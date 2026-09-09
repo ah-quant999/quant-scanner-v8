@@ -1342,6 +1342,20 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">· <b>算法链</b>：8 源全部在链上自产，且全部纳入「盘后选股门控」——18:00 前一律不跑，防半日数据出假选股（2026-08-20 主人令）。<br>· <b>云端 / 双机</b>：算法链跑前探针路由——本机 runner（lemoncat-cn）在线且空闲则按批转派 cn 链，否则云端跑全链，永不断供；两机共用同一份算法链代码，源配置天然一致。<br>· <b>运维</b>：健康面板对各源数据卡的新鲜度统一按 360 分钟阈值监控；某源红灯 = 看它产出脚本在哪个批次，等对应批次跑完即可自愈。<br>· <b>生效时点</b>：算法链 run 启动时即锁定代码快照——push 新源后<b>正在跑的链不可见</b>，下一次 checkout 才生效。若当晚推荐卡没出现新源标签，先看链的启动时间，勿误报故障。</div>
         <div class="logic-h">不接入的源</div>
         <div class="logic-p"><b>选股生命周期</b>（2026-09-04 主人拍板）：不做入选 source，二期转为<b>负向护栏</b>（只对已入选标的做剔除/降权，不做发现信号）——它管的是「已持有/已入选」的票，不是找新票。</div>
+      <div class="card">
+        <h3><span class="ic">🗓️</span>盘后算法链分批明细（A/B/D/E 各批跑什么 · 2026-09-09 主人令备忘）</h3>
+        <div class="logic-p">算法链按依赖顺序编排为 4 个按时触发的 stage，每 stage 独立触发、独立 timeout；同 stage 内严格沿用 ORDER 相对次序<b>串行</b>执行（批内无 sleep，背靠背跑）。跨 stage 产物经 main 分支传递：每 stage 跑完即 stage(out→raw_data)+push，下游 stage 云端 run checkout main 即含上游当日产物。模块级强校验 <code>_STAGE_UNION == set(ORDER)</code>（共 42 条）保证分批模式不丢脚本。<b>concurrency 组 v8-algo-cloud，cancel-in-progress:false</b> —— 批间互不取消，长批(B)若越过 20:00 由 D 排队等待，绝不杀进程。</div>
+        <table class="lg-table">
+          <tr><th>批次</th><th>触发时点</th><th>脚本数</th><th>本批运行内容（按执行次序）</th><th>关键产物 / 说明</th></tr>
+          <tr><td><b>A 采集批</b></td><td>~16:40 CST</td><td>12</td><td>fetch_fundamental_quality / fetch_stock_names / gen_stock_profile / fetch_stock_quote_v8 / fetch_sh_index_fib / fetch_inst_trade / fetch_sector_rs / fetch_lhb / fetch_orphan_suspension / fetch_orphan_market_alerts / fetch_orphan_nt_data / fetch_orphan_sector_fund_flow</td><td>纯 fetch + 上游自产前置；龙虎榜 16:30 后数据齐</td></tr>
+          <tr><td><b>B 选股批</b></td><td>~18:10 CST</td><td>23</td><td><b>v8/factor_lab_gen.py（最前 · baostock 冷启动 50-90min）</b> → calc_crds / build_candidate_pool / calc_stock_rps / generate_top10 / strategy_four_volume_60m / strategy_four_volume / market_regime / sector_recommendation / update_triple_resonance_history / gen_triple_consensus / gen_triple_track / calc_volatility_watch / gen_stock_stop / gen_algo_track / calc_sentiment_cycle / refresh_dividend_cninfo / refresh_stock_metadata / fetch_weekend_run / auto_run_dn_algorithm / strong_breakout / track_h_auto_buy / gen_lhb_7d</td><td>🛡 2026-09-09 主人令：<b>因子实验室生成器前置到本批最前</b>，必须在 D 批 final_recommend 之前产完 FACTOR_LAB.js，因子融合才能吃当日新鲜因子（18:10 起跑→19:40 前产完，D 批必吃到）。B 批内其余脚本保持原相对次序不变</td></tr>
+          <tr><td><b>D 汇总批</b></td><td>~20:00 CST</td><td>1</td><td>final_recommend.py</td><td>跨策略共振 Top5（管线最终产物）。内置<b>因子实验室新鲜度门控</b>：等待 FACTOR_LAB.js 为当日新鲜最多 20min（正常 0 等待），超时仍不可用则<b>降级跳过融合</b>而非报错中断</td></tr>
+          <tr><td><b>E 回测批</b></td><td>~21:00 CST</td><td>7</td><td>backtest_tdx / backtest_comprehensive / backtest_expectancy / export_optimized_strategy / factor_lab_backtest / v8/backtest_crds / strategy_four_volume</td><td>backtest 全家 + 因子实验室分层回测（生成器已在 B 批前置）；strategy_four_volume 经 SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js（根治孤儿）</td></tr>
+        </table>
+        <div class="logic-h">批内同跑 / 跨批双模式注意</div>
+        <div class="logic-p">· <b>strategy_four_volume.py 跨 B/E 双批</b>：B=选股模式产 FOUR_VOLUME.js，E=回测模式产 FOUR_VOLUME_BACKTEST.js（SCRIPT_ENV 注入），属有意为之，非重复误挂。<br>· <b>B 批同跑多算法</b>：因子实验室生成器（baostock 独立数据源）与 calc_crds / build_candidate_pool / calc_stock_rps 等互无文件写冲突、互无前置依赖，可安全背靠背串行；final_recommend(D) 仅依赖 B 产物，不依赖 B 内部次序之外的任何东西。<br>· <b>选股门控</b>：全部选股/回测脚本纳入「18:00 前不跑」护栏，防半日数据出假选股。</div>
+      </div>
+
       </div>
 
 
@@ -2205,8 +2219,13 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">⑭ 算法链耗时优化（calc_stock_rps 8 线程并行 · 2026-09-03 夜班）</div>
         <div class="logic-p">云端算法链原串行耗时 ~2h40m，逐脚本解析日志定位 <code>calc_stock_rps.py</code> 占 ~60min（37%）。根因：跨境抓数（mootdx/baostock）串行。修复：<code>ThreadPoolExecutor(max_workers=8)</code> 并行化，每线程独立连接（pytdx 非线程安全 → <code>threading.local</code> 隔离；baostock <code>_BS_LOCK</code> 全局锁；缓存写加锁；<code>as_completed</code> 完成序输出）。预期 60min → 10~15min，整链提速约 50%。<b>仅云端主链生效</b>，属性能优化、前端无感知。</div>
 
-        <div class="logic-h">📌 双机分时铁律（现行模型，2026-09-04 更新）</div>
-        <div class="logic-p"><b>云端主链 24/7</b>：GitHub Actions ubuntu-latest 跑 <code>v8_cn_fetch_cloud</code>（数据抓取）+ <code>v8_algo_cloud</code>（算法链）+ <code>v8_build_deploy</code>（部署）+ <code>v8_health_patrol</code>/<code>v8_freshness_watch</code>（兜底监控），全部 cron 自动调度，<b>不依赖本地机器</b>。<b>小九（单位机 / lemoncat-cn runner）</b>：看门狗监督 + 应急 <code>workflow_dispatch</code> 兜底 + 算法链探针路由 cn 执行机，不跑 cron 主链（主链云端 cron）。<b>阿狸咪（家中机）</b>：夜间/周末班（18:00–次日 7:30 + 周末）部署 v8 主力；本地预览一律用真身仓库 <code>E:/qs_workspaces/quant-scanner-v8/index.html</code>（<b style="color:#ef5350">🔴 禁用 E:/workspace 任何路径——坚果云 junction，2026-09-04 实证会整仓删除仓库</b>）。改完+审计通过即直接上线，不再逐次请示（2026-08-29 主人授权放宽）。</div>
+        <div class="logic-h">📌 双机分时铁律（升级版·接力赛模型，2026-09-09 更新）</div>
+        <div class="logic-p">
+        <b>云端主链 24/7</b>：GitHub Actions ubuntu-latest 跑 <code>v8_cn_fetch_cloud</code>（数据抓取）+ <code>v8_algo_cloud</code>（算法链）+ <code>v8_build_deploy</code>（部署）+ <code>v8_health_patrol</code>/<code>v8_freshness_watch</code>（兜底监控），全部 cron 自动调度，<b>不依赖本地机器</b>。
+        <b>盘中主力＝小九准点档</b>：新增 <code>v8_cn_fetch_intraday_lemoncat.yml</code>（小九 self-hosted cn runner），工作日 14 档（9:40/10:00/10:20/10:40/11:00/11:20/11:40/13:00/13:20/13:40/14:00/14:20/14:40/15:00 CST，跳午休）统一调度：每档先 dispatch 云端 <code>v8_cn_fetch_cloud</code>（category=intraday）→ sleep 10 分钟 → gh api 查 run 状态 → 失败/超时则 dispatch <code>v8_cn_fetch_cloud_selfhosted</code>（小九 cn IP 兜底）。单源 + 接力赛 + 同 concurrency group（<code>v8-cn-fetch-cloud</code>）互斥排队，不再双源互踢。
+        <b>盘后+夜间+周末主力＝阿狸咪</b>：17:30 起（含夜间、盘前备份、周末 08:00-23:00）由阿狸咪 WorkBuddy 自动化「云端按铃」30 分钟轮 dispatch 云端；盘中（9:40-17:30）阿狸咪阈值放宽到 60 分钟只作兜底（小九整台机掉才触发）。
+        <b>铁律</b>：白天阿狸咪是备机（只盯不派发），晚上小九是备机（只盯不派发）；谁在主力时段谁调度，另一台绝不抢节奏。
+        <b>本地预览</b>：一律用真身仓库 <code>E:/qs_workspaces/quant-scanner-v8/index.html</code>（<b style="color:#ef5350">🔴 禁用 E:/workspace 任何路径——坚果云 junction，2026-09-04 实证会整仓删除仓库</b>）。改完+审计通过即直接上线，不再逐次请示（2026-08-29 主人授权放宽）。</div>
 
         <div class="logic-h" style="background:linear-gradient(135deg,#7c2d12,#9a3412);color:#fed7aa;padding:8px 12px;border-radius:6px;margin:12px 0;">📋 2026-08-11 今日改动汇总（双机运维/逻辑详解/防覆盖）</div>
         <div class="logic-p"><b>推送入库</b>：commit <code>c232edf5a</code> 起所有本地→远端已同步（<code>git pull --rebase</code> 验证）。共 7 个功能 commit + 多份 v8 build。</div>
