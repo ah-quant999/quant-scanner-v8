@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "46cef9c66";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "2ea84e459";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -507,36 +507,36 @@ window.__domReadyFns=[];
   .tp-hist-cell .tp-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
 </style>
-    <script src="data/ETF_INTRADAY_HEAT.js?v=e65f48873d" defer></script>
-    <script src="data/SECTOR_FUND_FLOW.js?v=580cb0384a" defer></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=67e60b6d35" defer></script>
+    <script src="data/SECTOR_FUND_FLOW.js?v=8660217e79" defer></script>
 
-    <script src="data/SECTOR_FUND_FLOW_TREND.js?v=d6fc67f26d" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_TREND.js?v=bab4a01c4b" defer></script>
     <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=8ccf0dd89b" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=252f0fe179" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
-    <script src="data/SUSPENSION_ALERT.js?v=c09e1e01ec" defer></script>
-    <script src="data/GOLD_POOL.js?v=a995a8cd58" defer></script>
+    <script src="data/SUSPENSION_ALERT.js?v=495058324b" defer></script>
+    <script src="data/GOLD_POOL.js?v=109302253d" defer></script>
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_PROFILE 不再单独下载（1.4MB 与 STOCK_LIST 100% 重复），由 STOCK_LIST 合成 -->
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
-    <script src="data/MACRO_DATA.js?v=33a7605150" defer></script>
-    <script src="data/MACRO_BRIEF.js?v=ef3827cfc2" defer></script>
-<script src="data/NT_DATA.js?v=9441dc2d0a" defer></script>
-<script src="data/LHB_DATA.js?v=eb1feb04f9" defer></script>
+    <script src="data/MACRO_DATA.js?v=7df27219eb" defer></script>
+    <script src="data/MACRO_BRIEF.js?v=b34522fa28" defer></script>
+<script src="data/NT_DATA.js?v=ad1c9cf1bc" defer></script>
+<script src="data/LHB_DATA.js?v=d9fca103cf" defer></script>
 <!-- 2026-08-31 轻量化：data/LHB_7D.js（5.9 KB）前端零引用，停止注入（省 5.9 KB） -->
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
-<script src="data/CONCEPT_RANKING.js?v=cddc2b12d9" defer></script>
+<script src="data/CONCEPT_RANKING.js?v=3e718394d4" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
-<script src="data/INDEX_QUOTES.js?v=c0d915e401" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=688e4def8d" defer></script>
-<script src="data/MARGIN_DATA.js?v=fbb32aaf18" defer></script>
-<script src="data/CFFEX_HOLDINGS.js?v=075cd4d1bd" defer></script>
-<script src="data/IPO_DATA.js?v=d4ff0fcf72" defer></script>
-    <script src="data/CRISIS_DATA.js?v=2515eeb6e3" defer></script>
-    <script src="data/JUDGMENT_DATA.js?v=db3db2bdc0" defer></script>
-    <script src="data/OVERSEAS_MARKETS.js?v=6ff788711e" defer></script>
+<script src="data/INDEX_QUOTES.js?v=6152552ba7" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=eadcb15ed6" defer></script>
+<script src="data/MARGIN_DATA.js?v=f3e80831ff" defer></script>
+<script src="data/CFFEX_HOLDINGS.js?v=36cc53a2da" defer></script>
+<script src="data/IPO_DATA.js?v=5cca367892" defer></script>
+    <script src="data/CRISIS_DATA.js?v=e53207031e" defer></script>
+    <script src="data/JUDGMENT_DATA.js?v=fa7fb5e5b9" defer></script>
+    <script src="data/OVERSEAS_MARKETS.js?v=943b3836b1" defer></script>
     <script src="data/STOCK_RPS.js?v=5981d847d8" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
@@ -548,10 +548,10 @@ window.__domReadyFns=[];
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=959751fc26" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
-    <script src="data/RISK_GAUGE.js?v=cb418bdfba" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
+    <script src="data/RISK_GAUGE.js?v=414f697b47" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=8b638cdc2a" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
-    <script src="data/WEEKEND_META_REPORT.js?v=3da570c4a0" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
-  <script src="data/AVG_PRICE_DATA.js?v=c1770a9ba6" defer></script>
+    <script src="data/WEEKEND_META_REPORT.js?v=4f62ef0d8d" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
+  <script src="data/AVG_PRICE_DATA.js?v=7aaaa1e88b" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
@@ -1554,59 +1554,59 @@ function _buildJudgmentEnvHTML(d){
 window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 </script>
 <script src="data/CRDS_CARD_DATA.js?v=74f1946283" defer></script>
-<script src="data/TRIPLE_CONSENSUS.js?v=9c04df2780" defer></script>
-<script src="data/TRIPLE_TRACK.js?v=4236531b93" defer></script>
+<script src="data/TRIPLE_CONSENSUS.js?v=62d776bb9f" defer></script>
+<script src="data/TRIPLE_TRACK.js?v=38bf8cdce2" defer></script>
 <script src="data/TRIPLE_HISTORY.js?v=6d764c7254" defer></script>
-<script src="data/V8_CAL.js?v=3c4de71c59"></script>
-<script src="data/SH_FIB.js?v=96089e0484" defer></script>
-<script src="data/SZ_FIB.js?v=1bf3ac99f8" defer></script>
-<script src="data/SECTOR_RS.js?v=46efc90be5" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=d4728531a3" defer></script>
-<script src="data/INST_TRADE.js?v=39382e57bc" defer></script>
-<script src="data/NORTH_FUND.js?v=b21b25589d" defer></script>
-<script src="data/MARKET_ALERTS.js?v=730a603415" defer></script>
-<script src="data/MARKET_FUND_FLOW_DATA.js?v=8e4543cc68" defer></script>
-<script src="data/LIMIT_UP_HEATMAP.js?v=2c2c60653a" defer></script>
-<script src="data/LIMIT_UP_BROKEN.js?v=08a94c5ab0" defer></script>
-<script src="data/HERDING_DATA.js?v=53e8a301ab" defer></script>
+<script src="data/V8_CAL.js?v=5834f0ad8f"></script>
+<script src="data/SH_FIB.js?v=1354609a56" defer></script>
+<script src="data/SZ_FIB.js?v=ab21b9ce66" defer></script>
+<script src="data/SECTOR_RS.js?v=6da7c8bfa9" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=899a084182" defer></script>
+<script src="data/INST_TRADE.js?v=8d765daf83" defer></script>
+<script src="data/NORTH_FUND.js?v=d26568130e" defer></script>
+<script src="data/MARKET_ALERTS.js?v=a3acb4134d" defer></script>
+<script src="data/MARKET_FUND_FLOW_DATA.js?v=a47db9c15a" defer></script>
+<script src="data/LIMIT_UP_HEATMAP.js?v=686cb33751" defer></script>
+<script src="data/LIMIT_UP_BROKEN.js?v=00174964b2" defer></script>
+<script src="data/HERDING_DATA.js?v=4747b4f72d" defer></script>
 <script src="data/VOLATILITY.js?v=c6a682569d" defer></script>
-<script src="data/CAPITAL_FLOW_DATA.js?v=94e8aba761" defer></script>
-<script src="data/SH_SZ_HISTORY.js?v=1a3cd00484" defer></script>
-<script src="data/CANDIDATE.js?v=adaaa473a3" defer></script>
-    <script src="data/FOUR_VOLUME.js?v=b1d4c0b7f1" defer></script>
-    <script src="data/FOUR_VOLUME_60M.js?v=cb80a744f3" defer></script>
+<script src="data/CAPITAL_FLOW_DATA.js?v=f653ca7427" defer></script>
+<script src="data/SH_SZ_HISTORY.js?v=ff59b6e854" defer></script>
+<script src="data/CANDIDATE.js?v=fefc847ad9" defer></script>
+    <script src="data/FOUR_VOLUME.js?v=eb0b05cd83" defer></script>
+    <script src="data/FOUR_VOLUME_60M.js?v=e711c506d7" defer></script>
     <script src="data/STOCK_STOP_DATA.js?v=a68a62efe3" defer></script>
     <!-- 2026-08-31 一劳永逸：window.STOCK_RPS_DATA 已由 line 492 data/STOCK_RPS.js 注入（最新 19:16 版本），
          此处再引入 data/STOCK_RPS_DATA.js（旧 01:56 版本）会覆盖最新数据 → 相对强度子页/状态胶囊均读到陈旧值。
          删除重复注入，确保全局只保留一份最新 RPS 数据。 -->
-<script src="data/BACKTEST_COMPREHENSIVE.js?v=4ae6e7d419" defer></script>
-<script src="data/BACKTEST_TDX.js?v=1fccaf414b" defer></script>
+<script src="data/BACKTEST_COMPREHENSIVE.js?v=0486857870" defer></script>
+<script src="data/BACKTEST_TDX.js?v=cf62d2ce62" defer></script>
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=b791ee970c" defer></script>
-<script src="data/EXPERIMENT.js?v=b224b795a2" defer></script>
+<script src="data/EXPERIMENT.js?v=0aa4ad6e47" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=173bbe3293" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=46f7231a0f" defer></script>
-    <script src="data/IMA_STRONG_STOCK.js?v=e987b11592" defer></script>
+<script src="data/V8_POOL_TRACKER.js?v=ae7be52940" defer></script>
+    <script src="data/IMA_STRONG_STOCK.js?v=16ee91581a" defer></script>
     <!-- 🆕 2026-09-04 强势突破选股（高手算法反推版 v1，strong_breakout.py 盘后产出） -->
     <script src="data/STRONG_BREAKOUT.js?v=c168a911cb" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=97cf955dbc" defer></script>
     <script src="data/RPS_BACKTEST.js?v=0235eea550" defer></script>
-    <script src="data/FACTOR_LAB.js?v=90ead7d0a4" defer></script>
+    <script src="data/FACTOR_LAB.js?v=86980a0312" defer></script>
 <!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
-<script src="data/ETF_PULSE.js?v=c2fb00a40d" defer></script>
-<script src="data/ETF_DAILY_MONITOR.js?v=e6704856a3" defer></script>
-<script src="data/TOP10_DAILY.js?v=17a4ae6408" defer></script>
-<script src="data/WEEKEND_RUN.js?v=2fbba77033" defer></script>
-<script src="data/W52_HIGH.js?v=2800811dda" defer></script>
+<script src="data/ETF_PULSE.js?v=805470de9a" defer></script>
+<script src="data/ETF_DAILY_MONITOR.js?v=ecc1760daf" defer></script>
+<script src="data/TOP10_DAILY.js?v=6f7e027d0c" defer></script>
+<script src="data/WEEKEND_RUN.js?v=672ebb57b6" defer></script>
+<script src="data/W52_HIGH.js?v=803ee2116f" defer></script>
 <!-- 2026-08-30：盘后数据页新增解禁日历 + 业绩预告 -->
-<script src="data/RESTRICTED_RELEASE.js?v=5ff596ab87" defer></script>
-<script src="data/PERFORMANCE_FORECAST.js?v=cc09d05c63" defer></script>
+<script src="data/RESTRICTED_RELEASE.js?v=0b5cf57953" defer></script>
+<script src="data/PERFORMANCE_FORECAST.js?v=ec823ac962" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=086dcef996" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=3b91985a76" defer></script>
-<script src="data/HEALTH_CHECK.js?v=8053498995" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=b091733dc2" defer></script>
+<script src="data/RUNNER_STATUS.js?v=906f65224e" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=d1800a9b35" defer></script>
+<script src="data/HEALTH_CHECK.js?v=55211f16df" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=d04e98042f" defer></script>
     <!-- 2026-09-07 主人令：中信 PE 极值温度计 + PE<10 历史回测 双卡（暂未上架·实验区最下方） -->
     <script src="data/CITIC_PE_THERMO.js?v=3f8fc3589c" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=31b4f7272d" defer></script>
@@ -1616,15 +1616,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/FACTOR_AUDIT.js?v=f299ef15d5" defer></script>
     <!-- 2026-09-09 主人令：A股指数价格中枢+趋势门控框架迁移（暂未上架） -->
     <script src="data/INDEX_VALUE_FRAMEWORK.js?v=af773b1619" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=afd2018474" defer></script>
+    <!-- 2026-09-10 主人令：AI 洞察多源观点对比卡（暂未上架·实验区最下方） -->
+    <script src="data/AI_INSIGHTS_COMPARE.js?v=7379bf0f81" defer></script>
+    <!-- 2026-09-10 主人令：因子补缺 walk-forward 进度跟踪卡（暂未上架·实验区最下方） -->
+    <script src="data/FACTOR_PROGRESS.js?v=6c76fd402b" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=bef89fbe02" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=dcdcb83e19" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=a6a04dad9f" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=9daaa204bb" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=e7f5f4fb6f" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=44a3b99508" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=8c5e7e1418" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
-    <script src="data/FOUR_VOLUME_BACKTEST.js?v=b834739002" defer></script>
+    <script src="data/FOUR_VOLUME_BACKTEST.js?v=f7b073906f" defer></script>
     <!-- 2026-09-04 主人令收尾：ALLSITE_BACKTEST.js 注入已删（生成器/raw_data 已于 09-03「干掉全站精选」系列删除，前端无任何代码读 window.ALLSITE_BACKTEST，标签纯 404 噪音） -->
-    <script src="data/CRDS_BACKTEST.js?v=1f258a66c5" defer></script>
+    <script src="data/CRDS_BACKTEST.js?v=d82a900e52" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -1801,7 +1805,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       //   原 ok 仅校验 head 含卡名，但：defer 时序下需排序：
       //     1) HTML 分析到 line 1630+ 注册 ◐◦selfHealJudgmentHeader；
       //     2) HTML 继续分析到 line 10673 注册 v8CardHeader；
-      //     3) <script src="data/JUDGMENT_DATA.js?v=db3db2bdc0" defer> 和 <script src="data/MACRO_BRIEF.js?v=ef3827cfc2" defer> 在 HTML 分析完成后才异步执行；
+      //     3) <script src="data/JUDGMENT_DATA.js?v=fa7fb5e5b9" defer> 和 <script src="data/MACRO_BRIEF.js?v=b34522fa28" defer> 在 HTML 分析完成后才异步执行；
       //     4) 首次 initCardBadges / switchSec 触发 ◐◦renderJudgmentHeader 时，JUDGMENT_DATA.js 可能还没加载完；
       //     5) ts='' → v8CardHeader 返回的 HTML 中：卡名、副标题，但缺少「更新于」膠勢；
       //     6) 自愈校验 ok 通过（head.innerHTML.indexOf('今日判定')>=0）→ 永不重昆明；
@@ -6052,11 +6056,218 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px;">' + idxCards + '</div>'
       + '<div style="background:rgba(249,115,22,.05);border:1px solid rgba(249,115,22,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
       + '⚠️ <b style="color:#f97316;">框架迁移说明</b>：把 QQQ/TQQQ 的「估值中枢 + 价格档位 + 趋势门控」迁移到 A 股指数。当前仅上证指数有 5 年真实日K（来自 INDEX_HISTORY.js），中证系列因数据源接口在当前环境不可用，仅作占位。'
-      + '与左侧「估值分位切换卡」互补：本卡看<b>价格行为</b>，左卡看<b>PE-TTM 估值分位</b>。'
+      +       '与左侧「估值分位切换卡」互补：本卡看<b>价格行为</b>，左卡看<b>PE-TTM 估值分位</b>。'
       + '</div>';
   };
 
-  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderRpsAudit(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeThermo(); }catch(e){} try{ window.__renderCiticPeBacktest(); }catch(e){} try{ window.__renderValuationPercentile(); }catch(e){} try{ window.__renderFactorAudit(); }catch(e){} try{ window.__renderIndexValueFramework(); }catch(e){} }
+  // ===== 🔮 AI 洞察多源观点对比（2026-09-10 主人令：暂未上架·实验区最下方）=====
+  // 数据源：data/maharo_macro.js（已由小九日 07:22 拉好）→ 解析 daily/weekly/monthly 三段 AI 文本
+  // 提取板块提及频次 + 句子极性（看多/看空/中性），输出"AI 不同时长尺度上观点对比"
+  window.__aicRetry = 0;
+  window.__renderAiInsightsCompare = function(){
+    var dst = document.getElementById('aiInsightsCompareBody');
+    if(!dst) return;
+    var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+    var C = window.AI_INSIGHTS_COMPARE;
+    if(!C || !C.texts || !C.extracted){
+      if(window.__aicRetry < 25){ window.__aicRetry++; setTimeout(window.__renderAiInsightsCompare, 600); return; }
+      dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F52E; AI 洞察对比 数据未到位</div>';
+      return;
+    }
+    function renderScale(per){
+      var w = Math.max(2, Math.round(per * 100));
+      var c = per >= 0.6 ? '#ef5350' : (per >= 0.4 ? '#fbbf24' : '#26a69a');
+      return '<div style="background:rgba(148,163,184,.15);border-radius:3px;height:5px;margin-top:3px;overflow:hidden;">'
+        + '<div style="width:' + w + '%;height:100%;background:' + c + ';"></div></div>';
+    }
+    function renderBar(pol, label){
+      var tot = pol.bull + pol.bear + pol.neutral;
+      if(!tot) return '';
+      var bPct = Math.round(pol.bull / tot * 100);
+      var brPct = Math.round(pol.bear / tot * 100);
+      var nPct = 100 - bPct - brPct;
+      return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:11px;">'
+        + '<span style="width:42px;color:var(--sub);">' + label + '</span>'
+        + '<div style="flex:1;display:flex;height:7px;border-radius:3px;overflow:hidden;">'
+        + '<div style="width:' + bPct + '%;background:#ef5350;" title="看多 ' + pol.bull + ' 句"></div>'
+        + '<div style="width:' + brPct + '%;background:#26a69a;" title="看空 ' + pol.bear + ' 句"></div>'
+        + '<div style="width:' + nPct + '%;background:rgba(148,163,184,.3);" title="中性 ' + pol.neutral + ' 句"></div>'
+        + '</div>'
+        + '<span style="width:64px;font-size:10px;color:var(--dim);">看多' + bPct + '% / 看空' + brPct + '%</span></div>';
+    }
+    function renderSectorCol(title, sectors, accent){
+      if(!sectors) sectors = {};
+      var keys = Object.keys(sectors).slice(0, 6);
+      if(!keys.length) return '<div style="font-size:11px;color:var(--dim);padding:8px;">（无板块提及）</div>';
+      var maxV = Math.max.apply(null, keys.map(function(k){ return sectors[k]; }));
+      return '<div style="background:rgba(' + accent + ',.05);border:1px solid rgba(' + accent + ',.25);border-radius:7px;padding:8px 10px;">'
+        + '<div style="font-size:11.5px;font-weight:700;color:rgb(' + accent + ');margin-bottom:6px;">' + title + ' · Top 6 板块</div>'
+        + keys.map(function(k){
+          var n = sectors[k];
+          var per = n / maxV;
+          return '<div style="margin-bottom:5px;">'
+            + '<div style="display:flex;justify-content:space-between;font-size:11px;">'
+            + '<span style="color:var(--txt);">' + _ev(k) + '</span>'
+            + '<span style="font-weight:700;color:rgb(' + accent + ');">' + n + '</span></div>'
+            + renderScale(per)
+            + '</div>';
+        }).join('')
+        + '</div>';
+    }
+    var scope = C.scope || {};
+    var dScope = scope.daily || {}; var wScope = scope.weekly || {}; var mScope = scope.monthly || {};
+    var dEx = C.extracted.daily || {}; var wEx = C.extracted.weekly || {}; var mEx = C.extracted.monthly || {};
+    var src = dScope.sources_read || '?';
+    dst.innerHTML = ''
+      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
+      + '<b style="font-size:15px;">&#x1F52E; AI 洞察·多源观点对比</b>'
+      + '<span style="font-size:10px;font-weight:600;color:#8b5cf6;background:rgba(139,92,246,.12);padding:1px 6px;border-radius:4px;">暂未上架 · AI 观察</span>'
+      + _uBadge('盘后', '中长线', C.update_time, 'maharo_macro 7 源聚合 · ' + src)
+      + '</div>'
+      // 2026-09-10 主人令：卡名下方加"核心 + 解析"
+      + '<div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.22);border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.7;">'
+      + '<div style="font-size:12px;color:var(--txt);margin-bottom:6px;">'
+      + '&#x1F4CC; <b style="color:#8b5cf6;">核心</b>：把 MAHORO_MACRO 的 <b>daily / weekly / monthly</b> 三段 AI 文本<b>并排对比</b>——统计各时段 AI 提到的板块/主线频次 + 句子级看多/看空/中性比例。'
+      + '</div>'
+      + '<div style="font-size:11.5px;color:var(--sub);">'
+      + '&#x1F4A1; <b style="color:#8b5cf6;">解析</b>：同一 AI 在 <b>不同时长尺度上的观点强度</b>（月 > 周 > 日 的关切可能完全不同）。'
+      + '板块提及 Top 6 用相对宽度（不同时长文本长度不同，绝对次数不可比，<b>请看比例</b>）。'
+      + '<b>绝对不替代个股信号</b>，是顶层 AI 观点分布的<b>展示型</b>卡。'
+      + '</div></div>'
+      // 极性条
+      + '<div style="background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.2);border-radius:7px;padding:8px 12px;margin-bottom:12px;">'
+      + '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:6px;">观点极性分布（句子级·关键词法）</div>'
+      + renderBar(dEx.polarity || {}, '日 ' + (dScope.date || ''))
+      + renderBar(wEx.polarity || {}, '周 ' + (wScope.period || ''))
+      + renderBar(mEx.polarity || {}, '月 ' + (mScope.period || ''))
+      + '</div>'
+      // 3 列板块对比
+      + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">'
+      + renderSectorCol('日 · ' + (dScope.date || ''), dEx.sector_hits, '239, 68, 68')
+      + renderSectorCol('周 · ' + (wScope.period || ''), wEx.sector_hits, '251, 146, 60')
+      + renderSectorCol('月 · ' + (mScope.period || ''), mEx.sector_hits, '34, 197, 94')
+      + '</div>'
+      // 三段全文折叠
+      + '<div style="background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.2);border-radius:7px;padding:8px 12px;margin-bottom:10px;">'
+      + '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:6px;">三段全文（同期对比）</div>'
+      + '<details style="margin-bottom:4px;"><summary style="font-size:11.5px;font-weight:600;color:#ef5350;cursor:pointer;">日 · ' + _ev(dScope.date || '') + ' (' + (C.texts.daily || '').length + ' 字)</summary>'
+      + '<pre style="white-space:pre-wrap;font-size:11.5px;line-height:1.7;color:var(--sub);margin:6px 0 0 0;font-family:inherit;">' + _ev(C.texts.daily || '') + '</pre></details>'
+      + '<details style="margin-bottom:4px;"><summary style="font-size:11.5px;font-weight:600;color:#fb923c;cursor:pointer;">周 · ' + _ev(wScope.period || '') + ' (' + (C.texts.weekly || '').length + ' 字)</summary>'
+      + '<pre style="white-space:pre-wrap;font-size:11.5px;line-height:1.7;color:var(--sub);margin:6px 0 0 0;font-family:inherit;">' + _ev(C.texts.weekly || '') + '</pre></details>'
+      + '<details><summary style="font-size:11.5px;font-weight:600;color:#22c55e;cursor:pointer;">月 · ' + _ev(mScope.period || '') + ' (' + (C.texts.monthly || '').length + ' 字)</summary>'
+      + '<pre style="white-space:pre-wrap;font-size:11.5px;line-height:1.7;color:var(--sub);margin:6px 0 0 0;font-family:inherit;">' + _ev(C.texts.monthly || '') + '</pre></details>'
+      + '</div>'
+      // 底部
+      + '<div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
+      + '⚠️ <b style="color:#8b5cf6;">展示型卡</b>：本卡输出的是 mahoro_macro 既有 AI 文本的结构化对比视图，<b>不抓新源、不增加新接口</b>。'
+      + '板块词典 50 个为人工整理，待小九到岗后可补全；极性判断为关键词法（看多/看空词表），仅供参考。'
+      + '数据源更新于 ' + _ev(C.source_update_time || '?') + '，下次刷新跟 MAHORO_MACRO 同步（盘前 08:30 CST）。'
+      + '</div>';
+  };
+
+  // ===== 🧪 因子补缺 walk-forward 进度跟踪（2026-09-10 主人令：暂未上架·实验区最下方）=====
+  // 数据源：raw_data/factor_progress.json（由 gen_factor_progress.py 根据 FACTOR_AUDIT + 主人分批决策生成）
+  window.__fpRetry = 0;
+  window.__renderFactorProgress = function(){
+    var dst = document.getElementById('factorProgressBody');
+    if(!dst) return;
+    var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+    var P = window.FACTOR_PROGRESS;
+    if(!P || !P.factors || !P.factors.length){
+      if(window.__fpRetry < 25){ window.__fpRetry++; setTimeout(window.__renderFactorProgress, 600); return; }
+      dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F9EA; 因子补缺进度 数据未到位</div>';
+      return;
+    }
+    function batchColor(b){
+      if(b === 1) return '#ef5350';
+      if(b === 2) return '#fb923c';
+      return '#94a3b8';
+    }
+    function statusIcon(s){
+      if(s === 'done') return '<span style="color:#22c55e;">✅ done</span>';
+      if(s === 'in_progress') return '<span style="color:#fb923c;">⏳ 跑中</span>';
+      if(s === 'blocked') return '<span style="color:#ef5350;">⛔ blocked</span>';
+      return '<span style="color:var(--dim);">⏸ pending</span>';
+    }
+    // 进度条：done=绿、in_progress=橙、pending=灰
+    var st = P.summary || {};
+    var rows = P.factors.map(function(f){
+      var bc = batchColor(f.batch);
+      return '<tr>'
+        + '<td style="padding:6px 8px;font-size:12px;font-weight:800;color:' + bc + ';">B' + f.batch + '</td>'
+        + '<td style="padding:6px 8px;font-size:12px;font-weight:700;color:var(--txt);">' + _ev(f.name) + '</td>'
+        + '<td style="padding:6px 8px;font-size:11px;color:var(--sub);">' + _ev(f.label) + '</td>'
+        + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">' + _ev(f.data_source) + '</td>'
+        + '<td style="padding:6px 8px;font-size:11px;">' + statusIcon(f.backtest_status) + '</td>'
+        + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">' + _ev(f.oos_ir == null ? '—' : (f.oos_ir.toFixed ? f.oos_ir.toFixed(2) : f.oos_ir)) + '</td>'
+        + '<td style="padding:6px 8px;font-size:11px;font-weight:600;color:var(--sub);">' + _ev(f.owner || '?') + '</td>'
+        + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">' + _ev(f.deploy_status) + '</td>'
+        + '</tr>';
+    }).join('');
+    // 批次进度条
+    var batches = st.batches || {};
+    var batchBars = [1,2,3].map(function(b){
+      var s = batches[b] || {total:0, pending:0, done:0};
+      var doneW = s.total ? Math.round(s.done / s.total * 100) : 0;
+      var pendW = 100 - doneW;
+      var label = s.total ? ('B' + b + ' · ' + s.done + '/' + s.total) : ('B' + b + ' · 0');
+      return '<div style="margin-bottom:6px;">'
+        + '<div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:2px;">'
+        + '<span style="font-weight:700;color:' + batchColor(b) + ';">' + label + '</span>'
+        + '<span style="color:var(--dim);">done ' + doneW + '%</span></div>'
+        + '<div style="display:flex;height:8px;border-radius:3px;overflow:hidden;background:rgba(148,163,184,.15);">'
+        + '<div style="width:' + doneW + '%;background:#22c55e;"></div>'
+        + '<div style="width:' + pendW + '%;"></div>'
+        + '</div></div>';
+    }).join('');
+    dst.innerHTML = ''
+      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
+      + '<b style="font-size:15px;">&#x1F9EA; 因子补缺·walk-forward 进度</b>'
+      + '<span style="font-size:10px;font-weight:600;color:#f59e0b;background:rgba(245,158,11,.12);padding:1px 6px;border-radius:4px;">暂未上架 · 跟踪卡</span>'
+      + _uBadge('盘后', '研究', P.update_time, P.source_update_time)
+      + '</div>'
+      // 2026-09-10 主人令：卡名下方加"核心 + 解析"
+      + '<div style="background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.22);border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.7;">'
+      + '<div style="font-size:12px;color:var(--txt);margin-bottom:6px;">'
+      + '&#x1F4CC; <b style="color:#f59e0b;">核心</b>：按主人 2026-09-09 22:31 决策的<b>分批 walk-forward 计划</b>跟踪 7 因子补缺进度——B1 高优（质量+价值）/ B2 中优（规模+流动性）/ B3 低优（已覆盖）。'
+      + '</div>'
+      + '<div style="font-size:11.5px;color:var(--sub);">'
+      + '&#x1F4A1; <b style="color:#f59e0b;">解析</b>：上线条件 = <b>OOS IR &gt; 0.3</b> 且 4/5 年胜率 &gt; 55%。'
+      + '<b>严禁直接硬编码高分</b>，每因子必须先跑 walk-forward（5 年 × 12 月）按 edge 定权重，再回填 oos_ir / status。'
+      + 'owner 标注数据源责任人；<b>小九到岗后从 B1 开始跑</b>。'
+      + '</div></div>'
+      // 全局汇总
+      + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">'
+      + '<div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">总因子</div><div style="font-size:20px;font-weight:800;color:#f59e0b;">' + (st.total || 0) + '</div></div>'
+      + '<div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">已 done</div><div style="font-size:20px;font-weight:800;color:#22c55e;">' + (st.done || 0) + '</div></div>'
+      + '<div style="background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">pending</div><div style="font-size:20px;font-weight:800;color:#94a3b8;">' + (st.pending || 0) + '</div></div>'
+      + '<div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">完成率</div><div style="font-size:20px;font-weight:800;color:#f59e0b;">' + (st.total ? Math.round((st.done||0) / st.total * 100) : 0) + '%</div></div>'
+      + '</div>'
+      // 3 批次进度条
+      + '<div style="background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.2);border-radius:7px;padding:8px 12px;margin-bottom:12px;">'
+      + '<div style="font-size:12px;font-weight:700;color:#f59e0b;margin-bottom:8px;">分批进度</div>'
+      + batchBars
+      + '</div>'
+      // 7 因子表
+      + '<div style="overflow-x:auto;margin-bottom:12px;">'
+      + '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
+      + '<thead><tr style="background:rgba(245,158,11,.08);">'
+      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">批</th>'
+      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">因子</th>'
+      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">标签</th>'
+      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">数据源</th>'
+      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">回测</th>'
+      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">OOS IR</th>'
+      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">owner</th>'
+      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">上线</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody></table></div>'
+      + '<div style="background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
+      + '⚠️ <b style="color:#f59e0b;">禁止直接硬编码高分</b>：OOS IR/sharpe/max_dd 必须由 walk-forward 真实跑出，<b>小九到岗后回填</b>再 dispatch 重跑 <code style="background:rgba(245,158,11,.1);padding:1px 4px;border-radius:3px;">gen_factor_progress.py</code>。'
+      + '本卡只跟踪流程，<b>不回填数据</b>。策略：' + _ev(P.policy || '') + ''
+      + '</div>';
+  };
+
+  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderRpsAudit(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeThermo(); }catch(e){} try{ window.__renderCiticPeBacktest(); }catch(e){} try{ window.__renderValuationPercentile(); }catch(e){} try{ window.__renderFactorAudit(); }catch(e){} try{ window.__renderIndexValueFramework(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} try{ window.__renderFactorProgress(); }catch(e){} }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
   } else {
@@ -7722,17 +7933,17 @@ window.__renderV8CalFull();
       applyData(window.IPO_DATA);
     }else{
       /* 🛡 2026-08-28 一劳永逸（主站审计 P1-8）：缓存戳 ?v= 从页面已注入的
-         <script src="data/IPO_DATA.js?v=d4ff0fcf72"> 实时读取，不再手写 hash。
+         <script src="data/IPO_DATA.js?v=5cca367892"> 实时读取，不再手写 hash。
          历史债务：本处注释写死一个旧 hash、实际引用是另一个、报错信息又写一遍，
          三处漂移；且手写 hash 不随构建更新 → CDN 吐旧副本 → 打新数据陈旧。
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=d4ff0fcf72"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=5cca367892"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=d4ff0fcf72';
+        return 'data/IPO_DATA.js?v=5cca367892';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
@@ -11530,6 +11741,12 @@ window.showRestrictedItems = showRestrictedItems;
       if(tab==='lab' && typeof window.__renderIndexValueFramework==='function'){
         try{ window.__renderIndexValueFramework(); }catch(e){}
       }
+      if(tab==='lab' && typeof window.__renderAiInsightsCompare==='function'){
+        try{ window.__renderAiInsightsCompare(); }catch(e){}
+      }
+      if(tab==='lab' && typeof window.__renderFactorProgress==='function'){
+        try{ window.__renderFactorProgress(); }catch(e){}
+      }
     };
     if(!window.__ulSelfHealTimer){
       window.__ulSelfHealTimer=setInterval(function(){
@@ -11562,7 +11779,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=dcdcb83e19';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=e7f5f4fb6f';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -11571,7 +11788,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=a6a04dad9f';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=44a3b99508';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -11642,6 +11859,10 @@ window.showRestrictedItems = showRestrictedItems;
     h += '<div class="card" id="factorAuditBody" style="margin-bottom:16px;border-left:4px solid #22c55e;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4CA; 因子审计：v8 选股 vs 质量价值中小盘多因子 加载中…</div></div>';
     // ═══ 2026-09-09 主人令：A股指数价格中枢+趋势门控框架迁移（暂未上架）═══
     h += '<div class="card" id="indexValueFrameworkBody" style="margin-bottom:16px;border-left:4px solid #f97316;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; 指数估值中枢 · 价格档位+趋势门控 加载中…</div></div>';
+    // ═══ 2026-09-10 主人令：AI 洞察多源观点对比卡（暂未上架·实验区最下方）═══
+    h += '<div class="card" id="aiInsightsCompareBody" style="margin-bottom:16px;border-left:4px solid #8b5cf6;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52E; AI 洞察·多源观点对比 加载中…</div></div>';
+    // ═══ 2026-09-10 主人令：因子补缺 walk-forward 进度跟踪卡（暂未上架·实验区最下方）═══
+    h += '<div class="card" id="factorProgressBody" style="margin-bottom:16px;border-left:4px solid #f59e0b;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F9EA; 因子补缺·walk-forward 进度 加载中…</div></div>';
     h += '</div>'; // /ulPaneLab
 
     // ===== 宏观观测 pane =====
@@ -11820,6 +12041,12 @@ window.showRestrictedItems = showRestrictedItems;
       if(tab==='lab' && typeof window.__renderIndexValueFramework==='function'){
         try{ window.__renderIndexValueFramework(); }catch(e){}
       }
+      if(tab==='lab' && typeof window.__renderAiInsightsCompare==='function'){
+        try{ window.__renderAiInsightsCompare(); }catch(e){}
+      }
+      if(tab==='lab' && typeof window.__renderFactorProgress==='function'){
+        try{ window.__renderFactorProgress(); }catch(e){}
+      }
     };
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
@@ -11844,6 +12071,10 @@ window.showRestrictedItems = showRestrictedItems;
     try{ if(typeof window.__renderFactorAudit==='function') window.__renderFactorAudit(); }catch(e){ console.warn('因子审计卡渲染失败', e); }
     // 📈 2026-09-09 主人令：指数估值中枢框架迁移卡（暂未上架·实验区最下方）
     try{ if(typeof window.__renderIndexValueFramework==='function') window.__renderIndexValueFramework(); }catch(e){ console.warn('指数估值中枢卡渲染失败', e); }
+    // 🔮 2026-09-10 主人令：AI 洞察多源观点对比卡（暂未上架·实验区最下方）
+    try{ if(typeof window.__renderAiInsightsCompare==='function') window.__renderAiInsightsCompare(); }catch(e){ console.warn('AI 洞察对比卡渲染失败', e); }
+    // 🧪 2026-09-10 主人令：因子补缺 walk-forward 进度跟踪卡（暂未上架·实验区最下方）
+    try{ if(typeof window.__renderFactorProgress==='function') window.__renderFactorProgress(); }catch(e){ console.warn('因子进度卡渲染失败', e); }
     // 📚 2026-09-07 主人令：maharo 机构研究卡（本机 cookie 拉取，云端无权限）
     try{ if(typeof window._fillMahoroCard==='function') window._fillMahoroCard(); }catch(e){ console.warn('maharo 卡渲染失败',e); }
   }
@@ -13496,7 +13727,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
   function _check(){
-    var url = _scriptUrl('data/HEALTH_CHECK.js?v=8053498995') + '_ts=' + Date.now();
+    var url = _scriptUrl('data/HEALTH_CHECK.js?v=55211f16df') + '_ts=' + Date.now();
     fetch(url,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var remote=_pickTs(t);
       if(remote){
@@ -14212,12 +14443,12 @@ window.__renderV8CalToday();
 <script>
 (function(){
   var BIG=[
-    {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=0412b6d861'},
+    {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=962a173150'},
     // 🛡 2026-08-31 一劳永逸：STOCK_PROFILE.js(1.4MB) 与 STOCK_LIST 的 industry/concepts
     //   实测 9602 条【零差异】、且 45.9% 为空值 → 停止单独下载，改由 STOCK_LIST 到位后就地
     //   合成 window.STOCK_PROFILE，前端引用点(819/5979 行)零改动。省 1.4 MB 下载。
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=7a7a46d283'},
-    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=d6e5eabdb6'}
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=ac8d3e8476'},
+    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=7ad7bbec58'}
   ];
   function loadOne(item, done){
     var s=document.createElement('script');

@@ -119,6 +119,10 @@ DATA_SOURCES = {
     "factor_audit.json":            "FACTOR_AUDIT",
     # 2026-09-09 主人令：A股指数价格中枢+趋势门控框架迁移（QQQ/TQQQ → A股，暂未上架）
     "index_value_framework.json":   "INDEX_VALUE_FRAMEWORK",
+    # 2026-09-10 主人令：AI 洞察多源观点对比卡（暂未上架·实验区最下方），源 MAHORO_MACRO 已有 insights
+    "ai_insights_compare.json":     "AI_INSIGHTS_COMPARE",
+    # 2026-09-10 主人令：因子补缺 walk-forward 进度跟踪卡（暂未上架），源 FACTOR_AUDIT
+    "factor_progress.json":         "FACTOR_PROGRESS",
     # 🛡 2026-08-26 一劳永逸根因修复：原 DATA_SOURCES 漏挂 final_recommend.json / stock_rps.json 映射，
     #   这两个 .js 仅由算法脚本（final_recommend.py / calc_stock_rps.py）写入，而云端 build 的 update_v8 步骤
     #   不覆盖它们 → data/FINAL_RECOMMEND_DATA.js、data/STOCK_RPS.js 站点读的 window.* 永远停在 08-22（源 raw_data 已是 08-25 新鲜）。
