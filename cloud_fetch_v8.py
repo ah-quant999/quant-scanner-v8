@@ -1139,6 +1139,13 @@ def run(label, fn, retries=2):
     time.sleep(0.5)
 
 
+# 🛡 2026-09-09 盘中更新审计·一劳永逸：intraday 类别下，只有核心行情源
+# (CANDIDATE_QUOTES/INDEX_QUOTES) 失败才令整轮非零；其余源（涨停/ETF/题材/资金流等）
+# 失败不再阻断 job → 根治 selfhosted 因单源失败整轮 abort、云端拥堵时无兜底的顽疾。
+# 盘前/盘后/全量类别仍维持原语义（任一核心源失败即致命，防空壳推送）。
+_CRIT_INTRADAY = {"CANDIDATE_QUOTES", "INDEX_QUOTES"}
+
+
 def _has_critical_failures(category):
     """判断本次抓取是否存在应让 workflow 失败的严重失败。
 
@@ -1148,8 +1155,12 @@ def _has_critical_failures(category):
     if not _run_status:
         return False
     # runner_status 不计入
-    fails = [k for k, v in _run_status.items()
-             if v.get("status") == "fail" and k != "RUNNER_STATUS"]
+    if category == "intraday":
+        fails = [k for k, v in _run_status.items()
+                 if v.get("status") == "fail" and k in _CRIT_INTRADAY]
+    else:
+        fails = [k for k, v in _run_status.items()
+                 if v.get("status") == "fail" and k != "RUNNER_STATUS"]
     return bool(fails)
 
 # 涨停池缓存（避免 limit_up_heatmap / herding 重复抓取同一份数据）
