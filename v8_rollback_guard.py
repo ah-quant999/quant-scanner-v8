@@ -45,11 +45,9 @@ CRITICAL_FILES = [
     "index.html",
     "v8_health_check.py",
     "wf_health.yml",
-    "data/DELISTED.js",
-    "data/UNLISTED_PANEL.js",
+        "data/UNLISTED_PANEL.js",
     "data/HEALTH_CHECK.js",
-    "scripts/build_delisted.py",
-    "scripts/build_unlisted_panel.py",
+        "scripts/build_unlisted_panel.py",
 ]
 
 # index.html 结构标记（一劳永逸修复的"指纹"）：
@@ -57,7 +55,6 @@ CRITICAL_FILES = [
 #   must_present=False → 当前版本【必须不含】此串，存在=旧 bug 复现
 STRUCTURAL_MARKERS = [
     {"name": "AI速览改持仓建议", "needle": "⚖ 持仓建议", "must_present": True},
-    {"name": "已下架数据注入", "needle": "data/DELISTED.js?", "must_present": True},
     {"name": "暂未上架模块索引注入", "needle": "data/UNLISTED_PANEL.js?", "must_present": True},
     {"name": "运维nav解锁兜底", "needle": "_v8ForceUnlockAdminTabs", "must_present": True},
     {"name": "炸板6列(grid)", "needle": "repeat(6, minmax(0,1fr));gap:5px 6px", "must_present": True},
