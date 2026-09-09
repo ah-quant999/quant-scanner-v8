@@ -1476,7 +1476,12 @@ def check_data_cards():
         if empty_fields and status == "ok":
             status = "warn"
         rel = fmt_rel_time(ts)
-        msg = f"更新于 {rel}"
+        # 🛡 2026-09-10 主人令：manual_dep 项的 message 在前面的 manual_note 处理段已写好
+        #   (msg=_note)，不要被下方默认的"更新于 {rel}"无条件覆盖，否则运维面板只显示陈旧时间，
+        #   看不到"待小九中国IP"等真实原因。判断：当前 manual_dep 项是否已带 note。
+        _has_manual_note = bool(d.get("manual_dep") and age_min > max_age and (d.get("manual_note") or d.get("alimi_note")))
+        if not _has_manual_note:
+            msg = f"更新于 {rel}"
         if weekend_skip:
             status = "ok"
             phase = "盘后" if page in ("盘后数据", "选股策略") else "盘前"
