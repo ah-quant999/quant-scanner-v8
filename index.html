@@ -530,7 +530,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=cddc2b12d9" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=c0d915e401" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=8ed85afc0f" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=eadcb15ed6" defer></script>
 <script src="data/MARGIN_DATA.js?v=9b14a3b871" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=075cd4d1bd" defer></script>
 <script src="data/IPO_DATA.js?v=d4ff0fcf72" defer></script>
@@ -1605,18 +1605,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=1e65665d22" defer></script>
     <script src="data/AUDIT_TRAIL.js?v=ffcd8efbe2" defer></script>
-<script src="data/HEALTH_CHECK.js?v=98c270e8b2" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=ff9b83d383" defer></script>
+<script src="data/HEALTH_CHECK.js?v=3ff35f6d60" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=b9f45f2196" defer></script>
     <!-- 2026-09-07 主人令：中信 PE 极值温度计 + PE<10 历史回测 双卡（暂未上架·实验区最下方） -->
-    <script src="data/CITIC_PE_THERMO.js?v=f33cb17c29" defer></script>
-    <script src="data/CITIC_PE_BACKTEST.js?v=8a8894a3b0" defer></script>
+    <script src="data/CITIC_PE_THERMO.js?v=3f8fc3589c" defer></script>
+    <script src="data/CITIC_PE_BACKTEST.js?v=31b4f7272d" defer></script>
     <!-- 2026-09-09 主人令：A股指数 PE-TTM 历史分位切换卡（暂未上架·实验区） -->
     <script src="data/VALUATION_PERCENTILE.js?v=640a3d4ca8" defer></script>
     <!-- 2026-09-09 主人令：A股质量价值中小盘多因子 vs v8 选股因子审计（暂未上架） -->
     <script src="data/FACTOR_AUDIT.js?v=d1cd8708e7" defer></script>
     <!-- 2026-09-09 主人令：A股指数价格中枢+趋势门控框架迁移（暂未上架） -->
     <script src="data/INDEX_VALUE_FRAMEWORK.js?v=7fe1825904" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=0e462db226" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=03ca65ea34" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=e7f5f4fb6f" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=44a3b99508" defer></script>
@@ -13468,7 +13468,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
   function _check(){
-    var url = _scriptUrl('data/HEALTH_CHECK.js?v=98c270e8b2') + '_ts=' + Date.now();
+    var url = _scriptUrl('data/HEALTH_CHECK.js?v=3ff35f6d60') + '_ts=' + Date.now();
     fetch(url,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var remote=_pickTs(t);
       if(remote){
