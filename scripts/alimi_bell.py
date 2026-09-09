@@ -119,6 +119,17 @@ def _algo_need_bell(now):
         return 240, 30, "algo-main"
     return None, None, "algo-off-hours"
 
+def _recent_algo_run_within(now, minutes):
+    """最近一次 v8_algo_cloud run 是否发生在 minutes 分钟内（用于让位 E 档）。"""
+    run, err = _last_run(_WF_ALGO)
+    if err or not run:
+        return False
+    created = run.get("created_at", "")
+    ago = _minutes_ago(created, now)
+    if ago is None:
+        return False
+    return ago < minutes
+
 
 def _read_cloud_update_time(var_name):
     """从 GitHub Contents API 读取 data/X.js 内层 update_time / calc_time（避免本地滞后）。"""
@@ -245,21 +256,28 @@ def main():
     if rule_s is None:
         print(f"[{now:%H:%M}] algo_cloud 非按铃时段({label}) -> 跳过")
     else:
-        # 先直接检查回测数据文件新鲜度：比看 workflow 状态更准
-        stale = _algo_data_need_bell(now)
-        if stale:
-            run, err = _last_run(_WF_ALGO)
-            if err:
-                print(f"[{now:%H:%M}] algo_cloud 数据陈旧但查运行失败({err}) -> 仍尝试dispatch: {_dispatch(_WF_ALGO)}")
-            elif run.get("status") in ("in_progress", "queued", "waiting", "pending", "requested"):
-                print(f"[{now:%H:%M}] algo_cloud 数据陈旧但已有 run 在跑({run['status']}) -> 跳过按铃，等本轮完成")
-            else:
-                print(f"[{now:%H:%M}] algo_cloud 数据陈旧需补跑: {stale} -> {_dispatch(_WF_ALGO)}")
+        # 2026-09-09 主人令「云端按铃让位 E 档」：E 档(回测批)21:05 显式 repository_dispatch
+        #   stage=E 派发；20:55-22:30 窗口内若近 2h 已有任意 algo run（即 E 已起跑），
+        #   跳过本次按铃，避免与 E 档互踢/风暴（E 档耗时较长，重叠派发会抢 concurrency）。
+        hhmm = now.hour * 60 + now.minute
+        if 20 * 60 + 55 <= hhmm < 22 * 60 + 30 and _recent_algo_run_within(now, 120):
+            print(f"[{now:%H:%M}] algo_cloud 让位 E 档(近 2h 已有 algo run) -> 跳过按铃")
         else:
-            # V5 2026-09-03 主人令「风暴一劳永逸」：回测/AI 数据已新鲜时，不因 run 失败/取消
-            #   重试按铃——假阳性失败会引 30min 循环派发 → 队列互踩风暴（2026-09-03 实证）。
-            #   主档 schedule(16:40/18:10/19:15/20:00) + 21:30 内容级最终闸已覆盖兜底。
-            print(f"[{now:%H:%M}] algo_cloud 回测/AI 数据已新鲜 -> 跳过按铃（含失败重试，防风暴）")
+            # 先直接检查回测数据文件新鲜度：比看 workflow 状态更准
+            stale = _algo_data_need_bell(now)
+            if stale:
+                run, err = _last_run(_WF_ALGO)
+                if err:
+                    print(f"[{now:%H:%M}] algo_cloud 数据陈旧但查运行失败({err}) -> 仍尝试dispatch: {_dispatch(_WF_ALGO)}")
+                elif run.get("status") in ("in_progress", "queued", "waiting", "pending", "requested"):
+                    print(f"[{now:%H:%M}] algo_cloud 数据陈旧但已有 run 在跑({run['status']}) -> 跳过按铃，等本轮完成")
+                else:
+                    print(f"[{now:%H:%M}] algo_cloud 数据陈旧需补跑: {stale} -> {_dispatch(_WF_ALGO)}")
+            else:
+                # V5 2026-09-03 主人令「风暴一劳永逸」：回测/AI 数据已新鲜时，不因 run 失败/取消
+                #   重试按铃——假阳性失败会引 30min 循环派发 → 队列互踩风暴（2026-09-03 实证）。
+                #   主档 schedule(16:40/18:10/19:15/20:00) + 21:30 内容级最终闸已覆盖兜底。
+                print(f"[{now:%H:%M}] algo_cloud 回测/AI 数据已新鲜 -> 跳过按铃（含失败重试，防风暴）")
 
     print("=== done ===")
 
