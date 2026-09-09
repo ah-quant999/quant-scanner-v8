@@ -1,6 +1,6 @@
 {
  "month": "2026年9月",
- "update_time": "2026-09-09 07:41",
+ "update_time": "2026-09-09 13:09",
  "legend": [
   {
    "title": "重要政策",
@@ -201,11 +201,6 @@
        "text": "🇺🇸 美国CPI",
        "cls": "us",
        "released": false
-      },
-      {
-       "text": "🍎 苹果秋季发布会（预计·待官宣）",
-       "cls": "appl",
-       "released": false
       }
      ]
     },
@@ -311,13 +306,7 @@
      "num": 17,
      "dim": false,
      "today": false,
-     "events": [
-      {
-       "text": "🇺🇸 FOMC利率决议（北京时间 9/17 02:00）",
-       "cls": "fomc",
-       "released": false
-      }
-     ]
+     "events": []
     },
     {
      "num": 18,
@@ -431,25 +420,13 @@
      "num": 26,
      "dim": false,
      "today": false,
-     "events": [
-      {
-       "text": "🌕 中秋假期（连休）",
-       "cls": "imp",
-       "released": false
-      }
-     ]
+     "events": []
     },
     {
      "num": 27,
      "dim": false,
      "today": false,
-     "events": [
-      {
-       "text": "🌕 中秋假期（连休）",
-       "cls": "imp",
-       "released": false
-      }
-     ]
+     "events": []
     }
    ]
   },
@@ -494,11 +471,6 @@
       {
        "text": "🇨🇳 官方制造业PMI",
        "cls": "data",
-       "released": false
-      },
-      {
-       "text": "🇨🇳 国庆前最后交易日（10/1-7 休市）",
-       "cls": "imp",
        "released": false
       }
      ]
