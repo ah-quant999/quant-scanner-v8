@@ -23,6 +23,7 @@ import json
 import os
 import re
 import sys
+import time
 from collections import defaultdict
 from datetime import datetime
 
@@ -501,7 +502,16 @@ def main():
     # 择时控权：非开仓期(_open_regime=False) 因子权重 ×0.3（弱加成，避免逆势放大因子噪声）
     # 放量弱势：bottom 入池则打「放量弱势」信号，最终分 −0.5（弱势扣分）
     # 名字兜底：ROE 票 baostock 常返回 '1' → _resolve_name + stock_names 映射补全
-    fl = load_js("FACTOR_LAB.js", "FACTOR_LAB")
+    # 🛡 2026-09-09 主人令：最终推荐必须等因子实验室产出后才能推荐（因子为更好选股而存在）。
+    #   校验 FACTOR_LAB.js 为当日新鲜；缺失/陈旧则有限等待（覆盖 B 批生成器偶发延迟），超时仍不可用则降级跳过融合。
+    fl = None
+    _today = datetime.now().strftime("%Y-%m-%d")
+    for _wi in range(20):  # 最多等 ~20min（正常 19:40 前 B 批已产完，此处通常 0 等待）
+        _cand = load_js("FACTOR_LAB.js", "FACTOR_LAB")
+        if _cand and str(_cand.get("update_time", "")).startswith(_today):
+            fl = _cand
+            break
+        time.sleep(60)
     if fl:
         _at_top = (fl.get("abnormal_turnover") or {}).get("top") or []
         _at_bot = (fl.get("abnormal_turnover") or {}).get("bottom") or []
@@ -556,7 +566,7 @@ def main():
             if key in _weak:
                 r["signals"].append("放量弱势")
     else:
-        print("[warn] FACTOR_LAB.js 缺失，跳过因子实验室方案B融合")
+        print("[warn] FACTOR_LAB.js 缺失/非当日，等待 %d 次后仍不可用，跳过因子实验室方案B融合（降级推荐）" % 20)
 
     # ── 第8.5节 高手共振（外部共振源之一：ima 高手强势股跟踪池）──
     # 与 v8 选股池 code 命中且 IMA 状态仍有效（非见顶/走弱）→ 独立外部共识信号，最终分 +1
