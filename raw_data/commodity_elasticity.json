@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-10 03:06:42",
+  "update_time": "2026-09-10 03:43:50",
   "data_date": "2026-09-10",
   "source": "三通道: MACRO_DATA(gold/silver/copper/oil) + Sina免费外盘期货(LME/NYMEX/CBOT共15个，westock-mcp不可用/缓存陈旧时兜底) + eastmoney-push2国内期货(GFEX碳酸锂+ZCE纯碱)",
   "hot_count": 1,
@@ -50,45 +50,45 @@
       "unit": "$/bbl",
       "exchange": "NYMEX",
       "available": true,
-      "current_price": 96.247,
+      "current_price": 96.47,
       "price_date": "2026-09-10",
       "source": "MACRO_DATA",
-      "baseline_30d": 93.961,
+      "baseline_30d": 94.109,
       "baseline_label": "30日z-score",
-      "dev_pct": 2.43,
+      "dev_pct": 2.51,
       "is_hot": false,
-      "hot_basis": "z-score=1.285(σ=1.779, μ=93.961)",
-      "z_score": 1.285,
-      "ma30": 93.961,
-      "std30": 1.779,
+      "hot_basis": "z-score=1.328(σ=1.778, μ=94.109)",
+      "z_score": 1.328,
+      "ma30": 94.109,
+      "std30": 1.778,
       "use_zscore": true,
       "stocks": [
         {
           "code": "600938",
           "name": "中国海油",
           "business_pct": 0.85,
-          "elasticity_pct": 163.84,
+          "elasticity_pct": 169.32,
           "note": "海上油气龙头"
         },
         {
           "code": "601857",
           "name": "中国石油",
           "business_pct": 0.7,
-          "elasticity_pct": 134.92,
+          "elasticity_pct": 139.44,
           "note": "上游勘探主"
         },
         {
           "code": "600028",
           "name": "中国石化",
           "business_pct": 0.55,
-          "elasticity_pct": 106.01,
+          "elasticity_pct": 109.56,
           "note": "炼化一体"
         },
         {
           "code": "002353",
           "name": "杰瑞股份",
           "business_pct": 0.35,
-          "elasticity_pct": 67.46,
+          "elasticity_pct": 69.72,
           "note": "油服设备弹性"
         }
       ]
@@ -99,38 +99,38 @@
       "unit": "$/oz",
       "exchange": "NYMEX",
       "available": true,
-      "current_price": 1907.608,
-      "price_date": "2026-09-10 03:05:37",
+      "current_price": 1908.004,
+      "price_date": "2026-09-10 03:43:18",
       "source": "sina-futures(纽约铂金)",
-      "baseline_30d": 1865.185,
+      "baseline_30d": 1867.796,
       "baseline_label": "30日z-score",
-      "dev_pct": 2.27,
+      "dev_pct": 2.15,
       "is_hot": false,
-      "hot_basis": "z-score=1.225(σ=34.627, μ=1865.185)",
-      "z_score": 1.225,
-      "ma30": 1865.185,
-      "std30": 34.627,
+      "hot_basis": "z-score=1.156(σ=34.78, μ=1867.796)",
+      "z_score": 1.156,
+      "ma30": 1867.796,
+      "std30": 34.78,
       "use_zscore": true,
       "stocks": [
         {
           "code": "600459",
           "name": "贵研铂业",
           "business_pct": 0.7,
-          "elasticity_pct": 128.62,
+          "elasticity_pct": 121.38,
           "note": "铂系材料龙头"
         },
         {
           "code": "601168",
           "name": "西部矿业",
           "business_pct": 0.15,
-          "elasticity_pct": 27.56,
+          "elasticity_pct": 26.01,
           "note": "铂族金属伴生"
         },
         {
           "code": "002340",
           "name": "格林美",
           "business_pct": 0.1,
-          "elasticity_pct": 18.38,
+          "elasticity_pct": 17.34,
           "note": "贵金属回收含铂"
         }
       ]
@@ -141,45 +141,45 @@
       "unit": "$/oz",
       "exchange": "COMEX",
       "available": true,
-      "current_price": 68.606,
+      "current_price": 68.281,
       "price_date": "2026-09-10",
       "source": "MACRO_DATA",
-      "baseline_30d": 67.231,
+      "baseline_30d": 67.265,
       "baseline_label": "30日z-score",
-      "dev_pct": 2.05,
+      "dev_pct": 1.51,
       "is_hot": false,
-      "hot_basis": "z-score=1.791(σ=0.768, μ=67.231)",
-      "z_score": 1.791,
-      "ma30": 67.231,
-      "std30": 0.768,
+      "hot_basis": "z-score=1.261(σ=0.806, μ=67.265)",
+      "z_score": 1.261,
+      "ma30": 67.265,
+      "std30": 0.806,
       "use_zscore": true,
       "stocks": [
         {
           "code": "601020",
           "name": "华钰矿业",
           "business_pct": 0.4,
-          "elasticity_pct": 107.46,
+          "elasticity_pct": 75.66,
           "note": "锑银矿"
         },
         {
           "code": "000603",
           "name": "盛达资源",
           "business_pct": 0.35,
-          "elasticity_pct": 94.03,
+          "elasticity_pct": 66.2,
           "note": "银+铅锌"
         },
         {
           "code": "000975",
           "name": "银泰黄金",
           "business_pct": 0.3,
-          "elasticity_pct": 80.59,
+          "elasticity_pct": 56.74,
           "note": "银副业但量大"
         },
         {
           "code": "000426",
           "name": "兴业银锡",
           "business_pct": 0.25,
-          "elasticity_pct": 67.16,
+          "elasticity_pct": 47.29,
           "note": "银锡矿为主"
         }
       ]
@@ -190,52 +190,52 @@
       "unit": "$/吨",
       "exchange": "LME",
       "available": true,
-      "current_price": 688.51,
+      "current_price": 687.42,
       "price_date": "2026-09-10",
       "source": "MACRO_DATA",
-      "baseline_30d": 678.287,
+      "baseline_30d": 678.989,
       "baseline_label": "30日z-score",
-      "dev_pct": 1.51,
+      "dev_pct": 1.24,
       "is_hot": false,
-      "hot_basis": "z-score=1.552(σ=6.585, μ=678.287)",
-      "z_score": 1.552,
-      "ma30": 678.287,
-      "std30": 6.585,
+      "hot_basis": "z-score=1.294(σ=6.513, μ=678.989)",
+      "z_score": 1.294,
+      "ma30": 678.989,
+      "std30": 6.513,
       "use_zscore": true,
       "stocks": [
         {
           "code": "000630",
           "name": "铜陵有色",
           "business_pct": 0.75,
-          "elasticity_pct": 174.6,
+          "elasticity_pct": 145.58,
           "note": "纯铜冶炼"
         },
         {
           "code": "600362",
           "name": "江西铜业",
           "business_pct": 0.65,
-          "elasticity_pct": 151.32,
+          "elasticity_pct": 126.17,
           "note": "国内冶炼龙头"
         },
         {
           "code": "603993",
           "name": "洛阳钼业",
           "business_pct": 0.4,
-          "elasticity_pct": 93.12,
+          "elasticity_pct": 77.64,
           "note": "刚果（金）铜钴"
         },
         {
           "code": "601168",
           "name": "西部矿业",
           "business_pct": 0.35,
-          "elasticity_pct": 81.48,
+          "elasticity_pct": 67.94,
           "note": "铜+铅锌"
         },
         {
           "code": "601899",
           "name": "紫金矿业",
           "business_pct": 0.3,
-          "elasticity_pct": 69.84,
+          "elasticity_pct": 58.23,
           "note": "全球铜矿巨头"
         }
       ]
@@ -430,62 +430,6 @@
       ]
     },
     {
-      "key": "gold",
-      "name": "黄金",
-      "unit": "$/oz",
-      "exchange": "COMEX",
-      "available": true,
-      "current_price": 4466.4,
-      "price_date": "2026-09-10",
-      "source": "MACRO_DATA",
-      "baseline_30d": 4455.999,
-      "baseline_label": "30日z-score",
-      "dev_pct": 0.23,
-      "is_hot": false,
-      "hot_basis": "z-score=0.423(σ=24.58, μ=4455.999)",
-      "z_score": 0.423,
-      "ma30": 4455.999,
-      "std30": 24.58,
-      "use_zscore": true,
-      "stocks": [
-        {
-          "code": "600988",
-          "name": "赤峰黄金",
-          "business_pct": 0.9,
-          "elasticity_pct": 57.11,
-          "note": "高弹性纯金"
-        },
-        {
-          "code": "600547",
-          "name": "山东黄金",
-          "business_pct": 0.85,
-          "elasticity_pct": 53.93,
-          "note": "纯金矿龙头"
-        },
-        {
-          "code": "600489",
-          "name": "中金黄金",
-          "business_pct": 0.75,
-          "elasticity_pct": 47.59,
-          "note": "央企金矿"
-        },
-        {
-          "code": "000975",
-          "name": "银泰黄金",
-          "business_pct": 0.55,
-          "elasticity_pct": 34.9,
-          "note": "金+银双驱"
-        },
-        {
-          "code": "601899",
-          "name": "紫金矿业",
-          "business_pct": 0.3,
-          "elasticity_pct": 19.04,
-          "note": "金+铜综合"
-        }
-      ]
-    },
-    {
       "key": "lead",
       "name": "铅",
       "unit": "$/吨",
@@ -517,6 +461,62 @@
           "business_pct": 0.25,
           "elasticity_pct": 7.91,
           "note": "铅锌银多金属"
+        }
+      ]
+    },
+    {
+      "key": "gold",
+      "name": "黄金",
+      "unit": "$/oz",
+      "exchange": "COMEX",
+      "available": true,
+      "current_price": 4454.712,
+      "price_date": "2026-09-10",
+      "source": "MACRO_DATA",
+      "baseline_30d": 4454.156,
+      "baseline_label": "30日z-score",
+      "dev_pct": 0.01,
+      "is_hot": false,
+      "hot_basis": "z-score=0.026(σ=21.345, μ=4454.156)",
+      "z_score": 0.026,
+      "ma30": 4454.156,
+      "std30": 21.345,
+      "use_zscore": true,
+      "stocks": [
+        {
+          "code": "600988",
+          "name": "赤峰黄金",
+          "business_pct": 0.9,
+          "elasticity_pct": 3.51,
+          "note": "高弹性纯金"
+        },
+        {
+          "code": "600547",
+          "name": "山东黄金",
+          "business_pct": 0.85,
+          "elasticity_pct": 3.31,
+          "note": "纯金矿龙头"
+        },
+        {
+          "code": "600489",
+          "name": "中金黄金",
+          "business_pct": 0.75,
+          "elasticity_pct": 2.93,
+          "note": "央企金矿"
+        },
+        {
+          "code": "000975",
+          "name": "银泰黄金",
+          "business_pct": 0.55,
+          "elasticity_pct": 2.15,
+          "note": "金+银双驱"
+        },
+        {
+          "code": "601899",
+          "name": "紫金矿业",
+          "business_pct": 0.3,
+          "elasticity_pct": 1.17,
+          "note": "金+铜综合"
         }
       ]
     },
@@ -568,38 +568,38 @@
       "unit": "$/oz",
       "exchange": "NYMEX",
       "available": true,
-      "current_price": 1373.98,
-      "price_date": "2026-09-10 03:05:58",
+      "current_price": 1369.76,
+      "price_date": "2026-09-10 03:43:44",
       "source": "sina-futures(纽约钯金)",
-      "baseline_30d": 1383.75,
+      "baseline_30d": 1382.606,
       "baseline_label": "30日z-score",
-      "dev_pct": -0.71,
+      "dev_pct": -0.93,
       "is_hot": false,
-      "hot_basis": "z-score=-0.644(σ=15.167, μ=1383.75)",
-      "z_score": -0.644,
-      "ma30": 1383.75,
-      "std30": 15.167,
+      "hot_basis": "z-score=-0.884(σ=14.532, μ=1382.606)",
+      "z_score": -0.884,
+      "ma30": 1382.606,
+      "std30": 14.532,
       "use_zscore": true,
       "stocks": [
         {
           "code": "002340",
           "name": "格林美",
           "business_pct": 0.1,
-          "elasticity_pct": -9.66,
+          "elasticity_pct": -13.26,
           "note": "贵金属回收含钯"
         },
         {
           "code": "601168",
           "name": "西部矿业",
           "business_pct": 0.1,
-          "elasticity_pct": -9.66,
+          "elasticity_pct": -13.26,
           "note": "铂钯族伴生"
         },
         {
           "code": "600459",
           "name": "贵研铂业",
           "business_pct": 0.5,
-          "elasticity_pct": -48.3,
+          "elasticity_pct": -66.3,
           "note": "钯系材料龙头"
         }
       ]
@@ -687,45 +687,45 @@
       "unit": "$/MMBtu",
       "exchange": "NYMEX",
       "available": true,
-      "current_price": 2.806,
-      "price_date": "2026-09-10 03:06:22",
+      "current_price": 2.807,
+      "price_date": "2026-09-10 03:43:35",
       "source": "sina-futures(美国天然气)",
-      "baseline_30d": 2.911,
+      "baseline_30d": 2.907,
       "baseline_label": "30日z-score",
-      "dev_pct": -3.61,
+      "dev_pct": -3.44,
       "is_hot": false,
-      "hot_basis": "z-score=-1.949(σ=0.054, μ=2.911)",
-      "z_score": -1.949,
-      "ma30": 2.911,
-      "std30": 0.054,
+      "hot_basis": "z-score=-1.751(σ=0.057, μ=2.907)",
+      "z_score": -1.751,
+      "ma30": 2.907,
+      "std30": 0.057,
       "use_zscore": true,
       "stocks": [
         {
           "code": "601857",
           "name": "中国石油",
           "business_pct": 0.2,
-          "elasticity_pct": -58.47,
+          "elasticity_pct": -52.53,
           "note": "油气一体化"
         },
         {
           "code": "000985",
           "name": "大庆华科",
           "business_pct": 0.3,
-          "elasticity_pct": -87.7,
+          "elasticity_pct": -78.79,
           "note": "石化原料+CNG"
         },
         {
           "code": "600256",
           "name": "广汇能源",
           "business_pct": 0.5,
-          "elasticity_pct": -146.18,
+          "elasticity_pct": -131.32,
           "note": "LNG 接收站+煤制气"
         },
         {
           "code": "603393",
           "name": "新天然气",
           "business_pct": 0.8,
-          "elasticity_pct": -233.88,
+          "elasticity_pct": -210.12,
           "note": "城燃分销"
         }
       ]
