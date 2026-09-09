@@ -644,6 +644,16 @@ window.V8_CAL = {weeks:[],legend:[]};
       return {ok:false, regime:'', name:'暂无数据', open:false, icon:'⚪', color:'#94a3b8',
               verdict:'⏳ 等待数据', evidence:'盘后自动生成，生成后本条自动更新', date:''};
     }
+    // 2026-09-09 一劳永逸：持仓建议数据源 OPTIMIZED_STRATEGY 由盘后 E 批 backtest 生成，
+    //   若 current_regime.date != 今日（E 批失败/未跑/跨日），必须诚实提示，
+    //   禁止把 N 天前的 regime 当今日开仓依据误导。
+    var _cp = (window._cstParts ? window._cstParts(new Date()) : null);
+    var _today = _cp ? (_cp.y+'-'+('0'+_cp.m).slice(-2)+'-'+('0'+_cp.d).slice(-2)) : '';
+    if(_today && reg.date && reg.date !== _today){
+      var _dd = (reg.date||'').slice(5);
+      return {ok:false, regime:r, name:NAME[r]||r, open:false, icon:'⚠️', color:'#fbbf24',
+              verdict:'决策数据 '+_dd+'（非今日）', evidence:'盘后 E 批算法链自动刷新，等待今日 regime', date:reg.date};
+    }
     var open = !!reg.open_position;
     return {
       ok: true,
