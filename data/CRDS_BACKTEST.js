@@ -1,9 +1,9 @@
 window.CRDS_BACKTEST = {
- "update_time": "2026-09-10 03:30:28",
+ "update_time": "2026-09-10 06:55:19",
  "summary": {
-  "update_time": "2026-09-10 03:30:28",
+  "update_time": "2026-09-10 06:55:19",
   "total_signals": 0,
-  "calc_time": "2026-09-10 03:30:28",
+  "calc_time": "2026-09-10 06:55:19",
   "method": "CRDS 逆势龙头 advanced 档历史回测 · baostock 登录失败，自动降级",
   "signal_date_range": "—",
   "by_period": {

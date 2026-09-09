@@ -1,13 +1,31 @@
 {
-  "update_time": "2026-09-10 05:38:43",
-  "run_start": "2026-09-10 04:46:40",
-  "ok": 0,
+  "update_time": "2026-09-10 06:55:21",
+  "run_start": "2026-09-10 06:11:13",
+  "ok": 20,
   "fail": 0,
-  "failed_scripts": [
-    {
-      "script": "final_recommend.py",
-      "reason": "就绪门控未通过（上游选股输入陈旧/缺失）"
-    }
-  ],
-  "skipped_by_time_gate": []
+  "failed_scripts": [],
+  "skipped_by_time_gate": [
+    "calc_crds.py",
+    "build_candidate_pool.py",
+    "calc_stock_rps.py",
+    "generate_top10.py",
+    "backtest_tdx.py",
+    "backtest_comprehensive.py",
+    "export_optimized_strategy.py",
+    "strategy_four_volume_60m.py",
+    "strategy_four_volume.py",
+    "update_triple_resonance_history.py",
+    "gen_triple_consensus.py",
+    "gen_triple_track.py",
+    "calc_volatility_watch.py",
+    "gen_stock_stop.py",
+    "gen_algo_track.py",
+    "calc_sentiment_cycle.py",
+    "auto_run_dn_algorithm.py",
+    "strong_breakout.py",
+    "track_h_auto_buy.py",
+    "gen_lhb_7d.py",
+    "final_recommend.py",
+    "backtest_expectancy.py"
+  ]
 }
