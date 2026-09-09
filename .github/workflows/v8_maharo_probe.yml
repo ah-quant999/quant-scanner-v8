@@ -1,4 +1,4 @@
-name: "maharo API probe"
+name: "maharo API probe (cn)"
 
 on:
   workflow_dispatch:
@@ -13,11 +13,38 @@ permissions:
 
 jobs:
   probe:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, cn]
+    timeout-minutes: 20
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      MAHORO_COOKIE: ${{ secrets.MAHORO_COOKIE }}
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 1000
     steps:
-      - uses: actions/checkout@v4
-      - name: Run maharo API probe (push result via Contents API)
-        env:
-          MAHORO_COOKIE: ${{ secrets.MAHORO_COOKIE }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python scripts/probe_maharo.py
+      - name: "sync probe script via GitHub API (bypass git wall)"
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $TARGET = 'scripts/probe_maharo.py'
+          $URL = "https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/$($TARGET -replace '/','%2F')?ref=main"
+          $headers = @{
+            'User-Agent'    = 'v8-maharo-probe'
+            'Accept'        = 'application/vnd.github.raw'
+            'Authorization' = "Bearer $env:GITHUB_TOKEN"
+          }
+          New-Item -ItemType Directory -Force -Path scripts | Out-Null
+          $tmpPath = "scripts/_probe_maharo.py.tmp"
+          try {
+            $r = Invoke-RestMethod -Uri $URL -Headers $headers -TimeoutSec 60 -Method Get
+            [System.IO.File]::WriteAllText($tmpPath, $r, [System.Text.Encoding]::UTF8)
+            Move-Item -Force $tmpPath "scripts/probe_maharo.py"
+            Write-Host "fetched $TARGET from origin/main"
+          } catch {
+            Write-Host "[warn] API fetch failed: $_"
+            exit 1
+          }
+
+      - name: "run probe and push result via Contents API"
+        shell: powershell
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          python scripts/probe_maharo.py
