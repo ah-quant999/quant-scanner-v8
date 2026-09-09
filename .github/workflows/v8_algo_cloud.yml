@@ -88,7 +88,7 @@ jobs:
     #   仅 IP 敏感 workflow 用 cn label；lemoncat/alimi 双机互为兜底，避免美国 IP 反爬导致数据失真体检失败。
     #   （历史：2026-08-20 曾改为 ubuntu-latest 防 cn runner 离线；现双机 runner 自启+看门狗兜底，
     #    中国 IP 稳定性已恢复，且境外 runner 偶发 safe-delete/反爬/secondary rate limit 问题更不可控。）
-    runs-on: [self-hosted, cn, xiaojiu]  # 2026-09-09 一劳永逸: 固定到 lemoncat-cn(xiaojiu label)。根因: alimi-cn 家里机 runner PATH 缺 bash/git, step4 解析数据日期报 bash: command not found, 云端链 1613-1618 六连败(日志实证)。恢复双跑条件: 家里机装 Git for Windows 且 runner 服务 PATH 可见 bash 后, 移除本 label。
+    runs-on: [self-hosted, cn]  # 2026-09-09 一劳永逸: 固定到 lemoncat-cn(专属 label)。根因: alimi-cn 家里机 runner PATH 缺 bash/git, step4 解析数据日期报 bash: command not found, 云端链 1613-1618 六连败(日志实证)。恢复双跑条件: 家里机装 Git for Windows 且 runner 服务 PATH 可见 bash 后, 移除本 label。
     # 🔴 2026-08-21 22:00 根因修复（主人令「一劳永逸」）：120 分钟不够。
     #   实测对比：15:30 派发那轮因未到 18:00，run_algorithms 把 20+ 个选股脚本全跳过，
     #   step「运行盘后算法链」只用 45-49 分钟；而 18:00 后那轮选股脚本全放行
