@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       dummy:
-        description: "placeholder"
+        description: "trigger probe"
         required: false
-        default: ""
+        default: "go"
 
 permissions:
   contents: write
@@ -14,25 +14,10 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      TZ: Asia/Shanghai
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: main
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: "run probe"
+      - name: Run maharo API probe (push result via Contents API)
         env:
           MAHORO_COOKIE: ${{ secrets.MAHORO_COOKIE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scripts/probe_maharo.py
-      - name: "push result to maharo-probe branch"
-        run: |
-          git config user.email "bot@workbuddy.local"
-          git config user.name "WorkBuddy Bot"
-          git checkout -B maharo-probe
-          git add maharo_probe_result.txt
-          git commit -m "probe: mahoro api result" || echo "nothing"
-          git push --force origin mahoro-probe
