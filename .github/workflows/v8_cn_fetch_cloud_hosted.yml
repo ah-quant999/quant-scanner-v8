@@ -37,7 +37,10 @@ permissions:
   actions: write
 
 concurrency:
-  group: v8-cn-fetch-cloud-hosted
+  # 🔧 2026-09-09 一劳永逸「双机兜底配合」：原独立 group v8-cn-fetch-cloud-hosted 与
+  #   云端主力 v8-cn-fetch-cloud 互不互斥 → 夜间补抓档可能与主链并发 push main 互踢。
+  #   统一为 v8-cn-fetch-cloud（cancel-in-progress:false → 队列而非互杀）。
+  group: v8-cn-fetch-cloud
   cancel-in-progress: false
 
 jobs:

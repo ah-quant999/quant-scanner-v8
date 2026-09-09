@@ -102,7 +102,9 @@ def _cn_fetch_need_bell(now):
     if 8 * 60 <= hhmm < 8 * 60 + 45:
         return 70, "premarket"
     if 8 * 60 + 45 <= hhmm < 17 * 60:
-        return 45, "intraday"
+        # 🔧 2026-09-09 主人令「盘中 20 分钟单源」：原 45 阈值会让健康数据(>20min)不触发按铃，
+        #   20 分钟目标永远落空。降到 20 → 与 20 分钟调度节奏同频，健康时也每 ~20min 补一轮。
+        return 20, "intraday"
     if 17 * 60 <= hhmm < 18 * 60 + 30:
         return 100, "post-close"
     if 18 * 60 + 30 <= hhmm < 23 * 60:

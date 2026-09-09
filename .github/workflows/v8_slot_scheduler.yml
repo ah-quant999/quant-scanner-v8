@@ -9,14 +9,16 @@
 #   - 盘前 08:25 / 盘中 09:00-15:30 每 30 分 / 盘后 17:20
 #   - 任一档位在窗口内无成功 v8_cn_fetch_cloud run → 派发对应 category
 #   - 18:00 后若 post_close 已就绪且 v8_algo_cloud 今日尚未成功 → 派发算法链
+# 🔧 2026-09-09：本工作流现为休眠兜底，实际盘中单源由「云端按铃(alimi_bell)」每 20 分承担。
 name: "🕒 v8 档期兜底调度器(云端)"
 
 on:
-  # 🔴 2026-09-09 一劳永逸根治「GHA schedule 静默丢触发」：本 workflow 原靠 GitHub
-  #   schedule cron 自触发，但该 cron 今天只跑了 1 次就哑，导致缺口补齐器自己不跑、
-  #   盘中轮缺口无人补（10:30 整轮静默丢失即此因）。现删除 schedule 块，改由 WorkBuddy
-  #   自动化(195d8839·每20分)通过 workflow_dispatch 可靠唤起；缺口补齐逻辑本身不变
-  #   （仍只补缺口、自带 15 分钟冷却 + 同版本失败熔断防风暴）。GHA cron 退为次要备份。
+  # 🔴 2026-09-09 一劳永逸根治「GHA schedule 静默丢触发 + 双源互踢」：本 workflow 原靠 GitHub
+  #   schedule cron 自触发，但今天只跑 1 次就哑→盘中轮缺口无人补。现删除 schedule 块。
+  #   盘中单源已统一收口到「云端按铃(alimi_bell)」每 20 分直接 dispatch v8_cn_fetch_cloud
+  #   （独立唤起器 id 195d8839 经查自动化注册表不存在→悬空，故本 slot scheduler 改为休眠兜底，
+  #    不再被自动唤起）。缺口补齐逻辑本体不变（仍只补缺口、自带 15 分钟冷却 + 同版本失败熔断
+  #    防风暴），仅保留为手动/应急入口。
   workflow_dispatch:
 
 permissions:

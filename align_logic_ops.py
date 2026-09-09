@@ -54,7 +54,7 @@ ALLOW_NO_CRON = {
     "v8_sync_v6_data",            # v6→v8 数据桥（应急）
     "v8_sync_legacy",             # legacy 同步（已退役）
     "v8_build_deploy",            # 由 workflow_run 触发，无 cron
-    "v8_slot_scheduler",          # 档期兜底调度器：2026-09-09 起 GHA cron 已删（GHA schedule 静默丢触发），改由 WorkBuddy 自动化(195d8839)每20分 workflow_dispatch 唤起
+    "v8_slot_scheduler",          # 档期兜底调度器：2026-09-09 GHA cron 已删、无独立唤起器→休眠；盘中单源统一收口到「云端按铃(alimi_bell)」每20分（避免双源互踢）
     "v8_algo",                    # 46 模块新鲜度体检（已迁 dispatch-only，老引用）
 }
 

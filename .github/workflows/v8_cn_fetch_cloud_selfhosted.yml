@@ -31,7 +31,11 @@ permissions:
   contents: write
 
 concurrency:
-  group: v8-cn-fetch-cloud-selfhosted
+  # 🔧 2026-09-09 一劳永逸「双机兜底配合」：原独立 group v8-cn-fetch-cloud-selfhosted 与
+  #   云端主力 v8-cn-fetch-cloud 互不互斥 → 看门狗升级到本链时与主链并发抓+并发 push main
+  #   → api_push_raw 防倒退守卫互踢、半截 JSON。统一为 v8-cn-fetch-cloud（cancel-in-progress:false
+  #   → 队列而非互杀），从根上保证任一时刻只有一条 fetch 在写 main。
+  group: v8-cn-fetch-cloud
   cancel-in-progress: false
 
 jobs:
