@@ -1,19 +1,11 @@
 {
-  "update_time": "2026-09-08 20:48:10",
+  "update_time": "2026-09-10 04:46:39",
   "range": [
-    "2026-08-31",
-    "2026-09-08"
+    "2026-09-01",
+    "2026-09-09"
   ],
   "days_count": 7,
   "daily_summary": [
-    {
-      "date": "2026-08-31",
-      "total": 70,
-      "resonance": 0,
-      "inst_only": 0,
-      "yz_only": 11,
-      "north_present": 35
-    },
     {
       "date": "2026-09-01",
       "total": 64,
@@ -61,6 +53,14 @@
       "inst_only": 1,
       "yz_only": 9,
       "north_present": 26
+    },
+    {
+      "date": "2026-09-09",
+      "total": 60,
+      "resonance": 1,
+      "inst_only": 2,
+      "yz_only": 7,
+      "north_present": 27
     }
   ],
   "top_inst_buy": [
@@ -129,11 +129,21 @@
     {
       "code": "000977",
       "name": "浪潮信息",
-      "inst_net": -86270.8,
-      "yz_net": 66514.5,
-      "north_net": 13622.3,
-      "combined_net": -19756.3,
-      "days": 2,
+      "inst_net": -77368.4,
+      "yz_net": 12375.3,
+      "north_net": 16588.6,
+      "combined_net": -64993.1,
+      "days": 1,
+      "resonance_days": 0
+    },
+    {
+      "code": "600354",
+      "name": "敦煌种业",
+      "inst_net": -33923.6,
+      "yz_net": 37113.1,
+      "north_net": 0.0,
+      "combined_net": 3189.5,
+      "days": 5,
       "resonance_days": 0
     },
     {
@@ -147,47 +157,17 @@
       "resonance_days": 0
     },
     {
-      "code": "002437",
-      "name": "誉衡药业",
-      "inst_net": -28047.9,
-      "yz_net": -4692.7,
-      "north_net": -6236.7,
-      "combined_net": -32740.6,
-      "days": 2,
-      "resonance_days": 0
-    },
-    {
       "code": "002297",
       "name": "博云新材",
-      "inst_net": -26818.0,
-      "yz_net": 13849.0,
-      "north_net": 26288.9,
-      "combined_net": -12969.0,
-      "days": 3,
+      "inst_net": -25560.0,
+      "yz_net": 17723.7,
+      "north_net": 26851.4,
+      "combined_net": -7836.3,
+      "days": 4,
       "resonance_days": 0
     }
   ],
   "top_yz_buy": [
-    {
-      "code": "000977",
-      "name": "浪潮信息",
-      "inst_net": -86270.8,
-      "yz_net": 66514.5,
-      "north_net": 13622.3,
-      "combined_net": -19756.3,
-      "days": 2,
-      "resonance_days": 0
-    },
-    {
-      "code": "300413",
-      "name": "芒果超媒",
-      "inst_net": -12471.5,
-      "yz_net": 58389.7,
-      "north_net": -23902.5,
-      "combined_net": 45918.2,
-      "days": 2,
-      "resonance_days": 0
-    },
     {
       "code": "003040",
       "name": "楚天龙",
@@ -209,17 +189,47 @@
       "resonance_days": 1
     },
     {
+      "code": "300413",
+      "name": "芒果超媒",
+      "inst_net": -10834.2,
+      "yz_net": 48067.5,
+      "north_net": -12135.6,
+      "combined_net": 37233.3,
+      "days": 1,
+      "resonance_days": 0
+    },
+    {
+      "code": "000620",
+      "name": "盈新发展",
+      "inst_net": -1298.6,
+      "yz_net": 41316.3,
+      "north_net": 2354.1,
+      "combined_net": 40017.7,
+      "days": 1,
+      "resonance_days": 0
+    },
+    {
       "code": "600354",
       "name": "敦煌种业",
-      "inst_net": -25313.4,
-      "yz_net": 43319.4,
+      "inst_net": -33923.6,
+      "yz_net": 37113.1,
       "north_net": 0.0,
-      "combined_net": 18006.0,
+      "combined_net": 3189.5,
       "days": 5,
       "resonance_days": 0
     }
   ],
   "top_yz_sell": [
+    {
+      "code": "300364",
+      "name": "中文在线",
+      "inst_net": 17473.2,
+      "yz_net": -47731.6,
+      "north_net": 14032.1,
+      "combined_net": -30258.4,
+      "days": 1,
+      "resonance_days": 0
+    },
     {
       "code": "603228",
       "name": "景旺电子",
@@ -228,6 +238,16 @@
       "north_net": 22725.9,
       "combined_net": 47885.7,
       "days": 2,
+      "resonance_days": 0
+    },
+    {
+      "code": "600737",
+      "name": "中粮糖业",
+      "inst_net": 0.0,
+      "yz_net": -35924.6,
+      "north_net": -1888.6,
+      "combined_net": -35924.6,
+      "days": 1,
       "resonance_days": 0
     },
     {
@@ -248,26 +268,6 @@
       "north_net": -6071.2,
       "combined_net": -28704.5,
       "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "688356",
-      "name": "键凯科技",
-      "inst_net": 1853.9,
-      "yz_net": -27157.7,
-      "north_net": -4987.5,
-      "combined_net": -25303.8,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "300684",
-      "name": "中石科技",
-      "inst_net": 8849.2,
-      "yz_net": -25033.3,
-      "north_net": -3601.7,
-      "combined_net": -16184.1,
-      "days": 2,
       "resonance_days": 0
     }
   ],
@@ -313,14 +313,14 @@
       "resonance_days": 1
     },
     {
-      "code": "002579",
-      "name": "中京电子",
-      "inst_net": 3737.0,
-      "yz_net": 27674.2,
-      "north_net": 4013.4,
-      "combined_net": 31411.2,
+      "code": "002155",
+      "name": "湖南黄金",
+      "inst_net": 20115.9,
+      "yz_net": 10284.2,
+      "north_net": 13526.3,
+      "combined_net": 30400.1,
       "days": 1,
-      "resonance_days": 0
+      "resonance_days": 1
     }
   ],
   "top_north_buy": [
@@ -365,37 +365,17 @@
       "resonance_days": 0
     },
     {
-      "code": "002916",
-      "name": "深南电路",
-      "inst_net": 24979.1,
-      "yz_net": 3344.7,
-      "north_net": 26662.5,
-      "combined_net": 28323.8,
-      "days": 1,
+      "code": "002297",
+      "name": "博云新材",
+      "inst_net": -25560.0,
+      "yz_net": 17723.7,
+      "north_net": 26851.4,
+      "combined_net": -7836.3,
+      "days": 4,
       "resonance_days": 0
     }
   ],
   "top_north_sell": [
-    {
-      "code": "300413",
-      "name": "芒果超媒",
-      "inst_net": -12471.5,
-      "yz_net": 58389.7,
-      "north_net": -23902.5,
-      "combined_net": 45918.2,
-      "days": 2,
-      "resonance_days": 0
-    },
-    {
-      "code": "002008",
-      "name": "大族激光",
-      "inst_net": -8861.9,
-      "yz_net": 29986.1,
-      "north_net": -17865.3,
-      "combined_net": 21124.2,
-      "days": 1,
-      "resonance_days": 0
-    },
     {
       "code": "002484",
       "name": "江海股份",
@@ -407,22 +387,42 @@
       "resonance_days": 0
     },
     {
+      "code": "600227",
+      "name": "赤天化",
+      "inst_net": 0.0,
+      "yz_net": -18611.1,
+      "north_net": -14523.7,
+      "combined_net": -18611.1,
+      "days": 4,
+      "resonance_days": 0
+    },
+    {
+      "code": "600722",
+      "name": "金牛化工",
+      "inst_net": 0.0,
+      "yz_net": -1326.0,
+      "north_net": -13893.0,
+      "combined_net": -1326.0,
+      "days": 2,
+      "resonance_days": 0
+    },
+    {
+      "code": "300413",
+      "name": "芒果超媒",
+      "inst_net": -10834.2,
+      "yz_net": 48067.5,
+      "north_net": -12135.6,
+      "combined_net": 37233.3,
+      "days": 1,
+      "resonance_days": 0
+    },
+    {
       "code": "600378",
       "name": "昊华科技",
       "inst_net": 0.0,
       "yz_net": -23316.0,
       "north_net": -10512.2,
       "combined_net": -23316.0,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "002639",
-      "name": "雪人集团",
-      "inst_net": 3539.9,
-      "yz_net": 4724.1,
-      "north_net": -9209.7,
-      "combined_net": 8264.0,
       "days": 1,
       "resonance_days": 0
     }
