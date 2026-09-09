@@ -267,6 +267,26 @@ def _clear_premarket_marker(label):
             print(f"  ⚠️ {label}: 清除 premarket_cleared 失败: {e}")
 
 
+def _restamp_fib_for_premarket():
+    """🛡 2026-09-09 主人令：斐波那契F观测窗时间戳对齐盘前。
+    数据基于上一交易日收盘计算（收盘后已由 fetch_sh_index_fib.py 生成），
+    但卡片显示 update_time 为「昨日 17:24」显得陈旧。盘前轮仅刷新时间戳，
+    使前端显示「今日 08:25 盘前」，数据内容不变。"""
+    ts = now_cst().strftime("%Y-%m-%d %H:%M:%S")
+    for fname in ("sh_fib.json", "sz_fib.json"):
+        path = RAW_DIR / fname
+        if not path.exists():
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            data["update_time"] = ts
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, separators=(",", ":"), default=str)
+            print(f"  🕒 盘前重戳 {fname} update_time={ts}")
+        except Exception as e:
+            print(f"  ⚠️ 盘前重戳 {fname} 失败: {e}")
+
+
 # ───────────────────────── 东方财富「延迟镜像」直连 ─────────────────────────
 # 说明：东方财富 push2.eastmoney.com / push2his.eastmoney.com 的实时资金流接口
 # 在本机/runner 网络下被 WAF 以 TCP 重置（ConnectionError: RemoteDisconnected）拒绝；
@@ -3679,6 +3699,13 @@ def main(category=None, only=None):
 
     # 盘前必须把盘中/实时模块的当日数据清空，避免昨日收盘数据挂到开盘前（仅在 premarket 阶段执行）
     _clear_intraday_for_premarket(category, only=only)
+
+    # 🛡 2026-09-09 主人令：斐波那契F观测窗 update_time 对齐盘前（数据内容不变，仅刷新时间戳）
+    if category == "premarket":
+        try:
+            _restamp_fib_for_premarket()
+        except Exception as e:
+            print(f"  ⚠️ 斐波那契盘前重戳失败: {e}")
 
     # 盘中/收盘/全量抓取后，用实时 raw_data 生成 AI 盘面解读（规则引擎，零成本，稳定可调试）
     # post_close 15:30 运行会生成「收盘」版解读，避免盘中 13:xx 的评论挂到次日。
