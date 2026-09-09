@@ -124,13 +124,12 @@ CARD_DEFS = [
     {"id": "CRDS_CARD_DATA", "name": "逆势龙头", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["elite", "watch"], "heal_cat": "algo_run", "picking": True},
     # 运维/静态说明页（逻辑详解页「防删」子页）
     {"id": "DO_NOT_DELETE", "name": "防误删清单", "page": "运维", "freq": "周日+手动", "max_age": 10080, "key_fields": ["update_time"], "_window_var": "DO_NOT_DELETE", "heal_cat": "algo_run", "manual_dep": True},
-    # 2026-08-30 一劳永逸：DELISTED/UNLISTED_PANEL/AVG_PRICE_DATA 三张新看板卡此前未注册 CARD_DEFS，
-    # 导致数据 js 推送后 v8_health_check 无法识别 →「DELISTED.js 缺失或解析失败（未被 CARD_DEFS 登记）」红灯。
-    # 全部归「运维」page（自愈类别 algo_run，跟 DO_NOT_DELETE 同组），文件源/window 变量一一对应：
-    # · DELISTED        ← data/DELISTED.js        注入 window.DELISTED_STOCKS（已下架 7935 只样本）
+    # 2026-08-30 一劳永逸：UNLISTED_PANEL/AVG_PRICE_DATA 新看板卡此前未注册 CARD_DEFS → 红灯；已注册。
+    # DELISTED（已下架股票目录）于 2026-09-09 主人令整链下线：前端「已下架股票目录」卡从 index.html/logic.html 删除 +
+    #   data/DELISTED.js 删除 + scripts/build_delisted.py 停用 + 本 CARD_DEFS 登记移除，故不再注册（避免删文件后报缺失红灯）。
     # · UNLISTED_PANEL  ← data/UNLISTED_PANEL.js  注入 window.UNLISTED_PANEL（暂未上架模块去向索引）
     # · AVG_PRICE_DATA  ← data/AVG_PRICE_DATA.js  注入 window.AVG_PRICE_DATA（通达信880003 平均股价）
-    {"id": "DELISTED", "name": "已下架股票目录", "page": "运维", "freq": "手动+港交所公告", "max_age": 10080, "key_fields": ["total", "recent"], "_window_var": "DELISTED_STOCKS", "heal_cat": "algo_run", "manual_dep": True, "manual_note": "由 scripts/build_delisted.py 从 raw_data/delisted_stocks.json 手动生成（一周一次；港股下架名单相对静态）"},
+
     {"id": "UNLISTED_PANEL", "name": "暂未上架模块索引", "page": "运维", "freq": "手动策划", "max_age": 10080, "key_fields": ["modules", "meta"], "_window_var": "UNLISTED_PANEL", "heal_cat": "algo_run", "manual_dep": True, "manual_note": "由 scripts/build_unlisted_panel.py 手动生成（AI 策划实验模块去向，主人推送）"},
     # 🛡 2026-08-31 一劳永逸（主人「运维还有失败亮黄灯」令）：
     #   position_vs_ma20 / position_vs_ma60 在 history 累积满 20 / 60 个交易日之前
