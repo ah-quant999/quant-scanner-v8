@@ -28,7 +28,6 @@ MUST_HAVE_CRON = {
     "v8_cn_fetch_cloud": "中国数据抓取(云端)",
     "v8_cn_fetch_cloud_hosted": "中国数据抓取(selfhosted 备援)",
     "v8_cn_fetch_watchdog": "抓取看门狗",
-    "v8_slot_scheduler": "盘前/盘中/盘后调度分发",
     "v8_algo_cloud": "盘后算法链(云端主链)",
     "v8_algo_intraday_lite": "盘中轻量算法链",
     "v8_lhb_fetch": "龙虎榜抓取",
@@ -55,6 +54,7 @@ ALLOW_NO_CRON = {
     "v8_sync_v6_data",            # v6→v8 数据桥（应急）
     "v8_sync_legacy",             # legacy 同步（已退役）
     "v8_build_deploy",            # 由 workflow_run 触发，无 cron
+    "v8_slot_scheduler",          # 档期兜底调度器：2026-09-09 起 GHA cron 已删（GHA schedule 静默丢触发），改由 WorkBuddy 自动化(195d8839)每20分 workflow_dispatch 唤起
     "v8_algo",                    # 46 模块新鲜度体检（已迁 dispatch-only，老引用）
 }
 
