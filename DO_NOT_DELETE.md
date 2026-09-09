@@ -58,7 +58,7 @@
 > 🟢 🔴 **中信 PE 双卡保护段（2026-09-08 主人令，勿当孤儿误删）**：`v8/fetch_citic_pe.py` + `v8/gen_citic_pe.py` + `raw_data/citic_pe_history.json` + `raw_data/citic_pe_history.meta.json` + `data/CITIC_PE_THERMO.js` + `data/CITIC_PE_BACKTEST.js` 为完整活链（E 段算法链 21:00 每日调度 → 前端「暂未上架实验区最下方」双卡直读）。回测结论：PE<10 买入持有 250 日胜率 97.6%/均收益 +19.6%（4051 交易日样本）。当前 PE≈10.9（低估边缘）。**严禁删除任何一环**——删 fetcher 则断更，删 raw 则卡空，删 data/*.js 则卡片空白。
 > 🟢 豁免 `data/POTENTIAL_PICKS.js` + `raw_data/potential_picks.json` + `raw_data/history/potential_*.json` + `algorithms/calc_potential_picks.py`：已于 2026-09-06 主人令全链删除（卡下线、考核取消），云端残留允许清理，勿复活。
 > 🟢 豁免 `data/BLOAT_CHECK.js`：v8_bloat_check.py 已停生成（产物迁 .workbuddy/v8_bloat_report.json），全站0引用，允许删除（2026-08-29 轻量化收尾）。
-> 🔴 **`data/DELISTED_STOCKS.js` 已重新挂链·受保护（2026-09-08 阿狸咪暗灯审计修正）**：前端 `_renderV8StockLists()`（「暂未上架+已下架股票目录」卡，index.html:12432）实时消费 `window.DELISTED_STOCKS`；由 `scripts/build_delisted.py` 从 `raw_data/delisted_stocks.json` 生成，已挂回 `run_algorithms.py` ORDER/STAGES（暗灯1 修复）。**禁止删除**，旧「允许删除」豁免作废（原误判 renderDelisted 改读 raw_data，实际仍读 window.DELISTED_STOCKS，详见 2026-09-08 算法链一致性修复交接文档）。
+> 🟢 豁免 `data/DELISTED.js` + `raw_data/delisted_stocks.json` + `scripts/build_delisted.py`：已于 2026-09-09 主人令整链下线（前端「已下架股票目录」卡从 index.html/logic.html 删除 + data/DELISTED.js 删除 + build_delisted.py 停用 + v8_health_check CARD_DEFS 移除 + v8_rollback_guard 受保护列表移除），允许物理删除、勿复活。注：run_algorithms.py 实际从未挂此链（grep 0 命中），所谓「已挂回 ORDER/STAGES」为文档漂移误判。
 > 🟢 豁免 `data/MAHORO.js` + `algorithms/fetch_maharo_signals.py` + `.github/workflows/mahoro_refresh.yml` + `scripts/monitor_maharo_refresh.py`：mahoro 全链路引用/监控已移除（commit 7193a5b93），功能上等同删除，全站0引用，允许物理删除（2026-08-29 主人令：mahoro 孤儿清理）。
 > 🟢 豁免 `raw_data/kline_cache/*` + `raw_data/backtest_kline_cache/*` + `raw_data/_rps_cache/*` + `raw_data/_tdx_cache/*`：算法运行时行情缓存（RPS / K线 / TDX / 回测K线），纯本地加速用、可随时重建，`.gitignore` 已忽略（严禁入库）。2026-08-29 仓库瘦身：`git rm --cached` 移出版本跟踪，**本地文件全部保留**，仅删除库内副本，不删本地缓存、不影响任何算法运行。本条为通配符豁免，避免 `raw_data/*.json` 保护规则（其 `*` 跨 `/`）误伤缓存子目录。
 
@@ -137,7 +137,7 @@
 
 | 文件路径 | 内容描述 | 禁止删除原因 |
 |---------|---------|------------|
-| `scripts/build_delisted.py` | 已下架股票目录生成器（raw_data/delisted_stocks.json → data/DELISTED_STOCKS.js） | **已挂回 `run_algorithms.py` ORDER/STAGES（暗灯1 修复）**；前端「暂未上架+已下架」卡实时消费，删除则卡片空白 + 算法链缺产物 |
+| `scripts/build_delisted.py` | 已下架股票目录生成器（2026-09-09 主人令整链下线后停用：main() 改为 no-op 并打印已下线；data/DELISTED.js 已删除、前端卡已删） | 已下线停用，保留占位避免遗留 import 报错；如需彻底删除可物理删（已不在 CRITICAL_FILES/v8_rollback_guard 受保护列表） |
 | `scripts/gen_lhb_7d.py` | 龙虎榜 7 日聚合生成器 | 阿狸咪 2026-09-08 修复漏挂 ORDER 的 P0（commit c54c5f44d），已挂链；缺失则 LHB 7日卡断更 |
 
 ---
