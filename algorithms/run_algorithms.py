@@ -122,6 +122,7 @@ ORDER = [
     #   且只写 out/ 不 bridge raw_data/ → INDEX_HISTORY 永不更新）。
     # 🛡 2026-08-29 主人令：补跑第二基准（中证1000 / 国证A指），判断 +6% excess 是 alpha 还是风格 beta。
     "calc_crds.py",
+    "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（B批最前：final_recommend 前必产完，因子融合用当日新鲜因子；2026-09-09 主人令由 E 前置至此）
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "calc_stock_rps.py",               # → data/STOCK_RPS.js（个股RPS+RS，读 candidate.json 做 universe）
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
@@ -186,8 +187,7 @@ ORDER = [
     #   三者失败均不影响选股结果，仅自身卡片可能不刷新。
 
     # 🆕 2026-09-04 主人令「都按你的建议做」：因子实验室独立分层回测（升4⭐证据链）
-    # 🛡 2026-09-08 D2-A2：生成器挂在同一位置（ORDER 与 STAGES["E"] 必须同位，模块级 assert 强校验）
-    "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（先产因子，再分层回测）
+    # 🛡 2026-09-09 主人令：因子实验室生成器已前置到 B 批最前（ORDER 下方 B 区 calc_crds 之后），此处 E 区仅留分层回测
     "factor_lab_backtest.py",         # → data/FACTOR_LAB_BACKTEST.js（五分位分层·胜率/回撤/OOS）
     "v8/backtest_crds.py",               # → data/CRDS_BACKTEST.js （逆势龙头回测；2026-09-09 挂链补登，此前零调度成孤儿 → 红灯 age 1447min）
     # 🛡 2026-09-07 修复：以下两脚本曾只挂 E 批 STAGES、漏挂 ORDER → 模块级自校验
@@ -215,6 +215,9 @@ STAGES = {
         "fetch_orphan_suspension.py", "fetch_orphan_market_alerts.py",
         "fetch_orphan_nt_data.py", "fetch_orphan_sector_fund_flow.py"],
     "B": [  # 选股批（~18:10 CST，盘后数据齐）：核心选股策略
+        # 🛡 2026-09-09 主人令：因子实验室生成器前置到 B 批最前——必须在 final_recommend(D批20:00) 之前产完，
+        #   否则「为更好选股」的因子融合只能吃昨日陈旧数据。生成器 50-90min baostock 冷启动，18:10 起跑→19:40 前产完，D 批必吃到当日新鲜因子。
+        "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js + raw_data/factor_lab.json（baostock，冷启动长）
         "calc_crds.py", "build_candidate_pool.py", "calc_stock_rps.py", "generate_top10.py",
         "strategy_four_volume_60m.py", "strategy_four_volume.py",
         "market_regime.py", "sector_recommendation.py",
@@ -233,17 +236,15 @@ STAGES = {
     #   原 C(回测 19:15) 在 D(final_recommend 20:00) 之前 → 回测汇总胶囊早于最终推荐，时序倒挂。
     #   现改为 A(16:40 采集) → B(18:10 选股) → D(20:00 汇总·最终推荐上线) → E(21:00 回测)。
     #   键名 C 退役；回测批内容原样迁入 E，另收编 strategy_four_volume.py（回测模式，SCRIPT_ENV 注入）。
-    "E": [  # 回测批（~21:00 CST，最终推荐上线后）：backtest 全家 + 因子实验室生成（长任务，放夜间/21:00 后跑）
+    "E": [  # 回测批（~21:00 CST，最终推荐上线后）：backtest 全家 + 因子实验室分层回测（生成器已前置到 B 批）
         "backtest_tdx.py", "backtest_comprehensive.py",
         "backtest_expectancy.py",          # 🆕 期望收益回测：walk-forward 产出 raw_data/backtest_expectancy.json
         "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
 
-        # 🛡 2026-09-08 D2-A2 一劳永逸（补上当年只写在注释里的挂链）：因子实验室生成器正式落 E 批，
-        #   与 ORDER 同位（在 factor_lab_backtest 之前：先产 FACTOR_LAB.js 再分层回测）。
-        #   链内由 run_algorithms.py 统一注入 V8_IN_CHAIN=1 → 本脚本自带 git push 自动跳过，
-        #   不会与链尾统一推送互踢（暴风根治前提不变）。
-        "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js + raw_data/factor_lab.json（baostock，冷启动长）
-        "factor_lab_backtest.py",   # 🆕 因子实验室分层回测（读 _rps_cache，依赖 B 批 calc_stock_rps）
+        # 🛡 2026-09-09 主人令：因子实验室「生成器」已前置到 B 批最前（必须在 final_recommend 前产完），
+        #   此处 E 批仅保留其「分层回测」——读 FACTOR_LAB 做五分位分层验证（研究性质，不进选股打分），置于最终推荐之后无害。
+        #   链内由 run_algorithms.py 统一注入 V8_IN_CHAIN=1 → 本脚本自带 git push 自动跳过。
+        "factor_lab_backtest.py",   # 🆕 因子实验室分层回测（读 _rps_cache，依赖 B 批 calc_stock_rps + 当日 FACTOR_LAB）
         "v8/backtest_crds.py",   # → data/CRDS_BACKTEST.js （逆势龙头回测；2026-09-09 挂链补登，此前仅存在于 v8/ 目录、STAGES/ORDER 均未挂 → 永远跑不到）
         # 2026-09-06 主人令：AI预测卡回测 INVALID → 下架，停跑 path_probability_backtest.py
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
@@ -255,7 +256,7 @@ STAGES = {
         #   现把生成器从 D 摘到 E 批（21:00 夜间跑，不阻塞盘后 20:00 出最终推荐），
         #   D 批瘦身至 final_recommend 单脚本 → 选股策略全部数据出来 30-40min 内出最终推荐。
     ],
-    "D": [  # 汇总批（~20:00 CST，依赖全部）：仅 final_recommend（LHB历史/7d/生命周期/factor_lab_gen 全部前置到 E 批·互踢暴风根治）
+    "D": [  # 汇总批（~20:00 CST，依赖全部）：仅 final_recommend（LHB历史/7d/生命周期/factor_lab_gen 前置到 B 批·互踢暴风根治）
         "final_recommend.py",   # 必需上游 = B 批产物（CRDS/TOP10/三重共识/crisis/sector_rs/stock_profile/triple_track）
     ]}
 
