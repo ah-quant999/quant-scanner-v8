@@ -2869,10 +2869,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     if(pane) pane.classList.add('active');
     if(btn) btn.classList.add('active');
     window.__rcActiveTab = tabId;
-    // Lazy render on first visit（机游/北向/洞察已拆成独立 tab）
-    if(tabId === 'tab1' && !window.__jyCalRendered){ setTimeout(renderJyCalendar, 30); }
-    if(tabId === 'tab2' && !window.__northCalRendered){ setTimeout(renderNorthCalendar, 30); }
-    if(tabId === 'tab3' && !window.__insightRendered){ setTimeout(renderInsight, 30); }
+    // 🛡 2026-09-09 一劳永逸：改用「容器是否空」判定重渲，根治 __*CalRendered 标志被重绘清零后
+    //   切回该 tab 不重渲导致内容空白（"前面的会又没了"）的竞态
+    function _rcNeedRender(id){ var el = document.getElementById(id); return !el || !el.innerHTML || !el.innerHTML.trim(); }
+    if(tabId === 'tab1' && _rcNeedRender('jyCalContainer')){ setTimeout(renderJyCalendar, 30); }
+    if(tabId === 'tab2' && _rcNeedRender('northCalContainer')){ setTimeout(renderNorthCalendar, 30); }
+    if(tabId === 'tab3' && _rcNeedRender('insightContainer')){ setTimeout(renderInsight, 30); }
     /* tab4 大牛股猎手已于 2026-09-03 主人令全方位下线（renderHunter 函数删除、不再挂载 window）
        —— 2026-09-03 二清：注释精简为通用已下线 trace，保留审计 */
   }
@@ -2907,20 +2909,24 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var jy = cat('机游共振').filter(function(s){ return Math.abs((s.inst_net_万||0)+(s.yz_net_万||0)) >= TH; })
       .map(function(s){ s._net=(s.inst_net_万||0)+(s.yz_net_万||0); return s; }).sort(function(a,b){return b._net - a._net;}).slice(0,5);
     var pureYz = cat('游资独买').filter(function(s){ return Math.abs(s.yz_net_万||0) >= TH; }).slice(0,5);
-    function blk(title,color,arr,key){
+    function blk(title,color,arr,key,aliasKey){
       if(!arr.length) return '';
       var inner = arr.map(function(s){
-        return '<div class="jy-li"><span class="jy-name">'+_rcEsc(s.name)+'</span><span class="'+color+'">'+_rcFmtYi(s[key]||0)+'</span></div>';
+        var _chip = '';
+        if(aliasKey && s.seats && s.seats[aliasKey] && s.seats[aliasKey].aliases && s.seats[aliasKey].aliases.length){
+          _chip = '<span style="font-size:10px;color:var(--gold);margin-left:6px;padding:1px 6px;border:1px solid rgba(251,191,36,.4);border-radius:8px;white-space:nowrap">'+s.seats[aliasKey].aliases.map(_rcEsc).join('/')+'</span>';
+        }
+        return '<div class="jy-li"><span class="jy-name">'+_rcEsc(s.name)+'</span>'+_chip+'<span class="'+color+'">'+_rcFmtYi(s[key]||0)+'</span></div>';
       }).join('');
       return '<div class="jy-block"><div class="jy-block-hd" style="color:'+color+'">'+title+'</div>'+inner+'</div>';
     }
     var h='';
     h += blk('▲ 机构净买入TOP5','c-up',instBuy,'inst_net_万');
     h += blk('▼ 机构净卖出TOP5','c-down',instSell,'inst_net_万');
-    h += blk('★ 机游共振（合力）','#a78bfa',jy,'_net');
-    h += blk('⚡ 纯游资异动（大额）','#22c55e',pureYz,'yz_net_万');
-    h += blk('▲ 游资净买入TOP5','#f59e0b',yzBuy,'yz_net_万');
-    h += blk('▼ 游资净卖出TOP5','#f59e0b',yzSell,'yz_net_万');
+    h += blk('★ 机游共振（合力）','#a78bfa',jy,'_net','游资');
+    h += blk('⚡ 纯游资异动（大额）','#22c55e',pureYz,'yz_net_万','游资');
+    h += blk('▲ 游资净买入TOP5','#f59e0b',yzBuy,'yz_net_万','游资');
+    h += blk('▼ 游资净卖出TOP5','#f59e0b',yzSell,'yz_net_万','游资');
     return h;
   }
   function _rcWeekRangeOf(y, m, day){
@@ -3385,14 +3391,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var pureYz = (byCat['游资独买']||[]).filter(function(s){ return Math.abs(s.yz_net_万||0) >= TH*1.5; }).slice(0,5);
     var yzBuy = all.filter(function(s){ return (s.yz_net_万||0) >= TH; }).sort(function(a,b){return b.yz_net_万 - a.yz_net_万;}).slice(0,5);
     var yzSell = all.filter(function(s){ return (s.yz_net_万||0) <= -TH; }).sort(function(a,b){return a.yz_net_万 - b.yz_net_万;}).slice(0,5);
-    function blk6(title, color, arr, valFn){
+    function blk6(title, color, arr, valFn, aliasKey){
       // 单行紧凑卡片（2026-08-07 主人令：一只股票一行，名称+代码+金额+涨幅同行，字体放大）
       var cells = arr.map(function(s){
         var val = valFn(s);
         var pct = s.pct||0;
         var code = s.code || '';
+        var _chip = (aliasKey && s.seats && s.seats[aliasKey] && s.seats[aliasKey].aliases && s.seats[aliasKey].aliases.length)
+          ? ' <span style="font-size:10px;color:var(--gold);border:1px solid rgba(251,191,36,.4);border-radius:6px;padding:0 4px;margin-left:2px;white-space:nowrap">'+s.seats[aliasKey].aliases.map(_rcEsc).join('/')+'</span>' : '';
         return '<div style="padding:3px 4px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:6px">'
-          + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;font-weight:600">'+_rcEsc(s.name)+(code?' <span style="color:var(--dim);font-weight:400;font-size:11px">'+code+'</span>':'')+'</span>'
+          + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;font-weight:600">'+_rcEsc(s.name)+(code?' <span style="color:var(--dim);font-weight:400;font-size:11px">'+code+'</span>':'')+_chip+'</span>'
           + '<span style="color:'+(val>=0?'var(--up)':'var(--down)')+';font-weight:700;min-width:52px;text-align:right">'+_rcFmtYi(val)+'</span>'
           + '<span style="color:'+(pct>=0?'var(--up)':'var(--down)')+';font-weight:700;min-width:48px;text-align:right">'+(pct>=0?'+':'')+pct.toFixed(1)+'%</span>'
           + '</div>';
@@ -3406,11 +3414,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
        + blk6('▲ 净买入', '#38bdf8', instBuy, function(s){return s.inst_net_万||0;})
        + blk6('▼ 净卖出', '#60a5fa', instSell, function(s){return s.inst_net_万||0;}) +'</div>';
     h += '<div><div class="jy-col-hd" style="color:#a78bfa">🧬 共振</div>'
-       + blk6('★ 机游共振', '#a78bfa', jyStocks, function(s){return (s.inst_net_万||0)+(s.yz_net_万||0);})
-       + blk6('⚡ 纯游资异动', '#22c55e', pureYz, function(s){return s.yz_net_万||0;}) +'</div>';
+       + blk6('★ 机游共振', '#a78bfa', jyStocks, function(s){return (s.inst_net_万||0)+(s.yz_net_万||0);}, '游资')
+       + blk6('⚡ 纯游资异动', '#22c55e', pureYz, function(s){return s.yz_net_万||0;}, '游资') +'</div>';
     h += '<div><div class="jy-col-hd" style="color:#f59e0b">🔥 游资</div>'
-       + blk6('▲ 净买入', '#f59e0b', yzBuy, function(s){return s.yz_net_万||0;})
-       + blk6('▼ 净卖出', '#fb923c', yzSell, function(s){return s.yz_net_万||0;}) +'</div>';
+       + blk6('▲ 净买入', '#f59e0b', yzBuy, function(s){return s.yz_net_万||0;}, '游资')
+       + blk6('▼ 净卖出', '#fb923c', yzSell, function(s){return s.yz_net_万||0;}, '游资') +'</div>';
     h += '</div>';
 
     h += '</div>';
@@ -3795,7 +3803,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     }
     try{
     var CR = window.CRISIS_DATA || {};
-    var CD = {};  /* 2026-09-03 主人令：window.COCKPIT_ADVICE 已全方位下线，留 {} 占位以防下方 var CD.XXX 报 ReferenceError */
     var CAND = window.CANDIDATE || {};
     var SR = window.SECTOR_RS || {};
     var VOL = window.VOLATILITY || {};
@@ -3815,7 +3822,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var scoreLight = score >= 70 ? 'red' : score >= 50 ? 'yellow' : score >= 30 ? 'yellow' : 'green';
     // 每日洞察聚合多个数据源，取各源真实时间中最新的作为卡片时间戳
     var updateTime = [
-      CR.update_time, CD.update_time, CAND.update_time,
+      CR.update_time, CAND.update_time,
       SR.update_time, VOL.update_time, IQ.update_time,
       LHB.update_time, NF.update_time, window.SH_SZ_HISTORY && window.SH_SZ_HISTORY.update_time
     ].filter(Boolean).sort().pop() || '--';
@@ -6522,7 +6529,6 @@ function switchSec(sec,el){
     const goldList = (window.GOLD_POOL && (window.GOLD_POOL.stocks || window.GOLD_POOL.candidates))
                   || [];
     // COCKPIT 优先用 tier_a/tier_b（array 数组）合并 —— 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND 已全方位下线
-    const cock = {};
     const cockList = [];  /* 已下线 algorithm，列表永远为空 */
     // CRDS 用 cond1_list/cond2_list/cond3_list/cond4_list（按实际 schema）
     const crds = window.CRDS_CARD_DATA||{};
@@ -6582,7 +6588,6 @@ function switchSec(sec,el){
     try {
       var fr = window.FINAL_RECOMMEND_DATA || {};
       var sff = (window.SECTOR_FUND_FLOW || {});
-      var cock = {};  /* 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND 已全方位下线，留 {} 占位 */
 
       // --- 收集主线板块 ---
       var sectors = [];
@@ -12383,8 +12388,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     // 2026-09-07 主人令：宽基ETF卡恢复柱状图形态（数据仍东财五分类，不回退旧口径图表函数——旧口径 fetch 链保持下线）。
     // 2026-08-29 一劳永逸：删 renderMacro 调用——opTab4 无 phMacroBody 抛 null 已被主人之前在 initPostMarket 9680 注释；
     //   下面 3 个 safe 调用使用与 initPostMarket 同样的窗口数据来源（line 9658-9660 已对齐）：
-    // 🛡 2026-08-31: FOMC_DATA 数据源未配置，当前为空对象，温度计缺 FOMC 维度。
-    try{ if(window.renderThermo) window.renderThermo(window.SH_FIB||{}, window.MARGIN_DATA||{}, window.CFFEX_HOLDINGS||{}, window.FOMC_DATA||{}, window.SECTOR_FUND_FLOW||{}); }catch(e){console.warn("已下架·温度计渲染失败",e);}
+    try{ if(window.renderThermo) window.renderThermo(window.SH_FIB||{}, window.MARGIN_DATA||{}, window.CFFEX_HOLDINGS||{}, {}, window.SECTOR_FUND_FLOW||{}); }catch(e){console.warn("已下架·温度计渲染失败",e);}
     try{ if(window.renderSixDim)  window.renderSixDim(window.SH_FIB||{},  window.MARGIN_DATA||{}, window.CFFEX_HOLDINGS||{}, window.CRISIS_DATA||{}, window.SECTOR_FUND_FLOW||{}, window.MARKET_FUND_FLOW_DATA||{}); }catch(e){console.warn("已下架·六维共振渲染失败",e);}
     try{ if(window.renderCrisis)  window.renderCrisis(window.CRISIS_DATA||{}); }catch(e){console.warn("已下架·危机雷达渲染失败",e);}
     try{ if(window.renderMarketFundFlow) window.renderMarketFundFlow(window.MARKET_FUND_FLOW_DATA||{}); }catch(e){console.warn("已下架·资金流时间轴渲染失败",e);}

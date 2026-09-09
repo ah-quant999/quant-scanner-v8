@@ -33,9 +33,18 @@ def _load_lhb_seats():
     with open(SEATS_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
+def _norm_seat(s):
+    """归一化席位名：去『股份有限公司』、『证券营业部→营业部』、空格、·、（），
+    使 LHB 源里的长写法能与 seats 库里的短关键词做包含匹配。"""
+    if not s:
+        return ''
+    s = s.replace('股份有限公司', '').replace('证券营业部', '营业部')
+    s = s.replace(' ', '').replace('·', '').replace('（', '(').replace('）', ')')
+    return s
+
 def _classify_seat(seat_name, seats_db):
     """分类席位：返回 (类型, 别名或模式名)
-    知名游资精确匹配 → ('游资', '章盟主')
+    知名游资精确/包含匹配 → ('游资', '章盟主')
     模式匹配游资 → ('游资', '拉萨团结路')  // 具体模式名
     机构/北向/量化 → ('机构', '') 等
     未识别 → ('未识别', '')
@@ -46,9 +55,11 @@ def _classify_seat(seat_name, seats_db):
         return ('机构', '')
     if '深股通' in seat_name or '沪股通' in seat_name:
         return ('北向', '')
-    # 精确匹配已知席位 → 返回别名
+    # 已知席位：归一化后包含匹配（LHB 源席位名写法不一也能命中）→ 返回别名
+    sn = _norm_seat(seat_name)
     for s in seats_db.get("seats", []):
-        if s["name"] == seat_name:
+        kw = _norm_seat(s.get("name", ""))
+        if kw and kw in sn:
             return (s.get("type", "游资"), s.get("alias", ""))
     # 4. 模糊匹配模式 → 返回模式名作为标签（如"拉萨团结路"、"宁波桑田路"）
     for p in seats_db.get("patterns", {}).get("游资", []):
