@@ -203,7 +203,7 @@ def _dispatch(workflow_id, payload=None):
     if workflow_id == _WF_ALGO:
         st, data = _api(
             f"/repos/{_REPO}/dispatches",
-            method="POST", data={"event_type": "trigger_algo"},
+            method="POST", data={"event_type": "trigger_algo", "client_payload": {"stage": "E"}},
         )
         if st == 204:
             return "DISPATCH OK(204 · repository_dispatch/trigger_algo → 探针路由 cn 优先)"
