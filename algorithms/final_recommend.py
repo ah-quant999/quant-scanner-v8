@@ -27,6 +27,31 @@ import time
 from collections import defaultdict
 from datetime import datetime
 
+# 🛡 V8_OFFLINE：本机(阿狸咪)网络被墙时注入假 baostock 使其 login 立即抛错(而非静默挂死)，并 stub requests.get
+# 让 regime_filter 快失败；跳过 FACTOR_LAB 等待循环。小九(中国IP)永不设此变量，保持原在线行为。
+V8_OFFLINE = os.environ.get("V8_OFFLINE", "0") == "1"
+if V8_OFFLINE:
+    import sys as _sys
+    class _FakeBao:
+        @staticmethod
+        def login(*a, **k):
+            raise RuntimeError("V8_OFFLINE: baostock disabled")
+        @staticmethod
+        def query_history_k_data(*a, **k):
+            raise RuntimeError("V8_OFFLINE: baostock disabled")
+        @staticmethod
+        def logout(*a, **k):
+            return None
+    _sys.modules["baostock"] = _FakeBao()
+    import requests as _req
+    def _offline_get(*_a, **_k):
+        raise _req.exceptions.ConnectionError("V8_OFFLINE: network disabled")
+    _req.get = _offline_get
+    try:
+        _req.Session.get = _offline_get
+    except Exception:
+        pass
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(ROOT, "raw_data")
 DATA = os.path.join(ROOT, "data")
@@ -506,7 +531,8 @@ def main():
     #   校验 FACTOR_LAB.js 为当日新鲜；缺失/陈旧则有限等待（覆盖 B 批生成器偶发延迟），超时仍不可用则降级跳过融合。
     fl = None
     _today = datetime.now().strftime("%Y-%m-%d")
-    for _wi in range(20):  # 最多等 ~20min（正常 19:40 前 B 批已产完，此处通常 0 等待）
+    _fl_max_wait = 0 if V8_OFFLINE else 20  # 离线模式本机无 baostock 注定取不到 FACTOR_LAB，直接跳过等待
+    for _wi in range(_fl_max_wait):  # 最多等 ~20min（正常 19:40 前 B 批已产完，此处通常 0 等待）
         _cand = load_js("FACTOR_LAB.js", "FACTOR_LAB")
         if _cand and str(_cand.get("update_time", "")).startswith(_today):
             fl = _cand

@@ -42,7 +42,7 @@ def deploy():
         rc, _, _ = run(["git", "rebase", "origin/main"], cwd=REPO)
         if rc != 0:
             run(["git", "rebase", "--abort"], cwd=REPO)
-            run(["git", "stash"], cwd=REPO)
+            run(["git", "stash", "-u"], cwd=REPO)
             rc, _, _ = run(["git", "rebase", "origin/main"], cwd=REPO)
             run(["git", "stash", "pop"], cwd=REPO)
             if rc != 0:
