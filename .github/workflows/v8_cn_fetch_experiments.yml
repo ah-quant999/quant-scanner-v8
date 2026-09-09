@@ -1,0 +1,143 @@
+# 九宝量化 v8.0 — 暂未上架区实验卡数据抓取
+#
+# 🧪 2026-09-10 主人令：3 张实验卡（估值分位切换 / 因子审计 / 指数估值中枢）每日盘后
+#   16:30 CST 跑全量（fetcher → update_v8 → 推 main），独立于主链 v8_cn_fetch_cloud 的
+#   17:20 / 18:20 / 19:20 三档，避免互相干扰或单点失败连累主链路。
+#
+# 链结构：
+#   1. checkout 源码
+#   2. 装 akshare / requests（fetch_valuation_percentile 联网依赖）
+#   3. 跑 3 个 fetcher
+#      - scripts/fetch_valuation_percentile.py（akshare stock_index_pe_lg）
+#      - scripts/gen_factor_audit.py（读 generate_top10.py 源码做审计）
+#      - scripts/fetch_index_value_framework.py（读 INDEX_HISTORY.js ＋ akshare/东财补中证）
+#   4. python update_v8.py --category post_close（重生成 data/*.js + 更新 ?v）
+#   5. 推 main（仅这 3 张卡相关文件 + index.html 戳变化，原子提交）
+#
+# 🛡 铁律：
+#   - 独立 concurrency group（v8-cn-fetch-experiments）→ 不与主链互踢
+#   - 显式 git add 具体文件 → 严禁 add -A（坚果云上传本机时此模式曾误删 data/ 101 个文件）
+#   - push 走 https + x-access-token → 不依赖 ssh key
+#   - tz 显式 Asia/Shanghai → 避免云端 UTC 写错 update_time
+#
+# 已知局限（已写进交接，待小九处理）：
+#   - 沪深300/中证500/中证1000 在 fetch_index_value_framework.py 里会返回 available:false
+#     （akshare/东财接口当前环境不可用），属数据问题不是 yml 问题。
+#   - 上证指数数据可能滞后 2 个交易日（INDEX_HISTORY.js 自身刷新节奏）。
+
+name: "🧪 v8 实验卡数据抓取（暂未上架区）"
+
+on:
+  schedule:
+    - cron: '30 8 * * 1-5'  # 16:30 CST 盘后跑（早于主链 17:20 抓，确保不撞车）
+  workflow_dispatch:
+    inputs:
+      run_valuation:
+        description: '跑估值分位 fetcher（默认 true）'
+        required: false
+        default: 'true'
+        type: boolean
+      run_factor_audit:
+        description: '跑因子审计 generator（默认 true）'
+        required: false
+        default: 'true'
+        type: boolean
+      run_index_value:
+        description: '跑指数估值中枢 fetcher（默认 true）'
+        required: false
+        default: 'true'
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  # 独立 group，不与主链 v8-cn-fetch-cloud 互斥
+  group: v8-cn-fetch-experiments
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TZ: Asia/Shanghai
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: "🕒 Checkout 源码"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "📦 装依赖（akshare / requests）"
+        run: |
+          python -m pip install --quiet --upgrade pip
+          pip install --quiet akshare requests
+
+      - name: "📡 跑 3 个 fetcher"
+        run: |
+          set -e
+          if [ "${{ inputs.run_valuation }}" != "false" ]; then
+            echo "--- fetch_valuation_percentile ---"
+            python scripts/fetch_valuation_percentile.py || echo "⚠️ valuation fetcher failed (non-fatal)"
+          fi
+          if [ "${{ inputs.run_factor_audit }}" != "false" ]; then
+            echo "--- gen_factor_audit ---"
+            python scripts/gen_factor_audit.py || echo "⚠️ factor audit failed (non-fatal)"
+          fi
+          if [ "${{ inputs.run_index_value }}" != "false" ]; then
+            echo "--- fetch_index_value_framework ---"
+            python scripts/fetch_index_value_framework.py || echo "⚠️ index value failed (non-fatal)"
+          fi
+
+      - name: "🔄 重新生成 data/*.js + 更新 ?v"
+        run: |
+          python update_v8.py --category post_close
+
+      - name: "🚀 推 main（仅 3 卡相关文件 + index.html 戳）"
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
+          git config user.name "v8-experiments-bot"
+          git config user.email "v8-bot@users.noreply.github.com"
+          git remote set-url origin "$REPO" 2>/dev/null || git remote add origin "$REPO"
+
+          # 🛡 显式 add 具体文件（严禁 -A）
+          git add \
+            data/VALUATION_PERCENTILE.js \
+            data/FACTOR_AUDIT.js \
+            data/INDEX_VALUE_FRAMEWORK.js \
+            raw_data/valuation_percentile.json \
+            raw_data/factor_audit.json \
+            raw_data/index_value_framework.json \
+            index.html
+
+          # 没有变更就不提交
+          if git diff --cached --quiet; then
+            echo "⏭️ 无变更，跳过提交"
+            exit 0
+          fi
+
+          # 软失败但强制告警
+          _v8_ok=0
+          for i in 1 2 3; do
+            if git commit -m "experiment: 估值分位/因子审计/指数估值中枢 盘后刷新 ($(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M'))"; then
+              if git push "$REPO" HEAD:main; then
+                echo "✅ 已推 main（第 $i 次）"; _v8_ok=1; break
+              fi
+            fi
+            echo "⚠️ push/commit 被拒，重试 ($i/3)"
+            sleep 5
+            git fetch origin main && git rebase origin/main || true
+          done
+
+          if [ "$_v8_ok" != "1" ]; then
+            echo "::error title=v8-experiments-softfail::🛡️ 实验卡盘后刷新推送失败，请人工核查"
+            exit 1
+          fi
