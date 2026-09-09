@@ -1345,7 +1345,7 @@ function _buildJudgmentEnvHTML(d){
   var _cons = (typeof d==='object' && d) ? (d.consensus||'') : '';
   var lvColor = LIGHT[_cons.indexOf('偏多')>=0 ? 'green' : (_cons.indexOf('偏空')>=0 ? 'red' : 'yellow')];
   h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 12px;background:'+lvColor+'12;border:1px solid '+lvColor+'45;border-radius:8px;font-size:13px;flex-wrap:wrap">'
-    + '<span style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:'+lvColor+'">'+lightDot(lvColor,14)+'今日信号 · '+(_cons.indexOf('偏多')>=0 ? '积极' : (_cons.indexOf('偏空')>=0 ? '防守' : '观望'))+'</span>'
+    + '<span style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:'+lvColor+'">'+lightDot(lvColor,14)+'今日信号 · '+_cons+'</span>'
     + '<span style="margin-left:auto;font-size:10px;color:var(--dim)">🟢 积极 · 🟡 观望 · 🔴 防守</span></div>';
   /* 2026-08-30 主人令：全站择时裁决已统一收敛到「实时数据 → AI市场速览」顶部，
      今日判定不再重复展示择时结论，仅保留盘前读盘参考（共识/星级/时事），避免多处评判混乱。 */
@@ -9551,14 +9551,18 @@ function drawUpDownChart(){
     } catch (e) {}
     // 🩺 2026-09-08 D2-C 一劳永逸：显式纳入 HEALTH_CHECK 心跳时间（含 updated_at）
     //    旧实现只扫 timeFields（无 updated_at），漏掉 HEALTH_CHECK 心跳 → 页面误报「已停更」红灯。
+    // 🩺 2026-09-09 D2-C 收口（阿狸咪 08:45 P0-2）：HEALTH_CHECK 心跳是「站点是否存活」的权威信号，
+    //    应优先用其 updated；只有当 HEALTH_CHECK 自身缺失/格式不符时才回退到多源 max（避免 30min 节奏的
+    //    HEALTH_CHECK.updated 被其他陈旧源拖成「陈旧 max」反而误报「已停更」）。
+    let hcUpdated = null;
     try {
       const _hc = window.HEALTH_CHECK || {};
-      for (const _f of ['update_time','updated_at','updated','last_update','check_time']) {
+      for (const _f of ['updated','updated_at','update_time','last_update','check_time']) {
         const _t = _hc[_f];
-        if (_t && typeof _t === 'string' && /^\d{4}-\d{2}-\d{2}/.test(_t)) cands.push(_t);
+        if (_t && typeof _t === 'string' && /^\d{4}-\d{2}-\d{2}/.test(_t)) { hcUpdated = _t; break; }
       }
     } catch (e) {}
-    const liveUpdated = cands.length ? cands.sort().pop() : nowStr;
+    const liveUpdated = hcUpdated || (cands.length ? cands.sort().pop() : nowStr);
     const liveUpdatedDate = parseTs(liveUpdated);
     const staleMin = liveUpdatedDate ? Math.floor((new Date() - liveUpdatedDate) / 60000) : 0;
     // 🩺 2026-09-08 D2-C：阈值 30→60 分钟。多项数据源天然 1h+ 频（如 FACTOR_LAB 1440 分钟），
