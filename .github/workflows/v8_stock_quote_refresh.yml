@@ -360,24 +360,34 @@ jobs:
           #    本地无 index.html → FileNotFoundError；run92 的 success 是靠 runner 工作区残留碰运气）
           idx_url = f"https://api.github.com/repos/{REPO}/contents/index.html"
           html = idx_sha = None
-          for attempt in range(4):
+          # 🔴 run95 实证：cn runner GET 1.4MB JSON 偶发 http.client.IncompleteRead
+          #    （网络截断）——瞬时网络异常一律退避重试。
+          import http.client as _hc
+          _TRANSIENT = (urllib.error.URLError, _hc.IncompleteRead,
+                        ConnectionError, TimeoutError, OSError)
+          for attempt in range(5):
               try:
                   existing = api("GET", idx_url)
                   idx_sha = existing.get("sha")
                   html = base64.b64decode(existing["content"]).decode("utf-8")
                   break
               except urllib.error.HTTPError as e:
-                  if e.code in (409, 422) and attempt < 3:
+                  if e.code in (409, 422) or e.code >= 500:
                       import time as _t; _t.sleep(3); continue
                   if e.code == 404:
                       print("  ⚠️ index.html 不存在，跳过 ?v 更新")
                       raise SystemExit(0)
                   raise
+              except _TRANSIENT:
+                  import time as _t; _t.sleep(4); continue
+          if html is None:
+              print("  ⚠️ index.html 连续 5 次获取失败（网络截断），本轮跳过 ?v 更新（哨兵 10min 后自愈重试）")
+              raise SystemExit(0)
           # 匹配: index.html 实际用 loader 数组 {name:'STOCK_QUOTE', url:'data/STOCK_QUOTE.js?v=xxx'}
           #       （run94 实证旧 <script src> 正则匹配 0 处 → 假 success 跳过）。
           #       改为上下文无关匹配，兼容 loader 数组与 script 标签两种形态。
           pattern = r'(data/STOCK_QUOTE\.js\?v=)([a-f0-9]+)'
-          new_html, n = re.subn(pattern, lambda m: m.group(1) + content_sha + m.group(3), html)
+          new_html, n = re.subn(pattern, lambda m: m.group(1) + content_sha, html)
           if n == 0:
               print("  ⚠️ index.html 中未找到 STOCK_QUOTE.js?v= 引用，可能已被外链替换；跳过 ?v 更新")
           elif new_html == html:
@@ -399,9 +409,12 @@ jobs:
                   except urllib.error.HTTPError as e:
                       if e.code in (409, 422) and attempt < 3:
                           import time as _t; _t.sleep(3)
-                          existing = api("GET", idx_url)
-                          idx_sha = existing.get("sha")
-                          cur = base64.b64decode(existing["content"]).decode("utf-8")
+                          try:
+                              existing = api("GET", idx_url)
+                              idx_sha = existing.get("sha")
+                              cur = base64.b64decode(existing["content"]).decode("utf-8")
+                          except Exception:
+                              break  # 重取失败则本轮放弃，哨兵下轮自愈
                           # 并发方已写入同款 ?v 则无需再推
                           if re.search(pattern.replace(r'([a-f0-9]+)', content_sha), cur):
                               print("  并发方已写入同款 ?v，跳过推送")
