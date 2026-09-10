@@ -465,6 +465,17 @@ jobs:
         run: |
           python cloud_fetch_v8.py --only CANDIDATE_QUOTES || true
 
+      # 🛡 2026-09-11 一劳永逸（主人令「运维和看板的失败红灯全面修复」）：本链此前无 update_v8 步
+      #   （2026-08-18 注释所述「update_v8 重生成 data/*.js」步已不存在）→ 纯盘后 raw_data 新而
+      #   data/*.js 旧 → v8_verify_layer_parity 跨层闸门必红且下轮仍红（09-11 实证 19 对不一致）。
+      #   按 update_v8 2026-09-10 防回滚护栏的显式授权通道（--category post_close）补跑重建；
+      #   ?v 缓存戳由既有 --only-cache-busters / reconcile 机制统一收敛，此处不重复。
+      - name: "🏗️ 重建盘后 data/*.js（update_v8 --category post_close）"
+        if: steps.gate.outputs.proceed == 'true'
+        shell: bash
+        run: |
+          python update_v8.py --category post_close
+
       - name: "📤 唯一推送（本链只此一处推送 data/ 与 raw_data/，严格退出码）"
         if: steps.gate.outputs.proceed == 'true'
         run: |

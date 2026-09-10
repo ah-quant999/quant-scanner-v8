@@ -303,6 +303,9 @@ jobs:
         shell: powershell
         run: |
           python update_v8.py
+          # 🛡 2026-09-11 一劳永逸（对齐主链 all 档模式）：全量后补跑 post_close（防回滚护栏的显式授权通道），
+          # 否则纯盘后 raw 新 / data 旧 → 跨层一致性闸门必红（09-11 实证 19 对不一致）。
+          python update_v8.py --category post_close
 
       - name: "🔄 同步 ALGO_TRACK 缓存戳 ?v（Contents API 直推 index.html）"
         # 2026-09-04 自云端 v8_algo_cloud.yml 移植（包装层对齐·主人令「都按你的建议做」）：

@@ -386,6 +386,11 @@ jobs:
         shell: bash
         run: |
           python update_v8.py
+          #   🛡 2026-09-11 一劳永逸（对齐主链 all 档模式）：update_v8 的 2026-09-10 防回滚护栏规定
+          #   「纯盘后产物」仅在 --category post_close 显式授权时重建 → 全量调用后必须补跑 post_close，
+          #   否则本链刷新的 post_close raw 与 data/*.js 时间戳不一致 → 跨层一致性闸门（v8_verify_layer_parity）必红
+          #   且下轮仍红（09-11 实证 19 对不一致、当日构建部署 9 次 failure）。
+          python update_v8.py --category post_close
 
           # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
           #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
