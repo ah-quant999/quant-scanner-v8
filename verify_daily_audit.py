@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """v8 每日审计：当天修改审核通过防覆盖 + 与单位机小九交接。
 
-挂在 v8_backup.yml 21:00 CST 备份任务里跑（与 align_logic_ops.py / verify_card_badges.py 并列）。
+挂在 v8_backup.yml 23:00 CST 备份任务里跑（与 align_logic_ops.py / verify_card_badges.py 并列）。
+该 step 自 2026-09-10 起为【真阻断】：结构性漂移 → 退出码 1 → job 失败（不再 continue-on-error）。
 
 检查项：
   1. 当天小九的常规交接文档存在
@@ -10,11 +11,8 @@
      → 否则告警（未与小九做常规交接）
   2. 当天 origin/main 所有 commit 的 short hash 至少在一份当日交接文档里被提到
      → 否则告警（修改未经审计/未记录，防覆盖场景下是高风险 commit）
-  3. 当天 origin/main 所有 commit 的 message 含特定关键词（verified / 已审 / 已交接 / reviewed）
-     → 弱校验；与 2 互补（一些自动 commit 没人工审但有 HANDOVER 提过；反之亦然）
-
-发现漂移 → 写 HANDOVER_LOG.jsonl 并打印告警，退出码 1（备份步用 continue-on-error 不阻断）。
-全部通过 → 退出码 0。
+退出码：结构性硬失败（上述 1 或 2 未提及比例 > MANUAL_MISS_HARD_RATIO）→ 1；
+        非结构性软告警 / 无法判定 → 0（仅落 HANDOVER_LOG.jsonl，不阻断）。
 
 不依赖 PyYAML；仅用 subprocess 调 git。
 """
@@ -288,7 +286,7 @@ def main():
         f.write(json.dumps(log, ensure_ascii=False) + "\n")
 
     if has_drift:
-        print(f"❌ 每日审计发现【结构性】漂移（硬失败），已写入 HANDOVER_LOG.jsonl（备份步已配置 continue-on-error 不阻断）")
+        print(f"❌ 每日审计发现【结构性】漂移（硬失败），已写入 HANDOVER_LOG.jsonl（v8_backup.yml 审计步将真阻断本 job）")
         sys.exit(1)
     if has_soft:
         print(f"⚠️ 每日审计有【非结构性】软告警（不阻断，详见上方逐项）")

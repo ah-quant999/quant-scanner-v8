@@ -2,14 +2,15 @@
 """verify_card_badges.py
 
 校验 index.html 全站"更新于"卡片是否都已统一改用截图样式的 _uBadge 胶囊。
-挂到 v8_backup.yml：每晚 21:00 自动跑。
+挂到 v8_backup.yml：每晚 23:00（备份链末尾）自动跑；漂移即阻断该 job（2026-09-10 起）。
 
 规则：
 1. 抽出所有 .fresh ID（HTML 静态 / JS 端 ID）
 2. 抽出所有 setBadge('id', ...) 和 _uBadge(_inline_) 调用涉及到的 ID
 3. 抽 .fresh ID 但没有 setBadge 调用或 innerHTML=_uBadge 的，记入漂移
 4. 额外：显式列出的非 .fresh 卡片时间 ID（如 aiSummaryTime）也要校验
-5. 主站结构变更多由人手同步，校验结果进 HANDOVER_LOG，不阻断备份
+5. 主站结构变更多由人手同步；漂移 → 写 HANDOVER_LOG 并 sys.exit(1)
+   （🔴 2026-09-10 主人令：原「不阻断备份，仅告警」升为真阻断）
 
 输出：HANDOVER_LOG.jsonl 一条漂移记录
 """
@@ -91,5 +92,5 @@ with log.open('a', encoding='utf-8') as f:
 
 if drift:
     print(f'\n❌ 发现 {len(drift)} 处漂移，已写入 HANDOVER_LOG.jsonl')
-    sys.exit(0)  # 不阻断备份，仅告警
+    sys.exit(1)  # 🔴 2026-09-10 主人令：升为真阻断（原「不阻断备份，仅告警」恒 exit 0）
 print('\n✅ 全站卡片已 100% 统一 _uBadge 胶囊化（截图样式）')

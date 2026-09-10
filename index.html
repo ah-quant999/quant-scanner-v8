@@ -9862,8 +9862,8 @@ function drawUpDownChart(){
       nightlyBlock = '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--dim);">🌙 本机夜间审计：暂无（等待本机任务产出）</div>';
     }
     el.innerHTML = latestHtml + histBlock + nightlyBlock;
-    const tEl = document.getElementById('auditTrailTime');
-    if(tEl) tEl.textContent = at.generated_at ? _esc(at.generated_at) : (latest.date||'');
+    // 2026-09-10：改用全站统一胶囊（原 textContent 直写 → 被 verify_card_badges 判为唯一漂移）
+    setBadge('auditTrailTime', '', '', at.generated_at || (latest.date||''));
   }
 
   /* ---- 任务运行看板（按前端页面→卡片顺序，每个时段成功✓失败✗） ---- */
