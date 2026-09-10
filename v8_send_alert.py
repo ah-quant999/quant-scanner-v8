@@ -78,11 +78,18 @@ def load_config():
 
 
 def host_label(cfg=None):
-    """告警溯源用的机器标识（环境变量 > 配置文件 > hostname）。"""
+    """告警溯源用的机器标识（环境变量 > 配置文件 > hostname）。
+
+    🛡 2026-09-10 修复：原来 cfg=None 时只做 `cfg or {}`、
+    不会去读配置文件，导致 `_trace()` 里的 host= 恒退化成裸主机名
+    （实测 host=Cat），与主题行的「[v8·阿狸咪]」不一致，双机告警溯源时无法分辨。
+    现改为 cfg=None 时主动 load_config()。
+    """
     lab = os.environ.get("V8_ALERT_HOST", "").strip()
     if lab:
         return lab
-    cfg = cfg or {}
+    if cfg is None:
+        cfg = load_config() or {}
     lab = str(cfg.get("host_label", "") or "").strip()
     if lab:
         return lab
