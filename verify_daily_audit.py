@@ -5,8 +5,10 @@
 挂在 v8_backup.yml 21:00 CST 备份任务里跑（与 align_logic_ops.py / verify_card_badges.py 并列）。
 
 检查项：
-  1. 当天的 HANDOVER_小九_YYYY-MM-DD.md 存在 → 否则告警（未与小九做常规交接）
-  2. 当天 origin/main 所有 commit 的 short hash 至少在一份 HANDOVER_*.md 或 URGENT_*.md 里被提到
+  1. 当天小九的常规交接文档存在
+     （唯一交接目录 docs/ops/handover/ 下的 YYYY-MM-DD_HHmm[*_URGENT]_*小九* 文件）
+     → 否则告警（未与小九做常规交接）
+  2. 当天 origin/main 所有 commit 的 short hash 至少在一份当日交接文档里被提到
      → 否则告警（修改未经审计/未记录，防覆盖场景下是高风险 commit）
   3. 当天 origin/main 所有 commit 的 message 含特定关键词（verified / 已审 / 已交接 / reviewed）
      → 弱校验；与 2 互补（一些自动 commit 没人工审但有 HANDOVER 提过；反之亦然）
@@ -26,12 +28,16 @@ LOG_PATH = os.path.join(ROOT, "HANDOVER_LOG.jsonl")
 CST = timezone(timedelta(hours=8))
 today_cst = datetime.now(CST).strftime("%Y-%m-%d")
 today_compact = today_cst.replace("-", "")     # 20260806
-today_md = f"HANDOVER_小九_{today_cst}.md"     # 当日常规交接文件名
+# 2026-09-10 主人令：交接文档统一到唯一目录 docs/ops/handover/，
+#   命名 YYYY-MM-DD_HHmm[_URGENT]_<发件>给<收件>_<主题>.md
+#   按【文件名】排序 = 时间排序；禁用 mtime（坚果云同步会重写 mtime）
+HANDOVER_DIR = os.path.join(ROOT, "docs", "ops", "handover")
+today_prefix = today_cst + "_"                 # 当天交接文件名前缀
 short_sha_re = re.compile(r"\b[0-9a-f]{7,40}\b")
 
 # 🛡 2026-09-10 主人拍板「结构性错误硬阻断 + 非结构性降 warn 不阻断」：
 #   结构性错误（硬失败，退出码 1）：
-#     ① 当天缺失 HANDOVER_小九_YYYY-MM-DD.md —— 完全未交接
+#     ① 当天缺失小九的常规交接文档（docs/ops/handover/<今日>_*小九*）—— 完全未交接
 #     ② 当天人工 commit 未提及比例 > MANUAL_MISS_HARD_RATIO —— 大面积未记录 = 交接实质缺失
 #   非结构性（降软告警，不影响退出码）：
 #     ③ 个别 commit 关键词未命中 —— 关键词为模糊匹配，个例属误差，不应误杀整轮审计
@@ -80,12 +86,26 @@ def get_today_origin_commits():
 
 
 def load_today_handover_text():
-    """读今天所有 HANDOVER_*.md / URGENT_*.md / 自动化 memory.md 的全文，return list[str]"""
+    """读当天全部交接文档（唯一目录 docs/ops/handover/）+ 自动化 memory.md，return list[str]
+
+    🛡 2026-09-10 交接目录统一后修正：原先扮 os.listdir(ROOT) 找当日 *.md，
+       迁移后仓库根只剩 5 个核心 md（当日交接全在 docs/ops/handover/）→
+       命中面归零会使检查 2 的「关键词提及率」恒超阈值而误判硬失败。
+    """
     texts = []
+    # ① 唯一交接目录内当天全部交接（含 _URGENT_），按文件名升序读取
+    if os.path.isdir(HANDOVER_DIR):
+        for fn in sorted(os.listdir(HANDOVER_DIR)):
+            if not fn.endswith(".md") or not fn.startswith(today_prefix):
+                continue
+            if fn.startswith(("README", "_")):
+                continue
+            texts.append(("handover/" + fn,
+                          open(os.path.join(HANDOVER_DIR, fn), encoding="utf-8").read()))
+    # ② 兼容：仓库根若仍有当日 md（历史遗留/临时件）一并纳入，防漏读
     for fn in os.listdir(ROOT):
         if not fn.endswith(".md"):
             continue
-        # 当天常规交接 / 紧急 / 周末改造 / 算法迁移 / 任何 *小九* / *阿狸咪* 8-06 文件
         if today_compact in fn or today_cst in fn:
             texts.append((fn, open(os.path.join(ROOT, fn), encoding="utf-8").read()))
     # 也读 .workbuddy/memory 里的当日记忆（跨仓视野）
@@ -117,13 +137,26 @@ def load_today_handover_text():
 
 
 def check_handover_xj_exists():
-    """检查 1：当天的 HANDOVER_小九_YYYY-MM-DD.md 是否存在"""
-    p = os.path.join(ROOT, today_md)
-    if os.path.exists(p):
-        return True, f"✅ {today_md} 已存在"
+    """检查 1：当天小九的常规交接文档是否存在（唯一目录 docs/ops/handover/）
+
+    命中判据：文件名以 <今日>_ 开头且含「小九」；`*_URGENT_*` 紧急件同样计入
+    （紧急件本身就是一次交接，不应判「未交接」）。
+    """
+    hits = []
+    if os.path.isdir(HANDOVER_DIR):
+        for fn in sorted(os.listdir(HANDOVER_DIR)):
+            if not fn.endswith(".md") or not fn.startswith(today_prefix):
+                continue
+            if fn.startswith(("README", "_")):
+                continue
+            if "小九" in fn:
+                hits.append(fn)
+    if hits:
+        return True, ("✅ 当天小九交接已存在：" + "、".join(hits[:3])
+                      + ("…" if len(hits) > 3 else ""))
     return False, (
-        f"⚠️ 缺失 {today_md} —— 当天未与小九做常规交接。"
-        f"如本端(阿狸咪)已完成交接任务，请补写。"
+        f"⚠️ 缺失当天小九的常规交接 —— docs/ops/handover/ 下无 「{today_cst}_*小九*」文件。"
+        f"当天未与小九做常规交接；如本端(阿狸咪)已完成交接任务，请补写。"
     )
 
 
