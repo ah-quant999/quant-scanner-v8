@@ -64,6 +64,12 @@ jobs:
     env:
       TZ: Asia/Shanghai
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # 🔴 2026-09-10 14:10 GBK 崩溃一劳永逸（主人令「严禁同样 bug 二次出现」）：
+      #   run 90/91 实证——本机 Windows runner 上所有内联 python（抓取/推送/?v 同步）
+      #   打印 ✅/⚠️ emoji 时 UnicodeEncodeError('gbk' codec) 崩溃。
+      #   job 级强制 UTF-8，覆盖全部步骤，不再逐步骤打补丁。
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
       # safe-delete 守卫：cn runner 默认 50 会被拦，抬到 1000
       CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 1000
     defaults:
@@ -223,13 +229,7 @@ jobs:
 
       - name: "🧮 跑 fetch_stock_quote_v8.py（5-10 分钟）"
         if: steps.trading.outputs.is_trading_day == 'true'
-        # 🔴 2026-09-10 13:58 GBK 崩溃根治（小九看门狗巡检发现）：
-        #   self-hosted runner 上 fetch 脚本打印 ✅/⚠️ emoji 时
-        #   UnicodeEncodeError: 'gbk' codec can't encode —— Windows 控制台默认 GBK。
-        #   强制 UTF-8 输出，脚本逻辑/数据源零改动。
-        env:
-          PYTHONIOENCODING: utf-8
-          PYTHONUTF8: "1"
+        # GBK 崩溃已升级为 job 级 PYTHONIOENCODING/PYTHONUTF8 根治（见 job env 注释）
         run: |
           set +e
           cd algorithms && python fetch_stock_quote_v8.py
