@@ -47,6 +47,20 @@ jobs:
       #   30 分钟去抖锁由 cn_fetch 内部自愈的 _load_heal_lock 保证不会雪崩。
       - name: "🔧 CORE/WARN 过期 → 云端补抓（category=heal）"
         run: |
+          # 🔴 2026-09-10 一劳永逸修复（盘中混乱根因②）：交易时段【只检测、不派发】。
+          #   本守门 cron 是每小时 :10/:40，而盘中准点档调度器是 :00/:20/:40 —— 两者在 :40
+          #   同分钟撞车。同并发组 GitHub 只保留 1 个 pending，新派发会把准点档的 pending
+          #   顶掉 → 09-10 实测 26 个 run 被 cancelled（大多从未启动），盘中出现 26~62 分钟空窗。
+          #   修复：09:32-15:05 CST 工作日的盘中派发权【唯一】归属 20 分准点档调度器；
+          #   本守门在该时段仅做检测与留痕，不 dispatch。盘前/盘后/夜间行为不变。
+          HHMM=$(TZ=Asia/Shanghai date '+%H%M' | sed 's/^0*//'); HHMM=${HHMM:-0}
+          DOW=$(TZ=Asia/Shanghai date '+%u')
+          if [ "$DOW" -le 5 ] && [ "$HHMM" -ge 932 ] && [ "$HHMM" -le 1505 ]; then
+            echo "🛡 交易时段（$(TZ=Asia/Shanghai date '+%H:%M') CST）：盘中派发权归 20 分准点档调度器，本守门仅检测不派发"
+            echo "--- 新鲜度检查尾部（供留痕）---"
+            tail -12 freshness_out.txt || true
+            exit 0
+          fi
           if grep -qE "(核心数据过期|次要数据过期)" freshness_out.txt 2>/dev/null; then
             echo "🔧 检测到 CORE/WARN 过期，dispatch v8_cn_fetch_cloud.yml category=heal"
             gh workflow run v8_cn_fetch_cloud.yml -f category=heal || true
