@@ -527,9 +527,13 @@ _FINAL_RECOMMEND_INPUTS = {
 # 🛡 2026-08-26 补全（昨天门控漏挂四量）：final_recommend 实际读 data/FOUR_VOLUME_60M.js
 #   （60min 四量终极共振），四量终极卡还读 data/FOUR_VOLUME.js；二者必须本轮回合新鲜产出，
 #   否则最终推荐用陈旧四量汇总（"逻辑不对"根因）。这两脚本直接写 data/*.js（不经 out/，无需 stage）。
+# 🛡 2026-09-10 主人令（一劳永逸·硬等待）：final_recommend 实际读 data/FOUR_VOLUME_60M.js（60min），
+#   四量终极卡读 data/FOUR_VOLUME.js（日线）。二者必须本轮回合新鲜产出，否则最终推荐用陈旧四量汇总（"逻辑不对"根因）。
+#   - FOUR_VOLUME_60M.js：保持软告警（加分因子，final_recommend.py 已做 60m 非今日→回退日线版降级）。
+#   - FOUR_VOLUME.js（日线版，主信号源）：升级为【硬等待】——见 _final_recommend_gate，非今日则重跑生成器并等待，
+#     超时才拒绝产出（绝不用陈日落盘汇总）。主人 19:52 拍板："盘后算的才有效，算法链停下等重算出来再继续"。
 _FINAL_RECOMMEND_DATA_INPUTS = {
-    "FOUR_VOLUME_60M.js": ("strategy_four_volume_60m.py", False),
-    "FOUR_VOLUME.js":      ("strategy_four_volume.py", False),
+    "FOUR_VOLUME_60M.js": ("strategy_four_volume_60m.py", False),  # 软告警（加分因子）
 }
 
 
@@ -588,6 +592,32 @@ def _gate_ensure_inputs(inputs_map, base_dir, run_start, soft=False):
     #   final_recommend.py 自身会回退日线版，无需整轮跳过。
     return (True, bad) if soft else (len(bad) == 0, bad)
 
+
+def _gate_hardwait_four_volume(run_start, max_retry=3, wait_sec=90):
+    """🛡 2026-09-10 主人令：四量终极其日线版(FOUR_VOLUME.js)硬等待。
+    盘后 final_recommend 必须等日线四量今日新鲜产出；非今日则重跑 strategy_four_volume.py 并 sleep 等待，
+    最多 max_retry 次。成功产出当日数据→返回 True；超时仍陈旧→返回 False（gate 据此拒绝产出，不用陈旧）。
+    区别于旧软告警：旧逻辑陈旧也照常产出（用旧）；本函数实现主人诉求"停下等重算出来再继续"。"""
+    import time
+    fpath = os.path.join(V8_ROOT, "data", "FOUR_VOLUME.js")
+    prod = os.path.join(ALGO, "strategy_four_volume.py")
+    for attempt in range(1, max_retry + 1):
+        if os.path.exists(fpath) and datetime.fromtimestamp(os.path.getmtime(fpath)) >= run_start:
+            return True
+        print(f"  ⏳ 四量终极其日线版非今日(run_start={run_start})，第{attempt}/{max_retry}次重跑 strategy_four_volume.py 并等待{wait_sec}s")
+        try:
+            _gto = _script_timeout("strategy_four_volume.py")
+            r = subprocess.run([PY, prod], cwd=ALGO, capture_output=True, text=True, timeout=_gto)
+            print(f"     {'✅' if r.returncode == 0 else '⚠️ 退出码 ' + str(r.returncode)} 重跑 strategy_four_volume.py")
+        except Exception as e:
+            print(f"     ❌ 重跑 strategy_four_volume.py 异常: {e}")
+        if os.path.exists(fpath) and datetime.fromtimestamp(os.path.getmtime(fpath)) >= run_start:
+            return True
+        if attempt < max_retry:
+            time.sleep(wait_sec)
+    return False
+
+
 def _final_recommend_gate(run_start):
     """final_recommend 前的就绪门控。返回 True=可继续；False=应跳过本轮最终推荐。
     🛡 2026-08-26 补全：校验 raw_data/*.json 核心选股输入（硬，缺失/陈旧则拒绝产出，遵守「不得造假」）。
@@ -601,12 +631,16 @@ def _final_recommend_gate(run_start):
     _stage_out_to_raw()
     # 核心选股输入：硬门控（缺失/陈旧且重跑仍失败 → 拒绝产出）
     ok_raw, bad_raw = _gate_ensure_inputs(_FINAL_RECOMMEND_INPUTS, os.path.join(V8_ROOT, "raw_data"), run_start)
-    # 四量终极：软告警（脚本自带回退，陈旧不阻断整轮）
+    # 四量终极 60m：软告警（脚本自带回退，陈旧不阻断整轮）
     _, bad_data = _gate_ensure_inputs(_FINAL_RECOMMEND_DATA_INPUTS, os.path.join(V8_ROOT, "data"), run_start, soft=True)
+    if bad_data:
+        print(f"  ⚠️ 四量 60m 输入陈旧(软告警，final_recommend 将回退日线版，不阻断): {', '.join(bad_data)}")
+    # 🛡 2026-09-10 主人令：四量终极其日线版【硬等待】——必须今日新鲜，否则停等重算，超时拒绝产出
+    if not _gate_hardwait_four_volume(run_start):
+        print(f"  🛑 四量终极其日线版等待超时仍非今日，拒绝产出最终推荐（避免陈日落盘汇总）")
+        return False
     if ok_raw:
-        if bad_data:
-            print(f"  ⚠️ 四量输入陈旧(软告警，final_recommend 将回退日线版，不阻断): {', '.join(bad_data)}")
-        print(f"  ✅ 核心选股输入均为本轮新鲜产出，放行 final_recommend（四量终极为加分因子，陈旧仅告警）")
+        print(f"  ✅ 核心选股输入+四量终极其日线版均为本轮新鲜产出，放行 final_recommend")
         return True
     print(f"  🛑 核心门控未通过，拒绝产出最终推荐（避免陈旧/造假数据）: {', '.join(bad_raw)}")
     return False
