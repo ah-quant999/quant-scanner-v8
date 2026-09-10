@@ -1,20 +1,12 @@
 {
-  "update_time": "2026-09-11 01:00:54",
-  "run_start": "2026-09-10 23:57:40",
-  "ok": 20,
-  "fail": 3,
+  "update_time": "2026-09-11 07:46:24",
+  "run_start": "2026-09-11 07:36:17",
+  "ok": 6,
+  "fail": 1,
   "failed_scripts": [
     {
-      "script": "v8/factor_lab_gen.py",
-      "reason": "退出码 1 | IndexError: list index out of range"
-    },
-    {
-      "script": "calc_crds.py",
-      "reason": "退出码 1 | NameError: name 'V8_OFFLINE' is not defined"
-    },
-    {
-      "script": "calc_stock_rps.py",
-      "reason": "监督器静默杀(>15min 无输出)"
+      "script": "factor_lab_backtest.py",
+      "reason": "退出码 1 | [error] _rps_cache 无 A股 6 位码 universe"
     }
   ],
   "skipped_by_time_gate": []
