@@ -78,7 +78,14 @@ concurrency:
 
 jobs:
   intraday_slot:
-    runs-on: [self-hosted, cn]
+    # 🔴 2026-09-10 一劳永逸修复（盘中混乱根因①）：原 runs-on: [self-hosted, cn] 本以为能
+    #    "固定小九单位机"，但 [self-hosted, cn] 是【标签集合】而非专属标签——任何注册了
+    #    self-hosted + cn 的 runner 都会被接单。实测 09-10 全天 14 档有 11 档落在 alimi-cn
+    #    （家里机），违反双机分时铁律；且机器忙碌/离线时档位会排队积压、错时执行
+    #    （15:29 / 17:22 / 19:03 / 20:04 这些盘后时刻的 schedule run 即由此而来）。
+    #    本 job 是纯调度器：只做 dispatch + 轮询 + 兜底派发，零数据、零写盘、零 push，
+    #    不需要中国 IP、不需要任何自托管机 → 改 GitHub 托管 ubuntu-latest，更快更稳。
+    runs-on: ubuntu-latest
     # 🛡 2026-09-09 一档最多 20 分钟：dispatch + sleep 10min + 查状态 + 兜底 dispatch
     #   （兜底 job 自己 75min timeout），本 yml 只跑前 20 分钟的"调度+检查"段
     timeout-minutes: 20
@@ -89,8 +96,51 @@ jobs:
       run:
         working-directory: ${{ github.workspace }}
     steps:
+      # 🔴 2026-09-10 一劳永逸修复（盘中混乱根因②）：三重守卫。
+      #   同并发组 GitHub 只保留 1 个 pending，新派发会把上一档 pending 顶掉
+      #   → 09-10 实测 26 个 run 被 cancelled（大多从未启动）。守卫不通过就整档安静退出。
+      - name: "🛡 三重守卫（交易日 / 时间窗 / 云端在途）"
+        id: guard
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set +e
+          DOW=$(TZ=Asia/Shanghai date '+%u')
+          HHMM=$(TZ=Asia/Shanghai date '+%H%M' | sed 's/^0*//'); HHMM=${HHMM:-0}
+          echo "本档时间: $(TZ=Asia/Shanghai date '+%F %T') CST (dow=$DOW hhmm=$HHMM)"
+          GO=true; WHY=""
+          if [ "$DOW" -ge 6 ]; then GO=false; WHY="非交易日(dow=$DOW)"; fi
+          if [ "$GO" = "true" ] && { [ "$HHMM" -lt 932 ] || [ "$HHMM" -gt 1505 ]; }; then
+            GO=false; WHY="迟到档/窗外（$HHMM 不在 09:32-15:05）"
+          fi
+          if [ "$GO" = "true" ]; then
+            curl -sS -o /tmp/inflight.json -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/ah-quant999/quant-scanner-v8/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=5" 2>/dev/null
+            UNFIN_TS=$(jq -r '[.workflow_runs[] | select(.status != "completed")] | sort_by(.created_at) | last | .created_at // empty' /tmp/inflight.json 2>/dev/null)
+            UNFIN_ID=$(jq -r '[.workflow_runs[] | select(.status != "completed")] | sort_by(.created_at) | last | .id // empty' /tmp/inflight.json 2>/dev/null)
+            if [ -n "$UNFIN_TS" ]; then
+              AGE=$(( ( $(date -u +%s) - $(date -u -d "$UNFIN_TS" +%s) ) / 60 ))
+              echo "云端在途: run#$UNFIN_ID 起始 $UNFIN_TS (龄 ${AGE}min)"
+              if [ "$AGE" -lt 30 ]; then
+                GO=false; WHY="云端在途（run#$UNFIN_ID，龄 ${AGE}min）→ 本档跳过，绝不制造第二个 pending"
+              else
+                echo "::warning title=云端疑似卡死::run#$UNFIN_ID 已 ${AGE}min 未完成，本档不派发，交由 v8_cn_fetch_watchdog(>45min) 兜底"
+              fi
+            else
+              echo "云端无在途 run ✅"
+            fi
+          fi
+          echo "go=$GO" >> "$GITHUB_OUTPUT"
+          if [ "$GO" = "true" ]; then
+            echo "✅ 守卫放行，本档正常派发"
+          else
+            echo "⏭ 守卫拦截，本档安静退出：$WHY"
+            echo "::notice title=盘中档跳过::$WHY"
+          fi
+
       - name: "🚀 dispatch 云端主力 v8_cn_fetch_cloud（category=intraday）"
         id: dispatch_cloud
+        if: steps.guard.outputs.go == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
@@ -230,7 +280,9 @@ jobs:
         #    ⑤ check 探测自身 failure 时同样从未赋值 → 兜底再次落空。
         #    现以 outcome 为准做完备覆盖：只要「dispatch 没成功」或「没探测成功」或「探测说要兜底」，
         #    一律兜底。宁可多跑一次 cn 兜底，也不能因为探测链路问题丢掉整档数据。
-        if: steps.dispatch_cloud.outputs.ok != 'true' || steps.check_cloud.outcome != 'success' || steps.check_cloud.outputs.need_fallback == 'true'
+        # 🔴 2026-09-10 同步加守卫门：守卫拦截（本档跳过）时 ok 为空串，原条件 `ok != 'true'`
+        #    会成立 → 无脑触发 cn 兜底，等于绕开守卫。必须先确认守卫放行。
+        if: steps.guard.outputs.go == 'true' && (steps.dispatch_cloud.outputs.ok != 'true' || steps.check_cloud.outcome != 'success' || steps.check_cloud.outputs.need_fallback == 'true')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
@@ -256,6 +308,7 @@ jobs:
           {
             echo "## 盘中准点档·本档总结"
             echo "- 档期: \`$(TZ=Asia/Shanghai date '+%F %T')\` CST"
+            echo "- 守卫: \`go=${{ steps.guard.outputs.go }}\`（false = 本档按设计跳过，非故障）"
             echo "- 云端 dispatch: \`${{ steps.dispatch_cloud.outcome }}\`"
             echo "- 云端 run 状态: \`${{ steps.check_cloud.outputs.status }}/${{ steps.check_cloud.outputs.conclusion }}\`"
             echo "- 兜底触发: \`${{ steps.check_cloud.outputs.need_fallback }}\`"
