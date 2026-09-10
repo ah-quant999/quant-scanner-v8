@@ -213,7 +213,13 @@ jobs:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           CN_WORKFLOW_ID=327687211   # 🇨🇳 v8 中国数据抓取(云端)
-          STALE_MIN=6
+          # 🔴 2026-09-10 主人令「该删就删，留最有效的」（风暴踩踏根治）：
+          #   原 STALE_MIN=6 ——「近 6 分钟无 cn_fetch 完成就派发」是本仓最激进的派发阈值
+          #   （cn_fetch 一轮本身要跑 8-20 分钟，6 分钟口径下几乎每轮巡检都补派一发）。
+          #   盘中 09:25-15:00 整轮已被本文件上方 gate 跳过，实际生效窗仅 09:00-09:24 与 15:00-17:00。
+          #   现收到 30 分钟：盘中派发权唯一归属准点档(lemoncat 14档)，状态兜底归看门狗(陈旧>45min)，
+          #   本步只作「主链彻底失联」的兜底，不再按 6 分钟蹭线派发。
+          STALE_MIN=30
           # 盘中时间才派发 intraday（盘前/盘后/周末 dispatch 也没用）
           CST_HH=$(TZ=Asia/Shanghai date +%H)
           CST_MM=$(TZ=Asia/Shanghai date +%M)

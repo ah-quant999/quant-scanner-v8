@@ -34,7 +34,6 @@ MUST_HAVE_CRON = {
     "v8_ima_strong_stock": "高手 ima 强势股(周一-五 07:45)",
     "v8_stock_quote_refresh": "盘中行情刷新",
     "v8_risk_gauge": "危机雷达/风险温度计",
-    "v8_freshness_watch": "数据新鲜度值守",
     "v8_health_patrol": "健康巡检",
     "v8_cache_buster_reconcile": "?v 缓存戳对齐",
     "v8_daily_audit": "每晚全站审核",
@@ -63,7 +62,6 @@ ALLOW_NO_CRON = {
     "v8_sync_v6_data",            # v6→v8 数据桥（应急）
     "v8_sync_legacy",             # legacy 同步（已退役）
     "v8_build_deploy",            # 由 workflow_run 触发，无 cron
-    "v8_slot_scheduler",          # 档期兜底调度器：2026-09-09 GHA cron 已删、无独立唤起器→休眠；盘中单源统一收口到「云端按铃(alimi_bell)」每20分（避免双源互踢）
     "v8_algo",                    # 46 模块新鲜度体检（已迁 dispatch-only，老引用）
     # 🛡 2026-09-10 阿狸咪临时豁免：v8_cn_fetch_experiments 是今日新加的"暂未上架·实验卡"抓取链
     # （估值分位/因子审计/指数估值中枢，16:30 CST cron）。logic.html 尚未同步登记本 workflow。
