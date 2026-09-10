@@ -1,36 +1,36 @@
 {
-  "update_time": "2026-09-10 17:19:14",
+  "update_time": "2026-09-10 18:01:35",
   "source": "akshare fund_etf_spot_em (东方财富)",
   "metric": "净流入(亿元) + 规模(亿元)",
   "categories": {
     "stock": {
       "name": "股票型",
       "net_amount_yi": -22.299287279999994,
-      "scale_yi": 29340.854311430034,
+      "scale_yi": 29403.099644020007,
       "n_funds": 1308,
       "top5": [
         {
           "code": "511880",
           "name": "银华日利ETF",
-          "scale_yi": 1132.72,
+          "scale_yi": 1131.67,
           "net_amount_yi": 0.23
         },
         {
           "code": "510300",
           "name": "沪深300ETF华泰柏瑞",
-          "scale_yi": 1070.47,
+          "scale_yi": 1083.56,
           "net_amount_yi": -1.1834
         },
         {
           "code": "511990",
           "name": "华宝添益ETF",
-          "scale_yi": 922.68,
+          "scale_yi": 922.19,
           "net_amount_yi": -0.0936
         },
         {
           "code": "588000",
           "name": "科创50ETF华夏",
-          "scale_yi": 888.14,
+          "scale_yi": 899.94,
           "net_amount_yi": -5.307
         },
         {
@@ -51,7 +51,7 @@
     "money": {
       "name": "货币型",
       "net_amount_yi": 0.07638211999999997,
-      "scale_yi": 550.3644142500002,
+      "scale_yi": 549.2601782300002,
       "n_funds": 50,
       "top5": [
         {
@@ -63,25 +63,25 @@
         {
           "code": "511660",
           "name": "货币ETF建信",
-          "scale_yi": 80.75,
+          "scale_yi": 79.81,
           "net_amount_yi": 0.0311
         },
         {
           "code": "159399",
           "name": "现金流ETF国泰",
-          "scale_yi": 43.34,
+          "scale_yi": 43.62,
           "net_amount_yi": 0.0619
         },
         {
           "code": "159001",
           "name": "货币ETF易方达",
-          "scale_yi": 32.87,
+          "scale_yi": 32.5,
           "net_amount_yi": 0.0809
         },
         {
           "code": "563390",
           "name": "全指现金流ETF华泰柏瑞",
-          "scale_yi": 26.11,
+          "scale_yi": 26.13,
           "net_amount_yi": 0.0189
         }
       ]
@@ -89,7 +89,7 @@
     "commodity": {
       "name": "商品型",
       "net_amount_yi": 0.54048903,
-      "scale_yi": 3580.5475595900007,
+      "scale_yi": 3581.0374375900005,
       "n_funds": 55,
       "top5": [
         {
@@ -127,7 +127,7 @@
     "cross_border": {
       "name": "跨境型",
       "net_amount_yi": -14.912507020000005,
-      "scale_yi": 5988.044065129995,
+      "scale_yi": 5989.103679109995,
       "n_funds": 192,
       "top5": [
         {
@@ -151,7 +151,7 @@
         {
           "code": "159792",
           "name": "港股通互联网ETF富国",
-          "scale_yi": 339.5,
+          "scale_yi": 337.16,
           "net_amount_yi": -0.4906
         },
         {
