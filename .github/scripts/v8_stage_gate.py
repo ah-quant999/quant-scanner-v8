@@ -107,6 +107,10 @@ def decide(root: str, today: str, hh: int, explicit: str, bypass: bool):
     def ready_out() -> dict[str, str]:
         return {f"ready_{s}": ready[s][1] for s in ("A", "B", "D", "E")}
 
+    # ── 0) 显式全链 ALL（force_run / 应急全量补算）──────────────────────
+    if explicit == "ALL":
+        return "ALL", True, "显式全链（ALL：应急全量补算）", ready_out()
+
     # ── 1) 显式 stage（人工应急）─────────────────────────────────────────
     if explicit in ("A", "B", "D", "E"):
         pre = PREREQ[explicit]

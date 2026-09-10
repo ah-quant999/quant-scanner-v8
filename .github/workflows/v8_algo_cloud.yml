@@ -358,143 +358,6 @@ jobs:
           echo "weekend_t1=$VAL" >> "$GITHUB_OUTPUT"
           echo "🗓️ 周末/假期首日 T+1 判定 = $VAL"
 
-      - name: "🔇 静默闸门 V5（schedule 放行，dispatch 内容级全收敛·午夜翻日洞已封）"
-        id: silent
-        env:
-          GH_EVENT: ${{ github.event_name }}
-          IS_TRADING_DAY: ${{ steps.trading.outputs.is_trading_day }}
-        run: |
-          # V3 (2026-09-03 19:4x) 修正 V2 致命回归：V2 用「距上次 raw_data/+data/ 提交<30min」
-          #   判空转，但 v8 cn fetch 每 8~20min 就推一次 data/，DIFF 永远 <30 →
-          #   把 16:40/18:10/19:15/20:00 的合法 schedule 批也全静默（当晚盘后链 0 产出实锤）。
-          # 原则：
-          #   1) schedule 一律放行 —— 每天最多 4 次合法定时批量（V4 起所有 dispatch 走新鲜度检查）；
-          #   2) repository_dispatch（阿狸咪兜底风暴）只在
-          #      「交易日 && 选股时间窗(HH>=18 或 HH<6) && 选股三模块今晚尚未产出」时放行；
-          #      非交易日 / 盘中 / 已产出 一律静默 ——「限定盘后批量+静默阈值」合体；
-          #   3) 新鲜判定读 git 内容级 update_time（>=16 点算今晚产出），
-          #      免疫 cn_fetch 只 bump ?v 的伪新鲜。
-          if [ "$GH_EVENT" = "schedule" ]; then
-            echo "skip_silent=false" >> "$GITHUB_OUTPUT"
-            echo "🟢 schedule 定时批量(16:40/18:10/19:15/20:00)，放行"
-            exit 0
-          fi
-          # V4 修正：阿狸咪风暴的主力是 workflow_dispatch（Actions 页满屏 30s "Manually run"），
-          #   V3 只查 repository_dispatch 会把 workflow_dispatch 风暴全放回来。
-          #   故非 schedule 一律走下方新鲜度检查；手动 force_run 在各步骤 if 里自带绕过。
-          if [ "$IS_TRADING_DAY" != "true" ]; then
-            echo "skip_silent=true" >> "$GITHUB_OUTPUT"
-            echo "🔇 dispatch×非交易日：算法链必被交易日 gate 跳过，纯空转，静默"
-            exit 0
-          fi
-          HH=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).hour)")
-          # 🔴 2026-09-07 一劳永逸修复（22 个红灯根因）：原 [6,18) 静默窗写于 09-03，
-          #   09-04 时序重排把 A 采集批挪到 16:40 后，16/17 点 dispatch 被误杀 →
-          #   cron 又静默失效（本 workflow 多 cron 顽疾）→ A 档既无 schedule 又被闸门拦，
-          #   当天采集批 0 产出，连锁 22 项 heal_cat=algo_run 红灯。
-          #   现放行 16/17 点：主步骤按 CST 小时映射得 STAGE=A（采集批，非全链），无风暴风险。
-          if [ "$HH" -ge 6 ] && [ "$HH" -lt 16 ]; then
-            echo "skip_silent=true" >> "$GITHUB_OUTPUT"
-            echo "🔇 dispatch×无效时段(${HH}点)：6-15 点无盘后批次，纯空转，静默"
-            exit 0
-          fi
-          # V5 (2026-09-03 22:xx 主人令「风暴一劳永逸」) 封午夜翻日洞：
-          #   00:00-05:59 时 TODAY 已翻到次日，昨晚盘后产物会被判"不新鲜"
-          #   → 午夜派发风暴可无限放行全链(2-3h/轮)。修法：凌晨归前一交易日，
-          #   用昨日日期+16点判据；昨晚已产出 → 静默。
-          # 🔴 2026-09-10 主人令根因修复（Windows 自托管 runner 无 tzdata）：
-          #   `TZ=Asia/Shanghai date +%H` 在 Git Bash 下被**静默忽略** → 取到 UTC 小时。
-          #   本机实测：TZ=Asia/Shanghai date +%H = 12（UTC），date -u -d '+8 hours' +%H = 20（真 CST）。
-          #   后果（09-10 实锤）：CST 16:40/18:10/19:15/20:00/21:00 派发 → UTC 08~13 ⊂ [6,16)
-          #   → 命中下方「无效时段」静默分支 → **盘后链从未真正跑过，run 却报 success**（假成功）。
-          #   统一改用仓库既有正确写法 date -u -d '+8 hours'（第 686 行早已如此）。
-          if [ "$HH" -lt 6 ]; then
-            TODAY=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)-d.timedelta(days=1)).strftime('%Y-%m-%d'))")
-            echo "ℹ️ 凌晨时段：新鲜度归属前一交易日 ${TODAY}"
-          else
-            TODAY=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).strftime('%Y-%m-%d'))")
-          fi
-          FRESH=0
-          for f in TRIPLE_CONSENSUS FOUR_VOLUME CRDS_CARD_DATA; do
-            UT=$(git show HEAD:data/$f.js 2>/dev/null                  | grep -o '"update_time"[^"]*"[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}'                  | head -1 | grep -o '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}$' || echo "")
-            case "$UT" in
-              "$TODAY "*)
-                UTH=$((10#${UT##* }))
-                if [ "$UTH" -ge 16 ]; then FRESH=$((FRESH+1)); fi ;;
-            esac
-          done
-          if [ "$FRESH" -eq 3 ]; then
-            echo "skip_silent=true" >> "$GITHUB_OUTPUT"
-            echo "🔇 dispatch×盘后但选股三模块今晚已产出(${FRESH}/3)，静默防重算"
-            exit 0
-          fi
-          echo "skip_silent=false" >> "$GITHUB_OUTPUT"
-          echo "🟡 交易日盘后且选股模块未产出(${FRESH}/3)，放行 dispatch 补跑"
-
-      # 🧭 2026-09-04 探针自动路由（主人令「都按你的建议做」·治本：云端跨境抓数占全链 ~85%）：
-      #   每轮 schedule/repository_dispatch 跑前查 lemoncat-cn（小九单位机，中国 IP）是否 online+idle：
-      #     在线+空闲 → 按 CST 小时算 stage 转派 cn 链（v8_algo_run.yml，实测全链 84min vs 云端 2h40m），云端后续重活全跳过；
-      #     离线/忙/转派失败 → 一律回落云端自跑，永不断供。
-      #   手动 workflow_dispatch 不路由（保留 force_run/bypass_time_gate 人工语义）。
-      #   失败自愈：若 cn 接单后中途断供，看门狗下次 dispatch 时探针见 offline 自动回落云端。
-      - name: "🧭 探针路由：lemoncat-cn 在线且空闲则转派国内机"
-        id: route
-        if: (github.event_name == 'schedule' || github.event_name == 'repository_dispatch') && steps.silent.outputs.skip_silent != 'true'
-        env:
-          PROBE_TOKEN: ${{ secrets.V8_GH_TOKEN || secrets.GITHUB_TOKEN }}
-          IS_TRADING_DAY: ${{ steps.trading.outputs.is_trading_day }}
-          WEEKEND_T1: ${{ steps.wknd.outputs.weekend_t1 }}
-        run: |
-          set -eo pipefail
-          echo "route=cloud" >> "$GITHUB_OUTPUT"
-          REPO="ah-quant999/quant-scanner-v8"
-          # 非交易日：默认云端运行步自会跳过，无需路由；
-          # 但周六/假期首日(有新鲜 T+1)仍需路由到 cn 跑全链（E 批 factor_lab 需 baostock 中国 IP）。
-          if [ "$IS_TRADING_DAY" != "true" ]; then
-            if [ "$WEEKEND_T1" = "true" ]; then
-              echo "🗓️ 周末/假期首日 T+1：路由到 cn 跑全链"
-            else
-              echo "非交易日且无 T+1 数据：不路由"; exit 0
-            fi
-          fi
-          CODE=$(curl -sS -o /tmp/runners_probe.json -w "%{http_code}" \
-            -H "Authorization: token $PROBE_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$REPO/actions/runners" 2>/dev/null || echo 000)
-          if [ "$CODE" != "200" ]; then
-            echo "::warning::runner 列表 API HTTP=$CODE → 保守走云端"
-            exit 0
-          fi
-          STATE=$(jq -r '[.runners[]? | select(.name=="lemoncat-cn")] | if length==0 then "missing" else (.[0].status) end' /tmp/runners_probe.json)
-          BUSY=$(jq -r '[.runners[]? | select(.name=="lemoncat-cn")] | if length==0 then "-" else (.[0].busy|tostring) end' /tmp/runners_probe.json)
-          echo "lemoncat-cn: state=$STATE busy=$BUSY"
-          # 只在「在线 + 空闲」时转派；busy 忙说明 cn_fetch 自托管链在跑，别插队
-          if [ "$STATE" != "online" ] || [ "$BUSY" != "false" ]; then
-            echo "→ 不满足(在线+空闲)，走云端"
-            exit 0
-          fi
-          # 与云端分批同口径：按 CST 小时算 stage（16:40采集/18:10选股/20:00汇总/21:00回测，2026-09-04 重排）
-          HH=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).hour)")
-          STAGE=""
-          case "$HH" in
-            16|17) STAGE="A" ;;
-            18)    STAGE="B" ;;
-            20)    STAGE="D" ;;
-            21)    STAGE="E" ;;
-            *)     STAGE="" ;;
-          esac
-          DCODE=$(curl -sS -o /tmp/dispatch_resp.txt -w "%{http_code}" -X POST \
-            -H "Authorization: token $PROBE_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$REPO/actions/workflows/v8_algo_run.yml/dispatches" \
-            -d "{\"ref\":\"main\",\"inputs\":{\"stage\":\"$STAGE\"}}" 2>/dev/null || echo 000)
-          if [ "$DCODE" = "204" ]; then
-            echo "route=cn" >> "$GITHUB_OUTPUT"
-            echo "🇨🇳 已转派 cn 链(stage=${STAGE:-ALL})，本云端链后续重活跳过"
-          else
-            echo "::warning::转派 HTTP=$DCODE → 回落云端自跑"
-          fi
-
       # 🔒 2026-09-10 主人令「一劳永逸·发现前面错了就该退回拒绝之后执行并紧急报告」：
       #   事故根因：stage 由「CST 小时盲猜」（16/17→A 18/19→B 20→D 21→E）。
       #   21:00 的 E(回测) cron 于 21:07 触发时，完全不管 B(选股)/D(汇总) 跑没跑，
@@ -503,12 +366,14 @@ jobs:
       #   新逻辑：显式 inputs.stage 优先，否则「缺什么跑什么」；上游未就绪 → 拒绝执行 + 红灯。
       - name: "🔒 批次自愈判定 + 上游顺序闸门（上游未就绪→拒绝执行并紧急报告）"
         id: gate
-        if: steps.route.outputs.route != 'cn'
+        if: always()
         run: |
           set +e
           IS_TD="${{ steps.trading.outputs.is_trading_day }}"
           EX_STAGE="${{ github.event.inputs.stage || github.event.client_payload.stage || '' }}"
           BYPASS=""
+          # force_run 且未显式指定 stage → 全链应急（ALL）
+          [ -z "$EX_STAGE" ] && [ "${{ github.event.inputs.force_run }}" = "true" ] && EX_STAGE="ALL"
           [ "${{ github.event.inputs.bypass_stage_gate }}" = "true" ] && BYPASS="--bypass"
           if [ "$IS_TD" != "true" ] && [ -z "$EX_STAGE" ]; then
             echo "target_stage=NONE" >> "$GITHUB_OUTPUT"
@@ -534,17 +399,28 @@ jobs:
             echo ""
             printf '%s\n' "$OUT" | grep -E '^(ready_|today=|cst_hour=)' | sed 's/^/    /'
           } >> "$GITHUB_STEP_SUMMARY"
+          # 🚦 统一放行标志（单一决策点）：删除静默闸门/探针路由后，后续步骤只看这一个值
+          WKND_T1="${{ steps.wknd.outputs.weekend_t1 }}"
+          FORCE="${{ github.event.inputs.force_run }}"
+          PROCEED="false"
+          if [ "$OK" = "true" ] && [ "${TGT:-NONE}" != "NONE" ] && \
+             { [ "$IS_TD" = "true" ] || [ "$WKND_T1" = "true" ] || [ "$FORCE" = "true" ]; }; then
+            PROCEED="true"
+          fi
+          echo "proceed=$PROCEED" >> "$GITHUB_OUTPUT"
+          echo "🚦 proceed=$PROCEED（交易日=${IS_TD:-?} 周末T+1=${WKND_T1:-?} force=${FORCE:-?} 目标批=${TGT}）"
+          if [ "$TGT" = "NONE" ]; then
+            echo "::notice title=v8-stage-gate-noop::各批产物均已就绪或未到时段，本轮空转（真成功）"
+            exit 0
+          fi
           if [ "$OK" != "true" ]; then
             echo "::error title=v8-stage-gate-blocked::上游未就绪，已拒绝执行 ${TGT} 批 —— ${REASON}"
             exit 1
           fi
-          if [ "$TGT" = "NONE" ]; then
-            echo "::notice title=v8-stage-gate-noop::各批产物均已就绪或未到时段，本轮空转（真成功）"
-          fi
 
       - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
         id: algo
-        if: steps.gate.outputs.stage_ok == 'true' && steps.gate.outputs.target_stage != 'NONE' && (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true' || steps.wknd.outputs.weekend_t1 == 'true') && steps.route.outputs.route != 'cn'
+        if: steps.gate.outputs.proceed == 'true'
         # 🔴 2026-08-30 23:3x 抬高步级墙钟 90 → 150（实测 run 33316835316 坐实）：
         #   周末 force_run 全量补算时，本步跑到 70 分钟仍未完成，距 90 分钟限时仅剩
         #   20 分钟——一旦超时被硬杀，后续 bridge / ALGO_TRACK / 兜底推送 / **产物完整性
@@ -612,19 +488,19 @@ jobs:
       #   必刷新——bridge_raw_data 防 raw_data 内部改名断点（如 triple_resonance_history → triple_history），
       #   update_v8 重生成 data/*.js，v8_health_check 刷新 HEALTH_CHECK.js。
       - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
-        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true' || steps.wknd.outputs.weekend_t1 == 'true') && steps.route.outputs.route != 'cn'
+        if: steps.gate.outputs.proceed == 'true'
         run: |
           python algorithms/bridge_raw_data.py || true
 
       # 2026-08-08 修复：算法链产出 candidate.json 后，立即刷新候选池行情，
       # 避免 runner 状态卡 CANDIDATE_QUOTES 长期显示「空」。
       - name: "📈 刷新候选池行情（CANDIDATE_QUOTES）"
-        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true' || steps.wknd.outputs.weekend_t1 == 'true') && steps.route.outputs.route != 'cn'
+        if: steps.gate.outputs.proceed == 'true'
         run: |
           python cloud_fetch_v8.py --only CANDIDATE_QUOTES || true
 
       - name: "📤 兜底推送（若上一步未推）"
-        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true' || steps.wknd.outputs.weekend_t1 == 'true') && steps.route.outputs.route != 'cn'
+        if: steps.gate.outputs.proceed == 'true'
         run: |
           # 2026-08-22 根因⑪收口：去掉 || true —— 推送失败必须让 job 失败，
           # 否则「算法链算完但推送 422 失败」永远被假 success 掩盖。
@@ -644,7 +520,7 @@ jobs:
       #   此步只在算法链收尾重算 ALGO_TRACK.js 的 ?v 并推送 index.html（Contents API，避开 cn git 墙）。
       #   只改 ALGO_TRACK 一项，不碰 COMMODITY 等（避免用陈旧本地文件覆盖 build/deploy 已对齐的 ?v）。
       - name: "🔄 同步 ALGO_TRACK 缓存戳 ?v 并推送 index.html"
-        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true' || steps.wknd.outputs.weekend_t1 == 'true') && steps.route.outputs.route != 'cn'
+        if: steps.gate.outputs.proceed == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -706,7 +582,7 @@ jobs:
       #    v8_ops_watch）可见；同时写 $GITHUB_STEP_SUMMARY + raw_data/algo_chain_report.json，
       #    让主人一眼看到断在哪一环，而不是对着全绿的 job 发呆。
       - name: "🛡 产物完整性闸门（核心产物必须本交易日产出）"
-        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || steps.wknd.outputs.weekend_t1 == 'true') && steps.route.outputs.route != 'cn'
+        if: steps.gate.outputs.proceed == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -753,7 +629,7 @@ jobs:
       #  失败即 job 失败，告警链路可见，杜绝「漏挂/断链」类暗灯再悄悄上线。
       # ============================================================
       - name: "🛡 算法链结构一致性校验（ORDER↔STAGES / 孤儿 / 断链 / 悬空）"
-        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || steps.wknd.outputs.weekend_t1 == 'true') && steps.route.outputs.route != 'cn'
+        if: steps.gate.outputs.proceed == 'true'
         run: |
           python algorithms/verify_chain_consistency.py
           VERIFY_EXIT=$?
@@ -772,7 +648,7 @@ jobs:
       #    ③ 整表空/截断（豁免表除外；字段语境豁免见脚本头）
       # ============================================================
       - name: "🛡 数据失真体检（旧装新 / 越界 / 空表）"
-        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || steps.wknd.outputs.weekend_t1 == 'true') && steps.route.outputs.route != 'cn'
+        if: steps.gate.outputs.proceed == 'true'
         run: |
           python algorithms/verify_data_sanity.py --no-baseline
           SANITY_EXIT=$?
@@ -792,57 +668,66 @@ jobs:
       #   凌晨 00:00-05:59 属回填窗口（产物可能刚产出、日期是今天），放宽到任意时刻。
       #   只读 data/*.js，绝不改数据。
       # ============================================================
-      - name: "🛡 结果问责（杜绝假成功：静默跳过 ≠ 成功）"
+      - name: "🛡 结果问责（杜绝假成功：按目标批次问责）"
         if: always()
         run: |
           set +e
-          SKIP="${{ steps.silent.outputs.skip_silent }}"
+          TGT="${{ steps.gate.outputs.target_stage }}"
+          OK="${{ steps.gate.outputs.stage_ok }}"
+          PROCEED="${{ steps.gate.outputs.proceed }}"
           OUTCOME="${{ steps.algo.outcome }}"
-          ROUTED="${{ steps.route.outputs.route }}"
           IS_TD="${{ steps.trading.outputs.is_trading_day }}"
-          IN_STAGE="$(printf '%s' "${{ github.event.inputs.stage || github.event.client_payload.stage || '' }}" | tr -cd 'A-Za-z' | tr 'a-z' 'A-Z')"
-          HH=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).hour)")
-          HHMM=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).strftime('%H%M'))")
+          HHMM=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).strftime('%H:%M'))")
           TODAY=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).strftime('%Y-%m-%d'))")
+          HH=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).hour)")
           MIN_H=16
-          if [ "$HH" -lt 6 ]; then MIN_H=0; fi   # 凌晨回填窗口：产物可能刚产出（今日 00:00-05:59）
-          FRESH=0
-          for f in TRIPLE_CONSENSUS FOUR_VOLUME CRDS_CARD_DATA; do
-            UT=$(git show HEAD:data/$f.js 2>/dev/null | grep -o '"update_time"[^"]*"[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}' | head -1 | grep -o '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}$' || echo "")
+          if [ "$HH" -lt 6 ]; then MIN_H=0; fi   # 凌晨回填窗口：产物可能刚产出
+
+          fresh_of () {   # $1=仓库相对路径 → 1/0（update_time 日期=今天 且 小时>=MIN_H）
+            UT=$(git show HEAD:"$1" 2>/dev/null                  | grep -o '"update_time"[^"]*"[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}'                  | head -1 | grep -o '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}$' || echo "")
             case "$UT" in
-              "$TODAY "*) UTH=$((10#${UT##* })); if [ "$UTH" -ge "$MIN_H" ]; then FRESH=$((FRESH+1)); fi ;;
+              "$TODAY "*) if [ "$((10#${UT##* }))" -ge "$MIN_H" ]; then echo 1; else echo 0; fi ;;
+              *) echo 0 ;;
             esac
+          }
+
+          B_FRESH=0
+          for f in data/TRIPLE_CONSENSUS.js data/FOUR_VOLUME.js data/CRDS_CARD_DATA.js; do
+            [ "$(fresh_of "$f")" = "1" ] && B_FRESH=$((B_FRESH+1))
           done
-          echo "问责输入: 静默标记=${SKIP:-?} 算法步骤=${OUTCOME:-?} 转派=${ROUTED:-?} 交易日=${IS_TD:-?} CST=${HHMM} stage=${IN_STAGE:-按小时} 三模块新鲜=${FRESH}/3"
-          { echo "### 🛡 盘后算法链结果问责"; echo ""; echo "| 项 | 值 |"; echo "|---|---|";
-            echo "| 静默闸门跳过 | ${SKIP:-?} |"; echo "| 算法链步骤结果 | ${OUTCOME:-?} |";
-            echo "| 转派 cn | ${ROUTED:-?} |"; echo "| 是否交易日 | ${IS_TD:-?} |";
-            echo "| 当前 CST | ${HHMM} |"; echo "| stage | ${IN_STAGE:-按小时} |";
-            echo "| 选股三模块今日 16:30 后产出 | ${FRESH}/3 |"; } >> "$GITHUB_STEP_SUMMARY"
-          if [ "$FRESH" -eq 3 ]; then
-            echo "::notice title=v8-algo-ok::选股三模块均为今日盘后产出（静默=${SKIP:-?} 步骤=${OUTCOME:-?}），合规"
-            exit 0
-          fi
+          D_FRESH="$(fresh_of data/FINAL_RECOMMEND_DATA.js)"
+
+          echo "问责输入: 目标批=${TGT:-?} 闸门放行=${OK:-?} 执行标志=${PROCEED:-?} 算法步骤=${OUTCOME:-?} 交易日=${IS_TD:-?} CST=${HHMM} B三模块=${B_FRESH}/3 D最终推荐=${D_FRESH}"
+          { echo "### 🛡 盘后算法链结果问责（按目标批次）"; echo ""; echo "| 项 | 值 |"; echo "|---|---|";
+            echo "| 目标批次 | **${TGT:-?}** |"; echo "| 闸门放行 | ${OK:-?} |";
+            echo "| 执行标志 proceed | ${PROCEED:-?} |"; echo "| 算法链结果 | ${OUTCOME:-?} |";
+            echo "| 是否交易日 | ${IS_TD:-?} |"; echo "| 当前 CST | ${HHMM} |";
+            echo "| B 批三模块今日盘后 | ${B_FRESH}/3 |"; echo "| D 批最终推荐今日盘后 | ${D_FRESH}/1 |"; } >> "$GITHUB_STEP_SUMMARY"
+
           if [ "$IS_TD" != "true" ]; then
-            echo "::notice title=v8-algo-holiday::非交易日，无盘后批次（合规跳过）"
-            exit 0
+            echo "::notice title=v8-algo-holiday::非交易日，无盘后批次（合规跳过）"; exit 0
           fi
-          case "$IN_STAGE" in
-            A|E) echo "::notice title=v8-algo-batch::${IN_STAGE} 批本不产选股三模块，豁免问责"; exit 0 ;;
+          if [ "$OK" != "true" ]; then
+            echo "::error title=v8-algo-gate-blocked::上游未就绪，本批已被批次闸门拒绝执行（目标 ${TGT}）——这不是成功"; exit 1
+          fi
+          if [ "${TGT:-NONE}" = "NONE" ]; then
+            echo "::notice title=v8-algo-noop-ok::各批产物均已就绪或未到时段，本轮空转（合规）"; exit 0
+          fi
+          case "${TGT}" in
+            B|ALL)
+              if [ "$B_FRESH" -eq 3 ]; then
+                echo "::notice title=v8-algo-ok::${TGT} 批完成，选股三模块均为今日盘后产出（执行=${OUTCOME:-?}）"; exit 0
+              fi
+              echo "::error title=v8-algo-stale::${TGT} 批跑完但选股三模块仍非今日盘后（${B_FRESH}/3，执行=${OUTCOME:-?}）——假成功，必须排查"; exit 1 ;;
+            D)
+              if [ "$D_FRESH" = "1" ]; then
+                echo "::notice title=v8-algo-ok::D 批完成，最终推荐为今日盘后产出（执行=${OUTCOME:-?}）"; exit 0
+              fi
+              echo "::error title=v8-algo-stale::D 批跑完但 FINAL_RECOMMEND 仍非今日盘后（执行=${OUTCOME:-?}）——假成功，必须排查"; exit 1 ;;
+            A|E)
+              if [ "${OUTCOME:-none}" = "success" ]; then
+                echo "::notice title=v8-algo-batch::${TGT} 批完成（本批按设计不产选股三模块）"; exit 0
+              fi
+              echo "::error title=v8-algo-failed::${TGT} 批执行未成功（${OUTCOME:-?}）"; exit 1 ;;
           esac
-          if [ -z "$IN_STAGE" ]; then
-            case "$HH" in
-              16|17) echo "::notice title=v8-algo-batch::CST ${HH} 点＝采集批(A)，本不产选股三模块，豁免"; exit 0 ;;
-              21)    echo "::notice title=v8-algo-batch::CST ${HH} 点＝回测批(E)，本不产选股三模块，豁免"; exit 0 ;;
-            esac
-          fi
-          if [ "$HH" -ge 6 ] && [ "$HHMM" -lt 1630 ]; then
-            echo "::notice title=v8-algo-intraday::CST ${HHMM} 属盘中档，盘后三模块按设计未产出（非失败）"
-            exit 0
-          fi
-          if [ "${OUTCOME:-none}" != "success" ]; then
-            echo "::error title=v8-algo-noop::交易日盘后档但算法链没跑（静默=${SKIP:-?} 结果=${OUTCOME:-?} 转派=${ROUTED:-?}）——本轮 0 产出，这不是成功！"
-            exit 1
-          fi
-          echo "::error title=v8-algo-stale::算法链跑完但选股三模块仍非今日 16:30 后产出（${FRESH}/3）——假成功，必须排查"
-          exit 1
+          echo "::notice title=v8-algo-unknown::未知目标批（${TGT}），无问责规则"; exit 0
