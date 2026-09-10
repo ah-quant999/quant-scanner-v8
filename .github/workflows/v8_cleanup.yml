@@ -66,6 +66,16 @@ jobs:
           git rm --cached --ignore-unmatch \
             data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json \
             data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
+          # 🔴 2026-09-10 阿狸咪根因修复（主人令「全面审计瘦身」）：
+          #   git add -A 只挡「未跟踪」文件；对【已被跟踪】的运行时缓存/写前备份，
+          #   它会把改动一并暂存 → 缓存长期赖在版本库里，每次 checkout 又带回工作区，
+          #   形成自循环（09-01→09-10 仓库 +111MB 的主因之一）。
+          #   与上面处理密钥同一套路：交给 git add -A 之前先 rm --cached。
+          git rm -r --cached --ignore-unmatch --quiet \
+            algorithms/__pycache__ algorithms/_opt_kline_cache \
+            raw_data/_rps_cache raw_data/_tdx_cache 2>/dev/null || true
+          find raw_data -maxdepth 1 -name '*.bak' -print0 2>/dev/null \
+            | xargs -0 -r git rm --cached --ignore-unmatch --quiet 2>/dev/null || true
           git add -A
           if git diff --cached --quiet; then
             echo "ℹ️ 无变化，跳过提交"

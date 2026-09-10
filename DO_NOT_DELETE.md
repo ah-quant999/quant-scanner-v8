@@ -60,7 +60,9 @@
 > 🟢 豁免 `data/BLOAT_CHECK.js`：v8_bloat_check.py 已停生成（产物迁 .workbuddy/v8_bloat_report.json），全站0引用，允许删除（2026-08-29 轻量化收尾）。
 > 🟢 豁免 `data/DELISTED.js` + `raw_data/delisted_stocks.json` + `scripts/build_delisted.py`：已于 2026-09-09 主人令整链下线（前端「已下架股票目录」卡从 index.html/logic.html 删除 + data/DELISTED.js 删除 + build_delisted.py 停用 + v8_health_check CARD_DEFS 移除 + v8_rollback_guard 受保护列表移除），允许物理删除、勿复活。注：run_algorithms.py 实际从未挂此链（grep 0 命中），所谓「已挂回 ORDER/STAGES」为文档漂移误判。
 > 🟢 豁免 `data/MAHORO.js` + `algorithms/fetch_maharo_signals.py` + `.github/workflows/mahoro_refresh.yml` + `scripts/monitor_maharo_refresh.py`：mahoro 全链路引用/监控已移除（commit 7193a5b93），功能上等同删除，全站0引用，允许物理删除（2026-08-29 主人令：mahoro 孤儿清理）。
-> 🟢 豁免 `raw_data/kline_cache/*` + `raw_data/backtest_kline_cache/*` + `raw_data/_rps_cache/*` + `raw_data/_tdx_cache/*`：算法运行时行情缓存（RPS / K线 / TDX / 回测K线），纯本地加速用、可随时重建，`.gitignore` 已忽略（严禁入库）。2026-08-29 仓库瘦身：`git rm --cached` 移出版本跟踪，**本地文件全部保留**，仅删除库内副本，不删本地缓存、不影响任何算法运行。本条为通配符豁免，避免 `raw_data/*.json` 保护规则（其 `*` 跨 `/`）误伤缓存子目录。
+> 🟢 豁免 `raw_data/kline_cache/*` + `raw_data/backtest_kline_cache/*` + `raw_data/_rps_cache/*` + `raw_data/_tdx_cache/*`：算法运行时行情缓存（RPS / K线 / TDX / 回测K线），纯本地加速用、可随时重建，`.gitignore` 已忽略（严禁入库）。2026-08-29 仓库瘦身：`git rm --cached` 移出版本跟踪，**本地文件全部保留**，仅删除库内副本，不删本地缓存、不影响任何算法运行。本条为通配符豁免，避免「raw_data 下的 json 通配保护规则」（其 `*` 跨 `/`）误伤缓存子目录。
+> 🔴 2026-09-10 阿狸咪修复本文件一处**静默漏洞**（主人令「全面审计瘦身·千万别删错」）：钩子 `git_hooks/pre-commit` 的豁免解析是「取含『豁免』二字行内**全部**反引号内容」，因此上一行原先在**说明文字**里写了反引号包裹的 raw_data 通配保护规则本身 → 该规则被当成豁免路径抓走，**raw_data 全部 json 的保护实际长期失效**。已改为中文引号表述，保护恢复生效。**后续在本文件写豁免说明时，说明文字里不要用反引号包住想保护的通配符。**
+> 🟢 豁免 `algorithms/__pycache__/*` + `algorithms/_opt_kline_cache/*` + `algorithms/.scanner.lock`：Python 字节码缓存与算法运行时候选池缓存、进程互斥锁，全部为运行时可再生文件，`.gitignore` 已忽略。2026-09-10 仓库瘦身：`git rm --cached` 移出版本跟踪（**本地文件全部保留**），并同步修复 `git add -A` 与 `api_push_raw.py::walk_raw()` 两条回潮路径，防止再次入库。
 
 ---
 

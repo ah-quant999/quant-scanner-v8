@@ -112,6 +112,12 @@ jobs:
           git rm --cached --ignore-unmatch \
             data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json \
             data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
+          # 🔴 2026-09-10 阿狸咪根因修复（主人令「全面审计瘦身」）：同上，git add -A 前先摘缓存索引
+          git rm -r --cached --ignore-unmatch --quiet \
+            algorithms/__pycache__ algorithms/_opt_kline_cache \
+            raw_data/_rps_cache raw_data/_tdx_cache 2>/dev/null || true
+          find raw_data -maxdepth 1 -name '*.bak' -print0 2>/dev/null \
+            | xargs -0 -r git rm --cached --ignore-unmatch --quiet 2>/dev/null || true
           git add -A
           # 仅有变更时提交（无变更 = noop）
           if git diff --cached --quiet; then

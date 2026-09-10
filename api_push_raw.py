@@ -113,9 +113,25 @@ def walk_raw():
         "commodity_prices_cache",  # calc_commodity_elasticity.py westock 价格缓存（MCP 预抓取）
     )
     push_algo_raw = os.environ.get("PUSH_ALGO_RAW") == "1"
+    # 🔴 2026-09-10 阿狸咪根因修复（主人令「全面审计瘦身·千万别删错」）：
+    #   原实现 os.walk("raw_data") 全量遍历，只排除「算法产物词根」+ _PROTECTED_RAW，
+    #   对【运行时缓存 / 写前备份 / 临时件】零排除。而本函数走 GitHub Git Data API
+    #   （blobs/trees/commits）创建提交 —— **完全绕开 .gitignore**。
+    #   实测后果（09-01→09-10 仓库 +111MB 的主要来源）：
+    #     · raw_data/_rps_cache/* 461 个 / 28.5MB 回潮（08-29 已 git rm --cached 过一次）
+    #     · raw_data/*.bak 15 个 / 5.3MB（fetcher 写前备份，scripts/raw_retention.py 已在归档）
+    #   实证：raw_data/stock_names.json.bak 由 `v8 cn fetch: 2026-09-05 20:54` 引入本函数。
+    #   此处按「目录名剪枝 + 后缀过滤」双重排除，与 .gitignore / DO_NOT_DELETE.md L63 同口径。
+    #   ⚠️ 有意不排除 kline_cache：2026-09-08 主人令明确入仓（云端零网络取数，根治静默断更）。
+    _SKIP_DIR_NAMES = ("__pycache__", "_rps_cache", "_tdx_cache", "_archive")
+    _SKIP_SUFFIXES = (".bak", ".tmp", ".pyc", ".pyo")
     for root, _dirs, files in os.walk("raw_data"):
+        # 就地剪枝：不进入被排除的目录（os.walk 原生支持，顺带省一遍遍历）
+        _dirs[:] = [d for d in _dirs if d not in _SKIP_DIR_NAMES]
         for f in files:
             if f.startswith(_ALGO_RAW_PREFIXES) and not push_algo_raw:
+                continue
+            if f.endswith(_SKIP_SUFFIXES):
                 continue
             full = os.path.join(root, f)
             rel = os.path.relpath(full, ".").replace("\\", "/")
