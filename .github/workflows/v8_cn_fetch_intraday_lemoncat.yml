@@ -116,8 +116,9 @@ jobs:
           fi
           if [ "$GO" = "true" ]; then
             curl -sS -o /tmp/inflight.json -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/ah-quant999/quant-scanner-v8/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=5" 2>/dev/null
-            UNFIN_TS=$(jq -r '[.workflow_runs[] | select(.status != "completed")] | sort_by(.created_at) | last | .created_at // empty' /tmp/inflight.json 2>/dev/null)
-            UNFIN_ID=$(jq -r '[.workflow_runs[] | select(.status != "completed")] | sort_by(.created_at) | last | .id // empty' /tmp/inflight.json 2>/dev/null)
+            # 用 python3 单行解析（ubuntu-latest 必带；不赌 jq 是否存在——jq 缺失会让守卫静默失效）
+            UNFIN_ID=$(python3 -c "import json;d=json.load(open('/tmp/inflight.json'));u=[r for r in d.get('workflow_runs',[]) if r.get('status')!='completed'];print(u[0]['id'] if u else '')" 2>/dev/null)
+            UNFIN_TS=$(python3 -c "import json;d=json.load(open('/tmp/inflight.json'));u=[r for r in d.get('workflow_runs',[]) if r.get('status')!='completed'];print(u[0]['created_at'] if u else '')" 2>/dev/null)
             if [ -n "$UNFIN_TS" ]; then
               AGE=$(( ( $(date -u +%s) - $(date -u -d "$UNFIN_TS" +%s) ) / 60 ))
               echo "云端在途: run#$UNFIN_ID 起始 $UNFIN_TS (龄 ${AGE}min)"
