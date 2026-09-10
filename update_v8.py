@@ -1100,6 +1100,18 @@ def build(category=None, detect_changes=False):
             print(f"  ⏭️  {src_path.name} 不在 DATA_SOURCES 映射中，跳过（避免废弃数据复活）")
             skipped += 1
             continue
+        # 🛡 2026-09-10 主人令根治「最终推荐盘中反复回退」P0 事故：
+        #   纯盘后产物（FINAL_RECOMMEND_DATA / CRDS_CARD_DATA / TRIPLE_CONSENSUS 等，
+        #   _file_category 仅含 post_close、不含 intraday/premarket）在非 post_close 构建
+        #   （盘中 intraday / 全量 None / detect-changes）时绝不重写 —— 杜绝「旧 raw 洗新 data」
+        #   回滚（13:48 同类：盘中全量 build 用退化 raw 把今日真推荐洗成旧版）。
+        #   仅 --category post_close 显式授权时才重建（盘后/实验 workflow 已用此参数）。
+        _vc = _file_category(src_path.name)
+        _pure_pc = ("post_close" in _vc) and ("intraday" not in _vc) and ("premarket" not in _vc)
+        if _pure_pc and category != "post_close":
+            print(f"  ⏭️  {src_path.name} → data/{var_name}.js | 纯盘后产物，非 post_close 构建跳过（防回滚）")
+            skipped += 1
+            continue
         obj = _load_json(src_path)
         if obj is None:
             skipped += 1
