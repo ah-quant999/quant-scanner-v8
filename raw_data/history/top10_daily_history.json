@@ -272,16 +272,10 @@
     "max_score": 26.7,
     "update_time": "2026-09-08 19:57:34"
   },
-  "2026-09-09": {
-    "count_80plus": 0,
-    "total_scored": 77,
-    "max_score": 31.7,
-    "update_time": "2026-09-09 22:11:31"
-  },
   "2026-09-10": {
     "count_80plus": 0,
-    "total_scored": 77,
-    "max_score": 21.4,
-    "update_time": "2026-09-10 04:09:49"
+    "total_scored": 76,
+    "max_score": 12.5,
+    "update_time": "2026-09-10 04:46:46"
   }
 }

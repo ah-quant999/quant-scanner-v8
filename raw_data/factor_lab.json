@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-09-08 11:27:52",
+  "update_time": "2026-09-09 19:02:20",
   "meta": {
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
-    "n_universe": 378,
-    "n_at_valid": 453,
-    "n_roe_large": 279,
+    "n_universe": 461,
+    "n_at_valid": 516,
+    "n_roe_large": 424,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板(3193)·大市值档(成交额代理top1/3)按ROE_TTM降序 Top30",
     "roe_universe": "全市场主板"
@@ -364,6 +364,16 @@
         "asof_ym": "2026-09"
       },
       {
+        "code": "sh.601086",
+        "name": "国芳集团",
+        "close": 14.95,
+        "abn": 1.169,
+        "factor_at": -1.1685,
+        "roe_ttm": null,
+        "size_proxy": 4795662769.2,
+        "asof_ym": "2026-09"
+      },
+      {
         "code": "sz.000560",
         "name": "我爱我家",
         "close": 3.15,
@@ -394,23 +404,13 @@
         "asof_ym": "2026-09"
       },
       {
-        "code": "sh.688356",
-        "name": "键凯科技",
-        "close": 80.44,
-        "abn": 0.961,
-        "factor_at": -0.9609,
+        "code": "sh.603989",
+        "name": "艾华集团",
+        "close": 34.29,
+        "abn": 0.986,
+        "factor_at": -0.9857,
         "roe_ttm": null,
-        "size_proxy": 2802597327.0,
-        "asof_ym": "2026-09"
-      },
-      {
-        "code": "sz.002886",
-        "name": "沃特股份",
-        "close": 25.11,
-        "abn": 0.954,
-        "factor_at": -0.9543,
-        "roe_ttm": null,
-        "size_proxy": 5526332959.9,
+        "size_proxy": 6369200623.6,
         "asof_ym": "2026-09"
       }
     ]
@@ -420,25 +420,41 @@
       {
         "code": "sh.600221",
         "name": "海航控股",
-        "close": 1.3,
+        "close": 1.31,
         "roe_ttm": 1.6,
-        "size_proxy": 402440643.5,
+        "size_proxy": 399251171.1,
+        "asof_q": "2026Q3"
+      },
+      {
+        "code": "sh.603268",
+        "name": "松发股份",
+        "close": 192.4,
+        "roe_ttm": 1.07,
+        "size_proxy": 1285750249.6,
         "asof_q": "2026Q3"
       },
       {
         "code": "sh.600961",
         "name": "株冶集团",
-        "close": 25.25,
+        "close": 25.34,
         "roe_ttm": 1.03,
-        "size_proxy": 1577929153.9,
+        "size_proxy": 1565570155.0,
+        "asof_q": "2026Q3"
+      },
+      {
+        "code": "sh.601336",
+        "name": "新华保险",
+        "close": 60.06,
+        "roe_ttm": 0.93,
+        "size_proxy": 1635000698.4,
         "asof_q": "2026Q3"
       },
       {
         "code": "sh.600809",
         "name": "山西汾酒",
-        "close": 123.05,
+        "close": 122.2,
         "roe_ttm": 0.93,
-        "size_proxy": 1211712259.4,
+        "size_proxy": 1202804453.9,
         "asof_q": "2026Q3"
       },
       {
@@ -447,6 +463,22 @@
         "close": 1316.01,
         "roe_ttm": 0.89,
         "size_proxy": 5358305666.0,
+        "asof_q": "2026Q3"
+      },
+      {
+        "code": "sh.601899",
+        "name": "紫金矿业",
+        "close": 33.86,
+        "roe_ttm": 0.87,
+        "size_proxy": 9268286836.1,
+        "asof_q": "2026Q3"
+      },
+      {
+        "code": "sh.601628",
+        "name": "中国人寿",
+        "close": 38.06,
+        "roe_ttm": 0.82,
+        "size_proxy": 1536719836.8,
         "asof_q": "2026Q3"
       },
       {
@@ -460,9 +492,9 @@
       {
         "code": "sh.600989",
         "name": "宝丰能源",
-        "close": 23.41,
+        "close": 24.39,
         "roe_ttm": 0.71,
-        "size_proxy": 1905098168.0,
+        "size_proxy": 1901588010.1,
         "asof_q": "2026Q3"
       },
       {
@@ -476,33 +508,49 @@
       {
         "code": "sh.600988",
         "name": "赤峰黄金",
-        "close": 44.48,
+        "close": 44.2,
         "roe_ttm": 0.69,
-        "size_proxy": 2534574628.0,
+        "size_proxy": 2523674676.8,
+        "asof_q": "2026Q3"
+      },
+      {
+        "code": "sh.603259",
+        "name": "药明康德",
+        "close": 156.35,
+        "roe_ttm": 0.66,
+        "size_proxy": 8069945067.1,
         "asof_q": "2026Q3"
       },
       {
         "code": "sh.601168",
         "name": "西部矿业",
-        "close": 38.63,
+        "close": 40.69,
         "roe_ttm": 0.66,
-        "size_proxy": 2327914161.1,
+        "size_proxy": 2342816138.5,
+        "asof_q": "2026Q3"
+      },
+      {
+        "code": "sh.603129",
+        "name": "春风动力",
+        "close": 290.47,
+        "roe_ttm": 0.65,
+        "size_proxy": 468261756.3,
         "asof_q": "2026Q3"
       },
       {
         "code": "sh.600183",
         "name": "生益科技",
-        "close": 148.15,
+        "close": 146.28,
         "roe_ttm": 0.62,
-        "size_proxy": 11133238765.8,
+        "size_proxy": 11120764079.4,
         "asof_q": "2026Q3"
       },
       {
         "code": "sh.600887",
         "name": "伊利股份",
-        "close": 26.61,
+        "close": 26.53,
         "roe_ttm": 0.61,
-        "size_proxy": 1636018869.6,
+        "size_proxy": 1629985155.8,
         "asof_q": "2026Q3"
       },
       {
@@ -522,19 +570,43 @@
         "asof_q": "2026Q3"
       },
       {
+        "code": "sh.603045",
+        "name": "福达合金",
+        "close": 49.53,
+        "roe_ttm": 0.57,
+        "size_proxy": 747948464.1,
+        "asof_q": "2026Q3"
+      },
+      {
         "code": "sh.601138",
         "name": "工业富联",
-        "close": 66.57,
+        "close": 64.75,
         "roe_ttm": 0.56,
-        "size_proxy": 11401763882.9,
+        "size_proxy": 11340614807.7,
         "asof_q": "2026Q3"
       },
       {
         "code": "sh.600160",
         "name": "巨化股份",
-        "close": 37.95,
+        "close": 38.23,
         "roe_ttm": 0.55,
-        "size_proxy": 3004020780.6,
+        "size_proxy": 2970503807.4,
+        "asof_q": "2026Q3"
+      },
+      {
+        "code": "sh.601600",
+        "name": "中国铝业",
+        "close": 9.74,
+        "roe_ttm": 0.55,
+        "size_proxy": 2539680992.7,
+        "asof_q": "2026Q3"
+      },
+      {
+        "code": "sh.603369",
+        "name": "今世缘",
+        "close": 30.65,
+        "roe_ttm": 0.53,
+        "size_proxy": 443185762.7,
         "asof_q": "2026Q3"
       },
       {
@@ -548,9 +620,9 @@
       {
         "code": "sh.600186",
         "name": "莲花控股",
-        "close": 12.55,
+        "close": 12.39,
         "roe_ttm": 0.51,
-        "size_proxy": 2696380186.3,
+        "size_proxy": 2701393035.1,
         "asof_q": "2026Q3"
       },
       {
@@ -559,6 +631,14 @@
         "close": 126.33,
         "roe_ttm": 0.51,
         "size_proxy": 1234031539.9,
+        "asof_q": "2026Q3"
+      },
+      {
+        "code": "sh.603288",
+        "name": "海天味业",
+        "close": 34.06,
+        "roe_ttm": 0.51,
+        "size_proxy": 722774972.8,
         "asof_q": "2026Q3"
       },
       {
@@ -572,89 +652,9 @@
       {
         "code": "sh.601126",
         "name": "四方股份",
-        "close": 41.29,
+        "close": 40.1,
         "roe_ttm": 0.49,
-        "size_proxy": 1573055798.3,
-        "asof_q": "2026Q3"
-      },
-      {
-        "code": "sh.600415",
-        "name": "小商品城",
-        "close": 13.06,
-        "roe_ttm": 0.49,
-        "size_proxy": 934723067.3,
-        "asof_q": "2026Q3"
-      },
-      {
-        "code": "sh.601225",
-        "name": "陕西煤业",
-        "close": 25.69,
-        "roe_ttm": 0.47,
-        "size_proxy": 1244168839.5,
-        "asof_q": "2026Q3"
-      },
-      {
-        "code": "sh.601020",
-        "name": "华钰矿业",
-        "close": 22.0,
-        "roe_ttm": 0.47,
-        "size_proxy": 719234994.0,
-        "asof_q": "2026Q3"
-      },
-      {
-        "code": "sh.601127",
-        "name": "赛力斯",
-        "close": 49.24,
-        "roe_ttm": 0.46,
-        "size_proxy": 1567347490.3,
-        "asof_q": "2026Q3"
-      },
-      {
-        "code": "sh.601058",
-        "name": "赛轮轮胎",
-        "close": 14.35,
-        "roe_ttm": 0.46,
-        "size_proxy": 578771571.5,
-        "asof_q": "2026Q3"
-      },
-      {
-        "code": "sh.600690",
-        "name": "海尔智家",
-        "close": 21.61,
-        "roe_ttm": 0.45,
-        "size_proxy": 962914370.1,
-        "asof_q": "2026Q3"
-      },
-      {
-        "code": "sh.600938",
-        "name": "中国海油",
-        "close": 33.12,
-        "roe_ttm": 0.44,
-        "size_proxy": 1773735750.9,
-        "asof_q": "2026Q3"
-      },
-      {
-        "code": "sh.601123",
-        "name": "马矿股份",
-        "close": 17.07,
-        "roe_ttm": 0.44,
-        "size_proxy": 1084598242.9,
-        "asof_q": "2026Q3"
-      },
-      {
-        "code": "sh.600301",
-        "name": "华锡有色",
-        "close": 44.73,
-        "roe_ttm": 0.44,
-        "size_proxy": 820404151.3,
-        "asof_q": "2026Q3"
-      },
-      {
-        "code": "sh.600549",
-        "name": "厦门钨业",
-        "close": 50.3,
-        "roe_ttm": 0.43,
-        "size_proxy": 4888697622.1,
+        "size_proxy": 1560092422.9,
         "asof_q": "2026Q3"
       }
     ]

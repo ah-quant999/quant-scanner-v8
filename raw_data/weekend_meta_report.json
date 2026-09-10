@@ -1,16 +1,13 @@
 {
-"update_time": "2026-09-10 01:45:10",
-"total": 7466,
+"update_time": "2026-09-10 06:41:10",
+"total": 9622,
 "new_listings_count": 0,
 "delisted_count": 0,
 "new_listings": [],
 "delisted": [],
 "meta_enriched": 0,
-"guard_tripped": true,
-"guard_reasons": [
-"口径塌缩：fresh(7466) < old(9621) 的 90%",
-"单轮退市 2158 只 > 阈值 96 只（真实退市每日 0~5 只）"
-],
-"old_universe": 9621,
-"fresh_universe": 7466
+"guard_tripped": false,
+"guard_reasons": [],
+"old_universe": 9622,
+"fresh_universe": 9622
 }
