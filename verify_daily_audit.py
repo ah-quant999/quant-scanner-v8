@@ -29,6 +29,16 @@ today_compact = today_cst.replace("-", "")     # 20260806
 today_md = f"HANDOVER_小九_{today_cst}.md"     # 当日常规交接文件名
 short_sha_re = re.compile(r"\b[0-9a-f]{7,40}\b")
 
+# 🛡 2026-09-10 主人拍板「结构性错误硬阻断 + 非结构性降 warn 不阻断」：
+#   结构性错误（硬失败，退出码 1）：
+#     ① 当天缺失 HANDOVER_小九_YYYY-MM-DD.md —— 完全未交接
+#     ② 当天人工 commit 未提及比例 > MANUAL_MISS_HARD_RATIO —— 大面积未记录 = 交接实质缺失
+#   非结构性（降软告警，不影响退出码）：
+#     ③ 个别 commit 关键词未命中 —— 关键词为模糊匹配，个例属误差，不应误杀整轮审计
+MANUAL_MISS_HARD_RATIO = 0.5
+SOFT = "soft"   # 软告警哨兵（与 True 通过 / False 硬失败 / None 无法判定 区分）
+
+
 
 def run(cmd, cwd=ROOT):
     """Run a shell command, return (rc, stdout, stderr)."""
@@ -78,14 +88,25 @@ def load_today_handover_text():
         # 当天常规交接 / 紧急 / 周末改造 / 算法迁移 / 任何 *小九* / *阿狸咪* 8-06 文件
         if today_compact in fn or today_cst in fn:
             texts.append((fn, open(os.path.join(ROOT, fn), encoding="utf-8").read()))
-    # 也读 quant-scanner-v8/.workbuddy/memory 里的当日记忆（跨仓视野）
-    mem_root = r"E:\workspace\quant-scanner-v8\.workbuddy\memory"
-    mem_file = os.path.join(mem_root, f"{today_cst}.md")
-    if os.path.exists(mem_file):
-        texts.append((f"memory/{today_cst}.md", open(mem_file, encoding="utf-8").read()))
+    # 也读 .workbuddy/memory 里的当日记忆（跨仓视野）
+    # 🛡 2026-09-10 修复路径 BUG：原写死 E:\workspace\quant-scanner-v8（不存在的副本目录），
+    #    且 auto_root 误带前导反斜杠，本机运行时两处恒不命中 → 命中面被无谓砍掉。
+    #    改为多候选探测，兼容双机真实工作目录。
+    _mem_candidates = [
+        os.path.join(ROOT, ".workbuddy", "memory"),
+        os.path.join(ROOT, os.pardir, "quant-scanner-v8", ".workbuddy", "memory"),
+        "E:" + os.sep + "workspace" + os.sep + "stock-scanner" + os.sep + ".workbuddy" + os.sep + "memory",
+        "E:" + os.sep + "qs_workspaces" + os.sep + "quant-scanner-v8" + os.sep + ".workbuddy" + os.sep + "memory",
+    ]
+    for mem_root in _mem_candidates:
+        mem_file = os.path.join(mem_root, today_cst + ".md")
+        if os.path.exists(mem_file):
+            texts.append(("memory/" + today_cst + ".md", open(mem_file, encoding="utf-8").read()))
+            break
     # 自动化 memory（automation-*.md）
-    auto_root = r"\E:\workspace\quant-scanner-v8\.workbuddy\automations"
-    if os.path.isdir(auto_root):
+    _auto_candidates = [os.path.join(m, os.pardir, "automations") for m in _mem_candidates]
+    auto_root = next((a for a in _auto_candidates if os.path.isdir(a)), None)
+    if auto_root:
         for ad in os.listdir(auto_root):
             mfile = os.path.join(auto_root, ad, "memory.md")
             if os.path.exists(mfile):
@@ -184,7 +205,13 @@ def check_commits_audit(commits, handover_texts):
             lines.append(f"        关键词: {kws}")
 
     if not_mentioned:
-        return False, "\n".join(lines)
+        ratio = len(not_mentioned) / max(1, len(manual_commits))
+        # 🛡 2026-09-10 主人拍板：结构性错误硬阻断，非结构性降 warn 不阻断
+        if ratio > MANUAL_MISS_HARD_RATIO:
+            lines.append(f"  ❌ 未提及比例 {ratio:.0%} > {MANUAL_MISS_HARD_RATIO:.0%} → 结构性缺失（硬失败）")
+            return False, "\n".join(lines)
+        lines.append(f"  ⚠️ 未提及比例 {ratio:.0%} ≤ {MANUAL_MISS_HARD_RATIO:.0%} → 属个例误差，降软告警（不阻断）")
+        return SOFT, "\n".join(lines)
     return True, "\n".join(lines)
 
 
@@ -207,7 +234,8 @@ def main():
 
     # 汇总
     print()
-    has_drift = any(o is False for _, o, _ in findings)
+    has_drift = any(o is False for _, o, _ in findings)     # 结构性硬失败
+    has_soft = any(o == SOFT for _, o, _ in findings)       # 非结构性软告警
     has_unknown = any(o is None for _, o, _ in findings)
 
     log = {
@@ -221,15 +249,19 @@ def main():
             {"name": n, "ok": o, "msg": m.split("\n")[0]} for n, o, m in findings
         ],
         "success": not has_drift,
+        "soft_warn": has_soft,
     }
     with open(LOG_PATH, "a", encoding="utf-8") as f:
         f.write(json.dumps(log, ensure_ascii=False) + "\n")
 
     if has_drift:
-        print(f"❌ 每日审计发现漂移，已写入 HANDOVER_LOG.jsonl（备份步已配置 continue-on-error 不阻断）")
+        print(f"❌ 每日审计发现【结构性】漂移（硬失败），已写入 HANDOVER_LOG.jsonl（备份步已配置 continue-on-error 不阻断）")
         sys.exit(1)
+    if has_soft:
+        print(f"⚠️ 每日审计有【非结构性】软告警（不阻断，详见上方逐项）")
     if has_unknown:
         print(f"⚠️ 每日审计有项无法判定（网络/数据问题），已记录，不阻断")
+    if has_soft or has_unknown:
         sys.exit(0)
     print(f"✅ 每日审计全部通过")
 
