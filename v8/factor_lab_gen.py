@@ -457,9 +457,9 @@ def main():
         "abnormal_turnover": {"top": at_top, "bottom": at_bottom},
         "roe_largecap": {"top": top30},
     }
-    json.dump(out, open(OUT_JSON, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    json.dump(out, open(OUT_JSON, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
     js = "window.FACTOR_LAB = " + json.dumps(out, ensure_ascii=False) + ";\n"
-    open(OUT_JS, "w", encoding="utf-8").write(js)
+    open(OUT_JS, "w", encoding="utf-8", newline="\n").write(js)
 
     # 更新 index.html 的 ?v 缓存戳 + 强制 ROE 段文案为全市场主板口径
     # ===== 同一进程内原子提交推送（仅本机 standalone 模式；链内由 run_algorithms 统一提交，防双推插针） =====
