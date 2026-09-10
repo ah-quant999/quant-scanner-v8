@@ -379,8 +379,9 @@ jobs:
           IS_TD="${{ steps.trading.outputs.is_trading_day }}"
           EX_STAGE="${{ github.event.inputs.stage || github.event.client_payload.stage || '' }}"
           BYPASS=""
-          # force_run 且未显式指定 stage → 全链应急（ALL）
-          [ -z "$EX_STAGE" ] && [ "${{ github.event.inputs.force_run }}" = "true" ] && EX_STAGE="ALL"
+          # ⚠️ force_run 只放行「时间门控」，**不改变 target_stage**（跑哪批仍由闸门按「缺什么跑什么」判定）。
+          #   ❌ 曾写成 `force_run → EX_STAGE=ALL`：会让 force 派发重跑 A 批 → 重新抓取 LHB 等
+          #      已到手数据，违反主人令「别乱跑把已经拿到手的数据冲掉了」。ALL 只保留给显式 stage=ALL。
           [ "${{ github.event.inputs.bypass_stage_gate }}" = "true" ] && BYPASS="--bypass"
           if [ "$IS_TD" != "true" ] && [ -z "$EX_STAGE" ]; then
             echo "target_stage=NONE" >> "$GITHUB_OUTPUT"
