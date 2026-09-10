@@ -158,7 +158,7 @@ CATEGORY_MAP = {
     "NT_DATA": "premarket",
     "MARGIN_DATA": "premarket,post_close",
     # 2026-08-31：期指主力合约卡移回「实时数据」页，改为 intraday 盘中实时
-    "CFFEX_HOLDINGS": "intraday",
+    "CFFEX_HOLDINGS": "intraday,post_close",
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：与 cloud_fetch_v8.py 同步加 post_close。
     #   盘后数据页「宏观数据速览」卡读本变量，原只标 premarket → 盘后档不重生成 data/MACRO_DATA.js。
     "MACRO_DATA": "premarket,post_close",
@@ -166,7 +166,7 @@ CATEGORY_MAP = {
     "NORTH_FUND": "premarket",
     "ANALYST_RATINGS": "premarket",
     "SUSPENSION_ALERT": "premarket",
-    "MARKET_ALERTS": "intraday",
+    "MARKET_ALERTS": "intraday,post_close",
     "OVERSEAS_MARKETS": "intraday,post_close",
     # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
     "W52_HIGH": "premarket,post_close",
@@ -181,23 +181,23 @@ CATEGORY_MAP = {
 
     # 盘中（每30分钟 09:40~15:10，由 cn runner 刷新）
     # 注意：ETF_DAILY_MONITOR 虽字段含 T+1，但为配合 ETF 三连板实时卡，归 intraday 盘中更新
-    "INDEX_QUOTES": "intraday",
-    "ETF_PULSE": "intraday",
-    "ETF_INTRADAY_HEAT": "intraday",
-    "ETF_DAILY_MONITOR": "intraday",
+    "INDEX_QUOTES": "intraday,post_close",
+    "ETF_PULSE": "intraday,post_close",
+    "ETF_INTRADAY_HEAT": "intraday,post_close",
+    "ETF_DAILY_MONITOR": "intraday,post_close",
     # 🛡 2026-09-04 一劳永逸（两处映射不一致根治）：cloud_fetch_v8.py 早在 2026-09-03 就把这两个
     #   改成 "intraday,post_close"（盘中 cron 偶发丢档→收盘定格值无着落），但 update_v8.py 侧漏同步，
     #   仍是 "intraday" → 盘后档抓取更新了 raw_data，update_v8 却跳过重生成 data/*.js，
     #   造成「raw 已新、js 仍旧」的半截更新。现补齐对齐。
     "SECTOR_FUND_FLOW": "intraday,post_close",
     "SECTOR_FUND_FLOW_INTRADAY": "intraday,post_close",  # 2026-08-19 主人令：分时快照盘中每30分随 SECTOR_FUND_FLOW 同步发布
-    "CAPITAL_FLOW_DATA": "intraday",
-    "CONCEPT_RANKING": "intraday",
+    "CAPITAL_FLOW_DATA": "intraday,post_close",
+    "CONCEPT_RANKING": "intraday,post_close",
     "LIMIT_UP_HEATMAP": "intraday,post_close",
-    "LIMIT_UP_BROKEN": "intraday",
+    "LIMIT_UP_BROKEN": "intraday,post_close",
     "CANDIDATE_QUOTES": "intraday",
-    "SH_SZ_HISTORY": "intraday",
-    "AI_MARKET_BRIEF": "intraday",
+    "SH_SZ_HISTORY": "intraday,post_close",
+    "AI_MARKET_BRIEF": "intraday,post_close",
     # 盘后：大盘资金流时间轴，累积历史序列
     "MARKET_FUND_FLOW_DATA": "post_close",
 
@@ -228,7 +228,7 @@ CATEGORY_MAP = {
     "V8_POOL_TRACKER": "post_close",
     # 2026-08-31：AVG_PRICE_DATA 由 scripts/fetch_avg_price.py 在盘中/盘后/周末生成，
     #   映射为 intraday 使 update_v8 在盘中也刷新 AVG_PRICE_DATA.js（数据源单点，无双写冲突）。
-    "AVG_PRICE_DATA": "intraday",
+    "AVG_PRICE_DATA": "intraday,post_close",
     # 2026-08-15：ALGO_TRACK 依赖 FINAL_RECOMMEND_DATA + FOUR_VOLUME，归属盘后
     "ALGO_TRACK": "post_close",
     # 2026-08-19：INDEX_HISTORY（5年K线）数据源（盘后跑，与算法链节奏一致）
