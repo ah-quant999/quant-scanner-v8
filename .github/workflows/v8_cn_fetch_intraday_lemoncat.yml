@@ -115,27 +115,29 @@ jobs:
             GO=false; WHY="迟到档/窗外（$HHMM 不在 09:32-15:05）"
           fi
           if [ "$GO" = "true" ]; then
-            curl -sS -o /tmp/inflight.json -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/ah-quant999/quant-scanner-v8/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=5" 2>/dev/null
-            # 用 python3 单行解析（ubuntu-latest 必带；不赌 jq 是否存在——jq 缺失会让守卫静默失效）
-            UNFIN_ID=$(python3 -c "import json;d=json.load(open('/tmp/inflight.json'));u=[r for r in d.get('workflow_runs',[]) if r.get('status')!='completed'];print(u[0]['id'] if u else '')" 2>/dev/null)
-            UNFIN_TS=$(python3 -c "import json;d=json.load(open('/tmp/inflight.json'));u=[r for r in d.get('workflow_runs',[]) if r.get('status')!='completed'];print(u[0]['created_at'] if u else '')" 2>/dev/null)
-            if [ -n "$UNFIN_TS" ]; then
-              AGE=$(( ( $(date -u +%s) - $(date -u -d "$UNFIN_TS" +%s) ) / 60 ))
-              echo "云端在途: run#$UNFIN_ID 起始 $UNFIN_TS (龄 ${AGE}min)"
-              if [ "$AGE" -lt 30 ]; then
-                GO=false; WHY="云端在途（run#$UNFIN_ID，龄 ${AGE}min）→ 本档跳过，绝不制造第二个 pending"
+            # 🛡 零解析依赖（2026-09-10 最终版）：直接按状态向 GitHub 查，服务端过滤；
+            #    取值只用 grep/cut（POSIX 必带），不用 python/jq —— 解析器一旦失败就会静默放行。
+            INFLIGHT_TS=""; INFLIGHT_ID=""; INFLIGHT_ST=""
+            for ST in in_progress queued pending; do
+              curl -sS -o /tmp/q.json -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/ah-quant999/quant-scanner-v8/actions/workflows/v8_cn_fetch_cloud.yml/runs?status=$ST&per_page=1" 2>/dev/null
+              T=$(grep -o '"created_at":"[^"]*"' /tmp/q.json 2>/dev/null | head -1 | cut -d'"' -f4)
+              if [ -n "$T" ]; then
+                INFLIGHT_TS="$T"; INFLIGHT_ST="$ST"
+                INFLIGHT_ID=$(grep -o '"id":[0-9]*' /tmp/q.json 2>/dev/null | head -1 | cut -d: -f2)
+                break
+              fi
+            done
+            if [ -n "$INFLIGHT_TS" ]; then
+              AGE=$(( ( $(date -u +%s) - $(date -u -d "$INFLIGHT_TS" +%s) ) / 60 )) 2>/dev/null
+              echo "云端在途: run#$INFLIGHT_ID 状态=$INFLIGHT_ST 起始 $INFLIGHT_TS (龄 ${AGE}min)"
+              # 算不出龄时保守按"在途"处理（已确认确有在途 run，绝不叠加第二个 pending）
+              if [ -z "$AGE" ] || [ "$AGE" -lt 30 ]; then
+                GO=false; WHY="云端在途（run#$INFLIGHT_ID，龄 ${AGE}min）→ 本档跳过，绝不制造第二个 pending"
               else
-                echo "::warning title=云端疑似卡死::run#$UNFIN_ID 已 ${AGE}min 未完成，本档不派发，交由 v8_cn_fetch_watchdog(>45min) 兜底"
+                echo "::warning title=云端疑似卡死::run#$INFLIGHT_ID 已 ${AGE}min 未完成，本档不派发，交由 v8_cn_fetch_watchdog(>45min) 兜底"
               fi
             else
-              # 🛡 fail-closed 兜底：解析异常/为空时，若原始 JSON 里仍有在途状态字样，按"在途"处理。
-              #    否则解析一旦失败会静默 fail-open（照常派发）→ 守卫形同虚设。
-              if grep -qE '"status": *"(in_progress|queued|waiting|pending)"' /tmp/inflight.json 2>/dev/null; then
-                GO=false; WHY="云端在途（解析兜底判定）→ 本档跳过"
-                echo "::warning title=守卫解析兜底::python3 解析为空，但原始 JSON 含在途状态，保守判定为在途"
-              else
-                echo "云端无在途 run ✅"
-              fi
+              echo "云端无在途 run ✅"
             fi
           fi
           echo "go=$GO" >> "$GITHUB_OUTPUT"
