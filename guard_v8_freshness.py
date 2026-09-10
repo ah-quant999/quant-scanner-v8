@@ -188,6 +188,7 @@ from collections import defaultdict
 
 REPO = "ah-quant999/quant-scanner-v8"
 CN_WORKFLOW_ID = 327687211   # 🇨🇳 v8 中国数据抓取(云端)（v8_cn_fetch_cloud.yml）
+SELFHOSTED_WORKFLOW_ID = 336661558  # 🇨🇳 v8 中国数据抓取(云端·小九应急)（v8_cn_fetch_cloud_selfhosted.yml）
 ALGO_WORKFLOW_ID = 324119592  # ☁️ v8 盘后算法链（v8_algo_cloud.yml）
 STOCK_QUOTE_WORKFLOW_ID = 336548691  # 📈 v8 STOCK_QUOTE 轻量 refresh（v8_stock_quote_refresh.yml，云端 ubuntu-latest）
 SELFHEAL_PATH = DATA_DIR / "freshness_selfheal.json"
@@ -221,7 +222,7 @@ def _load_token():
 
 
 def _dispatch_cn(category, token):
-    """派发 cn_fetch 在在线 self-hosted cn runner 上重抓（自愈核心动作）。"""
+    """派发 cn_fetch 云端主力（v8_cn_fetch_cloud.yml）。"""
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/dispatches"
     hdr = {
         "Authorization": f"Bearer {token}",
@@ -237,6 +238,50 @@ def _dispatch_cn(category, token):
         return False, f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:120]}"
     except Exception as e:
         return False, str(e)[:120]
+
+
+def _dispatch_cn_selfhosted(category, token):
+    """派发 cn_fetch 应急 self-hosted（v8_cn_fetch_cloud_selfhosted.yml），用于云端拥堵/失败兜底。"""
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{SELFHOSTED_WORKFLOW_ID}/dispatches"
+    hdr = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    data = json.dumps({"ref": "main", "inputs": {"category": category}}).encode()
+    req = urllib.request.Request(url, data=data, headers=hdr, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, r.status
+    except urllib.error.HTTPError as e:
+        return False, f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:120]}"
+    except Exception as e:
+        return False, str(e)[:120]
+
+
+def _cloud_congested(token, threshold=2):
+    """检查云端 cn_fetch 是否拥堵（>=threshold 个 run 在跑/排队）或最近一次失败。
+    用于盘中 intraday 改派 self-hosted 兜底，避免队列拥堵导致数据空窗。"""
+    try:
+        url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/runs?per_page=5"
+        runs = _api_get(url, token)
+        if "__error__" in runs:
+            print(f"  [拥堵检查] 查 runs 失败: {runs['__error__']}，保守视为不拥堵")
+            return False
+        items = runs.get("workflow_runs", [])
+        running = sum(1 for x in items if x.get("status") != "completed")
+        latest = None
+        for x in items:
+            if x.get("status") == "completed":
+                latest = x.get("conclusion")
+                break
+        if running >= threshold or latest == "failure":
+            print(f"  [拥堵检查] 云端 running={running} latest={latest}，判定拥堵，改派 selfhosted")
+            return True
+        return False
+    except Exception as e:
+        print(f"  [拥堵检查] 异常: {e}，保守视为不拥堵")
+        return False
 
 
 def _dispatch_algo(token):
@@ -389,16 +434,17 @@ def pipeline_selfheal(token, now, is_trading, sh):
             print(f"  [跳过] cn_fetch 失败过旧({age_min/60:.0f}h)，不自动重试")
             return
         cat = choose_category_cn(now, is_trading)
-        ok, msg = _dispatch_cn(cat, token)
+        # 🔴 2026-09-09 盘中更新审计·一劳永逸：失败重派不再回同一个云端队列，直接走 selfhosted 兜底。
+        ok, msg = _dispatch_cn_selfhosted(cat, token)
         if ok:
             sh["cn_fetch_pipeline"] = {
                 "ts": now.strftime("%Y-%m-%d %H:%M:%S"),
                 "run_id": latest.get("id"),
                 "category": cat,
             }
-            print(f"  [自愈✓] cn_fetch 上次运行失败(run#{latest.get('id')})，已重派 {cat}（HTTP {msg}）")
+            print(f"  [自愈✓] cn_fetch 上次运行失败(run#{latest.get('id')})，已重派 selfhosted {cat}（HTTP {msg}）")
         else:
-            print(f"  [自愈✗] cn_fetch 重派失败: {msg}")
+            print(f"  [自愈✗] cn_fetch 失败重派 selfhosted {cat} 失败: {msg}")
     except Exception as e:
         print(f"  [管线自愈] 异常: {e}")
 
@@ -648,8 +694,13 @@ def main():
                 ok, msg = _dispatch_algo(token)
                 dispatch_name = "algo_cloud"
             else:
-                ok, msg = _dispatch_cn(cat, token)
-                dispatch_name = f"cn_fetch({cat})"
+                # 🔴 2026-09-09 盘中更新审计·一劳永逸：intraday 若云端拥堵/刚失败，改派 selfhosted 兜底。
+                if cat == "intraday" and _cloud_congested(token):
+                    ok, msg = _dispatch_cn_selfhosted(cat, token)
+                    dispatch_name = f"cn_fetch_selfhosted({cat})"
+                else:
+                    ok, msg = _dispatch_cn(cat, token)
+                    dispatch_name = f"cn_fetch({cat})"
             if ok:
                 sh[cat] = {"ts": now.strftime("%Y-%m-%d %H:%M:%S"), "vars": vars_}
                 healed_cats.add(cat)
