@@ -15,6 +15,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 SRC = REPO / "data" / "maharo_macro.js"
+INSIGHTS_SRC = REPO / "data" / "maharo_insights.js"  # 2026-09-10 一劳永逸：独立 insights 文件
 DST = REPO / "raw_data" / "ai_insights_compare.json"
 
 # 50 个 A 股常见板块/主线词典（按数据自洽顺序，手工整理；后续主人可补）
@@ -39,6 +40,19 @@ def _load_maharo_macro():
     m = re.search(r"window\.MAHORO_MACRO\s*=\s*\{", txt)
     d, _ = JSONDecoder().raw_decode(txt, m.end() - 1)
     return d
+
+
+def _load_maharo_insights():
+    """2026-09-10 一劳永逸：优先从独立文件读 insights；缺失则 fallback 到 maharo_macro.js 内嵌。
+    返回 {daily, weekly, monthly}（各为 {"text": ...}）。"""
+    if INSIGHTS_SRC.exists():
+        txt = INSIGHTS_SRC.read_text(encoding="utf-8")
+        m = re.search(r"window\.MAHORO_INSIGHTS\s*=\s*\{", txt)
+        if m:
+            d, _ = JSONDecoder().raw_decode(txt, m.end() - 1)
+            return d
+    # fallback
+    return _load_maharo_macro().get("insights", {})
 
 
 def _extract(text: str):
@@ -75,7 +89,7 @@ def _extract(text: str):
 
 def main():
     d = _load_maharo_macro()
-    ins = d.get("insights", {})
+    ins = _load_maharo_insights()
     daily_text = ins.get("daily", {}).get("text", "")
     weekly_text = ins.get("weekly", {}).get("text", "")
     monthly_text = ins.get("monthly", {}).get("text", "")
