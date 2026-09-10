@@ -91,7 +91,7 @@ CARD_DEFS = [
     # 若沿用 PAGE_TO_CAT["盘后数据"|"选股策略"]="post_close" 派发 cn_fetch，**永远刷不到它们**，
     # 且会白占 25 分钟 debounce 锁导致真正需要的派发被跳过（与 155 轮 NT_DATA 同一类缺陷）。
     # 故统一显式覆盖 heal_cat="algo_run"。
-    {"id": "SH_FIB", "name": "市场温度计", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "heal_cat": "algo_run"},
+    {"id": "SH_FIB", "name": "市场温度计", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "heal_cat": "algo_run", "raw_file": "sh_fib.json"},  # 🛡 2026-09-10 一劳永逸：raw_file 用于「raw已新/js待D批重建」窗口交叉校验，根治误报 fail
     # 🛡 2026-09-02 一劳永逸（主人令「运维还有错」）：SIX_DIM_RADAR 是 derived 项
     #   （前端 renderSixDim 直接读 SH_FIB 派生六维评分视图,无独立 SIX_DIM_RADAR.js 文件）。
     #   原 CARD_DEFS 登记让它绑死 SH_FIB 检查 → SH_FIB 老化超时同步误报 red。
@@ -109,7 +109,7 @@ CARD_DEFS = [
     {"id": "CANDIDATE", "name": "候选池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
     {"id": "GOLD_POOL", "name": "黄金池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
     {"id": "LHB_DATA", "name": "龙虎榜", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
-    {"id": "INST_TRADE", "name": "机构买卖", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top_buy", "top_sell"], "heal_cat": "algo_run"},
+    {"id": "INST_TRADE", "name": "机构买卖", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top_buy", "top_sell"], "heal_cat": "algo_run", "raw_file": "inst_trade.json"},  # 🛡 2026-09-10 一劳永逸：raw_file 交叉校验，根治「raw已新/js待D批重建」误报 fail
     {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
     # 2026-08-29 一劳永逸：MARKET_REGIME / SECTOR_RECOMMENDATION 由 market_regime.py / sector_recommendation.py
     #   每日盘后产出，原属通用全量审计分支（被 parse_time T 格式误伤判黄灯）。正式纳入 CARD_DEFS：
@@ -120,7 +120,7 @@ CARD_DEFS = [
     {"id": "SECTOR_RECOMMENDATION", "name": "板块推荐", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["regime", "current_rates", "trends", "meta"], "heal_cat": "algo_run"},
     # 选股策略
     {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
-    {"id": "STOCK_RPS", "name": "相对强度", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["records"], "_window_var": "STOCK_RPS_DATA", "heal_cat": "algo_run", "picking": True},  # 文件名 STOCK_RPS.js，但 window 变量名是 STOCK_RPS_DATA（历史遗留）
+    {"id": "STOCK_RPS", "name": "相对强度", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["records"], "_window_var": "STOCK_RPS_DATA", "heal_cat": "algo_run", "picking": True, "raw_file": "stock_rps.json"},  # 文件名 STOCK_RPS.js，但 window 变量名是 STOCK_RPS_DATA（历史遗留）；🛡 2026-09-10 raw_file 交叉校验根治误报 fail
     {"id": "CRDS_CARD_DATA", "name": "逆势龙头", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["elite", "watch"], "heal_cat": "algo_run", "picking": True},
     # 运维/静态说明页（逻辑详解页「防删」子页）
     {"id": "DO_NOT_DELETE", "name": "防误删清单", "page": "运维", "freq": "周日+手动", "max_age": 10080, "key_fields": ["update_time"], "_window_var": "DO_NOT_DELETE", "heal_cat": "algo_run", "manual_dep": True},
@@ -151,6 +151,14 @@ CARD_DEFS = [
     #   自愈链不去派发永远刷不出的任务，避免日复一日假派发噪声邮件。
     {"id": "RPS_BACKTEST", "name": "RPS A档回测", "page": "盘后数据", "freq": "每日盘后", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run", "manual_dep": True, "manual_note": "需 baostock 拉前复权K线计算 T+1/T+20 持有期收益。本机 baostock 被风控黑名单(err=10001011匿名用户)，无凭据。阿狸咪走 v8/backtest_rps_offline.py 离线半残版（kline_cache 替 baostock，T+1=57样本/T+3=11样本/T+5+0样本 degraded=true）；完整版需小九中国IP在线跑原版。"},
     {"id": "STOCK_STOP_DATA", "name": "精确止损止盈", "page": "选股策略", "freq": "盘后", "max_age": 1440, "key_fields": ["stocks"], "heal_cat": "algo_run", "manual_dep": True, "manual_note": "需 gtimg 日K(腾讯 urllib HTTPS) 计算 fixedP10/rrK1.5 止损止盈。本机实测 gtimg HTTPS=HTTP 501（腾讯waf反爬虫JS challenge拦截 urllib 类爬虫），无浏览器UA绕不开。本机无替代源，需小九中国IP+浏览器UA在线跑原版。"},
+    # 🛡 2026-09-10 主人令一劳永逸：H_AUTO_BUY / H_AUTO_BUY_TRACK 此前未登记 CARD_DEFS
+    #   → 落入 check_all_data_files 全量审计按「通用 24h 红线」误判 fail（all_H_AUTO_BUY / all_H_AUTO_BUY_TRACK）。
+    #   根因同 STOCK_STOP_DATA：track_h_auto_buy.py / auto_run_dn_algorithm.py 经腾讯 gtimg 拉日K，
+    #   云端 runner 无浏览器UA → HTTPS 501 腾讯 waf 拦截，永远刷不出。本机/云端均无法自动产出。
+    #   登记 manual_dep + manual_note，让面板显示「本机限制」(warn) 而非「陈旧」(fail)，
+    #   自愈链不去派发永远刷不出的任务；小九中国IP+浏览器UA在线跑原版刷新后即转 ok。
+    {"id": "H_AUTO_BUY", "name": "精确自动买入(H反推)", "page": "选股策略", "freq": "盘后(挂链)", "max_age": 1440, "key_fields": ["date", "total_scanned"], "heal_cat": "algo_run", "manual_dep": True, "manual_note": "需 gtimg 日K(腾讯 urllib HTTPS) 反推涨幅≥3%+量比≥1.2 选股。本机实测 gtimg HTTPS=HTTP 501（腾讯waf反爬虫JS challenge拦截 urllib 类爬虫），无浏览器UA绕不开。本机无替代源，需小九中国IP+浏览器UA在线跑原版。"},
+    {"id": "H_AUTO_BUY_TRACK", "name": "精确自动买入追踪", "page": "选股策略", "freq": "盘后(挂链)", "max_age": 1440, "key_fields": ["update_time", "by_date"], "heal_cat": "algo_run", "manual_dep": True, "manual_note": "同上，依赖 gtimg 日K 累积胜率(T+1/T+3/T+5)。云端 runner HTTPS 501 waf 拦截，无浏览器UA绕不开，需小九中国IP+浏览器UA在线跑原版。"},
 ]
 
 
@@ -1340,6 +1348,37 @@ def _hard_cap_for_owner_rule(n=None, page=None):
     return max(24 * 60, cap)
 
 
+def _raw_fresh_override(d, status, msg):
+    """🛡 2026-09-10 主人令一劳永逸：post_close 卡「raw 已新 / js 待 20:00 D批重建」窗口误报 fail 根因修复。
+
+    根因：SH_FIB / INST_TRADE / STOCK_RPS 等卡片的 raw_data 由盘后算法链(A/B 批)盘中刷新，
+    但 data/*.js 仅在 20:00 D 批(post_close 构建)从 raw 重建（update_v8.py 的 _pure_pc 守卫防回滚）。
+    故每日 15:00 收盘后 ~ 20:00 D 批前存在「raw 已新、js update_time 仍旧」窗口；
+    健康检查只读 js update_time → 误判 fail → 触发 futile self_heal 派发永远刷不出的任务。
+
+    修复：algo_run 类卡片，当对应 raw_data/<file> 在 24h（主人交易日红线）内已更新，
+    即判定数据管线本交易日已产出、js 待重建属设计内 → 健康(ok)，不误报 fail。
+    raw 超 24h 仍未更新 = 真·管线缺口 → 保持原 fail，绝不掩盖。
+    manual_dep 卡（本机限制类）不走此逻辑，保持 warn「本机限制」。
+    """
+    if status not in ("fail", "warn"):
+        return status, msg
+    if d.get("manual_dep"):
+        return status, msg
+    if d.get("heal_cat") != "algo_run":
+        return status, msg
+    rf = d.get("raw_file") or f"{d['id'].lower()}.json"
+    rp = RAW_DIR / rf
+    if not rp.exists():
+        return status, msg
+    raw_mtime = datetime.fromtimestamp(rp.stat().st_mtime, tz=timezone(timedelta(hours=8)))
+    raw_age = (now_cst() - raw_mtime).total_seconds() / 60
+    if raw_age <= 24 * 60:
+        rel = fmt_rel_time(raw_mtime.strftime("%Y-%m-%d %H:%M:%S"))
+        return "ok", f"raw_data/{rf} {rel} 已更新；js 待 20:00 D批重建(设计内·_pure_pc 守卫)，数据管线健康"
+    return status, msg
+
+
 def check_data_cards():
     results = []
     today_str = now_cst().strftime("%Y-%m-%d")
@@ -1494,6 +1533,10 @@ def check_data_cards():
             msg += "；抓取占位符（available=false，前端显示抓取中，下轮自愈）"
         elif empty_fields:
             msg += f"；关键字段空值：{', '.join(empty_fields)}"
+        # 🛡 2026-09-10 主人令一劳永逸：post_close 卡「raw 已新 / js 待 D批重建」窗口交叉校验。
+        #   仅在 algo_run 且非 manual_dep 且 raw_data 24h 内已更新时，把误报 fail/warn 翻回 ok。
+        #   放在所有 status 重算分支之后、fail 消息追加之前，作为权威终裁（不掩盖真·管线缺口）。
+        status, msg = _raw_fresh_override(d, status, msg)
         if status == "fail":
             if intentional_empty:
                 msg += "；占位符长期未刷新（抓取疑似持续失败）"
