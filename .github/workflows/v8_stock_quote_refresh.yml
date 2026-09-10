@@ -223,6 +223,13 @@ jobs:
 
       - name: "🧮 跑 fetch_stock_quote_v8.py（5-10 分钟）"
         if: steps.trading.outputs.is_trading_day == 'true'
+        # 🔴 2026-09-10 13:58 GBK 崩溃根治（小九看门狗巡检发现）：
+        #   self-hosted runner 上 fetch 脚本打印 ✅/⚠️ emoji 时
+        #   UnicodeEncodeError: 'gbk' codec can't encode —— Windows 控制台默认 GBK。
+        #   强制 UTF-8 输出，脚本逻辑/数据源零改动。
+        env:
+          PYTHONIOENCODING: utf-8
+          PYTHONUTF8: "1"
         run: |
           set +e
           cd algorithms && python fetch_stock_quote_v8.py
