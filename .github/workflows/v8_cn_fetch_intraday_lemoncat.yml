@@ -61,12 +61,20 @@ permissions:
   contents: read
   actions: write
 
+# 🔴 2026-09-10 实测修正（Bug ④ 架构死锁）：本 yml **移出** v8-cn-fetch-cloud 组。
+#   原因：本 job 占组长达 20 分钟（dispatch + sleep 10min + 检查 + 兜底），
+#   而它 dispatch 出去的 v8_cn_fetch_cloud / _selfhosted 又同属该组 → 被调度者
+#   必须排队等本 job 让出组 → 本 job 10 分钟后检查时对方还在 queued → 误判失败
+#   → 触发兜底 → 兜底同样排队 → 死锁。
+#   实测证据：run 34430728891 跑到 sleep 结束时被外力 cancelled（02:46→02:56），
+#   check/兜底两步全部 skipped，一档 20 分钟白跑。
+#
+#   本 yml 零产物（不写 raw_data/、不写 data/、不 git push），与被调度者没有资源竞争，
+#   互斥毫无必要。改独立组 v8-cn-fetch-slot：
+#     - cancel-in-progress: true → 上一档若卡住，新档接管，避免 14 档逐档堆积。
 concurrency:
-  # 🛡 2026-09-09 一劳永逸「双机/三机/四机兜底配合」：
-  #   v8-cn-fetch-cloud 同组：云端主力 + 小九 selfhosted + hosted 兜底 + 本 yml（小九准点档）
-  #   + 阿狸咪按铃（盘中阈值 60min 兜底）。cancel-in-progress:false → 同 group 排队不互杀。
-  group: v8-cn-fetch-cloud
-  cancel-in-progress: false
+  group: v8-cn-fetch-slot
+  cancel-in-progress: true
 
 jobs:
   intraday_slot:
