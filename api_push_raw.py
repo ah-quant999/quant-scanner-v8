@@ -68,6 +68,19 @@ def api(method, path, data=None):
                 print(f"     doc: {err.get('documentation_url')}")
             except Exception:
                 print(f"     body: {body[:500]}")
+            # 🔴 2026-09-11 修复（今夜 P0 事故·一劳永逸）：
+            #   原实现只对「网络类异常」重试，HTTPError 一律立即 return →
+            #   api() 的 3 次重试对 HTTP 5xx 形同虚设。实测今夜 run#1689：
+            #   `GET /git/trees/{sha}?recursive=1 -> HTTP 500`（GitHub 瞬时故障）
+            #   → 防倒退守卫拿不到基线 → sys.exit(1) → **整条链算完却零推送**，
+            #   主站最终推荐整天停在昨天。
+            #   修法：幂等请求(GET)遇 5xx / 429（可重试瞬时错）走退避重试。
+            if method.upper() == "GET" and (e.code >= 500 or e.code == 429) and i < attempts - 1:
+                wait = 2 ** i
+                print(f"     ↻ HTTP {e.code} 属可重试瞬时故障，{wait}s 后重试 {i + 1}/{attempts - 1}")
+                _time.sleep(wait)
+                last_msg = f"HTTP {e.code}"
+                continue
             return {"__error__": e.code, "__msg__": body}
         except (TimeoutError, urllib.error.URLError, OSError,
                 http.client.HTTPException, json.JSONDecodeError) as e:
@@ -315,11 +328,22 @@ def main():
     # 覆盖远端更新版本，正是 08-09 大范围数据回退故障的成因。
     # 守卫基线不完整时必须中止，绝不能「无守卫裸推」。
     if "__error__" in tfull or "tree" not in tfull:
-        print("❌ 获取 base tree 失败（防倒退守卫无基线，拒绝裸推）:", tfull.get("__msg__"))
+        # 🔴 2026-09-11 修复（今夜 P0）：原来此处直接 sys.exit(1)，一旦 GitHub
+        #   该接口 5xx/截断，整夜算出的成果一个字都推不上 main。改为先退到
+        #   本地 git ls-tree 兜底基线（与 API 等价，见 _local_tree_fallback），
+        #   兜底也拿不到才中止 —— 既不裸推，也不丢整夜成果。
+        why = tfull.get("__msg__") or f"HTTP {tfull.get('__error__')}"
+        print(f"⚠️ 远端 base tree 不可用（{why}）→ 回退本地 git ls-tree 作守卫基线")
+        tfull = _local_tree_fallback(base_sha)
+    if tfull is None:
+        print("❌ 获取 base tree 失败（远端 5xx 且本地兜底亦失败），拒绝裸推")
         sys.exit(1)
     if tfull.get("truncated"):
-        print("❌ base tree 被 GitHub 截断（truncated=true），守卫基线残缺，拒绝裸推")
-        sys.exit(1)
+        print("⚠️ base tree 被 GitHub 截断（truncated=true）→ 回退本地 git ls-tree 作守卫基线")
+        tfull = _local_tree_fallback(base_sha)
+        if tfull is None:
+            print("❌ base tree 截断且本地兜底失败，守卫基线残缺，拒绝裸推")
+            sys.exit(1)
     for e in tfull.get("tree", []):
         if (e["path"].startswith("raw_data/")
             or e["path"] in ("data/FOUR_VOLUME.js", "data/STOCK_STOP_DATA.js",

@@ -31,6 +31,14 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(ROOT, "raw_data")
 DATA = os.path.join(ROOT, "data")
 
+# 🔴 2026-09-11 修复（今夜 P0 事故·一劳永逸）：本文件 L509 用了 V8_OFFLINE，
+#   但全仓从未定义过它（`grep -rn "V8_OFFLINE" .` = 仅 2 处「使用」、0 处「定义」）。
+#   疑 commit 5393f4c66「V8_OFFLINE 完整实现」在 rebase/合并中把定义行丢了。
+#   后果：**D 批（最终推荐）一跑就 NameError 崩** → data/FINAL_RECOMMEND_DATA.js
+#   永远停在旧版（实测停在 2026-09-10 04:57:09）→ 主站「最终推荐」整天是昨天的。
+#   语义：V8_OFFLINE=1 = 本机无外网/无 baostock 的离线模式（不等 FACTOR_LAB）。
+V8_OFFLINE = os.environ.get("V8_OFFLINE", "0") == "1"
+
 # 名称归一化共享模块（2026-08-14 抽出，消除与 build_candidate_pool/guanlan_extractor/scanner 的重复）
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from name_utils import norm_code, fix_name, strip_entitlement_prefix, STANDARD_NAME_MAP  # noqa: E402

@@ -40,6 +40,14 @@ OUTPUT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ra
 _KLINE_FAILS = 0
 _KLINE_MAX_FAILS = 40  # 连续失败过多则放弃本次计算, 保留旧 crds_result.json
 
+# 🔴 2026-09-11 修复（今夜 P0 事故·一劳永逸）：本文件 L82 用了 V8_OFFLINE，
+#   但全仓从未定义过它（`grep -rn "V8_OFFLINE" .` = 仅 2 处「使用」、0 处「定义」）。
+#   疑 commit 5393f4c66「V8_OFFLINE 完整实现」在 rebase/合并中把定义行丢了。
+#   后果：calc_crds.py 每次一进 _query_kline_mootdx 就 NameError 退出码 1
+#   → CRDS 卡永久陈旧（raw_data/crds_card_data.json 停在 09-10 04:10:39）。
+#   语义：V8_OFFLINE=1 = 本机无外网/无 baostock 的离线模式（跳过通达信直连）。
+V8_OFFLINE = os.environ.get("V8_OFFLINE", "0") == "1"
+
 import gc
 import requests as _requests
 
