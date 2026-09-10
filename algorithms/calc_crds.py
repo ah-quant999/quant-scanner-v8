@@ -342,7 +342,14 @@ def _rate_wait():
 
 
 def _expected_kline_end():
-    """期望的 K 线末根交易日（最近 A 股交易日）。取不到返回 ""（不拦截，fail-open）。"""
+    """期望的 K 线末根交易日 = 最近一个「**已收盘**」的交易日。取不到返回 ""（fail-open）。
+
+    🔴 2026-09-11 修正（缓存此前永不命中）：原实现直接取「最近交易日」，于是**交易日
+      15:10 之前**返回的是「今天」，而今天的日K根本不存在 → kline_cache 全量被判陈旧
+      → 缓存形同虚设（实测 07:0x 修完仍走满 718 次网络、耗时不变）。
+      而算法链的补跑窗口正是 00:00~09:00（盘前），命中的是这条错误分支。
+      A 股 15:00 收盘、约 15:10 后日K落定 → 15:10 之前一律回退一个交易日再取。
+    """
     global _EXPECTED_END
     if _EXPECTED_END is None:
         try:
@@ -350,7 +357,16 @@ def _expected_kline_end():
             if _root not in sys.path:
                 sys.path.insert(0, _root)
             import v8_date
-            _EXPECTED_END = str(v8_date.last_trading_day(max_lookback=15))[:10]
+            ref = None
+            try:
+                _now = v8_date.now_cst()
+                _d = _now.date()
+                if _now.hour < 15 or (_now.hour == 15 and _now.minute < 10):
+                    _d = _d - timedelta(days=1)      # 当日 K 线尚未落定
+                ref = _d
+            except Exception:
+                ref = None
+            _EXPECTED_END = str(v8_date.last_trading_day(ref, max_lookback=15))[:10]
         except Exception:
             _EXPECTED_END = ""
     return _EXPECTED_END
@@ -726,29 +742,37 @@ def _normalize_name(n):
 # 故仅在 code 属股票段且 mootdx 名字非指数/债时才采用, 否则交回 raw/代码。
 _TDX_NAME_MAP = None
 _TDX_NAME_MAP_READY = False
+# 🛡 2026-09-11：12 线程下原实现会各自并发构建 mootdx 映射表（读-改-写竞态），
+#   且并发调用 mootdx 有触发 py_mini_racer(V8) 崩溃的历史。加锁只构建一次。
+_TDX_NAME_LOCK = threading.Lock()
 
 _INDEX_KW = ['指数', '债', 'ETF', '基金', 'LOF', '可转债', '权证', '成份',
              'A股指数', 'B股指数', '港股通', '板块']
 
 def _build_tdx_name_map():
-    """懒构建 mootdx 代码→名字 映射(仅本机东财被墙时触发一次)。"""
+    """懒构建 mootdx 代码→名字 映射(仅本机东财被墙时触发一次)。
+
+    🔴 2026-09-11：加锁串行构建 —— 12 线程下原实现会各自同时构建（竞态），
+      且并发调 mootdx 有 V8 崩溃先例；现在最多只构建一次，其余线程直接取结果。
+    """
     global _TDX_NAME_MAP, _TDX_NAME_MAP_READY
-    if _TDX_NAME_MAP_READY:
+    with _TDX_NAME_LOCK:
+        if _TDX_NAME_MAP_READY:
+            return _TDX_NAME_MAP
+        _TDX_NAME_MAP_READY = True
+        _TDX_NAME_MAP = {}
+        try:
+            from mootdx.quotes import Quotes
+            cl = Quotes.factory(market='std')
+            stk = cl.stocks()
+            for _, r in stk.iterrows():
+                code = str(r.get('code') or '').strip()
+                nm = str(r.get('name') or '').replace('\x00', '').strip()
+                if code:
+                    _TDX_NAME_MAP[code.zfill(6)] = nm
+        except Exception:
+            pass
         return _TDX_NAME_MAP
-    _TDX_NAME_MAP_READY = True
-    _TDX_NAME_MAP = {}
-    try:
-        from mootdx.quotes import Quotes
-        cl = Quotes.factory(market='std')
-        stk = cl.stocks()
-        for _, r in stk.iterrows():
-            code = str(r.get('code') or '').strip()
-            nm = str(r.get('name') or '').replace('\x00', '').strip()
-            if code:
-                _TDX_NAME_MAP[code.zfill(6)] = nm
-    except Exception:
-        pass
-    return _TDX_NAME_MAP
 
 def _tdx_name(code):
     return _build_tdx_name_map().get(str(code).zfill(6))
