@@ -163,6 +163,7 @@ CATEGORY_MAP = {
     "ANALYST_RATINGS": "premarket",
     "SUSPENSION_ALERT": "premarket",
     "MARKET_ALERTS": "intraday",
+    "OVERSEAS_MARKETS": "intraday,post_close",
     # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
     "W52_HIGH": "premarket,post_close",
     # 2026-09-08 一劳永逸：HERDING_DATA(羊群效应) 由 f_herding_data() 读当日完整涨停池(_get_zt_pool)，
