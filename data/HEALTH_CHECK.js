@@ -1,5 +1,5 @@
 window.HEALTH_CHECK = {
-  "updated": "2026-09-10 10:07:19",
+  "updated": "2026-09-10 10:14:21",
   "overall": "warn",
   "summary": {
     "ok": 111,
@@ -15,7 +15,7 @@ window.HEALTH_CHECK = {
       "freq": "每周日+月末",
       "status": "ok",
       "last_update": "2026-09-10 08:23:09",
-      "age_min": 103.3,
+      "age_min": 111.1,
       "message": "更新于 今日 08:23"
     },
     {
@@ -25,7 +25,7 @@ window.HEALTH_CHECK = {
       "freq": "每日盘前",
       "status": "ok",
       "last_update": "2026-09-10 08:21:49",
-      "age_min": 104.6,
+      "age_min": 112.5,
       "message": "更新于 今日 08:21"
     },
     {
@@ -34,9 +34,9 @@ window.HEALTH_CHECK = {
       "page": "今日事件",
       "freq": "每日盘前",
       "status": "ok",
-      "last_update": "2026-09-10 10:03:48",
-      "age_min": 2.6,
-      "message": "更新于 今日 10:03"
+      "last_update": "2026-09-10 10:11:21",
+      "age_min": 2.9,
+      "message": "更新于 今日 10:11"
     },
     {
       "id": "MACRO_DATA",
@@ -44,9 +44,9 @@ window.HEALTH_CHECK = {
       "page": "今日事件",
       "freq": "每日盘前",
       "status": "ok",
-      "last_update": "2026-09-10 10:01:38",
-      "age_min": 4.8,
-      "message": "更新于 今日 10:01"
+      "last_update": "2026-09-10 10:09:44",
+      "age_min": 4.6,
+      "message": "更新于 今日 10:09"
     },
     {
       "id": "NT_DATA",
@@ -55,7 +55,7 @@ window.HEALTH_CHECK = {
       "freq": "每日盘后(算法链)",
       "status": "ok",
       "last_update": "2026-09-10 06:24",
-      "age_min": 222.4,
+      "age_min": 230.3,
       "message": "更新于 今日 06:24",
       "heal_cat": "algo_run"
     },
@@ -65,9 +65,9 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中每30分",
       "status": "ok",
-      "last_update": "2026-09-10 10:00:44",
-      "age_min": 5.7,
-      "message": "更新于 今日 10:00"
+      "last_update": "2026-09-10 10:09:05",
+      "age_min": 5.2,
+      "message": "更新于 今日 10:09"
     },
     {
       "id": "ETF_PULSE",
@@ -75,9 +75,9 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中实时",
       "status": "ok",
-      "last_update": "2026-09-10 10:02:50",
-      "age_min": 3.6,
-      "message": "更新于 今日 10:02"
+      "last_update": "2026-09-10 10:10:38",
+      "age_min": 3.7,
+      "message": "更新于 今日 10:10"
     },
     {
       "id": "ETF_INTRADAY_HEAT",
@@ -85,9 +85,9 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中实时 T+0",
       "status": "ok",
-      "last_update": "2026-09-10 09:59:33",
-      "age_min": 6.9,
-      "message": "更新于 今日 09:59"
+      "last_update": "2026-09-10 10:08:18",
+      "age_min": 6.0,
+      "message": "更新于 今日 10:08"
     },
     {
       "id": "ETF_DAILY_MONITOR",
@@ -95,9 +95,9 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中每30分",
       "status": "ok",
-      "last_update": "2026-09-10 10:03:27",
-      "age_min": 3.0,
-      "message": "更新于 今日 10:03"
+      "last_update": "2026-09-10 10:11:09",
+      "age_min": 3.1,
+      "message": "更新于 今日 10:11"
     },
     {
       "id": "SECTOR_FUND_FLOW",
@@ -105,9 +105,9 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中每30分",
       "status": "ok",
-      "last_update": "2026-09-10 09:59:38",
-      "age_min": 6.8,
-      "message": "更新于 今日 09:59"
+      "last_update": "2026-09-10 10:08:22",
+      "age_min": 5.9,
+      "message": "更新于 今日 10:08"
     },
     {
       "id": "CONCEPT_RANKING",
@@ -115,9 +115,9 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中每30分",
       "status": "ok",
-      "last_update": "2026-09-10 10:00:45",
-      "age_min": 5.7,
-      "message": "更新于 今日 10:00"
+      "last_update": "2026-09-10 10:09:06",
+      "age_min": 5.2,
+      "message": "更新于 今日 10:09"
     },
     {
       "id": "LIMIT_UP_HEATMAP",
@@ -125,9 +125,9 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中每30分",
       "status": "ok",
-      "last_update": "2026-09-10 10:02:05",
+      "last_update": "2026-09-10 10:10:02",
       "age_min": 4.3,
-      "message": "更新于 今日 10:02"
+      "message": "更新于 今日 10:10"
     },
     {
       "id": "MARKET_FUND_FLOW_DATA",
@@ -135,9 +135,9 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中每30分",
       "status": "ok",
-      "last_update": "2026-09-10 10:02:09",
-      "age_min": 4.3,
-      "message": "更新于 今日 10:02"
+      "last_update": "2026-09-10 10:10:07",
+      "age_min": 4.2,
+      "message": "更新于 今日 10:10"
     },
     {
       "id": "MARKET_ALERTS",
@@ -145,9 +145,9 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中实时",
       "status": "ok",
-      "last_update": "2026-09-10 10:05:18",
-      "age_min": 1.1,
-      "message": "更新于 今日 10:05"
+      "last_update": "2026-09-10 10:12:28",
+      "age_min": 1.8,
+      "message": "更新于 今日 10:12"
     },
     {
       "id": "SH_FIB",
@@ -156,7 +156,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-09-10 08:23:19",
-      "age_min": 103.1,
+      "age_min": 111.0,
       "message": "更新于 今日 08:23",
       "heal_cat": "algo_run"
     },
@@ -167,7 +167,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-09-10 08:53:39",
-      "age_min": 72.8,
+      "age_min": 80.6,
       "message": "更新于 今日 08:53",
       "heal_cat": "post_close"
     },
@@ -178,7 +178,7 @@ window.HEALTH_CHECK = {
       "freq": "每日盘后(挂链)",
       "status": "ok",
       "last_update": "2026-09-09 19:02:20",
-      "age_min": 904.1,
+      "age_min": 912.0,
       "message": "更新于 昨日 19:02",
       "heal_cat": "algo_run"
     },
@@ -189,7 +189,7 @@ window.HEALTH_CHECK = {
       "freq": "每日回测批",
       "status": "ok",
       "last_update": "2026-09-10 05:38:43",
-      "age_min": 267.7,
+      "age_min": 275.6,
       "message": "更新于 今日 05:38",
       "heal_cat": "algo_run"
     },
@@ -199,9 +199,9 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中每30分（日行情取最近交易日）",
       "status": "ok",
-      "last_update": "2026-09-10 10:00:49",
-      "age_min": 5.6,
-      "message": "更新于 今日 10:00",
+      "last_update": "2026-09-10 10:09:09",
+      "age_min": 5.1,
+      "message": "更新于 今日 10:09",
       "heal_cat": "intraday"
     },
     {
@@ -210,9 +210,9 @@ window.HEALTH_CHECK = {
       "page": "盘后数据",
       "freq": "收盘后1次",
       "status": "ok",
-      "last_update": "2026-09-10 10:02:01",
-      "age_min": 4.4,
-      "message": "更新于 今日 10:02",
+      "last_update": "2026-09-10 10:10:00",
+      "age_min": 4.3,
+      "message": "更新于 今日 10:10",
       "heal_cat": "premarket"
     },
     {
@@ -221,9 +221,9 @@ window.HEALTH_CHECK = {
       "page": "盘后数据",
       "freq": "收盘后1次",
       "status": "ok",
-      "last_update": "2026-09-10 10:02:09",
-      "age_min": 4.3,
-      "message": "更新于 今日 10:02",
+      "last_update": "2026-09-10 10:10:07",
+      "age_min": 4.2,
+      "message": "更新于 今日 10:10",
       "heal_cat": "premarket"
     },
     {
@@ -233,7 +233,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-09-10 09:18:31",
-      "age_min": 47.9,
+      "age_min": 55.8,
       "message": "更新于 今日 09:18",
       "heal_cat": "algo_run"
     },
@@ -244,7 +244,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-09-10 06:55:22",
-      "age_min": 191.1,
+      "age_min": 198.9,
       "message": "更新于 今日 06:55",
       "heal_cat": "algo_run"
     },
@@ -255,7 +255,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-09-10 09:13:26",
-      "age_min": 53.0,
+      "age_min": 60.9,
       "message": "更新于 今日 09:13",
       "heal_cat": "algo_run"
     },
@@ -266,7 +266,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-09-10 06:17:07",
-      "age_min": 229.3,
+      "age_min": 237.2,
       "message": "更新于 今日 06:17",
       "heal_cat": "algo_run"
     },
@@ -277,7 +277,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-09-10 04:46:40",
-      "age_min": 319.8,
+      "age_min": 327.6,
       "message": "更新于 今日 04:46",
       "heal_cat": "algo_run"
     },
@@ -288,7 +288,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-09-10T06:23:15",
-      "age_min": 223.2,
+      "age_min": 231.1,
       "message": "更新于 今日 06:23",
       "heal_cat": "algo_run"
     },
@@ -299,7 +299,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-09-10T06:23:20",
-      "age_min": 223.1,
+      "age_min": 231.0,
       "message": "更新于 今日 06:23",
       "heal_cat": "algo_run"
     },
@@ -310,7 +310,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-09-10 05:37:41",
-      "age_min": 268.7,
+      "age_min": 276.6,
       "message": "更新于 今日 05:37",
       "heal_cat": "algo_run"
     },
@@ -321,7 +321,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-09-10 01:23:05",
-      "age_min": 523.3,
+      "age_min": 531.2,
       "message": "更新于 今日 01:23",
       "heal_cat": "algo_run"
     },
@@ -332,7 +332,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-09-10 04:10:39",
-      "age_min": 355.8,
+      "age_min": 363.7,
       "message": "更新于 今日 04:10",
       "heal_cat": "algo_run"
     },
@@ -343,7 +343,7 @@ window.HEALTH_CHECK = {
       "freq": "周日+手动",
       "status": "ok",
       "last_update": "2026-09-07 01:31",
-      "age_min": 4835.4,
+      "age_min": 4843.3,
       "message": "更新于 3天前 01:31",
       "heal_cat": "algo_run"
     },
@@ -354,7 +354,7 @@ window.HEALTH_CHECK = {
       "freq": "手动策划",
       "status": "ok",
       "last_update": "2026-09-06",
-      "age_min": 6366.4,
+      "age_min": 6374.3,
       "message": "更新于 4天前 00:00",
       "heal_cat": "algo_run"
     },
@@ -364,9 +364,9 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中每30分",
       "status": "ok",
-      "last_update": "2026-09-10 10:00:43",
-      "age_min": 5.7,
-      "message": "更新于 今日 10:00",
+      "last_update": "2026-09-10 10:09:04",
+      "age_min": 5.2,
+      "message": "更新于 今日 10:09",
       "heal_cat": "intraday"
     },
     {
@@ -376,7 +376,7 @@ window.HEALTH_CHECK = {
       "freq": "每日盘后",
       "status": "ok",
       "last_update": "2026-09-10 06:39:29",
-      "age_min": 206.9,
+      "age_min": 214.8,
       "message": "更新于 今日 06:39",
       "heal_cat": "algo_run"
     },
@@ -387,7 +387,7 @@ window.HEALTH_CHECK = {
       "freq": "盘后",
       "status": "warn",
       "last_update": "2026-09-08 20:14:56",
-      "age_min": 2271.5,
+      "age_min": 2279.4,
       "message": "需 gtimg 日K(腾讯 urllib HTTPS) 计算 fixedP10/rrK1.5 止损止盈。本机实测 gtimg HTTPS=HTTP 501（腾讯waf反爬虫JS challenge拦截 urllib 类爬虫），无浏览器UA绕不开。本机无替代源，需小九中国IP+浏览器UA在线跑原版。",
       "heal_cat": "algo_run"
     },
@@ -438,28 +438,28 @@ window.HEALTH_CHECK = {
       "name": "Pages 部署同步",
       "page": "管线",
       "status": "ok",
-      "message": "本地 HEAD cf0f721 / 线上 abb0152 已同步（线上领先本地 2 commit，云端 build 已部署，本机待 pull，非部署故障）"
+      "message": "本地 HEAD cf0f721 / 线上 359156b 已同步（线上领先本地 9 commit，云端 build 已部署，本机待 pull，非部署故障）"
     },
     {
       "id": "runner_local",
       "name": "runner 本地检测",
       "page": "管线",
       "status": "ok",
-      "message": " 最近抓取 2026-09-10 10:05:19，20 个模块全部成功"
+      "message": " 最近抓取 2026-09-10 10:12:29，20 个模块全部成功"
     },
     {
       "id": "runner_github",
       "name": "runner GitHub API 检测",
       "page": "管线",
       "status": "ok",
-      "message": "最近运行正常（本地状态:  最近抓取 2026-09-10 10:05:19，20 个模块全部成功）"
+      "message": "最近运行正常（本地状态:  最近抓取 2026-09-10 10:12:29，20 个模块全部成功）"
     },
     {
       "id": "runner",
       "name": "self-hosted runner",
       "page": "管线",
       "status": "ok",
-      "message": "runner 本地检测:ok- 最近抓取 2026-09-10 10:05:19，20 个模块全部成功 | runner GitHub API 检测:ok-最近运行正常（本地状态:  最近抓取 2026-09-10 10:05:19，20 个模块全部成功）"
+      "message": "runner 本地检测:ok- 最近抓取 2026-09-10 10:12:29，20 个模块全部成功 | runner GitHub API 检测:ok-最近运行正常（本地状态:  最近抓取 2026-09-10 10:12:29，20 个模块全部成功）"
     },
     {
       "id": "final_enter_stale",
@@ -489,7 +489,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 07:10:27",
-      "age_min": 176.0,
+      "age_min": 183.9,
       "heal_cat": "algo_run",
       "message": "AI_INSIGHTS_COMPARE.js 更新于 今日 07:10"
     },
@@ -499,10 +499,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:05:19",
-      "age_min": 1.1,
+      "last_update": "2026-09-10 10:12:29",
+      "age_min": 1.8,
       "heal_cat": "algo_run",
-      "message": "AI_MARKET_BRIEF.js 更新于 今日 10:05"
+      "message": "AI_MARKET_BRIEF.js 更新于 今日 10:12"
     },
     {
       "id": "all_ALGO_BACKTEST_COMPARE",
@@ -510,10 +510,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:06:19",
-      "age_min": 0.1,
+      "last_update": "2026-09-10 10:14:16",
+      "age_min": 0.0,
       "heal_cat": "algo_run",
-      "message": "ALGO_BACKTEST_COMPARE.js 更新于 今日 10:06"
+      "message": "ALGO_BACKTEST_COMPARE.js 更新于 今日 10:14"
     },
     {
       "id": "all_ALGO_TRACK",
@@ -522,7 +522,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 01:30",
-      "age_min": 516.4,
+      "age_min": 524.3,
       "heal_cat": "algo_run",
       "message": "ALGO_TRACK.js 更新于 今日 01:30"
     },
@@ -533,7 +533,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 08:23:09",
-      "age_min": 103.3,
+      "age_min": 111.2,
       "heal_cat": "algo_run",
       "message": "ANALYST_RATINGS.js 更新于 今日 08:23"
     },
@@ -543,10 +543,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:06:19",
-      "age_min": 0.1,
+      "last_update": "2026-09-10 10:14:16",
+      "age_min": 0.0,
       "heal_cat": "algo_run",
-      "message": "AUDIT_TRAIL.js 更新于 今日 10:06"
+      "message": "AUDIT_TRAIL.js 更新于 今日 10:14"
     },
     {
       "id": "all_BACKTEST_COMPREHENSIVE",
@@ -555,7 +555,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-09 17:35:02",
-      "age_min": 991.4,
+      "age_min": 999.3,
       "heal_cat": "algo_run",
       "message": "BACKTEST_COMPREHENSIVE.js 更新于 昨日 17:35"
     },
@@ -576,10 +576,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:03:37",
-      "age_min": 2.8,
+      "last_update": "2026-09-10 10:11:16",
+      "age_min": 3.0,
       "heal_cat": "algo_run",
-      "message": "CANDIDATE_QUOTES.js 更新于 今日 10:03"
+      "message": "CANDIDATE_QUOTES.js 更新于 今日 10:11"
     },
     {
       "id": "all_CAPITAL_FLOW_DATA",
@@ -587,10 +587,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:02:08",
-      "age_min": 4.3,
+      "last_update": "2026-09-10 10:10:05",
+      "age_min": 4.2,
       "heal_cat": "algo_run",
-      "message": "CAPITAL_FLOW_DATA.js 更新于 今日 10:02"
+      "message": "CAPITAL_FLOW_DATA.js 更新于 今日 10:10"
     },
     {
       "id": "all_CITIC_PE_BACKTEST",
@@ -599,7 +599,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 05:08",
-      "age_min": 298.4,
+      "age_min": 306.3,
       "heal_cat": "algo_run",
       "message": "CITIC_PE_BACKTEST.js 更新于 今日 05:08"
     },
@@ -610,7 +610,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 05:08",
-      "age_min": 298.4,
+      "age_min": 306.3,
       "heal_cat": "algo_run",
       "message": "CITIC_PE_THERMO.js 更新于 今日 05:08"
     },
@@ -620,10 +620,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:06:19",
-      "age_min": 0.1,
+      "last_update": "2026-09-10 10:14:16",
+      "age_min": 0.0,
       "heal_cat": "algo_run",
-      "message": "COMMODITY_ELASTICITY.js 更新于 今日 10:06"
+      "message": "COMMODITY_ELASTICITY.js 更新于 今日 10:14"
     },
     {
       "id": "all_CONCEPT_ETF_MAP",
@@ -643,7 +643,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 06:55:19",
-      "age_min": 191.1,
+      "age_min": 199.0,
       "heal_cat": "algo_run",
       "message": "CRDS_BACKTEST.js 更新于 今日 06:55"
     },
@@ -654,7 +654,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 09:09:24",
-      "age_min": 57.0,
+      "age_min": 64.9,
       "heal_cat": "algo_run",
       "message": "ETF_SUBSCRIPTION_EM.js 更新于 今日 09:09"
     },
@@ -665,7 +665,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 08:55:10",
-      "age_min": 71.3,
+      "age_min": 79.1,
       "heal_cat": "algo_run",
       "message": "EXPERIMENT.js 更新于 今日 08:55"
     },
@@ -676,7 +676,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 06:35:23",
-      "age_min": 211.0,
+      "age_min": 218.9,
       "heal_cat": "algo_run",
       "message": "FACTOR_AUDIT.js 更新于 今日 06:35"
     },
@@ -687,7 +687,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 03:30:25",
-      "age_min": 396.0,
+      "age_min": 403.9,
       "heal_cat": "algo_run",
       "message": "FACTOR_LAB_BACKTEST.js 更新于 今日 03:30"
     },
@@ -698,7 +698,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 07:11:28",
-      "age_min": 175.0,
+      "age_min": 182.8,
       "heal_cat": "algo_run",
       "message": "FACTOR_PROGRESS.js 更新于 今日 07:11"
     },
@@ -709,7 +709,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 04:57:09",
-      "age_min": 309.3,
+      "age_min": 317.2,
       "heal_cat": "algo_run",
       "message": "FINAL_RECOMMEND_DATA.js 更新于 今日 04:57"
     },
@@ -730,7 +730,7 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:06:13",
+      "last_update": "2026-09-10 10:14:11",
       "age_min": null,
       "heal_cat": "algo_run",
       "message": "HEALTH_CHECK.js 低频/手动维护文件（白名单内，无时间戳属正常，25KB）"
@@ -742,7 +742,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 07:55:16",
-      "age_min": 131.2,
+      "age_min": 139.0,
       "heal_cat": "algo_run",
       "message": "HERDING_DATA.js 更新于 今日 07:55"
     },
@@ -753,7 +753,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 01:57:26",
-      "age_min": 489.0,
+      "age_min": 496.9,
       "heal_cat": "algo_run",
       "message": "H_AUTO_BUY.js 更新于 今日 01:57"
     },
@@ -764,7 +764,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 02:18:00",
-      "age_min": 468.4,
+      "age_min": 476.3,
       "heal_cat": "algo_run",
       "message": "H_AUTO_BUY_TRACK.js 更新于 今日 02:18"
     },
@@ -775,7 +775,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-09 20:30:44",
-      "age_min": 815.7,
+      "age_min": 823.6,
       "heal_cat": "algo_run",
       "message": "IMA_STRONG_STOCK.js 更新于 昨日 20:30"
     },
@@ -785,10 +785,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 09:59:10",
-      "age_min": 7.3,
+      "last_update": "2026-09-10 10:07:53",
+      "age_min": 6.4,
       "heal_cat": "algo_run",
-      "message": "INDEX_HISTORY.js 更新于 今日 09:59"
+      "message": "INDEX_HISTORY.js 更新于 今日 10:07"
     },
     {
       "id": "all_INDEX_VALUE_FRAMEWORK",
@@ -797,7 +797,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 06:35:23",
-      "age_min": 211.1,
+      "age_min": 218.9,
       "heal_cat": "algo_run",
       "message": "INDEX_VALUE_FRAMEWORK.js 更新于 今日 06:35"
     },
@@ -808,7 +808,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 04:46:39",
-      "age_min": 319.8,
+      "age_min": 327.7,
       "heal_cat": "algo_run",
       "message": "LHB_7D.js 更新于 今日 04:46"
     },
@@ -819,7 +819,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 09:13:49",
-      "age_min": 52.6,
+      "age_min": 60.5,
       "heal_cat": "algo_run",
       "message": "LHB_HISTORY.js 更新于 今日 09:13"
     },
@@ -829,10 +829,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:02:06",
+      "last_update": "2026-09-10 10:10:03",
       "age_min": 4.3,
       "heal_cat": "algo_run",
-      "message": "LIMIT_UP_BROKEN.js 更新于 今日 10:02"
+      "message": "LIMIT_UP_BROKEN.js 更新于 今日 10:10"
     },
     {
       "id": "all_MACRO_BRIEF",
@@ -840,10 +840,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:03:48",
-      "age_min": 2.6,
+      "last_update": "2026-09-10 10:11:21",
+      "age_min": 3.0,
       "heal_cat": "algo_run",
-      "message": "MACRO_BRIEF.js 更新于 今日 10:03"
+      "message": "MACRO_BRIEF.js 更新于 今日 10:11"
     },
     {
       "id": "all_NORTH_FUND",
@@ -852,7 +852,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 08:23:00",
-      "age_min": 103.4,
+      "age_min": 111.3,
       "heal_cat": "algo_run",
       "message": "NORTH_FUND.js 更新于 今日 08:23"
     },
@@ -873,10 +873,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:05:19",
-      "age_min": 1.1,
+      "last_update": "2026-09-10 10:12:29",
+      "age_min": 1.8,
       "heal_cat": "algo_run",
-      "message": "OVERSEAS_MARKETS.js 更新于 今日 10:05"
+      "message": "OVERSEAS_MARKETS.js 更新于 今日 10:12"
     },
     {
       "id": "all_PERFORMANCE_FORECAST",
@@ -885,7 +885,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 08:55:15",
-      "age_min": 71.2,
+      "age_min": 79.1,
       "heal_cat": "algo_run",
       "message": "PERFORMANCE_FORECAST.js 更新于 今日 08:55"
     },
@@ -907,7 +907,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 08:55:13",
-      "age_min": 71.2,
+      "age_min": 79.1,
       "heal_cat": "algo_run",
       "message": "RESTRICTED_RELEASE.js 更新于 今日 08:55"
     },
@@ -918,7 +918,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 08:18:28",
-      "age_min": 108.0,
+      "age_min": 115.9,
       "heal_cat": "algo_run",
       "message": "RISK_GAUGE.js 更新于 今日 08:18"
     },
@@ -928,10 +928,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:05:19",
-      "age_min": 1.1,
+      "last_update": "2026-09-10 10:12:29",
+      "age_min": 1.8,
       "heal_cat": "algo_run",
-      "message": "RUNNER_STATUS.js 更新于 今日 10:05"
+      "message": "RUNNER_STATUS.js 更新于 今日 10:12"
     },
     {
       "id": "all_RUNNER_STATUS_HEALTH",
@@ -950,10 +950,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:05:22",
-      "age_min": 1.1,
+      "last_update": "2026-09-10 10:12:31",
+      "age_min": 1.8,
       "heal_cat": "algo_run",
-      "message": "SECTOR_FUND_FLOW_INTRADAY.js 更新于 今日 10:05"
+      "message": "SECTOR_FUND_FLOW_INTRADAY.js 更新于 今日 10:12"
     },
     {
       "id": "all_SECTOR_FUND_FLOW_TREND",
@@ -962,7 +962,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 06:25",
-      "age_min": 221.4,
+      "age_min": 229.3,
       "heal_cat": "algo_run",
       "message": "SECTOR_FUND_FLOW_TREND.js 更新于 今日 06:25"
     },
@@ -973,7 +973,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 09:13",
-      "age_min": 53.4,
+      "age_min": 61.3,
       "heal_cat": "algo_run",
       "message": "SECTOR_PHASE_HISTORY.js 更新于 今日 09:13"
     },
@@ -984,7 +984,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 09:13",
-      "age_min": 53.4,
+      "age_min": 61.3,
       "heal_cat": "algo_run",
       "message": "SECTOR_RS.js 更新于 今日 09:13"
     },
@@ -994,10 +994,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:06:19",
+      "last_update": "2026-09-10 10:14:16",
       "age_min": 0.1,
       "heal_cat": "algo_run",
-      "message": "SENTIMENT_CYCLE.js 更新于 今日 10:06"
+      "message": "SENTIMENT_CYCLE.js 更新于 今日 10:14"
     },
     {
       "id": "all_SH_SZ_HISTORY",
@@ -1005,10 +1005,10 @@ window.HEALTH_CHECK = {
       "page": "全量数据",
       "freq": "—",
       "status": "ok",
-      "last_update": "2026-09-10 10:03:45",
-      "age_min": 2.7,
+      "last_update": "2026-09-10 10:11:18",
+      "age_min": 3.0,
       "heal_cat": "algo_run",
-      "message": "SH_SZ_HISTORY.js 更新于 今日 10:03"
+      "message": "SH_SZ_HISTORY.js 更新于 今日 10:11"
     },
     {
       "id": "all_STOCK_LIST",
@@ -1017,7 +1017,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 06:55:22",
-      "age_min": 191.1,
+      "age_min": 199.0,
       "heal_cat": "algo_run",
       "message": "STOCK_LIST.js 更新于 今日 06:55"
     },
@@ -1039,7 +1039,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 06:16:46",
-      "age_min": 229.7,
+      "age_min": 237.6,
       "heal_cat": "algo_run",
       "message": "STOCK_QUOTE.js 更新于 今日 06:16"
     },
@@ -1050,7 +1050,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 01:23:05",
-      "age_min": 523.4,
+      "age_min": 531.2,
       "heal_cat": "algo_run",
       "message": "STOCK_RPS_DATA.js 更新于 今日 01:23"
     },
@@ -1061,7 +1061,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 02:03:08",
-      "age_min": 483.3,
+      "age_min": 491.2,
       "heal_cat": "algo_run",
       "message": "STRONG_BREAKOUT.js 更新于 今日 02:03"
     },
@@ -1072,7 +1072,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 06:23:31",
-      "age_min": 222.9,
+      "age_min": 230.8,
       "heal_cat": "algo_run",
       "message": "SUSPENSION_ALERT.js 更新于 今日 06:23"
     },
@@ -1083,7 +1083,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 08:23:19",
-      "age_min": 103.1,
+      "age_min": 111.0,
       "heal_cat": "algo_run",
       "message": "SZ_FIB.js 更新于 今日 08:23"
     },
@@ -1094,7 +1094,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 04:46:46",
-      "age_min": 319.7,
+      "age_min": 327.6,
       "heal_cat": "algo_run",
       "message": "TOP10_DAILY.js 更新于 今日 04:46"
     },
@@ -1105,7 +1105,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "fail",
       "last_update": "2026-09-08 20:14:10",
-      "age_min": 2272.3,
+      "age_min": 2280.2,
       "heal_cat": "algo_run",
       "message": "TRIPLE_HISTORY.js 更新于 2天前 20:14；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
     },
@@ -1116,7 +1116,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 05:36:28",
-      "age_min": 270.0,
+      "age_min": 277.9,
       "heal_cat": "algo_run",
       "message": "TRIPLE_TRACK.js 更新于 今日 05:36"
     },
@@ -1127,7 +1127,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 04:46:40",
-      "age_min": 319.8,
+      "age_min": 327.7,
       "heal_cat": "algo_run",
       "message": "V8_POOL_TRACKER.js 更新于 今日 04:46"
     },
@@ -1138,7 +1138,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 06:35:44",
-      "age_min": 210.7,
+      "age_min": 218.6,
       "heal_cat": "algo_run",
       "message": "VALUATION_PERCENTILE.js 更新于 今日 06:35"
     },
@@ -1149,7 +1149,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "fail",
       "last_update": "2026-09-08 20:14:42",
-      "age_min": 2271.7,
+      "age_min": 2279.6,
       "heal_cat": "algo_run",
       "message": "VOLATILITY.js 更新于 2天前 20:14；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
     },
@@ -1160,7 +1160,7 @@ window.HEALTH_CHECK = {
       "freq": "—",
       "status": "ok",
       "last_update": "2026-09-10 08:54:33",
-      "age_min": 71.9,
+      "age_min": 79.8,
       "heal_cat": "algo_run",
       "message": "W52_HIGH.js 更新于 今日 08:54"
     },
