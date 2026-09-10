@@ -1,6 +1,6 @@
 {
  "month": "2026年9月",
- "update_time": "2026-09-09 22:10",
+ "update_time": "2026-09-10 08:23",
  "legend": [
   {
    "title": "重要政策",
@@ -195,19 +195,19 @@
     {
      "num": 9,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇺🇸 美国CPI",
        "cls": "us",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 10,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇨🇳 CPI/PPI数据",
