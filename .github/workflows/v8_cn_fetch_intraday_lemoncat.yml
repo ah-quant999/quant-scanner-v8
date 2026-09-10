@@ -128,7 +128,14 @@ jobs:
                 echo "::warning title=云端疑似卡死::run#$UNFIN_ID 已 ${AGE}min 未完成，本档不派发，交由 v8_cn_fetch_watchdog(>45min) 兜底"
               fi
             else
-              echo "云端无在途 run ✅"
+              # 🛡 fail-closed 兜底：解析异常/为空时，若原始 JSON 里仍有在途状态字样，按"在途"处理。
+              #    否则解析一旦失败会静默 fail-open（照常派发）→ 守卫形同虚设。
+              if grep -qE '"status": *"(in_progress|queued|waiting|pending)"' /tmp/inflight.json 2>/dev/null; then
+                GO=false; WHY="云端在途（解析兜底判定）→ 本档跳过"
+                echo "::warning title=守卫解析兜底::python3 解析为空，但原始 JSON 含在途状态，保守判定为在途"
+              else
+                echo "云端无在途 run ✅"
+              fi
             fi
           fi
           echo "go=$GO" >> "$GITHUB_OUTPUT"
