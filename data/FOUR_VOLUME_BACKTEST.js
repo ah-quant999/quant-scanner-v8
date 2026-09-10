@@ -1,44 +1,44 @@
 window.FOUR_VOLUME_BACKTEST = {
- "update_time": "2026-09-10 04:14:20",
+ "update_time": "2026-09-11 00:48:50",
  "summary": {
-  "update_time": "2026-09-10 04:14:20",
-  "calc_time": "2026-09-10 04:14:20",
-  "total_signals": 121,
+  "update_time": "2026-09-11 00:48:50",
+  "calc_time": "2026-09-11 00:48:50",
+  "total_signals": 1417,
   "method": "四量终极历史回测：信号日收盘价买入，持有N个交易日收盘价卖出",
   "signal_date_range": "—",
   "by_period": {
    "1": {
-    "samples": 120,
-    "win_rate": 43.3,
-    "avg_return": -0.51,
+    "samples": 1415,
+    "win_rate": 46.3,
+    "avg_return": 0.5,
     "best_return": 0,
     "worst_return": 0
    },
    "3": {
-    "samples": 118,
-    "win_rate": 39.8,
-    "avg_return": -1.42,
+    "samples": 1405,
+    "win_rate": 51.7,
+    "avg_return": 1.79,
     "best_return": 0,
     "worst_return": 0
    },
    "5": {
-    "samples": 117,
-    "win_rate": 36.8,
-    "avg_return": -1.23,
+    "samples": 1393,
+    "win_rate": 49.8,
+    "avg_return": 2.16,
     "best_return": 0,
     "worst_return": 0
    },
    "10": {
-    "samples": 111,
-    "win_rate": 43.2,
-    "avg_return": -1.28,
+    "samples": 1385,
+    "win_rate": 54.9,
+    "avg_return": 3.5,
     "best_return": 0,
     "worst_return": 0
    },
    "20": {
-    "samples": 102,
-    "win_rate": 46.1,
-    "avg_return": -0.87,
+    "samples": 1371,
+    "win_rate": 58.9,
+    "avg_return": 8.6,
     "best_return": 0,
     "worst_return": 0
    }
