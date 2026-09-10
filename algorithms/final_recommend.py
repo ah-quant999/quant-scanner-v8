@@ -27,31 +27,6 @@ import time
 from collections import defaultdict
 from datetime import datetime
 
-# 🛡 V8_OFFLINE：本机(阿狸咪)网络被墙时注入假 baostock 使其 login 立即抛错(而非静默挂死)，并 stub requests.get
-# 让 regime_filter 快失败；跳过 FACTOR_LAB 等待循环。小九(中国IP)永不设此变量，保持原在线行为。
-V8_OFFLINE = os.environ.get("V8_OFFLINE", "0") == "1"
-if V8_OFFLINE:
-    import sys as _sys
-    class _FakeBao:
-        @staticmethod
-        def login(*a, **k):
-            raise RuntimeError("V8_OFFLINE: baostock disabled")
-        @staticmethod
-        def query_history_k_data(*a, **k):
-            raise RuntimeError("V8_OFFLINE: baostock disabled")
-        @staticmethod
-        def logout(*a, **k):
-            return None
-    _sys.modules["baostock"] = _FakeBao()
-    import requests as _req
-    def _offline_get(*_a, **_k):
-        raise _req.exceptions.ConnectionError("V8_OFFLINE: network disabled")
-    _req.get = _offline_get
-    try:
-        _req.Session.get = _offline_get
-    except Exception:
-        pass
-
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(ROOT, "raw_data")
 DATA = os.path.join(ROOT, "data")

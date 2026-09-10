@@ -8112,16 +8112,16 @@
       "board": "主板"
     }
   ],
-  "generated_at": "2026-09-08 20:34:43",
-  "update_time": "2026-09-08 20:34:43",
+  "generated_at": "2026-09-10 01:57:26",
+  "update_time": "2026-09-10 01:57:26",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖",
   "kline_stat": {
-    "cache_fresh": 640,
+    "cache_fresh": 693,
     "cache_stale": 36,
-    "net": 53,
+    "net": 0,
     "fail": 259
   },
   "degraded": false,
   "degraded_reason": "",
-  "quote_stale_days": 0
+  "quote_stale_days": 2
 }

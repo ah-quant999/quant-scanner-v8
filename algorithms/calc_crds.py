@@ -43,17 +43,6 @@ _KLINE_MAX_FAILS = 40  # 连续失败过多则放弃本次计算, 保留旧 crds
 import gc
 import requests as _requests
 
-# 🛡 V8_OFFLINE：本机(阿狸咪)网络被墙时 stub 掉网络客户端，强制走本地 kline_cache 快失败，避免 mootdx/东财/腾讯 静默挂死。小九(中国IP)永不设此变量。
-V8_OFFLINE = os.environ.get("V8_OFFLINE", "0") == "1"
-if V8_OFFLINE:
-    def _offline_get(*_a, **_k):
-        raise _requests.exceptions.ConnectionError("V8_OFFLINE: network disabled")
-    _requests.get = _offline_get
-    try:
-        _requests.Session.get = _offline_get
-    except Exception:
-        pass
-
 MARKET_DOWN_THRESHOLD = -1.5     # 大盘跌超多少算"大跌日"(%)
 LIMIT_UP_PCT = 9.0               # 涨停阈值(主板≈10%，留1%误差允许实际9.95%)
 GEM_LIMIT_PCT = 18.0             # 创业板/科创板涨停阈值(≈20%)
@@ -493,8 +482,6 @@ _INDEX_KW = ['指数', '债', 'ETF', '基金', 'LOF', '可转债', '权证', '�
 def _build_tdx_name_map():
     """懒构建 mootdx 代码→名字 映射(仅本机东财被墙时触发一次)。"""
     global _TDX_NAME_MAP, _TDX_NAME_MAP_READY
-    if V8_OFFLINE:
-        return _TDX_NAME_MAP
     if _TDX_NAME_MAP_READY:
         return _TDX_NAME_MAP
     _TDX_NAME_MAP_READY = True

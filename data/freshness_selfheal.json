@@ -5,16 +5,15 @@
     "category": "post_close"
   },
   "post_close": {
-    "ts": "2026-09-07 20:24:31",
+    "ts": "2026-09-09 20:09:17",
     "vars": [
       "VOLATILITY"
     ]
   },
   "algo": {
-    "ts": "2026-09-07 20:24:31",
+    "ts": "2026-09-09 20:09:17",
     "vars": [
-      "BACKTEST_COMPREHENSIVE",
-      "BACKTEST_TDX",
+      "CRDS_CARD_DATA",
       "LHB_7D"
     ]
   },

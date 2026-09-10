@@ -77,15 +77,10 @@ permissions:
 #     ② 姊妹 workflow cn_fetch 的 api_push_raw.py 取 main ref 同样吃 403 →
 #        收盘数据抓到却推不上 main → 实时数据卡永久停在 14:52（「没有收盘数据」）。
 #   加 concurrency：同一时刻最多 1 跑 + 1 排队，API 压力从根上消失。
-#   2026-09-09 主人令「小九今晚不回，全部兜底跑出」+ 历史教训：
-#     cancel-in-progress:false 导致多 run 排队积压，手动取消/失败自愈时互相踩踏，
-#     今晚出现 7+ queued run 被逐一取消、最终 E 批 failure 后无干净 run 顶上。
-#   改为 true：新派发自动取消旧排队/进行中，保证永远只跑最新一次意图，杜绝暴风。
-#   风险：会打断旧 run；但在当前 lemoncat-cn offline、仅剩 alimi-cn 单点兜底场景下，
-#     新意图必须立即生效，旧 run 卡死/排队/失败时更应被顶掉。
+#   cancel-in-progress: false —— 算法链单轮 20-40 分钟，绝不能被新派发打断（会丢产物）。
 concurrency:
   group: v8-algo-cloud
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   algo:

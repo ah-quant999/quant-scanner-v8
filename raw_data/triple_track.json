@@ -1,47 +1,53 @@
 {
-  "update_time": "2026-09-10 05:36:28",
-  "data_date": "2026-09-08",
-  "track_start": "2026-09-08",
-  "history_days": 15,
-  "strict_count": 0,
-  "near_count": 1,
+  "update_time": "2026-09-10 04:10:40",
+  "data_date": "2026-09-10",
+  "track_start": "2026-09-10",
+  "history_days": 16,
+  "strict_count": 1,
+  "near_count": 0,
   "tracked": [
     {
-      "code": "300759",
-      "name": "康龙化成",
+      "code": "002463",
+      "name": "沪电股份",
       "market": "sz",
-      "board": "创业板",
-      "status": "near",
-      "total_score": 28.0,
-      "quality_grade": "D",
-      "industry": "研究和试验发展",
+      "board": "主板",
+      "status": "strict",
+      "total_score": 31.7,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "MSCI中国",
-        "研究和试验发展",
-        "AH股",
-        "AI制药（医疗）",
+        "百元股",
+        "PCB",
+        "计算机、通信和其他电子设备制造业",
+        "2026一季报预增",
         "深股通",
-        "中证500",
-        "创业成份",
-        "CRO"
+        "深证100R",
+        "2026中报预增",
+        "MSCI中国"
       ],
-      "signal_count": 2,
-      "enter_date": "2026-09-08",
-      "hold_days": 1,
+      "signal_count": null,
+      "enter_date": "2026-08-30",
+      "hold_days": 5,
       "consecutive_days": 1,
-      "first_close": 42.76,
-      "current_close": 42.76,
-      "pnl_pct": 0.0,
+      "first_close": 0,
+      "current_close": null,
+      "pnl_pct": null,
       "catalysts": [
         {
-          "tag": "中报略增",
-          "score": 5,
-          "reaction": "观察中"
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "—"
         }
       ]
     }
   ],
   "alerts": [
+    {
+      "level": "warn",
+      "code": "601899",
+      "name": "紫金矿业",
+      "text": "紫金矿业(601899) 于 2026-09-08 跌出共识（曾连续 1 日）"
+    },
     {
       "level": "warn",
       "code": "603993",
@@ -86,6 +92,12 @@
     },
     {
       "level": "warn",
+      "code": "300274",
+      "name": "阳光电源",
+      "text": "阳光电源(300274) 于 2026-09-08 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
       "code": "688331",
       "name": "荣昌生物",
       "text": "荣昌生物(688331) 于 2026-09-04 跌出共识（曾连续 2 日）"
@@ -98,6 +110,12 @@
     },
     {
       "level": "warn",
+      "code": "300476",
+      "name": "胜宏科技",
+      "text": "胜宏科技(300476) 于 2026-09-08 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
       "code": "002371",
       "name": "创联控股",
       "text": "创联控股(002371) 于 2026-08-19 跌出共识（曾连续 3 日）"
@@ -107,6 +125,12 @@
       "code": "002396",
       "name": "青城新药－B",
       "text": "青城新药－B(002396) 于 2026-08-18 跌出共识（曾连续 2 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300604",
+      "name": "长川科技",
+      "text": "长川科技(300604) 于 2026-09-08 跌出共识（曾连续 1 日）"
     },
     {
       "level": "warn",
@@ -187,10 +211,10 @@
       "text": "盐湖股份(000792) 于 2026-08-29 跌出共识（曾连续 2 日）"
     },
     {
-      "level": "good",
+      "level": "warn",
       "code": "002475",
       "name": "立讯精密",
-      "text": "立讯精密(002475) 连续 5 日稳居严格共识（高质量）"
+      "text": "立讯精密(002475) 于 2026-09-08 跌出共识（曾连续 5 日）"
     },
     {
       "level": "warn",
@@ -209,12 +233,6 @@
       "code": "001309",
       "name": "德明利",
       "text": "德明利(001309) 于 2026-09-02 跌出共识（曾连续 4 日）"
-    },
-    {
-      "level": "warn",
-      "code": "002463",
-      "name": "沪电股份",
-      "text": "沪电股份(002463) 于 2026-09-02 跌出共识（曾连续 4 日）"
     },
     {
       "level": "warn",
@@ -245,33 +263,69 @@
       "code": "300760",
       "name": "迈瑞医疗",
       "text": "迈瑞医疗(300760) 于 2026-09-07 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "688802",
+      "name": "",
+      "text": "(688802) 于 2026-09-08 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "301526",
+      "name": "",
+      "text": "(301526) 于 2026-09-08 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "600584",
+      "name": "",
+      "text": "(600584) 于 2026-09-08 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "603986",
+      "name": "",
+      "text": "(603986) 于 2026-09-08 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300054",
+      "name": "",
+      "text": "(300054) 于 2026-09-08 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300759",
+      "name": "康龙化成",
+      "text": "康龙化成(300759) 于 2026-09-08 跌出共识（曾连续 1 日）"
     }
   ],
   "sector_cluster": {
     "by_industry": [
       {
-        "industry": "研究和试验发展",
+        "industry": "计算机、通信和其他电子设备制造业",
         "count": 1,
         "names": [
-          "康龙化成"
+          "沪电股份"
         ]
       }
     ],
     "by_sector": [
       {
-        "sector": "MSCI中国",
+        "sector": "百元股",
         "count": 1
       },
       {
-        "sector": "研究和试验发展",
+        "sector": "PCB",
         "count": 1
       },
       {
-        "sector": "AH股",
+        "sector": "计算机、通信和其他电子设备制造业",
         "count": 1
       },
       {
-        "sector": "AI制药（医疗）",
+        "sector": "2026一季报预增",
         "count": 1
       },
       {
@@ -279,15 +333,15 @@
         "count": 1
       },
       {
-        "sector": "中证500",
+        "sector": "深证100R",
         "count": 1
       },
       {
-        "sector": "创业成份",
+        "sector": "2026中报预增",
         "count": 1
       },
       {
-        "sector": "CRO",
+        "sector": "MSCI中国",
         "count": 1
       }
     ],
@@ -303,8 +357,8 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
-    "latest_date": "2026-09-09 17:35:02",
-    "total": 311,
+    "latest_date": "2026-09-10 03:11:27",
+    "total": 313,
     "best_hold_days": 1,
     "periods": {
       "1d": {
@@ -360,7 +414,7 @@
     },
     {
       "band": "70~80",
-      "count": 187,
+      "count": 189,
       "win_rate_5d": 0.0,
       "avg_ret_5d": 0.0,
       "best_win_rate": 0.0,
@@ -418,13 +472,13 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-09-08",
-    "history_days": 15,
+    "track_start": "2026-09-10",
+    "history_days": 16,
     "summary": {
       "1d": {
-        "count": 16,
-        "win_rate": 37.5,
-        "avg_return": 2.54
+        "count": 17,
+        "win_rate": 35.29,
+        "avg_return": 2.39
       },
       "3d": {
         "count": 9,
@@ -648,6 +702,14 @@
         "enter_date": "2026-09-07",
         "offsets": {
           "1d": 0.02
+        }
+      },
+      {
+        "code": "300759",
+        "name": "康龙化成",
+        "enter_date": "2026-09-08",
+        "offsets": {
+          "1d": 0.0
         }
       }
     ]

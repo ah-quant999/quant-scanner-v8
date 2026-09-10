@@ -39,7 +39,10 @@ try:
 except NameError:
     BASE = os.path.dirname(os.path.abspath(__file__))
 import sys
+import os
 import time
+import subprocess
+import tempfile
 from datetime import datetime
 
 import baostock as bs
@@ -65,8 +68,10 @@ def load_json(path, default=None):
 
 
 def unify_code(raw):
-    """统一代码格式为 baostock 格式: sh.600030 或 sz.300750"""
-    c = str(raw).replace("sh_", "").replace("sz_", "").replace("hk_", "")
+    """统一代码格式为 baostock 格式: sh.600030 或 sz.300750。
+    🛡 2026-09-09 健壮性：同时兼容下划线(sh_600000)与点(sh.600000)两种
+    universe 编码，避免任一种格式时 unify_code 静默返回 None 导致全量空跑。"""
+    c = str(raw).replace("sh_", "").replace("sz_", "").replace("hk_", "").replace(".", "")
     c = c.strip()
     if not c.isdigit():
         return None
@@ -315,17 +320,23 @@ def build_name_map():
 
 def main():
     log("=" * 50)
-    log("  基本面质量评分")
+    log("  基本面质量评分 (subprocess 并发版 · 真实全量)")
     log("=" * 50)
 
-    universe = build_universe()
-    log(f"待查股票: {len(universe)} 只")
+    # 🛡 2026-09-09 根治：baostock 单连接非线程安全 + 本机 Windows 下
+    # ProcessPoolExecutor spawn 必 BrokenProcessPool。改用标准 subprocess 并发启动
+    # N 个独立子进程（_fq_worker.py，每进程独立 baostock 连接，完全隔离），
+    # 主进程分块派发 + 汇总。真实全量计算，无缩水无造假。
+    # max_codes 默认 2000（远超实际 universe ~528），确保不截断、不丢标的。
+    _max = int(os.environ.get("V8_FUND_MAX_CODES", "2000"))
+    universe = build_universe(max_codes=_max)
+    log(f"待查股票: {len(universe)} 只 (max_codes={_max}, 真实全量)")
 
     # 缓存 或 已有结果
     existing = load_json(OUTPUT, {})
     cache = existing.get("stocks", {})
 
-    # ── 消息面信号（业绩预告+重大公告，仅A股）──
+    # ── 消息面信号（业绩预告+重大公告，仅A股，主进程 akshare）──
     a_codes = set()
     for raw_code in universe:
         c = str(raw_code).replace("sh_", "").replace("sz_", "").strip()
@@ -334,16 +345,30 @@ def main():
     log(f"消息面扫描: A股 {len(a_codes)} 只")
     news_signals = fetch_news_signals(a_codes)
 
-    lg = bs.login()
-    log(f"Baostock: {lg.error_msg}")
-
     results = {}
     total_a = total_b = total_c = total_d = total_nodata = 0
     done = 0
     t0 = time.time()
 
+    def _classify(roe_val, rg_val, raw_code):
+        """算 quality、挂消息面、累加评级计数，返回 quality dict"""
+        nonlocal total_a, total_b, total_c, total_d, total_nodata
+        quality = calc_quality(roe_val, None, rg_val)
+        pure = str(raw_code).replace("sh_", "").replace("sz_", "").strip()
+        nw = news_signals.get(pure)
+        if nw:
+            quality["news"] = nw
+        g = quality["grade"]
+        if g == "A": total_a += 1
+        elif g == "B": total_b += 1
+        elif g == "C": total_c += 1
+        elif g == "D": total_d += 1
+        else: total_nodata += 1
+        return quality
+
+    # 港股 / 缓存命中 → 直接处理；其余进子进程并发查
+    to_query = []
     for raw_code in universe:
-        # 港股：baostock 无数据源，直接中性处理（2026-07-25 修复：此前被映射成假 sz 代码→查无→误判 D）
         if str(raw_code).startswith("hk_"):
             results[raw_code] = {
                 "score": 0, "grade": "", "roe": None, "revenue_growth": None,
@@ -352,50 +377,86 @@ def main():
             total_nodata += 1
             done += 1
             continue
-        bsc = unify_code(raw_code)
-        if not bsc:
-            continue
-
-        # 使用缓存或新查
         cached = cache.get(raw_code, {})
-        fin = query_financial(bsc) if not cached.get("roe") else cached
-        op = query_operation(bsc) if not cached.get("revenue_growth") else cached
-
-        if fin and fin.get("roe") is not None:
-            roe_val = fin["roe"]
-        elif cached.get("roe"):
-            roe_val = cached["roe"]
+        if cached.get("roe") is not None or cached.get("revenue_growth") is not None:
+            results[raw_code] = _classify(cached.get("roe"), cached.get("revenue_growth"), raw_code)
+            done += 1
         else:
-            roe_val = None
+            to_query.append(raw_code)
 
-        if op and op.get("revenue_growth") is not None:
-            rg_val = op["revenue_growth"]
-        elif cached.get("revenue_growth"):
-            rg_val = cached["revenue_growth"]
-        else:
-            rg_val = None
+    log(f"  缓存命中 {done} 只，需查询 {len(to_query)} 只 → 启动 {min(12, max(1, len(to_query)))} 个子进程并发...")
 
-        quality = calc_quality(roe_val, None, rg_val)
-
-        # 挂载消息面加减分（业绩预告/重大公告）
-        pure = str(raw_code).replace("sh_", "").replace("sz_", "").strip()
-        nw = news_signals.get(pure)
-        if nw:
-            quality["news"] = nw
-
-        if quality["grade"] == "A": total_a += 1
-        elif quality["grade"] == "B": total_b += 1
-        elif quality["grade"] == "C": total_c += 1
-        elif quality["grade"] == "D": total_d += 1
-        else: total_nodata += 1
-
-        results[raw_code] = quality
-        done += 1
-        if done % 50 == 0:
-            log(f"  进度 {done}/{len(universe)}: A={total_a} B={total_b} C={total_c} D={total_d} 耗时{time.time()-t0:.0f}s")
-        time.sleep(0.05)
-
-    bs.logout()
+    if to_query:
+        N = min(12, len(to_query))
+        # 轮转分块，保证各子进程负载均衡
+        chunks = [to_query[i::N] for i in range(N)]
+        tmpdir = tempfile.mkdtemp(prefix="fq_")
+        worker = os.path.join(BASE, "_fq_worker.py")
+        pybin = os.environ.get("V8_PYTHON", "python")
+        chunk_paths, out_paths, procs = [], [], []
+        for i, ch in enumerate(chunks):
+            if not ch:
+                continue
+            cp = os.path.join(tmpdir, f"chunk_{i}.json")
+            op = os.path.join(tmpdir, f"out_{i}.json")
+            with open(cp, "w", encoding="utf-8") as f:
+                json.dump(ch, f, ensure_ascii=False)
+            chunk_paths.append(cp)
+            out_paths.append(op)
+            p = subprocess.Popen([pybin, worker, cp, op], cwd=BASE,
+                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                 text=True, bufsize=1, encoding="utf-8", errors="replace")
+            procs.append(p)
+            log(f"    worker[{i}] 启动 pid={p.pid} 处理 {len(ch)} 只")
+        # 等待所有子进程结束（带总超时保护，单 worker 卡死不影响汇总）
+        deadline = time.time() + 5400  # 90min 总预算
+        alive = list(procs)
+        while alive and time.time() < deadline:
+            for p in list(alive):
+                rc = p.poll()
+                if rc is not None:
+                    alive.remove(p)
+                    out = p.stdout.read() if p.stdout else ""
+                    if rc != 0:
+                        log(f"    ⚠️ worker 退出码 {rc}: {out[-200:].strip()}")
+            if alive:
+                time.sleep(3)
+        for p in alive:  # 超时仍有存活 → 强杀（产物视为未产出，下游门控拒用陈旧数据）
+            try: p.kill()
+            except Exception: pass
+            log(f"    💀 worker pid={p.pid} 超时强杀")
+        # 汇总子进程输出
+        for op in out_paths:
+            try:
+                d = load_json(op)
+                results.update(d.get("stocks", {}))
+                done += len(d.get("stocks", {}))
+            except Exception as e:
+                log(f"    ⚠️ 汇总 {os.path.basename(op)} 失败: {e}")
+        # 对子进程产出的结果做质量分级 + 消息面挂载
+        cache_hit = set()
+        for raw_code in universe:
+            if raw_code.startswith("hk_"):
+                continue
+            c = cache.get(raw_code, {})
+            if c.get("roe") is not None or c.get("revenue_growth") is not None:
+                cache_hit.add(raw_code)
+        for raw_code, q in results.items():
+            if raw_code in cache_hit:
+                continue  # 已是缓存命中分类过的（含 news），跳过
+            g = q.get("grade", "")
+            if g == "A": total_a += 1
+            elif g == "B": total_b += 1
+            elif g == "C": total_c += 1
+            elif g == "D": total_d += 1
+            else: total_nodata += 1
+            pure = str(raw_code).replace("sh_", "").replace("sz_", "").strip()
+            nw = news_signals.get(pure)
+            if nw:
+                q["news"] = nw
+        log(f"  子进程汇总完成，累计 {done} 只")
+    else:
+        log("  无需查询（全部缓存命中）")
 
     out = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),

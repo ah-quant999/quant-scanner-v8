@@ -43,7 +43,7 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     # 🛡 2026-09-08 全链审计补登：以下重活此前未登记，走默认 1800s 易被误杀
     #   （被杀 = 产物写不出 = 下游读旧文件 = 静默断更，与 H_AUTO_BUY 同类）。
     "gen_stock_stop.py": 2400,             # 147~200 只逐只 250 根 K 线（已改并发，冷网络留足预算）
-    "fetch_fundamental_quality.py": 2400,  # ~570 只 × 最多 8 次 baostock 查询，零超时零熔断的重灾区
+    "fetch_fundamental_quality.py": 5400,  # 🛡 2026-09-09 并发根治：单线程串行 baostock 必超 40min 预算被杀→盘后选股链整瘫；改 ProcessPoolExecutor(12) 后实测分钟级，预算放宽到 90min 留足余量
     "refresh_dividend_cninfo.py": 2400,    # ~500 只 × cninfo ×3 重试，无超时
     "fetch_lhb.py": 2400,                  # 逐股 ×2flag ×3attempt 东财 akshare
     "build_candidate_pool.py": 2400,       # missing[:200] 串行东财补全行业

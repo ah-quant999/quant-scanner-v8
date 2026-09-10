@@ -27,11 +27,7 @@ MUST_HAVE_CRON = {
     # 有 cron 的 v8 主链 workflow（必须文档化）
     "v8_cn_fetch_cloud": "中国数据抓取(云端)",
     "v8_cn_fetch_cloud_hosted": "中国数据抓取(selfhosted 备援)",
-    # 🛡 2026-09-10 移出：v8_cn_fetch_watchdog 在 2026-09-09「盘中更新审计·一劳永逸」改造中
-    #    已刻意删除 GitHub schedule cron，改由 WorkBuddy 自动化「v8 看门狗驱动(每15分)」dispatch 触发
-    #    （云端 schedule 高负载时会静默漏触发，实测 2026-09-01 全天 0 次）。留在 MUST_HAVE_CRON
-    #    会恒定报「期望有 cron 但实际无 cron」→ Pre-deploy audit 阻断 → 部署步骤 skipped
-    #    → 盘中 data/*.js 不更新（2026-09-10 实测落后 18.7h）。故移入 ALLOW_NO_CRON。
+    "v8_cn_fetch_watchdog": "抓取看门狗",
     "v8_algo_cloud": "盘后算法链(云端主链)",
     "v8_algo_intraday_lite": "盘中轻量算法链",
     "v8_lhb_fetch": "龙虎榜抓取",
@@ -64,7 +60,6 @@ ALLOW_NO_CRON = {
     "v8_build_deploy",            # 由 workflow_run 触发，无 cron
     "v8_slot_scheduler",          # 档期兜底调度器：2026-09-09 GHA cron 已删、无独立唤起器→休眠；盘中单源统一收口到「云端按铃(alimi_bell)」每20分（避免双源互踢）
     "v8_algo",                    # 46 模块新鲜度体检（已迁 dispatch-only，老引用）
-    "v8_cn_fetch_watchdog",    # 见上方 MUST_HAVE_CRON 移出说明：2026-09-09 起 dispatch-only（去 schedule 依赖），无 cron 属设计
     # 🛡 2026-09-10 阿狸咪临时豁免：v8_cn_fetch_experiments 是今日新加的"暂未上架·实验卡"抓取链
     # （估值分位/因子审计/指数估值中枢，16:30 CST cron）。logic.html 尚未同步登记本 workflow。
     # 待小九/主人补 logic.html 文档化后移至 MUST_HAVE_CRON。豁免目的：让 CI Pre-deploy audit 通过，

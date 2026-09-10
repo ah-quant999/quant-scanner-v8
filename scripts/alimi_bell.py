@@ -12,14 +12,13 @@
 用法：
     python scripts/alimi_bell.py [--dry-run] [--verbose]
 
-时段规则（CST，工作日周一至周五）：
+时段规则（CST，工作日周一至周五）—— 🔴 2026-09-09 22:15 主人令「新调度模型 v3·双机分时铁律升级版（接力赛模型）」：
     cn_fetch_cloud（云端 ubuntu，25min timeout）：
-        08:00-08:45 盘前   -> 上次成功 < 70min 则跳过
-        08:45-17:00 盘中   -> 上次成功 < 45min 则跳过
-        17:00-18:30 盘后   -> 上次成功 < 100min 则跳过
-        18:30-23:00 晚间   -> 上次成功 < 3h 则跳过
-        23:00-08:00 夜间   -> 不按铃
-        周末 08:00-11:00   -> 上次成功 < 3h 则跳过；其余时间不按铃
+        工作日 09:40-15:00 -> 小九 GHA 准点档主力（v8_cn_fetch_intraday_lemoncat.yml，14 档），
+                              阿狸咪每 30 分钟轮巡兜底（小九正常时几乎不触发，整台机掉才兜底）
+        工作日 15:00-15:30 -> 小九收盘更新窗口（阿狸咪按铃但不抢，跳过本轮）
+        工作日 15:30-次日 09:40（盘后+夜间+盘前备份）+ 周末 08:00-23:00 -> 阿狸咪主力，阈值 30 分钟
+        周末 23:00-08:00 -> 不主动按铃（避免扰民）
     algo_cloud（ubuntu-latest，120min timeout，19:15 主档 + dispatch 兜底）：
         工作日 19:15-23:30 -> 上次成功 < 4h 则跳过；最近 run 失败/取消则 30min 重试
         盘后若 BACKTEST_TDX/BACKTEST_COMPREHENSIVE 仍为旧日期 -> 直接按铃
@@ -93,23 +92,31 @@ def _minutes_ago(ts_str, now):
 
 
 def _cn_fetch_need_bell(now):
+    """判断当前时段阿狸咪按铃角色与阈值。
+
+    🔴 2026-09-09 22:15 主人令「新调度模型 v3·双机分时铁律升级版（接力赛模型）」：
+      - 09:40-15:00 工作日：小九 GHA 准点档（v8_cn_fetch_intraday_lemoncat.yml，14 档）
+        主力——阿狸咪每 30 分钟轮巡兜底（小九正常时几乎不触发，整台机掉才兜底）。
+      - 15:30-次日 09:40 盘后+夜间+盘前备份：阿狸咪主力，按铃阈值 30 分钟。
+      - 周末 08:00-23:00：阿狸咪主力，按铃阈值 30 分钟；23:00-08:00 不按铃（避免扰民）。
+
+    返回：(阈值分钟数, 角色标签) 或 (None, 标签)。None 表示当前时段不按铃。
+    """
     wd = now.weekday()  # 0=Mon .. 6=Sun
     hhmm = now.hour * 60 + now.minute
-    if wd >= 5:  # 周末：仅 08:00-11:00 窗口，阈值 3h
-        if 8 * 60 <= hhmm < 11 * 60:
-            return 180, "weekend-0900"
-        return None, "weekend-off-hours"
-    if 8 * 60 <= hhmm < 8 * 60 + 45:
-        return 70, "premarket"
-    if 8 * 60 + 45 <= hhmm < 17 * 60:
-        # 🔧 2026-09-09 主人令「盘中 20 分钟单源」：原 45 阈值会让健康数据(>20min)不触发按铃，
-        #   20 分钟目标永远落空。降到 20 → 与 20 分钟调度节奏同频，健康时也每 ~20min 补一轮。
-        return 20, "intraday"
-    if 17 * 60 <= hhmm < 18 * 60 + 30:
-        return 100, "post-close"
-    if 18 * 60 + 30 <= hhmm < 23 * 60:
-        return 180, "evening"
-    return None, "night-off"
+    if wd >= 5:  # 周末
+        if 8 * 60 <= hhmm < 23 * 60:
+            return 30, "weekend-prime"
+        return None, "weekend-quiet"
+    # 工作日
+    # 09:40-15:00 小九准点档主力：阿狸咪每 30 分钟轮巡兜底
+    if 9 * 60 + 40 <= hhmm < 15 * 60:
+        return 30, "intraday-xiao9-main"
+    # 15:00-15:30 小九收盘更新窗口：阿狸咪按铃但不抢（跳过本轮）
+    if 15 * 60 <= hhmm < 15 * 60 + 30:
+        return None, "xiao9-close-update"
+    # 其余（盘前 08:25 起 + 15:30-次日 09:40 盘后夜间）：阿狸咪主力，阈值 30min
+    return 30, "alimi-main"
 
 
 def _algo_need_bell(now):

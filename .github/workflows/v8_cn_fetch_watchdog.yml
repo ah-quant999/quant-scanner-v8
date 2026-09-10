@@ -14,14 +14,10 @@
 name: "🐕 v8 数据抓取看门狗(云端自愈)"
 
 on:
-  # 🔴 2026-09-10 一劳永逸修复（主人令·午休窗口）：09-09 误删 schedule，导致看门狗整日哑火——
-  #    上午 5 次云端 run 被 cancelled 且零兜底 → 数据空窗近 30 分钟（09-10 上午事故）。
-  #    现恢复 GitHub cron 自唤起（每 15 分，与 WorkBuddy 唤起器 2d9121c8 互为冗余，任一方掉线都自恢复），
-  #    数据陈旧（盘中>35min）即自动补派云端/小九 cn 兜底。时段：交易日 08:07-15:52 CST（UTC 00:07-07:52），
-  #    与 20 分主派发错峰（:07/:22/:37/:52），避免并发互相踩踏。
-  schedule:
-    - cron: '7,22,37,52 0-7 * * 1-5'
-  # 🔴 保留手动入口：WorkBuddy 唤起器 2d9121c8 每 15 分也可主动触发（双保险）。
+  # 🔴 2026-09-09 盘中更新审计·一劳永逸：移除 GitHub schedule cron。
+  #    根因：GitHub schedule 在高负载时被整段静默漏触发（实测 2026-09-01 全天 0 次），
+  #    单靠 workflow 内置 cron 不可靠。改由 WorkBuddy 自动化「v8 看门狗驱动(每15分)」(id=2d9121c8)
+  #    用 workflow_dispatch 主动触发本看门狗，彻底去 schedule 依赖（与云端 cron 静默丢失解耦）。
   workflow_dispatch:
     inputs:
       force_category:

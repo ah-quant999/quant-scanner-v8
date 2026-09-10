@@ -1,9 +1,11 @@
 {
-  "update_time": "2026-09-10 06:55:21",
-  "script": "(chain-end)",
+  "update_time": "2026-09-10 04:27:35",
+  "script": "final_recommend.py",
   "step": "run_algorithms",
-  "status": "completed",
-  "ok": 20,
-  "fail": 0,
-  "note": "算法链本轮执行完毕"
+  "pid": 23396,
+  "last_line": "WARNING:root:[time_gate] BYPASS 已设置，跳过选股策略守门",
+  "last_output_time": "2026-09-10 04:14:20",
+  "silent_sec": 795,
+  "started": "2026-09-10 04:14:20",
+  "status": "running"
 }

@@ -1,31 +1,13 @@
 {
-  "update_time": "2026-09-10 06:55:21",
-  "run_start": "2026-09-10 06:11:13",
-  "ok": 20,
-  "fail": 0,
-  "failed_scripts": [],
-  "skipped_by_time_gate": [
-    "calc_crds.py",
-    "build_candidate_pool.py",
-    "calc_stock_rps.py",
-    "generate_top10.py",
-    "backtest_tdx.py",
-    "backtest_comprehensive.py",
-    "export_optimized_strategy.py",
-    "strategy_four_volume_60m.py",
-    "strategy_four_volume.py",
-    "update_triple_resonance_history.py",
-    "gen_triple_consensus.py",
-    "gen_triple_track.py",
-    "calc_volatility_watch.py",
-    "gen_stock_stop.py",
-    "gen_algo_track.py",
-    "calc_sentiment_cycle.py",
-    "auto_run_dn_algorithm.py",
-    "strong_breakout.py",
-    "track_h_auto_buy.py",
-    "gen_lhb_7d.py",
-    "final_recommend.py",
-    "backtest_expectancy.py"
-  ]
+  "update_time": "2026-09-10 03:34:12",
+  "run_start": "2026-09-10 03:10:44",
+  "ok": 6,
+  "fail": 1,
+  "failed_scripts": [
+    {
+      "script": "export_optimized_strategy.py",
+      "reason": "退出码 1 | ⚠️ backtest_tdx.json 中无 optimized_summary，先运行 backtest_tdx.py"
+    }
+  ],
+  "skipped_by_time_gate": []
 }
