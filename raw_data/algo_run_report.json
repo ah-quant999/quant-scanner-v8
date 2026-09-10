@@ -1,31 +1,21 @@
 {
-  "update_time": "2026-09-10 06:55:21",
-  "run_start": "2026-09-10 06:11:13",
+  "update_time": "2026-09-11 01:00:54",
+  "run_start": "2026-09-10 23:57:40",
   "ok": 20,
-  "fail": 0,
-  "failed_scripts": [],
-  "skipped_by_time_gate": [
-    "calc_crds.py",
-    "build_candidate_pool.py",
-    "calc_stock_rps.py",
-    "generate_top10.py",
-    "backtest_tdx.py",
-    "backtest_comprehensive.py",
-    "export_optimized_strategy.py",
-    "strategy_four_volume_60m.py",
-    "strategy_four_volume.py",
-    "update_triple_resonance_history.py",
-    "gen_triple_consensus.py",
-    "gen_triple_track.py",
-    "calc_volatility_watch.py",
-    "gen_stock_stop.py",
-    "gen_algo_track.py",
-    "calc_sentiment_cycle.py",
-    "auto_run_dn_algorithm.py",
-    "strong_breakout.py",
-    "track_h_auto_buy.py",
-    "gen_lhb_7d.py",
-    "final_recommend.py",
-    "backtest_expectancy.py"
-  ]
+  "fail": 3,
+  "failed_scripts": [
+    {
+      "script": "v8/factor_lab_gen.py",
+      "reason": "退出码 1 | IndexError: list index out of range"
+    },
+    {
+      "script": "calc_crds.py",
+      "reason": "退出码 1 | NameError: name 'V8_OFFLINE' is not defined"
+    },
+    {
+      "script": "calc_stock_rps.py",
+      "reason": "监督器静默杀(>15min 无输出)"
+    }
+  ],
+  "skipped_by_time_gate": []
 }

@@ -363,7 +363,8 @@
     },
     "300759": {
       "2026-09-08": 42.76,
-      "2026-09-10": 42.76
+      "2026-09-10": 42.76,
+      "2026-09-11": 42.76
     }
   },
   "_tracking_latest": {
@@ -655,7 +656,7 @@
       "enter_close": 0,
       "last_date": "2026-09-10",
       "last_close": 0,
-      "status": "strict",
+      "status": "dropped",
       "streak": 1,
       "total_days": 5
     },
@@ -746,16 +747,17 @@
     "300759": {
       "enter_date": "2026-09-08",
       "enter_close": 42.76,
-      "last_date": "2026-09-08",
+      "last_date": "2026-09-11",
       "last_close": 42.76,
-      "status": "dropped",
-      "streak": 1
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-09-10 01:27:26"
+    "last_update": "2026-09-11 00:30:38"
   },
   "2026-08-18": [
     {
@@ -1350,7 +1352,7 @@
       "status": "near"
     }
   ],
-  "update_time": "2026-09-10 01:27:26",
+  "update_time": "2026-09-11 00:30:38",
   "2026-08-30": [
     {
       "code": "300475",
@@ -1885,6 +1887,31 @@
       ],
       "signal_count": null,
       "status": "strict"
+    }
+  ],
+  "2026-09-11": [
+    {
+      "code": "300759",
+      "name": "康龙化成",
+      "market": "sz",
+      "board": "创业板",
+      "close": 42.76,
+      "pct_chg": 3.64,
+      "total_score": 26.7,
+      "quality_grade": "D",
+      "industry": "研究和试验发展",
+      "sectors": [
+        "创业成份",
+        "AH股",
+        "中证500",
+        "深股通",
+        "研究和试验发展",
+        "CRO",
+        "AI制药（医疗）",
+        "MSCI中国"
+      ],
+      "signal_count": null,
+      "status": "near"
     }
   ]
 }
