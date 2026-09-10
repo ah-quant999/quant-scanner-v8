@@ -1,5 +1,5 @@
 window.MAHORO_MACRO = {
- "updated_at": "2026-09-10 08:38",
+ "updated_at": "2026-09-10 08:40",
  "sources": [
   {
    "name": "zsxq_jinfutou",
