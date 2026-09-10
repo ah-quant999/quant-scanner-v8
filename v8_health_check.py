@@ -1522,6 +1522,10 @@ _WINDOW_VAR_ALIASES = {
     # 2026-09-07 一劳永逸：文件名 maharo_macro.js 但 window 变量是 MAHORO_MACRO（拼写不一致），
     #   通用全量审计解析失败 -> 长期误报「maharo_macro.js 缺失或解析失败（未被 CARD_DEFS 登记）」红灯。
     "maharo_macro": ["MAHORO_MACRO", "MAHARO_MACRO"],
+    # 2026-09-10 一劳永逸：小九当日把 insights 从 maharo_macro.js 拆出独立文件
+    #   data/maharo_insights.js -> window.MAHORO_INSIGHTS（已实证 6864B 有效）。
+    #   拆分时漏登记别名 -> 全量审计解析失败 -> 长期误报「缺失或解析失败（未被 CARD_DEFS 登记）」红灯。
+    "maharo_insights": ["MAHORO_INSIGHTS", "MAHARO_INSIGHTS"],
     "PORTFOLIO": ["PORTFOLIO_DATA"],
     "STOCK_RPS": ["STOCK_RPS_DATA"],
 }
@@ -1547,6 +1551,7 @@ _LOW_FREQ_FILES = {
     "HEALTH_CHECK", "RUNNER_STATUS_HEALTH",
     "WEEKEND_RUN",
     "maharo_macro",  # 2026-09-08 一劳永逸：本机 cookie 拉取(云端无权限)，家里机离线会陈旧 -> 7天容忍仅告警
+    "maharo_insights",  # 2026-09-10：同 maharo_macro 口径（本机 cookie 拉取，云端无权限）-> 同样 7天容忍仅告警
     "MACRO",  # 2026-08-29：window.MACRO 已被 window.MACRO_DATA 取代，index.html 仅用 MACRO_DATA/MACRO_BRIEF，全站 0 渲染引用 → 白名单免误报
     "FOUR_VOLUME_60M",  # 🛡 2026-08-27 主人令：baostock 60min 源本身滞后（曾到 8/22），
     # 且 final_recommend 已回退读日线 FOUR_VOLUME.js（Layer B），60M 不再作为最终推荐必需输入 → 降级低频白名单，消除误报红灯
