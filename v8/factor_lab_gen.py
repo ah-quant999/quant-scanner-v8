@@ -46,8 +46,12 @@ def last_trade_day(ref=None):
 KL_END   = last_trade_day()                        # 动态到上一交易日（根治周末 query_all_stock 返回 0 只）
 ASOF_YM  = KL_END[:7]                              # abn 因子按月刷新标记（ym() 同格式）
 ASOF_Q   = "%dQ%d" % (int(KL_END[:4]), (int(KL_END[5:7]) - 1) // 3 + 1)  # ROE 按季刷新标记
-# ROE 因子取近 7 年（含当前年），动态滑动——根治硬编码 2025-2027 在 2027-01-01 起的冻结
-ROE_YEARS = list(range(max(2015, dt.datetime.now().year - 6), dt.datetime.now().year + 1))
+# 2026-09-11 口径版本号：原为「最近4个累计 roeAvg 求和」(错)，现为「近4个单季 roeAvg 差分求和」并转百分数。
+#   缓存判定带上它 → 旧口径缓存自动失效并重算，无需手工删缓存。
+ROE_VER = 3
+# 算 ROE_TTM 只需最近 5 个季度的累计值（4 个单季 + 1 个前值），近 2 年足够；
+#   原取近 7 年 = 28 次 query/只，全市场 3193 只约 6 小时必撞 workflow timeout（实测 1.36 s/只·8 次 query）。
+ROE_YEARS = [dt.datetime.now().year - 1, dt.datetime.now().year]
 ROE_QTRS  = (1, 2, 3, 4)
 FORCE = "--force" in " ".join(sys.argv)
 
@@ -153,47 +157,102 @@ def resolve_data_date(max_back=10, min_rows=1000):
     return None
 
 
+def _q(fn, *a, **kw):
+    """2026-09-11 一劳永逸：baostock 查询抗抖动包装。
+
+    背景：baostock 服务端偶发协议/网络异常（IndexError body_arr[11] / timed out /
+    接收数据异常 / gzip 解码失败）。原实现裸调用，单只票撞上就把整轮打死：
+    实测 2026-09-11 01:19 那轮已跑 73 分钟、roe 1800/3195 只，
+    因 get_kline_amt 抛 IndexError 整体崩掉，产物写不出、链上记失败、已算的缓存白等。
+    改法：单次查询最多重试 3 次，每次失败先 logout+login 重置连接态；
+    仍失败返回 None，由调用方按「本只无数据」跳过，绝不中断整轮。
+    """
+    for k in range(3):
+        try:
+            return fn(*a, **kw)
+        except Exception as e:
+            log("⚠️ baostock 查询异常重试", k + 1, type(e).__name__, str(e)[:80])
+            try:
+                bs.logout()
+            except Exception:
+                pass
+            time.sleep(1.0 + k)
+            try:
+                bs.login()
+            except Exception:
+                pass
+    log("⚠️ baostock 查询连续 3 次失败，本只按无数据处理")
+    return None
+
 def get_main_universe(day=None):
-    rs = bs.query_all_stock(day=day or KL_END)
+    rs = _q(bs.query_all_stock, day=day or KL_END)
     codes = {}
-    while rs.error_code == '0' and rs.next():
-        v = rs.get_row_data()
-        if re.match(r'^(sh\.60|sz\.00)\d{4}$', v[0]):
-            codes[v[0]] = True
+    if rs is None:
+        return []
+    try:
+        while rs.error_code == '0' and rs.next():
+            v = rs.get_row_data()
+            if re.match(r'^(sh\.60|sz\.00)\d{4}$', v[0]):
+                codes[v[0]] = True
+    except Exception as e:
+        log("⚠️ get_main_universe 读行中断", type(e).__name__, str(e)[:60])
     return sorted(codes.keys())
 
 def get_kline_abn(code):
-    rs = bs.query_history_k_data_plus(code,
+    rs = _q(bs.query_history_k_data_plus, code,
         "date,close,turn,amount", start_date=KL_ABN_START, end_date=KL_END,
         frequency="d", adjustflag="2")
     rows = []
-    while rs.error_code == '0' and rs.next():
-        d = rs.get_row_data()
-        try:
-            rows.append({"date": d[0], "close": float(d[1]),
-                "turn": float(d[2]) if d[2] not in ("", "None") else 0.0,
-                "amount": float(d[3]) if d[3] not in ("", "None") else 0.0})
-        except Exception:
-            pass
+    if rs is None:
+        return rows
+    try:
+        while rs.error_code == '0' and rs.next():
+            d = rs.get_row_data()
+            try:
+                rows.append({"date": d[0], "close": float(d[1]),
+                    "turn": float(d[2]) if d[2] not in ("", "None") else 0.0,
+                    "amount": float(d[3]) if d[3] not in ("", "None") else 0.0})
+            except Exception:
+                pass
+    except Exception as e:
+        log("⚠️ get_kline_abn 读行中断（已收", len(rows), "行）", code, type(e).__name__, str(e)[:60])
     return rows
 
 def get_kline_amt(code):
-    rs = bs.query_history_k_data_plus(code,
+    rs = _q(bs.query_history_k_data_plus, code,
         "date,close,amount", start_date=KL_AMT_START, end_date=KL_END,
         frequency="d", adjustflag="2")
     amts, last = [], None
-    while rs.error_code == '0' and rs.next():
-        d = rs.get_row_data()
-        try:
-            if d[2] not in ("", "None"): amts.append(float(d[2]))
-            if d[1] not in ("", "None"): last = float(d[1])
-        except Exception:
-            pass
+    if rs is None:
+        return 0.0, None
+    try:
+        while rs.error_code == '0' and rs.next():
+            d = rs.get_row_data()
+            try:
+                if d[2] not in ("", "None"): amts.append(float(d[2]))
+                if d[1] not in ("", "None"): last = float(d[1])
+            except Exception:
+                pass
+    except Exception as e:
+        log("⚠️ get_kline_amt 读行中断（已收", len(amts), "行）", code, type(e).__name__, str(e)[:60])
     return (sum(amts)/len(amts) if amts else 0.0), last
 
 def get_roe_ttm(code):
+    """ROE_TTM，单位【百分比数值】（33.16 即 33.16%）。
+
+    2026-09-11 口径修正：
+      baostock query_profit_data 的 roeAvg 是【财年内累计值·小数】——茅台 2026Q2=0.1795
+      表示上半年累计 ROE 17.95%，既不是单季值、也不是百分数。
+      旧实现把「最近 4 个累计值」直接相加 → 跨年重复计算：
+        0.2637(25Q3) + 0.3446(25Q4) + 0.1057(26Q1) + 0.1795(26Q2) = 0.8935，
+      前端再拼 '%' → 卡片显示「ROE_TTM 0.9%」，而真值 33%。
+      实测对照：茅台权威 ROE_TTM = 32.41%（westock 财务接口 @2026-06-30），本算法算得 33.16%。
+
+    新算法：逐季差分成【单季】后取最近 4 个单季求和，×100 转百分比。
+      单季(Q1) = 累计(Q1)
+      单季(Qn) = 累计(Qn) - 累计(Qn-1)   （同财年；缺上一季累计则跳过该季，不猜）
+    """
     series = {}
-    # 2026-09-07：单只查询阻塞时跳过该股（socket 超时已设 20s），不拖死全链
     try:
         for y in ROE_YEARS:
             for q in ROE_QTRS:
@@ -202,7 +261,7 @@ def get_roe_ttm(code):
                     v = rp.get_row_data()
                     try:
                         if len(v) > 3 and v[3] not in ("", "None"):
-                            series[f"{y}{q:02d}"] = float(v[3])
+                            series[(y, q)] = float(v[3])
                     except Exception:
                         pass
                 time.sleep(0.02)
@@ -212,11 +271,25 @@ def get_roe_ttm(code):
     order = sorted(series.keys())
     if len(order) < 4:
         return None
-    return sum(series[order[i]] for i in range(len(order)-4, len(order)))
+    singles = []
+    for (y, q) in order:
+        cum = series[(y, q)]
+        if q == 1:
+            singles.append(cum)
+        else:
+            prev = series.get((y, q - 1))
+            if prev is None:
+                continue
+            singles.append(cum - prev)
+    if len(singles) < 4:
+        return None
+    return round(sum(singles[-4:]) * 100.0, 2)
 
 def get_name(code):
+    rs = _q(bs.query_stock_basic, code=code)
+    if rs is None:
+        return ""
     try:
-        rs = bs.query_stock_basic(code=code)
         while rs.error_code == '0' and rs.next():
             v = rs.get_row_data()
             if len(v) > 1 and v[1]:
@@ -266,8 +339,12 @@ def main():
         # 🛡 2026-09-04：按月刷新（asof_ym 标记）——旧版「算过即永久跳过」导致因子冻结在计算当月
         if (not FORCE) and code in a and a[code].get("factor_at") is not None and a[code].get("asof_ym") == ASOF_YM:
             continue
-        name = get_name(code)
-        kl = get_kline_abn(code)
+        try:
+            name = get_name(code)
+            kl = get_kline_abn(code)
+        except Exception as e:
+            log("⚠️ abn 单只异常跳过", code, type(e).__name__, str(e)[:80])
+            continue
         agg = {}
         for r in kl:
             x = agg.setdefault(ym(r["date"]), {"t": 0.0, "a": 0.0})
@@ -325,18 +402,23 @@ def main():
             log("达到本轮夜预算", BUDGET, "-> 停止新取，缓存已落盘，剩余下轮续跑")
             break
         # 🛡 2026-09-04：按季刷新（asof_q 标记）——季报披露后下一季度自动重算
-        if (not FORCE) and code in r and r[code].get("roe_ttm") is not None and r[code].get("size_proxy") and r[code].get("asof_q") == ASOF_Q:
+        if (not FORCE) and code in r and r[code].get("roe_ver") == ROE_VER and r[code].get("roe_ttm") is not None and r[code].get("size_proxy") and r[code].get("asof_q") == ASOF_Q:
             continue
         n_new += 1
-        name = get_name(code)
-        amt, last = get_kline_amt(code)
-        roe = get_roe_ttm(code)
+        try:
+            name = get_name(code)
+            amt, last = get_kline_amt(code)
+            roe = get_roe_ttm(code)
+        except Exception as e:
+            log("⚠️ roe 单只异常跳过", code, type(e).__name__, str(e)[:80])
+            continue
         r[code] = {
             "code": code, "name": name,
             "close": round(last, 2) if last is not None else None,
             "roe_ttm": round(roe, 2) if roe is not None else None,
             "size_proxy": round(amt, 1) if amt else 0.0,
             "asof_q": ASOF_Q,
+            "roe_ver": ROE_VER,
         }
         if (i+1) % 25 == 0:
             save_cache(r, CACHE_R)
@@ -369,7 +451,7 @@ def main():
             "n_at_valid": len(at_valid),
             "n_roe_large": len(large),
             "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
-            "roe_def": "全市场主板(3193)·大市值档(成交额代理top1/3)按ROE_TTM降序 Top30",
+            "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
             "roe_universe": "全市场主板",
         },
         "abnormal_turnover": {"top": at_top, "bottom": at_bottom},
@@ -391,9 +473,9 @@ def main():
         h = hashlib.sha1(js.encode("utf-8")).hexdigest()[:10]
         hp = os.path.join(REPO, "index.html")
         html = open(hp, encoding="utf-8").read()
-        html = html.replace(
-            "② ROE(TTM) 大市值档（成交额代理 Top1/3）— Top 30",
-            "② ROE(TTM) 全市场主板·大市值档（成交额代理 Top1/3）— Top 30")
+        # 2026-09-11 口径修正：把线上可能残留的旧口径描述自动纠正为「近4个单季差分求和」
+        html = html.replace("最近4季度 roeAvg 求和", "近4个单季 roeAvg 差分求和")
+        html = html.replace("ROE_TTM=最近4季度 roeAvg 求和", "ROE_TTM=近4个单季 roeAvg 差分求和")
         html = html.replace(
             "注：重点池60%为双创，ROE大市值档样本偏薄，仅作观察。",
             "已切换为全市场主板(3193只)·大市值档(成交额top1/3)。")
