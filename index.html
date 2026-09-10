@@ -506,6 +506,36 @@ window.__domReadyFns=[];
   .tp-hist-cell .tp-code{font-size:10px;color:var(--sub);font-family:monospace}
   .tp-hist-cell .tp-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
+
+  /* ===== 🌅 盘前全局速览（2026-09-10 · 暂未上架·宏观观测实验区） ===== */
+  .pm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+  @media(max-width:900px){.pm-grid{grid-template-columns:repeat(2,1fr)}}
+  .pm-cell{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+  .pm-cell .pm-label{font-size:11px;color:var(--dim);font-weight:600}
+  .pm-cell .pm-val{font-size:14px;font-weight:700;color:var(--txt);line-height:1.45}
+  .pm-cell .pm-sub{font-size:11px;color:var(--sub)}
+  .pm-quote{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0}
+  .pm-quote .pm-price{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
+  .pm-quote .pm-change{font-size:13px;font-weight:700;padding:3px 8px;border-radius:6px}
+  .pm-levels{display:flex;gap:6px;flex-wrap:wrap}
+  .pm-level{display:flex;align-items:center;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px}
+  .pm-level b{font-weight:700;font-variant-numeric:tabular-nums}
+  .pm-hr{height:1px;background:var(--border);margin:12px 0}
+  .pm-row{display:grid;gap:12px}
+  .pm-row.g-2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:900px){.pm-row.g-2{grid-template-columns:1fr}}
+  .pm-mini-head{font-size:12px;color:var(--sub);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .pm-list{font-size:12px;line-height:1.75;color:var(--txt)}
+  .pm-list li{margin-bottom:4px}
+  .pm-tag{display:inline-block;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:600;margin-right:4px}
+  .pm-tag.positive{background:rgba(244,73,93,.14);color:var(--up)}
+  .pm-tag.negative{background:rgba(31,209,123,.14);color:var(--down)}
+  .pm-tag.neutral{background:var(--bg2);color:var(--sub)}
+  .pm-verdict{font-size:11px;padding:1px 6px;border-radius:4px;font-weight:600}
+  .pm-verdict.favor{background:rgba(244,73,93,.12);color:var(--up)}
+  .pm-verdict.avoid{background:rgba(31,209,123,.12);color:var(--down)}
+  .pm-verdict.watch{background:rgba(251,191,36,.12);color:var(--gold)}
+  .pm-empty{color:var(--dim);padding:18px 10px;text-align:center;font-size:13px}
 </style>
     <script src="data/ETF_INTRADAY_HEAT.js?v=1789016080" defer></script>
     <script src="data/SECTOR_FUND_FLOW.js?v=1789016080" defer></script>
@@ -11870,6 +11900,12 @@ window.showRestrictedItems = showRestrictedItems;
 
     // ===== 宏观观测 pane =====
     h += '<div id="ulPaneMacro" style="display:none;">';
+    // ═══ 2026-09-10 主人令：盘前全局速览实验卡（基于 MAHORO_INSIGHTS + INDEX_QUOTES），放宏观观测最上方 ═══
+    h += '<div class="card" id="premarketOverviewCard" style="margin-bottom:16px;border-left:4px solid #fbbf24;">'
+       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+       + '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🌅 盘前全局速览</span>'
+       + '<span style="font-size:11px;color:var(--dim);">实验卡 · 每日开盘前自动提炼 · 仅限当日有效 · 暂放宏观观测测试</span></div>'
+       + '<div id="premarketOverviewBody"><div class="note">加载中…</div></div></div>';
     // ═══ 2026-09-07 主人令（二改）：卡只放宏观页最顶部（禁止在实验区显示）；
     //   内容以 AI 解析建议为主（日→周→月三层，AI 阅读后撰写），新闻条目折叠为附录；标题行带「更新于」。
     h += '<div class="card" id="maharoCard" style="margin-bottom:16px;border-left:4px solid #34d399;">'
@@ -12009,6 +12045,8 @@ window.showRestrictedItems = showRestrictedItems;
     h += '</div>'; // /ulPaneMacro
     // 2026-09-02 主人令：强势突破 pane、模块去向索引、动量共识/H反推/两套算法回测对比 全部删除（卡片清单以 renderUnlisted 为准）。
     el.innerHTML=h;
+    // 🌅 2026-09-10 盘前全局速览实验卡：DOM 就绪后立即渲染
+    try{ renderPremarketOverview(); }catch(e){ console.warn('盘前全局速览渲染失败', e); }
     // 恢复上次激活的子 tab（默认实验区）
     setTimeout(function(){ window.__ulSwitch(document.querySelector('#sec-ul .ul-tab[data-ul="'+_ulAct+'"]'), _ulAct); }, 0);
     // 2026-08-30 主人令:渲染兜底
@@ -14432,6 +14470,136 @@ window.__renderV8CalToday();
       setTimeout(renderFinalCand, 30);
     }
   };
+
+  // 🌅 2026-09-10 盘前全局速览：基于 MAHORO_INSIGHTS + INDEX_QUOTES 前端纯渲染
+  function renderPremarketOverview(){
+    var el=document.getElementById('premarketOverviewBody');
+    if(!el) return;
+    try{
+      var ins=(window.MAHORO_INSIGHTS && window.MAHORO_INSIGHTS.daily) || {};
+      var text=ins.text || '';
+      var oneLine='';
+      var m=text.match(/【一句话结论】\s*([\s\S]*?)(?=\n\s*【|$)/);
+      if(m) oneLine=m[1].trim().replace(/\n+/g,' ');
+
+      var mainLines=[];
+      var mm=text.match(/【三条主线】\s*([\s\S]*?)(?=\n\s*【|$)/);
+      if(mm){
+        mm[1].split('\n').forEach(function(line){
+          var clean=line.trim();
+          if(/^(\d+[）)])\s*(.+)/.test(clean)){
+            mainLines.push(clean.replace(/^(\d+[）)])\s*/,''));
+          }
+        });
+      }
+
+      var risks=[];
+      var rm=text.match(/【反向证据 \/ 风险】\s*([\s\S]*?)(?=\n\s*【|$)/);
+      if(rm){
+        rm[1].split('\n').forEach(function(line){
+          var clean=line.trim();
+          if(clean && clean.charAt(0)==='•'){
+            risks.push(clean.replace(/^•\s*/,''));
+          }
+        });
+      }
+
+      var watches=[];
+      var wm=text.match(/【今日观察点】\s*([\s\S]*?)(?=\n\s*【|$)/);
+      if(wm){
+        wm[1].split('\n').forEach(function(line){
+          var clean=line.trim();
+          if(clean && /^[①②③④⑤⑥⑦⑧⑨⑩]/.test(clean)){
+            watches.push(clean.replace(/^[①②③④⑤⑥⑦⑧⑨⑩]\s*/,''));
+          }
+        });
+      }
+
+      var idx=window.INDEX_QUOTES || {};
+      var sh=idx['000001'] || idx['上证指数'] || {};
+      var shClose=sh.close||0, shPre=sh.prev_close||sh.pre_close||0;
+      var shChange=0, shPct=0;
+      if(shClose && shPre){
+        shChange=shClose-shPre;
+        shPct=(shChange/shPre)*100;
+      }
+      var up=shChange>=0;
+      var color=up?'var(--up)':'var(--down)';
+      var pctTxt=(up?'+':'')+shPct.toFixed(2)+'%';
+
+      var riskLevel='中性', riskClass='neutral';
+      if(risks.length>=5){ riskLevel='偏高'; riskClass='negative'; }
+      else if(risks.length>=2){ riskLevel='中等'; riskClass='neutral'; }
+      else { riskLevel='可控'; riskClass='positive'; }
+
+      var keyLevels='';
+      if(shClose){
+        var lv1=shPre*1.0025, lv2=shPre*1.0013, lv3=shPre*0.9975, lv4=shPre*0.9950;
+        keyLevels='<div class="pm-levels">'
+          +'<div class="pm-level"><b>'+lv1.toFixed(0)+'</b> <span style="color:'+(shClose>lv1?'var(--up)':'var(--down)')+'">'+(shClose>lv1?'之上':'之下')+'</span></div>'
+          +'<div class="pm-level"><b>'+lv2.toFixed(0)+'</b> <span style="color:'+(shClose>lv2?'var(--up)':'var(--down)')+'">'+(shClose>lv2?'之上':'之下')+'</span></div>'
+          +'<div class="pm-level"><b>'+lv3.toFixed(0)+'</b> <span style="color:'+(shClose>lv3?'var(--up)':'var(--down)')+'">'+(shClose>lv3?'之上':'之下')+'</span></div>'
+          +'<div class="pm-level"><b>'+lv4.toFixed(0)+'</b> <span style="color:'+(shClose>lv4?'var(--up)':'var(--down)')+'">'+(shClose>lv4?'之上':'之下')+'</span></div>'
+          +'</div>';
+      }
+
+      var openingBias='平开震荡';
+      if(shPct>0.3) openingBias='倾向高开';
+      else if(shPct<-0.3) openingBias='倾向低开';
+      else if(shPct>0.1) openingBias='倾向小幅高开';
+      else if(shPct<-0.1) openingBias='倾向小幅低开';
+
+      var focusSector=(mainLines[0]||'—').split('：')[0].replace(/^(\d+[）)])/,'').trim();
+      if(mainLines.length && focusSector.length>18) focusSector=focusSector.slice(0,18)+'…';
+
+      var h='<div class="pm-grid">'
+        +'<div class="pm-cell"><div class="pm-label">开盘预判</div><div class="pm-val">'+_fe(openingBias)+'</div><div class="pm-sub">基于隔夜综合判断</div></div>'
+        +'<div class="pm-cell"><div class="pm-label">关注板块</div><div class="pm-val">'+_fe(focusSector)+'</div><div class="pm-sub">主线映射</div></div>'
+        +'<div class="pm-cell"><div class="pm-label">风险等级</div><div class="pm-val"><span class="pm-tag '+riskClass+'">'+_fe(riskLevel)+'</span></div><div class="pm-sub">反向证据 '+risks.length+' 条</div></div>'
+        +'<div class="pm-cell"><div class="pm-label">关键事件</div><div class="pm-val">'+_fe(watches[0]||'暂无')+'</div><div class="pm-sub">今日观察点</div></div>'
+        +'</div>';
+
+      h+='<div style="padding:12px 14px;background:var(--bg2);border-radius:10px;border-left:4px solid var(--gold);margin-bottom:14px;">'
+        +'<div style="font-size:12px;color:var(--dim);margin-bottom:4px;font-weight:600;">📌 一句话结论</div>'
+        +'<div style="font-size:14px;line-height:1.65;color:var(--txt);font-weight:600;">'+_fe(oneLine||'—')+'</div></div>';
+
+      h+='<div class="pm-row g-2" style="margin-bottom:14px;">'
+        +'<div class="card" style="background:var(--bg2);padding:12px 14px;">'
+        +'<div class="pm-mini-head">📐 关键点位 · 上证指数</div>'
+        +(shClose?('<div class="pm-quote"><span class="pm-price" style="color:'+color+'">'+_fe(shClose.toFixed(2))+'</span><span class="pm-change" style="background:'+color+'20;color:'+color+'">'+_fe(pctTxt)+'</span><span style="font-size:12px;color:var(--sub)">昨收 '+_fe(shPre.toFixed(2))+'</span></div>'+keyLevels):'<div class="pm-empty">上证指数数据未就绪</div>')
+        +'</div>'
+        +'<div class="card" style="background:var(--bg2);padding:12px 14px;">'
+        +'<div class="pm-mini-head">🏭 产业链评估</div>'
+        +'<div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:6px;">'+_fe(mainLines.length?mainLines[0]:'—')+'</div>'
+        +'<div style="font-size:11px;color:var(--sub);line-height:1.7;">'+_fe(mainLines.length>=3?'三条主线均具备日频事件驱动，盘中观察资金是否认可。':'主线数量 '+mainLines.length+'，事件驱动强度待验证。')+'</div></div>'
+        +'</div>';
+
+      h+='<div class="pm-row g-2" style="margin-bottom:14px;">'
+        +'<div class="card" style="background:var(--bg2);padding:12px 14px;">'
+        +'<div class="pm-mini-head">⚖️ 仓位与风控</div>'
+        +'<div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:6px;">'+_fe(riskLevel==='可控'?'可维持计划仓位，单票止损 5-7%':(riskLevel==='偏高'?'建议控仓观望，单票止损 3-5%':'建议半仓左右，单票止损 4-6%'))+'</div>'
+        +'<div style="font-size:11px;color:var(--sub);line-height:1.7;">风险'+_fe(riskLevel)+' · 反向证据 '+risks.length+' 条 · 盘中若关键点位失守则减仓。</div></div>'
+        +'<div class="card" style="background:var(--bg2);padding:12px 14px;">'
+        +'<div class="pm-mini-head">🎯 主线策略</div>'
+        +'<ol class="pm-list">'+mainLines.slice(0,3).map(function(l){return '<li>'+_fe(l)+'</li>';}).join('')+'</ol>'
+        +(mainLines.length?'':'<div class="pm-empty">暂无主线策略</div>')
+        +'</div>'
+        +'</div>';
+
+      h+='<div class="pm-row g-2" style="margin-bottom:8px;">'
+        +'<div class="card" style="background:var(--bg2);padding:12px 14px;">'
+        +'<div class="pm-mini-head">🚫 回避清单</div>'
+        +'<ul class="pm-list">'+(risks.slice(0,3).map(function(r){return '<li><span class="pm-verdict avoid">回避</span> '+_fe(r)+'</li>';}).join('')||'<li class="pm-empty">暂无明确回避信号</li>')+'</ul></div>'
+        +'<div class="card" style="background:var(--bg2);padding:12px 14px;">'
+        +'<div class="pm-mini-head">⏱️ 盘中待验证预案</div>'
+        +'<ol class="pm-list">'+(watches.slice(0,4).map(function(w){return '<li>'+_fe(w)+'</li>';}).join('')||'<li class="pm-empty">暂无观察点</li>')+'</ol></div>'
+        +'</div>';
+
+      el.innerHTML=h;
+    }catch(e){
+      el.innerHTML='<div class="pm-empty">盘前速览渲染失败：'+_fe(e.message)+'</div>';
+    }
+  }
 
   window.__renderFinalSec=function(){
     // 🔴 2026-08-13 修复: renderFinalRec/renderFinalCand 内部已有 try/catch,
