@@ -120,10 +120,19 @@ jobs:
       - name: "🔍 gh api 查云端 run 状态"
         id: check_cloud
         if: steps.dispatch_cloud.outputs.ok == 'true'
+        # 🔴 2026-09-10 修正（Bug ⑤）：探测脚本自身报错时原会 step failure，
+        #    而 need_fallback 从未赋值 → 兜底落空（实测 run 34433613329：
+        #    check failure → 兜底 skipped，整档白跑）。
+        #    探测只是"看看云端跑完没"，失败绝不该阻断；兜底条件已覆盖 outcome != success。
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
+          # 🔴 2026-09-10：GitHub Actions 的 bash 默认带 -e，探测链任意一环非零即中断整步
+          #    → need_fallback 永远写不进 OUTPUT → 兜底落空。探测全程关 errexit，
+          #    任何异常都转为"判定为需要兜底"，由兜底条件统一接住。
+          set +e
           REPO="ah-quant999/quant-scanner-v8"
           RESP=$(curl -sS -o /tmp/check.json -w "%{http_code}" \
             -H "Authorization: token $GH_TOKEN" \
@@ -140,7 +149,9 @@ jobs:
           # 🔴 2026-09-10 修正：原硬编码 python3。小九 cn runner 是 Windows + Git Bash，
           #    实测同机其他 yml（v8_cn_fetch_cloud_selfhosted.yml / v8_lhb_fetch.yml
           #    / v8_stock_quote_refresh.yml）一律用 `python`。统一用自动探测。
-          PY_CMD=$(command -v python3 || command -v python || echo python)
+          PY_CMD=$(command -v python3 2>/dev/null || command -v python 2>/dev/null || echo python)
+          echo "使用解释器: $PY_CMD"
+          $PY_CMD --version 2>&1 | head -1
           STATUS=$($PY_CMD -c "
           import json, datetime
           try:
@@ -161,7 +172,7 @@ jobs:
                   break
           else:
               print('NONE_FOUND|')
-          ")
+          " 2>/tmp/py_err.txt || echo "PY_FAIL|$(head -c 80 /tmp/py_err.txt 2>/dev/null)")
           IFS='|' read -r s c <<<"$STATUS"
           echo "云端最近 run: status=[$s] conclusion=[$c]"
           echo "status=$s" >> "$GITHUB_OUTPUT"
@@ -176,12 +187,12 @@ jobs:
 
       - name: "🛡️ 小九 cn IP 兜底（云端 dispatch 失败 或 云端跑失败 时均触发）"
         id: fallback_cn
-        # 🔴 2026-09-10 修正：原条件只写 if: steps.check_cloud.outputs.need_fallback == 'true'
-        #    致命漏洞——当 dispatch_cloud 自身失败时 ok != 'true'，sleep/check 两步都被跳过，
-        #    need_fallback 从未被赋值 → 空字符串 != 'true' → cn 兜底永远不触发，
-        #    恰好是"整条云端链挂掉"最需要兜底的场景。
-        #    新条件显式覆盖两种情形：①云端 dispatch 失败 ②dispatch 成功但云端跑失败/超时/无 run
-        if: steps.dispatch_cloud.outputs.ok != 'true' || steps.check_cloud.outputs.need_fallback == 'true'
+        # 🔴 2026-09-10 二修（Bug ② + ⑤ 完备条件）：
+        #    ② 原只写 need_fallback == 'true' → 云端 dispatch 失败时该变量从未赋值 → 兜底永不触发。
+        #    ⑤ check 探测自身 failure 时同样从未赋值 → 兜底再次落空。
+        #    现以 outcome 为准做完备覆盖：只要「dispatch 没成功」或「没探测成功」或「探测说要兜底」，
+        #    一律兜底。宁可多跑一次 cn 兜底，也不能因为探测链路问题丢掉整档数据。
+        if: steps.dispatch_cloud.outputs.ok != 'true' || steps.check_cloud.outcome != 'success' || steps.check_cloud.outputs.need_fallback == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
