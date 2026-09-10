@@ -1,4 +1,9 @@
-# 九宝量化 v8.0 — 盘后算法链（云端 ubuntu-latest）
+# 九宝量化 v8.0 — 盘后算法链（A 采集 → B 选股 → D 汇总 → E 回测 · 批次由闸门判定）
+#
+# 🔴 2026-09-10 阿狸咪更正（前端「盘前/盘中/盘后 权威划分表」逐条核对）：
+#   本链**现已跑在 [self-hosted, cn]**（小九 / 阿狸咪两台 cn 机谁空谁接），**不是** ubuntu-latest。
+#   文件名与历史注释里的「云端」是 2026-08 沿革名（当时确实跑 ubuntu-latest），
+#   请勿据此判断执行机——以 jobs.<job>.runs-on 为准。
 #
 # 2026-08-05 23:45 创建：cn 自托管 runner 连续 2 天盘后算法链失败——
 #   run#16/#17（08-05 18:30/20:00）双双挂在「经 GitHub API 同步源码」步骤，
@@ -96,7 +101,7 @@ jobs:
     #   仅 IP 敏感 workflow 用 cn label；lemoncat/alimi 双机互为兜底，避免美国 IP 反爬导致数据失真体检失败。
     #   （历史：2026-08-20 曾改为 ubuntu-latest 防 cn runner 离线；现双机 runner 自启+看门狗兜底，
     #    中国 IP 稳定性已恢复，且境外 runner 偶发 safe-delete/反爬/secondary rate limit 问题更不可控。）
-    runs-on: [self-hosted, cn]  # 2026-09-09 一劳永逸: 固定到 lemoncat-cn(专属 label)。根因: alimi-cn 家里机 runner PATH 缺 bash/git, step4 解析数据日期报 bash: command not found, 云端链 1613-1618 六连败(日志实证)。恢复双跑条件: 家里机装 Git for Windows 且 runner 服务 PATH 可见 bash 后, 移除本 label。
+    runs-on: [self-hosted, cn]  # 2026-09-10 更正：这里用的是【共享标签 cn】——任何注册了 self-hosted+cn 的 runner 都会接单 = 双机谁空谁跑（与前端「盘前/盘中/盘后 权威划分表」同口径）。09-09 旧注释所称「固定到 lemoncat-cn 专属 label」与代码不符（代码里从未出现该 label）；且其成因——家里机缺 bash/git——已于 2026-09-09 08:20 消除（Git 2.55 装到 E:\Git，runner 进程内 git / bash 实测均可见，当日 lhb / stock_quote / selfhosted 链全部 success）。
     # 🔴 2026-08-21 22:00 根因修复（主人令「一劳永逸」）：120 分钟不够。
     #   实测对比：15:30 派发那轮因未到 18:00，run_algorithms 把 20+ 个选股脚本全跳过，
     #   step「运行盘后算法链」只用 45-49 分钟；而 18:00 后那轮选股脚本全放行

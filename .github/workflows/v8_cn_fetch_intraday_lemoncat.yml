@@ -1,4 +1,10 @@
-# 九宝量化 v8.0 — 盘中准点档调度器（小九 self-hosted cn 主力）
+# 九宝量化 v8.0 — 盘中准点档调度器（14 档 · 跑 GitHub ubuntu-latest）
+#
+# 🔴 2026-09-10 阿狸咪更正：本调度器**已不再跑在 [self-hosted, cn]**，改 GitHub 托管 ubuntu-latest。
+#   根因：共享标签 [self-hosted, cn] 会让 14 档落到家里机（违反双机分时），且机器忙/离线时档位
+#   排队积压、错时执行（实测 09-10 的 15:29 / 16:23 / 17:22 / 18:01 / 19:03 / 19:29 / 19:45 / 20:04
+#   这 8 个 schedule run 全部晚于 15:05，被守卫判「迟到档」丢弃）。本 job 零产物、纯调度，
+#   不需要中国 IP → 用 GitHub 托管更稳。
 #
 # 🔴 2026-09-09 主人令「盘中 20 分钟单源闭环（升级版·接力赛模型）」：
 #   根因：原盘中由 WorkBuddy 自动化「云端按铃」(1787141452867) 每 20 分 dispatch 易导致
@@ -134,6 +140,9 @@ jobs:
               if [ -z "$AGE" ] || [ "$AGE" -lt 30 ]; then
                 GO=false; WHY="云端在途（run#$INFLIGHT_ID，龄 ${AGE}min）→ 本档跳过，绝不制造第二个 pending"
               else
+                # 🔴 2026-09-10 阿狸咪修 bug：原注释写「本档不派发」但代码没置 GO=false → 实际仍会派发，
+                #    与注释矛盾，且是「同一档叠第二个 pending」的隐患。补齐守卫，与注释/设计一致。
+                GO=false; WHY="云端疑似卡死（run#$INFLIGHT_ID 已 ${AGE}min 未完成）→ 本档不派发，交 v8_cn_fetch_watchdog(>45min) 兜底"
                 echo "::warning title=云端疑似卡死::run#$INFLIGHT_ID 已 ${AGE}min 未完成，本档不派发，交由 v8_cn_fetch_watchdog(>45min) 兜底"
               fi
             else
