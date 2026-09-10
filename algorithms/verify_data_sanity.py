@@ -5,9 +5,20 @@ verify_data_sanity.py — v8 数据失真快速体检（只读，绝不改数据
 
 背景（2026-09-08 主人拍板）: 夜间审计 freshness_status.json 只查「有没有/新不新」，
 不查「对不对」。三类最伤人的失真此处机器把关：
-  ① 旧数据包装成新  → update_time 对账（陈旧软告警/超限硬失败）
-  ② 数值越界        → price=0 / 涨跌幅超界 / PE 越界（词边界精确匹配，防 open_interest 误判）
-  ③ 整表清空/截断    → 列表为空（豁免表除外）
+分类：旧数据包装成新 / 数值越界 / 整表清空
+  ① update_time 对账
+       >2 天软告警；>7 天硬失败
+       🛡 2026-09-10 一劳永逸：>7 天新增「全站共享停更」豁免 ——
+          以全站最新 update_time 为基准，本 VAR 落后 ≤3 天说明是全站一起停（长假/离线），
+          降软告警；落后 >3 天才硬失败（真正独自断更）。详见 SHARED_STALE_GRACE_DAYS 注释。
+  ② 数值越界
+       price=0               → 软告警（2026-09-08 已降，属完整性缺口非数据失真）
+       当日涨跌幅 ±44% / PE     → 软告警（2026-09-10 主人拍板「数值越界降 warn 不阻断」）
+       （词边界精确匹配，防 open_interest 等字段误判）
+  ③ 整表清空/截断 → 列表为空（豁免表除外）→ 硬失败（结构性）
+
+🔴 硬失败仅保留 3 类「结构性错误」（其余全部降软告警、不阻断部署）：
+     ① JSON 解析失败  ② 整表无记录  ③ 独自断更 >7 天且落后全站 >3 天
 
 退出码: 0=通过(可有软告警) 1=存在硬失败
 用法: python verify_data_sanity.py [--no-baseline] [--data-dir PATH]
@@ -67,6 +78,19 @@ FIELD_CONTEXT_OK = {
 }
 # update_time 陈旧阈值（天）：>2 软告警，>7 硬失败（豁免表除外）
 STALE_WARN_DAYS, STALE_FAIL_DAYS = 2, 7
+
+# 🛡 2026-09-10 一劳永逸（主人令「这个指标有效吗？有用的希望一劳永逸式修复」）：
+#   「陈旧 >7 天」硬失败保留（灾难兜底不弃守），但新增「全站共享停更」宽容差，解决节假日误伤。
+#   核心洞察：区分两种情况 ——
+#     (a) 整个站都陈旧（春节/国庆长假、家里机离线一周、双机同时断电）→ 不是某个 VAR 的错
+#     (b) 别人都新、就它落后 → 才是真断了的数据
+#   判定口径：以「全站所有 VAR 里最新的 update_time」为基准 site_latest，
+#     本 VAR 落后全站 lag = (site_latest - 本VAR) 天。
+#     lag <= SHARED_STALE_GRACE → 属情况(a)，假期/离线窗口统一豁免硬失败，降为软告警；
+#     lag >  SHARED_STALE_GRACE → 属情况(b)，硬失败。
+#   好处：无需引入交易日历/网络依赖（脚本保持纯标准库、只读、可在 CI 离线跑），
+#         且长假里某个 VAR 单独坏掉依然抓得住（lag 仍然超标）。
+SHARED_STALE_GRACE_DAYS = 3.0
 
 HARD, SOFT = "硬失败", "软告警"
 issues = []  # (level, var, msg)
@@ -170,20 +194,22 @@ def check_value(var, key, val):
     #    → 降级为软告警(仍可见，但不阻断部署)。
     if kl == "price" and f == 0:
         return (SOFT, f"price=0 (现价缺失,仅告警不阻断)")
-    # ② 当日涨跌幅越界
+    # ② 当日涨跌幅越界 —— 2026-09-10 主人拍板「结构性错误硬阻断 + 数值越界降 warn 不阻断」
+    #    数值本身可疑 ≠ 结构损坏：应由邮件/日志可见，不把整条 algo_cloud run 判红
+    #    （教训：成千上万条数值噪声会把整条 run 误标红，真红灯反而被淹没）。
     if kl in DAY_PCT_FIELDS and abs(f) > DAY_PCT_HARD:
-        return (HARD, f"{key}={f} 超当日涨跌幅物理边界±{DAY_PCT_HARD}%")
+        return (SOFT, f"{key}={f} 超当日涨跌幅物理边界±{DAY_PCT_HARD}%(数值越界,仅告警不阻断)")
     # ③ 预期收益类越界（软）
     if any(k in kl for k in EXPECT_PCT_KEYS) and "pct" in kl or ("yield" in kl or "gain" in kl):
         if abs(f) > EXPECT_PCT_SOFT:
             return (SOFT, f"{key}={f} 偏高(预期/期次收益类?请复核)")
-    # ④ PE 精确字段越界
+    # ④ PE 精确字段越界 —— 2026-09-10 主人拍板：同上，数值越界降 warn 不阻断
     if kl in PE_FIELDS and (f < PE_HARD_MIN or f > PE_HARD_MAX):
-        return (HARD, f"{key}={f} 市盈率越界({PE_HARD_MIN}~{PE_HARD_MAX})")
+        return (SOFT, f"{key}={f} 市盈率越界({PE_HARD_MIN}~{PE_HARD_MAX})(数值越界,仅告警不阻断)")
     return None
 
-def check_var(var, obj):
-    """单 VAR 全量体检"""
+def check_var(var, obj, site_latest=None):
+    """单 VAR 全量体检（site_latest = 全站最新 update_time，用于假期共享停更豁免判断）"""
     if var in SKIP_CONTENT:
         t = find_update_time(obj) if isinstance(obj, dict) else None
         if var == "STOCK_MOMENTUM_STATE" and t is None:
@@ -201,7 +227,19 @@ def check_var(var, obj):
         else:
             days = (now() - t).total_seconds() / 86400.0
             if days > STALE_FAIL_DAYS:
-                issues.append((HARD, var, f"update_time 陈旧 {days:.1f} 天({t:%Y-%m-%d %H:%M})"))
+                # 计算「本 VAR 落后全站多少天」（无基准则视为 0，保持原有严格行为）
+                lag = 0.0
+                if site_latest is not None:
+                    lag = (site_latest - t).total_seconds() / 86400.0
+                if lag > SHARED_STALE_GRACE_DAYS:
+                    issues.append((HARD, var,
+                        f"update_time 陈旧 {days:.1f} 天({t:%Y-%m-%d %H:%M})，"
+                        f"且比全站最新落后 {lag:.1f} 天(>{SHARED_STALE_GRACE_DAYS} 天)——本 VAR 独自落后，真断更"))
+                else:
+                    issues.append((SOFT, var,
+                        f"update_time 陈旧 {days:.1f} 天({t:%Y-%m-%d %H:%M})，"
+                        f"但落后全站仅 {lag:.1f} 天(≤{SHARED_STALE_GRACE_DAYS} 天)——"
+                        f"全站同步停更(假期/离线窗口)，豁免硬失败仅告警"))
             elif days > STALE_WARN_DAYS:
                 issues.append((SOFT, var, f"update_time 陈旧 {days:.1f} 天({t:%Y-%m-%d %H:%M})"))
 
@@ -233,13 +271,30 @@ def main():
 
     files = sorted(data_dir.glob("*.js"))
     print(f"[sanity] 扫描 {len(files)} 个 data/*.js  (只读,绝不改数据)")
+
+    # ── 第一遍：收集全部 VAR 及其 update_time，算出「全站最新基准」──
+    #    （2026-09-10 一劳永逸：为「全站共享停更豁免」提供基准，无需交易日历/网络）
+    scanned = []  # [(var, obj, t), ...]
+    now_t = now()
     for fp in files:
         var = fp.stem
         text = fp.read_text(encoding="utf-8", errors="replace")
         if "window." not in text:
             continue  # 非注入文件
         obj = extract_json(strip_js_comments(text))
-        check_var(var, obj)
+        t = find_update_time(obj) if isinstance(obj, dict) else None
+        if t is not None and t > now_t:
+            t = None  # 未来时间戳异常，丢弃，防污染基准
+        scanned.append((var, obj, t))
+
+    site_latest = max((t for _, _, t in scanned if t is not None), default=None)
+    if site_latest is not None:
+        print(f"[sanity] 全站最新基准 update_time = {site_latest:%Y-%m-%d %H:%M}"
+              f"（共享停更豁免阈值 {SHARED_STALE_GRACE_DAYS} 天）")
+
+    # ── 第二遍：正式体检 ──
+    for var, obj, _t in scanned:
+        check_var(var, obj, site_latest)
 
     hard = [x for x in issues if x[0] == HARD]
     soft = [x for x in issues if x[0] == SOFT]
