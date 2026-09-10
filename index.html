@@ -6395,7 +6395,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <table><thead><tr><th>任务</th><th>周期</th><th>状态</th><th>说明</th></tr></thead><tbody>
         <tr><td>v8_cn_fetch_cloud</td><td>工作日 cron</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>中国数据抓取主链 · push raw_data → 自动触发 build_deploy</td></tr>
         <tr><td>v8_cn_fetch_intraday_lemoncat</td><td>工作日 14 档(9:40-15:00)</td><td><span class="status-dot s-ok"></span>小九 self-hosted cn</td><td>盘中准点档调度器（接力赛模型）：每档 dispatch 云端 → sleep 10min → 查状态 → 失败则小九 cn IP 兜底；同 group v8-cn-fetch-cloud 互斥排队</td></tr>
-        <!-- ✅ 2026-08-29 一劳永逸：下列 3 个自愈器已于 commit 1fe4f8c71 删除（.github/workflows/ 下已不存在），
+        <tr><td>v8_intraday_snapshot</td><td>盘中每 10 分(9:00-15:50)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>板块资金日内快照（独立高频·根治上午空白）：写 SECTOR_FUND_FLOW_INTRADAY，ubuntu-latest 云端，独立 group v8-intraday-snapshot；2026-09-10 补登记（此前漏登记致 Pre-deploy audit 阻断部署）</td></tr>        <!-- ✅ 2026-08-29 一劳永逸：下列 3 个自愈器已于 commit 1fe4f8c71 删除（.github/workflows/ 下已不存在），
              原表仍标绿点 ACTIVE 属误导；改为灰色「已下线」，保留行以存历史 -->
         <tr><td>v8_algo_cloud</td><td>19:15/20:00+兜底</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产（选股四模块+回测）</td></tr>
         <tr><td>v8_backup</td><td>每日23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data / 交接文档（含 v6 备份保留策略：v8 稳定一周前不删）</td></tr>
