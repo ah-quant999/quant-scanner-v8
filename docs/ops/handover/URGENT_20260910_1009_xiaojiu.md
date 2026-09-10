@@ -119,12 +119,34 @@
 
 ---
 
-## 四、待观察 C：🇨🇳 中国数据抓取(云端) 被取消（**原因未确证，别当结论用**）
+## 四、⚠️ 待小九查证 C：cn_fetch 反复「派发→被取消」（**已是第二次，非偶发**）
 
-- run 34425888151，`workflow_dispatch`，09:32 CST 起跑，**09:48 CST 在 `💰 分红方案刷新（cninfo·云端主跑）` 步骤被 cancelled**，后续 18 个步骤全 skipped。
-- 已排除：① 不是超时（16min < job timeout 60min）② 不是同组顶掉（`v8-cn-fetch-cloud` 的 `cancel-in-progress: false`，2026-08-24 起）。
-- **未确证**：怀疑是人工取消（该时段有「小九应急」run 在跑），但**没有日志证据，不打包票**。
-- 建议小九查证命令：`gh api repos/ah-quant999/quant-scanner-v8/actions/runs/34425888151` 看 `event` / `actor`，或看 Actions 页面操作记录。
+### 实测事实（已查证，非推测）
+| run | workflow | 起跑 | 取消时刻 | 取消点 |
+|---|---|---|---|---|
+| 34425888151 | 🇨🇳 v8 中国数据抓取(云端) | 09:32 | 09:48（跑 16min） | `💰 分红方案刷新（cninfo·云端主跑）` |
+| 34427338732 | 🇨🇳 v8 中国数据抓取(云端·小九应急) | 09:54 | 09:58（跑 4min） | `📡 抓中国数据 → raw_data/（selective）` |
+
+两次均为 `event=workflow_dispatch`、`actor=ah-quant999`、`run_attempt=1`。**10:10 复跑巡检时，第三个 cn_fetch 又处于 in_progress。**
+
+### 已排除
+- ❌ 不是超时（16min / 4min 都远小于 job `timeout-minutes: 60`）
+- ❌ 不是同组互顶（`v8-cn-fetch-cloud` 的 `cancel-in-progress: false`，2026-08-24 起）
+- ❌ 不是踩踏风暴（活跃并发始终 ≤2，API 配额 5000/5000 未被限流）
+
+### 模式判断（**这是推测，未拿到日志证据**）
+时间线呈「**派发 → 跑几分钟 → 被外部取消 → 再派发**」的循环。cancel 只能来自账号 `ah-quant999` 的 UI/CLI 操作或某条自动化调 `gh run cancel`。
+**请小九优先排查**：WorkBuddy 自动化「v8 看门狗驱动(每15分)」(id `2d9121c8`) 是否存在高频派发 —— 远端 watchdog 改成 dispatch-only 后，若驱动频率过高且 watchdog 的 `cloud_state()` 拥堵判断未拦住，就会形成**新的踩踏源**（这正是 2026-09-09 改造想避免、但换了个入口复发）。
+
+### 查证命令
+```bash
+gh api repos/ah-quant999/quant-scanner-v8/actions/runs/34425888151 --jq '{event,actor:.actor.login,status,conclusion}'
+gh api repos/ah-quant999/quant-scanner-v8/actions/runs/34427338732 --jq '{event,actor:.actor.login,status,conclusion}'
+# 看 cn_fetch 近 2h 全部派发，判断频率
+gh api "repos/ah-quant999/quant-scanner-v8/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=20" --jq '.workflow_runs[]|"\(.created_at) \(.status) \(.conclusion) \(.actor.login)"'
+```
+
+> 🔴 **不要靠「再派一次」解决** —— 前两次都是这么没的。先定位谁在取消。
 
 ---
 
@@ -149,7 +171,7 @@
 | # | 事项 | 状态 |
 |---|---|---|
 | 1 | 执行第三节的 `v8_algo_intraday_lite.yml` 补丁（需 workflow scope 凭据 / 本地 git push） | ⬜ 待小九 |
-| 2 | 查证第四节 cn_fetch 被取消的真因 | ⬜ 待小九 |
+| 2 | **查证第四节 cn_fetch 反复「派发→取消」的元凶**（别再派第三次） | ⬜ 待小九·优先 |
 | 3 | 确认今日 16:00 后盘后链正常跑，INDEX_QUOTES 等追平 | ⬜ 待观察 |
 | 4 | **本地 `v8_cn_fetch_watchdog.yml` 是坚果云回退的旧版**，下次改这文件前先 `git fetch origin main` 对齐 | 📌 记住 |
 
