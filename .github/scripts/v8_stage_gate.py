@@ -274,6 +274,33 @@ def chain_day(ref: dt.date, lookback: int = 0):
     return None, "none", "非交易日（休市，无 T+1 需求）"
 
 
+def _backfill_candidate(root: str, ref: dt.date):
+    """上一数据日仍有未完成批次时返回 (day, kind, note, ready)，否则 None。
+
+    🛡 2026-09-11 一劳永逸（闸门死区根治）：
+      原设计只在「本数据日的链起点」之后才跑批，工作日 09:00~15:59 遂成死区 ——
+      若上一数据日的链中途失败没跑完，这段时段**任何补跑都被判 NONE**。
+      实测 run#1692：B 批 06:43 才跑完（链耗时 84min，跨出了夜间补跑窗口），
+      06:01 派发的那一轮闸门 06:51 判「未到本日 16:00 → NONE」→ 整链空转，
+      84 分钟成果无人接力，TOP10_DAILY / FINAL_RECOMMEND_DATA / V8_POOL_TRACKER /
+      BACKTEST_COMPREHENSIVE 四个模块停更一整天。
+      判据严格限定为「上一数据日**确有**未完成批次」，正常日不受任何影响。
+    """
+    prev = ref - dt.timedelta(days=1)
+    pday, pkind, pnote = chain_day(prev, lookback=2)
+    if pkind == "none" or pday is None:
+        return None
+    pfloor = FLOOR_TRADING if pkind == "trading" else FLOOR_T1
+    pday_s = pday.strftime("%Y-%m-%d")
+    pready = {s: check_ready(root, s, pday_s, pfloor, pkind) for s in READY_SPEC}
+    if all(pready[s][0] for s in ("A", "B", "D", "E")):
+        return None
+    missing = "/".join(s for s in ("A", "B", "D", "E") if not pready[s][0])
+    return (pday, pkind,
+            f"{pnote}·上一数据日链未完成({missing})→补跑（本数据日链未到起点）",
+            pready)
+
+
 def decide(root: str, now: dt.datetime, explicit: str, force: bool):
     hh, mm = now.hour, now.minute
     ref = now.date()
@@ -313,9 +340,15 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool):
     eff = (hh + 24, mm) if hh < _NIGHT_CUT else (hh, mm)
     start = START_TRADING if kind == "trading" else START_T1
     if not force and eff < start:
-        return ("NONE", True,
-                f"⏸ 未到{note}盘后链起点（{start[0]:02d}:{start[1]:02d}，现 {hh:02d}:{mm:02d}）→ 空转（合规）",
-                day, kind, out())
+        # 🛡 2026-09-11 一劳永逸（死区根治）：本数据日的链还没到起点，但**上一数据日**
+        #   可能中途失败没跑完 —— 此时唯一正解是补跑上一数据日（见 _backfill_candidate）。
+        _bf = _backfill_candidate(root, ref)
+        if _bf is None:
+            return ("NONE", True,
+                    f"⏸ 未到{note}盘后链起点（{start[0]:02d}:{start[1]:02d}，现 {hh:02d}:{mm:02d}）"
+                    f"，且上一数据日已无未完成批次 → 空转（合规）",
+                    day, kind, out())
+        day, kind, note, ready = _bf
 
     # ── 3) 自愈：缺什么跑什么（纯内容级 · 一环套一环）────────────────────────
     if not ready["A"][0]:

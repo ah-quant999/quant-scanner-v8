@@ -417,6 +417,13 @@ jobs:
       - name: "🧮 运行盘后算法链（写入 raw_data/，推送由链尾统一执行）"
         id: algo
         if: steps.gate.outputs.proceed == 'true'
+        # 🛡 2026-09-11 一劳永逸：本步只在闸门放行(proceed=true)时才执行 —— 把「闸门已授权」
+        #   显式告知链内脚本，使其不再用「现在几点」二次否决。
+        #   真凶实证 run#1692：闸门 05:16 判 B（放行），而选股脚本 06:36 按钟点自行 exit 1
+        #   → generate_top10 / strategy_four_volume(_60m) / gen_triple_consensus / calc_crds
+        #   全灭 → B 批永不满 3/3 → target_stage 恒为 B → D/E 永不执行。
+        env:
+          V8_GATE_AUTHORIZED: "1"
         # 🔴 2026-08-30 23:3x 抬高步级墙钟 90 → 150（实测 run 33316835316 坐实）：
         #   周末 force_run 全量补算时，本步跑到 70 分钟仍未完成，距 90 分钟限时仅剩
         #   20 分钟——一旦超时被硬杀，后续 bridge / ALGO_TRACK / 兜底推送 / **产物完整性
