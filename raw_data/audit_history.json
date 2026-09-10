@@ -1392,5 +1392,100 @@
     "message": "未找到元素"
    }
   ]
+ },
+ {
+  "date": "2026-09-10",
+  "time": "17:47:52",
+  "overall": "fail",
+  "summary": {
+   "ok": 110,
+   "warn": 11,
+   "fail": 5,
+   "total": 126
+  },
+  "warn_items": [
+   {
+    "id": "FACTOR_LAB",
+    "name": "因子实验室",
+    "message": "本机baostock被风控黑名单(err=10001011匿名用户)，无替代数据源，需小九中国IP+浏览器UA在线刷全市场3200只财务+ROE+异常换手。本机无法产出，保留旧数据待小九。"
+   },
+   {
+    "id": "RPS_BACKTEST",
+    "name": "RPS A档回测",
+    "message": "需 baostock 拉前复权K线计算 T+1/T+20 持有期收益。本机 baostock 被风控黑名单(err=10001011匿名用户)，无凭据。阿狸咪走 v8/backtest_rps_offline.py 离线半残版（kline_"
+   },
+   {
+    "id": "local_sync",
+    "name": "本地与 origin/main 同步",
+    "message": "git fetch origin 失败（网络/认证）：TimeoutExpired，跳过同步检查"
+   },
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "dom_phMacroBody",
+    "name": "DOM #phMacroBody",
+    "message": "未找到元素"
+   },
+   {
+    "id": "all_ALGO_TRACK",
+    "name": "ALGO_TRACK",
+    "message": "ALGO_TRACK.js 更新于 昨日 01:30；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_STOCK_RPS_DATA",
+    "name": "STOCK_RPS_DATA",
+    "message": "STOCK_RPS_DATA.js 更新于 昨日 01:23；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_TRIPLE_HISTORY",
+    "name": "TRIPLE_HISTORY",
+    "message": "TRIPLE_HISTORY.js 更新于 昨日 01:27；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_VOLATILITY",
+    "name": "VOLATILITY",
+    "message": "VOLATILITY.js 更新于 昨日 01:28；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
