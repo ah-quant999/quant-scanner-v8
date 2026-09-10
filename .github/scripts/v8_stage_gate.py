@@ -48,6 +48,10 @@
 
 ■ 输出（stdout key=value，供 $GITHUB_OUTPUT 消费）
   target_stage=A|B|D|E|ALL|NONE
+
+■ 跨批顺序（2026-09-10 加严，实测两缺陷后修）
+  下游最新产物 必须 ≥ 上游基准产物（SEQ_REF），否则判未就绪 → 重算。
+  产物时间戳含「凌晨 00:00-05:59 归前一自然日 24:xx」的候选解释（防凌晨死循环）。
   stage_ok=true|false
   proceed=true|false            ← 后续步骤只看这一个值
   chain_day=YYYY-MM-DD|none      chain_kind=trading|t1|none
@@ -140,6 +144,42 @@ def read_ut(root: str, rel: str):
     return None
 
 
+def _cand(r):
+    """把 (day, hh, mm) 展开成候选解释：原样 +（若 hh<6）归前一自然日的 24:xx。
+
+    🔴 2026-09-10 实测缺陷修复：夜间补跑窗口（00:00-05:59）写出的产物戳是「当天」，
+    但该档判定的数据日是「前一自然日」→ 只认原样会永不匹配 → 00:30-05:59 每档重跑该批
+    （死循环，实测已复现）。两种解释都接受即根治。
+    """
+    out = [(r[0], r[1], r[2])]
+    if r[1] < 6:
+        d = dt.date.fromisoformat(r[0]) - dt.timedelta(days=1)
+        out.append((d.strftime("%Y-%m-%d"), r[1] + 24, r[2]))
+    return out
+
+
+def _newest(root: str, items):
+    """取这些产物里「最新」的时间戳（含凌晨候选解释），无则 None。"""
+    best = None
+    for it in items:
+        r = read_ut(root, it)
+        if not r:
+            continue
+        for c in _cand(r):
+            if best is None or c > best:
+                best = c
+    return best
+
+
+# 🔴 跨批顺序判据（一环套一环的硬约束）：下游最新产物必须 ≥ 上游基准产物。
+#   基准只挑「单一来源、写一次就固定」的产物，避免被后续抓取链刷新导致反复重算。
+SEQ_REF: dict[str, str] = {
+    "B": "data/LHB_DATA.js",             # A 批核心标志（17:30 落盘后不再变）
+    "D": "data/TRIPLE_CONSENSUS.js",     # B 批代表产物
+    "E": "data/FINAL_RECOMMEND_DATA.js", # D 批产物
+}
+
+
 def check_ready(root: str, stage: str, day: str, floor: tuple[int, int], kind: str = "trading"):
     """返回 (是否就绪, '命中/总数', 明细)。
 
@@ -155,7 +195,7 @@ def check_ready(root: str, stage: str, day: str, floor: tuple[int, int], kind: s
     hit, must_ok, parts = 0, True, []
     for it in spec["items"]:
         r = read_ut(root, it)
-        ok = bool(r and r[0] == day and (r[1], r[2]) >= floor)
+        ok = bool(r and any(c[0] == day and (c[1], c[2]) >= floor for c in _cand(r)))
         if ok:
             hit += 1
             parts.append(f"{os.path.basename(it)}=OK({r[0]} {r[1]:02d}:{r[2]:02d})")
@@ -165,7 +205,20 @@ def check_ready(root: str, stage: str, day: str, floor: tuple[int, int], kind: s
             parts.append(f"{os.path.basename(it)}=MISS")
         if it in must and not ok:
             must_ok = False
-    return (must_ok and hit >= need), f"{hit}/{len(spec['items'])}", " ".join(parts)
+
+    ready = must_ok and hit >= need
+    # 🔴 跨批顺序闸门：下游算完但上游之后又被刷新过 → 判未就绪，必须重算（防「拿旧上游算下游」）
+    if ready and stage in SEQ_REF:
+        up = read_ut(root, SEQ_REF[stage])
+        mine = _newest(root, spec["items"])
+        if up and mine:
+            up_best = max(_cand(up))
+            if mine < up_best:
+                parts.append(
+                    "\u26d4\u4e0b\u6e38\u65e9\u4e8e\u4e0a\u6e38(%s=%s %02d:%02d)\u2192\u9700\u91cd\u7b97"
+                    % (os.path.basename(SEQ_REF[stage]), up_best[0], up_best[1], up_best[2]))
+                ready = False
+    return ready, f"{hit}/{len(spec['items'])}", " ".join(parts)
 
 
 # ── 交易日历：今天该跑哪个「数据日」 ─────────────────────────────────────────
