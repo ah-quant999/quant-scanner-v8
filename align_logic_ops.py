@@ -44,6 +44,11 @@ MUST_HAVE_CRON = {
     "runner_health_alert": "Runner健康监控",
     "v8_t1_guard": "周六 T+1 兜底",
     "v8_weekend_light": "周末轻量维护(周六/日)",
+    # 🛡 2026-09-10 阿狸咪补登记：板块资金日内快照（独立高频·根治上午空白）
+    #   cron = */10 1-7 * * 1-5（UTC 01:00-07:50 ≈ CST 09:00-15:50 盘中，每 10 分钟）
+    #   此前既未登记两名单、也未在 index.html 运维页文档化 → align_logic_ops EXIT 2
+    #   → Pre-deploy audit 第4项失败 → v8_build_deploy 全链阻断（数据推了不部署）
+    "v8_intraday_snapshot": "板块资金日内快照(盘中每10分钟)",
     # 🛡 2026-09-10 移出：v8_cn_fetch_intraday_lemoncat 是「小九 self-hosted cn 主力·盘中14档」调度器，
     # 设计上就是 dispatch-only（由小九准点档/云端按铃按档派发），GHA cron 已刻意删除（防双源互踢）。
     # 原放在 MUST_HAVE_CRON 会恒定报「期望有 cron 但实际无 cron」→ Pre-deploy audit 阻断 → CI 不重建 data
