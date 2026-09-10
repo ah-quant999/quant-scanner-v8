@@ -62,6 +62,13 @@ def markets_required(markets):
 # 🔴 2026-08-20 主人令·一劳永逸：所有选股策略统一守门
 STOCK_PICKING_READY = (18, 0)  # CST 18:00
 
+# 🛡 2026-09-11 一劳永逸：夜间补跑窗口上界（CST）。原为 6，实测过窄 ——
+#   算法链耗时 84+ 分钟，05:16 起跑的链在 06:36 才轮到选股脚本，此时窗口已关闭
+#   → 4 脚本 exit 1（run#1692 实锤）→ B 批残缺 → D/E 永不执行。放宽到 9（开盘前）。
+#   与 algorithms/run_algorithms.py::_NEXT_DAY_CUTOFF_HOUR、
+#   .github/scripts/v8_stage_gate.py::_NIGHT_CUT 三处同源对齐。
+_NIGHT_CUT_HOUR = 9
+
 
 def check_stock_picking_ready(by='unknown'):
     """盘后选股策略统一门控：必须 ≥ 18:00 CST。
@@ -84,7 +91,7 @@ def check_stock_picking_ready(by='unknown'):
     # 整批选股脚本被误跳过的教训）。链跨午夜时（00:00~05:59）上一交易日盘后数据
     # 早已齐全，必须放行，否则 gen_triple_consensus / strategy_four_volume /
     # final_recommend 全部退出码 1 → 三重共识/最终推荐/四量停更。
-    if 0 <= now.hour < 6:
+    if 0 <= now.hour < _NIGHT_CUT_HOUR:
         logging.info(f'[time_gate] 凌晨补跑窗口放行（{now:%H:%M} CST，上一交易日盘后数据已齐）')
         return
     hh, mm = STOCK_PICKING_READY
@@ -139,12 +146,16 @@ def check(markets, by='unknown'):
         # A股/港股/LHB 周末无数据：跳过（不是时间门问题）
         logging.info(f'[time_gate] 周末，跳过 {markets} 守门')
         return
+    # 🛡 2026-09-11 一劳永逸：夜间补跑窗口按 24:xx+ 计有效时刻。
+    #   原实现直接用 now.hour 比较 → 06:36 判「A股 15:30 未到」而拒绝，
+    #   但此刻跑的其实是**上一交易日**的盘后链，数据早已齐全（与链级口径不一致）。
+    eff_min = (now.hour + 24 if now.hour < _NIGHT_CUT_HOUR else now.hour) * 60 + now.minute
     for m in markets:
         if m not in MARKET_READY:
             logging.warning(f'[time_gate] 未知市场 {m}，跳过')
             continue
         hh, mm = MARKET_READY[m]
-        ready = now.hour * 60 + now.minute >= hh * 60 + mm
+        ready = eff_min >= hh * 60 + mm
         if not ready:
             print(f'\n🚫 [time_gate] {MARKET_LABEL[m]} 数据未就绪（需 ≥ {hh:02d}:{mm:02d} CST，当前 {now:%H:%M}）', file=sys.stderr)
             print(f'   触发方: {by}', file=sys.stderr)

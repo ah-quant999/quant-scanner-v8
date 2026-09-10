@@ -16,7 +16,7 @@
        交易日            → 数据日=今天，盘后产出须 >= 16:30
        周六 / 假期首日    → T+1 数据日，当日 08:00 后即可
        周日 / 假期中末段  → NONE（休市，无 T+1）
-       凌晨(00:00-05:59) → 归前一自然日（夜间补跑窗口，允许继续跑未完的批）
+       凌晨(00:00-08:59) → 归前一自然日（夜间补跑窗口，允许继续跑未完的批）
   2) 再「缺什么跑什么」（**纯内容级**，不吃 git checkout 的 mtime）：
        A 未就绪            → A
        A 就绪 且 B 未就绪   → B
@@ -119,6 +119,16 @@ START_T1 = (8, 0)
 FLOOR_TRADING = (16, 30)
 FLOOR_T1 = (8, 0)
 
+# 🛡 2026-09-11 一劳永逸（run#1692 / run#34535287523 双实证）：夜间补跑窗口上界。
+#   原为 6（00:00-05:59）。缺陷：算法链实测耗时 84+ 分钟，凡 05:00 后起跑的夜间补跑
+#   必然在跑到一半时跨出窗口 —— run#1692 于 05:16 起跑，B 批 06:43 才跑完，而 06:01
+#   派发的那一轮闸门在 06:51 判定「未到本日 16:00 起点 → NONE」→ 整链空转，
+#   B 批 84 分钟成果无人接力，TOP10_DAILY/FINAL_RECOMMEND_DATA 整日停更。
+#   修法：窗口放宽到 08:59（开盘前），使「本日链未到起点」的时段仍能补跑上一数据日。
+#   与 algorithms/run_algorithms.py::_NEXT_DAY_CUTOFF_HOUR、algorithms/utils/time_gate.py::
+#   _NIGHT_CUT_HOUR 三处同源对齐 —— 两套口径必然漂移（历史教训）。
+_NIGHT_CUT = 9
+
 _UT_RE = re.compile(r'"update_time"\s*:\s*"(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})')
 _DT_ONLY_RE = re.compile(r'"update_time"\s*:\s*"(\d{4})-(\d{2})-(\d{2})')
 _DATE_RE = re.compile(r'"data_date"\s*:\s*"(\d{4})-(\d{2})-(\d{2})"')
@@ -147,12 +157,12 @@ def read_ut(root: str, rel: str):
 def _cand(r):
     """把 (day, hh, mm) 展开成候选解释：原样 +（若 hh<6）归前一自然日的 24:xx。
 
-    🔴 2026-09-10 实测缺陷修复：夜间补跑窗口（00:00-05:59）写出的产物戳是「当天」，
+    🔴 2026-09-10 实测缺陷修复：夜间补跑窗口（00:00-08:59）写出的产物戳是「当天」，
     但该档判定的数据日是「前一自然日」→ 只认原样会永不匹配 → 00:30-05:59 每档重跑该批
     （死循环，实测已复现）。两种解释都接受即根治。
     """
     out = [(r[0], r[1], r[2])]
-    if r[1] < 6:
+    if r[1] < _NIGHT_CUT:
         d = dt.date.fromisoformat(r[0]) - dt.timedelta(days=1)
         out.append((d.strftime("%Y-%m-%d"), r[1] + 24, r[2]))
     return out
@@ -267,7 +277,7 @@ def chain_day(ref: dt.date, lookback: int = 0):
 def decide(root: str, now: dt.datetime, explicit: str, force: bool):
     hh, mm = now.hour, now.minute
     ref = now.date()
-    if hh < 6:                      # 凌晨归前一自然日（夜间补跑窗口）
+    if hh < _NIGHT_CUT:             # 凌晨归前一自然日（夜间补跑窗口）
         ref -= dt.timedelta(days=1)
     day, kind, note = chain_day(ref, lookback=3 if force else 0)
 
@@ -298,9 +308,9 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool):
                 f"否则会用陈旧数据算出假新鲜产物", day, kind, out())
 
     # ── 2) 时间闸：盘后链起点（交易日 16:00 / T+1 日 08:00；--force 跳过）────
-    #   凌晨 00:00-05:59 属**前一数据日的夜间补跑窗口** → 有效时刻按 24:xx 计，
+    #   凌晨 00:00-08:59 属**前一数据日的夜间补跑窗口** → 有效时刻按 24:xx 计，
     #   否则 00:30 接力档会恒判「未到起点」→ B 若 22:30 后才跑完，D/E 永远补不上（漏档实锤）。
-    eff = (hh + 24, mm) if hh < 6 else (hh, mm)
+    eff = (hh + 24, mm) if hh < _NIGHT_CUT else (hh, mm)
     start = START_TRADING if kind == "trading" else START_T1
     if not force and eff < start:
         return ("NONE", True,

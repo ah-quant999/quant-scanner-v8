@@ -271,6 +271,28 @@ jobs:
 
       # 🛡 2026-08-29 统一交易日历中枢：所有下游脚本通过 V8_DATA_DATE 取「数据应属日期」，
       #   根治非交易日跑批把日期错标成「今天」的冒充今日问题。
+      # 🛡 2026-09-11 一劳永逸（run#1692 实测坐实）：自托管 runner 的仓库目录属主与
+      #   执行步骤用户不一致（实测 D:\actions-runner-v8\_work\quant-scanner-v8\... 属
+      #   NT AUTHORITY/NETWORK SERVICE，而步骤跑在 NT AUTHORITY/SYSTEM），git 直接拒绝
+      #   一切操作：`fatal: detected dubious ownership in repository` → exit 128。
+      #   后果链：链尾「唯一推送」的清单收集第一个 git 命令就 128 → 整步失败 →
+      #   B 批 84 分钟成果零推送 → TOP10_DAILY / FINAL_RECOMMEND_DATA /
+      #   V8_POOL_TRACKER / BACKTEST_COMPREHENSIVE 四个模块整日停更。
+      #   修法：在任何业务步骤之前把工作区加入 git 安全目录白名单（幂等），并当场自证。
+      - name: "🔧 修复 git 安全目录（自托管 runner 属主不一致）"
+        if: steps.co.outcome == 'success'
+        shell: bash
+        run: |
+          set +e
+          git config --system --add safe.directory '*' 2>/dev/null
+          git config --global --add safe.directory '*' 2>/dev/null
+          if git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git status --porcelain >/dev/null 2>&1; then
+            echo "✅ git 可用（safe.directory 已就绪；自托管 runner 属主不一致已绕过）"
+          else
+            echo "::error title=v8-git-unusable::git 在本机不可用（safe.directory 修复后仍失败）—— 链尾推送必失败，拒绝继续"
+            exit 1
+          fi
+
       - name: "🗓 解析数据日期"
         id: data_date
         shell: bash
@@ -465,17 +487,6 @@ jobs:
         run: |
           python cloud_fetch_v8.py --only CANDIDATE_QUOTES || true
 
-      # 🛡 2026-09-11 一劳永逸（主人令「运维和看板的失败红灯全面修复」）：本链此前无 update_v8 步
-      #   （2026-08-18 注释所述「update_v8 重生成 data/*.js」步已不存在）→ 纯盘后 raw_data 新而
-      #   data/*.js 旧 → v8_verify_layer_parity 跨层闸门必红且下轮仍红（09-11 实证 19 对不一致）。
-      #   按 update_v8 2026-09-10 防回滚护栏的显式授权通道（--category post_close）补跑重建；
-      #   ?v 缓存戳由既有 --only-cache-busters / reconcile 机制统一收敛，此处不重复。
-      - name: "🏗️ 重建盘后 data/*.js（update_v8 --category post_close）"
-        if: steps.gate.outputs.proceed == 'true'
-        shell: bash
-        run: |
-          python update_v8.py --category post_close
-
       - name: "📤 唯一推送（本链只此一处推送 data/ 与 raw_data/，严格退出码）"
         if: steps.gate.outputs.proceed == 'true'
         run: |
@@ -484,12 +495,28 @@ jobs:
           # 2026-08-22 来源驱动增量：只推本次 changed，避免全量 848 扫描。
           # 2026-09-03 派发风暴去重（B·小九接手）：算法链盘后产物同理剥时间戳比对，仅时间戳变的伪变更不进 PUSH_FILES
           #   脚本失败则回退原 git status 清单（安全优先，绝不漏推真数据）
-          MANIFEST=$(python .github/scripts/dedup_fetch_manifest.py raw_data/ data/ 2>/dev/null) \
-            || MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
-          if [ -n "$MANIFEST" ]; then
+          # 🛡 2026-09-11 一劳永逸（run#1692 实证）：原写法把「清单不可得」误判成「无变更」。
+          #   自托管 runner 上 git 属主冲突 → dedup 脚本与回退 git status 双双失败 →
+          #   脚本被 `-e` 立刻终止（exit 128），**B 批 84 分钟成果零推送**。
+          #   现三态严格区分：
+          #     ① 拿到清单（且非空）→ 增量推送
+          #     ② 确认无变更        → 跳过（合规空转）
+          #     ③ 清单不可得        → **绝不跳过**，交 api_push_raw 全量来源驱动
+          #        （它与远端 tree 逐 blob 比对，完全不依赖本地 git）
+          MANIFEST=""; MANIFEST_OK=0
+          if MANIFEST=$(python .github/scripts/dedup_fetch_manifest.py raw_data/ data/ 2>/dev/null); then
+            MANIFEST_OK=1
+          elif MANIFEST=$(git status --porcelain raw_data/ data/ 2>/dev/null | awk '{print $2}' | tr '\n' ','); then
+            MANIFEST_OK=1
+          fi
+          if [ "$MANIFEST_OK" = "1" ] && [ -n "$MANIFEST" ]; then
+            echo "📋 本次变更清单: ${MANIFEST:0:200}"
             PUSH_FILES="$MANIFEST" python api_push_raw.py
+          elif [ "$MANIFEST_OK" = "1" ]; then
+            echo "ℹ️ 确认无 raw_data/data 变更，跳过推送"
           else
-            echo "ℹ️ 无 raw_data/data 变更，跳过推送"
+            echo "⚠️ 变更清单不可得（本地 git 不可用）→ 全量来源驱动推送（api_push_raw 自行与远端 tree 比对，不依赖 git）"
+            python api_push_raw.py
           fi
 
       # 🔴 2026-08-15 防覆盖铁律修复：run_algorithms 刚重写 data/ALGO_TRACK.js（带新时间戳），

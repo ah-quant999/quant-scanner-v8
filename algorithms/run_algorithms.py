@@ -31,7 +31,10 @@ DEFAULT_SCRIPT_TIMEOUT = int(_os.environ.get("V8_ALGO_TIMEOUT", "1800"))
 # 计算量大 / 网络重活单独放宽（秒）。新增重活在此登记即可，无需改调度代码。
 SCRIPT_TIMEOUT_OVERRIDE = {
     "calc_stock_rps.py": 3600,   # 全 universe 逐只取 K 线，实测 30min 偶发不够
-    "calc_crds.py": 2700,        # 逆势龙头 CRDS，同样遍历较广
+    # 🛡 2026-09-11 一劳永逸：2700s(45min) 实测不足 —— run#1692 于 05:22 起跑、06:07 被
+    #   「超时 >45min」杀掉 → 无产物 → B 批 2/3 → target_stage 恒为 B → D/E 永不执行
+    #   （FINAL_RECOMMEND_DATA 停在昨日的结构性真凶）。放宽到 90min 留足余量。
+    "calc_crds.py": 5400,        # 逆势龙头 CRDS（全池遍历，实测需 >45min）
     "gen_stock_profile.py": 2700,
     "factor_lab_backtest.py": 1800,  # 🆕 700日长历史抓取+五分位分层回测（cn ~5min / 云端 ~15min）
     # 🛡 2026-09-07 一劳永逸：H 反推对「全市场涨幅≥3%」的数百只逐只取前 4 日均量。
@@ -396,7 +399,11 @@ BACKTEST_SCRIPTS = {
 # 18:00 = 所有盘后数据（龙虎榜/北向/板块资金/个股行情/机构调研等）稳定就绪时间
 _STOCK_PICKING_READY_HOUR, _STOCK_PICKING_READY_MIN = 18, 0
 # 次日凌晨补跑的截止时刻（CST）：过了这个点就属于新交易日的盘前，不再放行
-_NEXT_DAY_CUTOFF_HOUR = 6
+# 🛡 2026-09-11 一劳永逸：窗口上界 6 → 9，与 v8_stage_gate.py::_NIGHT_CUT 同源。
+#   原值 6 的实测缺陷：链 05:16 起跑 → 06:36 才轮到选股脚本 → picking_ready 早在上游
+#   判定为 True，但脚本级 time_gate 按「现在 06:36」二次否决 → generate_top10 /
+#   strategy_four_volume(_60m) / gen_triple_consensus / calc_crds 全 exit 1（run#1692 实锤）。
+_NEXT_DAY_CUTOFF_HOUR = 9
 
 
 def _is_post_close_picking_ready():
@@ -727,7 +734,10 @@ SILENCE_KILL_SEC = int(_os.environ.get("V8_ALGO_SILENCE", "900"))
 #   产物写不出 → FACTOR_LAB 永远刷不出来，链尾还计「失败 1」。
 #   现在双保险：① 脚本自带心跳（v8/factor_lab_gen.py 每 30s 一行）② 此处给静默预算兜底。
 SILENCE_OVERRIDE = {
-    "v8/factor_lab_gen.py": 3600,   # 冷启动 50-90min，给 1h 静默预算（总时长仍受 5400s 超时约束）
+    "v8/factor_lab_gen.py": 3600,
+    # 🛡 2026-09-11：CRDS 逐只抓取，段落间可能长时间无 stdout → 给 30min 静默预算，
+    #   避免被全局 15min 静默杀误杀（与 2.3 的 90min 总预算配套）。
+    "calc_crds.py": 1800,   # 冷启动 50-90min，给 1h 静默预算（总时长仍受 5400s 超时约束）
 }
 
 
@@ -869,6 +879,14 @@ def step_run(order=None):
     run_start = datetime.now()
     # 🔴 盘后选股策略统一门控：18:00 前跳过所有选股脚本
     picking_ready = _is_post_close_picking_ready()
+    # 🛡 2026-09-11 一劳永逸：链级判定必须显式传给子脚本，杜绝「两套时间门打架」。
+    #   实测 run#1692（05:16 起跑）：链级 05:16 判 picking_ready=True 放行全部选股脚本，
+    #   但 scripts 内的 utils/time_gate.check_stock_picking_ready 在 06:36 按「现在几点」
+    #   重新否决 → 4 个脚本 exit 1 → B 批永不满 3/3 → target_stage 恒为 B → D/E 永不执行。
+    #   链一旦判定放行，子脚本不得二次否决（闸门是唯一决策点，这是本仓既定铁律）。
+    if picking_ready:
+        os.environ["TIME_GATE_BYPASS"] = "1"
+        print("  🔓 链级已判定盘后选股就绪 → TIME_GATE_BYPASS=1 下发子脚本（口径唯一，杜绝二次否决）")
     mode = _run_mode()
     is_td = _is_trading_day_now()
     if mode == "backfill":
@@ -989,21 +1007,31 @@ def step_push():
     # 2026-08-22 来源驱动增量推送（主人令升级）：git status 收集"本次 changed"作清单，
     #   聚焦推送本次算法链产物，不再全量 848 文件扫描；配合 api_push_raw 的 PUSH_FILES，
     #   单次 tree 请求大小与仓库规模解耦（422 根治）。
-    manifest = ""
+    # 🛡 2026-09-11 一劳永逸（run#1692 实证）：原写法把「清单不可得」误当「无变更」跳过。
+    #   自托管 runner 上 git 属主冲突（dubious ownership）会让 git status 直接失败，
+    #   清单一空就 return → 整轮 84 分钟产物零推送，且**静默**（只印一句「无变更」）。
+    #   现三态严格区分：None=不可得(必须全量推) / ""=确无变更(可跳过) / 有值(增量推)。
+    manifest = None
     try:
         out = subprocess.run(["git", "status", "--porcelain", "raw_data/", "data/"],
                              cwd=V8_ROOT, capture_output=True, text=True, encoding="utf-8", timeout=60)
-        manifest = ",".join(ln.split(None, 1)[1] for ln in out.stdout.splitlines() if ln.strip())
+        if out.returncode == 0:
+            manifest = ",".join(ln.split(None, 1)[1] for ln in out.stdout.splitlines() if ln.strip())
+        else:
+            print(f"  ⚠️ git status 退出码 {out.returncode}（自托管 runner 属主冲突?）")
     except Exception as e:
-        print(f"  ⚠️ 收集变更清单失败，回退全量推送: {e}")
+        print(f"  ⚠️ 收集变更清单异常: {e}")
     if manifest:
         print(f"  📋 本次变更清单: {manifest[:200]}{'...' if len(manifest) > 200 else ''}")
         env = dict(os.environ)
         env["PUSH_FILES"] = manifest
         r = subprocess.run([PY, "api_push_raw.py"], cwd=V8_ROOT, env=env)
-    else:
-        print("  ℹ️ 本次无 raw_data/data 变更，跳过推送")
+    elif manifest == "":
+        print("  ℹ️ git 判定本次无 raw_data/data 变更，交由链尾「唯一推送」步复核")
         return
+    else:
+        print("  ⚠️ 变更清单不可得 → 全量来源驱动推送（api_push_raw 与远端 tree 比对，不依赖本地 git）")
+        r = subprocess.run([PY, "api_push_raw.py"], cwd=V8_ROOT)
     if r.returncode == 0:
         print("  ✅ 已推送")
     else:
