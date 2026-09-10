@@ -49,6 +49,7 @@ _KLINE_MAX_FAILS = 40  # 连续失败过多则放弃本次计算, 保留旧 crds
 V8_OFFLINE = os.environ.get("V8_OFFLINE", "0") == "1"
 
 import gc
+import threading
 import requests as _requests
 
 MARKET_DOWN_THRESHOLD = -1.5     # 大盘跌超多少算"大跌日"(%)
@@ -56,12 +57,31 @@ LIMIT_UP_PCT = 9.0               # 涨停阈值(主板≈10%，留1%误差允许
 GEM_LIMIT_PCT = 18.0             # 创业板/科创板涨停阈值(≈20%)
 LOOKBACK_DAYS = 10               # 回顾天数
 MA_DAYS = 20                     # VR均量周期
+_SKIP = object()                 # 墙钟预算耗尽的哨兵（区别于「真失败」）
 
 
 # ---- mootdx 客户端(单例 + 周期重置, 防 socket 泄漏) ----
 _TDX_CLIENT = None
 _TDX_CALL_COUNT = 0
 _TDX_RESET_INTERVAL = 50
+# 🔴 2026-09-11 提速：mootdx 失败熔断 + 调用锁
+#   本机实测单只 4.4s 且恒失败（无 tdx 客户端 / 网络层拦截），而原调度把它排在第一位
+#   → 718 只白等 54 分钟。现「连续失败 _TDX_MAX_FAILS 次即本轮禁用」+ 单例 socket 调用锁。
+_TDX_FAIL_STREAK = 0
+_TDX_DISABLED = False
+_TDX_MAX_FAILS = int(os.environ.get("V8_CRDS_TDX_FAILS", "5"))
+_TDX_LOCK = threading.Lock()
+
+
+def _tdx_fail():
+    """mootdx 失败计数 + 连续失败熔断。须在 _TDX_LOCK 内调用。"""
+    global _TDX_FAIL_STREAK, _TDX_DISABLED
+    _TDX_FAIL_STREAK += 1
+    if _TDX_FAIL_STREAK >= _TDX_MAX_FAILS and not _TDX_DISABLED:
+        _TDX_DISABLED = True
+        print("\n  ⛔ mootdx 连续失败 %d 次 → 本轮禁用（每只省 4.4s 空等）"
+              % _TDX_FAIL_STREAK)
+    _tdx_reset()
 
 def _get_tdx():
     global _TDX_CLIENT
@@ -83,48 +103,60 @@ def _tdx_reset():
     _TDX_CALL_COUNT = 0
 
 def _query_kline_mootdx(code, days):
-    """mootdx 通达信直连日K线。code: 6位。返回归一化 DataFrame 或 None。"""
+    """mootdx 通达信直连日K线。code: 6位。返回归一化 DataFrame 或 None。
+
+    🔴 2026-09-11 提速（该函数此前是 CRDS 最大的拖后腿项）：本机实测单只 4.4s 且恒失败
+      （无本地 tdx 客户端 / 网络层拦截），原调度却把它排在第一位 → 718 只白等 54 分钟，
+      叠加东财 4.9s 白等 = 单只 9.45s、整轮 113 分钟 → 云端预算被强杀 → B 批 2/3 → D 批饿死。
+      现加「连续失败熔断」+「调用锁」（线程池下单例 socket 不可并发），失败 5 次即本轮禁用。
+    """
     # 2026-08-01 修正：函数体在 except 分支写 _KLINE_FAILS，但原来只声明了 _TDX_CALL_COUNT，
     # 触发 UnboundLocalError；因主循环对该函数无 try 兜底 → mootdx 一异常整轮 CRDS 崩溃。
-    global _TDX_CALL_COUNT, _KLINE_FAILS
-    if V8_OFFLINE:
+    global _TDX_CALL_COUNT, _KLINE_FAILS, _TDX_FAIL_STREAK
+    if _TDX_DISABLED or V8_OFFLINE:
         return None
-    client = _get_tdx()
-    if client is None:
-        return None
-    try:
-        df = client.bars(symbol=code, category=9, offset=days + MA_DAYS + 10)
-        _TDX_CALL_COUNT += 1
-        if _TDX_CALL_COUNT >= _TDX_RESET_INTERVAL:
-            _tdx_reset()
-        if df is None or len(df) < LOOKBACK_DAYS:
+    with _TDX_LOCK:
+        if _TDX_DISABLED:
             return None
-        dt = df["datetime"]
-        if hasattr(dt, "dt"):
-            dates = dt.dt.strftime("%Y-%m-%d")
-        else:
-            dates = dt.astype(str).str[:10]
-        out = pd.DataFrame({
-            "date": dates,
-            "open": df["open"].astype(float),
-            "close": df["close"].astype(float),
-            "high": df["high"].astype(float),
-            "low": df["low"].astype(float),
-            "volume": df["volume"].astype(float),
-            "amount": df["amount"].astype(float),
-            "turn": 0.0,  # mootdx bars 不含换手率, TS 仅展示用不影响评分
-        })
-        out = out.sort_values("date").reset_index(drop=True)
-        out["pctChg"] = ((out["close"] / out["close"].shift(1) - 1) * 100).round(2)
-        out["pctChg"] = out["pctChg"].fillna(0.0)
-        return out
-    except Exception:
-        # 🛡 2026-09-05 一劳永逸：mootdx 失败是常态（云端无 tdx 客户端/本机网络层拦截），
-        # 绝不可累加到全局 _KLINE_FAILS——否则连败 40 次会把东方财富兜底也拖死，
-        # 导致 CRDS 逐只 K 线全失败、total_scanned=0（静默 0 命中根因）。
-        # _KLINE_FAILS 只统计「真兜底」东方财富的连续失败。
-        _tdx_reset()
-        return None
+        client = _get_tdx()
+        if client is None:
+            _tdx_fail()
+            return None
+        try:
+            df = client.bars(symbol=code, category=9, offset=days + MA_DAYS + 10)
+            _TDX_CALL_COUNT += 1
+            if _TDX_CALL_COUNT >= _TDX_RESET_INTERVAL:
+                _tdx_reset()
+            if df is None or len(df) < LOOKBACK_DAYS:
+                _tdx_fail()
+                return None
+            dt = df["datetime"]
+            if hasattr(dt, "dt"):
+                dates = dt.dt.strftime("%Y-%m-%d")
+            else:
+                dates = dt.astype(str).str[:10]
+            out = pd.DataFrame({
+                "date": dates,
+                "open": df["open"].astype(float),
+                "close": df["close"].astype(float),
+                "high": df["high"].astype(float),
+                "low": df["low"].astype(float),
+                "volume": df["volume"].astype(float),
+                "amount": df["amount"].astype(float),
+                "turn": 0.0,  # mootdx bars 不含换手率, TS 仅展示用不影响评分
+            })
+            out = out.sort_values("date").reset_index(drop=True)
+            out["pctChg"] = ((out["close"] / out["close"].shift(1) - 1) * 100).round(2)
+            out["pctChg"] = out["pctChg"].fillna(0.0)
+            _TDX_FAIL_STREAK = 0
+            return out
+        except Exception:
+            # 🛡 2026-09-05 一劳永逸：mootdx 失败是常态（云端无 tdx 客户端/本机网络层拦截），
+            # 绝不可累加到全局 _KLINE_FAILS——否则连败 40 次会把东方财富兜底也拖死，
+            # 导致 CRDS 逐只 K 线全失败、total_scanned=0（静默 0 命中根因）。
+            # _KLINE_FAILS 只统计「真兜底」东方财富的连续失败。
+            _tdx_fail()
+            return None
 
 
 # ---- 东方财富兜底(云端可用, 本机网络层拦截) ----
@@ -258,15 +290,193 @@ def _query_kline_tx(code, secid_prefix, days):
         return None
 
 
+# ════════════════════════════════════════════════════════════════════════════
+# 🔴 2026-09-11 主人令·一劳永逸（「CRDS 永远在拖后腿」）—— 取数提速重构
+# 【实测根因】原调度顺序为「mootdx → 东财 → 腾讯」，而实测（本机 09-11 07:0x）：
+#     mootdx 4.4s 恒失败 ／ 东财 4.9s 恒失败（限流）／ 腾讯 0.15s 成功且 JSON 同构
+#   → 单只真实耗时 9.45s，其中 9.3s 纯粹白等两个失败源；718 只 = 113 分钟，
+#     云端 90 分钟预算仍被强杀 → 无产物 → B 批 2/3 → D 批饿死（最终推荐整夜不更新）。
+#   → 且 raw_data/kline_cache（2796 个文件，2026-09-08 主人令「入仓供云端零网络取数」）
+#     早已存在，本脚本却从未使用。
+# 【修法】对齐仓库既有范式（auto_run_dn_algorithm.py / gen_stock_stop.py）：
+#   ① 本地缓存优先：新鲜（末根K线 == 最近交易日）即零网络返回
+#   ② 快源前置：腾讯 gtimg 双域提到第 2 位（0.15s/只，本机+云端均可达）
+#   ③ 源熔断：mootdx/东财连续失败即本轮禁用，不再每只白等数秒
+#   ④ 结果回写缓存（按日期合并、不缩短既有历史）→ 逐晚收敛，次日起几乎零网络
+#   ⑤ 调用方叠加 N 线程并发 + 全局限速 + 墙钟预算（见 calc_crds 主流程）
+# ════════════════════════════════════════════════════════════════════════════
+_KLINE_CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "..", "raw_data", "kline_cache")
+_SRC_STAT = {"cache_fresh": 0, "cache_miss": 0, "cache_stale": 0,
+             "net_tx": 0, "net_mootdx": 0, "net_em": 0, "fail": 0}
+_STAT_LOCK = threading.Lock()
+_EXPECTED_END = None
+
+# 并发与限速（环境变量可调）：腾讯 gtimg 无严格限流，但保留全局限速避免被 WAF 反噬。
+_WORKERS = int(os.environ.get("V8_CRDS_WORKERS", "12"))
+_QPS_LIMIT = float(os.environ.get("V8_CRDS_QPS", "8"))
+_BUDGET_SEC = float(os.environ.get("V8_CRDS_BUDGET", "1500"))
+_DEADLINE = time.monotonic() + _BUDGET_SEC
+_BUDGET_HIT = [False]
+_rate_lock = threading.Lock()
+_rate_next = [0.0]
+
+
+def _bump(key, n=1):
+    """线程安全地累加取数来源统计。"""
+    with _STAT_LOCK:
+        _SRC_STAT[key] = _SRC_STAT.get(key, 0) + n
+
+
+def _rate_wait():
+    """全局令牌间隔限速：保证整体网络请求不超过 _QPS_LIMIT req/s。"""
+    if _QPS_LIMIT <= 0:
+        return
+    with _rate_lock:
+        now = time.monotonic()
+        slot = max(now, _rate_next[0])
+        _rate_next[0] = slot + 1.0 / _QPS_LIMIT
+        wait = slot - now
+    if wait > 0:
+        time.sleep(wait)
+
+
+def _expected_kline_end():
+    """期望的 K 线末根交易日（最近 A 股交易日）。取不到返回 ""（不拦截，fail-open）。"""
+    global _EXPECTED_END
+    if _EXPECTED_END is None:
+        try:
+            _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            if _root not in sys.path:
+                sys.path.insert(0, _root)
+            import v8_date
+            _EXPECTED_END = str(v8_date.last_trading_day(max_lookback=15))[:10]
+        except Exception:
+            _EXPECTED_END = ""
+    return _EXPECTED_END
+
+
+def _records_to_df(rows):
+    """kline_cache records → 与网络源同构的 DataFrame（补齐 amount/turn/pctChg）。"""
+    if not rows:
+        return None
+    out = pd.DataFrame(rows)
+    for c in ("open", "close", "high", "low", "volume"):
+        if c not in out.columns:
+            return None
+        out[c] = pd.to_numeric(out[c], errors="coerce")
+    out = out.dropna(subset=["close"])
+    if out.empty:
+        return None
+    # 缓存只存 date/open/close/high/low/volume（与 data_source_gtimg 同口径、同为前复权）。
+    # amount 用收盘价×成交量×100 近似 —— 与 _query_kline_tx 完全一致（VR 只用同源比值，口径自洽）；
+    # turn 腾讯/通达信源本就不含（恒 0，仅前端展示用，不参与 CRDS 评分）。
+    out["amount"] = out["close"] * out["volume"] * 100.0
+    out["turn"] = 0.0
+    out = out.sort_values("date").reset_index(drop=True)
+    out["pctChg"] = ((out["close"] / out["close"].shift(1) - 1) * 100).round(2)
+    out["pctChg"] = out["pctChg"].fillna(0.0)
+    return out
+
+
+def _load_cache_df(code):
+    """本地缓存优先：新鲜（末根K线 >= 最近交易日）且行数够 → DataFrame；否则 None。"""
+    p = os.path.join(_KLINE_CACHE_DIR, "%s.json" % code)
+    if not os.path.exists(p):
+        _bump("cache_miss")
+        return None
+    try:
+        with open(p, encoding="utf-8") as f:
+            rows = json.load(f)
+        if not isinstance(rows, list) or len(rows) < LOOKBACK_DAYS + MA_DAYS:
+            _bump("cache_miss")
+            return None
+        rows = [r for r in rows if isinstance(r, dict) and r.get("date") and r.get("close")]
+        rows.sort(key=lambda r: str(r["date"]))
+        if len(rows) < LOOKBACK_DAYS + MA_DAYS:
+            _bump("cache_miss")
+            return None
+        # 🔴 只认最新收盘（对齐 generate_top10 的内容级日期闸）：末根未覆盖最近交易日即判陈旧。
+        exp = _expected_kline_end()
+        if exp and str(rows[-1]["date"])[:10] < exp:
+            _bump("cache_stale")
+            return None
+        df = _records_to_df(rows)
+        if df is None or len(df) < LOOKBACK_DAYS:
+            _bump("cache_miss")
+            return None
+        _bump("cache_fresh")
+        return df
+    except Exception:
+        _bump("cache_miss")
+        return None
+
+
+def _save_cache_df(code, df):
+    """取数结果回写缓存：按日期合并（新值覆盖），不缩短既有历史 → 逐晚收敛。"""
+    if df is None or len(df) < LOOKBACK_DAYS:
+        return
+    try:
+        p = os.path.join(_KLINE_CACHE_DIR, "%s.json" % code)
+        merged = {}
+        try:
+            with open(p, encoding="utf-8") as f:
+                for r in (json.load(f) or []):
+                    if isinstance(r, dict) and r.get("date"):
+                        merged[str(r["date"])[:10]] = r
+        except Exception:
+            pass
+        for _, r in df.iterrows():
+            d = str(r.get("date"))[:10]
+            try:
+                merged[d] = {"date": d,
+                             "open": float(r["open"]), "close": float(r["close"]),
+                             "high": float(r["high"]), "low": float(r["low"]),
+                             "volume": float(r["volume"])}
+            except (TypeError, ValueError):
+                continue
+        if not merged:
+            return
+        recs = [merged[k] for k in sorted(merged)][-320:]
+        os.makedirs(_KLINE_CACHE_DIR, exist_ok=True)
+        tmp = p + ".tmp%d" % os.getpid()
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(recs, f, ensure_ascii=False)
+        os.replace(tmp, p)
+    except Exception:
+        pass
+
+
 def _query_kline(code, secid_prefix, days):
-    """取数调度: mootdx 优先, 东方财富兜底, 腾讯第三兜底(2026-09-06)。"""
+    """取数调度（2026-09-11 提速重构）：
+       ① 本地缓存 raw_data/kline_cache（新鲜→零网络）
+       ② 腾讯 gtimg 双域（实测 0.15s/只，本机+云端均可达）
+       ③ mootdx 通达信（有本地客户端时最快；失败 5 次本轮熔断）
+       ④ 东方财富（最后兜底，限流较重）
+    每只成功后回写缓存，返回归一化 DataFrame 或 None。"""
+    if not code or not re.fullmatch(r"\d{6}", str(code)):
+        return None
+    df = _load_cache_df(code)
+    if df is not None:
+        return df
+    _rate_wait()
+    df = _query_kline_tx(code, secid_prefix, days)
+    if df is not None and len(df) >= LOOKBACK_DAYS:
+        _bump("net_tx")
+        _save_cache_df(code, df)
+        return df
     df = _query_kline_mootdx(code, days)
     if df is not None and len(df) >= LOOKBACK_DAYS:
+        _bump("net_mootdx")
+        _save_cache_df(code, df)
         return df
     df = _query_kline_em(code, secid_prefix, days)
     if df is not None and len(df) >= LOOKBACK_DAYS:
+        _bump("net_em")
+        _save_cache_df(code, df)
         return df
-    return _query_kline_tx(code, secid_prefix, days)
+    _bump("fail")
+    return None
 
 
 def _load_index_quotes():
@@ -822,30 +1032,64 @@ def calc_crds():
     print(f"  [大盘判断] {market_context.get('validity')} | 上证今日{market_context.get('today_pct', 0):+.2f}% | {market_context.get('summary')}")
 
     # 3. 逐只计算CRDS
-    print(f"\n[2/3] 逐只计算CRDS ({len(all_stocks)} 只)...")
-    _tdx_start = _TDX_CALL_COUNT
+    # 🔴 2026-09-11 主人令·一劳永逸（「CRDS 永远在拖后腿」）：原实现「串行 + 把慢而失败的源排最前」
+    #   实测单只 9.45s → 718 只 = 113 分钟，云端预算被强杀 → 无产物 → B 批 2/3 → D 批饿死。
+    #   现对齐仓库既有范式（auto_run_dn_algorithm / gen_stock_stop）：缓存优先 + 快源前置 +
+    #   源熔断 + N 线程并发 + 全局限速 + 墙钟预算。热缓存分钟级，冷缓存 ≈ 90s。
+    print(f"\n[2/3] 逐只计算CRDS ({len(all_stocks)} 只)｜缓存 {_KLINE_CACHE_DIR}"
+          f"｜期望末根K线 {_expected_kline_end() or '未知'}"
+          f"｜{_WORKERS} 线程 / 限速 {_QPS_LIMIT:g} req/s / 预算 {_BUDGET_SEC:.0f}s")
     failed_count = 0
+    budget_skipped = 0
     results = []
-    for i, s in enumerate(all_stocks):
-        code = s.get("code", "")
-        name = s.get("name", "")
-        board = s.get("board_label", "")
-        pct = f"{s.get('pct_chg', 0):.1f}%" if "pct_chg" in s else ""
+    _t0 = time.monotonic()
+    _done = [0]
+    _last = [0]
+    _plock = threading.Lock()
 
-        print(f"\r  [{i+1}/{len(all_stocks)}] {code} {name} ({pct})...", end="", flush=True)
-
+    def _one(stock):
+        """单只：取K线 → 计算CRDS → 解析干净名。预算耗尽返回 _SKIP。"""
+        if _BUDGET_HIT[0] or time.monotonic() > _DEADLINE:
+            _BUDGET_HIT[0] = True
+            return _SKIP
+        code = stock.get("code", "")
+        name = stock.get("name", "")
+        board = stock.get("board_label", "")
         try:
             stock_df = get_stock_kline(code)
             crds = calc_crds_for_stock(stock_df, mkt_df, code, name, board)
-            time.sleep(0.12)  # 东方财富限流友好间隔
             if crds:
                 crds["name"] = _resolve_name(code, crds.get("name", name))
-                crds["market_label"] = s.get("market_label", "")
-                results.append(crds)
-        except Exception as e:
-            failed_count += 1
-            print(f"\n  [WARN] {code} 计算异常: {e}")
-            continue
+                crds["market_label"] = stock.get("market_label", "")
+                return crds
+            return None
+        except Exception as e:  # noqa: BLE001
+            with _plock:
+                print(f"\n  [WARN] {code} 计算异常: {e}")
+            return None
+
+    if all_stocks:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=_WORKERS) as ex:
+            for crds in ex.map(_one, all_stocks):
+                with _plock:
+                    _done[0] += 1
+                    _n = _done[0]
+                    if _n - _last[0] >= 25 or _n == len(all_stocks):
+                        _last[0] = _n
+                        _el = max(time.monotonic() - _t0, 0.001)
+                        print(f"\r  [{_n}/{len(all_stocks)}] {_n/_el:.1f} 只/秒"
+                              f" (已用 {_el:.0f}s)...", end="", flush=True)
+                if crds is _SKIP:
+                    budget_skipped += 1
+                elif crds:
+                    results.append(crds)
+                else:
+                    failed_count += 1
+        print()
+    if _BUDGET_HIT[0]:
+        print(f"  ⚠️ 墙钟预算 {_BUDGET_SEC:.0f}s 用尽 → 已出结果 {len(results)} 只、"
+              f"跳过 {budget_skipped} 只（写盘并标 degraded，绝不空手被 SIGKILL）")
 
     # 🛡 2026-09-06 主人令：K线全灭时空结果严禁覆盖旧数据——保留旧文件，卡片显示上一跑而非清空
     if not results:
@@ -874,12 +1118,15 @@ def calc_crds():
     data_date = datetime.now().strftime("%Y-%m-%d")
 
     # 5. 输出
-    _tdx_end = _TDX_CALL_COUNT
+    _elapsed = time.monotonic() - _t0
     if results:
-        if _tdx_end > _tdx_start:
-            _src = "mootdx(eastmoney兜底可用)"
-        else:
-            _src = "eastmoney(mootdx不可用)"
+        _rank = [k for k in ("cache_fresh", "net_tx", "net_mootdx", "net_em", "cache_stale")
+                 if _SRC_STAT.get(k)]
+        _top = max(_rank, key=lambda k: _SRC_STAT[k]) if _rank else ""
+        _label = {"cache_fresh": "本地缓存", "net_tx": "腾讯gtimg",
+                  "net_mootdx": "mootdx通达信", "net_em": "东方财富",
+                  "cache_stale": "本地缓存"}.get(_top, "unknown")
+        _src = f"{_label}(主源 {_SRC_STAT.get(_top, 0)}/{len(results)} 只)"
     else:
         _src = "none(全部失败)"
     scan_stats = {
@@ -887,6 +1134,21 @@ def calc_crds():
         "succeeded": len(results),
         "failed": failed_count,
         "kline_source_used": _src,
+        # 🔴 2026-09-11 提速可观测性：缓存命中/网络来源/熔断/耗时全部落盘，
+        #   运维面板一眼看出 CRDS 是快是慢、是否被预算截断，不再靠猜。
+        "elapsed_sec": round(_elapsed, 1),
+        "throughput_per_sec": round(len(all_stocks) / max(_elapsed, 0.001), 1),
+        "cache_fresh": _SRC_STAT.get("cache_fresh", 0),
+        "cache_miss": _SRC_STAT.get("cache_miss", 0),
+        "cache_stale": _SRC_STAT.get("cache_stale", 0),
+        "net_tx": _SRC_STAT.get("net_tx", 0),
+        "net_mootdx": _SRC_STAT.get("net_mootdx", 0),
+        "net_em": _SRC_STAT.get("net_em", 0),
+        "kline_fail": _SRC_STAT.get("fail", 0),
+        "workers": _WORKERS,
+        "budget_sec": int(_BUDGET_SEC),
+        "budget_skipped": budget_skipped,
+        "degraded": bool(_BUDGET_HIT[0] or budget_skipped),
     }
     output = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
