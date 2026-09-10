@@ -79,20 +79,24 @@ def main():
         print("⚠️ sector_fund_flow.json 无 sectors_in/out，跳过（数据暂空）")
         return 0
 
-    # 🛡 2026-09-02 主人令一劳永逸：口径守卫 —— 只接受「今日开盘后(≥09:30)抓取」的板块数据。
-    #   原逻辑无此校验：09:00/09:30 档抓取发生在开盘前，sector_fund_flow.json 存的是
-   #   「昨日收盘累计」（如互联网金融 31.59 亿），而 10:00 起才是「今日盘中累计」（线缆 8.93 亿）。
-    #   两套口径混进同一条累计曲线 → 前段点与后段点板块名/量级全不同 → 曲线前段空白
-    #   （主人 2026-09-02 截图实锤「前面数据的曲线呢」）。宁缺毋滥：非今日盘中数据一律不写快照。
+    # 🛡 2026-09-02 主人令一劳永逸：口径守卫 —— 只接受「今日」抓取的板块数据。
+    #   原逻辑额外卡 update_time 时刻 ≥09:30，但开盘前累计数据的 update_time 本就是【昨天】，
+    #   已被上面「startswith(today)」拦掉；保留"今天"检查即可，去掉 09:30 硬门槛。
+    #   否则 9:30 后首笔今日盘中数据（09:25-09:30 集合竞价后）会被误判"开盘前"整段跳过
+    #   → 上午前段空白（主人 2026-09-10 实锤「上午数据都没出来过」）。宁缺毋滥仅针对跨日口径，
+    #   同日内开盘后数据一律可写。
     _src_ts = str(sector.get("update_time") or "")
-    if not _src_ts.startswith(today) or _src_ts[11:16] < "09:30":
-        print(f"⏭️ 板块数据源为开盘前抓取（update_time={_src_ts or '空'}），非今日盘中口径，跳过写快照")
+    if not _src_ts.startswith(today):
+        print(f"⏭️ 板块数据源非今日口径（update_time={_src_ts or '空'}），跳过写快照")
         return 0
-    # 陈旧守卫：板块数据距今超 40 分钟（盘中每 30 分抓一次，留 10 分余量）→ 不写，防假点
+    # 🛡 2026-09-10 主人令修复「上午数据空白」：陈旧阈值 40→90min。
+    #   原 40min 太严——某档 intraday 抓取失败/延迟时，后续 40min 内快照脚本全因"数据陈旧"跳过
+    #   → 上午曲线断成 1 个点。90min 覆盖"跳过 1-2 档"（每档 ~20min）的情况，
+    #   宁可写稍旧点保曲线连续，也不空白。
     try:
         _src_dt = datetime.datetime.strptime(_src_ts, "%Y-%m-%d %H:%M:%S").replace(tzinfo=CST)
         _age_min = (t - _src_dt).total_seconds() / 60.0
-        if _age_min > 40:
+        if _age_min > 90:
             print(f"⏭️ 板块数据已陈旧（update_time={_src_ts}，距今 {_age_min:.0f} 分钟），跳过写快照")
             return 0
     except Exception:
