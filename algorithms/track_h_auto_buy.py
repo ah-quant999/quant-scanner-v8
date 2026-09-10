@@ -277,6 +277,34 @@ def _summarize_by_date(by_date):
     return summary
 
 
+def _backfill_history(history, today_str):
+    """🔴 2026-09-11 一劳永逸（主人令「发现了就马上一劳永逸式修复」）：历史 T+N 回填。
+    旧设计只在候选「当天」跟踪一次——彼时 T+1/T+3/T+5/T+10 尚未发生（全 None），
+    之后永不回填 → 累计胜率恒 0%（198/198 全 None 实证）。每轮把「T+1 仍为 None」的
+    历史 pick 全部重算（候选日之后 K 线已有新数据），并重算各日命中计数。"""
+    for key in ("by_date", "expert_by_date"):
+        recs = history.get(key) or {}
+        for d, entry in recs.items():
+            picks = entry.get("picks") or []
+            pending = [p for p in picks if p.get("T+1") is None]
+            if not pending:
+                continue
+            print(f"🔁 回填 {d} {key}: {len(pending)} 只 T+N 缺失")
+            for p in pending:
+                rec = track_one_pick(p.get("code") or "", d, today_str)
+                if rec is None:
+                    continue
+                for f in ("T+1", "T+1_hit", "T+3", "T+3_hit", "T+5", "T+5_hit",
+                          "T+10", "T+10_hit", "best_T_plus", "best_pct",
+                          "base_close", "samples"):
+                    if f in rec:
+                        p[f] = rec[f]
+            entry["n"] = len(picks)
+            for h in ("T+1", "T+3", "T+5", "T+10"):
+                entry[f"{h}_hit"] = sum(1 for r in picks if r.get(f"{h}_hit"))
+            entry["backfilled_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
 def run(target_date=None, emit_js=True, top_n=50):
     """
     把 target_date（默认昨日）的 h_auto_buy 候选股全部跟踪一遍，
@@ -305,6 +333,9 @@ def run(target_date=None, emit_js=True, top_n=50):
         history["expert_by_date"][real_date] = expert_rec
     else:
         print(f"ℹ️ {real_date} 候选文件无 expert_candidates，跳过高手画像版跟踪")
+
+    # 🔴 2026-09-11 一劳永逸：历史 T+N 回填（胜率恒 0% 根治），见函数 docstring
+    _backfill_history(history, today_str)
 
     history["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     # 🔴 2026-08-22 主人令修复：顶层 update_time 必须随每次生成刷新，
