@@ -198,9 +198,11 @@
 | `V8_PRINCIPLES.md` | v8 设计原则文档 | 架构决策记录 |
 | `DO_NOT_DELETE.md` (本文件) | 禁止删除清单 | 防误删核心文档 |
 | `HANDOVER_LOG.jsonl` | 双机交接索引日志 | 自动化读取最新交接的依据 |
-| `docs/ops/handover/HANDOVER*.md` | 双机交接文档归档 | 小九↔阿狸咪协作记录 |
-| `docs/ops/urgent/URGENT*.md` | 紧急指令文档归档 | 夜间/周末紧急问题记录 |
-| `docs/ops/audit/AUDIT*.md` | 审计报告归档 | 全站/算法审计结论 |
+| `docs/ops/handover/*.md` | 双机交接文档归档（**唯一交接目录**，时间优先命名） | 小九↔阿狸咪协作记录；2026-09-10 起唯一目录 |
+| `docs/ops/urgent/README.md` | 停用通告 | 本目录已停用，防再次误放交接 |
+| `docs/ops/audit/*.md` | 审计报告归档（时间优先命名） | 全站/算法审计结论 |
+| `docs/ops/handover/_迁移对照表_20260910.md` | 交接迁移对照表 | 旧名→新名追溯依据 |
+> 🟢 豁免 `docs/ops/handover/HANDOVER_阿狸咪给小九_20260910_2130_派发源精简与假成功根治.md`：2026-09-10 主人令统一交接目录 + 去重 —— 该文件是 23 行摘要桩，内容全部包含于同目录 `2026-09-10_2130_URGENT_阿狸咪给小九_派发源精简与假成功根治.md`（125 行完整版），仅保留完整版 |
 | `docs/ops/scripts/_*.py` | 临时检查/调试脚本归档 | 非核心管线，仅备查 |
 | `docs/ops/archive/*.zip` | 历史打包归档 | 临时产物/探针日志归档 |
 | `docs/ops/notes/*.md` | 临时解读/备注归档 | 宏观事件等一次性备注 |

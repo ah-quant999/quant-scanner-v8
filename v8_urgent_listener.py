@@ -3,7 +3,7 @@
 """
 v8_urgent_listener.py — 紧急指令监听 + 健康检查（v8 去 v6 化版）
 =========================================================
-监听 URGENT_*.md（docs/ops/urgent/ 与仓库根目录双位置），读取最新内容并：
+监听 docs/ops/handover/ 下的紧急文件（*_URGENT_*.md，唯一交接目录），读取最新内容并：
 1. 运行 guard_v8_freshness.py 生成数据新鲜度报告；
 2. 根据文件内容中的关键词自动 dispatch 对应 workflow；
 3. 输出摘要供 automation 向主人汇报。
@@ -24,7 +24,8 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
-URGENT_DIR = BASE / "docs" / "ops" / "urgent"
+HANDOVER_DIR = BASE / "docs" / "ops" / "handover"   # 2026-09-10 起唯一交接目录
+URGENT_DIR = BASE / "docs" / "ops" / "urgent"        # 已停用（历史目录，勿再写入）
 REPO = "ah-quant999/quant-scanner-v8"
 
 # workflow 文件名 -> dispatch payload
@@ -53,20 +54,23 @@ def _load_token():
 
 
 def _scan_urgent_files():
-    """扫描全部 URGENT 落盘位置（去重）：
-    1. docs/ops/urgent/（历史位置，v8 去 v6 化前）
-    2. 仓库根目录（小九 08-10 起使用，如 URGENT_小九_2026-08-18_*.md）
+    """扫描唯一交接目录 docs/ops/handover/ 下的紧急文件。
+
+    2026-09-10 主人令：交接文档统一目录 + 时间优先命名
+      YYYY-MM-DD_HHmm_URGENT_<发件>给<收件>_<主题>.md
+    旧版同时扫 docs/ops/urgent/ 与仓库根（双位置）—— 那正是"同一份交接被复制到
+    3 个目录、谁都读不准"的成因，已彻底收敛为单一目录。
     """
-    paths = set()
-    for d in (URGENT_DIR, BASE):
-        if d.is_dir():
-            for p in d.glob("URGENT_*.md"):
-                paths.add(p.resolve())
-    return paths
+    d = HANDOVER_DIR
+    if not d.is_dir():
+        return set()
+    return {p.resolve() for p in d.glob("*_URGENT_*.md")
+            if not p.name.startswith(("README", "_"))}
 
 
 def recent_urgent_files(n=5):
-    files = sorted(_scan_urgent_files(), key=os.path.getmtime, reverse=True)
+    # 按【文件名倒序】= 时间倒序；不用 mtime（坚果云同步会重写 mtime，曾导致取错"最新"）
+    files = sorted(_scan_urgent_files(), key=lambda p: p.name, reverse=True)
     return files[:n]
 
 
@@ -157,7 +161,7 @@ def main():
     for p in files:
         head = read_head(p, 40)
         mtime_hours = (datetime.now().timestamp() - os.path.getmtime(p)) / 3600.0
-        out.append(f"- **{os.path.basename(p)}** (mtime={mtime_hours:.1f}h)")
+        out.append(f"- **{os.path.basename(p)}** (mtime={mtime_hours:.1f}h，仅参考；排序以文件名为准)")
         out.append("```markdown")
         out.append(head)
         out.append("```")
