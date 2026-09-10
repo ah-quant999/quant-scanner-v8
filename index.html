@@ -11731,8 +11731,10 @@ window.showRestrictedItems = showRestrictedItems;
       window.__ulActivePane = tab;  // guard: 记住当前子 tab，重渲染不再 snap-back
       var pLab=document.getElementById('ulPaneLab');
       var pMacro=document.getElementById('ulPaneMacro');
+      var pFactor=document.getElementById('ulPaneFactor');
       if(pLab) pLab.style.display=(tab==='lab')?'block':'none';
       if(pMacro) pMacro.style.display=(tab==='macro')?'block':'none';
+      if(pFactor) pFactor.style.display=(tab==='factor')?'block':'none';
       var tabs=document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
       if(btn) btn.classList.add('active');
@@ -11764,12 +11766,22 @@ window.showRestrictedItems = showRestrictedItems;
       if(tab==='lab' && typeof window.__renderFactorProgress==='function'){
         try{ window.__renderFactorProgress(); }catch(e){}
       }
+      // 2026-09-10 主人令：切到「因子实验室」子页时兜底触发 3 张因子卡渲染
+      if(tab==='factor' && typeof window.__renderFactorLab==='function'){
+        try{ window.__renderFactorLab(); }catch(e){}
+      }
+      if(tab==='factor' && typeof window.__renderFactorAudit==='function'){
+        try{ window.__renderFactorAudit(); }catch(e){}
+      }
+      if(tab==='factor' && typeof window.__renderFactorProgress==='function'){
+        try{ window.__renderFactorProgress(); }catch(e){}
+      }
     };
     if(!window.__ulSelfHealTimer){
       window.__ulSelfHealTimer=setInterval(function(){
         var p=document.getElementById('unlistedPanel');
         if(!p) return;
-        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneLab')>=0) return; // 已渲染成功停止
+        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneFactor')>=0) return; // 已渲染成功停止（2026-09-10：改用因子实验室容器作判据）
         if(typeof window.renderUnlisted==='function'){
           console.log('[ulSelfHeal] retry renderUnlisted len='+p.innerHTML.length);
           try{ window.renderUnlisted(); }catch(e){ console.warn('[ulSelfHeal] rethrow:',e.message); }
@@ -11840,9 +11852,10 @@ window.showRestrictedItems = showRestrictedItems;
 
     // 暂未上架页经 09-01/09-02 多轮重构，当前卡片清单以 renderUnlisted 实际渲染为准（概念ETF龙头参考/因子实验室/RPS考核/主题空间实验卡/宏观景气K型）。
 
-    // ===== 子 tab 导航（实验区 · 宏观观测）=====
+    // ===== 子 tab 导航（实验区 · 因子实验室 · 宏观观测；2026-09-10 主人令新增因子实验室）=====
     h += '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:10px;">'
        + '<button class="ul-tab active" data-ul="lab" onclick="window.__ulSwitch(this,\'lab\')" style="padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--sub);font-weight:600;transition:.15s;">🧪 实验区</button>'
+       + '<button class="ul-tab" data-ul="factor" onclick="window.__ulSwitch(this,\'factor\')" style="padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--sub);font-weight:600;transition:.15s;">🧪 因子实验室</button>'
        + '<button class="ul-tab" data-ul="macro" onclick="window.__ulSwitch(this,\'macro\')" style="padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--sub);font-weight:600;transition:.15s;">🌍 宏观观测</button>'
        + '</div>';
 
@@ -11857,8 +11870,7 @@ window.showRestrictedItems = showRestrictedItems;
        + '<div id="dbgEtfMapBody"><div class="note">加载中…</div></div>'
        + '<hr style="border:none;border-top:1px dashed rgba(56,189,248,.25);margin:12px 0;">'
        + '<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;color:var(--sub);">研究信号，未纳入推荐链路。</div></div>';
-    // ═══ 2026-09-03 主人令：因子实验室迁入暂未上架（★★ 观测仓 · 调试与回测中；升 4⭐ 再转正选股策略子页）═══
-    h += '<div class="card" id="factorLabBody" style="margin-bottom:16px;border-left:4px solid #22d3ee;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">🧪 因子实验室（异常换手率 · ROE_TTM 大市值档）加载中…</div></div>';
+    // 2026-09-10 主人令：因子实验室卡已迁出实验区（→ 🧪 因子实验室 子页 ulPaneFactor），此处不留副本
     // ═══ 2026-09-06 主人令：RPS 相对强度「30 天样本考核」卡迁回实验区 pane —— 前端展示不会被遗忘；
     //     数据链保留纯观测（E 批 21:00 每日续跑），不参与选股评分权重；达标才谈恢复子 tab/进评分 ═══
     h += '<div class="card" id="rpsAuditBody" style="margin-bottom:16px;border-left:4px solid #94a3b8;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">📈 相对强度 RPS · 30 天样本考核 加载中…</div></div>';
@@ -11872,15 +11884,22 @@ window.showRestrictedItems = showRestrictedItems;
     h += '<div class="card" id="citicPeBacktestBody" style="margin-bottom:16px;border-left:4px solid #60a5fa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">📊 中信 PE&lt;10 历史回测 加载中…</div></div>';
     // ═══ 2026-09-09 主人令：A股指数 PE-TTM 历史分位切换卡（暂未上架·实验区）═══
     h += '<div class="card" id="valuationPercentileBody" style="margin-bottom:16px;border-left:4px solid #a78bfa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F321; 估值分位切换 · A股指数周期定位 加载中…</div></div>';
-    // ═══ 2026-09-09 主人令：A股质量价值中小盘多因子 vs v8 选股因子审计（暂未上架）═══
-    h += '<div class="card" id="factorAuditBody" style="margin-bottom:16px;border-left:4px solid #22c55e;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4CA; 因子审计：v8 选股 vs 质量价值中小盘多因子 加载中…</div></div>';
+    // 2026-09-10 主人令：因子审计卡已迁出实验区（→ 🧪 因子实验室 子页 ulPaneFactor）
     // ═══ 2026-09-09 主人令：A股指数价格中枢+趋势门控框架迁移（暂未上架）═══
     h += '<div class="card" id="indexValueFrameworkBody" style="margin-bottom:16px;border-left:4px solid #f97316;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; 指数估值中枢 · 价格档位+趋势门控 加载中…</div></div>';
     // ═══ 2026-09-10 主人令：AI 洞察多源观点对比卡（暂未上架·实验区最下方）═══
     h += '<div class="card" id="aiInsightsCompareBody" style="margin-bottom:16px;border-left:4px solid #8b5cf6;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52E; AI 洞察·多源观点对比 加载中…</div></div>';
-    // ═══ 2026-09-10 主人令：因子补缺 walk-forward 进度跟踪卡（暂未上架·实验区最下方）═══
-    h += '<div class="card" id="factorProgressBody" style="margin-bottom:16px;border-left:4px solid #f59e0b;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F9EA; 因子补缺·walk-forward 进度 加载中…</div></div>';
+    // 2026-09-10 主人令：因子补缺进度卡已迁出实验区（→ 🧪 因子实验室 子页 ulPaneFactor）
     h += '</div>'; // /ulPaneLab
+
+    // ===== 因子实验室 pane（2026-09-10 主人令：3 张因子卡独立成子页）=====
+    //   卡容器 id 与实验区时期完全一致（factorLabBody / factorAuditBody / factorProgressBody），
+    //   3 个 __render* 函数按 id 取容器，故迁页零改动；切页时 __ulSwitch 兜底触发渲染。
+    h += '<div id="ulPaneFactor" style="display:none;">';
+    h += '<div class="card" id="factorLabBody" style="margin-bottom:16px;border-left:4px solid #22d3ee;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">🧪 因子实验室（异常换手率 · ROE_TTM 大市值档）加载中…</div></div>';
+    h += '<div class="card" id="factorAuditBody" style="margin-bottom:16px;border-left:4px solid #22c55e;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4CA; 因子审计：v8 选股 vs 质量价值中小盘多因子 加载中…</div></div>';
+    h += '<div class="card" id="factorProgressBody" style="margin-bottom:16px;border-left:4px solid #f59e0b;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F9EA; 因子补缺·walk-forward 进度 加载中…</div></div>';
+    h += '</div>'; // /ulPaneFactor
 
     // ===== 宏观观测 pane =====
     h += '<div id="ulPaneMacro" style="display:none;">';
@@ -12032,8 +12051,10 @@ window.showRestrictedItems = showRestrictedItems;
       window.__ulActivePane = tab;
       var pLab = document.getElementById('ulPaneLab');
       var pMacro = document.getElementById('ulPaneMacro');
+      var pFactor = document.getElementById('ulPaneFactor');
       if(pLab) pLab.style.display = (tab === 'lab') ? 'block' : 'none';
       if(pMacro) pMacro.style.display = (tab === 'macro') ? 'block' : 'none';
+      if(pFactor) pFactor.style.display = (tab === 'factor') ? 'block' : 'none';
       var tabs = document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
       if(btn) btn.classList.add('active');
@@ -12062,6 +12083,16 @@ window.showRestrictedItems = showRestrictedItems;
         try{ window.__renderAiInsightsCompare(); }catch(e){}
       }
       if(tab==='lab' && typeof window.__renderFactorProgress==='function'){
+        try{ window.__renderFactorProgress(); }catch(e){}
+      }
+      // 2026-09-10 主人令：切到「因子实验室」子页时兜底触发 3 张因子卡渲染
+      if(tab==='factor' && typeof window.__renderFactorLab==='function'){
+        try{ window.__renderFactorLab(); }catch(e){}
+      }
+      if(tab==='factor' && typeof window.__renderFactorAudit==='function'){
+        try{ window.__renderFactorAudit(); }catch(e){}
+      }
+      if(tab==='factor' && typeof window.__renderFactorProgress==='function'){
         try{ window.__renderFactorProgress(); }catch(e){}
       }
     };
