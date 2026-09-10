@@ -356,9 +356,23 @@ jobs:
               content_sha = __import__("hashlib").sha1(f.read()).hexdigest()[:10]
           print(f"  new STOCK_QUOTE.js sha10 = {content_sha}")
 
-          # 2) 读 index.html，找 STOCK_QUOTE.js?v=xxxxxx 替换
-          with open("index.html", "r", encoding="utf-8") as f:
-              html = f.read()
+          # 2) 经 Contents API 取 index.html 再改 ?v（run93 实证：self-hosted 不 checkout，
+          #    本地无 index.html → FileNotFoundError；run92 的 success 是靠 runner 工作区残留碰运气）
+          idx_url = f"https://api.github.com/repos/{REPO}/contents/index.html"
+          html = idx_sha = None
+          for attempt in range(4):
+              try:
+                  existing = api("GET", idx_url)
+                  idx_sha = existing.get("sha")
+                  html = base64.b64decode(existing["content"]).decode("utf-8")
+                  break
+              except urllib.error.HTTPError as e:
+                  if e.code in (409, 422) and attempt < 3:
+                      import time as _t; _t.sleep(3); continue
+                  if e.code == 404:
+                      print("  ⚠️ index.html 不存在，跳过 ?v 更新")
+                      raise SystemExit(0)
+                  raise
           # 匹配: <script src="data/STOCK_QUOTE.js?v=..."></script>
           pattern = r'(<script[^>]*src=["\']data/STOCK_QUOTE\.js\?v=)([a-f0-9]+)(["\'])'
           new_html, n = re.subn(pattern, lambda m: m.group(1) + content_sha + m.group(3), html)
@@ -368,24 +382,30 @@ jobs:
               print(f"  STOCK_QUOTE.js?v= 已是 {content_sha}，无需变更")
           else:
               print(f"  替换了 {n} 处 STOCK_QUOTE.js?v= → {content_sha}")
-              # 3) 推送 index.html
-              idx_url = f"https://api.github.com/repos/{REPO}/contents/index.html"
-              try:
-                  existing = api("GET", idx_url)
-                  sha = existing.get("sha")
-              except urllib.error.HTTPError as e:
-                  if e.code == 404:
-                      sha = None
-                  else:
-                      raise
+              # 3) 推送 index.html（sha 冲突自动重取重试 3 次，防并发互顶）
               payload = {
                   "message": f"chore(cache): STOCK_QUOTE.js?v={content_sha}",
                   "content": base64.b64encode(new_html.encode("utf-8")).decode(),
                   "branch": "main",
               }
-              if sha:
-                  payload["sha"] = sha
-              api("PUT", idx_url, payload)
+              for attempt in range(4):
+                  if idx_sha:
+                      payload["sha"] = idx_sha
+                  try:
+                      api("PUT", idx_url, payload)
+                      break
+                  except urllib.error.HTTPError as e:
+                      if e.code in (409, 422) and attempt < 3:
+                          import time as _t; _t.sleep(3)
+                          existing = api("GET", idx_url)
+                          idx_sha = existing.get("sha")
+                          cur = base64.b64decode(existing["content"]).decode("utf-8")
+                          # 并发方已写入同款 ?v 则无需再推
+                          if re.search(pattern.replace(r'([a-f0-9]+)', content_sha), cur):
+                              print("  并发方已写入同款 ?v，跳过推送")
+                              break
+                          continue
+                      raise
               print(f"  ✅ index.html 已推送（?v={content_sha}）")
           PY
 
