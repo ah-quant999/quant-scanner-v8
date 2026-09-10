@@ -496,7 +496,21 @@ jobs:
           #   前端表现为「收盘数据没更新」。修复：把本轮抓取类别显式透传给 update_v8。
           #   all 档：先全量（覆盖 premarket/intraday）再补跑 post_close（覆盖纯盘后产物）。
           CAT="${{ steps.cat.outputs.category }}"
-          if [ -z "$CAT" ]; then CAT="post_close"; fi
+          # 🛡️ 2026-09-10 小九修：默认 category 必须按北京时间推断，不能恒等于 post_close。
+          #   原因：盘中/全量 dispatch 若 steps.cat 意外为空，默认 post_close 会导致纯盘后产物
+          #   （CANDIDATE/MARKET_FUND_FLOW_DATA/SECTOR_FUND_FLOW_TREND 等）在盘中被重写，
+          #   前端表现为「盘后数据时间戳显示盘中/早盘」；反之若盘中默认 intraday，盘后 cron
+          #   已显式输出 post_close 不会落到这里。仅在 CST 收盘后（15:00 后）才默认 post_close。
+          if [ -z "$CAT" ]; then
+            HOUR_CST=$(python -c "import datetime; print((datetime.datetime.utcnow().hour + 8) % 24)")
+            if [ "$HOUR_CST" -ge 15 ]; then
+              CAT="post_close"
+            elif [ "$HOUR_CST" -ge 9 ]; then
+              CAT="intraday"
+            else
+              CAT="premarket"
+            fi
+          fi
           if [ "$CAT" = "all" ]; then
             echo "all 档：先全量构建，再补跑 post_close 类别（覆盖纯盘后产物）"
             python update_v8.py

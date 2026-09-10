@@ -129,6 +129,10 @@ DATA_SOURCES = {
     #   补映射后，云端 build 自动按 raw_data 重建，杜绝复发。
     "final_recommend.json":        "FINAL_RECOMMEND_DATA",
     "stock_rps.json":              "STOCK_RPS_DATA",
+    # 🛡 2026-09-10 主人令：factor_lab.json 原只在 run_algorithms B 批由 v8/factor_lab_gen.py
+    #   直接写 data/FACTOR_LAB.js，但 B 批在云端/家里机常因 baostock 超时失败 → FACTOR_LAB.js
+    #   停更 2 天。补映射后，只要 raw_data/factor_lab.json 已新鲜提交，update_v8 即可独立重建 js。
+    "factor_lab.json":             "FACTOR_LAB",
     "factor_lab_backtest.json":    "FACTOR_LAB_BACKTEST",  # 🆕 2026-09-04 因子实验室独立分层回测
     "rps_backtest.json":           "RPS_BACKTEST",  # 🆕 2026-09-06 主人令：RPS 30天样本考核防孤儿（weekly_cleanup 有映射不删；考核详见 DO_NOT_DELETE.md / logic.html）
     # "path_probability_backtest.json": "PATH_PROB_BACKTEST",  # 2026-09-06 已注释：AI预测卡下架，停止发布
@@ -215,6 +219,7 @@ CATEGORY_MAP = {
     # 2026-09-04 主人令收尾：COCKPIT_TIER_RECOMMEND/COCKPIT_ADVICE/COCKPIT_BACKTEST heal 分类已删（模块下线）
     "BACKTEST_TDX": "post_close",
     "BACKTEST_COMPREHENSIVE": "post_close",
+    "FACTOR_LAB": "post_close",
     "FACTOR_LAB_BACKTEST": "post_close",
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
