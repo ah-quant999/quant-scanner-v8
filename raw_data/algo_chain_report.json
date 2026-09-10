@@ -1,0 +1,121 @@
+{
+  "update_time": "2026-09-10 06:57:54",
+  "base_trade_date": "2026-09-10",
+  "ok": 6,
+  "failed_required": 2,
+  "ts_blind": 0,
+  "items": [
+    {
+      "name": "候选池",
+      "path": "raw_data/candidate.json",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-10 05:04:44",
+      "required": true,
+      "note": ""
+    },
+    {
+      "name": "候选池(前端)",
+      "path": "data/CANDIDATE.js",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-10 04:22:14",
+      "required": false,
+      "note": ""
+    },
+    {
+      "name": "逆势龙头CRDS",
+      "path": "raw_data/crds_card_data.json",
+      "status": "❌ 陈旧 2 天",
+      "ts": "2026-09-08 19:55:38",
+      "required": true,
+      "note": "基准日 2026-09-10，产物停留在 2026-09-08"
+    },
+    {
+      "name": "逆势龙头(前端)",
+      "path": "data/CRDS_CARD_DATA.js",
+      "status": "❌ 陈旧 2 天",
+      "ts": "2026-09-08 19:55:38",
+      "required": false,
+      "note": "基准日 2026-09-10，产物停留在 2026-09-08"
+    },
+    {
+      "name": "相对强度RPS",
+      "path": "data/STOCK_RPS.js",
+      "status": "❌ 陈旧 2 天",
+      "ts": "2026-09-08 19:57:28",
+      "required": false,
+      "note": "基准日 2026-09-10，产物停留在 2026-09-08"
+    },
+    {
+      "name": "全站精选TOP10",
+      "path": "raw_data/top10_daily.json",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-10 04:46:46",
+      "required": true,
+      "note": ""
+    },
+    {
+      "name": "全站精选(前端)",
+      "path": "data/TOP10_DAILY.js",
+      "status": "❌ 陈旧 2 天",
+      "ts": "2026-09-08 19:57:34",
+      "required": false,
+      "note": "基准日 2026-09-10，产物停留在 2026-09-08"
+    },
+    {
+      "name": "三重共识",
+      "path": "raw_data/triple_consensus.json",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-10 04:46:40",
+      "required": true,
+      "note": ""
+    },
+    {
+      "name": "三重共识(前端)",
+      "path": "data/TRIPLE_CONSENSUS.js",
+      "status": "❌ 陈旧 2 天",
+      "ts": "2026-09-08 20:14:15",
+      "required": false,
+      "note": "基准日 2026-09-10，产物停留在 2026-09-08"
+    },
+    {
+      "name": "四量终极",
+      "path": "data/FOUR_VOLUME.js",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-10 05:37:41",
+      "required": false,
+      "note": ""
+    },
+    {
+      "name": "四量终极60m",
+      "path": "data/FOUR_VOLUME_60M.js",
+      "status": "❌ 陈旧 2 天",
+      "ts": "2026-09-08 20:06:29",
+      "required": false,
+      "note": "基准日 2026-09-10，产物停留在 2026-09-08"
+    },
+    {
+      "name": "最终推荐",
+      "path": "raw_data/final_recommend.json",
+      "status": "❌ 陈旧 2 天",
+      "ts": "2026-09-08 23:25:30",
+      "required": true,
+      "note": "基准日 2026-09-10，产物停留在 2026-09-08"
+    },
+    {
+      "name": "最终推荐(前端)",
+      "path": "data/FINAL_RECOMMEND_DATA.js",
+      "status": "❌ 陈旧 2 天",
+      "ts": "2026-09-08 23:25:30",
+      "required": false,
+      "note": "基准日 2026-09-10，产物停留在 2026-09-08"
+    },
+    {
+      "name": "金股池",
+      "path": "raw_data/gold_pool.json",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-10 06:11:06",
+      "required": false,
+      "note": ""
+    }
+  ]
+}
