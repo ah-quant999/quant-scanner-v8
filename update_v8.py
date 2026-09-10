@@ -8,7 +8,7 @@
 - 删除死数据文件 RECOMMEND / SCAN_DATA 的映射。
 """
 
-import json, os, re, subprocess, sys
+import json, os, re, subprocess, sys, time
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -644,6 +644,10 @@ def _write_js(var_name, obj):
     return out_path
 
 
+# 单调部署令牌缓存：同一进程内所有 data/*.js 共用，保证一次构建 ?v 统一失效。
+_UPDATE_TOKEN = None
+
+
 def _data_file_update_time(var_name):
     """获取 data/*.js 的 cache-busting 标记。
 
@@ -673,20 +677,16 @@ def _data_file_update_time(var_name):
     path = DATA_DIR / f"{var_name}.js"
     if not path.exists():
         return ""
-    try:
-        text = path.read_text(encoding='utf-8')
-        import hashlib
-        # ★ 2026-08-15 根因修复（ALGO_TRACK ?v 长期失配 + 构建竞态）：
-        # _write_js 每次构建都会注入 republish_time（=构建时刻），使同一份数据每
-        # 构建一次文件内容都变 → ① ?v 每次都变、丧失缓存命中本意；
-        # ② 构建被拒后 reset+重跑的竞态里，?v 与最终落库文件因 republish_time
-        #   不同步而失配 → CDN 吐旧副本。
-        # 修复：哈希前把 republish_time 的值中性化为空（仅构建时间戳、非数据本身），
-        # 使 ?v 只随「真实数据」变化，构建时刻/竞态不再影响 ?v，彻底消除失配。
-        neutral = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', text)
-        return hashlib.sha1(neutral.encode('utf-8')).hexdigest()[:10]
-    except Exception:
-        return ""
+    # 🔴 2026-09-10 一劳永逸修复（主人令：根治「数据回滚/更新后浏览器陈旧缓存」）：
+    #   原内容哈希 ?v 在「数据被回滚到旧内容」时，哈希恰好等于旧版 → 浏览器缓存旧 ?v
+    #   永远吐旧数据（表现为「最终推荐回退到2天前」「盘中主线卡在旧时刻」）。
+    #   改为单调部署令牌（unix 秒），每次构建必变 → 浏览器永远重载最新数据；
+    #   代价是全量重载（数据可靠性优先于带宽，符合主人「最及时准确数据」铁律）。
+    #   同一进程内复用同一令牌，保证一次构建所有 data/*.js 的 ?v 一致（单次统一失效）。
+    global _UPDATE_TOKEN
+    if _UPDATE_TOKEN is None:
+        _UPDATE_TOKEN = str(int(time.time()))
+    return _UPDATE_TOKEN
 
 
 def _rewrite_index_html_cache_busters():
