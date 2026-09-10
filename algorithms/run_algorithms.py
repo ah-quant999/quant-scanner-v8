@@ -433,7 +433,7 @@ def _is_post_close_picking_ready():
     #   按「现在 06:36 属盘前」重新否决 → generate_top10 / strategy_four_volume(_60m) /
     #   gen_triple_consensus / calc_crds 全部 exit 1 → B 批残缺 → D/E 永不执行。
     if os.environ.get("V8_GATE_AUTHORIZED") == "1":
-        logging.info('[run_algorithms] 批次闸门已授权本链 → 放行选股脚本（不再按钟点二次否决）')
+        print('[run_algorithms] 批次闸门已授权本链 → 放行选股脚本（不再按钟点二次否决）')
         return True
     # 2026-08-20 根因修复：统一使用 time_gate 的 UTC+8 计算，避免 runner 时区漂移。
     sys.path.insert(0, ALGO)
