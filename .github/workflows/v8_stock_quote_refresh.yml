@@ -373,8 +373,10 @@ jobs:
                       print("  ⚠️ index.html 不存在，跳过 ?v 更新")
                       raise SystemExit(0)
                   raise
-          # 匹配: <script src="data/STOCK_QUOTE.js?v=..."></script>
-          pattern = r'(<script[^>]*src=["\']data/STOCK_QUOTE\.js\?v=)([a-f0-9]+)(["\'])'
+          # 匹配: index.html 实际用 loader 数组 {name:'STOCK_QUOTE', url:'data/STOCK_QUOTE.js?v=xxx'}
+          #       （run94 实证旧 <script src> 正则匹配 0 处 → 假 success 跳过）。
+          #       改为上下文无关匹配，兼容 loader 数组与 script 标签两种形态。
+          pattern = r'(data/STOCK_QUOTE\.js\?v=)([a-f0-9]+)'
           new_html, n = re.subn(pattern, lambda m: m.group(1) + content_sha + m.group(3), html)
           if n == 0:
               print("  ⚠️ index.html 中未找到 STOCK_QUOTE.js?v= 引用，可能已被外链替换；跳过 ?v 更新")
