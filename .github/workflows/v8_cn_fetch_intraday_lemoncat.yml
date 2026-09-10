@@ -7,7 +7,7 @@
 #   新模型：
 #     - 盘中 14 档（9:40/10:00/.../15:00 CST，跳午休 11:30-13:00）由本 workflow 统一调度。
 #     - 每档先 dispatch 云端 v8_cn_fetch_cloud（category=intraday，云端抓中国源主力）。
-#     - sleep 600s（10 分钟）等待云端跑完。
+#     - 实时轮询云端 run 状态（最多 12 分钟，每 30s 探测），成功即结束；超时/失败转兜底。
 #     - gh api 查 run 状态：成功 → 本档结束；失败/超时/无 run → dispatch
 #       v8_cn_fetch_cloud_selfhosted（小九 cn IP 兜底，同 runner 不出海）。
 #     - 接力赛：云端抓 8-10min + 小九 10min 后检查 + 失败小九兜底（cn IP 直连）→ 一档 20-25min。
@@ -109,12 +109,50 @@ jobs:
             echo "ok=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: "⏳ sleep 600s（10 分钟）等待云端跑完"
+      - name: "⏳ 实时轮询云端 run 状态（最多 12 分钟，每 30s 探测）"
         if: steps.dispatch_cloud.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
-          echo "档期起点: $(TZ=Asia/Shanghai date '+%F %T') CST, sleep 10min..."
-          sleep 600
+          set +e
+          echo "档期起点: $(TZ=Asia/Shanghai date '+%F %T') CST, 开始实时轮询云端 run..."
+          REPO="ah-quant999/quant-scanner-v8"
+          DONE=0
+          for i in $(seq 1 24); do
+            sleep 30
+            STATUS=$(curl -sS -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/$REPO/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=3" \
+              | python -c "
+            import sys, json, datetime
+            try:
+                d = json.load(sys.stdin)
+            except Exception:
+                print('PARSE_FAIL')
+                sys.exit(0)
+            now = datetime.datetime.now(datetime.timezone.utc)
+            for r in d.get('workflow_runs', []):
+                c = r.get('created_at', '')
+                if not c:
+                    continue
+                try:
+                    ts = datetime.datetime.fromisoformat(c.replace('Z', '+00:00'))
+                except Exception:
+                    continue
+                if (now - ts).total_seconds() / 60 < 30:
+                    print(r.get('status'), r.get('conclusion'))
+                    break
+            else:
+                print('NONE')
+            " 2>/dev/null)
+            echo "  轮询#$i: [$STATUS] @ $(TZ=Asia/Shanghai date '+%H:%M:%S')"
+            if [ "$STATUS" = "completed success" ]; then
+              echo "✅ 云端本档已完成 @ $(TZ=Asia/Shanghai date '+%F %T') CST"; DONE=1; break
+            fi
+          done
+          if [ "$DONE" = "0" ]; then
+            echo "⚠️ 轮询 12 分钟云端仍未成功 → 交由后续兜底步处理"
+          fi
           echo "档期检查点: $(TZ=Asia/Shanghai date '+%F %T') CST"
 
       - name: "🔍 gh api 查云端 run 状态"
