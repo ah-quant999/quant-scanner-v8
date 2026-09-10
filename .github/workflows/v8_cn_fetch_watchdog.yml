@@ -14,9 +14,10 @@
 name: "🐕 v8 数据抓取看门狗(云端自愈)"
 
 on:
-  schedule:
-    # 交易日 08:00-21:30 CST 每 30 分（UTC 00:00-13:30）。覆盖盘前/盘中/盘后+晚间全窗口。
-    - cron: '*/30 0-13 * * 1-5'
+  # 🔴 2026-09-09 盘中更新审计·一劳永逸：移除 GitHub schedule cron。
+  #    根因：GitHub schedule 在高负载时被整段静默漏触发（实测 2026-09-01 全天 0 次），
+  #    单靠 workflow 内置 cron 不可靠。改由 WorkBuddy 自动化「v8 看门狗驱动(每15分)」(id=2d9121c8)
+  #    用 workflow_dispatch 主动触发本看门狗，彻底去 schedule 依赖（与云端 cron 静默丢失解耦）。
   workflow_dispatch:
     inputs:
       force_category:
@@ -88,7 +89,7 @@ jobs:
           BASE_URL = "https://ah-quant999.github.io/quant-scanner-v8/data/"
           PROBE = {
               "intraday": ["LIMIT_UP_HEATMAP.js", "CONCEPT_RANKING.js", "CAPITAL_FLOW_DATA.js",
-                           "SECTOR_FUND_FLOW.js", "INDEX_QUOTES.js"],
+                           "SECTOR_FUND_FLOW.js", "INDEX_QUOTES.js", "CANDIDATE_QUOTES.js"],
               "premarket": ["JUDGMENT_DATA.js", "CRISIS_DATA.js", "LIMIT_UP_HEATMAP.js"],
               "post_close": ["LHB_DATA.js", "CANDIDATE_QUOTES.js", "CAPITAL_FLOW_DATA.js"],
           }
@@ -96,8 +97,11 @@ jobs:
           thr = 35 if cat == "intraday" else 60
           PAT = re.compile(r'"?update_time"?\s*[:=]\s*"([^"]+)"')
 
-          def already_running():
-              """派发前确认没有正在跑/排队的 cn_fetch run，避免重复排队互相拖累。"""
+          # 🔴 2026-09-09 盘中更新审计·一劳永逸：不仅看「有没有在跑」，还要看「最近一次是否失败/拥堵」。
+          #    云端 ubuntu-latest 队列拥堵时（>=2 run 在排队 或 最近一次 failure），改派 self-hosted cn runner
+          #    兜底，避免 13:00 数据停滞 70min 同类事故。
+          def cloud_state():
+              """查询云端 cn_fetch 队列状态 + 最近一次完成结论。"""
               try:
                   import os as _os
                   rq = urllib.request.Request(
@@ -106,9 +110,34 @@ jobs:
                       headers={"User-Agent": "Mozilla/5.0",
                                "Authorization": "Bearer " + _os.environ.get("GH_TOKEN", "")})
                   j = json.loads(urllib.request.urlopen(rq, timeout=20).read())
-                  return sum(1 for x in j.get("workflow_runs", []) if x.get("status") != "completed")
-              except Exception:
-                  return 0
+                  runs = j.get("workflow_runs", [])
+                  running = sum(1 for x in runs if x.get("status") != "completed")
+                  latest = None
+                  for x in runs:
+                      if x.get("status") == "completed":
+                          latest = x.get("conclusion")
+                          break
+                  return running, latest
+              except Exception as e:
+                  print(f"[watchdog] 查云端状态失败: {e}")
+                  return 0, None
+
+          def dispatch_cat(category, use_selfhosted=False):
+              """按拥堵状态派发：云端正常 -> 派云端；拥堵/刚失败 -> 派 selfhosted 兜底。"""
+              import subprocess
+              if use_selfhosted:
+                  r = subprocess.run(
+                      ["gh", "workflow", "run", "v8_cn_fetch_cloud_selfhosted.yml",
+                       "-f", f"category={category}"],
+                      capture_output=True, text=True, check=False)
+                  print(r.stdout.strip(), r.stderr.strip())
+                  print(f"[watchdog] 🛰️ 已派 selfhosted {category}（云端拥堵/刚失败兜底）")
+                  return
+              r = subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
+                                "-f", f"category={category}"],
+                               capture_output=True, text=True, check=False)
+              print(r.stdout.strip(), r.stderr.strip())
+              print(f"[watchdog] ☁️ 已派云端 {category}")
 
           stale, newest = [], None
           for fn in files:
@@ -131,20 +160,22 @@ jobs:
 
           if newest is None:
               print(f"[watchdog] 无法解析任何数据时间戳，保守派发 {cat}")
-              if not already_running():
-                  subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
-                                  "-f", f"category={cat}"], check=False)
+              n, latest = cloud_state()
+              if n >= 2 or latest == "failure":
+                  print(f"[watchdog] 云端拥堵({n} run)或刚失败({latest})，改派 selfhosted")
+                  dispatch_cat(cat, use_selfhosted=True)
+              else:
+                  dispatch_cat(cat, use_selfhosted=False)
               sys.exit(0)
 
           if stale:
               print(f"[watchdog] ❌ {len(stale)}/{len(files)} 个文件陈旧（阈值 {thr}min），准备派发 {cat}")
-              n = already_running()
-              if n:
-                  print(f"[watchdog]    云端已有 {n} 个 run 在跑/排队，本轮不重复派发")
+              n, latest = cloud_state()
+              if n >= 2 or latest == "failure":
+                  print(f"[watchdog] 云端拥堵({n} run)或刚失败({latest})，改派 selfhosted 兜底")
+                  dispatch_cat(cat, use_selfhosted=True)
               else:
-                  r = subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
-                                      "-f", f"category={cat}"], capture_output=True, text=True, check=False)
-                  print(r.stdout.strip(), r.stderr.strip())
+                  dispatch_cat(cat, use_selfhosted=False)
               # ::error 注解：坏死文件在 Actions UI 直接标红，不再静默（原代码只 print，无人知晓）
               print("::error title=数据陈旧::" +
                     ", ".join(f"{fn}({a:.0f}min)" for fn, a in stale))
