@@ -198,6 +198,26 @@ _KLINE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 _KLINE_CACHE = {}
 
 
+# 🔴 2026-09-10 主人令铁律「只认最新收盘」：K 线缓存必须覆盖最近交易日才算有效。
+#   背景：缓存逐晚回写，但 09-10 实测 raw_data/kline_cache 2724 个文件里，末根 K 线
+#   分布在 09-07 / 09-08 / 09-02…（没有一个到 09-10），而消费侧只看「行数够不够」→
+#   20 日涨幅、形态判定全部基于数日前的价格，最终推荐随之失真。
+#   现加内容级日期闸：陈旧即实时重取（重取失败才退化为陈旧值并打 degraded 告警）。
+_EXPECTED_KLINE_END = None
+
+
+def _expected_kline_end():
+    """期望的 K 线末根交易日（最近 A 股交易日，CST）；取不到返回 ""（不拦截）。"""
+    global _EXPECTED_KLINE_END
+    if _EXPECTED_KLINE_END is None:
+        try:
+            import v8_date  # 仓库根目录模块（上方 sys.path 已含根目录）
+            _EXPECTED_KLINE_END = str(v8_date.last_trading_day(max_lookback=15))[:10]
+        except Exception:
+            _EXPECTED_KLINE_END = ""
+    return _EXPECTED_KLINE_END
+
+
 def _num_code(code):
     return re.sub(r"\D", "", str(code or ""))
 
@@ -317,11 +337,19 @@ def _load_kline(code):
             rows.sort(key=lambda x: x[0])
     except Exception:
         rows = []
-    # 缓存 miss 或数据不足：实时拉取
-    if len(rows) < 21:
+    # 缓存 miss / 数据不足 / 🔴陈旧（末根未覆盖最近交易日）→ 实时拉取
+    exp = _expected_kline_end()
+    stale = bool(rows and exp and rows[-1][0] < exp)
+    if len(rows) < 21 or stale:
         records = _fetch_kline_fallback(code)
-        rows = [(r["date"], r["close"]) for r in records if r.get("date") and r.get("close") > 0]
-        rows.sort(key=lambda x: x[0])
+        fresh = [(r["date"], r["close"]) for r in records if r.get("date") and r.get("close") > 0]
+        fresh.sort(key=lambda x: x[0])
+        if fresh:
+            if stale:
+                print(f"  ⚠️ {code}: K线缓存陈旧(止于 {rows[-1][0]} < {exp}) → 已实时重取")
+            rows = fresh
+        elif stale:
+            print(f"  ⚠️ {code}: K线缓存陈旧(止于 {rows[-1][0]}) 且实时拉取失败 → 暂用陈旧值(degraded)")
     _KLINE_CACHE[code] = rows
     return rows
 

@@ -387,7 +387,7 @@ jobs:
             echo "🔇 dispatch×非交易日：算法链必被交易日 gate 跳过，纯空转，静默"
             exit 0
           fi
-          HH=$(TZ=Asia/Shanghai date +%H)
+          HH=$(date -u -d '+8 hours' +%H)
           # 🔴 2026-09-07 一劳永逸修复（22 个红灯根因）：原 [6,18) 静默窗写于 09-03，
           #   09-04 时序重排把 A 采集批挪到 16:40 后，16/17 点 dispatch 被误杀 →
           #   cron 又静默失效（本 workflow 多 cron 顽疾）→ A 档既无 schedule 又被闸门拦，
@@ -402,11 +402,17 @@ jobs:
           #   00:00-05:59 时 TODAY 已翻到次日，昨晚盘后产物会被判"不新鲜"
           #   → 午夜派发风暴可无限放行全链(2-3h/轮)。修法：凌晨归前一交易日，
           #   用昨日日期+16点判据；昨晚已产出 → 静默。
-          if [ "$(TZ=Asia/Shanghai date +%H)" -lt 6 ]; then
-            TODAY=$(TZ=Asia/Shanghai date -d yesterday +%F)
+          # 🔴 2026-09-10 主人令根因修复（Windows 自托管 runner 无 tzdata）：
+          #   `TZ=Asia/Shanghai date +%H` 在 Git Bash 下被**静默忽略** → 取到 UTC 小时。
+          #   本机实测：TZ=Asia/Shanghai date +%H = 12（UTC），date -u -d '+8 hours' +%H = 20（真 CST）。
+          #   后果（09-10 实锤）：CST 16:40/18:10/19:15/20:00/21:00 派发 → UTC 08~13 ⊂ [6,16)
+          #   → 命中下方「无效时段」静默分支 → **盘后链从未真正跑过，run 却报 success**（假成功）。
+          #   统一改用仓库既有正确写法 date -u -d '+8 hours'（第 686 行早已如此）。
+          if [ "$(date -u -d '+8 hours' +%H)" -lt 6 ]; then
+            TODAY=$(date -u -d '+8 hours -1 day' +%F)
             echo "ℹ️ 凌晨时段：新鲜度归属前一交易日 ${TODAY}"
           else
-            TODAY=$(TZ=Asia/Shanghai date +%F)
+            TODAY=$(date -u -d '+8 hours' +%F)
           fi
           FRESH=0
           for f in TRIPLE_CONSENSUS FOUR_VOLUME CRDS_CARD_DATA; do
@@ -468,7 +474,7 @@ jobs:
             exit 0
           fi
           # 与云端分批同口径：按 CST 小时算 stage（16:40采集/18:10选股/20:00汇总/21:00回测，2026-09-04 重排）
-          HH=$(TZ=Asia/Shanghai date +%H)
+          HH=$(date -u -d '+8 hours' +%H)
           STAGE=""
           case "$HH" in
             16|17) STAGE="A" ;;
@@ -516,7 +522,9 @@ jobs:
           #   22/23 及夜间小时不进批（防 20:00 D 批漂移到 23:0x 后按小时误进 E 批、
           #   当晚 final_recommend 丢失），仍全链兜底。
           STAGE=""
-          HH=$(TZ=Asia/Shanghai date +%H)
+          # 🔴 2026-09-10 根因修复：stage 也按真 CST 小时算（原 TZ= 写法在 Windows runner 取 UTC，
+          #   导致 19:26 CST 派发被判成 UTC 11 点 → 落 * 分支跑「全链」而非 B 批，整晚被拖长）。
+          HH=$(date -u -d '+8 hours' +%H)
           IN_STAGE="$(printf '%s' "${{ github.event.inputs.stage || github.event.client_payload.stage || '' }}" | tr -cd 'A-Za-z' | tr 'a-z' 'A-Z')"
           if [ -n "$IN_STAGE" ]; then
             case "$IN_STAGE" in

@@ -312,6 +312,29 @@ def _cache_path(code):
     return os.path.join(CACHE_DIR, f"{code}.json")
 
 
+# 🔴 2026-09-10 主人令铁律「只认最新收盘」：
+#   原实现只用文件 mtime 判断缓存新鲜度，而 git 检出 / 坚果云同步 / 每轮回写都会把
+#   陈旧内容的 mtime 刷成"刚写的" → 2026-09-07 的 K 线被当成新鲜数据算进 RPS/RS。
+#   实测 09-10：raw_data/_rps_cache 461 个文件里 375 个末根 K 线停在 09-07（81%）。
+#   现改为**内容级判据**：末根 K 线日期必须 >= 最近交易日，否则视为 miss → 强制重取。
+_EXPECTED_KLINE_END = None
+_STALE_CACHE_N = 0
+
+
+def _expected_kline_end():
+    """期望的 K 线末根交易日（最近 A 股交易日，CST）；取不到返回 ""（不拦截）。"""
+    global _EXPECTED_KLINE_END
+    if _EXPECTED_KLINE_END is None:
+        try:
+            if ROOT not in sys.path:
+                sys.path.insert(0, ROOT)
+            import v8_date
+            _EXPECTED_KLINE_END = str(v8_date.last_trading_day(max_lookback=15))[:10]
+        except Exception:
+            _EXPECTED_KLINE_END = ""
+    return _EXPECTED_KLINE_END
+
+
 def _load_cache(code, max_age_days=1):
     path = _cache_path(code)
     if not os.path.exists(path):
@@ -324,7 +347,18 @@ def _load_cache(code, max_age_days=1):
             rows = json.load(f)
         if not rows or len(rows) < 20:
             return None
-        return pd.DataFrame(rows)
+        df = pd.DataFrame(rows)
+        # 🔴 内容级新鲜度闸（铁律）：末根 K 线未覆盖最近交易日 → 视为 miss，强制重取
+        exp = _expected_kline_end()
+        if exp and "date" in df.columns and len(df):
+            last = str(df["date"].iloc[-1])[:10]
+            if last < exp:
+                global _STALE_CACHE_N
+                _STALE_CACHE_N += 1
+                if _STALE_CACHE_N <= 3 or _STALE_CACHE_N % 50 == 0:
+                    print(f"  ⚠️ 陈旧K线缓存 #{_STALE_CACHE_N}（末根 {last} < 期望 {exp}）→ 强制重取: {code}")
+                return None
+        return df
     except Exception:
         return None
 
