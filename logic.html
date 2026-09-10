@@ -1341,7 +1341,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td>8</td><td>动量共识</td><td>动量共识筛选卡数据</td><td>scripts/momentum_common_filter.py</td><td>B</td><td>🆕 2026-09-04 主人令：candidates 全量共振 +1，非开仓期 ×0.3</td></tr>
         </table>
         <div class="logic-h">四层保障（云端 / 双机 / 运维 / 算法链）</div>
-        <div class="logic-p">· <b>算法链</b>：8 源全部在链上自产，且全部纳入「盘后选股门控」——18:00 前一律不跑，防半日数据出假选股（2026-08-20 主人令）。<br>· <b>云端 / 双机</b>：算法链跑前探针路由——本机 runner（lemoncat-cn）在线且空闲则按批转派 cn 链，否则云端跑全链，永不断供；两机共用同一份算法链代码，源配置天然一致。<br>· <b>运维</b>：健康面板对各源数据卡的新鲜度统一按 360 分钟阈值监控；某源红灯 = 看它产出脚本在哪个批次，等对应批次跑完即可自愈。<br>· <b>生效时点</b>：算法链 run 启动时即锁定代码快照——push 新源后<b>正在跑的链不可见</b>，下一次 checkout 才生效。若当晚推荐卡没出现新源标签，先看链的启动时间，勿误报故障。</div>
+        <div class="logic-p">· <b>算法链</b>：8 源全部在链上自产，且全部纳入「盘后选股门控」——18:00 前一律不跑，防半日数据出假选股（2026-08-20 主人令）。<br>· <b>云端 / 双机</b>：算法链为 <b>active-active</b>（<code>v8_algo_cloud</code> 固定 <code>runs-on: [self-hosted, cn]</code>），lemoncat-cn / alimi-cn 谁在线谁接单；两机共用同一份算法链代码，源配置天然一致。<b>（2026-09-10 更正：原「探针路由」已删除，勿再按该口径排查。）</b><br>· <b>运维</b>：健康面板对各源数据卡的新鲜度统一按 360 分钟阈值监控；某源红灯 = 看它产出脚本在哪个批次，等对应批次跑完即可自愈。<br>· <b>生效时点</b>：算法链 run 启动时即锁定代码快照——push 新源后<b>正在跑的链不可见</b>，下一次 checkout 才生效。若当晚推荐卡没出现新源标签，先看链的启动时间，勿误报故障。</div>
         <div class="logic-h">不接入的源</div>
         <div class="logic-p"><b>选股生命周期</b>（2026-09-04 主人拍板）：不做入选 source，二期转为<b>负向护栏</b>（只对已入选标的做剔除/降权，不做发现信号）——它管的是「已持有/已入选」的票，不是找新票。</div>
       <div class="card">
@@ -1786,7 +1786,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 <div class="lg-pane" id="lg-op">
       <div class="card">
         <h3><span class="ic">⏰</span>v8 定时任务矩阵（最新版，已对齐实际 workflow）</h3>
-        <div class="logic-p"><b>执行方说明（2026-08-06 更新）</b>：中国数据抓取已迁 <b>GitHub 云端 ubuntu-latest</b>（实测 push2delay 东财镜像 + akshare 从 GHA 可达，OK 10/11），<code>v8_cn_fetch_cloud</code> 自动调度跑在云端 24/7，<b>不依赖小九停电与否</b>。原盘中自愈器 v8_intraday_healer / Safety Net 兜底 v8_safety_net 已于 2026-08 删除（commit 1fe4f8c71），职能并入 v8_health_patrol + v8_freshness_watch。盘后算法链主链已迁 GitHub 云端 <code>v8_algo_cloud</code>（08-06 收敛 4→1 条 cron 修复静默失效），<code>v8_algo_run</code> 仅保留 workflow_dispatch 应急回退（cn runner 不再跑 cron 主链）；构建/部署/体检/清理/备份/自愈/健康监控全部云端。小九本机只运行看门狗监督 + 盘后算法链，不手动跑数据、不手动部署。</div>
+        <div class="logic-p"><b>执行方说明（2026-08-06 更新）</b>：中国数据抓取已迁 <b>GitHub 云端 ubuntu-latest</b>（实测 push2delay 东财镜像 + akshare 从 GHA 可达，OK 10/11），<code>v8_cn_fetch_cloud</code> 自动调度跑在云端 24/7，<b>不依赖小九停电与否</b>。原盘中自愈器 v8_intraday_healer / Safety Net 兜底 v8_safety_net 已于 2026-08 删除（commit 1fe4f8c71），职能并入 v8_health_patrol（2026-09-10 起 v8_freshness_watch 亦已整链删除，新鲜度守门职责同样归 v8_health_patrol）。盘后算法链主链已迁 GitHub 云端 <code>v8_algo_cloud</code>（08-06 收敛 4→1 条 cron 修复静默失效），<code>v8_algo_run</code> 仅保留 workflow_dispatch 应急回退（cn runner 不再跑 cron 主链）；构建/部署/体检/清理/备份/自愈/健康监控全部云端。小九本机只运行看门狗监督 + 盘后算法链，不手动跑数据、不手动部署。</div>
 
         <div class="logic-p">每次抓取后经 <code>api_push_raw</code> 推 <code>raw_data</code> → <code>v8_build_deploy</code> 自动 selective build + 部署 Pages，所以每个时间槽的“更新”必然触发对应前端的“部署”，不遗漏。</div>
 
@@ -1794,7 +1794,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">🛡 <b>HERDING_DATA（羊群效应）</b>：类别由 <code>premarket</code> 改为 <code>post_close</code>。该模块依赖当日完整涨停池，盘前/盘中数据不全，只有盘后生成才有意义，消除 runner 空 1 模块 warn。<br>
         🛡 <b>RUNNER_STATUS 时间戳</b>：<code>cloud_fetch_v8.py</code> 生成 runner_status 时补标准字段 <code>update_time</code>；<code>update_v8.py</code> 兼容旧产物 <code>run_time</code> → <code>update_time</code>，供 guard/前端统一读取。<br>
         🛡 <b>NT_DATA 盘前 180min 豁免</b>：NT_DATA 为 ETF 实时异动，盘前本就不刷新；<code>guard_v8_freshness.py</code> 在 06:30–09:30 之间对 NT_DATA 陈旧/无时间豁免告警与派发，避免清晨误报。<br>
-        🛡 <b>调度器深夜窗口漂移</b>：<code>v8_freshness_watch.yml</code> cron 由全天 <code>10,40 * * * *</code> 收紧为工作日 <code>10,40 0-14 * * 1-5</code>（CST 08:00–22:10）；本地 WorkBuddy 档期调度器 rrule 同步加 BYDAY/BYHOUR 限制（8–22 点、工作日），防止深夜窗口外空转漂移。</div>
+        🗑 <b>（本条已失效 · 2026-09-10 删除）</b>原「调度器深夜窗口漂移」所述 <code>v8_freshness_watch.yml</code> 与 <code>v8_slot_scheduler.yml</code> 已整链删除：前者与 <code>v8_health_patrol</code> 跑同一份 <code>guard_v8_freshness.py</code>、同一 dispatch 目标，属纯重复派发源；后者自 09-09 起已无 cron 空转。删除后派发源收敛为「一条主线 + 一个兜底」，详见下方「<b>2026-09-10 派发源精简与假成功根治</b>」。</div>
 
         <div class="logic-h">2026-09-08 补充修复：审计产物保护 + 过期不挂实时徽章 + NT_DATA 页面归属</div>
         <div class="logic-p">【审计产物保护 / api_push_raw.py】新增模块级 _PROTECTED_RAW = {"raw_data/audit_history.json","raw_data/audit_nightly.log"}，在 walk_raw() 与 main() 的 PUSH_FILES 分支双重跳过这两个文件。根因：审计轨迹只由本机审计脚本经 git 推送，若经 api_push_raw 的 Git Database API 裸推，cn runner 工作区的旧审计文件会覆盖 main 上的新版、吞掉历史审计轨迹（实测 09-08 多轮审计记录丢失）。<br>
@@ -1802,22 +1802,51 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         【NT_DATA 页面归属 / v8_health_check.py】NT_DATA 由盘后算法链 fetch_orphan_nt_data.py 产出，原挂「今日事件」页在 08:00-10:00 盘前被 adjust_max_age 收紧到 180min 误杀；现改挂「全量数据」页豁免（盘后产物本不可能 &lt;180min 新鲜），与上文 guard_v8_freshness.py 的 180min 豁免互补。</div>
 
 
-        <table class="lg-table">
+        <div class="logic-h" style="background:linear-gradient(135deg,#7c2d12,#9a3412);color:#fed7aa;padding:8px 12px;border-radius:6px;margin:12px 0;">📋 2026-09-10 派发源精简 + 假成功根治（阿狸咪 · 主人令「一劳永逸」）</div>
+
+<div class="logic-h">① 派发源收敛：只留「一条主线 + 一个兜底」</div>
+<div class="logic-p"><b>问题</b>：同一并发组 <code>v8-cn-fetch-cloud</code> 被<b>多源抢派</b>（准点档调度器 + 新鲜度守门 :10/:40 + 看门狗 + 本机 WorkBuddy 按铃）。GitHub 并发语义是<b>同组只保留 1 running + 1 pending</b>，第 3 个派发会把 pending 顶掉变 <code>cancelled</code>——当日实测 <code>v8_cn_fetch_cloud</code> 共 <b>47 run / 25 cancelled</b>，且绝大多数 cancelled 的 run 连 job 都没生成（从未启动）。<br>
+<b>处置（commit 6231ff76，Git Database API 单次原子提交）</b>：<br>
+· 🗑 删除 <code>v8_freshness_watch.yml</code>——与 <code>v8_health_patrol</code> 跑同一份 <code>guard_v8_freshness.py</code>、同一 dispatch 目标，属纯重复<br>
+· 🗑 删除 <code>v8_slot_scheduler.yml</code> + <code>.github/scripts/v8_slot_scheduler.py</code>（09-09 起已无 cron 休眠）<br>
+· 📉 <code>v8_health_patrol</code> 陈旧阈值 <b>6 分 → 30 分</b>（原值为全仓最激进派发阈值）<br>
+· ⏸ 本机 WorkBuddy 自动化「数据新鲜度自动值守」（每小时 :30）<b>暂停</b>（按铁律只暂停不删除）<br>
+<b>🔴 现行铁律</b>：盘中唯一主线 = <code>v8_cn_fetch_intraday_lemoncat</code>（14 档 + 三重守卫）；唯一状态型兜底 = <code>v8_cn_fetch_watchdog</code>（陈旧 &gt; 45 分钟才动手）；主体定时 = <code>v8_cn_fetch_cloud</code> 自身 3 条 cron。三者共用 <code>v8-cn-fetch-cloud</code> 组。<b>禁止新增第四个派发者</b>——要补缺口就调这三者的阈值/守卫；新增带 cron 的 workflow 必须双登记（<code>align_logic_ops.py</code> 名单 + 文档），否则 Pre-deploy audit 失败 → <b>全链阻断部署</b>。</div>
+
+<div class="logic-h">② 假成功根治：<code>landcheck</code> 终检步</div>
+<div class="logic-p"><b>问题</b>：<code>v8_cn_fetch_cloud.yml</code> 有 16 个消费步带 <code>continue-on-error: true</code>，失败只打 annotation、<b>job 结论仍是 success</b> → 看门狗 / 巡检 / 人眼看到全绿即认定「已刷新」、不再兜底，数据于是持续陈旧。<br>
+<b>处置</b>：<code>v8_cn_fetch_cloud.yml</code> 末尾新增 <code>landcheck</code> 步，<b>不看步骤报错、只看结果事实</b>——用 Contents API 直读远端 main 该 category 代表文件的 <code>update_time</code> 是否 ≥ <code>run_started_at − 3min</code>：<br>
+· <b>0 个推进</b> = 整轮空转假成功 → <code>::error title=v8-fake-success</code> + <code>exit 1</code>（run 变红，看门狗 / 巡检才会兜底）<br>
+· <b>部分推进</b> = 局部软失败 → 交既有 <code>softfail-summary</code> 覆盖，本步不重复报红<br>
+· <b>全部解析不出</b> = 证据不足 → <b>不报红</b>（宁可不报，不误报）<br>
+⚠️ <b>PROBE 清单必须与 <code>v8_cn_fetch_watchdog.yml</code> 的 PROBE 同源同口径，改一处必须改两处。</b><br>
+<b>配套认知</b>：cloud run 变红<b>不阻断部署</b>（<code>v8_build_deploy</code> 用 <code>workflow_run: types: [completed]</code>，不筛结论）。看到红先确认是不是 <code>v8-fake-success</code>。</div>
+
+<div class="logic-h">③ runner 标签实测（推翻旧注释）</div>
+<div class="logic-p">· <code>lemoncat-cn</code>（小九单位机）：<code>self-hosted, Windows, X64, cn, <b>xiaojiu</b></code><br>
+· <code>alimi-cn</code>（阿狸咪家中机）：<code>self-hosted, Windows, X64, cn, <b>cn-cn</b></code><br>
+<b>两台机器都挂 <code>cn</code></b> → <code>runs-on: [self-hosted, cn]</code> 是<b>标签集合而非专属标签，会被抢单</b>（2026-09-10 实测：盘中准点档 14 档有 11 档落 alimi-cn）。<b>想只跑某一台，必须用其专属标签 <code>xiaojiu</code> / <code>cn-cn</code>。</b><br>
+⚠️ <code>v8_algo_cloud.yml</code> 内注释称「家里机 runner PATH 缺 bash/git，step4 报 bash: command not found」——本机日志实证 job 用 <code>shell: bash</code> 且步骤 success，<b>该结论已过时，勿照抄</b>（核心链路未擅改，待小九确认）。</div>
+
+<div class="logic-h">④ 交接触达通道（本次新发现的坑）</div>
+<div class="logic-p"><code>auto_handoff_read.py</code> 的 URGENT 目录是 <code>docs/ops/urgent/</code>，但 09-08 之后历史紧急件全写在 <code>docs/ops/handover/</code> → <b>从未被「最近紧急文件」段读到</b>。本次起归位 <code>docs/ops/urgent/</code>。另：读取器按 mtime 排序取 5 篇，且<b>每篇只打印前 20 行</b> → 紧急件前 20 行必须自洽。</div>
+
+<table class="lg-table">
           <tr><th>时间槽</th><th>Workflow</th><th>类别</th><th>刷新的前端模块</th></tr>
           <tr><td>08:25（工作日）/ 09:00（周六日）</td><td>v8_cn_fetch_cloud</td><td>盘前</td><td>今日事件(V8_CAL日历+今日判定JUDGMENT_DATA+打新)、IPO、两融、宏观、危机雷达、北向、分析师评级、52周高、羊群效应、ETF申赎、解禁日历、业绩预告</td></tr>
-          <tr><td>09:40 / 10:00 / 10:30 / 11:00 / 11:30 / 13:00 / 13:30 / 14:00 / 14:30 / 15:10</td><td>v8_cn_fetch_cloud</td><td>盘中</td><td>指数行情、亚太市场、ETF脉搏、ETF盘中热度、ETF日监控(实时)、板块资金流、行业树图、个股资金流、概念排行、涨停热力、候选池实时行情、成交金额/涨跌家数(SH_SZ_HISTORY)</td></tr>
-          <tr><td>15:30 / 17:20</td><td>v8_cn_fetch_cloud</td><td>盘后</td><td>EXPERIMENT、期指主力合约、大盘资金流累积序列、ETF日监控再补抓(T+1收盘定稿)、龙虎榜历史回填</td></tr>
-          <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓</td><td>港股16:00收盘后补抓恒指/港股候选/盘中模块收盘值（A股已收盘，不重复抓A股）</td></tr>
+          <tr><td>09:40 / 10:00 / 10:20 / 10:40 / 11:00 / 11:20 / 11:40 / 13:00 / 13:20 / 13:40 / 14:00 / 14:20 / 14:40 / 15:00<br><span style="color:var(--dim)">（14 档 · 20 分钟/档 · 跳午休）</span></td><td>v8_cn_fetch_intraday_lemoncat<br><span style="color:var(--dim)">→ dispatch</span> v8_cn_fetch_cloud</td><td>盘中</td><td>指数行情、亚太市场、ETF脉搏、ETF盘中热度、ETF日监控(实时)、板块资金流、行业树图、个股资金流、概念排行、涨停热力、候选池实时行情、成交金额/涨跌家数(SH_SZ_HISTORY)</td></tr>
+          <tr><td>17:20 / 18:20 / 19:20</td><td>v8_cn_fetch_cloud</td><td>盘后</td><td>EXPERIMENT、期指主力合约、大盘资金流累积序列、ETF日监控再补抓(T+1收盘定稿)、龙虎榜历史回填</td></tr>
+          <tr><td>17:20 起（随 post_close 档）</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓</td><td>港股 16:00 收盘后随盘后档补抓恒指/港股候选/盘中模块收盘值（A股已收盘，不重复抓 A 股）。<span style="color:var(--dim)">2026-09-10 核对：v8_cn_fetch_cloud 实际 cron 仅 3 条（08:25 / 17:20·18:20·19:20 / 周六日 09:00），原表所写「16:30 档」已不存在。</span></td></tr>
           <tr><td>16:30</td><td>v8_cn_fetch_experiments</td><td>实验卡（暂未上架）</td><td>🧪 2026-09-10 主人令：3 张实验卡（估值分位切换 / 因子审计 / 指数估值中枢）盘后抓取，独立于主链 v8_cn_fetch_cloud 的 17:20/18:20/19:20 三档，避免单点失败连累主链路。fetcher→update_v8→推 main 原子提交（仅这 3 张相关 data + index.html）。</td></tr>
-          <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达</td><td>危机雷达/风险温度计实时刷新（美股开盘情绪覆盖 19:00-22:00 北京时间）</td></tr>
-          <tr><td>16:40 / 18:10 / 19:15 / 20:00（A/B/C/D 四批）</td><td>v8_algo_cloud<br><span style="color:var(--cyan)">+ 探针路由</span></td><td>盘后算法（云端主链·分批跑）</td><td>A采集/B选股/C回测/D汇总(final_recommend)；龙虎榜/三重共识/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu）。<br><span style="color:var(--cyan)">调度前探针检查 lemoncat-cn 状态：online+idle 则 A/B/C 批转派中国节点；离线/忙/失败均回落云端。</span></td></tr>
+          <tr><td>08:00–16:30 每 30 分<br>+ 19:00/20:00/21:00/22:00 整点</td><td>v8_risk_gauge</td><td>危机雷达</td><td>危机雷达/风险温度计实时刷新（美股开盘情绪覆盖 19:00-22:00 北京时间）</td></tr>
+          <tr><td>16:40 / 18:10 / 20:00 / 21:00（A/B/D/E 四批）<br>+ 22:30 / 00:30 接力兜底</td><td>v8_algo_cloud<br><span style="color:var(--cyan)">active-active</span></td><td>盘后算法（云端主链·分批跑）</td><td>A采集/B选股/C回测/D汇总(final_recommend)；龙虎榜/三重共识/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu）。<br><span style="color:var(--cyan)">🛡 2026-09-10 更正：<b>探针路由已删除</b>（<code>v8_algo_cloud.yml</code> 注释「删除静默闸门/探针路由后…」）。现为 <b>active-active</b>：<code>runs-on: [self-hosted, cn]</code>，两台 runner（lemoncat-cn / alimi-cn）谁在线谁接单。<b>⚠️ 两机同挂 <code>cn</code> 标签，此 label 非专属</b>，想只跑某一台须用其专属标签（小九 <code>xiaojiu</code> / 阿狸咪 <code>cn-cn</code>）。</span></td></tr>
           <tr><td>23:00</td><td>v8_backup</td><td>每日备份</td><td>备份 raw_data/*.json 防意外丢失（push 至 main）</td></tr>
-          <tr><td>09:00 / 17:00</td><td>v8_algo</td><td>体检</td><td>46 模块新鲜度体检（云端）</td></tr>
-          <tr><td>非交易时段每2h</td><td>runner_health_alert</td><td>健康监控</td><td>lemoncat-cn runner 离线 → 开 Issue 告警（云端，工作日13-21点/周末0-20点）</td></tr>
+          <tr><td>每小时 :08 / :38</td><td>v8_health_patrol</td><td>巡检 + 自愈</td><td>数据健康巡检 + 自愈（跑 v8_health_check.py --heal，含 46 模块新鲜度体检）；陈旧阈值 2026-09-10 由 6 分调为 <b>30 分</b>，含 MAX_DISPATCHES_PER_RUN 防雪崩</td></tr>
+          <tr><td>工作日 13/15/17/19/21 点<br>周末 08–20 点每 2h</td><td>runner_health_alert</td><td>健康监控</td><td>runner 离线 → 开 Issue 告警（云端，恢复后自动关闭 Issue）</td></tr>
           <tr><td>周六/周日 09:00</td><td>v8_cn_fetch_cloud</td><td>T+1 周度</td><td>日历/今日判定/IPO/两融/宏观/危机/北向/分析师/52周高/羊群效应/解禁日历/业绩预告统一刷新</td></tr>
         </table>
-        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>成交金额 / 涨跌家数</b> = 模块 <code>SH_SZ_HISTORY</code>，归属 <b>盘中 09:40–15:10 每 30 分钟</b> 自动抓取（v8_cn_fetch_cloud · 云端）。此前因上游 push2his 接口被 WAF 拦截导致序列冻结，已于今日改用 akshare 指数日线 + 全市场快照修复，恢复实时刷新。</div>
-        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后数据里「仍在盘中实时更新」的模块（易遗漏，特此单列）</b>：<code>ETF_DAILY_MONITOR</code>（ETF 日监控）在 <b>盘中 09:40–15:10 每 30 分钟</b> 实时刷新，且 <b>15:30 盘后再补抓一次</b> 做 T+1 日监控收盘定稿——它既出现在「实时数据区」实时卡，也会出现在「盘后数据」区，两端都不遗漏。<br>📌 <b>日频序列防漏跑 safety_net</b>：<code>MARKET_FUND_FLOW_DATA</code>（资金流时间轴·中长线）主档为 <b>盘后 15:30</b>，但因其是日频收盘累积序列、一旦 15:30 漏跑就会滞后一天，故额外在 <b>次日盘前 08:25</b> 补抓一次。其余纯盘后模块（EXPERIMENT / 龙虎榜历史回填）仅在 15:30 或 19:15 产出，盘中不刷新。所有前端模块均已落在上方「前端模块→时段」表与「工作日」逐档表中，无遗漏。</div>
+        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>成交金额 / 涨跌家数</b> = 模块 <code>SH_SZ_HISTORY</code>，归属 <b>盘中 09:40–15:00 每 20 分钟（14 档）</b> 自动抓取（v8_cn_fetch_cloud · 云端）。此前因上游 push2his 接口被 WAF 拦截导致序列冻结，已于今日改用 akshare 指数日线 + 全市场快照修复，恢复实时刷新。</div>
+        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后数据里「仍在盘中实时更新」的模块（易遗漏，特此单列）</b>：<code>ETF_DAILY_MONITOR</code>（ETF 日监控）在 <b>盘中 09:40–15:00 每 20 分钟（14 档）</b> 实时刷新，且 <b>盘后 17:20 再补抓一次</b> 做 T+1 日监控收盘定稿——它既出现在「实时数据区」实时卡，也会出现在「盘后数据」区，两端都不遗漏。<br>📌 <b>日频序列防漏跑 safety_net</b>：<code>MARKET_FUND_FLOW_DATA</code>（资金流时间轴·中长线）主档为 <b>盘后 15:30</b>，但因其是日频收盘累积序列、一旦 15:30 漏跑就会滞后一天，故额外在 <b>次日盘前 08:25</b> 补抓一次。其余纯盘后模块（EXPERIMENT / 龙虎榜历史回填）仅在 15:30 或 19:15 产出，盘中不刷新。所有前端模块均已落在上方「前端模块→时段」表与「工作日」逐档表中，无遗漏。</div>
 
         <div class="logic-h">工作日</div>
         <table class="lg-table">
@@ -1833,15 +1862,13 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>14:00</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
           <tr><td>14:30</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
           <tr><td>15:10</td><td>v8_cn_fetch_cloud</td><td>盘中末档（收盘前最后快照）</td><td>云端</td></tr>
-          <tr><td>15:45</td><td>v8_cn_fetch_cloud</td><td>盘后（T+1 龙虎榜·机游共振+北向席位数据产出·v6四色块入榜阈值≥0.8亿）</td><td>云端</td></tr>
-          <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓（恒指/港股候选/盘中模块收盘值）</td><td>云端</td></tr>
+          <tr><td>17:20 / 18:20 / 19:20</td><td>v8_cn_fetch_cloud</td><td>盘后三档（T+1 龙虎榜·机游共振+北向席位产出·v6四色块入榜阈值≥0.8亿；另有 v8_lhb_fetch 17:30 专抓龙虎榜）</td><td>云端</td></tr>
+          <tr><td>17:20</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓 + 盘后首档（恒指/港股候选/盘中模块收盘值；EXPERIMENT/期指/资金流序列/龙虎榜回填）</td><td>云端</td></tr>
           <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达/风险温度计实时刷新</td><td>云端</td></tr>
           <tr><td>工作日13/15/17/19/21点 · 周末0-20点每2h</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue；workflow 当前 active，无需手动 unpause）</td><td>云端</td></tr>
-          <tr><td>09:00</td><td>v8_algo</td><td>盘前预检（46模块新鲜度体检）</td><td>云端</td></tr>
-          <tr><td>17:00</td><td>v8_algo</td><td>收盘后总检（46模块新鲜度体检）</td><td>云端</td></tr>
-          <tr><td>16:40 / 18:10 / 20:00 / 21:00</td><td>v8_algo_cloud</td><td>盘后算法链分批（<b>A采集 → B选股 → D汇总(最终推荐) → E回测</b>；原 C 回测批已退役，2026-09-04 时序重排为推荐上线后再跑回测）</td><td>GitHub 云端 ubuntu（主链·四批按时触发）</td></tr>
-          <tr style="background:rgba(56,189,248,.06);"><td>16:40 起</td><td>v8_algo_run（cn）</td><td>本机在线且空闲时，云端按小时把对应批次<b>转派本机</b>执行（中国 IP 抓中文数据更快，全链约 84 分钟 vs 云端 2h40m）</td><td>本机（小九，cn runner）</td></tr>
-          <tr><td>23:00</td><td>v8_backup</td><td>每日自动备份 raw_data</td><td>云端</td></tr>
+          <tr><td>每小时 :08 / :38</td><td>v8_health_patrol</td><td>巡检 + 自愈（含 46 模块新鲜度体检，陈旧阈值 30 分）</td><td>云端</td></tr>
+          <tr><td>16:40 / 18:10 / 20:00 / 21:00<br>+ 22:30 / 00:30 接力</td><td>v8_algo_cloud</td><td>盘后算法链分批（<b>A采集 → B选股 → D汇总(最终推荐) → E回测</b>；原 C 回测批已退役，2026-09-04 时序重排为推荐上线后再跑回测；22:30 / 00:30 为接力兜底档，缺则补跑）</td><td>GitHub 云端 ubuntu（主链·四批按时触发）</td></tr>
+                    <tr><td>23:00</td><td>v8_backup</td><td>每日自动备份 raw_data</td><td>云端</td></tr>
           <tr style="background:rgba(56,189,248,.06);"><td colspan="4" style="text-align:center;font-size:12px;color:var(--dim);">↓ push raw_data → 自动触发 v8_build_deploy → GitHub Pages 部署</td></tr>
         </table>
 
@@ -1878,14 +1905,13 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <table class="lg-table">
           <tr><th>Workflow</th><th>用途</th><th>触发方式</th></tr>
           <tr><td>v8_sync_v6_data</td><td>v6→v8 数据桥（v8原生链故障时应急灌数据）</td><td>workflow_dispatch（无定时）</td></tr>
-          <tr><td>v8_cn_fetch（应急回退）</td><td>任意时段强制补跑（原中国节点自托管版，cron 已移除；云端版 v8_cn_fetch_cloud 为主力）</td><td>workflow_dispatch</td></tr>
-          <tr><td>v8_algo_run</td><td>强制重跑算法链（中国节点小九）</td><td>workflow_dispatch</td></tr>
+                    <tr><td>v8_algo_run</td><td>强制重跑算法链（中国节点小九）</td><td>workflow_dispatch</td></tr>
           <tr><td>v8_build_deploy</td><td>强制全量构建部署</td><td>workflow_dispatch</td></tr>
           <tr><td>runner_health_alert</td><td>Runner 离线即时告警（可手动触发立即检查）</td><td>workflow_dispatch</td></tr>
         </table>
 
         <div class="logic-h">关键设计原则</div>
-        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链按批次分布在 16:40~21:00（2026-09-02 起改分批：A采集16:40 → B选股18:10 → D汇总20:00 → E回测21:00；取代 2026-08-20 的 19:15 单档）。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>Safety Net</b>是保险机制——中国数据抓取已迁云端 24/7 在线，Safety Net 是「断线时自动补跑」而非「日常调度」。</div>
+        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链按批次分布在 16:40~21:00（2026-09-02 起改分批：A采集16:40 → B选股18:10 → D汇总20:00 → E回测21:00；取代 2026-08-20 的 19:15 单档）。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>兜底机制（2026-09-10 收敛后）</b>：原 Safety Net / v8_freshness_watch 已删除，现仅保留<b>唯一状态型兜底 v8_cn_fetch_watchdog</b>（盘中陈旧 &gt; 45 分钟才动手派发）；硬失败则由 <code>landcheck</code> 终检步把 run 变红暴露。</div>
         <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后算法链顺序铁律（2026-08-08 修复）</b>：<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">generate_top10.py</code> 必须在 <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">backtest_comprehensive.py</code> / <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">cockpit_backtest_now.py</code> <b>之前</b>执行——综合回测依赖 top10 当日快照（<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">raw_data/history/top10_daily_YYYYMMDD.json</code>），顺序倒置会导致「综合回测」卡长期为空。当前固定顺序：build_candidate_pool → generate_top10 → backtest_tdx → backtest_comprehensive → cockpit_backtest_now。</div>
       </div>
 
@@ -1910,9 +1936,9 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <h3><span class="ic">🔄</span>盘中 vs 盘后分工</h3>
         <table class="lg-table">
           <tr><th>时段</th><th>职责</th><th>失败影响</th><th>兜底</th></tr>
-          <tr><td>盘前 08:25</td><td>把当日已知事件、预警、宏观状态准备好</td><td>事件/日历显示旧数据</td><td>Safety Net 2h 后补跑</td></tr>
-          <tr><td>盘中 09:40~15:10</td><td>刷新实时行情、资金、ETF、涨停热力</td><td>实时区时间戳停滞</td><td>盘中自愈器每30分检测补跑 + 下一档自动覆盖</td></tr>
-          <tr><td>盘后 18:10</td><td>基于完整收盘数据生成选股结果（B 选股批）</td><td>三重共识/选股结果用隔夜数据</td><td>周六 self_heal 补跑</td></tr>
+          <tr><td>盘前 08:25</td><td>把当日已知事件、预警、宏观状态准备好</td><td>事件/日历显示旧数据</td><td>v8_health_patrol 巡检 + v8_cn_fetch_cloud 自身 08:25 cron 兜底</td></tr>
+          <tr><td>盘中 09:40~15:00（14 档 / 20 分）</td><td>刷新实时行情、资金、ETF、涨停热力</td><td>实时区时间戳停滞</td><td>准点档三重守卫（非交易日 / 时间窗 09:32–15:05 / 云端在途则跳过）+ v8_cn_fetch_watchdog &gt;45min 状态兜底 + 下一档自动覆盖</td></tr>
+          <tr><td>盘后 18:10</td><td>基于完整收盘数据生成选股结果（B 选股批）</td><td>三重共识/选股结果用隔夜数据</td><td>v8_algo_cloud 22:30 / 00:30 接力档 + v8_t1_guard（周六 08:30 / 09:30）</td></tr>
           <tr><td>构建部署</td><td>raw_data push 触发 selective build → Pages</td><td>线上数据不更新</td><td>manual dispatch</td></tr>
         </table>
       </div>
@@ -1923,7 +1949,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <table class="lg-table">
           <tr><th>能力</th><th>v6 实现</th><th>v8 现状</th><th>优先级</th></tr>
           <tr style="opacity:.55"><td>Safety Net 兜底</td><td>safety-net.yml 每15min轮询</td><td><span style="color:#94a3b8;">— 已下线（v8_safety_net.yml 已删除，职能并入 v8_health_patrol）</span></td><td>P0 必须</td></tr>
-          <tr style="opacity:.55"><td>云端自愈器</td><td>cloud_self_heal 周末T+1补全</td><td><span style="color:#94a3b8;">— 已下线（v8_self_heal.yml 已删除，职能并入 v8_freshness_watch）</span></td><td>P1 应补</td></tr>
+          <tr style="opacity:.55"><td>云端自愈器</td><td>cloud_self_heal 周末T+1补全</td><td><span style="color:#94a3b8;">— 已下线（v8_self_heal.yml / v8_freshness_watch.yml 均已删除，职能并入 v8_health_patrol）</span></td><td>P1 应补</td></tr>
           <tr><td>每日备份</td><td>cloud_backup.yml 21:00</td><td><span style="color:#38bdf8;">✅ 已建 v8_backup.yml 23:00</span></td><td>P2 可选</td></tr>
           <tr><td>心跳监控上云</td><td>peer_health_monitor 本机</td><td>✅ Actions 日志即心跳</td><td>P2 可选</td></tr>
           <tr><td>防误删清单</td><td>DO_NOT_DELETE.md + pre-commit hook</td><td><span style="color:#38bdf8;">✅ 已建 DO_NOT_DELETE.md</span></td><td>P0 必须</td></tr>
@@ -1961,7 +1987,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">部署链路</div>
         <div class="logic-p"><b>v8 独立仓库</b>：中国数据抓取（cn_fetch）→ 推送 raw_data → GitHub Actions 自动触发 build_deploy（workflow_run）→ 构建 data/*.js → 推 main → GitHub Pages 自动发布。小九本机<b>只监督、不手动部署</b>。</div>
         <div class="logic-h">双机状态</div>
-        <div class="logic-p"><b>GitHub 云端（ubuntu runner）</b>：执行<b>中国数据抓取 v8_cn_fetch_cloud</b> + 盘后算法链 <b>v8_algo_cloud</b> + 构建/部署/体检/备份/自愈/健康监控；2026-08-05 起主链已全部云端化。<b>小九（单位机 / lemoncat-cn）</b>：白天班（7:45–17:45）独家值守；同时是算法链探针路由的 cn 执行机——跑前探针发现它在线且空闲，则按批次转派 cn 链（≈84min），否则回落云端全链（≈2h40m），失败永不断供。<b>阿狸咪（家中机）</b>：夜间/周末班（18:00–次日 7:30 + 周末）部署 v8 主力，与白天班分时交接；本地预览一律用真身仓库 <code>E:/qs_workspaces/quant-scanner-v8/index.html</code>。<b style="color:#ef5350">🔴 禁用 E:/workspace 任何路径</b>（2026-09-04 实证它是坚果云 junction，同步层会整仓删除仓库，该路径已永久废弃）。</div>
+        <div class="logic-p"><b>GitHub 云端（ubuntu runner）</b>：执行<b>中国数据抓取 v8_cn_fetch_cloud</b> + 盘后算法链 <b>v8_algo_cloud</b> + 构建/部署/体检/备份/自愈/健康监控；2026-08-05 起主链已全部云端化。<b>小九（单位机 / lemoncat-cn）</b>：白天班（7:45–17:45）独家值守；盘后算法链为 <b>active-active</b>（<code>v8_algo_cloud</code> 固定 <code>runs-on: [self-hosted, cn]</code>，<b>原「探针路由」已于 2026-09-10 前后删除</b>），两台 runner 谁在线谁接单。<b>阿狸咪（家中机）</b>：夜间/周末班（18:00–次日 7:30 + 周末）部署 v8 主力，与白天班分时交接；本地预览一律用真身仓库 <code>E:/qs_workspaces/quant-scanner-v8/index.html</code>。<b style="color:#ef5350">🔴（仅小九机口径）小九机禁用 E:/workspace 任何路径</b>（2026-09-04 实证该机此路径是坚果云 junction，同步层会整仓删除仓库）。<b>阿狸咪机不适用本条</b>——其唯一真实工作目录本就是 <code>E:/workspace/stock-scanner</code>（= v8 主仓库真身，2026-08-28 主人确认）；小九机工作目录为 <code>E:/qs_workspaces/quant-scanner-v8</code>。<b>两机路径不同，禁令不可跨机套用。</b></div>
       </div>
 
       
@@ -1986,7 +2012,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 <div class="card">
         <h3><span class="ic">⚙️</span>自动化任务 - 说明</h3>
         <div class="logic-h">云端调度</div>
-        <div class="logic-p">v8_cn_fetch_cloud（盘前/盘中/盘后/周末，云端主链）、v8_algo_cloud（收盘后算法数据生产，云端主链；本机仅 workflow_dispatch 应急）、v8_backup（每日23:00备份）、runner_health_alert（非交易时段每2h runner 健康监控）；原盘中自愈与 stale 兜底已下线（v8_intraday_healer / v8_safety_net），职能并入 v8_health_patrol + v8_freshness_watch。</div>
+        <div class="logic-p">v8_cn_fetch_cloud（盘前/盘中/盘后/周末，云端主链）、v8_algo_cloud（收盘后算法数据生产，云端主链；本机仅 workflow_dispatch 应急）、v8_backup（每日23:00备份）、runner_health_alert（非交易时段每2h runner 健康监控）；原盘中自愈与 stale 兜底已下线（v8_intraday_healer / v8_safety_net），职能并入 v8_health_patrol（2026-09-10 起 v8_freshness_watch 亦已整链删除，新鲜度守门职责同样归 v8_health_patrol）。</div>
         <div class="logic-h">本机监督</div>
         <div class="logic-p">小九-v8云端管线看门狗：每天 08:00–22:00 每小时运行 v8_cloud_watchdog.py，检查 runner 在线、cn_fetch/build_deploy 状态、raw_data 陈旧度、站点存活。发现异常写 _v8_watchdog.log 并告警。</div>
         <div class="logic-h">v6 状态</div>
@@ -1997,7 +2023,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 <div class="card">
         <h3><span class="ic">💾</span>数据新鲜度 / 看门狗 - 说明</h3>
         <div class="logic-h">云端兜底</div>
-        <div class="logic-p">v8_health_patrol 每30分钟检查 raw_data 最新 commit，超过阈值自动 dispatch cn_fetch 全量兜底；阈值当前为1小时（方案B严格版待生效）。</div>
+        <div class="logic-p">v8_health_patrol 每小时 <b>:08 / :38</b> 巡检并检查 raw_data 最新 commit，超过阈值自动 dispatch cn_fetch 全量兜底。<b>2026-09-10 起陈旧阈值由 6 分钟调整为 30 分钟</b>（6 分钟是全仓最激进的派发阈值，正是风暴踩踏成因之一）；同批删除重复派发源 v8_freshness_watch / v8_slot_scheduler。</div>
         <div class="logic-h">本机闸门</div>
         <div class="logic-p">v8_cloud_watchdog.py 核对核心 data/*.js 的 update_time，raw_data 超过90分钟无新 commit 即 ALERT；本机只告警/汇报，不自动覆盖数据。</div>
         <div class="logic-h">候选股池来源级监控（2026-08-08 新增）</div>
@@ -2224,11 +2250,11 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 
         <div class="logic-h">📌 双机分时铁律（升级版·接力赛模型，2026-09-09 更新）</div>
         <div class="logic-p">
-        <b>云端主链 24/7</b>：GitHub Actions ubuntu-latest 跑 <code>v8_cn_fetch_cloud</code>（数据抓取）+ <code>v8_algo_cloud</code>（算法链）+ <code>v8_build_deploy</code>（部署）+ <code>v8_health_patrol</code>/<code>v8_freshness_watch</code>（兜底监控），全部 cron 自动调度，<b>不依赖本地机器</b>。
-        <b>盘中主力＝小九准点档</b>：新增 <code>v8_cn_fetch_intraday_lemoncat.yml</code>（小九 self-hosted cn runner），工作日 14 档（9:40/10:00/10:20/10:40/11:00/11:20/11:40/13:00/13:20/13:40/14:00/14:20/14:40/15:00 CST，跳午休）统一调度：每档先 dispatch 云端 <code>v8_cn_fetch_cloud</code>（category=intraday）→ sleep 10 分钟 → gh api 查 run 状态 → 失败/超时则 dispatch <code>v8_cn_fetch_cloud_selfhosted</code>（小九 cn IP 兜底）。单源 + 接力赛 + 同 concurrency group（<code>v8-cn-fetch-cloud</code>）互斥排队，不再双源互踢。
-        <b>盘后+夜间+周末主力＝阿狸咪</b>：17:30 起（含夜间、盘前备份、周末 08:00-23:00）由阿狸咪 WorkBuddy 自动化「云端按铃」30 分钟轮 dispatch 云端；盘中（9:40-17:30）阿狸咪阈值放宽到 60 分钟只作兜底（小九整台机掉才触发）。
+        <b>云端主链 24/7</b>：GitHub Actions ubuntu-latest 跑 <code>v8_cn_fetch_cloud</code>（数据抓取）+ <code>v8_algo_cloud</code>（算法链）+ <code>v8_build_deploy</code>（部署）+ <code>v8_health_patrol</code>（唯一巡检 + 自愈；原 <code>v8_freshness_watch</code> 已于 2026-09-10 删除），全部 cron 自动调度，<b>不依赖本地机器</b>。
+        <b>盘中主力＝准点档调度器</b>：<code>v8_cn_fetch_intraday_lemoncat.yml</code>（<b>2026-09-10 起 runs-on 收归 ubuntu-latest 云端</b>；原 <code>[self-hosted, cn]</code> 标签非专属——实测当日 14 档有 11 档被阿狸咪机抢跑），工作日 14 档（9:40/10:00/10:20/10:40/11:00/11:20/11:40/13:00/13:20/13:40/14:00/14:20/14:40/15:00 CST，跳午休）统一调度：每档先 dispatch 云端 <code>v8_cn_fetch_cloud</code>（category=intraday）→ sleep 10 分钟 → gh api 查 run 状态 → 失败/超时则 dispatch <code>v8_cn_fetch_cloud_selfhosted</code>（小九 cn IP 兜底）。单源 + 接力赛 + 同 concurrency group（<code>v8-cn-fetch-cloud</code>）互斥排队，不再双源互踢。<b>三重守卫（2026-09-10 新增）</b>：① 非交易日直接拦截；② 时间窗 09:32–15:05 之外拦截；③ <b>云端在途即跳过本档</b>——GitHub 并发组只保留 1 running + 1 pending，第 3 个派发会顶掉 pending 变 <code>cancelled</code>，正是当日 25 个 cancelled 的根因。
+        <b>盘后+夜间+周末主力＝阿狸咪</b>：17:30 起（含夜间、盘前备份、周末 08:00-23:00）由阿狸咪 WorkBuddy 自动化按轮 dispatch 云端。<b>🛡 2026-09-10 收口</b>：本机自动化「数据新鲜度自动值守」<b>已暂停（PAUSED）</b>——它与云端 <code>v8_health_patrol</code> 属同一脚本、同一目标的双份重复派发源，且实测当日 08:16–18:02（小九白天时段）密集派发、违反双机分时铁律。按「阿狸咪自动化只暂停不删除」铁律保留定义。
         <b>铁律</b>：白天阿狸咪是备机（只盯不派发），晚上小九是备机（只盯不派发）；谁在主力时段谁调度，另一台绝不抢节奏。
-        <b>本地预览</b>：一律用真身仓库 <code>E:/qs_workspaces/quant-scanner-v8/index.html</code>（<b style="color:#ef5350">🔴 禁用 E:/workspace 任何路径——坚果云 junction，2026-09-04 实证会整仓删除仓库</b>）。改完+审计通过即直接上线，不再逐次请示（2026-08-29 主人授权放宽）。</div>
+        <b>本地预览</b>：<b>小九机</b>用 <code>E:/qs_workspaces/quant-scanner-v8/index.html</code>（<b style="color:#ef5350">🔴 小九机禁用 E:/workspace 任何路径——该机此路径是坚果云 junction，2026-09-04 实证会整仓删除仓库</b>）；<b>阿狸咪机</b>用 <code>E:/workspace/stock-scanner/index.html</code>（该机此路径即 v8 主仓库真身，2026-08-28 主人确认）。改完+审计通过即直接上线，不再逐次请示（2026-08-29 主人授权放宽）。</div>
 
         <div class="logic-h" style="background:linear-gradient(135deg,#7c2d12,#9a3412);color:#fed7aa;padding:8px 12px;border-radius:6px;margin:12px 0;">📋 2026-08-11 今日改动汇总（双机运维/逻辑详解/防覆盖）</div>
         <div class="logic-p"><b>推送入库</b>：commit <code>c232edf5a</code> 起所有本地→远端已同步（<code>git pull --rebase</code> 验证）。共 7 个功能 commit + 多份 v8 build。</div>

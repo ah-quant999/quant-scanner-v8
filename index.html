@@ -6395,13 +6395,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <h3><span class="ic">⚙️</span>自动化任务 <span class="fresh" style="font-size:10px;color:var(--dim)">[静态]</span></h3>
       <table><thead><tr><th>任务</th><th>周期</th><th>状态</th><th>说明</th></tr></thead><tbody>
         <tr><td>v8_cn_fetch_cloud</td><td>工作日 cron</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>中国数据抓取主链 · push raw_data → 自动触发 build_deploy</td></tr>
-        <tr><td>v8_cn_fetch_intraday_lemoncat</td><td>工作日 14 档(9:40-15:00)</td><td><span class="status-dot s-ok"></span>小九 self-hosted cn</td><td>盘中准点档调度器（接力赛模型）：每档 dispatch 云端 → sleep 10min → 查状态 → 失败则小九 cn IP 兜底；同 group v8-cn-fetch-cloud 互斥排队</td></tr>
+        <tr><td>v8_cn_fetch_intraday_lemoncat</td><td>工作日 14 档(9:40-15:00)</td><td><span class="status-dot s-ok"></span>云端 ubuntu-latest</td><td>盘中准点档调度器（接力赛模型）：每档 dispatch 云端 → sleep 10min → 查状态 → 失败则小九 cn IP 兜底；同 group v8-cn-fetch-cloud 互斥排队。<b>2026-09-10 改</b>：runs-on 由 [self-hosted, cn] 收归 ubuntu-latest（原标签非专属，实测 14 档 11 档被阿狸咪机抢跑）；并新增三重守卫（非交易日拦截 / 时间窗 09:32-15:05 / 云端在途则跳过本档，绝不制造第二个 pending）</td></tr>
         <tr><td>v8_intraday_snapshot</td><td>盘中每 10 分(9:00-15:50)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>板块资金日内快照（独立高频·根治上午空白）：写 SECTOR_FUND_FLOW_INTRADAY，ubuntu-latest 云端，独立 group v8-intraday-snapshot；2026-09-10 补登记（此前漏登记致 Pre-deploy audit 阻断部署）</td></tr>        <!-- ✅ 2026-08-29 一劳永逸：下列 3 个自愈器已于 commit 1fe4f8c71 删除（.github/workflows/ 下已不存在），
              原表仍标绿点 ACTIVE 属误导；改为灰色「已下线」，保留行以存历史 -->
-        <tr><td>v8_algo_cloud</td><td>19:15/20:00+兜底</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产（选股四模块+回测）</td></tr>
+        <tr><td>v8_cn_fetch_watchdog</td><td>盘中每 15 分(8:07-15:52)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td><b>唯一状态型兜底</b>：陈旧 &gt;45min 才动手派发；其余一概不新增派发者（2026-09-10 派发源收敛铁律）</td></tr>
+        <tr><td>v8_health_patrol</td><td>每小时 :08/:38</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>数据健康巡检 + 自愈（v8_health_check.py --heal）；陈旧阈值 2026-09-10 由 6 分调为 30 分</td></tr>
+        <tr><td>v8_algo_cloud</td><td>16:40/18:10/20:00/21:00(+22:30/00:30)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产（选股四模块+回测）</td></tr>
         <tr><td>v8_backup</td><td>每日23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data / 交接文档（含 v6 备份保留策略：v8 稳定一周前不删）</td></tr>
-        <tr><td>runner_health_alert</td><td>非交易时段每2h</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>lemoncat-cn runner 离线告警 + 自动恢复关闭 Issue</td></tr>
+        <tr><td>runner_health_alert</td><td>工作日 13/15/17/19/21 点 · 周末 08-20 点每 2h</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>lemoncat-cn runner 离线告警 + 自动恢复关闭 Issue</td></tr>
         <tr><td>小九-v8云端管线看门狗</td><td>08-22每小时</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>只监督、不部署、不抢跑</td></tr>
+        <tr><td colspan="4" style="font-size:11px;color:var(--dim);background:var(--bg2)">🛡 <b>2026-09-10 派发源收敛铁律</b>：盘中唯一主线 = v8_cn_fetch_intraday_lemoncat（14 档 + 三重守卫）；唯一状态兜底 = v8_cn_fetch_watchdog（&gt;45min）；主体定时 = v8_cn_fetch_cloud 自身 cron。三者共用 v8-cn-fetch-cloud 并发组。<b>禁止新增第四个派发者</b>；已删 v8_freshness_watch / v8_slot_scheduler；阿狸咪本机按铃自动化已 PAUSED。</td></tr>
       </tbody></table>
     </div>
 
@@ -6432,10 +6435,20 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     </div>
 
-    <!-- 2026-09-05 阿狸咪加注：v8 workflow 同步清单（隐藏不渲染，但 align_logic_ops.py 校验需要这些 stem 出现在 sec-lg/sec-op）——
-         19 项 MUST_HAVE_CRON（必须有 cron）：v8_cn_fetch_cloud | v8_cn_fetch_cloud_hosted | v8_cn_fetch_watchdog | v8_algo_cloud | v8_algo_intraday_lite | v8_lhb_fetch | v8_ima_strong_stock | v8_stock_quote_refresh | v8_risk_gauge | v8_health_patrol | v8_cache_buster_reconcile | v8_daily_audit | v8_backup | v8_cleanup | cloud_weekly_cleanup | runner_health_alert | v8_t1_guard | v8_weekend_light | v8_cn_fetch_intraday_lemoncat
-         7 项 ALLOW_NO_CRON（仅 workflow_dispatch 应急）：v8_algo_run | v8_cn_fetch | v8_cn_fetch_cloud_selfhosted | v8_sync_v6_data | v8_sync_legacy | v8_build_deploy | v8_algo
-        2026-09-08 阿狸咪清理：v8_safety_net / v8_self_heal 已于 commit 1fe4f8c71 删除（.github/workflows/ 下已无此二文件），从白名单移除，避免误导 + 未来审计逻辑改动的坑
+    <!-- 2026-09-05 阿狸咪加注 / 2026-09-10 重构：v8 workflow 同步清单（隐藏不渲染，但 align_logic_ops.py 校验需要这些 stem 出现在 index.html 的 sec-lg/sec-op 或 logic.html 的 sec-lg）——
+         21 项 MUST_HAVE_CRON（必须有 cron 且必须文档化）：
+           v8_cn_fetch_cloud | v8_cn_fetch_cloud_hosted | v8_cn_fetch_watchdog | v8_algo_cloud | v8_algo_intraday_lite |
+           v8_lhb_fetch | v8_ima_strong_stock | v8_stock_quote_refresh | v8_risk_gauge | v8_health_patrol |
+           v8_cache_buster_reconcile | v8_daily_audit | v8_backup | v8_cleanup | cloud_weekly_cleanup |
+           runner_health_alert | v8_t1_guard | v8_weekend_light | v8_intraday_snapshot |
+           v8_cn_fetch_intraday_lemoncat | v8_cn_fetch_experiments
+         3 项 ALLOW_NO_CRON（仅 workflow_dispatch 应急 / 事件驱动）：
+           v8_algo_run | v8_cn_fetch_cloud_selfhosted | v8_build_deploy
+         2026-09-10 阿狸咪「派发源精简」清理（防止名单积灰再次误导）：
+           · v8_freshness_watch / v8_slot_scheduler —— 文件已删除 → 从名单彻底移除
+           · v8_cn_fetch / v8_algo / v8_sync_v6_data / v8_sync_legacy —— 文件早已不存在 → 删除死登记
+           · v8_cn_fetch_intraday_lemoncat —— 事实有 14 条 cron（旧注释归 ALLOW 属分类错误）→ 归回 MUST
+           · v8_cn_fetch_experiments —— 有 16:30 cron 且已文档化 → 由 ALLOW 升入 MUST
          —— 让 align_logic_ops.py 校验 = 0 漂移 -->
     <!-- 2026-08-30 主人令：opTab4（已下架）已随「已下架」提升为一级 nav 而删除，避免重复显示 -->
 
