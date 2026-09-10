@@ -58,7 +58,7 @@ jobs:
       TZ: Asia/Shanghai
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # self-hosted runner 上 WorkBuddy safe-delete 批量删除守卫阈值
-      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 1000
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
     defaults:
       run:
         working-directory: ${{ github.workspace }}

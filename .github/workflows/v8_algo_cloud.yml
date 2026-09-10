@@ -120,8 +120,8 @@ jobs:
       TZ: Asia/Shanghai
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # ⛔️ 2026-08-14 主人令永久修复：WorkBuddy safe-delete 批量删除守卫默认阈值 50
-      #   （alimi-cn 实测 966 文件，100% 被拦、所有 [self-hosted, cn] workflow 必须显式抬到 1000。
-      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 1000
+      #   （alimi-cn 实测 966 文件，100% 被拦、所有 [self-hosted, cn] workflow 必须显式抬到 2000。
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
       V8_PUSH: "1"
       # 2026-08-29 周末审计：手动 dispatch 带 force_run=true 时置 1，run_algorithms 时间门控直接放行
       V8_FORCE_RUN: ${{ github.event.inputs.force_run == 'true' && '1' || '' }}

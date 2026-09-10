@@ -70,8 +70,8 @@ jobs:
       #   job 级强制 UTF-8，覆盖全部步骤，不再逐步骤打补丁。
       PYTHONIOENCODING: utf-8
       PYTHONUTF8: "1"
-      # safe-delete 守卫：cn runner 默认 50 会被拦，抬到 1000
-      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 1000
+      # safe-delete 守卫：cn runner 默认 50 会被拦，抬到 2000
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
     defaults:
       run:
         shell: bash

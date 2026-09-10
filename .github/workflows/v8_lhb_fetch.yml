@@ -44,6 +44,11 @@ permissions:
 jobs:
   lhb-only:
     runs-on: [self-hosted, cn]
+    # 🔴 2026-09-10 主人令：safe-delete 批量删除守卫阈值统一 2000。
+    #   本链是 runs-on: [self-hosted, cn]（Windows runner），铁律要求必须显式设；
+    #   不设则吃默认 50，checkout/git clean 批量删必被拦。
+    env:
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
     # 🔴 2026-08-30 22:3x 抬高 job 墙钟（实测本 workflow run 33309687912 跑满
     #   25 分钟被硬杀，杀点是推送步 13.8 分钟未完成 → 数据抓到却推不上 main）。
     timeout-minutes: 50

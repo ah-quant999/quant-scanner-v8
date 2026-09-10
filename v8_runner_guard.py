@@ -46,7 +46,26 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 REPO = "ah-quant999/quant-scanner-v8"
-RUNNER_DIR = Path("D:/actions-runner-v8")
+def _detect_runner_dir() -> Path:
+    """双机自适应定位 runner 安装目录（2026-09-10 主人令）。
+
+    原硬编码 D:/actions-runner-v8 是【小九单位机】的路径；阿狸咪家机的 runner
+    装在 D:/actions/cn-runner → 在家里跑 `--heal` 时改的是不存在的目录，
+    真 .env 永远停在 1000（本次「阈值没退到 2000」的根因）。
+    优先级：环境变量 V8_RUNNER_DIR > 含 .env/run.cmd 的候选目录 > 首个候选。
+    """
+    cands = []
+    env = os.environ.get("V8_RUNNER_DIR")
+    if env:
+        cands.append(Path(env))
+    cands += [Path("D:/actions-runner-v8"), Path("D:/actions/cn-runner")]
+    for c in cands:
+        if (c / ".env").exists() or (c / "run.cmd").exists():
+            return c
+    return cands[0]
+
+
+RUNNER_DIR = _detect_runner_dir()
 WORK_DIR = RUNNER_DIR / "_work"
 SERVICE_NAME = "actions.runner.ah-quant999-quant-scanner-v8.lemoncat-cn"
 RUNNER_CMD = "run.cmd"
@@ -339,7 +358,7 @@ def check_github_runs(token, workflow_ids, lookback_hours=24, max_runs=15):
 def check_runner_env():
     """检查 runner .env 是否配置了 safe-delete 阈值。
 
-    2026-08-19 主人令：一劳永逸式修复，把推荐阈值从 500 提高到 2000。
+    2026-08-19 主人令 + 2026-09-10 复核：一劳永逸式修复，推荐阈值 500 → 2000。
     理由：lemoncat-cn runner 跑算法链/cloud_weekly_cleanup 时一次性 unlink 数百个
     raw_data/*.json（top10_daily 历史快照清理等），旧阈值 500/默认 50 频繁触发
     SAFE_DELETE_BULK_CONFIRM_REQUIRED 拦截 → workflow 失败。
