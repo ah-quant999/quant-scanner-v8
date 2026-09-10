@@ -65,7 +65,7 @@ on:
         # 2026-09-04 dispatch 分批改造（主人令，防风暴查证通过后实施）：与 cn 链
         # v8_algo_run.yml 的 stage 入参对齐——留空=按北京时间小时自动分派，
         # A=采集 B=选股 D=汇总 E=回测，all=全链应急。
-        description: '批次(留空=按北京时间小时自动分派)：A=采集 B=选股 D=汇总 E=回测 all=全链应急'
+        description: '批次(留空=由批次闸门按内容级就绪自动判定，推荐留空)：A=采集 B=选股 D=汇总 E=回测 all=全链应急'
         type: string
         default: ''
 
@@ -333,71 +333,41 @@ jobs:
             || echo "mootdx 未安装（可选依赖，SKIP_MOOTDX=1 不影响算法链）"
           python -c "import akshare, pandas, numpy, requests; print('deps ready')"
 
-      - name: "📅 交易日历 gate"
-        id: trading
-        run: |
-          python algorithms/check_trading_day.py
-
-      - name: "📅 周末/假期首日 T+1 判定（驱动周六·假期首日跑全链）"
-        id: wknd
-        run: |
-          # 2026-09-05 主人令「双机云端把周六和假期第一天要跑全链的任务也加入」：
-          #   周六（处理上周五 T+1）与假期首日（上一交易日 <=3 天，含周末间隔）视为「有新鲜 T+1 可处理」，
-          #   云端该日也应跑全链并路由到 cn（E 批 factor_lab 需 baostock 中国 IP）。
-          #   周日跳过（周五数据周六已处理）；深假期(>3天)跳过（无新鲜 T+1，避免空转浪费小九机）。
-          VAL=$(python - <<'PY'
-          import datetime, sys
-          sys.path.insert(0, ".")
-          import v8_date
-          today = datetime.date.today()
-          if today.weekday() == 5:            # 周六
-              print("true")
-          elif today.weekday() == 6:          # 周日：周五数据周六已处理，跳过
-              print("false")
-          elif not v8_date.is_trading_day(today):
-              ld = v8_date.last_trading_day(today)
-              gap = (today - ld).days
-              print("true" if 0 < gap <= 3 else "false")  # 假期首日(上一交易日<=3天)
-          else:
-              print("false")
-          PY
-          )
-          echo "weekend_t1=$VAL" >> "$GITHUB_OUTPUT"
-          echo "🗓️ 周末/假期首日 T+1 判定 = $VAL"
-
       # 🔒 2026-09-10 主人令「一劳永逸·发现前面错了就该退回拒绝之后执行并紧急报告」：
       #   事故根因：stage 由「CST 小时盲猜」（16/17→A 18/19→B 20→D 21→E）。
       #   21:00 的 E(回测) cron 于 21:07 触发时，完全不管 B(选股)/D(汇总) 跑没跑，
       #   拿凌晨陈旧数据跑回测；而 16:40/18:10/20:00 三轮被闸门静默跳过（假成功）→
       #   整晚只剩一个毫无意义的回测，「最终推荐」被回退。
       #   新逻辑：显式 inputs.stage 优先，否则「缺什么跑什么」；上游未就绪 → 拒绝执行 + 红灯。
-      - name: "🔒 批次自愈判定 + 上游顺序闸门（上游未就绪→拒绝执行并紧急报告）"
+      # 🔒 2026-09-10 主人令「一劳永逸·简化优化·不缺档·不抢跑」：
+      #   唯一决策点 = .github/scripts/v8_stage_gate.py
+      #   （已删：按小时盲猜 stage / 静默闸门V5 / 探针路由 / 独立日历判定 四处历史设计）
+      - name: "🔒 批次闸门（日历 + 上游顺序 + 内容级就绪 · 唯一决策点）"
         id: gate
         if: always()
         run: |
           set +e
-          IS_TD="${{ steps.trading.outputs.is_trading_day }}"
           EX_STAGE="${{ github.event.inputs.stage || github.event.client_payload.stage || '' }}"
-          BYPASS=""
-          # ⚠️ force_run 只放行「时间门控」，**不改变 target_stage**（跑哪批仍由闸门按「缺什么跑什么」判定）。
-          #   ❌ 曾写成 `force_run → EX_STAGE=ALL`：会让 force 派发重跑 A 批 → 重新抓取 LHB 等
-          #      已到手数据，违反主人令「别乱跑把已经拿到手的数据冲掉了」。ALL 只保留给显式 stage=ALL。
-          [ "${{ github.event.inputs.bypass_stage_gate }}" = "true" ] && BYPASS="--bypass"
-          if [ "$IS_TD" != "true" ] && [ -z "$EX_STAGE" ]; then
-            echo "target_stage=NONE" >> "$GITHUB_OUTPUT"
-            echo "stage_ok=true"    >> "$GITHUB_OUTPUT"
-            echo "reason=非交易日且未显式指定 stage → 交由交易日 gate 处理" >> "$GITHUB_OUTPUT"
-            echo "ℹ️ 非交易日且未显式指定 stage，闸门不介入"
-            exit 0
-          fi
-          OUT=$(python .github/scripts/v8_stage_gate.py --root . --explicit-stage "$EX_STAGE" $BYPASS)
+          # force_run / bypass_time_gate 一律只表示「忽略时间门控」，**绝不改变跑哪批**
+          #   （跑哪批永远由内容级就绪判定 —— 防止 force 派发重跑 A 批冲掉已到手的龙虎榜）
+          FORCE=""
+          { [ "${{ github.event.inputs.force_run }}" = "true" ] || [ "${{ github.event.inputs.bypass_time_gate }}" = "true" ]; } && FORCE="--force"
+          OUT=$(python .github/scripts/v8_stage_gate.py --root . --explicit-stage "$EX_STAGE" $FORCE)
           echo "$OUT"
           echo "$OUT" >> "$GITHUB_OUTPUT"
           OK=$(printf '%s' "$OUT" | grep -m1 '^stage_ok=' | cut -d= -f2)
           TGT=$(printf '%s' "$OUT" | grep -m1 '^target_stage=' | cut -d= -f2)
           REASON=$(printf '%s' "$OUT" | grep -m1 '^reason=' | sed 's/^reason=//')
+          # 🛡 闸门自身异常必须红灯（否则下游全 skip = 假绿灯，又是"什么都没跑却全绿"）
+          if [ -z "$TGT" ] || [ -z "$OK" ]; then
+            echo "::error title=v8-stage-gate-crash::批次闸门未产出判定（脚本异常/输出解析失败）—— 拒绝放行，请排查"
+            echo "target_stage=NONE" >> "$GITHUB_OUTPUT"
+            echo "stage_ok=false"    >> "$GITHUB_OUTPUT"
+            echo "proceed=false"     >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
           {
-            echo "## 🔒 v8 批次闸门"
+            echo "## 🔒 v8 批次闸门（唯一决策点）"
             echo ""
             echo "| 项 | 值 |"
             echo "| --- | --- |"
@@ -405,28 +375,18 @@ jobs:
             echo "| 是否放行 | **${OK}** |"
             echo "| 判定 | ${REASON} |"
             echo ""
-            printf '%s\n' "$OUT" | grep -E '^(ready_|today=|cst_hour=)' | sed 's/^/    /'
+            printf '%s\n' "$OUT" | grep -E '^(proceed=|chain_|ready_|cst_hour=)' | sed 's/^/    /'
           } >> "$GITHUB_STEP_SUMMARY"
-          # 🚦 统一放行标志（单一决策点）：删除静默闸门/探针路由后，后续步骤只看这一个值
-          WKND_T1="${{ steps.wknd.outputs.weekend_t1 }}"
-          FORCE="${{ github.event.inputs.force_run }}"
-          PROCEED="false"
-          if [ "$OK" = "true" ] && [ "${TGT:-NONE}" != "NONE" ] && \
-             { [ "$IS_TD" = "true" ] || [ "$WKND_T1" = "true" ] || [ "$FORCE" = "true" ]; }; then
-            PROCEED="true"
-          fi
-          echo "proceed=$PROCEED" >> "$GITHUB_OUTPUT"
-          echo "🚦 proceed=$PROCEED（交易日=${IS_TD:-?} 周末T+1=${WKND_T1:-?} force=${FORCE:-?} 目标批=${TGT}）"
-          if [ "$TGT" = "NONE" ]; then
-            echo "::notice title=v8-stage-gate-noop::各批产物均已就绪或未到时段，本轮空转（真成功）"
-            exit 0
-          fi
           if [ "$OK" != "true" ]; then
             echo "::error title=v8-stage-gate-blocked::上游未就绪，已拒绝执行 ${TGT} 批 —— ${REASON}"
             exit 1
           fi
+          if [ "${TGT:-NONE}" = "NONE" ]; then
+            echo "::notice title=v8-stage-gate-noop::${REASON}"
+          fi
+          echo "🚦 目标批=${TGT} 放行=${{ steps.gate.outputs.proceed }}（${REASON}）"
 
-      - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
+      - name: "🧮 运行盘后算法链（写入 raw_data/，推送由链尾统一执行）"
         id: algo
         if: steps.gate.outputs.proceed == 'true'
         # 🔴 2026-08-30 23:3x 抬高步级墙钟 90 → 150（实测 run 33316835316 坐实）：
@@ -482,15 +442,7 @@ jobs:
           # 内部 step_push 重复全量 848 扫描（与 api_push_raw PUSH_FILES 配合，422 根治闭环）。
           # 2026-09-03 派发风暴去重（B·小九接手）：算法链盘后产物同理剥时间戳比对，仅时间戳变的伪变更不进 PUSH_FILES
           #   脚本失败则回退原 git status 清单（安全优先，绝不漏推真数据）
-          MANIFEST=$(python .github/scripts/dedup_fetch_manifest.py raw_data/ data/ 2>/dev/null) \
-            || MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
-          if [ -n "$MANIFEST" ]; then
-            echo "📋 本次变更清单: ${MANIFEST%,}"
-            PUSH_FILES="$MANIFEST" python api_push_raw.py
-          else
-            echo "ℹ️ 无 raw_data/data 变更，跳过推送"
-          fi
-          echo "push exit: $?"
+          echo "ℹ️ 推送已统一收敛到链尾「📤 唯一推送」步（一次链只推一次，避免 Pages 构建风暴）"
 
       # 🛡 2026-08-18 主人紧急令根治：算法链收尾前先做 4 件事，确保 data/*.js 与 HEALTH_CHECK.js
       #   必刷新——bridge_raw_data 防 raw_data 内部改名断点（如 triple_resonance_history → triple_history），
@@ -507,7 +459,7 @@ jobs:
         run: |
           python cloud_fetch_v8.py --only CANDIDATE_QUOTES || true
 
-      - name: "📤 兜底推送（若上一步未推）"
+      - name: "📤 唯一推送（本链只此一处推送 data/ 与 raw_data/，严格退出码）"
         if: steps.gate.outputs.proceed == 'true'
         run: |
           # 2026-08-22 根因⑪收口：去掉 || true —— 推送失败必须让 job 失败，
@@ -589,40 +541,6 @@ jobs:
       #  缺失/陈旧 → exit 1 → job 显式失败 → 既有告警链路（runner_health_alert /
       #    v8_ops_watch）可见；同时写 $GITHUB_STEP_SUMMARY + raw_data/algo_chain_report.json，
       #    让主人一眼看到断在哪一环，而不是对着全绿的 job 发呆。
-      - name: "🛡 产物完整性闸门（核心产物必须本交易日产出）"
-        if: steps.gate.outputs.proceed == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "本轮 run_algorithms 退出码 = ${ALGO_EXIT:-未知}（仅供参考：continue-on-error 下常为 0）"
-          # 闸门报告 + 算法执行报告一并推送，供前端运维面板 / 后续排查消费
-          PUSH_FILES="raw_data/algo_chain_report.json,raw_data/algo_run_report.json" \
-            python api_push_raw.py || echo "⚠️ 报告推送失败（不影响闸门判定）"
-          # 2026-08-31 一劳永逸（主人令「一劳永逸式修复」·闸门假阳性根治）
-          #   本闸门要求 CRDS / 最终推荐「本交易日产出」，但：
-          #     - calc_crds.py       挂在 run_algorithms._POST_LHB_SCRIPTS（16:30 龙虎榜门控后才放行）
-          #     - final_recommend.py 另有 _final_recommend_gate() 就绪门控
-          #   于是看门狗在盘中派发本链时（实测 #1312 08:19 / #1313 09:33），这两个脚本
-          #   按设计正确跳过、并未产出今日产物，闸门却仍严格判定 -> exit 1 -> 整轮假阳性报红，
-          #   连带 HEALTH_CHECK 长期挂 CRDS_CARD_DATA / FINAL_RECOMMEND_DATA 两个 fail。
-          #   修复：16:30 前（CRDS/最终推荐尚未放行）以 --warn-only 运行（只报告、不判失败）；
-          #        16:30 之后（含真正的盘后主档 19:15）保持严格判定，不放水。
-          #   用 date -u -d '+8 hours' 而非 TZ=，避免依赖 runner 的 tzdata；
-          #   10#$HH 强制十进制，防 "0933" 被当八进制。
-          HH=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).strftime('%H%M'))")
-          if [ "$((10#$HH))" -lt 1630 ]; then
-            echo "当前 CST ${HH} < 16:30 —— CRDS/最终推荐按设计尚未放行，闸门以 warn-only 模式运行（不判失败）"
-            python algorithms/verify_chain_outputs.py --warn-only
-          else
-            echo "当前 CST ${HH} >= 16:30 —— 盘后窗口，闸门严格判定"
-            python algorithms/verify_chain_outputs.py
-          fi
-          GATE_EXIT=$?
-          if [ "$GATE_EXIT" != "0" ]; then
-            echo "::error::盘后算法链产物不完整——核心产物未在本交易日产出，详见上方闸门报告"
-          fi
-          exit $GATE_EXIT
-
       # ============================================================
       #  2026-09-08 一劳永逸（主人令「一劳永逸式修复」·C 收敛版·阿狸咪暗灯审计跟进）
       #    ── 算法链「结构一致性」机器校验，作为收尾硬性闸门 ──
@@ -636,34 +554,19 @@ jobs:
       #    ④ 无映射悬空（DATA_SOURCES 声明但 data/*.js 缺失 → 告警）
       #  失败即 job 失败，告警链路可见，杜绝「漏挂/断链」类暗灯再悄悄上线。
       # ============================================================
-      - name: "🛡 算法链结构一致性校验（ORDER↔STAGES / 孤儿 / 断链 / 悬空）"
+      - name: "🛡 机器校验（结构一致性 + 数据失真体检）"
         if: steps.gate.outputs.proceed == 'true'
         run: |
-          python algorithms/verify_chain_consistency.py
-          VERIFY_EXIT=$?
-          if [ "$VERIFY_EXIT" != "0" ]; then
-            echo "::error::算法链结构一致性校验未通过（STAGES/ORDER 双表不一致或存在孤儿/断链/悬空），详见上方报告"
+          # 两个只读校验合并为一步：任一不过 → 本步红（退出码非 0），告警链路可见。
+          #   ① verify_chain_consistency.py  STAGES↔ORDER 双表一致 / 孤儿 / 断链 / 悬空
+          #   ② verify_data_sanity.py        旧装新 / 数值越界 / 整表空
+          RC=0
+          python algorithms/verify_chain_consistency.py || RC=1
+          python algorithms/verify_data_sanity.py --no-baseline || RC=1
+          if [ "$RC" != "0" ]; then
+            echo "::error::机器校验未通过（结构不一致 或 数据失真），详见上方报告"
           fi
-          exit $VERIFY_EXIT
-
-      # ============================================================
-      #  2026-09-08 数据失真快速体检（主人令「靠谱的审计，不当摆设」·硬性闸门）
-      #    ── 查三类最伤人的失真：旧数据包装成新 / 数值越界 / 整表清空 ──
-      #  背景：夜间审计 freshness_status.json 只查「有没有/新不新」，不查「对不对」；
-      #  本步骤只读扫描 data/*.js（绝不改数据），硬失败即 job 红 + 告警链路可见：
-      #    ① update_time 对账（>7 天硬失败 / >2 天软告警）
-      #    ② 数值越界（price=0 / 当日涨跌幅超±44% / PE 越界；词边界精确匹配防误判）
-      #    ③ 整表空/截断（豁免表除外；字段语境豁免见脚本头）
-      # ============================================================
-      - name: "🛡 数据失真体检（旧装新 / 越界 / 空表）"
-        if: steps.gate.outputs.proceed == 'true'
-        run: |
-          python algorithms/verify_data_sanity.py --no-baseline
-          SANITY_EXIT=$?
-          if [ "$SANITY_EXIT" != "0" ]; then
-            echo "::error::数据失真体检未通过（旧数据装新/数值越界/整表清空），详见上方报告"
-          fi
-          exit $SANITY_EXIT
+          exit $RC
 
       # ============================================================
       #  2026-09-10 主人令「假成功必须杜绝」·结果问责（一劳永逸）
@@ -676,7 +579,7 @@ jobs:
       #   凌晨 00:00-05:59 属回填窗口（产物可能刚产出、日期是今天），放宽到任意时刻。
       #   只读 data/*.js，绝不改数据。
       # ============================================================
-      - name: "🛡 结果问责（杜绝假成功：按目标批次问责）"
+      - name: "🛡 结果问责（按目标批次 + 产物完整性 · 杜绝假成功）"
         if: always()
         run: |
           set +e
@@ -684,58 +587,53 @@ jobs:
           OK="${{ steps.gate.outputs.stage_ok }}"
           PROCEED="${{ steps.gate.outputs.proceed }}"
           OUTCOME="${{ steps.algo.outcome }}"
-          IS_TD="${{ steps.trading.outputs.is_trading_day }}"
+          KIND="${{ steps.gate.outputs.chain_kind }}"
+          DAY="${{ steps.gate.outputs.chain_day }}"
           HHMM=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).strftime('%H:%M'))")
-          TODAY=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).strftime('%Y-%m-%d'))")
-          HH=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).hour)")
-          MIN_H=16
-          if [ "$HH" -lt 6 ]; then MIN_H=0; fi   # 凌晨回填窗口：产物可能刚产出
+          # 就绪复核：与批次闸门**同一判据同源代码**（v8_stage_gate.py --recheck），
+          #   绝不在链尾另写一套新鲜度规则 —— 两套规则必然漂移（历史教训）。
+          CHK=$(python .github/scripts/v8_stage_gate.py --root . --recheck --today "$DAY" 2>/dev/null)
+          B_FRESH=$(printf '%s' "$CHK" | grep -m1 '^ready_B=' | cut -d= -f2)
+          D_FRESH=$(printf '%s' "$CHK" | grep -m1 '^ready_D=' | cut -d= -f2)
+          RC=0
 
-          fresh_of () {   # $1=仓库相对路径 → 1/0（update_time 日期=今天 且 小时>=MIN_H）
-            UT=$(git show HEAD:"$1" 2>/dev/null                  | grep -o '"update_time"[^"]*"[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}'                  | head -1 | grep -o '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}$' || echo "")
-            case "$UT" in
-              "$TODAY "*) if [ "$((10#${UT##* }))" -ge "$MIN_H" ]; then echo 1; else echo 0; fi ;;
-              *) echo 0 ;;
-            esac
-          }
-
-          B_FRESH=0
-          for f in data/TRIPLE_CONSENSUS.js data/FOUR_VOLUME.js data/CRDS_CARD_DATA.js; do
-            [ "$(fresh_of "$f")" = "1" ] && B_FRESH=$((B_FRESH+1))
-          done
-          D_FRESH="$(fresh_of data/FINAL_RECOMMEND_DATA.js)"
-
-          echo "问责输入: 目标批=${TGT:-?} 闸门放行=${OK:-?} 执行标志=${PROCEED:-?} 算法步骤=${OUTCOME:-?} 交易日=${IS_TD:-?} CST=${HHMM} B三模块=${B_FRESH}/3 D最终推荐=${D_FRESH}"
-          { echo "### 🛡 盘后算法链结果问责（按目标批次）"; echo ""; echo "| 项 | 值 |"; echo "|---|---|";
+          echo "问责输入: 目标批=${TGT:-?} 闸门放行=${OK:-?} 执行标志=${PROCEED:-?} 算法步骤=${OUTCOME:-?} 数据日=${DAY:-?}(${KIND:-?}) CST=${HHMM} B三模块=${B_FRESH:-?} D最终推荐=${D_FRESH:-?}"
+          { echo "### 🛡 盘后算法链结果问责"; echo ""; echo "| 项 | 值 |"; echo "|---|---|";
             echo "| 目标批次 | **${TGT:-?}** |"; echo "| 闸门放行 | ${OK:-?} |";
             echo "| 执行标志 proceed | ${PROCEED:-?} |"; echo "| 算法链结果 | ${OUTCOME:-?} |";
-            echo "| 是否交易日 | ${IS_TD:-?} |"; echo "| 当前 CST | ${HHMM} |";
-            echo "| B 批三模块今日盘后 | ${B_FRESH}/3 |"; echo "| D 批最终推荐今日盘后 | ${D_FRESH}/1 |"; } >> "$GITHUB_STEP_SUMMARY"
+            echo "| 数据日 | ${DAY:-?} (${KIND:-?}) |"; echo "| 当前 CST | ${HHMM} |";
+            echo "| B 批三模块 | ${B_FRESH:-?} |"; echo "| D 批最终推荐 | ${D_FRESH:-?} |"; } >> "$GITHUB_STEP_SUMMARY"
 
-          if [ "$IS_TD" != "true" ]; then
-            echo "::notice title=v8-algo-holiday::非交易日，无盘后批次（合规跳过）"; exit 0
+          if [ "${KIND:-none}" = "none" ]; then
+            echo "::notice title=v8-algo-holiday::休市日（无 T+1 需求），不跑算法链（合规）"; exit 0
           fi
           if [ "$OK" != "true" ]; then
             echo "::error title=v8-algo-gate-blocked::上游未就绪，本批已被批次闸门拒绝执行（目标 ${TGT}）——这不是成功"; exit 1
           fi
-          if [ "${TGT:-NONE}" = "NONE" ]; then
-            echo "::notice title=v8-algo-noop-ok::各批产物均已就绪或未到时段，本轮空转（合规）"; exit 0
+          if [ -z "$TGT" ]; then
+            echo "::error title=v8-algo-no-gate::批次闸门未产出判定（脚本异常）—— 不能当成功，请排查"; exit 1
           fi
-          case "${TGT}" in
+          if [ "${TGT:-NONE}" = "NONE" ]; then
+            echo "::notice title=v8-algo-noop-ok::各批产物均已就绪或未到起点，本轮空转（合规）"; exit 0
+          fi
+
+          # ① 按目标批次问责
+          case "$TGT" in
             B|ALL)
-              if [ "$B_FRESH" -eq 3 ]; then
-                echo "::notice title=v8-algo-ok::${TGT} 批完成，选股三模块均为今日盘后产出（执行=${OUTCOME:-?}）"; exit 0
-              fi
-              echo "::error title=v8-algo-stale::${TGT} 批跑完但选股三模块仍非今日盘后（${B_FRESH}/3，执行=${OUTCOME:-?}）——假成功，必须排查"; exit 1 ;;
+              [ "$B_FRESH" = "3/3" ] || { echo "::error title=v8-algo-stale::${TGT} 批跑完但选股三模块仍非本数据日盘后产出（${B_FRESH}，执行=${OUTCOME:-?}）—— 假成功，必须排查"; RC=1; } ;;
             D)
-              if [ "$D_FRESH" = "1" ]; then
-                echo "::notice title=v8-algo-ok::D 批完成，最终推荐为今日盘后产出（执行=${OUTCOME:-?}）"; exit 0
-              fi
-              echo "::error title=v8-algo-stale::D 批跑完但 FINAL_RECOMMEND 仍非今日盘后（执行=${OUTCOME:-?}）——假成功，必须排查"; exit 1 ;;
+              [ "$D_FRESH" = "1/1" ] || { echo "::error title=v8-algo-stale::D 批跑完但 FINAL_RECOMMEND 仍非本数据日盘后产出（${D_FRESH}，执行=${OUTCOME:-?}）—— 假成功，必须排查"; RC=1; } ;;
             A|E)
-              if [ "${OUTCOME:-none}" = "success" ]; then
-                echo "::notice title=v8-algo-batch::${TGT} 批完成（本批按设计不产选股三模块）"; exit 0
-              fi
-              echo "::error title=v8-algo-failed::${TGT} 批执行未成功（${OUTCOME:-?}）"; exit 1 ;;
+              [ "${OUTCOME:-none}" = "success" ] || { echo "::error title=v8-algo-failed::${TGT} 批执行未成功（${OUTCOME:-?}）"; RC=1; } ;;
           esac
-          echo "::notice title=v8-algo-unknown::未知目标批（${TGT}），无问责规则"; exit 0
+
+          # ② 产物完整性（raw_data 源头层，选股/汇总/回测/全链适用；A 采集批不产这些，跳过）
+          case "$TGT" in
+            B|D|E|ALL)
+              python algorithms/verify_chain_outputs.py --date "$DAY" || { echo "::error::产物完整性闸门未通过（raw_data 源头层有陈旧/缺失），详见上方报告"; RC=1; } ;;
+          esac
+
+          if [ "$RC" = "0" ]; then
+            echo "::notice title=v8-algo-ok::${TGT} 批完成，产物核验通过（执行=${OUTCOME:-?}）"
+          fi
+          exit $RC
