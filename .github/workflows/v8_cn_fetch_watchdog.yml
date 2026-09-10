@@ -122,6 +122,38 @@ jobs:
                   print(f"[watchdog] 查云端状态失败: {e}")
                   return 0, None
 
+          def cancel_stuck_cloud_runs():
+              """🔴 2026-09-10 一劳永逸破锁：取消 cloud.yml 中创建>12分且无新数据的 running run，
+              释放 v8-cn-fetch-cloud concurrency 锁。否则一个卡死 run 占锁会把主派发档挡掉 → 数据空窗
+              （09-10 09:32 watchdog 派发的 cloud run 卡15分占锁、挡掉 09:40 主派，同 09-09 13点事故）。"""
+              try:
+                  import os as _os, time as _t
+                  hdr = {"User-Agent": "Mozilla/5.0",
+                         "Authorization": "Bearer " + _os.environ.get("GH_TOKEN", ""),
+                         "Accept": "application/vnd.github+json",
+                         "X-GitHub-Api-Version": "2022-11-28"}
+                  rq = urllib.request.Request(
+                      "https://api.github.com/repos/ah-quant999/quant-scanner-v8"
+                      "/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=5", headers=hdr)
+                  j = json.loads(urllib.request.urlopen(rq, timeout=20).read())
+                  for x in j.get("workflow_runs", []):
+                      if x.get("status") == "completed":
+                          continue
+                      created = datetime.datetime.strptime(x["created_at"][:19], "%Y-%m-%dT%H:%M:%S")
+                      age_min = (datetime.datetime.utcnow() - created).total_seconds() / 60
+                      if age_min > 12:
+                          req2 = urllib.request.Request(
+                              f"https://api.github.com/repos/ah-quant999/quant-scanner-v8"
+                              f"/actions/runs/{x['id']}/cancel",
+                              data=b"", method="POST", headers=hdr)
+                          try:
+                              urllib.request.urlopen(req2, timeout=20)
+                              print(f"[watchdog] 🔓 破锁：取消卡死 cloud run#{x['id']}（龄{age_min:.0f}分，释放 concurrency）")
+                          except Exception as e:
+                              print(f"[watchdog] 取消 run#{x['id']} 失败: {e}")
+              except Exception as e:
+                  print(f"[watchdog] 破锁查询失败: {e}")
+
           def dispatch_cat(category, use_selfhosted=False):
               """按拥堵状态派发：云端正常 -> 派云端；拥堵/刚失败 -> 派 selfhosted 兜底。"""
               import subprocess
@@ -170,12 +202,16 @@ jobs:
 
           if stale:
               print(f"[watchdog] ❌ {len(stale)}/{len(files)} 个文件陈旧（阈值 {thr}min），准备派发 {cat}")
-              n, latest = cloud_state()
-              if n >= 2 or latest == "failure":
-                  print(f"[watchdog] 云端拥堵({n} run)或刚失败({latest})，改派 selfhosted 兜底")
+              cancel_stuck_cloud_runs()  # 🔴 一劳永逸破锁：清掉卡死 run，释放 concurrency 锁
+              if cat == "intraday":
+                  # 盘中优先 selfhosted（小九机中国IP，不挤云公共队列）；cloud 作 fallback
                   dispatch_cat(cat, use_selfhosted=True)
               else:
-                  dispatch_cat(cat, use_selfhosted=False)
+                  n, latest = cloud_state()
+                  if n >= 2 or latest == "failure":
+                      dispatch_cat(cat, use_selfhosted=True)
+                  else:
+                      dispatch_cat(cat, use_selfhosted=False)
               # ::error 注解：坏死文件在 Actions UI 直接标红，不再静默（原代码只 print，无人知晓）
               print("::error title=数据陈旧::" +
                     ", ".join(f"{fn}({a:.0f}min)" for fn, a in stale))
