@@ -387,7 +387,7 @@ jobs:
             echo "🔇 dispatch×非交易日：算法链必被交易日 gate 跳过，纯空转，静默"
             exit 0
           fi
-          HH=$(date -u -d '+8 hours' +%H)
+          HH=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).hour)")
           # 🔴 2026-09-07 一劳永逸修复（22 个红灯根因）：原 [6,18) 静默窗写于 09-03，
           #   09-04 时序重排把 A 采集批挪到 16:40 后，16/17 点 dispatch 被误杀 →
           #   cron 又静默失效（本 workflow 多 cron 顽疾）→ A 档既无 schedule 又被闸门拦，
@@ -408,15 +408,15 @@ jobs:
           #   后果（09-10 实锤）：CST 16:40/18:10/19:15/20:00/21:00 派发 → UTC 08~13 ⊂ [6,16)
           #   → 命中下方「无效时段」静默分支 → **盘后链从未真正跑过，run 却报 success**（假成功）。
           #   统一改用仓库既有正确写法 date -u -d '+8 hours'（第 686 行早已如此）。
-          if [ "$(date -u -d '+8 hours' +%H)" -lt 6 ]; then
-            TODAY=$(date -u -d '+8 hours -1 day' +%F)
+          if [ "$HH" -lt 6 ]; then
+            TODAY=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)-d.timedelta(days=1)).strftime('%Y-%m-%d'))")
             echo "ℹ️ 凌晨时段：新鲜度归属前一交易日 ${TODAY}"
           else
-            TODAY=$(date -u -d '+8 hours' +%F)
+            TODAY=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).strftime('%Y-%m-%d'))")
           fi
           FRESH=0
           for f in TRIPLE_CONSENSUS FOUR_VOLUME CRDS_CARD_DATA; do
-            UT=$(git show HEAD:data/$f.js 2>/dev/null                  | grep -o '"update_time"[^"]*"[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}'                  | head -1 | grep -o '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}$')
+            UT=$(git show HEAD:data/$f.js 2>/dev/null                  | grep -o '"update_time"[^"]*"[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}'                  | head -1 | grep -o '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}$' || echo "")
             case "$UT" in
               "$TODAY "*)
                 UTH=$((10#${UT##* }))
@@ -474,7 +474,7 @@ jobs:
             exit 0
           fi
           # 与云端分批同口径：按 CST 小时算 stage（16:40采集/18:10选股/20:00汇总/21:00回测，2026-09-04 重排）
-          HH=$(date -u -d '+8 hours' +%H)
+          HH=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).hour)")
           STAGE=""
           case "$HH" in
             16|17) STAGE="A" ;;
@@ -524,7 +524,7 @@ jobs:
           STAGE=""
           # 🔴 2026-09-10 根因修复：stage 也按真 CST 小时算（原 TZ= 写法在 Windows runner 取 UTC，
           #   导致 19:26 CST 派发被判成 UTC 11 点 → 落 * 分支跑「全链」而非 B 批，整晚被拖长）。
-          HH=$(date -u -d '+8 hours' +%H)
+          HH=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).hour)")
           IN_STAGE="$(printf '%s' "${{ github.event.inputs.stage || github.event.client_payload.stage || '' }}" | tr -cd 'A-Za-z' | tr 'a-z' 'A-Z')"
           if [ -n "$IN_STAGE" ]; then
             case "$IN_STAGE" in
@@ -691,7 +691,7 @@ jobs:
           #        16:30 之后（含真正的盘后主档 19:15）保持严格判定，不放水。
           #   用 date -u -d '+8 hours' 而非 TZ=，避免依赖 runner 的 tzdata；
           #   10#$HH 强制十进制，防 "0933" 被当八进制。
-          HH=$(date -u -d '+8 hours' +%H%M)
+          HH=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).strftime('%H%M'))")
           if [ "$((10#$HH))" -lt 1630 ]; then
             echo "当前 CST ${HH} < 16:30 —— CRDS/最终推荐按设计尚未放行，闸门以 warn-only 模式运行（不判失败）"
             python algorithms/verify_chain_outputs.py --warn-only
@@ -746,3 +746,69 @@ jobs:
             echo "::error::数据失真体检未通过（旧数据装新/数值越界/整表清空），详见上方报告"
           fi
           exit $SANITY_EXIT
+
+      # ============================================================
+      #  2026-09-10 主人令「假成功必须杜绝」·结果问责（一劳永逸）
+      #   背景（09-10 实证）：盘后 15:47~18:57 六轮 workflow 全部 success，
+      #   实测一步没跑（runner 时区被忽略 → 闸门误判「6-15 点无效时段」静默跳过）。
+      #   本步骤把「静默跳过 / 跑完无产出」从"绿色成功"变成**可见告警或红灯**：
+      #     · 非交易日 / 盘中档 / 三模块已新鲜 / A·E 批 → notice（合规，不算失败）
+      #     · 交易日盘后档：链没跑 或 跑了但三模块仍不新鲜 → ::error + exit 1
+      #       （这正是假成功 —— 必须红，不能再让"什么都没产出"的 run 绿灯放过）
+      #   凌晨 00:00-05:59 属回填窗口（产物可能刚产出、日期是今天），放宽到任意时刻。
+      #   只读 data/*.js，绝不改数据。
+      # ============================================================
+      - name: "🛡 结果问责（杜绝假成功：静默跳过 ≠ 成功）"
+        if: always()
+        run: |
+          set +e
+          SKIP="${{ steps.silent.outputs.skip_silent }}"
+          OUTCOME="${{ steps.algo.outcome }}"
+          ROUTED="${{ steps.route.outputs.route }}"
+          IS_TD="${{ steps.trading.outputs.is_trading_day }}"
+          IN_STAGE="$(printf '%s' "${{ github.event.inputs.stage || github.event.client_payload.stage || '' }}" | tr -cd 'A-Za-z' | tr 'a-z' 'A-Z')"
+          HH=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).hour)")
+          HHMM=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).strftime('%H%M'))")
+          TODAY=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).strftime('%Y-%m-%d'))")
+          MIN_H=16
+          if [ "$HH" -lt 6 ]; then MIN_H=0; fi   # 凌晨回填窗口：产物可能刚产出（今日 00:00-05:59）
+          FRESH=0
+          for f in TRIPLE_CONSENSUS FOUR_VOLUME CRDS_CARD_DATA; do
+            UT=$(git show HEAD:data/$f.js 2>/dev/null | grep -o '"update_time"[^"]*"[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}' | head -1 | grep -o '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}$' || echo "")
+            case "$UT" in
+              "$TODAY "*) UTH=$((10#${UT##* })); if [ "$UTH" -ge "$MIN_H" ]; then FRESH=$((FRESH+1)); fi ;;
+            esac
+          done
+          echo "问责输入: 静默标记=${SKIP:-?} 算法步骤=${OUTCOME:-?} 转派=${ROUTED:-?} 交易日=${IS_TD:-?} CST=${HHMM} stage=${IN_STAGE:-按小时} 三模块新鲜=${FRESH}/3"
+          { echo "### 🛡 盘后算法链结果问责"; echo ""; echo "| 项 | 值 |"; echo "|---|---|";
+            echo "| 静默闸门跳过 | ${SKIP:-?} |"; echo "| 算法链步骤结果 | ${OUTCOME:-?} |";
+            echo "| 转派 cn | ${ROUTED:-?} |"; echo "| 是否交易日 | ${IS_TD:-?} |";
+            echo "| 当前 CST | ${HHMM} |"; echo "| stage | ${IN_STAGE:-按小时} |";
+            echo "| 选股三模块今日 16:30 后产出 | ${FRESH}/3 |"; } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$FRESH" -eq 3 ]; then
+            echo "::notice title=v8-algo-ok::选股三模块均为今日盘后产出（静默=${SKIP:-?} 步骤=${OUTCOME:-?}），合规"
+            exit 0
+          fi
+          if [ "$IS_TD" != "true" ]; then
+            echo "::notice title=v8-algo-holiday::非交易日，无盘后批次（合规跳过）"
+            exit 0
+          fi
+          case "$IN_STAGE" in
+            A|E) echo "::notice title=v8-algo-batch::${IN_STAGE} 批本不产选股三模块，豁免问责"; exit 0 ;;
+          esac
+          if [ -z "$IN_STAGE" ]; then
+            case "$HH" in
+              16|17) echo "::notice title=v8-algo-batch::CST ${HH} 点＝采集批(A)，本不产选股三模块，豁免"; exit 0 ;;
+              21)    echo "::notice title=v8-algo-batch::CST ${HH} 点＝回测批(E)，本不产选股三模块，豁免"; exit 0 ;;
+            esac
+          fi
+          if [ "$HH" -ge 6 ] && [ "$HHMM" -lt 1630 ]; then
+            echo "::notice title=v8-algo-intraday::CST ${HHMM} 属盘中档，盘后三模块按设计未产出（非失败）"
+            exit 0
+          fi
+          if [ "${OUTCOME:-none}" != "success" ]; then
+            echo "::error title=v8-algo-noop::交易日盘后档但算法链没跑（静默=${SKIP:-?} 结果=${OUTCOME:-?} 转派=${ROUTED:-?}）——本轮 0 产出，这不是成功！"
+            exit 1
+          fi
+          echo "::error title=v8-algo-stale::算法链跑完但选股三模块仍非今日 16:30 后产出（${FRESH}/3）——假成功，必须排查"
+          exit 1
