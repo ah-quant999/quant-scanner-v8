@@ -1,0 +1,116 @@
+# 九宝量化 v8.0 — 板块资金日内快照（独立高频 job，根治主力净额卡上午空白）
+#
+# 🛡 2026-09-10 双管齐下根治「主力净额分时上午断档」：
+#   第一管（已推）：intraday_snapshot.py 守卫放宽（口径只卡今天 + 陈旧 40→90min）。
+#   第二管（本文件）：把快照从 fetch job 内「合并步骤」彻底解耦为独立高频 job。
+#
+# 🔴 根因（已查明）：原 soft_9 嵌在 v8_cn_fetch_cloud 的 fetch job 内，快照 time 取
+#   脚本运行时刻（intraday_snapshot.py:59）。上午某档 fetch 在 GHA 队列排队延迟后跑到，
+#   写的 time 已是延迟后的时刻 → 10:20/10:40 这些「目标档期」点永远缺失，上午仅剩
+#   10:00 档准时跑出的 10:12 一个点。守卫放宽救不了「档期错位」。
+#
+# ✅ 本 job 独立每 10 分钟触发（不被 fetch 排队/取消风暴波及），跑 intraday_snapshot.py
+#   读「已提交的 raw_data/sector_fund_flow.json」（fetch 成功一次后长时间新鲜，≤90min
+#   守卫放过）→ 准时写「当前档期时刻」点。即使某档 fetch 整轮失败，只要今日有过一次
+#   成功提交，本 job 后续每 10 分钟持续补点 → 曲线连续不断。
+#
+# 🛡 防「多 cron 静默失效」：本文件只有 1 条 schedule（每 10 分钟，UTC 1-7 覆盖
+#   CST 09:00-15:00 盘中），单条 cron 不触发 GHA 单 workflow 多 cron 失效坑。
+#   午休（11:30-13:00）也跑，但脚本守卫 09:25-16:05 会写（用上次新鲜数据填旧点，
+#   保曲线连续，无害）。
+#
+# 🛡 并发安全：独立 concurrency group（v8-intraday-snapshot, cancel-in-progress:true），
+#   与 v8-cn-fetch-cloud 组隔离，互不取消；高频秒级完成，cancel 不会丢（上一次已跑完）。
+#   推送仅限 2 个快照文件（data/SECTOR_FUND_FLOW_INTRADAY.js + raw_data/sector_fund_flow_intraday.json），
+#   与 fetch job 的 soft_10 全量推送文件不重叠 → rebase 无冲突，fast-forward 安全。
+name: "📈 板块资金日内快照(独立高频·根治上午空白)"
+
+on:
+  schedule:
+    - cron: '*/10 1-7 * * 1-5'   # 每 10 分钟，UTC 01:00-07:50 ≈ CST 09:00-15:50 盘中（单条，防多 cron 失效）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-intraday-snapshot
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Shanghai
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: "⬇️ checkout main"
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: "🐍 setup-python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: "📈 追加快日快照（独立解耦·重试5）"
+        id: snap
+        continue-on-error: true
+        shell: bash
+        run: |
+          _ok=0
+          for i in 1 2 3 4 5; do
+            echo "尝试 $i/5 追加板块资金日内快照"
+            if python intraday_snapshot.py; then
+              echo "✅ 快照追加成功"
+              _ok=1
+              break
+            fi
+            echo "⚠️ 第 $i 次失败，6s 后重试"
+            sleep 6
+          done
+          if [ "$_ok" != "1" ]; then
+            echo "::error title=v8-softfail:intraday-snapshot::📈 独立快照追加失败（5次重试均败），本步不阻断 job，请核对健康面板主力净额卡新鲜度。"
+          fi
+
+      - name: "📤 推送 2 个快照文件（仅快照，rebase 无冲突）"
+        id: push
+        continue-on-error: true
+        shell: bash
+        run: |
+          git config user.email "2814546@qq.com"
+          git config user.name "ah-quant999"
+          git add data/SECTOR_FUND_FLOW_INTRADAY.js raw_data/sector_fund_flow_intraday.json
+          if git diff --cached --quiet; then
+            echo "ℹ️ 本次无快照变更，跳过推送"
+            exit 0
+          fi
+          git commit -q -m "snapshot: 板块资金日内快照 $(TZ=Asia/Shanghai date '+%F %H:%M') CST"
+          for i in 1 2 3 4; do
+            git fetch origin >/dev/null 2>&1
+            if git rebase origin/main >/dev/null 2>&1; then
+              if git push origin HEAD:main 2>&1 | tail -2; then
+                echo "✅ 快照推送成功 (attempt=$i)"
+                break
+              fi
+            else
+              git rebase --abort >/dev/null 2>&1
+            fi
+            echo "⚠️ 第 $i 次推送冲突/失败，重试"
+          done
+
+      - name: "📢 软失败告警（不阻断）"
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.snap.outcome }}" != "success" ] || [ "${{ steps.push.outcome }}" != "success" ]; then
+            echo "::error title=v8-intraday-snapshot-softfail::独立快照 job 软失败（snap=${{ steps.snap.outcome }} push=${{ steps.push.outcome }}），主力净额卡可能未刷新，请检查。"
+          else
+            echo "✅ 独立快照 job 本轮无软失败"
+          fi

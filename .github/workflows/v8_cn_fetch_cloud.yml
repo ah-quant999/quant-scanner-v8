@@ -402,15 +402,15 @@ jobs:
         continue-on-error: true
         run: |
           _v8_ok=0
-          for i in 1 2 3; do
-            echo "尝试 $i/3 追加板块资金日内快照"
+          for i in 1 2 3 4 5; do
+            echo "尝试 $i/5 追加板块资金日内快照"
             if python intraday_snapshot.py; then
               echo "✅ 快照追加成功"
               _v8_ok=1
               break
             fi
-            echo "⚠️ 第 $i 次失败，10s 后重试"
-            sleep 10
+            echo "⚠️ 第 $i 次失败，6s 后重试"
+            sleep 6
           done
 
           # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
