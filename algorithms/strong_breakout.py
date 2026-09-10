@@ -70,10 +70,21 @@ def _sym(code):
 def _fetch_kline_gtimg(code, n):
     """gtimg 日K前复权：[date, open, close, high, low, volume(手)]（云端生产主源）"""
     s = _sym(code)
-    url = f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={s},day,,,{n},qfq"
-    req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=15) as r:
-        d = json.loads(r.read().decode("utf-8"))
+    # 2026-09-11 域名级故障转移：web.ifzq 在阿狸咪本机 501（域名级拦截）→ proxy 域同构 API 兜底
+    d = None
+    _err = None
+    for _host in ("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
+                  "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/fqkline/get"):
+        try:
+            req = urllib.request.Request(f"{_host}?param={s},day,,,{n},qfq", headers=UA)
+            with urllib.request.urlopen(req, timeout=15) as r:
+                d = json.loads(r.read().decode("utf-8"))
+            break
+        except Exception as _e:  # noqa: BLE001
+            _err = _e
+            d = None
+    if d is None:
+        raise _err
     node = d["data"][s]
     k = node.get("qfqday") or node.get("day")
     return [[row[0], float(row[1]), float(row[2]), float(row[3]),

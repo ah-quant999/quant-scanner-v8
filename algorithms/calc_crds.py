@@ -208,12 +208,20 @@ def _query_kline_tx(code, secid_prefix, days):
     if _TX_KLINE_FAILS >= _TX_KLINE_MAX_FAILS:
         return None
     symbol = ("sh" if secid_prefix == "1" else "sz") + code
-    url = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
-    params = {"param": f"{symbol},day,,,{days + MA_DAYS + 30},qfq"}
+    # 2026-09-11 域名级故障转移：web.ifzq 本机 501（域名级拦截）→ proxy 域同构 API 兜底
+    r = None
+    for _tx_host in ("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
+                     "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/fqkline/get"):
+        try:
+            r = _requests.get(_tx_host, params={"param": f"{symbol},day,,,{days + MA_DAYS + 30},qfq"},
+                              timeout=12, headers={"User-Agent": "Mozilla/5.0 (v8-crds;quant)"})
+            if r.status_code == 200:
+                break
+            r = None
+        except Exception:
+            r = None
     try:
-        r = _requests.get(url, params=params, timeout=12,
-                          headers={"User-Agent": "Mozilla/5.0 (v8-crds;quant)"})
-        if r.status_code != 200:
+        if r is None:
             _TX_KLINE_FAILS += 1
             return None
         node = (r.json().get("data") or {}).get(symbol) or {}

@@ -11,7 +11,8 @@ mootdx/东财不可达。接口与 scanner 期望完全一致：
       （新浪 getHQNodeData 按成交额排序，分流 创业板/科创板/主板；港股暂不支持）
 
 数据来源：
-  - 日K：web.ifzq.gtimg.cn（腾讯行情，前复权 qfqday）
+  - 日K：web.ifzq.gtimg.cn（腾讯行情，前复权 qfqday）；阿狸咪本机 501 时自动切
+    proxy.finance.qq.com/ifzqgtimg 代理域（2026-09-11 域名级故障转移，同构 JSON）
   - 活跃股：vip.stock.finance.sina.com.cn（新浪沪深A排行 sort=amount）
 两者均为 HTTP JSON，无需本地库。
 """
@@ -23,7 +24,15 @@ import urllib.error
 
 import pandas as pd
 
-KLINE_API = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+# 🔴 2026-09-11 一劳永逸（主人令「发现了就马上一劳永逸式修复」）：web.ifzq.gtimg.cn 在阿狸咪
+#   本机被【域名级】WAF 拦截（HTTPS=HTTP 501 Not Implemented；换 UA/Referer/http 均无效，实测复现）。
+#   同一 API 经 proxy.finance.qq.com/ifzqgtimg 代理域返回 HTTP 200 且 JSON 结构完全一致（qfqday 同构）。
+#   → 域名级故障转移：主域失败自动切代理域；云端（海外 runner）两域均可达，保持主域优先。
+KLINE_HOSTS = (
+    "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
+    "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/fqkline/get",
+)
+KLINE_API = KLINE_HOSTS[0]
 RANK_API = "https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData"
 
 _UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
@@ -75,14 +84,25 @@ def _http(url, timeout=20, retries=3, referer="https://finance.sina.com.cn/"):
     raise last or RuntimeError("no attempts")
 
 
+def _kline_json(param, timeout=20):
+    """域名级故障转移拉 K 线 JSON（2026-09-11）：web.ifzq 域名级 501 时自动切 proxy 域。"""
+    last = None
+    for _host in KLINE_HOSTS:
+        try:
+            return json.loads(_http(f"{_host}?param={param}", referer="https://gu.qq.com/", timeout=timeout))
+        except Exception as _e:  # noqa: BLE001
+            print(f"  [GTimg] {_host.split('/')[2]} 失败: {_e}")
+            last = _e
+    raise last or RuntimeError("no kline host attempts")
+
+
 def fetch_a_daily_gtimg(code, market="sh", bars=250):
     """腾讯前复权日K → DataFrame(date/open/close/high/low/volume/pct_chg)。
 
     与 scanner.fetch_a_daily 的 mootdx 分支列结构一致；非未来函数（仅截至当日）。
     """
     sym = f"{market}{code}"
-    raw = _http(f"{KLINE_API}?param={sym},day,,,{bars},qfq", referer="https://gu.qq.com/")
-    d = json.loads(raw)
+    d = _kline_json(f"{sym},day,,,{bars},qfq")
     node = (d.get("data") or {}).get(sym) or {}
     k = node.get("qfqday") or node.get("day") or []
     rows = []

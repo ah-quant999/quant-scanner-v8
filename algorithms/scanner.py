@@ -1988,10 +1988,20 @@ def fetch_hk_daily(code, bars=None):
                 continue
 
     # 源3: QQ/腾讯财付通 (最终抢救)
+    # 2026-09-11 域名级故障转移：web.ifzq 本机 501（域名级拦截）→ proxy 域同构 API 兜底
+    r = None
+    for _tx_host in ("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
+                     "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/fqkline/get"):
+        try:
+            r = requests.get(_tx_host, params={"param": f"hk{code},day,,,{bars},qfq"}, timeout=10)
+            if r.status_code == 200:
+                break
+            r = None
+        except Exception:
+            r = None
     try:
-        url = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
-        params = {"param": f"hk{code},day,,,{bars},qfq"}
-        r = requests.get(url, params=params, timeout=10)
+        if r is None:
+            raise RuntimeError("gtimg 双域均失败")
         d = r.json()
         stock_data = d.get("data", {}).get(f"hk{code}", {})
         days = stock_data.get("qfqday", stock_data.get("day", []))
