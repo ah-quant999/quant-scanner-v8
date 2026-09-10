@@ -447,33 +447,56 @@ def _save_cache_df(code, df):
         pass
 
 
-def _query_kline(code, secid_prefix, days):
+def _is_index_like(code, secid_prefix):
+    """沪市(prefix='1')且代码以 '0' 开头 ⇒ 指数（个股沪市必为 6 开头）。
+    例：('000001','1')=上证指数 ←→ ('000001','0')=平安银行。"""
+    return str(secid_prefix) == "1" and str(code).startswith("0")
+
+
+def _query_kline(code, secid_prefix, days, is_index=False):
     """取数调度（2026-09-11 提速重构）：
-       ① 本地缓存 raw_data/kline_cache（新鲜→零网络）
+       ① 本地缓存 raw_data/kline_cache（新鲜→零网络；指数不走缓存，见下）
        ② 腾讯 gtimg 双域（实测 0.15s/只，本机+云端均可达）
        ③ mootdx 通达信（有本地客户端时最快；失败 5 次本轮熔断）
        ④ 东方财富（最后兜底，限流较重）
-    每只成功后回写缓存，返回归一化 DataFrame 或 None。"""
+    每只成功后回写缓存，返回归一化 DataFrame 或 None。
+
+    🔴 2026-09-11 修正（缓存键冲突 / 大盘口径）：
+      kline_cache 以 6 位代码为文件名，而「000001」在沪、深是两个完全不同的标的：
+        · sh000001 = 上证指数   · sz000001 = 平安银行
+      两者若共用同一份缓存会互相污染（实测本盘首轮把上证指数写进了平安银行的
+      000001.json，混成 254 行「2025-08-26 平安银行 … 2026-09-10 3934.4 上证」）。
+      故：① 指数请求不读也不写缓存；
+          ② 指数请求不走 mootdx —— mootdx.bars('000001') 返回的是深市平安银行，
+             并非上证指数（历史 CRDS「大盘大跌日」判定因此长期错用平安银行，
+             实测 09-08 产物 prev_pct=-1.6/trend5=-1.17 与平安银行逐值吻合）。
+    """
     if not code or not re.fullmatch(r"\d{6}", str(code)):
         return None
-    df = _load_cache_df(code)
-    if df is not None:
-        return df
+    cache_ok = (not is_index) and (not _is_index_like(code, secid_prefix))
+    if cache_ok:
+        df = _load_cache_df(code)
+        if df is not None:
+            return df
     _rate_wait()
     df = _query_kline_tx(code, secid_prefix, days)
     if df is not None and len(df) >= LOOKBACK_DAYS:
         _bump("net_tx")
-        _save_cache_df(code, df)
+        if cache_ok:
+            _save_cache_df(code, df)
         return df
-    df = _query_kline_mootdx(code, days)
-    if df is not None and len(df) >= LOOKBACK_DAYS:
-        _bump("net_mootdx")
-        _save_cache_df(code, df)
-        return df
+    if not is_index:
+        df = _query_kline_mootdx(code, days)
+        if df is not None and len(df) >= LOOKBACK_DAYS:
+            _bump("net_mootdx")
+            if cache_ok:
+                _save_cache_df(code, df)
+            return df
     df = _query_kline_em(code, secid_prefix, days)
     if df is not None and len(df) >= LOOKBACK_DAYS:
         _bump("net_em")
-        _save_cache_df(code, df)
+        if cache_ok:
+            _save_cache_df(code, df)
         return df
     _bump("fail")
     return None
@@ -528,7 +551,9 @@ def _composite_market_score(quotes):
 
 def get_market_index():
     """获取大盘指数(上证)近期数据(含每日涨跌幅)"""
-    df = _query_kline("000001", "1", LOOKBACK_DAYS + 5)
+    # 上证指数(sh000001)：显式声明为指数 → 不走缓存（避免与 sz000001 平安银行撞键）、
+    # 不走 mootdx（其 bars('000001') 返回深市平安银行，非指数）。
+    df = _query_kline("000001", "1", LOOKBACK_DAYS + 5, is_index=True)
     if df is None or len(df) < LOOKBACK_DAYS:
         print(f"  [市场] 数据不足({len(df) if df is not None else 0}条)")
         return None
