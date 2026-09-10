@@ -345,7 +345,8 @@ def _build_result(sectors, benchmark, now_str, source="unknown"):
     #    同花顺源不可达时（云端美国 IP 常态）sectors 全空仍宣称有数据 → 板块卡空白
     #    但健康面板判新鲜。现：取数为空即标记不可用并拒绝写盘（保留上一版）。
     if not sectors:
-        log(f"❌ 板块数据全空（0/{total}），拒绝写盘：不产出空 SECTOR_RS 污染前端（保留上一版）")
+        log(f"❌ 板块数据全空（来源 {source} 返回 0 个板块），拒绝写盘："
+            f"不产出空 SECTOR_RS 污染前端（保留上一版）")
         return None
     result = {
         "update_time": now_str,

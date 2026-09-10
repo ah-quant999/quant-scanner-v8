@@ -1464,7 +1464,7 @@ def check_data_cards():
                 _cd = dt.strftime("%Y-%m-%d")
                 if _cd == _dd:
                     status = "ok"
-                    msg = f"更新于 {rel}（当日选股·盘后链将刷新）"
+                    msg = f"更新于 {fmt_rel_time(ts)}（当日选股·盘后链将刷新）"   # 2026-09-11 修：rel 在本行之后才赋值 → NameError 被 except 吞掉，说明文案一直没生效
             except Exception:
                 pass
 

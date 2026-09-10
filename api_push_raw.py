@@ -6,6 +6,7 @@ import os, sys, json, base64, hashlib, datetime, re
 import urllib.request, urllib.error
 import http.client
 import time as _time
+import subprocess
 from zoneinfo import ZoneInfo
 
 CST = ZoneInfo("Asia/Shanghai")
@@ -274,6 +275,34 @@ def _stamp_index_v(index_text: str, changed: dict) -> tuple:
         return m.group(0)
     new = _RE_V.sub(repl, index_text)
     return new, new != index_text
+
+def _local_tree_fallback(base_sha):
+    """GitHub tree API 不可用（5xx/截断）时，用本地 git ls-tree 生成等价守卫基线。
+
+    🔴 2026-09-11 补：调用点在下方 main() 里（原 P0 修复注释声明"见 _local_tree_fallback"），
+      但本函数**从未被定义** —— 一旦 GitHub tree 接口抽风，此处会 NameError 直接把
+      整夜算出的成果全丢掉（正是那次 P0 想避免的后果）。
+      返回 {"tree": [{"path","mode","type","sha"}...]}；拿不到返回 None（调用方会拒绝裸推）。
+    """
+    repo_dir = os.path.dirname(os.path.abspath(__file__))
+    for cmd in (["git", "ls-tree", "-r", base_sha],):
+        try:
+            r = subprocess.run(cmd, cwd=repo_dir, capture_output=True, text=True, timeout=180)
+        except Exception:
+            continue
+        if r.returncode != 0 or not r.stdout.strip():
+            continue
+        tree = []
+        for ln in r.stdout.splitlines():
+            try:
+                meta, path = ln.split("\t", 1)
+                mode, typ, sha = meta.split()
+            except ValueError:
+                continue
+            tree.append({"path": path, "mode": mode, "type": typ, "sha": sha})
+        if tree:
+            return {"tree": tree}
+    return None
 
 
 def main():

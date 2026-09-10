@@ -623,22 +623,6 @@ def _norm(code, name, market_raw, full_code):
     return code, name, market, board
 
 
-    t = str(ticker).strip().upper()
-    if ".HK" in t:
-        code = t.split(".HK")[0].zfill(5)
-        return code, "hk", "港股"
-    if ".SS" in t:
-        return t.split(".SS")[0].zfill(6), "sh", "主板"
-    if ".SZ" in t:
-        return t.split(".SZ")[0].zfill(6), "sz", "创业板" if t.startswith("3") else "主板"
-    # 纯数字
-    if t.isdigit():
-        if len(t) <= 5:
-            return t.zfill(5), "hk", "港股"
-        return t.zfill(6), ("sh" if t.startswith("6") else "sz"), ""
-    return None
-
-
 # ---------- 候选池解耦（#14）：慢变成员表 + 快变每日指标 ----------
 def _fetch_price_amount_gtimg(codes):
     """批量取现价/成交额（仅用确认安全的 f[3]=现价、f[6]=成交量 字段），用于补全

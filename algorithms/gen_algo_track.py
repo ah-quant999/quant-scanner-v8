@@ -205,7 +205,7 @@ def _extract_from_final_rec(source_name):
             "code": str(code),
             "name": s.get("name", ""),
             "market": s.get("board", ""),
-            "algo": algo_map.get(source_name, source_name),
+            "algo": source_name,   # 2026-09-11 修：algo_map 从未定义（原注释已写明"禁止实际引用"，直接落 source_name）
             "signal_date": _today_dashed(),
             "sources": sources,
             "source_scores": s.get("source_scores", {}),
