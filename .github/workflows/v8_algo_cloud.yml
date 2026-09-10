@@ -39,6 +39,13 @@ on:
     - cron: '10 10 * * *'  # 18:10 CST 选股批(B)
     - cron: '0 12 * * *'   # 20:00 CST 汇总批(D, factor_lab_gen + final_recommend)
     - cron: '0 13 * * *'   # 21:00 CST 回测批(E, 最终推荐上线后)
+    # 🔒 2026-09-10 主人令「一劳永逸·不要一直抢跑」新增「接力触发点」：
+    #   21:00 之后原本再无 cron → 若 B 批因 factor_lab_gen 冷启动(50-90min)拖到 22:30 才跑完，
+    #   则 D(最终推荐)/E(回测) 永远没人触发，当晚链条断在半路。
+    #   这两条只是**触发点**，实跑哪批完全由批次闸门(.github/scripts/v8_stage_gate.py)
+    #   按「缺什么跑什么」判定 —— 幂等：产物已就绪则 target=NONE 空转，重复触发不会抢跑。
+    - cron: '30 14 * * *'  # 22:30 CST 接力触发（D 若缺则跑）
+    - cron: '30 16 * * *'  # 00:30 CST 接力触发（E 若缺则跑；凌晨归属前一交易日）
   repository_dispatch:
     # 2026-09-01 加固：允许本机 WorkBuddy 自动化 / 手动经 API 主动唤醒盘后链，
     #   不再单纯依赖 GitHub schedule（已知静默失效）。types 见下。
