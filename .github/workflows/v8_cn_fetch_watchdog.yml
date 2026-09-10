@@ -98,7 +98,14 @@ jobs:
               "post_close": ["LHB_DATA.js", "CANDIDATE_QUOTES.js", "CAPITAL_FLOW_DATA.js"],
           }
           files = PROBE.get(cat) or ["LIMIT_UP_HEATMAP.js"]
-          thr = 35 if cat == "intraday" else 60
+          # 🔴 2026-09-10 修正（主人令·13:00开盘数据停更事故）：
+          #   原盘中阈值 35min 太松，开盘后干等~10min 才兜底（实时盘不可接受）。
+          #   改为：盘中 12min、开盘前后窗口(09:25-09:40 / 12:55-13:10) 5min、盘前盘后 60min。
+          #   另设 dispatch_thr（派发兜底阈值）远高于主派发间隔：盘中 45min / 盘前盘后 90min，
+          #   仅当主派发 22505803 彻底失联(>45min)才由看门狗派 selfhosted 兜底，绝不抢主派发档。
+          in_open = in_window(9*60+25, 9*60+40) or in_window(12*60+55, 13*60+10)
+          thr = 5 if (cat == "intraday" and in_open) else (12 if cat == "intraday" else 60)
+          dispatch_thr = 45 if cat == "intraday" else 90
           PAT = re.compile(r'"?update_time"?\s*[:=]\s*"([^"]+)"')
 
           # 🔴 2026-09-09 盘中更新审计·一劳永逸：不仅看「有没有在跑」，还要看「最近一次是否失败/拥堵」。
@@ -204,11 +211,13 @@ jobs:
                   dispatch_cat(cat, use_selfhosted=False)
               sys.exit(0)
 
-          if stale:
-              print(f"[watchdog] ❌ {len(stale)}/{len(files)} 个文件陈旧（阈值 {thr}min），准备派发 {cat}")
-              cancel_stuck_cloud_runs()  # 🔴 一劳永逸破锁：清掉卡死 run，释放 concurrency 锁
+          # 🔴 2026-09-10 修正：区分「监控告警阈值 thr」与「派发兜底阈值 dispatch_thr」。
+          #   - age ∈ (thr, dispatch_thr]：仅告警（主派发 22505803 应已在跑，看门狗不抢档、不杀 run）。
+          #   - age > dispatch_thr（盘中45/盘后90）：主派发疑似死透，才派 selfhosted 兜底。
+          hard_stale = [(fn, a) for fn, a in stale if a > dispatch_thr]
+          if hard_stale:
+              print(f"[watchdog] ❌ {len(hard_stale)}/{len(files)} 个文件极陈旧（派发阈值 {dispatch_thr}min），主派发疑似失联，派 selfhosted 兜底 {cat}")
               if cat == "intraday":
-                  # 盘中优先 selfhosted（小九机中国IP，不挤云公共队列）；cloud 作 fallback
                   dispatch_cat(cat, use_selfhosted=True)
               else:
                   n, latest = cloud_state()
@@ -216,9 +225,12 @@ jobs:
                       dispatch_cat(cat, use_selfhosted=True)
                   else:
                       dispatch_cat(cat, use_selfhosted=False)
-              # ::error 注解：坏死文件在 Actions UI 直接标红，不再静默（原代码只 print，无人知晓）
-              print("::error title=数据陈旧::" +
+              print("::error title=数据极陈旧·已派兜底::" +
+                    ", ".join(f"{fn}({a:.0f}min)" for fn, a in hard_stale))
+          elif stale:
+              print(f"[watchdog] ⚠️ {len(stale)}/{len(files)} 个文件偏旧（监控阈值 {thr}min，派发阈值 {dispatch_thr}min），仅告警不派发（主派发应运行中）")
+              print("::warning title=数据偏旧::" +
                     ", ".join(f"{fn}({a:.0f}min)" for fn, a in stale))
           else:
-              print(f"[watchdog] ✅ {len(files)} 个文件全部新鲜（最新 {newest}，阈值 {thr}min），无需派发")
+              print(f"[watchdog] ✅ {len(files)} 个文件全部新鲜（最新 {newest}，监控阈值 {thr}min），无需派发")
           PY
