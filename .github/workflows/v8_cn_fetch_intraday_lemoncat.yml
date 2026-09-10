@@ -1,0 +1,237 @@
+# 九宝量化 v8.0 — 盘中准点档调度器（小九 self-hosted cn 主力）
+#
+# 🔴 2026-09-09 主人令「盘中 20 分钟单源闭环（升级版·接力赛模型）」：
+#   根因：原盘中由 WorkBuddy 自动化「云端按铃」(1787141452867) 每 20 分 dispatch 易导致
+#   多源齐发 + api_push_raw 防倒退守卫互踢、半截 JSON；尤其小九偶尔下线时阿狸咪兜底
+#   仍要抢按铃节奏 → 真正的"风暴根因"。
+#   新模型：
+#     - 盘中 14 档（9:40/10:00/.../15:00 CST，跳午休 11:30-13:00）由本 workflow 统一调度。
+#     - 每档先 dispatch 云端 v8_cn_fetch_cloud（category=intraday，云端抓中国源主力）。
+#     - sleep 600s（10 分钟）等待云端跑完。
+#     - gh api 查 run 状态：成功 → 本档结束；失败/超时/无 run → dispatch
+#       v8_cn_fetch_cloud_selfhosted（小九 cn IP 兜底，同 runner 不出海）。
+#     - 接力赛：云端抓 8-10min + 小九 10min 后检查 + 失败小九兜底（cn IP 直连）→ 一档 20-25min。
+#   优点：
+#     ① 单源（小九 GHA cron 14 档）+ 接力赛（云端失败小九兜底）→ 不再双源互踢。
+#     ② 同 concurrency group v8-cn-fetch-cloud（含云端主力+小九应急+hosted 兜底+阿狸咪按铃）
+#        互斥排队不互杀，api_push_raw 防倒退守卫稳定。
+#     ③ 阿狸咪盘中按铃阈值放宽到 60 分钟（小九正常时永不触发，整台机掉才兜底）。
+#     ④ 与现状 cron 完全解耦：本 yml 是新加，v8_cn_fetch_cloud.yml 盘中 cron 已删，
+#        纯依赖本 yml 与阿狸咪按铃（兜底）。
+#
+# 工作日窗口（小九 cn runner 在线时段 7:45-17:45）：
+#   CST  9:40  10:00  10:20  10:40  11:00  11:20  11:40  13:00  13:20  13:40  14:00  14:20  14:40  15:00
+#   UTC  1:40  2:00   2:20   2:40   3:00   3:20   3:40   5:00   5:20   5:40   6:00   6:20   6:40   7:00
+#   注：UTC 4:00-4:59 是午休（11:30-12:30 CST 跳过，A股午休无数据；13:00 CST = UTC 5:00）
+#
+# 🔴 反踩踏铁律：
+#   - 本 workflow **不直接跑抓取**，只 dispatch + 检查 + 兜底 dispatch，零产物输出。
+#   - 不写 raw_data/、不写 data/、不 git push → 不会有 api_push_raw 互踢。
+#   - 三层 dispatch 全走同 group v8-cn-fetch-cloud 互斥排队。
+
+name: "🇨🇳 v8 盘中准点档调度器(小九 self-hosted cn 主力)"
+
+on:
+  schedule:
+    # 🔧 2026-09-09 主人令「盘中 14 档准点档」：
+    #   每档 UTC 触发后 → dispatch 云端 → sleep 10min → 查状态 → 失败时 dispatch 小九 cn 兜底
+    #   共 14 档，跳午休（UTC 4:00-4:59）
+    - cron: '40 1 * * 1-5'    # 09:40 CST
+    - cron: '0 2 * * 1-5'     # 10:00 CST
+    - cron: '20 2 * * 1-5'    # 10:20 CST
+    - cron: '40 2 * * 1-5'    # 10:40 CST
+    - cron: '0 3 * * 1-5'     # 11:00 CST
+    - cron: '20 3 * * 1-5'    # 11:20 CST
+    - cron: '40 3 * * 1-5'    # 11:40 CST
+    # 🛡 午休 11:30-13:00 CST（UTC 3:30-4:59）跳过，A股午休无新数据
+    - cron: '0 5 * * 1-5'     # 13:00 CST
+    - cron: '20 5 * * 1-5'    # 13:20 CST
+    - cron: '40 5 * * 1-5'    # 13:40 CST
+    - cron: '0 6 * * 1-5'     # 14:00 CST
+    - cron: '20 6 * * 1-5'    # 14:20 CST
+    - cron: '40 6 * * 1-5'    # 14:40 CST
+    - cron: '0 7 * * 1-5'     # 15:00 CST
+  workflow_dispatch:
+
+permissions:
+  # 🔴 2026-09-10 修正：原写 `actions: read` → 用 GITHUB_TOKEN dispatch 其他 workflow 会 403
+  #    （对照 v8_cn_fetch_watchdog.yml / v8_slot_scheduler.yml / v8_freshness_watch.yml
+  #      / v8_algo_cloud.yml 全为 actions: write，本 yml 原是唯一异类）
+  #    dispatch 需要 actions: write；本 yml 不写盘、不 push，故 contents 保持 read。
+  contents: read
+  actions: write
+
+concurrency:
+  # 🛡 2026-09-09 一劳永逸「双机/三机/四机兜底配合」：
+  #   v8-cn-fetch-cloud 同组：云端主力 + 小九 selfhosted + hosted 兜底 + 本 yml（小九准点档）
+  #   + 阿狸咪按铃（盘中阈值 60min 兜底）。cancel-in-progress:false → 同 group 排队不互杀。
+  group: v8-cn-fetch-cloud
+  cancel-in-progress: false
+
+jobs:
+  intraday_slot:
+    runs-on: [self-hosted, cn]
+    # 🛡 2026-09-09 一档最多 20 分钟：dispatch + sleep 10min + 查状态 + 兜底 dispatch
+    #   （兜底 job 自己 75min timeout），本 yml 只跑前 20 分钟的"调度+检查"段
+    timeout-minutes: 20
+    env:
+      TZ: Asia/Shanghai
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: "🚀 dispatch 云端主力 v8_cn_fetch_cloud（category=intraday）"
+        id: dispatch_cloud
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          REPO="https://api.github.com/repos/ah-quant999/quant-scanner-v8"
+          HTTP_CODE=$(curl -sS -o /tmp/dispatch_cloud.json -w "%{http_code}" -X POST \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "$REPO/actions/workflows/v8_cn_fetch_cloud.yml/dispatches" \
+            -d '{"ref":"main","inputs":{"category":"intraday"}}')
+          if [ "$HTTP_CODE" = "204" ]; then
+            echo "✅ 云端 dispatch OK (204)"
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "⚠️ 云端 dispatch 失败 HTTP=$HTTP_CODE body=$(cat /tmp/dispatch_cloud.json)"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: "⏳ sleep 600s（10 分钟）等待云端跑完"
+        if: steps.dispatch_cloud.outputs.ok == 'true'
+        shell: bash
+        run: |
+          echo "档期起点: $(TZ=Asia/Shanghai date '+%F %T') CST, sleep 10min..."
+          sleep 600
+          echo "档期检查点: $(TZ=Asia/Shanghai date '+%F %T') CST"
+
+      - name: "🔍 gh api 查云端 run 状态"
+        id: check_cloud
+        if: steps.dispatch_cloud.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          REPO="ah-quant999/quant-scanner-v8"
+          RESP=$(curl -sS -o /tmp/check.json -w "%{http_code}" \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=5")
+          if [ "$RESP" != "200" ]; then
+            echo "⚠️ API 查询失败 HTTP=$RESP, 默认按云端失败处理（兜底）"
+            echo "status=unknown" >> "$GITHUB_OUTPUT"
+            echo "conclusion=unknown" >> "$GITHUB_OUTPUT"
+            echo "need_fallback=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # 解析最近 30 分钟内 v8_cn_fetch_cloud 的 run
+          # 🔴 2026-09-10 修正：原硬编码 python3。小九 cn runner 是 Windows + Git Bash，
+          #    实测同机其他 yml（v8_cn_fetch_cloud_selfhosted.yml / v8_lhb_fetch.yml
+          #    / v8_stock_quote_refresh.yml）一律用 `python`。统一用自动探测。
+          PY_CMD=$(command -v python3 || command -v python || echo python)
+          STATUS=$($PY_CMD -c "
+          import json, datetime
+          try:
+              with open('/tmp/check.json') as f: data = json.load(f)
+          except Exception as e:
+              print(f'PARSE_FAIL|{e}')
+              raise SystemExit(0)
+          now = datetime.datetime.now(datetime.timezone.utc)
+          for r in data.get('workflow_runs', []):
+              created = r.get('created_at', '')
+              if not created: continue
+              try:
+                  ts = datetime.datetime.fromisoformat(created.replace('Z','+00:00'))
+              except Exception: continue
+              age_min = (now - ts).total_seconds() / 60
+              if age_min < 30:
+                  print(f\"{r.get('status')}|{r.get('conclusion')}\")
+                  break
+          else:
+              print('NONE_FOUND|')
+          ")
+          IFS='|' read -r s c <<<"$STATUS"
+          echo "云端最近 run: status=[$s] conclusion=[$c]"
+          echo "status=$s" >> "$GITHUB_OUTPUT"
+          echo "conclusion=$c" >> "$GITHUB_OUTPUT"
+          if [ "$s" = "completed" ] && [ "$c" = "success" ]; then
+            echo "✅ 云端本档成功"
+            echo "need_fallback=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "⚠️ 云端本档失败/超时/无 run → 触发小九 cn IP 兜底"
+            echo "need_fallback=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: "🛡️ 小九 cn IP 兜底（云端 dispatch 失败 或 云端跑失败 时均触发）"
+        id: fallback_cn
+        # 🔴 2026-09-10 修正：原条件只写 if: steps.check_cloud.outputs.need_fallback == 'true'
+        #    致命漏洞——当 dispatch_cloud 自身失败时 ok != 'true'，sleep/check 两步都被跳过，
+        #    need_fallback 从未被赋值 → 空字符串 != 'true' → cn 兜底永远不触发，
+        #    恰好是"整条云端链挂掉"最需要兜底的场景。
+        #    新条件显式覆盖两种情形：①云端 dispatch 失败 ②dispatch 成功但云端跑失败/超时/无 run
+        if: steps.dispatch_cloud.outputs.ok != 'true' || steps.check_cloud.outputs.need_fallback == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          REPO="https://api.github.com/repos/ah-quant999/quant-scanner-v8"
+          HTTP_CODE=$(curl -sS -o /tmp/dispatch_cn.json -w "%{http_code}" -X POST \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "$REPO/actions/workflows/v8_cn_fetch_cloud_selfhosted.yml/dispatches" \
+            -d '{"ref":"main","inputs":{"category":"intraday"}}')
+          if [ "$HTTP_CODE" = "204" ]; then
+            echo "✅ cn 兜底 dispatch OK (204) → 小九本机 cn IP 直连中国源"
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "⚠️ cn 兜底 dispatch 失败 HTTP=$HTTP_CODE body=$(cat /tmp/dispatch_cn.json)"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: "📝 档期状态汇总"
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## 盘中准点档·本档总结"
+            echo "- 档期: \`$(TZ=Asia/Shanghai date '+%F %T')\` CST"
+            echo "- 云端 dispatch: \`${{ steps.dispatch_cloud.outcome }}\`"
+            echo "- 云端 run 状态: \`${{ steps.check_cloud.outputs.status }}/${{ steps.check_cloud.outputs.conclusion }}\`"
+            echo "- 兜底触发: \`${{ steps.check_cloud.outputs.need_fallback }}\`"
+            echo "- cn 兜底 dispatch: \`${{ steps.fallback_cn.outcome }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # 🔴 2026-09-09 主人令「软失败但强制 ::error:: 告警」（对齐 09-08 消费层软失败策略）：
+      #   本 yml 不写盘、只 dispatch，失败也不阻断——但必须显式 annotation 让主人一眼可见
+      - name: "📢 软失败汇总告警（不阻断 job，但强制 annotation）"
+        if: always()
+        shell: bash
+        env:
+          V8_CLOUD_DISPATCH: ${{ steps.dispatch_cloud.outcome }}
+          V8_CLOUD_CHECK: ${{ steps.check_cloud.outcome }}
+          V8_CN_FALLBACK: ${{ steps.fallback_cn.outcome }}
+        run: |
+          FAILED=""
+          for sid in dispatch_cloud check_cloud fallback_cn; do
+            eval "v=\"\${V8_${sid^^}:-}\""
+            if [ "$v" = "failure" ] || [ "$v" = "cancelled" ]; then
+              FAILED="$FAILED $sid"
+            fi
+          done
+          if [ -n "$FAILED" ]; then
+            N=$(echo $FAILED | wc -w)
+            echo "::error title=v8-intraday-slot-softfail::盘中准点档调度器软失败步（不阻断 job，但本档数据可能未刷新，请检查）：$FAILED"
+            {
+              echo "## ⚠️ 本档软失败 ${N} 项"
+              echo ""
+              echo "盘中准点档调度器失败步："
+              echo ""
+              for s in $FAILED; do echo "- \`$s\`"; done
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "✅ 本档无软失败"
+          fi
