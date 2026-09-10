@@ -1114,7 +1114,13 @@ def main():
     #   D 批 final_recommend 才能覆盖生命周期卡股票（原顺序 final_recommend 05:37 →
     #   pool_tracker 05:48 倒挂，最终推荐用的是昨日池，主人质疑「不够权威」实锤）。
     #   仅全链(无--stage)或 D 汇总批执行；A/B/E 批跳过（D 批会补）。
-    if stage in (None, "D"):
+    # 🛡 2026-09-11 主人报「生命周期也没更新」一劳永逸修复：
+    #   原为 `if stage in (None, "D")` —— 生命周期池(V8_POOL_TRACKER)只有 D 批产出。
+    #   但 D 批 PREREQ 依赖 B 就绪，B 又要求 CRDS 新鲜；CRDS 一旦卡住 → D 永久饿死
+    #   → **最终推荐与生命周期同时停更**（09-10~09-11 事故实证）。
+    #   生命周期池语义属「选股池构建」，D 批 final_recommend 是消费者；
+    #   生产者绑在消费者批次里是反向依赖 → 扩为 B/D 均执行。
+    if stage in (None, "B", "D"):
         # 🔴 盘后选股策略门控：LHB 7日累计属于选股向汇总，未到 18:00 不处理当日龙虎榜数据
         if _is_post_close_picking_ready() and _is_trading_day_now():
             step_append_lhb_history()
@@ -1123,7 +1129,7 @@ def main():
         else:
             print("\n[2.5-2.7] ⏭️ 跳过 LHB 历史累积 + LHB 7日累计 + v8 选股生命周期（非交易日或盘后策略未就绪）")
     else:
-        print(f"\n[2.5-2.7] ⏭️ 跳过 LHB 历史累积 + 生命周期前置（stage={stage}，交由 D 汇总批执行）")
+        print(f"\n[2.5-2.7] ⏭️ 跳过 LHB 历史累积 + 生命周期前置（stage={stage}，A/C/E 批不承担该职责）")
     step_run(order=order)
     n = step_stage()
     step_push()
