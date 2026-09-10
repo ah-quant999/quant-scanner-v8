@@ -82,6 +82,13 @@ def collect_universe():
     if gp:
         for k, s in (gp.get("stocks", {}) or {}).items():
             add(s)
+        # 🔴 2026-09-11 一劳永逸（主人令「发现了就马上一劳永逸式修复」）：GOLD_POOL lite 化后
+        #   stocks 已变空壳（total_count=0，_lite_note「仅保留 latest 聚合」）、真实成员在
+        #   candidates（540 只，键形如 sh_600487，值含 code/market/board_label）。
+        #   旧实现只读 stocks → 宇宙退化到 FOUR_VOLUME 残余 5 只 → 全部取数失败拒写盘。
+        for s in (gp.get("candidates", {}) or {}).values():
+            if isinstance(s, dict) and str(s.get("market", "")) in ("sh", "sz"):
+                add(s)
 
     return codes
 

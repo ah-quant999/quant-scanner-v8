@@ -158,7 +158,7 @@ CARD_DEFS = [
     #   登记 manual_dep + manual_note，让面板显示「本机限制」(warn) 而非「陈旧」(fail)，
     #   自愈链不去派发永远刷不出的任务；小九中国IP+浏览器UA在线跑原版刷新后即转 ok。
     {"id": "H_AUTO_BUY", "name": "精确自动买入(H反推)", "page": "选股策略", "freq": "盘后(挂链)", "max_age": 1440, "key_fields": ["date", "total_scanned"], "heal_cat": "algo_run", "manual_dep": True, "manual_note": "需 gtimg 日K(腾讯 urllib HTTPS) 反推涨幅≥3%+量比≥1.2 选股。本机实测 gtimg HTTPS=HTTP 501（腾讯waf反爬虫JS challenge拦截 urllib 类爬虫），无浏览器UA绕不开。本机无替代源，需小九中国IP+浏览器UA在线跑原版。"},
-    {"id": "H_AUTO_BUY_TRACK", "name": "精确自动买入追踪", "page": "选股策略", "freq": "盘后(挂链)", "max_age": 1440, "key_fields": ["update_time", "by_date"], "heal_cat": "algo_run", "manual_dep": True, "manual_note": "同上，依赖 gtimg 日K 累积胜率(T+1/T+3/T+5)。云端 runner HTTPS 501 waf 拦截，无浏览器UA绕不开，需小九中国IP+浏览器UA在线跑原版。"},
+    {"id": "H_AUTO_BUY_TRACK", "name": "精确自动买入追踪", "page": "选股策略", "freq": "盘后(挂链)", "max_age": 1440, "key_fields": ["update_time", "by_date"], "heal_cat": "algo_run", "manual_dep": True, "manual_note": "2026-09-11 一劳永逸修复：同 H_AUTO_BUY，data_source_gtimg 域名级故障转移已上线，track_h_auto_buy.py 本机恢复产出（此前 gtimg 501 全败 → 胜率 0% 假数据）。"},
 ]
 
 

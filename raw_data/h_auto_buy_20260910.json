@@ -9,17 +9,17 @@
   "final_count": 151,
   "candidates": [
     {
-      "code": "300600",
-      "symbol": "sz300600",
-      "name": "国瑞科技",
-      "pct": 6.92,
-      "price": 11.59,
-      "prev_close": 10.84,
-      "volume": 30103778.0,
-      "avg_vol_4d": 49617.0,
-      "vol_ratio": 606.723,
-      "industry": "铁路、船舶、航空航天和其他运输设备制造业",
-      "board": "创业板"
+      "code": "00860",
+      "symbol": "hk00860",
+      "name": "ＡＰＯＬＬＯ出行",
+      "pct": 40.74,
+      "price": 0.76,
+      "prev_close": 0.54,
+      "volume": 1603800.0,
+      "avg_vol_4d": 150314.0,
+      "vol_ratio": 10.67,
+      "industry": "",
+      "board": "港股"
     },
     {
       "code": "600812",
@@ -1023,19 +1023,6 @@
       "board": "主板"
     },
     {
-      "code": "00860",
-      "symbol": "hk00860",
-      "name": "ＡＰＯＬＬＯ出行",
-      "pct": 40.74,
-      "price": 0.76,
-      "prev_close": 0.54,
-      "volume": 1603800.0,
-      "avg_vol_4d": 150314.0,
-      "vol_ratio": 10.67,
-      "industry": "",
-      "board": "港股"
-    },
-    {
       "code": "00999",
       "symbol": "hk00999",
       "name": "小菜园",
@@ -1332,6 +1319,19 @@
       "avg_vol_4d": 12970952.25,
       "vol_ratio": 3.439,
       "industry": "装卸搬运和仓储业",
+      "board": "创业板"
+    },
+    {
+      "code": "300600",
+      "symbol": "sz300600",
+      "name": "国瑞科技",
+      "pct": 6.92,
+      "price": 11.59,
+      "prev_close": 10.84,
+      "volume": 30103778.0,
+      "avg_vol_4d": 12214124.75,
+      "vol_ratio": 2.465,
+      "industry": "铁路、船舶、航空航天和其他运输设备制造业",
       "board": "创业板"
     },
     {
@@ -2002,14 +2002,14 @@
       "board": "主板"
     }
   ],
-  "generated_at": "2026-09-11 00:52:16",
-  "update_time": "2026-09-11 00:52:16",
+  "generated_at": "2026-09-11 05:31:39",
+  "update_time": "2026-09-11 05:31:39",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖",
   "kline_stat": {
-    "cache_fresh": 0,
-    "cache_stale": 10,
-    "net": 183,
-    "fail": 214
+    "cache_fresh": 183,
+    "cache_stale": 9,
+    "net": 2,
+    "fail": 213
   },
   "degraded": false,
   "degraded_reason": "",

@@ -1,1 +1,6945 @@
-window.RPS_BACKTEST = {"update_time":"2026-09-10 06:39:29","degraded":true,"degraded_reason":"本地 cache 覆盖，baostock 版需小九中国 IP","summary":{"update_time":"2026-09-10 06:39:29","total_signals":176,"calc_time":"2026-09-10 06:39:29","method":"RPS 离线回测：基于 raw_data/kline_cache 本地缓存（T+1~T+20 各期样本数={1: 57, 3: 11, 5: 0, 10: 0, 20: 0}）。⚠️ 本机 baostock 被风控黑名单(10001011 匿名用户)，仅用本地缓存；持有期窗口超出 cache 范围的 periods 样本=0。需待小九中国 IP 在线跑 baostock 版获取完整回测。","signal_date_range":"2026-09-03 ~ 2026-09-08","cost_bps_per_side":15,"cache_hit_rate":96.0,"skipped_no_cache":7,"skipped_no_window":72,"by_period":{"1":{"samples":57,"draws":0,"win_rate":52.63,"avg_return":1.5,"best_return":17.09,"worst_return":-10.32,"win_avg":6.37,"loss_avg":-3.91,"profit_loss_ratio":1.63,"max_drawdown":-84.97,"sharpe_ratio":0.24,"cost_adjusted":true},"3":{"samples":11,"draws":0,"win_rate":72.73,"avg_return":5.18,"best_return":16.43,"worst_return":-9.26,"win_avg":8.84,"loss_avg":-4.57,"profit_loss_ratio":1.93,"max_drawdown":-69.38,"sharpe_ratio":0.67,"cost_adjusted":true},"5":{"samples":0,"draws":0,"win_rate":0,"avg_return":0,"best_return":0,"worst_return":0,"win_avg":0,"loss_avg":0,"profit_loss_ratio":0,"max_drawdown":0,"sharpe_ratio":0},"10":{"samples":0,"draws":0,"win_rate":0,"avg_return":0,"best_return":0,"worst_return":0,"win_avg":0,"loss_avg":0,"profit_loss_ratio":0,"max_drawdown":0,"sharpe_ratio":0},"20":{"samples":0,"draws":0,"win_rate":0,"avg_return":0,"best_return":0,"worst_return":0,"win_avg":0,"loss_avg":0,"profit_loss_ratio":0,"max_drawdown":0,"sharpe_ratio":0}}},"signals":[{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"688485","name":"九州一轨","entry_price":99.83,"periods":{"1":{"return_pct":-4.67,"gross_return":-4.37,"exit_price":95.47,"exit_date":"2026-09-04"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"300903","name":"科翔股份","entry_price":91.18,"periods":{"1":{"return_pct":-5.98,"gross_return":-5.68,"exit_price":86.0,"exit_date":"2026-09-04"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"600127","name":"金健米业","entry_price":12.67,"periods":{"1":{"return_pct":-3.22,"gross_return":-2.92,"exit_price":12.3,"exit_date":"2026-09-04"},"3":{"return_pct":16.43,"gross_return":16.73,"exit_price":14.79,"exit_date":"2026-09-08"},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"002396","name":"青城新药－B","entry_price":39.65,"periods":{"1":{"return_pct":-6.96,"gross_return":-6.66,"exit_price":37.01,"exit_date":"2026-09-04"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"300209","name":"行云科技","entry_price":35.1,"periods":{"1":{"return_pct":-1.13,"gross_return":-0.83,"exit_price":34.81,"exit_date":"2026-09-04"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"600722","name":"金牛化工","entry_price":17.33,"periods":{"1":{"return_pct":-1.05,"gross_return":-0.75,"exit_price":17.2,"exit_date":"2026-09-04"},"3":{"return_pct":13.78,"gross_return":14.08,"exit_price":19.77,"exit_date":"2026-09-08"},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"600613","name":"神奇制药","entry_price":9.09,"periods":{"1":{"return_pct":-1.07,"gross_return":-0.77,"exit_price":9.02,"exit_date":"2026-09-04"},"3":{"return_pct":8.72,"gross_return":9.02,"exit_price":9.91,"exit_date":"2026-09-08"},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"688143","name":"长盈通","entry_price":175.64,"periods":{"1":{"return_pct":-7.5,"gross_return":-7.2,"exit_price":163.0,"exit_date":"2026-09-04"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"603618","name":"杭电股份","entry_price":39.25,"periods":{"1":{"return_pct":-7.41,"gross_return":-7.11,"exit_price":36.46,"exit_date":"2026-09-04"},"3":{"return_pct":1.89,"gross_return":2.19,"exit_price":40.11,"exit_date":"2026-09-08"},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"300862","name":"蓝盾光电","entry_price":45.8,"periods":{"1":{"return_pct":1.12,"gross_return":1.42,"exit_price":46.45,"exit_date":"2026-09-04"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"301080","name":"百普赛斯","entry_price":85.56,"periods":{"1":{"return_pct":-4.8,"gross_return":-4.5,"exit_price":81.71,"exit_date":"2026-09-04"},"3":{"return_pct":7.81,"gross_return":8.11,"exit_price":92.5,"exit_date":"2026-09-08"},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"603186","name":"华正新材","entry_price":180.36,"periods":{"1":{"return_pct":-6.5,"gross_return":-6.2,"exit_price":169.17,"exit_date":"2026-09-04"},"3":{"return_pct":6.59,"gross_return":6.89,"exit_price":192.78,"exit_date":"2026-09-08"},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"600227","name":"赤天化","entry_price":4.42,"periods":{"1":{"return_pct":-3.24,"gross_return":-2.94,"exit_price":4.29,"exit_date":"2026-09-04"},"3":{"return_pct":11.92,"gross_return":12.22,"exit_price":4.96,"exit_date":"2026-09-08"},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"003040","name":"楚天龙","entry_price":19.2,"periods":{"1":{"return_pct":9.7,"gross_return":10.0,"exit_price":21.12,"exit_date":"2026-09-04"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"300420","name":"五洋自控","entry_price":8.79,"periods":{"1":{"return_pct":-8.83,"gross_return":-8.53,"exit_price":8.04,"exit_date":"2026-09-04"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"300759","name":"康龙化成","entry_price":43.0,"periods":{"1":{"return_pct":-4.51,"gross_return":-4.21,"exit_price":41.19,"exit_date":"2026-09-04"},"3":{"return_pct":-0.86,"gross_return":-0.56,"exit_price":42.76,"exit_date":"2026-09-08"},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"600121","name":"郑州煤电","entry_price":5.69,"periods":{"1":{"return_pct":-10.32,"gross_return":-10.02,"exit_price":5.12,"exit_date":"2026-09-04"},"3":{"return_pct":-9.26,"gross_return":-8.96,"exit_price":5.18,"exit_date":"2026-09-08"},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"300765","name":"石药创新","entry_price":44.24,"periods":{"1":{"return_pct":-1.11,"gross_return":-0.81,"exit_price":43.88,"exit_date":"2026-09-04"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"600479","name":"千金药业","entry_price":14.26,"periods":{"1":{"return_pct":-8.08,"gross_return":-7.78,"exit_price":13.15,"exit_date":"2026-09-04"},"3":{"return_pct":3.56,"gross_return":3.86,"exit_price":14.81,"exit_date":"2026-09-08"},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"688185","name":"康希诺","entry_price":73.93,"periods":{"1":{"return_pct":-7.06,"gross_return":-6.76,"exit_price":68.93,"exit_date":"2026-09-04"},"3":{"return_pct":-3.59,"gross_return":-3.29,"exit_price":71.5,"exit_date":"2026-09-08"},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"300189","name":"神农种业","entry_price":7.03,"periods":{"1":{"return_pct":-0.02,"gross_return":0.28,"exit_price":7.05,"exit_date":"2026-09-04"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"300684","name":"中石科技","entry_price":89.56,"periods":{"1":{"return_pct":-1.04,"gross_return":-0.74,"exit_price":88.9,"exit_date":"2026-09-04"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-03","entry_trade_date":"2026-09-03","code":"600693","name":"东百集团","entry_price":11.04,"periods":{"1":{"return_pct":-1.3,"gross_return":-1.0,"exit_price":10.93,"exit_date":"2026-09-04"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"688485","name":"九州一轨","entry_price":95.47,"periods":{"1":{"return_pct":5.96,"gross_return":6.26,"exit_price":101.45,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"002396","name":"星网锐捷","entry_price":37.01,"periods":{"1":{"return_pct":2.75,"gross_return":3.05,"exit_price":38.14,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"300903","name":"科翔股份","entry_price":86.0,"periods":{"1":{"return_pct":3.37,"gross_return":3.67,"exit_price":89.16,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"600127","name":"金健米业","entry_price":12.3,"periods":{"1":{"return_pct":9.7,"gross_return":10.0,"exit_price":13.53,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"300209","name":"行云科技","entry_price":34.81,"periods":{"1":{"return_pct":2.86,"gross_return":3.16,"exit_price":35.91,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"600722","name":"金牛化工","entry_price":17.2,"periods":{"1":{"return_pct":4.18,"gross_return":4.48,"exit_price":17.97,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"688143","name":"长盈通","entry_price":163.0,"periods":{"1":{"return_pct":10.87,"gross_return":11.17,"exit_price":181.2,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"603618","name":"杭电股份","entry_price":36.46,"periods":{"1":{"return_pct":1.07,"gross_return":1.37,"exit_price":36.96,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"003040","name":"楚天龙","entry_price":21.12,"periods":{"1":{"return_pct":8.36,"gross_return":8.66,"exit_price":22.95,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"600227","name":"赤天化","entry_price":4.29,"periods":{"1":{"return_pct":4.83,"gross_return":5.13,"exit_price":4.51,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"603186","name":"华正新材","entry_price":169.17,"periods":{"1":{"return_pct":9.7,"gross_return":10.0,"exit_price":186.09,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"300759","name":"康龙化成","entry_price":41.19,"periods":{"1":{"return_pct":-0.13,"gross_return":0.17,"exit_price":41.26,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"600121","name":"郑州煤电","entry_price":5.12,"periods":{"1":{"return_pct":-3.82,"gross_return":-3.52,"exit_price":4.94,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"300189","name":"神农种业","entry_price":7.05,"periods":{"1":{"return_pct":9.2,"gross_return":9.5,"exit_price":7.72,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"600479","name":"千金药业","entry_price":13.15,"periods":{"1":{"return_pct":5.1,"gross_return":5.4,"exit_price":13.86,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"300684","name":"中石科技","entry_price":88.9,"periods":{"1":{"return_pct":17.09,"gross_return":17.39,"exit_price":104.36,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"688185","name":"康希诺","entry_price":68.93,"periods":{"1":{"return_pct":-1.65,"gross_return":-1.35,"exit_price":68.0,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"300420","name":"五洋自控","entry_price":8.04,"periods":{"1":{"return_pct":2.81,"gross_return":3.11,"exit_price":8.29,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"601168","name":"西部矿业","entry_price":38.79,"periods":{"1":{"return_pct":-0.71,"gross_return":-0.41,"exit_price":38.63,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"000560","name":"我爱我家","entry_price":3.15,"periods":{"1":{"return_pct":-0.93,"gross_return":-0.63,"exit_price":3.13,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"600693","name":"东百集团","entry_price":10.93,"periods":{"1":{"return_pct":4.82,"gross_return":5.12,"exit_price":11.49,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-04","entry_trade_date":"2026-09-04","code":"002297","name":"博云新材","entry_price":21.32,"periods":{"1":{"return_pct":-2.55,"gross_return":-2.25,"exit_price":20.84,"exit_date":"2026-09-07"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-07","entry_trade_date":"2026-09-07","code":"600127","name":"金健米业","entry_price":13.53,"periods":{"1":{"return_pct":9.01,"gross_return":9.31,"exit_price":14.79,"exit_date":"2026-09-08"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-07","entry_trade_date":"2026-09-07","code":"600722","name":"金牛化工","entry_price":17.97,"periods":{"1":{"return_pct":9.72,"gross_return":10.02,"exit_price":19.77,"exit_date":"2026-09-08"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-07","entry_trade_date":"2026-09-07","code":"600227","name":"赤天化","entry_price":4.51,"periods":{"1":{"return_pct":9.68,"gross_return":9.98,"exit_price":4.96,"exit_date":"2026-09-08"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-07","entry_trade_date":"2026-09-07","code":"603186","name":"华正新材","entry_price":186.09,"periods":{"1":{"return_pct":3.3,"gross_return":3.6,"exit_price":192.78,"exit_date":"2026-09-08"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-07","entry_trade_date":"2026-09-07","code":"601869","name":"长飞光纤","entry_price":400.51,"periods":{"1":{"return_pct":3.78,"gross_return":4.08,"exit_price":416.85,"exit_date":"2026-09-08"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-07","entry_trade_date":"2026-09-07","code":"603618","name":"杭电股份","entry_price":36.96,"periods":{"1":{"return_pct":8.22,"gross_return":8.52,"exit_price":40.11,"exit_date":"2026-09-08"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-07","entry_trade_date":"2026-09-07","code":"000560","name":"我爱我家","entry_price":3.13,"periods":{"1":{"return_pct":9.6,"gross_return":9.9,"exit_price":3.44,"exit_date":"2026-09-08"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-07","entry_trade_date":"2026-09-07","code":"600479","name":"千金药业","entry_price":13.86,"periods":{"1":{"return_pct":6.55,"gross_return":6.85,"exit_price":14.81,"exit_date":"2026-09-08"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-07","entry_trade_date":"2026-09-07","code":"601168","name":"西部矿业","entry_price":38.63,"periods":{"1":{"return_pct":5.03,"gross_return":5.33,"exit_price":40.69,"exit_date":"2026-09-08"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-07","entry_trade_date":"2026-09-07","code":"600121","name":"郑州煤电","entry_price":4.94,"periods":{"1":{"return_pct":4.56,"gross_return":4.86,"exit_price":5.18,"exit_date":"2026-09-08"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-07","entry_trade_date":"2026-09-07","code":"688185","name":"康希诺","entry_price":68.0,"periods":{"1":{"return_pct":4.85,"gross_return":5.15,"exit_price":71.5,"exit_date":"2026-09-08"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}},{"signal_date":"2026-09-07","entry_trade_date":"2026-09-07","code":"600103","name":"青山纸业","entry_price":3.91,"periods":{"1":{"return_pct":3.28,"gross_return":3.58,"exit_price":4.05,"exit_date":"2026-09-08"},"3":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"5":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"10":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null},"20":{"return_pct":null,"gross_return":null,"exit_price":null,"exit_date":null}}}],"republish_time":"2026-09-10 07:12:07"};
+window.RPS_BACKTEST = {
+ "update_time": "2026-09-11 04:59:11",
+ "summary": {
+  "update_time": "2026-09-11 04:59:11",
+  "total_signals": 176,
+  "calc_time": "2026-09-11 04:59:11",
+  "method": "RPS 相对强度 A档历史回测：信号日取真实下一交易日开盘买入，持有 N 个真实交易日收盘价卖出（前复权；胜率=win/(win+loss) 排平盘；已扣双边交易成本 0.3%）",
+  "signal_date_range": "2026-09-03 ~ 2026-09-08",
+  "cost_bps_per_side": 15,
+  "by_period": {
+   "1": {
+    "samples": 176,
+    "draws": 0,
+    "win_rate": 44.32,
+    "avg_return": -0.09,
+    "best_return": 17.09,
+    "worst_return": -15.76,
+    "win_avg": 3.95,
+    "loss_avg": -3.31,
+    "profit_loss_ratio": 1.19,
+    "max_drawdown": -108.74,
+    "sharpe_ratio": -0.02,
+    "cost_adjusted": true
+   },
+   "3": {
+    "samples": 112,
+    "draws": 0,
+    "win_rate": 41.07,
+    "avg_return": -0.27,
+    "best_return": 25.05,
+    "worst_return": -24.16,
+    "win_avg": 7.0,
+    "loss_avg": -5.34,
+    "profit_loss_ratio": 1.31,
+    "max_drawdown": -187.54,
+    "sharpe_ratio": -0.03,
+    "cost_adjusted": true
+   },
+   "5": {
+    "samples": 36,
+    "draws": 0,
+    "win_rate": 19.44,
+    "avg_return": -3.96,
+    "best_return": 20.56,
+    "worst_return": -20.42,
+    "win_avg": 6.79,
+    "loss_avg": -6.55,
+    "profit_loss_ratio": 1.04,
+    "max_drawdown": -314.36,
+    "sharpe_ratio": -0.52,
+    "cost_adjusted": true
+   },
+   "10": {
+    "samples": 0,
+    "win_rate": 0,
+    "avg_return": 0,
+    "best_return": 0,
+    "worst_return": 0,
+    "win_avg": 0,
+    "loss_avg": 0,
+    "profit_loss_ratio": 0,
+    "max_drawdown": 0,
+    "sharpe_ratio": 0
+   },
+   "20": {
+    "samples": 0,
+    "win_rate": 0,
+    "avg_return": 0,
+    "best_return": 0,
+    "worst_return": 0,
+    "win_avg": 0,
+    "loss_avg": 0,
+    "profit_loss_ratio": 0,
+    "max_drawdown": 0,
+    "sharpe_ratio": 0
+   }
+  }
+ },
+ "signals": [
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "688485",
+   "name": "九州一轨",
+   "entry_price": 99.83,
+   "periods": {
+    "1": {
+     "return_pct": -4.67,
+     "gross_return": -4.37,
+     "exit_price": 95.47,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -3.13,
+     "gross_return": -2.83,
+     "exit_price": 97.0,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -2.39,
+     "gross_return": -2.09,
+     "exit_price": 97.74,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "600664",
+   "name": "哈药股份",
+   "entry_price": 8.55,
+   "periods": {
+    "1": {
+     "return_pct": -9.31,
+     "gross_return": -9.01,
+     "exit_price": 7.78,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -9.66,
+     "gross_return": -9.36,
+     "exit_price": 7.75,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -16.91,
+     "gross_return": -16.61,
+     "exit_price": 7.13,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "300903",
+   "name": "科翔股份",
+   "entry_price": 91.18,
+   "periods": {
+    "1": {
+     "return_pct": -5.98,
+     "gross_return": -5.68,
+     "exit_price": 86.0,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -3.72,
+     "gross_return": -3.42,
+     "exit_price": 88.06,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -3.61,
+     "gross_return": -3.31,
+     "exit_price": 88.16,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "600127",
+   "name": "金健米业",
+   "entry_price": 12.67,
+   "periods": {
+    "1": {
+     "return_pct": -3.22,
+     "gross_return": -2.92,
+     "exit_price": 12.3,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 16.43,
+     "gross_return": 16.73,
+     "exit_price": 14.79,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": 10.2,
+     "gross_return": 10.5,
+     "exit_price": 14.0,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "002396",
+   "name": "青城新药－B",
+   "entry_price": 39.65,
+   "periods": {
+    "1": {
+     "return_pct": -6.96,
+     "gross_return": -6.66,
+     "exit_price": 37.01,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -6.15,
+     "gross_return": -5.85,
+     "exit_price": 37.33,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -9.53,
+     "gross_return": -9.23,
+     "exit_price": 35.99,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "300209",
+   "name": "行云科技",
+   "entry_price": 35.1,
+   "periods": {
+    "1": {
+     "return_pct": -1.13,
+     "gross_return": -0.83,
+     "exit_price": 34.81,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 0.95,
+     "gross_return": 1.25,
+     "exit_price": 35.54,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": 3.4,
+     "gross_return": 3.7,
+     "exit_price": 36.4,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "600722",
+   "name": "金牛化工",
+   "entry_price": 17.33,
+   "periods": {
+    "1": {
+     "return_pct": -1.05,
+     "gross_return": -0.75,
+     "exit_price": 17.2,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 13.78,
+     "gross_return": 14.08,
+     "exit_price": 19.77,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": 5.35,
+     "gross_return": 5.65,
+     "exit_price": 18.31,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "002084",
+   "name": "海鸥住工",
+   "entry_price": 6.91,
+   "periods": {
+    "1": {
+     "return_pct": 2.45,
+     "gross_return": 2.75,
+     "exit_price": 7.1,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -1.89,
+     "gross_return": -1.59,
+     "exit_price": 6.8,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -20.42,
+     "gross_return": -20.12,
+     "exit_price": 5.52,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "600613",
+   "name": "神奇制药",
+   "entry_price": 9.09,
+   "periods": {
+    "1": {
+     "return_pct": -1.07,
+     "gross_return": -0.77,
+     "exit_price": 9.02,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 8.72,
+     "gross_return": 9.02,
+     "exit_price": 9.91,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -6.68,
+     "gross_return": -6.38,
+     "exit_price": 8.51,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "688143",
+   "name": "长盈通",
+   "entry_price": 175.64,
+   "periods": {
+    "1": {
+     "return_pct": -7.5,
+     "gross_return": -7.2,
+     "exit_price": 163.0,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -4.65,
+     "gross_return": -4.35,
+     "exit_price": 168.0,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -4.17,
+     "gross_return": -3.87,
+     "exit_price": 168.84,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "603618",
+   "name": "杭电股份",
+   "entry_price": 39.25,
+   "periods": {
+    "1": {
+     "return_pct": -7.41,
+     "gross_return": -7.11,
+     "exit_price": 36.46,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 1.89,
+     "gross_return": 2.19,
+     "exit_price": 40.11,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -0.17,
+     "gross_return": 0.13,
+     "exit_price": 39.3,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "300862",
+   "name": "蓝盾光电",
+   "entry_price": 45.8,
+   "periods": {
+    "1": {
+     "return_pct": 1.12,
+     "gross_return": 1.42,
+     "exit_price": 46.45,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 8.43,
+     "gross_return": 8.73,
+     "exit_price": 49.8,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": 3.13,
+     "gross_return": 3.43,
+     "exit_price": 47.37,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "688432",
+   "name": "有研硅",
+   "entry_price": 45.22,
+   "periods": {
+    "1": {
+     "return_pct": -0.3,
+     "gross_return": 0.0,
+     "exit_price": 45.22,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -0.3,
+     "gross_return": 0.0,
+     "exit_price": 45.22,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -0.3,
+     "gross_return": 0.0,
+     "exit_price": 45.22,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "301080",
+   "name": "百普赛斯",
+   "entry_price": 85.56,
+   "periods": {
+    "1": {
+     "return_pct": -4.8,
+     "gross_return": -4.5,
+     "exit_price": 81.71,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 7.81,
+     "gross_return": 8.11,
+     "exit_price": 92.5,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -4.93,
+     "gross_return": -4.63,
+     "exit_price": 81.6,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "600988",
+   "name": "赤峰黄金",
+   "entry_price": 46.6,
+   "periods": {
+    "1": {
+     "return_pct": -2.25,
+     "gross_return": -1.95,
+     "exit_price": 45.69,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -5.45,
+     "gross_return": -5.15,
+     "exit_price": 44.2,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -5.24,
+     "gross_return": -4.94,
+     "exit_price": 44.3,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "603186",
+   "name": "华正新材",
+   "entry_price": 180.36,
+   "periods": {
+    "1": {
+     "return_pct": -6.5,
+     "gross_return": -6.2,
+     "exit_price": 169.17,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 6.59,
+     "gross_return": 6.89,
+     "exit_price": 192.78,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": 20.56,
+     "gross_return": 20.86,
+     "exit_price": 217.99,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "600721",
+   "name": "百花医药",
+   "entry_price": 11.8,
+   "periods": {
+    "1": {
+     "return_pct": 0.89,
+     "gross_return": 1.19,
+     "exit_price": 11.94,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 3.77,
+     "gross_return": 4.07,
+     "exit_price": 12.28,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -3.69,
+     "gross_return": -3.39,
+     "exit_price": 11.4,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "600227",
+   "name": "赤天化",
+   "entry_price": 4.42,
+   "periods": {
+    "1": {
+     "return_pct": -3.24,
+     "gross_return": -2.94,
+     "exit_price": 4.29,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 11.92,
+     "gross_return": 12.22,
+     "exit_price": 4.96,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": 2.64,
+     "gross_return": 2.94,
+     "exit_price": 4.55,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "003040",
+   "name": "楚天龙",
+   "entry_price": 19.2,
+   "periods": {
+    "1": {
+     "return_pct": 9.7,
+     "gross_return": 10.0,
+     "exit_price": 21.12,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 15.59,
+     "gross_return": 15.89,
+     "exit_price": 22.25,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -1.86,
+     "gross_return": -1.56,
+     "exit_price": 18.9,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "600547",
+   "name": "山东黄金",
+   "entry_price": 37.5,
+   "periods": {
+    "1": {
+     "return_pct": 0.77,
+     "gross_return": 1.07,
+     "exit_price": 37.9,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -4.27,
+     "gross_return": -3.97,
+     "exit_price": 36.01,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -5.39,
+     "gross_return": -5.09,
+     "exit_price": 35.59,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "300420",
+   "name": "五洋自控",
+   "entry_price": 8.79,
+   "periods": {
+    "1": {
+     "return_pct": -8.83,
+     "gross_return": -8.53,
+     "exit_price": 8.04,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -8.38,
+     "gross_return": -8.08,
+     "exit_price": 8.08,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -13.27,
+     "gross_return": -12.97,
+     "exit_price": 7.65,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "300759",
+   "name": "康龙化成",
+   "entry_price": 43.0,
+   "periods": {
+    "1": {
+     "return_pct": -4.51,
+     "gross_return": -4.21,
+     "exit_price": 41.19,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -0.86,
+     "gross_return": -0.56,
+     "exit_price": 42.76,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -3.67,
+     "gross_return": -3.37,
+     "exit_price": 41.55,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "600121",
+   "name": "郑州煤电",
+   "entry_price": 5.69,
+   "periods": {
+    "1": {
+     "return_pct": -10.32,
+     "gross_return": -10.02,
+     "exit_price": 5.12,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -9.26,
+     "gross_return": -8.96,
+     "exit_price": 5.18,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -2.23,
+     "gross_return": -1.93,
+     "exit_price": 5.58,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "300765",
+   "name": "石药创新",
+   "entry_price": 44.24,
+   "periods": {
+    "1": {
+     "return_pct": -1.11,
+     "gross_return": -0.81,
+     "exit_price": 43.88,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 1.73,
+     "gross_return": 2.03,
+     "exit_price": 45.14,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -3.94,
+     "gross_return": -3.64,
+     "exit_price": 42.63,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "600479",
+   "name": "千金药业",
+   "entry_price": 14.26,
+   "periods": {
+    "1": {
+     "return_pct": -8.08,
+     "gross_return": -7.78,
+     "exit_price": 13.15,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 3.56,
+     "gross_return": 3.86,
+     "exit_price": 14.81,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -11.17,
+     "gross_return": -10.87,
+     "exit_price": 12.71,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "000506",
+   "name": "招金黄金",
+   "entry_price": 20.99,
+   "periods": {
+    "1": {
+     "return_pct": -1.97,
+     "gross_return": -1.67,
+     "exit_price": 20.64,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -8.26,
+     "gross_return": -7.96,
+     "exit_price": 19.32,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -8.88,
+     "gross_return": -8.58,
+     "exit_price": 19.19,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "002437",
+   "name": "誉衡药业",
+   "entry_price": 4.25,
+   "periods": {
+    "1": {
+     "return_pct": -7.59,
+     "gross_return": -7.29,
+     "exit_price": 3.94,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -5.48,
+     "gross_return": -5.18,
+     "exit_price": 4.03,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -16.77,
+     "gross_return": -16.47,
+     "exit_price": 3.55,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "688185",
+   "name": "康希诺",
+   "entry_price": 73.93,
+   "periods": {
+    "1": {
+     "return_pct": -7.06,
+     "gross_return": -6.76,
+     "exit_price": 68.93,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -3.59,
+     "gross_return": -3.29,
+     "exit_price": 71.5,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -11.3,
+     "gross_return": -11.0,
+     "exit_price": 65.8,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "000603",
+   "name": "盛达资源",
+   "entry_price": 37.0,
+   "periods": {
+    "1": {
+     "return_pct": -2.57,
+     "gross_return": -2.27,
+     "exit_price": 36.16,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -7.06,
+     "gross_return": -6.76,
+     "exit_price": 34.5,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -5.11,
+     "gross_return": -4.81,
+     "exit_price": 35.22,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "300189",
+   "name": "神农种业",
+   "entry_price": 7.03,
+   "periods": {
+    "1": {
+     "return_pct": -0.02,
+     "gross_return": 0.28,
+     "exit_price": 7.05,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 8.95,
+     "gross_return": 9.25,
+     "exit_price": 7.68,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": 2.26,
+     "gross_return": 2.56,
+     "exit_price": 7.21,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "300684",
+   "name": "中石科技",
+   "entry_price": 89.56,
+   "periods": {
+    "1": {
+     "return_pct": -1.04,
+     "gross_return": -0.74,
+     "exit_price": 88.9,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -1.79,
+     "gross_return": -1.49,
+     "exit_price": 88.23,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -7.07,
+     "gross_return": -6.77,
+     "exit_price": 83.5,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "601212",
+   "name": "白银有色",
+   "entry_price": 7.33,
+   "periods": {
+    "1": {
+     "return_pct": -0.71,
+     "gross_return": -0.41,
+     "exit_price": 7.3,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -3.3,
+     "gross_return": -3.0,
+     "exit_price": 7.11,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -7.39,
+     "gross_return": -7.09,
+     "exit_price": 6.81,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "300454",
+   "name": "深信服",
+   "entry_price": 135.15,
+   "periods": {
+    "1": {
+     "return_pct": -0.35,
+     "gross_return": -0.05,
+     "exit_price": 135.08,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -4.01,
+     "gross_return": -3.71,
+     "exit_price": 130.13,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -4.77,
+     "gross_return": -4.47,
+     "exit_price": 129.11,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "600693",
+   "name": "东百集团",
+   "entry_price": 11.04,
+   "periods": {
+    "1": {
+     "return_pct": -1.3,
+     "gross_return": -1.0,
+     "exit_price": 10.93,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": 4.05,
+     "gross_return": 4.35,
+     "exit_price": 11.52,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -2.84,
+     "gross_return": -2.54,
+     "exit_price": 10.76,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "300139",
+   "name": "晓程科技",
+   "entry_price": 52.95,
+   "periods": {
+    "1": {
+     "return_pct": -2.17,
+     "gross_return": -1.87,
+     "exit_price": 51.96,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -6.59,
+     "gross_return": -6.29,
+     "exit_price": 49.62,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -4.74,
+     "gross_return": -4.44,
+     "exit_price": 50.6,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-03",
+   "entry_trade_date": "2026-09-03",
+   "code": "600489",
+   "name": "中金黄金",
+   "entry_price": 25.69,
+   "periods": {
+    "1": {
+     "return_pct": -0.65,
+     "gross_return": -0.35,
+     "exit_price": 25.6,
+     "exit_date": "2026-09-04"
+    },
+    "3": {
+     "return_pct": -2.21,
+     "gross_return": -1.91,
+     "exit_price": 25.2,
+     "exit_date": "2026-09-08"
+    },
+    "5": {
+     "return_pct": -1.51,
+     "gross_return": -1.21,
+     "exit_price": 25.38,
+     "exit_date": "2026-09-10"
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "688485",
+   "name": "九州一轨",
+   "entry_price": 95.47,
+   "periods": {
+    "1": {
+     "return_pct": 5.96,
+     "gross_return": 6.26,
+     "exit_price": 101.45,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 1.63,
+     "gross_return": 1.93,
+     "exit_price": 97.31,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600664",
+   "name": "哈药股份",
+   "entry_price": 7.78,
+   "periods": {
+    "1": {
+     "return_pct": 2.53,
+     "gross_return": 2.83,
+     "exit_price": 8.0,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -2.23,
+     "gross_return": -1.93,
+     "exit_price": 7.63,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "002396",
+   "name": "星网锐捷",
+   "entry_price": 37.01,
+   "periods": {
+    "1": {
+     "return_pct": 2.75,
+     "gross_return": 3.05,
+     "exit_price": 38.14,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -3.54,
+     "gross_return": -3.24,
+     "exit_price": 35.81,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300903",
+   "name": "科翔股份",
+   "entry_price": 86.0,
+   "periods": {
+    "1": {
+     "return_pct": 3.37,
+     "gross_return": 3.67,
+     "exit_price": 89.16,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 0.43,
+     "gross_return": 0.73,
+     "exit_price": 86.63,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600127",
+   "name": "金健米业",
+   "entry_price": 12.3,
+   "periods": {
+    "1": {
+     "return_pct": 9.7,
+     "gross_return": 10.0,
+     "exit_price": 13.53,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 16.2,
+     "gross_return": 16.5,
+     "exit_price": 14.33,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "002084",
+   "name": "海鸥住工",
+   "entry_price": 7.1,
+   "periods": {
+    "1": {
+     "return_pct": 1.81,
+     "gross_return": 2.11,
+     "exit_price": 7.25,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -14.1,
+     "gross_return": -13.8,
+     "exit_price": 6.12,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300209",
+   "name": "行云科技",
+   "entry_price": 34.81,
+   "periods": {
+    "1": {
+     "return_pct": 2.86,
+     "gross_return": 3.16,
+     "exit_price": 35.91,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 7.97,
+     "gross_return": 8.27,
+     "exit_price": 37.69,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600722",
+   "name": "金牛化工",
+   "entry_price": 17.2,
+   "periods": {
+    "1": {
+     "return_pct": 4.18,
+     "gross_return": 4.48,
+     "exit_price": 17.97,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 15.98,
+     "gross_return": 16.28,
+     "exit_price": 20.0,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "688143",
+   "name": "长盈通",
+   "entry_price": 163.0,
+   "periods": {
+    "1": {
+     "return_pct": 10.87,
+     "gross_return": 11.17,
+     "exit_price": 181.2,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 6.57,
+     "gross_return": 6.87,
+     "exit_price": 174.2,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600988",
+   "name": "赤峰黄金",
+   "entry_price": 45.69,
+   "periods": {
+    "1": {
+     "return_pct": -2.95,
+     "gross_return": -2.65,
+     "exit_price": 44.48,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -4.26,
+     "gross_return": -3.96,
+     "exit_price": 43.88,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "603618",
+   "name": "杭电股份",
+   "entry_price": 36.46,
+   "periods": {
+    "1": {
+     "return_pct": 1.07,
+     "gross_return": 1.37,
+     "exit_price": 36.96,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 13.74,
+     "gross_return": 14.04,
+     "exit_price": 41.58,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "003040",
+   "name": "楚天龙",
+   "entry_price": 21.12,
+   "periods": {
+    "1": {
+     "return_pct": 8.36,
+     "gross_return": 8.66,
+     "exit_price": 22.95,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -0.87,
+     "gross_return": -0.57,
+     "exit_price": 21.0,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600227",
+   "name": "赤天化",
+   "entry_price": 4.29,
+   "periods": {
+    "1": {
+     "return_pct": 4.83,
+     "gross_return": 5.13,
+     "exit_price": 4.51,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 14.39,
+     "gross_return": 14.69,
+     "exit_price": 4.92,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "603186",
+   "name": "华正新材",
+   "entry_price": 169.17,
+   "periods": {
+    "1": {
+     "return_pct": 9.7,
+     "gross_return": 10.0,
+     "exit_price": 186.09,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 25.05,
+     "gross_return": 25.35,
+     "exit_price": 212.06,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300759",
+   "name": "康龙化成",
+   "entry_price": 41.19,
+   "periods": {
+    "1": {
+     "return_pct": -0.13,
+     "gross_return": 0.17,
+     "exit_price": 41.26,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 0.91,
+     "gross_return": 1.21,
+     "exit_price": 41.69,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600547",
+   "name": "山东黄金",
+   "entry_price": 37.9,
+   "periods": {
+    "1": {
+     "return_pct": -4.13,
+     "gross_return": -3.83,
+     "exit_price": 36.45,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -4.65,
+     "gross_return": -4.35,
+     "exit_price": 36.25,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "002437",
+   "name": "誉衡药业",
+   "entry_price": 3.94,
+   "periods": {
+    "1": {
+     "return_pct": -0.05,
+     "gross_return": 0.25,
+     "exit_price": 3.95,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -6.39,
+     "gross_return": -6.09,
+     "exit_price": 3.7,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600121",
+   "name": "郑州煤电",
+   "entry_price": 5.12,
+   "periods": {
+    "1": {
+     "return_pct": -3.82,
+     "gross_return": -3.52,
+     "exit_price": 4.94,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 11.03,
+     "gross_return": 11.33,
+     "exit_price": 5.7,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300189",
+   "name": "神农种业",
+   "entry_price": 7.05,
+   "periods": {
+    "1": {
+     "return_pct": 9.2,
+     "gross_return": 9.5,
+     "exit_price": 7.72,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 10.05,
+     "gross_return": 10.35,
+     "exit_price": 7.78,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600479",
+   "name": "千金药业",
+   "entry_price": 13.15,
+   "periods": {
+    "1": {
+     "return_pct": 5.1,
+     "gross_return": 5.4,
+     "exit_price": 13.86,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 7.08,
+     "gross_return": 7.38,
+     "exit_price": 14.12,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300684",
+   "name": "中石科技",
+   "entry_price": 88.9,
+   "periods": {
+    "1": {
+     "return_pct": 17.09,
+     "gross_return": 17.39,
+     "exit_price": 104.36,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -6.19,
+     "gross_return": -5.89,
+     "exit_price": 83.66,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "688185",
+   "name": "康希诺",
+   "entry_price": 68.93,
+   "periods": {
+    "1": {
+     "return_pct": -1.65,
+     "gross_return": -1.35,
+     "exit_price": 68.0,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -0.46,
+     "gross_return": -0.16,
+     "exit_price": 68.82,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300454",
+   "name": "深信服",
+   "entry_price": 135.08,
+   "periods": {
+    "1": {
+     "return_pct": -0.66,
+     "gross_return": -0.36,
+     "exit_price": 134.6,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -4.16,
+     "gross_return": -3.86,
+     "exit_price": 129.87,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300420",
+   "name": "五洋自控",
+   "entry_price": 8.04,
+   "periods": {
+    "1": {
+     "return_pct": 2.81,
+     "gross_return": 3.11,
+     "exit_price": 8.29,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -1.17,
+     "gross_return": -0.87,
+     "exit_price": 7.97,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300139",
+   "name": "晓程科技",
+   "entry_price": 51.96,
+   "periods": {
+    "1": {
+     "return_pct": -3.88,
+     "gross_return": -3.58,
+     "exit_price": 50.1,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -1.38,
+     "gross_return": -1.08,
+     "exit_price": 51.4,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "601168",
+   "name": "西部矿业",
+   "entry_price": 38.79,
+   "periods": {
+    "1": {
+     "return_pct": -0.71,
+     "gross_return": -0.41,
+     "exit_price": 38.63,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 5.78,
+     "gross_return": 6.08,
+     "exit_price": 41.15,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "002716",
+   "name": "湖南白银",
+   "entry_price": 11.22,
+   "periods": {
+    "1": {
+     "return_pct": -4.93,
+     "gross_return": -4.63,
+     "exit_price": 10.7,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -4.04,
+     "gross_return": -3.74,
+     "exit_price": 10.8,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "601212",
+   "name": "白银有色",
+   "entry_price": 7.3,
+   "periods": {
+    "1": {
+     "return_pct": -4.41,
+     "gross_return": -4.11,
+     "exit_price": 7.0,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -3.18,
+     "gross_return": -2.88,
+     "exit_price": 7.09,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "000560",
+   "name": "我爱我家",
+   "entry_price": 3.15,
+   "periods": {
+    "1": {
+     "return_pct": -0.93,
+     "gross_return": -0.63,
+     "exit_price": 3.13,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -1.25,
+     "gross_return": -0.95,
+     "exit_price": 3.12,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600693",
+   "name": "东百集团",
+   "entry_price": 10.93,
+   "periods": {
+    "1": {
+     "return_pct": 4.82,
+     "gross_return": 5.12,
+     "exit_price": 11.49,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 3.73,
+     "gross_return": 4.03,
+     "exit_price": 11.37,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600489",
+   "name": "中金黄金",
+   "entry_price": 25.6,
+   "periods": {
+    "1": {
+     "return_pct": -2.37,
+     "gross_return": -2.07,
+     "exit_price": 25.07,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 0.83,
+     "gross_return": 1.13,
+     "exit_price": 25.89,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "301086",
+   "name": "鸿富瀚",
+   "entry_price": 157.43,
+   "periods": {
+    "1": {
+     "return_pct": -2.17,
+     "gross_return": -1.87,
+     "exit_price": 154.49,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -0.5,
+     "gross_return": -0.2,
+     "exit_price": 157.12,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300613",
+   "name": "富瀚微",
+   "entry_price": 72.37,
+   "periods": {
+    "1": {
+     "return_pct": 0.06,
+     "gross_return": 0.36,
+     "exit_price": 72.63,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -3.16,
+     "gross_return": -2.86,
+     "exit_price": 70.3,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "002297",
+   "name": "博云新材",
+   "entry_price": 21.32,
+   "periods": {
+    "1": {
+     "return_pct": -2.55,
+     "gross_return": -2.25,
+     "exit_price": 20.84,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 5.23,
+     "gross_return": 5.53,
+     "exit_price": 22.5,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "603259",
+   "name": "603259",
+   "entry_price": 153.83,
+   "periods": {
+    "1": {
+     "return_pct": -0.68,
+     "gross_return": -0.38,
+     "exit_price": 153.25,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": 0.38,
+     "gross_return": 0.68,
+     "exit_price": 154.88,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "000977",
+   "name": "浪潮信息",
+   "entry_price": 77.72,
+   "periods": {
+    "1": {
+     "return_pct": -4.13,
+     "gross_return": -3.83,
+     "exit_price": 74.74,
+     "exit_date": "2026-09-07"
+    },
+    "3": {
+     "return_pct": -8.46,
+     "gross_return": -8.16,
+     "exit_price": 71.38,
+     "exit_date": "2026-09-09"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "600127",
+   "name": "金健米业",
+   "entry_price": 13.53,
+   "periods": {
+    "1": {
+     "return_pct": 9.01,
+     "gross_return": 9.31,
+     "exit_price": 14.79,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": 3.17,
+     "gross_return": 3.47,
+     "exit_price": 14.0,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "003040",
+   "name": "楚天龙",
+   "entry_price": 22.95,
+   "periods": {
+    "1": {
+     "return_pct": -3.35,
+     "gross_return": -3.05,
+     "exit_price": 22.25,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -17.95,
+     "gross_return": -17.65,
+     "exit_price": 18.9,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "688485",
+   "name": "九州一轨",
+   "entry_price": 101.45,
+   "periods": {
+    "1": {
+     "return_pct": -4.69,
+     "gross_return": -4.39,
+     "exit_price": 97.0,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -3.96,
+     "gross_return": -3.66,
+     "exit_price": 97.74,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "300903",
+   "name": "科翔股份",
+   "entry_price": 89.16,
+   "periods": {
+    "1": {
+     "return_pct": -1.53,
+     "gross_return": -1.23,
+     "exit_price": 88.06,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -1.42,
+     "gross_return": -1.12,
+     "exit_price": 88.16,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "002396",
+   "name": "星网锐捷",
+   "entry_price": 38.14,
+   "periods": {
+    "1": {
+     "return_pct": -2.42,
+     "gross_return": -2.12,
+     "exit_price": 37.33,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -5.94,
+     "gross_return": -5.64,
+     "exit_price": 35.99,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "600664",
+   "name": "哈药股份",
+   "entry_price": 8.0,
+   "periods": {
+    "1": {
+     "return_pct": -3.42,
+     "gross_return": -3.12,
+     "exit_price": 7.75,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -11.18,
+     "gross_return": -10.88,
+     "exit_price": 7.13,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "300209",
+   "name": "行云科技",
+   "entry_price": 35.91,
+   "periods": {
+    "1": {
+     "return_pct": -1.33,
+     "gross_return": -1.03,
+     "exit_price": 35.54,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": 1.06,
+     "gross_return": 1.36,
+     "exit_price": 36.4,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "688498",
+   "name": "源杰科技",
+   "entry_price": 1702.0,
+   "periods": {
+    "1": {
+     "return_pct": 0.46,
+     "gross_return": 0.76,
+     "exit_price": 1715.0,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": 0.7,
+     "gross_return": 1.0,
+     "exit_price": 1719.0,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "600722",
+   "name": "金牛化工",
+   "entry_price": 17.97,
+   "periods": {
+    "1": {
+     "return_pct": 9.72,
+     "gross_return": 10.02,
+     "exit_price": 19.77,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": 1.59,
+     "gross_return": 1.89,
+     "exit_price": 18.31,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "002084",
+   "name": "海鸥住工",
+   "entry_price": 7.25,
+   "periods": {
+    "1": {
+     "return_pct": -6.51,
+     "gross_return": -6.21,
+     "exit_price": 6.8,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -24.16,
+     "gross_return": -23.86,
+     "exit_price": 5.52,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "688143",
+   "name": "长盈通",
+   "entry_price": 181.2,
+   "periods": {
+    "1": {
+     "return_pct": -7.58,
+     "gross_return": -7.28,
+     "exit_price": 168.0,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -7.12,
+     "gross_return": -6.82,
+     "exit_price": 168.84,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "600227",
+   "name": "赤天化",
+   "entry_price": 4.51,
+   "periods": {
+    "1": {
+     "return_pct": 9.68,
+     "gross_return": 9.98,
+     "exit_price": 4.96,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": 0.59,
+     "gross_return": 0.89,
+     "exit_price": 4.55,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "300684",
+   "name": "中石科技",
+   "entry_price": 104.36,
+   "periods": {
+    "1": {
+     "return_pct": -15.76,
+     "gross_return": -15.46,
+     "exit_price": 88.23,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -20.29,
+     "gross_return": -19.99,
+     "exit_price": 83.5,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "603186",
+   "name": "华正新材",
+   "entry_price": 186.09,
+   "periods": {
+    "1": {
+     "return_pct": 3.3,
+     "gross_return": 3.6,
+     "exit_price": 192.78,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": 16.84,
+     "gross_return": 17.14,
+     "exit_price": 217.99,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "600988",
+   "name": "赤峰黄金",
+   "entry_price": 44.48,
+   "periods": {
+    "1": {
+     "return_pct": -0.93,
+     "gross_return": -0.63,
+     "exit_price": 44.2,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -0.7,
+     "gross_return": -0.4,
+     "exit_price": 44.3,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "601869",
+   "name": "长飞光纤",
+   "entry_price": 400.51,
+   "periods": {
+    "1": {
+     "return_pct": 3.78,
+     "gross_return": 4.08,
+     "exit_price": 416.85,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": 8.5,
+     "gross_return": 8.8,
+     "exit_price": 435.74,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "300189",
+   "name": "神农种业",
+   "entry_price": 7.72,
+   "periods": {
+    "1": {
+     "return_pct": -0.82,
+     "gross_return": -0.52,
+     "exit_price": 7.68,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -6.91,
+     "gross_return": -6.61,
+     "exit_price": 7.21,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "603618",
+   "name": "杭电股份",
+   "entry_price": 36.96,
+   "periods": {
+    "1": {
+     "return_pct": 8.22,
+     "gross_return": 8.52,
+     "exit_price": 40.11,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": 6.03,
+     "gross_return": 6.33,
+     "exit_price": 39.3,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "688677",
+   "name": "海泰新光",
+   "entry_price": 93.11,
+   "periods": {
+    "1": {
+     "return_pct": 1.18,
+     "gross_return": 1.48,
+     "exit_price": 94.49,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -6.71,
+     "gross_return": -6.41,
+     "exit_price": 87.14,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "000560",
+   "name": "我爱我家",
+   "entry_price": 3.13,
+   "periods": {
+    "1": {
+     "return_pct": 9.6,
+     "gross_return": 9.9,
+     "exit_price": 3.44,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -6.69,
+     "gross_return": -6.39,
+     "exit_price": 2.93,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "603228",
+   "name": "景旺电子",
+   "entry_price": 105.97,
+   "periods": {
+    "1": {
+     "return_pct": 0.64,
+     "gross_return": 0.94,
+     "exit_price": 106.97,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": 3.51,
+     "gross_return": 3.81,
+     "exit_price": 110.01,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "600183",
+   "name": "生益科技",
+   "entry_price": 148.15,
+   "periods": {
+    "1": {
+     "return_pct": -1.56,
+     "gross_return": -1.26,
+     "exit_price": 146.28,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -1.1,
+     "gross_return": -0.8,
+     "exit_price": 146.96,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "600693",
+   "name": "东百集团",
+   "entry_price": 11.49,
+   "periods": {
+    "1": {
+     "return_pct": -0.04,
+     "gross_return": 0.26,
+     "exit_price": 11.52,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -6.65,
+     "gross_return": -6.35,
+     "exit_price": 10.76,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "600479",
+   "name": "千金药业",
+   "entry_price": 13.86,
+   "periods": {
+    "1": {
+     "return_pct": 6.55,
+     "gross_return": 6.85,
+     "exit_price": 14.81,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -8.6,
+     "gross_return": -8.3,
+     "exit_price": 12.71,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "300454",
+   "name": "深信服",
+   "entry_price": 134.6,
+   "periods": {
+    "1": {
+     "return_pct": -3.62,
+     "gross_return": -3.32,
+     "exit_price": 130.13,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -4.38,
+     "gross_return": -4.08,
+     "exit_price": 129.11,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "002491",
+   "name": "通鼎互联",
+   "entry_price": 21.1,
+   "periods": {
+    "1": {
+     "return_pct": 1.36,
+     "gross_return": 1.66,
+     "exit_price": 21.45,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -0.68,
+     "gross_return": -0.38,
+     "exit_price": 21.02,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "002437",
+   "name": "誉衡药业",
+   "entry_price": 3.95,
+   "periods": {
+    "1": {
+     "return_pct": 1.73,
+     "gross_return": 2.03,
+     "exit_price": 4.03,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -10.43,
+     "gross_return": -10.13,
+     "exit_price": 3.55,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "601168",
+   "name": "西部矿业",
+   "entry_price": 38.63,
+   "periods": {
+    "1": {
+     "return_pct": 5.03,
+     "gross_return": 5.33,
+     "exit_price": 40.69,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": 4.46,
+     "gross_return": 4.76,
+     "exit_price": 40.47,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "601212",
+   "name": "白银有色",
+   "entry_price": 7.0,
+   "periods": {
+    "1": {
+     "return_pct": 1.27,
+     "gross_return": 1.57,
+     "exit_price": 7.11,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -3.01,
+     "gross_return": -2.71,
+     "exit_price": 6.81,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "300139",
+   "name": "晓程科技",
+   "entry_price": 50.1,
+   "periods": {
+    "1": {
+     "return_pct": -1.26,
+     "gross_return": -0.96,
+     "exit_price": 49.62,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": 0.7,
+     "gross_return": 1.0,
+     "exit_price": 50.6,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "300620",
+   "name": "光库科技",
+   "entry_price": 302.29,
+   "periods": {
+    "1": {
+     "return_pct": -4.76,
+     "gross_return": -4.46,
+     "exit_price": 288.8,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -1.06,
+     "gross_return": -0.76,
+     "exit_price": 300.0,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "600489",
+   "name": "中金黄金",
+   "entry_price": 25.07,
+   "periods": {
+    "1": {
+     "return_pct": 0.22,
+     "gross_return": 0.52,
+     "exit_price": 25.2,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": 0.94,
+     "gross_return": 1.24,
+     "exit_price": 25.38,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "300420",
+   "name": "五洋自控",
+   "entry_price": 8.29,
+   "periods": {
+    "1": {
+     "return_pct": -2.83,
+     "gross_return": -2.53,
+     "exit_price": 8.08,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -8.02,
+     "gross_return": -7.72,
+     "exit_price": 7.65,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "600121",
+   "name": "郑州煤电",
+   "entry_price": 4.94,
+   "periods": {
+    "1": {
+     "return_pct": 4.56,
+     "gross_return": 4.86,
+     "exit_price": 5.18,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": 12.66,
+     "gross_return": 12.96,
+     "exit_price": 5.58,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "688209",
+   "name": "英集芯",
+   "entry_price": 33.61,
+   "periods": {
+    "1": {
+     "return_pct": -1.25,
+     "gross_return": -0.95,
+     "exit_price": 33.29,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -2.47,
+     "gross_return": -2.17,
+     "exit_price": 32.88,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "002716",
+   "name": "湖南白银",
+   "entry_price": 10.7,
+   "periods": {
+    "1": {
+     "return_pct": -1.14,
+     "gross_return": -0.84,
+     "exit_price": 10.61,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -2.36,
+     "gross_return": -2.06,
+     "exit_price": 10.48,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "688185",
+   "name": "康希诺",
+   "entry_price": 68.0,
+   "periods": {
+    "1": {
+     "return_pct": 4.85,
+     "gross_return": 5.15,
+     "exit_price": 71.5,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -3.54,
+     "gross_return": -3.24,
+     "exit_price": 65.8,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "600186",
+   "name": "莲花控股",
+   "entry_price": 12.55,
+   "periods": {
+    "1": {
+     "return_pct": -1.57,
+     "gross_return": -1.27,
+     "exit_price": 12.39,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -6.36,
+     "gross_return": -6.06,
+     "exit_price": 11.79,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "600103",
+   "name": "青山纸业",
+   "entry_price": 3.91,
+   "periods": {
+    "1": {
+     "return_pct": 3.28,
+     "gross_return": 3.58,
+     "exit_price": 4.05,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -4.14,
+     "gross_return": -3.84,
+     "exit_price": 3.76,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-07",
+   "entry_trade_date": "2026-09-07",
+   "code": "002536",
+   "name": "飞龙股份",
+   "entry_price": 57.37,
+   "periods": {
+    "1": {
+     "return_pct": 1.83,
+     "gross_return": 2.13,
+     "exit_price": 58.59,
+     "exit_date": "2026-09-08"
+    },
+    "3": {
+     "return_pct": -6.68,
+     "gross_return": -6.38,
+     "exit_price": 53.71,
+     "exit_date": "2026-09-10"
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600127",
+   "name": "金健米业",
+   "entry_price": 14.79,
+   "periods": {
+    "1": {
+     "return_pct": -3.41,
+     "gross_return": -3.11,
+     "exit_price": 14.33,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688485",
+   "name": "九州一轨",
+   "entry_price": 97.0,
+   "periods": {
+    "1": {
+     "return_pct": 0.02,
+     "gross_return": 0.32,
+     "exit_price": 97.31,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300903",
+   "name": "科翔股份",
+   "entry_price": 88.06,
+   "periods": {
+    "1": {
+     "return_pct": -1.92,
+     "gross_return": -1.62,
+     "exit_price": 86.63,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300489",
+   "name": "光智科技",
+   "entry_price": 220.0,
+   "periods": {
+    "1": {
+     "return_pct": 0.05,
+     "gross_return": 0.35,
+     "exit_price": 220.78,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300862",
+   "name": "蓝盾光电",
+   "entry_price": 49.8,
+   "periods": {
+    "1": {
+     "return_pct": -1.91,
+     "gross_return": -1.61,
+     "exit_price": 49.0,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600664",
+   "name": "哈药股份",
+   "entry_price": 7.75,
+   "periods": {
+    "1": {
+     "return_pct": -1.85,
+     "gross_return": -1.55,
+     "exit_price": 7.63,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300209",
+   "name": "行云科技",
+   "entry_price": 35.54,
+   "periods": {
+    "1": {
+     "return_pct": 5.75,
+     "gross_return": 6.05,
+     "exit_price": 37.69,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688498",
+   "name": "源杰科技",
+   "entry_price": 1715.0,
+   "periods": {
+    "1": {
+     "return_pct": -0.13,
+     "gross_return": 0.17,
+     "exit_price": 1718.0,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "601086",
+   "name": "国芳集团",
+   "entry_price": 14.95,
+   "periods": {
+    "1": {
+     "return_pct": -0.77,
+     "gross_return": -0.47,
+     "exit_price": 14.88,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "003040",
+   "name": "楚天龙",
+   "entry_price": 22.25,
+   "periods": {
+    "1": {
+     "return_pct": -5.92,
+     "gross_return": -5.62,
+     "exit_price": 21.0,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600722",
+   "name": "金牛化工",
+   "entry_price": 19.77,
+   "periods": {
+    "1": {
+     "return_pct": 0.86,
+     "gross_return": 1.16,
+     "exit_price": 20.0,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688143",
+   "name": "长盈通",
+   "entry_price": 168.0,
+   "periods": {
+    "1": {
+     "return_pct": 3.39,
+     "gross_return": 3.69,
+     "exit_price": 174.2,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "002396",
+   "name": "星网锐捷",
+   "entry_price": 37.33,
+   "periods": {
+    "1": {
+     "return_pct": -4.37,
+     "gross_return": -4.07,
+     "exit_price": 35.81,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "301511",
+   "name": "德福科技",
+   "entry_price": 103.08,
+   "periods": {
+    "1": {
+     "return_pct": 2.24,
+     "gross_return": 2.54,
+     "exit_price": 105.7,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "603186",
+   "name": "华正新材",
+   "entry_price": 192.78,
+   "periods": {
+    "1": {
+     "return_pct": 9.7,
+     "gross_return": 10.0,
+     "exit_price": 212.06,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600988",
+   "name": "赤峰黄金",
+   "entry_price": 44.2,
+   "periods": {
+    "1": {
+     "return_pct": -1.02,
+     "gross_return": -0.72,
+     "exit_price": 43.88,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "601869",
+   "name": "长飞光纤",
+   "entry_price": 416.85,
+   "periods": {
+    "1": {
+     "return_pct": 5.74,
+     "gross_return": 6.04,
+     "exit_price": 442.03,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "301080",
+   "name": "百普赛斯",
+   "entry_price": 92.5,
+   "periods": {
+    "1": {
+     "return_pct": -3.33,
+     "gross_return": -3.03,
+     "exit_price": 89.7,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "603618",
+   "name": "杭电股份",
+   "entry_price": 40.11,
+   "periods": {
+    "1": {
+     "return_pct": 3.36,
+     "gross_return": 3.66,
+     "exit_price": 41.58,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300684",
+   "name": "中石科技",
+   "entry_price": 88.23,
+   "periods": {
+    "1": {
+     "return_pct": -5.48,
+     "gross_return": -5.18,
+     "exit_price": 83.66,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688677",
+   "name": "海泰新光",
+   "entry_price": 94.49,
+   "periods": {
+    "1": {
+     "return_pct": -5.76,
+     "gross_return": -5.46,
+     "exit_price": 89.33,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300534",
+   "name": "陇神戎发",
+   "entry_price": 13.78,
+   "periods": {
+    "1": {
+     "return_pct": -4.22,
+     "gross_return": -3.92,
+     "exit_price": 13.24,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "603228",
+   "name": "景旺电子",
+   "entry_price": 106.97,
+   "periods": {
+    "1": {
+     "return_pct": 2.15,
+     "gross_return": 2.45,
+     "exit_price": 109.59,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600183",
+   "name": "生益科技",
+   "entry_price": 146.28,
+   "periods": {
+    "1": {
+     "return_pct": 0.99,
+     "gross_return": 1.29,
+     "exit_price": 148.16,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300189",
+   "name": "神农种业",
+   "entry_price": 7.68,
+   "periods": {
+    "1": {
+     "return_pct": 1.0,
+     "gross_return": 1.3,
+     "exit_price": 7.78,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "603118",
+   "name": "共进股份",
+   "entry_price": 18.04,
+   "periods": {
+    "1": {
+     "return_pct": -1.35,
+     "gross_return": -1.05,
+     "exit_price": 17.85,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688630",
+   "name": "芯碁微装",
+   "entry_price": 405.0,
+   "periods": {
+    "1": {
+     "return_pct": 1.13,
+     "gross_return": 1.43,
+     "exit_price": 410.78,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "601118",
+   "name": "海南橡胶",
+   "entry_price": 7.87,
+   "periods": {
+    "1": {
+     "return_pct": 3.26,
+     "gross_return": 3.56,
+     "exit_price": 8.15,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "301047",
+   "name": "义翘神州",
+   "entry_price": 99.63,
+   "periods": {
+    "1": {
+     "return_pct": 1.88,
+     "gross_return": 2.18,
+     "exit_price": 101.8,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "002491",
+   "name": "通鼎互联",
+   "entry_price": 21.45,
+   "periods": {
+    "1": {
+     "return_pct": 3.29,
+     "gross_return": 3.59,
+     "exit_price": 22.22,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600737",
+   "name": "中粮糖业",
+   "entry_price": 18.16,
+   "periods": {
+    "1": {
+     "return_pct": 8.73,
+     "gross_return": 9.03,
+     "exit_price": 19.8,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688028",
+   "name": "沃尔德",
+   "entry_price": 112.89,
+   "periods": {
+    "1": {
+     "return_pct": 9.85,
+     "gross_return": 10.15,
+     "exit_price": 124.35,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688655",
+   "name": "迅捷兴",
+   "entry_price": 54.86,
+   "periods": {
+    "1": {
+     "return_pct": 2.73,
+     "gross_return": 3.03,
+     "exit_price": 56.52,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600256",
+   "name": "广汇能源",
+   "entry_price": 7.21,
+   "periods": {
+    "1": {
+     "return_pct": 2.61,
+     "gross_return": 2.91,
+     "exit_price": 7.42,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "000560",
+   "name": "珠江船务",
+   "entry_price": 3.44,
+   "periods": {
+    "1": {
+     "return_pct": -9.6,
+     "gross_return": -9.3,
+     "exit_price": 3.12,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "002428",
+   "name": "云南锗业",
+   "entry_price": 90.05,
+   "periods": {
+    "1": {
+     "return_pct": 1.23,
+     "gross_return": 1.53,
+     "exit_price": 91.43,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300179",
+   "name": "四方达",
+   "entry_price": 39.41,
+   "periods": {
+    "1": {
+     "return_pct": 7.03,
+     "gross_return": 7.33,
+     "exit_price": 42.3,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600693",
+   "name": "东百集团",
+   "entry_price": 11.52,
+   "periods": {
+    "1": {
+     "return_pct": -1.6,
+     "gross_return": -1.3,
+     "exit_price": 11.37,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600479",
+   "name": "千金药业",
+   "entry_price": 14.81,
+   "periods": {
+    "1": {
+     "return_pct": -4.96,
+     "gross_return": -4.66,
+     "exit_price": 14.12,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688596",
+   "name": "正帆科技",
+   "entry_price": 63.5,
+   "periods": {
+    "1": {
+     "return_pct": -2.85,
+     "gross_return": -2.55,
+     "exit_price": 61.88,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300454",
+   "name": "深信服",
+   "entry_price": 130.13,
+   "periods": {
+    "1": {
+     "return_pct": -0.5,
+     "gross_return": -0.2,
+     "exit_price": 129.87,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300835",
+   "name": "龙磁科技",
+   "entry_price": 172.45,
+   "periods": {
+    "1": {
+     "return_pct": 1.93,
+     "gross_return": 2.23,
+     "exit_price": 176.3,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300620",
+   "name": "光库科技",
+   "entry_price": 288.8,
+   "periods": {
+    "1": {
+     "return_pct": 0.77,
+     "gross_return": 1.07,
+     "exit_price": 291.88,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "601168",
+   "name": "西部矿业",
+   "entry_price": 40.69,
+   "periods": {
+    "1": {
+     "return_pct": 0.83,
+     "gross_return": 1.13,
+     "exit_price": 41.15,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688519",
+   "name": "南亚新材",
+   "entry_price": 284.71,
+   "periods": {
+    "1": {
+     "return_pct": 2.14,
+     "gross_return": 2.44,
+     "exit_price": 291.65,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "002437",
+   "name": "誉衡药业",
+   "entry_price": 4.03,
+   "periods": {
+    "1": {
+     "return_pct": -8.49,
+     "gross_return": -8.19,
+     "exit_price": 3.7,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "603338",
+   "name": "浙江鼎力",
+   "entry_price": 58.49,
+   "periods": {
+    "1": {
+     "return_pct": 1.53,
+     "gross_return": 1.83,
+     "exit_price": 59.56,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300420",
+   "name": "五洋自控",
+   "entry_price": 8.08,
+   "periods": {
+    "1": {
+     "return_pct": -1.66,
+     "gross_return": -1.36,
+     "exit_price": 7.97,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300759",
+   "name": "康龙化成",
+   "entry_price": 42.76,
+   "periods": {
+    "1": {
+     "return_pct": -2.8,
+     "gross_return": -2.5,
+     "exit_price": 41.69,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "601212",
+   "name": "白银有色",
+   "entry_price": 7.11,
+   "periods": {
+    "1": {
+     "return_pct": -0.58,
+     "gross_return": -0.28,
+     "exit_price": 7.09,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300139",
+   "name": "晓程科技",
+   "entry_price": 49.62,
+   "periods": {
+    "1": {
+     "return_pct": 3.29,
+     "gross_return": 3.59,
+     "exit_price": 51.4,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600353",
+   "name": "旭光电子",
+   "entry_price": 31.73,
+   "periods": {
+    "1": {
+     "return_pct": 1.72,
+     "gross_return": 2.02,
+     "exit_price": 32.37,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600186",
+   "name": "莲花控股",
+   "entry_price": 12.39,
+   "periods": {
+    "1": {
+     "return_pct": -3.21,
+     "gross_return": -2.91,
+     "exit_price": 12.03,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600489",
+   "name": "中金黄金",
+   "entry_price": 25.2,
+   "periods": {
+    "1": {
+     "return_pct": 2.44,
+     "gross_return": 2.74,
+     "exit_price": 25.89,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688209",
+   "name": "英集芯",
+   "entry_price": 33.29,
+   "periods": {
+    "1": {
+     "return_pct": 1.59,
+     "gross_return": 1.89,
+     "exit_price": 33.92,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688195",
+   "name": "腾景科技",
+   "entry_price": 202.5,
+   "periods": {
+    "1": {
+     "return_pct": 0.01,
+     "gross_return": 0.31,
+     "exit_price": 203.12,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "002716",
+   "name": "湖南白银",
+   "entry_price": 10.61,
+   "periods": {
+    "1": {
+     "return_pct": 1.49,
+     "gross_return": 1.79,
+     "exit_price": 10.8,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688185",
+   "name": "康希诺",
+   "entry_price": 71.5,
+   "periods": {
+    "1": {
+     "return_pct": -4.05,
+     "gross_return": -3.75,
+     "exit_price": 68.82,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "603989",
+   "name": "艾华集团",
+   "entry_price": 34.29,
+   "periods": {
+    "1": {
+     "return_pct": -2.17,
+     "gross_return": -1.87,
+     "exit_price": 33.65,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600487",
+   "name": "亨通光电",
+   "entry_price": 63.11,
+   "periods": {
+    "1": {
+     "return_pct": 5.26,
+     "gross_return": 5.56,
+     "exit_price": 66.62,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688433",
+   "name": "华曙高科",
+   "entry_price": 103.22,
+   "periods": {
+    "1": {
+     "return_pct": -4.49,
+     "gross_return": -4.19,
+     "exit_price": 98.9,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "300164",
+   "name": "通源石油",
+   "entry_price": 11.28,
+   "periods": {
+    "1": {
+     "return_pct": -2.25,
+     "gross_return": -1.95,
+     "exit_price": 11.06,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "688037",
+   "name": "芯源微",
+   "entry_price": 330.66,
+   "periods": {
+    "1": {
+     "return_pct": -1.26,
+     "gross_return": -0.96,
+     "exit_price": 327.47,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-08",
+   "entry_trade_date": "2026-09-08",
+   "code": "600330",
+   "name": "天通股份",
+   "entry_price": 30.08,
+   "periods": {
+    "1": {
+     "return_pct": -2.69,
+     "gross_return": -2.39,
+     "exit_price": 29.36,
+     "exit_date": "2026-09-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  }
+ ]
+};
