@@ -33,6 +33,39 @@ SKIP_KEYS = {
     'timestamp', '_ts', 'fetch_time', 'fetchtime', 'last_update', 'lastupdate',
 }
 
+# 🛡 2026-09-11 一劳永逸（主人令「9 张红灯卡」根治）：强制推送白名单。
+#
+#   背景：本去重器的判据是「剥掉时间戳后内容是否改变」。对**数据内容天然稳定**的
+#   研究/审计类卡片，剥掉时间戳后逐字节相同 → 被判定为「伪变更」→ 永不推送 →
+#   其 update_time 永远停在首次落盘那一刻。
+#
+#   两层后果（实测 2026-09-11）：
+#     ① 前端恒显示「昨日」红灯（卡片新鲜度 = update_time，而它永不前进）；
+#     ② 批次闸门 v8_stage_gate.py 的 READY_SPEC 读同一批文件判就绪 →
+#        永远判 STALE → B 批每轮都被判「未就绪」而反复重跑（60~90min/轮）。
+#
+#   为何这 5 张卡内容稳定：
+#     · factor_audit     审计的是 generate_top10.py 的**源码**，源码不改则内容不变
+#     · factor_progress  读 factor_audit 结果，同理
+#     · index_value_framework 依赖 INDEX_HISTORY.js 的刷新节奏（自身可能滞后数日）
+#     · valuation_percentile / ai_insights_compare 多数日子数值相同
+#
+#   故这 5 张卡的 raw/ js **一律强制推送**（单文件 1~8KB，开销可忽略），
+#   保证 update_time 每日前进 —— 这正是它们作为「今日已刷新」指示灯的设计意图
+#  （原 v8_cn_fetch_experiments.yml 也是无条件 git add + push 这 3 个文件）。
+_ALWAYS_PUSH = {
+    "raw_data/factor_audit.json",
+    "raw_data/factor_progress.json",
+    "raw_data/index_value_framework.json",
+    "raw_data/valuation_percentile.json",
+    "raw_data/ai_insights_compare.json",
+    "data/FACTOR_AUDIT.js",
+    "data/FACTOR_PROGRESS.js",
+    "data/INDEX_VALUE_FRAMEWORK.js",
+    "data/VALUATION_PERCENTILE.js",
+    "data/AI_INSIGHTS_COMPARE.js",
+}
+
 
 def strip_ts(text):
     """剥离时间戳字段后返回规范化字符串，用于比对内容是否真变。"""
@@ -92,6 +125,12 @@ def main():
     for f in files:
         if not os.path.exists(f):
             real.append(f)  # 工作树已删，保留（让推送层处理删除）
+            continue
+        if f in _ALWAYS_PUSH:
+            # 🛡 强制推送白名单：研究/审计类卡片，update_time 即其新鲜度指示灯，
+            #   内容稳定也不得被当作「伪变更」丢弃（详见 _ALWAYS_PUSH 注释）。
+            sys.stderr.write('📌 force push (always-push card): %s\n' % f)
+            real.append(f)
             continue
         try:
             cur = open(f, encoding='utf-8', errors='replace').read()
