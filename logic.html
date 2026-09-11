@@ -1849,6 +1849,40 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       </div>
 
       <div class="card">
+        <h3><span class="ic">🔄</span>前端刷新链分类清单（2026-09-11 主人令 · 备忘）</h3>
+        <div class="logic-p">本表把前端每张卡的数据源按 <b>盘前链 / 盘中链 / 盘后链</b> 分类，配「刷新时间纪律」。目的：让刷新严格按档分时，<b>杜绝整页无差别 reload 把盘前 / 盘后数据一起重拉</b>（即主人 16:xx 指出的「还在一起刷新，浪费资源」）。档位来源＝<code>cloud_fetch_v8.py</code> / <code>update_v8.py</code> 的 <code>CATEGORY_MAP</code>；标「建议」＝当前未在 CATEGORY_MAP 登记，本次补归属建议、待补登。</div>
+        <div class="logic-h">⏱ 刷新时间纪律（主人 2026-09-11 原话提炼）</div>
+        <div class="logic-p">· <b>盘前链</b>：08:25 抓取、<b>9:15 前必须部署到位</b>；9:15 后 / 12:45 后均不再有盘前任务。<br>· <b>盘中链</b>：09:30-11:30 / 13:00-15:00 高频更新，通道最高优先级留给盘中。<br>· <b>午休</b>：11:30 上午最后一轮盘中上线后 → 12:45 之间空窗（没做完可续，做完可上，但不派新盘前 / 盘后）。<br>· <b>盘后链</b>：15:00 收盘后最后一轮盘中结束，才开<b>盘后更新组 + 算法链</b>上线。<br>· <b>铁律</b>：在哪个档就严格按时间刷，<b>时间到了就不要一直更新</b>。</div>
+        <table class="lg-table">
+          <tr><th>链</th><th>时段</th><th>刷新纪律</th><th>数据源（window.X / data/X.js）</th></tr>
+          <tr><td>🟡 盘前链</td><td>08:25→9:15</td><td>9:15 前到位；盘中不更新</td><td><code>V8_CAL</code> <code>W52_HIGH</code> <code>ANALYST_RATINGS</code> <code>IPO_DATA</code> <code>MACRO_DATA</code> <code>MACRO_BRIEF</code> <code>MARGIN_DATA</code> <code>NORTH_FUND</code> <code>RESTRICTED_RELEASE</code> <code>PERFORMANCE_FORECAST</code> <code>SUSPENSION_ALERT</code> <code>NT_DATA</code> <code>ETF_NET_SUBSCRIPTION</code> <code>JUDGMENT_DATA</code> <code>CRISIS_DATA</code> <code>RISK_GAUGE</code>（建议·盘中实时）</td></tr>
+          <tr><td>🔴 盘中链</td><td>09:30-11:30<br>13:00-15:00</td><td>高频；午休空窗</td><td><code>INDEX_QUOTES</code> <code>AVG_PRICE_DATA</code> <code>CAPITAL_FLOW_DATA</code> <code>ETF_INTRADAY_HEAT</code> <code>ETF_PULSE</code> <code>CONCEPT_RANKING</code> <code>SECTOR_FUND_FLOW</code> <code>SECTOR_FUND_FLOW_INTRADAY</code> <code>LIMIT_UP_BROKEN</code> <code>LIMIT_UP_HEATMAP</code> <code>MARKET_ALERTS</code> <code>OVERSEAS_MARKETS</code> <code>CFFEX_HOLDINGS</code> <code>SH_SZ_HISTORY</code> <code>CANDIDATE_QUOTES</code> <code>AI_MARKET_BRIEF</code> <code>FOUR_VOLUME</code>（建议） <code>COMMODITY_ELASTICITY</code>（建议·今日迁回实时） <code>STOCK_QUOTE</code>（建议） <code>STOCK_MOMENTUM_STATE</code>（建议） <code>CONCEPT_ETF_MAP</code>（建议）</td></tr>
+          <tr><td>🔵 盘后链</td><td>15:00 后</td><td>收盘后上线；盘中不更新</td><td><code>LHB_DATA</code> <code>LHB_HISTORY</code> <code>SECTOR_RS</code> <code>SECTOR_FUND_FLOW_TREND</code> <code>SECTOR_RECOMMENDATION</code> <code>SECTOR_PHASE_HISTORY</code>（建议） <code>SH_FIB</code> <code>SZ_FIB</code> <code>CRDS_CARD_DATA</code> <code>CRDS_BACKTEST</code>（建议） <code>TRIPLE_CONSENSUS</code> <code>TRIPLE_HISTORY</code> <code>TRIPLE_TRACK</code> <code>CANDIDATE</code>（建议） <code>GOLD_POOL</code> <code>STRONG_BREAKOUT</code> <code>MOMENTUM_FILTER</code>（建议） <code>OPTIMIZED_STRATEGY</code>（建议） <code>PORTFOLIO</code>（建议） <code>STOCK_RPS</code> <code>STOCK_RPS_DATA</code> <code>BACKTEST_COMPREHENSIVE</code> <code>BACKTEST_TDX</code> <code>RPS_BACKTEST</code>（建议） <code>CITIC_PE_BACKTEST</code>（建议） <code>CITIC_PE_THERMO</code>（建议） <code>FACTOR_LAB</code> <code>FACTOR_LAB_BACKTEST</code> <code>FACTOR_AUDIT</code>（建议） <code>FACTOR_PROGRESS</code>（建议） <code>MARKET_REGIME</code> <code>INST_TRADE</code> <code>ALGO_TRACK</code> <code>V8_POOL_TRACKER</code> <code>ETF_DAILY_MONITOR</code> <code>IMA_STRONG_STOCK</code>（建议） <code>INDEX_VALUE_FRAMEWORK</code>（建议） <code>VALUATION_PERCENTILE</code>（建议） <code>UNLISTED_PANEL</code>（建议） <code>STOCK_STOP_DATA</code>（建议） <code>SENTIMENT_CYCLE</code>（建议） <code>WEEKEND_META_REPORT</code>（建议） <code>WEEKEND_RUN</code>（建议）</td></tr>
+          <tr><td>⚙ 运维 / 健康</td><td>常驻</td><td>不属三链</td><td><code>HEALTH_CHECK</code> <code>RUNNER_STATUS</code> <code>AUDIT_TRAIL</code> <code>DO_NOT_DELETE</code> <code>AI_INSIGHTS_COMPARE</code>（建议·洞察对比）</td></tr>
+        </table>
+        <div class="logic-h">⚪ 跨档变量主档裁决（15 个，CATEGORY_MAP 标了多档，本次定主档）</div>
+        <table class="lg-table">
+          <tr><th>变量</th><th>CATEGORY_MAP 原值</th><th>本次主档裁决</th><th>理由</th></tr>
+          <tr><td><code>AI_MARKET_BRIEF</code></td><td>intraday / post_close</td><td><b>盘中</b></td><td>盘中实时生成，盘后仅归档</td></tr>
+          <tr><td><code>CRISIS_DATA</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>危机雷达盘前生成</td></tr>
+          <tr><td><code>ETF_DAILY_MONITOR</code></td><td>intraday / post_close</td><td><b>盘后</b></td><td>日监控收盘后定稿</td></tr>
+          <tr><td><code>ETF_NET_SUBSCRIPTION</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>上交所日频份额，盘前披露</td></tr>
+          <tr><td><code>JUDGMENT_DATA</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>今日判定盘前生成</td></tr>
+          <tr><td><code>LIMIT_UP_HEATMAP</code></td><td>intraday / post_close</td><td><b>盘中</b></td><td>涨停热力盘中实时</td></tr>
+          <tr><td><code>MACRO_BRIEF</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>宏观速览盘前</td></tr>
+          <tr><td><code>MACRO_DATA</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>宏观数据盘前</td></tr>
+          <tr><td><code>MARGIN_DATA</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>两融盘前</td></tr>
+          <tr><td><code>PERFORMANCE_FORECAST</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>业绩预告盘前</td></tr>
+          <tr><td><code>RESTRICTED_RELEASE</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>解禁日历盘前</td></tr>
+          <tr><td><code>RISK_GAUGE</code></td><td>premarket / intraday</td><td><b>盘中</b></td><td>风险温度计盘中实时</td></tr>
+          <tr><td><code>RUNNER_STATUS</code></td><td>premarket / intraday</td><td><b>运维</b></td><td>runner 状态，不属三链</td></tr>
+          <tr><td><code>SECTOR_FUND_FLOW</code></td><td>premarket / intraday / post_close</td><td><b>盘中</b></td><td>板块资金流盘中实时</td></tr>
+          <tr><td><code>SECTOR_FUND_FLOW_INTRADAY</code></td><td>premarket / intraday / post_close</td><td><b>盘中</b></td><td>板块资金日内快照</td></tr>
+        </table>
+        <div class="logic-p" style="color:var(--warn)">🔧 <b>当前前端刷新机制 vs 本纪律</b>：机制B＝整页 <code>location.reload()</code>，盘中每 15 分（含午休）。仍把盘前链（今日事件）/ 盘后链（LHB 等）一起重拉，<b>违背「时间到了就不要一直更新」</b>。根治＝前端<b>分区刷新</b>（按链分时 fetch + 局部重渲），依据本表。待主人确认后改造。</div>
+      </div>
+
+      <div class="card">
         <h3><span class="ic">🩺</span>时段主力与触发可靠性（2026-09-10 实测 · 诚实版）</h3>
         <div class="logic-p">三条时段的<b>设计职责</b>与<b>实测可靠性</b>必须分开看：划分清楚 <b>≠</b> 触发可靠。下表「实测」一列全部来自 GitHub Actions API 的真实 run 记录，不是推测。</div>
         <table class="lg-table">
