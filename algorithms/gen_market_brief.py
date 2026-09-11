@@ -389,7 +389,7 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
     sw1_net = sw1_industry_net(sectors)
     if sw1_net is not None or ind_in:
         parts = []
-        parts.append(f"净额(行业·申万一级31)：{sw1_net:+.1f}亿" if sw1_net is not None else "净额(行业)：待更新")
+        parts.append(f"净额(行业31)：{sw1_net:+.1f}亿" if sw1_net is not None else "净额(行业)：待更新")
         if ind_in:
             parts.append("流入：" + _fmt_sector_list(ind_in))
         if ind_out:
