@@ -521,7 +521,12 @@ def main():
             log("达到本轮夜预算", BUDGET, "-> 停止新取，缓存已落盘，剩余下轮续跑")
             break
         # 🛡 2026-09-04：按季刷新（asof_q 标记）——季报披露后下一季度自动重算
-        if (not FORCE) and code in r and r[code].get("roe_ver") == ROE_VER and r[code].get("roe_ttm") is not None and r[code].get("size_proxy") and r[code].get("asof_q") == ASOF_Q:
+        # 🔴 2026-09-12 一劳永逸：跳过条件必须同时要求「质量判据已落盘」（roe_ok 字段存在）。
+        #   否则只要缓存来自闸门上线前的版本，就会永远命中 continue ⇒ 既不重算也不补写判据
+        #   ⇒ 闸门永久空转。且首轮受 BUDGET=800 限制只能刷 800 只，若只看「整体有无判据」
+        #   会漏掉剩下 2395 只蒙混过关 —— 必须**逐只**判定，杜绝半开闸门。
+        _has_gate = ("roe_ok" in r[code]) if code in r else False
+        if (not FORCE) and _has_gate and code in r and r[code].get("roe_ver") == ROE_VER and r[code].get("roe_ttm") is not None and r[code].get("size_proxy") and r[code].get("asof_q") == ASOF_Q:
             continue
         n_new += 1
         try:
@@ -572,25 +577,32 @@ def main():
     #   ⚠️ 默认开启；可用 V8_ROE_GATE=0 临时关闭（仅限诊断，生产不得关）。
     _GATE_ON = os.environ.get("V8_ROE_GATE", "1") != "0"
 
-    # 🔴 2026-09-12 自愈断言（一劳永逸·防「装了没接电」复发）：
-    #   闸门判据是候选记录里的 roe_ok 字段。若该字段在候选集中**一条都没有**，说明本轮的
-    #   缓存全部来自闸门上线前的旧版本 ⇒ 所有股票都会被 `v.get("roe_ok", True)` 宽容放行
-    #   ⇒ 闸门静默空转、榜单照旧失真，而日志/产物全绿（典型「假成功」）。
-    #   这里主动硬失败，绝不半开着上线。触发后无需人工干预：删 WORK 目录缓存或
-    #   抬高 ROE_VER 即可让下轮全量重算；本轮放弃推送、保留上一份合格产物。
-    _n_tagged = sum(1 for v in large if "roe_ok" in v)
-    if _GATE_ON and large and _n_tagged == 0:
-        log("ERROR: ROE 闸门无判据 —— 候选", len(large), "只中 0 只带 roe_ok 字段"
-            "（缓存系闸门上线前旧版本）。拒绝推送以免闸门静默空转出假榜。"
-            " 处置：删", CACHE_R, "或抬高 ROE_VER 让下轮全量重算。")
+    # 🔴 2026-09-12 自愈守卫（一劳永逸·防「装了没接电」与「半开闸门」两种假成功）：
+    #   闸门判据是候选记录里的 roe_ok 字段，**无判据 = 没被闸门检过**。
+    #   情形① 缓存全部来自闸门上线前版本 → 0 只带判据 → 若沿用宽容放行则闸门静默空转、
+    #         榜单照旧失真而日志产物全绿（典型假成功）；
+    #   情形② ROE_VER 升版后受 BUDGET=800/轮 限制，首轮只刷了一部分 → 出现「部分带判据」，
+    #         剩下走宽容分支**蒙混过关**，比情形①更隐蔽（看起来闸门在工作）。
+    #   故一律**逐只严格**：无判据即剔除，且整榜「无判据占比过半」时直接硬失败拒绝推送
+    #   （避免榜单被残缺样本主导）。下轮全量重算后自动恢复正常，无需人工干预。
+    _n_gate_missing = sum(1 for v in large if "roe_ok" not in v)
+    if _GATE_ON and large and _n_gate_missing * 2 > len(large):
+        log("ERROR: ROE 闸门判据大面积缺失 —— 候选", len(large), "只中",
+            _n_gate_missing, "只无 roe_ok 字段（>50%，缓存系闸门上线前版本或升版后未刷完）。"
+            "拒绝推送以免半开闸门出失真榜。处置：删", CACHE_R,
+            "或抬高 ROE_VER 让下轮全量重算。")
         bs.logout(); return
     if _GATE_ON:
-        _dropped = [v for v in large if not v.get("roe_ok", True)]
-        large = [v for v in large if v.get("roe_ok", True)]
+        # 🔴 关键：默认值必须是 **False**（无判据 = 未过闸 = 剔除），不能写 True。
+        #   写 True 会让 `v.get("roe_ok", True) is True` 在缺字段时命中默认值而放行，
+        #   等于把上面刚拦住的「半开闸门」从后门放进来（实测踩过：d 系列 10 只无判据
+        #   全被放行，剔除数从应然 20 掉到 10）。
+        _dropped = [v for v in large if v.get("roe_ok", False) is not True]
+        large = [v for v in large if v.get("roe_ok", False) is True]
         log("ROE 闸门(G1净资产/G2负单季/G3超上限) 剔除", len(_dropped), "只 /",
             "剔除前", len(_dropped) + len(large), "只",
-            "| 带判据", _n_tagged, "只",
-            "| 样例:", [f"{x['code']}({x.get('roe_gate') or '-'})" for x in _dropped[:6]])
+            "| 无判据剔除", _n_gate_missing, "只",
+            "| 样例:", [f"{x['code']}({x.get('roe_gate') or '无判据'})" for x in _dropped[:6]])
     else:
         log("⚠️ V8_ROE_GATE=0 —— ROE 质量闸门已被人为关闭（仅诊断用途）")
     if len(large) < 10:
