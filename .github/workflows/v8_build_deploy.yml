@@ -9,7 +9,10 @@
 #
 # 触发策略（2026-08-01 审计修正，2026-08-03 修正 auto-deploy，2026-08-03 扩展风险温度计）：
 #   - push raw_data/**  → 检测变化 → 只构建受影响类别（v6 算法端推 raw_data 由此触发）
-#   - workflow_run: 🇨🇳 v8 中国数据抓取(cn) / 🌍 v8 实时风险温度计 成功完成后 → 自动构建部署
+#   🛡 2026-09-11 一劳永逸（阿狸咪）：原要求上游"成功完成"才构建 —— 实证盘后算法链/盘中追踪
+#      常因闸门或问责红灯整体结论为 failure（数据其实已产出）→ build job skipped → 前端整日无新数据。
+#      现改为「上游一结束即构建」；并把「纯盘后产物正向重建」显式补进部署步（见该步注释）。
+#   - workflow_run: 🇨🇳 v8 中国数据抓取(cn) / 🌍 v8 实时风险温度计 一结束 → 自动构建部署
 #     原因：cn runner / 云端 workflow 用 GITHUB_TOKEN push raw_data 不会触发 push 类 workflow，
 #     用 workflow_run 原生机制绕过该限制，实现"抓取完成即自动部署"，无需小九手动 dispatch。
 #   - workflow_dispatch → 全量构建（人工兜底）
@@ -100,7 +103,14 @@ jobs:
     #   必定跑完并部署；push 组的机器人互相取消无害（数据由 workflow_run 兜底重建）。
     # 🛡 2026-09-03 交易时段优先级闸门（盘中风暴一劳永逸根治）：盘中全量 build 排队，不抢 CI；
     #   盘中数据由 cn_fetch 自闭环推送 data/*.js 直接上线。盘后/手动才跑全量构建部署。
-    if: needs.gate.outputs.trading != 'true' && ((github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || (github.event_name == 'workflow_dispatch') || (github.event_name == 'push'))
+    # 🛡 2026-09-11 一劳永逸（主人令）：原条件要求上游 workflow_run.conclusion == 'success'
+    #   才构建。实证缺陷：盘后算法链 / 盘中追踪常因「闸门或问责红灯」整体结论为 failure
+    #   （数据其实已产出/已推送），本 job 直接 skipped → 前端整日拿不到新数据
+    #   （2026-09-11 20:00 实证：盘中算法追踪 failure → build skipped）。
+    #   改为「上游一结束就构建」：update_v8 内部有 ① 空/占位跳过 ② 旧 raw 不洗新 data
+    #   ③ 内容无变化不落盘 三道护栏，构建只做正向重建，不会回滚数据；
+    #   且部署步末尾有跨层一致性闸门兜底，错位数据不会被推上线。
+    if: needs.gate.outputs.trading != 'true' && (github.event_name == 'workflow_run' || github.event_name == 'workflow_dispatch' || github.event_name == 'push')
     steps:
       - uses: actions/checkout@v4
         with:
@@ -208,6 +218,24 @@ jobs:
             #   跳过所有 data/*.js 重建 → 盘中数据永远停留在旧版本。注释已要求"全量重建"，
             #   实现却用了 detect_changes，这是实现与注释不一致的致命 bug。
             python update_v8.py
+
+            # 🛡🛡 2026-09-11 一劳永逸（主人令「三重共识/逆势龙头盘后没跑出来·后面的出不来」）：
+            #   上面那行全量 update_v8.py 的 category=None —— 而 update_v8.py:1174-1179 的
+            #   _pure_pc 护栏规定：CATEGORY_MAP 仅含 post_close 的「纯盘后产物」只在
+            #   category=="post_close" 时才重建（防盘中旧 raw 洗新 data）。
+            #   ⇒ 全量构建对它们 100% 跳过，本工作流此前**任何一条路径都重建不出**
+            #     TRIPLE_CONSENSUS / CRDS_CARD_DATA / TOP10_DAILY / FINAL_RECOMMEND_DATA /
+            #     FACTOR_LAB / V8_POOL_TRACKER 等纯盘后前端文件。
+            #   实证（2026-09-11）：raw_data/triple_consensus.json 已 18:43:12，
+            #   而 data/TRIPLE_CONSENSUS.js 仍停 09:36:40；crds 同病（18:10 vs 09:03）。
+            #   本步此前刚 `git reset --hard FETCH_HEAD`（已拿到线上最新 raw_data），
+            #   是全仓唯一「既持最新 raw_data、又负责推送」的位置 → 在此显式补一次正向重建。
+            #   三重安全保证（update_v8 内部护栏，均不削弱）：
+            #     ① _is_raw_empty_or_stale：空/占位产物跳过，绝不写空污染前端
+            #     ② _should_skip_data_staleness_guard：data 比 raw 新则跳过（防旧 raw 洗新 data）
+            #     ③ 写入前幂等比对：内容无变化则不落盘 → 不产生提交风暴
+            #   若本步失败，紧随其后的跨层一致性闸门会拦截，不会把错位数据推上线。
+            python update_v8.py --category post_close
 
             # 🛡 2026-08-29 跨层一致性闸门：raw_data 新但 data/*.js 没重建的错位（如 CANDIDATE 卡 3 天）
             #   必须在此步拦截，防止陈旧消费层被推送上线。
