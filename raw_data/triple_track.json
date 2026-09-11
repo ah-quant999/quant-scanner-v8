@@ -1,46 +1,11 @@
 {
-  "update_time": "2026-09-11 00:30:48",
+  "update_time": "2026-09-11 09:36:45",
   "data_date": "2026-09-11",
-  "track_start": "2026-09-11",
+  "track_start": "2026-08-17",
   "history_days": 17,
   "strict_count": 0,
-  "near_count": 1,
-  "tracked": [
-    {
-      "code": "300759",
-      "name": "康龙化成",
-      "market": "sz",
-      "board": "创业板",
-      "status": "near",
-      "total_score": 26.7,
-      "quality_grade": "D",
-      "industry": "研究和试验发展",
-      "sectors": [
-        "创业成份",
-        "AH股",
-        "中证500",
-        "深股通",
-        "研究和试验发展",
-        "CRO",
-        "AI制药（医疗）",
-        "MSCI中国"
-      ],
-      "signal_count": null,
-      "enter_date": "2026-09-08",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 42.76,
-      "current_close": 42.76,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报略增",
-          "score": 5,
-          "reaction": "观察中"
-        }
-      ]
-    }
-  ],
+  "near_count": 0,
+  "tracked": [],
   "alerts": [
     {
       "level": "warn",
@@ -302,53 +267,12 @@
     }
   ],
   "sector_cluster": {
-    "by_industry": [
-      {
-        "industry": "研究和试验发展",
-        "count": 1,
-        "names": [
-          "康龙化成"
-        ]
-      }
-    ],
-    "by_sector": [
-      {
-        "sector": "创业成份",
-        "count": 1
-      },
-      {
-        "sector": "AH股",
-        "count": 1
-      },
-      {
-        "sector": "中证500",
-        "count": 1
-      },
-      {
-        "sector": "深股通",
-        "count": 1
-      },
-      {
-        "sector": "研究和试验发展",
-        "count": 1
-      },
-      {
-        "sector": "CRO",
-        "count": 1
-      },
-      {
-        "sector": "AI制药（医疗）",
-        "count": 1
-      },
-      {
-        "sector": "MSCI中国",
-        "count": 1
-      }
-    ],
-    "concentration": 100.0
+    "by_industry": [],
+    "by_sector": [],
+    "concentration": 0
   },
   "overlap": {
-    "total_tracked": 1,
+    "total_tracked": 0,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -357,67 +281,67 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
-    "latest_date": "2026-09-10 03:11:27",
-    "total": 313,
+    "latest_date": "2026-09-11 07:37:05",
+    "total": 318,
     "best_hold_days": 1,
     "periods": {
       "1d": {
-        "win_rate": 0.0,
-        "avg_return": 0.0,
-        "sharpe": 0.0,
-        "count": 0,
-        "best": 0.0,
-        "worst": 0.0
+        "win_rate": 53.0,
+        "avg_return": -0.03,
+        "sharpe": -0.01,
+        "count": 306,
+        "best": 14.69,
+        "worst": -10.32
       },
       "3d": {
-        "win_rate": 0.0,
-        "avg_return": 0.0,
-        "sharpe": 0.0,
-        "count": 0,
-        "best": 0.0,
-        "worst": 0.0
+        "win_rate": 39.9,
+        "avg_return": -1.09,
+        "sharpe": -0.16,
+        "count": 306,
+        "best": 14.76,
+        "worst": -10.34
       },
       "5d": {
-        "win_rate": 0.0,
-        "avg_return": 0.0,
-        "sharpe": 0.0,
-        "count": 0,
-        "best": 0.0,
-        "worst": 0.0
+        "win_rate": 43.4,
+        "avg_return": -0.82,
+        "sharpe": -0.1,
+        "count": 306,
+        "best": 14.76,
+        "worst": -10.38
       },
       "10d": {
-        "win_rate": 0.0,
-        "avg_return": 0.0,
-        "sharpe": 0.0,
-        "count": 0,
-        "best": 0.0,
-        "worst": 0.0
+        "win_rate": 48.8,
+        "avg_return": 0.27,
+        "sharpe": 0.03,
+        "count": 306,
+        "best": 14.77,
+        "worst": -10.38
       },
       "20d": {
-        "win_rate": 0.0,
-        "avg_return": 0.0,
-        "sharpe": 0.0,
-        "count": 0,
-        "best": 0.0,
-        "worst": 0.0
+        "win_rate": 48.6,
+        "avg_return": 0.74,
+        "sharpe": 0.09,
+        "count": 306,
+        "best": 14.77,
+        "worst": -10.34
       }
     }
   },
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 124,
-      "win_rate_5d": 0.0,
-      "avg_ret_5d": 0.0,
-      "best_win_rate": 0.0,
-      "best_hold_days": 1
+      "count": 127,
+      "win_rate_5d": 51.5,
+      "avg_ret_5d": 0.75,
+      "best_win_rate": 63.0,
+      "best_hold_days": 20
     },
     {
       "band": "70~80",
-      "count": 189,
-      "win_rate_5d": 0.0,
-      "avg_ret_5d": 0.0,
-      "best_win_rate": 0.0,
+      "count": 191,
+      "win_rate_5d": 38.8,
+      "avg_ret_5d": -1.77,
+      "best_win_rate": 50.5,
       "best_hold_days": 1
     }
   ],
@@ -425,45 +349,45 @@
     "periods": [
       {
         "period": "1d",
-        "strict_win": 0.0,
-        "strict_ret": 0.0,
-        "strict_count": 0,
+        "strict_win": 53.0,
+        "strict_ret": -0.03,
+        "strict_count": 306,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "3d",
-        "strict_win": 0.0,
-        "strict_ret": 0.0,
-        "strict_count": 0,
+        "strict_win": 39.9,
+        "strict_ret": -1.09,
+        "strict_count": 306,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "5d",
-        "strict_win": 0.0,
-        "strict_ret": 0.0,
-        "strict_count": 0,
+        "strict_win": 43.4,
+        "strict_ret": -0.82,
+        "strict_count": 306,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "10d",
-        "strict_win": 0.0,
-        "strict_ret": 0.0,
-        "strict_count": 0,
+        "strict_win": 48.8,
+        "strict_ret": 0.27,
+        "strict_count": 306,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "20d",
-        "strict_win": 0.0,
-        "strict_ret": 0.0,
-        "strict_count": 0,
+        "strict_win": 48.6,
+        "strict_ret": 0.74,
+        "strict_count": 306,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -472,7 +396,7 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-09-11",
+    "track_start": "2026-08-17",
     "history_days": 17,
     "summary": {
       "1d": {
@@ -481,14 +405,14 @@
         "avg_return": 2.39
       },
       "3d": {
-        "count": 9,
-        "win_rate": 55.56,
-        "avg_return": 3.81
+        "count": 11,
+        "win_rate": 54.55,
+        "avg_return": 2.88
       },
       "5d": {
-        "count": 9,
-        "win_rate": 44.44,
-        "avg_return": 2.85
+        "count": 10,
+        "win_rate": 50.0,
+        "avg_return": 2.68
       },
       "10d": {
         "count": 7,
@@ -677,7 +601,8 @@
         "enter_date": "2026-09-03",
         "offsets": {
           "1d": -1.9,
-          "3d": -0.98
+          "3d": -0.98,
+          "5d": 1.14
         }
       },
       {
@@ -693,7 +618,8 @@
         "name": "联讯仪器",
         "enter_date": "2026-09-07",
         "offsets": {
-          "1d": 7.63
+          "1d": 7.63,
+          "3d": 0.24
         }
       },
       {
@@ -701,7 +627,8 @@
         "name": "迈瑞医疗",
         "enter_date": "2026-09-07",
         "offsets": {
-          "1d": 0.02
+          "1d": 0.02,
+          "3d": -2.77
         }
       },
       {

@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-09-11 02:09:29",
+  "update_time": "2026-09-11 09:00:18",
   "meta": {
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
-    "n_universe": 718,
-    "n_at_valid": 794,
-    "n_roe_large": 988,
+    "n_universe": 751,
+    "n_at_valid": 820,
+    "n_roe_large": 1047,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
     "roe_universe": "全市场主板"
@@ -404,13 +404,13 @@
         "asof_ym": "2026-09"
       },
       {
-        "code": "sz.000930",
-        "name": "中粮科技",
-        "close": 6.5,
-        "abn": 1.185,
-        "factor_at": -1.185,
+        "code": "sz.300911",
+        "name": "亿田智能",
+        "close": 28.89,
+        "abn": 1.198,
+        "factor_at": -1.1978,
         "roe_ttm": null,
-        "size_proxy": 3152406154.3,
+        "size_proxy": 5012498337.5,
         "asof_ym": "2026-09"
       }
     ]
@@ -423,6 +423,15 @@
         "close": 16.98,
         "roe_ttm": 183.36,
         "size_proxy": 1690918142.3,
+        "asof_q": "2026Q3",
+        "roe_ver": 3
+      },
+      {
+        "code": "sz.001309",
+        "name": "德明利",
+        "close": 418.22,
+        "roe_ttm": 121.07,
+        "size_proxy": 9128464829.7,
         "asof_q": "2026Q3",
         "roe_ver": 3
       },
@@ -675,15 +684,6 @@
         "close": 28.33,
         "roe_ttm": 32.57,
         "size_proxy": 2224176964.6,
-        "asof_q": "2026Q3",
-        "roe_ver": 3
-      },
-      {
-        "code": "sz.002463",
-        "name": "沪电股份",
-        "close": 127.92,
-        "roe_ttm": 32.33,
-        "size_proxy": 9048478512.7,
         "asof_q": "2026Q3",
         "roe_ver": 3
       }
