@@ -352,6 +352,9 @@ def write_four_volume_backtest_js(records, bt_summary=None, out_dir=DATA_DIR):
                 "sharpe_ratio": v.get("sharpe_ratio"),
             }
     method = "四量终极历史回测：信号日收盘价买入，持有N个交易日收盘价卖出"
+    # 🆕 2026-09-11：原文案没写成本口径，页面上看不出收益是否已扣费（口径不透明 = 半假）
+    if bt_summary:
+        method += f"（前复权；已扣双边交易成本 {2 * COST_BPS / 100:.2f}%）"
     if not by_period:
         method += ("（当前 0 信号，待四量信号恢复后自动填充）" if n == 0
                    else "（当前 %d 信号；深度分层回测待 --backtest 手动跑）" % n)
@@ -362,7 +365,11 @@ def write_four_volume_backtest_js(records, bt_summary=None, out_dir=DATA_DIR):
             "calc_time": update_time,
             "total_signals": (bt_summary or {}).get("total_signals", n),
             "method": method,
-            "signal_date_range": "—",
+            # 🆕 2026-09-11：run_backtest 的 years 是唯一的区间事实，原来恒写 "—" 是空话
+            "signal_date_range": (f"近 {(bt_summary or {}).get('years')} 年"
+                                   if (bt_summary or {}).get("years") else None),
+            "cost_bps_per_side": (bt_summary or {}).get("cost_bps_per_side"),
+            "cost_adjusted": (bt_summary or {}).get("cost_adjusted"),
             "by_period": by_period,
         },
     }
