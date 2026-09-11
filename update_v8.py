@@ -161,7 +161,11 @@ CATEGORY_MAP = {
     "CFFEX_HOLDINGS": "intraday,post_close",
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：与 cloud_fetch_v8.py 同步加 post_close。
     #   盘后数据页「宏观数据速览」卡读本变量，原只标 premarket → 盘后档不重生成 data/MACRO_DATA.js。
-    "MACRO_DATA": "premarket,post_close",
+    # 🛡 2026-09-11 小九的工程师（三档归档对齐）：补 intraday。cloud_fetch_v8.py 侧自 09-07 起
+    #   已注册 "premarket,intraday,post_close"（主人令「今日判定·环境综合卡盘中随实时数据
+    #   变化，将其及依赖源纳入 intraday」），update_v8 侧漏同步 → 盘中档抓了新 raw_data
+    #   却跳过重生成 data/MACRO_DATA.js，前端「宏观数据速览」盘中恒显示盘前值（半截更新）。
+    "MACRO_DATA": "premarket,intraday,post_close",
     "CRISIS_DATA": "premarket,intraday",
     "NORTH_FUND": "premarket",
     "ANALYST_RATINGS": "premarket",
@@ -173,8 +177,11 @@ CATEGORY_MAP = {
     # 2026-09-08 一劳永逸：HERDING_DATA(羊群效应) 由 f_herding_data() 读当日完整涨停池(_get_zt_pool)，
     #   收盘后定稿 → 属 post_close，原挂 premarket 致盘中 cn_fetch 永远刷不到 / 盘前判 stale。
     "HERDING_DATA": "post_close",
-    "JUDGMENT_DATA": "premarket",
-    "MACRO_BRIEF": "premarket",
+    # 🛡 2026-09-11 小九的工程师（三档归档对齐）：同上漏同步。抓取侧 cloud_fetch_v8.py 两者均为
+    #   "premarket,intraday"（09-07 主人令），注入侧只有 premarket → 盘中 raw 已新、
+    #   data/JUDGMENT_DATA.js（今日判定卡）/ data/MACRO_BRIEF.js（宏观解读卡）不重建。
+    "JUDGMENT_DATA": "premarket,intraday",
+    "MACRO_BRIEF": "premarket,intraday",
 
     # 盘后（由 v6 算法 calc_volatility_watch.py 同步桥推送）
     "VOLATILITY": "post_close",
@@ -198,6 +205,15 @@ CATEGORY_MAP = {
     "CANDIDATE_QUOTES": "intraday",
     "SH_SZ_HISTORY": "intraday,post_close",
     "AI_MARKET_BRIEF": "intraday,post_close",
+    # 🛡 2026-09-11 小九的工程师（三档归档普查·补「无档位」盲区）：
+    #   以下 3 个在 DATA_SOURCES 有文件映射，却**从未登记 CATEGORY_MAP** →
+    #   _file_category() 返回空集 → ① `--category X` 构建永不命中；② `--detect-changes`
+    #   构建时它们既不贡献 affected_cats、也不进 target_files（而 push 触发的部署链
+    #   v8_build_deploy.yml 走的正是 detect-changes 模式）→ data/*.js 只能靠全量构建
+    #   兜底；实测 raw 已新而 js 停在前一日（半截更新）。
+    "RISK_GAUGE": "premarket,intraday",            # 实时风险温度计：v8_risk_gauge.yml 每30分（08:00-16:30 CST）
+    "ETF_SUBSCRIPTION_EM": "premarket,post_close",  # ETF 申赎（东财口径）：cn_fetch 盘前/盘后两档产出
+    "RUNNER_STATUS": "premarket,intraday,post_close",  # 任务跟踪看板：每轮抓取都写，全时段
     # 盘后：大盘资金流时间轴，累积历史序列
     "MARKET_FUND_FLOW_DATA": "post_close",
 
