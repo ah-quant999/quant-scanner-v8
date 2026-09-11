@@ -6455,7 +6455,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="auditTrailBody"><div style="font-size:12px;color:var(--dim)">等待审计数据…</div></div>
     </div>
 
-    <!-- ═══════════ 🔑 凭证台账（2026-09-11 主人令：并入运维页「数据健康总览 · 外部数据源」表内，原独立卡太占版面；
+    <!-- ═══════════ 🔑 凭证台账（2026-09-11 主人令：改为「占满整宽」独立区块，渲染在运维页「数据健康总览」卡内
+         「文件新鲜度 / 外部数据源」双列的下方 —— 曾短暂并入右列表尾，双列宽度下过窄、观感差，已撤回该方案；
          换新后只改下面登记表里的 updated YYYY-MM-DD，剩余天数与灯色自动重算。本表只登记位置与日期，不含任何凭据内容） ═══════════ -->
     <script>
     window.__v8CredTable = function(){
@@ -9986,18 +9987,28 @@ function drawUpDownChart(){
         '<table style="width:100%;font-size:11px;"><thead><tr><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">项目</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">状态</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">说明</th></tr></thead><tbody>'+
           '<tr id="extSrcAkshare"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">akshare（港股/行业）</td><td id="extSrcAkStatus" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcAkDiag" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--sub)">—</td></tr>'+
           '<tr id="extSrcGuanlan"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">外资研投（知识星球研报）</td><td id="extSrcGlStatus" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcGlDiag" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--sub)">—</td></tr>'+
-          '<tr><td colspan="3" style="padding:10px 6px 5px;font-size:11px;border-bottom:1px solid rgba(255,255,255,.04)">🔑 <b>凭证台账</b> <span style="font-size:10px;color:'+(_cred.warn?'var(--gold)':'var(--dim)')+'">'+_cred.summary+'</span></td></tr>'+
+        '</tbody></table>'+
+      '</div>';
+
+    // 2026-09-11 主人令（二次）：凭证台账独立为「占满整宽」区块，置于「文件新鲜度 / 外部数据源」双列的下方，
+    //   不再挤进右列表尾（原并入方案在双列宽度下过窄、观感差）。
+    const credHtml =
+      '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">'+
+        '<div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:8px;">🔑 凭证台账 · 到期提醒 <span style="font-weight:400;font-size:10px;color:'+(_cred.warn?'var(--gold)':'var(--dim)')+'">'+_cred.summary+'</span></div>'+
+        '<table style="width:100%;font-size:11px;"><thead><tr><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">项目</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border);width:110px">状态</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">说明</th></tr></thead><tbody>'+
           _cred.rows+
         '</tbody></table>'+
         '<div style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.6">⏰ 凭证口径：剩余 ≤ 7 天亮黄灯、超期亮红灯，届时按「换新方式」找主人拿新值；换新后只改卡片脚本里登记表的 <code>updated</code>（YYYY-MM-DD），剩余天数与灯色自动重算。本表只登记位置与日期，<b>不含任何凭据内容</b>；带「推定」的到期日来自历史记录，仅供参考。</div>'+
       '</div>';
 
     // 2026-08-11 主人令：文件新鲜度 + 外部数据源改为并排双列布局
+    // 2026-09-11 主人令（二次）：双列下方追加「整宽」凭证台账区块（flex 之外，故自然占满整宽）
     el.innerHTML = runnerHtml +
       '<div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;">'+
         '<div style="flex:1;min-width:280px;">'+freshHtml+'</div>'+
         '<div style="flex:1;min-width:280px;">'+extHtml+'</div>'+
-      '</div>';
+      '</div>'+
+      credHtml;
 
     // 2026-08-10 小九：接入孤儿数据源（RISK_GAUGE / WEEKEND_RUN / WEEKEND_META_REPORT）
     try {

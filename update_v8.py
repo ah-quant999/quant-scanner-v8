@@ -214,8 +214,18 @@ CATEGORY_MAP = {
     "RISK_GAUGE": "premarket,intraday",            # 实时风险温度计：v8_risk_gauge.yml 每30分（08:00-16:30 CST）
     "ETF_SUBSCRIPTION_EM": "premarket,post_close",  # ETF 申赎（东财口径）：cn_fetch 盘前/盘后两档产出
     "RUNNER_STATUS": "premarket,intraday,post_close",  # 任务跟踪看板：每轮抓取都写，全时段
-    # 盘后：大盘资金流时间轴，累积历史序列
-    "MARKET_FUND_FLOW_DATA": "post_close",
+    # 🛡 2026-09-11 小九的股票专家 一劳永逸（主人令·「市场资金流向」盘中红灯）：
+    #   原只标 post_close → _pure_pc=True → data/MARKET_FUND_FLOW_DATA.js 仅由
+    #   17:20/18:20/19:20 三档 --category post_close 构建重建。
+    #   但本卡：① 位于前端「实时数据」页；② 抓取侧 f_market_fund_flow_data()
+    #   属 cn_fetch 盘中 tasks（实测 main 上 raw 10:00:29 鲜活）；
+    #   ③ v8_health_check.py CARD_DEFS 以「实时数据 / 盘中每30分 / max_age=60」登记。
+    #   → 归类自相矛盾，结果：整个交易时段 js 停在盘前值（实测 00:39:54），
+    #     前端「实时数据·市场资金流向」盘中恒红，且盘中永不可能转绿（半截更新）。
+    #   数据本体为「日频时间轴 daily(148 天) + 盘中实时字段 market_net/sh_quote/cumulative」
+    #   双性质 → 正确口径为两档都建：intraday 承载盘中实时字段，
+    #   post_close 追加收盘定稿的当日 daily 点。
+    "MARKET_FUND_FLOW_DATA": "intraday,post_close",
 
     # 盘后（17:00，主要由 v6 算法推送；cloud_fetch 暂无生产者）
     "SECTOR_FUND_FLOW_TREND": "post_close",
