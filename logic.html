@@ -1383,8 +1383,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><th>环节</th><th>说明</th></tr>
           <tr><td><b>触发源</b>（谁派都一样）</td><td>cron（不可靠，仅备份）/ 人工 <code>workflow_dispatch</code> / 本机「接力推进器」每小时 :10 —— <b>三个入口，同一个闸门</b></td></tr>
           <tr><td><b>批次闸门</b><br>（唯一决策点）</td><td><b>日历</b>（交易日 / T+1 数据日）+ <b>上游顺序</b>（下游产物必须晚于上游）+ <b>内容级就绪</b>（读产物内 <code>update_time</code>，不吃 git checkout 的 mtime）——一处判完，输出 <code>target_stage</code> / <code>stage_ok</code> / <code>proceed</code> / <code>reason</code></td></tr>
-          <tr><td>① A 采集</td><td>龙虎榜必新 <b>3/3</b>（<code>LHB_DATA.js</code> / <code>sector_rs.json</code> / <code>stock_profile.json</code>）· <b>12</b> 个脚本</td></tr>
-          <tr><td>② B 选股</td><td>三模块 <b>3/3</b>（三重共识 / 四量终极 / 逆势龙头）· <b>23</b> 个脚本（<code>v8/factor_lab_gen.py</code> 最前，baostock 冷启动 50-90min）</td></tr>
+          <tr><td>① A 采集</td><td>就绪 <b>7/10</b> 项（<code>LHB_DATA.js</code> 为<b>必中项</b>；另有 sector_rs / stock_profile / fundamental_quality / stock_quote / inst_trade / suspension_alert / nt_data / sector_fund_flow_trend / market_alerts）· <b>12</b> 个脚本<br><span style="color:var(--sub)">2026-09-11：清单由 3 项扩到 10 项 —— 旧版只看 3 个代表产物，其余 6 个产物陈旧时闸门仍判「A 已就绪」，那些卡便整日红灯无人重跑。</span></td></tr>
+          <tr><td>② B 选股</td><td>就绪 <b>8/9</b> 项（三重共识 / 四量终极 / 逆势龙头 + ai_insights_compare / factor_audit / factor_progress / valuation_percentile / index_value_framework / gold_pool；<b>只容忍 1 项不新鲜</b>）· <b>27</b> 个脚本（<code>v8/factor_lab_gen.py</code> 最前，baostock 冷启动 50-90min）<br><span style="color:var(--sub)">2026-09-11：清单由 3 项扩到 9 项 —— 原版 3 项鲜活即判「B 已就绪」→ 空转 → 9 张卡整日红灯。</span></td></tr>
           <tr><td>③ D 汇总</td><td>最终推荐 <b>1/1</b>（<code>FINAL_RECOMMEND_DATA.js</code>）· 仅 <code>final_recommend.py</code></td></tr>
           <tr><td>④ E 回测</td><td>回测产物<b>任一</b>（<code>CRDS_BACKTEST.js</code> / <code>BACKTEST_TDX.js</code>）· <b>7</b> 个脚本</td></tr>
         </table>
@@ -1405,17 +1405,17 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">🕒</span>盘后算法链当日时间线（2026-09-10 闸门版）</h3>
-        <div class="logic-p">盘后从 15:05 到次日 01:00 的完整值守。关键：<b>「唤醒点」不等于「跑批点」</b>——每个唤醒点都只是「问一次闸门要不要跑」，跑不跑由闸门按内容就绪度决定。</div>
+        <h3><span class="ic">🕒</span>盘后算法链当日时间线（2026-09-11 闸门版）</h3>
+        <div class="logic-p">盘后从 15:05 到次日 <b>09:00（开盘前）</b>的完整值守。关键：<b>「唤醒点」不等于「跑批点」</b>——每个唤醒点都只是「问一次闸门要不要跑」，跑不跑由闸门按内容就绪度决定。</div>
         <table class="lg-table">
           <tr><th>时点</th><th>谁唤醒</th><th>实际发生什么</th></tr>
-          <tr><td>16:00-01:00 每小时 :10</td><td>本机「盘后算法链接力推进器」（阿狸咪）</td><td><b>实际主力</b>：先查无在跑 → 跑闸门 → 只按 <code>proceed</code> 派发（不带 stage / 不带 force_run）</td></tr>
+          <tr><td><b>16:00-08:59</b> 每小时 :10</td><td>本机「盘后算法链接力推进器」（阿狸咪）</td><td><b>实际主力</b>：先查无在跑 → 跑闸门 → 只按 <code>proceed</code> 派发（不带 stage / 不带 force_run）</td></tr>
           <tr><td>16:40</td><td>cron 唤醒①</td><td>闸门判定：<b>未到 18:00 盘后链起点 → 空转</b>；≥18:00 且 A 未就绪则跑 A；已就绪则空转</td></tr>
           <tr><td>17:20 / 18:20 / 19:20</td><td>cron <code>v8_cn_fetch_cloud</code> post_close</td><td>盘后三档抓取（龙虎榜 17:00 后发布，故 post_close 从 15:45 推迟到 17:20）</td></tr>
           <tr><td>17:30</td><td>cron <code>v8_lhb_fetch</code>（cn 双机）</td><td>当日龙虎榜落盘</td></tr>
           <tr><td>18:10</td><td>cron 唤醒②</td><td>闸门判定：A 就绪 B 缺 → 跑 B（含因子实验室 50-90min 冷启动）</td></tr>
           <tr><td>20:00 / 21:00</td><td>cron 唤醒③④</td><td>闸门判定：B 就绪 D 缺 → 跑 D（最终推荐）；D 就绪 E 缺 → 跑 E（回测）</td></tr>
-          <tr><td>22:30 / 00:30</td><td>cron 唤醒⑤⑥（接力点）</td><td>B 拖到 22:30 后才完时，D/E 仍有人唤醒；凌晨档归前一交易日，按 24:xx 计</td></tr>
+          <tr><td>22:30 / 00:30 / 06:00 / 08:00</td><td>cron 唤醒⑤⑥⑦⑧（接力点）</td><td>B 拖到 22:30 后才完时，D/E 仍有人唤醒；<b>07:00 后仍算夜窗</b>（上界 08:59，与闸门 <code>_NIGHT_CUT=9</code> 同源），凌晨档归前一交易日按 24:xx 计<br><span style="color:var(--sub)">2026-09-11 补：原只到 00:30，06:00-08:59 无人唤醒 —— B 若 06:30 才完，D 要饿到次日 16:40。</span></td></tr>
           <tr><td>22:30 / 23:00 / 23:30</td><td><code>v8_daily_audit</code> / <code>v8_backup</code> / 本机轻量审计</td><td>每日审计 / 备份 raw_data / 备份前审计</td></tr>
         </table>
         <div class="logic-h">判读要点（取代旧「静默闸门」说法）</div>
@@ -1830,14 +1830,14 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>每 30 分 <code>v8_stock_quote_refresh</code> + <code>v8_risk_gauge</code></td><td>行情 / 风险温度计</td><td>cn self-hosted / 云端 ubuntu</td></tr>
           <tr><td>11:00 / 13:00 / 15:00 <code>v8_algo_intraday_lite</code></td><td>盘中算法追踪（轻量）</td><td>云端 ubuntu</td></tr>
           <tr><td>每 30 分 <code>v8_health_patrol</code>；每 15 分 <code>v8_cache_buster_reconcile</code></td><td>巡检 / 缓存戳对齐（全天）</td><td>云端 ubuntu</td></tr>
-          <tr><td rowspan="3"><b>盘后</b><br>15:05-<br>次日<br>01:00</td><td>16:30 <code>v8_cn_fetch_experiments</code></td><td>实验卡（暂未上架区）</td><td>云端 ubuntu</td></tr>
-          <tr><td><b>16:40 / 18:10 / 20:00 / 21:00 / 22:30 / 00:30</b> 六个唤醒点 <code>v8_algo_cloud</code></td><td>跑哪批由闸门定：<b>A 采集 → B 选股 → D 汇总 → E 回测</b></td><td><code>[self-hosted, cn]</code> 双机谁空谁跑</td></tr>
+          <tr><td rowspan="3"><b>盘后</b><br>15:05-<br>次日<br>09:00</td><td>16:30 <code>v8_cn_fetch_experiments</code></td><td>实验卡（暂未上架区）</td><td>云端 ubuntu</td></tr>
+          <tr><td><b>16:40 / 18:10 / 20:00 / 21:00 / 22:30 / 00:30 / 06:00 / 08:00</b> 八个唤醒点 <code>v8_algo_cloud</code></td><td>跑哪批由闸门定：<b>A 采集 → B 选股 → D 汇总 → E 回测</b></td><td><code>[self-hosted, cn]</code> 双机谁空谁跑</td></tr>
           <tr><td>17:20 / 18:20 / 19:20 <code>v8_cn_fetch_cloud</code> post_close</td><td>盘后三档抓取</td><td>云端 ubuntu</td></tr>
         </table>
         <div class="logic-h">补充：本表之外仍在跑的定时项（防漏）</div>
         <table class="lg-table">
           <tr><th>时点</th><th>Workflow / 任务</th><th>干什么</th><th>归属</th></tr>
-          <tr><td>16:00-01:00 每小时 :10</td><td>「盘后算法链接力推进器」（本机自动化）</td><td><b>盘后链实际主力</b>：先查无在跑 → 跑闸门 → 只按 <code>proceed</code> 派发 <code>v8_algo_cloud</code>（不带 stage）</td><td>阿狸咪机</td></tr>
+          <tr><td><b>16:00-08:59</b> 每小时 :10</td><td>「盘后算法链接力推进器」（本机自动化）</td><td><b>盘后链实际主力</b>：先查无在跑 → 跑闸门 → 只按 <code>proceed</code> 派发 <code>v8_algo_cloud</code>（不带 stage）</td><td>阿狸咪机</td></tr>
           <tr><td>17:30</td><td><code>v8_lhb_fetch</code></td><td>当日龙虎榜（交易所 17:00 后发布）</td><td><code>[self-hosted, cn]</code></td></tr>
           <tr><td>22:30</td><td><code>v8_daily_audit</code></td><td>每日审计</td><td>云端 ubuntu</td></tr>
           <tr><td>23:00</td><td><code>v8_backup</code></td><td>备份 <code>raw_data/*.json</code></td><td>云端 ubuntu</td></tr>
@@ -1855,7 +1855,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>周六 / 假期<b>第一天</b></td><td>✅ 照常全量跑（含采集）</td><td>持有上一交易日的 <b>T+1 数据</b>（龙虎榜 / 机构调研 / 大宗 / 两融等收盘后发布、次日才全）</td></tr>
           <tr><td>周日 / 假期<b>中段 / 末日</b></td><td>⏭ 不跑（闸门判 <code>NONE</code>）</td><td>距上一交易日已 ≥2 天，无 T+1 新源，跑了只会空转</td></tr>
           <tr><td>补班日（调休上班）</td><td>✅ 全量跑</td><td>按交易日处理</td></tr>
-          <tr><td>凌晨 00:00-05:59</td><td>✅ 继续接力（归<b>前一自然日</b>，按 24:xx 计）</td><td>B 批因子实验室冷启动常拖到 22:30 后，D/E 需要夜间补档窗口</td></tr>
+          <tr><td>凌晨 00:00-08:59</td><td>✅ 继续接力（归<b>前一自然日</b>，按 24:xx 计）</td><td>B 批因子实验室冷启动常拖到 22:30 后，D/E 需要夜间补档窗口</td></tr>
         </table>
       </div>
 
@@ -1947,11 +1947,11 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
             <td><span style="color:#fbbf24">🔴 需小九做「可靠调度器」（已写交接第 ① 条）</span>；调度器已从 <code>[self-hosted, cn]</code> 改 <b>GitHub ubuntu-latest</b>（09-10）以消除 runner 排队延迟，待下一交易日实测验证；兜底＝看门狗（盘中陈旧 &gt;45min 补派）</td>
           </tr>
           <tr>
-            <td><b>盘后</b><br>15:05-<br>次日 01:00</td>
+            <td><b>盘后</b><br>15:05-<br>次日 09:00</td>
             <td>阿狸咪（夜间主力）<br>任务：A 采集 → B 选股 → D 最终推荐 → E 回测（<b>13 步 · 闸门判批次</b>）+ 龙虎榜 / 回测族 / 备份</td>
-            <td>cron 6 唤醒点 + 本机「接力推进器」每小时 :10</td>
+            <td>cron 8 唤醒点 + 本机「接力推进器」每小时 :10（16:00-08:59）</td>
             <td><span style="color:#ef5350">🔴 6 档只到 2 档</span>（21:07 / 22:19）；<b>16:40 / 18:10 / 20:00 从未创建 run</b></td>
-            <td><span style="color:#26a69a">✅ 唯一派发源已收敛</span>＝本机「盘后算法链接力推进器」（16:00-01:00 每小时 :10，不带 stage）</td>
+            <td><span style="color:#26a69a">✅ 唯一派发源已收敛</span>＝本机「盘后算法链接力推进器」（<b>16:00-08:59</b> 每小时 :10，不带 stage；窗口上界与闸门 <code>_NIGHT_CUT=9</code> 同源）</td>
           </tr>
         </table>
         <div class="logic-h">结论（只此一句）</div>

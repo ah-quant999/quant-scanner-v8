@@ -88,7 +88,7 @@ def check_stock_picking_ready(by='unknown'):
         return
     # 🛡 2026-09-04 一劳永逸（cn 链 run#23 实测）：补凌晨补跑窗口，与链级
     # run_algorithms._is_post_close_picking_ready 口径对齐（其注释已载 08-29 run#1204
-    # 整批选股脚本被误跳过的教训）。链跨午夜时（00:00~05:59）上一交易日盘后数据
+    # 整批选股脚本被误跳过的教训）。链跨午夜时（00:00~08:59）上一交易日盘后数据
     # 早已齐全，必须放行，否则 gen_triple_consensus / strategy_four_volume /
     # final_recommend 全部退出码 1 → 三重共识/最终推荐/四量停更。
     if 0 <= now.hour < _NIGHT_CUT_HOUR:
