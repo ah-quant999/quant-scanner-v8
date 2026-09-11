@@ -146,6 +146,13 @@ CARD_DEFS = [
     {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
     {"id": "STOCK_RPS", "name": "相对强度", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["records"], "_window_var": "STOCK_RPS_DATA", "heal_cat": "algo_run", "picking": True, "raw_file": "stock_rps.json"},  # 文件名 STOCK_RPS.js，但 window 变量名是 STOCK_RPS_DATA（历史遗留）；🛡 2026-09-10 raw_file 交叉校验根治误报 fail
     {"id": "CRDS_CARD_DATA", "name": "逆势龙头", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["elite", "watch"], "heal_cat": "algo_run", "picking": True},
+    # 🔴 2026-09-11 主人令（选项A·软告警→硬告警）：FOUR_VOLUME_60M 由「低频白名单（仅 >7 天才告警）」
+    #   升为**正式登记卡**，按 24h 红线判定。
+    #   原白名单理由（2026-08-27）是「baostock 60min 源本身滞后 → 常陈旧 → 误报红灯」，该前提自
+    #   2026-09-03 起已不成立：脚本改为「无论命中多少只（含 0 只）都写新鲜时间戳」，
+    #   故**文件陈旧 ⇔ 脚本没跑成 / 产物写错地方**，属真故障，必须亮红灯。
+    #   2026-09-11 实证：正因这层白名单，该卡产物被写进仓库之外、冻结 3 天（09-08→09-11）零告警。
+    {"id": "FOUR_VOLUME_60M", "name": "四量终极60m", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
     # 🛡 2026-09-11 一劳永逸：4 个孤儿 algo_run 产物此前未注册 CARD_DEFS → 被 all_ 通用扫描按 1440min 红线误判 fail
     {"id": "ALGO_TRACK", "name": "算法追踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     {"id": "TRIPLE_HISTORY", "name": "三重历史", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
@@ -1682,8 +1689,9 @@ _LOW_FREQ_FILES = {
     "maharo_macro",  # 2026-09-08 一劳永逸：本机 cookie 拉取(云端无权限)，家里机离线会陈旧 -> 7天容忍仅告警
     "maharo_insights",  # 2026-09-10：同 maharo_macro 口径（本机 cookie 拉取，云端无权限）-> 同样 7天容忍仅告警
     "MACRO",  # 2026-08-29：window.MACRO 已被 window.MACRO_DATA 取代，index.html 仅用 MACRO_DATA/MACRO_BRIEF，全站 0 渲染引用 → 白名单免误报
-    "FOUR_VOLUME_60M",  # 🛡 2026-08-27 主人令：baostock 60min 源本身滞后（曾到 8/22），
-    # 且 final_recommend 已回退读日线 FOUR_VOLUME.js（Layer B），60M 不再作为最终推荐必需输入 → 降级低频白名单，消除误报红灯
+    # 🔴 2026-09-11 主人令（选项A）：FOUR_VOLUME_60M **已移出本白名单**，并正式登记进 CARD_DEFS
+    #   （「选股策略」段，max_age=1440）。原白名单把 24h 红线降到「>7天才告警」，
+    #   导致该卡产物冻结 3 天（09-08→09-11）全程零告警。现由 check_data_cards 按 d.max_age 正常判定。
 }
 def check_all_data_files():
     """全量审计 data/*.js：已登记 CARD_DEFS 的跳过（check_data_cards 管），其余全部按通用规则查。

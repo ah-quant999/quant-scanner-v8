@@ -33,18 +33,28 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 ROOT = os.path.dirname(BASE_DIR)
 
-# 输出目录解析（v8 双机/预览架构，2026-08-09 修复）：
-#  1) 环境变量 V8_DATA_DIR 最高优先（云端/CI 可显式指定输出位置）；
-#  2) 本机若存在真实仓库 E:/workspace/stock-scanner（git 源），直接写入其 data/，
-#     便于生成后自动提交入库，避免数据只落在预览副本 quant-scanner-v8 而主站缺失；
-#  3) 否则沿用脚本所在仓库 ROOT/data（云端 checkout 场景）。
-_LOCAL_REPO = r"E:/workspace/stock-scanner"
-if os.path.isdir(os.path.join(_LOCAL_REPO, ".git")):
-    DATA_DIR = os.path.join(_LOCAL_REPO, "data")
-else:
-    DATA_DIR = os.path.join(ROOT, "data")
-DATA_DIR = os.environ.get("V8_DATA_DIR", DATA_DIR)
+# 输出目录解析（🔴 2026-09-11 一劳永逸·根治产物流失）：
+#   1) 环境变量 V8_DATA_DIR 最高优先（CI/云端可显式指定输出位置）；
+#   2) 否则恒为**脚本所在仓库 ROOT/data**（与同族 strategy_four_volume.py 完全一致）。
+#
+#   ❌ 已删除原「本机存在 E:/workspace/stock-scanner 就写它的 data/」分支：
+#      那是 v6 遗留的**硬编码绝对路径**，谁装了旧仓库谁中招 —— 产物被写到**本仓库之外**，
+#      而链级只校验 rc 与日志文本，于是「写成功」却等同「没产出」。
+#      2026-09-11 实证（run#1763 / 11:40Z）：cn 自托管机上该脚本打印
+#        「✅ 写出 E:/workspace/stock-scanner\data\FOUR_VOLUME_60M.js（0 只命中）」
+#      而同批 strategy_four_volume.py 写的是 runner 工作区 …\data\FOUR_VOLUME.js。
+#      → 站点 data/FOUR_VOLUME_60M.js 自 09-08 起静默冻结 3 天，rc=0、链级零告警。
+#      产物必须**始终落在本仓库 ROOT/data**：跨机行为一致，杜绝机器相关分叉。
+DATA_DIR = os.environ.get("V8_DATA_DIR") or os.path.join(ROOT, "data")
 os.makedirs(DATA_DIR, exist_ok=True)
+
+
+class ScanUnavailable(RuntimeError):
+    """扫描**未能执行**（活跃股池为空 / baostock 不可用）—— 与「真的扫完了但命中 0 只」严格区分。
+
+    🔴 2026-09-11 主人令（选项A：软告警→硬告警）：两者必须分开处置，否则「没扫成」会被
+    写成「今天没有信号」的假 0 产物。
+    """
 
 # ── 导入日线版的信号计算引擎（纯数学，周期无关）──
 from strategy_four_volume import (  # noqa: E402
@@ -200,8 +210,9 @@ def scan_four_volume_60m(top_cy=80, top_kc=80, top_zb=80, top_hk=0):
     """
     stocks = fetch_volume_top_stocks(top_cy, top_kc, top_zb, top_hk=0)
     if not stocks:
-        print("  ⚠️ 活跃股池为空，四量终极 60min 扫描跳过")
-        return []
+        # 🔴 2026-09-11：股池为空 = 数据源断连/限流，**不是**「今天没有信号」→ 抛专用异常，
+        #   由 main() 判为「扫描未能执行」（硬失败），绝不写出 0 只命中的假产物。
+        raise ScanUnavailable("活跃股池为空（mootdx 失败 + 东方财富限流/冷却，数据源断连）")
 
     hits = []
     total = len(stocks)
@@ -211,8 +222,7 @@ def scan_four_volume_60m(top_cy=80, top_kc=80, top_zb=80, top_hk=0):
     try:
         _bs_login()
     except Exception as e:
-        print(f"  ⚠️ baostock 无法启动，60min 扫描终止: {e}")
-        return []
+        raise ScanUnavailable(f"baostock 无法启动: {e}")
 
     for s in stocks:
         code, name, market, board_label = s[0], s[1], s[2], s[3]
@@ -440,24 +450,40 @@ def main():
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
+    # 显式回声产物去向：任何机器上都能从 CI 日志一眼确认写到了哪个仓库
+    print(f"  [60m] DATA_DIR={DATA_DIR}")
     records = []
     try:
         records = scan_four_volume_60m(top_cy=args.top, top_kc=args.top,
                                        top_zb=args.top)
+    except ScanUnavailable as e:
+        # 🔴 2026-09-11 主人令·一劳永逸（选项A：软告警→硬告警）
+        #   「扫描未能执行」时**绝不写出 0 只命中的新鲜产物** —— 那是把「没扫成」
+        #   伪装成「今天没有信号」的假数据（违背「不得造假」）。
+        #   2026-09-11 实证：cn runner 上 mootdx 失败 + 东财限流冷却 300s → 股池 0 只，
+        #   脚本仅跑 11 秒即打印「✅ 写出 …（0 只命中）」，rc=0 → 链级零告警、烂满 3 天。
+        #   现行：保留上次真实产物 + 退出码 1 → 进 raw_data/algo_run_report.json 失败账本
+        #   → 健康检查 FOUR_VOLUME_60M 走 24h 红线亮红灯，人可见。
+        print(f"  🛑 四量终极60m 扫描未能执行：{e}")
+        print(f"     → 保留上次真实产物（不写假 0），本脚本以退出码 1 上报失败")
+        return records, 1
     except Exception as e:
-        # 🛡 2026-09-03 一劳永逸：扫描异常也要写出带新鲜时间戳的产物，避免
-        #   data/FOUR_VOLUME_60M.js 冻结在上一跑、被运维按陈旧判 fail（静默冻结根因）。
+        # 🛡 2026-09-03 一劳永逸（保留）：扫描中途异常仍写出带新鲜时间戳的产物，
+        #   避免 data/FOUR_VOLUME_60M.js 冻结在上一跑；但以退出码 1 上报失败（原先静默 rc=0）。
         print(f"  [ERROR] 四量终极60m扫描异常: {e}")
-    # 🛡 2026-09-03 一劳永逸：无论命中多少只（含 0 只）都写出带新鲜时间戳的产物，
-    #   不再「跳过写入保留上次」——那种写法正是 data/FOUR_VOLUME_60M.js 静默冻结的根因。
+        write_four_volume_60m_js(records)
+        return records, 1
+    # ✅ 扫描**真的执行完毕**（命中数含 0 只）→ 写出带新鲜时间戳的产物
+    #   （2026-09-03 一劳永逸口径不变：真 0 命中也是有效结论，照样刷新）
     write_four_volume_60m_js(records)
     if args.backtest > 0:
         try:
             backtest_four_volume_60m(years=args.backtest)
         except Exception as e:
             print(f"  [WARN] 60m 回测失败: {e}")
-    return records
+    return records, 0
 
 
 if __name__ == "__main__":
-    main()
+    _records, _rc = main()
+    sys.exit(_rc)

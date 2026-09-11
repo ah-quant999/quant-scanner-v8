@@ -58,6 +58,12 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   （脚本自述冷启动 50-90min；热缓存后分钟级）。
     "v8/factor_lab_gen.py": 5400,
     "v8/backtest_crds.py": 3600,            # CRDS 回测：逐只回测，给 1h 预算 （2026-09-09 挂链时补）
+    # 🛡 2026-09-11 一劳永逸（主人令·选项A）：四量终极 60min 此前**未登记预算** → 走默认 1800s。
+    #   它是全链少数走 baostock 独立数据源 + 逐只拉 120 根 60min K 线的脚本（冷缓存慢），
+    #   240 只逐只取数在源抖动时极易超过 30min → 被监督器硬超时杀 → 产物写不出。
+    #   注意：被杀与「源不可用秒退」是两种不同故障，登记预算只解决前者，后者由
+    #   ScanUnavailable 硬失败上报（见该脚本 main()）。给足 90min 余量。
+    "strategy_four_volume_60m.py": 5400,
     # 🛡 2026-09-11 一劳永逸：以下 5 个实验/研究卡脚本从 v8_cn_fetch_experiments.yml
     #   正式收编进 B 批链尾（详见 ORDER / STAGES["B"] 注释）。均为纯本地计算或
     #   单接口调用（不遍历全 universe），给 900s 足够余量；显式登记避免走默认 1800s
@@ -589,11 +595,13 @@ _FINAL_RECOMMEND_INPUTS = {
 #   否则最终推荐用陈旧四量汇总（"逻辑不对"根因）。这两脚本直接写 data/*.js（不经 out/，无需 stage）。
 # 🛡 2026-09-10 主人令（一劳永逸·硬等待）：final_recommend 实际读 data/FOUR_VOLUME_60M.js（60min），
 #   四量终极卡读 data/FOUR_VOLUME.js（日线）。二者必须本轮回合新鲜产出，否则最终推荐用陈旧四量汇总（"逻辑不对"根因）。
-#   - FOUR_VOLUME_60M.js：保持软告警（加分因子，final_recommend.py 已做 60m 非今日→回退日线版降级）。
+#   - FOUR_VOLUME_60M.js：🔴 2026-09-11 起 = 【硬告警·计败不阻断】——陈旧时计入失败账本
+#     （algo_run_report.json），但不阻断 final_recommend（final_recommend.py 已做
+#      「60m 非今日 → 回退日线版」降级）。
 #   - FOUR_VOLUME.js（日线版，主信号源）：升级为【硬等待】——见 _final_recommend_gate，非今日则重跑生成器并等待，
 #     超时才拒绝产出（绝不用陈日落盘汇总）。主人 19:52 拍板："盘后算的才有效，算法链停下等重算出来再继续"。
 _FINAL_RECOMMEND_DATA_INPUTS = {
-    "FOUR_VOLUME_60M.js": ("strategy_four_volume_60m.py", False),  # 软告警（加分因子）
+    "FOUR_VOLUME_60M.js": ("strategy_four_volume_60m.py", False),  # 硬告警·计败不阻断
 }
 
 
@@ -685,16 +693,30 @@ def _final_recommend_gate(run_start):
         其本身为「加分因子，独立于日线版」，final_recommend.py 已做「60m 非今日→回退日线版」
         降级（见 final_recommend.py L289-302）。baostock 60min 源常滞后（曾陈旧到 8/22），
         列硬门控会反复阻断整轮最终推荐，反而让站点长期展示更旧的 FINAL_RECOMMEND（违背「不得造假」本意）。
-        故：核心选股输入硬门控，四量软告警；四量陈旧的告警仍打印，但 final_recommend 照常产出。"""
+        故：核心选股输入硬门控，四量软告警；四量陈旧的告警仍打印，但 final_recommend 照常产出。
+    🔴 2026-09-11 主人令（选项A）：四量 60m 由「软告警」升级为【硬告警·计败不阻断】——
+        仍不阻断 final_recommend（理由同上），但陈旧必计入 FAILED_SCRIPTS →
+        raw_data/algo_run_report.json，使运维面板/健康检查可见。"""
     print(f"\n  🚦 final_recommend 就绪门控（核心选股输入硬门控 + 四量终极为加分因子软告警）")
     # (1) 先把本轮 out/ 产物搬运到 raw_data/，使 out-依赖输入新鲜
     _stage_out_to_raw()
     # 核心选股输入：硬门控（缺失/陈旧且重跑仍失败 → 拒绝产出）
     ok_raw, bad_raw = _gate_ensure_inputs(_FINAL_RECOMMEND_INPUTS, os.path.join(V8_ROOT, "raw_data"), run_start)
-    # 四量终极 60m：软告警（脚本自带回退，陈旧不阻断整轮）
+    # 四量终极 60m：🔴 2026-09-11 主人令（选项A：软告警 → 硬告警）
+    #   **仍不阻断** final_recommend（脚本自带「60m 非今日 → 回退日线版」降级，
+    #   2026-08-31 已实证硬门控会反复阻断整轮推荐、反而让站点展示更旧的 FINAL_RECOMMEND），
+    #   但**必须计入失败账本**：写进 raw_data/algo_run_report.json 的 failed_scripts
+    #   → 运维面板红灯 + 健康检查可见，杜绝「静默烂 3 天无人喊」。
     _, bad_data = _gate_ensure_inputs(_FINAL_RECOMMEND_DATA_INPUTS, os.path.join(V8_ROOT, "data"), run_start, soft=True)
     if bad_data:
-        print(f"  ⚠️ 四量 60m 输入陈旧(软告警，final_recommend 将回退日线版，不阻断): {', '.join(bad_data)}")
+        print(f"  🔴 四量 60m 输入陈旧【硬告警·计败不阻断】: {', '.join(bad_data)}")
+        print(f"     （final_recommend 将回退日线版 FOUR_VOLUME.js；本项已计入失败账本）")
+        FAILED_SCRIPTS.append(
+            ("strategy_four_volume_60m.py",
+             f"四量60m 输入陈旧（{'、'.join(bad_data)}）——已回退日线版，计为失败项")
+        )
+    else:
+        print(f"  ✅ 四量 60m 输入为本轮新鲜产出")
     # 🛡 2026-09-10 主人令：四量终极其日线版【硬等待】——必须今日新鲜，否则停等重算，超时拒绝产出
     if not _gate_hardwait_four_volume(run_start):
         print(f"  🛑 四量终极其日线版等待超时仍非今日，拒绝产出最终推荐（避免陈日落盘汇总）")
