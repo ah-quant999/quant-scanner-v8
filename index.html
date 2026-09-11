@@ -2516,6 +2516,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     <!-- ===== TAB 页面：🧭 选股池（2026-08-29 主人令：从盘后数据·已下架迁至选股策略子页；2026-08-30 移到首位并改为点击展开） ===== -->
     <div id="st-pool" class="st-pane active">
+      <!-- ===== 2026-09-11 主人令：金股池卡片置于「观测候选股池」上方（数据源 GOLD_POOL）===== -->
+      <div class="card" style="border-left:4px solid #fbbf24;">
+        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">⭐</span>金股池 <span id="stGoldPoolTime">—</span> <span id="stGoldPoolSlot" style="font-size:11px;color:var(--sub);font-weight:400">累计信号池 · 盘后</span></h3>
+        <div id="stGoldPoolSummary" class="tp-stocklist"></div>
+        <div id="stGoldPoolList" class="tp-stocklist"></div>
+        <div id="stGoldPoolMore" style="display:none;margin:6px 0 4px;">
+          <button id="stGoldPoolMoreBtn" onclick="window.toggleStGoldPool()" style="background:transparent;color:#fbbf24;border:1px solid #fbbf24;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">▾ 展开更多</button>
+        </div>
+        <div class="note">口径：候选池 ∩ (信号共振≥2 或 研报来源)；45 个交易日后自动出池。按累计信号降序，默认展示前 36 只。</div>
+      </div>
       <div class="card" style="border-left:4px solid #f9a8d4;">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🧭</span>观测候选股池 <span id="stPoolTime">—</span> <span id="stPoolSlot" style="font-size:11px;color:var(--sub);font-weight:400">上游水源 · 盘后</span></h3> <!-- 2026-09-06 审计修复：选股池是初筛池非信号策略，与文档口径一致不挂星级 -->
         <div id="stPoolSourceDist" class="tp-stocklist"></div>
@@ -6430,6 +6440,112 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="card" style="margin-bottom:16px;border-left:3px solid var(--gold)">
       <h3><span class="ic">🧾</span>审计轨迹 <span class="fresh" id="auditTrailTime">—</span></h3>
       <div id="auditTrailBody"><div style="font-size:12px;color:var(--dim)">等待审计数据…</div></div>
+    </div>
+
+    <!-- ═══════════ 🔑 凭证台账 · 到期提醒（2026-09-11 主人令：知识星球/邮箱/mahoro 各一条，快过期亮灯找主人拿新的） ═══════════ -->
+    <div class="card" style="margin-bottom:16px;border-left:3px solid var(--pink)">
+      <h3><span class="ic">🔑</span>凭证台账 · 到期提醒 <span class="fresh" style="font-size:10px;color:var(--dim)">[登记静态 · 亮灯动态]</span></h3>
+      <div id="credBanner" style="font-size:12px;font-weight:700;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:var(--bg2);border:1px solid var(--border)">加载中…</div>
+      <table>
+        <thead><tr><th>凭证</th><th>用途 / 换新方式</th><th>存放位置</th><th>上次续期</th><th>剩余</th><th>状态 / 提醒</th></tr></thead>
+        <tbody id="credLedgerBody"><tr><td colspan="6" style="font-size:12px;color:var(--dim)">加载中…</td></tr></tbody>
+      </table>
+      <div class="note">⏰ 口径：<b>剩余 ≤ 7 天亮黄灯、已超期亮红灯</b>，届时按「换新方式」找主人拿新值。换新后只改下方登记表里的 <code>updated</code>（YYYY-MM-DD），剩余天数与灯色自动重算。<b>本卡只登记位置与日期，不含任何凭据内容</b>；带「推定」的到期日来自历史记录，仅供参考。服务端不提供到期日的凭证，按「建议复核周期」倒计时。</div>
+      <script>
+      (function(){
+        var WARN_DAYS = 7;
+        // ── 凭证登记表（换新后只改这里）──────────────────────────────
+        //   updated : 最近换新日期 YYYY-MM-DD（用于按 cycle 倒计时）
+        //   cycle   : 建议复核周期（服务端不给到期日时的保守经验值）
+        //   expires : 已知真实到期日 YYYY-MM-DD（有则优先，覆盖 cycle 口径）
+        var CREDS = [
+          { name:'知识星球 token',
+            use:'外资研投研报抓取（观澜台 → 候选池）',
+            where:'本地 data/zsxq_token.json · 云端 Secret ZSXQ_TOKEN',
+            local:true, cloud:true,
+            updated:'2026-09-11', cycle:30, expires:'',
+            how:'wx.zsxq.com 登录 → DevTools → Application → Cookies → 复制 zsxq_access_token' },
+          { name:'QQ 邮箱授权码',
+            use:'全站邮件告警出口（2814546@qq.com）',
+            where:'.workbuddy/v8_smtp_config.json（小九 · 阿狸咪各一份，不跨机同步）',
+            local:true, cloud:false,
+            updated:'2026-09-11', cycle:90, expires:'',
+            how:'QQ邮箱 → 设置 → 账户 → 开启 SMTP 服务 → 生成授权码（16 位小写字母）' },
+          { name:'mahoro cookie',
+            use:'机构研究 insights / maharo 数据源',
+            where:'云端 Secret MAHORO_COOKIE（本机无本地 cookie）',
+            local:false, cloud:true,
+            updated:'', cycle:30, expires:'2026-10-09', expire_note:'推定·据 09-10 记录 days_left=29',
+            how:'找主人拿新 cookie' }
+        ];
+        function _pd(s){
+          if (!s) return null;
+          var p = String(s).split('-');
+          if (p.length !== 3) return null;
+          var d = new Date(+p[0], (+p[1]) - 1, +p[2]);
+          return isNaN(d.getTime()) ? null : d;
+        }
+        function _today(){
+          var n = new Date();
+          return new Date(n.getFullYear(), n.getMonth(), n.getDate());
+        }
+        function _dot(on){
+          return '<span class="status-dot" style="' +
+            (on ? 'background:var(--down);box-shadow:0 0 6px var(--down)' : 'background:var(--dim);box-shadow:none') +
+            '"></span>';
+        }
+        function _status(c){
+          var exp = _pd(c.expires), upd = _pd(c.updated), left = null;
+          if (exp) left = Math.round((exp - _today()) / 86400000);
+          else if (upd && c.cycle) left = c.cycle - Math.round((_today() - upd) / 86400000);
+          if (left === null) return { left:null, cls:'s-warn', txt:'❓ 未登记续期日 —— 请补录 updated', remain:'—' };
+          var remain = left > 0 ? ('剩 ' + left + ' 天') : ('超期 ' + (-left) + ' 天');
+          if (left > WARN_DAYS) return { left:left, cls:'s-ok',   txt:'正常',                                remain:remain };
+          if (left > 0)         return { left:left, cls:'s-warn', txt:'⏳ 临近到期（' + left + ' 天）—— 找主人拿新的', remain:remain };
+          return                       { left:left, cls:'s-err',  txt:'🔴 已超期 —— 立即找主人拿新的',        remain:remain };
+        }
+        function render(){
+          var tb = document.getElementById('credLedgerBody');
+          var bn = document.getElementById('credBanner');
+          if (!tb || !bn) return;
+          var rows = '', need = [], minL = null, minN = '';
+          for (var i = 0; i < CREDS.length; i++){
+            var c = CREDS[i], st = _status(c);
+            if (st.left === null || st.left <= WARN_DAYS) need.push(c.name);
+            if (st.left !== null && (minL === null || st.left < minL)) { minL = st.left; minN = c.name; }
+            rows += '<tr>'
+              + '<td><b>' + c.name + '</b>'
+              + (c.expires ? '<div style="font-size:10px;color:var(--dim);margin-top:3px">' + (c.expire_note || '') + '</div>' : '')
+              + '</td>'
+              + '<td>' + c.use + '<div style="font-size:11px;color:var(--dim);margin-top:3px">换新：' + c.how + '</div></td>'
+              + '<td style="font-size:12px">' + c.where
+              + '<div style="font-size:11px;color:var(--dim);margin-top:3px">' + _dot(c.local) + '本地 &nbsp; ' + _dot(c.cloud) + '云端</div></td>'
+              + '<td>' + (c.updated || '—') + '</td>'
+              + '<td>' + st.remain + '</td>'
+              + '<td><span class="status-dot ' + st.cls + '"></span>' + st.txt + '</td>'
+              + '</tr>';
+          }
+          tb.innerHTML = rows;
+          if (!need.length){
+            bn.innerHTML = '✅ 凭证 ' + CREDS.length + ' 项全部在有效周期内'
+              + (minN ? '（最近到期：' + minN + (minL > 0 ? ' 剩 ' + minL + ' 天' : ' 已超期') + '）' : '');
+            bn.style.background = 'var(--bg2)';
+            bn.style.borderColor = 'var(--border)';
+            bn.style.color = 'var(--down)';
+          } else {
+            bn.innerHTML = '⚠️ ' + need.length + ' 项凭证需处理：' + need.join(' / ') + ' —— 找主人拿新的';
+            bn.style.background = 'rgba(251,191,36,.10)';
+            bn.style.borderColor = 'var(--gold)';
+            bn.style.color = 'var(--gold)';
+          }
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
+        else render();
+        window.addEventListener('load', render);
+        setTimeout(render, 1200);
+        window.__v8CredLedgerRender = render;
+      })();
+      </script>
     </div>
 
     <!-- ═══════════════ 📋 静态配置区（部署时写入/手动维护） ═══════════════ -->
@@ -11470,6 +11586,8 @@ window.showRestrictedItems = showRestrictedItems;
     // 确保 op 标签的 DATA.*（逆势龙头读取的共享数据源）已从 window.X 填充
     if(tab!=='tc'){ try{ if(window.__renderOps) window.__renderOps(); }catch(e){} }
     if(tab==='tc'){ initTriple(); }
+    else if(tab==='pool'){ /* 2026-09-11 补齐：pool 原无分支 → 重试路径永不重渲（金股池+选股池一起） */
+      try{ if(window.renderStPoolAll) window.renderStPoolAll(); }catch(e){ console.warn('选股池渲染失败',e); } }
     else if(tab==='crds'){ if(!stRendered.crds){ stRendered.crds=1; try{ window.renderV8Crds('st'); }catch(e){console.warn('逆势龙头渲染失败',e);} } }
     else if(tab==='fv'){ /* 跨脚本块：必须走 window，裸调用会 ReferenceError（2026-08-07 修） */
       if(!stRendered.fv){ stRendered.fv=1; }
@@ -11479,8 +11597,8 @@ window.showRestrictedItems = showRestrictedItems;
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
     ['tc','fv','crds','pool','life'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
-    // 2026-08-29 主人令：选股池子页渲染
-    if(n==='pool' && typeof window.renderStPool==='function') setTimeout(window.renderStPool, 30);
+    // 2026-08-29 主人令：选股池子页渲染（2026-09-11：并入金股池卡片，统一走 renderStPoolAll）
+    if(n==='pool' && typeof window.renderStPoolAll==='function') setTimeout(window.renderStPoolAll, 30);
     if(n==='life' && typeof window.__renderLifecycleSection==='function') setTimeout(window.__renderLifecycleSection, 30);
     if(n==='life' && typeof window.__renderImaStrongStock==='function') setTimeout(window.__renderImaStrongStock, 30);
     if(n==='life' && typeof window.__renderStrongBreakout==='function') setTimeout(window.__renderStrongBreakout, 30);
@@ -11493,7 +11611,7 @@ window.showRestrictedItems = showRestrictedItems;
   //   （tc/rps 已有同类自愈，此处补齐剩余三 tab）。方案：按各 tab 数据源就绪态轮询补渲，最多 15 次（~10s，覆盖 defer 加载窗口）。
   window.__stRetryTab=function(n){
     var _map={
-      pool:function(){return !!(window.CANDIDATE&&(window.CANDIDATE.stocks||window.CANDIDATE.source_dist));},
+      pool:function(){return !!(window.CANDIDATE&&(window.CANDIDATE.stocks||window.CANDIDATE.source_dist))&&!!window.GOLD_POOL;},  // 2026-09-11：金股池卡片并入 pool 子页，需 GOLD_POOL 就绪
       tc:function(){return !!(window.TRIPLE_CONSENSUS||window.TRIPLE_TRACK);},
       crds:function(){return !!window.CRDS_CARD_DATA;},
       life:function(){return !!(window.V8_POOL_TRACKER&&window.V8_POOL_TRACKER.items&&window.V8_POOL_TRACKER.items.length);}
@@ -11519,6 +11637,99 @@ window.showRestrictedItems = showRestrictedItems;
   //     1. "更新时间" 总 pill（取最旧的算法 update_time，避免给"还差一个"的假绿色）
   //     2. 就绪状态 pill（4 状态全到位 → 绿色 / 否则金色)
   // 2026-08-29 主人令：选股池子页渲染；2026-08-30 主人令：来源分布行点击展开个股明细（默认折叠）
+  // ===== 2026-09-11 主人令：金股池卡片（置于「观测候选股池」上方）=====
+  //   数据源 window.GOLD_POOL（update_v8 注入的 lite：stocks 已裁 history，保留 latest 聚合）
+  //   口径与盘后 scanner 一致：候选池 ∩ (信号共振≥2 或 研报来源)，45 交易日过期。
+  var _goldPoolExpanded = false;
+  function renderStGoldPool(){
+    const $ = id => document.getElementById(id);
+    const gp = window.GOLD_POOL || {};
+    const raw = (gp.stocks && typeof gp.stocks === 'object') ? gp.stocks : {};
+    const list = Object.keys(raw).map(function(k){ return Object.assign({_key:k}, raw[k] || {}); })
+      .sort(function(a,b){
+        return (b.signal_count||0)-(a.signal_count||0)
+            || (b.max_signal||0)-(a.max_signal||0)
+            || String(a.code||'').localeCompare(String(b.code||''));
+      });
+
+    // 时间胶囊（与选股池口径统一：盘后 · 中长线）
+    const tEl = $('stGoldPoolTime');
+    const ts = gp.update_time || gp.last_update || '';
+    if(tEl){
+      try{
+        tEl.innerHTML = window._uBadge ? window._uBadge('盘后','中长线', ts)
+          : ((window._fmtAshareRel && window._fmtAshareRel(ts)) || String(ts).slice(0,16).replace('T',' '));
+      }catch(e){ tEl.textContent = String(ts).slice(0,16).replace('T',' '); }
+    }
+
+    const sumEl = $('stGoldPoolSummary'), listEl = $('stGoldPoolList'), moreWrap = $('stGoldPoolMore');
+    if(!list.length){
+      if(sumEl) sumEl.innerHTML = '';
+      if(listEl) listEl.innerHTML = '<div class="note" style="text-align:center;">金股池数据暂不可用</div>';
+      if(moreWrap) moreWrap.style.display = 'none';
+      return;
+    }
+
+    if(sumEl){
+      const ge2 = list.filter(s=>(s.signal_count||0)>=2).length;
+      const ge3 = list.filter(s=>(s.signal_count||0)>=3).length;
+      const res = list.filter(s=>(s.sources||[]).some(x=>String(x).indexOf('研报')>=0)).length;
+      const lastIn = list.map(s=>String(s.first_date||'')).sort().pop() || '--';
+      const pill = (txt,color)=>'<span style="background:'+color+'1a;color:'+color+';border:1px solid '+color+'4d;border-radius:4px;padding:2px 7px;white-space:nowrap;">'+txt+'</span>';
+      sumEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:4px 0 10px;font-size:12px;">'
+        + pill('⭐ 在池 <b>'+list.length+'</b> 只','#fbbf24')
+        + pill('共振≥2 <b>'+ge2+'</b>','#60a5fa')
+        + pill('共振≥3 <b>'+ge3+'</b>','#fbbf24')
+        + (res ? pill('研报来源 <b>'+res+'</b>','#94a3b8') : '')
+        + '<span style="color:var(--dim);margin-left:auto;">最近入池 '+lastIn+'</span>'
+        + '</div>';
+    }
+
+    const limit = _goldPoolExpanded ? list.length : 36;
+    const sigColor = s => (s>=3 ? '#fbbf24' : (s>=2 ? '#60a5fa' : 'var(--dim)'));
+    let h = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;">';
+    list.slice(0, limit).forEach(function(s){
+      const board = s.board_label || '';
+      const sig = s.signal_count||0, mx = s.max_signal||0;
+      const l = (s.latest && typeof s.latest === 'object') ? s.latest : {};
+      const flags = [];
+      if(l['缠论买_日K']) flags.push('缠论买');
+      if(l['金钻_黄柱']) flags.push('金钻黄柱');
+      if(l['金钻_起涨']) flags.push('金钻起涨');
+      if(l['四量图_机构变红']) flags.push('机构变红');
+      if(l['三线共振']) flags.push('三线共振');
+      if(l['上涨趋势']) flags.push('上涨趋势');
+      h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;">';
+      h += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;row-gap:3px;">';
+      h += '<span style="font-weight:700;color:var(--txt);">'+(s.name||s.code||'')+'</span>';
+      h += '<span style="color:var(--dim);font-size:10px;font-family:monospace;">'+(s.code||'')+'</span>';
+      if(board) h += '<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(99,102,241,.15);color:#a5b4fc;">'+board+'</span>';
+      h += '<span style="margin-left:auto;font-weight:700;color:'+sigColor(sig)+';">信号 '+sig+'</span>';
+      if(mx > sig) h += '<span style="font-size:10px;color:var(--dim);">峰值 '+mx+'</span>';
+      h += '</div>';
+      if(flags.length) h += '<div style="margin-top:4px;font-size:10.5px;color:var(--sub);">'+flags.join(' · ')+'</div>';
+      const src = (s.sources||[]).filter(x=>String(x).indexOf('成交前')<0).join(' / ');
+      h += '<div style="margin-top:3px;font-size:10.5px;color:var(--dim);">入池 '+(s.first_date||'--')+(src?(' · '+src):'')+'</div>';
+      h += '</div>';
+    });
+    h += '</div>';
+    if(listEl) listEl.innerHTML = h;
+    if(moreWrap){
+      moreWrap.style.display = list.length > 36 ? 'block' : 'none';
+      const btn = $('stGoldPoolMoreBtn');
+      if(btn) btn.textContent = _goldPoolExpanded ? '▴ 收起' : ('▾ 展开更多（共 '+list.length+' 只）');
+    }
+  }
+  window.renderStGoldPool = renderStGoldPool;
+  window.toggleStGoldPool = function(){
+    _goldPoolExpanded = !_goldPoolExpanded;
+    renderStGoldPool();
+  };
+  // 选股池子页统一渲染入口：金股池（上）+ 观测候选股池（下）
+  window.renderStPoolAll = function(){
+    try{ renderStGoldPool(); }catch(e){ try{ console.warn('[金股池] 渲染失败', e); }catch(_){} }
+    try{ renderStPool(); }catch(e){ try{ console.warn('[选股池] 渲染失败', e); }catch(_){} }
+  };
   function renderStPool(){
     const $ = id => document.getElementById(id);
     const cand = window.CANDIDATE || {};

@@ -286,6 +286,12 @@ def _make_lite(name, obj):
         lite = {k: v for k, v in obj.items() if k != 'stocks'}
         stocks_lite = {}
         for sid, s in obj.get('stocks', {}).items():
+            # 2026-09-11：history 被裁剪后 latest 常为 null（老条目无 latest 字段）→
+            # 前端金股池卡片拿不到「最近一日信号」。改为 history[-1].latest > history[-1] 兜底，
+            # 保证卡片能显示缠论买/金钻/机构变红/上涨趋势/三线共振等最新信号（不新增文件体积源）。
+            _hist = s.get('history') or []
+            _last = _hist[-1] if (_hist and isinstance(_hist[-1], dict)) else None
+            _latest = s.get('latest') or ((_last or {}).get('latest') if _last else None) or _last
             stocks_lite[sid] = {
                 'code': s.get('code'),
                 'name': s.get('name'),
@@ -297,7 +303,7 @@ def _make_lite(name, obj):
                 'max_signal': s.get('max_signal'),
                 'signal_count': s.get('signal_count'),
                 'sources': s.get('sources'),
-                'latest': s.get('latest'),
+                'latest': _latest,
                 'industry': s.get('industry'),
                 'sectors': s.get('sectors'),
                 'concepts': s.get('concepts'),
