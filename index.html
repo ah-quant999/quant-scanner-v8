@@ -8866,6 +8866,8 @@ window.__renderV8CalFull();
     //   原始 isOut 红/绿二分导致 12 条线全一样色，完全分不清；
     //   改为按板块名 hash 到 64 色调色板（djb2 hash + 防同分布），主人一眼区分。
     //   颜色回退（最后一段）仍按"红涨绿跌"提示方向（见最后一段数据正负）。
+    // 🎨 2026-09-11 主人令：暗色底禁用灰色系（#3f3f46/#52525b/#71717a/#a8a29e 看不清），
+    //   全部替换为鲜亮高对比度色（荧光青/品红/金黄/青绿），保证深色背景每条线清晰可辨。
     var _SF_PALETTE=['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f97316',
                      '#6366f1','#84cc16','#06b6d4','#a855f7','#d946ef','#0ea5e9','#22c55e',
                      '#eab308','#0891b2','#7c3aed','#fb7185','#facc15','#4f46e5','#34d399',
@@ -8873,8 +8875,8 @@ window.__renderV8CalFull();
                      '#4338ca','#9333ea','#c026d3','#0d9488','#ea580c','#65a30d','#0891b2',
                      '#0284c7','#059669','#ca8a04','#a16207','#9d174d','#1d4ed8','#166534',
                      '#7e22ce','#a21caf','#0e7490','#c2410c','#854d0e','#92400e','#831843',
-                     '#155e75','#166534','#0f766e','#0c4a6e','#075985','#3f3f46','#52525b',
-                     '#71717a','#a8a29e','#f87171','#facc15','#4ade80','#67e8f9','#c4b5fd',
+                     '#155e75','#166534','#0f766e','#0c4a6e','#075985',
+                     '#22d3ee','#f472b6','#a3e635','#67e8f9','#c4b5fd',
                      '#f9a8d4','#86efac','#fcd34d','#7dd3fc'];
     function _sfHashIdx(name){
       // 双 hash（FNV-1a + sdbm）+ length prime mix。21 个候选板块 64 色调色板足以保证全 unique。
@@ -8910,7 +8912,7 @@ window.__renderV8CalFull();
       var color=_sfPickColor(name);
       return {
         name:name, type:'line', smooth:true, data:data, showSymbol:false,
-        lineStyle:{width:2.0, color:color, opacity:0.85},
+        lineStyle:{width:2.0, color:color, opacity:0.95},
         itemStyle:{color:color},
         emphasis:{focus:'series', lineStyle:{width:3.2}},
         connectNulls:true
