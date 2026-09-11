@@ -329,11 +329,13 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
             "signal": "yellow",
         })
 
-    # 3. ETF 资金流向（宽基/行业）
+    # 3. ETF 资金流向（宽基/行业/主题/跨境/商品/策略；排除货币/债券/其他）
     if etf_heat and "categories" in etf_heat:
         cats = etf_heat["categories"]
-        # 找出净流入/流出最大的分类
-        cat_nets = [(n, c.get("net_inflow_yi", 0)) for n, c in cats.items()]
+        relevant_types = {"宽基", "行业", "主题", "跨境", "商品", "策略"}
+        # 🛡 兼容旧结构（list）与新结构（dict with net_inflow_yi）
+        cat_nets = [(n, cats[n].get("net_inflow_yi", 0)) for n in relevant_types
+                    if n in cats and isinstance(cats[n], dict)]
         cat_nets.sort(key=lambda x: x[1], reverse=True)
         if cat_nets and cat_nets[0][1] >= 5:
             top_cat, top_val = cat_nets[0]
@@ -354,6 +356,21 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
                 "text": text,
                 "color": "gold",
                 "signal": "red",
+            })
+
+    # 3b. ETF 真实行业资金 TOP5（2026-09-11 主人令：按真行业写）
+    if etf_heat and etf_heat.get("industry_flow"):
+        top5 = etf_heat["industry_flow"][:5]
+        if top5:
+            text = "ETF 真实行业资金 TOP5：" + "、".join(
+                f"{x['name']} {x['net_inflow_yi']:+.1f}亿" for x in top5
+            )
+            anomalies.append({
+                "tag": "ETF行业资金",
+                "emoji": "🏭",
+                "text": text,
+                "color": "gold",
+                "signal": "green" if top5[0].get("net_inflow_yi", 0) > 0 else "red",
             })
 
     # 4. 概念热点（前 5）
