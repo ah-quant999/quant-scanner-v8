@@ -2189,9 +2189,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="limitUpHeatContent" class="limit-up-content">加载中…</div>
     </div>
 
-    <!-- ETF 三合一（盘中异动 + 资金热度 + 日监控，纵向三联） -->
+    <!-- ETF 二合一（盘中异动 + 资金热度，纵向双联）
+         🚚 2026-09-11 主人令：原 Block 3「日监控·主力净流入」已迁至「盘后数据」页（市场宽度卡上方），
+              故本卡由「三合一」改为「二合一」。 -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">💰</span>ETF 三合一 - 盘中异动 + 资金热度 + 日监控 · <span class="fresh" id="phEtfTime">—</span></h3>
+      <h3><span class="ic">💰</span>ETF 二合一 - 盘中异动 + 资金热度 · <span class="fresh" id="phEtfTime">—</span></h3>
       <div id="etfAnalysis" class="limit-up-analysis" style="display:none;margin-bottom:12px;"></div>
 
       <!-- Block 1: 盘中异动·量能脉冲 (顶, T+0) -->
@@ -2209,23 +2211,27 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         </div>
       </div>
 
-      <!-- 📊 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 主人令：放到 ETF 三合一 Block 3 上方 与下方主力日监控 T+0 联动） -->
+      <!-- 📊 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 主人令：与「主力日监控」T+0 联动） -->
       <div class="card" style="margin-bottom:16px">
-        <h3><span class="ic">📈</span>主力净额分时累计曲线 - 盘中每30分快照 · <span class="fresh" id="sfIntradayTime">—</span> <span style="font-size:10px;color:#a78bfa;font-weight:600">↕ 与下方主力日监控 T+0 联动</span></h3>
+        <h3><span class="ic">📈</span>主力净额分时累计曲线 - 盘中每30分快照 · <span class="fresh" id="sfIntradayTime">—</span> <span style="font-size:10px;color:#a78bfa;font-weight:600">↕ 与「盘后数据」页 主力日监控 T+0 联动</span></h3>
         <!-- 🛡 2026-08-19 主人令一劳永逸修复：legend div 加底部分隔线 + 下边距，与下方 ECharts 图表彻底视觉隔离；
              并把快照时间范围（旧的 ECharts title 文字）搬进 legend 文本，删除 ECharts 内冗余 title 以减少图表上方空白。 -->
         <div id="sfIntradayLegend" style="display:flex;flex-wrap:wrap;gap:6px 10px;padding:8px 10px 10px;margin-bottom:6px;font-size:11px;color:#cbd5e1;border-bottom:1px solid rgba(71,85,105,.35)"></div>
         <div id="sfIntradayChart" style="width:100%;height:420px;"><div class="ipo-empty">加载中…</div></div>
       </div>
 
-      <!-- Block 3: 日监控·主力净流入 (底, T+0·盘后定基) -->
-      <div class="sf-block sf-block-trend">
-        <div class="sf-block-title"><span class="sf-block-icon">📊</span>日监控·主力净流入 <span style="font-size:10px;color:var(--dim);font-weight:600">T+0·盘后定基（盘前空·盘中累积·15:10/15:30 定基）</span></div>
-        <div id="etfDailyBlock"><div class="ipo-empty">加载中…</div></div>
-      </div>
-      <div class="note">盘中异动=ETF 5 分钟量能脉冲异动；资金热度=宽基 ETF 净申赎份额趋势；日监控=全市场 ETF 当日主力净流入排名（盘后定基）。三者维度互补，不构成重复。</div>
+      <!-- 🚚 2026-09-11 主人令：原 Block 3「日监控·主力净流入」迁出至「盘后数据」页（市场宽度卡上方）——
+            容器 id="etfDailyBlock" 与函数 renderEtfDaily() 不变，仅 DOM 位置移动。 -->
+      <div class="note">盘中异动=ETF 5 分钟量能脉冲异动；资金热度=宽基 ETF 净申赎份额趋势。二者维度互补，不构成重复（原第三段「日监控」已移至盘后数据页）。</div>
 
           </div>
+
+    <!-- 💹 商品涨价弹性榜（🚚 2026-09-11 主人令：由「运维→已下架·盘后观测」迁回实时数据页，主力净额分时累计曲线卡下方。
+         容器 id="ceBody" / 时间戳 id="prCEFresh" 不变；渲染仍走 _fillCommodityElasticity + 本页 ceBody 永久自愈轮询（14226 行起），数据 COMMODITY_ELASTICITY（盘后·短线）。） -->
+    <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
+      <h3><span class="ic">💹</span>商品涨价弹性榜 <span class="fresh" id="prCEFresh">—</span></h3>
+      <div id="ceBody"><div class="note">加载中…</div></div>
+    </div>
 
     <!-- 概念资金热力图 · 大小=净流入 · 颜色=涨跌 -->
     <div class="card" style="margin-bottom:16px">
@@ -2452,15 +2458,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 
 
-    <!-- 板块资金趋势（v6 风格移植：盘中追热 + 收盘复盘 + 周期定位） -->
+    <!-- 板块资金趋势（v6 风格移植：收盘复盘 + 周期定位）
+         🗑 2026-09-11 主人令：Block1「盘中追热」整块删除——
+              行业/概念净额榜与 AI市场速览重复，已改由「AI市场速览」承载
+              （概念行前 5 + 新建「行业资金」行，见 algorithms/gen_market_brief.py），此处不再重复展示。
+              注意：renderSector() 已同步删除 Block1 渲染与 sfBlock1 依赖，勿再引入。 -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">📈</span>板块资金趋势 · <span class="fresh" id="phSectorTime">—</span></h3>
-
-      <!-- Block 1: 盘中追热 -->
-      <div class="sf-block sf-block-hot">
-        <div class="sf-block-title"><span class="sf-block-icon">🚀</span>盘中追热<span style="display:inline-flex;align-items:center;padding:1px 7px;border-radius:6px;font-size:10.5px;font-weight:600;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.3);margin-left:6px;white-space:nowrap">盘中实时</span></div>
-        <div id="sfBlock1"><div class="ipo-empty">加载中…</div></div>
-      </div>
 
       <!-- Block 2: 收盘复盘 -->
       <div class="sf-block sf-block-close">
@@ -2474,6 +2478,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div id="sfBlock3"><div class="ipo-empty">加载中…</div></div>
       </div>
 
+    </div>
+
+    <!-- 🚚 日监控·主力净流入（2026-09-11 主人令：自「实时数据」页 ETF 三合一 Block3 迁来，置于市场宽度卡上方）
+         容器 id="etfDailyBlock" 与 renderEtfDaily() 保持不变，仅 DOM 位置移动；跨页与「实时数据」页主力净额分时曲线 T+0 联动。 -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📊</span>日监控·主力净流入 <span style="font-size:10px;color:var(--dim);font-weight:600">T+0·盘后定基（盘前空·盘中累积·15:10/15:30 定基）</span> <span style="font-size:10px;color:#a78bfa;font-weight:600">↕ 与「实时数据」页 主力净额分时曲线 T+0 联动</span></h3>
+      <div id="etfDailyBlock"><div class="ipo-empty">加载中…</div></div>
     </div>
 
     <!-- 市场宽度：52周新高广度 -->
@@ -8457,56 +8468,18 @@ window.__renderV8CalFull();
 
   /* ~~ 已下架：资金流时间轴 MARKET_FUND_FLOW_DATA（2026-08-16 主人令） ~~ */
 
-  /* ---- 5. 板块资金三合一（盘中追热 + 收盘复盘 + 周期定位） ---- */
+  /* ---- 5. 板块资金趋势（收盘复盘 + 周期定位；原 Block1「盘中追热」已于 2026-09-11 删除） ---- */
   function renderSector(sf){
     const sff = window.SECTOR_FUND_FLOW || {};
     const sft = window.SECTOR_FUND_FLOW_TREND || {};
     const sr  = window.SECTOR_RS || {};
     const fmt = v => (v >= 0 ? '+' : '') + num(v, 1);
-    const $b1 = $('sfBlock1'), $b2 = $('sfBlock2'), $b3 = $('sfBlock3');
-    if (!$b1 || !$b2 || !$b3) return;
-
-    // 申万一级白名单（渲染端兜底，剔除二/三级子行业避免净额重复计入）
-    const SW_LV1_NAMES = new Set([
-      '农林牧渔','基础化工','钢铁','有色金属','电子','家用电器','食品饮料','纺织服饰',
-      '轻工制造','医药生物','公用事业','交通运输','房地产','商贸零售','社会服务','综合',
-      '建筑材料','建筑装饰','电力设备','机械设备','国防军工','汽车','美容护理','石油石化',
-      '煤炭','环保','传媒','计算机','通信','银行','非银金融'
-    ]);
-    const _isSwLv1 = s => !!(s && s.name && SW_LV1_NAMES.has(s.name));
-
-    // ── Block 1: 盘中追热 ──
-    const sffIn = (sff.sectors_in || []).slice(), sffOut = (sff.sectors_out || []).slice();
-    const hasSff = sffIn.length + sffOut.length > 0;
-    if (hasSff) {
-      const indIn = sffIn.filter(s => s.type === '行业' && _isSwLv1(s));
-      const indOut = sffOut.filter(s => s.type === '行业' && _isSwLv1(s));
-      const totalIn = indIn.reduce((a, b) => a + (b.net || 0), 0);
-      const totalOut = Math.abs(indOut.reduce((a, b) => a + (b.net || 0), 0));
-      const net = totalIn - totalOut;
-      const netColor = net > 0 ? 'var(--up)' : net < 0 ? 'var(--down)' : 'var(--dim)';
-      let h1 = '';
-      h1 += '<div class="sf-net-big"><span class="n" style="color:' + netColor + '">' + (net > 0 ? '+' : '') + net.toFixed(1) + '</span><span class="u" style="color:' + netColor + '">亿</span><span class="lbl" title="按申万一级行业 31 个口径：流入 ' + totalIn.toFixed(1) + '亿 - 流出 ' + totalOut.toFixed(1) + '亿（剔除二/三级子板块，避免重复计入）">净额(行业·SW1)</span></div>';
-
-      const iTop = sffIn.filter(s => s.type === '行业').slice(0, 5);
-      const cTop = sffIn.filter(s => s.type === '概念').slice(0, 5);
-      const oTop = sffOut.slice(0, 3);
-      h1 += '<div style="display:flex;flex-wrap:wrap;gap:14px;font-size:13px;line-height:1.8;">';
-      if (iTop.length) {
-        h1 += '<div style="flex:1 1 45%;min-width:260px;"><b style="color:#fb923c">📊 行业流入 TOP5</b><br>' + iTop.map(s => s.name + ' <b style="color:var(--up)">+' + s.net.toFixed(1) + '亿</b>').join(' / ') + '</div>';
-      }
-      if (cTop.length) {
-        h1 += '<div style="flex:1 1 45%;min-width:260px;"><b style="color:#38bdf8">🚀 概念流入 TOP5</b><br>' + cTop.map(s => s.name + ' <b style="color:var(--up)">+' + s.net.toFixed(1) + '亿</b>').join(' / ') + '</div>';
-      }
-      if (oTop.length) {
-        h1 += '<div style="flex:1 1 45%;min-width:260px;"><b style="color:var(--down)">🔻 流出 TOP3</b><br>' + oTop.map(s => s.name + ' <b style="color:var(--down)">' + s.net.toFixed(1) + '亿</b>').join(' / ') + '</div>';
-      }
-      h1 += '</div>';
-      $b1.innerHTML = h1;
-    } else {
-      const note = sff.note || '盘前板块数据待开盘刷新，开盘后自动更新';
-      $b1.innerHTML = '<div style="text-align:center;padding:16px;color:var(--dim)">⏳ ' + note + '</div>';
-    }
+    // 🗑 2026-09-11 主人令：Block1「盘中追热」整块删除（DOM + 渲染 + 申万一级白名单 + 大数口径一并移除）。
+    //   行业/概念资金榜改由「AI市场速览」承载（概念行前 5 + 新建「行业资金」行，见 algorithms/gen_market_brief.py）。
+    //   ⚠️ 旧写法 `const $b1=…; if (!$b1 || !$b2 || !$b3) return;` 会因 sfBlock1 已不存在而整函数早退，
+    //      连「收盘复盘 / 周期定位」一起不渲染 —— 此处只校验 Block2/3。
+    const $b2 = $('sfBlock2'), $b3 = $('sfBlock3');
+    if (!$b2 || !$b3) return;
 
     // ── Block 2: 收盘复盘 ──
     const sftIn = (sft.sectors_in || []).slice(), sftOut = (sft.sectors_out || []).slice();
@@ -9210,7 +9183,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(daily.update_time) setBadge('phEtfTime',_slotNow,'短线',daily.update_time);
   }
 
-  /* ---- ETF 三合一·三段式分析说明（对标涨停热力矩阵） ---- */
+  /* ---- ETF 二合一·盘面分析说明（对标涨停热力矩阵；原三段式含「日监控」，该块已迁盘后数据页） ---- */
   function renderEtfAnalysis(pulse, heat, daily){
     var el=document.getElementById('etfAnalysis');
     if(!el) return;
@@ -10168,7 +10141,7 @@ function drawUpDownChart(){
 
           {name:'期指主力合约', source:'CFFEX_HOLDINGS', freq:'盘中每30分', slots:['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'IF/IC/IM 主力合约（intraday 刷新，2026-08-31 迁回实时数据页）；胶囊改小内部一行'},
 
-          {name:'宏观数据速览', source:'MACRO_DATA', freq:'每日盘前', slots:['08:25'], note:'LPR / M2 / CPI / PMI / 中美利差 / VIX / 商品；胶囊改小内部一行'},
+          {name:'宏观数据速览', source:'MACRO_DATA', freq:'盘前+盘后', slots:['08:25','17:20'], note:'LPR / M2 / CPI / PMI / 中美利差 / VIX / 商品；日级/月级数据不随盘中实时刷（2026-09-11 主人令移出 intraday）；胶囊改小内部一行'},
 
           {name:'解禁日历', source:'RESTRICTED_RELEASE', freq:'每日盘前', slots:['08:25'], note:'未来 7/30/60/90 天限售股解禁；列表排除今日并按日期升序'},
 
@@ -11186,7 +11159,7 @@ window.showRestrictedItems = showRestrictedItems;
     //   不挂带具体时间的 🐻 胶囊；时间统一在下属各子卡片上展示）
     // 原代码曾在 rtUpdateTime 拼一个 max(intradayTimes) 的胶囊徽章,已删除。
 
-    // 1) ETF 三合一（盘中异动/资金热度/日监控）—— 直接用已注入的 window 变量
+    // 1) ETF 二合一（盘中异动/资金热度）+ 盘后页「日监控·主力净流入」—— 直接用已注入的 window 变量
     safe(renderEtfPulse, window.ETF_PULSE || {});
     safe(renderEtfHeatByCategory, window.ETF_INTRADAY_HEAT || {});
     safe(renderEtfDaily, window.ETF_DAILY_MONITOR || {});
@@ -13117,10 +13090,8 @@ if(_fib2.windows&&_fib2.windows.length){
   h+=`<div class="note" style="text-align:center;">已下架数据暂不可用</div>`;
 }
 h+=`</div>`;
-    h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
-      <h3><span class="ic">💹</span>商品涨价弹性榜 <span class="fresh" id="prCEFresh">—</span></h3>
-      <div id="ceBody"><div class="note">加载中…</div></div>
-    </div>`;
+    /* 🚚 2026-09-11 主人令：商品涨价弹性榜已迁回「实时数据」页（主力净额分时累计曲线卡下方），
+       不再在「已下架」渲染；容器/自愈链不变（见实时数据区 14226 行起）。 */
 
     /* ===== 📊 盘中 ===== */
 h+='<div style="background:linear-gradient(135deg,rgba(56,189,248,.18),rgba(56,189,248,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#38bdf8;border-radius:8px;margin:16px 0 10px 0;">📊 盘中（实时页指标）</div>';
@@ -13272,9 +13243,9 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     try{ if(window.drawAmountChart) window.drawAmountChart(); }catch(e){console.warn("已下架·成交额渲染失败",e);}
     try{ if(window.drawUpDownChart) window.drawUpDownChart(); }catch(e){console.warn("已下架·涨跌家数渲染失败",e);}
 
-    /* 2026-08-29 主人令：下沉盘后观测卡渲染（斐波那契窗口 + 商品涨价弹性榜） */
+    /* 2026-08-29 主人令：下沉盘后观测卡渲染（斐波那契窗口）；
+       🚚 2026-09-11 主人令：商品涨价弹性榜迁回实时数据页，此处调用删除（自愈链照常覆盖） */
     try{ if(window.renderFib) window.renderFib(window.SH_FIB||{}); }catch(e){console.warn("已下架·斐波那契渲染失败",e);}
-    try{ if(typeof window._fillCommodityElasticity==='function') window._fillCommodityElasticity(); }catch(e){console.warn("已下架·商品涨价弹性榜渲染失败",e);}
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderDelisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
   }
 
