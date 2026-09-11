@@ -3,14 +3,17 @@
 """
 v8 Pre-deploy audit（CI 自动门禁，2026-09-05 主人令一劳永逸落地）
 ================================================================
-目的：每次云端 build/deploy 前自动跑 4 项校验，任何一项失败 → 阻断 deploy。
+目的：每次云端 build/deploy 前自动跑 **5** 项校验，任何一项失败 → 阻断 deploy。
 等同「改后三件套」固化为 CI step，不再依赖人工记忆流程。
 
-四项校验：
+五项校验：
   1. py_compile        —— 所有 *.py 文件 0 语法错误
   2. new Function      —— index.html 所有 inline <script> 0 语法错误（Node）
   3. 完整性核对        —— data/*.js 数量在合理范围（90~110，与 HEAD 对齐）
   4. align_logic_ops   —— 逻辑详解页与真 workflow 一致（EXIT 0）
+  5. workflow YAML     —— .github/workflows/*.yml 对 GitHub 真正有效
+                          （2026-09-11 新增：`3ce9dd972` 丢 run 块内一行缩进
+                          致整份 workflow 无效 → schedule 不触发/dispatch 被拒）
 
 退出码：
   0  全部通过
@@ -122,6 +125,72 @@ def check_align_logic_ops():
     return (True, "align_logic_ops EXIT 0（逻辑详解页与真 workflow 对齐）")
 
 
+def check_workflow_yaml():
+    """校验 .github/workflows/*.yml 对 GitHub **真正有效**。
+
+    🔴 2026-09-11 P0 血泪（#1771 实证）：`3ce9dd972` 在 `run: |` 块里丢了一行的
+    10 空格缩进 → YAML literal block scalar 在此终止 → 后文被当顶层键 → 整份
+    workflow 对 GitHub **无效**：run name 退回文件路径 / jobs=0 / 瞬时 failure，
+    进而 schedule 不触发、workflow_dispatch 被拒 = 「后面的出不来」。
+    注：这类损坏 py_compile 查不出、HTML 校验查不出、data 完整性查不出，
+    只有本项门禁能拦 —— 故 2026-09-11 新增。
+
+    双层校验（守本文件「纯标准库」铁律）：
+      层1 零依赖「顶层行合法性」扫描 —— 精准命中上述事故签名；
+      层2 若环境有 PyYAML，再做全量 safe_load 复核（CI 一般预装）。
+    """
+    wf_dir = ROOT / ".github" / "workflows"
+    if not wf_dir.exists():
+        return (True, "无 workflows 目录（跳过）")
+    files = sorted(list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml")))
+    if not files:
+        return (True, "无 workflow 文件")
+
+    # YAML 顶层合法形式：注释 / 文档分隔符 / %指令 / 键值 / 列表项
+    top_key = re.compile(r"""^(?:[A-Za-z_][\w.\-]*|'[^']+'|"[^"]+")\s*:(?:\s|$)""")
+    failed = []
+    for f in files:
+        try:
+            lines = f.read_text(encoding="utf-8").splitlines()
+        except Exception as e:
+            failed.append("%s: 读取失败 %s" % (f.name, e))
+            continue
+        for i, raw in enumerate(lines, 1):
+            s = raw.rstrip()
+            if not s.strip() or s.lstrip().startswith("#"):
+                continue
+            if raw[0] in " \t":          # 有缩进 → 属于某个块/嵌套，跳过
+                continue
+            if s in ("---", "...") or s.startswith("- ") or s.startswith("%"):
+                continue
+            if top_key.match(s):
+                continue
+            failed.append(
+                "%s:%d 顶层非法行（YAML 必崩，通常= run: | 块内丢了缩进）→ %r"
+                % (f.name, i, s[:70]))
+            break                      # 一个文件报一处即可
+
+    # 层2：有 PyYAML 则全量复核（无则静默降级，不破坏「纯标准库可用」）
+    try:
+        import yaml as _yaml
+    except Exception:
+        _yaml = None
+    if _yaml is not None:
+        for f in files:
+            try:
+                _yaml.safe_load(f.read_text(encoding="utf-8"))
+            except Exception as e:
+                msg = str(e).replace("\n", " ")[:110]
+                if not any(x.startswith(f.name + ":") for x in failed):
+                    failed.append("%s: YAML 解析失败 → %s" % (f.name, msg))
+
+    if failed:
+        return (False, "%d/%d 个 workflow 对 GitHub 无效:\n  - %s"
+                       % (len(failed), len(files), "\n  - ".join(failed[:4])))
+    tag = "PyYAML 全量" if _yaml is not None else "零依赖扫描"
+    return (True, "%d 个 workflow 全部有效（%s）" % (len(files), tag))
+
+
 def write_audit_log(results, exit_code):
     """落盘三件套审计轨迹到 raw_data/code_audit.log（append）。
     让「何时/谁跑过三件套」有据可查。*.log 已被 .gitignore 忽略 → 不入库、不污染工作树。
@@ -150,13 +219,14 @@ def write_audit_log(results, exit_code):
 
 def main():
     checks = [
-        ("[1/4] py_compile", check_py_compile),
-        ("[2/4] new Function", check_new_function),
-        ("[3/4] data 完整性", check_data_integrity),
-        ("[4/4] align_logic_ops", check_align_logic_ops),
+        ("[1/5] py_compile", check_py_compile),
+        ("[2/5] new Function", check_new_function),
+        ("[3/5] data 完整性", check_data_integrity),
+        ("[4/5] align_logic_ops", check_align_logic_ops),
+        ("[5/5] workflow YAML", check_workflow_yaml),
     ]
     print("=" * 60)
-    print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用）")
+    print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项）")
     print("=" * 60)
     fails = 0
     results = []
@@ -175,7 +245,7 @@ def main():
         for e in errors:
             print(f"  - {e}")
         sys.exit(1)
-    print("🎉 4 项全部通过 → deploy 可继续")
+    print("🎉 5 项全部通过 → deploy 可继续")
     sys.exit(0)
 
 
