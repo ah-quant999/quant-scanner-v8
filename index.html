@@ -2571,7 +2571,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <button id="stPoolOtherBtn" onclick="window.toggleStPoolOther()" style="background:transparent;color:var(--cyan);border:1px solid var(--cyan);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">▾ 展开其他来源（主板/创业板/科创板/港股）</button>
         </div>
         <div id="stPoolOtherList" class="tp-stocklist" style="display:none;"></div>
-        <div class="note">筛选：主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 外资研投(自选+研报)。三板合计≥280视为健康。</div>
+        <div class="note">筛选：主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 外资研投(自选+研报)；防抖：掉出前N仍留5交易日(MEMBER_HYSTERESIS_DAYS=5)。三板合计≥280视为健康。</div>
       </div>
     </div><!--/st-pool-->
 

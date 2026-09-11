@@ -235,7 +235,7 @@ ORDER = [
 #   下游 stage 的云端 run checkout main 即含上游当日产物。
 #   同 stage 内严格沿用 ORDER 相对次序（build_candidate_pool 在 calc_stock_rps 前等依赖不变）。
 STAGES = {
-    "A": [  # 数据采集批（~16:40 CST，龙虎榜16:30后）：纯 fetch + 上游自产前置
+    "A": [  # 数据采集批（~18:00 CST 后，受闸门 START_TRADING 约束；龙虎榜16:30后）：纯 fetch + 上游自产前置
         "fetch_fundamental_quality.py", "fetch_stock_names.py", "gen_stock_profile.py",
         "fetch_stock_quote_v8.py", "fetch_sh_index_fib.py", "fetch_inst_trade.py",
         "fetch_sector_rs.py", "fetch_lhb.py",

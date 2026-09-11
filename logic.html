@@ -1348,11 +1348,11 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p"><b>选股生命周期</b>（2026-09-04 主人拍板）：不做入选 source，二期转为<b>负向护栏</b>（只对已入选标的做剔除/降权，不做发现信号）——它管的是「已持有/已入选」的票，不是找新票。</div>
       <div class="card">
         <h3><span class="ic">🗓️</span>盘后算法链分批明细（A/B/D/E 各批跑什么 · 2026-09-09 主人令备忘）</h3>
-        <div class="logic-p">算法链按依赖顺序编排为 4 个按时触发的 stage，每 stage 独立触发、独立 timeout；同 stage 内严格沿用 ORDER 相对次序<b>串行</b>执行（批内无 sleep，背靠背跑）。跨 stage 产物经 main 分支传递：每 stage 跑完即 stage(out→raw_data)+push，下游 stage 的 run checkout main 即含上游当日产物。模块级强校验 <code>_STAGE_UNION == set(ORDER)</code>（共 42 条）保证分批模式不丢脚本。<b>concurrency 组 v8-algo-cloud，cancel-in-progress:false</b> —— 批间互不取消，长批(B)若越过 20:00 由 D 排队等待，绝不杀进程。</div>
+        <div class="logic-p">算法链按依赖顺序编排为 4 个按时触发的 stage，每 stage 独立触发、独立 timeout；同 stage 内严格沿用 ORDER 相对次序<b>串行</b>执行（批内无 sleep，背靠背跑）。跨 stage 产物经 main 分支传递：每 stage 跑完即 stage(out→raw_data)+push，下游 stage 的 run checkout main 即含上游当日产物。模块级强校验 <code>_STAGE_UNION == set(ORDER)</code>（共 46 条）保证分批模式不丢脚本。<b>concurrency 组 v8-algo-cloud，cancel-in-progress:false</b> —— 批间互不取消，长批(B)若越过 20:00 由 D 排队等待，绝不杀进程。</div>
         <table class="lg-table">
           <tr><th>批次</th><th>触发时点</th><th>脚本数</th><th>本批运行内容（按执行次序）</th><th>关键产物 / 说明</th></tr>
-          <tr><td><b>A 采集批</b></td><td>~16:40 CST</td><td>12</td><td>fetch_fundamental_quality / fetch_stock_names / gen_stock_profile / fetch_stock_quote_v8 / fetch_sh_index_fib / fetch_inst_trade / fetch_sector_rs / fetch_lhb / fetch_orphan_suspension / fetch_orphan_market_alerts / fetch_orphan_nt_data / fetch_orphan_sector_fund_flow</td><td>纯 fetch + 上游自产前置；龙虎榜 16:30 后数据齐</td></tr>
-          <tr><td><b>B 选股批</b></td><td>~18:10 CST</td><td>23</td><td><b>v8/factor_lab_gen.py（最前 · baostock 冷启动 50-90min）</b> → calc_crds / build_candidate_pool / calc_stock_rps / generate_top10 / strategy_four_volume_60m / strategy_four_volume / market_regime / sector_recommendation / update_triple_resonance_history / gen_triple_consensus / gen_triple_track / calc_volatility_watch / gen_stock_stop / gen_algo_track / calc_sentiment_cycle / refresh_dividend_cninfo / refresh_stock_metadata / fetch_weekend_run / auto_run_dn_algorithm / strong_breakout / track_h_auto_buy / gen_lhb_7d</td><td>🛡 2026-09-09 主人令：<b>因子实验室生成器前置到本批最前</b>，必须在 D 批 final_recommend 之前产完 FACTOR_LAB.js，因子融合才能吃当日新鲜因子（18:10 起跑→19:40 前产完，D 批必吃到）。B 批内其余脚本保持原相对次序不变</td></tr>
+          <tr><td><b>A 采集批</b></td><td>交易日 18:00 后（闸门硬约束）</td><td>12</td><td>fetch_fundamental_quality / fetch_stock_names / gen_stock_profile / fetch_stock_quote_v8 / fetch_sh_index_fib / fetch_inst_trade / fetch_sector_rs / fetch_lhb / fetch_orphan_suspension / fetch_orphan_market_alerts / fetch_orphan_nt_data / fetch_orphan_sector_fund_flow</td><td>纯 fetch + 上游自产前置；<b>含龙虎榜 fetch_lhb（属 A 批，非 B 批）</b>；A 就绪是 B 批门槛</td></tr>
+          <tr><td><b>B 选股批</b></td><td>A 就绪后 ~18:10 起</td><td>27</td><td><b>v8/factor_lab_gen.py（最前 · baostock 冷启动 50-90min）</b> → calc_crds / build_candidate_pool / calc_stock_rps / generate_top10 / strategy_four_volume_60m / strategy_four_volume / market_regime / sector_recommendation / update_triple_resonance_history / gen_triple_consensus / gen_triple_track / calc_volatility_watch / gen_stock_stop / gen_algo_track / calc_sentiment_cycle / refresh_dividend_cninfo / refresh_stock_metadata / fetch_weekend_run / auto_run_dn_algorithm / strong_breakout / track_h_auto_buy / scripts/fetch_ai_insights_compare / gen_factor_audit / gen_factor_progress / fetch_valuation_percentile / fetch_index_value_framework</td><td>🛡 2026-09-09 主人令：<b>因子实验室生成器前置到本批最前</b>，必须在 D 批 final_recommend 之前产完 FACTOR_LAB.js，因子融合才能吃当日新鲜因子（18:10 起跑→19:40 前产完，D 批必吃到）。B 批内其余脚本保持原相对次序不变；<b>候选股池</b>(build_candidate_pool) / <b>CRDS 含金股层</b>(calc_crds) / <b>TOP10</b>(generate_top10) 均在 B 批自产</td></tr>
           <tr><td><b>D 汇总批</b></td><td>~20:00 CST</td><td>1</td><td>final_recommend.py</td><td>跨策略共振 Top5（管线最终产物）。内置<b>因子实验室新鲜度门控</b>：等待 FACTOR_LAB.js 为当日新鲜最多 20min（正常 0 等待），超时仍不可用则<b>降级跳过融合</b>而非报错中断</td></tr>
           <tr><td><b>E 回测批</b></td><td>~21:00 CST</td><td>7</td><td>backtest_tdx / backtest_comprehensive / backtest_expectancy / export_optimized_strategy / factor_lab_backtest / v8/backtest_crds / strategy_four_volume</td><td>backtest 全家 + 因子实验室分层回测（生成器已在 B 批前置）；strategy_four_volume 经 SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js（根治孤儿）</td></tr>
         </table>
@@ -1375,10 +1375,20 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td>③ D 汇总</td><td>最终推荐 <b>1/1</b>（<code>FINAL_RECOMMEND_DATA.js</code>）· 仅 <code>final_recommend.py</code></td></tr>
           <tr><td>④ E 回测</td><td>回测产物<b>任一</b>（<code>CRDS_BACKTEST.js</code> / <code>BACKTEST_TDX.js</code>）· <b>7</b> 个脚本</td></tr>
         </table>
-        <div class="logic-h">两条铁律</div>
+        <div class="logic-h">✅ 全链成功定义（2026-09-11 主人令）</div>
+        <div class="logic-p">盘后链「成功」= <b>A→B→D→E 四批产物全部为当日新鲜</b> + <b>已推送 main</b> + <b>Pages 部署完成</b>。任一批失败即该轮失败：闸门 <code>stage_ok=false</code> → 红灯 + 拒绝下游 + <b>紧急邮件报告</b> 2814546@qq.com（由本地看门狗/patrol 发出，GitHub Actions 本身不发邮件）。失败不回退死等——下一唤醒点重新问闸门，按「缺哪批跑哪批」幂等续跑，直到四批全绿且部署上线才算成功。</div>
+<div class="logic-h">两条铁律</div>
         <div class="logic-p">① <b>跑哪批 =「缺什么跑什么」</b>：A 缺 → 跑 A；A 就绪 B 缺 → 跑 B；B 就绪 D 缺 → 跑 D；D 就绪 E 缺 → 跑 E；<b>全部就绪 → 空转（<code>target_stage=NONE</code>），不算失败</b>。闸门是幂等的——重复唤醒绝不抢跑。<br>
         ② <b>上游未就绪 → 红灯 + 拒绝执行 + 紧急报告</b>：绝不拿陈旧数据算下游。<code>stage_ok=false</code> 时闸门直接拒绝，<b>禁止 bypass、禁止人工指定 stage 硬跑</b>（含 A 批）。</div>
         <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>2026-09-10 加严「下游必须晚于上游」</b>：若 E 的产物早于 D 的产物（例如拿旧最终推荐算出来的新回测），闸门判 E <b>未就绪 → 重算</b>。此前只看「是否过了 16:30」，会出现「用旧 D 算出的新 E」被误判为就绪——现已闭环。同理，凌晨产物时间戳按「归前一日 24:xx」双候选解释，既正确匹配又不会每档重跑。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🎯</span>候选股池 / 金股池 入选标准（权威备忘 · 2026-09-11 主人令）</h3>
+        <div class="logic-h">候选股池（全站上游水源 · B 批 build_candidate_pool.py 产出）</div>
+        <div class="logic-p">· <b>主板 / 创业板 / 科创板</b>：各取当日<b>成交额前 100</b>。<br>· <b>港股</b>：成交额前 50。<br>· <b>外资研投</b>：自选 + 研报来源（永久 pinned，不随时间掉出）。<br>· <b>防抖</b>：<code>MEMBER_HYSTERESIS_DAYS=5</code>——掉出前 N 后仍保留 5 个交易日，避免单日波动误踢。<br>· 三板合计 ≥ 280 视为健康基线（主板+创业+科创各前 100）。</div>
+        <div class="logic-h">金股池（候选股的子集 · 口径：候选池 ∩ (信号共振≥2 或 研报来源)）</div>
+        <div class="logic-p">· 入选：已在候选股池内，且<b>信号共振 ≥ 2 路</b>（三重共识/四量/CRDS/强势突破/动量共识等任一组合）或<b>带研报来源</b>。<br>· <b>自动出池</b>：入选后 <code>GOLD_POOL_DAYS=45</code> 个交易日未再触发信号即出池。<br>· 排序：按累计信号数降序，默认展示前 36 只。<br>· 🔴 <b>刷新现状（2026-09-11 核查）</b>：金股池前端卡 / 个股命中标签 / CRDS 金股层仍在消费，但其唯一产出脚本 <code>scanner.py</code> 的 <code>save_gold_pool()</code> 未挂入云端盘后链 <code>ORDER/STAGES</code>，数据停在 09-11 阿狸咪手动救回的 184 只快照；<code>calc_crds.py</code> 期望的 <code>gold_pool_stocks.json</code> 全仓无任何脚本写出。→ <b>待修复</b>：将金股池派生并入 B 批（build_candidate_pool 产出后写 raw_data/gold_pool.json），恢复每日刷新。</div>
       </div>
 
       <div class="card">
@@ -1387,7 +1397,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <table class="lg-table">
           <tr><th>时点</th><th>谁唤醒</th><th>实际发生什么</th></tr>
           <tr><td>16:00-01:00 每小时 :10</td><td>本机「盘后算法链接力推进器」（阿狸咪）</td><td><b>实际主力</b>：先查无在跑 → 跑闸门 → 只按 <code>proceed</code> 派发（不带 stage / 不带 force_run）</td></tr>
-          <tr><td>16:40</td><td>cron 唤醒①</td><td>闸门判定：A 未就绪则跑 A；已就绪则空转</td></tr>
+          <tr><td>16:40</td><td>cron 唤醒①</td><td>闸门判定：<b>未到 18:00 盘后链起点 → 空转</b>；≥18:00 且 A 未就绪则跑 A；已就绪则空转</td></tr>
           <tr><td>17:20 / 18:20 / 19:20</td><td>cron <code>v8_cn_fetch_cloud</code> post_close</td><td>盘后三档抓取（龙虎榜 17:00 后发布，故 post_close 从 15:45 推迟到 17:20）</td></tr>
           <tr><td>17:30</td><td>cron <code>v8_lhb_fetch</code>（cn 双机）</td><td>当日龙虎榜落盘</td></tr>
           <tr><td>18:10</td><td>cron 唤醒②</td><td>闸门判定：A 就绪 B 缺 → 跑 B（含因子实验室 50-90min 冷启动）</td></tr>
@@ -1640,19 +1650,6 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
       </div>
 
       
-<div class="card">
-        <h3><span class="ic">🐂</span>大牛股猎手 - 说明 <span style="font-size:10px;color:#f59e0b;background:rgba(245,158,11,.12);padding:1px 6px;border-radius:4px">🗑️ 已下架（2026-09-02 迁至「已下架」一级 nav）</span></h3>
-        <div class="logic-h">定位</div>
-        <div class="logic-p">基于<b>龙虎榜上榜个股</b>（机构 + 游资净买卖）的「机游共振」中线策略，核心区分「一日游」与「真启动」。2026-08-08 从「共振日历」迁入「选股策略」独立 tab（原标题残留的「大牛股猎手」字样已清除，功能卡仅保留此处）。</div>
-        <div class="logic-h">三栏结构</div>
-        <div class="logic-p">· <b>🆕 新赛道发现</b>：当日行业净流入 TOP5（SECTOR_FUND_FLOW 行业类）<br>· <b>🔮 早期信号</b>：纯游资净买异动（游资净买&gt;0 且 机构净买≤0），按游资净买排序 TOP6<br>· <b>🔥 核心共振</b>：机构+游资双净买的「真启动」标的，按合计净买排序 TOP6</div>
-        <div class="logic-h">数据口径</div>
-        <div class="logic-p">机游共振来自 <code>LHB_DATA</code>（龙虎榜），<b>仅覆盖当日上榜异动股</b>，非全市场资金流；板块资金流为当日行业净流入。徽章与严格三重共识/四量终极同格式：🐻 盘后短线 + 🧺 MM-DD 已入仓 N（N=机构+游资双净买标的数）。</div>
-        <div class="logic-h">🔔 60min 动量延续（区分一日游 / 真启动）</div>
-        <div class="logic-p">大牛股猎手「聪明钱 + 60min 动量延续」评分说明（2026-09-03 已全方位下线，本说明保留作历史档案）。</div>
-        <div class="logic-h">使用边界</div>
-        <div class="logic-p">样本小、偏短线情绪，<b>不单独作为买点</b>；需结合三重共识等做买卖决策。完整机游/北向/每日洞察分析见顶部 🧲 共振日历。</div>
-      </div>
 
       
 <div class="card">

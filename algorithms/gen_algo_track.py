@@ -153,39 +153,6 @@ def _extract_four_volume():
     return signals
 
 
-def _extract_big_bull():
-    """从 raw_data/lhb_data.json 提取大牛股猎手信号（机构+游资双正）。
-    
-    数据源：龙虎榜 lhb_data.json → 与 final_recommend.py line 469-497 同逻辑
-    条件：inst_net_万 > 0 且 yz_net_万 > 0（机构净买入 & 游资净买入）
-    """
-    ld = _load_json(RAW / "lhb_data.json")
-    if not ld:
-        return []
-    signals = []
-    for s in ld.get("stocks", []):
-        inst = float(s.get("inst_net_万") or 0)
-        yz = float(s.get("yz_net_万") or 0)
-        if inst <= 0 or yz <= 0:
-            continue
-        code = s.get("code")
-        if not code:
-            continue
-        signals.append({
-            "code": str(code),
-            "name": s.get("name", ""),
-            "market": s.get("market", ""),
-            "algo": "big_bull",
-            "signal_date": ld.get("date") or _today_dashed(),
-            "inst_net_wan": inst,
-            "yz_net_wan": yz,
-            "category": s.get("category", ""),
-            "reason": f"机构{inst/10000:.1f}亿+游资{yz/10000:.1f}亿",
-            "close": s.get("close"),
-            "pct_chg": s.get("pct"),
-        })
-    return signals
-
 
 def _extract_from_final_rec(source_name):
     """从 FINAL_RECOMMEND_DATA.js 提取指定 source 的股票。"""
