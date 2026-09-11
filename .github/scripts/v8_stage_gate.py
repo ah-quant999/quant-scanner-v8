@@ -119,9 +119,16 @@ READY_SPEC: dict[str, dict] = {
             "raw_data/valuation_percentile.json",
             "raw_data/index_value_framework.json",
         ],
-        # need 用 5/8：3 个核心选股产物 + 5 个新收编产物中至少命中 2 个，
-        #   既覆盖新卡、又不在个别 fetcher 因上游限流失败时把整链锁死。
-        "need": 5,
+        # need 用 7/8：3 个核心选股产物 + 5 个收编产物，即「只容忍 1 项不新鲜」。
+        #   ⚠️ 为何不是 5：实测发现 dedup 去重器会把「内容天然稳定」的卡判为伪变更而丢弃
+        #   （见 .github/scripts/dedup_fetch_manifest.py 的 _ALWAYS_PUSH）。在去重器修好之前，
+        #   一轮 B 批跑完后线上只会有 3 核心 + 2 张（ai_insights/valuation_percentile）= 5/8。
+        #   若 need=5，闸门会据此判「B 已就绪」→ 空转 → 另 3 张（factor_audit /
+        #   factor_progress / index_value_framework）永远补不上 → 恒红。
+        #   need=7 使闸门在上述状态下判「未就绪」→ 再跑一轮 B → 去重修复生效后 8/8 → 收敛。
+        #   容错：8 项中唯一易碎的是 valuation_percentile（依赖 akshare 外部接口），
+        #   故 7 恰好容忍它单独失败而不把整链锁死。
+        "need": 7,
         "must": [],
     },
     "D": {"items": ["data/FINAL_RECOMMEND_DATA.js"], "need": 1, "must": []},
