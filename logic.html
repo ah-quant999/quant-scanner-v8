@@ -7764,7 +7764,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       var vEl=document.getElementById(p+'crdsMarketValidity'), pEl=document.getElementById(p+'crdsMarketPct'), sEl=document.getElementById(p+'crdsMarketSummary');
       if(mc.summary){
         vEl.textContent=mc.validity||'未知'; vEl.style.backgroundColor=mc.color||'#666';
-        pEl.textContent=mc.today_pct!=null?'上证 '+(mc.today_pct>=0?'+':'')+Number(mc.today_pct).toFixed(2)+'%':'';
+        pEl.textContent=mc.today_pct!=null?'综合强度 '+(mc.today_pct>=0?'+':'')+Number(mc.today_pct).toFixed(2)+'%':'';
         sEl.textContent=mc.summary; mcBox.style.borderLeftColor=mc.color||'var(--border)';
       }else{
         vEl.textContent='暂无数据';vEl.style.backgroundColor='#555';
@@ -7782,19 +7782,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     document.getElementById(p+'crdsCnt3').textContent=l3.length;
     fillList(document.getElementById(p+'crdsList1'),l1,'<span style="color:var(--dim);">今日无（10日≥2板稀疏信号）</span>');
     fillList(document.getElementById(p+'crdsList2'),l2,'<span style="color:var(--dim);">今日无（需近期大跌日）</span>');
-    // 待命中
-    var sb=document.getElementById(p+'crdsStandby');
-    if(sb){
-      if(l2.length===0){
-        sb.style.display='block';
-        var vv=mc.validity||'';
-        if(vv==='高有效'||vv==='较有效') sb.innerHTML='🟡 <b>当前无逆势板信号</b> — 今日大盘偏弱但暂无个股逆势涨停，CRDS 逆势模型持续监控中';
-        else if(vv==='有效') sb.innerHTML='🟢 <b>当前大盘震荡，暂无逆势板信号</b> — 震荡市 CRDS 可正常参考，模型持续监控中';
-        else if(vv==='低效') sb.innerHTML='⚠️ <b>市场偏强，CRDS 有效性降低</b> — 暂无需逆势龙头，信号参考意义有限';
-        else if(vv==='失效') sb.innerHTML='🔴 <b>今日大涨，逆势龙头不适用</b> — CRDS 参考意义极低';
-        else sb.innerHTML='⏳ <b>当前无暴跌日</b> — 近期上证无单日跌超 1.5% 的恐慌日，CRDS 逆势模型持续监控中';
-      }else{sb.style.display='none';}
-    }
     fillList(document.getElementById(p+'crdsList3'),l3,'<span style="color:var(--dim);">今日无</span>');
     // 精选/进阶（score=0 的占位项不展示，主人令：'没有的就删除'）
     var elite=(d.elite||[]).filter(function(s){return (s.score||0)>0;});
