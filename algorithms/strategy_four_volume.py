@@ -334,12 +334,22 @@ def write_four_volume_backtest_js(records, bt_summary=None, out_dir=DATA_DIR):
     by_period = {}
     if bt_summary:
         for k, v in (bt_summary.get("periods") or {}).items():
+            # 🔴 2026-09-11 主人令「真实回测，不得造假」根因修复（阿狸咪的工程师）：
+            #   原写 v.get("best", 0) / v.get("worst", 0) —— 但 backtest_four_volume
+            #   实际写出的键名是 **best_return / worst_return**，键名不匹配 ⇒ 永远取默认 0
+            #   ⇒ 前端「最佳/最差」恒 0.00%，真实值（实测 T+5 best=+121.73% /
+            #   worst=-24.74%）被静默丢弃；且 max_drawdown / sharpe_ratio 从未复制
+            #   ⇒ 前端「DD 0.00% / SR 0.00」亦是假 0。
+            #   另一条铁律：**未知一律 None，绝不用 0 冒充**（0=算出来真是 0，
+            #   None=没算；前端分别渲染 0.00% 与 —）。
             by_period[str(k).replace("d", "")] = {
-                "samples": v.get("count", 0),
-                "win_rate": v.get("win_rate", 0),
-                "avg_return": v.get("avg_return", 0),
-                "best_return": v.get("best", 0),
-                "worst_return": v.get("worst", 0),
+                "samples": v.get("count"),
+                "win_rate": v.get("win_rate"),
+                "avg_return": v.get("avg_return"),
+                "best_return": v.get("best_return"),
+                "worst_return": v.get("worst_return"),
+                "max_drawdown": v.get("max_drawdown"),
+                "sharpe_ratio": v.get("sharpe_ratio"),
             }
     method = "四量终极历史回测：信号日收盘价买入，持有N个交易日收盘价卖出"
     if not by_period:
@@ -463,8 +473,9 @@ j    - 前复权（fetch_a_daily 走 akshare/腾讯前复权，前端 np 已处�
             "win": a["win"], "loss": a["loss"], "draw": a["draw"],
             "win_rate": win_rate,
             "avg_return": avg_return,
-            "best_return": round(a["best"], 2) if c else 0,
-            "worst_return": round(a["worst"], 2) if c else 0,
+            # 无样本时写 None（不写 0）——0 会被前端画成「最佳 0.00%」，是假数据
+            "best_return": round(a["best"], 2) if c else None,
+            "worst_return": round(a["worst"], 2) if c else None,
             "max_drawdown": round(max_dd, 2),
             "sharpe_ratio": sharpe,
         }
@@ -524,8 +535,9 @@ def main():
                 "cost_bps_per_side": COST_BPS,
                 "cost_adjusted": True,
                 "periods": {
-                    k: {"count": 0, "samples": 0, "win_rate": 0, "avg_return": 0,
-                        "best_return": 0, "worst_return": 0, "max_drawdown": 0, "sharpe_ratio": 0}
+                    k: {"count": 0, "samples": 0, "win_rate": None, "avg_return": None,
+                        "best_return": None, "worst_return": None,
+                        "max_drawdown": None, "sharpe_ratio": None}
                     for k in ["1d", "3d", "5d", "10d", "20d"]
                 },
                 "method": f"四量终极历史回测：{e}",

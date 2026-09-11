@@ -232,6 +232,156 @@ def _advance_tracking(prev_tracking, qmap, today):
 
     return new_tracking, new_history
 
+# 🆕 2026-09-11 主人令「从近到远、慢慢跟踪」：分档前向收益档位。
+#   与「等 90 天 timeout 出场」不同，本口径**有多少天算多少天**：
+#   入场满 5 个交易日即出 T+5 样本，随时间推移逐档长出 T+10/T+20/…，无需期满。
+HORIZONS = [5, 10, 20, 30, 45, 60, 75, 90]
+COST_PCT = 0.3          # 双边成本%（与 backtest_* 系列同口径：15bp/边）
+_KCACHE = {}
+
+
+def _kcache_closes(code):
+    """raw_data/kline_cache/<code>.json → [(date, close)]，升序；不可用返回 None。
+
+    ⚠️ 该缓存是 tracked 产物（CI 检出即有，实测远端覆盖 104/108、末根多为当日）。
+    缺失/损坏一律返回 None 并打印原因（**不静默、不猜、不用 0 顶替**）。
+    """
+    c0 = str(code or "").strip().lower()
+    for pre in ("sh", "sz", "bj"):
+        if c0.startswith(pre):
+            c0 = c0[2:]
+            break
+    if c0 in _KCACHE:
+        return _KCACHE[c0]
+    cands = [c0]
+    if c0.isdigit() and len(c0) == 6:
+        cands.append(("sh" if c0[0] in "56" else "sz") + c0)
+    for c in cands:
+        p = RAW / "kline_cache" / f"{c}.json"
+        if not p.exists():
+            continue
+        try:
+            with open(p, encoding="utf-8") as fh:
+                bars = json.load(fh)
+            out = [(str(b.get("date")), float(b["close"]))
+                   for b in bars if b.get("date") and b.get("close") is not None]
+            out.sort()
+            _KCACHE[c0] = out or None
+            return _KCACHE[c0]
+        except Exception as e:
+            print(f"    ⚠️ kline_cache {c} 不可用: {e.__class__.__name__}")
+            _KCACHE[c0] = None
+            return None
+    _KCACHE[c0] = None
+    return None
+
+
+def _entry_dashed(item):
+    d = str(item.get("list_date_dashed") or "").strip()
+    if d:
+        return d
+    s = str(item.get("list_date") or "")
+    return f"{s[0:4]}-{s[4:6]}-{s[6:8]}" if len(s) == 8 else s
+
+
+def _series(item):
+    """该标的「入场日→今日」收盘序列 [(date, close)]，升序。**只取缓存日线**。
+
+    🔴 口径诚实铁律（2026-09-11 阿狸咪的工程师）：**绝不**把「缓存末日 → 今日实时价」
+    当成一个交易日接在序列尾部。缓存若落后 N 个交易日，这样接会把 N 天算成 1 天，
+    使 T+h 的 h 索引错位 → 产出的是假前向收益。
+    实时价只在 unrealized（当日浮动）使用，不参与档位计算。
+    """
+    d0 = _entry_dashed(item)
+    if not d0:
+        return []
+    bars = _kcache_closes(item.get("code"))
+    if bars:
+        return [b for b in bars if b[0] >= d0]
+    e = item.get("entry_price")
+    try:
+        e = float(e)
+    except (TypeError, ValueError):
+        return []
+    return [(d0, e)] if e else []
+
+
+def _horizon_stats(items, today_dashed, qmap):
+    """分档前向收益（从近到远）。口径：固定持有期，买入=入场日收盘，
+    卖出=入场后第 h 个交易日收盘，扣双边成本；不含中途止损止盈
+    （与 CRDS / RPS 回测同口径，故可比）。
+    样本不足的档位 samples=0，胜率/收益一律 None —— **绝不用 0 冒充「无样本」**。
+    返回 {"by_horizon": {...}, "unrealized": [...], "coverage": {...}}。
+    """
+    by, unreal = {}, []
+    n_items = 0
+    n_series = 0
+    last_seen = {}
+    for it in items:
+        try:
+            entry = float(it.get("entry_price"))
+        except (TypeError, ValueError):
+            continue
+        if entry == 0:
+            continue
+        n_items += 1
+        seq = _series(it)
+        if not seq:
+            continue
+        n_series += 1
+        last_seen[seq[-1][0]] = last_seen.get(seq[-1][0], 0) + 1
+        # 当日浮动：用实时价（取不到则退回收盘序列末值），**不参与档位计算**
+        q = qmap.get(str(it.get("code"))) or {}
+        px = q.get("close")
+        if px is None:
+            px = seq[-1][1]
+        try:
+            px = float(px)
+        except (TypeError, ValueError):
+            px = seq[-1][1]
+        unreal.append({
+            "code": it.get("code"), "name": it.get("name"),
+            "bars": len(seq),
+            "pct": round((px - entry) / entry * 100 - COST_PCT, 2),
+            "last_bar": seq[-1][0],
+        })
+        for h in HORIZONS:
+            if len(seq) <= h:
+                continue
+            pxh = seq[h][1]
+            by.setdefault(h, []).append(round((pxh - entry) / entry * 100 - COST_PCT, 2))
+
+    out = {}
+    for h in HORIZONS:
+        v = sorted(by.get(h) or [])
+        if not v:
+            out[str(h)] = {"samples": 0, "win_rate": None, "avg_return": None,
+                           "best_return": None, "worst_return": None,
+                           "median_return": None}
+            continue
+        win = sum(1 for x in v if x > 0)
+        loss = sum(1 for x in v if x < 0)
+        dec = win + loss
+        out[str(h)] = {
+            "samples": len(v),
+            "win_rate": round(win / dec * 100, 1) if dec else None,
+            "avg_return": round(sum(v) / len(v), 2),
+            "best_return": round(v[-1], 2),
+            "worst_return": round(v[0], 2),
+            "median_return": round(v[len(v) // 2], 2),
+        }
+    # 数据截至日 = 序列末根日期中出现最多的那个（诚实暴露缓存新鲜度）
+    asof = max(last_seen.items(), key=lambda kv: kv[1])[0] if last_seen else None
+    cov = {
+        "items": n_items,
+        "with_series": n_series,
+        "missing_cache": n_items - n_series,
+        "bar_asof": asof,
+        "t5_ready": out["5"]["samples"],
+        "t5_ready_pct": (round(out["5"]["samples"] / n_items * 100, 1) if n_items else None),
+    }
+    return {"by_horizon": out, "unrealized": unreal, "coverage": cov}
+
 
 def main():
     print(f"\n[gen_algo_track] {_now_cst():%Y-%m-%d %H:%M:%S}  单 algo（四量终极）追踪")
@@ -317,13 +467,19 @@ def main():
 
         # 计算 stats
         history_90d = [h for h in all_history if (h.get("exit_date") or "") >= cutoff_90d]
+        # 🆕 分档前向收益（追踪中 + 已出场 一起算，有多少天算多少天）
+        hz = _horizon_stats(new_tracking_list + history_90d, today_dashed, qmap)
         win = sum(1 for h in history_90d if h.get("exit_type") == "target")
         loss = sum(1 for h in history_90d if h.get("exit_type") == "stop")
         timeout = sum(1 for h in history_90d if h.get("exit_type") == "timeout")
         total_decided = win + loss
-        wr = round(win / total_decided, 4) if total_decided else 0
+        # 🔴 2026-09-11 主人令「真实回测，不得造假」：无历史样本时写 None 而不是 0。
+        #   原实现 else 0 → 前端把「还没样本」画成「0% 胜率 / 0.00% 收益」，属视觉假数据。
+        #   （history_samples 只在 target/stop 出场时增长，而当前唯一出场是 90 天
+        #    timeout ⇒ 上线以来一直是 0。真实前向收益请看 by_horizon。）
+        wr = round(win / total_decided, 4) if total_decided else None
         eps = [h.get("exit_pct") for h in history_90d if h.get("exit_pct") is not None]
-        avg_r = round(sum(eps) / len(eps), 2) if eps else 0
+        avg_r = round(sum(eps) / len(eps), 2) if eps else None
 
         algo_stats = {
             "tracking": len(new_tracking_list),
@@ -334,6 +490,11 @@ def main():
             "exit_stop": loss,
             "exit_timeout": timeout,
             "today_signals": len(signals),
+            # 🆕 2026-09-11 主人令：从近到远的分档前向收益（不必等 90 天期满）
+            "by_horizon": hz["by_horizon"],
+            "horizons": HORIZONS,
+            "cost_pct_roundtrip": COST_PCT,
+            "coverage": hz["coverage"],
         }
         total_stats[algo_key] = algo_stats
 
@@ -348,18 +509,26 @@ def main():
             "stats": algo_stats,
             "tracking": new_tracking_list,
             "history": history_90d,
+            # 🆕 未实现浮动盈亏：任何时刻都可见，不等任何档位
+            "unrealized": hz["unrealized"],
         })
 
     # ---- 5. 组装输出 ----
     result = {
         "update_time": _now_cst().strftime("%Y-%m-%d %H:%M"),
         "window_days": WINDOW_DAYS,
+        "horizons": HORIZONS,
+        "cost_pct_roundtrip": COST_PCT,
         "total_stats": total_stats,
         "algos": result_algos,
         "_meta": {
             "version": "v1",
             "schema_date": today_dashed,
-            "note": "三算法独立追踪；entry=信号日收盘，exit=timeout≥90天（stop/target待接止损数据）",
+            "note": ("单算法（四量终极）独立追踪；entry=信号日收盘；"
+                     "by_horizon=从近到远的分档前向收益 T+5…T+90（有多少天算多少天，"
+                     "只取 kline_cache 日线，扣双边 0.3%，不含中途止损止盈）；"
+                     "unrealized=当日浮动（用实时价）；coverage=样本就绪度；"
+                     "win_rate/avg_return 无历史样本时为 null（不是 0）"),
         },
     }
 
