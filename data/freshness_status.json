@@ -1,13 +1,8 @@
 {
-  "check_time": "2026-09-11 19:50:20",
+  "check_time": "2026-09-12 00:21:20",
   "last_trade_close": "2026-09-11 15:30:00",
-  "is_trading_day": true,
+  "is_trading_day": false,
   "core_stale": [
-    {
-      "var": "CANDIDATE_QUOTES",
-      "reason": "文件缺失",
-      "category": "post_close"
-    },
     {
       "var": "INDEX_HISTORY",
       "reason": "更新于 09-08 16:54，落后 4 个交易日（阈值 2）",
@@ -25,7 +20,7 @@
   "no_update_time": [],
   "summary": {
     "total_checked": 45,
-    "core_stale": 2,
+    "core_stale": 1,
     "warn_stale": 1,
     "frozen_stale": 0,
     "no_timestamp": 0
