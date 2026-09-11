@@ -2560,7 +2560,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div id="stGoldPoolMore" style="display:none;margin:6px 0 4px;">
           <button id="stGoldPoolMoreBtn" onclick="window.toggleStGoldPool()" style="background:transparent;color:#fbbf24;border:1px solid #fbbf24;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">▾ 展开更多</button>
         </div>
-        <div class="note">口径：候选池 ∩ (信号共振≥2 或 研报来源)；45 个交易日后自动出池。按累计信号降序，默认展示前 36 只。</div>
+        <div class="note">口径：候选池 ∩ (外资研投 或 多源共振≥2)；45 个交易日后自动出池。多源共振指同时命中候选池两个及以上来源（如主板前100 + 外资研投）。按累计信号降序，默认展示前 36 只。</div>
       </div>
       <div class="card" style="border-left:4px solid #f9a8d4;">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🧭</span>观测候选股池 <span id="stPoolTime">—</span> <span id="stPoolSlot" style="font-size:11px;color:var(--sub);font-weight:400">上游水源 · 盘后</span></h3> <!-- 2026-09-06 审计修复：选股池是初筛池非信号策略，与文档口径一致不挂星级 -->
@@ -13992,7 +13992,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 
 
 <!-- 2026-09-08 主人令：智能时段整页硬刷新兜底（与上方「数据变化即刷新」自愈互补）。
-     规则：① 交易日开盘时段 09:30-15:00 → 每 15 分钟；② 非开盘（盘后/午休/周末）→ 每 1 小时；
+     规则：① 交易日开盘时段 09:30-14:59 → 每 15 分钟；② 收盘后 / 午休 / 周末 / 非交易时段 → 每 1 小时；
            ③ 夜间 22:00-次日 07:00 → 不刷新。location.reload(true) 强制绕过所有缓存。 -->
 <script>
 (function(){

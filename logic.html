@@ -1387,8 +1387,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <h3><span class="ic">🎯</span>候选股池 / 金股池 入选标准（权威备忘 · 2026-09-11 主人令）</h3>
         <div class="logic-h">候选股池（全站上游水源 · B 批 build_candidate_pool.py 产出）</div>
         <div class="logic-p">· <b>主板 / 创业板 / 科创板</b>：各取当日<b>成交额前 100</b>。<br>· <b>港股</b>：成交额前 50。<br>· <b>外资研投</b>：自选 + 研报来源（永久 pinned，不随时间掉出）。<br>· <b>防抖</b>：<code>MEMBER_HYSTERESIS_DAYS=5</code>——掉出前 N 后仍保留 5 个交易日，避免单日波动误踢。<br>· 三板合计 ≥ 280 视为健康基线（主板+创业+科创各前 100）。</div>
-        <div class="logic-h">金股池（候选股的子集 · 口径：候选池 ∩ (信号共振≥2 或 研报来源)）</div>
-        <div class="logic-p">· 入选：已在候选股池内，且<b>信号共振 ≥ 2 路</b>（三重共识/四量/CRDS/强势突破/动量共识等任一组合）或<b>带研报来源</b>。<br>· <b>自动出池</b>：入选后 <code>GOLD_POOL_DAYS=45</code> 个交易日未再触发信号即出池。<br>· 排序：按累计信号数降序，默认展示前 36 只。<br>· 🔴 <b>刷新现状（2026-09-11 核查）</b>：金股池前端卡 / 个股命中标签 / CRDS 金股层仍在消费，但其唯一产出脚本 <code>scanner.py</code> 的 <code>save_gold_pool()</code> 未挂入云端盘后链 <code>ORDER/STAGES</code>，数据停在 09-11 阿狸咪手动救回的 184 只快照；<code>calc_crds.py</code> 期望的 <code>gold_pool_stocks.json</code> 全仓无任何脚本写出。→ <b>待修复</b>：将金股池派生并入 B 批（build_candidate_pool 产出后写 raw_data/gold_pool.json），恢复每日刷新。</div>
+        <div class="logic-h">金股池（候选股的子集 · 口径：候选池 ∩ (外资研投 或 多源共振≥2)）</div>
+        <div class="logic-p">· <b>入选</b>：已在候选股池内，且满足以下任一条件：<br>&nbsp;&nbsp;① <b>外资研投来源</b>（自选/研报）；<br>&nbsp;&nbsp;② <b>多源共振 ≥ 2</b>：同时命中候选池两个及以上不同来源（如主板成交前100 + 外资研投）。<br>· <b>自动出池</b>：入选后 <code>GOLD_POOL_DAYS=45</code> 个交易日未再触发口径即出池。<br>· <b>派生位置</b>：B 批 <code>build_candidate_pool.py</code> 产完候选池后即时派生，写入 <code>out/gold_pool.json</code> + <code>out/gold_pool_stocks.json</code> + <code>raw_data/gold_pool.json</code>，供 generate_top10 / calc_crds / 前端 GOLD_POOL.js 消费。<br>· <b>防洗空闸门</b>：stocks 为空时拒绝覆盖已有非空池（确需清空请设 <code>GOLD_POOL_FORCE_EMPTY=1</code>）。<br>· 排序：按累计信号数降序，默认展示前 36 只。<br>· ✅ <b>刷新状态（2026-09-11 修复）</b>：金股池已由 B 批 <code>build_candidate_pool.py</code> 原生派生，scanner.py 不再作为唯一产出路径，每日盘后链自动刷新。</div>
       </div>
 
       <div class="card">
@@ -1851,32 +1851,66 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">⏱ 刷新时间纪律（主人 2026-09-11 原话提炼）</div>
         <div class="logic-p">· <b>盘前链</b>：08:25 抓取、<b>9:15 前必须部署到位</b>；9:15 后 / 12:45 后均不再有盘前任务。<br>· <b>盘中链</b>：09:30-11:30 / 13:00-15:00 高频更新，通道最高优先级留给盘中。<br>· <b>午休</b>：11:30 上午最后一轮盘中上线后 → 12:45 之间空窗（没做完可续，做完可上，但不派新盘前 / 盘后）。<br>· <b>盘后链</b>：15:00 收盘后最后一轮盘中结束，才开<b>盘后更新组 + 算法链</b>上线。<br>· <b>铁律</b>：在哪个档就严格按时间刷，<b>时间到了就不要一直更新</b>。</div>
         <table class="lg-table">
-          <tr><th>链</th><th>时段</th><th>刷新纪律</th><th>数据源（window.X / data/X.js）</th></tr>
-          <tr><td>🟡 盘前链</td><td>08:25→9:15</td><td>9:15 前到位；盘中不更新</td><td><code>V8_CAL</code> <code>W52_HIGH</code> <code>ANALYST_RATINGS</code> <code>IPO_DATA</code> <code>MACRO_DATA</code> <code>MACRO_BRIEF</code> <code>MARGIN_DATA</code> <code>NORTH_FUND</code> <code>RESTRICTED_RELEASE</code> <code>PERFORMANCE_FORECAST</code> <code>SUSPENSION_ALERT</code> <code>NT_DATA</code> <code>ETF_NET_SUBSCRIPTION</code> <code>JUDGMENT_DATA</code> <code>CRISIS_DATA</code> <code>RISK_GAUGE</code>（建议·盘中实时）</td></tr>
-          <tr><td>🔴 盘中链</td><td>09:30-11:30<br>13:00-15:00</td><td>高频；午休空窗</td><td><code>INDEX_QUOTES</code> <code>AVG_PRICE_DATA</code> <code>CAPITAL_FLOW_DATA</code> <code>ETF_INTRADAY_HEAT</code> <code>ETF_PULSE</code> <code>CONCEPT_RANKING</code> <code>SECTOR_FUND_FLOW</code> <code>SECTOR_FUND_FLOW_INTRADAY</code> <code>LIMIT_UP_BROKEN</code> <code>LIMIT_UP_HEATMAP</code> <code>MARKET_ALERTS</code> <code>OVERSEAS_MARKETS</code> <code>CFFEX_HOLDINGS</code> <code>SH_SZ_HISTORY</code> <code>CANDIDATE_QUOTES</code> <code>AI_MARKET_BRIEF</code> <code>FOUR_VOLUME</code>（建议） <code>COMMODITY_ELASTICITY</code>（建议·今日迁回实时） <code>STOCK_QUOTE</code>（建议） <code>STOCK_MOMENTUM_STATE</code>（建议） <code>CONCEPT_ETF_MAP</code>（建议）</td></tr>
-          <tr><td>🔵 盘后链</td><td>15:00 后</td><td>收盘后上线；盘中不更新</td><td><code>LHB_DATA</code> <code>LHB_HISTORY</code> <code>SECTOR_RS</code> <code>SECTOR_FUND_FLOW_TREND</code> <code>SECTOR_RECOMMENDATION</code> <code>SECTOR_PHASE_HISTORY</code>（建议） <code>SH_FIB</code> <code>SZ_FIB</code> <code>CRDS_CARD_DATA</code> <code>CRDS_BACKTEST</code>（建议） <code>TRIPLE_CONSENSUS</code> <code>TRIPLE_HISTORY</code> <code>TRIPLE_TRACK</code> <code>CANDIDATE</code>（建议） <code>GOLD_POOL</code> <code>STRONG_BREAKOUT</code> <code>MOMENTUM_FILTER</code>（建议） <code>OPTIMIZED_STRATEGY</code>（建议） <code>PORTFOLIO</code>（建议） <code>STOCK_RPS</code> <code>STOCK_RPS_DATA</code> <code>BACKTEST_COMPREHENSIVE</code> <code>BACKTEST_TDX</code> <code>RPS_BACKTEST</code>（建议） <code>CITIC_PE_BACKTEST</code>（建议） <code>CITIC_PE_THERMO</code>（建议） <code>FACTOR_LAB</code> <code>FACTOR_LAB_BACKTEST</code> <code>FACTOR_AUDIT</code>（建议） <code>FACTOR_PROGRESS</code>（建议） <code>MARKET_REGIME</code> <code>INST_TRADE</code> <code>ALGO_TRACK</code> <code>V8_POOL_TRACKER</code> <code>ETF_DAILY_MONITOR</code> <code>IMA_STRONG_STOCK</code>（建议） <code>INDEX_VALUE_FRAMEWORK</code>（建议） <code>VALUATION_PERCENTILE</code>（建议） <code>UNLISTED_PANEL</code>（建议） <code>STOCK_STOP_DATA</code>（建议） <code>SENTIMENT_CYCLE</code>（建议） <code>WEEKEND_META_REPORT</code>（建议） <code>WEEKEND_RUN</code>（建议）</td></tr>
-          <tr><td>⚙ 运维 / 健康</td><td>常驻</td><td>不属三链</td><td><code>HEALTH_CHECK</code> <code>RUNNER_STATUS</code> <code>AUDIT_TRAIL</code> <code>DO_NOT_DELETE</code> <code>AI_INSIGHTS_COMPARE</code>（建议·洞察对比）</td></tr>
+          <tr><th>链</th><th>时段</th><th>刷新纪律</th><th>对应前端卡片 / 数据（括号内＝技术变量名，备查）</th></tr>
+          <tr><td>🟡 盘前链</td><td>08:25→9:15</td><td>9:15 前到位；盘中不更新</td><td>
+            📅 今日事件 · 日历(<code>V8_CAL</code>) · 打新(<code>IPO_DATA</code>) · 解禁(<code>RESTRICTED_RELEASE</code>) · 业绩预告(<code>PERFORMANCE_FORECAST</code>)
+            📊 两融(<code>MARGIN_DATA</code>) · 北向(<code>NORTH_FUND</code>) · 分析师评级(<code>ANALYST_RATINGS</code>) · 52周高(<code>W52_HIGH</code>)
+            🌍 宏观速览(<code>MACRO_BRIEF</code>) · 宏观数据(<code>MACRO_DATA</code>) · ETF申赎份额(<code>ETF_NET_SUBSCRIPTION</code>)
+            ⚠️ 危机雷达(<code>CRISIS_DATA</code>) · 今日判定(<code>JUDGMENT_DATA</code>) · ETF异动NT(<code>NT_DATA</code>)
+            💡 风险仪表(<code>RISK_GAUGE</code>)→建议归<span style="color:var(--purple)">🔴盘中实时</span>
+          </td></tr>
+          <tr><td>🔴 盘中链</td><td>09:30-11:30<br>13:00-15:00</td><td>高频；午休空窗</td><td>
+            📈 指数快览(<code>INDEX_QUOTES</code>) · 平均股价(<code>AVG_PRICE_DATA</code>) · 亚太市场(<code>OVERSEAS_MARKETS</code>) · 期指主力(<code>CFFEX_HOLDINGS</code>)
+            💰 板块资金流向(<code>SECTOR_FUND_FLOW</code>) · 行业树图·细分赛道(<code>SECTOR_FUND_FLOW</code>) · 板块资金分时(<code>SECTOR_FUND_FLOW_INTRADAY</code>)
+            🔥 涨停热力矩阵(<code>LIMIT_UP_HEATMAP</code>) · 炸板(<code>LIMIT_UP_BROKEN</code>) · 概念排名(<code>CONCEPT_RANKING</code>)
+            📊 市场资金流向(<code>MARKET_FUND_FLOW_DATA</code>) · 市场预警(<code>MARKET_ALERTS</code>)
+            📋 ETF三合一(<code>ETF_INTRADAY_HEAT</code>/<code>ETF_PULSE</code>) · 概念ETF映射(<code>CONCEPT_ETF_MAP</code>)
+            🤖 AI速览·市场简报(<code>AI_MARKET_BRIEF</code>) · 个股行情(<code>STOCK_QUOTE</code>) · 候选池行情(<code>CANDIDATE_QUOTES</code>)
+            📐 四量终极(<code>FOUR_VOLUME</code>)→<span style="color:var(--purple)">建议盘中</span>
+            📈 商品弹性(<code>COMMODITY_ELASTICITY</code>)→<span style="color:var(--purple)">建议迁回实时</span>
+            📊 动量状态(<code>STOCK_MOMENTUM_STATE</code>)→<span style="color:var(--purple)">建议盘中</span>
+          </td></tr>
+          <tr><td>🔵 盘后链</td><td>15:00 后</td><td>收盘后上线；盘中不更新</td><td>
+            🎯 选股策略区：<b>三重共识</b>(<code>TRIPLE_CONSENSUS</code>) · <b>CRDS逆势龙头</b>(<code>CRDS_CARD_DATA</code>) · <b>机游共振</b>(<code>LHB_DATA</code>)
+            📜 共振日历/龙虎榜历史(<code>LHB_HISTORY</code>) · 三重入选历史(<code>TRIPLE_HISTORY</code>) · 三重追踪(<code>TRIPLE_TRACK</code>)
+            🎯 最终推荐：<b>候选池</b>(<code>CANDIDATE</code>) →<span style="color:var(--purple)">建议</span> · <b>金股池</b>(<code>GOLD_POOL</code>) · <b>强势突破</b>(<code>STRONG_BREAKOUT</code>) · <b>动量共识</b>(<code>MOMENTUM_FILTER</code>)→<span style="color:var(--purple)">建议</span> · 优化策略门控(<code>OPTIMIZED_STRATEGY</code>)→<span style="color:var(--purple)">建议</span>
+            📊 回测族：综合回测(<code>BACKTEST_COMPREHENSIVE</code>) · 通达信回测(<code>BACKTEST_TDX</code>) · RPS回测(<code>RPS_BACKTEST</code>)→<span style="color:var(--purple)">建议</span> · CRDS回测(<code>CRDS_BACKTEST</code>)→<span style="color:var(--purple)">建议</span> · 中信PE温度计(<code>CITIC_PE_THERMO</code>)→<span style="color:var(--purple)">建议</span> · 中信PE回测(<code>CITIC_PE_BACKTEST</code>)→<span style="color:var(--purple)">建议</span>
+            📈 个股RPS(<code>STOCK_RPS</code>/<code>STOCK_RPS_DATA</code>)
+            🔬 因子实验室(<code>FACTOR_LAB</code>) · 因子回测(<code>FACTOR_LAB_BACKTEST</code>) · 因子审计(<code>FACTOR_AUDIT</code>)→<span style="color:var(--purple)">建议</span> · 因子进度(<code>FACTOR_PROGRESS</code>)→<span style="color:var(--purple)">建议</span>
+            📊 板块RS(<code>SECTOR_RS</code>) · 板块资金趋势(<code>SECTOR_FUND_FLOW_TREND</code>) · 板块推荐(<code>SECTOR_RECOMMENDATION</code>) · 板块周期历史(<code>SECTOR_PHASE_HISTORY</code>)→<span style="color:var(--purple)">建议</span>
+            📐 上证FIB(<code>SH_FIB</code>) · 深证FIB(<code>SZ_FIB</code>)
+            📊 市场状态(<code>MARKET_REGIME</code>) · 机构交易(<code>INST_TRADE</code>) · 算法追踪(<code>ALGO_TRACK</code>) · 池子追踪(<code>V8_POOL_TRACKER</code>)
+            📋 ETF日监控(<code>ETF_DAILY_MONITOR</code>) · IMA强股(<code>IMA_STRONG_STOCK</code>)→<span style="color:var(--purple)">建议</span>
+            📐 指数估值框架(<code>INDEX_VALUE_FRAMEWORK</code>)→<span style="color:var(--purple)">建议</span> · 估值分位(<code>VALUATION_PERCENTILE</code>)→<span style="color:var(--purple)">建议</span>
+            📋 未上市面板(<code>UNLISTED_PANEL</code>)→<span style="color:var(--purple)">建议</span> · 停牌数据(<code>STOCK_STOP_DATA</code>)→<span style="color:var(--purple)">建议</span> · 情绪周期(<code>SENTIMENT_CYCLE</code>)→<span style="color:var(--purple)">建议</span>
+            📄 周末元报告(<code>WEEKEND_META_REPORT</code>)→<span style="color:var(--purple)">建议</span> · 周末运行(<code>WEEKEND_RUN</code>)→<span style="color:var(--purple)">建议</span>
+            ☁️ 持仓云端同步(<code>PORTFOLIO</code>)→<span style="color:var(--purple)">建议</span>
+          </td></tr>
+          <tr><td>⚙ 运维 / 健康</td><td>常驻</td><td>不属三链</td><td>
+            ❤️ 健康检查(<code>HEALTH_CHECK</code>) · Runner状态(<code>RUNNER_STATUS</code>) · 审计轨迹(<code>AUDIT_TRAIL</code>) · 守卫标记(<code>DO_NOT_DELETE</code>)
+            🤖 AI洞察对比(<code>AI_INSIGHTS_COMPARE</code>)→<span style="color:var(--purple)">建议·洞察对比</span>
+          </td></tr>
         </table>
         <div class="logic-h">⚪ 跨档变量主档裁决（15 个，CATEGORY_MAP 标了多档，本次定主档）</div>
         <table class="lg-table">
-          <tr><th>变量</th><th>CATEGORY_MAP 原值</th><th>本次主档裁决</th><th>理由</th></tr>
-          <tr><td><code>AI_MARKET_BRIEF</code></td><td>intraday / post_close</td><td><b>盘中</b></td><td>盘中实时生成，盘后仅归档</td></tr>
-          <tr><td><code>CRISIS_DATA</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>危机雷达盘前生成</td></tr>
-          <tr><td><code>ETF_DAILY_MONITOR</code></td><td>intraday / post_close</td><td><b>盘后</b></td><td>日监控收盘后定稿</td></tr>
-          <tr><td><code>ETF_NET_SUBSCRIPTION</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>上交所日频份额，盘前披露</td></tr>
-          <tr><td><code>JUDGMENT_DATA</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>今日判定盘前生成</td></tr>
-          <tr><td><code>LIMIT_UP_HEATMAP</code></td><td>intraday / post_close</td><td><b>盘中</b></td><td>涨停热力盘中实时</td></tr>
-          <tr><td><code>MACRO_BRIEF</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>宏观速览盘前</td></tr>
-          <tr><td><code>MACRO_DATA</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>宏观数据盘前</td></tr>
-          <tr><td><code>MARGIN_DATA</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>两融盘前</td></tr>
-          <tr><td><code>PERFORMANCE_FORECAST</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>业绩预告盘前</td></tr>
-          <tr><td><code>RESTRICTED_RELEASE</code></td><td>premarket / post_close</td><td><b>盘前</b></td><td>解禁日历盘前</td></tr>
-          <tr><td><code>RISK_GAUGE</code></td><td>premarket / intraday</td><td><b>盘中</b></td><td>风险温度计盘中实时</td></tr>
-          <tr><td><code>RUNNER_STATUS</code></td><td>premarket / intraday</td><td><b>运维</b></td><td>runner 状态，不属三链</td></tr>
-          <tr><td><code>SECTOR_FUND_FLOW</code></td><td>premarket / intraday / post_close</td><td><b>盘中</b></td><td>板块资金流盘中实时</td></tr>
-          <tr><td><code>SECTOR_FUND_FLOW_INTRADAY</code></td><td>premarket / intraday / post_close</td><td><b>盘中</b></td><td>板块资金日内快照</td></tr>
+          <tr><th>卡片</th><th>技术变量</th><th>CATEGORY_MAP 原值</th><th>本次主档裁决</th><th>理由</th></tr>
+          <tr><td>AI速览·市场简报</td><td><code>AI_MARKET_BRIEF</code></td><td>intraday / post_close</td><td><b>🔴盘中</b></td><td>盘中实时生成，盘后仅归档</td></tr>
+          <tr><td>危机雷达</td><td><code>CRISIS_DATA</code></td><td>premarket / post_close</td><td><b>🟡盘前</b></td><td>危机雷达盘前生成</td></tr>
+          <tr><td>ETF日监控</td><td><code>ETF_DAILY_MONITOR</code></td><td>intraday / post_close</td><td><b>🔵盘后</b></td><td>日监控收盘后定稿</td></tr>
+          <tr><td>ETF申赎份额</td><td><code>ETF_NET_SUBSCRIPTION</code></td><td>premarket / post_close</td><td><b>🟡盘前</b></td><td>上交所日频份额，盘前披露</td></tr>
+          <tr><td>今日判定</td><td><code>JUDGMENT_DATA</code></td><td>premarket / post_close</td><td><b>🟡盘前</b></td><td>今日判定盘前生成</td></tr>
+          <tr><td>涨停热力矩阵</td><td><code>LIMIT_UP_HEATMAP</code></td><td>intraday / post_close</td><td><b>🔴盘中</b></td><td>涨停热力盘中实时</td></tr>
+          <tr><td>宏观速览</td><td><code>MACRO_BRIEF</code></td><td>premarket / post_close</td><td><b>🟡盘前</b></td><td>宏观速览盘前</td></tr>
+          <tr><td>宏观数据</td><td><code>MACRO_DATA</code></td><td>premarket / post_close</td><td><b>🟡盘前</b></td><td>宏观数据盘前</td></tr>
+          <tr><td>两融数据</td><td><code>MARGIN_DATA</code></td><td>premarket / post_close</td><td><b>🟡盘前</b></td><td>两融盘前</td></tr>
+          <tr><td>业绩预告</td><td><code>PERFORMANCE_FORECAST</code></td><td>premarket / post_close</td><td><b>🟡盘前</b></td><td>业绩预告盘前</td></tr>
+          <tr><td>解禁日历</td><td><code>RESTRICTED_RELEASE</code></td><td>premarket / post_close</td><td><b>🟡盘前</b></td><td>解禁日历盘前</td></tr>
+          <tr><td>风险仪表</td><td><code>RISK_GAUGE</code></td><td>premarket / intraday</td><td><b>🔴盘中</b></td><td>风险温度计盘中实时</td></tr>
+          <tr><td>Runner状态</td><td><code>RUNNER_STATUS</code></td><td>premarket / intraday</td><td><b>⚙运维</b></td><td>runner 状态，不属三链</td></tr>
+          <tr><td>板块资金流向/行业树图</td><td><code>SECTOR_FUND_FLOW</code></td><td>premarket / intraday / post_close</td><td><b>🔴盘中</b></td><td>板块资金流盘中实时</td></tr>
+          <tr><td>板块资金分时</td><td><code>SECTOR_FUND_FLOW_INTRADAY</code></td><td>premarket / intraday / post_close</td><td><b>🔴盘中</b></td><td>板块资金日内快照</td></tr>
         </table>
-        <div class="logic-p" style="color:var(--warn)">🔧 <b>当前前端刷新机制 vs 本纪律</b>：机制B＝整页 <code>location.reload()</code>，盘中每 15 分（含午休）。仍把盘前链（今日事件）/ 盘后链（LHB 等）一起重拉，<b>违背「时间到了就不要一直更新」</b>。根治＝前端<b>分区刷新</b>（按链分时 fetch + 局部重渲），依据本表。待主人确认后改造。</div>
+        <div class="logic-p" style="color:var(--warn)">🔧 <b>当前前端刷新机制 vs 本纪律</b>：机制B＝整页 <code>location.reload()</code>，<b>盘中(09:30-15:00)每 15 分，收盘后/午休/夜间每 1 小时，22:00-07:00 不刷</b>。仍把盘前链（今日事件）/ 盘后链（LHB 等）一起重拉，<b>违背「时间到了就不要一直更新」</b>。根治＝前端<b>分区刷新</b>（按链分时 fetch + 局部重渲），依据本表。待主人确认后改造。</div>
       </div>
 
       <div class="card">
