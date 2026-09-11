@@ -2246,21 +2246,80 @@ def check_stock_signals(code, name, market="sh", board_label="", volume_amount=0
 
 # ============== 金股池管理 ==============
 
+# 🔴 2026-09-11 根治「金股池被洗空」（stocks 从 86 只 → 0 只，TOP10/回测随之停产）
+# 根因：out/ 被 .gitignore 排除（.gitignore:46），云端/他机 fresh checkout 拿不到
+#      out/gold_pool.json → load_gold_pool() 返回空池 → save_gold_pool() 直接覆盖 →
+#      stage_to_raw.py 再把空池搬进【tracked】的 raw_data/gold_pool.json 固化进 git
+#      （实测 2026-09-10 01:24:47 = 86 只，06:11:06 = 0 只，不可逆）
+# 修复：① 读取走多路径「非空优先」链（out/ → raw_data/ tracked → algorithms/data/）；
+#       ② 写入加防洗空闸门：拒绝用空池覆盖磁盘上已有的非空池；
+#       ③ 过期清理不再用空串/None 比较（空串恒小于 cutoff → 误删）。
+_GOLD_POOL_FALLBACKS = (
+    GOLD_POOL_JSON,
+    os.path.join(REPO_ROOT, "raw_data", "gold_pool.json"),
+    os.path.join(BASE_DIR, "data", "gold_pool.json"),
+)
+
+
+def _gold_pool_paths():
+    """金股池候选读取路径（去重、保持优先级顺序）。"""
+    seen, out = set(), []
+    for p in _GOLD_POOL_FALLBACKS:
+        ap = os.path.abspath(p)
+        if ap not in seen:
+            seen.add(ap)
+            out.append(ap)
+    return out
+
+
 def load_gold_pool():
-    """加载金股池"""
-    if not os.path.exists(GOLD_POOL_JSON):
-        return {"stocks": {}, "last_update": None}
-    try:
-        with open(GOLD_POOL_JSON, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except:
-        return {"stocks": {}, "last_update": None}
+    """加载金股池（多路径 · 非空优先）。
+
+    按 out/ → raw_data/（git tracked，跨机/跨 CI 可存活）→ algorithms/data/ 依次读取，
+    命中 stocks 非空即返回；全为空时回退第一份可解析内容（保持旧语义，不抛错）。
+    """
+    best = None
+    for p in _gold_pool_paths():
+        if not os.path.exists(p):
+            continue
+        try:
+            with open(p, "r", encoding="utf-8") as f:
+                d = json.load(f)
+        except Exception:
+            continue
+        if not isinstance(d, dict):
+            continue
+        if best is None or (not best.get("stocks") and d.get("stocks")):
+            best = d
+        if d.get("stocks"):
+            return d
+    return best if best is not None else {"stocks": {}, "last_update": None}
 
 
 def save_gold_pool(pool):
-    """保存金股池"""
+    """保存金股池（带防洗空闸门）。
+
+    🛡 拒绝用「stocks 为空」的池覆盖磁盘上已有的非空池：scanner 在 fresh checkout
+    （out/ 不存在）上跑且候选宇宙暂时为空时，写回空池会把累积数周的金股池一次性清零。
+    仅当显式设置 GOLD_POOL_FORCE_EMPTY=1 时才允许真实清空。
+    """
+    if not pool.get("stocks") and os.environ.get("GOLD_POOL_FORCE_EMPTY") != "1":
+        for p in _gold_pool_paths():
+            if not os.path.exists(p):
+                continue
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    prev = json.load(f)
+            except Exception:
+                continue
+            if isinstance(prev, dict) and prev.get("stocks"):
+                print(f"  🛡 金股池防洗空：本次 stocks=0，拒绝覆盖 "
+                      f"{os.path.basename(p)} 中已有的 {len(prev['stocks'])} 只"
+                      f"（确需清空请设 GOLD_POOL_FORCE_EMPTY=1）")
+                return False
     with open(GOLD_POOL_JSON, "w", encoding="utf-8") as f:
         json.dump(pool, f, ensure_ascii=False, indent=2)
+    return True
 
 
 def load_candidate_pool():
@@ -2516,8 +2575,20 @@ def update_gold_pool_from_scan(output):
                 s["signal_count"] = 0
 
     # 清理过期股票（所有来源统一按 GOLD_POOL_DAYS 个交易日过期）
+    # 🛡 2026-09-11：first_date 缺失时旧写法 v.get("first_date","") 得到空串，
+    #    空串恒小于 cutoff → 该股被无条件误删（历史池缺字段即集体蒸发）；
+    #    若是 None 更会触发 Python3 的 str<None TypeError 直接中断整池更新。
+    #    现改为：缺字段回退 history 最早日期；两者都没有 → 视为有效，不删。
+    def _entry_first_date(v):
+        fd = v.get("first_date")
+        if not fd:
+            hist = v.get("history") or []
+            if hist and isinstance(hist[0], dict):
+                fd = hist[0].get("date")
+        return fd if isinstance(fd, str) and len(fd) >= 10 else None
+
     expired_keys = [k for k, v in pool["stocks"].items()
-                    if v.get("first_date", "") < cutoff]
+                    if (_entry_first_date(v) or "") and _entry_first_date(v) < cutoff]
     for k in expired_keys:
         del pool["stocks"][k]
 

@@ -1044,7 +1044,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge; window._holdBadge = _holdB
 
 /* ===== 🎯 今日判定 · 可入手候选 HTML 构建（2026-08-08 重构） =====
    规则：① 只保留「值得买入」的股票；② 按统一买入评分降序；③ 每只股票汇总关键详情；④ 三不原则独立第二行。
-   数据：🥇三重共识 > 🥉四量终极（金股池移出本卡，见独立「黄金池」卡片）；渲染由 initCardBadges / switchSec('td') 触发。 */
+   数据：🥇三重共识 > 🥉四量终极（金股池/黄金池【当前无独立卡片】：renderGoldPool 已于 2026-08-06
+   轻量化时删除，GOLD_POOL 仅在「个股查询 → 策略命中」以 ⭐ 命中标签呈现）；渲染由 initCardBadges / switchSec('td') 触发。 */
 function __judgmentCandidatesHTML(){
   var SQ = window.STOCK_QUOTE || {};
   var sq = SQ.stocks || {};
@@ -7079,10 +7080,22 @@ function switchSec(sec,el){
       });
     };
     // 兼容 dict/array 两种 schema：先提 stocks 字段
+    // 🔴 2026-09-11 修复：空对象 {} 在 JS 里是 truthy → 当 GOLD_POOL.stocks 被上游洗成 {}
+    //    时，`stocks || candidates` 不会回退（拿到 {} 而非候选池），金股池命中恒不计数。
+    //    现改为按「字段存在性 + 非空」判定：stocks 存在则只认 stocks（空 = 池子确实空，
+    //    绝不用 540 只候选池冒充金股池，避免共振虚高）；仅当 stocks 字段整体缺失
+    //    （旧 schema）时才回退 candidates。
+    const _len = function(v){
+      if(!v) return 0;
+      if(Array.isArray(v)) return v.length;
+      return (typeof v==='object') ? Object.keys(v).length : 0;
+    };
+    const _gpObj = window.GOLD_POOL || {};
     const candList = (window.CANDIDATE && (window.CANDIDATE.stocks || window.CANDIDATE.data))
                   || [];
-    const goldList = (window.GOLD_POOL && (window.GOLD_POOL.stocks || window.GOLD_POOL.candidates))
-                  || [];
+    const goldList = ('stocks' in _gpObj)
+                   ? (_len(_gpObj.stocks) ? _gpObj.stocks : [])
+                   : (_gpObj.candidates || []);
     // COCKPIT 优先用 tier_a/tier_b（array 数组）合并 —— 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND 已全方位下线
     const cockList = [];  /* 已下线 algorithm，列表永远为空 */
     // CRDS 用 cond1_list/cond2_list/cond3_list/cond4_list（按实际 schema）
