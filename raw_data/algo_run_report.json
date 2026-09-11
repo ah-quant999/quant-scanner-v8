@@ -1,8 +1,21 @@
 {
-  "update_time": "2026-09-11 21:39:31",
-  "run_start": "2026-09-11 21:30:05",
-  "ok": 1,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-09-12 02:42:49",
+  "run_start": "2026-09-12 01:50:02",
+  "ok": 24,
+  "fail": 3,
+  "failed_scripts": [
+    {
+      "script": "calc_stock_rps.py",
+      "reason": "退出码 1 | [error] 无任何有效个股数据, 退出"
+    },
+    {
+      "script": "strategy_four_volume_60m.py",
+      "reason": "退出码 1 |      → 保留上次真实产物（不写假 0），本脚本以退出码 1 上报失败"
+    },
+    {
+      "script": "track_h_auto_buy.py",
+      "reason": "监督器静默杀(>15min 无输出)"
+    }
+  ],
   "skipped_by_time_gate": []
 }
