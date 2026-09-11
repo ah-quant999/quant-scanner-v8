@@ -280,6 +280,118 @@ def _stamp_index_v(index_text: str, changed: dict) -> tuple:
     new = _RE_V.sub(repl, index_text)
     return new, new != index_text
 
+def _local_tree_paths(base_sha, want_prefixes):
+    """用本地 git ls-tree 直接取「受管路径 → blob sha」，**零网络请求**。
+
+    🔴 2026-09-12 一劳永逸修复（P0·小九机链推不出去）——这是最终方案，理由：
+
+      原实现：单次 `GET /git/trees/{sha}?recursive=1`（全仓 3913 文件 ≈1.24MB）→
+              跨境必 IncompleteRead ×3 → 拒绝推送 → 整夜白跑（小九机 #1772/#1773 实证）。
+
+      我曾试「分层 BFS + 剪枝」：单次响应降到 41KB，但实测**必须把
+      raw_data/kline_cache 排除**才能降下来，而该目录有 3119 个文件、742.6KB
+      单层响应（扁平目录、GitHub tree API 不支持分页）。一旦排除它，
+      existing 就缺 3119 条 ⇒ 防倒退守卫对 K 线缓存完全失效
+      （正是 08-09 大范围数据回退的老路，比崩溃更危险）。
+
+      **真正的事实**：本脚本运行在 runner / 小九机的工作区里，那里本来就有一份
+      完整 git 仓库，`git ls-tree -r <sha> -- raw_data/ data/` 一条本地命令就能拿到
+      全部 3474 条受管路径的 sha —— 零网络、零截断、零重试、毫秒级。
+      用 Git API 去枚举「本地已有的东西」从一开始就是错误路线。
+
+    返回 (mapping, ok)；ok=False 表示本地也拿不到（调用方须拒绝裸推）。
+    """
+    # 仓库目录解析：环境变量 > 脚本所在目录 > cwd > 逐级向上找 .git
+    # （加固原因：不能假定脚本一定就在仓库根，实测在仓库外跑会静默返回空）
+    cands = []
+    _env = os.environ.get("V8_REPO_DIR", "").strip()
+    if _env:
+        cands.append(_env)
+    cands.append(os.path.dirname(os.path.abspath(__file__)))
+    cands.append(os.getcwd())
+    repo_dir = None
+    for c in cands:
+        if c and os.path.isdir(os.path.join(c, ".git")):
+            repo_dir = c
+            break
+    if repo_dir is None:
+        print(f"  ⚠️ 未找到 git 仓库根（候选: {cands}），本地 ls-tree 不可用")
+        return {}, False
+    out = {}
+    for pre in want_prefixes:
+        args = ["git", "ls-tree", "-r", base_sha]
+        if pre:
+            args += ["--", pre]
+        try:
+            r = subprocess.run(args, cwd=repo_dir, capture_output=True,
+                               text=True, timeout=180)
+        except Exception as e:
+            print(f"  ⚠️ git ls-tree {pre or '*'} 异常: {e}")
+            continue
+        if r.returncode != 0:
+            print(f"  ⚠️ git ls-tree {pre or '*'} 失败: {r.stderr.strip()[:200]}")
+            continue
+        for ln in r.stdout.splitlines():
+            try:
+                meta, path = ln.split("\t", 1)
+                mode, typ, sha = meta.split()
+            except ValueError:
+                continue
+            if typ == "blob":
+                out[path] = sha
+    return out, bool(out)
+
+
+def _remote_tree_paths(base_tree, want_prefixes):
+    """兜底：本地 git 不可用时，分层 BFS 枚举远端 tree（单次响应 ≤41KB）。
+
+    ⚠️ 已知局限：为避免 742.6KB 的 raw_data/kline_cache 单层响应触发截断，
+       本函数会把 kline_cache 等重目录剪掉 ⇒ 返回的基线**不含**这些路径。
+       因此它只是本地 ls-tree 的降级预案；调用方应优先走 _local_tree_paths，
+       并在本函数结果不完整时继续降级（绝不拿残缺基线当守卫）。
+
+    ⚠️ 关键坑：tree 条目里的目录名**不带尾斜杠**（"raw_data/kline_cache" 而非
+       "raw_data/kline_cache/"），因此必须用 `p == K or p.startswith(K + "/")` 判定，
+       直接 startswith("xxx/") 会永远匹不中（在 algo_cloud.yml 里先踩过一次）。
+    """
+    SKIP = ("backup", "docs", "raw_data/kline_cache", "legacy_v6", "out",
+            "tdx_formulas", ".git")
+
+    def _skip(p):
+        return any(p == k or p.startswith(k + "/") for k in SKIP)
+
+    out = {}
+    queue = [("", base_tree)]
+    seen = 0
+    while queue:
+        prefix, sha = queue.pop(0)
+        seen += 1
+        if seen > 80:
+            print("  ⚠️ tree 遍历层数超限（>80），判定枚举不完整")
+            return out, False
+        d = api("GET", f"/repos/{REPO}/git/trees/{sha}")
+        if "__error__" in d or "tree" not in d:
+            print(f"  ⚠️ 分层枚举中断于「{prefix or '/'}」: {d.get('__msg__') or d}")
+            return out, False
+        if d.get("truncated"):
+            print(f"  ⚠️ 分层枚举「{prefix or '/'}」被 GitHub 截断")
+            return out, False
+        for e in d["tree"]:
+            p = prefix + e["path"]
+            if e["type"] == "tree":
+                if _skip(p):
+                    continue
+                # 只在「该子树可能含有受管路径」时才下钻，避免无谓请求
+                if not any((p + "/").startswith(k) or k.startswith(p + "/")
+                           for k in want_prefixes):
+                    continue
+                queue.append((p + "/", e["sha"]))
+            elif e["type"] == "blob":
+                if not _skip(p) and p.startswith(want_prefixes):
+                    out[p] = e["sha"]
+    return out, True
+
+
 def _local_tree_fallback(base_sha):
     """GitHub tree API 不可用（5xx/截断）时，用本地 git ls-tree 生成等价守卫基线。
 
@@ -353,39 +465,33 @@ def main():
         print("❌ 获取 base commit 失败:", cmt.get("__msg__")); sys.exit(1)
     base_tree = cmt["tree"]["sha"]
     existing = {}
-    tfull = api("GET", f"/repos/{REPO}/git/trees/{base_tree}?recursive=1")
+    # 🔴 2026-09-12 一劳永逸修复（P0·小九机链推不出去）：
+    #   原实现单次 `?recursive=1`（全仓 3913 文件 ≈1.24MB）→ 跨境必 IncompleteRead
+    #   ×3 → 走兜底或直接拒绝 → 每跑一轮盘后就在这白跑一次。
+    #   现改为「本地 git ls-tree 优先（零网络，3474 条一次拿全，含 kline_cache 3119 条）
+    #          → 本地不可用才退分层 API 枚举（41KB）」，语义与原实现完全等价。
+    _GUARD_PREFIXES = ("raw_data/", "data/")
+    existing, _ok = _local_tree_paths(base_sha, _GUARD_PREFIXES)
+    if _ok:
+        print(f"🛡 守卫基线（本地 git ls-tree，零网络）：{len(existing)} 个受管路径")
+    else:
+        print("⚠️ 本地 ls-tree 不可用 → 退分层 API 枚举作守卫基线")
+        existing, _ok2 = _remote_tree_paths(base_tree, _GUARD_PREFIXES)
+        if not _ok2 or not existing:
+            print("⚠️ 分层 API 枚举亦未完整 → 退本地全量 ls-tree（不带前缀）")
+            existing, _ok3 = _local_tree_paths(base_sha, ())
+            if not _ok3:
+                print("❌ 守卫基线三种取法全失败，拒绝裸推")
+                sys.exit(1)
     # 2026-08-11 修复（159 轮看门狗）·数据回退隐患根治：
     # existing 是「防倒退守卫」的唯一基线。原代码用 tfull.get("tree", []) 兜底，
     # 一旦这次 GET 失败或被 GitHub 截断，existing 会静默变成空/残缺 →
     # 所有本地文件都被判为「远端没有」→ 守卫完全失效 → 用 checkout 时刻的旧内容
     # 覆盖远端更新版本，正是 08-09 大范围数据回退故障的成因。
     # 守卫基线不完整时必须中止，绝不能「无守卫裸推」。
-    if "__error__" in tfull or "tree" not in tfull:
-        # 🔴 2026-09-11 修复（今夜 P0）：原来此处直接 sys.exit(1)，一旦 GitHub
-        #   该接口 5xx/截断，整夜算出的成果一个字都推不上 main。改为先退到
-        #   本地 git ls-tree 兜底基线（与 API 等价，见 _local_tree_fallback），
-        #   兜底也拿不到才中止 —— 既不裸推，也不丢整夜成果。
-        why = tfull.get("__msg__") or f"HTTP {tfull.get('__error__')}"
-        print(f"⚠️ 远端 base tree 不可用（{why}）→ 回退本地 git ls-tree 作守卫基线")
-        tfull = _local_tree_fallback(base_sha)
-    if tfull is None:
-        print("❌ 获取 base tree 失败（远端 5xx 且本地兜底亦失败），拒绝裸推")
+    if not existing:
+        print("❌ 守卫基线为空，拒绝裸推")
         sys.exit(1)
-    if tfull.get("truncated"):
-        print("⚠️ base tree 被 GitHub 截断（truncated=true）→ 回退本地 git ls-tree 作守卫基线")
-        tfull = _local_tree_fallback(base_sha)
-        if tfull is None:
-            print("❌ base tree 截断且本地兜底失败，守卫基线残缺，拒绝裸推")
-            sys.exit(1)
-    for e in tfull.get("tree", []):
-        if (e["path"].startswith("raw_data/")
-            or e["path"] in ("data/FOUR_VOLUME.js", "data/STOCK_STOP_DATA.js",
-                              "data/FINAL_RECOMMEND_DATA.js", "data/STOCK_RPS.js",
-                              "data/FOUR_VOLUME_60M.js",
-                              # 🛡 2026-08-19：H 反推注册到防倒退守卫远端基线
-                              "data/H_AUTO_BUY.js", "data/H_AUTO_BUY_TRACK.js")
-            ) and e["type"] == "blob":
-            existing[e["path"]] = e["sha"]
 
     # 上传 blobs（幂等：内容相同则 sha 相同）
     # 2026-08-04：GitHub blob API 对较大文件偶发 HTTP 400 "malformed request"（08-03 stock_names.json

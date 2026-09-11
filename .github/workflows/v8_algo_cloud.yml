@@ -258,37 +258,77 @@ jobs:
                       time.sleep(min(2 ** i, 20))
               raise SystemExit("blob fetch failed: %s (%s)" % (sha, last))
 
-          # [ALIMI 2026-09-12] 分层 tree 枚举（旧全量递归实测 1.24MB / 26.4s / 真实 IncompleteRead）。
-          #   本处只做「排除 backup/ docs/ kline_cache/」的目录剪枝，命中的正是根 tree 顶层条目
-          #   ⇒ 只需根 tree，无需下钻任何子树。
-          def _root_tree():
-              root = get_json("https://api.github.com/repos/%s/git/trees/main" % REPO)
-              if not isinstance(root, dict) or "tree" not in root:
-                  return get_json("https://api.github.com/repos/%s/git/trees/main?recursive=1" % REPO)
-              return root
-          tree = _root_tree()
-          # 🛡 2026-09-11 20:2x 阿狸咪一劳永逸：冷启动全量同步结构性不可行。
-          #   实测 main tree 构成：backup/ 69.3MB(28) + raw_data/kline_cache/ 57.3MB(3119)
-          #   + docs/ 1.2MB(174) = 3321 文件 / 127.8MB，三者对算法链均无用：
-          #     · backup/               历史备份，无任何脚本读取
-          #     · raw_data/kline_cache/ K线缓存，calc_crds 冷缓存实测 91s 可跑（有网络兜底）
-          #     · docs/                 交接与文档，算法链不读
-          #   排除后剩 ~592 文件 / ~48MB，可在预算内完成。
-          #   安全：链尾推送走 base_tree 继承，未列出路径天然保留（api_push_raw.py L315）。
-          SKIP_PREFIX = ("backup/", "docs/", "raw_data/kline_cache/")
-          want = []
-          skipped_heavy = 0
-          for e in tree.get("tree", []):
-              if e.get("type") != "blob":
-                  continue
-              p = e["path"]
-              if p.startswith(".git/"):
-                  continue
-              if p.startswith(SKIP_PREFIX):
-                  skipped_heavy += 1
-                  continue
-              want.append((p, e["sha"]))
-          print("files to sync: %d (skipped heavy/unused: %d)" % (len(want), skipped_heavy), flush=True)
+          # [ALIMI 2026-09-12 v2] 分层 tree 枚举（一劳永逸）。
+          #   旧全量递归实测 1.24MB / 26.4s / 真实 IncompleteRead；上一版「只取根 tree」
+          #   实测同样是错的：根 tree 只有 77 个【顶层】条目（12 个子目录名字，
+          #   `raw_data/` 只是其中一个 tree 条目），因此
+          #     · SKIP_PREFIX 里的深层前缀 "raw_data/kline_cache/" **永远匹不中**；
+          #     · 需要同步的深层文件（raw_data/*.json、data/*.js、algorithms/*.py …）
+          #       一个都进不了 want ⇒ 冷启动同步形同虚设，链尾照旧推不动。
+          #   本版：BFS 逐层下钻，**在进入子树前判断前缀**（命中即整棵剪枝，不下钻请求），
+          #   既不触发大响应截断（每次请求只覆盖一层），也不会漏同步深层文件。
+          SKIP_PREFIX = ("backup", "docs", "raw_data/kline_cache",
+                         "legacy_v6", "out", "tdx_formulas")
+
+          def _pruned(path):
+              """路径是否命中剪枝（须同时支持「目录条目」与「其下文件」两种形态）。
+
+              🔴 关键坑：GitHub tree 条目里的目录名**不带尾斜杠**（就是 "raw_data/kline_cache"），
+                 所以旧写法 p.startswith("raw_data/kline_cache/") 永远匹不中 ⇒ 该子树照旧被下钻，
+                 那一层实测 742.6KB / 3119 条，正是 IncompleteRead 的来源。
+                 正确判据：path == K 或 path.startswith(K + "/")。
+              """
+              for _k in SKIP_PREFIX:
+                  if path == _k or path.startswith(_k + "/"):
+                      return True
+              return False
+
+          def _tree_entries(tree_sha, prefix):
+              """取一层 tree 条目；返回 None 表示该层不可用（调用方须拒绝半量同步）。"""
+              d = get_json("https://api.github.com/repos/%s/git/trees/%s" % (REPO, tree_sha))
+              if not isinstance(d, dict) or "tree" not in d:
+                  return None
+              out = []
+              for e in d["tree"]:
+                  out.append((prefix + e["path"], e["type"], e["sha"]))
+              return out
+
+          def walk_tree(root_sha):
+              """BFS 分层遍历；返回 (want, skipped_heavy, complete)。"""
+              _want = []; _heavy = 0; _queue = [("", root_sha)]; _seen = 0
+              while _queue:
+                  _prefix, _sha = _queue.pop(0)
+                  _seen += 1
+                  if _seen > 60:          # 安全阀：正常情况下 <20 层
+                      print("  ⚠️ 遍历层数超限，中止枚举", flush=True)
+                      return _want, _heavy, False
+                  _ents = _tree_entries(_sha, _prefix)
+                  if _ents is None:
+                      return _want, _heavy, False
+                  for _p, _t, _s in _ents:
+                      if _t == "tree":
+                          if _pruned(_p):
+                              _heavy += 1        # 整棵子树剪枝，绝不发请求
+                              continue
+                          _queue.append((_p + "/", _s))
+                      elif _t == "blob":
+                          if _p.startswith(".git/"):
+                              continue
+                          if _pruned(_p):
+                              _heavy += 1
+                              continue
+                          _want.append((_p, _s))
+              return _want, _heavy, True
+
+          _root = get_json("https://api.github.com/repos/%s/git/trees/main" % REPO)
+          if not isinstance(_root, dict) or "tree" not in _root:
+              raise SystemExit("root tree 获取失败，拒绝半量同步")
+          want, skipped_heavy, _complete = walk_tree(_root["sha"])
+          if not _complete or not want:
+              # 🛡 半量同步比不同步更危险（会把工作区残缺树推上去）→ 必须硬失败
+              raise SystemExit("分层枚举未完整（want=%d complete=%s），拒绝冷启动同步"
+                               % (len(want), _complete))
+          print("files to sync: %d (pruned subtrees/blobs: %d)" % (len(want), skipped_heavy), flush=True)
           ok = 0; skipped = 0
           # 🛡 2026-09-11 20:2x：脚本内软预算（默认 1080s = 18 分钟）。
           #   超预算即收尾（已同步的文件保留），避免被 GitHub 硬杀在半途、且让日志有结论。
