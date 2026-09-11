@@ -58,6 +58,15 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   （脚本自述冷启动 50-90min；热缓存后分钟级）。
     "v8/factor_lab_gen.py": 5400,
     "v8/backtest_crds.py": 3600,            # CRDS 回测：逐只回测，给 1h 预算 （2026-09-09 挂链时补）
+    # 🛡 2026-09-11 一劳永逸：以下 5 个实验/研究卡脚本从 v8_cn_fetch_experiments.yml
+    #   正式收编进 B 批链尾（详见 ORDER / STAGES["B"] 注释）。均为纯本地计算或
+    #   单接口调用（不遍历全 universe），给 900s 足够余量；显式登记避免走默认 1800s
+    #   而在极端网络退避下拖长 B 批（B 批在 D 批 20:00 关键路径上）。
+    "scripts/fetch_ai_insights_compare.py": 900,    # 读本地 data/maharo_macro.js，纯本地文本比对
+    "scripts/gen_factor_audit.py": 900,             # 读 generate_top10.py 源码做静态审计，纯本地
+    "scripts/gen_factor_progress.py": 900,          # 读 factor_audit.json，纯本地
+    "scripts/fetch_valuation_percentile.py": 1200,  # akshare stock_index_pe_lg（理杏仁），单接口
+    "scripts/fetch_index_value_framework.py": 900,  # 读本地 INDEX_HISTORY.js + numpy 计算
 }
 
 
@@ -201,6 +210,22 @@ ORDER = [
     # 🆕 2026-09-07 主人令「中信 PE 极值温度计 + 历史回测」双卡：fetcher 拉 sh.600030 PE/PB 时序
     # (raw_data/citic_pe_history.json) + 生成器产 data/CITIC_PE_THERMO.js + CITIC_PE_BACKTEST.js。
     # 同类纳入 E 回测批：baostock 数据源 + 夜间跑（不阻塞盘后 20:00 final_recommend）。
+
+    # 🔴 2026-09-11 主人令「一劳永逸」：以下 5 个实验/研究卡脚本此前**从未挂进任何批次**，
+    #   唯一载体是 .github/workflows/v8_cn_fetch_experiments.yml（cron 16:30 CST），
+    #   而该 workflow 自创建起只触发过 1 次（run#1 2026-09-10T13:01）且失败：
+    #   工作区残留未提交改动（raw_data/kline_cache/*.json）→ git push 被拒 →
+    #   重试循环里 `git rebase origin/main` 报 "cannot rebase: You have unstaged changes"
+    #   → 3 次重试全败 → 永久静默。
+    #   后果：5 张卡长期红灯，全部停在 09-10（AI_INSIGHTS_COMPARE / FACTOR_AUDIT /
+    #   FACTOR_PROGRESS / VALUATION_PERCENTILE / INDEX_VALUE_FRAMEWORK）。
+    #   根治：正式挂进 B 批链尾（与 STAGES["B"] 同位置），不再依赖那个不稳定的独立 workflow。
+    #   ⚠️ 必须与 STAGES["B"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
+    "scripts/fetch_ai_insights_compare.py",   # → raw_data/ai_insights_compare.json（读 data/maharo_macro.js）
+    "scripts/gen_factor_audit.py",            # → raw_data/factor_audit.json（多因子 vs v8 审计）
+    "scripts/gen_factor_progress.py",         # → raw_data/factor_progress.json（读 factor_audit，须在其后）
+    "scripts/fetch_valuation_percentile.py",  # → raw_data/valuation_percentile.json（A股指数 PE 分位）
+    "scripts/fetch_index_value_framework.py", # → raw_data/index_value_framework.json（指数中枢+趋势门控）
     ]
 
 
@@ -234,7 +259,23 @@ STAGES = {
         # 2026-09-08 一劳永逸：gen_lhb_7d.py 此前只存在于 STOCK_PICKING_SCRIPTS 与 step 顺序表里，
         # 从未挂进 STAGES -> 分批模式（A/B/D/E）永远跑不到它，data/LHB_7D.js 卡在 09-04 的红灯根因。
         # 挂 B 批：依赖 A 批 fetch_lhb.py 产出的当日龙虎榜，属选股向汇总。
-        "gen_lhb_7d.py"],
+        "gen_lhb_7d.py",
+
+        # 🛡 2026-09-11 主人令「一劳永逸」：以下 5 个实验/研究卡脚本**从未挂进任何批次**，
+        #   只在 v8_cn_fetch_experiments.yml 里跑，而该 workflow 的 cron 只触发过 1 次且
+        #   因「工作区有未提交改动 → push 被拒 → rebase 失败」3 次重试全败后永久静默
+        #   → 5 张卡长期红灯（AI_INSIGHTS_COMPARE / FACTOR_AUDIT / FACTOR_PROGRESS /
+        #   VALUATION_PERCENTILE / INDEX_VALUE_FRAMEWORK 全部停在 09-10）。
+        #   ⚠️ 这 5 个脚本在仓库根 scripts/ 而非 algorithms/，必须带 "scripts/" 前缀
+        #   （run_algorithms.py:946 的双层路径解析认该前缀），否则报「缺失脚本」。
+        #   根治：直接挂进 B 批链尾（它们的输入——maharo_macro / 候选池 / 指数历史 /
+        #   FACTOR_AUDIT——在 B 批时均已就绪），不再依赖那个不稳定的独立 workflow。
+        "scripts/fetch_ai_insights_compare.py",     # → raw_data/ai_insights_compare.json（读 data/maharo_macro.js）
+        "scripts/gen_factor_audit.py",              # → raw_data/factor_audit.json（多因子 vs v8 审计）
+        "scripts/gen_factor_progress.py",           # → raw_data/factor_progress.json（读 factor_audit）
+        "scripts/fetch_valuation_percentile.py",    # → raw_data/valuation_percentile.json（A股指数 PE 分位）
+        "scripts/fetch_index_value_framework.py",   # → raw_data/index_value_framework.json（指数中枢+趋势门控）
+    ],
     # 🛡 2026-09-04 主人令「策略全部数据出来→最终数据上线→然后才是回测」时序重排：
     #   原 C(回测 19:15) 在 D(final_recommend 20:00) 之前 → 回测汇总胶囊早于最终推荐，时序倒挂。
     #   现改为 A(16:40 采集) → B(18:10 选股) → D(20:00 汇总·最终推荐上线) → E(21:00 回测)。

@@ -134,7 +134,22 @@ jobs:
             fi
             echo "⚠️ push/commit 被拒，重试 ($i/3)"
             sleep 5
-            git fetch origin main && git rebase origin/main || true
+            # 🔴 2026-09-11 一劳永逸（run#1 失败根因）：
+            #   原写法 `git fetch origin main && git rebase origin/main || true` 必然失败 ——
+            #   update_v8.py 会在工作区留下大量**未提交**改动（raw_data/kline_cache/*.json 等），
+            #   git rebase 遇到 unstaged changes 直接报
+            #   "error: cannot rebase: You have unstaged changes" → 3 次重试全败 →
+            #   workflow 永久静默 → 5 张实验卡整日红灯（09-10 实锤）。
+            #   修法：rebase 前先把工作区残余改动收进 commit（而不是 stash —— 云上 stash
+            #   无交互确认会丢改动），并对 fetch 失败也放行重试，不让 set -e 提前中断循环。
+            git fetch origin main || echo "⚠️ fetch 失败，继续重试"
+            # 把工作区残余改动一并提交，消灭 unstaged 状态（rebase 的前置条件）
+            git add -u -- raw_data data index.html 2>/dev/null || true
+            if ! git diff --cached --quiet; then
+              git commit -m "chore: 实验卡链残余产物一并提交 ($(TZ=Asia/Shanghai date '+%H:%M'))" \
+                || echo "⚠️ 残余提交失败（可能无实际变更）"
+            fi
+            git rebase origin/main || { echo "⚠️ rebase 失败，改用 merge"; git merge -X ours origin/main --no-edit || true; }
           done
 
           if [ "$_v8_ok" != "1" ]; then

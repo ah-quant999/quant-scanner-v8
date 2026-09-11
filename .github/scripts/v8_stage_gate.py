@@ -101,8 +101,27 @@ READY_SPEC: dict[str, dict] = {
         "must": ["data/LHB_DATA.js"],   # 龙虎榜是「16:30后数据」的核心标志
     },
     "B": {
-        "items": ["data/TRIPLE_CONSENSUS.js", "data/FOUR_VOLUME.js", "data/CRDS_CARD_DATA.js"],
-        "need": 3,
+        # 🛡 2026-09-11 主人令「一劳永逸」：readiness 清单从 3 项代表产物扩到 8 项。
+        #   根因（2026-09-11 09:5x 实证）：原清单只校验 3 个代表产物，而 B 批实际有
+        #   28 个脚本、产出几十个 raw_data/*.json。当这 3 项鲜活、其余产物陈旧时，
+        #   闸门判「B 批已就绪」→ target_stage=NONE / OUTCOME=skipped
+        #   （reason=「✅ 四批产物均已就绪 → 空转」）→ 9 张卡（AI_INSIGHTS_COMPARE /
+        #   FACTOR_AUDIT / FACTOR_PROGRESS / VALUATION_PERCENTILE / INDEX_VALUE_FRAMEWORK /
+        #   TOP10_DAILY / BACKTEST_COMPREHENSIVE / SUSPENSION_ALERT /
+        #   SECTOR_FUND_FLOW_TREND）整日红灯却无人重跑。
+        #   修法：纳入 5 个刚从 experiments workflow 收编的新产物，使「B 批已就绪」
+        #   必须以它们也鲜活为前提 —— 标本兼治（挂链 + 闸门双向对齐）。
+        "items": [
+            "data/TRIPLE_CONSENSUS.js", "data/FOUR_VOLUME.js", "data/CRDS_CARD_DATA.js",
+            "raw_data/ai_insights_compare.json",
+            "raw_data/factor_audit.json",
+            "raw_data/factor_progress.json",
+            "raw_data/valuation_percentile.json",
+            "raw_data/index_value_framework.json",
+        ],
+        # need 用 5/8：3 个核心选股产物 + 5 个新收编产物中至少命中 2 个，
+        #   既覆盖新卡、又不在个别 fetcher 因上游限流失败时把整链锁死。
+        "need": 5,
         "must": [],
     },
     "D": {"items": ["data/FINAL_RECOMMEND_DATA.js"], "need": 1, "must": []},
