@@ -63,7 +63,11 @@ def main():
         f"｜{now.strftime('%Y-%m-%d %H:%M')}｜{topic}\n\n"
         f"> 规范：`docs/ops/handover/README.md`（唯一交接目录，时间优先命名）\n\n"
         f"---\n\n## 一句话结论\n\n\n\n---\n\n## 正文\n\n",
-        encoding="utf-8")
+        encoding="utf-8",
+        # 🔴 2026-09-11 修：Windows 下 write_text 的 newline 默认 None
+        #   → 把 \n 翻译成 os.linesep(CRLF)，实测生成 14 行 CRLF，
+        #   与规范（docs/ops/handover/*.md 一律 LF）不符。显式锁 LF。
+        newline="\n")
     print(path)
     return 0
 
