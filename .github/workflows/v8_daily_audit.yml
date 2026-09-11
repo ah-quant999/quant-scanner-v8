@@ -114,6 +114,17 @@ jobs:
         run: |
           python - <<'EOF'
           import json, os, datetime
+          # 🛡 2026-09-11 小九的股票专家 根治「审计卡看着慢一天」：
+          #   原用 datetime.datetime.now() —— GitHub runner 是 UTC，写入的 date/time 实为 UTC。
+          #   实证：记录里的 2026-09-10 17:47:52，对应 run created 2026-09-10T17:45:48Z，
+          #   其实是 CST 2026-09-11 01:47。前端按本地展示 → 永远显示「昨天 17:47」，
+          #   主人误判「这卡是不是死的」。
+          #   改为显式 Asia/Shanghai，并加 tz 字段供前端/排查识别口径。
+          try:
+              from zoneinfo import ZoneInfo
+              _now = datetime.datetime.now(ZoneInfo("Asia/Shanghai"))
+          except Exception:
+              _now = datetime.datetime.utcnow() + datetime.timedelta(hours=8)
           # 读 health report（v8_health_check 已生成 .workbuddy/v8_health_report.json）
           rep = {}
           try:
@@ -121,8 +132,9 @@ jobs:
           except Exception as e:
               print('health report 读取失败:', e)
           rec = {
-              "date": datetime.datetime.now().strftime('%Y-%m-%d'),
-              "time": datetime.datetime.now().strftime('%H:%M:%S'),
+              "date": _now.strftime('%Y-%m-%d'),
+              "time": _now.strftime('%H:%M:%S'),
+              "tz": "Asia/Shanghai",
               "overall": rep.get("overall", "unknown"),
               "summary": rep.get("summary", {}),
               "warn_items": [{"id": x.get("id"), "name": x.get("name"), "message": (x.get("message") or "")[:120]}
@@ -155,15 +167,43 @@ jobs:
           REPO = "ah-quant999/quant-scanner-v8"
           path = "raw_data/audit_history.json"
           H = {"Authorization": "Bearer " + tok, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
-          data = open(path, "rb").read()
+          # 🛡 2026-09-11 小九的股票专家 根治「审计记录被广域推送冲掉」（一劳永逸）：
+          #   实证（对 main 提交史逐条统计本文件条数）：
+          #     588ee12ae audit 15 → 132632893 audit 16 → 403981825 "v8 cn fetch" 15 ⬇️
+          #     a2b740cae audit 16 → d1c355641 "v8 cn fetch" 15 ⬇️  （09-03~09-07 五条如此丢失）
+          #     e75cc2b41 audit 17 → e50a1d45c 人工广域推 16 ⬇️      （09-09 记录丢失）
+          #   根因：任何「从陈旧工作树广域推送」的作业都会把本文件确定性回退到它 checkout 时的
+          #   旧版。原 push 步只取 sha、不与远端内容合并，故对这种回退零抵抗。
+          #   修法：先 GET 远端内容 → 与本地按 date 取并集（同日以本地为准）→ 再推。
+          #   → 即使本地副本陈旧，也绝不吞掉 main 上已有的审计记录（自愈式，不依赖别人守规矩）。
+          remote_hist = []
           sha = None
           try:
               r = json.load(urllib.request.urlopen(urllib.request.Request(
                   f"https://api.github.com/repos/{REPO}/contents/{path}", headers=H), timeout=60))
               sha = r["sha"]
+              remote_hist = json.loads(base64.b64decode(r["content"]).decode("utf-8"))
+              if not isinstance(remote_hist, list):
+                  remote_hist = []
           except Exception:
-              pass  # 首次推送无 sha
-          body = {"message": "audit: 每日全站审核 " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+              pass  # 首次推送无 sha / 内容不可解析
+          try:
+              local_hist = json.load(open(path, encoding="utf-8"))
+              if not isinstance(local_hist, list):
+                  local_hist = []
+          except Exception:
+              local_hist = []
+          _merged = {}
+          for _h in list(remote_hist) + list(local_hist):   # 本地在后 → 同日以本地为准
+              if isinstance(_h, dict) and _h.get("date"):
+                  _merged[_h["date"]] = _h
+          hist_out = [_merged[_k] for _k in sorted(_merged.keys())][-90:]
+          with open(path, "w", encoding="utf-8") as f:
+              json.dump(hist_out, f, ensure_ascii=False, indent=1)
+          print(f"🔀 审计历史合并：远端 {len(remote_hist)} + 本地 {len(local_hist)} → 去重后 {len(hist_out)} 条")
+          data = open(path, "rb").read()
+          _cst = datetime.datetime.utcnow() + datetime.timedelta(hours=8)
+          body = {"message": "audit: 每日全站审核 " + _cst.strftime("%Y-%m-%d %H:%M"),
                   "content": base64.b64encode(data).decode(), "branch": "main"}
           if sha:
               body["sha"] = sha

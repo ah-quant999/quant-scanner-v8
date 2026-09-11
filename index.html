@@ -882,8 +882,19 @@ window.V8_CAL = {weeks:[],legend:[]};
     if(s.indexOf('盘后') >= 0 || s.indexOf('收盘') >= 0) return 22;
     return 72;
   };
-  /* 交易时段判定（CST 周一至周五 09:15-15:15）：仅此窗口内才对「实时/盘中」卡做 1.5h SLA 判定 */
-  window._isMarketHoursCST = function(){
+  /* 盘中/实时类「陈旧判定窗口」（CST 周一至周五 10:15-15:15）
+     —— 仅此窗口内才对「实时/盘中」卡做 1.5h SLA 判定。
+     2026-09-11 小九的工程师·一劳永逸（假告警家族·新一类：判定窗口早于数据可产出时间）：
+       原起点 09:15（集合竞价）早于首个盘中数据可产出时间，导致 09:15-10:15 这段必然误报红灯：
+       新交易日开盘前本就没有盘中数据可产出。实证（2026-09-11 09:23 截图）——
+       「行业树图·细分赛道」被判「已停更 9 小时」：东财板块资金流在新交易日 00:00 后
+       全部归零，09:00 档 f_sector_fund_flow 每行 net==0 被过滤 → 返回空（RUNNER_STATUS
+       记 empty/返回空）→ data/SECTOR_FUND_FLOW.js 保留前一日 00:38 定稿值，
+       而盘中类 SLA=1.5h，故必然判停更。同日 09:30 开盘后首个盘中数据落地即自愈
+       （主站实测 09:30:17），但次日盘前仍会照旧误报一次。
+       现与「首个盘中数据 09:30 + 看门狗同口径 45 分容错」对齐，取 10:15 为判定起点：
+       只有首档跑完仍无新数据才判陈旧——真停更不隐藏（15:15 上限与「收盘后 / 周末不判」照旧）。 */
+  window._isIntradaySlaWindowCST = function(){
     try{
       var p = window._cstParts ? window._cstParts(new Date()) : null;
       if(!p) return false;
@@ -891,9 +902,11 @@ window.V8_CAL = {weeks:[],legend:[]};
       var dow = new Date(Date.UTC(p.y, p.m - 1, p.d)).getUTCDay();
       if(dow === 0 || dow === 6) return false;   // 周末不判陈旧
       var t = p.hh * 60 + (p.mm || 0);
-      return t >= 555 && t <= 915;                    // 09:15 - 15:15
+      return t >= 615 && t <= 915;                    // 10:15 - 15:15
     }catch(e){ return false; }
   };
+  /* 兼容别名：历史调用点沿用旧名（语义已收敛为上面的盘中陈旧判定窗口） */
+  window._isMarketHoursCST = window._isIntradaySlaWindowCST;
   /* 返回 null（无法判定）/ {stale:false} / {stale:true, text:'⚠️ 已停更 N 天', ageH:数值} */
   window._staleMark = function(ts, slot){
     try{
@@ -6442,17 +6455,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="auditTrailBody"><div style="font-size:12px;color:var(--dim)">等待审计数据…</div></div>
     </div>
 
-    <!-- ═══════════ 🔑 凭证台账 · 到期提醒（2026-09-11 主人令：知识星球/邮箱/mahoro 各一条，快过期亮灯找主人拿新的） ═══════════ -->
-    <div class="card" style="margin-bottom:16px;border-left:3px solid var(--pink)">
-      <h3><span class="ic">🔑</span>凭证台账 · 到期提醒 <span class="fresh" style="font-size:10px;color:var(--dim)">[登记静态 · 亮灯动态]</span></h3>
-      <div id="credBanner" style="font-size:12px;font-weight:700;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:var(--bg2);border:1px solid var(--border)">加载中…</div>
-      <table>
-        <thead><tr><th>凭证</th><th>用途 / 换新方式</th><th>存放位置</th><th>上次续期</th><th>剩余</th><th>状态 / 提醒</th></tr></thead>
-        <tbody id="credLedgerBody"><tr><td colspan="6" style="font-size:12px;color:var(--dim)">加载中…</td></tr></tbody>
-      </table>
-      <div class="note">⏰ 口径：<b>剩余 ≤ 7 天亮黄灯、已超期亮红灯</b>，届时按「换新方式」找主人拿新值。换新后只改下方登记表里的 <code>updated</code>（YYYY-MM-DD），剩余天数与灯色自动重算。<b>本卡只登记位置与日期，不含任何凭据内容</b>；带「推定」的到期日来自历史记录，仅供参考。服务端不提供到期日的凭证，按「建议复核周期」倒计时。</div>
-      <script>
-      (function(){
+    <!-- ═══════════ 🔑 凭证台账（2026-09-11 主人令：并入运维页「数据健康总览 · 外部数据源」表内，原独立卡太占版面；
+         换新后只改下面登记表里的 updated YYYY-MM-DD，剩余天数与灯色自动重算。本表只登记位置与日期，不含任何凭据内容） ═══════════ -->
+    <script>
+    window.__v8CredTable = function(){
         var WARN_DAYS = 7;
         // ── 凭证登记表（换新后只改这里）──────────────────────────────
         //   updated : 最近换新日期 YYYY-MM-DD（用于按 cycle 倒计时）
@@ -6489,64 +6495,40 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var n = new Date();
           return new Date(n.getFullYear(), n.getMonth(), n.getDate());
         }
-        function _dot(on){
-          return '<span class="status-dot" style="' +
-            (on ? 'background:var(--down);box-shadow:0 0 6px var(--down)' : 'background:var(--dim);box-shadow:none') +
-            '"></span>';
-        }
         function _status(c){
           var exp = _pd(c.expires), upd = _pd(c.updated), left = null;
           if (exp) left = Math.round((exp - _today()) / 86400000);
           else if (upd && c.cycle) left = c.cycle - Math.round((_today() - upd) / 86400000);
-          if (left === null) return { left:null, cls:'s-warn', txt:'❓ 未登记续期日 —— 请补录 updated', remain:'—' };
+          if (left === null) return { left:null, cls:'s-warn', txt:'未登记', remain:'—' };
           var remain = left > 0 ? ('剩 ' + left + ' 天') : ('超期 ' + (-left) + ' 天');
-          if (left > WARN_DAYS) return { left:left, cls:'s-ok',   txt:'正常',                                remain:remain };
-          if (left > 0)         return { left:left, cls:'s-warn', txt:'⏳ 临近到期（' + left + ' 天）—— 找主人拿新的', remain:remain };
-          return                       { left:left, cls:'s-err',  txt:'🔴 已超期 —— 立即找主人拿新的',        remain:remain };
+          if (left > WARN_DAYS) return { left:left, cls:'s-ok',   txt:'正常',                   remain:remain };
+          if (left > 0)         return { left:left, cls:'s-warn', txt:'临近 ' + left + ' 天',    remain:remain };
+          return                       { left:left, cls:'s-err',  txt:'超期 ' + (-left) + ' 天', remain:remain };
         }
-        function render(){
-          var tb = document.getElementById('credLedgerBody');
-          var bn = document.getElementById('credBanner');
-          if (!tb || !bn) return;
-          var rows = '', need = [], minL = null, minN = '';
-          for (var i = 0; i < CREDS.length; i++){
-            var c = CREDS[i], st = _status(c);
-            if (st.left === null || st.left <= WARN_DAYS) need.push(c.name);
-            if (st.left !== null && (minL === null || st.left < minL)) { minL = st.left; minN = c.name; }
-            rows += '<tr>'
-              + '<td><b>' + c.name + '</b>'
-              + (c.expires ? '<div style="font-size:10px;color:var(--dim);margin-top:3px">' + (c.expire_note || '') + '</div>' : '')
-              + '</td>'
-              + '<td>' + c.use + '<div style="font-size:11px;color:var(--dim);margin-top:3px">换新：' + c.how + '</div></td>'
-              + '<td style="font-size:12px">' + c.where
-              + '<div style="font-size:11px;color:var(--dim);margin-top:3px">' + _dot(c.local) + '本地 &nbsp; ' + _dot(c.cloud) + '云端</div></td>'
-              + '<td>' + (c.updated || '—') + '</td>'
-              + '<td>' + st.remain + '</td>'
-              + '<td><span class="status-dot ' + st.cls + '"></span>' + st.txt + '</td>'
-              + '</tr>';
-          }
-          tb.innerHTML = rows;
-          if (!need.length){
-            bn.innerHTML = '✅ 凭证 ' + CREDS.length + ' 项全部在有效周期内'
-              + (minN ? '（最近到期：' + minN + (minL > 0 ? ' 剩 ' + minL + ' 天' : ' 已超期') + '）' : '');
-            bn.style.background = 'var(--bg2)';
-            bn.style.borderColor = 'var(--border)';
-            bn.style.color = 'var(--down)';
-          } else {
-            bn.innerHTML = '⚠️ ' + need.length + ' 项凭证需处理：' + need.join(' / ') + ' —— 找主人拿新的';
-            bn.style.background = 'rgba(251,191,36,.10)';
-            bn.style.borderColor = 'var(--gold)';
-            bn.style.color = 'var(--gold)';
-          }
+        // 生成「外部数据源」表内的凭证行（3 列：项目 / 状态 / 说明）+ 汇总句
+        var rows = '', need = [], minL = null, minN = '';
+        for (var i = 0; i < CREDS.length; i++){
+          var c = CREDS[i], st = _status(c);
+          if (st.left === null || st.left <= WARN_DAYS) need.push(c.name);
+          if (st.left !== null && (minL === null || st.left < minL)) { minL = st.left; minN = c.name; }
+          var scope = (c.local && c.cloud) ? '本地 + 云端' : (c.local ? '仅本地' : '仅云端');
+          rows += '<tr>'
+            + '<td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">' + c.name
+              + '<div style="font-size:10px;color:var(--dim);margin-top:2px">' + c.use + '</div></td>'
+            + '<td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap"><span class="status-dot ' + st.cls + '"></span>' + st.txt + '</td>'
+            + '<td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--sub);line-height:1.65">'
+              + st.remain + ' · 续期 ' + (c.updated || '—') + ' · ' + scope
+              + '<br>存放：' + c.where
+              + (c.expire_note ? '<br><span style="color:var(--dim)">' + c.expire_note + '</span>' : '')
+              + '<br>换新：' + c.how + '</td>'
+            + '</tr>';
         }
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
-        else render();
-        window.addEventListener('load', render);
-        setTimeout(render, 1200);
-        window.__v8CredLedgerRender = render;
-      })();
+        var summary = need.length
+          ? ('⚠️ ' + need.length + ' 项需处理：' + need.join(' / ') + ' —— 找主人拿新的')
+          : ('✅ ' + CREDS.length + ' 项均有效' + (minN ? '（最近到期：' + minN + (minL > 0 ? ' 剩 ' + minL + ' 天' : ' 已超期') + '）' : ''));
+        return { rows: rows, summary: summary, warn: need.length > 0 };
+      };
       </script>
-    </div>
 
     <!-- ═══════════════ 📋 静态配置区（部署时写入/手动维护） ═══════════════ -->
 
@@ -9995,13 +9977,19 @@ function drawUpDownChart(){
         '</tbody></table>'+
       '</div>';
 
+    // 2026-09-11 主人令：凭证台账（知识星球/邮箱/mahoro）并入本表，不再单开一卡占版面
+    var _cred = (typeof window.__v8CredTable === 'function') ? window.__v8CredTable() : { rows:'', summary:'', warn:false };
+
     const extHtml =
       '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">'+
         '<div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:8px;">🔌 外部数据源（候选股池上游）</div>'+
-        '<table style="width:100%;font-size:11px;"><thead><tr><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">数据源</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">状态</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">诊断</th></tr></thead><tbody>'+
+        '<table style="width:100%;font-size:11px;"><thead><tr><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">项目</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">状态</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">说明</th></tr></thead><tbody>'+
           '<tr id="extSrcAkshare"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">akshare（港股/行业）</td><td id="extSrcAkStatus" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcAkDiag" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--sub)">—</td></tr>'+
           '<tr id="extSrcGuanlan"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">外资研投（知识星球研报）</td><td id="extSrcGlStatus" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcGlDiag" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--sub)">—</td></tr>'+
+          '<tr><td colspan="3" style="padding:10px 6px 5px;font-size:11px;border-bottom:1px solid rgba(255,255,255,.04)">🔑 <b>凭证台账</b> <span style="font-size:10px;color:'+(_cred.warn?'var(--gold)':'var(--dim)')+'">'+_cred.summary+'</span></td></tr>'+
+          _cred.rows+
         '</tbody></table>'+
+        '<div style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.6">⏰ 凭证口径：剩余 ≤ 7 天亮黄灯、超期亮红灯，届时按「换新方式」找主人拿新值；换新后只改卡片脚本里登记表的 <code>updated</code>（YYYY-MM-DD），剩余天数与灯色自动重算。本表只登记位置与日期，<b>不含任何凭据内容</b>；带「推定」的到期日来自历史记录，仅供参考。</div>'+
       '</div>';
 
     // 2026-08-11 主人令：文件新鲜度 + 外部数据源改为并排双列布局
