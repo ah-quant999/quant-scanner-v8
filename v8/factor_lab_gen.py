@@ -291,6 +291,97 @@ def get_roe_ttm(code):
         return None
     return round(sum(singles[-4:]) * 100.0, 2)
 
+
+# 🔬 2026-09-12 主人令「ROE 榜极端值裁剪 · 算法要公平公正不偏不倚」——
+#   三闸门（**全部基于实测数据质量，不是拍脑袋阈值**）
+#
+# 实证根因（本机 baostock 逐季取证，2026-09-12）：
+#   roeAvg 是【财年内累计值】，在「亏损→微利」或「单季剧变」的公司上，累计序列
+#   符号/斜率剧烈跳变，逐季差分后噪声被放大，TTM 求和得到毫无经济含义的值。
+#
+#   sh.600397 江钨装备（榜上第 1 名，TTM=183.36%）：
+#     累计 roeAvg: 25Q1 -0.6795 → 25Q2 -3.1876 → 25Q3 -1.5636 → 25Q4 -1.3603
+#                  → 26Q1 +0.0069 → 26Q2 +0.0063      ← 跨年符号翻转
+#     单季: -0.6795, -2.5081, +1.624, +0.2033, +0.0069, -0.0007
+#     → 最后 4 个单季混合了巨额负值与正值，求和 1.8336 纯粹是算术巧合
+#     ⚠️ 注意：它净资产 = 净利润/roeAvg 反推约 11.13 亿，**家底并不薄**
+#        ⇒ 网传「家底太薄导致放大」的说法不成立，真因是累计口径下的符号翻转。
+#
+#   sz.001309 德明利（TTM=121.07%）：单季 26Q1=0.6765（单个季度 ROE 67.65%）
+#     —— 业绩真实爆发但不可持续，作为「赚钱能力」排序具有误导性。
+#
+#   sh.600519 贵州茅台（TTM=33.17%，权威 32.41%）：序列平滑 ✅ 保留。
+#   → 闸门设计目标：**剔除口径噪声，保留真实高 ROE**，不误伤茅台这类正常公司。
+
+ROE_GATE_MAX_TTM = 150.0   # G3：TTM ROE 上限（主板极端罕见，超出几乎必为口径噪声）
+ROE_GATE_MIN_EQUITY = 1.0e8  # G1：反推净资产下限（1 亿元；低于此 ROE 无经济含义）
+
+
+def get_roe_detail(code):
+    """返回 ROE 明细 dict；与 get_roe_ttm 同源同算法，额外带质量闸门判定。
+
+    {"ttm": float|None, "singles": [...], "n_neg": int,
+     "equity": float|None, "g1": bool, "g2": bool, "g3": bool, "ok": bool}
+
+    闸门：
+      G1 净资产  —— 用 netProfit/roeAvg 反推净资产，≤ 1 亿则 ROE 无经济含义，剔除
+      G2 稳定性  —— 近 4 个单季 roeAvg 任一为负 → 盈利不稳定，累计差分噪声大，剔除
+      G3 合理性  —— TTM > 150% → 主板极端罕见，判为口径噪声，剔除
+    """
+    out = {"ttm": None, "singles": [], "n_neg": 0, "equity": None,
+           "g1": True, "g2": True, "g3": True, "ok": True}
+    series, profits = {}, {}
+    try:
+        for y in ROE_YEARS:
+            for q in ROE_QTRS:
+                rp = bs.query_profit_data(code, year=y, quarter=q)
+                while rp.error_code == '0' and rp.next():
+                    v = rp.get_row_data()
+                    try:
+                        if len(v) > 3 and v[3] not in ("", "None"):
+                            series[(y, q)] = float(v[3])
+                        if len(v) > 6 and v[6] not in ("", "None"):
+                            profits[(y, q)] = float(v[6])      # netProfit
+                    except Exception:
+                        pass
+                time.sleep(0.02)
+    except Exception as e:
+        log("⚠️ ROE 查询异常跳过", code, type(e).__name__, str(e)[:60])
+        return out
+    order = sorted(series.keys())
+    if len(order) < 4:
+        return out
+    singles = []
+    for (y, q) in order:
+        cum = series[(y, q)]
+        if q == 1:
+            singles.append(cum)
+        else:
+            prev = series.get((y, q - 1))
+            if prev is None:
+                continue
+            singles.append(cum - prev)
+    if len(singles) < 4:
+        return out
+    last4 = singles[-4:]
+    ttm = round(sum(last4) * 100.0, 2)
+    out["ttm"] = ttm
+    out["singles"] = [round(x, 6) for x in last4]
+    out["n_neg"] = sum(1 for x in last4 if x < 0)
+    # G1：反推净资产（取最后一个有 netProfit 的季 + 其累计 roeAvg）
+    try:
+        for k in reversed(order):
+            if k in profits and series.get(k):
+                out["equity"] = profits[k] / series[k]
+                break
+    except Exception:
+        pass
+    out["g1"] = (out["equity"] is None) or (out["equity"] > ROE_GATE_MIN_EQUITY)
+    out["g2"] = (out["n_neg"] == 0)
+    out["g3"] = (ttm <= ROE_GATE_MAX_TTM)
+    out["ok"] = bool(out["g1"] and out["g2"] and out["g3"])
+    return out
+
 def get_name(code):
     rs = _q(bs.query_stock_basic, code=code)
     if rs is None:
@@ -431,7 +522,8 @@ def main():
         try:
             name = get_name(code)
             amt, last, last_date = get_kline_amt(code)
-            roe = get_roe_ttm(code)
+            _rd = get_roe_detail(code)
+            roe = _rd["ttm"]
         except Exception as e:
             log("⚠️ roe 单只异常跳过", code, type(e).__name__, str(e)[:80])
             continue
@@ -444,6 +536,14 @@ def main():
             "size_proxy": round(amt, 1) if amt else 0.0,
             "asof_q": ASOF_Q,
             "roe_ver": ROE_VER,
+            # 🔬 2026-09-12 质量闸门（三闸门 + 取证字段，供前端与审计复核）
+            "roe_ok": _rd["ok"],
+            "roe_gate": ("G1净资产" if not _rd["g1"] else "")
+                          + ("G2负单季" if not _rd["g2"] else "")
+                          + ("G3超上限" if not _rd["g3"] else ""),
+            "roe_singles": _rd["singles"],
+            "roe_n_neg": _rd["n_neg"],
+            "roe_equity": round(_rd["equity"], 0) if _rd["equity"] is not None else None,
         }
         if (i+1) % 25 == 0:
             save_cache(r, CACHE_R)
@@ -461,9 +561,32 @@ def main():
     valid.sort(key=lambda x: x["size_proxy"], reverse=True)
     n = len(valid)
     large = valid[:max(1, n//3)]
+    # 🔬 2026-09-12 主人令「算法要公平公正，不偏不倚」：ROE 榜**极端值裁剪**。
+    #   闸门在候选层过滤（而非排序后再砍头），保证「大市值档 Top1/3」的样本口径
+    #   不被少数噪声股挤占；被剔除的股票仍在缓存里，只是不进榜。
+    #   ⚠️ 默认开启；可用 V8_ROE_GATE=0 临时关闭（仅限诊断，生产不得关）。
+    #   兼容历史缓存：老记录没有 roe_ok 字段 → 视为通过（不让旧缓存凭空掉榜）。
+    _GATE_ON = os.environ.get("V8_ROE_GATE", "1") != "0"
+    _gated = []
+    if _GATE_ON:
+        for v in large:
+            if v.get("roe_ok", True):
+                _gated.append(v)
+            else:
+                _gated.append(None)
+        _dropped = [v for v in large if not v.get("roe_ok", True)]
+        large = [v for v in large if v.get("roe_ok", True)]
+        log("ROE 闸门(G1净资产/G2负单季/G3超上限) 剔除", len(_dropped), "只 /",
+            "剔除前", len(_gated), "只",
+            "| 样例:", [f"{x['code']}({x.get('roe_gate') or '-'})" for x in _dropped[:6]])
+    else:
+        log("⚠️ V8_ROE_GATE=0 —— ROE 质量闸门已被人为关闭（仅诊断用途）")
+    if len(large) < 10:
+        log("ERROR: ROE 闸门后样本不足（" + str(len(large)) + "），拒绝推送以免榜单失真")
+        return
     large.sort(key=lambda x: x["roe_ttm"], reverse=True)
     top30 = large[:30]
-    log("全市场有效", n, "大市值档", len(large), "Top30首只", top30[0]["code"] if top30 else "无")
+    log("全市场有效", n, "大市值档(闸门后)", len(large), "Top30首只", top30[0]["code"] if top30 else "无")
 
     if len(at_valid) < 10 or len(large) < 10:
         log("ERROR: 有效样本不足（abn=" + str(len(at_valid)) + ", roe_large=" + str(len(large)) + "），中止推送")
