@@ -306,6 +306,9 @@ def _make_lite(name, obj):
         return obj
     if name == 'BACKTEST_TDX':
         return {
+            # 🛡 2026-09-11：必须透传 update_time，否则下方组装逻辑会退回
+            #   `or obj.get('calc_time')` 兜底 → 产物只剩日期精度 → 闸门 floor 判据失效。
+            'update_time': obj.get('update_time'),
             'calc_time': obj.get('calc_time'),
             'method': obj.get('method'),
             'gold_pool_size': obj.get('gold_pool_size'),

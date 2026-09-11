@@ -16,6 +16,9 @@ def make_lite(name, obj):
     if name == 'BACKTEST_TDX':
         # 只保留全局汇总统计
         return {
+            # 🛡 2026-09-11：同 update_v8.py::_make_lite，必须透传 update_time
+            #   （两处是重复实现，改一处漏一处 = 漂移）。
+            'update_time': obj.get('update_time'),
             'calc_time': obj.get('calc_time'),
             'method': obj.get('method'),
             'gold_pool_size': obj.get('gold_pool_size'),

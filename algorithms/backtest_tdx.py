@@ -651,6 +651,13 @@ def main():
     
     result_data = {
         "calc_time": TODAY,
+        # 🛡 2026-09-11 阿狸咪的工程师：原先只写 calc_time（仅日期 %Y-%m-%d），
+        #   导致下游 update_v8 用 calc_time 兜底出「仅日期」的 update_time，
+        #   而 stage_gate.read_ut() 对「仅日期」宽松补 23:59 → E 批 floor(16:30)
+        #   判据失效 + _newest() 跨批顺序判据被伪 23:59 污染。此处补精确时刻治本。
+        #   ⚠️ 只加在最终产物；下方「每只一存」的中间快照刻意不加（半成品，
+        #      带上时间戳会造出「有 update_time 但无 summary」的假新鲜产物）。
+        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "method": f"baostock 60日K线全量回测 (T+{', T+'.join(map(str, HOLD_DAYS))})",
         "gold_pool_size": len(gp_stocks),
         "stocks_analyzed": len([k for k in stock_results if "signals" in stock_results[k]]),
