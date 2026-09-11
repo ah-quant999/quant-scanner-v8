@@ -418,6 +418,37 @@ jobs:
           if [ "${TGT:-NONE}" = "NONE" ]; then
             echo "::notice title=v8-stage-gate-noop::${REASON}"
           fi
+          # ⏰ 2026-09-11 小九的工程师（盘中错题 E5 一劳永逸修复 · 源头无关的最后闸门）
+          #   实证：本日 09:05/11:15/11:57/12:05 四次「盘中派发盘后算法链」，
+          #   其中 09:05 那条在盘中占用 cn runner 3 小时+（卡在第 9 步 75 分钟无进展），
+          #   且链尾第 12 步会推送 data/ —— 直接覆盖盘中实时数据（FOUR_VOLUME 洗空同源）。
+          #   上游派发源为 PAT 身份、非本机任何 ACTIVE 自动化（已逐一排除），
+          #   故在此设「源头无关」的硬闸门：盘中时段一律拒绝长任务。
+          #   豁免：force_run / bypass_time_gate 显式授权（应急补跑）。
+          #   静默秒退 = success 属本仓既有设计（见文件头 concurrency 注释）。
+          if [ "$FORCE" != "--force" ]; then
+            HHMM=$(python -c "import datetime as d;n=d.datetime.now(d.timezone.utc)+d.timedelta(hours=8);print('%d%02d'%(n.hour,n.minute))")
+            DOW=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).isoweekday())")
+            if [ "$DOW" -le 5 ] && [ "$HHMM" -ge 925 ] && [ "$HHMM" -le 1505 ]; then
+              echo "::warning title=v8-algo-market-hours-blocked::盘中时段(CST ${HHMM})拒绝算法链长任务 —— 保护盘中数据 + 释放 cn runner"
+              echo "proceed=false"      >> "$GITHUB_OUTPUT"
+              echo "target_stage=MARKET_HOURS_BLOCKED" >> "$GITHUB_OUTPUT"
+              {
+                echo "## ⏰ 盘中静默闸门（正常设计，非故障）"
+                echo ""
+                echo "| 项 | 值 |"
+                echo "| --- | --- |"
+                echo "| CST 时刻 | **${HHMM}** |"
+                echo "| 判定 | 盘中时段（09:25-15:05）→ 拒绝算法链长任务 |"
+                echo "| 盘后唤醒点 | 16:40 / 18:10 / 20:00 / 21:00 / 22:30 / 00:30 照常 |"
+                echo "| 应急补跑 | 派发时带 force_run=true 或 bypass_time_gate=true |"
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "🕐 CST ${HHMM} 非盘中时段 → 算法链放行"
+          else
+            echo "⚠️ force 模式 → 盘中时段闸门已豁免"
+          fi
           echo "🚦 目标批=${TGT} 放行=${{ steps.gate.outputs.proceed }}（${REASON}）"
 
       - name: "🧮 运行盘后算法链（写入 raw_data/，推送由链尾统一执行）"
@@ -663,6 +694,11 @@ jobs:
 
           if [ "${KIND:-none}" = "none" ]; then
             echo "::notice title=v8-algo-holiday::休市日（无 T+1 需求），不跑算法链（合规）"; exit 0
+          fi
+          # ⏰ 2026-09-11 小九的工程师：盘中时段闸门拦截 = 合规空转（非假成功，非故障）。
+          #   必须在下方「OK 检查」之前返回，否则会打出「批完成·产物核验通过」的误导结论。
+          if [ "${TGT:-}" = "MARKET_HOURS_BLOCKED" ]; then
+            echo "::notice title=v8-algo-market-hours::盘中时段(CST ${HHMM})拒绝算法链长任务 —— 保护盘中数据 + 释放 cn runner（合规，非故障）"; exit 0
           fi
           if [ "$OK" != "true" ]; then
             echo "::error title=v8-algo-gate-blocked::上游未就绪，本批已被批次闸门拒绝执行（目标 ${TGT}）——这不是成功"; exit 1
