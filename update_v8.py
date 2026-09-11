@@ -185,7 +185,12 @@ CATEGORY_MAP = {
     "VOLATILITY": "post_close",
 
     # 盘中（每30分钟 09:40~15:10，由 cn runner 刷新）
-    # 注意：ETF_DAILY_MONITOR 虽字段含 T+1，但为配合 ETF 三连板实时卡，归 intraday 盘中更新
+    # 🛡 2026-09-11 主人令（轻量化·卡迁移·注入侧一并对齐）：「日监控·主力净流入」卡已自
+    #   「实时数据」页迁至「盘后数据」页（市场宽度卡上方）→ ETF_DAILY_MONITOR 维持
+    #   "intraday,post_close" 双档：intraday 保证盘中每 30 分重建（数据本体含 T+0 字段），
+    #   post_close 保证盘后页该卡有 T+1 定稿重建；与 cloud_fetch_v8.py 侧同档。
+    #   （原注释「为配合 ETF 三连板实时卡」中的「三连板」已随 2026-09-11 轻量化拆为
+    #    「ETF 二合一」，勿再按旧名检索或复建。）
     "INDEX_QUOTES": "intraday,post_close",
     "ETF_PULSE": "intraday,post_close",
     "ETF_INTRADAY_HEAT": "intraday,post_close",

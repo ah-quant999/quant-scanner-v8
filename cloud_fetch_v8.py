@@ -109,14 +109,22 @@ CATEGORY_MAP = {
     # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
     "W52_HIGH": "premarket,post_close",
     "HERDING_DATA": "post_close",  # 🛡 2026-09-08 改 post_close：f_herding_data 依赖当日完整涨停池，盘前/盘中数据不全，只有盘后生成才有意义
-    # 盘中（含 ETF 三连板、板块资金三连板盘中追热等实时场景）
+    # 盘中（ETF 二合一·盘中异动/资金热度、板块资金流向等实时场景。
+    #   2026-09-11 轻量化：原「板块资金三连板·盘中追热」整块删除、「ETF 三合一」拆为「ETF 二合一」，
+    #   旧注释里的「三连板 / 盘中追热」措辞已失效，勿按旧名检索或复建。）
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
     "ETF_INTRADAY_HEAT": "intraday",
-    # ETF_DAILY_MONITOR 归 intraday：CATEGORY_MAP 决定的是「抓取时段」（main() 的 target_vars 按 cat 筛选），
-    # 该卡片配合 ETF 三连板实时卡，盘中每 30 分需要刷新，改成 post_close 会把它踢出盘中抓取（2026-08-11 回归）。
+    # 🛡 2026-09-11 主人令（轻量化·卡迁移·算法侧一并对齐）：「日监控·主力净流入」卡已由
+    #   「实时数据」页迁至「盘后数据」页（市场宽度卡上方），抓取档位同步升为双档：
+    #   · intraday  —— 数据本体含 T+0 字段（top_inflow/top_outflow 每 30 分刷新），盘中链继续抓；
+    #     2026-08-11 的回归教训：只留 post_close 会把它踢出盘中抓取（卡在开盘后一片空白）。
+    #   · post_close —— 卡已归盘后数据页，收盘后必须重抓一次（T+1 定稿值），与 update_v8.py 侧
+    #     早已存在的 "intraday,post_close" 对齐。此前依赖 main() 里
+    #     `post_close → target_vars.add("ETF_DAILY_MONITOR")` 的隐式特例补抓，现改为显式登记，
+    #     隐式特例退化为幂等兜底，杜绝两侧口径再次漂移。
     # 「盘前不清空、保留昨日 T+1 收盘值」是另一个语义，由下方 _clear_intraday_for_premarket 的 KEEP_VARS 负责。
-    "ETF_DAILY_MONITOR": "intraday",
+    "ETF_DAILY_MONITOR": "intraday,post_close",
     "SECTOR_FUND_FLOW": "intraday,post_close",  # 2026-09-03 根治：盘中 cron 偶发丢档→收盘定格值无着落；加 post_close 兜底（过滤已 comma-aware）
     "SECTOR_FUND_FLOW_INTRADAY": "intraday,post_close",  # 分时快照，跟随 SECTOR_FUND_FLOW 同周期；盘后追加收盘定格点
     "CAPITAL_FLOW_DATA": "intraday",
@@ -3121,7 +3129,8 @@ def _clear_intraday_for_premarket(category, only=None):
     # 明确保留的卡片：盘前不清空，保留历史/上一交易日数据
     # ETF_DAILY_MONITOR：T+1 主力净流入为盘后（15:30）定稿值，盘前清成空会让「日监控·主力净流入」
     #   卡片在开盘前一片空白（阿狸咪 2026-08-11 反馈「这是盘后的啊，清空了干嘛」）。保留昨日值，
-    #   开盘后盘中 fetch 自然覆盖为当日数据。注意它在 CATEGORY_MAP 里仍是 intraday（保证盘中被抓）。
+    #   开盘后盘中 fetch 自然覆盖为当日数据。注意它在 CATEGORY_MAP 里是 "intraday,post_close"
+    #   （盘中保证被抓 + 2026-09-11 卡迁「盘后数据」页后补 post_close 定稿档）。
     # 🛡 2026-08-26 一劳永逸根因修复：CONCEPT_RANKING 原不在 KEEP_VARS，盘前(08:25)即被抹成空 stub，
     #   导致"概念资金热图过早清空"。现与 SH_SZ_HISTORY 同等对待——盘前保留前一交易日真实数据，
     #   等 09:00 盘中 fetch 自然刷新（即"开盘前一起刷新"，而非 08:25 就空白）。
@@ -3275,7 +3284,10 @@ def main(category=None, only=None):
 
     cleaned = 0
 
-    # 🔧 盘后（15:30）额外补抓 ETF_DAILY_MONITOR（T+1 日监控收盘后定稿，配合盘中实时卡）
+    # 🔧 盘后（15:30）补抓 ETF_DAILY_MONITOR（T+1 日监控收盘后定稿）。
+    #    2026-09-11：该变量已在 CATEGORY_MAP 显式登记为 "intraday,post_close"，本行退化为
+    #    幂等兜底（set.add 无副作用）——防未来有人误删 CATEGORY_MAP 的 post_close，
+    #    导致「盘后数据」页 日监控卡定格在 15:30 的盘中快照。
     if category == "post_close" and target_vars is not None:
         target_vars.add("ETF_DAILY_MONITOR")
     # 🔧 盘前（08:25）额外补抓 MARKET_FUND_FLOW_DATA（日频资金流时间轴，防止 15:30 post_close 漏跑导致滞后一天）

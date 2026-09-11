@@ -132,7 +132,7 @@
   .lu-h4{background:rgba(198,40,40,.68);color:#fff;font-weight:700}
   .lu-h5{background:rgba(198,40,40,.88);color:#fff;font-weight:700}
 
-  /* ===== 板块资金三合一（v6 风格暗色移植） ===== */
+  /* ===== 板块资金趋势（2026-09-11 轻量化：原「板块资金三合一」Block1 盘中追热已整块删除） ===== */
   .sf-block{border-radius:12px;padding:14px 16px;margin-bottom:12px;border:1px solid var(--border)}
   .sf-block:last-child{margin-bottom:0}
   .sf-block-hot{background:linear-gradient(135deg,rgba(24,95,165,.18),rgba(56,189,248,.08));border-left:4px solid #38bdf8}
@@ -985,8 +985,9 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
           <tr><td><b>期指主力合约 · 情绪方向</b></td><td><b>CFFEX_HOLDINGS</b></td><td><b>云端 v8_cn_fetch_cloud</b></td><td><b>实时数据 / 盘中 · 短线（2026-08-31 迁回，防回滚）</b></td></tr>
           <tr><td>情绪周期 · 连板天梯</td><td>LIMIT_UP_HEATMAP</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
           <tr><td>涨停热力矩阵</td><td>LIMIT_UP_HEATMAP</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
-          <tr><td>ETF 三合一</td><td>ETF_PULSE / ETF_INTRADAY_HEAT / ETF_DAILY_MONITOR</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中 + 盘后定稿</td></tr>
-          <tr><td>板块资金趋势</td><td>SECTOR_FUND_FLOW / SECTOR_FUND_FLOW_TREND</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
+          <tr><td>ETF 二合一</td><td>ETF_PULSE / ETF_INTRADAY_HEAT</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分（2026-09-11 轻量化：原「ETF 三合一」Block3「日监控·主力净流入」已独立成卡并迁至「盘后数据」页）</td></tr>
+          <tr><td><b>（2026-09-11 迁出）日监控 · 主力净流入</b></td><td><b>ETF_DAILY_MONITOR</b></td><td><b>云端 v8_cn_fetch_cloud</b></td><td><b>已迁至「盘后数据」页（市场宽度卡上方）· 盘中每 30 分 + 收盘后定稿（防回滚）</b></td></tr>
+          <tr><td>板块资金趋势</td><td>SECTOR_FUND_FLOW / SECTOR_FUND_FLOW_TREND</td><td>云端 v8_cn_fetch_cloud</td><td>盘后数据页 / 盘中每 30 分（2026-09-11：原 Block1「盘中追热」整块删除，行业/概念净额榜改由「AI 市场速览」承载）</td></tr>
           <tr><td>概念资金热力图</td><td>CONCEPT_RANKING</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
           <tr><td>行业树图 · 细分赛道</td><td>SECTOR_FUND_FLOW</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中 · 短线</td></tr>
         </table>
@@ -1013,7 +1014,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-h">ETF资金热度</div>
         <div class="logic-p">宽基指数ETF每日净申购赎回份额折线图，T+0实时估算国家队动向。数据源：etf_intraday_heat.json（akshare fund_etf_hist_em）。展示沪深300/中证500/创业板/科创50/上证50等主要宽基ETF。</div>
         <div class="logic-h">主力净额分时累计曲线（2026-08-18 主人令：数据源说明从卡片移到逻辑详解）</div>
-        <div class="logic-p">📌 <b>实时数据源</b> SECTOR_FUND_FLOW_INTRADAY（cn_fetch 每30分钟快照 Top15流入+Top5流出）。<b>盘前不清空</b>——保留上一交易日全天快照供开盘前查阅，由 09:30 盘中首轮自然覆盖为当日数据；盘中累积、盘后自然定基——一段连续 time-series 即完整曲线。<b style="color:#f59e0b">不依赖高频 tick</b>，调度与你"不要太频繁"偏好一致。<br>⏱ <b>盘前清空时点（2026-09-07 主人令）</b>：其余盘中/实时卡（指数快照/ETF脉搏/ETF资金热度/板块资金/候选池行情/市场预警/亚太市场）的清空由 09:15–10:00 窗口内的盘中首轮执行，08:25 盘前轮只抓数据不再清空。</div>
+        <div class="logic-p">📌 <b>实时数据源</b> SECTOR_FUND_FLOW_INTRADAY（cn_fetch 每30分钟快照 Top15流入+Top5流出）。<b>盘前不清空</b>——保留上一交易日全天快照供开盘前查阅，由 09:30 盘中首轮自然覆盖为当日数据；盘中累积、盘后自然定基——一段连续 time-series 即完整曲线。<b style="color:#f59e0b">不依赖高频 tick</b>，调度与你"不要太频繁"偏好一致。<br>⏱ <b>盘前清空时点（2026-09-07 主人令）</b>：其余盘中/实时卡（指数快照/ETF脉搏/ETF资金热度/板块资金/候选池行情/市场预警/亚太市场）的清空由 09:15–10:00 窗口内的盘中首轮执行，08:25 盘前轮只抓数据不再清空。<br>🔗 <b>2026-09-11 主人令（跨页联动）</b>：本曲线与「盘后数据」页的「日监控 · 主力净流入」（ETF_DAILY_MONITOR）作 T+0 联动——本卡看板块级分时累计，对页看全市场 ETF 当日净流入 TOP 排名；两卡 DOM 分属不同 Tab，但同属一条盘后定基链。</div>
       </div>
 
     </div>
@@ -1021,13 +1022,13 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
                          
     
 <div class="card">
-        <h3><span class="ic">📈</span>板块资金趋势 / 概念资金热力图 - 说明（2026-09-08 轻量化更名）</h3>
+        <h3><span class="ic">📈</span>板块资金趋势 / 概念资金热力图 - 说明（2026-09-08 更名 · 2026-09-11 再轻量化）</h3>
         <div class="logic-h">板块资金趋势</div>
-        <div class="logic-p">原「板块资金三合一 - 盘中+盘后+趋势」简化为「板块资金趋势」：保留周期定位 + 资金趋势验证核心两栏，前端卡片标题同步精简。行业板块主力净流入/流出排名，|净流入|≥5亿为「大幅流入/流出」。红色=流入，绿色=流出。主数据源失败时自动切换备用数据源（流入TOP10+流出TOP10合并去重）。</div>
+        <div class="logic-p">原「板块资金三合一 - 盘中+盘后+趋势」→ 2026-09-08 更名为「板块资金趋势」并精简周期定位/资金趋势两栏；<b>2026-09-11 主人令</b>：Block1「盘中追热」整块删除（其「概念流入 TOP5」与实时数据页「概念资金热力图」完全同维度重复，「行业流入 TOP5 / 流出 TOP3」又与「主力净额分时累计曲线」最新快照重合），行业/概念净额榜改由「AI 市场速览」承载；卡片现仅保留「收盘复盘 + 板块资金趋势（周期定位）」两块。行业板块主力净流入/流出排名，|净流入|≥5亿为「大幅流入/流出」。红色=流入，绿色=流出。主数据源失败时自动切换备用数据源（流入TOP10+流出TOP10合并去重）。</div>
         <div class="logic-h">概念资金热力图</div>
         <div class="logic-p">以 treemap 方块可视化概念板块主力净流入 TOP30。方块大小∝|净流入|，红色=上涨、绿色=下跌。一眼识别资金集中流向与概念热度。</div>
         <div class="logic-h">收盘复盘 · 周期定位 + 资金趋势（2026-08-30 主人令：数据源说明从卡片移到逻辑详解）</div>
-        <div class="logic-p">📌 板块按 20 日涨幅周期定位；资金按主力净流入滚动累计验证（SECTOR_FUND_FLOW_TREND 盘后快照，与 Block1 盘中 SECTOR_FUND_FLOW 不同源，数值可能不一致属正常）。</div>
+        <div class="logic-p">📌 板块按 20 日涨幅周期定位；资金按主力净流入滚动累计验证（SECTOR_FUND_FLOW_TREND 盘后快照，与盘中 SECTOR_FUND_FLOW 不同源，数值可能不一致属正常）。<br>🗑 <b>2026-09-11 口径变更</b>：原文「与 Block1 盘中 SECTOR_FUND_FLOW 不同源」中的 Block1（盘中追热）已删除，现对比对象是盘中 SECTOR_FUND_FLOW 本身（行业树图 / AI 速览在用）。</div>
       </div>
 
       
@@ -1118,13 +1119,14 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
       
       <div class="card">
-        <h3><span class="ic">📋</span>📋 盘后数据页 · 卡片归属与刷新对齐矩阵（2026-09-02 自动对齐）</h3>
+        <h3><span class="ic">📋</span>📋 盘后数据页 · 卡片归属与刷新对齐矩阵（2026-09-02 自动对齐 · 2026-09-11 补盘后卡）</h3>
         <div class="logic-p">本矩阵按主站实际卡片顺序，明确每张卡片的时间/任务/执行机/前端位置，防止后续 CI 或回滚覆盖后再出现卡片位置/刷新标签错误。</div>
         <table class="lg-table">
           <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
           <tr><td>15:30 收盘后</td><td>板块资金趋势</td><td>云端 v8_cn_fetch_cloud</td><td>盘后数据页首卡</td></tr>
-          <tr><td>盘中每 10 分</td><td>板块资金日内快照（高频补点，根治上午空白）</td><td>云端 v8_intraday_snapshot</td><td>实时数据页·板块资金</td></tr>          <tr><td>15:30 收盘后</td><td>市场宽度（新高家数）</td><td>云端 v8_cn_fetch_cloud</td><td>盘后数据页</td></tr>
-          <tr><td>08:25 盘前</td><td>宏观数据速览 MACRO_DATA</td><td>云端 v8_cn_fetch_cloud</td><td>盘后数据页</td></tr>
+          <tr><td>盘中每 10 分</td><td>板块资金日内快照（高频补点，根治上午空白）</td><td>云端 v8_intraday_snapshot</td><td>实时数据页·板块资金</td></tr>          <tr><td>盘中每 30 分 + 17:20/18:20/19:20 定稿</td><td><b>日监控 · 主力净流入（ETF_DAILY_MONITOR）</b>——2026-09-11 主人令自「实时数据」页 ETF 三合一 Block3 迁来</td><td>云端 v8_cn_fetch_cloud</td><td><b>盘后数据页（市场宽度卡上方）· CATEGORY_MAP=intraday,post_close 双档；健康检查 page=盘后数据 + dual_page=实时数据（阈值双轨）</b></td></tr>
+          <tr><td>15:30 收盘后</td><td>市场宽度（新高家数）</td><td>云端 v8_cn_fetch_cloud</td><td>盘后数据页</td></tr>
+          <tr><td>08:25 盘前 + 17:20 盘后</td><td>宏观数据速览 MACRO_DATA（2026-09-11 主人令移出 intraday）</td><td>云端 v8_cn_fetch_cloud</td><td>盘后数据页</td></tr>
           <tr><td>08:25 盘前</td><td>解禁日历 / 业绩预告</td><td>云端 v8_cn_fetch_cloud</td><td>盘后数据页</td></tr>
         </table>
       </div>
@@ -4334,7 +4336,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(document.getElementById('etfHeatTime')) setBadge('etfHeatTime','盘中','短线',etfHeat.update_time);
   }
 
-  /* ---- 5.5 ETF 量能脉冲(盘中异动) / 日监控 渲染 ---- */
+  /* ---- 5.5 ETF 量能脉冲(盘中异动) / 日监控（2026-09-11 起挂「盘后数据」页，容器 id 不变） 渲染 ---- */
   function renderEtfPulse(pulse){
     var el=document.getElementById('etfPulseBlock');
     if(!el) return;
@@ -4438,7 +4440,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(daily.update_time) setBadge('phEtfTime',_slotNow,'短线',daily.update_time);
   }
 
-  /* ---- ETF 三合一·三段式分析说明（对标涨停热力矩阵） ---- */
+  /* ---- ETF 二合一·盘面分析说明（对标涨停热力矩阵；原三段式含「日监控」，该块已迁「盘后数据」页） ---- */
   function renderEtfAnalysis(pulse, heat, daily){
     var el=document.getElementById('etfAnalysis');
     if(!el) return;
@@ -5292,8 +5294,6 @@ function drawUpDownChart(){
 
           {name:'ETF 资金热度', source:'ETF_INTRADAY_HEAT', freq:'盘中实时 T+0', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'按类别实时热度'},
 
-          {name:'ETF 日监控', source:'ETF_DAILY_MONITOR', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'日常监控清单'},
-
           {name:'板块资金流向', source:'SECTOR_FUND_FLOW', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'行业/概念资金流'},
 
           {name:'行业树图 · 细分赛道', source:'SECTOR_FUND_FLOW', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'行业板块涨跌 treemap（强制显示「盘中」标签）'},
@@ -5323,6 +5323,8 @@ function drawUpDownChart(){
           {name:'六维共振雷达', source:'SH_FIB', freq:'收盘后1次', slots:['17:30'], note:'战术/战略层评分'},
 
           {name:'融资融券', source:'MARGIN_DATA', freq:'收盘后1次', slots:['17:30'], note:'两市融资余额'},
+
+          {name:'日监控 · 主力净流入', source:'ETF_DAILY_MONITOR', freq:'盘中每30分 + 收盘后定稿', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30','17:20'], note:'全市场 ETF 当日主力净流入 TOP 排名（T+0 定基）；2026-09-11 主人令自「实时数据」页 ETF 三合一 Block3 独立成卡、迁至本页（市场宽度卡上方）；数据本体盘中每30分刷新 + 盘后三档(17:20/18:20/19:20)定稿，CATEGORY_MAP=intraday,post_close'},
 
           {name:'市场宽度 · 新高家数与宽度评分', source:'W52_HIGH', freq:'收盘后1次', slots:['17:30'], note:'今日历史新高家数 + 宽度评分 + 领涨新高股 TOP8；胶囊改小内部一行'},
 
@@ -6194,7 +6196,7 @@ window.showRestrictedItems = showRestrictedItems;
     //   不挂带具体时间的 🐻 胶囊；时间统一在下属各子卡片上展示）
     // 原代码曾在 rtUpdateTime 拼一个 max(intradayTimes) 的胶囊徽章,已删除。
 
-    // 1) ETF 三合一（盘中异动/资金热度/日监控）—— 直接用已注入的 window 变量
+    // 1) ETF 二合一（盘中异动/资金热度，实时数据页）+ 日监控·主力净流入（盘后数据页，同容器 id）—— 直接用已注入的 window 变量
     safe(renderEtfPulse, window.ETF_PULSE || {});
     safe(renderEtfHeatByCategory, window.ETF_INTRADAY_HEAT || {});
     safe(renderEtfDaily, window.ETF_DAILY_MONITOR || {});

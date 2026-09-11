@@ -74,7 +74,12 @@ CARD_DEFS = [
     {"id": "INDEX_QUOTES", "name": "全球指数 / 股指期货", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["items"]},
     {"id": "ETF_PULSE", "name": "ETF 盘中异动", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["etfs"]},
     {"id": "ETF_INTRADAY_HEAT", "name": "ETF 资金热度", "page": "实时数据", "freq": "盘中实时 T+0", "max_age": 60, "key_fields": ["items"]},
-    {"id": "ETF_DAILY_MONITOR", "name": "ETF 日监控", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["top_inflow", "top_outflow"], "premarket_keep": True},
+    # 🛡 2026-09-11 主人令（轻量化·卡迁移·健康检查一并对齐）：「ETF 日监控」（日监控·主力净流入）
+    #   卡已自「实时数据」页迁至「盘后数据」页（市场宽度卡上方）→ 本登记同步迁入下方「盘后数据」段
+    #   （page="盘后数据" + dual_page="实时数据"，阈值按窗口双轨计算，避免「迁页即误报」）。
+    #   原条目（已迁走，勿在本段复建，否则又成重复登记）：
+    #     {"id": "ETF_DAILY_MONITOR", "name": "ETF 日监控", "page": "实时数据", "freq": "盘中每30分",
+    #      "max_age": 60, "key_fields": ["top_inflow", "top_outflow"], "premarket_keep": True}
     {"id": "SECTOR_FUND_FLOW", "name": "板块资金流向", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["top_list"]},
     {"id": "CONCEPT_RANKING", "name": "概念排名", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["items"]},
     # 🛡 2026-09-02 一劳永逸：LIMIT_UP_HEATMAP.js 实际字段为 update_time/dates/sectors/republish_time，
@@ -104,6 +109,15 @@ CARD_DEFS = [
     #   移除该项登记;下面"全量数据审计"循环的 derived = {..., "SIX_DIM_RADAR"}
     #   已保护它不报"缺失或解析失败"。前端 renderSixDim 直接读 SH_FIB,无副作用。
     {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["sh"], "heal_cat": "post_close"},  # 2026-08-18 主人令一劳永逸：交易所每日16:15发布1次，360min 阈值导致 22:15 必误报 → 1440（24h，符合主人 24h 铁律）
+    # 🛡 2026-09-11 主人令（轻量化·卡迁移）：原「实时数据」段条目迁来——「日监控·主力净流入」
+    #   已自 ETF 二合一（原三合一）Block3 拆出，独立成卡挂在「盘后数据」页、市场宽度卡上方。
+    #   · page="盘后数据"     —— 与 index.html / logic.html「任务运行看板」的分组一致（不再置实时数据组）
+    #   · dual_page="实时数据" —— 数据本体仍由盘中 30 分链刷新（T+0 字段），阈值按窗口双轨计算
+    #     （见 _dual_threshold / _dual_hard_cap：盘中取较严、15:30-18:00 取较宽、18:00 后回归盘后口径），
+    #     既有 45~60min 敏感性不丢，也不会在「15:30 末班车 → 17:20 盘后首轮」之间天天假红灯。
+    #   · heal_cat="intraday" —— 主刷新通道是盘中 30 分链；盘后档同样已登记（CATEGORY_MAP
+    #     "intraday,post_close"），但自愈优先派发更轻的 intraday，避免抢占盘后 25min debounce 锁。
+    {"id": "ETF_DAILY_MONITOR", "name": "ETF 日监控", "page": "盘后数据", "dual_page": "实时数据", "freq": "盘中每30分 + 收盘后定稿", "max_age": 60, "key_fields": ["top_inflow", "top_outflow"], "premarket_keep": True, "heal_cat": "intraday"},
     # 🛡 2026-09-04 主人令一劳永逸：孤儿文件转正——此前无生成调度（all_ 动态扫描按通用 1440 红线误报 fail）。
     #   FACTOR_LAB 由 v8/factor_lab_gen.py 挂 STAGES[B] 产出；FOUR_VOLUME_BACKTEST 由 strategy_four_volume.py
     #   在回测批（STAGES[E]，注入 V8_BACKTEST_YEARS）产出。登记后走运维卡区正式判定，all_ 扫描跳过。
@@ -1187,7 +1201,7 @@ def write_urgent(reason_lines):
     print(f"[INFO] 已写紧急文件 {p}")
 
 
-def adjust_max_age(def_max, page=None):
+def adjust_max_age(def_max, page=None, n=None):
     """根据交易时段 + 数据更新窗口动态调整阈值。
 
     核心思路：每类数据有自己的「更新窗口」，窗口关闭后数据自然不会再刷新，
@@ -1196,8 +1210,11 @@ def adjust_max_age(def_max, page=None):
     参数:
         def_max: CARD_DEFS 里定义的默认阈值（分钟）
         page:   卡片所属分组（今日事件/实时数据/盘后数据/选股策略），用于区分更新窗口
+        n:      参照时间（北京时间 aware datetime）；默认 now_cst()。
+                🛡 2026-09-11 新增：双档卡（_dual_threshold）必须在**同一参照时间**下比较两页口径，
+                否则会「按 A 页的时刻算、用 B 页的实时钟取值」，得出自相矛盾的阈值（审计实测发现）。
     """
-    n = now_cst()
+    n = n or now_cst()
     h = n.hour + n.minute / 60.0
     weekday = n.weekday()
     is_weekend = weekday >= 5
@@ -1358,6 +1375,58 @@ def _hard_cap_for_owner_rule(n=None, page=None):
     return max(24 * 60, cap)
 
 
+# ── 🛡 2026-09-11 主人令（轻量化·卡迁移）：「双档卡」阈值双轨计算 ─────────────────────
+# 背景：卡片**页面归属**（盘后数据页）与**数据节拍**（盘中每 30 分 + 盘后定稿）分离后，
+#       只按单一 page 算阈值必然二选一出错：
+#         · 全按「实时数据」→ 15:30 之后落到 2880min（48h）放过夜，掩盖「盘后定稿未产出」；
+#         · 全按「盘后数据」→ 09:30-15:00 阈值 60min 尚可，但「15:30 盘中末班车 → 17:20 盘后首轮」
+#           之间本就不刷新，必被判 stale → 天天假红灯（主人最反感的「满屏红灯」）。
+#       故按窗口分三段（仅对声明了 dual_page 的卡生效；其余卡行为一字不变）：
+#         09:00-15:30 盘中 → 取两口径**较严格**者：保住 45min 敏感度与 2h 主人铁律
+#         15:30 之后      → 「距最近收盘 + 180min」缓冲（实测修正，见 _dual_threshold 文档）
+#       非交易日一律回归页面自身口径（周末两口径都极宽松，取页面口径语义更稳）。
+_DUAL_MARKET_OPEN_H, _DUAL_POSTCLOSE_H = 9.0, 15.5
+_DUAL_FIRST_POSTCLOSE_H = 18.0   # 17:20 盘后首轮 + 40min 余量（实测 cn_fetch post_close 批偶需 10~30min）
+
+
+def _dual_threshold(def_max, page, dual_page=None, n=None):
+    """双档卡 max_age：见上方窗口说明。dual_page 为空时等价于 adjust_max_age(def_max, page)。
+
+    🩸 2026-09-11 实测修正（审计发现两处反直觉结果，故窗口定为 2 段而非 3 段）：
+      · 15:30 之后的阈值不能取「实时数据」分支——它在 16:30 后会跳到 2880min（48h），
+        与「收盘→盘后三档」的节拍完全不匹配（17:10 会放过夜，掩盖盘后定稿缺失）；
+      · 也不能只取「盘后数据」分支——该卡 max_age=60，而盘后数据页 8h 内用 min(60,360)=60，
+        卡片在 19:20（当日最后一次 post_close）定稿后再不刷新 → 20:20 起必被误报 stale（天天假红灯）。
+      故 15:30 之后统一用「距最近收盘 + 180min」缓冲（与实时数据页收盘分支同口径）：
+      15:45→195min、19:30→420min、23:00→630min，次日 08:00→1170min，既不误报也不放过夜。
+    """
+    n = n or now_cst()
+    base = adjust_max_age(def_max, page=page, n=n)
+    if not dual_page:
+        return base
+    if not _is_trading_day(n.date()):
+        return base
+    h = n.hour + n.minute / 60.0
+    if _DUAL_MARKET_OPEN_H <= h < _DUAL_POSTCLOSE_H:
+        # 盘中（09:00-15:30）：两口径取较严格者 —— 保住 45min 敏感度与 2h 主人铁律
+        return min(base, adjust_max_age(def_max, page=dual_page, n=n))
+    # 15:30 收盘之后（含收盘→盘后首轮间隙、盘后三档、夜间）：距最近收盘 + 180min 缓冲
+    close = last_trade_day_close(n)
+    buf = int((n - close).total_seconds() / 60) + 180
+    return max(base, buf)
+
+
+def _dual_hard_cap(page, dual_page=None, n=None):
+    """双档卡的 2h/24h 硬 cap：盘中叠加严格侧（保住 2h 主人铁律），其余时段用页面自身口径。"""
+    n = n or now_cst()
+    cap = _hard_cap_for_owner_rule(n=n, page=page)
+    if dual_page and _is_trading_day(n.date()):
+        h = n.hour + n.minute / 60.0
+        if _DUAL_MARKET_OPEN_H <= h < _DUAL_POSTCLOSE_H:
+            cap = min(cap, _hard_cap_for_owner_rule(n=n, page=dual_page))
+    return cap
+
+
 def _raw_fresh_override(d, status, msg):
     """🛡 2026-09-10 主人令一劳永逸：post_close 卡「raw 已新 / js 待 20:00 D批重建」窗口误报 fail 根因修复。
 
@@ -1421,10 +1490,12 @@ def check_data_cards():
         if d.get("weekly"):
             max_age = d["max_age"]
         else:
-            max_age = adjust_max_age(d["max_age"], page=d.get("page"))
+            # 🛡 2026-09-11 主人令（卡迁移）：双档卡（page 与 dual_page 不同）走 _dual_threshold，
+            #   其余卡一字不变（dual_page 为空时 _dual_threshold 直接返回单页 adjust_max_age 结果）。
+            max_age = _dual_threshold(d["max_age"], d.get("page"), d.get("dual_page"))
             # 🛡 主人铁律 2026-08-18：分 page × 分时段红线（仅实时数据盘中 2h / 其他 24h）
             # 硬 cap 必须在 adjust_max_age 之后叠加，否则盘中/盘后自适应逻辑被绕过
-            max_age = min(max_age, _hard_cap_for_owner_rule(page=d.get("page")))
+            max_age = min(max_age, _dual_hard_cap(d.get("page"), d.get("dual_page")))
 
         # 盘中 premarket_cleared 异常自愈检测：实时数据在交易时段被标记为盘前清空，属于误清空
         prem_cleared = data.get("premarket_cleared") is True

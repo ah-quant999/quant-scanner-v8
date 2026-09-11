@@ -19,8 +19,13 @@
 #   盘中每30分钟刷新（09:00-15:30）：INDEX_QUOTES / ETF_PULSE / ETF_INTRADAY_HEAT /
 #                     ETF_DAILY_MONITOR / SECTOR_FUND_FLOW / CAPITAL_FLOW_DATA /
 #                     CONCEPT_RANKING / LIMIT_UP_HEATMAP / AI_MARKET_BRIEF
-#   17:20  盘后：CFFEX_HOLDINGS + EXPERIMENT + MARKET_FUND_FLOW_DATA + 龙虎榜当日数据刷新
+#   17:20  盘后：CFFEX_HOLDINGS + EXPERIMENT + MARKET_FUND_FLOW_DATA + ETF_DAILY_MONITOR +
+#          龙虎榜当日数据刷新
 #          （交易所 17:00 后才发布龙虎榜，故 post_close 从 15:45 推迟到 17:20）
+#          🛡 2026-09-11 主人令（轻量化·卡迁移）：「日监控·主力净流入」卡迁至「盘后数据」页后，
+#             ETF_DAILY_MONITOR 由单纯 intraday 升为 "intraday,post_close" 双档（见 cloud_fetch_v8.py
+#             CATEGORY_MAP）——盘中继续每 30 分抓，盘后三档(17:20/18:20/19:20)必重抓一次 T+1 定稿。
+#             （原「ETF 三连板」措辞已随该次轻量化拆为「ETF 二合一」，勿按旧名检索。）
 #   17:00/21:30 全量兜底（防 GitHub schedule 高负载丢触发；21:30 刚好美股开盘后捕获隔夜宏观变动）
 #   周六 09:00 / 周日 09:00  T+1 周度/月度统一刷新
 #
