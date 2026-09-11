@@ -16,6 +16,7 @@
 import os
 import sys
 import json
+import re
 import time
 import argparse
 from datetime import datetime, timedelta
@@ -286,6 +287,28 @@ def write_four_volume_js(records, out_dir=DATA_DIR):
         "stocks": records,
     }
     path = os.path.join(out_dir, "FOUR_VOLUME.js")
+
+    # 🛡 2026-09-11 小九的工程师·一劳永逸「防洗空」闸门：
+    #   实证故障：2026-09-11 盘中某轮抓取跑本策略（当日日线尚未收盘成型）→ 命中 0 只 →
+    #   把线上非空的 FOUR_VOLUME.js（5 只）直接覆盖成 total:0/stocks:[]（commit 049925d5）→
+    #   ① 前端「四量终极」卡空；② CI pre_deploy_audit 判「data/ 下过小文件」硬阻断
+    #      整站部署（后续好数据也上不了线）。
+    #   与金股池（out/gold_pool.json 被洗空）同族：**累积态一旦允许空写就必然被洗**。
+    #   规则：本次命中 0 只且磁盘已有非空 → 拒绝覆盖，保留旧值；确需清空须显式
+    #   V8_FOUR_VOLUME_FORCE_EMPTY=1（人工授权）。
+    if not records and os.environ.get("V8_FOUR_VOLUME_FORCE_EMPTY") != "1":
+        try:
+            if os.path.exists(path):
+                _old = open(path, "r", encoding="utf-8", errors="replace").read()
+                _m = re.search(r'"total"\s*:\s*(\d+)', _old)
+                if _m and int(_m.group(1)) > 0:
+                    print(f"  🛡 防洗空：本次命中 0 只，磁盘 {os.path.basename(path)} 已有 "
+                          f"{_m.group(1)} 只 → 拒绝覆盖（保留旧值，待盘后重算）")
+                    return path
+        except Exception as _e:
+            print(f"  [warn] 防洗空检查异常，按保守策略跳过写入: {_e}")
+            return path
+
     with open(path, "w", encoding="utf-8") as f:
         f.write("window.FOUR_VOLUME=" + json.dumps(data, ensure_ascii=False, indent=1) + ";\n")
     print(f"  ✅ 写出 {path}（{len(records)} 只命中）")
