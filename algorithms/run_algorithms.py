@@ -195,11 +195,15 @@ ORDER = [
     # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：LHB_7D.js 前端零引用，
     #   停止调度 gen_lhb_7d.py，释放 B 批算力。
     # "gen_lhb_7d.py",                   # → data/LHB_7D.js（龙虎榜 7 日累计，依赖 A 批 fetch_lhb.py）
-    # 🛡 2026-09-04 主人令（一劳永逸挂链）：动量共识筛选器此前零调度成孤儿——
-    #   只被 update_v8.py 的 run_experiment_cards() 副作用式调用（部署链，失败仅告警不阻断），
-    #   算法链从不调度 → 它是最终推荐 8 源里唯一「链外依赖」的一源，与强势突破不对称。
-    #   现正式挂链（B 批，依赖 A 批 fetch_stock_quote_v8.py 产出的 STOCK_QUOTE，纯本地计算无重抓）。
-    #   runner 无参调用 → 由 SCRIPT_ENV 注入 V8_MOMENTUM_EMIT_JS=1 触发 --emit-js 等价行为。
+    # ⚠️ 2026-09-11 A 类修复（假注释纠正）：上句「现正式挂链（B 批）」**与事实不符** ——
+    #   本文件的 ORDER 与 STAGES 里都没有 scripts/momentum_common_filter.py
+    #   （实测 `grep -n momentum algorithms/run_algorithms.py` = 0 命中），
+    #   MOMENTUM_FILTER.js 的真实重算方是 **update_v8.run_experiment_cards()**（盘后构建链，
+    #   失败仅告警不阻断），实测其 update_time 随构建链刷新（09-11 23:40:39）。
+    #   ⇒ 结论：它仍是「构建链依赖」而非「算法链依赖」，与强势突破（strong_breakout.py 已在
+    #   ORDER 内）**并不对称**。此处保留说明以免后人再被这句注释误导；是否真挂进算法链
+    #   属调度口径变更，需主人拍板，不在 A 类修复范围。
+    #   附：runner 无参调用依赖 SCRIPT_ENV 注入 V8_MOMENTUM_EMIT_JS=1 触发 --emit-js 等价行为。
 
     #   杜绝「某选股还没跑完，推荐却已生成」的抢跑问题。
     #   🆕 2026-09-04 主人令：因子实验室(FACTOR_LAB.js)此前零调度成孤儿（运维红灯）——

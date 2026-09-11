@@ -94,9 +94,14 @@ DATA_SOURCES = {
     #   但 update_v8 转换层漏挂，data/*.js 永远停在 8/14 旧版本。
     "overseas_markets.json":       "OVERSEAS_MARKETS",
     "v8_cal.json":                 "V8_CAL",
-    # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：CANDIDATE_QUOTES 前端零引用，
-    #   由 final_recommend.py 附带产出但无渲染消费，停止发布 js。
-    # "candidate_quotes.json":       "CANDIDATE_QUOTES",
+    # 🔴 2026-09-11 阿狸咪的股票专家（A 类修复·撤回误判）：恢复 CANDIDATE_QUOTES 映射。
+    #   原注释「前端零引用」不成立 —— algorithms/final_recommend.py 是 **Python 侧**消费方
+    #   （`load_js("CANDIDATE_QUOTES.js", ...)`，用作候选池行情兜底），只 grep 前端自然查不到。
+    #   停发后果实测：data/CANDIDATE_QUOTES.js 在远端不存在 → 兜底恒为空；且
+    #   data/FRESHNESS_STATUS.js 长期把它报成 core_stale「文件缺失」（红灯挂着无人处置）。
+    #   注：最终推荐的当日价权威源已在 final_recommend.py 改为 STOCK_QUOTE.js（价格真实性闸门），
+    #   本映射恢复是为了让健康巡检与「候选池行情」这条数据链回到自洽状态。
+    "candidate_quotes.json":       "CANDIDATE_QUOTES",
     "sh_sz_history.json":         "SH_SZ_HISTORY",
     "ai_market_brief.json":        "AI_MARKET_BRIEF",
     "runner_status.json":          "RUNNER_STATUS",

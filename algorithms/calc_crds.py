@@ -549,24 +549,31 @@ def _load_index_quotes():
         return None
 
 
+# 🔴 2026-09-11 A 类修复「口径真合一」：综合口径的**唯一公式**（权重和 = 1.0）。
+#   原实现同一份产物里有两个公式：
+#     get_market_context().today_pct  = 4 指数加权 + breadth 项×0.15   → 09-11 = −1.01%
+#     get_market_index()  序列 pct_chg = 4 指数加权（无 breadth）      → 09-11 = −0.79%
+#   而「大跌日」阈值 MARKET_DOWN_THRESHOLD = −0.8% 判的是**后者**，
+#   −0.80 恰好夹在两个口径之间 → 同一天一张卡上说"偏弱环境 CRDS 较有效"、
+#   算法却说"今天不是大跌日"，cond②（大跌日逆势板）因此长期恒 0。
+#   10 日历史序列本就拿不到逐日 breadth，故统一为 4 指数加权（= 主人 2026-09-11 拍板的
+#   方案 A 口径）；breadth 仅作展示字段，**不得进入综合强度**。
+COMPOSITE_WEIGHTS = {"000001": 0.25, "399001": 0.20, "399006": 0.25, "000688": 0.15}
+
+
+def _composite_from_pcts(getter):
+    """按 COMPOSITE_WEIGHTS 合成综合强度（唯一真源，序列与快照共用同一公式）。"""
+    return round(sum(w * float(getter(c) or 0) for c, w in COMPOSITE_WEIGHTS.items()), 2)
+
+
 def _composite_market_score(quotes):
-    """综合市场强度得分。避免上证被权重股扭曲，纳入深证/创业板/科创50 + 涨跌家数比。"""
+    """综合市场强度得分 —— 与 get_market_index() **同一公式**（2026-09-11 口径合一）。
+
+    breadth（涨跌家数比）退回展示字段，不再按 0.15 权重并入，理由见上方注释。
+    """
     if not quotes:
         return None
-    sh = quotes.get("000001", 0)
-    sz = quotes.get("399001", 0)
-    cy = quotes.get("399006", 0)
-    kc = quotes.get("000688", 0)
-    breadth = quotes.get("breadth", 0.5)
-    breadth_score = (breadth - 0.5) * 4.0
-    composite = (
-        sh * 0.25 +
-        sz * 0.20 +
-        cy * 0.25 +
-        kc * 0.15 +
-        breadth_score * 0.15
-    )
-    return round(composite, 2)
+    return _composite_from_pcts(lambda c: quotes.get(c, 0))
 
 
 def get_market_index():
@@ -608,12 +615,8 @@ def get_market_index():
             chgs[code] = float(row["pctChg"].iloc[0])
         if not ok:
             continue
-        # 综合口径（10日历史无逐日breadth，breadth_score=0）：
-        composite = round(
-            chgs.get("000001", 0) * 0.25 +
-            chgs.get("399001", 0) * 0.20 +
-            chgs.get("399006", 0) * 0.25 +
-            chgs.get("000688", 0) * 0.15, 2)
+        # 综合口径：与 get_market_context().today_pct 共用 _composite_from_pcts 唯一公式
+        composite = _composite_from_pcts(lambda c: chgs.get(c, 0))
         rows.append({"date": d, "pct_chg": composite})
     if not rows:
         return None
@@ -656,6 +659,13 @@ def get_market_context(mkt_df):
     prev_pct = float(mkt_df["pct_chg"].iloc[-2])
     trend5_pct = float(mkt_df["pct_chg"].iloc[-5:].sum()) if len(mkt_df) >= 5 else 0.0
 
+    # 口径自证（2026-09-11 A 类修复）：展示值必须与「大跌日」判定所用序列**同公式**。
+    # 两者数据源不同（index_quotes 快照 vs 指数日K），允许小差；差 >0.6pp 说明又漂了。
+    _series_last = float(mkt_df["pct_chg"].iloc[-1])
+    if abs(today_pct - _series_last) > 0.6:
+        print(f"  [市场] ⚠️ 口径核对：快照综合={today_pct:+.2f}% vs K线序列综合={_series_last:+.2f}%"
+              f"（差 {today_pct - _series_last:+.2f}pp；同公式不同数据源，若持续偏大需查取数）")
+
     if today_pct >= 2.0:
         validity = "失效"
         summary = f"市场综合强度 +{today_pct:.2f}%（上证{sh_pct:+.2f}%，上涨占比{breadth:.1%}），逆势龙头信号参考意义极低，无需关注"
@@ -692,6 +702,9 @@ def get_market_context(mkt_df):
         "color": color,
         "data_source": data_source,
         "sh_pct": round(sh_pct, 2),
+        "composite_weights": COMPOSITE_WEIGHTS,
+        "series_last_pct": round(_series_last, 2),
+        "breadth_score": round((breadth - 0.5) * 4.0, 2),   # 仅展示，不并入 today_pct
         "breadth": round(breadth, 4),
         "up_total": up_total,
         "down_total": down_total,

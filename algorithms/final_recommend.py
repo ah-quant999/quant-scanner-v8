@@ -173,6 +173,108 @@ def safe_float(x, default=0.0):
         return default
 
 
+def num_or_none(x):
+    """严格数值化：None / "" / 不可解析 → None。**绝不把缺失伪造成 0.0**。
+
+    2026-09-11 A 类修复：原输出用 safe_float(s["pct_chg"])，缺失涨跌幅被写成 0.00，
+    前端显示为「平盘」，而当日真实是 −5.42% / −4.67%（紫金矿业/国城矿业 09-11）。
+    """
+    if x is None or x == "":
+        return None
+    try:
+        return float(x)
+    except Exception:
+        return None
+
+
+def _num2(x):
+    v = num_or_none(x)
+    return round(v, 2) if v is not None else None
+
+
+def _set_close(r, price, pct, src, date=None):
+    """价格真实性闸门（2026-09-11 A 类修复）：只有「数据日期 == 今日」的价格才准进 close。
+
+    事故：最终推荐 Top2 的 close 用的是 09-10 收盘价（34.11 / 27.63），pct_chg 被写成
+      0.00 → 止损/目标价/盈亏比/跟踪收益全部建立在过期价上。根因是各处用
+      `s.get("close") or r["close"]` 覆盖式赋值（后写者赢，因子源最后跑把当日价顶掉）。
+    日期不可验证的价格一律不采信，只记进 _price_rejected 便于排查。
+    """
+    p = num_or_none(price)
+    if not p:
+        return False
+    _today = datetime.now().strftime("%Y-%m-%d")
+    if not date or str(date)[:10] != _today:
+        r.setdefault("_price_rejected", []).append(
+            "%s:%s" % (src, "无日期" if not date else str(date)[:10]))
+        return False
+    r["close"] = p
+    _pc = num_or_none(pct)
+    if _pc is not None:
+        r["pct_chg"] = _pc
+    r["close_date"] = _today
+    r["close_source"] = src
+    r["close_verified"] = True
+    return True
+
+
+_QUOTE_SNAP = None
+
+
+def _quote_snapshot():
+    """当日有效行情快照 {6位code: {"price","pct"}}，带**日期校验**。
+
+    数据源优先级（均要求 update_time 日期 == 今日，否则整份作废）：
+      ① STOCK_QUOTE.js     —— 15:02 收盘快照，覆盖全 A（含 price/pct/prev_close）
+      ② CANDIDATE_QUOTES.js —— 候选池行情（raw_data/candidate_quotes.json 的 js 版，含 chg）
+    这是最终推荐价格的**唯一权威来源**：因子实验室 FACTOR_LAB 记录里的 close 是
+    「上次算到这只票那天」的快照（roe 按季缓存 asof_q / abn 按月缓存 asof_ym），
+    实测 roe TOP30 的 close 30/30 全部等于当日昨收 —— 根本不是报价，不可用于定价。
+    """
+    global _QUOTE_SNAP
+    if _QUOTE_SNAP is not None:
+        return _QUOTE_SNAP
+    today = datetime.now().strftime("%Y-%m-%d")
+    snap = {"date": None, "source": None, "map": {}}
+
+    _sq = load_js("STOCK_QUOTE.js", "STOCK_QUOTE") or {}
+    _d = str(_sq.get("update_time") or "")[:10]
+    if _d == today:
+        _m = {}
+        for _k, _v in (_sq.get("stocks") or {}).items():
+            if not isinstance(_v, dict):
+                continue
+            _c = norm_code(_k).lstrip(".")
+            _p = num_or_none(_v.get("price"))
+            if _c and _p:
+                _m[_c] = {"price": _p, "pct": num_or_none(_v.get("pct"))}
+        if _m:
+            snap = {"date": _d, "source": "STOCK_QUOTE", "map": _m}
+
+    if not snap["map"]:
+        _cq = load_js("CANDIDATE_QUOTES.js", "CANDIDATE_QUOTES") or {}
+        _d2 = str(_cq.get("update_time") or "")[:10]
+        if _d2 == today:
+            _m = {}
+            for _it in (_cq.get("items") or []):
+                if not isinstance(_it, dict):
+                    continue
+                _c = norm_code(_it.get("code") or "").lstrip(".")
+                _p = num_or_none(_it.get("price"))
+                if _c and _p:
+                    _m[_c] = {"price": _p, "pct": num_or_none(_it.get("chg"))}
+            if _m:
+                snap = {"date": _d2, "source": "CANDIDATE_QUOTES", "map": _m}
+
+    _QUOTE_SNAP = snap
+    if snap["map"]:
+        print(f"[行情] 价格闸门启用：{snap['source']} @ {snap['date']}，覆盖 {len(snap['map'])} 只")
+    else:
+        print("[warn] ⚠️ 无当日行情快照（STOCK_QUOTE / CANDIDATE_QUOTES 均缺失或非当日）→ "
+              "close/pct_chg 一律写 null（不再伪造 0.00%）")
+    return snap
+
+
 def build_sector_maps(sector_rs):
     sectors = sector_rs.get("sectors") or []
     strong_rel = sector_rs.get("strong_relative_5d") or []
@@ -320,10 +422,19 @@ def main():
     try:
         _ut = _four_vol_raw.get("update_time", "")
         _ut_date = datetime.strptime(_ut, "%Y-%m-%d %H:%M:%S").date()
+        # 🔴 2026-09-11 A 类修复：原判据只看 update_time —— 但只要 60m 文件是"今天生成的空壳"
+        #   （实测 09-11 21:33 的 FOUR_VOLUME_60M.js：total=0 / stocks=[]），就被当成有效
+        #   数据源，日线版 FOUR_VOLUME.js（11 只命中）**永远不被读取** → 60m 多周期共振加分
+        #   恒为 0，且看不出一丝异常。现补「空数据」判据：命中数 0 视同不可用。
+        _n60 = len(_four_vol_raw.get("hits") or _four_vol_raw.get("stocks") or [])
         if _ut_date < datetime.now().date():
             _four_vol_raw = load_js("FOUR_VOLUME.js", "FOUR_VOLUME")
             _four_vol_src = "day(60m陈旧回退)"
             print(f"[warn] 60m 四量 update_time={_ut} 非今日，回退读日线四量终极")
+        elif _n60 == 0:
+            _four_vol_raw = load_js("FOUR_VOLUME.js", "FOUR_VOLUME")
+            _four_vol_src = "day(60m空数据回退)"
+            print(f"[warn] ⚠️ 60m 四量 update_time={_ut} 是今日但命中数=0（空壳），回退读日线四量终极")
     except Exception as e:
         print(f"[warn] 四量新鲜度校验失败，沿用 60m: {e}")
     _60m_hits = {}  # norm_code → {reason, signals[], qd, pct_chg, ...}
@@ -348,19 +459,33 @@ def main():
     # ── 市场状态 regime 门控（回测验证提升胜率，见 backtest_tdx.json optimized_summary）──
     # stabilize / rebound_diverge = 好状态：历史回测该阶段 ≥3 共振信号整体负期望 → 应少推/观察
     # grind / panic               = 可开仓状态 → 正常推
+    # 🔴 2026-09-11 A 类修复（统一失败语义）：原 except 分支写 `_open_regime = True` 并注释
+    #   「失败时默认正常推」—— 但 get_current_regime() 取不到数时是 **return None 而非抛异常**，
+    #   except 永不触发，实际走的是 bool(None and ...) = False（=观望、推票数 5→2），**注释与
+    #   行为相反**；同一时刻 generate_top10 写 "stabilize"、export_optimized_strategy 写
+    #   "grind/可开仓" → 同一次失败三种结论。
+    #   现统一走 get_current_regime_safe()：ok=False ⇒ regime=None + 不开仓（显式保守），
+    #   并把 ok/reason 写进产物，前端与巡检可核对"这条结论是算出来的还是降级来的"。
+    #   （若将来决定「失败时按正常推」，改这里一处即可，三个消费方自动同步。）
+    _regime_info = None
+    _regime_ok = False
+    _regime_reason = "unavailable"
+    _open_regime = False
     try:
-        from regime_filter import get_current_regime, is_open_regime
-        _regime_info = get_current_regime()
-        _open_regime = bool(_regime_info and is_open_regime(_regime_info.get("regime")))
+        from regime_filter import get_current_regime_safe, is_open_regime
+        _regime_info, _regime_ok, _regime_reason = get_current_regime_safe()
+        _open_regime = bool(_regime_ok and is_open_regime((_regime_info or {}).get("regime")))
     except Exception as e:
-        print(f"  [warn] regime 门控不可用，跳过: {e}")
-        _regime_info = None
-        _open_regime = True  # 失败时默认正常推，不破坏原有逻辑
-    _regime_name = (_regime_info or {}).get("regime")
-    _regime_date = (_regime_info or {}).get("date")
+        print(f"  [warn] regime 门控不可用: {e}")
+        _regime_reason = f"import/exception:{e}"
+    _regime_name = (_regime_info or {}).get("regime") if _regime_ok else None
+    _regime_date = (_regime_info or {}).get("date") if _regime_ok else None
+    if not _regime_ok:
+        print(f"  [warn] ⚠️ regime 不可用（{_regime_reason}）→ 按保守处置：观望、推票数 {TOP_N}→{max(2, TOP_N // 2)}")
     _effective_top_n = TOP_N if _open_regime else max(2, TOP_N // 2)
     _action_label = "买入" if _open_regime else "观察（市场企稳/反弹，历史回测负期望）"
-    print(f"[regime] 市场状态={_regime_name}({_regime_date}) 开仓={_open_regime} 推票数 {TOP_N}→{_effective_top_n}")
+    print(f"[regime] 市场状态={_regime_name or '未知'}({_regime_date}) ok={_regime_ok} "
+          f"开仓={_open_regime} 推票数 {TOP_N}→{_effective_top_n}")
 
     profiles = (profile or {}).get("profiles") or {}
 
@@ -423,8 +548,7 @@ def main():
         if src_score > 0:
             r["sources"].append("三重共识")
             r["source_scores"]["三重共识"] = round(src_score, 2)
-            r["close"] = s.get("close") or r["close"]
-            r["pct_chg"] = s.get("pct_chg") or r["pct_chg"]
+            _set_close(r, s.get("close"), s.get("pct_chg"), "三重共识", triple.get("update_time"))
             r["stop_loss"] = s.get("stop_loss") or r["stop_loss"]
             r["target_price"] = s.get("target_price") or r["target_price"]
             r["risk_reward"] = s.get("risk_reward") or r["risk_reward"]
@@ -463,15 +587,19 @@ def main():
             _60m_qd = bool(_60m_item.get("qd") or _60m_item.get("XG"))
             _60m_bonus = 0.8 if _60m_qd else 0.5
             src_score += _60m_bonus
-            r["signals"].append("60min多周期共振")
-            r["_60m_resonance"] = True
+            # 🔴 2026-09-11 A 类修复：标签必须与真实口径一致。_four_vol_src 非 60m
+            #   （60m 陈旧/空壳回退日线）时不得再标「60min多周期共振」—— 那是日线共振。
+            if _four_vol_src.startswith("60m"):
+                r["signals"].append("60min多周期共振")
+                r["_60m_resonance"] = True
+            else:
+                r["signals"].append("多周期共振(日线口径)")
         # ── end 60m ──
         src_score = round(min(4.5, max(0.0, src_score)), 2)
         if src_score > 0:
             r["sources"].append("四量终极")
             r["source_scores"]["四量终极"] = src_score
-            r["close"] = s.get("close") or r["close"]
-            r["pct_chg"] = s.get("pct_chg") or r["pct_chg"]
+            _set_close(r, s.get("close"), s.get("pct_chg"), "四量终极", top10.get("update_time"))
             r["stop_loss"] = s.get("stop_loss") or r["stop_loss"]
             r["target_price"] = s.get("target_price") or r["target_price"]
             r["risk_reward"] = s.get("risk_reward") or r["risk_reward"]
@@ -534,6 +662,9 @@ def main():
         _at_bot = (fl.get("abnormal_turnover") or {}).get("bottom") or []
         _roe_top = (fl.get("roe_largecap") or {}).get("top") or []
 
+        # 流动性闸门（2026-09-11 A 类修复）：停牌/零成交股不进因子榜（产物已标 liquid=False）
+        _at_top = [x for x in _at_top if x.get("liquid", True)]
+        _roe_top = [x for x in _roe_top if x.get("liquid", True)]
         _at_rank = sorted(_at_top, key=lambda x: safe_float(x.get("factor_at")), reverse=True)
         for i, s in enumerate(_at_rank):
             code = s.get("code")
@@ -571,10 +702,11 @@ def main():
             r["signals"].append("高ROE")
             # 2026-09-03 主人令：补入选依据与行情（之前第1/2名 reason 空、无价格→分析不如第3名）
             r["reasons"].append(f"基本面因子 高ROE 排名第{i + 1}")
-            if s.get("close"):
-                r["close"] = s.get("close") or r["close"]
-            if s.get("pct_chg"):
-                r["pct_chg"] = s.get("pct_chg") or r["pct_chg"]
+            # 🔴 2026-09-11 A 类修复：**不再从因子榜取价**。FACTOR_LAB 的 close 是
+            #   「上次算到这只票那天」的快照（roe 按季 asof_q / abn 按月 asof_ym 缓存，
+            #   实测 roe TOP30 的 close 30/30 等于当日昨收），把它当当日价正是本轮
+            #   「最终推荐价格是昨天的、涨跌幅被写成 0.00%」的直接原因。
+            #   价格改由 _quote_snapshot()（当日 STOCK_QUOTE/CANDIDATE_QUOTES）统一填充。
             if s.get("first_date"):
                 r["enter_dates"].append(s["first_date"])
 
@@ -589,6 +721,12 @@ def main():
     # 与 v8 选股池 code 命中且 IMA 状态仍有效（非见顶/走弱）→ 独立外部共识信号，最终分 +1
     # 择时控权：非开仓期(_open_regime=False) 权重 ×0.3（弱加成）
     ima = load_js("IMA_STRONG_STOCK.js", "IMA_STRONG_STOCK")
+    # 🔴 2026-09-11 A 类修复：原实现只判 `if ima:`，**从不校验 update_time** → 文件陈旧时
+    #   仍照常给 +1.0 共振分（假成功）。
+    _ima_ut = str((ima or {}).get("update_time") or "")[:10]
+    if ima and _ima_ut != _today:
+        print(f"[warn] ⚠️ IMA_STRONG_STOCK 非当日（update_time={_ima_ut or '缺失'}）→ 跳过高手共振融合")
+        ima = {}
     if ima:
         _ima_norm = {}
         for s in (ima.get("stocks") or []):
@@ -672,20 +810,38 @@ def main():
             if prof.get("concepts"):
                 r["concepts"] = list(set(r["concepts"] + prof.get("concepts")))
 
-    # 2026-09-03 主人令：候选池行情兜底——ROE_TTM/高手跟踪单源票常无 close，
-    #   导致止损/目标/盈亏比全空、前端"第1/2名分析不如第3名"。从 CANDIDATE_QUOTES 补价。
-    _cq_map = {}
-    for _q in ((load_js("CANDIDATE_QUOTES.js", "CANDIDATE_QUOTES") or {}).get("items") or []):
-        if isinstance(_q, dict) and _q.get("code"):
-            _cq_map[norm_code(_q["code"]).lstrip('.')] = _q
+    # ── 价格真实性闸门（2026-09-11 A 类修复，替换原 CANDIDATE_QUOTES 兜底）──
+    # 原兜底恒为空：data/CANDIDATE_QUOTES.js 在远端**根本不存在**（update_v8.py 的
+    # candidate_quotes.json 映射被注释掉，理由「前端零引用」—— 但本文件是 Python 侧消费方，
+    # grep 前端自然查不到），于是 ROE_TTM/高手跟踪单源票永远拿不到当日价，
+    # safe_float(None) 再把 pct_chg 写成 0.00。现改为：
+    #   ① 当日行情快照（STOCK_QUOTE.js，15:02 收盘快照，覆盖全 A）为准；
+    #   ② 快照没覆盖到的票，一律 close/pct_chg = None（前端显示"待行情"），绝不拿旧价充数；
+    #   ③ 同时把覆盖情况写进结果 meta，便于巡检发现"行情源整体缺失"。
+    _qs = _quote_snapshot()
+    _qs_map = _qs["map"]
+    _px_hit = 0
+    _px_keep = 0
     for key, r in pool.items():
-        if not r["close"]:
-            _q = _cq_map.get(key) or _cq_map.get(norm_code(key).lstrip('.'))
-            if _q:
-                if _q.get("price"):
-                    r["close"] = _q["price"]
-                if _q.get("chg") and not r["pct_chg"]:
-                    r["pct_chg"] = _q["chg"]
+        _q = _qs_map.get(key)
+        if _q:
+            r["close"] = _q["price"]
+            r["pct_chg"] = _q["pct"]
+            r["close_date"] = _qs["date"]
+            r["close_source"] = _qs["source"]
+            r["close_verified"] = True
+            _px_hit += 1
+        elif r.get("close_verified"):
+            # 该票不在此快照覆盖内（如港股），但已由带当日日期的源价通过闸门 → 保留
+            _px_keep += 1
+        else:
+            r["close"] = None
+            r["pct_chg"] = None
+            r["close_date"] = None
+            r["close_source"] = None
+            r["close_verified"] = False
+    print(f"[行情] 价格闸门：快照命中 {_px_hit} 只，源价保真 {_px_keep} 只，"
+          f"其余 {len(pool) - _px_hit - _px_keep} 只 close/pct_chg 写 null（来源={_qs['source']}）")
 
     # 计算板块加分 与 最终分
     scored = []
@@ -801,7 +957,7 @@ def main():
         # market 统一为交易所前缀；原始 s["market"] 可能是中文描述，不可靠
         market = market_prefix(code)
         board = s["board"] or board_from_code(code)
-        close = safe_float(s["close"])
+        close = num_or_none(s.get("close"))
         stop = s["stop_loss"]
         target = s["target_price"]
         rr = s["risk_reward"]
@@ -858,7 +1014,10 @@ def main():
             "board": board,
             "horizon": horizon_for(s["sources"], s.get("resonance",0), is_top=True),
             "close": round(close, 2) if close else None,
-            "pct_chg": safe_float(s["pct_chg"]),
+            "close_date": s.get("close_date"),
+            "close_source": s.get("close_source"),
+            "close_verified": bool(s.get("close_verified")),
+            "pct_chg": _num2(s.get("pct_chg")),
             "stop_loss": round(safe_float(stop), 2) if stop else None,
             "target_price": round(safe_float(target), 2) if target else None,
             "risk_reward": round(safe_float(rr), 2) if rr else None,
@@ -893,7 +1052,7 @@ def main():
         # 但 consensus_stocks 需要独立 rank 和排序语义，所以仍完整构建
         market = {"sh": "沪市", "sz": "深市", "bj": "北交所", "hk": "港股"}.get((s["market"] or market_prefix(code)).lower(), s["market"] or market_prefix(code))
         board = s["board"] or board_from_code(code, s["market"])
-        close = safe_float(s.get("close"))
+        close = num_or_none(s.get("close"))   # 价格真实性闸门：缺失写 None，不伪造 0.0
         stop = s.get("stop_loss")
         target = s.get("target_price")
         rr = s.get("risk_reward")
@@ -921,7 +1080,10 @@ def main():
             "board": board,
             "horizon": horizon_for(s["sources"], s.get("resonance",0), is_top=True),
             "close": round(close, 2) if close else None,
-            "pct_chg": safe_float(s["pct_chg"]),
+            "close_date": s.get("close_date"),
+            "close_source": s.get("close_source"),
+            "close_verified": bool(s.get("close_verified")),
+            "pct_chg": _num2(s.get("pct_chg")),
             "stop_loss": round(safe_float(stop), 2) if stop else None,
             "target_price": round(safe_float(target), 2) if target else None,
             "risk_reward": round(safe_float(rr), 2) if rr else None,
@@ -963,7 +1125,17 @@ def main():
             "date": _regime_date,
             "regime": _regime_name,
             "open": _open_regime,
-            "note": "grind/panic=可开仓(正常推)；stabilize/rebound=历史回测≥3共振负期望，应观察/少推",
+            "ok": _regime_ok,
+            "reason": _regime_reason,
+            "note": "grind/panic=可开仓(正常推)；stabilize/rebound=历史回测≥3共振负期望，应观察/少推；"
+                    "ok=false 表示 regime 取数失败已按保守处置（regime=null、不推满仓）",
+        },
+        "price_source": {
+            "date": _qs["date"],
+            "source": _qs["source"],
+            "covered": _px_hit,
+            "total": len(pool),
+            "note": "价格唯一权威来源（当日有效快照）；未覆盖的票 close/pct_chg 为 null，不伪造 0.00%",
         },
         "strong_sectors": sorted(rel_set)[:20],
         "stocks": out_stocks,
@@ -975,8 +1147,10 @@ def main():
                 "market": {"sh": "沪市", "sz": "深市", "bj": "北交所", "hk": "港股"}.get((x["market"] or market_prefix(x["key"])).lower(), x["market"] or market_prefix(x["key"])),
                 "board": x["board"] or board_from_code(x["key"], x["market"]),
                 "horizon": horizon_for(x["sources"], x.get("resonance",0)),
-                "close": round(safe_float(x["close"]), 2) if safe_float(x["close"]) else None,
-                "pct_chg": safe_float(x["pct_chg"]),
+                "close": round(num_or_none(x.get("close")), 2) if num_or_none(x.get("close")) else None,
+                "close_date": x.get("close_date"),
+                "close_verified": bool(x.get("close_verified")),
+                "pct_chg": _num2(x.get("pct_chg")),
                 "final_score": x["final_score"],
                 "resonance": x["resonance"],
                 "sources": sorted(set(x["sources"])),

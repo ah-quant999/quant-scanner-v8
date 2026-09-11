@@ -72,19 +72,28 @@ def main():
         result["baseline_ge3"]["total_signals"] = ge3.get("total")
 
     # 当前市场 regime（用于前端提示是否处于开仓段）
+    # 🔴 2026-09-11 A 类修复（A3 统一失败语义 + 去重复实现）：
+    #   原实现 `from backtest_tdx import _merge_market_regime` 自带**另一套** regime 计算，
+    #   与 regime_filter 各算各的，且取 max(keys) 后**不校验新鲜度**。实测同日三方结论：
+    #     backtest_tdx 口径 → grind(09-10)、open_position=true  ← 前端 v8MarketGate 的"可开仓"
+    #     regime_filter     → None（baostock 黑名单）           ← final_recommend 的"观望"
+    #     generate_top10    → "stabilize"（硬编码兜底）
+    #   现统一走 regime_filter 单一真源；取数失败时 regime=null → 前端显示"暂无数据"，
+    #   绝不用几天前的缓存冒充"可开仓"。
     try:
         sys.path.insert(0, BASE)
-        from backtest_tdx import _merge_market_regime
-        regime_map = _merge_market_regime()
-        if regime_map:
-            latest_date = max(regime_map.keys())
-            result["current_regime"] = {
-                "date": latest_date,
-                "regime": regime_map[latest_date],
-                "open_position": regime_map[latest_date] in ("grind", "panic"),
-            }
+        from regime_filter import get_current_regime_safe
+        _ri, _rok, _rreason = get_current_regime_safe()
+        result["current_regime"] = {
+            "date": (_ri or {}).get("date") if _rok else None,
+            "regime": (_ri or {}).get("regime") if _rok else None,
+            "open_position": bool(_rok and (_ri or {}).get("regime") in ("grind", "panic")),
+            "ok": _rok,
+            "reason": _rreason,
+        }
     except Exception as e:
-        result["current_regime_error"] = str(e)
+        result["current_regime"] = {"date": None, "regime": None, "open_position": False,
+                                    "ok": False, "reason": f"exception:{e}"}
 
     json.dump(result, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     print(f"✓ 已导出: {OUT}")

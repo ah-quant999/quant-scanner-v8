@@ -219,23 +219,29 @@ def get_kline_abn(code):
     return rows
 
 def get_kline_amt(code):
+    """返回 (成交额均值, 最新收盘, 最新K线日) —— 第三项供「数据日期/流动性」判定用。
+
+    2026-09-11 A 类修复：原返回值无日期，导致产物里的 close 无法判定属于哪一天，
+    下游把「上次算到这只票那天」的快照当当日价用（见 data/FACTOR_LAB.js close 污染）。
+    """
     rs = _q(bs.query_history_k_data_plus, code,
         "date,close,amount", start_date=KL_AMT_START, end_date=KL_END,
         frequency="d", adjustflag="2")
-    amts, last = [], None
+    amts, last, last_date = [], None, None
     if rs is None:
-        return 0.0, None
+        return 0.0, None, None
     try:
         while rs.error_code == '0' and rs.next():
             d = rs.get_row_data()
             try:
                 if d[2] not in ("", "None"): amts.append(float(d[2]))
                 if d[1] not in ("", "None"): last = float(d[1])
+                if d[0]: last_date = str(d[0])[:10]
             except Exception:
                 pass
     except Exception as e:
         log("⚠️ get_kline_amt 读行中断（已收", len(amts), "行）", code, type(e).__name__, str(e)[:60])
-    return (sum(amts)/len(amts) if amts else 0.0), last
+    return (sum(amts)/len(amts) if amts else 0.0), last, last_date
 
 def get_roe_ttm(code):
     """ROE_TTM，单位【百分比数值】（33.16 即 33.16%）。
@@ -337,7 +343,10 @@ def main():
     a = load_cache(CACHE_A)
     for i, code in enumerate(kcodes):
         # 🛡 2026-09-04：按月刷新（asof_ym 标记）——旧版「算过即永久跳过」导致因子冻结在计算当月
-        if (not FORCE) and code in a and a[code].get("factor_at") is not None and a[code].get("asof_ym") == ASOF_YM:
+        # 🔴 2026-09-11 A 类修复：补 `liquid is not None` → 历史缓存记录（无该字段）
+        #   会在本轮被一次性重算（重点池仅 ~766 只，成本可控），之后就恢复正常月度缓存。
+        if (not FORCE) and code in a and a[code].get("factor_at") is not None \
+                and a[code].get("asof_ym") == ASOF_YM and a[code].get("liquid") is not None:
             continue
         try:
             name = get_name(code)
@@ -360,8 +369,18 @@ def main():
                 factor_at = -abn
         size = mean([agg[m]["a"] for m in months]) if months else 0.0
         last = kl[-1]["close"] if kl else None
+        last_date = str(kl[-1]["date"])[:10] if kl else None
+        # 🔴 2026-09-11 A 类修复「流动性闸门」：停牌/零成交股不得进因子榜。
+        #   实测榜首 sh.688432（有研硅）自 2026-08-28 起零成交（腾讯日K / 腾讯实时成交量 0 /
+        #   westock 三源一致），当月换手率 = 0 → abn = 0.0 → factor_at = -0.0 却排第 1 名，
+        #   并拿到最高档 +2.0 分进最终推荐融合。判据：最新 K 线日 == 数据日 KL_END
+        #   且当月换手率 > 0（两条件同时满足才算有流动性）。
+        _cur_turn = agg.get(months[-1], {}).get("t", 0.0) if months else 0.0
+        _liquid = bool(last_date and last_date == str(KL_END)[:10] and _cur_turn > 0)
         a[code] = {
             "code": code, "name": name, "close": last,
+            "close_date": last_date,
+            "liquid": _liquid,
             "abn": round(abn, 3) if abn is not None else None,
             "factor_at": round(factor_at, 4) if factor_at is not None else None,
             "roe_ttm": a[code].get("roe_ttm") if code in a else None,
@@ -378,11 +397,15 @@ def main():
             lg = bs.login(); log("自动重登录 abn", lg.error_code, "at", i)
         time.sleep(0.02)
     save_cache(a, CACHE_A)
-    at_valid = [r for r in a.values() if r["factor_at"] is not None]
+    _illiquid = [r for r in a.values() if r["factor_at"] is not None and r.get("liquid") is False]
+    if _illiquid:
+        log("流动性闸门剔除", len(_illiquid), "只（停牌/零成交）：",
+            [str(x.get("code")) for x in _illiquid[:6]], "...")
+    at_valid = [r for r in a.values() if r["factor_at"] is not None and r.get("liquid", True)]
     at_valid.sort(key=lambda r: r["factor_at"], reverse=True)
     at_top = at_valid[:30]
     at_bottom = at_valid[-10:][::-1]
-    log("异常换手率有效", len(at_valid))
+    log("异常换手率有效", len(at_valid), "（已剔除无流动性", len(_illiquid), "只）")
 
     # ---- ROE 全市场主板 ----
     mcodes = get_main_universe(); log("主板 universe", len(mcodes))
@@ -407,7 +430,7 @@ def main():
         n_new += 1
         try:
             name = get_name(code)
-            amt, last = get_kline_amt(code)
+            amt, last, last_date = get_kline_amt(code)
             roe = get_roe_ttm(code)
         except Exception as e:
             log("⚠️ roe 单只异常跳过", code, type(e).__name__, str(e)[:80])
@@ -415,6 +438,8 @@ def main():
         r[code] = {
             "code": code, "name": name,
             "close": round(last, 2) if last is not None else None,
+            "close_date": last_date,
+            "liquid": bool(last_date and last_date == str(KL_END)[:10]),
             "roe_ttm": round(roe, 2) if roe is not None else None,
             "size_proxy": round(amt, 1) if amt else 0.0,
             "asof_q": ASOF_Q,
@@ -431,7 +456,8 @@ def main():
             lg = bs.login(); log("自动重登录 roe", lg.error_code, "at", i)
         time.sleep(0.02)
     save_cache(r, CACHE_R)
-    valid = [v for v in r.values() if v.get("roe_ttm") is not None and v.get("size_proxy")]
+    valid = [v for v in r.values()
+             if v.get("roe_ttm") is not None and v.get("size_proxy") and v.get("liquid", True)]
     valid.sort(key=lambda x: x["size_proxy"], reverse=True)
     n = len(valid)
     large = valid[:max(1, n//3)]
@@ -445,7 +471,11 @@ def main():
 
     out = {
         "update_time": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "data_date": KL_END,
         "meta": {
+            "data_date": KL_END,
+            "close_semantics": "⚠️ 记录里的 close 是「上次算到这只票那天」的快照（roe 按季 asof_q / abn 按月 asof_ym 缓存），**不是当日报价**；需要当日价请查 STOCK_QUOTE.js 或 CANDIDATE_QUOTES.js。同时看 close_date 字段。",
+            "liquid_def": "liquid=false 表示最新K线日 != 数据日 或 当月换手率为 0（停牌/零成交），已从榜单剔除",
             "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
             "n_universe": len(kcodes),
             "n_at_valid": len(at_valid),

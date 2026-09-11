@@ -792,17 +792,29 @@ def main():
     _strat = (_regime_gate.get("strategies") or {}).get("ge3", {})
     regime_weight = float(_strat.get("weight") or 1.0)
     regime_action = (_regime_gate.get("overall_action") or "ok")
+    # 🔴 2026-09-11 A 类修复（统一失败语义）：原实现在取数失败时把 current_regime 写成
+    #   "stabilize" —— 一个**并不存在**的结论，并被写进产物（TOP10_DAILY / FINAL_RECOMMEND
+    #   的 current_regime 字段），消费方与前端据此认为「已判定为企稳」。
+    #   现统一走 get_current_regime_safe()：ok=False → current_regime=None（未知），
+    #   开仓判定与 final_recommend / export_optimized_strategy 完全一致（未知 ⇒ 不开仓）。
+    _regime_ok = False
+    _regime_reason = "unknown"
     try:
-        _regime_info = regime_filter.get_current_regime(force=False)
-        current_regime = (_regime_info or {}).get("regime", "stabilize")
+        _regime_info, _regime_ok, _regime_reason = regime_filter.get_current_regime_safe()
+        current_regime = (_regime_info or {}).get("regime") if _regime_ok else None
     except Exception as _e:
-        current_regime = "stabilize"
-    regime_open = regime_filter.is_open_regime(current_regime)
+        _regime_reason = f"exception:{_e}"
+        current_regime = None
+    # ⚠️ 计分哨兵：P4 因子 edge 分桶需要一个「开门/关门」布尔；未知时按**关门**处理（保守，
+    #    与修复前行为一致）。它只用于内部计分，绝不上报为真实 regime。
+    _regime_for_score = current_regime if current_regime else "stabilize"
+    regime_open = bool(_regime_ok and regime_filter.is_open_regime(current_regime))
     open_multiplier = 1.0 if regime_open else 0.65   # 非开仓状态显著降权
     ic_weight_adj = max(0.85, min(1.0, ic_weight))
     regime_weight_adj = max(0.85, min(1.0, regime_weight))
     gate_multiplier = max(0.3, min(1.05, open_multiplier * ic_weight_adj * regime_weight_adj))
-    print(f"  🚦 择时门控: regime={current_regime}({'开仓' if regime_open else '观望'}) "
+    print(f"  🚦 择时门控: regime={current_regime or '未知'}({'开仓' if regime_open else '观望'}) "
+          f"ok={_regime_ok}{'' if _regime_ok else ' reason=' + _regime_reason} "
           f"× ic={ic_weight:.2f}→{ic_weight_adj:.2f}({ic_action}) "
           f"× regime_w={regime_weight:.2f}→{regime_weight_adj:.2f}({regime_action}) "
           f"→ 乘子={gate_multiplier:.3f}")
@@ -998,9 +1010,9 @@ def main():
         if _lv is not None:
             _s_lv = 0
             if _lv <= 45:
-                _s_lv = p4_score_for("lowvol", current_regime)
+                _s_lv = p4_score_for("lowvol", _regime_for_score)
             elif _lv <= 55:
-                _s_lv = _p4_partial(p4_score_for("lowvol", current_regime), 0.5)
+                _s_lv = _p4_partial(p4_score_for("lowvol", _regime_for_score), 0.5)
             if _s_lv:
                 p4_score += _s_lv
                 p4_detail.append(f"低波动{_lv:.0f}%{_s_lv:+d}")
@@ -1008,9 +1020,9 @@ def main():
         if _rm is not None:
             _s_rm = 0
             if _rm >= 10:
-                _s_rm = p4_score_for("residmom", current_regime)          # 强正残差满额罚
+                _s_rm = p4_score_for("residmom", _regime_for_score)          # 强正残差满额罚
             elif _rm >= 5:
-                _s_rm = _p4_partial(p4_score_for("residmom", current_regime), 0.6)
+                _s_rm = _p4_partial(p4_score_for("residmom", _regime_for_score), 0.6)
             # 负残差不罚：超跌机会由 P3 超跌反弹因子判定（避免反转/动量逻辑互斥）
             if _s_rm:
                 p4_score += _s_rm
@@ -1216,6 +1228,8 @@ def main():
             "breakout_5d": breakout_5d,
             "total_score": total,
             "current_regime": current_regime,
+            "regime_ok": _regime_ok,
+            "regime_reason": _regime_reason,
             "regime_open": regime_open,
             "regime_adjust": regime_adj,
             "quality_grade": quality_grade,
@@ -1336,6 +1350,8 @@ def main():
         # 🚦 P0-1 门禁信号透出（前端可直接展示 ic/regime/乘子，便于主人审核）
         "gate_info": {
             "current_regime": current_regime,
+            "regime_ok": _regime_ok,
+            "regime_reason": _regime_reason,
             "regime_open": regime_open,
             "ic_weight": ic_weight,
             "ic_action": ic_action,
