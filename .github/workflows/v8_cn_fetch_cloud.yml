@@ -39,6 +39,16 @@ on:
     #   改由本机 WorkBuddy 单一调度器每 20 分钟 workflow_dispatch 派发 category=intraday。
     #   本处保留 3 条 cron：盘前 + 盘后 + 周末。
     - cron: '25 0 * * 1-5'     # 08:25 CST 盘前（不变）
+    # 🛡 2026-09-11 小九的工程师（盘中错题 E1/E6 一劳永逸修复 · 云端原生种子）：
+    #   实证：盘中 14 档权威定义在本机调度器 v8_cn_fetch_intraday_lemoncat.yml，
+    #   但该 workflow **历史仅 14 次运行且全部严重迟到**（09-10 全部落在 15:29-20:04，
+    #   最大延迟 5 小时），09-11 全天 **0 次**；同日本 workflow 的 8,38 cron 也只跑了
+    #   4/22 次 —— 本仓 GitHub schedule 已普遍不可靠，盘中档位**没有可靠种子**，
+    #   导致 10:40/11:00/11:20/11:30 四档全部零派发、数据两度靠人工兜底。
+    #   本 workflow 的 08:25 盘前档每日准时 → 在此追加云端原生盘中种子（每 20 分），
+    #   与 lemoncat（如恢复）同 concurrency group 排队不互杀、幂等闸门自动去重。
+    #   注：本 job 的 schedule 触发为**每次新派发**（非高频轮询），不构成风暴。
+    - cron: '*/20 1-3,5-6 * * 1-5'  # 09:00-11:40 / 13:00-14:40 CST 盘中种子
     - cron: '20 9-11 * * 1-5'  # 17:20/18:20/19:20 CST 盘后三档（不变）
     - cron: '0 1 * * 0,6'      # 周六/周日 09:00 CST 周度刷新（不变）
   workflow_dispatch:
@@ -116,6 +126,9 @@ jobs:
               "25 0 * * 1-5")           # 08:25 CST 盘前
                 echo "category=premarket" >> "$GITHUB_OUTPUT"
                 echo "label=盘前" ;;
+              "*/20 1-3,5-6 * * 1-5")   # 09:00-11:40 / 13:00-14:40 CST 盘中种子（云端原生）
+                echo "category=intraday" >> "$GITHUB_OUTPUT"
+                echo "label=盘中(云端原生种子)" ;;
               "20 9-11 * * 1-5")        # 17:20 / 18:20 / 19:20 CST 盘后三档
                 echo "category=post_close" >> "$GITHUB_OUTPUT"
                 echo "label=盘后" ;;
