@@ -53,6 +53,7 @@ _NOISE_CONCEPTS = {
 
 # 变量名 → raw_data 文件名（与 update_v8.py 的 DATA_SOURCES 对应）
 VAR_TO_RAW = {
+    "ETF_NET_SUBSCRIPTION": "etf_net_subscription.json",  # 2026-09-11 主人 P1：真实 ETF 份额申赎（上交所日环比）
     "ETF_INTRADAY_HEAT": "etf_intraday_heat.json",
     "SECTOR_FUND_FLOW": "sector_fund_flow.json",
     "SECTOR_FUND_FLOW_INTRADAY": "sector_fund_flow_intraday.json",  # 分时累计曲线（每10min快照追加）
@@ -113,6 +114,10 @@ CATEGORY_MAP = {
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
     "ETF_INTRADAY_HEAT": "intraday",
+    # 🆕 2026-09-11 主人 P1（能用真实数据就不用估算）：ETF 净申赎改为上交所官方「基金份额日环比」。
+    #   份额是日频披露（当日晚/次日发布），盘中拿到的与盘前同值 → 只挂盘前+盘后两档，
+    #   不占用盘中 20 分钟的抓取预算。前端如实标注「上交所口径 · 数据日 T-1」。
+    "ETF_NET_SUBSCRIPTION": "premarket,post_close",
     # 🛡 2026-09-11 主人令（轻量化·卡迁移·算法侧一并对齐）：「日监控·主力净流入」卡已由
     #   「实时数据」页迁至「盘后数据」页（市场宽度卡上方），抓取档位同步升为双档：
     #   · intraday  —— 数据本体含 T+0 字段（top_inflow/top_outflow 每 30 分刷新），盘中链继续抓；
@@ -1278,6 +1283,151 @@ def f_etf_intraday_heat():
         "note": "ETF主力净流入真实排名(东财push2delay, ETF市场m:1+t:9, fid=f62)；净流入单位元，分类按名称关键词",
         "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
     }
+
+def f_etf_net_subscription():
+    """真实 ETF 净申赎（上交所「基金份额日环比」口径）。
+    2026-09-11 主人 P1：能用真实数据的全部用真实数据，绝不用估算。
+
+    数据源：上交所官方 ETF 基金份额表（ak.fund_etf_scale_sse(date=YYYYMMDD)，支持按日回溯）。
+    口径：  净申赎份额 = 当日基金份额 − 上一交易日基金份额（真实的申购/赎回引致的份额变动，
+            不是按成交方向推断的估算值）。
+            净申赎金额 = 净申赎份额 × 单位净值（净值取自 fund_etf_fund_daily_em 的当日单位净值）。
+    分类：  宽基 / 行业 / 主题 / 跨境 / 商品（关键词与 f_etf_intraday_heat 完全同口径，禁止两套标准）。
+    覆盖：  上交所上市 ETF。深交所「按日历史份额」无公开接口（fund_etf_scale_szse 仅当前快照），
+            故本数据不含深市，前端须如实标注来源与范围。
+    防洗空：可用交易日不足 2 天时直接 return None（不写盘），保留现有真数据。
+    与 ETF_INTRADAY_HEAT（主力净流入，A 类估算）是两个完全不同的东西，勿混用。
+    """
+    try:
+        ak = get_ak()
+    except Exception as e:
+        print(f"  ⚠️ akshare 不可用，跳过 ETF 净申赎: {e}")
+        return None
+
+    def _recent_weekdays(n):
+        out, d = [], now_cst()
+        while len(out) < n:
+            if d.weekday() < 5:
+                out.append(d.strftime("%Y%m%d"))
+            d = d - timedelta(days=1)
+        return out  # 降序（近 → 远）
+
+    # 由近及远探测，取「最新有数据的两个交易日」
+    frames = []
+    for ds in _recent_weekdays(8):
+        try:
+            df = ak.fund_etf_scale_sse(date=ds)
+        except Exception:
+            df = None
+        if df is None or len(df) == 0 or "基金份额" not in list(getattr(df, "columns", [])):
+            continue
+        frames.append((ds, df))
+        if len(frames) >= 2:
+            break
+    if len(frames) < 2:
+        print("  ⚠️ 上交所 ETF 份额可用交易日 <2，跳过写入（保留现有 raw，防洗空）")
+        return None
+    (d1, df1), (d0, df0) = frames[0], frames[1]
+
+    # 单位净值映射（份额 → 金额）
+    nav = {}
+    try:
+        daily = ak.fund_etf_fund_daily_em()
+        if daily is not None and len(daily) > 0:
+            ncol = next((c for c in daily.columns if str(c).endswith("单位净值")), None)
+            if ncol:
+                for _, r in daily.iterrows():
+                    code = str(r.get("基金代码", "")).strip().zfill(6)
+                    try:
+                        nav[code] = float(r.get(ncol) or 0)
+                    except Exception:
+                        pass
+    except Exception as e:
+        print(f"  ⚠️ 单位净值表获取失败（金额按 1 元/份近似）: {e}")
+
+    def _cat_of(name):
+        n = str(name or "")
+        if any(k in n for k in ["沪深300", "中证500", "中证1000", "中证2000", "创业板", "科创", "上证50",
+                                 "上证180", "深证", "MSCI", "A50", "A500", "双创", "300ETF", "500ETF",
+                                 "综指", "中证A", "上证综", "深证成指"]):
+            return "宽基"
+        if any(k in n for k in ["黄金", "白银", "原油", "石油", "豆粕", "能源", "有色金属", "商品", "矿业"]):
+            return "商品"
+        if any(k in n for k in ["恒生", "纳斯达克", "标普", "纳指", "日经", "德国", "法国", "美国",
+                                 "道琼斯", "港股", "中概", "H股", "日本", "东南亚", "沙特", "越南", "亚太"]):
+            return "跨境"
+        if any(k in n for k in ["5G", "人工智能", "AI", "半导体", "芯片", "新能源", "碳中和", "国企",
+                                 "医药", "消费", "券商", "银行", "证券", "军工", "有色", "煤炭", "地产",
+                                 "化工", "食品", "汽车", "光伏", "锂电", "机器人", "算力", "数据", "稀土",
+                                 "钢铁", "保险", "传媒", "游戏", "养殖", "农业", "电力", "通信", "环保",
+                                 "酒", "中药", "疫苗", "创新药", "VR", "物联网", "区块链", "元宇宙",
+                                 "科技", "电子", "高端装备", "智能", "信创", "云计算", "低空", "卫星"]):
+            return "主题"
+        return "行业"
+
+    base = {}
+    for _, r in df0.iterrows():
+        try:
+            base[str(r.get("基金代码", "")).strip().zfill(6)] = float(r.get("基金份额") or 0)
+        except Exception:
+            continue
+
+    cats = {"宽基": [], "行业": [], "主题": [], "跨境": [], "商品": []}
+    for _, r in df1.iterrows():
+        code = str(r.get("基金代码", "")).strip().zfill(6)
+        name = str(r.get("基金简称", "")).strip()
+        try:
+            sh1 = float(r.get("基金份额") or 0)
+        except Exception:
+            continue
+        sh0 = base.get(code)
+        if not sh0 or sh0 <= 0 or sh1 <= 0:
+            continue
+        d_share = sh1 - sh0
+        p = nav.get(code) or 0.0
+        d_yuan = d_share * (p if p > 0 else 1.0)
+        cats[_cat_of(name)].append({
+            "code": code, "name": name,
+            "d_shares_yi": round(d_share / 1e8, 4),
+            "d_amount_yi": round(d_yuan / 1e8, 4),
+            "pct": round(d_share / sh0 * 100, 2),
+            "shares_yi": round(sh1 / 1e8, 2),
+            "_d": d_share,
+        })
+
+    categories = {}
+    for cn, lst in cats.items():
+        top_sub = sorted(lst, key=lambda x: x["_d"], reverse=True)[:5]
+        top_red = sorted(lst, key=lambda x: x["_d"])[:5]
+        categories[cn] = {
+            "net_share_yi": round(sum(x["_d"] for x in lst) / 1e8, 3),
+            "net_amount_yi": round(sum(x["d_amount_yi"] for x in lst), 3),
+            "count": len(lst),
+            "top_sub": [{k: v for k, v in x.items() if k != "_d"} for x in top_sub if x["_d"] > 0],
+            "top_redeem": [{k: v for k, v in x.items() if k != "_d"} for x in top_red if x["_d"] < 0],
+        }
+
+    all_items = [x for lst in cats.values() for x in lst]
+    if not all_items:
+        print("  ⚠️ ETF 净申赎无有效条目，跳过写入（防洗空）")
+        return None
+    print(f"  ✅ ETF 净申赎(上交所 {d0}→{d1}): {len(all_items)} 只, "
+          f"净申赎 {sum(x['_d'] for x in all_items) / 1e8:+.2f} 亿份")
+    return {
+        "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
+        "data_date": f"{d1[:4]}-{d1[4:6]}-{d1[6:]}",
+        "prev_date": f"{d0[:4]}-{d0[4:6]}-{d0[6:]}",
+        "source": "上交所 ETF 基金份额（日环比）",
+        "scope": "上交所上市 ETF",
+        "unit": "net_share_yi=净申赎亿份 / net_amount_yi=净申赎亿元(按单位净值折算)",
+        "total_net_share_yi": round(sum(x["_d"] for x in all_items) / 1e8, 3),
+        "total_net_amount_yi": round(sum(x["d_amount_yi"] for x in all_items), 3),
+        "total_etf": len(all_items),
+        "categories": categories,
+        "note": ("真实份额申赎口径：净申赎 = 当日基金份额 − 上一交易日份额（上交所官方披露），"
+                 "与「主力净流入」等按主动成交方向推断的估算值无关。"),
+    }
+
 
 def f_sector_fund_flow():
     # 板块/概念资金流：行业(m:90 t:2) + 概念(m:90 t:3)，主力净流入(f62, 元→亿)
@@ -3611,6 +3761,7 @@ def main(category=None, only=None):
 
     tasks = [
         ("ETF_INTRADAY_HEAT", f_etf_intraday_heat),
+        ("ETF_NET_SUBSCRIPTION", f_etf_net_subscription),  # 2026-09-11 主人 P1：真实份额申赎（上交所日环比）
         ("SECTOR_FUND_FLOW", f_sector_fund_flow),
         ("AVG_PRICE_DATA", f_avg_price),
         ("INDEX_QUOTES", f_index_quotes),

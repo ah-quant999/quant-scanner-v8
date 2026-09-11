@@ -51,7 +51,7 @@ MIN_SIZE = {
     "TRIPLE_HISTORY.js": 563,
     "MARKET_FUND_FLOW_DATA.js": 8950,
     "MARGIN_DATA.js": 2680,
-    "ETF_SUBSCRIPTION.js": 3292,
+    # 2026-09-11 主人 P3：ETF_SUBSCRIPTION.js 已于 2026-09-06 随旧口径全链删除，此处残留条目一并清理
     "ETF_INTRADAY_HEAT.js": 7911,
     "CONCEPT_RANKING.js": 2461,
     "CONCEPT_ETF_MAP.js": 3564,

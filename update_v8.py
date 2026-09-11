@@ -24,6 +24,7 @@ def now_cst():
 
 # 原始文件名 → window 变量名
 DATA_SOURCES = {
+    "etf_net_subscription.json":   "ETF_NET_SUBSCRIPTION",  # 2026-09-11 主人 P1：真实 ETF 份额申赎（上交所日环比）
     "etf_intraday_heat.json":      "ETF_INTRADAY_HEAT",
     "sector_phase_history.json":   "SECTOR_PHASE_HISTORY",  # 2026-08-17 主人令：盘后每日阶段快照（自动累积+前端"今日 vs 上次"对比）
     "sector_fund_flow.json":       "SECTOR_FUND_FLOW",
@@ -139,11 +140,11 @@ DATA_SOURCES = {
     "factor_lab_backtest.json":    "FACTOR_LAB_BACKTEST",  # 🆕 2026-09-04 因子实验室独立分层回测
     "rps_backtest.json":           "RPS_BACKTEST",  # 🆕 2026-09-06 主人令：RPS 30天样本考核防孤儿（weekly_cleanup 有映射不删；考核详见 DO_NOT_DELETE.md / logic.html）
     # "path_probability_backtest.json": "PATH_PROB_BACKTEST",  # 2026-09-06 已注释：AI预测卡下架，停止发布
-    # 🛡 2026-08-30 一劳永逸式：补 ETF 申购赎回东方财富口径（股票/债券/货币/商品/跨境 5 类 + 亿元）。
-    #   2026-09-06 主人令轻量化：旧宽基+亿份口径全链删除（fetcher/映射/前端注入），仅保留东财口径 window.ETF_SUBSCRIPTION_EM。
-    # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：ETF_SUBSCRIPTION_EM 前端零引用，
-    #   驾驶舱/ETF三合一卡已读 ETF_PULSE / ETF_DAILY_MONITOR 等活数据，停止发布该死 js。
-    # "etf_subscription_em.json":   "ETF_SUBSCRIPTION_EM",
+    # 🗑 2026-09-11 主人 P3（清理孤儿链）：ETF_SUBSCRIPTION_EM 全链下线 ——
+    #   原 fetcher（scripts/fetch_etf_subscription_em.py）在 workflow 里一直跑、raw 一直产出，
+    #   但注入映射早已注释掉 → data/ETF_SUBSCRIPTION_EM.js 从不生成、前端 0 引用 = 半截接线死链；
+    #   且其「净申赎(亿)」实取「主力净流入-净额」（A 类估算贴 B 类标签）。
+    #   真实 ETF 份额申赎已由 "etf_net_subscription.json": "ETF_NET_SUBSCRIPTION" 取代（见本表顶部）。
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告
     "restricted_release.json":    "RESTRICTED_RELEASE",
     "performance_forecast.json":  "PERFORMANCE_FORECAST",
@@ -196,6 +197,10 @@ CATEGORY_MAP = {
     "INDEX_QUOTES": "intraday,post_close",
     "ETF_PULSE": "intraday,post_close",
     "ETF_INTRADAY_HEAT": "intraday,post_close",
+    # 🆕 2026-09-11 主人 P1（真实数据优先）：ETF 净申赎 = 上交所官方基金份额日环比（真实申赎，
+    #   非估算）。份额为日频披露 → 抓取侧只挂 premarket/post_close，注入侧同档对齐，
+    #   盘中不重建（盘中数据与盘前同值），前端如实标注「上交所口径 · 数据日 T-1」。
+    "ETF_NET_SUBSCRIPTION": "premarket,post_close",
     "ETF_DAILY_MONITOR": "intraday,post_close",
     # 🛡 2026-09-04 一劳永逸（两处映射不一致根治）：cloud_fetch_v8.py 早在 2026-09-03 就把这两个
     #   改成 "intraday,post_close"（盘中 cron 偶发丢档→收盘定格值无着落），但 update_v8.py 侧漏同步，
@@ -217,7 +222,7 @@ CATEGORY_MAP = {
     #   v8_build_deploy.yml 走的正是 detect-changes 模式）→ data/*.js 只能靠全量构建
     #   兜底；实测 raw 已新而 js 停在前一日（半截更新）。
     "RISK_GAUGE": "premarket,intraday",            # 实时风险温度计：v8_risk_gauge.yml 每30分（08:00-16:30 CST）
-    # "ETF_SUBSCRIPTION_EM": "premarket,post_close",  # 2026-09-11 P1 死数据清理：映射已移除
+    # 2026-09-11 P3：ETF_SUBSCRIPTION_EM 全链下线（孤儿死链，见 DATA_SOURCES 顶部说明）
     "RUNNER_STATUS": "premarket,intraday,post_close",  # 任务跟踪看板：每轮抓取都写，全时段
     # 🛡 2026-09-11 小九的股票专家 一劳永逸（主人令·「市场资金流向」盘中红灯）：
     #   原只标 post_close → _pure_pc=True → data/MARKET_FUND_FLOW_DATA.js 仅由

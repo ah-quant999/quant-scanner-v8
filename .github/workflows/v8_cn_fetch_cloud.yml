@@ -294,26 +294,12 @@ jobs:
             exit 1
           fi
 
-      # 2026-08-31 主人令：ETF_SUBSCRIPTION_EM 硬缺口修复（原产出脚本无任何 workflow 引用）
-      # 每个交易日盘前/盘后各抓一次即可（T+1 数据，akshare fund_etf_fund_info_em）。
-      # 仅生成 raw_data/etf_subscription_em.json，后续 update_v8 会映射为 data/ETF_SUBSCRIPTION_EM.js。
-      - name: "💰 ETF 申购赎回（东财口径，盘前/盘后/全量）"
-        id: soft_2
-        if: steps.cat.outputs.category == 'premarket' || steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
-        continue-on-error: true
-        timeout-minutes: 20
-        shell: bash
-        run: |
-          python scripts/fetch_etf_subscription_em.py
-
-          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
-          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
-          #   同款静默失败（脚本崩了、job 全绿、无人知晓）。
-          _v8_rc=$?
-          if [ "$_v8_rc" != "0" ]; then
-            echo "::error title=v8-softfail:soft_2(exit=$_v8_rc)::💰 ETF 申购赎回（东财口径，盘前/盘后/全量） 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
-            exit 1
-          fi
+      # 🗑 2026-09-11 主人 P3（清理孤儿链）：原 soft_2「ETF 申购赎回（东财口径）」整步删除。
+      #   原因：该链 fetcher 一直在跑、raw_data/etf_subscription_em.json 一直产出，
+      #   但 update_v8.py 侧的注入映射早已被注释掉 → data/ETF_SUBSCRIPTION_EM.js 从不生成、
+      #   前端 0 引用 = 「半截接线」死链；且其「净申赎(亿)」实取「主力净流入-净额」，
+      #   属 A 类估算值贴 B 类标签。真实 ETF 份额申赎已由 ETF_NET_SUBSCRIPTION
+      #   （上交所基金份额日环比）取代，本链整体下线（脚本 + raw 已同步删除）。
 
       - name: "🐉 刷新当日 LHB 数据（post_close + 周末全量）"
         id: soft_3
