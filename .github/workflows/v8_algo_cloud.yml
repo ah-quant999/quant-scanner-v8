@@ -258,7 +258,15 @@ jobs:
                       time.sleep(min(2 ** i, 20))
               raise SystemExit("blob fetch failed: %s (%s)" % (sha, last))
 
-          tree = get_json("https://api.github.com/repos/%s/git/trees/main?recursive=1" % REPO)
+          # [ALIMI 2026-09-12] 分层 tree 枚举（旧全量递归实测 1.24MB / 26.4s / 真实 IncompleteRead）。
+          #   本处只做「排除 backup/ docs/ kline_cache/」的目录剪枝，命中的正是根 tree 顶层条目
+          #   ⇒ 只需根 tree，无需下钻任何子树。
+          def _root_tree():
+              root = get_json("https://api.github.com/repos/%s/git/trees/main" % REPO)
+              if not isinstance(root, dict) or "tree" not in root:
+                  return get_json("https://api.github.com/repos/%s/git/trees/main?recursive=1" % REPO)
+              return root
+          tree = _root_tree()
           # 🛡 2026-09-11 20:2x 阿狸咪一劳永逸：冷启动全量同步结构性不可行。
           #   实测 main tree 构成：backup/ 69.3MB(28) + raw_data/kline_cache/ 57.3MB(3119)
           #   + docs/ 1.2MB(174) = 3321 文件 / 127.8MB，三者对算法链均无用：

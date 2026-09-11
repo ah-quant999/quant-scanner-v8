@@ -138,12 +138,49 @@ jobs:
           ref_data = get_json("https://api.github.com/repos/%s/git/ref/heads/main" % REPO)
           head_sha = ref_data["object"]["sha"]
           commit = get_json("https://api.github.com/repos/%s/git/commits/%s" % (REPO, head_sha))
-          tree = get_json("https://api.github.com/repos/%s/git/trees/%s?recursive=1" % (REPO, commit["tree"]["sha"]))
+          # [ALIMI 2026-09-12] 分层 tree 枚举（旧全量递归实测 1.24MB / 26.4s / 真实 IncompleteRead）。
+          #   ⚠️ 子树返回的 path 相对子树根（algorithms 子树给 "_x.py" 而非 "algorithms/_x.py"），
+          #   必须逐层拼接前缀，否则前缀过滤会 100% 落空（首版实测 旧 177 / 新 162 全错位）。
+          def _list_all_blobs(prefixes):
+              root = get_json("https://api.github.com/repos/%s/git/trees/%s" % (REPO, commit["tree"]["sha"]))
+              if not isinstance(root, dict) or "tree" not in root:
+                  return get_json("https://api.github.com/repos/%s/git/trees/%s?recursive=1" % (REPO, commit["tree"]["sha"])).get("tree", [])
+              out = []
+
+              def _walk(node, prefix, depth):
+                  for e in node.get("tree", []):
+                      rel = e.get("path", "")
+                      full = prefix + rel
+                      if e.get("type") == "blob":
+                          out.append({"type": "blob", "path": full, "sha": e.get("sha")})
+                      elif e.get("type") == "tree" and depth < 3:
+                          if any(full == p.split("/")[0] or full + "/" == p or p.startswith(full + "/")
+                                 or full.startswith(p.rstrip("/") + "/") for p in prefixes):
+                              sub = get_json("https://api.github.com/repos/%s/git/trees/%s" % (REPO, e.get("sha")))
+                              if isinstance(sub, dict) and "tree" in sub:
+                                  _walk(sub, full + "/", depth + 1)
+
+              _walk(root, "", 0)
+              return out
+          tree = {"tree": _list_all_blobs(("algorithms/",))}
           for item in tree.get("tree", []):
               if item["type"] != "blob":
                   continue
               path = item["path"]
+              # [ALIMI 2026-09-12] 一并补上源码过滤：旧实现无任何过滤，会把全仓 3961 个 blob
+              #   逐个 local_blob_sha() 比较（每个都要算 sha）—— 叠加 26.4s 的清单拉取必然撞 job 超时。
+              #   本步只需 fetcher 依赖的源码（algorithms/ + 根级 .py）。
+              if not (path.startswith("algorithms/") or (path.count("/") == 0 and path.endswith(".py"))):
+                  continue
               l_sha = local_blob_sha(path)
+              if l_sha == item["sha"]:
+                  continue
+              data = fetch_blob(item["sha"])
+              if sha_of(data) != item["sha"]:
+                  raise SystemExit("blob sha mismatch: %s" % path)
+              os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+              with open(path, "wb") as f:
+                  f.write(data)
               if l_sha == item["sha"]:
                   continue
               data = fetch_blob(item["sha"])
