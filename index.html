@@ -6631,7 +6631,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
              原表仍标绿点 ACTIVE 属误导；改为灰色「已下线」，保留行以存历史 -->
         <tr><td>v8_cn_fetch_watchdog</td><td>盘中每 15 分(8:07-15:52)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td><b>唯一状态型兜底</b>：陈旧 &gt;45min 才动手派发；其余一概不新增派发者（2026-09-10 派发源收敛铁律）</td></tr>
         <tr><td>v8_health_patrol</td><td>每小时 :08/:38</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>数据健康巡检 + 自愈（v8_health_check.py --heal）；陈旧阈值 2026-09-10 由 6 分调为 30 分</td></tr>
-        <tr><td>v8_algo_cloud</td><td>16:40/18:10/20:00/21:00(+22:30/00:30)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产（选股四模块+回测）</td></tr>
+        <tr><td>v8_algo_cloud</td><td>16:40/18:10/20:00/21:00(+22:30/00:30/06:00/08:00)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产（选股四模块+回测）</td></tr>
         <tr><td>v8_backup</td><td>每日23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data / 交接文档（含 v6 备份保留策略：v8 稳定一周前不删）</td></tr>
         <tr><td>runner_health_alert</td><td>工作日 13/15/17/19/21 点 · 周末 08-20 点每 2h</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>lemoncat-cn runner 离线告警 + 自动恢复关闭 Issue</td></tr>
         <tr><td>小九-v8云端管线看门狗</td><td>08-22每小时</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>只监督、不部署、不抢跑</td></tr>
@@ -10270,12 +10270,12 @@ function drawUpDownChart(){
 
           {name:'中国数据抓取 (v8_cn_fetch_cloud)', source:'RUNNER_STATUS', freq:'工作日 cron · 云端', slots:['08:25','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:20'], note:'核心数据管线 · GitHub Actions 云端 ubuntu-latest 主链（含 17:20 龙虎榜收盘后刷新）'},
 
-          {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日16:40/18:10/19:15/20:00 四批', slots:['19:15'], note:'候选池/黄金池/三重共识/回测 · <b>跑在 self-hosted cn 双机（lemoncat-cn / alimi-cn），非 ubuntu-latest</b>（job 日志 runner_name 实证）· 批次由闸门按「缺什么跑什么」判定 · 冗余由本机每30分检查dispatch兜底 · 源码同步：git 直连为主，被墙时走 GitHub API 回退（2026-09-11 20:2x 修：排除 backup/docs/kline_cache 三个重目录 + b64 优先 + 软预算，step 超时 10→25min）'},
+          {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日 8 唤醒点 16:40/18:10/20:00/21:00/22:30/00:30/06:00/08:00', slots:['19:15'], note:'候选池/黄金池/三重共识/回测 · <b>跑在 self-hosted cn 双机（lemoncat-cn / alimi-cn），非 ubuntu-latest</b>（job 日志 runner_name 实证）· 批次由闸门按「缺什么跑什么」判定 · 冗余由本机每30分检查dispatch兜底 · 源码同步：git 直连为主，被墙时走 GitHub API 回退（2026-09-11 20:2x 修：排除 backup/docs/kline_cache 三个重目录 + b64 优先 + 软预算，step 超时 10→25min）'},
 
           {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查 · 覆盖构建/部署/备份健康'},
 
 
-          {name:'运维常态巡检 (v8_ops_self_heal)', source:'HEALTH_CHECK', freq:'每30分(云端cron)', slots:['00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'], note:'v8_health_check.py --heal 全站42卡巡检+自动治愈 · 纯云端不依赖小九/阿狸咪'},
+          {name:'运维常态巡检 (v8_health_patrol)', source:'HEALTH_CHECK', freq:'每30分(云端cron)', slots:['00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'], note:'v8_health_check.py --heal 全站42卡巡检+自动治愈 · 纯云端不依赖小九/阿狸咪'},
 
           {name:'☁️ 持仓云端同步 (westock)', source:'PORTFOLIO_DATA', freq:'盘中每30分', slots:['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'westock 双机同步·实时持仓成本（操作信号面板②维止损锚点）',
             // 🛡 2026-08-19 一劳永逸：westock 源可能未接入（用户没开云端联结）→ 整行不报红叉，免误报
