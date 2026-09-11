@@ -6651,6 +6651,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;">⚠️ 失败/诊断详情</div>
         <div id="opDiagBody" style="font-size:11px;color:var(--sub);line-height:1.6;"></div>
       </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--sub);line-height:1.7;">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px;">📌 2026-09-12 修复 · 每日洞察卡时间戳</div>
+        <div>「📊 每日市场洞察」是<b>八路数据汇合卡</b>（危机雷达/选股池/板块资金/波动率/指数/沪深历史/龙虎榜/北向席位），「更新于」的语义是<b>最后一路上线、这张卡才成型</b>。</div>
+        <div>· 旧实现有两处硬伤：龙虎榜那一路被替换成硬编码伪时刻「数据日期 + 15:30:00」；八路排序后取<b>最旧</b>一条 ⇒ 卡片被永久钉在 15:30，其余七路真实时刻（22:xx/23:xx）全部被无视。</div>
+        <div>· 已改：撤掉伪时刻、改用各路真实产出时刻；<b>取最小 → 取最大</b>（卡成型时刻）；时段胶囊<b>锚定真实刷新时刻</b>而非访客本地钟点，以 <b>17:30</b>（龙虎榜单飞抓取器起跑点）为「今日盘后」分界。</div>
+        <div>· 若看到「更新于」明显早于当日盘后链结束时刻，即说明某一路未落盘 —— 请对照上方文件新鲜度定位是哪一路。</div>
+      </div>
     </div>
 
     <div class="card" style="margin-bottom:16px;border-left:3px solid var(--gold)">
