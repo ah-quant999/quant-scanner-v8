@@ -1710,15 +1710,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>-2.0% ~ -0.5%</td><td>较有效</td><td>市场偏弱，CRDS 较有效</td></tr>
           <tr><td>&lt; -2.0%</td><td>高有效</td><td>暴跌恐慌市信号最强，但需防系统性风险</td></tr>
         </table>
-        <div class="logic-h">待机提示文案（无逆势板时显示）</div>
-        <table class="lg-table">
-          <tr><th>大盘档</th><th>卡片待机文案</th></tr>
-          <tr><td>高有效 / 较有效</td><td>🟡 <b>当前无逆势板信号</b> — 今日大盘偏弱但暂无个股逆势涨停，CRDS 逆势模型持续监控中</td></tr>
-          <tr><td>有效（震荡市）</td><td>🟢 <b>当前大盘震荡，暂无逆势板信号</b> — 震荡市 CRDS 可正常参考，模型持续监控中</td></tr>
-          <tr><td>低效</td><td>⚠️ <b>市场偏强，CRDS 有效性降低</b> — 暂无需逆势龙头，信号参考意义有限</td></tr>
-          <tr><td>失效</td><td>🔴 <b>今日大涨，逆势龙头不适用</b> — CRDS 参考意义极低</td></tr>
-          <tr><td>其他</td><td>⏳ <b>当前无暴跌日</b> — CRDS 逆势模型持续监控中</td></tr>
-        </table>
+<div class="logic-h">无信号时怎么读</div>
+<div class="logic-p">卡内<b>只保留一处「大盘判断」</b>（档位徽章 + 今日大盘涨跌幅 + 完整结论摘要）。<b>2026-09-11 主人令</b>：原「待机横幅」（<code>stcrdsStandby</code>，按大盘档位另写一套口语化文案）与「大盘判断」同源同口径（都取自 <code>market_context.validity</code>），属重复展示，已整体删除；今日有无逆势板信号改由子条件区「②大跌日逆势板」的计数与空态文案（今日无）表达。</div>
         <div class="logic-h">名字清洗（防研报/新闻稿污染名）</div>
         <div class="logic-p">卡片绝不出「看好/完成/给予」等研报词垃圾名。优先级：东财 f58 权威名 &gt; 通达信名字(仅股票段且非指数/债) &gt; raw 干净名 &gt; 退化代码兜底。</div>
       <div class="logic-h">与「涨停热力矩阵」的区别</div>
