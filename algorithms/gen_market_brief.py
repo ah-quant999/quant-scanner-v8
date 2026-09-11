@@ -166,6 +166,35 @@ def _fmt_sector_list(items, signed=False):
     return "、".join(out)
 
 
+_ROMAN_LV = {"Ⅰ": 1, "Ⅱ": 2, "Ⅲ": 3, "Ⅳ": 4}
+
+
+def _split_level(name):
+    """(基名, 层级序号)：`地面兵装Ⅲ` -> ('地面兵装', 3)；无罗马数字后缀 -> (原名, 1)"""
+    if name and name[-1] in _ROMAN_LV:
+        return name[:-1], _ROMAN_LV[name[-1]]
+    return name, 1
+
+
+def _dedupe_same_level(items):
+    """剔除「同数据、同父级」的父子级重复项：每个基名只保留层级最高的一条。
+
+    东财行业源（m:90 t:2）同时给出 Ⅱ/Ⅲ 细分，父子同额并排（如 地面兵装Ⅱ/Ⅲ 各 +9.74亿
+    = 同一笔资金被算两遍）。本函数按基名去重、保留层级最高的一个（Ⅱ 优先于 Ⅲ），
+    其余非层级条目按原顺序原样保留（2026-09-11 主人令：「同数据有同级的就保留一级，其他不变」）。
+    """
+    best = {}
+    order = []
+    for s in items:
+        base, lvl = _split_level(s.get("name") or "")
+        if base not in best:
+            best[base] = (lvl, s)
+            order.append(base)
+        elif lvl < best[base][0]:
+            best[base] = (lvl, s)
+    return [best[b][1] for b in order]
+
+
 def health_lights(indices, up_down_ratio, main_net):
     """三灯：结构/资金/情绪 + 整行聚合灯（取最差）"""
     # 结构：四大指数同向性 + 平均涨跌幅
@@ -346,13 +375,17 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
     # 4b. 行业资金（新建独立行）
     # 🛡 2026-09-11 主人令：行业单独成行，与概念分开写明白。
     #   大数 = 申万一级 31 行业净额（与卡片大数同口径）；
-    #   流入 TOP5 / 流出 TOP3 = type=='行业'（东财行业，含二三级子行业，与卡片两张榜同口径）。
+    #   流入 TOP5 / 流出 TOP3 = type=='行业'（东财行业，含二三级细分）；
+    #   🛡 同数据、同父级的重复项只保留层级最高的一条（如 地面兵装Ⅱ/Ⅲ 各 +9.74亿 → 只留 Ⅱ），
+    #     其余条目一律保留（2026-09-11 主人令：「同数据有同级的就保留一级，其他不变」）。
     #   ⚠️ 流出榜必须【按净额升序取前三】= 真实最大流出；卡片旧写法 sectors_out.slice(0,3)
     #   取的是文件里"最小流出"的三条（≈-0.01亿），显示无意义。
-    ind_in = sorted([s for s in _sector_list(sectors, "sectors_in") if s.get("type") == "行业"],
-                    key=lambda s: -float(s.get("net") or 0))[:5]
-    ind_out = sorted([s for s in _sector_list(sectors, "sectors_out") if s.get("type") == "行业"],
-                     key=lambda s: float(s.get("net") or 0))[:3]
+    ind_in = _dedupe_same_level(sorted(
+        [s for s in _sector_list(sectors, "sectors_in") if s.get("type") == "行业"],
+        key=lambda s: -float(s.get("net") or 0)))[:5]
+    ind_out = _dedupe_same_level(sorted(
+        [s for s in _sector_list(sectors, "sectors_out") if s.get("type") == "行业"],
+        key=lambda s: float(s.get("net") or 0)))[:3]
     sw1_net = sw1_industry_net(sectors)
     if sw1_net is not None or ind_in:
         parts = []
