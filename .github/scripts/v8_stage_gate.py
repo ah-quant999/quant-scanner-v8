@@ -96,8 +96,32 @@ def _ensure_v8_date(root: str) -> None:
 #   must  : 其中必须命中（全中）的关键项
 READY_SPEC: dict[str, dict] = {
     "A": {
-        "items": ["data/LHB_DATA.js", "raw_data/sector_rs.json", "raw_data/stock_profile.json"],
-        "need": 3,
+        # 🛡 2026-09-11 主人令「一劳永逸」（与 B 批同源根治）：readiness 清单 3 → 10 项。
+        #   原清单只校验 3 个代表产物（LHB_DATA / sector_rs / stock_profile），而 A 批实有
+        #   12 个脚本。实测（2026-09-11 经 Contents API 直查 main）：
+        #   这 3 项鲜活，但 A 批另有 6 个产物停在 09-10 ——
+        #     fundamental_quality / stock_quote / inst_trade / suspension_alert /
+        #     nt_data / sector_fund_flow_trend
+        #   → 闸门判「A 已就绪」→ 这些卡整日红灯却无人重跑
+        #     （主人截图中的 SUSPENSION_ALERT / SECTOR_FUND_FLOW_TREND 正是此类）。
+        #   故把 A 批全部可读时戳的产物纳入清单。
+        #   ⚠️ 不含 stock_names.json：该文件无 update_time/data_date 字段，read_ut 恒返回
+        #      None → 会永久计为 MISS 从而拉低命中数（实测已确认）。
+        #   need=7/10：容忍 3 项失败仍放行，避免个别抓取源抖动把整条链锁死在 A 批；
+        #     而当前 4/10 的状态会被判「未就绪」→ 正确触发补跑。
+        "items": [
+            "data/LHB_DATA.js",                 # 龙虎榜 = 「16:30后数据」的核心标志（must）
+            "raw_data/sector_rs.json",
+            "raw_data/stock_profile.json",
+            "raw_data/fundamental_quality.json",
+            "raw_data/stock_quote.json",
+            "raw_data/inst_trade.json",
+            "raw_data/suspension_alert.json",
+            "raw_data/nt_data.json",
+            "raw_data/sector_fund_flow_trend.json",
+            "raw_data/market_alerts.json",
+        ],
+        "need": 7,
         "must": ["data/LHB_DATA.js"],   # 龙虎榜是「16:30后数据」的核心标志
     },
     "B": {
