@@ -2454,7 +2454,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="sec-head"><h2>🌙 盘后数据</h2><span class="tag">收盘后生成</span></div>
 
     
-    <!-- 斐波那契窗口 / 商品涨价弹性榜 → 已下沉「运维→已下架·盘后观测」(2026-08-29 主人令) -->
+    <!-- 斐波那契窗口 → 已下沉「运维→已下架·盘后观测」(2026-08-29 主人令)；商品涨价弹性榜 → 2026-09-11 主人令迁回「📡 实时数据」页（主力净额分时卡下方） -->
 
 
 
@@ -13045,6 +13045,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,
     /* 2026-08-30 主人令：观测候选股池已作为选股策略子页，删除已下架中的重复卡片 */
 
     // 2026-08-30 主人令：斐波那契双卡 + 商品涨价弹性榜三卡置顶到「已下架」顶部，盘前条幅下方。
+    //   🚚 2026-09-11 主人令：商品涨价弹性榜已迁回实时数据页，「已下架」仅剩斐波那契双卡。
     //   原在盘后分组底部，现作为首屏辅助观测卡常驻。
     h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">
   `+v8CardHeader('🧪','斐波那契F观测窗','','update_time',Object.assign({},window.SH_FIB,{slot:'盘前',horizon:'中长线'}))+`

@@ -161,11 +161,9 @@ CATEGORY_MAP = {
     "CFFEX_HOLDINGS": "intraday,post_close",
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：与 cloud_fetch_v8.py 同步加 post_close。
     #   盘后数据页「宏观数据速览」卡读本变量，原只标 premarket → 盘后档不重生成 data/MACRO_DATA.js。
-    # 🛡 2026-09-11 小九的工程师（三档归档对齐）：补 intraday。cloud_fetch_v8.py 侧自 09-07 起
-    #   已注册 "premarket,intraday,post_close"（主人令「今日判定·环境综合卡盘中随实时数据
-    #   变化，将其及依赖源纳入 intraday」），update_v8 侧漏同步 → 盘中档抓了新 raw_data
-    #   却跳过重生成 data/MACRO_DATA.js，前端「宏观数据速览」盘中恒显示盘前值（半截更新）。
-    "MACRO_DATA": "premarket,intraday,post_close",
+    # 🛡 2026-09-11 主人令：宏观为日级/月级数据，不随盘中实时刷——与 cloud_fetch_v8.py 同步移出
+    #   intraday（两侧曾于 09-11 上午对齐为三档，本条即回归盘前+盘后两档），归盘后更新链。
+    "MACRO_DATA": "premarket,post_close",
     "CRISIS_DATA": "premarket,intraday",
     "NORTH_FUND": "premarket",
     "ANALYST_RATINGS": "premarket",
