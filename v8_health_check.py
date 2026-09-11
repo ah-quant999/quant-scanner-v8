@@ -146,6 +146,11 @@ CARD_DEFS = [
     {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
     {"id": "STOCK_RPS", "name": "相对强度", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["records"], "_window_var": "STOCK_RPS_DATA", "heal_cat": "algo_run", "picking": True, "raw_file": "stock_rps.json"},  # 文件名 STOCK_RPS.js，但 window 变量名是 STOCK_RPS_DATA（历史遗留）；🛡 2026-09-10 raw_file 交叉校验根治误报 fail
     {"id": "CRDS_CARD_DATA", "name": "逆势龙头", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["elite", "watch"], "heal_cat": "algo_run", "picking": True},
+    # 🛡 2026-09-11 一劳永逸：4 个孤儿 algo_run 产物此前未注册 CARD_DEFS → 被 all_ 通用扫描按 1440min 红线误判 fail
+    {"id": "ALGO_TRACK", "name": "算法追踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
+    {"id": "TRIPLE_HISTORY", "name": "三重历史", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
+    {"id": "VOLATILITY", "name": "波动率", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
+    {"id": "STOCK_RPS_DATA", "name": "相对强度数据", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},  # STOCK_RPS.js 的 _window_var；all_ 扫描独立命中此文件名
     # 运维/静态说明页（逻辑详解页「防删」子页）
     {"id": "DO_NOT_DELETE", "name": "防误删清单", "page": "运维", "freq": "周日+手动", "max_age": 10080, "key_fields": ["update_time"], "_window_var": "DO_NOT_DELETE", "heal_cat": "algo_run", "manual_dep": True},
     # 2026-08-30 一劳永逸：UNLISTED_PANEL/AVG_PRICE_DATA 新看板卡此前未注册 CARD_DEFS → 红灯；已注册。
@@ -2189,7 +2194,8 @@ def check_site_dom(site_html=None):
     # 2026-08-08 96轮适配：阿狸咪方案三重构后页面卡片改由 JS 从外部 data/*.js 动态渲染，
     # 静态 HTML 内是空壳/“加载中…”占位符（旧 critical_ids 中 4 个 id 已删除）。
     # 故改为：① 关键容器存在性检查（缺失=fail）；② 静态占位符（空/加载中）=warn（JS 渲染属常态）。
-    critical_ids = ["taskScheduleBody", "phMacroBody", "ttBackBody", "ttThrBody", "ttSvlBody", "ttTrackBody",
+    # 🛡 2026-09-11 移除 phMacroBody（opTab4 已删，HTML 中无此元素，DOM 检查永久 fail 假阳性）
+    critical_ids = ["taskScheduleBody", "ttBackBody", "ttThrBody", "ttSvlBody", "ttTrackBody",
                     "stcrdsAdvBody", "stcrdsEliteBody", "runnerTrackBody", "healthCheckBody"]
     results = []
     for cid in critical_ids:
