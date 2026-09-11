@@ -172,4 +172,131 @@ index_value_framework.json  ut=2026-09-11 09:01:20
 
 ---
 
-**小九 · 2026-09-11 09:10 CST**
+---
+
+# 【补篇】09:10 → 10:05 第二轮深挖：又挖出两层阻断（均已根治）
+
+第一轮修完（挂链 + 闸门 8 项 + experiments 推送步）后做了端到端推演，发现**还差两环**
+才能真正让卡片转绿。补记如下，避免你按第一轮的结论判断"已经好了"。
+
+## 8. 阻断④：dedup 去重器把「内容稳定」的卡当伪变更丢掉 → 时间戳永不前进
+
+**这是最隐蔽的一层。** `.github/scripts/dedup_fetch_manifest.py`（仅 `v8_algo_cloud.yml`
+推送步使用）的判据是「**剥掉时间戳字段后内容是否改变**」。
+
+对**数据内容天然稳定**的研究/审计类卡片，剥掉时间戳后逐字节相同 → 判「伪变更」→ **永不推送**。
+
+实测（本地文件 vs `origin/main`，都过 `strip_ts()` 再逐字节比）：
+
+```
+raw_data/ai_insights_compare.json     ✅ 内容真变 → 会推送
+raw_data/valuation_percentile.json    ✅ 内容真变 → 会推送
+raw_data/factor_audit.json            ⚠️ 仅时间戳差异 → 被丢弃
+raw_data/factor_progress.json         ⚠️ 仅时间戳差异 → 被丢弃
+raw_data/index_value_framework.json   ⚠️ 仅时间戳差异 → 被丢弃
+```
+
+**为何内容稳定**：`factor_audit` 审计的是 `generate_top10.py` 的**源码**（源码不改则内容不变）；
+`factor_progress` 读 `factor_audit`；`index_value_framework` 依赖 `INDEX_HISTORY` 的刷新节奏。
+
+**两层后果**：
+1. 前端恒显示「昨日」红灯 —— 卡片新鲜度就是 `update_time`，而它永不前进；
+2. 闸门 `READY_SPEC` 读同一批文件判就绪 → 永远 STALE → 该批（60~90min）**反复重跑**，永不收敛。
+
+**修复**：新增 `_ALWAYS_PUSH` 白名单（5 卡 raw + 5 卡 js）→ 强制推送。
+单文件 1~8KB，开销可忽略。**注意：原 `v8_cn_fetch_experiments.yml` 本来就是无条件
+`git add + push` 这几个文件**，所以强制推送正是原始设计意图。
+
+## 9. 阻断⑤：A 批闸门**完全同源**的盲区（不是 B 批独有）
+
+我原以为只有 B 批的 `READY_SPEC` 太窄。**A 批一模一样**，而且实测更严重。
+
+A 批 `READY_SPEC` 只校验 3 个代表产物（`LHB_DATA` / `sector_rs` / `stock_profile`），
+而 A 批实有 **12 个脚本**。经 Contents API 直查 main 实证，这 3 项鲜活，但另有 **6 个产物
+停在 09-10**：
+
+```
+fundamental_quality.json     09-10 06:12
+stock_quote.json             09-10 15:03
+inst_trade.json              09-10 06:17
+suspension_alert.json        09-10 06:23   ← 主人截图红灯
+nt_data.json                 09-10 06:24
+sector_fund_flow_trend.json  09-10 06:25   ← 主人截图红灯
+```
+
+→ 闸门判「A 已就绪」→ 这 6 个产物整日无人重跑。
+
+**修复**：`items` 3 → 10（纳入 A 批全部**可读时戳**的产物），`need=7/10`。
+
+⚠️ **有意不含 `stock_names.json`**：该文件**无** `update_time` / `data_date` 字段，
+`read_ut()` 恒返回 `None` → 会永久计 MISS 从而拉低命中数（已实测确认）。**新挂产物前
+务必用 `read_ut()` 验证能否读到时戳**，否则等于给自己挖坑。
+
+`need=7` 而非更严的理由：A 未就绪时闸门**只跑 A**，会挡住 B/D/E，所以不能设得过严
+—— 需容忍 3 项失败仍放行。T+1 日（周六/假期首日）走既有放宽分支（`need=1`），不会死锁。
+
+## 10. 阻断⑥（连带）：B 批 `need` 必须 ≥7，否则 3 张卡永远补不上
+
+dedup 修好前，一轮 B 批跑完线上只得 3 核心 + 2 张 = **5/8**。若 `need=5`，闸门会据此判
+「B 已就绪」→ 空转 → 另 3 张（`factor_audit` / `factor_progress` / `index_value_framework`）
+**永远补不上，恒红**。
+
+→ `need` 5 → **7**（只容忍 1 项不新鲜）。8 项中唯一易碎的是 `valuation_percentile`
+（依赖 akshare 外部接口），7 恰好容忍它单独失败而不把整链锁死。
+
+## 11. 完整管线（四环，缺一不可 · 现已全部打通）
+
+| 环 | 内容 | 提交 |
+|---|---|---|
+| ① | 5 脚本挂进 B 批 → raw 每日生成 | `b9606fb9c` |
+| ② | 闸门 `READY_SPEC` A=10项/B=8项 + `need` → 链不再误判空转 | `b9606fb9c` / `3682d70f` / `babc6f72` |
+| ③ | `dedup` `_ALWAYS_PUSH` 强制推送 → raw 时间戳真正到达 main | `057eab8d8` |
+| ④ | `v8_cn_fetch_cloud` 17:20/18:20/19:20 的 **post_close 构建** → `data/*.js` 重生成 → 前端转绿 | 既有，已核 |
+
+**④ 为何关键**（易被忽略）：`update_v8.py:1139` 的 `_pure_pc` 保护决定
+「纯盘后产物只在 `--category post_close` 构建时才重写」。
+而算法链完成触发的 build 走 `--detect-changes`，**`category` 为 None → 必然跳过 pure_pc 卡片**。
+唯一会跑 `--category post_close` 的是 **cn_fetch 链（17:20/18:20/19:20 CST）**
+和 experiments workflow。且 `v8_build_deploy.yml` 的 schedule **已被有意移除**
+（见该文件 17-19 行：与算法链竞态，用旧 raw 洗新 data）——**不要试图把 schedule 加回来**。
+**结论：raw 更新后，`data/*.js` 要到当天 17:20 后的 post_close 构建才会跟着更新。**
+
+## 12. 闸门实测对照（同一时刻 2026-09-11 09:50 并发跑两版）
+
+```
+[修复前] target_stage=NONE | reason=⏸ 未到交易日 2026-09-11 盘后链起点（16:00，现 09:50），
+                              且上一数据日已无未完成批次 → 空转（合规）
+[修复后] target_stage=A    | reason=A 未就绪(3/10) → 跑采集批
+```
+
+**「空转（合规）」正是主人看到的「满屏红灯却六管线全绿」的原始形态。**
+
+**另一处需你知晓（我未擅自改）**：`check_ready` 要求 `c[0] == day`（产物日期必须**等于**
+数据日）。后果：09:00–15:59 时段触发的「补跑上一数据日」即使跑完，产物日期是**今天**，
+仍无法满足**昨天**的判定 → 该时段内每次派发都会再判「上一日未完成」。
+**实践中不构成死循环**：派发只在 16:10–01:00（本机接力推进器）+ 云端 cron ≥16:40，
+09:00–15:59 **没有派发**。但如果你后续要在白天加派发档位，需一并处理这个语义。
+
+## 13. 本轮我实际推送的提交（作者署名：小九的股票专家）
+
+| 提交 | 内容 |
+|---|---|
+| `b9606fb9c` | 5 孤儿脚本挂 B 批 + 闸门 B 批 3→8 项 + experiments 推送步修 rebase |
+| `057eab8d8` | dedup `_ALWAYS_PUSH` 强制推送白名单 |
+| `babc6f72` | 闸门 B 批 `need` 5→7 |
+| `3682d70f` | 闸门 A 批 3→10 项 + `need=7` |
+| `1f50a42d` | 5 个实验卡 raw 实测数据（09:30 新鲜，经 `api_push_raw` 推） |
+
+> 补充约定：本机（小九）改动署名统一为**「小九的股票专家」**（git `user.name` 已设，
+> commit message 亦带标识）。你那台机对应「阿狸咪的股票专家」，便于双机辨认。
+
+## 14. 待你拍板 / 建议你接手的
+
+| # | 事项 | 我的建议 |
+|---|---|---|
+| 1 | 盘前跨层闸门 100% 阻断部署（`v8_verify_layer_parity.py`） | 加时段白名单：盘前/盘中类只 warn，post_close 仍硬阻断 |
+| 2 | `check_ready` 的 `c[0] == day` 严格等值语义 | 若白天加派发档位需放宽为「≥ 数据日」；现不改 |
+| 3 | BACKTEST_COMPREHENSIVE 的 `_pure_pc` 保护 | **不动**（改回去会让 9/10 最终推荐回退事故重演） |
+| 4 | `v8_cn_fetch_experiments.yml` 是否停用 | 保留作兜底（推送步已修）；5 脚本主力已在 B 批 |
+
+**小九的股票专家 · 2026-09-11 10:05 CST**

@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-09-11 00:44:39",
-  "generated": "2026-09-11 00:44:39",
+  "update_time": "2026-09-11 10:30:16",
+  "generated": "2026-09-11 10:30:16",
   "period_start": "2026-08-31",
   "period_end": "2026-09-06",
   "stats": {
@@ -16,22 +16,22 @@
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-09-10 22:11:00",
+      "update_time": "2026-09-11 00:50:08",
       "size_kb": 21.0
     },
     {
       "file": "triple_history.json",
       "label": "三重共振历史",
       "status": "ok",
-      "update_time": "2026-09-08 20:14:10",
-      "size_kb": 28.9
+      "update_time": "2026-09-11 00:30:38",
+      "size_kb": 29.9
     },
     {
       "file": "top10_daily.json",
       "label": "全站精选",
       "status": "ok",
-      "update_time": "2026-09-10 04:46:46",
-      "size_kb": 33.2
+      "update_time": "2026-09-11 09:34:19",
+      "size_kb": 31.3
     },
     {
       "file": "/* cockpit 已下线 2026-09-03 */_tier_recommend.json",
@@ -43,28 +43,28 @@
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-09-10 22:12",
+      "update_time": "2026-09-11 00:50",
       "size_kb": 72.5
     },
     {
       "file": "final_recommend.json",
       "label": "最终推荐池",
       "status": "ok",
-      "update_time": "2026-09-10 04:57:09",
-      "size_kb": 28.6
+      "update_time": "2026-09-11 06:55:08",
+      "size_kb": 66.4
     },
     {
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-09-10 06:55:22",
-      "size_kb": 280.4
+      "update_time": "2026-09-11 08:42:26",
+      "size_kb": 851.3
     },
     {
       "file": "candidate.json",
       "label": "候选池",
       "status": "ok",
-      "update_time": "2026-09-10 22:17:40",
+      "update_time": "2026-09-11 00:01:27",
       "size_kb": 445.6
     },
     {
@@ -77,8 +77,8 @@
       "file": "crds_card_data.json",
       "label": "逆势龙头",
       "status": "ok",
-      "update_time": "2026-09-10 04:10:39",
-      "size_kb": 176.0
+      "update_time": "2026-09-11 09:03:46",
+      "size_kb": 341.2
     }
   ],
   "source_note": "v8 周度运行汇总（轻量，离线可跑；由 algorithms/run_algorithms.py 周末链路调用）"

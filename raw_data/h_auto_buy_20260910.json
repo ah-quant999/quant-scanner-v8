@@ -6,20 +6,72 @@
   "total_scanned": 9968,
   "skipped_no_quote": 1,
   "hit_chg_only": 407,
-  "final_count": 151,
+  "final_count": 152,
   "candidates": [
     {
-      "code": "00860",
-      "symbol": "hk00860",
-      "name": "ＡＰＯＬＬＯ出行",
-      "pct": 40.74,
-      "price": 0.76,
-      "prev_close": 0.54,
-      "volume": 1603800.0,
-      "avg_vol_4d": 150314.0,
-      "vol_ratio": 10.67,
-      "industry": "",
-      "board": "港股"
+      "code": "601991",
+      "symbol": "sh601991",
+      "name": "大唐发电",
+      "pct": 3.26,
+      "price": 6.02,
+      "prev_close": 5.83,
+      "volume": 473516236.0,
+      "avg_vol_4d": 2755580.5,
+      "vol_ratio": 171.839,
+      "industry": "电力、热力生产和供应业",
+      "board": "主板"
+    },
+    {
+      "code": "600354",
+      "symbol": "sh600354",
+      "name": "敦煌种业",
+      "pct": 4.28,
+      "price": 11.45,
+      "prev_close": 10.98,
+      "volume": 219553634.0,
+      "avg_vol_4d": 1424100.5,
+      "vol_ratio": 154.17,
+      "industry": "农、林、牧、渔专业及辅助性活动",
+      "board": "主板"
+    },
+    {
+      "code": "000823",
+      "symbol": "sz000823",
+      "name": "超声电子",
+      "pct": 10.0,
+      "price": 18.7,
+      "prev_close": 17.0,
+      "volume": 154274626.0,
+      "avg_vol_4d": 1193667.5,
+      "vol_ratio": 129.244,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "主板"
+    },
+    {
+      "code": "600150",
+      "symbol": "sh600150",
+      "name": "中国船舶",
+      "pct": 3.26,
+      "price": 40.82,
+      "prev_close": 39.53,
+      "volume": 175740221.0,
+      "avg_vol_4d": 1691768.75,
+      "vol_ratio": 103.88,
+      "industry": "铁路、船舶、航空航天和其他运输设备制造业",
+      "board": "主板"
+    },
+    {
+      "code": "600667",
+      "symbol": "sh600667",
+      "name": "太极实业",
+      "pct": 10.02,
+      "price": 19.98,
+      "prev_close": 18.16,
+      "volume": 190870406.0,
+      "avg_vol_4d": 2166784.25,
+      "vol_ratio": 88.089,
+      "industry": "土木工程建筑业",
+      "board": "主板"
     },
     {
       "code": "600812",
@@ -58,19 +110,6 @@
       "avg_vol_4d": 8090052.5,
       "vol_ratio": 6.849,
       "industry": "电力、热力生产和供应业",
-      "board": "主板"
-    },
-    {
-      "code": "002204",
-      "symbol": "sz002204",
-      "name": "大连重工",
-      "pct": 10.09,
-      "price": 5.89,
-      "prev_close": 5.35,
-      "volume": 87169448.0,
-      "avg_vol_4d": 19802102.25,
-      "vol_ratio": 4.402,
-      "industry": "通用设备制造业",
       "board": "主板"
     },
     {
@@ -344,19 +383,6 @@
       "avg_vol_4d": 18764969.0,
       "vol_ratio": 1.725,
       "industry": "化学原料和化学制品制造业",
-      "board": "主板"
-    },
-    {
-      "code": "000823",
-      "symbol": "sz000823",
-      "name": "超声电子",
-      "pct": 10.0,
-      "price": 18.7,
-      "prev_close": 17.0,
-      "volume": 154274626.0,
-      "avg_vol_4d": 89880787.75,
-      "vol_ratio": 1.716,
-      "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
     },
     {
@@ -672,19 +698,6 @@
       "board": "主板"
     },
     {
-      "code": "688519",
-      "symbol": "sh688519",
-      "name": "南亚新材",
-      "pct": 6.15,
-      "price": 309.59,
-      "prev_close": 291.65,
-      "volume": 6600282.0,
-      "avg_vol_4d": 5344022.25,
-      "vol_ratio": 1.235,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "688135",
       "symbol": "sh688135",
       "name": "利扬芯片",
@@ -815,6 +828,19 @@
       "board": "科创板"
     },
     {
+      "code": "001388",
+      "symbol": "sz001388",
+      "name": "信通电子",
+      "pct": 3.58,
+      "price": 22.6,
+      "prev_close": 21.82,
+      "volume": 9604541.0,
+      "avg_vol_4d": 4000038.0,
+      "vol_ratio": 2.401,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "主板"
+    },
+    {
       "code": "601949",
       "symbol": "sh601949",
       "name": "中国出版",
@@ -838,32 +864,6 @@
       "avg_vol_4d": 108624374.5,
       "vol_ratio": 2.075,
       "industry": "煤炭开采和洗选业",
-      "board": "主板"
-    },
-    {
-      "code": "600354",
-      "symbol": "sh600354",
-      "name": "敦煌种业",
-      "pct": 4.28,
-      "price": 11.45,
-      "prev_close": 10.98,
-      "volume": 219553634.0,
-      "avg_vol_4d": 124380782.0,
-      "vol_ratio": 1.765,
-      "industry": "农、林、牧、渔专业及辅助性活动",
-      "board": "主板"
-    },
-    {
-      "code": "601991",
-      "symbol": "sh601991",
-      "name": "大唐发电",
-      "pct": 3.26,
-      "price": 6.02,
-      "prev_close": 5.83,
-      "volume": 473516236.0,
-      "avg_vol_4d": 199538709.5,
-      "vol_ratio": 2.373,
-      "industry": "电力、热力生产和供应业",
       "board": "主板"
     },
     {
@@ -945,19 +945,6 @@
       "board": "主板"
     },
     {
-      "code": "688035",
-      "symbol": "sh688035",
-      "name": "德邦科技",
-      "pct": 4.24,
-      "price": 74.95,
-      "prev_close": 71.9,
-      "volume": 9283642.0,
-      "avg_vol_4d": 7278040.5,
-      "vol_ratio": 1.276,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "600391",
       "symbol": "sh600391",
       "name": "航发科技",
@@ -1021,6 +1008,97 @@
       "vol_ratio": NaN,
       "industry": "金属制品业",
       "board": "主板"
+    },
+    {
+      "code": "300600",
+      "symbol": "sz300600",
+      "name": "国瑞科技",
+      "pct": 6.92,
+      "price": 11.59,
+      "prev_close": 10.84,
+      "volume": 30103778.0,
+      "avg_vol_4d": 49617.0,
+      "vol_ratio": 606.723,
+      "industry": "铁路、船舶、航空航天和其他运输设备制造业",
+      "board": "创业板"
+    },
+    {
+      "code": "300008",
+      "symbol": "sz300008",
+      "name": "天海防务",
+      "pct": 3.19,
+      "price": 6.79,
+      "prev_close": 6.58,
+      "volume": 174308254.0,
+      "avg_vol_4d": 990906.25,
+      "vol_ratio": 175.908,
+      "industry": "铁路、船舶、航空航天和其他运输设备制造业",
+      "board": "创业板"
+    },
+    {
+      "code": "002015",
+      "symbol": "sz002015",
+      "name": "协鑫能科",
+      "pct": 4.57,
+      "price": 17.18,
+      "prev_close": 16.43,
+      "volume": 142529281.0,
+      "avg_vol_4d": 1103670.25,
+      "vol_ratio": 129.141,
+      "industry": "电力、热力生产和供应业",
+      "board": "主板"
+    },
+    {
+      "code": "002636",
+      "symbol": "sz002636",
+      "name": "金安国纪",
+      "pct": 10.0,
+      "price": 76.45,
+      "prev_close": 69.5,
+      "volume": 64968910.0,
+      "avg_vol_4d": 561599.75,
+      "vol_ratio": 115.685,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "主板"
+    },
+    {
+      "code": "300677",
+      "symbol": "sz300677",
+      "name": "英科医疗",
+      "pct": 3.42,
+      "price": 55.63,
+      "prev_close": 53.79,
+      "volume": 8337088.0,
+      "avg_vol_4d": 69632.75,
+      "vol_ratio": 119.729,
+      "industry": "橡胶和塑料制品业",
+      "board": "创业板"
+    },
+    {
+      "code": "300394",
+      "symbol": "sz300394",
+      "name": "天孚通信",
+      "pct": 4.25,
+      "price": 269.0,
+      "prev_close": 258.03,
+      "volume": 50983659.0,
+      "avg_vol_4d": 435165.5,
+      "vol_ratio": 117.159,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "创业板"
+    },
+    {
+      "code": "00860",
+      "symbol": "hk00860",
+      "name": "ＡＰＯＬＬＯ出行",
+      "pct": 40.74,
+      "price": 0.76,
+      "prev_close": 0.54,
+      "volume": 1603800.0,
+      "avg_vol_4d": 150314.0,
+      "vol_ratio": 10.67,
+      "industry": "",
+      "board": "港股"
     },
     {
       "code": "00999",
@@ -1098,6 +1176,19 @@
       "avg_vol_4d": 2268524.0,
       "vol_ratio": 5.081,
       "industry": "软件和信息技术服务业",
+      "board": "主板"
+    },
+    {
+      "code": "002204",
+      "symbol": "sz002204",
+      "name": "大连重工",
+      "pct": 10.09,
+      "price": 5.89,
+      "prev_close": 5.35,
+      "volume": 87169448.0,
+      "avg_vol_4d": 19802102.25,
+      "vol_ratio": 4.402,
+      "industry": "通用设备制造业",
       "board": "主板"
     },
     {
@@ -1231,19 +1322,6 @@
       "board": "主板"
     },
     {
-      "code": "002636",
-      "symbol": "sz002636",
-      "name": "金安国纪",
-      "pct": 10.0,
-      "price": 76.45,
-      "prev_close": 69.5,
-      "volume": 64968910.0,
-      "avg_vol_4d": 52799449.75,
-      "vol_ratio": 1.23,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "主板"
-    },
-    {
       "code": "300852",
       "symbol": "sz300852",
       "name": "四会富仕",
@@ -1319,19 +1397,6 @@
       "avg_vol_4d": 12970952.25,
       "vol_ratio": 3.439,
       "industry": "装卸搬运和仓储业",
-      "board": "创业板"
-    },
-    {
-      "code": "300600",
-      "symbol": "sz300600",
-      "name": "国瑞科技",
-      "pct": 6.92,
-      "price": 11.59,
-      "prev_close": 10.84,
-      "volume": 30103778.0,
-      "avg_vol_4d": 12214124.75,
-      "vol_ratio": 2.465,
-      "industry": "铁路、船舶、航空航天和其他运输设备制造业",
       "board": "创业板"
     },
     {
@@ -1699,19 +1764,6 @@
       "board": "创业板"
     },
     {
-      "code": "001388",
-      "symbol": "sz001388",
-      "name": "信通电子",
-      "pct": 3.58,
-      "price": 22.6,
-      "prev_close": 21.82,
-      "volume": 9604541.0,
-      "avg_vol_4d": 4000038.0,
-      "vol_ratio": 2.401,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "主板"
-    },
-    {
       "code": "300846",
       "symbol": "sz300846",
       "name": "首都在线",
@@ -1829,32 +1881,6 @@
       "board": "主板"
     },
     {
-      "code": "300008",
-      "symbol": "sz300008",
-      "name": "天海防务",
-      "pct": 3.19,
-      "price": 6.79,
-      "prev_close": 6.58,
-      "volume": 174308254.0,
-      "avg_vol_4d": 79201462.25,
-      "vol_ratio": 2.201,
-      "industry": "铁路、船舶、航空航天和其他运输设备制造业",
-      "board": "创业板"
-    },
-    {
-      "code": "002015",
-      "symbol": "sz002015",
-      "name": "协鑫能科",
-      "pct": 4.57,
-      "price": 17.18,
-      "prev_close": 16.43,
-      "volume": 142529281.0,
-      "avg_vol_4d": 112466057.5,
-      "vol_ratio": 1.267,
-      "industry": "电力、热力生产和供应业",
-      "board": "主板"
-    },
-    {
       "code": "300711",
       "symbol": "sz300711",
       "name": "广哈通信",
@@ -1904,19 +1930,6 @@
       "avg_vol_4d": 5225043.75,
       "vol_ratio": 1.784,
       "industry": "汽车制造业",
-      "board": "创业板"
-    },
-    {
-      "code": "300394",
-      "symbol": "sz300394",
-      "name": "天孚通信",
-      "pct": 4.25,
-      "price": 269.0,
-      "prev_close": 258.03,
-      "volume": 50983659.0,
-      "avg_vol_4d": 40417916.75,
-      "vol_ratio": 1.261,
-      "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
     {
@@ -2002,14 +2015,14 @@
       "board": "主板"
     }
   ],
-  "generated_at": "2026-09-11 05:31:39",
-  "update_time": "2026-09-11 05:31:39",
+  "generated_at": "2026-09-11 10:32:54",
+  "update_time": "2026-09-11 10:32:54",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖",
   "kline_stat": {
     "cache_fresh": 183,
-    "cache_stale": 9,
+    "cache_stale": 10,
     "net": 2,
-    "fail": 213
+    "fail": 212
   },
   "degraded": false,
   "degraded_reason": "",
