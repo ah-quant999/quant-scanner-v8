@@ -127,6 +127,11 @@ ORDER = [
     "gen_stock_profile.py",            # → raw_data/stock_profile.json（个股行业/概念，最终推荐用）
     "fetch_stock_quote_v8.py",         # → raw_data/stock_quote.json + data/STOCK_QUOTE.js（全市场实时报价快照，查股功能用）
     "fetch_sh_index_fib.py",
+    # 🛡 2026-09-11 一劳永逸：scripts/fetch_index_history.py 此前零调度成孤儿
+    #   （只写 out/，不写 raw_data/ + 算法链不挂）→ data/INDEX_HISTORY.js 永停 09-07 假新鲜。
+    #   现正式挂进 A 批最前（紧跟 fetch_sh_index_fib 之后），cloud-only 护栏由 v8_algo_cloud 双机调度，
+    #   输出 raw_data/index_history.json（bridge 已内置）→ update_v8 后续 post_close 重建 INDEX_HISTORY.js。
+    "scripts/fetch_index_history.py",
     "fetch_inst_trade.py",
     "fetch_sector_rs.py",
     "fetch_lhb.py",
@@ -237,7 +242,9 @@ ORDER = [
 STAGES = {
     "A": [  # 数据采集批（~18:00 CST 后，受闸门 START_TRADING 约束；龙虎榜16:30后）：纯 fetch + 上游自产前置
         "fetch_fundamental_quality.py", "fetch_stock_names.py", "gen_stock_profile.py",
-        "fetch_stock_quote_v8.py", "fetch_sh_index_fib.py", "fetch_inst_trade.py",
+        "fetch_stock_quote_v8.py", "fetch_sh_index_fib.py",
+        "scripts/fetch_index_history.py",   # → raw_data/index_history.json（INDEX_HISTORY.js 上游；cloud-only 护栏，09-11 正式挂 A 批）
+        "fetch_inst_trade.py",
         "fetch_sector_rs.py", "fetch_lhb.py",
         "fetch_orphan_suspension.py", "fetch_orphan_market_alerts.py",
         "fetch_orphan_nt_data.py", "fetch_orphan_sector_fund_flow.py"],
@@ -471,7 +478,7 @@ def _is_post_close_picking_ready():
     #   按「现在 06:36 属盘前」重新否决 → generate_top10 / strategy_four_volume(_60m) /
     #   gen_triple_consensus / calc_crds 全部 exit 1 → B 批残缺 → D/E 永不执行。
     if os.environ.get("V8_GATE_AUTHORIZED") == "1":
-print('[run_algorithms] 批次闸门已授权本链 → 放行选股脚本（不再按钟点二次否决）')
+        print('[run_algorithms] 批次闸门已授权本链 → 放行选股脚本（不再按钟点二次否决）')
         return True
     # 2026-08-20 根因修复：统一使用 time_gate 的 UTC+8 计算，避免 runner 时区漂移。
     sys.path.insert(0, ALGO)

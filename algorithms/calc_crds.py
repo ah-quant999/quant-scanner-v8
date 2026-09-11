@@ -52,7 +52,11 @@ import gc
 import threading
 import requests as _requests
 
-MARKET_DOWN_THRESHOLD = -1.5     # 大盘跌超多少算"大跌日"(%)
+MARKET_DOWN_THRESHOLD = -0.8     # 大盘"大跌日"阈值(%)——综合口径
+                                  # 2026-09-11 主人令一劳永逸：原 -1.5 是上证单一口径
+                                  # （上证近10日最大单日仅 -0.97% → cond② 恒不触发 → 精选级长期 0 只）。
+                                  # 改综合口径后 -0.8% 即清晰的弱势日（≈ 单指数普跌 -1%）；
+                                  # 阈值可在 logic.html 注释中说明，主拍板亦可上调/下调。
 LIMIT_UP_PCT = 9.0               # 涨停阈值(主板≈10%，留1%误差允许实际9.95%)
 GEM_LIMIT_PCT = 18.0             # 创业板/科创板涨停阈值(≈20%)
 LOOKBACK_DAYS = 10               # 回顾天数
@@ -566,15 +570,54 @@ def _composite_market_score(quotes):
 
 
 def get_market_index():
-    """获取大盘指数(上证)近期数据(含每日涨跌幅)"""
-    # 上证指数(sh000001)：显式声明为指数 → 不走缓存（避免与 sz000001 平安银行撞键）、
-    # 不走 mootdx（其 bars('000001') 返回深市平安银行，非指数）。
-    df = _query_kline("000001", "1", LOOKBACK_DAYS + 5, is_index=True)
-    if df is None or len(df) < LOOKBACK_DAYS:
-        print(f"  [市场] 数据不足({len(df) if df is not None else 0}条)")
+    """获取大盘综合口径(上证/深证/创业板/科创50 等权)近 10 日序列，作为 CRDS 唯一大盘基准。
+
+    2026-09-11 主人令一劳永逸·「口径合一」：
+    原仅取上证指数单一口径 → 与 有效性判断(综合口径)割裂，且 MARKET_DOWN_THRESHOLD=-1.5
+    在上证近10日最大单日仅 -0.97% 时恒不触发 → cond② 大跌日逆势板 长期 0 只 → 精选级空。
+    现统一为综合口径 10 日序列：cond② 与 有效性判断 共用同一口径（4 指数等权 + 涨跌家数比）。
+    10 日历史无逐日 breadth 数据，breadth 项以 0.5 兜底（breadth_score=0），仅用 4 指数等权。
+    """
+    indices = [("000001", "1"), ("399001", "0"), ("399006", "0"), ("000688", "1")]
+    frames = {}
+    for code, pref in indices:
+        # 上证/科创50 沪市=1；深证/创业板 深市=0；均 is_index=True 不走缓存、不走 mootdx
+        df = _query_kline(code, pref, LOOKBACK_DAYS + 5, is_index=True)
+        if df is not None and len(df) >= LOOKBACK_DAYS:
+            frames[code] = df
+    if not frames:
+        print("  [市场] 四指数K线均不可用，无法构建综合口径序列")
         return None
-    df["pct_chg"] = df["pctChg"].astype(float)
-    return df.tail(LOOKBACK_DAYS).reset_index(drop=True)
+    # 取四指数共同交易日，截最近 LOOKBACK_DAYS 天
+    common = None
+    for df in frames.values():
+        d = set(df["date"].astype(str))
+        common = d if common is None else (common & d)
+    if not common:
+        return None
+    dates = sorted(common)[-LOOKBACK_DAYS:]
+    rows = []
+    for d in dates:
+        chgs = {}
+        ok = True
+        for code, df in frames.items():
+            row = df[df["date"].astype(str) == d]
+            if len(row) == 0:
+                ok = False
+                break
+            chgs[code] = float(row["pctChg"].iloc[0])
+        if not ok:
+            continue
+        # 综合口径（10日历史无逐日breadth，breadth_score=0）：
+        composite = round(
+            chgs.get("000001", 0) * 0.25 +
+            chgs.get("399001", 0) * 0.20 +
+            chgs.get("399006", 0) * 0.25 +
+            chgs.get("000688", 0) * 0.15, 2)
+        rows.append({"date": d, "pct_chg": composite})
+    if not rows:
+        return None
+    return pd.DataFrame(rows).tail(LOOKBACK_DAYS).reset_index(drop=True)
 
 
 def get_market_context(mkt_df):
@@ -1078,7 +1121,7 @@ def calc_crds():
         print(f"  大盘: {len(mkt_df)} 天")
 
     # 2.5 大盘环境判断
-    print(f"  [大盘判断] {market_context.get('validity')} | 上证今日{market_context.get('today_pct', 0):+.2f}% | {market_context.get('summary')}")
+    print(f"  [大盘判断] {market_context.get('validity')} | 综合今日{market_context.get('today_pct', 0):+.2f}% | {market_context.get('summary')}")
 
     # 3. 逐只计算CRDS
     # 🔴 2026-09-11 主人令·一劳永逸（「CRDS 永远在拖后腿」）：原实现「串行 + 把慢而失败的源排最前」

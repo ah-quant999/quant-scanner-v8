@@ -1683,12 +1683,12 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">定位</div>
         <div class="logic-p">在大盘大跌/震荡市中，捕捉「逆势涨停」的强势龙头股。<b>盘后看</b>(基于日K) · <b>短线</b>捕捉逆势龙头 · <b>日频</b>(每日盘后跑)。逆势龙头只在大跌/震荡市有效，若今日大涨则信号参考意义极低。</div>
         <div class="logic-h">输入与数据源</div>
-        <div class="logic-p">· 个股池：<b>watch_result.json</b>（来自 scanner.py watch 模式，即金股池/观察池股票），按数字代码去重。<br>· 个股K线（<b>2026-09-11 取数层提速重构</b>：718 只由 <b>113 分钟 → 冷缓存 91s / 热缓存 22s</b>，四级取数链）：<br>&nbsp;&nbsp;① <b>raw_data/kline_cache/ 本地缓存优先</b> —— 内容级新鲜度闸门：末根K线须 ≥ 最近一个<b>已收盘</b>交易日（避免盘前/盘中把当日不存在的日K误判为陈旧而全量回源）<br>&nbsp;&nbsp;② <b>腾讯 proxy.finance.qq.com</b> 快源前置（实测 0.15s/只；<code>web.ifzq.gtimg.cn</code> 在本机被域名级 WAF 拦，同 API 换 proxy 域可达，双域故障转移）<br>&nbsp;&nbsp;③ <b>mootdx 通达信直连 bars()</b> —— 带<b>熔断</b>：连续 5 次失败即停用本轮，不再逐只白等 4.4s<br>&nbsp;&nbsp;④ <b>东方财富 push2his</b> 兜底<br>&nbsp;&nbsp;· 并发：<b>12 线程 + 8 req/s 限速 + 1500s 墙钟预算</b>；预算用尽标 <code>degraded</code> 并保留已算结果，不整轮崩。<br>· 大盘：<b>上证指数 000001</b> 近10日K线（显式按指数取数）。<br>· <b>缓存键铁律</b>：kline_cache 以 6 位代码为文件名，<code>sh000001</code>(上证指数) 与 <code>sz000001</code>(平安银行) 会<b>撞键</b> → 指数<b>不读不写缓存</b>，且指数<b>不走 mootdx</b>（其 <code>bars('000001')</code> 返回的是深市平安银行，非指数）。<br>· 注：mootdx.bars() 每约50次调用重建客户端+gc 以规避 socket 泄漏；CRDS 约需 176 次调用，必须周期重置。</div>
+        <div class="logic-p">· 个股池：<b>watch_result.json</b>（来自 scanner.py watch 模式，即金股池/观察池股票），按数字代码去重。<br>· 个股K线（<b>2026-09-11 取数层提速重构</b>：718 只由 <b>113 分钟 → 冷缓存 91s / 热缓存 22s</b>，四级取数链）：<br>&nbsp;&nbsp;① <b>raw_data/kline_cache/ 本地缓存优先</b> —— 内容级新鲜度闸门：末根K线须 ≥ 最近一个<b>已收盘</b>交易日（避免盘前/盘中把当日不存在的日K误判为陈旧而全量回源）<br>&nbsp;&nbsp;② <b>腾讯 proxy.finance.qq.com</b> 快源前置（实测 0.15s/只；<code>web.ifzq.gtimg.cn</code> 在本机被域名级 WAF 拦，同 API 换 proxy 域可达，双域故障转移）<br>&nbsp;&nbsp;③ <b>mootdx 通达信直连 bars()</b> —— 带<b>熔断</b>：连续 5 次失败即停用本轮，不再逐只白等 4.4s<br>&nbsp;&nbsp;④ <b>东方财富 push2his</b> 兜底<br>&nbsp;&nbsp;· 并发：<b>12 线程 + 8 req/s 限速 + 1500s 墙钟预算</b>；预算用尽标 <code>degraded</code> 并保留已算结果，不整轮崩。<br>· 大盘：<b>综合口径 4 指数等权</b>（上证 000001 / 深证 399001 / 创业板 399006 / 科创50 000688；近 10 日 K 线）—— 2026-09-11 口径合一，与卡片「有效性判断」同源；详见 <code>calc_crds.py:get_market_index()</code>。<br>· <b>缓存键铁律</b>：kline_cache 以 6 位代码为文件名，<code>sh000001</code>(上证指数) 与 <code>sz000001</code>(平安银行) 会<b>撞键</b> → 指数<b>不读不写缓存</b>，且指数<b>不走 mootdx</b>（其 <code>bars('000001')</code> 返回的是深市平安银行，非指数）。<br>· 注：mootdx.bars() 每约50次调用重建客户端+gc 以规避 socket 泄漏；CRDS 约需 176 次调用，必须周期重置。</div>
         <div class="logic-h">三个核心条件（满足越多越好）</div>
         <table class="lg-table">
           <tr><th>条件</th><th>判定</th><th>阈值/口径</th></tr>
           <tr><td><b>① 10日≥2板</b></td><td>近10个交易日涨停次数 ≥ 2</td><td>主板涨停阈值 9%（留1%误差）；创业板/科创板 18%</td></tr>
-          <tr><td><b>② 大跌日逆势板</b></td><td>至少1个涨停日对应大盘当日跌超阈值</td><td>MARKET_DOWN_THRESHOLD = <b>-1.5%</b></td></tr>
+          <tr><td><b>② 大跌日逆势板</b></td><td>至少1个涨停日对应大盘当日跌超阈值</td><td>MARKET_DOWN_THRESHOLD = <b>-0.8%</b>（综合口径；原 -1.5% 为上证单一口径已废）</td></tr>
           <tr><td><b>③ 量能确认</b></td><td>量价比 VR 峰值 ≥ 1.5</td><td>VR = 当日成交额 / 近20日均成交额</td></tr>
         </table>
         <div class="logic-h">打分公式</div>
@@ -1701,7 +1701,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">分层（按满足条件个数 conds 0~3）</div>
         <div class="logic-p">· <b style="color:#1D9E75">精选级 (3/3)</b>：elite，无条件优先看<br>· <b style="color:#BA7517">进阶级 (2/3)</b>：advanced，差1步<br>· <b style="color:var(--dim)">关注级 (1/3)</b>：watch，仅放量2连板/非逆势（评分均0时前端标注折叠去噪）</div>
         <div class="logic-h">大盘环境有效性判断（决定信号可信度）</div>
-        <div class="logic-p">⚠️ <b>口径说明（2026-09-11 核对源码）</b>：本表「今日涨跌幅」取 <code>raw_data/index_quotes.json</code> 的 <b>综合口径</b>（上证 / 深证成指 / 创业板指 / 科创50 等权，叠加全市场涨跌家数比；2026-08-19 主人令「不再只看上证指数，权重股易扭曲」），摘要会同时给出上证涨幅与涨跌家数。<br>而上方条件②「大跌日逆势板」的 <code>MARKET_DOWN_THRESHOLD = -1.5%</code> 判定走的是 <code>detect_market_down()</code>，喂进去的是 <b>上证指数</b> 近 10 日 K 线。<br>→ <b>同一张卡目前并存两套大盘口径</b>（有效性判断 = index_quotes 综合；大跌日判定 = 上证指数）。是否统一为综合口径<b>正待主人拍板</b>；未拍板前不得改动评分口径。</div>
+        <div class="logic-p">✅ <b>口径说明（2026-09-11 一劳永逸根除）</b>：本表「今日涨跌幅」与条件②「大跌日逆势板」判定已统一为同一大盘基准 —— <code>raw_data/index_quotes.json</code> 的<b>综合口径</b>（上证 / 深证成指 / 创业板指 / 科创50 等权；2026-08-19 主人令「不再只看上证指数，权重股易扭曲」）。<br>→ <code>calc_crds.py</code> 的 <code>get_market_index()</code> 拉取 4 指数 K 线并按等权计算每日综合涨跌幅，作为 <code>MARKET_DOWN_THRESHOLD = -0.8%</code> 与「有效性判断」的<b>唯一大盘基准</b>。<br>→ <b>两套大盘口径并存已根除</b>（原 -1.5% 上证路径已删；上证近 10 日最大单日仅 -0.97% 恒不触阈的历史事故一并消除）。</div>
         <table class="lg-table">
           <tr><th>综合口径今日涨跌幅</th><th>有效性</th><th>含义</th></tr>
           <tr><td>≥ +2.0%</td><td>失效</td><td>大涨市无需逆势龙头，信号参考意义极低</td></tr>
@@ -5239,7 +5239,7 @@ function drawUpDownChart(){
         if(stamp) stamp.textContent = '最后同步：' + ts + ' · 由 data/DO_NOT_DELETE.js 注入';
       }
     } else {
-      el.innerHTML = '<div class="ipo-empty">防删清单尚未加载（data/DO_NOT_DELETE.js?v=<sha> 未就绪）</div>';
+      el.innerHTML = '<div class="ipo-empty">防删清单尚未加载（data/DO_NOT_DELETE.js 未就绪）</div>';
     }
   }
   window.renderLgDnd = renderLgDnd;
