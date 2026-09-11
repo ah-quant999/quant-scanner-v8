@@ -175,7 +175,12 @@ jobs:
       #   2026-08-16 首次引入；blob 下载带 sha 校验防截断，大文件未变则跳过。
       - name: "📥 回退·经 GitHub API 同步源码（仅 checkout 失败时）"
         if: steps.co.outcome == 'failure'
-        timeout-minutes: 10
+        # 🛡 2026-09-11 20:2x 阿狸咪一劳永逸：10 → 25 分钟。
+        #   实测该步需同步 3913 文件 / 175.8 MB，10 分钟结构性不可能完成。
+        #   铁证 run#34594585246（19:33，lemoncat-cn）：11:45:23 起 → 11:55:19 被超时打断，
+        #   期间只处理了 4 个大文件的重试（blob retry 1 [raw]: IncompleteRead(...)）。
+        #   后果：步失败 → 步骤 4~14 全 skipped → 「结果问责」红灯（同 17:30 / 18:05 三连）。
+        timeout-minutes: 25
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
@@ -217,16 +222,17 @@ jobs:
                       time.sleep(min(2 ** i, 20))
               raise SystemExit("API fetch failed: %s (%s)" % (url, last))
 
-          def fetch_blob(sha, tries=6):
+          def fetch_blob(sha, tries=4):
               url = "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, sha)
               raw_h = dict(H); raw_h["Accept"] = "application/vnd.github.raw"
               last = None
               for i in range(tries):
-                  mode = "raw" if i % 2 == 0 else "b64"
+                  # b64 优先：raw 端点在 >1MB 文件上实测 IncompleteRead(截断)，b64 是 JSON 响应、长度可校验
+                  mode = "b64" if i % 2 == 0 else "raw"
                   try:
                       hdr = raw_h if mode == "raw" else H
                       resp = urllib.request.urlopen(
-                          urllib.request.Request(url, headers=hdr), timeout=180)
+                          urllib.request.Request(url, headers=hdr), timeout=90)
                       body = resp.read()
                       data = body if mode == "raw" else base64.b64decode(json.loads(body.decode())["content"])
                       if sha_of(data) != sha:
@@ -239,17 +245,38 @@ jobs:
               raise SystemExit("blob fetch failed: %s (%s)" % (sha, last))
 
           tree = get_json("https://api.github.com/repos/%s/git/trees/main?recursive=1" % REPO)
+          # 🛡 2026-09-11 20:2x 阿狸咪一劳永逸：冷启动全量同步结构性不可行。
+          #   实测 main tree 构成：backup/ 69.3MB(28) + raw_data/kline_cache/ 57.3MB(3119)
+          #   + docs/ 1.2MB(174) = 3321 文件 / 127.8MB，三者对算法链均无用：
+          #     · backup/               历史备份，无任何脚本读取
+          #     · raw_data/kline_cache/ K线缓存，calc_crds 冷缓存实测 91s 可跑（有网络兜底）
+          #     · docs/                 交接与文档，算法链不读
+          #   排除后剩 ~592 文件 / ~48MB，可在预算内完成。
+          #   安全：链尾推送走 base_tree 继承，未列出路径天然保留（api_push_raw.py L315）。
+          SKIP_PREFIX = ("backup/", "docs/", "raw_data/kline_cache/")
           want = []
+          skipped_heavy = 0
           for e in tree.get("tree", []):
               if e.get("type") != "blob":
                   continue
               p = e["path"]
               if p.startswith(".git/"):
                   continue
+              if p.startswith(SKIP_PREFIX):
+                  skipped_heavy += 1
+                  continue
               want.append((p, e["sha"]))
-          print("files to sync: %d" % len(want), flush=True)
+          print("files to sync: %d (skipped heavy/unused: %d)" % (len(want), skipped_heavy), flush=True)
           ok = 0; skipped = 0
+          # 🛡 2026-09-11 20:2x：脚本内软预算（默认 1080s = 18 分钟）。
+          #   超预算即收尾（已同步的文件保留），避免被 GitHub 硬杀在半途、且让日志有结论。
+          _t0 = time.time()
+          BUDGET = float(os.environ.get("V8_SYNC_BUDGET", "1080"))
           for p, sha in want:
+              if (time.time() - _t0) > BUDGET:
+                  print("  ⏱ 预算 %.0fs 用尽，本轮剩余 %d 个文件跳过（已同步 %d）"
+                        % (BUDGET, len(want) - ok, ok), flush=True)
+                  break
               lp = os.path.join(".", p)
               if local_blob_sha(lp) == sha:
                   skipped += 1; ok += 1; continue
