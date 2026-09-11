@@ -300,6 +300,8 @@ jobs:
       #   前端 0 引用 = 「半截接线」死链；且其「净申赎(亿)」实取「主力净流入-净额」，
       #   属 A 类估算值贴 B 类标签。真实 ETF 份额申赎已由 ETF_NET_SUBSCRIPTION
       #   （上交所基金份额日环比）取代，本链整体下线（脚本 + raw 已同步删除）。
+      #   注：soft_2 删除后，后续 soft_* 保持原 id **不重编号**（与历史日志/告警一一对应，
+      #   避免旧 issue 里的 soft_N 指向新步造成误读）；其 env 与汇总 for 列表已同步清理。
 
       - name: "🐉 刷新当日 LHB 数据（post_close + 周末全量）"
         id: soft_3
@@ -695,7 +697,6 @@ jobs:
         shell: bash
         env:
           V8_SF_soft_1: ${{ steps.soft_1.outcome }}
-          V8_SF_soft_2: ${{ steps.soft_2.outcome }}
           V8_SF_soft_3: ${{ steps.soft_3.outcome }}
           V8_SF_soft_4: ${{ steps.soft_4.outcome }}
           V8_SF_soft_5: ${{ steps.soft_5.outcome }}
@@ -713,7 +714,7 @@ jobs:
         run: |
           FAILED=""
           # 显式列出本 job 全部软失败步 id（生成期确定，不依赖 env 扫描，永不漏）
-          for sid in soft_1 soft_2 soft_3 soft_4 soft_5 soft_6 soft_7 soft_8 soft_9 soft_10 soft_11 soft_12 soft_13 soft_14 soft_15 soft_16; do
+          for sid in soft_1 soft_3 soft_4 soft_5 soft_6 soft_7 soft_8 soft_9 soft_10 soft_11 soft_12 soft_13 soft_14 soft_15 soft_16; do
             eval "v=\"\${V8_SF_$sid:-}\""
             if [ "$v" = "failure" ] || [ "$v" = "cancelled" ]; then
               FAILED="$FAILED $sid"
