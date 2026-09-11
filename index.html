@@ -2552,11 +2552,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     <!-- ===== TAB 页面：🧭 选股池（2026-08-29 主人令：从盘后数据·已下架迁至选股策略子页；2026-08-30 移到首位并改为点击展开） ===== -->
     <div id="st-pool" class="st-pane active">
-      <!-- 2026-09-11 主人令：文件新鲜感(候选股池来源级)从运维区移到候选股池上方 -->
-      <div class="card" style="margin-bottom:12px;border-left:3px solid var(--cyan);">
-        <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">💾</span>文件新鲜感 <span class="fresh" id="stPoolFreshTime">—</span></h3>
-        <div id="stPoolFreshBody"><div style="font-size:12px;color:var(--dim)">等待新鲜度数据…</div></div>
-      </div>
+    <!-- ===== 2026-09-11 主人令纠正：候选股池来源级新鲜感不在选股策略页，已移至运维页数据健康总览卡内 ===== -->
       <!-- ===== 2026-09-11 主人令：金股池卡片置于「观测候选股池」上方（数据源 GOLD_POOL）===== -->
       <div class="card" style="border-left:4px solid #fbbf24;">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">⭐</span>金股池 <span id="stGoldPoolTime">—</span> <span id="stGoldPoolSlot" style="font-size:11px;color:var(--sub);font-weight:400">累计信号池 · 盘后</span></h3>
@@ -6503,6 +6499,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="card" style="margin-bottom:16px;border-left:3px solid var(--teal)">
       <h3><span class="ic">🩺</span>数据健康总览 <span class="fresh" style="font-size:10px">[动态]</span></h3>
       <div id="runnerTrackBody"><div style="font-size:12px;color:var(--dim)">等待数据健康状态…</div></div>
+      <!-- 2026-09-11 主人令纠正：候选股池来源级新鲜感(六大来源标签)置于元数据巡检上方 -->
+      <div id="opsCandidateFreshBody" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);"><h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;margin-bottom:6px;"><span class="ic">💾</span>文件新鲜感 <span class="fresh" id="opsCandidateFreshTime">—</span></h3><div style="font-size:12px;color:var(--dim)">等待候选股池来源级数据…</div></div>
       <!-- 失败/诊断详情始终放在卡片最下面 -->
       <div id="opDiagDetails" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:none;">
         <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;">⚠️ 失败/诊断详情</div>
@@ -10055,9 +10053,9 @@ function drawUpDownChart(){
       el.innerHTML += extra;
     } catch (e) { console.warn('extra orphan-data render fail', e); }
 
-    // 2026-09-11 主人令：候选股池文件新鲜感同步渲染到选股策略区 stPoolFreshBody
+    // 2026-09-11 主人令纠正：候选股池来源级新鲜感渲染到运维页 opsCandidateFreshBody（元数据巡检上方）
     (function(){
-      var pel = document.getElementById('stPoolFreshBody');
+      var pel = document.getElementById('opsCandidateFreshBody');
       if(!pel) return;
       var cand = window.CANDIDATE || {};
       var sd = cand.source_dist || {};
@@ -10081,7 +10079,7 @@ function drawUpDownChart(){
       var rel = (window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts).slice(0,16).replace('T',' '));
       pel.innerHTML = '<div style="font-size:11px;color:var(--sub);margin-bottom:6px;">🧭 候选股池 <span style="color:var(--dim)">(来源级)</span></div>'+html
         +'<div style="font-size:10px;color:var(--dim);margin-top:6px;">最后更新：'+_esc(rel)+'</div>';
-      var pt = document.getElementById('stPoolFreshTime');
+      var pt = document.getElementById('opsCandidateFreshTime');
       if(pt) pt.textContent = rel;
     })();
 
