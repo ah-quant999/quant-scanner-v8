@@ -71,7 +71,6 @@ DATA_SOURCES = {
     "w52_high.json":               "W52_HIGH",
     "limit_up_heatmap.json":       "LIMIT_UP_HEATMAP",
     "limit_up_broken.json":        "LIMIT_UP_BROKEN",
-    "herding_data.json":           "HERDING_DATA",
     # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：ANALYST_RATINGS 前端零引用，
     #   由 generate_top10.py 附带产出但无渲染消费，停止发布 js。
     # "analyst_ratings.json":        "ANALYST_RATINGS",
@@ -178,9 +177,6 @@ CATEGORY_MAP = {
     "OVERSEAS_MARKETS": "intraday,post_close",
     # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
     "W52_HIGH": "premarket,post_close",
-    # 2026-09-08 一劳永逸：HERDING_DATA(羊群效应) 由 f_herding_data() 读当日完整涨停池(_get_zt_pool)，
-    #   收盘后定稿 → 属 post_close，原挂 premarket 致盘中 cn_fetch 永远刷不到 / 盘前判 stale。
-    "HERDING_DATA": "post_close",
     # 🛡 2026-09-11 小九的工程师（三档归档对齐）：同上漏同步。抓取侧 cloud_fetch_v8.py 两者均为
     #   "premarket,intraday"（09-07 主人令），注入侧只有 premarket → 盘中 raw 已新、
     #   data/JUDGMENT_DATA.js（今日判定卡）/ data/MACRO_BRIEF.js（宏观解读卡）不重建。
@@ -1094,11 +1090,28 @@ def _write_audit_trail_js(trail):
         print(f"  [WARN] 写出 AUDIT_TRAIL.js 失败: {e}")
 
 
+def _emit_freshness_status_js():
+    """2026-09-11 小九的股票专家（P2 死功能修复）：运维面板「文件新鲜度」读 window.FRESHNESS_STATUS，
+    但 data/freshness_status.json 从未被转成 data/FRESHNESS_STATUS.js → 面板永远空对象。
+    本函数在每次 build 后无条件转换（若存在），使新鲜度总览真正可用。"""
+    src = DATA_DIR / "freshness_status.json"
+    if not src.exists():
+        print("  ⏭️  data/freshness_status.json 不存在，跳过 FRESHNESS_STATUS.js")
+        return
+    obj = _load_json(src)
+    if obj is None:
+        print("  ⏭️  data/freshness_status.json 读取失败，跳过 FRESHNESS_STATUS.js")
+        return
+    _write_js("FRESHNESS_STATUS", obj)
+    print("  ✅ data/freshness_status.json → data/FRESHNESS_STATUS.js")
+
+
 def _post_build_extras():
     """🆕 2026-09-05：build 后补 RUNNER_STATUS 全量 + AUDIT_TRAIL（供运维看板消费）。"""
     print("  🔧 生成运维 extras（RUNNER_STATUS 全量 + AUDIT_TRAIL）...")
     _expand_runner_status()
     _write_audit_trail_js(_generate_audit_trail())
+    _emit_freshness_status_js()
 
 
 

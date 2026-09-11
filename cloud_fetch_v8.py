@@ -64,7 +64,6 @@ VAR_TO_RAW = {
     "CRISIS_DATA": "crisis_data.json",
     "MACRO_BRIEF": "macro_brief.json",
     "JUDGMENT_DATA": "judgment_data.json",
-    "HERDING_DATA": "herding_data.json",
     "LIMIT_UP_HEATMAP": "limit_up_heatmap.json",
     "LIMIT_UP_BROKEN": "limit_up_broken.json",
     "CAPITAL_FLOW_DATA": "capital_flow_data.json",
@@ -108,7 +107,6 @@ CATEGORY_MAP = {
     "ANALYST_RATINGS": "premarket",
     # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
     "W52_HIGH": "premarket,post_close",
-    "HERDING_DATA": "post_close",  # 🛡 2026-09-08 改 post_close：f_herding_data 依赖当日完整涨停池，盘前/盘中数据不全，只有盘后生成才有意义
     # 盘中（ETF 二合一·盘中异动/资金热度、板块资金流向等实时场景。
     #   2026-09-11 轻量化：原「板块资金三连板·盘中追热」整块删除、「ETF 三合一」拆为「ETF 二合一」，
     #   旧注释里的「三连板 / 盘中追热」措辞已失效，勿按旧名检索或复建。）
@@ -1193,7 +1191,7 @@ def _has_critical_failures(category):
                  if v.get("status") == "fail" and k != "RUNNER_STATUS"]
     return bool(fails)
 
-# 涨停池缓存（避免 limit_up_heatmap / herding 重复抓取同一份数据）
+# 涨停池缓存（limit_up_heatmap 复用；herding 消费方已于 2026-09-11 随「精选预判信号」卡下线删除）
 _zt_cache = {"date": None, "df": None}
 def _get_zt_pool():
     d = now_cst().strftime("%Y%m%d")
@@ -2003,33 +2001,6 @@ def f_crisis_data():
         "note": f"经济维度=中国PMI真实值({economy or 'N/A'})；"
                f"货币维度=中国银行USD/CNY中间价({usd_cny_latest or 'N/A'})；"
                f"全球维度=基于MACRO_DATA的VIX({(vix_v or 0):.1f})+美债10Y({(us10y_v or 0):.2f}%)日级数据动态计算",
-    }
-
-def f_herding_data():
-    # 羊群效应（抱团板块）：由当日涨停池的行业集中度推导
-    # 涨停越集中在少数行业，说明资金抱团越强。
-    try:
-        df = _get_zt_pool()
-    except Exception as e:
-        print("  zt_pool err:", e)
-        return None
-    if df is None or df.empty:
-        return None
-    ind = {}
-    for _, r in df.iterrows():
-        name = r.get("所属行业") or "其它"
-        if name in (None, "", "None"):
-            name = "其它"
-        ind[name] = ind.get(name, 0) + 1
-    if not ind:
-        return None
-    clusters = []
-    for k, v in sorted(ind.items(), key=lambda x: -x[1])[:3]:
-        clusters.append({"sector": k, "direction": "强势抱团", "count": v})
-    return {
-        "current_clusters": clusters,
-        "total_limit_up": int(len(df)),
-        "note": "由涨停行业集中度推导的抱团板块（行业涨停数降序）",
     }
 
 def f_limit_up_heatmap():
@@ -3649,7 +3620,6 @@ def main(category=None, only=None):
         ("CFFEX_HOLDINGS", f_cffex_holdings),
         ("MACRO_DATA", f_macro_data),
         ("CRISIS_DATA", f_crisis_data),
-        ("HERDING_DATA", f_herding_data),
         ("LIMIT_UP_HEATMAP", f_limit_up_heatmap),
         ("LIMIT_UP_BROKEN", f_limit_up_broken),
         ("CAPITAL_FLOW_DATA", f_capital_flow_data),

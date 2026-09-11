@@ -743,8 +743,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/ETF_SUBSCRIPTION_EM.js?v=edbb4a9085" defer></script>
   <script src="data/LIMIT_UP_HEATMAP.js?v=290e9631f6" defer></script>
   <script src="data/LIMIT_UP_BROKEN.js?v=cee690d979" defer></script>
-  <script src="data/HERDING_DATA.js?v=b96f321639" defer></script>
-  <script src="data/VOLATILITY.js?v=9f717d98d6" defer></script>
+    <script src="data/VOLATILITY.js?v=9f717d98d6" defer></script>
   <script src="data/CAPITAL_FLOW_DATA.js?v=f796e25fac" defer></script>
   <script src="data/SH_SZ_HISTORY.js?v=c667054319" defer></script>
   <script src="data/CANDIDATE.js?v=98a4072b2b" defer></script>
@@ -1882,8 +1881,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 
       <div class="card">
         <h3><span class="ic">🩹</span>近期修复纪要 + 关键设计原则（保留有效条目）</h3>
-        <div class="logic-p">🛡 <b>HERDING_DATA（羊群效应）</b>：类别由 <code>premarket</code> 改为 <code>post_close</code>——依赖当日完整涨停池，盘前/盘中数据不全，只有盘后生成才有意义。<br>
-        🛡 <b>RUNNER_STATUS 时间戳</b>：<code>cloud_fetch_v8.py</code> 生成时补标准字段 <code>update_time</code>；<code>update_v8.py</code> 兼容旧产物 <code>run_time</code>，供 guard / 前端统一读取。<br>
+        <div class="logic-p">🛡 <b>RUNNER_STATUS 时间戳</b>：<code>cloud_fetch_v8.py</code> 生成时补标准字段 <code>update_time</code>；<code>update_v8.py</code> 兼容旧产物 <code>run_time</code>，供 guard / 前端统一读取。<br>
         🛡 <b>NT_DATA 盘前 180min 豁免</b>：NT_DATA 是 ETF 实时异动、盘前本就不刷新；<code>guard_v8_freshness.py</code> 在 06:30-09:30 对它豁免告警与派发，避免清晨误报；同时改挂「全量数据」页豁免。<br>
         🛡 <b>审计产物保护</b>：<code>api_push_raw.py</code> 设 <code>_PROTECTED_RAW</code>，<code>raw_data/audit_history.json</code> 与 <code>audit_nightly.log</code> 绝不经 API 裸推（否则 cn 机工作区旧审计文件会覆盖 main 新版、吞掉审计轨迹）。<br>
         🛡 <b>过期不挂实时徽章</b>：<code>index.html</code> 的 <code>_uBadge</code> 对 slot 为「实时/盘中」的卡片过期时不再显示实时标签，只留「更新于 + 时间 + 已停更」红胶囊。</div>
@@ -1945,7 +1943,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       </div>
 
 <div class="card">
-        <div class="logic-p">· <b>v6精选</b>：选股驾驶舱+全站精选（15个JSON映射到DATA.*）<br>· <b>暂未上架</b>：V6卡片真实渲染（F窗口/金股池停牌/波动率/精选预判/四路资金/大盘资金流/期指/两融/ETF申赎）<br>· <b>已下架</b>：2026-07-30 起已<b>全面接入真实数据（11张卡）</b>，观测候选股池(CANDIDATE) 置顶，其余分别来自 F窗口实时监测(SH_FIB) / 金股池停牌监测(GOLD_POOL) / 波动率结构观测(VOLATILITY) / 精选预判信号(W52_HIGH·LIMIT_UP_HEATMAP·HERDING_DATA) / 四路资金流向对比(CAPITAL_FLOW_DATA) / 上交所大盘资金流时间轴(MARKET_FUND_FLOW_DATA) / 股指期货升贴水(CFFEX_HOLDINGS) / 两融余额走势(MARGIN_DATA) / 宽基ETF净申赎·东财口径(ETF_SUBSCRIPTION_EM) / 国家队ETF资金流向(ETF_INTRADAY_HEAT)；数据缺失时显示友好提示而非空白。</div>
+        <div class="logic-p">· <b>v6精选</b>：选股驾驶舱+全站精选（15个JSON映射到DATA.*）<br>· <b>暂未上架</b>：V6卡片真实渲染（F窗口/金股池停牌/波动率/四路资金/大盘资金流/期指/两融/ETF申赎）<br>· <b>已下架</b>：2026-07-30 起已<b>全面接入真实数据（10张卡）</b>，观测候选股池(CANDIDATE) 置顶，其余分别来自 F窗口实时监测(SH_FIB) / 金股池停牌监测(GOLD_POOL) / 波动率结构观测(VOLATILITY) / 四路资金流向对比(CAPITAL_FLOW_DATA) / 上交所大盘资金流时间轴(MARKET_FUND_FLOW_DATA) / 股指期货升贴水(CFFEX_HOLDINGS) / 两融余额走势(MARGIN_DATA) / 宽基ETF净申赎·东财口径(ETF_SUBSCRIPTION_EM) / 国家队ETF资金流向(ETF_INTRADAY_HEAT)；数据缺失时显示友好提示而非空白。</div>
       </div>
 
       
@@ -7476,64 +7474,6 @@ h+='    </div>';
 
     /* ===== 🌙 盘后 ===== */
 h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167,139,250,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#a78bfa;border-radius:8px;margin:16px 0 10px 0;">🌙 盘后（收盘后复盘）</div>';
-    /* 2. 精选预判信号 */
-    var w52=window.W52_HIGH||{}, lu=window.LIMIT_UP_HEATMAP||{}, hd=window.HERDING_DATA||{};
-    var sigT=w52.update_time||lu.update_time||hd.update_time||'';
-    var hasSig=(w52.total||0)>0 || (lu.sectors&&lu.dates) || (hd.current_clusters&&hd.current_clusters.length);
-    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #7b1fa2;">';
-    h+=v8CardHeader('🎯','精选预判信号','事件型盘后','update_time',{update_time:sigT},!hasSig);
-    h+='<div style="padding:0;">';
-    if(hasSig){
-      var n52=w52.total||0;
-      var luTotal=0, topSector={name:'--',n:0}, prevTotal=0;
-      try{ if(lu.sectors&&lu.dates){var li=lu.dates.length-1; lu.sectors.forEach(function(s){var v=(s.data&&s.data[li])||0; luTotal+=v; if(v>topSector.n){topSector={name:s.name,n:v};}}); var pi=li-1; if(pi>=0){lu.sectors.forEach(function(s){prevTotal+=(s.data&&s.data[pi])||0;});} } }catch(e){}
-      var diff=luTotal-prevTotal;
-      var diffStr=diff>0?'↑+'+diff:(diff<0?'↓'+diff:'±0');
-      var herdingTop='',herdingAmt=0,herdingPct=0,herdingLeader='--';
-      try{ if(hd.current_clusters&&hd.current_clusters[0]){var t1=hd.current_clusters[0]; herdingTop=(t1.medal||'🥇')+' '+t1.sector; herdingAmt=t1.amount||0; herdingPct=t1.pct||0; herdingLeader=t1.leader||'--';} }catch(e){}
-      var totalA=5500;
-      try{ var sl=window.STOCK_LIST; var sla=Array.isArray(sl)?sl:(sl&&Array.isArray(sl.data)?sl.data:[]); totalA=sla.filter(function(s){return /^\d{6}$/.test((s&&s.code)||'');}).length||5500; }catch(e){}
-      var pct52=(n52/totalA)*100;
-      var zone52=pct52<1?'极度弱势区':pct52<3?'温和活跃区':pct52<5?'健康偏强区':pct52<10?'强势主升区':pct52<15?'亢奋警戒区':'极度贪婪';
-      var zoneColor52=pct52<1?'#ef5350':pct52<3?'#aaa':pct52<5?'#7ee0a0':pct52<10?'#f59e0b':pct52<15?'#ef5350':'#ef5350';
-      var n52Label=n52>=150?'市场热度极高':n52>=100?'强势股活跃':n52>=50?'结构性行情':n52>0?'局部热点':'';
-      var n52LabelColor=n52>=150?'#ef5350':n52>=100?'#f59e0b':n52>=50?'var(--txt)':'#aaa';
-
-      h+='<div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:0;">';
-      h+='<div style="padding:14px 12px;text-align:center;border-right:1px solid var(--border);background:linear-gradient(135deg,rgba(255,160,0,.12),rgba(255,160,0,.04));">';
-      h+='<div style="font-size:10px;color:#f59e0b;font-weight:700;margin-bottom:2px;">🎯 主信号</div>';
-      h+='<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">📈 52周新高</div>';
-      h+='<div style="font-size:32px;font-weight:800;color:#f59e0b;line-height:1.1;">'+n52+'<span style="font-size:14px;color:var(--dim);">只</span></div>';
-      h+='<div style="font-size:10px;color:'+n52LabelColor+';margin-top:2px;font-weight:600;">'+n52Label+'</div>';
-      h+='<div style="font-size:9px;color:var(--sub);margin-top:4px;line-height:1.4;">占比 '+pct52.toFixed(1)+'% / <span style="color:'+zoneColor52+';font-weight:600;">'+zone52+'</span></div>';
-      h+='<div style="font-size:9px;color:var(--dim);margin-top:4px;line-height:1.3;">突破过去一年最高价的股票数量，反映市场中长期强势股活跃度</div>';
-      h+='</div>';
-      h+='<div style="padding:14px 8px;text-align:center;border-right:1px solid var(--border);background:linear-gradient(135deg,rgba(239,83,80,.12),rgba(239,83,80,.04));">';
-      h+='<div style="font-size:10px;color:#ef5350;font-weight:600;margin-bottom:4px;">🔥 今日涨停</div>';
-      h+='<div style="font-size:26px;font-weight:800;color:#ef5350;line-height:1.1;">'+luTotal+'<span style="font-size:14px;color:var(--dim);">只</span></div>';
-      h+='<div style="font-size:10px;color:var(--sub);margin-top:2px;">vs昨日 <b style="color:'+(diff>0?'var(--up)':diff<0?'var(--down)':'#aaa')+';">'+diffStr+'</b></div>';
-      h+='<div style="font-size:9px;color:#ef5350;margin-top:4px;line-height:1.3;">情绪热度·连板梯队<br>最强板块：'+topSector.name+'('+topSector.n+'只)</div>';
-      h+='</div>';
-      h+='<div style="padding:14px 8px;text-align:center;background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(167,139,250,.04));">';
-      h+='<div style="font-size:10px;color:#a78bfa;font-weight:600;margin-bottom:4px;">🥇 最强抱团</div>';
-      h+='<div style="font-size:18px;font-weight:800;color:#a78bfa;line-height:1.2;max-width:120px;margin:0 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(herdingTop||'--')+'</div>';
-      h+='<div style="font-size:10px;color:#a78bfa;margin-top:2px;">'+(herdingAmt?herdingAmt.toFixed(1)+'亿 · ':'')+herdingPct.toFixed(1)+'%</div>';
-      h+='<div style="font-size:9px;color:#a78bfa;margin-top:4px;line-height:1.3;">资金抱团方向·龙头：'+herdingLeader+'</div>';
-      h+='</div>';
-      h+='</div>';
-
-      var judge=''; var luT=luTotal||0;
-      if(n52>=100&&luT>=50) judge='⚡ 强势股独立行情：历史新高活跃+'+luT+'只涨停，短线可追但快进快出。';
-      else if(n52>=100&&luT<50) judge='📊 新高多涨停少，跟风盘不热，结构性行情。';
-      else if(n52>=30&&n52<100&&luT>=30) judge='📈 温和偏多：结构性行情。';
-      else if(n52<30&&luT>=50) judge='🔥 短线热炒，游资主导，严格止损。';
-      else if(n52<30&&luT<30) judge='🌫️ 信号清淡，多看少动。';
-      else judge='🌫️ 信号混合，建议综合判断。';
-      h+='<div style="font-size:12px;color:var(--sub);background:var(--bg2);border-radius:0 0 8px 8px;padding:10px 14px;border-top:1px solid var(--border);">'+judge+'</div>';
-    } else {
-      h+='<div class="note" style="padding:14px;text-align:center;">信号数据为空</div>';
-    }
-    h+='</div></div>';
 
     /* 🛡 2026-08-19 主人令恢复：资金流时间轴卡（v6 一年样式）
        数据 window.MARKET_FUND_FLOW_DATA 一直加载；render 函数 renderMarketFundFlow/renderMffChart 一直在；
@@ -7836,7 +7776,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     DATA.etf_daily = window.ETF_DAILY_MONITOR||null;
     DATA.w52 = window.W52_HIGH||null;
     DATA.limit_up = window.LIMIT_UP_HEATMAP||null;
-    DATA.herding = window.HERDING_DATA||null;
     DATA.capital_flow = window.CAPITAL_FLOW_DATA||null;
     DATA.cffex = window.CFFEX_HOLDINGS||null;
     DATA.margin = window.MARGIN_DATA||null;

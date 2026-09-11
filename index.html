@@ -1585,7 +1585,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/MARKET_FUND_FLOW_DATA.js?v=1789102159" defer></script>
 <script src="data/LIMIT_UP_HEATMAP.js?v=1789102159" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=1789102159" defer></script>
-<script src="data/HERDING_DATA.js?v=1789102159" defer></script>
 <script src="data/VOLATILITY.js?v=1789102159" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=1789102159" defer></script>
 <script src="data/SH_SZ_HISTORY.js?v=1789102159" defer></script>
@@ -1645,7 +1644,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/MOMENTUM_FILTER.js?v=1789102159" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=1789102159" defer></script>
-    <!-- 2026-09-04 主人令收尾：ALLSITE_BACKTEST.js 注入已删（生成器/raw_data 已于 09-03「干掉全站精选」系列删除，前端无任何代码读 window.ALLSITE_BACKTEST，标签纯 404 噪音） -->
     <script src="data/CRDS_BACKTEST.js?v=1789102159" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -4172,7 +4170,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
   // ═══ 2026-08-13 主人令：策略星级对比表（聚合已有回测数据） ═══
   // 2026-09-03 主人令：数据来源仅保留仍活跃的回测源（BACKTEST_COMPREHENSIVE + BACKTEST_TDX + OPTIMIZED_STRATEGY）。
-  //     COCKPIT_BACKTEST 已下线。
   // 综合分 = (胜率-50)×1 + 平均收益×8 + min(8, log10(样本)×2)
   // 星级：≥30⭐⭐⭐⭐⭐ / ≥20⭐⭐⭐⭐ / ≥12⭐⭐⭐ / ≥6⭐⭐ / ≥0⭐ / <0无星
   function _buildStrategyRating(){
@@ -4181,9 +4178,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var bd = window.BACKTEST_TDX || {};
     var op = window.OPTIMIZED_STRATEGY || {};
 
-    // ① COCKPIT_BACKTEST 已下线，星级表只跑仍在线的回测源
-
-    // ② 共振（BACKTEST_COMPREHENSIVE.comparison.hold_1d）
+    // ① 共振（BACKTEST_COMPREHENSIVE.comparison.hold_1d）
     if(bc && bc.comparison && bc.comparison.hold_1d){
       var labelMap = {'resonance_all':'共振≥2 宽松','resonance_gte70_lt80':'共振70-79分','resonance_gte80':'共振≥80 严格'};
       Object.keys(bc.comparison.hold_1d).forEach(function(k){
@@ -4701,8 +4696,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     try{
     var bc = (typeof window!=='undefined' && window.BACKTEST_COMPREHENSIVE) || {};
     var bd = (typeof window!=='undefined' && window.BACKTEST_TDX) || {};
-    // 2026-09-03 主人令：var cb = window.COCKPIT_BACKTEST 已删（脚本标签 + 数据源均已下线，留 fallback 反而误导）
-    // 2026-09-06 主人令 P0-D：删除残留的 cb.calc_time 取值（cb 已注释删，但下一行 try{} 还活着，触发 ReferenceError 报 console.warn、污染健康看板）
 
     // 2. 取各回测数据源中最新的 calc_time/update_time 作为统一"更新于"时间
     var btTimes = [];
@@ -13151,64 +13144,6 @@ h+='    </div>';
 
     /* ===== 🌙 盘后 ===== */
 h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167,139,250,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#a78bfa;border-radius:8px;margin:16px 0 10px 0;">🌙 盘后（收盘后复盘）</div>';
-    /* 2. 精选预判信号 */
-    var w52=window.W52_HIGH||{}, lu=window.LIMIT_UP_HEATMAP||{}, hd=window.HERDING_DATA||{};
-    var sigT=w52.update_time||lu.update_time||hd.update_time||'';
-    var hasSig=(w52.total||0)>0 || (lu.sectors&&lu.dates) || (hd.current_clusters&&hd.current_clusters.length);
-    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #7b1fa2;">';
-    h+=v8CardHeader('🎯','精选预判信号','事件型盘后','update_time',{update_time:sigT,slot:'盘后',horizon:'短线'},!hasSig);
-    h+='<div style="padding:0;">';
-    if(hasSig){
-      var n52=w52.total||0;
-      var luTotal=0, topSector={name:'--',n:0}, prevTotal=0;
-      try{ if(lu.sectors&&lu.dates){var li=lu.dates.length-1; lu.sectors.forEach(function(s){var v=(s.data&&s.data[li])||0; luTotal+=v; if(v>topSector.n){topSector={name:s.name,n:v};}}); var pi=li-1; if(pi>=0){lu.sectors.forEach(function(s){prevTotal+=(s.data&&s.data[pi])||0;});} } }catch(e){}
-      var diff=luTotal-prevTotal;
-      var diffStr=diff>0?'↑+'+diff:(diff<0?'↓'+diff:'±0');
-      var herdingTop='',herdingAmt=0,herdingPct=0,herdingLeader='--';
-      try{ if(hd.current_clusters&&hd.current_clusters[0]){var t1=hd.current_clusters[0]; herdingTop=(t1.medal||'🥇')+' '+t1.sector; herdingAmt=t1.amount||0; herdingPct=t1.pct||0; herdingLeader=t1.leader||'--';} }catch(e){}
-      var totalA=5500;
-      try{ var sl=window.STOCK_LIST; var sla=Array.isArray(sl)?sl:(sl&&Array.isArray(sl.data)?sl.data:[]); totalA=sla.filter(function(s){return /^\d{6}$/.test((s&&s.code)||'');}).length||5500; }catch(e){}
-      var pct52=(n52/totalA)*100;
-      var zone52=pct52<1?'极度弱势区':pct52<3?'温和活跃区':pct52<5?'健康偏强区':pct52<10?'强势主升区':pct52<15?'亢奋警戒区':'极度贪婪';
-      var zoneColor52=pct52<1?'#ef5350':pct52<3?'#aaa':pct52<5?'#7ee0a0':pct52<10?'#f59e0b':pct52<15?'#ef5350':'#ef5350';
-      var n52Label=n52>=150?'市场热度极高':n52>=100?'强势股活跃':n52>=50?'结构性行情':n52>0?'局部热点':'';
-      var n52LabelColor=n52>=150?'#ef5350':n52>=100?'#f59e0b':n52>=50?'var(--txt)':'#aaa';
-
-      h+='<div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:0;">';
-      h+='<div style="padding:14px 12px;text-align:center;border-right:1px solid var(--border);background:linear-gradient(135deg,rgba(255,160,0,.12),rgba(255,160,0,.04));">';
-      h+='<div style="font-size:10px;color:#f59e0b;font-weight:700;margin-bottom:2px;">🎯 主信号</div>';
-      h+='<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">📈 52周新高</div>';
-      h+='<div style="font-size:32px;font-weight:800;color:#f59e0b;line-height:1.1;">'+n52+'<span style="font-size:14px;color:var(--dim);">只</span></div>';
-      h+='<div style="font-size:10px;color:'+n52LabelColor+';margin-top:2px;font-weight:600;">'+n52Label+'</div>';
-      h+='<div style="font-size:9px;color:var(--sub);margin-top:4px;line-height:1.4;">占比 '+pct52.toFixed(1)+'% / <span style="color:'+zoneColor52+';font-weight:600;">'+zone52+'</span></div>';
-      h+='<div style="font-size:9px;color:var(--dim);margin-top:4px;line-height:1.3;">突破过去一年最高价的股票数量，反映市场中长期强势股活跃度</div>';
-      h+='</div>';
-      h+='<div style="padding:14px 8px;text-align:center;border-right:1px solid var(--border);background:linear-gradient(135deg,rgba(239,83,80,.12),rgba(239,83,80,.04));">';
-      h+='<div style="font-size:10px;color:#ef5350;font-weight:600;margin-bottom:4px;">🔥 今日涨停</div>';
-      h+='<div style="font-size:26px;font-weight:800;color:#ef5350;line-height:1.1;">'+luTotal+'<span style="font-size:14px;color:var(--dim);">只</span></div>';
-      h+='<div style="font-size:10px;color:var(--sub);margin-top:2px;">vs昨日 <b style="color:'+(diff>0?'var(--up)':diff<0?'var(--down)':'#aaa')+';">'+diffStr+'</b></div>';
-      h+='<div style="font-size:9px;color:#ef5350;margin-top:4px;line-height:1.3;">情绪热度·连板梯队<br>最强板块：'+topSector.name+'('+topSector.n+'只)</div>';
-      h+='</div>';
-      h+='<div style="padding:14px 8px;text-align:center;background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(167,139,250,.04));">';
-      h+='<div style="font-size:10px;color:#a78bfa;font-weight:600;margin-bottom:4px;">🥇 最强抱团</div>';
-      h+='<div style="font-size:18px;font-weight:800;color:#a78bfa;line-height:1.2;max-width:120px;margin:0 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(herdingTop||'--')+'</div>';
-      h+='<div style="font-size:10px;color:#a78bfa;margin-top:2px;">'+(herdingAmt?herdingAmt.toFixed(1)+'亿 · ':'')+herdingPct.toFixed(1)+'%</div>';
-      h+='<div style="font-size:9px;color:#a78bfa;margin-top:4px;line-height:1.3;">资金抱团方向·龙头：'+herdingLeader+'</div>';
-      h+='</div>';
-      h+='</div>';
-
-      var judge=''; var luT=luTotal||0;
-      if(n52>=100&&luT>=50) judge='⚡ 强势股独立行情：历史新高活跃+'+luT+'只涨停，短线可追但快进快出。';
-      else if(n52>=100&&luT<50) judge='📊 新高多涨停少，跟风盘不热，结构性行情。';
-      else if(n52>=30&&n52<100&&luT>=30) judge='📈 温和偏多：结构性行情。';
-      else if(n52<30&&luT>=50) judge='🔥 短线热炒，游资主导，严格止损。';
-      else if(n52<30&&luT<30) judge='🌫️ 信号清淡，多看少动。';
-      else judge='🌫️ 信号混合，建议综合判断。';
-      h+='<div style="font-size:12px;color:var(--sub);background:var(--bg2);border-radius:0 0 8px 8px;padding:10px 14px;border-top:1px solid var(--border);">'+judge+'</div>';
-    } else {
-      h+='<div class="note" style="padding:14px;text-align:center;">信号数据为空</div>';
-    }
-    h+='</div></div>';
 
     /* 🛡 2026-08-19 主人令恢复：资金流时间轴卡（v6 一年样式）
        数据 window.MARKET_FUND_FLOW_DATA 一直加载；render 函数 renderMarketFundFlow/renderMffChart 一直在；
@@ -13529,8 +13464,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     DATA.market_alerts = window.MARKET_ALERTS||null;
     DATA.volatility = window.VOLATILITY||null;
     DATA.gold_pool = window.GOLD_POOL||null;
-    // 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND / COCKPIT_BACKTEST / COCKPIT_ADVICE 整片已全方位下线
-    //     window.X 已全删，DATA.xxx dead assignment 同步删除（不留 null 占位）
     DATA.candidate = window.CANDIDATE||null;
     DATA.backtest_comprehensive = window.BACKTEST_COMPREHENSIVE||null;
     DATA.backtest_tdx = window.BACKTEST_TDX||null;
@@ -13541,7 +13474,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     DATA.etf_daily = window.ETF_DAILY_MONITOR||null;
     DATA.w52 = window.W52_HIGH||null;
     DATA.limit_up = window.LIMIT_UP_HEATMAP||null;
-    DATA.herding = window.HERDING_DATA||null;
     DATA.capital_flow = window.CAPITAL_FLOW_DATA||null;
     DATA.cffex = window.CFFEX_HOLDINGS||null;
     DATA.margin = window.MARGIN_DATA||null;

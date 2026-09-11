@@ -10,7 +10,7 @@
 #
 # 时段映射（北京时间）：
 #   08:25  盘前：V8_CAL / IPO_DATA / MARGIN_DATA / MACRO_DATA / CRISIS_DATA /
-#                 NORTH_FUND / ANALYST_RATINGS / W52_HIGH / VOLATILITY / HERDING_DATA /
+#                 NORTH_FUND / ANALYST_RATINGS / W52_HIGH / VOLATILITY /
 #                 RESTRICTED_RELEASE / PERFORMANCE_FORECAST
   #   注意：PERFORMANCE_FORECAST 数据格式 = {summary: {increase, decrease, loss, uncertain, total}, items: [...]}
   #   summary.total 由云端 f_perf_forecast 算出 = 4 类型合计（schema 已稳定，不要写 sum(increase+...)现算避免与 stats 双源漂移）。

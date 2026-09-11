@@ -81,7 +81,6 @@ MIN_SIZE = {
     "RUNNER_STATUS_HEALTH.js": 93,
     "PORTFOLIO.js": 426,
     "PORTFOLIO_COST.js": 383,
-    "HERDING_DATA.js": 203,
     "NORTH_FUND.js": 94,
     "WEEKEND_RUN.js": 89,
     "WEEKEND_META_REPORT.js": 106
