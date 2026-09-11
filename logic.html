@@ -1380,7 +1380,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td><b>A 采集批</b></td><td>交易日 18:00 后（闸门硬约束）</td><td>12</td><td>fetch_fundamental_quality / fetch_stock_names / gen_stock_profile / fetch_stock_quote_v8 / fetch_sh_index_fib / fetch_inst_trade / fetch_sector_rs / fetch_lhb / fetch_orphan_suspension / fetch_orphan_market_alerts / fetch_orphan_nt_data / fetch_orphan_sector_fund_flow</td><td>纯 fetch + 上游自产前置；<b>含龙虎榜 fetch_lhb（属 A 批，非 B 批）</b>；A 就绪是 B 批门槛</td></tr>
           <tr><td><b>B 选股批</b></td><td>A 就绪后 ~18:10 起</td><td>27</td><td><b>v8/factor_lab_gen.py（最前 · baostock 冷启动 50-90min）</b> → calc_crds / build_candidate_pool / calc_stock_rps / generate_top10 / strategy_four_volume_60m / strategy_four_volume / market_regime / sector_recommendation / update_triple_resonance_history / gen_triple_consensus / gen_triple_track / calc_volatility_watch / gen_stock_stop / gen_algo_track / calc_sentiment_cycle / refresh_dividend_cninfo / refresh_stock_metadata / fetch_weekend_run / auto_run_dn_algorithm / strong_breakout / track_h_auto_buy / scripts/fetch_ai_insights_compare / gen_factor_audit / gen_factor_progress / fetch_valuation_percentile / fetch_index_value_framework</td><td>🛡 2026-09-09 主人令：<b>因子实验室生成器前置到本批最前</b>，必须在 D 批 final_recommend 之前产完 FACTOR_LAB.js，因子融合才能吃当日新鲜因子（18:10 起跑→19:40 前产完，D 批必吃到）。B 批内其余脚本保持原相对次序不变；<b>候选股池</b>(build_candidate_pool) / <b>CRDS 含金股层</b>(calc_crds) / <b>TOP10</b>(generate_top10) 均在 B 批自产</td></tr>
           <tr><td><b>D 汇总批</b></td><td>~20:00 CST</td><td>1</td><td>final_recommend.py</td><td>跨策略共振 Top5（管线最终产物）。内置<b>因子实验室新鲜度门控</b>：等待 FACTOR_LAB.js 为当日新鲜最多 20min（正常 0 等待），超时仍不可用则<b>降级跳过融合</b>而非报错中断</td></tr>
-          <tr><td><b>E 回测批</b></td><td>~21:00 CST</td><td>7</td><td>backtest_tdx / backtest_comprehensive / backtest_expectancy / export_optimized_strategy / factor_lab_backtest / v8/backtest_crds / strategy_four_volume</td><td>backtest 全家 + 因子实验室分层回测（生成器已在 B 批前置）；strategy_four_volume 经 SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js（根治孤儿）</td></tr>
+          <tr><td><b>E 回测批</b></td><td>~21:00 CST</td><td>8</td><td>backtest_tdx / backtest_comprehensive / backtest_expectancy / export_optimized_strategy / factor_lab_backtest / v8/backtest_crds / strategy_four_volume / gen_backtest_all_algos</td><td>backtest 全家 + 因子实验室分层回测（生成器已在 B 批前置）；strategy_four_volume 经 SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js（根治孤儿）；gen_backtest_all_algos 挂批内最末位次（ORDER 47/48，须读同批刚产出的回测源），按前端卡名汇总全部算法 → data/BACKTEST_ALL_ALGOS.js（策略回测页「全算法回测汇总」块：卡级排名 + 分档阶梯 + 低绩效下架提请）</td></tr>
         </table>
         <div class="logic-h">批内同跑 / 跨批双模式注意</div>
         <div class="logic-p">· <b>strategy_four_volume.py 跨 B/E 双批</b>：B=选股模式产 FOUR_VOLUME.js，E=回测模式产 FOUR_VOLUME_BACKTEST.js（SCRIPT_ENV 注入），属有意为之，非重复误挂。<br>· <b>B 批同跑多算法</b>：因子实验室生成器（baostock 独立数据源）与 calc_crds / build_candidate_pool / calc_stock_rps 等互无文件写冲突、互无前置依赖，可安全背靠背串行；final_recommend(D) 仅依赖 B 产物，不依赖 B 内部次序之外的任何东西。<br>· <b>选股门控</b>：全部选股/回测脚本纳入「18:00 前不跑」护栏，防半日数据出假选股。</div>
@@ -1552,7 +1552,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
           <tr><td>16:40 A批采集</td><td>龙虎榜/行情/板块RS/指数历史/港股</td><td>云端 v8_algo_cloud (--stage A)</td><td>选股策略·选股池/板块资金流</td></tr>
           <tr><td>18:10 B批选股</td><td>三重共识/相对强度/CRDS/四量终极/选股生命周期</td><td>云端 v8_algo_cloud (--stage B)</td><td>选股策略各子 tab</td></tr>
-          <tr><td>21:00 E批回测+因子实验室</td><td>趋势/综合/逆势龙头/相对强度/四量回测 + <b>因子实验室生成(v8/factor_lab_gen.py，2026-09-07 从 D 摘出·治互踢暴风)</b></td><td>云端 v8_algo_cloud (--stage E)</td><td>策略回顾·回测区 + 因子实验室卡</td></tr>
+          <tr><td>21:00 E批回测+因子实验室</td><td>趋势/综合/逆势龙头/相对强度/四量回测 + <b>因子实验室生成(v8/factor_lab_gen.py，2026-09-07 从 D 摘出·治互踢暴风)</b> + <b>全算法回测汇总(gen_backtest_all_algos.py，2026-09-11 新增·批内最末)</b></td><td>云端 v8_algo_cloud (--stage E)</td><td>策略回顾·回测区 + 因子实验室卡</td></tr>
           <tr><td>20:00 D批汇总</td><td>仅 final_recommend（LHB历史/7d/生命周期由 B 批主流程前置）</td><td>云端 v8_algo_cloud (--stage D)</td><td>今日推荐候选池·Top3</td></tr>
           <tr><td>本地因子(盘后/周末)</td><td>异常换手率(重点池) + ROE(TTM)全市场主板 · 因子实验室卡</td><td>小九本机 baostock 生成 → push main</td><td>选股策略·🧬生命周期 tab</td></tr>
         </table>
@@ -8335,6 +8335,15 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
      2026-09-03 主人令：各选股策略回测汇总（逻辑详解页）
      顶部：从 BACKTEST_COMPREHENSIVE + 模块回测源中实时计算「胜率最高」「收益最好」
      下方：各策略 T+1/3/5/10/20 完整明细表（不写死，全部从 window 数据算出）
+     2026-09-11 主人令：新增「全算法回测汇总」（数据源 window.BACKTEST_ALL_ALGOS，
+     由算法链 E 批最末的 gen_backtest_all_algos.py 在「当日最终推荐产出之后」汇总）：
+       ① 按前端卡名逐个列出全部算法，真实回测，不造假、不允许假成功；
+       ② 只让「卡级主口径 + 样本≥30」进排序主表，按胜率降序（同胜率按平均收益降序）；
+       ③ 样本不足 30 的另列「累积中」，不参与排序，更不当成 0% 胜率；
+       ④ 分档阶梯：跟踪池从近到远现采 T+5/10/20/30/45/60/75/90 个真实交易日的前向收益，
+          有多少天算多少天，不必等 90 天期满；未成熟档位显示「累积中」；
+       ⑤ 回测累积足够时间后，低绩效（胜率<45% 或 平均收益≤0）自动进入「下架提请」，
+          由主人决定是否下架不再跟踪；中间态进「观察名单」。
      ════════════════════════════════════════════════════════════════════ */
   window.__renderLgBacktest = function(){
     var sumEl = document.getElementById('lgBacktestSummary');
@@ -8525,6 +8534,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
         if(!s.track) howHtml += '<b style="color:var(--txt);">持有期窗口</b>：1 / 3 / 5 / 10 / 20 个交易日<br>';
         howHtml += '<b style="color:var(--txt);">指标定义</b>：'+_hEsc(s.def)+'<br>';
         if(trackCount) howHtml += '<b style="color:var(--txt);">实时跟踪</b>：'+_hEsc(trackCount)+'<br>';
+        if(trackCount) howHtml += '<b style="color:var(--txt);">分档阶梯</b>：跟踪池逐日现采前向收益 T+5 / 10 / 20 / 30 / 45 / 60 / 75 / 90 个真实交易日（从近到远，有多少天算多少天，不必等 90 天期满；未成熟档位显示「累积中」——不是 0% 胜率）<br>';
         howHtml += '<b style="color:var(--txt);">当前状态</b>：'+(m ? ('已回测 '+m.sample+' 样本，最佳 T+'+m.hold+' 胜率 '+m.wr.toFixed(1)+'%、收益 '+(m.ar>0?'+':'')+m.ar.toFixed(2)+'%') : _hEsc(s.status));
         howHtml += '</div></div>';
       });
