@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-11 18:36:51",
+  "update_time": "2026-09-11 19:10:59",
   "total": 875,
   "hysteresis_days": 5,
   "source_dist": {
@@ -10525,6 +10525,28 @@
         "外资研投"
       ],
       "first_seen": "2026-09-08",
+      "last_seen": "2026-09-11"
+    },
+    "hk_06031": {
+      "code": "06031",
+      "name": "三一重工",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "外资研投"
+      ],
+      "first_seen": "2026-09-08",
+      "last_seen": "2026-09-11"
+    },
+    "hk_01772": {
+      "code": "01772",
+      "name": "赣锋锂业",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "外资研投"
+      ],
+      "first_seen": "2026-08-31",
       "last_seen": "2026-09-11"
     },
     "hk_03200": {
@@ -22365,17 +22387,6 @@
       "first_seen": "2026-09-08",
       "last_seen": "2026-09-08"
     },
-    "hk_06031": {
-      "code": "06031",
-      "name": "三一重工",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "外资研投"
-      ],
-      "first_seen": "2026-09-08",
-      "last_seen": "2026-09-08"
-    },
     "hk_02313": {
       "code": "02313",
       "name": "02313",
@@ -24343,17 +24354,6 @@
       "board": "主板",
       "first_seen": "2026-08-29",
       "last_seen": "2026-09-01"
-    },
-    "hk_01772": {
-      "code": "01772",
-      "name": "赣锋锂业",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "外资研投"
-      ],
-      "first_seen": "2026-08-31",
-      "last_seen": "2026-08-31"
     },
     "hk_02579": {
       "code": "02579",
