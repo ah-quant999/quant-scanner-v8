@@ -492,9 +492,9 @@ def _is_post_close_picking_ready():
         return True
     if h == _STOCK_PICKING_READY_HOUR:             # 18:00 ~ 18:59
         return m >= _STOCK_PICKING_READY_MIN
-    if h < _NEXT_DAY_CUTOFF_HOUR:                  # 00:00 ~ 05:59 凌晨补跑
+    if h < _NEXT_DAY_CUTOFF_HOUR:                  # 00:00 ~ 08:59 凌晨补跑
         return True
-    return False                                   # 06:00 ~ 17:59 盘前/盘中
+    return False                                   # 09:00 ~ 17:59 盘前/盘中
 
 
 # 2026-08-29 科学运行模式（主人：周末/假期放开跑，不要限死；长假仅首日有 T+1）

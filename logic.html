@@ -1423,7 +1423,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <table class="lg-table">
           <tr><th>时点</th><th>谁唤醒</th><th>实际发生什么</th></tr>
           <tr><td><b>16:00-08:59</b> 每小时 :10</td><td>本机「盘后算法链接力推进器」（阿狸咪）</td><td><b>实际主力</b>：先查无在跑 → 跑闸门 → 只按 <code>proceed</code> 派发（不带 stage / 不带 force_run）</td></tr>
-          <tr><td>16:40</td><td>cron 唤醒①</td><td>闸门判定：<b>未到 18:00 盘后链起点 → 空转</b>；≥18:00 且 A 未就绪则跑 A；已就绪则空转</td></tr>
+          <tr><td>16:40</td><td>cron 唤醒①</td><td>闸门判定：<b>未到 18:00 盘后链起点</b> → 若上一数据日仍有未完成批次则<b>回填补跑</b>（死区根治），否则空转；≥18:00 且 A 未就绪则跑 A；已就绪则空转</td></tr>
           <tr><td>17:20 / 18:20 / 19:20</td><td>cron <code>v8_cn_fetch_cloud</code> post_close</td><td>盘后三档抓取（龙虎榜 17:00 后发布，故 post_close 从 15:45 推迟到 17:20）</td></tr>
           <tr><td>17:30</td><td>cron <code>v8_lhb_fetch</code>（cn 双机）</td><td>当日龙虎榜落盘</td></tr>
           <tr><td>18:10</td><td>cron 唤醒②</td><td>闸门判定：A 就绪 B 缺 → 跑 B（含因子实验室 50-90min 冷启动）</td></tr>
@@ -1857,7 +1857,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">周 / 假期口径（与算法链闸门同源）</div>
         <table class="lg-table">
           <tr><th>日子</th><th>是否跑盘后链</th><th>为什么</th></tr>
-          <tr><td>周一~周五（交易日）</td><td>✅ 跑，起点 16:00（产物门槛 16:30）</td><td>当日收盘数据齐</td></tr>
+          <tr><td>周一~周五（交易日）</td><td>✅ 跑，起点 18:00（产物门槛 16:30）</td><td>当日收盘数据齐（龙虎榜等 16:30 后发布，故 18:00 才开跑；与闸门 <code>START_TRADING</code> 同源）</td></tr>
           <tr><td>周六 / 假期<b>第一天</b></td><td>✅ 照常全量跑（含采集）</td><td>持有上一交易日的 <b>T+1 数据</b>（龙虎榜 / 机构调研 / 大宗 / 两融等收盘后发布、次日才全）</td></tr>
           <tr><td>周日 / 假期<b>中段 / 末日</b></td><td>⏭ 不跑（闸门判 <code>NONE</code>）</td><td>距上一交易日已 ≥2 天，无 T+1 新源，跑了只会空转</td></tr>
           <tr><td>补班日（调休上班）</td><td>✅ 全量跑</td><td>按交易日处理</td></tr>
