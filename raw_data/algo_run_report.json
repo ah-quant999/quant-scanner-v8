@@ -1,17 +1,8 @@
 {
-  "update_time": "2026-09-11 21:15:42",
-  "run_start": "2026-09-11 19:59:01",
-  "ok": 25,
-  "fail": 2,
-  "failed_scripts": [
-    {
-      "script": "calc_stock_rps.py",
-      "reason": "监督器静默杀(>15min 无输出)"
-    },
-    {
-      "script": "auto_run_dn_algorithm.py",
-      "reason": "监督器静默杀(>15min 无输出)"
-    }
-  ],
+  "update_time": "2026-09-11 21:39:31",
+  "run_start": "2026-09-11 21:30:05",
+  "ok": 1,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }
