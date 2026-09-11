@@ -647,6 +647,35 @@ def main():
         "window.BACKTEST_ALL_ALGOS = " + json.dumps(out, ensure_ascii=False) + ";\n",
         encoding="utf-8", newline="\n")
     print("  ✅ 写出 raw_data/backtest_all_algos.json + data/BACKTEST_ALL_ALGOS.js")
+
+    # 🔴 2026-09-12 主人令（拍板第 1 项·②）：低绩效策略下架提醒接**邮件主动触达**。
+    #   主人原话：「回测累积到一定时间，收益率和胜率低的要提醒我是否要下架不再跟踪。」
+    #   设计取舍（**刻意**如此，勿改）：
+    #     · 提醒逻辑放在独立脚本 scripts/v8_delist_advice.py，不写进本聚合器 ——
+    #       否则本脚本会依赖 SMTP 配置/网络，一旦邮件通道异常就把 E 批链尾搞红，
+    #       连带 BACKTEST_ALL_ALGOS.js 都产不出（本末倒置）。
+    #     · 用 subprocess 且 check=False + timeout：提醒失败**绝不**影响回测产物落盘。
+    #     · 不新增 workflow / 不新增 cron ⇒ 不动云端与本机的时窗矩阵，零新竞态。
+    #     · 提醒用**窄口径**（胜率<40% 且样本≥20），页面用宽口径（45%/30）——
+    #       不同值是故意的：页面宁多看，邮件宁少扰。详见该脚本 docstring。
+    try:
+        import subprocess
+        _adv = os.path.join(ROOT, "scripts", "v8_delist_advice.py")
+        if os.path.isfile(_adv):
+            _r = subprocess.run(
+                [sys.executable, _adv, "--quiet-ok"],
+                cwd=str(ROOT), capture_output=True, text=True,
+                timeout=120, encoding="utf-8", errors="replace")
+            for _ln in (_r.stdout or "").strip().splitlines():
+                print("    [delist] " + _ln)
+            if _r.returncode != 0:
+                print(f"    ⚠️ 下架提醒脚本退出码 {_r.returncode}（不影响回测产物）")
+        else:
+            print("    ⚠️ 未找到 scripts/v8_delist_advice.py → 跳过下架提醒")
+    except Exception as _e:
+        # 提醒是**尽力而为**：任何异常都不许影响回测产物（产物已落盘，这才是主任务）
+        print(f"    ⚠️ 下架提醒调用异常（{_e.__class__.__name__}）：{_e}")
+        print("       → 不影响回测产物；可手动 python scripts/v8_delist_advice.py 补发")
     return 0
 
 
