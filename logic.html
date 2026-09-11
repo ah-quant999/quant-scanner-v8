@@ -1157,6 +1157,19 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
 
       
 <div class="card">
+        <h3><span class="ic">🔍</span>每日洞察卡时间戳锚定修复（2026-09-11 一劳永逸）</h3>
+        <div class="logic-h">现象</div>
+        <div class="logic-p">每日洞察卡片显示「更新于 今日 16:50 今日盘后」，但卡内龙虎榜/北向席位数据实际还是上一交易日（例如 09-10）。卡片时间跟着两个共振日历的刷新时间走，造成「昨天数据挂今天时间」的误导。</div>
+        <div class="logic-h">根因</div>
+        <div class="logic-p"><code>index.html renderInsight()</code> 原逻辑取 CR/CAND/SR/VOL/IQ/LHB/NF/SH_SZ_HISTORY 各源 <code>update_time</code> 的最大值。LHB/NF 是两个共振日历，它们一刷新（日历重新构建、history 追加）<code>update_time</code> 就变，但里面 stocks 的 <code>date</code> 仍是上一交易日。</div>
+        <div class="logic-h">修复</div>
+        <div class="logic-p">· LHB/NF 不再直接使用 <code>update_time</code>，而是使用自身 <code>date</code> 字段对应的交易日日期（YYYY-MM-DD 15:30:00）参与计算。<br>· 卡片时间戳由「取最大」改为「取最小」——整体新鲜度由最旧的一条决定，杜绝新日历刷新掩盖旧 LHB 数据。<br>· 当 LHB/NF 数据日期不是今天时，时段胶囊不再显示「今日盘后/盘中」，统一降级为「盘后」，避免昨天数据挂今天标签。</div>
+        <div class="logic-h">文件</div>
+        <div class="logic-p"><code>index.html</code> <code>renderInsight()</code></div>
+      </div>
+
+      
+<div class="card">
         <h3><span class="ic">📏</span>全站判定区间 / 分档一览（备忘）</h3>
         <div class="logic-p">各算法/模块核心区间值与档位阈值汇总，方便对比记忆。完整算法见各对应章节。</div>
 
@@ -2108,7 +2121,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">本机闸门</div>
         <div class="logic-p">v8_cloud_watchdog.py 核对核心 data/*.js 的 update_time，raw_data 超过90分钟无新 commit 即 ALERT；本机只告警/汇报，不自动覆盖数据。</div>
         <div class="logic-h">候选股池来源级监控（2026-08-08 新增）</div>
-        <div class="logic-p">候选股池是全站算法链的<b>上游水源</b>（金股/CRDS/四量/评分全部从它取股）。除整体 update_time 外，运维面板「数据健康总览」已合并来源级监控：<br>· <b>night_watchdog.py</b> 每次巡检拆分六大来源数量，成交额TOP三板归零→🔴CRITICAL、&lt;80%→⚠️WARNING；港股/外资研投归零→⚠️降级（云端可能天然缺失）。<br>· <b>数据健康总览</b> CANDIDATE 行下方展示六来源彩色标签行，实时反映各源健康状态。<br>· <b>正常基线</b>：主板成交前100 + 创业板成交前100 + 科创板成交前100（三板合计≥300只）。低于此基线需排查 mootdx/akshare 是否挂了。</div>
+        <div class="logic-p">候选股池是全站算法链的<b>上游水源</b>（金股/CRDS/四量/评分全部从它取股）。除整体 update_time 外，来源级监控「文件新鲜感」卡（<b>2026-09-11 主人令</b>）已从运维面板迁至<b>选股策略页·候选股池上方</b>；运维面板「数据健康总览」CANDIDATE 行仍合并来源级状态：<br>· <b>night_watchdog.py</b> 每次巡检拆分六大来源数量，成交额TOP三板归零→🔴CRITICAL、&lt;80%→⚠️WARNING；港股/外资研投归零→⚠️降级（云端可能天然缺失）。<br>· <b>数据健康总览</b> CANDIDATE 行下方展示六来源彩色标签行，实时反映各源健康状态。<br>· <b>正常基线</b>：主板成交前100 + 创业板成交前100 + 科创板成交前100（三板合计≥300只）。低于此基线需排查 mootdx/akshare 是否挂了。</div>
       </div>
 
       
@@ -5183,7 +5196,7 @@ function drawUpDownChart(){
       h+=row('新增投资者','周', num(ni,2)+'万人', ni, niPrev, [50.0,200.0], '新增投资者多→散户入场热度高', '新增投资者少→情绪冷清', '散户入场热度', 'new_investors', g(se.new_investors,'date'));
     }
     h+='</table></div>';
-    $('phMacroBody').innerHTML=h;
+    var _pmb=document.getElementById('phMacroBody'); if(_pmb) _pmb.innerHTML=h; // 2026-09-11 对齐：opTab4 已删，元素不存在时守卫避免抛 null（与 index.html 口径一致）
     setBadge('phMacroTime','盘后','中长线',m.update_time);
   }
 
