@@ -58,8 +58,20 @@ OUT = os.path.join(BASE, "..", "raw_data", "backtest_comprehensive.json")
 TODAY = datetime.now()
 TODAY_STR = TODAY.strftime("%Y-%m-%d")
 
+# 🔴 2026-09-12 主人令（拍板第 1 项·①）：回测持有期统一阶梯（近→远）。
+#   主人原话：「可以从近到远，从5天开始、10天、20天、30天、45天、60天、75天、90天
+#   这样写出来慢慢跟踪」。短档 1/3 保留（隔日冲高/短线验证有独立价值）。
+#   ⚠️ **同源铁律**：本阶梯是唯一真源，四个回测脚本一律引此常量；
+#      各写一套必然漂移（本仓历史教训）。
+HOLD_LADDER = [5, 10, 20, 30, 45, 60, 75, 90]
 # 持有期测试列表（交易日）
-HOLD_PERIODS = [1, 3, 5, 10, 20]
+# 🔴 2026-09-12 主人令：原 [1,3,5,10,20] → [1,3] + HOLD_LADDER。
+HOLD_PERIODS = [1, 3] + HOLD_LADDER
+# 🔴 2026-09-12 同批修复：价格窗口。原 ±35 天 ⇒ max(HOLD_PERIODS)=90 交易日时
+#   `len(after) - 1 < hp` 恒成立 → 45/60/75/90 四档**每只票都 continue** ⇒ 静默零样本。
+#   90 交易日 ≈ 130 自然日，留余量取 150。
+LOOKBACK_DAYS = 30    # 入场前窗口（供算近 20 日高低做止损/止盈基准）
+LOOKAHEAD_DAYS = 150  # 入场后窗口（覆盖 90 交易日持有）
 
 # 是否启用 baostock（离线模式跳过拉价格，只统计信号数）
 BAOSTOCK_ENABLED = True
@@ -266,8 +278,10 @@ def calc_multi_hold(entry_date: str, entry_price: float, bsc: str, board: str = 
         return None
     entry_dt = datetime.strptime(entry_date, "%Y-%m-%d")
     # 多取 30 天历史，保证能算近 20 日高低
-    start = (entry_dt - timedelta(days=35)).strftime("%Y-%m-%d")
-    end = (entry_dt + timedelta(days=35)).strftime("%Y-%m-%d")
+    # 🔴 2026-09-12 扩档：入场后窗口 35 → LOOKAHEAD_DAYS(150) 自然日，
+    #   否则 90 交易日档永远拿不到足够行数（原窗口只够 ~24 个交易日）。
+    start = (entry_dt - timedelta(days=LOOKBACK_DAYS)).strftime("%Y-%m-%d")
+    end = (entry_dt + timedelta(days=LOOKAHEAD_DAYS)).strftime("%Y-%m-%d")
 
     rs = bs.query_history_k_data_plus(
         bsc, fields="date,open,high,low,close,volume",
@@ -333,7 +347,12 @@ def calc_multi_hold(entry_date: str, entry_price: float, bsc: str, board: str = 
 
     exit_date = after["date"].iloc[exit_idx]
 
-    # 多持有期收益：若在该周期前已触发 stop/target，则按提前出场收益；否则按周期收盘价
+    # 多持有期收益：**双口径并列**（2026-09-12 主人令「改止损逻辑」）
+    #   · ret      = 原口径：周期内已触发 stop/target 则按提前出场价（**历史语义不动**）
+    #   · ret_hold = 新口径：**忽略中途触发**，严格持有到第 hp 个交易日收盘
+    #     理由：原口径下 90 天档只要第 3 天碰了止损就整档按止损价记 —— 长档
+    #     退化成「止损幅度」，测不出「长期持有」这件事本身。
+    #     两者同时输出，前端可并列；**绝不**用新口径覆盖旧口径（否则历史不可比）。
     holds = {}
     cost_pct = 2 * COST_BPS / 100  # 双边 0.3%
     for hp in HOLD_PERIODS:
@@ -351,8 +370,17 @@ def calc_multi_hold(entry_date: str, entry_price: float, bsc: str, board: str = 
             hp_date = after["date"].iloc[hp]
             hp_price = float(after["close"].iloc[hp])
             hp_exit_type = None
+        # 🆕 2026-09-12 主人令「改止损逻辑」：新增**严格持有口径** ret_hold。
+        #   忽略中途 stop/target，一律取第 hp 个交易日收盘价（扣同一双边成本）。
+        #   ⚠️ 这是**新增并列口径**，不是替换 —— 上面 hp_ret 的历史语义原样保留，
+        #      否则「改前/改后」不可比，且会篡改既有回测结论。
+        _hp_close = float(after["close"].iloc[hp])
+        _ret_hold = round((_hp_close - real_entry_price) / real_entry_price * 100 - cost_pct, 2)
         holds[f"hold_{hp}d"] = {
             "ret": hp_ret,
+            "ret_hold": _ret_hold,
+            "hold_close_price": _hp_close,
+            "hold_close_date": after["date"].iloc[hp],
             "target_date": hp_date,
             "target_price": hp_price,
             "exit_type": hp_exit_type,

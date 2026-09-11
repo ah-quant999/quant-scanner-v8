@@ -47,7 +47,17 @@ DATA_DIR = HERE / "data"
 HISTORY_DIRS = [HERE / "out" / "history", RAW_DIR / "history"]
 OUT_JSON = RAW_DIR / "crds_backtest.json"
 OUT_JS = DATA_DIR / "CRDS_BACKTEST.js"
-HOLD_PERIODS = [1, 3, 5, 10, 20]
+# 🔴 2026-09-12 主人令（拍板第 1 项·①）：回测持有期统一阶梯（近→远）。
+#   主人原话：「可以从近到远，从5天开始、10天、20天、30天、45天、60天、75天、90天
+#   这样写出来慢慢跟踪」。短档 1/3 保留（隔日冲高/短线验证有独立价值）。
+#   ⚠️ **同源铁律**：本阶梯是唯一真源，四个回测脚本一律引此常量；
+#      各写一套必然漂移（本仓历史教训）。
+HOLD_LADDER = [5, 10, 20, 30, 45, 60, 75, 90]
+# 🔴 2026-09-12 主人令：原 [1,3,5,10,20] → [1,3] + HOLD_LADDER。
+HOLD_PERIODS = [1, 3] + HOLD_LADDER
+# 🔴 2026-09-12 同批修复：原 lookahead_days=35（自然日）只够 ~24 个交易日，
+#   90 交易日档会静默零样本。90 交易日 ≈ 130 自然日，留余量取 150。
+LOOKAHEAD_DAYS = 150
 
 # 2026-09-06 主人令 P1-A：交易成本（单边 万分之1.5 = 0.15%；双边 0.3%）；
 # 这是 A 股场内交易的合理默认假设（含印花税+佣金+过户费），写死写在此处
@@ -163,7 +173,7 @@ def fetch_close(code, date):
     return None
 
 
-def fetch_kline_around(code, center_date_str, lookback_days=8, lookahead_days=35):
+def fetch_kline_around(code, center_date_str, lookback_days=8, lookahead_days=LOOKAHEAD_DAYS):
     """一次性拉 signal 前后一段连续 K 线（前复权），返回 [(date, close), ...]。
 
     用于：在 K 线序列里找 entry 真实交易日 + 后 N 个真实交易日，避免日历日的提前/延后失真。

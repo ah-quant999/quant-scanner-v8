@@ -49,7 +49,18 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE, "..", "raw_data")
 OUT = os.path.join(DATA_DIR, "backtest_tdx.json")
 TODAY = datetime.now().strftime("%Y-%m-%d")
-HOLD_DAYS = [1, 3, 5, 10, 20]  # 2026-07-26: 从 3d/5d 扩展到 1/3/5/10/20d
+# 🔴 2026-09-12 主人令（拍板第 1 项·①）：回测持有期统一阶梯（近→远）。
+#   主人原话：「可以从近到远，从5天开始、10天、20天、30天、45天、60天、75天、90天
+#   这样写出来慢慢跟踪」。短档 1/3 保留（隔日冲高/短线验证有独立价值）。
+#   ⚠️ **同源铁律**：本阶梯是唯一真源，四个回测脚本一律引此常量；
+#      各写一套必然漂移（本仓历史教训）。
+HOLD_LADDER = [5, 10, 20, 30, 45, 60, 75, 90]
+# 🔴 2026-09-12 主人令：原 [1,3,5,10,20] → [1,3] + HOLD_LADDER。
+#   ⚠️ 只改档位**不够** —— 原 tdx_kline(count=60) 只有 60 根日K，而下面
+#      `idx + max(HOLD_DAYS) >= n` 会把近 90 个交易日内的信号**整条跳过**
+#      ⇒ 长档静默零样本（不是算出 0，是没算）。故 TDX_BARS 同步放宽。
+HOLD_DAYS = [1, 3] + HOLD_LADDER  # 2026-07-26 基线 [1,3,5,10,20]；2026-09-12 扩档
+TDX_BARS = 260  # 覆盖 90 交易日持有 + 信号检测自身所需窗口（原 60 根硬上限）
 
 # 2026-09-06 主人令 P1-A：A 股交易成本默认假设（单边 万分之1.5，双边 0.3%）
 COST_BPS = 15
@@ -493,7 +504,7 @@ def main():
             log(f"  重算 {name}({key}) — 补齐新周期")
         
         setcode = setcode_map.get(mkt, "0")
-        rows = tdx_kline(code, setcode, count=60)
+        rows = tdx_kline(code, setcode, count=TDX_BARS)  # 🛡 2026-09-12 扩档：60 → 260
         if not rows or len(rows) < 30:
             stock_results[key] = {"code": code, "name": name, "market": mkt, "error": "数据不足", "signals": {}}
             continue
