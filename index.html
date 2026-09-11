@@ -4132,6 +4132,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 (function(){
   var rendered = false;
   function _esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+  // 🛡 2026-09-11 小九的工程师：IIFE 顶层补 _e 转义助手。
+  //   根因：_e 此前仅在 5094/5220/5367 三处【内层作用域】局部定义，
+  //   而 window.__renderRpsAudit 位于 IIFE 顶层作用域，拼字符串时引用 _e
+  //   → ReferenceError: _e is not defined → dst.innerHTML 那行从未执行
+  //   → 卡片永久停在静态占位符「加载中…」（异常又被外层 catch 静默吞掉）。
+  function _e(s){ return _esc(s); }
   function _colorNum(v, mid){
     // 数值染色（红涨绿跌·中国习惯）：>= mid+5 红，<= mid-5 绿，中间黄
     if(v == null || v === '--' || v === '') return 'var(--sub)';
@@ -5496,7 +5502,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   // ===== RPS 相对强度 · 30 天样本考核（2026-09-06 主人令：暂未上架·因子实验室下方，前端展示防遗忘）=====
   // 数据源 window.RPS_BACKTEST（E 批 21:00 每日续刷）；纯观测层，不参与选股评分权重（generate_top10 引擎 0 引用）。
   window.__rpsRetry = 0;
+  // 🛡 2026-09-11 小九的工程师：异常兜底 —— 原实现一旦拼串抛错，外层 catch 只 console.warn，
+  //   用户端表现为「永久加载中」的假死卡，无任何可见线索。现改为显式写错误提示。
   window.__renderRpsAudit = function(){
+    var _dst = document.getElementById('rpsAuditBody');
+    if(!_dst) return;
+    try{ return window.__renderRpsAuditInner.apply(this, arguments); }
+    catch(e){
+      _dst.innerHTML = '<div class="note" style="padding:16px;text-align:center;color:#f87171;">'
+        + '📈 相对强度 RPS 考核卡渲染异常：' + String((e && e.message) || e) + '</div>';
+      console.warn('[RPS卡] 渲染异常（已显式提示，不再永久「加载中」）', e);
+    }
+  };
+  window.__renderRpsAuditInner = function(){
     var dst = document.getElementById('rpsAuditBody');
     if(!dst) return;
     var D = window.RPS_BACKTEST;
