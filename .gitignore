@@ -5,6 +5,11 @@ __pycache__/
 .workbuddy/
 # 临时文件（_ 开头 / 脚本检查切片 / 日志 / 缓存）
 _*/
+# 🛡 2026-09-12 阿狸咪补漏：上面 `_*/` 带尾斜杠**只匹配目录**，匹配不到 `_` 开头的**文件**。
+#   实测 `git check-ignore algorithms/_valid_codes.json` returncode=1（未命中）→ 该运行时缓存
+#   一直以未跟踪态污染 git status。backtest_expectancy.py 缺失时会用 baostock 自动重建，
+#   属纯本地缓存，不入库 → 精确点名（不用宽泛的 `_*`，`_*.py` 规则见下方「临时脚本残留」段）。
+algorithms/_valid_codes.json
 _tmp_*/
 *.log
 *.err
