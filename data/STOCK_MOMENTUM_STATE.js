@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-11 20:19",
- "generated": "2026-09-11 20:19",
+ "update_time": "2026-09-11 20:23",
+ "generated": "2026-09-11 20:23",
  "meta": {
-  "generated": "2026-09-11 20:19",
+  "generated": "2026-09-11 20:23",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 7,
   "days_with_consensus": 0,
@@ -1666,10 +1666,31 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
+      "code": "601086",
+      "name": "国芳集团",
+      "change_pct": 8.206,
+      "price": 16.35,
+      "category": "突破"
+     },
+     {
       "code": "300649",
       "name": "杭州园林",
       "change_pct": 3.951,
       "price": 26.31,
+      "category": "突破"
+     },
+     {
+      "code": "688143",
+      "name": "长盈通",
+      "change_pct": 15.494,
+      "price": 195.0,
+      "category": "突破"
+     },
+     {
+      "code": "603936",
+      "name": "博敏电子",
+      "change_pct": 10.011,
+      "price": 20.88,
       "category": "突破"
      },
      {
@@ -1715,6 +1736,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "300739",
+      "name": "明阳电路",
+      "change_pct": 6.313,
+      "price": 28.63,
+      "category": "突破"
+     },
+     {
+      "code": "605006",
+      "name": "山东玻纤",
+      "change_pct": 6.64,
+      "price": 18.47,
+      "category": "突破"
+     },
+     {
       "code": "603421",
       "name": "鼎信通讯",
       "change_pct": 10.014,
@@ -1748,35 +1783,35 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 19.983,
       "price": 27.92,
       "category": "突破"
-     },
-     {
-      "code": "002848",
-      "name": "高斯贝尔",
-      "change_pct": 10.036,
-      "price": 15.24,
-      "category": "突破"
-     },
-     {
-      "code": "603679",
-      "name": "华体科技",
-      "change_pct": 6.0,
-      "price": 25.97,
-      "category": "突破"
-     },
-     {
-      "code": "600876",
-      "name": "凯盛新能",
-      "change_pct": 9.987,
-      "price": 8.7,
-      "category": "突破"
      }
     ],
     "加速": [
+     {
+      "code": "601086",
+      "name": "国芳集团",
+      "change_pct": 8.206,
+      "price": 16.35,
+      "category": "加速"
+     },
      {
       "code": "300649",
       "name": "杭州园林",
       "change_pct": 3.951,
       "price": 26.31,
+      "category": "加速"
+     },
+     {
+      "code": "688143",
+      "name": "长盈通",
+      "change_pct": 15.494,
+      "price": 195.0,
+      "category": "加速"
+     },
+     {
+      "code": "603936",
+      "name": "博敏电子",
+      "change_pct": 10.011,
+      "price": 20.88,
       "category": "加速"
      },
      {
@@ -1803,10 +1838,31 @@ window.STOCK_MOMENTUM_STATE = (function() {
     ],
     "短线选股": [
      {
+      "code": "601086",
+      "name": "国芳集团",
+      "change_pct": 8.206,
+      "price": 16.35,
+      "category": "短线选股"
+     },
+     {
       "code": "300649",
       "name": "杭州园林",
       "change_pct": 3.951,
       "price": 26.31,
+      "category": "短线选股"
+     },
+     {
+      "code": "688143",
+      "name": "长盈通",
+      "change_pct": 15.494,
+      "price": 195.0,
+      "category": "短线选股"
+     },
+     {
+      "code": "603936",
+      "name": "博敏电子",
+      "change_pct": 10.011,
+      "price": 20.88,
       "category": "短线选股"
      },
      {
@@ -1852,6 +1908,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "300739",
+      "name": "明阳电路",
+      "change_pct": 6.313,
+      "price": 28.63,
+      "category": "短线选股"
+     },
+     {
+      "code": "605006",
+      "name": "山东玻纤",
+      "change_pct": 6.64,
+      "price": 18.47,
+      "category": "短线选股"
+     },
+     {
       "code": "603421",
       "name": "鼎信通讯",
       "change_pct": 10.014,
@@ -1884,27 +1954,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "神宇股份",
       "change_pct": 19.983,
       "price": 27.92,
-      "category": "短线选股"
-     },
-     {
-      "code": "002848",
-      "name": "高斯贝尔",
-      "change_pct": 10.036,
-      "price": 15.24,
-      "category": "短线选股"
-     },
-     {
-      "code": "603679",
-      "name": "华体科技",
-      "change_pct": 6.0,
-      "price": 25.97,
-      "category": "短线选股"
-     },
-     {
-      "code": "600876",
-      "name": "凯盛新能",
-      "change_pct": 9.987,
-      "price": 8.7,
       "category": "短线选股"
      }
     ],
@@ -1931,6 +1980,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "300739",
+      "name": "明阳电路",
+      "change_pct": 6.313,
+      "price": 28.63,
+      "category": "强势股"
+     },
+     {
+      "code": "605006",
+      "name": "山东玻纤",
+      "change_pct": 6.64,
+      "price": 18.47,
+      "category": "强势股"
+     },
+     {
       "code": "603421",
       "name": "鼎信通讯",
       "change_pct": 10.014,
@@ -1963,27 +2026,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "神宇股份",
       "change_pct": 19.983,
       "price": 27.92,
-      "category": "强势股"
-     },
-     {
-      "code": "002848",
-      "name": "高斯贝尔",
-      "change_pct": 10.036,
-      "price": 15.24,
-      "category": "强势股"
-     },
-     {
-      "code": "603679",
-      "name": "华体科技",
-      "change_pct": 6.0,
-      "price": 25.97,
-      "category": "强势股"
-     },
-     {
-      "code": "600876",
-      "name": "凯盛新能",
-      "change_pct": 9.987,
-      "price": 8.7,
       "category": "强势股"
      }
     ]
