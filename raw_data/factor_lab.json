@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-09-11 09:00:18",
+  "update_time": "2026-09-11 20:11:40",
   "meta": {
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
-    "n_universe": 751,
-    "n_at_valid": 820,
-    "n_roe_large": 1047,
+    "n_universe": 766,
+    "n_at_valid": 830,
+    "n_roe_large": 1053,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
     "roe_universe": "全市场主板"
