@@ -72,7 +72,9 @@ DATA_SOURCES = {
     "limit_up_heatmap.json":       "LIMIT_UP_HEATMAP",
     "limit_up_broken.json":        "LIMIT_UP_BROKEN",
     "herding_data.json":           "HERDING_DATA",
-    "analyst_ratings.json":        "ANALYST_RATINGS",
+    # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：ANALYST_RATINGS 前端零引用，
+    #   由 generate_top10.py 附带产出但无渲染消费，停止发布 js。
+    # "analyst_ratings.json":        "ANALYST_RATINGS",
     "suspension_alert.json":       "SUSPENSION_ALERT",
     "volatility.json":             "VOLATILITY",
     "index_quotes.json":           "INDEX_QUOTES",
@@ -92,7 +94,9 @@ DATA_SOURCES = {
     #   但 update_v8 转换层漏挂，data/*.js 永远停在 8/14 旧版本。
     "overseas_markets.json":       "OVERSEAS_MARKETS",
     "v8_cal.json":                 "V8_CAL",
-    "candidate_quotes.json":       "CANDIDATE_QUOTES",
+    # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：CANDIDATE_QUOTES 前端零引用，
+    #   由 final_recommend.py 附带产出但无渲染消费，停止发布 js。
+    # "candidate_quotes.json":       "CANDIDATE_QUOTES",
     "sh_sz_history.json":         "SH_SZ_HISTORY",
     "ai_market_brief.json":        "AI_MARKET_BRIEF",
     "runner_status.json":          "RUNNER_STATUS",
@@ -138,7 +142,9 @@ DATA_SOURCES = {
     # "path_probability_backtest.json": "PATH_PROB_BACKTEST",  # 2026-09-06 已注释：AI预测卡下架，停止发布
     # 🛡 2026-08-30 一劳永逸式：补 ETF 申购赎回东方财富口径（股票/债券/货币/商品/跨境 5 类 + 亿元）。
     #   2026-09-06 主人令轻量化：旧宽基+亿份口径全链删除（fetcher/映射/前端注入），仅保留东财口径 window.ETF_SUBSCRIPTION_EM。
-    "etf_subscription_em.json":   "ETF_SUBSCRIPTION_EM",
+    # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：ETF_SUBSCRIPTION_EM 前端零引用，
+    #   驾驶舱/ETF三合一卡已读 ETF_PULSE / ETF_DAILY_MONITOR 等活数据，停止发布该死 js。
+    # "etf_subscription_em.json":   "ETF_SUBSCRIPTION_EM",
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告
     "restricted_release.json":    "RESTRICTED_RELEASE",
     "performance_forecast.json":  "PERFORMANCE_FORECAST",
@@ -166,7 +172,7 @@ CATEGORY_MAP = {
     "MACRO_DATA": "premarket,post_close",
     "CRISIS_DATA": "premarket,intraday",
     "NORTH_FUND": "premarket",
-    "ANALYST_RATINGS": "premarket",
+    # "ANALYST_RATINGS": "premarket",  # 2026-09-11 P1 死数据清理：映射已移除
     "SUSPENSION_ALERT": "premarket",
     "MARKET_ALERTS": "intraday,post_close",
     "OVERSEAS_MARKETS": "intraday,post_close",
@@ -205,7 +211,7 @@ CATEGORY_MAP = {
     "CONCEPT_RANKING": "intraday,post_close",
     "LIMIT_UP_HEATMAP": "intraday,post_close",
     "LIMIT_UP_BROKEN": "intraday,post_close",
-    "CANDIDATE_QUOTES": "intraday",
+    # "CANDIDATE_QUOTES": "intraday",  # 2026-09-11 P1 死数据清理：映射已移除
     "SH_SZ_HISTORY": "intraday,post_close",
     "AI_MARKET_BRIEF": "intraday,post_close",
     # 🛡 2026-09-11 小九的工程师（三档归档普查·补「无档位」盲区）：
@@ -215,7 +221,7 @@ CATEGORY_MAP = {
     #   v8_build_deploy.yml 走的正是 detect-changes 模式）→ data/*.js 只能靠全量构建
     #   兜底；实测 raw 已新而 js 停在前一日（半截更新）。
     "RISK_GAUGE": "premarket,intraday",            # 实时风险温度计：v8_risk_gauge.yml 每30分（08:00-16:30 CST）
-    "ETF_SUBSCRIPTION_EM": "premarket,post_close",  # ETF 申赎（东财口径）：cn_fetch 盘前/盘后两档产出
+    # "ETF_SUBSCRIPTION_EM": "premarket,post_close",  # 2026-09-11 P1 死数据清理：映射已移除
     "RUNNER_STATUS": "premarket,intraday,post_close",  # 任务跟踪看板：每轮抓取都写，全时段
     # 🛡 2026-09-11 小九的股票专家 一劳永逸（主人令·「市场资金流向」盘中红灯）：
     #   原只标 post_close → _pure_pc=True → data/MARKET_FUND_FLOW_DATA.js 仅由
@@ -1283,23 +1289,8 @@ def run_experiment_cards():
     else:
         print("[experiment] ⚠️ 缺失 scripts/momentum_common_filter.py，跳过")
 
-    # 2026-08-23 主人令：两套算法（H反推 vs 强势突破）回测横向对比，统一口径产出
-    # data/ALGO_BACKTEST_COMPARE.js（无网络依赖，纯聚合既有产物；失败不影响主流程）
-    compare_py = Path(__file__).resolve().parent / "scripts" / "algo_backtest_compare.py"
-    if compare_py.exists():
-        print(f"[experiment] ▶ algo_backtest_compare.py ({datetime.now():%H:%M:%S})")
-        try:
-            r = subprocess.run([sys.executable, str(compare_py)],
-                               capture_output=True, text=True, timeout=120)
-            if r.returncode == 0:
-                last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
-                print(f"[experiment]   ✅ {last[0][:120]}")
-            else:
-                print(f"[experiment]   ⚠️ algo_backtest_compare 退出码 {r.returncode}")
-        except Exception as e:
-            print(f"[experiment]   ⚠️ algo_backtest_compare 异常: {e}")
-    else:
-        print("[experiment] ⚠️ 缺失 scripts/algo_backtest_compare.py，跳过")
+    # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：ALGO_BACKTEST_COMPARE.js 前端零引用，
+    #   停止调用 algo_backtest_compare.py 生成该死数据。
 
 
 def main():
