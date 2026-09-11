@@ -3888,12 +3888,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var scoreColor = score >= 70 ? 'var(--down)' : score >= 50 ? 'var(--gold)' : score >= 30 ? 'var(--gold)' : 'var(--up)';
     // 红黄绿灯映射：风险度反语义（高=危险/红，低=安全/绿）
     var scoreLight = score >= 70 ? 'red' : score >= 50 ? 'yellow' : score >= 30 ? 'yellow' : 'green';
-    // 每日洞察聚合多个数据源，取各源真实时间中最新的作为卡片时间戳
+    // 每日洞察时间戳：龙虎榜/北向席位数据锚定「数据日期(date)」而非「刷新时间(update_time)」，
+    // 避免两个共振日历一刷新、卡片时间跟着更新、但卡内 LHB/NF 数据仍是昨天的问题（2026-09-11 一劳永逸）。
+    // 整体新鲜度由最旧一条决定（取最小），LHB/NF 用数据日期；其余源用自身 update_time。
+    var _lhbDate = LHB.date ? (LHB.date + '').replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : null;
+    var _nfDate = NF.date ? (NF.date + '').replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : null;
+    var _todayStr = new Date().toISOString().slice(0, 10);
     var updateTime = [
-      CR.update_time, CAND.update_time,
-      SR.update_time, VOL.update_time, IQ.update_time,
-      LHB.update_time, NF.update_time, window.SH_SZ_HISTORY && window.SH_SZ_HISTORY.update_time
-    ].filter(Boolean).sort().pop() || '--';
+      CR.update_time, CAND.update_time, SR.update_time, VOL.update_time, IQ.update_time,
+      window.SH_SZ_HISTORY && window.SH_SZ_HISTORY.update_time,
+      _lhbDate ? (_lhbDate + ' 15:30:00') : LHB.update_time,
+      NF.update_time
+    ].filter(Boolean).sort().shift() || '--';
 
     var h = '';
     // Header：标题、🐻 胶囊、🧺 计数胶囊统一放同一行（与严格三重共识/四量终极格式一致）
@@ -3904,9 +3910,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">';
     h += '<span style="font-size:21px;font-weight:800;color:var(--txt)">📊 每日市场洞察</span>';
     // 2026-08-14 修复：时段标签动态判断（原写死"盘后"导致 08:16 盘前数据也显示"盘后"）
+    // 2026-09-11 修复：LHB/NF 数据日期不是今天 → 不挂「今日盘后」，统一显示「盘后」（锚定上一交易日收盘）
     var _miHr = new Date().getHours();
-    var _miSlot = (_miHr < 9) ? '盘前' : (_miHr < 15) ? '盘中' : (_miHr < 17) ? '盘后' : '今日盘后';
-    var _miHoriz = (_miHr >= 9 && _miHr < 17) ? '短线' : '';
+    var _miSlot;
+    if ((_lhbDate && _lhbDate !== _todayStr) || (_nfDate && _nfDate !== _todayStr)) {
+      _miSlot = '盘后';
+    } else {
+      _miSlot = (_miHr < 9) ? '盘前' : (_miHr < 15) ? '盘中' : (_miHr < 17) ? '盘后' : '今日盘后';
+    }
+    var _miHoriz = (_lhbDate === _todayStr && _miHr >= 9 && _miHr < 17) ? '短线' : '';
     h += _uBadge(_miSlot, _miHoriz, updateTime);
     if(_insightSignalCount > 0){
       h += _holdBadge(updateTime, _insightSignalCount, '信号');
@@ -6481,6 +6493,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     <!-- 2026-08-31 轻量化：逻辑详解已拆为独立页 logic.html，主站运维页同步说明 -->
     <div style="font-size:12px;color:var(--dim);margin:0 0 14px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">ℹ️ <b style="color:var(--gold)">逻辑详解（指标/策略/安全口径）</b> 已于 2026-08-31 轻量化拆为独立页 <code>logic.html</code>。点顶部 🔒 <b>逻辑详解</b> Tab 可打开（本体 153.6 KB 不再进首屏，首屏省 166 KB）。</div>
+
+    <!-- 2026-09-11 一劳永逸：今日两改运维页 note（与 logic.html 双向对齐） -->
+    <div style="font-size:12px;color:var(--dim);margin:0 0 14px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;line-height:1.7">📌 <b style="color:var(--gold)">2026-09-11 今日两改（一劳永逸）</b><br>
+      &nbsp;① <b style="color:#93c5fd">每日洞察卡时间戳锚定</b>：<code>index.html renderInsight()</code>（约 L3861）时间戳改「取最小」、LHB/NF 不再直接用 <code>update_time</code>，改用 <code>data.date</code>（YYYY-MM-DD 15:30:00）参与计算；非今日数据时段胶囊降级为「盘后」。根治「昨天数据挂今天时间」。详见 logic.html 「🔍 每日洞察卡时间戳锚定修复」。<br>
+      &nbsp;② <b style="color:#93c5fd">龙虎榜历史累积 richer 覆盖</b>：<code>algorithms/stage_to_raw.py append_lhb_to_history()</code>（L132）新增 <code>_quality(stocks)</code> 评分，覆盖判定由「truthy 跳过」改为 <code>new_quality &gt; old_quality</code> 才覆盖；骨架数据始终允许覆盖。同步修 <code>_save_json</code>（L109）以 <code>newline='\n'</code> 落盘，规避 CRLF 巨量 diff。2026-09-11 当日条目已重跑覆盖，质量 117→291（58 只均含真实 aliases）。详见 logic.html 「🔁 龙虎榜历史累积 richer 覆盖机制」。</div>
 
     <!-- 🩺 数据健康总览：Runner 追踪 + 文件新鲜度 + 上游诊断 合并为一劳永逸式展示 -->
     <div class="card" style="margin-bottom:16px;border-left:3px solid var(--teal)">

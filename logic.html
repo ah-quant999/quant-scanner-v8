@@ -1327,6 +1327,19 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
       </div>
 
       
+<div class="card">
+        <h3><span class="ic">🔁</span>龙虎榜历史累积 richer 覆盖机制（2026-09-11 一劳永逸）</h3>
+        <div class="logic-h">现象</div>
+        <div class="logic-p">机游共振详情页「知名游资」标签缺失：明明 <code>fetch_lhb.py</code> <code>_classify_seat</code> 已返回 alias（章盟主/赵老哥/方新侠/溧阳路·孙哥等），但卡片只显示「营业部」。今日(09-11) 与前几日（09-09/09-10）均出现，详情页游资名单断档。</div>
+        <div class="logic-h">根因</div>
+        <div class="logic-p"><code>stage_to_raw.py append_lhb_to_history()</code> 原判定 <code>has_real_data</code>：trading=True + stocks&gt;0 + seats 非全空即跳过。当日首轮残缺版（如 stock.price=0、seats.游资.aliases 仅为 <code>["营业部","证券"]</code>、机构/北向/量化任一缺位）一旦写入即永久阻塞完整版——后续 fetch 拿全别名后，<code>has_real_data=True</code> 触发 skip，游资标签丢失。</div>
+        <div class="logic-h">修复</div>
+        <div class="logic-p">· 新增 <code>_quality(stocks)</code> 评分：每只含 price +1、seats 非空 +1、游资 aliases 数量逐条 +1、机构/北向/量化任一有买卖 +1。<br>· 覆盖判定由「truthy 跳过」改为「new_quality &gt; old_quality 才覆盖」；骨架数据（trading=True + stocks&gt;0 + 全部 seats={}）始终允许覆盖。<br>· <code>_save_json()</code> 统一以 <code>newline='\n'</code> + <code>indent=1</code> 落盘，杜绝 Windows CRLF 与仓库原 LF+1 空格缩进格式冲突产生巨量 diff。<br>· 历史回填：2026-09-11 当日条目已重跑覆盖，质量分 117→291，58 只均含 price 与真实 aliases（如 688143 长盈通 aliases <code>["营业部","溧阳路·孙哥","金融","证券"]</code>）。</div>
+        <div class="logic-h">文件</div>
+        <div class="logic-p"><code>algorithms/stage_to_raw.py</code> <code>append_lhb_to_history()</code> / <code>_quality()</code> / <code>_save_json()</code></div>
+      </div>
+
+      
 <div class="lg-pane" id="lg-final">
       <div class="card">
         <h3><span class="ic">🏆</span>最终推荐 - 说明</h3>

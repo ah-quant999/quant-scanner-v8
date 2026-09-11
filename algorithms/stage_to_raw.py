@@ -99,19 +99,20 @@ def _load_json(path):
         return None
 
 
-def _save_json(path, obj):
+def _save_json(path, obj, indent=None, separators=(",", ":")):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     _bak = path.with_suffix(path.suffix + ".bak")
     _tmp = path.with_suffix(path.suffix + ".tmp")
     # 2026-08-24 抗丢失：原子写（临时文件 replace）+ 写成功后存 .bak。
     # 避免被并发取消风暴杀掉时留下半截 JSON 清空数据。
-    with open(_tmp, "w", encoding="utf-8") as f:
-        json.dump(obj, f, ensure_ascii=False, separators=(",", ":"), default=str)
+    # 2026-09-11 追加：统一用 LF（newline='\n'），避免 Windows 下 CRLF 与仓库原格式不一致产生巨量 diff。
+    with open(_tmp, "w", encoding="utf-8", newline='\n') as f:
+        json.dump(obj, f, ensure_ascii=False, indent=indent, separators=separators, default=str)
     _tmp.replace(path)
     try:
-        with open(_bak, "w", encoding="utf-8") as f:
-            json.dump(obj, f, ensure_ascii=False, separators=(",", ":"), default=str)
+        with open(_bak, "w", encoding="utf-8", newline='\n') as f:
+            json.dump(obj, f, ensure_ascii=False, indent=indent, separators=separators, default=str)
     except Exception:
         pass
 
@@ -148,6 +149,28 @@ def append_lhb_to_history():
     hist = {}
     if hist_path.exists():
         hist = _load_json(hist_path) or {}
+    # 🛡 2026-09-11 一劳永逸：按「数据丰富度」判定是否覆盖，防止早期 seats 缺 aliases /
+    # price=0 的版本被判定为 has_real_data 后，后续更完整版本（含知名游资标签）永远写不进去。
+    def _quality(stocks):
+        if not stocks:
+            return 0
+        score = 0
+        for s in stocks:
+            if s.get("price"):
+                score += 1
+            seats = s.get("seats") or {}
+            if seats:
+                score += 1
+                yz = seats.get("游资", {})
+                aliases = yz.get("aliases") or []
+                score += len(aliases)
+                # 机构/北向/量化只要有明细也加分
+                for stype in ("机构", "北向", "量化"):
+                    d = seats.get(stype)
+                    if d and (d.get("buy") or d.get("sell")):
+                        score += 1
+        return score
+
     # 修复：空壳占位符 OR 骨架数据(stocks>0 但所有股票 seats={})应被真实数据覆盖，而非永久阻塞
     if iso in hist:
         existing = hist[iso]
@@ -157,14 +180,19 @@ def append_lhb_to_history():
         is_skeleton = existing.get("trading") is True and len(existing_stocks) > 0 and all(
             (not (s or {}).get("seats")) for s in existing_stocks
         )
-        has_real_data = existing.get("trading") is True and len(existing_stocks) > 0 and not is_skeleton
-        if has_real_data:
-            return False  # 真实数据（含 seats）已存在，跳过
-        if is_skeleton:
-            print(f"  🔄 覆盖骨架数据 {iso}（原 trading=True stocks={len(existing_stocks)} 但 seats 全空 → 新 {len(obj['stocks'])} 只）")
+        new_quality = _quality(obj["stocks"])
+        old_quality = _quality(existing_stocks)
+        if not (is_shell or is_skeleton):
+            # 已有真实数据时，只有新版本更丰富才覆盖；避免低质量/ fallback 版本覆盖高质量版本
+            if new_quality <= old_quality:
+                return False
+            print(f"  🔄 覆盖 richer 龙虎榜数据 {iso}（质量 {old_quality} → {new_quality}，"
+                  f"stocks={len(existing_stocks)} → 新 {len(obj['stocks'])} 只）")
+        elif is_skeleton:
+            print(f"  🔄 覆盖骨架数据 {iso}（原 trading=True stocks={len(existing_stocks)} 但 seats 全空 → 新 {len(obj['stocks'])} 只，质量 {old_quality} → {new_quality}）")
         else:
             print(f"  🔄 覆盖空壳占位 {iso}（原 trading={existing.get('trading')} "
-                  f"stocks={len(existing_stocks)} → 新 {len(obj['stocks'])} 只）")
+                  f"stocks={len(existing_stocks)} → 新 {len(obj['stocks'])} 只，质量 {old_quality} → {new_quality}）")
     hist[iso] = {
         "trading": True,
         "stocks": obj["stocks"],
@@ -173,7 +201,8 @@ def append_lhb_to_history():
     hist["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")
     if "range" not in hist:
         hist["range"] = [iso, iso]
-    _save_json(hist_path, hist)
+    # lhb_history.json 文件大且历史记录为可读格式（1 空格缩进），保持缩进避免后续 diff 爆炸。
+    _save_json(hist_path, hist, indent=1)
     print(f"  🐉 龙虎榜历史追加 {iso}（{len(obj['stocks'])} 只，"
           f"共振{obj.get('summary', {}).get('机游共振', 0)}）")
     return True
