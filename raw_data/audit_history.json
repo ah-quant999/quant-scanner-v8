@@ -1,76 +1,6 @@
 [
  {
   "date": "2026-08-16",
-  "time": "00:26:44",
-  "overall": "ok",
-  "summary": {
-   "ok": 46,
-   "warn": 11,
-   "fail": 0,
-   "total": 57
-  },
-  "warn_items": [
-   {
-    "id": "dom_taskScheduleBody",
-    "name": "DOM #taskScheduleBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_phMacroBody",
-    "name": "DOM #phMacroBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttBackBody",
-    "name": "DOM #ttBackBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttThrBody",
-    "name": "DOM #ttThrBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttSvlBody",
-    "name": "DOM #ttSvlBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttTrackBody",
-    "name": "DOM #ttTrackBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_stcrdsAdvBody",
-    "name": "DOM #stcrdsAdvBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_stcrdsEliteBody",
-    "name": "DOM #stcrdsEliteBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_healthCheckBody",
-    "name": "DOM #healthCheckBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "a_share_triple_consensus",
-    "name": "三重共识 A股覆盖",
-    "message": "⚠️ 三重共识 今日 0 只（弱市真实状态可接受，但若其他池也 0 则排查上游；若此池独立为 0 而其他池正常则不报警）"
-   },
-   {
-    "id": "a_share_mahoro",
-    "name": "国际投行信号 A股覆盖",
-    "message": "⚠️ 国际投行信号 今日 0 只（弱市真实状态可接受，但若其他池也 0 则排查上游；若此池独立为 0 而其他池正常则不报警）"
-   }
-  ],
-  "fail_items": [],
-  "tz": "Asia/Shanghai"
- },
- {
-  "date": "2026-08-16",
   "time": "22:46:02",
   "overall": "warn",
   "summary": {
@@ -2267,5 +2197,75 @@
    }
   ],
   "tz": "Asia/Shanghai"
+ },
+ {
+  "date": "2026-09-12",
+  "time": "01:49:57",
+  "tz": "Asia/Shanghai",
+  "overall": "ok",
+  "summary": {
+   "ok": 111,
+   "warn": 11,
+   "fail": 0,
+   "total": 122
+  },
+  "warn_items": [
+   {
+    "id": "RPS_BACKTEST",
+    "name": "RPS A档回测",
+    "message": "需 baostock 拉前复权K线计算 T+1/T+20 持有期收益。本机 baostock 被风控黑名单(err=10001011匿名用户)，无凭据。阿狸咪走 v8/backtest_rps_offline.py 离线半残版（kline_"
+   },
+   {
+    "id": "H_AUTO_BUY",
+    "name": "精确自动买入(H反推)",
+    "message": "需 gtimg 日K(腾讯 urllib HTTPS) 反推涨幅≥3%+量比≥1.2 选股。本机实测 gtimg HTTPS=HTTP 501（腾讯waf反爬虫JS challenge拦截 urllib 类爬虫），无浏览器UA绕不开。本机无"
+   },
+   {
+    "id": "local_sync",
+    "name": "本地与 origin/main 同步",
+    "message": "git fetch origin 失败（网络/认证）：TimeoutExpired，跳过同步检查"
+   },
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   }
+  ],
+  "fail_items": []
  }
 ]
