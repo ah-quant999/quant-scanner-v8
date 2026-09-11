@@ -64,7 +64,9 @@ republish_time      = 2026-09-10 22:18:15
 ```
 
 - 即：**09-08 / 09-09 / 09-10 三个交易日的指数 K 线没有追加**，文件只是被重新发布了一遍。
-- 危险点：`intraday_watch.py` / `v8_health_check.py` 若取**文件尾部 `update_time`** 判新鲜度，会被这个 republish 骗过去（显示"13h 前更新，合格"），实际内容落后 3 个交易日。
+- 危险点：任何取**文件尾部 `update_time`** 判新鲜度的脚本
+- 已核对：`intraday_watch.py:187` 用 `re.search` 取**首个** `update_time`（即 `meta.update_time`），所以本轮判 65.6h 是**内容真实落后，判对了，不是误报**；
+  但 `v8_health_check.py` 等其它脚本取的是哪个尚未逐条核实，**请一并审计**
 
 **一劳永逸修法**：
 1. **新鲜度判据改为「内容时间」优先**：对 `INDEX_HISTORY` 这类带 `meta.update_time` 的产物，判定顺序改为
