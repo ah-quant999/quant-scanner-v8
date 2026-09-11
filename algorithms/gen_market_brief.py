@@ -121,6 +121,51 @@ def real_concepts(items):
     return [c for c in items if c.get("name") not in _NOISE_CONCEPTS]
 
 
+# 申万一级行业白名单（31 个）
+# 🛡 2026-09-11 主人令：AI速览「行业」行的大数必须与前端「板块资金趋势·盘中追热」的
+#   SW1 大数逐字一致（同源 sector_fund_flow，剔除二/三级子行业避免重复计入）。
+#   改这里 = 必须同步 index.html renderSector() 里的 SW_LV1_NAMES。
+_SW_LV1_NAMES = {
+    "农林牧渔", "基础化工", "钢铁", "有色金属", "电子", "家用电器", "食品饮料", "纺织服饰",
+    "轻工制造", "医药生物", "公用事业", "交通运输", "房地产", "商贸零售", "社会服务", "综合",
+    "建筑材料", "建筑装饰", "电力设备", "机械设备", "国防军工", "汽车", "美容护理", "石油石化",
+    "煤炭", "环保", "传媒", "计算机", "通信", "银行", "非银金融",
+}
+
+
+def _sector_list(sectors, key):
+    """取 sector_fund_flow.json 的 sectors_in/out 列表（缺字段返回空表）"""
+    if not sectors:
+        return []
+    return [s for s in (sectors.get(key) or []) if isinstance(s, dict) and s.get("name")]
+
+
+def sw1_industry_net(sectors):
+    """申万一级 31 行业口径的主力净额汇总（流入 - 流出，亿元）。
+
+    与 index.html renderSector() 的 SW1 大数 1:1 对齐：只认 type=='行业' 且在 31 个一级名单内的条目。
+    数据缺失/盘前清空时返回 None（不得用 0 兜底，0 会被误读成「资金平衡」）。
+    """
+    ins = [s for s in _sector_list(sectors, "sectors_in")
+           if s.get("type") == "行业" and s["name"] in _SW_LV1_NAMES]
+    outs = [s for s in _sector_list(sectors, "sectors_out")
+            if s.get("type") == "行业" and s["name"] in _SW_LV1_NAMES]
+    if not ins and not outs:
+        return None
+    total_in = sum(float(s.get("net") or 0) for s in ins)
+    total_out = abs(sum(float(s.get("net") or 0) for s in outs))
+    return round(total_in - total_out, 1)
+
+
+def _fmt_sector_list(items, signed=False):
+    """[{name,net}] → ‘名称 +x.x亿、…’（signed=True 时保留数值自带符号）"""
+    out = []
+    for s in items:
+        net = float(s.get("net") or 0)
+        out.append(f"{s['name']} {net:+.1f}亿" if signed else f"{s['name']} +{net:.1f}亿")
+    return "、".join(out)
+
+
 def health_lights(indices, up_down_ratio, main_net):
     """三灯：结构/资金/情绪 + 整行聚合灯（取最差）"""
     # 结构：四大指数同向性 + 平均涨跌幅
@@ -282,19 +327,47 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
                 "signal": "red",
             })
 
-    # 4. 概念/行业异动（过滤索引类条目）
-    if concepts and concepts.get("items"):
-        top = [c for c in real_concepts(concepts["items"]) if c.get("net", 0) > 0][:3]
-        hot_concepts = [f"{c['name']}(+{c['net']:.1f}亿)" for c in top]
-        if hot_concepts:
-            text = f"主力流向：{'、'.join(hot_concepts[:3])}"
-            anomalies.append({
-                "tag": "概念热点",
-                "emoji": "🔥",
-                "text": text,
-                "color": "red",
-                "signal": "green",
-            })
+    # 4. 概念热点（前 5）
+    # 🛡 2026-09-11 主人令：口径改为与「板块资金趋势·盘中追热」卡的【概念流入 TOP5】同源同口径
+    #   （sector_fund_flow.json 里 type=='概念' 的前 5 名，净额降序），替代原 concept_ranking 的 3 条，
+    #   让同一屏上两处「概念」永远同一批名字、同一个数。
+    hot_concepts = sorted([s for s in _sector_list(sectors, "sectors_in")
+                           if s.get("type") == "概念" and float(s.get("net") or 0) > 0],
+                          key=lambda s: -float(s.get("net") or 0))[:5]
+    if hot_concepts:
+        anomalies.append({
+            "tag": "概念热点",
+            "emoji": "🔥",
+            "text": f"主力流向：{'、'.join(f"{s['name']}(+{float(s['net']):.1f}亿)" for s in hot_concepts)}",
+            "color": "red",
+            "signal": "green",
+        })
+
+    # 4b. 行业资金（新建独立行）
+    # 🛡 2026-09-11 主人令：行业单独成行，与概念分开写明白。
+    #   大数 = 申万一级 31 行业净额（与卡片大数同口径）；
+    #   流入 TOP5 / 流出 TOP3 = type=='行业'（东财行业，含二三级子行业，与卡片两张榜同口径）。
+    #   ⚠️ 流出榜必须【按净额升序取前三】= 真实最大流出；卡片旧写法 sectors_out.slice(0,3)
+    #   取的是文件里"最小流出"的三条（≈-0.01亿），显示无意义。
+    ind_in = sorted([s for s in _sector_list(sectors, "sectors_in") if s.get("type") == "行业"],
+                    key=lambda s: -float(s.get("net") or 0))[:5]
+    ind_out = sorted([s for s in _sector_list(sectors, "sectors_out") if s.get("type") == "行业"],
+                     key=lambda s: float(s.get("net") or 0))[:3]
+    sw1_net = sw1_industry_net(sectors)
+    if sw1_net is not None or ind_in:
+        parts = []
+        parts.append(f"净额(行业·申万一级31)：{sw1_net:+.1f}亿" if sw1_net is not None else "净额(行业)：待更新")
+        if ind_in:
+            parts.append("流入：" + _fmt_sector_list(ind_in))
+        if ind_out:
+            parts.append("流出：" + _fmt_sector_list(ind_out, signed=True))
+        anomalies.append({
+            "tag": "行业资金",
+            "emoji": "🏭",
+            "text": " ｜ ".join(parts),
+            "color": "blue",
+            "signal": "red" if (sw1_net is not None and sw1_net < 0) else "green",
+        })
 
     # 5. 个股主力异动
     if capital and capital.get("top_inflow"):
@@ -343,6 +416,8 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
             })
 
     # 去重并限制条数
+    # 🛡 2026-09-11：上限 5 → 6 —— 新增「行业资金」独立行后，若仍限 5 条会把原有的
+    #   「涨停热度 / 个股异动」挤掉（行为回退）。
     seen = set()
     unique = []
     for a in anomalies:
@@ -350,7 +425,7 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
         if key not in seen:
             seen.add(key)
             unique.append(a)
-    return unique[:5]
+    return unique[:6]
 
 
 def _strategy_signal(text):

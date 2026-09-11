@@ -104,7 +104,7 @@ jobs:
               all)        echo "category=all" >> "$GITHUB_OUTPUT"; echo "label=手动派发(全量)" ;;
               *)          echo "category=all" >> "$GITHUB_OUTPUT"; echo "label=手动派发(未知入参→all)" ;;
             esac
-          else
+          elif [ -n "$CRON" ]; then
             # 🛡 2026-09-11 小九的工程师（三档口径对齐·清理幽灵分支）：
             #   case 表此前同时接受 4 组 cron，其中 3 组**已不在本文件**——盘中
             #   `*/30 1-3` / `*/30 5-7`（09-10 起盘中抓取改由本机调度器
@@ -126,6 +126,30 @@ jobs:
                 echo "category=all" >> "$GITHUB_OUTPUT"
                 echo "label=兜底(未匹配cron $CRON, 走all)" ;;
             esac
+          else
+            # 🛡 2026-09-11 小九的工程师·一劳永逸（治「裸 dispatch 落 all」）：
+            #   实证 09-11：09:39–10:21 有 6 次 `workflow_dispatch` 但**未带 category 入参**
+            #   （actor=github-actions[bot]）→ 既无 IN 也无 CRON → 原先一路落到 `*)` = **all（最重档）**
+            #   → 盘中跑了盘后策略（四量等）→ 命中 0 只 → 洗空 data/FOUR_VOLUME.js →
+            #     前端卡空 + CI pre_deploy_audit 硬阻断整站部署。
+            #   修复：无 IN 且无 CRON 时，按 **CST 当前时刻自适应** 归类，绝不再落 all。
+            #   （all 仅保留给周末周度与显式请求；盘中派发无入参也只会跑 intraday，危害面归零。）
+            # 用 python 显式 +8h 计算 CST，不依赖 TZ 环境变量是否生效（跨 runner 更稳）
+            HM=$(python3 -c "from datetime import datetime,timezone,timedelta;n=datetime.now(timezone.utc)+timedelta(hours=8);print(n.hour*60+n.minute)")
+            HSTR=$(python3 -c "from datetime import datetime,timezone,timedelta;n=datetime.now(timezone.utc)+timedelta(hours=8);print('%d:%02d'%(n.hour,n.minute))")
+            if [ "$HM" -ge 505 ] && [ "$HM" -lt 540 ]; then
+              echo "category=premarket" >> "$GITHUB_OUTPUT"
+              echo "label=裸派发·按时刻自适应(盘前 $HSTR)"
+            elif [ "$HM" -ge 540 ] && [ "$HM" -le 905 ]; then
+              echo "category=intraday" >> "$GITHUB_OUTPUT"
+              echo "label=裸派发·按时刻自适应(盘中 $HSTR)"
+            elif [ "$HM" -gt 905 ] && [ "$HM" -le 1290 ]; then
+              echo "category=post_close" >> "$GITHUB_OUTPUT"
+              echo "label=裸派发·按时刻自适应(盘后 $HSTR)"
+            else
+              echo "category=all" >> "$GITHUB_OUTPUT"
+              echo "label=裸派发·按时刻自适应(深夜 $HSTR → all)"
+            fi
           fi
           # 注：原 if 兜底已删（重复 echo 同一 output 键会导致 GitHub Action 报 Multiple outputs）
 
@@ -822,4 +846,93 @@ jobs:
                       f.write(f"## ❌ 假成功：{msg}\n\n未推进文件："
                               + ", ".join(f"`{x}`" for x in stale) + "\n")
               sys.exit(1)
+          PY
+
+      # 🔁 2026-09-11 小九的工程师·一劳永逸（治「盘中 14 档双源皆哑」）：
+      #   病灶：盘中 20 分钟档此前**只有定时器**——`v8_cn_fetch_intraday_lemoncat.yml` 的
+      #     14 档 GitHub schedule。实证 2026-09-11：该 workflow **全天 0 次运行**
+      #     （GitHub schedule 静默失约，平台级问题、无法在本仓根治），WorkBuddy 侧对应
+      #     调度器同时处于 PAUSED → 10:40 / 11:00 / 11:20 / 11:30 **四个档位全部零派发**，
+      #     数据两次靠人工兜底（10:48、11:36）才没断档。
+      #   修法：**不再依赖任何定时器**——本轮 intraday 成功落地后，由本步自行派发下一轮。
+      #     间隔 = 本轮耗时（实测 9~18 分钟），天然落在「20 分钟档」区间；
+      #     只要链上有一环活着，链条就自己维持到收盘；窗口外自动停止。
+      #   闸门：① 仅盘中窗口（09:38-11:32 / 12:58-15:05 CST）；② 距本轮开跑 <15 分钟则等待，
+      #         保持 20 分钟档节奏、不与外部派发叠加成风暴；③ 幂等闸门已生效时不接力。
+      #   兜底：链条若被异常掐断（run 被 timeout 杀死致本步未执行），由 v8_cn_fetch_watchdog
+      #         的「数据极陈旧(>45min)」分支恢复，形成「链式维持 + 状态兜底」双保险。
+      - name: "🔁 盘中自接力（不依赖定时器·链式维持到收盘）"
+        id: relay
+        if: always() && steps.gate.outputs.skip != 'true' && steps.cat.outputs.category == 'intraday'
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          V8_RUN_START: ${{ github.run_started_at }}
+          V8_RUN_ID: ${{ github.run_id }}
+        run: |
+          python3 - <<'PY'
+          import os, json, sys, time, datetime, urllib.request
+
+          tok  = os.environ.get("GITHUB_TOKEN", "")
+          repo = os.environ.get("GITHUB_REPOSITORY", "ah-quant999/quant-scanner-v8")
+          me   = str(os.environ.get("V8_RUN_ID", ""))
+          rstart = (os.environ.get("V8_RUN_START", "") or "").strip()
+
+          CST = datetime.timezone(datetime.timedelta(hours=8))
+          now = datetime.datetime.now(CST)
+          hm  = now.hour * 60 + now.minute
+
+          # 盘中窗口：上午 09:38-11:32 / 下午 12:58-15:05（收盘跑完最后一档即自然终止）
+          in_win = (9 * 60 + 38 <= hm <= 11 * 60 + 32) or (12 * 60 + 58 <= hm <= 15 * 60 + 5)
+          print(f"[relay] CST={now:%H:%M:%S} hm={hm} in_window={in_win}")
+          if not in_win:
+              print("[relay] 非盘中窗口（午休 / 已收盘）→ 链条在此自然终止，交由盘前/盘后档与看门狗")
+              sys.exit(0)
+
+          H = {"Authorization": "Bearer " + tok,
+               "Accept": "application/vnd.github+json",
+               "User-Agent": "v8-relay",
+               "X-GitHub-Api-Version": "2022-11-28"}
+
+          def api(method, url, data=None):
+              body = json.dumps(data).encode() if data is not None else None
+              req = urllib.request.Request(url, data=body, headers=H, method=method)
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  return r.read()
+
+          # 节奏闸门：距本轮开跑不足 15 分钟则等到 15 分钟，避免与外部派发叠加
+          gap = 999.0
+          if rstart:
+              try:
+                  t0 = datetime.datetime.fromisoformat(rstart.replace("Z", "+00:00")).astimezone(CST)
+                  gap = (now - t0).total_seconds() / 60
+              except Exception as e:
+                  print(f"[relay] 解析 run_started_at 失败: {e}")
+          print(f"[relay] 本轮已跑 {gap:.1f} 分钟（口径：距本轮开跑）")
+          if gap < 15:
+              wait = 15 - gap
+              print(f"[relay] 间隔不足 15 分钟 → 等待 {wait:.0f} 分钟后派发（保持 20 分钟档节奏，上限 8 分钟）")
+              time.sleep(min(wait * 60, 480))
+
+          # ① 派发下一轮 intraday（自接力主环）
+          try:
+              api("POST",
+                  f"https://api.github.com/repos/{repo}/actions/workflows/v8_cn_fetch_cloud.yml/dispatches",
+                  {"ref": "main", "inputs": {"category": "intraday"}})
+              print("[relay] ✅ 已派发下一轮 intraday（自接力）")
+          except Exception as e:
+              print(f"[relay] ❌ 派发失败: {e} —— 链条断于此，由 v8_cn_fetch_watchdog(>45min) 恢复")
+              sys.exit(0)
+
+          # ② 同频派发 STOCK_QUOTE 刷新
+          #    原设计依赖「哨兵 e7b2e732 + 4 个时间点兜底」，五个 automation 全 PAUSED
+          #    → 实证 09-11 全天 STOCK_QUOTE 停在昨日 15:03，靠人工兜底才刷新一次。
+          #    现挂到本链上，与抓取同频（约 15-18 分钟一次），不再依赖任何本机定时器。
+          try:
+              api("POST",
+                  f"https://api.github.com/repos/{repo}/actions/workflows/v8_stock_quote_refresh_cloud.yml/dispatches",
+                  {"ref": "main"})
+              print("[relay] ✅ 已派发 STOCK_QUOTE refresh（与抓取同频）")
+          except Exception as e:
+              print(f"[relay] ⚠️ STOCK_QUOTE 派发失败: {e}（不阻断接力主环）")
           PY

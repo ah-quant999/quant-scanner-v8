@@ -98,7 +98,9 @@ CATEGORY_MAP = {
     #   原只标 premarket → 盘后档(17:20/18:20/19:20)根本不抓它，页面却标着「收盘后」语义，
     #   主人截图质问「盘后数据页每个卡时间都不对」。加 post_close 使盘后必重抓一次。
     # 🛡 2026-09-07 主人令：今日判定·环境综合卡盘中随实时数据变化，将其及依赖源纳入 intraday。
-    "MACRO_DATA": "premarket,intraday,post_close",
+    # 🛡 2026-09-11 主人令：宏观为日级/月级数据，不随盘中实时刷（移出 intraday），归盘后更新链；
+    #   盘中「今日判定」链路照常读盘前已生成的 macro_data.json 基线，不受影响。
+    "MACRO_DATA": "premarket,post_close",
     "CRISIS_DATA": "premarket,intraday",
     "MACRO_BRIEF": "premarket,intraday",
     "JUDGMENT_DATA": "premarket,intraday",
@@ -3227,12 +3229,13 @@ def _clear_intraday_for_premarket(category, only=None):
     save("CAPITAL_FLOW_DATA", data)
 
     # MACRO_DATA：2026-09-08 一劳永逸（主人质询「放盘后数据，为啥盘前会清空」）。宏观为日级/月级
-    #   数据，盘前保留上一交易日值并打标记（有真实内容才写，避免把 stub 又存回去），开盘后批次自然刷新。
+    #   数据，盘前保留上一交易日值并打标记（有真实内容才写，避免把 stub 又存回去）。
+    #   2026-09-11 主人令：宏观已移出 intraday（盘前+盘后各刷一次），此处措辞同步修正。
     data = _load_judgment_raw("MACRO_DATA", VAR_TO_RAW.get("MACRO_DATA")) or {}
     if data.get("monetary") or data.get("cpi") or data.get("pmi"):
         data.pop("no_data", None)
         data["premarket_cleared"] = True
-        data["note"] = "宏观为日级/月级数据，盘前保留上一交易日值，开盘后自动刷新"
+        data["note"] = "宏观为日级/月级数据，盘前+盘后各刷新一次，盘中不随实时更新"
         save("MACRO_DATA", data)
 
     print(f"🧹 盘前清空完成（保留 SH_SZ_HISTORY/CAPITAL_FLOW_DATA/LIMIT_UP_HEATMAP/ETF_DAILY_MONITOR）")
@@ -3662,6 +3665,16 @@ def main(category=None, only=None):
         [2026-08-26 一劳永逸-理顺cn fetch时序] 若 data/FOUR_VOLUME.js 已是「今日」产出，
            说明算法链(run_algorithms, 19:15 CST，先于 final_recommend) 本轮已生成四量 -> 跳过，
            避免 30 分 patrol 在 final_recommend 之后又重发四量 -> 四量卡时间戳晚于最终推荐(逻辑倒置)。"""
+        # 🛡 2026-09-11 小九的工程师·一劳永逸「盘中禁跑盘后策略」：
+        #   四量是**盘后日线**策略，非收盘时段跑，当日日线尚未成型 → 必然命中 0 只。
+        #   实证 09-11：盘中某轮把线上非空的 FOUR_VOLUME.js（5 只）洗成 total:0（commit 049925d5）
+        #   → ① 前端「四量终极」卡空；② CI pre_deploy_audit 判「data/ 下过小文件」硬阻断整站部署。
+        #   15:05 CST 前一律不重算；盘后由本函数或算法链按当日收盘数据产出。
+        _now = now_cst()
+        if _now.hour * 60 + _now.minute < 15 * 60 + 5:
+            print("  [skip] 四量终极为盘后日线策略，当前 %s 未到收盘(15:05)，跳过重算（防洗空）"
+                  % _now.strftime("%H:%M"))
+            return
         # 当日新鲜度闸门：仅当四量尚未是今日产出时才重算(同时自愈陈旧/缺失)。
         import re as _re
         _fv = ROOT / "data" / "FOUR_VOLUME.js"
