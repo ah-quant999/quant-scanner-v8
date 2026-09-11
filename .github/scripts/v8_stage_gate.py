@@ -479,6 +479,11 @@ def main() -> int:
         for st in ("A", "B", "D", "E"):
             ok, cnt, _det = check_ready(a.root, st, ds, floor, kind)
             lines.append(f"ready_{st}={cnt}")
+            # 🛡 2026-09-11 一劳永逸（阿狸咪）：把闸门的**布尔裁决**一并透出。
+            #   链尾问责步曾写死 `[ "$B_FRESH" = "3/3" ]`，而本契约 2026-09-11 已改为
+            #   「9 项 / need=8」（ready_B=8/9 或 9/9）→ 字面量永不匹配 → 每轮 B 批假红灯。
+            #   透出 true/false 后，问责只消费闸门裁决，不再复制字面量 ⇒ 契约再变也不漂移。
+            lines.append(f"ready_ok_{st}={'true' if ok else 'false'}")
         print("\n".join(lines))
         return 0
 

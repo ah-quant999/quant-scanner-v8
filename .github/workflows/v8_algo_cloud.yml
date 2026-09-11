@@ -688,8 +688,11 @@ jobs:
       #   背景（09-10 实证）：盘后 15:47~18:57 六轮 workflow 全部 success，
       #   实测一步没跑（runner 时区被忽略 → 闸门误判「6-15 点无效时段」静默跳过）。
       #   本步骤把「静默跳过 / 跑完无产出」从"绿色成功"变成**可见告警或红灯**：
-      #     · 非交易日 / 盘中档 / 三模块已新鲜 / A·E 批 → notice（合规，不算失败）
-      #     · 交易日盘后档：链没跑 或 跑了但三模块仍不新鲜 → ::error + exit 1
+      #     · 非交易日 / 盘中档 / 目标批已就绪 / A·E 批 → notice（合规，不算失败）
+      #     · 交易日盘后档：链没跑 或 跑了但目标批仍不就绪 → ::error + exit 1
+      #   🛡 2026-09-11 一劳永逸（阿狸咪）：判据已改为消费闸门裁决 `ready_ok_<stage>`
+      #     （原写死 "3/3" / "1/1"，而 B 契约已变为「9 项/need=8」→ 字面量永不匹配
+      #      → 每轮 B 批被判假成功假红灯）。契约今后再变也不会漂移。
       #       （这正是假成功 —— 必须红，不能再让"什么都没产出"的 run 绿灯放过）
       #   凌晨 00:00-05:59 属回填窗口（产物可能刚产出、日期是今天），放宽到任意时刻。
       #   只读 data/*.js，绝不改数据。
@@ -710,14 +713,20 @@ jobs:
           CHK=$(python .github/scripts/v8_stage_gate.py --root . --recheck --today "$DAY" 2>/dev/null)
           B_FRESH=$(printf '%s' "$CHK" | grep -m1 '^ready_B=' | cut -d= -f2)
           D_FRESH=$(printf '%s' "$CHK" | grep -m1 '^ready_D=' | cut -d= -f2)
+          # 🛡 2026-09-11 一劳永逸（阿狸咪）：闸门裁决布尔值 —— 问责只消费它，不再写死
+          #   命中数（原写死 "3/3"/"1/1"，而 B 契约已变为 9 项 need=8 → 字面量永不匹配
+          #   → 每轮 B 批被判「假成功」假红灯）。契约再变也不会漂移。
+          B_OK=$(printf '%s' "$CHK" | grep -m1 '^ready_ok_B=' | cut -d= -f2)
+          D_OK=$(printf '%s' "$CHK" | grep -m1 '^ready_ok_D=' | cut -d= -f2)
           RC=0
 
-          echo "问责输入: 目标批=${TGT:-?} 闸门放行=${OK:-?} 执行标志=${PROCEED:-?} 算法步骤=${OUTCOME:-?} 数据日=${DAY:-?}(${KIND:-?}) CST=${HHMM} B三模块=${B_FRESH:-?} D最终推荐=${D_FRESH:-?}"
+          echo "问责输入: 目标批=${TGT:-?} 闸门放行=${OK:-?} 执行标志=${PROCEED:-?} 算法步骤=${OUTCOME:-?} 数据日=${DAY:-?}(${KIND:-?}) CST=${HHMM} B就绪=${B_FRESH:-?}(${B_OK:-?}) D最终推荐=${D_FRESH:-?}(${D_OK:-?})"
           { echo "### 🛡 盘后算法链结果问责"; echo ""; echo "| 项 | 值 |"; echo "|---|---|";
             echo "| 目标批次 | **${TGT:-?}** |"; echo "| 闸门放行 | ${OK:-?} |";
             echo "| 执行标志 proceed | ${PROCEED:-?} |"; echo "| 算法链结果 | ${OUTCOME:-?} |";
             echo "| 数据日 | ${DAY:-?} (${KIND:-?}) |"; echo "| 当前 CST | ${HHMM} |";
-            echo "| B 批三模块 | ${B_FRESH:-?} |"; echo "| D 批最终推荐 | ${D_FRESH:-?} |"; } >> "$GITHUB_STEP_SUMMARY"
+            echo "| B 批就绪（闸门同源） | ${B_FRESH:-?} / ${B_OK:-?} |";
+            echo "| D 批最终推荐（闸门同源） | ${D_FRESH:-?} / ${D_OK:-?} |"; } >> "$GITHUB_STEP_SUMMARY"
 
           if [ "${KIND:-none}" = "none" ]; then
             echo "::notice title=v8-algo-holiday::休市日（无 T+1 需求），不跑算法链（合规）"; exit 0
@@ -740,9 +749,20 @@ jobs:
           # ① 按目标批次问责
           case "$TGT" in
             B|ALL)
-              [ "$B_FRESH" = "3/3" ] || { echo "::error title=v8-algo-stale::${TGT} 批跑完但选股三模块仍非本数据日盘后产出（${B_FRESH}，执行=${OUTCOME:-?}）—— 假成功，必须排查"; RC=1; } ;;
+              # 🛡 2026-09-11 一劳永逸（阿狸咪）：判据改为消费闸门裁决布尔值。
+              #   旧的 `[ "$B_FRESH" = "3/3" ]` 在 B 契约改为「9 项/need=8」后永不匹配
+              #   → 每轮 B 批被判「假成功」假红灯（且把 run 拖成 failure，连带 build 被跳过）。
+              case "${B_OK:-}" in
+                true)  ;;
+                false) echo "::error title=v8-algo-stale::${TGT} 批跑完但选股批次仍非本数据日盘后产出（闸门裁决=未就绪 ${B_FRESH}，执行=${OUTCOME:-?}）—— 假成功，必须排查"; RC=1 ;;
+                *)     echo "::error title=v8-algo-gate-skew::问责步未取到 ready_ok_B（闸门与 workflow 版本错位）—— 请核对 .github/scripts/v8_stage_gate.py --recheck 输出，不得按成功放过"; RC=1 ;;
+              esac ;;
             D)
-              [ "$D_FRESH" = "1/1" ] || { echo "::error title=v8-algo-stale::D 批跑完但 FINAL_RECOMMEND 仍非本数据日盘后产出（${D_FRESH}，执行=${OUTCOME:-?}）—— 假成功，必须排查"; RC=1; } ;;
+              case "${D_OK:-}" in
+                true)  ;;
+                false) echo "::error title=v8-algo-stale::D 批跑完但 FINAL_RECOMMEND 仍非本数据日盘后产出（闸门裁决=未就绪 ${D_FRESH}，执行=${OUTCOME:-?}）—— 假成功，必须排查"; RC=1 ;;
+                *)     echo "::error title=v8-algo-gate-skew::问责步未取到 ready_ok_D（闸门与 workflow 版本错位）—— 请核对 .github/scripts/v8_stage_gate.py --recheck 输出，不得按成功放过"; RC=1 ;;
+              esac ;;
             A|E)
               [ "${OUTCOME:-none}" = "success" ] || { echo "::error title=v8-algo-failed::${TGT} 批执行未成功（${OUTCOME:-?}）"; RC=1; } ;;
           esac
