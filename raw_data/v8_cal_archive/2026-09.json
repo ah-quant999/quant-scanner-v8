@@ -1,6 +1,6 @@
 {
  "month": "2026年9月",
- "update_time": "2026-09-10 17:41",
+ "update_time": "2026-09-11 08:07",
  "legend": [
   {
    "title": "重要政策",
@@ -207,24 +207,24 @@
     {
      "num": 10,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇨🇳 CPI/PPI数据",
        "cls": "data2",
-       "released": false
+       "released": true
       },
       {
        "text": "华为Mate系列发布会",
        "cls": "appl",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 11,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇺🇸 密歇根消费者信心预公布",
