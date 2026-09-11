@@ -1610,6 +1610,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/STRONG_BREAKOUT.js?v=1789139764" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=1789139764" defer></script>
     <script src="data/RPS_BACKTEST.js?v=1789139764" defer></script>
+<!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
+<script src="data/BACKTEST_ALL_ALGOS.js?v=1789137702" defer></script>
     <script src="data/FACTOR_LAB.js?v=1789139764" defer></script>
 <!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
 <script src="data/ETF_PULSE.js?v=1789139764" defer></script>
@@ -4855,6 +4857,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var _dim = (m.sample||0)<SAMPLE_LOW_THRESHOLD ? ';opacity:.6;' : '';
         return '<span style="color:'+_colorPL(m.ar)+';'+_dim+'">'+(m.ar>0?'+':'')+m.ar.toFixed(2)+'%</span>';
       }
+      // 🆕 2026-09-11 全算法回测汇总用（null → 「—」，绝不把「没样本」画成 0）
+      function _wrNum(v,n){
+        if(v==null) return '<span style="color:var(--dim);">—</span>';
+        var _d = (n||0) < SAMPLE_LOW_THRESHOLD ? ';opacity:.55;' : '';
+        return '<span style="font-weight:700;color:'+_colorWR(v)+_d+'">'+Number(v).toFixed(1)+'%</span>';
+      }
+      function _arNum(v,n){
+        if(v==null) return '<span style="color:var(--dim);">—</span>';
+        var _d = (n||0) < SAMPLE_LOW_THRESHOLD ? ';opacity:.55;' : '';
+        return '<span style="color:'+_colorPL(v)+_d+'">'+(v>0?'+':'')+Number(v).toFixed(2)+'%</span>';
+      }
       function _riskCell(m){  // P2-C：最大回撤+夏普紧凑展示
         if(!m.ready) return '<span style="color:var(--dim);font-size:10px;">—</span>';
         var _dim = (m.sample||0)<SAMPLE_LOW_THRESHOLD ? ';opacity:.6;' : '';
@@ -4862,6 +4875,119 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var sr = (m.sharpe||0).toFixed(2);
         return '<span style="font-size:10px;color:var(--sub);white-space:nowrap;'+_dim+'">DD '+dd+'%<br><span style="color:'+(m.sharpe>=1?'#22c55e':'var(--sub)')+';">SR '+sr+'</span></span>';
       }
+      /* ══ 🆕 2026-09-11 主人令：全算法回测汇总（按前端卡名 · 收益率与胜率降序） ══
+         数据源 window.BACKTEST_ALL_ALGOS —— 由 E 批（回测批，在 D 批最终推荐之后）
+         algorithms/gen_backtest_all_algos.py 产出。三个子块：
+           ① 卡级主表：每张卡只取既定主口径（同口径横比，绝不把 T+1 与 T+20 放一起比），
+              样本 ≥30 才排名，按「胜率降序 → 平均收益降序」。
+           ② 分档阶梯：跟踪池逐日现采前向收益 T+5/10/20/30/45/60/75/90 —— 有多少天算
+              多少天，样本随交易日自然累积，**不必等 90 天期满**。
+           ③ 下架提醒：低胜率/低收益、样本达标且源在链内的，逐条提请主人决定是否下架。
+         诚实铁律：未知一律 null → 显示「—」或「累积中」，绝不把「没样本」画成 0。 */
+      (function(){
+        var A = window.BACKTEST_ALL_ALGOS;
+        if(!A || !A.rows) return;
+        var MINS = A.min_samples || 30;
+        function _asof(t){ return t ? ('<span style="font-size:10px;color:var(--sub);">'+_esc(String(t).substring(0,16))+'</span>') : '<span style="color:var(--dim);">—</span>'; }
+        html += '<div style="margin:18px 0 6px;font-size:13px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>🧮</span>全算法回测汇总'
+             +  ' <span style="font-size:11px;color:var(--dim);font-weight:500;">按前端卡名 · 胜率降序 · 样本≥'+MINS+' 才排名 · 最终推荐之后跑</span></div>';
+
+        /* ① 卡级主表 */
+        html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+        html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+        ['#','策略卡','回测口径','样本','胜率','平均收益','源更新时间'].forEach(function(h){
+          html += '<th style="padding:6px;text-align:left;color:var(--sub);white-space:nowrap;">'+h+'</th>';
+        });
+        html += '</tr></thead><tbody>';
+        (A.ranking||[]).forEach(function(r){
+          html += '<tr style="border-bottom:1px solid var(--border2);">'
+               +  '<td style="padding:6px;color:var(--sub);font-weight:700;">'+r.rank+'</td>'
+               +  '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">'+(r.icon||'')+_esc(r.card)+'</td>'
+               +  '<td style="padding:6px;color:var(--dim);font-size:10.5px;">'+_esc(r.label||'—')+'</td>'
+               +  '<td style="padding:6px;color:var(--sub);">'+(r.sample||0)+'</td>'
+               +  '<td style="padding:6px;">'+_wrNum(r.win_rate,r.sample)+'</td>'
+               +  '<td style="padding:6px;">'+_arNum(r.avg_return,r.sample)+'</td>'
+               +  '<td style="padding:6px;">'+_asof(r.source_time)+'</td>'
+               +  '</tr>';
+        });
+        if(!(A.ranking||[]).length){
+          html += '<tr><td colspan="7" style="padding:14px;text-align:center;color:var(--sub);">暂无样本≥'+MINS+' 的策略卡，累积中（见下方）</td></tr>';
+        }
+        html += '</tbody></table></div>';
+
+        /* ② 累积中（不排名，明示原因） */
+        if((A.insufficient||[]).length){
+          html += '<div style="margin:8px 0 4px;font-size:11px;color:var(--dim);line-height:1.7;">⏳ <b style="color:var(--sub);">累积中（样本 &lt; '+MINS+'，不进主表、不做下架评估）</b>：'
+               +  (A.insufficient||[]).map(function(r){
+                    return _esc(r.card)+'·'+_esc(r.label||'—')+' <b style="color:var(--sub);">n='+(r.sample||0)+'</b>'
+                         + (r.win_rate==null?'':'·胜率'+Number(r.win_rate).toFixed(1)+'%');
+                  }).join(' ｜ ')
+               +  '</div>';
+        }
+
+        /* ③ 分档阶梯（跟踪池逐日现采） */
+        var TL = A.track_ladder;
+        if(TL && TL.available && (TL.algos||[]).length){
+          var HZ = TL.horizons || [5,10,20,30,45,60,75,90];
+          html += '<div style="margin:14px 0 6px;font-size:12.5px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>🪜</span>跟踪池分档阶梯'
+               +  ' <span style="font-size:11px;color:var(--dim);font-weight:500;">从近到远 · 有多少天算多少天 · 不必等 90 天期满</span></div>';
+          html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;">';
+          html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">'
+               +  '<th style="padding:5px;text-align:left;color:var(--sub);white-space:nowrap;">策略</th>'
+               +  HZ.map(function(h){ return '<th style="padding:5px;text-align:center;color:var(--sub);white-space:nowrap;">T+'+h+'</th>'; }).join('')
+               +  '<th style="padding:5px;text-align:left;color:var(--sub);white-space:nowrap;">样本就绪</th></tr></thead><tbody>';
+          (TL.algos||[]).forEach(function(a){
+            var bh = a.by_horizon || {};
+            var cov = a.coverage || {};
+            html += '<tr style="border-bottom:1px solid var(--border2);">'
+                 +  '<td style="padding:5px;color:var(--txt);font-weight:700;white-space:nowrap;">'+_esc(a.display_name||a.algo||'—')
+                 +  '<div style="font-size:10px;color:var(--dim);font-weight:400;">跟踪中 '+(a.tracking==null?'—':a.tracking)+' 只</div></td>';
+            HZ.forEach(function(h){
+              var v = bh[String(h)] || {};
+              if(!v.samples){
+                html += '<td style="padding:5px;text-align:center;color:var(--dim);font-size:10px;">累积中</td>';
+              }else{
+                html += '<td style="padding:5px;text-align:center;white-space:nowrap;">'
+                     +  '<div style="font-size:10px;color:var(--sub);">n='+v.samples+'</div>'
+                     +  '<div style="font-weight:700;color:'+_colorWR(v.win_rate)+'">'+(v.win_rate==null?'—':Number(v.win_rate).toFixed(1)+'%')+'</div>'
+                     +  '<div style="color:'+_colorPL(v.avg_return)+'">'+(v.avg_return==null?'—':(v.avg_return>0?'+':'')+Number(v.avg_return).toFixed(2)+'%')+'</div>'
+                     +  '</td>';
+              }
+            });
+            html += '<td style="padding:5px;color:var(--dim);font-size:10px;white-space:nowrap;">'
+                 +  (cov.with_series==null?'—':('有数据 '+cov.with_series+'/'+cov.items+'<br>数据截至 '+_esc(cov.bar_asof||'—')+'<br>T+5 就绪 '+(cov.t5_ready==null?'—':cov.t5_ready)+' 只'))
+                 +  '</td></tr>';
+          });
+          html += '</tbody></table></div>';
+          html += '<div style="font-size:10.5px;color:var(--sub);margin:6px 0 0;line-height:1.6;">📌 '+_esc((TL.algos[0]&&TL.note)||'')+' 口径：信号日收盘买入、持有到第 h 个真实交易日收盘、扣双边成本'+(TL.cost_pct_roundtrip==null?'':(' '+TL.cost_pct_roundtrip+'%'))+'；更新于 '+_esc(String(TL.update_time||'—'))+'。</div>';
+        }
+
+        /* ④ 下架提醒 / 观察名单 */
+        if((A.delist_advice||[]).length){
+          html += '<div style="margin:12px 0;padding:10px 12px;border-left:4px solid #ef5350;border-radius:8px;background:rgba(239,83,80,.08);">';
+          html += '<div style="font-size:12.5px;font-weight:700;color:#ef5350;margin-bottom:6px;">🔔 低绩效提醒 —— 是否下架并停止跟踪？（共 '+(A.delist_advice||[]).length+' 条）</div>';
+          (A.delist_advice||[]).forEach(function(d){
+            html += '<div style="font-size:11.5px;color:var(--txt);line-height:1.8;">• <b>'+_esc(d.card)+'</b>·'+_esc(d.label||'—')
+                 +  '：'+_esc((d.reasons||[]).join('；'))+' <span style="color:var(--sub);">（n='+(d.sample||0)+'）</span></div>';
+          });
+          html += '<div style="font-size:10.5px;color:var(--sub);margin-top:6px;">判定线：胜率 &lt; '+(A.low_win_rate==null?'—':A.low_win_rate)+'% 或 平均收益 ≤ '+(A.low_avg_return==null?'—':A.low_avg_return)+'%（已扣成本）。请回复「下架 X」即可停止跟踪。</div>';
+          html += '</div>';
+        }
+        if((A.watch_list||[]).length){
+          html += '<div style="margin:10px 0;padding:10px 12px;border-left:4px solid rgba(148,163,184,.5);border-radius:8px;background:rgba(148,163,184,.05);">';
+          html += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;">👀 观察名单（不提议下架，仅记录）</div>';
+          (A.watch_list||[]).forEach(function(w){
+            html += '<div style="font-size:11px;color:var(--sub);line-height:1.8;">• <b style="color:var(--txt);">'+_esc(w.card)+'</b>·'+_esc(w.label||'—')
+                 +  '：'+_esc((w.reasons||[]).join('；'))
+                 +  (w.note?(' <span style="color:var(--dim);">['+_esc(w.note)+']</span>'):'')+'</div>';
+          });
+          html += '</div>';
+        }
+        html += '<div style="font-size:10.5px;color:var(--dim);margin:6px 0 14px;line-height:1.6;">'
+             +  '🧾 口径说明：'+_esc(A.primary_rule||'')+' 排序：'+_esc(A.sort_rule||'')+' 数据日 '+_esc(A.data_day||'—')
+             +  '（'+_esc(A.chain_note||'')+'）。'+_esc(A.honesty_note||'')+'</div>';
+      })();
+
       html += '<div style="margin:16px 0 6px;font-size:13px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px;"><span>📊</span>各选股策略回测汇总 <span style="font-size:11px;color:var(--dim);font-weight:500;">仅活跃策略 · 样本累积后自动刷新 · 样本&lt;30 灰显</span></div>';
       /* 2026-09-03 主人令：顶部「回测汇总」——跨策略扫描真实样本，算 胜率最高/收益最好（只渲染一次） */
       (function(){

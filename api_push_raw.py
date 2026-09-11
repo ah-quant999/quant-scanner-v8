@@ -207,6 +207,10 @@ def walk_extra():
         # ── 2026-08-19 补入：H 反推短线买点 + 跟踪（auto_run_dn_algorithm / track_h_auto_buy） ──
         # 之前仅手动 commit，未注册到 api_push 队列 → 每天盘后算法链跑完也不上传。
         "data/H_AUTO_BUY.js",           # 反推算法当日候选（脱离 PDF OCR）
+        # ── 🆕 2026-09-11 补入：全算法回测汇总（gen_backtest_all_algos.py 产出）──
+        #   本文件不在 update_v8.py 的 raw→js 映射表内（由脚本自己直接写 data/），
+        #   按本函数约定「需在此注册才能被 api_push 推到 main」。
+        "data/BACKTEST_ALL_ALGOS.js",
         "data/H_AUTO_BUY_TRACK.js",     # 反推算法累计胜率（每日跟踪 T+1/T+3/T+5/T+10）
         # 🔴 2026-08-20 根因修复：LHB_7D.js 由 gen_lhb_7d.py 直写 data/，之前未注册
         #    到 extra → 算法链跑完也不上传，页面 7 日龙虎榜/机游共振长期 stale。

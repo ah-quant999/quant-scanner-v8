@@ -73,6 +73,8 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "scripts/gen_factor_progress.py": 900,          # 读 factor_audit.json，纯本地
     "scripts/fetch_valuation_percentile.py": 1200,  # akshare stock_index_pe_lg（理杏仁），单接口
     "scripts/fetch_index_value_framework.py": 900,  # 读本地 INDEX_HISTORY.js + numpy 计算
+    # 🆕 2026-09-11：全算法回测汇总——纯本地读 data/*.js + raw_data/algo_track.json，零网络
+    "gen_backtest_all_algos.py": 900,
 }
 
 
@@ -236,6 +238,12 @@ ORDER = [
     "scripts/gen_factor_progress.py",         # → raw_data/factor_progress.json（读 factor_audit，须在其后）
     "scripts/fetch_valuation_percentile.py",  # → raw_data/valuation_percentile.json（A股指数 PE 分位）
     "scripts/fetch_index_value_framework.py", # → raw_data/index_value_framework.json（指数中枢+趋势门控）
+
+    # 🆕 2026-09-11 主人令「在每日最终推荐出来后，开始回测所有算法，按前端卡名都写出来」：
+    #   全算法回测汇总聚合器。放 ORDER **最末**⇒ 在 E 批内最后执行（同 stage 沿用 ORDER
+    #   相对次序）：它要读 E 批其他脚本本轮刚产出的 CRDS_BACKTEST / BACKTEST_TDX /
+    #   FOUR_VOLUME_BACKTEST / FACTOR_LAB_BACKTEST，先跑就会读到上一轮旧数。
+    "gen_backtest_all_algos.py",   # → raw_data/backtest_all_algos.json + data/BACKTEST_ALL_ALGOS.js
     ]
 
 
@@ -302,6 +310,9 @@ STAGES = {
         "v8/backtest_crds.py",   # → data/CRDS_BACKTEST.js （逆势龙头回测；2026-09-09 挂链补登，此前仅存在于 v8/ 目录、STAGES/ORDER 均未挂 → 永远跑不到）
         # 2026-09-06 主人令：AI预测卡回测 INVALID → 下架，停跑 path_probability_backtest.py
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
+        # 🆕 2026-09-11 主人令：全算法回测汇总（按前端卡名、胜率/收益降序、低绩效提请下架）。
+        #   ⚠️ 必须在 E 批**最后**——读同批其他脚本刚产出的回测产物 + D 批最终推荐。
+        "gen_backtest_all_algos.py",   # → data/BACKTEST_ALL_ALGOS.js（策略回测页总览）
         # 🛡 2026-09-07 主人令「互踢/暴风/覆盖不想再看到·方案 B 一劳永逸根治」：
         #   原 D 批首脚本(factor_lab 生成器)冷启动 50-90min（注释自述），串行堵在
         #   final_recommend 前 → 整批从理论 8min 拖到实测 35-90min。
