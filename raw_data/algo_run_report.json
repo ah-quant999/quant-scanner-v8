@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-11 10:33:47",
-  "run_start": "2026-09-11 08:53:58",
-  "ok": 27,
+  "update_time": "2026-09-11 15:16:58",
+  "run_start": "2026-09-11 15:08:36",
+  "ok": 11,
   "fail": 1,
   "failed_scripts": [
     {
-      "script": "refresh_stock_metadata.py",
-      "reason": "超时 >30min"
+      "script": "fetch_stock_quote_v8.py",
+      "reason": "退出码 1 | ❌ A股行情异常稀少（0 只 < 3000），新浪+东财均不可用 → 拒绝写输出，保留旧数据"
     }
   ],
   "skipped_by_time_gate": []
