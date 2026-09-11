@@ -3885,18 +3885,25 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var scoreColor = score >= 70 ? 'var(--down)' : score >= 50 ? 'var(--gold)' : score >= 30 ? 'var(--gold)' : 'var(--up)';
     // 红黄绿灯映射：风险度反语义（高=危险/红，低=安全/绿）
     var scoreLight = score >= 70 ? 'red' : score >= 50 ? 'yellow' : score >= 30 ? 'yellow' : 'green';
-    // 每日洞察时间戳：龙虎榜/北向席位数据锚定「数据日期(date)」而非「刷新时间(update_time)」，
-    // 避免两个共振日历一刷新、卡片时间跟着更新、但卡内 LHB/NF 数据仍是昨天的问题（2026-09-11 一劳永逸）。
-    // 整体新鲜度由最旧一条决定（取最小），LHB/NF 用数据日期；其余源用自身 update_time。
-    var _lhbDate = LHB.date ? (LHB.date + '').replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : null;
-    var _nfDate = NF.date ? (NF.date + '').replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : null;
-    var _todayStr = new Date().toISOString().slice(0, 10);
-    var updateTime = [
+    // 🛡 2026-09-12 主人令「一劳永逸」——每日洞察卡时间戳根治（旧实现有两处硬伤）：
+    //   硬伤A：LHB 那一项被替换成 `_lhbDate + ' 15:30:00'` —— 15:30 是**硬编码伪时刻**，
+    //          不是数据真实产出时刻。实证 09-11：LHB_DATA.update_time = 22:35:28，
+    //          卡片却显示 15:30（与主人截图逐字吻合）。15:30 只是「龙虎榜数据截止」的行业口径，
+    //          不是「本卡数据就绪」的时刻，两者不可混用。
+    //   硬伤B：`.sort().shift()` **取最小**（最旧一条）⇒ 只要任一路带伪时刻，
+    //          卡片被永久锁死在 15:30，其它七路 22:xx/23:xx 全部被无视。
+    //   本卡是**八路数据的汇合卡**（危机雷达/选股池/板块资金/波动率/指数/沪深历史/龙虎榜/北向），
+    //   其「更新于」的语义应为：**最后一路上线、这张卡才算成型、才可以开始看** ⇒ 取**最大**。
+    //   数据来源节奏：龙虎榜单飞 fetcher `v8_lhb_fetch` 每交易日 17:30 CST（cron `30 9 * * 1-5`）
+    //   产出 LHB_DATA.js（机游共振 + 北向席位两卡共用），其余七路由 v8_algo_cloud 盘后链陆续产出。
+    var _miTsArr = [
       CR.update_time, CAND.update_time, SR.update_time, VOL.update_time, IQ.update_time,
       window.SH_SZ_HISTORY && window.SH_SZ_HISTORY.update_time,
-      _lhbDate ? (_lhbDate + ' 15:30:00') : LHB.update_time,
-      NF.update_time
-    ].filter(Boolean).sort().shift() || '--';
+      LHB.update_time, NF.update_time
+    ].filter(Boolean).sort();          // 升序
+    var _miAllTs = _miTsArr.length ? _miTsArr[_miTsArr.length - 1] : null;   // 取最大 = 卡成型时刻
+    var _miOldTs = _miTsArr.length ? _miTsArr[0] : null;                    // 取最小 = 最陈旧一路（供后续诊断）
+    var updateTime = _miAllTs || '--';
 
     var h = '';
     // Header：标题、🐻 胶囊、🧺 计数胶囊统一放同一行（与严格三重共识/四量终极格式一致）
@@ -3907,15 +3914,35 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">';
     h += '<span style="font-size:21px;font-weight:800;color:var(--txt)">📊 每日市场洞察</span>';
     // 2026-08-14 修复：时段标签动态判断（原写死"盘后"导致 08:16 盘前数据也显示"盘后"）
-    // 2026-09-11 修复：LHB/NF 数据日期不是今天 → 不挂「今日盘后」，统一显示「盘后」（锚定上一交易日收盘）
+    // 🛡 2026-09-12 主人令「一劳永逸」：时段胶囊改为**锚定真实刷新时刻**，
+    //   不再按「当前钟点」猜（旧实现 `new Date().getHours()` 会说出「22:35 的数据 = 今日盘后」这种错话）。
+    //   判据优先级：① 卡成型时刻不是今天 ⇒ 锚上一交易日收盘，显示「盘后」；
+    //              ② 是今天 ⇒ 按成型时刻的钟点分档（17:30 是龙虎榜单飞 fetcher 的起跑点，
+    //                 过了 17:30 才意味着两张共振日历齐活、本卡才真正成型 ⇒「今日盘后」）。
     var _miHr = new Date().getHours();
-    var _miSlot;
-    if ((_lhbDate && _lhbDate !== _todayStr) || (_nfDate && _nfDate !== _todayStr)) {
+    var _miTsDay = _miAllTs ? String(_miAllTs).slice(0, 10) : null;
+    var _miToday = new Date().toISOString().slice(0, 10);
+    var _miSlot, _miHoriz = '';
+    if (_miAllTs && _miTsDay && _miTsDay !== _miToday) {
+      // 卡内数据整体停留在上一交易日 ⇒ 只称「盘后」，不挂「今日」
       _miSlot = '盘后';
+    } else if (_miAllTs && _miTsDay === _miToday) {
+      // 按**卡成型时刻**（不是当前钟点）分档
+      var _miTsHm = String(_miAllTs).slice(11, 16);        // 'HH:MM'
+      var _miHH = parseInt(_miTsHm.slice(0, 2), 10);
+      var _miMM = parseInt(_miTsHm.slice(3, 5), 10);
+      var _miMin = _miHH * 60 + (isNaN(_miMM) ? 0 : _miMM);
+      _miSlot = (_miMin < 9 * 60) ? '盘前'
+              : (_miMin < 15 * 60) ? '盘中'
+              : (_miMin < 17 * 60 + 30) ? '盘后'
+              : '今日盘后';
+      // 仅当卡成型时刻落在**盘中交易时段**（09:00–15:00 A 股连续竞价）才标「短线」；
+      // 收盘后（15:00 起）数据已是当日定格结果，不再具备「盘中短线」语义 ⇒ 一律不标。
+      _miHoriz = (_miMin >= 9 * 60 && _miMin < 15 * 60) ? '短线' : '';
     } else {
+      // 极端兜底：一路数据都没有 → 退回按当前钟点
       _miSlot = (_miHr < 9) ? '盘前' : (_miHr < 15) ? '盘中' : (_miHr < 17) ? '盘后' : '今日盘后';
     }
-    var _miHoriz = (_lhbDate === _todayStr && _miHr >= 9 && _miHr < 17) ? '短线' : '';
     h += _uBadge(_miSlot, _miHoriz, updateTime);
     if(_insightSignalCount > 0){
       h += _holdBadge(updateTime, _insightSignalCount, '信号');
