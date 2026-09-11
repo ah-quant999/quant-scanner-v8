@@ -48,7 +48,12 @@ ASOF_YM  = KL_END[:7]                              # abn 因子按月刷新标�
 ASOF_Q   = "%dQ%d" % (int(KL_END[:4]), (int(KL_END[5:7]) - 1) // 3 + 1)  # ROE 按季刷新标记
 # 2026-09-11 口径版本号：原为「最近4个累计 roeAvg 求和」(错)，现为「近4个单季 roeAvg 差分求和」并转百分数。
 #   缓存判定带上它 → 旧口径缓存自动失效并重算，无需手工删缓存。
-ROE_VER = 3
+# 2026-09-12 v3→v4：新增质量闸门字段（roe_ok/roe_gate/roe_singles/roe_n_neg/roe_equity）。
+#   🔴 为什么必须升版本号（一劳永逸，勿省）：闸门判定读的是缓存记录里的 roe_ok 字段；
+#      而 L519 的缓存跳过条件不含「roe_ok 是否存在」⇒ 若沿用 v3，3195 条老缓存**全部命中
+#      continue 被跳过**，既不会重算也不会补写 roe_ok ⇒ 闸门在首个季度（ASOF_Q 变化）到来前
+#      **完全不生效 = 装了没接电**。升版本号让老缓存一次性全部失配重算，闸门上线当轮即真实生效。
+ROE_VER = 4
 # 算 ROE_TTM 只需最近 5 个季度的累计值（4 个单季 + 1 个前值），近 2 年足够；
 #   原取近 7 年 = 28 次 query/只，全市场 3193 只约 6 小时必撞 workflow timeout（实测 1.36 s/只·8 次 query）。
 ROE_YEARS = [dt.datetime.now().year - 1, dt.datetime.now().year]
@@ -565,19 +570,26 @@ def main():
     #   闸门在候选层过滤（而非排序后再砍头），保证「大市值档 Top1/3」的样本口径
     #   不被少数噪声股挤占；被剔除的股票仍在缓存里，只是不进榜。
     #   ⚠️ 默认开启；可用 V8_ROE_GATE=0 临时关闭（仅限诊断，生产不得关）。
-    #   兼容历史缓存：老记录没有 roe_ok 字段 → 视为通过（不让旧缓存凭空掉榜）。
     _GATE_ON = os.environ.get("V8_ROE_GATE", "1") != "0"
-    _gated = []
+
+    # 🔴 2026-09-12 自愈断言（一劳永逸·防「装了没接电」复发）：
+    #   闸门判据是候选记录里的 roe_ok 字段。若该字段在候选集中**一条都没有**，说明本轮的
+    #   缓存全部来自闸门上线前的旧版本 ⇒ 所有股票都会被 `v.get("roe_ok", True)` 宽容放行
+    #   ⇒ 闸门静默空转、榜单照旧失真，而日志/产物全绿（典型「假成功」）。
+    #   这里主动硬失败，绝不半开着上线。触发后无需人工干预：删 WORK 目录缓存或
+    #   抬高 ROE_VER 即可让下轮全量重算；本轮放弃推送、保留上一份合格产物。
+    _n_tagged = sum(1 for v in large if "roe_ok" in v)
+    if _GATE_ON and large and _n_tagged == 0:
+        log("ERROR: ROE 闸门无判据 —— 候选", len(large), "只中 0 只带 roe_ok 字段"
+            "（缓存系闸门上线前旧版本）。拒绝推送以免闸门静默空转出假榜。"
+            " 处置：删", CACHE_R, "或抬高 ROE_VER 让下轮全量重算。")
+        bs.logout(); return
     if _GATE_ON:
-        for v in large:
-            if v.get("roe_ok", True):
-                _gated.append(v)
-            else:
-                _gated.append(None)
         _dropped = [v for v in large if not v.get("roe_ok", True)]
         large = [v for v in large if v.get("roe_ok", True)]
         log("ROE 闸门(G1净资产/G2负单季/G3超上限) 剔除", len(_dropped), "只 /",
-            "剔除前", len(_gated), "只",
+            "剔除前", len(_dropped) + len(large), "只",
+            "| 带判据", _n_tagged, "只",
             "| 样例:", [f"{x['code']}({x.get('roe_gate') or '-'})" for x in _dropped[:6]])
     else:
         log("⚠️ V8_ROE_GATE=0 —— ROE 质量闸门已被人为关闭（仅诊断用途）")
