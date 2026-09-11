@@ -135,7 +135,7 @@ READY_SPEC: dict[str, dict] = {
         "must": ["data/LHB_DATA.js"],   # 龙虎榜是「16:30后数据」的核心标志
     },
     "B": {
-        # 🛡 2026-09-11 主人令「一劳永逸」：readiness 清单从 3 项代表产物扩到 8 项。
+        # 🛡 2026-09-11 主人令「一劳永逸」：readiness 清单从 3 项代表产物扩到 9 项。
         #   根因（2026-09-11 09:5x 实证）：原清单只校验 3 个代表产物，而 B 批实际有
         #   28 个脚本、产出几十个 raw_data/*.json。当这 3 项鲜活、其余产物陈旧时，
         #   闸门判「B 批已就绪」→ target_stage=NONE / OUTCOME=skipped
@@ -152,17 +152,18 @@ READY_SPEC: dict[str, dict] = {
             "raw_data/factor_progress.json",
             "raw_data/valuation_percentile.json",
             "raw_data/index_value_framework.json",
+            "raw_data/gold_pool.json",            # 🛡 2026-09-11：金股池改为 B 批 build_candidate_pool 原生派生，纳入就绪硬约束
         ],
-        # need 用 7/8：3 个核心选股产物 + 5 个收编产物，即「只容忍 1 项不新鲜」。
+        "need": 8,
+        # need 用 8/9：3 个核心选股产物 + 5 个收编产物 + gold_pool，即「只容忍 1 项不新鲜」。
         #   ⚠️ 为何不是 5：实测发现 dedup 去重器会把「内容天然稳定」的卡判为伪变更而丢弃
         #   （见 .github/scripts/dedup_fetch_manifest.py 的 _ALWAYS_PUSH）。在去重器修好之前，
-        #   一轮 B 批跑完后线上只会有 3 核心 + 2 张（ai_insights/valuation_percentile）= 5/8。
-        #   若 need=5，闸门会据此判「B 已就绪」→ 空转 → 另 3 张（factor_audit /
-        #   factor_progress / index_value_framework）永远补不上 → 恒红。
-        #   need=7 使闸门在上述状态下判「未就绪」→ 再跑一轮 B → 去重修复生效后 8/8 → 收敛。
-        #   容错：8 项中唯一易碎的是 valuation_percentile（依赖 akshare 外部接口），
-        #   故 7 恰好容忍它单独失败而不把整链锁死。
-        "need": 7,
+        #   一轮 B 批跑完后线上只会有 3 核心 + 2 张（ai_insights/valuation_percentile）= 5/9。
+        #   若 need=5，闸门会据此判「B 已就绪」→ 空转 → 另 4 张（factor_audit /
+        #   factor_progress / index_value_framework / gold_pool）永远补不上 → 恒红。
+        #   need=8 使闸门在上述状态下判「未就绪」→ 再跑一轮 B → 去重修复生效后 9/9 → 收敛。
+        #   容错：9 项中唯一易碎的是 valuation_percentile（依赖 akshare 外部接口），
+        #   故 8 恰好容忍它单独失败而不把整链锁死。
         "must": [],
     },
     "D": {"items": ["data/FINAL_RECOMMEND_DATA.js"], "need": 1, "must": []},

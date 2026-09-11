@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-构建「候选股池」(candidate_pool.json)
-====================================
-股池 = 主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50
-      + 外资研投(自选+研报) + mahoro研报
-后续金股池 = 股池 ∩ (信号共振≥2 或 研报来源)，见 scanner.py。
+构建「候选股池」(candidate_pool.json) 并派生「金股池」(gold_pool.json)
+=========================================================================
+候选股池 = 主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50
+          + 外资研投(自选+研报)
+金股池   = 候选股池 ∩ (外资研投来源 或 多源共振≥2)
+           多源共振：候选股池 sources 中包含 ≥2 个不同来源
+           保留 45 个交易日（与 scanner.py 过期口径一致），带防洗空闸门。
+
+🔴 2026-09-11 一劳永逸修复：scanner.py 未挂入 v8 云端盘后链，导致 gold_pool.json
+   成为孤儿数据（仅 09-11 手动 P0 救回后由盘中云抓取重推）。现改由本脚本在 B 批
+   产完候选池后直接派生金股池，恢复每日刷新。
 
 数据源（生产健壮）：
   A股：stock_zh_a_spot_em(东财) → stock_zh_a_spot(新浪) 回退
@@ -696,6 +702,176 @@ def _merge_membership(today, prev, hyst_days, today_date):
     return members
 
 
+
+# ════════════════════════════════════════════════════════════════
+# 金股池派生（v8 原生）：候选股池 ∩ (外资研投 或 多源共振≥2)
+# ════════════════════════════════════════════════════════════════
+GOLD_POOL_DAYS = 45
+GOLD_POOL_RAW = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                             "raw_data", "gold_pool.json")
+GOLD_POOL_OUT = os.path.join(DATA, "gold_pool.json")
+GOLD_POOL_STOCKS_OUT = os.path.join(DATA, "gold_pool_stocks.json")
+
+
+def _n_trade_days_ago_approx(n, today_date):
+    """45 个交易日 ≈ n*1.4 个自然日（与 scanner.py 的 baostock fallback 口径一致）。"""
+    try:
+        d = datetime.date.fromisoformat(today_date)
+    except Exception:
+        d = datetime.date.today()
+    return (d - datetime.timedelta(days=int(n * 1.4))).strftime("%Y-%m-%d")
+
+
+def _load_prev_gold_pool():
+    """按 raw_data/ → out/ 优先级加载历史金股池（raw_data 为 git tracked 持久副本）。"""
+    for p in (GOLD_POOL_RAW, GOLD_POOL_OUT, GOLD_POOL_STOCKS_OUT):
+        if not os.path.exists(p):
+            continue
+        try:
+            with open(p, "r", encoding="utf-8") as f:
+                d = json.load(f)
+            if isinstance(d, dict) and "stocks" in d:
+                return d
+        except Exception:
+            continue
+    return {"stocks": {}}
+
+
+def _is_gold_research_source(source):
+    """判定来源是否属研报/研投类（可单独入金股池）。"""
+    return source in ("外资研投", "外资研投研报", "mahoro研报")
+
+
+def _derive_gold_qualified(members):
+    """从候选股池成员中筛选符合金股口径的股票。
+
+    口径：候选股池成员 ∩ (外资研投来源 或 多源共振≥2)
+      - 外资研投来源：sources 含 "外资研投" / "外资研投研报" / "mahoro研报"
+      - 多源共振≥2：sources 中不同来源数量 ≥2（如同时命中主板前100 + 外资研投）
+    """
+    qualified = {}
+    for key, st in members.items():
+        sources = list(st.get("sources", []))
+        is_research = any(_is_gold_research_source(src) for src in sources)
+        is_multi = len(set(sources)) >= 2
+        if is_research or is_multi:
+            qualified[key] = st
+    return qualified
+
+
+def _save_gold_pool(pool):
+    """写金股池到 out/gold_pool.json + out/gold_pool_stocks.json + raw_data/gold_pool.json。
+
+    带防洗空闸门：本次 stocks 为空时，拒绝覆盖磁盘上已有的非空金股池。
+    """
+    if not pool.get("stocks"):
+        if os.environ.get("GOLD_POOL_FORCE_EMPTY") != "1":
+            for p in (GOLD_POOL_RAW, GOLD_POOL_OUT, GOLD_POOL_STOCKS_OUT):
+                if not os.path.exists(p):
+                    continue
+                try:
+                    with open(p, "r", encoding="utf-8") as f:
+                        prev = json.load(f)
+                    if isinstance(prev, dict) and prev.get("stocks"):
+                        print(f"  🛡 金股池防洗空：本次 stocks=0，拒绝覆盖 "
+                              f"{os.path.basename(p)} 中已有的 {len(prev['stocks'])} 只"
+                              f"（确需清空请设 GOLD_POOL_FORCE_EMPTY=1）")
+                        return False
+                except Exception:
+                    continue
+    for p in (GOLD_POOL_OUT, GOLD_POOL_STOCKS_OUT, GOLD_POOL_RAW):
+        try:
+            os.makedirs(os.path.dirname(p), exist_ok=True)
+            with open(p, "w", encoding="utf-8") as f:
+                json.dump(pool, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"  ⚠️ 写 {p} 失败: {e}")
+    return True
+
+
+def derive_and_save_gold_pool(members):
+    """主入口：从候选股池派生金股池、合并历史、过期清理、落盘。
+
+    规则：
+      1. 候选股池中符合口径（外资研投 或 多源共振≥2）的股票进入/更新金股池；
+      2. 历史金股池中未过期股票继续保留（45 交易日自动出池），避免每日 churn；
+      3. 今日符合口径的股票刷新 sources / signal_count / history；
+      4. 今日不符合口径的历史股票保持原状，不追加今日 history。
+
+    返回金股池 dict，供调用方日志/调试使用。
+    """
+    today = time.strftime("%Y-%m-%d")
+    now = time.strftime("%Y-%m-%d %H:%M:%S")
+    cutoff = _n_trade_days_ago_approx(GOLD_POOL_DAYS, today)
+    prev = _load_prev_gold_pool()
+    qualified = _derive_gold_qualified(members)
+
+    def _entry_first_date(v):
+        fd = v.get("first_date")
+        if not fd:
+            hist = v.get("history") or []
+            if hist and isinstance(hist[0], dict):
+                fd = hist[0].get("date")
+        return fd if isinstance(fd, str) and len(fd) >= 10 else None
+
+    stocks = {}
+    # 1) 继承历史池：未过期即保留
+    for key, old in prev.get("stocks", {}).items():
+        fd = _entry_first_date(old)
+        if fd and fd < cutoff:
+            continue  # 过期出池
+        stocks[key] = dict(old)
+
+    # 2) 今日符合口径：新增或刷新
+    for key, st in qualified.items():
+        sources = list(st.get("sources", []))
+        signal_count = len(set(sources))
+        if key not in stocks:
+            stocks[key] = {
+                "code": st.get("code", ""),
+                "name": st.get("name", ""),
+                "market": st.get("market", ""),
+                "board_label": st.get("board_label", ""),
+                "fund_type": "",
+                "first_date": today,
+                "first_signal": signal_count,
+                "max_signal": signal_count,
+                "signal_count": signal_count,
+                "history": [],
+                "sources": sources,
+            }
+        else:
+            entry = stocks[key]
+            entry.update({
+                "code": st.get("code", entry.get("code", "")),
+                "name": st.get("name", entry.get("name", "")),
+                "market": st.get("market", entry.get("market", "")),
+                "board_label": st.get("board_label", entry.get("board_label", "")),
+                "signal_count": signal_count,
+                "max_signal": max(entry.get("max_signal", signal_count), signal_count),
+                "sources": sources,
+            })
+        # 追加/覆盖今日 history
+        hist = [h for h in stocks[key].get("history", []) if isinstance(h, dict) and h.get("date") != today]
+        hist.append({
+            "date": today,
+            "signal_count": signal_count,
+            "sources": sources,
+        })
+        stocks[key]["history"] = hist
+
+    pool = {
+        "update_time": now,
+        "last_update": now,
+        "total_count": len(stocks),
+        "candidate_total": len(members),
+        "stocks": stocks,
+    }
+    _save_gold_pool(pool)
+    print(f"  ✅ 金股池已派生：{len(stocks)} 只（候选池 {len(members)} 只）")
+    return pool
+
+
 # ---------- 主构建 ----------
 def build():
     pool = {}  # key -> {code,name,market,board_label,sources:[]}
@@ -842,6 +1018,11 @@ def build():
             except Exception:
                 continue
     members = _merge_membership(pool, prev_members, MEMBER_HYSTERESIS_DAYS, today_date)
+
+    # ── #14+ 金股池派生（v8 原生，2026-09-11 一劳永逸修复）──
+    # scanner.py 未挂入 v8 云端盘后链，导致 gold_pool.json 成为孤儿数据。
+    # 现由候选池直接派生：候选 ∩ (外资研投 或 多源共振≥2)，45 交易日过期，防洗空。
+    derive_and_save_gold_pool(members)
 
     # 汇总来源分布（基于慢变成员表）
     from collections import Counter
