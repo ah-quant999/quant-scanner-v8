@@ -123,6 +123,22 @@ CARD_DEFS = [
     #   在回测批（STAGES[E]，注入 V8_BACKTEST_YEARS）产出。登记后走运维卡区正式判定，all_ 扫描跳过。
     {"id": "FACTOR_LAB", "name": "因子实验室", "page": "盘后数据", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "manual_dep": True, "manual_note": "本机baostock被风控黑名单(err=10001011匿名用户)，无替代数据源，需小九中国IP+浏览器UA在线刷全市场3200只财务+ROE+异常换手。本机无法产出，保留旧数据待小九。"},
     {"id": "FOUR_VOLUME_BACKTEST", "name": "四量终极回测", "page": "盘后数据", "freq": "每日回测批", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🛡 2026-09-07 22:2x：原 key_fields=["periods"] 但 periods 在 summary.by_period 嵌套、回测未跑时顶层缺失 → 永久 warn。改为 summary（永远非空 dict，by_period/calc_time 都在内）。
+
+    # 🔴 2026-09-12 主人令（拍板第 2 项·一劳永逸）：BACKTEST_ALL_ALGOS 正式登记。
+    #   根因（实测）：algorithms/gen_backtest_all_algos.py 已挂 STAGES["E"]（ORDER 47/48），
+    #   源码明写产出 raw_data/backtest_all_algos.json + data/BACKTEST_ALL_ALGOS.js，
+    #   但 data/BACKTEST_ALL_ALGOS.js **远端不存在**、全链**零红灯** —— 三重静默：
+    #     ① 闸门 READY_SPEC["E"] 未列该产物、need=1 下也不参与判定 ⇒ 不触发重跑
+    #     ② 本表未登记 ⇒ 不进 check_data_cards、也不渲染告警卡
+    #     ③ api_push_raw.py::walk_extra() 有 isfile 守卫 ⇒ 静默跳过（有意的防崩设计，不动）
+    #   登记后：该产物缺失/陈旧/结构坏 → 正常亮红灯 → 主人可见。
+    #   ⚠️ 刻意**不进** _LOW_FREQ_FILES：它是每日回测批产物，本就该每日刷新；
+    #      进白名单会把 24h 红线降成 7 天容忍，正是 09-11 FOUR_VOLUME_60M 冻结 3 天
+    #      零告警的同型事故（该条目已被移出白名单，此处同理）。
+    #   ⚠️ key_fields 取 ["rows", "coverage"]：二者由 build() 无条件产出（顶层恒有）。
+    #      不取 update_time —— 它是 CARD_DEFS 的通用时戳字段，列进 key_fields 等于没校验；
+    #      本卡要抓的恰是「文件在不在 + 内容结构化没有」。
+    {"id": "BACKTEST_ALL_ALGOS", "name": "全算法回测汇总", "page": "策略回测", "freq": "每日回测批（E 批末位）", "max_age": 1440, "key_fields": ["rows", "coverage"], "heal_cat": "algo_run", "raw_file": "backtest_all_algos.json"},
     {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "实时数据", "freq": "盘中每30分（日行情取最近交易日）", "max_age": 120, "key_fields": ["items"], "heal_cat": "intraday"},  # 2026-08-31 修复：cloud_fetch_v8.py 的 tasks 列表含 CFFEX_HOLDINGS，盘中每 30 分执行并刷新 update_time，但数据为日行情取最近交易日；HC 分类应与调度一致，避免盘后/盘中口径冲突
     {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"], "heal_cat": "premarket"},  # 危机雷达每日 08:25 跑一次
     # 🛡 2026-09-11 小九的股票专家：此处原有 MARKET_FUND_FLOW_DATA 的**重复登记**
