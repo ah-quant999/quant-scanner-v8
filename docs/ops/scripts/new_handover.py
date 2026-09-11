@@ -37,6 +37,14 @@ def main():
     ap.add_argument("--dry-run", action="store_true", help="只打印路径，不创建文件")
     a = ap.parse_args()
 
+    # 🛡 2026-09-11 主人令：阿狸咪机一律署名「阿狸咪的工程师」（见本目录 README「署名规范」）。
+    #   这里只**提示不阻断** —— 不替使用者做决定，也不拦合法用法（如小九代发）。
+    _OLD_SIGNS = ("股票专家", "阿狸咪的股", "阿狸咪机")
+    if a.frm == "阿狸咪" or any(s in a.frm for s in _OLD_SIGNS):
+        print(f"⚠ 署名提示：你传的是「{a.frm}」。主人 2026-09-11 令阿狸咪机一律署名"
+              f"「阿狸咪的工程师」（详见 docs/ops/handover/README.md「署名规范」）。"
+              f"仍按你所传生成；如需改名请重跑或之后改名。", file=sys.stderr)
+
     topic = BAD.sub("", a.topic).strip().replace(" ", "_")
     if not topic:
         sys.exit("ABORT: --topic 去非法字符后为空")
