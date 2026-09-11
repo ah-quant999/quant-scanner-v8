@@ -1160,9 +1160,9 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <h3><span class="ic">📏</span>全站判定区间 / 分档一览（备忘）</h3>
         <div class="logic-p">各算法/模块核心区间值与档位阈值汇总，方便对比记忆。完整算法见各对应章节。</div>
 
-        <div class="logic-h">① CRDS 大盘环境有效性判断（基于上证今日涨跌幅）</div>
+        <div class="logic-h">① CRDS 大盘环境有效性判断（基于 index_quotes 综合口径今日涨跌幅）</div>
         <table class="lg-table">
-          <tr><th>上证涨跌幅</th><th>有效性</th><th>含义</th></tr>
+          <tr><th>综合口径涨跌幅</th><th>有效性</th><th>含义</th></tr>
           <tr><td>≥ +2.0%</td><td>失效</td><td>大涨市无需逆势龙头，信号参考意义极低</td></tr>
           <tr><td>+1.0% ~ +2.0%</td><td>低效</td><td>市场偏强，CRDS 有效性降低</td></tr>
           <tr><td>-0.5% ~ +1.0%</td><td>有效</td><td>震荡市，CRDS 可正常参考</td></tr>
@@ -1657,7 +1657,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">定位</div>
         <div class="logic-p">在大盘大跌/震荡市中，捕捉「逆势涨停」的强势龙头股。<b>盘后看</b>(基于日K) · <b>短线</b>捕捉逆势龙头 · <b>日频</b>(每日盘后跑)。逆势龙头只在大跌/震荡市有效，若今日大涨则信号参考意义极低。</div>
         <div class="logic-h">输入与数据源</div>
-        <div class="logic-p">· 个股池：<b>watch_result.json</b>（来自 scanner.py watch 模式，即金股池/观察池股票），按数字代码去重。<br>· 个股K线：<b>mootdx 通达信直连 bars()</b> 为主（不受 BaoStock 封禁影响），<b>东方财富 push2his K线</b> 为兜底。<br>· 大盘：<b>上证指数 000001</b> 近10日K线。<br>· 注：mootdx.bars() 每约50次调用重建客户端+gc 以规避 socket 泄漏；CRDS 约需 176 次调用，必须周期重置。</div>
+        <div class="logic-p">· 个股池：<b>watch_result.json</b>（来自 scanner.py watch 模式，即金股池/观察池股票），按数字代码去重。<br>· 个股K线（<b>2026-09-11 取数层提速重构</b>：718 只由 <b>113 分钟 → 冷缓存 91s / 热缓存 22s</b>，四级取数链）：<br>&nbsp;&nbsp;① <b>raw_data/kline_cache/ 本地缓存优先</b> —— 内容级新鲜度闸门：末根K线须 ≥ 最近一个<b>已收盘</b>交易日（避免盘前/盘中把当日不存在的日K误判为陈旧而全量回源）<br>&nbsp;&nbsp;② <b>腾讯 proxy.finance.qq.com</b> 快源前置（实测 0.15s/只；<code>web.ifzq.gtimg.cn</code> 在本机被域名级 WAF 拦，同 API 换 proxy 域可达，双域故障转移）<br>&nbsp;&nbsp;③ <b>mootdx 通达信直连 bars()</b> —— 带<b>熔断</b>：连续 5 次失败即停用本轮，不再逐只白等 4.4s<br>&nbsp;&nbsp;④ <b>东方财富 push2his</b> 兜底<br>&nbsp;&nbsp;· 并发：<b>12 线程 + 8 req/s 限速 + 1500s 墙钟预算</b>；预算用尽标 <code>degraded</code> 并保留已算结果，不整轮崩。<br>· 大盘：<b>上证指数 000001</b> 近10日K线（显式按指数取数）。<br>· <b>缓存键铁律</b>：kline_cache 以 6 位代码为文件名，<code>sh000001</code>(上证指数) 与 <code>sz000001</code>(平安银行) 会<b>撞键</b> → 指数<b>不读不写缓存</b>，且指数<b>不走 mootdx</b>（其 <code>bars('000001')</code> 返回的是深市平安银行，非指数）。<br>· 注：mootdx.bars() 每约50次调用重建客户端+gc 以规避 socket 泄漏；CRDS 约需 176 次调用，必须周期重置。</div>
         <div class="logic-h">三个核心条件（满足越多越好）</div>
         <table class="lg-table">
           <tr><th>条件</th><th>判定</th><th>阈值/口径</th></tr>
@@ -1675,8 +1675,9 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">分层（按满足条件个数 conds 0~3）</div>
         <div class="logic-p">· <b style="color:#1D9E75">精选级 (3/3)</b>：elite，无条件优先看<br>· <b style="color:#BA7517">进阶级 (2/3)</b>：advanced，差1步<br>· <b style="color:var(--dim)">关注级 (1/3)</b>：watch，仅放量2连板/非逆势（评分均0时前端标注折叠去噪）</div>
         <div class="logic-h">大盘环境有效性判断（决定信号可信度）</div>
+        <div class="logic-p">⚠️ <b>口径说明（2026-09-11 核对源码）</b>：本表「今日涨跌幅」取 <code>raw_data/index_quotes.json</code> 的 <b>综合口径</b>（上证 / 深证成指 / 创业板指 / 科创50 等权，叠加全市场涨跌家数比；2026-08-19 主人令「不再只看上证指数，权重股易扭曲」），摘要会同时给出上证涨幅与涨跌家数。<br>而上方条件②「大跌日逆势板」的 <code>MARKET_DOWN_THRESHOLD = -1.5%</code> 判定走的是 <code>detect_market_down()</code>，喂进去的是 <b>上证指数</b> 近 10 日 K 线。<br>→ <b>同一张卡目前并存两套大盘口径</b>（有效性判断 = index_quotes 综合；大跌日判定 = 上证指数）。是否统一为综合口径<b>正待主人拍板</b>；未拍板前不得改动评分口径。</div>
         <table class="lg-table">
-          <tr><th>上证今日涨跌幅</th><th>有效性</th><th>含义</th></tr>
+          <tr><th>综合口径今日涨跌幅</th><th>有效性</th><th>含义</th></tr>
           <tr><td>≥ +2.0%</td><td>失效</td><td>大涨市无需逆势龙头，信号参考意义极低</td></tr>
           <tr><td>+1.0% ~ +2.0%</td><td>低效</td><td>市场偏强，CRDS 有效性降低</td></tr>
           <tr><td>-0.5% ~ +1.0%</td><td>有效</td><td>震荡市，CRDS 可正常参考</td></tr>

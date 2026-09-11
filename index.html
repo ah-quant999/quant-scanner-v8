@@ -6615,8 +6615,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
       <div class="card">
         <h3><span class="ic">🖥️</span>双机状态 <span class="fresh" style="font-size:10px;color:var(--dim)">[静态]</span></h3>
-        <div class="kv"><span class="k">执行节点</span><span><span class="status-dot s-ok"></span>GitHub Actions 云端 ubuntu-latest（主链：cn_fetch + algo_cloud + build_deploy）</span></div>
-        <div class="kv"><span class="k">小九（单位机）</span><span><span class="status-dot s-warn"></span>仅应急 workflow_dispatch，不再跑 cron 主链（lemoncat-cn runner · 云端管线看门狗）</span></div>
+        <div class="kv"><span class="k">执行节点</span><span><span class="status-dot s-ok"></span>cn_fetch / build_deploy = GitHub Actions 云端 ubuntu-latest；<b>algo_cloud（盘后算法链）= self-hosted cn 双机</b>（lemoncat-cn / alimi-cn · 共享 cn 标签谁空谁跑 · 已由 job 日志 runner_name 实证）</span></div>
+        <div class="kv"><span class="k">小九（单位机）</span><span><span class="status-dot s-warn"></span>lemoncat-cn runner：承接 algo_cloud 盘后算法链（与阿狸咪共享 cn 标签，谁空谁跑）+ 应急 workflow_dispatch + 云端管线看门狗</span></div>
         <div class="kv"><span class="k">阿狸咪（家中机）</span><span><span class="status-dot s-ok"></span>本地预览（file:///E:/workspace/stock-scanner/index.html），不接部署</span></div>
         <div class="kv"><span class="k">failover 守卫</span><span><span class="status-dot s-ok"></span>活跃</span></div>
       </div>
@@ -10270,7 +10270,7 @@ function drawUpDownChart(){
 
           {name:'中国数据抓取 (v8_cn_fetch_cloud)', source:'RUNNER_STATUS', freq:'工作日 cron · 云端', slots:['08:25','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:20'], note:'核心数据管线 · GitHub Actions 云端 ubuntu-latest 主链（含 17:20 龙虎榜收盘后刷新）'},
 
-          {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日16:40/18:10/19:15/20:00 四批', slots:['19:15'], note:'候选池/黄金池/三重共识/回测 · 已迁 GitHub Actions 云端 ubuntu-latest · 冗余由本机每30分检查dispatch兜底'},
+          {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日16:40/18:10/19:15/20:00 四批', slots:['19:15'], note:'候选池/黄金池/三重共识/回测 · <b>跑在 self-hosted cn 双机（lemoncat-cn / alimi-cn），非 ubuntu-latest</b>（job 日志 runner_name 实证）· 批次由闸门按「缺什么跑什么」判定 · 冗余由本机每30分检查dispatch兜底 · 源码同步：git 直连为主，被墙时走 GitHub API 回退（2026-09-11 20:2x 修：排除 backup/docs/kline_cache 三个重目录 + b64 优先 + 软预算，step 超时 10→25min）'},
 
           {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查 · 覆盖构建/部署/备份健康'},
 
