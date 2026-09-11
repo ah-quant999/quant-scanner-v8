@@ -72,7 +72,7 @@ POST_CLOSE_ALGO_FILES = [
 WF_FETCH_CLOUD = 327687211   # v8_cn_fetch_cloud.yml
 WF_ALGO_CLOUD = 324119592    # v8_algo_cloud.yml（无 inputs，跑全链）
 # cn 自托管 runner 应急回退（仅当该 runner 在线时才用，避免离线空转）
-WF_FETCH_CN = 324135267      # v8_cn_fetch.yml
+WF_FETCH_CN = 336661558      # v8_cn_fetch_cloud_selfhosted.yml（小九应急 self-hosted cn）
 WF_ALGO_CN = 324833339       # v8_algo_run.yml
 
 

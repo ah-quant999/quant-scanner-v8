@@ -72,11 +72,11 @@ RUNNER_CMD = "run.cmd"
 # ⚠️ 2026-08-18 修正：327687211 是【云端 ubuntu 主力】workflow，其失败≠本地 runner 挂
 #    （云端 HEALTH_CHECK 步骤问题由 v8_cloud_watchdog.py 处置）。
 #    runner 守护的 GitHub 维度必须查【self-hosted】workflow：
-#      · v8_cn_fetch.yml                 (324135267, self-hosted cn 应急)
+#      · v8_cn_fetch.yml                 (324135267, 已删除重构→336661558)
 #      · v8_cn_fetch_cloud_selfhosted.yml (336661558, 小九应急兜底)
 #      · v8_algo_run.yml                 (324833339, self-hosted 算法链)
 #    全部无近期记录 → ok（self-hosted 是兜底，云端主力时无 job 属正常）
-SELFHOSTED_WORKFLOW_IDS = [324135267, 336661558, 324833339]
+SELFHOSTED_WORKFLOW_IDS = [336661558, 324833339]  # 324135267(v8_cn_fetch.yml)已删除重构
 CN_CLOUD_WORKFLOW_ID = 327687211   # 云端 ubuntu 主力（仅 runner 全挂时派发 fallback 用）
 BUILD_DEPLOY_WORKFLOW_ID = 324135263
 

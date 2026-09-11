@@ -27,10 +27,12 @@ from datetime import datetime, timezone, timedelta
 REPO = "ah-quant999/quant-scanner-v8"
 # workflow_id 字典：category -> 该派哪个 workflow
 WF_IDS = {
-    "premarket":   324135267,  # v8_cn_fetch
-    "intraday":    324135267,  # v8_cn_fetch
-    "post_close":  324135267,  # v8_cn_fetch
-    "all":         324135267,  # v8_cn_fetch
+    # 2026-09-11 修正：旧 v8_cn_fetch.yml（id 324135267）已重构删除，
+    # cn_fetch 主力为 v8_cn_fetch_cloud.yml（id 327687211，ubuntu-latest，schedule+dispatch）
+    "premarket":   327687211,  # v8_cn_fetch_cloud
+    "intraday":    327687211,  # v8_cn_fetch_cloud
+    "post_close":  327687211,  # v8_cn_fetch_cloud
+    "all":         327687211,  # v8_cn_fetch_cloud
     "intraday_lite": None,     # ⛔ 动态解析一次（v8_algo_intraday_lite.yml）
 }
 WF_NAME_INTRADAY_LITE = "v8_algo_intraday_lite.yml"
