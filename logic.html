@@ -1688,6 +1688,20 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         · <b>参考止损 / 止盈</b>：由真实收盘价推导，<b>明确标注【参考】</b>—— 主板 -7%、创业板/科创板 -10%、止盈 +12%。<br>
         · <b>操作建议</b>：由组件真实标志模板生成，如「游资点火+机构托底，资金合力强，叠加均线金叉，回踩不破参考止损可持有；仓位建议≤2成」。非固定话术，依当日真实信号组合输出。<br>
         · <b>信号日</b>：该票最近一次触发 QD 共振的日期。</div>
+        <div class="logic-h">🛠 四量终极 60m · 产物三宗罪与硬告警（2026-09-11 根治）</div>
+        <div class="logic-p"><b>症状</b>：60m 共振徽章自 2026-09-08 起信号全废 —— 不是文件冻结，而是<b>每天产出一份 <code>total:0</code> 的假产物</b>，且连续多日零告警。根因是三个互相独立的缺陷，已一次性根除。</div>
+        <table class="lg-table">
+          <tr><th>#</th><th>缺陷</th><th>机理（实测证据）</th><th>修法</th></tr>
+          <tr><td>①</td><td><b>产物写错目录</b></td><td><code>strategy_four_volume_60m.py</code> 内残留 v6 硬编码分支：只要本机存在 <code>E:/workspace/stock-scanner</code>，就把产物写进它的 <code>data/</code> 而非当前仓库。CI 日志实锤：同批相邻两行，日线版写 runner 工作区、60m 版写 <code>E:/workspace/stock-scanner\data\...</code>。双机 active-active → <b>哪台装了旧仓库哪台中招</b>。</td><td>删该分支，输出目录恒为 <code>V8_DATA_DIR</code>（最高优先）或脚本所在仓库 <code>ROOT/data</code>；新增日志回声 <code>[60m] DATA_DIR=…</code></td></tr>
+          <tr><td>②</td><td><b>「没扫成」写成「今天没信号」</b></td><td>活跃股池为空（东财限流/冷却）时，脚本仍无条件写出<b>带新鲜时间戳</b>的 <code>total:0</code> 产物 → 前端把它当成「今天真的没有 60m 信号」。本地复现：股池 0 只 / 全程仅 11 秒 → 非超时、非登录失败，是源断连被静默吞掉。</td><td>新增异常类 <code>ScanUnavailable</code>，严格区分：<b>扫描未能执行</b> → 拒绝写产物 + 保留上次真实数据 + <b>退出码 1</b> 上报失败；<b>真扫完但 0 只命中</b> → 照写（合法结果）</td></tr>
+          <tr><td>③</td><td><b>三层静默</b></td><td>健康检查把它放在低频白名单（<b>&gt;7 天</b>才告警）× 链尾闸门 <code>verify_chain_outputs.py</code> 仅 warn-only × 门控 <code>_final_recommend_gate()</code> 走 <code>soft=True</code> 只打印一行 → 冻结 3 天仍全绿。</td><td>移出低频白名单并正式登记 <code>CARD_DEFS</code>（<b>24h 红线</b>）；门控软告警 → <b>硬告警·计败不阻断</b>（写入 <code>algo_run_report.json</code> 的 <code>failed_scripts</code>，运维面板红灯可见）；超时预算 30 → <b>90 分钟</b></td></tr>
+        </table>
+        <div class="logic-h">现行口径（已生效，以此为准）</div>
+        <div class="logic-p">· <b>输出目录</b>：恒为本仓库 <code>data/</code>（或 <code>V8_DATA_DIR</code> 指定），日志回声 <code>[60m] DATA_DIR=…</code>；<br>
+        · <b>扫描未执行</b> → 硬失败（保留真实产物 + 退出码 1），<b>绝不写假 0</b>；<br>
+        · <b>真 0 命中</b> → 照写（这是合法结果，不是假成功）；<br>
+        · <b>硬告警双保险</b>：<code>CARD_DEFS</code> 24h 红线 + 门控「计败不阻断」；<br>
+        · <b>仍不阻断</b>最终推荐：<code>final_recommend.py</code> 自带「60m 非今日 → 回退日线版 <code>FOUR_VOLUME.js</code>」降级（硬门控会反复阻断整轮推荐、反而让站点展示更旧的产物）。</div>
       </div>
 
       
