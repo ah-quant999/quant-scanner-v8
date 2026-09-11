@@ -41,6 +41,47 @@ VALID = {"premarket", "intraday", "post_close", "all", "intraday_lite"}
 WINDOW_INTRADAY_LITE_OPEN = (9, 30)   # 09:30
 WINDOW_INTRADAY_LITE_CLOSE = (15, 0)  # 15:00 收盘
 
+# 🛡 2026-09-11 主人令「盘中安静窗」：交易时段两段必须给盘中更新让出通道与锁，
+#   除盘中更新(intraday/intraday_lite)外，任何派发都不许占用盘中更新通道与 _DISPATCH_LOCK。
+#     窗1：09:20 → 11:30（开盘前 10 分 ~ 上午收盘）—— 防非盘中风抓取顶掉盘中种子档 /
+#                                               长期持有派发锁导致盘中刷新卡死
+#     窗2：12:50 → 15:00（午后开盘前 10 分 ~ 下午收盘）
+#   注：11:30-12:50 午间休市、15:00 后盘后、09:20 前盘前 均不限制（非盘中更新可正常跑）。
+_QUIET_WINDOWS = [((9, 20), (11, 30)), ((12, 50), (15, 0))]
+_INTRADAY_CATS = {"intraday", "intraday_lite"}
+
+# 2026 A股交易日历（与 cloud_dispatcher.py / v8_health_check.py 一致；每年初需更新）
+_HOLIDAYS_2026 = {
+    "01-01", "01-02", "01-03",
+    "02-15", "02-16", "02-17", "02-18", "02-19", "02-20", "02-21", "02-22", "02-23",
+    "04-04", "04-05", "04-06",
+    "05-01", "05-02", "05-03", "05-04", "05-05",
+    "06-19", "06-20", "06-21",
+    "09-25", "09-26", "09-27",
+    "10-01", "10-02", "10-03", "10-04", "10-05", "10-06", "10-07",
+}
+_MAKEUP_DAYS_2026 = {
+    "2026-01-04", "2026-02-14", "2026-02-28",
+    "2026-05-09", "2026-09-20", "2026-10-10",
+}
+
+
+def _is_trading_day(dt):
+    """给定 CST 时间是否为 A 股交易日（周末 + 节假日剔除，补班日算交易日）。"""
+    d = dt.date()
+    if d.weekday() >= 5 and d.isoformat() not in _MAKEUP_DAYS_2026:
+        return False
+    return d.strftime("%m-%d") not in _HOLIDAYS_2026
+
+
+def in_trading_quiet_window(now=None):
+    """当前是否处于「盘中安静窗」（交易日 + 09:20-11:30 / 12:50-15:00）。"""
+    now = now or _now_cst()
+    if not _is_trading_day(now):
+        return False
+    hhmm = (now.hour, now.minute)
+    return any(o <= hhmm < c for (o, c) in _QUIET_WINDOWS)
+
 
 def load_token():
     try:
@@ -78,6 +119,14 @@ def dispatch(category):
     if category not in VALID:
         print(f"[FATAL] 非法 category={category!r}，可选: {sorted(VALID)}")
         sys.exit(1)
+
+    # 🛡 2026-09-11 主人令「盘中安静窗」守卫：交易时段 09:20-11:30 / 12:50-15:00 内，
+    #   非盘中更新类派发一律 no-op，绝不占用盘中更新通道与 _DISPATCH_LOCK，给盘中更新让出通道。
+    if category not in _INTRADAY_CATS and in_trading_quiet_window():
+        now = _now_cst()
+        print(f"⏰ 盘中安静窗守卫：当前 CST {now:%H:%M} 处于安静窗(09:20-11:30 / 12:50-15:00)，"
+              f"非盘中类 category={category!r} 跳过派发（给盘中更新让出通道与锁）")
+        return True  # no-op 视为成功
 
     # 🛡 2026-08-19 一劳永逸时间窗守卫：盘中兜底只在 09:30-15:00 CST 派发
     # 注：BACKTEST 重型仍 18:30 由 v8_algo_cloud.yml cron 跑，不受影响
