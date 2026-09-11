@@ -80,7 +80,13 @@ CARD_DEFS = [
     # 🛡 2026-09-02 一劳永逸：LIMIT_UP_HEATMAP.js 实际字段为 update_time/dates/sectors/republish_time，
     #   不存在 "top" 字段；原 key_fields 含 "top" 导致健康检查每天误报"关键字段空值：top"黄灯。
     {"id": "LIMIT_UP_HEATMAP", "name": "涨停热度", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["dates", "sectors"]},
-    {"id": "MARKET_FUND_FLOW_DATA", "name": "市场资金流向", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["daily"]},
+    # 🛡 2026-09-11 小九的股票专家 一劳永逸：本 id 原在 CARD_DEFS 里**重复登记两条**
+    #   （本行「实时数据/盘中每30分/max_age=60」+ 第 108 行「盘后数据/收盘后1次/max_age=360」），
+    #   而消费处 `for d in CARD_DEFS` 无去重 → ① 同一卡被计两次（虚增总项数）；
+    #   ② 两条口径互相矛盾，实时数据那条盘中恒判 stale。
+    #   现合并为单条，按数据本体（日频时间轴 daily + 盘中实时字段 market_net）取
+    #   「实时数据 / 盘中每30分 + 收盘后定稿」，heal_cat=intraday（自愈应派发盘中抓取）。
+    {"id": "MARKET_FUND_FLOW_DATA", "name": "市场资金流向", "page": "实时数据", "freq": "盘中每30分（收盘后追加当日定稿）", "max_age": 60, "key_fields": ["daily"], "heal_cat": "intraday"},
     {"id": "MARKET_ALERTS", "name": "市场预警", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["indices"]},
     # 盘后数据
     # ── 自愈类别说明（2026-08-11 第158轮全表核对）──────────────────────────────
@@ -105,7 +111,11 @@ CARD_DEFS = [
     {"id": "FOUR_VOLUME_BACKTEST", "name": "四量终极回测", "page": "盘后数据", "freq": "每日回测批", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🛡 2026-09-07 22:2x：原 key_fields=["periods"] 但 periods 在 summary.by_period 嵌套、回测未跑时顶层缺失 → 永久 warn。改为 summary（永远非空 dict，by_period/calc_time 都在内）。
     {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "实时数据", "freq": "盘中每30分（日行情取最近交易日）", "max_age": 120, "key_fields": ["items"], "heal_cat": "intraday"},  # 2026-08-31 修复：cloud_fetch_v8.py 的 tasks 列表含 CFFEX_HOLDINGS，盘中每 30 分执行并刷新 update_time，但数据为日行情取最近交易日；HC 分类应与调度一致，避免盘后/盘中口径冲突
     {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"], "heal_cat": "premarket"},  # 危机雷达每日 08:25 跑一次
-    {"id": "MARKET_FUND_FLOW_DATA", "name": "盘后资金流向", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["daily"], "heal_cat": "premarket"},  # 资金流日频时间轴——08:25 必跑一次（防漏跑）
+    # 🛡 2026-09-11 小九的股票专家：此处原有 MARKET_FUND_FLOW_DATA 的**重复登记**
+    #   （「盘后资金流向 / 盘后数据 / max_age=360 / heal_cat=premarket」），与上面
+    #   「实时数据」那条 id 完全同名 → 消费处无去重 → 同卡被计两次且口径打架。
+    #   已合并为唯一一条（见"实时数据"段），此处删除。
+    #   原注：资金流日频时间轴——08:25 必跑一次（防漏跑）｜语义已并入合并后的 freq/口径。
     {"id": "CANDIDATE", "name": "候选池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
     {"id": "GOLD_POOL", "name": "黄金池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
     {"id": "LHB_DATA", "name": "龙虎榜", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
