@@ -882,8 +882,19 @@ window.V8_CAL = {weeks:[],legend:[]};
     if(s.indexOf('盘后') >= 0 || s.indexOf('收盘') >= 0) return 22;
     return 72;
   };
-  /* 交易时段判定（CST 周一至周五 09:15-15:15）：仅此窗口内才对「实时/盘中」卡做 1.5h SLA 判定 */
-  window._isMarketHoursCST = function(){
+  /* 盘中/实时类「陈旧判定窗口」（CST 周一至周五 10:15-15:15）
+     —— 仅此窗口内才对「实时/盘中」卡做 1.5h SLA 判定。
+     2026-09-11 小九的工程师·一劳永逸（假告警家族·新一类：判定窗口早于数据可产出时间）：
+       原起点 09:15（集合竞价）早于首个盘中数据可产出时间，导致 09:15-10:15 这段必然误报红灯：
+       新交易日开盘前本就没有盘中数据可产出。实证（2026-09-11 09:23 截图）——
+       「行业树图·细分赛道」被判「已停更 9 小时」：东财板块资金流在新交易日 00:00 后
+       全部归零，09:00 档 f_sector_fund_flow 每行 net==0 被过滤 → 返回空（RUNNER_STATUS
+       记 empty/返回空）→ data/SECTOR_FUND_FLOW.js 保留前一日 00:38 定稿值，
+       而盘中类 SLA=1.5h，故必然判停更。同日 09:30 开盘后首个盘中数据落地即自愈
+       （主站实测 09:30:17），但次日盘前仍会照旧误报一次。
+       现与「首个盘中数据 09:30 + 看门狗同口径 45 分容错」对齐，取 10:15 为判定起点：
+       只有首档跑完仍无新数据才判陈旧——真停更不隐藏（15:15 上限与「收盘后 / 周末不判」照旧）。 */
+  window._isIntradaySlaWindowCST = function(){
     try{
       var p = window._cstParts ? window._cstParts(new Date()) : null;
       if(!p) return false;
@@ -891,9 +902,11 @@ window.V8_CAL = {weeks:[],legend:[]};
       var dow = new Date(Date.UTC(p.y, p.m - 1, p.d)).getUTCDay();
       if(dow === 0 || dow === 6) return false;   // 周末不判陈旧
       var t = p.hh * 60 + (p.mm || 0);
-      return t >= 555 && t <= 915;                    // 09:15 - 15:15
+      return t >= 615 && t <= 915;                    // 10:15 - 15:15
     }catch(e){ return false; }
   };
+  /* 兼容别名：历史调用点沿用旧名（语义已收敛为上面的盘中陈旧判定窗口） */
+  window._isMarketHoursCST = window._isIntradaySlaWindowCST;
   /* 返回 null（无法判定）/ {stale:false} / {stale:true, text:'⚠️ 已停更 N 天', ageH:数值} */
   window._staleMark = function(ts, slot){
     try{
