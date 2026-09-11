@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-11 21:57",
- "generated": "2026-09-11 21:57",
+ "update_time": "2026-09-11 22:04",
+ "generated": "2026-09-11 22:04",
  "meta": {
-  "generated": "2026-09-11 21:57",
+  "generated": "2026-09-11 22:04",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 7,
   "days_with_consensus": 0,
@@ -1722,6 +1722,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "601595",
+      "name": "上海电影",
+      "change_pct": 5.705,
+      "price": 23.53,
+      "category": "突破"
+     },
+     {
       "code": "000993",
       "name": "闽东电力",
       "change_pct": 9.984,
@@ -1775,13 +1782,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "神宇股份",
       "change_pct": 19.983,
       "price": 27.92,
-      "category": "突破"
-     },
-     {
-      "code": "002848",
-      "name": "高斯贝尔",
-      "change_pct": 10.036,
-      "price": 15.24,
       "category": "突破"
      }
     ],
@@ -1894,6 +1894,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "601595",
+      "name": "上海电影",
+      "change_pct": 5.705,
+      "price": 23.53,
+      "category": "短线选股"
+     },
+     {
       "code": "000993",
       "name": "闽东电力",
       "change_pct": 9.984,
@@ -1947,13 +1954,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "神宇股份",
       "change_pct": 19.983,
       "price": 27.92,
-      "category": "短线选股"
-     },
-     {
-      "code": "002848",
-      "name": "高斯贝尔",
-      "change_pct": 10.036,
-      "price": 15.24,
       "category": "短线选股"
      }
     ],
@@ -1966,6 +1966,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "601595",
+      "name": "上海电影",
+      "change_pct": 5.705,
+      "price": 23.53,
+      "category": "强势股"
+     },
+     {
       "code": "000993",
       "name": "闽东电力",
       "change_pct": 9.984,
@@ -2019,13 +2026,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "神宇股份",
       "change_pct": 19.983,
       "price": 27.92,
-      "category": "强势股"
-     },
-     {
-      "code": "002848",
-      "name": "高斯贝尔",
-      "change_pct": 10.036,
-      "price": 15.24,
       "category": "强势股"
      }
     ]
