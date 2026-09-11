@@ -16,7 +16,7 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, date
+from datetime import datetime, date, timedelta, timezone
 from pathlib import Path
 
 # 把仓库根加入路径以导入 update_v8 的 DATA_SOURCES
@@ -34,10 +34,30 @@ DATE_KEYS = ("update_time", "calc_time", "gen_time", "run_time", "date", "data_d
 # 🛡 2026-08-29：raw 无日期字段时，data 层超过此天数即判为陈旧静默上线
 STALE_DAYS = 3
 
+# 🛡 2026-09-11 小九的股票专家（主人批准「时段白名单」方案）：
+#   病灶：「raw 已更新到今日、data/*.js 尚未重建」被一律判 FAIL 并阻断部署。
+#   而这是每日盘前/盘中的【正常中间态】—— 纯盘后产物（CATEGORY_MAP 归 post_close）
+#   只在 v8_cn_fetch_cloud.yml 的 17:20/18:20/19:20 三档 --category post_close 构建时才重建；
+#   盘前 raw 一刷新，mismatch 立刻出现，闸门 100% 阻断盘前部署（实测 11 项 FAIL）。
+#   修法：改为【方向 + 时段】双判，不削弱真护栏：
+#     · raw 比 data 新（待重建）→ 仅当已过「盘后重建窗口结束」才判失败，其余时段降级为告警
+#     · data 比 raw 新 / 任一侧无日期 → 恒判失败（真错位，任何时段都不放行）
+POSTCLOSE_REBUILD_DONE = (20, 30)
+
+
+def _now_cst() -> datetime:
+    """取中国时区当前【时刻】。
+
+    🔴 勿用 datetime.now()：GitHub runner 是 UTC，datetime.now().date() 取到的是 UTC 日期
+    （CST 00:00-08:00 时段会整整差一天）。用 timezone.utc + 8h 在 runner 与本机都正确。
+    校验不依赖 v8_date，避免循环导入。
+    """
+    return datetime.now(timezone.utc) + timedelta(hours=8)
+
 
 def _today_cst() -> date:
-    """取当前日期（中国时区）。校验不依赖 v8_date，避免循环导入。"""
-    return datetime.now().date()
+    """取当前日期（中国时区）。"""
+    return _now_cst().date()
 
 
 def _extract_date_from_json(path: Path) -> str | None:
@@ -121,13 +141,16 @@ def _parse_date(value: str | None) -> date | None:
 
 
 def main() -> int:
-    mismatches = []
+    mismatches = []          # 真错位（data 比 raw 新 / 无法解析）→ 恒判失败
+    pending_mismatches = []  # raw 比 data 新（待 post_close 构建重建）→ 按时段判定
     unable = []
     stale_data = []
     missing_raw = []
     missing_data = []
     checked = 0
-    today = _today_cst()
+    _now = _now_cst()
+    today = _now.date()
+    after_rebuild = (_now.hour, _now.minute) >= POSTCLOSE_REBUILD_DONE
 
     for raw_name, var_name in DATA_SOURCES.items():
         raw_path = RAW_DIR / raw_name
@@ -160,17 +183,26 @@ def main() -> int:
                 unable.append({"var": var_name, "raw_date": raw_date, "data_date": data_date})
             continue
         if data_dp is None or raw_dp != data_dp:
-            mismatches.append(
-                {
-                    "var": var_name,
-                    "raw": str(raw_path),
-                    "raw_date": raw_date,
-                    "data": str(data_path),
-                    "data_date": data_date,
-                }
-            )
+            _r = _parse_date(raw_date)
+            _d = _parse_date(data_date)
+            _rec = {
+                "var": var_name,
+                "raw": str(raw_path),
+                "raw_date": raw_date,
+                "data": str(data_path),
+                "data_date": data_date,
+            }
+            # 🛡 方向判定：raw 比 data 新 ⇔ 消费层待重建（正常中间态，看时段）；
+            #    data 比 raw 新或任一侧无日期 ⇔ 真错位（恒判失败）。
+            if _r is not None and _d is not None and _r > _d:
+                pending_mismatches.append(_rec)
+            else:
+                mismatches.append(_rec)
 
-    print(f"🔍 跨层一致性校验完成：检查 {checked} 对，缺失 raw {len(missing_raw)} 个，缺失 data {len(missing_data)} 个，无法校验 {len(unable)} 个，日期不一致 {len(mismatches)} 个，data 层陈旧 {len(stale_data)} 个")
+    print(f"🔍 跨层一致性校验完成：检查 {checked} 对，缺失 raw {len(missing_raw)} 个，缺失 data {len(missing_data)} 个，无法校验 {len(unable)} 个，真错位 {len(mismatches)} 个，待重建 {len(pending_mismatches)} 个，data 层陈旧 {len(stale_data)} 个")
+    print(f"   时段判定：当前 CST {_now.strftime('%Y-%m-%d %H:%M')}，"
+          f"{'已过' if after_rebuild else '未过'}盘后重建窗口结束点 "
+          f"({POSTCLOSE_REBUILD_DONE[0]:02d}:{POSTCLOSE_REBUILD_DONE[1]:02d})")
 
     if missing_raw:
         print("  ⚠️ 缺失 raw_data（数据源未产出）:")
@@ -189,14 +221,35 @@ def main() -> int:
         for s in stale_data:
             print(f"    - {s['var']}: data={s['data_date']} 已陈旧 {s['stale_days']} 天")
     if mismatches:
-        print("  ❌ 日期不一致（消费层陈旧 / 未重建）：")
+        print("  ❌ 真错位（data 比 raw 新 / 任一侧无日期）——任何时段都不放行：")
         for m in mismatches:
             print(f"    - {m['var']}: raw={m['raw_date']} vs data={m['data_date']}")
+    if pending_mismatches:
+        print(f"  {'❌' if after_rebuild else '⏳'} raw 已更新、data 待 post_close 构建重建（{len(pending_mismatches)} 个）：")
+        for m in pending_mismatches:
+            print(f"    - {m['var']}: raw={m['raw_date']} vs data={m['data_date']}")
 
-    # 日期不一致 或 data 层陈旧静默上线 均视为失败
-    if mismatches or stale_data:
-        print("\n🛑 存在消费层时间戳不一致或陈旧数据静默上线，阻断部署/推送。")
+    # 🛡 失败条件（2026-09-11 起）：
+    #   · 真错位（mismatches）              → 恒失败
+    #   · data 层陈旧静默上线（stale_data）  → 恒失败（>STALE_DAYS 天，与时段无关）
+    #   · 待重建（pending_mismatches）       → 仅当已过盘后重建窗口才失败；盘前/盘中只告警放行
+    _hard = bool(mismatches) or bool(stale_data) or (bool(pending_mismatches) and after_rebuild)
+    if _hard:
+        _why = []
+        if mismatches:
+            _why.append(f"真错位 {len(mismatches)} 项")
+        if stale_data:
+            _why.append(f"陈旧静默上线 {len(stale_data)} 项")
+        if pending_mismatches and after_rebuild:
+            _why.append(f"盘后重建窗口已过仍有 {len(pending_mismatches)} 项未重建")
+        print(f"\n🛑 {'；'.join(_why)}，阻断部署/推送。")
         return 1
+
+    if pending_mismatches:
+        print(f"\n⏳ 仅存在「raw 已更新、data/*.js 待下一次 post_close 构建重建」的正常中间态"
+              f"（{len(pending_mismatches)} 项，未过盘后重建窗口），不阻断部署。")
+        print("   预期由 v8_cn_fetch_cloud.yml 的 17:20/18:20/19:20 --category post_close 构建消解。")
+        return 0
 
     print("✅ data/*.js 与 raw_data/*.json 时间戳一致，且无陈旧静默上线风险")
     return 0
