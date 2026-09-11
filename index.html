@@ -2552,6 +2552,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     <!-- ===== TAB 页面：🧭 选股池（2026-08-29 主人令：从盘后数据·已下架迁至选股策略子页；2026-08-30 移到首位并改为点击展开） ===== -->
     <div id="st-pool" class="st-pane active">
+      <!-- 2026-09-11 主人令：文件新鲜感(候选股池来源级)从运维区移到候选股池上方 -->
+      <div class="card" style="margin-bottom:12px;border-left:3px solid var(--cyan);">
+        <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">💾</span>文件新鲜感 <span class="fresh" id="stPoolFreshTime">—</span></h3>
+        <div id="stPoolFreshBody"><div style="font-size:12px;color:var(--dim)">等待新鲜度数据…</div></div>
+      </div>
       <!-- ===== 2026-09-11 主人令：金股池卡片置于「观测候选股池」上方（数据源 GOLD_POOL）===== -->
       <div class="card" style="border-left:4px solid #fbbf24;">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">⭐</span>金股池 <span id="stGoldPoolTime">—</span> <span id="stGoldPoolSlot" style="font-size:11px;color:var(--sub);font-weight:400">累计信号池 · 盘后</span></h3>
@@ -9262,6 +9267,11 @@ window.__renderV8CalFull();
       });
       if(domCat && domVal>0) syn+='，'+domCat+'类净流入居首（'+domVal.toFixed(2)+'亿）';
     }
+    if(heat&&heat.industry_flow&&heat.industry_flow.length){
+      var top5=heat.industry_flow.slice(0,5);
+      var indText=top5.map(function(x){ return x.name+' '+((x.net_inflow_yi>=0?'+':'')+x.net_inflow_yi.toFixed(1))+'亿'; }).join(' / ');
+      analysis.push('🏭 <b>ETF 真实行业资金 TOP5：</b>'+indText);
+    }
     if(heatItems.length){
       var up=heatItems.filter(function(x){ return (x.chg||0)>=0; }).length;
       syn+='；资金热度样本 '+heatItems.length+' 只中 '+up+' 只上涨，广度'+(up>heatItems.length/2?'偏暖':'分化');
@@ -10027,6 +10037,36 @@ function drawUpDownChart(){
       extra += '</div>';
       el.innerHTML += extra;
     } catch (e) { console.warn('extra orphan-data render fail', e); }
+
+    // 2026-09-11 主人令：候选股池文件新鲜感同步渲染到选股策略区 stPoolFreshBody
+    (function(){
+      var pel = document.getElementById('stPoolFreshBody');
+      if(!pel) return;
+      var cand = window.CANDIDATE || {};
+      var sd = cand.source_dist || {};
+      var fs = window.FRESHNESS_STATUS || {};
+      var fi = fs.Candidate || {};
+      var order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'];
+      var expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50};
+      var html = '<div style="display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;">';
+      order.forEach(function(s){
+        var cnt = sd[s]||0;
+        var exp = expect[s]||null;
+        var color, icon;
+        if(cnt === 0){ color = s==='港股成交前50'||s==='外资研报' ? '#f59e0b' : '#ef4444'; icon = '✗'; }
+        else if(exp && cnt < exp * 0.6){ color = '#f59e0b'; icon = '⚠'; }
+        else { color = '#22c55e'; icon = '✓'; }
+        var label = s.replace(/成交前\d+|研报/,'');
+        html += '<span style="background:'+color+'15;color:'+color+';border:1px solid '+color+'30;border-radius:4px;padding:2px 8px;font-size:11px;white-space:nowrap">'+icon+' '+label+' '+cnt+'</span>';
+      });
+      html += '</div>';
+      var ts = fi.last_update || cand.update_time || cand.gen_time || '';
+      var rel = (window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts).slice(0,16).replace('T',' '));
+      pel.innerHTML = '<div style="font-size:11px;color:var(--sub);margin-bottom:6px;">🧭 候选股池 <span style="color:var(--dim)">(来源级)</span></div>'+html
+        +'<div style="font-size:10px;color:var(--dim);margin-top:6px;">最后更新：'+_esc(rel)+'</div>';
+      var pt = document.getElementById('stPoolFreshTime');
+      if(pt) pt.textContent = rel;
+    })();
 
     // 统一渲染文件新鲜度与上游诊断，并收集失败原因到底部 opDiagDetails
     try{ renderDataFreshness(); }catch(e){ console.warn('renderDataFreshness fail', e); }
