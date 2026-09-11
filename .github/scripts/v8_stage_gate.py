@@ -325,18 +325,29 @@ def chain_day(ref: dt.date, lookback: int = 0):
     """返回 (数据日 | None, 类型 trading|t1|none, 说明)。
 
     lookback>0 时向前找最近一个「应跑日」（供 --force 周末审计补跑）。
+
+    🔴 2026-09-11 一劳永逸（阿狸咪的工程师）：非交易日「应跑日」判据精确化。
+      主人规则：**周六跑 / 周日不跑 / 假期第一日跑 / 假期第二日起不跑**。
+      旧判据 `gap=(d-上一交易日).days; 0 < gap <= 3` ⇒ 距上个交易日不超过 3 天即判 t1，
+      实测把**假期第 2、3 天也判成应跑日**（中秋 09-26、国庆 10-02/10-03 全部 t1）：
+        · 白跑整链 84 分钟 ×(N-1) 天；
+        · 产物 update_time 被刷成**非交易日日期** → 主站卡片显示「10-02」这类不存在的数据日。
+      新判据只认「连续休市段的第一天」（前一天是交易日），三条规则**全部自动成立**：
+        · 周六         d-1 = 周五(交易日)   → 段首   → 跑
+        · 周日         d-1 = 周六(非交易日) → 非段首 → 不跑
+        · 假期第一日   d-1 = 交易日         → 段首   → 跑
+        · 假期第2日起  d-1 = 非交易日       → 非段首 → 不跑（含假期里落到周六的那天）
+      ⚠️ 已知边界（非交易日集合无法区分，已在交接单标注）：若某年假期自**周六**开始，
+        则段首=周六；若假期自**周一**开始，段首仍是周六（周末也属该休市段）。两种情况
+        都只在段首跑一次，同一目标（下个交易日）的数据不会缺，只是唤醒点比字面少一次。
     """
     for i in range(lookback + 1):
         d = ref - dt.timedelta(days=i)
         if _is_trading_day(d):
             return d, "trading", f"交易日 {d}"
-        if d.weekday() == 6:      # 周日休市（周五 T+1 周六已处理）
-            continue
-        ld = _last_trading_day(d)
-        if ld is not None:
-            gap = (d - ld).days
-            if 0 < gap <= 3:
-                return d, "t1", f"T+1 数据日 {d}（上一交易日 {ld}）"
+        # 🔴 2026-09-11 精确判据：仅「连续休市段的第一天」为应跑日（详见 docstring）
+        if _is_trading_day(d - dt.timedelta(days=1)):
+            return d, "t1", f"T+1 数据日 {d}（上一交易日 {_last_trading_day(d)}）"
     return None, "none", "非交易日（休市，无 T+1 需求）"
 
 
@@ -354,7 +365,9 @@ def _backfill_candidate(root: str, ref: dt.date):
       判据严格限定为「上一数据日**确有**未完成批次」，正常日不受任何影响。
     """
     prev = ref - dt.timedelta(days=1)
-    pday, pkind, pnote = chain_day(prev, lookback=2)
+    # 🔴 2026-09-11 判据改「段首」后，回填需跨过**整段**连续休市（最长 = 国庆 7 天
+    #   + 前后周末 ≈ 9~10 天）才能找到上一个应跑日；2 太短会漏掉假期首日。
+    pday, pkind, pnote = chain_day(prev, lookback=10)
     if pkind == "none" or pday is None:
         return None
     pfloor = FLOOR_TRADING if pkind == "trading" else FLOOR_T1
@@ -373,7 +386,7 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool):
     ref = now.date()
     if hh < _NIGHT_CUT:             # 凌晨归前一自然日（夜间补跑窗口）
         ref -= dt.timedelta(days=1)
-    day, kind, note = chain_day(ref, lookback=3 if force else 0)
+    day, kind, note = chain_day(ref, lookback=10 if force else 0)
 
     if kind == "none":
         return ("NONE", True, f"⏸ {note} → 不跑任何批（合规空转）", day, kind, {})
@@ -469,7 +482,7 @@ def main() -> int:
         else:
             d = None
         if d is None:
-            d, kind, _ = chain_day(now.date(), lookback=3)
+            d, kind, _ = chain_day(now.date(), lookback=10)
             if d is None:
                 d, kind = now.date(), "trading"
         else:
