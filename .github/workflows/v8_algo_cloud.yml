@@ -329,7 +329,11 @@ jobs:
           set +e
           git config --system --add safe.directory '*' 2>/dev/null
           git config --global --add safe.directory '*' 2>/dev/null
-if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+          # 🛡 2026-09-11 抢修（阿狸咪的工程师）：本行缩进曾被 `3ce9dd972` 丢失 →
+          #   YAML literal block scalar 在此终止 → 整份 workflow 对 GitHub 无效
+          #   （run name 退回文件路径 / jobs=0 / 瞬时 failure，#1771 实证）
+          #   → schedule 不触发、dispatch 被拒 = 「后面的出不来」。勿再改动本行缩进。
+          if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
             if git status --porcelain >/dev/null 2>&1; then
               echo "✅ git 可用（safe.directory 已就绪；自托管 runner 属主不一致已绕过）"
             else
