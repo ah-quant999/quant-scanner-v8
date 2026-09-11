@@ -258,6 +258,53 @@ def _newest(root: str, items):
     return best
 
 
+# 🚪 逃生门（2026-09-12 主人令·一劳永逸）：上游落后超阈值时的强制放行。
+#
+# 背景（真危险，非理论）：B 批 need=8/9，只要 A 的 9 项里有 2 项长期不鲜，
+#   闸门就永远判「B 未就绪」→ 每轮都去跑 B → **D 批（最终推荐）永久不触发**。
+#   系统只亮红灯、不会自己绕过去 ⇒ 最终推荐永久停更（比「带降级标记的旧结果」更糟）。
+#
+# 主人拍板语义：「宁可给带降级标记的结果，也不要永久空白（标记可见就不算假成功）。」
+#
+# 生效条件（两者同时满足才算「上游长坏」）：
+#   ① A 批未就绪，且
+#   ② A 批**最新**产物的数据日 距当前数据日 > UPSTREAM_LAG_MAX 个自然日。
+# 效果：B 批强行放行（由 PREREQ 让 D 也能跑），并在日志/产物打 `DEGRADED_UPSTREAM` 标记。
+UPSTREAM_LAG_MAX = 2
+
+
+def _upstream_lag_days(root: str, items, day: str) -> int | None:
+    """上游最新产物距目标数据日落后几个自然日；无任何产物时返回 None。"""
+    newest = _newest(root, items)
+    if not newest:
+        return None
+    try:
+        d_new = dt.date.fromisoformat(newest[0])
+        d_tgt = dt.date.fromisoformat(day)
+        return (d_tgt - d_new).days
+    except Exception:
+        return None
+
+
+def _escape_gate(root: str, day: str) -> tuple[bool, str, int]:
+    """判断是否满足逃生门（上游长坏 > UPSTREAM_LAG_MAX 天）。
+
+    返回 (是否放行, 原因文案, 落后天数)。滞后天数用 -1 表示「无从判断（产物全缺）」。
+    原因文案仅供日志/人读；机器消费请用 rdy 里的 DEGRADED_UPSTREAM / degrade_lag_days。
+    """
+    lag = _upstream_lag_days(root, READY_SPEC["A"]["items"], day)
+    if lag is None:
+        # A 批一个产物都没有：可能是首次冷启动。仍给逃生门（否则整链永远起不来），
+        # 但标记要更醒目 —— 「无上游」比「上游落后」更需要人工看一眼。
+        return True, ("🚪 DEGRADED_UPSTREAM：A 批产物全部缺失（无从判断落后天数）"
+                      "→ 强制放行 B 批，下游带「数据降级」标记"), -1
+    if lag > UPSTREAM_LAG_MAX:
+        return True, (f"🚪 DEGRADED_UPSTREAM：A 批最新产物落后 {lag} 天 "
+                      f"(> {UPSTREAM_LAG_MAX}) → 强制放行 B 批，"
+                      f"避免 D 批（最终推荐）永久饿死；下游带「数据降级」标记"), lag
+    return False, f"A 批落后 {lag} 天（≤ {UPSTREAM_LAG_MAX}，仍在容忍窗内）→ 不放行，先补采 A", lag
+
+
 # 🔴 跨批顺序判据（一环套一环的硬约束）：下游最新产物必须 ≥ 上游基准产物。
 #   基准只挑「单一来源、写一次就固定」的产物，避免被后续抓取链刷新导致反复重算。
 SEQ_REF: dict[str, str] = {
@@ -409,6 +456,13 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool):
     def out():
         return {f"ready_{s}": ready[s][1] for s in ("A", "B", "D", "E")}
 
+    # 🚪 逃生门（2026-09-12 主人令）：上游长坏时强制放行 B 批，防 D 批永久饿死。
+    #   放在所有「显式 stage」分支**之前**判定，但只在**自动链**路径生效
+    #   （人工 --explicit-stage 仍尊重人工意图，见下方分支顺序）。
+    _escape = (False, "", 0)
+    if not ready["A"][0] and not explicit:
+        _escape = _escape_gate(root, day_s)
+
     # ── 0) 显式全链（人工应急全量补算）──────────────────────────────────────
     if explicit == "ALL":
         return ("ALL", True, "显式 ALL：应急全量补算（缺什么跑什么，由 run_algorithms 全链兜底）",
@@ -444,6 +498,16 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool):
 
     # ── 3) 自愈：缺什么跑什么（纯内容级 · 一环套一环）────────────────────────
     if not ready["A"][0]:
+        if _escape[0]:
+            # 🚪 逃生门开启：不先跑 A（上游源已长坏，再跑也是白跑），直接放行 B→D，
+            #    让「带数据降级标记的最终推荐」先出得来（可见标记 ≠ 假成功）。
+            #    ⚠️ rdy 的值会被 main() 逐行写成 `KEY=VALUE` 并 source 进 shell，
+            #       故此处只放**不含空格/换行**的安全值；可读原因放 reason（单行）。
+            return ("B", True,
+                    f"A 未就绪({ready['A'][1]})，但{_escape[1]}；"
+                    f"→ 本轮跑选股批 B（降级放行，D 批将据此后继放行）",
+                    day, kind, dict(out(), DEGRADED_UPSTREAM="1",
+                                    degrade_lag_days=str(_escape[2])))
         return ("A", True, f"A 未就绪({ready['A'][1]}) → 跑采集批", day, kind, out())
     if not ready["B"][0]:
         return ("B", True, f"A 就绪({ready['A'][1]}) B 未就绪({ready['B'][1]}) → 跑选股批", day, kind, out())

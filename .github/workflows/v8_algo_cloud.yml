@@ -485,6 +485,18 @@ jobs:
           OK=$(printf '%s' "$OUT" | grep -m1 '^stage_ok=' | cut -d= -f2)
           TGT=$(printf '%s' "$OUT" | grep -m1 '^target_stage=' | cut -d= -f2)
           REASON=$(printf '%s' "$OUT" | grep -m1 '^reason=' | sed 's/^reason=//')
+          # 🚪 2026-09-12 逃生门标记（主人令·一劳永逸）：
+          #   上游长坏 >2 交易日时，闸门会降级放行 B 批并置 DEGRADED_UPSTREAM=1。
+          #   该标记必须**透出为 step output** 并写进 step summary —— 否则「加了标记没人看」，
+          #   等于没加（这正是主人最反感的假成功：有问题却全绿、前端也无从显示）。
+          DEG=$(printf '%s' "$OUT" | grep -m1 '^DEGRADED_UPSTREAM=' | cut -d= -f2)
+          DEGLAG=$(printf '%s' "$OUT" | grep -m1 '^degrade_lag_days=' | cut -d= -f2)
+          DEG="${DEG:-0}"
+          echo "degraded_upstream=${DEG}" >> "$GITHUB_OUTPUT"
+          echo "degrade_lag_days=${DEGLAG:--1}" >> "$GITHUB_OUTPUT"
+          if [ "$DEG" = "1" ]; then
+            echo "::warning title=v8-degraded-upstream::🚪 上游数据长坏（落后 ${DEGLAG} 天）—— 已降级放行 ${TGT} 批，产物将带「数据降级」标记（可见标记 ≠ 假成功）"
+          fi
           # 🛡 闸门自身异常必须红灯（否则下游全 skip = 假绿灯，又是"什么都没跑却全绿"）
           if [ -z "$TGT" ] || [ -z "$OK" ]; then
             echo "::error title=v8-stage-gate-crash::批次闸门未产出判定（脚本异常/输出解析失败）—— 拒绝放行，请排查"
@@ -501,8 +513,9 @@ jobs:
             echo "| 目标批次 | **${TGT}** |"
             echo "| 是否放行 | **${OK}** |"
             echo "| 判定 | ${REASON} |"
+            [ "${DEG:-0}" = "1" ] && echo "| 🚪 降级放行 | **是**（上游落后 ${DEGLAG:--1} 天，产物带「数据降级」标记） |"
             echo ""
-            printf '%s\n' "$OUT" | grep -E '^(proceed=|chain_|ready_|cst_hour=)' | sed 's/^/    /'
+            printf '%s\n' "$OUT" | grep -E '^(proceed=|chain_|ready_|cst_hour=|DEGRADED_UPSTREAM=|degrade_lag_days=)' | sed 's/^/    /'
           } >> "$GITHUB_STEP_SUMMARY"
           if [ "$OK" != "true" ]; then
             echo "::error title=v8-stage-gate-blocked::上游未就绪，已拒绝执行 ${TGT} 批 —— ${REASON}"
@@ -585,6 +598,11 @@ jobs:
           HH=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).hour)")
           echo "🎯 event=${GITHUB_EVENT_NAME} CST=${HH:-?} → stage=${STAGE:-ALL}（闸门：${{ steps.gate.outputs.reason }}）"
           if [ "$STAGE" = "ALL" ]; then STAGE=""; fi   # 显式全链应急
+          # 🚪 2026-09-12 逃生门标记透传给算法脚本（D 批 final_recommend 会写进产物 →
+          #   前端可显示「数据降级」横幅）。默认 0，绝不默认降级。
+          export DEGRADED_UPSTREAM="${{ steps.gate.outputs.degraded_upstream }}"
+          export DEGRADE_LAG_DAYS="${{ steps.gate.outputs.degrade_lag_days }}"
+          echo "🚪 DEGRADED_UPSTREAM=${DEGRADED_UPSTREAM:-0}  lag=${DEGRADE_LAG_DAYS:--1}"
           if [ -n "$STAGE" ]; then
             python algorithms/run_algorithms.py --stage "$STAGE"
           else

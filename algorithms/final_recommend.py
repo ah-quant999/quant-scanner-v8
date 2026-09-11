@@ -1114,6 +1114,15 @@ def main():
     _top30_keys = {x["key"] for x in _top30}
     _factor_extra = [x for x in scored[30:] if ("异常换手率" in x["sources"] or "ROE_TTM" in x["sources"]) and x["key"] not in _top30_keys]
 
+    # 🚪 数据降级标记（2026-09-12 主人令·一劳永逸）：
+    #   上游（A 采集批）长坏 >2 交易日时，批次闸门会降级放行 B 批，并把
+    #   DEGRADED_UPSTREAM=1 / degrade_lag_days=N 经 workflow env 传到这里。
+    #   **必须写进产物并透到前端** —— 主人拍板原话：「宁可给带降级标记的结果，
+    #   也不要永久空白（标记可见就不算假成功）」。没有这行，降级放行出来的
+    #   最终推荐会和正常结果长得一模一样 ⇒ 又变成一种新的假成功。
+    _degraded = str(os.environ.get("DEGRADED_UPSTREAM", "")).strip() == "1"
+    _degrade_lag = str(os.environ.get("DEGRADE_LAG_DAYS", "")).strip()
+
     result = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "crisis_score": round(crisis_score, 1),
@@ -1121,6 +1130,12 @@ def main():
         "crisis_note": "逆势龙头已并入" if crisis_high else "危机雷达未达高位，逆势龙头暂不并入",
         "total_candidates": len(scored),
         "top_n": _effective_top_n,
+        "data_degraded": _degraded,
+        "degrade_note": (
+            f"⚠️ 数据降级：上游采集（A 批）已落后 {_degrade_lag or '?'} 个交易日（阈值 2），"
+            f"本结果为「降级放行」产物 —— 排序与信号有效，但底层行情可能不是最新交易日。"
+            f"请勿据此判断当日市场状态。" if _degraded else None
+        ),
         "market_regime": {
             "date": _regime_date,
             "regime": _regime_name,
