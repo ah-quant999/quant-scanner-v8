@@ -2134,7 +2134,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">本机闸门</div>
         <div class="logic-p">v8_cloud_watchdog.py 核对核心 data/*.js 的 update_time，raw_data 超过90分钟无新 commit 即 ALERT；本机只告警/汇报，不自动覆盖数据。</div>
         <div class="logic-h">候选股池来源级监控（2026-08-08 新增）</div>
-        <div class="logic-p">候选股池是全站算法链的<b>上游水源</b>（金股/CRDS/四量/评分全部从它取股）。除整体 update_time 外，来源级监控「文件新鲜感」卡（<b>2026-09-11 主人令</b>）为<b>运维页顶部独立卡（数据健康总览卡上方）</b>（id=opsCandidateFreshBody），展示六大来源彩色标签行（主板/创业板/科创板/港股/外资研投各自数量+✓⚠✗状态）：<br>· <b>night_watchdog.py</b> 每次巡检拆分六大来源数量，成交额TOP三板归零→🔴CRITICAL、&lt;80%→⚠️WARNING；港股/外资研投归零→⚠️降级（云端可能天然缺失）。<br>· <b>正常基线</b>：主板成交前100 + 创业板成交前100 + 科创板成交前100（三板合计≥300只）。低于此基线需排查 mootdx/akshare 是否挂了。</div>
+        <div class="logic-p">候选股池是全站算法链的<b>上游水源</b>（金股/CRDS/四量/评分全部从它取股）。除整体 update_time 外，来源级监控由<b>运维页「数据健康总览」卡 → 「文件新鲜度」表内「候选股池（来源级）」行</b>承载（<b>2026-09-11 主人令</b>；id=freshRowCandidate + 六来源彩色标签子行 freshCandidateSources：主板/创业板/科创板/港股/外资研投各自数量+✓⚠✗状态）。<b>一劳永逸</b>：此前与它重复的「运维页顶部独立卡（opsCandidateFreshBody）」已删除 —— 同一信息不再两处渲染。<br>· <b>night_watchdog.py</b> 每次巡检拆分六大来源数量，成交额TOP三板归零→🔴CRITICAL、&lt;80%→⚠️WARNING；港股/外资研投归零→⚠️降级（云端可能天然缺失）。<br>· <b>正常基线</b>：主板成交前100 + 创业板成交前100 + 科创板成交前100（三板合计≥300只）。低于此基线需排查 mootdx/akshare 是否挂了。</div>
       </div>
 
       

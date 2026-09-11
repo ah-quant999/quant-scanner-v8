@@ -6490,12 +6490,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 2026-08-31 轻量化：逻辑详解已拆为独立页 logic.html，主站运维页同步说明 -->
     <div style="font-size:12px;color:var(--dim);margin:0 0 14px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">ℹ️ <b style="color:var(--gold)">逻辑详解（指标/策略/安全口径）</b> 已于 2026-08-31 轻量化拆为独立页 <code>logic.html</code>。点顶部 🔒 <b>逻辑详解</b> Tab 可打开（本体 153.6 KB 不再进首屏，首屏省 166 KB）。</div>
 
-    <!-- 2026-09-11 主人令：文件新鲜感(候选股池来源级) 独立卡，置于运维页顶部 · 数据健康总览上方 -->
-    <div class="card" style="margin-bottom:16px;border-left:3px solid var(--cyan);">
-      <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">💾</span>文件新鲜感 <span class="fresh" id="opsCandidateFreshTime">—</span></h3>
-      <div id="opsCandidateFreshBody"><div style="font-size:12px;color:var(--dim)">等待候选股池来源级数据…</div></div>
-    </div>
-
     <!-- 🩺 数据健康总览：Runner 追踪 + 文件新鲜度 + 上游诊断 合并为一劳永逸式展示 -->
     <div class="card" style="margin-bottom:16px;border-left:3px solid var(--teal)">
       <h3><span class="ic">🩺</span>数据健康总览 <span class="fresh" style="font-size:10px">[动态]</span></h3>
@@ -9955,37 +9949,6 @@ function drawUpDownChart(){
     const el = document.getElementById('runnerTrackBody');
     if(!el) return;
     const _esc = function(v){ return String(v==null?'':v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
-    // 2026-09-11 主人令：候选股池来源级新鲜感 → 运维页顶部独立卡 opsCandidateFreshBody（数据健康总览上方）
-    //   本渲染独立于 rs，故置于「暂无 runner 状态」早退之前，保证该卡始终渲染。
-    function _renderOpsCandidateFresh(){
-      var pel = document.getElementById('opsCandidateFreshBody');
-      if(!pel) return;
-      var cand = window.CANDIDATE || {};
-      var sd = cand.source_dist || {};
-      var fs = window.FRESHNESS_STATUS || {};
-      var fi = fs.Candidate || {};
-      var order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'];
-      var expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50};
-      var html = '<div style="display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;">';
-      order.forEach(function(s){
-        var cnt = sd[s]||0;
-        var exp = expect[s]||null;
-        var color, icon;
-        if(cnt === 0){ color = s==='港股成交前50'||s==='外资研报' ? '#f59e0b' : '#ef4444'; icon = '✗'; }
-        else if(exp && cnt < exp * 0.6){ color = '#f59e0b'; icon = '⚠'; }
-        else { color = '#22c55e'; icon = '✓'; }
-        var label = s.replace(/成交前\d+|研报/,'');
-        html += '<span style="background:'+color+'15;color:'+color+';border:1px solid '+color+'30;border-radius:4px;padding:2px 8px;font-size:11px;white-space:nowrap">'+icon+' '+label+' '+cnt+'</span>';
-      });
-      html += '</div>';
-      var ts = fi.last_update || cand.update_time || cand.gen_time || '';
-      var tsRel = (window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts).slice(0,16).replace('T',' '));
-      pel.innerHTML = '<div style="font-size:11px;color:var(--sub);margin-bottom:6px;">🧭 候选股池 <span style="color:var(--dim)">(来源级)</span></div>'+html
-        +'<div style="font-size:10px;color:var(--dim);margin-top:6px;">最后更新：'+_esc(tsRel)+'</div>';
-      var pt = document.getElementById('opsCandidateFreshTime');
-      if(pt) pt.textContent = tsRel;
-    }
-    try{ _renderOpsCandidateFresh(); }catch(e){ console.warn('opsCandidateFresh render fail', e); }
     if(!rs || !rs.run_time){
       el.innerHTML = '<div style="font-size:12px;color:var(--dim)">暂无 runner 状态（等待中国节点首次抓取后生成）</div>';
       return;
@@ -10082,9 +10045,6 @@ function drawUpDownChart(){
       extra += '</div>';
       el.innerHTML += extra;
     } catch (e) { console.warn('extra orphan-data render fail', e); }
-
-    // 2026-09-11：候选股池来源级新鲜感渲染已上移至函数开头 _renderOpsCandidateFresh()，
-    //   独立于 rs，确保「暂无 runner 状态」早退时该卡也照常渲染。
 
     // 统一渲染文件新鲜度与上游诊断，并收集失败原因到底部 opDiagDetails
     try{ renderDataFreshness(); }catch(e){ console.warn('renderDataFreshness fail', e); }
