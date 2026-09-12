@@ -6074,7 +6074,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + (cards ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">' + cards + '</div>'
                : '<div class="note" style="color:var(--dim);">本主题无概念命中，换个主题试试</div>')
       + (hits.length > TV_MAX ? '<div style="font-size:11px;color:var(--dim);margin-top:6px;">仅展示前 ' + TV_MAX + ' 只 / 共 ' + hits.length + ' 只（按 A→B→C、板块资金净额、命中标签数排序）</div>' : '')
-      + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.6;">口径：板块资金取 SECTOR_FUND_FLOW「概念」类板块当日主力净额（亿元），个股资金 = Σ(其命中概念板块净额)；'
+      + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.6;">口径：先按七大主题概念筛选，再按「业绩预告变化率 + ROE_TTM」给成长+质量分排序；板块资金取 SECTOR_FUND_FLOW「概念」类板块当日主力净额（亿元），个股资金 = Σ(其命中概念板块净额)；'
       + '卡内符号：🔥=资金流入+基本面证据 / 💰=仅资金流入 / 📈=有基本面证据但资金未流入，仅作交叉提示、非买卖信号。仅研究参考，不构成投资建议。</div>'
       + '</div>';   // /padding 12 14
   };
