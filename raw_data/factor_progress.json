@@ -1,6 +1,6 @@
 {
- "update_time": "2026-09-12 11:46:21",
- "source_update_time": "2026-09-12 02:42:29",
+ "update_time": "2026-09-12 15:48:51",
+ "source_update_time": "2026-09-12 11:46:16",
  "policy": "主人 2026-09-09 22:31 决策：分批 walk-forward，禁止直接硬编码高分；OOS IR > 0.3 且 4/5 年胜率 > 55% 方可上线",
  "summary": {
   "total": 7,

@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-12 12:39:47",
+  "update_time": "2026-09-12 15:12:55",
   "data_date": "2026-09-12",
   "track_start": "2026-09-12",
   "history_days": 18,
@@ -12,18 +12,18 @@
       "market": "sh",
       "board": "科创板",
       "status": "near",
-      "total_score": 30.4,
+      "total_score": 33.5,
       "quality_grade": "C",
       "industry": "软件和信息技术服务业",
       "sectors": [
-        "软件和信息技术服务业",
-        "融资融券",
-        "科创板做市股",
-        "MSCI中国",
-        "昨日高振幅",
         "半导体概念",
+        "科创板做市股",
+        "中证500",
+        "MSCI中国",
         "超清视频",
-        "中证500"
+        "融资融券",
+        "软件和信息技术服务业",
+        "昨日高振幅"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-12",
@@ -46,7 +46,7 @@
       "market": "hk",
       "board": "港股",
       "status": "near",
-      "total_score": 28.0,
+      "total_score": 31.1,
       "quality_grade": "",
       "industry": "",
       "sectors": [],
@@ -65,7 +65,7 @@
       "market": "hk",
       "board": "港股",
       "status": "near",
-      "total_score": 26.7,
+      "total_score": 29.8,
       "quality_grade": "",
       "industry": "",
       "sectors": [],
@@ -84,7 +84,7 @@
       "market": "hk",
       "board": "港股",
       "status": "near",
-      "total_score": 25.5,
+      "total_score": 28.6,
       "quality_grade": "",
       "industry": "",
       "sectors": [],
@@ -98,31 +98,12 @@
       "catalysts": []
     },
     {
-      "code": "06862",
-      "name": "海底捞",
-      "market": "hk",
-      "board": "港股",
-      "status": "near",
-      "total_score": 25.5,
-      "quality_grade": "",
-      "industry": "",
-      "sectors": [],
-      "signal_count": 2,
-      "enter_date": "2026-09-12",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 10.36,
-      "current_close": 10.36,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
       "code": "09868",
       "name": "小鹏汽车-W",
       "market": "hk",
       "board": "港股",
       "status": "near",
-      "total_score": 25.5,
+      "total_score": 28.6,
       "quality_grade": "",
       "industry": "",
       "sectors": [],
@@ -136,12 +117,31 @@
       "catalysts": []
     },
     {
+      "code": "06862",
+      "name": "海底捞",
+      "market": "hk",
+      "board": "港股",
+      "status": "near",
+      "total_score": 28.6,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 2,
+      "enter_date": "2026-09-12",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 10.36,
+      "current_close": 10.36,
+      "pnl_pct": 0.0,
+      "catalysts": []
+    },
+    {
       "code": "00291",
       "name": "华润啤酒",
       "market": "hk",
       "board": "港股",
       "status": "near",
-      "total_score": 25.5,
+      "total_score": 28.6,
       "quality_grade": "",
       "industry": "",
       "sectors": [],
@@ -160,18 +160,18 @@
       "market": "sh",
       "board": "主板",
       "status": "near",
-      "total_score": 33.8,
+      "total_score": 34.4,
       "quality_grade": "C",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "生物识别",
-        "2026中报预增",
-        "计算机、通信和其他电子设备制造业",
         "物联网",
-        "HS300",
-        "新材料",
+        "计算机、通信和其他电子设备制造业",
+        "毫米波概念",
+        "2026中报预增",
         "MSCI中国",
-        "毫米波概念"
+        "新材料",
+        "HS300",
+        "生物识别"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-08",
@@ -198,14 +198,14 @@
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
-        "有色金属矿采选业",
-        "锂矿概念",
+        "稀缺资源",
         "2026中报预增",
         "MSCI中国",
-        "稀缺资源",
-        "钒电池",
+        "有色金属矿采选业",
+        "新材料",
         "昨日炸板",
-        "新材料"
+        "钒电池",
+        "锂矿概念"
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
@@ -233,13 +233,13 @@
       "industry": "电气机械和器材制造业",
       "sectors": [
         "电气机械和器材制造业",
-        "周期股",
         "2026中报预增",
-        "上证180",
-        "沪股通",
-        "HS300",
         "MSCI中国",
-        "2026一季报预增"
+        "上证180",
+        "HS300",
+        "2026一季报预增",
+        "沪股通",
+        "周期股"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-12",
@@ -526,8 +526,8 @@
           "百胜中国",
           "09866",
           "吉利汽车",
-          "海底捞",
           "小鹏汽车-W",
+          "海底捞",
           "华润啤酒"
         ]
       },
@@ -570,19 +570,15 @@
         "count": 3
       },
       {
-        "sector": "HS300",
-        "count": 2
-      },
-      {
         "sector": "新材料",
         "count": 2
       },
       {
-        "sector": "软件和信息技术服务业",
-        "count": 1
+        "sector": "HS300",
+        "count": 2
       },
       {
-        "sector": "融资融券",
+        "sector": "半导体概念",
         "count": 1
       },
       {
@@ -590,11 +586,7 @@
         "count": 1
       },
       {
-        "sector": "昨日高振幅",
-        "count": 1
-      },
-      {
-        "sector": "半导体概念",
+        "sector": "中证500",
         "count": 1
       },
       {
@@ -602,15 +594,15 @@
         "count": 1
       },
       {
-        "sector": "中证500",
+        "sector": "融资融券",
         "count": 1
       },
       {
-        "sector": "生物识别",
+        "sector": "软件和信息技术服务业",
         "count": 1
       },
       {
-        "sector": "计算机、通信和其他电子设备制造业",
+        "sector": "昨日高振幅",
         "count": 1
       },
       {
@@ -618,15 +610,15 @@
         "count": 1
       },
       {
+        "sector": "计算机、通信和其他电子设备制造业",
+        "count": 1
+      },
+      {
         "sector": "毫米波概念",
         "count": 1
       },
       {
-        "sector": "有色金属矿采选业",
-        "count": 1
-      },
-      {
-        "sector": "锂矿概念",
+        "sector": "生物识别",
         "count": 1
       },
       {
@@ -634,7 +626,7 @@
         "count": 1
       },
       {
-        "sector": "钒电池",
+        "sector": "有色金属矿采选业",
         "count": 1
       },
       {
@@ -642,11 +634,15 @@
         "count": 1
       },
       {
-        "sector": "电气机械和器材制造业",
+        "sector": "钒电池",
         "count": 1
       },
       {
-        "sector": "周期股",
+        "sector": "锂矿概念",
+        "count": 1
+      },
+      {
+        "sector": "电气机械和器材制造业",
         "count": 1
       },
       {
@@ -654,11 +650,15 @@
         "count": 1
       },
       {
+        "sector": "2026一季报预增",
+        "count": 1
+      },
+      {
         "sector": "沪股通",
         "count": 1
       },
       {
-        "sector": "2026一季报预增",
+        "sector": "周期股",
         "count": 1
       }
     ],

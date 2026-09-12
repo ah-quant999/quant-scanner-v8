@@ -2496,13 +2496,13 @@
       "board": "主板"
     }
   ],
-  "generated_at": "2026-09-12 11:30:51",
-  "update_time": "2026-09-12 11:30:51",
+  "generated_at": "2026-09-12 15:33:28",
+  "update_time": "2026-09-12 15:33:28",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖",
   "kline_stat": {
-    "cache_fresh": 121,
+    "cache_fresh": 196,
     "cache_stale": 11,
-    "net": 75,
+    "net": 0,
     "fail": 4
   },
   "degraded": false,
