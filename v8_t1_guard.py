@@ -26,6 +26,7 @@ STATE_FILE = BASE / ".t1_heal_state.json"
 
 #  post_close 算法链产物，T+1 应在周六补全
 T1_FILES = [
+    # 消费层（前端直接读取）
     "data/CANDIDATE.js",
     "data/GOLD_POOL.js",
     "data/LHB_DATA.js",
@@ -36,6 +37,15 @@ T1_FILES = [
     "data/SZ_FIB.js",
     "data/NT_DATA.js",
     "data/LHB_HISTORY.js",
+    # 上游 raw_data：T+1 数据早上出齐后，raw_data 先于/同步于 data 刷新，必须纳入检查
+    "raw_data/candidate.json",
+    "raw_data/gold_pool.json",
+    "raw_data/lhb_data.json",
+    "raw_data/inst_trade.json",
+    "raw_data/triple_consensus.json",
+    "raw_data/sh_fib.json",
+    "raw_data/sz_fib.json",
+    "raw_data/nt_data.json",
 ]
 
 
@@ -75,10 +85,11 @@ def save_state(state):
     STATE_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def last_saturday_midnight():
+def last_saturday_at_0800():
+    """T+1 数据在周六早上 08:00 后才陆续出齐，故以周六 08:00 为新鲜度门槛。"""
     now = datetime.now()
     days_since_sat = (now.weekday() - 5) % 7
-    return (now - timedelta(days=days_since_sat)).replace(hour=0, minute=0, second=0, microsecond=0)
+    return (now - timedelta(days=days_since_sat)).replace(hour=8, minute=0, second=0, microsecond=0)
 
 
 def extract_update_time(path):
@@ -100,7 +111,7 @@ def extract_update_time(path):
 
 
 def t1_failed_files():
-    deadline = last_saturday_midnight()
+    deadline = last_saturday_at_0800()
     failed = []
     for rel in T1_FILES:
         p = BASE / rel

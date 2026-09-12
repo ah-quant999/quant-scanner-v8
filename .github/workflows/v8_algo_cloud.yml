@@ -635,6 +635,23 @@ jobs:
         run: |
           python algorithms/bridge_raw_data.py || true
 
+      # 🛡 2026-09-12 一劳永逸：v8_algo_cloud.yml 从 cn 链迁移时丢失了 update_v8.py，
+      #   导致 run_algorithms 只更新 raw_data/*.json，前端 data/GOLD_POOL.js / CANDIDATE.js
+      #   等消费层仍停在旧时间戳（周六 T+1 数据源头正确但界面错误）。
+      #   必须显式跑全量 + post_close，否则纯盘后产物被防回滚护栏跳过。
+      - name: "🔄 重生成 data/*.js (update_v8)"
+        if: steps.gate.outputs.proceed == 'true'
+        run: |
+          set -e
+          python update_v8.py
+          python update_v8.py --category post_close
+
+      - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
+        if: steps.gate.outputs.proceed == 'true'
+        continue-on-error: true
+        run: |
+          python v8_health_check.py
+
       # 2026-08-08 修复：算法链产出 candidate.json 后，立即刷新候选池行情，
       # 避免 runner 状态卡 CANDIDATE_QUOTES 长期显示「空」。
       - name: "📈 刷新候选池行情（CANDIDATE_QUOTES）"
