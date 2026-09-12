@@ -163,6 +163,9 @@ AUTO_COMMIT_PREFIXES = (
     "v8 build:",            # build_deploy workflow 自动产物
     "runner health:",       # runner 健康检查自动 commit
     "Merge origin/main",    # watchdog 自动 rebase 合并
+    "chore(v8):",           # 每日安全网/备份类自动 commit（v8_backup 等）
+    "chore:",               # 缓存戳实时对齐等自动 commit（v8_cache_buster_reconcile）
+    "backup:",              # 每日自动备份自动 commit
 )
 
 # 人工 commit 的类型前缀（用于剥离，得到核心短语）
