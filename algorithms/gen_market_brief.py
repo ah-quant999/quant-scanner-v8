@@ -339,7 +339,16 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
         cat_nets.sort(key=lambda x: x[1], reverse=True)
         if cat_nets and cat_nets[0][1] >= 5:
             top_cat, top_val = cat_nets[0]
-            text = f"{top_cat}ETF 净流入 {top_val:+.2f}亿，资金借道 ETF 布局{top_cat}"
+            # 🛡 2026-09-12 主人令「具体行业写进去」：当 ETF 分类是「行业」时，
+            #   用 sector_fund_flow 里真实行业净流入第一名替换占位词，避免「布局行业」这种空话。
+            if top_cat == "行业":
+                _ind_leaders = sorted(
+                    [s for s in _sector_list(sectors, "sectors_in") if s.get("type") == "行业"],
+                    key=lambda s: -float(s.get("net") or 0))
+                _ind_name = _ind_leaders[0]["name"] if _ind_leaders else "行业"
+                text = f"{_ind_name}行业ETF 净流入 {top_val:+.2f}亿，资金借道 ETF 布局{_ind_name}"
+            else:
+                text = f"{top_cat}ETF 净流入 {top_val:+.2f}亿，资金借道 ETF 布局{top_cat}"
             anomalies.append({
                 "tag": "ETF资金",
                 "emoji": "💰",
@@ -349,7 +358,14 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
             })
         if len(cat_nets) >= 2 and cat_nets[-1][1] <= -3:
             bot_cat, bot_val = cat_nets[-1]
-            text = f"{bot_cat}ETF 净流出 {bot_val:+.2f}亿，资金从{bot_cat}撤离"
+            if bot_cat == "行业":
+                _ind_leaders = sorted(
+                    [s for s in _sector_list(sectors, "sectors_out") if s.get("type") == "行业"],
+                    key=lambda s: float(s.get("net") or 0))
+                _ind_name = _ind_leaders[0]["name"] if _ind_leaders else "行业"
+                text = f"{_ind_name}行业ETF 净流出 {bot_val:+.2f}亿，资金从{_ind_name}撤离"
+            else:
+                text = f"{bot_cat}ETF 净流出 {bot_val:+.2f}亿，资金从{bot_cat}撤离"
             anomalies.append({
                 "tag": "ETF资金",
                 "emoji": "💰",

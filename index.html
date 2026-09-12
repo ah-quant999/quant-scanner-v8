@@ -3885,6 +3885,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     // 兼容 stocks 字段为 dict/array 两种形态
     function _rcArr(x){ if(!x) return []; if(Array.isArray(x)) return x; if(typeof x==='object') return Object.values(x); return []; }
 
+    // 🛡 2026-09-12 主人令「一劳永逸」：每日洞察内容依赖机游共振 + 北向席位
+    //   两路共振日历，必须等它们都就绪才开始计算；但本卡「更新于」时间戳
+    //   不能跟着这两路共振日历一起变——否则盘后基础数据 15:xx 算好后会被
+    //   龙虎榜 17:xx / 北向 22:xx 拖到很晚，徽章永远显示「今日盘后」。
+    var _resReady = !!(LHB.update_time && NF.update_time);
+    if (!_resReady) {
+      c.innerHTML = '<div style="text-align:center;padding:40px;color:var(--dim);">等待机游共振与北向席位数据就绪…<br><span style="font-size:11px;">两路共振日历齐全后自动计算</span></div>';
+      window.__insightRendered = false;
+      return;
+    }
+
     var score = CR.score || 50;
     // 优先级：数据自带的 level 字段（生成端细分） > score 推断（兜底）
     var levelMap = {'危机':'危机','高风险':'危机','警戒':'警戒','警惕':'警戒','关注':'关注','平稳':'平稳','安全':'关注'};
@@ -3904,10 +3915,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     //   其「更新于」的语义应为：**最后一路上线、这张卡才算成型、才可以开始看** ⇒ 取**最大**。
     //   数据来源节奏：龙虎榜单飞 fetcher `v8_lhb_fetch` 每交易日 17:30 CST（cron `30 9 * * 1-5`）
     //   产出 LHB_DATA.js（机游共振 + 北向席位两卡共用），其余七路由 v8_algo_cloud 盘后链陆续产出。
+    // 时间戳只取「非共振」的 6 路数据（不含 LHB/NF），避免被共振日历拖晚。
     var _miTsArr = [
       CR.update_time, CAND.update_time, SR.update_time, VOL.update_time, IQ.update_time,
-      window.SH_SZ_HISTORY && window.SH_SZ_HISTORY.update_time,
-      LHB.update_time, NF.update_time
+      window.SH_SZ_HISTORY && window.SH_SZ_HISTORY.update_time
     ].filter(Boolean).sort();          // 升序
     var _miAllTs = _miTsArr.length ? _miTsArr[_miTsArr.length - 1] : null;   // 取最大 = 卡成型时刻
     var _miOldTs = _miTsArr.length ? _miTsArr[0] : null;                    // 取最小 = 最陈旧一路（供后续诊断）
