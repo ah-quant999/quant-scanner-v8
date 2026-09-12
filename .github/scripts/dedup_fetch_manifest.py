@@ -64,6 +64,19 @@ _ALWAYS_PUSH = {
     "data/INDEX_VALUE_FRAMEWORK.js",
     "data/VALUATION_PERCENTILE.js",
     "data/AI_INSIGHTS_COMPARE.js",
+    # 🛡 2026-09-13 一劳永逸（主人令「金股池还有被用到吗」核查后修复）：补齐 09-11 漏项。
+    #   金股池是「45 交易日继承池」——同一天内多次运行产出的 stocks 完全不变
+    #   （实测：候选池 877 只 → 今日合格 57 只 + 历史继承 196 只 = 253 只；同日重复跑 identical）。
+    #   剥掉时间戳后与远端逐字节几乎相同 ⇒ 本去重器判「伪变更」⇒ 永不推送 ⇒
+    #     ① 前端「金股池」卡片 update_time 停滞（新鲜度恒旧）；
+    #     ② v8_stage_gate.py 的 B 段 READY_SPEC 把 raw_data/gold_pool.json 列为 9/9
+    #        就绪项之一（need=8）⇒ 它恒陈旧 = 永久占用唯一容错名额 ⇒ 任一项抖动即判
+    #        「未就绪」→ **B 批反复重跑**（实测 2026-09-12 派发 9 次 / 7 次 cancelled）。
+    #   v8_stage_gate.py L162-168 的注释早已点名「另 4 张（factor_audit / factor_progress /
+    #   index_value_framework / gold_pool）同病」，但 09-11 那轮只补了前 3 张 + 另 2 张
+    #   （ai_insights_compare / valuation_percentile）——**gold_pool 被漏掉**，本次补齐。
+    "raw_data/gold_pool.json",
+    "data/GOLD_POOL.js",
 }
 
 

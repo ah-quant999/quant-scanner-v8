@@ -154,7 +154,13 @@ READY_SPEC: dict[str, dict] = {
             "raw_data/factor_progress.json",
             "raw_data/valuation_percentile.json",
             "raw_data/index_value_framework.json",
-            "raw_data/gold_pool.json",            # 🛡 2026-09-11：金股池改为 B 批 build_candidate_pool 原生派生，纳入就绪硬约束
+            # 🛡 2026-09-11 纳入；2026-09-13 修正生产者属性（原注释误写为「B 批派生」）：
+            #   实际产出者是**采集批** v8_cn_fetch_cloud.yml 的
+            #   `python algorithms/build_candidate_pool.py` —— 该脚本不在 v8_algo_cloud.yml
+            #   的算法链里（实测 grep 无命中）。
+            #   本项保留为「上游新鲜度抵押」：它鲜活即证明采集批正常。
+            #   need=8 的容错语义与 items 清单均未改动。
+            "raw_data/gold_pool.json",
         ],
         "need": 8,
         # need 用 8/9：3 个核心选股产物 + 5 个收编产物 + gold_pool，即「只容忍 1 项不新鲜」。

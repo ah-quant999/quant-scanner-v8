@@ -515,7 +515,25 @@ def main():
             unchanged += 1
             continue
         # (2) 内容不同：比对时间戳，本地更旧则保留远端版本，绝不覆盖
-        if remote_sha and path.endswith(".json"):
+        # 🛡 2026-09-13 一劳永逸：**累积继承型池类产物**豁免本守卫。
+        #   根因（远端真源实测）：金股池由两条链写同一份 out/gold_pool.json ——
+        #     · algorithms/scanner.py        （算法链 [0-pre]，run_algorithms.py:360）
+        #     · algorithms/build_candidate_pool.py（采集批，v8_cn_fetch_cloud.yml:414）
+        #   scanner.py 的两处落盘**从不设置顶层 update_time**（整文件 0 处命中），
+        #   产出完全继承 prev 旧值（实测 .bak: update_time=2026-09-11 15:00:00，
+        #   而远端已是 2026-09-12 00:53:46）⇒ stage_to_raw 搬进 raw_data 后，
+        #   本守卫判 lts < rts ⇒ **永久拒推自锁**（远端越新越推不动）。
+        #   旁证：commit ed0d5b659 / 485f1719b 里 raw_data/gold_pool.json.bak 被推送、
+        #   gold_pool.json 主文件没有 —— 正因为本守卫判据是 `path.endswith(".json")`，
+        #   .bak 天然豁免、主文件被拦。
+        #   ⚠️ 只豁免「成员单调累积、以磁盘 prev 为输入、覆盖不丢信号」的池类产物。
+        #      lhb_history.json 等 **append 型不在豁免内**（本地更短时覆盖会真丢数据）。
+        _NO_REGRESSION_GUARD = {
+            "raw_data/gold_pool.json",
+            "raw_data/gold_pool_stocks.json",
+        }
+        if (remote_sha and path.endswith(".json")
+                and path not in _NO_REGRESSION_GUARD):
             lts = _content_ts(content)
             if lts:
                 rb = api("GET", f"/repos/{REPO}/git/blobs/{remote_sha}")

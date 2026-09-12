@@ -2712,6 +2712,13 @@ def update_gold_pool_from_scan(output):
     pool["candidate_total"] = len(cand) if cand else 0
 
     pool["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # 🛡 2026-09-13 一劳永逸：显式刷新顶层 update_time。
+    #   本文件此前**从不设置 update_time**（整文件 0 处命中），产出完全继承
+    #   load_gold_pool() 读到的上一版值；一旦该值是「源数据交易日 15:00:00」这类
+    #   陈旧值（实测 .bak: 2026-09-11 15:00:00），stage_to_raw 搬进 raw_data/ 后
+    #   就会触发 api_push_raw.py 的防倒退守卫（lts < rts）⇒ 金股池永久推不动。
+    #   刷新后，产出时间戳恒为本次运行时刻，与 last_update 同源。
+    pool["update_time"] = pool["last_update"]
     pool["total_count"] = len(pool["stocks"])
 
     save_gold_pool(pool)
@@ -2792,6 +2799,13 @@ def update_gold_pool_from_watch(watch_output):
             }
 
     pool["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # 🛡 2026-09-13 一劳永逸：显式刷新顶层 update_time。
+    #   本文件此前**从不设置 update_time**（整文件 0 处命中），产出完全继承
+    #   load_gold_pool() 读到的上一版值；一旦该值是「源数据交易日 15:00:00」这类
+    #   陈旧值（实测 .bak: 2026-09-11 15:00:00），stage_to_raw 搬进 raw_data/ 后
+    #   就会触发 api_push_raw.py 的防倒退守卫（lts < rts）⇒ 金股池永久推不动。
+    #   刷新后，产出时间戳恒为本次运行时刻，与 last_update 同源。
+    pool["update_time"] = pool["last_update"]
     pool["total_count"] = len(pool["stocks"])
 
     save_gold_pool(pool)
