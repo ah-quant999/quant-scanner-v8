@@ -1,6 +1,6 @@
 {
   "calc_time": "2026-09-12",
-  "update_time": "2026-09-12 06:08:42",
+  "update_time": "2026-09-12 21:33:11",
   "method": "baostock 60日K线全量回测 (T+1, T+3, T+5, T+10, T+20, T+30, T+45, T+60, T+75, T+90)",
   "gold_pool_size": 221,
   "stocks_analyzed": 296,

@@ -1,8 +1,17 @@
 {
-  "update_time": "2026-09-12 18:59:42",
-  "run_start": "2026-09-12 18:29:13",
-  "ok": 1,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-09-12 22:23:20",
+  "run_start": "2026-09-12 20:36:15",
+  "ok": 46,
+  "fail": 2,
+  "failed_scripts": [
+    {
+      "script": "fetch_stock_quote_v8.py",
+      "reason": "退出码 1 | ❌ A股行情异常稀少（0 只 < 3000），新浪+东财均不可用 → 拒绝写输出，保留旧数据"
+    },
+    {
+      "script": "track_h_auto_buy.py",
+      "reason": "监督器静默杀(>15min 无输出)"
+    }
+  ],
   "skipped_by_time_gate": []
 }

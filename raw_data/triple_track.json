@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-12 18:34:32",
+  "update_time": "2026-09-12 21:40:37",
   "data_date": "2026-09-12",
   "track_start": "2026-09-12",
   "history_days": 18,
@@ -16,14 +16,14 @@
       "quality_grade": "C",
       "industry": "软件和信息技术服务业",
       "sectors": [
-        "半导体概念",
-        "科创板做市股",
         "中证500",
+        "昨日高振幅",
+        "软件和信息技术服务业",
         "MSCI中国",
         "超清视频",
+        "半导体概念",
         "融资融券",
-        "软件和信息技术服务业",
-        "昨日高振幅"
+        "科创板做市股"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-12",
@@ -79,8 +79,8 @@
       "catalysts": []
     },
     {
-      "code": "00175",
-      "name": "吉利汽车",
+      "code": "06862",
+      "name": "海底捞",
       "market": "hk",
       "board": "港股",
       "status": "near",
@@ -92,8 +92,8 @@
       "enter_date": "2026-09-12",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 16.59,
-      "current_close": 16.59,
+      "first_close": 10.36,
+      "current_close": 10.36,
       "pnl_pct": 0.0,
       "catalysts": []
     },
@@ -117,8 +117,8 @@
       "catalysts": []
     },
     {
-      "code": "06862",
-      "name": "海底捞",
+      "code": "00175",
+      "name": "吉利汽车",
       "market": "hk",
       "board": "港股",
       "status": "near",
@@ -130,8 +130,8 @@
       "enter_date": "2026-09-12",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 10.36,
-      "current_close": 10.36,
+      "first_close": 16.59,
+      "current_close": 16.59,
       "pnl_pct": 0.0,
       "catalysts": []
     },
@@ -164,14 +164,14 @@
       "quality_grade": "C",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "物联网",
+        "生物识别",
         "计算机、通信和其他电子设备制造业",
-        "毫米波概念",
-        "2026中报预增",
         "MSCI中国",
+        "物联网",
         "新材料",
+        "毫米波概念",
         "HS300",
-        "生物识别"
+        "2026中报预增"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-08",
@@ -198,14 +198,14 @@
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
-        "稀缺资源",
-        "2026中报预增",
+        "钒电池",
+        "昨日炸板",
         "MSCI中国",
+        "稀缺资源",
+        "锂矿概念",
         "有色金属矿采选业",
         "新材料",
-        "昨日炸板",
-        "钒电池",
-        "锂矿概念"
+        "2026中报预增"
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
@@ -232,14 +232,14 @@
       "quality_grade": "A",
       "industry": "电气机械和器材制造业",
       "sectors": [
-        "电气机械和器材制造业",
-        "2026中报预增",
-        "MSCI中国",
+        "周期股",
         "上证180",
-        "HS300",
-        "2026一季报预增",
+        "MSCI中国",
+        "电气机械和器材制造业",
         "沪股通",
-        "周期股"
+        "2026一季报预增",
+        "HS300",
+        "2026中报预增"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-12",
@@ -525,9 +525,9 @@
         "names": [
           "百胜中国",
           "09866",
-          "吉利汽车",
-          "小鹏汽车-W",
           "海底捞",
+          "小鹏汽车-W",
+          "吉利汽车",
           "华润啤酒"
         ]
       },
@@ -578,27 +578,7 @@
         "count": 2
       },
       {
-        "sector": "半导体概念",
-        "count": 1
-      },
-      {
-        "sector": "科创板做市股",
-        "count": 1
-      },
-      {
         "sector": "中证500",
-        "count": 1
-      },
-      {
-        "sector": "超清视频",
-        "count": 1
-      },
-      {
-        "sector": "融资融券",
-        "count": 1
-      },
-      {
-        "sector": "软件和信息技术服务业",
         "count": 1
       },
       {
@@ -606,15 +586,23 @@
         "count": 1
       },
       {
-        "sector": "物联网",
+        "sector": "软件和信息技术服务业",
         "count": 1
       },
       {
-        "sector": "计算机、通信和其他电子设备制造业",
+        "sector": "超清视频",
         "count": 1
       },
       {
-        "sector": "毫米波概念",
+        "sector": "半导体概念",
+        "count": 1
+      },
+      {
+        "sector": "融资融券",
+        "count": 1
+      },
+      {
+        "sector": "科创板做市股",
         "count": 1
       },
       {
@@ -622,15 +610,15 @@
         "count": 1
       },
       {
-        "sector": "稀缺资源",
+        "sector": "计算机、通信和其他电子设备制造业",
         "count": 1
       },
       {
-        "sector": "有色金属矿采选业",
+        "sector": "物联网",
         "count": 1
       },
       {
-        "sector": "昨日炸板",
+        "sector": "毫米波概念",
         "count": 1
       },
       {
@@ -638,11 +626,23 @@
         "count": 1
       },
       {
+        "sector": "昨日炸板",
+        "count": 1
+      },
+      {
+        "sector": "稀缺资源",
+        "count": 1
+      },
+      {
         "sector": "锂矿概念",
         "count": 1
       },
       {
-        "sector": "电气机械和器材制造业",
+        "sector": "有色金属矿采选业",
+        "count": 1
+      },
+      {
+        "sector": "周期股",
         "count": 1
       },
       {
@@ -650,7 +650,7 @@
         "count": 1
       },
       {
-        "sector": "2026一季报预增",
+        "sector": "电气机械和器材制造业",
         "count": 1
       },
       {
@@ -658,7 +658,7 @@
         "count": 1
       },
       {
-        "sector": "周期股",
+        "sector": "2026一季报预增",
         "count": 1
       }
     ],
@@ -674,15 +674,15 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
-    "latest_date": "2026-09-12 06:08:44",
-    "total": 324,
+    "latest_date": "2026-09-12 21:33:13",
+    "total": 323,
     "best_hold_days": 1,
     "periods": {
       "1d": {
         "win_rate": 53.3,
         "avg_return": -0.06,
         "sharpe": -0.01,
-        "count": 312,
+        "count": 311,
         "best": 14.69,
         "worst": -10.32
       },
@@ -690,15 +690,15 @@
         "win_rate": 40.1,
         "avg_return": -1.1,
         "sharpe": -0.16,
-        "count": 312,
+        "count": 311,
         "best": 14.76,
         "worst": -10.34
       },
       "5d": {
         "win_rate": 43.2,
-        "avg_return": -0.8,
+        "avg_return": -0.81,
         "sharpe": -0.1,
-        "count": 312,
+        "count": 311,
         "best": 14.76,
         "worst": -10.38
       },
@@ -706,7 +706,7 @@
         "win_rate": 47.9,
         "avg_return": 0.17,
         "sharpe": 0.02,
-        "count": 312,
+        "count": 311,
         "best": 14.77,
         "worst": -10.38
       },
@@ -714,7 +714,7 @@
         "win_rate": 47.7,
         "avg_return": 0.65,
         "sharpe": 0.07,
-        "count": 312,
+        "count": 311,
         "best": 14.77,
         "worst": -10.34
       }
@@ -731,9 +731,9 @@
     },
     {
       "band": "70~80",
-      "count": 193,
+      "count": 192,
       "win_rate_5d": 38.7,
-      "avg_ret_5d": -1.75,
+      "avg_ret_5d": -1.76,
       "best_win_rate": 51.3,
       "best_hold_days": 1
     }
@@ -744,7 +744,7 @@
         "period": "1d",
         "strict_win": 53.3,
         "strict_ret": -0.06,
-        "strict_count": 312,
+        "strict_count": 311,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -753,7 +753,7 @@
         "period": "3d",
         "strict_win": 40.1,
         "strict_ret": -1.1,
-        "strict_count": 312,
+        "strict_count": 311,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -761,8 +761,8 @@
       {
         "period": "5d",
         "strict_win": 43.2,
-        "strict_ret": -0.8,
-        "strict_count": 312,
+        "strict_ret": -0.81,
+        "strict_count": 311,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -771,7 +771,7 @@
         "period": "10d",
         "strict_win": 47.9,
         "strict_ret": 0.17,
-        "strict_count": 312,
+        "strict_count": 311,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -780,7 +780,7 @@
         "period": "20d",
         "strict_win": 47.7,
         "strict_ret": 0.65,
-        "strict_count": 312,
+        "strict_count": 311,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0

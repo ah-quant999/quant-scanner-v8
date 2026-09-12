@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-09-12 17:09:54",
+  "update_time": "2026-09-12 21:13:21",
   "total": 877,
   "hysteresis_days": 5,
   "source_dist": {
     "主板成交前100": 257,
+    "外资研投": 57,
     "创业板成交前100": 234,
     "科创板成交前100": 217,
-    "港股成交前50": 117,
-    "外资研投": 54
+    "港股成交前50": 117
   },
   "stocks": {
     "sh_601899": {
@@ -1789,7 +1789,7 @@
     },
     "sh_600309": {
       "code": "600309",
-      "name": "600309",
+      "name": "万华化",
       "market": "sh",
       "board_label": "主板",
       "sources": [
@@ -2848,7 +2848,7 @@
     },
     "sz_000725": {
       "code": "000725",
-      "name": "000725",
+      "name": "京东方A",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -3342,7 +3342,8 @@
       "market": "sz",
       "board_label": "主板",
       "sources": [
-        "主板成交前100"
+        "主板成交前100",
+        "外资研投"
       ],
       "industry": "专用设备制造业",
       "concepts": [
@@ -4072,7 +4073,8 @@
       "market": "sz",
       "board_label": "创业板",
       "sources": [
-        "创业板成交前100"
+        "创业板成交前100",
+        "外资研投"
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
@@ -5760,7 +5762,7 @@
     },
     "sz_301689": {
       "code": "301689",
-      "name": "301689",
+      "name": "C电科思",
       "market": "sz",
       "board_label": "创业板",
       "sources": [
@@ -6975,7 +6977,7 @@
     },
     "sz_301699": {
       "code": "301699",
-      "name": "301699",
+      "name": "C洛轴",
       "market": "sz",
       "board_label": "创业板",
       "sources": [
@@ -10295,11 +10297,12 @@
     },
     "hk_01109": {
       "code": "01109",
-      "name": "01109",
+      "name": "华润置地",
       "market": "hk",
       "board_label": "港股",
       "sources": [
-        "港股成交前50"
+        "港股成交前50",
+        "外资研投"
       ],
       "first_seen": "2026-08-29",
       "last_seen": "2026-09-12"
@@ -10403,118 +10406,9 @@
       "first_seen": "2026-08-29",
       "last_seen": "2026-09-12"
     },
-    "sz_300010": {
-      "code": "300010",
-      "name": "300010",
-      "market": "sz",
-      "board_label": "创业板",
-      "sources": [
-        "创业板成交前100"
-      ],
-      "industry": "软件和信息技术服务业",
-      "concepts": [
-        "AI应用",
-        "低价股",
-        "信创",
-        "智谱AI概念",
-        "富时罗素",
-        "AI智能体",
-        "机器人概念",
-        "智慧政务",
-        "超跌股",
-        "财税数字化",
-        "在线教育",
-        "AIGC概念",
-        "破发股",
-        "ST股",
-        "人工智能",
-        "DeepSeek概念"
-      ],
-      "board": "创业板",
-      "first_seen": "2026-09-08",
-      "last_seen": "2026-09-12"
-    },
-    "sh_688801": {
-      "code": "688801",
-      "name": "688801",
-      "market": "sh",
-      "board_label": "科创板",
-      "sources": [
-        "科创板成交前100"
-      ],
-      "board": "科创板",
-      "first_seen": "2026-09-11",
-      "last_seen": "2026-09-12"
-    },
-    "hk_09880": {
-      "code": "09880",
-      "name": "09880",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-09-12",
-      "last_seen": "2026-09-12"
-    },
-    "hk_01208": {
-      "code": "01208",
-      "name": "01208",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-09-09",
-      "last_seen": "2026-09-12"
-    },
-    "hk_09992": {
-      "code": "09992",
-      "name": "09992",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-09-12"
-    },
-    "hk_00999": {
-      "code": "00999",
-      "name": "00999",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-09-12",
-      "last_seen": "2026-09-12"
-    },
-    "hk_00669": {
-      "code": "00669",
-      "name": "00669",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-09-12"
-    },
-    "hk_02099": {
-      "code": "02099",
-      "name": "02099",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-09-10",
-      "last_seen": "2026-09-12"
-    },
     "sz_000811": {
       "code": "000811",
-      "name": "发布针对冰轮环境",
+      "name": "冰轮环境",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -10650,6 +10544,115 @@
       ],
       "board": "创业板",
       "first_seen": "2026-09-08",
+      "last_seen": "2026-09-12"
+    },
+    "sz_300010": {
+      "code": "300010",
+      "name": "300010",
+      "market": "sz",
+      "board_label": "创业板",
+      "sources": [
+        "创业板成交前100"
+      ],
+      "industry": "软件和信息技术服务业",
+      "concepts": [
+        "AI应用",
+        "低价股",
+        "信创",
+        "智谱AI概念",
+        "富时罗素",
+        "AI智能体",
+        "机器人概念",
+        "智慧政务",
+        "超跌股",
+        "财税数字化",
+        "在线教育",
+        "AIGC概念",
+        "破发股",
+        "ST股",
+        "人工智能",
+        "DeepSeek概念"
+      ],
+      "board": "创业板",
+      "first_seen": "2026-09-08",
+      "last_seen": "2026-09-12"
+    },
+    "sh_688801": {
+      "code": "688801",
+      "name": "688801",
+      "market": "sh",
+      "board_label": "科创板",
+      "sources": [
+        "科创板成交前100"
+      ],
+      "board": "科创板",
+      "first_seen": "2026-09-11",
+      "last_seen": "2026-09-12"
+    },
+    "hk_09880": {
+      "code": "09880",
+      "name": "09880",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-09-12",
+      "last_seen": "2026-09-12"
+    },
+    "hk_01208": {
+      "code": "01208",
+      "name": "01208",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-09-09",
+      "last_seen": "2026-09-12"
+    },
+    "hk_09992": {
+      "code": "09992",
+      "name": "09992",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-09-12"
+    },
+    "hk_00999": {
+      "code": "00999",
+      "name": "00999",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-09-12",
+      "last_seen": "2026-09-12"
+    },
+    "hk_00669": {
+      "code": "00669",
+      "name": "00669",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-09-12"
+    },
+    "hk_02099": {
+      "code": "02099",
+      "name": "02099",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-09-10",
       "last_seen": "2026-09-12"
     },
     "sh_600000": {
