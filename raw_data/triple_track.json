@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-12 16:09:29",
+  "update_time": "2026-09-12 17:54:40",
   "data_date": "2026-09-12",
   "track_start": "2026-09-12",
   "history_days": 18,
@@ -16,14 +16,14 @@
       "quality_grade": "C",
       "industry": "软件和信息技术服务业",
       "sectors": [
-        "半导体概念",
-        "科创板做市股",
-        "中证500",
-        "MSCI中国",
-        "超清视频",
-        "融资融券",
+        "昨日高振幅",
         "软件和信息技术服务业",
-        "昨日高振幅"
+        "融资融券",
+        "科创板做市股",
+        "半导体概念",
+        "中证500",
+        "超清视频",
+        "MSCI中国"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-12",
@@ -79,8 +79,8 @@
       "catalysts": []
     },
     {
-      "code": "00175",
-      "name": "吉利汽车",
+      "code": "00291",
+      "name": "华润啤酒",
       "market": "hk",
       "board": "港股",
       "status": "near",
@@ -92,8 +92,8 @@
       "enter_date": "2026-09-12",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 16.59,
-      "current_close": 16.59,
+      "first_close": 18.91,
+      "current_close": 18.91,
       "pnl_pct": 0.0,
       "catalysts": []
     },
@@ -117,6 +117,25 @@
       "catalysts": []
     },
     {
+      "code": "00175",
+      "name": "吉利汽车",
+      "market": "hk",
+      "board": "港股",
+      "status": "near",
+      "total_score": 28.6,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 2,
+      "enter_date": "2026-09-12",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 16.59,
+      "current_close": 16.59,
+      "pnl_pct": 0.0,
+      "catalysts": []
+    },
+    {
       "code": "06862",
       "name": "海底捞",
       "market": "hk",
@@ -136,25 +155,6 @@
       "catalysts": []
     },
     {
-      "code": "00291",
-      "name": "华润啤酒",
-      "market": "hk",
-      "board": "港股",
-      "status": "near",
-      "total_score": 28.6,
-      "quality_grade": "",
-      "industry": "",
-      "sectors": [],
-      "signal_count": 2,
-      "enter_date": "2026-09-12",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 18.91,
-      "current_close": 18.91,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
       "code": "600584",
       "name": "长电科技",
       "market": "sh",
@@ -164,14 +164,14 @@
       "quality_grade": "C",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "物联网",
-        "计算机、通信和其他电子设备制造业",
-        "毫米波概念",
-        "2026中报预增",
-        "MSCI中国",
-        "新材料",
+        "生物识别",
         "HS300",
-        "生物识别"
+        "2026中报预增",
+        "计算机、通信和其他电子设备制造业",
+        "新材料",
+        "毫米波概念",
+        "MSCI中国",
+        "物联网"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-08",
@@ -198,14 +198,14 @@
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
-        "稀缺资源",
-        "2026中报预增",
-        "MSCI中国",
         "有色金属矿采选业",
+        "2026中报预增",
         "新材料",
-        "昨日炸板",
         "钒电池",
-        "锂矿概念"
+        "稀缺资源",
+        "锂矿概念",
+        "昨日炸板",
+        "MSCI中国"
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
@@ -232,14 +232,14 @@
       "quality_grade": "A",
       "industry": "电气机械和器材制造业",
       "sectors": [
-        "电气机械和器材制造业",
-        "2026中报预增",
-        "MSCI中国",
-        "上证180",
         "HS300",
-        "2026一季报预增",
+        "电气机械和器材制造业",
         "沪股通",
-        "周期股"
+        "周期股",
+        "2026中报预增",
+        "上证180",
+        "2026一季报预增",
+        "MSCI中国"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-12",
@@ -525,10 +525,10 @@
         "names": [
           "百胜中国",
           "09866",
-          "吉利汽车",
+          "华润啤酒",
           "小鹏汽车-W",
-          "海底捞",
-          "华润啤酒"
+          "吉利汽车",
+          "海底捞"
         ]
       },
       {
@@ -570,19 +570,31 @@
         "count": 3
       },
       {
-        "sector": "新材料",
-        "count": 2
-      },
-      {
         "sector": "HS300",
         "count": 2
       },
       {
-        "sector": "半导体概念",
+        "sector": "新材料",
+        "count": 2
+      },
+      {
+        "sector": "昨日高振幅",
+        "count": 1
+      },
+      {
+        "sector": "软件和信息技术服务业",
+        "count": 1
+      },
+      {
+        "sector": "融资融券",
         "count": 1
       },
       {
         "sector": "科创板做市股",
+        "count": 1
+      },
+      {
+        "sector": "半导体概念",
         "count": 1
       },
       {
@@ -594,19 +606,7 @@
         "count": 1
       },
       {
-        "sector": "融资融券",
-        "count": 1
-      },
-      {
-        "sector": "软件和信息技术服务业",
-        "count": 1
-      },
-      {
-        "sector": "昨日高振幅",
-        "count": 1
-      },
-      {
-        "sector": "物联网",
+        "sector": "生物识别",
         "count": 1
       },
       {
@@ -618,11 +618,7 @@
         "count": 1
       },
       {
-        "sector": "生物识别",
-        "count": 1
-      },
-      {
-        "sector": "稀缺资源",
+        "sector": "物联网",
         "count": 1
       },
       {
@@ -630,11 +626,11 @@
         "count": 1
       },
       {
-        "sector": "昨日炸板",
+        "sector": "钒电池",
         "count": 1
       },
       {
-        "sector": "钒电池",
+        "sector": "稀缺资源",
         "count": 1
       },
       {
@@ -642,15 +638,11 @@
         "count": 1
       },
       {
+        "sector": "昨日炸板",
+        "count": 1
+      },
+      {
         "sector": "电气机械和器材制造业",
-        "count": 1
-      },
-      {
-        "sector": "上证180",
-        "count": 1
-      },
-      {
-        "sector": "2026一季报预增",
         "count": 1
       },
       {
@@ -659,6 +651,14 @@
       },
       {
         "sector": "周期股",
+        "count": 1
+      },
+      {
+        "sector": "上证180",
+        "count": 1
+      },
+      {
+        "sector": "2026一季报预增",
         "count": 1
       }
     ],

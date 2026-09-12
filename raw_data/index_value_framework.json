@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-12 15:49:06",
+  "update_time": "2026-09-12 18:23:46",
   "source": "data/INDEX_HISTORY.js + 框架迁移",
   "note": "价格中枢框架迁移（QQQ/TQQQ → A股指数），基于收盘价布林带/EMA趋势，非PE估值分位；中证序列待补",
   "indices": [

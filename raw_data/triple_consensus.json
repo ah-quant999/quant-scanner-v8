@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-09-12 16:04:08",
-  "data_time": "2026-09-12 15:06:23",
+  "update_time": "2026-09-12 17:54:35",
+  "data_time": "2026-09-12 17:35:15",
   "count": 2,
   "near_miss_count": 8,
   "criteria": "主站TOP10精选（rank≤10 & score≥min(max(max_score×0.5,25), max_score)） · 基本面A档",
@@ -29,14 +29,14 @@
         "form_A": false
       },
       "sectors": [
-        "MSCI中国",
-        "新材料",
-        "昨日炸板",
         "有色金属矿采选业",
-        "稀缺资源",
+        "昨日炸板",
+        "新材料",
         "钒电池",
-        "锂矿概念",
-        "2026中报预增"
+        "MSCI中国",
+        "稀缺资源",
+        "2026中报预增",
+        "锂矿概念"
       ],
       "fund_detail": "",
       "sector_detail": "黄金概念-43.9亿",
@@ -93,14 +93,14 @@
         "form_A": false
       },
       "sectors": [
-        "2026一季报预增",
-        "MSCI中国",
+        "沪股通",
         "上证180",
+        "2026一季报预增",
         "周期股",
         "电气机械和器材制造业",
-        "沪股通",
-        "HS300",
-        "2026中报预增"
+        "MSCI中国",
+        "2026中报预增",
+        "HS300"
       ],
       "fund_detail": "",
       "sector_detail": "储能概念-43.5亿",
@@ -152,14 +152,14 @@
         "form_A": false
       },
       "sectors": [
-        "新材料",
         "生物识别",
-        "毫米波概念",
         "物联网",
-        "计算机、通信和其他电子设备制造业",
+        "毫米波概念",
+        "新材料",
+        "MSCI中国",
         "2026中报预增",
         "HS300",
-        "MSCI中国"
+        "计算机、通信和其他电子设备制造业"
       ],
       "enter_date": "2026-09-08",
       "industry": "计算机、通信和其他电子设备制造业",
@@ -224,14 +224,14 @@
         "form_A": false
       },
       "sectors": [
-        "融资融券",
+        "科创板做市股",
+        "昨日高振幅",
         "中证500",
         "半导体概念",
         "软件和信息技术服务业",
         "超清视频",
-        "昨日高振幅",
         "MSCI中国",
-        "科创板做市股"
+        "融资融券"
       ],
       "enter_date": "2026-09-12",
       "industry": "软件和信息技术服务业",
@@ -336,34 +336,6 @@
       "industry": ""
     },
     {
-      "code": "00175",
-      "name": "吉利汽车",
-      "market": "hk",
-      "board": "港股",
-      "total_score": 28.6,
-      "top10_rank": 7,
-      "a_score": 0,
-      "quality_grade": "",
-      "in_top10": true,
-      "in_tier_a": false,
-      "in_tier_b": false,
-      "in_good_fund": false,
-      "miss_steps": 1,
-      "close": 16.59,
-      "pct_chg": -1.95,
-      "pct_chg_20d": 0,
-      "signals": {
-        "chan": true,
-        "jinzuan": true,
-        "jigou": false,
-        "trend": false,
-        "form_A": false
-      },
-      "sectors": [],
-      "enter_date": "2026-09-12",
-      "industry": ""
-    },
-    {
       "code": "06862",
       "name": "海底捞",
       "market": "hk",
@@ -407,6 +379,34 @@
       "miss_steps": 1,
       "close": 18.91,
       "pct_chg": 0.16,
+      "pct_chg_20d": 0,
+      "signals": {
+        "chan": true,
+        "jinzuan": true,
+        "jigou": false,
+        "trend": false,
+        "form_A": false
+      },
+      "sectors": [],
+      "enter_date": "2026-09-12",
+      "industry": ""
+    },
+    {
+      "code": "00175",
+      "name": "吉利汽车",
+      "market": "hk",
+      "board": "港股",
+      "total_score": 28.6,
+      "top10_rank": 7,
+      "a_score": 0,
+      "quality_grade": "",
+      "in_top10": true,
+      "in_tier_a": false,
+      "in_tier_b": false,
+      "in_good_fund": false,
+      "miss_steps": 1,
+      "close": 16.59,
+      "pct_chg": -1.95,
       "pct_chg_20d": 0,
       "signals": {
         "chan": true,
