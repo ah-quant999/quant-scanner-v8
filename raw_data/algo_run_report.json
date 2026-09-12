@@ -1,15 +1,11 @@
 {
-  "update_time": "2026-09-12 11:46:36",
-  "run_start": "2026-09-12 10:04:07",
-  "ok": 25,
-  "fail": 2,
+  "update_time": "2026-09-12 12:26:13",
+  "run_start": "2026-09-12 12:01:08",
+  "ok": 0,
+  "fail": 1,
   "failed_scripts": [
     {
-      "script": "strategy_four_volume.py",
-      "reason": "监督器静默杀(>15min 无输出)"
-    },
-    {
-      "script": "track_h_auto_buy.py",
+      "script": "final_recommend.py",
       "reason": "监督器静默杀(>15min 无输出)"
     }
   ],
