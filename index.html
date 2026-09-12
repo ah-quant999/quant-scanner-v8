@@ -4355,6 +4355,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     html += '<span style="font-size:15px;font-weight:700;color:'+meta.color+';">'+meta.icon+' '+meta.name+'</span>';html += '<span style="font-size:10px;font-weight:700;color:#14b8a6;background:rgba(20,184,166,.14);border:1px solid rgba(20,184,166,.35);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:4px;">📈 选股策略</span>';
     html += '<span style="font-size:11px;color:var(--dim);">'+meta.desc+'</span>';
     html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);">'+_btStars(meta.stars)+'</span>';
+    var totalS = (data && data.summary && data.summary.total_signals) || 0;
+    var lowSample = totalS > 0 && totalS < 30;
+    if(lowSample){
+      html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(239,83,80,.12);color:#ef5350;border:1px solid rgba(239,83,80,.35);margin-left:4px;">[样本不足 n<'+totalS+']</span>';
+    }
     html += '</div>';
     var bp = data && data.summary && data.summary.by_period;
     if(bp && data.summary.total_signals > 0){
@@ -4371,7 +4376,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       periods.forEach(function(p){
         var r = bp[String(p)] || {};
         var wr = r.win_rate, ar = r.avg_return, br = r.best_return, wst = r.worst_return;
-        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+        var rowDim = (lowSample || (r.samples||0) < 30) ? ';opacity:.55;background:rgba(148,163,184,.04);' : '';
+        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+rowDim+'"';
         html += '<td style="padding:6px;color:var(--txt);font-weight:700;">T+'+p+'天</td>';
         html += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(r.samples||0)+'</td>';
         html += '<td style="padding:6px;text-align:right;font-weight:700;color:'+_colorWR(wr)+';">'+(wr!=null?wr.toFixed(1):'—')+'%</td>';
@@ -4383,7 +4389,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '</tbody></table></div>';
       var method = (data.summary.method||'').replace(/</g,'&lt;');
       if(method.length > 70) method = method.substring(0,70)+'…';
-      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">方法：'+method+' · 数据 '+(data.summary.update_time||'').substring(0,16)+' · 信号数 '+(data.summary.total_signals||0)+'</div>';
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">方法：'+method+' · 数据 '+(data.summary.update_time||'').substring(0,16)+' · 信号数 '+(data.summary.total_signals||0)+(lowSample?' <span style="color:#ef5350;font-weight:700;">[样本<30，仅观测，不参与排名]</span>':'')+'</div>';
     } else {
       html += '<div class="note">暂无历史回测信号</div>';
     }
@@ -5044,13 +5050,24 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           Object.keys(_tm).forEach(function(k){
             var o=_bc.overview[k]; if(!o||!o.periods) return;
             var rows=[];
-            [1,3,5,10,20].forEach(function(p){ var r=o.periods['hold_'+p+'d']; if(r) rows.push({period:p,sample:r.count||0,win_rate:r.win_rate,avg_return:r.avg_return}); });
+            Object.keys(o.periods||{}).forEach(function(pk){
+              var r=o.periods[pk];
+              var m=pk.match(/^hold_(\d+)d$/);
+              if(!r||!m) return;
+              var p=parseInt(m[1],10);
+              rows.push({period:p,sample:r.count||0,win_rate:r.win_rate,avg_return:r.avg_return});
+            });
             if(rows.length) _strategies.push({name:_tm[k].n,icon:_tm[k].i,rows:rows});
           });
         }
         [['FOUR_VOLUME_BACKTEST','四量终极','🔥'],['CRDS_BACKTEST','逆势龙头CRDS','🐉'],['RPS_BACKTEST','相对强度RPS·A档','📐']].forEach(function(m){
           var sm=((window[m[0]]||{}).summary||{}), bp=sm.by_period||{}, rows=[];
-          [1,3,5,10,20].forEach(function(p){ var r=bp[String(p)]||{}; rows.push({period:p,sample:r.samples||0,win_rate:r.win_rate,avg_return:r.avg_return}); });
+          Object.keys(bp).forEach(function(pk){
+            var r=bp[pk]||{};
+            var p=parseInt(pk,10);
+            if(isNaN(p)) return;
+            rows.push({period:p,sample:r.samples||0,win_rate:r.win_rate,avg_return:r.avg_return});
+          });
           _strategies.push({name:m[1],icon:m[2],rows:rows});
         });
         // P2-A：升级 MIN 到 30（与 SAMPLE_LOW_THRESHOLD 一致）
@@ -5277,6 +5294,43 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       }
     }
     // 🛡 兜底：final try/catch 保证 dst.innerHTML 总被执行（即使异常也不让"卡空了"）
+    /* ── 研究/估值型回测：中信 PE 温度计（2026-09-12 主人令：从暂未上架区孤立展示，不与交易策略同列排名）── */
+    (function(){
+      var cp = window.CITIC_PE_BACKTEST;
+      if(!cp || !cp.result) return;
+      html += '<div style="margin:14px 0;border-left:4px solid #f59e0b;" class="card">';
+      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+      html += '<span style="font-size:15px;font-weight:700;color:#f59e0b;">中信 PE 估值回测（研究型）</span>';
+      html += '<span style="font-size:10px;font-weight:700;color:#a78bfa;background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.35);padding:1px 7px;border-radius:10px;white-space:nowrap;">[估值研究]</span>';
+      html += '<span style="font-size:11px;color:var(--dim);">不与交易策略同列排名</span>';
+      html += '</div>';
+      html += '<div style="font-size:11px;color:var(--sub);line-height:1.7;margin-bottom:6px;"><b style="color:var(--txt);">口径</b>：以中信证券历史 PE TTM 为锚，统计 2010–2026 年 A股在 PE<10/12/15/20 档位买入后持有 60/120/250 个交易日的真实收益分布。PE 越低、持有越长，胜率和收益越高；但 PE<10 信号稀疏，PE<20 信号密集而质量稀释。本块为<b>估值研究参考</b>，不属于选股信号回测。</div>';
+      var holds = [60,120,250];
+      var ths = [['pe<10','PE<10'],['pe<12','PE<12'],['pe<15','PE<15'],['pe<20','PE<20']];
+      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+      html += '<th style="padding:6px;text-align:left;color:var(--sub);white-space:nowrap;">持有期</th>';
+      ths.forEach(function(t){ html += '<th colspan="2" style="padding:6px;text-align:center;color:var(--sub);border-left:1px solid var(--border2);">'+t[1]+'</th>'; });
+      html += '</tr><tr style="background:var(--card2);border-bottom:1px solid var(--border);">';
+      html += '<th style="padding:4px 6px;"></th>';
+      ths.forEach(function(t,idx){ html += '<th style="padding:4px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;'+(idx>0?'border-left:1px solid var(--border2);':'')+'">胜率</th><th style="padding:4px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;">平均收益</th>'; });
+      html += '</tr></thead><tbody>';
+      holds.forEach(function(h){
+        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+        html += '<td style="padding:6px;color:var(--txt);font-weight:700;">持有 '+h+' 日</td>';
+        ths.forEach(function(t,idx){
+          var r = (cp.result[t[0]] || {})['hold_'+h+'d'] || {};
+          var wr = r.win_rate, ar = r.avg_ret;
+          html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(wr)+';'+(idx>0?'border-left:1px solid var(--border2);':'')+'">'+(typeof wr==='number'?wr.toFixed(1):'—')+'%</td>';
+          html += '<td style="padding:6px;text-align:center;color:'+_colorPL(ar)+';">'+(typeof ar==='number'?(ar>0?'+':'')+ar.toFixed(2):'—')+'%</td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">数据：'+_e(cp.data_source||'')+' · 样本区间 '+_e((cp.data_range||[]).join(' ~ '))+' · 更新时间 '+_e((cp.update_time||'').substring(0,16))+'</div>';
+      html += '</div>';
+    })();
+
     try{
       dst.innerHTML = html || '<div class="note" style="padding:24px;text-align:center;color:var(--dim);">⏳ 策略回测数据刷新中…<br><span style="font-size:11px">若长时间为空请硬刷新 (Ctrl/Cmd+F5)</span></div>';
     }catch(e){ console.error('[bt dst.innerHTML fail]', e); }
