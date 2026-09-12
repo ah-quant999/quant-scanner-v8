@@ -122,8 +122,10 @@ def main():
         except Exception as e:  # noqa: BLE001
             return code, None, f"err:{e}"
 
+    processed = 0  # 🛡 2026-09-12 防监督器静默杀进度计数
     with ThreadPoolExecutor(max_workers=MAXW) as ex:
         for code, stats, st in ex.map(_one, universe.items()):
+            processed += 1
             if st == "ok":
                 stocks[str(code)] = stats
                 ok += 1
@@ -131,6 +133,10 @@ def main():
                 skip += 1
             else:
                 fail += 1
+            # 每 20 只打印一次进度，确保 run_algorithms 监督器看到持续输出
+            if processed % 20 == 0:
+                print(f"  💓 精确止损计算进度: {processed}/{len(universe)} 只"
+                      f" (ok {ok} / skip {skip} / fail {fail})")
 
     method_desc = (
         "全站统一口径(方案三优化): 固定10%止损 + R:R=1.5止盈; "

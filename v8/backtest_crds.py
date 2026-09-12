@@ -284,7 +284,12 @@ def main():
     detail_signals = []
     total = len(signals)
     cost_pct = 2 * COST_BPS / 100  # 双边 0.3%
+    last_heartbeat = time.time()  # 🛡 2026-09-12 防监督器静默杀时间心跳
     for idx, sig in enumerate(signals, 1):
+        # 每 60 秒至少打印一次心跳，避免单个信号拉 K 线卡住时 10 个信号跨度超过 15min
+        if time.time() - last_heartbeat >= 60:
+            print(f"💓 CRDS 回测心跳: 已处理 {idx-1}/{total} 个信号")
+            last_heartbeat = time.time()
         code = sig["code"]
         signal_date = sig["signal_date"]
         rows = fetch_kline_around(code, signal_date, lookback_days=8, lookahead_days=35)

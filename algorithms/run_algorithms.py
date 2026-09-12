@@ -1029,6 +1029,7 @@ def step_run(order=None):
         for _ek, _ev in SCRIPT_ENV.get(script, {}).items():
             os.environ[_ek] = _ev
         _to = _script_timeout(script)
+        _sl = _silence_budget(script)  # 该脚本的实际静默预算（SILENCE_OVERRIDE 优先）
         try:
             rc, last_lines, killed_reason = _supervised_run(script, path, _to)
         except Exception as e:
@@ -1038,8 +1039,8 @@ def step_run(order=None):
             continue
         if killed_reason == "silence":
             fail += 1
-            print(f"     💀 静默卡死(>{SILENCE_KILL_SEC//60}min 无输出)，监督器已终止并续跑下一脚本")
-            FAILED_SCRIPTS.append((script, f"监督器静默杀(>{SILENCE_KILL_SEC//60}min 无输出)"))
+            print(f"     💀 静默卡死(>{_sl//60}min 无输出)，监督器已终止并续跑下一脚本")
+            FAILED_SCRIPTS.append((script, f"监督器静默杀(>{_sl//60}min 无输出)"))
             continue
         if killed_reason == "timeout":
             fail += 1

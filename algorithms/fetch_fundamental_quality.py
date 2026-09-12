@@ -411,6 +411,7 @@ def main():
         # 等待所有子进程结束（带总超时保护，单 worker 卡死不影响汇总）
         deadline = time.time() + 5400  # 90min 总预算
         alive = list(procs)
+        last_heartbeat = time.time()  # 🛡 2026-09-12 防监督器静默杀心跳
         while alive and time.time() < deadline:
             for p in list(alive):
                 rc = p.poll()
@@ -421,6 +422,11 @@ def main():
                         log(f"    ⚠️ worker 退出码 {rc}: {out[-200:].strip()}")
             if alive:
                 time.sleep(3)
+                # 每 30 秒打印一次心跳，防止 run_algorithms 监督器 15min 无输出误杀
+                if time.time() - last_heartbeat >= 30:
+                    waited = int(time.time() - (deadline - 5400))
+                    log(f"    💓 等待子进程完成，剩余 {len(alive)} 个 worker，已等 {waited}s")
+                    last_heartbeat = time.time()
         for p in alive:  # 超时仍有存活 → 强杀（产物视为未产出，下游门控拒用陈旧数据）
             try: p.kill()
             except Exception: pass
