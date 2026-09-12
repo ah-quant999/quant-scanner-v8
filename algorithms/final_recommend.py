@@ -656,6 +656,11 @@ def main():
         if _cand and str(_cand.get("update_time", "")).startswith(_today):
             fl = _cand
             break
+        # 💓 2026-09-12 主人令·方案①：等待 FACTOR_LAB 当日新鲜数据期间逐分钟打印心跳，
+        #   避免被 run_algorithms 监督器 15min 静默杀（SILENCE_KILL_SEC=900）误杀——
+        #   误杀会让 final_recommend 永远跑不到出结果那步，FINAL_RECOMMEND_DATA 永久停旧版。
+        #   纯打印、不改任何数据口径/筛选条件，仅保活；FACTOR_LAB 就绪即 break，永不伪造数据。
+        print(f"  💓 等待 FACTOR_LAB.js 当日新鲜数据（因子实验室）… 已等 {_wi+1}/{_fl_max_wait} 分钟", flush=True)
         time.sleep(60)
     if fl:
         _at_top = (fl.get("abnormal_turnover") or {}).get("top") or []
