@@ -105,6 +105,21 @@ def load_tracking_enter_dates():
     return {code: info.get("enter_date", "") for code, info in tracking.items() if info.get("enter_date")}
 
 
+def _is_excluded_stock(name="", code="", amount=None):
+    """B4 (2026-09-12 主人令·剔除st)：剔除 ST/*ST/N(新股首日)/退(退市)/停牌股。
+    仅按名称判定：'退' 为退市股后缀（如 '某某退'），须按包含判定而非前缀。"""
+    name = (name or "").strip()
+    if not name:
+        return False
+    if name.startswith(("N", "ST", "*ST")):
+        return True
+    if "退" in name or "退市" in name:
+        return True
+    if "停牌" in name or "停盘" in name:
+        return True
+    return False
+
+
 def main():
     print(f"  三重共识选股  —  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 60)

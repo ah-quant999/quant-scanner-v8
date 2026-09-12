@@ -105,6 +105,7 @@ DATA_SOURCES = {
     "sh_sz_history.json":         "SH_SZ_HISTORY",
     "ai_market_brief.json":        "AI_MARKET_BRIEF",
     "runner_status.json":          "RUNNER_STATUS",
+    "hb_xiaojiu.json":             "HB_XIAOJIU",     # 🆕 2026-09-12 主人令：小九心跳 raw_data -> data/hb_xiaojiu.js (window.HB_XIAOJIU)
     "risk_gauge.json":             "RISK_GAUGE",
     # 🛡 2026-09-08 一劳永逸式根因修复：STOCK_QUOTE.js 由独立工作流 v8_stock_quote_refresh.yml 独占产出
     #   （fetch_stock_quote_v8.py -> 写入 data/STOCK_QUOTE.js），不调用本脚本。若仍挂此映射，cn_fetch 跑 update_v8
@@ -229,6 +230,7 @@ CATEGORY_MAP = {
     "RISK_GAUGE": "premarket,intraday",            # 实时风险温度计：v8_risk_gauge.yml 每30分（08:00-16:30 CST）
     # 2026-09-11 P3：ETF_SUBSCRIPTION_EM 全链下线（孤儿死链，见 DATA_SOURCES 顶部说明）
     "RUNNER_STATUS": "premarket,intraday,post_close",  # 任务跟踪看板：每轮抓取都写，全时段
+    "HB_XIAOJIU": "intraday,post_close",            # 🆕 2026-09-12 主人令：小九心跳实时，盘中+盘后双档重建
     # 🛡 2026-09-11 小九的股票专家 一劳永逸（主人令·「市场资金流向」盘中红灯）：
     #   原只标 post_close → _pure_pc=True → data/MARKET_FUND_FLOW_DATA.js 仅由
     #   17:20/18:20/19:20 三档 --category post_close 构建重建。

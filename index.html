@@ -1624,6 +1624,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=1789189555" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=1789189555" defer></script>
+<script src="data/hb_xiaojiu.js?v=2026091201" defer></script>
     <script src="data/AUDIT_TRAIL.js?v=1789189555" defer></script>
 <script src="data/HEALTH_CHECK.js?v=1789189555" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=1789189555" defer></script>
@@ -6789,12 +6790,50 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="kv"><span class="k">心跳</span><span><span class="status-dot s-ok"></span>正常（每小时巡查）</span></div>
       </div>
       <div class="card">
-        <h3><span class="ic">🖥️</span>双机状态 <span class="fresh" style="font-size:10px;color:var(--dim)">[静态]</span></h3>
+        <h3><span class="ic">🖥️</span>双机状态 <span class="fresh" style="font-size:10px;color:var(--dim)">[实时]</span></h3>
         <div class="kv"><span class="k">执行节点</span><span><span class="status-dot s-ok"></span>cn_fetch / build_deploy = GitHub Actions 云端 ubuntu-latest；<b>algo_cloud（盘后算法链）= self-hosted cn 双机</b>（lemoncat-cn / alimi-cn · 共享 cn 标签谁空谁跑 · 已由 job 日志 runner_name 实证）</span></div>
-        <div class="kv"><span class="k">小九（单位机）</span><span><span class="status-dot s-warn"></span>lemoncat-cn runner：承接 algo_cloud 盘后算法链（与阿狸咪共享 cn 标签，谁空谁跑）+ 应急 workflow_dispatch + 云端管线看门狗</span></div>
+        <div class="kv"><span class="k">小九（单位机）</span><span><span class="status-dot s-warn" id="hbXiaojiuDot"></span><span id="hbXiaojiuStatus">等待心跳…</span> · lemoncat-cn runner：承接 algo_cloud 盘后算法链（与阿狸咪共享 cn 标签，谁空谁跑）+ 应急 workflow_dispatch + 云端管线看门狗</span></div>
+        <div class="kv"><span class="k">小九心跳明细</span><span id="hbXiaojiuDetail" style="font-size:12px">正在加载 data/hb_xiaojiu.js …</span></div>
         <div class="kv"><span class="k">阿狸咪（家中机）</span><span><span class="status-dot s-ok"></span>本地预览（file:///E:/workspace/stock-scanner/index.html），不接部署</span></div>
         <div class="kv"><span class="k">failover 守卫</span><span><span class="status-dot s-ok"></span>活跃</span></div>
       </div>
+    <script>
+    (function(){
+      function renderHb(){
+        var el=document.getElementById('hbXiaojiuStatus');
+        var dot=document.getElementById('hbXiaojiuDot');
+        var det=document.getElementById('hbXiaojiuDetail');
+        if(!el) return;
+        var hb=window.HB_XIAOJIU;
+        if(!hb){
+          el.textContent='心跳数据未加载（等待 data/hb_xiaojiu.js）';
+          if(dot) dot.className='status-dot s-warn';
+          if(det) det.textContent='raw_data/hb_xiaojiu.json 尚未经 update_v8 生成';
+          return;
+        }
+        var t=hb.last_time||'';
+        var st=(hb.status||'').toString().toLowerCase();
+        if(!t){
+          el.textContent='无心跳时间戳';
+          if(dot) dot.className='status-dot s-warn';
+          if(det) det.textContent='raw_data/hb_xiaojiu.json 尚未写入 last_time';
+          return;
+        }
+        var now=Date.now();
+        var ts=Date.parse(String(t).replace(/-/g,'/'));
+        var mins=ts?Math.floor((now-ts)/60000):9999;
+        var alive=(mins<=20)&&(st!=='down');
+        var ago=mins<0?('未来'+(-mins)+'分'):(mins+' 分钟前');
+        el.textContent=(alive?'在线':'离线')+' · 心跳 '+ago;
+        if(dot) dot.className='status-dot '+(alive?'s-ok':'s-bad');
+        if(det) det.textContent='machine='+(hb.machine||'?')+' · status='+(hb.status||'?')+' · last_time='+t;
+      }
+      window.addEventListener('DOMContentLoaded', renderHb);
+      window.addEventListener('load', renderHb);
+      setTimeout(renderHb, 1500);
+      setTimeout(renderHb, 4000);
+    })();
+    </script>
     </div>
 
     <div class="card" style="margin-bottom:16px">

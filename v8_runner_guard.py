@@ -597,6 +597,77 @@ def push_status_file(path):
         return False, f"Contents API 异常: {e}"
 
 
+def write_heartbeat(overall):
+    """🆕 2026-09-12 主人令·双机心跳：写 raw_data/hb_xiaojiu.json（小九心跳，供阿狸咪 v8_peer_monitor 读取）。
+    仅在 小九本机（lemoncat-cn runner）生效；设 V8_SKIP_HB=1 可禁用。"""
+    if os.environ.get("V8_SKIP_HB") == "1":
+        return None
+    RAW_DIR = Path(__file__).resolve().parent / "raw_data"
+    RAW_DIR.mkdir(exist_ok=True)
+    path = RAW_DIR / "hb_xiaojiu.json"
+    hb = {
+        "last_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
+        "status": overall,
+        "machine": "lemoncat-cn",
+        "source": "v8_runner_guard",
+    }
+    try:
+        path.write_text(json.dumps(hb, ensure_ascii=False, indent=2), encoding="utf-8")
+        return path
+    except Exception as e:
+        print(f"[WARN] 心跳写入失败: {e}")
+        return None
+
+
+def push_heartbeat_file(path):
+    """🆕 2026-09-12 主人令：经 Contents API 把 hb_xiaojiu.json 推到 raw_data/（与 push_status_file 同源）。
+    推送后云端 build 经 update_v8 生成 data/hb_xiaojiu.js，阿狸咪 v8_peer_monitor 即可读取。"""
+    token = _load_token()
+    if not token:
+        return False, "无 GitHub token，无法推送心跳"
+    api = f"https://api.github.com/repos/{REPO}/contents/raw_data/hb_xiaojiu.json"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "Content-Type": "application/json",
+    }
+    try:
+        import base64
+        content = path.read_bytes()
+        req = urllib.request.Request(api, headers=headers, method="GET")
+        sha = None
+        remote_b64 = ""
+        try:
+            with urllib.request.urlopen(req, timeout=25) as r:
+                remote = json.loads(r.read().decode("utf-8"))
+                sha = remote.get("sha")
+                remote_b64 = remote.get("content", "")
+        except urllib.error.HTTPError as e:
+            if e.code != 404:
+                return False, f"GET sha 失败: HTTP {e.code}"
+        if sha and remote_b64:
+            try:
+                if base64.b64decode(remote_b64.replace("\n", "")) == content:
+                    return True, "远端心跳已是最新，跳过推送"
+            except Exception:
+                pass
+        payload = {
+            "message": f"data: 小九心跳上报 {now_cst().strftime('%Y%m%d-%H%M')}",
+            "content": base64.b64encode(content).decode("utf-8"),
+        }
+        if sha:
+            payload["sha"] = sha
+        body = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(api, data=body, headers=headers, method="PUT")
+        with urllib.request.urlopen(req, timeout=25) as r:
+            return True, f"Contents API 已推送心跳 (HTTP {r.status})"
+    except urllib.error.HTTPError as e:
+        return False, f"Contents API 失败: HTTP {e.code}: {e.read().decode('utf-8','replace')[:200]}"
+    except Exception as e:
+        return False, f"Contents API 异常: {e}"
+
+
 def decide_overall(process_ok, service_exists, service_ok, log_ok, github, env_ok):
     """综合判定 runner 健康状态。
 
@@ -745,12 +816,21 @@ def main():
     path = write_status_file(status)
     print(f"[INFO] 状态已写入 {path}")
 
+    # 🆕 2026-09-12 主人令：写小九心跳（双机掉线告警闭环）
+    hb_path = write_heartbeat(overall)
+    if hb_path:
+        print(f"[INFO] 心跳已写入 {hb_path}")
+
     # ── 推送 ──
     pushed = False
     if args.push:
         ok, msg = push_status_file(path)
         pushed = ok
         print(f"[INFO] 推送: {msg}")
+        # 🆕 同步推送心跳（确保阿狸咪侧 v8_peer_monitor 能读到）
+        if hb_path:
+            hok, hmsg = push_heartbeat_file(hb_path)
+            print(f"[INFO] 心跳推送: {hmsg}")
 
     # ── 告警（仅 fail 触发，对齐文档；warn 只记录不打扰）──
     # 2026-08-18 新增去重：同级别 fail 60 分钟内只发一封，避免网络型持续失败

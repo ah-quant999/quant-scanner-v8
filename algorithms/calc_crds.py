@@ -48,6 +48,23 @@ _KLINE_MAX_FAILS = 40  # 连续失败过多则放弃本次计算, 保留旧 crds
 #   语义：V8_OFFLINE=1 = 本机无外网/无 baostock 的离线模式（跳过通达信直连）。
 V8_OFFLINE = os.environ.get("V8_OFFLINE", "0") == "1"
 
+
+def _is_excluded_stock(name="", code="", amount=None):
+    """B4 (2026-09-12 主人令·剔除st)：剔除 ST/*ST/N(新股首日)/退(退市)/停牌股。
+    仅按名称判定：gtimg 兜底源成交额占位 0，不能凭 amount 误伤正常票。
+    '退' 为退市股后缀（如 '某某退'），须按包含判定而非前缀。"""
+    name = (name or "").strip()
+    if not name:
+        return False  # 空名不凭 amount 误伤正常票
+    if name.startswith(("N", "ST", "*ST")):
+        return True
+    if "退" in name or "退市" in name:
+        return True
+    if "停牌" in name or "停盘" in name:
+        return True
+    return False
+
+
 import gc
 import threading
 import requests as _requests
@@ -1045,6 +1062,9 @@ def _load_scan_targets():
                 mk = str(s.get("market", "") or s.get("market_label", "")).lower()
                 bd = str(s.get("board_label", "") or s.get("board", ""))
                 if mk == "hk" or bd == "港股":
+                    continue
+                # 🛡 2026-09-12 主人令 B4：剔除 ST/退/停牌股（扫描标的防御性过滤）
+                if _is_excluded_stock(str(s.get("name", "") or s.get("stock_name", "")), nc):
                     continue
                 merged[nc] = {
                     "code": nc,

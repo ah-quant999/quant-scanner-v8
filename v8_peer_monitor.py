@@ -18,7 +18,7 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
-HB_FILE = BASE / "data" / "hb_xiaojiu.json"
+HB_FILE = BASE / "data" / "hb_xiaojiu.js"
 LOG_FILE = BASE / "data" / "_peer_monitor.log"
 ALERT_STATE_FILE = BASE / "data" / "_peer_alert_state.json"
 PEER_FAILOVER_THRESHOLD_MIN = 90
@@ -68,24 +68,44 @@ def _git_pull():
         log(f"  ⚠️ git pull 异常: {e}")
 
 
+def _load_hb():
+    """解析 data/hb_xiaojiu.js（window.HB_XIAOJIU = {...};）为 dict，失败返回 None。"""
+    if not HB_FILE.exists():
+        return None
+    try:
+        import re as _re
+        text = HB_FILE.read_text(encoding="utf-8")
+        m = _re.search(r"window\.HB_XIAOJIU\s*=\s*(\{.*?\})\s*;", text, _re.S)
+        if not m:
+            return None
+        return json.loads(m.group(1))
+    except Exception:
+        return None
+
+
 def check_peer_alive():
     """返回 (alive, silent_min, last_time)"""
     _git_pull()
+    # 🔴 2026-09-12 一劳永逸根治：原 fail-open（文件缺失/无字段/异常→判 alive）导致双机掉线永不告警。
+    #   改为 fail-closed：心跳缺失/异常即判小九【掉线】并告警（缺就安装→倒逼补洞）。
     if not HB_FILE.exists():
-        log("  ⚠️ hb_xiaojiu.json 不存在，默认认为小九活着（可能从未初始化）")
-        return True, 0, ""
+        log("  🔴 hb_xiaojiu.js 不存在 → 判小九【掉线】(fail-closed，缺失即告警)")
+        return False, 9999, ""
+    hb = _load_hb()
+    if hb is None:
+        log("  🔴 hb_xiaojiu.js 解析失败 → 判小九【掉线】(fail-closed)")
+        return False, 9999, ""
+    last_ts = hb.get("last_time", "")
+    if not last_ts:
+        log("  🔴 hb_xiaojiu.js 无 last_time 字段 → 判小九【掉线】(fail-closed)")
+        return False, 9999, ""
     try:
-        hb = json.loads(HB_FILE.read_text(encoding="utf-8"))
-        last_ts = hb.get("last_time", "")
-        if not last_ts:
-            log("  ⚠️ hb_xiaojiu.json 无 last_time 字段")
-            return True, 0, ""
         peer_time = datetime.strptime(last_ts, "%Y-%m-%d %H:%M:%S")
         elapsed = (datetime.now() - peer_time).total_seconds() / 60.0
         return elapsed < PEER_FAILOVER_THRESHOLD_MIN, elapsed, last_ts
     except Exception as e:
-        log(f"  ❌ 读 hb_xiaojiu.json 失败: {e}")
-        return True, 0, ""
+        log(f"  🔴 解析 last_time 失败: {e} → 判小九【掉线】(fail-closed)")
+        return False, 9999, ""
 
 
 def _alert_cooldown_active():

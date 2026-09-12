@@ -872,12 +872,32 @@ def derive_and_save_gold_pool(members):
     return pool
 
 
+# ---------- B4 (2026-09-12 主人令·剔除st) ----------
+def _is_excluded_stock(name="", code="", amount=None):
+    """B4 (2026-09-12 主人令·剔除st)：剔除 ST/*ST/N(新股首日)/退(退市)/停牌股。
+    仅按名称判定：gtimg 兜底源成交额占位 0，不能凭 amount 误伤正常票。
+    '退' 为退市股后缀（如 '某某退'），须按包含判定而非前缀。"""
+    name = (name or "").strip()
+    if not name:
+        return False  # 空名不凭 amount 误伤正常票
+    if name.startswith(("N", "ST", "*ST")):
+        return True
+    if "退" in name or "退市" in name:
+        return True
+    if "停牌" in name or "停盘" in name:
+        return True
+    return False
+
+
 # ---------- 主构建 ----------
 def build():
     pool = {}  # key -> {code,name,market,board_label,sources:[]}
 
     def add(key, code, name, market, board, source, metrics=None):
         if not key or not code:
+            return
+        # 🛡 2026-09-12 主人令 B4：候选池唯一入口，剔除 ST/退/停牌股（全源统一，杜绝漏网）
+        if _is_excluded_stock(name, code):
             return
         # ★ 干净名字解析: 无论哪层(raw/研报/行情)传入的 name 都强制校正,
         #   杜绝外资研投研报把新闻稿当股票名污染候选池(根治点)
