@@ -190,6 +190,9 @@ def main():
         top = top_map.get(code)
         a = a_map.get(code)
         b = b_map.get(code)
+        _nm = (top or a or b or {}).get("name", "")
+        if _is_excluded_stock(_nm, code):
+            continue
         in_top = bool(top)
         in_a = bool(a)
         in_ab = bool(a or b)

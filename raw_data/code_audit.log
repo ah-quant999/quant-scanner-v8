@@ -1,0 +1,54 @@
+[2026-09-11 11:50:20] env=local commit=ef3b6d5ea result=PASS
+    [1/4] py_compile: OK - 170 个 .py 文件 0 错误
+    [2/4] new Function: OK - 25 个 inline script 块 0 错误
+    [3/4] data 完整性: OK - data/*.js 数量=104, 全部 > 100B
+    [4/4] align_logic_ops: OK - align_logic_ops EXIT 0（逻辑详解页与真 workflow 对齐）
+
+[2026-09-11 12:03:22] env=local commit=ef3b6d5ea result=PASS
+    [1/4] py_compile: OK - 170 个 .py 文件 0 错误
+    [2/4] new Function: OK - 25 个 inline script 块 0 错误
+    [3/4] data 完整性: OK - data/*.js 数量=104, 全部 > 100B
+    [4/4] align_logic_ops: OK - align_logic_ops EXIT 0（逻辑详解页与真 workflow 对齐）
+
+[2026-09-11 14:03:55] env=local commit=669121bb9 result=PASS
+    [1/4] py_compile: OK - 170 个 .py 文件 0 错误
+    [2/4] new Function: OK - 25 个 inline script 块 0 错误
+    [3/4] data 完整性: OK - data/*.js 数量=99, 全部 > 100B
+    [4/4] align_logic_ops: OK - align_logic_ops EXIT 0（逻辑详解页与真 workflow 对齐）
+
+[2026-09-11 14:12:19] env=local commit=669121bb9 result=PASS
+    [1/4] py_compile: OK - 168 个 .py 文件 0 错误
+    [2/4] new Function: OK - 25 个 inline script 块 0 错误
+    [3/4] data 完整性: OK - data/*.js 数量=99, 全部 > 100B
+    [4/4] align_logic_ops: OK - align_logic_ops EXIT 0（逻辑详解页与真 workflow 对齐）
+
+[2026-09-11 14:16:23] env=local commit=57b68464b result=PASS
+    [1/4] py_compile: OK - 168 个 .py 文件 0 错误
+    [2/4] new Function: OK - 25 个 inline script 块 0 错误
+    [3/4] data 完整性: OK - data/*.js 数量=99, 全部 > 100B
+    [4/4] align_logic_ops: OK - align_logic_ops EXIT 0（逻辑详解页与真 workflow 对齐）
+
+[2026-09-11 14:22:54] env=local commit=2176a0e53 result=PASS
+    [1/4] py_compile: OK - 168 个 .py 文件 0 错误
+    [2/4] new Function: OK - 25 个 inline script 块 0 错误
+    [3/4] data 完整性: OK - data/*.js 数量=99, 全部 > 100B
+    [4/4] align_logic_ops: OK - align_logic_ops EXIT 0（逻辑详解页与真 workflow 对齐）
+
+[2026-09-11 14:24:48] env=local commit=6541de961 result=PASS
+    [1/4] py_compile: OK - 168 个 .py 文件 0 错误
+    [2/4] new Function: OK - 25 个 inline script 块 0 错误
+    [3/4] data 完整性: OK - data/*.js 数量=99, 全部 > 100B
+    [4/4] align_logic_ops: OK - align_logic_ops EXIT 0（逻辑详解页与真 workflow 对齐）
+
+[2026-09-11 15:28:06] env=local commit=105697cd5 result=PASS
+    [1/4] py_compile: OK - 168 个 .py 文件 0 错误
+    [2/4] new Function: OK - 24 个 inline script 块 0 错误
+    [3/4] data 完整性: OK - data/*.js 数量=99, 全部 > 100B
+    [4/4] align_logic_ops: OK - align_logic_ops EXIT 0（逻辑详解页与真 workflow 对齐）
+
+[2026-09-11 16:11:26] env=local commit=ee199070c result=PASS
+    [1/4] py_compile: OK - 168 个 .py 文件 0 错误
+    [2/4] new Function: OK - 24 个 inline script 块 0 错误
+    [3/4] data 完整性: OK - data/*.js 数量=99, 全部 > 100B
+    [4/4] align_logic_ops: OK - align_logic_ops EXIT 0（逻辑详解页与真 workflow 对齐）
+
