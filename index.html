@@ -4832,6 +4832,41 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var byWr = R.slice().sort(function(a,b){ return (b.win_rate==null?-1:b.win_rate) - (a.win_rate==null?-1:a.win_rate); });
       var byAr = R.slice().sort(function(a,b){ return (b.avg_return==null?-999:b.avg_return) - (a.avg_return==null?-999:a.avg_return); });
       var bestWr = byWr[0], bestAr = byAr[0];
+      /* 🔴 2026-09-12 主人令「方案一·结论先行」：新增「最佳持有期」——
+         口径 = 跨该策略全部持有期（ranking_all）扫描，取「胜率×收益」综合最优档。
+         排序规则（明示、可复核）：先按胜率降序，胜率相同再按平均收益降序，
+         且样本必须 ≥ MINS（同主表门槛，绝不拿小样本冒充「最佳」）。 */
+      var _RA = (A.ranking_all || []);
+      var _bestHoldOf = {};
+      _RA.forEach(function(r){
+        if((r.sample||0) < MINS) return;          // 样本门槛
+        var k = r.card;
+        var cur = _bestHoldOf[k];
+        if(!cur
+           || (r.win_rate||0) > (cur.win_rate||0)
+           || ((r.win_rate||0) === (cur.win_rate||0) && (r.avg_return||0) > (cur.avg_return||0))){
+          _bestHoldOf[k] = r;
+        }
+      });
+      /* 全局最佳持有期（跨所有策略）：一句话结论用 */
+      var _globalBest = null;
+      Object.keys(_bestHoldOf).forEach(function(k){
+        var r = _bestHoldOf[k];
+        if(!_globalBest
+           || (r.win_rate||0) > (_globalBest.win_rate||0)
+           || ((r.win_rate||0) === (_globalBest.win_rate||0) && (r.avg_return||0) > (_globalBest.avg_return||0))){
+          _globalBest = r;
+        }
+      });
+      function _holdTxt(r){
+        if(!r) return '<span style="color:var(--dim);">—</span>';
+        var hd = String(r.hold||'').replace(/[^0-9]/g,'');
+        if(!hd) return '<span style="color:var(--dim);">—</span>';
+        return '<span style="font-weight:700;color:var(--txt);white-space:nowrap;">'+hd+' 日</span>'
+             + '<span style="color:'+_colorNum(r.win_rate)+';font-weight:700;margin-left:6px;">'+_n(r.win_rate)+'%</span>'
+             + '<span style="color:var(--sub);"> / </span>'
+             + '<span style="color:'+_colorPL(r.avg_return)+';font-weight:700;">'+_sgn(r.avg_return)+_n(r.avg_return,2)+'%</span>';
+      }
       var h = '';
       /* ── ① 榜单摘要（方案三）── */
       h += '<div style="margin:0 0 14px;padding:13px 15px;border-radius:10px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.22);">';
@@ -4851,20 +4886,31 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           +  '</div>';
       });
       h += '</div>';
-      if(bestWr){
+      /* 🔴 2026-09-12 主人令「方案一·结论先行」：首屏第一句必须是可执行结论——
+         最强策略 + 最佳持有期 + 胜率 + 平均收益 + 样本，五要素齐全。 */
+      if(_globalBest){
+        var _ghd = String(_globalBest.hold||'').replace(/[^0-9]/g,'');
+        h += '<div style="margin-top:11px;padding-top:9px;border-top:1px dashed rgba(56,189,248,.25);font-size:13px;line-height:1.9;color:var(--txt);">'
+          +  '📌 <b>一句话结论</b>：<b style="color:#fbbf24;">'+_esc(_globalBest.card)+'</b> 最强，'
+          +  '最佳持有 <b style="color:var(--txt);">'+_ghd+' 日</b>，'
+          +  '胜率 <b style="color:'+_colorNum(_globalBest.win_rate)+';">'+_n(_globalBest.win_rate)+'%</b>、'
+          +  '平均 <b style="color:'+_colorPL(_globalBest.avg_return)+';">'+_sgn(_globalBest.avg_return)+_n(_globalBest.avg_return,2)+'%</b>'
+          +  '（样本 '+(_globalBest.sample||0)+'）';
+        if(bestWr && (bestWr.card!==_globalBest.card || bestWr.label!==_globalBest.label)){
+          h += '；主口径上胜率最高的是 <b style="color:'+_colorNum(bestWr.win_rate)+';">'+_esc(bestWr.card)+'</b>（'+_esc(bestWr.label||'')+'，'+_n(bestWr.win_rate)+'%，样本 '+(bestWr.sample||0)+'）';
+        }
+        h += '。</div>';
+      } else if(bestWr){
         h += '<div style="margin-top:11px;padding-top:9px;border-top:1px dashed rgba(56,189,248,.25);font-size:12.5px;line-height:1.8;color:var(--txt);">'
           +  '📌 <b>一句话结论</b>：胜率最高的是 <b style="color:'+_colorNum(bestWr.win_rate)+';">'+_esc(bestWr.card)+'</b>'
-          +  '（'+_esc(bestWr.label||'')+'，胜率 <b style="color:'+_colorNum(bestWr.win_rate)+';">'+_n(bestWr.win_rate)+'%</b>、平均 <b style="color:'+_colorPL(bestWr.avg_return)+';">'+_sgn(bestWr.avg_return)+_n(bestWr.avg_return,2)+'%</b>，样本 '+ (bestWr.sample||0) +'）'
-          +  (bestAr && bestWr && (bestAr.card!==bestWr.card || bestAr.label!==bestWr.label)
-                ? '；平均收益最高的是 <b style="color:'+_colorPL(bestAr.avg_return)+';">'+_esc(bestAr.card)+'</b>（'+_n(bestAr.avg_return,2)+'%，样本 '+(bestAr.sample||0)+'）' : '')
-          +  '。</div>';
+          +  '（'+_esc(bestWr.label||'')+'，胜率 <b style="color:'+_colorNum(bestWr.win_rate)+';">'+_n(bestWr.win_rate)+'%</b>、平均 <b style="color:'+_colorPL(bestWr.avg_return)+';">'+_sgn(bestWr.avg_return)+_n(bestWr.avg_return,2)+'%</b>，样本 '+ (bestWr.sample||0) +'）。</div>';
       }
       h += '</div>';
       /* ── ② 主对比表（方案一）── */
-      h += '<div style="margin:16px 0 6px;font-size:13px;font-weight:700;color:var(--txt);">📋 主对比表 <span style="font-size:11px;color:var(--dim);font-weight:500;">每个策略只取自己的主口径，绝不跨持有期比较</span></div>';
+      h += '<div style="margin:16px 0 6px;font-size:13px;font-weight:700;color:var(--txt);">📋 主对比表 <span style="font-size:11px;color:var(--dim);font-weight:500;">「样本/胜率」=各自主口径；「最佳持有期」=跨全部持有期扫描取胜率最优档（样本≥'+MINS+'）</span></div>';
       h += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
       h += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      ['#','策略','星级','主口径','样本','胜率','平均收益','源更新时间'].forEach(function(x){
+      ['#','策略','星级','主口径','样本','胜率','最佳持有期'].forEach(function(x){
         h += '<th style="padding:6px;text-align:left;color:var(--sub);white-space:nowrap;">'+x+'</th>';
       });
       h += '</tr></thead><tbody>';
@@ -4877,7 +4923,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           +  '<td style="padding:6px;color:var(--sub);">'+(r.sample||0)+'</td>'
           +  '<td style="padding:6px;font-weight:700;color:'+_colorNum(r.win_rate)+';">'+_n(r.win_rate)+'%</td>'
           +  '<td style="padding:6px;font-weight:700;color:'+_colorPL(r.avg_return)+';">'+_sgn(r.avg_return)+_n(r.avg_return,2)+'%</td>'
-          +  '<td style="padding:6px;color:var(--dim);font-size:10.5px;white-space:nowrap;">'+_esc(String(r.source_time||'—').substring(0,16))+'</td>'
+          +  '<td style="padding:6px;white-space:nowrap;">'+_holdTxt(_bestHoldOf[r.card])+'</td>'
           +  '</tr>';
       });
       INS.forEach(function(r){
@@ -5082,31 +5128,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
                +  '<span style="color:var(--dim);">' + R.delRule + '；' + R.promoteRule + '</span>'
                +  '</div>';
         })();
-        html += '<div style="margin:18px 0 6px;font-size:13px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>🧮</span>全算法回测汇总'
-             +  ' <span style="font-size:11px;color:var(--dim);font-weight:500;">按前端卡名 · 胜率降序 · 样本≥'+MINS+' 才排名 · 最终推荐之后跑</span></div>';
-
-        /* ① 卡级主表 */
-        html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
-        html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-        ['#','策略卡','回测口径','样本','胜率','平均收益','源更新时间'].forEach(function(h){
-          html += '<th style="padding:6px;text-align:left;color:var(--sub);white-space:nowrap;">'+h+'</th>';
-        });
-        html += '</tr></thead><tbody>';
-        (A.ranking||[]).forEach(function(r){
-          html += '<tr style="border-bottom:1px solid var(--border2);">'
-               +  '<td style="padding:6px;color:var(--sub);font-weight:700;">'+r.rank+'</td>'
-               +  '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">'+(r.icon||'')+_esc(r.card)+'</td>'
-               +  '<td style="padding:6px;color:var(--dim);font-size:10.5px;">'+_esc(r.label||'—')+'</td>'
-               +  '<td style="padding:6px;color:var(--sub);">'+(r.sample||0)+'</td>'
-               +  '<td style="padding:6px;">'+_wrNum(r.win_rate,r.sample)+'</td>'
-               +  '<td style="padding:6px;">'+_arNum(r.avg_return,r.sample)+'</td>'
-               +  '<td style="padding:6px;">'+_asof(r.source_time)+'</td>'
-               +  '</tr>';
-        });
-        if(!(A.ranking||[]).length){
-          html += '<tr><td colspan="7" style="padding:14px;text-align:center;color:var(--sub);">暂无样本≥'+MINS+' 的策略卡，累积中（见下方）</td></tr>';
-        }
-        html += '</tbody></table></div>';
+        /* 🔴 2026-09-12 主人令「去重」：原「① 卡级主表」与页首「📋 主对比表」同源同列，
+           整体删除。此处只保留原「② 累积中（不排名）」，标题上提为主标题。 */
 
         /* ② 累积中（不排名，明示原因） */
         if((A.insufficient||[]).length){
@@ -5181,113 +5204,47 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
              +  '（'+_esc(A.chain_note||'')+'）。'+_esc(A.honesty_note||'')+'</div>';
       })();
 
-      html += '<div style="margin:16px 0 6px;font-size:13px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px;"><span>📊</span>各选股策略回测汇总 <span style="font-size:11px;color:var(--dim);font-weight:500;">仅活跃策略 · 样本累积后自动刷新 · 样本&lt;30 灰显</span></div>';
-      /* 2026-09-03 主人令：顶部「回测汇总」——跨策略扫描真实样本，算 胜率最高/收益最好（只渲染一次） */
-      (function(){
-        var _strategies = [];
-        var _bc = window.BACKTEST_COMPREHENSIVE || {};
-        if(_bc.overview){
-          var _tm = { resonance_all:{n:'三重共识·共振≥2（宽松）',i:'🧲'}, resonance_gte70_lt80:{n:'三重共识·共振70-79分',i:'🧲'}, resonance_gte80:{n:'三重共识·共振≥80（严格）',i:'🧲'} };
-          Object.keys(_tm).forEach(function(k){
-            var o=_bc.overview[k]; if(!o||!o.periods) return;
-            var rows=[];
-            Object.keys(o.periods||{}).forEach(function(pk){
-              var r=o.periods[pk];
-              var m=pk.match(/^hold_(\d+)d$/);
-              if(!r||!m) return;
-              var p=parseInt(m[1],10);
-              rows.push({period:p,sample:r.count||0,win_rate:r.win_rate,avg_return:r.avg_return});
-            });
-            if(rows.length) _strategies.push({name:_tm[k].n,icon:_tm[k].i,rows:rows});
-          });
-        }
-        [['FOUR_VOLUME_BACKTEST','四量终极','🔥'],['CRDS_BACKTEST','逆势龙头CRDS','🐉'],['RPS_BACKTEST','相对强度RPS·A档','📐']].forEach(function(m){
-          var sm=((window[m[0]]||{}).summary||{}), bp=sm.by_period||{}, rows=[];
-          Object.keys(bp).forEach(function(pk){
-            var r=bp[pk]||{};
-            var p=parseInt(pk,10);
-            if(isNaN(p)) return;
-            rows.push({period:p,sample:r.samples||0,win_rate:r.win_rate,avg_return:r.avg_return});
-          });
-          _strategies.push({name:m[1],icon:m[2],rows:rows});
-        });
-        // P2-A：升级 MIN 到 30（与 SAMPLE_LOW_THRESHOLD 一致）
-        var MIN=30, bestWR=null,bestAR=null,bestWRraw=null,bestARraw=null;
-        _strategies.forEach(function(s){ s.rows.forEach(function(r){
-          if((r.sample||0)>0){
-            if(r.win_rate!=null){ if(!bestWRraw||r.win_rate>bestWRraw.win_rate) bestWRraw={s:s.name,p:r.period,wr:r.win_rate,n:r.sample}; if((r.sample||0)>=MIN&&(!bestWR||r.win_rate>bestWR.win_rate)) bestWR={s:s.name,p:r.period,wr:r.win_rate,n:r.sample}; }
-            if(r.avg_return!=null){ if(!bestARraw||r.avg_return>bestARraw.avg_return) bestARraw={s:s.name,p:r.period,ar:r.avg_return,n:r.sample}; if((r.sample||0)>=MIN&&(!bestAR||r.avg_return>bestAR.avg_return)) bestAR={s:s.name,p:r.period,ar:r.avg_return,n:r.sample}; }
-          }
-        }); });
-        if(!bestWR) bestWR=bestWRraw; if(!bestAR) bestAR=bestARraw;
-        html += '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;">';
-        if(bestWR){ html += '<div style="flex:1 1 260px;background:rgba(244,73,93,.08);border:1px solid rgba(244,73,93,.25);border-radius:10px;padding:10px 12px;"><div style="font-size:11px;color:var(--dim);margin-bottom:4px;">🏆 胜率最高</div><div style="font-size:15px;font-weight:800;color:var(--up);line-height:1.3;">'+_esc(bestWR.s)+'</div><div style="font-size:13px;font-weight:700;color:var(--up);margin-top:4px;">T+'+bestWR.p+' · '+bestWR.wr.toFixed(1)+'% <span style="font-size:11px;color:var(--sub);font-weight:500;">(n='+bestWR.n+')</span></div></div>'; }
-        if(bestAR){ html += '<div style="flex:1 1 260px;background:rgba(31,209,123,.08);border:1px solid rgba(31,209,123,.25);border-radius:10px;padding:10px 12px;"><div style="font-size:11px;color:var(--dim);margin-bottom:4px;">💰 收益最好</div><div style="font-size:15px;font-weight:800;color:var(--up);line-height:1.3;">'+_esc(bestAR.s)+'</div><div style="font-size:13px;font-weight:700;margin-top:4px;color:'+_colorPL(bestAR.ar)+';">T+'+bestAR.p+' · '+(bestAR.ar>0?'+':'')+bestAR.ar.toFixed(2)+'% <span style="font-size:11px;color:var(--sub);font-weight:500;">(n='+bestAR.n+')</span></div></div>'; }
-        if(!bestWR&&!bestAR){ html += '<div style="color:var(--sub);font-size:12px;">暂无有效回测样本，等待盘后算法链累积历史信号。</div>'; }
-        html += '<div style="width:100%;font-size:10.5px;color:var(--sub);margin-top:8px;line-height:1.5;">📌 排名仅纳入样本≥'+MIN+' 的稳健策略；小样本策略（如逆势龙头CRDS 当前 n=4）详见下方明细，不计入排名以免噪声误导。所有数字均由 baostock 真实收盘价前向收益回测算得（前复权·扣双边 0.3%）。</div>';
-        html += '</div>';
-      })();
+    })();
+
+    /* 🔴 2026-09-12 主人令「去重」：原「📊 各选股策略回测汇总」整块删除 ——
+       其 4 策略主表与页首「📋 主对比表」同源同列；「🏆胜率最高/💰收益最好」双卡
+       与页首「📌 一句话结论」同义。唯一不重复的是「🧬选股生命周期 / 🧪因子实验室」
+       两行（池内跟踪·非信号回测），单列一张极简小表保留，不丢信息。 */
+    (function(){
+      var _tag='<span style="font-size:9px;font-weight:700;color:#14b8a6;background:rgba(20,184,166,.14);border:1px solid rgba(20,184,166,.35);padding:1px 5px;border-radius:4px;white-space:nowrap;">📈 选股策略</span>';
+      html += '<div style="margin:16px 0 6px;font-size:12.5px;font-weight:700;color:var(--txt);">🧬 池内跟踪（非信号回测）'
+           +  ' <span style="font-size:11px;color:var(--dim);font-weight:500;">池内实时跟踪统计，与上方历史信号回测口径不同，不混排</span></div>';
       html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
       html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      // P2-A：增加「DD/SR」列（最大回撤 + 夏普比）
-      ['策略','星级','回测口径','样本','最佳持有期','最佳胜率','最佳平均收益','DD/SR','更新'].forEach(function(h){ html+='<th style="padding:6px;text-align:left;color:var(--sub);white-space:nowrap;">'+h+'</th>'; });
-      html += '</tr></thead><tbody>';
-      _STRATS.forEach(function(s){
-        var m=_metric(s);
-        var stars=(window.__MODULE_STARS&&window.__MODULE_STARS[s.key])||0;
-        var starStr=''; for(var i=0;i<stars;i++) starStr+='⭐'; if(!starStr) starStr='—';
-        var status = m.ready ? ('T+'+m.hold+'天') : (m.sample>0 ? '累计中(n='+m.sample+')' : '待积累');
-        // P2-A：灰显整行
-        var _rowCss = _rowStyle(m);
-        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+_rowCss+'">';
-        html += '<td style="padding:6px;color:var(--txt);font-weight:700;">'+s.icon+' '+s.name+' <span style="font-size:9px;font-weight:700;color:#14b8a6;background:rgba(20,184,166,.14);border:1px solid rgba(20,184,166,.35);padding:1px 5px;border-radius:4px;white-space:nowrap;">📈 选股策略</span></td>';
-        html += '<td style="padding:6px;color:#fbbf24;font-size:11px;white-space:nowrap;">'+starStr+'</td>';
-        html += '<td style="padding:6px;color:var(--sub);font-size:10.5px;">'+_esc(s.key==='triple'?'共振分档·baostock全回测':'信号日买/持N日卖')+'</td>';
-        // 样本<30 时补灰显徽章
-        var _low = (m.sample||0)>0 && (m.sample||0)<SAMPLE_LOW_THRESHOLD;
-        html += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(_low ? (m.sample+'<span style="font-size:9px;color:var(--sub);">⚠</span>') : (m.sample||0))+'</td>';
-        html += '<td style="padding:6px;color:'+(m.ready?'var(--txt)':'var(--dim)')+';">'+status+'</td>';
-        html += '<td style="padding:6px;text-align:right;">'+_wrCell(m)+'</td>';
-        html += '<td style="padding:6px;text-align:right;">'+_arCell(m)+'</td>';
-        html += '<td style="padding:6px;text-align:right;">'+_riskCell(m)+'</td>';  // P2-C
-        html += '<td style="padding:6px;color:var(--dim);font-size:10px;white-space:nowrap;">'+(m.upd?m.upd.substring(0,16):'—')+'</td>';
-        html += '</tr>';
+      ['模块','口径','样本','胜率','平均收益','更新'].forEach(function(x){
+        html += '<th style="padding:6px;text-align:left;color:var(--sub);white-space:nowrap;">'+x+'</th>';
       });
-      /* 2026-09-03 主人令：补入 选股生命周期 / 因子实验室（池内跟踪统计与因子截面观察，非信号回测，不造假） */
-      (function(){
-        var _tag='<span style="font-size:9px;font-weight:700;color:#14b8a6;background:rgba(20,184,166,.14);border:1px solid rgba(20,184,166,.35);padding:1px 5px;border-radius:4px;white-space:nowrap;">📈 选股策略</span>';
-        var _pt=window.V8_POOL_TRACKER||{}, _items=_pt.items||[];
-        var _r='<tr style="border-bottom:1px solid rgba(148,163,184,.1);">'
-          +'<td style="padding:6px;color:var(--txt);font-weight:700;">🧬 选股生命周期 '+_tag+'</td>'
-          +'<td style="padding:6px;color:#fbbf24;font-size:11px;white-space:nowrap;">⭐⭐⭐</td>'
-          +'<td style="padding:6px;color:var(--sub);font-size:10.5px;">池内跟踪·入池价→最新收盘</td>'
-          +'<td style="padding:6px;text-align:right;color:var(--sub);">'+_items.length+'</td>'
-          +'<td style="padding:6px;color:var(--txt);">实时跟踪</td>';
-        if(_items.length){
-          var _w=0,_sum=0;
-          _items.forEach(function(it){ var p=it.last_pct; if(p==null&&it.entry_price&&it.last_close)p=(it.last_close/it.entry_price-1)*100; if(p!=null){_sum+=p; if(p>0)_w++;} });
-          var _wr=_w/_items.length*100, _avg=_sum/_items.length;
-          _r+='<td style="padding:6px;text-align:right;"><span style="font-weight:700;color:'+_colorWR(_wr)+';">'+_wr.toFixed(1)+'%</span></td>'
-            +'<td style="padding:6px;text-align:right;"><span style="color:'+_colorPL(_avg)+';">'+(_avg>0?'+':'')+_avg.toFixed(2)+'%</span></td>'
-            +'<td style="padding:6px;color:var(--dim);font-size:10px;white-space:nowrap;">'+(((_pt.update_time||'')+'').substring(0,16)||'—')+'</td>';
-        } else {
-          _r+='<td style="padding:6px;text-align:right;color:var(--dim);">—</td><td style="padding:6px;text-align:right;color:var(--dim);">—</td><td style="padding:6px;color:var(--dim);font-size:10px;">—</td>';
-        }
-        html += _r+'</tr>';
-        var _fl=window.FACTOR_LAB||{};
-        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">'
-          +'<td style="padding:6px;color:var(--txt);font-weight:700;">🧪 因子实验室 '+_tag+'</td>'
-          +'<td style="padding:6px;color:#fbbf24;font-size:11px;white-space:nowrap;">—</td>'
-          +'<td style="padding:6px;color:var(--sub);font-size:10.5px;">因子截面观察·暂无信号回测</td>'
-          +'<td style="padding:6px;text-align:right;color:var(--sub);">—</td>'
-          +'<td style="padding:6px;color:var(--dim);">信号累积中</td>'
-          +'<td style="padding:6px;text-align:right;color:var(--dim);">—</td>'
-          +'<td style="padding:6px;text-align:right;color:var(--dim);">—</td>'
-          +'<td style="padding:6px;color:var(--dim);font-size:10px;white-space:nowrap;">'+(((_fl.update_time||'')+'').substring(0,16)||'—')+'</td>'
-          +'</tr>';
-      })();
-      html += '<div style="font-size:10.5px;color:var(--dim);margin-top:6px;line-height:1.5;">⚠️ 样本为 0 / 累计中：该策略历史回测信号尚未累积，最终推荐不依赖其回测胜率（依赖实时信号 + ALGO_TRACK 跟踪），样本到位后本表自动填充。🧬 选股生命周期为池内跟踪统计（胜率列=池内盈利占比：最新收盘高于入池价的股票占比；收益列=平均浮盈），非历史信号回测；🧪 因子实验室为因子截面观察（异常换手率·ROE_TTM 大市值档），前向收益回测待因子信号历史累积后上线，不造假。</div>';
-
+      html += '</tr></thead><tbody>';
+      var _pt=window.V8_POOL_TRACKER||{}, _items=_pt.items||[];
+      html += '<tr style="border-bottom:1px solid var(--border2);">'
+        + '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">🧬 选股生命周期 '+_tag+'</td>'
+        + '<td style="padding:6px;color:var(--dim);font-size:10.5px;">池内跟踪·入池价→最新收盘</td>'
+        + '<td style="padding:6px;color:var(--sub);">'+_items.length+'</td>';
+      if(_items.length){
+        var _w=0,_sum=0;
+        _items.forEach(function(it){ var p=it.last_pct; if(p==null&&it.entry_price&&it.last_close)p=(it.last_close/it.entry_price-1)*100; if(p!=null){_sum+=p; if(p>0)_w++;} });
+        var _wr=_w/_items.length*100, _avg=_sum/_items.length;
+        html += '<td style="padding:6px;"><span style="font-weight:700;color:'+_colorWR(_wr)+';">'+_wr.toFixed(1)+'%</span></td>'
+             +  '<td style="padding:6px;"><span style="color:'+_colorPL(_avg)+';">'+(_avg>0?'+':'')+_avg.toFixed(2)+'%</span></td>';
+      } else {
+        html += '<td style="padding:6px;color:var(--dim);">—</td><td style="padding:6px;color:var(--dim);">—</td>';
+      }
+      html += '<td style="padding:6px;color:var(--dim);font-size:10px;white-space:nowrap;">'+(((_pt.update_time||'')+'').substring(0,16)||'—')+'</td></tr>';
+      var _fl=window.FACTOR_LAB||{};
+      html += '<tr style="border-bottom:1px solid var(--border2);">'
+        + '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">🧪 因子实验室 '+_tag+'</td>'
+        + '<td style="padding:6px;color:var(--dim);font-size:10.5px;">因子截面观察·暂无信号回测</td>'
+        + '<td style="padding:6px;color:var(--dim);">—</td>'
+        + '<td style="padding:6px;color:var(--dim);">信号累积中</td>'
+        + '<td style="padding:6px;color:var(--dim);">—</td>'
+        + '<td style="padding:6px;color:var(--dim);font-size:10px;white-space:nowrap;">'+(((_fl.update_time||'')+'').substring(0,16)||'—')+'</td></tr>';
+      html += '</tbody></table></div>';
+      html += '<div style="font-size:10.5px;color:var(--dim);margin-top:6px;line-height:1.6;">🧬 胜率列=池内盈利占比（最新收盘高于入池价的股票占比）；收益列=平均浮盈。🧪 因子实验室为因子截面观察（异常换手率·ROE_TTM 大市值档），前向收益回测待因子信号历史累积后上线，不造假。</div>';
     })();
 
     html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin:18px 0 8px;display:flex;align-items:center;gap:8px;"><span>🎯</span>主策略回测 <span style="font-size:11px;color:var(--dim);font-weight:500;">按星级降序</span></div>';
@@ -5475,8 +5432,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     try{
       var _btOv = "";
       try{ if(typeof window.__btOverviewHTML === "function") _btOv = window.__btOverviewHTML(); }catch(e){}
-      dst.innerHTML = (_btOv + (html ? ('<details style="margin-top:18px;border-top:1px solid var(--border);padding-top:12px;">'
-        + '<summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:var(--sub);padding:6px 0;user-select:none;">▸ 完整明细：各策略 × 各持有期阶梯 + 方法与口径说明</summary>'
+      dst.innerHTML = (_btOv + (html ? ('<details open style="margin-top:18px;border-top:1px solid var(--border);padding-top:12px;">'
+        + '<summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:var(--sub);padding:6px 0;user-select:none;">▾ 完整明细：各策略 × 各持有期阶梯 + 方法与口径说明 <span style="font-weight:400;color:var(--dim);font-size:11px;">（已默认展开）</span></summary>'
         + '<div style="margin-top:10px;">' + html + '</div></details>') : ''))
         || '<div class="note" style="padding:24px;text-align:center;color:var(--dim);">⏳ 策略回测数据刷新中…<br><span style="font-size:11px">若长时间为空请硬刷新 (Ctrl/Cmd+F5)</span></div>';
     }catch(e){ console.error('[bt dst.innerHTML fail]', e); }
@@ -6721,11 +6678,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       // 三段全文折叠
       + '<div style="background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.2);border-radius:7px;padding:8px 12px;margin-bottom:10px;">'
       + '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:6px;">三段全文（同期对比）</div>'
-      + '<details style="margin-bottom:4px;"><summary style="font-size:11.5px;font-weight:600;color:#ef5350;cursor:pointer;">日 · ' + _ev(dScope.date || '') + ' (' + (C.texts.daily || '').length + ' 字)</summary>'
+      + '<details open style="margin-bottom:4px;"><summary style="font-size:11.5px;font-weight:600;color:#ef5350;cursor:pointer;">日 · ' + _ev(dScope.date || '') + ' (' + (C.texts.daily || '').length + ' 字)</summary>'
       + '<pre style="white-space:pre-wrap;font-size:11.5px;line-height:1.7;color:var(--sub);margin:6px 0 0 0;font-family:inherit;">' + _ev(C.texts.daily || '') + '</pre></details>'
-      + '<details style="margin-bottom:4px;"><summary style="font-size:11.5px;font-weight:600;color:#fb923c;cursor:pointer;">周 · ' + _ev(wScope.period || '') + ' (' + (C.texts.weekly || '').length + ' 字)</summary>'
+      + '<details open style="margin-bottom:4px;"><summary style="font-size:11.5px;font-weight:600;color:#fb923c;cursor:pointer;">周 · ' + _ev(wScope.period || '') + ' (' + (C.texts.weekly || '').length + ' 字)</summary>'
       + '<pre style="white-space:pre-wrap;font-size:11.5px;line-height:1.7;color:var(--sub);margin:6px 0 0 0;font-family:inherit;">' + _ev(C.texts.weekly || '') + '</pre></details>'
-      + '<details><summary style="font-size:11.5px;font-weight:600;color:#22c55e;cursor:pointer;">月 · ' + _ev(mScope.period || '') + ' (' + (C.texts.monthly || '').length + ' 字)</summary>'
+      + '<details open><summary style="font-size:11.5px;font-weight:600;color:#22c55e;cursor:pointer;">月 · ' + _ev(mScope.period || '') + ' (' + (C.texts.monthly || '').length + ' 字)</summary>'
       + '<pre style="white-space:pre-wrap;font-size:11.5px;line-height:1.7;color:var(--sub);margin:6px 0 0 0;font-family:inherit;">' + _ev(C.texts.monthly || '') + '</pre></details>'
       + '</div>'
       // 底部
@@ -12750,7 +12707,7 @@ h += '</div>'; // /ulPaneObserve
       });
       h += '</div>';
     }
-    h += '<details style="font-size:11px;color:var(--dim);"><summary style="cursor:pointer;color:var(--sub);">\ud83d\udcf0 \u539f\u59cb\u6761\u76ee\u9644\u5f55\uff08\u547d\u4e2d '+((d.watched||[]).length)+' \u00b7 \u6838\u5fc3 '+((d.core||[]).length)+' \u00b7 \u5168\u90e8 '+((d.all_lite||[]).length)+'\uff0c\u70b9\u51fb\u5c55\u5f00\uff09</summary>';
+    h += '<details open style="font-size:11px;color:var(--dim);"><summary style="cursor:pointer;color:var(--sub);">\ud83d\udcf0 \u539f\u59cb\u6761\u76ee\u9644\u5f55\uff08\u547d\u4e2d '+((d.watched||[]).length)+' \u00b7 \u6838\u5fc3 '+((d.core||[]).length)+' \u00b7 \u5168\u90e8 '+((d.all_lite||[]).length)+'\uff0c\u5df2\u9ed8\u8ba4\u5c55\u5f00\uff09</summary>';
     (d.watched||[]).forEach(function(r){
       h += '<div style="padding:3px 0;border-top:1px dashed rgba(255,255,255,.06);">\u2605\u3010'+r.source_label+'\u3011'+esc(r.title)+' \uff5c '+esc(r.ts)+'</div>';
     });
