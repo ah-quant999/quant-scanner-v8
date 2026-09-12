@@ -132,7 +132,11 @@ def main():
     #（昨晚最高分仅 39.2）。改为 rank<=10 且 score>=max(max_score*0.5, 25)，
     # 既保留“当日相对最强”语义，又避免极端弱市硬塞入票。
     max_score = top10.get("max_score", 0) or 0
-    top_threshold = max(max_score * 0.5, 25)
+    # 🛡 2026-09-12 主人令修复：原 max(max_score * 0.5, 25) 的**硬底线 25** 是结构性缺陷 ——
+    #   弱市里榜首分本身就 < 25（实测 2026-09-11 max_score=22.0），门槛必然高于榜首，
+    #   rank<=10 全被筛掉 → 「主站 TOP10 精选」恒空 → 三重共识长期 0 只（count=0）。
+    #   改为门槛不超过榜首：强弱市都保证至少榜首入选，且保留「相对最强」语义。
+    top_threshold = min(max(max_score * 0.5, 25), max_score)
     top_map = {}
     for s in top10.get("top10", []):
         score = s.get("total_score", 0) or 0
@@ -245,7 +249,7 @@ def main():
         "data_time": top10.get("update_time", ""),
         "count": len(consensus),
         "near_miss_count": len(near_miss),
-        "criteria": "主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)） · 基本面A档",
+        "criteria": "主站TOP10精选（rank≤10 & score≥min(max(max_score×0.5,25), max_score)） · 基本面A档",
         "near_miss_criteria": "有TOP10精选但缺基本面A档（差1步）",
         "stocks": consensus,
         "near_miss": near_miss,

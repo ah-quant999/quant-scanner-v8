@@ -558,12 +558,33 @@ def _load_index_quotes():
 #   算法却说"今天不是大跌日"，cond②（大跌日逆势板）因此长期恒 0。
 #   10 日历史序列本就拿不到逐日 breadth，故统一为 4 指数加权（= 主人 2026-09-11 拍板的
 #   方案 A 口径）；breadth 仅作展示字段，**不得进入综合强度**。
-COMPOSITE_WEIGHTS = {"000001": 0.25, "399001": 0.20, "399006": 0.25, "000688": 0.15}
+COMPOSITE_WEIGHTS = {"000001": 0.25, "399001": 0.25, "399006": 0.25, "000688": 0.25}   # 2026-09-12 主人令：4 指数等权（原 0.25/0.20/0.25/0.15 和为 0.85 → 综合强度被系统性缩小 15%）
 
 
 def _composite_from_pcts(getter):
-    """按 COMPOSITE_WEIGHTS 合成综合强度（唯一真源，序列与快照共用同一公式）。"""
-    return round(sum(w * float(getter(c) or 0) for c, w in COMPOSITE_WEIGHTS.items()), 2)
+    """按 COMPOSITE_WEIGHTS 合成综合强度（唯一真源，序列与快照共用同一公式）。
+
+    2026-09-12 主人令修复 —— 三层假成功之第③层「安全默认值方向错」：
+      原写法 float(getter(c) or 0) 把**缺失指数当作 0% 涨跌**参与加权。
+      实测后果：kline_cache 只有 000001，399001/399006/000688 三个取不到，
+      序列路径只剩 1 个指数 → 综合强度退化为 0.25 × 上证 = -0.30%（真值 -1.18%）
+      → 恒 > MARKET_DOWN_THRESHOLD(-0.8) → cond② 大跌日逆势板恒 False
+      → cond2_list 恒 0 → 精选级(elite) 长期空 —— 即用户所报「cond② 100% 漏判」。
+      现改为：只用**实际可用**的指数，并按可用权重重新归一（缺失即剔除，绝不稀释）。
+    """
+    _sum, _w = 0.0, 0.0
+    for c, w in COMPOSITE_WEIGHTS.items():
+        v = getter(c)
+        if v is None:
+            continue
+        try:
+            _sum += float(v) * w
+        except (TypeError, ValueError):
+            continue
+        _w += w
+    if _w <= 0:
+        return None
+    return round(_sum / _w, 2)
 
 
 def _composite_market_score(quotes):
@@ -573,7 +594,7 @@ def _composite_market_score(quotes):
     """
     if not quotes:
         return None
-    return _composite_from_pcts(lambda c: quotes.get(c, 0))
+    return _composite_from_pcts(lambda c: quotes.get(c))
 
 
 def get_market_index():
@@ -616,7 +637,9 @@ def get_market_index():
         if not ok:
             continue
         # 综合口径：与 get_market_context().today_pct 共用 _composite_from_pcts 唯一公式
-        composite = _composite_from_pcts(lambda c: chgs.get(c, 0))
+        composite = _composite_from_pcts(lambda c: chgs.get(c))
+        if composite is None:
+            continue   # 2026-09-12：无任何可用指数 → 跳过该日，勿把 None 写进序列
         rows.append({"date": d, "pct_chg": composite})
     if not rows:
         return None
@@ -644,6 +667,11 @@ def get_market_context(mkt_df):
     quotes = _load_index_quotes()
     if quotes:
         today_pct = _composite_market_score(quotes)
+        if today_pct is None:
+            # 2026-09-12：快照里无任何可用指数（防御性）→ 回退日K序列路径，
+            #   避免 None 参与 abs(today_pct - _series_last) 比较时抛 TypeError。
+            quotes = None
+    if quotes:
         sh_pct = quotes.get("000001", 0)
         up_total = quotes.get("up_total", 0)
         down_total = quotes.get("down_total", 0)
