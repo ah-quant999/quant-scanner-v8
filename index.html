@@ -12099,7 +12099,8 @@ window.showRestrictedItems = showRestrictedItems;
       if(typeof window.__renderFactorAudit==='function') setTimeout(window.__renderFactorAudit, 30);
       if(typeof window.__renderFactorProgress==='function') setTimeout(window.__renderFactorProgress, 30);
     }
-    // 2026-09-06 审计修复：__renderFactorLab 死调用移除（因子实验室容器已迁暂未上架·实验区，life tab 无此容器）
+    // 2026-09-06 审计修复：__renderFactorLab 死调用移除（当时该容器在暂未上架·实验区，life tab 无此容器）
+    // 2026-09-12 更新：因子实验室已迁入本页 🧪 因子 子页，其渲染由上方 if(n==='fa') 分支负责，故此处仍不挂 life。
     // 🛡 2026-09-02 主人令根治：切换后立即启动「子 tab 数据就绪重试」（见 __stRetryTab），消除 defer 未注入导致的首渲空卡
     try{ window.__stRetryTab(n); }catch(e){}
   };
@@ -12111,7 +12112,9 @@ window.showRestrictedItems = showRestrictedItems;
       pool:function(){return !!(window.CANDIDATE&&(window.CANDIDATE.stocks||window.CANDIDATE.source_dist))&&!!window.GOLD_POOL;},  // 2026-09-11：金股池卡片并入 pool 子页，需 GOLD_POOL 就绪
       tc:function(){return !!(window.TRIPLE_CONSENSUS||window.TRIPLE_TRACK);},
       crds:function(){return !!window.CRDS_CARD_DATA;},
-      life:function(){return !!(window.V8_POOL_TRACKER&&window.V8_POOL_TRACKER.items&&window.V8_POOL_TRACKER.items.length);}
+      life:function(){return !!(window.V8_POOL_TRACKER&&window.V8_POOL_TRACKER.items&&window.V8_POOL_TRACKER.items.length);},
+      // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
+      fa:function(){return !!(window.FACTOR_LAB||window.FACTOR_LAB_BACKTEST);}
     };
     var _chk=_map[n]||function(){return true;};
     if(_chk()) return; // 数据已就绪，无需重试
@@ -12538,14 +12541,11 @@ window.showRestrictedItems = showRestrictedItems;
     // 🛡 2026-08-26 一劳永逸：提前暴露 __ulSwitch，子 tab 按钮在 renderUnlisted 任何位置抛错后仍可切换
     window.__ulSwitch = function(btn, tab){
       window.__ulActivePane = tab;  // guard: 记住当前子 tab，重渲染不再 snap-back
+      // 2026-09-12 主人令：回测·框架 / 因子 / 宏观 三组子页已迁出暂未上架
+      //   （分别 → 策略回测页底部 / 选股策略·🧪 因子 / 新建一级页「宏观观测」），
+      //   故此处只保留唯一在册子页「观测类」，原三组容器查找与显示切换随之删除。
       var pObserve=document.getElementById('ulPaneObserve');
-      var pBacktest=document.getElementById('ulPaneBacktest');
-      var pFactor=document.getElementById('ulPaneFactor');
-      var pMacro=document.getElementById('ulPaneMacro');
       if(pObserve) pObserve.style.display=(tab==='observe')?'block':'none';
-      if(pBacktest) pBacktest.style.display=(tab==='backtest')?'block':'none';
-      if(pFactor) pFactor.style.display=(tab==='factor')?'block':'none';
-      if(pMacro) pMacro.style.display=(tab==='macro')?'block':'none';
       var tabs=document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
       if(btn) btn.classList.add('active');
@@ -12557,22 +12557,12 @@ window.showRestrictedItems = showRestrictedItems;
         if(typeof window.__renderValuationPercentile==='function'){ try{ window.__renderValuationPercentile(); }catch(e){} }
         if(typeof window.__renderAiInsightsCompare==='function'){ try{ window.__renderAiInsightsCompare(); }catch(e){} }
       }
-      if(tab==='backtest'){
-        if(typeof window.__renderRpsAudit==='function'){ try{ window.__renderRpsAudit(); }catch(e){} }
-        if(typeof window.__renderCiticPeBacktest==='function'){ try{ window.__renderCiticPeBacktest(); }catch(e){} }
-        if(typeof window.__renderIndexValueFramework==='function'){ try{ window.__renderIndexValueFramework(); }catch(e){} }
-      }
-      if(tab==='factor'){
-        if(typeof window.__renderFactorLab==='function'){ try{ window.__renderFactorLab(); }catch(e){} }
-        if(typeof window.__renderFactorAudit==='function'){ try{ window.__renderFactorAudit(); }catch(e){} }
-        if(typeof window.__renderFactorProgress==='function'){ try{ window.__renderFactorProgress(); }catch(e){} }
-      }
     };
     if(!window.__ulSelfHealTimer){
       window.__ulSelfHealTimer=setInterval(function(){
         var p=document.getElementById('unlistedPanel');
         if(!p) return;
-        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneObserve')>=0) return; // 已渲染成功停止（2026-09-10：改用因子实验室容器作判据）
+        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneObserve')>=0) return; // 已渲染成功停止（2026-09-12：判据改为观测类容器 ulPaneObserve —— 因子/回测/宏观三子页已迁出，沿用旧判据 ulPaneFactor 会永假 → 无限重渲刷屏）
         if(typeof window.renderUnlisted==='function'){
           console.log('[ulSelfHeal] retry renderUnlisted len='+p.innerHTML.length);
           try{ window.renderUnlisted(); }catch(e){ console.warn('[ulSelfHeal] rethrow:',e.message); }
@@ -12672,52 +12662,23 @@ h += '<div class="card" id="valuationPercentileBody" style="margin-bottom:16px;b
 h += '<div class="card" id="aiInsightsCompareBody" style="margin-bottom:16px;border-left:4px solid #8b5cf6;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52E; AI 洞察·多源观点对比 加载中&#x2026;</div></div>';
 h += '</div>'; // /ulPaneObserve
 
-// ===== 回测·框架 pane（3 张卡） =====
-//   RPS 30天样本考核 / 中信PE<10历史回测 / 指数估值中枢+趋势门控
-
-// ===== 因子实验室 pane（3 张因子卡，2026-09-10 主人令独立成子页）=====
-//   卡容器 id 与实验区时期完全一致（factorLabBody / factorAuditBody / factorProgressBody），
-//   3 个 __render* 函数按 id 取容器，故迁页零改动；切页时 __ulSwitch 兜底触发渲染。
-
-// ===== 宏观观测 pane =====
-        // 2026-09-02 主人令：强势突破 pane、模块去向索引、动量共识/H反推/两套算法回测对比 全部删除（卡片清单以 renderUnlisted 为准）。
+// 2026-09-12 主人令：本页子页从 4 组（观测类 / 回测·框架 / 因子类 / 宏观类）收敛为 1 组「观测类」。
+//   三组迁出去向（卡片容器 id 全部保留，仅换宿主；渲染函数按 id 取容器，故迁页零改动）：
+//     · 回测·框架 3 卡  RPS 30天样本考核 / 中信PE<10历史回测 / 指数估值中枢+趋势门控
+//       → 策略回测页底部 #btExtraHost（__renderBtExtraPane）
+//     · 因子类   3 卡  因子实验室 / 因子审计 / 因子补缺进度
+//       → 选股策略 → 🧪 因子 子页 #stFaHost（__renderFactorPane），位于逆势龙头左侧
+//     · 宏观类   3 卡  机构研究·AI解析 / 新周期判定 / 宏观景气背景·K型分层
+//       → 新建一级页「🌍 宏观观测」 #macroHost（__renderMacroPane）
+//   原 4 按钮子页签导航行与 __ulSwitch 的多组分支已随迁一并删除，避免指向不存在的容器。
+// 2026-09-02 主人令：强势突破 pane、模块去向索引、动量共识/H反推/两套算法回测对比 全部删除（卡片清单以 renderUnlisted 为准）。
     el.innerHTML=h;
-    // 恢复上次激活的子 tab（默认实验区）
+    // 2026-09-12：暂未上架仅剩「观测类」一个在册子页，直接激活之
     setTimeout(function(){ window.__ulSwitch(null, 'observe'); }, 0);
     // 2026-08-30 主人令:渲染兜底
     if(!h || h.length<200){ el.innerHTML='<div style=\"text-align:center;padding:40px;color:var(--dim);\"><div style=\"font-size:32px;margin-bottom:12px;\">📭</div><div style=\"font-size:14px;\">已下架卡片暂无可用数据</div><div style=\"font-size:12px;margin-top:8px;\">稍后再试或检查数据源</div></div>'; }
-    // 2026-09-12 主人令：子 tab 按功能类重组为「观测类 / 回测·框架 / 因子类 / 宏观类」。
-    window.__ulSwitch = function(btn, tab){
-      window.__ulActivePane = tab;
-      var pObserve = document.getElementById('ulPaneObserve');
-      var pBacktest = document.getElementById('ulPaneBacktest');
-      var pFactor = document.getElementById('ulPaneFactor');
-      var pMacro = document.getElementById('ulPaneMacro');
-      if(pObserve) pObserve.style.display = (tab === 'observe') ? 'block' : 'none';
-      if(pBacktest) pBacktest.style.display = (tab === 'backtest') ? 'block' : 'none';
-      if(pFactor) pFactor.style.display = (tab === 'factor') ? 'block' : 'none';
-      if(pMacro) pMacro.style.display = (tab === 'macro') ? 'block' : 'none';
-      var tabs = document.querySelectorAll('#sec-ul .ul-tab');
-      for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
-      if(btn) btn.classList.add('active');
-      // 切到对应子页时兜底触发该页全部卡片渲染，避免 defer 数据未到导致空卡。
-      if(tab==='observe'){
-        if(typeof window.__renderThemeValue==='function'){ try{ window.__renderThemeValue(); }catch(e){} }
-        if(typeof window.__renderCiticPeThermo==='function'){ try{ window.__renderCiticPeThermo(); }catch(e){} }
-        if(typeof window.__renderValuationPercentile==='function'){ try{ window.__renderValuationPercentile(); }catch(e){} }
-        if(typeof window.__renderAiInsightsCompare==='function'){ try{ window.__renderAiInsightsCompare(); }catch(e){} }
-      }
-      if(tab==='backtest'){
-        if(typeof window.__renderRpsAudit==='function'){ try{ window.__renderRpsAudit(); }catch(e){} }
-        if(typeof window.__renderCiticPeBacktest==='function'){ try{ window.__renderCiticPeBacktest(); }catch(e){} }
-        if(typeof window.__renderIndexValueFramework==='function'){ try{ window.__renderIndexValueFramework(); }catch(e){} }
-      }
-      if(tab==='factor'){
-        if(typeof window.__renderFactorLab==='function'){ try{ window.__renderFactorLab(); }catch(e){} }
-        if(typeof window.__renderFactorAudit==='function'){ try{ window.__renderFactorAudit(); }catch(e){} }
-        if(typeof window.__renderFactorProgress==='function'){ try{ window.__renderFactorProgress(); }catch(e){} }
-      }
-    };
+    // 2026-09-12：此处原有第二份 __ulSwitch 定义（与函数开头那份完全重复，
+    //   且含指向已迁走容器的死分支）已删除，只保留函数开头提前暴露的那一份。
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
 

@@ -793,6 +793,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     <div class="sec-head"><h2>📖 逻辑详解</h2><span class="tag">仅管理员可见 · 指标/策略/安全口径</span></div>
 
     <div class="lg-subtabs" id="lgSubtabs">
+      <div class="lg-tab" data-lg="macro" onclick="switchLg('macro',this)">🌍 宏观观测</div>
       <div class="lg-tab active" data-lg="td" onclick="switchLg('td',this)">📅 今日事件</div>
       <div class="lg-tab" data-lg="rt" onclick="switchLg('rt',this)">📡 实时数据</div>
       <div class="lg-tab" data-lg="ph" onclick="switchLg('ph',this)">🌙 盘后数据</div>
@@ -800,6 +801,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       <div class="lg-tab" data-lg="final" onclick="switchLg('final',this)">🏆 最终推荐</div>
       <div class="lg-tab" data-lg="query" onclick="switchLg('query',this)">🔍 个股查询</div>
       <div class="lg-tab" data-lg="st" onclick="switchLg('st',this)">🎯 选股策略</div>
+      <div class="lg-tab" data-lg="bt" onclick="switchLg('bt',this)">🔬 策略回测</div>
       <div class="lg-tab" data-lg="ul" onclick="switchLg('ul',this)">🔒 暂未上架</div>
       <div class="lg-tab" data-lg="op" onclick="switchLg('op',this)">🔒 运维</div>
       <div class="lg-tab" data-lg="v6" onclick="switchLg('v6',this)">📦 v6备忘录</div>
@@ -811,7 +813,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       <div class="card" style="border-left:3px solid var(--gold);">
         <h3><span class="ic">📖</span>逻辑详解页 · 使用说明（2026-09-01 重构）</h3>
         <div class="logic-h">本页定位</div>
-        <div class="logic-p">按主站顶部导航（今日事件 / 实时数据 / 盘后数据 / 共振日历 / 最终推荐 / 个股查询 / 选股策略 / 暂未上架 / 运维）顺序，<b>逐一解说每个 tab 里有哪些卡片、每张卡片的用处、数据来源、算法逻辑、以及按市场常规的标注理由</b>。它是给管理员/开发者看的「使用说明书」，不是每日备份。</div>
+        <div class="logic-p">按主站顶部导航（宏观观测 / 今日事件 / 实时数据 / 盘后数据 / 共振日历 / 最终推荐 / 个股查询 / 选股策略 / 策略回测 / 暂未上架 / 已下架 / 运维）顺序，<b>逐一解说每个 tab 里有哪些卡片、每张卡片的用处、数据来源、算法逻辑、以及按市场常规的标注理由</b>。它是给管理员/开发者看的「使用说明书」，不是每日备份。</div>
         <div class="logic-h">更新规则</div>
         <div class="logic-p">主站新增/删除/重命名卡片时，必须同步更新本页对应子 tab；历史改动归档折叠在「🗄️ 历史改动归档」内，只供追溯，不得替代卡片说明书。</div>
       </div>
@@ -1574,7 +1576,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
 
 <div class="card">
               <div class="card">
-        <h3><span class="ic">🧪</span>因子实验室（2026-09-10 主人令：已升为「暂未上架 → 🧪 因子实验室」独立子页）</h3>
+        <h3><span class="ic">🧪</span>因子实验室（<b>2026-09-12 主人令：已从「暂未上架」迁入「选股策略 → 🧪 因子」子页</b>，位于逆势龙头左侧 · ⭐⭐）</h3>
         <div class="logic-p">把 v2 回测验证显著的单因子做成「可观测截面排名 + 择时闸门」，作为选股策略的<b>因子观察层</b>。两个因子<b>均已通过 D 批 final_recommend 的「方案B融合」进入最终推荐加权</b>（前 5 名 +2.0 / 6-15 名 +1.5 / 16-30 名 +1.0，非开仓期 ×0.3，见上方「最终推荐」计分表第 4/5 项）——即最终推荐在因子实验室产出当日新鲜结果后才生成，缺失/陈旧则降级跳过融合。卡片本身则作为<b>因子观察层</b>展示截面排名。<b>2026-09-04 主人令</b>：先在<b>暂未上架</b>里调试和回测；<b>2026-09-10 主人令</b>：已在该页下方成立「🧪 因子实验室」独立子页（3 张因子卡迁入），升级到 ⭐⭐⭐⭐（4 星）后再考虑迁回选股策略页。</div>
         <div class="logic-h">当前因子</div>
         <table class="lg-table">
@@ -1588,7 +1590,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">数据来源与刷新</div>
         <div class="logic-p">· 数据源：baostock 历史换手率/ROE/成交额（本地系统 Python 抓取；云端 runner 无中国行情权限，故为<b>本机生成</b>）。<br>· 刷新：小九本机定时任务周期重算 → 提交 data/FACTOR_LAB_BACKTEST.js + raw_data/factor_lab.json → 推送 main → 云端构建自动部署。<br>· 口径铁律：不得造假；数据过期时卡片显「加载中/数据陈旧」而非编造信号。</div>
         <div class="logic-h">4⭐ 升级路线图</div>
-        <div class="logic-p">1) 先在暂未上架跑分层回测（信号 vs 次日开盘收益、胜率、回撤、OOS 稳定性）；<br>2) 只有当因子策略本身达到 ⭐⭐⭐⭐ 可信度，且与现有选股策略低相关时；<br>3) 才考虑把它从「暂未上架 → 🧪 因子实验室」迁入选股策略页（加权已在 2026-09-09 起生效，迁移仅为入口位置调整）。</div>
+        <div class="logic-p">1) 先在暂未上架跑分层回测（信号 vs 次日开盘收益、胜率、回撤、OOS 稳定性）；<br>2) 只有当因子策略本身达到 ⭐⭐⭐⭐ 可信度，且与现有选股策略低相关时；<br>3) 才考虑把它从「暂未上架 → 🧪 因子实验室」迁入选股策略页（<b>加权已在 2026-09-09 起生效</b>）。<br><b style="color:var(--gold)">✅ 2026-09-12 主人令：入口迁移已执行</b> —— 三张卡（因子实验室 / 因子审计 / 因子补缺 walk-forward 进度）整体迁入「<b>选股策略 → 🧪 因子</b>」子页（逆势龙头左侧 · ⭐⭐）。选股策略子页现行顺序：<b>选股池 → 四量终极(⭐⭐⭐⭐⭐) → 三重共识(⭐⭐⭐⭐) → 选股生命周期(⭐⭐⭐) → 因子(⭐⭐) → 逆势龙头</b>（2026-09-12 令：五星级模块置于四星级左侧，因子置于逆势龙头左侧）。</div>
       </div>
 
 <div class="card">
@@ -1826,13 +1828,66 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       </div>
 
       
+    <!-- === 宏观观测（2026-09-12 主人令：新建一级页，原「暂未上架 > 宏观类」迁入） === -->
+    <div class="lg-pane" id="lg-macro">
+      <div class="card">
+        <h3><span class="ic">🌍</span>宏观观测 - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">2026-09-12 主人令新建的<b>一级导航页</b>，挂在主站最左侧（今日事件之前）。它把原先埋在「暂未上架 → 宏观类」深处的宏观/周期判断搬到台前：<b>先看宏观处在什么位置，再看个股</b>。页内三张卡里两张为<b>静态内联内容</b>（随主站构建一起发布），唯一有数据链的是置顶的机构研究卡。</div>
+        <div class="logic-h">三张卡</div>
+        <table class="lg-table">
+          <tr><th>卡片</th><th>内容</th><th>数据 / 刷新</th></tr>
+          <tr><td>📚 机构研究 · AI 解析建议<br><span style="color:var(--dim);font-size:11px;">卡容器 <code>maharoCard</code></span></td><td>观澜台 / 金斧头 / 逻辑与思考 / 树枝报告 / 180K Research / 智堡 Wisburg / Vito行研札记 共 7 源，AI 阅读后按「日 → 周 → 月」三层撰写，新闻条目折叠为附录；标题行带「更新于」</td><td><code>data/maharo_macro.js</code>，每日 <b>08:30</b> 由本机 <code>maharo_daily_pull.py</code> 拉取生成</td></tr>
+          <tr><td>🌐 新周期判定 · 海外宏观 + AI 大周期</td><td>海外宏观 + AI 大周期的当前位置判定（事件驱动）</td><td>静态内联，无 data 依赖，2026-09-06 起固定</td></tr>
+          <tr><td>🌍 宏观景气背景 · K 型分层</td><td>K 型分化结构对照：扩张区（上端 · 红）/ 收缩区（下端 · 绿），含金融抑制模型框架要点</td><td>静态内联；源为沧海一土狗（公众号）K 型行业景气图，<b>每月 1 日随宏观数据手动更新</b></td></tr>
+        </table>
+        <div class="logic-h">为什么提升为一级</div>
+        <div class="logic-p">这三张卡原先在「暂未上架」最深处，要连点两层才看得到，实际使用率极低。<b>2026-09-12 主人令</b>：宏观判断属「开盘前必看」，与今日事件同级，故提升为一级页，且<b>不锁</b>（访客可见）。</div>
+        <div class="logic-h">与「今日事件」的区别</div>
+        <div class="logic-p">「今日事件」看的是<b>当天有什么</b>（解禁 / 业绩预告 / 宏观数据速览 / 择时裁决）；「宏观观测」看的是<b>周期处在哪里</b>（月 / 季尺度）。前者是日历，后者是坐标，不重复。</div>
+        <div class="logic-h">前端位置</div>
+        <div class="logic-p">宿主容器 <code>#macroHost</code>（<code>&lt;section id="sec-macro"&gt;</code>），渲染入口 <code>window.__renderMacroPane()</code>；<code>switchSec('macro')</code> 与 <code>_renderPostReady()</code> 双入口触发。</div>
+      </div>
+    </div>
+
+    <!-- === 策略回测（2026-09-12 主人令：整页重写为「结论先行」，并接回迁入的回测·框架 3 卡） === -->
+    <div class="lg-pane" id="lg-bt">
+      <div class="card">
+        <h3><span class="ic">🔬</span>策略回测 - 说明（2026-09-12 整页重写）</h3>
+        <div class="logic-h">为什么重写</div>
+        <div class="logic-p">原页面把「各策略 × 各持有期」的完整阶梯表一次性铺满，打开就是几十行长表，<b>看不到结论</b>。<b>2026-09-12 主人令：全部重写，要简洁明了、事实充分</b> —— 把结论提到最上面，明细折叠起来，一个字不删。</div>
+        <div class="logic-h">新版结构与阅读顺序（方案一 · 结论先行 ＋ 方案三 · 榜单排名）</div>
+        <table class="lg-table">
+          <tr><th>#</th><th>区块</th><th>看什么</th></tr>
+          <tr><td>①</td><td>📊 回测榜单（Top3）</td><td>按各星级策略的历史表现排名，一眼看出「谁在赚钱」</td></tr>
+          <tr><td>②</td><td>一句话结论</td><td>本期表现最强的策略 + 持有期，以及是否值得跟</td></tr>
+          <tr><td>③</td><td>主对比表</td><td>各策略 × 关键指标（胜率 / 平均超额 / 样本数 / 星级）横向对照</td></tr>
+          <tr><td>④</td><td>▸ 完整明细（默认折叠）</td><td>各策略 × 各持有期阶梯 + 方法与口径说明，<b>原文一字未删</b>，需要时展开</td></tr>
+          <tr><td>⑤</td><td>回测 · 框架 3 卡</td><td>2026-09-12 由「暂未上架 → 回测类」迁入，见下表</td></tr>
+        </table>
+        <div class="logic-h">样本量规则（重要）</div>
+        <div class="logic-p">数据源 <code>window.BACKTEST_ALL_ALGOS</code>（<code>raw_data/backtest_all_algos.json</code>，E 批 21:00 <code>gen_backtest_all_algos.py</code> 生成）。字段契约：<code>ranking</code>（可排名策略）/ <code>insufficient</code>（样本不足策略）/ <code>min_samples</code>（门槛，默认 <b>30</b>）/ <code>rows</code> / <code>track_ladder</code>。<b>样本数 &lt; 30 的策略一律标「不参与排名」</b>，只展示、不进榜单 —— 避免小样本被误读成强策略。</div>
+        <div class="logic-h">迁入的「回测 · 框架」3 卡</div>
+        <table class="lg-table">
+          <tr><th>卡片</th><th>类别</th><th>数据源 / 刷新</th></tr>
+          <tr><td>📈 相对强度 RPS · 30 天样本考核</td><td>回测类</td><td><code>data/RPS_AUDIT.js</code>；数据链保留、每日续跑（自 2026-09-05 起满 30 个交易日，约 2026-10 中到期）；<b>不参与选股评分权重</b></td></tr>
+          <tr><td>📊 中信 PE&lt;10 历史回测</td><td>回测类 · 个股</td><td><code>data/CITIC_PE_BACKTEST.js</code>，E 批回测</td></tr>
+          <tr><td>📈 指数估值中枢 · 价格档位 + 趋势门控</td><td>框架类 · 大盘 / 指数</td><td><code>data/INDEX_VALUE_FRAMEWORK.js</code>，E 批回测</td></tr>
+        </table>
+        <div class="logic-h">口径提醒</div>
+        <div class="logic-p">本页榜单为<b>信号表口径</b>（毛胜率、未扣成本）；专项「持有期」回测（入场价 = 信号日次一交易日<b>开盘价</b>、扣往返 0.20% 成本）见「🎯 选股策略」子 tab 的「各选股策略回测汇总」。<b>两者口径不同，不得混用</b>。</div>
+        <div class="logic-h">前端位置</div>
+        <div class="logic-p">宿主 <code>&lt;section id="sec-bt"&gt;</code>；结论区由 <code>__btOverviewHTML()</code> 生成，明细折叠在 <code>&lt;details&gt;</code> 内；回测·框架 3 卡挂在 <code>#btExtraHost</code>，渲染入口 <code>__renderBtExtraPane()</code>。</div>
+      </div>
+    </div>
+
 <div class="lg-pane" id="lg-ul">
       <div class="card">
         <h3><span class="ic">🧪</span>暂未上架 - 说明</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">仅管理员可见的实验区。放置已开发但尚未正式上架的卡片、调试工具或过渡性模块，避免在主站显示不稳定功能。</div>
         <div class="logic-h">当前内容</div>
-        <div class="logic-p">· <b>🧪 因子实验室（独立子页·2026-09-10 新增）</b>：异常换手率（重点池）+ ROE(TTM) 全市场主板大市值档 2 张因子卡 + 分层回测卡。<br>· <b>实验选股调试专区</b>：三重起涨 / CRDS逆势 / 候选池等验证中模块；含「🔭 主题空间 · 概念资金热度」（2026-09-11 由静态主题表改造为 SECTOR_FUND_FLOW 377 个概念/行业板块 × 主力净额 × 均涨跌的每日交叉，原版三项源日间不动被误读为死卡）。<br>· <b>今日判定 · 环境态势</b>：已迁回「今日事件」页，此处不再重复。<br>· <b style="color:var(--gold)">2026-08-29 主人令</b>：🧪 斐波那契F观测窗已从本专区移出 → 「<b>已下架 → 斐波那契窗口 · 当前回调状态</b>」下方（保留可查）。</div>
+        <div class="logic-p">· <b>📊 观测类（唯一在册子页）</b>：概念/行业 → ETF·龙头 参考（板块/行业映射）/ 🔭 主题空间 · 概念资金热度（2026-09-11 由静态主题表改造为 SECTOR_FUND_FLOW 377 个概念/行业板块 × 主力净额 × 均涨跌的每日交叉，原版三项源日间不动被误读为死卡）/ 🌡️ 中信 PE 极值温度计 / 🌡️ 估值分位切换 · A股指数周期定位 / 🔮 AI 洞察 · 多源观点对比，共 5 张。<br>· <b style="color:var(--gold)">2026-09-12 主人令：本页子页从 4 组收敛为 1 组</b> —— 「回测·框架 / 因子类 / 宏观类」三组共 9 张卡全部迁出：回测·框架 3 卡 → <b>策略回测页底部</b>；因子类 3 卡 → <b>选股策略 → 🧪 因子</b> 子页（逆势龙头左侧）；宏观类 3 卡 → 新建一级页 <b>🌍 宏观观测</b>（主站最左）。原 4 按钮子页签导航行随迁一并删除。去向对照见下方「子页去向对照」。<br>· <b>实验选股调试专区</b>：三重起涨 / CRDS逆势 / 候选池等验证中模块。<br>· <b>今日判定 · 环境态势</b>：已迁回「今日事件」页，此处不再重复。<br>· <b style="color:var(--gold)">2026-08-29 主人令</b>：🧪 斐波那契F观测窗已从本专区移出 → 「<b>已下架 → 斐波那契窗口 · 当前回调状态</b>」下方（保留可查）。</div>
         <div class="logic-h">与正式区关系</div>
         <div class="logic-p">经主人确认稳定的模块会逐步提升到一级 Tab 或正式卡片；确认废弃的模块会移除。用户不应把暂未上架内容作为买卖依据。</div>
       </div>
@@ -1847,6 +1902,20 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
           <tr><td>按需</td><td>已下架/观测候选股池/模块去向索引</td><td>cn runner + 浏览器本地</td><td>暂未上架页</td></tr>
         </table>
+        <div class="logic-h">🔄 2026-09-12 子页去向对照（迁移留痕）</div>
+        <table class="lg-table">
+          <tr><th>原位置</th><th>卡片（卡容器 id）</th><th>新位置</th><th>渲染入口 / 宿主</th></tr>
+          <tr><td rowspan="3">暂未上架 · 回测·框架</td><td>📈 相对强度 RPS · 30 天样本考核（<code>rpsAuditBody</code>）</td><td rowspan="3">策略回测页 · 底部</td><td rowspan="3"><code>__renderBtExtraPane()</code> → <code>#btExtraHost</code></td></tr>
+          <tr><td>📊 中信 PE&lt;10 历史回测（<code>citicPeBacktestBody</code>）</td></tr>
+          <tr><td>📈 指数估值中枢 · 价格档位+趋势门控（<code>indexValueFrameworkBody</code>）</td></tr>
+          <tr><td rowspan="3">暂未上架 · 因子类</td><td>🧪 因子实验室 · 异常换手率 / ROE_TTM（<code>factorLabBody</code>）</td><td rowspan="3">选股策略 → 🧪 因子<br>（逆势龙头左侧）</td><td rowspan="3"><code>__renderFactorPane()</code> → <code>#stFaHost</code></td></tr>
+          <tr><td>📊 因子审计：v8 选股 vs 质量价值中小盘多因子（<code>factorAuditBody</code>）</td></tr>
+          <tr><td>🧪 因子补缺 · walk-forward 进度（<code>factorProgressBody</code>）</td></tr>
+          <tr><td rowspan="3">暂未上架 · 宏观类</td><td>📚 机构研究 · AI 解析建议（<code>maharoCard</code>）</td><td rowspan="3">🌍 宏观观测（一级页）</td><td rowspan="3"><code>__renderMacroPane()</code> → <code>#macroHost</code></td></tr>
+          <tr><td>🌐 新周期判定 · 海外宏观 + AI 大周期（静态内联）</td></tr>
+          <tr><td>🌍 宏观景气背景 · K 型分层（静态内联）</td></tr>
+        </table>
+        <div class="logic-p"><b>迁移方式</b>：三组卡片的容器 id 全部保留，只是换了宿主容器（<code>#btExtraHost</code> / <code>#stFaHost</code> / <code>#macroHost</code>），渲染函数按 id 取容器，故迁页零改动。触发入口：<code>_renderPostReady()</code> 与各自的 <code>switchSec / switchSt</code> 分支。</div>
       </div>
 
 <div class="lg-pane" id="lg-op">
