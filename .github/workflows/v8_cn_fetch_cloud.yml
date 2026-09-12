@@ -247,6 +247,28 @@ jobs:
               print("skip=false", file=open(out, 'a'))
           PY
 
+      - name: "\U0001F6E1 交易日历闸门（连续休市段跳过冗余抓取）"
+        id: td
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CAT="${{ steps.cat.outputs.category }}"
+          # check_trading_day.py：A 股交易日判断；失败时保守视为交易日（不跳过），避免调休漏跑
+          TD=$(python algorithms/check_trading_day.py 2>/dev/null | grep -o 'is_trading_day=.*' | tail -1 | cut -d= -f2)
+          if [ -z "$TD" ]; then TD="true"; fi   # 解析失败→保守视为交易日，不跳过
+          if [ "$TD" != "true" ]; then TD="false"; fi
+          echo "is_trading_day=$TD"
+          # 交易日 / 周末周度刷新(category=all) / 手动全量 → 继续抓取；
+          # 仅「工作日 + 非交易日(节假日)」→ 跳过冗余抓取（V8_DATA_DATE 已保证不串日，无数据风险）
+          if [ "$TD" = "true" ] || [ "$CAT" = "all" ]; then
+            echo "proceed=true  (交易日 或 周末周度/手动全量)"
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "proceed=false (工作日遇节假日，跳过冗余抓取)"
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
@@ -262,7 +284,7 @@ jobs:
 
       - name: "📡 抓中国数据 → raw_data/（selective）"
         # 🛡 2026-08-22 幂等闸门：skip=true 时本 run 不重复抓取（另一新鲜 run 已在做）
-        if: steps.gate.outputs.skip != 'true'
+        if: steps.gate.outputs.skip != 'true' && steps.td.outputs.proceed != 'false'
         # 🛡️ 2026-08-12 移除 continue-on-error：抓取失败必须让 job 失败，
         #    阻止 api_push_raw 把只刷了 update_time 的空壳数据推送到 main。
         shell: bash
@@ -279,7 +301,7 @@ jobs:
       # 由小九机「分红刷新」监督 automation 检测后作为应急兜底本地补跑。
       - name: "💰 分红方案刷新（cninfo·云端主跑）"
         id: soft_1
-        if: steps.cat.outputs.category == 'premarket' || steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        if: (steps.cat.outputs.category == 'premarket' || steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all') && steps.td.outputs.proceed != 'false'
         continue-on-error: true
         shell: bash
         run: |
