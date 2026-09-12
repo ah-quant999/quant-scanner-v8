@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-12 06:21:44",
-  "run_start": "2026-09-12 06:02:31",
-  "ok": 7,
+  "update_time": "2026-09-12 09:52:06",
+  "run_start": "2026-09-12 08:48:08",
+  "ok": 26,
   "fail": 1,
   "failed_scripts": [
     {
-      "script": "factor_lab_backtest.py",
-      "reason": "退出码 1 | [error] _rps_cache 无 A股 6 位码 universe"
+      "script": "track_h_auto_buy.py",
+      "reason": "监督器静默杀(>15min 无输出)"
     }
   ],
   "skipped_by_time_gate": []

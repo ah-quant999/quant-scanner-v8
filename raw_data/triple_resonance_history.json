@@ -386,6 +386,30 @@
       "2026-09-10": 42.76,
       "2026-09-11": 40.28,
       "2026-09-12": 40.28
+    },
+    "09987": {
+      "2026-09-12": 338.6
+    },
+    "00291": {
+      "2026-09-12": 18.91
+    },
+    "605117": {
+      "2026-09-12": 0
+    },
+    "688099": {
+      "2026-09-12": 84.89
+    },
+    "09868": {
+      "2026-09-12": 41.96
+    },
+    "06862": {
+      "2026-09-12": 10.36
+    },
+    "00175": {
+      "2026-09-12": 16.59
+    },
+    "09866": {
+      "2026-09-12": 29.7
     }
   },
   "_tracking_latest": {
@@ -419,9 +443,9 @@
     "601168": {
       "enter_date": "2026-08-17",
       "enter_close": 42.45,
-      "last_date": "2026-08-29",
-      "last_close": 42.45,
-      "status": "dropped",
+      "last_date": "2026-09-12",
+      "last_close": 37.59,
+      "status": "strict",
       "streak": 2,
       "total_days": 3
     },
@@ -744,9 +768,9 @@
     "600584": {
       "enter_date": "2026-09-08",
       "enter_close": 69.0,
-      "last_date": "2026-09-08",
-      "last_close": 69.0,
-      "status": "dropped",
+      "last_date": "2026-09-12",
+      "last_close": 67.74,
+      "status": "near",
       "streak": 1
     },
     "603986": {
@@ -773,12 +797,76 @@
       "status": "dropped",
       "streak": 1,
       "total_days": 1
+    },
+    "605117": {
+      "enter_date": "2026-09-12",
+      "enter_close": 0,
+      "last_date": "2026-09-12",
+      "last_close": 0,
+      "status": "strict",
+      "streak": 1
+    },
+    "688099": {
+      "enter_date": "2026-09-12",
+      "enter_close": 84.89,
+      "last_date": "2026-09-12",
+      "last_close": 84.89,
+      "status": "near",
+      "streak": 1
+    },
+    "09987": {
+      "enter_date": "2026-09-12",
+      "enter_close": 338.6,
+      "last_date": "2026-09-12",
+      "last_close": 338.6,
+      "status": "near",
+      "streak": 1
+    },
+    "09866": {
+      "enter_date": "2026-09-12",
+      "enter_close": 29.7,
+      "last_date": "2026-09-12",
+      "last_close": 29.7,
+      "status": "near",
+      "streak": 1
+    },
+    "00175": {
+      "enter_date": "2026-09-12",
+      "enter_close": 16.59,
+      "last_date": "2026-09-12",
+      "last_close": 16.59,
+      "status": "near",
+      "streak": 1
+    },
+    "06862": {
+      "enter_date": "2026-09-12",
+      "enter_close": 10.36,
+      "last_date": "2026-09-12",
+      "last_close": 10.36,
+      "status": "near",
+      "streak": 1
+    },
+    "09868": {
+      "enter_date": "2026-09-12",
+      "enter_close": 41.96,
+      "last_date": "2026-09-12",
+      "last_close": 41.96,
+      "status": "near",
+      "streak": 1
+    },
+    "00291": {
+      "enter_date": "2026-09-12",
+      "enter_close": 18.91,
+      "last_date": "2026-09-12",
+      "last_close": 18.91,
+      "status": "near",
+      "streak": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-09-12 02:10:53"
+    "last_update": "2026-09-12 09:22:00"
   },
   "2026-08-18": [
     {
@@ -1373,7 +1461,7 @@
       "status": "near"
     }
   ],
-  "update_time": "2026-09-12 02:10:53",
+  "update_time": "2026-09-12 09:22:00",
   "2026-08-30": [
     {
       "code": "300475",
@@ -1911,5 +1999,182 @@
     }
   ],
   "2026-09-11": [],
-  "2026-09-12": []
+  "2026-09-12": [
+    {
+      "code": "601168",
+      "name": "西部矿业",
+      "market": "sh",
+      "board": "主板",
+      "close": 37.59,
+      "pct_chg": -7.12,
+      "total_score": 26.7,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业",
+        "锂矿概念",
+        "2026中报预增",
+        "MSCI中国",
+        "稀缺资源",
+        "钒电池",
+        "昨日炸板",
+        "新材料"
+      ],
+      "signal_count": 0,
+      "status": "strict"
+    },
+    {
+      "code": "605117",
+      "name": "德业股份",
+      "market": "sh",
+      "board": "主板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 25.5,
+      "quality_grade": "A",
+      "industry": "电气机械和器材制造业",
+      "sectors": [
+        "电气机械和器材制造业",
+        "周期股",
+        "2026中报预增",
+        "上证180",
+        "沪股通",
+        "HS300",
+        "MSCI中国",
+        "2026一季报预增"
+      ],
+      "signal_count": 1,
+      "status": "strict"
+    },
+    {
+      "code": "600584",
+      "name": "长电科技",
+      "market": "sh",
+      "board": "主板",
+      "close": 67.74,
+      "pct_chg": -0.56,
+      "total_score": 33.8,
+      "quality_grade": "C",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "生物识别",
+        "2026中报预增",
+        "计算机、通信和其他电子设备制造业",
+        "物联网",
+        "HS300",
+        "新材料",
+        "MSCI中国",
+        "毫米波概念"
+      ],
+      "signal_count": 1,
+      "status": "near"
+    },
+    {
+      "code": "688099",
+      "name": "晶晨股份",
+      "market": "sh",
+      "board": "科创板",
+      "close": 84.89,
+      "pct_chg": -1.49,
+      "total_score": 30.4,
+      "quality_grade": "C",
+      "industry": "软件和信息技术服务业",
+      "sectors": [
+        "软件和信息技术服务业",
+        "融资融券",
+        "科创板做市股",
+        "MSCI中国",
+        "昨日高振幅",
+        "半导体概念",
+        "超清视频",
+        "中证500"
+      ],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "09987",
+      "name": "百胜中国",
+      "market": "hk",
+      "board": "港股",
+      "close": 338.6,
+      "pct_chg": -0.94,
+      "total_score": 28.0,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "09866",
+      "name": "09866",
+      "market": "hk",
+      "board": "港股",
+      "close": 29.7,
+      "pct_chg": 2.84,
+      "total_score": 26.7,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "00175",
+      "name": "吉利汽车",
+      "market": "hk",
+      "board": "港股",
+      "close": 16.59,
+      "pct_chg": -1.95,
+      "total_score": 25.5,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "06862",
+      "name": "海底捞",
+      "market": "hk",
+      "board": "港股",
+      "close": 10.36,
+      "pct_chg": -8.96,
+      "total_score": 25.5,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "09868",
+      "name": "小鹏汽车-W",
+      "market": "hk",
+      "board": "港股",
+      "close": 41.96,
+      "pct_chg": -3.32,
+      "total_score": 25.5,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "00291",
+      "name": "华润啤酒",
+      "market": "hk",
+      "board": "港股",
+      "close": 18.91,
+      "pct_chg": 0.16,
+      "total_score": 25.5,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 2,
+      "status": "near"
+    }
+  ]
 }
