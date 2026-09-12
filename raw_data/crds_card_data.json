@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-12 09:00:41",
+  "update_time": "2026-09-12 10:36:57",
   "data_time": "2026-09-12 15:30:00",
   "total_scanned": 763,
   "scan_stats": {
@@ -7,8 +7,8 @@
     "succeeded": 763,
     "failed": 3,
     "kline_source_used": "本地缓存(主源 759/763 只)",
-    "elapsed_sec": 33.7,
-    "throughput_per_sec": 22.7,
+    "elapsed_sec": 40.7,
+    "throughput_per_sec": 18.8,
     "cache_fresh": 759,
     "cache_miss": 7,
     "cache_stale": 0,
@@ -46,12 +46,12 @@
   "cond1_list": [
     {
       "code": "000560",
-      "name": "珠江船务",
+      "name": "我爱我家",
       "board_label": "主板"
     },
     {
       "code": "000735",
-      "name": "000735",
+      "name": "罗 牛 山",
       "board_label": "主板"
     },
     {
@@ -76,7 +76,7 @@
     },
     {
       "code": "002881",
-      "name": "武汉有机",
+      "name": "美格智能",
       "board_label": "主板"
     },
     {
@@ -223,12 +223,12 @@
   "cond2_list": [
     {
       "code": "000560",
-      "name": "珠江船务",
+      "name": "我爱我家",
       "board_label": "主板"
     },
     {
       "code": "000564",
-      "name": "中创智领",
+      "name": "供销大集",
       "board_label": "主板"
     },
     {
@@ -238,7 +238,7 @@
     },
     {
       "code": "000735",
-      "name": "000735",
+      "name": "罗 牛 山",
       "board_label": "主板"
     },
     {
@@ -415,22 +415,22 @@
   "cond3_list": [
     {
       "code": "000039",
-      "name": "上证信息",
+      "name": "中集集团",
       "board_label": "主板"
     },
     {
       "code": "000560",
-      "name": "珠江船务",
+      "name": "我爱我家",
       "board_label": "主板"
     },
     {
       "code": "000564",
-      "name": "中创智领",
+      "name": "供销大集",
       "board_label": "主板"
     },
     {
       "code": "000591",
-      "name": "中国高精密",
+      "name": "太阳能",
       "board_label": "主板"
     },
     {
@@ -440,17 +440,17 @@
     },
     {
       "code": "000735",
-      "name": "000735",
+      "name": "罗 牛 山",
       "board_label": "主板"
     },
     {
       "code": "000737",
-      "name": "湾区发展",
+      "name": "北方铜业",
       "board_label": "主板"
     },
     {
       "code": "000807",
-      "name": "上海实业环境",
+      "name": "云铝股份",
       "board_label": "主板"
     },
     {
@@ -460,12 +460,12 @@
     },
     {
       "code": "000833",
-      "name": "华讯",
+      "name": "粤桂股份",
       "board_label": "主板"
     },
     {
       "code": "000878",
-      "name": "金朝阳集团",
+      "name": "云南铜业",
       "board_label": "主板"
     },
     {
@@ -475,7 +475,7 @@
     },
     {
       "code": "000933",
-      "name": "中证医药",
+      "name": "神火股份",
       "board_label": "主板"
     },
     {
@@ -490,7 +490,7 @@
     },
     {
       "code": "002028",
-      "name": "映美控股",
+      "name": "思源电气",
       "board_label": "主板"
     },
     {
@@ -540,7 +540,7 @@
     },
     {
       "code": "002602",
-      "name": "万物云",
+      "name": "世纪华通",
       "board_label": "主板"
     },
     {
@@ -570,7 +570,7 @@
     },
     {
       "code": "002881",
-      "name": "武汉有机",
+      "name": "美格智能",
       "board_label": "主板"
     },
     {
@@ -2482,13 +2482,13 @@
   "elite": [
     {
       "code": "000560",
-      "name": "珠江船务",
+      "name": "我爱我家",
       "score": 100,
       "enter_date": "2026-09-12"
     },
     {
       "code": "000735",
-      "name": "000735",
+      "name": "罗 牛 山",
       "score": 100,
       "enter_date": "2026-09-12"
     },
@@ -2622,7 +2622,7 @@
   "advanced": [
     {
       "code": "000564",
-      "name": "中创智领",
+      "name": "供销大集",
       "score": 100,
       "enter_date": "2026-09-12"
     },
@@ -2718,7 +2718,7 @@
     },
     {
       "code": "002881",
-      "name": "武汉有机",
+      "name": "美格智能",
       "score": 0,
       "enter_date": "2026-09-12"
     },
@@ -2780,43 +2780,43 @@
     },
     {
       "code": "000039",
-      "name": "上证信息",
+      "name": "中集集团",
       "score": 0,
       "enter_date": "2026-09-12"
     },
     {
       "code": "000591",
-      "name": "中国高精密",
+      "name": "太阳能",
       "score": 0,
       "enter_date": "2026-09-12"
     },
     {
       "code": "000737",
-      "name": "湾区发展",
+      "name": "北方铜业",
       "score": 0,
       "enter_date": "2026-09-12"
     },
     {
       "code": "000807",
-      "name": "上海实业环境",
+      "name": "云铝股份",
       "score": 0,
       "enter_date": "2026-09-12"
     },
     {
       "code": "000833",
-      "name": "华讯",
+      "name": "粤桂股份",
       "score": 0,
       "enter_date": "2026-09-12"
     },
     {
       "code": "000878",
-      "name": "金朝阳集团",
+      "name": "云南铜业",
       "score": 0,
       "enter_date": "2026-09-12"
     },
     {
       "code": "000933",
-      "name": "中证医药",
+      "name": "神火股份",
       "score": 0,
       "enter_date": "2026-09-12"
     },
@@ -2828,7 +2828,7 @@
     },
     {
       "code": "002028",
-      "name": "映美控股",
+      "name": "思源电气",
       "score": 0,
       "enter_date": "2026-09-12"
     },
@@ -2870,7 +2870,7 @@
     },
     {
       "code": "002602",
-      "name": "万物云",
+      "name": "世纪华通",
       "score": 0,
       "enter_date": "2026-09-12"
     },
@@ -4977,7 +4977,7 @@
   ],
   "detail": {
     "000039": {
-      "name": "上证信息",
+      "name": "中集集团",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4992,7 +4992,7 @@
       "board_label": "主板"
     },
     "000560": {
-      "name": "珠江船务",
+      "name": "我爱我家",
       "score": 100,
       "conds": 3,
       "cond1": true,
@@ -5007,7 +5007,7 @@
       "board_label": "主板"
     },
     "000564": {
-      "name": "中创智领",
+      "name": "供销大集",
       "score": 100,
       "conds": 2,
       "cond1": false,
@@ -5022,7 +5022,7 @@
       "board_label": "主板"
     },
     "000591": {
-      "name": "中国高精密",
+      "name": "太阳能",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -5052,7 +5052,7 @@
       "board_label": "主板"
     },
     "000620": {
-      "name": "大唐西市",
+      "name": "盈新发展",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -5067,7 +5067,7 @@
       "board_label": "主板"
     },
     "000630": {
-      "name": "隽泰控股",
+      "name": "铜陵有色",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -5082,7 +5082,7 @@
       "board_label": "主板"
     },
     "000703": {
-      "name": "000703",
+      "name": "恒逸石化",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -5097,7 +5097,7 @@
       "board_label": "主板"
     },
     "000735": {
-      "name": "000735",
+      "name": "罗 牛 山",
       "score": 100,
       "conds": 3,
       "cond1": true,
@@ -5112,7 +5112,7 @@
       "board_label": "主板"
     },
     "000737": {
-      "name": "湾区发展",
+      "name": "北方铜业",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -5127,7 +5127,7 @@
       "board_label": "主板"
     },
     "000807": {
-      "name": "上海实业环境",
+      "name": "云铝股份",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -5142,7 +5142,7 @@
       "board_label": "主板"
     },
     "000811": {
-      "name": "发布针对冰轮环境",
+      "name": "冰轮环境",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -5172,7 +5172,7 @@
       "board_label": "主板"
     },
     "000833": {
-      "name": "华讯",
+      "name": "粤桂股份",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -5187,7 +5187,7 @@
       "board_label": "主板"
     },
     "000878": {
-      "name": "金朝阳集团",
+      "name": "云南铜业",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -5217,7 +5217,7 @@
       "board_label": "主板"
     },
     "000933": {
-      "name": "中证医药",
+      "name": "神火股份",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -5277,7 +5277,7 @@
       "board_label": "主板"
     },
     "002028": {
-      "name": "映美控股",
+      "name": "思源电气",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -5427,7 +5427,7 @@
       "board_label": "主板"
     },
     "002422": {
-      "name": "四川科伦药业",
+      "name": "科伦药业",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -5577,7 +5577,7 @@
       "board_label": "主板"
     },
     "002602": {
-      "name": "万物云",
+      "name": "世纪华通",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -5697,7 +5697,7 @@
       "board_label": "主板"
     },
     "002881": {
-      "name": "武汉有机",
+      "name": "美格智能",
       "score": 0,
       "conds": 2,
       "cond1": true,
