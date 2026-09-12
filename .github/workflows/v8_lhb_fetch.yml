@@ -41,6 +41,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: v8-lhb-fetch
+  cancel-in-progress: false
+
 jobs:
   lhb-only:
     runs-on: [self-hosted, cn]

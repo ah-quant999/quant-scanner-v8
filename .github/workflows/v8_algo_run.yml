@@ -125,7 +125,7 @@ concurrency:
 
 jobs:
   algo:
-    runs-on: [self-hosted, cn]  # 2026-09-09 一劳永逸: 固定到 lemoncat-cn(专属 label)。根因: alimi-cn 家里机 runner PATH 缺 bash/git, step4 解析数据日期报 bash: command not found, 云端链 1613-1618 六连败(日志实证)。恢复双跑条件: 家里机装 Git for Windows 且 runner 服务 PATH 可见 bash 后, 移除本 label。
+    runs-on: [self-hosted, cn]  # 2026-09-12 修正：共享标签 cn（双机谁空谁接）；专属 lemoncat-cn/alimi-cn label 实测从未配置（runner API 返回 0、无 org/runner-read 权限），盲改不存在的 label 会让 workflow 静默失效，故保持共享标签。
     # 2026-09-04 提升 120 → 240：探针路由后本链承接云端分批；stage 空=全链（实测 84min）
     #   + update_v8 + health_check + 兜底推送 40min ≈ 150min 逼近旧上限，留足余量。
     timeout-minutes: 240
