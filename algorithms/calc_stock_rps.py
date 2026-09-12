@@ -319,6 +319,7 @@ def _cache_path(code):
 #   现改为**内容级判据**：末根 K 线日期必须 >= 最近交易日，否则视为 miss → 强制重取。
 _EXPECTED_KLINE_END = None
 _STALE_CACHE_N = 0
+_DEGRADED_N = 0    # 🛡 2026-09-12：在线取数失败而回退到旧缓存的次数（写入产物供前端/审计识别）
 
 
 def _expected_kline_end():
@@ -335,7 +336,15 @@ def _expected_kline_end():
     return _EXPECTED_KLINE_END
 
 
-def _load_cache(code, max_age_days=1):
+def _load_cache(code, max_age_days=3):
+    """带新鲜度闸的缓存读取。
+
+    🛡 2026-09-12 主人令：max_age_days 由 1 放宽到 3。
+      实测 2026-09-12 08:20：_rps_cache 714 只 mtime 全部 24-48h（100%），
+      单是这道 mtime 硬闸就把全部缓存判 miss（内容其实只差 1 根 K 线）。
+      真正的权威判据是下面的**内容级闸**（末根 K 线 >= 最近交易日），
+      mtime 只作极端陈旧（>3 天）的兜底，避免长假后永不失效。
+    """
     path = _cache_path(code)
     if not os.path.exists(path):
         return None
@@ -359,6 +368,25 @@ def _load_cache(code, max_age_days=1):
                     print(f"  ⚠️ 陈旧K线缓存 #{_STALE_CACHE_N}（末根 {last} < 期望 {exp}）→ 强制重取: {code}")
                 return None
         return df
+    except Exception:
+        return None
+
+
+def _load_cache_raw(code, min_rows=20):
+    """🛡 2026-09-12：不带任何新鲜度闸的「裸」缓存读取。
+
+    仅供 fetch_stock_df 在「在线重取失败」时降级回退使用 —— 宁可用 T-1 缓存，
+    也不产出宇宙级空榜（见 fetch_stock_df 内事故说明）。
+    """
+    path = _cache_path(code)
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            rows = json.load(f)
+        if not rows or len(rows) < min_rows:
+            return None
+        return pd.DataFrame(rows)
     except Exception:
         return None
 
@@ -428,14 +456,33 @@ def load_universe(path):
 
 
 def fetch_stock_df(code, market, days=DAYS_NEED):
-    """获取单票 K 线, 优先读缓存。"""
+    """获取单票 K 线：优先读缓存 → 在线重取 → **降级回退**（2026-09-12 新增）。
+
+    事故（2026-09-12 08:20 实测）：
+      universe 875 只、_rps_cache 714 只（每只 413 条 K 线，容量充足），
+      但缓存 mtime 全部停在 09-11 05:11（>24h）且末根为 09-10，
+      两道闸全拦 → 875 只全部走在线重取 → 批量失败 → 产物 valid_count=2。
+      根因不是「没数据」，而是**取数失败后不做任何降级**：宁可产出空榜也不用已有缓存。
+    RPS 是 250 日窗口的相对排名，用 T-1 缓存与用 T 数据差异极小；
+    而「宇宙级空产物」是完全不可用。故取数失败时降级回退，绝不静默全空。
+    """
     df = _load_cache(code)
     if df is not None and len(df) >= days * 0.8:
         return df
     df = _query_kline(code, market, days)
     if df is not None and len(df) >= 20:
         _save_cache(code, df)
-    return df
+        return df
+    # 🛡 降级回退：在线取数失败 → 用「过期但可用」的缓存兜底，并计数上报产物
+    df_stale = _load_cache_raw(code)
+    if df_stale is not None:
+        global _DEGRADED_N
+        _DEGRADED_N += 1
+        if _DEGRADED_N <= 3 or _DEGRADED_N % 100 == 0:
+            print(f"  ⚠️ 降级回退 #{_DEGRADED_N}：在线取数失败，改用缓存 {code}"
+                  f"（末根 {str(df_stale['date'].iloc[-1])[:10]}）")
+        return df_stale
+    return None
 
 
 def fetch_index_df(market="cn", days=DAYS_NEED):
@@ -683,6 +730,7 @@ def main():
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "universe_count": len(stocks),
         "valid_count": len(records),
+        "degraded_count": _DEGRADED_N,   # 🛡 2026-09-12：回退旧缓存的只数（>0 说明本轮带降级）
         "index_code": actual_index_code,
         "index_name": "沪深300" if actual_index_code == INDEX_CODE else "上证指数(兜底)",
         "has_hk": hk_count > 0,
