@@ -708,7 +708,16 @@ jobs:
           H = {"Authorization": "Bearer " + TOK, "Content-Type": "application/json", "Accept": "application/vnd.github+json"}
           ROOT = "."
           idx = os.path.join(ROOT, "index.html")
-          html = open(idx, encoding="utf-8").read()
+          # ★ 2026-09-12 防覆盖根因修复（阿狸咪的工程师）：
+          #   原读 run checkout 的 index.html —— run 长跑期间 main 被 build/手改推进（head 落后）时，
+          #   整文件 PUT 会把主线手改全部回退（实测 2026-09-12 一次 855 行 517+/338- 事故）。
+          #   改为取【当前 main 的 index.html】原文，只把 ALGO_TRACK ?v 改掉再 PUT，主线手改一律保留。
+          #   注：index.html > 1MB，Contents API 的 content 字段为空 → 用 blob API 取全文。
+          meta = json.loads(urllib.request.urlopen(urllib.request.Request(API + "/contents/index.html?ref=main", headers=H)).read())
+          _raw = urllib.request.urlopen(urllib.request.Request(
+              "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, meta["sha"]),
+              headers=dict(H, Accept="application/vnd.github.raw"))).read()
+          html = _raw.decode("utf-8")
           p = os.path.join(ROOT, "data", "ALGO_TRACK.js")
           # ★ 2026-08-16 审计修复：必须与 build/reconcile 的 ?v 计算逐字符一致——
           #   ① 取原始字节（非 read().encode()，避免 Windows CRLF→LF 归一化致 sha 偏移）；
@@ -728,7 +737,6 @@ jobs:
               print("ALGO_TRACK ?v 已是最新，无需推送")
           else:
               open(idx, "w", encoding="utf-8").write(new)
-              meta = json.loads(urllib.request.urlopen(urllib.request.Request(API + "/contents/index.html?ref=main", headers=H)).read())
               body = json.dumps({"message": "chore: 算法链后同步 ALGO_TRACK ?v（防覆盖）", "content": base64.b64encode(new.encode()).decode(), "sha": meta["sha"]}).encode()
               req = urllib.request.Request(API + "/contents/index.html", data=body, headers=H, method="PUT")
               print("push index.html ALGO_TRACK ?v:", urllib.request.urlopen(req).getcode(), "v=", t)
