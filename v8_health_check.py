@@ -1589,7 +1589,7 @@ def check_data_cards():
         # 🛡 2026-08-19 修：人工维护卡（今日宏观解读=主人撰写宏观解读，管线只补cpi/pmi）
         #   陈旧属预期，降 warn 不误报 fail（看板保留提示主人更新）。
         if d.get("manual_dep") and age_min > max_age:
-            status = "warn"
+            status = "limited"
             # 🛡 2026-09-10 主人令：manual_dep 项的 message 必须带 manual_note，
             #   否则运维面板只显示"陈旧超过阈值"无法判断是"待主人手动更新"还是"本机网络无替代源"。
             #   区分：note 区分人工(需主人)/网络(需小九中国IP)，让自愈链不会去派发永远刷不出的任务。
@@ -2561,14 +2561,18 @@ def check_top10_history_depth():
 
 def build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh=None, history_depth=None, a_share_cov=None, all_data=None):
     all_items = cards + raw + site_sync + runner + local_sync + dom + (signal_fresh or []) + (history_depth or []) + (a_share_cov or []) + (all_data or [])
+    # 🛡 2026-09-12 ④：把计算/定义顺序写进 order，前端组内按此排序，与算法执行顺序一致
+    for _i, _it in enumerate(all_items):
+        _it["order"] = _i
     ok = sum(1 for x in all_items if x["status"] == "ok")
     warn = sum(1 for x in all_items if x["status"] == "warn")
     fail = sum(1 for x in all_items if x["status"] == "fail")
+    limited = sum(1 for x in all_items if x["status"] == "limited")
     overall = "ok" if fail == 0 else ("warn" if fail <= 2 else "fail")
     return {
         "updated": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
         "overall": overall,
-        "summary": {"ok": ok, "warn": warn, "fail": fail, "total": len(all_items)},
+        "summary": {"ok": ok, "warn": warn, "fail": fail, "limited": limited, "total": len(all_items)},
         "items": all_items,
     }
 
