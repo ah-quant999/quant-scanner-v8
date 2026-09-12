@@ -2552,10 +2552,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="st-tabs">
       <!-- 2026-08-29 主人令：选股池作为选股策略子页面；2026-08-30 主人令：选股池移到三重共识前面 -->
       <button class="st-tab active" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
-      <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span></button>
-      <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
+      <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
+      <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="life" onclick="switchSt('life')">🧬 选股生命周期 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
-      <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·固定</span></button>
+      <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·0⭐观测</span></button>
     </div>
 
     <!-- ===== 2026-09-02 主人令：大牛股猎手 / 全站精选 与选股策略高度重复，彻底删除；四量终极迁回选股策略子页 ===== -->
@@ -4144,8 +4144,22 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   }
 
   /* 2026-09-02 主人令：选股模块星级表全局化（原在已下架分组内，现卡片迁回选股策略仍需共享） */
-  window.__MODULE_STARS = { fourvolume:4, triple:5 };  /* 2026-09-06 审计修复：crds 移除（弱市专用不评星，与文档一致）；hunter/cockpit/allsite/rps 已全方位下线 */
+  window.__MODULE_STARS = { fourvolume:5, triple:4 };  /* 2026-09-12 星级调整：四量主口径T+5 n=1435 升5⭐；三重严格档T+20 n=115 样本偏少降4⭐；crds 0⭐弱市专用保留；hunter/cockpit/allsite/rps 已下线 */
   window.__moduleStarsHTML = function(k){ var n=(window.__MODULE_STARS&&window.__MODULE_STARS[k])||0; var x=''; for(var i=0;i<n;i++) x+='⭐'; return x || '—'; };
+  /* 2026-09-12 星级委员会规则：每月评定，五维加权，硬门槛防小样本冒充高星 */
+  window.__STAR_COMMITTEE_RULES = {
+    asOf: "2026-09-12",
+    dimensions: [
+      {name: "主口径胜率", weight: 0.30, gate5: 60, gate4: 55, gate3: 50},
+      {name: "主口径平均收益", weight: 0.25, gate5: 2.0, gate4: 1.0, gate3: 0.0},
+      {name: "样本量", weight: 0.30, gate5: 500, gate4: 100, gate3: 30, hard: "n<30不评级；n<100最高4⭐"},
+      {name: "夏普比率", weight: 0.10, gate5: 0.5, gate4: 0.3, gate3: 0.0},
+      {name: "近20日稳定性", weight: 0.05, gate5: "无大回撤", gate4: "波动可控", gate3: "可接受"}
+    ],
+    delRule: "连续两次月度评定≤2⭐自动下架删除；首次2⭐黄牌限期30交易日整改",
+    promoteRule: "≥4⭐方可入选选股策略主tab；3⭐及以下留在暂未上架观测",
+    note: "星级只反映历史回测表现，不保证未来；主口径与样本量是硬约束。"
+  };
   // ══ 2026-09-02 主人令：策略回测单一来源（一劳永逸）══
   //   主策略区(__renderBacktestSection) / 选股生命周期(__renderLifecycleSection) / 星级表模块行(_buildStrategyRating)
   //   全部读此配置；删一个策略只改这里，三处自动同步消失，绝不再漏删/错删。
@@ -4846,7 +4860,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           def:'胜率=收益>0占比（排平盘）；最大回撤=全局累计收益峰谷。' },
         { key:'crds', name:'逆势龙头CRDS', icon:'🐉', color:'#ef4444',
           method:'CRDS advanced 档历史回测（前复权·扣双边 0.3%）：信号日取真实下一交易日开盘买入，持有 N 个真实交易日收盘价卖出（节假日自动跳过）。',
-          def:'胜率=win/(win+loss) 排平盘；最大回撤=该期内全局峰谷。' },
+          def:'胜率=win/(win+loss) 排平盘；最大回撤=该期内全局峰谷。<br><b style="color:#ef5350;">⚠️ 历史回测样本极少（advanced档 n=4），统计意义有限；当前每日盘后仍生成 elite/advanced/watch 信号，作弱市观察工具使用。</b>' },
         { key:'rps', name:'相对强度RPS', icon:'📐', color:'#10b981',
           method:'RPS A档历史回测（前复权·扣双边 0.3%）：观测非主推档，A档仅用作信号质量观测，不参与选股推荐。',
           def:'胜率=win/(win+loss) 排平盘；最大回撤=该期内全局峰谷；样本<30 时仅观测不计入排名。' },
@@ -4941,6 +4955,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         if(!A || !A.rows) return;
         var MINS = A.min_samples || 30;
         function _asof(t){ return t ? ('<span style="font-size:10px;color:var(--sub);">'+_esc(String(t).substring(0,16))+'</span>') : '<span style="color:var(--dim);">—</span>'; }
+        // 2026-09-12 星级委员会规则可视化块
+        (function(){
+          var R = window.__STAR_COMMITTEE_RULES;
+          if(!R) return;
+          html += '<div style="margin:14px 0 8px;padding:10px 12px;border-radius:8px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.25);line-height:1.7;font-size:11.5px;color:var(--txt);">'
+               +  '<b style="color:#fbbf24;">⭐ 星级委员会规则（2026-09-12 起）</b><br>'
+               +  '五维加权：胜率30% + 平均收益25% + 样本量30%（硬门槛：n<30不评级，n<100最高4⭐） + 夏普10% + 稳定性5%。<br>'
+               +  '<span style="color:var(--dim);">' + R.delRule + '；' + R.promoteRule + '</span>'
+               +  '</div>';
+        })();
         html += '<div style="margin:18px 0 6px;font-size:13px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>🧮</span>全算法回测汇总'
              +  ' <span style="font-size:11px;color:var(--dim);font-weight:500;">按前端卡名 · 胜率降序 · 样本≥'+MINS+' 才排名 · 最终推荐之后跑</span></div>';
 
@@ -5686,6 +5710,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
       + '<b style="font-size:15px;">🧪 因子截面观测 · 异常换手率 × ROE_TTM</b>'
       + '<span style="color:#fbbf24;font-size:12px;letter-spacing:1px;">⭐⭐</span>'
+      + '</div>'
+      + '<div style="background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
+      + '<b style="color:#22d3ee;">&#x1F4CC; 核心：</b>当前仅验证 2 个单因子（异常换手率、ROE_TTM 大市值档），IC 显著但样本外待验证。<br>'
+      + '<b style="color:#22d3ee;">&#x1F4A1; 用法：</b>达标（利差>0 + Top胜率≥55% + OOS同号）后升3⭐，再扩样本后升4⭐转正。<br>'
+      + '<b style="color:#22d3ee;">&#x26A0; 限制：</b>当前 2⭐ 观测仓，不可用于选股评分。</div>'
+      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
       + '<span style="font-size:10px;font-weight:600;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px;">观测仓 · 调试与回测中</span>'
       + _flBadge + '</div>'
       + gateBanner
@@ -5799,6 +5829,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
       + '<span style="font-size:15px;font-weight:700;">📈 相对强度 RPS · 30 天样本考核</span>'
       + '<span class="fresh" data-fresh="'+_e(s.update_time || D.update_time || '')+'">更新 '+_e(s.update_time || D.update_time || '—')+'</span>'
+      + '</div>'
+      + '<div style="background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
+      + '<b style="color:#94a3b8;">&#x1F4CC; 核心：</b>RPS 相对强度策略正在接受 30 交易日样本考核。<br>'
+      + '<b style="color:#94a3b8;">&#x1F4A1; 用法：</b>达标（T+1胜率≥55% 且 T+5/T+10平均收益为正）才考虑恢复子tab。<br>'
+      + '<b style="color:#94a3b8;">&#x26A0; 限制：</b>当前读数不作结论，样本还在累积，不参与选股评分。</div>'
+      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
       + '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(251,191,36,.14);color:#fbbf24;font-weight:600;">'+(passNow?'✅ 当前读数达标':'考核中')+'</span>'
       + '</div>'
       + '<div style="font-size:12px;line-height:1.7;color:var(--sub);margin-bottom:8px;">'
@@ -5959,11 +5995,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       if(b) return '<span title="有基本面证据，资金未流入" style="font-size:11px;">📈</span>';
       return '';
     }
-    // 分档：A=概念+业绩正向  B=概念+ROE榜  C=仅概念命中；同档按【资金净额】降序（这就是每天变的地方）
-    hits.forEach(function(x){ x.tier = x.perf ? 0 : (x.roe ? 1 : 2); });
+    // 分档：A=概念+业绩正向+ROE  B=概念+业绩或ROE其一  C=仅概念命中；同档按「成长+质量」综合分降序
+    hits.forEach(function(x){
+      var hasPerf = !!x.perf, hasRoe = !!x.roe;
+      x.tier = (hasPerf && hasRoe) ? 0 : (hasPerf || hasRoe ? 1 : 2);
+      // 潜力价值分：业绩预告变化率 + ROE_TTM；无数据则取0
+      x.valueScore = ((x.perf && x.perf.change_pct != null) ? x.perf.change_pct : 0)
+                   + ((x.roe && x.roe.roe_ttm != null) ? x.roe.roe_ttm : 0);
+    });
     hits.sort(function(a,b){
-      return a.tier - b.tier || (b.fund - a.fund) || b.tags.length - a.tags.length
-        || ((b.perf && b.perf.change_pct) || 0) - ((a.perf && a.perf.change_pct) || 0);
+      return a.tier - b.tier || (b.valueScore - a.valueScore) || (b.fund - a.fund) || b.tags.length - a.tags.length;
     });
     var TV_MAX = 60;
     var shown = hits.slice(0, TV_MAX);
@@ -6009,8 +6050,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var stamp = (SFF && SFF.update_time) || (L && L.update_time) || (window.STOCK_PROFILE && window.STOCK_PROFILE.update_time) || '—';
     var nPerf = Object.keys(perfMap).length, nRoe = Object.keys(roeMap).length;
     dst.innerHTML = ''
-      + window.v8CardHeader('🔭','主题空间 · 概念资金热度','概念 × 资金热度 × 业绩/ROE 交叉（实验版）','update_time',{update_time:stamp, slot:'盘后', horizon:'中长线'})
+      + window.v8CardHeader('🔭','主题空间 · 潜力价值','概念 × 成长 × 质量 交叉（实验版）','update_time',{update_time:stamp, slot:'盘后', horizon:'中长线'})
       + '<div style="padding:12px 14px;">'
+      + '<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
+      +   '<b style="color:#c4b5fd;">📌 核心：</b>在七大长期主题（创新药、AI医疗、机器人、固态电池、低空航天、算力/CPO、数据要素）中，找出「有概念想象空间 + 业绩或ROE质量证据」的股票。<br>'
+      +   '<b style="color:#c4b5fd;">💡 用法：</b>A档=概念+业绩正向+ROE大市值榜；B档=概念+业绩或ROE其一；C档=仅概念命中。按成长+质量排序，资金仅作辅助验证。<br>'
+      +   '<b style="color:#c4b5fd;">⚠️ 限制：</b>当前无个股PE/PB估值数据，不能算「便宜」，只能算「成长+质量」；资金维度每日变，会扰动排序。</div>'
       + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">' + chips + '</div>'
       + '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;padding:6px 8px;background:rgba(148,163,184,.06);border-radius:6px;line-height:1.7;">'
       +   '<b style="color:var(--sub);">主题资金热度</b>（主力净额，亿元 · 红流入/绿流出）：' + (hasFund ? rankStr : '<span style="color:#fbbf24;">资金源 SECTOR_FUND_FLOW 未加载</span>')
@@ -6020,11 +6065,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       +   '概念板块 <b>' + curSt.nSec + '</b> 个 · 板块资金合计 <b style="color:' + _numColor(curSt.net) + ';">' + _sign(curSt.net) + '亿</b>'
       +   (curSt.nSec ? ' · 均涨跌 <b style="color:' + _numColor(curSt.avg) + ';">' + _sign(curSt.avg, 2) + '%</b>' : '')
       +   (curSt.lead ? ' · 资金最强 <span style="color:var(--sub);">' + _ev(curSt.lead) + '</span>' : '')
-      +   '<br><span style="color:#ef5350;font-weight:600;">A档 概念+业绩正向 ' + nA + '</span> · '
-      +   '<span style="color:#38bdf8;font-weight:600;">B档 概念+ROE榜 ' + nB + '</span> · '
+      +   '<br><span style="color:#ef5350;font-weight:600;">A档 概念+业绩正向+ROE ' + nA + '</span> · '
+      +   '<span style="color:#38bdf8;font-weight:600;">B档 概念+业绩或ROE ' + nB + '</span> · '
       +   '<span style="color:var(--dim);">C档 仅概念 ' + (hits.length - nA - nB) + '</span> · '
       +   '<span style="color:#ef5350;font-weight:600;">💰资金净流入 ' + nFundPos + '</span> 只'
-      +   '<br>证据覆盖：业绩预告正向 ' + nPerf + ' 只 · ROE大市值榜 ' + nRoe + ' 只 / 画像全市场 ' + nScanned + ' 只 —— 基本面证据仍窄；资金维度每日刷新，为本卡主要变化来源。'
+      +   '<br>证据覆盖：业绩预告正向 ' + nPerf + ' 只 · ROE大市值榜 ' + nRoe + ' 只 / 画像全市场 ' + nScanned + ' 只。排序主键=成长+质量，资金为辅助验证。'
       + '</div>'
       + (cards ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">' + cards + '</div>'
                : '<div class="note" style="color:var(--dim);">本主题无概念命中，换个主题试试</div>')
@@ -6067,6 +6112,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var pct = p.pe_rank || 50;
     var barLeft = 'left:calc(' + Math.max(0, Math.min(100, pct)) + '% - 4px)';
     dst.innerHTML = ''
+      + '<div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.7;font-size:12px;color:var(--txt);">'
+      + '<b style="color:#fbbf24;">&#x1F4CC; 核心：</b>用上证指数中信 PE-TTM 判断 A 股中长期估值位置。<br>'
+      + '<b style="color:#fbbf24;">&#x1F4A1; 用法：</b>自上而下辅助判断「贵/便宜」，不是每日买卖信号。<br>'
+      + '<b style="color:#fbbf24;">&#x26A0; 限制：</b>PE 是截面 TTM，未修正盈利质量；2018/2022 两次真大底 PE 都没到 10。</div>'
       + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
       + '<b style="font-size:15px;">🌡 中信 PE 极值温度计</b>'
       + '<span style="font-size:10px;font-weight:600;color:#fbbf24;background:rgba(251,191,36,.12);padding:1px 6px;border-radius:4px;">参考级 · 自上而下择时 · 不作交易信号</span>'
@@ -6184,6 +6233,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         + '<span>' + _ev(x) + '</span></div>';
     }).join('');
     dst.innerHTML = ''
+      + '<div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.7;font-size:12px;color:var(--txt);">'
+      + '<b style="color:#60a5fa;">&#x1F4CC; 核心：</b>PE&lt;10 是罕见低估事件，2010-2026 年持有 250 日胜率 97.6%、平均 +19.56%（n=166）。<br>'
+      + '<b style="color:#60a5fa;">&#x1F4A1; 用法：</b>估值研究框架，用于判断中长期赔率，不是每日交易信号。<br>'
+      + '<b style="color:#60a5fa;">&#x26A0; 限制：</b>信号稀疏（16 年仅 166 次），最大回撤 -37.5%；2018/2022 大底未触发。</div>'
       + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
       + '<b style="font-size:15px;">📊 中信 PE&lt;10 历史回测</b>'
       + '<span style="font-size:10px;font-weight:600;color:#60a5fa;background:rgba(96,165,250,.12);padding:1px 6px;border-radius:4px;">纯历史回测 · 不预测未来</span>'
@@ -6285,6 +6338,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '<div style="font-size:11.5px;color:var(--sub);">'
       + '&#x1F4A1; <b style="color:#a78bfa;">解析</b>：<b>5 年 / 3 年 / 1 年三窗口可能互相矛盾</b>（如沪深300 五年 76% 高估 vs 一年 3.9% 低估），卡片同时列三档即为此——<b>禁止只取单一窗口下结论</b>。'
       + '用于顶层仓位/风格定位，<b>不直接触发个股买卖</b>。'
+      + '<br>&#x26A0; <b style="color:#a78bfa;">限制</b>：akshare 数据源偶有不稳定，结果仅供参考。'
       + '</div></div>'
       + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px;">' + idxCards + '</div>'
       + '<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.3);border-radius:7px;padding:10px 13px;margin-bottom:10px;">'
@@ -6358,6 +6412,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '<div style="font-size:11.5px;color:var(--sub);">'
       + '&#x1F4A1; <b style="color:#22c55e;">解析</b>：当前 v8 <code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">quality</code> 维度仅 ROE + 营收增长 + grade + news，<b>5 个真正缺失</b>（GPOA / 经营现金流-总资产 / 盈利收益率 E/P / 总市值 / 60 日成交额中位数）。'
       + '红色缺失项接入 <code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">generate_top10.py</code> 前，<b>必须先跑 walk-forward 回测按 edge 定权重，禁止直接硬编码高分</b>。'
+      + '<br>&#x26A0; <b style="color:#22c55e;">限制</b>：基于截图逻辑人工审计，walk-forward 未跑完。'
       + '</div></div>'
       + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">'
       + '<div style="background:rgba(239,83,80,.06);border:1px solid rgba(239,83,80,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">缺失/未直接用</div><div style="font-size:20px;font-weight:800;color:#ef5350;">' + (st.missing || 0) + '</div></div>'
@@ -6444,6 +6499,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '<div style="font-size:11.5px;color:var(--sub);">'
       + '&#x1F4A1; <b style="color:#f97316;">解析</b>：当前<b>仅上证指数</b>有真实日K（来自 <code style="background:rgba(249,115,22,.1);padding:1px 4px;border-radius:3px;">INDEX_HISTORY.js</code>，最新点 <b>2026-09-07，滞后 2 个交易日</b>）；沪深300 / 中证500 / 中证1000 因 akshare / 东财接口当前环境不可用，<b>全部 <code style="background:rgba(249,115,22,.1);padding:1px 4px;border-radius:3px;">available:false</code></b>。'
       + '与左卡「估值分位切换」<b>互补</b>：本卡看<b>价格行为</b>，左卡看<b>PE-TTM 估值分位</b>。'
+      + '<br>&#x26A0; <b style="color:#f97316;">限制</b>：当前仅上证指数有真实日K（滞后2交易日），中证序列数据缺失。'
       + '</div></div>'
       + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px;">' + idxCards + '</div>'
       + '<div style="background:rgba(249,115,22,.05);border:1px solid rgba(249,115,22,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
@@ -6525,6 +6581,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '&#x1F4A1; <b style="color:#8b5cf6;">解析</b>：同一 AI 在 <b>不同时长尺度上的观点强度</b>（月 > 周 > 日 的关切可能完全不同）。'
       + '板块提及 Top 6 用相对宽度（不同时长文本长度不同，绝对次数不可比，<b>请看比例</b>）。'
       + '<b>绝对不替代个股信号</b>，是顶层 AI 观点分布的<b>展示型</b>卡。'
+      + '<br>&#x26A0; <b style="color:#8b5cf6;">限制</b>：极性判断为关键词法，有主观性；板块词典待补全。'
       + '</div></div>'
       // 极性条
       + '<div style="background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.2);border-radius:7px;padding:8px 12px;margin-bottom:12px;">'
@@ -6627,6 +6684,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '&#x1F4A1; <b style="color:#f59e0b;">解析</b>：上线条件 = <b>OOS IR &gt; 0.3</b> 且 4/5 年胜率 &gt; 55%。'
       + '<b>严禁直接硬编码高分</b>，每因子必须先跑 walk-forward（5 年 × 12 月）按 edge 定权重，再回填 oos_ir / status。'
       + 'owner 标注数据源责任人；<b>小九到岗后从 B1 开始跑</b>。'
+      + '<br>&#x26A0; <b style="color:#f59e0b;">限制</b>：当前主要是流程跟踪，数据待回填。'
       + '</div></div>'
       // 全局汇总
       + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">'
@@ -12463,6 +12521,10 @@ h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;
    + '<span style="font-size:15px;font-weight:700;color:#38bdf8;">&#x1F4CC; 概念/行业 &#x2192; ETF·龙头 参考</span>'
    + '<span class="fresh" id="prEtfFresh">&#x2014;</span>'
    + '<span style="font-size:12px;color:var(--dim);">观测类 · 板块/行业映射</span></div>'
+   + '<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.25);border-radius:7px;padding:9px 11px;margin-bottom:10px;font-size:12px;line-height:1.7;color:var(--txt);">'
+   + '<b style="color:#38bdf8;">&#x1F4CC; 核心：</b>把当日热点板块/概念翻译成可交易的 ETF 与龙头股。<br>'
+   + '<b style="color:#38bdf8;">&#x1F4A1; 用法：</b>辅助理解资金去向，不是选股信号。<br>'
+   + '<b style="color:#38bdf8;">&#x26A0; 限制：</b>映射关系偏静态，板块热度假；需结合回测与资金数据交叉验证。</div>'
    + '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">&#x26A0;&#xFE0F; 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成投资建议</b>。</div>'
    + '<div id="dbgEtfMapBody"><div class="note">加载中&#x2026;</div></div>'
    + '<hr style="border:none;border-top:1px dashed rgba(56,189,248,.25);margin:12px 0;">'
@@ -12515,6 +12577,10 @@ h += '</div>'; // /ulPaneFactor
     //   数据源：4 次搜索 20+ 源 cross-checked（CME FedWatch / Kalshi / 国泰海通 / 中信建投 / 证券时报 / 沃什讲话）。
     h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #60a5fa;">'
        // ── 标题行：卡名 + ⚡ 事件驱动彩色 badge + 数据源 + 更新时间 ──
+       + '<div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
+       + '<b style="color:#60a5fa;">&#x1F4CC; 核心：</b>海外宏观 + AI 资本开支周期的定性判断。<br>'
+       + '<b style="color:#60a5fa;">&#x1F4A1; 用法：</b>背景认知，辅助顶层仓位与行业配置。<br>'
+       + '<b style="color:#60a5fa;">&#x26A0; 限制：</b>无自动刷新管线，2026-09-06 历史快照，下次更新需手动维护。</div>'
        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
        + '<span style="font-size:15px;font-weight:700;color:#60a5fa;">🌐 新周期判定 · 海外宏观 + AI 大周期</span>'
        // 频率 badge（事件驱动·高亮）：比 K 型的「月度」更显眼
@@ -12586,6 +12652,10 @@ h += '</div>'; // /ulPaneFactor
     //   🛡 2026-09-06 主人令：在标题行加「📅 月度更新」彩色 badge，与上方新卡的「⚡ 事件驱动」频率区别更明显。
     //   红涨绿跌铁律适用：增速为正=红(扩张)，为负=绿(收缩)。
     h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #fbbf24;">'
+       + '<div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
+       + '<b style="color:#fbbf24;">&#x1F4CC; 核心：</b>用 K 型框架把行业分为扩张/中性/收缩三区。<br>'
+       + '<b style="color:#fbbf24;">&#x1F4A1; 用法：</b>理解为什么某些板块资金持续流入/流出，辅助背景判断。<br>'
+       + '<b style="color:#fbbf24;">&#x26A0; 限制：</b>静态月度更新（7月数据），适合查阅不适合盯盘。</div>'
        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
        + '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🌍 宏观景气背景 · K 型分层</span>'
        // 频率 badge（月度更新·低饱和黄色）：与新卡的橙色事件驱动 badge 区分
