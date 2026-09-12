@@ -10868,11 +10868,7 @@ function drawUpDownChart(){
 
     const byPage = {};
 
-    // 🛡 2026-09-12 主人令「一劳永逸」：前端健康巡检只展示运维/基础设施类（管线/运维/内容审计），
-    //   选股策略/盘后数据/实时数据属数据·策略域，其健康项不在此页堆砌（对应卡各自带更新批次徽章）。
-    const _OPS_EXCLUDE_PAGES = new Set(["选股策略","盘后数据","实时数据"]);
     H.items.forEach(function(it){
-      if(_OPS_EXCLUDE_PAGES.has(it.page)) return;
       byPage[it.page] = byPage[it.page] || [];
 
       byPage[it.page].push(it);
