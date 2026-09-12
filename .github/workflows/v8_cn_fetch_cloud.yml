@@ -247,7 +247,7 @@ jobs:
               print("skip=false", file=open(out, 'a'))
           PY
 
-      - name: "\U0001F6E1 交易日历闸门（连续休市段跳过冗余抓取）"
+      - name: "🛡 交易日历闸门（连续休市段跳过冗余抓取）"
         id: td
         shell: bash
         env:
