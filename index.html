@@ -5913,6 +5913,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '<b style="color:#94a3b8;">&#x1F4CC; 核心：</b>RPS 相对强度策略正在接受 30 交易日样本考核。<br>'
       + '<b style="color:#94a3b8;">&#x1F4A1; 用法：</b>达标（T+1胜率≥55% 且 T+5/T+10平均收益为正）才考虑恢复子tab。<br>'
       + '<b style="color:#94a3b8;">&#x26A0; 限制：</b>当前读数不作结论，样本还在累积，不参与选股评分。</div>'
+      // 2026-09-13 主人令：把原先只出现在「运维·失败/诊断详情」里的 RPS 数据口径说明，
+      //   归位到本卡自身（那属于本卡的数据来源说明，不该占运维诊断位）。
+      + '<div style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.28);border-left:3px solid #fbbf24;border-radius:7px;padding:8px 12px;margin-bottom:10px;line-height:1.75;font-size:11.5px;color:var(--sub);">'
+      + '<div style="font-weight:700;color:#fbbf24;margin-bottom:4px;">📡 数据口径说明（为什么样本偏少 · 当前状态：受限可用）</div>'
+      + '要算「T+1 / T+20 持有期收益」必须拿到<b>前复权 K 线</b>，本机（家用网络）走 baostock 会被风控拉黑，<b>没有凭据</b>。'
+      + '所以目前采用<b>降级方案</b>：用本地 <code>kline_cache</code> 顶替 baostock 离线计算，代价是<b>可用样本明显偏少</b>（T+1 仅数十笔、T+5 / T+10 更少甚至为 0），'
+      + '数据内已标记 <code>degraded=true</code>。<b>完整版需要中国 IP 节点（小九机）在线跑原版脚本</b>。'
+      + '<div style="margin-top:5px;color:var(--dim);">➜ 因此：<b>样本未达量前，本卡读数一律不作结论</b>；这是数据获取能力受限，<b>不是策略本身失效</b>，无需人工干预。</div>'
+      + '</div>'
       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
       + '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(251,191,36,.14);color:#fbbf24;font-weight:600;">'+(passNow?'✅ 当前读数达标':'考核中')+'</span>'
       + '</div>'
@@ -6085,11 +6094,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     hits.sort(function(a,b){
       return a.tier - b.tier || (b.valueScore - a.valueScore) || (b.fund - a.fund) || b.tags.length - a.tags.length;
     });
-    var TV_MAX = 60;
-    var shown = hits.slice(0, TV_MAX);
+    // 2026-09-13 主人令：不再三档混排统一截断 60 只，改为 A/B/C 分桶。
+    //   A 档（概念+业绩+ROE 三项齐）= 全量直出；B/C 档默认折叠，点标题展开。
     var nA = 0, nB = 0, nFundPos = 0;
     hits.forEach(function(x){ if(x.tier===0) nA++; else if(x.tier===1) nB++; if(x.nFundSec>0 && x.fund>0) nFundPos++; });
-    var cards = shown.map(function(x){
+    var tierHits = [[], [], []];
+    hits.forEach(function(x){ tierHits[x.tier].push(x); });
+    // 卡片渲染器（原 shown.map 回调体，提为可复用函数）
+    function _tvCard(x){
       var border = x.tier===0 ? '#ef5350' : (x.tier===1 ? '#38bdf8' : '#94a3b8');
       var tagStr = x.tags.slice(0,2).map(_ev).join(' / ') + (x.tags.length > 2 ? ' +' + (x.tags.length-2) : '');
       var badge = perfBadge(x.perf);
@@ -6104,7 +6116,32 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         + '<div style="color:var(--sub);font-size:10.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">🏷 ' + tagStr + '</div>'
         + '<div style="margin-top:3px;line-height:1.5;">' + badge + '</div>'
         + '</div>';
-    }).join('');
+    }
+    var TIER_META = [
+      { key:'A', name:'A档', color:'#ef5350', desc:'概念 + 业绩正向 + ROE 三项齐（证据最全）' },
+      { key:'B', name:'B档', color:'#38bdf8', desc:'概念 + 业绩或 ROE 其一（部分证据）' },
+      { key:'C', name:'C档', color:'#94a3b8', desc:'仅概念命中（暂无基本面证据）' }
+    ];
+    var cards = '';
+    TIER_META.forEach(function(tm, ti){
+      var bucket = tierHits[ti];
+      if(!bucket.length) return;
+      var inner = bucket.map(_tvCard).join('');
+      var grid = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">' + inner + '</div>';
+      if(tm.key === 'A'){
+        // A 档：直接全部展开显示
+        cards += '<div style="margin-bottom:12px;">'
+          + '<div style="font-size:12px;font-weight:700;color:' + tm.color + ';margin-bottom:6px;">'
+          + '（' + tm.name + ' · ' + bucket.length + ' 只 · ' + tm.desc + '）</div>'
+          + grid + '</div>';
+      } else {
+        // B/C 档：折叠，点标题展开
+        cards += '<details style="margin-bottom:12px;">'
+          + '<summary style="cursor:pointer;font-size:12px;font-weight:700;color:' + tm.color + ';padding:4px 0;user-select:none;">'
+          + '（' + tm.name + ' · ' + bucket.length + ' 只 · ' + tm.desc + '）点击展开 ▾</summary>'
+          + '<div style="margin-top:8px;">' + grid + '</div></details>';
+      }
+    });
 
     // ---- chip：主题名 + 当日主力净额（每天在动）----
     var chips = '';
@@ -6131,10 +6168,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     dst.innerHTML = ''
       + window.v8CardHeader('🔭','主题空间 · 潜力价值','概念 × 成长 × 质量 交叉（实验版）','update_time',{update_time:stamp, slot:'盘后', horizon:'中长线'})
       + '<div style="padding:12px 14px;">'
-      + '<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
-      +   '<b style="color:#c4b5fd;">📌 核心：</b>在七大长期主题（创新药、AI医疗、机器人、固态电池、低空航天、算力/CPO、数据要素）中，找出「有概念想象空间 + 业绩或ROE质量证据」的股票。<br>'
-      +   '<b style="color:#c4b5fd;">💡 用法：</b>A档=概念+业绩正向+ROE大市值榜；B档=概念+业绩或ROE其一；C档=仅概念命中。按成长+质量排序，资金仅作辅助验证。<br>'
-      +   '<b style="color:#c4b5fd;">⚠️ 限制：</b>当前无个股PE/PB估值数据，不能算「便宜」，只能算「成长+质量」；资金维度每日变，会扰动排序。</div>'
+      + '<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;font-size:12px;color:var(--txt);">'
+      +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">📌 核心：</b>在七大长期主题（创新药、AI医疗、机器人、固态电池、低空航天、算力/CPO、数据要素）中，找出「有概念想象空间 + 业绩或ROE质量证据」的股票。</div>'
+      +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b>A 档=概念+业绩正向+ROE 三项齐（已全部展开）；B 档=概念+业绩或ROE 其一；C 档=仅概念命中（后两档点标题展开）。按成长+质量排序，资金仅作辅助验证。</div>'
+      +   '<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠️ 限制（重要）：</b>本卡<b>没有个股 PE / PB 估值数据</b>，所以它<b>不能判断「便宜」</b>，只能判断「成长 + 质量」。资金维度每天变，会扰动排序。仅研究参考，不构成投资建议。</div>'
+      + '</div>'
       + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">' + chips + '</div>'
       + '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;padding:6px 8px;background:rgba(148,163,184,.06);border-radius:6px;line-height:1.7;">'
       +   '<b style="color:var(--sub);">主题资金热度</b>（主力净额，亿元 · 红流入/绿流出）：' + (hasFund ? rankStr : '<span style="color:#fbbf24;">资金源 SECTOR_FUND_FLOW 未加载</span>')
@@ -6150,8 +6188,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       +   '<span style="color:#ef5350;font-weight:600;">💰资金净流入 ' + nFundPos + '</span> 只'
       +   '<br>证据覆盖：业绩预告正向 ' + nPerf + ' 只 · ROE大市值榜 ' + nRoe + ' 只 / 画像全市场 ' + nScanned + ' 只。排序主键=成长+质量，资金为辅助验证。'
       + '</div>'
-      + (cards ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">' + cards + '</div>'
-               : '<div class="note" style="color:var(--dim);">本主题无概念命中，换个主题试试</div>')
+      + (cards || '<div class="note" style="color:var(--dim);">本主题无概念命中，换个主题试试</div>')
       + (hits.length > TV_MAX ? '<div style="font-size:11px;color:var(--dim);margin-top:6px;">仅展示前 ' + TV_MAX + ' 只 / 共 ' + hits.length + ' 只（按 A→B→C、板块资金净额、命中标签数排序）</div>' : '')
       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.6;">口径：先按七大主题概念筛选，再按「业绩预告变化率 + ROE_TTM」给成长+质量分排序；板块资金取 SECTOR_FUND_FLOW「概念」类板块当日主力净额（亿元），个股资金 = Σ(其命中概念板块净额)；'
       + '卡内符号：🔥=资金流入+基本面证据 / 💰=仅资金流入 / 📈=有基本面证据但资金未流入，仅作交叉提示、非买卖信号。仅研究参考，不构成投资建议。</div>'
@@ -6192,9 +6229,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var barLeft = 'left:calc(' + Math.max(0, Math.min(100, pct)) + '% - 4px)';
     dst.innerHTML = ''
       + '<div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.7;font-size:12px;color:var(--txt);">'
-      + '<b style="color:#fbbf24;">&#x1F4CC; 核心：</b>用上证指数中信 PE-TTM 判断 A 股中长期估值位置。<br>'
-      + '<b style="color:#fbbf24;">&#x1F4A1; 用法：</b>自上而下辅助判断「贵/便宜」，不是每日买卖信号。<br>'
-      + '<b style="color:#fbbf24;">&#x26A0; 限制：</b>PE 是截面 TTM，未修正盈利质量；2018/2022 两次真大底 PE 都没到 10。</div>'
+      + '<div style="font-weight:700;color:#fbbf24;margin-bottom:5px;">📖 这张卡在说什么（大白话）</div>'
+      + '<div style="margin-bottom:4px;">把整个 A 股当成一件商品，这张卡在告诉你：<b>它现在卖得贵还是便宜</b>。</div>'
+      + '<div style="margin-bottom:4px;">怎么算的？用<b>「股价 ÷ 每股赚的钱」（PE）</b>，再拿去和过去 10 年的自己比 —— 比过去大多数时候都低，就是便宜；都比过去高，就是贵。</div>'
+      + '<div style="margin-bottom:4px;">🌡 <b>温度计读数含义：</b>读数低（蓝）＝历史偏低、中长期下行空间小；读数高（红）＝历史偏高、要小心。<b>它看的是「几个月到几年」的级别，不是今天明天涨跌。</b></div>'
+      + '<div style="padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠️ 使用时注意：</b>① 它按「已公布的过去四个季度利润」算，<b>不预判未来</b>；② 别信「PE 低于 10 就是铁底」—— 2018 和 2022 两次真大底，这指标都没低到 10；③ 这不是每日买卖信号，只帮你判断「现在整体贵不贵」。</div>'
+      + '</div>'
       + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
       + '<b style="font-size:15px;">🌡 中信 PE 极值温度计</b>'
       + '<span style="font-size:10px;font-weight:600;color:#fbbf24;background:rgba(251,191,36,.12);padding:1px 6px;border-radius:4px;">参考级 · 自上而下择时 · 不作交易信号</span>'
@@ -6411,13 +6451,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '</div>'
       // 2026-09-10 主人令：卡名下方加"核心内容 + 解析"，让判读者一眼看懂这卡是什么、怎么用
       + '<div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.22);border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.7;">'
-      + '<div style="font-size:12px;color:var(--txt);margin-bottom:6px;">'
-      + '&#x1F4CC; <b style="color:#a78bfa;">核心</b>：沪深300 / 中证500 / 中证1000 的 <b>PE-TTM</b> 近 5 年 / 3 年 / 1 年分位 + 档位 + 防御仓位建议。'
+      + '<div style="font-weight:700;color:#a78bfa;margin-bottom:5px;">📖 这张卡在说什么（大白话）</div>'
+      + '<div style="font-size:12px;color:var(--txt);margin-bottom:5px;">'
+      + '它给 A 股三个主要指数（沪深300 / 中证500 / 中证1000）各拍一张<b>「此刻贵不贵」的照片</b>，并告诉你<b>现在该多拿现金还是多拿股票</b>。'
       + '</div>'
-      + '<div style="font-size:11.5px;color:var(--sub);">'
-      + '&#x1F4A1; <b style="color:#a78bfa;">解析</b>：<b>5 年 / 3 年 / 1 年三窗口可能互相矛盾</b>（如沪深300 五年 76% 高估 vs 一年 3.9% 低估），卡片同时列三档即为此——<b>禁止只取单一窗口下结论</b>。'
-      + '用于顶层仓位/风格定位，<b>不直接触发个股买卖</b>。'
-      + '<br>&#x26A0; <b style="color:#a78bfa;">限制</b>：akshare 数据源偶有不稳定，结果仅供参考。'
+      + '<div style="font-size:11.5px;color:var(--sub);margin-bottom:5px;">'
+      + '📐 <b>「分位」是什么意思？</b>把这只指数过去 N 年的估值从低到高排成一队，看现在站在队伍的第几个位置。<b>分位 10% = 比过去 90% 的时间都便宜</b>；分位 90% = 比过去 90% 的时间都贵。'
+      + '</div>'
+      + '<div style="font-size:11.5px;color:var(--sub);padding:6px 9px;border-radius:6px;background:rgba(139,92,246,.1);border-left:3px solid #a78bfa;margin-bottom:5px;">'
+      + '⚠️ <b style="color:#c4b5fd;">最容易误读的一点：</b>本卡故意同时列 <b>5 年 / 3 年 / 1 年</b> 三个口径，因为<b>它们经常互相打架</b>（例：某指数按 5 年看偏高 76%，按 1 年看却低估到 3.9%）。这不是数据错了 —— 拉长看是历史高位、砍短看是刚从坑里爬起来。<b>只看一个口径就会得出相反结论，所以三个都要看。</b>'
+      + '</div>'
+      + '<div style="font-size:11.5px;color:var(--sub);padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;">'
+      + '⚠️ <b style="color:#fbbf24;">限制与边界：</b>① 它管的是<b>整体仓位轻重</b>（大盘级别），<b>不会告诉你买哪只股</b>；② 数据来自 akshare 公开接口，偶有抽风，读数仅供参考；③ 估值便宜 ≠ 马上会涨，可能继续便宜很久。'
       + '</div></div>'
       + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px;">' + idxCards + '</div>'
       + '<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.3);border-radius:7px;padding:10px 13px;margin-bottom:10px;">'
@@ -6653,14 +6698,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '</div>'
       // 2026-09-10 主人令：卡名下方加"核心 + 解析"
       + '<div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.22);border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.7;">'
-      + '<div style="font-size:12px;color:var(--txt);margin-bottom:6px;">'
-      + '&#x1F4CC; <b style="color:#8b5cf6;">核心</b>：把 MAHORO_MACRO 的 <b>daily / weekly / monthly</b> 三段 AI 文本<b>并排对比</b>——统计各时段 AI 提到的板块/主线频次 + 句子级看多/看空/中性比例。'
+      + '<div style="font-weight:700;color:#8b5cf6;margin-bottom:5px;">📖 这张卡在说什么（大白话）</div>'
+      + '<div style="font-size:12px;color:var(--txt);margin-bottom:5px;">'
+      + '它把 AI 写的<b>三份市场分析报告</b>（看一天的 / 看一周的 / 看一个月的）摆在一起做<b>统计</b>，看 AI 自己在不同时间尺度上<b>关注的东西是不是同一批</b>、<b>语气偏多还是偏空</b>。'
       + '</div>'
-      + '<div style="font-size:11.5px;color:var(--sub);">'
-      + '&#x1F4A1; <b style="color:#8b5cf6;">解析</b>：同一 AI 在 <b>不同时长尺度上的观点强度</b>（月 > 周 > 日 的关切可能完全不同）。'
-      + '板块提及 Top 6 用相对宽度（不同时长文本长度不同，绝对次数不可比，<b>请看比例</b>）。'
-      + '<b>绝对不替代个股信号</b>，是顶层 AI 观点分布的<b>展示型</b>卡。'
-      + '<br>&#x26A0; <b style="color:#8b5cf6;">限制</b>：极性判断为关键词法，有主观性；板块词典待补全。'
+      + '<div style="font-size:11.5px;color:var(--sub);margin-bottom:5px;">'
+      + '🎯 <b>为什么要三份对比？</b>因为 AI 常常「一天说主线是A、一个月说主线是B」。把三份并排，一眼就能看出<b>它自己的观点稳不稳</b>——三份都指向同一个方向，可信度相对高；三份各说各话，说明当下市场本身没共识。'
+      + '</div>'
+      + '<div style="font-size:11.5px;color:var(--sub);padding:6px 9px;border-radius:6px;background:rgba(139,92,246,.1);border-left:3px solid #8b5cf6;margin-bottom:5px;">'
+      + '📊 <b>怎么看板块 Top 6 的条宽？</b>因为三份报告长短不一样（月度那篇字数多，提谁都提得多），<b>直接比次数会失真</b>，所以条宽用的是<b>占比</b>——即「这个板块在它提到的所有板块里占多大比例」。<b>看比例，不要看绝对次数。</b>'
+      + '</div>'
+      + '<div style="font-size:11.5px;color:var(--sub);padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;">'
+      + '⚠️ <b style="color:#fbbf24;">限制与边界：</b>① 这是<b>展示卡</b>，只呈现「AI 说了什么」，<b>不构成买卖建议</b>，更不替代个股信号；② AI 文本本身可能有幻觉或滞后，<b>它的观点同样可能错</b>；③ 语气统计是按句子做的粗分类，不保证每条都分得准。'
       + '</div></div>'
       // 极性条
       + '<div style="background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.2);border-radius:7px;padding:8px 12px;margin-bottom:12px;">'
@@ -6858,6 +6907,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="card" style="margin-bottom:16px;border-left:3px solid var(--teal)">
       <h3><span class="ic">🩺</span>数据健康总览 <span class="fresh" style="font-size:10px">[动态]</span></h3>
       <div id="runnerTrackBody"><div style="font-size:12px;color:var(--dim)">等待数据健康状态…</div></div>
+      <!-- 2026-09-13 主人令：补「灯色图例」——此前面板只有灯点没有释义，主人无法判断红灯是真故障还是
+           正常分批调度，只能凭感觉问「是不是完蛋了」。图例把四态语义钉在卡内，避免误读。 -->
+      <div style="margin-top:12px;padding:8px 10px;background:rgba(148,163,184,.06);border-radius:6px;font-size:11px;color:var(--dim);line-height:1.9;">
+        <b style="color:var(--sub);">灯色图例</b>（鼠标悬停小圆点可看该模块状态）：
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--down);margin:0 3px 0 8px;"></span><span style="color:var(--sub);">绿</span>=正常 ·
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin:0 3px 0 8px;"></span><span style="color:var(--sub);">黄</span>=返回空 / 提示 ·
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--dim);margin:0 3px 0 8px;"></span><span style="color:var(--sub);">灰</span>=<b style="color:var(--sub);">本周期未运行（正常）</b> / 离线空 / 受限可用 ·
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--up);margin:0 3px 0 8px;"></span><span style="color:var(--sub);">红</span>=<b style="color:var(--up);">真失败（仅此需处理）</b>
+        <div style="margin-top:3px;">💡 <b style="color:var(--sub);">灰灯不是故障</b>：算法链按批次分批调度，非本批次的模块当周期不会运行，属设计内正常现象。
+        只有<b style="color:var(--up);">红灯（真实失败）</b>才需要人工干预；<b>黄灯</b>为提示级，<b>灰灯</b>无需处理。</div>
+      </div>
       <!-- 失败/诊断详情始终放在卡片最下面 -->
       <div id="opDiagDetails" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:none;">
         <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;">⚠️ 失败/诊断详情</div>
@@ -10371,17 +10431,45 @@ function drawUpDownChart(){
     const fail = summary.fail || 0;
     const empty = summary.empty || 0;
     const staleCount = Object.values(modules).filter(function(m){ return m && m.status === 'stale'; }).length;
-    const statusColor = fail > 0 ? 'var(--up)' : (empty > 0 ? 'var(--gold)' : (staleCount > 0 ? 'var(--up)' : 'var(--down)'));
-    const statusText = fail > 0 ? '有失败' : (empty > 0 ? '部分空' : (staleCount > 0 ? '数据源离线空(' + staleCount + ')' : '正常'));
+    // 2026-09-13 主人令（一劳永逸）：RUNNER_STATUS 模块状态实为四态，此前漏判 skip 导致「本周期未运行」
+    //   被并入红分支 → 非轮次所在节点整片飘红（实测 72/73 为 skip、summary.fail=0，属正常分批调度，非故障）。
+    //   现统一四态：ok=绿(正常) / empty=黄(返回空) / skip=灰(本周期未运行·正常) / fail=红(真失败)。
+    //   并与「任务运行看板」的 health 四态实现同源（见本文件 _PAGE_ORDER 附近的 _s 判定）。
+    function _stColor(s){
+      if(s === 'ok') return 'var(--down)';
+      if(s === 'empty' || s === 'warn') return 'var(--gold)';
+      if(s === 'skip' || s === 'stale' || s === 'limited') return 'var(--dim)';
+      return 'var(--up)';
+    }
+    function _stText(s){
+      return s === 'ok' ? '正常'
+           : s === 'empty' ? '返回空'
+           : s === 'warn' ? '提示'
+           : s === 'skip' ? '本周期未运行'
+           : s === 'stale' ? '离线空'
+           : s === 'limited' ? '受限可用'
+           : '失败';
+    }
+    const skipCount = Object.values(modules).filter(function(m){ return m && m.status === 'skip'; }).length;
+    const runCount = total - skipCount;
+    // staleCount>0 亦属「离线空」灰系，不再拉红；仅 fail>0 才红灯。
+    const statusColor = fail > 0 ? 'var(--up)' : (empty > 0 ? 'var(--gold)' : ((staleCount > 0 || (skipCount > 0 && ok === 0)) ? 'var(--gold)' : 'var(--down)'));
+    const statusText = fail > 0 ? ('有失败 ' + fail + ' 项')
+      : (empty > 0 ? ('部分空 ' + empty + ' 项')
+      : (staleCount > 0 ? ('数据源离线空 ' + staleCount + ' 项')
+      : (skipCount > 0 ? ('正常 · 本周期未运行 ' + skipCount + ' 项') : '正常')));
     // 关注与全球宏观、资金流时间轴直接相关的模块
     const watch = ['MACRO_DATA','MARKET_FUND_FLOW_DATA','INDEX_QUOTES','ETF_INTRADAY_HEAT','SECTOR_FUND_FLOW'];
     let watchHtml = '';
     watch.forEach(function(key){
       const m = modules[key];
       if(!m) return;
-      const color = m.status === 'ok' ? 'var(--down)' : (m.status === 'empty' ? 'var(--gold)' : 'var(--up)');
+      // 2026-09-13 主人令：skip(本周期未运行) 不再与 fail 共用红灯；复用统一映射函数，杜绝两套口径。
+      const _st = m.status;
+      const color = _stColor(_st);
+      const _stTxt = _stText(_st);
       const dot = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+color+';margin-right:4px;"></span>';
-      watchHtml += '<span style="font-size:11px;color:var(--sub);margin-right:10px;">'+dot+key+'</span>';
+      watchHtml += '<span style="font-size:11px;color:var(--sub);margin-right:10px;" title="'+key+' · '+_stTxt+'">'+dot+key+'</span>';
     });
     // 2026-08-08 一劳永逸：Runner 追踪 + 文件新鲜度 + 上游诊断 合并为「数据健康总览」
     const runnerHtml =
@@ -10391,7 +10479,9 @@ function drawUpDownChart(){
         '<span style="font-size:11px;color:'+statusColor+';flex:0 0 auto;">● '+statusText+'</span>'+
       '</div>'+
       '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">'+
-        '共 '+total+' 模块 · 成功 '+ok+' · 空 '+empty+' · 失败 '+fail+(staleCount > 0 ? (' · 离线空 ' + staleCount) : '')+
+        '共 '+total+' 模块 · 本周期运行 '+runCount+' · 成功 '+ok+' · 空 '+empty+' · 失败 '+fail+
+        (skipCount > 0 ? (' · 本周期未运行 '+skipCount+'（正常·分批调度）') : '')+
+        (staleCount > 0 ? (' · 离线空 ' + staleCount) : '')+
         (rs.hostname ? ' · 节点 '+_esc(rs.hostname) : '')+
       '</div>'+
       '<div style="display:flex;flex-wrap:wrap;gap:4px 0;margin-bottom:10px;">'+watchHtml+'</div>';
@@ -11072,7 +11162,8 @@ function drawUpDownChart(){
 
     // 🛡 2026-09-12：看板分组固定顺序——上方按导航 TAB 页（今日事件/实时数据/盘后数据/选股策略/运维），
     //   下方为各类算法页（全量数据/管线/策略回测/内容审计），避免数据插入顺序漂移。
-    const _PAGE_ORDER = ['今日事件','实时数据','盘后数据','选股策略','运维','全量数据','管线','策略回测','内容审计'];
+    // 2026-09-13 主人令：看板分组顺序调整 —— 「策略回测」上移到「运维」之前。
+  const _PAGE_ORDER = ['今日事件','实时数据','盘后数据','选股策略','策略回测','运维','全量数据','管线','内容审计'];
     _PAGE_ORDER.filter(function(p){return byPage[p];}).concat(Object.keys(byPage).filter(function(p){return _PAGE_ORDER.indexOf(p) < 0;})).forEach(function(page){
 
       html += '<div style="margin-bottom:10px;"><div style="font-weight:700;margin-bottom:6px;font-size:12px;color:var(--txt);letter-spacing:.3px;">'+page+'</div>';
@@ -13833,7 +13924,12 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     // 2) HEALTH_CHECK 失败项
     var hc = window.HEALTH_CHECK || {};
     (hc.items || []).forEach(function(it){
-      if(!it || it.status === 'ok') return;
+      // 2026-09-13 主人令（一劳永逸）：状态四态语义 —— ok=正常 / limited=受限但可用（降级仍出数） /
+      //   warn=提示 / fail=真失败。此前只放过 ok，把 limited 与 warn 也当失败推入诊断区，
+      //   导致「RPS A档回测(limited)」这类降级可用项长期占据运维诊断位（假告警，且经核实本机100%不可解）。
+      //   注：RPS/STOCK_STOP_DATA 等「本机网络受限」项的信息已归位到各自卡片内说明。
+      if(!it) return;
+      if(it.status === 'ok' || it.status === 'limited' || it.status === 'warn') return;
       // 2026-09-02 主人令:每个 HEALTH_CHECK fail 项附运维行动提示
       var _hint = (it.id==='SH_FIB' || it.id==='INST_TRADE') ? ' → 静候 16:40 CST STAGE A 采集批;或在 Actions 手动 Run workflow(force_run) 重跑本盘后算法链'
                 : (it.id==='MARKET_REGIME') ? ' → 静候 20:00 CST STAGE D 汇总批(final_recommend)前一并产出;或手动 Run workflow(force_run) 重跑'
