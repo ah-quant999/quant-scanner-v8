@@ -98,61 +98,18 @@ jobs:
         run: |
           python update_v8.py --category post_close
 
-      - name: "🚀 推 main（仅 3 卡相关文件 + index.html 戳）"
+      - name: "🚀 推 main（实验卡 data/raw_data + index.html，Contents API 增量）"
         env:
-          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
-          REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
-          git config user.name "v8-experiments-bot"
-          git config user.email "v8-bot@users.noreply.github.com"
-          git remote set-url origin "$REPO" 2>/dev/null || git remote add origin "$REPO"
-
-          # 🛡 显式 add 具体文件（严禁 -A）
-          git add \
-            data/VALUATION_PERCENTILE.js \
-            data/FACTOR_AUDIT.js \
-            data/INDEX_VALUE_FRAMEWORK.js \
-            raw_data/valuation_percentile.json \
-            raw_data/factor_audit.json \
-            raw_data/index_value_framework.json \
-            index.html
-
-          # 没有变更就不提交
-          if git diff --cached --quiet; then
-            echo "⏭️ 无变更，跳过提交"
-            exit 0
-          fi
-
-          # 软失败但强制告警
-          _v8_ok=0
-          for i in 1 2 3; do
-            if git commit -m "experiment: 估值分位/因子审计/指数估值中枢 盘后刷新 ($(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M'))"; then
-              if git push "$REPO" HEAD:main; then
-                echo "✅ 已推 main（第 $i 次）"; _v8_ok=1; break
-              fi
-            fi
-            echo "⚠️ push/commit 被拒，重试 ($i/3)"
-            sleep 5
-            # 🔴 2026-09-11 一劳永逸（run#1 失败根因）：
-            #   原写法 `git fetch origin main && git rebase origin/main || true` 必然失败 ——
-            #   update_v8.py 会在工作区留下大量**未提交**改动（raw_data/kline_cache/*.json 等），
-            #   git rebase 遇到 unstaged changes 直接报
-            #   "error: cannot rebase: You have unstaged changes" → 3 次重试全败 →
-            #   workflow 永久静默 → 5 张实验卡整日红灯（09-10 实锤）。
-            #   修法：rebase 前先把工作区残余改动收进 commit（而不是 stash —— 云上 stash
-            #   无交互确认会丢改动），并对 fetch 失败也放行重试，不让 set -e 提前中断循环。
-            git fetch origin main || echo "⚠️ fetch 失败，继续重试"
-            # 把工作区残余改动一并提交，消灭 unstaged 状态（rebase 的前置条件）
-            git add -u -- raw_data data index.html 2>/dev/null || true
-            if ! git diff --cached --quiet; then
-              git commit -m "chore: 实验卡链残余产物一并提交 ($(TZ=Asia/Shanghai date '+%H:%M'))" \
-                || echo "⚠️ 残余提交失败（可能无实际变更）"
-            fi
-            git rebase origin/main || { echo "⚠️ rebase 失败，改用 merge"; git merge -X ours origin/main --no-edit || true; }
-          done
-
-          if [ "$_v8_ok" != "1" ]; then
-            echo "::error title=v8-experiments-softfail::🛡️ 实验卡盘后刷新推送失败，请人工核查"
-            exit 1
-          fi
+          # 🛡 2026-09-12 一劳永逸根治（run#34601506282 / #34480051443 实证）：
+          #   原写法 git fetch origin + git rebase + git push HEAD:main 必败——
+          #   云端 runner 到 github.com:443 偶发 TimeoutExpired → 本地 base 陈旧 →
+          #   非 fast-forward 被拒 → 3 次重试全败 → 5 张实验卡整日红灯。
+          #   现改用 api_push_raw.py（GitHub Contents API，零 git fetch，免疫 cn git 墙）
+          #   仅推「本次变更清单」（含 index.html，update_v8 已重写其 ?v），与
+          #   v8_algo_cloud 链尾「📤 唯一推送」完全同构，无 ?v 失配窗口。
+          PUSH_FILES="data/VALUATION_PERCENTILE.js,data/FACTOR_AUDIT.js,data/INDEX_VALUE_FRAMEWORK.js,raw_data/valuation_percentile.json,raw_data/factor_audit.json,raw_data/index_value_framework.json,index.html" \
+            python api_push_raw.py
+          echo "✅ 实验卡 data/raw_data/index.html 已推送（Contents API）"
