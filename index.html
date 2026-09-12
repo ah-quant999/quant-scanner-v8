@@ -12679,25 +12679,17 @@ h += '</div>'; // /ulPaneObserve
     // ═══ 2026-09-02 主人令：暂未上架 = 调试专区原 3 张卡平铺（AI预测/潜力挖掘/ETF龙头参考）══
     // 🛡 2026-09-02 主人令：ETF·龙头参考 抽为独立函数 + 自愈重试（原内联，defer 未就绪即永久空卡）
     window._fillEtfMap();
-    // 🧪 2026-09-03 主人令：因子实验室迁入暂未上架后随本函数重渲（此前 DOM ready 时容器尚不存在）
-    try{ if(typeof window.__renderFactorLab==='function') window.__renderFactorLab(); }catch(e){ console.warn('因子实验室卡渲染失败', e); }
-    try{ if(typeof window.__renderRpsAudit==='function') window.__renderRpsAudit(); }catch(e){ console.warn('RPS考核卡渲染失败', e); }
+    // 2026-09-12 搬迁收口：因子实验室 / RPS考核 / 中信PE回测 / 指数估值中枢 /
+    //   因子审计 / 因子补缺进度 / maharo 机构研究 共 7 卡的容器已迁出本页，
+    //   其填充调用随之迁至各新宿主的骨架函数尾部（__renderBtExtraPane /
+    //   __renderFactorPane / __renderMacroPane）。本页只保留观测类 5 卡的填充。
     // 🔭 2026-09-06 主人令：主题空间·价值投资 实验卡随 renderUnlisted 重渲（实验区最下方）
     try{ if(typeof window.__renderThemeValue==='function') window.__renderThemeValue(); }catch(e){ console.warn('主题空间实验卡渲染失败', e); }
     try{ if(typeof window.__renderCiticPeThermo==='function') window.__renderCiticPeThermo(); }catch(e){ console.warn('中信 PE 温度计渲染失败', e); }
-    try{ if(typeof window.__renderCiticPeBacktest==='function') window.__renderCiticPeBacktest(); }catch(e){ console.warn('中信 PE 回测卡渲染失败', e); }
     // 🌡 2026-09-09 主人令：A股指数估值分位切换卡（暂未上架·实验区最下方）
     try{ if(typeof window.__renderValuationPercentile==='function') window.__renderValuationPercentile(); }catch(e){ console.warn('估值分位切换卡渲染失败', e); }
-    // 📊 2026-09-09 主人令：因子审计卡（暂未上架·实验区最下方）
-    try{ if(typeof window.__renderFactorAudit==='function') window.__renderFactorAudit(); }catch(e){ console.warn('因子审计卡渲染失败', e); }
-    // 📈 2026-09-09 主人令：指数估值中枢框架迁移卡（暂未上架·实验区最下方）
-    try{ if(typeof window.__renderIndexValueFramework==='function') window.__renderIndexValueFramework(); }catch(e){ console.warn('指数估值中枢卡渲染失败', e); }
-    // 🔮 2026-09-10 主人令：AI 洞察多源观点对比卡（暂未上架·实验区最下方）
+    // 🔮 2026-09-10 主人令：AI 洞察多源观点对比卡（观测类）
     try{ if(typeof window.__renderAiInsightsCompare==='function') window.__renderAiInsightsCompare(); }catch(e){ console.warn('AI 洞察对比卡渲染失败', e); }
-    // 🧪 2026-09-10 主人令：因子补缺 walk-forward 进度跟踪卡（暂未上架·实验区最下方）
-    try{ if(typeof window.__renderFactorProgress==='function') window.__renderFactorProgress(); }catch(e){ console.warn('因子进度卡渲染失败', e); }
-    // 📚 2026-09-07 主人令：maharo 机构研究卡（本机 cookie 拉取，云端无权限）
-    try{ if(typeof window._fillMahoroCard==='function') window._fillMahoroCard(); }catch(e){ console.warn('maharo 卡渲染失败',e); }
   }
 
   function renderMahoroCard(){
@@ -14135,6 +14127,11 @@ hm += '<div class="card" id="indexValueFrameworkBody" style="margin-bottom:16px;
 hm += '</div>'; // /ulPaneBacktest
     var _host = document.getElementById('btExtraHost');
     if(_host) _host.innerHTML = hm;
+    // 🔴 2026-09-12 补漏：骨架入 DOM 后必须就地填充（原先这三个填充调用只留在
+    //   renderUnlisted 里，宿主迁走后不再被触发 → 三卡恒「加载中」）
+    try{ if(typeof window.__renderRpsAudit==='function') window.__renderRpsAudit(); }catch(e){ console.warn('RPS考核卡渲染失败', e); }
+    try{ if(typeof window.__renderCiticPeBacktest==='function') window.__renderCiticPeBacktest(); }catch(e){ console.warn('中信PE回测卡渲染失败', e); }
+    try{ if(typeof window.__renderIndexValueFramework==='function') window.__renderIndexValueFramework(); }catch(e){ console.warn('指数估值中枢卡渲染失败', e); }
   };
   window.__renderFactorPane = function(){
     var hm = '';
@@ -14145,6 +14142,10 @@ hm += '<div class="card" id="factorProgressBody" style="margin-bottom:16px;borde
 hm += '</div>'; // /ulPaneFactor
     var _host = document.getElementById('stFaHost');
     if(_host) _host.innerHTML = hm;
+    // 🔴 2026-09-12 补漏：同上（因子三卡原填充调用只留在 renderUnlisted）
+    try{ if(typeof window.__renderFactorLab==='function') window.__renderFactorLab(); }catch(e){ console.warn('因子实验室卡渲染失败', e); }
+    try{ if(typeof window.__renderFactorAudit==='function') window.__renderFactorAudit(); }catch(e){ console.warn('因子审计卡渲染失败', e); }
+    try{ if(typeof window.__renderFactorProgress==='function') window.__renderFactorProgress(); }catch(e){ console.warn('因子进度卡渲染失败', e); }
   };
   window.__renderMacroPane = function(){
     var hm = '';
@@ -14296,6 +14297,16 @@ hm += '<div id="ulPaneMacro">';
     hm += '</div>'; // /ulPaneMacro
     var _host = document.getElementById('macroHost');
     if(_host) _host.innerHTML = hm;
+    // 🔴 2026-09-12 补漏：机构研究·AI 解析卡的填充函数 _fillMahoroCard 原先全局
+    //   只在 renderUnlisted 里被调用；宿主迁到本页后无任何触发 → 卡永久「加载中」。
+    //   数据源 window.MAHORO_MACRO（云端/小九每日 07:22 拉取）+ window.MAHORO_INSIGHTS。
+    //   defer 数据可能晚于首渲到达，故 3 次退避重试（0/600/1800ms），成功即止。
+    try{
+      var _mh = function(){ try{ if(typeof window._fillMahoroCard==='function') window._fillMahoroCard(); }catch(e){ console.warn('maharo 卡渲染失败',e); } };
+      _mh();
+      setTimeout(_mh, 600);
+      setTimeout(_mh, 1800);
+    }catch(e){ console.warn('maharo 卡调度失败', e); }
   };
   window.renderUnlisted=renderUnlisted;
   window.renderDelisted=renderDelisted;
