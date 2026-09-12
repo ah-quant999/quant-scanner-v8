@@ -429,6 +429,15 @@ def _update_time_to_dt(ts):
     return None
 
 
+def _local_runner_age_min(run_time):
+    """本地 runner 最近上报距现在的分钟数（UTC+8）；无法解析返回 None。"""
+    dt = _update_time_to_dt(run_time)
+    if dt is None:
+        return None
+    now = datetime.now(tz=timezone(timedelta(hours=8)))
+    return (now - dt).total_seconds() / 60.0
+
+
 def load_window_var_newest(source_id, var_name, local_path):
     """取「线上站点」与「本地文件」两者中时间戳较新的一个。
 
@@ -2007,6 +2016,8 @@ def check_runner():
                 runner_status = None
 
     local_msg = "本地 runner 守护未上报状态"
+    local_status = None
+    local_run_time = None
     if runner_status:
         # 2026-08-15 一劳永逸：兼容两种 runner_status 格式
         #   · cloud_fetch_v8.py 生成格式：{run_time, category, hostname, modules, summary}
@@ -2045,6 +2056,8 @@ def check_runner():
         else:
             results.append({"id": "runner_local", "name": "runner 本地检测", "page": "管线", "status": "fail", "message": msg})
         local_msg = msg
+        local_status = st
+        local_run_time = runner_status.get("run_time")
 
     # 2. GitHub API 视角：连续失败 / checkout 失败
     token = _load_token()
@@ -2091,6 +2104,19 @@ def check_runner():
             #   30 分钟覆盖最长实测 26 分并留余量，同时仍能抓到真卡死（远超 26 分即异常）。
             is_warn = (latest_failed and not is_fail) or (latest and latest.get("status") == "in_progress" and stuck_min > 30)
 
+            # 2026-09-12 主人令「一劳永逸」：本站数据实际由本地 self-hosted runner 产出。
+            # 若本地 runner 已成功且上报较新（≤90 分钟），则云端 cn_fetch(ubuntu) 单次失败 / 卡住
+            # 不影响本站数据新鲜度 → 降级为 ok（附说明），不再亮黄灯假告警。
+            # 仅当本地也异常（local_status 非 ok）或本地上报已陈旧（>90 分钟，可能 runner 已停）时，
+            # 才保留云端失败的告警语义，避免掩盖真故障。
+            _cloud_downgraded = False
+            if local_status == "ok":
+                _age = _local_runner_age_min(local_run_time)
+                if _age is None or _age <= 90:
+                    is_fail = False
+                    is_warn = False
+                    _cloud_downgraded = True
+
             if is_fail:
                 results.append({
                     "id": "runner_github",
@@ -2114,7 +2140,7 @@ def check_runner():
                     "name": "runner GitHub API 检测",
                     "page": "管线",
                     "status": "ok",
-                    "message": f"最近运行正常（本地状态: {local_msg}）",
+                    "message": (f"云端 cn_fetch 最近一次运行异常但本地 runner 已成功覆盖（本地状态: {local_msg}），数据新鲜度不受影响" if _cloud_downgraded else f"最近运行正常（本地状态: {local_msg}）"),
                 })
         else:
             err = data.get("__msg__", "unknown") if isinstance(data, dict) else "API 失败"

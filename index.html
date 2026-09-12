@@ -955,6 +955,13 @@ window.V8_CAL = {weeks:[],legend:[]};
    原始定义（line 2515+）会一并删除以避免重复。
    ================================================================ */
 function _uBadge(slot, horizon, ts, sub){
+  // 2026-09-12 主人令：盘前/盘中/盘后按实际 update_time 动态判断，不硬编码。
+  //   调用方传 slot='auto' 时，由统一 _slotByTs 根据 ts 自动归类；数据源真实产出时段变了，标签自动跟随。
+  if(slot === 'auto' && window._slotByTs){
+    var _sl = window._slotByTs(ts);
+    slot = _sl.slot || '';
+    horizon = _sl.horizon || horizon || '';
+  }
   var t = '—';
   if(ts){
     try{
@@ -2309,7 +2316,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         h+='</div>';
         el.innerHTML=h;
         const mt=$('conceptMapTime');
-        if(mt) mt.innerHTML = _uBadge('盘中','短线',d.update_time);
+        if(mt) mt.innerHTML = _uBadge('auto','短线',d.update_time);
       }
       if(document.readyState==='loading')
         document.addEventListener('DOMContentLoaded', renderConceptTreemap);
@@ -2444,7 +2451,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         if(timeEl && updateTime){
           // 2026-08-30 修复：行业树图位于「实时数据」tab，数据源优先 SECTOR_FUND_FLOW（盘中），
           // 即使回退到 SECTOR_RS 也不得显示「盘后」标签，避免用户误判为盘后数据。
-          timeEl.innerHTML = _uBadge('盘中', '短线', updateTime);
+          timeEl.innerHTML = _uBadge('auto','短线', updateTime);
         }
       }
       if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderIndustryTree);
@@ -3094,7 +3101,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">📅 机游共振日历 ' + _uBadge('盘后', '短线', updateTime) + '</span>';
+    h += '<span class="cal-title">📅 机游共振日历 ' + _uBadge('auto','短线', updateTime) + '</span>';
     h += '<span class="cal-meta">'
        + '<button class="cal-nav-btn" onclick="_jyCalPrev()" title="上个月">◀</button>'
        + ' <span id="jyCalYearMonth">' + year + '年' + (month+1) + '月</span> '
@@ -3532,7 +3539,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + _uBadge('盘后', '短线', (window.LHB_DATA && window.LHB_DATA.update_time) || NF.update_time) + '</span>';
+    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + _uBadge('auto','短线', (window.LHB_DATA && window.LHB_DATA.update_time) || NF.update_time) + '</span>';
     h += '<span class="cal-meta">'
        + '<button class="cal-nav-btn" onclick="_northCalPrev()" title="上个月">◀</button>'
        + ' <span id="northCalYearMonth">' + year + '年' + (month+1) + '月</span> '
@@ -5296,7 +5303,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     html += '<span style="font-size:10px;color:#ef5350;font-weight:600;background:rgba(239,83,80,.14);padding:1px 7px;border-radius:4px;">算法自算 · 高手反推 v1</span>';
     // 🛡 2026-09-04 一劳永逸：不再 slice(0,16) 截断——完整时间戳交给 _fmtAshareRel 解析，
     //   截断会让「秒」丢失虽不影响日差计算，但 ISO 串被切成半截属隐患，统一传原值。
-    if(typeof _uBadge === 'function') html += _uBadge('盘后','短线',(D.update_time||''));
+    if(typeof _uBadge === 'function') html += _uBadge('auto','短线',(D.update_time||''));
     html += '</div>';
     if(D.method) html += '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.6;">口径：'+_e(D.method)+'</div>';
     // 汇总胶囊
@@ -5433,7 +5440,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     html += '<span style="font-size:10px;color:#a78bfa;font-weight:600;background:rgba(167,139,250,.14);padding:1px 7px;border-radius:4px;">ima 自动同步</span>';
     if(D.note_url) html += '<a href="'+_e(D.note_url)+'" target="_blank" style="font-size:11px;color:#a78bfa;text-decoration:none;">原帖↗</a>';
     // 🛡 2026-09-04 一劳永逸：同上，不再 slice(0,16)，传完整时间戳给 _fmtAshareRel
-    if(typeof _uBadge === 'function') html += _uBadge('盘后','短线',(D.update_time||''));
+    if(typeof _uBadge === 'function') html += _uBadge('auto','短线',(D.update_time||''));
     // 已跟踪 N（语义真实，非已入仓）
     html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);white-space:nowrap">📋 已跟踪 <b style="margin-left:2px">'+(D.stocks?D.stocks.length:0)+'</b></span>';
     if(_reso>0) html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);white-space:nowrap">🏆 高手共振 <b style="margin-left:2px">'+_reso+'</b></span>';
@@ -8673,7 +8680,7 @@ window.__renderV8CalFull();
     if(svg){
       svg.innerHTML=grid+axes+`<polygon points="${dpts.join(' ')}" fill="rgba(56,189,248,.25)" stroke="#38bdf8" stroke-width="2"/>`+dpts.map((p,i)=>`<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="3" fill="#38bdf8"/>`).join('');
     }
-    setBadge('phRadarTime','盘中','中线', margin.update_time || sf.update_time || cffex.update_time || crisis.update_time);
+    setBadge('phRadarTime','盘后','中线', margin.update_time || sf.update_time || cffex.update_time || crisis.update_time);
   }
 
   /* ---- 4. 六维预警雷达 ---- */
@@ -8704,7 +8711,7 @@ window.__renderV8CalFull();
     }
     var _crisisEl=document.getElementById('phCrisisBody');
     if(_crisisEl) _crisisEl.innerHTML=h;
-    setBadge('phCrisisTime','盘中','短线',cr.update_time);
+    setBadge('phCrisisTime','auto','短线',cr.update_time);
   }
 
   /* 🛡 2026-08-19 主人令「赶紧修复」:
@@ -8995,7 +9002,7 @@ window.__renderV8CalFull();
                 || (_isToday(sr.update_time)  ? sr.update_time  : '')
                 || sft.update_time || sff.update_time || sr.update_time || '';
     } catch(_){ _sectorTs = sft.update_time || sff.update_time || sr.update_time || ''; }
-    setBadge('phSectorTime', '盘后', '短线', _sectorTs);
+    setBadge('phSectorTime','auto','短线', _sectorTs);
   }
 
   /* ---- 主力净额分时累计曲线  /* ---- 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 加） ---- */
@@ -9218,7 +9225,7 @@ window.__renderV8CalFull();
       var _h=_now.getHours()+_now.getMinutes()/60;
       var _inTrade=(_day>=1&&_day<=5) && (((_h>=9.5&&_h<=11.5)||(_h>=13&&_h<=15)));
       if(_inTrade){
-        tEl.innerHTML=_uBadge('盘中','短线',snaps[snaps.length-1].time+'（共 '+snaps.length+' 快照）');
+        tEl.innerHTML=_uBadge('auto','短线',snaps[snaps.length-1].time+'（共 '+snaps.length+' 快照）');
       } else {
         tEl.innerHTML=_uBadge('休市','短线','非交易时段（9:30-11:30+13:00-15:00）');
       }
@@ -9281,7 +9288,7 @@ window.__renderV8CalFull();
     if(!netSub||!netSub.categories||!Object.keys(netSub.categories).length){
       if(el0) el0.innerHTML='';
       if(el1) el1.innerHTML='<div class="ipo-empty">⏳ ETF 份额申赎（上交所真实口径）待生成 · 交易所披露后更新</div>';
-      if(el1 && netSub && netSub.update_time) setBadge('phEtfTime','盘后','短线',netSub.update_time);
+      if(el1 && netSub && netSub.update_time) setBadge('phEtfTime','auto','短线',netSub.update_time);
       return;
     }
     const catNames=['宽基','行业','主题','跨境','商品'];
@@ -9324,7 +9331,7 @@ window.__renderV8CalFull();
       h+='</div>';
     });
     if(el1) el1.innerHTML=h;
-    if(document.getElementById('etfHeatTime')) setBadge('etfHeatTime','盘后','短线',netSub.update_time);
+    if(document.getElementById('etfHeatTime')) setBadge('etfHeatTime','auto','短线',netSub.update_time);
   }
 
   /* ---- 5.5 ETF 量能脉冲(盘中异动) / 日监控 渲染 ---- */
@@ -9334,7 +9341,7 @@ window.__renderV8CalFull();
     if(!pulse||pulse.no_data||!pulse.etfs||!pulse.etfs.length){
       var msg=(pulse&&pulse.note)?pulse.note:'盘中异动数据尚未生成';
       el.innerHTML='<div class="ipo-empty">⏳ '+msg+'</div>';
-      if(pulse&&pulse.update_time) setBadge('phEtfTime','盘中','短线',pulse.update_time);
+      if(pulse&&pulse.update_time) setBadge('phEtfTime','auto','短线',pulse.update_time);
       return;
     }
     var list=pulse.etfs.slice(0,6);
@@ -9364,7 +9371,7 @@ window.__renderV8CalFull();
     });
     h+='</div>';
     el.innerHTML=h;
-    if(pulse.update_time) setBadge('phEtfTime','盘中','短线',pulse.update_time);
+    if(pulse.update_time) setBadge('phEtfTime','auto','短线',pulse.update_time);
   }
 
   function renderEtfDaily(daily){
@@ -10861,8 +10868,11 @@ function drawUpDownChart(){
 
     const byPage = {};
 
+    // 🛡 2026-09-12 主人令「一劳永逸」：前端健康巡检只展示运维/基础设施类（管线/运维/内容审计），
+    //   选股策略/盘后数据/实时数据属数据·策略域，其健康项不在此页堆砌（对应卡各自带更新批次徽章）。
+    const _OPS_EXCLUDE_PAGES = new Set(["选股策略","盘后数据","实时数据"]);
     H.items.forEach(function(it){
-
+      if(_OPS_EXCLUDE_PAGES.has(it.page)) return;
       byPage[it.page] = byPage[it.page] || [];
 
       byPage[it.page].push(it);
@@ -10959,7 +10969,7 @@ function drawUpDownChart(){
       h+='</div>';
     }
     $b.innerHTML=h;
-    if($t) $t.innerHTML=_uBadge('盘后','短线',data.update_time);
+    if($t) $t.innerHTML=_uBadge('auto','短线',data.update_time);
   }
   window.renderMarketBreadth = renderMarketBreadth;
 
@@ -11104,7 +11114,7 @@ function drawUpDownChart(){
       h+='</div>';
     }
     $b.innerHTML=h;
-    if($t) $t.innerHTML=_uBadge('盘中','短线',d.update_time);
+    if($t) $t.innerHTML=_uBadge('auto','短线',d.update_time);
   }
   window.renderFuturesMain = renderFuturesMain;
 
@@ -11259,7 +11269,7 @@ window.showRestrictedItems = showRestrictedItems;
       h+='<div class="ipo-empty" style="padding:10px 12px;font-size:12px;text-align:center;">今日无解禁</div>';
     }
     $b.innerHTML=h;
-    if($t) $t.innerHTML=_uBadge('盘前','短线',d.update_time);
+    if($t) $t.innerHTML=_uBadge('auto','短线',d.update_time);
   }
   window.renderTodayEventRestricted = renderTodayEventRestricted;
 
@@ -11273,7 +11283,7 @@ window.showRestrictedItems = showRestrictedItems;
     const hasToday = !!(d.today_summary && typeof d.today_summary.total === 'number');
     if(!hasToday){
       $b.innerHTML = '<div class="ipo-empty" style="padding:10px 12px;font-size:12px;text-align:center;">今日口径需云端下次抓取后生效；当前暂无当日业绩预告数据。<br>全报告期累计请查看<b>盘后数据 → 业绩预告</b>卡。</div>';
-      if($t) $t.innerHTML = _uBadge('盘前','短线',d.update_time);
+      if($t) $t.innerHTML = _uBadge('auto','短线',d.update_time);
       return;
     }
     const s = d.today_summary;
@@ -11302,7 +11312,7 @@ window.showRestrictedItems = showRestrictedItems;
       h+='</div>';
     }
     $b.innerHTML=h;
-    if($t) $t.innerHTML=_uBadge('盘前','短线',d.update_time);
+    if($t) $t.innerHTML=_uBadge('auto','短线',d.update_time);
   }
   window.renderTodayEventForecast = renderTodayEventForecast;
 
@@ -11368,7 +11378,7 @@ window.showRestrictedItems = showRestrictedItems;
     h+='<div id="restrictedCalendarTable" style="display:none;"></div>';
     $b.innerHTML=h;
     showRestrictedItems('d7');
-    if($t) $t.innerHTML=_uBadge('盘后','短线',d.update_time);
+    if($t) $t.innerHTML=_uBadge('auto','短线',d.update_time);
   }
   window.renderRestrictedCalendar = renderRestrictedCalendar;
 
@@ -11402,7 +11412,7 @@ window.showRestrictedItems = showRestrictedItems;
     h+='<div id="forecastCalendarTable" style="display:none;"></div>';
     $b.innerHTML=h;
     showForecastItems('increase');
-    if($t) $t.innerHTML=_uBadge('盘后','短线',d.update_time);
+    if($t) $t.innerHTML=_uBadge('auto','短线',d.update_time);
   }
   window.renderForecastCalendar = renderForecastCalendar;
 
@@ -11562,7 +11572,7 @@ window.showRestrictedItems = showRestrictedItems;
     if(_tcExtTime) _tcExtTime.textContent = '';
     $('tcExtCount').textContent=ext.length;
     $('tcExtended').innerHTML=ext.length?ext.map(s=>renderStock(s,true,tm)).join(''):'<div class="tp-empty">暂无</div>';
-    setBadge('tcTime','盘后','短线',data.update_time);
+    setBadge('tcTime','auto','短线',data.update_time);
     // 「已跑完」胶囊：统一调用 _runBadgeInfo，消除昨日数据误报今日（2026-08-07 修复）
     var _tcTs = data.data_time || data.gen_time || data.update_time || '';
     var _tcInfo = window._runBadgeInfo(_tcTs);
@@ -11971,7 +11981,7 @@ window.showRestrictedItems = showRestrictedItems;
     if(tEl){
       try{
         // 🛡 2026-09-04 一劳永逸：fallback 亦走 _fmtAshareRel，保持「今日/昨日/N天前」统一语义
-        tEl.innerHTML = window._uBadge ? window._uBadge('盘后','短线', cand.update_time || '')
+        tEl.innerHTML = window._uBadge ? window._uBadge('auto','短线', cand.update_time || '')
           : ((window._fmtAshareRel && window._fmtAshareRel(cand.update_time || '')) || ((cand.update_time||'--').slice(0,16).replace('T',' ')));
       }catch(e){ tEl.textContent = (window._fmtAshareRel && window._fmtAshareRel(cand.update_time || '')) || (cand.update_time||'--').slice(0,16).replace('T',' '); }
     }
@@ -12254,7 +12264,7 @@ window.showRestrictedItems = showRestrictedItems;
       var em = window.CONCEPT_ETF_MAP || {};
       var tm=document.getElementById('prEtfFresh');
       var _etfSrcTs = (window.CONCEPT_RANKING||{}).update_time || (window.SECTOR_FUND_FLOW||{}).update_time || em.update_time || null;
-      var _etfBadge = _uBadge('盘后','短线',_etfSrcTs);
+      var _etfBadge = _uBadge('auto','短线',_etfSrcTs);
       if(tm) tm.innerHTML = _etfBadge;
     }catch(e){ console.warn('ETF龙头渲染失败',e); }
   };
@@ -12677,7 +12687,7 @@ window.showRestrictedItems = showRestrictedItems;
       return;
     }
     var fresh = document.getElementById('maharoFresh');
-    if(fresh && typeof setBadge === 'function') setBadge('maharoFresh','盘前','短线', d.updated_at);
+    if(fresh && typeof setBadge === 'function') setBadge('maharoFresh','auto','短线', d.updated_at);
     function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     function renderLines(txt){
       var rows = String(txt||'').split('\n'); var out = '';
@@ -12820,7 +12830,7 @@ window.showRestrictedItems = showRestrictedItems;
   // 💹 商品涨价弹性榜（2026-08-15 主人令：多列紧凑 grid，全部品种不隐藏）
   window._fillCommodityElasticity = function(){
     var ce = window.COMMODITY_ELASTICITY;
-    try{ var tm=document.getElementById('prCEFresh'); if(tm) tm.innerHTML = _uBadge('盘后','短线',(ce&&ce.update_time)||null); }catch(e){}
+    try{ var tm=document.getElementById('prCEFresh'); if(tm) tm.innerHTML = _uBadge('auto','短线',(ce&&ce.update_time)||null); }catch(e){}
     var dst = document.getElementById('ceBody');
     if(!dst) return;
     if(!ce || !ce.commodities || !ce.commodities.length){
@@ -13305,7 +13315,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,
     //   🚚 2026-09-11 主人令：商品涨价弹性榜已迁回实时数据页，「已下架」仅剩斐波那契双卡。
     //   原在盘后分组底部，现作为首屏辅助观测卡常驻。
     h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">
-  `+v8CardHeader('🧪','斐波那契F观测窗','','update_time',Object.assign({},window.SH_FIB,{slot:'盘前',horizon:'中长线'}))+`
+  `+v8CardHeader('🧪','斐波那契F观测窗','','update_time',Object.assign({},window.SH_FIB,{slot:'盘后',horizon:'中长线'}))+`
   <div style="font-size:11px;color:var(--dim);margin:-6px 0 10px 0;line-height:1.5;">📌 基于日K收盘数据计算，仅收盘后更新，盘前/盘中不刷新</div>`;
 var _fib2=window.SH_FIB||{};
 if(_fib2.windows&&_fib2.windows.length){
@@ -13530,7 +13540,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
         if(_validity === '失效') _statusKw = ' · 出局';
         else if(_validity === '低效') _statusKw = ' · 观望';
         else if(_validity === '高有效' || _validity === '较有效' || _validity === '有效') _statusKw = ' · 正常';
-        var _html = _uBadge('盘后','短线',_ts);
+        var _html = _uBadge('auto','短线',_ts);
         if(_html && _html.length > 30){
           // 统一格式：在原 badge 后追加状态关键词
           timeEl.innerHTML = _html + (_statusKw ? ' <span style="font-size:11px;font-weight:700;color:'+(_validity==='失效'?'#fca5a5':_validity==='低效'?'#fde68a':'#86efac')+';margin-left:6px;padding:2px 8px;border-radius:6px;background:'+(_validity==='失效'?'rgba(239,68,68,.15)':_validity==='低效'?'rgba(245,158,11,.15)':'rgba(34,197,94,.15)')+';">'+_statusKw.slice(3)+'</span>' : '');
@@ -13969,7 +13979,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       var _stfv=document.getElementById('stfvTime');
       var _ts=d && d.update_time ? d.update_time : '已加载';
       if(_stfv){
-        var _badgeHtml = _uBadge('盘后','短线',_ts);
+        var _badgeHtml = _uBadge('auto','短线',_ts);
         if(_badgeHtml && _badgeHtml.length > 30){
           _stfv.innerHTML = _badgeHtml;
         } else {
