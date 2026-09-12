@@ -1672,6 +1672,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 </header>
 
 <nav id="nav">
+  <div class="tab" data-sec="macro" onclick="switchSec('macro',this)">🌍 宏观观测</div>
   <div class="tab" data-sec="td" onclick="switchSec('td',this)">📅 今日事件</div>
   <div class="tab" data-sec="rt" onclick="switchSec('rt',this)">📡 实时数据</div>
   <div class="tab" data-sec="ph" onclick="switchSec('ph',this)">🌙 盘后数据</div>
@@ -1765,6 +1766,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   </section>
 
   <!-- ============ 今日事件 ============ -->
+  <!-- 2026-09-12 主人令：宏观观测 独立一级页（原「暂未上架 > 宏观类」迁入） -->
+  <section id="sec-macro">
+    <div class="sec-head"><h2>🌍 宏观观测</h2><span class="tag">海外宏观 + AI 大周期 + 国内景气 · 背景认知 · 仅供研究参考</span></div>
+    <div id="macroHost"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">加载中…</div></div>
+  </section>
+
   <section id="sec-td">
     <div class="sec-head"><h2>📅 今日事件</h2><span class="tag" id="tdHeaderTag">交易日历 + 打新速览 · --</span></div>
 
@@ -2545,16 +2552,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <section id="sec-st">
     <div class="sec-head" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h2 style="margin:0;">🎯 选股策略</h2>
-      <span class="tag">选股池 · 三重共识（主入口） · 选股生命周期 · 逆势龙头(CRDS)</span>
+      <span class="tag">选股池 · 三重共识 · 四量终极 · 选股生命周期 · 因子 · 逆势龙头(CRDS)</span>
     </div>
     <!-- 建议持有期纪律 banner 已于 2026-08-30 移至逻辑详解页「选股策略·持有期纪律」段，此处不再展示（避免客户可看区域堆文字） -->
     <!-- TAB 按钮行（横排，独立于内容区） -->
     <div class="st-tabs">
       <!-- 2026-08-29 主人令：选股池作为选股策略子页面；2026-08-30 主人令：选股池移到三重共识前面 -->
       <button class="st-tab active" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
-      <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span></button>
+      <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="life" onclick="switchSt('life')">🧬 选股生命周期 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
+      <button class="st-tab" data-st="fa" onclick="switchSt('fa')">🧪 因子 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐</span></button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·0⭐观测</span></button>
     </div>
 
@@ -2693,6 +2701,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     </div><!--/st-fv-->
 
     <!-- ===== TAB 页面：逆势龙头(CRDS) ===== -->
+    <!-- 2026-09-12 主人令：因子子页（原「暂未上架 > 因子类」迁入），置于逆势龙头左侧 -->
+    <div id="st-fa" class="st-pane"><div id="stFaHost"></div></div>
+
     <div id="st-crds" class="st-pane"><div class="card" id="stv8CrdsCard">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
           📊 <span style="font-weight:700;font-size:14px;color:var(--txt);">CRDS · 逆势龙头</span><!-- 2026-09-06 审计修复：弱市专用不评星（与文档/tab按钮一致），移除 ⭐⭐⭐ -->
@@ -4208,6 +4219,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="sec-head"><h2>📈 回测汇总</h2><span class="tag">仅管理员可见 · 综合回测 + K线信号 + 模块回测 · 三块一站看完</span><span class="fresh" id="btFresh">—</span></div>
     <div id="btSummary" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 4px;padding:8px 12px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:10px;font-size:11.5px;"><span style="color:var(--dim);font-weight:600;">📊 回测总览</span><span style="color:var(--sub);">加载中…</span></div>
     <div id="btBody"><div class="note">加载中…</div></div>
+    <div id="btExtraHost"></div>
   </section>
 
 
@@ -4519,6 +4531,21 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       function _loadRemovedMap(){
         try { return JSON.parse(localStorage.getItem('v8_pool_removed') || '{}') || {}; } catch(e){ return {}; }
       }
+      // 2026-09-12 主人令：一键全部剔除（原来要一只一只点）
+      window.__removeAllStocks = function(codes){
+        try {
+          if(!codes || !codes.length) return;
+          var m = _loadRemovedMap();
+          var items = (window.V8_POOL_TRACKER && window.V8_POOL_TRACKER.items) || [];
+          codes.forEach(function(code){
+            var it = items.find(function(x){ return x.code === code; }) || {};
+            m[code] = { name: it.name, status: it.status, last_pct: it.last_pct, drawdown: it.drawdown, removed_at: new Date().toISOString().slice(0,16) };
+          });
+          localStorage.setItem('v8_pool_removed', JSON.stringify(m));
+          if(typeof window.__renderLifecycleSection === 'function') window.__renderLifecycleSection();
+          if(typeof window.__renderBacktestSection === 'function') window.__renderBacktestSection();
+        } catch(e){ console.warn('[removeAllStocks]', e); }
+      };
       window.__removeStock = function(code){
         try {
           var m = _loadRemovedMap();
@@ -4734,7 +4761,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       }catch(e){ console.warn('[life] toRemove filter', e); toRemove = []; }
       if(toRemove && toRemove.length){
         try{ toRemove = _sortBucket(toRemove, 'drawdown', false); }catch(e){ console.warn('[life] sortBucket', e); }
-        var toRemoveHtml = '<div style="padding:6px 10px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;">';
+        var _rmCodes = toRemove.map(function(it){ return (it && it.code) || ''; }).filter(Boolean);
+        var toRemoveHtml = '<div style="padding:8px 10px 2px;"><span onclick=\'window.__removeAllStocks(' + JSON.stringify(_rmCodes) + '); closeLifeModal();\' style="display:inline-block;padding:5px 12px;border-radius:6px;font-size:11.5px;font-weight:700;color:#ef5350;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.45);cursor:pointer;user-select:none;">⚠️ 全部剔除（' + toRemove.length + ' 只）</span></div>'
+          + '<div style="padding:6px 10px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;">';
         toRemove.forEach(function(it){
           var _code = (it && it.code) || '';
           var _name = (it && it.name) || '';
@@ -6717,7 +6746,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '</div>';
   };
 
-  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderRpsAudit(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeThermo(); }catch(e){} try{ window.__renderCiticPeBacktest(); }catch(e){} try{ window.__renderValuationPercentile(); }catch(e){} try{ window.__renderFactorAudit(); }catch(e){} try{ window.__renderIndexValueFramework(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} try{ window.__renderFactorProgress(); }catch(e){} }
+  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderBtExtraPane(); }catch(e){} try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderMacroPane(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderRpsAudit(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeThermo(); }catch(e){} try{ window.__renderCiticPeBacktest(); }catch(e){} try{ window.__renderValuationPercentile(); }catch(e){} try{ window.__renderFactorAudit(); }catch(e){} try{ window.__renderIndexValueFramework(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} try{ window.__renderFactorProgress(); }catch(e){} }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
   } else {
@@ -7192,6 +7221,10 @@ function switchSec(sec,el){
       try{ window.renderTodayEventForecast(window.PERFORMANCE_FORECAST || {}); }catch(e){}
     }, 80);
   }
+  // 2026-09-12 主人令：宏观观测页（原暂未上架·宏观类迁入）
+  if(sec==='macro' && typeof window.__renderMacroPane==='function') setTimeout(window.__renderMacroPane,60);
+  // 2026-09-12 主人令：策略回测页 追加的回测类三卡
+  if(sec==='bt' && typeof window.__renderBtExtraPane==='function') setTimeout(window.__renderBtExtraPane,60);
   // 共振日历：进入时确保默认 tab1（机游共振）渲染（rcTab1 默认 active，但 switchRcTab 仅在点 tab 时触发）
   if(sec==='rc' && typeof window.switchRcTab==='function') setTimeout(function(){ try{ window.switchRcTab('tab1', document.querySelector('.rc-tab-btn.active')); }catch(e){} }, 30);
   // tab 切换后 echarts 实例需要 resize（容器从 display:none 恢复时尺寸为 0）
@@ -11950,16 +11983,29 @@ window.showRestrictedItems = showRestrictedItems;
     else if(tab==='fv'){ /* 跨脚本块：必须走 window，裸调用会 ReferenceError（2026-08-07 修） */
       if(!stRendered.fv){ stRendered.fv=1; }
       try{ window.renderFourVolume(); }catch(e){ console.warn('四量终极渲染失败',e); } }
+    else if(tab==='fa'){
+      if(typeof window.__renderFactorPane==='function'){ try{ window.__renderFactorPane(); }catch(e){} }
+      if(typeof window.__renderFactorLab==='function'){ try{ window.__renderFactorLab(); }catch(e){} }
+      if(typeof window.__renderFactorAudit==='function'){ try{ window.__renderFactorAudit(); }catch(e){} }
+      if(typeof window.__renderFactorProgress==='function'){ try{ window.__renderFactorProgress(); }catch(e){} }
+    }
   }
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
-    ['tc','fv','crds','pool','life'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['tc','fv','crds','pool','life','fa'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
     // 2026-08-29 主人令：选股池子页渲染（2026-09-11：并入金股池卡片，统一走 renderStPoolAll）
     if(n==='pool' && typeof window.renderStPoolAll==='function') setTimeout(window.renderStPoolAll, 30);
     if(n==='life' && typeof window.__renderLifecycleSection==='function') setTimeout(window.__renderLifecycleSection, 30);
     if(n==='life' && typeof window.__renderImaStrongStock==='function') setTimeout(window.__renderImaStrongStock, 30);
     if(n==='life' && typeof window.__renderStrongBreakout==='function') setTimeout(window.__renderStrongBreakout, 30);
+    // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
+    if(n==='fa'){
+      if(typeof window.__renderFactorPane==='function') setTimeout(window.__renderFactorPane, 30);
+      if(typeof window.__renderFactorLab==='function') setTimeout(window.__renderFactorLab, 30);
+      if(typeof window.__renderFactorAudit==='function') setTimeout(window.__renderFactorAudit, 30);
+      if(typeof window.__renderFactorProgress==='function') setTimeout(window.__renderFactorProgress, 30);
+    }
     // 2026-09-06 审计修复：__renderFactorLab 死调用移除（因子实验室容器已迁暂未上架·实验区，life tab 无此容器）
     // 🛡 2026-09-02 主人令根治：切换后立即启动「子 tab 数据就绪重试」（见 __stRetryTab），消除 defer 未注入导致的首渲空卡
     try{ window.__stRetryTab(n); }catch(e){}
@@ -12433,7 +12479,7 @@ window.showRestrictedItems = showRestrictedItems;
       window.__ulSelfHealTimer=setInterval(function(){
         var p=document.getElementById('unlistedPanel');
         if(!p) return;
-        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneFactor')>=0) return; // 已渲染成功停止（2026-09-10：改用因子实验室容器作判据）
+        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneObserve')>=0) return; // 已渲染成功停止（2026-09-10：改用因子实验室容器作判据）
         if(typeof window.renderUnlisted==='function'){
           console.log('[ulSelfHeal] retry renderUnlisted len='+p.innerHTML.length);
           try{ window.renderUnlisted(); }catch(e){ console.warn('[ulSelfHeal] rethrow:',e.message); }
@@ -12506,12 +12552,6 @@ window.showRestrictedItems = showRestrictedItems;
 
     // ===== 子 tab 导航（2026-09-12 主人令：按功能类重组为四子页）=====
 //   观测类(5) / 回测·框架(3) / 因子类(3) / 宏观类(2)。容器 id 全保留，仅调整分组。
-h += '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:10px;">'
-   + '<button class="ul-tab active" data-ul="observe" onclick="window.__ulSwitch(this,\'observe\')" style="padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--sub);font-weight:600;transition:.15s;">&#x1F4CA; 观测类</button>'
-   + '<button class="ul-tab" data-ul="backtest" onclick="window.__ulSwitch(this,\'backtest\')" style="padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--sub);font-weight:600;transition:.15s;">&#x1F4C8; 回测·框架</button>'
-   + '<button class="ul-tab" data-ul="factor" onclick="window.__ulSwitch(this,\'factor\')" style="padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--sub);font-weight:600;transition:.15s;">&#x1F9EA; 因子类</button>'
-   + '<button class="ul-tab" data-ul="macro" onclick="window.__ulSwitch(this,\'macro\')" style="padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--sub);font-weight:600;transition:.15s;">&#x1F30D; 宏观类</button>'
-   + '</div>';
 
 // ===== 观测类 pane（5 张卡） =====
 //   概念ETF龙头参考 / 主题空间 / 中信PE温度计 / A股指数PE-TTM分位 / AI洞察多源对比
@@ -12541,175 +12581,16 @@ h += '</div>'; // /ulPaneObserve
 
 // ===== 回测·框架 pane（3 张卡） =====
 //   RPS 30天样本考核 / 中信PE<10历史回测 / 指数估值中枢+趋势门控
-h += '<div id="ulPaneBacktest" style="display:none;">';
-// 2026-09-12 主人令：RPS 相对强度「30 天样本考核」卡归回测·框架类（数据链 E 批每日续跑，不参与选股评分权重）
-h += '<div class="card" id="rpsAuditBody" style="margin-bottom:16px;border-left:4px solid #94a3b8;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; 相对强度 RPS · 30 天样本考核 加载中&#x2026;</div></div>';
-// 2026-09-12 主人令：中信 PE<10 历史回测卡（回测类·个股）
-h += '<div class="card" id="citicPeBacktestBody" style="margin-bottom:16px;border-left:4px solid #60a5fa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4CA; 中信 PE&lt;10 历史回测 加载中&#x2026;</div></div>';
-// 2026-09-12 主人令：A股指数价格中枢+趋势门控框架迁移（框架类·大盘/指数）
-h += '<div class="card" id="indexValueFrameworkBody" style="margin-bottom:16px;border-left:4px solid #f97316;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; 指数估值中枢 · 价格档位+趋势门控 加载中&#x2026;</div></div>';
-h += '</div>'; // /ulPaneBacktest
 
 // ===== 因子实验室 pane（3 张因子卡，2026-09-10 主人令独立成子页）=====
 //   卡容器 id 与实验区时期完全一致（factorLabBody / factorAuditBody / factorProgressBody），
 //   3 个 __render* 函数按 id 取容器，故迁页零改动；切页时 __ulSwitch 兜底触发渲染。
-h += '<div id="ulPaneFactor" style="display:none;">';
-h += '<div class="card" id="factorLabBody" style="margin-bottom:16px;border-left:4px solid #22d3ee;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F9EA; 因子实验室（异常换手率 · ROE_TTM 大市值档）加载中&#x2026;</div></div>';
-h += '<div class="card" id="factorAuditBody" style="margin-bottom:16px;border-left:4px solid #22c55e;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4CA; 因子审计：v8 选股 vs 质量价值中小盘多因子 加载中&#x2026;</div></div>';
-h += '<div class="card" id="factorProgressBody" style="margin-bottom:16px;border-left:4px solid #f59e0b;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F9EA; 因子补缺·walk-forward 进度 加载中&#x2026;</div></div>';
-h += '</div>'; // /ulPaneFactor
 
 // ===== 宏观观测 pane =====
-    h += '<div id="ulPaneMacro" style="display:none;">';
-    // ═══ 2026-09-07 主人令（二改）：卡只放宏观页最顶部（禁止在实验区显示）；
-    //   内容以 AI 解析建议为主（日→周→月三层，AI 阅读后撰写），新闻条目折叠为附录；标题行带「更新于」。
-    h += '<div class="card" id="maharoCard" style="margin-bottom:16px;border-left:4px solid #34d399;">'
-       // 2026-09-07 主人令：「更新于」改为全站统一 v8CardHeader 版式（🦊 胶囊 setBadge 补填），副标题文案保留
-       + '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;padding:10px 14px;border-bottom:1px solid var(--border);border-radius:12px 12px 0 0;min-width:0;">'
-       + '<span style="font-size:15px;line-height:1;flex:0 0 auto;">📚</span>'
-       + '<span style="font-size:14px;font-weight:800;color:var(--cyan);flex:0 0 auto;white-space:nowrap;">机构研究 · AI 解析建议</span>'
-       + '<span style="flex:0 0 auto;" id="maharoFresh">—</span>'
-       + '<span style="font-size:11px;color:var(--dim);margin-left:4px;flex:0 1 auto;min-width:120px;">观澜台/金斧头/逻辑与思考/树枝报告/180K Research/智堡 Wisburg/Vito行研札记 · AI 阅读后撰写 · 每日 08:30 更新</span></div>'
-       + '<div id="maharoCardBody"><div class="note">加载中…</div></div></div>';
-    // ═══ 2026-09-06 主人令：新周期判定卡（海外宏观+AI 大周期 · 事件驱动）═══
-    //   位置：K 型卡上方（事件驱动更新频率 > K 型月度更新）；
-    //   形式：双源对比（白话愍博士原文 vs 我交叉验证），差异处红框高亮；
-    //   数据源：4 次搜索 20+ 源 cross-checked（CME FedWatch / Kalshi / 国泰海通 / 中信建投 / 证券时报 / 沃什讲话）。
-    h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #60a5fa;">'
-       // ── 标题行：卡名 + ⚡ 事件驱动彩色 badge + 数据源 + 更新时间 ──
-       + '<div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
-       + '<b style="color:#60a5fa;">&#x1F4CC; 核心：</b>海外宏观 + AI 资本开支周期的定性判断。<br>'
-       + '<b style="color:#60a5fa;">&#x1F4A1; 用法：</b>背景认知，辅助顶层仓位与行业配置。<br>'
-       + '<b style="color:#60a5fa;">&#x26A0; 限制：</b>无自动刷新管线，2026-09-06 历史快照，下次更新需手动维护。</div>'
-       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-       + '<span style="font-size:15px;font-weight:700;color:#60a5fa;">🌐 新周期判定 · 海外宏观 + AI 大周期</span>'
-       // 频率 badge（事件驱动·高亮）：比 K 型的「月度」更显眼
-       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#94a3b2;background:rgba(148,163,184,.16);border:1px solid rgba(148,163,184,.4);letter-spacing:.5px;">📢 历史快照 · 手动维护</span>'
-       + '<span style="font-size:11.5px;color:var(--dim);">数据源：白话愍博士 + 中信建投·周君芝 + CME FedWatch + 国泰海通 + 证券时报 · 4 次搜索 20+ 源 cross-checked</span>'
-       + '</div>'
-       + '<div style="font-size:11.5px;color:var(--dim);margin-bottom:10px;">'
-       + '<b style="color:var(--txt);">更新于 2026-09-06 22:38</b> · <b style="color:#ef5350;">无自动刷新管线</b>，下次更新需手动维护 · 用途：'
-       + '<b style="color:var(--txt);">海外宏观+AI 大周期判断</b>（与下方 K 型卡「国内行业景气」互补）。</div>'
-
-       // ── 顶部：核心结论（合并视角，两源已对齐的部分） ──
-       + '<div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.25);border-radius:7px;padding:10px 13px;margin-bottom:10px;">'
-       + '<div style="font-size:12.5px;font-weight:700;color:#60a5fa;margin-bottom:10px;">📌 核心结论（两源共识）</div>'
-       + '<div style="font-size:12px;line-height:1.55;color:var(--txt);display:flex;flex-direction:column;gap:8px;">'
-       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">①</span><span>8 月非农 <b style="color:#60a5fa;">+16.2 万</b>（3 倍超预期）→ <b style="color:#fb923c;">增长确认（不是滞胀确认）</b></span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">②</span><span>AI 资本开支已<b style="color:#fb923c;">独立于利率</b>（北美四大 CSP 全年 ~7100 亿美元 = 美国 GDP 1%）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">③</span><span>9 月 FOMC <b style="color:#fb923c;">大概率维持</b>（CME 68% / Kalshi 29% 加息，市场认知已撕裂）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">④</span><span>黄金 <b style="color:#fb923c;">短空中多</b>（10Y 4.7% - 7月CPI 3.4% = 实际利率 < 1.5% 已触发多头阈值）</span></div>'
-       + '</div></div>'
-
-       // ── 双源对比表（差异处红框高亮） ──
-       + '<div style="font-size:12px;font-weight:700;color:var(--txt);margin:6px 0 8px;">🔍 双源对比 · <span style="color:#ef5350;">🔴 红色标注 = 我与原文判断的关键差异</span></div>'
-       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">'
-
-       // 子卡 1：白话愍博士原文判断
-       + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:10px 12px;">'
-       + '<div style="font-size:12px;font-weight:700;color:#fbbf24;margin-bottom:10px;">🧑 白话愍博士《新周期已到来》</div>'
-       + '<div style="font-size:11.5px;line-height:1.55;color:var(--txt);display:flex;flex-direction:column;gap:7px;">'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">①</span><span>8月非农→<b>增长确认</b>（非滞胀确认）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">②</span><span>AI 六层：L1/L2/L3 已公开基线+活跃+行业层证据，<b>L4 扩产周期启动</b>、<b>L5 需再证</b>、<b>L6 待证</b></span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">③</span><span>9月 FOMC 维持利率 <b style="color:#fbbf24;">「当前后验 40%」</b>（与 6 月持平）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">④</span><span>AI Capex 独立于利率 = <b style="color:#fbbf24;">38% 后验</b>（盘面开始支持）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">⑤</span><span>黄金 <b style="color:#fbbf24;">短空中多</b>（短空：美元走强+实际利率上行；中多：长期通胀粘性+信用稀释）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">⑥</span><span>美元信用稀释 <b style="color:#fbbf24;">短空长多 83%</b></span></div>'
-       + '</div></div>'
-
-       // 子卡 2：我的判断（交叉验证）
-       + '<div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.3);border-radius:7px;padding:10px 12px;">'
-       + '<div style="font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:10px;">🤖 我的判断 · 跨源交叉验证</div>'
-       + '<div style="font-size:11.5px;line-height:1.55;color:var(--txt);display:flex;flex-direction:column;gap:7px;">'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">①</span><span>增长是 <b style="color:#60a5fa;">K 型化</b>（非普惠）—— 强：建筑/制造/AI基建（+7.5万）；<b style="color:#26a69a;">弱：信息业 -2.3万、金融业 -1.1万（AI 替代白领首批实证）</b></span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">②</span><span>L4 芯片/光通 <b style="color:#60a5fa;">从「涨价」叙事切到「产能扩张」叙事</b>（关键转折）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">②</span><span>L5 产业链 <b style="color:#60a5fa;">已显著盈利</b>（中际旭创 26H1 净利+242%、营收+182%；光纤 1-7 月利润+468%）→ <b style="color:#ef5350;">原文「需再证」应改为「已过」</b></span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">③</span><span><b style="color:#ef5350;">原文「9月维持 40%」偏保守</b>——CME 显示 40%→<b style="color:#fb923c;">68% 加息</b>，实际是「鹰派重定价」（市场认知已撕裂：CME 68% vs Kalshi 29% 加息）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">④</span><span>9月 <b style="color:#60a5fa;">维持 ~65%</b>（沃什讲话已定价，9/9 CPI 出来前不动）→ 12月 <b style="color:#60a5fa;">保险式加息 25bp ~50%</b>（CPI 还热+沃什「信誉」未恢复）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">⑤</span><span>AI Capex 独立于利率 = <b style="color:#60a5fa;">75% 后验</b>（L5 盈利 + 云厂 +70% Capex 印证，<b style="color:#ef5350;">原文 38% 偏保守</b>）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">⑥</span><span>黄金多配 <b style="color:#60a5fa;">触发位已量化</b>：<b style="color:#fb923c;">实际利率 < 1.5% = 多头信号已触发</b>（10Y 4.7% - 7月CPI 3.4%）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">⑦</span><span><b style="color:#60a5fa;">原文未讲 A 股板块映射</b>——补：防御底仓（红利/银行/煤炭/石油石化/公用事业）+ 进攻（算力龙头非涨价逻辑/半导体设备/黄金股）+ 避免（内需消费/长久期债/美股硬件涨价）</span></div>'
-       + '</div></div>'
-
-       + '</div>' // /双源 grid
-
-       // ── 三情景概率（我的判断 + 原文章节都有，这里合并一行） ──
-       + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:10px 13px;margin-bottom:8px;">'
-       + '<div style="font-size:12.5px;font-weight:700;color:#fbbf24;margin-bottom:6px;">📊 三情景概率（共识框架）</div>'
-       + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:12px;">'
-       + '<div><span style="color:#fbbf24;">乐观 30%</span> <span style="color:var(--dim);">█ █ █ ▍</span><div style="font-size:10.5px;color:var(--dim);">AI 拉生产率+美元软着陆</div></div>'
-       + '<div><span style="color:#fbbf24;">基准 45%</span> <span style="color:var(--dim);">█ █ █ █ █ ▌</span><div style="font-size:10.5px;color:var(--dim);">AI 拉生产率但慢，9月不加息</div></div>'
-       + '<div><span style="color:#fbbf24;">悲观 15%</span> <span style="color:var(--dim);">█ █ ▎</span><div style="font-size:10.5px;color:var(--dim);">加息+AI 替代加速消费弱</div></div>'
-       + '<div><span style="color:#fbbf24;">尾部 10%</span> <span style="color:var(--dim);">█ ▌</span><div style="font-size:10.5px;color:var(--dim);">不可平均</div></div>'
-       + '</div></div>'
-
-       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">🔭 仅供研究参考，不构成个人投资建议 · 数据时点以原文为准 · 差异标注 = 我的判断（4 次搜索 20+ 源 cross-checked）vs 白话愍博士原文</div>'
-       + '</div>';
-
-    // ═══ 2026-09-04 主人令：宏观景气背景（K型分层）迁入宏观观测 pane（主人自看 · 背景认知 · 适合查阅不适合盯盘）═══
-    //   静态内容内联，无 data 依赖/无管线；数据源：沧海一土狗（公众号）K型行业景气图；每月 1 日随宏观数据手动更新此处。
-    //   更新记录：2026-09-04 部署（7月数据口径）；下次更新 2026-10-01（主人 09-04 令：标题行须带「更新于/下次更新」）。
-    //   🛡 2026-09-06 主人令：在标题行加「📅 月度更新」彩色 badge，与上方新卡的「⚡ 事件驱动」频率区别更明显。
-    //   红涨绿跌铁律适用：增速为正=红(扩张)，为负=绿(收缩)。
-    h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #fbbf24;">'
-       + '<div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
-       + '<b style="color:#fbbf24;">&#x1F4CC; 核心：</b>用 K 型框架把行业分为扩张/中性/收缩三区。<br>'
-       + '<b style="color:#fbbf24;">&#x1F4A1; 用法：</b>理解为什么某些板块资金持续流入/流出，辅助背景判断。<br>'
-       + '<b style="color:#fbbf24;">&#x26A0; 限制：</b>静态月度更新（7月数据），适合查阅不适合盯盘。</div>'
-       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-       + '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🌍 宏观景气背景 · K 型分层</span>'
-       // 频率 badge（月度更新·低饱和黄色）：与新卡的橙色事件驱动 badge 区分
-       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#fbbf24;background:rgba(251,191,36,.16);border:1px solid rgba(251,191,36,.4);letter-spacing:.5px;">📅 月度更新 · 每月 1 日</span>'
-       + '<span style="font-size:12px;color:var(--dim);">7月数据 · 来源：沧海一土狗 · <b style="color:var(--dim);">更新于 2026-09-04</b> · 下次更新 2026-10-01</span></div>'
-       + '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;">帮你理解<b style="color:var(--txt);">为什么某些板块资金持续流入</b>（外需+AI+技改 vs 地产链+财政收缩）——背景认知，适合查阅不适合盯盘。</div>'
-       + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;">'
-       // ── 扩张区（K型上端 · 红） ──
-       + '<div style="background:rgba(239,83,80,.06);border:1px solid rgba(239,83,80,.25);border-radius:7px;padding:9px 11px;">'
-       + '<div style="font-size:12.5px;font-weight:700;color:#ef5350;margin-bottom:5px;">▲ 扩张区 · K 型上端</div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">出口</span><b style="color:#ef5350;">+23.9%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">通讯器材零售</span><b style="color:#ef5350;">+15~20%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">高技术制造业</span><b style="color:#ef5350;">+13.8%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">计算机通信电子</span><b style="color:#ef5350;">+19.1%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">铁路运输设备</span><b style="color:#ef5350;">+13.6%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">专用设备</span><b style="color:#ef5350;">+12.6%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">装备制造业</span><b style="color:#ef5350;">+9.7%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">化妆品零售</span><b style="color:#ef5350;">+6.3%</b></div>'
-       + '</div>'
-       // ── 中性区（灰） ──
-       + '<div style="background:rgba(154,164,178,.06);border:1px solid rgba(154,164,178,.25);border-radius:7px;padding:9px 11px;">'
-       + '<div style="font-size:12.5px;font-weight:700;color:#9aa4b2;margin-bottom:5px;">◆ 中性区 · 总量平稳</div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">规上工业增加值</span><b style="color:#9aa4b2;">+4.5%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">社会消费品零售</span><b style="color:#9aa4b2;">+0.6%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">调查失业率</span><b style="color:#9aa4b2;">5.2%</b></div>'
-       + '<div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(154,164,178,.3);font-size:11px;line-height:1.7;color:var(--dim);">总量无感，结构剧烈分化——这正是 K 型的含义。</div>'
-       + '</div>'
-       // ── 收缩区（K型下端 · 绿） ──
-       + '<div style="background:rgba(38,166,154,.06);border:1px solid rgba(38,166,154,.25);border-radius:7px;padding:9px 11px;">'
-       + '<div style="font-size:12.5px;font-weight:700;color:#26a69a;margin-bottom:5px;">▼ 收缩区 · K 型下端</div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">房地产投资</span><b style="color:#26a69a;">-19.2%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">汽车零售</span><b style="color:#26a69a;">-17.0%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">基建投资(7月单月)</span><b style="color:#26a69a;">-12.9%~-14.7%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">煤炭开采</span><b style="color:#26a69a;">-10.8%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">金银珠宝零售</span><b style="color:#26a69a;">-10.1%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">家具建材零售</span><b style="color:#26a69a;">-3~-9%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">基建投资(累计)</span><b style="color:#26a69a;">-3.6%</b></div>'
-       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">财政支出(二季度)</span><b style="color:#26a69a;">-8.4%</b></div>'
-       + '</div>'
-       + '</div>'
-       // ── 框架要点（沧海一土狗） ──
-       + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:9px 12px;margin-top:10px;font-size:12px;line-height:1.8;color:var(--sub);">'
-       + '<b style="color:#fbbf24;">📖 框架要点（沧海一土狗 · 金融抑制模型）：</b>'
-       + '① 货币政策刺激<b style="color:var(--txt);">外需</b>、财政政策刺激<b style="color:var(--txt);">内需</b>（宋铮 <i>Growing Like China</i> 框架）；'
-       + '② 社零 3.7% 年增目标（2030 年 60 万亿）约束降息空间 → 政策组合转向<b style="color:var(--txt);">财政为主</b>；'
-       + '③ 投资曲线弹性是核心特征值：缺弹性时降息抑制内需（资金外流+出口），弹性修复后降息才利好股市；'
-       + '④ 对 A 股映射：<b style="color:#ef5350;">外需+AI+技改链</b>景气持续 vs <b style="color:#26a69a;">地产链+基建链</b>收缩——与行业树图/板块资金的分化互为印证。</div>'
-       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">🔭 仅供研究参考，不构成个人投资建议 · 数据时点以原文为准</div>'
-       + '</div>';
-    h += '</div>'; // /ulPaneMacro
-    // 2026-09-02 主人令：强势突破 pane、模块去向索引、动量共识/H反推/两套算法回测对比 全部删除（卡片清单以 renderUnlisted 为准）。
+        // 2026-09-02 主人令：强势突破 pane、模块去向索引、动量共识/H反推/两套算法回测对比 全部删除（卡片清单以 renderUnlisted 为准）。
     el.innerHTML=h;
     // 恢复上次激活的子 tab（默认实验区）
-    setTimeout(function(){ window.__ulSwitch(document.querySelector('#sec-ul .ul-tab[data-ul="'+_ulAct+'"]'), _ulAct); }, 0);
+    setTimeout(function(){ window.__ulSwitch(null, 'observe'); }, 0);
     // 2026-08-30 主人令:渲染兜底
     if(!h || h.length<200){ el.innerHTML='<div style=\"text-align:center;padding:40px;color:var(--dim);\"><div style=\"font-size:32px;margin-bottom:12px;\">📭</div><div style=\"font-size:14px;\">已下架卡片暂无可用数据</div><div style=\"font-size:12px;margin-top:8px;\">稍后再试或检查数据源</div></div>'; }
     // 2026-09-12 主人令：子 tab 按功能类重组为「观测类 / 回测·框架 / 因子类 / 宏观类」。
@@ -14198,6 +14079,180 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   // 末尾 initCardBadges 通过 window.renderFourVolume 找不到它 → 四量终极胶囊永远不显示。
   // 现挂到 window 上与 renderV8Crds 一致。
   window.renderFourVolume = renderFourVolume;
+  window.__renderBtExtraPane = function(){
+    var hm = '';
+hm += '<div id="ulPaneBacktest">';
+// 2026-09-12 主人令：RPS 相对强度「30 天样本考核」卡归回测·框架类（数据链 E 批每日续跑，不参与选股评分权重）
+hm += '<div class="card" id="rpsAuditBody" style="margin-bottom:16px;border-left:4px solid #94a3b8;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; 相对强度 RPS · 30 天样本考核 加载中&#x2026;</div></div>';
+// 2026-09-12 主人令：中信 PE<10 历史回测卡（回测类·个股）
+hm += '<div class="card" id="citicPeBacktestBody" style="margin-bottom:16px;border-left:4px solid #60a5fa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4CA; 中信 PE&lt;10 历史回测 加载中&#x2026;</div></div>';
+// 2026-09-12 主人令：A股指数价格中枢+趋势门控框架迁移（框架类·大盘/指数）
+hm += '<div class="card" id="indexValueFrameworkBody" style="margin-bottom:16px;border-left:4px solid #f97316;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; 指数估值中枢 · 价格档位+趋势门控 加载中&#x2026;</div></div>';
+hm += '</div>'; // /ulPaneBacktest
+    var _host = document.getElementById('btExtraHost');
+    if(_host) _host.innerHTML = hm;
+  };
+  window.__renderFactorPane = function(){
+    var hm = '';
+hm += '<div id="ulPaneFactor">';
+hm += '<div class="card" id="factorLabBody" style="margin-bottom:16px;border-left:4px solid #22d3ee;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F9EA; 因子实验室（异常换手率 · ROE_TTM 大市值档）加载中&#x2026;</div></div>';
+hm += '<div class="card" id="factorAuditBody" style="margin-bottom:16px;border-left:4px solid #22c55e;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4CA; 因子审计：v8 选股 vs 质量价值中小盘多因子 加载中&#x2026;</div></div>';
+hm += '<div class="card" id="factorProgressBody" style="margin-bottom:16px;border-left:4px solid #f59e0b;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F9EA; 因子补缺·walk-forward 进度 加载中&#x2026;</div></div>';
+hm += '</div>'; // /ulPaneFactor
+    var _host = document.getElementById('stFaHost');
+    if(_host) _host.innerHTML = hm;
+  };
+  window.__renderMacroPane = function(){
+    var hm = '';
+hm += '<div id="ulPaneMacro">';
+    // ═══ 2026-09-07 主人令（二改）：卡只放宏观页最顶部（禁止在实验区显示）；
+    //   内容以 AI 解析建议为主（日→周→月三层，AI 阅读后撰写），新闻条目折叠为附录；标题行带「更新于」。
+    hm += '<div class="card" id="maharoCard" style="margin-bottom:16px;border-left:4px solid #34d399;">'
+       // 2026-09-07 主人令：「更新于」改为全站统一 v8CardHeader 版式（🦊 胶囊 setBadge 补填），副标题文案保留
+       + '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;padding:10px 14px;border-bottom:1px solid var(--border);border-radius:12px 12px 0 0;min-width:0;">'
+       + '<span style="font-size:15px;line-height:1;flex:0 0 auto;">📚</span>'
+       + '<span style="font-size:14px;font-weight:800;color:var(--cyan);flex:0 0 auto;white-space:nowrap;">机构研究 · AI 解析建议</span>'
+       + '<span style="flex:0 0 auto;" id="maharoFresh">—</span>'
+       + '<span style="font-size:11px;color:var(--dim);margin-left:4px;flex:0 1 auto;min-width:120px;">观澜台/金斧头/逻辑与思考/树枝报告/180K Research/智堡 Wisburg/Vito行研札记 · AI 阅读后撰写 · 每日 08:30 更新</span></div>'
+       + '<div id="maharoCardBody"><div class="note">加载中…</div></div></div>';
+    // ═══ 2026-09-06 主人令：新周期判定卡（海外宏观+AI 大周期 · 事件驱动）═══
+    //   位置：K 型卡上方（事件驱动更新频率 > K 型月度更新）；
+    //   形式：双源对比（白话愍博士原文 vs 我交叉验证），差异处红框高亮；
+    //   数据源：4 次搜索 20+ 源 cross-checked（CME FedWatch / Kalshi / 国泰海通 / 中信建投 / 证券时报 / 沃什讲话）。
+    hm += '<div class="card" style="margin-bottom:16px;border-left:4px solid #60a5fa;">'
+       // ── 标题行：卡名 + ⚡ 事件驱动彩色 badge + 数据源 + 更新时间 ──
+       + '<div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
+       + '<b style="color:#60a5fa;">&#x1F4CC; 核心：</b>海外宏观 + AI 资本开支周期的定性判断。<br>'
+       + '<b style="color:#60a5fa;">&#x1F4A1; 用法：</b>背景认知，辅助顶层仓位与行业配置。<br>'
+       + '<b style="color:#60a5fa;">&#x26A0; 限制：</b>无自动刷新管线，2026-09-06 历史快照，下次更新需手动维护。</div>'
+       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
+       + '<span style="font-size:15px;font-weight:700;color:#60a5fa;">🌐 新周期判定 · 海外宏观 + AI 大周期</span>'
+       // 频率 badge（事件驱动·高亮）：比 K 型的「月度」更显眼
+       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#94a3b2;background:rgba(148,163,184,.16);border:1px solid rgba(148,163,184,.4);letter-spacing:.5px;">📢 历史快照 · 手动维护</span>'
+       + '<span style="font-size:11.5px;color:var(--dim);">数据源：白话愍博士 + 中信建投·周君芝 + CME FedWatch + 国泰海通 + 证券时报 · 4 次搜索 20+ 源 cross-checked</span>'
+       + '</div>'
+       + '<div style="font-size:11.5px;color:var(--dim);margin-bottom:10px;">'
+       + '<b style="color:var(--txt);">更新于 2026-09-06 22:38</b> · <b style="color:#ef5350;">无自动刷新管线</b>，下次更新需手动维护 · 用途：'
+       + '<b style="color:var(--txt);">海外宏观+AI 大周期判断</b>（与下方 K 型卡「国内行业景气」互补）。</div>'
+
+       // ── 顶部：核心结论（合并视角，两源已对齐的部分） ──
+       + '<div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.25);border-radius:7px;padding:10px 13px;margin-bottom:10px;">'
+       + '<div style="font-size:12.5px;font-weight:700;color:#60a5fa;margin-bottom:10px;">📌 核心结论（两源共识）</div>'
+       + '<div style="font-size:12px;line-height:1.55;color:var(--txt);display:flex;flex-direction:column;gap:8px;">'
+       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">①</span><span>8 月非农 <b style="color:#60a5fa;">+16.2 万</b>（3 倍超预期）→ <b style="color:#fb923c;">增长确认（不是滞胀确认）</b></span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">②</span><span>AI 资本开支已<b style="color:#fb923c;">独立于利率</b>（北美四大 CSP 全年 ~7100 亿美元 = 美国 GDP 1%）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">③</span><span>9 月 FOMC <b style="color:#fb923c;">大概率维持</b>（CME 68% / Kalshi 29% 加息，市场认知已撕裂）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">④</span><span>黄金 <b style="color:#fb923c;">短空中多</b>（10Y 4.7% - 7月CPI 3.4% = 实际利率 < 1.5% 已触发多头阈值）</span></div>'
+       + '</div></div>'
+
+       // ── 双源对比表（差异处红框高亮） ──
+       + '<div style="font-size:12px;font-weight:700;color:var(--txt);margin:6px 0 8px;">🔍 双源对比 · <span style="color:#ef5350;">🔴 红色标注 = 我与原文判断的关键差异</span></div>'
+       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">'
+
+       // 子卡 1：白话愍博士原文判断
+       + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:10px 12px;">'
+       + '<div style="font-size:12px;font-weight:700;color:#fbbf24;margin-bottom:10px;">🧑 白话愍博士《新周期已到来》</div>'
+       + '<div style="font-size:11.5px;line-height:1.55;color:var(--txt);display:flex;flex-direction:column;gap:7px;">'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">①</span><span>8月非农→<b>增长确认</b>（非滞胀确认）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">②</span><span>AI 六层：L1/L2/L3 已公开基线+活跃+行业层证据，<b>L4 扩产周期启动</b>、<b>L5 需再证</b>、<b>L6 待证</b></span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">③</span><span>9月 FOMC 维持利率 <b style="color:#fbbf24;">「当前后验 40%」</b>（与 6 月持平）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">④</span><span>AI Capex 独立于利率 = <b style="color:#fbbf24;">38% 后验</b>（盘面开始支持）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">⑤</span><span>黄金 <b style="color:#fbbf24;">短空中多</b>（短空：美元走强+实际利率上行；中多：长期通胀粘性+信用稀释）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">⑥</span><span>美元信用稀释 <b style="color:#fbbf24;">短空长多 83%</b></span></div>'
+       + '</div></div>'
+
+       // 子卡 2：我的判断（交叉验证）
+       + '<div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.3);border-radius:7px;padding:10px 12px;">'
+       + '<div style="font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:10px;">🤖 我的判断 · 跨源交叉验证</div>'
+       + '<div style="font-size:11.5px;line-height:1.55;color:var(--txt);display:flex;flex-direction:column;gap:7px;">'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">①</span><span>增长是 <b style="color:#60a5fa;">K 型化</b>（非普惠）—— 强：建筑/制造/AI基建（+7.5万）；<b style="color:#26a69a;">弱：信息业 -2.3万、金融业 -1.1万（AI 替代白领首批实证）</b></span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">②</span><span>L4 芯片/光通 <b style="color:#60a5fa;">从「涨价」叙事切到「产能扩张」叙事</b>（关键转折）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">②</span><span>L5 产业链 <b style="color:#60a5fa;">已显著盈利</b>（中际旭创 26H1 净利+242%、营收+182%；光纤 1-7 月利润+468%）→ <b style="color:#ef5350;">原文「需再证」应改为「已过」</b></span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">③</span><span><b style="color:#ef5350;">原文「9月维持 40%」偏保守</b>——CME 显示 40%→<b style="color:#fb923c;">68% 加息</b>，实际是「鹰派重定价」（市场认知已撕裂：CME 68% vs Kalshi 29% 加息）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">④</span><span>9月 <b style="color:#60a5fa;">维持 ~65%</b>（沃什讲话已定价，9/9 CPI 出来前不动）→ 12月 <b style="color:#60a5fa;">保险式加息 25bp ~50%</b>（CPI 还热+沃什「信誉」未恢复）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">⑤</span><span>AI Capex 独立于利率 = <b style="color:#60a5fa;">75% 后验</b>（L5 盈利 + 云厂 +70% Capex 印证，<b style="color:#ef5350;">原文 38% 偏保守</b>）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">⑥</span><span>黄金多配 <b style="color:#60a5fa;">触发位已量化</b>：<b style="color:#fb923c;">实际利率 < 1.5% = 多头信号已触发</b>（10Y 4.7% - 7月CPI 3.4%）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">⑦</span><span><b style="color:#60a5fa;">原文未讲 A 股板块映射</b>——补：防御底仓（红利/银行/煤炭/石油石化/公用事业）+ 进攻（算力龙头非涨价逻辑/半导体设备/黄金股）+ 避免（内需消费/长久期债/美股硬件涨价）</span></div>'
+       + '</div></div>'
+
+       + '</div>' // /双源 grid
+
+       // ── 三情景概率（我的判断 + 原文章节都有，这里合并一行） ──
+       + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:10px 13px;margin-bottom:8px;">'
+       + '<div style="font-size:12.5px;font-weight:700;color:#fbbf24;margin-bottom:6px;">📊 三情景概率（共识框架）</div>'
+       + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:12px;">'
+       + '<div><span style="color:#fbbf24;">乐观 30%</span> <span style="color:var(--dim);">█ █ █ ▍</span><div style="font-size:10.5px;color:var(--dim);">AI 拉生产率+美元软着陆</div></div>'
+       + '<div><span style="color:#fbbf24;">基准 45%</span> <span style="color:var(--dim);">█ █ █ █ █ ▌</span><div style="font-size:10.5px;color:var(--dim);">AI 拉生产率但慢，9月不加息</div></div>'
+       + '<div><span style="color:#fbbf24;">悲观 15%</span> <span style="color:var(--dim);">█ █ ▎</span><div style="font-size:10.5px;color:var(--dim);">加息+AI 替代加速消费弱</div></div>'
+       + '<div><span style="color:#fbbf24;">尾部 10%</span> <span style="color:var(--dim);">█ ▌</span><div style="font-size:10.5px;color:var(--dim);">不可平均</div></div>'
+       + '</div></div>'
+
+       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">🔭 仅供研究参考，不构成个人投资建议 · 数据时点以原文为准 · 差异标注 = 我的判断（4 次搜索 20+ 源 cross-checked）vs 白话愍博士原文</div>'
+       + '</div>';
+
+    // ═══ 2026-09-04 主人令：宏观景气背景（K型分层）迁入宏观观测 pane（主人自看 · 背景认知 · 适合查阅不适合盯盘）═══
+    //   静态内容内联，无 data 依赖/无管线；数据源：沧海一土狗（公众号）K型行业景气图；每月 1 日随宏观数据手动更新此处。
+    //   更新记录：2026-09-04 部署（7月数据口径）；下次更新 2026-10-01（主人 09-04 令：标题行须带「更新于/下次更新」）。
+    //   🛡 2026-09-06 主人令：在标题行加「📅 月度更新」彩色 badge，与上方新卡的「⚡ 事件驱动」频率区别更明显。
+    //   红涨绿跌铁律适用：增速为正=红(扩张)，为负=绿(收缩)。
+    hm += '<div class="card" style="margin-bottom:16px;border-left:4px solid #fbbf24;">'
+       + '<div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
+       + '<b style="color:#fbbf24;">&#x1F4CC; 核心：</b>用 K 型框架把行业分为扩张/中性/收缩三区。<br>'
+       + '<b style="color:#fbbf24;">&#x1F4A1; 用法：</b>理解为什么某些板块资金持续流入/流出，辅助背景判断。<br>'
+       + '<b style="color:#fbbf24;">&#x26A0; 限制：</b>静态月度更新（7月数据），适合查阅不适合盯盘。</div>'
+       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
+       + '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🌍 宏观景气背景 · K 型分层</span>'
+       // 频率 badge（月度更新·低饱和黄色）：与新卡的橙色事件驱动 badge 区分
+       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#fbbf24;background:rgba(251,191,36,.16);border:1px solid rgba(251,191,36,.4);letter-spacing:.5px;">📅 月度更新 · 每月 1 日</span>'
+       + '<span style="font-size:12px;color:var(--dim);">7月数据 · 来源：沧海一土狗 · <b style="color:var(--dim);">更新于 2026-09-04</b> · 下次更新 2026-10-01</span></div>'
+       + '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;">帮你理解<b style="color:var(--txt);">为什么某些板块资金持续流入</b>（外需+AI+技改 vs 地产链+财政收缩）——背景认知，适合查阅不适合盯盘。</div>'
+       + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;">'
+       // ── 扩张区（K型上端 · 红） ──
+       + '<div style="background:rgba(239,83,80,.06);border:1px solid rgba(239,83,80,.25);border-radius:7px;padding:9px 11px;">'
+       + '<div style="font-size:12.5px;font-weight:700;color:#ef5350;margin-bottom:5px;">▲ 扩张区 · K 型上端</div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">出口</span><b style="color:#ef5350;">+23.9%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">通讯器材零售</span><b style="color:#ef5350;">+15~20%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">高技术制造业</span><b style="color:#ef5350;">+13.8%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">计算机通信电子</span><b style="color:#ef5350;">+19.1%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">铁路运输设备</span><b style="color:#ef5350;">+13.6%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">专用设备</span><b style="color:#ef5350;">+12.6%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">装备制造业</span><b style="color:#ef5350;">+9.7%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">化妆品零售</span><b style="color:#ef5350;">+6.3%</b></div>'
+       + '</div>'
+       // ── 中性区（灰） ──
+       + '<div style="background:rgba(154,164,178,.06);border:1px solid rgba(154,164,178,.25);border-radius:7px;padding:9px 11px;">'
+       + '<div style="font-size:12.5px;font-weight:700;color:#9aa4b2;margin-bottom:5px;">◆ 中性区 · 总量平稳</div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">规上工业增加值</span><b style="color:#9aa4b2;">+4.5%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">社会消费品零售</span><b style="color:#9aa4b2;">+0.6%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">调查失业率</span><b style="color:#9aa4b2;">5.2%</b></div>'
+       + '<div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(154,164,178,.3);font-size:11px;line-height:1.7;color:var(--dim);">总量无感，结构剧烈分化——这正是 K 型的含义。</div>'
+       + '</div>'
+       // ── 收缩区（K型下端 · 绿） ──
+       + '<div style="background:rgba(38,166,154,.06);border:1px solid rgba(38,166,154,.25);border-radius:7px;padding:9px 11px;">'
+       + '<div style="font-size:12.5px;font-weight:700;color:#26a69a;margin-bottom:5px;">▼ 收缩区 · K 型下端</div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">房地产投资</span><b style="color:#26a69a;">-19.2%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">汽车零售</span><b style="color:#26a69a;">-17.0%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">基建投资(7月单月)</span><b style="color:#26a69a;">-12.9%~-14.7%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">煤炭开采</span><b style="color:#26a69a;">-10.8%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">金银珠宝零售</span><b style="color:#26a69a;">-10.1%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">家具建材零售</span><b style="color:#26a69a;">-3~-9%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">基建投资(累计)</span><b style="color:#26a69a;">-3.6%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">财政支出(二季度)</span><b style="color:#26a69a;">-8.4%</b></div>'
+       + '</div>'
+       + '</div>'
+       // ── 框架要点（沧海一土狗） ──
+       + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:9px 12px;margin-top:10px;font-size:12px;line-height:1.8;color:var(--sub);">'
+       + '<b style="color:#fbbf24;">📖 框架要点（沧海一土狗 · 金融抑制模型）：</b>'
+       + '① 货币政策刺激<b style="color:var(--txt);">外需</b>、财政政策刺激<b style="color:var(--txt);">内需</b>（宋铮 <i>Growing Like China</i> 框架）；'
+       + '② 社零 3.7% 年增目标（2030 年 60 万亿）约束降息空间 → 政策组合转向<b style="color:var(--txt);">财政为主</b>；'
+       + '③ 投资曲线弹性是核心特征值：缺弹性时降息抑制内需（资金外流+出口），弹性修复后降息才利好股市；'
+       + '④ 对 A 股映射：<b style="color:#ef5350;">外需+AI+技改链</b>景气持续 vs <b style="color:#26a69a;">地产链+基建链</b>收缩——与行业树图/板块资金的分化互为印证。</div>'
+       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">🔭 仅供研究参考，不构成个人投资建议 · 数据时点以原文为准</div>'
+       + '</div>';
+    hm += '</div>'; // /ulPaneMacro
+    var _host = document.getElementById('macroHost');
+    if(_host) _host.innerHTML = hm;
+  };
   window.renderUnlisted=renderUnlisted;
   window.renderDelisted=renderDelisted;
   // 🛡 2026-08-19 阿狸咪根治空白bug：整个 JS 在 IIFE 内，render 函数必须显式挂 window
