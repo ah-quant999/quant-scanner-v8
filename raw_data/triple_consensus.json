@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-12 15:12:50",
+  "update_time": "2026-09-12 16:04:08",
   "data_time": "2026-09-12 15:06:23",
   "count": 2,
   "near_miss_count": 8,
@@ -29,14 +29,14 @@
         "form_A": false
       },
       "sectors": [
-        "有色金属矿采选业",
-        "2026中报预增",
+        "MSCI中国",
         "新材料",
-        "钒电池",
-        "稀缺资源",
-        "锂矿概念",
         "昨日炸板",
-        "MSCI中国"
+        "有色金属矿采选业",
+        "稀缺资源",
+        "钒电池",
+        "锂矿概念",
+        "2026中报预增"
       ],
       "fund_detail": "",
       "sector_detail": "黄金概念-43.9亿",
@@ -93,14 +93,14 @@
         "form_A": false
       },
       "sectors": [
-        "HS300",
+        "2026一季报预增",
+        "MSCI中国",
+        "上证180",
+        "周期股",
         "电气机械和器材制造业",
         "沪股通",
-        "周期股",
-        "2026中报预增",
-        "上证180",
-        "2026一季报预增",
-        "MSCI中国"
+        "HS300",
+        "2026中报预增"
       ],
       "fund_detail": "",
       "sector_detail": "储能概念-43.5亿",
@@ -152,14 +152,14 @@
         "form_A": false
       },
       "sectors": [
-        "生物识别",
-        "HS300",
-        "2026中报预增",
-        "计算机、通信和其他电子设备制造业",
         "新材料",
+        "生物识别",
         "毫米波概念",
-        "MSCI中国",
-        "物联网"
+        "物联网",
+        "计算机、通信和其他电子设备制造业",
+        "2026中报预增",
+        "HS300",
+        "MSCI中国"
       ],
       "enter_date": "2026-09-08",
       "industry": "计算机、通信和其他电子设备制造业",
@@ -224,14 +224,14 @@
         "form_A": false
       },
       "sectors": [
-        "昨日高振幅",
-        "软件和信息技术服务业",
         "融资融券",
-        "科创板做市股",
-        "半导体概念",
         "中证500",
+        "半导体概念",
+        "软件和信息技术服务业",
         "超清视频",
-        "MSCI中国"
+        "昨日高振幅",
+        "MSCI中国",
+        "科创板做市股"
       ],
       "enter_date": "2026-09-12",
       "industry": "软件和信息技术服务业",
@@ -295,34 +295,6 @@
       "miss_steps": 1,
       "close": 29.7,
       "pct_chg": 2.84,
-      "pct_chg_20d": 0,
-      "signals": {
-        "chan": true,
-        "jinzuan": true,
-        "jigou": false,
-        "trend": false,
-        "form_A": false
-      },
-      "sectors": [],
-      "enter_date": "2026-09-12",
-      "industry": ""
-    },
-    {
-      "code": "00291",
-      "name": "华润啤酒",
-      "market": "hk",
-      "board": "港股",
-      "total_score": 28.6,
-      "top10_rank": 5,
-      "a_score": 0,
-      "quality_grade": "",
-      "in_top10": true,
-      "in_tier_a": false,
-      "in_tier_b": false,
-      "in_good_fund": false,
-      "miss_steps": 1,
-      "close": 18.91,
-      "pct_chg": 0.16,
       "pct_chg_20d": 0,
       "signals": {
         "chan": true,
@@ -407,6 +379,34 @@
       "miss_steps": 1,
       "close": 10.36,
       "pct_chg": -8.96,
+      "pct_chg_20d": 0,
+      "signals": {
+        "chan": true,
+        "jinzuan": true,
+        "jigou": false,
+        "trend": false,
+        "form_A": false
+      },
+      "sectors": [],
+      "enter_date": "2026-09-12",
+      "industry": ""
+    },
+    {
+      "code": "00291",
+      "name": "华润啤酒",
+      "market": "hk",
+      "board": "港股",
+      "total_score": 28.6,
+      "top10_rank": 5,
+      "a_score": 0,
+      "quality_grade": "",
+      "in_top10": true,
+      "in_tier_a": false,
+      "in_tier_b": false,
+      "in_good_fund": false,
+      "miss_steps": 1,
+      "close": 18.91,
+      "pct_chg": 0.16,
       "pct_chg_20d": 0,
       "signals": {
         "chan": true,

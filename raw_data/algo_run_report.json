@@ -1,11 +1,11 @@
 {
-  "update_time": "2026-09-12 15:49:11",
-  "run_start": "2026-09-12 14:14:03",
-  "ok": 26,
+  "update_time": "2026-09-12 16:30:19",
+  "run_start": "2026-09-12 16:04:07",
+  "ok": 0,
   "fail": 1,
   "failed_scripts": [
     {
-      "script": "track_h_auto_buy.py",
+      "script": "final_recommend.py",
       "reason": "监督器静默杀(>15min 无输出)"
     }
   ],
