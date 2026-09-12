@@ -34,14 +34,15 @@ jobs:
           python -m pip install playwright
           python -m playwright install chromium
 
-      - name: "🔄 同步远端最新 main（避免 ?v 漂移竞态）"
+      - name: "🔄 同步远端最新 main（避免 ?v 漂移竞态，best-effort）"
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin main
-          git reset --hard origin/main
+          git fetch origin main || echo "⚠️ fetch 失败，沿用 checkout 已拉取的最新 main"
+          git reset --hard origin/main || echo "⚠️ reset 失败，沿用 checkout 已拉取的最新 main"
 
       - name: "🕸️ 抓取 ima 强势股日报"
         run: python fetch_ima_strong_stock.py
@@ -49,14 +50,14 @@ jobs:
       - name: "🔁 重写 index.html 的 ?v 缓存戳（与刚生成的 data 文件对齐）"
         run: python update_v8.py --only-cache-busters
 
-      - name: "🚀 提交并推送"
+      - name: "🚀 推送到仓库（api_push_raw.py，Contents API 增量）"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git add raw_data/ima_strong_stock.json data/IMA_STRONG_STOCK.js index.html
-          if git diff --cached --quiet; then
-            echo "无变化，跳过提交"
-          else
-            git commit -m "📡 ima 强势股自动同步 $(date +%Y-%m-%d)"
-            git push origin HEAD:refs/heads/main
-          fi
+          set -e
+          # 🛡 2026-09-12 一劳永逸根治（与实验卡同根因）：原 git fetch + git push HEAD:main
+          #   偶发非 fast-forward / 网络超时失败。改用 api_push_raw.py（零 git fetch，免疫 cn git 墙），
+          #   index.html 由 update_v8.py --only-cache-busters 已重写 ?v，一并纳入 PUSH_FILES。
+          PUSH_FILES="raw_data/ima_strong_stock.json,data/IMA_STRONG_STOCK.js,index.html" \
+            python api_push_raw.py
+          echo "✅ ima 强势股 data/raw_data/index.html 已推送（Contents API）"
