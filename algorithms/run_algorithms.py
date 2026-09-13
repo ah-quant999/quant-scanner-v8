@@ -21,8 +21,7 @@ import threading
 
 # ── 单脚本超时（2026-08-31 一劳永逸修复）──────────────────────────────────
 # 背景：原代码把 1800s 硬编码在两处 subprocess.run，实测 run 33316835316 中
-#   calc_stock_rps.py 因遍历全 universe（数千只）逐只取 K 线 + 网络退避重试，
-#   30 分钟不够 → 超时被杀 → data/STOCK_RPS.js 长期陈旧（前端 RPS 卡不更新）。
+#   某些脚本网络重活可能超时，故默认阈值可配并允许单脚本放宽。
 # 修法：默认阈值可配（V8_ALGO_TIMEOUT），并给重活单独放宽，不影响其他脚本。
 import os as _os
 
@@ -30,7 +29,6 @@ DEFAULT_SCRIPT_TIMEOUT = int(_os.environ.get("V8_ALGO_TIMEOUT", "1800"))
 
 # 计算量大 / 网络重活单独放宽（秒）。新增重活在此登记即可，无需改调度代码。
 SCRIPT_TIMEOUT_OVERRIDE = {
-    "calc_stock_rps.py": 3600,   # 全 universe 逐只取 K 线，实测 30min 偶发不够
     # 🛡 2026-09-11 一劳永逸：2700s(45min) 实测不足 —— run#1692 于 05:22 起跑、06:07 被
     #   「超时 >45min」杀掉 → 无产物 → B 批 2/3 → target_stage 恒为 B → D/E 永不执行
     #   （FINAL_RECOMMEND_DATA 停在昨日的结构性真凶）。放宽到 90min 留足余量。
@@ -149,7 +147,6 @@ ORDER = [
     "calc_crds.py",
     "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（B批最前：final_recommend 前必产完，因子融合用当日新鲜因子；2026-09-09 主人令由 E 前置至此）
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
-    "calc_stock_rps.py",               # → data/STOCK_RPS.js（个股RPS+RS，读 candidate.json 做 universe）
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
     # 🛡 2026-08-29 主人令：A/B 对照（金股池/候选池/全市场同一信号收益），每日累积信号、T+N 后回填收益。
     "backtest_tdx.py",                 # 读 gold_pool 输入
@@ -211,7 +208,6 @@ ORDER = [
 
     "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top5，管线最终产物，置于末尾）
     #   前端策略回顾卡长期为空/陈旧）。统一挂链尾（依赖各自历史/截面数据已就位）。
-    #   - rps：读 stock_rps 截面（RPS 为相对强度指标，非选股信号引擎，回测为截面有效性说明）
     #   三者失败均不影响选股结果，仅自身卡片可能不刷新。
 
     # 🆕 2026-09-04 主人令「都按你的建议做」：因子实验室独立分层回测（升4⭐证据链）
@@ -279,7 +275,7 @@ STAGES = {
         # 🛡 2026-09-09 主人令：因子实验室生成器前置到 B 批最前——必须在 final_recommend(D批20:00) 之前产完，
         #   否则「为更好选股」的因子融合只能吃昨日陈旧数据。生成器 50-90min baostock 冷启动，18:10 起跑→19:40 前产完，D 批必吃到当日新鲜因子。
         "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js + raw_data/factor_lab.json（baostock，冷启动长）
-        "calc_crds.py", "build_candidate_pool.py", "calc_stock_rps.py", "generate_top10.py",
+        "calc_crds.py", "build_candidate_pool.py", "generate_top10.py",
         "strategy_four_volume_60m.py", "strategy_four_volume.py",
         "market_regime.py", "sector_recommendation.py",
         "update_triple_resonance_history.py",   # 累积 triple_resonance_history（在 gen_triple_consensus 之前）
@@ -319,7 +315,7 @@ STAGES = {
         # 🛡 2026-09-09 主人令：因子实验室「生成器」已前置到 B 批最前（必须在 final_recommend 前产完），
         #   此处 E 批仅保留其「分层回测」——读 FACTOR_LAB 做五分位分层验证（研究性质，不进选股打分），置于最终推荐之后无害。
         #   链内由 run_algorithms.py 统一注入 V8_IN_CHAIN=1 → 本脚本自带 git push 自动跳过。
-        "factor_lab_backtest.py",   # 🆕 因子实验室分层回测（读 _rps_cache，依赖 B 批 calc_stock_rps + 当日 FACTOR_LAB）
+        "factor_lab_backtest.py",   # 🆕 因子实验室分层回测
         "v8/backtest_crds.py",   # → data/CRDS_BACKTEST.js （逆势龙头回测；2026-09-09 挂链补登，此前仅存在于 v8/ 目录、STAGES/ORDER 均未挂 → 永远跑不到）
         # 2026-09-06 主人令：AI预测卡回测 INVALID → 下架，停跑 path_probability_backtest.py
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
@@ -453,7 +449,6 @@ STOCK_PICKING_SCRIPTS = {
     # 核心选股策略
     "calc_crds.py",                  # CRDS 逆势龙头（前端 17:13 更新元凶）
     "build_candidate_pool.py",       # 候选池/金股池聚合
-    "calc_stock_rps.py",             # 个股 RPS（依赖候选池结果）
     "generate_top10.py",             # 多维共振 TOP10 精选
     "strategy_four_volume.py",       # 四量终极 日线选股
     "strategy_four_volume_60m.py",   # 四量终极 60min 选股
@@ -495,9 +490,9 @@ def _is_post_close_picking_ready():
     🛡 2026-08-29 一劳永逸根因修复（候选池停更 3 天的真凶）：
     原写法只判断「hour > 18」，把**次日凌晨补跑**（00:00~08:59）也误判成
     「未到 18:00」→ 实测 run #1204 在北京时间 08-29 00:43 跑算法链，
-    20 个选股脚本（calc_crds / build_candidate_pool / calc_stock_rps /
+    20 个选股脚本（calc_crds / build_candidate_pool /
     generate_top10 / strategy_four_volume* ...）被整批跳过 → 候选池不产出 →
-    CRDS / RPS / 最终推荐整条选股链停更，链尾闸门随之 failure。
+    CRDS / 最终推荐整条选股链停更，链尾闸门随之 failure。
 
     本门控真正要挡的是「盘中/盘前数据不全时抢跑选股」，不是挡凌晨补跑 ——
     凌晨时上一交易日的盘后数据早已齐全。

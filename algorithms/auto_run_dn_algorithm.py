@@ -171,7 +171,7 @@ def _fetch_kline_akshare(code, bars=250):
 # ════════════════════════════════════════════════════════════════════════════
 KLINE_CACHE_DIR = RAW_DIR / "kline_cache"
 _KLINE_STAT = {"cache_fresh": 0, "cache_stale": 0, "net": 0, "fail": 0}
-_SRC_UNIFIED = None   # calc_stock_rps._query_kline 延迟导入句柄（None=未试，False=失败）
+_SRC_UNIFIED = None
 
 
 def _unified_query_kline():

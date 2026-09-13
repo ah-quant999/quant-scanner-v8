@@ -137,18 +137,16 @@ DATA_SOURCES = {
     "ai_insights_compare.json":     "AI_INSIGHTS_COMPARE",
     # 2026-09-10 主人令：因子补缺 walk-forward 进度跟踪卡（暂未上架），源 FACTOR_AUDIT
     "factor_progress.json":         "FACTOR_PROGRESS",
-    # 🛡 2026-08-26 一劳永逸根因修复：原 DATA_SOURCES 漏挂 final_recommend.json / stock_rps.json 映射，
-    #   这两个 .js 仅由算法脚本（final_recommend.py / calc_stock_rps.py）写入，而云端 build 的 update_v8 步骤
-    #   不覆盖它们 → data/FINAL_RECOMMEND_DATA.js、data/STOCK_RPS.js 站点读的 window.* 永远停在 08-22（源 raw_data 已是 08-25 新鲜）。
+    # 🛡 2026-08-26 一劳永逸根因修复：原 DATA_SOURCES 漏挂 final_recommend.json 映射，
+    #   该 .js 仅由算法脚本 final_recommend.py 写入，而云端 build 的 update_v8 步骤
+    #   不覆盖它 → data/FINAL_RECOMMEND_DATA.js 站点读的 window.* 永远停在 08-22（源 raw_data 已是 08-25 新鲜）。
     #   补映射后，云端 build 自动按 raw_data 重建，杜绝复发。
     "final_recommend.json":        "FINAL_RECOMMEND_DATA",
-    "stock_rps.json":              "STOCK_RPS_DATA",
     # 🛡 2026-09-10 主人令：factor_lab.json 原只在 run_algorithms B 批由 v8/factor_lab_gen.py
     #   直接写 data/FACTOR_LAB.js，但 B 批在云端/家里机常因 baostock 超时失败 → FACTOR_LAB.js
     #   停更 2 天。补映射后，只要 raw_data/factor_lab.json 已新鲜提交，update_v8 即可独立重建 js。
     "factor_lab.json":             "FACTOR_LAB",
     "factor_lab_backtest.json":    "FACTOR_LAB_BACKTEST",  # 🆕 2026-09-04 因子实验室独立分层回测
-    "rps_backtest.json":           "RPS_BACKTEST",  # 🆕 2026-09-06 主人令：RPS 30天样本考核防孤儿（weekly_cleanup 有映射不删；考核详见 DO_NOT_DELETE.md / logic.html）
     # "path_probability_backtest.json": "PATH_PROB_BACKTEST",  # 2026-09-06 已注释：AI预测卡下架，停止发布
     # 🗑 2026-09-11 主人 P3（清理孤儿链）：ETF_SUBSCRIPTION_EM 全链下线 ——
     #   原 fetcher（scripts/fetch_etf_subscription_em.py）在 workflow 里一直跑、raw 一直产出，
@@ -282,10 +280,9 @@ CATEGORY_MAP = {
     # 2026-08-19：板块推荐框架数据源（盘后跑宏观+板块融合；MACRO.js 已删孤儿→不注册）
     "MARKET_REGIME": "post_close",
     "SECTOR_RECOMMENDATION": "post_close",
-    # 🛡 2026-08-26 一劳永逸根因修复：final_recommend / stock_rps 与 FINAL_RECOMMEND_DATA / STOCK_RPS_DATA
+    # 🛡 2026-08-26 一劳永逸根因修复：final_recommend 与 FINAL_RECOMMEND_DATA
     #   归属盘后（与 finalRec 同节奏），补类别映射使 --category post_close / --detect-changes 能正确重建。
     "FINAL_RECOMMEND_DATA": "post_close",
-    "STOCK_RPS_DATA": "post_close",
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告（cloud_fetch 注册为 premarket，日频）
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：与 cloud_fetch_v8.py 同步加 post_close。
     #   注释写着「盘后数据页」却只在盘前重建 data/*.js —— 盘后重抓了 raw 却不重生成 js，半截更新。

@@ -10,9 +10,7 @@ factor_lab_backtest.py — 因子实验室独立分层回测（2026-09-04 主人
   升 4⭐ 另需「异常换手扩全市场扫描」（数据侧另行开启后复验）。
 
 数据源：
-  raw_data/_rps_cache/*.json — universe 名单（重点池 A股 6 位码；calc_stock_rps 当日产出）
-  K 线历史 — 复用 calc_stock_rps 的三级兜底抓数链（mootdx→东财→baostock）拉 700 交易日长历史
-             （拉不到的票回落 _rps_cache 的 300 日缓存，可回测调仓点相应变少）
+  K 线历史 — 用 mootdx/东财/baostock 拉 700 交易日长历史
   raw_data/factor_lab.json — 当期 ROE_TTM Top30（ROE 因子用）
 
 方法论（每个数字可追溯，无前视）：
@@ -33,7 +31,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 BASE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(BASE)
 RAW = os.path.join(ROOT, "raw_data")
-CACHE_DIR = os.path.join(RAW, "_rps_cache")
 OUT_JSON = os.path.join(RAW, "factor_lab_backtest.json")
 
 COST = 0.0020          # 往返成本
@@ -45,7 +42,6 @@ NEED_MIN = BASELINE + RECENT + 1   # 参与分层的最少历史
 FETCH_DAYS = 700       # 拉取长历史（≈ 34 个月，可容纳 ~40 个调仓点）
 
 sys.path.insert(0, BASE)
-from calc_stock_rps import _query_kline, _load_cache  # noqa: E402  复用三级兜底抓数链
 
 
 def _log(m=""):

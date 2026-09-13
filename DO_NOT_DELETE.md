@@ -81,23 +81,6 @@
 | `raw_data/etf_subscription_em.json` | ETF 申购赎回东方财富分类聚合（5 类 + 亿元） | 旧宽基+亿份口径（data/ETF_SUBSCRIPTION.js / raw_data/etf_subscription.json）已于 2026-09-06 主人令轻量化全链删除 |
 | `raw_data/freshness_sla.json` | 新鲜度 SLA 体检输出（最近 13 个核心 raw_data 文件的 update_time 状态） | `scripts/freshness_sla.py` 产出；挂 `v8_algo.yml 17:00` |
 
-**🛡 2026-09-06 主人令：RPS 相对强度「30 天样本考核」保护段（前端入口已下线，数据链必须保留到考核出结果）**
-
-> ⚠️ **背景**：相对强度（RPS）选股策略子 tab 已于 2026-09-03 轻量化下线（`renderRpsScreen` 已删、`__MODULE_STARS` 已移除 rps），但主人 2026-09-06 拍板：**数据链保留，按「因子实验室同款标准」跑 30 个交易日样本考核再定去留**。前端无展示 → 极易被当作"无人消费的孤儿"误删，特立此段防遗忘/防误删。
->
-> **考核标准（与因子实验室同口径）**：自 2026-09-05 起满 **30 个交易日**（约 2026-10-中），若 `raw_data/rps_backtest.json` 的 **A 档 T+1 胜率 ≥55% 且 T+5/T+10 平均收益为正** → 再谈恢复选股策略子 tab 甚至进评分权重；**不达标 → 彻底降级为「个股详情命中行」展示层，策略页永不恢复**。
->
-> **考核期内禁止删除的文件链**：
-> | 文件 | 角色 | 产出方 |
-> |---|---|---|
-> | `v8/backtest_rps.py` | 回测引擎（读日归档 → rps_backtest.json） | 已挂算法链 E 批（2026-09-06） |
-> | `raw_data/rps_backtest.json` | 考核核心产物（A档 T+1/3/5/10/20 胜率收益） | `v8/backtest_rps.py`（E 批每日刷新） |
-> | `raw_data/history/stock_rps_*.json` | 每日 RPS 快照归档（回测的输入源，删了考核直接报废） | `algorithms/calc_stock_rps.py:668` |
-> | `raw_data/stock_rps.json` + `data/STOCK_RPS.js` | 当日 RPS 截面（详情命中行消费） | `calc_stock_rps.py`（B 批） |
-> | `data/RPS_BACKTEST.js` | 回测 JS 产物（update_v8 已加映射防孤儿清理，前端暂不注入属正常） | `update_v8.py` |
-> | `algorithms/calc_stock_rps.py` 的 history 归档逻辑（:668） | 日归档开关 | 算法链 B 批 |
->
-> **防孤儿双保险**：① `update_v8.py` DATA_SOURCES 已加 `"rps_backtest.json": "RPS_BACKTEST"` 映射（weekly_cleanup 有映射不删）；② 本清单 pre-commit 拦截 `raw_data/*.json` 删除。**任何轻量化/瘦身/清理操作不得删除上表文件**。
 
 **🛡 2026-09-06 主人令：暂未上架实证链保护段（AI预测三轮实证归档；潜力挖掘当晚全链下线）**
 
@@ -284,6 +267,5 @@
 > 🟢 豁免 `data/TOP5_TRACK.js`：TOP5 滚动跟踪样本<30 长期空表，主人 2026-08-30 令彻底删除（A 方案），随孤儿脚本一并移除，无前端/下游依赖。
 > 🟢 豁免 `algorithms/gen_top5_track.py`：随 TOP5_TRACK 数据一并删除的孤儿算法脚本，run_algorithms.py 已移除其调度，无任何前端/下游依赖。
 
-> 🟢 豁免 `data/RPS_BACKTEST.js`：RPS 相对强度选股层已按主人令（2026-09-05）从选股策略子页全方位下线，data/RPS_BACKTEST.js 全站0引用，允许删除（2026-09-05 轻量化收尾）。
 > 🟢 豁免 `raw_data/backtest_h_vs_momentum.json`：老动量 vs H反推回测残留，已归档，全站0引用，允许删除（2026-09-05 轻量化收尾）。
 > 🟢 豁免 `raw_data/hunter_backtest.json`：大牛股猎手回测残留，已按主人令（2026-09-03）下线，全站0引用，允许删除（2026-09-05 轻量化收尾）。

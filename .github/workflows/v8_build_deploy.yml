@@ -115,7 +115,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           # ★ 2026-08-15 根治 build clobber：必须全量克隆（fetch-depth: 0），否则浅克隆
-          #   reset --hard FETCH_HEAD 拉不到 cn 单独推送的 5 个 extra 文件（STOCK_RPS 等）
+          #   reset --hard FETCH_HEAD 拉不到 cn 单独推送的 4 个 extra 文件
           #   最新 blob，本地副本落后 → ?v 算成陈旧值 → CDN 吐旧副本。全量克隆保证
           #   reset 后本地 data/*.js 与线上严格一致，?v 一律取本地文件即权威。
           fetch-depth: 0
@@ -192,7 +192,7 @@ jobs:
             # 🔒 取远端最新 main（含阿狸咪/cn 直接推仓的 data/*.js），消除 push 事件
             #   checkout 滞后导致的 ?v 陈旧失配：先 sync 远端再 reconcile，确保 ?v 对齐到
             #   「当前线上最新数据」而非构建机滞后副本（2026-08-15 缓存戳铁律根因修复·续）。
-            #   这 5 个文件(FOUR_VOLUME/FOUR_VOLUME_60M/STOCK_RPS/STOCK_STOP_DATA/
+            #   这 4 个文件(FOUR_VOLUME/FOUR_VOLUME_60M/STOCK_STOP_DATA/
             #   FINAL_RECOMMEND_DATA) 只由 cn 直接推，update_v8 不重建，构建机 checkout
             #   若落后 cn 最新推送就会拿到旧内容算旧 ?v → CDN 吐旧副本。先 reset 到
             #   FETCH_HEAD 即拿到 cn 最新版，reconcile 即可对齐。
@@ -206,8 +206,7 @@ jobs:
             git reset --hard FETCH_HEAD
             cp /tmp/index.html.manual index.html
             # 同步 cn runner 单独推送的 5 个 extra 文件（update_v8.py 不重建这些），
-            #   确保 ?v 计算基于线上真实最新内容。
-            git checkout FETCH_HEAD -- data/FOUR_VOLUME.js data/FOUR_VOLUME_60M.js data/STOCK_RPS.js data/STOCK_STOP_DATA.js data/FINAL_RECOMMEND_DATA.js
+            #   确保 ?v 计算基于线上真实最新内容。            git checkout FETCH_HEAD -- data/FOUR_VOLUME.js data/FOUR_VOLUME_60M.js data/STOCK_STOP_DATA.js data/FINAL_RECOMMEND_DATA.js
             # ★ update_v8.py 是 build 内 ?v 的唯一权威：自身重写过的文件用本地新鲜内容，
             #   cn 单独推送的 5 个 extra 文件用线上真实内容（GITHUB_TOKEN 经 git blobs API）。
             #   二者都已中性化 republish_time 后取 sha1 前 10 位，与独立 reconcile 完全一致。
@@ -297,7 +296,7 @@ jobs:
             #   累加型 raw_data 此前只靠 cn_fetch/algo_cloud 的 api_push_raw（Contents API + git status 变更清单），
             #   遇大 tree 会 HTTP 422 失败且 continue-on-error 吞掉 → 这些文件永不持久化 → 每轮构建从陈旧基线重来（死亡螺旋）。
             #   现由本部署步用【可靠 git】一并提交累加型小文件（非缓存），确保下一轮 checkout 拿到真实累积基线。
-            #   仅列历史累加型文件，避免把 kline/_rps 等缓存（共 51M）塞进仓库。
+            #   仅列历史累加型文件，避免把 kline 等缓存塞进仓库。
             # 🛡 2026-09-02 一劳永逸根因修复（?v 缓存戳防线·提交前守卫）：
             #   上方 update_v8.py 已重写 ?v，但 BUILD 戳注入/护栏步骤不碰 ?v，故此处再跑一次
             #   --only-cache-busters 确保「即将提交的 index.html ?v」与「即将提交的 data/*.js 实际
@@ -332,8 +331,7 @@ jobs:
             # 重试路径同样备份/恢复 index.html，避免人工前端改动被擦除
             cp index.html /tmp/index.html.manual
             git reset --hard FETCH_HEAD
-            cp /tmp/index.html.manual index.html
-            git checkout FETCH_HEAD -- data/FOUR_VOLUME.js data/FOUR_VOLUME_60M.js data/STOCK_RPS.js data/STOCK_STOP_DATA.js data/FINAL_RECOMMEND_DATA.js
+            cp /tmp/index.html.manual index.html            git checkout FETCH_HEAD -- data/FOUR_VOLUME.js data/FOUR_VOLUME_60M.js data/STOCK_STOP_DATA.js data/FINAL_RECOMMEND_DATA.js
             # 🔴 2026-08-18 根因修复：重试路径同样必须全量构建，不能用 --detect-changes
             #   （原因同上：reset 后 HEAD~1..HEAD 已无法反映 raw_data 的真实变化）。
             python update_v8.py

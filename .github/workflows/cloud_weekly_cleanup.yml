@@ -95,7 +95,6 @@ jobs:
               "fundamental_quality.json",
               "lhb_7d.json",
               "sentiment_cycle.json",
-              "stock_rps.json",
               "stop_target_optimization.json",
               # 🆕 2026-09-08 主人令：中信 PE 双卡数据链（E 段 21:00 每日调度，前端直读）
               #   不登记 → weekly_cleanup 判为孤儿删除 → 实验区双卡空白（详见 DO_NOT_DELETE.md 保护段）

@@ -73,7 +73,7 @@ jobs:
           #   与上面处理密钥同一套路：交给 git add -A 之前先 rm --cached。
           git rm -r --cached --ignore-unmatch --quiet \
             algorithms/__pycache__ algorithms/_opt_kline_cache \
-            raw_data/_rps_cache raw_data/_tdx_cache 2>/dev/null || true
+            raw_data/_tdx_cache 2>/dev/null || true
           find raw_data -maxdepth 1 -name '*.bak' -print0 2>/dev/null \
             | xargs -0 -r git rm --cached --ignore-unmatch --quiet 2>/dev/null || true
           git add -A

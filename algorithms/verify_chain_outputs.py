@@ -18,7 +18,7 @@ verify_chain_outputs.py — v8 盘后算法链「产物完整性闸门」
        只在 stdout 打一行「⚠️ 退出码 N」，无人看、无汇总、无告警；
     ② workflow step「🧮 运行盘后算法链」用 `set +e` + `echo "algo exit: $?"`
        **显式丢弃退出码**，job 永远 success；
-    ③ 上游不动则下游全停（候选池是 CRDS / RPS / 最终推荐的共同底座），
+    ③ 上游不动则下游全停（候选池是 CRDS / 最终推荐的共同底座），
        但整条链没有任何「产物是否真的产出了」的校验环节。
 
 修复
@@ -62,7 +62,6 @@ CRITICAL = [
     ("候选池(前端)", "data/CANDIDATE.js",              False),
     ("逆势龙头CRDS", "raw_data/crds_card_data.json",   True),
     ("逆势龙头(前端)", "data/CRDS_CARD_DATA.js",       False),
-    ("相对强度RPS",  "data/STOCK_RPS.js",              False),
     ("全站精选TOP10", "raw_data/top10_daily.json",     True),
     ("全站精选(前端)", "data/TOP10_DAILY.js",          False),
     ("三重共识",     "raw_data/triple_consensus.json", True),

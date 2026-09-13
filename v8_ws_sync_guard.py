@@ -8,7 +8,7 @@
   ⇒ 远端已经修好的代码，会在本机跑批时被**从产物侧静默撤销**（典型「假成功」）。
 
   实测证据（2026-09-13 12:5x）：
-  · 本机 `v8/backtest_rps.py` 仍是「多信号路径首尾拼接累加」的旧回撤算法，
+  · 本机 `algorithms/strategy_four_volume.py` 仍是「多信号路径首尾拼接累加」的旧回撤算法，
     而远端 `FETCH_HEAD` 已是「逐信号峰谷再取均值」；
   · 抽查 6 个关键文件，`git hash-object --no-filters` 与 `git rev-parse FETCH_HEAD:<f>`
     **6/6 全部不等**；

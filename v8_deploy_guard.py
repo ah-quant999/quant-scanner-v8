@@ -19,7 +19,6 @@ DATA = Path(__file__).resolve().parent / "data"
 MIN_SIZE = {
     "FINAL_RECOMMEND_DATA.js": 8000,
     "CANDIDATE.js": 60000,
-    "STOCK_RPS.js": 60000,
     "SECTOR_FUND_FLOW.js": 8000,
     "TOP10_DAILY.js": 4000,
     "STOCK_QUOTE.js": 100000,
