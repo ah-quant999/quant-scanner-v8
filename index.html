@@ -1822,8 +1822,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       if(!head || typeof window.v8CardHeader !== 'function') return;
       // 🛡️ 2026-08-14 一劳永逸式修复（主人令"空的！一劳永逸式修复！"）：不传 !ts，
       //   避免 ts 为空瞬间误报"无数值"（dataset.rendered='1' 拦截 + render 时序问题）。
-      // 🛡️ 2026-08-15 时段标签走统一 _slotByTs（盘中边界 9:00-15:30），禁止硬编码盘前。
-      var _jdSlot = (ts && window._slotByTs) ? window._slotByTs(ts) : {slot:'盘前', horizon:'短线'};
+      // 🛡️ 2026-09-13 主人令：本卡属「今日事件」页，时段语义固定为**盘前**。
+      //   旧实现按数据产出时刻自动判 ⇒ 15:3x 又刷一遍即被误标「盘后」，
+      //   与「今日事件=盘前读盘」的语义相悖（主人 09-13 截图指出）。
+      //   盘前卡的 horizon 为空（盘前不看短线持有期）。
+      var _jdSlot = {slot:'盘前', horizon:''};
       head.innerHTML = window.v8CardHeader('⚖️','今日判定 · 环境综合','宏观/美股/技术/情绪/共同结论/危险信号/大盘','update_time',
         {update_time:ts, slot:_jdSlot.slot, horizon:_jdSlot.horizon}, false);
     };
@@ -2009,9 +2012,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           return;
         }
         if(timeEl){
-          // 2026-08-15 改用统一 _slotByTs（盘中边界 9:00-15:30，盘后 15:30-17:00）
-          var __slotMeta = window._slotByTs(d.gen_time);
-          timeEl.innerHTML = _uBadge(__slotMeta.slot, __slotMeta.horizon, d.gen_time);
+          // 🛡️ 2026-09-13 主人令：本卡属「实时数据」页（盘中实时观察卡，09:25 起持续刷新），
+          //   时段语义固定为**盘中**。旧实现按产出时刻自动判 ⇒ 15:3x 最后一次刷新
+          //   被判「盘后」（主人截图实证：15:40 盘后）——盘中卡不该因收盘后刷一次就变盘后。
+          timeEl.innerHTML = _uBadge('盘中', '短线', d.gen_time);
         }
         var h='';
 
@@ -2336,7 +2340,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         h+='</div>';
         el.innerHTML=h;
         const mt=$('conceptMapTime');
-        if(mt) mt.innerHTML = _uBadge('auto','短线',d.update_time);
+        // 2026-09-13 主人令：概念资金热力图 freq='盘中每30分'，时段固定「盘中」。
+        if(mt) mt.innerHTML = _uBadge('盘中','短线',d.update_time);
       }
       if(document.readyState==='loading')
         document.addEventListener('DOMContentLoaded', renderConceptTreemap);
@@ -2471,7 +2476,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         if(timeEl && updateTime){
           // 2026-08-30 修复：行业树图位于「实时数据」tab，数据源优先 SECTOR_FUND_FLOW（盘中），
           // 即使回退到 SECTOR_RS 也不得显示「盘后」标签，避免用户误判为盘后数据。
-          timeEl.innerHTML = _uBadge('auto','短线', updateTime);
+          // 🛡️ 2026-09-13 主人令：上述承诺**原为注释级别**（代码仍用 'auto' ⇒ 15:32 产出被判「盘后」，
+          //   主人截图实证），现改为**固定「盘中」**，把注释兑现成行为。
+          timeEl.innerHTML = _uBadge('盘中','短线', updateTime);
         }
       }
       if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderIndustryTree);
@@ -3939,12 +3946,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     //   其「更新于」的语义应为：**最后一路上线、这张卡才算成型、才可以开始看** ⇒ 取**最大**。
     //   数据来源节奏：龙虎榜单飞 fetcher `v8_lhb_fetch` 每交易日 17:30 CST（cron `30 9 * * 1-5`）
     //   产出 LHB_DATA.js（机游共振 + 北向席位两卡共用），其余七路由 v8_algo_cloud 盘后链陆续产出。
-    // 时间戳只取「非共振」的 6 路数据（不含 LHB/NF），避免被共振日历拖晚。
+    // 🔴 2026-09-13 主人令：「这个逻辑是在 2 个共振日历出来之后才能计算，时间一定是比 2 个共振后面。」
+    //   本卡内容**依赖**机游共振(LHB) + 北向席位(NF) 两路（上方 _resReady 已强制二者就绪），
+    //   故其「成型时刻」必须 ≥ 这两路 —— 时间戳取**八路全量**最大值（含 LHB/NF）。
+    //   ⚠️ 2026-09-12 版为「避免被共振拖晚」**刻意剔除** LHB/NF（方向与依赖关系相反），
+    //      实测本卡显示 16:05 却早于两路共振日历，主人当场指出。本次按依赖方向纠正。
     var _miTsArr = [
       CR.update_time, CAND.update_time, SR.update_time, VOL.update_time, IQ.update_time,
-      window.SH_SZ_HISTORY && window.SH_SZ_HISTORY.update_time
+      window.SH_SZ_HISTORY && window.SH_SZ_HISTORY.update_time,
+      LHB.update_time, NF.update_time
     ].filter(Boolean).sort();          // 升序
-    var _miAllTs = _miTsArr.length ? _miTsArr[_miTsArr.length - 1] : null;   // 取最大 = 卡成型时刻
+    var _miAllTs = _miTsArr.length ? _miTsArr[_miTsArr.length - 1] : null;   // 取最大 = 卡成型时刻（≥ 两路共振）
     var _miOldTs = _miTsArr.length ? _miTsArr[0] : null;                    // 取最小 = 最陈旧一路（供后续诊断）
     var updateTime = _miAllTs || '--';
 
@@ -5521,18 +5533,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
                +  '</div>';
         }
 
-                /* 下架提醒 / 观察名单 */
+                /* 观察名单 */
 
-        if((A.delist_advice||[]).length){
-          html += '<div style="margin:12px 0;padding:10px 12px;border-left:4px solid #ef5350;border-radius:8px;background:rgba(239,83,80,.08);">';
-          html += '<div style="font-size:12.5px;font-weight:700;color:#ef5350;margin-bottom:6px;">🔔 低绩效提醒 —— 是否下架并停止跟踪？（共 '+(A.delist_advice||[]).length+' 条）</div>';
-          (A.delist_advice||[]).forEach(function(d){
-            html += '<div style="font-size:11.5px;color:var(--txt);line-height:1.8;">• <b>'+_esc(d.card)+'</b>·'+_esc(d.label||'—')
-                 +  '：'+_esc((d.reasons||[]).join('；'))+' <span style="color:var(--sub);">（n='+(d.sample||0)+'）</span></div>';
-          });
-          html += '<div style="font-size:10.5px;color:var(--sub);margin-top:6px;">判定线：胜率 &lt; '+(A.low_win_rate==null?'—':A.low_win_rate)+'% 或 平均收益 ≤ '+(A.low_avg_return==null?'—':A.low_avg_return)+'%（已扣成本）。请回复「下架 X」即可停止跟踪。</div>';
-          html += '</div>';
-        }
+        /* 🗑️ 2026-09-13 主人令：原「是否下架并停止跟踪」提请块**整块删除**。
+           理由（主人原话）：选股池要关注的是**选股的对错**，不该用「胜率/平均收益」
+           这套信号回测口径去反向提议下架策略。 */
         if((A.watch_list||[]).length){
           html += '<div style="margin:10px 0;padding:10px 12px;border-left:4px solid rgba(148,163,184,.5);border-radius:8px;background:rgba(148,163,184,.05);">';
           html += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;">👀 观察名单（不提议下架，仅记录）</div>';
@@ -5550,53 +5555,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     })();
 
-    /* 🔴 2026-09-12 主人令「去重」：原「📊 各选股策略回测汇总」整块删除 ——
-       其 4 策略主表与页首「📋 主对比表」同源同列；「🏆胜率最高/💰收益最好」双卡
-       与页首「📌 一句话结论」同义。唯一不重复的是「🧬选股生命周期 / 🧪因子实验室」
-       两行（池内跟踪·非信号回测），单列一张极简小表保留，不丢信息。 */
-    (function(){
-      var _tag='<span style="font-size:9px;font-weight:700;color:#14b8a6;background:rgba(20,184,166,.14);border:1px solid rgba(20,184,166,.35);padding:1px 5px;border-radius:4px;white-space:nowrap;">📈 选股策略</span>';
-      html += '<div style="margin:16px 0 6px;font-size:12.5px;font-weight:700;color:var(--txt);">🧬 池内跟踪（非信号回测）'
-           +  ' <span style="font-size:11px;color:var(--dim);font-weight:500;">池内实时跟踪统计，与上方历史信号回测口径不同，不混排</span></div>';
-      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
-      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      ['模块','口径','样本','胜率','平均收益','更新'].forEach(function(x){
-        html += '<th style="padding:6px;text-align:left;color:var(--sub);white-space:nowrap;">'+x+'</th>';
-      });
-      html += '</tr></thead><tbody>';
-      var _pt=window.V8_POOL_TRACKER||{}, _items=_pt.items||[];
-      html += '<tr style="border-bottom:1px solid var(--border2);">'
-        + '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">🧬 选股生命周期 '+_tag+'</td>'
-        + '<td style="padding:6px;color:var(--dim);font-size:10.5px;">池内跟踪·入池价→最新收盘</td>'
-        + '<td style="padding:6px;color:var(--sub);">'+_items.length+'</td>';
-      if(_items.length){
-        var _w=0,_sum=0;
-        _items.forEach(function(it){ var p=it.last_pct; if(p==null&&it.entry_price&&it.last_close)p=(it.last_close/it.entry_price-1)*100; if(p!=null){_sum+=p; if(p>0)_w++;} });
-        var _wr=_w/_items.length*100, _avg=_sum/_items.length;
-        html += '<td style="padding:6px;"><span style="font-weight:700;color:'+_colorWR(_wr)+';">'+_wr.toFixed(1)+'%</span></td>'
-             +  '<td style="padding:6px;"><span style="color:'+_colorPL(_avg)+';">'+(_avg>0?'+':'')+_avg.toFixed(2)+'%</span></td>';
-      } else {
-        html += '<td style="padding:6px;color:var(--dim);">—</td><td style="padding:6px;color:var(--dim);">—</td>';
-      }
-      html += '<td style="padding:6px;color:var(--dim);font-size:10px;white-space:nowrap;">'+(((_pt.update_time||'')+'').substring(0,16)||'—')+'</td></tr>';
-      var _fl=window.FACTOR_LAB||{};
-      var _flbt=window.FACTOR_LAB_BACKTEST||{};
-      var _flA=_flbt.abnormal_volume||{};
-      var _flR=_flbt.roe_largecap||{};
-      var _flVerdict=_flA.verdict_3star;
-      var _flSpread=_flA.spread_top_bottom_10d_pct;
-      var _flWin=_flA.top_layer_win_10d;
-      var _flReady=_flVerdict!=null;
-      html += '<tr style="border-bottom:1px solid var(--border2);">'
-        + '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">🧪 因子实验室 '+_tag+'</td>'
-        + '<td style="padding:6px;color:var(--dim);font-size:10.5px;">五分位分层回测（异常量比+ROE）</td>'
-        + '<td style="padding:6px;color:var(--sub);">'+(_flReady?(_flA.universe_n||'—'):'—')+'</td>'
-        + '<td style="padding:6px;color:'+(_flWin==null?'var(--dim)':_colorWR(_flWin))+';font-weight:700;">'+(_flWin!=null?Number(_flWin).toFixed(1)+'%':'—')+'</td>'
-        + '<td style="padding:6px;color:'+(_flSpread==null?'var(--dim)':_colorPL(_flSpread))+';">'+(_flSpread!=null?(_flSpread>0?'+':'')+Number(_flSpread).toFixed(2)+'%':'—')+'</td>'
-        + '<td style="padding:6px;color:var(--dim);font-size:10px;white-space:nowrap;">'+(((_flbt.update_time||'')+'').substring(0,16)||((_fl.update_time||'')+'').substring(0,16)||'—')+'</td></tr>';
-      html += '</tbody></table></div>';
-      html += '<div style="font-size:10.5px;color:var(--dim);margin-top:6px;line-height:1.6;">🧬 胜率列=池内盈利占比（最新收盘高于入池价的股票占比）；收益列=平均浮盈。🧪 因子实验室=异常量比五分位分层 + ROE_TTM 大市值 Top30 回测，T+10 胜率/利差为当前证据；verdict 由「利差>0 + Top层胜率≥55% + OOS同号」判定。</div>';
-    })();
+    /* 🗑️ 2026-09-13 主人令：「这2个删除」（第二块）—— 原池内浮盈跟踪小表**整块删除**。
+       该表以池内浮盈/胜率口径跟踪「选股生命周期」与「因子实验室」，
+       与上方信号回测口径混排易误读，主人已明确不要此跟踪。 */
 
     html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin:18px 0 8px;display:flex;align-items:center;gap:8px;"><span>🎯</span>主策略回测 <span style="font-size:11px;color:var(--dim);font-weight:500;">按星级降序</span></div>';
     // 2026-09-02 主人令：已下线模块的回测卡保持不可见（选股信号层全删；回测不再保留以免误用）
@@ -6552,7 +6513,7 @@ window.__renderCiticPeObserve = function(){
     var yrs = vh && vh.days_total ? Math.round(vh.days_total/244) : 10;
     var peConclusion = nPct < 25 ? '整体估值偏低，中长期赔率较好' : (nPct > 75 ? '整体估值偏高，宜控制仓位' : '整体估值中性，仅作仓位参考');
     nowStatus = '<div style="background:rgba(56,189,248,.05);border-left:3px solid #38bdf8;border-radius:6px;padding:8px 12px;margin:8px 0;font-size:12px;line-height:1.7;color:var(--sub);">'
-      + '<b style="color:#38bdf8;">&#x1F4CC; 现在什么情况：</b>'
+      + '<b style="color:#38bdf8;">&#x1F4CC; 一句话结论：</b>'
       + '当前 PE-TTM 为 <b style="color:#38bdf8;">' + pe + '</b> 倍，处近' + yrs + '年 <b style="color:' + sigColor + ';">' + nPct + '% 分位</b>（' + nZone + '），信号灯显示「<b style="color:' + sigColor + ';">' + sigLabel + '</b>」—— ' + peConclusion + '。'
       + '</div>';
   }
@@ -6688,7 +6649,7 @@ window.__renderIndexObserve = function(){
     });
     var tone = loN > hiN ? '市场估值重心偏低，中长期赔率占优' : (hiN > loN ? '估值重心偏高，注意回撤风险' : '估值分化、结构性行情为主');
     idxNow = '<div style="background:rgba(167,139,250,.05);border-left:3px solid #a78bfa;border-radius:6px;padding:8px 12px;margin:10px 0;font-size:12px;line-height:1.7;color:var(--sub);">'
-      + '<b style="color:#a78bfa;">&#x1F4CC; 现在什么情况：</b>'
+      + '<b style="color:#a78bfa;">&#x1F4CC; 一句话结论：</b>'
       + '监测 ' + V.indices.length + ' 个指数：' + loN + ' 个低估 / ' + hiN + ' 个高估 / ' + openN + ' 个门控多头开放；综合定位「<b style="color:' + defC + ';">' + _ev(st.overall) + '</b>」（防御仓位 ' + defW + '%）—— ' + tone + '。'
       + '</div>';
   }
@@ -6933,7 +6894,7 @@ window.__renderIndexObserve = function(){
     var dS=_topSec(dEx.sector_hits||{}), wS=_topSec(wEx.sector_hits||{}), mS=_topSec(mEx.sector_hits||{});
     var consistent = (dP===wP && wP===mP);
     aiNow = '<div style="background:rgba(139,92,246,.05);border-left:3px solid #8b5cf6;border-radius:6px;padding:8px 12px;margin:10px 0;font-size:12px;line-height:1.7;color:var(--sub);">'
-      + '<b style="color:#8b5cf6;">&#x1F4CC; 现在什么情况：</b>'
+      + '<b style="color:#8b5cf6;">&#x1F4CC; 一句话结论：</b>'
       + '日/周/月 AI 情绪分别为 <b>' + dP + '</b> / <b>' + wP + '</b> / <b>' + mP + '</b>，' + (consistent ? '三尺度观点一致，可信度较高' : '观点存在分歧，参考权重下调') + '；板块关注 Top：日·' + dS + ' / 周·' + wS + ' / 月·' + mS + '。'
       + '</div>';
   }
@@ -9396,7 +9357,8 @@ window.__renderV8CalFull();
                 || (_isToday(sr.update_time)  ? sr.update_time  : '')
                 || sft.update_time || sff.update_time || sr.update_time || '';
     } catch(_){ _sectorTs = sft.update_time || sff.update_time || sr.update_time || ''; }
-    setBadge('phSectorTime','auto','短线', _sectorTs);
+    // 2026-09-13 主人令：板块资金流向 freq='盘中每30分'，时段固定「盘中」。
+    setBadge('phSectorTime','盘中','短线', _sectorTs);
   }
 
   /* ---- 主力净额分时累计曲线  /* ---- 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 加） ---- */
@@ -9682,7 +9644,8 @@ window.__renderV8CalFull();
     if(!netSub||!netSub.categories||!Object.keys(netSub.categories).length){
       if(el0) el0.innerHTML='';
       if(el1) el1.innerHTML='<div class="ipo-empty">⏳ ETF 份额申赎（上交所真实口径）待生成 · 交易所披露后更新</div>';
-      if(el1 && netSub && netSub.update_time) setBadge('phEtfTime','auto','短线',netSub.update_time);
+      // 2026-09-13 主人令：ETF 卡 freq='盘中实时 T+0'，时段固定「盘中」
+      if(el1 && netSub && netSub.update_time) setBadge('phEtfTime','盘中','短线',netSub.update_time);
       return;
     }
     const catNames=['宽基','行业','主题','跨境','商品'];
@@ -9725,7 +9688,8 @@ window.__renderV8CalFull();
       h+='</div>';
     });
     if(el1) el1.innerHTML=h;
-    if(document.getElementById('etfHeatTime')) setBadge('etfHeatTime','auto','短线',netSub.update_time);
+    // 2026-09-13 主人令：ETF 资金热度 freq='盘中实时 T+0'，时段固定「盘中」
+    if(document.getElementById('etfHeatTime')) setBadge('etfHeatTime','盘中','短线',netSub.update_time);
   }
 
   /* ---- 5.5 ETF 量能脉冲(盘中异动) / 日监控 渲染 ---- */
@@ -9735,7 +9699,8 @@ window.__renderV8CalFull();
     if(!pulse||pulse.no_data||!pulse.etfs||!pulse.etfs.length){
       var msg=(pulse&&pulse.note)?pulse.note:'盘中异动数据尚未生成';
       el.innerHTML='<div class="ipo-empty">⏳ '+msg+'</div>';
-      if(pulse&&pulse.update_time) setBadge('phEtfTime','auto','短线',pulse.update_time);
+      // 2026-09-13 主人令：ETF 盘中异动 freq='盘中实时'，时段固定「盘中」
+      if(pulse&&pulse.update_time) setBadge('phEtfTime','盘中','短线',pulse.update_time);
       return;
     }
     var list=pulse.etfs.slice(0,6);
@@ -9765,7 +9730,8 @@ window.__renderV8CalFull();
     });
     h+='</div>';
     el.innerHTML=h;
-    if(pulse.update_time) setBadge('phEtfTime','auto','短线',pulse.update_time);
+    // 2026-09-13 主人令：ETF 盘中异动 freq='盘中实时'，时段固定「盘中」
+    if(pulse.update_time) setBadge('phEtfTime','盘中','短线',pulse.update_time);
   }
 
   function renderEtfDaily(daily){
@@ -11537,7 +11503,8 @@ function drawUpDownChart(){
       h+='</div>';
     }
     $b.innerHTML=h;
-    if($t) $t.innerHTML=_uBadge('auto','短线',d.update_time);
+    // 2026-09-13 主人令：期指主力合约 freq='盘中每30分'（intraday 刷新），时段固定「盘中」。
+    if($t) $t.innerHTML=_uBadge('盘中','短线',d.update_time);
   }
   window.renderFuturesMain = renderFuturesMain;
 
@@ -11692,7 +11659,8 @@ window.showRestrictedItems = showRestrictedItems;
       h+='<div class="ipo-empty" style="padding:10px 12px;font-size:12px;text-align:center;">今日无解禁</div>';
     }
     $b.innerHTML=h;
-    if($t) $t.innerHTML=_uBadge('auto','短线',d.update_time);
+    // 2026-09-13 主人令：今日解禁=盘前卡（08:25 产出），时段固定「盘前」，不按产出时刻自动判。
+    if($t) $t.innerHTML=_uBadge('盘前','',d.update_time);
   }
   window.renderTodayEventRestricted = renderTodayEventRestricted;
 
@@ -11706,7 +11674,7 @@ window.showRestrictedItems = showRestrictedItems;
     const hasToday = !!(d.today_summary && typeof d.today_summary.total === 'number');
     if(!hasToday){
       $b.innerHTML = '<div class="ipo-empty" style="padding:10px 12px;font-size:12px;text-align:center;">今日口径需云端下次抓取后生效；当前暂无当日业绩预告数据。<br>全报告期累计请查看<b>盘后数据 → 业绩预告</b>卡。</div>';
-      if($t) $t.innerHTML = _uBadge('auto','短线',d.update_time);
+      if($t) $t.innerHTML = _uBadge('盘前','',d.update_time);
       return;
     }
     const s = d.today_summary;
@@ -11735,7 +11703,8 @@ window.showRestrictedItems = showRestrictedItems;
       h+='</div>';
     }
     $b.innerHTML=h;
-    if($t) $t.innerHTML=_uBadge('auto','短线',d.update_time);
+    // 2026-09-13 主人令：今日业绩预告=盘前卡（08:25 产出），时段固定「盘前」。
+    if($t) $t.innerHTML=_uBadge('盘前','',d.update_time);
   }
   window.renderTodayEventForecast = renderTodayEventForecast;
 
@@ -11801,7 +11770,8 @@ window.showRestrictedItems = showRestrictedItems;
     h+='<div id="restrictedCalendarTable" style="display:none;"></div>';
     $b.innerHTML=h;
     showRestrictedItems('d7');
-    if($t) $t.innerHTML=_uBadge('auto','短线',d.update_time);
+    // 2026-09-13 主人令：解禁数据 freq='每日盘前'（08:25），时段固定「盘前」。
+    if($t) $t.innerHTML=_uBadge('盘前','',d.update_time);
   }
   window.renderRestrictedCalendar = renderRestrictedCalendar;
 
@@ -11835,7 +11805,8 @@ window.showRestrictedItems = showRestrictedItems;
     h+='<div id="forecastCalendarTable" style="display:none;"></div>';
     $b.innerHTML=h;
     showForecastItems('increase');
-    if($t) $t.innerHTML=_uBadge('auto','短线',d.update_time);
+    // 2026-09-13 主人令：业绩预告 freq='每日盘前'（08:25），时段固定「盘前」。
+    if($t) $t.innerHTML=_uBadge('盘前','',d.update_time);
   }
   window.renderForecastCalendar = renderForecastCalendar;
 
@@ -13371,7 +13342,9 @@ h += '</div>'; // /ulPaneObserve
     var hasData = cr.update_time || lh.update_time;
     var html = '<div class="card" style="margin-bottom:12px;border-left:4px solid #38bdf8;">';
     var updateTime = cr.update_time || lh.update_time;
-    var _cycleSlot = window._slotByTs ? window._slotByTs(updateTime) : {slot:'盘中', horizon:'短线'};
+    // 🛡️ 2026-09-13 主人令：本卡属「实时数据」页（涨停热力/连板梯队驱动，盘中持续刷），
+    //   时段语义固定为**盘中**。旧实现按产出时刻自动判 ⇒ 15:37 刷新被误标「盘后」。
+    var _cycleSlot = {slot:'盘中', horizon:'短线'};
     html += v8CardHeader('🎭','情绪周期 · 连板天梯','危机雷达+涨停热力+连板梯队+龙虎榜','update_time',
       {update_time:updateTime, slot:_cycleSlot.slot, horizon:_cycleSlot.horizon}, !hasData);
     html += '<div style="padding:12px 14px;">';
