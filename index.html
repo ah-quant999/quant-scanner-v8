@@ -4168,7 +4168,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   }
 
   /* 2026-09-02 主人令：选股模块星级表全局化（原在已下架分组内，现卡片迁回选股策略仍需共享） */
-  window.__MODULE_STARS = { fourvolume:4, triple:4 };  /* 2026-09-13 修正：星级委员会改用多期加权综合评判，不再以单一持有期判星。四量终极属长线信号：按 long 权重(T+1 10%/T+5 15%/T+30 25%/T+90 40%/T+180 10%)综合得分4.15，但T+1评分2分触发短周期惩罚（最高4⭐），最终4⭐。胜率随持有期单调升含β，超额收益待基准比对认证。rps已下线 */「多周期确认」中长线持仓信号(final_recommend/gen_algo_track 作 position source)，须按既定中长线持有期评判，禁以T+1片面降星。T+90：胜率71.8%/均值+39.25%/夏普0.58/样本1334→四项门全过=5⭐；T+1仅44.6%属短线不适用。胜率随持有期单调升含市场β成分，超额收益待基准比对认证。rps已下线 */
+  window.__MODULE_STARS = { fourvolume:4, triple:4 };  /* 2026-09-13 修正：星级委员会改用多期加权综合评判，不再以单一持有期判星。四量终极属长线信号：按 long 权重(T+1 10%/T+5 15%/T+30 25%/T+90 40%/T+180 10%)综合得分4.15，但T+1评分2分触发短周期惩罚（最高4⭐），最终4⭐。胜率随持有期单调升含β，超额收益待基准比对认证。rps已下线 */
   window.__moduleStarsHTML = function(k){ var n=(window.__MODULE_STARS&&window.__MODULE_STARS[k])||0; var x=''; for(var i=0;i<n;i++) x+='⭐'; return x || '—'; };
   /* 2026-09-12 星级委员会规则：每月评定，五维加权，硬门槛防小样本冒充高星 */
   /* 2026-09-13 星级委员会规则：多期加权综合评判，短周期惩罚，月度评定；预留 rankBonus 待统一回测框架后启用 */
@@ -4201,7 +4201,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     // 2026-09-03 主人令：已下架策略（cockpit/allsite/hunter）整体从回测区退出，
     // 既然选股策略子页已彻底删除（九宝不让「选股已删回测还在」），回测卡也不必保留。
     // 当前 active 仅留真正仍在选股策略子页展示的 2 个主策略（fourvolume/crds）。
-    {key:'fourvolume', name:'四量终极',     stars:4, icon:'📊', desc:'四量信号历史回测 · 多期综合4⭐（T+90达5⭐门限，但T+1/T+5评分低触发短周期惩罚；胜率随持有期单调升含β，超额收益待基准认证）', color:'#38bdf8', var:'FOUR_VOLUME_BACKTEST'},📊', desc:'四量信号历史回测 · 中长线持仓（T+90：胜率71.8%/均值+39.25%/夏普0.58，达5⭐门限；T+1仅44.6%非短线信号；胜率随持有期单调升含β，超额收益待基准认证）', color:'#38bdf8', var:'FOUR_VOLUME_BACKTEST'},
+    {key:'fourvolume', name:'四量终极',     stars:4, icon:'📊', desc:'四量信号历史回测 · 多期综合4⭐（T+90达5⭐门限，但T+1/T+5评分低触发短周期惩罚；胜率随持有期单调升含β，超额收益待基准认证）', color:'#38bdf8', var:'FOUR_VOLUME_BACKTEST'},
     {key:'crds',       name:'逆势龙头CRDS', stars:0, icon:'🐉', desc:'CRDS advanced 档历史回测', color:'#ef4444', var:'CRDS_BACKTEST'}, /* 2026-09-06 审计修复：弱市专用不评星，回测卡不再挂 3⭐ */
   ];
   // 2026-09-03 主人令：cockpit/allsite 大牛股/全站精选 全部移出回测区，DELISTED 保留为空数组
