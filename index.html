@@ -2579,7 +2579,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div id="stGoldPoolMore" style="display:none;margin:6px 0 4px;">
           <button id="stGoldPoolMoreBtn" onclick="window.toggleStGoldPool()" style="background:transparent;color:#fbbf24;border:1px solid #fbbf24;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">▾ 展开更多</button>
         </div>
-        <div class="note">口径：候选池 ∩ (外资研投 或 多源共振≥2)；45 个交易日后自动出池。多源共振指同时命中候选池两个及以上来源（如主板前100 + 外资研投）。按累计信号降序，默认展示前 36 只。</div>
+        <div class="note">口径：候选池 ∩ (外资研投 或 多源共振≥2)；45 个交易日（按<b>真交易日历精确回溯</b>，排除周末与节假日）后自动出池。多源共振指同时命中候选池两个及以上来源（如主板前100 + 外资研投）。状态标记：<b style="color:#26a69a;">新晋</b>=今日首次入选 ｜ <b style="color:#fbbf24;">在池</b>=今日仍符合口径 ｜ <b style="color:#94a3b8;">观察中</b>=仅继承保留（今日未复现口径，<b>不占金股优先位</b>）。按累计信号降序，默认展示前 36 只。</div>
       </div>
       <div class="card" style="border-left:4px solid #f9a8d4;">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🧭</span>观测候选股池 <span id="stPoolTime">—</span> <span id="stPoolSlot" style="font-size:11px;color:var(--sub);font-weight:400">上游水源 · 盘后</span></h3> <!-- 2026-09-06 审计修复：选股池是初筛池非信号策略，与文档口径一致不挂星级 -->
@@ -12203,10 +12203,15 @@ window.showRestrictedItems = showRestrictedItems;
       const ge2 = list.filter(s=>(s.signal_count||0)>=2).length;
       const ge3 = list.filter(s=>(s.signal_count||0)>=3).length;
       const res = list.filter(s=>(s.sources||[]).some(x=>String(x).indexOf('研报')>=0)).length;
+      // 🔴 2026-09-13 主人令：区分「今日命中」与「仅继承·观察中」，避免 253 只看起来一样新鲜
+      const watchN = list.filter(s=>s.status==='观察中').length;
+      const freshN = list.length - watchN;
       const lastIn = list.map(s=>String(s.first_date||'')).sort().pop() || '--';
       const pill = (txt,color)=>'<span style="background:'+color+'1a;color:'+color+';border:1px solid '+color+'4d;border-radius:4px;padding:2px 7px;white-space:nowrap;">'+txt+'</span>';
       sumEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:4px 0 10px;font-size:12px;">'
         + pill('⭐ 在池 <b>'+list.length+'</b> 只','#fbbf24')
+        + (watchN ? pill('✅ 今日命中 <b>'+freshN+'</b>','#26a69a') : '')
+        + (watchN ? pill('🕗 观察中 <b>'+watchN+'</b>','#94a3b8') : '')
         + pill('共振≥2 <b>'+ge2+'</b>','#60a5fa')
         + pill('共振≥3 <b>'+ge3+'</b>','#fbbf24')
         + (res ? pill('研报来源 <b>'+res+'</b>','#94a3b8') : '')
@@ -12233,6 +12238,9 @@ window.showRestrictedItems = showRestrictedItems;
       h += '<span style="font-weight:700;color:var(--txt);">'+(s.name||s.code||'')+'</span>';
       h += '<span style="color:var(--dim);font-size:10px;font-family:monospace;">'+(s.code||'')+'</span>';
       if(board) h += '<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(99,102,241,.15);color:#a5b4fc;">'+board+'</span>';
+      // 观察中=仅继承保留（今日未复现口径）；新晋=今日首次入选
+      if(s.status==='观察中') h += '<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(148,163,184,.16);color:#94a3b8;">观察中</span>';
+      else if(s.status==='新晋') h += '<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(38,166,154,.16);color:#26a69a;">新晋</span>';
       h += '<span style="margin-left:auto;font-weight:700;color:'+sigColor(sig)+';">信号 '+sig+'</span>';
       if(mx > sig) h += '<span style="font-size:10px;color:var(--dim);">峰值 '+mx+'</span>';
       h += '</div>';

@@ -713,8 +713,57 @@ GOLD_POOL_OUT = os.path.join(DATA, "gold_pool.json")
 GOLD_POOL_STOCKS_OUT = os.path.join(DATA, "gold_pool_stocks.json")
 
 
+# 🔴 2026-09-13 主人令（必修 1/2）：真交易日历辅助
+#   原实现全用「运行自然日 + n*1.4 自然日近似」，两个口径缺陷：
+#     ① 周六/周日/假日跑批时，运行日不是交易日却被写进 first_date / history；
+#     ② 「45 个交易日」被换成 63 个自然日，含长假时误差可达数个交易日。
+#   ⇒ 出池窗口改用真交易日历精确回溯；日历不可用（无 akshare/无网）时**回退**原近似，
+#     绝不因日历缺失而中断链（与 scanner.py 的 baostock fallback 同一容错哲学）。
+_trade_dates_cache = None
+
+
+def _load_trade_dates():
+    """A股交易日历（akshare tool_trade_date_hist_sina，进程内缓存）。失败返回 []。"""
+    global _trade_dates_cache
+    if _trade_dates_cache is not None:
+        return _trade_dates_cache
+    try:
+        cal = ak.tool_trade_date_hist_sina()
+        _trade_dates_cache = sorted(str(d).replace("-", "")[:8] for d in cal["trade_date"].tolist())
+    except Exception as e:
+        print(f"  ⚠️ 交易日历获取失败（{e}），本次回退自然日近似口径")
+        _trade_dates_cache = []
+    return _trade_dates_cache
+
+
+def _last_trade_date(on_or_before):
+    """<= 给定日期的最近交易日（YYYY-MM-DD）；日历不可用返回 None。"""
+    dates = _load_trade_dates()
+    if not dates:
+        return None
+    key = str(on_or_before).replace("-", "")[:8]
+    prev = [d for d in dates if d <= key]
+    if not prev:
+        return None
+    d = prev[-1]
+    return f"{d[:4]}-{d[4:6]}-{d[6:8]}"
+
+
+def _n_trade_days_ago_precise(n, on_or_before):
+    """精确回溯 n 个交易日（YYYY-MM-DD）；日历不可用/样本不足返回 None。"""
+    dates = _load_trade_dates()
+    if not dates:
+        return None
+    key = str(on_or_before).replace("-", "")[:8]
+    prev = [d for d in dates if d <= key]
+    if len(prev) < n + 1:
+        return None
+    d = prev[-1 - n]
+    return f"{d[:4]}-{d[4:6]}-{d[6:8]}"
+
+
 def _n_trade_days_ago_approx(n, today_date):
-    """45 个交易日 ≈ n*1.4 个自然日（与 scanner.py 的 baostock fallback 口径一致）。"""
+    """45 个交易日 ≈ n*1.4 个自然日（仅作交易日历不可用时的兜底，不再作主口径）。"""
     try:
         d = datetime.date.fromisoformat(today_date)
     except Exception:
@@ -800,9 +849,12 @@ def derive_and_save_gold_pool(members):
 
     返回金股池 dict，供调用方日志/调试使用。
     """
-    today = time.strftime("%Y-%m-%d")
+    # 🔴 2026-09-13 主人令（必修 1）：today 取「最近交易日」而非运行自然日。
+    _run_day = time.strftime("%Y-%m-%d")
+    today = _last_trade_date(_run_day) or _run_day
     now = time.strftime("%Y-%m-%d %H:%M:%S")
-    cutoff = _n_trade_days_ago_approx(GOLD_POOL_DAYS, today)
+    # 🔴 同令（必修 2）：出池窗口按真交易日历精确回溯 45 个交易日。
+    cutoff = _n_trade_days_ago_precise(GOLD_POOL_DAYS, today) or _n_trade_days_ago_approx(GOLD_POOL_DAYS, today)
     prev = _load_prev_gold_pool()
     qualified = _derive_gold_qualified(members)
 
@@ -815,12 +867,14 @@ def derive_and_save_gold_pool(members):
         return fd if isinstance(fd, str) and len(fd) >= 10 else None
 
     stocks = {}
-    # 1) 继承历史池：未过期即保留
+    inherited_keys = set()
+    # 1) 继承历史池：未过期即保留（今日是否仍符合口径，稍后据 qualified 判 status）
     for key, old in prev.get("stocks", {}).items():
         fd = _entry_first_date(old)
         if fd and fd < cutoff:
             continue  # 过期出池
         stocks[key] = dict(old)
+        inherited_keys.add(key)
 
     # 2) 今日符合口径：新增或刷新
     for key, st in qualified.items():
@@ -839,6 +893,9 @@ def derive_and_save_gold_pool(members):
                 "signal_count": signal_count,
                 "history": [],
                 "sources": sources,
+                # 今日首次入选 ⇒ 新晋（前端标 [新晋]，与「观察中」区分）
+                "status": "新晋",
+                "last_qualified": today,
             }
         else:
             entry = stocks[key]
@@ -850,15 +907,44 @@ def derive_and_save_gold_pool(members):
                 "signal_count": signal_count,
                 "max_signal": max(entry.get("max_signal", signal_count), signal_count),
                 "sources": sources,
+                # 今日仍符合口径 ⇒ 在池（清掉可能残留的观察中）
+                "status": "在池",
+                "last_qualified": today,
             })
         # 追加/覆盖今日 history
         hist = [h for h in stocks[key].get("history", []) if isinstance(h, dict) and h.get("date") != today]
+        # 🔴 2026-09-13 主人令（必修 3）：history 恢复 close/pct_chg。
+        #   原实现只记 date/signal_count/sources ⇒ 历史轨迹没有价格，无法回看每日涨跌，
+        #   也无法事后核对「入池当天买、第 N 天卖」的收益。价格取自候选池成员 metrics。
+        _mv = st.get("metrics") or st.get("_metrics") or {}
+        _close = _mv.get("price")
+        if not isinstance(_close, (int, float)) or _close == 0:
+            _close = st.get("close")
+        _pct = _mv.get("pct_chg")
+        if not isinstance(_pct, (int, float)):
+            _pct = st.get("pct_chg")
         hist.append({
             "date": today,
             "signal_count": signal_count,
             "sources": sources,
+            "close": (round(float(_close), 2) if isinstance(_close, (int, float)) else None),
+            "pct_chg": (round(float(_pct), 2) if isinstance(_pct, (int, float)) else None),
         })
         stocks[key]["history"] = hist
+
+    # 3) 🔴 2026-09-13 主人令（必修 4）：仅继承、今日不再符合口径的成员 → 降级「观察中」。
+    #    原实现把继承成员原样保留、且不带任何标记 ⇒ 前端看起来与今日新命中无异，
+    #    「金股池 253 只」里混着大量 stale 成员，主人无法判断哪些是今天真的新鲜。
+    #    观察中成员仍可在池回看（不删数据），但不再冒充今日命中。
+    _watch_n = 0
+    for _k in list(stocks.keys()):
+        if _k in qualified:
+            continue
+        if stocks[_k].get("status") != "观察中":
+            stocks[_k]["status"] = "观察中"
+        _watch_n += 1
+    if _watch_n:
+        print(f"    金股池：观察中（仅继承·今日未复现）{_watch_n} 只 / 今日命中 {len(qualified)} 只")
 
     pool = {
         "update_time": now,

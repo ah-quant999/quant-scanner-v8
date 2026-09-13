@@ -1066,13 +1066,18 @@ def _load_scan_targets():
                 # 🛡 2026-09-12 主人令 B4：剔除 ST/退/停牌股（扫描标的防御性过滤）
                 if _is_excluded_stock(str(s.get("name", "") or s.get("stock_name", "")), nc):
                     continue
+                # 🔴 2026-09-13 主人令（必修 5）：金股池中「仅继承保留、今日不再符合口径」
+                #   的成员（status=观察中）不占金股层优先位 —— 否则 stale 成员会冒充今日
+                #   金股，把今日真正命中的标的挤到列表后面，排序与事实不符。
+                _watch = (str(s.get("status", "") or "") == "观察中")
                 merged[nc] = {
                     "code": nc,
                     "name": s.get("name", "") or s.get("stock_name", ""),
                     "board_label": bd,
                     "market_label": s.get("market_label", "") or s.get("market", ""),
                     "pct_chg": s.get("pct_chg", 0) or s.get("pctChg", 0) or s.get("change_pct", 0),
-                    "is_gold": is_gold,
+                    "is_gold": bool(is_gold) and not _watch,
+                    "watch": _watch,
                     "_from": label,
                 }
                 _added += 1
