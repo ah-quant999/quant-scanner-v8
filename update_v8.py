@@ -321,6 +321,12 @@ def _make_lite(name, obj):
             'gold_pool_size': obj.get('gold_pool_size'),
             'stocks_analyzed': obj.get('stocks_analyzed'),
             'summary': obj.get('summary', {}),
+            # 🔴 2026-09-14 小九审计修复：口径审计字段必须一并透传。
+            #   本函数是白名单裁剪，新增字段默认被丢 ⇒ 算法侧写的
+            #   entry_caliber_ver / stale_caliber_dropped 到不了 window.BACKTEST_TDX，
+            #   前端与看门狗就失去了「口径混用」的判据（审计链断在搬运层）。
+            'entry_caliber_ver': obj.get('entry_caliber_ver'),
+            'stale_caliber_dropped': obj.get('stale_caliber_dropped'),
             '_lite_note': '个股历史信号明细已裁剪，仅保留汇总统计',
         }
     if name == 'BACKTEST_COMPREHENSIVE':

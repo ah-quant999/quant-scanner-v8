@@ -505,7 +505,25 @@ def main():
     except:
         pass
     
-    stock_results = existing.get("stocks", {})
+    # 🔴 2026-09-14 小九审计修复：陈旧口径条目不得进入汇总（口径混用治本·P0）。
+    #   原实现 stock_results 直接继承整份旧产物，而下方 summary / opt_summary 均
+    #   遍历**全部** stock_results（不区分是否本轮宇宙）⇒ 掉出宇宙的历史条目因
+    #   循环永不遍历而永远得不到重算，会以旧入场口径（信号日收盘买入）永久留在
+    #   库里污染头条胜率（实测：296 条中 66 条为旧口径残留，trend_up T+5 虚高 0.2pp、
+    #   均收虚高 0.20pp）。修法同 ENTRY_CALIBER_VER 精神 —— 按口径版本号裁剪，
+    #   非当前版本一律丢弃；仍在宇宙内的会由下方循环重算补回，不丢样本。
+    _raw_existing = existing.get("stocks", {})
+    _stale_keys = [k for k, v in _raw_existing.items()
+                   if isinstance(v, dict) and v.get("signals")
+                   and v.get("entry_caliber_ver") != ENTRY_CALIBER_VER]
+    if _stale_keys:
+        _sk = set(_stale_keys)
+        stock_results = {k: v for k, v in _raw_existing.items() if k not in _sk}
+        log(f"[裁剪] {len(_stale_keys)} 只陈旧口径条目(entry_caliber_ver != v{ENTRY_CALIBER_VER})"
+            f" 已丢弃，不参与汇总；仍在宇宙内的会于下方重算补回")
+    else:
+        stock_results = _raw_existing
+    stale_caliber_dropped = len(_stale_keys)
     
     # market映射
     setcode_map = {"hk": "31", "sh": "1", "sz": "0", "bj": "2"}
@@ -604,7 +622,7 @@ def main():
         # 每处理一只存一次（防中断丢失）
         json.dump({
             "calc_time": TODAY,
-            "method": f"baostock 60日K线全量回测 (T+{', T+'.join(map(str, HOLD_DAYS))})",
+            "method": f"baostock 日K全量回测({TDX_BARS}根·约{round(TDX_BARS / 244)}年) (T+{', T+'.join(map(str, HOLD_DAYS))})",
             "gold_pool_size": len(gp_stocks),
             "stocks": stock_results,
         }, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
@@ -703,7 +721,10 @@ def main():
         #   ⚠️ 只加在最终产物；下方「每只一存」的中间快照刻意不加（半成品，
         #      带上时间戳会造出「有 update_time 但无 summary」的假新鲜产物）。
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "method": f"baostock 60日K线全量回测 (T+{', T+'.join(map(str, HOLD_DAYS))})",
+        # 🔴 2026-09-14：口径版本与裁剪审计入产物，供前端/看门狗做「口径混用」守卫
+        "entry_caliber_ver": ENTRY_CALIBER_VER,
+        "stale_caliber_dropped": stale_caliber_dropped,
+        "method": f"baostock 日K全量回测({TDX_BARS}根·约{round(TDX_BARS / 244)}年) (T+{', T+'.join(map(str, HOLD_DAYS))})",
         "gold_pool_size": len(gp_stocks),
         "stocks_analyzed": len([k for k in stock_results if "signals" in stock_results[k]]),
         "survivor_bias_warning": survivor_bias_warning,
