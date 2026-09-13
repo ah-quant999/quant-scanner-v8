@@ -44,7 +44,7 @@
      （链尾「产物完整性闸门 + 结果问责」逐批校验，任一停留非当日即整条链变红）。
 
 ■ 就绪判据（READY_SPEC）
-  A 采集批：10 项产物中 ≥7 项鲜活，且龙虎榜（must）必新  ← 以 READY_SPEC["A"] 为唯一真源
+  A 采集批：19 项中 ≥13 项鲜活（老 10 项的 6 项容错保留）+ **新增 9 项与龙虎榜 must 必新** ← 以 READY_SPEC["A"] 为唯一真源
   B 选股批：9 项产物中 ≥8 项鲜活 + 三重共识/四量终极/逆势龙头（must）必新  ← 以 READY_SPEC["B"] 为唯一真源
   D 汇总批：最终推荐                              → 1/1
   E 回测批：CRDS 回测 / TDX 回测（任一）+ 全算法回测汇总 + 候选池回测 + 金股池回测 → 4/5
@@ -123,7 +123,8 @@ READY_SPEC: dict[str, dict] = {
         #   故把 A 批全部可读时戳的产物纳入清单。
         #   ⚠️ 不含 stock_names.json：该文件无 update_time/data_date 字段，read_ut 恒返回
         #      None → 会永久计为 MISS 从而拉低命中数（实测已确认）。
-        #   need=7/10：容忍 3 项失败仍放行，避免个别抓取源抖动把整条链锁死在 A 批；
+        #   need=13/19（must=1）：见 items 末尾 2026-09-13 的账，余量 6→12（更宽松）；
+        #   ⚠️ 原写「need=7/10：容忍 3 项」是**改前**旧账，已按现值更正；
         #     而当前 4/10 的状态会被判「未就绪」→ 正确触发补跑。
         "items": [
             "data/LHB_DATA.js",                 # 龙虎榜 = 「16:30后数据」的核心标志（must）
@@ -136,9 +137,51 @@ READY_SPEC: dict[str, dict] = {
             "raw_data/nt_data.json",
             "raw_data/sector_fund_flow_trend.json",
             "raw_data/market_alerts.json",
+            # 🛡 2026-09-13 主人令（拍板「A 批 9 项纳入」）：items 10 → 19，need 7 → 22。
+            #   这 9 项是 A 批**实际产出、主站有卡、却未被本清单覆盖**的产物 ⇒
+            #   老 10 项新鲜而它们整日红灯时，闸门仍判「A 已就绪」⇒ 空转 ⇒ 永远补不上
+            #   （与 09-11 / 09-12 两次同类事故同因）。
+            #   🔴 账（先核实再动手，**must 只有 1 项**，不是 16 项 —— 我第一版算错过）：
+            #     改前 items=10 / need=7 / must=1 ⇒ 容错余量 = 7 − 1 = 6；
+            #     改后 items=19 / need=13 / must=1 ⇒ 余量 = 13 − 1 = **12**。
+            #     ⇒ 余量不减反增（更宽松），且新增 9 项**确实参与**判定。
+            #     ⚠️ 铁律：**只加 items 不抬 need = 没加**（need 是纯计数）；
+            #        但 **need 绝不能 > len(items)**（那会永不就绪、锁死）——
+            #        我第一版写 need=22 > items=19，被自检当场拦下。
+            #   🔴 联动：新增项必须同步进 dedup_fetch_manifest.py::_ALWAYS_PUSH，
+            #     否则内容天然稳定项被判伪变更 ⇒ 恒旧 ⇒ 每轮重跑不收敛。
+            "data/ALGO_BACKTEST_COMPARE.js",       # 多算法同口径聚合（含强势突破）
+            "raw_data/lhb_data.json",              # 龙虎榜明细（LHB_DATA.js 的源）
+            "data/TDX_BACKTEST.js",                # TDX 全档回测
+            "data/AVG_PRICE.js",                   # 平均股价（通达信 880003）
+            "data/ETF_SUBSCRIPTION.js",            # ETF 申购赎回
+            "raw_data/etf_subscription.json",      # ETF 申赎源
+            "raw_data/avg_price.json",             # 平均股价源
+            "raw_data/etf_spot.json",              # ETF 实时快照（ETF 三合一卡）
+            "raw_data/zsxq_posts.json",            # 知识星球主题（候选观澜台 P0 监控项）
         ],
-        "need": 7,
-        "must": ["data/LHB_DATA.js"],   # 龙虎榜是「16:30后数据」的核心标志
+        "need": 13,
+        # 🔴 方案丙（2026-09-13 实测后定稿，强于「只抬 need」）：
+        #   need=13 保留老 10 项的 6 项容错（采集批抓取源抖动常见，不宜一刀切全须新）；
+        #   但**新增 9 项一律进 must（逐项必新）** ⇒ 它们任一陈旧即 not ready
+        #   （must 与 need 计数无关，直接否决）⇒ 缺口被根治。
+        #   对照实测：若只抬 need=13 而不加 must，则「老 10 全新鲜 + 新增 9 项坏 6 项」
+        #   仍判就绪 ⇒ 拦截太弱；need=19 又会让任一抖动锁死 A 批。must 是正解。
+        #   ⚠️ must 的代价：must 项必须同步进 dedup_fetch_manifest.py::_ALWAYS_PUSH
+        #      （已在本补丁 D1 落地），否则内容天然稳定项被判伪变更 ⇒ must 恒不满足 ⇒ 锁死。
+        "must": [
+            "data/LHB_DATA.js",                       # 原有：龙虎榜（16:30 后数据核心标志）
+            # 2026-09-13 新增 9 项：A 批实际产出、主站有卡、原未覆盖 ⇒ 逐项必新
+            "data/ALGO_BACKTEST_COMPARE.js",
+            "raw_data/lhb_data.json",
+            "data/TDX_BACKTEST.js",
+            "data/AVG_PRICE.js",
+            "data/ETF_SUBSCRIPTION.js",
+            "raw_data/etf_subscription.json",
+            "raw_data/avg_price.json",
+            "raw_data/etf_spot.json",
+            "raw_data/zsxq_posts.json",
+        ],   # 龙虎榜是「16:30后数据」的核心标志
     },
     "B": {
         # 🛡 2026-09-11 主人令「一劳永逸」：readiness 清单从 3 项代表产物扩到 9 项。

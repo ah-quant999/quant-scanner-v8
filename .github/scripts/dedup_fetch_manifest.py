@@ -123,6 +123,18 @@ _ALWAYS_PUSH = {
     "data/FINAL_RECOMMEND_DATA.js",        # READY_SPEC["D"].items（need=1，零余量，最高危）
     "data/CRDS_BACKTEST.js",               # READY_SPEC["E"].items
     "data/BACKTEST_TDX.js",                # READY_SPEC["E"].items
+    # ── 🛡 2026-09-13 同步 stage_gate 的「A 批 9 项纳入」────────────────
+    #   契约同前：凡 READY_SPEC[*] 的 items 一律纳入本白名单（一一对应，可断言）。
+    #   漏加 ⇒ 内容天然稳定的项被判伪变更 ⇒ update_time 恒旧 ⇒ A 批每轮重跑永不收敛。
+    "data/ALGO_BACKTEST_COMPARE.js",       # READY_SPEC["A"].items（2026-09-13 新增）
+    "raw_data/lhb_data.json",              # READY_SPEC["A"].items（2026-09-13 新增）
+    "data/TDX_BACKTEST.js",                # READY_SPEC["A"].items（2026-09-13 新增）
+    "data/AVG_PRICE.js",                   # READY_SPEC["A"].items（2026-09-13 新增）
+    "data/ETF_SUBSCRIPTION.js",            # READY_SPEC["A"].items（2026-09-13 新增）
+    "raw_data/etf_subscription.json",      # READY_SPEC["A"].items（2026-09-13 新增）
+    "raw_data/avg_price.json",             # READY_SPEC["A"].items（2026-09-13 新增）
+    "raw_data/etf_spot.json",              # READY_SPEC["A"].items（2026-09-13 新增）
+    "raw_data/zsxq_posts.json",            # READY_SPEC["A"].items（2026-09-13 新增）
 }
 
 
