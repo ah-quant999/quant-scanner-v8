@@ -451,7 +451,7 @@ STOCK_PICKING_SCRIPTS = {
     "track_h_auto_buy.py",           # H 反推跟踪
     "calc_volatility_watch.py",      # 波动率观察选股
     "gen_stock_stop.py",             # ATR 止损止盈（读候选宇宙日K）
-    "gen_lhb_7d.py",                 # 龙虎榜 7 日累计（选股向汇总）
+    # LHB_7D 已停跑（2026-09-13）：gen_lhb_7d.py 从选股门控名单移除（前端零引用 + raw 无消费方）
 }
 # 🔴 2026-09-03 主人令「回测页跟着最终推荐的算法时间走，太早算就无效、浪费」：
 #   回测批与选股批同一盘后门控 —— 交易日盘中/盘前（06:00-17:59）即使 force 跑链，
@@ -1144,7 +1144,10 @@ def step_append_lhb_history():
 
 
 def step_gen_lhb_7d():
-    """生成龙虎榜 7 日累计数据（机游共振 + 北向席位），输出 raw_data/lhb_7d.json + data/LHB_7D.js。
+    """⚠️ DEPRECATED（2026-09-13 阿狸咪的工程师）：本函数已停用，调用点已注释。
+    保留函数体仅供回滚；不要再挂回任何批次（产物 LHB_7D.js / lhb_7d.json 均无消费方）。
+
+    生成龙虎榜 7 日累计数据（机游共振 + 北向席位），输出 raw_data/lhb_7d.json + data/LHB_7D.js。
     依赖 step_append_lhb_history 已把当日数据追加进 raw_data/lhb_history.json，同时读取 raw_data/lhb_data.json 当日明细兜底。"""
     print("\n[2.6] 生成 LHB 7 日累计 → data/LHB_7D.js")
     try:
@@ -1207,7 +1210,12 @@ def main():
         # 🔴 盘后选股策略门控：LHB 7日累计属于选股向汇总，未到 18:00 不处理当日龙虎榜数据
         if _is_post_close_picking_ready() and _is_trading_day_now():
             step_append_lhb_history()
-            step_gen_lhb_7d()
+            # 🛑 2026-09-13 阿狸咪的工程师：gen_lhb_7d.py **已停跑（2026-09-13 阿狸咪的工程师）**。
+            #   取证：data/LHB_7D.js 前端零引用（index.html L527 早已停止注入）；
+            #         raw_data/lhb_7d.json 全仓无任何读取者（grep 仅命中 gen_lhb_7d.py 自身写入）。
+            #   但 ORDER(L197)/STAGES(L284) 注释后，本处硬调用仍在 → B/D 批每天白跑。
+            #   现一并停用，保留函数体（step_gen_lhb_7d）便于随时回滚。
+            # step_gen_lhb_7d()
             step_build_pool_tracker()
         else:
             print("\n[2.5-2.7] ⏭️ 跳过 LHB 历史累积 + LHB 7日累计 + v8 选股生命周期（非交易日或盘后策略未就绪）")

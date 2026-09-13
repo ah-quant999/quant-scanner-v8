@@ -525,6 +525,9 @@ window.__domReadyFns=[];
 <script src="data/NT_DATA.js?v=1789263370" defer></script>
 <script src="data/LHB_DATA.js?v=1789263370" defer></script>
 <!-- 2026-08-31 轻量化：data/LHB_7D.js（5.9 KB）前端零引用，停止注入（省 5.9 KB） -->
+<!-- 2026-09-13 阿狸咪的工程师：生成器硬调用已一并停用（run_algorithms.py L1210 的
+     step_gen_lhb_7d() 已注释）—— raw_data/lhb_7d.json 全仓无消费方。
+     若日后需复活，同步恢复该调用与本注入。 -->
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
@@ -555,6 +558,11 @@ window.__domReadyFns=[];
     <script src="data/RISK_GAUGE.js?v=1789263370" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=1789263370" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=1789263370" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
+    <!-- 2026-09-13 阿狸咪的工程师：补注入 FRESHNESS_STATUS（2.7 KB）。
+         后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
+         前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
+         作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
+    <script src="data/FRESHNESS_STATUS.js?v=1789263370" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=1789263370" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=1789263370" defer></script>
