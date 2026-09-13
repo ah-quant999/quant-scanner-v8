@@ -2118,8 +2118,6 @@ def check_stock_signals(code, name, market="sh", board_label="", volume_amount=0
         signal_count = sum([缠论买, 金钻信号, 机构变红, 上涨趋势])
         # 三线共振：四个信号中满足任意三种
         三线共振 = signal_count >= 3
-        # 三足鼎立：四信号全满足（最难出现）
-        三足鼎立 = signal_count == 4
 
         # RSI(14) — 用于风控和评分
         try:
@@ -2193,7 +2191,6 @@ def check_stock_signals(code, name, market="sh", board_label="", volume_amount=0
             "上涨趋势_条件4": 上涨趋势_条件4,
             "上涨趋势": 上涨趋势,
             "三线共振": 三线共振,
-            "三足鼎立": 三足鼎立,
             "signal_count": signal_count,
             "当日涨停": 当日涨停,
             "涨停延迟": 当日涨停,
@@ -2227,7 +2224,6 @@ def check_stock_signals(code, name, market="sh", board_label="", volume_amount=0
                 "上涨趋势_条件4": 上涨趋势_条件4,
                 "上涨趋势": 上涨趋势,
                 "三线共振": 三线共振,
-                "三足鼎立": 三足鼎立,
                 "signal_count": signal_count,
                 "当日涨停": 当日涨停,
                 "涨停延迟": 当日涨停,
@@ -2272,6 +2268,36 @@ def _gold_pool_paths():
     return out
 
 
+# 🔴 2026-09-13 阿狸咪的工程师：清理历史「三足鼎立」来源标签（一劳永逸）
+#   背景①：该标签原为池内**兜底默认值**（非真实来源），凡池中查不到记录的股票
+#          都会被标成「三足鼎立」⇒ 前端来源 chips 长期显示不实信息。
+#   背景②：「三足鼎立」信号（signal_count==4）经 3120 只 × 一年共 325,466 个
+#          股票日离线回溯实测触发 0 次（含金钻的三腿组合全年最稀有仅 7 次），
+#          已随策略一并删除（主人令：删干净）。
+#   本迁移把历史写入的旧标签就地改名 —— _merge_sources 只追加不删，不迁会永久残留。
+_LEGACY_SOURCE_RENAME = {"三足鼎立": "信号≥2"}
+
+
+def _migrate_legacy_sources(d):
+    """就地把历史遗留的来源标签改名（幂等 · 去重保序）。"""
+    if not isinstance(d, dict):
+        return d
+    for _st in (d.get("stocks") or {}).values():
+        if not isinstance(_st, dict):
+            continue
+        _src = _st.get("sources")
+        if not isinstance(_src, list):
+            continue
+        _out, _seen = [], set()
+        for _x in _src:
+            _x = _LEGACY_SOURCE_RENAME.get(_x, _x)
+            if _x not in _seen:
+                _seen.add(_x)
+                _out.append(_x)
+        _st["sources"] = _out
+    return d
+
+
 def load_gold_pool():
     """加载金股池（多路径 · 非空优先）。
 
@@ -2292,8 +2318,9 @@ def load_gold_pool():
         if best is None or (not best.get("stocks") and d.get("stocks")):
             best = d
         if d.get("stocks"):
-            return d
-    return best if best is not None else {"stocks": {}, "last_update": None}
+            return _migrate_legacy_sources(d)
+    return _migrate_legacy_sources(
+        best if best is not None else {"stocks": {}, "last_update": None})
 
 
 def save_gold_pool(pool):
@@ -2635,7 +2662,7 @@ def update_gold_pool_from_scan(output):
                 "max_signal": s["signal_count"],
                 "signal_count": s["signal_count"],
                 "history": [],
-                "sources": ["三足鼎立"] + cand_src,
+                "sources": ["信号≥2"] + cand_src,
             }
         else:
             pool["stocks"][key]["max_signal"] = max(
@@ -2643,7 +2670,7 @@ def update_gold_pool_from_scan(output):
             pool["stocks"][key]["signal_count"] = s["signal_count"]
             pool["stocks"][key]["board_label"] = s.get("board_label", pool["stocks"][key].get("board_label", ""))
             pool["stocks"][key]["fund_type"] = s.get("fund_type", pool["stocks"][key].get("fund_type", ""))
-            _merge_sources(pool["stocks"][key], ["三足鼎立"] + cand_src)
+            _merge_sources(pool["stocks"][key], ["信号≥2"] + cand_src)
 
         # 记录每日信号（新入池和已有股票都记录，保证每天有pct_chg）
         history_entry = {
@@ -2779,7 +2806,7 @@ def update_gold_pool_from_watch(watch_output):
                 "first_signal": s["signal_count"],
                 "max_signal": s["signal_count"],
                 "signal_count": s["signal_count"],
-                "sources": ["三足鼎立"],
+                "sources": ["信号≥2"],
                 "history": [{
                     "date": today,
                     "signal_count": s["signal_count"],
@@ -2927,7 +2954,7 @@ def _scan_one_stock(args):
         result = check_stock_signals(code, name, market, board_label, volume_amount, turnover_rate, mv_yi, fund_type)
         if result is not None:
             pool_key = f"{market}_{code}"
-            result["sources"] = _preload_stocks.get(pool_key, {}).get("sources", ["三足鼎立"])
+            result["sources"] = _preload_stocks.get(pool_key, {}).get("sources", [])
         return (result, None)
     except Exception as e:
         return (None, {
@@ -3275,7 +3302,7 @@ def watch_gold_pool():
             result = check_stock_signals(code, name, market)
             if result is not None:
                 # 注入来源标签(从金股池读取)
-                result["sources"] = stock_info.get("sources", ["三足鼎立"])
+                result["sources"] = stock_info.get("sources", [])
                 results.append(result)
                 if result["三线共振"]:
                     三线共振_list.append(result)

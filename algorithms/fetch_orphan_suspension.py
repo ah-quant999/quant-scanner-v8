@@ -69,7 +69,7 @@ def fetch_near_trigger():
             "gap": round(gap, 1),
         })
 
-    # 来源1：金股池全量扫描（不限三足鼎立）
+    # 来源1：金股池全量扫描（不限信号档位）
     pool_path = os.path.join(DATA_DIR, "gold_pool.json")
     # 金股池如未生成则降级到 v6 源（过渡期）
     if not os.path.exists(pool_path):
