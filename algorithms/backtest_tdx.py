@@ -703,7 +703,8 @@ def main():
         sd = {"label": label, "total": s["total"]}
         for d_ in HOLD_DAYS:
             decided = s[f"win_{d_}d"] + s[f"loss_{d_}d"]  # 排除平盘，与 comprehensive 统一
-            wr = round(s[f"win_{d_}d"] / decided * 100, 1) if decided else 0
+            # 🔴 2026-09-13 禁止 0 冒充：该档未到期/全平盘 ⇒ 胜率 None
+            wr = round(s[f"win_{d_}d"] / decided * 100, 1) if decided else None
             ar = round(s[f"total_ret_{d_}d"] / s["total"], 2) if s["total"] else 0
             row += f" {wr:>6}%  {ar:>+8}%"
             sd[f"win_{d_}d"] = s[f"win_{d_}d"]
@@ -732,7 +733,7 @@ def main():
             sd = {"label": label, "total": opt["total"], "config": OPTIMIZED}
             for d_ in OPTIMIZED["report_periods"]:
                 decided = opt[f"win_{d_}d"] + opt[f"loss_{d_}d"]
-                wr = round(opt[f"win_{d_}d"] / decided * 100, 1) if decided else 0
+                wr = round(opt[f"win_{d_}d"] / decided * 100, 1) if decided else None
                 ar = round(opt[f"total_ret_{d_}d"] / opt["total"], 2) if opt["total"] else 0
                 row += f" {wr:>6}%  {ar:>+8}%"
                 sd[f"win_{d_}d"] = opt[f"win_{d_}d"]

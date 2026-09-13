@@ -479,8 +479,9 @@ j    - 前复权（fetch_a_daily 走 akshare/腾讯前复权，前端 np 已处�
     for k, a in agg.items():
         c = a["count"]
         decided = a["win"] + a["loss"]
-        win_rate = round(a["win"] / decided * 100, 1) if decided else 0
-        avg_return = round(a["ret_sum"] / c, 2) if c else 0
+        # 🔴 2026-09-13 禁止 0 冒充：未到期/无样本 ⇒ None（前端「—」）
+        win_rate = round(a["win"] / decided * 100, 1) if decided else None
+        avg_return = round(a["ret_sum"] / c, 2) if c else None
         # 🔴 2026-09-13 一劳永逸修复「回撤量纲错误」：原实现把所有信号拼成一条线
         #   累加求峰谷 —— 那不是任何组合的净值曲线（实测 −133.56%，回撤下界应为
         #   −100%）。现改为**逐信号**算其持有期内回撤（相对该信号入场价的峰值回撤），

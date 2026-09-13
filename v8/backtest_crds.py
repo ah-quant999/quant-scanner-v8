@@ -206,7 +206,10 @@ def fetch_kline_around(code, center_date_str, lookback_days=8, lookahead_days=LO
 
 
 def fmt_pct(v):
-    return round(v, 2)
+    # 🔴 2026-09-13 主人令「统一测算标准 · 禁止 0 冒充」：无样本/未到期
+    #   的统计量一律 None（前端显示「—」），绝不用 0 冒充 —— 0 会被读成
+    #   「胜率 0% / 收益 0%」，那是把「没数据」谎报成「最差结果」。
+    return round(v, 2) if v is not None else None
 
 
 def fetch_close_roll(code, date_str, max_fwd=8):
@@ -237,13 +240,13 @@ def empty_backtest(reason):
             "by_period": {
                 str(p): {
                     "samples": 0,
-                    "win_rate": 0,
-                    "avg_return": 0,
-                    "best_return": 0,
-                    "worst_return": 0,
-                    "win_avg": 0,
-                    "loss_avg": 0,
-                    "profit_loss_ratio": 0,
+                    "win_rate": None,
+                    "avg_return": None,
+                    "best_return": None,
+                    "worst_return": None,
+                    "win_avg": None,
+                    "loss_avg": None,
+                    "profit_loss_ratio": None,
                 }
                 for p in HOLD_PERIODS
             },
@@ -359,11 +362,12 @@ def main():
         rets = period_returns[p]
         equity_paths = period_per_signal_equity[p]
         if not rets:
+            # 🔴 2026-09-13：该档未到期/无样本 ⇒ 统计量一律 None（只留 samples:0）
             by_period[str(p)] = {
-                "samples": 0, "win_rate": 0, "avg_return": 0,
-                "best_return": 0, "worst_return": 0,
-                "win_avg": 0, "loss_avg": 0, "profit_loss_ratio": 0,
-                "max_drawdown": 0, "sharpe_ratio": 0,
+                "samples": 0, "win_rate": None, "avg_return": None,
+                "best_return": None, "worst_return": None,
+                "win_avg": None, "loss_avg": None, "profit_loss_ratio": None,
+                "max_drawdown": None, "sharpe_ratio": None,
             }
             continue
         wins = [r for r in rets if r > 0]
@@ -373,9 +377,10 @@ def main():
         avg_ret = sum(rets) / len(rets)
         max_ret = max(rets)
         min_ret = min(rets)
-        win_avg = sum(wins) / len(wins) if wins else 0
-        loss_avg = sum(losses) / len(losses) if losses else 0
-        profit_loss_ratio = abs(win_avg / loss_avg) if wins and losses else 0
+        # 🔴 2026-09-13：无「赢/亏」子集时，对应均值/盈亏比无意义 ⇒ None
+        win_avg = sum(wins) / len(wins) if wins else None
+        loss_avg = sum(losses) / len(losses) if losses else None
+        profit_loss_ratio = abs(win_avg / loss_avg) if (wins and losses) else None
         # 🔴 2026-09-13 一劳永逸修复「回撤量纲错误」：原实现把各信号收益路径
         #   **首尾拼接**后累加求峰谷 —— 那不是任何组合的净值曲线，量纲错误
         #   （实测 CRDS −314.36%，而回撤下界应为 −100%）。现改为**逐信号**算其
@@ -395,11 +400,11 @@ def main():
         # 夏普：以均收益/收益标准差（简单近似，未年化）
         variance = sum((r - avg_ret) ** 2 for r in rets) / max(len(rets) - 1, 1)
         std_ret = variance ** 0.5
-        sharpe = round(avg_ret / std_ret, 2) if std_ret > 0 else 0
+        sharpe = round(avg_ret / std_ret, 2) if std_ret > 0 else None
         by_period[str(p)] = {
             "samples": len(rets),
             "draws": len(draws),  # 透明：平盘数
-            "win_rate": fmt_pct(len(wins) / decided * 100) if decided else 0,
+            "win_rate": fmt_pct(len(wins) / decided * 100) if decided else None,
             "avg_return": fmt_pct(avg_ret),
             "best_return": fmt_pct(max_ret),
             "worst_return": fmt_pct(min_ret),
