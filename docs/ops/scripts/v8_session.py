@@ -32,10 +32,15 @@
   python docs/ops/scripts/v8_session.py push --commit <sha> --files a.py,b.py --msg "主题"
   python docs/ops/scripts/v8_session.py end --summary "已完成 X"
 
-■ 会话号
-  取环境变量 `V8_SESSION`（如 `alimi-A` / `alimi-B`）；未设则读/生成
-  `~/.workbuddy/v8_session_id`（形如 `alimi-1`），保证同一终端重复调用身份稳定。
-  ⚠️ 不许编造身份：拿不到就落 `unknown`，但会显著降低区分度。
+■ 会话号（🔴 2026-09-13 重修：必须**按会话**派生，不能按机器）
+  ① 优先环境变量 `V8_SESSION`（如 `alimi-A` / `alimi-B`）—— 人工可覆盖；
+  ② 否则按 **cwd 所属的会话目录**（形如 `2026-08-28-21-48-18`）分配，映射存
+     `~/.workbuddy/v8_session_ids.json` ⇒ **同机两会话各得稳定且不同的号**；
+     可用 `V8_SESSION_DIR` 显式指定会话目录（推送工具应传工具自身所在目录）。
+  ③ 上溯不到会话目录 ⇒ 回退旧的机器级 `~/.workbuddy/v8_session_id`，并向 stderr 告警
+     —— ⚠️ 该文件**机器级共享**，同机多会话会收敛成同一个号（这正是重修前的实测缺陷）。
+  ⚠️ 不许编造身份：三条都拿不到才落 `unknown`。
+  🔴 本文件的 `id` 子命令是**会话身份的唯一真源**，推送工具必须调它取号。
 
 ■ 退出码（供脚本消费）
   0 = 无冲突   2 = 发现潜在冲突（不阻断，仅提示）   3 = 参数/环境错误
@@ -43,6 +48,7 @@
 import argparse
 import json
 import os
+import re
 import socket
 import sys
 import time
@@ -50,7 +56,9 @@ from datetime import datetime
 from pathlib import Path
 
 REG = Path.home() / ".workbuddy" / "v8_session_registry.jsonl"
-IDF = Path.home() / ".workbuddy" / "v8_session_id"
+IDF = Path.home() / ".workbuddy" / "v8_session_id"          # 旧机器级文件（仅作回退）
+IDS = Path.home() / ".workbuddy" / "v8_session_ids.json"    # 每会话一条 {会话目录名: 会话号}
+_SDIR_RE = re.compile(r"^\d{4}-\d{2}-\d{2}[-_]\d{2}[-_]\d{2}[-_]\d{2}$")
 LEASE_MIN = 90      # `begin` 的租约窗口：窗口内同文件/同主题视为可能撞车
 HOT_MIN = 20        # `check` 的热点窗口：窗口内他人改过的文件视为热
 KEEP_DAYS = 14      # 登记表自动裁剪：只保留最近 N 天（防无限膨胀）
@@ -64,21 +72,56 @@ def host():
     return os.environ.get("V8_HOSTNAME") or socket.gethostname()
 
 
+def _sdir_key():
+    """会话身份键 = cwd 所属的**会话目录名**（如 `2026-08-28-21-48-18`）。
+
+    🔴 为什么必须按会话而非按机器：`~/.workbuddy/v8_session_id` 是机器级共享文件，
+      同机两个会话未设 `V8_SESSION` 时会**收敛到同一个号** ⇒ commit 尾巴全成
+      `[Cat]`/`[Cat/cat-1]` ⇒「同机哪个会话」不可区分。按会话目录分配可根治。
+    """
+    env = (os.environ.get("V8_SESSION_DIR") or "").strip()
+    base = os.path.abspath(env or os.getcwd())
+    for anc in [Path(base)] + list(Path(base).parents):
+        if _SDIR_RE.match(anc.name):
+            return anc.name
+    return None
+
+
 def session_id():
     s = (os.environ.get("V8_SESSION") or "").strip()
     if s:
         return s
+    key = _sdir_key()
     try:
+        if key:
+            m = {}
+            if IDS.exists():
+                m = json.loads(IDS.read_text(encoding="utf-8")) or {}
+                if not isinstance(m, dict):
+                    m = {}
+            if str(m.get(key, "")).strip():
+                return str(m[key]).strip()
+            used = set(str(v) for v in m.values())
+            prefix = host().split(".")[0].lower() or "unknown"
+            i = 1
+            while "%s-%d" % (prefix, i) in used:
+                i += 1
+            sid = "%s-%d" % (prefix, i)
+            m[key] = sid
+            IDS.parent.mkdir(parents=True, exist_ok=True)
+            IDS.write_text(json.dumps(m, ensure_ascii=False, indent=1), encoding="utf-8")
+            return sid
         if IDF.exists():
             v = IDF.read_text(encoding="utf-8").strip()
             if v:
+                sys.stderr.write(
+                    "[v8_session] ⚠️ 未识别到会话目录，回退机器级 ID %r；"
+                    "该文件为机器级共享，**同机多会话会收敛**，"
+                    "请设 V8_SESSION 或 V8_SESSION_DIR\n" % v)
                 return v
-        v = "%s-1" % (host().split(".")[0].lower() or "unknown")
-        IDF.parent.mkdir(parents=True, exist_ok=True)
-        IDF.write_text(v, encoding="utf-8")
-        return v
     except Exception:
-        return "unknown"
+        pass
+    return "unknown"
 
 
 def norm_files(rel):
@@ -254,6 +297,17 @@ def cmd_note(a):
     return 0
 
 
+def cmd_id(a):
+    """打印 `host/session`（供推送工具取号 ⇒ commit 尾巴与登记表**同源**）。
+
+    🔴 单一真源：推送工具**必须**调本命令，禁止自行实现。实测教训：本机
+      `atomic_patch_push.py` 曾自行取号 ⇒ 工具落 `[Cat]`、登记表落 `cat-1`，
+      两处不同源 ⇒ 同机两会话在 git 层与登记表里都不可区分。
+    """
+    print("%s/%s" % (host().split(".")[0].lower(), session_id()))
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description="v8 同机双会话登记器")
     sub = ap.add_subparsers(dest="cmd")
@@ -287,6 +341,9 @@ def main():
     p.add_argument("--msg", default=None)
     p.add_argument("--files", default="")
     p.set_defaults(fn=cmd_note)
+
+    p = sub.add_parser("id", help="打印当前会话身份 host/session（推送工具取号的唯一真源）")
+    p.set_defaults(fn=cmd_id)
 
     a = ap.parse_args()
     if not getattr(a, "fn", None):
