@@ -6067,6 +6067,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       return '<span style="font-size:10px;color:' + _numColor(x.fund) + ';font-weight:600;">💰 ' + _sign(x.fund)
         + '亿<span style="color:var(--dim);font-weight:400;">·' + x.nFundSec + '概念</span></span>';
     }
+    function pePbBadge(x){
+      if(x.pe_ttm == null && x.pb_mrq == null) return '';
+      var parts = [];
+      if(x.pe_ttm != null) parts.push('PE ' + x.pe_ttm.toFixed(1));
+      if(x.pb_mrq != null) parts.push('PB ' + x.pb_mrq.toFixed(2));
+      return '<span style="font-size:10px;color:#a78bfa;font-weight:600;">📊 ' + parts.join(' · ') + '</span>';
+    }
     // 交叉象限符号：🔥 资金正+基本面 / 💰 仅资金正 / 📈 仅基本面 / 空
     function quadMark(x){
       var f = x.nFundSec > 0 && x.fund > 0, b = !!(x.perf || x.roe);
@@ -6075,13 +6082,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       if(b) return '<span title="有基本面证据，资金未流入" style="font-size:11px;">📈</span>';
       return '';
     }
-    // 分档：A=概念+业绩正向+ROE  B=概念+业绩或ROE其一  C=仅概念命中；同档按「成长+质量」综合分降序
+    // 分档：A=概念+业绩正向+ROE+PE合理  B=概念+业绩或ROE其一  C=仅概念命中；同档按「成长+质量+估值」综合分降序
     hits.forEach(function(x){
+      var q = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks && window.STOCK_QUOTE.stocks[x.code]) || {};
+      x.pe_ttm = (q.pe_ttm == null || q.pe_ttm <= 0) ? null : q.pe_ttm;
+      x.pb_mrq = (q.pb_mrq == null || q.pb_mrq <= 0) ? null : q.pb_mrq;
       var hasPerf = !!x.perf, hasRoe = !!x.roe;
-      x.tier = (hasPerf && hasRoe) ? 0 : (hasPerf || hasRoe ? 1 : 2);
-      // 潜力价值分：业绩预告变化率 + ROE_TTM；无数据则取0
+      var peOk = x.pe_ttm != null && x.pe_ttm > 0 && x.pe_ttm < 50; // PE合理：有正PE且<50（规避亏损/极端高估值）
+      x.tier = (hasPerf && hasRoe && peOk) ? 0 : (hasPerf || hasRoe ? 1 : 2);
+      // 潜力价值分：成长 + 质量 - PE 惩罚（PE 越高扣分越多，无PE不惩罚）
+      var pePenalty = (x.pe_ttm == null) ? 0 : Math.max(-20, (x.pe_ttm - 30) * 0.5);
       x.valueScore = ((x.perf && x.perf.change_pct != null) ? x.perf.change_pct : 0)
-                   + ((x.roe && x.roe.roe_ttm != null) ? x.roe.roe_ttm : 0);
+                   + ((x.roe && x.roe.roe_ttm != null) ? x.roe.roe_ttm : 0)
+                   - pePenalty;
     });
     hits.sort(function(a,b){
       return a.tier - b.tier || (b.valueScore - a.valueScore) || (b.fund - a.fund) || b.tags.length - a.tags.length;
@@ -6101,6 +6114,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       if(badge && b2) badge += ' ' + b2; else if(b2) badge = b2;
       var badge3 = fundBadge(x);
       if(badge3) badge = badge ? badge + '<br>' + badge3 : badge3;
+      var badge4 = pePbBadge(x);
+      if(badge4) badge = badge ? badge + '<br>' + badge4 : badge4;
       if(!badge) badge = '<span style="font-size:10px;color:var(--dim);">仅概念命中</span>';
       return '<div style="border:1px solid ' + border + '44;border-left:3px solid ' + border + ';border-radius:8px;padding:6px 8px;font-size:12px;background:rgba(148,163,184,.05);">'
         + '<div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + quadMark(x) + '<b>' + _ev(x.code) + '</b> <span style="color:var(--sub);font-weight:400;">' + _ev(x.name) + '</span></div>'
@@ -6162,8 +6177,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '<div style="padding:12px 14px;">'
       + '<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;font-size:12px;color:var(--txt);">'
       +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">📌 核心：</b>在七大长期主题（创新药、AI医疗、机器人、固态电池、低空航天、算力/CPO、数据要素）中，找出「有概念想象空间 + 业绩或ROE质量证据」的股票。</div>'
-      +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b>A 档=概念+业绩正向+ROE 三项齐（已全部展开）；B 档=概念+业绩或ROE 其一；C 档=仅概念命中（后两档点标题展开）。按成长+质量排序，资金仅作辅助验证。</div>'
-      +   '<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠️ 限制（重要）：</b>本卡<b>没有个股 PE / PB 估值数据</b>，所以它<b>不能判断「便宜」</b>，只能判断「成长 + 质量」。资金维度每天变，会扰动排序。仅研究参考，不构成投资建议。</div>'
+      +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b>A 档=概念+业绩正向+ROE+PE&lt;50 四项齐；B 档=概念+业绩或ROE 其一；C 档=仅概念命中（后两档点标题展开）。按成长+质量-估值惩罚排序，资金仅作辅助验证。</div>'
+      +   '<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠️ 估值护栏：</b>A 档要求 PE 为正且&lt;50；排序已扣减高 PE 惩罚。PE/PB 来自东财全市场快照，若数据源未刷新则可能缺失。仅研究参考，不构成投资建议。</div>'
       + '</div>'
       + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">' + chips + '</div>'
       + '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;padding:6px 8px;background:rgba(148,163,184,.06);border-radius:6px;line-height:1.7;">'
