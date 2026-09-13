@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-09-12 23:55:23",
+  "check_time": "2026-09-13 16:13:47",
   "last_trade_close": "2026-09-11 15:30:00",
   "is_trading_day": false,
   "core_stale": [],
@@ -72,7 +72,6 @@
     "FACTOR_LAB_BACKTEST": "post_close",
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
-    "STOCK_PROFILE": "post_close",
     "V8_POOL_TRACKER": "post_close",
     "AVG_PRICE_DATA": "intraday,post_close",
     "ALGO_TRACK": "post_close",
@@ -80,7 +79,6 @@
     "MARKET_REGIME": "post_close",
     "SECTOR_RECOMMENDATION": "post_close",
     "FINAL_RECOMMEND_DATA": "post_close",
-    "STOCK_RPS_DATA": "post_close",
     "RESTRICTED_RELEASE": "premarket,post_close",
     "PERFORMANCE_FORECAST": "premarket,post_close"
   },
