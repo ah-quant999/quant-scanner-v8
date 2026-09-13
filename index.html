@@ -4189,7 +4189,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   window.__renderBacktestCardsFrom = function(list){
     var h = '';
     (list||[]).slice().sort(function(a,b){ return (b.stars||0) - (a.stars||0); }).forEach(function(m){
-      h += _renderPeriodBacktestCard({key:m.key, name:m.name, stars:m.stars, icon:m.icon, desc:m.desc, color:m.color}, window[m.var]);
+      var _rpc = (typeof _renderPeriodBacktestCard === 'function') ? _renderPeriodBacktestCard
+               : window._renderPeriodBacktestCard;
+      if(typeof _rpc !== 'function'){ console.warn('[bt] _renderPeriodBacktestCard 尚未注册，跳过', m.key); return; }
+      h += _rpc({key:m.key, name:m.name, stars:m.stars, icon:m.icon, desc:m.desc, color:m.color}, window[m.var]);
     });
     return h;
   };
@@ -4209,7 +4212,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   </script>
  
   
- <!-- ============ 运维（管理员） ============ --</script>
+<!-- 2026-09-13 修复：此处原为畸形残骸（注释未闭合 + 混入 </script>），已删除。正确注释见下方 <section id="sec-bt"> 前。 -->
 
 
 <!-- ============ 🔒 策略回测（统一 · 2026-08-13 主人令） ============
@@ -4422,6 +4425,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     html += '</div>';
     return html;
   }
+  /* 🛡 2026-09-13 修复：本函数原为 IIFE 私有，但调用方 __renderBacktestCardsFrom
+     位于前一个 <script> 块（L4189）⇒ 跨块不可见 ⇒ ReferenceError → 回测卡整体渲染失败
+     （partialLen 停在 16616）。现显式挂到 window，跨块可见。 */
+  window._renderPeriodBacktestCard = _renderPeriodBacktestCard;
+
 
   /* ════════════════════════════════════════════════════════════════════
      选股生命周期详情弹窗（2026-09-04 主人令：走弱桶 / 待确认剔除 不直接铺大网格）
@@ -6401,24 +6409,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       return '<div style="background:rgba(148,163,184,.15);border-radius:3px;height:6px;margin-top:4px;overflow:hidden;">'
         + '<div style="width:' + w + '%;height:100%;background:' + c + ';"></div></div>';
     }
-    /* 🔴 2026-09-13 主人令（图7/8/9）：文案按**实际数据**动态生成。
-       原实现把「仅上证指数 / 全部 available:false / 滞后 2 个交易日」写死在字符串里，
-       数据源修好后仍会喊缺 —— 那就是又一处自相矛盾。 */
-    var _ivfOk  = V.indices.filter(function(x){ return x.available !== false; });
-    var _ivfBad = V.indices.filter(function(x){ return x.available === false; });
-    var _ivfLatest = _ivfOk.map(function(x){ return x.latest_date || ''; }).sort().pop() || '—';
-    var _ivfDataLine, _ivfLimitLine;
-    if(_ivfBad.length){
-      _ivfDataLine = '当前 <b>' + _ivfOk.length + '/' + V.indices.length + '</b> 个指数有真实日K（最新 <b>'
-        + _ev(_ivfLatest) + '</b>）；' + _ivfBad.map(function(x){ return _ev(x.name); }).join(' / ')
-        + ' 暂缺（' + _ev(_ivfBad[0].reason || '待补') + '）。';
-      _ivfLimitLine = _ivfBad.map(function(x){ return _ev(x.name); }).join(' / ') + ' 数据缺失，仅作占位。';
-    } else {
-      _ivfDataLine = '<b>' + V.indices.length + ' 个指数（'
-        + V.indices.map(function(x){ return _ev(x.name); }).join(' / ') + '）均有真实日K</b>，数据截止 <b>'
-        + _ev(_ivfLatest) + '</b>，无滞后缺口。';
-      _ivfLimitLine = '数据来自 baostock 前复权日K，仅反映<b>价格行为</b>，不含基本面与估值分位；指数级别结论不可直接套用到个股。';
-    }
+    /* 2026-09-13 修复：本块（_ivfDataLine/_ivfLimitLine 动态文案生成）原被误插在此处，
+       但它服务的对象是「指数估值中枢」卡（__renderIndexValueFramework），跨函数作用域
+       ⇒ ReferenceError: _ivfDataLine is not defined，该卡整卡渲染失败。
+       已迁至 __renderIndexValueFramework 内（紧跟 var V = window.INDEX_VALUE_FRAMEWORK 之后）。 */
     var idxCards = V.indices.map(function(idx){
       var c5 = pctColor(idx.percentile_5y);
       return '<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.25);border-radius:7px;padding:10px 12px;">'
@@ -6568,6 +6562,26 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       if(window.__ivfRetry < 25){ window.__ivfRetry++; setTimeout(window.__renderIndexValueFramework, 600); return; }
       dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F4C8; 指数估值中枢 数据未到位</div>';
       return;
+    }
+    /* 🔴 2026-09-13 主人令（图7/8/9）：文案按**实际数据**动态生成。
+       🛡 2026-09-13 修复：本块原被误插在 __renderValuationPercentile 内（跨函数作用域 ⇒
+          ReferenceError 整卡渲染失败），已迁回本函数，且置于空值守卫之后。
+       原实现把「仅上证指数 / 全部 available:false / 滞后 2 个交易日」写死在字符串里，
+       数据源修好后仍会喊缺 —— 那就是又一处自相矛盾。 */
+    var _ivfOk  = V.indices.filter(function(x){ return x.available !== false; });
+    var _ivfBad = V.indices.filter(function(x){ return x.available === false; });
+    var _ivfLatest = _ivfOk.map(function(x){ return x.latest_date || ''; }).sort().pop() || '—';
+    var _ivfDataLine, _ivfLimitLine;
+    if(_ivfBad.length){
+      _ivfDataLine = '当前 <b>' + _ivfOk.length + '/' + V.indices.length + '</b> 个指数有真实日K（最新 <b>'
+        + _ev(_ivfLatest) + '</b>）；' + _ivfBad.map(function(x){ return _ev(x.name); }).join(' / ')
+        + ' 暂缺（' + _ev(_ivfBad[0].reason || '待补') + '）。';
+      _ivfLimitLine = _ivfBad.map(function(x){ return _ev(x.name); }).join(' / ') + ' 数据缺失，仅作占位。';
+    } else {
+      _ivfDataLine = '<b>' + V.indices.length + ' 个指数（'
+        + V.indices.map(function(x){ return _ev(x.name); }).join(' / ') + '）均有真实日K</b>，数据截止 <b>'
+        + _ev(_ivfLatest) + '</b>，无滞后缺口。';
+      _ivfLimitLine = '数据来自 baostock 前复权日K，仅反映<b>价格行为</b>，不含基本面与估值分位；指数级别结论不可直接套用到个股。';
     }
     var idxCards = V.indices.map(function(idx){
       if(idx.available === false){
@@ -14562,8 +14576,9 @@ window.__renderV8CalToday();
   // 选股策略 tab 上的 6 张算法卡（非 query/tc/crds 的都有 lazy render，需要显式激活）
   tryRun('renderFourVolume', (typeof window.renderFourVolume==='function')?window.renderFourVolume:null, 'fv-badge init');
   tryRun('renderV8Crds-st',  (typeof window.renderV8Crds==='function')?function(){window.renderV8Crds('st');}:null, 'crds-badge init');
-  tryRun('renderRpsScreen', (typeof window.renderRpsScreen==='function')?window.renderRpsScreen:null, 'rps init');
-  tryRun('renderRpsBacktest', (typeof window.renderRpsBacktest==='function')?window.renderRpsBacktest:null, 'rps-bt init');
+  /* 🛡 2026-09-13：原此处 tryRun('renderRpsScreen'/'renderRpsBacktest')。
+     两函数已于 2026-08-30 按主人令删除（renderRpsBacktest 属模拟非真实回测；renderRpsScreen 宿主卡已删），
+     typeof 守卫虽不报错，但每次加载刷 2 条 warning 噪声 ⇒ 一并移除。 */
   // 今日事件「今日判定」卡头+内容（脚本块位于 v8CardHeader 定义之前，只能延后到此处渲染）
   tryRun('renderJudgmentHeader', window.__renderJudgmentHeader, 'judgment-header init');
   tryRun('renderJudgmentBody', window.__renderJudgmentBody, 'judgment-body init');
