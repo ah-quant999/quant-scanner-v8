@@ -14217,24 +14217,32 @@ hm += '<div id="ulPaneMacro">';
        + '<span style="font-size:15px;line-height:1;flex:0 0 auto;">📚</span>'
        + '<span style="font-size:14px;font-weight:800;color:var(--cyan);flex:0 0 auto;white-space:nowrap;">机构研究 · AI 解析建议</span>'
        + '<span style="flex:0 0 auto;" id="maharoFresh">—</span>'
-       + '<span style="font-size:11px;color:var(--dim);margin-left:4px;flex:0 1 auto;min-width:120px;">观澜台/金斧头/逻辑与思考/树枝报告/180K Research/智堡 Wisburg/Vito行研札记 · AI 阅读后撰写 · 每日 08:30 更新</span></div>'
+       // 2026-09-13 主人令：频率标注（日频 · 每日 07:15 出稿 / 08:30 更新正文）
+       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#34d399;background:rgba(52,211,153,.16);border:1px solid rgba(52,211,153,.4);letter-spacing:.5px;">📆 日更 · 每日 08:30</span>'
+       + '<span style="font-size:11px;color:var(--dim);margin-left:4px;flex:0 1 auto;min-width:120px;">观澜台/金斧头/逻辑与思考/树枝报告/180K Research/智堡 Wisburg/Vito行研札记 · AI 阅读后撰写</span></div>'
+       // ── ② 分析块（卡名下方）：核心 / 用法 / 限制；与下方两卡版式统一 ──
+       + '<div style="padding:0 14px;"><div style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.25);border-radius:8px;padding:10px 12px;margin:10px 0;line-height:1.7;font-size:12px;color:var(--txt);">'
+       + '<b style="color:#34d399;">&#x1F4CC; 核心：</b>把机构研报原文交给 AI 阅读后写成可执行要点。<br>'
+       + '<b style="color:#34d399;">&#x1F4A1; 用法：</b>盘前 5 分钟掌握机构共识与分歧，落到本日操作。<br>'
+       + '<b style="color:#34d399;">&#x26A0; 限制：</b>AI 摘要，判断需回原文核对；每日 07:15 出稿，正文 08:30 更新。</div></div>'
        + '<div id="maharoCardBody"><div class="note">加载中…</div></div></div>';
     // ═══ 2026-09-06 主人令：新周期判定卡（海外宏观+AI 大周期 · 事件驱动）═══
     //   位置：K 型卡上方（事件驱动更新频率 > K 型月度更新）；
     //   形式：双源对比（白话愍博士原文 vs 我交叉验证），差异处红框高亮；
     //   数据源：4 次搜索 20+ 源 cross-checked（CME FedWatch / Kalshi / 国泰海通 / 中信建投 / 证券时报 / 沃什讲话）。
     hm += '<div class="card" style="margin-bottom:16px;border-left:4px solid #60a5fa;">'
-       // ── 标题行：卡名 + ⚡ 事件驱动彩色 badge + 数据源 + 更新时间 ──
+       // ── ① 标题行（置顶）：卡名 + 频率 badge + 数据源 ──
+       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
+       + '<span style="font-size:15px;font-weight:700;color:#60a5fa;">🌐 新周期判定 · 海外宏观 + AI 大周期</span>'
+       // 2026-09-13 主人令：频率标注（事件驱动 · 手动维护快照）
+       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#94a3b2;background:rgba(148,163,184,.16);border:1px solid rgba(148,163,184,.4);letter-spacing:.5px;">📢 事件驱动 · 手动维护</span>'
+       + '<span style="font-size:11.5px;color:var(--dim);">数据源：白话愍博士 + 中信建投·周君芝 + CME FedWatch + 国泰海通 + 证券时报 · 4 次搜索 20+ 源 cross-checked</span>'
+       + '</div>'
+       // ── ② 分析块（卡名下方）：核心 / 用法 / 限制 ──
        + '<div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
        + '<b style="color:#60a5fa;">&#x1F4CC; 核心：</b>海外宏观 + AI 资本开支周期的定性判断。<br>'
        + '<b style="color:#60a5fa;">&#x1F4A1; 用法：</b>背景认知，辅助顶层仓位与行业配置。<br>'
        + '<b style="color:#60a5fa;">&#x26A0; 限制：</b>无自动刷新管线，2026-09-06 历史快照，下次更新需手动维护。</div>'
-       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-       + '<span style="font-size:15px;font-weight:700;color:#60a5fa;">🌐 新周期判定 · 海外宏观 + AI 大周期</span>'
-       // 频率 badge（事件驱动·高亮）：比 K 型的「月度」更显眼
-       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#94a3b2;background:rgba(148,163,184,.16);border:1px solid rgba(148,163,184,.4);letter-spacing:.5px;">📢 历史快照 · 手动维护</span>'
-       + '<span style="font-size:11.5px;color:var(--dim);">数据源：白话愍博士 + 中信建投·周君芝 + CME FedWatch + 国泰海通 + 证券时报 · 4 次搜索 20+ 源 cross-checked</span>'
-       + '</div>'
        + '<div style="font-size:11.5px;color:var(--dim);margin-bottom:10px;">'
        + '<b style="color:var(--txt);">更新于 2026-09-06 22:38</b> · <b style="color:#ef5350;">无自动刷新管线</b>，下次更新需手动维护 · 用途：'
        + '<b style="color:var(--txt);">海外宏观+AI 大周期判断</b>（与下方 K 型卡「国内行业景气」互补）。</div>'
@@ -14300,15 +14308,17 @@ hm += '<div id="ulPaneMacro">';
     //   🛡 2026-09-06 主人令：在标题行加「📅 月度更新」彩色 badge，与上方新卡的「⚡ 事件驱动」频率区别更明显。
     //   红涨绿跌铁律适用：增速为正=红(扩张)，为负=绿(收缩)。
     hm += '<div class="card" style="margin-bottom:16px;border-left:4px solid #fbbf24;">'
+       // ── ① 标题行（置顶）：卡名 + 频率 badge + 数据源 ──
+       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
+       + '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🌍 宏观景气背景 · K 型分层</span>'
+       // 2026-09-13 主人令：频率标注（月频）
+       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#fbbf24;background:rgba(251,191,36,.16);border:1px solid rgba(251,191,36,.4);letter-spacing:.5px;">📅 月度更新 · 每月 1 日</span>'
+       + '<span style="font-size:12px;color:var(--dim);">7月数据 · 来源：沧海一土狗 · <b style="color:var(--dim);">更新于 2026-09-04</b> · 下次更新 2026-10-01</span></div>'
+       // ── ② 分析块（卡名下方）：核心 / 用法 / 限制 ──
        + '<div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
        + '<b style="color:#fbbf24;">&#x1F4CC; 核心：</b>用 K 型框架把行业分为扩张/中性/收缩三区。<br>'
        + '<b style="color:#fbbf24;">&#x1F4A1; 用法：</b>理解为什么某些板块资金持续流入/流出，辅助背景判断。<br>'
        + '<b style="color:#fbbf24;">&#x26A0; 限制：</b>静态月度更新（7月数据），适合查阅不适合盯盘。</div>'
-       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-       + '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🌍 宏观景气背景 · K 型分层</span>'
-       // 频率 badge（月度更新·低饱和黄色）：与新卡的橙色事件驱动 badge 区分
-       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#fbbf24;background:rgba(251,191,36,.16);border:1px solid rgba(251,191,36,.4);letter-spacing:.5px;">📅 月度更新 · 每月 1 日</span>'
-       + '<span style="font-size:12px;color:var(--dim);">7月数据 · 来源：沧海一土狗 · <b style="color:var(--dim);">更新于 2026-09-04</b> · 下次更新 2026-10-01</span></div>'
        + '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;">帮你理解<b style="color:var(--txt);">为什么某些板块资金持续流入</b>（外需+AI+技改 vs 地产链+财政收缩）——背景认知，适合查阅不适合盯盘。</div>'
        + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;">'
        // ── 扩张区（K型上端 · 红） ──
