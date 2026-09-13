@@ -7737,7 +7737,11 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     var mods = d.modules || [];
     function modulesHtml(){
       var h='<div class="card" style="border-left:4px solid #c4b5fd;">';
-        h+='<h3><span class="ic">🧪</span>实验区·模块去向索引 <span class="fresh">'+(d.update_time||"--")+"</span></h3>";
+        // 2026-09-13 主人令同步（与 index.html 保持同口径）：原裸 <span class="fresh"> 时间戳 →
+        //   显式「📋 静态索引 · 无自动刷新」+ 快照日期（静态索引无管线，不应走「更新于/手动」SLA）
+        h+='<h3><span class="ic">🧪</span>实验区·模块去向索引 '
+          +'<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#c4b5fd;background:rgba(196,181,253,.14);border:1px solid rgba(196,181,253,.4);letter-spacing:.5px;">&#x1F4CB; 静态索引 · 无自动刷新</span>'
+          +'<span style="font-size:11px;color:var(--dim);margin-left:6px;">快照 '+(d.update_time||'--')+'</span></h3>';
         h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;padding:12px 14px;">';
       mods.forEach(function(m){
         h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">'

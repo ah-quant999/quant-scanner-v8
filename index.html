@@ -13872,12 +13872,18 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     var mods = d.modules || [];
     function modulesHtml(){
       var h='<div class="card" style="border-left:4px solid #c4b5fd;">';
-        // 🛡 2026-09-04 主人令（一劳永逸）：原为裸时间戳 d.update_time（形如 2026-09-02，无相对语义），
-        //   与全站「🦊 更新于 …」胶囊格式不一致。统一走 _uBadge（slot='手动' → 72h SLA 兜底，
-        //   超期自动变红并追加「⚠️ 已停更 N 天」）。
-        var _idxBadge = (typeof _uBadge === 'function')
-          ? _uBadge('手动', '', d.update_time || '')
-          : '<span class="fresh">'+(d.update_time||'--')+'</span>';
+        // 🛡 2026-09-13 主人令（图7「手动？」）：本卡是**静态索引**（UNLISTED_PANEL，无数据管线），
+        //   原走 _uBadge('手动','',d.update_time) → 命中原 72h SLA 兜底，超期即变红并追加
+        //   「⚠️ 已停更 N 天」—— 对静态索引属**语义误报**（本就不会自动更新，何来"停更"）。
+        //   改：显式「静态索引 · 无自动刷新」+ 快照日期；仅 >90d 才追加过期提示。
+        var _idxBadge;
+        try{
+          var _snap = d.update_time || '--';
+          var _ageD = (function(){ try{ return Math.floor((Date.now() - new Date(String(_snap).replace(' ','T')).getTime())/86400000); }catch(e){ return NaN; } })();
+          _idxBadge = '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#c4b5fd;background:rgba(196,181,253,.14);border:1px solid rgba(196,181,253,.4);letter-spacing:.5px;">&#x1F4CB; 静态索引 · 无自动刷新</span>'
+            + '<span style="font-size:11px;color:var(--dim);margin-left:6px;">快照 ' + _snap + '</span>'
+            + ((_ageD >= 90) ? '<span style="font-size:11px;color:#ef5350;margin-left:6px;">&#x26A0;&#xFE0F; 快照已过期 ' + _ageD + ' 天</span>' : '');
+        }catch(e){ _idxBadge = '<span class="fresh">'+(d.update_time||'--')+'</span>'; }
         h+='<h3><span class="ic">🧪</span>实验区·模块去向索引 '+_idxBadge+"</h3>";
         h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;padding:12px 14px;">';
       mods.forEach(function(m){
