@@ -706,8 +706,23 @@ def main():
 
     closing_summary = build_closing_summary(indices, up, down, flat, amount_total) if market_status == "收盘" else ""
 
+    # 🔴 2026-09-13 阿狸咪的工程师 · 根因修复（CI 门禁「AI_MARKET_BRIEF 真错位」恒失败）：
+    #   原 payload **只有 gen_time**，而全仓其它 raw 文件的日期字段都是 update_time
+    #   （实测：ai_insights_compare / algo_track / avg_price_data 均为 update_time）。
+    #   而 v8_verify_layer_parity.py 的 DATE_KEYS 顺序是
+    #   ("update_time","calc_time","gen_time",...) ⇒ 取「第一个命中项」：
+    #     raw 侧只能取到 gen_time，data 侧优先取到 update_time
+    #     （update_v8.py:stamp_missing_update_time() 在构建时把文件 mtime 补成 update_time）。
+    #   ⇒ 两侧读的不是同一个字段，日期天然可能不一致 ⇒ 跨零点构建必判「真错位」阻断部署
+    #     （2026-09-14 00:12 构建实证：raw=09-13 15:40:41 vs data=09-14 00:12:27）。
+    #   修法：补一个与 gen_time **同值**的 update_time，让两侧口径一致。
+    #   ⚠️ 一次取值两字段共用（禁两次 datetime.now()，防跨秒产生两个不同值）。
+    #   ⚠️ 保留 gen_time 不动 ⇒ 前端/其他消费方零影响（向后兼容）。
+    #   ⚠️ 语义诚实：该时刻既是生成时刻也是本数据的新鲜度时刻，同值是事实，非造假。
+    _brief_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     brief = {
-        "gen_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "gen_time": _brief_now,
+        "update_time": _brief_now,
         "market_status": market_status,
         "sentiment": {
             "label": sentiment_label,
