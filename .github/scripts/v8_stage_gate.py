@@ -45,11 +45,13 @@
 
 ■ 就绪判据（READY_SPEC）
   A 采集批：10 项产物中 ≥7 项鲜活，且龙虎榜（must）必新  ← 以 READY_SPEC["A"] 为唯一真源
-  B 选股批：9 项产物中 ≥8 项鲜活                        ← 以 READY_SPEC["B"] 为唯一真源
+  B 选股批：9 项产物中 ≥8 项鲜活 + 三重共识/四量终极/逆势龙头（must）必新  ← 以 READY_SPEC["B"] 为唯一真源
   D 汇总批：最终推荐                              → 1/1
   E 回测批：CRDS 回测 / TDX 回测（任一）+ 全算法回测汇总 + 候选池回测 + 黄金池回测 → 4/5
-            ⚠️ 2026-09-12 起：BACKTEST_ALL_ALGOS 为**必新项**（原「任一即可」不覆盖它
-               ⇒ 它缺失时全链零红灯）。need 随之 1 → 2。
+            ⚠️ 2026-09-13 起 must 收紧：原 must=[] + need=4 只是**纯计数**，
+               表达不了「哪几项必新」⇒ 陈旧项恰为 BACKTEST_ALL_ALGOS 时仍判就绪。
+               现 must=[BACKTEST_ALL_ALGOS, CANDIDATE_BACKTEST, GOLD_POOL_BACKTEST]，
+               第 4 项由 CRDS_BACKTEST / BACKTEST_TDX 任一补足（3 must + 1 任一 = need 4）。
   「今日盘后」= update_time 的日期==数据日 且 (时:分) >= 该日门槛。
 
 ■ 用法
@@ -106,6 +108,8 @@ def _ensure_v8_date(root: str) -> None:
 #   items : 代表性产物（读文件内容 update_time / data_date）
 #   need  : 至少命中几项算就绪
 #   must  : 其中必须命中（全中）的关键项
+#            ⚠️ must 必须是 items 的子集 —— 不在 items 里的项不进判定循环，会**静默失效**。
+#            ⚠️ 不变式：must ⊆ dedup_fetch_manifest.py::_ALWAYS_PUSH（详见该文件注释）。
 READY_SPEC: dict[str, dict] = {
     "A": {
         # 🛡 2026-09-11 主人令「一劳永逸」（与 B 批同源根治）：readiness 清单 3 → 10 项。
@@ -170,9 +174,19 @@ READY_SPEC: dict[str, dict] = {
         #   若 need=5，闸门会据此判「B 已就绪」→ 空转 → 另 4 张（factor_audit /
         #   factor_progress / index_value_framework / gold_pool）永远补不上 → 恒红。
         #   need=8 使闸门在上述状态下判「未就绪」→ 再跑一轮 B → 去重修复生效后 9/9 → 收敛。
-        #   容错：9 项中唯一易碎的是 valuation_percentile（依赖 akshare 外部接口），
-        #   故 8 恰好容忍它单独失败而不把整链锁死。
-        "must": [],
+        #   （2026-09-13 复核：dedup 的 _ALWAYS_PUSH 已补齐 gold_pool 等 6 项，
+        #     故上面「need=8 因去重器丢弃伪变更」的历史约束已解除，9/9 可稳态达成；
+        #     need=8 的现役语义 = 容忍 1 项真失败。）
+        #
+        # 🛡 2026-09-13 主人令（拍板 P1 · 一劳永逸）：must 由 [] 收紧为**三项核心选股产物**。
+        #   根因：need 是**纯计数**，表达不了「哪几项必新」。当陈旧项恰好是三重共识 /
+        #   四量终极 / 逆势龙头时，闸门仍判「B 已就绪」→ 空转 → 三张核心卡整日停更
+        #   而全链零红灯（主人 09-12 令「必新」在 B 批从未真正生效）。
+        #   🔴 与 dedup 的联动不变式（缺一即锁死，详见 dedup_fetch_manifest.py::_ALWAYS_PUSH）：
+        #      must 项必须同时在 _ALWAYS_PUSH 中，否则内容天然稳定的 must 项
+        #      （FOUR_VOLUME 长期命中 0 只 ⇒ 剥时间戳后逐字节相同）会被判「伪变更」永不推送
+        #      ⇒ update_time 恒旧 ⇒ must 恒不满足 ⇒ B 批每轮重跑 60~90min 永不收敛。
+        "must": ["data/TRIPLE_CONSENSUS.js", "data/FOUR_VOLUME.js", "data/CRDS_CARD_DATA.js"],
     },
     "D": {"items": ["data/FINAL_RECOMMEND_DATA.js"], "need": 1, "must": []},
     # 🔴 2026-09-12 主人令（拍板第 2 项·一劳永逸）：E 批就绪清单 2 → 3 项，need 1 → 2。
@@ -190,8 +204,17 @@ READY_SPEC: dict[str, dict] = {
     #   已挂 STAGES["E"] 第 8 位、聚合器之前）。
     #   🔴 同一条铁律：**只加 items 不抬 need = 没加**。need=2 的语义下新增两项仍不参与判定，
     #      必须抬到 4 = 「CRDS/TDX 至少 1 项」+「BACKTEST_ALL_ALGOS」+「两池回测」全部鲜活。
+    # 🛡 2026-09-13 主人令（拍板 P1 · 一劳永逸）：need 仍是纯计数 ⇒ 必须补 must 才真正闭环。
+    #   原 must=[] + need=4 的语义只保证「5 项里有 4 项鲜活」，**无法表达「哪几项必新」**：
+    #     若陈旧项恰好是 BACKTEST_ALL_ALGOS.js（主人 09-12 令点名必新的那一项）
+    #     → 闸门仍判 E 已就绪 → 空转 → 全算法回测汇总卡停更，全链零红灯。
+    #   现 must = 三项「跑成功必有产物」的聚合器产物；第 4 项由 CRDS_BACKTEST / BACKTEST_TDX
+    #   任一补足（保持原「至少 1 项」语义）⇒ 3(must) + 1(任一) = need 4，自洽。
+    #   🔴 同样受 must ⊆ dedup_fetch_manifest.py::_ALWAYS_PUSH 不变式约束（见 B 批注释）。
     "E": {"items": ["data/CRDS_BACKTEST.js", "data/BACKTEST_TDX.js", "data/BACKTEST_ALL_ALGOS.js",
-                    "data/CANDIDATE_BACKTEST.js", "data/GOLD_POOL_BACKTEST.js"], "need": 4, "must": []},
+                    "data/CANDIDATE_BACKTEST.js", "data/GOLD_POOL_BACKTEST.js"], "need": 4,
+          "must": ["data/BACKTEST_ALL_ALGOS.js", "data/CANDIDATE_BACKTEST.js",
+                   "data/GOLD_POOL_BACKTEST.js"]},
 }
 
 # 各批上游：上游不就绪则拒绝开跑（顺序闸门 · 一环套一环）

@@ -77,6 +77,26 @@ _ALWAYS_PUSH = {
     #   （ai_insights_compare / valuation_percentile）——**gold_pool 被漏掉**，本次补齐。
     "raw_data/gold_pool.json",
     "data/GOLD_POOL.js",
+    # 🛡 2026-09-13 一劳永逸（主人令 P1 拍板）：**v8_stage_gate.py 的 must 项全部纳入本白名单**。
+    #   🔴 不变式：must（闸门要求「必新」的产物）⊆ _ALWAYS_PUSH（去重器不得丢弃的产物）。
+    #   理由：must 项的新鲜度**只由 update_time 是否前进体现**，而 update_time 前进必须靠
+    #     「真被推送」。若它同时满足「内容天然稳定」（剥掉时间戳后与远端逐字节相同），
+    #     本去重器就会判「伪变更」丢弃它 ⇒ update_time 恒旧 ⇒ 闸门 must 恒不满足
+    #     ⇒ 该批每轮判「未就绪」→ 重跑 60~90min → **永久不收敛**（比不加 must 更危险）。
+    #   实证风险路径：FOUR_VOLUME 长期命中 0 只时其 stocks 恒为空 ⇒ 内容稳定 ⇒ 必被丢弃。
+    #   ⇒ 凡把某项写进 READY_SPEC 的 must，本白名单必须同步添加（两处联动，缺一即锁死）。
+    "data/TRIPLE_CONSENSUS.js",       # READY_SPEC["B"].must
+    "data/FOUR_VOLUME.js",            # READY_SPEC["B"].must
+    "data/CRDS_CARD_DATA.js",         # READY_SPEC["B"].must
+    "data/BACKTEST_ALL_ALGOS.js",     # READY_SPEC["E"].must
+    "data/CANDIDATE_BACKTEST.js",     # READY_SPEC["E"].must
+    "data/GOLD_POOL_BACKTEST.js",     # READY_SPEC["E"].must
+    # A 批 must 项同样纳入 —— 不变式要求**零特例**（特例即隐身风险，且无法机器验证）：
+    #   龙虎榜虽是真实市场数据、名单理论上每日必变，但 T+1 / 假期补跑档存在
+    #   「最新交易日未变 ⇒ 内容剥掉时间戳后与远端相同」的路径 ⇒ 一样会被本去重器丢弃。
+    #   实测该文件仅 23 KB，白名单化带来的每日多推开销可忽略。
+    #   ⇒ 规则：凡 READY_SPEC[*]["must"] 中的产物，一律纳入本白名单（一一对应，可断言）。
+    "data/LHB_DATA.js",               # READY_SPEC["A"].must
 }
 
 

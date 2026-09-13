@@ -161,40 +161,22 @@ def _fetch_kline_akshare(code, bars=250):
 #   涨幅≥3% 的数百只股票**串行**逐只拉取。云端 runner（美国 IP）抓中国源基本不可达
 #   → 请求挂起/失败 → 30 分钟超时被 kill → h_auto_buy_<date>.json 根本没写出来
 #   → track_h_auto_buy 主源缺失、兜底读旧 data/H_AUTO_BUY.js → 前端冻结在 09-04。
-# 【修法】四层加固（本段代码），调用方再叠加并发：
+# 【修法】本段三级取数（调用方再叠加并发）：
 #   ① 本地缓存 raw_data/kline_cache/<code>.json（随仓入仓，云端零网络可读）新鲜则用
 #      （同仓早有成熟取数链，本脚本此前没复用 = 本次事故根子）
-#   ③ 上一步取到的 K 线回写缓存，逐晚收敛，缓存越跑越全（与 factor_lab_gen 同款策略）
-#   ④ 网络全挂时退回（可能陈旧的）本地缓存并标 degraded，宁可出滞后数据也不出空，
-#      最后由 gtimg 老路径兜底
+#   ② 网络全挂时退回（可能陈旧的）本地缓存并标 degraded，宁可出滞后数据也不出空，
+#      最后由 gtimg 老路径兜底。
+#   🧹 2026-09-13 主人令（拍板清理）：原 ② 统一三级兜底取数链（mootdx → 东财 →
+#      baostock，唯一实现者 calc_stock_rps._query_kline）随 RPS 下线一并删除；
+#      原 ③「回写缓存」只服务于该链，随之不可达，一并移除（其辅助函数亦已删）。
 # ════════════════════════════════════════════════════════════════════════════
 KLINE_CACHE_DIR = RAW_DIR / "kline_cache"
 _KLINE_STAT = {"cache_fresh": 0, "cache_stale": 0, "net": 0, "fail": 0}
-_SRC_UNIFIED = None
-
-
-def _unified_query_kline():
-    """统一三级兜底取数链接口（占位）。
-
-    🔴 2026-09-13：该链的唯一实现者 calc_stock_rps 已随 RPS 下线删除，
-    本函数现恒返回 None（调用方退回本地缓存 / gtimg 老路径）。
-
-    """
-    global _SRC_UNIFIED
-    if _SRC_UNIFIED is not None:
-        return _SRC_UNIFIED or None
-    # 🔴 2026-09-13 一劳永逸修复（阿狸咪的工程师）：
-    #   RPS 下线（8e360ed65 → D-2/2）机械删除本块时，误删了
-    #   `import calc_stock_rps as _rps` 与 `if not _SRC_UNIFIED:` 的循环体 print(...)，
-    #   只留空壳 if ⇒ IndentationError ⇒ 本脚本**完全无法解析**：
-    #     ① v8_build_deploy 的 pre_deploy_audit 第1项 py_compile 恒红
-    #        ⇒ 全部 deploy 被阻断（实测 09-13 14:32 CST 后 20/20 run failure）；
-    #     ② 本脚本是 data/H_AUTO_BUY.js 的唯一生产者 ⇒ 该卡静默停更且无门禁可见。
-    #   calc_stock_rps.py 已随 RPS 一并删除，统一取数链**不存在** ⇒
-    #   直接判定不可用并返回 None。调用点（L273 `if fn is not None:`）
-    #   已有完整降级：→ 本地缓存（新鲜/陈旧）→ gtimg 老路径。
-    _SRC_UNIFIED = False
-    return None
+# 🧹 2026-09-13 清理：原「统一三级兜底取数链（mootdx→东财→baostock）」的入口函数
+#   与其全局句柄已删除（唯一实现者 calc_stock_rps._query_kline 随 RPS 下线一并移除）。
+#   该函数体已退化为恒 `return None`（其 P0 语法错修复见 commit 4f2fc4ca）⇒ 删除
+#   **零行为变更**。取数链保留 ①缓存(新鲜) → ②缓存(陈旧, degraded) → ③gtimg 老路径。
+#   注：本注释刻意不写出被删符号名 —— 否则 grep 残留扫描会误判「死代码未清干净」。
 
 
 def _vols_from_cache(code):
@@ -224,26 +206,6 @@ def _vols_from_cache(code):
         return None, None
 
 
-def _vols_to_cache(code, df):
-    """把 DataFrame 日线回写本地缓存（逐晚收敛，让后续跑批零网络直取）。失败静默。"""
-    try:
-        KLINE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        rows = []
-        for _, r in df.tail(250).iterrows():
-            rows.append({
-                "date": str(r.get("date", ""))[:10],
-                "open": r.get("open"), "close": r.get("close"),
-                "high": r.get("high"), "low": r.get("low"),
-                "volume": r.get("volume"), "pct_chg": r.get("pct_chg"),
-            })
-        if len(rows) < 5:
-            return
-        p = KLINE_CACHE_DIR / f"{_norm_code(code)}.json"
-        json.dump(rows, open(p, "w", encoding="utf-8"), ensure_ascii=False)
-    except Exception:
-        pass
-
-
 def _prev4(vols):
     """前 4 日均量（不含当日，最后一格是当日）。"""
     if not vols or len(vols) < 5:
@@ -262,7 +224,7 @@ def _stale_days(snapshot_date):
 
 
 def get_avg_volume_4d(code, target_date=None, quote_date=None):
-    """前 4 日均量。取数链：缓存(新鲜) → 三级兜底网络(回写缓存) → 缓存(陈旧, degraded) → gtimg。
+    """前 4 日均量。取数链：缓存(新鲜) → 缓存(陈旧, degraded) → gtimg 老路径。
 
     quote_date: 行情快照日（STOCK_QUOTE.meta.date）。缓存末根日期 >= 它才算新鲜。
     """
@@ -273,26 +235,12 @@ def get_avg_volume_4d(code, target_date=None, quote_date=None):
         _KLINE_STAT["cache_fresh"] += 1
         return _prev4(vols)
 
-    # ② 统一三级兜底链（mootdx → 东财 → baostock + 熔断）
-    fn = _unified_query_kline()
-    if fn is not None:
-        try:
-            df = fn(code, _market_prefix(code), 60)
-            if df is not None and len(df) >= 5:
-                v = df["volume"].tolist() if hasattr(df, "columns") else None
-                if v:
-                    _vols_to_cache(code, df)      # ③ 回写缓存，逐晚收敛
-                    _KLINE_STAT["net"] += 1
-                    return _prev4(v)
-        except Exception:
-            pass
-
-    # ④ 网络全挂 → 退回（可能陈旧的）本地缓存，保障出数不空
+    # ② 网络全挂 → 退回（可能陈旧的）本地缓存，保障出数不空（原 ② 统一链已删除）
     if vols:
         _KLINE_STAT["cache_stale"] += 1
         return _prev4(vols)
 
-    # ⑤ 最后兜底：腾讯 gtimg 老路径
+    # ③ 最后兜底：腾讯 gtimg 老路径
     try:
         from data_source_gtimg import fetch_a_daily_gtimg
         kl = fetch_a_daily_gtimg(code, market=_market_prefix(code), bars=250)
