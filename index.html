@@ -4829,9 +4829,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var s=''; for(var i=0;i<n;i++) s+='⭐';
         return '<span style="font-size:10.5px;color:#fbbf24;">'+s+'</span>';
       }
-      var byWr = R.slice().sort(function(a,b){ return (b.win_rate==null?-1:b.win_rate) - (a.win_rate==null?-1:a.win_rate); });
-      var byAr = R.slice().sort(function(a,b){ return (b.avg_return==null?-999:b.avg_return) - (a.avg_return==null?-999:a.avg_return); });
-      var bestWr = byWr[0], bestAr = byAr[0];
+      /* 🏁 2026-09-13 主人令（图3「不能自相矛盾」）：
+         原地这里曾按「主口径 A.ranking」算 byWr/byAr，而下方「一句话结论」按
+         ranking_all（跨持有期）算 —— 两套口径混用 ⇒ 榜单第 1 是「三重共识 61.9%」、
+         结论却说「四量终极最强 72.2%」，同屏打架。
+         现已统一搬到 _bestHoldOf 之后、与结论**同源同序**重建（见下）。 */
       /* 🔴 2026-09-12 主人令「方案一·结论先行」：新增「最佳持有期」——
          口径 = 跨该策略全部持有期（ranking_all）扫描，取「胜率×收益」综合最优档。
          排序规则（明示、可复核）：先按胜率降序，胜率相同再按平均收益降序，
@@ -4848,16 +4850,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           _bestHoldOf[k] = r;
         }
       });
-      /* 全局最佳持有期（跨所有策略）：一句话结论用 */
-      var _globalBest = null;
-      Object.keys(_bestHoldOf).forEach(function(k){
-        var r = _bestHoldOf[k];
-        if(!_globalBest
-           || (r.win_rate||0) > (_globalBest.win_rate||0)
-           || ((r.win_rate||0) === (_globalBest.win_rate||0) && (r.avg_return||0) > (_globalBest.avg_return||0))){
-          _globalBest = r;
-        }
-      });
+      /* 🏁 2026-09-13 主人令（图2「先汇总哪种算法的哪种持有时间的收益最好、胜率最高」
+         + 图3「不能自相矛盾」）：
+         汇总口径 = 「每个算法先取自己的最佳持有期（样本≥MINS）」→ 得 _bestList →
+         再按胜率降序 / 收益降序各排一次。
+         榜单摘要与「一句话结论」**共用这一份 _bestList**，两者物理同源，
+         不存在「榜单说 A、结论说 B」的可能性。 */
+      var _bestList = [];
+      Object.keys(_bestHoldOf).forEach(function(k){ _bestList.push(_bestHoldOf[k]); });
+      var byWr = _bestList.slice().sort(function(a,b){ return (b.win_rate==null?-1:b.win_rate) - (a.win_rate==null?-1:a.win_rate); });
+      var byAr = _bestList.slice().sort(function(a,b){ return (b.avg_return==null?-999:b.avg_return) - (a.avg_return==null?-999:a.avg_return); });
+      var bestWr = byWr[0] || null, bestAr = byAr[0] || null;
+      function _holdDays(r){ return String((r && r.hold) || '').replace(/[^0-9]/g,'') || '—'; }
       function _holdTxt(r){
         if(!r) return '<span style="color:var(--dim);">—</span>';
         var hd = String(r.hold||'').replace(/[^0-9]/g,'');
@@ -4870,15 +4874,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var h = '';
       /* ── ① 榜单摘要（方案三）── */
       h += '<div style="margin:0 0 14px;padding:13px 15px;border-radius:10px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.22);">';
-      h += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:9px;">🏁 回测榜单 <span style="font-size:11px;color:var(--dim);font-weight:500;">样本 ≥' + MINS + ' 才上榜 · 同口径横比</span></div>';
+      h += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:9px;">🏁 最优组合榜 · 算法 × 持有期 <span style="font-size:11px;color:var(--dim);font-weight:500;">每个算法取其「最佳持有期」后再按胜率降序 · 样本 ≥' + MINS + ' 才上榜</span></div>';
       h += '<div style="display:flex;flex-direction:column;gap:6px;">';
       byWr.slice(0,3).forEach(function(r,i){
-        var isArBest = bestAr && bestAr.card===r.card && bestAr.label===r.label;
+        var isArBest = bestAr && bestAr.card===r.card && bestAr.hold===r.hold;
         h += '<div style="display:flex;align-items:center;gap:10px;font-size:12.5px;padding:8px 11px;border-radius:8px;background:rgba(148,163,184,.06);">'
           +  '<span style="font-weight:700;color:#38bdf8;min-width:14px;">'+(i+1)+'</span>'
           +  '<span style="font-weight:700;color:var(--txt);white-space:nowrap;">'+_esc((r.icon||'')+r.card)+'</span>'
           +  _stars(r.card)
-          +  '<span style="color:var(--dim);font-size:11px;white-space:nowrap;">'+_esc(r.label||'—')+'</span>'
+          +  '<span style="color:var(--txt);font-size:11px;font-weight:700;white-space:nowrap;">持有 '+_holdDays(r)+' 日</span>'
           +  '<span style="margin-left:auto;font-weight:700;color:'+_colorNum(r.win_rate)+';white-space:nowrap;">胜率 '+_n(r.win_rate)+'%</span>'
           +  '<span style="font-weight:700;color:'+_colorPL(r.avg_return)+';min-width:72px;text-align:right;white-space:nowrap;">'+_sgn(r.avg_return)+_n(r.avg_return,2)+'%</span>'
           +  '<span style="color:var(--dim);font-size:11px;min-width:58px;text-align:right;">n='+(r.sample||0)+'</span>'
@@ -4888,33 +4892,45 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       h += '</div>';
       /* 🔴 2026-09-12 主人令「方案一·结论先行」：首屏第一句必须是可执行结论——
          最强策略 + 最佳持有期 + 胜率 + 平均收益 + 样本，五要素齐全。 */
-      if(_globalBest){
-        var _ghd = String(_globalBest.hold||'').replace(/[^0-9]/g,'');
+      /* 🔴 2026-09-13 主人令（图3）：结论与上方榜单**同源**（都来自 _bestList），
+         并显式区分「胜率最高」与「收益最高」两个维度；若同一组合兼得则直说兼得，
+         绝不拿两套口径互相矛盾。 */
+      if(bestWr){
+        var _wCard = _esc(bestWr.card), _wHd = _holdDays(bestWr);
+        var _same = bestAr && bestAr.card===bestWr.card && bestAr.hold===bestWr.hold;
         h += '<div style="margin-top:11px;padding-top:9px;border-top:1px dashed rgba(56,189,248,.25);font-size:13px;line-height:1.9;color:var(--txt);">'
-          +  '📌 <b>一句话结论</b>：<b style="color:#fbbf24;">'+_esc(_globalBest.card)+'</b> 最强，'
-          +  '最佳持有 <b style="color:var(--txt);">'+_ghd+' 日</b>，'
-          +  '胜率 <b style="color:'+_colorNum(_globalBest.win_rate)+';">'+_n(_globalBest.win_rate)+'%</b>、'
-          +  '平均 <b style="color:'+_colorPL(_globalBest.avg_return)+';">'+_sgn(_globalBest.avg_return)+_n(_globalBest.avg_return,2)+'%</b>'
-          +  '（样本 '+(_globalBest.sample||0)+'）';
-        if(bestWr && (bestWr.card!==_globalBest.card || bestWr.label!==_globalBest.label)){
-          h += '；主口径上胜率最高的是 <b style="color:'+_colorNum(bestWr.win_rate)+';">'+_esc(bestWr.card)+'</b>（'+_esc(bestWr.label||'')+'，'+_n(bestWr.win_rate)+'%，样本 '+(bestWr.sample||0)+'）';
+          +  '📌 <b>一句话结论</b>：';
+        if(_same){
+          h += '<b style="color:#fbbf24;">'+_wCard+'</b> 持有 <b style="color:var(--txt);">'+_wHd+' 日</b> 最优 —— '
+            +  '胜率 <b style="color:'+_colorNum(bestWr.win_rate)+';">'+_n(bestWr.win_rate)+'%</b>、'
+            +  '平均 <b style="color:'+_colorPL(bestWr.avg_return)+';">'+_sgn(bestWr.avg_return)+_n(bestWr.avg_return,2)+'%</b>'
+            +  '（样本 '+(bestWr.sample||0)+' 次），<b>同时是胜率最高与收益最高</b>。';
+        } else {
+          h += '胜率最高：<b style="color:#fbbf24;">'+_wCard+'</b> 持有 <b style="color:var(--txt);">'+_wHd+' 日</b>，'
+            +  '胜率 <b style="color:'+_colorNum(bestWr.win_rate)+';">'+_n(bestWr.win_rate)+'%</b>（样本 '+(bestWr.sample||0)+'）；'
+            +  '收益最高：<b style="color:#fbbf24;">'+_esc(bestAr.card)+'</b> 持有 <b style="color:var(--txt);">'+_holdDays(bestAr)+' 日</b>，'
+            +  '平均 <b style="color:'+_colorPL(bestAr.avg_return)+';">'+_sgn(bestAr.avg_return)+_n(bestAr.avg_return,2)+'%</b>（样本 '+(bestAr.sample||0)+'）。';
         }
-        h += '。</div>';
-      } else if(bestWr){
-        h += '<div style="margin-top:11px;padding-top:9px;border-top:1px dashed rgba(56,189,248,.25);font-size:12.5px;line-height:1.8;color:var(--txt);">'
-          +  '📌 <b>一句话结论</b>：胜率最高的是 <b style="color:'+_colorNum(bestWr.win_rate)+';">'+_esc(bestWr.card)+'</b>'
-          +  '（'+_esc(bestWr.label||'')+'，胜率 <b style="color:'+_colorNum(bestWr.win_rate)+';">'+_n(bestWr.win_rate)+'%</b>、平均 <b style="color:'+_colorPL(bestWr.avg_return)+';">'+_sgn(bestWr.avg_return)+_n(bestWr.avg_return,2)+'%</b>，样本 '+ (bestWr.sample||0) +'）。</div>';
+        h += '</div>';
       }
       h += '</div>';
       /* ── ② 主对比表（方案一）── */
-      h += '<div style="margin:16px 0 6px;font-size:13px;font-weight:700;color:var(--txt);">📋 主对比表 <span style="font-size:11px;color:var(--dim);font-weight:500;">「样本/胜率」=各自主口径；「最佳持有期」=跨全部持有期扫描取胜率最优档（样本≥'+MINS+'）</span></div>';
+      h += '<div style="margin:16px 0 6px;font-size:13px;font-weight:700;color:var(--txt);">📋 主对比表 <span style="font-size:11px;color:var(--dim);font-weight:500;">按<b style="color:var(--sub);">星级降序</b>（同级再按胜率）；「样本/胜率」=各自主口径；「最佳持有期」=跨全部持有期扫描取胜率最优档（样本≥'+MINS+'）</span></div>';
       h += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
       h += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
       ['#','策略','星级','主口径','样本','胜率','最佳持有期'].forEach(function(x){
         h += '<th style="padding:6px;text-align:left;color:var(--sub);white-space:nowrap;">'+x+'</th>';
       });
       h += '</tr></thead><tbody>';
-      R.forEach(function(r,i){
+      /* 🏁 2026-09-13 主人令（图4「主对比表星级高的排第一」）：
+         按 __MODULE_STARS 星级降序；星级相同再按胜率降序（无星级的「弱市观测」垫底）。 */
+      var _starOf = function(card){ return (window.__MODULE_STARS && window.__MODULE_STARS[_STARKEY[card]]) || 0; };
+      var RS = R.slice().sort(function(a,b){
+        var d = _starOf(b.card) - _starOf(a.card);
+        if(d) return d;
+        return (b.win_rate==null?-1:b.win_rate) - (a.win_rate==null?-1:a.win_rate);
+      });
+      RS.forEach(function(r,i){
         h += '<tr style="border-bottom:1px solid var(--border2);">'
           +  '<td style="padding:6px;color:var(--sub);font-weight:700;">'+(i+1)+'</td>'
           +  '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">'+_esc((r.icon||'')+r.card)+'</td>'
@@ -5392,43 +5408,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       }
     }
     // 🛡 兜底：final try/catch 保证 dst.innerHTML 总被执行（即使异常也不让"卡空了"）
-    /* ── 研究/估值型回测：中信 PE 温度计（2026-09-12 主人令：从暂未上架区孤立展示，不与交易策略同列排名）── */
-    (function(){
-      var cp = window.CITIC_PE_BACKTEST;
-      if(!cp || !cp.result) return;
-      html += '<div style="margin:14px 0;border-left:4px solid #f59e0b;" class="card">';
-      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-      html += '<span style="font-size:15px;font-weight:700;color:#f59e0b;">中信 PE 估值回测（研究型）</span>';
-      html += '<span style="font-size:10px;font-weight:700;color:#a78bfa;background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.35);padding:1px 7px;border-radius:10px;white-space:nowrap;">[估值研究]</span>';
-      html += '<span style="font-size:11px;color:var(--dim);">不与交易策略同列排名</span>';
-      html += '</div>';
-      html += '<div style="font-size:11px;color:var(--sub);line-height:1.7;margin-bottom:6px;"><b style="color:var(--txt);">口径</b>：以中信证券历史 PE TTM 为锚，统计 2010–2026 年 A股在 PE<10/12/15/20 档位买入后持有 60/120/250 个交易日的真实收益分布。PE 越低、持有越长，胜率和收益越高；但 PE<10 信号稀疏，PE<20 信号密集而质量稀释。本块为<b>估值研究参考</b>，不属于选股信号回测。</div>';
-      var holds = [60,120,250];
-      var ths = [['pe<10','PE<10'],['pe<12','PE<12'],['pe<15','PE<15'],['pe<20','PE<20']];
-      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
-      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      html += '<th style="padding:6px;text-align:left;color:var(--sub);white-space:nowrap;">持有期</th>';
-      ths.forEach(function(t){ html += '<th colspan="2" style="padding:6px;text-align:center;color:var(--sub);border-left:1px solid var(--border2);">'+t[1]+'</th>'; });
-      html += '</tr><tr style="background:var(--card2);border-bottom:1px solid var(--border);">';
-      html += '<th style="padding:4px 6px;"></th>';
-      ths.forEach(function(t,idx){ html += '<th style="padding:4px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;'+(idx>0?'border-left:1px solid var(--border2);':'')+'">胜率</th><th style="padding:4px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;">平均收益</th>'; });
-      html += '</tr></thead><tbody>';
-      holds.forEach(function(h){
-        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-        html += '<td style="padding:6px;color:var(--txt);font-weight:700;">持有 '+h+' 日</td>';
-        ths.forEach(function(t,idx){
-          var r = (cp.result[t[0]] || {})['hold_'+h+'d'] || {};
-          var wr = r.win_rate, ar = r.avg_ret;
-          html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(wr)+';'+(idx>0?'border-left:1px solid var(--border2);':'')+'">'+(typeof wr==='number'?wr.toFixed(1):'—')+'%</td>';
-          html += '<td style="padding:6px;text-align:center;color:'+_colorPL(ar)+';">'+(typeof ar==='number'?(ar>0?'+':'')+ar.toFixed(2):'—')+'%</td>';
-        });
-        html += '</tr>';
-      });
-      html += '</tbody></table></div>';
-      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">数据：'+_e(cp.data_source||'')+' · 样本区间 '+_e((cp.data_range||[]).join(' ~ '))+' · 更新时间 '+_e((cp.update_time||'').substring(0,16))+'</div>';
-      html += '</div>';
-    })();
-
     try{
       var _btOv = "";
       try{ if(typeof window.__btOverviewHTML === "function") _btOv = window.__btOverviewHTML(); }catch(e){}
@@ -6228,17 +6207,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var pct = p.pe_rank || 50;
     var barLeft = 'left:calc(' + Math.max(0, Math.min(100, pct)) + '% - 4px)';
     dst.innerHTML = ''
+      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
+      + '<b style="font-size:15px;">🌡 中信 PE 极值温度计</b>'
+      + '<span style="font-size:10px;font-weight:600;color:#fbbf24;background:rgba(251,191,36,.12);padding:1px 6px;border-radius:4px;">参考级 · 自上而下择时 · 不作交易信号</span>'
+      + _uBadge('盘后', '中长线', T.update_time, '数据 ' + _ev(T.data_date))
+      + '</div>'
       + '<div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.7;font-size:12px;color:var(--txt);">'
       + '<div style="font-weight:700;color:#fbbf24;margin-bottom:5px;">📖 这张卡在说什么（大白话）</div>'
       + '<div style="margin-bottom:4px;">把整个 A 股当成一件商品，这张卡在告诉你：<b>它现在卖得贵还是便宜</b>。</div>'
       + '<div style="margin-bottom:4px;">怎么算的？用<b>「股价 ÷ 每股赚的钱」（PE）</b>，再拿去和过去 10 年的自己比 —— 比过去大多数时候都低，就是便宜；都比过去高，就是贵。</div>'
       + '<div style="margin-bottom:4px;">🌡 <b>温度计读数含义：</b>读数低（蓝）＝历史偏低、中长期下行空间小；读数高（红）＝历史偏高、要小心。<b>它看的是「几个月到几年」的级别，不是今天明天涨跌。</b></div>'
       + '<div style="padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠️ 使用时注意：</b>① 它按「已公布的过去四个季度利润」算，<b>不预判未来</b>；② 别信「PE 低于 10 就是铁底」—— 2018 和 2022 两次真大底，这指标都没低到 10；③ 这不是每日买卖信号，只帮你判断「现在整体贵不贵」。</div>'
-      + '</div>'
-      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
-      + '<b style="font-size:15px;">🌡 中信 PE 极值温度计</b>'
-      + '<span style="font-size:10px;font-weight:600;color:#fbbf24;background:rgba(251,191,36,.12);padding:1px 6px;border-radius:4px;">参考级 · 自上而下择时 · 不作交易信号</span>'
-      + _uBadge('盘后', '中长线', T.update_time, '数据 ' + _ev(T.data_date))
       + '</div>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">'
       + '<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.3);border-radius:8px;padding:10px 12px;">'
@@ -6352,15 +6331,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         + '<span>' + _ev(x) + '</span></div>';
     }).join('');
     dst.innerHTML = ''
-      + '<div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.7;font-size:12px;color:var(--txt);">'
-      + '<b style="color:#60a5fa;">&#x1F4CC; 核心：</b>PE&lt;10 是罕见低估事件，2010-2026 年持有 250 日胜率 97.6%、平均 +19.56%（n=166）。<br>'
-      + '<b style="color:#60a5fa;">&#x1F4A1; 用法：</b>估值研究框架，用于判断中长期赔率，不是每日交易信号。<br>'
-      + '<b style="color:#60a5fa;">&#x26A0; 限制：</b>信号稀疏（16 年仅 166 次），最大回撤 -37.5%；2018/2022 大底未触发。</div>'
       + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
       + '<b style="font-size:15px;">📊 中信 PE&lt;10 历史回测</b>'
       + '<span style="font-size:10px;font-weight:600;color:#60a5fa;background:rgba(96,165,250,.12);padding:1px 6px;border-radius:4px;">纯历史回测 · 不预测未来</span>'
       + _uBadge('盘后', '中长线', B.update_time, '数据 ' + _ev(B.data_range[0]) + ' ~ ' + _ev(B.data_range[1]))
       + '</div>'
+      + '<div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.7;font-size:12px;color:var(--txt);">'
+      + '<b style="color:#60a5fa;">&#x1F4CC; 核心：</b>PE&lt;10 是罕见低估事件，2010-2026 年持有 250 日胜率 97.6%、平均 +19.56%（n=166）。<br>'
+      + '<b style="color:#60a5fa;">&#x1F4A1; 用法：</b>估值研究框架，用于判断中长期赔率，不是每日交易信号。<br>'
+      + '<b style="color:#60a5fa;">&#x26A0; 限制：</b>信号稀疏（16 年仅 166 次），最大回撤 -37.5%；2018/2022 大底未触发。</div>'
       + '<div style="background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.25);border-radius:7px;padding:8px 10px;font-size:11.5px;line-height:1.65;color:var(--sub);margin-bottom:10px;">'
       + '<b style="color:#60a5fa;">方法：</b>' + _ev(B.method) + '<br>'
       + '<b style="color:#60a5fa;">样本：</b>近 16 年全交易日（' + B.data_range[0] + ' ~ ' + B.data_range[1] + '） · <b>PE&lt;10 共 ' + B.signals_pe10_total + ' 次触发</b>'
@@ -6416,6 +6395,24 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var w = p==null ? 0 : Math.max(2, Math.round(p * 100));
       return '<div style="background:rgba(148,163,184,.15);border-radius:3px;height:6px;margin-top:4px;overflow:hidden;">'
         + '<div style="width:' + w + '%;height:100%;background:' + c + ';"></div></div>';
+    }
+    /* 🔴 2026-09-13 主人令（图7/8/9）：文案按**实际数据**动态生成。
+       原实现把「仅上证指数 / 全部 available:false / 滞后 2 个交易日」写死在字符串里，
+       数据源修好后仍会喊缺 —— 那就是又一处自相矛盾。 */
+    var _ivfOk  = V.indices.filter(function(x){ return x.available !== false; });
+    var _ivfBad = V.indices.filter(function(x){ return x.available === false; });
+    var _ivfLatest = _ivfOk.map(function(x){ return x.latest_date || ''; }).sort().pop() || '—';
+    var _ivfDataLine, _ivfLimitLine;
+    if(_ivfBad.length){
+      _ivfDataLine = '当前 <b>' + _ivfOk.length + '/' + V.indices.length + '</b> 个指数有真实日K（最新 <b>'
+        + _ev(_ivfLatest) + '</b>）；' + _ivfBad.map(function(x){ return _ev(x.name); }).join(' / ')
+        + ' 暂缺（' + _ev(_ivfBad[0].reason || '待补') + '）。';
+      _ivfLimitLine = _ivfBad.map(function(x){ return _ev(x.name); }).join(' / ') + ' 数据缺失，仅作占位。';
+    } else {
+      _ivfDataLine = '<b>' + V.indices.length + ' 个指数（'
+        + V.indices.map(function(x){ return _ev(x.name); }).join(' / ') + '）均有真实日K</b>，数据截止 <b>'
+        + _ev(_ivfLatest) + '</b>，无滞后缺口。';
+      _ivfLimitLine = '数据来自 baostock 前复权日K，仅反映<b>价格行为</b>，不含基本面与估值分位；指数级别结论不可直接套用到个股。';
     }
     var idxCards = V.indices.map(function(idx){
       var c5 = pctColor(idx.percentile_5y);
@@ -6618,17 +6615,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       // 2026-09-10 主人令：卡名下方加"核心内容 + 解析"
       + '<div style="background:rgba(249,115,22,.05);border:1px solid rgba(249,115,22,.22);border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.7;">'
       + '<div style="font-size:12px;color:var(--txt);margin-bottom:6px;">'
-      + '&#x1F4CC; <b style="color:#f97316;">核心</b>：把 QQQ/TQQQ 的「<b>价格中枢 + 价格档位 + 趋势门控</b>」框架平移到 A 股指数（<b>上证指数 120 日布林带位置 + 20/60/120/250 日 EMA + 趋势门控</b>）。中证序列待补数据。'
+      + '&#x1F4CC; <b style="color:#f97316;">核心</b>：把 QQQ/TQQQ 的「<b>价格中枢 + 价格档位 + 趋势门控</b>」框架平移到 A 股指数（<b>120 日布林带位置 + 20/60/120/250 日 EMA + 趋势门控</b>）。'
       + '</div>'
       + '<div style="font-size:11.5px;color:var(--sub);">'
-      + '&#x1F4A1; <b style="color:#f97316;">解析</b>：当前<b>仅上证指数</b>有真实日K（来自 <code style="background:rgba(249,115,22,.1);padding:1px 4px;border-radius:3px;">INDEX_HISTORY.js</code>，最新点 <b>2026-09-07，滞后 2 个交易日</b>）；沪深300 / 中证500 / 中证1000 因 akshare / 东财接口当前环境不可用，<b>全部 <code style="background:rgba(249,115,22,.1);padding:1px 4px;border-radius:3px;">available:false</code></b>。'
+      + '&#x1F4A1; <b style="color:#f97316;">解析</b>：' + _ivfDataLine
       + '与左卡「估值分位切换」<b>互补</b>：本卡看<b>价格行为</b>，左卡看<b>PE-TTM 估值分位</b>。'
-      + '<br>&#x26A0; <b style="color:#f97316;">限制</b>：当前仅上证指数有真实日K（滞后2交易日），中证序列数据缺失。'
+      + '<br>&#x26A0; <b style="color:#f97316;">限制</b>：' + _ivfLimitLine
       + '</div></div>'
       + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px;">' + idxCards + '</div>'
       + '<div style="background:rgba(249,115,22,.05);border:1px solid rgba(249,115,22,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
-      + '⚠️ <b style="color:#f97316;">框架迁移说明</b>：把 QQQ/TQQQ 的「估值中枢 + 价格档位 + 趋势门控」迁移到 A 股指数。当前仅上证指数有 5 年真实日K（来自 INDEX_HISTORY.js），中证系列因数据源接口在当前环境不可用，仅作占位。'
-      +       '与左侧「估值分位切换卡」互补：本卡看<b>价格行为</b>，左卡看<b>PE-TTM 估值分位</b>。'
+      + '⚠️ <b style="color:#f97316;">读法</b>：本卡看<b>价格行为</b>（布林带位置 + 均线趋势），左卡「估值分位切换」看<b>PE-TTM 估值分位</b>，两者互补、不可互盿。'
       + '</div>';
   };
 
