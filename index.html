@@ -5503,10 +5503,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     try{
       var _btOv = "";
       try{ if(typeof window.__btOverviewHTML === "function") _btOv = window.__btOverviewHTML(); }catch(e){}
-      /* 🔴 2026-09-13 主人令（图2「策略回测页太乱了，先汇总…之后才是怎么算出来的证据」）：
-         证据区原本 <details open> 默认全展开 ⇒ 首屏被几十行明细阶梯冲掉。
-         改为默认收起，与「先汇总 → 后证据」的层级一致。 */
-      dst.innerHTML = (_btOv + (html ? ('<details style="margin-top:18px;border-top:1px solid var(--border);padding-top:12px;">'
+      /* 🟢 2026-09-13 16:40 主人令：策略回测页「完整明细」默认全部展开，无需点击。 */
+      dst.innerHTML = (_btOv + (html ? ('<details open style="margin-top:18px;border-top:1px solid var(--border);padding-top:12px;">'
         + '<summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:var(--sub);padding:6px 0;user-select:none;">▸ 完整明细：各策略 × 各持有期阶梯 + 方法与口径说明 <span style="font-weight:400;color:var(--dim);font-size:11px;">（点击展开 · 计算证据区）</span></summary>'
         + '<div style="margin-top:10px;">' + html + '</div></details>') : ''))
         || '<div class="note" style="padding:24px;text-align:center;color:var(--dim);">⏳ 策略回测数据刷新中…<br><span style="font-size:11px">若长时间为空请硬刷新 (Ctrl/Cmd+F5)</span></div>';
