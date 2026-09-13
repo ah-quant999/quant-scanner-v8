@@ -1326,6 +1326,30 @@ def run_experiment_cards():
 
 def main():
     import argparse
+    # 🔴 2026-09-13 一劳永逸（阿狸咪的工程师）：跑批前「工作区 vs 远端」一致性守卫。
+    #   根因（09-13 实测）：本机工作区内容由坚果云从另一台机同步，常与远端 HEAD 不一致，
+    #   而跑批直接执行工作区里那份脚本 ⇒ 远端已修好的代码被从产物侧**静默撤销**（假成功）。
+    #   守卫先把不一致的关键脚本备份到**仓库外**，再 `git checkout <ref> -- <文件>` 拉齐；
+    #   拉不齐则**中止本次跑批**（fail-closed，禁止用落后代码出产物）。
+    #   逃生舱：环境变量 V8_SKIP_WS_GUARD=1（正常不要设）。
+    try:
+        import subprocess as _sp, sys as _sys, os as _os
+        _d = _os.path.dirname(_os.path.abspath(__file__))
+        _cands = [_os.path.join(_d, "v8_ws_sync_guard.py"),
+                  _os.path.join(_os.path.dirname(_d), "v8_ws_sync_guard.py")]
+        _g = next((c for c in _cands if _os.path.exists(c)), None)
+        if _g:
+            _r = _sp.run([_sys.executable, _g, "--heal"], capture_output=True, text=True,
+                         encoding="utf-8", errors="replace")
+            print((_r.stdout or "").rstrip())
+            if _r.returncode != 0:
+                print("🔴 工作区一致性守卫未通过 → 中止本次跑批（禁止用落后代码出产物）")
+                return 2
+        else:
+            print("⚠️ 未找到 v8_ws_sync_guard.py → 跳过工作区一致性守卫")
+    except Exception as _e:
+        print(f"🔴 工作区一致性守卫异常：{_e} → 中止本次跑批（fail-closed）")
+        return 2
     parser = argparse.ArgumentParser(description="v8 data builder")
     parser.add_argument("--category", choices=["premarket", "intraday", "post_close", "weekly"],
                         help="只构建某一时段类别")
