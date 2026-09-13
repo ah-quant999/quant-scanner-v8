@@ -12748,11 +12748,77 @@ h += '</div>'; // /ulPaneObserve
     var fresh = document.getElementById('maharoFresh');
     if(fresh && typeof setBadge === 'function') setBadge('maharoFresh','auto','短线', stamp);
     function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    /* 2026-09-13 主人令：三条主线要「1/2/3 加粗明显标识」，且
+       事实层面 / 机构观点层面 / 本人判断 必须各自成段（原实现三者挤在同一行，
+       读者分不清哪句是事实、哪句是机构观点、哪句是作者判断）。
+       🔴 本函数是宏观观测页长文的唯一渲染入口，改这里即全卡生效；
+       同时挂到 window.__v8RichLines 供其它长文卡复用，避免各卡各写一套。 */
+    var _RICH_LABEL_COL = {'事实层面':'#34d399', '机构观点层面':'#60a5fa', '机构观点':'#60a5fa',
+                           '本人判断':'#fbbf24', '假设层面':'#f59e0b'};
+    var _RICH_NUM = ['\u2460','\u2461','\u2462','\u2463','\u2464','\u2465','\u2466','\u2467','\u2468','\u2469'];
+    function _richSplitLabels(s){
+      /* 按「标签：」把一行切成多段；返回 null 表示该行不含这些标签。 */
+      var marks = ['事实层面','机构观点层面','机构观点','本人判断','假设层面'];
+      var hits = [];
+      marks.forEach(function(m){
+        var i = s.indexOf(m + '\uff1a');
+        while(i >= 0){
+          hits.push({i:i, m:m});
+          i = s.indexOf(m + '\uff1a', i + m.length + 1);
+        }
+      });
+      if(!hits.length) return null;
+      /* 「机构观点层面」内含「机构观点」⇒ 丢掉被完全包住的短标签，避免切错 */
+      hits = hits.filter(function(h){
+        return !hits.some(function(o){
+          return o !== h && o.i <= h.i && (o.i + o.m.length) > h.i;
+        });
+      });
+      hits.sort(function(a,b){ return a.i - b.i; });
+      var out = [];
+      if(hits[0].i > 0) out.push({label:'', body:s.slice(0, hits[0].i)});
+      hits.forEach(function(h, k){
+        var end = (k + 1 < hits.length) ? hits[k+1].i : s.length;
+        out.push({label:h.m, body:s.slice(h.i + h.m.length + 1, end)});
+      });
+      return out;
+    }
     function renderLines(txt){
       var rows = String(txt||'').split('\n'); var out = '';
       rows.forEach(function(ln){
         if(!ln.trim()) return;
-        var s = esc(ln.trim());
+        var raw = ln.trim();
+        var s = esc(raw);
+        /* ① 主线标题：金色圆形序号 + 加粗 */
+        var mMain = raw.match(/^主线([\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d\u5341]+)\uff1a(.*)$/);
+        if(mMain){
+          var _ord = '\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d\u5341'.indexOf(mMain[1]);
+          var _badge = (_ord >= 0 && _ord < 10) ? _RICH_NUM[_ord] : ('(' + (_ord + 1) + ')');
+          out += '<div style="display:flex;align-items:baseline;gap:7px;margin:11px 0 4px;'
+               + 'padding:5px 9px;border-radius:6px;background:rgba(251,191,36,.07);'
+               + 'border-left:3px solid #fbbf24;">'
+               + '<span style="flex:0 0 auto;color:#fbbf24;font-size:13px;font-weight:800;">' + _badge + '</span>'
+               + '<span style="font-size:12.5px;font-weight:800;color:var(--txt);">'
+               + esc('主线' + mMain[1] + '\uff1a') + esc(mMain[2]) + '</span></div>';
+          return;
+        }
+        /* ② 事实 / 机构观点 / 本人判断 → 各自成段 */
+        var parts = _richSplitLabels(raw);
+        if(parts){
+          parts.forEach(function(p){
+            if(!p.label){
+              if(p.body.trim()) out += '<div style="padding:2px 0;">' + esc(p.body.trim()) + '</div>';
+              return;
+            }
+            var col = _RICH_LABEL_COL[p.label] || 'var(--sub)';
+            out += '<div style="display:flex;align-items:flex-start;gap:7px;padding:3px 0 3px 7px;'
+                 + 'margin:2px 0 2px 1px;border-left:2px solid ' + col + ';line-height:1.65;">'
+                 + '<span style="flex:0 0 auto;font-weight:800;color:' + col + ';font-size:11.5px;">'
+                 + p.label + '\uff1a</span>'
+                 + '<span style="flex:1 1 auto;">' + esc(p.body.trim()) + '</span></div>';
+          });
+          return;
+        }
         if(s.indexOf('- ')===0){
           out += '<div style="display:flex;align-items:flex-start;gap:8px;padding:2px 0 2px 6px;"><span style="color:#34d399;flex-shrink:0;">\u2022</span><span>'+s.slice(2)+'</span></div>';
         } else if(s.indexOf('\u3010')===0){
@@ -12760,11 +12826,20 @@ h += '</div>'; // /ulPaneObserve
         } else if(s.indexOf('\u2192')===0){
           out += '<div style="color:#fbbf24;padding:2px 0 2px 6px;">'+s+'</div>';
         } else {
-          out += '<div style="padding:2px 0;">'+s+'</div>';
+          /* ③ 「1）2）3）」编号条目 → 序号加粗显色，读起来一眼分段 */
+          var mNum = raw.match(/^(\d{1,2})[\uff09\u3001.\uff0c]\s*(.*)$/);
+          if(mNum && mNum[2]){
+            out += '<div style="display:flex;align-items:flex-start;gap:7px;padding:3px 0 3px 2px;">'
+                 + '<span style="flex:0 0 auto;font-weight:800;color:#fbbf24;">' + mNum[1] + '\uff09</span>'
+                 + '<span style="flex:1 1 auto;">' + esc(mNum[2]) + '</span></div>';
+          } else {
+            out += '<div style="padding:2px 0;">'+s+'</div>';
+          }
         }
       });
       return out;
     }
+    window.__v8RichLines = renderLines;
     var h = '';
     // 2026-09-10 一劳永逸：优先读独立 insights 文件（window.MAHORO_INSIGHTS），云端重生成 maharo_macro.js 不会覆盖它；fallback 到内嵌
     var ins = window.MAHORO_INSIGHTS || d.insights || {};
