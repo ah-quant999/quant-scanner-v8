@@ -133,6 +133,13 @@ jobs:
               #   → 不保护会被 weekly_cleanup 判孤儿删除。
               "CITIC_PE_THERMO",
               "CITIC_PE_BACKTEST",
+              # 🛡 2026-09-13 一劳永选：2026-09-12 23:55 cleanup commit 28ca85fb7 一次误删 3 个文件
+              #   （FRESHNESS_STATUS / maharo_insights / maharo_macro），均因上方四重判据均不命中 ⇒ unlink()。
+              #   后果：maharo_macro.js 已无生产者 ⇒ 永久消失 ⇒ 「机构研究·AI 解析」卡恒空。
+              #   以下三个载体名永久保护，防再次误删。
+              "FRESHNESS_STATUS",
+              "MAHORO_INSIGHTS",
+              "MAHORO_MACRO",
           }
           # 保留目录：历史快照、回测产物等整体保护
           PROTECTED_DIRS = {"history", "backtest", "optimize", "v8_cal_archive"}
