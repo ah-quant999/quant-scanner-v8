@@ -6413,11 +6413,10 @@ window.__renderCiticPeObserve = function(){
     var nPct = Math.round(pct);
     var nZone = nPct < 25 ? '低估区' : (nPct < 50 ? '偏低/合理偏低' : (nPct < 75 ? '合理偏高' : '高估区'));
     var yrs = vh && vh.days_total ? Math.round(vh.days_total/244) : 10;
-    var pe10n = (B && B.signals_pe10_total) || '—';
+    var peConclusion = nPct < 25 ? '整体估值偏低，中长期赔率较好' : (nPct > 75 ? '整体估值偏高，宜控制仓位' : '整体估值中性，仅作仓位参考');
     nowStatus = '<div style="background:rgba(56,189,248,.05);border-left:3px solid #38bdf8;border-radius:6px;padding:8px 12px;margin:8px 0;font-size:12px;line-height:1.7;color:var(--sub);">'
       + '<b style="color:#38bdf8;">&#x1F4CC; 现在什么情况：</b>'
-      + '当前中信一级行业 PE-TTM 中位数 = <b style="color:#38bdf8;">' + pe + '</b>，处近' + yrs + '年 <b style="color:' + sigColor + ';">' + nPct + '% 分位</b>（' + nZone + '），信号灯=<b style="color:' + sigColor + ';">' + sigLabel + '</b>。'
-      + 'PE&lt;10 这种极端便宜 16 年只出现 ' + pe10n + ' 次，说明当前还没到历史极端低估区；按本卡逻辑，要等分位跌破 25% 或信号灯转「极度低估」，才算进高赔率区间，平时仅作仓位参考。'
+      + '当前 PE-TTM 为 <b style="color:#38bdf8;">' + pe + '</b> 倍，处近' + yrs + '年 <b style="color:' + sigColor + ';">' + nPct + '% 分位</b>（' + nZone + '），信号灯显示「<b style="color:' + sigColor + ';">' + sigLabel + '</b>」—— ' + peConclusion + '。'
       + '</div>';
   }
   var details = '';
@@ -6553,9 +6552,7 @@ window.__renderIndexObserve = function(){
     var tone = loN > hiN ? '市场估值重心偏低，中长期赔率占优' : (hiN > loN ? '估值重心偏高，注意回撤风险' : '估值分化、结构性行情为主');
     idxNow = '<div style="background:rgba(167,139,250,.05);border-left:3px solid #a78bfa;border-radius:6px;padding:8px 12px;margin:10px 0;font-size:12px;line-height:1.7;color:var(--sub);">'
       + '<b style="color:#a78bfa;">&#x1F4CC; 现在什么情况：</b>'
-      + '监测 ' + V.indices.length + ' 个指数中，' + loN + ' 个处于 5 年估值偏低（&lt;30% 分位）、' + hiN + ' 个偏高（&gt;70%），' + openN + ' 个价格门控为「多头开放」。'
-      + (st.overall ? '综合策略信号=<b style="color:' + defC + ';">' + _ev(st.overall) + '</b>（防御仓位 ' + defW + '%）。' : '')
-      + '整体看，' + tone + '。'
+      + '监测 ' + V.indices.length + ' 个指数：' + loN + ' 个低估 / ' + hiN + ' 个高估 / ' + openN + ' 个门控多头开放；综合定位「<b style="color:' + defC + ';">' + _ev(st.overall) + '</b>」（防御仓位 ' + defW + '%）—— ' + tone + '。'
       + '</div>';
   }
   dst.innerHTML = ''
@@ -6802,9 +6799,7 @@ window.__renderIndexObserve = function(){
     var consistent = (dP===wP && wP===mP);
     aiNow = '<div style="background:rgba(139,92,246,.05);border-left:3px solid #8b5cf6;border-radius:6px;padding:8px 12px;margin:10px 0;font-size:12px;line-height:1.7;color:var(--sub);">'
       + '<b style="color:#8b5cf6;">&#x1F4CC; 现在什么情况：</b>'
-      + 'AI 文本情绪——日线=<b>' + dP + '</b>、周线=<b>' + wP + '</b>、月线=<b>' + mP + '</b>；'
-      + '板块关注 Top 分别为 日·' + dS + ' / 周·' + wS + ' / 月·' + mS + '。'
-      + (consistent ? '三尺度观点一致，信号相对可信。' : '三尺度观点不完全一致，说明当下市场分歧大、暂无强共识，参考权重需下调。')
+      + '日/周/月 AI 情绪分别为 <b>' + dP + '</b> / <b>' + wP + '</b> / <b>' + mP + '</b>，' + (consistent ? '三尺度观点一致，可信度较高' : '观点存在分歧，参考权重下调') + '；板块关注 Top：日·' + dS + ' / 周·' + wS + ' / 月·' + mS + '。'
       + '</div>';
   }
     dst.innerHTML = ''
