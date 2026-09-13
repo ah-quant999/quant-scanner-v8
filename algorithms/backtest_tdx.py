@@ -213,6 +213,26 @@ def passes_optimized_filter(sigs, market_regime):
 def log(msg):
     print(f"  {msg}")
 
+# 🔴 2026-09-14 小九审计修复（P0 · 产物体积逼近 GitHub 单文件硬限）：
+#   本产物含 12 档 × 221 只的逐笔明细，indent=2 序列化后达 126.9 MB > GitHub 100 MiB
+#   单文件硬限 ⇒ push 必被拒（能跑完却推不上去的隐性故障）。改为统一入口紧凑序列化
+#   （零信息损失，126.9 MB → 72.6 MB），并加 95 MB 体积告警护栏提前暴露。
+_FMT_SEP = (",", ":")
+_SIZE_WARN = 95 * 1024 * 1024
+
+def _dump_json(obj, path):
+    """统一写出入口：紧凑序列化 + 体积护栏（防「能跑但推不上去」的隐性故障）。"""
+    with open(path, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(obj, fh, ensure_ascii=False, separators=_FMT_SEP)
+    try:
+        _sz = os.path.getsize(path)
+    except OSError:
+        return
+    if _sz > _SIZE_WARN:
+        log(f"🔴 [P0] {os.path.basename(path)} 已达 {_sz/1048576:.1f} MB，逼近 GitHub 100 MiB "
+            f"单文件硬限 ⇒ push 随时会被拒。请瘦身（可去 win_Nd 冗余档，见交接文档遗留项）")
+
+
 # ─── 通达信K线工具 ───
 def tdx_kline(code, setcode, period="4", count=TDX_BARS):  # 2026-09-13：默认值跟随 TDX_BARS（调用处已显式传参）
     """通过subprocess调通达信MCP接口（因部署环境可能无MCP，做本地回退）"""
@@ -661,12 +681,17 @@ def main():
         log(f"  {name}({code}): {n}天K线, {signal_days}天含信号")
         
         # 每处理一只存一次（防中断丢失）
-        json.dump({
+        # 🔴 2026-09-14 小九审计修复：此处原用 json.dump(..., indent=2) 直写 OUT。
+        #   ① 格式不一致：最终产物由 _dump_json 紧凑写出，中间态却是 indent=2，
+        #      一旦流程在收尾前中断，残留产物体积翻倍（126.9 MB vs 72.6 MB）；
+        #   ② IO 浪费：快照随 stock_results 累积逐次变大、221 只共写 221 次全量，
+        #      是本脚本耗时的大头之一。统一走 _dump_json（紧凑 + 体积护栏）。
+        _dump_json({
             "calc_time": TODAY,
             "method": f"baostock 日K全量回测({TDX_BARS}根·约{round(TDX_BARS / 244)}年) (T+{', T+'.join(map(str, HOLD_DAYS))})",
             "gold_pool_size": len(gp_stocks),
             "stocks": stock_results,
-        }, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+        }, OUT)
     
     # ── 汇总统计 ──
     log(f"\n{'='*60}")
