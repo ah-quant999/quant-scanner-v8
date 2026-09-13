@@ -262,30 +262,65 @@ def _mk_row(src, label, sample, win_rate, avg_return, hold, extra=None, status=N
     return row
 
 
+def _hold_days_of(key):
+    """从 `hold_20d` / `20` / 20 解析持有天数；解析不出返回 None。
+
+    注意：`_num()` 用 float() 解析 ⇒ 吃不下 `hold_20d` 这种键（返回 None），
+    故这里单独补一层数字提取，供 periods 的键使用。
+    """
+    v = _num(key)
+    if v is not None:
+        return int(v)
+    import re as _re
+    m = _re.search(r"(\d+)", str(key))
+    return int(m.group(1)) if m else None
+
+
 def parse_comprehensive(src, obj):
-    """BACKTEST_COMPREHENSIVE：共振三档，每档取「最佳持有期」为主口径。"""
+    """BACKTEST_COMPREHENSIVE：共振三档 × **每个持有期一行**（统一 10/12 档矩阵）。
+
+    🔴 2026-09-13 主人令「统一测算标准 · 用最科学的计算」（小九周末审计 P1-2 采纳）：
+      原实现「每档只取『最佳持有期』」= 从 12 档里**事后挑最好的那档**报告
+      ⇒ 多重比较偏差 / cherry-picking，**系统性高估**该策略；
+      且三重共识在 10 档矩阵里只有 1~2 列有数 ⇒ 主人「统一 10 档」的要求只落地了一半
+      （与「只加 items 不抬 need = 没加」属同一类「改一半」错误）。
+      现改为：**每个持有期各出一行**，全部进矩阵；主口径固定 T+20（label 明示「主口径」，
+      可用 V8_CONSENSUS_PRIMARY_HOLD 覆盖），其余档位同为观测值 ——
+      **不再替使用者做「择优」**。
+      零样本档由 `_mk_row` 既有兜底自动归 None（绝不用 0 冒充）。
+    """
     rows = []
     ov = (obj or {}).get("overview") or {}
     band = [("resonance_all", "共振≥2（宽松）"), ("resonance_gte70_lt80", "共振70-79分"),
             ("resonance_gte80", "共振≥80（严格）")]
+    primary_hd = _num(__import__("os").environ.get("V8_CONSENSUS_PRIMARY_HOLD", "20"))
+    primary_hd = 20 if primary_hd is None else int(primary_hd)
     for key, name in band:
         o = ov.get(key)
-        if not isinstance(o, dict) or o.get("best_win_rate") is None:
+        per_all = (o or {}).get("periods") or {}
+        if not isinstance(o, dict) or not per_all:
             rows.append(_mk_row(src, name, None, None, None, None,
                                 status="该分档无有效样本"))
             continue
-        hd = o.get("best_hold_days")
-        per = (o.get("periods") or {}).get(f"hold_{hd}d") or {}
-        rows.append(_mk_row(
-            src, name, o.get("valid", o.get("total")),
-            o.get("best_win_rate"), o.get("best_avg_return"),
-            f"T+{hd}" if hd else None,
-            extra={"best_return": _num(per.get("best_return")),
-                   "worst_return": _num(per.get("worst_return")),
-                   "max_drawdown": _num(per.get("max_drawdown")),
-                   "sharpe": _num(per.get("sharpe_ratio")),
-                   "median_return": _num(per.get("median_return"))},
-        ))
+        for pk in sorted(per_all.keys(), key=lambda x: (_hold_days_of(x) is None,
+                                                        _hold_days_of(x) or 0)):
+            per = per_all.get(pk) or {}
+            hd = _hold_days_of(pk)
+            is_primary = (hd is not None and hd == primary_hd)
+            lbl = ("%s · T+%d%s" % (name, hd, "（主口径）" if is_primary else "")
+                   if hd is not None else name)
+            rows.append(_mk_row(
+                src, lbl, per.get("count"),
+                per.get("win_rate"), per.get("avg_return"),
+                ("T+%d" % hd) if hd is not None else None,
+                extra={"best_return": _num(per.get("best_return")),
+                       "worst_return": _num(per.get("worst_return")),
+                       "max_drawdown": _num(per.get("max_drawdown")),
+                       "sharpe": _num(per.get("sharpe_ratio")),
+                       "median_return": _num(per.get("median_return")),
+                       "decided": _int(per.get("decided"))},
+                primary=is_primary,
+            ))
     return rows
 
 
