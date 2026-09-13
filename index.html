@@ -1648,14 +1648,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/AUDIT_TRAIL.js?v=1789287115" defer></script>
 <script src="data/HEALTH_CHECK.js?v=1789287115" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=1789287115" defer></script>
-    <!-- 2026-09-07 主人令：中信 PE 极值温度计 + PE<10 历史回测 双卡（暂未上架·实验区最下方） -->
+    <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=1789287115" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=1789287115" defer></script>
-    <!-- 2026-09-09 主人令：A股指数 PE-TTM 历史分位切换卡（暂未上架·实验区） -->
+    <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
     <script src="data/VALUATION_PERCENTILE.js?v=1789287115" defer></script>
     <!-- 2026-09-09 主人令：A股质量价值中小盘多因子 vs v8 选股因子审计（暂未上架） -->
     <script src="data/FACTOR_AUDIT.js?v=1789287115" defer></script>
-    <!-- 2026-09-09 主人令：A股指数价格中枢+趋势门控框架迁移（暂未上架） -->
+    <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
     <script src="data/INDEX_VALUE_FRAMEWORK.js?v=1789287115" defer></script>
     <!-- 2026-09-10 主人令：AI 洞察多源观点对比卡（暂未上架·实验区最下方） -->
     <script src="data/AI_INSIGHTS_COMPARE.js?v=1789287115" defer></script>
@@ -6205,287 +6205,199 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '</div>';   // /padding 12 14
   };
 
-  // ===== 🌡 中信 PE 极值温度计（未来卡 · 2026-09-07 主人令：暂未上架·实验区最下方）=====
-  window.__cpRetry = 0;
-  window.__renderCiticPeThermo = function(){
-    var dst = document.getElementById('citicPeThermoBody');
-    if(!dst) return;
-    var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
-    var T = window.CITIC_PE_THERMO;
-    if(!T || !T.current){
-      if(window.__cpRetry < 25){ window.__cpRetry++; setTimeout(window.__renderCiticPeThermo, 600); return; }
-      dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">🌡 中信 PE 极值温度计 数据未到位（CITIC_PE_THERMO 未注入）</div>';
-      return;
-    }
-    var c = T.current, p = T.percentile, sig = T.signal, vh = T.valuation_history, bbc = T.big_bottom_compare;
-    var bbcRows = bbc.map(function(b){
-      var r60  = b.ret_60d==null?'-':(b.ret_60d>0?'+':'')+b.ret_60d+'%';
-      var r120 = b.ret_120d==null?'-':(b.ret_120d>0?'+':'')+b.ret_120d+'%';
-      var r250 = b.ret_250d==null?'-':(b.ret_250d>0?'+':'')+b.ret_250d+'%';
-      var c60  = b.ret_60d==null?'var(--dim)':(b.ret_60d>0?'#ef5350':'#26a69a');
-      var c120 = b.ret_120d==null?'var(--dim)':(b.ret_120d>0?'#ef5350':'#26a69a');
-      var c250 = b.ret_250d==null?'var(--dim)':(b.ret_250d>0?'#ef5350':'#26a69a');
-      return '<tr>'
-        + '<td style="padding:4px 6px;font-size:11.5px;color:var(--sub);white-space:nowrap;">' + b.date + '</td>'
-        + '<td style="padding:4px 6px;font-size:11.5px;">' + b.tag + '</td>'
-        + '<td style="padding:4px 6px;font-size:12px;text-align:right;font-weight:600;">' + b.pe + '</td>'
-        + '<td style="padding:4px 6px;font-size:12px;text-align:right;">' + (b.pb||'-') + '</td>'
-        + '<td style="padding:4px 6px;font-size:12px;text-align:right;color:' + c60 + ';">' + r60 + '</td>'
-        + '<td style="padding:4px 6px;font-size:12px;text-align:right;color:' + c120 + ';">' + r120 + '</td>'
-        + '<td style="padding:4px 6px;font-size:12px;text-align:right;color:' + c250 + ';">' + r250 + '</td>'
-        + '</tr>';
-    }).join('');
-    var pct = p.pe_rank || 50;
-    var barLeft = 'left:calc(' + Math.max(0, Math.min(100, pct)) + '% - 4px)';
-    dst.innerHTML = ''
-      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
-      + '<b style="font-size:15px;">🌡 中信 PE 极值温度计</b>'
-      + '<span style="font-size:10px;font-weight:600;color:#fbbf24;background:rgba(251,191,36,.12);padding:1px 6px;border-radius:4px;">参考级 · 自上而下择时 · 不作交易信号</span>'
-      + _uBadge('盘后', '中长线', T.update_time, '数据 ' + _ev(T.data_date))
-      + '</div>'
-      + '<div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.7;font-size:12px;color:var(--txt);">'
-      // 2026-09-13 主人令：去掉「大白话」小标题，统一为 📌核心/💡用法/⚠限制 三段式
-      + '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#fbbf24;font-weight:700;">&#x1F4CC; 核心：</b>把整个 A 股当成一件商品，这张卡在告诉你：<b>它现在卖得贵还是便宜</b>。用「股价 ÷ 每股赚的钱」（PE），再拿去和过去 10 年的自己比 —— 比过去大多数时候都低，就是便宜；都比过去高，就是贵。</div>'
-      + '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#fbbf24;font-weight:700;">&#x1F4A1; 用法：</b>🌡 读数低（蓝）＝历史偏低、中长期下行空间小；读数高（红）＝历史偏高、要小心。<b>它看的是「几个月到几年」的级别，不是今天明天涨跌。</b></div>'
-      + '<div style="font-size:11.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;font-weight:700;">&#x26A0; 限制：</b>① 它按「已公布的过去四个季度利润」算，<b>不预判未来</b>；② 别信「PE 低于 10 就是铁底」—— 2018 和 2022 两次真大底，这指标都没低到 10；③ 这不是每日买卖信号，只帮你判断「现在整体贵不贵」。</div>'
-      + '</div>'
-      + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">'
-      + '<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.3);border-radius:8px;padding:10px 12px;">'
-      + '<div style="font-size:11px;color:var(--dim);margin-bottom:3px;">📌 实时收盘价</div>'
-      + '<div style="font-size:22px;font-weight:800;color:#38bdf8;">¥' + c.price + '</div>'
-      + '</div>'
-      + '<div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:10px 12px;">'
-      + '<div style="font-size:11px;color:var(--dim);margin-bottom:3px;">📊 PE TTM</div>'
-      + '<div style="font-size:22px;font-weight:800;color:#fbbf24;">' + c.pe_ttm + '<span style="font-size:11px;color:var(--dim);font-weight:400;margin-left:4px;">倍</span></div>'
-      + '<div style="font-size:10.5px;color:var(--sub);margin-top:2px;">PB ' + (c.pb_mrq||'-') + ' 倍</div>'
-      + '</div>'
-      + '<div style="background:' + sig.color + '14;border:1px solid ' + sig.color + '88;border-radius:8px;padding:10px 12px;">'
-      + '<div style="font-size:11px;color:var(--dim);margin-bottom:3px;">🚦 信号灯</div>'
-      + '<div style="font-size:18px;font-weight:800;color:' + sig.color + ';">' + sig.label + '</div>'
-      + '<div style="font-size:10.5px;color:var(--sub);margin-top:2px;">阈值 &lt;' + sig.pe_threshold.deep + ' 深度 / &lt;' + sig.pe_threshold.value + ' 低估 / &gt;' + sig.pe_threshold.expensive + ' 偏贵</div>'
-      + '</div>'
-      + '</div>'
-      + '<div style="background:rgba(148,163,184,.06);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;">'
-      + '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-bottom:6px;">'
-      + '<span>📐 当前 PE TTM 在近 ' + Math.round(vh.days_total/244) + ' 年（' + vh.days_total + ' 个交易日）的位置</span>'
-      + '<span style="font-weight:700;color:' + sig.color + ';">' + (p.pe_rank||0) + '% 百分位</span>'
-      + '</div>'
-      + '<div style="position:relative;height:18px;background:linear-gradient(90deg,#26a69a 0%,#94a3b8 50%,#ef5350 100%);border-radius:4px;margin-bottom:6px;">'
-      + '<div style="position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--txt);opacity:.5;left:25%;"></div>'
-      + '<div style="position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--txt);opacity:.5;left:50%;"></div>'
-      + '<div style="position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--txt);opacity:.5;left:75%;"></div>'
-      + '<div style="position:absolute;top:-7px;' + barLeft + ';width:8px;height:32px;background:' + sig.color + ';border:2px solid #fff;border-radius:2px;box-shadow:0 1px 4px rgba(0,0,0,.3);"></div>'
-      + '<div style="position:absolute;top:-26px;' + barLeft + ';transform:translateX(-50%);background:' + sig.color + ';color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;white-space:nowrap;">PE ' + c.pe_ttm + '</div>'
-      + '</div>'
-      + '<div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim);">'
-      + '<span>0%（历史最低 ' + (p.pe_p25?p.pe_p25.toFixed(1):'?') + ' 附近）</span>'
-      + '<span>p25=' + (p.pe_p25||'-') + ' / p50=' + (p.pe_p50||'-') + ' / p75=' + (p.pe_p75||'-') + '</span>'
-      + '<span>100%（历史最高）</span>'
-      + '</div>'
-      + '<div style="font-size:10.5px;color:var(--sub);margin-top:6px;line-height:1.6;">'
-      + '近 16 年 PE&lt;10 出现 ' + vh.days_below_pe10 + ' 天（' + vh.pct_below_pe10 + '%）· PE&lt;12 出现 ' + vh.days_below_pe12 + ' 天（' + vh.pct_below_pe12 + '%）· PE&lt;15 出现 ' + vh.days_below_pe15 + ' 天（' + vh.pct_below_pe15 + '%）'
-      + '</div></div>'
-      + '<div style="font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:6px;">📚 历史上 9 次关键大底日 · 中信当时估值 + 后续持有期收益</div>'
-      + '<div style="overflow-x:auto;margin-bottom:8px;">'
-      + '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
-      + '<thead><tr style="background:rgba(148,163,184,.1);">'
-      + '<th style="padding:5px 6px;text-align:left;font-size:11px;color:var(--sub);">日期</th>'
-      + '<th style="padding:5px 6px;text-align:left;font-size:11px;color:var(--sub);">事件</th>'
-      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:var(--sub);">PE</th>'
-      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:var(--sub);">PB</th>'
-      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:#ef5350;">+60d</th>'
-      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:#ef5350;">+120d</th>'
-      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:#ef5350;">+250d</th>'
-      + '</tr></thead>'
-      + '<tbody>' + bbcRows + '</tbody>'
-      + '</table></div>'
-      + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
-      + '⚠️ <b style="color:#fbbf24;">温度计 = 参考级</b>：PE/PB 是截面 TTM，未做盈利质量修正；信号灯<b>不</b>触发交易动作。'
-      + '回测卡独立给出「PE&lt;10 买入后持有 60/120/250 日」的历史胜率。'
-      + '数据范围 ' + _ev(T.data_range[0]) + ' ~ ' + _ev(T.data_range[1]) + '（' + T.row_count + ' 个交易日） · baostock · sh.600030'
-      + '</div>';
-  };
-
-  // ===== 📊 中信 PE<10 历史回测卡（2026-09-07 主人令：暂未上架·实验区最下方）=====
-  window.__cbRetry = 0;
-  window.__renderCiticPeBacktest = function(){
-    var dst = document.getElementById('citicPeBacktestBody');
-    if(!dst) return;
-    var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
-    var B = window.CITIC_PE_BACKTEST;
-    if(!B || !B.result){
-      if(window.__cbRetry < 25){ window.__cbRetry++; setTimeout(window.__renderCiticPeBacktest, 600); return; }
-      dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">📊 中信 PE&lt;10 历史回测 数据未到位</div>';
-      return;
-    }
+  // ===== 🌡 中信 PE 观测 · 极值温度计 + PE<10 回测（2026-09-13 主人令：合并到暂未上架·观测指标）=====
+window.__cpeRetry = 0;
+window.__renderCiticPeObserve = function(){
+  var dst = document.getElementById('citicPeObserveBody');
+  if(!dst) return;
+  var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  var T = window.CITIC_PE_THERMO;
+  var B = window.CITIC_PE_BACKTEST;
+  if((!T || !T.current) && (!B || !B.result)){
+    if(window.__cpeRetry < 25){ window.__cpeRetry++; setTimeout(window.__renderCiticPeObserve, 600); return; }
+    dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F321; 中信 PE 观测 数据未到位</div>';
+    return;
+  }
+  var uT = (T && T.update_time) || (B && B.update_time) || '';
+  var dT = (T && T.data_date) || (B && B.data_range && B.data_range[1]) || '';
+  var c = (T && T.current) || {};
+  var sig = (T && T.signal) || {};
+  var p = (T && T.percentile) || {};
+  var vh = (T && T.valuation_history) || {};
+  var pe = c.pe_ttm != null ? c.pe_ttm : '—';
+  var sigColor = sig.color || '#94a3b8';
+  var sigLabel = sig.label || '—';
+  var pct = p.pe_rank || 0;
+  var barLeft = 'left:calc(' + Math.max(0, Math.min(100, pct)) + '% - 4px)';
+  var r250 = (B && B.result && B.result['pe<10'] && B.result['pe<10']['hold_250d']) || null;
+  var wr250 = r250 ? r250.win_rate + '%' : '—';
+  var ar250 = r250 ? ((r250.avg_ret>0?'+':'') + r250.avg_ret + '%') : '—';
+  var n250 = r250 ? 'n=' + r250.n : '';
+  var sigHtml = '<div style="display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;margin:10px 0;">'
+    + '<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px 12px;min-width:100px;text-align:center;">'
+    + '<div style="font-size:10px;color:var(--dim);">PE-TTM</div>'
+    + '<div style="font-size:20px;font-weight:800;color:#38bdf8;">' + pe + '</div>'
+    + '<div style="font-size:10px;color:var(--dim);margin-top:2px;">PB ' + (c.pb_mrq||'-') + '</div></div>'
+    + '<div style="background:' + sigColor + '14;border:1px solid ' + sigColor + '88;border-radius:7px;padding:8px 12px;min-width:100px;text-align:center;">'
+    + '<div style="font-size:10px;color:var(--dim);">信号灯</div>'
+    + '<div style="font-size:16px;font-weight:800;color:' + sigColor + ';">' + sigLabel + '</div></div>'
+    + '<div style="flex:1;min-width:180px;background:rgba(148,163,184,.06);border:1px solid var(--border);border-radius:7px;padding:8px 12px;">'
+    + '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-bottom:4px;">'
+    + '<span>近' + Math.round((vh.days_total||0)/244) + '年PE分位</span>'
+    + '<span style="font-weight:700;color:' + sigColor + ';">' + pct + '%</span></div>'
+    + '<div style="position:relative;height:12px;background:linear-gradient(90deg,#26a69a 0%,#94a3b8 50%,#ef5350 100%);border-radius:4px;">'
+    + '<div style="position:absolute;top:-2px;bottom:-2px;width:8px;background:' + sigColor + ';border:2px solid #fff;border-radius:2px;box-shadow:0 1px 4px rgba(0,0,0,.3);' + barLeft + '"></div></div>'
+    + '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:4px;">'
+    + '<span>低估</span><span>p25=' + (p.pe_p25||'-') + ' / p50=' + (p.pe_p50||'-') + ' / p75=' + (p.pe_p75||'-') + '</span><span>高估</span></div></div>'
+    + '<div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.3);border-radius:7px;padding:8px 12px;min-width:130px;text-align:center;">'
+    + '<div style="font-size:10px;color:var(--dim);">PE&lt;10 持有250日</div>'
+    + '<div style="font-size:18px;font-weight:800;color:#60a5fa;">' + wr250 + '</div>'
+    + '<div style="font-size:11px;color:' + (r250 && r250.avg_ret>0?'#ef5350':'#26a69a') + ';">' + ar250 + ' <span style="color:var(--dim);">' + n250 + '</span></div></div>'
+    + '</div>';
+  var compactMat = '';
+  if(B && B.result){
+    var hd = ['hold_60d','hold_120d','hold_250d'];
+    var hl = ['60日','120日','250日'];
+    compactMat = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;">';
+    hd.forEach(function(h, i){
+      var r = B.result['pe<10'][h];
+      if(!r) return;
+      var wrC = r.win_rate >= 60 ? '#26a69a' : (r.win_rate >= 50 ? '#94a3b8' : '#ef5350');
+      var arC = r.avg_ret > 0 ? '#ef5350' : '#26a69a';
+      compactMat += '<div style="flex:1;min-width:85px;background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.25);border-radius:6px;padding:6px 8px;text-align:center;">'
+        + '<div style="font-size:10px;color:var(--dim);">PE&lt;10 · ' + hl[i] + '</div>'
+        + '<div style="font-size:14px;font-weight:800;color:' + wrC + ';">' + r.win_rate + '%</div>'
+        + '<div style="font-size:11px;color:' + arC + ';">' + (r.avg_ret>0?'+':'') + r.avg_ret + '%</div>'
+        + '<div style="font-size:10px;color:var(--dim);">n=' + r.n + '</div></div>';
+    });
+    compactMat += '</div>';
+  }
+  var details = '';
+  if(B && B.result){
     var thresholds = ['pe<10','pe<12','pe<15','pe<20'];
     var holdDays   = ['hold_60d','hold_120d','hold_250d'];
-    var mat = '<table style="width:100%;border-collapse:collapse;font-size:11.5px;"><thead><tr style="background:rgba(96,165,250,.1);">'
-      + '<th style="padding:6px;text-align:left;font-size:11.5px;color:var(--sub);">阈值 \\ 持仓</th>'
-      + '<th style="padding:6px;text-align:center;font-size:11.5px;color:var(--sub);">60 日</th>'
-      + '<th style="padding:6px;text-align:center;font-size:11.5px;color:var(--sub);">120 日</th>'
-      + '<th style="padding:6px;text-align:center;font-size:11.5px;color:#fbbf24;font-weight:800;">250 日 ⭐</th>'
-      + '</tr></thead><tbody>';
+    var mat = '<table style="width:100%;border-collapse:collapse;font-size:11px;"><thead><tr style="background:rgba(96,165,250,.1);">'
+      + '<th style="padding:5px;text-align:left;">阈值 \\ 持仓</th>'
+      + '<th style="padding:5px;text-align:center;">60日</th>'
+      + '<th style="padding:5px;text-align:center;">120日</th>'
+      + '<th style="padding:5px;text-align:center;">250日</th></tr></thead><tbody>';
     thresholds.forEach(function(th, ti){
       var bg = ti%2===0 ? 'rgba(148,163,184,.04)' : 'transparent';
-      mat += '<tr style="background:' + bg + ';">'
-        + '<td style="padding:7px 6px;font-weight:700;color:#60a5fa;">' + th + '</td>';
+      mat += '<tr style="background:' + bg + ';"><td style="padding:5px;font-weight:700;color:#60a5fa;">' + th + '</td>';
       holdDays.forEach(function(hd){
         var r = B.result[th][hd];
-        if(!r){ mat += '<td style="padding:7px 6px;text-align:center;color:var(--dim);">—</td>'; return; }
+        if(!r){ mat += '<td style="padding:5px;text-align:center;color:var(--dim);">—</td>'; return; }
         var wrC = r.win_rate >= 60 ? '#26a69a' : (r.win_rate >= 50 ? '#94a3b8' : '#ef5350');
         var arC = r.avg_ret > 0 ? '#ef5350' : '#26a69a';
-        mat += '<td style="padding:7px 6px;text-align:center;">'
-          + '<div style="font-size:11px;color:var(--dim);">N=' + r.n + '</div>'
-          + '<div style="font-weight:700;font-size:13.5px;color:' + wrC + ';">' + r.win_rate + '%</div>'
-          + '<div style="font-size:11.5px;color:' + arC + ';">' + (r.avg_ret>0?'+':'') + r.avg_ret + '%</div>'
-          + '</td>';
+        mat += '<td style="padding:5px;text-align:center;">'
+          + '<div style="font-size:10px;color:var(--dim);">n=' + r.n + '</div>'
+          + '<div style="font-weight:700;font-size:12px;color:' + wrC + ';">' + r.win_rate + '%</div>'
+          + '<div style="font-size:10px;color:' + arC + ';">' + (r.avg_ret>0?'+':'') + r.avg_ret + '%</div></td>';
       });
       mat += '</tr>';
     });
     mat += '</tbody></table>';
-    var sigRows = (B.signal_list_pe10_hold250 || []).slice(0, 6).map(function(s){
-      var rc = s.ret_250d_pct > 0 ? '#ef5350' : '#26a69a';
-      return '<tr>'
-        + '<td style="padding:4px 6px;font-size:11.5px;color:var(--sub);">' + s.date + '</td>'
-        + '<td style="padding:4px 6px;font-size:11.5px;text-align:right;">' + s.pe + '</td>'
-        + '<td style="padding:4px 6px;font-size:11.5px;text-align:right;">¥' + s.price + '</td>'
-        + '<td style="padding:4px 6px;font-size:11.5px;text-align:right;">¥' + s.end_price + '</td>'
-        + '<td style="padding:4px 6px;font-size:12px;text-align:right;font-weight:700;color:' + rc + ';">' + (s.ret_250d_pct>0?'+':'') + s.ret_250d_pct + '%</td>'
-        + '<td style="padding:4px 6px;font-size:11px;text-align:right;color:#ef5350;">' + s.max_dd_pct + '%</td>'
-        + '</tr>';
-    }).join('');
-    var insightItems = (B.insights || []).map(function(x){
-      return '<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;">'
-        + '<span style="color:#60a5fa;font-weight:700;flex-shrink:0;">·</span>'
-        + '<span>' + _ev(x) + '</span></div>';
-    }).join('');
-    dst.innerHTML = ''
-      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
-      + '<b style="font-size:15px;">📊 中信 PE&lt;10 历史回测</b>'
-      + '<span style="font-size:10px;font-weight:600;color:#60a5fa;background:rgba(96,165,250,.12);padding:1px 6px;border-radius:4px;">纯历史回测 · 不预测未来</span>'
-      + _uBadge('盘后', '中长线', B.update_time, '数据 ' + _ev(B.data_range[0]) + ' ~ ' + _ev(B.data_range[1]))
-      + '</div>'
-      + '<div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.7;font-size:12px;color:var(--txt);">'
-      + '<b style="color:#60a5fa;">&#x1F4CC; 核心：</b>PE&lt;10 是罕见低估事件，2010-2026 年持有 250 日胜率 97.6%、平均 +19.56%（n=166）。<br>'
-      + '<b style="color:#60a5fa;">&#x1F4A1; 用法：</b>估值研究框架，用于判断中长期赔率，不是每日交易信号。<br>'
-      + '<b style="color:#60a5fa;">&#x26A0; 限制：</b>信号稀疏（16 年仅 166 次），最大回撤 -37.5%；2018/2022 大底未触发。</div>'
-      + '<div style="background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.25);border-radius:7px;padding:8px 10px;font-size:11.5px;line-height:1.65;color:var(--sub);margin-bottom:10px;">'
-      + '<b style="color:#60a5fa;">方法：</b>' + _ev(B.method) + '<br>'
-      + '<b style="color:#60a5fa;">样本：</b>近 16 年全交易日（' + B.data_range[0] + ' ~ ' + B.data_range[1] + '） · <b>PE&lt;10 共 ' + B.signals_pe10_total + ' 次触发</b>'
-      + '<br><b style="color:var(--dim);">未计交易成本/分红再投；纯个股回测，无对冲。</b>'
-      + '</div>'
-      + '<div style="font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:6px;">🎯 阈值 × 持仓 敏感性矩阵（胜率 / 平均收益）</div>'
-      + '<div style="overflow-x:auto;margin-bottom:12px;">' + mat + '</div>'
-      + '<div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.3);border-radius:7px;padding:8px 10px;margin-bottom:10px;font-size:11.5px;line-height:1.7;color:var(--sub);">'
-      + '<div style="font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:6px;">🔍 关键洞察</div>'
-      + insightItems
-      + '</div>'
-      + '<div style="font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:6px;">📜 PE&lt;10 持有 250 日 信号清单（前 6 条）</div>'
-      + '<div style="overflow-x:auto;margin-bottom:8px;">'
-      + '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
-      + '<thead><tr style="background:rgba(96,165,250,.08);">'
-      + '<th style="padding:5px 6px;text-align:left;font-size:11px;color:var(--sub);">信号日</th>'
-      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:var(--sub);">PE</th>'
-      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:var(--sub);">买入价</th>'
-      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:var(--sub);">250日价</th>'
-      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:#ef5350;">250日收益</th>'
-      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:#ef5350;">持有期回撤</th>'
-      + '</tr></thead>'
-      + '<tbody>' + (sigRows || '<tr><td colspan="6" style="text-align:center;color:var(--dim);padding:12px;">无信号</td></tr>') + '</tbody>'
-      + '</table></div>'
-      + '<div style="background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
-      + '⚠️ <b style="color:#60a5fa;">回测仅描述历史</b>，不构成未来收益承诺。原命题「没有一次牛市 PE&lt;10」<b style="color:#ef5350;">已部分证伪</b>：2018/2022 真大底中信 PE 分别是 15.4 / 11.6，<b>均未低于 10</b>。'
-      + 'PE&lt;10 实际是<b>罕见低估事件</b>（166 次 / 16 年），且<b>多早于大底 30-100 个交易日</b>（166 次里只有 2 次恰好落在已知大底日）。'
-      + '持有期内最大回撤 -37.5%，需极强耐心。'
-      + '</div>';
-  };
+    details += '<details style="margin-top:8px;"><summary style="font-size:12px;font-weight:700;color:#60a5fa;cursor:pointer;">&#x25B8; 完整阈值矩阵</summary>'
+      + '<div style="margin-top:8px;">' + mat + '</div></details>';
+  }
+  dst.innerHTML = ''
+    + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
+    + '<b style="font-size:15px;">&#x1F321; 中信 PE 观测 · 极值温度计 + PE&lt;10 回测</b>'
+    + '<span style="font-size:10px;font-weight:600;color:#fbbf24;background:rgba(251,191,36,.12);padding:1px 6px;border-radius:4px;">观测指标 &#x00B7; 暂未上架</span>'
+    + _uBadge('盘后', '中长线', uT, '数据 ' + _ev(dT))
+    + '</div>'
+    + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.22);border-radius:7px;padding:8px 12px;margin-bottom:10px;line-height:1.6;font-size:12px;">'
+    + '<b style="color:#fbbf24;">&#x1F4CC; 核心：</b>用中信 PE-TTM 判断 A 股整体贵贱，并给出 PE&lt;10 历史买入后的持有胜率。<br>'
+    + '<b style="color:#fbbf24;">&#x1F4A1; 用法：</b>信号灯 + 近10年分位看中长期赔率；PE&lt;10 回测看极端低估事件的历史收益。<br>'
+    + '<b style="color:#fbbf24;">&#x26A0; 限制：</b>非每日交易信号；PE&lt;10 罕见（16年仅' + (B && B.signals_pe10_total || '—') + '次），2018/2022 大底未触发。</div>'
+    + sigHtml
+    + compactMat
+    + details
+    + '<div style="font-size:10.5px;color:var(--sub);margin-top:8px;line-height:1.6;">'
+    + '口径：中信 PE-TTM vs 近10年自身分位；PE&lt;10 回测为信号日收盘价买入、持有 N 日收盘价卖出（未计成本/分红）。</div>';
+};
 
-  // ===== 🌡 估值分位切换 · A股指数周期定位（2026-09-09 主人令：暂未上架·实验区）=====
-  window.__vpRetry = 0;
-  window.__renderValuationPercentile = function(){
-    var dst = document.getElementById('valuationPercentileBody');
-    if(!dst) return;
-    var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
-    var V = window.VALUATION_PERCENTILE;
-    if(!V || !V.indices || !V.indices.length){
-      if(window.__vpRetry < 25){ window.__vpRetry++; setTimeout(window.__renderValuationPercentile, 600); return; }
-      dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F321; 估值分位切换 数据未到位</div>';
-      return;
-    }
-    function pctColor(p){
-      if(p==null) return '#94a3b2';
-      if(p < 0.30) return '#ef5350';      // 低估 → 机会（红）
-      if(p < 0.50) return '#fb923c';      // 偏低
-      if(p < 0.70) return '#fbbf24';      // 偏高
-      return '#26a69a';                    // 高估 → 风险（绿）
-    }
-    function pctBar(p){
-      var c = pctColor(p);
-      var w = p==null ? 0 : Math.max(2, Math.round(p * 100));
-      return '<div style="background:rgba(148,163,184,.15);border-radius:3px;height:6px;margin-top:4px;overflow:hidden;">'
-        + '<div style="width:' + w + '%;height:100%;background:' + c + ';"></div></div>';
-    }
-    /* 2026-09-13 修复：本块（_ivfDataLine/_ivfLimitLine 动态文案生成）原被误插在此处，
-       但它服务的对象是「指数估值中枢」卡（__renderIndexValueFramework），跨函数作用域
-       ⇒ ReferenceError: _ivfDataLine is not defined，该卡整卡渲染失败。
-       已迁至 __renderIndexValueFramework 内（紧跟 var V = window.INDEX_VALUE_FRAMEWORK 之后）。 */
-    var idxCards = V.indices.map(function(idx){
-      var c5 = pctColor(idx.percentile_5y);
-      return '<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.25);border-radius:7px;padding:10px 12px;">'
-        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'
-        + '<span style="font-size:13px;font-weight:800;color:#a78bfa;">' + _ev(idx.name) + '</span>'
-        + '<span style="font-size:10.5px;color:var(--dim);">' + _ev(idx.style) + '</span></div>'
-        + '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px;">'
-        + '<div><div style="font-size:10px;color:var(--dim);">PE-TTM</div><div style="font-size:18px;font-weight:800;color:var(--txt);">' + idx.current_pe + '</div></div>'
-        + '<div style="text-align:right;"><div style="font-size:10px;color:var(--dim);">5年分位</div><div style="font-size:16px;font-weight:800;color:' + c5 + ';">' + (idx.percentile_5y==null?'—':Math.round(idx.percentile_5y*100)+'%') + '</div></div></div>'
-        + pctBar(idx.percentile_5y)
-        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;font-size:11px;">'
-        + '<div style="color:var(--dim);">3年：<span style="font-weight:700;color:' + pctColor(idx.percentile_3y) + ';">' + (idx.percentile_3y==null?'—':Math.round(idx.percentile_3y*100)+'%') + '</span></div>'
-        + '<div style="color:var(--dim);">1年：<span style="font-weight:700;color:' + pctColor(idx.percentile_1y) + ';">' + (idx.percentile_1y==null?'—':Math.round(idx.percentile_1y*100)+'%') + '</span></div>'
-        + '</div>'
-        + '<div style="display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(167,139,250,.25);">'
-        + '<span style="font-size:11px;color:var(--dim);">档位</span>'
-        + '<span style="font-size:11px;font-weight:700;color:' + c5 + ';">' + _ev(idx.bucket_5y) + '</span></div>'
-        + '<div style="display:flex;justify-content:space-between;margin-top:4px;">'
-        + '<span style="font-size:11px;color:var(--dim);">信号</span>'
-        + '<span style="font-size:11px;font-weight:700;color:' + c5 + ';">' + _ev(idx.signal) + '</span></div>'
-        + '</div>';
-    }).join('');
-    var st = V.strategy || {};
-    var defRatio = st.defensive_ratio;
-    var defW = defRatio==null ? 50 : Math.round(defRatio * 100);
-    var defC = defW >= 55 ? '#26a69a' : (defW <= 35 ? '#ef5350' : '#fbbf24');
-    dst.innerHTML = ''
-      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
-      + '<b style="font-size:15px;">&#x1F321; 估值分位切换 · A股指数周期定位</b>'
-      + '<span style="font-size:10px;font-weight:600;color:#a78bfa;background:rgba(167,139,250,.12);padding:1px 6px;border-radius:4px;">暂未上架 · 实验卡</span>'
-      + _uBadge('盘后', '中长线', V.update_time, 'akshare / stock_index_pe_lg')
-      + '</div>'
-      // 2026-09-10 主人令：卡名下方加"核心内容 + 解析"，让判读者一眼看懂这卡是什么、怎么用
-      + '<div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.22);border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.7;">'
-      // 2026-09-13 主人令：去掉「大白话」小标题，统一为 📌核心/💡用法/⚠限制 三段式
-      + '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#a78bfa;font-weight:700;">&#x1F4CC; 核心：</b>给 A 股三个主要指数（沪深300 / 中证500 / 中证1000）各拍一张「此刻贵不贵」的照片，并告诉你<b>现在该多拿现金还是多拿股票</b>。</div>'
-      + '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#a78bfa;font-weight:700;">&#x1F4A1; 用法：</b>📐 把这只指数过去 N 年的估值从低到高排成一队，看现在站在队伍的第几个位置 —— <b>分位 10% = 比过去 90% 的时间都便宜</b>，分位 90% = 比过去 90% 的时间都贵。本卡故意同时列 <b>5 年 / 3 年 / 1 年</b> 三个口径，因为它们经常互相打架（某指数按 5 年看偏高 76%、按 1 年看却低估到 3.9%）—— 拉长看是历史高位、砍短看是刚从坑里爬起来，<b>只看一个口径会得出相反结论，所以三个都要看</b>。</div>'
-      + '<div style="font-size:11.5px;color:var(--sub);padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;font-weight:700;">&#x26A0; 限制：</b>① 它管的是<b>整体仓位轻重</b>（大盘级别），<b>不会告诉你买哪只股</b>；② 数据来自 akshare 公开接口，偶有抽风，读数仅供参考；③ 估值便宜 ≠ 马上会涨，可能继续便宜很久。</div>'
-      + '</div>'
-      + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px;">' + idxCards + '</div>'
-      + '<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.3);border-radius:7px;padding:10px 13px;margin-bottom:10px;">'
-      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">'
-      + '<span style="font-size:12.5px;font-weight:700;color:#a78bfa;">综合策略</span>'
-      + '<span style="font-size:12px;font-weight:800;color:' + defC + ';">' + _ev(st.overall) + '</span></div>'
-      + '<div style="font-size:12px;line-height:1.65;color:var(--txt);margin-bottom:8px;">' + _ev(st.suggestion) + '</div>'
-      + '<div style="display:flex;align-items:center;gap:10px;">'
-      + '<span style="font-size:11px;color:var(--dim);white-space:nowrap;">建议防御仓位</span>'
-      + '<div style="flex:1;background:rgba(148,163,184,.15);border-radius:3px;height:8px;overflow:hidden;">'
-      + '<div style="width:' + defW + '%;height:100%;background:' + defC + ';"></div></div>'
-      + '<span style="font-size:12px;font-weight:700;color:' + defC + ';">' + defW + '%</span></div>'
-      + '</div>'
-      + '<div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
-      + '⚠️ <b style="color:#a78bfa;">参考级择时信号</b>：基于 PE-TTM 历史分位（5年为主，辅以3年/1年），用于顶层仓位/风格定位，<b>不直接触发个股买卖</b>。'
-      + '数据为月度序列最新点，最新交易日 ' + _ev(V.indices[0].date) + '。'
-      + '</div>';
-  };
+  
+
+  // ===== 📈 A股指数观测 · 估值分位 + 价格中枢（2026-09-13 主人令：合并到暂未上架·大盘观测）=====
+window.__ivpRetry = 0;
+window.__renderIndexObserve = function(){
+  var dst = document.getElementById('indexObserveBody');
+  if(!dst) return;
+  var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  var V = window.VALUATION_PERCENTILE;
+  var F = window.INDEX_VALUE_FRAMEWORK;
+  if((!V || !V.indices || !V.indices.length) && (!F || !F.indices || !F.indices.length)){
+    if(window.__ivpRetry < 25){ window.__ivpRetry++; setTimeout(window.__renderIndexObserve, 600); return; }
+    dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F4C8; A股指数观测 数据未到位</div>';
+    return;
+  }
+  var uT = (V && V.update_time) || (F && F.update_time) || '';
+  var src = [];
+  if(V && V.source) src.push('估值：akshare');
+  if(F && F.source) src.push('价格：' + F.source);
+  function pctColor(p){
+    if(p==null) return '#94a3b2';
+    if(p < 0.30) return '#ef5350';
+    if(p < 0.50) return '#fb923c';
+    if(p < 0.70) return '#fbbf24';
+    return '#26a69a';
+  }
+  var fmap = {};
+  if(F && F.indices){
+    F.indices.forEach(function(x){ fmap[x.name] = x; });
+  }
+  var indices = (V && V.indices) ? V.indices : (F ? F.indices : []);
+  var rows = indices.map(function(idx){
+    var fx = fmap[idx.name] || {};
+    var c5 = pctColor(idx.percentile_5y);
+    var p5 = idx.percentile_5y==null ? '—' : Math.round(idx.percentile_5y*100)+'%';
+    var gateC = fx.gate_color === '红' ? '#ef5350' : (fx.gate_color === '绿' ? '#26a69a' : '#fbbf24');
+    var latest = fx.latest_close != null ? fx.latest_close : '—';
+    var bp = fx.boll_position == null ? null : Math.max(-1, Math.min(1, fx.boll_position));
+    var bpC = bp == null ? '#94a3b2' : (bp < -0.4 ? '#ef5350' : (bp > 0.4 ? '#26a69a' : '#fbbf24'));
+    var bpTxt = bp == null ? '—' : (fx.bucket || '—');
+    return '<tr>'
+      + '<td style="padding:5px 6px;font-size:12px;font-weight:700;">' + _ev(idx.name) + '<br><span style="font-size:10px;color:var(--dim);font-weight:400;">' + _ev(idx.style) + '</span></td>'
+      + '<td style="padding:5px 6px;font-size:13px;font-weight:800;text-align:right;">' + latest + '</td>'
+      + '<td style="padding:5px 6px;text-align:right;"><div style="font-size:13px;font-weight:800;color:var(--txt);">' + idx.current_pe + '</div></td>'
+      + '<td style="padding:5px 6px;text-align:right;"><div style="font-size:13px;font-weight:800;color:' + c5 + ';">' + p5 + '</div></td>'
+      + '<td style="padding:5px 6px;text-align:center;"><span style="font-size:12px;font-weight:700;color:' + gateC + ';">' + _ev(fx.gate || '—') + '</span></td>'
+      + '<td style="padding:5px 6px;text-align:center;"><span style="font-size:12px;font-weight:700;color:' + bpC + ';">' + bpTxt + '</span></td>'
+      + '<td style="padding:5px 6px;font-size:11px;color:var(--dim);text-align:center;">' + _ev(fx.trend_short || '—') + ' / ' + _ev(fx.trend_long || '—') + '</td>'
+      + '</tr>';
+  }).join('');
+  var st = V && V.strategy ? V.strategy : {};
+  var defRatio = st.defensive_ratio;
+  var defW = defRatio==null ? 50 : Math.round(defRatio * 100);
+  var defC = defW >= 55 ? '#26a69a' : (defW <= 35 ? '#ef5350' : '#fbbf24');
+  var strategyHtml = st.overall ? '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+    + '<span style="font-size:12px;font-weight:700;color:#a78bfa;">综合策略</span>'
+    + '<span style="font-size:13px;font-weight:800;color:' + defC + ';">' + _ev(st.overall) + '</span>'
+    + '<span style="font-size:11px;color:var(--dim);">防御仓位 ' + defW + '%</span>'
+    + '<div style="flex:1;min-width:100px;background:rgba(148,163,184,.15);border-radius:3px;height:8px;overflow:hidden;"><div style="width:' + defW + '%;height:100%;background:' + defC + ';"></div></div></div>' : '';
+  dst.innerHTML = ''
+    + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
+    + '<b style="font-size:15px;">&#x1F4C8; A股指数观测 · 估值分位 + 价格中枢</b>'
+    + '<span style="font-size:10px;font-weight:600;color:#a78bfa;background:rgba(167,139,250,.12);padding:1px 6px;border-radius:4px;">大盘观测 &#x00B7; 暂未上架</span>'
+    + _uBadge('盘后', '中长线', uT, src.join(' / '))
+    + '</div>'
+    + '<div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.22);border-radius:7px;padding:8px 12px;margin-bottom:10px;line-height:1.6;font-size:12px;">'
+    + '<b style="color:#a78bfa;">&#x1F4CC; 核心：</b>同时看指数的「PE-TTM 历史分位」和「价格中枢/趋势门控」，两者互补。<br>'
+    + '<b style="color:#a78bfa;">&#x1F4A1; 用法：</b>估值分位看贵贱（仓位轻重），价格中枢看趋势（多空门控）。<br>'
+    + '<b style="color:#a78bfa;">&#x26A0; 限制：</b>大盘级别参考，不指向个股；数据源偶有抽风，读数仅供参考。</div>'
+    + strategyHtml
+    + '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
+    + '<thead><tr style="background:rgba(167,139,250,.08);">'
+    + '<th style="padding:5px 6px;text-align:left;font-size:11px;color:var(--sub);">指数</th>'
+    + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:var(--sub);">最新价</th>'
+    + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:var(--sub);">PE-TTM</th>'
+    + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:var(--sub);">5年分位</th>'
+    + '<th style="padding:5px 6px;text-align:center;font-size:11px;color:var(--sub);">门控</th>'
+    + '<th style="padding:5px 6px;text-align:center;font-size:11px;color:var(--sub);">120日中枢</th>'
+    + '<th style="padding:5px 6px;text-align:center;font-size:11px;color:var(--sub);">短/长趋势</th>'
+    + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+};
 
   // ===== 📊 因子审计：v8 选股 vs 质量价值中小盘多因子（2026-09-09 主人令：暂未上架·实验区）=====
   window.__faRetry = 0;
@@ -6638,93 +6550,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '</div>';
   };
 
-  // ===== 📈 指数估值中枢 · 价格档位 + 趋势门控（2026-09-09 主人令：暂未上架·实验区）=====
-  window.__ivfRetry = 0;
-  window.__renderIndexValueFramework = function(){
-    var dst = document.getElementById('indexValueFrameworkBody');
-    if(!dst) return;
-    var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
-    var V = window.INDEX_VALUE_FRAMEWORK;
-    if(!V || !V.indices || !V.indices.length){
-      if(window.__ivfRetry < 25){ window.__ivfRetry++; setTimeout(window.__renderIndexValueFramework, 600); return; }
-      dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F4C8; 指数估值中枢 数据未到位</div>';
-      return;
-    }
-    /* 🔴 2026-09-13 主人令（图7/8/9）：文案按**实际数据**动态生成。
-       🛡 2026-09-13 修复：本块原被误插在 __renderValuationPercentile 内（跨函数作用域 ⇒
-          ReferenceError 整卡渲染失败），已迁回本函数，且置于空值守卫之后。
-       原实现把「仅上证指数 / 全部 available:false / 滞后 2 个交易日」写死在字符串里，
-       数据源修好后仍会喊缺 —— 那就是又一处自相矛盾。 */
-    var _ivfOk  = V.indices.filter(function(x){ return x.available !== false; });
-    var _ivfBad = V.indices.filter(function(x){ return x.available === false; });
-    var _ivfLatest = _ivfOk.map(function(x){ return x.latest_date || ''; }).sort().pop() || '—';
-    var _ivfDataLine, _ivfLimitLine;
-    if(_ivfBad.length){
-      _ivfDataLine = '当前 <b>' + _ivfOk.length + '/' + V.indices.length + '</b> 个指数有真实日K（最新 <b>'
-        + _ev(_ivfLatest) + '</b>）；' + _ivfBad.map(function(x){ return _ev(x.name); }).join(' / ')
-        + ' 暂缺（' + _ev(_ivfBad[0].reason || '待补') + '）。';
-      _ivfLimitLine = _ivfBad.map(function(x){ return _ev(x.name); }).join(' / ') + ' 数据缺失，仅作占位。';
-    } else {
-      _ivfDataLine = '<b>' + V.indices.length + ' 个指数（'
-        + V.indices.map(function(x){ return _ev(x.name); }).join(' / ') + '）均有真实日K</b>，数据截止 <b>'
-        + _ev(_ivfLatest) + '</b>，无滞后缺口。';
-      _ivfLimitLine = '数据来自 baostock 前复权日K，仅反映<b>价格行为</b>，不含基本面与估值分位；指数级别结论不可直接套用到个股。';
-    }
-    var idxCards = V.indices.map(function(idx){
-      if(idx.available === false){
-        return '<div style="background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.25);border-radius:7px;padding:10px 12px;">'
-          + '<div style="font-size:13px;font-weight:800;color:#94a3b2;">' + _ev(idx.name) + '</div>'
-          + '<div style="font-size:11px;color:var(--dim);margin-top:4px;">数据待补</div>'
-          + '<div style="font-size:10.5px;color:var(--dim);margin-top:4px;">' + _ev(idx.reason) + '</div></div>';
-      }
-      var gc = idx.gate_color;
-      var gateC = gc === '红' ? '#ef5350' : (gc === '绿' ? '#26a69a' : '#fbbf24');
-      var bp = idx.boll_position == null ? null : Math.max(-1, Math.min(1, idx.boll_position));
-      var bpPct = bp == null ? 50 : Math.round((bp + 1) * 50);
-      var bpC = bp == null ? '#94a3b2' : (bp < -0.4 ? '#ef5350' : (bp > 0.4 ? '#26a69a' : '#fbbf24'));
-      return '<div style="background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.25);border-radius:7px;padding:10px 12px;">'
-        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
-        + '<span style="font-size:13px;font-weight:800;color:#f97316;">' + _ev(idx.name) + '</span>'
-        + '<span style="font-size:10.5px;color:var(--dim);">' + _ev(idx.latest_date) + '</span></div>'
-        + '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px;">'
-        + '<div><div style="font-size:10px;color:var(--dim);">最新价</div><div style="font-size:18px;font-weight:800;color:var(--txt);">' + idx.latest_close + '</div></div>'
-        + '<div style="text-align:right;"><div style="font-size:10px;color:var(--dim);">门控</div><div style="font-size:13px;font-weight:800;color:' + gateC + ';">' + _ev(idx.gate) + '</div></div></div>'
-        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'
-        + '<span style="font-size:10px;color:var(--dim);white-space:nowrap;">120日中枢位置</span>'
-        + '<div style="flex:1;background:rgba(148,163,184,.15);border-radius:3px;height:6px;overflow:hidden;">'
-        + '<div style="width:' + bpPct + '%;height:100%;background:' + bpC + ';"></div></div>'
-        + '<span style="font-size:10px;font-weight:700;color:' + bpC + ';">' + (bp==null?'—':_ev(idx.bucket)) + '</span></div>'
-        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;color:var(--dim);">'
-        + '<div>EMA20：<span style="color:var(--txt);font-weight:700;">' + idx.ema20 + '</span></div>'
-        + '<div>EMA60：<span style="color:var(--txt);font-weight:700;">' + idx.ema60 + '</span></div>'
-        + '<div>EMA120：<span style="color:var(--txt);font-weight:700;">' + idx.ema120 + '</span></div>'
-        + '<div>EMA250：<span style="color:var(--txt);font-weight:700;">' + idx.ema250 + '</span></div>'
-        + '</div>'
-        + '<div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(249,115,22,.25);font-size:11px;color:var(--dim);">'
-        + '短趋势 ' + _ev(idx.trend_short) + ' · 长趋势 ' + _ev(idx.trend_long)
-        + '</div></div>';
-    }).join('');
-    dst.innerHTML = ''
-      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
-      + '<b style="font-size:15px;">&#x1F4C8; 指数估值中枢 · 价格档位 + 趋势门控</b>'
-      + '<span style="font-size:10px;font-weight:600;color:#f97316;background:rgba(249,115,22,.12);padding:1px 6px;border-radius:4px;">暂未上架 · 框架迁移</span>'
-      + _uBadge('盘后', '中长线', V.update_time, V.source)
-      + '</div>'
-      // 2026-09-10 主人令：卡名下方加"核心内容 + 解析"
-      + '<div style="background:rgba(249,115,22,.05);border:1px solid rgba(249,115,22,.22);border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.7;">'
-      + '<div style="font-size:12px;color:var(--txt);margin-bottom:6px;">'
-      + '&#x1F4CC; <b style="color:#f97316;">核心</b>：把 QQQ/TQQQ 的「<b>价格中枢 + 价格档位 + 趋势门控</b>」框架平移到 A 股指数（<b>120 日布林带位置 + 20/60/120/250 日 EMA + 趋势门控</b>）。'
-      + '</div>'
-      + '<div style="font-size:11.5px;color:var(--sub);">'
-      + '&#x1F4A1; <b style="color:#f97316;">解析</b>：' + _ivfDataLine
-      + '与左卡「估值分位切换」<b>互补</b>：本卡看<b>价格行为</b>，左卡看<b>PE-TTM 估值分位</b>。'
-      + '<br>&#x26A0; <b style="color:#f97316;">限制</b>：' + _ivfLimitLine
-      + '</div></div>'
-      + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px;">' + idxCards + '</div>'
-      + '<div style="background:rgba(249,115,22,.05);border:1px solid rgba(249,115,22,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
-      + '⚠️ <b style="color:#f97316;">读法</b>：本卡看<b>价格行为</b>（布林带位置 + 均线趋势），左卡「估值分位切换」看<b>PE-TTM 估值分位</b>，两者互补、不可互盿。'
-      + '</div>';
-  };
+  
 
   // ===== 🔮 AI 洞察多源观点对比（2026-09-10 主人令：暂未上架·实验区最下方）=====
   // 数据源：data/maharo_macro.js（已由小九日 07:22 拉好）→ 解析 daily/weekly/monthly 三段 AI 文本
@@ -6824,7 +6650,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   // 数据源：raw_data/factor_progress.json（由 gen_factor_progress.py 根据 FACTOR_AUDIT + 主人分批决策生成）
   window.__fpRetry = 0;
 
-  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderBtExtraPane(); }catch(e){} try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderMacroPane(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeThermo(); }catch(e){} try{ window.__renderCiticPeBacktest(); }catch(e){} try{ window.__renderValuationPercentile(); }catch(e){} try{ window.__renderFactorAudit(); }catch(e){} try{ window.__renderIndexValueFramework(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} }
+  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderBtExtraPane(); }catch(e){} try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderMacroPane(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeObserve(); }catch(e){} try{ window.__renderIndexObserve(); }catch(e){} try{ window.__renderFactorAudit(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
   } else {
@@ -12582,8 +12408,8 @@ window.showRestrictedItems = showRestrictedItems;
       //   切到对应子页时兜底触发该页全部卡片渲染，避免 defer 数据未到导致空卡。
       if(tab==='observe'){
         if(typeof window.__renderThemeValue==='function'){ try{ window.__renderThemeValue(); }catch(e){} }
-        if(typeof window.__renderCiticPeThermo==='function'){ try{ window.__renderCiticPeThermo(); }catch(e){} }
-        if(typeof window.__renderValuationPercentile==='function'){ try{ window.__renderValuationPercentile(); }catch(e){} }
+        if(typeof window.__renderCiticPeObserve==='function'){ try{ window.__renderCiticPeObserve(); }catch(e){} }
+        if(typeof window.__renderIndexObserve==='function'){ try{ window.__renderIndexObserve(); }catch(e){} }
         if(typeof window.__renderAiInsightsCompare==='function'){ try{ window.__renderAiInsightsCompare(); }catch(e){} }
       }
     };
@@ -12684,17 +12510,17 @@ h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;
 // 2026-09-12 主人令：主题空间卡 = 概念&#xD7;资金热度交叉（纯前端交叉，无新增管线）
 h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-left:4px solid var(--cyan);"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52D; 主题空间 · 概念资金热度 加载中&#x2026;</div></div>';
 // 2026-09-12 主人令：中信 PE 极值温度计（观测类·估值）
-h += '<div class="card" id="citicPeThermoBody" style="margin-bottom:16px;border-left:4px solid #fbbf24;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F321; 中信 PE 极值温度计 加载中&#x2026;</div></div>';
+h += '<div class="card" id="citicPeObserveBody" style="margin-bottom:16px;border-left:4px solid #fbbf24;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F321; 中信 PE 观测 加载中&#x2026;</div></div>';
 // 2026-09-12 主人令：A股指数 PE-TTM 历史分位切换卡（观测类·大盘）
-h += '<div class="card" id="valuationPercentileBody" style="margin-bottom:16px;border-left:4px solid #a78bfa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F321; 估值分位切换 · A股指数周期定位 加载中&#x2026;</div></div>';
+h += '<div class="card" id="indexObserveBody" style="margin-bottom:16px;border-left:4px solid #a78bfa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; A股指数观测 加载中&#x2026;</div></div>';
 // 2026-09-12 主人令：AI 洞察多源观点对比卡（观测类·情绪/观点）
 h += '<div class="card" id="aiInsightsCompareBody" style="margin-bottom:16px;border-left:4px solid #8b5cf6;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52E; AI 洞察·多源观点对比 加载中&#x2026;</div></div>';
 h += '</div>'; // /ulPaneObserve
 
 // 2026-09-12 主人令：本页子页从 4 组（观测类 / 回测·框架 / 因子类 / 宏观类）收敛为 1 组「观测类」。
 //   三组迁出去向（卡片容器 id 全部保留，仅换宿主；渲染函数按 id 取容器，故迁页零改动）：
-//     · 回测·框架 3 卡  RPS 30天样本考核 / 中信PE<10历史回测 / 指数估值中枢+趋势门控
-//       → 策略回测页底部 #btExtraHost（__renderBtExtraPane）
+//     · 回测·框架 3 卡  RPS 30天样本考核（已删）/ 中信PE观测（已并到暂未上架）/ 指数观测（已并到暂未上架）
+//       → 策略回测页底部 #btExtraHost（__renderBtExtraPane）现仅保留其它回测类卡壳
 //     · 因子类   3 卡  因子实验室 / 因子审计 / 因子补缺进度
 //       → 选股策略 → 🧪 因子 子页 #stFaHost（__renderFactorPane），位于逆势龙头左侧
 //     · 宏观类   3 卡  机构研究·AI解析 / 新周期判定 / 宏观景气背景·K型分层
@@ -12724,9 +12550,9 @@ h += '</div>'; // /ulPaneObserve
     //   __renderFactorPane / __renderMacroPane）。本页只保留观测类 5 卡的填充。
     // 🔭 2026-09-06 主人令：主题空间·价值投资 实验卡随 renderUnlisted 重渲（实验区最下方）
     try{ if(typeof window.__renderThemeValue==='function') window.__renderThemeValue(); }catch(e){ console.warn('主题空间实验卡渲染失败', e); }
-    try{ if(typeof window.__renderCiticPeThermo==='function') window.__renderCiticPeThermo(); }catch(e){ console.warn('中信 PE 温度计渲染失败', e); }
-    // 🌡 2026-09-09 主人令：A股指数估值分位切换卡（暂未上架·实验区最下方）
-    try{ if(typeof window.__renderValuationPercentile==='function') window.__renderValuationPercentile(); }catch(e){ console.warn('估值分位切换卡渲染失败', e); }
+    try{ if(typeof window.__renderCiticPeObserve==='function') window.__renderCiticPeObserve(); }catch(e){ console.warn('中信 PE 观测卡渲染失败', e); }
+    // 📈 2026-09-13 主人令：A股指数观测卡（估值分位 + 价格中枢 · 暂未上架·实验区最下方）
+    try{ if(typeof window.__renderIndexObserve==='function') window.__renderIndexObserve(); }catch(e){ console.warn('A股指数观测卡渲染失败', e); }
     // 🔮 2026-09-10 主人令：AI 洞察多源观点对比卡（观测类）
     try{ if(typeof window.__renderAiInsightsCompare==='function') window.__renderAiInsightsCompare(); }catch(e){ console.warn('AI 洞察对比卡渲染失败', e); }
   }
@@ -14243,17 +14069,13 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   window.__renderBtExtraPane = function(){
     var hm = '';
 hm += '<div id="ulPaneBacktest">';
-// 2026-09-12 主人令：中信 PE<10 历史回测卡（回测类·个股）
-hm += '<div class="card" id="citicPeBacktestBody" style="margin-bottom:16px;border-left:4px solid #60a5fa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4CA; 中信 PE&lt;10 历史回测 加载中&#x2026;</div></div>';
-// 2026-09-12 主人令：A股指数价格中枢+趋势门控框架迁移（框架类·大盘/指数）
-hm += '<div class="card" id="indexValueFrameworkBody" style="margin-bottom:16px;border-left:4px solid #f97316;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; 指数估值中枢 · 价格档位+趋势门控 加载中&#x2026;</div></div>';
+// 2026-09-13 主人令：中信PE回测 / 指数估值中枢 已并到暂未上架观测区，本页底部不再重复展示
 hm += '</div>'; // /ulPaneBacktest
     var _host = document.getElementById('btExtraHost');
     if(_host) _host.innerHTML = hm;
     // 🔴 2026-09-12 补漏：骨架入 DOM 后必须就地填充（原先这三个填充调用只留在
     //   renderUnlisted 里，宿主迁走后不再被触发 → 三卡恒「加载中」）
-    try{ if(typeof window.__renderCiticPeBacktest==='function') window.__renderCiticPeBacktest(); }catch(e){ console.warn('中信PE回测卡渲染失败', e); }
-    try{ if(typeof window.__renderIndexValueFramework==='function') window.__renderIndexValueFramework(); }catch(e){ console.warn('指数估值中枢卡渲染失败', e); }
+    // 2026-09-13 主人令：原回测卡 / 原指数中枢卡 已并入暂未上架合并卡，此处不再调用
   };
   window.__renderFactorPane = function(){
     var hm = '';
