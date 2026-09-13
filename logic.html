@@ -1823,16 +1823,15 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       <div class="card">
         <h3><span class="ic">🌍</span>宏观观测 - 说明</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p">2026-09-12 主人令新建的<b>一级导航页</b>，挂在主站最左侧（今日事件之前）。它把原先埋在「暂未上架 → 宏观类」深处的宏观/周期判断搬到台前：<b>先看宏观处在什么位置，再看个股</b>。页内三张卡里两张为<b>静态内联内容</b>（随主站构建一起发布），唯一有数据链的是置顶的机构研究卡。</div>
-        <div class="logic-h">三张卡</div>
+        <div class="logic-p">2026-09-12 主人令新建的<b>一级导航页</b>，挂在主站最左侧（今日事件之前）。它把原先埋在「暂未上架 → 宏观类」深处的宏观/周期判断搬到台前：<b>先看宏观处在什么位置，再看个股</b>。页内两张卡里一张为<b>静态内联内容</b>（随主站构建一起发布），唯一有数据链的是置顶的机构研究卡。</div>
+        <div class="logic-h">两张卡</div>
         <table class="lg-table">
           <tr><th>卡片</th><th>内容</th><th>数据 / 刷新</th></tr>
           <tr><td>📚 机构研究 · AI 解析建议<br><span style="color:var(--dim);font-size:11px;">卡容器 <code>maharoCard</code></span></td><td>观澜台 / 金斧头 / 逻辑与思考 / 树枝报告 / 180K Research / 智堡 Wisburg / Vito行研札记 共 7 源，AI 阅读后按「日 → 周 → 月」三层撰写，新闻条目折叠为附录；标题行带「更新于」</td><td><code>data/maharo_macro.js</code>，每日 <b>08:30</b> 由本机 <code>maharo_daily_pull.py</code> 拉取生成</td></tr>
-          <tr><td>🌐 新周期判定 · 海外宏观 + AI 大周期</td><td>海外宏观 + AI 大周期的当前位置判定（事件驱动）</td><td>静态内联，无 data 依赖，2026-09-06 起固定</td></tr>
           <tr><td>🌍 宏观景气背景 · K 型分层</td><td>K 型分化结构对照：扩张区（上端 · 红）/ 收缩区（下端 · 绿），含金融抑制模型框架要点</td><td>静态内联；源为沧海一土狗（公众号）K 型行业景气图，<b>每月 1 日随宏观数据手动更新</b></td></tr>
         </table>
         <div class="logic-h">为什么提升为一级</div>
-        <div class="logic-p">这三张卡原先在「暂未上架」最深处，要连点两层才看得到，实际使用率极低。<b>2026-09-12 主人令</b>：宏观判断属「开盘前必看」，与今日事件同级，故提升为一级页，且<b>不锁</b>（访客可见）。</div>
+        <div class="logic-p">这两张卡原先在「暂未上架」最深处，要连点两层才看得到，实际使用率极低。<b style="color:var(--gold)">2026-09-13 主人令</b>：原「🌐 新周期判定」卡因属<b>事件驱动 · 手动维护</b>（09-06 快照，一周即整体失效）不符合「宏观坐标」定位，已下沉回「暂未上架 → 观测类」最下方保留可查。<b>2026-09-12 主人令</b>：宏观判断属「开盘前必看」，与今日事件同级，故提升为一级页，且<b>不锁</b>（访客可见）。</div>
         <div class="logic-h">与「今日事件」的区别</div>
         <div class="logic-p">「今日事件」看的是<b>当天有什么</b>（解禁 / 业绩预告 / 宏观数据速览 / 择时裁决）；「宏观观测」看的是<b>周期处在哪里</b>（月 / 季尺度）。前者是日历，后者是坐标，不重复。</div>
         <div class="logic-h">前端位置</div>
@@ -1898,7 +1897,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">定位</div>
         <div class="logic-p">仅管理员可见的实验区。放置已开发但尚未正式上架的卡片、调试工具或过渡性模块，避免在主站显示不稳定功能。</div>
         <div class="logic-h">当前内容</div>
-        <div class="logic-p">· <b>📊 观测类（唯一在册子页）</b>：概念/行业 → ETF·龙头 参考（板块/行业映射）/ 🔭 主题空间 · 概念资金热度（2026-09-11 由静态主题表改造为 SECTOR_FUND_FLOW 377 个概念/行业板块 × 主力净额 × 均涨跌的每日交叉，原版三项源日间不动被误读为死卡；<b style="color:var(--gold)">2026-09-13 主人令</b>：<b>主题清单不再写死</b> —— 改为「7 个长期主题（种子）+ 当日概念资金榜中未被种子覆盖的板块按主力净额降序取前 5（自动追加）」双轨重建，主题集合随每日行情变化）/ 🌡️ 中信 PE 极值温度计 / 🌡️ 估值分位切换 · A股指数周期定位 / 🔮 AI 洞察 · 多源观点对比，共 5 张。<br>· <b style="color:var(--gold)">2026-09-12 主人令：本页子页从 4 组收敛为 1 组</b> —— 「回测·框架 / 因子类 / 宏观类」三组共 9 张卡全部迁出：回测·框架 3 卡 → <b>策略回测页底部</b>；因子类 3 卡 → <b>选股策略 → 🧪 因子</b> 子页（逆势龙头左侧）；宏观类 3 卡 → 新建一级页 <b>🌍 宏观观测</b>（主站最左）。原 4 按钮子页签导航行随迁一并删除。去向对照见下方「子页去向对照」。<br>· <b>实验选股调试专区</b>：三重起涨 / CRDS逆势 / 候选池等验证中模块。<br>· <b>今日判定 · 环境态势</b>：已迁回「今日事件」页，此处不再重复。<br>· <b style="color:var(--gold)">2026-08-29 主人令</b>：🧪 斐波那契F观测窗已从本专区移出 → 「<b>已下架 → 斐波那契窗口 · 当前回调状态</b>」下方（保留可查）。</div>
+        <div class="logic-p">· <b>📊 观测类（唯一在册子页）</b>：概念/行业 → ETF·龙头 参考（板块/行业映射）/ 🔭 主题空间 · 概念资金热度（2026-09-11 由静态主题表改造为 SECTOR_FUND_FLOW 377 个概念/行业板块 × 主力净额 × 均涨跌的每日交叉，原版三项源日间不动被误读为死卡；<b style="color:var(--gold)">2026-09-13 主人令</b>：<b>主题清单不再写死</b> —— 改为「7 个长期主题（种子）+ 当日概念资金榜中未被种子覆盖的板块按主力净额降序取前 5（自动追加）」双轨重建，主题集合随每日行情变化）/ 🌡️ 中信 PE 极值温度计 / 🌡️ 估值分位切换 · A股指数周期定位 / 🔮 AI 洞察 · 多源观点对比 / 🌐 新周期判定 · 海外宏观 + AI 大周期（<b style="color:var(--gold)">2026-09-13 由「宏观观测」一级页迁入</b> —— 事件驱动 · 手动维护的 09-06 快照，时效性强，故下沉本页最下方保留可查），共 6 张。<br>· <b style="color:var(--gold)">2026-09-12 主人令：本页子页从 4 组收敛为 1 组</b> —— 「回测·框架 / 因子类 / 宏观类」三组共 9 张卡全部迁出：回测·框架 3 卡 → <b>策略回测页底部</b>；因子类 3 卡 → <b>选股策略 → 🧪 因子</b> 子页（逆势龙头左侧）；宏观类 3 卡 → 新建一级页 <b>🌍 宏观观测</b>（主站最左）。原 4 按钮子页签导航行随迁一并删除。去向对照见下方「子页去向对照」。<br>· <b>实验选股调试专区</b>：三重起涨 / CRDS逆势 / 候选池等验证中模块。<br>· <b>今日判定 · 环境态势</b>：已迁回「今日事件」页，此处不再重复。<br>· <b style="color:var(--gold)">2026-08-29 主人令</b>：🧪 斐波那契F观测窗已从本专区移出 → 「<b>已下架 → 斐波那契窗口 · 当前回调状态</b>」下方（保留可查）。</div>
         <div class="logic-h">与正式区关系</div>
         <div class="logic-p">经主人确认稳定的模块会逐步提升到一级 Tab 或正式卡片；确认废弃的模块会移除。用户不应把暂未上架内容作为买卖依据。</div>
       </div>
@@ -1921,8 +1920,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td rowspan="3">暂未上架 · 因子类</td><td>🧪 因子实验室 · 异常换手率 / ROE_TTM（<code>factorLabBody</code>）</td><td rowspan="3">选股策略 → 🧪 因子<br>（逆势龙头左侧）</td><td rowspan="3"><code>__renderFactorPane()</code> → <code>#stFaHost</code></td></tr>
           <tr><td>📊 因子审计：v8 选股 vs 质量价值中小盘多因子（<code>factorAuditBody</code>）</td></tr>
           <tr><td>🧪 因子补缺 · walk-forward 进度（<code>factorProgressBody</code>）</td></tr>
-          <tr><td rowspan="3">暂未上架 · 宏观类</td><td>📚 机构研究 · AI 解析建议（<code>maharoCard</code>）</td><td rowspan="3">🌍 宏观观测（一级页）</td><td rowspan="3"><code>__renderMacroPane()</code> → <code>#macroHost</code></td></tr>
-          <tr><td>🌐 新周期判定 · 海外宏观 + AI 大周期（静态内联）</td></tr>
+          <tr><td rowspan="2">暂未上架 · 宏观类</td><td>📚 机构研究 · AI 解析建议（<code>maharoCard</code>）</td><td rowspan="3">🌍 宏观观测（一级页）</td><td rowspan="3"><code>__renderMacroPane()</code> → <code>#macroHost</code></td></tr>
           <tr><td>🌍 宏观景气背景 · K 型分层（静态内联）</td></tr>
         </table>
         <div class="logic-p"><b>迁移方式</b>：三组卡片的容器 id 全部保留，只换宿主容器（<code>#btExtraHost</code> / <code>#stFaHost</code> / <code>#macroHost</code>）。触发入口：<code>_renderPostReady()</code> 与各自的 <code>switchSec / switchSt</code> 分支。</div><div class="logic-h" style="color:#fbbf24;">⚠️ 2026-09-12 第一次搬迁的缺陷与修复（防复发）</div><div class="logic-p" style="border-left:3px solid #fbbf24;padding-left:10px;"><b>现象</b>：🌍 宏观观测页「📚 机构研究 · AI 解析建议」卡永久停在「加载中…」，策略回测页底部 3 卡与选股策略「🧪 因子」子页 3 卡同样恒空——<b>共 9 张卡</b>。<br><b>根因</b>：搬迁只搬了「容器骨架」，<b>没有把填充它的渲染函数调用一起搬</b>。骨架函数（<code>__renderBtExtraPane / __renderFactorPane / __renderMacroPane</code>）只把占位卡 HTML 写进宿主，而真正填充占位卡的 7 个渲染函数（<code>__renderRpsAudit / __renderCiticPeBacktest / __renderIndexValueFramework / __renderFactorLab / __renderFactorAudit / __renderFactorProgress / _fillMahoroCard</code>）的调用点仍留在 <code>renderUnlisted()</code> 里；宿主迁走后那里不再渲染这三块，于是除非恰好进过「暂未上架」页，否则这些卡永远不会被填充。其中 <code>_fillMahoroCard</code> 全局仅此一处调用，故宏观页必然空白。<br><b>修复</b>：在每个骨架函数的 <code>_host.innerHTML = hm;</code> 之后就地追加对应的填充调用（顺序不可颠倒——骨架先入 DOM，填充函数才找得到容器），并把 <code>renderUnlisted()</code> 尾部相应调用收窄为「仅观测类 5 卡」。<br><b>口径修正</b>：上一版此处写「渲染函数按 id 取容器，故迁页零改动」——只说对一半。<b>容器骨架零改动 ≠ 迁页零改动</b>，<b>填充调用必须随宿主一起搬</b>。<br><b>防复发检查项</b>（今后任何卡片迁页均须逐条过）：① 新宿主骨架函数体内是否含该卡填充函数的调用；② 旧宿主（<code>renderUnlisted</code>）是否已移除对已迁走容器的调用；③ 填充函数内 <code>getElementById</code> 的容器 id 是否确实出现在新骨架里；④ <code>__stRetryTab</code> / 自愈轮询的判据是否指向已迁走的容器 id（会永假 → 无限重渲）。</div>

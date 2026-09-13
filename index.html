@@ -1781,7 +1781,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <!-- ============ 今日事件 ============ -->
   <!-- 2026-09-12 主人令：宏观观测 独立一级页（原「暂未上架 > 宏观类」迁入） -->
   <section id="sec-macro">
-    <div class="sec-head"><h2>🌍 宏观观测</h2><span class="tag">海外宏观 + AI 大周期 + 国内景气 · 背景认知 · 仅供研究参考</span></div>
+    <div class="sec-head"><h2>🌍 宏观观测</h2><span class="tag">海外宏观 + 国内景气 · 背景认知 · 仅供研究参考</span></div>
     <div id="macroHost"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">加载中…</div></div>
   </section>
 
@@ -12840,8 +12840,9 @@ window.showRestrictedItems = showRestrictedItems;
     // ===== 子 tab 导航（2026-09-12 主人令：按功能类重组为四子页）=====
 //   观测类(5) / 回测·框架(3) / 因子类(3) / 宏观类(2)。容器 id 全保留，仅调整分组。
 
-// ===== 观测类 pane（5 张卡） =====
+// ===== 观测类 pane（6 张卡） =====
 //   概念ETF龙头参考 / 主题空间 / 中信PE温度计 / A股指数PE-TTM分位 / AI洞察多源对比
+//   / 新周期判定（2026-09-13 由「宏观观测」一级页迁入 · 事件驱动·手动维护快照）
 h += '<div id="ulPaneObserve">';
 h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
@@ -12864,6 +12865,83 @@ h += '<div class="card" id="citicPeObserveBody" style="margin-bottom:16px;border
 h += '<div class="card" id="indexObserveBody" style="margin-bottom:16px;border-left:4px solid #a78bfa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; A股指数观测 加载中&#x2026;</div></div>';
 // 2026-09-12 主人令：AI 洞察多源观点对比卡（观测类·情绪/观点）
 h += '<div class="card" id="aiInsightsCompareBody" style="margin-bottom:16px;border-left:4px solid #8b5cf6;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52E; AI 洞察·多源观点对比 加载中&#x2026;</div></div>';
+// ═══ 2026-09-06 建卡 · 2026-09-13 主人令迁至「暂未上架 → 观测类」最下方 ═══
+//   迁因：纯静态内联、无 data 依赖/无生成器 ⇒ 本质是「事件驱动 · 手动维护」快照；
+//   09-06 内容至 09-13 已整体失效，时效性强的判断不适合留在「宏观观测」一级页当常态坐标。
+//   去向：renderUnlisted() → #ulPaneObserve 末尾（保留可查，不再作为宏观页看点）。
+//   形式：双源对比（白话愍博士原文 vs 我交叉验证），差异处红框高亮；
+//   数据源：4 次搜索 20+ 源 cross-checked（CME FedWatch / Kalshi / 国泰海通 / 中信建投 / 证券时报 / 沃什讲话）。
+h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #60a5fa;">'
+       // ── ① 标题行（置顶）：卡名 + 频率 badge + 数据源 ──
+       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
+       + '<span style="font-size:15px;font-weight:700;color:#60a5fa;">🌐 新周期判定 · 海外宏观 + AI 大周期</span>'
+       // 2026-09-13 主人令：频率标注（事件驱动 · 手动维护快照）
+       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#94a3b2;background:rgba(148,163,184,.16);border:1px solid rgba(148,163,184,.4);letter-spacing:.5px;">📢 事件驱动 · 手动维护</span>'
+       + '<span style="font-size:11.5px;color:var(--dim);">数据源：白话愍博士 + 中信建投·周君芝 + CME FedWatch + 国泰海通 + 证券时报 · 4 次搜索 20+ 源 cross-checked</span>'
+       + '</div>'
+       // ── ② 分析块（卡名下方）：核心 / 用法 / 限制 ──
+       + '<div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
+       + '<b style="color:#60a5fa;">&#x1F4CC; 核心：</b>海外宏观 + AI 资本开支周期的定性判断。<br>'
+       + '<b style="color:#60a5fa;">&#x1F4A1; 用法：</b>背景认知，辅助顶层仓位与行业配置。<br>'
+       + '<b style="color:#60a5fa;">&#x26A0; 限制：</b>无自动刷新管线，2026-09-06 历史快照，下次更新需手动维护。</div>'
+       + '<div style="font-size:11.5px;color:var(--dim);margin-bottom:10px;">'
+       + '<b style="color:var(--txt);">更新于 2026-09-06 22:38</b> · <b style="color:#ef5350;">无自动刷新管线</b>，下次更新需手动维护 · 用途：'
+       + '<b style="color:var(--txt);">海外宏观+AI 大周期判断</b>（与下方 K 型卡「国内行业景气」互补）。</div>'
+
+       // ── 顶部：核心结论（合并视角，两源已对齐的部分） ──
+       + '<div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.25);border-radius:7px;padding:10px 13px;margin-bottom:10px;">'
+       + '<div style="font-size:12.5px;font-weight:700;color:#60a5fa;margin-bottom:10px;">📌 核心结论（两源共识）</div>'
+       + '<div style="font-size:12px;line-height:1.55;color:var(--txt);display:flex;flex-direction:column;gap:8px;">'
+       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">①</span><span>8 月非农 <b style="color:#60a5fa;">+16.2 万</b>（3 倍超预期）→ <b style="color:#fb923c;">增长确认（不是滞胀确认）</b></span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">②</span><span>AI 资本开支已<b style="color:#fb923c;">独立于利率</b>（北美四大 CSP 全年 ~7100 亿美元 = 美国 GDP 1%）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">③</span><span>9 月 FOMC <b style="color:#fb923c;">大概率维持</b>（CME 68% / Kalshi 29% 加息，市场认知已撕裂）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">④</span><span>黄金 <b style="color:#fb923c;">短空中多</b>（10Y 4.7% - 7月CPI 3.4% = 实际利率 < 1.5% 已触发多头阈值）</span></div>'
+       + '</div></div>'
+
+       // ── 双源对比表（差异处红框高亮） ──
+       + '<div style="font-size:12px;font-weight:700;color:var(--txt);margin:6px 0 8px;">🔍 双源对比 · <span style="color:#ef5350;">🔴 红色标注 = 我与原文判断的关键差异</span></div>'
+       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">'
+
+       // 子卡 1：白话愍博士原文判断
+       + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:10px 12px;">'
+       + '<div style="font-size:12px;font-weight:700;color:#fbbf24;margin-bottom:10px;">🧑 白话愍博士《新周期已到来》</div>'
+       + '<div style="font-size:11.5px;line-height:1.55;color:var(--txt);display:flex;flex-direction:column;gap:7px;">'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">①</span><span>8月非农→<b>增长确认</b>（非滞胀确认）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">②</span><span>AI 六层：L1/L2/L3 已公开基线+活跃+行业层证据，<b>L4 扩产周期启动</b>、<b>L5 需再证</b>、<b>L6 待证</b></span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">③</span><span>9月 FOMC 维持利率 <b style="color:#fbbf24;">「当前后验 40%」</b>（与 6 月持平）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">④</span><span>AI Capex 独立于利率 = <b style="color:#fbbf24;">38% 后验</b>（盘面开始支持）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">⑤</span><span>黄金 <b style="color:#fbbf24;">短空中多</b>（短空：美元走强+实际利率上行；中多：长期通胀粘性+信用稀释）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">⑥</span><span>美元信用稀释 <b style="color:#fbbf24;">短空长多 83%</b></span></div>'
+       + '</div></div>'
+
+       // 子卡 2：我的判断（交叉验证）
+       + '<div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.3);border-radius:7px;padding:10px 12px;">'
+       + '<div style="font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:10px;">🤖 我的判断 · 跨源交叉验证</div>'
+       + '<div style="font-size:11.5px;line-height:1.55;color:var(--txt);display:flex;flex-direction:column;gap:7px;">'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">①</span><span>增长是 <b style="color:#60a5fa;">K 型化</b>（非普惠）—— 强：建筑/制造/AI基建（+7.5万）；<b style="color:#26a69a;">弱：信息业 -2.3万、金融业 -1.1万（AI 替代白领首批实证）</b></span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">②</span><span>L4 芯片/光通 <b style="color:#60a5fa;">从「涨价」叙事切到「产能扩张」叙事</b>（关键转折）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">②</span><span>L5 产业链 <b style="color:#60a5fa;">已显著盈利</b>（中际旭创 26H1 净利+242%、营收+182%；光纤 1-7 月利润+468%）→ <b style="color:#ef5350;">原文「需再证」应改为「已过」</b></span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">③</span><span><b style="color:#ef5350;">原文「9月维持 40%」偏保守</b>——CME 显示 40%→<b style="color:#fb923c;">68% 加息</b>，实际是「鹰派重定价」（市场认知已撕裂：CME 68% vs Kalshi 29% 加息）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">④</span><span>9月 <b style="color:#60a5fa;">维持 ~65%</b>（沃什讲话已定价，9/9 CPI 出来前不动）→ 12月 <b style="color:#60a5fa;">保险式加息 25bp ~50%</b>（CPI 还热+沃什「信誉」未恢复）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">⑤</span><span>AI Capex 独立于利率 = <b style="color:#60a5fa;">75% 后验</b>（L5 盈利 + 云厂 +70% Capex 印证，<b style="color:#ef5350;">原文 38% 偏保守</b>）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">⑥</span><span>黄金多配 <b style="color:#60a5fa;">触发位已量化</b>：<b style="color:#fb923c;">实际利率 < 1.5% = 多头信号已触发</b>（10Y 4.7% - 7月CPI 3.4%）</span></div>'
+       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">⑦</span><span><b style="color:#60a5fa;">原文未讲 A 股板块映射</b>——补：防御底仓（红利/银行/煤炭/石油石化/公用事业）+ 进攻（算力龙头非涨价逻辑/半导体设备/黄金股）+ 避免（内需消费/长久期债/美股硬件涨价）</span></div>'
+       + '</div></div>'
+
+       + '</div>' // /双源 grid
+
+       // ── 三情景概率（我的判断 + 原文章节都有，这里合并一行） ──
+       + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:10px 13px;margin-bottom:8px;">'
+       + '<div style="font-size:12.5px;font-weight:700;color:#fbbf24;margin-bottom:6px;">📊 三情景概率（共识框架）</div>'
+       + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:12px;">'
+       + '<div><span style="color:#fbbf24;">乐观 30%</span> <span style="color:var(--dim);">█ █ █ ▍</span><div style="font-size:10.5px;color:var(--dim);">AI 拉生产率+美元软着陆</div></div>'
+       + '<div><span style="color:#fbbf24;">基准 45%</span> <span style="color:var(--dim);">█ █ █ █ █ ▌</span><div style="font-size:10.5px;color:var(--dim);">AI 拉生产率但慢，9月不加息</div></div>'
+       + '<div><span style="color:#fbbf24;">悲观 15%</span> <span style="color:var(--dim);">█ █ ▎</span><div style="font-size:10.5px;color:var(--dim);">加息+AI 替代加速消费弱</div></div>'
+       + '<div><span style="color:#fbbf24;">尾部 10%</span> <span style="color:var(--dim);">█ ▌</span><div style="font-size:10.5px;color:var(--dim);">不可平均</div></div>'
+       + '</div></div>'
+
+       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">🔭 仅供研究参考，不构成个人投资建议 · 数据时点以原文为准 · 差异标注 = 我的判断（4 次搜索 20+ 源 cross-checked）vs 白话愍博士原文</div>'
+       + '</div>';
 h += '</div>'; // /ulPaneObserve
 
 // 2026-09-12 主人令：本页子页从 4 组（观测类 / 回测·框架 / 因子类 / 宏观类）收敛为 1 组「观测类」。
@@ -12873,6 +12951,8 @@ h += '</div>'; // /ulPaneObserve
 //     · 因子类   3 卡  因子实验室 / 因子审计 / 因子补缺进度
 //       → 选股策略 → 🧪 因子 子页 #stFaHost（__renderFactorPane），位于逆势龙头左侧
 //     · 宏观类   3 卡  机构研究·AI解析 / 新周期判定 / 宏观景气背景·K型分层
+//       （2026-09-13 主人令：「新周期判定」已下沉至「暂未上架 → 观测类」最下方
+//         ⇒ 宏观观测页现为 2 卡：机构研究·AI解析 + 宏观景气背景·K型分层）
 //       → 新建一级页「🌍 宏观观测」 #macroHost（__renderMacroPane）
 //   原 4 按钮子页签导航行与 __ulSwitch 的多组分支已随迁一并删除，避免指向不存在的容器。
 // 2026-09-02 主人令：强势突破 pane、模块去向索引、动量共识/H反推/两套算法回测对比 全部删除（卡片清单以 renderUnlisted 为准）。
@@ -14460,81 +14540,6 @@ hm += '<div id="ulPaneMacro">';
        + '<b style="color:#34d399;">&#x1F4A1; 用法：</b>盘前 5 分钟掌握机构共识与分歧，落到本日操作。<br>'
        + '<b style="color:#34d399;">&#x26A0; 限制：</b>AI 摘要，判断需回原文核对；每日 07:15 出稿，正文 08:30 更新。</div></div>'
        + '<div id="maharoCardBody"><div class="note">加载中…</div></div></div>';
-    // ═══ 2026-09-06 主人令：新周期判定卡（海外宏观+AI 大周期 · 事件驱动）═══
-    //   位置：K 型卡上方（事件驱动更新频率 > K 型月度更新）；
-    //   形式：双源对比（白话愍博士原文 vs 我交叉验证），差异处红框高亮；
-    //   数据源：4 次搜索 20+ 源 cross-checked（CME FedWatch / Kalshi / 国泰海通 / 中信建投 / 证券时报 / 沃什讲话）。
-    hm += '<div class="card" style="margin-bottom:16px;border-left:4px solid #60a5fa;">'
-       // ── ① 标题行（置顶）：卡名 + 频率 badge + 数据源 ──
-       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-       + '<span style="font-size:15px;font-weight:700;color:#60a5fa;">🌐 新周期判定 · 海外宏观 + AI 大周期</span>'
-       // 2026-09-13 主人令：频率标注（事件驱动 · 手动维护快照）
-       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#94a3b2;background:rgba(148,163,184,.16);border:1px solid rgba(148,163,184,.4);letter-spacing:.5px;">📢 事件驱动 · 手动维护</span>'
-       + '<span style="font-size:11.5px;color:var(--dim);">数据源：白话愍博士 + 中信建投·周君芝 + CME FedWatch + 国泰海通 + 证券时报 · 4 次搜索 20+ 源 cross-checked</span>'
-       + '</div>'
-       // ── ② 分析块（卡名下方）：核心 / 用法 / 限制 ──
-       + '<div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
-       + '<b style="color:#60a5fa;">&#x1F4CC; 核心：</b>海外宏观 + AI 资本开支周期的定性判断。<br>'
-       + '<b style="color:#60a5fa;">&#x1F4A1; 用法：</b>背景认知，辅助顶层仓位与行业配置。<br>'
-       + '<b style="color:#60a5fa;">&#x26A0; 限制：</b>无自动刷新管线，2026-09-06 历史快照，下次更新需手动维护。</div>'
-       + '<div style="font-size:11.5px;color:var(--dim);margin-bottom:10px;">'
-       + '<b style="color:var(--txt);">更新于 2026-09-06 22:38</b> · <b style="color:#ef5350;">无自动刷新管线</b>，下次更新需手动维护 · 用途：'
-       + '<b style="color:var(--txt);">海外宏观+AI 大周期判断</b>（与下方 K 型卡「国内行业景气」互补）。</div>'
-
-       // ── 顶部：核心结论（合并视角，两源已对齐的部分） ──
-       + '<div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.25);border-radius:7px;padding:10px 13px;margin-bottom:10px;">'
-       + '<div style="font-size:12.5px;font-weight:700;color:#60a5fa;margin-bottom:10px;">📌 核心结论（两源共识）</div>'
-       + '<div style="font-size:12px;line-height:1.55;color:var(--txt);display:flex;flex-direction:column;gap:8px;">'
-       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">①</span><span>8 月非农 <b style="color:#60a5fa;">+16.2 万</b>（3 倍超预期）→ <b style="color:#fb923c;">增长确认（不是滞胀确认）</b></span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">②</span><span>AI 资本开支已<b style="color:#fb923c;">独立于利率</b>（北美四大 CSP 全年 ~7100 亿美元 = 美国 GDP 1%）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">③</span><span>9 月 FOMC <b style="color:#fb923c;">大概率维持</b>（CME 68% / Kalshi 29% 加息，市场认知已撕裂）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:10px;"><span style="min-width:22px;text-align:center;font-size:12.5px;font-weight:800;color:#60a5fa;flex-shrink:0;">④</span><span>黄金 <b style="color:#fb923c;">短空中多</b>（10Y 4.7% - 7月CPI 3.4% = 实际利率 < 1.5% 已触发多头阈值）</span></div>'
-       + '</div></div>'
-
-       // ── 双源对比表（差异处红框高亮） ──
-       + '<div style="font-size:12px;font-weight:700;color:var(--txt);margin:6px 0 8px;">🔍 双源对比 · <span style="color:#ef5350;">🔴 红色标注 = 我与原文判断的关键差异</span></div>'
-       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">'
-
-       // 子卡 1：白话愍博士原文判断
-       + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:10px 12px;">'
-       + '<div style="font-size:12px;font-weight:700;color:#fbbf24;margin-bottom:10px;">🧑 白话愍博士《新周期已到来》</div>'
-       + '<div style="font-size:11.5px;line-height:1.55;color:var(--txt);display:flex;flex-direction:column;gap:7px;">'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">①</span><span>8月非农→<b>增长确认</b>（非滞胀确认）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">②</span><span>AI 六层：L1/L2/L3 已公开基线+活跃+行业层证据，<b>L4 扩产周期启动</b>、<b>L5 需再证</b>、<b>L6 待证</b></span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">③</span><span>9月 FOMC 维持利率 <b style="color:#fbbf24;">「当前后验 40%」</b>（与 6 月持平）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">④</span><span>AI Capex 独立于利率 = <b style="color:#fbbf24;">38% 后验</b>（盘面开始支持）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">⑤</span><span>黄金 <b style="color:#fbbf24;">短空中多</b>（短空：美元走强+实际利率上行；中多：长期通胀粘性+信用稀释）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#fbbf24;flex-shrink:0;">⑥</span><span>美元信用稀释 <b style="color:#fbbf24;">短空长多 83%</b></span></div>'
-       + '</div></div>'
-
-       // 子卡 2：我的判断（交叉验证）
-       + '<div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.3);border-radius:7px;padding:10px 12px;">'
-       + '<div style="font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:10px;">🤖 我的判断 · 跨源交叉验证</div>'
-       + '<div style="font-size:11.5px;line-height:1.55;color:var(--txt);display:flex;flex-direction:column;gap:7px;">'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">①</span><span>增长是 <b style="color:#60a5fa;">K 型化</b>（非普惠）—— 强：建筑/制造/AI基建（+7.5万）；<b style="color:#26a69a;">弱：信息业 -2.3万、金融业 -1.1万（AI 替代白领首批实证）</b></span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">②</span><span>L4 芯片/光通 <b style="color:#60a5fa;">从「涨价」叙事切到「产能扩张」叙事</b>（关键转折）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">②</span><span>L5 产业链 <b style="color:#60a5fa;">已显著盈利</b>（中际旭创 26H1 净利+242%、营收+182%；光纤 1-7 月利润+468%）→ <b style="color:#ef5350;">原文「需再证」应改为「已过」</b></span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">③</span><span><b style="color:#ef5350;">原文「9月维持 40%」偏保守</b>——CME 显示 40%→<b style="color:#fb923c;">68% 加息</b>，实际是「鹰派重定价」（市场认知已撕裂：CME 68% vs Kalshi 29% 加息）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">④</span><span>9月 <b style="color:#60a5fa;">维持 ~65%</b>（沃什讲话已定价，9/9 CPI 出来前不动）→ 12月 <b style="color:#60a5fa;">保险式加息 25bp ~50%</b>（CPI 还热+沃什「信誉」未恢复）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">⑤</span><span>AI Capex 独立于利率 = <b style="color:#60a5fa;">75% 后验</b>（L5 盈利 + 云厂 +70% Capex 印证，<b style="color:#ef5350;">原文 38% 偏保守</b>）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">⑥</span><span>黄金多配 <b style="color:#60a5fa;">触发位已量化</b>：<b style="color:#fb923c;">实际利率 < 1.5% = 多头信号已触发</b>（10Y 4.7% - 7月CPI 3.4%）</span></div>'
-       + '<div style="display:flex;align-items:flex-start;gap:9px;"><span style="min-width:20px;text-align:center;font-size:12px;font-weight:800;color:#60a5fa;flex-shrink:0;">⑦</span><span><b style="color:#60a5fa;">原文未讲 A 股板块映射</b>——补：防御底仓（红利/银行/煤炭/石油石化/公用事业）+ 进攻（算力龙头非涨价逻辑/半导体设备/黄金股）+ 避免（内需消费/长久期债/美股硬件涨价）</span></div>'
-       + '</div></div>'
-
-       + '</div>' // /双源 grid
-
-       // ── 三情景概率（我的判断 + 原文章节都有，这里合并一行） ──
-       + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:10px 13px;margin-bottom:8px;">'
-       + '<div style="font-size:12.5px;font-weight:700;color:#fbbf24;margin-bottom:6px;">📊 三情景概率（共识框架）</div>'
-       + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:12px;">'
-       + '<div><span style="color:#fbbf24;">乐观 30%</span> <span style="color:var(--dim);">█ █ █ ▍</span><div style="font-size:10.5px;color:var(--dim);">AI 拉生产率+美元软着陆</div></div>'
-       + '<div><span style="color:#fbbf24;">基准 45%</span> <span style="color:var(--dim);">█ █ █ █ █ ▌</span><div style="font-size:10.5px;color:var(--dim);">AI 拉生产率但慢，9月不加息</div></div>'
-       + '<div><span style="color:#fbbf24;">悲观 15%</span> <span style="color:var(--dim);">█ █ ▎</span><div style="font-size:10.5px;color:var(--dim);">加息+AI 替代加速消费弱</div></div>'
-       + '<div><span style="color:#fbbf24;">尾部 10%</span> <span style="color:var(--dim);">█ ▌</span><div style="font-size:10.5px;color:var(--dim);">不可平均</div></div>'
-       + '</div></div>'
-
-       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">🔭 仅供研究参考，不构成个人投资建议 · 数据时点以原文为准 · 差异标注 = 我的判断（4 次搜索 20+ 源 cross-checked）vs 白话愍博士原文</div>'
-       + '</div>';
 
     // ═══ 2026-09-04 主人令：宏观景气背景（K型分层）迁入宏观观测 pane（主人自看 · 背景认知 · 适合查阅不适合盯盘）═══
     //   静态内容内联，无 data 依赖/无管线；数据源：沧海一土狗（公众号）K型行业景气图；每月 1 日随宏观数据手动更新此处。
