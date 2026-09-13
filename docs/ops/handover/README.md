@@ -132,7 +132,7 @@ GitHub 账号 `ah-quant999` + 同一 email ⇒ **commit author 完全相同**。
 |---|---|
 | 哪一次改动 | 交接单文件名带 `HHmm`（分钟级）⇒ 时刻即区分依据（本目录既有规范） |
 | 哪一台机 | commit message 末尾**自动**附 `[<hostname>]`（阿狸咪=家机 / 小九=单位机） |
-| 同机哪个会话 | commit message 自动附 `[<hostname>/<会话号>]`，会话号用环境变量 `V8_SESSION` 声明（如 `alimi-A` / `alimi-B`）；未声明则只留机器名 —— **不许编造** |
+| 同机哪个会话 | commit message 自动附 `[<hostname>/<会话号>]`；会话号由 **`v8_session.py id`**（唯一真源）按**会话目录**派生 （`V8_SESSION` 可显式覆盖）—— 见 8.5.1；取不到才只留机器名，**不许编造** |
 | 谁在改什么 | commit message **必须写清主题**（如「回测口径」/「前端UI」）；另一会话据此判断是否与自己相关 |
 
 > 上面两条 `[...]` 后缀由推送工具自动追加（本机 `atomic_patch_push.py`），
@@ -187,13 +187,48 @@ git 层拦不住这种 —— 两次改动不冲突，只是**结论重复且都
 | 下结论时 | `note --topic "X" --msg "结论"` | 登记结论，供另会话检索（**防重复犯错**） |
 | 推完 | `push --commit <sha> --files ...` | 留痕 |
 
-- **身份**：环境变量 `V8_SESSION`（如 `alimi-A` / `alimi-B`）；未设则读/生成
-  `~/.workbuddy/v8_session_id`。拿不到就落 `unknown`，**不许编造身份**。
-  该值同时被推送工具用于 commit 尾巴 `[<host>/<会话号>]`（见 8.1）。
+- **身份**（🔴 2026-09-13 重修，见 8.5.1）：①优先环境变量 `V8_SESSION`；
+  ②否则按 **cwd 所属的会话目录**分配，映射存 `~/.workbuddy/v8_session_ids.json`；
+  可用 `V8_SESSION_DIR` 显式指定会话目录（推送工具应传**工具自身所在目录**）；
+  ③上溯不到 ⇒ 回退机器级 `~/.workbuddy/v8_session_id` **并告警**（该文件机器级共享，
+  同机多会话会收敛，正是重修前的缺陷）。三条都拿不到才落 `unknown`，**不许编造身份**。
+  🔴 **`v8_session.py id` 是会话身份的唯一真源**：推送工具必须调它取号，
+  以保证 commit 尾巴 `[<host>/<会话号>]` 与登记表**同源**（见 8.1）。
 - **登记表**：`~/.workbuddy/v8_session_registry.jsonl` —— **机器本地、永不入库**
   （同机两会话天然共享同一份；入库会引入提交冲突与仓库膨胀）。按 14 天自动裁剪。
 - **建议把它接进各机的推送工具**：推前跑 `check`（热点告警）、推后跑 `push`（留痕）。
-  阿狸咪侧 `atomic_patch_push.py` 已接入。
+  阿狸咪侧 `atomic_patch_push.py` 已接入（含 `id` 取号，见 8.5.1）。
+- 🔴 **接入的判据不是「工具里有这段代码」，而是「commit 尾巴与登记表同源」**：
+  实测命令 `python docs/ops/scripts/v8_session.py id` 与推送后 commit 尾巴的
+  `[host/session]` 必须一致；不一致即为假接入（本机曾如此，见 8.5.1）。
+
+#### 8.5.1 🔴 身份派生重修（2026-09-13 实测缺陷，修于 `b6c2de0f1`）
+
+**缺陷（实测，非推断）**：`session_id()` 未设 `V8_SESSION` 时读
+`~/.workbuddy/v8_session_id` —— 该文件**机器级共享**（实测值 `cat-1`）⇒
+同机两个会话**收敛成同一个号**；而推送工具的 commit 尾巴只认 `V8_SESSION`、
+未设时**连会话号都不落**（实测推 `9131c2652` 尾巴 = `[Cat]`）
+⇒ 工具与登记器**两处不同源** ⇒「同机哪个会话」在 git 层与登记表里**都不可区分**
+（区分能力实测 = 0，与 8.1 的设计目标相反）。
+
+**重修后的规则**：
+
+| 项 | 现值 |
+|---|---|
+| 派生维度 | **按会话目录**（cwd 逐级上溯到形如 `YYYY-MM-DD-HH-mm-ss` 的目录）；`V8_SESSION_DIR` 可显式指定 |
+| 持久化 | `~/.workbuddy/v8_session_ids.json` = `{会话目录名: 会话号}`（每会话一条，机器本地、永不入库） |
+| 分配 | 首次分配 `<机器短名>-<序号>`（跳过已用号），此后**幂等**返回同值 |
+| 单一真源 | `v8_session.py id`（打印 `host/session`）—— 推送工具**必须**调它 |
+| 兼容 | `V8_SESSION` 显式声明仍最优先；旧机器级文件降级为**回退**路径并打印告警 |
+
+**实测（本机，命令可复现）**：
+
+```
+$ V8_SESSION_DIR=<本会话目录>      python docs/ops/scripts/v8_session.py id   → cat/cat-1
+$ V8_SESSION_DIR=<另一会话目录>    python docs/ops/scripts/v8_session.py id   → cat/cat-2
+$ cat ~/.workbuddy/v8_session_ids.json
+  {"2026-08-28-21-48-18": "cat-1", "2026-08-28-19-46-49": "cat-2"}
+```
 - 🔴 **配合铁律**：凡涉及「判停更 / 判回退 / 建议加护栏」的结论，落笔前先 `who`
   **并**扫一遍近 1 小时同主题交接单 —— 这三类结论正是两会话**重复犯错**的高发区
   （本轮的 backfill 就是活例）。
