@@ -13,7 +13,8 @@ guanlan_extractor.py — 知识星球研报自动提取器（API优先 + Seleniu
   - 甲股文: wx.zsxq.com/group/51115218441414 (可选, 未启用)
 
 认证: cookie名=zsxq_access_token（非 xq_a_token！）
-凭据: data/zszxq_token.json {"token": "...", "updated": "..."}
+凭据: data/zsxq_token.json {"token": "...", "updated": "..."}
+      （2026-09-14 小九更正：原注释误写为 zszxq_token.json，与实际读取路径不符）
 
 ⚠️ 铁律: 本文件是生产脚本，禁止误删。
 ============================================================
@@ -27,6 +28,7 @@ import os
 import re
 import sys
 import time
+import urllib.error
 import urllib.request
 
 # 名称归一化共享模块（2026-08-14 抽出，消除与 final_recommend/build_candidate_pool/scanner 的重复）
@@ -302,6 +304,20 @@ def api_fetch_topics(group_id, token, count=20):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     }
 
+    # 🔴 2026-09-14 小九：本函数原先「取空就重试、只打印返回空」——把服务端的
+    #   真实失败码**完全吞掉**。而本接口有两种截然不同的失败：
+    #     · 未认证 / 凭据被注销 → HTTP 401
+    #     · 反第三方工具门禁      → HTTP 200 + {"succeeded": false, "code": 1059,
+    #                              "info": "不支持非官方工具访问…"}，且 1059 是**间歇性限流**
+    #                              （换请求头无用，间隔重试即通，与 token 好坏无关）
+    #   原写法把 1059 静默当成「0 条研报」⇒ 表现成「观澜台停摆」⇒ 极易误诊为
+    #   「token 丢了」（09-14 实际踩过：真因是限流，token 完全有效）。
+    #   ⇒ 现改为每次失败都打印 succeeded / code / info，并对 401 单独点明。
+    def _why(d):
+        """把服务端失败码压成一行可读摘要。"""
+        return (f"succeeded={d.get('succeeded')!r} code={d.get('code')!r} "
+                f"info={str(d.get('info'))[:120]!r}")
+
     for attempt in range(3):  # 最多重试 2 次
         if attempt > 0:
             time.sleep(3)  # 等待限流恢复
@@ -309,13 +325,24 @@ def api_fetch_topics(group_id, token, count=20):
             req = urllib.request.Request(url, headers=headers)
             resp = urllib.request.urlopen(req, timeout=20)
             data = json.loads(resp.read())
-            topics = data.get("resp_data", {}).get("topics", [])
+            _rd = data.get("resp_data") or {}
+            topics = _rd.get("topics", []) if isinstance(_rd, dict) else []
             if topics or attempt >= 2:  # 有数据或最后一次尝试
                 if attempt > 0 and topics:
                     print(f"    (第{attempt+1}次尝试成功)")
+                elif not topics:
+                    # 最后一次仍空 → 必须暴露服务端码，别静默成「0 条研报」
+                    print(f"    (第{attempt+1}次仍为空 | {_why(data)})")
                 return topics
-            # 空结果但还有重试机会 → 继续重试
-            print(f"    (第{attempt+1}次返回空，等待重试...)")
+            # 空结果但还有重试机会 → 继续重试（带码，便于区分限流与凭据失效）
+            print(f"    (第{attempt+1}次返回空，等待重试... | {_why(data)})")
+        except urllib.error.HTTPError as e:
+            # 401 = 凭据失效/被注销；其它码单独点明（原代码只当普通异常，看不出是认证问题）
+            hint = "  ← 凭据可能已失效或被注销（需重新取 zsxq_access_token）" \
+                   if e.code == 401 else ""
+            print(f"    (第{attempt+1}次 HTTP {e.code} {e.reason}{hint})")
+            if attempt >= 2:
+                return []
         except Exception as e:
             print(f"    (第{attempt+1}次异常: {e})")
             if attempt >= 2:

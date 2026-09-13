@@ -12,61 +12,24 @@ BACKUP_PATH = os.path.join(ROOT, 'index.html.inline.bak')
 DATA_DIR = os.path.join(ROOT, 'data')
 
 # 轻量裁剪策略：只保留累计/计算数值，去掉历史明细
+#
+# 🔴 2026-09-14 小九（三件套·遗留②「去重」）：
+#   本函数与 `update_v8.py::_make_lite` 曾是**两份独立实现**，且已**漂移两次**
+#   （09-11 漏透传 `update_time`、09-14 漏透传 `entry_caliber_ver`），而本文件
+#   原有注释自己就写着「两处是重复实现，改一处漏一处 = 漂移」。
+#   实测两份分支覆盖也已不一致：本处只有 4 个分支（TDX/COMPREHENSIVE/GOLD_POOL/
+#   W52_HIGH），另一侧有 8 个（另含 ANALYST_RATINGS/SUSPENSION_ALERT/IPO_DATA/
+#   SECTOR_PHASE_HISTORY）—— 缺的 4 个在本处静默走 `return obj`，与本工具
+#   「拆分时应裁剪」的预期不符。
+#
+#   现改为**单向委托**：`update_v8.py::_make_lite` 是唯一真源，本处只做转发。
+#   · 惰性 import（写在函数体内）—— 避免两脚本互相 import 的顶层副作用与循环风险；
+#   · `update_v8.py` 有 `if __name__ == '__main__'` 守卫（L1400），import 不触发主流程；
+#   · 委托后本工具自动获得全部 8 个分支，与线上构建行为彻底一致。
 def make_lite(name, obj):
-    if name == 'BACKTEST_TDX':
-        # 只保留全局汇总统计
-        return {
-            # 🛡 2026-09-11：同 update_v8.py::_make_lite，必须透传 update_time
-            #   （两处是重复实现，改一处漏一处 = 漂移）。
-            'update_time': obj.get('update_time'),
-            'calc_time': obj.get('calc_time'),
-            'method': obj.get('method'),
-            'gold_pool_size': obj.get('gold_pool_size'),
-            'stocks_analyzed': obj.get('stocks_analyzed'),
-            'summary': obj.get('summary', {}),
-            # 🛡 2026-09-14 小九三件套①：与 update_v8.py::_make_lite 保持同步（正是上方
-            #   注释警告的「漂移」实例 —— 09-14 加了口径审计字段后两边一度不一致）。
-            'entry_caliber_ver': obj.get('entry_caliber_ver'),
-            'stale_caliber_dropped': obj.get('stale_caliber_dropped'),
-            '_lite_note': '个股历史信号明细已裁剪，仅保留汇总统计',
-        }
-    if name == 'BACKTEST_COMPREHENSIVE':
-        # 去掉 details 明细，保留 overview/comparison
-        lite = {k: v for k, v in obj.items() if k != 'details'}
-        lite['_lite_note'] = 'details 回测明细已裁剪，仅保留 overview/comparison'
-        return lite
-    # 2026-09-04 主人令收尾：COCKPIT_BACKTEST 裁剪分支已删（驾驶舱模块下线）
-    if name == 'GOLD_POOL':
-        # 保留 stocks 的 latest 聚合字段，去掉每日 history 明细
-        lite = {k: v for k, v in obj.items() if k != 'stocks'}
-        stocks_lite = {}
-        for sid, s in obj.get('stocks', {}).items():
-            stocks_lite[sid] = {
-                'code': s.get('code'),
-                'name': s.get('name'),
-                'market': s.get('market'),
-                'board_label': s.get('board_label'),
-                'fund_type': s.get('fund_type'),
-                'first_date': s.get('first_date'),
-                'first_signal': s.get('first_signal'),
-                'max_signal': s.get('max_signal'),
-                'signal_count': s.get('signal_count'),
-                'sources': s.get('sources'),
-                'latest': s.get('latest'),
-                'industry': s.get('industry'),
-                'sectors': s.get('sectors'),
-                'concepts': s.get('concepts'),
-                'board': s.get('board'),
-            }
-        lite['stocks'] = stocks_lite
-        lite['_lite_note'] = 'stocks 已去掉 history 日明细，仅保留 latest 聚合'
-        return lite
-    if name == 'W52_HIGH':
-        # 52周新高：保留 top_gainers 与统计，去掉 146 只完整 stocks 列表
-        lite = {k: v for k, v in obj.items() if k != 'stocks'}
-        lite['_lite_note'] = 'stocks 完整列表已裁剪，仅保留 top_gainers 与 total'
-        return lite
-    return obj
+    """转发到唯一真源 `update_v8.py::_make_lite`（理由见上方注释）。"""
+    import update_v8
+    return update_v8._make_lite(name, obj)
 
 
 def main():
