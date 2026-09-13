@@ -4168,7 +4168,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   }
 
   /* 2026-09-02 主人令：选股模块星级表全局化（原在已下架分组内，现卡片迁回选股策略仍需共享） */
-  window.__MODULE_STARS = { fourvolume:4, triple:4 };  /* 2026-09-13 修正：星级委员会改用多期加权综合评判，不再以单一持有期判星。四量终极属长线信号：按 long 权重(T+1 10%/T+5 15%/T+30 25%/T+90 40%/T+180 10%)综合得分4.15，但T+1评分2分触发短周期惩罚（最高4⭐），最终4⭐。胜率随持有期单调升含β，超额收益待基准比对认证。rps已下线 */
+  window.__MODULE_STARS = { fourvolume:4, triple:4, candidate:2, goldpool:2 };  /* 2026-09-13 修正：星级委员会改用多期加权综合评判，不再以单一持有期判星。四量终极属长线信号：按 long 权重(T+1 10%/T+5 15%/T+30 25%/T+90 40%/T+180 10%)综合得分4.15，但T+1评分2分触发短周期惩罚（最高4⭐），最终4⭐。胜率随持有期单调升含β，超额收益待基准比对认证。rps已下线；2026-09-13 19:5x 补齐：候选池=2⭐（主口径 首次进池T+5 胜率48.81%/收益0.92%/n=293）、黄金池=2⭐（首次满足信号T+1 胜率32.28%/收益-1.79%/n=127），均因主口径胜率未过 50% 三⭐门槛取 2⭐ */
   window.__moduleStarsHTML = function(k){ var n=(window.__MODULE_STARS&&window.__MODULE_STARS[k])||0; var x=''; for(var i=0;i<n;i++) x+='⭐'; return x || '—'; };
   /* 2026-09-12 星级委员会规则：每月评定，五维加权，硬门槛防小样本冒充高星 */
   /* 2026-09-13 星级委员会规则：多期加权综合评判，短周期惩罚，月度评定；预留 rankBonus 待统一回测框架后启用 */
@@ -4936,7 +4936,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var R = (A.ranking || []).slice();
       var INS = (A.insufficient || []).slice();
       if(!R.length && !INS.length) return '';
-      var _STARKEY = { '三重共识':'triple', '四量终极':'fourvolume', '逆势龙头':'crds' };
+      var _STARKEY = { '三重共识':'triple', '四量终极':'fourvolume', '逆势龙头':'crds', '候选池':'candidate', '黄金池':'goldpool' };
       function _n(v,d){ return (v==null || isNaN(v)) ? '—' : Number(v).toFixed(d==null?1:d); }
       function _sgn(v){ return (v==null||isNaN(v)) ? '' : (Number(v)>=0 ? '+' : ''); }
       function _stars(card){

@@ -593,8 +593,13 @@ def build(root, day, kind, note, extra_note=""):
         "low_win_rate": LOW_WIN_RATE,
         "low_avg_return": LOW_AVG_RETURN,
         "sort_rule": "胜率降序 → 平局看平均收益降序（与页内星级对比表同口径）",
-        "primary_rule": ("卡级主表每卡只取 1 行既定主口径（三重共识＝共振≥80 严格；"
-                         "四量/逆势/相对强度＝T+5；强势突破＝T+5），**不跨持有期横比**；"
+        # 🔴 2026-09-13 根因修复：本串原先**手写死**，删 RPS 后仍残留「相对强度＝T+5」、
+        #   且新增候选池/黄金池后未同步 ⇒ 产物里的口径说明与真实判定不一致（误导）。
+        #   现改为**从 SOURCES 派生**（唯一的真值来源），改 SOURCES 即自动同步、永不漂移。
+        "primary_rule": ("卡级主表每卡只取 1 行既定主口径（"
+                         + "；".join(f"{s['card']}＝{s['primary']}"
+                                    for s in SOURCES if s.get("primary"))
+                         + "），**不跨持有期横比**；"
                          f"且**样本 < {MIN_SAMPLES} 不进主表**（累积不足不排名）。"),
         "honesty_note": ("未知一律 null（前端显示 —），绝不用 0 冒充；"
                          f"样本< {MIN_SAMPLES} 只观测、不进排名、不做下架评估；"
