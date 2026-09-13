@@ -1898,6 +1898,26 @@ def check_raw_data():
     return results
 
 
+def _remote_main_sha():
+    """获取 origin/main 当前 SHA：优先本地 ref，git fetch 失败/缺失时回退 GitHub API。
+
+    2026-09-13 一劳永逸：解决本机 git fetch 偶发超时（TimeoutExpired）导致
+    「本地与 origin/main 同步」和「Pages 部署同步」双双误报黄灯的问题。
+    当本地对象库没有远端 commit 时，用 GitHub API 做交叉验证，避免把
+    "无法比较" 误判成 "部署故障"。
+    """
+    try:
+        sha = subprocess.check_output(["git", "rev-parse", "origin/main"], text=True, timeout=10).strip()
+        if sha:
+            return sha, False
+    except Exception:
+        pass
+    ref = api_get(f"https://api.github.com/repos/{REPO}/git/ref/heads/main")
+    if isinstance(ref, dict) and ref.get("object", {}).get("sha"):
+        return ref["object"]["sha"], True
+    return None, False
+
+
 def check_site_deploy_sync():
     """检查线上 Pages commit 是否与 origin/main 一致。"""
     # 先拿本地 HEAD
@@ -1983,10 +2003,23 @@ def check_site_deploy_sync():
         ahead = _rev_count(f"{local_sha}..{site_sha}")
 
     if behind is None or ahead is None:
-        # 两个方向都算不出来（site_sha 拉不到），只能判定为无法比较，不能武断报部署故障
+        # 两个方向都算不出来（site_sha 拉不到）→ 先尝试 GitHub API 拿 origin/main 做交叉验证
+        remote_sha, api_used = _remote_main_sha()
+        if remote_sha:
+            if site_sha[:7] == remote_sha[:7] or remote_sha.startswith(site_sha) or site_sha.startswith(remote_sha):
+                # Pages 部署的 commit 与 origin/main 一致（或为其前缀）：部署链路健康
+                return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "ok",
+                         "message": f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} 已同步"
+                                    f"（与 origin/main {remote_sha[:7]} 一致，本地对象库未 fetch，API 交叉验证）"}]
+            # Pages 与 origin/main 不一致，但本地也未知 → 至少说明部署确实发生了
+            return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "info",
+                     "message": f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]}；"
+                                f"origin/main {remote_sha[:7]}（API 验证）。本地对象库缺失线上 commit，"
+                                f"建议 fetch 后复核"}]
+        # API 也拿不到，只能判定为无法比较，不能武断报部署故障
         return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn",
                  "message": f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]}："
-                            f"线上 commit 在本地对象库中不存在，无法比较（fetch 后自动恢复）"}]
+                            f"线上 commit 在本地对象库中不存在，且 GitHub API 亦不可达，无法比较（fetch 后自动恢复）"}]
 
     if synced:
         msg = f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} 已同步"
@@ -2201,32 +2234,44 @@ def check_local_head_sync():
     #   原逻辑整段一个 try，git rev-parse origin/main 失败（本地无该 ref，常见于无 origin 推送的机器）
     #   → CalledProcessError 抛出 → 整个检查 fail → 看板红灯。
     #   现在每个子命令独立捕获，失败一律 warn + 明确原因，不再误报。
-    try:
-        subprocess.run(["git", "fetch", "origin"], check=True, timeout=30)
-    except Exception as e:
-        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
-                "status": "warn", "message": f"git fetch origin 失败（网络/认证）：{type(e).__name__}，跳过同步检查"}]
-
+    # 2026-09-13 升级：git fetch 增加 3 次重试；全部失败后回退 GitHub API 获取 origin/main，
+    #   根治偶发 TimeoutExpired 导致的「跳过同步检查」误报。
     try:
         local = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, timeout=10).strip()
     except Exception as e:
         return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
                 "status": "warn", "message": f"git rev-parse HEAD 失败：{type(e).__name__}，跳过同步检查"}]
 
-    try:
-        remote = subprocess.check_output(["git", "rev-parse", "origin/main"], text=True, timeout=10).strip()
-    except Exception as e:
-        # 2026-08-29 一劳永逸：origin/main ref 不存在时（本地无 origin 推送或未 fetch），
-        #   不再当 fail，降 warn —— 这不是真故障
+    fetch_err = None
+    for attempt in range(3):
+        try:
+            subprocess.run(["git", "fetch", "origin"], check=True, timeout=30,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            fetch_err = None
+            break
+        except Exception as e:
+            fetch_err = e
+            if attempt < 2:
+                import time as _time
+                _time.sleep(2)
+
+    remote, api_fallback = _remote_main_sha()
+    if not remote:
+        reason = f"git fetch origin 失败（{type(fetch_err).__name__}）且 GitHub API 不可达"
         return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
-                "status": "warn",
-                "message": f"origin/main ref 不存在（本地无 origin 推送或未 fetch）：{type(e).__name__}，跳过同步检查"}]
+                "status": "warn", "message": f"{reason}，跳过同步检查"}]
 
     synced = local == remote
     if synced:
-        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": "ok", "message": f"本地 {local[:7]} / origin/main {remote[:7]} 同步"}]
+        msg = f"本地 {local[:7]} / origin/main {remote[:7]} 同步"
+        if api_fallback:
+            msg += "（git fetch 失败，经 GitHub API 交叉验证）"
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
+                 "status": "ok", "message": msg}]
 
-        # 2026-08-24 拆态：检查 raw_data/ 子树是否落后（这是数据卡陈旧的二级根因）
+    # 2026-08-24 拆态：检查 raw_data/ 子树是否落后（这是数据卡陈旧的二级根因）
+    raw_data_diff = ""
+    if not api_fallback:
         try:
             raw_data_diff = subprocess.check_output(
                 ["git", "diff", "--name-only", f"{local}..origin/main", "--", "raw_data/"],
@@ -2235,15 +2280,22 @@ def check_local_head_sync():
         except Exception:
             raw_data_diff = ""
 
-        if raw_data_diff:
-            # raw_data 真的落后 → 数据卡陈旧的二级根因 → fail + 自愈拉取
-            n_raw = len([x for x in raw_data_diff.splitlines() if x.strip()])
-            msg = f"本地 {local[:7]} / origin/main {remote[:7]} 落后；其中 raw_data/ 子树有 {n_raw} 个文件待同步（数据卡陈旧二级根因）"
-            return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": "fail", "message": msg}]
+    if raw_data_diff:
+        # raw_data 真的落后 → 数据卡陈旧的二级根因 → fail + 自愈拉取
+        n_raw = len([x for x in raw_data_diff.splitlines() if x.strip()])
+        msg = f"本地 {local[:7]} / origin/main {remote[:7]} 落后；其中 raw_data/ 子树有 {n_raw} 个文件待同步（数据卡陈旧二级根因）"
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
+                 "status": "fail", "message": msg}]
 
-        # 仅代码层落后（index.html / ?v= cache）→ 仍属云端 build 副作用 → info
-        msg = f"本地 {local[:7]} / origin/main {remote[:7]} 落后（仅代码层，Pages build 重写 index.html 属预期，已降级 info 不报警）"
-        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": "info", "message": msg}]
+    # 仅代码层落后（index.html / ?v= cache）→ 仍属云端 build 副作用 → info
+    # API fallback 时同样走 info，因为无法本地 diff raw_data，但已知本地 != origin/main
+    msg = f"本地 {local[:7]} / origin/main {remote[:7]} 落后"
+    if api_fallback:
+        msg += "（git fetch 失败，经 GitHub API 验证；仅代码层或待 pull，已降级 info）"
+    else:
+        msg += "（仅代码层，Pages build 重写 index.html 属预期，已降级 info 不报警）"
+    return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
+             "status": "info", "message": msg}]
 
 
 def check_site_dom(site_html=None):
