@@ -9,3 +9,40 @@
 # 从而 index.html 的 ?v= 缓存戳永远等于实际部署文件 sha，杜绝 CDN 按旧 URL 吐旧副本。
 v6_memo.html        text eol=lf
 v6_memo.golden.html text eol=lf
+
+# ═══ 2026-09-13 主人令（收尾·阿狸咪的工程师）：页面与数据文件行尾锁定 ═══
+#
+# 【根因】本机 `core.autocrlf` = true（仓库级），而本文件原先**未锁** index.html /
+#   logic.html ⇒ 双机（各机 autocrlf 取值未必相同）+ CI（Linux）三方各按本地设置
+#   转换，同一文件被反复整文件改写。证据：8cb2bbb7e 提交标题即
+#   「重打被 a40abe2ec 静默回退的三处 index.html 口径文案（双机共写热文件覆盖事故）」
+#   —— 那次「静默回退」的机制之一正是行尾整文件改写。
+#
+# 【全仓 .html 行尾实测（blob 原始字节）】
+#   index.html / calendar.html / v6_memo.html / v6_memory.html / docs/ops/audit/*.html = 纯 LF
+#   logic.html                                                                        = 纯 CRLF  ← 唯一例外
+#   ⇒ 统一锁 LF，再对 logic.html 单独开例外。
+#
+# 【logic.html 为何必须用 -text 而不是 eol=crlf】—— 临时仓库对照实验实测：
+#     `logic.html text eol=crlf` → 索引 blob 被规范化成 LF（704701 B）⇒ **整文件改写**
+#     `logic.html text eol=lf`   → 同上（整文件改写）
+#     `logic.html -text`         → 索引 blob 与远端逐字节相同（713347 B）✅
+#   因 logic.html 的 blob **本身**就存着 CRLF，凡带 `text` 属性的规则都会把它「规范化掉」。
+#   故只能用 `-text`（= 二进制，禁止任何行尾转换）：既冻结现状，又杜绝未来再被平台转换。
+#
+# ⚠⚠ 【规则顺序 + 必须同时解掉 eol】gitattributes 是**后面的规则覆盖前面的**。
+#   但 `-text` 只把 text 置 unset，**并不会解掉前面 `*.html` 设下的 `eol=lf`** ⇒
+#   会得到 `text: unset` + `eol: lf` 这种自相矛盾的组合（实测踩过，check-attr 可见）。
+#   正解：用 `-text -eol`，两个属性一起解，让该文件彻底回到「二进制、零转换」。
+#   （顺序仍必须在本段 `*.html` 之后。）
+
+*.html              text eol=lf
+logic.html          -text -eol
+
+# 本文件自己也要锁：原为 CRLF，按惯例应为 LF（防 Windows checkout 改写规则文件本身）
+.gitattributes      text eol=lf
+
+# 数据文件锁 LF：index.html 的 ?v= 缓存戳按「内容 sha」计算，
+# 若行尾被平台转换则 sha 变化 ⇒ 戳与实际部署文件不符 ⇒ CDN 按旧 URL 吐旧副本。
+data/*.js           text eol=lf
+raw_data/*.json     text eol=lf
