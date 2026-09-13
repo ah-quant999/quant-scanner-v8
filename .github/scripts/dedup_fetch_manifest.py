@@ -97,6 +97,32 @@ _ALWAYS_PUSH = {
     #   实测该文件仅 23 KB，白名单化带来的每日多推开销可忽略。
     #   ⇒ 规则：凡 READY_SPEC[*]["must"] 中的产物，一律纳入本白名单（一一对应，可断言）。
     "data/LHB_DATA.js",               # READY_SPEC["A"].must
+    # 🛡 2026-09-13 一劳永逸（小九周末审计 P2 采纳 · 主人令「按你顺序都做」）：
+    #   **READY_SPEC[*] 的 items 与 must 全部纳入**（零特例，机器可断言）。
+    #   原不变式只覆盖 must，但 items 同样参与 need 的命中计数 ⇒ 任一项被本去重器判
+    #   「伪变更」丢弃 ⇒ update_time 恒旧 ⇒ **永久占用容错名额**，耗尽即无限重跑。
+    #   严重度按「容错余量 = need − 可容忍陈旧项数」排序：
+    #     🔴 D 批 need=1 且 items **仅 1 项**（FINAL_RECOMMEND_DATA.js）⇒ 该项一旦变陈旧
+    #        就 100% 判「未就绪」⇒ 重跑 → 内容仍不前进 → 再被丢弃 → **永久锁死不收敛**
+    #        （**零余量，全场最高危**；正是「最终推荐永远是昨天的」故障模式）。
+    #     🟡 E 批 need=4 / items 5 ⇒ 余量 1；A 批 need=7 / items 10 ⇒ 余量 3（实测 8/10 ⇒ 1）。
+    #   高风险项 = 「内容天然稳定」型：stock_profile（个股档案）、suspension_alert（常空）、
+    #     fundamental_quality（财报季才变）、FINAL_RECOMMEND_DATA（推荐未变时）、
+    #     CRDS_BACKTEST / BACKTEST_TDX（**不重算就不变**）。
+    #   旁证：B 批 gold_pool 同病曾致「派发 9 次 / 7 cancelled」（本文件 L67-79 已修）。
+    #   ⇒ 规则：凡 READY_SPEC[*] 的 must 与 items **一律**纳入本白名单（一一对应，可断言）。
+    "raw_data/sector_rs.json",             # READY_SPEC["A"].items
+    "raw_data/stock_profile.json",         # READY_SPEC["A"].items
+    "raw_data/fundamental_quality.json",   # READY_SPEC["A"].items
+    "raw_data/stock_quote.json",           # READY_SPEC["A"].items
+    "raw_data/inst_trade.json",            # READY_SPEC["A"].items
+    "raw_data/suspension_alert.json",      # READY_SPEC["A"].items
+    "raw_data/nt_data.json",               # READY_SPEC["A"].items
+    "raw_data/sector_fund_flow_trend.json",# READY_SPEC["A"].items
+    "raw_data/market_alerts.json",         # READY_SPEC["A"].items
+    "data/FINAL_RECOMMEND_DATA.js",        # READY_SPEC["D"].items（need=1，零余量，最高危）
+    "data/CRDS_BACKTEST.js",               # READY_SPEC["E"].items
+    "data/BACKTEST_TDX.js",                # READY_SPEC["E"].items
 }
 
 
