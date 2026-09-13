@@ -331,7 +331,7 @@ def write_outputs(data):
     etf_count = sum(1 for k in data if data[k].get('board') == 'ETF')
     meta = {
         'update_time': now.strftime('%Y-%m-%d %H:%M:%S'),
-        'source': 'akshare.stock_zh_a_spot(新浪A股)+stock_hk_spot(新浪港股)+fund_etf_spot_em(东财ETF)+algorithms/stock_industry_concepts.json',
+        'source': 'akshare.stock_zh_a_spot(新浪A股)+stock_zh_a_spot_em(东财A股PE/PB)+stock_hk_spot(新浪港股)+fund_etf_spot_em(东财ETF)+algorithms/stock_industry_concepts.json',
         'count': len(data),
         'a_count': a_count,
         'hk_count': hk_count,
@@ -350,6 +350,51 @@ def write_outputs(data):
     with open(js_path, 'w', encoding='utf-8') as f:
         f.write('window.STOCK_QUOTE = ' + json.dumps(out, ensure_ascii=False, separators=(',', ':')) + ';\n')
     print(f"✅ data/STOCK_QUOTE.js       {len(data)} stocks | {os.path.getsize(js_path)//1024} KB")
+
+
+
+def merge_pe_pb_from_em(quote_data):
+    """从东方财富全市场 A 股行情补全 PE_TTM / PB_MRQ。
+
+    新浪主源 stock_zh_a_spot 没有估值字段；东财 spot_em 返回'市盈率-动态'/'市净率'。
+    仅当东财接口可用时才合并；失败则保留原 quote_data（不造空白字段），不影响现有功能。
+    2026-09-13 新增：为主题空间卡提供估值护栏数据源。
+    """
+    try:
+        import akshare as ak
+    except ImportError:
+        print("⚠️ akshare 未安装，跳过 PE/PB 合并")
+        return quote_data
+    try:
+        df = ak.stock_zh_a_spot_em()
+        if df is None or len(df) == 0:
+            print("⚠️ 东财 PE/PB 返回空")
+            return quote_data
+        merged = 0
+        for _, r in df.iterrows():
+            code6 = str(r.get('代码', '')).strip()
+            if not code6.isdigit() or len(code6) != 6:
+                continue
+            # 前缀规则与 _fetch_all_spot_em 保持一致
+            if code6.startswith(('6', '9', '5')):
+                key = 'sh' + code6
+            elif code6.startswith(('0', '1', '2', '3')):
+                key = 'sz' + code6
+            else:
+                key = 'bj' + code6
+            if key not in quote_data:
+                continue
+            pe = _safe_float(r.get('市盈率-动态'))
+            pb = _safe_float(r.get('市净率'))
+            if pe is not None:
+                quote_data[key]['pe_ttm'] = pe
+            if pb is not None:
+                quote_data[key]['pb_mrq'] = pb
+            merged += 1
+        print(f"✅ 合并 PE/PB：{merged}/{len(quote_data)} 只")
+    except Exception as e:
+        print(f"⚠️ PE/PB 合并失败: {type(e).__name__} {str(e)[:80]}")
+    return quote_data
 
 
 def merge_fundamental_quality(quote_data):
@@ -422,6 +467,7 @@ def main():
     print(f"合并后：{len(data)} 只")
     data = merge_industry_concepts(data)
     data = merge_dividend(data)
+    data = merge_pe_pb_from_em(data)
     data = merge_fundamental_quality(data)
     write_outputs(data)
     print(f"\n总计：{time.time()-t0:.1f}s")
