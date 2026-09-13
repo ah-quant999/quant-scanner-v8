@@ -174,23 +174,27 @@ _SRC_UNIFIED = None
 
 
 def _unified_query_kline():
-    """延迟导入统一三级兜底取数链（mootdx → 东财 → baostock，带 SOURCE_BREAKER 熔断）。
+    """统一三级兜底取数链接口（占位）。
 
-    云端 runner 抓腾讯/东财常失败，但该链会自动降级到 baostock（境外可达），
-    不再由本脚本自己硬碰网络。导入失败返回 None（调用方退回 gtimg 老路径）。
+    🔴 2026-09-13：该链的唯一实现者 calc_stock_rps 已随 RPS 下线删除，
+    本函数现恒返回 None（调用方退回本地缓存 / gtimg 老路径）。
+
     """
     global _SRC_UNIFIED
     if _SRC_UNIFIED is not None:
         return _SRC_UNIFIED or None
-    try:
-        sys.path.insert(0, str(ALGO_DIR))
-        fn = getattr(_rps, "_query_kline", None)
-        _SRC_UNIFIED = fn if callable(fn) else False
-        if not _SRC_UNIFIED:
-    except Exception as e:
-        print(f"  ⚠️ 导入统一取数链失败（退回 gtimg 老路径）: {e}")
-        _SRC_UNIFIED = False
-    return _SRC_UNIFIED or None
+    # 🔴 2026-09-13 一劳永逸修复（阿狸咪的工程师）：
+    #   RPS 下线（8e360ed65 → D-2/2）机械删除本块时，误删了
+    #   `import calc_stock_rps as _rps` 与 `if not _SRC_UNIFIED:` 的循环体 print(...)，
+    #   只留空壳 if ⇒ IndentationError ⇒ 本脚本**完全无法解析**：
+    #     ① v8_build_deploy 的 pre_deploy_audit 第1项 py_compile 恒红
+    #        ⇒ 全部 deploy 被阻断（实测 09-13 14:32 CST 后 20/20 run failure）；
+    #     ② 本脚本是 data/H_AUTO_BUY.js 的唯一生产者 ⇒ 该卡静默停更且无门禁可见。
+    #   calc_stock_rps.py 已随 RPS 一并删除，统一取数链**不存在** ⇒
+    #   直接判定不可用并返回 None。调用点（L273 `if fn is not None:`）
+    #   已有完整降级：→ 本地缓存（新鲜/陈旧）→ gtimg 老路径。
+    _SRC_UNIFIED = False
+    return None
 
 
 def _vols_from_cache(code):
