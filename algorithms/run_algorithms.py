@@ -260,6 +260,17 @@ ORDER = [
     #   否则聚合器读不到本轮产物。
     "scripts/algo_backtest_compare.py",   # → data/ALGO_BACKTEST_COMPARE.js（H反推 / 高手画像版H反推 / 强势突破 同口径对比）
     "gen_backtest_all_algos.py",   # → raw_data/backtest_all_algos.json + data/BACKTEST_ALL_ALGOS.js
+
+    # 🆕 2026-09-13 主人令「PE/PB 方案 A 落地」：中信证券(sh.600030)历史估值双卡。
+    #   脚本 09-07 就写好却**从未挂进任何批次**（只靠手动跑）⇒ CITIC_PE_THERMO 长期 stale。
+    #   方案比对定论 = **方案 A（挂 E 批最末）**；**否决方案 B（另建独立 workflow/定时）**——
+    #   那是本仓已定罪的错误（见上方 2026-09-11 实验卡判决书：独立 workflow 自创建只触发
+    #   1 次且失败 → 5 张卡永久静默）。挂进批次才有闸门监视 / freshness / 失败上报。
+    #   ⚠️ 位置必须在**最末**（gen_backtest_all_algos 之后）：CITIC 属实验区卡，不参与
+    #      D 批最终推荐 ⇒ baostock 抖动只影响整链结束时刻，不碰关键路径。
+    #   ⚠️ 与 STAGES["E"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
+    "v8/fetch_citic_pe.py",       # → raw_data/citic_pe_history.json（baostock 增量，断点续跑）
+    "v8/gen_citic_pe.py",         # → data/CITIC_PE_THERMO.js + data/CITIC_PE_BACKTEST.js（须在 fetcher 之后）
     ]
 
 
@@ -344,6 +355,13 @@ STAGES = {
         #   FACTOR_LAB 停在 09-05 仍出 5 只），生成器根本不该绑在 final_recommend 关键路径上。
         #   现把生成器从 D 摘到 E 批（21:00 夜间跑，不阻塞盘后 20:00 出最终推荐），
         #   D 批瘦身至 final_recommend 单脚本 → 选股策略全部数据出来 30-40min 内出最终推荐。
+
+        # 🆕 2026-09-13 主人令「PE/PB 方案 A 落地」：中信证券(sh.600030)历史估值双卡。
+        #   与上方 ORDER 同位置（E 批最末）。两脚本 09-07 写好却从未挂链 ⇒ 长期 stale。
+        #   超时预算：fetch 600s（增量拉取；首跑全量约 4000 行需余量）/ gen 300s（纯本地计算）。
+        #   ⚠️ 与上方 ORDER 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
+        "v8/fetch_citic_pe.py",   # → raw_data/citic_pe_history.json
+        "v8/gen_citic_pe.py",     # → data/CITIC_PE_THERMO.js + CITIC_PE_BACKTEST.js
     ],
     "D": [  # 汇总批（~20:00 CST，依赖全部）：仅 final_recommend（LHB历史/7d/生命周期/factor_lab_gen 前置到 B 批·互踢暴风根治）
         "final_recommend.py",   # 必需上游 = B 批产物（CRDS/TOP10/三重共识/crisis/sector_rs/stock_profile/triple_track）

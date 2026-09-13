@@ -218,6 +218,13 @@ def walk_extra():
         # 🔴 2026-08-20 根因修复：LHB_7D.js 由 gen_lhb_7d.py 直写 data/，之前未注册
         #    到 extra → 算法链跑完也不上传，页面 7 日龙虎榜/机游共振长期 stale。
         "data/LHB_7D.js",
+        # 🆕 2026-09-13 主人令「PE/PB 方案 A 落地」：中信 PE 极值温度计双卡产物。
+        #   gen_citic_pe.py 直写 data/（不经 update_v8 的 raw→js 映射表）⇒ 必须在此登记。
+        #   🔴 不登记 = **降级路径半边修复**：PUSH_FILES 模式（workflow 用 git status 收集
+        #      变更）能推到它们，但「清单不可得」时的全量回退
+        #      （walk_raw + walk_extra）推不到 ⇒ CITIC 永不刷新。
+        "data/CITIC_PE_THERMO.js",      # 中信证券 PE 极值温度计（含分位/极值判定）
+        "data/CITIC_PE_BACKTEST.js",    # 中信证券 PE 分位分层历史回测
         # optimized_strategy.json 在 raw_data/，由 walk_raw() 按算法产物前缀自动排除（不推送，免覆盖）
     ]
     for rel in extra:
@@ -250,6 +257,11 @@ _EXTRA_FILES = (
     # 2026-08-19：板块推荐框架（宏观+板块RS+资金流+周期融合）注册到 ?v 重写集
     "data/MARKET_REGIME.js",
     "data/SECTOR_RECOMMENDATION.js",
+    # 🆕 2026-09-13 主人令（PE/PB 方案 A）：中信 PE 双卡注册进 ?v 重写集。
+    #   不登记 ⇒ api_push 推了新内容但 index.html 的 ?v 仍指旧哈希 ⇒ CDN/浏览器
+    #   吐旧副本，最长撑到 reconcile workflow 跑（~15min 窗口）。
+    "data/CITIC_PE_THERMO.js",
+    "data/CITIC_PE_BACKTEST.js",
     # 🛡 2026-08-19 阿狸咪根治孤儿：data/MACRO.js 删除（前端 render 0 处引用 window.MACRO）—节省空间+Actions分钟
 )
 _RE_V = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
