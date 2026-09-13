@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-选股观测台 - 全市场三线共振扫描 v4.0
+选股观测台 - 全市场四信号共振扫描 v4.0
 缠论买字(日K) + 金钻趋势(黄柱/起涨) + 四量图(机构变红)
 三重数据源: mootdx(通达信直连) → BaoStock(证券宝) → 东方财富(兜底)
 
@@ -2038,7 +2038,7 @@ def fetch_hk_daily(code, bars=None):
 
 def check_stock_signals(code, name, market="sh", board_label="", volume_amount=0, turnover_rate=0, mv_yi=0, fund_type=""):
     """
-    检测个股三线共振信号(仅日K)
+    检测个股四信号共振(缠论买/金钻/机构变红/上涨趋势，仅日K)
     返回: dict 含信号详情
     """
     # 获取日K数据
@@ -2116,8 +2116,11 @@ def check_stock_signals(code, name, market="sh", board_label="", volume_amount=0
 
         # 信号统计(原四维共振: 缠论买 / 金钻信号 / 四量图机构变红 / 上涨趋势)
         signal_count = sum([缠论买, 金钻信号, 机构变红, 上涨趋势])
-        # 三线共振：四个信号中满足任意三种
-        三线共振 = signal_count >= 3
+        # 🔴 2026-09-13 主人令：三线共振（signal_count>=3）已整链删除。
+        #   依据：离线回溯 3120 只 × 一年 = 325,466 个股票日，其 T+5 胜率 43.4% /
+        #   均值 −0.08%（T+20 起转负），低于全站 45% 胜率红线；且 triple_count /
+        #   triple_signals 全仓零消费者（只写进 gitignored 的 out/scan_result.json）。
+        #   signal_count 本体**保留**：金股池入池门槛 >=2 依赖它。
 
         # RSI(14) — 用于风控和评分
         try:
@@ -2190,8 +2193,7 @@ def check_stock_signals(code, name, market="sh", board_label="", volume_amount=0
             "上涨趋势_条件3": 上涨趋势_条件3,
             "上涨趋势_条件4": 上涨趋势_条件4,
             "上涨趋势": 上涨趋势,
-            "三线共振": 三线共振,
-            "signal_count": signal_count,
+                        "signal_count": signal_count,
             "当日涨停": 当日涨停,
             "涨停延迟": 当日涨停,
             "开盘_标签": 开盘_标签,
@@ -2223,8 +2225,7 @@ def check_stock_signals(code, name, market="sh", board_label="", volume_amount=0
                 "上涨趋势_条件3": 上涨趋势_条件3,
                 "上涨趋势_条件4": 上涨趋势_条件4,
                 "上涨趋势": 上涨趋势,
-                "三线共振": 三线共振,
-                "signal_count": signal_count,
+                                "signal_count": signal_count,
                 "当日涨停": 当日涨停,
                 "涨停延迟": 当日涨停,
                 "开盘_标签": 开盘_标签,
@@ -2687,8 +2688,7 @@ def update_gold_pool_from_scan(output):
             "上涨趋势_条件3": s.get("上涨趋势_条件3", False),
             "上涨趋势_条件4": s.get("上涨趋势_条件4", False),
             "上涨趋势": s.get("上涨趋势", False),
-            "三线共振": s.get("三线共振", False),
-            "latest": {
+                        "latest": {
                 "缠论买_日K": s.get("缠论买_日K", False),
                 "金钻_黄柱": s.get("金钻_黄柱", False),
                 "金钻_起涨": s.get("金钻_起涨", False),
@@ -2785,8 +2785,7 @@ def update_gold_pool_from_watch(watch_output):
                 "上涨趋势_条件3": s.get("上涨趋势_条件3", False),
                 "上涨趋势_条件4": s.get("上涨趋势_条件4", False),
                 "上涨趋势": s.get("上涨趋势", False),
-                "三线共振": s.get("三线共振", False),
-            })
+                            })
             pool["stocks"][key]["max_signal"] = max(
                 pool["stocks"][key]["max_signal"], s["signal_count"]
             )
@@ -2816,8 +2815,7 @@ def update_gold_pool_from_watch(watch_output):
                     "金钻_黄柱": s.get("金钻_黄柱", False),
                     "金钻_起涨": s.get("金钻_起涨", False),
                     "四量图_机构变红": s.get("四量图_机构变红", False),
-                "三线共振": s.get("三线共振", False),
-                "上涨趋势_条件1": s.get("上涨趋势_条件1", False),
+                                "上涨趋势_条件1": s.get("上涨趋势_条件1", False),
                 "上涨趋势_条件2": s.get("上涨趋势_条件2", False),
                 "上涨趋势_条件3": s.get("上涨趋势_条件3", False),
                 "上涨趋势_条件4": s.get("上涨趋势_条件4", False),
@@ -2983,7 +2981,6 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
 
     # 断点续扫: 加载已有进度
     results = []
-    三线共振_list = []
     双线共振_list = []
     errors = 0
     start_idx = 0
@@ -2993,7 +2990,6 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
             with open(PROGRESS_JSON, "r", encoding="utf-8") as f:
                 progress = json.load(f)
             results = progress.get("results", [])
-            三线共振_list = progress.get("triple", [])
             双线共振_list = progress.get("double", [])
             errors = progress.get("errors", 0)
             start_idx = progress.get("next_idx", 0)
@@ -3091,10 +3087,9 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
                     _error_details.append(err)
                 elif result is not None:
                     results.append(result)
-                    if result["三线共振"]:
-                        三线共振_list.append(result)
-                        print(f"\n    >>> 三线共振! {code} {name} [{board_label}] <<<")
-                    elif result["signal_count"] >= 2:
+                    # 🔴 2026-09-13：三线共振通道已删；`== 2` 精确等价于原
+                    #   `if 三线(>=3) / elif >=2` 中「>=3 已被第一支吃掉」后的语义。
+                    if result["signal_count"] == 2:
                         双线共振_list.append(result)
 
                 # 交叉审核: 仅对信号>=2的股票全量验证, 减少采样 (提速)
@@ -3123,7 +3118,6 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
                 if completed % save_interval == 0:
                     progress = {
                         "results": results,
-                        "triple": 三线共振_list,
                         "double": 双线共振_list,
                         "errors": errors,
                         "next_idx": start_idx + completed,
@@ -3141,7 +3135,6 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
     print(f"  成功: {len(results)}, 错误: {errors}")
     if timed_out > 0:
         print(f"  超时跳过: {timed_out} 只")
-    print(f"  三线共振: {len(三线共振_list)} 只")
     print(f"  双线共振: {len(双线共振_list)} 只")
     print(f"  数据源: mootdx={_data_source_stats['mootdx']} baostock={_data_source_stats['baostock']} eastmoney={_data_source_stats['eastmoney']} efinance={_data_source_stats['efinance']} qq={_data_source_stats['qq']} fail={_data_source_stats['fail']}")
     if _bs_consecutive_fails >= _BS_FAIL_SKIP_THRESHOLD:
@@ -3179,7 +3172,7 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
                     code = code[len(prefix):]
                     break
             gl_codes.add(code)
-        for stock_list in [results, 三线共振_list, 双线共振_list]:
+        for stock_list in [results, 双线共振_list]:
             for s in stock_list:
                 scan_code = s.get("code", "")
                 code_variants = [scan_code]
@@ -3198,7 +3191,6 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
         "scan_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "total_scanned": len(results),
         "total_errors": errors,
-        "triple_count": len(三线共振_list),
         "double_count": len(双线共振_list),
         "pool_summary": {
             "创业板": len([s for s in all_stocks if s[3] == "创业板"]),
@@ -3215,7 +3207,6 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
             "no_verify": _audit_stats["no_verify"],
             "suspicious": _audit_results[-20:],
         },
-        "triple_signals": 三线共振_list,
         "double_signals": 双线共振_list,
         "all_results": results,
         "guanlan": guanlan_data,
@@ -3258,9 +3249,7 @@ def watch_gold_pool():
     print(f"  金股池: {len(pool.get('stocks',{}))} 只")
 
     results = []
-    三线共振_list = []
     双线共振_list = []
-    new_triple = []  # 新增三线共振
     errors = 0
 
     # ── 分批保存函数（定义在循环前，供 idx%50 调用，防 300s 超时整批丢失） ──
@@ -3271,12 +3260,8 @@ def watch_gold_pool():
             "total_scanned": len(results),
             "total_errors": errors,
             "error_details": _error_details,
-            "triple_count": len(三线共振_list),
             "double_count": len(双线共振_list),
-            "new_triple_count": len(new_triple),
-            "triple_signals": 三线共振_list,
             "double_signals": 双线共振_list,
-            "new_triple_signals": new_triple,
             "all_results": results,
             "gold_pool_total": len(pool.get("stocks",{})),
             "_partial": True,  # 标记半成品，前端可见但可用 progress
@@ -3304,13 +3289,9 @@ def watch_gold_pool():
                 # 注入来源标签(从金股池读取)
                 result["sources"] = stock_info.get("sources", [])
                 results.append(result)
-                if result["三线共振"]:
-                    三线共振_list.append(result)
-                    # 判断是否新增三线共振(之前max_signal < 3)
-                    if stock_info.get("max_signal", 0) < 3:
-                        new_triple.append(result)
-                        print(f"\n    >>> 新增三线共振! {code} {name} <<<")
-                elif result["signal_count"] >= 2:
+                # 🔴 2026-09-13：三线共振通道已删；`== 2` 精确等价于原
+                #   `if 三线(>=3) / elif >=2` 中「>=3 已被第一支吃掉」后的语义。
+                if result["signal_count"] == 2:
                     双线共振_list.append(result)
         except Exception as e:
             errors += 1
@@ -3336,12 +3317,7 @@ def watch_gold_pool():
 
     print(f"\n\n精监完成!")
     print(f"  扫描: {len(results)}, 错误: {errors}")
-    print(f"  三线共振: {len(三线共振_list)} 只")
     print(f"  双线共振: {len(双线共振_list)} 只")
-    if new_triple:
-        print(f"  新增三线共振: {len(new_triple)} 只!")
-        for s in new_triple:
-            print(f"    ★ {s['code']} {s['name']} ({s['market_label']}) {s['close']} {s['pct_chg']:+.2f}%")
 
     # 排序
     results.sort(key=lambda x: (-x["signal_count"], -x.get("pct_chg", 0)))
@@ -3353,12 +3329,8 @@ def watch_gold_pool():
         "total_scanned": len(results),
         "total_errors": errors,
         "error_details": _error_details,
-        "triple_count": len(三线共振_list),
         "double_count": len(双线共振_list),
-        "new_triple_count": len(new_triple),
-        "triple_signals": 三线共振_list,
         "double_signals": 双线共振_list,
-        "new_triple_signals": new_triple,
         "all_results": results,
         "gold_pool_total": len(pool.get("stocks",{})),
     }
@@ -3808,7 +3780,7 @@ if __name__ == "__main__":
             if result.get("mark_x"):
                 print(f"  标X: {len(result['mark_x'])} 只")
     else:
-        print("选股观测台 - 三线共振扫描 v4.0 (三重数据源: mootdx+BaoStock+东方财富)")
+        print("选股观测台 - 四信号共振扫描 v4.0 (三重数据源: mootdx+BaoStock+东方财富)")
         print("用法:")
         print("  python scanner.py full   - 盘后扫描活跃股池(创业板100+科创板100+主板100+港股50)")
         print("  python scanner.py a      - 仅A股")

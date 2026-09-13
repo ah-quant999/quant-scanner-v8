@@ -4954,7 +4954,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           +  '<td style="padding:6px;color:var(--dim);font-size:11px;white-space:nowrap;">'+_esc(r.label||'—')+'</td>'
           +  '<td style="padding:6px;color:var(--sub);">'+(r.sample||0)+'</td>'
           +  '<td style="padding:6px;font-weight:700;color:'+_colorNum(r.win_rate)+';">'+_n(r.win_rate)+'%</td>'
-          +  '<td style="padding:6px;font-weight:700;color:'+_colorPL(r.avg_return)+';">'+_sgn(r.avg_return)+_n(r.avg_return,2)+'%</td>'
+          // 🔴 2026-09-13 主人令「平均收益没用，不留」：删掉本列。
+          //   注：该 td 原本就没有对应 <th> ⇒ 表头 7 列而数据 8 td，
+          //   导致「最佳持有期」整体右移一格错位；删掉即自动对齐。
           +  '<td style="padding:6px;white-space:nowrap;">'+_holdTxt(_bestHoldOf[r.card])+'</td>'
           +  '</tr>';
       });
@@ -4965,7 +4967,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           +  '<td style="padding:6px;white-space:nowrap;">'+(_stars(r.card)||'<span style="color:var(--dim);">—</span>')+'</td>'
           +  '<td style="padding:6px;font-size:11px;">'+_esc(r.label||'—')+'</td>'
           +  '<td style="padding:6px;">'+(r.sample||0)+'</td>'
-          +  '<td style="padding:6px;" colspan="3">⚠️ 样本不足 '+MINS+'，不参与排名、不做下架评估</td>'
+          +  '<td style="padding:6px;" colspan="2">⚠️ 样本不足 '+MINS+'，不参与排名、不做下架评估</td>'
           +  '</tr>';
       });
       h += '</tbody></table></div>';
@@ -12228,7 +12230,6 @@ window.showRestrictedItems = showRestrictedItems;
       if(l['金钻_黄柱']) flags.push('金钻黄柱');
       if(l['金钻_起涨']) flags.push('金钻起涨');
       if(l['四量图_机构变红']) flags.push('机构变红');
-      if(l['三线共振']) flags.push('三线共振');
       if(l['上涨趋势']) flags.push('上涨趋势');
       h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;">';
       h += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;row-gap:3px;">';

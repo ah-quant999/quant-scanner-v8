@@ -36,7 +36,11 @@ DATA_SOURCES = {
     "sector_fund_flow_intraday.json": "SECTOR_FUND_FLOW_INTRADAY",
     "gold_pool.json":              "GOLD_POOL",
     "stock_names.json":            "STOCK_LIST",
-    "stock_profile.json":          "STOCK_PROFILE",
+    # 🔴 2026-09-13 主人令「前后端都无人读，删干净」：stock_profile.json → STOCK_PROFILE
+    #   data/STOCK_PROFILE.js 转换已停产（省 1.33 MB/次入库）。
+    #   前端 window.STOCK_PROFILE 由 STOCK_LIST 就地合成（index.html:15290-15304）；
+    #   全仓无脚本读 data/STOCK_PROFILE.js。raw_data/stock_profile.json **保留**
+    #   （3 个真消费者：build_pool_tracker / final_recommend:396 / A 批闸门 must）。
     "macro_data.json":             "MACRO_DATA",
     "macro_brief.json":            "MACRO_BRIEF",
     "nt_data.json":                "NT_DATA",
@@ -266,7 +270,6 @@ CATEGORY_MAP = {
     "FACTOR_LAB_BACKTEST": "post_close",
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
-    "STOCK_PROFILE": "post_close",
     # 🆕 2026-08-31：v8 选股生命周期跟踪归属盘后（依赖算法跟踪池，每日盘后产出）。
     "V8_POOL_TRACKER": "post_close",
     # 2026-08-31：AVG_PRICE_DATA 由 scripts/fetch_avg_price.py 在盘中/盘后/周末生成，
