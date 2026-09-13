@@ -5620,16 +5620,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 
 
-    /* 2026-09-02 主人令：回测汇总 tab 上方汇总+下方跟踪分层；下方"如何跟踪"说明（用户原话） */
-    html += '<div style="margin:18px 0 8px;padding:0;border:1.5px solid rgba(56,189,248,.35);border-radius:10px;background:rgba(56,189,248,.04);">';
-    html += '<div style="padding:10px 12px;font-size:13px;font-weight:700;color:#38bdf8;">📡 如何跟踪这些回测信号？</div>';
-    html += '<div style="padding:0 14px 12px;font-size:11.5px;color:var(--dim);line-height:1.7;">';
-    html += '<b style="color:var(--txt);">① 各算法当日/近期触发的信号</b> · 集中在主站「📅 今日事件」Tab，点信号查看个股跟踪详情<br>';
-    html += '<b style="color:var(--txt);">② K线信号 9 个通达信公式</b> · 最新触发点见「📡 实时数据」Tab；最近 60 日样本均值见本 tab 上方「📈 K线信号 9×5」块<br>';
-    html += '<b style="color:var(--txt);">③ 综合回测（策略本身价值）</b> · 历史信号入场记录全表见本 tab 上方「🔬 综合回测·策略×持有期」块；想看每日新增的入场信号 → 见候选池入口「🧭 选股池」<br>';
-    html += '<b style="color:var(--txt);">④ 算法逻辑与口径</b> · 见<a href="logic.html" style="color:#38bdf8;text-decoration:none;">「逻辑详解」</a>独立页（与本 tab 同步对齐）<br>';
-    html += '<b style="color:var(--txt);">⑤ 当日异常告警</b> · 如某算法胜率/收益异常下滑 → 邮件告警 <span style="color:var(--cyan);">2814546@qq.com</span>（每晚 03:00 跨文件对齐审计）';
-    html += '</div></div>';
 
     /* ── v8 选股生命周期 已迁至「选股策略」子页面（2026-09-01 主人令：
           置于三重共识之后，由 window.__renderLifecycleSection() 渲染进 #lifeBody）── */

@@ -1877,6 +1877,17 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">前端位置</div>
         <div class="logic-p">宿主 <code>&lt;section id="sec-bt"&gt;</code>；结论区由 <code>__btOverviewHTML()</code> 生成，明细折叠在 <code>&lt;details&gt;</code> 内；回测·框架 3 卡挂在 <code>#btExtraHost</code>，渲染入口 <code>__renderBtExtraPane()</code>。</div>
       </div>
+
+      <div class="card">
+        <h3><span class="ic">📡</span>如何跟踪这些回测信号？</h3>
+        <div class="logic-p" style="line-height:1.8;">
+          <b>① 各算法当日/近期触发的信号</b> · 集中在主站「📅 今日事件」Tab，点信号查看个股跟踪详情<br>
+          <b>② K线信号 9 个通达信公式</b> · 最新触发点见「📡 实时数据」Tab；最近 60 日样本均值见本 tab 上方「📈 K线信号 9×5」块<br>
+          <b>③ 综合回测（策略本身价值）</b> · 历史信号入场记录全表见本 tab 上方「🔬 综合回测·策略×持有期」块；想看每日新增的入场信号 → 见候选池入口「🧭 选股池」<br>
+          <b>④ 算法逻辑与口径</b> · 见<a href="logic.html" style="color:#38bdf8;text-decoration:none;">「逻辑详解」</a>独立页（与本 tab 同步对齐）<br>
+          <b>⑤ 当日异常告警</b> · 如某算法胜率/收益异常下滑 → 邮件告警 <span style="color:var(--cyan);">2814546@qq.com</span>（每晚 03:00 跨文件对齐审计）
+        </div>
+      </div>
     </div>
 
 <div class="lg-pane" id="lg-ul">
