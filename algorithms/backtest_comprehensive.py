@@ -442,7 +442,14 @@ def run_backtest(signals: list[dict]) -> dict:
         log(f"\n策略 [{st_name}]: {len(group)} 个信号")
 
         per_signal = []
-        win_rate_data = {f"hold_{hp}d": {"win": 0, "loss": 0, "rets": []} for hp in HOLD_PERIODS}
+        # 2026-09-13 主人令「统一测算标准·ret_hold 接线」：
+        #   每个持有期维护**双口径**桶 —— 旧 `ret`（周期内已触发 stop/target 按提前出场价）
+        #   与 09-12 新增 `ret_hold`（严格持有到第 hp 日收盘）。两者**同分母**，可横比。
+        win_rate_data = {
+            f"hold_{hp}d": {"win": 0, "loss": 0, "rets": [],
+                            "win_hold": 0, "loss_hold": 0, "rets_hold": []}
+            for hp in HOLD_PERIODS
+        }
 
         for i, sig in enumerate(group):
             board = sig.get("board", "") or board_from_code(sig.get("code", ""))
@@ -471,6 +478,16 @@ def run_backtest(signals: list[dict]) -> dict:
                     win_rate_data[hk]["win"] += 1
                 elif ret < 0:
                     win_rate_data[hk]["loss"] += 1
+                # 🆕 2026-09-13 主人令「统一测算标准·ret_hold 接线」：
+                #   09-12 新增的**严格持有口径**此前只写明细、不聚合 ⇒ 页面上零呈现
+                #   （功能写了等于没写）。此处与旧口径**并列**统计，供前端对照。
+                _rh = hd.get("ret_hold")
+                if _rh is not None:
+                    win_rate_data[hk]["rets_hold"].append(_rh)
+                    if _rh > 0:
+                        win_rate_data[hk]["win_hold"] += 1
+                    elif _rh < 0:
+                        win_rate_data[hk]["loss_hold"] += 1
 
             if DEBUG and (i % 5 == 0):
                 r1 = result.get("hold_1d", {}).get("ret", 0)
@@ -488,6 +505,11 @@ def run_backtest(signals: list[dict]) -> dict:
             total_decided = wd["win"] + wd["loss"]
             rets = wd["rets"]
             n_ret = len(rets)
+            # 🆕 ret_hold 严格持有口径的并列统计量
+            rets_h = wd["rets_hold"]
+            n_hold = len(rets_h)
+            decided_hold = wd["win_hold"] + wd["loss_hold"]
+            avg_ret_h = round(sum(rets_h) / n_hold, 2) if n_hold else None
             # 🔴 无样本 ⇒ 一律 None（前端显示「累积中」），绝不用 0 冒充真实值
             avg_ret = round(sum(rets) / n_ret, 2) if n_ret else None
             median_ret = round(sorted(rets)[n_ret // 2], 2) if n_ret else None
@@ -509,6 +531,21 @@ def run_backtest(signals: list[dict]) -> dict:
                 "worst_return": min(rets) if n_ret else None,
                 "std_return": std_ret,
                 "sharpe_ratio": sharpe,
+                # 🆕 2026-09-13 主人令「统一测算标准·ret_hold 接线」：
+                #   严格持有口径并列字段（忽略中途 stop/target，持到第 hp 个交易日收盘）。
+                #   与上方旧口径**同分母 n_ret**，故可直接横比落差；
+                #   空样本一律 None（禁止 0 冒充，主人铁律⑭）。
+                "count_hold": n_hold,
+                "win_hold": wd["win_hold"],
+                "loss_hold": wd["loss_hold"],
+                "decided_hold": decided_hold,
+                "draw_hold": n_hold - wd["win_hold"] - wd["loss_hold"],
+                "win_rate_hold": (round(wd["win_hold"] / decided_hold * 100, 1)
+                                  if decided_hold else None),
+                "avg_return_hold": avg_ret_h,
+                "median_return_hold": (round(sorted(rets_h)[n_hold // 2], 2) if n_hold else None),
+                "best_return_hold": max(rets_h) if n_hold else None,
+                "worst_return_hold": min(rets_h) if n_hold else None,
             }
 
             if DEBUG and period_stats[hk]["count"] >= 3:
@@ -574,6 +611,12 @@ def build_output(results: dict, total_signals: int) -> dict:
                 "avg_return": ps.get("avg_return", 0),
                 "sharpe": ps.get("sharpe_ratio", 0),
                 "count": ps.get("count", 0),
+                # 🆕 2026-09-13 主人令「统一测算标准·ret_hold 接线」：
+                #   严格持有口径并列值，供前端在同一格内做对照（不新增列，避免 UI 膨胀）。
+                #   空样本为 None（与上游一致，禁止 0 冒充）。
+                "win_rate_hold": ps.get("win_rate_hold"),
+                "avg_return_hold": ps.get("avg_return_hold"),
+                "count_hold": ps.get("count_hold", 0),
             }
         comparison[hk] = row
 

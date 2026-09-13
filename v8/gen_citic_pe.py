@@ -159,28 +159,58 @@ def gen_thermo(d):
 
 
 def gen_backtest(d):
-    """回测卡：PE<10 买入后持有 60/120/250 日 胜率 + 阈值敏感性"""
+    """回测卡：PE<10 买入后持有 60/120/250 日 胜率 + 阈值敏感性
+
+    🔴 2026-09-13 主人令「回测入场口径统一为信号日次一交易日开盘」：
+      原实现在**信号当日收盘价**买入 ⇒ 前视偏差 —— PE(TTM) 是当日收盘后才算出的，
+      当日收盘价在决策时不可得（与本卡同页的四量/CRDS/三重共识口径也不一致）。
+      现改为：**信号后次一交易日开盘价买入**，出场为持有期最后一日的收盘价。
+      与主站其余回测同口径 ⇒ 跨卡可横比。
+      数据源须带 `o`（open，2026-09-13 起 fetch_citic_pe.py 已补）；
+      个别行缺 open 时回退该日收盘价，并计数上报（绝不静默改口径）。
+    """
     rows = d["data"]
-    pe_series = [(r["d"], r["pe"], r["c"]) for r in rows if r.get("pe") is not None and r.get("c") is not None]
+    # 序列四元组：(日期, PE, 开盘价 o, 收盘价 c)
+    pe_series = [(r["d"], r["pe"], r.get("o"), r["c"])
+                 for r in rows if r.get("pe") is not None and r.get("c") is not None]
+    _fb = {"open_missing": 0}   # 缺 open 回退计数（写进产物，可审计）
+
+    def _entry(i):
+        """信号 i → (入场索引, 入场价)。严格取**次一交易日开盘**；越界返回 (None, None)。"""
+        ei = i + 1
+        if ei >= len(pe_series):
+            return None, None
+        _o = pe_series[ei][2]
+        try:
+            _o = float(_o) if _o is not None else None
+        except (TypeError, ValueError):
+            _o = None
+        if _o is None or _o <= 0:
+            _fb["open_missing"] += 1
+            return ei, float(pe_series[ei][3])
+        return ei, _o
 
     def run_threshold(threshold, hold_days):
-        """对每一日，PE<threshold 视为买入信号，持有 hold_days 日"""
+        """对每一日，PE<threshold 视为买入信号，**次日开盘买入**，持有 hold_days 个交易日"""
         n = 0
         wins = 0  # 持有期末收益 > 0
         ret_list = []
         max_dd = 0  # 持有期内最大回撤
-        for i, (d0, pe0, c0) in enumerate(pe_series):
-            if pe0 < threshold and i + hold_days < len(pe_series):
-                c_end = pe_series[i+hold_days][2]
-                ret = (c_end / c0 - 1) * 100
+        for i, (d0, pe0, _o0, c0) in enumerate(pe_series):
+            if pe0 < threshold:
+                ei, e_px = _entry(i)
+                if ei is None or ei + hold_days >= len(pe_series):
+                    continue
+                c_end = pe_series[ei + hold_days][3]
+                ret = (c_end / e_px - 1) * 100
                 ret_list.append(ret)
                 n += 1
                 if ret > 0: wins += 1
-                # 持有期内最大回撤
+                # 持有期内最大回撤（自入场日算起）
                 mdd = 0
-                peak = c0
-                for j in range(i, min(i+hold_days+1, len(pe_series))):
-                    p = pe_series[j][2]
+                peak = e_px
+                for j in range(ei, min(ei+hold_days+1, len(pe_series))):
+                    p = pe_series[j][3]
                     peak = max(peak, p)
                     dd = (p/peak - 1) * 100
                     mdd = min(mdd, dd)
@@ -208,23 +238,30 @@ def gen_backtest(d):
             result[f"pe<{th}"][f"hold_{hd}d"] = r
 
     # 找出"PE<10 + 持有 250 日"的具体信号列表（详细展示前 6 条）
+    #   2026-09-13：入场同步改为**次一交易日开盘** —— 同时展示 entry_date / entry_price。
+    #   原展示信号日收盘价，那是回测里**买不到**的价格，展示出来会误导。
     signal_list = []
-    for i, (d0, pe0, c0) in enumerate(pe_series):
-        if pe0 < 10 and i + 250 < len(pe_series):
-            c_end = pe_series[i+250][2]
-            ret = round((c_end / c0 - 1) * 100, 1)
-            # 持有期内最大回撤
+    for i, (d0, pe0, _o0, c0) in enumerate(pe_series):
+        if pe0 < 10:
+            ei, e_px = _entry(i)
+            if ei is None or ei + 250 >= len(pe_series):
+                continue
+            c_end = pe_series[ei+250][3]
+            ret = round((c_end / e_px - 1) * 100, 1)
+            # 持有期内最大回撤（自入场日算起）
             mdd = 0
-            peak = c0
-            for j in range(i, min(i+251, len(pe_series))):
-                p = pe_series[j][2]
+            peak = e_px
+            for j in range(ei, min(ei+251, len(pe_series))):
+                p = pe_series[j][3]
                 peak = max(peak, p)
                 dd = (p/peak - 1) * 100
                 mdd = min(mdd, dd)
             signal_list.append({
                 "date": d0,
                 "pe": round(pe0, 2),
-                "price": round(c0, 2),
+                "entry_date": pe_series[ei][0],
+                "price": round(e_px, 2),          # 入场价 = 次一交易日开盘
+                "signal_close": round(c0, 2),     # 信号日收盘（仅参考，非成交价）
                 "ret_250d_pct": ret,
                 "max_dd_pct": round(mdd, 1),
                 "end_price": round(c_end, 2),
@@ -252,13 +289,16 @@ def gen_backtest(d):
 
     out = {
         "update_time": dt.datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "method": "中信证券 PE TTM < 阈值 当日收盘价买入 → 持有 60/120/250 交易日 → 当日收盘价卖出",
+        "method": "中信证券 PE TTM < 阈值当日为信号日 → **次一交易日开盘价买入** → 持有 60/120/250 交易日 → 末日收盘价卖出（与主站其余回测同口径）",
         "data_range": [d["start_date"], d["end_date"]],
         "data_source": "baostock sh.600030 PE TTM 日线",
         "signals_pe10_total": pe10_250["n"] if pe10_250 else 0,
         "result": result,
         "signal_list_pe10_hold250": signal_list,
         "insights": insights,
+        # 🆕 2026-09-13 口径自证字段（可审计，不靠文案声称）
+        "entry_rule": "next_open",
+        "entry_fallback_n": _fb["open_missing"],   # 缺 open 回退收盘价的样本数（0 = 全量真开盘价）
         "note": "未计交易成本/分红再投。回测对象：中信证券个股，未做对冲。统计置信度受样本数限制。",
     }
     return out

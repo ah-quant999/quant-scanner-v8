@@ -349,7 +349,14 @@ def parse_comprehensive(src, obj):
                        "max_drawdown": _num(per.get("max_drawdown")),
                        "sharpe": _num(per.get("sharpe_ratio")),
                        "median_return": _num(per.get("median_return")),
-                       "decided": _int(per.get("decided"))},
+                       "decided": _int(per.get("decided")),
+                       # 🆕 2026-09-13 主人令「统一测算标准·ret_hold 接线」：
+                       #   09-12 新增的**严格持有口径**（忽略中途 stop/target，持到第 hp
+                       #   个交易日收盘）此前只写明细、产物/聚合/前端三层全无 ⇒ 功能空转。
+                       #   现随旧口径并列下发；缺字段/零样本一律 None（禁止 0 冒充）。
+                       "win_rate_hold": _num(per.get("win_rate_hold")),
+                       "avg_return_hold": _num(per.get("avg_return_hold")),
+                       "count_hold": _int(per.get("count_hold"))},
                 primary=is_primary,
             ))
     return rows
