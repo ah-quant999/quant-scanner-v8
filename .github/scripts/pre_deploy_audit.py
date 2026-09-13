@@ -267,6 +267,77 @@ def write_audit_log(results, exit_code):
         pass
 
 
+
+def check_gate_headnote():
+    """[7/7] 闸门模块头注 vs READY_SPEC 真源一致性（2026-09-14 新增）。
+
+    为什么需要：头注漂移不影响运行时裁决，但会污染下一轮审计的前提 ——
+    小九 bd5349de1 §4.3 发现头注写「must 含 AVG_PRICE_DATA」而真源不含，
+    这正是 P0（7 项不存在产物致 A 批永久锁死）的认知根因在头注上重演。
+
+    只校验可机器精确判定的三项：项数、门槛(need)、AVG_PRICE_DATA 不得列在 must 侧。
+    不做产物名名单比对 —— 头注用中文别名、真源用英文名，名单比对必误报（v1/v2 实测）。
+    """
+    import ast
+    gate = ROOT / ".github" / "scripts" / "v8_stage_gate.py"
+    if not gate.exists():
+        return True, "闸门文件不存在（跳过）"
+    try:
+        src = gate.read_text(encoding="utf-8")
+        tree = ast.parse(src)
+    except Exception as e:
+        return False, "闸门解析失败: %s" % e
+
+    spec = None
+    for node in ast.walk(tree):
+        tgts = node.targets if isinstance(node, ast.Assign) else (
+            [node.target] if isinstance(node, ast.AnnAssign) else [])
+        for t in tgts:
+            if isinstance(t, ast.Name) and t.id == "READY_SPEC":
+                try:
+                    spec = ast.literal_eval(node.value)
+                except Exception:
+                    pass
+    if not isinstance(spec, dict):
+        return False, "未能从闸门抽出 READY_SPEC（真源缺失）"
+
+    head = ast.get_docstring(tree) or ""
+    if not head:
+        return False, "闸门模块无 docstring（头注缺失）"
+
+    fails = []
+    for key, label in [("A", "A 采集批"), ("B", "B 选股批"), ("E", "E 回测批")]:
+        st = spec.get(key) or {}
+        items = st.get("items") or []
+        need = st.get("need")
+        must = st.get("must") or []
+
+        head_line = ""
+        for ln in head.splitlines():
+            if ln.strip().startswith(label):
+                head_line = ln
+                break
+        if not head_line:
+            continue
+
+        # (1) 项数
+        m = re.search(r"(\d+)\s*项", head_line)
+        if m and int(m.group(1)) != len(items):
+            fails.append("%s 头注项数 %s != 真源 %d" % (label, m.group(1), len(items)))
+        # (2) 门槛
+        m = re.search(r"[≥>=]+\s*(\d+)\s*项", head_line)
+        if m and need is not None and int(m.group(1)) != need:
+            fails.append("%s 头注门槛 >=%s != 真源 need %s" % (label, m.group(1), need))
+        # (3) P0 专项：AVG_PRICE_DATA 不得出现在 must 侧
+        must_txt = " ".join(p.split("/")[-1].rsplit(".", 1)[0] for p in must)
+        if "must" in head_line and "AVG_PRICE_DATA" in head_line:
+            if "AVG_PRICE_DATA" not in must_txt:
+                fails.append("%s 头注 must 侧提到 AVG_PRICE_DATA，真源 must 不含"
+                             "（P0 方向性错误：放回 must 会致该批永久锁死）" % label)
+    if fails:
+        return False, "；".join(fails[:4])
+    return True, "闸门头注与 READY_SPEC 真源一致（项数/门槛/P0 专项）"
+
 def main():
     checks = [
         ("[1/6] py_compile", check_py_compile),
@@ -275,9 +346,10 @@ def main():
         ("[4/6] align_logic_ops", check_align_logic_ops),
         ("[5/6] workflow YAML", check_workflow_yaml),
         ("[6/6] HTML 数据引用", check_html_refs),
+        ("[7/7] gate 头注一致", check_gate_headnote),
     ]
     print("=" * 60)
-    print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；2026-09-13 扩至 6 项）")
+    print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；2026-09-13 扩至 6 项；2026-09-14 扩至 7 项）")
     print("=" * 60)
     fails = 0
     results = []
@@ -296,7 +368,7 @@ def main():
         for e in errors:
             print(f"  - {e}")
         sys.exit(1)
-    print("🎉 6 项全部通过 → deploy 可继续")
+    print("🎉 7 项全部通过 → deploy 可继续")
     sys.exit(0)
 
 
