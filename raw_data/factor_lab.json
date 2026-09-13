@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-12 21:12:46",
+  "update_time": "2026-09-13 15:57:00",
   "data_date": "2026-09-11",
   "meta": {
     "data_date": "2026-09-11",
@@ -8,7 +8,7 @@
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
     "n_universe": 766,
     "n_at_valid": 830,
-    "n_roe_large": 654,
+    "n_roe_large": 663,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
     "roe_universe": "全市场主板"
@@ -770,6 +770,27 @@
         "roe_equity": 4600945698.0
       },
       {
+        "code": "sz.003010",
+        "name": "若羽臣",
+        "close": 28.75,
+        "close_date": "2026-09-11",
+        "liquid": true,
+        "roe_ttm": 36.04,
+        "size_proxy": 268859194.1,
+        "asof_q": "2026Q3",
+        "roe_ver": 4,
+        "roe_ok": true,
+        "roe_gate": "",
+        "roe_singles": [
+          0.036983,
+          0.102283,
+          0.095765,
+          0.125406
+        ],
+        "roe_n_neg": 0,
+        "roe_equity": 757122675.0
+      },
+      {
         "code": "sh.601899",
         "name": "紫金矿业",
         "close": 32.26,
@@ -1083,27 +1104,6 @@
         ],
         "roe_n_neg": 0,
         "roe_equity": 19921260924.0
-      },
-      {
-        "code": "sh.603986",
-        "name": "兆易创新",
-        "close": 371.32,
-        "close_date": "2026-09-11",
-        "liquid": true,
-        "roe_ttm": 30.23,
-        "size_proxy": 25878494402.8,
-        "asof_q": "2026Q3",
-        "roe_ver": 4,
-        "roe_ok": true,
-        "roe_gate": "",
-        "roe_singles": [
-          0.028332,
-          0.030384,
-          0.065999,
-          0.177619
-        ],
-        "roe_n_neg": 0,
-        "roe_equity": 28261454486.0
       }
     ]
   }
