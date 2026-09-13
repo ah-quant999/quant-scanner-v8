@@ -62,6 +62,17 @@ HOLD_LADDER = [5, 10, 20, 30, 45, 60, 75, 90, 180, 250]
 HOLD_DAYS = [1, 3] + HOLD_LADDER  # 2026-07-26 基线 [1,3,5,10,20]；2026-09-12 扩档
 TDX_BARS = 520  # 覆盖 250 交易日持有 + 信号检测自身窗口（2026-09-13 主人令：90→250 档，260→520）
 
+# 🔴 2026-09-13 主人令「统一测算标准 · 回测入场口径统一」——**口径版本号**（小九审计修复）
+#   背景：本脚本有**明细级断点续跑缓存**（见下方 `if key in stock_results`）——
+#   已回测过的股票直接 `continue` 跳过，只补新股票。于是 09-13 把入场口径从
+#   「信号日收盘」改成「次一交易日开盘」后，**既有 221 只股票一条都不会重算**，
+#   summary 与旧产物逐字相同（实测：改完重跑，total/胜率/收益全部一模一样）
+#   ⇒ 口径统一对 TDX 主数据完全失效 = 「改了但没生效」的隐性形态。
+#   修法：把口径版本写进明细，版本不匹配即整只重算 —— 以后每次口径变更只改这一个数字。
+#     1 = 信号日收盘价买入（2026-09-13 之前的旧口径）
+#     2 = 信号日次一交易日开盘买入（当前口径）
+ENTRY_CALIBER_VER = 2
+
 # 2026-09-06 主人令 P1-A：A 股交易成本默认假设（单边 万分之1.5，双边 0.3%）
 COST_BPS = 15
 
@@ -504,17 +515,25 @@ def main():
         mkt = s.get("market", "")
         name = s.get("name", key)
         
-        # 跳过已处理的（缓存），但若旧数据缺少新增周期字段则重新计算
+        # 跳过已处理的（缓存），但若旧数据缺少新增周期字段 / **口径版本不符** 则重新计算
         if key in stock_results:
-            old_sigs = stock_results[key].get("signals") or {}
+            _old = stock_results[key]
+            old_sigs = _old.get("signals") or {}
             has_all_periods = bool(old_sigs) and all(
                 f"ret_{d}d" in next(iter(old_sigs.values()), {}) and f"raw_ret_{d}d" in next(iter(old_sigs.values()), {})
                 for d in HOLD_DAYS
             )
-            if has_all_periods:
+            # 🔴 2026-09-13 小九审计修复：口径版本校验。原判据只看「周期字段齐不齐」，
+            #   故改成「次日开盘买入」后旧明细（信号日收盘口径）会被判为合格而整只跳过
+            #   ⇒ 主数据口径不统一且无人察觉。现版本不符即整只重算。
+            same_caliber = (_old.get("entry_caliber_ver") == ENTRY_CALIBER_VER)
+            if has_all_periods and same_caliber:
                 log(f"  跳过 {name}({key}) — 已有回测")
                 continue
-            log(f"  重算 {name}({key}) — 补齐新周期")
+            if has_all_periods and not same_caliber:
+                log(f"  重算 {name}({key}) — 入场口径由 v{_old.get('entry_caliber_ver')} 升到 v{ENTRY_CALIBER_VER}")
+            else:
+                log(f"  重算 {name}({key}) — 补齐新周期")
         
         setcode = setcode_map.get(mkt, "0")
         rows = tdx_kline(code, setcode, count=TDX_BARS)  # 🛡 2026-09-12 扩档：60 → 260
@@ -575,6 +594,8 @@ def main():
             "date_range": f"{rows[0]['date']}~{rows[-1]['date']}",
             "kline_days": n,
             "days_with_signals": len(stock_signals),
+            # 🆕 2026-09-13：入场口径版本 —— 断点续跑据此判定是否需要整只重算（见顶部常量）
+            "entry_caliber_ver": ENTRY_CALIBER_VER,
             "signals": stock_signals,
         }
         signal_days = len(stock_signals)
