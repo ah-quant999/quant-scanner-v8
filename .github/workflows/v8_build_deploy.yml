@@ -300,11 +300,18 @@ jobs:
             #   仅列历史累加型文件，避免把 kline 等缓存塞进仓库。
             # 🛡 2026-09-02 一劳永逸根因修复（?v 缓存戳防线·提交前守卫）：
             #   上方 update_v8.py 已重写 ?v，但 BUILD 戳注入/护栏步骤不碰 ?v，故此处再跑一次
-            #   --only-cache-busters 确保「即将提交的 index.html ?v」与「即将提交的 data/*.js 实际
-            #   内容」严格一致；随后核验，若仍失配则强制再重写一次。即便本 build 因 push 组
-            #   cancel-in-progress 被取消，v8_cache_buster_reconcile 也会在 15 分钟内兜底纠正，双保险。
+            #   --only-cache-busters 确保 ?v 是**本轮构建的 unix 秒令牌**。
+            #   🔴 2026-09-13 判据更正（阿狸咪的工程师）：原核验比对 `sha1(内容)[:10] == ?v`，
+            #     但 update_v8.py 自 2026-09-10 起已把 ?v 改为**单调 unix 秒令牌**
+            #     （原内容哈希在「数据被回滚到旧内容」时哈希不变 ⇒ 浏览器永久吐旧副本，故废弃）。
+            #     核验判据未同步 ⇒ **恒报「?v 仍失配」并白跑一次兜底**（实测 run 34763191682
+            #     success 仍复现 97 项）—— 属「假 failure」：不阻断部署，却会让审计者误判为真故障。
+            #     现改为核验令牌**形态**（纯数字 unix 秒）；若出现 16 进制 sha1 形态 = 旧口径
+            #     写入者回潮 ⇒ 报警并重写一次。
+            #   即便本 build 因 push 组 cancel-in-progress 被取消，v8_cache_buster_reconcile
+            #   也会在 15 分钟内兜底纠正，双保险。
             python update_v8.py --only-cache-busters
-            python -c "import re,hashlib,pathlib; idx=pathlib.Path('index.html').read_text(encoding='utf-8'); bad=[(s,v) for s,v in re.findall(r'data/([A-Z0-9_]+)\.js\?v=([0-9a-f]{1,40})',idx) if (lambda p: p.exists() and hashlib.sha1(re.sub(r'\"republish_time\"\s*:\s*\"[^\"]*\"','\"republish_time\":\"\"',p.read_text(encoding='utf-8')).encode()).hexdigest()[:10]!=v)(pathlib.Path('data')/(s+'.js'))]; print('❌ ?v 仍失配',bad) if bad else print('✅ 提交前核验：index.html 全部 ?v 与 data/*.js 实际内容一致'); (lambda: __import__('subprocess').run(['python','update_v8.py','--only-cache-busters'],check=True) if bad else None)()"
+            python -c "import re,pathlib,collections,subprocess; idx=pathlib.Path('index.html').read_text(encoding='utf-8'); m=re.findall(r'data/[A-Z0-9_]+\.js\?v=([0-9a-zA-Z]{1,40})',idx); bad=sorted(set(v for v in m if not v.isdigit())); c=collections.Counter(m); print('::warning::?v 出现非 unix 秒令牌(旧内容哈希口径回潮): '+str(bad[:8])) if bad else print('OK 提交前核验: '+str(len(m))+' 个 ?v 均为 unix 秒令牌, token='+c.most_common(1)[0][0]+' x'+str(c.most_common(1)[0][1])); subprocess.run(['python','update_v8.py','--only-cache-busters'],check=True) if bad else None"
             # 🛡 安全：先把任何落入 data/ 的密钥/令牌文件从索引移除，避免一并由 git add 提交到
             #   公开仓库（git add 不会自动 unstage 已跟踪的敏感文件；此前 -f 曾把 .mahoro_cookies.txt 等强制入库）。
             git rm --cached --ignore-unmatch \
