@@ -191,6 +191,50 @@ def check_workflow_yaml():
     return (True, "%d 个 workflow 全部有效（%s）" % (len(files), tag))
 
 
+def check_html_refs():
+    """HTML 的本地 <script src> 引用必须真实存在（防「删数据漏改引用」复发）。
+
+    🔴 2026-09-13 P1 血泪（阿狸咪逐字节复核实证）：小九两次「前端零引用死数据」
+    清理（9a27eca71 砍 6 项 / 2026-09-11 停用 algo_backtest_compare）**只扫了
+    index.html、漏扫 logic.html** ⇒ 三个真 404 长期挂在线上：
+
+        index.html : data/hb_xiaojiu.js（大小写错，实产 HB_XIAOJIU.js）
+        logic.html : data/ETF_SUBSCRIPTION_EM.js
+        logic.html : data/ALGO_BACKTEST_COMPARE.js
+
+    这类断链 py_compile 查不出、new Function 查不出、data 完整性查不出
+    （文件本来就不该存在）、YAML 更查不出 —— 只有本项能拦。
+    故 2026-09-13 新增为第 6 项硬门禁。
+
+    纯标准库实现（守本文件「零依赖可用」铁律）。
+    """
+    pages = ["index.html", "logic.html", "calendar.html", "v6_memo.html"]
+    pat = re.compile(r"""<script[^>]*\bsrc=["']([^"']+)["']""", re.IGNORECASE)
+    checked, missing = 0, []
+    for page in pages:
+        fp = ROOT / page
+        if not fp.exists():
+            continue
+        try:
+            html = fp.read_text(encoding="utf-8", errors="replace")
+        except Exception as e:
+            missing.append("%s: 读取失败 %s" % (page, e))
+            continue
+        for src in pat.findall(html):
+            if src.startswith(("http://", "https://", "//", "data:")):
+                continue
+            local = src.split("?")[0].split("#")[0].strip()
+            if not local or local.startswith("/"):
+                continue          # 站外/绝对路径不判
+            checked += 1
+            if not (ROOT / local).exists():
+                missing.append("%s -> %s" % (page, local))
+    if missing:
+        uniq = sorted(set(missing))
+        return (False, "发现 %d 处 404 断链（引用文件不存在）:\n    " % len(uniq)
+                + "\n    ".join(uniq[:8]))
+    return (True, "%d 个本地 script 引用全部存在（4 页）" % checked)
+
 def write_audit_log(results, exit_code):
     """落盘三件套审计轨迹到 raw_data/code_audit.log（append）。
     让「何时/谁跑过三件套」有据可查。*.log 已被 .gitignore 忽略 → 不入库、不污染工作树。
@@ -219,14 +263,15 @@ def write_audit_log(results, exit_code):
 
 def main():
     checks = [
-        ("[1/5] py_compile", check_py_compile),
-        ("[2/5] new Function", check_new_function),
-        ("[3/5] data 完整性", check_data_integrity),
-        ("[4/5] align_logic_ops", check_align_logic_ops),
-        ("[5/5] workflow YAML", check_workflow_yaml),
+        ("[1/6] py_compile", check_py_compile),
+        ("[2/6] new Function", check_new_function),
+        ("[3/6] data 完整性", check_data_integrity),
+        ("[4/6] align_logic_ops", check_align_logic_ops),
+        ("[5/6] workflow YAML", check_workflow_yaml),
+        ("[6/6] HTML 数据引用", check_html_refs),
     ]
     print("=" * 60)
-    print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项）")
+    print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；2026-09-13 扩至 6 项）")
     print("=" * 60)
     fails = 0
     results = []
@@ -245,7 +290,7 @@ def main():
         for e in errors:
             print(f"  - {e}")
         sys.exit(1)
-    print("🎉 5 项全部通过 → deploy 可继续")
+    print("🎉 6 项全部通过 → deploy 可继续")
     sys.exit(0)
 
 
