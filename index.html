@@ -541,7 +541,6 @@ window.__domReadyFns=[];
     <script src="data/CRISIS_DATA.js?v=1789280090" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=1789280090" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=1789280090" defer></script>
-    <script src="data/STOCK_RPS_DATA.js?v=1789277692" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
     <script src="data/H_AUTO_BUY.js?v=1789280090" defer></script>
@@ -1625,7 +1624,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 🆕 2026-09-04 强势突破选股（高手算法反推版 v1，strong_breakout.py 盘后产出） -->
     <script src="data/STRONG_BREAKOUT.js?v=1789280090" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=1789280090" defer></script>
-    <script src="data/RPS_BACKTEST.js?v=1789277692" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
 <script src="data/BACKTEST_ALL_ALGOS.js?v=1789280090" defer></script>
 <!-- 🧮 2026-09-13 主人令「只要接入算法链的选股策略，都要有回测」：候选池 / 黄金池
@@ -4252,7 +4250,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   function _esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
   // 🛡 2026-09-11 小九的工程师：IIFE 顶层补 _e 转义助手。
   //   根因：_e 此前仅在 5094/5220/5367 三处【内层作用域】局部定义，
-  //   而 window.__renderRpsAudit 位于 IIFE 顶层作用域，拼字符串时引用 _e
+  //   而部分顶层渲染函数（如 window.__renderJudgmentHeader）位于 IIFE 顶层作用域，拼字符串时引用 _e
   //   → ReferenceError: _e is not defined → dst.innerHTML 那行从未执行
   //   → 卡片永久停在静态占位符「加载中…」（异常又被外层 catch 静默吞掉）。
   function _e(s){ return _esc(s); }
@@ -5065,9 +5063,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         { key:'crds', name:'逆势龙头CRDS', icon:'🐉', color:'#ef4444',
           method:'CRDS advanced 档历史回测（前复权·扣双边 0.3%）：信号日取真实下一交易日开盘买入，持有 N 个真实交易日收盘价卖出（节假日自动跳过）。',
           def:'胜率=win/(win+loss) 排平盘；最大回撤=该期内全局峰谷。<br><b style="color:#ef5350;">⚠️ 历史回测样本极少（advanced档 n=4），统计意义有限；当前每日盘后仍生成 elite/advanced/watch 信号，作弱市观察工具使用。</b>' },
-        { key:'rps', name:'相对强度RPS', icon:'📐', color:'#10b981',
-          method:'RPS A档历史回测（前复权·扣双边 0.3%）：观测非主推档，A档仅用作信号质量观测，不参与选股推荐。',
-          def:'胜率=win/(win+loss) 排平盘；最大回撤=该期内全局峰谷；样本<30 时仅观测不计入排名。' },
       ];
       // P2-A：低样本判定阈
       var SAMPLE_LOW_THRESHOLD = 30;
@@ -6729,6 +6724,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       if(window.__aicRetry < 25){ window.__aicRetry++; setTimeout(window.__renderAiInsightsCompare, 600); return; }
       dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F52E; AI 洞察对比 数据未到位</div>';
       return;
+    }
     function renderScale(per){
       var w = Math.max(2, Math.round(per * 100));
       var c = per >= 0.6 ? '#ef5350' : (per >= 0.4 ? '#fbbf24' : '#26a69a');
@@ -6813,7 +6809,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   // 数据源：raw_data/factor_progress.json（由 gen_factor_progress.py 根据 FACTOR_AUDIT + 主人分批决策生成）
   window.__fpRetry = 0;
 
-  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderBtExtraPane(); }catch(e){} try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderMacroPane(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderRpsAudit(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeThermo(); }catch(e){} try{ window.__renderCiticPeBacktest(); }catch(e){} try{ window.__renderValuationPercentile(); }catch(e){} try{ window.__renderFactorAudit(); }catch(e){} try{ window.__renderIndexValueFramework(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} }
+  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderBtExtraPane(); }catch(e){} try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderMacroPane(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeThermo(); }catch(e){} try{ window.__renderCiticPeBacktest(); }catch(e){} try{ window.__renderValuationPercentile(); }catch(e){} try{ window.__renderFactorAudit(); }catch(e){} try{ window.__renderIndexValueFramework(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
   } else {
@@ -14232,8 +14228,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   window.__renderBtExtraPane = function(){
     var hm = '';
 hm += '<div id="ulPaneBacktest">';
-// 2026-09-12 主人令：RPS 相对强度「30 天样本考核」卡归回测·框架类（数据链 E 批每日续跑，不参与选股评分权重）
-hm += '<div class="card" id="rpsAuditBody" style="margin-bottom:16px;border-left:4px solid #94a3b8;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; 相对强度 RPS · 30 天样本考核 加载中&#x2026;</div></div>';
 // 2026-09-12 主人令：中信 PE<10 历史回测卡（回测类·个股）
 hm += '<div class="card" id="citicPeBacktestBody" style="margin-bottom:16px;border-left:4px solid #60a5fa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4CA; 中信 PE&lt;10 历史回测 加载中&#x2026;</div></div>';
 // 2026-09-12 主人令：A股指数价格中枢+趋势门控框架迁移（框架类·大盘/指数）
@@ -14243,7 +14237,6 @@ hm += '</div>'; // /ulPaneBacktest
     if(_host) _host.innerHTML = hm;
     // 🔴 2026-09-12 补漏：骨架入 DOM 后必须就地填充（原先这三个填充调用只留在
     //   renderUnlisted 里，宿主迁走后不再被触发 → 三卡恒「加载中」）
-    try{ if(typeof window.__renderRpsAudit==='function') window.__renderRpsAudit(); }catch(e){ console.warn('RPS考核卡渲染失败', e); }
     try{ if(typeof window.__renderCiticPeBacktest==='function') window.__renderCiticPeBacktest(); }catch(e){ console.warn('中信PE回测卡渲染失败', e); }
     try{ if(typeof window.__renderIndexValueFramework==='function') window.__renderIndexValueFramework(); }catch(e){ console.warn('指数估值中枢卡渲染失败', e); }
   };
@@ -14638,9 +14631,6 @@ window.__renderV8CalToday();
   // 选股策略 tab 上的 6 张算法卡（非 query/tc/crds 的都有 lazy render，需要显式激活）
   tryRun('renderFourVolume', (typeof window.renderFourVolume==='function')?window.renderFourVolume:null, 'fv-badge init');
   tryRun('renderV8Crds-st',  (typeof window.renderV8Crds==='function')?function(){window.renderV8Crds('st');}:null, 'crds-badge init');
-  /* 🛡 2026-09-13：原此处 tryRun('renderRpsScreen'/'renderRpsBacktest')。
-     两函数已于 2026-08-30 按主人令删除（renderRpsBacktest 属模拟非真实回测；renderRpsScreen 宿主卡已删），
-     typeof 守卫虽不报错，但每次加载刷 2 条 warning 噪声 ⇒ 一并移除。 */
   // 今日事件「今日判定」卡头+内容（脚本块位于 v8CardHeader 定义之前，只能延后到此处渲染）
   tryRun('renderJudgmentHeader', window.__renderJudgmentHeader, 'judgment-header init');
   tryRun('renderJudgmentBody', window.__renderJudgmentBody, 'judgment-body init');
@@ -14664,15 +14654,14 @@ window.__renderV8CalToday();
       }catch(e){ console.warn('[judgment DOMContentLoaded retry]', e); }
     }
     if(document.readyState === 'loading'){
-      document.addEventListener('DOMContentLoaded', function(){ doV8CalRetry(); doJdRetry(); doRpsRetry(); });
+      document.addEventListener('DOMContentLoaded', function(){ doV8CalRetry(); doJdRetry(); });
     } else {
       doV8CalRetry();
       doJdRetry();
-      doRpsRetry();
     }
     // 额外再拍一次：defer 脚本可能在 DOMContentLoaded 之后才全部跑完
-    setTimeout(function(){ doV8CalRetry(); doJdRetry(); doRpsRetry(); }, 400);
-    setTimeout(function(){ doV8CalRetry(); doJdRetry(); doRpsRetry(); }, 1200);
+    setTimeout(function(){ doV8CalRetry(); doJdRetry(); }, 400);
+    setTimeout(function(){ doV8CalRetry(); doJdRetry(); }, 1200);
   }
   // 实时数据区：情绪周期·连板天梯（迁到涨停热力矩阵上方）
   tryRun('renderCycleLadderCard', window.__renderCycleLadderCard, 'cycle-ladder init');
@@ -14823,20 +14812,6 @@ window.__renderV8CalToday();
     (s.sources||[]).forEach(function(src){ h+='<span class="fr-chip src">'+_fe(src)+'</span>'; });
     if(Number(s.sector_score||0)>0){
       h+='<span class="fr-chip" style="background:rgba(251,191,36,.12);color:var(--gold);border-color:rgba(251,191,36,.25)">📊 板块 +'+(s.sector_score||0).toFixed(1)+'</span>';
-    }
-    // 个股 RPS/RS 标签（2026-08-08 新增）
-    // 🔴 2026-08-13 主人紧急修复：跨 IIFE ReferenceError (同 _renderMainlinePicks 案例)
-    //   _buildRpsMap 定义在 IIFE 11004-11454,stockCard 在 IIFE 11676-12041
-    //   之前直接调 _buildRpsMap() ReferenceError → renderFinalRec 整体崩 → 顶部 nav 加载中
-    //   修复:window 前缀(挂全局)+ try/catch 兜底
-    //   2026-09-13 主人令：补函数存在性守卫（_buildRpsMap 定义在 logic.html，
-    //     index.html 并无此函数 → 每次渲染抛 TypeError。与 L15074 写法对齐，消除全站告警）。
-    var rpsMap={};
-    try{ rpsMap=window.__rpsMapByCode||(window.__rpsMapByCode=(window._buildRpsMap?window._buildRpsMap():{})); }catch(e){ console.warn('[stockCard] rpsMap 失败', e); }
-    var rpsRec=rpsMap[(s.code||'')];
-    if(rpsRec && rpsRec.rps_max!=null){
-      var rpsColor=rpsRec.tier==='A'?'#22c55e':rpsRec.tier==='B'?'#3b82f6':'#eab308';
-      h+='<span class="fr-chip" style="background:'+rpsColor+'1a;color:'+rpsColor+';border-color:'+rpsColor+'40">📈 RPS '+rpsRec.rps_max.toFixed(0)+' '+rpsRec.tier+' · RS '+((rpsRec.rs||0)>0?'+':'')+(rpsRec.rs||0).toFixed(1)+'</span>';
     }
     h+='</div>';
 
@@ -15104,12 +15079,6 @@ window.__renderV8CalToday();
       if(isHK) tags+='<span class="no-shrink"  style="display:inline-block;padding:2px 7px;border-radius:999px;background:#64748b22;color:#94a3b8;border:1px solid #64748b40;font-size:10px;font-weight:600;white-space:nowrap">数据待补</span>';
       if(s.industry) tags+=_mkTag(s.industry, '#64748b');
       (s.concepts||[]).slice(0,8).forEach(function(c){ tags+=_mkTag(c, '#38bdf8'); });  /* 2026-09-03 主人令：后缀标签 4→8 */
-      // 2026-09-03 主人令：RPS 相对强度评分（新分析角度·带分）
-      try{
-        var _rmap = window.__rpsMapByCode || (window.__rpsMapByCode = window._buildRpsMap ? window._buildRpsMap() : {});
-        var _rr = _rmap[String(s.code)||''];
-        if(_rr && _rr.rps_max!=null) tags+='<span class="no-shrink" style="display:inline-block;padding:2px 7px;border-radius:999px;background:rgba(20,184,166,.15);color:#14b8a6;border:1px solid rgba(20,184,166,.4);font-size:11px;font-weight:700;white-space:nowrap" title="相对强度 RPS 段位：'+_fe(_rr.tier||'')+'">📈 RPS '+_rr.rps_max.toFixed(0)+'</span>';
-      }catch(_e){}
       // 2026-09-01 主人令：🆕 多 algo 共识加权（3/3→+5、2/3→+3、1/3→+1）→ 蓝色 chip 显示在 tags 行
       try{
         var _ai = _algoIndex[String(s.code)||''];

@@ -716,7 +716,6 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/CRISIS_DATA.js?v=d5eff40132" defer></script>
   <script src="data/JUDGMENT_DATA.js?v=2f9f5ef94a" defer></script>
   <script src="data/OVERSEAS_MARKETS.js?v=3476e4e890" defer></script>
-  <script src="data/STOCK_RPS.js?v=01c70ca90f" defer></script>
   <script src="data/H_AUTO_BUY.js?v=66d7974bc3" defer></script>
   <script src="data/H_AUTO_BUY_TRACK.js?v=45339f2662" defer></script>
   <script src="data/UNLISTED_PANEL.js?v=cbb45ec824" defer></script>
@@ -757,7 +756,6 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <!-- 选股策略模块回测源（供「各选股策略回测汇总」读取） -->
   <script src="data/FOUR_VOLUME_BACKTEST.js?v=7b774c251c" defer></script>
   <script src="data/CRDS_BACKTEST.js?v=318fde1812" defer></script>
-  <script src="data/RPS_BACKTEST.js?v=73b38c0682" defer></script>
   <script src="data/EXPERIMENT.js?v=0eb4075617" defer></script>
   <script src="data/FINAL_RECOMMEND_DATA.js?v=bb2d45b606" defer></script>
   <script src="data/V8_POOL_TRACKER.js?v=c3a084a1cd" defer></script>
@@ -1523,10 +1521,9 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td>2</td><td>🥇 三重共识</td><td>主站TOP10精选 ∩ 基本面A档（2 重过滤）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐⭐</b> 最严</td></tr>
           <tr><td>3</td><td>🔥 四量终极</td><td>游资点火+机构托底+当天金叉+四路翻多（4 重共振 + 5 年回测）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐</b></td></tr>
           <tr><td>4</td><td>🧬 选股生命周期</td><td>逐日累积快照跟踪（入池→持仓→走弱→剔除），与选股策略子页一致口径</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
-          <tr><td>5</td><td>📈 相对强度</td><td>个股 RPS 百分位(50/120/250日) + 曼斯菲尔德 RS + 250日年线门禁（排名/筛选层）</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
-          <tr><td>6</td><td>📊 逆势龙头</td><td>CRDS（弱市专用）</td><td><span style="font-size:10px;color:#94a3b8;font-weight:500;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span></td></tr>
-          <tr><td>7</td><td>⚡ 强势突破</td><td>高手算法反推 v1（涨幅≥5% + 量比≥1.35 + 收位≥0.55），core 前 30</td><td><span style="font-size:10px;color:#60a5fa;font-weight:500;background:rgba(96,165,250,.12);padding:1px 6px;border-radius:4px">🆕 共振源</span></td></tr>
-          <tr><td>8</td><td>📡 动量共识</td><td>无未来函数版筛选器（S1/S2/S3 三重规则，仅入选日当天可知条件）</td><td><span style="font-size:10px;color:#60a5fa;font-weight:500;background:rgba(96,165,250,.12);padding:1px 6px;border-radius:4px">🆕 共振源</span></td></tr>
+          <tr><td>5</td><td>📊 逆势龙头</td><td>CRDS（弱市专用）</td><td><span style="font-size:10px;color:#94a3b8;font-weight:500;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span></td></tr>
+          <tr><td>6</td><td>⚡ 强势突破</td><td>高手算法反推 v1（涨幅≥5% + 量比≥1.35 + 收位≥0.55），core 前 30</td><td><span style="font-size:10px;color:#60a5fa;font-weight:500;background:rgba(96,165,250,.12);padding:1px 6px;border-radius:4px">🆕 共振源</span></td></tr>
+          <tr><td>7</td><td>📡 动量共识</td><td>无未来函数版筛选器（S1/S2/S3 三重规则，仅入选日当天可知条件）</td><td><span style="font-size:10px;color:#60a5fa;font-weight:500;background:rgba(96,165,250,.12);padding:1px 6px;border-radius:4px">🆕 共振源</span></td></tr>
         </table>
 
         <div class="logic-h">排序逻辑</div>
@@ -1872,7 +1869,6 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">迁入的「回测 · 框架」3 卡</div>
         <table class="lg-table">
           <tr><th>卡片</th><th>类别</th><th>数据源 / 刷新</th></tr>
-          <tr><td>📈 相对强度 RPS · 30 天样本考核</td><td>回测类</td><td><code>data/RPS_AUDIT.js</code>；数据链保留、每日续跑（自 2026-09-05 起满 30 个交易日，约 2026-10 中到期）；<b>不参与选股评分权重</b></td></tr>
           <tr><td>📊 中信 PE&lt;10 历史回测</td><td>回测类 · 个股</td><td><code>data/CITIC_PE_BACKTEST.js</code>，E 批回测</td></tr>
           <tr><td>📈 指数估值中枢 · 价格档位 + 趋势门控</td><td>框架类 · 大盘 / 指数</td><td><code>data/INDEX_VALUE_FRAMEWORK.js</code>，E 批回测</td></tr>
         </table>
@@ -1907,7 +1903,6 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">🔄 2026-09-12 子页去向对照（迁移留痕）</div>
         <table class="lg-table">
           <tr><th>原位置</th><th>卡片（卡容器 id）</th><th>新位置</th><th>渲染入口 / 宿主</th></tr>
-          <tr><td rowspan="3">暂未上架 · 回测·框架</td><td>📈 相对强度 RPS · 30 天样本考核（<code>rpsAuditBody</code>）</td><td rowspan="3">策略回测页 · 底部</td><td rowspan="3"><code>__renderBtExtraPane()</code> → <code>#btExtraHost</code></td></tr>
           <tr><td>📊 中信 PE&lt;10 历史回测（<code>citicPeBacktestBody</code>）</td></tr>
           <tr><td>📈 指数估值中枢 · 价格档位+趋势门控（<code>indexValueFrameworkBody</code>）</td></tr>
           <tr><td rowspan="3">暂未上架 · 因子类</td><td>🧪 因子实验室 · 异常换手率 / ROE_TTM（<code>factorLabBody</code>）</td><td rowspan="3">选股策略 → 🧪 因子<br>（逆势龙头左侧）</td><td rowspan="3"><code>__renderFactorPane()</code> → <code>#stFaHost</code></td></tr>
@@ -3442,11 +3437,6 @@ function switchSec(sec,el){
   function renderStrategyHits(item, code){
     const hits=[];
     const nc = normCode(code);
-      const rps20 = rpsRow.rps50 != null ? Number(rpsRow.rps50).toFixed(1) : '--';
-      const rs = rpsRow.rs != null ? Number(rpsRow.rs).toFixed(2) : '--';
-      const maTag = rpsRow.above_ma250 ? '· 站上250日线' : (rpsRow.above_ma200 ? '· 站上200日线' : '');
-      hits.push({name:'📈 相对强度 '+tier+'档', color:tierColor, detail:'RPSmax '+rpsMax+' · 50日 '+rps20+' · RS '+rs+' '+maTag});
-    }
     // 金股池
     const gp = window.GOLD_POOL || {};
     const gstocks = gp.stocks || {};
@@ -8115,16 +8105,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   //   之前这行顶层 ReferenceError 阻断 line 9064 的 switchLg 定义 → 点击所有 tab 无响应。
   window.renderV8Crds=renderV8Crds;
 
-  /* ===== 个股相对强度 RPS + RS + 年线（2026-08-08 新增） ===== */
-  function _rps$(id){ return document.getElementById(id); }
-  function _rpsEscapeHtml(s){
-    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-  function _buildRpsMap(){
-      badge.style.display='inline-block';
-    }
-  }
-  window.renderRpsScreen=renderRpsScreen;
 
   /* 2026-08-30 主人令「我只要最有效的东西」删除：renderRpsBacktest()
      删除理由：该函数为「模拟」而非真实回测 —— 用 ret=(r.ret50/50)*hold 把 50 日已实现收益
@@ -8495,10 +8475,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
          status:'历史信号累计中；最终推荐以实时信号 + ALGO_TRACK 跟踪为准。'},
         {icon:'🐉',name:'逆势龙头CRDS',color:'#ef4444',key:'crds',atKey:'crds',
          method:'CRDS advanced 档历史回测：信号日收盘价买入，持有 N 个交易日收盘价卖出（不处理节假日，按日历日 +1/3/5/10/20）。',
-         def:'胜率=收益>0占比；平均收益=收益均值%。',
-         status:'历史信号累计中；最终推荐以实时信号 + ALGO_TRACK 跟踪为准。'},
-        {icon:'📈',name:'相对强度RPS',color:'#14b8a6',key:'rps',atKey:'rps',
-         method:'RPS 相对强度 A 档历史回测：信号日收盘价买入，持有 N 个交易日收盘价卖出（不处理节假日，按日历日 +1/3/5/10/20）。',
          def:'胜率=收益>0占比；平均收益=收益均值%。',
          status:'历史信号累计中；最终推荐以实时信号 + ALGO_TRACK 跟踪为准。'},
         {icon:'🧬',name:'选股生命周期',color:'#34d399',key:'__none_life',track:true,
