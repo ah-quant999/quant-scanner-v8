@@ -1342,7 +1342,15 @@ def calc_crds():
 
     # 保存历史：当日快照 + 历史汇总（供卡片历史追踪）
     try:
-        hist_dir = os.path.join(DATA_DIR, "history")
+        # 🔴 2026-09-14 阿狸咪根因修复（主人令「一劳永逸」）：
+        #   旧写法 hist_dir = DATA_DIR/history 即 out/history/：
+        #   · api_push_raw.walk_raw() 只遍历 raw_data/ ⇒ out/history/crds_*.json 永不被推送；
+        #   · 实测 crds_history.json 仅 1 个键（2026-08-01，188B），
+        #     而 crds_card_data.json 每日新鲜 ⇒ 脚本每日在跑，是落盘后丢失。
+        #   同型修复先例：backtest_comprehensive.py L54-55（同日类 bug 已修）。
+        hist_dir = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "..", "raw_data", "history"
+        )
         os.makedirs(hist_dir, exist_ok=True)
         today_str = datetime.now().strftime("%Y-%m-%d")
         daily_file = os.path.join(hist_dir, f"crds_{today_str.replace('-', '')}.json")
