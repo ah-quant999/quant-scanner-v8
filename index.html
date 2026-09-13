@@ -6171,7 +6171,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       +   '<br>证据覆盖：业绩预告正向 ' + nPerf + ' 只 · ROE大市值榜 ' + nRoe + ' 只 / 画像全市场 ' + nScanned + ' 只。排序主键=成长+质量，资金为辅助验证。'
       + '</div>'
       + (cards || '<div class="note" style="color:var(--dim);">本主题无概念命中，换个主题试试</div>')
-      + (hits.length > TV_MAX ? '<div style="font-size:11px;color:var(--dim);margin-top:6px;">仅展示前 ' + TV_MAX + ' 只 / 共 ' + hits.length + ' 只（按 A→B→C、板块资金净额、命中标签数排序）</div>' : '')
+      // 2026-09-13 主人令：删除 TV_MAX 截断提示行。
+      //   原写法引用未定义的 TV_MAX → 整个 __renderThemeValue 抛 ReferenceError →
+      //   卡片永远停在「加载中」（真浏览器实测 err: "TV_MAX is not defined"）。
+      //   且新设计已改成 A/B/C 分桶（A 档全量直出、B/C 折叠），统一截断已无意义。
       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.6;">口径：先按七大主题概念筛选，再按「业绩预告变化率 + ROE_TTM」给成长+质量分排序；板块资金取 SECTOR_FUND_FLOW「概念」类板块当日主力净额（亿元），个股资金 = Σ(其命中概念板块净额)；'
       + '卡内符号：🔥=资金流入+基本面证据 / 💰=仅资金流入 / 📈=有基本面证据但资金未流入，仅作交叉提示、非买卖信号。仅研究参考，不构成投资建议。</div>'
       + '</div>';   // /padding 12 14
@@ -6216,11 +6219,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + _uBadge('盘后', '中长线', T.update_time, '数据 ' + _ev(T.data_date))
       + '</div>'
       + '<div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.7;font-size:12px;color:var(--txt);">'
-      + '<div style="font-weight:700;color:#fbbf24;margin-bottom:5px;">📖 这张卡在说什么（大白话）</div>'
-      + '<div style="margin-bottom:4px;">把整个 A 股当成一件商品，这张卡在告诉你：<b>它现在卖得贵还是便宜</b>。</div>'
-      + '<div style="margin-bottom:4px;">怎么算的？用<b>「股价 ÷ 每股赚的钱」（PE）</b>，再拿去和过去 10 年的自己比 —— 比过去大多数时候都低，就是便宜；都比过去高，就是贵。</div>'
-      + '<div style="margin-bottom:4px;">🌡 <b>温度计读数含义：</b>读数低（蓝）＝历史偏低、中长期下行空间小；读数高（红）＝历史偏高、要小心。<b>它看的是「几个月到几年」的级别，不是今天明天涨跌。</b></div>'
-      + '<div style="padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠️ 使用时注意：</b>① 它按「已公布的过去四个季度利润」算，<b>不预判未来</b>；② 别信「PE 低于 10 就是铁底」—— 2018 和 2022 两次真大底，这指标都没低到 10；③ 这不是每日买卖信号，只帮你判断「现在整体贵不贵」。</div>'
+      // 2026-09-13 主人令：去掉「大白话」小标题，统一为 📌核心/💡用法/⚠限制 三段式
+      + '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#fbbf24;font-weight:700;">&#x1F4CC; 核心：</b>把整个 A 股当成一件商品，这张卡在告诉你：<b>它现在卖得贵还是便宜</b>。用「股价 ÷ 每股赚的钱」（PE），再拿去和过去 10 年的自己比 —— 比过去大多数时候都低，就是便宜；都比过去高，就是贵。</div>'
+      + '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#fbbf24;font-weight:700;">&#x1F4A1; 用法：</b>🌡 读数低（蓝）＝历史偏低、中长期下行空间小；读数高（红）＝历史偏高、要小心。<b>它看的是「几个月到几年」的级别，不是今天明天涨跌。</b></div>'
+      + '<div style="font-size:11.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;font-weight:700;">&#x26A0; 限制：</b>① 它按「已公布的过去四个季度利润」算，<b>不预判未来</b>；② 别信「PE 低于 10 就是铁底」—— 2018 和 2022 两次真大底，这指标都没低到 10；③ 这不是每日买卖信号，只帮你判断「现在整体贵不贵」。</div>'
       + '</div>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">'
       + '<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.3);border-radius:8px;padding:10px 12px;">'
@@ -6451,19 +6453,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '</div>'
       // 2026-09-10 主人令：卡名下方加"核心内容 + 解析"，让判读者一眼看懂这卡是什么、怎么用
       + '<div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.22);border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.7;">'
-      + '<div style="font-weight:700;color:#a78bfa;margin-bottom:5px;">📖 这张卡在说什么（大白话）</div>'
-      + '<div style="font-size:12px;color:var(--txt);margin-bottom:5px;">'
-      + '它给 A 股三个主要指数（沪深300 / 中证500 / 中证1000）各拍一张<b>「此刻贵不贵」的照片</b>，并告诉你<b>现在该多拿现金还是多拿股票</b>。'
+      // 2026-09-13 主人令：去掉「大白话」小标题，统一为 📌核心/💡用法/⚠限制 三段式
+      + '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#a78bfa;font-weight:700;">&#x1F4CC; 核心：</b>给 A 股三个主要指数（沪深300 / 中证500 / 中证1000）各拍一张「此刻贵不贵」的照片，并告诉你<b>现在该多拿现金还是多拿股票</b>。</div>'
+      + '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#a78bfa;font-weight:700;">&#x1F4A1; 用法：</b>📐 把这只指数过去 N 年的估值从低到高排成一队，看现在站在队伍的第几个位置 —— <b>分位 10% = 比过去 90% 的时间都便宜</b>，分位 90% = 比过去 90% 的时间都贵。本卡故意同时列 <b>5 年 / 3 年 / 1 年</b> 三个口径，因为它们经常互相打架（某指数按 5 年看偏高 76%、按 1 年看却低估到 3.9%）—— 拉长看是历史高位、砍短看是刚从坑里爬起来，<b>只看一个口径会得出相反结论，所以三个都要看</b>。</div>'
+      + '<div style="font-size:11.5px;color:var(--sub);padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;font-weight:700;">&#x26A0; 限制：</b>① 它管的是<b>整体仓位轻重</b>（大盘级别），<b>不会告诉你买哪只股</b>；② 数据来自 akshare 公开接口，偶有抽风，读数仅供参考；③ 估值便宜 ≠ 马上会涨，可能继续便宜很久。</div>'
       + '</div>'
-      + '<div style="font-size:11.5px;color:var(--sub);margin-bottom:5px;">'
-      + '📐 <b>「分位」是什么意思？</b>把这只指数过去 N 年的估值从低到高排成一队，看现在站在队伍的第几个位置。<b>分位 10% = 比过去 90% 的时间都便宜</b>；分位 90% = 比过去 90% 的时间都贵。'
-      + '</div>'
-      + '<div style="font-size:11.5px;color:var(--sub);padding:6px 9px;border-radius:6px;background:rgba(139,92,246,.1);border-left:3px solid #a78bfa;margin-bottom:5px;">'
-      + '⚠️ <b style="color:#c4b5fd;">最容易误读的一点：</b>本卡故意同时列 <b>5 年 / 3 年 / 1 年</b> 三个口径，因为<b>它们经常互相打架</b>（例：某指数按 5 年看偏高 76%，按 1 年看却低估到 3.9%）。这不是数据错了 —— 拉长看是历史高位、砍短看是刚从坑里爬起来。<b>只看一个口径就会得出相反结论，所以三个都要看。</b>'
-      + '</div>'
-      + '<div style="font-size:11.5px;color:var(--sub);padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;">'
-      + '⚠️ <b style="color:#fbbf24;">限制与边界：</b>① 它管的是<b>整体仓位轻重</b>（大盘级别），<b>不会告诉你买哪只股</b>；② 数据来自 akshare 公开接口，偶有抽风，读数仅供参考；③ 估值便宜 ≠ 马上会涨，可能继续便宜很久。'
-      + '</div></div>'
       + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px;">' + idxCards + '</div>'
       + '<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.3);border-radius:7px;padding:10px 13px;margin-bottom:10px;">'
       + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">'
@@ -6697,18 +6691,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '</div>'
       // 2026-09-10 主人令：卡名下方加"核心 + 解析"
       + '<div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.22);border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.7;">'
-      + '<div style="font-weight:700;color:#8b5cf6;margin-bottom:5px;">📖 这张卡在说什么（大白话）</div>'
-      + '<div style="font-size:12px;color:var(--txt);margin-bottom:5px;">'
-      + '它把 AI 写的<b>三份市场分析报告</b>（看一天的 / 看一周的 / 看一个月的）摆在一起做<b>统计</b>，看 AI 自己在不同时间尺度上<b>关注的东西是不是同一批</b>、<b>语气偏多还是偏空</b>。'
-      + '</div>'
-      + '<div style="font-size:11.5px;color:var(--sub);margin-bottom:5px;">'
-      + '🎯 <b>为什么要三份对比？</b>因为 AI 常常「一天说主线是A、一个月说主线是B」。把三份并排，一眼就能看出<b>它自己的观点稳不稳</b>——三份都指向同一个方向，可信度相对高；三份各说各话，说明当下市场本身没共识。'
-      + '</div>'
-      + '<div style="font-size:11.5px;color:var(--sub);padding:6px 9px;border-radius:6px;background:rgba(139,92,246,.1);border-left:3px solid #8b5cf6;margin-bottom:5px;">'
-      + '📊 <b>怎么看板块 Top 6 的条宽？</b>因为三份报告长短不一样（月度那篇字数多，提谁都提得多），<b>直接比次数会失真</b>，所以条宽用的是<b>占比</b>——即「这个板块在它提到的所有板块里占多大比例」。<b>看比例，不要看绝对次数。</b>'
-      + '</div>'
-      + '<div style="font-size:11.5px;color:var(--sub);padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;">'
-      + '⚠️ <b style="color:#fbbf24;">限制与边界：</b>① 这是<b>展示卡</b>，只呈现「AI 说了什么」，<b>不构成买卖建议</b>，更不替代个股信号；② AI 文本本身可能有幻觉或滞后，<b>它的观点同样可能错</b>；③ 语气统计是按句子做的粗分类，不保证每条都分得准。'
+      // 2026-09-13 主人令：去掉「大白话」小标题，统一为 📌核心/💡用法/⚠限制 三段式
+      + '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#8b5cf6;font-weight:700;">&#x1F4CC; 核心：</b>把 AI 写的三份市场分析报告（看一天的 / 看一周的 / 看一个月的）摆在一起做统计，看 AI 在不同时间尺度上关注的是不是同一批东西、语气偏多还是偏空。</div>'
+      + '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#8b5cf6;font-weight:700;">&#x1F4A1; 用法：</b>🎯 AI 常常「一天说主线是 A、一个月说主线是 B」，把三份并排，一眼看出它自己的观点稳不稳 —— 三份都指向同一方向，可信度相对高；三份各说各话，说明当下市场本身没共识。📊 板块 Top 6 的条宽用的是<b>占比</b>而非次数（三份报告长短不一，直接比次数会失真），<b>看比例，不要看绝对次数</b>。</div>'
+      + '<div style="font-size:11.5px;color:var(--sub);padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;font-weight:700;">&#x26A0; 限制：</b>① 这是<b>展示卡</b>，只呈现「AI 说了什么」，<b>不构成买卖建议</b>，更不替代个股信号；② AI 文本本身可能有幻觉或滞后，<b>它的观点同样可能错</b>；③ 语气统计是按句子做的粗分类，不保证每条都分得准。</div>'
       + '</div></div>'
       // 极性条
       + '<div style="background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.2);border-radius:7px;padding:8px 12px;margin-bottom:12px;">'
@@ -6723,16 +6709,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + renderSectorCol('周 · ' + (wScope.period || ''), wEx.sector_hits, '251, 146, 60')
       + renderSectorCol('月 · ' + (mScope.period || ''), mEx.sector_hits, '34, 197, 94')
       + '</div>'
-      // 三段全文折叠
-      + '<div style="background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.2);border-radius:7px;padding:8px 12px;margin-bottom:10px;">'
-      + '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:6px;">三段全文（同期对比）</div>'
-      + '<details open style="margin-bottom:4px;"><summary style="font-size:11.5px;font-weight:600;color:#ef5350;cursor:pointer;">日 · ' + _ev(dScope.date || '') + ' (' + (C.texts.daily || '').length + ' 字)</summary>'
-      + '<pre style="white-space:pre-wrap;font-size:11.5px;line-height:1.7;color:var(--sub);margin:6px 0 0 0;font-family:inherit;">' + _ev(C.texts.daily || '') + '</pre></details>'
-      + '<details open style="margin-bottom:4px;"><summary style="font-size:11.5px;font-weight:600;color:#fb923c;cursor:pointer;">周 · ' + _ev(wScope.period || '') + ' (' + (C.texts.weekly || '').length + ' 字)</summary>'
-      + '<pre style="white-space:pre-wrap;font-size:11.5px;line-height:1.7;color:var(--sub);margin:6px 0 0 0;font-family:inherit;">' + _ev(C.texts.weekly || '') + '</pre></details>'
-      + '<details open><summary style="font-size:11.5px;font-weight:600;color:#22c55e;cursor:pointer;">月 · ' + _ev(mScope.period || '') + ' (' + (C.texts.monthly || '').length + ' 字)</summary>'
-      + '<pre style="white-space:pre-wrap;font-size:11.5px;line-height:1.7;color:var(--sub);margin:6px 0 0 0;font-family:inherit;">' + _ev(C.texts.monthly || '') + '</pre></details>'
-      + '</div>'
+      // 2026-09-13 主人令：删除「三段全文（同期对比）」整块 —— 全文展示职责
+      //   已由「宏观观测」页承担，此处属残留重复渲染。
       // 底部
       + '<div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
       + '⚠️ <b style="color:#8b5cf6;">展示型卡</b>：本卡输出的是 mahoro_macro 既有 AI 文本的结构化对比视图，<b>不抓新源、不增加新接口</b>。'
@@ -12684,7 +12662,7 @@ h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;
    + '<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.25);border-radius:7px;padding:9px 11px;margin-bottom:10px;font-size:12px;line-height:1.7;color:var(--txt);">'
    + '<b style="color:#38bdf8;">&#x1F4CC; 核心：</b>把当日热点板块/概念翻译成可交易的 ETF 与龙头股。<br>'
    + '<b style="color:#38bdf8;">&#x1F4A1; 用法：</b>辅助理解资金去向，不是选股信号。<br>'
-   + '<b style="color:#38bdf8;">&#x26A0; 限制：</b>映射关系偏静态，板块热度假；需结合回测与资金数据交叉验证。</div>'
+   + '<b style="color:#38bdf8;">&#x26A0; 限制：</b>ETF/龙头与板块的映射关系偏静态（人工维护），<b style="color:#fbbf24">热度实时、映射不实时</b>；需结合资金数据与回测交叉验证。</div>'
    + '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">&#x26A0;&#xFE0F; 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成投资建议</b>。</div>'
    + '<div id="dbgEtfMapBody"><div class="note">加载中&#x2026;</div></div>'
    + '<hr style="border:none;border-top:1px dashed rgba(56,189,248,.25);margin:12px 0;">'
