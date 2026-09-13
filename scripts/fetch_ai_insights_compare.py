@@ -2,9 +2,14 @@
 # -*- coding: utf-8 -*-
 """
 AI 洞察多源观点对比卡 fetcher
-- 数据源：data/maharo_macro.js（已由小九日 07:22 拉好的活数据）
+- 数据源（优先级）：
+    1) data/maharo_insights.js  (window.MAHORO_INSIGHTS)——有生产者，每日 07:22 更新
+    2) data/maharo_macro.js    (window.MAHORO_MACRO)  ——旧融合文件，仅作兼容回退
 - 解析 daily/weekly/monthly 三段文本，统计"AI 在不同时长尺度上的板块/主题关注度"
 - 输出：raw_data/ai_insights_compare.json
+
+2026-09-13 一劳永选：原硬依赖 data/maharo_macro.js，而该文件已无生产者
+（远端已删），云端/小九机跑此脚本必报 FileNotFoundError ⇒ 卡红灯。
 """
 import json
 import re
@@ -14,7 +19,8 @@ from json import JSONDecoder
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-SRC = REPO / "data" / "maharo_macro.js"
+SRC_INSIGHTS = REPO / "data" / "maharo_insights.js"   # 优先：有生产者（每日 07:22）
+SRC_MACRO    = REPO / "data" / "maharo_macro.js"     # 回退：旧融合文件（可能不存在）
 DST = REPO / "raw_data" / "ai_insights_compare.json"
 
 # 50 个 A 股常见板块/主线词典（按数据自洽顺序，手工整理；后续主人可补）
@@ -33,12 +39,45 @@ BULL_KW = ["看多", "做多", "受益", "景气", "加速", "上涨", "布局",
 BEAR_KW = ["看空", "做空", "回撤", "防御", "谨慎", "回避", "风险", "承压", "回调", "看跌", "熊", "爆雷", "下行", "收缩", "压力"]
 
 
-def _load_maharo_macro():
-    """容错解析 window.MAHORO_MACRO = {...};（之前发现文件末尾有额外字符）"""
-    txt = SRC.read_text(encoding="utf-8")
-    m = re.search(r"window\.MAHORO_MACRO\s*=\s*\{", txt)
+def _parse_js_object(path, var_name):
+    """容错解析 window.<var_name> = {...}（文件末尾可能有额外字符）"""
+    txt = path.read_text(encoding="utf-8")
+    m = re.search(r"window\.%s\s*=\s*\{" % var_name, txt)
+    if not m:
+        raise ValueError(f"{path.name} 中未找到 window.{var_name} = {{")
     d, _ = JSONDecoder().raw_decode(txt, m.end() - 1)
     return d
+
+
+def _load_insights():
+    """按优先级加载：先 maharo_insights.js（独立、有生产者），再回退 maharo_macro.js。
+
+    2026-09-13 一劳永选：返回 (insights_dict, macro_dict_or_None, source_name)。
+    - insights_dict 必为 {"daily":{...},"weekly":{...},"monthly":{...}} 形态
+    - macro_dict 为旧融合文件原对象（提供 update_time / sources / watched），
+      若仅有 insights 则为 None（sources/watched 计 0，不伪造）。
+    """
+    if SRC_MACRO.exists():
+        try:
+            macro = _parse_js_object(SRC_MACRO, "MAHORO_MACRO")
+            ins = macro.get("insights") or {}
+            # 优先用独立 insights 文件（它每日更新，macro 里的可能是陈旧副本）
+            if SRC_INSIGHTS.exists():
+                try:
+                    ins2 = _parse_js_object(SRC_INSIGHTS, "MAHORO_INSIGHTS")
+                    if ins2:
+                        return ins2, macro, SRC_INSIGHTS.name
+                except Exception:
+                    pass
+            return ins, macro, SRC_MACRO.name
+        except Exception as e:
+            print(f"⚠️ {SRC_MACRO.name} 解析失败（{e}），尝试 insights 文件")
+    if SRC_INSIGHTS.exists():
+        ins = _parse_js_object(SRC_INSIGHTS, "MAHORO_INSIGHTS")
+        return ins, None, SRC_INSIGHTS.name
+    raise FileNotFoundError(
+        f"两个数据源均不存在：{SRC_INSIGHTS} / {SRC_MACRO}"
+    )
 
 
 def _extract(text: str):
@@ -74,8 +113,9 @@ def _extract(text: str):
 
 
 def main():
-    d = _load_maharo_macro()
-    ins = d.get("insights", {})
+    ins, d, src_name = _load_insights()
+    d = d or {}
+    print(f"📄 source = {src_name}")
     daily_text = ins.get("daily", {}).get("text", "")
     weekly_text = ins.get("weekly", {}).get("text", "")
     monthly_text = ins.get("monthly", {}).get("text", "")

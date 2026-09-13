@@ -12744,12 +12744,18 @@ h += '</div>'; // /ulPaneObserve
     var host = document.getElementById('maharoCardBody');
     if(!host) return;
     var d = window.MAHORO_MACRO || {};
-    if(!d.updated_at){
+    // 2026-09-13 一劳永选：MAHORO_MACRO 已无生产者（远端已删），真正的 AI 解析在 window.MAHORO_INSIGHTS。
+    //   原判据 if(!d.updated_at) 用错了变量 ⇒ d={} 恒真 ⇒ 永远走空态 return，下方读 insights 的代码永远到不了。
+    //   现：两者任一有时效即渲染（insights 顶层无 updated_at，必用 daily.generated_at）。
+    var ins0 = window.MAHORO_INSIGHTS || d.insights || {};
+    var insStamp = (ins0.daily && (ins0.daily.generated_at || ins0.daily.date)) || '';
+    var stamp = d.updated_at || insStamp;
+    if(!stamp){
       host.innerHTML = '<div class="note" style="padding:14px;text-align:center;">机构研究数据暂未生成（本机 cookie 拉取）</div>';
       return;
     }
     var fresh = document.getElementById('maharoFresh');
-    if(fresh && typeof setBadge === 'function') setBadge('maharoFresh','auto','短线', d.updated_at);
+    if(fresh && typeof setBadge === 'function') setBadge('maharoFresh','auto','短线', stamp);
     function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     function renderLines(txt){
       var rows = String(txt||'').split('\n'); var out = '';

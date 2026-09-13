@@ -52,6 +52,15 @@ STALE_OK = {
     "DO_NOT_DELETE",
     "maharo_macro",           # 2026-09-08 一劳永逸：本机 cookie 拉取(云端无权限)，家里机离线会陈旧，非失真
 }
+# 🛡 2026-09-13 一劳永逸：关键数据文件**存在性**清单。
+#   原脚本用 data_dir.glob("*.js") 扫描 ⇒ 文件被删就压根不在扫描范围 ⇒ 静默漏检。
+#   实例：data/maharo_macro.js、data/FRESHNESS_STATUS.js 被 2026-09-12 23:55 cleanup 误删，
+#        前者无生产者 ⇒ 永久消失 ⇒ 「机构研究·AI 解析」卡恒空，而 sanity 全绿。
+#   本清单仅在文件缺失时报 **软告警**（不阻断），不改变退出码语义。
+EXPECT_FILES = {
+    # 前端 index.html 已引用、必须存在的数据文件
+    "maharo_insights.js",     # window.MAHORO_INSIGHTS（机构研究 AI 解析，每日 07:22）
+}
 # PE 精确字段名（词边界集合成员判断，绝不子串匹配）
 PE_FIELDS = {"pe", "pe_ttm", "pe_lyr", "pes", "pe_ratio"}
 PE_HARD_MIN, PE_HARD_MAX = -50.0, 20000.0   # 市盈率合理硬边界
@@ -268,6 +277,11 @@ def main():
     if not data_dir.is_dir():
         print(f"[sanity] data 目录不存在: {data_dir}")
         sys.exit(1)
+
+    # 🛡 2026-09-13 一劳永逸：关键文件存在性检查（glob 扫不到已删文件，故需显式校）
+    for _fn in sorted(EXPECT_FILES):
+        if not (data_dir / _fn).exists():
+            issues.append((SOFT, _fn, "关键数据文件缺失（前端已引用），卡将空白；请查 weekly_cleanup 误删或生产者断链"))
 
     files = sorted(data_dir.glob("*.js"))
     print(f"[sanity] 扫描 {len(files)} 个 data/*.js  (只读,绝不改数据)")
