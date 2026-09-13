@@ -201,6 +201,12 @@ def check_html_refs():
         index.html : data/hb_xiaojiu.js（大小写错，实产 HB_XIAOJIU.js）
         logic.html : data/ETF_SUBSCRIPTION_EM.js
         logic.html : data/ALGO_BACKTEST_COMPARE.js
+                    ↳ 🔵 2026-09-13 已闭环：该引用**已恢复且文件已重新产出**
+                      （scripts/algo_backtest_compare.py 重新挂进 E 批，
+                       位于聚合器 gen_backtest_all_algos.py 之前）。
+                      ⇒ 它现在**不再是 404**；上方列举仅作历史记录。
+                      ⚠️ 请勿再以本条为依据删除 logic.html 的该 script 标签：
+                        该标签支撑「两套算法回测对比」卡（logic.html L6707）。
 
     这类断链 py_compile 查不出、new Function 查不出、data 完整性查不出
     （文件本来就不该存在）、YAML 更查不出 —— 只有本项能拦。

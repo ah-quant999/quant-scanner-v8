@@ -1319,6 +1319,14 @@ def run_experiment_cards():
 
     # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：ALGO_BACKTEST_COMPARE.js 前端零引用，
     #   停止调用 algo_backtest_compare.py 生成该死数据。
+    # 🔵 2026-09-13 状态更新（阿狸咪的工程师，主人令「只要接入算法链的选股策略都要有回测」）：
+    #   该判定**已被主人令推翻** —— 强势突破（algorithms/strong_breakout.py）就在 B 批链内，
+    #   而本文件是它唯一的回测源；"前端零引用"的结论也漏扫了 logic.html
+    #   （其 L6707「两套算法回测对比」卡一直在读 window.ALGO_BACKTEST_COMPARE）。
+    #   ⚠️ 但**不在本构建链恢复调用**：回测汇总器 algorithms/gen_backtest_all_algos.py
+    #   （E 批末位）必须先读到本文件，而构建链跑在 run_algorithms 之后 ⇒ 会永远读到昨天。
+    #   故已改挂 **算法链 E 批**（algorithms/run_algorithms.py 的 ORDER + STAGES["E"]，
+    #   位于聚合器之前）。此处保留墓志铭以防被误当"仍需生成"而重复挂链。
 
 
 def main():
