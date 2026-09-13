@@ -130,39 +130,104 @@ def load_index_history_js():
             "dates": dates, "prices": prices}
 
 
+# ── 四指数清单（baostock 代码）─────────────────────────────────────────
+# 🔴 2026-09-13 主人令一劳永逸修复（图7/8/9）：
+#   原实现对沪深300/中证500/中证1000 只写 `available: False` + reason「接口不可用」，
+#   而**代码里从没写过取数逻辑** —— 是假占位，不是接口不可用。
+#   本机实测 baostock 对四个指数全部可取且到最新交易日（见模块 docstring）。
+IDX_LIST = [
+    ("上证指数", "sh.000001"),
+    ("沪深300", "sh.000300"),
+    ("中证500", "sh.000905"),
+    ("中证1000", "sh.000852"),
+]
+
+
+def fetch_baostock_history(code, lookback_days=1400):
+    """用 baostock 取指数日K（前复权口径 adjustflag=3）。
+
+    返回 (dates, prices)；不足 250 根或任何异常返回 None（由调用方兜底）。
+    lookback_days=1400 自然日 ≈ 950 交易日，满足 EMA250 计算所需。
+    """
+    try:
+        import baostock as bs
+    except Exception:
+        return None
+    logged = False
+    try:
+        lg = bs.login()
+        if getattr(lg, "error_code", "1") != "0":
+            return None
+        logged = True
+        start = (datetime.now(CST) - timedelta(days=lookback_days)).strftime("%Y-%m-%d")
+        end = datetime.now(CST).strftime("%Y-%m-%d")
+        rs = bs.query_history_k_data_plus(
+            code, "date,close", start_date=start, end_date=end,
+            frequency="d", adjustflag="3")
+        dates, prices = [], []
+        while rs.next():
+            row = rs.get_row_data()
+            try:
+                c = float(row[1])
+            except (TypeError, ValueError):
+                continue
+            dates.append(row[0])
+            prices.append(c)
+        if len(prices) < 250:
+            return None
+        return dates, prices
+    except Exception:
+        return None
+    finally:
+        if logged:
+            try:
+                bs.logout()
+            except Exception:
+                pass
+
+
 def main():
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     results = []
     errors = []
+    used_baostock = False
+    used_fallback = []
 
-    # 主指数：上证指数（来自已有 INDEX_HISTORY.js）
-    sh = load_index_history_js()
-    if sh:
-        stats = analyze_prices(sh["dates"], sh["prices"])
-        if stats:
-            results.append({"name": sh["name"], "code": sh["code"], **stats})
-        else:
-            errors.append("上证指数: insufficient history")
-    else:
-        errors.append("上证指数: INDEX_HISTORY.js not available")
-
-    # 中证系列：当前环境接口不可用，仅占位
-    for cfg in [
-        {"name": "沪深300", "code": "000300"},
-        {"name": "中证500", "code": "000905"},
-        {"name": "中证1000", "code": "000852"},
-    ]:
+    # 四个指数统一走 baostock：真实日K、到最新交易日、与 INDEX_HISTORY 刷新节奏解耦
+    for name, code in IDX_LIST:
+        got = fetch_baostock_history(code)
+        if got:
+            used_baostock = True
+            dates, prices = got
+            stats = analyze_prices(dates, prices)
+            if stats:
+                results.append({"name": name, "code": code.split(".")[-1], **stats})
+                continue
+            errors.append("%s: insufficient history" % name)
+        # 二级兜底：上证指数可从已有 INDEX_HISTORY.js 取
+        if code == "sh.000001":
+            sh = load_index_history_js()
+            if sh:
+                stats = analyze_prices(sh["dates"], sh["prices"])
+                if stats:
+                    used_fallback.append(name)
+                    results.append({"name": name, "code": sh["code"], **stats})
+                    continue
         results.append({
-            "name": cfg["name"],
-            "code": cfg["code"],
+            "name": name,
+            "code": code.split(".")[-1],
             "available": False,
-            "reason": "akshare/东财接口当前环境不可用，待后续补数据",
+            "reason": "baostock 取数失败（网络/接口），下次刷新自动重试",
         })
 
+    src = ("baostock 四指数日K（上证/沪深300/中证500/中证1000）"
+           if used_baostock else "INDEX_HISTORY.js 兜底")
+    if used_fallback:
+        src += "（%s 走 INDEX_HISTORY.js 兜底）" % "/".join(used_fallback)
     payload = {
         "update_time": datetime.now(CST).strftime("%Y-%m-%d %H:%M:%S"),
-        "source": "data/INDEX_HISTORY.js + 框架迁移",
-        "note": "价格中枢框架迁移（QQQ/TQQQ → A股指数），基于收盘价布林带/EMA趋势，非PE估值分位；中证序列待补",
+        "source": src,
+        "note": "价格中枢框架迁移（QQQ/TQQQ → A股指数），基于收盘价布林带/EMA趋势，非PE估值分位",
         "indices": results,
     }
     if errors:
