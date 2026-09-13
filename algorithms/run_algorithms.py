@@ -252,6 +252,13 @@ ORDER = [
     #   全算法回测汇总聚合器。放 ORDER **最末**⇒ 在 E 批内最后执行（同 stage 沿用 ORDER
     #   相对次序）：它要读 E 批其他脚本本轮刚产出的 CRDS_BACKTEST / BACKTEST_TDX /
     #   FOUR_VOLUME_BACKTEST / FACTOR_LAB_BACKTEST，先跑就会读到上一轮旧数。
+    # 🆕 2026-09-13 主人令「只要接入算法链的选股策略，都要有回测」：
+    #   强势突破（algorithms/strong_breakout.py）早已挂 B 批，但其回测源
+    #   scripts/algo_backtest_compare.py 一直是孤儿（ORDER/STAGES 均未挂）
+    #   ⇒ data/ALGO_BACKTEST_COMPARE.js 永不生成 ⇒ 聚合器里「强势突破」卡恒为 0 档。
+    #   与 backtest_pools.py 同例会：必须在聚合器 gen_backtest_all_algos.py **之前**，
+    #   否则聚合器读不到本轮产物。
+    "scripts/algo_backtest_compare.py",   # → data/ALGO_BACKTEST_COMPARE.js（H反推 / 高手画像版H反推 / 强势突破 同口径对比）
     "gen_backtest_all_algos.py",   # → raw_data/backtest_all_algos.json + data/BACKTEST_ALL_ALGOS.js
     ]
 
@@ -324,6 +331,11 @@ STAGES = {
         "backtest_pools.py",        # → data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（10 档前向收益）
         # 🆕 2026-09-11 主人令：全算法回测汇总（按前端卡名、胜率/收益降序、低绩效提请下架）。
         #   ⚠️ 必须在 E 批**最后**——读同批其他脚本刚产出的回测产物 + D 批最终推荐。
+        # 🆕 2026-09-13（同上，ORDER 同源）：强势突破回测源补齐。
+        #   读 B 批 track_h_auto_buy.py 的 data/H_AUTO_BUY_TRACK.js + 构建链的
+        #   data/STOCK_MOMENTUM_STATE_V2.js，聚合出 H反推 / 高手画像版 / 强势突破 三套同口径指标。
+        #   ⚠️ 必须在聚合器之前。
+        "scripts/algo_backtest_compare.py",   # → data/ALGO_BACKTEST_COMPARE.js（本卡无 raw_data 中间件，脚本直写 data/）
         "gen_backtest_all_algos.py",   # → data/BACKTEST_ALL_ALGOS.js（策略回测页总览）
         # 🛡 2026-09-07 主人令「互踢/暴风/覆盖不想再看到·方案 B 一劳永逸根治」：
         #   原 D 批首脚本(factor_lab 生成器)冷启动 50-90min（注释自述），串行堵在

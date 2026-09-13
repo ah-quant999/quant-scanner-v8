@@ -172,7 +172,11 @@ def main():
     out = DATA_DIR / "ALGO_BACKTEST_COMPARE.js"
     out.write_text(
         "window.ALGO_BACKTEST_COMPARE = " + json.dumps(payload, ensure_ascii=False, indent=1) + ";\n",
-        encoding="utf-8",
+        # 🔴 2026-09-13 一劳永逸：显式钉 LF。原缺 newline 参数 ⇒ 文本模式按 OS 翻译，
+        #   Windows runner 出 CRLF、Linux runner 出 LF ⇒ **同一产物在两台机上行尾翻转**，
+        #   每次换机重跑都产生「整文件重写」的伪 diff（2172B 文件 97 行全变）。
+        #   同批同族的 algorithms/gen_backtest_all_algos.py:713-716 早已显式 newline="\n"，本脚本对齐。
+        encoding="utf-8", newline="\n",
     )
     n_ha = ha["n_samples"] if ha else 0
     n_ha_ex = ha_expert["n_samples"] if ha_expert else 0

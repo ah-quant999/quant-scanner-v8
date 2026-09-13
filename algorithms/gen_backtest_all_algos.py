@@ -82,8 +82,11 @@ SOURCES = [
          var="ALGO_BACKTEST_COMPARE", rel="data/ALGO_BACKTEST_COMPARE.js",
          parser="algo_compare", label_prefix="", primary=None,
          method="实盘入选样本同口径聚合（T+1~T+10 前向收益）",
-         chain_member=False,
-         chain_note="生成脚本 scripts/algo_backtest_compare.py 原为孤儿（未挂 STAGES）"),
+         # 🆕 2026-09-13 主人令：缺口闭环 —— scripts/algo_backtest_compare.py
+         #   已挂进 E 批（ORDER + STAGES，位于本聚合器之前），不再是孤儿。
+         #   原值 chain_member=False / chain_note="原为孤儿（未挂 STAGES）"。
+         chain_member=True,
+         chain_note=None),
     dict(card="K线信号层", kind="signal", page="策略回测", icon="📈", cat="signal",
          var="BACKTEST_TDX", rel="data/BACKTEST_TDX.js",
          parser="tdx", label_prefix="", primary=None,

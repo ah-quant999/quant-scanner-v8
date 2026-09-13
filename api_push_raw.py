@@ -210,6 +210,10 @@ def walk_extra():
         #   本文件不在 update_v8.py 的 raw→js 映射表内（由脚本自己直接写 data/），
         #   按本函数约定「需在此注册才能被 api_push 推到 main」。
         "data/BACKTEST_ALL_ALGOS.js",
+        # ── 🆕 2026-09-13 补入：强势突破回测源（scripts/algo_backtest_compare.py 产出）──
+        #   同样不在 update_v8.py 的 raw→js 映射表内（脚本直写 data/，无 raw 中间件），
+        #   不注册则算法链跑完也永不上传（与 BACKTEST_ALL_ALGOS.js 同型）。
+        "data/ALGO_BACKTEST_COMPARE.js",
         "data/H_AUTO_BUY_TRACK.js",     # 反推算法累计胜率（每日跟踪 T+1/T+3/T+5/T+10）
         # 🔴 2026-08-20 根因修复：LHB_7D.js 由 gen_lhb_7d.py 直写 data/，之前未注册
         #    到 extra → 算法链跑完也不上传，页面 7 日龙虎榜/机游共振长期 stale。
