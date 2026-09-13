@@ -46,7 +46,11 @@ RAW = ROOT / "raw_data"
 # ── 阈值（主人可调；改这里即可，前端声明与实际同源由「页面口径」小节保证）──
 MIN_SAMPLES = 30          # 累积样本门槛：低于此只观测、不进排名、不评估下架（= 前端既有 MIN=30）
 # 🔴 2026-09-12 主人令（拍板第 1 项·①）：各回测脚本持有期已扩为
-#   [1, 3] + [5,10,20,30,45,60,75,90]（同源常量 HOLD_LADDER，见各脚本）。
+#   [1, 3] + [5,10,20,30,45,60,75,90,180,250]（同源常量 HOLD_LADDER，见各脚本）。
+#   🔴 2026-09-13 主人令扩档：+180/+250（原 8 档）。主人原话：「所有接入算法链的
+#      选股策略都按5、10、20、30、45、60、75、90、180、250日的跟踪回测」。
+#      ⇒ 各脚本的 lookahead 窗口已同步从 90 交易日口径抬到 250 交易日口径
+#        （否则长档 `len(after)-1 < hp` 恒真 → 静默零样本，12 日与 13 日各踩一次）。
 #   ⚠️ 本脚本的**主口径刻意仍取 T+5**（各 src 的 primary 字段）：
 #     主表是「同口径横比」，T+5 是各卡唯一共同拥有的短档，样本最厚、可比性最强；
 #     若改 T+90，则① 长档样本天然薄（回测区间早期信号凑不满 90 日）
@@ -90,11 +94,31 @@ SOURCES = [
          var="BACKTEST_TDX", rel="data/BACKTEST_TDX.js",
          parser="tdx", label_prefix="", primary=None,
          method="9 类 K 线信号 60 日前向回测（前复权）"),
+    # 🆕 2026-09-13 主人令：「只要接入算法链的选股策略，都要有回测」。
+    #   候选池 / 黄金池此前在 coverage 里是硬编码 known_gaps（「无独立前向收益回测」），
+    #   但它们**确实接在盘后算法链内**（B 批 build_candidate_pool.py 产出）。
+    #   本批新建 algorithms/backtest_pools.py 补齐，使其成为结构性保证而非缺口。
+    dict(card="候选池", page="选股策略", icon="📋", cat="trade",
+         var="CANDIDATE_BACKTEST", rel="data/CANDIDATE_BACKTEST.js",
+         parser="pool", label_prefix="首次进池 T+", primary="首次进池 T+5",
+         method="候选池「首次进池日」次一交易日开盘买入、持有 N 个真实交易日收盘卖出"
+                "（前复权·扣双边 0.3%）"),
+    dict(card="黄金池", page="选股策略", icon="🪙", cat="trade",
+         var="GOLD_POOL_BACKTEST", rel="data/GOLD_POOL_BACKTEST.js",
+         parser="pool", label_prefix="首次满足信号 T+", primary="首次满足信号 T+1",
+         method="黄金池「首次满足信号日」次一交易日开盘买入、持有 N 个真实交易日收盘卖出"
+                "（前复权·扣双边 0.3%）"),
     dict(card="因子实验室", page="暂未上架", icon="🧪", cat="research",
          var="FACTOR_LAB_BACKTEST", rel="data/FACTOR_LAB_BACKTEST.js",
          parser="factor_lab", label_prefix="", primary=None,
          method="因子五分位分层超额（每10交易日调仓·次一交易日开盘入场）"),
 ]
+
+# 🆕 2026-09-13 主人令：全部接入算法链的选股策略统一 10 档（同源 HOLD_LADDER）。
+FULL_LADDER = [5, 10, 20, 30, 45, 60, 75, 90, 180, 250]
+# TDX 源（backtest_tdx.py）另产 T+1 / T+3 短档 —— 矩阵同样要显示，故单列全阶。
+# ⚠️ 与 algorithms/backtest_tdx.py 的 HOLD_DAYS = [1, 3] + HOLD_LADDER 同源。
+HOLD_LADDER_FULL = [1, 3] + FULL_LADDER
 
 _UT_RE = re.compile(r'"update_time"\s*:\s*"(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})')
 _DT_ONLY_RE = re.compile(r'"update_time"\s*:\s*"(\d{4})-(\d{2})-(\d{2})')
@@ -219,7 +243,7 @@ def _resolve_chain(day_arg, kind_arg):
 # ────────────────────────────── 各源解析器 ──────────────────────────────
 def _mk_row(src, label, sample, win_rate, avg_return, hold, extra=None, status=None,
             primary=None, card=None):
-    return {
+    row = {
         "card": card or src["card"], "page": src["page"], "icon": src["icon"], "cat": src["cat"],
         "label": label, "source_var": src["var"], "source_file": src["rel"],
         "hold": hold, "sample": _int(sample),
@@ -227,6 +251,21 @@ def _mk_row(src, label, sample, win_rate, avg_return, hold, extra=None, status=N
         "extra": extra or {}, "status": status, "method": src.get("method", ""),
         "_primary_override": primary,
     }
+    # 🔴 2026-09-13 主人铁律⑭（未知一律 null，绝不用 0 冒充）——统一兜底：
+    #   零样本档位的源里常写着 win_rate=0 / avg_return=0.0（如 BACKTEST_TDX 的
+    #   win_rate_30d=0、CRDS 旧产物的 avg_return=0），直接透传会在前端显示成
+    #   「胜率 0.0% / 收益 0.00%」—— 那是**把「算不出」伪装成「算出来了且很差」**，
+    #   会直接污染下架判断（把窗口不足误读成策略失效）。
+    #   真实语义 = 「该档尚无足够历史信号，累积中」。故在此统一归零为 None。
+    #   放在 _mk_row 本体而非各解析器内，保证同源（各写一套必然漂移）。
+    if not row["sample"]:
+        row["win_rate"] = None
+        row["avg_return"] = None
+        if not row["status"]:
+            row["status"] = "样本为 0（尚无足够历史信号，该档累积中）"
+        elif "样本为 0" not in row["status"] and "累积中" not in row["status"]:
+            row["status"] = "样本为 0（该档累积中）；" + row["status"]
+    return row
 
 
 def parse_comprehensive(src, obj):
@@ -281,8 +320,64 @@ def parse_by_period(src, obj):
     return rows
 
 
+def parse_pool(src, obj):
+    """CANDIDATE_BACKTEST / GOLD_POOL_BACKTEST：候选池 / 黄金池前向收益。
+
+    🆕 2026-09-13 主人令：「只要接入算法链的选股策略，都要有回测」。
+    结构 = summary.by_period（与四量/CRDS/RPS 同构），每档一行。
+
+    额外诚实呈现（本产物特有，直接透传以免二次加工失真）：
+      · readiness      —— 每档「预期可算日期」（按交易日推算的**预期值**，非承诺）
+      · honesty_note   —— 生成器自带的诚实声明（零样本档一律 null，不用 0 冒充）
+      · priced_signals —— 真正取到 K 线的信号数（总信号数可能更多，差额=数据缺口）
+    """
+    sm = (obj or {}).get("summary") or {}
+    bp = sm.get("by_period") or {}
+    rows = []
+    if not bp:
+        return [_mk_row(src, "—", None, None, None, None, status="无 by_period 数据")]
+    readiness = (obj or {}).get("readiness") or {}
+    honesty = (obj or {}).get("honesty_note")
+    prefix = src.get("label_prefix") or "持有 T+"
+    for k in sorted(bp.keys(), key=lambda x: (_num(x) is None, _num(x) or 0)):
+        r = bp.get(k) or {}
+        n = _num(r.get("samples"))
+        if n is None:
+            n = _num(r.get("count"))
+        status = None
+        if not (n or 0):
+            exp = readiness.get(str(k))
+            status = "样本为 0（累积中）"
+            if exp:
+                status += f"；预期 {exp} 可算"
+        rows.append(_mk_row(
+            src, f"{prefix}{k}", n, r.get("win_rate"), r.get("avg_return"), f"T+{k}",
+            extra={"best_return": _num(r.get("best_return")),
+                   "worst_return": _num(r.get("worst_return")),
+                   "max_drawdown": _num(r.get("max_drawdown")),
+                   "sharpe": _num(r.get("sharpe_ratio")),
+                   "win_avg": _num(r.get("win_avg")), "loss_avg": _num(r.get("loss_avg")),
+                   "total_signals": _num((obj or {}).get("total_signals")),
+                   "priced_signals": _num((obj or {}).get("priced_signals")),
+                   "readiness": readiness.get(str(k)),
+                   "signal_date_range": sm.get("signal_date_range") or (obj or {}).get("signal_date_range"),
+                   "honesty_note": honesty},
+            status=status,
+        ))
+    return rows
+
+
 def parse_tdx(src, obj):
-    """BACKTEST_TDX.summary：每类 K 线信号一行，主口径 T+1、副口径 T+5。"""
+    """BACKTEST_TDX.summary：每类 K 线信号 × **每个持有期档位** 一行。
+
+    🔴 2026-09-13 主人令（档位扩至 10 档）——真根因修复：
+      原实现只取 T+1/T+3/T+5 三档塞进 extra，**长档（T+30…T+250）完全不进 rows**
+      ⇒ 前端 10 档矩阵里 K线信号层永远只有 T+1 一列有数。
+      更糟的是：源里零样本档写的是 win_rate_30d=0（**0 冒充未知**），
+      即使进了 rows 也会被误读成「策略失效」。
+      现改为「每个档位一行」，主口径仍标 T+1（该源原始主口径），
+      但所有档位都进 rows ⇒ 矩阵完整；零样本档由 _mk_row 统一兜底为 null + 累积中。
+    """
     sm = (obj or {}).get("summary") or {}
     rows = []
     if not sm:
@@ -290,14 +385,27 @@ def parse_tdx(src, obj):
     for k, v in sm.items():
         if not isinstance(v, dict):
             continue
-        rows.append(_mk_row(
-            src, (v.get("label") or k), _num(v.get("total")),
-            v.get("win_rate_1d"), v.get("avg_return_1d"), "T+1",
-            extra={"win_rate_5d": _num(v.get("win_rate_5d")),
-                   "avg_return_5d": _num(v.get("avg_return_5d")),
-                   "win_rate_3d": _num(v.get("win_rate_3d")),
-                   "avg_return_3d": _num(v.get("avg_return_3d"))},
-        ))
+        label = (v.get("label") or k)
+        total = _num(v.get("total"))
+        for hp in HOLD_LADDER_FULL:
+            wr = _num(v.get(f"win_rate_{hp}d"))
+            ar = _num(v.get(f"avg_return_{hp}d"))
+            win = _num(v.get(f"win_{hp}d"))
+            loss = _num(v.get(f"loss_{hp}d"))
+            draw = _num(v.get(f"draw_{hp}d"))
+            n = None
+            if win is not None or loss is not None or draw is not None:
+                n = (win or 0) + (loss or 0) + (draw or 0)
+            extra = {"total": total, "win": win, "loss": loss, "draw": draw}
+            if hp != FULL_LADDER[0]:
+                extra["_sibling"] = f"{label}·T+{FULL_LADDER[0]}"
+            rows.append(_mk_row(
+                src, label, n, wr, ar, f"T+{hp}",
+                extra=extra,
+                # ⚠️ 必须传 **False** 而非 True：传 True 会被 `bool(ov)` 判真
+                #    从而把 12 个档位全标成 is_primary ⇒ 卡级主表出现 12 条同卡重复行。
+                primary=False,
+            ))
     return rows
 
 
@@ -367,6 +475,7 @@ def parse_factor_lab(src, obj):
 PARSERS = {
     "comprehensive": parse_comprehensive,
     "by_period": parse_by_period,
+    "pool": parse_pool,
     "tdx": parse_tdx,
     "algo_compare": parse_algo_compare,
     "factor_lab": parse_factor_lab,
@@ -531,9 +640,9 @@ def _coverage(rows):
         c["status"] = st
         out.append(c)
     # 已知无回测产物的算法卡（**如实列出，不用编造数字填补**）
+    # 🔴 2026-09-13 主人令：候选池 / 黄金池已由 algorithms/backtest_pools.py 补齐
+    #   真实前向收益回测（挂 E 批），**从 known_gaps 移除** —— 它们不再是缺口。
     known_gaps = [
-        {"card": "候选池", "page": "选股策略", "status": "⚪ 无独立前向收益回测（仅 V8_POOL_TRACKER 跟踪池，可算浮动盈亏）"},
-        {"card": "黄金池", "page": "选股策略", "status": "⚪ 无独立前向收益回测"},
         {"card": "机游共振", "page": "盘后数据", "status": "⚪ 无独立前向收益回测"},
     ]
     have = {c["card"] for c in out}

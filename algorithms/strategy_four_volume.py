@@ -36,7 +36,7 @@ os.makedirs(DATA_DIR, exist_ok=True)
 #   这样写出来慢慢跟踪」。短档 1/3 保留（隔日冲高/短线验证有独立价值）。
 #   ⚠️ **同源铁律**：四个回测脚本共引此阶梯（backtest_tdx / backtest_comprehensive /
 #      strategy_four_volume / backtest_crds），不各写一套 —— 各写一套必然漂移。
-HOLD_LADDER = [5, 10, 20, 30, 45, 60, 75, 90]  # __SFV_LADDER_ANCHOR__
+HOLD_LADDER = [5, 10, 20, 30, 45, 60, 75, 90, 180, 250]  # __SFV_LADDER_ANCHOR__
 
 from scanner import (  # noqa: E402
     fetch_volume_top_stocks,
@@ -405,7 +405,10 @@ j    - 前复权（fetch_a_daily 走 akshare/腾讯前复权，前端 np 已处�
     """
     # 🔴 2026-09-12 扩档：+60 → +120 且下限抬到 480（覆盖 max(HOLD_LADDER)=90 交易日；
     #   原 3 年=810 根本身够，但 years 调小或 DAILY_BARS 被改小时会静默截断长档）。
-    bars = max(DAILY_BARS, int(years * 250) + 120, 480)
+    # 2026-09-13 主人令扩档：90 → 250 交易日，窗口下限 480 → 640。
+    #   原式 int(years*250)+120：years=5 时 = 1370 够；但 years 被调小或
+    #   DAILY_BARS 变小则 250 档静默截断 ⇒ 下限同步抬到 640 兜底。
+    bars = max(DAILY_BARS, int(years * 250) + 250, 640)
     stocks = fetch_volume_top_stocks(top_cy, top_kc, top_zb, top_hk)
     # 🔴 2026-09-12 主人令（拍板第 1 项·①）：持有期扩档 [1,3] + HOLD_LADDER。
     #   本脚本用 "Nd" 字符串键（与前端 by_period 键名一致），故在此展开为 str 形式；

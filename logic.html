@@ -1398,7 +1398,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td><b>A 采集批</b></td><td>交易日 18:00 后（闸门硬约束）</td><td>12</td><td>fetch_fundamental_quality / fetch_stock_names / gen_stock_profile / fetch_stock_quote_v8 / fetch_sh_index_fib / fetch_inst_trade / fetch_sector_rs / fetch_lhb / fetch_orphan_suspension / fetch_orphan_market_alerts / fetch_orphan_nt_data / fetch_orphan_sector_fund_flow</td><td>纯 fetch + 上游自产前置；<b>含龙虎榜 fetch_lhb（属 A 批，非 B 批）</b>；A 就绪是 B 批门槛</td></tr>
           <tr><td><b>B 选股批</b></td><td>A 就绪后 ~18:10 起</td><td>27</td><td><b>v8/factor_lab_gen.py（最前 · baostock 冷启动 50-90min）</b> → calc_crds / build_candidate_pool / calc_stock_rps / generate_top10 / strategy_four_volume_60m / strategy_four_volume / market_regime / sector_recommendation / update_triple_resonance_history / gen_triple_consensus / gen_triple_track / calc_volatility_watch / gen_stock_stop / gen_algo_track / calc_sentiment_cycle / refresh_dividend_cninfo / refresh_stock_metadata / fetch_weekend_run / auto_run_dn_algorithm / strong_breakout / track_h_auto_buy / scripts/fetch_ai_insights_compare / gen_factor_audit / gen_factor_progress / fetch_valuation_percentile / fetch_index_value_framework</td><td>🛡 2026-09-09 主人令：<b>因子实验室生成器前置到本批最前</b>，必须在 D 批 final_recommend 之前产完 FACTOR_LAB.js，因子融合才能吃当日新鲜因子（18:10 起跑→19:40 前产完，D 批必吃到）。B 批内其余脚本保持原相对次序不变；<b>候选股池</b>(build_candidate_pool) / <b>CRDS 含金股层</b>(calc_crds) / <b>TOP10</b>(generate_top10) 均在 B 批自产</td></tr>
           <tr><td><b>D 汇总批</b></td><td>~20:00 CST</td><td>1</td><td>final_recommend.py</td><td>跨策略共振 Top5（管线最终产物）。内置<b>因子实验室新鲜度门控</b>：等待 FACTOR_LAB.js 为当日新鲜最多 20min（正常 0 等待），超时仍不可用则<b>降级跳过融合</b>而非报错中断</td></tr>
-          <tr><td><b>E 回测批</b></td><td>~21:00 CST</td><td>8</td><td>backtest_tdx / backtest_comprehensive / backtest_expectancy / export_optimized_strategy / factor_lab_backtest / v8/backtest_crds / strategy_four_volume / gen_backtest_all_algos</td><td>backtest 全家 + 因子实验室分层回测（生成器已在 B 批前置）；strategy_four_volume 经 SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js（根治孤儿）；gen_backtest_all_algos 挂批内最末位次（ORDER 47/48，须读同批刚产出的回测源），按前端卡名汇总全部算法 → data/BACKTEST_ALL_ALGOS.js（策略回测页「全算法回测汇总」块：卡级排名 + 分档阶梯 + 低绩效下架提请）</td></tr>
+          <tr><td><b>E 回测批</b></td><td>~21:00 CST</td><td>9</td><td>backtest_tdx / backtest_comprehensive / backtest_expectancy / export_optimized_strategy / factor_lab_backtest / v8/backtest_crds / strategy_four_volume / <b>backtest_pools</b> / gen_backtest_all_algos</td><td>backtest 全家 + 因子实验室分层回测（生成器已在 B 批前置）；strategy_four_volume 经 SCRIPT_ENV 注入 <b>V8_BACKTEST_YEARS=5</b>（2026-09-13 由 3 抬升，否则 T+180/T+250 长档回看区间不足恒零样本）→ 补写 FOUR_VOLUME_BACKTEST.js（根治孤儿）；<b>backtest_pools</b>（2026-09-13 挂链）读 B 批候选池/黄金池产物算 10 档前向收益 → data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js，使「只要接入算法链的选股策略都有回测」成为结构性保证；gen_backtest_all_algos 挂批内最末位次（ORDER 47/48，须读同批刚产出的回测源），按前端卡名汇总全部算法 → data/BACKTEST_ALL_ALGOS.js（策略回测页「全算法回测汇总」块：卡级排名 + 分档阶梯 + 低绩效下架提请）</td></tr>
         </table>
         <div class="logic-h">批内同跑 / 跨批双模式注意</div>
         <div class="logic-p">· <b>strategy_four_volume.py 跨 B/E 双批</b>：B=选股模式产 FOUR_VOLUME.js，E=回测模式产 FOUR_VOLUME_BACKTEST.js（SCRIPT_ENV 注入），属有意为之，非重复误挂。<br>· <b>B 批同跑多算法</b>：因子实验室生成器（baostock 独立数据源）与 calc_crds / build_candidate_pool / calc_stock_rps 等互无文件写冲突、互无前置依赖，可安全背靠背串行；final_recommend(D) 仅依赖 B 产物，不依赖 B 内部次序之外的任何东西。<br>· <b>选股门控</b>：全部选股/回测脚本纳入「18:00 前不跑」护栏，防半日数据出假选股。</div>
@@ -1417,7 +1417,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td>① A 采集</td><td>就绪 <b>7/10</b> 项（<code>LHB_DATA.js</code> 为<b>必中项</b>；另有 sector_rs / stock_profile / fundamental_quality / stock_quote / inst_trade / suspension_alert / nt_data / sector_fund_flow_trend / market_alerts）· <b>12</b> 个脚本<br><span style="color:var(--sub)">2026-09-11：清单由 3 项扩到 10 项 —— 旧版只看 3 个代表产物，其余 6 个产物陈旧时闸门仍判「A 已就绪」，那些卡便整日红灯无人重跑。</span></td></tr>
           <tr><td>② B 选股</td><td>就绪 <b>8/9</b> 项（三重共识 / 四量终极 / 逆势龙头 + ai_insights_compare / factor_audit / factor_progress / valuation_percentile / index_value_framework / gold_pool；<b>只容忍 1 项不新鲜</b>）· <b>27</b> 个脚本（<code>v8/factor_lab_gen.py</code> 最前，baostock 冷启动 50-90min）<br><span style="color:var(--sub)">2026-09-11：清单由 3 项扩到 9 项 —— 原版 3 项鲜活即判「B 已就绪」→ 空转 → 9 张卡整日红灯。</span></td></tr>
           <tr><td>③ D 汇总</td><td>最终推荐 <b>1/1</b>（<code>FINAL_RECOMMEND_DATA.js</code>）· 仅 <code>final_recommend.py</code></td></tr>
-          <tr><td>④ E 回测</td><td>回测产物<b>任一</b>（<code>CRDS_BACKTEST.js</code> / <code>BACKTEST_TDX.js</code>）· <b>7</b> 个脚本</td></tr>
+          <tr><td>④ E 回测</td><td><code>CRDS_BACKTEST.js</code>/<code>BACKTEST_TDX.js</code> 至少 1 项 + <code>BACKTEST_ALL_ALGOS.js</code> + <code>CANDIDATE_BACKTEST.js</code> + <code>GOLD_POOL_BACKTEST.js</code>（<b>4/5</b> 项，2026-09-13 由 2/3 抬升）· <b>9</b> 个脚本</td></tr>
         </table>
         <div class="logic-h">✅ 全链成功定义（2026-09-11 主人令）</div>
         <div class="logic-p">盘后链「成功」= <b>A→B→D→E 四批产物全部为当日新鲜</b> + <b>已推送 main</b> + <b>Pages 部署完成</b>。任一批失败即该轮失败：闸门 <code>stage_ok=false</code> → 红灯 + 拒绝下游 + <b>紧急邮件报告</b> 2814546@qq.com（由本地看门狗/patrol 发出，GitHub Actions 本身不发邮件）。失败不回退死等——下一唤醒点重新问闸门，按「缺哪批跑哪批」幂等续跑，直到四批全绿且部署上线才算成功。</div>
@@ -1521,7 +1521,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <table class="lg-table">
           <tr><th>序</th><th>算法</th><th>一句话定义</th><th>可信度</th></tr>
           <tr><td>2</td><td>🥇 三重共识</td><td>主站TOP10精选 ∩ 基本面A档（2 重过滤）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐⭐</b> 最严</td></tr>
-          <tr><td>3</td><td>🔥 四量终极</td><td>游资点火+机构托底+当天金叉+四路翻多（4 重共振 + 3 年回测）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐</b></td></tr>
+          <tr><td>3</td><td>🔥 四量终极</td><td>游资点火+机构托底+当天金叉+四路翻多（4 重共振 + 5 年回测）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐</b></td></tr>
           <tr><td>4</td><td>🧬 选股生命周期</td><td>逐日累积快照跟踪（入池→持仓→走弱→剔除），与选股策略子页一致口径</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
           <tr><td>5</td><td>📈 相对强度</td><td>个股 RPS 百分位(50/120/250日) + 曼斯菲尔德 RS + 250日年线门禁（排名/筛选层）</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
           <tr><td>6</td><td>📊 逆势龙头</td><td>CRDS（弱市专用）</td><td><span style="font-size:10px;color:#94a3b8;font-weight:500;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span></td></tr>
@@ -1532,7 +1532,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">排序逻辑</div>
         <ul style="margin:6px 0 0 18px;font-size:13px;line-height:1.85;color:var(--txt);">
           <li><b>三重共识最可信</b>是因为它有 <b>2 个独立维度</b>（主站评分/基本面质量）<b>一致才入选</b>，命中即高质量。</li>
-          <li><b>四量终极</b> 4 重共振 + 3 年回测验证，信号明确，<b>命中即四条件齐发</b>，回测稳健。</li>
+          <li><b>四量终极</b> 4 重共振 + 5 年回测验证，信号明确，<b>命中即四条件齐发</b>，回测稳健。</li>
           <li><b>全站精选（已下线 2026-09-03）</b>曾是综合池，单信号强度弱。</li>
           <li><b>逆势龙头 CRDS</b> 是<b>专用场景</b>（弱市找强势股），不通用——所以不挂星级，只标"弱市专用"挂在末尾。</li>
           <li style="color:var(--gold)"><b>2026-08-29 主人令</b>：<b>🧭 选股池</b>作为选股策略子页（🧭 选股池 tab）——上游水源多源信号初筛池（主板+创业板+科创板成交前100 + 港股成交前50 + 外资研投），三板合计≥280视为健康。</li>
@@ -1666,7 +1666,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
 <div class="card">
         <h3><span class="ic">🔥</span>四量终极 - 说明</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p">游资点火 + 机构托底 + 当天金叉 + 四路翻多四条件<b>同时共振</b>才入选，命中即四路信号齐发。4 重共振 + 3 年回测验证，信号明确 → 可信度 ⭐⭐⭐⭐。</div>
+        <div class="logic-p">游资点火 + 机构托底 + 当天金叉 + 四路翻多四条件<b>同时共振</b>才入选，命中即四路信号齐发。4 重共振 + 5 年回测验证，信号明确 → 可信度 ⭐⭐⭐⭐。</div>
         <div class="logic-h">四个条件（全部满足 = QD 共振）</div>
         <table class="lg-table">
           <tr><th>条件</th><th>含义</th><th>技术定义</th></tr>
@@ -2082,7 +2082,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         🛡 <b>审计产物保护</b>：<code>api_push_raw.py</code> 设 <code>_PROTECTED_RAW</code>，<code>raw_data/audit_history.json</code> 与 <code>audit_nightly.log</code> 绝不经 API 裸推（否则 cn 机工作区旧审计文件会覆盖 main 新版、吞掉审计轨迹）。<br>
         🛡 <b>过期不挂实时徽章</b>：<code>index.html</code> 的 <code>_uBadge</code> 对 slot 为「实时/盘中」的卡片过期时不再显示实时标签，只留「更新于 + 时间 + 已停更」红胶囊。</div>
         <div class="logic-h">关键设计原则</div>
-        <div class="logic-p"><b>龙虎榜必须等 17:00 交易所发布后才能取完整数据</b>，因此 <code>post_close</code> 抓取档从 15:45 推迟到 <b>17:20 / 18:20 / 19:20</b>。盘中只刷新 T+0 快照、<b>不跑盘后算法</b>，避免用陈旧数据算出错误共识。盘后算法按 <b>A 采集（12 脚本）→ B 选股（23 脚本）→ D 汇总（1 脚本）→ E 回测（7 脚本）</b> 分批，批次由闸门按内容就绪度决定（详见「最终推荐」页的批次闸门说明）。</div>
+        <div class="logic-p"><b>龙虎榜必须等 17:00 交易所发布后才能取完整数据</b>，因此 <code>post_close</code> 抓取档从 15:45 推迟到 <b>17:20 / 18:20 / 19:20</b>。盘中只刷新 T+0 快照、<b>不跑盘后算法</b>，避免用陈旧数据算出错误共识。盘后算法按 <b>A 采集（12 脚本）→ B 选股（23 脚本）→ D 汇总（1 脚本）→ E 回测（9 脚本）</b> 分批，批次由闸门按内容就绪度决定（详见「最终推荐」页的批次闸门说明）。</div>
         <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后算法链顺序铁律（2026-08-08 修复）</b>：<code>generate_top10.py</code> 必须在 <code>backtest_comprehensive.py</code> / <code>cockpit_backtest_now.py</code> <b>之前</b>执行——综合回测依赖 top10 当日快照（<code>raw_data/history/top10_daily_YYYYMMDD.json</code>），顺序倒置会导致「综合回测」卡长期为空。</div>
       </div>
 
@@ -8642,7 +8642,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
         howHtml += '<div style="font-weight:700;color:'+s.color+';font-size:12.5px;margin-bottom:6px;">'+s.icon+' '+_hEsc(s.name)+(m?'':' <span style="font-size:10px;color:var(--dim);font-weight:500;">'+(s.track?'· 实时跟踪/截面观察':'· 历史回测样本累计中')+'</span>')+'</div>';
         howHtml += '<div style="font-size:11px;color:var(--dim);line-height:1.7;">';
         howHtml += '<b style="color:var(--txt);">口径</b>：'+_hEsc(s.method)+'<br>';
-        if(!s.track) howHtml += '<b style="color:var(--txt);">持有期窗口</b>：1 / 3 / 5 / 10 / 20 个交易日<br>';
+        if(!s.track) howHtml += '<b style="color:var(--txt);">持有期窗口</b>：1 / 3 / 5 / 10 / 20 / 30 / 45 / 60 / 75 / 90 / 180 / 250 个交易日（<b>统一 10 档阶梯</b>，2026-09-13 主人令由 90 日扩至 250 日）<br>';
         howHtml += '<b style="color:var(--txt);">指标定义</b>：'+_hEsc(s.def)+'<br>';
         if(trackCount) howHtml += '<b style="color:var(--txt);">实时跟踪</b>：'+_hEsc(trackCount)+'<br>';
         if(trackCount) howHtml += '<b style="color:var(--txt);">分档阶梯</b>：跟踪池逐日现采前向收益 T+5 / 10 / 20 / 30 / 45 / 60 / 75 / 90 个真实交易日（从近到远，有多少天算多少天，不必等 90 天期满；未成熟档位显示「累积中」——不是 0% 胜率）<br>';

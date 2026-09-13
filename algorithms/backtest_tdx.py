@@ -54,13 +54,13 @@ TODAY = datetime.now().strftime("%Y-%m-%d")
 #   这样写出来慢慢跟踪」。短档 1/3 保留（隔日冲高/短线验证有独立价值）。
 #   ⚠️ **同源铁律**：本阶梯是唯一真源，四个回测脚本一律引此常量；
 #      各写一套必然漂移（本仓历史教训）。
-HOLD_LADDER = [5, 10, 20, 30, 45, 60, 75, 90]
+HOLD_LADDER = [5, 10, 20, 30, 45, 60, 75, 90, 180, 250]
 # 🔴 2026-09-12 主人令：原 [1,3,5,10,20] → [1,3] + HOLD_LADDER。
 #   ⚠️ 只改档位**不够** —— 原 tdx_kline(count=60) 只有 60 根日K，而下面
 #      `idx + max(HOLD_DAYS) >= n` 会把近 90 个交易日内的信号**整条跳过**
 #      ⇒ 长档静默零样本（不是算出 0，是没算）。故 TDX_BARS 同步放宽。
 HOLD_DAYS = [1, 3] + HOLD_LADDER  # 2026-07-26 基线 [1,3,5,10,20]；2026-09-12 扩档
-TDX_BARS = 260  # 覆盖 90 交易日持有 + 信号检测自身所需窗口（原 60 根硬上限）
+TDX_BARS = 520  # 覆盖 250 交易日持有 + 信号检测自身窗口（2026-09-13 主人令：90→250 档，260→520）
 
 # 2026-09-06 主人令 P1-A：A 股交易成本默认假设（单边 万分之1.5，双边 0.3%）
 COST_BPS = 15
@@ -189,7 +189,7 @@ def log(msg):
     print(f"  {msg}")
 
 # ─── 通达信K线工具 ───
-def tdx_kline(code, setcode, period="4", count=60):
+def tdx_kline(code, setcode, period="4", count=TDX_BARS):  # 2026-09-13：默认值跟随 TDX_BARS（调用处已显式传参）
     """通过subprocess调通达信MCP接口（因部署环境可能无MCP，做本地回退）"""
     # 如果本地有缓存优先用
     cache_dir = os.path.join(DATA_DIR, "_tdx_cache")
@@ -224,7 +224,14 @@ def tdx_kline(code, setcode, period="4", count=60):
             bs_code = f"{prefix}.{code}"
 
             end_date = TODAY  # 保持 YYYY-MM-DD
-            start_dt = (datetime.now() - timedelta(days=90)).strftime("%Y-%m-%d")
+            # 🔴 2026-09-13 主人令（档位扩至 250 日）——真根因修复：
+            #   原经典写死 `timedelta(days=90)`（≈60 交易日），
+            #   count 参数**只用于缓存键**、根本没参与 baostock 取数。
+            #   故把 TDX_BARS 从 260 改到 520 是**无效改动** ——
+            #   窗口没变，T+30 以上仍必然零样本（不是算出 0，是根本没取到那么长的K线）。
+            #   现让 count 真正驱动窗口：自然日 ≈ 交易日 × 7/5 + 缓冲（覆盖长假），下限 120 天兜底。
+            _span_days = max(120, int(count * 7 / 5) + 30)
+            start_dt = (datetime.now() - timedelta(days=_span_days)).strftime("%Y-%m-%d")
             start_date = start_dt
 
             # baostock 不支持港股，跳过

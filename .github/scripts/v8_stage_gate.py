@@ -47,7 +47,7 @@
   A 采集批：10 项产物中 ≥7 项鲜活，且龙虎榜（must）必新  ← 以 READY_SPEC["A"] 为唯一真源
   B 选股批：9 项产物中 ≥8 项鲜活                        ← 以 READY_SPEC["B"] 为唯一真源
   D 汇总批：最终推荐                              → 1/1
-  E 回测批：CRDS 回测 / TDX 回测（任一）+ 全算法回测汇总 → 2/3
+  E 回测批：CRDS 回测 / TDX 回测（任一）+ 全算法回测汇总 + 候选池回测 + 黄金池回测 → 4/5
             ⚠️ 2026-09-12 起：BACKTEST_ALL_ALGOS 为**必新项**（原「任一即可」不覆盖它
                ⇒ 它缺失时全链零红灯）。need 随之 1 → 2。
   「今日盘后」= update_time 的日期==数据日 且 (时:分) >= 该日门槛。
@@ -184,7 +184,14 @@ READY_SPEC: dict[str, dict] = {
     #   可行性：该脚本是同批最后跑的一个（ORDER 47/48，排在其它回测之后，要读它们刚产出的源），
     #      只要它跑成功就必有产物 ⇒ 正常情况下不会把 E 批锁死成「永不就绪」。
     #      它若失败 → 正该重跑 E（而非静默）—— 这正是本改动的目的。
-    "E": {"items": ["data/CRDS_BACKTEST.js", "data/BACKTEST_TDX.js", "data/BACKTEST_ALL_ALGOS.js"], "need": 2, "must": []},
+    #
+    # 🔴 2026-09-13 主人令「只要接入算法链的选股策略，都要有回测」：E 批就绪清单 3 → 5 项，need 2 → 4。
+    #   新增 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（脚本 algorithms/backtest_pools.py
+    #   已挂 STAGES["E"] 第 8 位、聚合器之前）。
+    #   🔴 同一条铁律：**只加 items 不抬 need = 没加**。need=2 的语义下新增两项仍不参与判定，
+    #      必须抬到 4 = 「CRDS/TDX 至少 1 项」+「BACKTEST_ALL_ALGOS」+「两池回测」全部鲜活。
+    "E": {"items": ["data/CRDS_BACKTEST.js", "data/BACKTEST_TDX.js", "data/BACKTEST_ALL_ALGOS.js",
+                    "data/CANDIDATE_BACKTEST.js", "data/GOLD_POOL_BACKTEST.js"], "need": 4, "must": []},
 }
 
 # 各批上游：上游不就绪则拒绝开跑（顺序闸门 · 一环套一环）

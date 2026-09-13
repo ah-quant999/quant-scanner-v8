@@ -222,6 +222,15 @@ ORDER = [
     #   `_STAGE_UNION == set(ORDER)` 断言崩（仅STAGES有两脚本），盘后链启动即死、0 产出。
     #   此前被 V5 心跳闸门跳过链本体掩盖，2026-09-07 17:40 #1579 首次真跑暴露。
     "backtest_expectancy.py",         # → raw_data/backtest_expectancy.json（期望收益回测，与 E 批同位）
+    # 🆕 2026-09-13 主人令（“只要接入算法链的选股策略，都要有回测”）：
+    #   候选池 / 黄金池此前在回测页只有 known_gaps 占位，无任何回测产物。
+    #   本脚本读 B 批 build_candidate_pool 产出的 raw_data/candidate_members.json（first_seen）
+    #   与 raw_data/gold_pool.json（first_date），用 baostock 前复权日线算各档前向收益（T+N）。
+    #   输出：raw_data/candidate_backtest.json + data/CANDIDATE_BACKTEST.js，
+    #        raw_data/gold_pool_backtest.json + data/GOLD_POOL_BACKTEST.js。
+    #   ⚠️ 必须在 E 批末尾聚合器 gen_backtest_all_algos.py 之前（聚合器要读它本轮产物）。
+    #   ⚠️ 与 STAGES["E"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
+    "backtest_pools.py",
 
     # 🆕 2026-09-07 主人令「中信 PE 极值温度计 + 历史回测」双卡：fetcher 拉 sh.600030 PE/PB 时序
     # (raw_data/citic_pe_history.json) + 生成器产 data/CITIC_PE_THERMO.js + CITIC_PE_BACKTEST.js。
@@ -314,6 +323,10 @@ STAGES = {
         "v8/backtest_crds.py",   # → data/CRDS_BACKTEST.js （逆势龙头回测；2026-09-09 挂链补登，此前仅存在于 v8/ 目录、STAGES/ORDER 均未挂 → 永远跑不到）
         # 2026-09-06 主人令：AI预测卡回测 INVALID → 下架，停跑 path_probability_backtest.py
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
+        # 🆕 2026-09-13 主人令：候选池 / 黄金池前向收益回测（补齐“接链策略必有回测”的结构性保证）。
+        #   依赖 B 批 build_candidate_pool.py 产物（candidate_members / gold_pool），与回测家族同批；
+        #   必须在聚合器之前 → 聚合器才能读到本轮新产物。
+        "backtest_pools.py",        # → data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（10 档前向收益）
         # 🆕 2026-09-11 主人令：全算法回测汇总（按前端卡名、胜率/收益降序、低绩效提请下架）。
         #   ⚠️ 必须在 E 批**最后**——读同批其他脚本刚产出的回测产物 + D 批最终推荐。
         "gen_backtest_all_algos.py",   # → data/BACKTEST_ALL_ALGOS.js（策略回测页总览）
@@ -333,7 +346,11 @@ STAGES = {
 #   故按脚本注入环境变量（strategy_four_volume.py 读 V8_BACKTEST_YEARS>0 时同时跑近 N 年回测
 #   并补写 data/FOUR_VOLUME_BACKTEST.js）。仅影响 E 回测批；B 选股批无注入、保持轻快。
 SCRIPT_ENV = {
-    "strategy_four_volume.py": {"V8_BACKTEST_YEARS": "3"},
+    # 🔴 2026-09-13 主人令（档位扩至 250 交易日）：3 → 5 年。
+    #   根因：years=3 时 bars≈810 根，扣掉信号检测窗口后 T+180/T+250 落在区间外
+    #   ⇒ 两档恒零样本（前端只能显示「累积中」），并非策略失效而是**回看区间不够**。
+    #   years=5 → bars = max(DAILY_BARS, 5*250+250=1500) 足以覆盖 250 交易日最长持有。
+    "strategy_four_volume.py": {"V8_BACKTEST_YEARS": "5"},
     "backtest_expectancy.py": {"V8_USE_BAOSTOCK": "1"},   # 🆕 runner 用 baostock 拉全量K线，产出新鲜回测
 }
 # 自校验：STAGES 并集必须精确覆盖 ORDER（无遗漏/多余，保证分批模式不丢脚本）

@@ -1632,6 +1632,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/RPS_BACKTEST.js?v=1789277007" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
 <script src="data/BACKTEST_ALL_ALGOS.js?v=1789277007" defer></script>
+<!-- 🧮 2026-09-13 主人令「只要接入算法链的选股策略，都要有回测」：候选池 / 黄金池
+     前向收益回测（E 批 algorithms/backtest_pools.py 产出，10 档：5/10/20/30/45/60/75/90/180/250）。
+     口径：首次进池（候选池）/ 首次满足信号（黄金池）的次一交易日开盘买入，
+     持有 N 个真实交易日收盘卖出，前复权、扣双边 0.3%。 -->
+<script src="data/CANDIDATE_BACKTEST.js?v=1789277007" defer></script>
+<script src="data/GOLD_POOL_BACKTEST.js?v=1789277007" defer></script>
     <script src="data/FACTOR_LAB.js?v=1789277007" defer></script>
 <!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
 <script src="data/ETF_PULSE.js?v=1789277007" defer></script>
@@ -5169,6 +5175,79 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         })();
         /* 🔴 2026-09-12 主人令「去重」：原「① 卡级主表」与页首「📋 主对比表」同源同列，
            整体删除。此处只保留原「② 累积中（不排名）」，标题上提为主标题。 */
+
+        /* ══ 🆕 2026-09-13 主人令：持有期档位矩阵（5/10/20/30/45/60/75/90/180/250） ══
+           主人原话：「只要接入算法链的选股策略，都要有回测，这样才能完整观测到底靠不靠谱。
+           马上把所有接入算法链的选股策略都按 5、10、20、30、45、60、75、90、180、250 日
+           的跟踪回测，详细记录在策略回测页。」
+           本块 = 把「累积中」提示升级为**完整矩阵**：每张链内策略卡一行 × 全部 10 档，
+           每格显示 胜率 / 平均收益。
+           诚实铁律：无样本的档位显示「累积中」而**不显示 0%** —— 没算到 ≠ 算出来是 0。 */
+        var LADDER = A.full_ladder || [5,10,20,30,45,60,75,90,180,250];
+        var _allRows = A.rows || [];
+        // 按卡聚合：只取 trade 类（研究型/信号层口径不同，不套 10 档矩阵）
+        var _byCard = {};
+        _allRows.forEach(function(r){
+          if(r.cat !== 'trade') return;
+          var h = String(r.hold||'').replace('T+','').trim();
+          if(!/^\d+$/.test(h)) return;
+          if(LADDER.indexOf(Number(h)) < 0) return;
+          var c = _byCard[r.card] || (_byCard[r.card] = {card:r.card, icon:r.icon, page:r.page,
+                                                        fresh:false, chain:r.chain_member, cells:{}});
+          c.cells[Number(h)] = r;
+          if(r.fresh) c.fresh = true;
+        });
+        var _cardList = Object.keys(_byCard).map(function(k){ return _byCard[k]; })
+                          .sort(function(a,b){ return (b.chain?1:0)-(a.chain?1:0) || a.card.localeCompare(b.card); });
+
+        if(_cardList.length){
+          html += '<div style="margin:16px 0 6px;font-size:12.5px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>🧭</span>持有期档位矩阵'
+               +  ' <span style="font-size:11px;color:var(--dim);font-weight:500;">'+LADDER.length+' 档 · 每格「胜率 / 平均收益」· 「累积中」=样本不足（不是 0%）</span></div>';
+          html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:10.5px;">';
+          html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">'
+               +  '<th style="padding:5px;text-align:left;color:var(--sub);white-space:nowrap;position:sticky;left:0;background:var(--card2);z-index:1;">策略卡</th>'
+               +  LADDER.map(function(h){ return '<th style="padding:4px 3px;text-align:center;color:var(--sub);white-space:nowrap;">T+'+h+'</th>'; }).join('')
+               +  '<th style="padding:5px;text-align:center;color:var(--sub);white-space:nowrap;">档位就绪</th>'
+               +  '</tr></thead><tbody>';
+          _cardList.forEach(function(c){
+            var ready = LADDER.filter(function(h){ var r=c.cells[h]; return r && (r.sample||0) > 0; }).length;
+            html += '<tr style="border-bottom:1px solid var(--border2);">'
+                 +  '<td style="padding:5px;white-space:nowrap;position:sticky;left:0;background:var(--card);z-index:1;">'
+                 +    '<b style="color:var(--txt);">'+(c.icon||'')+_esc(c.card)+'</b>'
+                 +    '<div style="font-size:9.5px;font-weight:400;color:'+(c.chain?'var(--sub)':'#fb923c')+';">'
+                 +      (c.chain? '链内' : '⚠ 未挂链')+' · '+_esc(c.page||'')+'</div>'
+                 +  '</td>';
+            LADDER.forEach(function(h){
+              var r = c.cells[h];
+              if(!r || !(r.sample||0)){
+                var eta = (r && r.extra && r.extra.ready_eta) ? r.extra.ready_eta : null;
+                html += '<td style="padding:4px 3px;text-align:center;color:var(--dim);font-size:9.5px;"'
+                     +  (eta?(' title="预期 '+_esc(eta)+' 可算"'):'') + '>累积中</td>';
+              }else{
+                var wr = (r.win_rate==null) ? null : Number(r.win_rate);
+                var ar = (r.avg_return==null) ? null : Number(r.avg_return);
+                var dim = ((r.sample||0) < MINS) ? 'opacity:.55;' : '';
+                html += '<td style="padding:4px 3px;text-align:center;white-space:nowrap;'+dim+'">'
+                     +    '<div style="font-weight:700;color:'+(wr==null?'var(--dim)':_colorWR(wr))+';">'
+                     +      (wr==null?'—':wr.toFixed(1)+'%')+'</div>'
+                     +    '<div style="color:'+(ar==null?'var(--dim)':_colorPL(ar))+';">'
+                     +      (ar==null?'—':((ar>0?'+':'')+ar.toFixed(2)+'%'))+'</div>'
+                     +    '<div style="font-size:9px;color:var(--dim);">n='+(r.sample||0)+'</div>'
+                     +  '</td>';
+              }
+            });
+            html += '<td style="padding:5px;text-align:center;color:'+(ready?'var(--sub)':'var(--dim)')+';white-space:nowrap;">'
+                 +   ready+'/'+LADDER.length
+                 +   (ready<LADDER.length?'<div style="font-size:9px;color:var(--dim);">累积中</div>':' ✅')
+                 +  '</td></tr>';
+          });
+          html += '</tbody></table></div>';
+          html += '<div style="font-size:10.5px;color:var(--sub);margin:6px 0 0;line-height:1.6;">'
+               +  '📌 口径：信号日<b>次一交易日开盘</b>买入、持有到第 N 个真实交易日<b>收盘</b>卖出（前复权·'
+               +  '已扣双边 0.3%）。「累积中」= 信号历史还不足该档所需交易日数，'
+               +  '<b>不是 0% 胜率</b>；鼠标悬停可见预期就绪日期。'
+               +  '链内 = 该策略由盘后算法链产出；⚠ 未挂链 = 该源不在链内，新鲜度无保证。</div>';
+        }
 
         /* ② 累积中（不排名，明示原因） */
         if((A.insufficient||[]).length){

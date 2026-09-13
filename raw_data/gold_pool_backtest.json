@@ -1,0 +1,158 @@
+{
+ "update_time": "2026-09-13 12:18:13",
+ "calc_time": "2026-09-13 12:18:13",
+ "card": "黄金池",
+ "method": "黄金池「首次满足信号日」次一交易日开盘买入、持有 N 个真实交易日收盘卖出（前复权·扣双边 0.3%）。含多信号共振硬筛。",
+ "cost_bps_per_side": 15,
+ "cost_adjusted": true,
+ "hold_periods": [
+  1,
+  3,
+  5,
+  10,
+  20,
+  30,
+  45,
+  60,
+  75,
+  90,
+  180,
+  250
+ ],
+ "signal_date_range": "2026-09-07 ~ 2026-09-11",
+ "signal_days": 5,
+ "total_signals": 253,
+ "priced_signals": 127,
+ "readiness": {
+  "5": "2026-09-19",
+  "10": "2026-09-26",
+  "20": "2026-10-10",
+  "30": "2026-10-24",
+  "45": "2026-11-14",
+  "60": "2026-12-05",
+  "75": "2026-12-26",
+  "90": "2027-01-16",
+  "180": "2027-05-22",
+  "250": "2027-08-28"
+ },
+ "honesty_note": "样本不足的档位 samples=0 且 win_rate/avg_return 为 null（前端显示「累积中」），绝不用 0 冒充；长档就绪日期为按交易日推算的预期值，非承诺。",
+ "summary": {
+  "update_time": "2026-09-13 12:18:13",
+  "calc_time": "2026-09-13 12:18:13",
+  "method": "黄金池「首次满足信号日」次一交易日开盘买入、持有 N 个真实交易日收盘卖出（前复权·扣双边 0.3%）。含多信号共振硬筛。",
+  "signal_date_range": "2026-09-07 ~ 2026-09-11",
+  "cost_bps_per_side": 15,
+  "cost_adjusted": true,
+  "total_signals": 253,
+  "by_period": {
+   "1": {
+    "samples": 127,
+    "win_rate": 32.28,
+    "avg_return": -1.79,
+    "best_return": 14.03,
+    "worst_return": -13.33,
+    "win_avg": 2.85,
+    "loss_avg": -4.0
+   },
+   "3": {
+    "samples": 88,
+    "win_rate": 14.77,
+    "avg_return": -4.59,
+    "best_return": 20.49,
+    "worst_return": -24.25,
+    "win_avg": 5.46,
+    "loss_avg": -6.33
+   },
+   "5": {
+    "samples": 0,
+    "win_rate": null,
+    "avg_return": null,
+    "best_return": null,
+    "worst_return": null,
+    "win_avg": null,
+    "loss_avg": null
+   },
+   "10": {
+    "samples": 0,
+    "win_rate": null,
+    "avg_return": null,
+    "best_return": null,
+    "worst_return": null,
+    "win_avg": null,
+    "loss_avg": null
+   },
+   "20": {
+    "samples": 0,
+    "win_rate": null,
+    "avg_return": null,
+    "best_return": null,
+    "worst_return": null,
+    "win_avg": null,
+    "loss_avg": null
+   },
+   "30": {
+    "samples": 0,
+    "win_rate": null,
+    "avg_return": null,
+    "best_return": null,
+    "worst_return": null,
+    "win_avg": null,
+    "loss_avg": null
+   },
+   "45": {
+    "samples": 0,
+    "win_rate": null,
+    "avg_return": null,
+    "best_return": null,
+    "worst_return": null,
+    "win_avg": null,
+    "loss_avg": null
+   },
+   "60": {
+    "samples": 0,
+    "win_rate": null,
+    "avg_return": null,
+    "best_return": null,
+    "worst_return": null,
+    "win_avg": null,
+    "loss_avg": null
+   },
+   "75": {
+    "samples": 0,
+    "win_rate": null,
+    "avg_return": null,
+    "best_return": null,
+    "worst_return": null,
+    "win_avg": null,
+    "loss_avg": null
+   },
+   "90": {
+    "samples": 0,
+    "win_rate": null,
+    "avg_return": null,
+    "best_return": null,
+    "worst_return": null,
+    "win_avg": null,
+    "loss_avg": null
+   },
+   "180": {
+    "samples": 0,
+    "win_rate": null,
+    "avg_return": null,
+    "best_return": null,
+    "worst_return": null,
+    "win_avg": null,
+    "loss_avg": null
+   },
+   "250": {
+    "samples": 0,
+    "win_rate": null,
+    "avg_return": null,
+    "best_return": null,
+    "worst_return": null,
+    "win_avg": null,
+    "loss_avg": null
+   }
+  }
+ }
+}
