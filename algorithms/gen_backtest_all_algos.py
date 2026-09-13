@@ -69,11 +69,11 @@ SOURCES = [
     dict(card="三重共识", kind="strategy", page="选股策略", icon="🧲", cat="trade",
          var="BACKTEST_COMPREHENSIVE", rel="data/BACKTEST_COMPREHENSIVE.js",
          parser="comprehensive", label_prefix="共振", primary="共振≥80（严格）",
-         method="baostock 真实收盘价（前复权·扣双边 0.3%）"),
+         method="信号日次一交易日开盘买入、持有 N 个真实交易日收盘卖出（baostock 前复权·扣双边 0.3%）"),
     dict(card="四量终极", kind="strategy", page="选股策略", icon="📊", cat="trade",
          var="FOUR_VOLUME_BACKTEST", rel="data/FOUR_VOLUME_BACKTEST.js",
          parser="by_period", label_prefix="持有", primary="持有 T+5",
-         method="信号日收盘价买入、持有 N 个真实交易日收盘价卖出（前复权·扣双边 0.3%）"),
+         method="信号日次一交易日开盘买入、持有 N 个真实交易日收盘卖出（前复权·扣双边 0.3%）"),
     dict(card="逆势龙头", kind="strategy", page="选股策略", icon="🐉", cat="trade",
          var="CRDS_BACKTEST", rel="data/CRDS_BACKTEST.js",
          parser="by_period", label_prefix="持有", primary="持有 T+5",
@@ -87,7 +87,7 @@ SOURCES = [
     dict(card="K线信号层", kind="signal", page="策略回测", icon="📈", cat="signal",
          var="BACKTEST_TDX", rel="data/BACKTEST_TDX.js",
          parser="tdx", label_prefix="", primary=None,
-         method="9 类 K 线信号 60 日前向回测（前复权）"),
+         method="9 类 K 线信号 60 日前向回测：信号日次一交易日开盘买入、持有 N 日收盘卖出（前复权）"),
     # 🆕 2026-09-13 主人令：「只要接入算法链的选股策略，都要有回测」。
     #   候选池 / 金股池此前在 coverage 里是硬编码 known_gaps（「无独立前向收益回测」），
     #   但它们**确实接在盘后算法链内**（B 批 build_candidate_pool.py 产出）。

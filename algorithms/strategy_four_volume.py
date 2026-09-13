@@ -358,7 +358,7 @@ def write_four_volume_backtest_js(records, bt_summary=None, out_dir=DATA_DIR):
                 "max_drawdown": v.get("max_drawdown"),
                 "sharpe_ratio": v.get("sharpe_ratio"),
             }
-    method = "四量终极历史回测：信号日收盘价买入，持有N个交易日收盘价卖出"
+    method = "四量终极历史回测：信号日次一交易日开盘买入，持有N个交易日收盘价卖出"
     # 🆕 2026-09-11：原文案没写成本口径，页面上看不出收益是否已扣费（口径不透明 = 半假）
     if bt_summary:
         method += f"（前复权；已扣双边交易成本 {2 * COST_BPS / 100:.2f}%）"
@@ -430,15 +430,22 @@ j    - 前复权（fetch_a_daily 走 akshare/腾讯前复权，前端 np 已处�
             df = calc_siliang_ultimate_signal(df)
             xg = df["四量终极_XG"].fillna(False).values
             closes = df["close"].astype(float).values
+            opens = df["open"].astype(float).values
             for i in range(len(df)):
                 if not xg[i]:
                     continue
+                # 🔴 2026-09-13 主人令「统一测算标准 · 用最科学的计算」（小九周末审计 P1-1）：
+                #   入场 = 信号日**次一交易日开盘**（原取信号日收盘 = 前视偏差：
+                #   信号由当日收盘算出，「当日收盘价买入」实盘做不到 ⇒ 系统性高估）。
+                e = i + 1                        # 入场日索引 = 信号日次一交易日
+                if e >= len(df):
+                    continue
                 total_signals += 1
-                entry_px = closes[i]
-                if entry_px <= 0:
+                entry_px = opens[e]              # 入场价 = 次日开盘
+                if not (entry_px > 0):
                     continue
                 for k, off in periods.items():
-                    j = i + off
+                    j = e + off
                     if 0 <= j < len(closes):
                         gross = (closes[j] / entry_px - 1) * 100
                         net = gross - cost_pct
@@ -461,7 +468,7 @@ j    - 前复权（fetch_a_daily 走 akshare/腾讯前复权，前端 np 已处�
                         #   与 net 同口径）。
                         _path = []
                         for m in range(1, off + 1):
-                            jm = i + m
+                            jm = e + m
                             if 0 <= jm < len(closes):
                                 _path.append((closes[jm] / entry_px - 1) * 100
                                              - cost_pct * (m / off))
@@ -524,7 +531,7 @@ j    - 前复权（fetch_a_daily 走 akshare/腾讯前复权，前端 np 已处�
     #   .js 自 09-02 手工跑后无人再生成（运维 all_ 动态扫描按通用 24h 红线必报孤儿 fail）。
     summary_out = dict(summary)
     summary_out["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    summary_out["method"] = f"四量终极历史回测：信号日收盘价买入，持有N个真实交易日收盘价卖出（前复权；已扣双边交易成本 {2*COST_BPS/100:.2f}%）"
+    summary_out["method"] = f"四量终极历史回测：信号日次一交易日开盘买入，持有N个真实交易日收盘价卖出（前复权；已扣双边交易成本 {2*COST_BPS/100:.2f}%）"
     with open(os.path.join(DATA_DIR, "FOUR_VOLUME_BACKTEST.js"), "w", encoding="utf-8") as f:
         f.write("/* 四量终极历史回测 strategy_four_volume.py 默认 3 年回测 */\n")
         f.write("window.FOUR_VOLUME_BACKTEST = " + json.dumps(summary_out, ensure_ascii=False) + ";\n")

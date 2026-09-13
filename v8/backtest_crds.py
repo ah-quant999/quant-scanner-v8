@@ -177,7 +177,7 @@ def fetch_close(code, date):
 
 
 def fetch_kline_around(code, center_date_str, lookback_days=8, lookahead_days=LOOKAHEAD_DAYS):
-    """一次性拉 signal 前后一段连续 K 线（前复权），返回 [(date, close), ...]。
+    """一次性拉 signal 前后一段连续 K 线（前复权），返回 [(date, open, close), ...]。
 
     用于：在 K 线序列里找 entry 真实交易日 + 后 N 个真实交易日，避免日历日的提前/延后失真。
     2026-09-06 主人令 P0-A：用 K 线序列替代「日历日+1/3/5/10/20」持有期，与综合回测/通达信口径统一。
@@ -190,15 +190,21 @@ def fetch_kline_around(code, center_date_str, lookback_days=8, lookahead_days=LO
         end = (d + timedelta(days=lookahead_days)).strftime("%Y-%m-%d")
         r = bs.query_history_k_data_plus(
             bs_code(code),
-            "date,close",
+            "date,open,close",   # 🔴 09-13：入场改用次日开盘 ⇒ 需 open
             start_date=start, end_date=end,
             frequency="d", adjustflag="2",  # 前复权
         )
         rows = []
         while r.error_code == "0" and r.next():
             x = r.get_row_data()
-            if x and x[0] and x[1]:
-                rows.append((x[0], float(x[1])))
+            if x and x[0] and x[2]:
+                # 🔴 2026-09-13 统一测算标准（小九审计 P1-1）：入场改用**次日开盘**
+                #   ⇒ 需 open；停牌/缺失时回退当日收盘（避免整条信号被丢弃）。
+                try:
+                    _of = float(x[1]) if x[1] not in (None, "", "0.0000") else float(x[2])
+                except Exception:
+                    _of = float(x[2])
+                rows.append((x[0], _of, float(x[2])))
         return rows
     except Exception as e:
         print(f"[kline] {code} {center_date_str} error: {e}")
@@ -303,14 +309,22 @@ def main():
         #   （35 自然日 ≈ 24 交易日，凑不满 30）。这才是「假修复」的真凶。
         rows = fetch_kline_around(code, signal_date, lookback_days=8,
                                   lookahead_days=LOOKAHEAD_DAYS)
-        entry_idx = None
-        for i, (d, _) in enumerate(rows):
-            if d >= signal_date:
-                entry_idx = i; break
-        if entry_idx is None:
-            print(f"[{idx}/{total}] skip {code} {signal_date}: no kline after signal date")
+        # 🔴 2026-09-13 主人令「统一测算标准 · 用最科学的计算」（小九周末审计 P1-1）：
+        #   入场 = 信号日**次一交易日开盘**。原取 `d >= signal_date` = 信号日本身、
+        #   价 = 当日收盘 ⇒ 前视偏差（信号由盘后算出，「当日收盘价买入」实盘做不到）。
+        sig_idx = None
+        for i, r in enumerate(rows):
+            if r[0] >= signal_date:
+                sig_idx = i; break
+        if sig_idx is None:
+            print(f"[{idx}/{total}] skip {code} {signal_date}: no kline at/after signal date")
             continue
-        entry_td, entry_price = rows[entry_idx]
+        entry_idx = sig_idx + 1                  # 次一交易日 = 入场日
+        if entry_idx >= len(rows):
+            print(f"[{idx}/{total}] skip {code} {signal_date}: no next trading day after signal")
+            continue
+        entry_td, _entry_o, _entry_c = rows[entry_idx]
+        entry_price = _entry_o                   # 入场价 = 次日开盘
         if entry_price is None or entry_price <= 0:
             print(f"[{idx}/{total}] skip {code} {signal_date}: invalid entry price")
             continue
@@ -327,7 +341,7 @@ def main():
             if target_idx >= len(rows):
                 sig_result["periods"][str(p)] = {"return_pct": None, "gross_return": None, "exit_price": None, "exit_date": None}
                 continue
-            exit_td, exit_price = rows[target_idx]
+            exit_td, _x_o, exit_price = rows[target_idx]   # 卖出按收盘
             gross = (exit_price - entry_price) / entry_price * 100
             net = gross - cost_pct
             sig_result["periods"][str(p)] = {
@@ -343,7 +357,7 @@ def main():
             for k in range(1, p + 1):
                 j = entry_idx + k
                 if j >= len(rows): break
-                _, px2 = rows[j]
+                _, _, px2 = rows[j]
                 cum_path.append((px2 / entry_price - 1) * 100 - cost_pct)
             period_per_signal_equity[p].append(cum_path)
         detail_signals.append(sig_result)

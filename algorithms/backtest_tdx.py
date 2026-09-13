@@ -368,16 +368,22 @@ def calc_forward_return(rows, idx, hold_days, board="主板"):
     返回 {"ret": 提前出场后收益, "raw_ret": 原持有期收盘价收益,
           "exit_type": 'stop'/'target'/None, "stop_loss": ..., "target_price": ..., "risk_reward": ...}
     """
+    # 🔴 2026-09-13 主人令「统一测算标准 · 用最科学的计算」（小九周末审计 P1-1）：
+    #   入场 = 信号日**次一交易日开盘**。原取「信号日收盘」= 前视偏差：
+    #   本信号由盘后 18:10（B 批）用**当日收盘**数据算出，「当日收盘价买入」实盘做不到；
+    #   且动量/突破类信号当日多伴涨 ⇒ 等于白拿尾盘涨幅 ⇒ 系统性高估（T+1 档最失真）。
     n = len(rows)
-    target = idx + hold_days
+    entry_idx = idx + 1                     # 次一交易日 = 入场日
+    target = entry_idx + hold_days          # 持有期自入场日起算
     if target >= n:
         return None
-    entry = rows[idx]["close"]
-    if entry <= 0:
+    entry = rows[entry_idx].get("open")     # 入场价 = 次日开盘
+    if not entry or entry <= 0:
         return None
+    idx = entry_idx                         # 后续止损模拟/收益窗口一律以入场日为基准
 
-    # 用 idx 当日及之前数据计算止损/止盈（非未来函数）
-    df = pd.DataFrame(rows[: idx + 1])
+    # 用「入场日之前」数据计算止损/止盈（不含入场日 ⇒ 严格非未来函数）
+    df = pd.DataFrame(rows[: idx])
     st = compute_stop_target(df, board=board, strategy="tdx")
     if st:
         stop_loss = st["stop_loss"]

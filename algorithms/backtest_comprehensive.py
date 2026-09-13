@@ -296,17 +296,21 @@ def calc_multi_hold(entry_date: str, entry_price: float, bsc: str, board: str = 
     if not rows:
         return None
 
-    # 找到 <= entry_date 的最后一条（真实入场日/价）
-    entry_idx = None
+    # 🔴 2026-09-13 主人令「统一测算标准 · 用最科学的计算」（小九周末审计 P1-1）：
+    #   入场 = 信号日**次一交易日开盘**。原取「<= entry_date 的最后一条」= 信号日本身、
+    #   价取索引 4（收盘）⇒ 前视偏差（信号由盘后算出，「当日收盘价买入」实盘做不到）。
+    #   先定位信号日，再取其**下一条** = 次一交易日（休市/停牌自动顺延）。
+    sig_idx = None
     for i in reversed(range(len(rows))):
         if rows[i][0] <= entry_date:
-            entry_idx = i
+            sig_idx = i
             break
-    if entry_idx is None:
+    if sig_idx is None or sig_idx + 1 >= len(rows):
         return None
+    entry_idx = sig_idx + 1                 # 次一交易日 = 入场日
 
     real_entry_date = rows[entry_idx][0]
-    real_entry_price = float(rows[entry_idx][4])
+    real_entry_price = float(rows[entry_idx][1])   # 索引 1 = open
 
     # 建 DataFrame（前复权）
     df_all = pd.DataFrame(rows, columns=["date", "open", "high", "low", "close", "volume"])
@@ -314,7 +318,8 @@ def calc_multi_hold(entry_date: str, entry_price: float, bsc: str, board: str = 
         df_all[c] = pd.to_numeric(df_all[c], errors="coerce")
 
     # 用 entry 当日及之前数据算止损/止盈（非未来函数）
-    df_entry = df_all.iloc[: entry_idx + 1].copy()
+    # 止损/止盈基准只用「入场日之前」的数据（不含入场日 ⇒ 严格非未来函数）
+    df_entry = df_all.iloc[: entry_idx].copy()
     st = compute_stop_target(df_entry, board=board, strategy="comprehensive")
     if not st:
         # 历史数据不足时回退方案三统一口径：固定10%止损 + R:R=1.5止盈
