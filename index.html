@@ -6657,10 +6657,8 @@ window.__renderIndexObserve = function(){
       + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
       + '<b style="font-size:15px;">&#x1F4CA; 因子补缺与审计：v8 选股 vs 质量价值中小盘多因子</b>'
       + '<span style="font-size:10px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);padding:1px 6px;border-radius:4px;">审计+跟踪</span>'
-      + _uBadge('盘后', '研究', F.update_time, F.source)
-      // 2026-09-13 主人令：原「因子补缺·walk-forward 进度」卡与本卡同源同规矩，合并为一张。
-      //   两个徽章并排：审计源 + 进度源，各自独立报陈旧。
-      + _uBadge('盘后', '进度', P.update_time, P.source_update_time)
+      // 2026-09-13 主人令：原「因子补缺·walk-forward 进度」卡与本卡合并，取两源最新时间，只留一个「更新于」胶囊。
+      + _uBadge('盘后', '研究+进度', (F.update_time > P.update_time ? F.update_time : P.update_time), (F.source || P.source_update_time))
       + '</div>'
       // 2026-09-10 主人令：卡名下方加"核心内容 + 解析"
       + '<div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.22);border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.7;">'
