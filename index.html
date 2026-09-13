@@ -4419,7 +4419,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var r = bp[String(p)] || {};
         var wr = r.win_rate, ar = r.avg_return, br = r.best_return, wst = r.worst_return;
         var rowDim = (lowSample || (r.samples||0) < 30) ? ';opacity:.55;background:rgba(148,163,184,.04);' : '';
-        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+rowDim+'"';
+        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+rowDim+'">';
         html += '<td style="padding:6px;color:var(--txt);font-weight:700;">T+'+p+'天</td>';
         html += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(r.samples||0)+'</td>';
         html += '<td style="padding:6px;text-align:right;font-weight:700;color:'+_colorWR(wr)+';">'+(wr!=null?wr.toFixed(1):'—')+'%</td>';
@@ -5376,31 +5376,71 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         resonance_gte70_lt80:'共振70-79分',
         resonance_gte80:     '共振≥80（严格）',
       };
-      // 在前三档 label 后追加口径标签
       var labelSuffix = function(base){ return base + '<span style="font-size:9px;color:var(--sub);margin-left:4px;font-weight:400;">'+_ldr+'</span>'; };
       var stratList = bc.strategies_tested || ['resonance_all','resonance_gte70_lt80','resonance_gte80'];
       var holdList = bc.hold_periods_tested || [1,3,5,10,20];
-      // 表头：策略 × 持有期
+      // 2026-09-13 主人令：直接标出最佳策略 + 最佳持有期，不用自己找
+      var bestScore = -Infinity, bestS = null, bestH = null, bestD = null;
+      var stratAvg = {};
+      stratList.forEach(function(s){
+        var sum = 0, n = 0, bestHs = -Infinity, bestHp = null;
+        holdList.forEach(function(h){
+          var d = (bc.comparison['hold_'+h+'d']||{})[s] || {};
+          if(d.win_rate != null && d.avg_return != null){
+            var sc = (d.win_rate - 50) + d.avg_return * 8;
+            sum += sc; n++;
+            if(sc > bestScore){ bestScore = sc; bestS = s; bestH = h; bestD = d; }
+            if(sc > bestHs){ bestHs = sc; bestHp = h; }
+          }
+        });
+        stratAvg[s] = {avg: n ? sum/n : -Infinity, bestH: bestHp};
+      });
+      var bestStrategy = bestS;
+      stratList.forEach(function(s){ if(stratAvg[s].avg > stratAvg[bestStrategy].avg) bestStrategy = s; });
+      if(bestS && bestH){
+        html += '<div style="margin:8px 0 10px;padding:7px 11px;border-radius:8px;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.35);font-size:12px;line-height:1.5;">';
+        html += '<span style="color:#fbbf24;font-weight:700;">👑 当前最佳策略：</span>';
+        html += '<span style="color:var(--txt);font-weight:700;">'+_esc(labelMap[bestS]||bestS)+'</span>';
+        html += '<span style="color:var(--sub);"> · 持有 T+'+bestH+'天 · 胜率 </span>';
+        html += '<span style="color:'+_colorWR(bestD.win_rate)+';font-weight:700;">'+(bestD.win_rate!=null?bestD.win_rate.toFixed(1):'—')+'%</span>';
+        html += '<span style="color:var(--sub);"> · 平均收益 </span>';
+        html += '<span style="color:'+_colorPL(bestD.avg_return)+';font-weight:700;">'+(bestD.avg_return!=null?(bestD.avg_return>0?'+':'')+bestD.avg_return.toFixed(2):'—')+'%</span>';
+        html += '<span style="color:var(--dim);font-size:10.5px;margin-left:6px;">（综合得分最高）</span>';
+        html += '</div>';
+      }
+      // 表：行=策略档，列=样本 | T+1胜率/收益 | T+3 | T+5 | T+10 | T+20
       html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
       html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      html += '<th style="padding:6px;text-align:left;color:var(--sub);">持有期</th>';
-      stratList.forEach(function(s){
-        html += '<th colspan="2" style="padding:6px;text-align:center;color:var(--sub);border-left:1px solid var(--border2);">'+labelSuffix(_esc(labelMap[s]||s))+'</th>';
+      html += '<th rowspan="2" style="padding:6px;text-align:left;color:var(--sub);vertical-align:bottom;">策略档<span style="display:block;font-size:9px;font-weight:400;color:var(--dim);line-height:1.2;">'+_ldr+'</span></th>';
+      html += '<th rowspan="2" style="padding:6px;text-align:right;color:var(--sub);vertical-align:bottom;">样本</th>';
+      holdList.forEach(function(h){
+        var isBestH = (h === bestH);
+        html += '<th colspan="2" style="padding:6px;text-align:center;color:var(--sub);border-left:1px solid var(--border2);'+(isBestH?'background:rgba(251,191,36,.12);color:#fbbf24;':'')+'">T+'+h+'天'+(isBestH?' 👑':'')+'</th>';
       });
       html += '</tr><tr style="background:var(--card2);border-bottom:1px solid var(--border);">';
-      html += '<th style="padding:4px 6px;"></th>';
-      stratList.forEach(function(){ html += '<th style="padding:4px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;">胜率</th><th style="padding:4px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;border-left:1px solid var(--border2);">收益</th>'; });
-      html += '</tr></thead><tbody>';
+      html += '<th style="padding:4px 6px;"></th><th style="padding:4px 6px;"></th>';
       holdList.forEach(function(h){
-        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-        html += '<td style="padding:6px;color:var(--txt);font-weight:700;">T+'+h+'天</td>';
-        stratList.forEach(function(s){
+        var isBestH = (h === bestH);
+        var extra = isBestH ? 'background:rgba(251,191,36,.08);' : '';
+        html += '<th style="padding:4px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;'+extra+'">胜率</th>';
+        html += '<th style="padding:4px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;border-left:1px solid var(--border2);'+extra+'">收益</th>';
+      });
+      html += '</tr></thead><tbody>';
+      stratList.forEach(function(s){
+        var isBestS = (s === bestStrategy);
+        var rowEmoji = isBestS ? '👑 ' : '';
+        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+(isBestS?'background:rgba(251,191,36,.06);':'')+'">';
+        html += '<td style="padding:6px;color:var(--txt);font-weight:700;">'+rowEmoji+_esc(labelMap[s]||s)+'</td>';
+        var firstD = (bc.comparison['hold_'+(holdList[0]||1)+'d']||{})[s] || {};
+        html += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(firstD.count!=null?firstD.count:'—')+'</td>';
+        holdList.forEach(function(h){
           var d = (bc.comparison['hold_'+h+'d']||{})[s] || {};
           var wr = d.win_rate == null ? '—' : d.win_rate;
           var ar = d.avg_return == null ? '—' : d.avg_return;
-          var first = (stratList.indexOf(s) === 0);
-          html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(wr)+';">'+(typeof wr === 'number' ? wr.toFixed(1) : wr)+'%</td>';
-          html += '<td style="padding:6px;text-align:center;color:'+_colorPL(ar)+';'+(first?'':'border-left:1px solid var(--border2);')+'">'+(typeof ar==='number'?(ar>0?'+':'')+ar.toFixed(2):ar)+'%</td>';
+          var isBestCell = (bestS && bestH && s === bestS && h === bestH);
+          var cellStyle = isBestCell ? 'background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);' : '';
+          html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(wr)+';'+cellStyle+'">'+(typeof wr === 'number' ? wr.toFixed(1) : wr)+'%</td>';
+          html += '<td style="padding:6px;text-align:center;color:'+_colorPL(ar)+';border-left:1px solid var(--border2);'+cellStyle+'">'+(typeof ar==='number'?(ar>0?'+':'')+ar.toFixed(2):ar)+'%</td>';
         });
         html += '</tr>';
       });
