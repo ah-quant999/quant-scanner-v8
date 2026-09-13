@@ -126,15 +126,15 @@ _ALWAYS_PUSH = {
     # ── 🛡 2026-09-13 同步 stage_gate 的「A 批 9 项纳入」────────────────
     #   契约同前：凡 READY_SPEC[*] 的 items 一律纳入本白名单（一一对应，可断言）。
     #   漏加 ⇒ 内容天然稳定的项被判伪变更 ⇒ update_time 恒旧 ⇒ A 批每轮重跑永不收敛。
-    "data/ALGO_BACKTEST_COMPARE.js",       # READY_SPEC["A"].items（2026-09-13 新增）
     "raw_data/lhb_data.json",              # READY_SPEC["A"].items（2026-09-13 新增）
-    "data/TDX_BACKTEST.js",                # READY_SPEC["A"].items（2026-09-13 新增）
-    "data/AVG_PRICE.js",                   # READY_SPEC["A"].items（2026-09-13 新增）
-    "data/ETF_SUBSCRIPTION.js",            # READY_SPEC["A"].items（2026-09-13 新增）
-    "raw_data/etf_subscription.json",      # READY_SPEC["A"].items（2026-09-13 新增）
-    "raw_data/avg_price.json",             # READY_SPEC["A"].items（2026-09-13 新增）
-    "raw_data/etf_spot.json",              # READY_SPEC["A"].items（2026-09-13 新增）
-    "raw_data/zsxq_posts.json",            # READY_SPEC["A"].items（2026-09-13 新增）
+    "data/AVG_PRICE_DATA.js",              # READY_SPEC["A"].items（2026-09-13 新增）
+    "data/ETF_NET_SUBSCRIPTION.js",        # READY_SPEC["A"].items（2026-09-13 新增）
+    # 🔴 2026-09-13 23:5x 紧急修正（P0）：上表原含 7 项**线上不存在**的产物
+    #   （TDX_BACKTEST / AVG_PRICE / ETF_SUBSCRIPTION / etf_subscription / avg_price /
+    #    etf_spot / zsxq_posts）——其中 ETF_SUBSCRIPTION+etf_subscription 是 09-06
+    #   主人令「旧口径全链下线」的**死产物**，其余 5 项**从未存在**（真名见上 3 行）。
+    #   已全部移除；且 `data/TDX_BACKTEST.js` 本属 **E 批**（见本文件上方 E.items 行），
+    #   原列入 A 批 items 属**批次错位**，一并移除。
 }
 
 
