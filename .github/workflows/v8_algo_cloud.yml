@@ -28,7 +28,7 @@ name: "☁️ v8 盘后算法链(云端)"
 on:
   # 🔴 2026-08-06 21:00 收敛 4→1：GitHub Actions 单 workflow 多条 cron 存在静默失效问题
   #   （cn_fetch_cloud 17→5 收敛后恢复触发；本 workflow 4 条 cron 自创建起 0 次 schedule 触发，
-  #    仅 workflow_dispatch 可用）。算法链一次跑完所有产物（候选池/黄金池/三重共识/回测），
+  #    仅 workflow_dispatch 可用）。算法链一次跑完所有产物（候选池/金股池/三重共识/回测），
   #   只需 18:30 主档成功一次即可；冗余兜底由「本机 WorkBuddy 每30分检查 + dispatch」承担，
   #   不再依赖 GitHub schedule 多条冗余。
   schedule:

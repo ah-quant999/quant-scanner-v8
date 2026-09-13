@@ -1077,7 +1077,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge; window._holdBadge = _holdB
 
 /* ===== 🎯 今日判定 · 可入手候选 HTML 构建（2026-08-08 重构） =====
    规则：① 只保留「值得买入」的股票；② 按统一买入评分降序；③ 每只股票汇总关键详情；④ 三不原则独立第二行。
-   数据：🥇三重共识 > 🥉四量终极（金股池/黄金池【当前无独立卡片】：renderGoldPool 已于 2026-08-06
+   数据：🥇三重共识 > 🥉四量终极（金股池/金股池【当前无独立卡片】：renderGoldPool 已于 2026-08-06
    轻量化时删除，GOLD_POOL 仅在「个股查询 → 策略命中」以 ⭐ 命中标签呈现）；渲染由 initCardBadges / switchSec('td') 触发。 */
 function __judgmentCandidatesHTML(){
   var SQ = window.STOCK_QUOTE || {};
@@ -1626,9 +1626,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/FACTOR_LAB_BACKTEST.js?v=1789303080" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
 <script src="data/BACKTEST_ALL_ALGOS.js?v=1789303080" defer></script>
-<!-- 🧮 2026-09-13 主人令「只要接入算法链的选股策略，都要有回测」：候选池 / 黄金池
+<!-- 🧮 2026-09-13 主人令「只要接入算法链的选股策略，都要有回测」：候选池 / 金股池
      前向收益回测（E 批 algorithms/backtest_pools.py 产出，10 档：5/10/20/30/45/60/75/90/180/250）。
-     口径：首次进池（候选池）/ 首次满足信号（黄金池）的次一交易日开盘买入，
+     口径：首次进池（候选池）/ 首次满足信号（金股池）的次一交易日开盘买入，
      持有 N 个真实交易日收盘卖出，前复权、扣双边 0.3%。 -->
 <script src="data/CANDIDATE_BACKTEST.js?v=1789303080" defer></script>
 <script src="data/GOLD_POOL_BACKTEST.js?v=1789303080" defer></script>
@@ -4168,8 +4168,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   }
 
   /* 2026-09-02 主人令：选股模块星级表全局化（原在已下架分组内，现卡片迁回选股策略仍需共享） */
-  window.__MODULE_STARS = { fourvolume:4, triple:4, candidate:2, goldpool:2 };  /* 2026-09-13 修正：星级委员会改用多期加权综合评判，不再以单一持有期判星。四量终极属长线信号：按 long 权重(T+1 10%/T+5 15%/T+30 25%/T+90 40%/T+180 10%)综合得分4.15，但T+1评分2分触发短周期惩罚（最高4⭐），最终4⭐。胜率随持有期单调升含β，超额收益待基准比对认证。rps已下线；2026-09-13 19:5x 补齐：候选池=2⭐（主口径 首次进池T+5 胜率48.81%/收益0.92%/n=293）、黄金池=2⭐（首次满足信号T+1 胜率32.28%/收益-1.79%/n=127），均因主口径胜率未过 50% 三⭐门槛取 2⭐ */
-  window.__moduleStarsHTML = function(k){ var n=(window.__MODULE_STARS&&window.__MODULE_STARS[k])||0; var x=''; for(var i=0;i<n;i++) x+='⭐'; return x || '—'; };
+  /* 2026-09-13 主人令「统一测算标准」——**本表不再是星级真源**，改为校验用的人工覆写口（默认空）。全站星级一律由 window.__committeeRate() 从**多期真实样本**实时计算，一处算、全站用，根治「同一策略两处不同星」。星级覆写见 window.__MODULE_STARS_OVERRIDE。 */
+  window.__MODULE_STARS = {};
+  window.__STAR_KEY2CARD = {triple:'三重共识', fourvolume:'四量终极', crds:'逆势龙头', candidate:'候选池', goldpool:'金股池'};
+  window.__moduleStarsHTML = function(k){
+    var card = window.__STAR_KEY2CARD[k] || k;
+    var n = window.__committeeStarsOf(card);
+    var x=''; for(var i=0;i<n;i++) x+='⭐'; return x || '—';
+  };
   /* 2026-09-12 星级委员会规则：每月评定，五维加权，硬门槛防小样本冒充高星 */
   /* 2026-09-13 星级委员会规则：多期加权综合评判，短周期惩罚，月度评定；预留 rankBonus 待统一回测框架后启用 */
   window.__STAR_COMMITTEE_RULES = {
@@ -4186,12 +4192,197 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       {name: "夏普比率", gate5: 0.5, gate4: 0.3, gate3: 0.0}
     ],
     scoreToStars: "5:[4.0,5.0], 4:[3.2,4.0), 3:[2.4,3.2), 2:[1.6,2.4), 1:[1.0,1.6)",
-    shortTermPenalty: "若T+1或T+5评分≤2，最终星级最高4⭐",
+    /* 单期四维权重（稳定性维度暂无数据源，未启用，其权重归并入其余四项） */
+    perPeriodDims: {win_rate: 0.30, avg_return: 0.30, samples: 0.30, sharpe: 0.10},
+    shortTermPenalty: "两条任一触发即封顶 4⭐：① T+1/T+5 期分≤2；② T+1（无则 T+5）胜率<50% —— 短期输给随机，不配满分",
     rankBonus: {enabled: false, note: "待所有策略统一输出同持有期回测后启用：T+90排第一+0.3星，被超过则取消"},
     delRule: "连续两次月度评定≤2⭐自动下架删除；首次2⭐黄牌限期30交易日整改",
     promoteRule: "≥4⭐方可入选选股策略主tab；3⭐及以下留在暂未上架观测",
     note: "星级只反映历史回测表现，不保证未来；多期综合避免单一持有期片面评判。"
   };
+  /* ═══════════════════════════════════════════════════════════════════════
+     2026-09-13 主人令「统一测算标准，用最科学的计算」——全站唯一星级真源
+     ─────────────────────────────────────────────────────────────────────
+     动因（三查实证）：此前星级是**两处人工硬编码**，结构上随时会打架 ——
+       ① window.__MODULE_STARS            → 策略回测页「主对比表 / 最优组合榜」
+       ② window.__STRATEGY_BACKTESTS[].stars → 策略回顾页各回测卡
+     现统一为：**一处算、全站用**，两处都调本函数。
+
+     主人 09-13 两条口径（已落进代码）：
+       A.「股池是基础，它们应该不算胜率，而是确认入选的门槛对不对」
+          ⇒ __STAR_KIND 里 kind='pool' 的卡（候选池 / 金股池）**不评星级**，
+            只保留「入选门槛」这件事本身，前端显示「基础股池」标签。
+       B.「肯定要统一测算标准，用最科学的计算」
+          ⇒ ① 多期加权（不是单期片面）；② 持有期覆盖不足 ⇒ **不评级**（显示「累积中」），
+            绝不拿 2~3 个短档硬凑星级；③ 短期（T+1/T+5）胜率不过半 ⇒ 封顶 4⭐
+            （满分应各期都稳，短期输给随机不配 5⭐）。
+
+     数据来源：window.BACKTEST_ALL_ALGOS.rows（各卡 × 各持有期的真实样本），
+     故本函数**无任何硬编码星级**，随回测数据自动更新。
+     ═══════════════════════════════════════════════════════════════════════ */
+  window.__STAR_KIND = { '候选池': 'pool', '金股池': 'pool' };   // 基础股池（主人口径 A）
+  window.__STAR_PROFILE_OF = {                                    // 信号性质 → 权重档
+    '三重共识': 'medium', '四量终极': 'long', '逆势龙头': 'short',
+    'K线信号层': 'short', '强势突破': 'short'
+  };
+  /* 人工覆写口（默认为空；仅在主人明令固定某卡星级时使用，不藏在算法里）。
+     2026-09-13 主人令「三重共识 4⭐ 不变」→ 固定为 4。 */
+  window.__MODULE_STARS_OVERRIDE = { '三重共识': 4 };
+
+  /* 从聚合产物抽出某卡的「多期真实样本」；无样本/未到期的档**一律不进**。
+     🔴 同一张卡可能有多个门槛档（三重共识＝共振≥2 / 70-79 / ≥80 三档），
+        **绝不能混档** —— 否则同一持有期被后写覆盖，星级就成了随机数。
+        故先由 is_primary 行定出「主口径标签模式」（把 T+数字 归一为 T+#），
+        再只取同一档的各持有期。 */
+  window.__committeePeriods = function(card){
+    var rows = ((window.BACKTEST_ALL_ALGOS || {}).rows) || [];
+    var prim = null;
+    for(var i=0;i<rows.length;i++){
+      if(rows[i].card === card && rows[i].is_primary){ prim = rows[i].label; break; }
+    }
+    var pat = prim ? String(prim).replace(/T\+\d+/g, 'T+#') : null;
+    var out = {};
+    for(var j=0;j<rows.length;j++){
+      var r = rows[j];
+      if(r.card !== card) continue;
+      if(pat){
+        var lab = String(r.label || '').replace(/T\+\d+/g, 'T+#');
+        if(lab !== pat) continue;                 // 非主口径档 ⇒ 不参与评级
+      }
+      if(r.sample == null || r.sample <= 0) continue;          // 累积中 ⇒ 不进
+      if(r.win_rate == null || r.avg_return == null) continue; // 未知一律不猜
+      var h = String(r.hold || '').replace(/[^0-9]/g, '');
+      if(!h) continue;
+      var ex = r.extra || {};
+      out[h] = { win_rate: r.win_rate, avg_return: r.avg_return,
+                 samples: r.sample, sharpe: (ex.sharpe == null ? null : ex.sharpe) };
+    }
+    return out;
+  };
+
+  /* 部分卡的**多期**数据不在聚合产物 rows 里 —— 因为 comprehensive parser
+     每档只输出「最佳持有期」一行（三重共识即属此类：rows 仅 3 行）；
+     其完整多期在各源文件的 comparison 里。此处补齐，口径仍取**主口径档**。
+     🔴 旧数据没有 decided 字段（09-13 数据层修复前），此时只信 ≤T+30 ——
+        三重共识 T+45/T+60 是「未到期被填 0」的伪值、T+75/T+90 直接是 0，一律不采信。 */
+  window.__STAR_COMPARISON_CARDS = {
+    '三重共识': { src: 'BACKTEST_COMPREHENSIVE', key: 'resonance_gte80' }
+  };
+  window.__committeePeriodsFromComparison = function(card){
+    var cfg = (window.__STAR_COMPARISON_CARDS || {})[card];
+    if(!cfg) return null;
+    var d = window[cfg.src];
+    if(!d || !d.comparison) return null;
+    var out = {};
+    Object.keys(d.comparison).forEach(function(hk){
+      var m = /^hold_(\d+)d$/.exec(hk); if(!m) return;
+      var row = (d.comparison[hk] || {})[cfg.key]; if(!row) return;
+      if(row.count == null || row.count <= 0) return;
+      if(row.win_rate == null || row.avg_return == null) return;
+      if(row.decided != null){ if(row.decided <= 0) return; }
+      else if(Number(m[1]) > 30) return;              // 旧数据：>T+30 不可信
+      out[m[1]] = { win_rate: row.win_rate, avg_return: row.avg_return,
+                    samples: row.count, sharpe: (row.sharpe == null ? null : row.sharpe) };
+    });
+    return Object.keys(out).length ? out : null;
+  };
+
+  /* 星级委员会主函数：多期加权 → 星级；覆盖不足不评级 */
+  window.__committeeRate = function(card){
+    var R = window.__STAR_COMMITTEE_RULES || {};
+    var kind = (window.__STAR_KIND || {})[card] || 'strategy';
+    if(kind === 'pool'){
+      return { ready:false, stars:0, kind:'pool', cov:0,
+               note:'基础股池 · 不评星级（只验入选门槛）' };
+    }
+    var periods = window.__committeePeriods(card);
+    /* 再并入「源文件 comparison」的多期（若该卡登记在 __STAR_COMPARISON_CARDS）——
+       必须用**并集**：rows 里可能只有零星几档（三重共识只有 T+20），
+       靠「periods 为空才补」会漏掉，必须无条件合并去重。 */
+    var alt = window.__committeePeriodsFromComparison ? window.__committeePeriodsFromComparison(card) : null;
+    if(alt){
+      Object.keys(alt).forEach(function(k){ if(!periods[k]) periods[k] = alt[k]; });
+    }
+    var pk = (window.__STAR_PROFILE_OF || {})[card] || 'medium';
+    var prof = (R.profiles && R.profiles[pk]) || { name:'默认', weights:{5:1} };
+    var dims = R.perPeriodDims || { win_rate:0.30, avg_return:0.30, samples:0.30, sharpe:0.10 };
+    var gates = {};
+    (R.perPeriodGates || []).forEach(function(g){ gates[g.name] = g; });
+
+    function _dim(v, g){
+      if(v == null || !g) return null;
+      if(v >= g.gate5) return 5;
+      if(v >= g.gate4) return 4;
+      if(v >= g.gate3) return 3;
+      if(v >= (g.gate3 - 1)) return 2;
+      return 1;
+    }
+    function _periodScore(p){
+      var pairs = [
+        [dims.win_rate,   _dim(p.win_rate,   gates['胜率'])],
+        [dims.avg_return, _dim(p.avg_return, gates['平均收益'])],
+        [dims.samples,    _dim(p.samples,    gates['样本量'])],
+        [dims.sharpe,     _dim(p.sharpe,     gates['夏普比率'])]
+      ];
+      var s = 0, w = 0;
+      pairs.forEach(function(x){ if(x[1] != null){ s += x[1] * x[0]; w += x[0]; } });
+      return w ? s / w : null;                 // 缺维度 ⇒ 权重重归一化，不按 0 计
+    }
+
+    /* 覆盖度：profile 权重中「真有样本」的比例 */
+    var tot = 0, got = 0, maxN = 0;
+    Object.keys(prof.weights).forEach(function(k){
+      var w = prof.weights[k]; tot += w;
+      var p = periods[k];
+      if(p && p.samples > 0){ got += w; if(p.samples > maxN) maxN = p.samples; }
+    });
+    var cov = tot ? got / tot : 0;
+    if(cov < 0.6 || maxN < 30){
+      return { ready:false, stars:0, kind:'strategy', cov:cov, maxN:maxN,
+               note:'累积中 · 持有期覆盖 ' + Math.round(cov * 100) + '%（需 ≥60% 且样本 ≥30）' };
+    }
+
+    var score = 0, wsum = 0, minShort = 5;
+    Object.keys(prof.weights).forEach(function(k){
+      var p = periods[k];
+      if(!(p && p.samples > 0)) return;
+      var ps = _periodScore(p);
+      if(ps == null) return;
+      var w = prof.weights[k];
+      score += ps * w; wsum += w;
+      if((k === '1' || k === '5') && ps < minShort) minShort = ps;
+    });
+    if(!wsum) return { ready:false, stars:0, kind:'strategy', cov:cov, note:'累积中' };
+    score = score / wsum;
+
+    var stars = 1;
+    if(score >= 4.0) stars = 5;
+    else if(score >= 3.2) stars = 4;
+    else if(score >= 2.4) stars = 3;
+    else if(score >= 1.6) stars = 2;
+
+    /* 短周期惩罚（两条任一触发即封顶 4⭐）：
+       ① 原规则：T+1/T+5 期分 ≤2
+       ② 2026-09-13 新增：T+1（无则 T+5）胜率 < 50% —— 短期输给随机，不配满分 */
+    var p1 = periods['1'], p5 = periods['5'];
+    var shortWr = p1 ? p1.win_rate : (p5 ? p5.win_rate : null);
+    var penal = false, penalWhy = '';
+    if(minShort <= 2 && stars > 4){ stars = 4; penal = true; penalWhy = '短周期评分≤2'; }
+    if(shortWr != null && shortWr < 50 && stars > 4){
+      stars = 4; penal = true; penalWhy = '短期胜率 ' + shortWr + '%<50%';
+    }
+    return { ready:true, stars:stars, score:Math.round(score * 100) / 100, kind:'strategy',
+             cov:cov, maxN:maxN, profile:pk, penal:penal, penalWhy:penalWhy, shortWr:shortWr };
+  };
+
+  /* 全站唯一取星入口（人工覆写优先，其次委员会） */
+  window.__committeeStarsOf = function(card){
+    var ov = (window.__MODULE_STARS_OVERRIDE || {})[card];
+    if(ov != null) return ov;
+    var r = window.__committeeRate(card);
+    return (r && r.ready) ? r.stars : 0;
+  };
+
   // ══ 2026-09-02 主人令：策略回测单一来源（一劳永逸）══
   //   主策略区(__renderBacktestSection) / 选股生命周期(__renderLifecycleSection) / 星级表模块行(_buildStrategyRating)
   //   全部读此配置；删一个策略只改这里，三处自动同步消失，绝不再漏删/错删。
@@ -4209,7 +4400,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   window.__STRATEGY_BACKTESTS_DELISTED = [];
   window.__renderBacktestCardsFrom = function(list){
     var h = '';
-    (list||[]).slice().sort(function(a,b){ return (b.stars||0) - (a.stars||0); }).forEach(function(m){
+    /* 2026-09-13 主人令「统一测算标准」：回测卡星级不再是硬编码（原 __STRATEGY_BACKTESTS[].stars），
+       一律实时取全站唯一真源 —— 与策略回测页主表**同源**，两处永不打架。 */
+    (list||[]).slice().map(function(m){
+      var rt = (typeof window.__committeeRate === 'function') ? window.__committeeRate(m.name) : null;
+      var o = {}; for(var k in m){ if(Object.prototype.hasOwnProperty.call(m,k)) o[k]=m[k]; }
+      o._rt = rt; o.stars = (rt && rt.ready) ? rt.stars : 0;
+      return o;
+    }).sort(function(a,b){ return (b.stars||0) - (a.stars||0); }).forEach(function(m){
       var _rpc = (typeof _renderPeriodBacktestCard === 'function') ? _renderPeriodBacktestCard
                : window._renderPeriodBacktestCard;
       if(typeof _rpc !== 'function'){ console.warn('[bt] _renderPeriodBacktestCard 尚未注册，跳过', m.key); return; }
@@ -4294,98 +4492,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   // 2026-09-02 主人令：已下线算法回测统一迁回策略回顾（已下架算法回测区），
   //   原 window.__renderHunterBacktest 已删除，避免与 _renderPeriodBacktestCard 重复。
 
-  // ═══ 2026-08-13 主人令：策略星级对比表（聚合已有回测数据） ═══
-  // 2026-09-03 主人令：数据来源仅保留仍活跃的回测源（BACKTEST_COMPREHENSIVE + BACKTEST_TDX + OPTIMIZED_STRATEGY）。
-  // 综合分 = (胜率-50)×1 + 平均收益×8 + min(8, log10(样本)×2)
-  // 星级：≥30⭐⭐⭐⭐⭐ / ≥20⭐⭐⭐⭐ / ≥12⭐⭐⭐ / ≥6⭐⭐ / ≥0⭐ / <0无星
-  function _buildStrategyRating(){
-    var rows = [];
-    var bc = window.BACKTEST_COMPREHENSIVE || {};
-    var bd = window.BACKTEST_TDX || {};
-    var op = window.OPTIMIZED_STRATEGY || {};
-
-    // ① 共振（BACKTEST_COMPREHENSIVE.comparison.hold_1d）
-    if(bc && bc.comparison && bc.comparison.hold_1d){
-      var labelMap = {'resonance_all':'共振≥2 宽松','resonance_gte70_lt80':'共振70-79分','resonance_gte80':'共振≥80 严格'};
-      Object.keys(bc.comparison.hold_1d).forEach(function(k){
-        var d = bc.comparison.hold_1d[k];
-        if(d && d.count){
-          rows.push({name:'🧲 '+ (labelMap[k]||k), cat:'共振', win_rate:d.win_rate, avg_return:d.avg_return, sample:d.count, extra:'T+1'});
-        }
-      });
-    }
-
-    // ②-b 中线最强（2026-09-05 主人令：策略回顾漏了 T+20 严格版，单独标「中线最强」与短线最佳区分）
-    if(bc && bc.comparison && bc.comparison.hold_20d && bc.comparison.hold_20d.resonance_gte80){
-      var d20 = bc.comparison.hold_20d.resonance_gte80;
-      if(d20 && d20.count){
-        rows.push({name:'🧲 共振≥80 严格·中线(T+20)', cat:'共振·中线', win_rate:d20.win_rate, avg_return:d20.avg_return, sample:d20.count, extra:'T+20', isMid:true});
-      }
-    }
-
-    // ③ K线信号（BACKTEST_TDX.summary，取 T+1 主口径 + 标注 T+5）
-    if(bd && bd.summary){
-      var sigCat = {
-        trend_up:'趋势', trend_down:'趋势', chan_buy:'缠论', contrarian:'逆势',
-        breakout_5d:'突破', volume_surge:'放量', divergence:'背离',
-        ge2_signals:'共振', ge3_signals:'共振'
-      };
-      Object.keys(bd.summary).forEach(function(k){
-        var d = bd.summary[k];
-        if(d && d.total){
-          rows.push({
-            name:'📈 '+ (d.label||k), cat:'信号·'+(sigCat[k]||''),
-            win_rate:d.win_rate_1d, avg_return:d.avg_return_1d, sample:d.total,
-            extra:'T+5 '+(d.win_rate_5d!=null ? d.win_rate_5d.toFixed(1) : '—')+'%'
-          });
-        }
-      });
-    }
-
-    // ④ 三信号优化（OPTIMIZED_STRATEGY.baseline_ge3）—— 2026-08-16 主人令：合成基线，非真实算法跟踪回测（样本伪造/胜率≈随机），已从星级表移除，只保留真实跟踪回测
-    // （保留代码分支但默认跳过；若未来该源产出真实信号样本再启用）
-    if(op && op.baseline_ge3 && op.baseline_ge3._real_tracked){
-      var b3 = op.baseline_ge3;
-      rows.push({
-        name:'🎯 三信号共振(严格)', cat:'共振·优化', isOpt:true,
-        win_rate:(b3.T+5||{}).win_rate_pct, avg_return:(b3.T+5||{}).avg_return_pct,
-        sample:(b3.T+5||{}).total_signals || b3.total_signals,
-        extra:'T+5 优化版'
-      });
-    }
-
-    // ⑤ 模块级回测（2026-09-02 主人令：统一收纳全部算法回测；现读 __STRATEGY_BACKTESTS 配置，已删策略自动不出现）
-    (window.__STRATEGY_BACKTESTS||[]).forEach(function(m){
-      var d = window[m.var];
-      var bp = d && d.summary && d.summary.by_period;
-      var row = bp && bp['5'];
-      if(row && row.samples > 0 && row.win_rate != null && row.avg_return != null){
-        rows.push({name:m.icon+' '+m.name, cat:'模块回测', win_rate:row.win_rate, avg_return:row.avg_return, sample:row.samples, extra:'T+5'});
-      }
-    });
-
-    // 2026-08-16 主人令：只保留真实算法跟踪回测——剔除样本为空/占位、胜率或收益缺失的"虚"行（哪怕综合分高也删）
-    rows = rows.filter(function(r){
-      return r.sample > 0 && r.win_rate != null && r.avg_return != null;
-    });
-
-    // 计算综合分 + 星级
-    rows.forEach(function(r){
-      var conf = Math.min(8, Math.log10(Math.max(1, r.sample)) * 2);
-      r.score = (r.win_rate - 50) + r.avg_return * 8 + conf;
-      if(r.score >= 30) r.stars = '★★★★★';
-      else if(r.score >= 20) r.stars = '★★★★';
-      else if(r.score >= 12) r.stars = '★★★';
-      else if(r.score >= 6) r.stars = '★★';
-      else if(r.score >= 0) r.stars = '★';
-      else r.stars = '—';
-    });
-    // 🛡 2026-08-26 一劳永逸根因修复：原按"综合分"排序，avg_return 权重过大，
-    //   把低胜率但 avg_return 偏高的策略顶到最上并标"👑最强"，与真实强度背离。
-    //   现改为【胜率降序、平局看平均收益降序】——胜率最高的策略才是"最强"，排序有唯一主依据。
-    rows.sort(function(a,b){ if(a.isMid !== b.isMid) return a.isMid ? -1 : 1; return (b.win_rate - a.win_rate) || (b.avg_return - a.avg_return); });
-    return rows;
-  }
 
   /* ════════════════════════════════════════════════════════════════════
      策略回顾统一回测卡片渲染器（2026-09-02 主人令：全部算法回测集中到策略回顾，
@@ -4404,7 +4510,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
     html += '<span style="font-size:15px;font-weight:700;color:'+meta.color+';">'+meta.icon+' '+meta.name+'</span>';html += '<span style="font-size:10px;font-weight:700;color:#14b8a6;background:rgba(20,184,166,.14);border:1px solid rgba(20,184,166,.35);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:4px;">📈 选股策略</span>';
     html += '<span style="font-size:11px;color:var(--dim);">'+meta.desc+'</span>';
-    html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);">'+_btStars(meta.stars)+'</span>';
+    var _starBadge;
+    if(meta._rt && meta._rt.kind === 'pool'){
+      _starBadge = '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;'
+        + 'background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.3);">基础股池</span>';
+    } else if(meta._rt && !meta._rt.ready){
+      _starBadge = '<span title="'+(meta._rt.note||'')+'" style="padding:1px 8px;border-radius:10px;font-size:10px;'
+        + 'font-weight:700;background:rgba(148,163,184,.14);color:var(--dim);border:1px solid var(--border2);">累积中</span>';
+    } else {
+      _starBadge = '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);">'+_btStars(meta.stars)+'</span>';
+    }
+    html += _starBadge;
     var totalS = (data && data.summary && data.summary.total_signals) || 0;
     var lowSample = totalS > 0 && totalS < 30;
     if(lowSample){
@@ -4936,16 +5052,27 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var R = (A.ranking || []).slice();
       var INS = (A.insufficient || []).slice();
       if(!R.length && !INS.length) return '';
-      var _STARKEY = { '三重共识':'triple', '四量终极':'fourvolume', '逆势龙头':'crds', '候选池':'candidate', '黄金池':'goldpool' };
+      var _STARKEY = { '三重共识':'triple', '四量终极':'fourvolume', '逆势龙头':'crds', '候选池':'candidate', '金股池':'goldpool' };
       function _n(v,d){ return (v==null || isNaN(v)) ? '—' : Number(v).toFixed(d==null?1:d); }
       function _sgn(v){ return (v==null||isNaN(v)) ? '' : (Number(v)>=0 ? '+' : ''); }
+      /* 2026-09-13 主人令「统一测算标准」：星级一律取全站唯一真源 __committeeRate。
+         · 基础股池（候选池/金股池）→ 不评星，显示「基础股池」（主人：股池不算胜率，
+           它验的是入选门槛）；
+         · 持有期覆盖不足 / 样本不足 → 「累积中」，不硬凑星级。 */
       function _stars(card){
-        var k = _STARKEY[card];
-        if(!k) return '';
-        var n = (window.__MODULE_STARS && window.__MODULE_STARS[k]) || 0;
-        if(!n) return '<span style="font-size:10px;color:var(--dim);">弱市观测</span>';
-        var s=''; for(var i=0;i<n;i++) s+='⭐';
-        return '<span style="font-size:10.5px;color:#fbbf24;">'+s+'</span>';
+        var rt = (typeof window.__committeeRate === 'function') ? window.__committeeRate(card) : null;
+        if(!rt) return '';
+        if(rt.kind === 'pool'){
+          return '<span title="基础股池：不评星级，只验入选门槛（'+(rt.note||'')+'）"'
+               + ' style="font-size:10px;color:#38bdf8;background:rgba(56,189,248,.12);'
+               + 'border:1px solid rgba(56,189,248,.32);padding:1px 6px;border-radius:8px;white-space:nowrap;">基础股池</span>';
+        }
+        if(!rt.ready){
+          return '<span style="font-size:10px;color:var(--dim);" title="'+(rt.note||'')+'">累积中</span>';
+        }
+        var s=''; for(var i=0;i<rt.stars;i++) s+='⭐';
+        return '<span style="font-size:10.5px;color:#fbbf24;" title="委员会多期加权 · profile '+rt.profile
+             + ' · 综合得分 '+rt.score+(rt.penal?(' · 短周期惩罚：'+rt.penalWhy):'')+'">'+s+'</span>';
       }
       /* 🏁 2026-09-13 主人令（图3「不能自相矛盾」）：
          原地这里曾按「主口径 A.ranking」算 byWr/byAr，而下方「一句话结论」按
@@ -5042,7 +5169,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       h += '</tr></thead><tbody>';
       /* 🏁 2026-09-13 主人令（图4「主对比表星级高的排第一」）：
          按 __MODULE_STARS 星级降序；星级相同再按胜率降序（无星级的「弱市观测」垫底）。 */
-      var _starOf = function(card){ return (window.__MODULE_STARS && window.__MODULE_STARS[_STARKEY[card]]) || 0; };
+      var _starOf = function(card){
+        var rt = (typeof window.__committeeRate === 'function') ? window.__committeeRate(card) : null;
+        if(rt && rt.kind === 'pool') return -1;            // 基础股池不参与星级排序，垫底
+        return (rt && rt.ready) ? rt.stars : 0;
+      };
       var RS = R.slice().sort(function(a,b){
         var d = _starOf(b.card) - _starOf(a.card);
         if(d) return d;
@@ -10456,7 +10587,7 @@ function drawUpDownChart(){
         '<table style="width:100%;font-size:11px;"><thead><tr><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">文件</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">最后更新</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">状态</th></tr></thead><tbody>'+
           '<tr id="freshRowCandidate"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">🧭 候选股池 <span style="font-size:10px;color:var(--dim)">(来源级)</span></td><td id="freshTimeCandidate" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">--</td><td id="freshStatusCandidate" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>待扫描</td></tr>'+
           '<tr id="freshRowCandidateSrc" style="display:none"><td colspan="3" id="freshCandidateSources" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"></td></tr>'+
-          '<tr id="freshRowGold"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">黄金池</td><td id="freshTimeGold" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">--</td><td id="freshStatusGold" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>待扫描</td></tr>'+
+          '<tr id="freshRowGold"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">金股池</td><td id="freshTimeGold" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">--</td><td id="freshStatusGold" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>待扫描</td></tr>'+
           '<tr id="freshRowConcept"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">概念映射</td><td id="freshTimeConcept" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">--</td><td id="freshStatusConcept" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>待扫描</td></tr>'+
           '<tr id="freshRowFactorLab"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">🧪 因子截面观测 <span style="font-size:10px;color:var(--dim)">(异常换手率·重点池 / ROE·全市场主板)</span></td><td id="freshTimeFactorLab" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">--</td><td id="freshStatusFactorLab" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>待扫描</td></tr>'+
         '</tbody></table>'+
@@ -10664,7 +10795,7 @@ function drawUpDownChart(){
 
           {name:'候选池', source:'CANDIDATE', freq:'收盘后1次', slots:['20:00'], note:'算法初筛名单（v8_algo_cloud 19:15 跑批，约20:00产出）'},
 
-          {name:'黄金池', source:'GOLD_POOL', freq:'收盘后1次', slots:['17:30'], note:'精选标的'},
+          {name:'金股池', source:'GOLD_POOL', freq:'收盘后1次', slots:['17:30'], note:'精选标的'},
 
           {name:'龙虎榜', source:'LHB_DATA', freq:'收盘后1次', slots:['17:30'], note:'机构/游资动向'},
 
@@ -10686,7 +10817,7 @@ function drawUpDownChart(){
 
           {name:'候选池（盘中/盘后）', source:'CANDIDATE', freq:'收盘后1次', slots:['20:00'], note:'算法初筛名单（v8_algo_cloud 19:15 跑批产出，无独立盘中更新）'},
 
-          {name:'黄金池', source:'GOLD_POOL', freq:'收盘后1次', slots:['19:15'], note:'精选标的'},
+          {name:'金股池', source:'GOLD_POOL', freq:'收盘后1次', slots:['19:15'], note:'精选标的'},
 
           {name:'三重共识', source:'TRIPLE_CONSENSUS', freq:'收盘后1次', slots:['19:15'], note:'多策略共振'},
 
@@ -10712,7 +10843,7 @@ function drawUpDownChart(){
 
           {name:'中国数据抓取 (v8_cn_fetch_cloud)', source:'RUNNER_STATUS', freq:'工作日 cron · 云端', slots:['08:25','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:20'], note:'核心数据管线 · GitHub Actions 云端 ubuntu-latest 主链（含 17:20 龙虎榜收盘后刷新）'},
 
-          {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日 8 唤醒点 16:40/18:10/20:00/21:00/22:30/00:30/06:00/08:00', slots:['19:15'], note:'候选池/黄金池/三重共识/回测 · <b>跑在 self-hosted cn 双机（lemoncat-cn / alimi-cn），非 ubuntu-latest</b>（job 日志 runner_name 实证）· 批次由闸门按「缺什么跑什么」判定 · 冗余由本机每30分检查dispatch兜底 · 源码同步：git 直连为主，被墙时走 GitHub API 回退（2026-09-11 20:2x 修：排除 backup/docs/kline_cache 三个重目录 + b64 优先 + 软预算，step 超时 10→25min）'},
+          {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日 8 唤醒点 16:40/18:10/20:00/21:00/22:30/00:30/06:00/08:00', slots:['19:15'], note:'候选池/金股池/三重共识/回测 · <b>跑在 self-hosted cn 双机（lemoncat-cn / alimi-cn），非 ubuntu-latest</b>（job 日志 runner_name 实证）· 批次由闸门按「缺什么跑什么」判定 · 冗余由本机每30分检查dispatch兜底 · 源码同步：git 直连为主，被墙时走 GitHub API 回退（2026-09-11 20:2x 修：排除 backup/docs/kline_cache 三个重目录 + b64 优先 + 软预算，step 超时 10→25min）'},
 
           {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查 · 覆盖构建/部署/备份健康'},
 
@@ -10987,7 +11118,7 @@ function drawUpDownChart(){
         var _upstreamStale = '';
         if(cMiss>0 && !hasDataToday && lastTs){
           // 检查是否为已知上游数据源陈旧（非本卡独立漏跑）
-          var _staleSources = {'CANDIDATE':'候选池(v8_algo_cloud)','TRIPLE_CONSENSUS':'三重共识/黄金池','GOLD_POOL':'黄金池','H_AUTO_BUY':'H反推短线买点'};
+          var _staleSources = {'CANDIDATE':'候选池(v8_algo_cloud)','TRIPLE_CONSENSUS':'三重共识/金股池','GOLD_POOL':'金股池','H_AUTO_BUY':'H反推短线买点'};
           for(var _si in _staleSources){ if(c.source.indexOf(_si)>=0){ _upstreamStale = ' ⚠️ 上游 '+_staleSources[_si]+' 未更新（根因）'; break; } }
         }
 

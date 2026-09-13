@@ -452,8 +452,15 @@ def run_backtest(signals: list[dict]) -> dict:
 
             for hp in HOLD_PERIODS:
                 hk = f"hold_{hp}d"
-                hd = result.get(hk, {})
-                ret = hd.get("ret", 0)
+                hd = result.get(hk)
+                # 🔴 2026-09-13 主人令「统一测算标准·禁止 0 冒充」：
+                #   原 `hd.get("ret", 0)` 把**未到期**持有期填成 0% 收益 ⇒
+                #   ① 样本虚高 ② 0 收益稀释均值 ③ 胜率分母与 count 不同源
+                #   ④ T+75/T+90 无数据却上屏为「0% 胜率」。
+                #   现在未到期一律**不进样本**，统计出 None → 前端「累积中」。
+                if not hd or hd.get("ret") is None:
+                    continue
+                ret = hd["ret"]
                 win_rate_data[hk]["rets"].append(ret)
                 if ret > 0:
                     win_rate_data[hk]["win"] += 1
@@ -475,21 +482,26 @@ def run_backtest(signals: list[dict]) -> dict:
             wd = win_rate_data[hk]
             total_decided = wd["win"] + wd["loss"]
             rets = wd["rets"]
-            avg_ret = round(sum(rets) / len(rets), 2) if rets else 0
-            median_ret = round(sorted(rets)[len(rets)//2], 2) if rets else 0
-            std_ret = round((sum((r - avg_ret)**2 for r in rets) / len(rets))**0.5, 2) if len(rets) > 1 else 0
-            sharpe = round(avg_ret / std_ret, 2) if std_ret > 0 else 0
+            n_ret = len(rets)
+            # 🔴 无样本 ⇒ 一律 None（前端显示「累积中」），绝不用 0 冒充真实值
+            avg_ret = round(sum(rets) / n_ret, 2) if n_ret else None
+            median_ret = round(sorted(rets)[n_ret // 2], 2) if n_ret else None
+            std_ret = (round((sum((r - avg_ret) ** 2 for r in rets) / n_ret) ** 0.5, 2)
+                       if n_ret > 1 else None)
+            sharpe = (round(avg_ret / std_ret, 2)
+                      if (std_ret and std_ret > 0 and avg_ret is not None) else None)
 
             period_stats[hk] = {
-                "count": len(rets),
+                "count": n_ret,
                 "win": wd["win"],
                 "loss": wd["loss"],
-                "draw": len(rets) - wd["win"] - wd["loss"],
-                "win_rate": round(wd["win"] / total_decided * 100, 1) if total_decided else 0,
+                "decided": total_decided,   # 🆕 有效判定数（前端据此判「累积中」）
+                "draw": n_ret - wd["win"] - wd["loss"],
+                "win_rate": round(wd["win"] / total_decided * 100, 1) if total_decided else None,
                 "avg_return": avg_ret,
                 "median_return": median_ret,
-                "best_return": max(rets) if rets else 0,
-                "worst_return": min(rets) if rets else 0,
+                "best_return": max(rets) if n_ret else None,
+                "worst_return": min(rets) if n_ret else None,
                 "std_return": std_ret,
                 "sharpe_ratio": sharpe,
             }
@@ -502,9 +514,9 @@ def run_backtest(signals: list[dict]) -> dict:
         # 整体策略统计（取最佳持有期）
         best_hp = max(
             HOLD_PERIODS,
-            key=lambda hp: period_stats.get(f"hold_{hp}d", {}).get("win_rate", 0)
+            key=lambda hp: (period_stats.get(f"hold_{hp}d", {}) or {}).get("win_rate") or 0
         )
-        best_stats = period_stats.get(f"hold_{best_hp}d", {})
+        best_stats = period_stats.get(f"hold_{best_hp}d", {}) or {}
 
         results[st_name] = {
             "total_signals": len(group),

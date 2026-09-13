@@ -219,7 +219,7 @@ ORDER = [
     #   此前被 V5 心跳闸门跳过链本体掩盖，2026-09-07 17:40 #1579 首次真跑暴露。
     "backtest_expectancy.py",         # → raw_data/backtest_expectancy.json（期望收益回测，与 E 批同位）
     # 🆕 2026-09-13 主人令（“只要接入算法链的选股策略，都要有回测”）：
-    #   候选池 / 黄金池此前在回测页只有 known_gaps 占位，无任何回测产物。
+    #   候选池 / 金股池此前在回测页只有 known_gaps 占位，无任何回测产物。
     #   本脚本读 B 批 build_candidate_pool 产出的 raw_data/candidate_members.json（first_seen）
     #   与 raw_data/gold_pool.json（first_date），用 baostock 前复权日线算各档前向收益（T+N）。
     #   输出：raw_data/candidate_backtest.json + data/CANDIDATE_BACKTEST.js，
@@ -318,7 +318,7 @@ STAGES = {
         "v8/backtest_crds.py",   # → data/CRDS_BACKTEST.js （逆势龙头回测；2026-09-09 挂链补登，此前仅存在于 v8/ 目录、STAGES/ORDER 均未挂 → 永远跑不到）
         # 2026-09-06 主人令：AI预测卡回测 INVALID → 下架，停跑 path_probability_backtest.py
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
-        # 🆕 2026-09-13 主人令：候选池 / 黄金池前向收益回测（补齐“接链策略必有回测”的结构性保证）。
+        # 🆕 2026-09-13 主人令：候选池 / 金股池前向收益回测（补齐“接链策略必有回测”的结构性保证）。
         #   依赖 B 批 build_candidate_pool.py 产物（candidate_members / gold_pool），与回测家族同批；
         #   必须在聚合器之前 → 聚合器才能读到本轮新产物。
         "backtest_pools.py",        # → data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（10 档前向收益）

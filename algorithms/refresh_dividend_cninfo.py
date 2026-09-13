@@ -9,7 +9,7 @@ refresh_dividend_cninfo.py — 用巨潮资讯(cninfo)刷新重点股票的「�
   能正确取到刚公布的分红方案（宝丰 2026-04-22 公告的 2025 年报 10派4.2）。
 
 本脚本（根因修复，非数据补丁）：
-  1. 从 data/PORTFOLIO.js(持仓) + data/CANDIDATE.js(候选池) + data/GOLD_POOL.js(黄金池)
+  1. 从 data/PORTFOLIO.js(持仓) + data/CANDIDATE.js(候选池) + data/GOLD_POOL.js(金股池)
      合并出「重点关注股票池」（约 300+ 只，非全市场，避免 cninfo 逐只限流）。
   2. 对每只调用 ak.stock_dividend_cninfo(code6)，取「最新一期分红方案」行。
   3. 更新 raw_data/stock_quote.json 中对应 stocks[code8].dividend 的方案字段
@@ -44,7 +44,7 @@ UNIVERSE_FILES = {
     "CANDIDATE": DATA_DIR / "CANDIDATE.js",
     "GOLD_POOL": DATA_DIR / "GOLD_POOL.js",
 }
-# 手动关注列表（用户指定、但不在候选池/持仓/黄金池里的票，如宝丰能源 600989）
+# 手动关注列表（用户指定、但不在候选池/持仓/金股池里的票，如宝丰能源 600989）
 WATCH_FILE = DATA_DIR / "DIVIDEND_WATCH.json"
 
 
@@ -75,7 +75,7 @@ def build_universe():
                 codes.add(c)
     except Exception as e:
         print("⚠️ 读 CANDIDATE 失败:", e)
-    # 黄金池
+    # 金股池
     try:
         d = _load_js(UNIVERSE_FILES["GOLD_POOL"])
         for k, v in d.get("candidates", {}).items():
@@ -206,7 +206,7 @@ def main():
     for a in sys.argv:
         if a.startswith("--codes="):
             codes = set(c.lstrip("shszbjhk") for c in a.split("=", 1)[1].split(",") if c.strip())
-    print(f"🎯 重点股票池: {len(codes)} 只（持仓+候选池+黄金池+手动关注）")
+    print(f"🎯 重点股票池: {len(codes)} 只（持仓+候选池+金股池+手动关注）")
 
     quote = json.load(open(QUOTE_RAW, encoding="utf-8"))
     stocks = quote.get("stocks", {})

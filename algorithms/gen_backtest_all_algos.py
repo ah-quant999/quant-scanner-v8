@@ -66,43 +66,43 @@ FLOOR_T1 = (8, 0)         # 与闸门 FLOOR_T1 同源
 
 # ── 源登记表：**card = 前端卡名**（权威出处 index.html 的 V8_PAGE_SCHEDULE + 策略回测页）──
 SOURCES = [
-    dict(card="三重共识", page="选股策略", icon="🧲", cat="trade",
+    dict(card="三重共识", kind="strategy", page="选股策略", icon="🧲", cat="trade",
          var="BACKTEST_COMPREHENSIVE", rel="data/BACKTEST_COMPREHENSIVE.js",
          parser="comprehensive", label_prefix="共振", primary="共振≥80（严格）",
          method="baostock 真实收盘价（前复权·扣双边 0.3%）"),
-    dict(card="四量终极", page="选股策略", icon="📊", cat="trade",
+    dict(card="四量终极", kind="strategy", page="选股策略", icon="📊", cat="trade",
          var="FOUR_VOLUME_BACKTEST", rel="data/FOUR_VOLUME_BACKTEST.js",
          parser="by_period", label_prefix="持有", primary="持有 T+5",
          method="信号日收盘价买入、持有 N 个真实交易日收盘价卖出（前复权·扣双边 0.3%）"),
-    dict(card="逆势龙头", page="选股策略", icon="🐉", cat="trade",
+    dict(card="逆势龙头", kind="strategy", page="选股策略", icon="🐉", cat="trade",
          var="CRDS_BACKTEST", rel="data/CRDS_BACKTEST.js",
          parser="by_period", label_prefix="持有", primary="持有 T+5",
          method="信号日次一交易日开盘买入、持有 N 日收盘卖出（前复权·扣双边 0.3%）"),
-    dict(card="强势突破", page="暂未上架", icon="🚀", cat="trade",
+    dict(card="强势突破", kind="strategy", page="暂未上架", icon="🚀", cat="trade",
          var="ALGO_BACKTEST_COMPARE", rel="data/ALGO_BACKTEST_COMPARE.js",
          parser="algo_compare", label_prefix="", primary=None,
          method="实盘入选样本同口径聚合（T+1~T+10 前向收益）",
          chain_member=False,
          chain_note="生成脚本 scripts/algo_backtest_compare.py 原为孤儿（未挂 STAGES）"),
-    dict(card="K线信号层", page="策略回测", icon="📈", cat="signal",
+    dict(card="K线信号层", kind="signal", page="策略回测", icon="📈", cat="signal",
          var="BACKTEST_TDX", rel="data/BACKTEST_TDX.js",
          parser="tdx", label_prefix="", primary=None,
          method="9 类 K 线信号 60 日前向回测（前复权）"),
     # 🆕 2026-09-13 主人令：「只要接入算法链的选股策略，都要有回测」。
-    #   候选池 / 黄金池此前在 coverage 里是硬编码 known_gaps（「无独立前向收益回测」），
+    #   候选池 / 金股池此前在 coverage 里是硬编码 known_gaps（「无独立前向收益回测」），
     #   但它们**确实接在盘后算法链内**（B 批 build_candidate_pool.py 产出）。
     #   本批新建 algorithms/backtest_pools.py 补齐，使其成为结构性保证而非缺口。
-    dict(card="候选池", page="选股策略", icon="📋", cat="trade",
+    dict(card="候选池", kind="pool", page="选股策略", icon="📋", cat="trade",
          var="CANDIDATE_BACKTEST", rel="data/CANDIDATE_BACKTEST.js",
          parser="pool", label_prefix="首次进池 T+", primary="首次进池 T+5",
          method="候选池「首次进池日」次一交易日开盘买入、持有 N 个真实交易日收盘卖出"
                 "（前复权·扣双边 0.3%）"),
-    dict(card="黄金池", page="选股策略", icon="🪙", cat="trade",
+    dict(card="金股池", kind="pool", page="选股策略", icon="🪙", cat="trade",
          var="GOLD_POOL_BACKTEST", rel="data/GOLD_POOL_BACKTEST.js",
          parser="pool", label_prefix="首次满足信号 T+", primary="首次满足信号 T+1",
-         method="黄金池「首次满足信号日」次一交易日开盘买入、持有 N 个真实交易日收盘卖出"
+         method="金股池「首次满足信号日」次一交易日开盘买入、持有 N 个真实交易日收盘卖出"
                 "（前复权·扣双边 0.3%）"),
-    dict(card="因子实验室", page="暂未上架", icon="🧪", cat="research",
+    dict(card="因子实验室", kind="research", page="暂未上架", icon="🧪", cat="research",
          var="FACTOR_LAB_BACKTEST", rel="data/FACTOR_LAB_BACKTEST.js",
          parser="factor_lab", label_prefix="", primary=None,
          method="因子五分位分层超额（每10交易日调仓·次一交易日开盘入场）"),
@@ -315,7 +315,7 @@ def parse_by_period(src, obj):
 
 
 def parse_pool(src, obj):
-    """CANDIDATE_BACKTEST / GOLD_POOL_BACKTEST：候选池 / 黄金池前向收益。
+    """CANDIDATE_BACKTEST / GOLD_POOL_BACKTEST：候选池 / 金股池前向收益。
 
     🆕 2026-09-13 主人令：「只要接入算法链的选股策略，都要有回测」。
     结构 = summary.by_period（与四量/CRDS/RPS 同构），每档一行。
@@ -501,6 +501,7 @@ def build(root, day, kind, note, extra_note=""):
         for r in parsed:
             r["source_time"] = (f"{ut[0]} {ut[1]:02d}:{ut[2]:02d}" if ut else None)
             r["fresh"] = bool(fresh)
+            r["kind"] = src.get("kind", "strategy")
             r["chain_member"] = src.get("chain_member", True)
             r["chain_note"] = src.get("chain_note")
             if not fresh:
@@ -594,13 +595,15 @@ def build(root, day, kind, note, extra_note=""):
         "low_avg_return": LOW_AVG_RETURN,
         "sort_rule": "胜率降序 → 平局看平均收益降序（与页内星级对比表同口径）",
         # 🔴 2026-09-13 根因修复：本串原先**手写死**，删 RPS 后仍残留「相对强度＝T+5」、
-        #   且新增候选池/黄金池后未同步 ⇒ 产物里的口径说明与真实判定不一致（误导）。
+        #   且新增候选池/金股池后未同步 ⇒ 产物里的口径说明与真实判定不一致（误导）。
         #   现改为**从 SOURCES 派生**（唯一的真值来源），改 SOURCES 即自动同步、永不漂移。
         "primary_rule": ("卡级主表每卡只取 1 行既定主口径（"
                          + "；".join(f"{s['card']}＝{s['primary']}"
                                     for s in SOURCES if s.get("primary"))
                          + "），**不跨持有期横比**；"
-                         f"且**样本 < {MIN_SAMPLES} 不进主表**（累积不足不排名）。"),
+                         f"且**样本 < {MIN_SAMPLES} 不进主表**（累积不足不排名）。"
+                         "其中 kind=pool（候选池/金股池）为**基础股池**，"
+                         "只作入选门槛验证，**不参与星级评定**（星规只评有买卖点的选股策略）。"),
         "honesty_note": ("未知一律 null（前端显示 —），绝不用 0 冒充；"
                          f"样本< {MIN_SAMPLES} 只观测、不进排名、不做下架评估；"
                          "研究型（因子分层）不与交易型同列比较；"
@@ -639,7 +642,7 @@ def _coverage(rows):
         c["status"] = st
         out.append(c)
     # 已知无回测产物的算法卡（**如实列出，不用编造数字填补**）
-    # 🔴 2026-09-13 主人令：候选池 / 黄金池已由 algorithms/backtest_pools.py 补齐
+    # 🔴 2026-09-13 主人令：候选池 / 金股池已由 algorithms/backtest_pools.py 补齐
     #   真实前向收益回测（挂 E 批），**从 known_gaps 移除** —— 它们不再是缺口。
     known_gaps = [
         {"card": "机游共振", "page": "盘后数据", "status": "⚪ 无独立前向收益回测"},

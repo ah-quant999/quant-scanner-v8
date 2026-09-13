@@ -47,7 +47,7 @@
   A 采集批：10 项产物中 ≥7 项鲜活，且龙虎榜（must）必新  ← 以 READY_SPEC["A"] 为唯一真源
   B 选股批：9 项产物中 ≥8 项鲜活 + 三重共识/四量终极/逆势龙头（must）必新  ← 以 READY_SPEC["B"] 为唯一真源
   D 汇总批：最终推荐                              → 1/1
-  E 回测批：CRDS 回测 / TDX 回测（任一）+ 全算法回测汇总 + 候选池回测 + 黄金池回测 → 4/5
+  E 回测批：CRDS 回测 / TDX 回测（任一）+ 全算法回测汇总 + 候选池回测 + 金股池回测 → 4/5
             ⚠️ 2026-09-13 起 must 收紧：原 must=[] + need=4 只是**纯计数**，
                表达不了「哪几项必新」⇒ 陈旧项恰为 BACKTEST_ALL_ALGOS 时仍判就绪。
                现 must=[BACKTEST_ALL_ALGOS, CANDIDATE_BACKTEST, GOLD_POOL_BACKTEST]，

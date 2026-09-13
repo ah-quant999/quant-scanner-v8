@@ -37,7 +37,7 @@ WEEKLY_TRACK = [
     ("/* cockpit 已下线 2026-09-03 */_tier_recommend.json", "驾驶舱分档"),
     ("sector_rs.json",           "板块相对强度"),
     ("final_recommend.json",     "最终推荐池"),
-    ("gold_pool.json",           "黄金池"),
+    ("gold_pool.json",           "金股池"),
     ("candidate.json",           "候选池"),
     ("four_volume.json",         "四量终极"),
     ("crds_card_data.json",      "逆势龙头"),

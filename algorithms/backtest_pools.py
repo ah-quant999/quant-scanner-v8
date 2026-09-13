@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""backtest_pools.py — 候选池 / 黄金池 前向收益回测（2026-09-13 主人令）
+"""backtest_pools.py — 候选池 / 金股池 前向收益回测（2026-09-13 主人令）
 
 主人原话：「只要接入算法链的选股策略，都要有回测，这样才能完整观测到底靠不靠谱。
 马上把所有接入算法链的选股策略都按5、10、20、30、45、60、75、90、180、250日
 的跟踪回测，详细记录在策略回测页。」
 
-背景：候选池（CANDIDATE）与黄金池（GOLD_POOL）**已接入盘后算法链**（B 批
+背景：候选池（CANDIDATE）与金股池（GOLD_POOL）**已接入盘后算法链**（B 批
 build_candidate_pool.py / scanner.py 产出），但**从来没有独立的前向收益回测** ——
 在 gen_backtest_all_algos.py 的 coverage 里一直是 known_gaps 硬编码占位。
 本脚本补齐这个缺口，使「接了链的选股策略 = 必有回测」成为结构性保证。
@@ -14,7 +14,7 @@ build_candidate_pool.py / scanner.py 产出），但**从来没有独立的前�
 【设计铁律 · 不得造假】
   1. **未知一律 null，绝不用 0 冒充**。样本不足的档位 → samples=0 且 win_rate/avg_return
      为 null，前端显示「累积中」；绝不把「没算到」画成「0% 胜率」。
-  2. **信号历史多长就只算多长**。候选池信号自 2026-08-29 起、黄金池自 2026-09-07 起，
+  2. **信号历史多长就只算多长**。候选池信号自 2026-08-29 起、金股池自 2026-09-07 起，
      **不允许**用其它数据源或猜测值填充长档（180/250 现必然为空，如实标注就绪日期）。
   3. **真实价格**。前向收益一律用 baostock 真实前复权日K收盘价，扣双边成本 0.3%。
   4. **入场口径与全站一致**：信号日**次一交易日开盘价**买入（避免用信号日收盘价
@@ -22,7 +22,7 @@ build_candidate_pool.py / scanner.py 产出），但**从来没有独立的前�
 
 数据源：
   · raw_data/candidate_members.json  —— 候选池成员（first_seen = 首次进池日）
-  · raw_data/gold_pool.json          —— 黄金池（first_date = 首次满足信号日）
+  · raw_data/gold_pool.json          —— 金股池（first_date = 首次满足信号日）
 
 输出：
   · raw_data/candidate_backtest.json / data/CANDIDATE_BACKTEST.js
@@ -122,7 +122,7 @@ def forward_returns(rows, signal_date, periods):
     """信号日**次一交易日开盘**买入 → 持有到第 p 个真实交易日**收盘**卖出。
 
     🔴 2026-09-13 修正（本轮实测发现的口径 bug）：
-       候选池 / 黄金池会把信号日期记在**休市日**上（实测 08-29 周六 285 条、
+       候选池 / 金股池会把信号日期记在**休市日**上（实测 08-29 周六 285 条、
        08-30 周日 6 条、09-12 周六 2 条）。原实现用 `d >= signal_date` 找位置，
        会把休市日信号对齐到**其后**第一个交易日 ⇒ 入场日整体后移一天，
        相当于多等一天才买（与全站「信号日次一交易日开盘买入」口径不符）。
@@ -212,9 +212,9 @@ def load_candidate_signals():
 
 
 def load_gold_signals():
-    """黄金池：first_date = 首次满足信号日。
+    """金股池：first_date = 首次满足信号日。
 
-    只取 first_signal >= 2（多信号共振）作为「强信号」样本 —— 这与前端黄金池
+    只取 first_signal >= 2（多信号共振）作为「强信号」样本 —— 这与前端金股池
     展示口径一致（signal_count 即硬筛条件）；同时保留全部信号作为对照。
     """
     p = RAW / "gold_pool.json"
@@ -312,11 +312,11 @@ def main():
     if a.pool in ("gold", "all"):
         sigs, err = load_gold_signals()
         if err:
-            print("  [黄金池] %s" % err)
+            print("  [金股池] %s" % err)
         else:
-            print("\n[黄金池] 信号 %d 条" % len(sigs))
-            r = run_pool("黄金池", sigs, cache,
-                         "黄金池「首次满足信号日」次一交易日开盘买入、持有 N 个真实交易日收盘卖出"
+            print("\n[金股池] 信号 %d 条" % len(sigs))
+            r = run_pool("金股池", sigs, cache,
+                         "金股池「首次满足信号日」次一交易日开盘买入、持有 N 个真实交易日收盘卖出"
                          "（前复权·扣双边 0.3%）。含多信号共振硬筛。")
             r["readiness"] = readiness(r["signal_days"], (r["signal_date_range"] or "").split(" ~ ")[-1])
             results["gold"] = r
@@ -332,7 +332,7 @@ def main():
     mapping = [("candidate", "candidate_backtest.json", "CANDIDATE_BACKTEST.js",
                 "CANDIDATE_BACKTEST", "候选池"),
                ("gold", "gold_pool_backtest.json", "GOLD_POOL_BACKTEST.js",
-                "GOLD_POOL_BACKTEST", "黄金池")]
+                "GOLD_POOL_BACKTEST", "金股池")]
     end_day = None
     for key, jf, js, var, label in mapping:
         r = results.get(key)
