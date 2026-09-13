@@ -3385,6 +3385,26 @@ def main(category=None, only=None):
         print(f"⏸️ 今日 {today} 非A股交易日（周末/假期），premarket 跳过清空，保留最后交易日数据")
         return 0
 
+    # 🛡 2026-09-13 主人令（甲′ · 后端真实分批修复）：给 all 补上与其余三档一致的交易日闸门。
+    #   根因：intraday / post_close / premarket 三档都有非交易日保护，**唯独 all 没有** ⇒
+    #     实证 2026-09-13（周日）15:31 CST 一次显式 category=all 派发（job 日志
+    #     `label=手动派发(全量)`）把 19 个含 intraday 的变量（INDEX_QUOTES / ETF_PULSE /
+    #     SECTOR_FUND_FLOW / CONCEPT_RANKING / LIMIT_UP_HEATMAP …）在周日午后刷新 →
+    #     时间戳落进 15:00-17:20 设计空窗 → 前端盘中卡显示「盘后 15:3x」（主人截图质疑）。
+    #   修法（主人拍板）：非交易日 + all
+    #     · 时刻 ∈ [08:30, 10:30] → 放行（周六/周日 09:00 周度全量刷新，设计内，不得打断）
+    #     · 其它时刻             → 降级 post_close（只刷盘后类，盘中类 19 变量不碰）
+    #   交易日不拦（正常全量纠错重跑不受影响）。
+    if category == "all" and not _is_trading_day(today):
+        _hm = now_cst().hour * 60 + now_cst().minute
+        if 510 <= _hm <= 630:  # 08:30-10:30 周度刷新窗口
+            print(f"✅ 今日 {today} 非A股交易日，但处于周度刷新窗口（{now_cst():%H:%M} ∈ 08:30-10:30），"
+                  "all 放行（周末周度全量刷新，设计内）")
+        else:
+            print(f"🛡 今日 {today} 非A股交易日且非周度刷新窗口（{now_cst():%H:%M}），"
+                  "category=all 降级为 post_close（盘中类变量不刷新，避免时间戳落入设计空窗）")
+            category = "post_close"
+
     # 分时段清理：只删除本次任务类别的 raw_data，避免盘中任务把盘前/盘后数据清掉
     target_vars = None
     if category == "all":
