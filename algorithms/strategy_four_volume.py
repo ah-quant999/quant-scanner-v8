@@ -388,7 +388,7 @@ def write_four_volume_backtest_js(records, bt_summary=None, out_dir=DATA_DIR):
 
 
 # ── 2026-09-06 主人令 P0-C：默认跑回测（原 0=不跑 → 3=跑近 3 年）；保证 .js 外壳永不空 ===
-# 原因：此前默认 0 → run_algorithms 即使注入 V8_BACKTEST_YEARS=3，也被 0 覆盖场景未走主链路，
+# 原因：此前默认 0 → run_algorithms 即使注入 V8_BACKTEST_YEARS=3（现为 5），也被 0 覆盖场景未走主链路，
 # 实际跑过但回测 → bt_summary=None → by_period={} → FOUR_VOLUME_BACKTEST.js 健康面板永 fail。
 # 现默认值 3 + 任何情况下都跑空保底（无 XG 信号也写 n=0 + N 年 + 提示）。
 COST_BPS = 15  # 单边万分之 1.5
@@ -549,7 +549,7 @@ def main():
     ap = argparse.ArgumentParser(description="四量终极 选股策略")
     ap.add_argument("--backtest", type=int,
                     default=int(os.environ.get("V8_BACKTEST_YEARS", "3") or 3),  # 2026-09-06 P0-C：默认跑回测（3 年）
-                    help="同时跑近 N 年回测（0=不跑；E 回测批经 SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3）")
+                    help="同时跑近 N 年回测（0=不跑；E 回测批经 SCRIPT_ENV 注入 V8_BACKTEST_YEARS=5）")
     ap.add_argument("--top", type=int, default=80,
                     help="每板成交量前N(默认80, 控制扫描规模)")
     args = ap.parse_args()
