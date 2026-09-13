@@ -6270,6 +6270,18 @@ window.__renderCiticPeObserve = function(){
     });
     compactMat += '</div>';
   }
+  var nowStatus = '';
+  if(T && T.current){
+    var nPct = Math.round(pct);
+    var nZone = nPct < 25 ? '低估区' : (nPct < 50 ? '偏低/合理偏低' : (nPct < 75 ? '合理偏高' : '高估区'));
+    var yrs = vh && vh.days_total ? Math.round(vh.days_total/244) : 10;
+    var pe10n = (B && B.signals_pe10_total) || '—';
+    nowStatus = '<div style="background:rgba(56,189,248,.05);border-left:3px solid #38bdf8;border-radius:6px;padding:8px 12px;margin:8px 0;font-size:12px;line-height:1.7;color:var(--sub);">'
+      + '<b style="color:#38bdf8;">&#x1F4CC; 现在什么情况：</b>'
+      + '当前中信一级行业 PE-TTM 中位数 = <b style="color:#38bdf8;">' + pe + '</b>，处近' + yrs + '年 <b style="color:' + sigColor + ';">' + nPct + '% 分位</b>（' + nZone + '），信号灯=<b style="color:' + sigColor + ';">' + sigLabel + '</b>。'
+      + 'PE&lt;10 这种极端便宜 16 年只出现 ' + pe10n + ' 次，说明当前还没到历史极端低估区；按本卡逻辑，要等分位跌破 25% 或信号灯转「极度低估」，才算进高赔率区间，平时仅作仓位参考。'
+      + '</div>';
+  }
   var details = '';
   if(B && B.result){
     var thresholds = ['pe<10','pe<12','pe<15','pe<20'];
@@ -6295,13 +6307,27 @@ window.__renderCiticPeObserve = function(){
       mat += '</tr>';
     });
     mat += '</tbody></table>';
-    details += '<details style="margin-top:8px;"><summary style="font-size:12px;font-weight:700;color:#60a5fa;cursor:pointer;">&#x25B8; 完整阈值矩阵</summary>'
-      + '<div style="margin-top:8px;">' + mat + '</div></details>';
+    var thNames = {'pe<10':'PE<10','pe<12':'PE<12','pe<15':'PE<15','pe<20':'PE<20'};
+    details += '<div style="margin-top:10px;">'
+      + '<div style="font-size:11px;font-weight:700;color:#60a5fa;margin-bottom:5px;">&#x1F4CA; 阈值矩阵 · 持有250日 胜率/收益（直接展示，无需展开）</div>'
+      + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;">'
+    thresholds.forEach(function(th){
+      var r = (B.result[th] && B.result[th]['hold_250d']) || null;
+      if(!r){ details += '<div style="background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.25);border-radius:6px;padding:6px 4px;text-align:center;"><div style="font-size:11px;color:var(--sub);font-weight:700;">'+thNames[th]+'</div><div style="font-size:11px;color:var(--dim);">—</div></div>'; return; }
+      var wrC2 = r.win_rate >= 60 ? '#26a69a' : (r.win_rate >= 50 ? '#94a3b8' : '#ef5350');
+      var arC2 = r.avg_ret > 0 ? '#ef5350' : '#26a69a';
+      details += '<div style="background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.25);border-radius:6px;padding:6px 4px;text-align:center;">'
+        + '<div style="font-size:11px;color:var(--sub);font-weight:700;">'+thNames[th]+'</div>'
+        + '<div style="font-size:15px;font-weight:800;color:'+wrC2+';">'+r.win_rate+'%</div>'
+        + '<div style="font-size:11px;color:'+arC2+';">'+(r.avg_ret>0?'+':'')+r.avg_ret+'%</div>'
+        + '<div style="font-size:9.5px;color:var(--dim);">n='+r.n+'</div></div>';
+    });
+    details += '</div></div>';
   }
   dst.innerHTML = ''
     + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
     + '<b style="font-size:15px;">&#x1F321; 中信 PE 观测 · 极值温度计 + PE&lt;10 回测</b>'
-    + '<span style="font-size:10px;font-weight:600;color:#fbbf24;background:rgba(251,191,36,.12);padding:1px 6px;border-radius:4px;">观测指标 &#x00B7; 暂未上架</span>'
+    + '<span style="font-size:10px;font-weight:600;color:#fbbf24;background:rgba(251,191,36,.12);padding:1px 6px;border-radius:4px;">观测指标</span>'
     + _uBadge('盘后', '中长线', uT, '数据 ' + _ev(dT))
     + '</div>'
     + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.22);border-radius:7px;padding:8px 12px;margin-bottom:10px;line-height:1.6;font-size:12px;">'
@@ -6311,6 +6337,7 @@ window.__renderCiticPeObserve = function(){
     + sigHtml
     + compactMat
     + details
+    + nowStatus
     + '<div style="font-size:10.5px;color:var(--sub);margin-top:8px;line-height:1.6;">'
     + '口径：中信 PE-TTM vs 近10年自身分位；PE&lt;10 回测为信号日收盘价买入、持有 N 日收盘价卖出（未计成本/分红）。</div>';
 };
@@ -6374,10 +6401,29 @@ window.__renderIndexObserve = function(){
     + '<span style="font-size:13px;font-weight:800;color:' + defC + ';">' + _ev(st.overall) + '</span>'
     + '<span style="font-size:11px;color:var(--dim);">防御仓位 ' + defW + '%</span>'
     + '<div style="flex:1;min-width:100px;background:rgba(148,163,184,.15);border-radius:3px;height:8px;overflow:hidden;"><div style="width:' + defW + '%;height:100%;background:' + defC + ';"></div></div></div>' : '';
+  var idxNow = '';
+  if(V && V.indices && V.indices.length){
+    var loN = 0, hiN = 0, openN = 0;
+    V.indices.forEach(function(x){
+      if(x.percentile_5y != null){
+        if(x.percentile_5y < 0.30) loN++;
+        else if(x.percentile_5y > 0.70) hiN++;
+      }
+      var gx = fmap[x.name] || {};
+      if(gx.gate === '多头开放') openN++;
+    });
+    var tone = loN > hiN ? '市场估值重心偏低，中长期赔率占优' : (hiN > loN ? '估值重心偏高，注意回撤风险' : '估值分化、结构性行情为主');
+    idxNow = '<div style="background:rgba(167,139,250,.05);border-left:3px solid #a78bfa;border-radius:6px;padding:8px 12px;margin:10px 0;font-size:12px;line-height:1.7;color:var(--sub);">'
+      + '<b style="color:#a78bfa;">&#x1F4CC; 现在什么情况：</b>'
+      + '监测 ' + V.indices.length + ' 个指数中，' + loN + ' 个处于 5 年估值偏低（&lt;30% 分位）、' + hiN + ' 个偏高（&gt;70%），' + openN + ' 个价格门控为「多头开放」。'
+      + (st.overall ? '综合策略信号=<b style="color:' + defC + ';">' + _ev(st.overall) + '</b>（防御仓位 ' + defW + '%）。' : '')
+      + '整体看，' + tone + '。'
+      + '</div>';
+  }
   dst.innerHTML = ''
     + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
     + '<b style="font-size:15px;">&#x1F4C8; A股指数观测 · 估值分位 + 价格中枢</b>'
-    + '<span style="font-size:10px;font-weight:600;color:#a78bfa;background:rgba(167,139,250,.12);padding:1px 6px;border-radius:4px;">大盘观测 &#x00B7; 暂未上架</span>'
+    + '<span style="font-size:10px;font-weight:600;color:#a78bfa;background:rgba(167,139,250,.12);padding:1px 6px;border-radius:4px;">大盘观测</span>'
     + _uBadge('盘后', '中长线', uT, src.join(' / '))
     + '</div>'
     + '<div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.22);border-radius:7px;padding:8px 12px;margin-bottom:10px;line-height:1.6;font-size:12px;">'
@@ -6385,6 +6431,7 @@ window.__renderIndexObserve = function(){
     + '<b style="color:#a78bfa;">&#x1F4A1; 用法：</b>估值分位看贵贱（仓位轻重），价格中枢看趋势（多空门控）。<br>'
     + '<b style="color:#a78bfa;">&#x26A0; 限制：</b>大盘级别参考，不指向个股；数据源偶有抽风，读数仅供参考。</div>'
     + strategyHtml
+    + idxNow
     + '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
     + '<thead><tr style="background:rgba(167,139,250,.08);">'
     + '<th style="padding:5px 6px;text-align:left;font-size:11px;color:var(--sub);">指数</th>'
@@ -6608,10 +6655,24 @@ window.__renderIndexObserve = function(){
     var dScope = scope.daily || {}; var wScope = scope.weekly || {}; var mScope = scope.monthly || {};
     var dEx = C.extracted.daily || {}; var wEx = C.extracted.weekly || {}; var mEx = C.extracted.monthly || {};
     var src = dScope.sources_read || '?';
+  function _domPol(pol){ var tot=(pol.bull||0)+(pol.bear||0)+(pol.neutral||0); if(!tot) return '中性'; return pol.bull>pol.bear?'偏多':(pol.bear>pol.bull?'偏空':'中性'); }
+  function _topSec(s){ if(!s) return '?'; var ks=Object.keys(s); return ks.length?ks.reduce(function(a,b){return s[b]>s[a]?b:a;},ks[0]):'?'; }
+  var aiNow = '';
+  if(C && C.extracted){
+    var dP=_domPol(dEx.polarity||{}), wP=_domPol(wEx.polarity||{}), mP=_domPol(mEx.polarity||{});
+    var dS=_topSec(dEx.sector_hits||{}), wS=_topSec(wEx.sector_hits||{}), mS=_topSec(mEx.sector_hits||{});
+    var consistent = (dP===wP && wP===mP);
+    aiNow = '<div style="background:rgba(139,92,246,.05);border-left:3px solid #8b5cf6;border-radius:6px;padding:8px 12px;margin:10px 0;font-size:12px;line-height:1.7;color:var(--sub);">'
+      + '<b style="color:#8b5cf6;">&#x1F4CC; 现在什么情况：</b>'
+      + 'AI 文本情绪——日线=<b>' + dP + '</b>、周线=<b>' + wP + '</b>、月线=<b>' + mP + '</b>；'
+      + '板块关注 Top 分别为 日·' + dS + ' / 周·' + wS + ' / 月·' + mS + '。'
+      + (consistent ? '三尺度观点一致，信号相对可信。' : '三尺度观点不完全一致，说明当下市场分歧大、暂无强共识，参考权重需下调。')
+      + '</div>';
+  }
     dst.innerHTML = ''
       + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
       + '<b style="font-size:15px;">&#x1F52E; AI 洞察·多源观点对比</b>'
-      + '<span style="font-size:10px;font-weight:600;color:#8b5cf6;background:rgba(139,92,246,.12);padding:1px 6px;border-radius:4px;">暂未上架 · AI 观察</span>'
+      + '<span style="font-size:10px;font-weight:600;color:#8b5cf6;background:rgba(139,92,246,.12);padding:1px 6px;border-radius:4px;">AI 观察</span>'
       + _uBadge('盘后', '中长线', C.update_time, 'maharo_macro 7 源聚合 · ' + src)
       + '</div>'
       // 2026-09-10 主人令：卡名下方加"核心 + 解析"
@@ -6621,6 +6682,7 @@ window.__renderIndexObserve = function(){
       + '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#8b5cf6;font-weight:700;">&#x1F4A1; 用法：</b>🎯 AI 常常「一天说主线是 A、一个月说主线是 B」，把三份并排，一眼看出它自己的观点稳不稳 —— 三份都指向同一方向，可信度相对高；三份各说各话，说明当下市场本身没共识。📊 板块 Top 6 的条宽用的是<b>占比</b>而非次数（三份报告长短不一，直接比次数会失真），<b>看比例，不要看绝对次数</b>。</div>'
       + '<div style="font-size:11.5px;color:var(--sub);padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;font-weight:700;">&#x26A0; 限制：</b>① 这是<b>展示卡</b>，只呈现「AI 说了什么」，<b>不构成买卖建议</b>，更不替代个股信号；② AI 文本本身可能有幻觉或滞后，<b>它的观点同样可能错</b>；③ 语气统计是按句子做的粗分类，不保证每条都分得准。</div>'
       + '</div></div>'
+      + aiNow
       // 极性条
       + '<div style="background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.2);border-radius:7px;padding:8px 12px;margin-bottom:12px;">'
       + '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:6px;">观点极性分布（句子级·关键词法）</div>'
