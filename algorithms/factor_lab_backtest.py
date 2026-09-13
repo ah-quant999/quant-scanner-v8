@@ -311,7 +311,6 @@ def main():
     _log(f"  因子实验室独立分层回测 — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     _log("=" * 70)
     if not os.path.isdir(CACHE_DIR):
-        _log(f"[error] universe 缓存目录不存在: {CACHE_DIR}（先跑 calc_stock_rps）")
         sys.exit(1)
     codes = [f[:-5] for f in os.listdir(CACHE_DIR)
              if f.endswith(".json") and _is_a6(f[:-5])]

@@ -1613,10 +1613,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/FOUR_VOLUME.js?v=1789278469" defer></script>
     <script src="data/FOUR_VOLUME_60M.js?v=1789278469" defer></script>
     <script src="data/STOCK_STOP_DATA.js?v=1789278469" defer></script>
-    <!-- 🛡 2026-09-10 根因修复（阿狸咪）：calc_stock_rps.py 直接写的 data/STOCK_RPS.js 已停在 09-08 19:57，
-         而 update_v8 从 raw_data/stock_rps.json 生成的 data/STOCK_RPS_DATA.js 为 09-10 01:23 最新。
-         因此前端改引 STOCK_RPS_DATA.js，确保相对强度子页/状态胶囊读到最新数据。
-         旧 data/STOCK_RPS.js 保留（RPS 保护链要求不删），但不再注入，避免继续覆盖新数据。 -->
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=1789278469" defer></script>
 <script src="data/BACKTEST_TDX.js?v=1789278469" defer></script>
 
@@ -5096,7 +5092,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         }
         var vname = s.key==='fourvolume' ? 'FOUR_VOLUME_BACKTEST'
                   : s.key==='crds'       ? 'CRDS_BACKTEST'
-                  : s.key==='rps'        ? 'RPS_BACKTEST'
                   : null;
         var sm=((window[vname]||{}).summary||{});
         var total=sm.total_signals||0, bp=sm.by_period||{}, upd=sm.update_time||sm.calc_time||'';
@@ -5939,88 +5934,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   };
 
   // DOM ready hook
-  // ===== RPS 相对强度 · 30 天样本考核（2026-09-06 主人令：暂未上架·因子实验室下方，前端展示防遗忘）=====
-  // 数据源 window.RPS_BACKTEST（E 批 21:00 每日续刷）；纯观测层，不参与选股评分权重（generate_top10 引擎 0 引用）。
-  window.__rpsRetry = 0;
-  // 🛡 2026-09-11 小九的工程师：异常兜底 —— 原实现一旦拼串抛错，外层 catch 只 console.warn，
-  //   用户端表现为「永久加载中」的假死卡，无任何可见线索。现改为显式写错误提示。
-  window.__renderRpsAudit = function(){
-    var _dst = document.getElementById('rpsAuditBody');
-    if(!_dst) return;
-    try{ return window.__renderRpsAuditInner.apply(this, arguments); }
-    catch(e){
-      _dst.innerHTML = '<div class="note" style="padding:16px;text-align:center;color:#f87171;">'
-        + '📈 相对强度 RPS 考核卡渲染异常：' + String((e && e.message) || e) + '</div>';
-      console.warn('[RPS卡] 渲染异常（已显式提示，不再永久「加载中」）', e);
-    }
-  };
-  window.__renderRpsAuditInner = function(){
-    var dst = document.getElementById('rpsAuditBody');
-    if(!dst) return;
-    var D = window.RPS_BACKTEST;
-    if(!D || !D.summary){
-      if(window.__rpsRetry < 15){ window.__rpsRetry++; setTimeout(window.__renderRpsAudit, 700); return; }
-      dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">📈 相对强度 RPS 考核回测数据待产出（算法链 E 批 21:00 自动刷新）</div>';
-      return;
-    }
-    var s = D.summary, bp = s.by_period || {}, sigs = D.signals || [];
-    var _days = {}; sigs.forEach(function(g){ if(g && g.signal_date) _days[g.signal_date] = 1; });
-    var nDays = Object.keys(_days).length;
-    var END = '2026-10-16';
-    var left = Math.max(0, Math.ceil((new Date(END + 'T23:59:59+08:00') - Date.now()) / 86400000));
-    var pctChg = function(v, suf){
-      if(v == null || isNaN(v) || v === 0) return '<span style="color:var(--dim);">'+(v===0?'0.00%':'—')+'</span>';
-      var c = v > 0 ? '#ef5350' : '#26a69a';
-      return '<span style="color:'+c+';font-weight:600;">'+(v>0?'+':'')+v.toFixed(2)+(suf||'')+'</span>';
-    };
-    var rows = '';
-    ['1','3','5','10','20'].forEach(function(k){
-      var p = bp[k]; if(!p) return;
-      var core = (k === '1' || k === '5' || k === '10');
-      rows += '<tr style="border-top:1px solid rgba(148,163,184,.15);'+(core?'':'opacity:.6;')+'">'
-        + '<td style="padding:5px 8px;color:var(--txt);font-weight:600;">T+'+k+'</td>'
-        + '<td style="padding:5px 8px;color:var(--sub);text-align:right;">'+(p.samples||0)+'</td>'
-        + '<td style="padding:5px 8px;text-align:right;font-weight:700;color:'+(p.samples?'#fbbf24':'var(--dim)')+';">'+(p.samples?(p.win_rate.toFixed(2)+'%'):'—')+'</td>'
-        + '<td style="padding:5px 8px;text-align:right;">'+pctChg(p.samples ? p.avg_return : null, '%')+'</td>'
-        + '<td style="padding:5px 8px;text-align:right;color:var(--sub);">'+(p.samples && p.profit_loss_ratio ? p.profit_loss_ratio.toFixed(2) : '—')+'</td>'
-        + '</tr>';
-    });
-    var p1 = bp['1'] || {}, p5 = bp['5'] || {}, p10 = bp['10'] || {};
-    var passNow = (p1.samples > 0 && p1.win_rate >= 55 && (p5.avg_return || 0) > 0 && (p10.avg_return || 0) > 0);
-    var verdict = '<span style="color:#94a3b8;font-weight:600;">考核中 · 样本累积（当前读数不作结论）</span>';
-    dst.innerHTML = ''
-      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-      + '<span style="font-size:15px;font-weight:700;">📈 相对强度 RPS · 30 天样本考核</span>'
-      + '<span class="fresh" data-fresh="'+_e(s.update_time || D.update_time || '')+'">更新 '+_e(s.update_time || D.update_time || '—')+'</span>'
-      + '</div>'
-      + '<div style="background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
-      + '<b style="color:#94a3b8;">&#x1F4CC; 核心：</b>RPS 相对强度策略正在接受 30 交易日样本考核。<br>'
-      + '<b style="color:#94a3b8;">&#x1F4A1; 用法：</b>达标（T+1胜率≥55% 且 T+5/T+10平均收益为正）才考虑恢复子tab。<br>'
-      + '<b style="color:#94a3b8;">&#x26A0; 限制：</b>当前读数不作结论，样本还在累积，不参与选股评分。</div>'
-      // 2026-09-13 主人令：把原先只出现在「运维·失败/诊断详情」里的 RPS 数据口径说明，
-      //   归位到本卡自身（那属于本卡的数据来源说明，不该占运维诊断位）。
-      + '<div style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.28);border-left:3px solid #fbbf24;border-radius:7px;padding:8px 12px;margin-bottom:10px;line-height:1.75;font-size:11.5px;color:var(--sub);">'
-      + '<div style="font-weight:700;color:#fbbf24;margin-bottom:4px;">📡 数据口径说明（为什么样本偏少 · 当前状态：受限可用）</div>'
-      + '要算「T+1 / T+20 持有期收益」必须拿到<b>前复权 K 线</b>，本机（家用网络）走 baostock 会被风控拉黑，<b>没有凭据</b>。'
-      + '所以目前采用<b>降级方案</b>：用本地 <code>kline_cache</code> 顶替 baostock 离线计算，代价是<b>可用样本明显偏少</b>（T+1 仅数十笔、T+5 / T+10 更少甚至为 0），'
-      + '数据内已标记 <code>degraded=true</code>。<b>完整版需要中国 IP 节点（小九机）在线跑原版脚本</b>。'
-      + '<div style="margin-top:5px;color:var(--dim);">➜ 因此：<b>样本未达量前，本卡读数一律不作结论</b>；这是数据获取能力受限，<b>不是策略本身失效</b>，无需人工干预。</div>'
-      + '</div>'
-      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-      + '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(251,191,36,.14);color:#fbbf24;font-weight:600;">'+(passNow?'✅ 当前读数达标':'考核中')+'</span>'
-      + '</div>'
-      + '<div style="font-size:12px;line-height:1.7;color:var(--sub);margin-bottom:8px;">'
-      + '📌 <b>考核标准</b>（2026-09-05 主人令）：自 09-05 起满 30 个交易日（约 '+END+'，剩 '+left+' 个自然日）——A 档 <b>T+1 胜率 ≥55%</b> 且 <b>T+5 / T+10 平均收益为正</b> → 谈恢复子 tab / 进评分；不达标 → 降级为详情命中行，策略页永不恢复。'
-      + '</div>'
-      + '<div style="font-size:11.5px;color:var(--dim);margin-bottom:8px;">信号样本：<b style="color:var(--txt);">'+(s.total_signals||sigs.length)+'</b> 笔 · 已积累信号交易日 <b style="color:var(--txt);">'+nDays+'</b> 天（'+_e(s.signal_date_range||'—')+'）· 到点以真实数字判定，不造假、不提前升格</div>'
-      + '<table style="width:100%;border-collapse:collapse;font-size:12px;">'
-      + '<thead><tr style="color:var(--dim);font-size:11px;">'
-      + '<th style="padding:4px 8px;text-align:left;">持有期</th><th style="padding:4px 8px;text-align:right;">样本</th>'
-      + '<th style="padding:4px 8px;text-align:right;">胜率</th><th style="padding:4px 8px;text-align:right;">平均收益</th>'
-      + '<th style="padding:4px 8px;text-align:right;">盈亏比</th></tr></thead>'
-      + '<tbody>' + rows + '</tbody></table>'
-      + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.6;">子 tab 已于 09-03 轻量化下线；数据链（STOCK_RPS / rps_backtest）保留每日续跑纯观测。RPS <b>不参与</b>选股评分权重（引擎 0 引用），本卡仅考核观测，不构成投资建议。T+3 / T+20 为参考列。</div>';
-  };
 
   // ===== 🔭 主题空间 · 概念资金热度 实验卡 =====
   // 2026-09-11 主人令改造（原「主题空间·价值投资」静态主题表 → 概念×资金热度交叉）。
@@ -6816,7 +6729,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       if(window.__aicRetry < 25){ window.__aicRetry++; setTimeout(window.__renderAiInsightsCompare, 600); return; }
       dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F52E; AI 洞察对比 数据未到位</div>';
       return;
-    }
     function renderScale(per){
       var w = Math.max(2, Math.round(per * 100));
       var c = per >= 0.6 ? '#ef5350' : (per >= 0.4 ? '#fbbf24' : '#26a69a');
@@ -8022,18 +7934,6 @@ function switchSec(sec,el){
     if(trow) hits.push({name:'🧬 三重共识', color:'var(--purple)', detail:'排名 #'+trow.rank+' · 评分 '+trow.total_score});
     // P4 研究因子明细（2026-09-05）：仅 score_p4 非零时显示（如「残差动量+18.0% -6」）
     if(trow && trow.score_p4) hits.push({name:'🧊 P4因子', color: trow.score_p4>0 ? 'var(--up)' : 'var(--down)', detail:(trow.p4_detail||('评分调整 '+trow.score_p4))});
-    // 相对强度（RPS 分层）
-    const rpsD = window.STOCK_RPS_DATA || {};
-    const rpsRow = (rpsD.records||[]).find(r => normCode(r.code) === nc);
-    if(rpsRow){
-      const tier = rpsRow.tier || '-';
-      const tierColor = tier==='A' ? '#ffd54f' : tier==='B' ? '#4fc3f7' : tier==='C' ? '#94a3b8' : 'var(--dim)';
-      const rpsMax = rpsRow.rps_max != null ? Number(rpsRow.rps_max).toFixed(1) : '--';
-      const rps20 = rpsRow.rps50 != null ? Number(rpsRow.rps50).toFixed(1) : '--';
-      const rs = rpsRow.rs != null ? Number(rpsRow.rs).toFixed(2) : '--';
-      const maTag = rpsRow.above_ma250 ? '· 站上250日线' : (rpsRow.above_ma200 ? '· 站上200日线' : '');
-      hits.push({name:'📈 相对强度 '+tier+'档', color:tierColor, detail:'RPSmax '+rpsMax+' · 50日 '+rps20+' · RS '+rs+' '+maTag});
-    }
     // 金股池
     const gp = window.GOLD_POOL || {};
     const gstocks = gp.stocks || {};
@@ -10807,7 +10707,6 @@ function drawUpDownChart(){
 
 
 
-          {name:'相对强度', source:'STOCK_RPS_DATA', freq:'收盘后1次', slots:['19:15'], note:'个股相对强度评分'},
 
           {name:'逆势龙头', source:'CRDS_CARD_DATA', freq:'收盘后1次', slots:['19:15'], note:'CRDS逆势龙头精英池'}
 
@@ -14763,30 +14662,6 @@ window.__renderV8CalToday();
       try{
         if(typeof window.__retryJudgmentRender==='function') window.__retryJudgmentRender();
       }catch(e){ console.warn('[judgment DOMContentLoaded retry]', e); }
-    }
-    // 🛡 2026-09-01 一劳永逸：策略回顾卡(strpsCard·个股相对强度 RPS+RS+年线) 因 data/STOCK_RPS.js 是
-    //   defer 脚本，init 末尾的普通 <script> 在解析阶段执行 renderRpsScreen 时 window.STOCK_RPS_DATA 尚未注入
-    //   → 卡片写入空表（显示「暂无满足条件的个股」）。defer 脚本在 DOMContentLoaded 前执行完毕，故在此兜底重试 +
-    //   自愈轮询，彻底消除空白。范式同 2026-08-19 商品弹性榜(COMMODITY_ELASTICITY)的 setTimeout+自愈。
-    function doRpsRetry(){
-      if(typeof window.renderRpsScreen === 'function' && window.STOCK_RPS_DATA && (window.STOCK_RPS_DATA.records||[]).length){
-        try{ window.renderRpsScreen(); }catch(e){ console.warn('[rps DOMContentLoaded retry]', e); }
-      }
-    }
-    // 自愈轮询：每 1s 检查策略回顾卡是否仍空白且数据已就绪，自动补渲染（应对 CDN 慢/缓存覆盖/defer 延迟）
-    if(typeof window !== 'undefined' && !window.__rpsHealStarted){
-      window.__rpsHealStarted = true;
-      (function selfHealRps(){
-        var body = document.getElementById('strpsBody');
-        if(body){
-          var hasData = window.STOCK_RPS_DATA && (window.STOCK_RPS_DATA.records||[]).length;
-          var isEmpty = !body.innerHTML || body.innerHTML.trim().length < 20;
-          if(hasData && isEmpty){
-            try{ window.renderRpsScreen(); }catch(e){}
-          }
-        }
-        setTimeout(selfHealRps, 1000);
-      })();
     }
     if(document.readyState === 'loading'){
       document.addEventListener('DOMContentLoaded', function(){ doV8CalRetry(); doJdRetry(); doRpsRetry(); });

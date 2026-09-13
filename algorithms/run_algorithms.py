@@ -261,7 +261,6 @@ ORDER = [
 #   每 stage 独立触发、独立 timeout，final_recommend 独占 D 批（不再被单窗口掐断）。
 #   跨 stage 产物经 main 分支传递：每 stage 跑完即 stage(out→raw_data)+push，
 #   下游 stage 的云端 run checkout main 即含上游当日产物。
-#   同 stage 内严格沿用 ORDER 相对次序（build_candidate_pool 在 calc_stock_rps 前等依赖不变）。
 STAGES = {
     "A": [  # 数据采集批（~18:00 CST 后，受闸门 START_TRADING 约束；龙虎榜16:30后）：纯 fetch + 上游自产前置
         "fetch_fundamental_quality.py", "fetch_stock_names.py", "gen_stock_profile.py",

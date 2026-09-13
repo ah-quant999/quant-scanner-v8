@@ -98,7 +98,7 @@ CARD_DEFS = [
     # cloud_fetch_v8.py 的 CATEGORY_MAP 中 post_close 只注册了 MARKET_FUND_FLOW_DATA / EXPERIMENT 两项。
     # 下列卡片的 raw_data 实际由 algorithms/run_algorithms.py 链内脚本产出（fetch_sh_index_fib /
     # build_candidate_pool / fetch_lhb / fetch_inst_trade / gen_triple_consensus / gen_cockpit_advice /
-    # generate_top10 / calc_stock_rps / calc_crds / strategy_four_volume_60m 等），
+    # generate_top10 / calc_crds / strategy_four_volume_60m 等），
     # 若沿用 PAGE_TO_CAT["盘后数据"|"选股策略"]="post_close" 派发 cn_fetch，**永远刷不到它们**，
     # 且会白占 25 分钟 debounce 锁导致真正需要的派发被跳过（与 155 轮 NT_DATA 同一类缺陷）。
     # 故统一显式覆盖 heal_cat="algo_run"。
@@ -205,14 +205,10 @@ CARD_DEFS = [
     # 🛡 2026-09-02 一劳永逸：HUNTER_BACKTEST.js（大牛股猎手历史回测）此前无 CARD_DEFS 登记，
     #   被通用全量审计按「全量数据/24h 红线」误杀。实际为历史回测产物，依赖 lhb_history，
     #   变化慢、baostock 取 K 线可能不稳定；改为显式登记，max_age=7 天，并纳入算法链日常调度。
-    # 🛡 2026-09-10 主人令：RPS_BACKTEST / STOCK_STOP_DATA 本机 100% 不可解（已实测）
-    #   RPS_BACKTEST 需 baostock 黑名单(10001011) → 阿狸咪无 baostock 凭据；
-    #   阿狸咪的 v8/backtest_rps_offline.py 用 kline_cache 替 baostock 可跑出 T+1/T+3 半残数据，
     #   已 push 到 main 但仍降级为 degraded=true（无 baostock 凭据前不要全量回测）。
     #   STOCK_STOP_DATA 需 gtimg 日 K（urllib 走 HTTPS=HTTP 501 腾讯 waf 反爬虫拦截）→ 阿狸咪无浏览器 UA。
     #   两者均显式登记 manual_dep + manual_note，让面板明确显示「本机限制」而非「陈旧」，
     #   自愈链不去派发永远刷不出的任务，避免日复一日假派发噪声邮件。
-    {"id": "RPS_BACKTEST", "name": "RPS A档回测", "page": "盘后数据", "freq": "每日盘后", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run", "net_dep": True, "net_dep_note": "需 baostock 拉前复权K线计算 T+1/T+20 持有期收益。本机 baostock 被风控黑名单(err=10001011匿名用户)，无凭据。阿狸咪走 v8/backtest_rps_offline.py 离线半残版（kline_cache 替 baostock，T+1=57样本/T+3=11样本/T+5+0样本 degraded=true）；完整版需小九中国IP在线跑原版。"},
     {"id": "STOCK_STOP_DATA", "name": "精确止损止盈", "page": "选股策略", "freq": "盘后", "max_age": 1440, "key_fields": ["stocks"], "heal_cat": "algo_run", "net_dep": True, "net_dep_note": "需 gtimg 日K(腾讯 urllib HTTPS) 计算 fixedP10/rrK1.5 止损止盈。本机实测 gtimg HTTPS=HTTP 501（腾讯waf反爬虫JS challenge拦截 urllib 类爬虫），无浏览器UA绕不开。本机无替代源，需小九中国IP+浏览器UA在线跑原版。"},
     # 🛡 2026-09-10 主人令一劳永逸：H_AUTO_BUY / H_AUTO_BUY_TRACK 此前未登记 CARD_DEFS
     #   → 落入 check_all_data_files 全量审计按「通用 24h 红线」误判 fail（all_H_AUTO_BUY / all_H_AUTO_BUY_TRACK）。

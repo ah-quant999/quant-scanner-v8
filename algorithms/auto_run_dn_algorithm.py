@@ -163,7 +163,6 @@ def _fetch_kline_akshare(code, bars=250):
 #   → track_h_auto_buy 主源缺失、兜底读旧 data/H_AUTO_BUY.js → 前端冻结在 09-04。
 # 【修法】四层加固（本段代码），调用方再叠加并发：
 #   ① 本地缓存 raw_data/kline_cache/<code>.json（随仓入仓，云端零网络可读）新鲜则用
-#   ② 复用 calc_stock_rps 的统一三级兜底链「mootdx → 东财 → baostock + 熔断器」
 #      （同仓早有成熟取数链，本脚本此前没复用 = 本次事故根子）
 #   ③ 上一步取到的 K 线回写缓存，逐晚收敛，缓存越跑越全（与 factor_lab_gen 同款策略）
 #   ④ 网络全挂时退回（可能陈旧的）本地缓存并标 degraded，宁可出滞后数据也不出空，
@@ -185,11 +184,9 @@ def _unified_query_kline():
         return _SRC_UNIFIED or None
     try:
         sys.path.insert(0, str(ALGO_DIR))
-        import calc_stock_rps as _rps
         fn = getattr(_rps, "_query_kline", None)
         _SRC_UNIFIED = fn if callable(fn) else False
         if not _SRC_UNIFIED:
-            print("  ⚠️ calc_stock_rps._query_kline 不可用，退回 gtimg 老路径")
     except Exception as e:
         print(f"  ⚠️ 导入统一取数链失败（退回 gtimg 老路径）: {e}")
         _SRC_UNIFIED = False

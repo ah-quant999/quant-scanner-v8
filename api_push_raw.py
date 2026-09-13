@@ -189,7 +189,7 @@ def _content_ts(content: bytes):
 def walk_extra():
     """额外推送文件（不在 raw_data/，但由算法脚本直接写 data/）。
 
-    2026-08-10 补入：final_recommend / calc_stock_rps / strategy_four_volume_60m /
+    2026-08-10 补入：final_recommend / strategy_four_volume_60m /
     export_optimized_strategy 等脚本直接写 data/*.js 或 raw_data/*.json，
     需在此注册才能被 api_push 推送到 main。
     """
@@ -199,7 +199,6 @@ def walk_extra():
         "data/STOCK_STOP_DATA.js",      # ATR止损止盈（gen_stock_stop 产出）
         # ── 2026-08-10 补入：之前缺失导致这些文件永远不刷新 ──
         "data/FINAL_RECOMMEND_DATA.js", # 跨策略共振 Top3（final_recommend.py 产出）
-        "data/STOCK_RPS.js",            # 个股相对强度 RPS+RS（calc_stock_rps.py 产出）
         "data/FOUR_VOLUME_60M.js",      # 四量终极60min版（strategy_four_volume_60m.py 产出）
         # ── 2026-08-17 补入：商品涨价弹性榜（calc_commodity_elasticity.py 产出）──
         # 之前未注册，导致国内期货 LC/SA 数据永远不显示；现加入云端自动跑 + 推送
@@ -236,7 +235,6 @@ _EXTRA_FILES = (
     "data/FOUR_VOLUME.js",
     "data/STOCK_STOP_DATA.js",
     "data/FINAL_RECOMMEND_DATA.js",
-    "data/STOCK_RPS.js",
     "data/FOUR_VOLUME_60M.js",
     # 🛡 2026-08-19：H 反推算法相关文件注册到 ?v 重写集，确保 api_push 推送后 index.html 同步对齐缓存戳
     "data/H_AUTO_BUY.js",

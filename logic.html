@@ -1396,12 +1396,12 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <table class="lg-table">
           <tr><th>批次</th><th>触发时点</th><th>脚本数</th><th>本批运行内容（按执行次序）</th><th>关键产物 / 说明</th></tr>
           <tr><td><b>A 采集批</b></td><td>交易日 18:00 后（闸门硬约束）</td><td>12</td><td>fetch_fundamental_quality / fetch_stock_names / gen_stock_profile / fetch_stock_quote_v8 / fetch_sh_index_fib / fetch_inst_trade / fetch_sector_rs / fetch_lhb / fetch_orphan_suspension / fetch_orphan_market_alerts / fetch_orphan_nt_data / fetch_orphan_sector_fund_flow</td><td>纯 fetch + 上游自产前置；<b>含龙虎榜 fetch_lhb（属 A 批，非 B 批）</b>；A 就绪是 B 批门槛</td></tr>
-          <tr><td><b>B 选股批</b></td><td>A 就绪后 ~18:10 起</td><td>27</td><td><b>v8/factor_lab_gen.py（最前 · baostock 冷启动 50-90min）</b> → calc_crds / build_candidate_pool / calc_stock_rps / generate_top10 / strategy_four_volume_60m / strategy_four_volume / market_regime / sector_recommendation / update_triple_resonance_history / gen_triple_consensus / gen_triple_track / calc_volatility_watch / gen_stock_stop / gen_algo_track / calc_sentiment_cycle / refresh_dividend_cninfo / refresh_stock_metadata / fetch_weekend_run / auto_run_dn_algorithm / strong_breakout / track_h_auto_buy / scripts/fetch_ai_insights_compare / gen_factor_audit / gen_factor_progress / fetch_valuation_percentile / fetch_index_value_framework</td><td>🛡 2026-09-09 主人令：<b>因子实验室生成器前置到本批最前</b>，必须在 D 批 final_recommend 之前产完 FACTOR_LAB.js，因子融合才能吃当日新鲜因子（18:10 起跑→19:40 前产完，D 批必吃到）。B 批内其余脚本保持原相对次序不变；<b>候选股池</b>(build_candidate_pool) / <b>CRDS 含金股层</b>(calc_crds) / <b>TOP10</b>(generate_top10) 均在 B 批自产</td></tr>
+          <tr><td><b>B 选股批</b></td><td>A 就绪后 ~18:10 起</td><td>27</td><td><b>v8/factor_lab_gen.py（最前 · baostock 冷启动 50-90min）</b> → calc_crds / build_candidate_pool / generate_top10 / strategy_four_volume_60m / strategy_four_volume / market_regime / sector_recommendation / update_triple_resonance_history / gen_triple_consensus / gen_triple_track / calc_volatility_watch / gen_stock_stop / gen_algo_track / calc_sentiment_cycle / refresh_dividend_cninfo / refresh_stock_metadata / fetch_weekend_run / auto_run_dn_algorithm / strong_breakout / track_h_auto_buy / scripts/fetch_ai_insights_compare / gen_factor_audit / gen_factor_progress / fetch_valuation_percentile / fetch_index_value_framework</td><td>🛡 2026-09-09 主人令：<b>因子实验室生成器前置到本批最前</b>，必须在 D 批 final_recommend 之前产完 FACTOR_LAB.js，因子融合才能吃当日新鲜因子（18:10 起跑→19:40 前产完，D 批必吃到）。B 批内其余脚本保持原相对次序不变；<b>候选股池</b>(build_candidate_pool) / <b>CRDS 含金股层</b>(calc_crds) / <b>TOP10</b>(generate_top10) 均在 B 批自产</td></tr>
           <tr><td><b>D 汇总批</b></td><td>~20:00 CST</td><td>1</td><td>final_recommend.py</td><td>跨策略共振 Top5（管线最终产物）。内置<b>因子实验室新鲜度门控</b>：等待 FACTOR_LAB.js 为当日新鲜最多 20min（正常 0 等待），超时仍不可用则<b>降级跳过融合</b>而非报错中断</td></tr>
           <tr><td><b>E 回测批</b></td><td>~21:00 CST</td><td>9</td><td>backtest_tdx / backtest_comprehensive / backtest_expectancy / export_optimized_strategy / factor_lab_backtest / v8/backtest_crds / strategy_four_volume / <b>backtest_pools</b> / gen_backtest_all_algos</td><td>backtest 全家 + 因子实验室分层回测（生成器已在 B 批前置）；strategy_four_volume 经 SCRIPT_ENV 注入 <b>V8_BACKTEST_YEARS=5</b>（2026-09-13 由 3 抬升，否则 T+180/T+250 长档回看区间不足恒零样本）→ 补写 FOUR_VOLUME_BACKTEST.js（根治孤儿）；<b>backtest_pools</b>（2026-09-13 挂链）读 B 批候选池/黄金池产物算 10 档前向收益 → data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js，使「只要接入算法链的选股策略都有回测」成为结构性保证；gen_backtest_all_algos 挂批内最末位次（ORDER 47/48，须读同批刚产出的回测源），按前端卡名汇总全部算法 → data/BACKTEST_ALL_ALGOS.js（策略回测页「全算法回测汇总」块：卡级排名 + 分档阶梯 + 低绩效下架提请）</td></tr>
         </table>
         <div class="logic-h">批内同跑 / 跨批双模式注意</div>
-        <div class="logic-p">· <b>strategy_four_volume.py 跨 B/E 双批</b>：B=选股模式产 FOUR_VOLUME.js，E=回测模式产 FOUR_VOLUME_BACKTEST.js（SCRIPT_ENV 注入），属有意为之，非重复误挂。<br>· <b>B 批同跑多算法</b>：因子实验室生成器（baostock 独立数据源）与 calc_crds / build_candidate_pool / calc_stock_rps 等互无文件写冲突、互无前置依赖，可安全背靠背串行；final_recommend(D) 仅依赖 B 产物，不依赖 B 内部次序之外的任何东西。<br>· <b>选股门控</b>：全部选股/回测脚本纳入「18:00 前不跑」护栏，防半日数据出假选股。</div>
+        <div class="logic-p">· <b>strategy_four_volume.py 跨 B/E 双批</b>：B=选股模式产 FOUR_VOLUME.js，E=回测模式产 FOUR_VOLUME_BACKTEST.js（SCRIPT_ENV 注入），属有意为之，非重复误挂。<br>· <b>B 批同跑多算法</b>：因子实验室生成器（baostock 独立数据源）与 calc_crds / build_candidate_pool 等互无文件写冲突、互无前置依赖，可安全背靠背串行；final_recommend(D) 仅依赖 B 产物，不依赖 B 内部次序之外的任何东西。<br>· <b>选股门控</b>：全部选股/回测脚本纳入「18:00 前不跑」护栏，防半日数据出假选股。</div>
       </div>
 
       </div>
@@ -1647,17 +1647,6 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
                          
     
 <div class="card">
-        <h3><span class="ic">📈</span>相对强度 (RPS + RS + 年线) - 说明</h3>
-        <div class="logic-h">定位</div>
-        <div class="logic-p">个股相对强度排名（RPS）+ 曼斯菲尔德 RS + 年线状态，作为选股「<b>排名 / 筛选层</b>」，与板块 RPS（SECTOR_RS）形成「板块 → 个股」双层互验。2026-08-08 全量实施（算法 <code>calc_stock_rps.py</code> + 前端 📈 相对强度 tab + RPS 分层回测卡）。</div>
-        <div class="logic-h">计算口径</div>
-        <div class="logic-p">· <b>RPS</b> = 个股 N 日收益率在 universe 中的百分位排名 → rps50 / rps120 / rps250，取最大为 <b>rps_max</b>（0~100，≥90 为极强）。<br>· <b>RS</b> = 曼斯菲尔德相对强度（个股价格/基准指数价格的 ROC 比值），&gt;0 表示跑赢基准。<br>· <b>年线</b>：above_ma250（站上 250 日线）作为趋势门禁。<br>· 排名池：候选池 universe（当前约 310 只，可扩全市场 5537）。</div>
-        <div class="logic-h">A 档硬门禁（2026-08-08 实施）</div>
-        <div class="logic-p">站上 250 日线 <b>且</b> RS&gt;0 <b>且</b> RPSmax≥90 → 三重过滤才入 A 档；B/C 档为逐级放宽。A 档硬门禁结果同时叠加进「最终推荐」共振来源徽标，与板块 RPS 自上而下互验。</div>
-        <div class="logic-h">前端展示</div>
-        <div class="logic-p">· <b>📈 相对强度</b> tab：A/B/C 分层筛选 + 最小 RPS 阈值；表格列 RPS50/120/250/RPSmax/RS/年线状态/收盘价。<br>· <b>RPS 分层回测</b> 卡：基于当前截面用历史收益近似模拟持有 N 日表现（胜率 / 平均收益 / 最佳最差 + 收益分布柱状图 + A 档硬门禁子集对比）。</div>
-        <div class="logic-h">2026-09-06 主人令：前端子 tab 已下线 · 数据链保留跑「30 天样本考核」</div>
-        <div class="logic-p">相对强度选股策略子 tab 已于 2026-09-03 轻量化下线（RPS 分层回测卡更早于 08-30 删除·前视偏差）。2026-09-06 主人令拍板：<b>数据链保留，按「因子实验室同款标准」考核</b>——自 2026-09-05 起满 <b>30 个交易日</b>（约 2026-10 中），A 档信号（信号日收盘买入、真实前向收益）若 <b>T+1 胜率 ≥55% 且 T+5/T+10 平均收益为正</b> → 再谈恢复子 tab 甚至进评分权重；<b>不达标 → 彻底降级为「个股详情命中行」展示层，策略页永不恢复</b>。定位澄清：RPS <b>不参与 generate_top10 评分权重</b>（引擎 0 引用），当前仅作个股详情命中行 + 候选池聚合来源。回测引擎挂算法链 E 批每日刷新（baostock 失败自动降级空回测）；文件链保护见 DO_NOT_DELETE.md「RPS 30 天样本考核保护段」。</div>
         <div class="logic-h">诚实标注</div>
         <div class="logic-p">RS 分母实际用<b>上证指数(000001)兜底</b>（沪深300 本地取数返回 0 条），不影响 RPS 百分位计算；回测为截面历史模拟近似、非未来函数，仅供内部验证，不构成收益承诺。</div>
       </div>
@@ -2005,8 +1994,6 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
             🎯 选股策略区：<b>三重共识</b>(<code>TRIPLE_CONSENSUS</code>) · <b>CRDS逆势龙头</b>(<code>CRDS_CARD_DATA</code>) · <b>机游共振</b>(<code>LHB_DATA</code>)
             📜 共振日历/龙虎榜历史(<code>LHB_HISTORY</code>) · 三重入选历史(<code>TRIPLE_HISTORY</code>) · 三重追踪(<code>TRIPLE_TRACK</code>)
             🎯 最终推荐：<b>候选池</b>(<code>CANDIDATE</code>) →<span style="color:var(--purple)">建议</span> · <b>金股池</b>(<code>GOLD_POOL</code>) · <b>强势突破</b>(<code>STRONG_BREAKOUT</code>) · <b>动量共识</b>(<code>MOMENTUM_FILTER</code>)→<span style="color:var(--purple)">建议</span> · 优化策略门控(<code>OPTIMIZED_STRATEGY</code>)→<span style="color:var(--purple)">建议</span>
-            📊 回测族：综合回测(<code>BACKTEST_COMPREHENSIVE</code>) · 通达信回测(<code>BACKTEST_TDX</code>) · RPS回测(<code>RPS_BACKTEST</code>)→<span style="color:var(--purple)">建议</span> · CRDS回测(<code>CRDS_BACKTEST</code>)→<span style="color:var(--purple)">建议</span> · 中信PE温度计(<code>CITIC_PE_THERMO</code>)→<span style="color:var(--purple)">建议</span> · 中信PE回测(<code>CITIC_PE_BACKTEST</code>)→<span style="color:var(--purple)">建议</span>
-            📈 个股RPS(<code>STOCK_RPS</code>/<code>STOCK_RPS_DATA</code>)
             🔬 因子实验室(<code>FACTOR_LAB</code>) · 因子回测(<code>FACTOR_LAB_BACKTEST</code>) · <b>因子补缺与审计</b>(<code>FACTOR_AUDIT</code>+<code>FACTOR_PROGRESS</code> 合并为一张：上半覆盖状态／下半 walk-forward 进度)→<span style="color:var(--purple)">建议</span>
             📊 板块RS(<code>SECTOR_RS</code>) · 板块资金趋势(<code>SECTOR_FUND_FLOW_TREND</code>) · 板块推荐(<code>SECTOR_RECOMMENDATION</code>) · 板块周期历史(<code>SECTOR_PHASE_HISTORY</code>)→<span style="color:var(--purple)">建议</span>
             📐 上证FIB(<code>SH_FIB</code>) · 深证FIB(<code>SZ_FIB</code>)
@@ -2456,8 +2443,6 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">⑫ 动量共识卡删重复时间戳 + ⑬ 对齐审计结论</div>
         <div class="logic-p">⑫ 删动量共识说明段尾部重复「更新 08-19 18:26」（顶部胶囊已够）。⑬ 三轴审计：raw_data→data 88 个全对齐（0 缺 data）；data→render 11 个孤儿 data（MACRO 已删，10 个历史待小九）；algorithm→ORDER 20 个孤儿算法（4 个今晚已补，其余待小九）。<b>待小九</b>：历史孤儿 data 10 个 + 孤儿算法 ~16 个 + fetcher 补字段 + algo 网络瞬断根治。</div>
 
-        <div class="logic-h">⑭ 算法链耗时优化（calc_stock_rps 8 线程并行 · 2026-09-03 夜班）</div>
-        <div class="logic-p">云端算法链原串行耗时 ~2h40m，逐脚本解析日志定位 <code>calc_stock_rps.py</code> 占 ~60min（37%）。根因：跨境抓数（mootdx/baostock）串行。修复：<code>ThreadPoolExecutor(max_workers=8)</code> 并行化，每线程独立连接（pytdx 非线程安全 → <code>threading.local</code> 隔离；baostock <code>_BS_LOCK</code> 全局锁；缓存写加锁；<code>as_completed</code> 完成序输出）。预期 60min → 10~15min，整链提速约 50%。<b>仅云端主链生效</b>，属性能优化、前端无感知。</div>
 
         <div class="logic-h">📌 双机分时铁律（升级版·接力赛模型，2026-09-09 更新）</div>
         <div class="logic-p">
@@ -3457,17 +3442,6 @@ function switchSec(sec,el){
   function renderStrategyHits(item, code){
     const hits=[];
     const nc = normCode(code);
-    // 三重共识
-    const top = window.TOP10_DAILY || {};
-    const trow = (top.top10||[]).find(r=>normCode(r.code)===nc);
-    if(trow) hits.push({name:'🧬 三重共识', color:'var(--purple)', detail:'排名 #'+trow.rank+' · 评分 '+trow.total_score});
-    // 相对强度（大牛股猎手 RPS 分层）
-    const rpsD = window.STOCK_RPS_DATA || {};
-    const rpsRow = (rpsD.records||[]).find(r => normCode(r.code) === nc);
-    if(rpsRow){
-      const tier = rpsRow.tier || '-';
-      const tierColor = tier==='A' ? '#ffd54f' : tier==='B' ? '#4fc3f7' : tier==='C' ? '#94a3b8' : 'var(--dim)';
-      const rpsMax = rpsRow.rps_max != null ? Number(rpsRow.rps_max).toFixed(1) : '--';
       const rps20 = rpsRow.rps50 != null ? Number(rpsRow.rps50).toFixed(1) : '--';
       const rs = rpsRow.rs != null ? Number(rpsRow.rs).toFixed(2) : '--';
       const maTag = rpsRow.above_ma250 ? '· 站上250日线' : (rpsRow.above_ma200 ? '· 站上200日线' : '');
@@ -5566,7 +5540,6 @@ function drawUpDownChart(){
 
 
 
-          {name:'相对强度', source:'STOCK_RPS_DATA', freq:'收盘后1次', slots:['19:15'], note:'个股相对强度评分'},
 
           {name:'逆势龙头', source:'CRDS_CARD_DATA', freq:'收盘后1次', slots:['19:15'], note:'CRDS逆势龙头精英池'},
 
@@ -8148,97 +8121,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
   function _buildRpsMap(){
-    var D=window.STOCK_RPS_DATA||{};
-    var m={};
-    (D.records||[]).forEach(function(r){ if(r && r.code) m[r.code]=r; });
-    return m;
-  }
-  window._buildRpsMap=_buildRpsMap;
-  window.__rpsMapByCode=null;
-  function _rpsBadge(tier){
-    var colors={A:'linear-gradient(135deg,#15803d,#22c55e)',B:'linear-gradient(135deg,#2563eb,#3b82f6)',C:'linear-gradient(135deg,#a16207,#eab308)'};
-    var c=colors[tier]||'var(--sub)';
-    return '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;color:#fff;background:'+c+';">'+tier+'</span>';
-  }
-  function _rpsCell(v, hi){
-    if(v==null) return '<span style="color:var(--dim)">—</span>';
-    v=Number(v);
-    var color= v>=90 ? '#22c55e' : v>=80 ? '#3b82f6' : v>=60 ? '#eab308' : '#94a3b8';
-    if(hi) color='#22c55e';
-    return '<span style="font-weight:700;color:'+color+'">'+v.toFixed(1)+'</span>';
-  }
-  function _rpsTrend(above){
-    return above
-      ? '<span style="color:#22c55e;font-weight:700">站上</span>'
-      : '<span style="color:#ef4444;font-weight:700">跌破</span>';
-  }
-  function _rpsName(name, code, market){
-    var prefix=(market||'').toLowerCase()==='sh'?'sh_':'sz_';
-    return '<span style="font-weight:700;color:var(--txt)">'+_rpsEscapeHtml(name)+'</span><br><span style="font-size:10px;color:var(--dim)">'+prefix+code+'</span>';
-  }
-  function renderRpsScreen(){
-    var D=window.STOCK_RPS_DATA||{};
-    var recs=D.records||[];
-    var time=D.update_time||'';
-    var uni=D.universe_count||0;
-    var idxName=D.index_name||'--';
-    var tierF=_rps$('strpsTierFilter')?_rps$('strpsTierFilter').value:'A';
-    var rpsMin=_rps$('strpsRpsFilter')?Number(_rps$('strpsRpsFilter').value):90;
-    var body=_rps$('strpsBody'); if(!body) return;
-    _rps$('strpsUniCount').textContent=uni;
-    _rps$('strpsIndexName').textContent=idxName;
-    if(_rps$('strpsTime')){
-      try{ _rps$('strpsTime').innerHTML=_uBadge('盘后','短线',time||'已加载'); }catch(e){ _rps$('strpsTime').textContent=time||''; }
-    }
-    var filtered=recs.filter(function(r){
-      if(!r) return false;
-      if(tierF!=='all' && (r.tier||'')!==tierF) return false;
-      return (r.rps_max||0)>=rpsMin;
-    });
-    // 2026-08-09：先按 A/B/C 档排，同档内按 rps_max 高→低，再按 rs 高→低
-    var tierOrder={A:0,B:1,C:2,D:3};
-    filtered.sort(function(a,b){
-      var ta=tierOrder[(a.tier||'D')]||3, tb=tierOrder[(b.tier||'D')]||3;
-      if(ta!==tb) return ta-tb;
-      return (b.rps_max||0)-(a.rps_max||0) || (b.rs||0)-(a.rs||0);
-    });
-    var h='';
-    filtered.forEach(function(r){
-      var isHi50=(r.rps50||0)>=(r.rps_max||0);
-      var isHi120=(r.rps120||0)>=(r.rps_max||0);
-      var isHi250=(r.rps250||0)>=(r.rps_max||0);
-      h+='<tr style="border-bottom:1px solid rgba(148,163,184,.12);">'+
-        '<td style="padding:6px;">'+_rpsName(r.name,r.code,r.market)+'</td>'+
-        '<td style="text-align:center;padding:6px;">'+_rpsBadge(r.tier)+'</td>'+
-        '<td style="text-align:center;padding:6px;">'+_rpsCell(r.rps50,isHi50)+'</td>'+
-        '<td style="text-align:center;padding:6px;">'+_rpsCell(r.rps120,isHi120)+'</td>'+
-        '<td style="text-align:center;padding:6px;">'+_rpsCell(r.rps250,isHi250)+'</td>'+
-        '<td style="text-align:center;padding:6px;">'+_rpsCell(r.rps_max,true)+'</td>'+
-        '<td style="text-align:center;padding:6px;"><span style="font-weight:700;color:'+((r.rs||0)>0?'#22c55e':'#ef4444')+'">'+(r.rs==null?'—':Number(r.rs).toFixed(2))+'</span></td>'+
-        '<td style="text-align:center;padding:6px;">'+_rpsTrend(r.above_ma250)+'</td>'+
-        '<td style="text-align:center;padding:6px;">'+(r.close==null?'—':Number(r.close).toFixed(2))+'</td>'+
-      '</tr>';
-    });
-    body.innerHTML=h;
-    var empty=_rps$('strpsEmpty');
-    if(empty) empty.style.display=filtered.length?'none':'block';
-    var badge=_rps$('strpsRunBadge');
-    if(badge){
-      // 2026-08-11：强制显示具体日期（MM-DD），不使用模糊的「今日」
-      var rawDate = D.calc_date || D.update_time || time || '';
-      var extracted = window._extractDateStr ? window._extractDateStr(rawDate) : '';
-      if(!extracted){ try{ extracted = String(rawDate).match(/\d{4}-\d{2}-\d{2}/)?String(rawDate).match(/\d{4}-\d{2}-\d{2}/)[0]:''; }catch(e){} }
-      var badgeText = '✅ 已计算';
-      if(extracted){
-        // 始终显示 MM-DD 具体日期，与其他卡片格式一致
-        badgeText = '✅ '+extracted.slice(5)+' 已计算';
-      } else {
-        var hc = window.HEALTH_CHECK || {}, hcDate = '';
-        try{ var hcIt=(hc.items||[]).find(function(x){return (x||{}).id==='STOCK_RPS'}); if(hcIt&&hcIt.last_update) hcDate=hcIt.last_update.slice(0,10); }catch(e){}
-        if(hcDate) badgeText = '✅ '+hcDate.slice(5)+' 已计算';
-        else badgeText = '✅ 已计算（日期未知）';
-      }
-      badge.textContent = badgeText;
       badge.style.display='inline-block';
     }
   }
@@ -8499,7 +8381,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     var mods = [
       {key:'fourvolume', name:'四量终极', icon:'🔥', color:'#f97316', var:'FOUR_VOLUME_BACKTEST'},
       {key:'crds', name:'逆势龙头CRDS', icon:'🐉', color:'#ef4444', var:'CRDS_BACKTEST'},
-      {key:'rps', name:'相对强度RPS', icon:'📈', color:'#14b8a6', var:'RPS_BACKTEST'}
     ];
     mods.forEach(function(m){
       var d = window[m.var] || {};
