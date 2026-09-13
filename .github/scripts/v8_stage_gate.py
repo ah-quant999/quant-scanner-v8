@@ -154,7 +154,12 @@ READY_SPEC: dict[str, dict] = {
             "data/AVG_PRICE_DATA.js",              # 平均股价（源 raw_data/avg_price_data.json）
             "data/ETF_NET_SUBSCRIPTION.js",        # ETF 净申赎（真实份额口径，09-11 主人 P1）
         ],
-        "need": 12,
+        "need": 11,
+        # 🔴 2026-09-14 阿狸咪的工程师（方案甲·P0 联动的账）：
+        #   need 12 → 11。理由：AVG_PRICE_DATA 移出 must 后不再受硬否决，
+        #   它若陈旧只占用容错额度；need 是「纯计数」门槛，须与 must 解耦。
+        #   账（复核）：items=13 / need=11 / must=3 ⇒ 容错余量 = 11 − 3 = 8（不变）；
+        #   need(11) <= len(items)(13) ✔、must(3) ⊆ items ✔ ⇒ 无锁死风险。
         # 🔴 方案丙（2026-09-13 定稿）+ 🔴🔴 同日 23:5x 紧急修正（P0）：
         #   need=12 保留老 10 项的 6 项容错（采集批抓取源抖动常见，不宜一刀切全须新）；
         #   新增的**真实存在**项进 must（逐项必新）⇒ 它们任一陈旧即 not ready
@@ -173,9 +178,31 @@ READY_SPEC: dict[str, dict] = {
         "must": [
             "data/LHB_DATA.js",                       # 原有：龙虎榜（16:30 后数据核心标志）
             # 2026-09-13 新增 3 项（均已 git cat-file -e 验证存在 + A 批时窗内产出）
-            "raw_data/lhb_data.json",                 # LHB_DATA.js 的源
-            "data/AVG_PRICE_DATA.js",                 # AVG_PRICE_DATA 映射 intraday,post_close
-            "data/ETF_NET_SUBSCRIPTION.js",           # 映射 premarket,post_close
+            "raw_data/lhb_data.json",                 # LHB_DATA.js 的源（龙虎榜 fetcher 17:30 档）
+            "data/ETF_NET_SUBSCRIPTION.js",           # 映射 premarket,post_close ⇒ A 批时窗内可刷
+            # 🔴🔴 2026-09-14 阿狸咪的工程师（方案甲·P0）：
+            #   data/AVG_PRICE_DATA.js 已**移出 must，保留在 items**。
+            #   根因（三层实测）：
+            #     ① A 批门槛 FLOOR_TRADING=(16,30)（本文件 L269）；
+            #     ② 该产物唯一写入者 cloud_fetch_v8.py 的 CATEGORY_MAP 里
+            #        "AVG_PRICE_DATA": "intraday" —— **只在盘中档刷，post_close 不刷**；
+            #     ③ run_algorithms.py 的 STAGES["A"] 13 项**不含** avg_price 脚本
+            #        ⇒ A 批自己跑完也刷不动它。
+            #   实测佐证：数据/AVG_PRICE_DATA.js 的 update_time=09-13 15:33:14，
+            #     而 republish_time=16:09:45 ⇒ 16:09 重建过、戳仍是 15:33
+            #     （戳由 update_v8.py::_pick_ts 从 raw 透传，**不是**构建时刻）。
+            #   后果：交易日盘中档最高约 15:1x–16:11，**结构性达不到 16:30**
+            #     ⇒ must_ok 恒 False（本文件 check_ready：must 任一不 ok 即 not ready）
+            #     ⇒ target_stage 恒 = A ⇒ B/D/E 永不推进 ⇒ 最终推荐/回测停更。
+            #   ⚠️ 原注释写「映射 intraday,post_close」是**引用错了源**：
+            #     update_v8.py 的 "intraday,post_close" 管的是「在哪些档**重建 .js**」，
+            #     与「哪个档**写时戳**」（决定闸门判据）是两回事 —— 这正是本 P0 的认知根因。
+            #   纪律沉淀：**must 项必须由该批时窗内的生产者产出**（与 09-13 TDX_BACKTEST
+            #     批次错位同源同因）。移出 must 后它仍在 items，仍参与计数与红灯显示，
+            #     因此**不掩盖问题**，只是不再单点否决整条链。
+            #   🔴 若要让 must 名副其实，需主人拍板方案乙：
+            #     给 cloud_fetch_v8.py 的 post_close 档补抓 AVG_PRICE_DATA
+            #     （参考 ETF_DAILY_MONITOR 的显式登记思路）—— 动抓取链，不擅动。
         ],   # 龙虎榜是「16:30后数据」的核心标志
     },
     "B": {
