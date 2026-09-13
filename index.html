@@ -5102,7 +5102,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          榜单摘要与「一句话结论」**共用这一份 _bestList**，两者物理同源，
          不存在「榜单说 A、结论说 B」的可能性。 */
       var _bestList = [];
-      Object.keys(_bestHoldOf).forEach(function(k){ _bestList.push(_bestHoldOf[k]); });
+      Object.keys(_bestHoldOf).forEach(function(k){
+        /* 2026-09-13 主人令「股池是基础，它们应该不算胜率，而是确认入选的门槛对不对」：
+           基础股池（候选池/金股池）**不进「最优组合榜 / 一句话结论」** ——
+           这两个榜单回答的是「哪种选股策略最强」，池子无买卖点、样本窗口又只有几个
+           交易日（金股池 T+1/T+3、候选池 T+1~T+5），拿来比胜率即误导。
+           池子仍保留在下方「主对比表」中，以「基础股池」标签展示入选门槛表现。 */
+        if(((window.__STAR_KIND || {})[k]) === 'pool') return;
+        _bestList.push(_bestHoldOf[k]);
+      });
       var byWr = _bestList.slice().sort(function(a,b){ return (b.win_rate==null?-1:b.win_rate) - (a.win_rate==null?-1:a.win_rate); });
       var byAr = _bestList.slice().sort(function(a,b){ return (b.avg_return==null?-999:b.avg_return) - (a.avg_return==null?-999:a.avg_return); });
       var bestWr = byWr[0] || null, bestAr = byAr[0] || null;
