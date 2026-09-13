@@ -550,7 +550,12 @@ window.__domReadyFns=[];
     <!-- 2026-09-07 主人令：机构研究·maharo 聚合卡（本机 cookie 拉取，云端无权限；数据由 .workbuddy/maharo_daily_pull.py 每日生成 data/maharo_macro.js） -->
     <!-- 2026-09-10 一劳永逸：AI 解析 insights 拆成独立文件 data/maharo_insights.js（window.MAHORO_INSIGHTS），
          与云端每日重生成的 maharo_macro.js 解耦，避免被云端浅版覆盖回退 -->
-    <script src="data/maharo_macro.js?v=20260911" defer></script>
+    <!-- 🔴 2026-09-13 主人令「没用的就删」：data/maharo_macro.js 注入行已删。
+         该文件在远端**从未存在**（未被 gitignore，只是从未推送）⇒ 每次访问
+         一个 404 + 一条 Console 报错。其消费方 renderMahoroCard() 现读
+         window.MAHORO_INSIGHTS（下一行的独立文件，云端重生成不会覆盖），
+         故删此行零功能损失。若日后云端产出 maharo_macro.js，恢复本行即可。 -->
+    <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20260911） -->
     <script src="data/maharo_insights.js?v=20260910" defer></script>
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
@@ -14894,7 +14899,10 @@ window.__renderV8CalToday();
       h+='<span style="color:var(--dim);font-weight:700">关联板块资金：</span>';
       s.sector_fund.forEach(function(f){
         var color = f.pct_5d>0?'up':(f.pct_5d<0?'down':'sub');
-        h+='<span title="相对强度 '+_fn(f.relative_5d,2)+'%">'+_fe(f.name)+' <span class="'+color+'">'+(f.pct_5d>0?'+':'')+_fn(f.pct_5d,2)+'%</span></span>';
+        // 🔴 2026-09-13：缺数据（null）时应显示「--」而非「--%」——不得假成功
+        var _p5 = (f.pct_5d==null||isNaN(f.pct_5d)) ? '--' : ((f.pct_5d>0?'+':'')+_fn(f.pct_5d,2)+'%');
+        var _r5 = (f.relative_5d==null||isNaN(f.relative_5d)) ? '--' : (_fn(f.relative_5d,2)+'%');
+        h+='<span title="相对强度 '+_r5+'">'+_fe(f.name)+' <span class="'+color+'">'+_p5+'</span></span>';
       });
       h+='</div>';
     }

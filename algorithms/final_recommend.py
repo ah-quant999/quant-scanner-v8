@@ -289,9 +289,12 @@ def build_sector_maps(sector_rs):
         if not name:
             continue
         score_map[name] = {
-            "relative_5d": safe_float(s.get("relative_5d")),
-            "pct_5d": safe_float(s.get("pct_5d")),
-            "pct_20d": safe_float(s.get("pct_20d")),
+            # 🔴 2026-09-13 一劳永逸（不得假成功）：**展示类**字段一律 num_or_none。
+            #   原用 safe_float ⇒ 缺失被写成 0.0，前端显示「+0.00%」＝平盘，
+            #   而真实可能是 −5.42%（2026-09-11 紫金矿业实测）。
+            "relative_5d": num_or_none(s.get("relative_5d")),
+            "pct_5d": num_or_none(s.get("pct_5d")),
+            "pct_20d": num_or_none(s.get("pct_20d")),
         }
 
     for item in strong_rel[:SECTOR_TOP_N]:
@@ -336,8 +339,9 @@ def sector_score_for(stock, rel_set, abs_set, score_map):
         info = score_map.get(name) or {}
         return {
             "name": name,
-            "pct_5d": safe_float(info.get("pct_5d")),
-            "relative_5d": safe_float(info.get("relative_5d")),
+            # 🔴 2026-09-13：展示字段一律 num_or_none（缺失=null，绝不伪造成 0.0）
+            "pct_5d": num_or_none(info.get("pct_5d")),
+            "relative_5d": num_or_none(info.get("relative_5d")),
             "strong": name in rel_set,
         }
 

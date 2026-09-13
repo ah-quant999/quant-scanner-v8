@@ -292,7 +292,11 @@ def main():
             last_heartbeat = time.time()
         code = sig["code"]
         signal_date = sig["signal_date"]
-        rows = fetch_kline_around(code, signal_date, lookback_days=8, lookahead_days=35)
+        # 🔴 2026-09-13 一劳永逸：原写死 lookahead_days=35，把 L60 已定义的
+        #   LOOKAHEAD_DAYS=150 **完全覆盖** ⇒ T+30/45/60/75/90 档永久 0 样本
+        #   （35 自然日 ≈ 24 交易日，凑不满 30）。这才是「假修复」的真凶。
+        rows = fetch_kline_around(code, signal_date, lookback_days=8,
+                                  lookahead_days=LOOKAHEAD_DAYS)
         entry_idx = None
         for i, (d, _) in enumerate(rows):
             if d >= signal_date:
@@ -369,17 +373,22 @@ def main():
         win_avg = sum(wins) / len(wins) if wins else 0
         loss_avg = sum(losses) / len(losses) if losses else 0
         profit_loss_ratio = abs(win_avg / loss_avg) if wins and losses else 0
-        # 最大回撤：把所有信号的持有期累计收益曲线拼一起，取全局最大峰谷
-        global_max_dd = 0.0
-        all_path = []
+        # 🔴 2026-09-13 一劳永逸修复「回撤量纲错误」：原实现把各信号收益路径
+        #   **首尾拼接**后累加求峰谷 —— 那不是任何组合的净值曲线，量纲错误
+        #   （实测 CRDS −314.36%，而回撤下界应为 −100%）。现改为**逐信号**算其
+        #   持有期内回撤（相对该信号入场价的峰值回撤），再取均值。
+        _dds = []
         for pth in equity_paths:
-            all_path.extend(pth)
-        peak = 0.0; cum = 0.0
-        for v in all_path:
-            cum += v
-            if cum > peak: peak = cum
-            dd = cum - peak
-            if dd < global_max_dd: global_max_dd = dd
+            if not pth:
+                continue
+            _pk = 0.0
+            _wr = 0.0
+            for v in pth:
+                if v > _pk: _pk = v
+                _dd = v - _pk
+                if _dd < _wr: _wr = _dd
+            _dds.append(_wr)
+        global_max_dd = (sum(_dds) / len(_dds)) if _dds else 0.0
         # 夏普：以均收益/收益标准差（简单近似，未年化）
         variance = sum((r - avg_ret) ** 2 for r in rets) / max(len(rets) - 1, 1)
         std_ret = variance ** 0.5

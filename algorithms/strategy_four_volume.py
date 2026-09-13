@@ -414,7 +414,8 @@ j    - 前复权（fetch_a_daily 走 akshare/腾讯前复权，前端 np 已处�
     cost_pct = 2 * COST_BPS / 100
     agg = {k: {"count": 0, "win": 0, "loss": 0, "draw": 0,
                "ret_sum": 0.0, "best": -1e9, "worst": 1e9,
-               "equity_path": []}  # 所有信号累计收益曲线（最大回撤算）
+               "equity_path": [],  # 每个信号的持有期收益路径（逐条算回撤）
+               "nets": []}          # 单笔净收益（夏普用，不可与路径混用）
            for k in periods}
     total_signals = 0
     for s in stocks:
@@ -449,15 +450,20 @@ j    - 前复权（fetch_a_daily 走 akshare/腾讯前复权，前端 np 已处�
                         a["ret_sum"] += net
                         a["best"] = max(a["best"], net)
                         a["worst"] = min(a["worst"], net)
-                        # 累计收益路径：entry → exit 每日累计 net
-                        cum = 0.0
+                        # 🔴 2026-09-13 一劳永逸修复「算出的路径被丢弃」：
+                        #   原实现逐日累加出 cum 后**从未使用**，只 append 单笔 net ⇒
+                        #   下游「最大回撤」把单笔收益当净值累加求峰谷，量纲错误
+                        #   （实测得 −133.56%，而回撤下界应为 −100%）。
+                        #   现改为 append 该信号的持有期收益路径（成本按持有期比例摊，
+                        #   与 net 同口径）。
+                        _path = []
                         for m in range(1, off + 1):
                             jm = i + m
                             if 0 <= jm < len(closes):
-                                cum += ((closes[jm] / entry_px) - 1) * 100 - cost_pct * (m / off)
-                                # 注：成本一次性扣；这里按持有期比例近似，仅为路径示意，真实回撤以周期累计为准
-                        # 简化：持有期末累计 net 作为路径终点，路径内部不平滑
-                        a["equity_path"].append(net)
+                                _path.append((closes[jm] / entry_px - 1) * 100
+                                             - cost_pct * (m / off))
+                        a["equity_path"].append(_path)
+                        a["nets"].append(net)
         except Exception as e:
             print(f"  [WARN] 回测 {code} 失败: {e}")
     summary = {
@@ -472,16 +478,25 @@ j    - 前复权（fetch_a_daily 走 akshare/腾讯前复权，前端 np 已处�
         decided = a["win"] + a["loss"]
         win_rate = round(a["win"] / decided * 100, 1) if decided else 0
         avg_return = round(a["ret_sum"] / c, 2) if c else 0
-        # 最大回撤（按全部 net 序列累计）
-        peak = 0.0; cum = 0.0; max_dd = 0.0
-        for v in a["equity_path"]:
-            cum += v
-            if cum > peak: peak = cum
-            dd = cum - peak
-            if dd < max_dd: max_dd = dd
-        # 夏普
+        # 🔴 2026-09-13 一劳永逸修复「回撤量纲错误」：原实现把所有信号拼成一条线
+        #   累加求峰谷 —— 那不是任何组合的净值曲线（实测 −133.56%，回撤下界应为
+        #   −100%）。现改为**逐信号**算其持有期内回撤（相对该信号入场价的峰值回撤），
+        #   再取均值 =>「单笔持仓期间的平均最大回撤」，下界天然 ≥ −100%。
+        _dds = []
+        for _pth in a["equity_path"]:
+            if not _pth:
+                continue
+            _pk = 0.0
+            _wr = 0.0
+            for _v in _pth:
+                if _v > _pk: _pk = _v
+                _dd = _v - _pk
+                if _dd < _wr: _wr = _dd
+            _dds.append(_wr)
+        max_dd = (sum(_dds) / len(_dds)) if _dds else 0.0
+        # 夏普：用**单笔净收益**序列（与路径严格分开，绝不复用 equity_path）
         if c > 1:
-            variance = sum((v - avg_return) ** 2 for v in a["equity_path"]) / (c - 1)
+            variance = sum((v - avg_return) ** 2 for v in a["nets"]) / (c - 1)
             std_ret = variance ** 0.5
             sharpe = round(avg_return / std_ret, 2) if std_ret > 0 else 0
         else:

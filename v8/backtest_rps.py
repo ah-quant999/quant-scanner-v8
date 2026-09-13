@@ -41,7 +41,13 @@ DATA_DIR = HERE / "data"
 HISTORY_DIR = RAW_DIR / "history"
 OUT_JSON = RAW_DIR / "rps_backtest.json"
 OUT_JS = DATA_DIR / "RPS_BACKTEST.js"
-HOLD_PERIODS = [1, 3, 5, 10, 20]
+# 🔴 2026-09-13 同源对齐（主人 2026-09-12 明令「本阶梯是唯一真源，四个回测脚本
+#   一律引此常量；各写一套必然漂移（本仓历史教训）」）。原自写 [1,3,5,10,20]。
+HOLD_LADDER = [5, 10, 20, 30, 45, 60, 75, 90]
+HOLD_PERIODS = [1, 3] + HOLD_LADDER
+# 🔴 2026-09-13 一劳永逸：原函数默认与调用点都写死 35（自然日 ≈ 24 交易日），
+#   90 交易日档静默零样本。90 交易日 ≈ 130 自然日，留余量取 150（与 CRDS 同源）。
+LOOKAHEAD_DAYS = 150
 
 # 2026-09-06 主人令 P1-A：交易成本默认假设（单边万分之 1.5，双边 0.3%）
 COST_BPS = 15
@@ -139,7 +145,7 @@ def fetch_close(code, date):
     return None
 
 
-def fetch_kline_around(code, center_date_str, lookback_days=8, lookahead_days=35):
+def fetch_kline_around(code, center_date_str, lookback_days=8, lookahead_days=LOOKAHEAD_DAYS):
     """2026-09-06 P0-B：用 K 线段替代日历日持有期。旧版「日历日 +N」在周末/节假日时
     baostock 返回 None → T+3/T+5/T+10/T+20 几乎全 0 samples。新版用 K 线索引直接偏移
     N 个真实交易日，从根本上消除空样本。
@@ -242,7 +248,9 @@ def main():
     for idx, sig in enumerate(signals, 1):
         code = sig["code"]
         signal_date = sig["signal_date"]
-        rows = fetch_kline_around(code, signal_date, lookback_days=8, lookahead_days=35)
+        # 🔴 2026-09-13：原写死 35，与 CRDS 同一处假修复；改引同源常量 LOOKAHEAD_DAYS
+        rows = fetch_kline_around(code, signal_date, lookback_days=8,
+                                  lookahead_days=LOOKAHEAD_DAYS)
         entry_idx = None
         for i, (d, _) in enumerate(rows):
             if d >= signal_date:
@@ -311,16 +319,22 @@ def main():
         win_avg = sum(wins) / len(wins) if wins else 0
         loss_avg = sum(losses) / len(losses) if losses else 0
         profit_loss_ratio = abs(win_avg / loss_avg) if wins and losses else 0
-        global_max_dd = 0.0
-        all_path = []
+        # 🔴 2026-09-13 一劳永逸修复「回撤量纲错误」：原实现把各信号收益路径
+        #   **首尾拼接**后累加求峰谷 —— 那不是任何组合的净值曲线，量纲错误
+        #   （实测 RPS −187.54% / −314.36%，而回撤下界应为 −100%）。现改为逐信号算
+        #   其持有期内回撤（相对该信号入场价的峰值回撤），再取均值。
+        _dds = []
         for pth in equity_paths:
-            all_path.extend(pth)
-        peak = 0.0; cum = 0.0
-        for v in all_path:
-            cum += v
-            if cum > peak: peak = cum
-            dd = cum - peak
-            if dd < global_max_dd: global_max_dd = dd
+            if not pth:
+                continue
+            _pk = 0.0
+            _wr = 0.0
+            for v in pth:
+                if v > _pk: _pk = v
+                _dd = v - _pk
+                if _dd < _wr: _wr = _dd
+            _dds.append(_wr)
+        global_max_dd = (sum(_dds) / len(_dds)) if _dds else 0.0
         variance = sum((r - avg_ret) ** 2 for r in rets) / max(len(rets) - 1, 1)
         std_ret = variance ** 0.5
         sharpe = round(avg_ret / std_ret, 2) if std_ret > 0 else 0
