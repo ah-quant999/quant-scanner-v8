@@ -2639,7 +2639,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="card">
         <h3><span class="ic">📊</span>回测 N 日胜率（信号层） - 历史</h3>
         <div class="note" id="ttBackNote">加载中…</div>
-        <table id="ttBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>夏普</th><th>最佳</th><th>最差</th></tr></thead><tbody id="ttBackBody"></tbody></table>
+        <table id="ttBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>最佳</th><th>最差</th></tr></thead><tbody id="ttBackBody"></tbody></table>
       </div>
       <div class="card">
         <h3><span class="ic">⚖️</span>严格 vs 宽松 - 历史</h3>
@@ -11947,7 +11947,7 @@ window.showRestrictedItems = showRestrictedItems;
     const bs=track.backtest_signal||{};
     $('ttBackNote').textContent='口径：'+(bs.method||'')+'；样本 '+(bs.total||0)+' 笔；数据截至 '+(bs.latest_date||'-')+'；最优持有 '+(bs.best_hold_days||'-')+' 日。';
     const per=bs.periods||{};
-    $('ttBackBody').innerHTML=['1d','3d','5d','10d','20d'].map(k=>{const p=per[k];if(!p)return '';return '<tr><td>'+k.replace('d','日')+'</td><td>'+p.count+'</td><td '+pnlClass(p.win_rate)+'>'+p.win_rate+'%</td><td '+pnlClass(p.avg_return)+'>'+(p.avg_return>0?'+':'')+p.avg_return+'%</td><td '+pnlClass(p.sharpe)+'>'+p.sharpe+'</td><td class="up">'+(p.best>0?'+':'')+p.best+'%</td><td class="down">'+(p.worst>0?'+':'')+p.worst+'%</td></tr>';}).join('')||'<tr><td colspan="7" style="color:var(--sub);text-align:center">回测样本不足'+needDaysMsg+'</td></tr>';
+    $('ttBackBody').innerHTML=['1d','3d','5d','10d','20d'].map(k=>{const p=per[k];if(!p)return '';return '<tr><td>'+k.replace('d','日')+'</td><td>'+p.count+'</td><td '+pnlClass(p.win_rate)+'>'+p.win_rate+'%</td><td '+pnlClass(p.avg_return)+'>'+(p.avg_return>0?'+':'')+p.avg_return+'%</td><td class="up">'+(p.best>0?'+':'')+p.best+'%</td><td class="down">'+(p.worst>0?'+':'')+p.worst+'%</td></tr>';}).join('')||'<tr><td colspan="6" style="color:var(--sub);text-align:center">回测样本不足'+needDaysMsg+'</td></tr>';
 
     $('ttSvlBody').innerHTML=((track.strict_vs_loose&&track.strict_vs_loose.periods)||[]).map(p=>'<tr><td>'+p.period.replace('d','日')+'</td><td '+pnlClass(p.strict_win)+'>'+p.strict_win+'%</td><td '+pnlClass(p.strict_ret)+'>'+(p.strict_ret>0?'+':'')+p.strict_ret+'%</td><td '+pnlClass(p.loose_win)+'>'+p.loose_win+'%</td><td '+pnlClass(p.loose_ret)+'>'+(p.loose_ret>0?'+':'')+p.loose_ret+'%</td></tr>').join('')||'<tr><td colspan="5" style="color:var(--sub);text-align:center">数据累积中'+needDaysMsg+'</td></tr>';
 
