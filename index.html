@@ -4441,6 +4441,95 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   /* 🛡 2026-09-13 修复：本函数原为 IIFE 私有，但调用方 __renderBacktestCardsFrom
      位于前一个 <script> 块（L4189）⇒ 跨块不可见 ⇒ ReferenceError → 回测卡整体渲染失败
      （partialLen 停在 16616）。现显式挂到 window，跨块可见。 */
+
+
+  /* ════════════════════════════════════════════════════════════════════
+     因子实验室独立分层回测卡（2026-09-13 主人令：把最新因子回测加入策略回测页）
+     数据源：window.FACTOR_LAB_BACKTEST（raw_data/factor_lab_backtest.json）
+     ════════════════════════════════════════════════════════════════════ */
+  function _renderFactorLabBacktest(){
+    var data = window.FACTOR_LAB_BACKTEST || {};
+    var html = '<div style="margin:14px 0;border-left:4px solid #22d3ee;" class="card">';
+    html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+    html += '<span style="font-size:15px;font-weight:700;color:#22d3ee;">🧪 因子实验室回测</span>';
+    html += '<span style="font-size:11px;color:var(--dim);">五分位分层 · 异常量比 + ROE_TTM 大市值</span>';
+    html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#22d3ee22;color:#22d3ee;border:1px solid #22d3ee59;">📈 选股策略</span>';
+    var _fb = data.abnormal_volume || {};
+    var _verdict = _fb.verdict_3star;
+    var _vcolor = _verdict === 'PASS' ? '#22c55e' : '#ef5350';
+    html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:'+_vcolor+'22;color:'+_vcolor+';border:1px solid '+_vcolor+'59;">' + (_verdict || '—') + '</span>';
+    html += '</div>';
+
+    if(_fb && _fb.layers){
+      // 异常量比 五分位分层表
+      html += '<div style="font-size:12px;font-weight:700;color:var(--txt);margin:8px 0 6px;">异常量比（缩量=强势）五分位分层 · T+10</div>';
+      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+      ['分层','样本','T+10胜率','T+10收益','T+20胜率','T+20收益'].forEach(function(x){
+        html += '<th style="padding:6px;text-align:center;color:var(--sub);white-space:nowrap;">'+x+'</th>';
+      });
+      html += '</tr></thead><tbody>';
+      var _layers = _fb.layers || {};
+      ['1','2','3','4','5'].forEach(function(k){
+        var L = _layers[k] || {};
+        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+        html += '<td style="padding:6px;text-align:center;color:var(--txt);font-weight:700;">L'+k+'</td>';
+        html += '<td style="padding:6px;text-align:center;color:var(--sub);">'+(L.n||0)+'</td>';
+        html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(L.win_10d)+';">'+(L.win_10d!=null?Number(L.win_10d).toFixed(1):'—')+'%</td>';
+        html += '<td style="padding:6px;text-align:center;color:'+_colorPL(L.avg_10d)+';">'+(L.avg_10d!=null?(L.avg_10d>0?'+':'')+Number(L.avg_10d).toFixed(2):'—')+'%</td>';
+        html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(L.win_20d)+';">'+(L.win_20d!=null?Number(L.win_20d).toFixed(1):'—')+'%</td>';
+        html += '<td style="padding:6px;text-align:center;color:'+_colorPL(L.avg_20d)+';">'+(L.avg_20d!=null?(L.avg_20d>0?'+':'')+Number(L.avg_20d).toFixed(2):'—')+'%</td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;font-size:11px;">';
+      html += '<span style="padding:2px 8px;border-radius:6px;background:var(--bg2);color:var(--txt);border:1px solid var(--border);">Top-Bottom 利差 ' + (_fb.spread_top_bottom_10d_pct!=null?(_fb.spread_top_bottom_10d_pct>0?'+':'')+_fb.spread_top_bottom_10d_pct.toFixed(2):'—') + '%</span>';
+      html += '<span style="padding:2px 8px;border-radius:6px;background:var(--bg2);color:var(--txt);border:1px solid var(--border);">IS 利差 ' + (_fb.spread_in_sample_pct!=null?(_fb.spread_in_sample_pct>0?'+':'')+_fb.spread_in_sample_pct.toFixed(2):'—') + '%</span>';
+      html += '<span style="padding:2px 8px;border-radius:6px;background:var(--bg2);color:var(--txt);border:1px solid var(--border);">OOS 利差 ' + (_fb.spread_oos_pct!=null?(_fb.spread_oos_pct>0?'+':'')+_fb.spread_oos_pct.toFixed(2):'—') + '%</span>';
+      html += '</div>';
+    }
+
+    var _roe = data.roe_largecap || {};
+    if(_roe && _roe.top30_n){
+      html += '<div style="font-size:12px;font-weight:700;color:var(--txt);margin:12px 0 6px;">ROE_TTM 大市值 Top30 vs 全池等权</div>';
+      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+      html += '<th style="padding:6px;text-align:left;color:var(--sub);">口径</th>';
+      html += '<th style="padding:6px;text-align:center;color:var(--sub);">T+10胜率</th>';
+      html += '<th style="padding:6px;text-align:center;color:var(--sub);">T+10收益</th>';
+      html += '<th style="padding:6px;text-align:center;color:var(--sub);">T+20胜率</th>';
+      html += '<th style="padding:6px;text-align:center;color:var(--sub);">T+20收益</th>';
+      html += '<th style="padding:6px;text-align:center;color:var(--sub);">超额(T+20)</th>';
+      html += '</tr></thead><tbody>';
+      html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+      html += '<td style="padding:6px;color:var(--txt);font-weight:700;">Top30</td>';
+      html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(_roe.top30_win_10d)+';">' + (_roe.top30_win_10d!=null?Number(_roe.top30_win_10d).toFixed(1):'—') + '%</td>';
+      html += '<td style="padding:6px;text-align:center;color:'+_colorPL(_roe.top30_avg_10d)+';">' + (_roe.top30_avg_10d!=null?(_roe.top30_avg_10d>0?'+':'')+Number(_roe.top30_avg_10d).toFixed(2):'—') + '%</td>';
+      html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(_roe.top30_win_20d)+';">' + (_roe.top30_win_20d!=null?Number(_roe.top30_win_20d).toFixed(1):'—') + '%</td>';
+      html += '<td style="padding:6px;text-align:center;color:'+_colorPL(_roe.top30_avg_20d)+';">' + (_roe.top30_avg_20d!=null?(_roe.top30_avg_20d>0?'+':'')+Number(_roe.top30_avg_20d).toFixed(2):'—') + '%</td>';
+      html += '<td style="padding:6px;text-align:center;color:'+_colorPL(_roe.excess_20d)+';">' + (_roe.excess_20d!=null?(_roe.excess_20d>0?'+':'')+Number(_roe.excess_20d).toFixed(2):'—') + '%</td>';
+      html += '</tr>';
+      html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+      html += '<td style="padding:6px;color:var(--txt);font-weight:700;">全池等权</td>';
+      html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(_roe.univ_avg_10d)+';">—</td>';
+      html += '<td style="padding:6px;text-align:center;color:'+_colorPL(_roe.univ_avg_10d)+';">' + (_roe.univ_avg_10d!=null?(_roe.univ_avg_10d>0?'+':'')+Number(_roe.univ_avg_10d).toFixed(2):'—') + '%</td>';
+      html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(_roe.univ_avg_20d)+';">—</td>';
+      html += '<td style="padding:6px;text-align:center;color:'+_colorPL(_roe.univ_avg_20d)+';">' + (_roe.univ_avg_20d!=null?(_roe.univ_avg_20d>0?'+':'')+Number(_roe.univ_avg_20d).toFixed(2):'—') + '%</td>';
+      html += '<td style="padding:6px;text-align:center;color:var(--sub);">基准</td>';
+      html += '</tr>';
+      html += '</tbody></table></div>';
+    }
+
+    html += '<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.5;">';
+    html += '方法：' + (data.rebalance || '每10个交易日调仓，次日开盘入场，扣往返成本 0.2%') + ' · 数据 ' + ((data.update_time||'').substring(0,16) || '—');
+    if(_fb.verdict_note) html += ' · <span style="color:var(--sub);">'+_esc(_fb.verdict_note)+'</span>';
+    if(_roe.methodology_limit) html += ' · <span style="color:#fbbf24;">ROE 局限：</span>'+_esc(_roe.methodology_limit);
+    html += '</div>';
+    html += '</div>';
+    return html;
+  }
+  window.__renderFactorLabBacktest = _renderFactorLabBacktest;
+
   window._renderPeriodBacktestCard = _renderPeriodBacktestCard;
 
 
@@ -5344,15 +5433,22 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       }
       html += '<td style="padding:6px;color:var(--dim);font-size:10px;white-space:nowrap;">'+(((_pt.update_time||'')+'').substring(0,16)||'—')+'</td></tr>';
       var _fl=window.FACTOR_LAB||{};
+      var _flbt=window.FACTOR_LAB_BACKTEST||{};
+      var _flA=_flbt.abnormal_volume||{};
+      var _flR=_flbt.roe_largecap||{};
+      var _flVerdict=_flA.verdict_3star;
+      var _flSpread=_flA.spread_top_bottom_10d_pct;
+      var _flWin=_flA.top_layer_win_10d;
+      var _flReady=_flVerdict!=null;
       html += '<tr style="border-bottom:1px solid var(--border2);">'
         + '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">🧪 因子实验室 '+_tag+'</td>'
-        + '<td style="padding:6px;color:var(--dim);font-size:10.5px;">因子截面观察·暂无信号回测</td>'
-        + '<td style="padding:6px;color:var(--dim);">—</td>'
-        + '<td style="padding:6px;color:var(--dim);">信号累积中</td>'
-        + '<td style="padding:6px;color:var(--dim);">—</td>'
-        + '<td style="padding:6px;color:var(--dim);font-size:10px;white-space:nowrap;">'+(((_fl.update_time||'')+'').substring(0,16)||'—')+'</td></tr>';
+        + '<td style="padding:6px;color:var(--dim);font-size:10.5px;">五分位分层回测（异常量比+ROE）</td>'
+        + '<td style="padding:6px;color:var(--sub);">'+(_flReady?(_flA.universe_n||'—'):'—')+'</td>'
+        + '<td style="padding:6px;color:'+(_flWin==null?'var(--dim)':_colorWR(_flWin))+';font-weight:700;">'+(_flWin!=null?Number(_flWin).toFixed(1)+'%':'—')+'</td>'
+        + '<td style="padding:6px;color:'+(_flSpread==null?'var(--dim)':_colorPL(_flSpread))+';">'+(_flSpread!=null?(_flSpread>0?'+':'')+Number(_flSpread).toFixed(2)+'%':'—')+'</td>'
+        + '<td style="padding:6px;color:var(--dim);font-size:10px;white-space:nowrap;">'+(((_flbt.update_time||'')+'').substring(0,16)||((_fl.update_time||'')+'').substring(0,16)||'—')+'</td></tr>';
       html += '</tbody></table></div>';
-      html += '<div style="font-size:10.5px;color:var(--dim);margin-top:6px;line-height:1.6;">🧬 胜率列=池内盈利占比（最新收盘高于入池价的股票占比）；收益列=平均浮盈。🧪 因子实验室为因子截面观察（异常换手率·ROE_TTM 大市值档），前向收益回测待因子信号历史累积后上线，不造假。</div>';
+      html += '<div style="font-size:10.5px;color:var(--dim);margin-top:6px;line-height:1.6;">🧬 胜率列=池内盈利占比（最新收盘高于入池价的股票占比）；收益列=平均浮盈。🧪 因子实验室=异常量比五分位分层 + ROE_TTM 大市值 Top30 回测，T+10 胜率/利差为当前证据；verdict 由「利差>0 + Top层胜率≥55% + OOS同号」判定。</div>';
     })();
 
     html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin:18px 0 8px;display:flex;align-items:center;gap:8px;"><span>🎯</span>主策略回测 <span style="font-size:11px;color:var(--dim);font-weight:500;">按星级降序</span></div>';
@@ -5461,6 +5557,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     // 2026-09-02 主人令：模块策略回测卡统一读 __STRATEGY_BACKTESTS 配置（按星级降序；已删策略自动不出现）
     html += window.__renderBacktestCardsFrom(window.__STRATEGY_BACKTESTS);
+    // 2026-09-13 主人令：因子实验室独立分层回测单独渲染（数据结构与 by_period 不同）
+    html += window.__renderFactorLabBacktest();
 
     /* ── K线信号 60 日回测 ── */
     html += '<div style="margin:14px 0;border-left:4px solid #c084fc;" class="card">';
