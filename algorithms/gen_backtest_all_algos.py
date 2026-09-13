@@ -55,8 +55,8 @@ MIN_SAMPLES = 30          # 累积样本门槛：低于此只观测、不进排�
 #     主表是「同口径横比」，T+5 是各卡唯一共同拥有的短档，样本最厚、可比性最强；
 #     若改 T+90，则① 长档样本天然薄（回测区间早期信号凑不满 90 日）
 #     ② 各卡主口径可能取到不同档 ⇒ 横比失去意义。
-#     长档（30/45/60/75/90）全部照常进 ranking_all 明细表 + 前端分档视图，
-#     主人要的「从近到远慢慢跟踪」由明细表 + track_ladder 承担，不由主表承担。
+#     长档（30/45/60/75/90）全部照常进 ranking_all 明细表 + 前端「持有期档位矩阵」，
+#     主人要的「从近到远慢慢跟踪」由明细表承担，不由主表承担。
 LOW_WIN_RATE = 45.0       # 胜率红线：低于此判「低胜率」
 LOW_AVG_RETURN = 0.0      # 平均收益红线：<= 此判「低收益」（已扣成本口径）
 
@@ -646,48 +646,6 @@ def _coverage(rows):
     return out
 
 
-def build_ladder(root):
-    """跟踪池分档阶梯（从近到远 T+5…T+90）—— 读 raw_data/algo_track.json。
-
-    🔴 与「历史回测」是两个不同口径，**不混进卡级排名**：
-      · 历史回测（backtest_*）= 对历史信号做固定持有期回溯；
-      · 本阶梯 = **逐日现采前向跟踪**：信号日入场 → 真实持有到第 h 个交易日收盘。
-    口径由 gen_algo_track.py 产出（只取 raw_data/kline_cache 真实日线、扣双边 0.3%），
-    累积多少个交易日就出多少个档位，**不必等 90 天期满**（主人 2026-09-11 令）。
-    未就绪档位 samples=0 且 win_rate/avg_return 为 null —— 前端显示「累积中」，
-    绝不把「没样本」画成「0% 胜率」。
-    """
-    p = Path(root) / "raw_data" / "algo_track.json"
-    if not p.exists():
-        return {"available": False, "reason": "raw_data/algo_track.json 不存在"}
-    try:
-        obj = json.loads(p.read_text(encoding="utf-8"))
-    except Exception as e:
-        return {"available": False, "reason": f"raw_data/algo_track.json 不可读: {e.__class__.__name__}"}
-    out = {
-        "available": True,
-        "update_time": obj.get("update_time"),
-        "horizons": obj.get("horizons") or [],
-        "cost_pct_roundtrip": obj.get("cost_pct_roundtrip"),
-        "note": ("逐日现采前向跟踪（非历史回溯）：入场=信号日收盘，持有到第 h 个真实"
-                 "交易日收盘，扣双边成本；样本随交易日自然累积，不必等 90 天期满。"
-                 "samples=0 的档位=样本未成熟，不是 0% 胜率。"),
-        "algos": [],
-    }
-    for a in obj.get("algos", []) or []:
-        st = a.get("stats") or {}
-        out["algos"].append({
-            "algo": a.get("algo"),
-            "display_name": a.get("display_name"),
-            "tracking": st.get("tracking"),
-            "history_samples": st.get("history_samples"),
-            "coverage": st.get("coverage"),
-            "by_horizon": st.get("by_horizon") or {},
-            "unrealized": a.get("unrealized") or [],
-        })
-    return out
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=str(ROOT))
@@ -707,7 +665,6 @@ def main():
         return 0
 
     out = build(root, day, kind, note)
-    out["track_ladder"] = build_ladder(root)
 
     print(f"  覆盖 {len(out['rows'])} 行 / {len(out['coverage'])} 张卡")
     for r in out["rows"]:
