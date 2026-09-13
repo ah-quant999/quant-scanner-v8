@@ -26,9 +26,18 @@ def main():
 
     bt = json.load(open(SRC, encoding="utf-8"))
     opt = bt.get("optimized_summary")
-    if not opt:
-        print("⚠️ backtest_tdx.json 中无 optimized_summary，先运行 backtest_tdx.py")
-        sys.exit(1)
+    # 🔴 2026-09-14 小九审计修复：原实现在缺 optimized_summary 时直接 sys.exit(1)。
+    #   而本脚本位于 run_algorithms 的 ORDER / STAGES["E"]，退出码非 0 会让 E 批链
+    #   被判定残缺；更严重的是本脚本是**全站择时唯一真源** current_regime 的唯一产出方
+    #   （index.html：「全站择时【唯一】以 OPTIMIZED_STRATEGY.current_regime 为准」）
+    #   ⇒ 硬退 = 前端择时永远卡在旧值（假死），且无人知晓。
+    #   现改为「降级但仍产出」：优化策略部分标 data_ok=false（不写 0 冒充），
+    #   current_regime 照常计算写入，退出码归 0，并保留上游 audit note 便于定位。
+    _opt_missing = not opt
+    if _opt_missing:
+        print("⚠️ backtest_tdx.json 中无 optimized_summary（上游 0 样本或未跑）"
+              "→ 优化策略部分 data_ok=false，current_regime 照常产出（不再硬退）")
+    _opt = opt or {}
 
     result = {
         "calc_time": bt.get("calc_time"),
@@ -38,20 +47,26 @@ def main():
             "stocks_analyzed": bt.get("stocks_analyzed"),
             "gold_pool_size": bt.get("gold_pool_size"),
             "survivor_bias_warning": bt.get("survivor_bias_warning", False),
+            # 2026-09-14：口径/样本窗口随产物一起下传，避免前端拿旧值当新值
+            "entry_caliber_ver": bt.get("entry_caliber_ver"),
+            "signal_window": bt.get("signal_window"),
         },
         "optimized": {
-            "label": opt.get("label"),
-            "total_signals": opt.get("total"),
+            "label": _opt.get("label"),
+            "total_signals": _opt.get("total", 0) or 0,
             "periods": {},
+            # data_ok=false 时前端应显示「暂无样本」，绝不用 0 冒充胜率
+            "data_ok": bool(_opt and (_opt.get("total") or 0) > 0),
+            **({"note": bt.get("optimized_summary_note")} if _opt_missing else {}),
         },
         "baseline_ge3": {},
-        "config": opt.get("config", {}),
+        "config": _opt.get("config", {}),
     }
 
     # 提取优化策略各周期
     for d in [5, 10]:
-        wr = opt.get(f"win_rate_{d}d")
-        ar = opt.get(f"avg_return_{d}d")
+        wr = _opt.get(f"win_rate_{d}d")
+        ar = _opt.get(f"avg_return_{d}d")
         if wr is not None:
             result["optimized"]["periods"][f"T+{d}"] = {
                 "win_rate_pct": wr,

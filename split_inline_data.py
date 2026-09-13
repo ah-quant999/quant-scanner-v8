@@ -24,6 +24,10 @@ def make_lite(name, obj):
             'gold_pool_size': obj.get('gold_pool_size'),
             'stocks_analyzed': obj.get('stocks_analyzed'),
             'summary': obj.get('summary', {}),
+            # 🛡 2026-09-14 小九三件套①：与 update_v8.py::_make_lite 保持同步（正是上方
+            #   注释警告的「漂移」实例 —— 09-14 加了口径审计字段后两边一度不一致）。
+            'entry_caliber_ver': obj.get('entry_caliber_ver'),
+            'stale_caliber_dropped': obj.get('stale_caliber_dropped'),
             '_lite_note': '个股历史信号明细已裁剪，仅保留汇总统计',
         }
     if name == 'BACKTEST_COMPREHENSIVE':

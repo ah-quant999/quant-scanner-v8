@@ -70,8 +70,12 @@ TDX_BARS = 520  # 覆盖 250 交易日持有 + 信号检测自身窗口（2026-0
 #   ⇒ 口径统一对 TDX 主数据完全失效 = 「改了但没生效」的隐性形态。
 #   修法：把口径版本写进明细，版本不匹配即整只重算 —— 以后每次口径变更只改这一个数字。
 #     1 = 信号日收盘价买入（2026-09-13 之前的旧口径）
-#     2 = 信号日次一交易日开盘买入（当前口径）
-ENTRY_CALIBER_VER = 2
+#     2 = 信号日次一交易日开盘买入（2026-09-13 起）
+#     3 = v2 入场口径 + **信号样本窗口修复**（2026-09-14：原判据要求最长档 T+250
+#         有完整前瞻数据才记录信号日 ⇒ 近 250 个交易日整条跳过、近一年样本消失；
+#         现改为只要求「入场日 + 最短档」，长档未到期即 None。样本集合因此变化，
+#         必须整只重算，故升版号 —— 复用同一机制，不新增第二套开关。）
+ENTRY_CALIBER_VER = 3
 
 # 2026-09-06 主人令 P1-A：A 股交易成本默认假设（单边 万分之1.5，双边 0.3%）
 COST_BPS = 15
@@ -97,8 +101,18 @@ OPTIMIZED = {
 }
 
 
-def _fetch_index_ohlc(code, prefix, days=150):
-    """从 baostock 拉取指数日K，返回 [(date, close)]"""
+def _fetch_index_ohlc(code, prefix, days=None):
+    """从 baostock 拉取指数日K，返回 [(date, close)]。
+
+    🔴 2026-09-14 小九审计修复（P0 · regime 序列窗口短于信号窗口）：
+      原默认 `days=150`（自然日）⇒ 扣掉 regime 自身预热只剩约 76 个交易日，
+      而本回测的信号窗口长达两年 ⇒ 两者交集恒为空，OPTIMIZED 的 regime 门控
+      **一个样本都匹配不到**（优化策略汇总整块消失，下游导出脚本 exit 1）。
+      现默认覆盖「K线窗口 + 最长持有期 + 预热余量」，随 TDX_BARS 自动伸缩，
+      以后扩档不会再次失配。
+    """
+    if days is None:
+        days = int((TDX_BARS + max(HOLD_DAYS)) * 365 / 244) + 90
     from fetch_source import socket_timeout, SOURCE_BREAKER
     if SOURCE_BREAKER.is_open("baostock"):
         log(f"  [_fetch_index_ohlc] {code}: baostock 熔断冷却中，跳过")
@@ -373,11 +387,15 @@ def detect_signals(rows):
     return signals
 
 
-def calc_forward_return(rows, idx, hold_days, board="主板"):
+def calc_forward_return(rows, idx, hold_days, board="主板", st_cache=None):
     """计算T+N日收益（方案二：按统一止损止盈口径模拟提前出场）。
 
     返回 {"ret": 提前出场后收益, "raw_ret": 原持有期收盘价收益,
           "exit_type": 'stop'/'target'/None, "stop_loss": ..., "target_price": ..., "risk_reward": ...}
+
+    st_cache: 可选的「止损/止盈」记忆字典（键=入场日索引）。止损/止盈只与入场日+板块
+              有关、与持有档位无关，而本函数对同一信号日会被 HOLD_DAYS 各档各调一次，
+              故由调用方传入本字典即可把 12 档的重复计算收敛为 1 次（2026-09-14 小九）。
     """
     # 🔴 2026-09-13 主人令「统一测算标准 · 用最科学的计算」（小九周末审计 P1-1）：
     #   入场 = 信号日**次一交易日开盘**。原取「信号日收盘」= 前视偏差：
@@ -394,8 +412,18 @@ def calc_forward_return(rows, idx, hold_days, board="主板"):
     idx = entry_idx                         # 后续止损模拟/收益窗口一律以入场日为基准
 
     # 用「入场日之前」数据计算止损/止盈（不含入场日 ⇒ 严格非未来函数）
-    df = pd.DataFrame(rows[: idx])
-    st = compute_stop_target(df, board=board, strategy="tdx")
+    # 🛡 2026-09-14 小九性能修复：止损/止盈只与「入场日 + 板块」有关、**与持有档位无关**，
+    #   而本函数被 HOLD_DAYS（现 12 档）对同一信号日各调用一次 ⇒ 同一天白算 12 遍。
+    #   实测单只 500 根K 的股票需 ~5300 次 compute_stop_target（26s/只 ⇒ 全量 95 分钟）。
+    #   以 entry_idx 为键记忆后降到 ~440 次；compute_stop_target 是确定性纯函数
+    #   （无 random / 无 now / 无 time），故结果逐位不变（已用 6 只股票逐字节对照验证）。
+    if st_cache is not None and idx in st_cache:
+        st = st_cache[idx]
+    else:
+        df = pd.DataFrame(rows[: idx])
+        st = compute_stop_target(df, board=board, strategy="tdx")
+        if st_cache is not None:
+            st_cache[idx] = st
     if st:
         stop_loss = st["stop_loss"]
         target_price = st["target_price"]
@@ -572,7 +600,19 @@ def main():
                 if rows[j]["date"] == date:
                     idx = j
                     break
-            if idx is None or idx + max(HOLD_DAYS) >= n:
+            # 🔴 2026-09-14 小九审计修复（P0 · 样本窗口被过长持有期吃掉）：
+            #   原判据 `idx + max(HOLD_DAYS) >= n` 要求**最长档（现为 T+250）**有完整前瞻
+            #   数据才记录该信号日 ⇒ 持有期阶梯扩到 250 档后，最近 250 个交易日的信号被
+            #   **整条跳过**（不是算出 0，是压根没算）。实测后果：
+            #     ① 产物信号日止于 2025-09-01 —— 近一年样本凭空消失（短档 T+1/T+5 白损失）；
+            #     ② 优化策略的 regime 门控序列只覆盖最近约 76 个交易日，与信号窗口
+            #        **交集恒为空** ⇒ opt 汇总 0 样本 ⇒ optimized_summary 被静默丢弃 ⇒
+            #        下游 export_optimized_strategy.py 直接 exit 1（全站择时真源一起卡死）。
+            #   修法：`calc_forward_return()` 对 `target >= n` 已安全返回 None（见其函数内
+            #   `if target >= n: return None`），`_accumulate` 亦对 None 逐档跳过 ⇒
+            #   记录信号只需保证「入场日 + 最短档」可取，长档自然落 None（未到期不进样本，
+            #   与「数据层禁止 0 冒充」同口径）。
+            if idx is None or idx + 1 + min(HOLD_DAYS) >= n:
                 continue
 
             returns = {}
@@ -580,8 +620,9 @@ def main():
             raw_returns = {}
             exit_types = {}
             board = board_from_code(code)
+            _st_cache = {}   # 本信号日的止损/止盈只与入场日有关，12 档共用一份（见 calc_forward_return）
             for d in HOLD_DAYS:
-                res = calc_forward_return(rows, idx, d, board=board)
+                res = calc_forward_return(rows, idx, d, board=board, st_cache=_st_cache)
                 if res is None:
                     returns[f"ret_{d}d"] = None
                     wins[f"win_{d}d"] = None
@@ -791,13 +832,30 @@ def main():
                 sd[f"avg_return_{d_}d"] = ar
             print(row)
             result_data["optimized_summary"] = sd
+        else:
+            # 🔴 2026-09-14 小九审计修复：0 样本时原来**静默不写** optimized_summary，
+            #   产物没有该字段 ⇒ 下游 export_optimized_strategy.py 读到 None 直接 exit 1
+            #   ⇒ 全站择时真源 OPTIMIZED_STRATEGY.current_regime 一起停止刷新（假死）。
+            #   现在大声报出来，并写入审计字段，杜绝「字段凭空消失且无人知晓」。
+            log("🔴 [P0] 优化策略 0 样本：regime 门控与信号日期无交集 ⇒ optimized_summary 缺失，"
+                "下游 export_optimized_strategy.py 将无法产出（请检查 regime 序列窗口 vs 信号窗口）")
+            result_data["optimized_summary_note"] = "empty:no_regime_signal_overlap"
+    elif not market_regime:
+        log("🔴 [P0] market regime 序列为空 ⇒ 优化策略汇总无法计算（optimized_summary 缺失）")
+        result_data["optimized_summary_note"] = "empty:no_market_regime"
+
+    # 审计字段：让「口径/样本异常」在产物里可见，而不是只活在日志里
+    result_data["optimized_samples"] = int(opt_summary["optimized"]["total"]) if opt_summary else 0
+    result_data["signal_window"] = None
+    _all_sig_dates = sorted({d for sr in stock_results.values() for d in (sr.get("signals") or {})})
+    if _all_sig_dates:
+        result_data["signal_window"] = f"{_all_sig_dates[0]}~{_all_sig_dates[-1]}"
 
     total_entries = sum(len(sr.get("signals", {})) for sr in stock_results.values())
     print(f"\n{'─'*56}")
     print(f"  总计: {len(gp_stocks)} 只股, {total_entries} 条信号")
     print(f"  输出: {OUT}")
-    
-    json.dump(result_data, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    _dump_json(result_data, OUT)
     print(f"\n  结果: ✓ {datetime.now().strftime('%H:%M:%S')}")
 
 
