@@ -4245,7 +4245,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      🔴 同一张卡可能有多个门槛档（三重共识＝共振≥2 / 70-79 / ≥80 三档），
         **绝不能混档** —— 否则同一持有期被后写覆盖，星级就成了随机数。
         故先由 is_primary 行定出「主口径标签模式」（把 T+数字 归一为 T+#），
-        再只取同一档的各持有期。 */
+        再只取同一档的各持有期。
+        ⚠️ 由此产生**硬约束**（2026-09-13 小九审计补充）：每卡必须**恰好 1 行**
+           is_primary，且该行 label **不得带额外后缀** —— 否则会取到 band 顺序最靠前
+           的档（如有三档 3 行 primary），或把同档其余档全过滤掉（label 后缀使归一化
+           后不相等，12 档退化为 1 档）⇒ 星级静默失真。生成侧由
+           gen_backtest_all_algos.py 的 CONSENSUS_PRIMARY_BAND/HOLD 常量保证唯一。 */
   window.__committeePeriods = function(card){
     var rows = ((window.BACKTEST_ALL_ALGOS || {}).rows) || [];
     var prim = null;
@@ -4272,9 +4277,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     return out;
   };
 
-  /* 部分卡的**多期**数据不在聚合产物 rows 里 —— 因为 comprehensive parser
-     每档只输出「最佳持有期」一行（三重共识即属此类：rows 仅 3 行）；
-     其完整多期在各源文件的 comparison 里。此处补齐，口径仍取**主口径档**。
+  /* 部分卡的**多期**数据不在聚合产物 rows 里（或在上层被零样本档过滤掉），
+     其完整多期在各源文件的 comparison 里 —— 此处补齐，口径仍取**主口径档**。
+     ⚠️ 2026-09-13 起 comprehensive parser 已改为「每档一行」
+        （三重共识 = 3 分档 × 12 持有期 = 36 行），本函数保留作并集兜底。
      🔴 旧数据没有 decided 字段（09-13 数据层修复前），此时只信 ≤T+30 ——
         三重共识 T+45/T+60 是「未到期被填 0」的伪值、T+75/T+90 直接是 0，一律不采信。 */
   window.__STAR_COMPARISON_CARDS = {
@@ -4324,7 +4330,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     }
     var periods = window.__committeePeriods(card);
     /* 再并入「源文件 comparison」的多期（若该卡登记在 __STAR_COMPARISON_CARDS）——
-       必须用**并集**：rows 里可能只有零星几档（三重共识只有 T+20），
+       必须用**并集**：rows 里可能只有零星几档（零样本长档在上层被过滤掉），
        靠「periods 为空才补」会漏掉，必须无条件合并去重。 */
     var alt = window.__committeePeriodsFromComparison ? window.__committeePeriodsFromComparison(card) : null;
     if(alt){

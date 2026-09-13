@@ -45,6 +45,20 @@ RAW = ROOT / "raw_data"
 
 # ── 阈值（主人可调；改这里即可，前端声明与实际同源由「页面口径」小节保证）──
 MIN_SAMPLES = 30          # 累积样本门槛：低于此只观测、不进排名、不评估下架（= 前端既有 MIN=30）
+
+# 🔴🔴 2026-09-13 小九审计修复：三重共识主口径的**单一真源**（且必须**恰好 1 行** primary）。
+#   为何必须是「严格档 · T+5」，三条例证缺一不可：
+#   ① **前端按它选档**：index.html `__committeePeriods()` 取「第一条 is_primary 行的 label」
+#      归一化出 pat（T+数字→T+#），再只保留 label==pat 的行去算星级。
+#      ⇒ 若 primary 有 2 行以上（原实现=三档各 1 行），会取到 band 顺序最靠前的**宽松档**；
+#      ⇒ 若 primary 行 label 带额外后缀（原实现有「（主口径）」），归一化后与其余档不等，
+#         评级只剩 primary 那一档。实测（node 复刻该函数）：原实现 = 用「宽松档 T+20」单档评星。
+#      现改为「严格档 · T+5」且 label **不加任何后缀** ⇒ 严格档 12 档全部参与评级。
+#   ② **本文件 L54 铁律**：主口径刻意取 T+5 —— 四量/CRDS/候选池主口径均 T+5、金股池 T+1，
+#      卡级主表是「同口径横比」，三重共识取 T+20 会使跨卡横比失效（= 文件头警告场景）。
+#   ③ `SOURCES.primary` 与产出 label 必须**逐字一致** ⇒ 兜底匹配（label == primary）才成立。
+CONSENSUS_PRIMARY_BAND = "共振≥80（严格）"   # = 前端 __STAR_COMPARISON_CARDS 的 resonance_gte80
+CONSENSUS_PRIMARY_HOLD = 5                   # T+5，与其余各卡主口径同档
 # 🔴 2026-09-12 主人令（拍板第 1 项·①）：各回测脚本持有期已扩为
 #   [1, 3] + [5,10,20,30,45,60,75,90,180,250]（同源常量 HOLD_LADDER，见各脚本）。
 #   🔴 2026-09-13 主人令扩档：+180/+250（原 8 档）。主人原话：「所有接入算法链的
@@ -68,7 +82,9 @@ FLOOR_T1 = (8, 0)         # 与闸门 FLOOR_T1 同源
 SOURCES = [
     dict(card="三重共识", kind="strategy", page="选股策略", icon="🧲", cat="trade",
          var="BACKTEST_COMPREHENSIVE", rel="data/BACKTEST_COMPREHENSIVE.js",
-         parser="comprehensive", label_prefix="共振", primary="共振≥80（严格）",
+         parser="comprehensive", label_prefix="共振",
+         # ⚠️ 必须与 parse_comprehensive 产出的主口径 label **逐字一致**（见上方常量块 ③）
+         primary=f"{CONSENSUS_PRIMARY_BAND} · T+{CONSENSUS_PRIMARY_HOLD}",
          method="信号日次一交易日开盘买入、持有 N 个真实交易日收盘卖出（baostock 前复权·扣双边 0.3%）"),
     dict(card="四量终极", kind="strategy", page="选股策略", icon="📊", cat="trade",
          var="FOUR_VOLUME_BACKTEST", rel="data/FOUR_VOLUME_BACKTEST.js",
@@ -287,17 +303,25 @@ def parse_comprehensive(src, obj):
       ⇒ 多重比较偏差 / cherry-picking，**系统性高估**该策略；
       且三重共识在 10 档矩阵里只有 1~2 列有数 ⇒ 主人「统一 10 档」的要求只落地了一半
       （与「只加 items 不抬 need = 没加」属同一类「改一半」错误）。
-      现改为：**每个持有期各出一行**，全部进矩阵；主口径固定 T+20（label 明示「主口径」，
-      可用 V8_CONSENSUS_PRIMARY_HOLD 覆盖），其余档位同为观测值 ——
-      **不再替使用者做「择优」**。
+      现改为：**每个持有期各出一行**，全部进矩阵（3 档 × 12 持有期 = 36 行）；
+      主口径固定「严格档 · T+5」且**恰好 1 行**（可用 V8_CONSENSUS_PRIMARY_HOLD 覆盖），
+      其余档位同为观测值 —— **不再替使用者做「择优」**。
       零样本档由 `_mk_row` 既有兜底自动归 None（绝不用 0 冒充）。
+
+    🔴 2026-09-13 小九审计二次修复（本函数主口径两处错）：
+      ① 主口径原取 **T+20**，与 L54 铁律「主口径刻意取 T+5」矛盾，且四量/CRDS/候选池
+         主口径均为 T+5、金股池 T+1 ⇒ 卡级主表跨卡横比失效（= 文件头警告的场景）；
+      ② 原 `primary=(hd == 主口径)` 使**三档各出 1 行 primary**（共 3 行），
+         违反 L638「卡级主表每卡只取 1 行」，且前端取到 band 顺序最前的**宽松档**去评星。
+      现：primary 恒为 `CONSENSUS_PRIMARY_BAND · T+CONSENSUS_PRIMARY_HOLD` 一行。
     """
     rows = []
     ov = (obj or {}).get("overview") or {}
     band = [("resonance_all", "共振≥2（宽松）"), ("resonance_gte70_lt80", "共振70-79分"),
-            ("resonance_gte80", "共振≥80（严格）")]
-    primary_hd = _num(__import__("os").environ.get("V8_CONSENSUS_PRIMARY_HOLD", "20"))
-    primary_hd = 20 if primary_hd is None else int(primary_hd)
+            ("resonance_gte80", CONSENSUS_PRIMARY_BAND)]
+    primary_hd = _num(__import__("os").environ.get(
+        "V8_CONSENSUS_PRIMARY_HOLD", str(CONSENSUS_PRIMARY_HOLD)))
+    primary_hd = CONSENSUS_PRIMARY_HOLD if primary_hd is None else int(primary_hd)
     for key, name in band:
         o = ov.get(key)
         per_all = (o or {}).get("periods") or {}
@@ -309,9 +333,13 @@ def parse_comprehensive(src, obj):
                                                         _hold_days_of(x) or 0)):
             per = per_all.get(pk) or {}
             hd = _hold_days_of(pk)
-            is_primary = (hd is not None and hd == primary_hd)
-            lbl = ("%s · T+%d%s" % (name, hd, "（主口径）" if is_primary else "")
-                   if hd is not None else name)
+            # ⚠️ 唯一一行 primary = 严格档 · 主口径持有期。
+            #    label **不得加任何后缀**（如「（主口径）」）：前端 `__committeePeriods()`
+            #    把 label 的 T+数字归一成 T+# 后要求与主口径行**逐字相等**，
+            #    加后缀会把同档其余 11 档全部过滤掉（实测：12 档退化为 1 档 ⇒ 星级失真）。
+            is_primary = (hd is not None and hd == primary_hd
+                          and name == CONSENSUS_PRIMARY_BAND)
+            lbl = ("%s · T+%d" % (name, hd)) if hd is not None else name
             rows.append(_mk_row(
                 src, lbl, per.get("count"),
                 per.get("win_rate"), per.get("avg_return"),
@@ -442,9 +470,23 @@ def parse_tdx(src, obj):
 
 
 def parse_algo_compare(src, obj):
-    """ALGO_BACKTEST_COMPARE：多算法同口径聚合，取 T+5 为主口径。"""
+    """ALGO_BACKTEST_COMPARE：多算法同口径聚合，取 T+5 为主口径。
+
+    🔴 2026-09-13 小九审计修复（**假挂链**：挂了链却读不出数，比不挂更隐蔽）：
+      scripts/algo_backtest_compare.py 产物的真实结构是
+        {"generated":…, "metrics_def":…, "verdict":…,
+         "algorithms": {"h_reverse": {"name":…, "rule":…, "source":…,
+                                      "summary": {"n_samples":198, "horizons": {"t1":…,"t5":…}}}}}
+      而本函数原读 `obj["algos"] or obj["results"]`、且把 `n_samples`/`horizons`
+      当**顶层**键取 —— **顶层键名错 + 嵌套层级错**，双重读空 ⇒ 本卡恒返回
+      「产物无可用算法行（等待盘后累积）」，强势突破 / H反推 / 高手画像版 三行
+      **永远显示「—」**（产物实际有 71 / 198 / 27 条样本）。页面文案还把锅甩给「等待累积」。
+      ⇒ 现已兼容两层：顶层键 `algorithms`(真值) → `algos` → `results`；
+        样本/持有期改为「顶层优先、再取 summary」。
+    """
     rows = []
-    algos = (obj or {}).get("algos") or (obj or {}).get("results") or {}
+    algos = ((obj or {}).get("algorithms") or (obj or {}).get("algos")
+             or (obj or {}).get("results") or {})
     if isinstance(algos, dict):
         items = algos.items()
     elif isinstance(algos, list):
@@ -454,15 +496,21 @@ def parse_algo_compare(src, obj):
     for k, a in items:
         if not isinstance(a, dict):
             continue
-        hs = (a.get("horizons") or {})
+        summ = a.get("summary") or {}
+        # 扁平结构与「嵌 summary」结构都要能读（见 docstring）
+        hs = (a.get("horizons") or summ.get("horizons") or {})
         t5 = hs.get("t5") or {}
+        _n = _num(a.get("n_samples"))
+        if _n is None:
+            _n = _num(summ.get("n_samples"))
+        _nm = (a.get("name") or a.get("display_name") or k)
         rows.append(_mk_row(
-            src, (a.get("name") or a.get("display_name") or k), _num(a.get("n_samples")),
+            src, _nm, _n,
             t5.get("win"), t5.get("avg"), "T+5",
             extra={"hit": _num(t5.get("hit"))},
-            status=None if _num(a.get("n_samples")) else "暂无足够可比历史（等待盘后累积）",
+            status=None if _n else "暂无足够可比历史（等待盘后累积）",
             # 本产物聚合多个算法；只有「强势突破」那一行属于本卡，其余留给其自身卡位
-            primary=("强势" in str(a.get("name") or a.get("display_name") or k)),
+            primary=("强势" in str(_nm)),
         ))
     if not rows:
         return [_mk_row(src, "—", None, None, None, None,
