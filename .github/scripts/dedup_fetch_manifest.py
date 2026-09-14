@@ -89,8 +89,13 @@ _ALWAYS_PUSH = {
     "data/FOUR_VOLUME.js",            # READY_SPEC["B"].must
     "data/CRDS_CARD_DATA.js",         # READY_SPEC["B"].must
     "data/BACKTEST_ALL_ALGOS.js",     # READY_SPEC["E"].must
-    "data/CANDIDATE_BACKTEST.js",     # READY_SPEC["E"].must
-    "data/GOLD_POOL_BACKTEST.js",     # READY_SPEC["E"].must
+    # 🔴 2026-09-14 摘除（主人令「候选池 / 金股池是算法**上游水源**，不是策略，不需要回测」）：
+    #   原此二行 `data/CANDIDATE_BACKTEST.js` / `data/GOLD_POOL_BACKTEST.js`（标注
+    #   READY_SPEC["E"].must）随 E 批收敛（5/4/3 → 3/2/1）与产物删除而失效 ⇒ 属**幽灵条目**。
+    #   注意：立表不变式是**单向** `READY_SPEC[*].items ∪ must ⊆ _ALWAYS_PUSH`（超集安全），
+    #   故幽灵条目**不破坏**闸门收敛（不是 P0）；但它是死配置，且本文件 L132-138 已记录过
+    #   同类事故（2026-09-13 该表含 7 项线上不存在的产物）⇒ 按「零幽灵」清除。
+    #   🔧 核验：白名单每条须真实存在于远端树；反向不变式须成立（先单向核验脚本可机器验证）。
     # A 批 must 项同样纳入 —— 不变式要求**零特例**（特例即隐身风险，且无法机器验证）：
     #   龙虎榜虽是真实市场数据、名单理论上每日必变，但 T+1 / 假期补跑档存在
     #   「最新交易日未变 ⇒ 内容剥掉时间戳后与远端相同」的路径 ⇒ 一样会被本去重器丢弃。
