@@ -582,7 +582,14 @@ def main():
         r = ensure(code, s.get("name"), s.get("market"), s.get("board"))
         sig_count = safe_float(s.get("sig_count"))
         qd = bool(s.get("qd"))
-        src_score = sig_count * 0.6
+        # 🔴 2026-09-14 阿狸咪修复（回测驱动·最高ROI）：原 src_score = sig_count*0.6 对所有信号
+        #   （含强负的 trend/jigou）等量计数 → 反向奖励回测亏钱组合（by_signal 0,0,1,1 胜率仅39%、edge -2.42）。
+        #   现改用与 generate_top10.py 同源的 walk-forward T+10 边际加权（jinzuan+8.11/chan+3.68/
+        #   trend-7.54/jigou-10.36）：正edge组合高分、负edge组合压到0（剔除），与回测证据方向一致。
+        _sig_d = s.get("signals", {}) or {}
+        _edge = sum({"jinzuan": 8.11, "chan": 3.68, "trend": -7.54, "jigou": -10.36}.get(k, 0.0)
+                    for k, v in _sig_d.items() if v)
+        src_score = max(0.0, min(4.5, 1.5 + _edge * 0.18))
         if qd:
             src_score += 0.5
         # ── 60min 多周期共振加分（同算法不同时间框架 = 经典共振）──
