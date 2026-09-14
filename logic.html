@@ -2355,7 +2355,15 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p"><code>v8_algo_cloud.yml</code> cron <code>30 10</code> → <code>15 11</code>（UTC，即 CST 19:15），确保龙虎榜/北向/板块资金等全部盘后数据就绪后再跑选股算法；<code>alimi_bell.py</code> 按铃/陈旧检查窗口同步 19:15。候选股池 post_close 档接入外资研投 + mahoro 数据源。</div>
 
         <div class="logic-h">⑤ 算法产物推送范围修复（8/20 晚间指令）</div>
-        <div class="logic-p"><code>time_gate._now_cst()</code> 改 UTC+8 显式计算（runner 时区漂移根因）；<code>api_push_raw.py</code> <code>PUSH_ALGO_RAW=1</code> 允许推送算法 raw 产物；<code>guard_v8_freshness.py</code> 加入 LHB_7D 监控自愈；<code>data/LHB_7D.js</code> 已即时刷新推仓。</div>
+        <div class="logic-p"><code>time_gate._now_cst()</code> 改 UTC+8 显式计算（runner 时区漂移根因）；<code>api_push_raw.py</code> <code>PUSH_ALGO_RAW=1</code> 允许推送算法 raw 产物；<code>guard_v8_freshness.py</code> 加入 LHB_7D 监控自愈；<code>data/LHB_7D.js</code> 已即时刷新推仓。<b style="color:var(--warn,#eab308)">（本行已于 2026-09-14 被下方「⑤-补」取代：LHB_7D 已移出监控自愈面。）</b></div>
+
+        <div class="logic-h">⑤-补 · 监控判据变更（2026-09-14）｜<code>LHB_7D</code> 移出 CORE 自愈面 → 冻结快照</div>
+        <div class="logic-p">
+        <b>背景（为什么 08-20 挂的监控今天必须摘）</b>：<code>LHB_7D</code> 的唯一生产者 <code>algorithms/gen_lhb_7d.py</code> 已于 <b>2026-09-13 主动停跑</b>（<code>run_algorithms.py</code> 从 ORDER/STAGES 摘除调度 + 注释掉调用），<code>index.html</code> 早于 08-31 就停止注入该 VAR（前端零引用）、<code>raw_data/lhb_7d.json</code> 全仓无消费方 ⇒ <b>它已无生产者</b>。但 08-20 那次给它挂的监控仍在：<code>guard_v8_freshness.py</code> 把它<b>同时</b>登记在 <code>CORE_SOURCES_ALGO</code>（阈值 24h）与 <code>ALGO_VARS</code> ⇒ <b>每 30min 必判红 → 必自愈派 <code>v8_algo_cloud</code>，而结构上永远治不好</b> ⇒ 无限红灯 + 空跑 run 抢占同一并发组（本机 <code>v8_urgent_listener</code> 内 guard 与云端 <code>v8_health_patrol</code> 内 guard 各判各的，属双源抢派，同 <code>INDEX_HISTORY</code> 型）。<br>
+        <b>处置</b>：将 <code>LHB_7D</code> 从 <code>CORE_SOURCES_ALGO</code> 与 <code>ALGO_VARS</code> <b>移出</b>，迁入该文件早已预留、语义完全对应的 <code>FROZEN_SOURCES</code>（「无云端生产者的冻结快照」）。<br>
+        <b>行为变化</b>：仍逐轮以 🧊 展示「已停更」（<b>保留可见性、不藏数据</b>），但<b>不再触发自愈派发</b>，也不计入最终 stale（<b>不影响 guard 退出码</b>）；受检模块总数不变（45）。<br>
+        <b>回滚</b>：若日后恢复 <code>gen_lhb_7d.py</code> 调度，把 <code>LHB_7D</code> 一并挪回 <code>CORE_SOURCES_ALGO</code>（阈值 24）与 <code>ALGO_VARS</code> 即可（函数体 <code>step_gen_lhb_7d</code> 一直保留）。
+        </div>
 
         <div class="logic-h">⑥ 本地算法链 vs 云端算法链 审计结论（2026-08-20 主人令一劳永逸）</div>
         <div class="logic-p">
