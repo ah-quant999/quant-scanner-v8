@@ -24,6 +24,7 @@ v8 自愈监控闭环（self_heal_monitor.py）
 import json
 import os
 import re
+import shutil
 import sys
 import subprocess
 import argparse
@@ -43,6 +44,21 @@ PYTHON = "C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts
 
 # 外资研投 token 文件
 ZSXQ_TOKEN_FILE = ROOT / "data" / "zsxq_token.json"
+
+# 🔴 2026-09-11 主人令「怎么又异常了？也没人通知我」一劳永逸修复之二：
+#   根因：token 只存在【仓库工作区】这一处，而本机并发会话/清理类操作会把工作区内
+#   未跟踪的 data/*.json 当成"遗留文件"清掉（git 本身不会删 ignored 文件，
+#   删除来自文件系统层直接操作）→ 文件消失且本地零副本，只能人工重补。
+#   修复：外置权威副本（仓库之外，~/.workbuddy/ 不被仓库清理波及）。
+#   - 仓库缺、外置在 → 自动回填（真自愈，无需人工）；
+#   - 仓库在、外置缺 → 自动补写外置副本（双写保护，静默）；
+#   - 两处皆无/格式非法 → 真异常，走 v8_send_alert.py 发邮件（状态翻转即发，6h 冷却去重）。
+ZSXQ_TOKEN_BACKUP = Path.home() / ".workbuddy" / "v8_zsxq_token.json"
+ALERT_STATE_FILE = Path.home() / ".workbuddy" / "v8_selfheal_alert_state.json"
+TOKEN_ALERT_COOLDOWN_HOURS = 6
+
+# --check-only 模式下禁止一切副作用（不写盘、不发信），保持只读语义
+CHECK_ONLY = False
 
 # 关键数据文件
 CANDIDATE_FILE = RAW_DIR / "candidate.json"
@@ -329,11 +345,12 @@ def check_momentum_filter():
 
 # ── P1-1: zsxq_token 检查 ───────────────────────────────
 
-def check_zsxq_token():
-    if not ZSXQ_TOKEN_FILE.exists():
-        return False, "TOKEN_FILE_MISSING"
+def _token_valid(path):
+    """校验单份 token 文件：返回 (True/False/None, detail)。None = 文件不存在。"""
     try:
-        d = json.load(open(ZSXQ_TOKEN_FILE, encoding="utf-8"))
+        if not path.exists():
+            return None, "TOKEN_FILE_MISSING"
+        d = json.load(open(path, encoding="utf-8"))
         token = d.get("token", "")
         if not token or len(token) < 10:
             return False, "TOKEN_INVALID_FORMAT"
@@ -342,9 +359,123 @@ def check_zsxq_token():
         return False, "TOKEN_PARSE_ERROR: " + str(e)
 
 
+def _read_alert_state():
+    try:
+        return json.load(open(ALERT_STATE_FILE, encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _write_alert_state(state):
+    try:
+        ALERT_STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(ALERT_STATE_FILE, "w", encoding="utf-8") as f:
+            json.dump(state, f, ensure_ascii=False)
+    except Exception as e:
+        log("告警状态写入失败(不影响主流程): " + str(e), "WARN")
+
+
+def _alert_token_lost(det_repo, det_backup):
+    """真异常（两处皆无 token）→ 邮件告警。状态翻转即发；同状态 6h 内冷却去重。
+    告警失败绝不阻断主流程（自愈脚本不能因为发不出邮件而崩）。"""
+    state = _read_alert_state()
+    last_state = state.get("zsxq_state")
+    last_alert = state.get("zsxq_last_alert", "")
+    now = now_cst()
+
+    cooled = False
+    if last_state == "bad" and last_alert:
+        try:
+            last_dt = datetime.fromisoformat(last_alert)
+            cooled = (now - last_dt) < timedelta(hours=TOKEN_ALERT_COOLDOWN_HOURS)
+        except Exception:
+            cooled = False
+
+    state["zsxq_state"] = "bad"
+    state["zsxq_last_seen_bad"] = now.isoformat()
+
+    if cooled:
+        log("P1-1 真异常但处于 6h 告警冷却内(上轮已发)，本轮不重复发信", "WARN")
+        _write_alert_state(state)
+        return
+
+    subject = "[v8自愈] zsxq_token 本地丢失 —— 观澜台本地抓取停摆，需补 token"
+    body = (
+        "自愈监控（self_heal_monitor.py，每 10 分钟一轮）检测到：\n\n"
+        "  P1-1  zsxq_token 两处皆不可用 → 真异常（非例行计数）\n"
+        "    仓库内 : " + str(ZSXQ_TOKEN_FILE) + "  → " + str(det_repo) + "\n"
+        "    外置副本: " + str(ZSXQ_TOKEN_BACKUP) + "  → " + str(det_backup) + "\n\n"
+        "影响面：\n"
+        "  · 生产零影响 —— 云端 GitHub Secret ZSXQ_TOKEN 仍在兜底，主站外资研投数据正常；\n"
+        "  · 本机侧 —— 观澜台(guanlan_extractor)本地抓取将失败，P0-1 自愈能力降级。\n\n"
+        "恢复步骤（1 分钟）：\n"
+        "  1. 浏览器登录 wx.zsxq.com；\n"
+        "  2. F12 → Application → Cookies → https://wx.zsxq.com；\n"
+        "  3. 复制 zsxq_access_token（UUID_哈希，约 53 字符；不是 xq_a_token）；\n"
+        "  4. 交给小九写入 data/zsxq_token.json（会自动同步一份外置副本）。\n\n"
+        "触发时间: " + now.strftime("%Y-%m-%d %H:%M:%S") + " (CST)\n"
+        "来源: self_heal_monitor.py P1-1"
+    )
+    try:
+        sys.path.insert(0, str(ROOT))
+        from v8_send_alert import send_alert
+        send_alert(subject, body, level="infra")
+        state["zsxq_last_alert"] = now.isoformat()
+        log("P1-1 真异常已发邮件告警(level=infra)", "ALERT")
+    except Exception as e:
+        log("P1-1 邮件告警发送失败: " + str(e), "WARN")
+    _write_alert_state(state)
+
+
+def check_zsxq_token():
+    """返回 (ok, detail)。ok=True 时保证仓库内文件可用（必要时已自动回填）。"""
+    ok, det = _token_valid(ZSXQ_TOKEN_FILE)
+    if ok:
+        # 仓库在、外置副本缺 → 静默补一份（双写保护，下次被清理即可自愈）
+        if not ZSXQ_TOKEN_BACKUP.exists():
+            try:
+                ZSXQ_TOKEN_BACKUP.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ZSXQ_TOKEN_FILE, ZSXQ_TOKEN_BACKUP)
+                log("P1-1 已补写外置副本: " + str(ZSXQ_TOKEN_BACKUP), "OK")
+            except Exception as e:
+                log("P1-1 外置副本补写失败(不影响本轮): " + str(e), "WARN")
+        # 恢复干净态：状态翻转记录复位（下次再坏 = 立即告警）
+        st = _read_alert_state()
+        if st.get("zsxq_state") == "bad":
+            st["zsxq_state"] = "ok"
+            st["zsxq_last_recovered"] = now_cst().isoformat()
+            _write_alert_state(st)
+        return True, det + " [仓库]"
+
+    bok, bdet = _token_valid(ZSXQ_TOKEN_BACKUP)
+    if bok:
+        if CHECK_ONLY:
+            # 仅检查模式：不写盘、不发信，只如实报告（保持 --check-only 的只读语义）
+            return True, bdet + " [外置副本可用(仅检查,未回填)]"
+        try:
+            ZSXQ_TOKEN_FILE.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ZSXQ_TOKEN_BACKUP, ZSXQ_TOKEN_FILE)
+            st = _read_alert_state()
+            st["zsxq_state"] = "ok"
+            st["zsxq_last_recovered"] = now_cst().isoformat()
+            _write_alert_state(st)
+            log("P1-1 仓库 token 缺失，已从外置副本自动回填（真自愈）", "HEAL")
+            return True, bdet + " [已从外置副本回填]"
+        except Exception as e:
+            _alert_token_lost(det, "回填失败: " + str(e))
+            return False, "仓库缺失且回填失败: " + str(e)
+
+    if CHECK_ONLY:
+        return False, det + " / 外置副本: " + bdet
+    _alert_token_lost(det, bdet)
+    return False, det + " / 外置副本: " + bdet
+
+
 # ── 主流程 ──────────────────────────────────────────────
 
 def run_check_only():
+    global CHECK_ONLY
+    CHECK_ONLY = True
     results = {}
     has, sd, total, det = check_candidate_guanlan()
     results["candidate_guanlan"] = {"ok": has, "detail": det, "source_dist": sd, "total": total}

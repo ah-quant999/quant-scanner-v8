@@ -542,6 +542,37 @@ def _backfill_candidate(root: str, ref: dt.date):
             pready)
 
 
+def _backfill_feasible(root: str, stage: str, tday: dt.date) -> bool:
+    """回填目标日 tday 时，stage 是否可能被「有意义地」补跑。
+
+    🔴🔴 2026-09-14 P0 修复（回填死锁根治）：
+    盘后批次（cloud_fetch / run_algorithms）产出的产物以「实际运行时刻」打 update_time，
+    而非「数据日」。因此回填一个过去的数据日 T 时，若其**上游输入链**
+    （PREREQ 链 + 自身采集输入）中任一文件的日期已严格晚于 T（被后续日覆盖），
+    重跑该 stage 只会把更新日期的产物再写一遍 → 永远填不上 T → 无意义 → 判不可能。
+    只有上游链仍停留在 T（或缺失）时，补跑才可能产出 T 日产物。
+
+    等价判据：stage 的全部上游输入里，不存在日期 > T 的项。
+    （A 批无 PREREQ，自身采集输入即其上游；其余批沿 PREREQ 向上追溯整条链。）
+    """
+    s = stage
+    items = []
+    while s is not None:
+        items.extend(READY_SPEC[s]["items"])
+        s = PREREQ.get(s)
+    for it in items:
+        r = read_ut(root, it)
+        if r is None:
+            continue
+        for c in _cand(r):
+            try:
+                if dt.date.fromisoformat(c[0]) > tday:
+                    return False
+            except (ValueError, TypeError):
+                return False
+    return True
+
+
 def decide(root: str, now: dt.datetime, explicit: str, force: bool):
     hh, mm = now.hour, now.minute
     ref = now.date()
@@ -600,26 +631,42 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool):
         day, kind, note, ready = _bf
 
     # ── 3) 自愈：缺什么跑什么（纯内容级 · 一环套一环）────────────────────────
-    if not ready["A"][0]:
-        if _escape[0]:
-            # 🚪 逃生门开启：不先跑 A（上游源已长坏，再跑也是白跑），直接放行 B→D，
-            #    让「带数据降级标记的最终推荐」先出得来（可见标记 ≠ 假成功）。
-            #    ⚠️ rdy 的值会被 main() 逐行写成 `KEY=VALUE` 并 source 进 shell，
-            #       故此处只放**不含空格/换行**的安全值；可读原因放 reason（单行）。
+    # 🔴🔴 2026-09-14 P0 修复（回填死锁根治）：
+    #   回填模式下，若某 stage 的上游输入链（PREREQ 链 + 自身采集输入）已被后续日
+    #   覆盖（日期严格晚于回填目标日），重跑只会产出更新日期的产物，永远填不上目标日
+    #   → 该 stage 不可能回填 → 跳过；四个非就绪 stage 全不可能 → 返回 NONE（等本日起点）。
+    _is_backfill = (day != (now.date() if hh >= _NIGHT_CUT
+                                  else now.date() - dt.timedelta(days=1)))
+    _stages_to_try = ["A", "B", "D", "E"]
+    for _s in _stages_to_try:
+        if ready[_s][0]:
+            continue
+        if _is_backfill and not _backfill_feasible(root, _s, day):
+            continue  # 上游已全被后续日覆盖 → 回填不可能，跳过该 stage
+
+        # 原有放行逻辑（逃生门 + 正常）
+        if _s == "A" and _escape[0]:
             return ("B", True,
                     f"A 未就绪({ready['A'][1]})，但{_escape[1]}；"
                     f"→ 本轮跑选股批 B（降级放行，D 批将据此后继放行）",
                     day, kind, dict(out(), DEGRADED_UPSTREAM="1",
                                     degrade_lag_days=str(_escape[2])))
-        return ("A", True, f"A 未就绪({ready['A'][1]}) → 跑采集批", day, kind, out())
-    if not ready["B"][0]:
-        return ("B", True, f"A 就绪({ready['A'][1]}) B 未就绪({ready['B'][1]}) → 跑选股批", day, kind, out())
-    if not ready["D"][0]:
-        return ("D", True, f"B 就绪({ready['B'][1]}) D 未就绪({ready['D'][1]}) → 跑汇总批（最终推荐）",
-                day, kind, out())
-    if not ready["E"][0]:
-        return ("E", True, f"D 就绪({ready['D'][1]}) E 未就绪({ready['E'][1]}) → 跑回测批", day, kind, out())
-    return ("NONE", True, "✅ 四批产物均已就绪 → 空转（合规，真成功）", day, kind, out())
+        _reason_map = {
+            "A": f"A 未就绪({ready['A'][1]}) -> 跑采集批",
+            "B": f"A 就绪({ready['A'][1]}) B 未就绪({ready['B'][1]}) -> 跑选股批",
+            "D": f"B 就绪({ready['B'][1]}) D 未就绪({ready['D'][1]}) -> 跑汇总批(最终推荐)",
+            "E": f"D 就绪({ready['D'][1]}) E 未就绪({ready['E'][1]}) -> 跑回测批",
+        }
+        return (_s, True, _reason_map[_s], day, kind, out())
+
+    # 所有非就绪 stage 都不可能回填？
+    if _is_backfill:
+        _imp = [s for s in ("A","B","D","E") if not ready[s][0]]
+        if _imp:
+            return ("NONE", True,
+                    f"回填目标 {day} 的 {_imp} 全被后续日覆盖->不可能->空转等本日起点",
+                    day, kind, out())
+    return ("NONE", True, "四批产物均已就绪 -> 空转（合规，真成功）", day, kind, out())
 
 
 def main() -> int:
