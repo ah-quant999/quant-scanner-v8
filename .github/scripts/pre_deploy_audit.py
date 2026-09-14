@@ -14,6 +14,11 @@ v8 Pre-deploy audit（CI 自动门禁，2026-09-05 主人令一劳永逸落地�
   5. workflow YAML     —— .github/workflows/*.yml 对 GitHub 真正有效
                           （2026-09-11 新增：`3ce9dd972` 丢 run 块内一行缩进
                           致整份 workflow 无效 → schedule 不触发/dispatch 被拒）
+  6. HTML 数据引用     —— 4 页 <script src> 本地引用真实存在（防 404 断链复发）
+  7. gate 头注一致     —— v8_stage_gate.py 头注与 READY_SPEC 真源一致（项数/门槛/P0 专项）
+  8. 心跳产物名一致    —— HB_*.js 字面量大小写与 update_v8 权威名对齐
+                          （2026-09-14 新增：小写 `hb_xiaojiu.js` 在 Windows 侥幸能过，
+                           换 Linux/mac 必 silent 判掉线）
 
 退出码：
   0  全部通过
@@ -199,6 +204,12 @@ def check_html_refs():
     index.html、漏扫 logic.html** ⇒ 三个真 404 长期挂在线上：
 
         index.html : data/hb_xiaojiu.js（大小写错，实产 HB_XIAOJIU.js）
+                    ↳ 🔵 2026-09-14 已闭环（实测：index.html 已是正确大写
+                      `data/HB_XIAOJIU.js`；全站 4 页**无任何小写 script 引用**）。
+                      ⇒ **不再是 404**；上方列举仅作历史记录。
+                      ⚠️ 另注：小写字面量当时还残留在 `v8_peer_monitor.py:HB_FILE`
+                        与 `update_v8.py:112` 的注释里（已随 2026-09-14 午休一轮修掉），
+                        并新增第 8 项门禁「心跳产物名一致」防漂移复发。
         logic.html : data/ETF_SUBSCRIPTION_EM.js
         logic.html : data/ALGO_BACKTEST_COMPARE.js
                     ↳ 🔵 2026-09-13 已闭环：该引用**已恢复且文件已重新产出**
@@ -240,6 +251,134 @@ def check_html_refs():
         return (False, "发现 %d 处 404 断链（引用文件不存在）:\n    " % len(uniq)
                 + "\n    ".join(uniq[:8]))
     return (True, "%d 个本地 script 引用全部存在（4 页）" % checked)
+
+def check_heartbeat_name_consistency():
+    """心跳产物名一致性门禁（2026-09-14 新增·第 2 条配套）。
+
+    🔴 背景（2026-09-14 P1 血泪）：
+      `v8_peer_monitor.py` 的 `HB_FILE` 写成小写 `data/hb_xiaojiu.js`，而实产是
+      大写 `data/HB_XIAOJIU.js`（update_v8 映射产物）。
+      Windows/NTFS 大小写不敏感 ⇒ 本机侥幸能打开；**换 Linux/mac 必 exists()==False
+      ⇒ 沉默判 9999 分钟掉线**。这类跨平台雷 py_compile 查不出、HTML 引用查不出，
+      只有本项能拦。
+
+    做法：
+      1) 以「真产/映射」为准取权威名 —— 从 `update_v8.py` 的 DATA_SOURCES 里读出
+         `<raw>.json -> <VAR>` 中所有以 `HB_` 开头的**值**（大写真源）；
+      2) 全仓扫 `.py`/`.html`/`.js`/`.yml` 里出现的 `hb_<something>.js` /
+         `HB_<something>.js` 字面量，**但先剔除注释与文档字符串**：
+         · `.py`：用 `tokenize` 剥掉 COMMENT，并剥掉「独占整行起头的三引号 docstring」；
+           **保留普通字符串字面量**（`"data/hb_xiaojiu.js"` 正是本项要抓的目标）；
+         · `.html`/`.js`：剥掉 `<!-- -->`、`//`、`/* */`；
+         · `.yml`：剥掉 `#` 注释。
+         理由：本项只应抓「真被当作产物路径用的字面量」，注释/说明里提历史旧名
+         是**合法**的（本文件自身头注就举了历史反向例子）—— 否则门禁必误报，
+         反过来逼人删注释，属本末倒置。
+      3) 凡剩下的字面量**大小写**与权威名不一致 → 报。
+         （`raw_data/hb_*.json` 小写是**契约**，本项只比对 `.js`。）
+
+    ⚠️ 已知边界：本项是「字面量大小写」检查，不是「运行时存在性」检查。
+       运行时路径由 `check_html_refs`（第 6 项）负责，二者互补不重叠。
+
+    纯标准库实现（守本文件「零依赖可用」铁律）。
+    """
+    # 1) 权威大写名：从 update_v8.py 的 DATA_SOURCES 抽 HB_* 值
+    auth_names = set()
+    upd = ROOT / "update_v8.py"
+    if upd.exists():
+        try:
+            txt = upd.read_text(encoding="utf-8", errors="replace")
+            for m in re.finditer(r'"([A-Za-z0-9_]+\.json)"\s*:\s*"(HB_[A-Z0-9_]+)"', txt):
+                auth_names.add(m.group(2))
+        except Exception:
+            pass
+    # 兜底：即使解析失败，也认这两个契约名（防止门禁因真源改写而失明）
+    auth_names |= {"HB_XIAOJIU", "HB_ALIMI"}
+
+    skip_dirs = {"__pycache__", ".git", "node_modules", ".workbuddy", "_archive", "backup"}
+    exts = {".py", ".html", ".htm", ".js", ".yml", ".yaml"}
+    pat = re.compile(r"\b([Hh][Bb]_[A-Za-z0-9_]+)\.js\b")
+
+    def _strip_py(text):
+        """剥掉 Python 注释与**独占行的三引号 docstring**，保留普通字符串字面量。"""
+        import io, tokenize
+        _SQ3 = chr(39) * 3
+        _DQ3 = chr(34) * 3
+        lines = text.splitlines(keepends=True)
+        drop = set()
+        try:
+            toks = list(tokenize.generate_tokens(io.StringIO(text).readline))
+        except Exception:
+            toks = []
+        if not toks:
+            return "\n".join(re.sub(r"#.*$", "", ln) for ln in lines)
+        for tok in toks:
+            ttype, tstr, (srow, _c), (erow, _e), _l = tok
+            if ttype == tokenize.COMMENT:
+                drop.add(srow)
+            elif ttype == tokenize.STRING and tstr[:3] in (_SQ3, _DQ3):
+                head = lines[srow - 1] if srow - 1 < len(lines) else ""
+                if head.lstrip()[:3] in (_SQ3, _DQ3):
+                    for r in range(srow, erow + 1):
+                        drop.add(r)
+        return "".join("" if i in drop else ln for i, ln in enumerate(lines, start=1))
+
+    def _strip_js(text):
+        text = re.sub(r"/\*.*?\*/", " ", text, flags=re.S)
+        text = re.sub(r"<!--.*?-->", " ", text, flags=re.S)
+        out = []
+        for ln in text.splitlines():
+            if "//" in ln:
+                q = 0; cut = None; i = 0
+                while i < len(ln) - 1:
+                    c = ln[i]
+                    if c in "\"'`":
+                        q = 0 if q else 1
+                    elif c == "/" and ln[i + 1] == "/" and not q:
+                        cut = i; break
+                    i += 1
+                if cut is not None:
+                    ln = ln[:cut]
+            out.append(ln)
+        return "\n".join(out)
+
+    def _strip_yml(text):
+        return "\n".join(re.sub(r"(?<!\S)#.*$", "", ln) for ln in text.splitlines())
+
+    strip = {".py": _strip_py, ".html": _strip_js, ".htm": _strip_js,
+             ".js": _strip_js, ".yml": _strip_yml, ".yaml": _strip_yml}
+
+    offenders = []
+    for sub in [".", ".github/scripts", "scripts", "v8", "algorithms", "docs"]:
+        d = (ROOT / sub) if sub != "." else ROOT
+        if not d.exists():
+            continue
+        for fp in d.rglob("*"):
+            if not fp.is_file() or fp.suffix.lower() not in exts:
+                continue
+            if any(part in skip_dirs for part in fp.parts):
+                continue
+            try:
+                raw = fp.read_text(encoding="utf-8", errors="replace")
+            except Exception:
+                continue
+            try:
+                scanned = strip.get(fp.suffix.lower(), lambda x: x)(raw)
+            except Exception:
+                scanned = raw
+            for m in pat.finditer(scanned):
+                lit = m.group(1)
+                if lit in auth_names:
+                    continue
+                if lit.upper() in auth_names:
+                    rel = fp.relative_to(ROOT).as_posix()
+                    offenders.append("%s : %s.js（应大写 %s.js）" % (rel, lit, lit.upper()))
+    if offenders:
+        uniq = sorted(set(offenders))
+        return (False, "心跳产物名大小写漂移 %d 处（跨平台会 silent 判掉线）:\n    " % len(uniq)
+                + "\n    ".join(uniq[:6]))
+    return (True, "心跳产物名大小写一致（权威 %s，全仓 0 处漂移）" % "/".join(sorted(auth_names)))
+
 
 def write_audit_log(results, exit_code):
     """落盘三件套审计轨迹到 raw_data/code_audit.log（append）。
@@ -340,16 +479,17 @@ def check_gate_headnote():
 
 def main():
     checks = [
-        ("[1/6] py_compile", check_py_compile),
-        ("[2/6] new Function", check_new_function),
-        ("[3/6] data 完整性", check_data_integrity),
-        ("[4/6] align_logic_ops", check_align_logic_ops),
-        ("[5/6] workflow YAML", check_workflow_yaml),
-        ("[6/6] HTML 数据引用", check_html_refs),
-        ("[7/7] gate 头注一致", check_gate_headnote),
+        ("[1/8] py_compile", check_py_compile),
+        ("[2/8] new Function", check_new_function),
+        ("[3/8] data 完整性", check_data_integrity),
+        ("[4/8] align_logic_ops", check_align_logic_ops),
+        ("[5/8] workflow YAML", check_workflow_yaml),
+        ("[6/8] HTML 数据引用", check_html_refs),
+        ("[7/8] gate 头注一致", check_gate_headnote),
+        ("[8/8] 心跳产物名一致", check_heartbeat_name_consistency),
     ]
     print("=" * 60)
-    print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；2026-09-13 扩至 6 项；2026-09-14 扩至 7 项）")
+    print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；2026-09-13 扩至 6 项；2026-09-14 扩至 8 项）")
     print("=" * 60)
     fails = 0
     results = []
@@ -368,7 +508,7 @@ def main():
         for e in errors:
             print(f"  - {e}")
         sys.exit(1)
-    print("🎉 7 项全部通过 → deploy 可继续")
+    print("🎉 8 项全部通过 → deploy 可继续")
     sys.exit(0)
 
 

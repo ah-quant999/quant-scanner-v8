@@ -621,7 +621,7 @@ def write_heartbeat(overall):
 
 def push_heartbeat_file(path):
     """🆕 2026-09-12 主人令：经 Contents API 把 hb_xiaojiu.json 推到 raw_data/（与 push_status_file 同源）。
-    推送后云端 build 经 update_v8 生成 data/hb_xiaojiu.js，阿狸咪 v8_peer_monitor 即可读取。"""
+    推送后云端 build 经 update_v8 生成 data/HB_XIAOJIU.js（大写，跨平台一致），阿狸咪 v8_peer_monitor 即可读取。"""
     token = _load_token()
     if not token:
         return False, "无 GitHub token，无法推送心跳"

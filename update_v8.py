@@ -109,7 +109,14 @@ DATA_SOURCES = {
     "sh_sz_history.json":         "SH_SZ_HISTORY",
     "ai_market_brief.json":        "AI_MARKET_BRIEF",
     "runner_status.json":          "RUNNER_STATUS",
-    "hb_xiaojiu.json":             "HB_XIAOJIU",     # 🆕 2026-09-12 主人令：小九心跳 raw_data -> data/hb_xiaojiu.js (window.HB_XIAOJIU)
+    # ⚠️ 产物名一律**大写** HB_XIAOJIU.js（与实产/前端/pre_deploy_audit 第 8 项门禁一致）；
+    #    原先注释写成小写 hb_xiaojiu.js 属笔误，2026-09-14 午休更正（曾致 v8_peer_monitor
+    #    HB_FILE 照抄小写 → Windows 侥幸能过、换 Linux/mac 必 silent 判掉线）。
+    "hb_xiaojiu.json":             "HB_XIAOJIU",     # 🆕 2026-09-12 主人令：小九心跳 raw_data -> data/HB_XIAOJIU.js (window.HB_XIAOJIU)
+    # 🆕 2026-09-14 主人令（反向心跳·第 5 条我方半）：阿狸咪心跳 raw_data/hb_alimi.json -> data/HB_ALIMI.js
+    #   发送侧（写 raw_data/hb_alimi.json）由阿狸咪独占落地，我方只挂注入映射 + 接收侧镜像判定。
+    #   她尚未推该文件时，本映射查无源文件 → 静默跳过、不产 data/HB_ALIMI.js（无害）。
+    "hb_alimi.json":               "HB_ALIMI",
     "risk_gauge.json":             "RISK_GAUGE",
     # 🛡 2026-09-08 一劳永逸式根因修复：STOCK_QUOTE.js 由独立工作流 v8_stock_quote_refresh.yml 独占产出
     #   （fetch_stock_quote_v8.py -> 写入 data/STOCK_QUOTE.js），不调用本脚本。若仍挂此映射，cn_fetch 跑 update_v8
@@ -233,6 +240,7 @@ CATEGORY_MAP = {
     # 2026-09-11 P3：ETF_SUBSCRIPTION_EM 全链下线（孤儿死链，见 DATA_SOURCES 顶部说明）
     "RUNNER_STATUS": "premarket,intraday,post_close",  # 任务跟踪看板：每轮抓取都写，全时段
     "HB_XIAOJIU": "intraday,post_close",            # 🆕 2026-09-12 主人令：小九心跳实时，盘中+盘后双档重建
+    "HB_ALIMI": "intraday,post_close",              # 🆕 2026-09-14 主人令：阿狸咪心跳（反向），档位照抄 HB_XIAOJIU
     # 🛡 2026-09-11 小九的股票专家 一劳永逸（主人令·「市场资金流向」盘中红灯）：
     #   原只标 post_close → _pure_pc=True → data/MARKET_FUND_FLOW_DATA.js 仅由
     #   17:20/18:20/19:20 三档 --category post_close 构建重建。
