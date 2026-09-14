@@ -42,7 +42,7 @@ def main():
 
     payload = {
         "modules": _MODULES,
-        "update_time": today,                  # ← 健康检查红线
+        "update_time": now_hms,                # ← 完整时间戳(2026-09-14 一劳永逸：此前纯日期戳致 sanity 判 born-stale)                  # ← 健康检查红线
         "note": "实验模块去向由主人拍板；新增模块请改 scripts/build_unlisted_panel.py",
         "meta": {                              # ← CARD_DEFS key_fields ["modules","meta"] 要求 meta 必填
             "schema_version": 1,

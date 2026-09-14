@@ -51,6 +51,7 @@ STALE_OK = {
     "CONCEPT_ETF_MAP",        # 映射表，低频变更
     "DO_NOT_DELETE",
     "maharo_macro",           # 2026-09-08 一劳永逸：本机 cookie 拉取(云端无权限)，家里机离线会陈旧，非失真
+    "UNLISTED_PANEL",         # 2026-09-14 一劳永逸：暂未上架模块索引(手动维护/manual_dep=True/非行情数据)，与 PORTFOLIO/WATCHLIST 同属参考清单，豁免新鲜度对账
 }
 # 🛡 2026-09-13 一劳永逸：关键数据文件**存在性**清单。
 #   原脚本用 data_dir.glob("*.js") 扫描 ⇒ 文件被删就压根不在扫描范围 ⇒ 静默漏检。
