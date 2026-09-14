@@ -1,13 +1,19 @@
 {
-"update_time": "2026-09-13 19:34:55",
-"total": 6824,
-"new_listings_count": 0,
+"update_time": "2026-09-14 15:57:14",
+"total": 6829,
+"new_listings_count": 5,
 "delisted_count": 0,
-"new_listings": [],
+"new_listings": [
+"512740 N汽车零部件ETF广发",
+"562150 N红利质量ETF鹏华",
+"562170 N沪深300现金流ETF易方达",
+"158032 化工ETF景顺",
+"159025 家电ETF华安"
+],
 "delisted": [],
-"meta_enriched": 0,
+"meta_enriched": 5,
 "guard_tripped": false,
 "guard_reasons": [],
 "old_universe": 6824,
-"fresh_universe": 6824
+"fresh_universe": 6829
 }
