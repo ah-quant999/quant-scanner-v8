@@ -13068,6 +13068,32 @@ window.showRestrictedItems = showRestrictedItems;
     var el=(typeof $==='function')?$('unlistedPanel'):document.getElementById('unlistedPanel');
     if(!el) return;
     // 🛡 2026-08-26 一劳永逸：提前暴露 __ulSwitch，子 tab 按钮在 renderUnlisted 任何位置抛错后仍可切换
+    // ═══ 🛡 2026-09-14 阿狸咪的工程师：暂未上架子页「卡片渲染派发器」（单一真源 · 一劳永逸）═══
+    //   根因：_renderPostReady() 只在 DOMContentLoaded 跑一次，那时 unlistedPanel 是空壳，
+    //         5 张卡的渲染函数全部因 dst 缺失提前 return（dst 判空在重试逻辑之前 ⇒ 连重试都没布上）；
+    //         用户随后进「暂未上架」时 renderUnlisted 只建骨架，__ulSwitch 的 observe 分支还是空块
+    //         ⇒ 无人再叫渲染函数 ⇒ 卡面永久「加载中…」（真浏览器实测复现）。
+    //   本函数即两个子页唯一的派发入口，`__ulSwitch` 与 `__ulSelfHealTimer` 都只调它。
+    window.__ulRenderPane = function(tab){
+      tab = tab || window.__ulActivePane || 'observe';
+      if(tab !== 'observe' && tab !== 'market') tab = 'observe';
+      var names = (tab==='market')
+        ? ['__renderElliottWave', '__renderCiticPeObserve', '__renderIndexObserve']
+        : ['__renderThemeValue', '__renderAiInsightsCompare'];
+      var probe = document.getElementById(tab==='market' ? 'elliottWaveBody' : 'themeValueBody');
+      if(probe) probe.setAttribute('data-ulpane', tab);
+      var out = [];
+      for(var i=0;i<names.length;i++){
+        var k = names[i];
+        if(typeof window[k]==='function'){
+          try{ window[k](); out.push(k+':ok'); }catch(e){ out.push(k+':THROW'); }
+        }else{
+          out.push(k+':nofn');
+        }
+      }
+      try{ console.log('[ulRenderPane] ' + tab + ' -> ' + out.join(', ')); }catch(e){}
+      return out.join(',');
+    };
     window.__ulSwitch = function(btn, tab){
       window.__ulActivePane = tab;  // guard: 记住当前子 tab，重渲染不再 snap-back
       // 2026-09-14 主人令：暂未上架拆为「观测类 / 大盘观察」两子页
@@ -13079,19 +13105,24 @@ window.showRestrictedItems = showRestrictedItems;
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
       if(btn) btn.classList.add('active');
       // 切到对应子页时兜底触发该页全部卡片渲染，避免 defer 数据未到导致空卡。
-      if(tab==='observe'){
-      }
-      if(tab==='market'){
-        if(typeof window.__renderElliottWave==='function'){ try{ window.__renderElliottWave(); }catch(e){} }
-        if(typeof window.__renderCiticPeObserve==='function'){ try{ window.__renderCiticPeObserve(); }catch(e){} }
-        if(typeof window.__renderIndexObserve==='function'){ try{ window.__renderIndexObserve(); }catch(e){} }
-      }
+      // 🛡 2026-09-14 阿狸咪的工程师：两个子页统一走派发器（原先 observe 分支是空块 ⇒ 主题空间/AI洞察永久「加载中…」）
+      if(typeof window.__ulRenderPane==='function'){ try{ window.__ulRenderPane(tab); }catch(e){} }
     };
     if(!window.__ulSelfHealTimer){
       window.__ulSelfHealTimer=setInterval(function(){
         var p=document.getElementById('unlistedPanel');
         if(!p) return;
-        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneObserve')>=0) return; // 已渲染成功停止（2026-09-12：判据改为观测类容器 ulPaneObserve —— 因子/回测/宏观三子页已迁出，沿用旧判据 ulPaneFactor 会永假 → 无限重渲刷屏）
+        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneObserve')>=0){
+          // 🛡 2026-09-14 阿狸咪的工程师：骨架就绪后派发一次「当前子页」的卡片渲染。
+          //   幂等：data-ulpane 标记 === 当前子页 就跳过（防每 1.5s 重渲刷屏）；
+          //   renderUnlisted 重建 innerHTML 会丢标记 ⇒ 自动再派发一次，无需人工干预。
+          var _t = window.__ulActivePane || 'observe';
+          var _probe = document.getElementById(_t==='market' ? 'elliottWaveBody' : 'themeValueBody');
+          if(_probe && _probe.getAttribute('data-ulpane') !== _t && typeof window.__ulRenderPane==='function'){
+            try{ window.__ulRenderPane(_t); }catch(e){}
+          }
+          return;
+        } // 已渲染成功停止（2026-09-12：判据改为观测类容器 ulPaneObserve —— 因子/回测/宏观三子页已迁出，沿用旧判据 ulPaneFactor 会永假 → 无限重渲刷屏）
         if(typeof window.renderUnlisted==='function'){
           console.log('[ulSelfHeal] retry renderUnlisted len='+p.innerHTML.length);
           try{ window.renderUnlisted(); }catch(e){ console.warn('[ulSelfHeal] rethrow:',e.message); }
