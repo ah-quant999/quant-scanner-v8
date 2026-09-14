@@ -1,7 +1,7 @@
 {
   "first_run": "2026-08-20 09:06:19",
   "generated": "2026-08-20 09:06:19",
-  "update_time": "2026-09-14 21:32:07",
+  "update_time": "2026-09-15 04:45:46",
   "by_date": {
     "2026-08-19": {
       "picks": [],
@@ -4479,6 +4479,28 @@
     "2026-09-14": {
       "picks": [
         {
+          "code": "601199",
+          "pick_date": "2026-09-14",
+          "base_close": 6.79,
+          "samples": 0,
+          "T+1": null,
+          "T+1_hit": null,
+          "T+3": null,
+          "T+3_hit": null,
+          "T+5": null,
+          "T+5_hit": null,
+          "T+10": null,
+          "T+10_hit": null,
+          "best_T_plus": null,
+          "best_pct": null,
+          "name": "江南水务",
+          "industry": "水的生产和供应业",
+          "pct_at_pick": 4.95,
+          "vol_ratio_at_pick": 807.415,
+          "board_at_pick": "主板",
+          "price_at_pick": 6.79
+        },
+        {
           "code": "600207",
           "pick_date": "2026-09-14",
           "base_close": 5.1,
@@ -5535,20 +5557,20 @@
           "price_at_pick": 17.62
         }
       ],
-      "n": 48,
+      "n": 49,
       "T+1_hit": 0,
       "T+3_hit": 0,
       "T+5_hit": 0,
       "T+10_hit": 0,
-      "tracked_at": "2026-09-14 21:26:34",
+      "tracked_at": "2026-09-15 04:45:34",
       "T+1_rate": 0.0,
       "T+5_rate": 0.0,
-      "backfilled_at": "2026-09-14 21:32:05"
+      "backfilled_at": "2026-09-15 04:45:44"
     }
   },
   "summary": {
     "days": 5,
-    "tracked_picks": 246,
+    "tracked_picks": 247,
     "T+1_hit": 18,
     "T+3_hit": 14,
     "T+5_hit": 19,
@@ -5557,7 +5579,7 @@
     "T+5_rate": 7.7,
     "T+10_rate": 0.0
   },
-  "last_updated": "2026-09-14 21:32:07",
+  "last_updated": "2026-09-15 04:45:46",
   "expert_by_date": {
     "2026-08-29": {
       "picks": [],
@@ -6554,10 +6576,10 @@
       "T+3_hit": 0,
       "T+5_hit": 0,
       "T+10_hit": 0,
-      "tracked_at": "2026-09-14 21:28:30",
+      "tracked_at": "2026-09-15 04:45:36",
       "T+1_rate": 0.0,
       "T+5_rate": 0.0,
-      "backfilled_at": "2026-09-14 21:32:07"
+      "backfilled_at": "2026-09-15 04:45:46"
     }
   },
   "expert_summary": {
