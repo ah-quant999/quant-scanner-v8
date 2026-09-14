@@ -12,6 +12,10 @@
     而远端 `FETCH_HEAD` 已是「逐信号峰谷再取均值」；
   · 抽查 6 个关键文件，`git hash-object --no-filters` 与 `git rev-parse FETCH_HEAD:<f>`
     **6/6 全部不等**；
+    〔2026-09-14 按语〕上面那次抽查用的是**当时的** `--no-filters` 口径；该口径已被证伪并
+    改为 filter-aware 的 `--path`（见 `_worktree_blob` 注释）—— 上面 6/6 全不等的结论
+    在当时那个「本机代码确实落后」的场景下成立，但 `--no-filters` 会把**行尾差异**
+    误判成代码落后（index.html 恒不齐即由此而来）。
   · 于是本机 E 批（12:58 写 `backtest_all_algos.json`）产出的
     `max_drawdown` 会重新出现 −100% 以下的量纲错误值。
 
@@ -29,6 +33,9 @@
 
 ■ 说明
   · `V8_SKIP_WS_GUARD=1` 可整体跳过（逃生舱；正常情况不要设）。
+  · 🔴 2026-09-14：`--heal` 时会**先单独拉齐 `.gitattributes`**（行尾规则文件），
+    再走原有的备份/拉齐/复检流程 —— 否则 index.html 会因本机规则陈旧而恒不齐，
+    导致整条盘后算法链恒被中止（详见 _heal_rules_first 注释）。
   · 只比对**脚本/页面**这类「跑批输入」，**不碰 `raw_data/` `data/` `out/`** 产物目录。
   · 备份目录在仓库外，不进 git、不被坚果云同步。
 """
@@ -44,6 +51,12 @@ REPO = r"E:\workspace\stock-scanner"
 # 🔴 跑批输入的关键脚本/页面白名单。只列「被跑批直接执行或直接被前端消费」的文件，
 #   不列产物（raw_data/ data/ out/）。
 CRITICAL = [
+    # 🔴 2026-09-14：**行尾规则文件必须在这里**。git 决定「checkout 写 LF 还是 CRLF」
+    #   读的是工作区里的 .gitattributes；它不在白名单里 ⇒ 本机会永远停在旧规则上，
+    #   于是 `*.html text eol=lf` 不生效 → index.html 被 core.autocrlf 写成 CRLF
+    #   → 与 LF blob 永不一致 → 本守卫恒 exit 1 → 整条盘后链恒被中止。
+    #   详见 _heal_rules_first() 注释。
+    ".gitattributes",
     "update_v8.py",
     "index.html",
     "logic.html",
@@ -83,10 +96,28 @@ def _blob_of(ref, rel, repo):
 
 
 def _worktree_blob(rel, repo):
+    """工作区文件的 blob sha —— **必须带 filter**（`--path`），不能用 `--no-filters`。
+
+    🔴 2026-09-14 一劳永逸根因（实测复现 + 证伪 `--no-filters`）：
+      git 判断「工作区文件与目标 blob 是否同一份」用的是**经过 clean filter 归一化后**
+      的内容。以 index.html（`.gitattributes` 里 `*.html text eol=lf`）为例：
+        · 本机 core.autocrlf=true 且 `.gitattributes` 陈旧（缺 `*.html` 那条）时，
+          checkout 会写出 **CRLF**；
+        · 但此后 `git checkout origin/main -- index.html` 认为「把 CRLF 归一化后 == 目标 blob」
+          ⇒ **认为无需重写，直接跳过**；
+        · 而本函数原先 `--no-filters` 比的是**原始字节**（CRLF）⇒ 与 LF blob 永远不等
+          ⇒ 复检「拉齐后仍不一致」⇒ 守卫恒 exit 1 ⇒ 整条盘后链恒被中止
+          （线上实证：15:49:08 与 15:49:17 两次，13 个 *.py 全部拉齐、**只有 index.html 恒不齐**）。
+
+      ⇒ 口径改为随 git 本身（`--path=<rel>` 触发 convert_to_git）：
+        · CRLF 工作副本 = 同一内容 ⇒ 一致（本来就不是「用落后代码出产物」）；
+        · **真正的代码差异仍然检出**（内容变了，归一化后 sha 必然不同）；
+        · `logic.html` 是 `-text -eol`（二进制）⇒ 不做任何转换 ⇒ 判定不变。
+    """
     p = os.path.join(repo, rel.replace("/", os.sep))
     if not os.path.exists(p):
         return None
-    rc, out, _ = _run(["git", "-C", repo, "hash-object", "--no-filters", p])
+    rc, out, _ = _run(["git", "-C", repo, "hash-object", "--path", rel, p])
     if rc != 0:
         return None
     return out.decode("utf-8", "replace").strip()
@@ -109,6 +140,49 @@ def pick_ref(repo):
     return None
 
 
+def _heal_rules_first(ref, repo):
+    """🔴 2026-09-14 一劳永逸：**行尾规则文件必须在其它文件之前拉齐**。
+
+    为什么不能只把 .gitattributes 塞进 CRITICAL 一起 checkout：
+      同一次 `git checkout <ref> -- a b .gitattributes` 里，git 处理每个路径时
+      读的仍是**当时**工作区的 .gitattributes（规则文件的生效不早于它自己被写出）
+      ⇒ index.html 仍会按旧规则写成 CRLF → 复检仍失败 → 要跑第二次才自愈。
+      故必须**单独一趟、先做**。
+
+    为什么 index.html 是唯一受害者：
+      · *.py / *.yml / *.sh 自带 `text eol=lf`，且规则是「内置」的（不依赖 .gitattributes 新旧）
+        ⇒ checkout 后原始字节即 LF ⇒ 复检通过；
+      · logic.html 是 `-text -eol`（blob 自身存 CRLF）⇒ checkout 写 CRLF ⇒ 复检同样通过；
+      · 只有 index.html 依赖 2026-09-13 才补上的 `*.html text eol=lf` 那一条
+        ⇒ 本机规则陈旧时它必不齐。
+    """
+    rel = ".gitattributes"
+    want = _blob_of(ref, rel, repo)
+    have = _worktree_blob(rel, repo)
+    if want is None:
+        print(f"  [rules] ⚠️ 远端无 {rel} → 跳过（不阻断）")
+        return
+    if want == have:
+        return
+    print(f"  [rules] 🔴 {rel} 与远端不一致 → 先单独拉齐（它决定后续 checkout 的行尾行为）")
+    ts = time.strftime("%Y%m%d_%H%M%S")
+    bak = os.path.join(os.path.dirname(os.path.abspath(repo)), f"v8_ws_backup_rules_{ts}")
+    try:
+        os.makedirs(bak, exist_ok=True)
+        shutil.copy2(os.path.join(repo, rel), os.path.join(bak, rel))
+    except OSError as e:
+        print(f"  [rules] 🔴 备份 {rel} 失败：{e} → 中止（不冒险覆盖）")
+        raise SystemExit(1)
+    rc, _, err = _run(["git", "-C", repo, "checkout", ref, "--", rel])
+    if rc != 0:
+        print(f"  [rules] 🔴 checkout {rel} 失败：{err.decode('utf-8', 'replace')[:300]}")
+        raise SystemExit(1)
+    if _worktree_blob(rel, repo) != want:
+        print(f"  [rules] 🔴 {rel} 拉齐后仍不一致 → 中止（fail-closed）")
+        raise SystemExit(1)
+    print(f"  [rules] ✅ {rel} 已拉齐（原文件备份在 {bak}）")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--repo", default=REPO)
@@ -129,6 +203,10 @@ def main():
     if not ref:
         print("[ws-guard] 🔴 取不到任何远端 ref → 无法校验（fail-closed）")
         return 1
+
+    # 🔴 行尾规则先行：必须早于任何 git checkout（理由见 _heal_rules_first）
+    if a.heal:
+        _heal_rules_first(ref, repo)
 
     mism, missing, same = [], [], []
     for rel in CRITICAL:
