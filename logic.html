@@ -1929,7 +1929,6 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>📈 指数估值中枢 · 价格档位+趋势门控（<code>indexValueFrameworkBody</code>）</td></tr>
           <tr><td rowspan="3">暂未上架 · 因子类</td><td>🧪 因子实验室 · 异常换手率 / ROE_TTM（<code>factorLabBody</code>）</td><td rowspan="3">选股策略 → 🧪 因子<br>（逆势龙头左侧）</td><td rowspan="3"><code>__renderFactorPane()</code> → <code>#stFaHost</code></td></tr>
           <tr><td>📊 因子审计：v8 选股 vs 质量价值中小盘多因子（<code>factorAuditBody</code>）</td></tr>
-          <tr><td>🧪 因子补缺 · walk-forward 进度（<code>factorProgressBody</code>）</td></tr>
           <tr><td rowspan="2">暂未上架 · 宏观类</td><td>📚 机构研究 · AI 解析建议（<code>maharoCard</code>）</td><td rowspan="3">🌍 宏观观测（一级页）</td><td rowspan="3"><code>__renderMacroPane()</code> → <code>#macroHost</code></td></tr>
           <tr><td>🌍 宏观景气背景 · K 型分层（静态内联）</td></tr>
         </table>
@@ -2010,7 +2009,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
             🎯 选股策略区：<b>三重共识</b>(<code>TRIPLE_CONSENSUS</code>) · <b>CRDS逆势龙头</b>(<code>CRDS_CARD_DATA</code>) · <b>机游共振</b>(<code>LHB_DATA</code>)
             📜 共振日历/龙虎榜历史(<code>LHB_HISTORY</code>) · 三重入选历史(<code>TRIPLE_HISTORY</code>) · 三重追踪(<code>TRIPLE_TRACK</code>)
             🎯 最终推荐：<b>候选池</b>(<code>CANDIDATE</code>) →<span style="color:var(--purple)">建议</span> · <b>金股池</b>(<code>GOLD_POOL</code>) · <b>强势突破</b>(<code>STRONG_BREAKOUT</code>) · <b>动量共识</b>(<code>MOMENTUM_FILTER</code>)→<span style="color:var(--purple)">建议</span> · 优化策略门控(<code>OPTIMIZED_STRATEGY</code>)→<span style="color:var(--purple)">建议</span>
-            🔬 因子实验室(<code>FACTOR_LAB</code>) · 因子回测(<code>FACTOR_LAB_BACKTEST</code>) · <b>因子补缺与审计</b>(<code>FACTOR_AUDIT</code>+<code>FACTOR_PROGRESS</code> 合并为一张：上半覆盖状态／下半 walk-forward 进度)→<span style="color:var(--purple)">建议</span>
+            🔬 因子实验室(<code>FACTOR_LAB</code>) · 因子回测(<code>FACTOR_LAB_BACKTEST</code>)→<span style="color:var(--purple)">建议</span>
             📊 板块RS(<code>SECTOR_RS</code>) · 板块资金趋势(<code>SECTOR_FUND_FLOW_TREND</code>) · 板块推荐(<code>SECTOR_RECOMMENDATION</code>) · 板块周期历史(<code>SECTOR_PHASE_HISTORY</code>)→<span style="color:var(--purple)">建议</span>
             📐 上证FIB(<code>SH_FIB</code>) · 深证FIB(<code>SZ_FIB</code>)
             📊 市场状态(<code>MARKET_REGIME</code>) · 机构交易(<code>INST_TRADE</code>) · 算法追踪(<code>ALGO_TRACK</code>) · 池子追踪(<code>V8_POOL_TRACKER</code>)

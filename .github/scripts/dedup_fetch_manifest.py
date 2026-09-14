@@ -54,13 +54,9 @@ SKIP_KEYS = {
 #   保证 update_time 每日前进 —— 这正是它们作为「今日已刷新」指示灯的设计意图
 #  （原 v8_cn_fetch_experiments.yml 也是无条件 git add + push 这 3 个文件）。
 _ALWAYS_PUSH = {
-    "raw_data/factor_audit.json",
-    "raw_data/factor_progress.json",
     "raw_data/index_value_framework.json",
     "raw_data/valuation_percentile.json",
     "raw_data/ai_insights_compare.json",
-    "data/FACTOR_AUDIT.js",
-    "data/FACTOR_PROGRESS.js",
     "data/INDEX_VALUE_FRAMEWORK.js",
     "data/VALUATION_PERCENTILE.js",
     "data/AI_INSIGHTS_COMPARE.js",

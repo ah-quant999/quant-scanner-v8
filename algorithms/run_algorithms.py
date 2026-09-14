@@ -67,8 +67,6 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   单接口调用（不遍历全 universe），给 900s 足够余量；显式登记避免走默认 1800s
     #   而在极端网络退避下拖长 B 批（B 批在 D 批 20:00 关键路径上）。
     "scripts/fetch_ai_insights_compare.py": 900,    # 读本地 data/maharo_macro.js，纯本地文本比对
-    "scripts/gen_factor_audit.py": 900,             # 读 generate_top10.py 源码做静态审计，纯本地
-    "scripts/gen_factor_progress.py": 900,          # 读 factor_audit.json，纯本地
     "scripts/fetch_valuation_percentile.py": 1200,  # akshare stock_index_pe_lg（理杏仁），单接口
     "scripts/fetch_index_value_framework.py": 900,  # 读本地 INDEX_HISTORY.js + numpy 计算
     # 🆕 2026-09-11：全算法回测汇总——纯本地读 data/*.js + raw_data/algo_track.json，零网络
@@ -239,8 +237,6 @@ ORDER = [
     #   根治：正式挂进 B 批链尾（与 STAGES["B"] 同位置），不再依赖那个不稳定的独立 workflow。
     #   ⚠️ 必须与 STAGES["B"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
     "scripts/fetch_ai_insights_compare.py",   # → raw_data/ai_insights_compare.json（读 data/maharo_macro.js）
-    "scripts/gen_factor_audit.py",            # → raw_data/factor_audit.json（多因子 vs v8 审计）
-    "scripts/gen_factor_progress.py",         # → raw_data/factor_progress.json（读 factor_audit，须在其后）
     "scripts/fetch_valuation_percentile.py",  # → raw_data/valuation_percentile.json（A股指数 PE 分位）
     "scripts/fetch_index_value_framework.py", # → raw_data/index_value_framework.json（指数中枢+趋势门控）
 
@@ -311,8 +307,6 @@ STAGES = {
         #   根治：直接挂进 B 批链尾（它们的输入——maharo_macro / 候选池 / 指数历史 /
         #   FACTOR_AUDIT——在 B 批时均已就绪），不再依赖那个不稳定的独立 workflow。
         "scripts/fetch_ai_insights_compare.py",     # → raw_data/ai_insights_compare.json（读 data/maharo_macro.js）
-        "scripts/gen_factor_audit.py",              # → raw_data/factor_audit.json（多因子 vs v8 审计）
-        "scripts/gen_factor_progress.py",           # → raw_data/factor_progress.json（读 factor_audit）
         "scripts/fetch_valuation_percentile.py",    # → raw_data/valuation_percentile.json（A股指数 PE 分位）
         "scripts/fetch_index_value_framework.py",   # → raw_data/index_value_framework.json（指数中枢+趋势门控）
     ],
