@@ -162,9 +162,13 @@ CORE_SOURCES_ALGO = {
     "BACKTEST_COMPREHENSIVE": 24,
     "BACKTEST_TDX": 24,
     "CRDS_CARD_DATA": 24,
-    # 🔴 2026-08-20 根因修复：LHB_7D.js 由算法链生成，之前不在监控/自愈范围，
-    #    文件停更 24h+ 无告警，页面 7 日龙虎榜/机游共振长期 stale。
-    "LHB_7D": 24,
+    # 🛡 2026-09-14 阿狸咪的工程师（双机独立复核后裁定）：LHB_7D 已从本组**移出** → FROZEN_SOURCES。
+    #    根因：唯一生产者 gen_lhb_7d.py 于 09-13 主动停跑（run_algorithms.py 摘除调度 + 注释调用），
+    #    前端零引用（index.html L565 注明「停止注入」）、raw 无消费方 ⇒ **它已无生产者**。
+    #    留在本组（+ ALGO_VARS）的后果：每 30min 必判红 → 必自愈派 algo_cloud，而结构上
+    #    永远治不好 ⇒ 无限红灯 + 空跑 run 抢同并发组（本机 listener 与云端 health_patrol
+    #    两处 guard 各判各的 ⇒ 双源抢派，同 INDEX_HISTORY 型）。
+    #    ⚠️ 若日后回滚 gen_lhb_7d.py 调度，请把它一并挪回本组（阈值 24）。
     # INDEX_HISTORY（5年上证K线）由 19:15 算法链产出，纳入 CORE 监控/自愈。
     "INDEX_HISTORY": 48,
 }
@@ -172,6 +176,10 @@ CORE_SOURCES_ALGO = {
 # ── 分类三：无云端生产者的冻结快照 ────────────────────────────────────
 # 当前暂无。保留空 dict，便于未来新增模块时快速标记。
 FROZEN_SOURCES = {
+    # 🧊 2026-09-14 阿狸咪的工程师：LHB_7D 无生产者（详见上方 CORE_SOURCES_ALGO 注释）。
+    #    归入本组＝仍逐轮展示「已停更」提醒（保留可见性、不藏数据），但**不再触发自愈派发**
+    #    （frozen 组既不参与自愈、也不计入最终 stale ⇒ 不影响 guard 退出码），止住 run 风暴。
+    "LHB_7D": 24,
 }
 
 # 引入 update_v8.py 的时段映射，用于输出"每个模块由哪个定时任务更新"
@@ -204,7 +212,8 @@ ALGO_VARS = {
     "CRDS_CARD_DATA", "TRIPLE_CONSENSUS", "TRIPLE_TRACK", "TRIPLE_HISTORY",
     "FINAL_RECOMMEND_DATA", "ALGO_TRACK",
     "SENTIMENT_CYCLE", "H_AUTO_BUY", "H_AUTO_BUY_TRACK",
-    "LHB_7D",
+    # LHB_7D 已移出（2026-09-14 阿狸咪的工程师）：无生产者，不再属 algo_cloud 自愈面，
+    #   详见上方 CORE_SOURCES_ALGO 段注释。
     "INDEX_HISTORY",
 }
 
