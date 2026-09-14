@@ -1738,7 +1738,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 </header>
 
 <nav id="nav">
-  <div class="tab" data-sec="macro" onclick="switchSec('macro',this)">🌍 宏观观测</div>
+  <div class="tab" data-sec="obs" onclick="switchSec('obs',this)">🌍 观测平台</div>
   <div class="tab" data-sec="td" onclick="switchSec('td',this)">📅 今日事件</div>
   <div class="tab" data-sec="rt" onclick="switchSec('rt',this)">📡 实时数据</div>
   <div class="tab" data-sec="ph" onclick="switchSec('ph',this)">🌙 盘后数据</div>
@@ -1832,10 +1832,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   </section>
 
   <!-- ============ 今日事件 ============ -->
-  <!-- 2026-09-12 主人令：宏观观测 独立一级页（原「暂未上架 > 宏观类」迁入） -->
-  <section id="sec-macro">
-    <div class="sec-head"><h2>🌍 宏观观测</h2><span class="tag">海外宏观 + 国内景气 · 背景认知 · 仅供研究参考</span></div>
-    <div id="macroHost"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">加载中…</div></div>
+  <!-- 2026-09-15 主人令：一级页「🌍 观测平台」（原「🌍 宏观观测」一级页升级为父级）
+       其下两个同级子页（子页顺序按主人令：宏观观测在左）：①🌍 宏观观测（2 卡）②📊 大盘观测（4 卡） -->
+  <section id="sec-obs">
+    <div class="sec-head"><h2>🌍 观测平台</h2><span class="tag">🌍 宏观观测（左）+ 📊 大盘观测（右）· 两个观测子页 · 仅供研究参考</span></div>
+    <div id="obsHost"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">加载中…</div></div>
   </section>
 
   <section id="sec-td">
@@ -7310,7 +7311,7 @@ window.__renderIndexObserve = function(){
   // 数据源：raw_data/factor_progress.json（由 gen_factor_progress.py 根据 FACTOR_AUDIT + 主人分批决策生成）
   window.__fpRetry = 0;
 
-  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderBtExtraPane(); }catch(e){} try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderMacroPane(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeObserve(); }catch(e){} try{ window.__renderIndexObserve(); }catch(e){} try{ window.__renderFactorAudit(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} }
+  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderBtExtraPane(); }catch(e){} try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderObsPlatform(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeObserve(); }catch(e){} try{ window.__renderIndexObserve(); }catch(e){} try{ window.__renderFactorAudit(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
   } else {
@@ -7784,7 +7785,8 @@ function switchSec(sec,el){
     }, 80);
   }
   // 2026-09-12 主人令：宏观观测页（原暂未上架·宏观类迁入）
-  if(sec==='macro' && typeof window.__renderMacroPane==='function') setTimeout(window.__renderMacroPane,60);
+  // 2026-09-15 主人令：一级页「🌍 观测平台」（宏观观测 + 大盘观测 两子页）
+  if(sec==='obs' && typeof window.__renderObsPlatform==='function') setTimeout(window.__renderObsPlatform,60);
   // 2026-09-12 主人令：策略回测页 追加的回测类三卡
   if(sec==='bt' && typeof window.__renderBtExtraPane==='function') setTimeout(window.__renderBtExtraPane,60);
   // 共振日历：进入时确保默认 tab1（机游共振）渲染（rcTab1 默认 active，但 switchRcTab 仅在点 tab 时触发）
@@ -7801,7 +7803,8 @@ function switchSec(sec,el){
 
 /* ===== 六维雷达 SVG：由 renderSixDim 动态绘制 ===== */
 
-/* ===== 斐波窗口：旧版死代码已移除（#fib 元素早已不存，新版斐波见 renderFib @盘后数据块） ===== */
+/* ===== 斐波窗口：旧版死代码已移除；原 renderFib 亦随卡迁出删除（目标 phFib* 元素不存在）
+   —— 现见 __renderFibWindow() @观测平台（入口见「🌍 观测平台」段） ===== */
 
 /* ===== 个股查询（v6 风格移植 · v8 数据源） ===== */
 (function(){
@@ -9162,70 +9165,6 @@ window.__renderV8CalFull();
 
   function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
   /* setTime 已统一为全局 setBadge（见 _rcRel 后定义）；保留 rel 共用 */
-
-  /* ---- 1. 斐波那契窗口 ---- */
-  function renderFib(fib){
-    if(!$('phFibDays')) return; // 🛡 2026-08-31 守卫：元素缺失时静默返回，避免整段抛错致「卡空了」
-    const c=fib.current||{};
-    $('phFibDays').textContent=(c.days_down!=null?c.days_down:'--')+'天';
-    $('phFibDays').classList.add('down');
-    $('phFibPct').textContent=c.total_pct!=null?num(c.total_pct)+'%':'--';
-    $('phFibPct').classList.add(c.total_pct<0?'down':'up');
-    $('phFibPoints').textContent=c.total_points!=null?num(c.total_points,1):'--';
-    $('phFibPoints').classList.add(c.total_points<0?'down':'up');
-    let nw=null;
-    (fib.windows||[]).forEach(w=>{if((w.status==='future'||w.status==='active'||w.status==='tracking')&&(!nw||w.days_left<nw.days_left))nw=w;});
-    if(!nw&&fib.next_cycle&&fib.next_cycle.length)nw=fib.next_cycle[0];
-    if(nw){
-      const daysLeft=nw.days_left>=0?nw.days_left:0;
-      $('phFibNext').textContent=daysLeft+'天';
-      $('phFibNext').style.fontSize='20px';
-      $('phFibNextLbl').textContent=(nw.date||'')+' · '+(nw.name||'')+(nw.desc?' · '+nw.desc:'');
-    }else{
-      // 无 future 窗口：全部已 passed 或数据中无下一周期
-      $('phFibNext').textContent='—';
-      $('phFibNext').style.color='var(--dim)';
-      $('phFibNextLbl').textContent='当前无在观测窗口';
-      $('phFibNextLbl').style.color='var(--dim)';
-    }
-    const badge=$('phFibBadge');
-    if(badge){
-      const modeLabel=c.mode||'--';
-      // 行内 weekday 工具（renderFib 所在 script 块无法引用 6086 行的 _fmtWeekday，故内联）
-      const fibWeekday=function(dateStr){
-        if(!dateStr) return '';
-        const dd=new Date(dateStr+'T00:00:00+08:00');
-        return ['周日','周一','周二','周三','周四','周五','周六'][dd.getDay()]||'';
-      };
-      const allWins=(fib.windows||[]).filter(w=>['future','triggered','tracking','active'].includes(w.status));
-      const triggered=allWins.filter(w=>w.status==='triggered'||w.status==='tracking'||w.status==='active');
-      const future=allWins.filter(w=>w.status==='future');
-
-      // 一行式：「⏱️ F窗口 · 触发 F(21)(06-12) F(55)(07-16) · 下转 F(21) 08-14 (13天)」
-      let html='';
-      html+='<span style="font-weight:700;color:#a78bfa;font-size:12px;">⏱️ F窗口 · '+modeLabel+'</span>';
-
-      if(triggered.length){
-        html+='<span style="color:#1D9E75;font-size:11.5px;">⚡ '+triggered.slice(0,5).map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</span>';
-      }
-      if(future.length){
-        // 每个未来 F 窗口都展开"下转 X 日期 周X·距今N天"，最多 3 个（避免行过长）
-        const nxList=future.slice(0,3);
-        html+='<span style="color:#d0bcff;font-size:11.5px;">📍 下转 '+nxList.map(function(w){return w.name+' '+(w.date||'').slice(5)+' '+fibWeekday(w.date)+' · 距今'+(w.days_left>=0?w.days_left:0)+'天';}).join(' / ')+'</span>';
-      }
-      if(!triggered.length && !future.length){
-        html+='<span style="color:var(--dim);font-size:11.5px;">当前无在观测窗口</span>';
-      }
-
-      // 容器撑成单行卡（覆盖 .ph-fib-badge 默认 inline-block 行胶囊样式）
-      badge.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px 12px;margin-top:10px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.25);border-radius:8px;text-align:left;color:var(--txt);line-height:1.5;';
-      badge.innerHTML=html;
-    }
-    setBadge('phFibTime','盘后','中长线',fib.update_time);
-  }
-
-
-  window.renderFib = renderFib;
 
   /* ---- 2. 短线/中线市场温度计（技术/资金/机构） ---- */
   function renderThermo(fib,margin,cffex,fomc,sf){
@@ -12217,7 +12156,6 @@ window.showRestrictedItems = showRestrictedItems;
     })();
 
     // 3) 盘后数据：全部使用已注入的 window.* 变量（data/*.js 已在 <head> 同步加载）
-    safe(renderFib, window.SH_FIB || {});
     safe(renderThermo, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, {}, window.SECTOR_FUND_FLOW || {});
     safe(renderSixDim, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, window.CRISIS_DATA || {}, window.SECTOR_FUND_FLOW || {}, window.MARKET_FUND_FLOW_DATA || {});
     safe(renderCrisis, window.CRISIS_DATA || {});
@@ -13070,17 +13008,15 @@ window.showRestrictedItems = showRestrictedItems;
     // 🛡 2026-08-26 一劳永逸：提前暴露 __ulSwitch，子 tab 按钮在 renderUnlisted 任何位置抛错后仍可切换
     // ═══ 🛡 2026-09-14 阿狸咪的工程师：暂未上架子页「卡片渲染派发器」（单一真源 · 一劳永逸）═══
     //   根因：_renderPostReady() 只在 DOMContentLoaded 跑一次，那时 unlistedPanel 是空壳，
-    //         5 张卡的渲染函数全部因 dst 缺失提前 return（dst 判空在重试逻辑之前 ⇒ 连重试都没布上）；
+    //         当时两子页共 5 张卡的渲染函数全部因 dst 缺失提前 return（dst 判空在重试逻辑之前 ⇒ 连重试都没布上）；
     //         用户随后进「暂未上架」时 renderUnlisted 只建骨架，__ulSwitch 的 observe 分支还是空块
     //         ⇒ 无人再叫渲染函数 ⇒ 卡面永久「加载中…」（真浏览器实测复现）。
-    //   本函数即两个子页唯一的派发入口，`__ulSwitch` 与 `__ulSelfHealTimer` 都只调它。
+    //   本函数即本页唯一的派发入口，`__ulSwitch` 与 `__ulSelfHealTimer` 都只调它。
+    //   2026-09-15：大盘观察整页迁出至「🌍 观测平台」，本页仅剩「观测类」⇒ 分支收敛为单一 tab。
     window.__ulRenderPane = function(tab){
-      tab = tab || window.__ulActivePane || 'observe';
-      if(tab !== 'observe' && tab !== 'market') tab = 'observe';
-      var names = (tab==='market')
-        ? ['__renderElliottWave', '__renderCiticPeObserve', '__renderIndexObserve']
-        : ['__renderThemeValue', '__renderAiInsightsCompare'];
-      var probe = document.getElementById(tab==='market' ? 'elliottWaveBody' : 'themeValueBody');
+      tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
+      var names = ['__renderThemeValue', '__renderAiInsightsCompare'];
+      var probe = document.getElementById('themeValueBody');
       if(probe) probe.setAttribute('data-ulpane', tab);
       var out = [];
       for(var i=0;i<names.length;i++){
@@ -13095,18 +13031,15 @@ window.showRestrictedItems = showRestrictedItems;
       return out.join(',');
     };
     window.__ulSwitch = function(btn, tab){
-      window.__ulActivePane = tab;  // guard: 记住当前子 tab，重渲染不再 snap-back
-      // 2026-09-14 主人令：暂未上架拆为「观测类 / 大盘观察」两子页
+      window.__ulActivePane = 'observe';  // 2026-09-15：本页仅剩「观测类」一个子页
       var pObserve=document.getElementById('ulPaneObserve');
-      var pMarket=document.getElementById('ulPaneMarket');
-      if(pObserve) pObserve.style.display=(tab==='observe')?'block':'none';
-      if(pMarket) pMarket.style.display=(tab==='market')?'block':'none';
+      if(pObserve) pObserve.style.display='block';
       var tabs=document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
       if(btn) btn.classList.add('active');
       // 切到对应子页时兜底触发该页全部卡片渲染，避免 defer 数据未到导致空卡。
       // 🛡 2026-09-14 阿狸咪的工程师：两个子页统一走派发器（原先 observe 分支是空块 ⇒ 主题空间/AI洞察永久「加载中…」）
-      if(typeof window.__ulRenderPane==='function'){ try{ window.__ulRenderPane(tab); }catch(e){} }
+      if(typeof window.__ulRenderPane==='function'){ try{ window.__ulRenderPane('observe'); }catch(e){} }
     };
     if(!window.__ulSelfHealTimer){
       window.__ulSelfHealTimer=setInterval(function(){
@@ -13117,7 +13050,7 @@ window.showRestrictedItems = showRestrictedItems;
           //   幂等：data-ulpane 标记 === 当前子页 就跳过（防每 1.5s 重渲刷屏）；
           //   renderUnlisted 重建 innerHTML 会丢标记 ⇒ 自动再派发一次，无需人工干预。
           var _t = window.__ulActivePane || 'observe';
-          var _probe = document.getElementById(_t==='market' ? 'elliottWaveBody' : 'themeValueBody');
+          var _probe = document.getElementById('themeValueBody');
           if(_probe && _probe.getAttribute('data-ulpane') !== _t && typeof window.__ulRenderPane==='function'){
             try{ window.__ulRenderPane(_t); }catch(e){}
           }
@@ -13197,15 +13130,13 @@ window.showRestrictedItems = showRestrictedItems;
 //   观测类(3)：概念ETF龙头参考 / 主题空间 / AI洞察对比（新周期判定 已按主人令移除）
 //   大盘观察(3)：斐波那契校验(艾略特波浪) / 中信PE观测 / A股指数观测
 
-    // ── 子 TAB 按钮行 ──
-    h += '<div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--border);">';
-    h += '<button class="ul-tab' + (_ulAct==='observe' ? ' active' : '') + '" onclick="window.__ulSwitch(this,\'observe\')" style="padding:8px 18px;font-size:13px;font-weight:700;color:' + (_ulAct==='observe' ? '#38bdf8' : 'var(--sub)') + ';background:none;border:none;border-bottom:2px solid ' + (_ulAct==='observe' ? '#38bdf8' : 'transparent') + ';cursor:pointer;transition:all .2s;">📡 观测类</button>';
-    h += '<button class="ul-tab' + (_ulAct==='market' ? ' active' : '') + '" onclick="window.__ulSwitch(this,\'market\')" style="padding:8px 18px;font-size:13px;font-weight:700;color:' + (_ulAct==='market' ? '#fbbf24' : 'var(--sub)') + ';background:none;border:none;border-bottom:2px solid ' + (_ulAct==='market' ? '#fbbf24' : 'transparent') + ';cursor:pointer;transition:all .2s;">📊 大盘观察</button>';
+    // 2026-09-15 主人令：「📊 大盘观察」整页迁出至新建一级页「🌍 观测平台」（改名「📊 大盘观测」），
+    //   本页仅剩「📡 观测类」一个在册子页 ⇒ 子 TAB 按钮行随之删除（单页无需切页签）。
     h += '</div>';
 
 // ===== 观测类 pane（3 张卡 · 2026-09-14 主人令：恢复被删的主题空间/AI洞察对比；大盘观察 3 张卡一律不动） =====
 //   概念ETF龙头参考
-h += '<div id="ulPaneObserve" style="display:' + (_ulAct==='observe' ? 'block' : 'none') + ';">';
+h += '<div id="ulPaneObserve" style="display:block;">';
 h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#38bdf8;">&#x1F4CC; 概念/行业 &#x2192; ETF·龙头 参考</span>'
@@ -13224,26 +13155,12 @@ h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-lef
 h += '<div class="card" id="aiInsightsCompareBody" style="margin-bottom:16px;border-left:4px solid #8b5cf6;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52E; AI 洞察·多源观点对比 加载中&#x2026;</div></div>';
 h += '</div>'; // /ulPaneObserve
 
-// ===== 大盘观察 pane（3 张卡 · 2026-09-14 主人令新建）=====
-//   斐波那契校验(艾略特波浪) / 中信PE观测 / A股指数观测
-h += '<div id="ulPaneMarket" style="display:' + (_ulAct==='market' ? 'block' : 'none') + ';">';
-
-// ── 卡1：艾略特波浪 · 深度分析（2026-09-14 主人令：合并原斐波那契校验 + 小九下午深度分析）──
-h += '<div class="card" id="elliottWaveBody" style="margin-bottom:16px;border-left:4px solid #c8a2e8;">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-   + '<span style="font-size:15px;font-weight:700;color:#c8a2e8;">📊 艾略特波浪 · 深度分析</span>'
-   + '<span class="fresh" id="elliottWaveFresh">&#x2014;</span>'
-   + '<span style="font-size:11.5px;color:var(--dim);">真实收盘序列 + 人工浪型拐点 + 关键位 · 小九机日频刷新</span></div>'
-   + '<div id="elliottWaveInner"><div class="note" style="padding:16px;text-align:center;color:var(--dim);">加载中&#x2026;</div></div>'
-   + '</div>';
-
-// ── 卡2：中信 PE 观测（从观测类迁入）──
-h += '<div class="card" id="citicPeObserveBody" style="margin-bottom:16px;border-left:4px solid #fbbf24;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F321; 中信 PE 观测 加载中&#x2026;</div></div>';
-
-// ── 卡3：A股指数观测（从观测类迁入）──
-h += '<div class="card" id="indexObserveBody" style="margin-bottom:16px;border-left:4px solid #a78bfa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; A股指数观测 加载中&#x2026;</div></div>';
-
-h += '</div>'; // /ulPaneMarket
+// ===== 📊 大盘观察 pane —— 🚚 2026-09-15 主人令：整页迁出 =====
+//   去向：新建一级页「🌍 观测平台」> 子页「📊 大盘观测」（改名），卡片由 3 张增至 4 张
+//   （新增「🧪 斐波那契F观测窗」← 原「🔒 已下架」盘前区迁入，紧贴艾略特波浪卡下方）。
+//   4 张卡的容器 id（elliottWaveBody / fibWindowBody / citicPeObserveBody / indexObserveBody）
+//   与渲染函数（__renderElliottWave / __renderFibWindow / __renderCiticPeObserve / __renderIndexObserve）均未变，
+//   仅换宿主；派发入口见 window.__renderObsPlatform / window.__obsRenderPane。
 
 // 2026-09-12 主人令：本页子页从 4 组（观测类 / 回测·框架 / 因子类 / 宏观类）收敛为 1 组「观测类」。
 //   三组迁出去向（卡片容器 id 全部保留，仅换宿主；渲染函数按 id 取容器，故迁页零改动）：
@@ -13998,59 +13915,10 @@ h += '</div>'; // /ulPaneMarket
     // 原缓存导致 raw_data 更新后页面看不到（数据停在早盘 11:xx/15:xx），主人怀疑"没更新"。
     try{
     var h='';
-    /* ===== 🌅 盘前 ===== */
-h+='<div style="background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,191,36,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#fbbf24;border-radius:8px;margin:16px 0 10px 0;">🌅 盘前（开盘前观测）</div>';
-    /* 2026-08-30 主人令：观测候选股池已作为选股策略子页，删除已下架中的重复卡片 */
-
-    // 2026-08-30 主人令：斐波那契双卡 + 商品涨价弹性榜三卡置顶到「已下架」顶部，盘前条幅下方。
-    //   🚚 2026-09-11 主人令：商品涨价弹性榜已迁回实时数据页，「已下架」仅剩斐波那契双卡。
-    //   原在盘后分组底部，现作为首屏辅助观测卡常驻。
-    h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #c8a2e8;">
-  `+v8CardHeader('🧪','斐波那契F观测窗','','update_time',Object.assign({},window.SH_FIB,{slot:'盘后',horizon:'中长线'}))+`
-  <div style="font-size:11px;color:var(--dim);margin:-6px 0 10px 0;line-height:1.5;">📌 基于日K收盘数据计算，仅收盘后更新，盘前/盘中不刷新</div>`;
-var _fib2=window.SH_FIB||{};
-if(_fib2.windows&&_fib2.windows.length){
-  var _c=_fib2.current||{};
-  var _fut2=(_fib2.windows.filter(function(w){return w.status==='future';})||[])[0]||{};
-  var _fibDescMap={'F(3)':'小反弹','F(5)':'短期变盘','F(8)':'8日变盘','F(13)':'13日重要','F(21)':'中期转折','F(34)':'趋势确认','F(55)':'大周期拐点'};
-  h+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;align-items:stretch;">`;
-  h+=`<span style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:10px 12px;color:var(--txt);white-space:nowrap;">已回调 <b style="color:var(--cyan);font-size:16px;">${_c.days_down!=null?_c.days_down:'--'}天</b></span>`;
-  h+=`<span style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:10px 12px;color:var(--txt);white-space:nowrap;">累计 <b style="color:${_c.total_pct<0?'var(--down)':'var(--up)'};font-size:16px;">${_c.total_pct!=null?num(_c.total_pct)+'%':'--'}</b></span>`;
-  h+=`<span style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:10px 12px;color:var(--txt);white-space:nowrap;">下跌 <b style="color:${_c.total_points<0?'var(--down)':'var(--up)'};font-size:16px;">${_c.total_points!=null?num(_c.total_points,1):'--'}</b></span>`;
-  h+=`<span style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:14px;padding:10px 12px;color:var(--txt);white-space:nowrap;">距<b style="color:#a78bfa;font-size:16px;">${_fut2.name||'F(?)'}</b> <b style="color:#d0bcff;font-size:16px;">${_fut2.date?(_fut2.days_left>=0?_fut2.days_left:0)+'天':'—'}</b></span>`;
-  h+=`</div>`;
-  var _trig2=_fib2.windows.filter(function(w){return w.status==='triggered'||w.status==='tracking';}).slice(0,3);
-  var _miss2=_fib2.windows.filter(function(w){return w.status==='missed';}).slice(0,3);
-  h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">`;
-  h+=`<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);border-radius:8px;padding:10px;">`;
-  h+=`<div style="font-weight:700;color:#a78bfa;margin-bottom:6px;font-size:12px;">⏱️ F窗口</div>`;
-  if(_trig2.length){
-    h+=`<div style="font-size:11px;color:#1D9E75;margin-bottom:6px;line-height:1.5;">⚡ 已触发/追踪：${_trig2.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')}</div>`;
-  } else { h+=`<div style="font-size:11px;color:var(--dim);margin-bottom:6px;">暂无触发窗口</div>`; }
-  if(_fut2.name){
-    h+=`<div style="font-size:11px;color:var(--sub);line-height:1.5;">📍 下个 ${_fut2.name} ${_fut2.date||'—'} · 距今${(_fut2.days_left>=0?_fut2.days_left:0)}天 · ${_fibDescMap[_fut2.name]||''}</div>`;
-  }
-  h+=`</div>`;
-  h+=`<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:10px;">`;
-  h+=`<div style="font-weight:700;color:var(--cyan);margin-bottom:6px;font-size:12px;">📐 缠论视角</div>`;
-  if(_c.peak_date){
-    h+=`<div style="font-size:12px;color:var(--txt);line-height:1.5;">从 <b>${_c.peak_date.slice(5)}</b> 高点回调 · 模式：<b>${_c.mode||'—'}</b></div>`;
-  } else { h+=`<div style="font-size:12px;color:var(--dim);">暂无中枢数据</div>`; }
-  h+=`</div>`;
-  h+=`<div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:10px;">`;
-  h+=`<div style="font-weight:700;color:var(--down);margin-bottom:6px;font-size:12px;">🛡️ 窗口失效应对</div>`;
-  if(_miss2.length){
-    h+=`<div style="font-size:11px;color:var(--dim);line-height:1.5;margin-bottom:6px;">近3个失效：${_miss2.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')}</div>`;
-  }
-  h+=`<div style="font-size:11px;color:var(--sub);line-height:1.5;">F窗口跌破或放量未反 → 按原计划止损，不追加。</div>`;
-  h+=`</div>`;
-  h+=`</div>`;
-} else {
-  h+=`<div class="note" style="text-align:center;">已下架数据暂不可用</div>`;
-}
-h+=`</div>`;
-    /* 🚚 2026-09-11 主人令：商品涨价弹性榜已迁回「实时数据」页（主力净额分时累计曲线卡下方），
-       不再在「已下架」渲染；容器/自愈链不变（见实时数据区 14226 行起）。 */
+    /* 🚚 2026-09-15 主人令：「🧪 斐波那契F观测窗」整卡迁至「🌍 观测平台 > 📊 大盘观测」
+       （紧贴艾略特波浪卡下方，两卡都盘后更新）。
+       原「🌅 盘前（开盘前观测）」分组内仅此一卡 ⇒ 分组横幅随之删除，避免出现空分组。 */
+    // 🚚 2026-08-30 置顶说明已作废：斐波那契卡已迁出，本页盘前分组清空。
 
     /* ===== 📊 盘中 ===== */
 h+='<div style="background:linear-gradient(135deg,rgba(56,189,248,.18),rgba(56,189,248,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#38bdf8;border-radius:8px;margin:16px 0 10px 0;">📊 盘中（实时页指标）</div>';
@@ -14144,9 +14012,9 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     try{ if(window.drawAmountChart) window.drawAmountChart(); }catch(e){console.warn("已下架·成交额渲染失败",e);}
     try{ if(window.drawUpDownChart) window.drawUpDownChart(); }catch(e){console.warn("已下架·涨跌家数渲染失败",e);}
 
-    /* 2026-08-29 主人令：下沉盘后观测卡渲染（斐波那契窗口）；
-       🚚 2026-09-11 主人令：商品涨价弹性榜迁回实时数据页，此处调用删除（自愈链照常覆盖） */
-    try{ if(window.renderFib) window.renderFib(window.SH_FIB||{}); }catch(e){console.warn("已下架·斐波那契渲染失败",e);}
+    /* 🚚 2026-09-15 主人令：斐波那契F观测窗 整卡迁往「🌍 观测平台 > 📊 大盘观测」，
+       renderFib 一并删除（其目标元素 phFibDays / phFibPct / phFibPoints / phFibNext / phFibNextLbl /
+       phFibBadge / phFibTime 在全 HTML 中早已不存在 ⇒ 恒早退的死代码，实测 16 处引用 0 处定义）。 */
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderDelisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
   }
 
@@ -14828,9 +14696,138 @@ hm += '</div>'; // /ulPaneFactor
     try{ if(typeof window.__renderFactorLab==='function') window.__renderFactorLab(); }catch(e){ console.warn('因子实验室卡渲染失败', e); }
     try{ if(typeof window.__renderFactorAudit==='function') window.__renderFactorAudit(); }catch(e){ console.warn('因子审计卡渲染失败', e); }
   };
-  window.__renderMacroPane = function(){
+  // ═══ 🧪 斐波那契F观测窗（2026-09-15 主人令：由「🔒 已下架」盘前区迁入「🌍 观测平台 > 📊 大盘观测」）═══
+  //   卡位：紧贴「📊 艾略特波浪 · 深度分析」卡下方（主人令：两卡都盘后更新，差别不大，**不合卡**）
+  //   🔴 数值口径修正（2026-09-15 阿狸咪的工程师 · 实测举证）：
+  //     data/SH_FIB.js 的 current.index / total_points / total_pct 三字段写的是【前一交易日】收盘——
+  //       实测：index=3888.11，而 2026-09-14 当日真实收盘 = 3885.33（WAVE_ELLIOTT.series 末值，westock 交叉验证）；
+  //       反推 peak_close + total_points = 4163.10 + (-274.99) = 3888.11 ⇒ 三字段同源于前一交易日。
+  //     而 days_down=60 / peak_date=2026-06-22 / peak_close=4163.10 三项实测【正确】
+  //       （2026-06-22 → 2026-09-14 在真实序列中恰好相隔 60 个交易日）。
+  //     ⇒ 本卡一律以【最新真实收盘】重算这三项；WAVE_ELLIOTT 缺失时退回 SH_FIB 原值并显式标注「前一交易日」。
+  //     ⚠️ 本卡未改任何数据源、未补造数值；数据层根因（SH_FIB 取数差一日）已报小九修 fetch 脚本。
+  window.__fwRetry = 0;
+  window.__renderFibWindow = function(){
+    var dst = document.getElementById('fibWindowBody');
+    if(!dst){ if(window.__fwRetry < 20){ window.__fwRetry++; setTimeout(window.__renderFibWindow, 400); } return; }
+    window.__fwRetry = 0;
+    var h = '';
+    h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #c8a2e8;">
+  `+v8CardHeader('🧪','斐波那契F观测窗','','update_time',Object.assign({},window.SH_FIB,{slot:'盘后',horizon:'中长线'}))+`
+  <div style="font-size:11px;color:var(--dim);margin:-6px 0 10px 0;line-height:1.5;">📌 基于日K收盘数据计算，仅收盘后更新，盘前/盘中不刷新</div>`;
+var _fib2=window.SH_FIB||{};
+if(_fib2.windows&&_fib2.windows.length){
+  var _c=_fib2.current||{};
+  // 🔴 数值口径修正（2026-09-15）· 依据见 __renderFibWindow 头注（实测举证）
+  var _wv=(window.WAVE_ELLIOTT && window.WAVE_ELLIOTT.series && window.WAVE_ELLIOTT.series.closes) || [];
+  var _lastClose=(_wv.length ? _wv[_wv.length-1] : null);
+  var _useReal=(_lastClose!=null && _c.peak_close!=null && isFinite(_lastClose) && isFinite(_c.peak_close));
+  var _curClose=_useReal ? _lastClose : _c.index;
+  var _pts=_useReal ? (_curClose - _c.peak_close) : _c.total_points;
+  var _pct=(_useReal && _c.peak_close) ? ((_curClose - _c.peak_close) / _c.peak_close * 100) : _c.total_pct;
+  var _srcLbl=_useReal ? '当日真实收盘 · WAVE_ELLIOTT' : '前一交易日 · SH_FIB 原值';
+  var _mk2=(window.WAVE_ELLIOTT && window.WAVE_ELLIOTT.marks) || [];
+  var _hv2=0, _hd2='';
+  for(var _mi=0; _mi<_mk2.length; _mi++){ if(_mk2[_mi] && _mk2[_mi].coord && _mk2[_mi].coord[1] > _hv2) _hv2=_mk2[_mi].coord[1]; }
+  for(var _mj=0; _mj<_mk2.length; _mj++){ if(_mk2[_mj] && _mk2[_mj].coord && _mk2[_mj].coord[1] === _hv2){ _hd2=_mk2[_mj].coord[0] || ''; break; } }
+  var _fut2=(_fib2.windows.filter(function(w){return w.status==='future';})||[])[0]||{};
+  var _fibDescMap={'F(3)':'小反弹','F(5)':'短期变盘','F(8)':'8日变盘','F(13)':'13日重要','F(21)':'中期转折','F(34)':'趋势确认','F(55)':'大周期拐点'};
+  h+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;align-items:stretch;">`;
+  h+=`<span style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:10px 12px;color:var(--txt);white-space:nowrap;">已回调 <b style="color:var(--cyan);font-size:16px;">${_c.days_down!=null?_c.days_down:'--'}天</b></span>`;
+  h+=`<span style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:10px 12px;color:var(--txt);white-space:nowrap;">累计 <b style="color:${_pct<0?'var(--down)':'var(--up)'};font-size:16px;">${_pct!=null?num(_pct)+'%':'--'}</b></span>`;
+  h+=`<span style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:10px 12px;color:var(--txt);white-space:nowrap;">下跌 <b style="color:${_pts<0?'var(--down)':'var(--up)'};font-size:16px;">${_pts!=null?num(_pts,1):'--'}</b></span>`;
+  h+=`<span style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:14px;padding:10px 12px;color:var(--txt);white-space:nowrap;">距<b style="color:#a78bfa;font-size:16px;">${_fut2.name||'F(?)'}</b> <b style="color:#d0bcff;font-size:16px;">${_fut2.date?(_fut2.days_left>=0?_fut2.days_left:0)+'天':'—'}</b></span>`;
+  h+=`</div>`;
+  var _trig2=_fib2.windows.filter(function(w){return w.status==='triggered'||w.status==='tracking';}).slice(0,3);
+  var _miss2=_fib2.windows.filter(function(w){return w.status==='missed';}).slice(0,3);
+  h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">`;
+  h+=`<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);border-radius:8px;padding:10px;">`;
+  h+=`<div style="font-weight:700;color:#a78bfa;margin-bottom:6px;font-size:12px;">⏱️ F窗口</div>`;
+  if(_trig2.length){
+    h+=`<div style="font-size:11px;color:#1D9E75;margin-bottom:6px;line-height:1.5;">⚡ 已触发/追踪：${_trig2.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')}</div>`;
+  } else { h+=`<div style="font-size:11px;color:var(--dim);margin-bottom:6px;">暂无触发窗口</div>`; }
+  if(_fut2.name){
+    h+=`<div style="font-size:11px;color:var(--sub);line-height:1.5;">📍 下个 ${_fut2.name} ${_fut2.date||'—'} · 距今${(_fut2.days_left>=0?_fut2.days_left:0)}天 · ${_fibDescMap[_fut2.name]||''}</div>`;
+  }
+  h+=`</div>`;
+  h+=`<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:10px;">`;
+  h+=`<div style="font-weight:700;color:var(--cyan);margin-bottom:6px;font-size:12px;">📐 缠论视角</div>`;
+  if(_c.peak_date){
+    h+=`<div style="font-size:12px;color:var(--txt);line-height:1.5;">从 <b>${_c.peak_date.slice(5)}</b> 高点回调 · 模式：<b>${_c.mode||'—'}</b></div>`;
+  } else { h+=`<div style="font-size:12px;color:var(--dim);">暂无中枢数据</div>`; }
+  h+=`</div>`;
+  h+=`<div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:10px;">`;
+  h+=`<div style="font-weight:700;color:var(--down);margin-bottom:6px;font-size:12px;">🛡️ 窗口失效应对</div>`;
+  if(_miss2.length){
+    h+=`<div style="font-size:11px;color:var(--dim);line-height:1.5;margin-bottom:6px;">近3个失效：${_miss2.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')}</div>`;
+  }
+  h+=`<div style="font-size:11px;color:var(--sub);line-height:1.5;">F窗口跌破或放量未反 → 按原计划止损，不追加。</div>`;
+  h+=`</div>`;
+  h+=`</div>`;
+} else {
+  h+=`<div class="note" style="text-align:center;">斐波那契F观测窗数据暂不可用（data/SH_FIB.js）</div>`;
+}
+  // 📐 口径声明（2026-09-15 主人令「先修」）：本卡为【收盘价】口径，与上方波浪卡的【最高价】口径不同源
+  h+=`<div style="margin-top:10px;padding:8px 10px;background:rgba(148,163,184,.07);border:1px solid rgba(148,163,184,.22);border-radius:7px;font-size:11px;line-height:1.75;color:var(--dim);"><b style="color:var(--sub);">📐 口径：</b>收盘价 · 高点 <b style="color:var(--txt);">${_c.peak_date ? _c.peak_date.slice(5) : '--'} 收盘 ${num(_c.peak_close)}</b> → 最新 <b style="color:var(--txt);">${num(_curClose)}</b>（${_srcLbl}）· 累计 <b style="color:${_pct<0?'var(--down)':'var(--up)'};">${num(_pct)}%</b> · 与上方「艾略特波浪 · 深度分析」的<b style="color:var(--sub);">最高价</b>口径（${_hd2?_hd2.slice(5):'--'} 最高 ${num(_hv2)}）不同源，<b style="color:#fbbf24;">两卡跌幅读数不同属正常，勿混比</b>。</div>`;
+h+=`</div>`;
+    dst.innerHTML = h;
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🌍 观测平台（2026-09-15 主人令：新建一级 TAB）—— 两个同级子页
+  //   子页顺序按主人令：①🌍 宏观观测（左）②📊 大盘观测（右）
+  //   大盘观测 = 原「🧪 暂未上架 > 📊 大盘观察」整页迁入并改名（4 卡）：
+  //     ①艾略特波浪 · 深度分析  ②斐波那契F观测窗（← 原「🔒 已下架」盘前区迁入）
+  //     ③中信 PE 观测            ④A股指数观测
+  //   宏观观测 = 原一级页「🌍 宏观观测」原样迁入（2 卡）：机构研究·AI解析建议 / 宏观景气背景·K型分层
+  //   宿主：#obsHost（原 #macroHost）；宏观卡容器 id 全部保留（maharoCard / ulPaneMacro→obsPaneMacro）
+  // ── 🛡 渲染派发器（单一真源）：子页切换 / 骨架就绪 / 自愈重试 均只调它 ──
+  //   对齐「暂未上架」__ulRenderPane 的成熟做法（2026-09-14 已验证：能根治「卡面永久加载中」）
+  window.__obsActivePane = window.__obsActivePane || 'macro';
+  window.__obsRenderPane = function(tab){
+    tab = tab || window.__obsActivePane || 'macro';
+    if(tab !== 'macro' && tab !== 'market') tab = 'macro';
+    var names = (tab === 'market')
+      ? ['__renderElliottWave', '__renderFibWindow', '__renderCiticPeObserve', '__renderIndexObserve']
+      : [];
+    var probe = document.getElementById(tab === 'market' ? 'elliottWaveBody' : 'maharoCard');
+    if(probe) probe.setAttribute('data-obspane', tab);
+    var out = [];
+    if(tab === 'macro'){
+      try{ if(typeof window._fillMahoroCard === 'function'){ window._fillMahoroCard(); out.push('_fillMahoroCard:ok'); } else { out.push('_fillMahoroCard:nofn'); } }
+      catch(e){ out.push('_fillMahoroCard:THROW'); }
+    }
+    for(var i = 0; i < names.length; i++){
+      var k = names[i];
+      if(typeof window[k] === 'function'){ try{ window[k](); out.push(k + ':ok'); }catch(e){ out.push(k + ':THROW'); } }
+      else { out.push(k + ':nofn'); }
+    }
+    try{ console.log('[obsRenderPane] ' + tab + ' -> ' + out.join(', ')); }catch(e){}
+    return out.join(',');
+  };
+  window.__obsSwitch = function(btn, tab){
+    if(tab !== 'macro' && tab !== 'market') tab = 'macro';
+    window.__obsActivePane = tab;
+    var pM = document.getElementById('obsPaneMacro');
+    var pK = document.getElementById('obsPaneMarket');
+    if(pM) pM.style.display = (tab === 'macro') ? 'block' : 'none';
+    if(pK) pK.style.display = (tab === 'market') ? 'block' : 'none';
+    var tabs = document.querySelectorAll('#sec-obs .obs-tab');
+    for(var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
+    if(btn) btn.classList.add('active');
+    if(typeof window.__obsRenderPane === 'function'){ try{ window.__obsRenderPane(tab); }catch(e){} }
+  };
+  window.__renderObsPlatform = function(){
+    var _act = window.__obsActivePane || 'macro';
     var hm = '';
-hm += '<div id="ulPaneMacro">';
+    // ── 子 TAB 按钮行（🌍 宏观观测 在左 · 按主人令）──
+    hm += '<div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--border);">';
+    hm += '<button class="obs-tab' + (_act==='macro' ? ' active' : '') + '" onclick="window.__obsSwitch(this,\'macro\')" style="padding:8px 18px;font-size:13px;font-weight:700;color:' + (_act==='macro' ? '#34d399' : 'var(--sub)') + ';background:none;border:none;border-bottom:2px solid ' + (_act==='macro' ? '#34d399' : 'transparent') + ';cursor:pointer;transition:all .2s;">🌍 宏观观测</button>';
+    hm += '<button class="obs-tab' + (_act==='market' ? ' active' : '') + '" onclick="window.__obsSwitch(this,\'market\')" style="padding:8px 18px;font-size:13px;font-weight:700;color:' + (_act==='market' ? '#c8a2e8' : 'var(--sub)') + ';background:none;border:none;border-bottom:2px solid ' + (_act==='market' ? '#c8a2e8' : 'transparent') + ';cursor:pointer;transition:all .2s;">📊 大盘观测</button>';
+    hm += '</div>';
+    // ══ 子页①：🌍 宏观观测（2 卡 · 原一级页原样迁入）══
+    hm += '<div id="obsPaneMacro" style="display:' + (_act==='macro' ? 'block' : 'none') + ';">';
+
     // ═══ 2026-09-07 主人令（二改）：卡只放宏观页最顶部（禁止在实验区显示）；
     //   内容以 AI 解析建议为主（日→周→月三层，AI 阅读后撰写），新闻条目折叠为附录；标题行带「更新于」。
     hm += '<div class="card" id="maharoCard" style="margin-bottom:16px;border-left:4px solid #34d399;">'
@@ -14910,8 +14907,27 @@ hm += '<div id="ulPaneMacro">';
        + '④ 对 A 股映射：<b style="color:#ef5350;">外需+AI+技改链</b>景气持续 vs <b style="color:#26a69a;">地产链+基建链</b>收缩——与行业树图/板块资金的分化互为印证。</div>'
        + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">🔭 仅供研究参考，不构成个人投资建议 · 数据时点以原文为准</div>'
        + '</div>';
-    hm += '</div>'; // /ulPaneMacro
-    var _host = document.getElementById('macroHost');
+    hm += '</div>'; // /obsPaneMacro
+    // ══ 子页②：📊 大盘观测（4 卡 · 2026-09-15 主人令：原「大盘观察」整页迁入并改名 + 斐波那契F观测窗迁入）══
+    hm += '<div id="obsPaneMarket" style="display:' + (_act==='market' ? 'block' : 'none') + ';">';
+    // ── 卡1：艾略特波浪 · 深度分析（容器 id / 渲染函数 __renderElliottWave 均未变，仅换宿主）──
+    hm += '<div class="card" id="elliottWaveBody" style="margin-bottom:16px;border-left:4px solid #c8a2e8;">'
+       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
+       + '<span style="font-size:15px;font-weight:700;color:#c8a2e8;">📊 艾略特波浪 · 深度分析</span>'
+       + '<span class="fresh" id="elliottWaveFresh">&#x2014;</span>'
+       + '<span style="font-size:11.5px;color:var(--dim);">真实收盘序列 + 人工浪型拐点 + 关键位 · 小九机日频刷新</span></div>'
+       + '<div id="elliottWaveInner"><div class="note" style="padding:16px;text-align:center;color:var(--dim);">加载中&#x2026;</div></div>'
+       + '</div>';
+    // ── 卡2：斐波那契F观测窗（← 2026-09-15 主人令：由「🔒 已下架」盘前区迁入，紧贴波浪卡下方，不合卡）──
+    hm += '<div class="card" id="fibWindowBody" style="margin-bottom:16px;border-left:4px solid #c8a2e8;">'
+       + '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F9EA; 斐波那契F观测窗 加载中&#x2026;</div></div>';
+    // ── 卡3：中信 PE 观测（从「暂未上架 · 观测类」迁入，容器 id 未变）──
+    hm += '<div class="card" id="citicPeObserveBody" style="margin-bottom:16px;border-left:4px solid #fbbf24;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F321; 中信 PE 观测 加载中&#x2026;</div></div>';
+    // ── 卡4：A股指数观测（从「暂未上架 · 观测类」迁入，容器 id 未变）──
+    hm += '<div class="card" id="indexObserveBody" style="margin-bottom:16px;border-left:4px solid #a78bfa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; A股指数观测 加载中&#x2026;</div></div>';
+    hm += '</div>'; // /obsPaneMarket
+    var _host = document.getElementById('obsHost');
+
     if(_host) _host.innerHTML = hm;
     // 🔴 2026-09-12 补漏：机构研究·AI 解析卡的填充函数 _fillMahoroCard 原先全局
     //   只在 renderUnlisted 里被调用；宿主迁到本页后无任何触发 → 卡永久「加载中」。
@@ -14923,6 +14939,22 @@ hm += '<div id="ulPaneMacro">';
       setTimeout(_mh, 600);
       setTimeout(_mh, 1800);
     }catch(e){ console.warn('maharo 卡调度失败', e); }
+    // 🛡 骨架就绪后派发「当前子页」渲染（defer 数据可能晚于首渲到达）
+    setTimeout(function(){ try{ window.__obsRenderPane(window.__obsActivePane || 'macro'); }catch(e){} }, 0);
+    // 🛡 自愈：宿主骨架重建 / 数据迟到时重派发（幂等：靠 data-obspane 标记去重，防每 1.5s 重渲刷屏）
+    if(!window.__obsSelfHealTimer){
+      window.__obsSelfHealTimer = setInterval(function(){
+        var p = document.getElementById('obsHost');
+        if(!p) return;
+        if(p.innerHTML.length >= 1000 && p.innerHTML.indexOf('obsPaneMarket') >= 0){
+          var _t = window.__obsActivePane || 'macro';
+          var _pr = document.getElementById(_t === 'market' ? 'elliottWaveBody' : 'maharoCard');
+          if(_pr && _pr.getAttribute('data-obspane') !== _t && typeof window.__obsRenderPane === 'function'){
+            try{ window.__obsRenderPane(_t); }catch(e){}
+          }
+        }
+      }, 1500);
+    }
   };
   window.renderUnlisted=renderUnlisted;
   window.renderDelisted=renderDelisted;
