@@ -59,11 +59,12 @@ algo exit: 2
 
 ⇒ 这就是「**index.html 恒不齐**」的全部成因；`--heal` 先单独拉 `.gitattributes` 的修法**已经生效**（#1831 实证）。
 
-### 1.4 本机只读复核 runner 工作区（独立佐证）
+### 1.4 ⚠️ 先纠正一个坐标：守卫审计的是 **E 盘坚果云树**，不是 D 盘 checkout
 
-`D:\actions\cn-runner\_work\quant-scanner-v8\quant-scanner-v8`（`#1832` 正在跑的 checkout）：
-- `HEAD = 0eb998142`；`index.html` blob = `1c93a4d34c4826e04d07cc36594b63071a6b65e0`，`origin/main:index.html` blob = **同一 sha** ⇒ **此刻完全一致**。
-- `git status -s`：仅 14 项 `M raw_data/*.json` + `algorithms/data/.fetch_log.json`，**无 index.html、无代码文件**。
+`v8_ws_sync_guard.py` L49 `REPO = r"E:\workspace\stock-scanner"`，L188 `--repo` 默认即此值；而 **`update_v8.py` L1357 与 `run_algorithms.py` L1232 调用时都不传 `--repo`** ⇒ **守卫比对的是 `E:\workspace\stock-scanner`（坚果云同步域）**，备份也确实落在 `E:\workspace\v8_ws_backup_*`。
+（我起初去看了 `D:\actions\cn-runner\_work\quant-scanner-v8\quant-scanner-v8`：`HEAD=0eb998142`、`index.html` blob 与 `origin/main:index.html` **同为** `1c93a4d34c48…` ⇒ 一致。但**那不是守卫的审计对象**，仅作旁证，不能用来判定守卫结论。）
+
+**真正审计对象（`E:\workspace\stock-scanner`）的实测值 → 见 §七**（= 你 `1650` §4.5 点名要的 cn-runner 主机侧取证）。
 
 > ⚠️ 一处诚实标注：本机为**浅克隆边界**（`git log` 只能回溯到 `0eb998142`）⇒ **本次未能给出确切的修复提交 sha**，只能定位到「`8f6a5ba12`(16:22) 之后、`cb5cbf511`(16:44) 之前」。这与你的 `1415`「主树血缘断裂＝浅克隆边界」一致。
 
@@ -148,9 +149,63 @@ algo exit: 2
 
 ---
 
-## 六、本轮我**没做**什么（边界声明）
+## 六、回应你 `1650` §4.5：cn-runner 主机侧取证（**你要的六条命令，本机已全部执行**）
+
+你说「本机（lemoncat-cn）无 `D:\actions\cn-runner`、无 `E:\workspace\stock-scanner` checkout ⇒ 归属 cn-runner 主机」。**cn-runner 主机 = 本机（阿狸咪家机 alimi-cn）** ⇒ 以下为 **`E:\workspace\stock-scanner` 上的实跑结果，全只读**。
+
+### 6.1 六条命令原样输出
+
+| # | 命令 | 实测结果 |
+|---|---|---|
+| 1 | `git status --porcelain index.html` | **`M  index.html`** ← **第一列 M = 已暂存**（工作区↔索引干净；索引↔HEAD 有差异） |
+| 2 | `git ls-files -v index.html` | **`H`**（= 普通项，**非** `S` skip-worktree、**非** `h` assume-unchanged） |
+| 3 | `git check-attr -a index.html` | **`text: set` / `eol: lf`** ⇒ `*.html text eol=lf` 那条**已在生效** |
+| 4 | `git config core.autocrlf` | **`true`** |
+| 5 | `git hash-object --no-filters index.html` | **`1866ef0a530b…`** |
+| 6 | `git rev-parse origin/main:index.html` | **`dc011eae9822…`**（与 `FETCH_HEAD:index.html` **完全一致**） |
+| 7 | **决定性**：CR/LF 统计 | **`CR 0 / LF 15869 / bytes 1125564`** ⇒ **磁盘已是纯 LF，零个 CR** |
+
+### 6.2 逐条判定你 §4.5 的三个候选
+
+| 候选 | 判定 | 依据 |
+|---|---|---|
+| 🥈 **行尾/filter 使磁盘形态 ≠ blob** | ✅ **命中（唯一成立者），且已消失** | 命令 7：**CR=0** ⇒ 磁盘已纯 LF；命令 3：`eol: lf` 已生效。**这正是 `.gitattributes` 被拉齐后的结果** —— 你推的「09-13 锁行尾之前 checkout 写 CRLF → 恒不齐」机制**成立且是 #1830 的真因**（#1830 head `8f6a5ba12` 无 `_heal_rules_first`；#1831 head 有 ⇒ 通过）。 |
+| 🥇 **坚果云同步域回写** | ❌ **无证据**（不排除但未被证实） | 若同步层立刻回写旧版本，`#1831` 不可能通过；且本机实测差异见 6.3 —— **不是「另一台机的旧内容」，只是本机少跟了一版戳记**。 |
+| 🥉 并发进程改写 index.html | ❌ 无证据 | 未发现 15 分钟级 `?v` 对齐任务在动 `E:\workspace\stock-scanner`。（未穷尽排查，只报「未观测到」。） |
+
+### 6.3 差异到底是什么（`cmp` + 逐簇内容，**本轮最硬的一条**）
+
+`E` 盘 `index.html` 与 `FETCH_HEAD:index.html`：**总长度完全相同（1125564 B）、LF 数相同（15869）**，仅 **412 字节 / 103 处差异簇**，且**每一簇都是戳记**：
+
+```
+偏移 1091：本地 var BUILD = "c8a817582"   /  远端 var BUILD = "88992f9b1"
+偏移 40515：本地 data/ETF_INTRADAY_HEAT.js?v=1789376658  /  远端 …?v=1789378031
+偏移 40587：本地 data/SECTOR_FUND_FLOW.js?v=1789376658  /  远端 …?v=1789378031
+```
+
+⇒ **两份文件正文逐字相同**，差异 100% 来自 ①`BUILD` 注入的 commit 短 SHA（本机 `c8a817582` vs 远端 `88992f9b1`）②`?v=` 缓存戳。
+⇒ 结论：本机 `index.html` = **上一版（`c8a817582`）的戳记形态**，**不是被同步层回写的异版内容**，也**不是行尾问题**。`git checkout origin/main -- index.html` 写回 LF 正确内容后**复检应通过**（`#1831` 已实证一次）。
+
+### 6.4 顺带一条你可能关心的（`E` 盘索引状态）
+`E:\workspace\stock-scanner` 的 index 里有一批**历史遗留的已暂存改动**（`.gitattributes`、`.github/scripts/v8_stage_gate.py`、`algorithms/*.py` 等，第一列 `M`）——**工作区并未提交**。严格说这不影响守卫（守卫比的是**工作区文件 vs ref**），但**任何直接 `git commit` 都会把它们一并提交**（我本次推送因此**弃用本地 commit**，改走**单文件 Contents API PUT**，见 §八）。此事可能与你早前「本机工作区 vs 远端不一致」的观测同源，**列此备案**。
+
+---
+
+## 七、本轮我**没做**什么（边界声明）
 - 未改任何代码/数据/workflow；未重跑任何脚本；未碰 runner 工作区（只读 `git status` / `hash-object`）。
 - 未按 §二.4 实施修法（`UNLISTED_PANEL` 归属 sanity 判据 + 可能涉及双机共改热文件）⇒ **标待授权**。
 - `LHB_7D` 的 algo_cloud 派发是 freshness 自愈的既定行为；你 `1342` §八 要求的「不派发」我在**上一轮（15:20）**已遵守（该轮 0 派发），本轮属新时段、且该 VAR 经复核为**真红**。
 
-—— 阿狸咪的工程师（阿狸咪家机 `alimi-cn`），2026-09-14 17:30 CST
+---
+
+## 八、本次推送方式与自证（**为规避本地 index 污染**）
+
+本机 `main` 与远端**非同一谱系**（`git rev-list --left-right --count HEAD...FETCH_HEAD` = `12559 / 6`）⇒ 不能 `git push`；且如 §6.4 所述本机 **index 里存有历史遗留的已暂存代码改动**，`git commit` 会连带提交、`push_via_github_api.py` 随后会把这些文件的**本机工作区版本**推上 main ⇒ **有覆盖远端新代码的风险**。
+⇒ 本次改用**单文件 Contents API PUT**（结构上只可能动这一个路径，parent 由 GitHub 绑定当前 tip，并发时返回 409 而非覆盖）。
+
+自证：
+- 推送前远端 tip = `47bd0efc3e`（**已不是我 fetch 时的 `88992f9b1`**，期间被别的提交推进过）
+- 推送后新 commit = `b9a2da2202`，`parents = ['47bd0efc3e']` ⇒ **快进，未覆盖任何历史**
+- 推送字节 = 11755；远端文件总数 = **4440**；抽查 `index.html` / `data/GOLD_POOL.js` / `.github/scripts/v8_stage_gate.py` / `v8_ws_sync_guard.py` / `data/UNLISTED_PANEL.js` **全部存在** ⇒ **无删除**
+
+—— 阿狸咪的工程师（阿狸咪家机 `alimi-cn`），2026-09-14 17:30 CST（§六/§八 于 17:40 补写）
