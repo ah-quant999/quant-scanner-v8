@@ -49,11 +49,12 @@
            🔴 `AVG_PRICE_DATA` 现为**非 must**：cloud_fetch_v8 的 post_close 档不写其时戳（仅 intraday 写）⇒ 放回 must 会立即复现锁死；须待「方案乙」落地后方可考虑加回。
   B 选股批：9 项产物中 ≥8 项鲜活 + 三重共识/四量终极/逆势龙头（must）必新  ← 以 READY_SPEC["B"] 为唯一真源
   D 汇总批：最终推荐                              → 1/1
-  E 回测批：CRDS 回测 / TDX 回测（任一）+ 全算法回测汇总 + 候选池回测 + 金股池回测 → 4/5
-            ⚠️ 2026-09-13 起 must 收紧：原 must=[] + need=4 只是**纯计数**，
-               表达不了「哪几项必新」⇒ 陈旧项恰为 BACKTEST_ALL_ALGOS 时仍判就绪。
-               现 must=[BACKTEST_ALL_ALGOS, CANDIDATE_BACKTEST, GOLD_POOL_BACKTEST]，
-               第 4 项由 CRDS_BACKTEST / BACKTEST_TDX 任一补足（3 must + 1 任一 = need 4）。
+  E 回测批：CRDS 回测 / TDX 回测（任一）+ 全算法回测汇总 → 2/3
+            ⚠️ must=[BACKTEST_ALL_ALGOS]：need 只是**纯计数**，表达不了「哪几项必新」
+               ⇒ 若陈旧项恰为 BACKTEST_ALL_ALGOS 仍会判就绪；must 补齐该漏洞。
+            🔴 2026-09-14 主人令更正：候选池 / 金股池(=黄金池) 是算法**上游水源**、
+               不是选股策略 ⇒ **不需要回测**。原 CANDIDATE_BACKTEST / GOLD_POOL_BACKTEST
+               两项已从 items/must 移除（并删除 algorithms/backtest_pools.py）。
   「今日盘后」= update_time 的日期==数据日 且 (时:分) >= 该日门槛。
 
 ■ 用法
@@ -266,22 +267,18 @@ READY_SPEC: dict[str, dict] = {
     #      只要它跑成功就必有产物 ⇒ 正常情况下不会把 E 批锁死成「永不就绪」。
     #      它若失败 → 正该重跑 E（而非静默）—— 这正是本改动的目的。
     #
-    # 🔴 2026-09-13 主人令「只要接入算法链的选股策略，都要有回测」：E 批就绪清单 3 → 5 项，need 2 → 4。
-    #   新增 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（脚本 algorithms/backtest_pools.py
-    #   已挂 STAGES["E"] 第 8 位、聚合器之前）。
-    #   🔴 同一条铁律：**只加 items 不抬 need = 没加**。need=2 的语义下新增两项仍不参与判定，
-    #      必须抬到 4 = 「CRDS/TDX 至少 1 项」+「BACKTEST_ALL_ALGOS」+「两池回测」全部鲜活。
-    # 🛡 2026-09-13 主人令（拍板 P1 · 一劳永逸）：need 仍是纯计数 ⇒ 必须补 must 才真正闭环。
-    #   原 must=[] + need=4 的语义只保证「5 项里有 4 项鲜活」，**无法表达「哪几项必新」**：
-    #     若陈旧项恰好是 BACKTEST_ALL_ALGOS.js（主人 09-12 令点名必新的那一项）
-    #     → 闸门仍判 E 已就绪 → 空转 → 全算法回测汇总卡停更，全链零红灯。
-    #   现 must = 三项「跑成功必有产物」的聚合器产物；第 4 项由 CRDS_BACKTEST / BACKTEST_TDX
-    #   任一补足（保持原「至少 1 项」语义）⇒ 3(must) + 1(任一) = need 4，自洽。
+    # 🛡 2026-09-13 主人令（拍板 P1 · 一劳永逸）：need 是纯计数 ⇒ 必须补 must 才真正闭环。
+    #   只计 need 保证不了「哪几项必新」：若陈旧项恰好是 BACKTEST_ALL_ALGOS.js
+    #   （主人 09-12 令点名必新的那一项）→ 闸门仍判 E 已就绪 → 空转 → 汇总卡停更，全链零红灯。
+    #   现 must = [BACKTEST_ALL_ALGOS.js]；第 2 项由 CRDS_BACKTEST / BACKTEST_TDX 任一补足
+    #   （保持「至少 1 项」语义）⇒ 1(must) + 1(任一) = need 2，自洽。
     #   🔴 同样受 must ⊆ dedup_fetch_manifest.py::_ALWAYS_PUSH 不变式约束（见 B 批注释）。
-    "E": {"items": ["data/CRDS_BACKTEST.js", "data/BACKTEST_TDX.js", "data/BACKTEST_ALL_ALGOS.js",
-                    "data/CANDIDATE_BACKTEST.js", "data/GOLD_POOL_BACKTEST.js"], "need": 4,
-          "must": ["data/BACKTEST_ALL_ALGOS.js", "data/CANDIDATE_BACKTEST.js",
-                   "data/GOLD_POOL_BACKTEST.js"]},
+    # 🔴 2026-09-14 主人令更正：候选池 / 金股池(=黄金池) 是算法**上游水源**（B 批基础股池），
+    #   不是选股策略 ⇒ **不需要回测**。原 5 项 / need 4 里的两池回测已移除（3 项 / need 2），
+    #   同时删除 algorithms/backtest_pools.py 与 data/{CANDIDATE,GOLD_POOL}_BACKTEST.js。
+    "E": {"items": ["data/CRDS_BACKTEST.js", "data/BACKTEST_TDX.js",
+                    "data/BACKTEST_ALL_ALGOS.js"], "need": 2,
+          "must": ["data/BACKTEST_ALL_ALGOS.js"]},
 }
 
 # 各批上游：上游不就绪则拒绝开跑（顺序闸门 · 一环套一环）

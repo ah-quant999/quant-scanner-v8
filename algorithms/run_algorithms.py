@@ -218,15 +218,11 @@ ORDER = [
     #   `_STAGE_UNION == set(ORDER)` 断言崩（仅STAGES有两脚本），盘后链启动即死、0 产出。
     #   此前被 V5 心跳闸门跳过链本体掩盖，2026-09-07 17:40 #1579 首次真跑暴露。
     "backtest_expectancy.py",         # → raw_data/backtest_expectancy.json（期望收益回测，与 E 批同位）
-    # 🆕 2026-09-13 主人令（“只要接入算法链的选股策略，都要有回测”）：
-    #   候选池 / 金股池此前在回测页只有 known_gaps 占位，无任何回测产物。
-    #   本脚本读 B 批 build_candidate_pool 产出的 raw_data/candidate_members.json（first_seen）
-    #   与 raw_data/gold_pool.json（first_date），用 baostock 前复权日线算各档前向收益（T+N）。
-    #   输出：raw_data/candidate_backtest.json + data/CANDIDATE_BACKTEST.js，
-    #        raw_data/gold_pool_backtest.json + data/GOLD_POOL_BACKTEST.js。
-    #   ⚠️ 必须在 E 批末尾聚合器 gen_backtest_all_algos.py 之前（聚合器要读它本轮产物）。
-    #   ⚠️ 与 STAGES["E"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
-    "backtest_pools.py",
+    # 🔴 2026-09-14 主人令更正（作废原 09-13 令）：「金股池和候选股池是算法的上游水源，
+    #   不是策略，不需要回测！」候选池 / 金股池(=黄金池) 是 B 批产出的**基础股池**，
+    #   供下游策略取用，本身无买卖点 ⇒ 拿 T+1 胜率考核它们必然误导
+    #   （实测 金股池 T+1 胜率 32.28% 被误读成「低绩效策略」）。
+    #   ⇒ algorithms/backtest_pools.py 及两条产物已删除，**不得再挂回算法链**。
 
     # 🆕 2026-09-07 主人令「中信 PE 极值温度计 + 历史回测」双卡：fetcher 拉 sh.600030 PE/PB 时序
     # (raw_data/citic_pe_history.json) + 生成器产 data/CITIC_PE_THERMO.js + CITIC_PE_BACKTEST.js。
@@ -256,7 +252,7 @@ ORDER = [
     #   强势突破（algorithms/strong_breakout.py）早已挂 B 批，但其回测源
     #   scripts/algo_backtest_compare.py 一直是孤儿（ORDER/STAGES 均未挂）
     #   ⇒ data/ALGO_BACKTEST_COMPARE.js 永不生成 ⇒ 聚合器里「强势突破」卡恒为 0 档。
-    #   与 backtest_pools.py 同例会：必须在聚合器 gen_backtest_all_algos.py **之前**，
+#   与回测家族同例会：必须在聚合器gen_backtest_all_algos.py **之前**，
     #   否则聚合器读不到本轮产物。
     "scripts/algo_backtest_compare.py",   # → data/ALGO_BACKTEST_COMPARE.js（H反推 / 高手画像版H反推 / 强势突破 同口径对比）
     "gen_backtest_all_algos.py",   # → raw_data/backtest_all_algos.json + data/BACKTEST_ALL_ALGOS.js
@@ -336,10 +332,8 @@ STAGES = {
         "v8/backtest_crds.py",   # → data/CRDS_BACKTEST.js （逆势龙头回测；2026-09-09 挂链补登，此前仅存在于 v8/ 目录、STAGES/ORDER 均未挂 → 永远跑不到）
         # 2026-09-06 主人令：AI预测卡回测 INVALID → 下架，停跑 path_probability_backtest.py
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=5 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
-        # 🆕 2026-09-13 主人令：候选池 / 金股池前向收益回测（补齐“接链策略必有回测”的结构性保证）。
-        #   依赖 B 批 build_candidate_pool.py 产物（candidate_members / gold_pool），与回测家族同批；
-        #   必须在聚合器之前 → 聚合器才能读到本轮新产物。
-        "backtest_pools.py",        # → data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（10 档前向收益）
+        # 🔴 2026-09-14 主人令更正：候选池 / 金股池是**上游水源**（基础股池），不是选股策略
+        #   ⇒ 不做回测（原 backtest_pools.py 已删除，见 ORDER 同处说明）。
         # 🆕 2026-09-11 主人令：全算法回测汇总（按前端卡名、胜率/收益降序、低绩效提请下架）。
         #   ⚠️ 必须在 E 批**最后**——读同批其他脚本刚产出的回测产物 + D 批最终推荐。
         # 🆕 2026-09-13（同上，ORDER 同源）：强势突破回测源补齐。

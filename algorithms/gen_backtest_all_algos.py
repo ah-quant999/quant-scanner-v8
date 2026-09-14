@@ -54,7 +54,7 @@ MIN_SAMPLES = 30          # 累积样本门槛：低于此只观测、不进排�
 #      ⇒ 若 primary 行 label 带额外后缀（原实现有「（主口径）」），归一化后与其余档不等，
 #         评级只剩 primary 那一档。实测（node 复刻该函数）：原实现 = 用「宽松档 T+20」单档评星。
 #      现改为「严格档 · T+5」且 label **不加任何后缀** ⇒ 严格档 12 档全部参与评级。
-#   ② **本文件 L54 铁律**：主口径刻意取 T+5 —— 四量/CRDS/候选池主口径均 T+5、金股池 T+1，
+#   ② **本文件 L54 铁律**：主口径刻意取 T+5 —— 四量/CRDS 主口径均为 T+5，
 #      卡级主表是「同口径横比」，三重共识取 T+20 会使跨卡横比失效（= 文件头警告场景）。
 #   ③ `SOURCES.primary` 与产出 label 必须**逐字一致** ⇒ 兜底匹配（label == primary）才成立。
 CONSENSUS_PRIMARY_BAND = "共振≥80（严格）"   # = 前端 __STAR_COMPARISON_CARDS 的 resonance_gte80
@@ -79,7 +79,7 @@ FLOOR_TRADING = (16, 30)  # 与闸门 FLOOR_TRADING 同源
 FLOOR_T1 = (8, 0)         # 与闸门 FLOOR_T1 同源
 
 # 🔴 2026-09-14：因子卡主口径 = T+5 —— 与文件头 L54 铁律一致
-#   （「主口径刻意取 T+5」，四量 / CRDS / 候选池均 T+5），保证卡级主表可跨卡横比。
+#   （「主口径刻意取 T+5」，四量 / CRDS 均 T+5），保证卡级主表可跨卡横比。
 #   必须**恰好 1 行** is_primary：前端 __committeePeriods() 靠它定「主口径标签模式」，
 #   多于 1 行会取到错误档、0 行则星级静默失真。
 #   ⚠️ 定义位置必须在 SOURCES 之前 —— SOURCES 内的 primary= 引用它，否则 NameError。
@@ -114,20 +114,13 @@ SOURCES = [
          var="BACKTEST_TDX", rel="data/BACKTEST_TDX.js",
          parser="tdx", label_prefix="", primary=None,
          method="9 类 K 线信号 60 日前向回测：信号日次一交易日开盘买入、持有 N 日收盘卖出（前复权）"),
-    # 🆕 2026-09-13 主人令：「只要接入算法链的选股策略，都要有回测」。
-    #   候选池 / 金股池此前在 coverage 里是硬编码 known_gaps（「无独立前向收益回测」），
-    #   但它们**确实接在盘后算法链内**（B 批 build_candidate_pool.py 产出）。
-    #   本批新建 algorithms/backtest_pools.py 补齐，使其成为结构性保证而非缺口。
-    dict(card="候选池", kind="pool", page="选股策略", icon="📋", cat="trade",
-         var="CANDIDATE_BACKTEST", rel="data/CANDIDATE_BACKTEST.js",
-         parser="pool", label_prefix="首次进池 T+", primary="首次进池 T+5",
-         method="候选池「首次进池日」次一交易日开盘买入、持有 N 个真实交易日收盘卖出"
-                "（前复权·扣双边 0.3%）"),
-    dict(card="金股池", kind="pool", page="选股策略", icon="🪙", cat="trade",
-         var="GOLD_POOL_BACKTEST", rel="data/GOLD_POOL_BACKTEST.js",
-         parser="pool", label_prefix="首次满足信号 T+", primary="首次满足信号 T+1",
-         method="金股池「首次满足信号日」次一交易日开盘买入、持有 N 个真实交易日收盘卖出"
-                "（前复权·扣双边 0.3%）"),
+    # 🔴 2026-09-14 主人令更正：「金股池和候选股池是算法的**上游水源**，不是策略，
+    #   **不需要回测**！」—— 候选池（B 批 build_candidate_pool.py）/ 金股池(黄金池,
+    #   scanner.py) 是基础股池，作为策略的输入宇宙供给下游，本身无买卖点；
+    #   拿 T+1 胜率考核它们必然误导（实测 金股池 T+1 胜率 32.28% 被当成低绩效策略
+    #   进了 delist_advice 下架提请）。
+    #   ⇒ 已删除两条 SOURCES 条目 + parse_pool()，并删除 algorithms/backtest_pools.py
+    #     与 data/{CANDIDATE,GOLD_POOL}_BACKTEST.js。**不得再登记回本表**。
     # 🔴 2026-09-14 主人令（图1「反而缺了因子的回测」）：因子卡面本就挂「📈 选股策略」
     #   徽章，却被登记为 kind=research / cat=research ⇒ 卡面说它是策略、数据层不给它排名，
     #   自相矛盾。现改为交易型（cat=trade），口径 = **L1 最强五分位组合**（见 parse_factor_lab）。
@@ -319,8 +312,8 @@ def parse_comprehensive(src, obj):
       零样本档由 `_mk_row` 既有兜底自动归 None（绝不用 0 冒充）。
 
     🔴 2026-09-13 小九审计二次修复（本函数主口径两处错）：
-      ① 主口径原取 **T+20**，与 L54 铁律「主口径刻意取 T+5」矛盾，且四量/CRDS/候选池
-         主口径均为 T+5、金股池 T+1 ⇒ 卡级主表跨卡横比失效（= 文件头警告的场景）；
+① 主口径原取 **T+20**，与 L54 铁律「主口径刻意取 T+5」矛盾，且四量/CRDS
+主口径均为 T+5 ⇒ 卡级主表跨卡横比失效（= 文件头警告的场景）；
       ② 原 `primary=(hd == 主口径)` 使**三档各出 1 行 primary**（共 3 行），
          违反 L638「卡级主表每卡只取 1 行」，且前端取到 band 顺序最前的**宽松档**去评星。
       现：primary 恒为 `CONSENSUS_PRIMARY_BAND · T+CONSENSUS_PRIMARY_HOLD` 一行。
@@ -393,53 +386,6 @@ def parse_by_period(src, obj):
                    "win_avg": _num(r.get("win_avg")), "loss_avg": _num(r.get("loss_avg")),
                    "signal_date_range": sm.get("signal_date_range")},
             status=None if (n or 0) > 0 else "样本为 0（尚无历史信号）",
-        ))
-    return rows
-
-
-def parse_pool(src, obj):
-    """CANDIDATE_BACKTEST / GOLD_POOL_BACKTEST：候选池 / 金股池前向收益。
-
-    🆕 2026-09-13 主人令：「只要接入算法链的选股策略，都要有回测」。
-    结构 = summary.by_period（与四量/CRDS/RPS 同构），每档一行。
-
-    额外诚实呈现（本产物特有，直接透传以免二次加工失真）：
-      · readiness      —— 每档「预期可算日期」（按交易日推算的**预期值**，非承诺）
-      · honesty_note   —— 生成器自带的诚实声明（零样本档一律 null，不用 0 冒充）
-      · priced_signals —— 真正取到 K 线的信号数（总信号数可能更多，差额=数据缺口）
-    """
-    sm = (obj or {}).get("summary") or {}
-    bp = sm.get("by_period") or {}
-    rows = []
-    if not bp:
-        return [_mk_row(src, "—", None, None, None, None, status="无 by_period 数据")]
-    readiness = (obj or {}).get("readiness") or {}
-    honesty = (obj or {}).get("honesty_note")
-    prefix = src.get("label_prefix") or "持有 T+"
-    for k in sorted(bp.keys(), key=lambda x: (_num(x) is None, _num(x) or 0)):
-        r = bp.get(k) or {}
-        n = _num(r.get("samples"))
-        if n is None:
-            n = _num(r.get("count"))
-        status = None
-        if not (n or 0):
-            exp = readiness.get(str(k))
-            status = "样本为 0（累积中）"
-            if exp:
-                status += f"；预期 {exp} 可算"
-        rows.append(_mk_row(
-            src, f"{prefix}{k}", n, r.get("win_rate"), r.get("avg_return"), f"T+{k}",
-            extra={"best_return": _num(r.get("best_return")),
-                   "worst_return": _num(r.get("worst_return")),
-                   "max_drawdown": _num(r.get("max_drawdown")),
-                   "sharpe": _num(r.get("sharpe_ratio")),
-                   "win_avg": _num(r.get("win_avg")), "loss_avg": _num(r.get("loss_avg")),
-                   "total_signals": _num((obj or {}).get("total_signals")),
-                   "priced_signals": _num((obj or {}).get("priced_signals")),
-                   "readiness": readiness.get(str(k)),
-                   "signal_date_range": sm.get("signal_date_range") or (obj or {}).get("signal_date_range"),
-                   "honesty_note": honesty},
-            status=status,
         ))
     return rows
 
@@ -591,7 +537,7 @@ def parse_factor_lab(src, obj):
 PARSERS = {
     "comprehensive": parse_comprehensive,
     "by_period": parse_by_period,
-    "pool": parse_pool,
+
     "tdx": parse_tdx,
     "algo_compare": parse_algo_compare,
     "factor_lab": parse_factor_lab,
@@ -716,16 +662,16 @@ def build(root, day, kind, note, extra_note=""):
         "low_win_rate": LOW_WIN_RATE,
         "low_avg_return": LOW_AVG_RETURN,
         "sort_rule": "胜率降序 → 平局看平均收益降序（与页内星级对比表同口径）",
-        # 🔴 2026-09-13 根因修复：本串原先**手写死**，删 RPS 后仍残留「相对强度＝T+5」、
-        #   且新增候选池/金股池后未同步 ⇒ 产物里的口径说明与真实判定不一致（误导）。
+# 🔴 2026-09-13 根因修复：本串原先**手写死**，删 RPS 后仍残留「相对强度＝T+5」⇒
+#   产物里的口径说明与真实判定不一致（误导）。
         #   现改为**从 SOURCES 派生**（唯一的真值来源），改 SOURCES 即自动同步、永不漂移。
         "primary_rule": ("卡级主表每卡只取 1 行既定主口径（"
                          + "；".join(f"{s['card']}＝{s['primary']}"
                                     for s in SOURCES if s.get("primary"))
                          + "），**不跨持有期横比**；"
                          f"且**样本 < {MIN_SAMPLES} 不进主表**（累积不足不排名）。"
-                         "其中 kind=pool（候选池/金股池）为**基础股池**，"
-                         "只作入选门槛验证，**不参与星级评定**（星规只评有买卖点的选股策略）。"),
+"🔴 候选池 / 金股池(=黄金池) 是算法**上游水源**（基础股池），不是选股策略，"
+"**不做回测、不进本表、不进下架提请**（2026-09-14 主人令）。"),
         "honesty_note": ("未知一律 null（前端显示 —），绝不用 0 冒充；"
                          f"样本< {MIN_SAMPLES} 只观测、不进排名、不做下架评估；"
                          "研究型（因子分层）不与交易型同列比较；"
@@ -764,8 +710,8 @@ def _coverage(rows):
         c["status"] = st
         out.append(c)
     # 已知无回测产物的算法卡（**如实列出，不用编造数字填补**）
-    # 🔴 2026-09-13 主人令：候选池 / 金股池已由 algorithms/backtest_pools.py 补齐
-    #   真实前向收益回测（挂 E 批），**从 known_gaps 移除** —— 它们不再是缺口。
+# 🔴 2026-09-14 主人令：候选池 / 金股池是**上游水源**（基础股池），不是选股策略
+#   ⇒ 既不做回测，也**不作为「缺回测的算法卡」登记**（它们本就不该有回测）。
     known_gaps = [
         {"card": "机游共振", "page": "盘后数据", "status": "⚪ 无独立前向收益回测"},
     ]

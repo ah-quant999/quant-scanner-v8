@@ -57,6 +57,14 @@ DELIST_AVG_RETURN = 0.0   # 平均收益红线（≤ 此判低收益；已扣成
 RESEND_SUPPRESS_DAYS = 7  # 同一卡 N 天内不重发
 RESEND_WORSEN_PT = 5.0    # 但胜率再降 ≥ 此值 → 破例重发
 
+# 🔴🔴 2026-09-14 主人令：「金股池和候选股池是算法的**上游水源**，不是策略，不需要回测！」
+#   基础股池（B 批产出的输入宇宙：候选池 / 金股池）**不得进任何绩效/下架判定** ——
+#   它们无买卖点，拿 T+1 胜率考核必然误导。实测事故：产物 delist_advice 里出现
+#   「金股池 首次满足信号 T+1 · 胜率 32.28%」→ 差点把上游水源当低绩效策略下架。
+#   本豁免按**卡名**匹配（产物 JS 的 rows 不带 kind 字段，无法按 kind 判），
+#   并同时兼容历史两种写法：金股池 / 黄金池。
+POOL_CARDS = {"候选池", "金股池", "黄金池"}
+
 STATE = RAW / "_delist_advice_state.json"
 DEFAULT_PRODUCT = DATA / "BACKTEST_ALL_ALGOS.js"
 
@@ -181,6 +189,8 @@ def judge(obj, force=False, state=None):
 
     for a in advice:
         card = a.get("card") or "?"
+        if card in POOL_CARDS:
+            continue      # 上游水源不参与绩效/下架判定（2026-09-14 主人令），连观察都不进
         wr, n = _num(a.get("win_rate")), _num(a.get("sample")) or 0
         ar = _num(a.get("avg_return"))
 
@@ -225,6 +235,8 @@ def _from_rows(rows):
     advice, watch = [], []
     cat_ok = {"trade"}
     for r in rows:
+        if r.get("card") in POOL_CARDS:
+            continue      # 上游水源豁免（2026-09-14 主人令）
         if r.get("cat") not in cat_ok or not r.get("is_primary"):
             continue
         wr, n = _num(r.get("win_rate")), _num(r.get("sample")) or 0

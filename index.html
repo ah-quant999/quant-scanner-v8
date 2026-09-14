@@ -1682,12 +1682,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/FACTOR_LAB_BACKTEST.js?v=1789396291" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
 <script src="data/BACKTEST_ALL_ALGOS.js?v=1789396291" defer></script>
-<!-- 🧮 2026-09-13 主人令「只要接入算法链的选股策略，都要有回测」：候选池 / 金股池
-     前向收益回测（E 批 algorithms/backtest_pools.py 产出，10 档：5/10/20/30/45/60/75/90/180/250）。
-     口径：首次进池（候选池）/ 首次满足信号（金股池）的次一交易日开盘买入，
-     持有 N 个真实交易日收盘卖出，前复权、扣双边 0.3%。 -->
-<script src="data/CANDIDATE_BACKTEST.js?v=1789396291" defer></script>
-<script src="data/GOLD_POOL_BACKTEST.js?v=1789396291" defer></script>
+<!-- 🔴 2026-09-14 主人令：「金股池和候选股池是算法的上游水源，不是策略，不需要回测！」
+     原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
+     已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
+     （实测该数据曾被当成「低绩效策略」提请下架）。 -->
     <script src="data/FACTOR_LAB.js?v=1789396291" defer></script>
 <!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
 <script src="data/ETF_PULSE.js?v=1789396291" defer></script>
@@ -4303,9 +4301,13 @@ function fmtSigned(v){
      现统一为：**一处算、全站用**，两处都调本函数。
 
      主人 09-13 两条口径（已落进代码）：
-       A.「股池是基础，它们应该不算胜率，而是确认入选的门槛对不对」
-          ⇒ __STAR_KIND 里 kind='pool' 的卡（候选池 / 金股池）**不评星级**，
-            只保留「入选门槛」这件事本身，前端显示「基础股池」标签。
+        A.「股池是基础，它们应该不算胜率，而是确认入选的门槛对不对」
+           ⇒ __STAR_KIND 里 kind='pool' 的卡（候选池 / 金股池 / 黄金池）**不评星级**，
+             只保留「入选门槛」这件事本身，前端显示「基础股池」标签。
+        🔴 2026-09-14 主人令再进一步：「金股池和候选股池是算法的**上游水源**，不是策略，
+           **不需要回测**！」⇒ 回测侧已整体摘除（生成器/挂链/门禁/产物全删）。
+           本判据保留为**永久护栏**：任何历史或残留产物里的股池行，一律不得进
+           主对比表 / 档位矩阵 / 最优组合榜 / 一句话结论。
        B.「肯定要统一测算标准，用最科学的计算」
           ⇒ ① 多期加权（不是单期片面）；② 持有期覆盖不足 ⇒ **不评级**（显示「累积中」），
             绝不拿 2~3 个短档硬凑星级；③ 短期（T+1/T+5）胜率不过半 ⇒ 封顶 4⭐
@@ -4314,7 +4316,7 @@ function fmtSigned(v){
      数据来源：window.BACKTEST_ALL_ALGOS.rows（各卡 × 各持有期的真实样本），
      故本函数**无任何硬编码星级**，随回测数据自动更新。
      ═══════════════════════════════════════════════════════════════════════ */
-  window.__STAR_KIND = { '候选池': 'pool', '金股池': 'pool' };   // 基础股池（主人口径 A）
+  window.__STAR_KIND = { '候选池': 'pool', '金股池': 'pool', '黄金池': 'pool' };   // 基础股池（上游水源·不评星/不进榜/不回测）
   window.__STAR_PROFILE_OF = {                                    // 信号性质 → 权重档
     '三重共识': 'medium', '四量终极': 'long', '逆势龙头': 'short',
     'K线信号层': 'short', '强势突破': 'short'

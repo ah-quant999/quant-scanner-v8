@@ -139,19 +139,10 @@ CARD_DEFS = [
     #      不取 update_time —— 它是 CARD_DEFS 的通用时戳字段，列进 key_fields 等于没校验；
     #      本卡要抓的恰是「文件在不在 + 内容结构化没有」。
     {"id": "BACKTEST_ALL_ALGOS", "name": "全算法回测汇总", "page": "策略回测", "freq": "每日回测批（E 批末位）", "max_age": 1440, "key_fields": ["rows", "coverage"], "heal_cat": "algo_run", "raw_file": "backtest_all_algos.json"},
-    # 🆕 2026-09-13 主人令「只要接入算法链的选股策略，都要有回测」——候选池/黄金池回测正式登记。
-    #   根因（与上条 09-12 BACKTEST_ALL_ALGOS 同型·三重静默）：backtest_pools.py 已挂
-    #   STAGES["E"]（E 批第 8 位、聚合器之前），产出 raw_data/{candidate,gold_pool}_backtest.json
-    #   + data/{CANDIDATE,GOLD_POOL}_BACKTEST.js；但若**不登记**，产物缺失/陈旧时
-    #   聚合器只会把它们显示成 known_gaps，运维页零红灯 ⇒ 又是一次静默。
-    #   ⚠️ key_fields 取 ["hold_periods", "honesty_note"]：
-    #      · hold_periods —— 恒非空，且能抓「档位阶梯被写坏/退化回 8 档」
-    #      · honesty_note —— 本脚本刻意产出的诚实声明（零样本档一律 null，必要非空）
-    #      不取 update_time（CARD_DEFS 通用字段，列了等于没校验）。
-    #   ⚠️ 刻意**不进** _LOW_FREQ_FILES：每日回测批产物，本就该每日刷新；
-    #      进白名单会把 24h 红线降成 7 天容忍（09-11 FOUR_VOLUME_60M 冻结 3 天零告警的同型事故）。
-    {"id": "CANDIDATE_BACKTEST", "name": "候选池回测", "page": "策略回测", "freq": "每日回测批（E 批）", "max_age": 1440, "key_fields": ["hold_periods", "honesty_note"], "heal_cat": "algo_run", "raw_file": "candidate_backtest.json"},
-    {"id": "GOLD_POOL_BACKTEST", "name": "黄金池回测", "page": "策略回测", "freq": "每日回测批（E 批）", "max_age": 1440, "key_fields": ["hold_periods", "honesty_note"], "heal_cat": "algo_run", "raw_file": "gold_pool_backtest.json"},
+    # 🔴 2026-09-14 主人令更正：候选池 / 金股池(=黄金池) 是算法**上游水源**，不是策略
+    #   ⇒ **不需要回测**。原 CANDIDATE_BACKTEST / GOLD_POOL_BACKTEST 两条登记已删除
+    #   （连同 algorithms/backtest_pools.py 与两条产物）。池子本身产出的新鲜度，仍由下面
+    #   「候选池 / 金股池」（page=盘后数据，heal_cat=algo_run）两条负责 —— 那才是它们该被考核的。
     {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "实时数据", "freq": "盘中每30分（日行情取最近交易日）", "max_age": 120, "key_fields": ["items"], "heal_cat": "intraday"},  # 2026-08-31 修复：cloud_fetch_v8.py 的 tasks 列表含 CFFEX_HOLDINGS，盘中每 30 分执行并刷新 update_time，但数据为日行情取最近交易日；HC 分类应与调度一致，避免盘后/盘中口径冲突
     {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"], "heal_cat": "premarket"},  # 危机雷达每日 08:25 跑一次
     # 🛡 2026-09-11 小九的股票专家：此处原有 MARKET_FUND_FLOW_DATA 的**重复登记**
