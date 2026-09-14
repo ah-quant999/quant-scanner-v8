@@ -69,6 +69,11 @@ HEARTBEAT_GRACE_MIN = 54             # 额外宽限（覆盖 runner 繁忙晚到
 PEER_FAILOVER_THRESHOLD_MIN = HEARTBEAT_INTERVAL_MIN * HEARTBEAT_THRESHOLD_FACTOR + HEARTBEAT_GRACE_MIN   # = 180
 
 ALERT_COOLDOWN_HOURS = 6
+# 🔴 2026-09-14 主人令「能自愈的就不要一直发，实在解决不了的才发给我」：反骚扰加固
+#   · fetch 抖动 / 远端瞬时读不到 / 解析失败 ⇒ 判「unknown」而非「掉线」→ 静默自愈，绝不发信、绝不 dispatch
+#   · 连续 N 次「真·静默超阈值」才升级为掉线并告警（迟滞，滤掉单跳抖动）
+#   · 恢复时只清零连续计数，**不**清零告警冷却 ⇒ 抖动期(掉线→在线→掉线)不会反复发信
+CONSEC_DOWN_BEFORE_ALERT = 2          # 连续 2 次真·掉线判定才告警
 REPO = "ah-quant999/quant-scanner-v8"
 GH_API = f"https://api.github.com/repos/{REPO}/contents"
 
@@ -203,7 +208,7 @@ def check_peer_alive(rel_path=HB_XIAOJIU_REL, var_name="HB_XIAOJIU", peer_name="
 
     machine = hb.get("machine", "?")
     detail = f"远端权威 origin/main:{rel_path} · last_time={last_ts} · machine={machine} · 沉默 {elapsed:.0f}min"
-    return elapsed < PEER_FAILOVER_THRESHOLD_MIN, elapsed, last_ts, detail
+    return ("down" if elapsed >= PEER_FAILOVER_THRESHOLD_MIN else "alive"), elapsed, last_ts, detail
 
 
 def check_alimi_alive(fetched=None):
@@ -213,21 +218,21 @@ def check_alimi_alive(fetched=None):
     if fetched is None:
         fetched, _ = fetch_origin_main()
     if not fetched:
-        return None, None, "", "fetch 失败"
+        return "unknown", None, "", "fetch 失败"
     text, rerr = _read_remote_file(HB_ALIMI_REL)
     if text is None:
-        return None, None, "", f"远端尚无 {HB_ALIMI_REL}（对方发送侧未落地）"
+        return "unknown", None, "", f"远端尚无 {HB_ALIMI_REL}（对方发送侧未落地）"
     hb = _load_hb_from_text(text, "HB_ALIMI")
     if not hb:
-        return None, None, "", f"{HB_ALIMI_REL} 解析失败"
+        return "unknown", None, "", f"{HB_ALIMI_REL} 解析失败"
     last_ts = (hb.get("last_time") or "").strip()
     if not last_ts:
-        return None, None, "", f"{HB_ALIMI_REL} 无 last_time"
+        return "unknown", None, "", f"{HB_ALIMI_REL} 无 last_time"
     try:
         elapsed = _silent_minutes(last_ts)
     except Exception as e:
-        return None, None, "", f"last_time 解析失败: {e}"
-    return elapsed < PEER_FAILOVER_THRESHOLD_MIN, elapsed, last_ts, (
+        return "unknown", None, "", f"last_time 解析失败: {e}"
+    return ("down" if elapsed >= PEER_FAILOVER_THRESHOLD_MIN else "alive"), elapsed, last_ts, (
         f"{HB_ALIMI_REL} · last_time={last_ts} · machine={hb.get('machine','?')} · 沉默 {elapsed:.0f}min")
 
 
@@ -399,12 +404,12 @@ def send_alert_email(silent_min, hb_last_time, peer_name="小九"):
     return False
 
 
-def reset_alert_state():
-    try:
-        if ALERT_STATE_FILE.exists():
-            ALERT_STATE_FILE.unlink()
-    except Exception:
-        pass
+def reset_consec_counter():
+    """对方恢复在线：只清零「连续掉线计数」，🔴 绝不触碰 last_alert_ts 冷却。
+    这样抖动期(掉线→在线→掉线)不会因冷却被清零而反复发信。"""
+    st = _load_alert_state()
+    if int(st.get("consec_down", 0)) != 0:
+        _save_alert_state(consec_down=0)
 
 
 def dispatch_rescue():
@@ -452,12 +457,12 @@ def main():
     if "--self-test" in sys.argv:
         fetched, fmsg = fetch_origin_main()
         print(f"fetch ok={fetched} {fmsg}")
-        alive, silent, last, detail = check_peer_alive(fetched=fetched)
-        print(f"小九 alive={alive} silent={silent} last={last}\n  {detail}")
+        status, silent, last, detail = check_peer_alive(fetched=fetched)
+        print(f"小九 status={status} silent={silent} last={last}\n  {detail}")
         aa, as_, al, ad = check_alimi_alive(fetched=fetched)
-        print(f"阿狸咪 alive={aa} silent={as_} last={al}\n  {ad}")
+        print(f"阿狸咪 status={aa} silent={as_} last={al}\n  {ad}")
         print(f"阈值 = {HEARTBEAT_INTERVAL_MIN} × {HEARTBEAT_THRESHOLD_FACTOR} + {HEARTBEAT_GRACE_MIN}"
-              f" = {PEER_FAILOVER_THRESHOLD_MIN}")
+              f" = {PEER_FAILOVER_THRESHOLD_MIN}；连续 {CONSEC_DOWN_BEFORE_ALERT} 次才告警；冷却 {ALERT_COOLDOWN_HOURS}h（恢复不重置）")
         return 0
 
     if not in_monitor_window():
@@ -469,32 +474,52 @@ def main():
     if not fetched:
         log(f"  ⚠️ fetch 失败: {fmsg}")
 
-    alive, silent_min, hb_last, detail = check_peer_alive(fetched=fetched)
-    al_alive, al_silent, al_last, al_detail = check_alimi_alive(fetched=fetched)
+    status, silent_min, hb_last, detail = check_peer_alive(fetched=fetched)
+    al_status, al_silent, al_last, al_detail = check_alimi_alive(fetched=fetched)
 
     # [4] 无论结论如何，先落自证
     run_ctx = {
-        "xj_alive": alive, "xj_silent": silent_min, "xj_last": hb_last, "xj_detail": detail,
-        "al_alive": al_alive, "al_silent": al_silent, "al_last": al_last, "al_detail": al_detail,
-        "verdict": ("xiaoju_alive" if alive else "xiaoju_down"),
+        "xj_status": status, "xj_alive": (status == "alive"),
+        "xj_silent": silent_min, "xj_last": hb_last, "xj_detail": detail,
+        "al_status": al_status, "al_alive": (al_status == "alive"),
+        "al_silent": al_silent, "al_last": al_last, "al_detail": al_detail,
+        "verdict": status,
     }
 
-    if alive:
+    if status == "alive":
         log(f"✅ 小九正常（最近心跳 {silent_min:.0f} 分钟前） | {detail}")
-        reset_alert_state()
+        reset_consec_counter()          # 只清零连续计数，绝不重置告警冷却
         self_proof(run_ctx)
         return 0
 
-    log(f"🔴 小九心跳已 {silent_min:.0f} 分钟（> {PEER_FAILOVER_THRESHOLD_MIN}min），判为掉线！ | {detail}")
-    run_ctx["verdict"] = "xiaoju_down"
-    send_alert_email(silent_min, hb_last)
-    self_proof(run_ctx)
+    if status == "unknown":
+        # 🔴 远端瞬时读不到/解析失败 ⇒ 静默自愈，绝不发信、绝不 dispatch
+        log(f"⚠️ 小九心跳判定为「未知」(瞬时抖动: {detail})，静默自愈，下一轮再判")
+        self_proof(run_ctx)
+        return 0
 
-    if "--alert-only" in sys.argv:
-        log("🚨 ALERT-ONLY 模式：仅报警，不 dispatch rescue。请人工确认小九状态！")
+    # —— status == "down"：真·静默超阈值 ——
+    st = _load_alert_state()
+    consec = int(st.get("consec_down", 0)) + 1
+    _save_alert_state(consec_down=consec)
+    run_ctx["verdict"] = "xiaoju_down"
+    if consec < CONSEC_DOWN_BEFORE_ALERT:
+        log(f"🔸 小九疑似掉线（连续第 {consec} 次，需 {CONSEC_DOWN_BEFORE_ALERT} 次才告警）→ 观察中，暂不打扰 | {detail}")
+        self_proof(run_ctx)
         return 1
 
-    dispatch_rescue()
+    # 已确认掉线：先自愈(云端兜底 dispatch)，再按冷却决定是否打扰主人
+    if _alert_cooldown_active():
+        log(f"🔴 小九已确认掉线（{silent_min:.0f}min>阈值），冷却中跳过邮件，但已 dispatch rescue 自愈 | {detail}")
+        if "--alert-only" not in sys.argv:
+            dispatch_rescue()
+        self_proof(run_ctx)
+        return 1
+
+    send_alert_email(silent_min, hb_last)
+    if "--alert-only" not in sys.argv:
+        dispatch_rescue()
+    self_proof(run_ctx)
     return 1
 
 
