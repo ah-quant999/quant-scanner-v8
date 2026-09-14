@@ -188,6 +188,27 @@ def render():
     print(r.stdout.strip())
     if r.returncode != 0:
         print("✗ 渲染报告失败:\n%s" % r.stderr)
+        sys.exit(1)
+
+
+def freshness_guard(last_date, stale_days=15):
+    """数据新鲜度守卫：最新交易日距今天超过 stale_days 自然日 → 说明取数异常（源给出陈旧数据）。
+
+    交易日历校验：正常情况最新交易日距今 ≤ 4 自然日（含周末）；长假最多 9 天（春节/国庆）。
+    超过 15 天必是异常，拒绝写入以防把陈旧数据推上仓库。
+    """
+    try:
+        from datetime import datetime, date as _d
+        ld = datetime.strptime(last_date, "%Y-%m-%d").date()
+    except Exception:
+        print("· 警告：无法解析最新交易日 %s，跳过新鲜度校验" % last_date)
+        return
+    gap = (_d.today() - ld).days
+    if gap > stale_days:
+        print("✗ 新鲜度守卫：最新交易日 %s 距今 %d 天（>%d），疑似取到陈旧数据，拒绝写入"
+              % (last_date, gap, stale_days))
+        sys.exit(2)
+    print("· 新鲜度：最新交易日 %s（距今 %d 天）" % (last_date, gap))
 
 
 def main():
@@ -208,8 +229,13 @@ def main():
         sys.exit(1)
     last = closes[-1]
     prev = closes[-2]
+    # 涨跌幅 = (最新收盘 - 上一交易日收盘) / 上一交易日收盘。序列本身已剔除休市日，
+    # 长假后 closes[-2] 即节前最后一个交易日，天然正确，无需另行处理交易日历。
     pct = round((last - prev) / prev * 100, 2)
     new_last_date = dates[-1]
+
+    # 数据新鲜度守卫（防源返回陈旧数据被推上仓库）
+    freshness_guard(new_last_date)
 
     # 2) 拉 5 指数
     idx_new = []
