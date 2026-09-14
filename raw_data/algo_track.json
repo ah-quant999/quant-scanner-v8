@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-13 16:09",
+  "update_time": "2026-09-14 19:29",
   "window_days": 90,
   "horizons": [
     5,
@@ -16,38 +16,38 @@
   "cost_pct_roundtrip": 0.3,
   "total_stats": {
     "four_volume": {
-      "tracking": 108,
+      "tracking": 111,
       "history_samples": 0,
       "win_rate": null,
       "avg_return": null,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
-      "today_signals": 12,
+      "today_signals": 15,
       "by_horizon": {
         "5": {
-          "samples": 60,
-          "win_rate": 25.0,
-          "avg_return": -4.24,
-          "best_return": 13.91,
+          "samples": 76,
+          "win_rate": 28.9,
+          "avg_return": -3.31,
+          "best_return": 15.61,
           "worst_return": -18.68,
-          "median_return": -3.99
+          "median_return": -3.62
         },
         "10": {
-          "samples": 34,
-          "win_rate": 20.6,
-          "avg_return": -6.21,
+          "samples": 44,
+          "win_rate": 15.9,
+          "avg_return": -6.95,
           "best_return": 22.11,
-          "worst_return": -23.7,
-          "median_return": -6.85
+          "worst_return": -28.68,
+          "median_return": -7.11
         },
         "20": {
-          "samples": 0,
-          "win_rate": null,
-          "avg_return": null,
-          "best_return": null,
-          "worst_return": null,
-          "median_return": null
+          "samples": 8,
+          "win_rate": 12.5,
+          "avg_return": -6.48,
+          "best_return": 5.31,
+          "worst_return": -17.74,
+          "median_return": -3.3
         },
         "30": {
           "samples": 0,
@@ -120,12 +120,12 @@
       ],
       "cost_pct_roundtrip": 0.3,
       "coverage": {
-        "items": 108,
-        "with_series": 106,
+        "items": 111,
+        "with_series": 109,
         "missing_cache": 2,
-        "bar_asof": "2026-09-11",
-        "t5_ready": 60,
-        "t5_ready_pct": 55.6
+        "bar_asof": "2026-09-14",
+        "t5_ready": 76,
+        "t5_ready_pct": 68.5
       }
     }
   },
@@ -134,38 +134,38 @@
       "algo": "four_volume",
       "display_name": "四量终极",
       "stats": {
-        "tracking": 108,
+        "tracking": 111,
         "history_samples": 0,
         "win_rate": null,
         "avg_return": null,
         "exit_target": 0,
         "exit_stop": 0,
         "exit_timeout": 0,
-        "today_signals": 12,
+        "today_signals": 15,
         "by_horizon": {
           "5": {
-            "samples": 60,
-            "win_rate": 25.0,
-            "avg_return": -4.24,
-            "best_return": 13.91,
+            "samples": 76,
+            "win_rate": 28.9,
+            "avg_return": -3.31,
+            "best_return": 15.61,
             "worst_return": -18.68,
-            "median_return": -3.99
+            "median_return": -3.62
           },
           "10": {
-            "samples": 34,
-            "win_rate": 20.6,
-            "avg_return": -6.21,
+            "samples": 44,
+            "win_rate": 15.9,
+            "avg_return": -6.95,
             "best_return": 22.11,
-            "worst_return": -23.7,
-            "median_return": -6.85
+            "worst_return": -28.68,
+            "median_return": -7.11
           },
           "20": {
-            "samples": 0,
-            "win_rate": null,
-            "avg_return": null,
-            "best_return": null,
-            "worst_return": null,
-            "median_return": null
+            "samples": 8,
+            "win_rate": 12.5,
+            "avg_return": -6.48,
+            "best_return": 5.31,
+            "worst_return": -17.74,
+            "median_return": -3.3
           },
           "30": {
             "samples": 0,
@@ -238,12 +238,12 @@
         ],
         "cost_pct_roundtrip": 0.3,
         "coverage": {
-          "items": 108,
-          "with_series": 106,
+          "items": 111,
+          "with_series": 109,
           "missing_cache": 2,
-          "bar_asof": "2026-09-11",
-          "t5_ready": 60,
-          "t5_ready_pct": 55.6
+          "bar_asof": "2026-09-14",
+          "t5_ready": 76,
+          "t5_ready_pct": 68.5
         }
       },
       "tracking": [
@@ -254,10 +254,10 @@
           "list_date": "20260815",
           "list_date_dashed": "2026-08-15",
           "entry_price": 40.9,
-          "last_close": 40.75,
-          "last_pct": -0.37,
+          "last_close": 40.63,
+          "last_pct": -0.66,
           "peak_pct": 3.81,
-          "days_in": 68,
+          "days_in": 69,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -273,10 +273,10 @@
           "list_date": "20260815",
           "list_date_dashed": "2026-08-15",
           "entry_price": 150.99,
-          "last_close": 118.94,
-          "last_pct": -21.23,
+          "last_close": 117.69,
+          "last_pct": -22.05,
           "peak_pct": 10.0,
-          "days_in": 68,
+          "days_in": 69,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -292,10 +292,10 @@
           "list_date": "20260815",
           "list_date_dashed": "2026-08-15",
           "entry_price": 65.12,
-          "last_close": 53.77,
-          "last_pct": -17.43,
+          "last_close": 53.76,
+          "last_pct": -17.44,
           "peak_pct": 3.81,
-          "days_in": 68,
+          "days_in": 69,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -311,10 +311,10 @@
           "list_date": "20260815",
           "list_date_dashed": "2026-08-15",
           "entry_price": 122.05,
-          "last_close": 107.98,
-          "last_pct": -11.53,
+          "last_close": 107.6,
+          "last_pct": -11.84,
           "peak_pct": 0.98,
-          "days_in": 68,
+          "days_in": 69,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -330,10 +330,10 @@
           "list_date": "20260815",
           "list_date_dashed": "2026-08-15",
           "entry_price": 56.46,
-          "last_close": 48.6,
-          "last_pct": -13.92,
+          "last_close": 49.3,
+          "last_pct": -12.68,
           "peak_pct": 1.31,
-          "days_in": 68,
+          "days_in": 69,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -349,10 +349,10 @@
           "list_date": "20260815",
           "list_date_dashed": "2026-08-15",
           "entry_price": 143.23,
-          "last_close": 132.24,
-          "last_pct": -7.67,
+          "last_close": 139.5,
+          "last_pct": -2.6,
           "peak_pct": 10.18,
-          "days_in": 68,
+          "days_in": 69,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -368,10 +368,10 @@
           "list_date": "20260816",
           "list_date_dashed": "2026-08-16",
           "entry_price": 24.85,
-          "last_close": 18.57,
-          "last_pct": -25.27,
+          "last_close": 18.97,
+          "last_pct": -23.66,
           "peak_pct": 0.0,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -387,10 +387,10 @@
           "list_date": "20260816",
           "list_date_dashed": "2026-08-16",
           "entry_price": 5.29,
-          "last_close": 4.79,
-          "last_pct": -9.45,
+          "last_close": 4.75,
+          "last_pct": -10.21,
           "peak_pct": 18.53,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -406,10 +406,10 @@
           "list_date": "20260816",
           "list_date_dashed": "2026-08-16",
           "entry_price": 43.16,
-          "last_close": 33.56,
-          "last_pct": -22.24,
+          "last_close": 33.34,
+          "last_pct": -22.75,
           "peak_pct": 0.0,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -425,10 +425,10 @@
           "list_date": "20260816",
           "list_date_dashed": "2026-08-16",
           "entry_price": 32.97,
-          "last_close": 34.59,
-          "last_pct": 4.91,
+          "last_close": 34.82,
+          "last_pct": 5.61,
           "peak_pct": 22.41,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -444,10 +444,10 @@
           "list_date": "20260816",
           "list_date_dashed": "2026-08-16",
           "entry_price": 235.8,
-          "last_close": 225.0,
-          "last_pct": -4.58,
+          "last_close": 228.72,
+          "last_pct": -3.0,
           "peak_pct": 7.53,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -463,10 +463,10 @@
           "list_date": "20260817",
           "list_date_dashed": "2026-08-17",
           "entry_price": 219.0,
-          "last_close": 207.84,
-          "last_pct": -5.1,
+          "last_close": 204.09,
+          "last_pct": -6.81,
           "peak_pct": 0.0,
-          "days_in": 65,
+          "days_in": 66,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -482,10 +482,10 @@
           "list_date": "20260817",
           "list_date_dashed": "2026-08-17",
           "entry_price": 99.78,
-          "last_close": 82.3,
-          "last_pct": -17.52,
+          "last_close": 83.45,
+          "last_pct": -16.37,
           "peak_pct": 3.64,
-          "days_in": 65,
+          "days_in": 66,
           "appear_count": 1,
           "last_seen": "20260817",
           "signal_detail": {
@@ -501,10 +501,10 @@
           "list_date": "20260817",
           "list_date_dashed": "2026-08-17",
           "entry_price": 23.43,
-          "last_close": 19.17,
-          "last_pct": -18.18,
+          "last_close": 19.45,
+          "last_pct": -16.99,
           "peak_pct": 0.81,
-          "days_in": 65,
+          "days_in": 66,
           "appear_count": 1,
           "last_seen": "20260817",
           "signal_detail": {
@@ -520,10 +520,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 97.0,
-          "last_close": 85.8,
-          "last_pct": -11.55,
+          "last_close": 84.61,
+          "last_pct": -12.77,
           "peak_pct": 7.59,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260819",
           "signal_detail": {
@@ -539,10 +539,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 111.33,
-          "last_close": 84.21,
-          "last_pct": -24.36,
+          "last_close": 88.9,
+          "last_pct": -20.15,
           "peak_pct": 0.0,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260819",
           "signal_detail": {
@@ -558,10 +558,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 185.34,
-          "last_close": 227.74,
-          "last_pct": 22.88,
-          "peak_pct": 22.88,
-          "days_in": 64,
+          "last_close": 228.7,
+          "last_pct": 23.39,
+          "peak_pct": 23.39,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260819",
           "signal_detail": {
@@ -577,10 +577,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 94.61,
-          "last_close": 81.38,
-          "last_pct": -13.98,
+          "last_close": 82.01,
+          "last_pct": -13.32,
           "peak_pct": 2.29,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -596,10 +596,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 183.15,
-          "last_close": 134.67,
-          "last_pct": -26.47,
+          "last_close": 133.8,
+          "last_pct": -26.95,
           "peak_pct": 0.0,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -615,10 +615,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 43.78,
-          "last_close": 37.31,
-          "last_pct": -14.78,
+          "last_close": 37.29,
+          "last_pct": -14.82,
           "peak_pct": 7.47,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -634,10 +634,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 16.55,
-          "last_close": 15.72,
-          "last_pct": -5.02,
+          "last_close": 16.27,
+          "last_pct": -1.69,
           "peak_pct": 12.75,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -653,10 +653,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 63.6,
-          "last_close": 65.24,
-          "last_pct": 2.58,
+          "last_close": 63.2,
+          "last_pct": -0.63,
           "peak_pct": 8.02,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -672,10 +672,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 150.35,
-          "last_close": 128.78,
-          "last_pct": -14.35,
+          "last_close": 126.32,
+          "last_pct": -15.98,
           "peak_pct": 3.35,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -691,10 +691,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 417.04,
-          "last_close": 301.5,
-          "last_pct": -27.7,
+          "last_close": 300.88,
+          "last_pct": -27.85,
           "peak_pct": 1.12,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -710,10 +710,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 422.04,
-          "last_close": 349.11,
-          "last_pct": -17.28,
+          "last_close": 346.52,
+          "last_pct": -17.89,
           "peak_pct": 3.57,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -729,10 +729,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 406.94,
-          "last_close": 391.79,
-          "last_pct": -3.72,
+          "last_close": 393.0,
+          "last_pct": -3.43,
           "peak_pct": 1.98,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -748,10 +748,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 134.0,
-          "last_close": 107.0,
-          "last_pct": -20.15,
+          "last_close": 105.29,
+          "last_pct": -21.43,
           "peak_pct": 4.34,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -767,10 +767,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 35.18,
-          "last_close": 34.49,
-          "last_pct": -1.96,
+          "last_close": 33.9,
+          "last_pct": -3.64,
           "peak_pct": 2.05,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -786,10 +786,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 36.16,
-          "last_close": 39.33,
-          "last_pct": 8.77,
+          "last_close": 40.06,
+          "last_pct": 10.79,
           "peak_pct": 10.95,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -805,10 +805,10 @@
           "list_date": "20260818",
           "list_date_dashed": "2026-08-18",
           "entry_price": 39.73,
-          "last_close": 27.8,
-          "last_pct": -30.03,
+          "last_close": 27.96,
+          "last_pct": -29.62,
           "peak_pct": 4.46,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -824,10 +824,10 @@
           "list_date": "20260820",
           "list_date_dashed": "2026-08-20",
           "entry_price": 187.65,
-          "last_close": 164.13,
-          "last_pct": -12.53,
+          "last_close": 177.6,
+          "last_pct": -5.36,
           "peak_pct": 0.0,
-          "days_in": 58,
+          "days_in": 59,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -843,10 +843,10 @@
           "list_date": "20260820",
           "list_date_dashed": "2026-08-20",
           "entry_price": 46.18,
-          "last_close": 43.81,
-          "last_pct": -5.13,
+          "last_close": 42.91,
+          "last_pct": -7.08,
           "peak_pct": 0.91,
-          "days_in": 58,
+          "days_in": 59,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -862,10 +862,10 @@
           "list_date": "20260820",
           "list_date_dashed": "2026-08-20",
           "entry_price": 22.96,
-          "last_close": 18.6,
-          "last_pct": -18.99,
+          "last_close": 19.31,
+          "last_pct": -15.9,
           "peak_pct": 0.0,
-          "days_in": 58,
+          "days_in": 59,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -881,10 +881,10 @@
           "list_date": "20260820",
           "list_date_dashed": "2026-08-20",
           "entry_price": 67.36,
-          "last_close": 57.94,
-          "last_pct": -13.98,
+          "last_close": 57.29,
+          "last_pct": -14.95,
           "peak_pct": 0.0,
-          "days_in": 58,
+          "days_in": 59,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -900,10 +900,10 @@
           "list_date": "20260820",
           "list_date_dashed": "2026-08-20",
           "entry_price": 36.16,
-          "last_close": 28.89,
-          "last_pct": -20.11,
+          "last_close": 28.96,
+          "last_pct": -19.91,
           "peak_pct": 0.0,
-          "days_in": 58,
+          "days_in": 59,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -919,10 +919,10 @@
           "list_date": "20260821",
           "list_date_dashed": "2026-08-21",
           "entry_price": 943.0,
-          "last_close": 926.0,
-          "last_pct": -1.8,
+          "last_close": 873.0,
+          "last_pct": -7.42,
           "peak_pct": 0.0,
-          "days_in": 50,
+          "days_in": 51,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -938,10 +938,10 @@
           "list_date": "20260821",
           "list_date_dashed": "2026-08-21",
           "entry_price": 53.35,
-          "last_close": 54.83,
-          "last_pct": 2.77,
+          "last_close": 54.73,
+          "last_pct": 2.59,
           "peak_pct": 9.41,
-          "days_in": 50,
+          "days_in": 51,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -960,7 +960,7 @@
           "last_close": 20.0,
           "last_pct": 0.86,
           "peak_pct": 3.78,
-          "days_in": 50,
+          "days_in": 51,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -976,10 +976,10 @@
           "list_date": "20260829",
           "list_date_dashed": "2026-08-29",
           "entry_price": 136.78,
-          "last_close": 125.25,
-          "last_pct": -8.43,
+          "last_close": 124.2,
+          "last_pct": -9.2,
           "peak_pct": 0.0,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -995,10 +995,10 @@
           "list_date": "20260829",
           "list_date_dashed": "2026-08-29",
           "entry_price": 150.74,
-          "last_close": 148.43,
-          "last_pct": -1.53,
+          "last_close": 146.0,
+          "last_pct": -3.14,
           "peak_pct": 1.76,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1014,10 +1014,10 @@
           "list_date": "20260829",
           "list_date_dashed": "2026-08-29",
           "entry_price": 177.34,
-          "last_close": 167.65,
-          "last_pct": -5.46,
+          "last_close": 161.38,
+          "last_pct": -9.0,
           "peak_pct": 1.67,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1033,10 +1033,10 @@
           "list_date": "20260829",
           "list_date_dashed": "2026-08-29",
           "entry_price": 321.95,
-          "last_close": 289.5,
-          "last_pct": -10.08,
+          "last_close": 288.33,
+          "last_pct": -10.44,
           "peak_pct": 0.0,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1052,10 +1052,10 @@
           "list_date": "20260829",
           "list_date_dashed": "2026-08-29",
           "entry_price": 510.09,
-          "last_close": 373.1,
-          "last_pct": -26.86,
+          "last_close": 365.35,
+          "last_pct": -28.38,
           "peak_pct": 0.0,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1071,10 +1071,10 @@
           "list_date": "20260829",
           "list_date_dashed": "2026-08-29",
           "entry_price": 50.68,
-          "last_close": 47.72,
-          "last_pct": -5.84,
+          "last_close": 48.29,
+          "last_pct": -4.72,
           "peak_pct": 2.98,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -1090,10 +1090,10 @@
           "list_date": "20260829",
           "list_date_dashed": "2026-08-29",
           "entry_price": 131.08,
-          "last_close": 125.7,
-          "last_pct": -4.1,
+          "last_close": 119.41,
+          "last_pct": -8.9,
           "peak_pct": 0.72,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -1109,10 +1109,10 @@
           "list_date": "20260829",
           "list_date_dashed": "2026-08-29",
           "entry_price": 49.35,
-          "last_close": 43.0,
-          "last_pct": -12.87,
+          "last_close": 42.97,
+          "last_pct": -12.93,
           "peak_pct": 1.52,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1128,10 +1128,10 @@
           "list_date": "20260829",
           "list_date_dashed": "2026-08-29",
           "entry_price": 125.49,
-          "last_close": 128.25,
-          "last_pct": 2.2,
+          "last_close": 125.7,
+          "last_pct": 0.17,
           "peak_pct": 2.2,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1147,10 +1147,10 @@
           "list_date": "20260830",
           "list_date_dashed": "2026-08-30",
           "entry_price": 28.92,
-          "last_close": 27.5,
-          "last_pct": -4.91,
+          "last_close": 26.95,
+          "last_pct": -6.81,
           "peak_pct": 0.0,
-          "days_in": 47,
+          "days_in": 48,
           "appear_count": 1,
           "last_seen": "20260831",
           "signal_detail": {
@@ -1166,10 +1166,10 @@
           "list_date": "20260831",
           "list_date_dashed": "2026-08-31",
           "entry_price": 27.28,
-          "last_close": 24.55,
-          "last_pct": -10.01,
+          "last_close": 24.21,
+          "last_pct": -11.25,
           "peak_pct": 3.78,
-          "days_in": 40,
+          "days_in": 41,
           "appear_count": 1,
           "last_seen": "20260901",
           "signal_detail": {
@@ -1185,10 +1185,10 @@
           "list_date": "20260902",
           "list_date_dashed": "2026-09-02",
           "entry_price": 5.1,
-          "last_close": 4.46,
-          "last_pct": -12.55,
+          "last_close": 4.47,
+          "last_pct": -12.35,
           "peak_pct": 0.0,
-          "days_in": 35,
+          "days_in": 36,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1204,10 +1204,10 @@
           "list_date": "20260902",
           "list_date_dashed": "2026-09-02",
           "entry_price": 42.41,
-          "last_close": 44.53,
-          "last_pct": 5.0,
+          "last_close": 43.41,
+          "last_pct": 2.36,
           "peak_pct": 5.85,
-          "days_in": 32,
+          "days_in": 33,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1223,10 +1223,10 @@
           "list_date": "20260902",
           "list_date_dashed": "2026-09-02",
           "entry_price": 8.27,
-          "last_close": 8.06,
-          "last_pct": -2.54,
+          "last_close": 8.1,
+          "last_pct": -2.06,
           "peak_pct": 0.73,
-          "days_in": 32,
+          "days_in": 33,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1245,7 +1245,7 @@
           "last_close": 23.97,
           "last_pct": -3.27,
           "peak_pct": 0.0,
-          "days_in": 30,
+          "days_in": 31,
           "appear_count": 1,
           "last_seen": "20260903",
           "signal_detail": {
@@ -1261,10 +1261,10 @@
           "list_date": "20260902",
           "list_date_dashed": "2026-09-02",
           "entry_price": 13.94,
-          "last_close": 15.56,
-          "last_pct": 11.62,
+          "last_close": 15.06,
+          "last_pct": 8.03,
           "peak_pct": 15.93,
-          "days_in": 30,
+          "days_in": 31,
           "appear_count": 1,
           "last_seen": "20260903",
           "signal_detail": {
@@ -1280,10 +1280,10 @@
           "list_date": "20260904",
           "list_date_dashed": "2026-09-04",
           "entry_price": 21.89,
-          "last_close": 23.53,
-          "last_pct": 7.49,
+          "last_close": 22.82,
+          "last_pct": 4.25,
           "peak_pct": 7.49,
-          "days_in": 19,
+          "days_in": 20,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1299,10 +1299,10 @@
           "list_date": "20260904",
           "list_date_dashed": "2026-09-04",
           "entry_price": 34.69,
-          "last_close": 39.75,
-          "last_pct": 14.59,
+          "last_close": 38.98,
+          "last_pct": 12.37,
           "peak_pct": 17.67,
-          "days_in": 19,
+          "days_in": 20,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1318,10 +1318,10 @@
           "list_date": "20260904",
           "list_date_dashed": "2026-09-04",
           "entry_price": 36.11,
-          "last_close": 40.43,
-          "last_pct": 11.96,
-          "peak_pct": 11.96,
-          "days_in": 19,
+          "last_close": 43.36,
+          "last_pct": 20.08,
+          "peak_pct": 20.08,
+          "days_in": 20,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1337,10 +1337,10 @@
           "list_date": "20260904",
           "list_date_dashed": "2026-09-04",
           "entry_price": 265.88,
-          "last_close": 261.0,
-          "last_pct": -1.84,
+          "last_close": 252.09,
+          "last_pct": -5.19,
           "peak_pct": 3.07,
-          "days_in": 17,
+          "days_in": 18,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1356,10 +1356,10 @@
           "list_date": "20260904",
           "list_date_dashed": "2026-09-04",
           "entry_price": 61.9,
-          "last_close": 64.48,
-          "last_pct": 4.17,
-          "peak_pct": 6.59,
-          "days_in": 15,
+          "last_close": 69.99,
+          "last_pct": 13.07,
+          "peak_pct": 13.07,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1375,10 +1375,10 @@
           "list_date": "20260904",
           "list_date_dashed": "2026-09-04",
           "entry_price": 9.13,
-          "last_close": 8.56,
-          "last_pct": -6.24,
+          "last_close": 8.79,
+          "last_pct": -3.72,
           "peak_pct": 0.0,
-          "days_in": 15,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1394,10 +1394,10 @@
           "list_date": "20260904",
           "list_date_dashed": "2026-09-04",
           "entry_price": 169.98,
-          "last_close": 163.7,
-          "last_pct": -3.69,
+          "last_close": 162.62,
+          "last_pct": -4.33,
           "peak_pct": 1.12,
-          "days_in": 15,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1413,10 +1413,10 @@
           "list_date": "20260904",
           "list_date_dashed": "2026-09-04",
           "entry_price": 299.5,
-          "last_close": 286.6,
-          "last_pct": -4.31,
+          "last_close": 286.78,
+          "last_pct": -4.25,
           "peak_pct": 5.58,
-          "days_in": 15,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1432,10 +1432,10 @@
           "list_date": "20260904",
           "list_date_dashed": "2026-09-04",
           "entry_price": 39.04,
-          "last_close": 35.5,
-          "last_pct": -9.07,
+          "last_close": 35.75,
+          "last_pct": -8.43,
           "peak_pct": 0.0,
-          "days_in": 15,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1451,10 +1451,10 @@
           "list_date": "20260904",
           "list_date_dashed": "2026-09-04",
           "entry_price": 13.32,
-          "last_close": 14.83,
-          "last_pct": 11.34,
+          "last_close": 14.82,
+          "last_pct": 11.26,
           "peak_pct": 11.34,
-          "days_in": 15,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1470,10 +1470,10 @@
           "list_date": "20260904",
           "list_date_dashed": "2026-09-04",
           "entry_price": 135.07,
-          "last_close": 153.0,
-          "last_pct": 13.27,
+          "last_close": 146.6,
+          "last_pct": 8.54,
           "peak_pct": 13.27,
-          "days_in": 15,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1489,10 +1489,10 @@
           "list_date": "20260904",
           "list_date_dashed": "2026-09-04",
           "entry_price": 24.39,
-          "last_close": 23.89,
-          "last_pct": -2.05,
+          "last_close": 23.99,
+          "last_pct": -1.64,
           "peak_pct": 9.55,
-          "days_in": 15,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1508,10 +1508,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 58.26,
-          "last_close": 62.31,
-          "last_pct": 6.95,
+          "last_close": 64.2,
+          "last_pct": 10.2,
           "peak_pct": 10.88,
-          "days_in": 14,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1527,10 +1527,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 122.77,
-          "last_close": 126.51,
-          "last_pct": 3.05,
-          "peak_pct": 3.05,
-          "days_in": 14,
+          "last_close": 142.3,
+          "last_pct": 15.91,
+          "peak_pct": 15.91,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1546,10 +1546,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 99.48,
-          "last_close": 106.4,
-          "last_pct": 6.96,
-          "peak_pct": 9.25,
-          "days_in": 14,
+          "last_close": 109.03,
+          "last_pct": 9.6,
+          "peak_pct": 9.6,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1565,10 +1565,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 84.5,
-          "last_close": 82.2,
-          "last_pct": -2.72,
+          "last_close": 83.5,
+          "last_pct": -1.18,
           "peak_pct": 0.0,
-          "days_in": 14,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1584,10 +1584,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 1702.0,
-          "last_close": 1701.0,
-          "last_pct": -0.06,
+          "last_close": 1692.66,
+          "last_pct": -0.55,
           "peak_pct": 1.0,
-          "days_in": 14,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1603,10 +1603,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 61.85,
-          "last_close": 63.06,
-          "last_pct": 1.96,
+          "last_close": 63.31,
+          "last_pct": 2.36,
           "peak_pct": 3.56,
-          "days_in": 14,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1622,12 +1622,12 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 242.75,
-          "last_close": 246.99,
-          "last_pct": 1.75,
-          "peak_pct": 1.75,
-          "days_in": 14,
+          "last_close": 257.36,
+          "last_pct": 6.02,
+          "peak_pct": 6.02,
+          "days_in": 15,
           "appear_count": 1,
-          "last_seen": "20260913",
+          "last_seen": "20260914",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
@@ -1641,10 +1641,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 90.0,
-          "last_close": 78.3,
-          "last_pct": -13.0,
+          "last_close": 78.33,
+          "last_pct": -12.97,
           "peak_pct": 0.0,
-          "days_in": 14,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1660,10 +1660,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 63.5,
-          "last_close": 66.83,
-          "last_pct": 5.24,
+          "last_close": 66.11,
+          "last_pct": 4.11,
           "peak_pct": 9.13,
-          "days_in": 14,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1679,10 +1679,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 68.91,
-          "last_close": 65.36,
-          "last_pct": -5.15,
+          "last_close": 65.09,
+          "last_pct": -5.54,
           "peak_pct": 0.0,
-          "days_in": 14,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1698,10 +1698,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 66.57,
-          "last_close": 64.07,
-          "last_pct": -3.76,
+          "last_close": 61.57,
+          "last_pct": -7.51,
           "peak_pct": 0.0,
-          "days_in": 14,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1717,12 +1717,12 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 181.48,
-          "last_close": 177.0,
-          "last_pct": -2.47,
+          "last_close": 177.89,
+          "last_pct": -1.98,
           "peak_pct": 1.07,
-          "days_in": 14,
+          "days_in": 15,
           "appear_count": 1,
-          "last_seen": "20260913",
+          "last_seen": "20260914",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -1736,10 +1736,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 105.26,
-          "last_close": 111.75,
-          "last_pct": 6.17,
+          "last_close": 108.21,
+          "last_pct": 2.8,
           "peak_pct": 6.17,
-          "days_in": 14,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1755,10 +1755,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 200.41,
-          "last_close": 200.86,
-          "last_pct": 0.22,
+          "last_close": 198.3,
+          "last_pct": -1.05,
           "peak_pct": 2.84,
-          "days_in": 14,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1774,10 +1774,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 37.14,
-          "last_close": 32.89,
-          "last_pct": -11.44,
+          "last_close": 31.97,
+          "last_pct": -13.92,
           "peak_pct": 3.69,
-          "days_in": 14,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1793,10 +1793,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 39.54,
-          "last_close": 39.26,
-          "last_pct": -0.71,
-          "peak_pct": 2.3,
-          "days_in": 14,
+          "last_close": 40.57,
+          "last_pct": 2.6,
+          "peak_pct": 2.6,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1812,10 +1812,10 @@
           "list_date": "20260907",
           "list_date_dashed": "2026-09-07",
           "entry_price": 2572.11,
-          "last_close": 2459.87,
-          "last_pct": -4.36,
+          "last_close": 2411.98,
+          "last_pct": -6.23,
           "peak_pct": 3.3,
-          "days_in": 14,
+          "days_in": 15,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1831,10 +1831,10 @@
           "list_date": "20260908",
           "list_date_dashed": "2026-09-08",
           "entry_price": 28.89,
-          "last_close": 27.48,
-          "last_pct": -4.88,
-          "peak_pct": 4.12,
-          "days_in": 12,
+          "last_close": 30.23,
+          "last_pct": 4.64,
+          "peak_pct": 4.64,
+          "days_in": 13,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1850,10 +1850,10 @@
           "list_date": "20260908",
           "list_date_dashed": "2026-09-08",
           "entry_price": 34.45,
-          "last_close": 32.29,
-          "last_pct": -6.27,
+          "last_close": 31.0,
+          "last_pct": -10.01,
           "peak_pct": 0.0,
-          "days_in": 12,
+          "days_in": 13,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1869,10 +1869,10 @@
           "list_date": "20260908",
           "list_date_dashed": "2026-09-08",
           "entry_price": 41.4,
-          "last_close": 41.11,
-          "last_pct": -0.7,
-          "peak_pct": 0.77,
-          "days_in": 11,
+          "last_close": 42.8,
+          "last_pct": 3.38,
+          "peak_pct": 3.38,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1888,10 +1888,10 @@
           "list_date": "20260908",
           "list_date_dashed": "2026-09-08",
           "entry_price": 48.53,
-          "last_close": 45.78,
-          "last_pct": -5.67,
+          "last_close": 44.43,
+          "last_pct": -8.45,
           "peak_pct": 2.29,
-          "days_in": 11,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1907,10 +1907,10 @@
           "list_date": "20260908",
           "list_date_dashed": "2026-09-08",
           "entry_price": 31.91,
-          "last_close": 29.31,
-          "last_pct": -8.15,
+          "last_close": 29.01,
+          "last_pct": -9.09,
           "peak_pct": 0.0,
-          "days_in": 11,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1926,10 +1926,10 @@
           "list_date": "20260908",
           "list_date_dashed": "2026-09-08",
           "entry_price": 116.47,
-          "last_close": 106.05,
-          "last_pct": -8.95,
-          "peak_pct": 0.0,
-          "days_in": 11,
+          "last_close": 117.7,
+          "last_pct": 1.06,
+          "peak_pct": 1.06,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1945,10 +1945,10 @@
           "list_date": "20260908",
           "list_date_dashed": "2026-09-08",
           "entry_price": 74.59,
-          "last_close": 68.27,
-          "last_pct": -8.47,
+          "last_close": 73.28,
+          "last_pct": -1.76,
           "peak_pct": 0.0,
-          "days_in": 11,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1964,10 +1964,10 @@
           "list_date": "20260908",
           "list_date_dashed": "2026-09-08",
           "entry_price": 17.61,
-          "last_close": 20.08,
-          "last_pct": 14.03,
-          "peak_pct": 14.03,
-          "days_in": 11,
+          "last_close": 21.12,
+          "last_pct": 19.93,
+          "peak_pct": 19.93,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -1983,10 +1983,10 @@
           "list_date": "20260908",
           "list_date_dashed": "2026-09-08",
           "entry_price": 475.02,
-          "last_close": 494.81,
-          "last_pct": 4.17,
-          "peak_pct": 5.05,
-          "days_in": 11,
+          "last_close": 524.0,
+          "last_pct": 10.31,
+          "peak_pct": 10.31,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -2002,12 +2002,12 @@
           "list_date": "20260908",
           "list_date_dashed": "2026-09-08",
           "entry_price": 391.78,
-          "last_close": 396.68,
-          "last_pct": 1.25,
+          "last_close": 389.13,
+          "last_pct": -0.68,
           "peak_pct": 1.25,
-          "days_in": 11,
+          "days_in": 12,
           "appear_count": 1,
-          "last_seen": "20260913",
+          "last_seen": "20260914",
           "signal_detail": {
             "period": "60m",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -2021,10 +2021,10 @@
           "list_date": "20260908",
           "list_date_dashed": "2026-09-08",
           "entry_price": 96.85,
-          "last_close": 96.09,
-          "last_pct": -0.78,
+          "last_close": 95.0,
+          "last_pct": -1.91,
           "peak_pct": 3.76,
-          "days_in": 11,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -2040,10 +2040,10 @@
           "list_date": "20260908",
           "list_date_dashed": "2026-09-08",
           "entry_price": 18.28,
-          "last_close": 15.95,
-          "last_pct": -12.75,
+          "last_close": 16.28,
+          "last_pct": -10.94,
           "peak_pct": 0.0,
-          "days_in": 11,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -2062,7 +2062,7 @@
           "last_close": 25.82,
           "last_pct": 0.0,
           "peak_pct": 0.0,
-          "days_in": 9,
+          "days_in": 10,
           "appear_count": 1,
           "last_seen": "20260910",
           "signal_detail": {
@@ -2078,10 +2078,10 @@
           "list_date": "20260911",
           "list_date_dashed": "2026-09-11",
           "entry_price": 56.49,
-          "last_close": 60.6,
-          "last_pct": 7.28,
+          "last_close": 58.88,
+          "last_pct": 4.23,
           "peak_pct": 7.28,
-          "days_in": 8,
+          "days_in": 9,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -2097,10 +2097,10 @@
           "list_date": "20260911",
           "list_date_dashed": "2026-09-11",
           "entry_price": 9.96,
-          "last_close": 10.79,
-          "last_pct": 8.33,
+          "last_close": 10.55,
+          "last_pct": 5.92,
           "peak_pct": 8.33,
-          "days_in": 8,
+          "days_in": 9,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -2116,10 +2116,10 @@
           "list_date": "20260911",
           "list_date_dashed": "2026-09-11",
           "entry_price": 15.51,
-          "last_close": 14.6,
-          "last_pct": -5.87,
+          "last_close": 14.4,
+          "last_pct": -7.16,
           "peak_pct": 0.0,
-          "days_in": 8,
+          "days_in": 9,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -2135,10 +2135,10 @@
           "list_date": "20260911",
           "list_date_dashed": "2026-09-11",
           "entry_price": 16.34,
-          "last_close": 15.87,
-          "last_pct": -2.88,
+          "last_close": 15.56,
+          "last_pct": -4.77,
           "peak_pct": 0.0,
-          "days_in": 8,
+          "days_in": 9,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -2154,12 +2154,12 @@
           "list_date": "20260911",
           "list_date_dashed": "2026-09-11",
           "entry_price": 109.9,
-          "last_close": 109.9,
-          "last_pct": 0.0,
-          "peak_pct": 0.0,
-          "days_in": 6,
+          "last_close": 119.47,
+          "last_pct": 8.71,
+          "peak_pct": 8.71,
+          "days_in": 7,
           "appear_count": 1,
-          "last_seen": "20260913",
+          "last_seen": "20260914",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
@@ -2173,12 +2173,12 @@
           "list_date": "20260911",
           "list_date_dashed": "2026-09-11",
           "entry_price": 124.36,
-          "last_close": 124.36,
-          "last_pct": 0.0,
-          "peak_pct": 0.0,
-          "days_in": 6,
+          "last_close": 125.83,
+          "last_pct": 1.18,
+          "peak_pct": 1.18,
+          "days_in": 7,
           "appear_count": 1,
-          "last_seen": "20260913",
+          "last_seen": "20260914",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -2192,12 +2192,12 @@
           "list_date": "20260911",
           "list_date_dashed": "2026-09-11",
           "entry_price": 18.47,
-          "last_close": 18.47,
-          "last_pct": 0.0,
+          "last_close": 18.35,
+          "last_pct": -0.65,
           "peak_pct": 0.0,
-          "days_in": 6,
+          "days_in": 7,
           "appear_count": 1,
-          "last_seen": "20260913",
+          "last_seen": "20260914",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -2211,12 +2211,12 @@
           "list_date": "20260911",
           "list_date_dashed": "2026-09-11",
           "entry_price": 19.5,
-          "last_close": 19.5,
-          "last_pct": 0.0,
+          "last_close": 18.73,
+          "last_pct": -3.95,
           "peak_pct": 0.0,
-          "days_in": 6,
+          "days_in": 7,
           "appear_count": 1,
-          "last_seen": "20260913",
+          "last_seen": "20260914",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -2230,12 +2230,12 @@
           "list_date": "20260911",
           "list_date_dashed": "2026-09-11",
           "entry_price": 28.45,
-          "last_close": 28.45,
-          "last_pct": 0.0,
-          "peak_pct": 0.0,
-          "days_in": 6,
+          "last_close": 28.63,
+          "last_pct": 0.63,
+          "peak_pct": 0.63,
+          "days_in": 7,
           "appear_count": 1,
-          "last_seen": "20260913",
+          "last_seen": "20260914",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉 + 主力金叉",
@@ -2249,12 +2249,12 @@
           "list_date": "20260911",
           "list_date_dashed": "2026-09-11",
           "entry_price": 7.06,
-          "last_close": 7.06,
-          "last_pct": 0.0,
+          "last_close": 6.98,
+          "last_pct": -1.13,
           "peak_pct": 0.0,
-          "days_in": 6,
+          "days_in": 7,
           "appear_count": 1,
-          "last_seen": "20260913",
+          "last_seen": "20260914",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -2268,12 +2268,12 @@
           "list_date": "20260911",
           "list_date_dashed": "2026-09-11",
           "entry_price": 6.97,
-          "last_close": 6.97,
-          "last_pct": 0.0,
-          "peak_pct": 0.0,
-          "days_in": 6,
+          "last_close": 7.0,
+          "last_pct": 0.43,
+          "peak_pct": 0.43,
+          "days_in": 7,
           "appear_count": 1,
-          "last_seen": "20260913",
+          "last_seen": "20260914",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
@@ -2287,16 +2287,73 @@
           "list_date": "20260911",
           "list_date_dashed": "2026-09-11",
           "entry_price": 8.11,
-          "last_close": 8.11,
-          "last_pct": 0.0,
-          "peak_pct": 0.0,
-          "days_in": 6,
+          "last_close": 8.22,
+          "last_pct": 1.36,
+          "peak_pct": 1.36,
+          "days_in": 7,
           "appear_count": 1,
-          "last_seen": "20260913",
+          "last_seen": "20260914",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
             "pct_chg": 0.12
+          }
+        },
+        {
+          "code": "600186",
+          "name": "莲花控股",
+          "algo": "four_volume",
+          "list_date": "20260914",
+          "list_date_dashed": "2026-09-14",
+          "entry_price": 13.18,
+          "last_close": 13.18,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260914",
+          "signal_detail": {
+            "period": "60m",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+            "pct_chg": 12.65
+          }
+        },
+        {
+          "code": "300568",
+          "name": "星源材质",
+          "algo": "four_volume",
+          "list_date": "20260914",
+          "list_date_dashed": "2026-09-14",
+          "entry_price": 15.6,
+          "last_close": 15.6,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260914",
+          "signal_detail": {
+            "period": "60m",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+            "pct_chg": 11.03
+          }
+        },
+        {
+          "code": "300454",
+          "name": "深信服",
+          "algo": "four_volume",
+          "list_date": "20260914",
+          "list_date_dashed": "2026-09-14",
+          "entry_price": 135.69,
+          "last_close": 135.69,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260914",
+          "signal_detail": {
+            "period": "60m",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+            "pct_chg": 6.2
           }
         }
       ],
@@ -2305,751 +2362,772 @@
         {
           "code": "600498",
           "name": "烽火通信",
-          "bars": 20,
-          "pct": -0.67,
-          "last_bar": "2026-09-11"
+          "bars": 21,
+          "pct": -0.96,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "002353",
           "name": "杰瑞股份",
           "bars": 20,
-          "pct": -21.53,
+          "pct": -22.35,
           "last_bar": "2026-09-11"
         },
         {
           "code": "300390",
           "name": "天华新能",
-          "bars": 20,
-          "pct": -17.73,
-          "last_bar": "2026-09-11"
+          "bars": 21,
+          "pct": -17.74,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300661",
           "name": "圣邦股份",
-          "bars": 20,
-          "pct": -11.83,
-          "last_bar": "2026-09-11"
+          "bars": 21,
+          "pct": -12.14,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300014",
           "name": "亿纬锂能",
-          "bars": 20,
-          "pct": -14.22,
-          "last_bar": "2026-09-11"
+          "bars": 21,
+          "pct": -12.98,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300814",
           "name": "中富电路",
-          "bars": 20,
-          "pct": -7.97,
-          "last_bar": "2026-09-11"
+          "bars": 21,
+          "pct": -2.9,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688179",
           "name": "阿拉丁",
           "bars": 1,
-          "pct": -25.57,
+          "pct": -23.96,
           "last_bar": "2026-08-16"
         },
         {
           "code": "002081",
           "name": "金 螳 螂",
           "bars": 17,
-          "pct": -9.75,
+          "pct": -10.51,
           "last_bar": "2026-09-08"
         },
         {
           "code": "002149",
           "name": "贝克微",
           "bars": 1,
-          "pct": -22.54,
+          "pct": -23.05,
           "last_bar": "2026-08-16"
         },
         {
           "code": "002396",
           "name": "青城新药－B",
-          "bars": 20,
-          "pct": 4.61,
-          "last_bar": "2026-09-11"
+          "bars": 21,
+          "pct": 5.31,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688052",
           "name": "纳芯微",
-          "bars": 20,
-          "pct": -4.88,
-          "last_bar": "2026-09-11"
+          "bars": 21,
+          "pct": -3.3,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300548",
           "name": "长芯博创",
-          "bars": 20,
-          "pct": -5.4,
-          "last_bar": "2026-09-11"
+          "bars": 21,
+          "pct": -7.11,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300236",
           "name": "上海新阳",
           "bars": 16,
-          "pct": -17.82,
+          "pct": -16.67,
           "last_bar": "2026-09-07"
         },
         {
           "code": "300738",
           "name": "奥飞数据",
           "bars": 10,
-          "pct": -18.48,
+          "pct": -17.29,
           "last_bar": "2026-08-28"
         },
         {
           "code": "300684",
           "name": "中石科技",
-          "bars": 19,
-          "pct": -11.85,
-          "last_bar": "2026-09-11"
+          "bars": 20,
+          "pct": -13.07,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "603773",
           "name": "沃格光电",
-          "bars": 19,
-          "pct": -24.66,
-          "last_bar": "2026-09-11"
+          "bars": 20,
+          "pct": -20.45,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "603186",
           "name": "华正新材",
-          "bars": 19,
-          "pct": 22.58,
-          "last_bar": "2026-09-11"
+          "bars": 20,
+          "pct": 23.09,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688508",
           "name": "芯朋微",
           "bars": 15,
-          "pct": -14.28,
+          "pct": -13.62,
           "last_bar": "2026-09-07"
         },
         {
           "code": "002028",
           "name": "映美控股",
-          "bars": 19,
-          "pct": -26.77,
-          "last_bar": "2026-09-11"
+          "bars": 20,
+          "pct": -27.25,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688380",
           "name": "中微半导",
           "bars": 1,
-          "pct": -15.08,
+          "pct": -15.12,
           "last_bar": "2026-08-18"
         },
         {
           "code": "300243",
           "name": "瑞丰高材",
           "bars": 15,
-          "pct": -5.32,
+          "pct": -1.99,
           "last_bar": "2026-09-07"
         },
         {
           "code": "600487",
           "name": "亨通光电",
-          "bars": 19,
-          "pct": 2.28,
-          "last_bar": "2026-09-11"
+          "bars": 20,
+          "pct": -0.93,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300223",
           "name": "君正股份",
-          "bars": 19,
-          "pct": -14.65,
-          "last_bar": "2026-09-11"
+          "bars": 20,
+          "pct": -16.28,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688702",
           "name": "盛科通信",
-          "bars": 19,
-          "pct": -28.0,
-          "last_bar": "2026-09-11"
+          "bars": 20,
+          "pct": -28.15,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688200",
           "name": "华峰测控",
-          "bars": 19,
-          "pct": -17.58,
-          "last_bar": "2026-09-11"
+          "bars": 20,
+          "pct": -18.19,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688025",
           "name": "杰普特",
-          "bars": 19,
-          "pct": -4.02,
-          "last_bar": "2026-09-11"
+          "bars": 20,
+          "pct": -3.73,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688141",
           "name": "杰华特",
-          "bars": 19,
-          "pct": -20.45,
-          "last_bar": "2026-09-11"
+          "bars": 20,
+          "pct": -21.73,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "600522",
           "name": "中天科技",
-          "bars": 19,
-          "pct": -2.26,
-          "last_bar": "2026-09-11"
+          "bars": 20,
+          "pct": -3.94,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "002436",
           "name": "凌雄科技",
-          "bars": 19,
-          "pct": 8.47,
-          "last_bar": "2026-09-11"
+          "bars": 20,
+          "pct": 10.49,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688548",
           "name": "广钢气体",
           "bars": 19,
-          "pct": -30.33,
+          "pct": -29.92,
           "last_bar": "2026-09-11"
         },
         {
           "code": "002821",
           "name": "凯莱英",
           "bars": 14,
-          "pct": -12.83,
+          "pct": -5.66,
           "last_bar": "2026-09-08"
         },
         {
           "code": "300418",
           "name": "昆仑万维",
-          "bars": 17,
-          "pct": -5.43,
-          "last_bar": "2026-09-11"
+          "bars": 18,
+          "pct": -7.38,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "002202",
           "name": "万科企业",
-          "bars": 17,
-          "pct": -19.29,
-          "last_bar": "2026-09-11"
+          "bars": 18,
+          "pct": -16.2,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "600118",
           "name": "中国卫星",
-          "bars": 17,
-          "pct": -14.28,
-          "last_bar": "2026-09-11"
+          "bars": 18,
+          "pct": -15.25,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "002747",
           "name": "埃斯顿",
-          "bars": 17,
-          "pct": -20.41,
-          "last_bar": "2026-09-11"
+          "bars": 18,
+          "pct": -20.21,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300308",
           "name": "中际旭创",
-          "bars": 16,
-          "pct": -2.1,
-          "last_bar": "2026-09-11"
+          "bars": 17,
+          "pct": -7.72,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "601318",
           "name": "中国平安",
-          "bars": 16,
-          "pct": 2.47,
-          "last_bar": "2026-09-11"
+          "bars": 17,
+          "pct": 2.29,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "601872",
           "name": "招商轮船",
-          "bars": 16,
+          "bars": 17,
           "pct": 0.56,
-          "last_bar": "2026-09-11"
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688183",
           "name": "生益电子",
-          "bars": 10,
-          "pct": -8.73,
-          "last_bar": "2026-09-11"
+          "bars": 11,
+          "pct": -9.5,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "600183",
           "name": "生益科技",
-          "bars": 10,
-          "pct": -1.83,
-          "last_bar": "2026-09-11"
+          "bars": 11,
+          "pct": -3.44,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300475",
           "name": "香农芯创",
-          "bars": 10,
-          "pct": -5.76,
-          "last_bar": "2026-09-11"
+          "bars": 11,
+          "pct": -9.3,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300620",
           "name": "光库科技",
-          "bars": 10,
-          "pct": -10.38,
-          "last_bar": "2026-09-11"
+          "bars": 11,
+          "pct": -10.74,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "301666",
           "name": "大普微",
-          "bars": 10,
-          "pct": -27.16,
-          "last_bar": "2026-09-11"
+          "bars": 11,
+          "pct": -28.68,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "601208",
           "name": "东材科技",
-          "bars": 10,
-          "pct": -6.14,
-          "last_bar": "2026-09-11"
+          "bars": 11,
+          "pct": -5.02,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "002851",
           "name": "麦格米特",
-          "bars": 10,
-          "pct": -4.4,
-          "last_bar": "2026-09-11"
+          "bars": 11,
+          "pct": -9.2,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "002466",
           "name": "天齐锂业",
           "bars": 1,
-          "pct": -13.17,
+          "pct": -13.23,
           "last_bar": "2026-08-29"
         },
         {
           "code": "002463",
           "name": "沪电股份",
-          "bars": 10,
-          "pct": 1.9,
-          "last_bar": "2026-09-11"
+          "bars": 11,
+          "pct": -0.13,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "002155",
           "name": "湖南黄金",
-          "bars": 10,
-          "pct": -5.21,
-          "last_bar": "2026-09-11"
+          "bars": 11,
+          "pct": -7.11,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300364",
           "name": "中文在线",
-          "bars": 10,
-          "pct": -10.31,
-          "last_bar": "2026-09-11"
+          "bars": 11,
+          "pct": -11.55,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688297",
           "name": "中无人机",
-          "bars": 8,
-          "pct": 4.7,
-          "last_bar": "2026-09-11"
+          "bars": 9,
+          "pct": 2.06,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "000425",
           "name": "敏实集团",
           "bars": 3,
-          "pct": -2.84,
+          "pct": -2.36,
           "last_bar": "2026-09-04"
         },
         {
           "code": "600989",
           "name": "宝丰能源",
-          "bars": 8,
+          "bars": 9,
           "pct": -3.57,
-          "last_bar": "2026-09-11"
+          "last_bar": "2026-09-14"
         },
         {
           "code": "002602",
           "name": "世纪华通",
-          "bars": 8,
-          "pct": 11.32,
-          "last_bar": "2026-09-11"
+          "bars": 9,
+          "pct": 7.73,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "002297",
           "name": "润迈德－B",
-          "bars": 6,
-          "pct": 7.19,
-          "last_bar": "2026-09-11"
+          "bars": 7,
+          "pct": 3.95,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "600150",
           "name": "中国船舶",
-          "bars": 6,
-          "pct": 14.29,
-          "last_bar": "2026-09-11"
+          "bars": 7,
+          "pct": 12.07,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300179",
           "name": "四方达",
-          "bars": 6,
-          "pct": 11.66,
-          "last_bar": "2026-09-11"
+          "bars": 7,
+          "pct": 19.78,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300857",
           "name": "协创数据",
-          "bars": 6,
-          "pct": -2.14,
-          "last_bar": "2026-09-11"
+          "bars": 7,
+          "pct": -5.49,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688170",
           "name": "德龙激光",
-          "bars": 6,
-          "pct": 3.87,
-          "last_bar": "2026-09-11"
+          "bars": 7,
+          "pct": 12.77,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300300",
           "name": "海峡创新",
-          "bars": 6,
-          "pct": -6.54,
-          "last_bar": "2026-09-11"
+          "bars": 7,
+          "pct": -4.02,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300672",
           "name": "国科微",
-          "bars": 6,
-          "pct": -3.99,
-          "last_bar": "2026-09-11"
+          "bars": 7,
+          "pct": -4.63,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688167",
           "name": "炬光科技",
-          "bars": 6,
-          "pct": -4.61,
-          "last_bar": "2026-09-11"
+          "bars": 7,
+          "pct": -4.55,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "603067",
           "name": "振华股份",
           "bars": 6,
-          "pct": -9.37,
+          "pct": -8.73,
           "last_bar": "2026-09-11"
         },
         {
           "code": "600601",
           "name": "方正科技",
-          "bars": 6,
-          "pct": 11.04,
-          "last_bar": "2026-09-11"
+          "bars": 7,
+          "pct": 10.96,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688020",
           "name": "方邦股份",
-          "bars": 6,
-          "pct": 12.97,
-          "last_bar": "2026-09-11"
+          "bars": 7,
+          "pct": 8.24,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688403",
           "name": "汇成股份",
-          "bars": 6,
-          "pct": -2.35,
-          "last_bar": "2026-09-11"
+          "bars": 7,
+          "pct": -1.94,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688001",
           "name": "华兴源创",
-          "bars": 5,
-          "pct": 6.65,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": 9.9,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688813",
           "name": "泰金新能",
-          "bars": 5,
-          "pct": 2.75,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": 15.61,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "301511",
           "name": "德福科技",
-          "bars": 5,
-          "pct": 6.66,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": 9.3,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300811",
           "name": "铂科新材",
-          "bars": 5,
-          "pct": -3.02,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": -1.48,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688498",
           "name": "源杰科技",
-          "bars": 5,
-          "pct": -0.36,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": -0.85,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688700",
           "name": "东威科技",
-          "bars": 5,
-          "pct": 1.66,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": 2.06,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "301183",
           "name": "东田微",
-          "bars": 5,
-          "pct": 1.45,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": 5.72,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688583",
           "name": "思看科技",
           "bars": 5,
-          "pct": -13.3,
+          "pct": -13.27,
           "last_bar": "2026-09-11"
         },
         {
           "code": "688800",
           "name": "瑞可达",
-          "bars": 5,
-          "pct": 4.94,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": 3.81,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688127",
           "name": "蓝特光学",
-          "bars": 5,
-          "pct": -5.45,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": -5.84,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "601138",
           "name": "工业富联",
-          "bars": 5,
-          "pct": -4.06,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": -7.81,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688002",
           "name": "睿创微纳",
-          "bars": 5,
-          "pct": -2.77,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": -2.28,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "603228",
           "name": "景旺电子",
-          "bars": 5,
-          "pct": 5.87,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": 2.5,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300570",
           "name": "太辰光",
-          "bars": 5,
-          "pct": -0.08,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": -1.35,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300607",
           "name": "拓斯达",
-          "bars": 5,
-          "pct": -11.74,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": -14.22,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300747",
           "name": "锐科激光",
-          "bars": 5,
-          "pct": -1.01,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": 2.3,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688808",
           "name": "联讯仪器",
-          "bars": 5,
-          "pct": -4.66,
-          "last_bar": "2026-09-11"
+          "bars": 6,
+          "pct": -6.53,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "600330",
           "name": "天通股份",
-          "bars": 4,
-          "pct": -5.18,
-          "last_bar": "2026-09-11"
+          "bars": 5,
+          "pct": 4.34,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300593",
           "name": "新雷能",
-          "bars": 4,
-          "pct": -6.57,
-          "last_bar": "2026-09-11"
+          "bars": 5,
+          "pct": -10.31,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688690",
           "name": "纳微科技",
-          "bars": 4,
-          "pct": -1.0,
-          "last_bar": "2026-09-11"
+          "bars": 5,
+          "pct": 3.08,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "600362",
           "name": "江西铜业",
-          "bars": 4,
-          "pct": -5.97,
-          "last_bar": "2026-09-11"
+          "bars": 5,
+          "pct": -8.75,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "600096",
           "name": "云天化",
-          "bars": 4,
-          "pct": -8.45,
-          "last_bar": "2026-09-11"
+          "bars": 5,
+          "pct": -9.39,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688333",
           "name": "铂力特",
-          "bars": 4,
-          "pct": -9.25,
-          "last_bar": "2026-09-11"
+          "bars": 5,
+          "pct": 0.76,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688090",
           "name": "瑞松科技",
-          "bars": 4,
-          "pct": -8.77,
-          "last_bar": "2026-09-11"
+          "bars": 5,
+          "pct": -2.06,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "002815",
           "name": "崇达技术",
-          "bars": 4,
-          "pct": 13.73,
-          "last_bar": "2026-09-11"
+          "bars": 5,
+          "pct": 19.63,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688809",
           "name": "强一股份",
-          "bars": 4,
-          "pct": 3.87,
-          "last_bar": "2026-09-11"
+          "bars": 5,
+          "pct": 10.01,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "002916",
           "name": "深南电路",
-          "bars": 4,
-          "pct": 0.95,
-          "last_bar": "2026-09-11"
+          "bars": 5,
+          "pct": -0.98,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300395",
           "name": "菲利华",
-          "bars": 4,
-          "pct": -1.08,
-          "last_bar": "2026-09-11"
+          "bars": 5,
+          "pct": -2.21,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "603118",
           "name": "共进股份",
           "bars": 4,
-          "pct": -13.05,
+          "pct": -11.24,
           "last_bar": "2026-09-11"
         },
         {
           "code": "301176",
           "name": "逸豪新材",
-          "bars": 1,
-          "pct": 6.98,
-          "last_bar": "2026-09-11"
+          "bars": 2,
+          "pct": 3.93,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "603601",
           "name": "再升科技",
-          "bars": 1,
-          "pct": 8.03,
-          "last_bar": "2026-09-11"
+          "bars": 2,
+          "pct": 5.62,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "600396",
           "name": "华电辽能",
-          "bars": 1,
-          "pct": -6.17,
-          "last_bar": "2026-09-11"
+          "bars": 2,
+          "pct": -7.46,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300065",
           "name": "海兰信",
-          "bars": 1,
-          "pct": -3.18,
-          "last_bar": "2026-09-11"
+          "bars": 2,
+          "pct": -5.07,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "688260",
           "name": "昀冢科技",
-          "bars": 1,
-          "pct": -0.3,
-          "last_bar": "2026-09-11"
+          "bars": 2,
+          "pct": 8.41,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300408",
           "name": "三环集团",
-          "bars": 1,
-          "pct": -0.3,
-          "last_bar": "2026-09-11"
+          "bars": 2,
+          "pct": 0.88,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "300207",
           "name": "欣旺达",
-          "bars": 1,
-          "pct": -0.3,
-          "last_bar": "2026-09-11"
+          "bars": 2,
+          "pct": -0.95,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "600667",
           "name": "太极实业",
-          "bars": 1,
-          "pct": -0.3,
-          "last_bar": "2026-09-11"
+          "bars": 2,
+          "pct": -4.25,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "600900",
           "name": "长江电力",
-          "bars": 1,
-          "pct": -0.3,
-          "last_bar": "2026-09-11"
+          "bars": 2,
+          "pct": 0.33,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "600744",
           "name": "华银电力",
-          "bars": 1,
-          "pct": -0.3,
-          "last_bar": "2026-09-11"
+          "bars": 2,
+          "pct": -1.43,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "601288",
           "name": "农业银行",
-          "bars": 1,
-          "pct": -0.3,
-          "last_bar": "2026-09-11"
+          "bars": 2,
+          "pct": 0.13,
+          "last_bar": "2026-09-14"
         },
         {
           "code": "601398",
           "name": "工商银行",
+          "bars": 2,
+          "pct": 1.06,
+          "last_bar": "2026-09-14"
+        },
+        {
+          "code": "600186",
+          "name": "莲花控股",
           "bars": 1,
           "pct": -0.3,
-          "last_bar": "2026-09-11"
+          "last_bar": "2026-09-14"
+        },
+        {
+          "code": "300568",
+          "name": "星源材质",
+          "bars": 1,
+          "pct": -2.09,
+          "last_bar": "2026-09-14"
+        },
+        {
+          "code": "300454",
+          "name": "深信服",
+          "bars": 1,
+          "pct": -1.35,
+          "last_bar": "2026-09-14"
         }
       ]
     }
   ],
   "_meta": {
     "version": "v1",
-    "schema_date": "2026-09-13",
+    "schema_date": "2026-09-14",
     "note": "单算法（四量终极）独立追踪；entry=信号日收盘；by_horizon=从近到远的分档前向收益 T+5…T+90（有多少天算多少天，只取 kline_cache 日线，扣双边 0.3%，不含中途止损止盈）；unrealized=当日浮动（用实时价）；coverage=样本就绪度；win_rate/avg_return 无历史样本时为 null（不是 0）"
   }
 }

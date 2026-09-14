@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-09-13 16:05:05",
-  "data_date": "2026-09-13",
-  "track_start": "2026-09-13",
-  "history_days": 19,
+  "update_time": "2026-09-14 19:14:12",
+  "data_date": "2026-09-14",
+  "track_start": "2026-09-14",
+  "history_days": 20,
   "strict_count": 2,
   "near_count": 8,
   "tracked": [
@@ -12,23 +12,23 @@
       "market": "sh",
       "board": "科创板",
       "status": "near",
-      "total_score": 33.5,
+      "total_score": 32.9,
       "quality_grade": "C",
       "industry": "软件和信息技术服务业",
       "sectors": [
-        "昨日高振幅",
+        "中证500",
         "软件和信息技术服务业",
+        "半导体概念",
+        "融资融券",
         "科创板做市股",
         "MSCI中国",
         "超清视频",
-        "中证500",
-        "半导体概念",
-        "融资融券"
+        "昨日高振幅"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-12",
-      "hold_days": 1,
-      "consecutive_days": 2,
+      "hold_days": 2,
+      "consecutive_days": 3,
       "first_close": 84.89,
       "current_close": 84.89,
       "pnl_pct": 0.0,
@@ -46,14 +46,14 @@
       "market": "hk",
       "board": "港股",
       "status": "near",
-      "total_score": 31.1,
+      "total_score": 30.4,
       "quality_grade": "",
       "industry": "",
       "sectors": [],
       "signal_count": 2,
       "enter_date": "2026-09-12",
-      "hold_days": 1,
-      "consecutive_days": 2,
+      "hold_days": 2,
+      "consecutive_days": 3,
       "first_close": 338.6,
       "current_close": 338.6,
       "pnl_pct": 0.0,
@@ -65,54 +65,16 @@
       "market": "hk",
       "board": "港股",
       "status": "near",
-      "total_score": 29.8,
+      "total_score": 29.2,
       "quality_grade": "",
       "industry": "",
       "sectors": [],
       "signal_count": 2,
       "enter_date": "2026-09-12",
-      "hold_days": 1,
-      "consecutive_days": 2,
+      "hold_days": 2,
+      "consecutive_days": 3,
       "first_close": 29.7,
       "current_close": 29.7,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "09868",
-      "name": "小鹏汽车-W",
-      "market": "hk",
-      "board": "港股",
-      "status": "near",
-      "total_score": 28.6,
-      "quality_grade": "",
-      "industry": "",
-      "sectors": [],
-      "signal_count": 2,
-      "enter_date": "2026-09-12",
-      "hold_days": 1,
-      "consecutive_days": 2,
-      "first_close": 41.96,
-      "current_close": 41.96,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "06862",
-      "name": "海底捞",
-      "market": "hk",
-      "board": "港股",
-      "status": "near",
-      "total_score": 28.6,
-      "quality_grade": "",
-      "industry": "",
-      "sectors": [],
-      "signal_count": 2,
-      "enter_date": "2026-09-12",
-      "hold_days": 1,
-      "consecutive_days": 2,
-      "first_close": 10.36,
-      "current_close": 10.36,
       "pnl_pct": 0.0,
       "catalysts": []
     },
@@ -122,16 +84,35 @@
       "market": "hk",
       "board": "港股",
       "status": "near",
-      "total_score": 28.6,
+      "total_score": 28.0,
       "quality_grade": "",
       "industry": "",
       "sectors": [],
       "signal_count": 2,
       "enter_date": "2026-09-12",
-      "hold_days": 1,
-      "consecutive_days": 2,
+      "hold_days": 2,
+      "consecutive_days": 3,
       "first_close": 18.91,
       "current_close": 18.91,
+      "pnl_pct": 0.0,
+      "catalysts": []
+    },
+    {
+      "code": "06862",
+      "name": "海底捞",
+      "market": "hk",
+      "board": "港股",
+      "status": "near",
+      "total_score": 28.0,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 2,
+      "enter_date": "2026-09-12",
+      "hold_days": 2,
+      "consecutive_days": 3,
+      "first_close": 10.36,
+      "current_close": 10.36,
       "pnl_pct": 0.0,
       "catalysts": []
     },
@@ -141,16 +122,35 @@
       "market": "hk",
       "board": "港股",
       "status": "near",
-      "total_score": 28.6,
+      "total_score": 28.0,
       "quality_grade": "",
       "industry": "",
       "sectors": [],
       "signal_count": 2,
       "enter_date": "2026-09-12",
-      "hold_days": 1,
-      "consecutive_days": 2,
+      "hold_days": 2,
+      "consecutive_days": 3,
       "first_close": 16.59,
       "current_close": 16.59,
+      "pnl_pct": 0.0,
+      "catalysts": []
+    },
+    {
+      "code": "09868",
+      "name": "小鹏汽车-W",
+      "market": "hk",
+      "board": "港股",
+      "status": "near",
+      "total_score": 28.0,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 2,
+      "enter_date": "2026-09-12",
+      "hold_days": 2,
+      "consecutive_days": 3,
+      "first_close": 41.96,
+      "current_close": 41.96,
       "pnl_pct": 0.0,
       "catalysts": []
     },
@@ -164,27 +164,27 @@
       "quality_grade": "C",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "物联网",
-        "毫米波概念",
-        "计算机、通信和其他电子设备制造业",
         "2026中报预增",
-        "MSCI中国",
         "新材料",
+        "HS300",
+        "计算机、通信和其他电子设备制造业",
+        "物联网",
         "生物识别",
-        "HS300"
+        "MSCI中国",
+        "毫米波概念"
       ],
-      "signal_count": 1,
+      "signal_count": 2,
       "enter_date": "2026-09-08",
-      "hold_days": 1,
-      "consecutive_days": 2,
+      "hold_days": 2,
+      "consecutive_days": 3,
       "first_close": 69.0,
-      "current_close": 67.74,
-      "pnl_pct": -1.83,
+      "current_close": 66.33,
+      "pnl_pct": -3.87,
       "catalysts": [
         {
           "tag": "中报预增",
           "score": 15,
-          "reaction": "观察中"
+          "reaction": "走弱"
         }
       ]
     },
@@ -198,22 +198,22 @@
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
-        "钒电池",
-        "昨日炸板",
         "2026中报预增",
         "新材料",
+        "稀缺资源",
+        "昨日炸板",
+        "钒电池",
         "MSCI中国",
         "锂矿概念",
-        "稀缺资源",
         "有色金属矿采选业"
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
-      "hold_days": 4,
-      "consecutive_days": 3,
+      "hold_days": 5,
+      "consecutive_days": 4,
       "first_close": 42.45,
-      "current_close": 37.59,
-      "pnl_pct": -11.45,
+      "current_close": 36.65,
+      "pnl_pct": -13.66,
       "catalysts": [
         {
           "tag": "中报预增",
@@ -232,19 +232,19 @@
       "quality_grade": "A",
       "industry": "电气机械和器材制造业",
       "sectors": [
+        "2026中报预增",
+        "HS300",
+        "MSCI中国",
+        "沪股通",
+        "2026一季报预增",
         "上证180",
         "周期股",
-        "2026一季报预增",
-        "2026中报预增",
-        "MSCI中国",
-        "HS300",
-        "沪股通",
         "电气机械和器材制造业"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-12",
-      "hold_days": 1,
-      "consecutive_days": 2,
+      "hold_days": 2,
+      "consecutive_days": 3,
       "first_close": 0,
       "current_close": null,
       "pnl_pct": null,
@@ -280,13 +280,13 @@
       "level": "good",
       "code": "601168",
       "name": "西部矿业",
-      "text": "西部矿业(601168) 连续 3 日稳居严格共识（高质量）"
+      "text": "西部矿业(601168) 连续 4 日稳居严格共识（高质量）"
     },
     {
       "level": "warn",
       "code": "601168",
       "name": "西部矿业",
-      "text": "西部矿业(601168) 入选以来回撤 -11.4%（2026-08-17 起）"
+      "text": "西部矿业(601168) 入选以来回撤 -13.7%（2026-08-17 起）"
     },
     {
       "level": "warn",
@@ -521,6 +521,12 @@
       "code": "300759",
       "name": "康龙化成",
       "text": "康龙化成(300759) 于 2026-09-11 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "good",
+      "code": "605117",
+      "name": "德业股份",
+      "text": "德业股份(605117) 连续 3 日稳居严格共识（高质量）"
     }
   ],
   "sector_cluster": {
@@ -531,10 +537,10 @@
         "names": [
           "百胜中国",
           "09866",
-          "小鹏汽车-W",
-          "海底捞",
           "华润啤酒",
-          "吉利汽车"
+          "海底捞",
+          "吉利汽车",
+          "小鹏汽车-W"
         ]
       },
       {
@@ -584,23 +590,11 @@
         "count": 2
       },
       {
-        "sector": "昨日高振幅",
+        "sector": "中证500",
         "count": 1
       },
       {
         "sector": "软件和信息技术服务业",
-        "count": 1
-      },
-      {
-        "sector": "科创板做市股",
-        "count": 1
-      },
-      {
-        "sector": "超清视频",
-        "count": 1
-      },
-      {
-        "sector": "中证500",
         "count": 1
       },
       {
@@ -612,11 +606,15 @@
         "count": 1
       },
       {
-        "sector": "物联网",
+        "sector": "科创板做市股",
         "count": 1
       },
       {
-        "sector": "毫米波概念",
+        "sector": "超清视频",
+        "count": 1
+      },
+      {
+        "sector": "昨日高振幅",
         "count": 1
       },
       {
@@ -624,19 +622,15 @@
         "count": 1
       },
       {
+        "sector": "物联网",
+        "count": 1
+      },
+      {
         "sector": "生物识别",
         "count": 1
       },
       {
-        "sector": "钒电池",
-        "count": 1
-      },
-      {
-        "sector": "昨日炸板",
-        "count": 1
-      },
-      {
-        "sector": "锂矿概念",
+        "sector": "毫米波概念",
         "count": 1
       },
       {
@@ -644,7 +638,27 @@
         "count": 1
       },
       {
+        "sector": "昨日炸板",
+        "count": 1
+      },
+      {
+        "sector": "钒电池",
+        "count": 1
+      },
+      {
+        "sector": "锂矿概念",
+        "count": 1
+      },
+      {
         "sector": "有色金属矿采选业",
+        "count": 1
+      },
+      {
+        "sector": "沪股通",
+        "count": 1
+      },
+      {
+        "sector": "2026一季报预增",
         "count": 1
       },
       {
@@ -653,14 +667,6 @@
       },
       {
         "sector": "周期股",
-        "count": 1
-      },
-      {
-        "sector": "2026一季报预增",
-        "count": 1
-      },
-      {
-        "sector": "沪股通",
         "count": 1
       },
       {
@@ -680,113 +686,113 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
-    "latest_date": "2026-09-12 21:33:13",
-    "total": 323,
-    "best_hold_days": 1,
+    "latest_date": "2026-09-13 23:37:06",
+    "total": 325,
+    "best_hold_days": 20,
     "periods": {
       "1d": {
-        "win_rate": 53.3,
-        "avg_return": -0.06,
-        "sharpe": -0.01,
-        "count": 311,
-        "best": 14.69,
-        "worst": -10.32
+        "win_rate": 35.7,
+        "avg_return": -1.61,
+        "sharpe": -0.31,
+        "count": 300,
+        "best": 15.09,
+        "worst": -12.95
       },
       "3d": {
-        "win_rate": 40.1,
-        "avg_return": -1.1,
-        "sharpe": -0.16,
-        "count": 311,
-        "best": 14.76,
-        "worst": -10.34
+        "win_rate": 38.9,
+        "avg_return": -1.54,
+        "sharpe": -0.23,
+        "count": 293,
+        "best": 15.21,
+        "worst": -13.43
       },
       "5d": {
-        "win_rate": 43.2,
-        "avg_return": -0.81,
-        "sharpe": -0.1,
-        "count": 311,
-        "best": 14.76,
-        "worst": -10.38
+        "win_rate": 43.8,
+        "avg_return": -0.69,
+        "sharpe": -0.08,
+        "count": 281,
+        "best": 19.25,
+        "worst": -15.32
       },
       "10d": {
-        "win_rate": 47.9,
-        "avg_return": 0.17,
-        "sharpe": 0.02,
-        "count": 311,
-        "best": 14.77,
-        "worst": -10.38
+        "win_rate": 46.8,
+        "avg_return": -0.22,
+        "sharpe": -0.02,
+        "count": 250,
+        "best": 19.25,
+        "worst": -15.32
       },
       "20d": {
-        "win_rate": 47.7,
-        "avg_return": 0.65,
-        "sharpe": 0.07,
-        "count": 311,
-        "best": 14.77,
-        "worst": -10.34
+        "win_rate": 49.7,
+        "avg_return": 0.91,
+        "sharpe": 0.09,
+        "count": 177,
+        "best": 19.25,
+        "worst": -15.32
       }
     }
   },
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 131,
-      "win_rate_5d": 50.9,
-      "avg_ret_5d": 0.73,
-      "best_win_rate": 61.9,
+      "count": 133,
+      "win_rate_5d": 53.4,
+      "avg_ret_5d": 0.96,
+      "best_win_rate": 61.1,
       "best_hold_days": 20
     },
     {
       "band": "70~80",
       "count": 192,
-      "win_rate_5d": 38.7,
-      "avg_ret_5d": -1.76,
-      "best_win_rate": 51.3,
-      "best_hold_days": 1
+      "win_rate_5d": 38.2,
+      "avg_ret_5d": -1.64,
+      "best_win_rate": 44.7,
+      "best_hold_days": 20
     }
   ],
   "strict_vs_loose": {
     "periods": [
       {
         "period": "1d",
-        "strict_win": 53.3,
-        "strict_ret": -0.06,
-        "strict_count": 311,
+        "strict_win": 35.7,
+        "strict_ret": -1.61,
+        "strict_count": 300,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "3d",
-        "strict_win": 40.1,
-        "strict_ret": -1.1,
-        "strict_count": 311,
+        "strict_win": 38.9,
+        "strict_ret": -1.54,
+        "strict_count": 293,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "5d",
-        "strict_win": 43.2,
-        "strict_ret": -0.81,
-        "strict_count": 311,
+        "strict_win": 43.8,
+        "strict_ret": -0.69,
+        "strict_count": 281,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "10d",
-        "strict_win": 47.9,
-        "strict_ret": 0.17,
-        "strict_count": 311,
+        "strict_win": 46.8,
+        "strict_ret": -0.22,
+        "strict_count": 250,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "20d",
-        "strict_win": 47.7,
-        "strict_ret": 0.65,
-        "strict_count": 311,
+        "strict_win": 49.7,
+        "strict_ret": 0.91,
+        "strict_count": 177,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -795,8 +801,8 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-09-13",
-    "history_days": 19,
+    "track_start": "2026-09-14",
+    "history_days": 20,
     "summary": {
       "1d": {
         "count": 24,
@@ -809,9 +815,9 @@
         "avg_return": 1.71
       },
       "5d": {
-        "count": 13,
-        "win_rate": 38.46,
-        "avg_return": 1.59
+        "count": 15,
+        "win_rate": 33.33,
+        "avg_return": 1.1
       },
       "10d": {
         "count": 7,
@@ -1038,7 +1044,8 @@
         "name": "长电科技",
         "enter_date": "2026-09-08",
         "offsets": {
-          "3d": -1.83
+          "3d": -1.83,
+          "5d": -3.87
         }
       },
       {
@@ -1047,7 +1054,8 @@
         "enter_date": "2026-09-08",
         "offsets": {
           "1d": 0.0,
-          "3d": -5.8
+          "3d": -5.8,
+          "5d": -0.26
         }
       },
       {
