@@ -108,14 +108,16 @@ def fetch_kline(name, secid, tcode, retries=3):
 
 def parse_data():
     h = open(DATA, encoding="utf-8").read()
-    m = re.search(r'window\.WAVE_ELLIOTT\s*=\s*(\{.*?\n\});', h, re.S)
+    # 兼容本地美化态与 update_v8.py 压缩态（仓库内 data/*.js 最终均为单行）
+    m = re.search(r'window\.WAVE_ELLIOTT\s*=\s*(\{.*\});\s*$', h.strip(), re.S)
     if not m:
         raise RuntimeError("无法解析 data/WAVE_ELLIOTT.js")
     return json.loads(m.group(1))
 
 
 def dump_js(obj):
-    return "window.WAVE_ELLIOTT = " + json.dumps(obj, ensure_ascii=False, indent=1) + ";\n"
+    """产出与 update_v8.py 一致的压缩态（单行），避免落入仓库后被二次重写。"""
+    return "window.WAVE_ELLIOTT = " + json.dumps(obj, ensure_ascii=False, separators=(",", ":")) + ";\n"
 
 
 def git(args, env=None):
@@ -124,6 +126,29 @@ def git(args, env=None):
     if env:
         e.update(env)
     return subprocess.run(["git"] + args, cwd=ROOT, env=e, capture_output=True, text=True)
+
+
+def sync_local():
+    """把本地工作树的 data/WAVE_ELLIOTT.js 对齐到 origin/main。
+
+    🔴 必须用远端 blob 直写（而非 checkout/pull）：本仓工作树常被 monitor 持续写入 raw_data，
+    常规 pull 会因脏树失败或误伤他人 WIP；只取单文件远端内容覆盖是零副作用的做法。
+    """
+    f = git(["fetch", "origin"])
+    if f.returncode != 0:
+        print("· 警告：fetch 失败，沿用本地副本")
+        return
+    blob = git(["show", "origin/main:data/WAVE_ELLIOTT.js"])
+    if blob.returncode != 0 or not blob.stdout.strip():
+        print("· 警告：远端无 data/WAVE_ELLIOTT.js，沿用本地副本")
+        return
+    cur = open(DATA, encoding="utf-8").read() if os.path.exists(DATA) else ""
+    if cur != blob.stdout:
+        with open(DATA, "w", encoding="utf-8", newline="") as fp:
+            fp.write(blob.stdout)
+        print("· 已对齐远端最新 data/WAVE_ELLIOTT.js")
+    else:
+        print("· 本地已是远端最新 data/WAVE_ELLIOTT.js")
 
 
 def raw_push(relpath, blob_path, commit_msg):
@@ -206,11 +231,13 @@ def main():
         dd = round((kc[-1] - hi) / hi * 100, 2)
         idx_new.append({"name": name, "last": kc[-1], "date": kd[-1], "hi": hi, "hdate": hdate, "dd": dd})
 
-    # 3) 读旧，保留人工浪型拐点 marks
+    # 3) 先把本地与远端对齐，再读旧数据（否则可能基于落后副本误判"无新交易日"）
+    sync_local()
+
     old = parse_data()
     marks = old.get("marks", [])
 
-    # 4) 幂等判断
+    # 4) 幂等判断（基于已对齐远端的最新副本）
     old_last_date = old.get("series", {}).get("dates", [""])[-1]
     if (not args.force) and new_last_date == old_last_date:
         print("· 无新交易日（最新 %s == 已记录 %s），跳过推送，仅校验+渲染" % (new_last_date, old_last_date))
