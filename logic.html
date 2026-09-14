@@ -2706,7 +2706,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
      部署时改由私有后端或 GitHub Secrets 提供，前端只渲染结果。
 */
 const ADMIN_HASH = "24f6683a479d5b95461b4549b26d2f685b109a3e8c960219c075c9da3825f529"; // sha256("cat999")
-function isAdmin(){ try{ if(location.protocol==='file:') return true; if(localStorage.getItem('v8_admin')==='1') return true; localStorage.setItem('v8_admin','1'); return true; }catch(e){ return true; } }
+function isAdmin(){ try{ if(location.protocol==='file:') return true; if(sessionStorage.getItem('v8_admin')==='1') return true; return false; }catch(e){ return false; } }
 function openLock(){ if(isAdmin())return; document.getElementById('lockMask').classList.add('show'); document.getElementById('adminPwd').focus(); }
 async function sha256(s){
   const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
@@ -2716,33 +2716,35 @@ async function tryUnlock(){
   const v=document.getElementById('adminPwd').value;
   let ok=false; try{ ok = await sha256(v)===ADMIN_HASH; }catch(e){ ok=false; }
   if(ok){
-    try{ localStorage.setItem('v8_admin','1'); }catch(e){}
+    try{ sessionStorage.setItem('v8_admin','1'); }catch(e){}
     document.getElementById('lockMask').classList.remove('show');
     document.getElementById('adminState').innerHTML='<b>管理员已登录</b>';
     document.getElementById('adminBtn').textContent='退出';
     document.getElementById('adminBtn').setAttribute('onclick','logout()');
-    document.querySelectorAll('.tab.locked').forEach(t=>{t.classList.remove('locked');const s=t.querySelector('.lk');if(s)s.remove();});
     document.querySelectorAll('.tab.admin-only').forEach(t=>t.style.display='flex');
     switchSec('op',document.querySelector('[data-sec="op"]'));
   }else{
     document.getElementById('lockErr').textContent='口令错误，请重试';
   }
 }
-function logout(){ try{ localStorage.removeItem('v8_admin'); }catch(e){} location.reload(); }
+function logout(){ try{ sessionStorage.removeItem('v8_admin'); }catch(e){} location.reload(); }
 function guardLock(sec,el){ if(isAdmin()){switchSec(sec,el);}else{openLock();} }
 function refreshAdminUI(){
-  if(!isAdmin()) return;
   var adminState=document.getElementById('adminState');
   var adminBtn=document.getElementById('adminBtn');
-  if(adminState) adminState.innerHTML='<b>管理员已登录</b>';
-  if(adminBtn){ adminBtn.textContent='退出'; adminBtn.setAttribute('onclick','logout()'); }
-  document.querySelectorAll('.tab.locked').forEach(t=>{t.classList.remove('locked');const s=t.querySelector('.lk');if(s)s.remove();});
-  document.querySelectorAll('.tab.admin-only').forEach(t=>t.style.display='flex');
+  if(isAdmin()){
+    if(adminState) adminState.innerHTML='<b>管理员已登录</b>';
+    if(adminBtn){ adminBtn.textContent='退出'; adminBtn.setAttribute('onclick','logout()'); }
+    document.querySelectorAll('.tab.admin-only').forEach(t=>t.style.display='flex');
+  }else{
+    if(adminState) adminState.innerHTML='访客模式';
+    if(adminBtn){ adminBtn.textContent='管理员登录'; adminBtn.setAttribute('onclick','openLock()'); }
+  }
 }
 refreshAdminUI();
 
-/* 2026-08-30 主人令：Nav admin-only tab 一劳永逸兜底 —— DOMContentLoaded + setInterval 双重强制 display:flex，
-   哪怕 CDN 缓存老版本、或某个上游逻辑把 .admin-only display 改回 none，也能在 50ms 内恢复可见、可点击。 */
+/* 2026-09-15 主人令修订（与 index.html 同步）：原实现把 admin bar 文案无条件伪装成「管理员已登录」，
+   且 isAdmin 恒真使锁形同虚设。改为按真实登录态显示。 */
 function _v8ForceUnlockAdminTabs(){
   try{
     var tabs = document.querySelectorAll('.tab.admin-only');
@@ -2751,11 +2753,16 @@ function _v8ForceUnlockAdminTabs(){
       t.style.display='flex';
       var lk = t.querySelector('.lk'); if(lk) lk.remove();
     });
-    /* 同步 admin bar 文案为已登录（避免提示「访客模式」）*/
+    /* admin bar 文案按真实登录态显示（不伪装已登录）*/
     var sb=document.getElementById('adminState');
-    if(sb && sb.textContent.indexOf('访客')>=0) sb.innerHTML='<b>管理员已登录</b>';
     var ab=document.getElementById('adminBtn');
-    if(ab && ab.textContent==='管理员登录'){ ab.textContent='退出'; ab.setAttribute('onclick','logout()'); }
+    if(isAdmin()){
+      if(sb && sb.textContent.indexOf('访客')>=0) sb.innerHTML='<b>管理员已登录</b>';
+      if(ab && ab.textContent==='管理员登录'){ ab.textContent='退出'; ab.setAttribute('onclick','logout()'); }
+    }else{
+      if(sb && sb.textContent.indexOf('管理员已登录')>=0) sb.innerHTML='访客模式';
+      if(ab && ab.textContent==='退出'){ ab.textContent='管理员登录'; ab.setAttribute('onclick','openLock()'); }
+    }
   }catch(e){}
 }
 if(document.readyState==='loading'){
