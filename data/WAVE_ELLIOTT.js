@@ -3,8 +3,8 @@ window.WAVE_ELLIOTT = {
   "date": "2026-09-14",
   "last": 3885.33,
   "pct": -0.07,
-  "source": "eastmoney push2his (小九机自动化)",
-  "note": "客观数据层：上证日线序列 + 浪型拐点 + 5指数对照。主观研判(浪型计数/情景概率/目标位解读)固化在 v8/wave_report_template.html，研判日 2026-09-14。更新数据只需重拉 DATES/CLOSES/IDX 并推本文件，阿狸咪无需 westock。",
+  "source": "腾讯 行情接口（小九机日频自动化 / 三级降级）",
+  "note": "客观数据层：上证日线序列 + 浪型拐点 + 5指数对照（腾讯/新浪/东财三级降级取数）。marks 为人工浪型拐点，脚本只保留不重判；主观研判固化在 v8/wave_report_template.html。更新仅需小九机跑 v8/fetch_wave_elliott.py 自动刷新并推仓库，阿狸咪无需 westock。",
   "update_by": "小九机收盘后日频自动化 fetch_wave_elliott.py（客观序列自动 / marks 人工保留）"
  },
  "series": {
