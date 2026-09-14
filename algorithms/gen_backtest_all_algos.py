@@ -78,6 +78,13 @@ _NIGHT_CUT = 9            # 与闸门 _NIGHT_CUT / _NEXT_DAY_CUTOFF_HOUR / _NIGH
 FLOOR_TRADING = (16, 30)  # 与闸门 FLOOR_TRADING 同源
 FLOOR_T1 = (8, 0)         # 与闸门 FLOOR_T1 同源
 
+# 🔴 2026-09-14：因子卡主口径 = T+5 —— 与文件头 L54 铁律一致
+#   （「主口径刻意取 T+5」，四量 / CRDS / 候选池均 T+5），保证卡级主表可跨卡横比。
+#   必须**恰好 1 行** is_primary：前端 __committeePeriods() 靠它定「主口径标签模式」，
+#   多于 1 行会取到错误档、0 行则星级静默失真。
+#   ⚠️ 定义位置必须在 SOURCES 之前 —— SOURCES 内的 primary= 引用它，否则 NameError。
+FACTOR_PRIMARY_HOLD = 5
+
 # ── 源登记表：**card = 前端卡名**（权威出处 index.html 的 V8_PAGE_SCHEDULE + 策略回测页）──
 SOURCES = [
     dict(card="三重共识", kind="strategy", page="选股策略", icon="🧲", cat="trade",
@@ -121,9 +128,12 @@ SOURCES = [
          parser="pool", label_prefix="首次满足信号 T+", primary="首次满足信号 T+1",
          method="金股池「首次满足信号日」次一交易日开盘买入、持有 N 个真实交易日收盘卖出"
                 "（前复权·扣双边 0.3%）"),
-    dict(card="因子实验室", kind="research", page="暂未上架", icon="🧪", cat="research",
+    # 🔴 2026-09-14 主人令（图1「反而缺了因子的回测」）：因子卡面本就挂「📈 选股策略」
+    #   徽章，却被登记为 kind=research / cat=research ⇒ 卡面说它是策略、数据层不给它排名，
+    #   自相矛盾。现改为交易型（cat=trade），口径 = **L1 最强五分位组合**（见 parse_factor_lab）。
+    dict(card="因子实验室", kind="strategy", page="选股策略", icon="🧪", cat="trade",
          var="FACTOR_LAB_BACKTEST", rel="data/FACTOR_LAB_BACKTEST.js",
-         parser="factor_lab", label_prefix="", primary=None,
+         parser="factor_lab", label_prefix="", primary=f"L1最强分位 T+{FACTOR_PRIMARY_HOLD}",
          method="因子五分位分层超额（每10交易日调仓·次一交易日开盘入场）"),
 ]
 
@@ -526,36 +536,55 @@ def parse_algo_compare(src, obj):
 
 
 def parse_factor_lab(src, obj):
-    """FACTOR_LAB_BACKTEST：研究型分层超额，**不产出交易型胜率/收益率**。
+    """FACTOR_LAB_BACKTEST → 交易型行（2026-09-14 主人令「加入因子的」）。
 
-    诚实处理：把可比的「样本内/样本外超额」与「分层胜率」如实列出，`cat=research`
-    使其**不进入交易型排名**（硬塞进同一排名就是造假）。
+    口径（明示、可复核）：**L1 最强五分位组合** —— 即「因子值最高的那 1/5 标的」
+    等权持有。它回答的是「跟着这个因子买最强的那批，各持有期到底赚不赚」，
+    与其余策略卡的「信号日买入」同属交易型口径，故 cat=trade，可进策略对比。
+
+    诚实铁律：
+      · 档位**动态发现**（扫描 win_{h}d），产物有多少档就出多少行 —— 不硬编码，
+        避免「产物加了档、生成器漏改」再次发生；
+      · 各档样本数取 n_{h}d（该档真实样本），拿不到则该档不出行，**绝不填 0**；
+      · 原「分层价差 / 相对超额」是研究结论（不构成策略收益），
+        仍由卡面另一块展示，不再伪装成一行「策略」参与排名；
+      · **一张卡只出一条序列**：ROE 侧不产出行（判据见函数尾注释），
+        保证本卡 `is_primary` 恰好 1 行 —— 前端 __committeePeriods() 靠它选档，
+        多于 1 行会取错档、0 行则星级静默失真。
     """
+    import re as _re
     rows = []
     av = (obj or {}).get("abnormal_volume") or {}
-    if av:
+    layers = av.get("layers") or {}
+    L1 = layers.get("1") or layers.get(1) or {}
+    holds = sorted({int(m.group(1)) for k in L1
+                    for m in [_re.match(r"^win_(\d+)d$", str(k))] if m})
+    for h in holds:
         rows.append(_mk_row(
-            src, "异常放量·分层价差", _num(av.get("n_points")),
-            av.get("top_layer_win_10d"), av.get("spread_oos_pct"), "T+10 价差",
-            extra={"spread_in_sample_pct": _num(av.get("spread_in_sample_pct")),
-                   "spread_top_bottom_10d_pct": _num(av.get("spread_top_bottom_10d_pct")),
-                   "universe_n": _num(av.get("universe_n")),
-                   "verdict": av.get("verdict_note") or av.get("verdict_3star")},
-            status="研究型：值为「分层价差%」非「平均收益%」，不与交易型同列排名",
+            src, f"L1最强分位 T+{h}", _num(L1.get(f"n_{h}d")) or _num(L1.get("n")),
+            _num(L1.get(f"win_{h}d")), _num(L1.get(f"avg_{h}d")), f"T+{h}",
+            extra={"best": _num(L1.get(f"best_{h}d")),
+                   "worst": _num(L1.get(f"worst_{h}d")),
+                   "factor": "异常量比（缩量=强势）",
+                   "layer": "L1 最强五分位"},
+            primary=(h == FACTOR_PRIMARY_HOLD),
         ))
-    roe = (obj or {}).get("roe_largecap") or {}
-    if roe:
-        rows.append(_mk_row(
-            src, "大盘ROE·TOP30超额", _num(roe.get("top30_n")),
-            roe.get("top30_win_5d"), roe.get("excess_5d"), "T+5 超额",
-            extra={"top30_avg_5d": _num(roe.get("top30_avg_5d")),
-                   "univ_avg_5d": _num(roe.get("univ_avg_5d")),
-                   "excess_10d": _num(roe.get("excess_10d")),
-                   "excess_20d": _num(roe.get("excess_20d"))},
-            status="研究型：值为「相对全池超额%」非「平均收益%」，不与交易型同列排名",
-        ))
+    # 🔴 2026-09-14：ROE 侧（obj["roe_largecap"]）**刻意不产出策略行** —— 不是漏掉，是判据。
+    #   三条硬理由：
+    #   ① **一卡一口径**：卡级主表与档位矩阵都建立在「一张卡 = 一条序列」之上
+    #      （`primary` 恰好 1 行 / 前端 __committeePeriods() 取第一条 is_primary 定档）。
+    #      L1 与 ROE 是两条不同因子序列，同挂一卡会让主表出现两条同卡行、
+    #      档位矩阵出现两条线的「假同源」，正是主人本轮要根治的形态。
+    #   ② **口径不可比**：ROE 用的是「**当期** ROE 排名回看历史」，源文件自己写着
+    #      methodology_limit「隐含 ROE 排名持续性假设，证据强度弱于量比因子的
+    #      point-in-time 分层」。把弱证据塞进同一张胜率排名表，就是本文件
+    #      设计铁律②（不把不可比的口径硬塞进同一排名）明令禁止的事。
+    #   ③ **不隐瞒**：ROE 的全部真实数值（top30_avg/win/best/worst_{h}d、excess_*）
+    #      仍完整保留在 raw_data/factor_lab_backtest.json，并由因子卡自身的
+    #      「ROE_TTM 大市值 Top30 vs 全池等权」表原样展示 —— 未被隐藏。
+    #   若主人日后要 ROE 单独参评，正确做法是**给它单开一张卡**，而非挤进本卡。
     if not rows:
-        return [_mk_row(src, "—", None, None, None, None, status="无分层回测数据")]
+        return [_mk_row(src, "—", None, None, None, None, status="无分层回测数据（等待下一次因子跑批）")]
     return rows
 
 

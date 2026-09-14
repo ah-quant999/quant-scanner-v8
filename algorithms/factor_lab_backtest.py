@@ -37,7 +37,14 @@ COST = 0.0020          # 往返成本
 BASELINE = 240         # 量比基线窗口（前12月 ≈ 240 交易日）
 RECENT = 20            # 当月窗口
 STEP = 10              # 调仓间隔（交易日）
-HOLDS = [5, 10, 20]
+# 🔴 2026-09-14 主人令（图3「这个也要按图4这个模式写」）：持有期档位扩展为
+#   与「四量终极」同档（T+1 … T+250），使因子卡能展示完整「持有期档位表」。
+#   实现铁律 = **按档取用**：某档因 K 线历史不足算不出，就只跳过该档，
+#   绝不让它拖累其余档 —— 某档样本数单独统计（n_{h}d），
+#   也绝不拿短档的样本数冒充长档（旧版 `any(v is None) -> 整点丢弃` 会让
+#   T+250 反过来把 T+1..T+20 的样本一起废掉，属于典型的「长档拖死短档」）。
+HOLDS = [1, 3, 5, 10, 20, 30, 45, 60, 75, 90, 180, 250]
+MIN_HOLD = min(HOLDS)
 NEED_MIN = BASELINE + RECENT + 1   # 参与分层的最少历史
 FETCH_DAYS = 700       # 拉取长历史（≈ 34 个月，可容纳 ~40 个调仓点）
 
@@ -145,6 +152,11 @@ def _layer_stats(samples_by_layer, dates_by_layer):
                 continue
             stat[f"avg_{h}d"] = round(sum(rets) / len(rets) * 100, 3)
             stat[f"win_{h}d"] = round(sum(1 for r in rets if r > 0) / len(rets) * 100, 1)
+            # 🔴 2026-09-14：每档各自样本数 + 最佳/最差 —— 前端「持有期档位表」需要，
+            #   且各档样本数必须独立统计（长档因 K 线不足天然更少，不能共用 n）。
+            stat[f"n_{h}d"] = len(rets)
+            stat[f"best_{h}d"] = round(max(rets) * 100, 3)
+            stat[f"worst_{h}d"] = round(min(rets) * 100, 3)
         # hold=10 非重叠净值（dates 与 rets 同序）
         rets10 = per.get(10, [])
         if len(rets10) >= 3:
@@ -165,14 +177,19 @@ def backtest_abn(klines, workers_note=""):
     rets_at = {}     # {t: {code: {hold: ret}}}
     for code, rows in klines.items():
         n = len(rows)
-        if n < NEED_MIN + 2 * HOLDS[-1]:
+        if n < NEED_MIN + 2 * MIN_HOLD:
             continue
-        for t in range(BASELINE + RECENT - 1, n - 1 - HOLDS[-1], STEP):
+        for t in range(BASELINE + RECENT - 1, n - 1 - MIN_HOLD, STEP):
             f = _abn_factor_at(rows, t)
             if f is None:
                 continue
-            rets = {h: _net_ret(rows, t, h) for h in HOLDS}
-            if any(v is None for v in rets.values()):
+            # 按档取用：只保留算得出的档，缺档跳过而非整点丢弃
+            rets = {}
+            for _h in HOLDS:
+                _v = _net_ret(rows, t, _h)
+                if _v is not None:
+                    rets[_h] = _v
+            if not rets:
                 continue
             factor_at.setdefault(t, {})[code] = f
             rets_at.setdefault(t, {})[code] = rets
@@ -275,11 +292,16 @@ def backtest_roe(klines):
     basket, univ = {}, {}
     for code, rows in klines.items():
         n = len(rows)
-        if n < NEED_MIN + 2 * HOLDS[-1]:
+        if n < NEED_MIN + 2 * MIN_HOLD:
             continue
-        for t in range(BASELINE + RECENT - 1, n - 1 - HOLDS[-1], STEP):
-            rets = {h: _net_ret(rows, t, h) for h in HOLDS}
-            if any(v is None for v in rets.values()):
+        for t in range(BASELINE + RECENT - 1, n - 1 - MIN_HOLD, STEP):
+            # 按档取用：只保留算得出的档，缺档跳过而非整点丢弃
+            rets = {}
+            for _h in HOLDS:
+                _v = _net_ret(rows, t, _h)
+                if _v is not None:
+                    rets[_h] = _v
+            if not rets:
                 continue
             tgt = basket if code in top30 else univ
             for h, r in rets.items():
@@ -294,6 +316,9 @@ def backtest_roe(klines):
             continue
         stat[f"top30_avg_{h}d"] = round(sum(b) / len(b) * 100, 3)
         stat[f"top30_win_{h}d"] = round(sum(1 for r in b if r > 0) / len(b) * 100, 1)
+        stat[f"top30_n_{h}d"] = len(b)
+        stat[f"top30_best_{h}d"] = round(max(b) * 100, 3)
+        stat[f"top30_worst_{h}d"] = round(min(b) * 100, 3)
         stat[f"univ_avg_{h}d"] = round(sum(u) / len(u) * 100, 3)
         stat[f"excess_{h}d"] = round((sum(b) / len(b) - sum(u) / len(u)) * 100, 3)
     return {
