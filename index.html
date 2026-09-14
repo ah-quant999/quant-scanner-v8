@@ -4015,7 +4015,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     //   判据优先级：① 卡成型时刻不是今天 ⇒ 锚上一交易日收盘，显示「盘后」；
     //              ② 是今天 ⇒ 按成型时刻的钟点分档（17:30 是龙虎榜单飞 fetcher 的起跑点，
     //                 过了 17:30 才意味着两张共振日历齐活、本卡才真正成型 ⇒「今日盘后」）。
-    var _miHr = new Date().getHours();
+    // 🔴 2026-09-14 一劳永逸：与刷新/探测逻辑统一口径，兜底分支也走北京时间，
+    //   不再依赖访客本机时区（跨时区访客会把这行算成错误时段）。
+    var _miHr = new Date(Date.now() + 8 * 3600 * 1000).getUTCHours();
     var _miTsDay = _miAllTs ? String(_miAllTs).slice(0, 10) : null;
     var _miToday = new Date().toISOString().slice(0, 10);
     var _miSlot, _miHoriz = '';
