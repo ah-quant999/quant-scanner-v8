@@ -1,8 +1,17 @@
 {
-  "update_time": "2026-09-14 21:56:17",
-  "run_start": "2026-09-14 21:44:04",
-  "ok": 1,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-09-14 22:55:01",
+  "run_start": "2026-09-14 22:27:11",
+  "ok": 10,
+  "fail": 2,
+  "failed_scripts": [
+    {
+      "script": "backtest_expectancy.py",
+      "reason": "监督器静默杀(>15min 无输出)"
+    },
+    {
+      "script": "factor_lab_backtest.py",
+      "reason": "退出码 1 | NameError: name 'CACHE_DIR' is not defined"
+    }
+  ],
   "skipped_by_time_gate": []
 }

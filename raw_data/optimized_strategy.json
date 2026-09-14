@@ -68,8 +68,8 @@
     "note": "数据驱动：仅在市场状态为 grind/panic 时开仓"
   },
   "current_regime": {
-    "date": "2026-09-11",
-    "regime": "grind",
+    "date": "2026-09-14",
+    "regime": "panic",
     "open_position": true,
     "ok": true,
     "reason": "ok"
