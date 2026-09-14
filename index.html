@@ -959,39 +959,27 @@ window.V8_CAL = {weeks:[],legend:[]};
   /* 兼容别名：历史调用点沿用旧名（语义已收敛为上面的盘中陈旧判定窗口） */
   window._isMarketHoursCST = window._isIntradaySlaWindowCST;
   /* 返回 null（无法判定）/ {stale:false} / {stale:true, text:'⚠️ 已停更 N 天', ageH:数值} */
+  /* 🛡 2026-09-14 主人令（一劳永逸）：全站「已停更」告警**彻底取消**。
+     ── 主人原话：「所有的已停更全部取消，你这本来就是日频的」
+     ── 判据错误：本仓绝大多数数据源是**日频**（每日盘后跑批一次产出），
+        「日频」的天然间隔就是 24h；用 20h/22h/72h 这类 SLA 去量它，
+        必然在「今日批次尚未产出」这个**完全正常的窗口**里报「已停更 N 小时/天」。
+        这类红灯从上线起就是**误报**，不是故障信号 —— 它淹没了真故障。
+     ── 处置：保留函数签名与返回形状（下游只读 .stale / .text / .ageH），
+        但恒返回 stale:false + 空文案；三处出口（胶囊/运维页/CRDS）的调用
+        与分支已一并删除，不留不可达死代码。
+     ── 保留：数据时间本身照常显示（「🦊 更新于 …」及今日/昨日/N天前的相对语义），
+        主人要判「是否新鲜」看时间即可，不需要一条会误报的红字来替主人下结论。
+     ── 保留：_staleSlaHours / _isIntradaySlaWindowCST 两个函数不删，
+        其口径已被看门狗与运维审计复用，删了会造成口径分叉。 */
   window._staleMark = function(ts, slot){
     try{
       if(!ts) return null;
       var d = window._parseAsCST ? window._parseAsCST(ts) : null;
       if(!d || isNaN(d.getTime())) return null;
       var ageH = (Date.now() - d.getTime()) / 36e5;
-      if(ageH < 0) return { stale:false, ageH:ageH, text:'' };   // 未来时间：交给 _fmtAshareRel 显示 ⚠️未来
-      var sla = window._staleSlaHours(slot);
-      // 实时/盘中类：非交易时段（收盘后、周末、节假日）不判陈旧，避免夜间与周末满屏红
-      if(sla <= 1.5 && !window._isMarketHoursCST()) return { stale:false, ageH:ageH, text:'' };
-      // 2026-09-06 fix: 非实时/盘中类数据（盘前/盘后/中长线/日频等）按「流逝的交易日」计数，非交易日天然允许用上一交易日数据
-      if(sla > 1.5){
-        var tradingDays = window._tradingDaysBetween ? window._tradingDaysBetween(d, new Date()) : Math.floor(ageH / 24);
-        // 2026-09-09 主人令：今日数据合理产出前，上一交易日的数据不算停更（删「昨日停更 1 日」误判）
-        //   盘前→09:30 前；盘后短线→18:30 前；其它（含长线/E 批/兜底）→22:30 前
-        //   tradingDays<=1 视作"昨日=上一交易日"→ 今日盘前/盘中直接置 0；>=2 真陈旧保留
-        var _nowParts = window._cstParts ? window._cstParts(new Date()) : null;
-        if(_nowParts){
-          var _dow = new Date(Date.UTC(_nowParts.y, _nowParts.m - 1, _nowParts.d)).getUTCDay();
-          var _isWk = (_dow >= 1 && _dow <= 5);
-          var _t = _nowParts.hh * 60 + (_nowParts.mm || 0);
-          var _cutoff = (s.indexOf('盘前') >= 0) ? 570 : ((s.indexOf('短线') >= 0) ? 1110 : 1350);
-          if(_isWk && _t < _cutoff){
-            tradingDays = (tradingDays <= 1) ? 0 : (tradingDays - 1);
-          }
-        }
-        if(tradingDays <= 0) return { stale:false, ageH:ageH, text:'' };
-        return { stale:true, ageH:ageH, text:'⚠️ 已停更 ' + tradingDays + ' 个交易日' };
-      }
-      if(ageH <= sla) return { stale:false, ageH:ageH, text:'' };
-      var days = Math.floor(ageH / 24);
-      var txt = days >= 1 ? ('⚠️ 已停更 ' + days + ' 天') : ('⚠️ 已停更 ' + Math.round(ageH) + ' 小时');
-      return { stale:true, ageH:ageH, text:txt };
+      // 只保留「未来时间」这一种异常态（交给 _fmtAshareRel 显示 ⚠️未来），其余一律不判停更
+      return { stale:false, ageH:ageH, text:'' };
     }catch(e){ return null; }
   };
 })();
@@ -1040,15 +1028,14 @@ function _uBadge(slot, horizon, ts, sub, pageSlot){
   // 🛡 2026-09-04 主人令「一劳永逸」：陈旧度自判下沉到胶囊本体。
   //   超过 SLA 的数据 → 胶囊变红并追加「⚠️ 已停更 N 天」，让主人一眼区分
   //   「数据新鲜」与「批次根本没跑」，不再需要靠截图问 AI。全站 _uBadge/setBadge 调用点自动生效。
-  var _st = (window._staleMark && window._staleMark(ts, slot)) || null;
-  if(_st && _st.stale){
-    var _stTitle = '数据源已超过更新时效（'+(Math.round(_st.ageH*10)/10)+' 小时未刷新），请检查对应抓取/算法任务';
-    if(_pageSlot && _realSlot && _realSlot !== _pageSlot){
-      _stTitle += '｜数据实际产出时段：' + _realSlot + '（本卡位于「' + _pageSlot + '」页）';
-    }
-    return '<span title="'+_stTitle+'" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(239,68,68,.14);color:#f87171;border:1px solid rgba(239,68,68,.38);white-space:nowrap">🦊 更新于 '+t+_slotHtml+hHTML+' '+_st.text+'</span>'
-      + (sub ? ' <span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">' + sub + '</span>' : '');
-  }
+  // 🛡 2026-09-14 主人令（一劳永逸）：原「陈旧红胶囊」分支**整段删除**。
+  //   ── 原逻辑：_staleMark 判陈旧 → 胶囊变红 + 「⚠️ 已停更 N 天」
+  //      + title="数据源已超过更新时效（N 小时未刷新），请检查对应抓取/算法任务"。
+  //   ── 为何删：本仓数据以**日频**为主，「今日批次尚未产出」是正常中间态而非故障，
+  //      按 SLA 判停更必然误报（主人 09-14 原话：「你这本来就是日频的」）。
+  //   ── 不保留不可达分支：留着会误导后人以为「停了告警但机制还在」，
+  //      下次有人调 SLA 就会把误报放回来。删干净才是真一劳永逸。
+  //   ── 胶囊仍照常显示真实更新时间 t（含今日/昨日/N天前相对语义）。
   // 统一轻量 pill 风格（与最终推荐 finalStatusBadges 一致）
   var _okTitle = '数据更新于 ' + t;
   if(_pageSlot && _realSlot && _realSlot !== _pageSlot){
@@ -11166,10 +11153,14 @@ function drawUpDownChart(){
     const staleMin = liveUpdatedDate ? Math.floor((new Date() - liveUpdatedDate) / 60000) : 0;
     // 🩺 2026-09-08 D2-C：阈值 30→60 分钟。多项数据源天然 1h+ 频（如 FACTOR_LAB 1440 分钟），
     //    30 分钟阈会造成与 v8_health_check 判定口径不一致的长期红灯误报。
-    const isStale = staleMin > 60;
+    // 🛡 2026-09-14 主人令（一劳永逸）：本处「⚠️ 已停更 N 分钟」一并取消。
+    //    它绕过 _staleMark 自带 60min 阈值，是「所有已停更」里最后漏网的一处。
+    //    理由同 _staleMark：日频/小时频数据在批次间空档期被判「停更」属误报。
+    //    顶栏仍照常显示 _uBadge('实时','—', liveUpdated) 的真实更新时间，
+    //    自动刷新机制与下方刷新按钮不受影响 —— 主人照旧可手动 Ctrl+F5。
+    void staleMin;
     if(timeEl) {
-      timeEl.innerHTML = _uBadge('实时','—', liveUpdated) +
-        (isStale ? ' <span title="页面数据陈旧：最新 '+liveUpdated+'，请 Ctrl+F5 硬刷新（或点击此处）" style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(239,68,68,.14);color:#f87171;border:1px solid rgba(239,68,68,.38);cursor:pointer;white-space:nowrap" onclick="location.reload(true)">⚠️ 已停更 '+staleMin+' 分钟</span>' : '');
+      timeEl.innerHTML = _uBadge('实时','—', liveUpdated);
     }
 
     const now = new Date();
@@ -14152,12 +14143,13 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
         _sb.style.cssText = 'display:none;margin:0 0 12px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:600;line-height:1.6;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.45);color:#ffb4b4;';
         el.insertBefore(_sb, el.firstChild);
       }
-      if(_staleDays >= 2){
-        _sb.style.display = 'block';
-        _sb.innerHTML = '⚠️ 本卡数据已停更 <b>'+_staleDays+' 个交易日</b>（最后产出 '+_crdsRel(_crdsTsRaw)+'），下列内容为历史快照，<b>请勿据此决策</b>；修复中。';
-      } else {
-        _sb.style.display = 'none';
-      }
+      // 🛡 2026-09-14 主人令（一劳永逸）：本红条取消。
+      //    原 _staleDays >= 2 即弹「本卡数据已停更 N 个交易日 / 请勿据此决策」，
+      //    但 CRDS 属**日频**（每日盘后跑批），跨周末/假期天然 2+ 交易日 → 必误报；
+      //    且卡头已给出真实产出时间（_crdsRel），红条属重复告知 + 语义误判。
+      //    _sb 元素保留（下游无引用），恒隐藏，避免 DOM 结构变动。
+      _sb.style.display = 'none';
+      void _staleDays;
     }catch(e){ console.warn('[renderV8Crds] stale bar failed', e); }
     // ⏳ 2026-09-03 主人令：半成品闸门 —— 链中途写出的空壳（扫描0只+全列表空）显式标示「盘后计算中」，不再呈错误态
     try{
@@ -14343,10 +14335,11 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       var _relTs = (window._fmtAshareRel ? window._fmtAshareRel(dispTs) : null)
                    || String(dispTs).slice(0,16).replace('T',' ');
       // 陈旧（>72h · 运维页按周级兜底）→ 标红，让「批次没跑」一眼可见
-      var _sm = window._staleMark ? window._staleMark(dispTs, '') : null;
-      timeEl.innerHTML = (_sm && _sm.stale)
-        ? '<span style="color:#f87171;font-weight:600">' + _relTs + ' ' + _sm.text + '</span>'
-        : _relTs;
+      // 🛡 2026-09-14 主人令（一劳永逸）：原「陈旧（>72h）→ 标红 + 已停更 N 天」整段删除。
+      //   运维页同样是日频数据，按 72h 兜底判停更在周末/假期必误报（周五产出 → 周一早上即 >72h）。
+      //   现仅显示真实相对时间 _relTs（今日/昨日/N天前），状态列另有 s-ok/s-fail/s-warn 三色点
+      //   表达「批次跑没跑」——那才是真信号；时间红字只是重复噪音。
+      timeEl.innerHTML = _relTs;
       // 真实数据时间 ≠ 心跳时间时，标注「(数据)」避免误导
       if(realTs && item && item.last_update && String(realTs).slice(0,16) !== String(item.last_update).slice(0,16)){
         timeEl.innerHTML += ' (数据)';
@@ -15035,7 +15028,8 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     return 15 * MIN;
   }
   function _probe(done){
-    var url = 'data/HEALTH_CHECK.js?v=1789360530' + Date.now();
+    var _hn = 'HEALTH_CHECK';
+    var url = 'data/' + _hn + '.js' + '?_=' + Date.now();
     var finished = false;
     function fin(v){ if(!finished){ finished = true; done(v); } }
     try{
