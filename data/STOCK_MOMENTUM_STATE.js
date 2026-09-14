@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-14 20:13",
- "generated": "2026-09-14 20:13",
+ "update_time": "2026-09-14 20:17",
+ "generated": "2026-09-14 20:17",
  "meta": {
-  "generated": "2026-09-14 20:13",
+  "generated": "2026-09-14 20:17",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 7,
   "days_with_consensus": 0,
@@ -1666,17 +1666,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
-      "code": "601086",
-      "name": "国芳集团",
-      "change_pct": 10.031,
-      "price": 17.99,
-      "category": "突破"
-     },
-     {
       "code": "000978",
       "name": "桂林旅游",
       "change_pct": 10.03,
       "price": 10.86,
+      "category": "突破"
+     },
+     {
+      "code": "301132",
+      "name": "满坤科技",
+      "change_pct": 20.004,
+      "price": 58.37,
       "category": "突破"
      },
      {
@@ -1694,13 +1694,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "688135",
-      "name": "利扬芯片",
-      "change_pct": 6.555,
-      "price": 39.5,
-      "category": "突破"
-     },
-     {
       "code": "300290",
       "name": "ST荣科",
       "change_pct": 3.199,
@@ -1712,6 +1705,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "森鹰窗业",
       "change_pct": 3.2,
       "price": 32.57,
+      "category": "突破"
+     },
+     {
+      "code": "301251",
+      "name": "威尔高",
+      "change_pct": 11.288,
+      "price": 65.66,
       "category": "突破"
      },
      {
@@ -1736,13 +1736,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "603936",
-      "name": "博敏电子",
-      "change_pct": 6.753,
-      "price": 22.29,
-      "category": "突破"
-     },
-     {
       "code": "605580",
       "name": "恒盛能源",
       "change_pct": 10.023,
@@ -1754,6 +1747,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "科森科技",
       "change_pct": 9.978,
       "price": 19.95,
+      "category": "突破"
+     },
+     {
+      "code": "300903",
+      "name": "科翔股份",
+      "change_pct": 20.0,
+      "price": 108.3,
+      "category": "突破"
+     },
+     {
+      "code": "603936",
+      "name": "博敏电子",
+      "change_pct": 6.753,
+      "price": 22.29,
       "category": "突破"
      },
      {
@@ -1778,6 +1785,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "600088",
+      "name": "中视传媒",
+      "change_pct": 10.0,
+      "price": 14.74,
+      "category": "突破"
+     },
+     {
       "code": "301234",
       "name": "五洲医疗",
       "change_pct": 5.412,
@@ -1789,22 +1803,36 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "凯盛新能",
       "change_pct": 10.0,
       "price": 9.57,
+      "category": "突破"
+     },
+     {
+      "code": "300352",
+      "name": "ST信源",
+      "change_pct": 5.667,
+      "price": 3.17,
+      "category": "突破"
+     },
+     {
+      "code": "300913",
+      "name": "兆龙互连",
+      "change_pct": 7.386,
+      "price": 46.09,
       "category": "突破"
      }
     ],
     "加速": [
      {
-      "code": "601086",
-      "name": "国芳集团",
-      "change_pct": 10.031,
-      "price": 17.99,
-      "category": "加速"
-     },
-     {
       "code": "000978",
       "name": "桂林旅游",
       "change_pct": 10.03,
       "price": 10.86,
+      "category": "加速"
+     },
+     {
+      "code": "301132",
+      "name": "满坤科技",
+      "change_pct": 20.004,
+      "price": 58.37,
       "category": "加速"
      },
      {
@@ -1822,13 +1850,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "688135",
-      "name": "利扬芯片",
-      "change_pct": 6.555,
-      "price": 39.5,
-      "category": "加速"
-     },
-     {
       "code": "300290",
       "name": "ST荣科",
       "change_pct": 3.199,
@@ -1840,6 +1861,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "森鹰窗业",
       "change_pct": 3.2,
       "price": 32.57,
+      "category": "加速"
+     },
+     {
+      "code": "301251",
+      "name": "威尔高",
+      "change_pct": 11.288,
+      "price": 65.66,
       "category": "加速"
      },
      {
@@ -1864,13 +1892,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "603936",
-      "name": "博敏电子",
-      "change_pct": 6.753,
-      "price": 22.29,
-      "category": "加速"
-     },
-     {
       "code": "605580",
       "name": "恒盛能源",
       "change_pct": 10.023,
@@ -1882,6 +1903,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "科森科技",
       "change_pct": 9.978,
       "price": 19.95,
+      "category": "加速"
+     },
+     {
+      "code": "300903",
+      "name": "科翔股份",
+      "change_pct": 20.0,
+      "price": 108.3,
+      "category": "加速"
+     },
+     {
+      "code": "603936",
+      "name": "博敏电子",
+      "change_pct": 6.753,
+      "price": 22.29,
       "category": "加速"
      },
      {
@@ -1903,22 +1938,29 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "联域股份",
       "change_pct": 6.244,
       "price": 78.95,
+      "category": "加速"
+     },
+     {
+      "code": "600088",
+      "name": "中视传媒",
+      "change_pct": 10.0,
+      "price": 14.74,
       "category": "加速"
      }
     ],
     "短线选股": [
      {
-      "code": "601086",
-      "name": "国芳集团",
-      "change_pct": 10.031,
-      "price": 17.99,
-      "category": "短线选股"
-     },
-     {
       "code": "000978",
       "name": "桂林旅游",
       "change_pct": 10.03,
       "price": 10.86,
+      "category": "短线选股"
+     },
+     {
+      "code": "301132",
+      "name": "满坤科技",
+      "change_pct": 20.004,
+      "price": 58.37,
       "category": "短线选股"
      },
      {
@@ -1936,13 +1978,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "688135",
-      "name": "利扬芯片",
-      "change_pct": 6.555,
-      "price": 39.5,
-      "category": "短线选股"
-     },
-     {
       "code": "300290",
       "name": "ST荣科",
       "change_pct": 3.199,
@@ -1954,6 +1989,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "森鹰窗业",
       "change_pct": 3.2,
       "price": 32.57,
+      "category": "短线选股"
+     },
+     {
+      "code": "301251",
+      "name": "威尔高",
+      "change_pct": 11.288,
+      "price": 65.66,
       "category": "短线选股"
      },
      {
@@ -1978,13 +2020,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "603936",
-      "name": "博敏电子",
-      "change_pct": 6.753,
-      "price": 22.29,
-      "category": "短线选股"
-     },
-     {
       "code": "605580",
       "name": "恒盛能源",
       "change_pct": 10.023,
@@ -1996,6 +2031,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "科森科技",
       "change_pct": 9.978,
       "price": 19.95,
+      "category": "短线选股"
+     },
+     {
+      "code": "300903",
+      "name": "科翔股份",
+      "change_pct": 20.0,
+      "price": 108.3,
+      "category": "短线选股"
+     },
+     {
+      "code": "603936",
+      "name": "博敏电子",
+      "change_pct": 6.753,
+      "price": 22.29,
       "category": "短线选股"
      },
      {
@@ -2017,6 +2066,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "联域股份",
       "change_pct": 6.244,
       "price": 78.95,
+      "category": "短线选股"
+     },
+     {
+      "code": "600088",
+      "name": "中视传媒",
+      "change_pct": 10.0,
+      "price": 14.74,
       "category": "短线选股"
      },
      {
@@ -2031,6 +2087,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "凯盛新能",
       "change_pct": 10.0,
       "price": 9.57,
+      "category": "短线选股"
+     },
+     {
+      "code": "300352",
+      "name": "ST信源",
+      "change_pct": 5.667,
+      "price": 3.17,
+      "category": "短线选股"
+     },
+     {
+      "code": "300913",
+      "name": "兆龙互连",
+      "change_pct": 7.386,
+      "price": 46.09,
       "category": "短线选股"
      }
     ],
@@ -2047,6 +2117,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "凯盛新能",
       "change_pct": 10.0,
       "price": 9.57,
+      "category": "强势股"
+     },
+     {
+      "code": "300352",
+      "name": "ST信源",
+      "change_pct": 5.667,
+      "price": 3.17,
+      "category": "强势股"
+     },
+     {
+      "code": "300913",
+      "name": "兆龙互连",
+      "change_pct": 7.386,
+      "price": 46.09,
       "category": "强势股"
      }
     ]
