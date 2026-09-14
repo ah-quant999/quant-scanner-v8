@@ -9,6 +9,7 @@
 #   2. 装 akshare / requests（fetch_valuation_percentile 联网依赖）
 #   3. 跑 3 个 fetcher
 #      - scripts/fetch_valuation_percentile.py（akshare stock_index_pe_lg）
+#      - scripts/gen_factor_audit.py（读 generate_top10.py 源码做审计）
 #      - scripts/fetch_index_value_framework.py（读 INDEX_HISTORY.js ＋ akshare/东财补中证）
 #   4. python update_v8.py --category post_close（重生成 data/*.js + 更新 ?v）
 #   5. 推 main（仅这 3 张卡相关文件 + index.html 戳变化，原子提交）
@@ -33,6 +34,11 @@ on:
     inputs:
       run_valuation:
         description: '跑估值分位 fetcher（默认 true）'
+        required: false
+        default: 'true'
+        type: boolean
+      run_factor_audit:
+        description: '跑因子审计 generator（默认 true）'
         required: false
         default: 'true'
         type: boolean
@@ -82,6 +88,10 @@ jobs:
             echo "--- fetch_valuation_percentile ---"
             python scripts/fetch_valuation_percentile.py || echo "⚠️ valuation fetcher failed (non-fatal)"
           fi
+          if [ "${{ inputs.run_factor_audit }}" != "false" ]; then
+            echo "--- gen_factor_audit ---"
+            python scripts/gen_factor_audit.py || echo "⚠️ factor audit failed (non-fatal)"
+          fi
           if [ "${{ inputs.run_index_value }}" != "false" ]; then
             echo "--- fetch_index_value_framework ---"
             python scripts/fetch_index_value_framework.py || echo "⚠️ index value failed (non-fatal)"
@@ -103,6 +113,6 @@ jobs:
           #   现改用 api_push_raw.py（GitHub Contents API，零 git fetch，免疫 cn git 墙）
           #   仅推「本次变更清单」（含 index.html，update_v8 已重写其 ?v），与
           #   v8_algo_cloud 链尾「📤 唯一推送」完全同构，无 ?v 失配窗口。
-          PUSH_FILES="data/VALUATION_PERCENTILE.js,data/INDEX_VALUE_FRAMEWORK.js,raw_data/valuation_percentile.json,raw_data/index_value_framework.json,index.html" \
+          PUSH_FILES="data/VALUATION_PERCENTILE.js,data/FACTOR_AUDIT.js,data/INDEX_VALUE_FRAMEWORK.js,raw_data/valuation_percentile.json,raw_data/factor_audit.json,raw_data/index_value_framework.json,index.html" \
             python api_push_raw.py
           echo "✅ 实验卡 data/raw_data/index.html 已推送（Contents API）"

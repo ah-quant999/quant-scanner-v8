@@ -136,10 +136,14 @@ DATA_SOURCES = {
     "sector_recommendation.json":   "SECTOR_RECOMMENDATION",
     # 2026-09-09 主人令：A股主要指数 PE-TTM 历史分位（估值分位切换实验卡，暂未上架）
     "valuation_percentile.json":    "VALUATION_PERCENTILE",
+    # 2026-09-09 主人令：A股质量价值中小盘多因子 vs v8 选股因子审计（暂未上架）
+    "factor_audit.json":            "FACTOR_AUDIT",
     # 2026-09-09 主人令：A股指数价格中枢+趋势门控框架迁移（QQQ/TQQQ → A股，暂未上架）
     "index_value_framework.json":   "INDEX_VALUE_FRAMEWORK",
     # 2026-09-10 主人令：AI 洞察多源观点对比卡（暂未上架·实验区最下方），源 MAHORO_MACRO 已有 insights
     "ai_insights_compare.json":     "AI_INSIGHTS_COMPARE",
+    # 2026-09-10 主人令：因子补缺 walk-forward 进度跟踪卡（暂未上架），源 FACTOR_AUDIT
+    "factor_progress.json":         "FACTOR_PROGRESS",
     # 🛡 2026-08-26 一劳永逸根因修复：原 DATA_SOURCES 漏挂 final_recommend.json 映射，
     #   该 .js 仅由算法脚本 final_recommend.py 写入，而云端 build 的 update_v8 步骤
     #   不覆盖它 → data/FINAL_RECOMMEND_DATA.js 站点读的 window.* 永远停在 08-22（源 raw_data 已是 08-25 新鲜）。
