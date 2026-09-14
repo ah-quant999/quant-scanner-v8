@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-14 19:14:12",
+  "update_time": "2026-09-14 20:46:17",
   "data_date": "2026-09-14",
   "track_start": "2026-09-14",
   "history_days": 20,
@@ -7,23 +7,91 @@
   "near_count": 8,
   "tracked": [
     {
+      "code": "000938",
+      "name": "紫光股份",
+      "market": "sz",
+      "board": "主板",
+      "status": "near",
+      "total_score": 41.0,
+      "quality_grade": "C",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "昨日炸板",
+        "参股新三板",
+        "MSCI中国",
+        "2026中报预增",
+        "深证100R",
+        "车联网(车路云)",
+        "物联网",
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-09-14",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 32.73,
+      "current_close": 32.73,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "300033",
+      "name": "同花顺",
+      "market": "sz",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 35.6,
+      "quality_grade": "C",
+      "industry": "其他金融业",
+      "sectors": [
+        "国产软件",
+        "MSCI中国",
+        "2026中报预增",
+        "深证100R",
+        "百元股",
+        "鸿蒙概念",
+        "机构重仓",
+        "其他金融业"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-09-14",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 205.55,
+      "current_close": 205.55,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
       "code": "688099",
       "name": "晶晨股份",
       "market": "sh",
       "board": "科创板",
       "status": "near",
-      "total_score": 32.9,
+      "total_score": 31.1,
       "quality_grade": "C",
       "industry": "软件和信息技术服务业",
       "sectors": [
-        "中证500",
-        "软件和信息技术服务业",
-        "半导体概念",
-        "融资融券",
-        "科创板做市股",
+        "昨日高振幅",
         "MSCI中国",
+        "融资融券",
         "超清视频",
-        "昨日高振幅"
+        "中证500",
+        "科创板做市股",
+        "软件和信息技术服务业",
+        "半导体概念"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-12",
@@ -60,6 +128,40 @@
       "catalysts": []
     },
     {
+      "code": "688409",
+      "name": "富创精密",
+      "market": "sh",
+      "board": "科创板",
+      "status": "near",
+      "total_score": 29.9,
+      "quality_grade": "D",
+      "industry": "通用设备制造业",
+      "sectors": [
+        "光刻机(胶)",
+        "百元股",
+        "2026中报预增",
+        "融资融券",
+        "科技风格",
+        "通用设备制造业",
+        "专精特新",
+        "半导体概念"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-09-14",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 174.87,
+      "current_close": 174.87,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
       "code": "09866",
       "name": "09866",
       "market": "hk",
@@ -79,99 +181,23 @@
       "catalysts": []
     },
     {
-      "code": "00291",
-      "name": "华润啤酒",
-      "market": "hk",
-      "board": "港股",
-      "status": "near",
-      "total_score": 28.0,
-      "quality_grade": "",
-      "industry": "",
-      "sectors": [],
-      "signal_count": 2,
-      "enter_date": "2026-09-12",
-      "hold_days": 2,
-      "consecutive_days": 3,
-      "first_close": 18.91,
-      "current_close": 18.91,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "06862",
-      "name": "海底捞",
-      "market": "hk",
-      "board": "港股",
-      "status": "near",
-      "total_score": 28.0,
-      "quality_grade": "",
-      "industry": "",
-      "sectors": [],
-      "signal_count": 2,
-      "enter_date": "2026-09-12",
-      "hold_days": 2,
-      "consecutive_days": 3,
-      "first_close": 10.36,
-      "current_close": 10.36,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "00175",
-      "name": "吉利汽车",
-      "market": "hk",
-      "board": "港股",
-      "status": "near",
-      "total_score": 28.0,
-      "quality_grade": "",
-      "industry": "",
-      "sectors": [],
-      "signal_count": 2,
-      "enter_date": "2026-09-12",
-      "hold_days": 2,
-      "consecutive_days": 3,
-      "first_close": 16.59,
-      "current_close": 16.59,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "09868",
-      "name": "小鹏汽车-W",
-      "market": "hk",
-      "board": "港股",
-      "status": "near",
-      "total_score": 28.0,
-      "quality_grade": "",
-      "industry": "",
-      "sectors": [],
-      "signal_count": 2,
-      "enter_date": "2026-09-12",
-      "hold_days": 2,
-      "consecutive_days": 3,
-      "first_close": 41.96,
-      "current_close": 41.96,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
       "code": "600584",
       "name": "长电科技",
       "market": "sh",
       "board": "主板",
       "status": "near",
-      "total_score": 34.4,
+      "total_score": 44.1,
       "quality_grade": "C",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "2026中报预增",
-        "新材料",
         "HS300",
-        "计算机、通信和其他电子设备制造业",
-        "物联网",
-        "生物识别",
+        "毫米波概念",
+        "新材料",
         "MSCI中国",
-        "毫米波概念"
+        "2026中报预增",
+        "生物识别",
+        "物联网",
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-08",
@@ -194,18 +220,18 @@
       "market": "sh",
       "board": "主板",
       "status": "strict",
-      "total_score": 26.7,
+      "total_score": 30.4,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
-        "2026中报预增",
-        "新材料",
-        "稀缺资源",
         "昨日炸板",
-        "钒电池",
+        "新材料",
         "MSCI中国",
-        "锂矿概念",
-        "有色金属矿采选业"
+        "2026中报预增",
+        "钒电池",
+        "有色金属矿采选业",
+        "稀缺资源",
+        "锂矿概念"
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
@@ -223,23 +249,51 @@
       ]
     },
     {
+      "code": "002371",
+      "name": "北方华创",
+      "market": "sz",
+      "board": "主板",
+      "status": "near",
+      "total_score": 34.2,
+      "quality_grade": "B",
+      "industry": "专用设备制造业",
+      "sectors": [
+        "光刻机(胶)",
+        "高带宽内存",
+        "MSCI中国",
+        "深证100R",
+        "百元股",
+        "第三代半导体",
+        "基金重仓",
+        "专用设备制造业"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-08-17",
+      "hold_days": 2,
+      "consecutive_days": 3,
+      "first_close": 765.97,
+      "current_close": 626.0,
+      "pnl_pct": -18.27,
+      "catalysts": []
+    },
+    {
       "code": "605117",
       "name": "德业股份",
       "market": "sh",
       "board": "主板",
       "status": "strict",
-      "total_score": 25.5,
+      "total_score": 33.5,
       "quality_grade": "A",
       "industry": "电气机械和器材制造业",
       "sectors": [
-        "2026中报预增",
-        "HS300",
-        "MSCI中国",
-        "沪股通",
-        "2026一季报预增",
         "上证180",
+        "HS300",
         "周期股",
-        "电气机械和器材制造业"
+        "MSCI中国",
+        "2026中报预增",
+        "沪股通",
+        "电气机械和器材制造业",
+        "2026一季报预增"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-12",
@@ -339,8 +393,8 @@
     {
       "level": "warn",
       "code": "002371",
-      "name": "创联控股",
-      "text": "创联控股(002371) 于 2026-08-19 跌出共识（曾连续 3 日）"
+      "name": "北方华创",
+      "text": "北方华创(002371) 入选以来回撤 -18.3%（2026-08-17 起）"
     },
     {
       "level": "warn",
@@ -532,15 +586,26 @@
   "sector_cluster": {
     "by_industry": [
       {
+        "industry": "计算机、通信和其他电子设备制造业",
+        "count": 2,
+        "names": [
+          "紫光股份",
+          "长电科技"
+        ]
+      },
+      {
         "industry": "未知",
-        "count": 6,
+        "count": 2,
         "names": [
           "百胜中国",
-          "09866",
-          "华润啤酒",
-          "海底捞",
-          "吉利汽车",
-          "小鹏汽车-W"
+          "09866"
+        ]
+      },
+      {
+        "industry": "其他金融业",
+        "count": 1,
+        "names": [
+          "同花顺"
         ]
       },
       {
@@ -551,10 +616,10 @@
         ]
       },
       {
-        "industry": "计算机、通信和其他电子设备制造业",
+        "industry": "通用设备制造业",
         "count": 1,
         "names": [
-          "长电科技"
+          "富创精密"
         ]
       },
       {
@@ -562,6 +627,13 @@
         "count": 1,
         "names": [
           "西部矿业"
+        ]
+      },
+      {
+        "industry": "专用设备制造业",
+        "count": 1,
+        "names": [
+          "北方华创"
         ]
       },
       {
@@ -575,14 +647,42 @@
     "by_sector": [
       {
         "sector": "MSCI中国",
-        "count": 4
+        "count": 7
       },
       {
         "sector": "2026中报预增",
+        "count": 6
+      },
+      {
+        "sector": "深证100R",
         "count": 3
       },
       {
-        "sector": "新材料",
+        "sector": "百元股",
+        "count": 3
+      },
+      {
+        "sector": "昨日炸板",
+        "count": 2
+      },
+      {
+        "sector": "物联网",
+        "count": 2
+      },
+      {
+        "sector": "计算机、通信和其他电子设备制造业",
+        "count": 2
+      },
+      {
+        "sector": "融资融券",
+        "count": 2
+      },
+      {
+        "sector": "半导体概念",
+        "count": 2
+      },
+      {
+        "sector": "光刻机(胶)",
         "count": 2
       },
       {
@@ -590,27 +690,31 @@
         "count": 2
       },
       {
-        "sector": "中证500",
+        "sector": "新材料",
+        "count": 2
+      },
+      {
+        "sector": "参股新三板",
         "count": 1
       },
       {
-        "sector": "软件和信息技术服务业",
+        "sector": "车联网(车路云)",
         "count": 1
       },
       {
-        "sector": "半导体概念",
+        "sector": "国产软件",
         "count": 1
       },
       {
-        "sector": "融资融券",
+        "sector": "鸿蒙概念",
         "count": 1
       },
       {
-        "sector": "科创板做市股",
+        "sector": "机构重仓",
         "count": 1
       },
       {
-        "sector": "超清视频",
+        "sector": "其他金融业",
         "count": 1
       },
       {
@@ -618,15 +722,31 @@
         "count": 1
       },
       {
-        "sector": "计算机、通信和其他电子设备制造业",
+        "sector": "超清视频",
         "count": 1
       },
       {
-        "sector": "物联网",
+        "sector": "中证500",
         "count": 1
       },
       {
-        "sector": "生物识别",
+        "sector": "科创板做市股",
+        "count": 1
+      },
+      {
+        "sector": "软件和信息技术服务业",
+        "count": 1
+      },
+      {
+        "sector": "科技风格",
+        "count": 1
+      },
+      {
+        "sector": "通用设备制造业",
+        "count": 1
+      },
+      {
+        "sector": "专精特新",
         "count": 1
       },
       {
@@ -634,11 +754,7 @@
         "count": 1
       },
       {
-        "sector": "稀缺资源",
-        "count": 1
-      },
-      {
-        "sector": "昨日炸板",
+        "sector": "生物识别",
         "count": 1
       },
       {
@@ -646,19 +762,31 @@
         "count": 1
       },
       {
-        "sector": "锂矿概念",
-        "count": 1
-      },
-      {
         "sector": "有色金属矿采选业",
         "count": 1
       },
       {
-        "sector": "沪股通",
+        "sector": "稀缺资源",
         "count": 1
       },
       {
-        "sector": "2026一季报预增",
+        "sector": "锂矿概念",
+        "count": 1
+      },
+      {
+        "sector": "高带宽内存",
+        "count": 1
+      },
+      {
+        "sector": "第三代半导体",
+        "count": 1
+      },
+      {
+        "sector": "基金重仓",
+        "count": 1
+      },
+      {
+        "sector": "专用设备制造业",
         "count": 1
       },
       {
@@ -670,11 +798,19 @@
         "count": 1
       },
       {
+        "sector": "沪股通",
+        "count": 1
+      },
+      {
         "sector": "电气机械和器材制造业",
+        "count": 1
+      },
+      {
+        "sector": "2026一季报预增",
         "count": 1
       }
     ],
-    "concentration": 60.0
+    "concentration": 20.0
   },
   "overlap": {
     "total_tracked": 10,
@@ -878,7 +1014,7 @@
       },
       {
         "code": "002371",
-        "name": "创联控股",
+        "name": "北方华创",
         "enter_date": "2026-08-17",
         "offsets": {
           "1d": 1.44
