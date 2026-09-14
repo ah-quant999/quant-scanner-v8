@@ -718,24 +718,31 @@ window.V8_CAL = {weeks:[],legend:[]};
      本卡自己的盘中信号（health.signal + sentiment.signal），不得读盘后 E 批回测
      OPTIMIZED_STRATEGY（那是选股因子门控 v8FactorGate 的正职，错接=假死）。 */
   window.v8IntradayGate = function(){
+    /* 2026-09-14 主人令：AI市场速览 = 全站唯一择时关口。
+       本函数聚合两类结论：
+       ① 仓位依据（是否可开新仓）—— 来自全站唯一有回测证据的 v8MarketGate()；
+       ② 盘面观测（今日节奏）     —— 来自 AI_MARKET_BRIEF 自身盘中实时信号。
+       下游模块（平均股价/因子实验室等）统一读取本函数，不再各自引用 v8MarketGate()。 */
+    var mkt = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {open:false,name:'未知',verdict:'等待数据',evidence:'',color:'#94a3b8'};
     var d = window.AI_MARKET_BRIEF || {};
     var hs = (d.health && d.health.signal) || '';
     var ss = (d.sentiment && d.sentiment.signal) || '';
     if(!hs && !ss){
-      return {ok:false, icon:'⚪', color:'#94a3b8', name:'暂无数据', verdict:'等待盘中数据', date:''};
+      return {ok:!!mkt.open, color:mkt.color, name:'暂无数据', observation:'等待盘中数据',
+              verdict:mkt.verdict, regime:mkt.name, evidence:mkt.evidence, date:mkt.date||''};
     }
     var _rank = {red:0, yellow:1, green:2};
     var _lo = Math.min(_rank[hs]!=null?_rank[hs]:1, _rank[ss]!=null?_rank[ss]:1);
+    var obs, obsName, obsColor;
     if(_lo === 2){
-      return {ok:true, icon:'✅', color:'#5ee0a0', name:'偏多', verdict:'可开新仓',
-              evidence:'盘中实时：健康度 + 情绪 双绿', date:''};
+      obsName='偏多'; obs='今日偏强，节奏积极'; obsColor='#5ee0a0';
+    } else if(_lo === 0){
+      obsName='偏弱'; obs='今日偏弱，注意节奏'; obsColor='#ff6b81';
+    } else {
+      obsName='震荡'; obs='今日情绪分化，控制仓位'; obsColor='#fbbf24';
     }
-    if(_lo === 0){
-      return {ok:false, icon:'⛔', color:'#ff6b81', name:'偏弱', verdict:'不开新仓',
-              evidence:'盘中实时：健康度/情绪 现红，防御为主', date:''};
-    }
-    return {ok:false, icon:'⏸', color:'#fbbf24', name:'震荡', verdict:'观望',
-            evidence:'盘中实时：健康度/情绪 未共振，震荡待方向', date:''};
+    return {ok:!!mkt.open, color:obsColor, name:obsName, observation:obs,
+            verdict:mkt.verdict, regime:mkt.name, evidence:mkt.evidence, date:mkt.date||''};
   };
   /* ---- 因子择时闸门：v8MarketGate(择时) ∩ 因子分位门槛 ----
      因子长多组合 t<2，仅作「排序信号」而非独立策略，故必须叠加择时闸门。
@@ -2068,16 +2075,25 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         }
         var h='';
 
-        /* ===== ⚖️ 持仓建议（2026-09-09 一劳永逸：改读盘中实时信号） =====
-           本卡为盘中实时观察：持仓建议由 v8IntradayGate() 读 AI_MARKET_BRIEF 自身
-           health.signal + sentiment.signal（09:25 起持续刷新），不再读盘后回测 regime
-           （那是选股因子门控 v8FactorGate 的正职，错接=假死）。本卡无回测证据，仅供参考。 */
-        var _ga = (typeof window.v8IntradayGate==='function') ? window.v8IntradayGate() : {ok:false,name:'暂无数据',icon:'⚪',color:'#94a3b8',verdict:'等待数据',date:''};
-        h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 12px;margin-bottom:8px;'
+        /* ===== ⚖️ AI市场速览 = 全站唯一择时关口（2026-09-14 主人令） =====
+           本函数聚合：① 仓位依据（来自 v8MarketGate 盘后回测 regime，唯一有回测证据）；
+           ② 盘面观测（来自 AI_MARKET_BRIEF 自身盘中实时信号）。
+           其余模块（平均股价/因子实验室）统一读 v8IntradayGate()，不再各自引用 v8MarketGate()。 */
+        var _ga = (typeof window.v8IntradayGate==='function') ? window.v8IntradayGate() : {ok:false,name:'暂无数据',color:'#94a3b8',observation:'等待数据',verdict:'等待数据',regime:'未知',date:''};
+        var _regimeTxt = _ga.regime ? '（'+_ga.regime+'）' : '';
+        var _posColor = _ga.ok ? '#5ee0a0' : '#ff6b81';
+        h+='<div style="display:flex;flex-direction:column;gap:4px;padding:7px 12px;margin-bottom:8px;'
          + 'background:'+_ga.color+'12;border:1px solid '+_ga.color+'59;border-radius:8px;font-size:11.5px;line-height:1.6;">'
-         + '<span style="font-weight:800;color:'+_ga.color+';">⚖ 持仓建议</span>'
-         + '<span style="font-weight:700;color:'+_ga.color+';background:rgba(255,255,255,.08);border:1px solid '+_ga.color+'59;'
-         + 'padding:1px 8px;border-radius:6px;">'+_ga.icon+' '+_ga.name+' · '+_ga.verdict+'</span>'
+         + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+         +   '<span style="font-weight:800;color:'+_posColor+';">仓位依据</span>'
+         +   '<span style="font-weight:700;color:'+_posColor+';background:rgba(255,255,255,.08);border:1px solid '+_posColor+'59;'
+         +   'padding:1px 8px;border-radius:6px;">'+(_ga.ok?'✅ ':'⛔ ')+_ga.verdict+_regimeTxt+'</span>'
+         + '</div>'
+         + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+         +   '<span style="font-weight:800;color:'+_ga.color+';">盘面观测</span>'
+         +   '<span style="font-weight:700;color:'+_ga.color+';background:rgba(255,255,255,.08);border:1px solid '+_ga.color+'59;'
+         +   'padding:1px 8px;border-radius:6px;">'+_ga.name+' · '+_ga.observation+'</span>'
+         + '</div>'
          + '</div>';
 
         // 1. 日内风向
@@ -2134,7 +2150,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var _cTxt=_chg==null?'--':((_chg>0?'+':'')+Number(_chg).toFixed(2)+'%');
           function _pt(v){ if(v==null||isNaN(v)) return '<span style="color:var(--sub)">--</span>'; var _c=v>=0?'var(--up)':'var(--down)'; return '<span style="color:'+_c+';font-weight:600;">'+(v>=0?'▲':'▼')+' '+(v>0?'+':'')+Number(v).toFixed(2)+'%</span>'; }
 
-          // ===== 买卖信号计算 =====
+          // ===== 买卖信号计算（2026-09-14 受 AI速览 主闸门约束）=====
+          var _ga2 = (typeof window.v8IntradayGate==='function') ? window.v8IntradayGate() : {ok:false};
+          var _gateOpen = !!_ga2.ok;   // AI速览 = 全站唯一买卖关口
           var _sigBuy=[], _sigSell=[];
           var _p20=ap.position_vs_ma20, _p60=ap.position_vs_ma60;
           if(_p20!=null && _p20>5) _sigSell.push('🔴 远超MA20 +'+_p20.toFixed(1)+'% · 高估');
@@ -2149,24 +2167,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           if(_hist.length>=3){
             var _d0=_hist[_hist.length-1], _d1=_hist[_hist.length-2], _d2=_hist[_hist.length-3];
             if(_d2.avg_change_pct<0 && _d1.avg_change_pct<0 && _d0.avg_change_pct>0)
-              _sigBuy.push('🔄 连跌后首阳 · 反弹确认');
+              _sigBuy.push('🔄 连跌后首阳 · 反抽待确认');
             if(_d2.avg_change_pct>0 && _d1.avg_change_pct>0 && _d0.avg_change_pct<0)
               _sigSell.push('⚡ 连涨后回调 · 注意风险');
           }
           if(_chg!=null && _chg<-1.5) _sigSell.push('⚠️ 单日暴跌 '+_chg.toFixed(1)+'% · 恐慌');
           if(_chg!=null && _chg>1.5) _sigBuy.push('⚡ 单日暴涨 '+(+_chg).toFixed(1)+'% · 追高风险');
 
-          // 2026-08-31 主人令：评价统一金色 var(--gold)（评价 = 综合判断，不是单色信号；行内灯保留红绿黄）；verdict 胶囊跟在 vs 60日线 后面不靠右
-          // I5 一劳永逸清理：var _vClr='#fbbf24' 死字段移除（再无引用，留着会误导下轮维护）
-          var _verdict='';  // emoji 区分具体语义（高位/偏高/偏低/超卖/中性），颜色统一 var(--gold)='#fbbf24' 见 1796
-          if(_sigSell.length>=2){ _verdict='🔴 高位·观测'; }
-          else if(_sigSell.length===1){ _verdict='🟠 偏高·观测'; }
-          else if(_sigBuy.length>=2){ _verdict='🟢 偏低·观测'; }
-          else if(_sigBuy.length===1){ _verdict='🟡 超卖·轻仓观测'; }
-          else { _verdict='⏸ 中性·观望'; }
+          // 2026-09-14 主人令：删除「超卖·轻仓观测」等综合 verdict 胶囊（图3），
+          //   避免与 AI速览 关口结论重复打架。只保留买卖信号明细。
 
           h+='<div style="padding:10px 18px;background:'+ac.bg+';font-size:13px;line-height:1.8;color:var(--txt);">';
-          // 第一行：标题 + 数据 + 综合结论
+          // 第一行：标题 + 数据
           h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
           // 2026-08-30：标签不再硬写 880003（数据可能来自全A等权口径），按 source 字段自述
           var _srcTag=(ap.source&&String(ap.source).indexOf('880003')>=0)?'880003':'全A等权';
@@ -2175,14 +2187,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           h+='<b style="font-size:15px;">'+Number(ap.avg_price).toFixed(2)+'</b>';
           h+=' <span style="color:'+_cCol+';font-weight:700;">'+_cTxt+'</span>';
           if(ap.prev_avg_price!=null){ var _df=ap.avg_price-ap.prev_avg_price; h+=' <span style="color:'+(_df>=0?'var(--up)':'var(--down)')+';font-size:12px;">较昨日 '+(_df>=0?'+':'')+_df.toFixed(3)+'</span>'; }
-          // 2026-08-30：history 不足 20/60 条时 ma 会退化成当日价，显示历史进度而非误导数字
+          // 2026-08-30：history 不足 20/60 条时 ma 未就绪（数据层返回 null），显示历史进度而非误导数字
           var _hd=(ap.history_days!=null?ap.history_days:(ap.history||[]).length);
           h+=' &nbsp;|&nbsp; vs 20日线 '+_pt(ap.position_vs_ma20)+' <span style="color:var(--dim);font-size:11.5px;">('+(_hd>=20?('MA20 '+Number(ap.ma20).toFixed(2)):('历史'+_hd+'/20日'))+')</span>';
           h+=' &nbsp;|&nbsp; vs 60日线 '+_pt(ap.position_vs_ma60)+' <span style="color:var(--dim);font-size:11.5px;">('+(_hd>=60?('MA60 '+Number(ap.ma60).toFixed(2)):('历史'+_hd+'/60日'))+')</span>';
-          // 2026-08-31 主人令：评价换金色 + 跟在后面不靠右 → 去掉 margin-left:auto，并改胶囊颜色为 var(--gold)（评价统一，不随信号变）
-          h+=' <span style="font-weight:700;color:#fbbf24;font-size:11.5px;padding:2px 8px;border-radius:5px;background:rgba(251,191,36,.15);border:1.5px solid rgba(251,191,36,.55);white-space:nowrap;">'+_verdict+'</span>';
+          // 2026-09-14：买/加胶囊受 AI速览 主闸门约束；闸门关闭时降级为「关注」（金色），不再叫「买/加」。
           if(_sigBuy.length){
-            h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:rgba(34,197,94,.18);border:1.5px solid rgba(34,197,94,.5);font-size:11.5px;font-weight:700;color:#4ade80;box-shadow:0 0 4px rgba(34,197,94,.25);">📈 买/加: ';
+            var _buyLabel = _gateOpen ? '📈 买/加' : '📋 关注';
+            var _buyColor = _gateOpen ? '#4ade80' : '#fbbf24';
+            var _buyBg    = _gateOpen ? 'rgba(34,197,94,.18)' : 'rgba(251,191,36,.18)';
+            var _buyBd    = _gateOpen ? 'rgba(34,197,94,.5)' : 'rgba(251,191,36,.5)';
+            var _buyShadow= _gateOpen ? 'rgba(34,197,94,.25)' : 'rgba(251,191,36,.25)';
+            h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:'+_buyBg+';border:1.5px solid '+_buyBd+';font-size:11.5px;font-weight:700;color:'+_buyColor+';box-shadow:0 0 4px '+_buyShadow+';">'+_buyLabel+': ';
             _sigBuy.forEach(function(s,i){ if(i>0) h+=' '; h+=s; });
             h+='</span>';
           }
@@ -6302,9 +6318,12 @@ function fmtSigned(v){
       || '<div class="note" style="color:var(--dim)">—</div>';
     var roeTop = roeTopArr.map(function(r){return row(r,'roe');}).join('')
       || '<div class="note" style="color:var(--dim)">无有效数据</div>';
-    var mkt = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {open:false,name:'未知',icon:'⚪',color:'#94a3b8'};
-    var gateBanner = '<div style="font-size:12px;padding:5px 9px;border-radius:6px;margin-bottom:9px;background:'+(mkt.open?'rgba(94,224,160,.12)':'rgba(255,107,129,.10)')+';color:'+(mkt.color||'#94a3b8')+';">'
-      + (mkt.icon||'⚪')+' 择时闸门：'+(mkt.name||'未知')+' · '+(mkt.open?'可开新仓 → 因子前20%标的打「🟢可关注」':'不开新仓 → 仅作观察')+'</div>';
+    /* 2026-09-14 主人令：全站择时关口统一收敛到 AI市场速览（v8IntradayGate）。
+       因子实验室只展示「仓位依据 + 盘面观测」，不再独立显示「可开/不开」。 */
+    var mkt = (typeof window.v8IntradayGate==='function') ? window.v8IntradayGate() : {ok:false,name:'未知',color:'#94a3b8',observation:'等待数据',verdict:'等待数据',regime:''};
+    var _regimeTxt2 = mkt.regime ? '（'+mkt.regime+'）' : '';
+    var gateBanner = '<div style="font-size:12px;padding:5px 9px;border-radius:6px;margin-bottom:9px;background:'+(mkt.ok?'rgba(94,224,160,.12)':'rgba(255,107,129,.10)')+';color:'+(mkt.ok?'#5ee0a0':'#ff6b81')+';">'
+      + '⚖ 择时闸门：'+mkt.name+' · '+mkt.observation+' &nbsp;|&nbsp; 仓位依据：'+(mkt.ok?'✅ ':'⛔ ')+mkt.verdict+_regimeTxt2+'</div>';
     /* ═══ 2026-09-03 主人令：卡面只展示「🟢可关注」标的（2 种因子），完整榜单点击弹窗查看；
        胶囊统一格式（更新时间紧跟卡名，删除靠右时间）；★★ 观测仓 · 调试与回测中，升 4⭐ 后转正「选股策略」子页 ═══ */
     function _gatePass(r, kind){
