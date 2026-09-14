@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>A股艾略特波浪定位 · 2026-09-14</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+:root{--up:#d63a34;--dn:#1f9d55;--ink:#1b1f24;--sub:#5b6570;--line:#e3e7ec;--bg:#f7f8fa;--card:#fff;--gold:#b8860b;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.75 -apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+.wrap{max-width:1160px;margin:0 auto;padding:28px 20px 64px;}
+h1{font-size:26px;margin:0 0 6px;letter-spacing:-.3px}
+.meta{color:var(--sub);font-size:13px;margin-bottom:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin-bottom:18px;}
+h2{font-size:18px;margin:0 0 14px;padding-left:11px;border-left:4px solid #2c6fdb;}
+h3{font-size:15px;margin:18px 0 8px;color:#2c6fdb}
+.tldr{background:linear-gradient(180deg,#fffdf5,#fff);border-left:5px solid var(--gold);}
+.tldr .big{font-size:20px;font-weight:700;line-height:1.6;margin-bottom:10px}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:16px 0 4px}
+.kpi div{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:11px 13px}
+.kpi span{display:block;color:var(--sub);font-size:12px;margin-bottom:3px}
+.kpi b{font-size:18px;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:10px 0}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--bg);font-weight:600;color:#39424c;white-space:nowrap}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.up{color:var(--up);font-weight:600}.dn{color:var(--dn);font-weight:600}
+.tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:12px;line-height:1.7}
+.t-ok{background:#e8f5ec;color:#1f7a45;border:1px solid #bfe3cb}
+.t-bad{background:#fdecea;color:#b52a24;border:1px solid #f5c6c2}
+.t-warn{background:#fff6e5;color:#9a6b00;border:1px solid #f0dcae}
+.note{color:var(--sub);font-size:13px;margin-top:8px}
+ul{margin:8px 0 0;padding-left:20px}li{margin:5px 0}
+.chart{width:100%;height:420px}
+.chart-s{width:100%;height:300px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.bar button{border:1px solid var(--line);background:#fff;border-radius:6px;padding:5px 14px;cursor:pointer;font-size:13px;color:var(--sub)}
+.bar button.on{background:#2c6fdb;border-color:#2c6fdb;color:#fff}
+.hide{display:none}
+.disc{background:#fbfbfc;border:1px dashed var(--line);border-radius:8px;padding:14px 16px;color:var(--sub);font-size:13px;line-height:1.8}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:800px){.grid2{grid-template-columns:1fr}}
+.sc{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.sc h4{margin:0 0 8px;font-size:15px}
+.src{color:#8a939c;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>A股当前处于艾略特波浪的哪一浪</h1>
+<div class="meta">以上证指数为主坐标 · 数据截至 <b>2026-09-14 收盘</b>（当日收 3885.33，-0.07%）| 数据源：日/周/月 K 线（通达信行情接口）、中证全指估值（2026-09-10）、全 A 涨跌分布（2026-09-11）</div>
+
+<div class="card tldr">
+  <div class="big">结论：主升浪（①–⑤）已走完，当前处在「三浪回调」的 A/B 阶段——<span style="color:var(--dn)">不是主升浪</span>。</div>
+  <p style="margin:0">把 2024-02-05 低点 <b>2635.09</b> 作为本轮起点，五浪推动的 ①②③④ 全部落位且斐波那契关系高度吻合；<b>⑤ 浪只从 3741.11 弹了 254 点（仅 ① 浪的 0.24 倍）就见顶回落</b>，且五大指数在 2026 年 5–7 月<b>依次见顶</b>、跌幅从 上证 -8.8% 一路放大到 科创50 -32.2%。这是典型的「五浪完成 + 涨势衰竭」形态。</p>
+  <div class="kpi">
+    <div><span>上证当前（2026-09-14）</span><b>3885.33</b></div>
+    <div><span>本轮高点（2026-05-14）</span><b class="up">4258.86</b></div>
+    <div><span>当前位置判断</span><b>⑤浪末 / ABC回调</b></div>
+    <div><span>距高点</span><b class="dn">-8.77%</b></div>
+    <div><span>④浪生命线</span><b>3741.11</b></div>
+    <div><span>情景概率（回调 / ⑤延续）</span><b>65% / 35%</b></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>一、主计数：上证指数 2024-02-05 起的五浪推动</h2>
+  <div class="bar">
+    <button class="on" id="btnC" onclick="sw('C')">看走势图</button>
+    <button id="btnT" onclick="sw('T')">看精确数值</button>
+    <button id="btnB" onclick="sw('B')">看多指数对照</button>
+  </div>
+  <div id="paneC"><div id="chartWave" class="chart"></div>
+    <div class="note">★ 圆点为浪型拐点。虚线为 ① 浪顶 3674.40（④ 浪不得进入该区域）与 ④ 浪底 3741.11（生命线）；黄色区间为当前 3850–3996 横盘箱体。</div>
+  </div>
+  <div id="paneT" class="hide">
+    <table>
+      <thead><tr><th>浪</th><th>起点 / 日期</th><th>终点 / 日期</th><th class="n">幅度</th><th>斐波那契关系</th><th>三铁律校验</th></tr></thead>
+      <tbody>
+        <tr><td><b>①</b></td><td>2635.09<br><span class="src">2024-02-05</span></td><td>3674.40<br><span class="src">2024-10-08</span></td><td class="n up">+1039.31<br>+39.4%</td><td>—</td><td><span class="tag t-ok">基准浪</span></td></tr>
+        <tr><td><b>②</b></td><td>3674.40</td><td>3040.69<br><span class="src">2025-04-07</span></td><td class="n dn">-633.71</td><td>回撤① <b>61.0%</b><br>标准 61.8% <span class="tag t-ok">吻合</span></td><td><span class="tag t-ok">未破①起点 ✓</span></td></tr>
+        <tr><td><b>③</b></td><td>3040.69</td><td>4258.86<br><span class="src">2026-05-14</span></td><td class="n up">+1218.17<br>+40.1%</td><td>③/① = <b>1.172</b><br>标准 1.618 <span class="tag t-warn">偏短</span></td><td><span class="tag t-ok">非最短 ✓</span></td></tr>
+        <tr><td><b>④</b></td><td>4258.86</td><td>3741.11<br><span class="src">2026-07-20</span></td><td class="n dn">-517.75</td><td>回撤③ <b>42.5%</b><br>标准 38.2% <span class="tag t-ok">接近</span></td><td><span class="tag t-ok">未入①区域 ✓<br>高出①顶仅 1.82%</span></td></tr>
+        <tr style="background:#fffdf5"><td><b>⑤</b></td><td>3741.11<br><span class="src">2026-07-20</span></td><td>3995.18*<br><span class="src">2026-09-01</span></td><td class="n up">+254.07<br>+6.8%</td><td>⑤/① = <b>0.244</b><br>标准 0.618–1.0 <span class="tag t-bad">严重偏短</span></td><td><span class="tag t-bad">无新高 = 衰竭</span></td></tr>
+      </tbody>
+    </table>
+    <div class="note">* ⑤ 浪是否为终点尚未确认（需跌破 3741.11 才最终确认）。①②③④ 四项校验中 3 项落在教科书区间、1 项偏短；④ 浪底 3741.11 仅高出 ① 浪顶 3674.40 一个 1.82% 的缝隙而未重叠——这正是「合规但脆弱」的典型形态。</div>
+  </div>
+  <div id="paneB" class="hide">
+    <div id="chartIdx" class="chart-s"></div>
+    <table>
+      <thead><tr><th>指数</th><th class="n">2026 高点</th><th>见顶日期</th><th class="n">最新（09-14）</th><th class="n">距高点</th><th>节奏</th></tr></thead>
+      <tbody id="tbIdx"></tbody>
+    </table>
+    <div class="note">五大指数<b>并非同时见顶</b>，而是按「权重→成长」顺序依次见顶，跨度近 7 周（上证 5/14 → 沪深300 与深成指 6/22–23 → 创业板 6/25 → 科创50 7/01）。这种<b>轮动式见顶 + 跌幅逐级放大</b>，是五浪推动走到末段时的经典特征；若仍在主升浪中段，各指数应同步创新高。</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>二、交叉证据：五项独立指标全部指向「涨势衰竭」</h2>
+  <table>
+    <thead><tr><th>维度</th><th>实测值</th><th>解读</th></tr></thead>
+    <tbody>
+      <tr><td>指数跌幅梯度</td><td>上证 <span class="dn">-8.77%</span> ｜ 沪深300 <span class="dn">-11.54%</span> ｜ 深成指 <span class="dn">-18.26%</span> ｜ 创业板 <span class="dn">-24.99%</span> ｜ 科创50 <span class="dn">-32.24%</span></td><td>成长端跌幅是权重端的 3–4 倍，风险偏好已系统性收缩</td></tr>
+      <tr><td>破位情况</td><td>科创50 已跌破自身 7 月低点（<span class="dn">-2.16%</span>）；沪深300 距 7 月低点仅 <span class="up">+0.04%</span></td><td>非权重指数已率先破位，上证「站在高位」是权重股结构性支撑的结果</td></tr>
+      <tr><td>市场广度（09-11）</td><td>下跌 <b>4870 家（87.56%）</b>；创 5 日新低 <b>4508 家</b>；创 250 日新高仅 <b>16 家</b> vs 新低 <b>242 家</b></td><td>指数仅微跌而个股全面崩塌 —— 最典型的<b>顶部广度背离</b></td></tr>
+      <tr><td>量能</td><td>5 月顶部区日均 <b>14252 亿</b> → 8/18 以来反弹区日均 <b>9330 亿</b>（<span class="dn">缩量 35%</span>）</td><td>反弹无量，五浪末段的量价背离</td></tr>
+      <tr><td>均线结构</td><td>收盘价同时跌破 MA5 / MA10 / MA20 / MA60 / MA120 / MA250，偏离 -0.88% ~ -2.82%</td><td>全面空头排列，中期趋势已转弱</td></tr>
+      <tr><td>估值（09-10）</td><td>中证全指 PE-TTM <b>20.32</b>，处 10 年 <b>78.9%</b> 分位、5 年 <b>79.3%</b> 分位；PB 1.75</td><td>估值已在偏高位，不具备「主升浪中段」的低估支撑</td></tr>
+    </tbody>
+  </table>
+  <div class="note">市场画像（09-11）：板块宽度「全面下跌（上涨板块&lt;20%）」、个股宽度「温和偏涨」、风格「价值主导（价值指数 &gt; 成长 +5%）」、技术「偏弱（MACD 死叉）」、趋势「弱势下跌（均线空头排列）」—— 防御风格占优，进一步印证资金已从进攻切向防守。</div>
+</div>
+
+<div class="card">
+  <h2>三、回调浪目标位与关键触发价</h2>
+  <table>
+    <thead><tr><th>性质</th><th class="n">点位</th><th>依据</th><th>含义</th></tr></thead>
+    <tbody>
+      <tr><td class="up">上沿 / 转多触发</td><td class="n"><b>3995 – 3996</b></td><td>箱体顶 3995.18（09-01）与 3994.18（08-18）双重平顶</td><td>放量站稳其上 → ⑤ 浪延续，看 4206–4383</td></tr>
+      <tr><td>箱体区间</td><td class="n">3850 – 3996</td><td>下沿 3850.86（08-25）/ 3852.03（09-11）双重平底</td><td>已横盘近一个月，方向未决</td></tr>
+      <tr style="background:#fff6f5"><td class="dn">④ 浪生命线</td><td class="n"><b>3741.11</b></td><td>2026-07-20 ④ 浪底</td><td><b>跌破即确认五浪完成</b>，正式进入 ABC 下跌</td></tr>
+      <tr><td class="dn">第一支撑带</td><td class="n">3640 – 3680</td><td>0.382 回撤（2635.09→4258.86）= 3638.58，与 ① 浪顶 3674.40 重合</td><td><b>两个独立方法汇合</b>，支撑最强</td></tr>
+      <tr><td class="dn">C 浪等长目标</td><td class="n">3477</td><td>C = A（4258.86→3741.11 = 517.75），自 3995.18 起算</td><td>与「0.5 回撤 3446.97」几乎重合</td></tr>
+      <tr><td class="dn">深度回调目标</td><td class="n">3255</td><td>0.618 回撤（2635.09→4258.86）</td><td>仅在大级别调整情形下触及</td></tr>
+    </tbody>
+  </table>
+  <div class="note">上方目标位（若 ⑤ 浪延续）：0.382×③ = 4206 ｜ 0.5×③ = 4350 ｜ 0.618×① = 4383。三档密集落在 <b>4206–4383</b>，是唯一值得参与的上行目标区。</div>
+</div>
+
+<div class="card">
+  <h2>四、两种情景与判别标准</h2>
+  <div class="grid2">
+    <div class="sc" style="border-color:#f0dcae;background:#fffdf7">
+      <h4>情景 A（主，约 65%）：五浪已完成 → 走 A-B-C 回调</h4>
+      <ul>
+        <li><b>计数</b>：4258.86 为 ⑤ 浪终点（失败型五浪）；3741.11→3995.18 为 A 浪下跌后的 B 浪反弹（回撤 A 浪 49.1%，标准 50%）</li>
+        <li><b>已在走什么</b>：B 浪末段或 C 浪初段</li>
+        <li><b>下行目标</b>：C 浪 3477 / 0.5 回撤 3447；若为更大级别调整，看 3255</li>
+        <li><b>确认信号</b>：跌破 <b>3741.11</b>；或反弹无法站上 3996 而再度失守 3850</li>
+        <li><b>失效信号</b>：放量站上 3996 并创出新高</li>
+      </ul>
+    </div>
+    <div class="sc" style="border-color:#bfe3cb;background:#f9fdfa">
+      <h4>情景 B（次，约 35%）：⑤ 浪尚未走完</h4>
+      <ul>
+        <li><b>计数</b>：3741.11 是 ④ 浪底，3995.18 仅是 ⑤ 浪的 iii 子浪，之后还有 v 子浪新高</li>
+        <li><b>上行目标</b>：<b>4206 – 4383</b>（0.382×③ / 0.5×③ / 0.618×① 三档汇聚）</li>
+        <li><b>确认信号</b>：放量突破 3996，且成长指数（创业板/科创50）同步转强</li>
+        <li><b>关键矛盾</b>：科创50 已 -32.2% 且跌破 7 月低点，与「⑤ 浪创新高」严重不符 → 本情景需要成长端先止跌企稳</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note">两情景的共同点：<b>无论走哪一种，当前位置都已是「末段」而非「中段」</b>——差别只在于是先补一冲再跌（B），还是直接跌（A）。这个区别决定的是节奏，不是方向。</div>
+</div>
+
+<div class="card">
+  <h2>五、反方证据与主观性坦白</h2>
+  <ul>
+    <li><b>波浪计数的固有主观性</b>：用官方波浪引擎（多组 swing 窗口 5/10/20、容差 15%/25%）机械扫描 2023-10 至今日 K，<b>有效五浪推动匹配数为 0</b>——因为严格斐波那契门槛下本轮结构不完美。这说明本报告的计数是<b>人为主观最优解</b>，不是算法唯一解，请按概率而非结论对待。</li>
+    <li><b>引擎给出的最新信号</b>：在 5 日窗口下，2026-09-01 触发「看涨 ABC 完成 → 卖出」信号，与本报告「⑤ 浪已于 9 月初见顶」的判断方向一致；但 10/20 日窗口下最近信号是 2026-07-20 的「ABC 下调完成 → 买入」，方向相反 —— <b>不同级别给出的信号是矛盾的</b>。</li>
+    <li><b>上证尚未破位</b>：3885.33 仍在 ④ 浪底 3741.11 之上 3.85%，五浪完成<b>尚未被价格确认</b>。若把「未破位」视为有效，情景 B 权重应上调。</li>
+    <li><b>③ 浪偏短留下伏笔</b>：③/① 仅 1.172（标准 1.618）。如果 ③ 本身没走完，那 4258.86 只是 ③ 的中间点，后续还有一段上涨——这是情景 B 之外更乐观的第三种可能，但需要 ⑤ 浪先创新高来验证。</li>
+    <li><b>宏观与政策变量未纳入</b>：本报告纯技术面定位，未纳入货币政策、财政刺激、外部冲击等外生变量，这些可以瞬间改变浪型归属。</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>六、一句话操作含义</h2>
+  <p style="margin:0 0 10px">结论落在「回调浪」而非「主升浪」，对应的仓位语言是：<b>降低风险敞口、不追高、以 3741.11 为多空分界</b>。具体地——指数站上 3996 前，反弹按「卖点」而非「买点」对待；若跌破 3741.11，第一目标区 3640–3680（双重支撑），第二目标区 3447–3477（C 浪等长 + 0.5 回撤汇合）。反之，若放量站上 3996，则改为跟随 ⑤ 浪末段，目标 4206–4383，且需同步看到成长指数转强作为验证。</p>
+  <div class="disc">
+    <b>免责声明</b>：以上内容基于公开数据和量化分析，仅供参考，不构成投资建议。市场有风险，投资需谨慎。任何投资决策应结合个人风险承受能力、资金状况和投资目标独立判断，必要时咨询持牌专业机构。过往表现不预示未来收益。
+  </div>
+</div>
+
+<div class="card">
+  <h2>数据来源与时点</h2>
+  <ul style="font-size:13px;color:var(--sub)">
+    <li>指数日/周/月 K 线（上证指数、沪深300、深证成指、创业板指、科创50）：通达信行情数据接口，截至 <b>2026-09-14 收盘</b></li>
+    <li>中证全指估值（PE-TTM 及其分位、PB）：市场估值数据集，数据日期 <b>2026-09-10</b></li>
+    <li>全 A 涨跌分布、市场画像（宽度/情绪/风格/技术/趋势）：市场统计数据集，数据日期 <b>2026-09-11</b></li>
+    <li>波浪结构识别：本地 ZigZag 拐点检测（阈值 1.5%/2.5%/3%/5%/7%/8%/12% 多档交叉）＋ 斐波那契关系校验；机械交叉验证使用官方波浪信号引擎（多参数组合扫描）</li>
+  </ul>
+</div>
+</div>
+
+<script src="../data/WAVE_ELLIOTT.js"></script>
+<script>
+var W = window.WAVE_ELLIOTT;
+var DATES = W.series.dates;
+var CLOSES = W.series.closes;
+var MARKS = W.marks;
+var IDX = W.idx;
+
+function sw(k){
+  ['C','T','B'].forEach(function(x){
+    document.getElementById('pane'+x).classList.toggle('hide', x!==k);
+    document.getElementById('btn'+x).classList.toggle('on', x===k);
+  });
+  if(k==='C'){ setTimeout(function(){ chartWave.resize(); }, 30); }
+  if(k==='B'){ setTimeout(function(){ chartIdx.resize(); }, 30); }
+}
+
+var chartWave = echarts.init(document.getElementById('chartWave'));
+chartWave.setOption({
+  tooltip: { trigger:'axis' },
+  grid: { left:64, right:26, top:34, bottom:56 },
+  xAxis: { type:'category', data:DATES, boundaryGap:false,
+           axisLabel:{ color:'#5b6570', fontSize:11 } },
+  yAxis: { type:'value', scale:true, name:'上证指数', nameTextStyle:{color:'#5b6570'},
+           axisLabel:{ color:'#5b6570' }, splitLine:{ lineStyle:{ color:'#eef1f4' } } },
+  series: [{
+    name:'上证指数', type:'line', data:CLOSES, showSymbol:false, smooth:false,
+    lineStyle:{ width:2.2, color:'#2c6fdb' },
+    areaStyle:{ color:'rgba(44,111,219,0.07)' },
+    markPoint:{ symbolSize:8, symbol:'circle',
+      itemStyle:{ color:'#1b1f24', borderColor:'#fff', borderWidth:1.5 },
+      label:{ formatter:'{b}', color:'#1b1f24', fontSize:11, fontWeight:'bold',
+              backgroundColor:'rgba(255,255,255,0.82)', padding:[1,3], borderRadius:3 },
+      data: MARKS.map(function(m){ return { name:m.name, coord:m.coord, value:m.coord[1], label:{ position:m.pos } }; }) },
+    markArea:{ silent:true, itemStyle:{ color:'rgba(184,134,11,0.10)' },
+      data:[[{ yAxis:3850.86, name:'当前箱体 3850–3996' },{ yAxis:3995.18 }]] },
+    markLine:{ silent:true, symbol:'none', label:{ color:'#5b6570', fontSize:11, backgroundColor:'rgba(255,255,255,0.82)', padding:[1,3] },
+      data: [
+        { yAxis:3674.40, lineStyle:{ color:'#9aa4ae', type:'dashed', width:1.4 }, label:{ formatter:'①浪顶 3674.40', position:'insideStartTop' } },
+        { yAxis:3741.11, lineStyle:{ color:'#d63a34', type:'dashed', width:1.6 }, label:{ formatter:'④浪生命线 3741.11', position:'insideEndTop' } },
+        { yAxis:3995.18, lineStyle:{ color:'#1f9d55', type:'dashed', width:1.4 }, label:{ formatter:'箱体顶 3995.18', position:'insideStartBottom' } }
+      ] }
+  }]
+});
+
+var chartIdx = echarts.init(document.getElementById('chartIdx'));
+chartIdx.setOption({
+  tooltip:{ trigger:'axis', axisPointer:{type:'shadow'}, valueFormatter:function(v){ return v + '%'; } },
+  grid:{ left:96, right:110, top:26, bottom:40 },
+  xAxis:{ type:'value', name:'回撤幅度（%）', nameLocation:'middle', nameGap:30,
+          nameTextStyle:{color:'#5b6570'},
+          axisLabel:{ color:'#5b6570', formatter:'{value}%' }, splitLine:{ lineStyle:{color:'#eef1f4'} } },
+  yAxis:{ type:'category', inverse:true, data:IDX.map(function(r){return r.name;}),
+          axisLabel:{ color:'#1b1f24', fontSize:13 }, axisTick:{show:false}, axisLine:{lineStyle:{color:'#e3e7ec'}} },
+  series:[{ type:'bar', barWidth:'52%',
+    data: IDX.map(function(r){ return { value:r.dd, itemStyle:{ color:'#1f9d55', borderRadius:[0,4,4,0] } }; }),
+    label:{ show:true, position:'right', formatter:'{c}%', color:'#1b1f24', fontSize:12 }
+  }]
+});
+window.addEventListener('resize', function(){ chartWave.resize(); chartIdx.resize(); });
+
+(function(){
+  var tb = document.getElementById('tbIdx');
+  var order = IDX.slice().sort(function(a,b){ return a.hdate < b.hdate ? -1 : 1; });
+  tb.innerHTML = order.map(function(r,i){
+    var n = order.length, pace = '第 ' + (i+1) + ' 个见顶';
+    if(i === 0){ pace += '（权重先行）'; }
+    if(i === n-1){ pace += '（成长殿后）'; }
+    var ddn = r.dd <= -20 ? 'dn' : 'dn';
+    return '<tr><td><b>'+r.name+'</b></td><td class="n">'+r.hi.toFixed(2)+'</td><td>'+r.hdate+'</td>'
+         + '<td class="n">'+r.last.toFixed(2)+'</td><td class="n '+ddn+'">'+r.dd.toFixed(2)+'%</td><td>'+pace+'</td></tr>';
+  }).join('');
+})();
+</script>
+</body>
+</html>
