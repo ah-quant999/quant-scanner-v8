@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-15 03:35:43",
+  "update_time": "2026-09-15 05:23:59",
   "data_time": "2026-09-15 15:30:00",
   "total_scanned": 749,
   "scan_stats": {
@@ -7,8 +7,8 @@
     "succeeded": 749,
     "failed": 3,
     "kline_source_used": "本地缓存(主源 745/749 只)",
-    "elapsed_sec": 115.7,
-    "throughput_per_sec": 6.5,
+    "elapsed_sec": 117.8,
+    "throughput_per_sec": 6.4,
     "cache_fresh": 745,
     "cache_miss": 7,
     "cache_stale": 0,
@@ -5058,21 +5058,6 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 0.89,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "主板"
-    },
-    "600584": {
-      "name": "长电科技",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.23,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -11733,6 +11718,21 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.04,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
+    "600584": {
+      "name": "长电科技",
+      "score": 0,
+      "conds": 0,
+      "cond1": false,
+      "cond2": false,
+      "cond3": false,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.23,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"

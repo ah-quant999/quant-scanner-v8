@@ -1,17 +1,8 @@
 {
-  "update_time": "2026-09-15 04:46:25",
-  "run_start": "2026-09-15 03:32:08",
-  "ok": 24,
-  "fail": 2,
-  "failed_scripts": [
-    {
-      "script": "strategy_four_volume.py",
-      "reason": "监督器静默杀(>15min 无输出)"
-    },
-    {
-      "script": "refresh_stock_metadata.py",
-      "reason": "超时 >30min"
-    }
-  ],
+  "update_time": "2026-09-15 05:53:31",
+  "run_start": "2026-09-15 05:21:02",
+  "ok": 1,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }
