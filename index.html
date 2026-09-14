@@ -4837,11 +4837,19 @@ function fmtSigned(v){
       if(_holds.length){
         var _costPct = (data.cost_roundtrip != null)
           ? (Number(data.cost_roundtrip) * 100).toFixed(2) : '0.20';
+        /* 🔴 2026-09-15 主人令：把「累积进度」摆在表头 —— 一眼看到还差多少根。 */
+        var _da = data.data_accumulation || {};
+        var _accTip = (_da.accumulating_holds > 0)
+          ? ' <span style="font-size:11px;font-weight:700;color:#f59e0b;background:#f59e0b1a;border:1px solid #f59e0b59;border-radius:4px;padding:1px 6px;white-space:nowrap;">'
+            + '&#x23F3; ' + _da.accumulating_holds + '/' + (_da.holds_total || 12) + ' 档累积中'
+            + '（需 ' + (_da.min_bars_required || 761) + ' 根·当前最长 ' + (_da.max_bars_available || '?') + ' 根）</span>'
+          : '';
         html += '<div style="font-size:12px;font-weight:700;color:var(--txt);margin:12px 0 6px;">'
              +  '持有期档位 · L1 最强五分位'
              +  ' <span style="font-size:11px;color:var(--dim);font-weight:500;">'
              +  _holds.length + ' 档 · 信号日次一交易日开盘买入、持有到第 N 个交易日收盘卖出（前复权·已扣双边 '
-             +  _costPct + '%）</span></div>';
+             +  _costPct + '%）</span>'
+             +  _accTip + '</div>';
         html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
         html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
         ['持有期','样本','胜率','平均收益','最佳','最差'].forEach(function(x){
@@ -4855,9 +4863,17 @@ function fmtSigned(v){
           var _ar = _L1['avg_' + hh + 'd'];
           var _bs = _L1['best_' + hh + 'd'];
           var _ws = _L1['worst_' + hh + 'd'];
+          /* 🔴 2026-09-15 主人令（图2「拿不到就写累积中，直到累积到为止」）：
+             K 线不足 MIN_BARS(761)⇒该档无样本。此时**不得显示空白/0**，
+             必须显式标「累积中」并给出可用票数进度。 */
+          var _hs  = (((data.data_accumulation || {}).holds) || {})[hh + 'd'] || {};
+          var _acc = (_wr == null && _hs.status === 'accumulating');
           html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
           html += '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">T+' + hh + '天</td>';
-          html += '<td style="padding:6px;text-align:right;color:var(--sub);">' + (_n == null ? '—' : _n) + '</td>';
+          html += '<td style="padding:6px;text-align:right;color:var(--sub);">'
+               + (_acc
+                  ? '<span style="color:#f59e0b;font-weight:700;white-space:nowrap;" title="需 ' + (_hs.need_bars || 761) + ' 根 K 线，当前可用 ' + (_hs.stocks_ready || 0) + '/' + (_hs.stocks_total || 0) + ' 只">累积中</span>'
+                  : (_n == null ? '—' : _n)) + '</td>';
           html += '<td style="padding:6px;text-align:right;font-weight:700;color:' + (_wr == null ? 'var(--dim)' : _colorWR(_wr)) + ';">' + (_wr == null ? '—' : Number(_wr).toFixed(1) + '%') + '</td>';
           html += '<td style="padding:6px;text-align:right;color:' + (_ar == null ? 'var(--dim)' : _colorPL(_ar)) + ';">' + (_ar == null ? '—' : (_ar > 0 ? '+' : '') + Number(_ar).toFixed(2) + '%') + '</td>';
           html += '<td style="padding:6px;text-align:right;color:' + (_bs == null ? 'var(--dim)' : _colorPL(_bs)) + ';">' + (_bs == null ? '—' : (_bs > 0 ? '+' : '') + Number(_bs).toFixed(2) + '%') + '</td>';

@@ -46,7 +46,13 @@ STEP = 10              # 调仓间隔（交易日）
 HOLDS = [1, 3, 5, 10, 20, 30, 45, 60, 75, 90, 180, 250]
 MIN_HOLD = min(HOLDS)
 NEED_MIN = BASELINE + RECENT + 1   # 参与分层的最少历史
-FETCH_DAYS = 700       # 拉取长历史（≈ 34 个月，可容纳 ~40 个调仓点）
+# 🔴 2026-09-15 主人令（图2「那就去获取761根，拿不到就写累积中，直到累积到为止」）：
+#   761 = NEED_MIN(261) + 2×250 —— 最长档 T+250 需要「预热段 + 持有段 + 末根余量」。
+#   FETCH_DAYS 取 800（留 39 根余量），使 T+250 档也能有足够调仓点参与分层。
+#   仍拿不到的票（次新股）**不许静默 0 样本** —— 由 `_hold_status()` 逐档标记
+#   「累积中」，并随交易日推移自然累积到满足 MIN_BARS 为止。
+MIN_BARS = NEED_MIN + 2 * max(HOLDS)          # = 761
+FETCH_DAYS = 800       # 拉取长历史（≈ 38 个月，覆盖 MIN_BARS 并留余量）
 
 sys.path.insert(0, BASE)
 
@@ -141,14 +147,27 @@ def _max_drawdown(nav):
     return round(mdd * 100, 2)
 
 
-def _layer_stats(samples_by_layer, dates_by_layer):
-    """samples_by_layer: {layer: {hold: [ret,...]}}；返回每层统计 + hold=10 净值回撤。"""
+def _layer_stats(samples_by_layer, dates_by_layer, holds=None):
+    """samples_by_layer: {layer: {hold: [ret,...]}}；返回每层统计 + hold=10 净值回撤。
+
+    🔴 2026-09-15 主人令：`holds` 传入完整档位后，**缺数据的档也显式输出
+    `n_{h}d=0` 与 `win/avg/best/worst_{h}d=null`**。两个作用：
+      ① 「本档无数据」被诚实表达为 null（不是 0，更不是拿短档样本冒充）；
+      ② 前端档位表是**动态发现** `win_Nd` 键的 ⇒ 显式 null 键让该档仍出现在
+         表里，从而能显示「累积中」，而不是整档消失、让人误以为没有这档。
+    """
     out = {}
     for layer in sorted(samples_by_layer):
         per = samples_by_layer[layer]
         stat = {"n": len(dates_by_layer.get(layer, []))}
-        for h, rets in per.items():
+        for h in (holds if holds else sorted(per)):
+            rets = [r for r in per.get(h, []) if r is not None]
             if not rets:
+                stat[f"n_{h}d"] = 0
+                stat[f"win_{h}d"] = None
+                stat[f"avg_{h}d"] = None
+                stat[f"best_{h}d"] = None
+                stat[f"worst_{h}d"] = None
                 continue
             stat[f"avg_{h}d"] = round(sum(rets) / len(rets) * 100, 3)
             stat[f"win_{h}d"] = round(sum(1 for r in rets if r > 0) / len(rets) * 100, 1)
@@ -168,6 +187,47 @@ def _layer_stats(samples_by_layer, dates_by_layer):
             stat["nav_total_10d"] = round((v - 1) * 100, 2)
         out[layer] = stat
     return out
+
+
+def _hold_status(klines, layers=None):
+    """各持有期的「数据就绪度」——拿不到就写累积中，禁静默 0 样本。
+
+    🔴 2026-09-15 主人令：「那就去获取 761 根，拿不到就写累积中，直到累积到为止。」
+
+    need_bars(h) = NEED_MIN + 2×h
+      预热 261 根（BASELINE 240 + RECENT 20 + 1）
+      ＋ 持有段 h 根（信号日次一交易日开盘买入 → 第 h 个交易日收盘卖出）
+      ＋ 末段 h 根余量（保证最后一个调仓点也能算完整收益）
+
+    layers：`_layer_stats()` 的输出（{layer: {"n_{h}d": N, ...}}），用于累计该档实际样本数。
+    判据：可用票 < 25（凑不出 5 层 × 5 只）或该档零样本 ⇒ accumulating。
+    返回 (holds_detail, n_accumulating)。
+    """
+    lens = sorted(len(r) for r in klines.values())
+    n_stock = len(lens)
+    max_bars = lens[-1] if lens else 0
+    detail, n_acc = {}, 0
+    for h in HOLDS:
+        need = NEED_MIN + 2 * h
+        ready = sum(1 for x in lens if x >= need)
+        n_samp = 0
+        for _per in (layers or {}).values():
+            if isinstance(_per, dict):
+                v = _per.get("n_%dd" % h)
+                if isinstance(v, int):
+                    n_samp += v
+        st = "ready" if (ready >= 25 and n_samp > 0) else "accumulating"
+        if st == "accumulating":
+            n_acc += 1
+        detail["%dd" % h] = {
+            "need_bars": need,
+            "stocks_ready": ready,
+            "stocks_total": n_stock,
+            "max_bars_available": max_bars,
+            "samples": n_samp,
+            "status": st,
+        }
+    return detail, n_acc
 
 
 def backtest_abn(klines, workers_note=""):
@@ -218,7 +278,7 @@ def backtest_abn(klines, workers_note=""):
             for h, r in rets_at[t][c].items():
                 samples.setdefault(layer, {}).setdefault(h, []).append(r)
             dates_by_layer.setdefault(layer, []).append(t)
-    layers = _layer_stats(samples, dates_by_layer)
+    layers = _layer_stats(samples, dates_by_layer, HOLDS)
 
     # 利差 / OOS / 分季稳定性（hold=10）
     def _spread(sub_ts):
@@ -357,6 +417,18 @@ def main():
                               "top_layer_win_10d", "spread_oos_pct", "verdict_3star")},
                     ensure_ascii=False))
 
+    # 🔴 2026-09-15 主人令：逐档报「就绪 / 累积中」——
+    #   拿不到 MIN_BARS(761) 根就写累积中，绝不静默 0 样本。
+    hold_status, n_acc = _hold_status(
+        klines, abn.get("layers") if isinstance(abn, dict) else None)
+    _log("  档位就绪度: " + json.dumps(
+        {k: ("就绪" if v["status"] == "ready"
+             else "累积中（可用票 %d/%d）" % (v["stocks_ready"], v["stocks_total"]))
+         for k, v in hold_status.items()}, ensure_ascii=False))
+    if n_acc:
+        _log("  ⏳ %d/%d 档处于累积中（需 %d 根 K 线，当前最长 %d 根）"
+             % (n_acc, len(HOLDS), MIN_BARS, max(len(r) for r in klines.values())))
+
     _log("\n—— 因子2：ROE_TTM 大市值 Top30 vs 全池等权 ——")
     roe = backtest_roe(klines)
     _log(json.dumps({k: v for k, v in roe.items() if not isinstance(v, dict)},
@@ -367,6 +439,23 @@ def main():
         "universe": "重点池 A股（_rps_cache）",
         "cost_roundtrip": COST,
         "rebalance": f"每{STEP}个交易日，入场=次日开盘",
+        # 🔴 2026-09-15 主人令（图2）：「拿不到就写累积中，直到累积到为止」。
+        #   本块是「累积进度账」：逐档给出 need_bars / 可用票数 / 实际样本数 / status。
+        #   前端据此把无数据的档显示为「累积中」而非空表或 0。
+        "data_accumulation": {
+            "fetch_days": FETCH_DAYS,
+            "min_bars_required": MIN_BARS,          # 761
+            "universe_requested": len(codes),
+            "stocks_loaded": len(klines),
+            "coverage_pct": round(100.0 * len(klines) / max(1, len(codes)), 1),
+            "max_bars_available": (max(len(r) for r in klines.values()) if klines else 0),
+            "accumulating_holds": n_acc,
+            "holds_total": len(HOLDS),
+            "status": "accumulating" if n_acc else "ready",
+            "holds": hold_status,
+            "note": ("拿不到足够 K 线的票（多为次新股）随时间自然累积；"
+                     "本块即累积进度，拿不到即显示「累积中」，禁止以 0 冒充样本。"),
+        },
         "abnormal_volume": abn,
         "roe_largecap": roe,
     }
