@@ -2239,7 +2239,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var _chg=ap.avg_change_pct;
           var _cCol=_chg>=0?'var(--up)':(_chg<0?'var(--down)':'var(--sub)');
           var _cTxt=_chg==null?'--':((_chg>0?'+':'')+Number(_chg).toFixed(2)+'%');
-          function _pt(v){ if(v==null||isNaN(v)) return '<span style="color:var(--sub)">--</span>'; var _c=v>=0?'var(--up)':'var(--down)'; return '<span style="color:'+_c+';font-weight:600;">'+(v>=0?'▲':'▼')+' '+(v>0?'+':'')+Number(v).toFixed(2)+'%</span>'; }
+          /* 2026-09-16 主人令：原百分比着色助手随「vs 20/60 日线」两行一并删除——已无引用点，死代码清零。 */
 
           // ===== 买卖信号计算（2026-09-14 受 AI速览 主闸门约束）=====
           var _ga2 = (typeof window.v8IntradayGate==='function') ? window.v8IntradayGate() : {ok:false};
@@ -2288,10 +2288,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           h+='<b style="font-size:15px;">'+Number(ap.avg_price).toFixed(2)+'</b>';
           h+=' <span style="color:'+_cCol+';font-weight:700;">'+_cTxt+'</span>';
           if(ap.prev_avg_price!=null){ var _df=ap.avg_price-ap.prev_avg_price; h+=' <span style="color:'+(_df>=0?'var(--up)':'var(--down)')+';font-size:12px;">较昨日 '+(_df>=0?'+':'')+_df.toFixed(3)+'</span>'; }
-          // 2026-08-30：history 不足 20/60 条时 ma 未就绪（数据层返回 null），显示历史进度而非误导数字
+          // 2026-09-16 主人令：截图标注的「均线对比文本段」整段删除（20 日线、60 日线两项）。
+          //   原两行文本已删。注意 _hd 必须保留——超买超卖胶囊的未就绪态要用它承载
+          //   「数据积累进度」（原由该段承担）；另 ap.ma20/ma60 在未就绪时数据层会写同一个占位值，
+          //   删除后该误导值不再有露出路径。
           var _hd=(ap.history_days!=null?ap.history_days:(ap.history||[]).length);
-          h+=' &nbsp;|&nbsp; vs 20日线 '+_pt(ap.position_vs_ma20)+' <span style="color:var(--dim);font-size:11.5px;">('+(_hd>=20?('MA20 '+Number(ap.ma20).toFixed(2)):('历史'+_hd+'/20日'))+')</span>';
-          h+=' &nbsp;|&nbsp; vs 60日线 '+_pt(ap.position_vs_ma60)+' <span style="color:var(--dim);font-size:11.5px;">('+(_hd>=60?('MA60 '+Number(ap.ma60).toFixed(2)):('历史'+_hd+'/60日'))+')</span>';
           // 2026-09-14：买/加胶囊受 AI速览 主闸门约束；闸门关闭时降级为「关注」（金色），不再叫「买/加」。
           if(_sigBuy.length){
             var _buyLabel = _gateOpen ? '📈 买/加' : '📋 关注';
@@ -2303,12 +2304,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
             _sigBuy.forEach(function(s,i){ if(i>0) h+=' '; h+=s; });
             h+='</span>';
           }
-          /* 2026-09-15 主人令（第二轮）：「把之前平均股价超买超卖那个金色胶囊找回来，放到第一行后面就行。」
-             位置观测胶囊（金色外壳不变、色随档位）由第二行移至第一行末尾；中性态已删故不渲染。 */
-          if(_verdict){
-            h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:rgba(251,191,36,.12);border:1.5px solid rgba(251,191,36,.45);font-size:11.5px;font-weight:700;color:'+_vClr+';">'+_verdict+'</span>';
-            h+='<span style="font-size:10.5px;color:var(--dim);">🔭 仅观测位置 · 开仓以 AI速览 ⚖ 裁决为准</span>';
-          }
+          /* 2026-09-16 主人令（第三轮）：「平均股价的超买超卖要加在最后，显著标识。」
+             ① 位置：胶囊后移至本行**末位**收尾；免责小字前移出位，胶囊不再被文字跟尾。
+             ② 显著：金色外壳 1.5px→2px、加外发光、字号 11.5→13px、字重 700→800、内边距加大。
+             ③ 空态兜底（本轮关键）：均线未就绪（position_vs_ma20/60 为 null）时原实现 if(_verdict){}
+                整块不渲染 ⇒ 页面**根本看不到「超买超卖」这个指标的存在**，主人无从知晓它是否在工作。
+                现改为显式给出未就绪态，并承接已删的「vs 20/60 日线」行原本承载的积累进度（⏳ X/20 日）；
+                绝不用 0 / 假档位冒充（2026-09-11 铁律）。
+             口径不变：只报位置观测，开仓仍以 AI速览 ⚖ 裁决为准（免责小字保留、仅前移）。 */
+          var _ovTxt=_verdict, _ovClr=_vClr;
+          if(!_verdict){ _ovTxt='⏳ 均线积累中 '+_hd+'/20日'; _ovClr='var(--gold)'; }
+          h+='<span style="font-size:10.5px;color:var(--dim);">🔭 仅观测位 · 开仓以 AI速览 ⚖ 裁决为准</span>';
+          h+='<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:6px;background:linear-gradient(180deg,rgba(251,191,36,.24),rgba(251,191,36,.10));border:2px solid rgba(251,191,36,.7);font-size:13px;font-weight:800;letter-spacing:.3px;color:'+_ovClr+';box-shadow:0 0 10px rgba(251,191,36,.38);">📊 超买超卖 '+_ovTxt+'</span>';
           h+='</div>';
           // 第二行：卖/减 + ⚠破线警告
           //   2026-09-15 主人令（第二轮）：位置观测胶囊已移至第一行末尾（且中性态不再渲染）；
