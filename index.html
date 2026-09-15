@@ -6569,14 +6569,18 @@ function fmtSigned(v){
     var padV = (mx - mn) * 0.12 || 1;
     mn -= padV; mx += padV;
     var VW = 1120, VH = 150, TOP = 16, BOT = 14;
-    var X = function(k){ return n <= 1 ? 0 : (k / (n - 1)) * VW; };
+    // 左右留白（2026-09-15 主人令）：左容最左拐点标注、右容最右拐点标注 + 末端现值圆点。
+    // 原为 0 边距 → X 映射到 [0,VW]：①起 标注居中于圆点正上方压住真实收盘线、
+    // ⑤高 向右展开「高」字整个甩出 viewBox（视觉上只剩「⑤」）、末端红点被切一半。
+    var PL = 26, PR = 60;
+    var X = function(k){ return n <= 1 ? PL : PL + (k / (n - 1)) * (VW - PL - PR); };
     var Y = function(v){ return TOP + (1 - (v - mn) / (mx - mn)) * (VH - TOP - BOT); };
     var pts = [];
     for(i = 0; i < n; i++){ pts.push(X(i).toFixed(1) + ',' + Y(closes[i]).toFixed(1)); }
     function hline(v, color, label){
       if(!v) return '';
       var y = Y(v).toFixed(1);
-      return '<line x1="0" y1="' + y + '" x2="' + VW + '" y2="' + y + '" stroke="' + color + '" stroke-width="1" stroke-dasharray="6,4" opacity="0.75"/>'
+      return '<line x1="' + PL + '" y1="' + y + '" x2="' + (VW - PR) + '" y2="' + y + '" stroke="' + color + '" stroke-width="1" stroke-dasharray="6,4" opacity="0.75"/>'
            + '<text x="4" y="' + y + '" fill="' + color + '" font-size="10" dy="-3">' + _e(label) + ' ' + v.toFixed(2) + '</text>';
     }
     var svg = hline(hiVal, '#ef5350', '本轮高点(' + hiName + ')')
@@ -6584,19 +6588,49 @@ function fmtSigned(v){
             + hline(lifeVal, '#60a5fa', '④浪生命线');
     var idxOf = {};
     for(i = 0; i < dates.length; i++){ idxOf[dates[i]] = i; }
-    var dots = '';
+    // ── 拐点标注：自适应避让（边界 / 自身圆点 / 真实收盘线 / 末端现值圆点）──
+    //   marks.pos 仅作【首选方向】；命中任一遮挡即换向；横向统一 text-anchor="start"
+    //   + 夹紧左边界 → 任意数据下标注都不出框、不压线、不压点（原实现无任何避让）。
+    function _tw(t){ var w = 0, q, c; for(q = 0; q < t.length; q++){ c = t.charCodeAt(q); w += ((c >= 0x2000 && c <= 0x9FFF) || (c >= 0xAC00 && c <= 0xD7A3) || (c >= 0xF900 && c <= 0xFAFF) || (c >= 0xFE30 && c <= 0xFE6F) || (c >= 0xFF00 && c <= 0xFF60)) ? 10 : 6; } return w; }
+    function _hit(a, b){ return (a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1]); }
+    function _onLine(bx0, bx1, by0, by1){
+      for(var z = 0; z < n; z++){
+        if(X(z) < bx0 - 2 || X(z) > bx1 + 2) continue;
+        var py = Y(closes[z]);
+        if(py >= by0 - 1 && py <= by1 + 1) return true;
+      }
+      return false;
+    }
+    var _lastY = Y(last), _rcx = VW - PR;
+    var _rObst = [_rcx - 5, _lastY - 5, _rcx + 5, _lastY + 5];   // 末端现值红点 = 障碍物
+    var dots = '', _sides, _box, _tx, _ty, _bb;
     for(i = 0; i < marks.length; i++){
       m = marks[i];
       if(!m || !m.coord || !m.name) continue;
       var k = idxOf[m.coord[0]];
       if(k == null || closes[k] == null) continue;
-      var cx = X(k).toFixed(1), cy = Y(m.coord[1]).toFixed(1);
-      var pos = (m.pos === 'bottom') ? 'dy="13"' : ((m.pos === 'right') ? 'dx="7"' : 'dy="-6"');
-      var anc = (m.pos === 'right') ? 'start' : 'middle';
-      dots += '<circle cx="' + cx + '" cy="' + cy + '" r="3" fill="#c8a2e8" stroke="#fff" stroke-width="1"/>'
-            + '<text x="' + cx + '" y="' + cy + '" fill="#c8a2e8" font-size="10" text-anchor="' + anc + '" ' + pos + '>' + _e(m.name) + '</text>';
+      var cx = X(k), cy = Y(m.coord[1]), nm = m.name, w = _tw(nm);
+      _sides = (m.pos === 'right') ? ['right','top','bottom'] : ((m.pos === 'bottom') ? ['bottom','top','right'] : ['top','bottom','right']);
+      _box = null; _tx = cx; _ty = cy - 6;
+      for(var ci = 0; ci < _sides.length; ci++){
+        var s = _sides[ci], ty, bx;
+        if(s === 'right'){ ty = cy - 4; bx = cx + 7; }
+        else if(s === 'bottom'){ ty = cy + 13; bx = cx - w / 2; }
+        else { ty = cy - 6; bx = cx - w / 2; }
+        if(bx < 2) bx = 2;
+        if(bx + w > VW - 2) bx = VW - 2 - w;
+        _bb = [bx, ty - 9, bx + w, ty + 1];
+        if(_bb[1] < 2 || _bb[3] > VH - 2) continue;                 // 上下出框
+        if(_hit(_bb, [cx - 3.5, cy - 3, cx + 3.5, cy + 3.5])) continue;   // 压自身圆点
+        if(_hit(_bb, _rObst)) continue;                              // 压末端现值红点
+        if(_onLine(_bb[0], _bb[2], _bb[1], _bb[3])) continue;        // 压真实收盘线
+        _tx = bx; _ty = ty; _box = _bb; break;
+      }
+      if(!_box){ _tx = Math.min(Math.max(cx - w / 2, 2), VW - 2 - w); _ty = (cy - 15 < 2) ? (cy + 13) : (cy - 6); }
+      dots += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="3" fill="#c8a2e8" stroke="#fff" stroke-width="1"/>'
+            + '<text x="' + _tx.toFixed(1) + '" y="' + _ty.toFixed(1) + '" fill="#c8a2e8" font-size="10" text-anchor="start">' + _e(nm) + '</text>';
     }
-    dots += '<circle cx="' + VW + '" cy="' + Y(last).toFixed(1) + '" r="4" fill="#ef5350" stroke="#fff" stroke-width="1.5"/>';
+    dots += '<circle cx="' + _rcx + '" cy="' + _lastY.toFixed(1) + '" r="4" fill="#ef5350" stroke="#fff" stroke-width="1.5"/>';
     h += '<div style="background:rgba(200,162,232,.05);border:1px solid rgba(200,162,232,.18);border-radius:8px;padding:6px 8px 2px;">'
        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px;">'
        + '<span style="font-size:11.5px;font-weight:700;color:#c8a2e8;">上证指数 · 真实收盘序列 + 人工浪型拐点</span>'
