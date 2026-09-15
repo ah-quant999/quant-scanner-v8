@@ -113,3 +113,62 @@
 ---
 
 **落款：小九的股票专家**（2026-09-15 11:25）
+
+---
+
+## 7. 盘后兜底核验（15:35 自动化 · 2026-09-15）
+
+> 本节由 15:35 盘后兜底自动化追加，**原文未作任何改动**（纯 append）。
+
+**① 幂等推送脚本 `tmp/fv_push_loop.py`**
+
+- 运行结果：第 1 轮即中止 —— `index.html: [ui] 打补丁异常 → [P1-仓位依据/盘面观测尺度分层] 起止锚点相距 2224 字符（>1500），疑似错位`
+- 判读：**未推送任何内容**。该提示是「补丁已应用」的副产物 —— `ui_patch.py` 的 P1 锚点间距守卫（`max_gap=1500`）在**已打过补丁**的文件上必然触发（新块约 2.2 KB 插在起止锚点之间），
+  属**脚本自身对已落地状态非幂等**，**不是线上异常**。故 15:35 未做任何写操作（符合「本批已于 11:20 落地」的事实）。
+- 后续建议：给 `ui_patch.py` 的 5 个 STEP 各加一条「已应用」短路（若 `P*_NEW` 的关键串已在文本中则直接返回原文），即可恢复真正的幂等 no-op。
+
+**② 远端逐项核验（GitHub API · main tip `18884e91f746` / head「v8 cn fetch: 2026-09-15 16:04」）**
+
+| 分组 | 结论 |
+|---|---|
+| ① 四量终极（注入 + 子卡 id + 渲染函数） | ✅ 全过 |
+| ② AI 洞察（新源 `window.MAHORO_INSIGHTS`、旧链路零残留、落位序 `obsPaneMacro` < 卡 < K 型分层） | ✅ 全过（`AI_INSIGHTS_COMPARE.js` 仅注释留痕） |
+| ③ UI 四项（`中线 · 回测`/`短线 · 实时`/调和语/金色位置提示/条合并/`单日跌` 零残留，`破MA20·MA60` 保留） | ✅ 全过 |
+| ④ 脚本侧（`update_v8.py` 映射已换、`v8_health_check.py` 含四量登记、`run_algorithms.py` 挂链） | ✅ 全过 |
+| ⑤ 3 删除项 | ⚠️ 2/3 过：`scripts/fetch_ai_insights_compare.py`、`data/AI_INSIGHTS_COMPARE.js` 均 404；**`raw_data/ai_insights_compare.json` 已复活（见 ③）** |
+
+**③ 唯一真实残留：`raw_data/ai_insights_compare.json` 于 11:22 被「v8 cn fetch」复活**
+
+- 提交链：`6d4b2b170e`（11:21 本批删除）→ **`33b8db52b2`（2026-09-15T03:22:06Z = 11:22 CST「v8 cn fetch」重新加入）**
+- 文件内容 `update_time=2026-09-15 04:45:50`（**早于删除时刻**）⇒ 属 runner 工作树里的**陈旧残留文件被 `git add` 回灌**，不是重新抓取（抓取脚本已删）。
+- 影响：无引用（fetcher / 映射 / 前端注入三者均已下线），**功能无影响**，但违反「彻底清理」要求，且会持续被每日 cn fetch 提交带回。
+- 处置建议（需下一写窗口）：① 再次删除该文件；② 同时清掉 **runner 工作树**（`D:/actions-runner-v8/_work/quant-scanner-v8/quant-scanner-v8/raw_data/ai_insights_compare.json`）的同名残留，否则会再次回灌。
+
+**④ 线上 Pages 实时抓取（`index.html?t=<unix>`，HTTP 200 · 994742 字符，与 main 逐字节一致）**
+
+- ① 四量新卡 `id="fvTrackBody"` + 双注入（`FOUR_VOLUME_TRACK.js` / `FOUR_VOLUME_HISTORY.js`）✅
+- ② `var M = window.MAHORO_INSIGHTS;` ✅；`<script src="data/AI_INSIGHTS_COMPARE.js` 命中 **0 次** ✅
+- ③ `id="aiInsightsCompareBody"` 出现 1 次，且 `obsPaneMacro(926387) < 卡(928623) < K 型分层(929476)` ✅
+- ④ UI 四项串全部在线；`_warns.push('单日跌'` 不在线；`破MA20/破MA60` 在线 ✅
+
+**⑤ 盘后数据链（本批新卡的产物状态）**
+
+| 文件 | 状态 |
+|---|---|
+| `data/FOUR_VOLUME_TRACK.js` (884 B) | ⚠️ **占位**：`update_time 2026-09-15 12:05:00`，`signal_count/tracked_total/history_days` 全 0，alerts=「四量历史账本尚未建立（首次运行后自动累积）」 |
+| `data/FOUR_VOLUME_HISTORY.js` (340 B) | ⚠️ **占位**：`_meta` 各计数 0 |
+| `raw_data/four_volume_history.json` | ⚠️ 远端 **404** —— 账本真实产物尚未落仓 |
+| `data/FOUR_VOLUME.js` | ✅ 6 只（`signal_date=2026-09-14`，`update_time 06:45:24`），**尚未入账** |
+| `data/maharo_insights.js` | ✅ `compare` 段齐备（`generated_at` / `basis` / `conclusion` / `segments`） |
+
+- **来源定性**：两文件由 **`97c7ac5553`（12:18 CST「解 P0 CI 门禁 404 断链（补四量占位）」）** 建立，**是刻意的占位补丁**（为让 CI 的「HTML 数据引用必须存在」闸门通过），**并非账本首次产出**。
+- 时序说明：本次核验在 **16:1x CST** 进行，**当日 18:10 B 批（算法链）尚未运行** → 此刻为空壳属时序正常；18:10 后应由 `update_four_volume_history.py` 建账、`gen_four_volume_track.py` 出真数据。
+- 复核点（18:10 后）：`raw_data/four_volume_history.json` 是否出现、`FOUR_VOLUME_TRACK.js` 的 `track_start/signal_count` 是否非 0、以及 06:45 那 6 只（signal_date 09-14）是否被正确入账。
+
+**⑥ 跨会话同文件合并（`v8_health_check.py`）**
+
+- ✅ 远端**同时**含本批四量登记 `{"id": "FOUR_VOLUME_TRACK", "name": "四量跟踪"` 与同事会话的 `_REG_ACTIVE_WINDOW` ⇒ 两批**互不覆盖、均已正确落地**（无需重推）。
+
+**⑦ 本次核验结论**
+
+本批 11:20 的推送**真实且完整在线**（三块改动 + 9 项文件变更均已生效，仅 1 项删除被 runner 残留回灌）；15:35 兜底**无需也不应重推**；遗留两项见第 6 节 + 本节 ③。
