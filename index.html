@@ -6837,7 +6837,13 @@ function fmtSigned(v){
   // 边界：纯前端交叉现有数据，无新增管线、不进选股评分、不构成投资建议。
   window.__tvRetry = 0;
   window.__tvTheme = 'ai_pharma';
-  window.__TV_THEMES = {
+  // 🔴 2026-09-13 主人令（主人第三次重申「这个主题是会变动的吧，不能写死啊」）：
+  //   主题清单由「写死 7 个」改为「种子 + 自动追加」双轨，全集在每次渲染时按当日资金榜重建。
+  //   · 种子（__TV_SEED_THEMES）= 7 个长期主题，提供稳定的分组语义（人工知识，无法从行情数据自动得出）；
+  //   · 自动追加（__TV_DYN_KEYS）= 当日 SECTOR_FUND_FLOW「概念」资金榜中**未被任何种子关键词覆盖**的
+  //     板块，按当日主力净额降序取前 TV_DYN_MAX 个 → 主题集合随每日行情变化，不再恒定 7 个。
+  //   ⚠️ 兼容：__TV_THEMES 指向「运行时全集」，渲染函数构建后覆盖它（未构建前退化为种子全集）。
+  window.__TV_SEED_THEMES = {
     // 2026-09-11 校对：kws 全部换成 SECTOR_FUND_FLOW 里【真实存在】的概念板块名
     //   （实测每主题命中 2–13 个板块；旧词表与资金榜板块字典不同源，多数主题 0 命中）
     ai_pharma: { label:'🧬 创新药',     kws:['创新药','长寿药','肝素概念','DRG/DIP'] },
@@ -6848,6 +6854,9 @@ function fmtSigned(v){
     compute:   { label:'🖥 算力·CPO',   kws:['CPO概念','算力概念','数据中心','液冷服务器','光通信模块','铜缆高速连接','高带宽内存','存储芯片','光纤概念','F5G概念','6G概念','半导体概念','国产芯片'] },
     dataelem:  { label:'🗂 数据要素',   kws:['数据安全','大数据','网络安全','数字水印','时空大数据','工业互联网','MLOps概念','ERP概念','DeepSeek概念','人工智能'] }
   };
+  window.__TV_THEMES = window.__TV_SEED_THEMES;  // 兼容视图：构建前 = 种子全集（构建后为种子+动态）
+  window.TV_DYN_MAX = 5;                         // 「自动追加」主题数上限
+  window.__TV_DYN_KEYS = [];                     // 当日自动追加主题 key（渲染时填充）
   window.__tvSetTheme = function(k){
     window.__tvTheme = k;
     window.__tvRetry = 0; // 重置：若数据未就绪允许重新走重试
@@ -6876,6 +6885,35 @@ function fmtSigned(v){
       cChg[x.name] = (x.chg == null ? 0 : x.chg);
       cList.push(x.name);
     });
+
+    // ---- 🔴 2026-09-13 主人令：主题全集 = 种子(长期主题) + 自动追加(当日资金榜新热点) ----
+    //   主人第三次重申「主题是会变动的，不能写死」⇒ 原先只渲染 7 个写死主题，
+    //   现改为每次渲染都按当日 SECTOR_FUND_FLOW 概念资金榜重建全集：
+    //     ① 种子：7 个长期主题（label + 关键词表，人工知识）；
+    //     ② 自动追加：资金榜里“未被任何种子关键词覆盖”的概念板块，按当日主力净额降序取前 TV_DYN_MAX 个。
+    //   → 主题集合每天随行情变化；动态主题 chip 用金色描边 + 🔥 前缀区分于长期主题。
+    (function(){
+      var themes = {}, sk;
+      for(sk in window.__TV_SEED_THEMES) themes[sk] = window.__TV_SEED_THEMES[sk];
+      var _covered = function(nm){
+        for(var s2 in window.__TV_SEED_THEMES){
+          var ks = window.__TV_SEED_THEMES[s2].kws || [];
+          for(var i=0;i<ks.length;i++){ if(nm.indexOf(ks[i]) >= 0) return true; }
+        }
+        return false;
+      };
+      var dynNames = cList.filter(function(nm){ return !_covered(nm); })
+                          .slice()
+                          .sort(function(a,b){ return (cNet[b] || 0) - (cNet[a] || 0); })
+                          .slice(0, window.TV_DYN_MAX || 5);
+      window.__TV_DYN_KEYS = dynNames.map(function(nm, i){
+        var k = 'hot' + i;
+        themes[k] = { label:'\uD83D\uDD25 ' + nm, kws:[nm], dynamic:true, srcName:nm };
+        return k;
+      });
+      window.__TV_THEMES = themes;
+      if(!themes[window.__tvTheme]) window.__tvTheme = window.__TV_DYN_KEYS[0] || 'ai_pharma';
+    })();
 
     // ---- 主题 × 概念板块聚合（这就是"会动"的那一层）----
     function _secsOf(th){
@@ -6977,11 +7015,14 @@ function fmtSigned(v){
       return a.tier - b.tier || (b.fund - a.fund) || b.tags.length - a.tags.length
         || ((b.perf && b.perf.change_pct) || 0) - ((a.perf && a.perf.change_pct) || 0);
     });
-    var TV_MAX = 60;
-    var shown = hits.slice(0, TV_MAX);
+    // 2026-09-13 主人令：不再三档混排统一截断 60 只，改为 A/B/C 分桶。
+    //   A 档（概念+业绩+ROE 三项齐）= 全量直出；B/C 档默认折叠，点标题展开。
     var nA = 0, nB = 0, nFundPos = 0;
     hits.forEach(function(x){ if(x.tier===0) nA++; else if(x.tier===1) nB++; if(x.nFundSec>0 && x.fund>0) nFundPos++; });
-    var cards = shown.map(function(x){
+    var tierHits = [[], [], []];
+    hits.forEach(function(x){ tierHits[x.tier].push(x); });
+    // 卡片渲染器（原 shown.map 回调体，提为可复用函数）
+    function _tvCard(x){
       var border = x.tier===0 ? '#ef5350' : (x.tier===1 ? '#38bdf8' : '#94a3b8');
       var tagStr = x.tags.slice(0,2).map(_ev).join(' / ') + (x.tags.length > 2 ? ' +' + (x.tags.length-2) : '');
       var badge = perfBadge(x.perf);
@@ -6996,19 +7037,48 @@ function fmtSigned(v){
         + '<div style="color:var(--sub);font-size:10.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">🏷 ' + tagStr + '</div>'
         + '<div style="margin-top:3px;line-height:1.5;">' + badge + '</div>'
         + '</div>';
-    }).join('');
+    }
+    var TIER_META = [
+      { key:'A', name:'A档', color:'#ef5350', desc:'概念 + 业绩正向 + ROE 三项齐（证据最全）' },
+      { key:'B', name:'B档', color:'#38bdf8', desc:'概念 + 业绩或 ROE 其一（部分证据）' },
+      { key:'C', name:'C档', color:'#94a3b8', desc:'仅概念命中（暂无基本面证据）' }
+    ];
+    var cards = '';
+    TIER_META.forEach(function(tm, ti){
+      var bucket = tierHits[ti];
+      if(!bucket.length) return;
+      var inner = bucket.map(_tvCard).join('');
+      var grid = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">' + inner + '</div>';
+      if(tm.key === 'A'){
+        // A 档：直接全部展开显示
+        cards += '<div style="margin-bottom:12px;">'
+          + '<div style="font-size:12px;font-weight:700;color:' + tm.color + ';margin-bottom:6px;">'
+          + '（' + tm.name + ' · ' + bucket.length + ' 只 · ' + tm.desc + '）</div>'
+          + grid + '</div>';
+      } else {
+        // B/C 档：折叠，点标题展开
+        cards += '<details style="margin-bottom:12px;">'
+          + '<summary style="cursor:pointer;font-size:12px;font-weight:700;color:' + tm.color + ';padding:4px 0;user-select:none;">'
+          + '（' + tm.name + ' · ' + bucket.length + ' 只 · ' + tm.desc + '）点击展开 ▾</summary>'
+          + '<div style="margin-top:8px;">' + grid + '</div></details>';
+      }
+    });
 
     // ---- chip：主题名 + 当日主力净额（每天在动）----
     var chips = '';
     for(tk in window.__TV_THEMES){
       var tt = window.__TV_THEMES[tk], st = themeStat[tk];
       var act = tk === window.__tvTheme;
+      var _dyn = !!tt.dynamic;   // 2026-09-13：自动追加主题（🔥 前缀）用金色区分于长期主题
       var fundTxt = hasFund
         ? '<span style="font-size:11px;font-weight:700;color:' + _numColor(st.net) + ';margin-left:5px;">' + _sign(st.net) + '亿</span>'
         : '';
-      chips += '<button onclick="window.__tvSetTheme(\'' + tk + '\')" style="padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid ' + (act ? '#a78bfa' : 'var(--border)') + ';background:' + (act ? 'rgba(167,139,250,.15)' : 'var(--card)') + ';color:' + (act ? '#c4b5fd' : 'var(--sub)') + ';font-weight:600;transition:.15s;">' + tt.label + fundTxt + '</button>';
+      var _acc   = _dyn ? '#fbbf24' : '#a78bfa';
+      var _accBg = _dyn ? 'rgba(251,191,36,.15)' : 'rgba(167,139,250,.15)';
+      var _accFg = _dyn ? '#fcd34d' : '#c4b5fd';
+      chips += '<button onclick="window.__tvSetTheme(\'' + tk + '\')" style="padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid ' + (act ? _acc : 'var(--border)') + ';background:' + (act ? _accBg : 'var(--card)') + ';color:' + (act ? _accFg : 'var(--sub)') + ';font-weight:600;transition:.15s;">' + tt.label + fundTxt + '</button>';
     }
-    // 主题资金热度排行（7 主题按主力净额降序 → 每天/每档刷新即变）
+    // 主题资金热度排行（主题全集 = 种子 + 自动追加，按当日主力净额降序 → 每天/每档刷新即变）
     var rankArr = [];
     for(tk in themeStat) rankArr.push({ label: window.__TV_THEMES[tk].label, st: themeStat[tk] });
     rankArr.sort(function(a,b){ return b.st.net - a.st.net; });
@@ -7020,9 +7090,18 @@ function fmtSigned(v){
     var curSt = themeStat[window.__tvTheme] || { net:0, nSec:0, avg:0, lead:'', leadNet:0 };
     var stamp = (SFF && SFF.update_time) || (L && L.update_time) || (window.STOCK_PROFILE && window.STOCK_PROFILE.update_time) || '—';
     var nPerf = Object.keys(perfMap).length, nRoe = Object.keys(roeMap).length;
+    // 2026-09-13：主题构成随当日资金榜变化 → 卡内文案不再写死主题名单，改为动态计数
+    var nSeed = Object.keys(window.__TV_SEED_THEMES).length;
+    var nDyn = (window.__TV_DYN_KEYS || []).length;
+    var nThemeAll = nSeed + nDyn;
     dst.innerHTML = ''
       + window.v8CardHeader('🔭','主题空间 · 概念资金热度','概念 × 资金热度 × 业绩/ROE 交叉（实验版）','update_time',{update_time:stamp, slot:'盘后', horizon:'中长线'})
       + '<div style="padding:12px 14px;">'
+      + '<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;font-size:12px;color:var(--txt);">'
+      +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">📌 核心：</b>在 <b style="color:var(--txt);">' + nThemeAll + '</b> 个主题（<b>' + nSeed + '</b> 个长期主题 + <b style="color:#fcd34d;">' + nDyn + '</b> 个由当日概念资金榜自动追加的新热点）中，找出「有概念想象空间 + 业绩或ROE质量证据」的股票。</div>'
+      +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b>A 档=概念+业绩正向+ROE 三项齐；B 档=概念+业绩或ROE 其一；C 档=仅概念命中（A 档直接展开，B/C 档点标题展开 ▾）。按 A→B→C、板块资金净额排序，资金为辅助验证。</div>'
+      +   '<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">🔥 主题会动：</b>7 个长期主题为固定种子，另按当日概念资金榜自动追加最多 ' + (window.TV_DYN_MAX || 5) + ' 个新热点（金色描边 + 🔥 前缀）—— 主题集合每天随行情变化，不写死。仅研究参考，不构成投资建议。</div>'
+      + '</div>'
       + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">' + chips + '</div>'
       + '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;padding:6px 8px;background:rgba(148,163,184,.06);border-radius:6px;line-height:1.7;">'
       +   '<b style="color:var(--sub);">主题资金热度</b>（主力净额，亿元 · 红流入/绿流出）：' + (hasFund ? rankStr : '<span style="color:#fbbf24;">资金源 SECTOR_FUND_FLOW 未加载</span>')
@@ -7040,7 +7119,7 @@ function fmtSigned(v){
       + '</div>'
       + (cards ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">' + cards + '</div>'
                : '<div class="note" style="color:var(--dim);">本主题无概念命中，换个主题试试</div>')
-      + (hits.length > TV_MAX ? '<div style="font-size:11px;color:var(--dim);margin-top:6px;">仅展示前 ' + TV_MAX + ' 只 / 共 ' + hits.length + ' 只（按 A→B→C、板块资金净额、命中标签数排序）</div>' : '')
+      // 2026-09-13 主人令：A/B/C 分档后不再截断，删除「仅展示前 N 只」提示行。
       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.6;">口径：板块资金取 SECTOR_FUND_FLOW「概念」类板块当日主力净额（亿元），个股资金 = Σ(其命中概念板块净额)；'
       + '卡内符号：🔥=资金流入+基本面证据 / 💰=仅资金流入 / 📈=有基本面证据但资金未流入，仅作交叉提示、非买卖信号。仅研究参考，不构成投资建议。</div>'
       + '</div>';   // /padding 12 14
