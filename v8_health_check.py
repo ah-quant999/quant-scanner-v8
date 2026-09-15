@@ -1845,6 +1845,11 @@ _LOW_FREQ_FILES = {
     "maharo_macro",  # 2026-09-08 一劳永逸：本机 cookie 拉取(云端无权限)，家里机离线会陈旧 -> 7天容忍仅告警
     "maharo_insights",  # 2026-09-10：同 maharo_macro 口径（本机 cookie 拉取，云端无权限）-> 同样 7天容忍仅告警
     "MACRO",  # 2026-08-29：window.MACRO 已被 window.MACRO_DATA 取代，index.html 仅用 MACRO_DATA/MACRO_BRIEF，全站 0 渲染引用 → 白名单免误报
+    # 🛡 2026-09-16 主人令一劳永逸：候选池 / 金股池是算法**上游水源**不是策略 ⇒ 不需要回测
+    #   （09-14 已摘 CARD_DEFS 登记 + 删 algorithms/backtest_pools.py），但两份产物当时漏删，
+    #   残留后被 all_ 通用扫描按 1440min 红线判 fail（09-16 看板实测 2 红灯）。
+    #   本轮已删产物；此处加护栏防「有人把旧产物放回」导致红灯复发。
+    "CANDIDATE_BACKTEST", "GOLD_POOL_BACKTEST",
     # 🔴 2026-09-11 主人令（选项A）：FOUR_VOLUME_60M **已移出本白名单**，并正式登记进 CARD_DEFS
     #   （「选股策略」段，max_age=1440）。原白名单把 24h 红线降到「>7天才告警」，
     #   导致该卡产物冻结 3 天（09-08→09-11）全程零告警。现由 check_data_cards 按 d.max_age 正常判定。
