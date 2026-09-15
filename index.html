@@ -2311,11 +2311,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
                 整块不渲染 ⇒ 页面**根本看不到「超买超卖」这个指标的存在**，主人无从知晓它是否在工作。
                 现改为显式给出未就绪态，并承接已删的「vs 20/60 日线」行原本承载的积累进度（⏳ X/20 日）；
                 绝不用 0 / 假档位冒充（2026-09-11 铁律）。
-             口径不变：只报位置观测，开仓仍以 AI速览 ⚖ 裁决为准（免责小字保留、仅前移）。 */
+             口径不变：只报位置观测，开仓仍以 AI速览 ⚖ 裁决为准（免责小字保留、仅前移）。
+             ④ 2026-09-16 主人令（第四轮）：「这个超买超卖不用这么大提示。」
+                第三轮为「显著标识」把视觉权重拉得很重（2px 金边+10px 发光+13px/800+渐变底），
+                本轮收敛到与同卡「📋 关注」胶囊同档（11.5px/700/1.5px 边/无发光/纯色低透底），
+                仅保留「可见性」这一核心成果：胶囊照常展示，未就绪态（⏳ 积累进度）不退化。 */
           var _ovTxt=_verdict, _ovClr=_vClr;
           if(!_verdict){ _ovTxt='⏳ 均线积累中 '+_hd+'/20日'; _ovClr='var(--gold)'; }
-          h+='<span style="font-size:10.5px;color:var(--dim);">🔭 仅观测位 · 开仓以 AI速览 ⚖ 裁决为准</span>';
-          h+='<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:6px;background:linear-gradient(180deg,rgba(251,191,36,.24),rgba(251,191,36,.10));border:2px solid rgba(251,191,36,.7);font-size:13px;font-weight:800;letter-spacing:.3px;color:'+_ovClr+';box-shadow:0 0 10px rgba(251,191,36,.38);">📊 超买超卖 '+_ovTxt+'</span>';
+          h+='<span style="font-size:10px;color:var(--dim);opacity:.75;">🔭 仅观测 · 开仓以 AI速览 ⚖ 裁决为准</span>';
+          h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:rgba(251,191,36,.12);border:1.5px solid rgba(251,191,36,.5);font-size:11.5px;font-weight:700;color:'+_ovClr+';">📊 超买超卖 '+_ovTxt+'</span>';
           h+='</div>';
           // 第二行：卖/减 + ⚠破线警告
           //   2026-09-15 主人令（第二轮）：位置观测胶囊已移至第一行末尾（且中性态不再渲染）；
