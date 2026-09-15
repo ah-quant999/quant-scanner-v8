@@ -2393,7 +2393,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
 
       <!-- 📊 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 主人令：与「主力日监控」T+0 联动） -->
-      <div style="margin-bottom:16px;border-top:1px dashed rgba(71,85,105,.35);padding-top:12px;">
+      <div class="card" style="margin-bottom:16px">
         <h3><span class="ic">📈</span>主力净额分时累计曲线 - 盘中每30分快照 · <span class="fresh" id="sfIntradayTime">—</span> <span style="font-size:10px;color:#a78bfa;font-weight:600">↕ 与「盘后数据」页 主力日监控 T+0 联动</span></h3>
         <!-- 🛡 2026-08-19 主人令一劳永逸修复：legend div 加底部分隔线 + 下边距，与下方 ECharts 图表彻底视觉隔离；
              并把快照时间范围（旧的 ECharts title 文字）搬进 legend 文本，删除 ECharts 内冗余 title 以减少图表上方空白。 -->
@@ -13708,13 +13708,6 @@ h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;
 // 🚚 2026-09-15 主人令：AI 洞察·多源观点对比 整卡迁往「🌍 观测平台 > 🌍 宏观观测」（K 型分层卡上方），
 //   容器 id 未变 ⇒ 本页不再渲染它；观测类 pane 现为 1 卡（主题空间），派发名单同步收窄为 __renderThemeValue。
 h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-left:4px solid var(--cyan);"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52D; 主题空间 · 概念资金热度 加载中&#x2026;</div></div>';
-// 2026-09-15 主人令：白河愁博士观点卡（数据驱动，读 window.BAIHECHOU_MACRO；每日07:30自动抓取刷新）
-h += '<div class="card" id="baihechouBody" style="margin-bottom:16px;border-left:4px solid #a78bfa;">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
-   + '<span style="font-size:15px;font-weight:700;color:#a78bfa;">&#x1F4DD; 白河愁博士观点</span>'
-   + '<span class="fresh" id="baihechouFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">雪球宏观舆情 · 观测类</span></div>'
-   + '<div id="baihechouInner"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4E1; 加载中&#x2026;</div></div></div>';
 h += '</div>'; // /ulPaneObserve
 
 // ===== 📊 大盘观察 pane —— 🚚 2026-09-15 主人令：整页迁出 =====
@@ -13753,7 +13746,6 @@ h += '</div>'; // /ulPaneObserve
     // ═══ 2026-09-02 主人令：暂未上架 = 调试专区原 3 张卡平铺（AI预测/潜力挖掘/ETF龙头参考）══
     // 🛡 2026-09-02 主人令：ETF·龙头参考 抽为独立函数 + 自愈重试（原内联，defer 未就绪即永久空卡）
     window._fillEtfMap();
-    try{ if(typeof window.__renderBaihechou==='function') window.__renderBaihechou(); }catch(e){}
     // 2026-09-12 搬迁收口：因子实验室 / 中信PE回测 / 指数估值中枢 /
     //   因子审计 / 因子补缺进度 / maharo 机构研究 共 7 卡的容器已迁出本页，
     //   其填充调用随之迁至各新宿主的骨架函数尾部（__renderBtExtraPane /
@@ -13765,35 +13757,6 @@ h += '</div>'; // /ulPaneObserve
     // try{ if(typeof window.__renderCiticPeObserve==='function') window.__renderCiticPeObserve(); }catch(e){}
     // try{ if(typeof window.__renderIndexObserve==='function') window.__renderIndexObserve(); }catch(e){}
   }
-
-  // 2026-09-15 主人令：白河愁博士观点卡（数据驱动，读 window.BAIHECHOU_MACRO；每日07:30自动抓取刷新）
-  window.__renderBaihechou = function(){
-    var host = document.getElementById('baihechouInner');
-    if(!host) return;
-    var d = window.BAIHECHOU_MACRO || {};
-    if(!d || !d.posts || !d.posts.length){
-      host.innerHTML = '<div class="note" style="padding:14px;text-align:center;color:var(--dim);">白河愁观点暂未抓取（待每日07:30自动任务）</div>';
-      return;
-    }
-    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-    var p = d.profile || {};
-    var st = d.stats || {};
-    var h = '';
-    h += '<div style="font-size:12px;color:var(--sub);margin-bottom:8px;">' + '<b style="color:#a78bfa;">' + esc(p.name || '白河愁博士') + '</b>' + (p.followers ? ' · 粉丝 ' + esc(p.followers) : '') + (st.stale_days!=null ? ' · 停更 ' + st.stale_days + ' 天' : '') + '</div>';
-    var posts = (d.posts||[]).slice(0,6);
-    h += '<div style="display:flex;flex-direction:column;gap:7px;">';
-    posts.forEach(function(pt){
-      h += '<div style="padding:6px 9px;border-left:2px solid rgba(167,139,250,.4);background:rgba(167,139,250,.05);border-radius:5px;font-size:12px;line-height:1.55;">' + '<div style="color:var(--dim);font-size:11px;margin-bottom:2px;">' + esc(pt.time||'') + '</div>' + '<div style="color:var(--txt);">' + esc(pt.text||'(图片帖)') + '</div></div>';
-    });
-    h += '</div>';
-    var ana = d.analysis;
-    if(ana && ana.verdict){
-      h += '<div style="margin-top:9px;padding:7px 9px;border-radius:6px;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);font-size:12px;line-height:1.6;">' + '<b style="color:#a78bfa;">AI 解析：</b>' + esc(ana.verdict) + '</div>';
-    }
-    host.innerHTML = h;
-    var fresh = document.getElementById('baihechouFresh');
-    if(fresh && typeof setBadge==='function'){ try{ setBadge('baihechouFresh','盘后','短线', d.update_time||''); }catch(e){} }
-  };
 
   function renderMahoroCard(){
     var host = document.getElementById('maharoCardBody');
