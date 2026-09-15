@@ -16353,6 +16353,67 @@ window.__renderV8CalToday();
 })();
 </script>
 
+<!-- 🕒 2026-09-15 主人令：首屏默认页按时段自适应（盘前→观测·宏观 / 盘中→实时数据 / 其余→最终推荐）
+     原实现：nav 硬编码 class="tab active" data-sec="final" + <section id="sec-final" class="active">，
+     导致任何时间打开都停在最终推荐。主人原话：「现在盘中高频更新这么快，每次打开网页后
+     都要再点一下回实时数据页，这不科学！」→ 改为时段化直达，避免多此一举的一次点击。
+     优先级：URL 深链（?sec=&sub=，见下方脚本）> 本时段判定 > 静态默认（最终推荐）。
+     静态默认（final 的 active）刻意保留：JS 失效/被拦时页面依旧有内容，不会空白。 -->
+<script>
+(function(){
+  try{
+    // ── ① 会话内记忆（仅「刷新」时尊重；新开标签/新会话一律按时段重判）──
+    var _nav = null;
+    try{ _nav = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || null; }catch(e){}
+    var _isReload = !!(_nav && _nav.type === 'reload');
+    var _saved = null;
+    try{ _saved = sessionStorage.getItem('v8_boot_sec'); }catch(e){}
+
+    var sec;
+    if(_isReload && _saved){
+      sec = _saved;                                          // 刷新：停在用户正在看的那一页
+    }else{
+      // ── ② 时段判定（北京时间；UTC 偏移换算，不依赖浏览器本地时区）──
+      var d = new Date();
+      var cst = new Date(d.getTime() + d.getTimezoneOffset()*60000 + 8*3600000);
+      var t = cst.getHours()*60 + cst.getMinutes();
+      var isPre   = (t >= 5*60      && t <  9*60+30);        // 盘前 05:00–09:30
+      var isTrade = (t >= 9*60+30   && t <= 11*60+30)        // 上午 09:30–11:30
+                 || (t >= 13*60     && t <= 15*60);          // 下午 13:00–15:00
+      sec = isPre ? 'obs' : (isTrade ? 'rt' : 'final');
+      try{ sessionStorage.removeItem('v8_boot_sec'); }catch(e){}
+    }
+
+    // ── ③ nav 点击 → 记录用户手动选择（供 ① 刷新恢复；事件委托，不改 nav 源码）──
+    var _navEl = document.getElementById('nav');
+    if(_navEl){
+      _navEl.addEventListener('click', function(ev){
+        var el = ev.target;
+        while(el && el !== _navEl && !(el.getAttribute && el.getAttribute('data-sec'))) el = el.parentNode;
+        if(el && el.getAttribute){
+          try{ sessionStorage.setItem('v8_boot_sec', el.getAttribute('data-sec')); }catch(e){}
+        }
+      }, true);
+    }
+
+    if(!sec || sec === 'final') return;   // 静态默认已是最终推荐 → 无需任何动作
+
+    var go = function(){
+      if(typeof switchSec !== 'function') return;
+      switchSec(sec);                     // el 省略 → 函数内自动按 data-sec 反查并高亮
+      if(sec === 'obs'){
+        // switchSec('obs') 内 60ms 后 __renderObsPlatform；此处再等一拍，显式钉住宏观观测子页
+        setTimeout(function(){
+          try{ if(typeof window.__obsSwitch === 'function') window.__obsSwitch(null,'macro'); }catch(e){}
+        }, 300);
+      }
+    };
+    if(document.readyState !== 'loading') go();
+    else document.addEventListener('DOMContentLoaded', go);
+  }catch(e){}
+})();
+</script>
+
 <!-- 🛡 2026-08-23 子 tab 直达链接：/?sec=ul&sub=ai 或 /?sec=lg&sub=v6 可直接定位到对应子 tab -->
 <script>
 (function(){
