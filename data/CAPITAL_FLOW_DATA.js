@@ -1,1 +1,1 @@
-window.CAPITAL_FLOW_DATA = {"top_inflow":[],"top_outflow":[],"market_net":0.0,"note":"全市场个股主力净流入(亿)，来源东方财富push2delay；非席位四路口径","update_time":"2026-09-15 09:19:57","republish_time":"2026-09-15 09:22:38"};
+window.CAPITAL_FLOW_DATA = {"top_inflow":[],"top_outflow":[],"market_net":0.0,"note":"全市场个股主力净流入(亿)，来源东方财富push2delay；非席位四路口径","update_time":"2026-09-15 09:27:51","republish_time":"2026-09-15 09:30:38"};
