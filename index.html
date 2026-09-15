@@ -14185,21 +14185,25 @@ h += '</div>'; // /ulPaneObserve
                            '本人判断':'#fbbf24', '假设层面':'#f59e0b'};
     var _RICH_NUM = ['\u2460','\u2461','\u2462','\u2463','\u2464','\u2465','\u2466','\u2467','\u2468','\u2469'];
     function _richSplitLabels(s){
-      /* 按「标签：」把一行切成多段；返回 null 表示该行不含这些标签。 */
+      /* 按「标签：」或「【标签】」把一行切成多段；返回 null 表示该行不含这些标签。
+         2026-09-16 主人令：数据里「本人判断」是方括号无冒号写法（【本人判断】…），
+         旧实现只认全角冒号 ⇒ 匹配不到 ⇒ 与正文连写、蓝色标签也不出现。此处补方括号形态。 */
       var marks = ['事实层面','机构观点层面','机构观点','本人判断','假设层面'];
       var hits = [];
       marks.forEach(function(m){
-        var i = s.indexOf(m + '\uff1a');
-        while(i >= 0){
-          hits.push({i:i, m:m});
-          i = s.indexOf(m + '\uff1a', i + m.length + 1);
-        }
+        [m + '\uff1a', '\u3010' + m + '\u3011'].forEach(function(pat){
+          var i = s.indexOf(pat);
+          while(i >= 0){
+            hits.push({i:i, m:m, span:pat.length});
+            i = s.indexOf(pat, i + pat.length);
+          }
+        });
       });
       if(!hits.length) return null;
       /* 「机构观点层面」内含「机构观点」⇒ 丢掉被完全包住的短标签，避免切错 */
       hits = hits.filter(function(h){
         return !hits.some(function(o){
-          return o !== h && o.i <= h.i && (o.i + o.m.length) > h.i;
+          return o !== h && o.i <= h.i && (o.i + o.span) > h.i;
         });
       });
       hits.sort(function(a,b){ return a.i - b.i; });
@@ -14207,12 +14211,14 @@ h += '</div>'; // /ulPaneObserve
       if(hits[0].i > 0) out.push({label:'', body:s.slice(0, hits[0].i)});
       hits.forEach(function(h, k){
         var end = (k + 1 < hits.length) ? hits[k+1].i : s.length;
-        out.push({label:h.m, body:s.slice(h.i + h.m.length + 1, end)});
+        out.push({label:h.m, body:s.slice(h.i + h.span, end)});
       });
       return out;
     }
     function renderLines(txt){
       var rows = String(txt||'').split('\n'); var out = '';
+      /* 2026-09-16 主人令：【一句话结论】标题之后的正文段整段加粗（遇下一个【标题】自动复位）。 */
+      var _bold = false;
       rows.forEach(function(ln){
         if(!ln.trim()) return;
         var raw = ln.trim();
@@ -14230,26 +14236,39 @@ h += '</div>'; // /ulPaneObserve
                + esc('主线' + mMain[1] + '\uff1a') + esc(mMain[2]) + '</span></div>';
           return;
         }
-        /* ② 事实 / 机构观点 / 本人判断 → 各自成段 */
-        var parts = _richSplitLabels(raw);
+        /* ①-b 圈号条目（①②③…，形如「① 光互连：…」）：序号金色 + 整行加粗
+           2026-09-16 主人令：1/2/3 点必须一眼看出是加粗条目（旧实现只认「主线一：」和「1）」，圈号落到普通段落）。 */
+        var mCirc = raw.match(/^([\u2460-\u2469])\s*(.*)$/);
+        if(mCirc){
+          out += '<div style="display:flex;align-items:flex-start;gap:7px;padding:4px 0 3px;font-weight:800;">'
+               + '<span style="flex:0 0 auto;color:#fbbf24;font-weight:800;">' + mCirc[1] + '</span>'
+               + '<span style="flex:1 1 auto;font-weight:800;">' + esc(mCirc[2]) + '</span></div>';
+          return;
+        }
+        /* ② 事实 / 机构观点 / 本人判断 → 各自成段（行首「- 」先剥掉：
+           否则「- 机构观点：…」会先切出一段孤零零的「- 」，这正是旧实现的残留瑕疵） */
+        var parts = _richSplitLabels(raw.replace(/^[-\u2022]\s+/, ''));
         if(parts){
           parts.forEach(function(p){
             if(!p.label){
-              if(p.body.trim()) out += '<div style="padding:2px 0;">' + esc(p.body.trim()) + '</div>';
+              if(p.body.trim()) out += '<div style="padding:2px 0;' + (_bold ? 'font-weight:800;' : '') + '">' + esc(p.body.trim()) + '</div>';
               return;
             }
             var col = _RICH_LABEL_COL[p.label] || 'var(--sub)';
+            /* 2026-09-16 主人令：本人判断是作者主观结论 ⇒ 标签与正文都加粗，与事实/机构观点视觉分层 */
+            var _fw = (p.label === '本人判断') ? 'font-weight:800;' : '';
             out += '<div style="display:flex;align-items:flex-start;gap:7px;padding:3px 0 3px 7px;'
                  + 'margin:2px 0 2px 1px;border-left:2px solid ' + col + ';line-height:1.65;">'
                  + '<span style="flex:0 0 auto;font-weight:800;color:' + col + ';font-size:11.5px;">'
                  + p.label + '\uff1a</span>'
-                 + '<span style="flex:1 1 auto;">' + esc(p.body.trim()) + '</span></div>';
+                 + '<span style="flex:1 1 auto;' + _fw + '">' + esc(p.body.trim()) + '</span></div>';
           });
           return;
         }
         if(s.indexOf('- ')===0){
           out += '<div style="display:flex;align-items:flex-start;gap:8px;padding:2px 0 2px 6px;"><span style="color:#34d399;flex-shrink:0;">\u2022</span><span>'+s.slice(2)+'</span></div>';
         } else if(s.indexOf('\u3010')===0){
+          _bold = (raw.indexOf('\u4e00\u53e5\u8bdd\u7ed3\u8bba') >= 0);
           out += '<div style="font-weight:700;color:#34d399;margin:9px 0 3px;font-size:12.5px;">'+s+'</div>';
         } else if(s.indexOf('\u2192')===0){
           out += '<div style="color:#fbbf24;padding:2px 0 2px 6px;">'+s+'</div>';
@@ -14261,7 +14280,7 @@ h += '</div>'; // /ulPaneObserve
                  + '<span style="flex:0 0 auto;font-weight:800;color:#fbbf24;">' + mNum[1] + '\uff09</span>'
                  + '<span style="flex:1 1 auto;">' + esc(mNum[2]) + '</span></div>';
           } else {
-            out += '<div style="padding:2px 0;">'+s+'</div>';
+            out += '<div style="padding:2px 0;' + (_bold ? 'font-weight:800;' : '') + '">'+s+'</div>';
           }
         }
       });
