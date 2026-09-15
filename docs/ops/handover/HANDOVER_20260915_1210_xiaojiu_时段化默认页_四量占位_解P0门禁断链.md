@@ -205,14 +205,18 @@ workflow 结论 success）；11:36 > 11:30 ⇒ 休市 ⇒ build 真跑 ⇒ 门�
 
 ## 六、遗留待办
 
+> ⚠️ **本节已按 12:08 他方提交 `8a12f9607649` 交叉复核后更新**——C/D 两项已被该提交修复并实证，
+> 详见新增的**第八节**。请勿按旧版结论重复施工。
+
 | 项 | 状态 | 承接 |
 |---|---|---|
-| `factor_lab_backtest.py` 三符号修复 | 已完整定位，**未修** | 任务 `928f903f`（16:40） |
-| `LHB_7D` 死数据清理（删文件 + 摘监控 + 摘推送） | 已完整定位，**未做** | 同上 |
-| 盘前巡检用盘中阈值 → 盘前假 FAIL（4 项实时卡） | 已识别，**未改** | 需单独评审（涉巡检判据） |
+| ~~`factor_lab_backtest.py` 三符号修复~~ | ✅ **已由 `8a12f9607649` 修复**（`CACHE_DIR` 补回 + 自带 `_load_klines` 取数层），产物今天 09:51 已刷新 | 本机 16:40 任务已改为**只复核其真实性**，禁止二次修改 |
+| ~~`LHB_7D` 死数据清理~~ | ✅ **已由 `8a12f9607649` 清理**：`data/LHB_7D.js` 已 404、`v8_health_check.py` 无登记、`api_push_raw.py` 引用摘除 | 同上 |
+| ~~盘前巡检用盘中阈值 → 盘前假 FAIL~~ | ✅ **已由 `8a12f9607649` 治理**（`v8_health_check.py` +127/-1，含「昨日午间数据在今日盘前批前被判 fail 满屏红」的阈值叠加根治） | 待今晚巡检实跑复核 |
+| `index.html` L575 仍留一条 LHB_7D 历史注释（文件已删，纯注释、无功能影响） | 极小残留 | 下次改 index.html 时顺手清 |
 | 四量账本首批仅 1 个交易日 | 逐日累积中 | 8 档前向样本需自然成熟 |
 | IVF 注入修复（`data/INDEX_VALUE_FRAMEWORK.js` 漏注入 → 「A股指数观测」4 列恒「—」） | pending | — |
-| 因子卡 12 档补满 | 依赖 E 批 + 缺陷 C 修复 | 任务 `928f903f` |
+| 因子卡 12 档补满 | 依赖 E 批 + 缺陷 C 修复 | 缺陷 C 已修，等 E 批 |
 
 ---
 
@@ -229,8 +233,82 @@ workflow 结论 success）；11:36 > 11:30 ⇒ 休市 ⇒ build 真跑 ⇒ 门�
 5. **两个 `maharo/mahoro` 拼写真相源**（09-14 地雷，仍然有效）：写盘必须**双写两份 json** 并做指纹三方比对，
    base 一律先取远端 main 的 `data/maharo_insights.js`。
 6. 本机 `E:/v8data/qs8-tmp/` 下的 `tmp/` 保留了全部补丁模块、审计器、渲染验证器与推仓脚本，可直接复用：
-   `boot_patch.py` `boot_render_verify.js` `bootfix_push.py` `ui_html_audit.js` `chain_audit.py` `fv_push_loop.py`。
+   `boot_patch.py` `boot_render_verify.js` `bootfix_push.py`（含 `--verify` 只验模式）`live_verify.py`
+   `watch_build.py` `chain_audit.py` `intraday_audit.py` `show_commit.py` `getf_tip.py` `codesearch.py`。
+7. **🔴 今晚请先读第八节**：`8a12f9607649`（12:08）已修掉原列的 factor_lab_backtest / LHB_7D / 巡检阈值
+   三项红灯，**不要再动这几个文件**；本机 16:40 任务已改为只复核。
+8. **🔴 判「跑没跑成功」的坑（今日再次实证）**：
+   · `trading=YES` 时 `构建部署` 的 success 是**假绿**（build 被跳过）——必须看 step11 是否 skipped；
+   · Code Search API 对**刚推过的仓库索引滞后**（实测搜 `FOUR_VOLUME_HISTORY` 返 0，但该串确实存在于
+     `index.html` 与 `update_v8.py`）⇒ **判死引用一律直接取文件 grep，不要信 code search 的 0**；
+   · 线上单次 HTTP 失败（跨境瞬时）**不构成**「未生效」证据，必须重试再判。
 
 ---
 
 *本交接单由小九的股票专家生成，数据与结论均来自实时核验（GitHub API 真值 + Pages HTTP 实测），未使用状态延续推断。*
+
+---
+
+## 八、推后核验结果 + 他方 12:08 提交的交叉审计（12:18–12:50 补记）
+
+### 8.1 ✅ P0 修复批推后核验（全部为远端/线上真值）
+
+| 核验项 | 结果 |
+|---|---|
+| 本批 commit | `97c7ac5553fa7b03191f119a9c92bea8b5ea61a9`（12:18，午休窗口） |
+| 17 项远端真值核验（`bootfix_push.py --verify`） | ✅ **全绿**：两占位存在且变量名正确 / index.html 含补丁 5 关键串 / 静态默认保留 / 补丁先于深链脚本 / 既有注入未误伤 / 交接单已入库 |
+| **CI 门禁是否解锁** | ✅ **已解锁**：`☁️ v8 构建部署(云端ubuntu)` run `34928319442` —— **step9 `Pre-deploy audit` = success、step10 = success、step11「📤 部署到 main」= success（不再 skipped）** |
+| 门前三连败 → 修后三连成 | ✅ 11:36 / 11:50 / 12:08 三次 failure ⇒ 12:18 / 12:25 / 12:31 **三次 success** |
+| 线上 `index.html` 真响应 | ✅ HTTP 200，**994247 字符**（= 补丁后字符数），10/10 校验全过（补丁标记 / 时段判定式 / `v8_boot_sec` / `__obsSwitch(null,'macro')` / 静态默认 / 5 个注入） |
+| 线上两占位 | ✅ `data/FOUR_VOLUME_HISTORY.js` 341 B、`data/FOUR_VOLUME_TRACK.js` 937 B 均 HTTP 200 |
+| 防覆盖复查（12:28 tip） | ✅ 云端 12:20 构建提交压在 `97c7ac…` **之上**，index.html 未被洗回 |
+
+⚠️ 线上首抓 `index.html` 曾返回 HTTP 0 / 28 B（跨境瞬时连接失败，同时段 6 个小文件全 200）→ 重试即 200。
+**判据：单次抓取失败不构成「线上没生效」的证据，必须重试。**
+
+### 8.2 ⚠️ 交叉审计：他方提交 `8a12f9607649`（12:08）**已修掉我原拟的 16:40 任务目标**
+
+该提交（另一会话，`+1071/-130`）标题：「看板红灯一劳永逸修复 —— 健康巡检多层阈值叠加误报根治 + 因子实验室回测取数层补回 + LHB_7D 退役清理」，变更：
+
+| 文件 | 变更 | 我方复核结论 |
+|---|---|---|
+| `algorithms/factor_lab_backtest.py` | +166/-28 | ✅ **真修**：`CACHE_DIR` 补回（L75）、新增 `KLINE_CACHE_DIR` / `_read_cache_file` / `_load_cache_any` / `_net_kline_records` / `_load_klines` 自成取数层（原 `_query_kline` / `_load_cache` 依赖已随 RPS 下线删除）；`py_compile` 语法通过 |
+| `data/LHB_7D.js` | removed | ✅ 线上 404；`v8_health_check.py` 内已无 `LHB_7D` 登记；`api_push_raw.py` 的 extra 推送集与 `?v` 重写集均已摘除（仅存注释说明） |
+| `v8_health_check.py` | +127/-1 | ✅ 阈值叠加根治（含「昨日午间数据在今日盘前批前被判 fail 满屏红」） |
+| `guard_v8_freshness.py` | +7/-4 | ✅ 补注 LHB_7D 退役，`FROZEN_SOURCES` 口径一致 |
+| `raw_data/factor_lab_backtest.json` | +524/-85 | ✅ 说明修复后**真跑通并产出了数据** |
+| `logic.html` / `v8_deploy_guard.py` / `api_push_raw.py` | 小改 | 死文档/死引用摘除 |
+
+**实证（消费端真值）**：线上 `data/FACTOR_LAB_BACKTEST.js` `update_time = 2026-09-15 09:51:47` ⇒ 已从「停在 09-12」转为当日新鲜。
+
+⇒ **处置**：本机原定 16:40 的「修三符号 + 清 LHB_7D」任务（`928f903f`）**目标已被覆盖**，若照旧执行将构成**二次修改甚至回退他人修复**（踩踏）。
+已将其**改为只复核、不改文件**（含「禁止改 `factor_lab_backtest.py` / 禁止复活 `data/LHB_7D.js`」的硬约束）。
+
+🔴 **流程铁律（新增）**：**动手修红灯前，先查当日是否已有他人提交覆盖同一目标**——
+`GET /actions/runs` 看当日提交 + `show_commit.py <sha>` 看变更文件清单。本项目多会话并联，
+「诊断时的缺口」到「动手时」可能已被另一会话补齐。
+
+### 8.3 ✅ 主人点名项：前端更新任务不能断 —— 审计通过
+
+**生产端（今日盘中节奏）**：
+
+| 链 | 今日盘中次数 | 节奏 | 断档 |
+|---|---|---|---|
+| 🇨🇳 中国数据抓取(云端) | 23 次（09:16→11:30） | 每 7–8 分钟 | ✅ **无**（09:32→11:30 连续 20 次 success） |
+| 📈 STOCK_QUOTE 轻量 refresh(云端兜底) | 17 次（09:27→11:30） | 每 7–8 分钟 | ✅ **无** |
+| 🌍 实时风险温度计 | 3 次（08:49 / 10:22 / 12:31） | — | ✅ |
+| ☁️ 构建部署 | 12:18 / 12:25 / 12:31 三连 success | — | ✅（修复后） |
+| 🛡️ 缓存戳实时对齐 | 每 ~10 分钟 success | — | ✅ |
+
+（`cancelled` 全部成对出现且紧随 success ⇒ 正常并发取消，非故障。）
+
+**消费端（线上实时卡 update_time 真值）**：INDEX_QUOTES 11:33:18 / SECTOR_FUND_FLOW 11:32:17 /
+CONCEPT_RANKING 11:33:19 / MARKET_ALERTS 11:39:29 / ETF_PULSE 11:37:34 / ETF_INTRADAY_HEAT 11:32:13 /
+LIMIT_UP_HEATMAP 11:36:49 / AVG_PRICE_DATA 11:33:17 / MARKET_FUND_FLOW_DATA 11:36:53 —— **全部落在盘中最后一轮** ⇒ 前端盘中确在更新 ✅
+
+### 8.4 ✅ 挂链完整性（主人令「算法链别漏了」）——复述结论
+
+`ORDER` ⇄ `STAGES` 并集 **51 == 51**、51 个脚本文件全存在、超时预算无孤儿、四量两脚本挂链齐全、
+已停跑脚本无残留挂链。**另核**：`update_v8.py` 四量映射
+（`four_volume_history.json → FOUR_VOLUME_HISTORY`、`four_volume_track.json → FOUR_VOLUME_TRACK`，均 `post_close`）
+与本批两占位文件的变量名**逐字一致** ⇒ 当晚 B 批产出真 raw 后会被正常构建覆盖为真实数据。
