@@ -622,7 +622,9 @@
         return d;
       }
     }
-    var d2 = new Date(s.replace('T',' ').replace(/-/g,'/'));
+    var _norm = s.replace('T',' ').replace(/-/g,'/');
+    if(/\d{1,2}:\d{2}/.test(_norm) && !/[Zz]|[+-]\d{2}:?\d{2}$/.test(_norm)) _norm += '+08:00';
+    var d2 = new Date(_norm);
     return isNaN(d2.getTime()) ? null : d2;
   };
   window._fmtHmCST = function(d){
@@ -6188,7 +6190,7 @@ function showRestrictedItems(windowKey){
   if(!$tbl) return;
   let todayStr;
   if(window._cstParts){ const p = window._cstParts(new Date()); todayStr = p.y + '-' + String(p.m).padStart(2,'0') + '-' + String(p.d).padStart(2,'0'); }
-  else { todayStr = new Date().toISOString().slice(0,10); }
+  else { todayStr = window._fmtDateCST ? window._fmtDateCST(new Date()) : new Date().toISOString().slice(0,10); }
   const days = {d7:7, d30:30, d60:60, d90:90}[windowKey];
   const label = {d7:'7天内', d30:'30天内', d60:'60天内', d90:'90天内'}[windowKey];
   const future = d.items.filter(it => String(it.date) > todayStr).slice().sort((a,b) => String(a.date).localeCompare(String(b.date)));
@@ -6261,7 +6263,7 @@ window.showRestrictedItems = showRestrictedItems;
       const p=window._cstParts(new Date());
       todayStr=p.y+'-'+String(p.m).padStart(2,'0')+'-'+String(p.d).padStart(2,'0');
     }else{
-      todayStr=new Date().toISOString().slice(0,10);
+      todayStr=window._fmtDateCST ? window._fmtDateCST(new Date()) : new Date().toISOString().slice(0,10);
     }
     const todayItems=d.items.filter(it=>it.date===todayStr);
     const stats=d.stats||{};
@@ -6344,7 +6346,7 @@ window.showRestrictedItems = showRestrictedItems;
       const p=window._cstParts(new Date());
       todayStr=p.y+'-'+String(p.m).padStart(2,'0')+'-'+String(p.d).padStart(2,'0');
     }else{
-      todayStr=new Date().toISOString().slice(0,10);
+      todayStr=window._fmtDateCST ? window._fmtDateCST(new Date()) : new Date().toISOString().slice(0,10);
     }
     const stats=d.stats||{};
     let h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">';
