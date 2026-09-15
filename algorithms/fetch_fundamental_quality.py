@@ -117,6 +117,54 @@ def query_operation(bsc):
         return None
 
 
+def _fval(x):
+    """安全 float 解析（空串/None/异常 → None）"""
+    try:
+        if x is None or str(x).strip() == "":
+            return None
+        return float(x)
+    except Exception:
+        return None
+
+
+def query_cash_quality(bsc):
+    """S4: 经营现金流/总资产（CFO/A）推导（2026-09-15 主人令 T0）。
+    baostock 只提供比率不提供原始值 → CFO/A = CFOToOR × dupontAssetTurn（同报告期、非年化）。
+    返回 dict（恒含 cf_queried 标记，供缓存判据用，避免无数据股每轮重查）：
+      命中: {"cfo_to_asset": xx.xx, "cfo_to_or": xx.xx, "asset_turn": xx.xx, "statDate": ..., "source": ..., "cf_queried": True}
+      未命中: {"cfo_to_asset": None, "cf_queried": True}
+    """
+    try:
+        this_year = datetime.now().year
+        for y in range(this_year, this_year - 2, -1):
+            for q in [4, 2]:
+                rs_c = bs.query_cash_flow_data(code=bsc, year=y, quarter=q)
+                if rs_c.error_code == "0" and rs_c.next():
+                    row_c = dict(zip(rs_c.fields, rs_c.get_row_data()))
+                    cfo_or = _fval(row_c.get("CFOToOR"))
+                    at = None
+                    try:
+                        rs_d = bs.query_dupont_data(code=bsc, year=y, quarter=q)
+                        if rs_d.error_code == "0" and rs_d.next():
+                            at = _fval(dict(zip(rs_d.fields, rs_d.get_row_data())).get("dupontAssetTurn"))
+                    except Exception:
+                        at = None
+                    if cfo_or is not None and at is not None:
+                        return {
+                            "cfo_to_asset": round(cfo_or * at * 100, 2),
+                            "cfo_to_or": round(cfo_or, 4),
+                            "asset_turn": round(at, 4),
+                            "statDate": row_c.get("statDate"),
+                            "source": "baostock_cashflow_x_dupont",
+                            "cf_queried": True,
+                        }
+                    # 有财报期但缺比率 → 视为已查无数据（不再重试该股，防每轮重查风暴）
+                    return {"cfo_to_asset": None, "cf_queried": True, "source": "baostock_cashflow_missing"}
+        return {"cfo_to_asset": None, "cf_queried": True}
+    except Exception:
+        return {"cfo_to_asset": None, "cf_queried": True}
+
+
 def calc_quality(roe, eps, revenue_growth):
     """根据 ROE/营收增速/PE/PB 计算质量分"""
     score = 0
@@ -350,10 +398,14 @@ def main():
     done = 0
     t0 = time.time()
 
-    def _classify(roe_val, rg_val, raw_code):
+    def _classify(roe_val, rg_val, raw_code, cfa_val=None):
         """算 quality、挂消息面、累加评级计数，返回 quality dict"""
         nonlocal total_a, total_b, total_c, total_d, total_nodata
         quality = calc_quality(roe_val, None, rg_val)
+        # CFO/A 透传（缓存路径；worker 路径由 worker 自带）
+        if cfa_val is not None:
+            quality["cfo_to_asset"] = cfa_val
+        quality["cf_queried"] = True
         pure = str(raw_code).replace("sh_", "").replace("sz_", "").strip()
         nw = news_signals.get(pure)
         if nw:
@@ -378,8 +430,10 @@ def main():
             done += 1
             continue
         cached = cache.get(raw_code, {})
-        if cached.get("roe") is not None or cached.get("revenue_growth") is not None:
-            results[raw_code] = _classify(cached.get("roe"), cached.get("revenue_growth"), raw_code)
+        # 🔴 2026-09-15 T0：缓存命中额外要求 cf_queried 标记 → 存量缓存(无 CFO/A)一次性刷新重查
+        if (cached.get("roe") is not None or cached.get("revenue_growth") is not None) and cached.get("cf_queried"):
+            results[raw_code] = _classify(cached.get("roe"), cached.get("revenue_growth"), raw_code,
+                                          cached.get("cfo_to_asset"))
             done += 1
         else:
             to_query.append(raw_code)
@@ -445,11 +499,14 @@ def main():
             if raw_code.startswith("hk_"):
                 continue
             c = cache.get(raw_code, {})
-            if c.get("roe") is not None or c.get("revenue_growth") is not None:
+            # 与上方缓存命中判据保持同一口径（cf_queried），否则双重计数
+            if (c.get("roe") is not None or c.get("revenue_growth") is not None) and c.get("cf_queried"):
                 cache_hit.add(raw_code)
         for raw_code, q in results.items():
             if raw_code in cache_hit:
                 continue  # 已是缓存命中分类过的（含 news），跳过
+            if raw_code.startswith("hk_"):
+                continue  # 🔴 09-15 修复：港股已在预循环计数过，此处再计即 grade_summary 双重计数
             g = q.get("grade", "")
             if g == "A": total_a += 1
             elif g == "B": total_b += 1
