@@ -1,18 +1,18 @@
 {
-  "update_time": "2026-09-15 20:19:15",
+  "update_time": "2026-09-15 23:16:02",
   "data_time": "2026-09-15 15:30:00",
   "total_scanned": 774,
   "scan_stats": {
     "candidates": 777,
     "succeeded": 774,
     "failed": 3,
-    "kline_source_used": "腾讯gtimg(主源 777/774 只)",
-    "elapsed_sec": 136.4,
-    "throughput_per_sec": 5.7,
-    "cache_fresh": 1,
+    "kline_source_used": "本地缓存(主源 770/774 只)",
+    "elapsed_sec": 141.3,
+    "throughput_per_sec": 5.5,
+    "cache_fresh": 770,
     "cache_miss": 7,
-    "cache_stale": 769,
-    "net_tx": 777,
+    "cache_stale": 0,
+    "net_tx": 8,
     "net_mootdx": 0,
     "net_em": 0,
     "kline_fail": 3,
@@ -451,11 +451,6 @@
     {
       "code": "002837",
       "name": "英维克",
-      "board_label": "主板"
-    },
-    {
-      "code": "600176",
-      "name": "中国巨石",
       "board_label": "主板"
     },
     {
@@ -1616,6 +1611,11 @@
     {
       "code": "600172",
       "name": "黄河旋风",
+      "board_label": "主板"
+    },
+    {
+      "code": "600176",
+      "name": "中国巨石",
       "board_label": "主板"
     },
     {
@@ -2719,12 +2719,6 @@
       "enter_date": "2026-09-15"
     },
     {
-      "code": "600176",
-      "name": "中国巨石",
-      "score": 0,
-      "enter_date": "2026-09-15"
-    },
-    {
       "code": "601099",
       "name": "太平洋",
       "score": 0,
@@ -3937,6 +3931,12 @@
       "enter_date": "2026-09-15"
     },
     {
+      "code": "600176",
+      "name": "中国巨石",
+      "score": 0,
+      "enter_date": "2026-09-15"
+    },
+    {
       "code": "600227",
       "name": "赤天化",
       "score": 0,
@@ -4916,21 +4916,6 @@
       "market_label": "sz",
       "board_label": "主板"
     },
-    "300454": {
-      "name": "深信服科技",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.45,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
     "300979": {
       "name": "300979",
       "score": 0,
@@ -4975,21 +4960,6 @@
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
-    },
-    "600176": {
-      "name": "中国巨石",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.56,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "主板"
     },
     "600406": {
       "name": "国电南瑞",
@@ -8411,6 +8381,21 @@
       "market_label": "sz",
       "board_label": "创业板"
     },
+    "300454": {
+      "name": "深信服科技",
+      "score": 0,
+      "conds": 0,
+      "cond1": false,
+      "cond2": false,
+      "cond3": false,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.45,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
     "300456": {
       "name": "赛微电子",
       "score": 0,
@@ -11482,6 +11467,21 @@
       "zt_down_count": 1,
       "af_peak": 11.6,
       "vr_peak": 1.75,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
+    "600176": {
+      "name": "中国巨石",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.56,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"

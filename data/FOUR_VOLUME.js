@@ -1,15 +1,15 @@
 window.FOUR_VOLUME={
- "update_time": "2026-09-15 06:45:24",
- "total": 6,
+ "update_time": "2026-09-15 23:24:15",
+ "total": 3,
  "stocks": [
   {
-   "code": "300657",
-   "name": "弘信电子",
+   "code": "300905",
+   "name": "宝丽迪",
    "market": "sz",
    "board_label": "创业板",
-   "close": 37.73,
-   "pct_chg": 10.06,
-   "turnover_rate": 12.12,
+   "close": 40.55,
+   "pct_chg": 15.53,
+   "turnover_rate": 17.55,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -18,62 +18,6 @@ window.FOUR_VOLUME={
     "广度翻多": true,
     "主力动量翻多": true,
     "机构金叉": true,
-    "散户金叉": false,
-    "主力金叉": true
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-   "signal_date": "2026-09-14",
-   "enter_date": "2026-09-14"
-  },
-  {
-   "code": "300568",
-   "name": "星源材质",
-   "market": "sz",
-   "board_label": "创业板",
-   "close": 15.32,
-   "pct_chg": 6.39,
-   "turnover_rate": 7.23,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": false,
-    "散户金叉": false,
-    "主力金叉": false
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
-   "signal_date": "2026-09-14",
-   "enter_date": "2026-09-14"
-  },
-  {
-   "code": "300454",
-   "name": "深信服",
-   "market": "sz",
-   "board_label": "创业板",
-   "close": 134.26,
-   "pct_chg": 4.96,
-   "turnover_rate": 6.88,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": false,
     "散户金叉": true,
     "主力金叉": true
    },
@@ -82,46 +26,18 @@ window.FOUR_VOLUME={
    "xc": true,
    "four": true,
    "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉 + 主力金叉",
-   "signal_date": "2026-09-14",
-   "enter_date": "2026-09-14"
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 散户金叉 + 主力金叉",
+   "signal_date": "2026-09-15",
+   "enter_date": "2026-09-15"
   },
   {
-   "code": "300037",
-   "name": "新宙邦",
+   "code": "000981",
+   "name": "山子高科",
    "market": "sz",
-   "board_label": "创业板",
-   "close": 73.02,
-   "pct_chg": 2.08,
-   "turnover_rate": 3.13,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": true,
-    "散户金叉": false,
-    "主力金叉": false
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉",
-   "signal_date": "2026-09-14",
-   "enter_date": "2026-09-14"
-  },
-  {
-   "code": "600410",
-   "name": "华胜天成",
-   "market": "sh",
    "board_label": "主板",
-   "close": 15.63,
-   "pct_chg": 1.36,
-   "turnover_rate": 20.59,
+   "close": 3.02,
+   "pct_chg": 5.96,
+   "turnover_rate": 15.74,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -139,17 +55,17 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
-   "signal_date": "2026-09-14",
-   "enter_date": "2026-09-14"
+   "signal_date": "2026-09-15",
+   "enter_date": "2026-09-15"
   },
   {
-   "code": "301526",
-   "name": "国际复材",
-   "market": "sz",
-   "board_label": "创业板",
-   "close": 30.85,
-   "pct_chg": 0.52,
-   "turnover_rate": 13.34,
+   "code": "688090",
+   "name": "瑞松科技",
+   "market": "sh",
+   "board_label": "科创板",
+   "close": 77.55,
+   "pct_chg": 5.83,
+   "turnover_rate": 6.35,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -159,16 +75,16 @@ window.FOUR_VOLUME={
     "主力动量翻多": true,
     "机构金叉": false,
     "散户金叉": false,
-    "主力金叉": true
+    "主力金叉": false
    },
    "yzc": true,
    "jg": true,
    "xc": true,
    "four": true,
    "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 主力金叉",
-   "signal_date": "2026-09-14",
-   "enter_date": "2026-09-14"
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+   "signal_date": "2026-09-15",
+   "enter_date": "2026-09-15"
   }
  ]
 };
