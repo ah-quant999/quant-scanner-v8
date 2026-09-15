@@ -217,15 +217,20 @@ window.__domReadyFns=[];
 
   /* ===== 涨停热力矩阵（暗色主题） ===== */
   .limit-up-content{overflow-x:auto;font-size:11px;line-height:1.5}
-  .limit-up-content table{width:100%;min-width:360px;table-layout:fixed;border-collapse:separate;border-spacing:0}
+  .limit-up-content table{width:100%;min-width:420px;table-layout:fixed;border-collapse:separate;border-spacing:0}
   .limit-up-content th{padding:5px 2px;text-align:center;font-weight:500;color:var(--dim);font-size:10px;border-bottom:1px solid var(--border2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .limit-up-content th:first-child{width:92px;min-width:92px;text-align:left;padding-left:6px}
+  /* 🔁 2026-09-15 主人令：新增首列「启动」日期列（窄·居中），板块名列后移为第 2 列 */
+  .limit-up-content th:first-child{width:58px;min-width:58px;text-align:center;padding-left:2px}
+  .limit-up-content th:nth-child(2){width:92px;min-width:92px;text-align:left;padding-left:6px}
   .limit-up-content th:nth-last-child(2){width:46px;min-width:46px}
   .limit-up-content th:last-child{width:38px;min-width:38px}
   .limit-up-content td{padding:4px 2px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap;overflow:hidden}
-  .limit-up-content td:first-child{width:92px;min-width:92px;text-align:left;padding-left:6px;color:var(--txt);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .limit-up-content td:first-child{width:58px;min-width:58px;text-align:center;padding-left:2px;font-variant-numeric:tabular-nums;font-size:10px;color:var(--gold);font-weight:700}
+  .limit-up-content td:nth-child(2){width:92px;min-width:92px;text-align:left;padding-left:6px;color:var(--txt);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .limit-up-content td:nth-last-child(2){width:46px;min-width:46px}
   .limit-up-content td:last-child{width:38px;min-width:38px}
+  /* 🎋 首列「≤MM/DD」＝启动日早于观测窗口（真实启动更早，不编造确切日） */
+  .limit-up-content td.lu-start-open{color:#94a3b8;font-weight:600}
   .limit-up-content .lu-total{color:var(--gold);font-weight:700}
   .limit-up-content .lu-trend{font-size:12px;font-weight:700}
   .limit-up-content .lu-ignite{box-shadow:inset 0 0 0 2px var(--gold);border-radius:4px}
@@ -233,6 +238,26 @@ window.__domReadyFns=[];
   .limit-up-legend span{padding:2px 6px;border-radius:3px}
   .limit-up-legend .lu-legend-ignite{border:2px solid var(--gold);padding:1px 6px}
   .limit-up-analysis{font-size:12px;line-height:1.7;margin-bottom:10px;padding:8px 10px;background:var(--bg2);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;color:var(--sub)}
+  .limit-up-analysis b{color:var(--txt)}
+  .lu-h0{background:transparent;color:var(--dim)}
+  .lu-h1{background:rgba(198,40,40,.12);color:#ff8a80}
+  .lu-h2{background:rgba(198,40,40,.28);color:#ff5252;font-weight:600}
+  .lu-h3{background:rgba(198,40,40,.48);color:#fff;font-weight:700}
+  .lu-h4{background:rgba(198,40,40,.68);color:#fff;font-weight:700}
+  .lu-h5{background:rgba(198,40,40,.88);color:#fff;font-weight:700}
+  /* 🌊 2026-09-15 主人令：退潮日标注（青蓝冷色，与金色「启动日」一眼区分）——
+       前一日仍 ≥3 只涨停、当日骤降到 ≤1 ⇒ 这天是这轮热度的退潮日。
+       退潮标记只保留 5 个交易日，之后自动退出（不长期挂着误导）。 */
+  .limit-up-content .lu-ebb{box-shadow:inset 0 0 0 2px #38bdf8;border-radius:4px}
+  .limit-up-legend .lu-legend-ebb{border:2px solid #38bdf8;color:#7dd3fc;padding:1px 6px}
+  /* 🗂 卡底「历史折叠」（2026-09-15 主人令：让历史可查） */
+  .lu-fold-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);
+    background:var(--bg2);color:var(--sub);font-size:12px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit}
+  .lu-fold-btn:hover{border-color:var(--cyan);color:var(--txt)}
+  .lu-history{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border2)}
+  .lu-history th,.lu-history td{opacity:.92}
+
+  /* ===== 板块资金三合一（v6 风格暗色移植） ===== */
   .limit-up-analysis b{color:var(--txt)}
   .lu-h0{background:transparent;color:var(--dim)}
   .lu-h1{background:rgba(198,40,40,.12);color:#ff8a80}
@@ -2360,11 +2385,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
     <div id="cycleLadderCard" style="margin-bottom:12px;"></div>
 
-    <!-- 涨停热力矩阵（整行宽度） -->
+    <!-- 涨停热力矩阵（整行宽度）
+         🌡 2026-09-15 主人令（六项）：卡名去掉旧「近15日」口径 → 主表固定展示最近 20 个交易日（≈一个月）；
+              首列新增「启动」日期（早于 20 日窗口启动的板块在此写出）；退潮日标注（保留 5 个交易日）；
+              排序改为连续热度降序；卡底新增「历史折叠」，更早交易日全部收纳其中。 -->
     <div class="card" id="limitUpHeatCard" style="margin-bottom:16px">
-      <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近15日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">—</span></h3>
+      <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近20日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">—</span></h3>
       <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
       <div id="limitUpHeatContent" class="limit-up-content">加载中…</div>
+      <div id="limitUpHeatHistWrap" style="display:none;margin-top:10px;">
+        <button type="button" id="limitUpHeatHistBtn" class="lu-fold-btn">🗂 展开历史矩阵</button>
+        <div id="limitUpHeatHistory" class="limit-up-content lu-history" style="display:none"></div>
+      </div>
     </div>
 
     <!-- ETF 二合一（盘中异动 + 主力净额分时，纵向双联）
@@ -8816,61 +8848,159 @@ function renderLimitUpHeatmap(){
     timeEl.innerHTML = _uBadge(_premkt?'盘前':'盘中','短线',data.update_time);
   }
 
+  /* ── 口径常量（2026-09-15 主人令，全函数唯一来源，勿散落硬编码）── */
+  var SHOW_DAYS = 20;   /* ① 主表窗口：最近 20 个交易日 ≈ 一个月 */
+  var EBB_KEEP  = 5;    /* ② 退潮标注只保留 5 个交易日，之后自动退出 */
+  var HOT_MIN   = 2;    /* 「有热度」阈值：当日该板块 ≥2 只涨停 */
+  var EBB_FROM  = 3;    /* 退潮前置条件：前一日 ≥3 只（确属热点）才谈得上退潮 */
+
   function isIgnite(sectorData,idx){
-    if(idx===0) return sectorData[0]>=2;
-    return sectorData[idx]>=2 && sectorData[idx-1]===0;
+    if(idx===0) return sectorData[0]>=HOT_MIN;
+    return sectorData[idx]>=HOT_MIN && sectorData[idx-1]===0;
+  }
+  /* ③ 退潮日：前一日仍 ≥EBB_FROM（热点）→ 当日 ≤1（热度散去）。
+       且距最新列 ≤EBB_KEEP 个交易日 —— 超过 5 日的退潮标记自动「退出」，不再占视觉。 */
+  function isEbb(sectorData,idx){
+    if(idx<1) return false;
+    if((sectorData.length-1-idx) > EBB_KEEP) return false;
+    return (sectorData[idx-1]||0)>=EBB_FROM && (sectorData[idx]||0)<=1;
+  }
+  /* ④ 连续热度：从最新一日往前数，连续 ≥HOT_MIN 的天数（主人令：连续热度最高的排最上方） */
+  function hotStreak(d){
+    var k=0;
+    for(var i=d.length-1;i>=0;i--){ if((d[i]||0)>=HOT_MIN) k++; else break; }
+    return k;
+  }
+  function sumRange(d,a,b){
+    var t=0; a=Math.max(0,a); b=Math.min(d.length,b);
+    for(var i=a;i<b;i++) t+=(d[i]||0);
+    return t;
+  }
+  function totalOf(d){ return sumRange(d,0,d.length); }
+
+  /* ⑥ 本轮启动日：优先取数据侧 sector_start（跨窗口累积，含被滚出的历史）；
+        数据侧缺省时退化为「从当前窗口找最后一次启动点」，首列即活跃则记「早于窗口」。 */
+  var _startMap={};
+  (function(){
+    var raw=(data.sector_start && typeof data.sector_start==='object') ? data.sector_start : {};
+    for(var k in raw){ if(Object.prototype.hasOwnProperty.call(raw,k)) _startMap[k]=String(raw[k]); }
+    for(var si=0;si<_displaySectors.length;si++){
+      var nm=_displaySectors[si].name, d=_displaySectors[si].data;
+      if(_startMap[nm]) continue;
+      var hit=null;
+      for(var i=d.length-1;i>=1;i--){ if((d[i]||0)>=HOT_MIN && (d[i-1]||0)===0){ hit=_displayDates[i]; break; } }
+      if(hit) _startMap[nm]=hit;
+      else if((d[0]||0)>=HOT_MIN && _displayDates.length) _startMap[nm]='~'+_displayDates[0];
+    }
+  })();
+  /* 只在「启动日早于当前展示窗口」时写首列；窗口内的启动点矩阵本身就能看到，不重复占位。
+     '~' 前缀＝真实启动早于观测起点，渲染为「≤MM/DD」（诚实标注，不编造确切日）。 */
+  function startLabel(name, startIdx){
+    var s=_startMap[name];
+    if(!s) return '';
+    var open=(s.charAt(0)==='~'), dstr=open?s.slice(1):s;
+    var pos=_displayDates.indexOf(dstr);
+    if(pos>=0 && pos>=startIdx) return '';
+    return open ? ('≤'+dstr) : dstr;
   }
 
   const sorted=_displaySectors.slice().sort(function(a,b){
-    return b.data.reduce(function(s,n){return s+n;},0) - a.data.reduce(function(s,n){return s+n;},0);
+    var sa=hotStreak(a.data), sb=hotStreak(b.data);
+    if(sb!==sa) return sb-sa;                                             /* ① 连续热度降序（主人令） */
+    var ra=sumRange(a.data,a.data.length-5,a.data.length), rb=sumRange(b.data,b.data.length-5,b.data.length);
+    if(rb!==ra) return rb-ra;                                             /* ② 近5日累计降序 */
+    return totalOf(b.data)-totalOf(a.data);                               /* ③ 全窗口累计降序 */
   });
   // 🛡 2026-08-30：涨停热力"其他"桶为汇总口径(非单一主线)，不参与主线排序，固定沉底并标注
   var _oi=sorted.findIndex(function(s){return s.name==='其他';});
   if(_oi>=0){ var _o=sorted.splice(_oi,1)[0]; sorted.push(_o); }
 
-  let h='<table><thead><tr><th>板块</th>';
-  for(let di=0;di<_displayDates.length;di++){
-    h+='<th>'+_displayDates[di].split('/').pop()+'</th>';
-  }
-  h+='<th>合</th><th>势</th></tr></thead><tbody>';
-
-  for(let s=0;s<sorted.length;s++){
-    const sector=sorted[s];
-    const total=sector.data.reduce(function(sum,n){return sum+n;},0);
-    if(total===0) continue; // 全0行隐藏，减少视觉噪音
-    var _isOther=sector.name==='其他';
-    h+='<tr'+( _isOther?' style="opacity:.7"':'')+'><td>'+sector.name+(_isOther?' <span style="font-size:9px;color:var(--dim)">(汇总·非主线)</span>':'')+'</td>';
-    for(let j=0;j<sector.data.length;j++){
-      const val=sector.data[j];
-      const ignite=isIgnite(sector.data,j)?' lu-ignite':'';
-      const cls=val>=8?'lu-h5':val>=5?'lu-h4':val>=3?'lu-h3':val>=2?'lu-h2':val>=1?'lu-h1':'lu-h0';
-      h+='<td class="'+cls+ignite+'">'+(val===0?'·':val)+'</td>';
+  /* 渲染矩阵表：startIdx 为「相对全量日期数组」的起始列。
+       主表 startIdx = 总列数-20（只看最近 20 个交易日）；历史折叠区 startIdx = 0（全量）。 */
+  function buildTable(startIdx, opts){
+    opts=opts||{};
+    var showDates=_displayDates.slice(startIdx);
+    var h='<table style="min-width:'+(148+showDates.length*34)+'px">';
+    h+='<thead><tr><th>启动</th><th>板块</th>';
+    for(var di=0;di<showDates.length;di++){
+      h+='<th>'+showDates[di].split('/').pop()+'</th>';
     }
-    h+='<td class="lu-total">'+total+'</td>';
-    const r3=sector.data.slice(-3).reduce(function(s,n){return s+n;},0);
-    const p3=sector.data.slice(-6,-3).reduce(function(s,n){return s+n;},0);
-    const tr=r3>p3*1.5?'↑':r3<p3*0.5?'↓':r3>=p3?'→':'↘';
-    const tColor=tr==='↑'?'var(--up)':tr==='↓'?'var(--down)':'var(--dim)';
-    h+='<td class="lu-trend" style="color:'+tColor+'">'+tr+'</td></tr>';
+    h+='<th>合</th><th>势</th></tr></thead><tbody>';
+
+    for(var s=0;s<sorted.length;s++){
+      var sector=sorted[s];
+      var full=sector.data;
+      var view=full.slice(startIdx);
+      var total=totalOf(view);
+      if(total===0) continue;   // 全0行隐藏，减少视觉噪音
+      var _isOther=sector.name==='其他';
+      var _sl=startLabel(sector.name, startIdx);
+      h+='<tr'+( _isOther?' style="opacity:.7"':'')+'>';
+      h+='<td class="lu-start'+(_sl && _sl.charAt(0)==='≤' ? ' lu-start-open' : '')+'"'+(opts.tip?(' title="'+esc(opts.tip)+'"'):'')+'>'+(_sl||'·')+'</td>';
+      h+='<td>'+sector.name+(_isOther?' <span style="font-size:9px;color:var(--dim)">(汇总·非主线)</span>':'')+'</td>';
+      for(var j=startIdx;j<full.length;j++){
+        var val=full[j];
+        var cls=val>=8?'lu-h5':val>=5?'lu-h4':val>=3?'lu-h3':val>=2?'lu-h2':val>=1?'lu-h1':'lu-h0';
+        var mark=isIgnite(full,j)?' lu-ignite':(isEbb(full,j)?' lu-ebb':'');
+        h+='<td class="'+cls+mark+'">'+(val===0?'·':val)+'</td>';
+      }
+      h+='<td class="lu-total">'+total+'</td>';
+      var r3=sumRange(view,view.length-3,view.length), p3=sumRange(view,view.length-6,view.length-3);
+      var tr=r3>p3*1.5?'↑':r3<p3*0.5?'↓':r3>=p3?'→':'↘';
+      var tColor=tr==='↑'?'var(--up)':tr==='↓'?'var(--down)':'var(--dim)';
+      h+='<td class="lu-trend" style="color:'+tColor+'">'+tr+'</td></tr>';
+    }
+    h+='</tbody></table>';
+    return h;
   }
-  h+='</tbody></table>';
-  h+='<div class="limit-up-legend">';
-  h+='<span>热度→</span>';
-  h+='<span class="lu-h1">1</span>';
-  h+='<span class="lu-h2">2</span>';
-  h+='<span class="lu-h3">3-4</span>';
-  h+='<span class="lu-h4">5-7</span>';
-  h+='<span class="lu-h5">≥8</span>';
-  h+='<span style="color:var(--dim)">|</span><span class="lu-legend-ignite">启动日</span></div>';
-  contentEl.innerHTML=h;
+
+  var _legend='<div class="limit-up-legend">'
+    +'<span>热度→</span>'
+    +'<span class="lu-h1">1</span><span class="lu-h2">2</span><span class="lu-h3">3-4</span>'
+    +'<span class="lu-h4">5-7</span><span class="lu-h5">≥8</span>'
+    +'<span style="color:var(--dim)">|</span><span class="lu-legend-ignite">启动日</span>'
+    +'<span class="lu-legend-ebb">退潮日（保留 5 个交易日）</span>'
+    +'<span style="color:var(--dim)">|</span><span>排序：连续热度降序</span>'
+    +'</div>';
+
+  var _startIdx=Math.max(0, _displayDates.length-SHOW_DAYS);
+  contentEl.innerHTML=buildTable(_startIdx)+_legend;
   card.style.display='block';
+
+  /* ③ 卡底「历史折叠」：主表只展示最近 20 个交易日，更早的交易日全部收纳于此，
+        默认折叠，点开即可回查（主人令：让历史可查）。 */
+  var _histWrap=document.getElementById('limitUpHeatHistWrap');
+  var _histBtn=document.getElementById('limitUpHeatHistBtn');
+  var _histEl=document.getElementById('limitUpHeatHistory');
+  if(_histWrap && _histBtn && _histEl){
+    if(_displayDates.length>SHOW_DAYS){
+      _histEl.innerHTML=buildTable(0);
+      _histWrap.style.display='block';
+      var _foldTxt=function(open){
+        return (open?'🗂 收起历史矩阵（':'🗂 展开历史矩阵（')
+             +'共 '+_displayDates.length+' 个交易日，默认只看最近 '+SHOW_DAYS+' 日）';
+      };
+      _histBtn.innerHTML=_foldTxt(false);
+      if(!_histBtn.__v8LuhBound){
+        _histBtn.__v8LuhBound=true;
+        _histBtn.addEventListener('click',function(){
+          var open=(_histEl.style.display==='none' || !_histEl.style.display);
+          _histEl.style.display=open?'block':'none';
+          _histBtn.innerHTML=_foldTxt(open);
+        });
+      }
+    }else{
+      _histWrap.style.display='none';
+    }
+  }
 
   if(!analysisEl) return;
   const analysis=[];
+  const _viewOf=function(sec){ return sec.data.slice(_startIdx); };
   const sustained=[];
   for(let si=0;si<sorted.length;si++){
     if(sorted[si].name==='其他') continue;
-    const sd=sorted[si].data;
+    const sd=_viewOf(sorted[si]);
     let streak=0,ms=0;
     for(let di2=0;di2<sd.length;di2++){ if(sd[di2]>=3){ streak++; if(streak>ms) ms=streak; } else streak=0; }
     if(ms>=2) sustained.push({name:sorted[si].name,days:ms});
@@ -8880,27 +9010,38 @@ function renderLimitUpHeatmap(){
   const ni=[];
   for(let si2=0;si2<sorted.length;si2++){
     if(sorted[si2].name==='其他') continue;
-    const sd2=sorted[si2].data;
-    if(sd2.slice(0,sd2.length-3).reduce(function(s,n){return s+n;},0)<=1 && sd2.slice(-3).reduce(function(s,n){return s+n;},0)>=4)
+    const sd2=_viewOf(sorted[si2]);
+    if(sumRange(sd2,0,sd2.length-3)<=1 && sumRange(sd2,sd2.length-3,sd2.length)>=4)
       ni.push(sorted[si2].name);
   }
   if(ni.length) analysis.push('⚡ <b>新启动：</b>'+ni.join('、')+' — 前期沉寂近期爆发');
 
   const cl=[];
   for(let si3=0;si3<sorted.length;si3++){
-    const sd3=sorted[si3].data;
+    const sd3=_viewOf(sorted[si3]);
     const hlen=Math.ceil(sd3.length/2);
-    if(sd3.slice(0,hlen).reduce(function(s,n){return s+n;},0)>=8 && sd3.slice(hlen).reduce(function(s,n){return s+n;},0)<=2)
+    if(sumRange(sd3,0,hlen)>=8 && sumRange(sd3,hlen,sd3.length)<=2)
       cl.push(sorted[si3].name);
   }
   if(cl.length) analysis.push('❄️ <b>热度消退：</b>'+cl.join('、')+' — 前期热闹近期熄火');
 
-  const ti=_displayDates.length-1;
-  const tt=sorted.slice().sort(function(a,b){return b.data[ti]-a.data[ti];}).slice(0,3);
-  if(tt[0].data[ti]>0) analysis.push('📊 <b>今日最强：</b>'+tt.map(function(x){return x.name+' '+x.data[ti]+'只涨停';}).join('、'));
+  /* ③ 退潮（新增）：前一日还是热点、当日骤降到 ≤1；只报 5 个交易日内的，与矩阵标注同口径 */
+  const ebbNow=[];
+  for(let se=0;se<sorted.length;se++){
+    if(sorted[se].name==='其他') continue;
+    const de=sorted[se].data;
+    for(let q=Math.max(1,de.length-1-EBB_KEEP);q<de.length;q++){
+      if(isEbb(de,q)){ ebbNow.push({name:sorted[se].name, day:_displayDates[q]}); break; }
+    }
+  }
+  if(ebbNow.length) analysis.push('🌊 <b>退潮：</b>'+ebbNow.map(function(x){return x.name+'（'+x.day+' 起熄火）';}).join('、')+' — 热度散去，短线不宜追高');
 
-  const td=sorted.reduce(function(s,sec){return s+sec.data[ti];},0);
-  const pd=sorted.reduce(function(s,sec){return s+sec.data[Math.max(0,ti-3)];},0);
+  const ti=_displayDates.length-1;
+  const tt=sorted.slice().sort(function(a,b){return (b.data[ti]||0)-(a.data[ti]||0);}).slice(0,3);
+  if((tt[0].data[ti]||0)>0) analysis.push('📊 <b>今日最强：</b>'+tt.map(function(x){return x.name+' '+x.data[ti]+'只涨停';}).join('、'));
+
+  const td=sorted.reduce(function(s,sec){return s+(sec.data[ti]||0);},0);
+  const pd=sorted.reduce(function(s,sec){return s+(sec.data[Math.max(0,ti-3)]||0);},0);
   if(data.premarket_cleared){
     analysis.unshift('⏳ <b>盘前占位：</b>今日涨停列已清空，开盘后自动刷新。');
     analysis.push('💡 <b>全局：</b>盘前暂无涨停数据，开盘后自动更新。');
@@ -8911,11 +9052,6 @@ function renderLimitUpHeatmap(){
   analysisEl.style.display='block';
 }
 
-(function(){
-  function run(){ try{ renderLimitUpHeatmap(); }catch(e){ console.warn('涨停热力矩阵渲染失败',e); } }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', run);
-  else run();
-})();
 
 /* ===== 完整周历渲染（V8_CAL 数据 · 与 calendar.html 同源） ===== */
 /* 🛡 2026-08-31 一劳永逸：重要事件日历月份回看（归档月 data/archive/V8_CAL_YYYY-MM.js） */
