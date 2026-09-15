@@ -15247,7 +15247,7 @@ hm += '</div>'; // /ulPaneFactor
     if(!dst){ if(window.__fwRetry < 20){ window.__fwRetry++; setTimeout(window.__renderFibWindow, 400); } return; }
     window.__fwRetry = 0;
     var h = '';
-    h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #c8a2e8;">
+    h+=`<div>
   `+v8CardHeader('🧪','斐波那契F观测窗','','update_time',Object.assign({},window.SH_FIB,{slot:'盘后',horizon:'中长线'}))+`
   <div style="font-size:11px;color:var(--dim);margin:-6px 0 10px 0;line-height:1.5;">📌 基于日K收盘数据计算，仅收盘后更新，盘前/盘中不刷新</div>`;
 var _fib2=window.SH_FIB||{};
@@ -15458,20 +15458,20 @@ h+=`</div>`;
     // ══ 子页②：📊 大盘观测（4 卡 · 2026-09-15 主人令：原「大盘观察」整页迁入并改名 + 斐波那契F观测窗迁入）══
     hm += '<div id="obsPaneMarket" style="display:' + (_act==='market' ? 'block' : 'none') + ';">';
     // ── 卡1：艾略特波浪 · 深度分析（容器 id / 渲染函数 __renderElliottWave 均未变，仅换宿主）──
-    hm += '<div class="card" id="elliottWaveBody" style="margin-bottom:16px;border-left:4px solid #c8a2e8;">'
+    hm += '<div class="card" id="elliottWaveBody" style="margin-bottom:16px;border-left:4px solid #f472b6;">'
        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-       + '<span style="font-size:15px;font-weight:700;color:#c8a2e8;">📊 艾略特波浪 · 深度分析</span>'
+       + '<span style="font-size:15px;font-weight:700;color:#f472b6;">📊 艾略特波浪 · 深度分析</span>'
        + '<span class="fresh" id="elliottWaveFresh">&#x2014;</span>'
        + '<span style="font-size:11.5px;color:var(--dim);">真实收盘序列 + 人工浪型拐点 + 关键位 · 小九机日频刷新</span></div>'
        + '<div id="elliottWaveInner"><div class="note" style="padding:16px;text-align:center;color:var(--dim);">加载中&#x2026;</div></div>'
        + '</div>';
     // ── 卡2：斐波那契F观测窗（← 2026-09-15 主人令：由「🔒 已下架」盘前区迁入，紧贴波浪卡下方，不合卡）──
-    hm += '<div class="card" id="fibWindowBody" style="margin-bottom:16px;border-left:4px solid #c8a2e8;">'
+    hm += '<div class="card" id="fibWindowBody" style="margin-bottom:16px;border-left:4px solid #38bdf8;">'
        + '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F9EA; 斐波那契F观测窗 加载中&#x2026;</div></div>';
     // ── 卡3：中信 PE 观测（从「暂未上架 · 观测类」迁入，容器 id 未变）──
     hm += '<div class="card" id="citicPeObserveBody" style="margin-bottom:16px;border-left:4px solid #fbbf24;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F321; 中信 PE 观测 加载中&#x2026;</div></div>';
     // ── 卡4：A股指数观测（从「暂未上架 · 观测类」迁入，容器 id 未变）──
-    hm += '<div class="card" id="indexObserveBody" style="margin-bottom:16px;border-left:4px solid #a78bfa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; A股指数观测 加载中&#x2026;</div></div>';
+    hm += '<div class="card" id="indexObserveBody" style="margin-bottom:16px;border-left:4px solid #60a5fa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; A股指数观测 加载中&#x2026;</div></div>';
     hm += '</div>'; // /obsPaneMarket
     var _host = document.getElementById('obsHost');
 
