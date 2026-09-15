@@ -2104,25 +2104,30 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
            盘面观测来自 AI_MARKET_BRIEF 盘中实时信号（短线）。直接并列会被读成互相矛盾
            （截图实证：✅可开新仓（恐慌下行） vs 偏弱·今日偏弱，注意节奏）。
            修法：① 两行各标尺度；② 方向相反时补一句可执行调和语；③ 不删任何原始结论。 */
-        var _scaleMid='<span style="font-size:10px;color:var(--dim);">中线 · 回测</span>';
-        var _scaleSht='<span style="font-size:10px;color:var(--dim);">短线 · 实时</span>';
+        /* 2026-09-15 主人令（第二轮）：「这里改成一行，短线写在前，中长写在后，要提亮标识。」
+           尺度标识改由下方 _chip() 生成为同语义色小胶囊（提亮），原 10px 灰字 _scaleMid/_scaleSht 已废。 */
         var _reconcile='';
         if(_ga.ok && _ga.name==='偏弱'){
           _reconcile='短线走弱不改中线窗口：宜<b>分批布局</b>、勿追高（该回测口径的机会区间本就出现在弱势段）';
         } else if(!_ga.ok && _ga.name==='偏多'){
           _reconcile='短线偏强、中线窗口未开：<b>仅短线机会</b>，不宜重仓押注反转';
         }
+        /* 2026-09-15 主人令（第二轮）：「这里改成一行，短线写在前，中长写在后，要提亮标识。」
+           ① 两行合一：盘面观测（短线·实时）在前、仓位依据（中线·回测）在后，中间竖线分隔；
+           ② 尺度标识由 10px 灰字提亮为同语义色小胶囊；
+           ③ 结论文本 / 配色 / 调和语逻辑一律不动（只动版式）。 */
+        var _chip=function(txt,clr){ return '<span style="font-size:10px;font-weight:700;color:'+clr+';background:'+clr+'22;'
+         + 'border:1px solid '+clr+'66;padding:0 5px;border-radius:4px;white-space:nowrap;">'+txt+'</span>'; };
+        var _pill=function(txt,clr){ return '<span style="font-weight:700;color:'+clr+';background:rgba(255,255,255,.08);'
+         + 'border:1px solid '+clr+'59;padding:1px 8px;border-radius:6px;white-space:nowrap;">'+txt+'</span>'; };
         h+='<div style="display:flex;flex-direction:column;gap:4px;padding:7px 12px;margin-bottom:8px;'
          + 'background:'+_ga.color+'12;border:1px solid '+_ga.color+'59;border-radius:8px;font-size:11.5px;line-height:1.6;">'
-         + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
-         +   '<span style="font-weight:800;color:'+_posColor+';">仓位依据</span>'+_scaleMid
-         +   '<span style="font-weight:700;color:'+_posColor+';background:rgba(255,255,255,.08);border:1px solid '+_posColor+'59;'
-         +   'padding:1px 8px;border-radius:6px;">'+(_ga.ok?'✅ ':'⛔ ')+_ga.verdict+_regimeTxt+'</span>'
-         + '</div>'
-         + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
-         +   '<span style="font-weight:800;color:'+_ga.color+';">盘面观测</span>'+_scaleSht
-         +   '<span style="font-weight:700;color:'+_ga.color+';background:rgba(255,255,255,.08);border:1px solid '+_ga.color+'59;'
-         +   'padding:1px 8px;border-radius:6px;">'+_ga.name+' · '+_ga.observation+'</span>'
+         + '<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">'
+         +   '<span style="font-weight:800;color:'+_ga.color+';">盘面观测</span>'+_chip('短线 · 实时',_ga.color)
+         +   _pill(_ga.name+' · '+_ga.observation,_ga.color)
+         +   '<span style="color:var(--dim);opacity:.55;">|</span>'
+         +   '<span style="font-weight:800;color:'+_posColor+';">仓位依据</span>'+_chip('中线 · 回测',_posColor)
+         +   _pill((_ga.ok?'✅ ':'⛔ ')+_ga.verdict+_regimeTxt,_posColor)
          + '</div>'
          + (_reconcile ? '<div style="color:#fbbf24;font-size:11px;line-height:1.5;">&#8635; '+_reconcile+'</div>' : '')
          + '</div>';
@@ -2238,7 +2243,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           else if(_sigSell.length===1){ _verdict='🟠 偏高·观测'; _vClr='#fbbf24'; }
           else if(_sigBuy.length>=2){ _verdict='🟢 偏低·观测'; _vClr='#4ade80'; }
           else if(_sigBuy.length===1){ _verdict='🟡 超卖·轻仓观测'; _vClr='#fbbf24'; }
-          else { _verdict='⏸ 中性·观望'; _vClr='var(--sub)'; }
+          /* 2026-09-15 主人令（第二轮）：「这个第二行的中性观望不需要了，删除吧」——
+             位置无偏离（中性）时不再产出「⏸ 中性·观望」胶囊（零信息量），_verdict 留空即不渲染。 */
 
 
           h+='<div style="padding:10px 18px;background:'+ac.bg+';font-size:13px;line-height:1.8;color:var(--txt);">';
@@ -2266,23 +2272,26 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
             _sigBuy.forEach(function(s,i){ if(i>0) h+=' '; h+=s; });
             h+='</span>';
           }
+          /* 2026-09-15 主人令（第二轮）：「把之前平均股价超买超卖那个金色胶囊找回来，放到第一行后面就行。」
+             位置观测胶囊（金色外壳不变、色随档位）由第二行移至第一行末尾；中性态已删故不渲染。 */
+          if(_verdict){
+            h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:rgba(251,191,36,.12);border:1.5px solid rgba(251,191,36,.45);font-size:11.5px;font-weight:700;color:'+_vClr+';">'+_verdict+'</span>';
+            h+='<span style="font-size:10.5px;color:var(--dim);">🔭 仅观测位置 · 开仓以 AI速览 ⚖ 裁决为准</span>';
+          }
           h+='</div>';
-          // 第二行：卖/减 + 位置观测（超买/超卖金色提示）+ ⚠警告
-          //   2026-09-15 主人令：① 恢复金色「超买/超卖」位置提示；
-          //   ② 删除「单日跌」（跌 0.5% 级属日常波动，与第一行涨跌幅、以及 _sigSell 里的「单日暴跌」重复告警）；
-          //   ③ 「破MA20 / 破MA60」保留。
+          // 第二行：卖/减 + ⚠破线警告
+          //   2026-09-15 主人令（第二轮）：位置观测胶囊已移至第一行末尾（且中性态不再渲染）；
+          //   本行两项皆空时整行不渲染 ⇒ 卡片自然收成一行。
           var _warns=[];
           if(ap.position_vs_ma20!=null && ap.position_vs_ma20<0) _warns.push('破MA20');
           if(ap.position_vs_ma60!=null && ap.position_vs_ma60<0) _warns.push('破MA60');
-          {
+          if(_sigSell.length || _warns.length){
             h+='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;">';
             if(_sigSell.length){
               h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:rgba(239,68,68,.18);border:1.5px solid rgba(239,68,68,.5);font-size:11.5px;font-weight:700;color:#fca5a5;box-shadow:0 0 4px rgba(239,68,68,.25);">📉 卖/减: ';
               _sigSell.forEach(function(s,i){ if(i>0) h+=' '; h+=s; });
               h+='</span>';
             }
-            h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:rgba(251,191,36,.12);border:1.5px solid rgba(251,191,36,.45);font-size:11.5px;font-weight:700;color:'+_vClr+';">'+_verdict+'</span>';
-            h+='<span style="font-size:10.5px;color:var(--dim);">🔭 仅观测位置 · 开仓以 AI速览 ⚖ 裁决为准</span>';
             if(_warns.length){
               h+='<span style="display:inline-block;padding:1px 7px;border-radius:3px;background:#b91c1c22;color:#f87171;font-size:11.5px;font-weight:700;">⚠ '+_warns.join(' / ')+'</span>';
             }
