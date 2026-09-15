@@ -175,6 +175,14 @@ CARD_DEFS = [
     # 🛡 2026-09-11 一劳永逸：4 个孤儿 algo_run 产物此前未注册 CARD_DEFS → 被 all_ 通用扫描按 1440min 红线误判 fail
     {"id": "ALGO_TRACK", "name": "算法追踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     {"id": "TRIPLE_HISTORY", "name": "三重历史", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
+    # 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」（历史追踪 + 跟踪/前向回测）。
+    #   与 FOUR_VOLUME / FOUR_VOLUME_60M 同页同批（B 批盘后算法链），故 picking=True：
+    #   ① 新鲜度按「交易日」判定（根治周末/节假日整日误标红）；
+    #   ② 陈旧自愈走「待治愈卡全为 picking 且 <18:00 则不派发」，守住 18:00 盘后门控；
+    #   ③ max_age 与 TRIPLE_HISTORY 同口径 1440（盘后产物，24h 红线）。
+    #   ⚠️ 若漏标 picking，_heal_loop 的 all() 判定失败 → 盘前会派发整条盘后链（假产物）。
+    {"id": "FOUR_VOLUME_HISTORY", "name": "四量历史", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
+    {"id": "FOUR_VOLUME_TRACK", "name": "四量跟踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
     {"id": "VOLATILITY", "name": "波动率", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     # 运维/静态说明页（逻辑详解页「防删」子页）
     {"id": "DO_NOT_DELETE", "name": "防误删清单", "page": "运维", "freq": "周日+手动", "max_age": 10080, "key_fields": ["update_time"], "_window_var": "DO_NOT_DELETE", "heal_cat": "algo_run"},

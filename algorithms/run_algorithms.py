@@ -66,13 +66,18 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   正式收编进 B 批链尾（详见 ORDER / STAGES["B"] 注释）。均为纯本地计算或
     #   单接口调用（不遍历全 universe），给 900s 足够余量；显式登记避免走默认 1800s
     #   而在极端网络退避下拖长 B 批（B 批在 D 批 20:00 关键路径上）。
-    "scripts/fetch_ai_insights_compare.py": 900,    # 读本地 data/maharo_macro.js，纯本地文本比对
     "scripts/gen_factor_audit.py": 900,             # 读 generate_top10.py 源码做静态审计，纯本地
     "scripts/gen_factor_progress.py": 900,          # 读 factor_audit.json，纯本地
     "scripts/fetch_valuation_percentile.py": 1200,  # akshare stock_index_pe_lg（理杏仁），单接口
     "scripts/fetch_index_value_framework.py": 900,  # 读本地 INDEX_HISTORY.js + numpy 计算
     # 🆕 2026-09-11：全算法回测汇总——纯本地读 data/*.js + raw_data/algo_track.json，零网络
     "gen_backtest_all_algos.py": 900,
+    # 🆕 2026-09-15 主人令（四量终极「自己的一整套系统」）：两个脚本均为**纯本地计算**——
+    #   history 读 data/FOUR_VOLUME.js + raw_data/stock_quote.json（全市场快照，一次载入、
+    #   按 code 建索引，不逐只网络请求）；track 读账本 + 本地 json，零网络。
+    #   与三重同族给出 900s 显式预算（避免走默认 1800s 拖长 B 批，B 批在 D 批 20:00 关键路径上）。
+    "update_four_volume_history.py": 900,
+    "gen_four_volume_track.py": 900,
 }
 
 
@@ -159,6 +164,11 @@ ORDER = [
     "update_triple_resonance_history.py",  # 累积 triple_resonance_history
     "gen_triple_consensus.py",         # 读 top10 / fundamental / gold_pool
     "gen_triple_track.py",             # 读 triple_history / gold_pool / backtest
+    # 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」= 历史追踪 + 跟踪/前向回测。
+    #   必须排在 strategy_four_volume.py（L156，产 data/FOUR_VOLUME.js）之后，
+    #   且二者内部有序：history 累积账本 → track 消费账本。
+    "update_four_volume_history.py",   # → raw_data/four_volume_history.json（逐日账本 + 自建真实收盘价序列）
+    "gen_four_volume_track.py",        # → raw_data/four_volume_track.json（持仓跟踪/告警/前向累积/聚类/重叠）
     "calc_volatility_watch.py",         # → raw_data/volatility.json（v8 原生，独立无依赖）
     "gen_stock_stop.py",                # → data/STOCK_STOP_DATA.js（ATR 精确止损止盈，读候选宇宙日K）
     # ── 孤儿模块原生化（2026-08-02）：原靠 v6→v8 sync_legacy 同步，现由 v8 直接产出 ──
@@ -234,11 +244,12 @@ ORDER = [
     #   工作区残留未提交改动（raw_data/kline_cache/*.json）→ git push 被拒 →
     #   重试循环里 `git rebase origin/main` 报 "cannot rebase: You have unstaged changes"
     #   → 3 次重试全败 → 永久静默。
-    #   后果：5 张卡长期红灯，全部停在 09-10（AI_INSIGHTS_COMPARE / FACTOR_AUDIT /
+    #   后果：5 张卡长期红灯，全部停在 09-10（AI_INSIGHTS_COMPARE【2026-09-15 已全链下线】 / FACTOR_AUDIT /
     #   FACTOR_PROGRESS / VALUATION_PERCENTILE / INDEX_VALUE_FRAMEWORK）。
     #   根治：正式挂进 B 批链尾（与 STAGES["B"] 同位置），不再依赖那个不稳定的独立 workflow。
     #   ⚠️ 必须与 STAGES["B"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
-    "scripts/fetch_ai_insights_compare.py",   # → raw_data/ai_insights_compare.json（读 data/maharo_macro.js）
+    # 🗑 2026-09-15 主人令：scripts/fetch_ai_insights_compare.py 全链下线（AI 洞察卡改读
+    #   window.MAHORO_INSIGHTS 直供「实情解析」，「统计」口径已删）⇒ 不再列入 ORDER。
     "scripts/gen_factor_audit.py",            # → raw_data/factor_audit.json（多因子 vs v8 审计）
     "scripts/gen_factor_progress.py",         # → raw_data/factor_progress.json（读 factor_audit，须在其后）
     "scripts/fetch_valuation_percentile.py",  # → raw_data/valuation_percentile.json（A股指数 PE 分位）
@@ -292,6 +303,10 @@ STAGES = {
         "strategy_four_volume_60m.py", "strategy_four_volume.py",
         "market_regime.py", "sector_recommendation.py",
         "update_triple_resonance_history.py",   # 累积 triple_resonance_history（在 gen_triple_consensus 之前）
+        # 🆕 2026-09-15 主人令：四量终极历史追踪 + 跟踪/前向回测（与三重同批、同序）。
+        #   插在 strategy_four_volume.py 之后 → 读到当日新鲜 data/FOUR_VOLUME.js；
+        #   ⚠️ 必须在 gen_triple_consensus 之前（本行位置天然满足）。
+        "update_four_volume_history.py", "gen_four_volume_track.py",
         "gen_triple_consensus.py", "gen_triple_track.py", "calc_volatility_watch.py",
         "gen_stock_stop.py", "gen_algo_track.py", "calc_sentiment_cycle.py",
         "refresh_dividend_cninfo.py",
@@ -310,7 +325,7 @@ STAGES = {
         #   （run_algorithms.py:946 的双层路径解析认该前缀），否则报「缺失脚本」。
         #   根治：直接挂进 B 批链尾（它们的输入——maharo_macro / 候选池 / 指数历史 /
         #   FACTOR_AUDIT——在 B 批时均已就绪），不再依赖那个不稳定的独立 workflow。
-        "scripts/fetch_ai_insights_compare.py",     # → raw_data/ai_insights_compare.json（读 data/maharo_macro.js）
+        # 🗑 2026-09-15 主人令：scripts/fetch_ai_insights_compare.py 全链下线（见 ORDER 同位说明）
         "scripts/gen_factor_audit.py",              # → raw_data/factor_audit.json（多因子 vs v8 审计）
         "scripts/gen_factor_progress.py",           # → raw_data/factor_progress.json（读 factor_audit）
         "scripts/fetch_valuation_percentile.py",    # → raw_data/valuation_percentile.json（A股指数 PE 分位）
@@ -478,6 +493,10 @@ STOCK_PICKING_SCRIPTS = {
     "update_triple_resonance_history.py",  # 三重历史累积
     "gen_triple_consensus.py",       # 三重共识选股
     "gen_triple_track.py",           # 三重跟踪
+    # 🆕 2026-09-15 主人令：四量历史追踪 + 跟踪（读当日 FOUR_VOLUME.js，属盘后选股产物）。
+    #   与三重同族一致纳入 18:00 门控 —— 盘中 force 跑链也不得重算（免半日数据假产物）。
+    "update_four_volume_history.py",  # 四量历史累积
+    "gen_four_volume_track.py",       # 四量跟踪/前向回测
     "final_recommend.py",            # 跨策略共振 Top5（管线最终产物）
     "gen_algo_track.py",             # 算法追踪
     "calc_sentiment_cycle.py",       # 情绪周期（读 LIMIT_UP_HEATMAP）

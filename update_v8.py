@@ -63,6 +63,15 @@ DATA_SOURCES = {
     #   raw_data/triple_resonance_history.json，而此处原读旧名 triple_history.json（同源不同名），
     #   桥接顺序一错位就吃陈旧基线 → 共振日历缺 08-24 等。改为直接读生成器真输出，消除重命名歧义。
     "triple_resonance_history.json": "TRIPLE_HISTORY",
+    # 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」——历史追踪 + 跟踪/前向回测。
+    #   产出链（B 批算法链，读当日新鲜 data/FOUR_VOLUME.js）：
+    #     algorithms/update_four_volume_history.py → raw_data/four_volume_history.json
+    #     algorithms/gen_four_volume_track.py     → raw_data/four_volume_track.json
+    #   与三重完全同构（triple_resonance_history/triple_track → TRIPLE_HISTORY/TRIPLE_TRACK）。
+    #   ⚠️ 铁律「一处 id 三处同口径」：本表 × cloud_fetch_v8.py × v8_health_check.py::CARD_DEFS。
+    #   （四量族原有的 FOUR_VOLUME / FOUR_VOLUME_60M 属脚本直写 data/，不登记本表，勿混淆）
+    "four_volume_history.json":    "FOUR_VOLUME_HISTORY",
+    "four_volume_track.json":      "FOUR_VOLUME_TRACK",
     # 2026-09-04 主人令收尾：cockpit_tier_recommend / cockpit_advice / cockpit_backtest 三映射已删
     #   （09-03「干掉驾驶舱」系列删了生成器与 raw_data，映射永不命中，纯死代码）
     "top10_daily.json":            "TOP10_DAILY",
@@ -140,8 +149,10 @@ DATA_SOURCES = {
     "factor_audit.json":            "FACTOR_AUDIT",
     # 2026-09-09 主人令：A股指数价格中枢+趋势门控框架迁移（QQQ/TQQQ → A股，暂未上架）
     "index_value_framework.json":   "INDEX_VALUE_FRAMEWORK",
-    # 2026-09-10 主人令：AI 洞察多源观点对比卡（暂未上架·实验区最下方），源 MAHORO_MACRO 已有 insights
-    "ai_insights_compare.json":     "AI_INSIGHTS_COMPARE",
+    # 🗑 2026-09-15 主人令：AI 洞察多源观点对比卡已改读 window.MAHORO_INSIGHTS（前端直供「实情解析」），
+    #   原 ai_insights_compare.json → AI_INSIGHTS_COMPARE 的桥接映射，连同其 fetcher
+    #   （scripts/fetch_ai_insights_compare.py）、产物 data/AI_INSIGHTS_COMPARE.js、
+    #   raw_data/ai_insights_compare.json 一并从仓库下线，此后不再重建。
     # 2026-09-10 主人令：因子补缺 walk-forward 进度跟踪卡（暂未上架），源 FACTOR_AUDIT
     "factor_progress.json":         "FACTOR_PROGRESS",
     # 🛡 2026-08-26 一劳永逸根因修复：原 DATA_SOURCES 漏挂 final_recommend.json 映射，
@@ -261,6 +272,10 @@ CATEGORY_MAP = {
     "TRIPLE_CONSENSUS": "post_close",
     "TRIPLE_TRACK": "post_close",
     "TRIPLE_HISTORY": "post_close",
+    # 🆕 2026-09-15 主人令：四量终极历史追踪 + 跟踪/前向回测（B 批盘后算法链产出，与三重同档）。
+    #   → _file_category() 返回 {"post_close"} → _pure_pc=True → 仅盘后 --category 构建重建（正确）
+    "FOUR_VOLUME_HISTORY": "post_close",
+    "FOUR_VOLUME_TRACK": "post_close",
     "TOP10_DAILY": "post_close",
     "LHB_DATA": "post_close",
     "LHB_HISTORY": "post_close",
