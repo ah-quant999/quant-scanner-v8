@@ -8,9 +8,15 @@ v8_urgent_listener.py — 紧急指令监听 + 健康检查（v8 去 v6 化版�
 2. 根据文件内容中的关键词自动 dispatch 对应 workflow；
 3. 输出摘要供 automation 向主人汇报。
 
+🔴 2026-09-15 修复（漏读高危）：清单与正文**远端优先**（best-effort git fetch → FETCH_HEAD /
+origin/main → git ls-tree / git show），仅当 git 不可用时才降级本机工作树并在输出显式标注。
+本机从不 pull，工作树会陈旧（实测 09-15：本机 1 份 vs 远端 10 份）⇒ 只读工作树会把
+「真有指令的新交接」误报成「无指令」。
+
 用法:
   python v8_urgent_listener.py              # 扫描 + 健康检查 + 自动 dispatch
   python v8_urgent_listener.py --dry-run    # 仅打印，不真 dispatch
+  python v8_urgent_listener.py --no-fetch   # 跳过 git fetch（离线/调试）
 """
 import glob
 import json
@@ -27,6 +33,7 @@ BASE = Path(__file__).resolve().parent
 HANDOVER_DIR = BASE / "docs" / "ops" / "handover"   # 2026-09-10 起唯一交接目录
 URGENT_DIR = BASE / "docs" / "ops" / "urgent"        # 已停用（历史目录，勿再写入）
 REPO = "ah-quant999/quant-scanner-v8"
+HANDOVER_REL = "docs/ops/handover"                   # 仓库内相对路径（远端读取用）
 
 # workflow 文件名 -> dispatch payload
 WF_MAP = {
@@ -53,33 +60,120 @@ def _load_token():
     return None
 
 
-def _scan_urgent_files():
-    """扫描唯一交接目录 docs/ops/handover/ 下的紧急文件。
+def _git(args, timeout=30):
+    """跑只读 git 命令（禁写）。失败返回 None，由调用方降级。"""
+    try:
+        r = subprocess.run(
+            ["git", "-c", "core.quotepath=false", *args],
+            cwd=BASE, capture_output=True, text=True,
+            encoding="utf-8", errors="replace", timeout=timeout,
+        )
+        return r.stdout if r.returncode == 0 else None
+    except Exception:
+        return None
 
-    2026-09-10 主人令：交接文档统一目录 + 时间优先命名
-      YYYY-MM-DD_HHmm_URGENT_<发件>给<收件>_<主题>.md
-    旧版同时扫 docs/ops/urgent/ 与仓库根（双位置）—— 那正是"同一份交接被复制到
-    3 个目录、谁都读不准"的成因，已彻底收敛为单一目录。
+
+def _remote_ref():
+    """远端权威 ref。FETCH_HEAD = 最近一次 fetch 的 tip（最新）；origin/main 兜底。
+
+    ⚠️ 2026-09-15 铁律：本机（阿狸咪）从不 pull，docs/ops/handover/ 工作树会陈旧
+    （实测 09-15：本机 1 份 vs 远端 10 份）⇒ 只读工作树 = 漏读新交接 + 把「真有指令」
+    误报成「无指令」。与 auto_handoff_read.py 同口径：一律远端优先。
     """
-    d = HANDOVER_DIR
-    if not d.is_dir():
-        return set()
-    return {p.resolve() for p in d.glob("*_URGENT_*.md")
-            if not p.name.startswith(("README", "_"))}
+    for ref in ("FETCH_HEAD", "origin/main"):
+        if _git(["rev-parse", "--verify", ref], timeout=15):
+            return ref
+    return None
+
+
+def _hours_from_name(name):
+    """从交接文件名前缀 YYYY-MM-DD_HHmm 推小时数（不依赖 mtime：坚果云会重写 mtime）。"""
+    m = re.match(r"(\d{4})-(\d{2})-(\d{2})_(\d{2})(\d{2})", name)
+    if not m:
+        return None
+    try:
+        dt = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)),
+                      int(m.group(4)), int(m.group(5)),
+                      tzinfo=timezone(timedelta(hours=8)))
+    except ValueError:
+        return None
+    return (datetime.now(timezone(timedelta(hours=8))) - dt).total_seconds() / 3600.0
+
+
+def _scan_urgent_files_remote(ref):
+    """远端 tip 下的 *_URGENT_*.md 清单。返回 [文件名] 或 None（不可用）。"""
+    out = _git(["ls-tree", "-r", "--name-only", ref, "--", HANDOVER_REL + "/"])
+    if out is None:
+        return None
+    names = []
+    for line in out.splitlines():
+        rel = line.strip()
+        if not rel or not rel.startswith(HANDOVER_REL + "/"):
+            continue
+        base = rel[len(HANDOVER_REL) + 1:]
+        if "_URGENT_" not in base or not base.endswith(".md"):
+            continue
+        if base.startswith(("README", "_")):
+            continue
+        names.append(base)
+    return names
+
+
+def _fetch_remote():
+    """尽力刷新 FETCH_HEAD / origin/main（只动 .git 引用，不碰工作树）。失败不报错。"""
+    if "--no-fetch" in sys.argv:
+        return False
+    return _git(["fetch", "origin", "main", "-q"], timeout=25) is not None
 
 
 def recent_urgent_files(n=5):
-    # 按【文件名倒序】= 时间倒序；不用 mtime（坚果云同步会重写 mtime，曾导致取错"最新"）
-    files = sorted(_scan_urgent_files(), key=lambda p: p.name, reverse=True)
-    return files[:n]
+    """按【文件名倒序】= 时间倒序取最近 N 份（不用 mtime）。
+
+    远端优先；git 不可用时降级读本机工作树（并在输出里显式标注，不掩盖降级）。
+    """
+    _fetch_remote()
+    ref = _remote_ref()
+    if ref:
+        names = _scan_urgent_files_remote(ref)
+        if names:
+            names.sort(reverse=True)
+            return [{"name": nm, "repo_path": f"{HANDOVER_REL}/{nm}",
+                     "src": "remote", "ref": ref, "local": HANDOVER_DIR / nm}
+                    for nm in names[:n]]
+    # 降级：本机工作树
+    d = HANDOVER_DIR
+    if not d.is_dir():
+        return []
+    local = sorted((p for p in d.glob("*_URGENT_*.md")
+                    if not p.name.startswith(("README", "_"))),
+                   key=lambda p: p.name, reverse=True)
+    return [{"name": p.name, "repo_path": None, "src": "local",
+             "ref": None, "local": p} for p in local[:n]]
 
 
-def read_head(path, lines=50):
+def read_head(item, lines=50):
+    """读文件前 N 行：远端优先（git show <ref>:<path>），失败降级本机工作树。"""
+    if item.get("src") == "remote":
+        txt = _git(["show", f"{item['ref']}:{item['repo_path']}"], timeout=30)
+        if txt is not None:
+            return "".join(txt.splitlines(keepends=True)[:lines])
     try:
-        with open(path, encoding="utf-8") as f:
+        with open(item["local"], encoding="utf-8") as f:
             return "".join(f.readlines()[:lines])
     except Exception as e:
         return f"[读取失败: {e}]"
+
+
+def item_age_hours(item):
+    """优先用文件名时间戳；无前缀（旧命名）才回退 mtime。"""
+    h = _hours_from_name(item["name"])
+    if h is not None:
+        return h
+    try:
+        return (datetime.now().timestamp() - os.path.getmtime(item["local"])) / 3600.0
+    except Exception:
+        return float("nan")
+
 
 
 def run_freshness_check():
@@ -154,20 +248,24 @@ def main():
     out = [f"# v8 紧急指令监听 ({now})", ""]
 
     files = recent_urgent_files()
-    out.append(f"## 最近 urgent 文件（{len(files)} 个）")
+    src = files[0]["src"] if files else "-"
+    src_txt = {"remote": f"远端优先（{files[0]['ref']}）", "local": "⚠️ 降级：本机工作树（可能陈旧）",
+               "-": "-"}[src]
+    out.append(f"## 最近 urgent 文件（{len(files)} 个）｜来源：{src_txt}")
     if not files:
         out.append("- 无")
     dispatch_cmds = []
-    for p in files:
-        head = read_head(p, 40)
-        mtime_hours = (datetime.now().timestamp() - os.path.getmtime(p)) / 3600.0
-        out.append(f"- **{os.path.basename(p)}** (mtime={mtime_hours:.1f}h，仅参考；排序以文件名为准)")
+    for i, item in enumerate(files):
+        head = read_head(item, 40)
+        age_h = item_age_hours(item)
+        stamp = f"{age_h:.1f}h" if age_h == age_h else "n/a"
+        out.append(f"- **{item['name']}** (距文件名时间={stamp}，仅参考；排序以文件名为准)")
         out.append("```markdown")
         out.append(head)
         out.append("```")
         # 只有最近 1 个文件参与自动 dispatch（避免旧文件反复触发）
-        if p == files[0]:
-            dispatch_cmds = parse_dispatch_commands(head, mtime_hours)
+        if i == 0:
+            dispatch_cmds = parse_dispatch_commands(head, age_h)
 
     # 健康检查
     out.append("")
