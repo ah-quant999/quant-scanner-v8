@@ -215,9 +215,8 @@ def walk_extra():
         #   不注册则算法链跑完也永不上传（与 BACKTEST_ALL_ALGOS.js 同型）。
         "data/ALGO_BACKTEST_COMPARE.js",
         "data/H_AUTO_BUY_TRACK.js",     # 反推算法累计胜率（每日跟踪 T+1/T+3/T+5/T+10）
-        # 🔴 2026-08-20 根因修复：LHB_7D.js 由 gen_lhb_7d.py 直写 data/，之前未注册
-        #    到 extra → 算法链跑完也不上传，页面 7 日龙虎榜/机游共振长期 stale。
-        "data/LHB_7D.js",
+        # 🧹 2026-09-15：data/LHB_7D.js 已随「无生产者 + 前端零引用」一并退役删除，
+        #   故此处不再登记（原 2026-08-20 登记项作废）。
         # 🆕 2026-09-13 主人令「PE/PB 方案 A 落地」：中信 PE 极值温度计双卡产物。
         #   gen_citic_pe.py 直写 data/（不经 update_v8 的 raw→js 映射表）⇒ 必须在此登记。
         #   🔴 不登记 = **降级路径半边修复**：PUSH_FILES 模式（workflow 用 git status 收集
@@ -250,8 +249,7 @@ _EXTRA_FILES = (
     # 🛡 2026-08-19：H 反推算法相关文件注册到 ?v 重写集，确保 api_push 推送后 index.html 同步对齐缓存戳
     "data/H_AUTO_BUY.js",
     "data/H_AUTO_BUY_TRACK.js",
-    # 🔴 2026-08-20：LHB_7D.js 同步对齐缓存戳
-    "data/LHB_7D.js",
+    # 🧹 2026-09-15：data/LHB_7D.js 已退役删除（同上方 extra 段说明），?v 重写集一并摘除。
     # 2026-08-19：路径概率预测卡（艾略特+江恩+缠论+形态匹配）注册到 ?v 重写集
     "data/INDEX_HISTORY.js",
     # 2026-08-19：板块推荐框架（宏观+板块RS+资金流+周期融合）注册到 ?v 重写集

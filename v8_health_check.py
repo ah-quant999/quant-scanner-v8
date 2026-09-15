@@ -1244,7 +1244,121 @@ def write_urgent(reason_lines):
     print(f"[INFO] 已写紧急文件 {p}")
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# 🛡 2026-09-15 主人令 · 一劳永逸：判定层加入「空档期不误判」不变量
+#
+# 【为什么必须收在这一层】
+#   本文件的历史病根 = **多层阈值各自合理，叠在一起即误报**：
+#     · adjust_max_age('实时数据') 在 08:24 已正确算出 1221min（距最近收盘+3h），
+#       但 _hard_cap_for_owner_rule 的「盘前 08:00-09:00 硬帽 360min」在 min() 里胜出
+#       → 12 张盘中卡在盘前全红（age 750+ > 360），全是「下一批还没跑」的假故障；
+#     · CARD_DEFS['IPO_DATA'].max_age 明明已改 1440（注释写「未到下一批次不红灯」），
+#       却被 adjust_max_age 的盘前分支 min(1440, 180) = 180 反手打回 → 依旧红。
+#   每加一张卡 / 改一次批次时间就要再补一层特例 —— 这正是 2900 行越滚越大的原因。
+#
+# 【新模型只问一句话】：「到这个点，这张卡的下一批该出了吗？出了没有？」
+#     · 该出而未出 → 阈值给小值，照常报红（**绝不掩盖真故障**）
+#     · 未到产出点 → 阈值 = 距上一批完成 + 宽限，数据停在上一批是设计内行为
+#
+# 【安全性质】本层只做 max() —— 只会放宽、绝不收紧 ⇒ 不可能凭空制造红灯；
+#   且活跃窗口内一律不介入，盘中 45min 严格判定一字不变。
+# ══════════════════════════════════════════════════════════════════════════════
+
+_REG_GRACE_MIN = 180   # 批次产出 + 构建部署 + CDN 回源的合理宽限
+
+# 活跃产出窗口（页 → (起, 止) 小时）。**只有窗口内才允许严格阈值**；
+# 窗口外是「上一批已完成、下一批未到期」的空档，一律走 _legit_ceiling。
+_REG_ACTIVE_WINDOW = {
+    # 🛡 2026-09-15（阿狸咪 1135 根因 A-2）：起点 09:30 → **09:45**。
+    #   盘中链首档数据 09:45 才产出（morning_scan 修正点）；09:30 开盘那一刻这批卡持有的
+    #   正是「上一交易日收盘值」⇒ 用 120min 严格阈值判定**必然假红**
+    #   （实测 09-15 09:19 / 09:30 两轮回查：概念排名 / 市场预警 / 股指期货持仓 / 平均股价，共 8 项全红）。
+    #   改后 09:30–09:45 落入「空档」→ 走 _legit_ceiling（距上一交易日 15:30 + 180min ≈ 1249min），
+    #   只放宽不收紧；盘中 09:45 之后的严格判定一字未变。
+    "实时数据": (9.75, 15.0),   # 盘中链 09:45-15:00（09:30-09:45 首档未产出，属空档）
+    "今日事件": (9.5, 15.0),    # 盘前批 08:15-09:15 跑完；09:30 起才允许判「今日批缺失」
+    "盘后数据": (20.5, 24.0),   # 盘后算法链 18:30-20:30
+    "选股策略": (20.5, 24.0),
+    "全量数据": (20.5, 24.0),
+}
+
+# 「上一批完成时刻」锚点（交易日 hh:mm）
+_REG_CYCLE_MARK = {
+    "今日事件": (9, 15),
+    "盘后数据": (20, 30),
+    "选股策略": (20, 30),
+    "全量数据": (20, 30),
+}
+
+
+def _recent_trading_mark(n, hh, mm):
+    """返回 <= n 的最近一个「A 股交易日 hh:mm」（跨周末/长假自动回退）。"""
+    tz = n.tzinfo or timezone(timedelta(hours=8))
+    d = n.date()
+    for _ in range(60):
+        if _is_trading_day(d):
+            t = datetime(d.year, d.month, d.day, hh, mm, tzinfo=tz)
+            if t <= n:
+                return t
+        d -= timedelta(days=1)
+    return n - timedelta(days=1)
+
+
+def _legit_ceiling(n, page, dual_page=None):
+    """该类卡在 n 时刻「合法可容许的最大数据年龄」（分钟）—— 由下一个产出周期决定。
+
+    只做下界：任何比本值更紧的阈值都是纯误报。dual_page 同卡双档时取两者较宽者。
+    """
+    n = n or now_cst()
+    pages = [p for p in (page, dual_page) if p]
+    if not pages:
+        return 0
+    ceilings = []
+    for pg in pages:
+        if pg == "运维":                       # 静态/手工维护页：7 天红线
+            ceilings.append(7 * 24 * 60)
+            continue
+        if pg == "实时数据":
+            due = last_trade_day_close(n)      # 最近交易日 15:30（盘前自动回退到上一交易日）
+        else:
+            hh, mm = _REG_CYCLE_MARK.get(pg, (9, 15))
+            due = _recent_trading_mark(n, hh, mm)
+        ceilings.append(int((n - due).total_seconds() / 60) + _REG_GRACE_MIN)
+    return max(ceilings)
+
+
+def _in_active_window(n, page):
+    """n 是否处在 page 的「本批正在跑/刚跑完」窗口内 —— 仅窗口内允许严格阈值。"""
+    win = _REG_ACTIVE_WINDOW.get(page)
+    if not win:
+        return False
+    if not _is_trading_day(n.date()):
+        return False
+    h = n.hour + n.minute / 60.0
+    return win[0] <= h < win[1]
+
+
+# ── 不变量包装层（原分时实现整体保留、原样下沉为 *_legacy）──────────────────
+
 def adjust_max_age(def_max, page=None, n=None):
+    """🛡 2026-09-15：legacy 分时收紧 → 再与「合法空档下界」取大（只放宽，不收紧）。"""
+    n = n or now_cst()
+    base = _adjust_max_age_legacy(def_max, page=page, n=n)
+    if page and not _in_active_window(n, page):
+        base = max(base, _legit_ceiling(n, page))
+    return base
+
+
+def _hard_cap_for_owner_rule(n=None, page=None):
+    """🛡 2026-09-15：同上，红线层也不得紧于「合法空档下界」。"""
+    n = n or now_cst()
+    base = _hard_cap_for_owner_rule_legacy(n=n, page=page)
+    if page and not _in_active_window(n, page):
+        base = max(base, _legit_ceiling(n, page))
+    return base
+
+
+def _adjust_max_age_legacy(def_max, page=None, n=None):
     """根据交易时段 + 数据更新窗口动态调整阈值。
 
     核心思路：每类数据有自己的「更新窗口」，窗口关闭后数据自然不会再刷新，
@@ -1347,7 +1461,7 @@ def adjust_max_age(def_max, page=None, n=None):
     return def_max
 
 
-def _hard_cap_for_owner_rule(n=None, page=None):
+def _hard_cap_for_owner_rule_legacy(n=None, page=None):
     """🛡 主人铁律 2026-08-18 终极收紧：按 page × 分时段红线。
 
     按 page 区分（仅实时数据走 2h 红线，盘后/选股/今日事件保留 24h 兜底）：
@@ -2235,6 +2349,18 @@ def check_local_head_sync():
     #   现在每个子命令独立捕获，失败一律 warn + 明确原因，不再误报。
     # 2026-09-13 升级：git fetch 增加 3 次重试；全部失败后回退 GitHub API 获取 origin/main，
     #   根治偶发 TimeoutExpired 导致的「跳过同步检查」误报。
+    #
+    # 🛡 2026-09-15 一劳永逸（阿狸咪 1135 根因 A-1）：**CI 内本检查语义不成立 → 直接降级 info**。
+    #   取证：v8_health_patrol 是 runs-on: ubuntu-latest + fetch-depth: 1 的一次性浅克隆，
+    #   而生成器每几分钟推一次 main ⇒ 该克隆的 HEAD **必然 ≠ origin/main**
+    #   （实测 09-15 09:30 日志仍在报「本地 d20aae8 / origin/main 573884a 落后」）
+    #   ⇒ 该判据在 CI 内**必然 FAIL** ⇒ health_patrol 的「🔁 自愈验证」step 必然 REMAIN_FAIL>0
+    #   ⇒ 整轮红 + 升级邮件（近 72h 实测 9/47 = 19% 假红，持续 ≥18h）。
+    #   本检查只在运维机（小九 / 阿狸咪本机）有意义，CI 内直接短路。
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
+                 "status": "info", "message": "CI 环境（一次性浅克隆）内本项语义不成立，跳过"}]
+
     try:
         local = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, timeout=10).strip()
     except Exception as e:

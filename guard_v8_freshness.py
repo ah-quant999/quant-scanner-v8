@@ -176,10 +176,13 @@ CORE_SOURCES_ALGO = {
 # ── 分类三：无云端生产者的冻结快照 ────────────────────────────────────
 # 当前暂无。保留空 dict，便于未来新增模块时快速标记。
 FROZEN_SOURCES = {
-    # 🧊 2026-09-14 阿狸咪的工程师：LHB_7D 无生产者（详见上方 CORE_SOURCES_ALGO 注释）。
-    #    归入本组＝仍逐轮展示「已停更」提醒（保留可见性、不藏数据），但**不再触发自愈派发**
-    #    （frozen 组既不参与自愈、也不计入最终 stale ⇒ 不影响 guard 退出码），止住 run 风暴。
-    "LHB_7D": 24,
+    # 🧹 2026-09-15 小九的工程师：LHB_7D 已**退役删除**（data/LHB_7D.js 不复存在），
+    #    故从本表摘除 —— 否则 check_group 会走到 line 501 的 `if not path.exists()`
+    #    产出「文件缺失」，把刚消掉的红灯换个名字放回来。
+    #    退役依据：唯一生产者 gen_lhb_7d.py 于 09-13 停跑（run_algorithms.py 摘调度）、
+    #    前端零引用（index.html「停止注入」）、raw 无消费方 ⇒ 无生产者亦无消费者。
+    #    回滚：从 09-14 及更早的提交取回 data/LHB_7D.js，并把本条与
+    #    run_algorithms.py 的 step_gen_lhb_7d 一并恢复。
 }
 
 # 引入 update_v8.py 的时段映射，用于输出"每个模块由哪个定时任务更新"

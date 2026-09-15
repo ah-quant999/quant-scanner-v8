@@ -38,7 +38,6 @@ MIN_SIZE = {
     "AVG_PRICE_DATA.js": 307,
     "INST_TRADE.js": 4756,
     "IPO_DATA.js": 7655,
-    "LHB_7D.js": 1826,
     "LHB_HISTORY.js": 295035,
     "SECTOR_FUND_FLOW_TREND.js": 3378,
     "SECTOR_RS.js": 21907,

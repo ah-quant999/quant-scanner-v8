@@ -56,6 +56,124 @@ FETCH_DAYS = 800       # 拉取长历史（≈ 38 个月，覆盖 MIN_BARS 并�
 
 sys.path.insert(0, BASE)
 
+# 🛡 2026-09-15：复用 strong_breakout.py 的 `_fetch_kline`（gtimg 主源 → 新浪兜底，
+# 双域名级故障转移）作为长历史主源 —— 该实现已在盘后链稳定运行，不另造第三条取数路径。
+from strong_breakout import _fetch_kline as _fetch_hist  # noqa: E402
+
+
+# ── 🛡 2026-09-15 小九的工程师：补回整层「取数层」─────────────────────────────
+# 本脚本自 2026-09-04 上线起**从未跑通过**：CACHE_DIR / _query_kline / _load_cache
+# 三个名字被引用却从未定义 ⇒ 一进 main() 即 NameError 秒退（2026-09-15 08:56 实测复现），
+# raw_data/factor_lab_backtest.json 永远停在旧值 → data/FACTOR_LAB_BACKTEST.js 陈旧
+# → 运维面板常驻红灯「更新于 3 天前」。
+# 修法：直接复用已在稳定运行的 alpha101_backtest.py 同源实现（双源缓存，云端零网络可取），
+# 不再自造网络拉取路径 —— 本仓「云端 runner 无外网」的现实下那条路本就不成立。
+# 注：原本想复用 alpha101_backtest.py 的实现，但它的
+#   `from calc_stock_rps import _load_cache_raw` 指向的模块**已随 RPS 下线从全仓删除**
+#   （远端 ls-tree 亦无）⇒ 复用等于换个坑再摔一次。故这里做成**自包含**：
+#   纯 json、零第三方依赖、零网络。
+CACHE_DIR = os.path.join(RAW, "_rps_cache")
+KLINE_CACHE_DIR = os.path.join(RAW, "kline_cache")
+
+
+def _read_cache_file(path):
+    """读单个 K 线缓存文件 → records list（按 date 升序）或 None。
+
+    兼容两种落盘形状：纯 list[dict]，或 dict 包一层（bars/data/rows）。
+    最小字段 date/open/close；high/low/volume/amount 缺失时安全降级。
+    """
+    try:
+        with open(path, encoding="utf-8") as f:
+            rows = json.load(f)
+    except Exception:
+        return None
+    if isinstance(rows, dict):
+        rows = rows.get("bars") or rows.get("data") or rows.get("rows") or []
+    if not isinstance(rows, list) or len(rows) < 60:
+        return None
+    out = []
+    for r in rows:
+        if not isinstance(r, dict):
+            continue
+        try:
+            o = float(r["open"]); c = float(r["close"])
+        except Exception:
+            continue
+        d = str(r.get("date") or r.get("day") or r.get("trade_date") or "")[:10]
+        if not d or c <= 0:
+            continue
+        try:
+            h = float(r["high"])
+        except Exception:
+            h = max(o, c)
+        try:
+            low = float(r["low"])
+        except Exception:
+            low = min(o, c)
+        try:
+            v = float(r["volume"])
+        except Exception:
+            v = 0.0
+        try:
+            amt = float(r["amount"])
+        except Exception:
+            amt = c * v * 100.0
+        out.append({"date": d, "open": o, "high": h, "low": low, "close": c,
+                    "volume": v, "amount": amt})
+    if len(out) < 60:
+        return None
+    out.sort(key=lambda x: x["date"])
+    return out
+
+
+def _load_cache_any(code):
+    """本地 K 线读取（双源，按可用性自动选择）。与 alpha101_backtest.py 同源同口径。
+
+    ① raw_data/_rps_cache/ —— 长历史 + 真实 amount（.gitignore:39 忽略，云端会被
+       actions/checkout 的 git clean -ffdx 清掉 ⇒ **不能作为唯一源**）。
+    ② raw_data/kline_cache/ —— **已入仓 · 云端零网络可取**（3000+ 只）。
+
+    返回 records list（date/open/high/low/close/volume/amount）或 None。
+    """
+    for _d in (CACHE_DIR, KLINE_CACHE_DIR):
+        _p = os.path.join(_d, "%s.json" % code)
+        if os.path.exists(_p):
+            _recs = _read_cache_file(_p)
+            if _recs:
+                return _recs
+    return None
+
+
+def _net_kline_records(code):
+    """网络长历史（700 日）→ records list；不可达则 None。
+
+    复用 algorithms/strong_breakout.py 的 `_fetch_kline`（gtimg 主源 → 新浪兜底，
+    双域名级故障转移，已在盘后链稳定运行）——不另造第三条取数路径。
+    返回行序为 [date, open, close, high, low, volume]（前复权）。
+    """
+    try:
+        k = _fetch_hist(code, FETCH_DAYS)
+    except Exception:
+        return None
+    if not k or len(k) < 60:
+        return None
+    out = []
+    for row in k:
+        try:
+            d = str(row[0])[:10]
+            o = float(row[1]); c = float(row[2])
+            h = float(row[3]); low = float(row[4]); v = float(row[5])
+        except Exception:
+            continue
+        if not d or c <= 0:
+            continue
+        out.append({"date": d, "open": o, "high": h, "low": low, "close": c,
+                    "volume": v, "amount": c * v * 100.0})
+    if len(out) < 60:
+        return None
+    out.sort(key=lambda x: x["date"])
+    return out
+
 
 def _log(m=""):
     print(m, flush=True)
@@ -70,41 +188,42 @@ def _market_of(code):
 
 
 def _load_klines(codes, workers):
-    """每票拉 700 日长历史；失败回落 _rps_cache 300 日缓存。返回 {code: rows}，rows 按 date 升序。"""
-    out, n_fetched, n_cached, n_fail = {}, 0, 0, 0
+    """网络长历史为主、本地缓存兜底。返回 {code: rows}，rows 按 date 升序。
+
+    🛡 2026-09-15：原实现调用的 _query_kline / _load_cache 从未定义（NameError → 全链秒退，
+    该脚本自 09-04 上线起从未产出过），现按原设计意图补齐：
+      ① 网络 700 日（gtimg→新浪，复用 strong_breakout._fetch_kline）——保证样本深度；
+      ② 失败回落本地缓存（_rps_cache → kline_cache）——保证云端/断网时不空手而归。
+    只读缓存会让样本深度掉到 251 日（NEED_MIN=261 都过不了），分层只剩个位数调仓点，
+    等于用「能跑」换「不算数」，故网络仍是主源。
+    """
+    out, n_net, n_cached, n_fail = {}, 0, 0, 0
     t0 = time.time()
 
     def _work(code):
-        try:
-            df = _query_kline(code, _market_of(code), FETCH_DAYS)
-            if df is not None and len(df) >= 60:
-                recs = df[["date", "open", "close", "volume"]].copy()
-                recs["date"] = recs["date"].astype(str).str[:10]
-                return code, recs.to_dict("records"), "fetch"
-        except Exception:
-            pass
-        rows = _load_cache(code)
-        if rows is not None and len(rows) >= 60:
-            recs = rows[["date", "open", "close", "volume"]].copy()
-            recs["date"] = recs["date"].astype(str).str[:10]
-            return code, recs.to_dict("records"), "cache"
+        recs = _net_kline_records(code)
+        if recs:
+            return code, recs, "net"
+        recs = _load_cache_any(code)
+        if recs:
+            return code, recs, "cache"
         return code, None, "fail"
 
-    _log(f"[kline] 拉取 {len(codes)} 只 x {FETCH_DAYS} 日（{workers} 线程）...")
+    _log(f"[kline] 拉取 {len(codes)} 只 x {FETCH_DAYS} 日（{workers} 线程，失败回落本地缓存）...")
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futs = {pool.submit(_work, c): c for c in codes}
         for i, fut in enumerate(as_completed(futs), 1):
             code, recs, how = fut.result()
             if recs:
                 out[code] = sorted(recs, key=lambda r: r["date"])
-                if how == "fetch":
-                    n_fetched += 1
+                if how == "net":
+                    n_net += 1
                 else:
                     n_cached += 1
             else:
                 n_fail += 1
-            if i % 40 == 0 or i == len(codes):
-                _log(f"[kline] {i}/{len(codes)} 完成（抓取{n_fetched}/缓存{n_cached}/失败{n_fail}，"
+            if i % 200 == 0 or i == len(codes):
+                _log(f"[kline] {i}/{len(codes)} 完成（网络{n_net}/缓存{n_cached}/失败{n_fail}，"
                      f"耗时 {time.time()-t0:.0f}s）")
     return out
 
@@ -395,14 +514,27 @@ def main():
     _log("=" * 70)
     _log(f"  因子实验室独立分层回测 — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     _log("=" * 70)
-    if not os.path.isdir(CACHE_DIR):
-        sys.exit(1)
-    codes = [f[:-5] for f in os.listdir(CACHE_DIR)
-             if f.endswith(".json") and _is_a6(f[:-5])]
+    # universe 目录：优先 _rps_cache（长历史，本机离线）；否则 kline_cache（已入仓·云端可取）。
+    # 🛡 2026-09-15：原实现只认 CACHE_DIR 且只判 isdir —— 该目录被 gitignore、云端清空后
+    #   仍然是「存在的空目录」，会走到 codes 为空再 sys.exit(1)，根因被掩盖成「无 universe」。
+    #   改为按**实际含 A股 6 位码 json** 逐目录探测，取第一个可用者。
+    def _uni_codes(d):
+        try:
+            return sorted(f[:-5] for f in os.listdir(d)
+                          if f.endswith(".json") and _is_a6(f[:-5]))
+        except Exception:
+            return []
+
+    uni_dir, codes = None, []
+    for _d in (CACHE_DIR, KLINE_CACHE_DIR):
+        _cs = _uni_codes(_d)
+        if _cs:
+            uni_dir, codes = _d, _cs
+            break
     if not codes:
-        _log("[error] _rps_cache 无 A股 6 位码 universe")
+        _log(f"[error] universe 缓存目录均无 A股 6 位码数据: {CACHE_DIR} / {KLINE_CACHE_DIR}")
         sys.exit(1)
-    _log(f"universe: {len(codes)} 只（重点池 A股，来自 _rps_cache）")
+    _log(f"universe: {len(codes)} 只（重点池 A股，来自 {os.path.basename(uni_dir)}）")
 
     klines = _load_klines(codes, args.workers)
     if not klines:
@@ -436,7 +568,10 @@ def main():
 
     out = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "universe": "重点池 A股（_rps_cache）",
+        # 🛡 2026-09-15（小九的工程师）：原为硬编码「（_rps_cache）」，
+        #    但 _rps_cache 被 .gitignore 忽略且本机为空 ⇒ 实际走 kline_cache，
+        #    文案与实际来源不符（数据口径失真）。改为回填实测目录名。
+        "universe": "重点池 A股（%s）" % os.path.basename(uni_dir),
         "cost_roundtrip": COST,
         "rebalance": f"每{STEP}个交易日，入场=次日开盘",
         # 🔴 2026-09-15 主人令（图2）：「拿不到就写累积中，直到累积到为止」。
@@ -459,7 +594,10 @@ def main():
         "abnormal_volume": abn,
         "roe_largecap": roe,
     }
-    with open(OUT_JSON, "w", encoding="utf-8") as f:
+    # 🛡 2026-09-15（小九的工程师）：显式 newline="\n"。
+    #    Windows 文本模式下 open(...,"w") 默认把 \n 转成 CRLF，而本仓 raw_data/*.json
+    #    与远端统一为 LF ⇒ 曾产出 488 处 CRLF，diff 出现 412/93 的假性大改。
+    with open(OUT_JSON, "w", encoding="utf-8", newline="\n") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
     _log(f"\n[ok] 写入 {OUT_JSON}")
 
