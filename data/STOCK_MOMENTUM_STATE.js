@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-15 19:33",
- "generated": "2026-09-15 19:33",
+ "update_time": "2026-09-15 19:37",
+ "generated": "2026-09-15 19:37",
  "meta": {
-  "generated": "2026-09-15 19:33",
+  "generated": "2026-09-15 19:37",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 8,
   "days_with_consensus": 0,
@@ -2142,13 +2142,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
-      "code": "301132",
-      "name": "满坤科技",
-      "change_pct": 6.048,
-      "price": 61.9,
-      "category": "突破"
-     },
-     {
       "code": "600792",
       "name": "云煤能源",
       "change_pct": 7.085,
@@ -2189,16 +2182,23 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 8.116,
       "price": 18.65,
       "category": "突破"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.481,
+      "price": 32.4,
+      "category": "突破"
+     },
+     {
+      "code": "688004",
+      "name": "博汇科技",
+      "change_pct": 19.982,
+      "price": 27.38,
+      "category": "突破"
      }
     ],
     "加速": [
-     {
-      "code": "301132",
-      "name": "满坤科技",
-      "change_pct": 6.048,
-      "price": 61.9,
-      "category": "加速"
-     },
      {
       "code": "600792",
       "name": "云煤能源",
@@ -2230,13 +2230,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
     ],
     "短线选股": [
      {
-      "code": "301132",
-      "name": "满坤科技",
-      "change_pct": 6.048,
-      "price": 61.9,
-      "category": "短线选股"
-     },
-     {
       "code": "600792",
       "name": "云煤能源",
       "change_pct": 7.085,
@@ -2277,6 +2270,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 8.116,
       "price": 18.65,
       "category": "短线选股"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.481,
+      "price": 32.4,
+      "category": "短线选股"
+     },
+     {
+      "code": "688004",
+      "name": "博汇科技",
+      "change_pct": 19.982,
+      "price": 27.38,
+      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -2292,6 +2299,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "骏亚科技",
       "change_pct": 8.116,
       "price": 18.65,
+      "category": "强势股"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.481,
+      "price": 32.4,
+      "category": "强势股"
+     },
+     {
+      "code": "688004",
+      "name": "博汇科技",
+      "change_pct": 19.982,
+      "price": 27.38,
       "category": "强势股"
      }
     ]
