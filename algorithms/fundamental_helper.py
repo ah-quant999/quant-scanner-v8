@@ -64,6 +64,11 @@ def quality_points(fq):
       D级: -10
       C级/无数据: 0
     叠加消息面 news.score（业绩预告/重组类公告，已在采集端截断 ±20，此处再夹 ±15）。
+
+    2026-09-15 主人令 T0 新增 CFO/A 现金含量分项（全档位通用调整）：
+      cfo_to_asset = 经营现金流/总资产（%，baostock CFOToOR×dupontAssetTurn 推导）：
+        ≥10% → +5（现金奶牛） | ≥5% → +3（现金流充沛） | <0 → -5（经营失血）
+        0~5% 或缺数据 → 0（中性，公平性原则不变）
     """
     if not fq:
         return 0, "", ""
@@ -102,6 +107,17 @@ def quality_points(fq):
     ns = int(news.get("score") or 0)
     ns = max(-15, min(15, ns))
     qs += ns
+
+    # 2026-09-15 主人令 T0：CFO/A 现金含量分项（缺数据一律中性 0，公平性原则不变）
+    cfa = fq.get("cfo_to_asset")
+    if cfa is not None:
+        if cfa >= 10:
+            qs += 5
+        elif cfa >= 5:
+            qs += 3
+        elif cfa < 0:
+            qs -= 5
+        # 0 ≤ cfa < 5 → 中性 0，不加减
 
     detail = reason or ""
     tags = news.get("tags") or []
