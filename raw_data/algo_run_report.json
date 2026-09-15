@@ -1,17 +1,40 @@
 {
-  "update_time": "2026-09-15 06:50:59",
-  "run_start": "2026-09-15 06:34:42",
-  "ok": 9,
+  "update_time": "2026-09-15 16:08:16",
+  "run_start": "2026-09-15 15:47:06",
+  "ok": 27,
   "fail": 2,
   "failed_scripts": [
     {
-      "script": "factor_lab_backtest.py",
-      "reason": "退出码 1 | NameError: name 'CACHE_DIR' is not defined"
+      "script": "fetch_stock_quote_v8.py",
+      "reason": "退出码 1 | ❌ A股行情异常稀少（0 只 < 3000），新浪+东财均不可用 → 拒绝写输出，保留旧数据"
     },
     {
       "script": "v8/fetch_citic_pe.py",
       "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
     }
   ],
-  "skipped_by_time_gate": []
+  "skipped_by_time_gate": [
+    "calc_crds.py",
+    "build_candidate_pool.py",
+    "generate_top10.py",
+    "backtest_tdx.py",
+    "backtest_comprehensive.py",
+    "export_optimized_strategy.py",
+    "strategy_four_volume_60m.py",
+    "strategy_four_volume.py",
+    "update_triple_resonance_history.py",
+    "gen_triple_consensus.py",
+    "gen_triple_track.py",
+    "update_four_volume_history.py",
+    "gen_four_volume_track.py",
+    "calc_volatility_watch.py",
+    "gen_stock_stop.py",
+    "gen_algo_track.py",
+    "calc_sentiment_cycle.py",
+    "auto_run_dn_algorithm.py",
+    "strong_breakout.py",
+    "track_h_auto_buy.py",
+    "final_recommend.py",
+    "backtest_expectancy.py"
+  ]
 }
