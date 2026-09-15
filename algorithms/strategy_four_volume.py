@@ -279,7 +279,7 @@ def scan_four_volume(top_cy=100, top_kc=100, top_zb=100, top_hk=50):
     return hits
 
 
-def write_four_volume_js(records, out_dir=DATA_DIR):
+def write_four_volume_js(records, out_dir=DATA_DIR, scan_error=None):
     """写出 data/FOUR_VOLUME.js（北京时间时间戳，供 v8 暂未上架区渲染）。"""
     try:
         from zoneinfo import ZoneInfo
@@ -303,22 +303,53 @@ def write_four_volume_js(records, out_dir=DATA_DIR):
     #   与金股池（out/gold_pool.json 被洗空）同族：**累积态一旦允许空写就必然被洗**。
     #   规则：本次命中 0 只且磁盘已有非空 → 拒绝覆盖，保留旧值；确需清空须显式
     #   V8_FOUR_VOLUME_FORCE_EMPTY=1（人工授权）。
-    if not records and os.environ.get("V8_FOUR_VOLUME_FORCE_EMPTY") != "1":
+    # 🛡 2026-09-16 阿狸咪的工程师·一劳永逸【死锁根治】（主人全权授权 · 采「乙」方案）：
+    #   实证冲突：0 命中时原闸门 return 不写盘 ⇒ 文件 mtime 冻结 ⇒
+    #   run_algorithms._gate_hardwait_four_volume 的判据是 **mtime >= run_start**（L742/L751）
+    #   ⇒ 永远判「非今日」⇒ 重跑 strategy_four_volume.py（单轮 60–90min）×3 + 每次 sleep 90s
+    #   ⇒ 超时 return False ⇒ _final_recommend_gate 拒绝产出 ⇒ **整轮 D 批白跑、不收敛**。
+    #   「防洗空」要「不写」，「新鲜度」要「必须写」——两个闸门语义直接打架。
+    #   乙方案 = **仍写盘，但口径绝不造假**（主人宗旨①数据新鲜真实）：
+    #     · update_time = 本轮真实计算时间（新鲜度据此放行，死循环解除）
+    #     · total       = 本轮真实命中数（0 就是 0，**绝不用旧值冒充**）
+    #     · stocks      = []（本轮真实结果）
+    #       🔴 旧命中**不可塞回 stocks**：update_four_volume_history.py L152 直接读
+    #          fv["stocks"] 记信号历史，塞回旧值＝把今天伪造成命中日 → 污染历史。
+    #     · zero_hit    = True（显式披露「本轮确为 0 命中」）
+    #     · carryover   = 上一有效批 {update_time,total,stocks}（**仅供前端兜底展示并标注来源**）
+    #   人工强制清空仍走 V8_FOUR_VOLUME_FORCE_EMPTY=1。
+    _zero_hit = (not records) and os.environ.get("V8_FOUR_VOLUME_FORCE_EMPTY") != "1"
+    if _zero_hit:
+        _carry = None
         try:
             if os.path.exists(path):
                 _old = open(path, "r", encoding="utf-8", errors="replace").read()
-                _m = re.search(r'"total"\s*:\s*(\d+)', _old)
-                if _m and int(_m.group(1)) > 0:
-                    print(f"  🛡 防洗空：本次命中 0 只，磁盘 {os.path.basename(path)} 已有 "
-                          f"{_m.group(1)} 只 → 拒绝覆盖（保留旧值，待盘后重算）")
-                    return path
+                _oj = _old.split("=", 1)[1].strip().rstrip(";") if "=" in _old else ""
+                _od = json.loads(_oj) if _oj else {}
+                _ot = int(_od.get("total") or 0)
+                _ostk = _od.get("stocks") or []
+                if _ot > 0 and _ostk:
+                    _carry = {"update_time": _od.get("update_time"),
+                              "total": _ot, "stocks": _ostk}
         except Exception as _e:
-            print(f"  [warn] 防洗空检查异常，按保守策略跳过写入: {_e}")
-            return path
+            print(f"  [warn] carryover 解析失败（不影响写盘）: {_e}")
+        data["total"] = 0
+        data["stocks"] = []
+        data["zero_hit"] = True
+        _err_txt = ("；扫描异常：" + str(scan_error)) if scan_error is not None else ""
+        if scan_error is not None:
+            data["scan_error"] = str(scan_error)
+        if _carry:
+            data["carryover"] = _carry
+            data["note"] = (f"本轮扫描 0 命中（真实无信号）{_err_txt}"
+                            f"；卡片展示沿用 {_carry.get('update_time') or '上一有效批'} 的 "
+                            f"{_carry['total']} 只（显式回退，非本轮结果）")
+        else:
+            data["note"] = f"本轮扫描 0 命中（真实无信号）{_err_txt}；且无可用历史批"
 
     with open(path, "w", encoding="utf-8") as f:
         f.write("window.FOUR_VOLUME=" + json.dumps(data, ensure_ascii=False, indent=1) + ";\n")
-    print(f"  ✅ 写出 {path}（{len(records)} 只命中）")
+    print(f"  ✅ 写出 {path}（{len(records)} 只命中{'; 🛡 零命中仍写盘·防死锁（zero_hit）' if _zero_hit else ''}）")
     return path
 
 
@@ -558,6 +589,7 @@ def main():
     except Exception:
         pass
     records = []
+    _scan_err = None
     try:
         records = scan_four_volume(top_cy=args.top, top_kc=args.top,
                                    top_zb=args.top, top_hk=max(20, args.top // 2))
@@ -565,7 +597,8 @@ def main():
         # 🛡 2026-09-03 一劳永逸：扫描异常也要写出带新鲜时间戳的产物，避免
         #   data/FOUR_VOLUME.js 冻结在上一跑、被运维按陈旧判 fail（静默冻结根因）。
         print(f"  [ERROR] 四量终极日线扫描异常: {e}")
-    write_four_volume_js(records)
+        _scan_err = e
+    write_four_volume_js(records, scan_error=_scan_err)
     # 2026-09-06 P0-C：默认就跑回测（不再 0 不跑）。即便 args.backtest=0 或 records 空，也尝试 sync 写
     # 一个空回测外壳以保 FOUR_VOLUME_BACKTEST.js 新鲜。
     bt_summary = None
