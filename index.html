@@ -2403,12 +2403,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
     </div>
 
-    <!-- ETF 二合一（盘中异动 + 主力净额分时，纵向双联）
+    <!-- ETF 盘中异动·主力净额分时（纵向双联）
+         📝 2026-09-16 主人令：卡名由「ETF 二合一 - 盘中异动 + 主力净额分时」改为「ETF 盘中异动 · 主力净额分时」
+              （原「三合一/二合一」为历史命名，Block2/Block3 已先后迁出，卡名不再是块数描述）。
          🚚 2026-09-11 主人令：原 Block 3「日监控·主力净流入」已迁至「盘后数据」页（市场宽度卡上方）；
          🚚 2026-09-15 主人令：原 Block 2「资金热度·净申赎」（T-1 非实时）迁至「盘后数据」页「日监控」卡下方。
               本卡现由 盘中异动 + 主力净额分时累计曲线 构成。 -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">💰</span>ETF 二合一 - 盘中异动 + 主力净额分时 · <span class="fresh" id="phEtfTime">—</span></h3>
+      <h3><span class="ic">💰</span>ETF 盘中异动 · 主力净额分时 · <span class="fresh" id="phEtfTime">—</span></h3>
       <div id="etfAnalysis" class="limit-up-analysis" style="display:none;margin-bottom:12px;"></div>
 
       <!-- Block 1: 盘中异动·量能脉冲 (顶, T+0) -->
@@ -2721,7 +2723,7 @@ function fmtSigned(v){
       <div class="note">⚠️ 口径披露：本卡「主力净流入」为<b>按主动成交方向推断的估算值</b>（东方财富口径），<b>非真实资金进出</b>。真实资金行为请看「资金热度·净申赎」（真实份额申赎）与「龙虎榜」（真实席位）。</div>
     </div>
 
-    <!-- 🚚 资金热度·净申赎（2026-09-15 主人令：T-1 非实时，自「实时数据」页 ETF 二合一 Block2 迁至本页「日监控·主力净流入」卡下方。
+    <!-- 🚚 资金热度·净申赎（2026-09-15 主人令：T-1 非实时，自「实时数据」页 ETF 盘中异动·主力净额分时卡 Block2 迁至本页「日监控·主力净流入」卡下方。
          容器 id="etfHeatBlock/etfHeatSummary/etfHeatByCat" 与 renderEtfHeatByCategory() 不变，仅 DOM 位置移动。） -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">🔥</span>资金热度·净申赎（真实份额） <span style="font-size:10px;color:var(--dim);font-weight:600">上交所口径 · 数据日 T-1 · 非估算（交易所盘后披露）</span> · <span class="fresh" id="etfHeatTime">—</span></h3>
@@ -10456,7 +10458,7 @@ window.__renderV8CalFull();
     if(daily.update_time) setBadge('etfDailyTime',_slotNow,'短线',daily.update_time,null,'盘后');
   }
 
-  /* ---- ETF 二合一·盘面分析说明（对标涨停热力矩阵；原三段式含「日监控」，该块已迁盘后数据页） ---- */
+  /* ---- ETF 盘中异动·主力净额分时·盘面分析说明（对标涨停热力矩阵；原三段式含「日监控」，该块已迁盘后数据页） ---- */
   function renderEtfAnalysis(pulse, heat, daily){
     var el=document.getElementById('etfAnalysis');
     if(!el) return;
@@ -11451,7 +11453,7 @@ function drawUpDownChart(){
 
           {name:'日监控 · 主力净流入', source:'ETF_DAILY_MONITOR', freq:'盘中每30分 + 收盘后定稿', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30','17:20'], note:'全市场 ETF 当日主力净流入 TOP 排名（T+0 定基）；2026-09-11 主人令自「实时数据」页 ETF 三合一 Block3 独立成卡、迁至本页（市场宽度卡上方）；数据本体盘中每30分刷新 + 盘后三档(17:20/18:20/19:20)定稿，CATEGORY_MAP=intraday,post_close'},
 
-          {name:'资金热度 · 净申赎', source:'ETF_NET_SUBSCRIPTION', freq:'每日盘前', slots:['08:25'], note:'上交所 ETF 真实份额申赎（数据日 T-1，交易所盘后披露，非实时）；2026-09-15 主人令自「实时数据」页 ETF 二合一 Block2 迁至本页（日监控卡下方），容器 id 与渲染函数不变'},
+          {name:'资金热度 · 净申赎', source:'ETF_NET_SUBSCRIPTION', freq:'每日盘前', slots:['08:25'], note:'上交所 ETF 真实份额申赎（数据日 T-1，交易所盘后披露，非实时）；2026-09-15 主人令自「实时数据」页 ETF 盘中异动·主力净额分时卡 Block2 迁至本页（日监控卡下方），容器 id 与渲染函数不变'},
           {name:'市场宽度 · 新高家数与宽度评分', source:'W52_HIGH', freq:'收盘后1次', slots:['17:30'], note:'今日历史新高家数 + 宽度评分 + 领涨新高股 TOP8；胶囊改小内部一行'},
 
           {name:'期指主力合约', source:'CFFEX_HOLDINGS', freq:'盘中每30分', slots:['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'IF/IC/IM 主力合约（intraday 刷新，2026-08-31 迁回实时数据页）；胶囊改小内部一行'},
@@ -12606,7 +12608,7 @@ window.showRestrictedItems = showRestrictedItems;
     //   不挂带具体时间的 🐻 胶囊；时间统一在下属各子卡片上展示）
     // 原代码曾在 rtUpdateTime 拼一个 max(intradayTimes) 的胶囊徽章,已删除。
 
-    // 1) ETF 二合一（盘中异动）+ 盘后页「日监控·主力净流入」「资金热度·净申赎」（2026-09-15 主人令迁入）—— 直接用已注入的 window 变量
+    // 1) ETF 盘中异动·主力净额分时 + 盘后页「日监控·主力净流入」「资金热度·净申赎」（2026-09-15 主人令迁入）—— 直接用已注入的 window 变量
     safe(renderEtfPulse, window.ETF_PULSE || {});
     safe(renderEtfHeatByCategory, window.ETF_NET_SUBSCRIPTION || {});
     safe(renderEtfDaily, window.ETF_DAILY_MONITOR || {});
