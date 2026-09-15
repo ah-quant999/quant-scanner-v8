@@ -137,6 +137,16 @@ window.__domReadyFns=[];
   .tab.locked .lk{font-size:11px}
   .tab.admin-only{display:none}
 
+  /* ===== 🌍 观测平台·子页签（2026-09-15 修复）=====
+     原实现只在 __obsSwitch 里切 .active 类，而全站 CSS 有 .tab.active / .ul-tab.active /
+     .rc-tab-btn.active / .lg-tab.active，独缺 .obs-tab.active —— 颜色与下划线又是在渲染时
+     用行内样式写死的 ⇒ 点「📊 大盘观测」后绿色横杆仍留在「🌍 宏观观测」。
+     此处补齐 CSS，与其余四族子页签统一为「CSS + classList」机制（渲染侧不再写死行内色）。 */
+  .obs-tab{padding:8px 18px;font-size:13px;font-weight:700;color:var(--sub);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s}
+  .obs-tab:hover{color:var(--txt)}
+  .obs-tab[data-obs="macro"].active{color:#34d399;border-bottom-color:#34d399}
+  .obs-tab[data-obs="market"].active{color:#c8a2e8;border-bottom-color:#c8a2e8}
+
   main{padding:22px 20px 60px;max-width:1320px;margin:0 auto;overflow:visible}
   section{display:none;animation:fade .25s ease}
   section.active{display:block}
@@ -1835,7 +1845,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <!-- 2026-09-15 主人令：一级页「🌍 观测平台」（原「🌍 宏观观测」一级页升级为父级）
        其下两个同级子页（子页顺序按主人令：宏观观测在左）：①🌍 宏观观测（2 卡）②📊 大盘观测（4 卡） -->
   <section id="sec-obs">
-    <div class="sec-head"><h2>🌍 观测平台</h2><span class="tag">🌍 宏观观测（左）+ 📊 大盘观测（右）· 两个观测子页 · 仅供研究参考</span></div>
+    <div class="sec-head"><h2>🌍 观测平台</h2><span class="tag">🌍 宏观观测 + 📊 大盘观测 · 两个观测子页 · 仅供研究参考</span></div>
     <div id="obsHost"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">加载中…</div></div>
   </section>
 
@@ -14810,7 +14820,7 @@ h+=`</div>`;
 
   // ═══════════════════════════════════════════════════════════════════════════════
   // 🌍 观测平台（2026-09-15 主人令：新建一级 TAB）—— 两个同级子页
-  //   子页顺序按主人令：①🌍 宏观观测（左）②📊 大盘观测（右）
+  //   子页顺序按主人令：①🌍 宏观观测 ②📊 大盘观测
   //   大盘观测 = 原「🧪 暂未上架 > 📊 大盘观察」整页迁入并改名（4 卡）：
   //     ①艾略特波浪 · 深度分析  ②斐波那契F观测窗（← 原「🔒 已下架」盘前区迁入）
   //     ③中信 PE 观测            ④A股指数观测
@@ -14847,9 +14857,14 @@ h+=`</div>`;
     var pK = document.getElementById('obsPaneMarket');
     if(pM) pM.style.display = (tab === 'macro') ? 'block' : 'none';
     if(pK) pK.style.display = (tab === 'market') ? 'block' : 'none';
+    // 2026-09-15 修复：按 data-obs 逐按钮判定高亮，不依赖 btn 入参
+    //   （原实现「先全 remove 再给 btn 加」——btn 为空时无人高亮；且高亮色原先写死在行内样式里，
+    //    类名切换根本改不动横杆。现统一交给 CSS：.obs-tab[data-obs].active）
     var tabs = document.querySelectorAll('#sec-obs .obs-tab');
-    for(var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
-    if(btn) btn.classList.add('active');
+    for(var j = 0; j < tabs.length; j++){
+      if(tabs[j].getAttribute('data-obs') === tab) tabs[j].classList.add('active');
+      else tabs[j].classList.remove('active');
+    }
     if(typeof window.__obsRenderPane === 'function'){ try{ window.__obsRenderPane(tab); }catch(e){} }
   };
   window.__renderObsPlatform = function(){
@@ -14857,8 +14872,8 @@ h+=`</div>`;
     var hm = '';
     // ── 子 TAB 按钮行（🌍 宏观观测 在左 · 按主人令）──
     hm += '<div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--border);">';
-    hm += '<button class="obs-tab' + (_act==='macro' ? ' active' : '') + '" onclick="window.__obsSwitch(this,\'macro\')" style="padding:8px 18px;font-size:13px;font-weight:700;color:' + (_act==='macro' ? '#34d399' : 'var(--sub)') + ';background:none;border:none;border-bottom:2px solid ' + (_act==='macro' ? '#34d399' : 'transparent') + ';cursor:pointer;transition:all .2s;">🌍 宏观观测</button>';
-    hm += '<button class="obs-tab' + (_act==='market' ? ' active' : '') + '" onclick="window.__obsSwitch(this,\'market\')" style="padding:8px 18px;font-size:13px;font-weight:700;color:' + (_act==='market' ? '#c8a2e8' : 'var(--sub)') + ';background:none;border:none;border-bottom:2px solid ' + (_act==='market' ? '#c8a2e8' : 'transparent') + ';cursor:pointer;transition:all .2s;">📊 大盘观测</button>';
+    hm += '<button class="obs-tab' + (_act==='macro' ? ' active' : '') + '" data-obs="macro" onclick="window.__obsSwitch(this,\'macro\')">🌍 宏观观测</button>';
+    hm += '<button class="obs-tab' + (_act==='market' ? ' active' : '') + '" data-obs="market" onclick="window.__obsSwitch(this,\'market\')">📊 大盘观测</button>';
     hm += '</div>';
     // ══ 子页①：🌍 宏观观测（2 卡 · 原一级页原样迁入）══
     hm += '<div id="obsPaneMacro" style="display:' + (_act==='macro' ? 'block' : 'none') + ';">';
