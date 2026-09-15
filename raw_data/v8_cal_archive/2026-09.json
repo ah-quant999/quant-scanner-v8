@@ -1,6 +1,6 @@
 {
  "month": "2026年9月",
- "update_time": "2026-09-14 18:09",
+ "update_time": "2026-09-15 08:20",
  "legend": [
   {
    "title": "重要政策",
@@ -254,24 +254,24 @@
     {
      "num": 14,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇺🇸 美国PPI数据",
        "cls": "us",
-       "released": false
+       "released": true
       },
       {
        "text": "🇺🇸 美国零售销售",
        "cls": "us",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 15,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇺🇸 FOMC议息会议第1天",
