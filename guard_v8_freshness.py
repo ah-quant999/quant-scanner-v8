@@ -162,7 +162,8 @@ CORE_SOURCES_ALGO = {
     "BACKTEST_COMPREHENSIVE": 24,
     "BACKTEST_TDX": 24,
     "CRDS_CARD_DATA": 24,
-    # 🛡 2026-09-14 阿狸咪的工程师（双机独立复核后裁定）：LHB_7D 已从本组**移出** → FROZEN_SOURCES。
+    # 🛡 2026-09-14 阿狸咪的工程师（双机独立复核后裁定）：LHB_7D 已从本组**移出**。
+    #    → 09-15 小九的工程师进一步**退役删除**（data/LHB_7D.js 已不存在，见下方 FROZEN_SOURCES 注释）。
     #    根因：唯一生产者 gen_lhb_7d.py 于 09-13 主动停跑（run_algorithms.py 摘除调度 + 注释调用），
     #    前端零引用（index.html L565 注明「停止注入」）、raw 无消费方 ⇒ **它已无生产者**。
     #    留在本组（+ ALGO_VARS）的后果：每 30min 必判红 → 必自愈派 algo_cloud，而结构上
@@ -252,6 +253,48 @@ def _dispatch_cn(category, token):
         return False, f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:120]}"
     except Exception as e:
         return False, str(e)[:120]
+
+
+def _algo_active_run(token, lookback_min=180):
+    """查 v8_algo_cloud 是否**已有活跃/排队 run** —— 有则不再重复派发（先查再派）。
+
+    🛡 2026-09-15（阿狸咪的工程师，第 412 轮实证）：19:27 派发的算法链仍在跑（step 12/17，
+    已 2h20m+），而 30min 冷却一到 guard 又派一发 ⇒ 新 run 只能 `pending` **排在链条之后**
+    （同 concurrency 组），链条跑完再空转跳过（step 8 闸门判「批次已完成」→ 秒退）。
+    这正是 algo_cloud「周期性空转 + 抢同并发组」的机制缺口（与 FROZEN 组漏判并列）。
+    与 `.github/scripts/cloud_dispatcher.py` 的 latest_run/dispatch_guard 同口径：**先查再派**。
+    lookback_min 内的活跃 run 才算「正在处理」；更老的活跃 run 视为僵尸（仍派发，交给看门狗清理）。
+
+    返回 (run_id, status, created_cst_str) 或 None（无活跃 run / 查询失败）。
+    """
+    url = (f"https://api.github.com/repos/{REPO}/actions/workflows/"
+           f"{ALGO_WORKFLOW_ID}/runs?per_page=10")
+    hdr = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    try:
+        req = urllib.request.Request(url, headers=hdr, method="GET")
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode("utf-8", "replace"))
+    except Exception:
+        return None   # 查询失败 → 不阻断派发（宁可多派一次，不可漏治）
+    ACTIVE = ("in_progress", "queued", "pending", "requested", "waiting")
+    now_utc = datetime.now(timezone.utc)
+    for run in data.get("workflow_runs", []):
+        if run.get("status") not in ACTIVE:
+            continue
+        try:
+            created = datetime.strptime(run["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(
+                tzinfo=timezone.utc)
+        except Exception:
+            continue
+        if (now_utc - created).total_seconds() / 60.0 > lookback_min:
+            continue   # 僵尸活跃 run：不据此跳过（由 cloud_dispatcher 看门狗清理）
+        cst = (created + timedelta(hours=8)).strftime("%H:%M")
+        return (run.get("id"), run.get("status"), cst)
+    return None
 
 
 def _dispatch_algo(token):
@@ -660,6 +703,16 @@ def main():
                 except Exception:
                     pass
             if cat == "algo":
+                # 🛡 2026-09-15 先查再派：链条已在跑 ⇒ 不再堆第二发（防抢同并发组 + 空转）
+                act = _algo_active_run(token)
+                if act:
+                    rid, st, cst = act
+                    print(f"  [排队中] 算法链已有活跃 run #{rid}（{st}，{cst} 创建）"
+                          f"⇒ 跳过重复派发，视为处理中（{', '.join(vars_)}）")
+                    healed_cats.add(cat)
+                    sh[cat] = {"ts": now.strftime("%Y-%m-%d %H:%M:%S"), "vars": vars_,
+                               "note": f"skip: active run #{rid} ({st})"}
+                    continue
                 ok, msg = _dispatch_algo(token)
                 dispatch_name = "algo_cloud"
             else:
