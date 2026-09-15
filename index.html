@@ -630,7 +630,7 @@ window.__domReadyFns=[];
          故删此行零功能损失。若日后云端产出 maharo_macro.js，恢复本行即可。 -->
     <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20260911） -->
     <script src="data/maharo_insights.js?v=20260910" defer></script>
-    <script src="data/BAIHECHOU_MACRO.js?v=1789513869" defer></script><!-- 🌐 新周期判定 · 海外宏观 + AI 大周期（数据源：雪球 @白河愁博士；工作日盘前 06:30 由本机自动化一次完成抓原文与 AI 出稿 · window.BAIHECHOU_MACRO） -->
+    <script src="data/BAIHECHOU_MACRO.js?v=1789513869" defer></script><!-- 🌐 新周期判定 · 海外宏观 + AI 大周期（数据源：雪球 @白河愁博士；工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿 · window.BAIHECHOU_MACRO） -->
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=1789513869" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
@@ -13980,7 +13980,7 @@ window.showRestrictedItems = showRestrictedItems;
 //   ①概念/行业 → ETF·龙头 参考 ②主题空间 ③🌐 新周期判定 · 海外宏观 + AI 大周期（本页最下方）
 //   2026-09-15：AI 洞察·多源观点对比 整卡迁往「🌍 观测平台 > 🌍 宏观观测」；
 //   2026-09-16 主人令：「🌐 新周期判定」恢复至本页最下方，并接入现有数据源（雪球 @白河愁博士 ⇒ window.BAIHECHOU_MACRO），
-//     同批开启盘前日频更新解析（工作日盘前 06:30 由本机自动化一次完成抓原文与 AI 出稿）。原卡为静态快照死卡，详见 R3/R4 注释。
+//     同批开启盘前日频更新解析（工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿）。原卡为静态快照死卡，详见 R3/R4 注释。
 //   概念ETF龙头参考
 h += '<div id="ulPaneObserve" style="display:block;">';
 h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">'
@@ -14005,7 +14005,7 @@ h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-lef
 //   「该卡纯静态内联、无 data 依赖/无生成器」⇒ 下沉至「暂未上架 · 观测类」最下方 → 2026-09-14 20:31
 //   随「移除观测类 3 卡(主题空间/AI洞察/新周期判定)」一并被删 ⇒ 内容永久停在 09-06，即死卡。
 //   本次恢复 = ①原样回来的卡名与双源对比版式 ②接入现有数据源（雪球 @白河愁博士 ⇒ window.BAIHECHOU_MACRO）
-//   ③开启盘前日频更新解析（工作日盘前 06:30 由本机自动化一次完成抓原文与 AI 出稿）。
+//   ③开启盘前日频更新解析（工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿）。
 //   ⚠ 容器 id 沿用 baihechouBody（2026-09-15 小九为该数据源建的卡壳 id）：同页同源只留一张卡，不重复建壳。
 h += '<div class="card" id="baihechouBody" style="margin-bottom:16px;border-left:4px solid #60a5fa;">'
    + '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F30D; 新周期判定 · 海外宏观 + AI 大周期 加载中&#x2026;</div></div>';
@@ -14062,7 +14062,7 @@ h += '</div>'; // /ulPaneObserve
 
   // ═══ 🌐 2026-09-16 主人令：新周期判定 · 海外宏观 + AI 大周期（唯一渲染入口）═══
   //   数据源：window.BAIHECHOU_MACRO（雪球 @白河愁博士 uid 7251377368）
-  //     · posts / replies = 当期公开原文（工作日盘前 06:30 抓取，Chrome/Edge headless 过 WAF）
+  //     · posts / replies = 当期公开原文（工作日盘前 06:30 抓取（失败 08:30 兜底），Chrome/Edge headless 过 WAF）
   //     · analysis = 同一批次由 AI 阅读原文后撰写：verdict（当期主线一句话）
   //       + sections[{k:market|sector|position, tag, tension, delta, align}]（三段实情解析）
   //   版式：卡名置顶 + 频率 badge + 数据源 → 核心/用法/限制 → 一句话结论 → 双源对比三组 → 原文折叠 → 口径。
@@ -14077,7 +14077,7 @@ h += '</div>'; // /ulPaneObserve
     var d = window.BAIHECHOU_MACRO;
     if(!d || !(d.posts && d.posts.length)){
       if(window.__ncRetry < 40){ window.__ncRetry++; setTimeout(window.__renderNewCycleJudge, 600); return; }
-      host.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F30D; 新周期判定 · 海外宏观 + AI 大周期 原文暂未抓取（工作日盘前 06:30 自动任务）</div>';
+      host.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F30D; 新周期判定 · 海外宏观 + AI 大周期 原文暂未抓取（工作日盘前 06:30 自动任务 · 失败 08:30 兜底）</div>';
       return;
     }
     var p = d.profile || {}, st = d.stats || {}, ana = d.analysis || {};
@@ -14089,7 +14089,7 @@ h += '</div>'; // /ulPaneObserve
     // ── ① 卡名行（置顶）+ 频率 badge + 实时时段胶囊 ──
     h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
        + '<span style="font-size:15px;font-weight:700;color:' + ACC + ';">&#x1F30D; 新周期判定 · 海外宏观 + AI 大周期</span>'
-       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:' + ACC + ';background:rgba(' + RGB + ',.16);border:1px solid rgba(' + RGB + ',.4);letter-spacing:.5px;">&#x1F4C6; 日频 · 工作日盘前 06:30 抓取并解析</span>'
+       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:' + ACC + ';background:rgba(' + RGB + ',.16);border:1px solid rgba(' + RGB + ',.4);letter-spacing:.5px;">&#x1F4C6; 日频 · 工作日盘前 06:30 抓取并解析 · 失败 08:30 兜底</span>'
        + '<span class="fresh" id="newCycleFresh">&#x2014;</span></div>';
     // ── ② 数据源行 ──
     h += '<div style="font-size:11.5px;color:var(--dim);margin-bottom:10px;">数据源：雪球 <b style="color:var(--txt);">@' + _e(p.name || '白河愁博士') + '</b>'
@@ -14149,7 +14149,7 @@ h += '</div>'; // /ulPaneObserve
        + '<div style="margin-top:8px;">' + _blk(posts.slice(0, 12), '主帖') + _blk(replies.slice(0, 8), '回复') + '</div></details>';
     // ── ⑦ 底部口径 ──
     h += '<div style="background:rgba(' + RGB + ',.05);border:1px solid rgba(' + RGB + ',.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
-       + '&#x26A0;&#xFE0F; <b style="color:' + ACC + ';">展示型卡</b>：原文取自雪球公开帖文（工作日盘前 06:30 自动抓取），解析由同一批次的 AI 步骤阅读原文后撰写，'
+       + '&#x26A0;&#xFE0F; <b style="color:' + ACC + ';">展示型卡</b>：原文取自雪球公开帖文（工作日盘前 06:30 自动抓取 · 失败 08:30 兜底），解析由同一批次的 AI 步骤阅读原文后撰写，'
        + '<b>AI 转述 + 判断</b>，不是量化统计、不替代个股信号；卡内个股名称均为<b>其原文提及</b>、非推荐，请回原文核对。'
        + '原文更新于 ' + _e(d.update_time || '—') + ' · 解析出稿于 ' + _e(ana.generated_at || '—') + ' · 仅供研究参考，不构成个人投资建议。</div>';
     host.innerHTML = h;
