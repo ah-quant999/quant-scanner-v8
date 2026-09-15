@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-15 23:56",
- "generated": "2026-09-15 23:56",
+ "update_time": "2026-09-16 00:29",
+ "generated": "2026-09-16 00:29",
  "meta": {
-  "generated": "2026-09-15 23:56",
+  "generated": "2026-09-16 00:29",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 8,
+  "total_days": 9,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -2139,6 +2139,188 @@ window.STOCK_MOMENTUM_STATE = (function() {
   },
   {
    "date": "2026-09-15",
+   "categories": {
+    "突破": [
+     {
+      "code": "600792",
+      "name": "云煤能源",
+      "change_pct": 7.085,
+      "price": 5.29,
+      "category": "突破"
+     },
+     {
+      "code": "301251",
+      "name": "威尔高",
+      "change_pct": 3.792,
+      "price": 68.15,
+      "category": "突破"
+     },
+     {
+      "code": "000993",
+      "name": "闽东电力",
+      "change_pct": 10.02,
+      "price": 16.8,
+      "category": "突破"
+     },
+     {
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 5.054,
+      "price": 2.91,
+      "category": "突破"
+     },
+     {
+      "code": "605058",
+      "name": "澳弘电子",
+      "change_pct": 9.989,
+      "price": 40.3,
+      "category": "突破"
+     },
+     {
+      "code": "603386",
+      "name": "骏亚科技",
+      "change_pct": 8.116,
+      "price": 18.65,
+      "category": "突破"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.481,
+      "price": 32.4,
+      "category": "突破"
+     },
+     {
+      "code": "688004",
+      "name": "博汇科技",
+      "change_pct": 19.982,
+      "price": 27.38,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "600792",
+      "name": "云煤能源",
+      "change_pct": 7.085,
+      "price": 5.29,
+      "category": "加速"
+     },
+     {
+      "code": "301251",
+      "name": "威尔高",
+      "change_pct": 3.792,
+      "price": 68.15,
+      "category": "加速"
+     },
+     {
+      "code": "000993",
+      "name": "闽东电力",
+      "change_pct": 10.02,
+      "price": 16.8,
+      "category": "加速"
+     },
+     {
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 5.054,
+      "price": 2.91,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "600792",
+      "name": "云煤能源",
+      "change_pct": 7.085,
+      "price": 5.29,
+      "category": "短线选股"
+     },
+     {
+      "code": "301251",
+      "name": "威尔高",
+      "change_pct": 3.792,
+      "price": 68.15,
+      "category": "短线选股"
+     },
+     {
+      "code": "000993",
+      "name": "闽东电力",
+      "change_pct": 10.02,
+      "price": 16.8,
+      "category": "短线选股"
+     },
+     {
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 5.054,
+      "price": 2.91,
+      "category": "短线选股"
+     },
+     {
+      "code": "605058",
+      "name": "澳弘电子",
+      "change_pct": 9.989,
+      "price": 40.3,
+      "category": "短线选股"
+     },
+     {
+      "code": "603386",
+      "name": "骏亚科技",
+      "change_pct": 8.116,
+      "price": 18.65,
+      "category": "短线选股"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.481,
+      "price": 32.4,
+      "category": "短线选股"
+     },
+     {
+      "code": "688004",
+      "name": "博汇科技",
+      "change_pct": 19.982,
+      "price": 27.38,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "605058",
+      "name": "澳弘电子",
+      "change_pct": 9.989,
+      "price": 40.3,
+      "category": "强势股"
+     },
+     {
+      "code": "603386",
+      "name": "骏亚科技",
+      "change_pct": 8.116,
+      "price": 18.65,
+      "category": "强势股"
+     },
+     {
+      "code": "603595",
+      "name": "ST东尼",
+      "change_pct": 3.481,
+      "price": 32.4,
+      "category": "强势股"
+     },
+     {
+      "code": "688004",
+      "name": "博汇科技",
+      "change_pct": 19.982,
+      "price": 27.38,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-09-16",
    "categories": {
     "突破": [
      {
