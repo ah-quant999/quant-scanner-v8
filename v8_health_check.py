@@ -2763,11 +2763,16 @@ def build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh=No
     warn = sum(1 for x in all_items if x["status"] == "warn")
     fail = sum(1 for x in all_items if x["status"] == "fail")
     limited = sum(1 for x in all_items if x["status"] == "limited")
+    # 🛡 2026-09-15 主人令一劳永逸：info 桶（真·不适用，非失败）+ other 桶（未知 status=接线缺口）。
+    #   不变量：info/other 永不计入 fail、永不拉红 overall；但 other>0 表示后端发了前端没接的 status，
+    #   前端会显红 ‼ 报警（藏错=违背纪律），此处仅保证 summary 分项之和 == total（对账无缺口）。
+    info = sum(1 for x in all_items if x["status"] == "info")
+    other = sum(1 for x in all_items if x["status"] not in ("ok", "warn", "fail", "limited", "info"))
     overall = "ok" if fail == 0 else ("warn" if fail <= 2 else "fail")
     return {
         "updated": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
         "overall": overall,
-        "summary": {"ok": ok, "warn": warn, "fail": fail, "limited": limited, "total": len(all_items)},
+        "summary": {"ok": ok, "warn": warn, "fail": fail, "limited": limited, "info": info, "other": other, "total": len(all_items)},
         "items": all_items,
     }
 

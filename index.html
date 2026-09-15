@@ -11217,6 +11217,14 @@ function drawUpDownChart(){
 
       {
 
+        id:'obs', icon:'🌍', name:'观测平台',
+
+        cards:[]
+
+      },
+
+      {
+
         id:'td', icon:'📅', name:'今日事件',
 
         cards:[
@@ -11319,6 +11327,30 @@ function drawUpDownChart(){
 
       {
 
+        id:'rc', icon:'🧲', name:'共振日历',
+
+        cards:[]
+
+      },
+
+      {
+
+        id:'final', icon:'🏆', name:'最终推荐',
+
+        cards:[]
+
+      },
+
+      {
+
+        id:'query', icon:'🔍', name:'个股查询',
+
+        cards:[]
+
+      },
+
+      {
+
         id:'st', icon:'🎯', name:'选股策略',
 
         cards:[
@@ -11345,6 +11377,30 @@ function drawUpDownChart(){
 
       {
 
+        id:'bt', icon:'🧪', name:'策略回测',
+
+        cards:[]
+
+      },
+
+      {
+
+        id:'ul', icon:'🔒', name:'暂未上架',
+
+        cards:[]
+
+      },
+
+      {
+
+        id:'dl', icon:'🔒', name:'已下架',
+
+        cards:[]
+
+      },
+
+      {
+
         id:'op', icon:'🔒', name:'运维',
 
         cards:[
@@ -11365,6 +11421,40 @@ function drawUpDownChart(){
           }
 
         ]
+
+      }
+
+      ,
+
+      {
+
+        id:'lgd', icon:'🔒', name:'逻辑详解',
+
+        cards:[]
+
+      },
+
+      {
+
+        id:'fd', icon:'🗂', name:'全量数据',
+
+        cards:[]
+
+      },
+
+      {
+
+        id:'pl', icon:'🔧', name:'管线',
+
+        cards:[]
+
+      },
+
+      {
+
+        id:'ca', icon:'📋', name:'内容审计',
+
+        cards:[]
 
       }
 
@@ -11662,13 +11752,14 @@ function drawUpDownChart(){
 
       html += '<div class="card" style="margin-bottom:14px;border-left:3px solid var(--cyan)">';
 
-      html += '<h3><span class="ic">'+pg.icon+'</span>'+pg.name+' <span style="font-size:11px;color:var(--dim);font-weight:400;">'+pg.cards.length+' 张卡片 · 今日 '+pageBadge+'</span></h3>';
+      const _pgMeta = pg.cards.length ? (pg.cards.length+' 张卡片 · 今日 '+pageBadge) : '暂无任务登记';
+      html += '<h3><span class="ic">'+pg.icon+'</span>'+pg.name+' <span style="font-size:11px;color:var(--dim);font-weight:400;">'+_pgMeta+'</span></h3>';
 
       html += '<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead>';
 
       html += '<tr style="background:var(--card2);"><th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">卡片</th><th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">频率</th><th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">今日运行时间轴（✓成功 ✗失败 ⬜未到期）</th><th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">最近实际</th><th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">说明</th></tr>';
 
-      html += '</thead><tbody>'+pageHtml+'</tbody></table>';
+      html += '</thead><tbody>'+(pageHtml || '<tr><td colspan="5" style="padding:10px 8px;border:1px solid var(--border);color:var(--dim);font-size:11px;text-align:center;">该页尚无任务登记（导航已列出，等待接入调度）</td></tr>')+'</tbody></table>';
 
       html += '</div>';
 
@@ -11704,6 +11795,26 @@ function drawUpDownChart(){
   //   导致运维「数据健康总览」无法被外部/自愈脚本重绘（排障时只能整页刷新）。补挂导出。
   window.renderRunnerTrack = renderRunnerTrack;
     // 🛡 2026-08-31 轻量化：window.V8_PAGE_SCHEDULE 为死赋值（全仓无定义、无读取），已删除。
+  /* ---- 状态视觉单一真相源（2026-09-15 主人令一劳永逸） ----
+     后端 v8_health_check 发出的 status 全集：ok / warn / fail / limited / info。
+     映射铁律（主人纪律：数据及时真实可靠，算法科学严谨）：
+       · ok/warn/fail/limited/info = 已定义语义，按表渲染
+       · info/limited/skip = 真·不适用（环境不支持/语义不成立）→ 灰显，不算失败
+       · fail/warn = 真失败 → 红/黄，必须可见
+       · unknown（前端没接的 status）= 接线缺口 → 显红 ‼，绝不静默灰化（藏错=违背纪律）
+  */
+  var V8_STATUS_VISUAL = {
+    ok:      {color:'var(--down)', sym:'✓',  bg:'rgba(31,209,123,.06)',  border:'rgba(31,209,123,.2)'},
+    warn:    {color:'var(--gold)', sym:'⚠',  bg:'rgba(251,191,36,.06)',  border:'rgba(251,191,36,.2)'},
+    limited: {color:'var(--dim)',  sym:'🔒', bg:'rgba(147,164,196,.06)', border:'rgba(147,164,196,.25)'},
+    info:    {color:'var(--dim)',  sym:'ⓘ',  bg:'rgba(147,164,196,.06)', border:'rgba(147,164,196,.25)'},
+    skip:    {color:'var(--dim)',  sym:'—',  bg:'rgba(147,164,196,.06)', border:'rgba(147,164,196,.25)'},
+    fail:    {color:'var(--up)',   sym:'✗',  bg:'rgba(244,73,93,.06)',   border:'rgba(244,73,93,.2)'},
+    unknown: {color:'var(--up)',   sym:'‼',  bg:'rgba(244,73,93,.14)',   border:'rgba(244,73,93,.5)'}
+  };
+  function _v8StatusVisual(s){ return V8_STATUS_VISUAL[s] || V8_STATUS_VISUAL.unknown; }
+  window._v8StatusVisual = _v8StatusVisual;
+
   /* ---- 前端健康巡检渲染 ---- */
 
   function renderHealthCheck(){
@@ -11753,7 +11864,7 @@ function drawUpDownChart(){
 
     const overallText = overall === 'ok' ? '✓ 正常' : (overall === 'warn' ? '⚠ 警告' : '✗ 异常');
 
-    if(sum) sum.innerHTML = '<span style="color:'+overallColor+'">'+overallText+'</span> · ✓ '+(s.ok||0)+' · ⚠ '+(s.warn||0)+' · 🔒 '+(s.limited||0)+' · ✗ '+(s.fail||0)+' / 共 '+(s.total||0)+' 项';
+    if(sum) sum.innerHTML = '<span style="color:'+overallColor+'">'+overallText+'</span> · ✓ '+(s.ok||0)+' · ⚠ '+(s.warn||0)+' · 🔒 '+(s.limited||0)+' · ⓘ '+(s.info||0)+' · ✗ '+(s.fail||0)+(s.other?(' · ‼ '+(s.other||0)+' 接线缺口'):'')+' / 共 '+(s.total||0)+' 项';
 
     const byPage = {};
 
@@ -11769,7 +11880,7 @@ function drawUpDownChart(){
     // 🛡 2026-09-12：看板分组固定顺序——上方按导航 TAB 页（今日事件/实时数据/盘后数据/选股策略/运维），
     //   下方为各类算法页（全量数据/管线/策略回测/内容审计），避免数据插入顺序漂移。
     // 2026-09-13 主人令：看板分组顺序调整 —— 「策略回测」上移到「运维」之前。
-  const _PAGE_ORDER = ['今日事件','实时数据','盘后数据','选股策略','策略回测','运维','全量数据','管线','内容审计'];
+  const _PAGE_ORDER = ['观测平台','今日事件','实时数据','盘后数据','共振日历','最终推荐','个股查询','选股策略','策略回测','暂未上架','已下架','运维','逻辑详解','全量数据','管线','内容审计'];
     _PAGE_ORDER.filter(function(p){return byPage[p];}).concat(Object.keys(byPage).filter(function(p){return _PAGE_ORDER.indexOf(p) < 0;})).forEach(function(page){
 
       html += '<div style="margin-bottom:10px;"><div style="font-weight:700;margin-bottom:6px;font-size:12px;color:var(--txt);letter-spacing:.3px;">'+page+'</div>';
@@ -11789,13 +11900,11 @@ function drawUpDownChart(){
           }
         }catch(e){}
 
-        const color = _s === 'ok' ? 'var(--down)' : (_s === 'warn' ? 'var(--gold)' : (_s === 'limited' ? 'var(--dim)' : 'var(--up)'));
-
-        const sym = _s === 'ok' ? '✓' : (_s === 'warn' ? '⚠' : (_s === 'limited' ? '🔒' : '✗'));
-
-        const bg = _s === 'ok' ? 'rgba(31,209,123,.06)' : (_s === 'warn' ? 'rgba(251,191,36,.06)' : (_s === 'limited' ? 'rgba(147,164,196,.06)' : 'rgba(244,73,93,.06)'));
-
-        const border = _s === 'ok' ? 'rgba(31,209,123,.2)' : (_s === 'warn' ? 'rgba(251,191,36,.2)' : (_s === 'limited' ? 'rgba(147,164,196,.25)' : 'rgba(244,73,93,.2)'));
+        const _vis = _v8StatusVisual(_s);
+        const color = _vis.color;
+        const sym = _vis.sym;
+        const bg = _vis.bg;
+        const border = _vis.border;
 
         html += '<div style="background:'+bg+';border:1px solid '+border+';border-radius:6px;padding:6px 8px;">';
 
