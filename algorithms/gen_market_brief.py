@@ -16,7 +16,8 @@ gen_market_brief.py — 基于 v8 实时数据生成「AI市场速览」
   concept_ranking.json   概念板块净流入/涨幅
   sector_fund_flow.json  行业/概念资金排名
   etf_intraday_heat.json ETF 分类净流入
-  etf_daily_monitor.json 全市场 ETF 净流入排名
+  etf_daily_monitor.json 全市场 ETF 净流入排名（ETF资金条的「净流入/净流出 TOP5」品种明细；
+                         品种块 = 名称+金额一行 / 代码小字另起一行，见 detect_anomalies 第 3 段）
   capital_flow_data.json 个股主力净流入排名
   limit_up_heatmap.json  涨停热力
 """
@@ -272,7 +273,7 @@ def _anomaly_signal(text):
 
 
 def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, limitup):
-    """基于规则生成 3~5 条市场异动（每项附 signal 灯）"""
+    """基于规则生成 3~6 条市场异动（每项附 signal 灯；上限 6 条见函数末尾 unique[:6]）"""
     anomalies = []
     by_code = {it["code"]: it for it in indices}
 
@@ -329,50 +330,85 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
             "signal": "yellow",
         })
 
-    # 3. ETF 资金流向（宽基/行业/主题/跨境/商品/策略；排除货币/债券/其他）
+    # 3. ETF 资金流向：【分类概览 ｜ 净流入TOP5 ｜ 净流出TOP5】
+    # 🛡 2026-09-16 主人令「写出具体的TOP5流入和流出」：
+    #   原写法只报分类第一名（「宽基ETF 净流入 +31.49亿，资金借道 ETF 布局宽基」），
+    #   看不出钱具体进了哪只 ETF，且分类第一名以外的信息全丢。
+    #   现改为在同一条内给出：分类概览 ｜ 具体品种净流入 TOP5 ｜ 具体品种净流出 TOP5，
+    #   品种明细取自 etf_daily_monitor.json（全市场 ETF 净流入真实排名，含代码，net 单位元）。
+    #   版式（2026-09-16 二次主人令「代码写在名字下方，要不会很长」）：
+    #   每品种 =「名称 +x.xx亿」一行 + 代码小字（11px · #cbd5e1）一行，5 个并排两行高。
+    #   ⚠️ 必须保持「一条 anomaly」：anomalies 上限 6 条且当前正好用满 6 条，
+    #      若拆成「流入/流出」两条会把后面的「个股异动」挤出（见函数末尾 unique[:6]），
+    #      故用「 ｜ 」分段合并为一条（与下方「行业资金」条同款版式）。
+    def _etf_top5(_key):
+        """全市场 ETF 净流入排名前 5 → HTML 小块列表（名称+金额一行、代码小字另起一行）"""
+        _out = []
+        for _x in ((etf_daily or {}).get(_key) or []):
+            try:
+                _net = float(_x.get("net") or 0) / 1e8
+            except (TypeError, ValueError):
+                continue
+            # 🛡 2026-09-16 主人令「ETF 的代码写在名字下方，要不会很长」「字小一点、
+            #   不要占用太大版面、字色提亮」：
+            #   代码另起一行（11px + 提亮 #cbd5e1），横向只占「名称 +金额」的宽度，
+            #   5 个品种并排也不挤；两行块用 inline-block 并排、行高 1.45 控高。
+            #   ⚠️ 前端 anomalies 渲染走 innerHTML（index.html:2286 h+=a.text），
+            #     本条的 signal 为显式给定，`_fallbackLight()` 不会被调用 ⇒ 带标签安全；
+            #     已全仓核查：无任何脚本解析本条文本（update_v8/audit_empty_cards/
+            #     logic.html 均只读键名或整体存在性）。
+            _out.append(
+                '<span style="display:inline-block;vertical-align:top;'
+                'margin:0 16px 0 0;line-height:1.45;white-space:nowrap;">'
+                f'{_x.get("name", "")} {_net:+.2f}亿<br>'
+                f'<span style="font-size:11px;color:#cbd5e1;">{_x.get("code", "")}</span></span>'
+            )
+            if len(_out) >= 5:
+                break
+        return _out
+
+    def _etf_cat_name(_cat, _direction):
+        """ETF 分类名 → 可读标签。分类为「行业」时用真实行业净额第一名，避免「布局行业」这种空话。"""
+        if _cat != "行业":
+            return _cat
+        _rows = [s for s in _sector_list(sectors, "sectors_in" if _direction == "in" else "sectors_out")
+                 if s.get("type") == "行业"]
+        _rows.sort(key=lambda s: -float(s.get("net") or 0) if _direction == "in" else float(s.get("net") or 0))
+        return (_rows[0]["name"] + "行业") if _rows else "行业"
+
     if etf_heat and "categories" in etf_heat:
-        cats = etf_heat["categories"]
-        relevant_types = {"宽基", "行业", "主题", "跨境", "商品", "策略"}
+        _cats = etf_heat["categories"]
+        _relevant = {"宽基", "行业", "主题", "跨境", "商品", "策略"}   # 排除货币/债券/其他
         # 🛡 兼容旧结构（list）与新结构（dict with net_inflow_yi）
-        cat_nets = [(n, cats[n].get("net_inflow_yi", 0)) for n in relevant_types
-                    if n in cats and isinstance(cats[n], dict)]
+        cat_nets = [(_n, _cats[_n].get("net_inflow_yi", 0)) for _n in _relevant
+                    if _n in _cats and isinstance(_cats[_n], dict)]
         cat_nets.sort(key=lambda x: x[1], reverse=True)
-        if cat_nets and cat_nets[0][1] >= 5:
-            top_cat, top_val = cat_nets[0]
-            # 🛡 2026-09-12 主人令「具体行业写进去」：当 ETF 分类是「行业」时，
-            #   用 sector_fund_flow 里真实行业净流入第一名替换占位词，避免「布局行业」这种空话。
-            if top_cat == "行业":
-                _ind_leaders = sorted(
-                    [s for s in _sector_list(sectors, "sectors_in") if s.get("type") == "行业"],
-                    key=lambda s: -float(s.get("net") or 0))
-                _ind_name = _ind_leaders[0]["name"] if _ind_leaders else "行业"
-                text = f"{_ind_name}行业ETF 净流入 {top_val:+.2f}亿，资金借道 ETF 布局{_ind_name}"
-            else:
-                text = f"{top_cat}ETF 净流入 {top_val:+.2f}亿，资金借道 ETF 布局{top_cat}"
-            anomalies.append({
-                "tag": "ETF资金",
-                "emoji": "💰",
-                "text": text,
-                "color": "gold",
-                "signal": "green",
-            })
-        if len(cat_nets) >= 2 and cat_nets[-1][1] <= -3:
-            bot_cat, bot_val = cat_nets[-1]
-            if bot_cat == "行业":
-                _ind_leaders = sorted(
-                    [s for s in _sector_list(sectors, "sectors_out") if s.get("type") == "行业"],
-                    key=lambda s: float(s.get("net") or 0))
-                _ind_name = _ind_leaders[0]["name"] if _ind_leaders else "行业"
-                text = f"{_ind_name}行业ETF 净流出 {bot_val:+.2f}亿，资金从{_ind_name}撤离"
-            else:
-                text = f"{bot_cat}ETF 净流出 {bot_val:+.2f}亿，资金从{bot_cat}撤离"
-            anomalies.append({
-                "tag": "ETF资金",
-                "emoji": "💰",
-                "text": text,
-                "color": "gold",
-                "signal": "red",
-            })
+    else:
+        cat_nets = []
+
+    _etf_in5 = _etf_top5("top_inflow")
+    _etf_out5 = _etf_top5("top_outflow")
+    _etf_parts = []
+    if cat_nets and cat_nets[0][1] >= 5:
+        # 分类概览（保留原有判断口径与阈值：≥+5亿 才报）
+        _etf_parts.append("%sETF 净流入 %+.2f亿" % (_etf_cat_name(cat_nets[0][0], "in"), cat_nets[0][1]))
+    if _etf_in5:
+        # 品种之间不再用「、」分隔：各品种已是 inline-block 小块（自带右间距），
+        # 中文顿号挤在两行块的基线上会错位。
+        _etf_parts.append("净流入TOP5：" + "".join(_etf_in5))
+    if _etf_out5:
+        _etf_parts.append("净流出TOP5：" + "".join(_etf_out5))
+    elif len(cat_nets) >= 2 and cat_nets[-1][1] <= -3:
+        # 兜底：etf_daily 排名缺失时改用分类口径的净流出，避免整条丢信息
+        _etf_parts.append("%sETF 净流出 %+.2f亿" % (_etf_cat_name(cat_nets[-1][0], "out"), cat_nets[-1][1]))
+    if _etf_parts:
+        anomalies.append({
+            "tag": "ETF资金",
+            "emoji": "💰",
+            "text": " ｜ ".join(_etf_parts),
+            "color": "gold",
+            "signal": "green" if _etf_in5 else "red",
+        })
 
     # 3b. ETF 真实行业资金 TOP5（2026-09-11 主人令：按真行业写）
     if etf_heat and etf_heat.get("industry_flow"):
@@ -435,9 +471,13 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
             "signal": "red" if (sw1_net is not None and sw1_net < 0) else "green",
         })
 
-    # 5. 个股主力异动
+    # 5. 个股主力异动（净流入 TOP5 / 净流出 TOP5）
+    # 🛡 2026-09-16 主人令「写出具体的TOP5流入和流出」：原各取前 2 名 → 改为各取前 5 名。
+    #    数据源 capital_flow_data.json 的 top_inflow / top_outflow 各含 20 条真实主力净额排名，取 5 条充足。
+    #    ⚠️ 前端 index.html 会把这两条同 tag 记录合并渲染成一行（流入在前、流出在后），
+    #       合并条件是「text 以『主力大单流入/流出』开头」——本处保持前缀不变，故前端无需改动。
     if capital and capital.get("top_inflow"):
-        top = capital["top_inflow"][:2]
+        top = capital["top_inflow"][:5]
         names = [f"{c['name']}(+{c['net']:.1f}亿)" for c in top]
         text = f"主力大单流入：{'、'.join(names)}"
         anomalies.append({
@@ -448,7 +488,7 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
             "signal": "green",
         })
     if capital and capital.get("top_outflow"):
-        bot = capital["top_outflow"][:2]
+        bot = capital["top_outflow"][:5]
         names = [f"{c['name']}({c['net']:.1f}亿)" for c in bot]
         text = f"主力大单流出：{'、'.join(names)}"
         anomalies.append({
