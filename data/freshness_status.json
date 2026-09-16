@@ -1,13 +1,8 @@
 {
-  "check_time": "2026-09-16 16:30:03",
+  "check_time": "2026-09-16 17:24:14",
   "last_trade_close": "2026-09-16 15:30:00",
   "is_trading_day": true,
   "core_stale": [
-    {
-      "var": "MARGIN_DATA",
-      "reason": "更新于 09-15 18:47，落后 2 个交易日（阈值 1.08333）",
-      "category": "premarket,post_close"
-    },
     {
       "var": "VOLATILITY",
       "reason": "更新于 09-15 23:26，落后 2 个交易日（阈值 1.08333）",
@@ -24,7 +19,7 @@
   "no_update_time": [],
   "summary": {
     "total_checked": 43,
-    "core_stale": 3,
+    "core_stale": 2,
     "warn_stale": 0,
     "frozen_stale": 0,
     "no_timestamp": 0
