@@ -154,6 +154,42 @@ def _scan_handover_files_remote(ref):
     return names
 
 
+def _commit_times_remote(ref, limit=60):
+    """远端 ref 下交接档的「最后一次提交时间」映射 ``{文件名: epoch 秒}``。
+
+    2026-09-16 排序治本（第二步，P1）：``_name_sort_key`` 只看**文件名内嵌时间**，
+    而文件名时间**可能超前真实时刻** ⇒ 超前命名档会长期顶在「最新」位。实测：
+    小九 ``2026-09-16_1730_…`` / ``_1715_…`` 两档实际是 **09:56 由 cloud-bot 提交**
+    （``caea15b02``，正文自称「本机时钟 17:10」），按名排序会一直压到当天 17:30 之后；
+    而 ``main()`` 只对 ``files[0]`` 判 action 标记 ⇒ **这 6~7 小时内任何真实的新
+    ``# action:`` 指令都会被遮蔽、静默漏派**。
+    ⇒ 排序改为「**提交时间优先 + 文件名时间兜底**」（``recent_urgent_files``）。
+
+    取不到时间（浅克隆/网络失败）⇒ 返回空 dict，排序自动退回纯文件名口径，不报错。
+    """
+    out = _git(["log", "--name-only", "--format=@%ct", "-n", str(limit),
+                ref, "--", HANDOVER_REL + "/"], timeout=40)
+    if out is None:
+        return {}
+    ct, res = None, {}
+    for line in out.splitlines():
+        s = line.strip()
+        if not s:
+            continue
+        if s.startswith("@"):
+            try:
+                ct = int(s[1:])
+            except ValueError:
+                ct = None
+            continue
+        if ct and s.startswith(HANDOVER_REL + "/"):
+            base = s[len(HANDOVER_REL) + 1:]
+            # log 为倒序 ⇒ 同名首次出现即「最后一次提交」
+            if base.endswith(".md") and base not in res:
+                res[base] = ct
+    return res
+
+
 def _fetch_remote():
     """尽力刷新 FETCH_HEAD / origin/main（只动 .git 引用，不碰工作树）。失败不报错。"""
     if "--no-fetch" in sys.argv:
@@ -162,10 +198,11 @@ def _fetch_remote():
 
 
 def recent_urgent_files(n=5):
-    """按【文件名内嵌时间】倒序取最近 N 份交接档（不用 mtime，也不用裸字符串序）。
+    """按【提交时间优先 + 文件名内嵌时间兜底】倒序取最近 N 份交接档。
 
     覆盖面 = **全部**交接档（2026-09-16 放宽；原只认 *_URGENT_*.md，见
     _scan_handover_files_remote 注释）。URGENT 只在输出里加 🔴 标注，不作过滤。
+    排序口径见 `_commit_times_remote`（2026-09-16 治本：防超前命名档遮蔽真最新档）。
 
     远端优先；git 不可用时降级读本机工作树（并在输出里显式标注，不掩盖降级）。
     """
@@ -174,7 +211,9 @@ def recent_urgent_files(n=5):
     if ref:
         names = _scan_handover_files_remote(ref)
         if names:
-            names.sort(key=_name_sort_key, reverse=True)
+            cts = _commit_times_remote(ref)
+            names.sort(key=lambda nm: (cts.get(nm, 0), _name_sort_key(nm)),
+                       reverse=True)
             return [{"name": nm, "repo_path": f"{HANDOVER_REL}/{nm}",
                      "src": "remote", "ref": ref, "local": HANDOVER_DIR / nm}
                     for nm in names[:n]]
@@ -299,7 +338,7 @@ def main():
         age_h = item_age_hours(item)
         stamp = f"{age_h:.1f}h" if age_h == age_h else "n/a"
         flag = "🔴 URGENT " if "_URGENT_" in item["name"] else "📄 "
-        out.append(f"- {flag}**{item['name']}** (距文件名时间={stamp}，仅参考；排序以文件名为准)")
+        out.append(f"- {flag}**{item['name']}** (距文件名时间={stamp}，仅参考；排序=提交时间优先+文件名兜底)")
         out.append("```markdown")
         out.append(head)
         out.append("```")
