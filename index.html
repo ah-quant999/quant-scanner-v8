@@ -6035,21 +6035,15 @@ function fmtSigned(v){
       var h = '';
       /* ── 唯一总表：算法 × 最佳持有期（合并原「最优组合榜」与「主对比表」）── */
       h += '<div style="margin:0 0 6px;font-size:13px;font-weight:700;color:var(--txt);">🏁 算法回测总表 · 每个算法的最佳持有期（真实收益率与胜率）'
-         + '<span style="font-size:11px;color:var(--dim);font-weight:500;">'
-         + '一个算法一行 · 取其自身「最佳持有期」那一档的真实<b style="color:var(--sub);">胜率</b>与<b style="color:var(--sub);">收益率</b>'
-         + ' · 样本 ≥' + MINS + ' 才参与排名 · 按胜率降序</span>'
+         + '一个算法一行 · 按胜率降序</span>'
          + '<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;'
          + 'border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:6px;">✅ 真实数据回测</span></div>';
-      h += '<div style="font-size:11px;color:var(--dim);margin:0 0 9px;line-height:1.8;">'
-         + '口径（<b style="color:#fbbf24;">全页只有这一套，不再并列第二口径</b>）：'
-         + '<b style="color:var(--sub);">每个算法只报它自己「最佳持有期」那一档</b> —— '
-         + '跨该算法全部持有期（T+1…T+250）扫描，在<b>样本 ≥' + MINS + '</b> 的档里取<b>胜率最高</b>者，'
-         + '并列给出该档的<b>真实胜率、平均收益与样本 n</b>。'
-         + '<span style="color:var(--sub);">可挑档位多的算法在本口径下天然占一点便宜，故「样本 n」与「挑选偏差」标注必须一起读；'
-         + '要看某个算法<b>逐档</b>的真实表现，请看下方它自己的明细表（同一份回测产物、同一套扣费口径）。'
-         + '「四量终极」这一行已与它自己的回测卡<b style="color:#22c55e;">强制同源</b>'
-         + '（真值源 <code>data/FOUR_VOLUME_BACKTEST.js</code> · 近 5 年 · 861 信号），'
-         + '不再沿用旧聚合快照里那版已被作废的近 3 年数字。</span></div>';
+      /* ── 口径压成一行（2026-09-17 主人令「能一行显示的就一行」）：细则一字未删，移入 ⓘ 悬浮 ── */
+      h += '<div style="font-size:11px;color:var(--dim);margin:0 0 8px;line-height:1.55;">'
+         + '<span style="cursor:help;" title="每个算法只报它自己「最佳持有期」那一档：跨该算法全部持有期（T+1…T+250）扫描，在样本 ≥' + MINS + ' 的档里取胜率最高者，并列给出该档的真实胜率、平均收益与样本 n。可挑档位多的算法在本口径下天然占一点便宜，故「样本 n」与「挑选偏差」标注必须一起读；要看某个算法逐档的真实表现，请看下方它自己的明细表（同一份回测产物、同一套扣费口径）。「四量终极」这一行已与它自己的回测卡强制同源（真值源 data/FOUR_VOLUME_BACKTEST.js · 近 5 年 · 861 信号），不再沿用旧聚合快照里那版已被作废的近 3 年数字。">'
+         + '口径（<b style="color:#fbbf24;">全页唯一</b>）：只取各算法自身「最佳持有期」那一档 · '
+         + '样本 ≥' + MINS + ' 才参与排名 · 逐档明细见下方各算法明细表'
+         + ' <span style="color:#7dd3fc;">ⓘ</span></span></div>';
       h += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
       h += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
       ['#','策略','星级','最佳持有期','样本 n','胜率','平均收益'].forEach(function(x){
