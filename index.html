@@ -14908,7 +14908,7 @@ h += '</div>'; // /ulPaneObserve
   //     · posts / replies = 当期公开原文（工作日盘前 06:30 抓取（失败 08:30 兜底），Chrome/Edge headless 过 WAF）
   //     · analysis = 同一批次由 AI 阅读原文后撰写：verdict（当期主线一句话）
   //       + sections[{k:market|sector|position, tag, tension, delta, align}]（三段实情解析）
-  //   版式：卡名置顶 + 频率 badge + 数据源 → 核心/用法/限制 → 一句话结论 → 双源对比三组 → 原文折叠 → 口径。
+  //   版式：卡名置顶 + 数据源 → 核心/用法/限制 → 一句话结论 → 双源对比三组 → 原文折叠 → 口径。
   //   ⚠ 09-06 那批静态快照数值（非农读数 / FOMC 概率 / 三情景概率）一律不再保留 ——
   //     静态数字会冒充新鲜数据（死卡根源），本卡所有内容全部来自当期数据，缺则如实空态。
   //   空态铁律：原文未抓 ⇒「原文暂未抓取」；原文在、解析缺 ⇒「当期解析待出稿」。两者都不填 0、不编造。
@@ -14929,10 +14929,9 @@ h += '</div>'; // /ulPaneObserve
     var ACC = '#60a5fa', RGB = '96,165,250', ORG = '#fbbf24';
     var PEND = '当期解析待出稿（工作日盘前与原文同批写入）';
     var h = '';
-    // ── ① 卡名行（置顶）+ 频率 badge + 实时时段胶囊 ──
+    // ── ① 卡名行（置顶）+ 实时时段胶囊 ──（2026-09-16 主人令：删去频率 badge —— setBadge 已含「盘前/中长线 + 更新于」，静态频率说明属冗余）
     h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
        + '<span style="font-size:15px;font-weight:700;color:' + ACC + ';">&#x1F30D; 新周期判定 · 海外宏观 + AI 大周期</span>'
-       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:' + ACC + ';background:rgba(' + RGB + ',.16);border:1px solid rgba(' + RGB + ',.4);letter-spacing:.5px;">&#x1F4C6; 日频 · 盘前 06:30 主跑 / 失败 08:30 兜底</span>'
        + '<span class="fresh" id="newCycleFresh">&#x2014;</span></div>';
     // ── ② 数据源行 ──
     h += '<div style="font-size:11.5px;color:var(--dim);margin-bottom:10px;">数据源：雪球 <b style="color:var(--txt);">@' + _e(p.name || '白河愁博士') + '</b>'
