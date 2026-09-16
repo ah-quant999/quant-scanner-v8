@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-09-16 17:24:14",
+  "check_time": "2026-09-16 19:40:09",
   "last_trade_close": "2026-09-16 15:30:00",
   "is_trading_day": true,
   "core_stale": [
@@ -83,6 +83,8 @@
     "V8_POOL_TRACKER": "post_close",
     "AVG_PRICE_DATA": "intraday,post_close",
     "ALGO_TRACK": "post_close",
+    "STRONG_BREAKOUT_BACKTEST": "post_close",
+    "IMA_STRONG_BACKTEST": "post_close",
     "INDEX_HISTORY": "post_close",
     "MARKET_REGIME": "post_close",
     "SECTOR_RECOMMENDATION": "post_close",
