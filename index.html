@@ -219,17 +219,18 @@ window.__domReadyFns=[];
   .limit-up-content{overflow-x:auto;font-size:11px;line-height:1.5}
   .limit-up-content table{width:100%;min-width:420px;table-layout:fixed;border-collapse:separate;border-spacing:0}
   .limit-up-content th{padding:5px 2px;text-align:center;font-weight:500;color:var(--dim);font-size:10px;border-bottom:1px solid var(--border2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  /* 🔁 2026-09-15 主人令：新增首列「启动」日期列（窄·居中），板块名列后移为第 2 列 */
-  .limit-up-content th:first-child{width:58px;min-width:58px;text-align:center;padding-left:2px}
-  .limit-up-content th:nth-child(2){width:92px;min-width:92px;text-align:left;padding-left:6px}
+  /* 🔁 2026-09-16 主人令（列序互换）：首列＝「板块」名（左对齐·宽 92px），第 2 列＝「启动日」（窄·居中·金色）。
+        （2026-09-15 原为「启动列在前、板块列在后」，本次按主人令将这两列对调。） */
+  .limit-up-content th:first-child{width:92px;min-width:92px;text-align:left;padding-left:6px}
+  .limit-up-content th:nth-child(2){width:64px;min-width:64px;text-align:center;padding-left:2px}
   .limit-up-content th:nth-last-child(2){width:46px;min-width:46px}
   .limit-up-content th:last-child{width:38px;min-width:38px}
   .limit-up-content td{padding:4px 2px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap;overflow:hidden}
-  .limit-up-content td:first-child{width:58px;min-width:58px;text-align:center;padding-left:2px;font-variant-numeric:tabular-nums;font-size:10px;color:var(--gold);font-weight:700}
-  .limit-up-content td:nth-child(2){width:92px;min-width:92px;text-align:left;padding-left:6px;color:var(--txt);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .limit-up-content td:first-child{width:92px;min-width:92px;text-align:left;padding-left:6px;color:var(--txt);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .limit-up-content td:nth-child(2){width:64px;min-width:64px;text-align:center;padding-left:2px;font-variant-numeric:tabular-nums;font-size:10px;color:var(--gold);font-weight:700}
   .limit-up-content td:nth-last-child(2){width:46px;min-width:46px}
   .limit-up-content td:last-child{width:38px;min-width:38px}
-  /* 🎋 首列「≤MM/DD」＝启动日早于观测窗口（真实启动更早，不编造确切日） */
+  /* 🎋 第 2 列「≤MM/DD」＝启动日早于观测窗口（真实启动更早，不编造确切日） */
   .limit-up-content td.lu-start-open{color:#94a3b8;font-weight:600}
   .limit-up-content .lu-total{color:var(--gold);font-weight:700}
   .limit-up-content .lu-trend{font-size:12px;font-weight:700}
@@ -254,8 +255,35 @@ window.__domReadyFns=[];
   .lu-fold-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);
     background:var(--bg2);color:var(--sub);font-size:12px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit}
   .lu-fold-btn:hover{border-color:var(--cyan);color:var(--txt)}
-  .lu-history{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border2)}
-  .lu-history th,.lu-history td{opacity:.92}
+  /* 🗂 2026-09-16 主人令（合并查询）：「历史矩阵」+「板块周期档案」合并为一个折叠区，
+       区内以「分区标题 + 虚线分隔」区分两块，一次点开即看全（原两个按钮已废弃）。
+       ⚠️ 原折叠容器专用样式（折叠容器那一族类名）随合并一并删除，避免死代码残留。 */
+  .lu-part{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border2)}
+  .lu-part:first-child{border-top:0;margin-top:0;padding-top:0}
+  .lu-part-title{font-size:11px;font-weight:700;color:var(--sub);margin:0 0 6px;padding-left:2px}
+  /* 📚 板块周期档案表：列宽独立于主矩阵 —— 主矩阵第 2 列＝「启动日」(64px)，
+       档案表第 2 列＝「周期」(「第N轮 进行中」)，若共用位置规则会被挤扁，故单列覆盖。 */
+  .limit-up-content table.lu-cycle th:first-child,
+  .limit-up-content table.lu-cycle td:first-child{width:84px;min-width:84px;text-align:left;padding-left:6px;color:var(--txt);font-weight:600}
+  .limit-up-content table.lu-cycle th:nth-child(2),
+  .limit-up-content table.lu-cycle td:nth-child(2){width:92px;min-width:92px;text-align:left;padding-left:6px;font-size:10px;font-weight:500;color:var(--dim)}
+  .limit-up-content table.lu-cycle td.lu-start{color:var(--gold);font-weight:700;text-align:center;padding-left:2px;font-variant-numeric:tabular-nums}
+  /* 📊 周期时间轴（甘特式·纯 CSS 百分比定位）：一眼看出「每轮走了多久、轮与轮间隔多长」 */
+  .lu-tl{margin:4px 0 2px}
+  .lu-tl-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:10px}
+  .lu-tl-name{width:84px;min-width:84px;text-align:right;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lu-tl-track{position:relative;flex:1;height:15px;background:rgba(255,255,255,.035);border-radius:3px;overflow:hidden}
+  .lu-tl-bar{position:absolute;top:0;height:15px;border-radius:3px;font-size:9px;line-height:15px;text-align:center;color:#fff;overflow:hidden;white-space:nowrap}
+  .lu-tl-bar.on{background:rgba(56,189,248,.62)}
+  .lu-tl-bar.off{background:rgba(148,163,184,.30);color:var(--sub)}
+  .lu-tl-bar.pulse{background:rgba(245,158,11,.50)}
+  .lu-tl-axis{display:flex;justify-content:space-between;font-size:9px;color:var(--dim);margin-top:1px;padding-left:92px}
+  /* 📊 统计层徽章：平均周期 / 当前位置（红＝已超历史均值，金＝均值附近，蓝＝仍在初期，灰＝已退潮） */
+  .lu-stat-badge{display:inline-block;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:700;white-space:nowrap}
+  .lu-stat-over{background:rgba(198,40,40,.22);color:#ff8a80}
+  .lu-stat-near{background:rgba(245,158,11,.20);color:#fbbf24}
+  .lu-stat-early{background:rgba(56,189,248,.18);color:#7dd3fc}
+  .lu-stat-done{background:rgba(148,163,184,.16);color:var(--dim)}
 
   /* ===== 板块资金三合一（v6 风格暗色移植） ===== */
   .limit-up-analysis b{color:var(--txt)}
@@ -2444,20 +2472,31 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     <!-- 涨停热力矩阵（整行宽度）
          🌡 2026-09-15 主人令（六项）：卡名去掉旧「近15日」口径 → 主表固定展示最近 20 个交易日（≈一个月）；
-              首列新增「启动」日期（早于 20 日窗口启动的板块在此写出）；退潮日标注（保留 5 个交易日）；
-              排序改为连续热度降序；卡底新增「历史折叠」，更早交易日全部收纳其中。 -->
+              新增「启动日」列（早于 20 日窗口启动的板块在此写出）；退潮日标注（保留 5 个交易日）；
+              排序改为连续热度降序；卡底新增「历史折叠」，更早交易日全部收纳其中。
+         🔁 2026-09-16 主人令（列序互换 + 折叠合并）：列序改为「板块 → 启动日」（原为「启动 → 板块」）；
+              卡底「历史矩阵」与「板块周期档案」两个折叠区合并为一个，一次点开即看全。 -->
     <div class="card" id="limitUpHeatCard" style="margin-bottom:16px">
       <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近20日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">—</span></h3>
       <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
       <div id="limitUpHeatContent" class="limit-up-content">加载中…</div>
       <div id="limitUpHeatHistWrap" style="display:none;margin-top:10px;">
-        <button type="button" id="limitUpHeatHistBtn" class="lu-fold-btn">🗂 展开历史矩阵</button>
-        <div id="limitUpHeatHistory" class="limit-up-content lu-history" style="display:none"></div>
-        <!-- 🗂 2026-09-16 主人令「放宽，用于累积」+「几几年几月什么板块启动，到什么时间结束，可以记录或回查好多年，甚至可以算出每个板块的周期」：
-             板块周期档案（累积型重要数据，源自 data/SECTOR_CYCLE_ARCHIVE.js）。
-             与「历史矩阵」一并折叠，点开即回查每个板块的「启动 → 退潮」完整周期。 -->
-        <button type="button" id="limitUpCycleBtn" class="lu-fold-btn" style="margin-top:8px;">📚 展开板块周期档案</button>
-        <div id="limitUpCycleArchive" class="limit-up-content lu-history" style="display:none"></div>
+        <!-- 🔁 2026-09-16 主人令（合并查询）：「🗂 历史矩阵」与「📚 板块周期档案」原为两个独立折叠区，
+             需点两次才能看全 —— 现**合并为一个折叠区**，一次点开即同时展开全部历史与周期档案。
+             🗂 2026-09-16 主人令「放宽，用于累积」：板块周期档案为累积型重要数据
+             （源自 data/SECTOR_CYCLE_ARCHIVE.js ← raw_data/sector_cycle.json，PROTECTED_FILES.json 登记在册），
+             记录每个板块「启动 → 退潮」的完整周期，可跨月跨年回查。 -->
+        <button type="button" id="limitUpFoldBtn" class="lu-fold-btn">🗂 展开历史与周期档案</button>
+        <div id="limitUpFoldBody" style="display:none">
+          <div class="lu-part">
+            <div class="lu-part-title">🗂 历史矩阵 · 全量 <span id="limitUpFoldHistN">—</span> 个交易日（主表默认只看最近 20 日）</div>
+            <div id="limitUpHeatHistory" class="limit-up-content"></div>
+          </div>
+          <div class="lu-part">
+            <div class="lu-part-title">📚 板块周期档案 · <span id="limitUpFoldCycN">—</span></div>
+            <div id="limitUpCycleArchive" class="limit-up-content"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -9335,6 +9374,23 @@ function switchSec(sec,el){
 
 /* ~~ 已下架：上证+深证成交额 SVG 曲线图 + 近一月涨跌家数 SVG 柱状图（2026-08-16 主人令） ~~ */
 
+/* 🔴🔴 2026-09-16 小九根因修复（一劳永逸）：
+   本 <script> 块内共 15 处调用 esc()，但**本块从未定义 esc**；
+   全站仅有的 3 个 function esc 分别定义在其它块的 IIFE **局部作用域**内（HTML 行 2572 / 2702 / 14838），
+   对本块不可见 ⇒ 一旦执行到任一处 esc(...) 必抛 `ReferenceError: esc is not defined`。
+   影响面（此前长期被误当成「没数据/没做」）：
+     renderLimitUpHeatmap() 在写完主表表格后即中断 ⇒
+       ① 卡底「历史矩阵 + 板块周期档案」折叠区**从未渲染**（历史回查入口一直不存在）；
+       ② 卡顶「分析文案」**从未渲染**。
+   现于本块顶层补齐 esc()（HTML 转义），彻底消除对本块之外作用域的隐式依赖。
+   ⚠️ 教训：跨 <script> 块调用「看着像全局」的工具函数前，先确认它的定义作用域；
+      未声明的标识符在**读取**时同样抛 ReferenceError，且常被 try/catch 静默吞成「无数据」。 */
+function esc(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 /* ===== 涨停热力矩阵（v6风格暗色适配） ===== */
 function renderLimitUpHeatmap(){
   const card=document.getElementById('limitUpHeatCard');
@@ -9413,7 +9469,7 @@ function renderLimitUpHeatmap(){
   function totalOf(d){ return sumRange(d,0,d.length); }
 
   /* ⑥ 本轮启动日：优先取数据侧 sector_start（跨窗口累积，含被滚出的历史）；
-        数据侧缺省时退化为「从当前窗口找最后一次启动点」，首列即活跃则记「早于窗口」。 */
+        数据侧缺省时退化为「从当前窗口找最后一次启动点」，窗口首日即活跃则记「早于窗口」。 */
   var _startMap={};
   (function(){
     var raw=(data.sector_start && typeof data.sector_start==='object') ? data.sector_start : {};
@@ -9427,7 +9483,7 @@ function renderLimitUpHeatmap(){
       else if((d[0]||0)>=HOT_MIN && _displayDates.length) _startMap[nm]='~'+_displayDates[0];
     }
   })();
-  /* 只在「启动日早于当前展示窗口」时写首列；窗口内的启动点矩阵本身就能看到，不重复占位。
+  /* 只在「启动日早于当前展示窗口」时写「启动日」列；窗口内的启动点矩阵本身就能看到，不重复占位。
      '~' 前缀＝真实启动早于观测起点，渲染为「≤MM/DD」（诚实标注，不编造确切日）。 */
   function startLabel(name, startIdx){
     var s=_startMap[name];
@@ -9454,8 +9510,8 @@ function renderLimitUpHeatmap(){
   function buildTable(startIdx, opts){
     opts=opts||{};
     var showDates=_displayDates.slice(startIdx);
-    var h='<table style="min-width:'+(148+showDates.length*34)+'px">';
-    h+='<thead><tr><th>启动</th><th>板块</th>';
+    var h='<table style="min-width:'+(156+showDates.length*34)+'px">';
+    h+='<thead><tr><th>板块</th><th>启动日</th>';
     for(var di=0;di<showDates.length;di++){
       h+='<th>'+showDates[di].split('/').pop()+'</th>';
     }
@@ -9470,8 +9526,9 @@ function renderLimitUpHeatmap(){
       var _isOther=sector.name==='其他';
       var _sl=startLabel(sector.name, startIdx);
       h+='<tr'+( _isOther?' style="opacity:.7"':'')+'>';
-      h+='<td class="lu-start'+(_sl && _sl.charAt(0)==='≤' ? ' lu-start-open' : '')+'"'+(opts.tip?(' title="'+esc(opts.tip)+'"'):'')+'>'+(_sl||'·')+'</td>';
+      /* 🔁 2026-09-16 主人令（列序互换）：首列＝「板块」名（左对齐·宽），第 2 列＝「启动日」（窄·居中·金色） */
       h+='<td>'+sector.name+(_isOther?' <span style="font-size:9px;color:var(--dim)">(汇总·非主线)</span>':'')+'</td>';
+      h+='<td class="lu-start'+(_sl && _sl.charAt(0)==='≤' ? ' lu-start-open' : '')+'"'+(opts.tip?(' title="'+esc(opts.tip)+'"'):'')+'>'+(_sl||'·')+'</td>';
       for(var j=startIdx;j<full.length;j++){
         var val=full[j];
         var cls=val>=8?'lu-h5':val>=5?'lu-h4':val>=3?'lu-h3':val>=2?'lu-h2':val>=1?'lu-h1':'lu-h0';
@@ -9501,51 +9558,40 @@ function renderLimitUpHeatmap(){
   contentEl.innerHTML=buildTable(_startIdx)+_legend;
   card.style.display='block';
 
-  /* ③ 卡底「历史折叠」：主表只展示最近 20 个交易日，更早的交易日全部收纳于此，
-        默认折叠，点开即可回查（主人令：让历史可查）。 */
-  var _histWrap=document.getElementById('limitUpHeatHistWrap');
-  var _histBtn=document.getElementById('limitUpHeatHistBtn');
+  /* ③ 卡底「历史 + 周期档案」合并折叠区（2026-09-16 主人令：两个折叠区合并为一个，一次点开全查到）
+        · 历史矩阵：主表只展示最近 SHOW_DAYS 日，更早交易日全量收纳于此（让历史可查）；
+        · 板块周期档案：累积型，见下方 IIFE（记录每个板块「启动 → 退潮」完整周期）。
+     两块统一由 _foldBtn 一个按钮控制；_foldMeta 收集内容量用于生成按钮文案。 */
+  var _foldWrap=document.getElementById('limitUpHeatHistWrap');
+  var _foldBtn=document.getElementById('limitUpFoldBtn');
+  var _foldBody=document.getElementById('limitUpFoldBody');
   var _histEl=document.getElementById('limitUpHeatHistory');
-  if(_histWrap && _histBtn && _histEl){
-    if(_displayDates.length>SHOW_DAYS){
-      _histEl.innerHTML=buildTable(0);
-      _histWrap.style.display='block';
-      var _foldTxt=function(open){
-        return (open?'🗂 收起历史矩阵（':'🗂 展开历史矩阵（')
-             +'共 '+_displayDates.length+' 个交易日，默认只看最近 '+SHOW_DAYS+' 日）';
-      };
-      _histBtn.innerHTML=_foldTxt(false);
-      if(!_histBtn.__v8LuhBound){
-        _histBtn.__v8LuhBound=true;
-        _histBtn.addEventListener('click',function(){
-          var open=(_histEl.style.display==='none' || !_histEl.style.display);
-          _histEl.style.display=open?'block':'none';
-          _histBtn.innerHTML=_foldTxt(open);
-        });
-      }
-    }else{
-      _histWrap.style.display='none';
-    }
+  var _cycEl=document.getElementById('limitUpCycleArchive');
+  var _foldMeta={histDays:0, cycCount:0, cycSecs:0, cycOngoing:0};
+
+  /* ① 历史矩阵（全量列） */
+  if(_histEl && _displayDates.length>SHOW_DAYS){
+    _histEl.innerHTML=buildTable(0);
+    _foldMeta.histDays=_displayDates.length;
   }
+  var _foldHistN=document.getElementById('limitUpFoldHistN');
+  if(_foldHistN) _foldHistN.textContent=String(_foldMeta.histDays||_displayDates.length);
 
   /* 📚 2026-09-16 主人令「几几年几月什么板块启动，到什么时间结束…甚至可以算出每个板块的周期」：
-     把累积型板块周期档案（data/SECTOR_CYCLE_ARCHIVE.js）渲染成一个折叠区块，
-     与「历史矩阵」同级，让「涨过的板块」在其退潮后仍可长期回查。
+     把累积型板块周期档案（data/SECTOR_CYCLE_ARCHIVE.js）渲染进合并折叠区，
+     让「涨过的板块」在其退潮后仍可长期回查。
      档案由 build_sector_cycle_archive.py 从 raw_data/limit_up_heatmap.json（永久累积长表）派生，
-     属 PROTECTED_FILES.json 登记的**累积型重要文件**，前端只读、不做任何写入。 */
+     属 PROTECTED_FILES.json 登记的**累积型重要文件**，前端只读、不做任何写入。
+     🔁 2026-09-16 主人令（选项 2「档案层 + 统计层」）：新增统计层 ——
+        「平均持续 / 平均活跃 / 本轮已走 / 位置」直接回答「这轮走了几天、历史上平均几天」。 */
   (function(){
-    var _cycBtn=document.getElementById('limitUpCycleBtn');
-    var _cycEl=document.getElementById('limitUpCycleArchive');
-    if(!_cycBtn || !_cycEl) return;
+    if(!_cycEl) return;
     var arc=window.SECTOR_CYCLE_ARCHIVE||null;
-    if(!arc || !arc.cycles || !arc.cycles.length){ _cycBtn.style.display='none'; return; }
+    if(!arc || !arc.cycles || !arc.cycles.length) return;
 
-    var H='<div style="font-size:11px;color:var(--dim);margin:2px 0 8px">'
-        + '统计区间 <b style="color:var(--fg)">'+esc(arc.range?arc.range[0]:'')+' ~ '+esc(arc.range?arc.range[1]:'')+'</b>'
-        + '（共 '+arc.columns+' 个交易日）· 判定：单日 ≥'+((arc.params||{}).hot_min||3)+' 家为活跃日，'
-        + '活跃日间隔 >'+((arc.params||{}).cycle_gap||3)+' 个交易日断为新周期 · 周期数 <b style="color:var(--fg)">'+arc.cycle_count+'</b>'
-        + '（进行中 '+(arc.cycles.filter(function(c){return c.ongoing;}).length)+'）'
-        + '<span style="color:var(--gold);margin-left:6px">📌 长期累积档案，随年月增长</span></div>';
+    var _hotMin=(arc.params||{}).hot_min||3, _gap=(arc.params||{}).cycle_gap||3;
+    var _cols=arc.columns||1, _rng=arc.range||['',''];
+    var _ongN=arc.cycles.filter(function(c){return c.ongoing;}).length;
 
     /* 按板块分组，组内按启动时间排序 —— 同一板块的多轮周期纵向排列，一眼看出轮动节奏 */
     var _bySector={}, _order=[];
@@ -9560,19 +9606,110 @@ function renderLimitUpHeatmap(){
       if(oa!==ob) return ob-oa;
       return lb[lb.length-1].end_idx - la[la.length-1].end_idx;
     });
+    /* 「其他」为汇总口径（非单一主线），与主表同规则：不参与主线排序，固定沉底 */
+    var _oi=_order.indexOf('其他');
+    if(_oi>=0){ _order.splice(_oi,1); _order.push('其他'); }
+    var _main=_order.filter(function(n){ return n!=='其他'; });   /* 统计层/时间轴只看真实主线 */
 
-    H+='<table style="min-width:520px"><thead><tr>'
+    function _avg(a){ if(!a.length) return 0; var t=0; for(var i=0;i<a.length;i++) t+=(a[i]||0); return t/a.length; }
+    function _fx(v){ return (Math.round(v*10)/10).toFixed(1); }
+
+    /* ── 统计层：每板块「平均周期 / 当前位置」── */
+    var _stat=[];
+    for(var oi0=0;oi0<_main.length;oi0++){
+      var nm0=_main[oi0], list0=_bySector[nm0];
+      var done0=list0.filter(function(c){return !c.ongoing;});
+      var base0=done0.length?done0:list0;                     /* 尚无已退潮轮次时退化为全部轮次 */
+      var _cur=list0[list0.length-1];                         /* 最近一轮＝当前所处位置 */
+      var _avgDays=_avg(base0.map(function(c){return c.days;}));
+      _stat.push({name:nm0, list:list0, done:done0.length,
+                  avgDays:_avgDays,
+                  avgHot:_avg(base0.map(function(c){return c.hot_days;})),
+                  avgPeak:_avg(base0.map(function(c){return c.peak;})),
+                  cur:_cur, ratio:(_avgDays>0?(_cur.days/_avgDays):0)});
+    }
+
+    var H='<div style="font-size:11px;color:var(--dim);margin:2px 0 8px">'
+        + '统计区间 <b style="color:var(--fg)">'+esc(_rng[0])+' ~ '+esc(_rng[1])+'</b>'
+        + '（共 '+_cols+' 个交易日）· 判定：单日 ≥'+_hotMin+' 家为活跃日，'
+        + '活跃日间隔 >'+_gap+' 个交易日断为新周期 · 周期数 <b style="color:var(--fg)">'+arc.cycle_count+'</b>'
+        + '（进行中 '+_ongN+'）'
+        + '<span style="color:var(--gold);margin-left:6px">📌 长期累积档案，随年月增长</span></div>';
+
+    /* ── ① 周期时间轴（甘特式）：横轴＝完整统计区间，色块＝每一轮周期 ── */
+    var _tl=_stat.filter(function(s){
+      return s.cur.ongoing || (_cols-1-s.cur.end_idx)<=20;      /* 进行中 或 最近 20 日内结束过 */
+    }).slice(0,16);
+    if(_tl.length){
+      H+='<div class="lu-tl">';
+      _tl.forEach(function(s){
+        H+='<div class="lu-tl-row"><span class="lu-tl-name" title="'
+         + esc(s.name)+' · 历史平均 '+_fx(s.avgDays)+' 日">'+esc(s.name)+'</span><div class="lu-tl-track">';
+        s.list.forEach(function(c,ci){
+          var L=(c.start_idx/_cols)*100;
+          var W=Math.max(1.4,((c.end_idx-c.start_idx+1)/_cols)*100);
+          if(L>100) L=100; if(L+W>100) W=Math.max(1.4,100-L);
+          var cls=c.ongoing?'on':(c.days<3?'pulse':'off');
+          var lbl=(W>=14)?('第'+(ci+1)+'轮 '+c.hot_days+'日'):'';
+          H+='<span class="lu-tl-bar '+cls+'" style="left:'+L.toFixed(2)+'%;width:'+W.toFixed(2)+'%"'
+           + ' title="第'+(ci+1)+'轮 '+esc(c.start)+'→'+esc(c.end)+' · 持续 '+c.days+' 日 · 活跃 '+c.hot_days+' 日 · 峰值 '+c.peak+'">'
+           + lbl+'</span>';
+        });
+        H+='</div></div>';
+      });
+      H+='<div class="lu-tl-axis"><span>'+esc(_rng[0])+'</span><span>'+esc(_rng[1])+'</span></div>';
+      H+='<div style="font-size:10px;color:var(--dim);margin-top:5px">'
+       + '<span class="lu-tl-bar on" style="position:static;display:inline-block;width:16px;height:9px;vertical-align:middle"></span> 进行中　'
+       + '<span class="lu-tl-bar off" style="position:static;display:inline-block;width:16px;height:9px;vertical-align:middle"></span> 已退潮　'
+       + '<span class="lu-tl-bar pulse" style="position:static;display:inline-block;width:16px;height:9px;vertical-align:middle"></span> 短脉冲（不足 3 日）'
+       + '　· 悬停色块可看该轮明细</div>';
+      H+='</div>';
+    }
+
+    /* ── ② 统计层：平均周期 / 当前位置（直接回答「这轮走了几天、历史上平均几天」）── */
+    H+='<table class="lu-cycle" style="min-width:580px;margin-top:12px"><thead><tr>'
+     + '<th>板块</th><th>轮次</th><th>平均持续</th><th>平均活跃</th><th>本轮已走</th><th>位置</th><th>平均峰值</th>'
+     + '</tr></thead><tbody>';
+    for(var si=0;si<_stat.length;si++){
+      var st=_stat[si], cur=st.cur, badge, btip;
+      if(cur.ongoing){
+        if(st.ratio>=1.2){ badge='<span class="lu-stat-badge lu-stat-over">已超均值</span>'; }
+        else if(st.ratio>=0.8){ badge='<span class="lu-stat-badge lu-stat-near">均值附近</span>'; }
+        else { badge='<span class="lu-stat-badge lu-stat-early">仍在初期</span>'; }
+        btip='本轮已走 '+cur.days+' 日；历史平均 '+_fx(st.avgDays)+' 日（'+(st.done?('按已退潮 '+st.done+' 轮计'):'暂无已退潮轮次，按全部轮次计')+'）';
+      }else{
+        badge='<span class="lu-stat-badge lu-stat-done">已退潮</span>';
+        btip='最近一轮已退潮，持续 '+cur.days+' 日；历史平均 '+_fx(st.avgDays)+' 日';
+      }
+      H+='<tr>';
+      H+='<td>'+esc(st.name)+'</td>';
+      H+='<td style="color:var(--dim);font-size:10px">'+st.list.length+' 轮'+(st.done?('（已退潮 '+st.done+'）'):'')+'</td>';
+      H+='<td style="color:var(--gold);font-weight:700" title="已完成周期的平均持续交易日数">'+_fx(st.avgDays)+' 日</td>';
+      H+='<td style="color:var(--dim)" title="平均活跃日数（单日 ≥'+_hotMin+' 家涨停）">'+_fx(st.avgHot)+' 日</td>';
+      H+='<td title="'+esc(btip)+'"><b style="color:'+(cur.ongoing?'var(--txt)':'var(--dim)')+'">'+cur.days+'</b>'
+       + '<span style="color:var(--dim);font-size:9px"> /'+_fx(st.avgDays)+'</span></td>';
+      H+='<td>'+badge+'</td>';
+      H+='<td style="color:var(--dim)" title="平均峰值（单日最多几家涨停）">'+_fx(st.avgPeak)+' 家</td>';
+      H+='</tr>';
+    }
+    H+='</tbody></table>';
+
+    /* ── ③ 逐轮明细（原始档案，可逐条核验）── */
+    H+='<div style="font-size:11px;color:var(--sub);font-weight:700;margin:14px 0 6px">'
+     + '🗂 逐轮明细（共 '+arc.cycle_count+' 轮 · '+_order.length+' 个板块）</div>';
+    H+='<table class="lu-cycle" style="min-width:520px"><thead><tr>'
      + '<th>板块</th><th>周期</th><th>启动</th><th>退潮</th><th>持续</th><th>活跃</th><th>峰值</th>'
      + '</tr></thead><tbody>';
     for(var oi=0;oi<_order.length;oi++){
       var nm=_order[oi], list=_bySector[nm];
+      var _isOther=(nm==='其他');
       for(var li=0;li<list.length;li++){
         var c=list[li];
         var _tag=c.ongoing
           ? '<span style="color:var(--up);font-size:10px">进行中</span>'
           : '<span style="color:var(--dim);font-size:10px">已退潮</span>';
-        H+='<tr>';
-        H+='<td>'+esc(c.sector)+'</td>';
+        H+='<tr'+(_isOther?' style="opacity:.7"':'')+'>';
+        H+='<td>'+esc(c.sector)+(_isOther?' <span style="font-size:9px;color:var(--dim)">(汇总·非主线)</span>':'')+'</td>';
         H+='<td style="color:var(--dim);font-size:10px">第'+(li+1)+'轮 '+_tag+'</td>';
         H+='<td class="lu-start">'+esc(c.start)+'</td>';
         H+='<td>'+esc(c.end)+'</td>';
@@ -9585,21 +9722,39 @@ function renderLimitUpHeatmap(){
     }
     H+='</tbody></table>';
     _cycEl.innerHTML=H;
-    _cycBtn.style.display='inline-block';
-    var _cycTxt=function(open){
-      return (open?'📚 收起板块周期档案（':'📚 展开板块周期档案（')
-           + arc.cycle_count+' 个周期 · '+_order.length+' 个板块，可长期回查）';
-    };
-    _cycBtn.innerHTML=_cycTxt(false);
-    if(!_cycBtn.__v8CycleBound){
-      _cycBtn.__v8CycleBound=true;
-      _cycBtn.addEventListener('click',function(){
-        var open=(_cycEl.style.display==='none'||!_cycEl.style.display);
-        _cycEl.style.display=open?'block':'none';
-        _cycBtn.innerHTML=_cycTxt(open);
-      });
+    _foldMeta.cycCount=arc.cycle_count||arc.cycles.length;
+    _foldMeta.cycSecs=_order.length;
+    _foldMeta.cycOngoing=_ongN;
+    var _foldCycN=document.getElementById('limitUpFoldCycN');
+    if(_foldCycN){
+      _foldCycN.textContent=_foldMeta.cycCount+' 个周期 · '+_foldMeta.cycSecs+' 个板块'
+        +(_foldMeta.cycOngoing?('（进行中 '+_foldMeta.cycOngoing+'）'):'')+'，可长期回查';
     }
   })();
+
+  /* ④ 合并折叠区统一控制：一个按钮同时展开/收起「历史矩阵 + 板块周期档案」 */
+  if(_foldWrap && _foldBtn && _foldBody){
+    if(_foldMeta.histDays>0 || _foldMeta.cycCount>0){
+      _foldWrap.style.display='block';
+      var _foldTxt=function(open){
+        var parts=[];
+        if(_foldMeta.histDays>0) parts.push(_foldMeta.histDays+' 个交易日');
+        if(_foldMeta.cycCount>0) parts.push(_foldMeta.cycCount+' 个周期 · '+_foldMeta.cycSecs+' 板块');
+        return (open?'🗂 收起历史与周期档案（':'🗂 展开历史与周期档案（')+parts.join(' · ')+'）';
+      };
+      _foldBtn.innerHTML=_foldTxt(false);
+      if(!_foldBtn.__v8FoldBound){
+        _foldBtn.__v8FoldBound=true;
+        _foldBtn.addEventListener('click',function(){
+          var open=(_foldBody.style.display==='none' || !_foldBody.style.display);
+          _foldBody.style.display=open?'block':'none';
+          _foldBtn.innerHTML=_foldTxt(open);
+        });
+      }
+    }else{
+      _foldWrap.style.display='none';
+    }
+  }
 
   if(!analysisEl) return;
   const analysis=[];
