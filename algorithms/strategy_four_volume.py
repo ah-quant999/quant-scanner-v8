@@ -412,6 +412,27 @@ def write_four_volume_backtest_js(records, bt_summary=None, out_dir=DATA_DIR):
         },
     }
     path = os.path.join(out_dir, "FOUR_VOLUME_BACKTEST.js")
+    # 🛡 2026-09-16 主人令「不是真实的我不要」：回测口径防降级覆盖。
+    #   事故：云端刷新链 cloud_fetch_v8.f_four_volume 重跑本脚本时不注入 V8_BACKTEST_YEARS
+    #   → argparse 默认 3 年 → 09-16 02:09 把 E 批 5 年真值(861 信号)覆盖成 3 年/1400 信号。
+    #   铁律：本外壳只允许「同档或升档」覆盖 —— 已存在更高 years 的分层真值时，
+    #   低档回测或无回测(空壳)一律不得落盘，真值原地不动。
+    try:
+        _new_years = (bt_summary or {}).get("years")
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as _f:
+                _old = _f.read()
+            import re as _re
+            _m_y = _re.search(r'[\'"]signal_date_range[\'"]\s*:\s*[\'"]近 (\d+) 年', _old)
+            _old_years = int(_m_y.group(1)) if _m_y else None
+            _old_has_data = bool(_re.search(r'[\'"]by_period[\'"]\s*:\s*\{\s*[\'"]', _old))
+            if _old_has_data and (_new_years is None
+                                  or (_old_years is not None and _new_years < _old_years)):
+                print(f"  🛡 跳过覆盖 {os.path.basename(path)}：已存 {_old_years} 年真值"
+                      f"（本次 {'无回测' if _new_years is None else str(_new_years) + ' 年'}口径），禁止降级覆盖")
+                return path
+    except Exception as _e:
+        print(f"  [warn] 回测外壳防降级检查异常，按原流程写出: {_e}")
     with open(path, "w", encoding="utf-8") as f:
         f.write("window.FOUR_VOLUME_BACKTEST = " + json.dumps(data, ensure_ascii=False, indent=1) + ";\n")
     print(f"  ✅ 写出 {path}（回测外壳刷新，{data['summary']['total_signals']} 信号）")
