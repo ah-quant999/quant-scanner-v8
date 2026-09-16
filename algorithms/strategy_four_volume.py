@@ -473,8 +473,25 @@ j    - 前复权（fetch_a_daily 走 akshare/腾讯前复权，前端 np 已处�
                "nets": []}          # 单笔净收益（夏普用，不可与路径混用）
            for k in periods}
     total_signals = 0
+    # 🔴 2026-09-16 阿狸咪的工程师 · 修「静默杀误杀」（D7 根因）：
+    #   run_algorithms.py::_supervised_run 对「连续 SILENCE_KILL_SEC（默认 900s = 15min）无 stdout」
+    #   判卡死并 kill 进程。本函数逐只抓 K 线、**循环体全程零输出**（原实现仅失败时与末尾各一处 print），
+    #   5 年档（years=5 → bars >= max(1500, 640)）实测必被误杀 —— run 35006805941 / stage=E 实证：
+    #   本脚本 03:16:55 起跑、03:32:00 被「静默卡死(>15min 无输出)，监督器已终止」，
+    #   回测外壳写不出 ⇒ data/FOUR_VOLUME_BACKTEST.js 真值冻在旧 calc_time（health_check 永久红灯）。
+    #   同型 2026-09-09 已在 v8/factor_lab_gen.py 修过一次（该脚本每 30s 一行心跳），此处同法补心跳。
+    #   ⚠️ 必须 flush=True：监督器读的是 Popen 管道，Python 对管道默认块缓冲，
+    #      print 不打进管道就等于没输出（这正是「有 print 也不够」的坑）。
+    #   按「时间片」而非「只数」发心跳（单只取数本身可能很慢），保证任意时刻静默 < 60s；
+    #   真挂死时心跳自然停止 ⇒ 监督器仍会 kill（不放松任何守门）。
+    _hb_t = time.time()
+    _hb_n = 0
     for s in stocks:
         code, market = s[0], s[2]
+        _hb_n += 1
+        if time.time() - _hb_t >= 60:
+            print(f"  [backtest] 逐只回测进度 {_hb_n}/{len(stocks)} 只（心跳，防静默杀）", flush=True)
+            _hb_t = time.time()
         try:
             df = fetch_hk_daily(code) if market == "hk" else fetch_a_daily(code, bars=bars)
             if df is None or len(df) < 60:

@@ -62,6 +62,11 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   注意：被杀与「源不可用秒退」是两种不同故障，登记预算只解决前者，后者由
     #   ScanUnavailable 硬失败上报（见该脚本 main()）。给足 90min 余量。
     "strategy_four_volume_60m.py": 5400,
+    # 🛡 2026-09-16 阿狸咪的工程师 · 修「5 年版未登记预算」（D7 配套）：
+    #   日线版同样逐只取数，且 E 批经 SCRIPT_ENV 注入 V8_BACKTEST_YEARS=5 ⇒ bars >= 1500 全池回测，
+    #   实测 > 15min（run 35006805941 实证）。此前未登记 ⇒ 走默认 1800s，与 60min 版同档补 90min。
+    #   ⚠️ 总预算与静默阈值是两把锁（见 SILENCE_OVERRIDE），缺任何一把仍会被杀。
+    "strategy_four_volume.py": 5400,
     # 🛡 2026-09-11 一劳永逸：以下 5 个实验/研究卡脚本从 v8_cn_fetch_experiments.yml
     #   正式收编进 B 批链尾（详见 ORDER / STAGES["B"] 注释）。均为纯本地计算或
     #   单接口调用（不遍历全 universe），给 900s 足够余量；显式登记避免走默认 1800s
@@ -882,6 +887,11 @@ SILENCE_OVERRIDE = {
     # 🛡 2026-09-11：CRDS 逐只抓取，段落间可能长时间无 stdout → 给 30min 静默预算，
     #   避免被全局 15min 静默杀误杀（与 2.3 的 90min 总预算配套）。
     "calc_crds.py": 1800,   # 冷启动 50-90min，给 1h 静默预算（总时长仍受 5400s 超时约束）
+    # 🛡 2026-09-16 阿狸咪的工程师 · 同型第三例（D7）：日线版四量终极 5 年回测在逐只循环内零 stdout，
+    #   2026-09-16 03:16:55~03:32:00 被全局 900s 静默杀误杀 ⇒ 产物写不出、卡永久陈旧。
+    #   照既有范式双保险：① 脚本自带心跳（strategy_four_volume.py 已补，60s 一片，带 flush）
+    #   ② 此处给静默预算兜底。日后新增「长跑 + 长段落无输出」脚本，同样两处一起加。
+    "strategy_four_volume.py": 3600,
 }
 
 

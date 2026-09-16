@@ -70,6 +70,18 @@ CARD_DEFS = [
     # 🛡 2026-09-08 一劳永逸：NT_DATA 由盘后算法链(fetch_orphan_nt_data.py)产出，原挂"今日事件"页
     #   在 08:00-10:00 盘前被 adjust_max_age 收紧到 180min 误杀（盘后产物不可能 <180min 新鲜）→ 改挂"全量数据"页豁免。
     {"id": "NT_DATA", "name": "市场提示", "page": "全量数据", "freq": "每日盘后(算法链)", "max_age": 720, "key_fields": ["alerts"], "weekend_update": False, "heal_cat": "algo_run"},
+    # 🛡 2026-09-16 阿狸咪的工程师 · 修「事件驱动数据被 24h 通用红线误判 fail」：
+    #   根因（实测）：MACRO_KSHAPE 既不在 CARD_DEFS 也不在 _KNOWN_EXTRA_PAGES 白名单
+    #   ⇒ 落入 check_all_data_files 动态扫描，按通用 24h 红线判 fail
+    #   （09-16 21:57 体检实测：[FAIL] 全量数据/MACRO_KSHAPE 更新于 昨日 20:11，超过 1440 分钟）。
+    #   但该卡 2026-09-15 19:27（ae30ea7a1）已按主人令改为**事件驱动**：
+    #   提交原文「convert to event-driven daily poll ... stop monthly automation」；
+    #   index.html 同位注释：每日「沧海一土狗文章巡检」自动化(21:00)发现新文才刷新 source/updated。
+    #   ⇒「无新文 ⇒ updated 不变」是设计内行为，不是陈旧故障。
+    #   按既有 manual_dep 范式登记（同 UNLISTED_PANEL）：超阈值降级为 limited（🔒 受限可用），
+    #   面板显示「等外部策展」而非「陈旧」，自愈链也不会做永远无效的派发。
+    #   ⚠️ 只登记这一个事件驱动卡，不放松任何算法产物的红线。
+    {"id": "MACRO_KSHAPE", "name": "宏观K型分层", "page": "全量数据", "freq": "事件驱动(每日巡检)", "max_age": 10080, "key_fields": ["data_point"], "manual_dep": True, "manual_note": "2026-09-15 19:27 ae30ea7a1 起改为事件驱动 daily poll（提交原文：convert to event-driven daily poll / stop monthly automation）：由「沧海一土狗文章巡检」自动化按日巡视，发现新文才刷新，无新文保持上次策展值；非算法产物。"},
     # 实时数据
     {"id": "INDEX_QUOTES", "name": "全球指数 / 股指期货", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["items"]},
     {"id": "ETF_PULSE", "name": "ETF 盘中异动", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["etfs"]},

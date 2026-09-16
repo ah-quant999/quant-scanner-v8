@@ -114,6 +114,18 @@ jobs:
           python v8_health_check.py || { echo "::error::v8_health_check.py 失败，健康面板未刷新"; exit 1; }
 
       - name: "📤 推送变更到 main（git push，全套 data/*.js + raw_data/*.json 自动）"
+        # 🔴 2026-09-16 阿狸咪的工程师 · 修「体检红灯把本链产物一并吞掉」（D6）：
+        #   上一步 `python v8_health_check.py || { …; exit 1; }` 是主人 2026-09-08「禁止假 success」
+        #   令立的硬失败（体检脚本跑挂 = 监控失效，必须可见）——**那行一字不动**。
+        #   但 v8_health_check.py 退出码语义是 `sys.exit(0 if report["overall"]=="ok" else 2)`，
+        #   于是「体检跑完、结论非 ok（有 stale 卡）」与「脚本自身崩溃」被同一个 exit 1 混为一谈，
+        #   `||` 分支把后续步骤全 skip ⇒ 本链刚算出的产物一条都推不上去。
+        #   实测 run 35105177952（09-16 21:56）：「三算法追踪入池」「重生成 data/ALGO_TRACK.js」
+        #   两步均 success，本步被 skip ⇒ 当晚 data/ALGO_TRACK.js 未刷新（D1/D2 修复成果被吞）。
+        #   修法：只给本推送步加 !cancelled() —— 硬失败/红灯完全不改（可见性不降、不造任何假 success），
+        #   但推送在体检失败后仍必须执行（数据新鲜优先于告警颜色）。用 !cancelled() 而非 always()，
+        #   以免 job 被 cancel 时还去推半成品。
+        if: ${{ !cancelled() }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
