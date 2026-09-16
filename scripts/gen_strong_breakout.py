@@ -40,6 +40,17 @@ RAW_DIR = Path(ROOT) / "raw_data"
 CACHE_DIR = RAW_DIR / "kline_cache"
 HISTORY_FILE = RAW_DIR / "strong_breakout_history.json"
 WINDOW_DAYS = 45
+# 🔴 2026-09-16 阿狸咪的工程师：账本「保留期」与「展示窗口」**解耦**。
+#   展示窗口（WINDOW_DAYS=45）决定 uni / periods / STOCK_MOMENTUM_STATE 的统计口径，
+#   **不得改**；保留期（LEDGER_KEEP_DAYS）只决定落到
+#   raw_data/strong_breakout_history.json 的入选记录留多久。
+#   动因：生命周期页「强势突破」的信号层回测读的就是这份账本，而 T+45~T+250 长档要成熟
+#   必须留得住 ≥250 个交易日的入选记录 —— 45 天窗口下长档**结构性永远只能是「未成熟」**。
+#   380 天与 algorithms/backtest_comprehensive.py 的 LOOKAHEAD_DAYS=380 同源
+#   （覆盖 250 交易日 ≈ 365 自然日 + 余量）。
+#   ⚠️ 该账本当前唯一消费方是 algorithms/backtest_life_cards.py（不发布前端），
+#     故扩保留期不改任何屏上口径。
+LEDGER_KEEP_DAYS = 380
 # 🛡 2026-08-29 硬化：K线可用率低于阈值时直接失败，禁止发布「data_available=false」的虚假回测。
 # 默认 50%：既避免偶发单股失败阻塞构建，又确保大多数样本真实可算。
 MIN_KLINE_RATIO = float(os.environ.get("GEN_SB_MIN_KLINE_RATIO", "0.5"))
@@ -449,9 +460,11 @@ def main():
         appended = True
         log(f"今日强势突破候选 {today}：初筛通过 {len(cands)} 只（涨幅≥3%+量比≥1.2+突破+RS前25%）")
 
-    # ── 2) 45 天滚动窗口 ───────────────────────────────
+    # ── 2) 展示窗口 45 天 / 落盘账本保留 380 天（解耦，见 LEDGER_KEEP_DAYS 注释）──
     dates = sorted(history.keys())
     cutoff = (now - datetime.timedelta(days=WINDOW_DAYS)).strftime("%Y-%m-%d")
+    ledger_cutoff = (now - datetime.timedelta(days=LEDGER_KEEP_DAYS)).strftime("%Y-%m-%d")
+    history_ledger = {d: history[d] for d in dates if d >= ledger_cutoff}
     dates = [d for d in dates if d >= cutoff]
     history = {d: history[d] for d in dates}
 
@@ -621,7 +634,9 @@ def main():
 
     # 落历史
     HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
-    HISTORY_FILE.write_text(json.dumps(history, ensure_ascii=False), encoding="utf-8")
+    HISTORY_FILE.write_text(json.dumps(history_ledger, ensure_ascii=False), encoding="utf-8")
+    log(f"✅ 账本落盘 {len(history_ledger)} 天（保留期 {LEDGER_KEEP_DAYS} 天 · "
+        f"展示窗口 {WINDOW_DAYS} 天）")
 
     log(f"✅ 写出 STOCK_MOMENTUM_STATE_V2.js（{total_uni} 只唯一，K线可用 {kline_ok}，月份 {len(periods)}）")
     log(f"✅ 写出 STOCK_MOMENTUM_STATE.js（窗口 {len(days)} 天，今日追加={appended}）")

@@ -1354,7 +1354,19 @@ def run_experiment_cards():
             print(f"[experiment]   ⚠️ gen_strong_breakout 异常: {e}")
     else:
         print("[experiment] ⚠️ 缺失 scripts/gen_strong_breakout.py，跳过")
-        life_bt_py = Path(__file__).resolve().parent / "algorithms" / "backtest_life_cards.py"
+
+    # ── 生命周期两卡「信号层真实回测」（强势突破 / 高手强势股跟踪）──────────────
+    # 🔴 2026-09-16 阿狸咪的工程师 · 修「契约未落地」：
+    #   本调用原先被放在上面的 `else` 分支里（=「gen_strong_breakout 缺失时才跑」），
+    #   而它**永远不缺失** ⇒ 正常路径下本脚本从不执行，两卡回测只在人工跑过时才更新。
+    #   实测证据：raw_data/strong_breakout_backtest.json 的 generated 长期停在人工那一次，
+    #   而 data/*.js 的 update_time 只是 update_v8 桥接重写、**内容没重算**（假新鲜）。
+    #   本脚本自己的 docstring 写的是「由 update_v8.py 的 experiment 段调用（紧随
+    #   scripts/gen_strong_breakout.py 之后，确保读到当日最新信号账本）」——现按契约落地。
+    #   失败仅告警、不阻断主链（与本段其它实验卡一致）；真停更由 v8_health_check.py 的
+    #   STRONG_BREAKOUT_BACKTEST / IMA_STRONG_BACKTEST（max_age 1440 分钟）兜底告警。
+    life_bt_py = Path(__file__).resolve().parent / "algorithms" / "backtest_life_cards.py"
+    if life_bt_py.exists():
         try:
             print(f"[experiment] ▶ backtest_life_cards.py ({datetime.now():%H:%M:%S})")
             r = subprocess.run([sys.executable, str(life_bt_py)], capture_output=True, text=True, timeout=900)
@@ -1365,6 +1377,8 @@ def run_experiment_cards():
                 print("[experiment]   ✅ backtest_life_cards 完成（强势突破/高手强势股跟踪 真实信号层回测已产出）")
         except Exception as e:
             print(f"[experiment]   ⚠️ backtest_life_cards 异常: {e}")
+    else:
+        print("[experiment] ⚠️ 缺失 algorithms/backtest_life_cards.py，跳过")
 
     
 

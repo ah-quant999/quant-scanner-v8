@@ -48,7 +48,13 @@ KC = RAW / "kline_cache"
 
 # ── 口径常量 ──────────────────────────────────────────────────────────────────
 COST_PCT = 0.30                      # 双边总成本（%）= 15bps x 2
-HORIZONS = [1, 2, 3, 5, 10]          # 受信号账本窗口限制，短档先落地
+# 档位 = 全站规范 ladder（HOLD_LADDER：backtest_comprehensive / backtest_tdx /
+# gen_algo_track / strategy_four_volume / gen_backtest_all_algos 同源），
+# **并保留本卡既有的 T+1/T+2/T+3 短线档**（已在屏、有真实样本，不动）。
+# 🔴 2026-09-16 主人令：「这两张卡怎么只有 T+10，要这些」⇒ 补齐 T+20~T+250。
+# ⚠️ 长档要能成熟，账本必须留得住信号 —— 见 scripts/gen_strong_breakout.py
+#    的 LEDGER_KEEP_DAYS（原 45 天窗口下 T+45 以上结构性不可能有样本）。
+HORIZONS = [1, 2, 3, 5, 10, 20, 30, 45, 60, 75, 90, 180, 250]
 CST = timezone(timedelta(hours=8))
 
 METHOD = ("信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出"
