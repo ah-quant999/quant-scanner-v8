@@ -660,6 +660,12 @@ jobs:
           python cloud_fetch_v8.py --only CANDIDATE_QUOTES || true
 
       - name: "📤 唯一推送（本链只此一处推送 data/ 与 raw_data/，严格退出码）"
+        # 🔴 2026-09-17 P0-A（阿狸咪的工程师落盘 · 小九 0110 档 §3.1 请求 / 0240 档 §2.1 实证）：
+        #   本步原**无步级超时**，仅靠 job 级 360min 兜底 ⇒ 单步最坏可堵满 6 小时，
+        #   僵尸 run 占死并发组（run #1883 实测 3h55m）⇒ 下游批次全被 cancelled。
+        #   20 分钟依据：正常推送实测 ≤3 分钟（含 848 扫描回退路径），20 分 = 6.7 倍冗余；
+        #   配合 api_push_raw.py 心跳看门狗（480s 无进展即强退），两层防护互不依赖。
+        timeout-minutes: 20
         if: steps.gate.outputs.proceed == 'true'
         run: |
           # 2026-08-22 根因⑪收口：去掉 || true —— 推送失败必须让 job 失败，
