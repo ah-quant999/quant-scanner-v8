@@ -317,11 +317,11 @@
   .ph-dim-name{font-size:11px;color:var(--dim);margin-bottom:6px}
   .ph-dim-bar{height:6px;background:var(--bg2);border-radius:4px;overflow:hidden}
   .ph-dim-fill{height:100%;border-radius:4px}
-  .ph-crisis-index{font-size:40px;font-weight:800;line-height:1;text-align:center;margin:8px 0}
-  .ph-crisis-cats{display:flex;flex-direction:column;gap:8px}
-  .ph-crisis-row{display:flex;align-items:center;gap:10px;font-size:12px}
-  .ph-crisis-row span{width:50px;color:var(--sub)}
-  .ph-crisis-bar{flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
+  .ph-crisis-pills{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:2px}
+  .ph-crisis-pill{display:flex;align-items:center;justify-content:center;gap:4px;font-size:10.5px;line-height:1;padding:4px 5px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);white-space:nowrap}
+  .ph-crisis-pill i{font-style:normal;font-weight:700;color:var(--sub)}
+  .ph-crisis-pill b{font-weight:800}
+  .ph-crisis-pill .sep{opacity:.35}
   .ph-sector-blocks{display:flex;flex-direction:column;gap:14px}
   .ph-sector-block{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px}
   .ph-sector-title{font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:8px}
@@ -1148,7 +1148,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
           <tr><td>70 ~ 100</td><td style="color:#ff6b81;font-weight:700;">危机</td><td>系统性风险高，防御为主</td><td style="color:#f4495d;font-weight:700;">🔴 红</td></tr>
         </table>
         <div class="logic-h">每日洞察「市场情绪健康度」红黄绿灯（2026-08-12 新增）</div>
-        <div class="logic-p">主分数（<code>CRISIS_DATA.score</code>）下方挂灯：≥70→🔴 危机 / ≥50→🟡 警戒 / ≥30→🟡 关注 / &lt;30→🟢 平稳。档位文字优先读数据自带 <code>CR.level</code> 字段（不再写死"安全"）。子指标（货币/经济/全球，数据字段为 <code>CR.indicators</code> 非旧版 dimensions）每条挂 8px 小灯：分数≥60→红 / ≥35→黄 / &lt;35→绿。</div>
+        <div class="logic-p">版式（2026-09-17 主人令）：本区渲染为 <b>1 行 3 列小胶囊</b>（<code>.ph-crisis-pills</code> 网格 + <code>.ph-crisis-pill</code> 胶囊），每格＝分项名 + 分值 + 档位文字（如 <code>货币 12 · 关注</code>）；顶部一行＝综合指数大字 + <code>/100 · 档位</code> + 数据时间。<b>位置：紧随「一句话结论」下方</b>（卡内序＝一句话结论 → 宏观硬指标 → 双源对比 → 当期原文）。分档口径：综合指数 ≥70 危险 / ≥50 警惕 / ≥30 关注 / &lt;30 安全；档位文字与颜色一律由前端按分值实时计算，<b>不读</b> <code>CR.level</code>。权重 货币×40% + 经济×35% + 全球×25%；分项取 <code>CR.indicators</code> 下同 <code>cat</code> 的 <code>score</code> 算术均值（货币 = USD/CNY 中间价 / 经济 = 中国制造业 PMI / 全球 = VIX + 美债 10Y）。</div>
         <div class="logic-h">指标危险分</div>
         <div class="logic-p">基于近1年历史分位。越高越危险指标（SHIBOR/VIX/DXY/两融/离岸汇率）危险分=分位；越低越危险指标（期限利差/中美利差/PMI/出口/CPI/房价/铜金比/BDI/美债倒挂）危险分=100−分位。</div>
       </div>

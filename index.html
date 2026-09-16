@@ -528,11 +528,11 @@ window.__domReadyFns=[];
   .ph-dim-name{font-size:11px;color:var(--dim);margin-bottom:6px}
   .ph-dim-bar{height:6px;background:var(--bg2);border-radius:4px;overflow:hidden}
   .ph-dim-fill{height:100%;border-radius:4px}
-  .ph-crisis-index{font-size:40px;font-weight:800;line-height:1;text-align:center;margin:8px 0}
-  .ph-crisis-cats{display:flex;flex-direction:column;gap:8px}
-  .ph-crisis-row{display:flex;align-items:center;gap:10px;font-size:12px}
-  .ph-crisis-row span{width:50px;color:var(--sub)}
-  .ph-crisis-bar{flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
+  .ph-crisis-pills{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:2px}
+  .ph-crisis-pill{display:flex;align-items:center;justify-content:center;gap:4px;font-size:10.5px;line-height:1;padding:4px 5px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);white-space:nowrap}
+  .ph-crisis-pill i{font-style:normal;font-weight:700;color:var(--sub)}
+  .ph-crisis-pill b{font-weight:800}
+  .ph-crisis-pill .sep{opacity:.35}
   .ph-sector-blocks{display:flex;flex-direction:column;gap:14px}
   .ph-sector-block{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px}
   .ph-sector-title{font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:8px}
@@ -14380,16 +14380,8 @@ h += '</div>'; // /ulPaneObserve
       h += '<div style="font-size:11.5px;font-weight:700;color:#f43f5e;margin-bottom:7px;">&#x1F4CA; 宏观硬指标 · 危机雷达（尾部风险）'
          + '<span style="font-weight:400;color:var(--dim);margin-left:8px;">window.CRISIS_DATA · 更新于 ' + _e(CR.update_time || '—') + '</span></div>';
       if(CR.score != null){
-        var w = lv(idx);
-        h += '<div class="ph-crisis-index" style="color:' + w[1] + '">' + idx
-           + '<span style="font-size:12px;color:var(--dim);font-weight:400"> /100 · ' + w[0] + '</span></div>';
-        h += '<div class="ph-crisis-cats">';
-        [['货币 40%', mS], ['经济 35%', eS], ['全球 25%', gS]].forEach(function(pair){
-          var c2 = lv(pair[1])[1];
-          h += '<div class="ph-crisis-row"><span>' + pair[0] + '</span>'
-             + '<div class="ph-crisis-bar"><div style="height:100%;width:' + Math.round(pair[1]) + '%;background:' + c2 + ';border-radius:4px"></div></div>'
-             + '<b style="color:' + c2 + ';width:34px;text-align:right">' + Math.round(pair[1]) + '</b></div>';
-        });
+        // 🔴 2026-09-17 主人令：本区「39px 大数字 + 三条分项长条」已移至 ④b（一句话结论下方），
+        //    并压缩为「1 行 3 列小胶囊」。此处仅保留分数存在性判定与 CR.note 口径说明。
         h += '</div>';
         if(CR.note) h += '<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.7">' + _e(CR.note) + '</div>';
       } else {
@@ -14410,6 +14402,27 @@ h += '</div>'; // /ulPaneObserve
             : '<div style="font-size:12px;color:var(--dim);">' + PEND + '</div>')
        + (ana.window ? '<div style="font-size:10.5px;color:var(--dim);margin-top:6px;">口径窗口：' + _e(ana.window) + '</div>' : '')
        + '</div>';
+      // ── ④b 宏观硬指标 · 单行三列小胶囊（2026-09-17 主人令：原 39 分大数字 + 三条长条太大）──
+      (function(){
+        var CR2 = window.CRISIS_DATA || {};
+        if(CR2.score == null) return;
+        var I2 = CR2.indicators || {};
+        var C2 = {'货币': [], '经济': [], '全球': []};
+        Object.keys(I2).forEach(function(k){ var it = I2[k]; if(it && C2[it.cat] && it.score != null) C2[it.cat].push(it.score); });
+        var a2 = function(x){ return x.length ? x.reduce(function(s3, y){ return s3 + y; }, 0) / x.length : 0; };
+        var mv = Math.round(a2(C2['货币']) * 100), ev = Math.round(a2(C2['经济']) * 100), gv = Math.round(a2(C2['全球']) * 100);
+        var ix = Math.round(mv * 0.40 + ev * 0.35 + gv * 0.25);
+        var L2 = function(s3){ return s3 >= 70 ? ['危险', '#ef5350'] : s3 >= 50 ? ['警惕', '#ff9800'] : s3 >= 30 ? ['关注', '#ffd54f'] : ['安全', '#4caf50']; };
+        var wp = L2(ix);
+        var x2 = function(lab, val){ var wv = L2(val); return '<div class="ph-crisis-pill"><i>' + lab + '</i><b style="color:' + wv[1] + '">' + val + '</b><span class="sep">·</span><span style="color:' + wv[1] + '">' + wv[0] + '</span></div>'; };
+        var sum = '<div class="" style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
+                + '<span style="font-size:11px;font-weight:700;color:#f43f5e;">&#x1F4CA; 宏观硬指标</span>'
+                + '<b style="font-size:15px;font-weight:800;color:' + wp[1] + ';">' + ix + '</b>'
+                + '<span style="font-size:10.5px;color:var(--dim);">/100 · ' + wp[0] + '</span>'
+                + '<span style="font-size:10.5px;color:var(--dim);margin-left:auto;">window.CRISIS_DATA · ' + _e(CR2.update_time || '—') + '</span></div>';
+        h += '<div style="background:rgba(244,63,94,.06);border:1px solid rgba(244,63,94,.28);border-radius:7px;padding:8px 10px;margin-bottom:10px;">'
+           + sum + '<div class="ph-crisis-pills">' + x2('货币', mv) + x2('经济', ev) + x2('全球', gv) + '</div></div>';
+      })();
     // ── ⑤ 双源对比（大盘 / 板块 / 仓位 三组，逐组左原文右判断）──
     h += '<div style="font-size:12px;font-weight:700;color:var(--txt);margin:6px 0 8px;">&#x1F50D; 双源对比 · <span style="color:#ef5350;">&#x1F534; 红字 = 我方与原文/共识的关键差异</span></div>';
     if(secs.length){
@@ -15213,11 +15226,8 @@ h+='      </div>';
 h+='      <div class="note" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>';
 h+='    </div>';
 
-    /* 🗑 2026-09-16 主人令：本段原为「🌐 下架雷达组」3 列网格（市场温度计·分项 / 六维共振雷达·战术层 /
-       危机雷达 三卡壳）。按主人令删前两卡、危机雷达并入「🌐 新周期判定 · 海外宏观 + AI 大周期」
-       ⇒ 整组撤除（该页「📈 上证+深证成交金额」「🏘️ 涨跌家数统计」两卡保留不动）。
-       ⚠️ 未办事项（记录，非本卡范围）：.ph-crisis-index / .ph-crisis-cats / .ph-crisis-row /
-          .ph-crisis-bar 四个 CSS 类**保留**，因合并卡的硬指标区复用同一套条形样式。 */
+      // 旧四类（ph-crisis-index / -cats / -row / -bar）已随 2026-09-17 胶囊化改造全量删除 ——
+      // 实测 index.html 与 logic.html 代码面命中均为 0、无残留死代码；新增两类由 ④b 独享。
 
     /* ===== 🌙 盘后 ===== */
 h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167,139,250,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#a78bfa;border-radius:8px;margin:16px 0 10px 0;">🌙 盘后（收盘后复盘）</div>';
