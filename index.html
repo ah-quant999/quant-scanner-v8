@@ -6134,10 +6134,10 @@ function fmtSigned(v){
           h += '<div style="margin:20px 0 0;" class="card">';
           /* 头部：只用「生命周期」自称，不带任何选股策略名 */
           h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
-          h += '<span style="font-size:15px;font-weight:700;color:#a78bfa;">\U0001f3af \u9009\u80a1\u751f\u547d\u5468\u671f</span>';
+          h += '<span style="font-size:15px;font-weight:700;color:#a78bfa;">🎯 \u9009\u80a1\u751f\u547d\u5468\u671f</span>';
           h += '<span style="font-size:10px;font-weight:700;color:#a78bfa;background:rgba(167,139,250,.13);'
              + 'border:1px solid rgba(167,139,250,.4);padding:1px 7px;border-radius:10px;white-space:nowrap;">'
-             + '\U0001f9fa \u72ec\u7acb\u7b56\u7565 \u00b7 \u6301\u6709\u7ba1\u7406</span>';
+             + '🧺 \u72ec\u7acb\u7b56\u7565 \u00b7 \u6301\u6709\u7ba1\u7406</span>';
           h += '<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;'
              + 'border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">'
              + '\u2705 \u771f\u5b9e\u6570\u636e\u56de\u6d4b</span>';
@@ -6559,169 +6559,12 @@ function fmtSigned(v){
     html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin:18px 0 8px;display:flex;align-items:center;gap:8px;"><span>🎯</span>主策略回测 <span style="font-size:11px;color:var(--dim);font-weight:500;">按星级降序</span></div>';
     // 2026-09-02 主人令：已下线模块的回测卡保持不可见（选股信号层全删；回测不再保留以免误用）
 
-    /* ── 综合回测（多策略×多持有期）── */
-    html += '<div style="margin:14px 0;border-left:4px solid #38bdf8;" class="card">';
-    html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-    html += '<span style="font-size:15px;font-weight:700;color:#38bdf8;">📊 综合回测 · 多策略 × 多持有期</span>';
-    html += '<span style="font-size:11px;color:var(--dim);">策略本身价值：哪条策略最值钱？</span>';
-    html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);">✅ 真实baostock全回测</span>';
-    html += '</div>';
-    html += '<div style="font-size:11px;color:var(--sub);line-height:1.7;margin-bottom:6px;"><b style="color:var(--txt);">包含</b>：三重共识 3 档共振（≥2 宽松 / 70-79 分 / ≥80 严格）× 5 个持有期（T+1/3/5/10/20 个交易日）= 15 组回测，每格给<b>胜率</b>与<b>平均收益</b>；样本=历史全部入选信号，按 baostock 真实收盘价前向收益计算。<b style="color:var(--txt);">更新时机</b>：每日盘后算法链（与最终推荐同链产出后）统一重算，盘中不重算——太早算无效、浪费。</div>';
-    if(bc.overview && bc.comparison){
-      // 2026-09-06 主人令 P1-B：按 score_regime 自动切换标签口径（百分制·历史 vs 排名·当日）
-      var _scoreRegime = bc.score_regime || 'legacy_pct';
-      var _isLegacy = _scoreRegime === 'legacy_pct';
-      var _ldr = _isLegacy ? '（百分制·历史共拍）' : '（排名·当日归一）';
-      var labelMap = {
-        resonance_all:       '共振≥2（宽松）',
-        resonance_gte70_lt80:'共振70-79分',
-        resonance_gte80:     '共振≥80（严格）',
-      };
-      var labelSuffix = function(base){ return base + '<span style="font-size:9px;color:var(--sub);margin-left:4px;font-weight:400;">'+_ldr+'</span>'; };
-      var stratList = bc.strategies_tested || ['resonance_all','resonance_gte70_lt80','resonance_gte80'];
-      var holdList = bc.hold_periods_tested || [1,3,5,10,20];
-      // 2026-09-13 主人令：直接标出最佳策略 + 最佳持有期，不用自己找
-      var bestScore = -Infinity, bestS = null, bestH = null, bestD = null;
-      var stratAvg = {};
-      stratList.forEach(function(s){
-        var sum = 0, n = 0, bestHs = -Infinity, bestHp = null;
-        holdList.forEach(function(h){
-          var d = (bc.comparison['hold_'+h+'d']||{})[s] || {};
-          if(d.win_rate != null && d.avg_return != null){
-            var sc = (d.win_rate - 50) + d.avg_return * 8;
-            sum += sc; n++;
-            if(sc > bestScore){ bestScore = sc; bestS = s; bestH = h; bestD = d; }
-            if(sc > bestHs){ bestHs = sc; bestHp = h; }
-          }
-        });
-        stratAvg[s] = {avg: n ? sum/n : -Infinity, bestH: bestHp};
-      });
-      var bestStrategy = bestS;
-      stratList.forEach(function(s){ if(stratAvg[s].avg > stratAvg[bestStrategy].avg) bestStrategy = s; });
-      if(bestS && bestH){
-        html += '<div style="margin:8px 0 10px;padding:7px 11px;border-radius:8px;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.35);font-size:12px;line-height:1.5;">';
-        html += '<span style="color:#fbbf24;font-weight:700;">👑 当前最佳策略：</span>';
-        html += '<span style="color:var(--txt);font-weight:700;">'+_esc(labelMap[bestS]||bestS)+'</span>';
-        html += '<span style="color:var(--sub);"> · 持有 T+'+bestH+'天 · 胜率 </span>';
-        html += '<span style="color:'+_colorWR(bestD.win_rate)+';font-weight:700;">'+(bestD.win_rate!=null?bestD.win_rate.toFixed(1):'—')+'%</span>';
-        html += '<span style="color:var(--sub);"> · 平均收益 </span>';
-        html += '<span style="color:'+_colorPL(bestD.avg_return)+';font-weight:700;">'+(bestD.avg_return!=null?(bestD.avg_return>0?'+':'')+bestD.avg_return.toFixed(2):'—')+'%</span>';
-        html += '<span style="color:var(--dim);font-size:10.5px;margin-left:6px;">（综合得分最高）</span>';
-        html += '</div>';
-      }
-      // 表：行=策略档，列=样本 | T+1胜率/收益 | T+3 | T+5 | T+10 | T+20
-      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
-      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      html += '<th rowspan="2" style="padding:6px;text-align:left;color:var(--sub);vertical-align:bottom;">策略档<span style="display:block;font-size:9px;font-weight:400;color:var(--dim);line-height:1.2;">'+_ldr+'</span></th>';
-      html += '<th rowspan="2" style="padding:6px;text-align:right;color:var(--sub);vertical-align:bottom;">样本</th>';
-      holdList.forEach(function(h){
-        var isBestH = (h === bestH);
-        html += '<th colspan="2" style="padding:6px;text-align:center;color:var(--sub);border-left:1px solid var(--border2);'+(isBestH?'background:rgba(251,191,36,.12);color:#fbbf24;':'')+'">T+'+h+'天'+(isBestH?' 👑':'')+'</th>';
-      });
-      html += '</tr><tr style="background:var(--card2);border-bottom:1px solid var(--border);">';
-      html += '<th style="padding:4px 6px;"></th><th style="padding:4px 6px;"></th>';
-      holdList.forEach(function(h){
-        var isBestH = (h === bestH);
-        var extra = isBestH ? 'background:rgba(251,191,36,.08);' : '';
-        html += '<th style="padding:4px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;'+extra+'">胜率</th>';
-        html += '<th style="padding:4px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;border-left:1px solid var(--border2);'+extra+'">收益</th>';
-      });
-      html += '</tr></thead><tbody>';
-      stratList.forEach(function(s){
-        var isBestS = (s === bestStrategy);
-        var rowEmoji = isBestS ? '👑 ' : '';
-        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+(isBestS?'background:rgba(251,191,36,.06);':'')+'">';
-        html += '<td style="padding:6px;color:var(--txt);font-weight:700;">'+rowEmoji+_esc(labelMap[s]||s)+'</td>';
-        var firstD = (bc.comparison['hold_'+(holdList[0]||1)+'d']||{})[s] || {};
-        html += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(firstD.count!=null?firstD.count:'—')+'</td>';
-        holdList.forEach(function(h){
-          var d = (bc.comparison['hold_'+h+'d']||{})[s] || {};
-          var wr = d.win_rate == null ? '—' : d.win_rate;
-          var ar = d.avg_return == null ? '—' : d.avg_return;
-          var isBestCell = (bestS && bestH && s === bestS && h === bestH);
-          var cellStyle = isBestCell ? 'background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);' : '';
-          html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(wr)+';'+cellStyle+'">'+(typeof wr === 'number' ? wr.toFixed(1) : wr)+'%</td>';
-          html += '<td style="padding:6px;text-align:center;color:'+_colorPL(ar)+';border-left:1px solid var(--border2);'+cellStyle+'">'+(typeof ar==='number'?(ar>0?'+':'')+ar.toFixed(2):ar)+'%</td>';
-        });
-        html += '</tr>';
-      });
-      html += '</tbody></table></div>';
-      // P1-B 副信息：方法 + regime 拆解 + 样本数
-      var _regimeCt = bc.score_regime_breakdown || {};
-      var _regimeNote = (_scoreRegime === 'legacy_pct')
-        ? '百分制·历史共拍（2019-2026/08 累计）'
-        : (_scoreRegime === 'modern_rank' ? '排名·当日归一（2026/08 起）' : '混合（legacy + modern）');
-      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">方法：'+_esc(bc.method||'baostock')+' · 数据 '+(bc.calc_time||'').substring(0,16)+
-        ' · 口径：<span style="color:#38bdf8;font-weight:700;">'+_regimeNote+'</span>'+
-        (_regimeCt.legacy_pct||_regimeCt.modern_rank ? ' · 拆解：legacy '+(_regimeCt.legacy_pct||0)+' / modern '+(_regimeCt.modern_rank||0) : '')+
-        ' · <span style="color:#fbbf24">≥55%胜率+≥+0.5%收益 = 真值钱</span></div>';
-    } else {
-      html += '<div class="note">BACKTEST_COMPREHENSIVE 数据不可用</div>';
-    }
-    html += '</div>';
 
     // 2026-09-02 主人令：模块策略回测卡统一读 __STRATEGY_BACKTESTS 配置（按星级降序；已删策略自动不出现）
     html += window.__renderBacktestCardsFrom(window.__STRATEGY_BACKTESTS);
     // 2026-09-13 主人令：因子实验室独立分层回测单独渲染（数据结构与 by_period 不同）
     html += window.__renderFactorLabBacktest();
 
-    /* ── K线信号回测 ── */
-    html += '<div style="margin:14px 0;border-left:4px solid #c084fc;" class="card">';
-    html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-    html += '<span style="font-size:15px;font-weight:700;color:#c084fc;">📈 K线信号回测</span>';
-    html += '<span style="font-size:11px;color:var(--dim);">信号层 alpha · 全档持有期回测</span>';
-    html += '<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>';
-    html += '</div>';
-    if(bd.summary){
-      var sigKeys = Object.keys(bd.summary);
-      /* 🔴 2026-09-14 小九（三件套·遗留③）：档位表原先**硬编码 5 档** `[1,3,5,10,20]`，
-         而产物 backtest_tdx.json 实测已有 12 档（1/3/5/10/20/30/45/60/75/90/180/250）
-         ⇒ 主人 09-13 令「所有接入算法链的选股策略都要按 5…250 全档跟踪回测」，
-         在「策略回测页」已由 full_ladder 矩阵满足，但**本卡看不到长档**，
-         形成「同一份回测产物、两处口径不同」的分裂。
-         现改为**从产物派生**：扫 `win_rate_<N>d` 键提取实测档位并升序排列 ——
-         口径随产物自动对齐，以后增删档位不必再改前端（一次性根治，不是逐个补档）。 */
-      var periods = window._holdLadder ? window._holdLadder(sigKeys.length ? bd.summary[sigKeys[0]] : null) : [1,3,5,10,20];
-      html += '<div style="font-size:11px;color:var(--dim);margin:-2px 0 8px;">📐 本表含 <b>'
-           +  periods.length + '</b> 档：T+' + periods.join(' / T+')
-           + ' · 横向可滚动查看全部档位</div>';
-      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:10.5px;">';
-      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      html += '<th style="padding:4px;text-align:left;color:var(--sub);">信号</th>';
-      html += '<th style="padding:4px;text-align:right;color:var(--sub);">样本</th>';
-      periods.forEach(function(p){
-        html += '<th colspan="2" style="padding:4px 3px;text-align:center;color:var(--sub);border-left:1px solid var(--border2);">T+'+p+'</th>';
-      });
-      html += '</tr><tr style="background:var(--card2);border-bottom:1px solid var(--border);">';
-      html += '<th colspan="2" style="padding:4px;"></th>';
-      periods.forEach(function(){ html += '<th style="padding:3px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;">胜率</th><th style="padding:3px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;border-left:1px solid var(--border2);">收益</th>'; });
-      html += '</tr></thead><tbody>';
-      // 2026-08-27 主人令：按 T+5 胜率降序排（最强的信号在最上）
-      sigKeys.sort(function(a,b){
-        return (bd.summary[b]['win_rate_5d']||0) - (bd.summary[a]['win_rate_5d']||0);
-      });
-      sigKeys.forEach(function(k){
-        var sig = bd.summary[k];
-        var label = sig.label || k;
-        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-        html += '<td style="padding:4px;color:var(--txt);font-weight:600;white-space:nowrap;">'+_esc(label)+'</td>';
-        html += '<td style="padding:4px;text-align:right;color:var(--sub);">'+sig.total+'</td>';
-        periods.forEach(function(p){
-          var wr = sig['win_rate_'+p+'d'];
-          var ar = sig['avg_return_'+p+'d'];
-          /* 2026-09-14 小九：档位由 5 扩到全档后每列变窄，内边距 6px→4px/3px，
-             保证「-19.53%」这类 7 字符数值不被挤压换行。 */
-          html += '<td style="padding:4px 3px;text-align:center;font-weight:700;color:'+_colorWR(wr)+';white-space:nowrap;">'+ (wr==null?'—':wr.toFixed(1))+'%</td>';
-          html += '<td style="padding:4px 3px;text-align:center;color:'+_colorPL(ar)+';border-left:1px solid var(--border2);white-space:nowrap;">'+(ar==null?'—':(ar>0?'+':'')+ar.toFixed(2))+'%</td>';
-        });
-        html += '</tr>';
-      });
-      html += '</tbody></table></div>';
-      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;">方法：'+_esc(bd.method||'baostock 日K全量回测')+' · 数据 '+(bd.update_time||'').substring(0,16)+' · <span style="color:#22c55e">≥55%胜率且 T+5 仍正收益 = 真信号</span></div>';
-    } else {
-      html += '<div class="note">BACKTEST_TDX 数据不可用</div>';
-    }
-    html += '</div>';
 
     /* 2026-09-03 主人令：「🗂 特殊口径算法回测」整段删除（全站精选 IIFE）
        —— 既然选股已彻底删除，回测层不再保留其历史胜率卡。 */
