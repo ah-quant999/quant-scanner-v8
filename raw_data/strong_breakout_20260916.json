@@ -1,9 +1,9 @@
 {
-  "update_time": "2026-09-16 21:52:59",
+  "update_time": "2026-09-17 05:42:03",
   "date": "2026-09-16",
   "method": "强势突破(高手反推v1): 涨幅≥5.0% + 量比≥1.35(5日均量) + 收位≥0.55 + 5日累计∈[0.5,15.0]%",
   "version": "v1 (2026-09-03 样本 31/31 全召回)",
-  "pool_count": 860,
+  "pool_count": 878,
   "kline_fail": 12,
   "picked_count": 199,
   "core_top_n": 30,
@@ -1809,24 +1809,6 @@
       "core": false
     },
     {
-      "code": "159516",
-      "symbol": "sz159516",
-      "name": "半导体设备ETF国泰",
-      "industry": "",
-      "board": "ETF",
-      "close": 0.71,
-      "pct": 6.13,
-      "vol_ratio": 1.738,
-      "close_pos": 1.0,
-      "ret5": 6.61,
-      "upper_shadow": 0.0,
-      "above_ma20": true,
-      "trade_date": "2026-09-16",
-      "score": 17.867,
-      "rank": 101,
-      "core": false
-    },
-    {
       "code": "001358",
       "symbol": "sz001358",
       "name": "兴欣新材",
@@ -1841,7 +1823,7 @@
       "above_ma20": false,
       "trade_date": "2026-09-16",
       "score": 17.856,
-      "rank": 102,
+      "rank": 101,
       "core": false
     },
     {
@@ -1859,7 +1841,7 @@
       "above_ma20": false,
       "trade_date": "2026-09-16",
       "score": 17.762,
-      "rank": 103,
+      "rank": 102,
       "core": false
     },
     {
@@ -1877,7 +1859,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 17.711,
-      "rank": 104,
+      "rank": 103,
       "core": false
     },
     {
@@ -1895,7 +1877,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 17.549,
-      "rank": 105,
+      "rank": 104,
       "core": false
     },
     {
@@ -1913,7 +1895,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 17.497,
-      "rank": 106,
+      "rank": 105,
       "core": false
     },
     {
@@ -1931,7 +1913,7 @@
       "above_ma20": false,
       "trade_date": "2026-09-16",
       "score": 17.44,
-      "rank": 107,
+      "rank": 106,
       "core": false
     },
     {
@@ -1949,7 +1931,7 @@
       "above_ma20": false,
       "trade_date": "2026-09-16",
       "score": 17.316,
-      "rank": 108,
+      "rank": 107,
       "core": false
     },
     {
@@ -1967,7 +1949,7 @@
       "above_ma20": false,
       "trade_date": "2026-09-16",
       "score": 17.312,
-      "rank": 109,
+      "rank": 108,
       "core": false
     },
     {
@@ -1985,7 +1967,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 17.261,
-      "rank": 110,
+      "rank": 109,
       "core": false
     },
     {
@@ -2003,7 +1985,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 17.255,
-      "rank": 111,
+      "rank": 110,
       "core": false
     },
     {
@@ -2021,7 +2003,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 17.237,
-      "rank": 112,
+      "rank": 111,
       "core": false
     },
     {
@@ -2039,7 +2021,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 17.228,
-      "rank": 113,
+      "rank": 112,
       "core": false
     },
     {
@@ -2057,7 +2039,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 17.225,
-      "rank": 114,
+      "rank": 113,
       "core": false
     },
     {
@@ -2075,7 +2057,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 17.209,
-      "rank": 115,
+      "rank": 114,
       "core": false
     },
     {
@@ -2093,7 +2075,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 17.174,
-      "rank": 116,
+      "rank": 115,
       "core": false
     },
     {
@@ -2111,7 +2093,7 @@
       "above_ma20": false,
       "trade_date": "2026-09-16",
       "score": 17.148,
-      "rank": 117,
+      "rank": 116,
       "core": false
     },
     {
@@ -2129,7 +2111,7 @@
       "above_ma20": false,
       "trade_date": "2026-09-16",
       "score": 17.068,
-      "rank": 118,
+      "rank": 117,
       "core": false
     },
     {
@@ -2147,7 +2129,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.981,
-      "rank": 119,
+      "rank": 118,
       "core": false
     },
     {
@@ -2165,7 +2147,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.969,
-      "rank": 120,
+      "rank": 119,
       "core": false
     },
     {
@@ -2183,7 +2165,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.934,
-      "rank": 121,
+      "rank": 120,
       "core": false
     },
     {
@@ -2201,7 +2183,7 @@
       "above_ma20": false,
       "trade_date": "2026-09-16",
       "score": 16.917,
-      "rank": 122,
+      "rank": 121,
       "core": false
     },
     {
@@ -2219,7 +2201,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.909,
-      "rank": 123,
+      "rank": 122,
       "core": false
     },
     {
@@ -2237,7 +2219,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.89,
-      "rank": 124,
+      "rank": 123,
       "core": false
     },
     {
@@ -2255,7 +2237,7 @@
       "above_ma20": false,
       "trade_date": "2026-09-16",
       "score": 16.87,
-      "rank": 125,
+      "rank": 124,
       "core": false
     },
     {
@@ -2273,7 +2255,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.857,
-      "rank": 126,
+      "rank": 125,
       "core": false
     },
     {
@@ -2291,7 +2273,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.803,
-      "rank": 127,
+      "rank": 126,
       "core": false
     },
     {
@@ -2309,7 +2291,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.802,
-      "rank": 128,
+      "rank": 127,
       "core": false
     },
     {
@@ -2327,7 +2309,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.732,
-      "rank": 129,
+      "rank": 128,
       "core": false
     },
     {
@@ -2345,7 +2327,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.719,
-      "rank": 130,
+      "rank": 129,
       "core": false
     },
     {
@@ -2363,7 +2345,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.714,
-      "rank": 131,
+      "rank": 130,
       "core": false
     },
     {
@@ -2381,7 +2363,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.701,
-      "rank": 132,
+      "rank": 131,
       "core": false
     },
     {
@@ -2399,7 +2381,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.651,
-      "rank": 133,
+      "rank": 132,
       "core": false
     },
     {
@@ -2417,7 +2399,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.617,
-      "rank": 134,
+      "rank": 133,
       "core": false
     },
     {
@@ -2435,7 +2417,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.589,
-      "rank": 135,
+      "rank": 134,
       "core": false
     },
     {
@@ -2453,7 +2435,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.567,
-      "rank": 136,
+      "rank": 135,
       "core": false
     },
     {
@@ -2471,7 +2453,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.534,
-      "rank": 137,
+      "rank": 136,
       "core": false
     },
     {
@@ -2489,7 +2471,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.51,
-      "rank": 138,
+      "rank": 137,
       "core": false
     },
     {
@@ -2507,7 +2489,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.493,
-      "rank": 139,
+      "rank": 138,
       "core": false
     },
     {
@@ -2525,7 +2507,7 @@
       "above_ma20": false,
       "trade_date": "2026-09-16",
       "score": 16.462,
-      "rank": 140,
+      "rank": 139,
       "core": false
     },
     {
@@ -2543,7 +2525,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.414,
-      "rank": 141,
+      "rank": 140,
       "core": false
     },
     {
@@ -2561,7 +2543,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.412,
-      "rank": 142,
+      "rank": 141,
       "core": false
     },
     {
@@ -2579,7 +2561,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.352,
-      "rank": 143,
+      "rank": 142,
       "core": false
     },
     {
@@ -2597,7 +2579,7 @@
       "above_ma20": false,
       "trade_date": "2026-09-16",
       "score": 16.351,
-      "rank": 144,
+      "rank": 143,
       "core": false
     },
     {
@@ -2615,7 +2597,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.339,
-      "rank": 145,
+      "rank": 144,
       "core": false
     },
     {
@@ -2633,7 +2615,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.333,
-      "rank": 146,
+      "rank": 145,
       "core": false
     },
     {
@@ -2651,7 +2633,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.261,
-      "rank": 147,
+      "rank": 146,
       "core": false
     },
     {
@@ -2669,7 +2651,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.188,
-      "rank": 148,
+      "rank": 147,
       "core": false
     },
     {
@@ -2687,6 +2669,24 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 16.138,
+      "rank": 148,
+      "core": false
+    },
+    {
+      "code": "159516",
+      "symbol": "sz159516",
+      "name": "半导体设备ETF国泰",
+      "industry": "",
+      "board": "ETF",
+      "close": 0.706,
+      "pct": 5.53,
+      "vol_ratio": 1.738,
+      "close_pos": 0.886,
+      "ret5": 6.01,
+      "upper_shadow": 0.71,
+      "above_ma20": true,
+      "trade_date": "2026-09-16",
+      "score": 16.129,
       "rank": 149,
       "core": false
     },
@@ -2817,24 +2817,6 @@
       "core": false
     },
     {
-      "code": "159558",
-      "symbol": "sz159558",
-      "name": "半导体设备ETF易方达",
-      "industry": "",
-      "board": "ETF",
-      "close": 1.11,
-      "pct": 5.71,
-      "vol_ratio": 1.58,
-      "close_pos": 0.857,
-      "ret5": 6.32,
-      "upper_shadow": 0.9,
-      "above_ma20": true,
-      "trade_date": "2026-09-16",
-      "score": 15.864,
-      "rank": 157,
-      "core": false
-    },
-    {
       "code": "300706",
       "symbol": "sz300706",
       "name": "阿石创",
@@ -2849,6 +2831,24 @@
       "above_ma20": true,
       "trade_date": "2026-09-16",
       "score": 15.854,
+      "rank": 157,
+      "core": false
+    },
+    {
+      "code": "159558",
+      "symbol": "sz159558",
+      "name": "半导体设备ETF易方达",
+      "industry": "",
+      "board": "ETF",
+      "close": 1.107,
+      "pct": 5.43,
+      "vol_ratio": 1.58,
+      "close_pos": 0.882,
+      "ret5": 6.03,
+      "upper_shadow": 0.72,
+      "above_ma20": true,
+      "trade_date": "2026-09-16",
+      "score": 15.829,
       "rank": 158,
       "core": false
     },

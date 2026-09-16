@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-09-15 23:13:34",
-  "data_date": "2026-09-15",
+  "update_time": "2026-09-17 04:49:26",
+  "data_date": "2026-09-16",
   "meta": {
-    "data_date": "2026-09-15",
+    "data_date": "2026-09-16",
     "close_semantics": "⚠️ 记录里的 close 是「上次算到这只票那天」的快照（roe 按季 asof_q / abn 按月 asof_ym 缓存），**不是当日报价**；需要当日价请查 STOCK_QUOTE.js 或 CANDIDATE_QUOTES.js。同时看 close_date 字段。",
     "liquid_def": "liquid=false 表示最新K线日 != 数据日 或 当月换手率为 0（停牌/零成交），已从榜单剔除",
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
-    "n_universe": 777,
-    "n_at_valid": 864,
+    "n_universe": 783,
+    "n_at_valid": 877,
     "n_roe_large": 663,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
@@ -258,16 +258,6 @@
         "asof_ym": "2026-09"
       },
       {
-        "code": "sz.300373",
-        "name": "扬杰科技",
-        "close": 86.19,
-        "abn": 0.118,
-        "factor_at": -0.1179,
-        "roe_ttm": null,
-        "size_proxy": 28837391860.0,
-        "asof_ym": "2026-09"
-      },
-      {
         "code": "sh.688449",
         "name": "联芸科技",
         "close": 62.64,
@@ -355,6 +345,16 @@
         "factor_at": -0.1247,
         "roe_ttm": null,
         "size_proxy": 7667632999.1,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sz.002466",
+        "name": "天齐锂业",
+        "close": 45.35,
+        "abn": 0.128,
+        "factor_at": -0.1277,
+        "roe_ttm": null,
+        "size_proxy": 64707338881.2,
         "asof_ym": "2026-09"
       }
     ],

@@ -1,64 +1,29 @@
 {
-  "update_time": "2026-09-16 21:10:04",
-  "data_date": "2026-09-16",
-  "track_start": "2026-09-16",
-  "history_days": 22,
-  "strict_count": 1,
-  "near_count": 9,
+  "update_time": "2026-09-17 05:23:53",
+  "data_date": "2026-09-17",
+  "track_start": "2026-09-17",
+  "history_days": 23,
+  "strict_count": 0,
+  "near_count": 10,
   "tracked": [
     {
-      "code": "300390",
-      "name": "天华新能",
-      "market": "sz",
-      "board": "创业板",
+      "code": "688795",
+      "name": "摩尔线程",
+      "market": "sh",
+      "board": "科创板",
       "status": "near",
-      "total_score": 43.5,
-      "quality_grade": "B",
+      "total_score": 32.2,
+      "quality_grade": "",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "2026一季报预增",
-        "锂矿概念",
-        "计算机、通信和其他电子设备制造业",
-        "深股通",
-        "独角兽",
-        "医疗器械概念",
-        "MSCI中国",
-        "固态电池"
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 2,
-      "enter_date": "2026-09-15",
+      "enter_date": "2026-09-17",
       "hold_days": 1,
-      "consecutive_days": 2,
-      "first_close": 52.3,
-      "current_close": 52.3,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "000977",
-      "name": "浪潮信息",
-      "market": "sz",
-      "board": "主板",
-      "status": "near",
-      "total_score": 34.5,
-      "quality_grade": "C",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "2026中报预增",
-        "计算机、通信和其他电子设备制造业",
-        "车联网(车路云)",
-        "元宇宙概念",
-        "百度概念",
-        "信创",
-        "MSCI中国",
-        "国产软件"
-      ],
-      "signal_count": 2,
-      "enter_date": "2026-09-15",
-      "hold_days": 1,
-      "consecutive_days": 2,
-      "first_close": 68.76,
-      "current_close": 68.76,
+      "consecutive_days": 1,
+      "first_close": 350.4,
+      "current_close": 350.4,
       "pnl_pct": 0.0,
       "catalysts": []
     },
@@ -74,8 +39,8 @@
       "sectors": [],
       "signal_count": 2,
       "enter_date": "2026-09-15",
-      "hold_days": 1,
-      "consecutive_days": 2,
+      "hold_days": 2,
+      "consecutive_days": 3,
       "first_close": 28.48,
       "current_close": 28.48,
       "pnl_pct": 0.0,
@@ -91,21 +56,96 @@
       "quality_grade": "",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "2026中报预增",
-        "计算机、通信和其他电子设备制造业",
-        "小米汽车",
-        "深证100R",
         "信创",
+        "深证100R",
         "AI眼镜",
+        "AI手机",
         "MSCI中国",
-        "AI手机"
+        "2026中报预增",
+        "小米汽车",
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-15",
-      "hold_days": 1,
-      "consecutive_days": 2,
+      "hold_days": 2,
+      "consecutive_days": 3,
       "first_close": 328.5,
       "current_close": 328.5,
+      "pnl_pct": 0.0,
+      "catalysts": []
+    },
+    {
+      "code": "000977",
+      "name": "浪潮信息",
+      "market": "sz",
+      "board": "主板",
+      "status": "near",
+      "total_score": 31.1,
+      "quality_grade": "",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "信创",
+        "国产软件",
+        "元宇宙概念",
+        "百度概念",
+        "车联网(车路云)",
+        "MSCI中国",
+        "2026中报预增",
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-09-15",
+      "hold_days": 2,
+      "consecutive_days": 3,
+      "first_close": 68.76,
+      "current_close": 68.76,
+      "pnl_pct": 0.0,
+      "catalysts": []
+    },
+    {
+      "code": "300390",
+      "name": "天华新能",
+      "market": "sz",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 30.2,
+      "quality_grade": "",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "2026一季报预增",
+        "锂矿概念",
+        "医疗器械概念",
+        "深股通",
+        "MSCI中国",
+        "固态电池",
+        "计算机、通信和其他电子设备制造业",
+        "独角兽"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-09-15",
+      "hold_days": 2,
+      "consecutive_days": 3,
+      "first_close": 52.3,
+      "current_close": 52.3,
+      "pnl_pct": 0.0,
+      "catalysts": []
+    },
+    {
+      "code": "02318",
+      "name": "中国平安",
+      "market": "hk",
+      "board": "港股",
+      "status": "near",
+      "total_score": 29.2,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 2,
+      "enter_date": "2026-09-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 53.0,
+      "current_close": 53.0,
       "pnl_pct": 0.0,
       "catalysts": []
     },
@@ -121,8 +161,8 @@
       "sectors": [],
       "signal_count": 2,
       "enter_date": "2026-09-12",
-      "hold_days": 4,
-      "consecutive_days": 5,
+      "hold_days": 5,
+      "consecutive_days": 6,
       "first_close": 338.6,
       "current_close": 333.0,
       "pnl_pct": -1.65,
@@ -140,8 +180,8 @@
       "sectors": [],
       "signal_count": 2,
       "enter_date": "2026-09-12",
-      "hold_days": 4,
-      "consecutive_days": 5,
+      "hold_days": 5,
+      "consecutive_days": 6,
       "first_close": 29.7,
       "current_close": 28.74,
       "pnl_pct": -3.23,
@@ -159,8 +199,8 @@
       "sectors": [],
       "signal_count": 2,
       "enter_date": "2026-09-12",
-      "hold_days": 3,
-      "consecutive_days": 4,
+      "hold_days": 4,
+      "consecutive_days": 5,
       "first_close": 18.91,
       "current_close": 18.25,
       "pnl_pct": -3.49,
@@ -178,67 +218,11 @@
       "sectors": [],
       "signal_count": 2,
       "enter_date": "2026-09-12",
-      "hold_days": 3,
-      "consecutive_days": 4,
+      "hold_days": 4,
+      "consecutive_days": 5,
       "first_close": 10.36,
       "current_close": 9.62,
       "pnl_pct": -7.14,
-      "catalysts": []
-    },
-    {
-      "code": "605117",
-      "name": "德业股份",
-      "market": "sh",
-      "board": "主板",
-      "status": "strict",
-      "total_score": 30.4,
-      "quality_grade": "A",
-      "industry": "电气机械和器材制造业",
-      "sectors": [
-        "2026中报预增",
-        "周期股",
-        "2026一季报预增",
-        "沪股通",
-        "电气机械和器材制造业",
-        "MSCI中国",
-        "上证180",
-        "HS300"
-      ],
-      "signal_count": 1,
-      "enter_date": "2026-09-12",
-      "hold_days": 4,
-      "consecutive_days": 5,
-      "first_close": 0,
-      "current_close": null,
-      "pnl_pct": null,
-      "catalysts": []
-    },
-    {
-      "code": "600176",
-      "name": "中国巨石",
-      "market": "sh",
-      "board": "主板",
-      "status": "near",
-      "total_score": 29.8,
-      "quality_grade": "C",
-      "industry": "非金属矿物制品业",
-      "sectors": [
-        "2026中报预增",
-        "2026一季报预增",
-        "新材料",
-        "非金属矿物制品业",
-        "PCB",
-        "一带一路",
-        "MSCI中国",
-        "中字头"
-      ],
-      "signal_count": 2,
-      "enter_date": "2026-09-15",
-      "hold_days": 1,
-      "consecutive_days": 2,
-      "first_close": 0,
-      "current_close": null,
-      "pnl_pct": null,
       "catalysts": []
     }
   ],
@@ -508,10 +492,10 @@
       "text": "康龙化成(300759) 于 2026-09-11 跌出共识（曾连续 1 日）"
     },
     {
-      "level": "good",
+      "level": "warn",
       "code": "605117",
       "name": "德业股份",
-      "text": "德业股份(605117) 连续 5 日稳居严格共识（高质量）"
+      "text": "德业股份(605117) 于 2026-09-16 跌出共识（曾连续 5 日）"
     },
     {
       "level": "warn",
@@ -548,15 +532,22 @@
       "code": "688409",
       "name": "富创精密",
       "text": "富创精密(688409) 于 2026-09-15 跌出共识（曾连续 2 日）"
+    },
+    {
+      "level": "warn",
+      "code": "600176",
+      "name": "中国巨石",
+      "text": "中国巨石(600176) 于 2026-09-16 跌出共识（曾连续 2 日）"
     }
   ],
   "sector_cluster": {
     "by_industry": [
       {
         "industry": "未知",
-        "count": 5,
+        "count": 6,
         "names": [
           "华润置地",
+          "中国平安",
           "百胜中国",
           "09866",
           "华润啤酒",
@@ -565,43 +556,22 @@
       },
       {
         "industry": "计算机、通信和其他电子设备制造业",
-        "count": 3,
+        "count": 4,
         "names": [
-          "天华新能",
+          "摩尔线程",
+          "江波龙",
           "浪潮信息",
-          "江波龙"
-        ]
-      },
-      {
-        "industry": "电气机械和器材制造业",
-        "count": 1,
-        "names": [
-          "德业股份"
-        ]
-      },
-      {
-        "industry": "非金属矿物制品业",
-        "count": 1,
-        "names": [
-          "中国巨石"
+          "天华新能"
         ]
       }
     ],
     "by_sector": [
       {
-        "sector": "MSCI中国",
-        "count": 5
-      },
-      {
-        "sector": "2026中报预增",
+        "sector": "计算机、通信和其他电子设备制造业",
         "count": 4
       },
       {
-        "sector": "2026一季报预增",
-        "count": 3
-      },
-      {
-        "sector": "计算机、通信和其他电子设备制造业",
+        "sector": "MSCI中国",
         "count": 3
       },
       {
@@ -609,44 +579,8 @@
         "count": 2
       },
       {
-        "sector": "锂矿概念",
-        "count": 1
-      },
-      {
-        "sector": "深股通",
-        "count": 1
-      },
-      {
-        "sector": "独角兽",
-        "count": 1
-      },
-      {
-        "sector": "医疗器械概念",
-        "count": 1
-      },
-      {
-        "sector": "固态电池",
-        "count": 1
-      },
-      {
-        "sector": "车联网(车路云)",
-        "count": 1
-      },
-      {
-        "sector": "元宇宙概念",
-        "count": 1
-      },
-      {
-        "sector": "百度概念",
-        "count": 1
-      },
-      {
-        "sector": "国产软件",
-        "count": 1
-      },
-      {
-        "sector": "小米汽车",
-        "count": 1
+        "sector": "2026中报预增",
+        "count": 2
       },
       {
         "sector": "深证100R",
@@ -661,47 +595,51 @@
         "count": 1
       },
       {
-        "sector": "周期股",
+        "sector": "小米汽车",
         "count": 1
       },
       {
-        "sector": "沪股通",
+        "sector": "国产软件",
         "count": 1
       },
       {
-        "sector": "电气机械和器材制造业",
+        "sector": "元宇宙概念",
         "count": 1
       },
       {
-        "sector": "上证180",
+        "sector": "百度概念",
         "count": 1
       },
       {
-        "sector": "HS300",
+        "sector": "车联网(车路云)",
         "count": 1
       },
       {
-        "sector": "新材料",
+        "sector": "2026一季报预增",
         "count": 1
       },
       {
-        "sector": "非金属矿物制品业",
+        "sector": "锂矿概念",
         "count": 1
       },
       {
-        "sector": "PCB",
+        "sector": "医疗器械概念",
         "count": 1
       },
       {
-        "sector": "一带一路",
+        "sector": "深股通",
         "count": 1
       },
       {
-        "sector": "中字头",
+        "sector": "固态电池",
+        "count": 1
+      },
+      {
+        "sector": "独角兽",
         "count": 1
       }
     ],
-    "concentration": 50.0
+    "concentration": 60.0
   },
   "overlap": {
     "total_tracked": 10,
@@ -828,8 +766,8 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-09-16",
-    "history_days": 22,
+    "track_start": "2026-09-17",
+    "history_days": 23,
     "summary": {
       "1d": {
         "count": 31,
@@ -842,14 +780,14 @@
         "avg_return": 0.01
       },
       "5d": {
-        "count": 15,
-        "win_rate": 33.33,
-        "avg_return": 1.1
+        "count": 20,
+        "win_rate": 25.0,
+        "avg_return": -0.13
       },
       "10d": {
-        "count": 8,
-        "win_rate": 62.5,
-        "avg_return": 0.38
+        "count": 9,
+        "win_rate": 66.67,
+        "avg_return": 1.0
       },
       "20d": {
         "count": 3,
@@ -1047,7 +985,8 @@
         "enter_date": "2026-09-04",
         "offsets": {
           "1d": 0.0,
-          "5d": 6.03
+          "5d": 6.03,
+          "10d": 6.03
         }
       },
       {
@@ -1104,7 +1043,8 @@
         "enter_date": "2026-09-12",
         "offsets": {
           "1d": 0.0,
-          "3d": -1.65
+          "3d": -1.65,
+          "5d": -1.65
         }
       },
       {
@@ -1113,7 +1053,8 @@
         "enter_date": "2026-09-12",
         "offsets": {
           "1d": 0.0,
-          "3d": -3.23
+          "3d": -3.23,
+          "5d": -3.23
         }
       },
       {
@@ -1131,7 +1072,8 @@
         "enter_date": "2026-09-12",
         "offsets": {
           "1d": 0.0,
-          "3d": -7.14
+          "3d": -7.14,
+          "5d": -7.14
         }
       },
       {
@@ -1140,7 +1082,8 @@
         "enter_date": "2026-09-12",
         "offsets": {
           "1d": 0.0,
-          "3d": -3.62
+          "3d": -3.62,
+          "5d": -3.62
         }
       },
       {
@@ -1149,7 +1092,8 @@
         "enter_date": "2026-09-12",
         "offsets": {
           "1d": 0.0,
-          "3d": -3.49
+          "3d": -3.49,
+          "5d": -3.49
         }
       },
       {
