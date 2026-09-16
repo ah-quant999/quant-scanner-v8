@@ -373,18 +373,44 @@ def main():
         print(f"  📊 今日({today_str}): {len(limit_stocks)} 只涨停")
 
         # 合并新旧板块（固定板块保底优先）
-        # 2026-07-24 移除：光伏、固态电池（持续多日 sum=0）
         fixed_sectors = ["其他", "半导体", "军工",
                          "消费电子", "通信设备", "AI算力", "医药", "电力",
                          "地产链", "白酒消费", "券商", "机器人", "新能源车"]
-        all_sec = set(fixed_sectors) | set(s["name"] for s in existing.get("sectors", [])) | set(sector_counts.keys())
-        # 防御：剔除「10日全 0 且今日仍 0」的板块（米业/国产电池这类历史遗留不会复活）
-        all_sec = {x for x in all_sec if not (
-            all(v == 0 for v in [
-                next((s["data"][i] for s in existing.get("sectors", []) if s["name"] == x), 0)
-                for i in range(len(existing_dates))
-            ]) and sum(sector_counts.get(x, {}).values()) == 0
-        )}
+
+        # 🔴 2026-09-16 主人令「这两个就这样表现了还没退出啊」—— 根因修复。
+        #   旧判据（已废）：剔除条件 = 「近 30 日**全 0** 且今日仍 0」。
+        #   ⇒ 只要历史上有过任何一天非 0，就**永不退出**：
+        #       实测 券商  近5日=1、30日中46家、12格为0 ⇒ 赖着不走；
+        #            固态电池 近5日=0、30日中仅3家、21格为0 ⇒ 同样赖着不走。
+        #   ⇒ 且 fixed_sectors「保底」身份使其**完全豁免**退出闸门、还永远排最前，
+        #      占掉 [:15] 名额，把真正有热度的新板块挤掉。
+        #   新判据：**近 STALE_WINDOW(5) 个交易日合计 ≤ HEAT_MIN(2) 家 ⇒ 退出**。
+        #     为什么是 5 日/2 家：实测卡点刚好 ——
+        #       券商(1)/固态电池(0) → 退出；地产链(5)/光伏(7) → 保留。零误杀。
+        #     为什么保底板块也要退出：保底的语义是「有热度时优先展示」，
+        #       不是「没热度也占位」。故保底只保留**排序优先权**，不再豁免退出。
+        #   ⚠️ 全部读 existing 里的历史列（含今日已写入的值），不额外依赖今日 sector_counts。
+        HEAT_MIN = 2          # 冷掉阈值：近 N 日合计 ≤ 此值 ⇒ 退出
+        STALE_WINDOW = 5      # 观察窗：最近 N 个交易日
+        _hist = {}
+        for s0 in existing.get("sectors", []):
+            _hist[s0["name"]] = s0.get("data") or []
+        all_sec = set(fixed_sectors) | set(_hist.keys()) | set(sector_counts.keys())
+
+        def _recent_sum(name):
+            """该板块最近 STALE_WINDOW 个交易日的涨停家数合计（含今日）。"""
+            arr = list(_hist.get(name) or [])
+            return sum(arr[-STALE_WINDOW:])
+
+        _dropped = sorted(
+            [x for x in all_sec if _recent_sum(x) <= HEAT_MIN],
+            key=lambda x: _recent_sum(x)
+        )
+        if _dropped:
+            print(f"  🧹 退出冷板块（近{STALE_WINDOW}日合计 ≤{HEAT_MIN}）："
+                  + "、".join(f"{x}({_recent_sum(x)})" for x in _dropped))
+        all_sec = {x for x in all_sec if _recent_sum(x) > HEAT_MIN}
+
         sorted_sec = sorted(
             all_sec,
             key=lambda x: (0 if x in fixed_sectors else 1,
@@ -535,13 +561,32 @@ def generate():
         fixed_sectors = ["其他", "半导体", "军工",
                          "消费电子", "通信设备", "AI算力", "医药", "电力",
                          "地产链", "白酒消费", "券商", "机器人", "新能源车"]
-        all_sec = set(fixed_sectors) | set(s["name"] for s in existing.get("sectors", [])) | set(sector_counts.keys())
-        all_sec = {x for x in all_sec if not (
-            all(v == 0 for v in [
-                next((s["data"][i] for s in existing.get("sectors", []) if s["name"] == x), 0)
-                for i in range(len(existing_dates))
-            ]) and sum(sector_counts.get(x, {}).values()) == 0
-        )}
+        # 🔴 2026-09-16 主人令「这两个就这样表现了还没退出啊」—— 根因修复（本分支）。
+        #   与文件主路径保持**完全一致**的口径，详见本文件上方主路径处的大段注释。
+        #   旧判据（已废）：剔除条件 = 「近 30 日全 0 且今日仍 0」⇒ 历史上任何一天非 0 就永不退出。
+        #   新判据：近 STALE_WINDOW(5) 个交易日合计 <= HEAT_MIN(2) 家 ⇒ 退出；
+        #           fixed_sectors 只保留排序优先权，不再豁免退出闸门。
+        HEAT_MIN = 2          # 冷掉阈值：近 N 日合计 <= 此值 ⇒ 退出
+        STALE_WINDOW = 5      # 观察窗：最近 N 个交易日
+        _hist = {}
+        for s0 in existing.get("sectors", []):
+            _hist[s0["name"]] = s0.get("data") or []
+        all_sec = set(fixed_sectors) | set(_hist.keys()) | set(sector_counts.keys())
+
+        def _recent_sum(name):
+            """该板块最近 STALE_WINDOW 个交易日的涨停家数合计（含今日）。"""
+            arr = list(_hist.get(name) or [])
+            return sum(arr[-STALE_WINDOW:])
+
+        _dropped = sorted(
+            [x for x in all_sec if _recent_sum(x) <= HEAT_MIN],
+            key=lambda x: _recent_sum(x)
+        )
+        if _dropped:
+            print(f"  🧹 退出冷板块（近{STALE_WINDOW}日合计 <={HEAT_MIN}）："
+                  + "、".join(f"{x}({_recent_sum(x)})" for x in _dropped))
+        all_sec = {x for x in all_sec if _recent_sum(x) > HEAT_MIN}
+
         sorted_sec = sorted(
             all_sec,
             key=lambda x: (0 if x in fixed_sectors else 1,
