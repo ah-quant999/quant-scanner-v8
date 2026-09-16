@@ -8291,7 +8291,9 @@ function switchSec(sec,el){
   }, 250);
 }
 
-/* ===== 六维雷达 SVG：由 renderSixDim 动态绘制 ===== */
+  /* 🗑 2026-09-16 主人令：「🕸️ 六维共振雷达 · 战术层」卡已删，renderSixDim 随卡移除。
+     原 `<svg class="radar">` 绘制说明位此；实测 `.radar` 全站无 CSS 定义（仅内联 style），
+     卡壳删除后无遗留样式需清。 */
 
 /* ===== 斐波窗口：旧版死代码已移除；原 renderFib 亦随卡迁出删除（目标 phFib* 元素不存在）
    —— 现见 __renderFibWindow() @观测平台（入口见「🌍 观测平台」段） ===== */
@@ -9957,204 +9959,15 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
   function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
   /* setTime 已统一为全局 setBadge（见 _rcRel 后定义）；保留 rel 共用 */
 
-  /* ---- 2. 短线/中线市场温度计（技术/资金/机构） ---- */
-  function renderThermo(fib,margin,cffex,fomc,sf){
-    if(!$('phThermoBody')) return; // 🛡 2026-08-31 守卫：元素缺失时静默返回，避免整段抛错致「卡空了」
-    const c=fib.current||{};
-    const declineDays=c.days_down||0, declinePct=c.total_pct||0;
-    let nextWindow='',nextWindowDays=99;
-    (fib.windows||[]).forEach(w=>{if((w.status==='future'||w.status==='active'||w.status==='tracking')&&w.days_left<nextWindowDays){nextWindow=w.name+'('+w.date+')';nextWindowDays=w.days_left;}});
-    let techScore=5,techDetail=[];
-    if(declineDays>=30){techScore-=2;techDetail.push('回调'+declineDays+'天');}
-    else if(declineDays>=15){techScore-=1;techDetail.push('回调'+declineDays+'天');}
-    if(declinePct<=-5){techScore-=2;techDetail.push('累计'+declinePct.toFixed(1)+'%');}
-    else if(declinePct<=-3){techScore-=1;}
-    if(nextWindowDays<=5)techDetail.push('窗口临近:'+nextWindow);
-    else if(nextWindowDays<=10)techDetail.push('窗口:'+nextWindow);
-    if(!techDetail.length)techDetail.push('震荡整理');
-    techScore=Math.max(1,Math.min(10,techScore));
-
-    let rzLatest=0;
-    if(margin.sh&&margin.sh.length)rzLatest=margin.sh[margin.sh.length-1].rz_balance||0;
-    const sfIn=(sf.summary||{}).in_count||0, sfOut=(sf.summary||{}).out_count||0;
-    let fundScore=5,fundDetail=[];
-    if(rzLatest>=15000){fundScore+=2;fundDetail.push('两融≥1.5万亿');}
-    else if(rzLatest>=14500){fundScore+=1;fundDetail.push('两融回升');}
-    if(sfIn>sfOut){fundScore+=1;fundDetail.push('板块流入>流出');}
-    else if(sfOut>sfIn){fundScore-=1;fundDetail.push('板块流出>流入');}
-    if(sfIn>=8){fundScore+=1;fundDetail.push('多板块流入');}
-    fundScore=Math.max(1,Math.min(10,fundScore));
-
-    const cffexNet=cffex.net_total||0, cffexAbs=Math.abs(cffexNet);
-    const fomcLabel=fomc.summary||'';
-    // 🛡 2026-08-30：FOMC 立场改为结构化枚举优先（fomc.stance: hawkish/dovish/neutral），关键词硬匹配仅作兜底，并补"转鸽/降息"对称分支
-    var _fomcStance = fomc.stance || (
-      fomcLabel.indexOf('转鹰')>-1 || fomcLabel.indexOf('加息')>-1 ? 'hawkish' :
-      (fomcLabel.indexOf('转鸽')>-1 || fomcLabel.indexOf('降息')>-1 ? 'dovish' : 'neutral')
-    );
-    let instScore=5,instDetail=[];
-    if(cffexNet<-8000){instScore-=2;instDetail.push('净空'+cffexAbs+'手');}
-    else if(cffexNet<-3000){instScore-=1;instDetail.push('净空'+cffexAbs+'手');}
-    else if(cffexNet>3000){instScore+=1;instDetail.push('净多'+cffexAbs+'手');}
-    if(_fomcStance==='hawkish'){instScore-=1;instDetail.push('FOMC转鹰');}
-    else if(_fomcStance==='dovish'){instScore+=1;instDetail.push('FOMC转鸽');}
-    instScore=Math.max(1,Math.min(10,instScore));
-
-    const avg=Math.round((techScore+fundScore+instScore)/3);
-    const deg=avg*10;                 // 0-10 映射为 0°-100°
-    const pct=deg/100;
-    // 颜色：>=70 偏热(红)，>=50 中性(黄)，<50 偏冷(绿)
-    let mainColor, word, subText;
-    if(deg>=70){mainColor='#f4495d'; word='偏热'; subText='情绪活跃，注意高位回撤';}
-    else if(deg>=50){mainColor='#fbbf24'; word='中性'; subText='多空交织，观望为主';}
-    else{mainColor='#1fd17b'; word='偏冷'; subText='偏空信号为主，建议减仓观望';}
-
-    // SVG gauge：半圆 0-180度，起点左端(-PI)，终点顶端/右端
-    const cx=100, cy=110, R=80, startA=Math.PI, maxSweep=Math.PI;
-    const sweep=maxSweep*pct;
-    const endA=startA+sweep;
-    const ex=cx+R*Math.cos(endA), ey=cy+R*Math.sin(endA);
-    const largeArc=sweep>Math.PI?1:0;
-    const arcPath=`M${cx-R} ${cy} A${R} ${R} 0 ${largeArc} 1 ${ex.toFixed(1)} ${ey.toFixed(1)}`;
-
-    const detailLine=[
-      '📉 技术面 '+techScore+'/10 · '+techDetail.join(' · '),
-      '💰 资金面 '+fundScore+'/10 · '+fundDetail.join(' · '),
-      '🏛 机构面 '+instScore+'/10 · '+instDetail.join(' · ')
-    ].filter(Boolean).join('<br>');
-
-    const bar=(label,score,detail,color)=>{
-      const pct=score*10;
-      const bgColor = score>=7 ? (color||'#1fd17b') : (score>=4 ? (color||'#fbbf24') : (color||'#f4495d'));
-      return '<div style="background:'+bgColor+'22;border:1px solid '+bgColor+'44;border-radius:10px;padding:14px 16px;">'+
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
-          '<span style="font-size:13px;font-weight:700;color:var(--txt)">'+label+'</span>'+
-          '<span style="font-size:22px;font-weight:800;color:'+color+'">'+score+'/10</span>'+
-        '</div>'+
-        '<div style="height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden">'+
-          '<div style="width:'+pct+'%;height:100%;background:'+color+';border-radius:3px"></div>'+
-        '</div>'+
-        '<div style="margin-top:6px;font-size:11px;color:var(--sub);line-height:1.5">'+detail+'</div>'+
-      '</div>';
-    };
-    const h='<div style="font-size:13px;color:var(--dim);margin-bottom:14px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;"><span>综合评分 <b style="color:'+mainColor+';font-size:18px">'+deg+'°</b> · '+word+'</span><span style="font-size:12px">'+subText+'</span></div>'+
-      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">'+
-      bar('📉 技术面',techScore,techDetail.join(' · ')||'震荡整理',techScore>=7?'#1fd17b':techScore>=4?'#fbbf24':'#f4495d')+
-      bar('💰 资金面',fundScore,fundDetail.join(' · ')||'多空平衡',fundScore>=7?'#1fd17b':fundScore>=4?'#fbbf24':'#f4495d')+
-      bar('🏛 机构面',instScore,instDetail.join(' · ')||'观望为主',instScore>=7?'#1fd17b':instScore>=4?'#fbbf24':'#f4495d')+
-      '</div>';
-    $('phThermoBody').innerHTML=h;
-    // 🛡 2026-09-04 一劳永逸：去掉 SH_FIB（盘前固定06:00刷一次，劫持"实时/盘中"语义），改取真盘中刷新源：margin / sector_fund_flow / cffex。
-    setBadge('phThermoTime','实时','—', margin.update_time || sf.update_time || cffex.update_time);
-  }
-
-  /* ---- 3. 六维共振雷达（量能/情绪/资金/估值/技术/外围） ---- */
-  function renderSixDim(fib,margin,cffex,crisis,sf,mff){
-    const c=fib.current||{};
-    const mktNet=(mff||{}).market_net||0;
-    const declinePct=c.total_pct||0;
-    const rzLatest=(margin.sh&&margin.sh.length)?(margin.sh[margin.sh.length-1].rz_balance||0):0;
-    const sfIn=(sf.summary||{}).in_count||0, sfOut=(sf.summary||{}).out_count||0;
-    const cffexNet=(cffex||{}).net_total||0;
-    const inds=(crisis||{}).indicators||{};
-    const crisisAvg=(keys)=>{
-      const vals=keys.map(k=>{const it=inds[k];return it&&it.score!=null?it.score:null;}).filter(v=>v!=null);
-      return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:50;
-    };
-
-    // 量能：基于市场主力净流入 + 成交额情绪；越大越热
-    let volScore=50;
-    if(mktNet>200)volScore=80; else if(mktNet>0)volScore=65; else if(mktNet>-200)volScore=45; else volScore=30;
-
-    // 情绪：基于两融余额 + 板块流入数量
-    let emoScore=50;
-    if(rzLatest>=15000)emoScore+=15; else if(rzLatest>=14500)emoScore+=5;
-    if(sfIn>=30)emoScore+=15; else if(sfIn>=15)emoScore+=5;
-    if(sfOut>=10)emoScore-=10;
-    emoScore=Math.max(20,Math.min(95,emoScore));
-
-    // 资金：板块净流入强度
-    let fundScore=50;
-    const netDiff=sfIn-sfOut;
-    if(netDiff>30)fundScore=85; else if(netDiff>15)fundScore=70; else if(netDiff>0)fundScore=60;
-    else if(netDiff>-15)fundScore=40; else fundScore=25;
-
-    // 估值：基于回调深度反向映射（跌得多=估值低=分数高）—— ⚠️ 仅为价格回调代理，非真实 PE/PB 估值分位
-    let valScore=50;
-    if(declinePct<=-15)valScore=85; else if(declinePct<=-8)valScore=75; else if(declinePct<=-3)valScore=65;
-    else if(declinePct>=10)valScore=35; else valScore=55;
-
-    // 技术：基于斐波那契回调状态
-    let techScore=50;
-    const days=c.days_down||0;
-    if(days>=20&&declinePct<=-10)techScore=30;          // 深度回调，技术偏弱
-    else if(days>=10&&declinePct<=-5)techScore=40;
-    else if(days<=5&&declinePct>=-3)techScore=65;
-    else if(days<=3&&declinePct>=0)techScore=75;
-    else techScore=55;
-
-    // 外围：基于危机雷达全球指标 + 期指净持仓
-    let outScore=50;
-    const gScore=crisisAvg(Object.keys(inds).filter(k=>inds[k]&&inds[k].cat==='全球'));
-    if(!isNaN(gScore))outScore=gScore;
-    if(cffexNet<-5000)outScore-=15; else if(cffexNet>5000)outScore+=5;
-    outScore=Math.max(20,Math.min(95,outScore));
-
-    const dims=['量能','情绪','资金','估值(回调代理)','技术','外围'];
-    const vals=[volScore,emoScore,fundScore,valScore,techScore,outScore];
-    const cx=0,cy=0,R=85,n=dims.length;
-    let grid='',axes='';
-    for(let g=1;g<=4;g++){
-      let pts=[];
-      for(let i=0;i<n;i++){let a=-Math.PI/2+i*2*Math.PI/n;pts.push((cx+Math.cos(a)*R*g/4).toFixed(1)+','+(cy+Math.sin(a)*R*g/4).toFixed(1));}
-      grid+=`<polygon points="${pts.join(' ')}" fill="none" stroke="#243150" stroke-width="1"/>`;
-    }
-    for(let i=0;i<n;i++){let a=-Math.PI/2+i*2*Math.PI/n;axes+=`<line x1="0" y1="0" x2="${(cx+Math.cos(a)*R).toFixed(1)}" y2="${(cy+Math.sin(a)*R).toFixed(1)}" stroke="#243150" stroke-width="1"/><text x="${(cx+Math.cos(a)*(R+14)).toFixed(1)}" y="${(cy+Math.sin(a)*(R+14)+4).toFixed(1)}" fill="#93a4c4" font-size="11" text-anchor="middle">${dims[i]}</text>`;}
-    let dpts=[];
-    for(let i=0;i<n;i++){let a=-Math.PI/2+i*2*Math.PI/n;dpts.push((cx+Math.cos(a)*R*vals[i]/100).toFixed(1)+','+(cy+Math.sin(a)*R*vals[i]/100).toFixed(1));}
-    const svg=document.getElementById('radar');
-    if(svg){
-      svg.innerHTML=grid+axes+`<polygon points="${dpts.join(' ')}" fill="rgba(56,189,248,.25)" stroke="#38bdf8" stroke-width="2"/>`+dpts.map((p,i)=>`<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="3" fill="#38bdf8"/>`).join('');
-    }
-    setBadge('phRadarTime','盘后','中线', margin.update_time || sf.update_time || cffex.update_time || crisis.update_time);
-  }
-
-  /* ---- 4. 六维预警雷达 ---- */
-  function renderCrisis(cr){
-    const inds=cr.indicators||{};
-    const cats={'货币':[],'经济':[],'全球':[]};
-    Object.keys(inds).forEach(k=>{const it=inds[k];if(cats[it.cat]&&it.score!=null)cats[it.cat].push(it.score);});
-    const avg=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:0;
-    // 后端 indicators.score 为 0~1 小数，前端展示需转 0~100
-    const mScore=Math.round(avg(cats['货币'])*100),eScore=Math.round(avg(cats['经济'])*100),gScore=Math.round(avg(cats['全球'])*100);
-    const idx=Math.round(mScore*0.40+eScore*0.35+gScore*0.25);
-    const lv=s=>s>=70?['危险','#ef5350']:s>=50?['警惕','#ff9800']:s>=30?['关注','#ffd54f']:['安全','#4caf50'];
-    const [word,color]=lv(idx);
-    let h='<div class="ph-crisis-index" style="color:'+color+'">'+idx+
-      '<span style="font-size:12px;color:var(--dim);font-weight:400"> /100 · '+word+'</span></div>'+
-      '<div class="ph-crisis-cats">';
-    [['货币 40%',mScore],['经济 35%',eScore],['全球 25%',gScore]].forEach(([name,s])=>{
-      const c2=lv(s)[1];
-      h+='<div class="ph-crisis-row"><span>'+name+'</span>'+
-        '<div class="ph-crisis-bar"><div style="height:100%;width:'+Math.round(s)+'%;background:'+c2+';border-radius:4px"></div></div>'+
-        '<b style="color:'+c2+';width:34px;text-align:right">'+Math.round(s)+'</b></div>';
-    });
-    h+='</div>';
-    const worst=Object.keys(inds).map(k=>inds[k]).filter(x=>(x.score!=null && x.score>=0.7)).sort((a,b)=>b.score-a.score).slice(0,3);
-    if(worst.length){
-      h+='<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.7">⚠️ 高分预警：'+
-        worst.map(x=>x.name+'('+Math.round(x.score)+')').join('、')+'</div>';
-    }
-    var _crisisEl=document.getElementById('phCrisisBody');
-    if(_crisisEl) _crisisEl.innerHTML=h;
-    setBadge('phCrisisTime','auto','短线',cr.update_time);
-  }
-
-  /* 🛡 2026-08-19 主人令「赶紧修复」:
-     renderCrisis 之前用 jQuery('$id')，在脚本加载顺序不稳时返 null，
-     给 null 设 innerHTML 会抛 TypeError 「Cannot set properties of null」，
-     进而中断后续 render 调用（HTML legend 跟着不出来，图就堆底成一团根本看不清）。
-     改用 document.getElementById + 显式 null check。*/
+  /* 🗑 2026-09-16 主人令：本段原为 renderThermo / renderSixDim / renderCrisis 三函数 ——
+       「🌡️ 市场温度计 · 分项」(宿主 #phThermoBody) /「🕸️ 六维共振雷达 · 战术层」(宿主 #radar SVG)
+       /「📊 危机雷达」(宿主 #phCrisisBody)，三卡同处「🔒 已下架 → 🌐 下架雷达组」。
+     处置：① 温度计与六维两卡删除（前者数据源 SH_FIB 与六维同源、分项口径与危机雷达/每日洞察重复；
+           后者算法说明与危机雷达同源，逻辑页本就写在同一张说明卡里）；
+         ② 危机雷达不做独立卡，其硬指标展示并入「🌐 新周期判定 · 海外宏观 + AI 大周期」
+           （见 __renderNewCycleJudge ②b 段），卡名「海外宏观」自此名副其实。
+     ⚠️ 数据层零改动：SH_FIB 仍由「🧪 斐波那契F观测窗」+ 艾略特波浪卡消费；
+        CRISIS_DATA 仍由每日洞察（八路汇合卡）/ 情绪周期卡消费 —— 只删卡壳，不删源。 */
 
   /* ~~ 已下架：资金流时间轴 MARKET_FUND_FLOW_DATA（2026-08-16 主人令） ~~ */
 
@@ -11594,14 +11407,9 @@ function drawUpDownChart(){
   window.renderMarketFundFlow = renderMarketFundFlow;
   window.drawAmountChart = drawAmountChart;
   window.drawUpDownChart = drawUpDownChart;
-  // 2026-08-29 一劳永逸修复：renderThermo/SixDim/Crisis 三函数为 IIFE 局部，
-  //   之前 renderDelisted 用 if(window.renderThermo) 调用永远 false，导致
-  //   「已下架」Tab 恢复的"市场温度计·分项"/"六维共振雷达·战术层"/"危机雷达"
-  //   三卡永远卡在「加载中…」。此处与 renderMarketFundFlow/drawAmountChart/drawUpDownChart
-  //   同口径挂到 window，调用即生效。
-  window.renderThermo = renderThermo;
-  window.renderSixDim = renderSixDim;
-  window.renderCrisis = renderCrisis;
+  // 🗑 2026-09-16 主人令：原此处把 renderThermo / renderSixDim / renderCrisis 三函数挂到 window
+  //   （2026-08-29 为治「已下架三卡永远卡在加载中…」而加）。三函数已随两卡删除 + 危机雷达并入
+  //   「🌐 新周期判定 · 海外宏观 + AI 大周期」而移除 ⇒ 暴露一并撤销（原注释见 git 历史 1971a6e8 之前）。
   // ===== 防删子页面渲染：逻辑详解页读 window.DO_NOT_DELETE_HTML =====
   // 注入源：data/DO_NOT_DELETE.js（由 scripts/gen_do_not_delete_js.py 从 DO_NOT_DELETE.md 解析）。
   // 切换到 dnd 子 tab 时无需重渲，DOMContentLoaded 时已注入；此处暴露给运维页排查用。
@@ -11899,9 +11707,6 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'市场温度计', source:'SH_FIB', freq:'收盘后1次', slots:['17:30'], note:'多因子综合温度'},
-
-          {name:'六维共振雷达', source:'SH_FIB', freq:'收盘后1次', slots:['17:30'], note:'战术/战略层评分'},
 
           // 🛡 2026-09-01 主人令修复：MARGIN_DATA 由 cloud_fetch_v8.f_margin_data（akshare stock_margin_sse）产出，
           //   跟随 cn_fetch 每 30 分节奏、末班车 17:20；原写 17:30 与真实末班车错位。
@@ -11922,7 +11727,6 @@ function drawUpDownChart(){
 
           {name:'业绩预告', source:'PERFORMANCE_FORECAST', freq:'每日盘前', slots:['08:25'], note:'全报告期累计（预增/预减/预亏/不确定）与预增 TOP，非今日口径'},
 
-          {name:'危机雷达', source:'CRISIS_DATA', freq:'收盘后1次', slots:['17:30'], note:'尾部风险监控'},
 
           {name:'盘后资金流向', source:'MARKET_FUND_FLOW_DATA', freq:'收盘后1次', slots:['17:30'], note:'全天资金总结'},
 
@@ -13143,9 +12947,9 @@ window.showRestrictedItems = showRestrictedItems;
     })();
 
     // 3) 盘后数据：全部使用已注入的 window.* 变量（data/*.js 已在 <head> 同步加载）
-    safe(renderThermo, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, {}, window.SECTOR_FUND_FLOW || {});
-    safe(renderSixDim, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, window.CRISIS_DATA || {}, window.SECTOR_FUND_FLOW || {}, window.MARKET_FUND_FLOW_DATA || {});
-    safe(renderCrisis, window.CRISIS_DATA || {});
+    // 🗑 2026-09-16 主人令：此处原有 renderThermo / renderSixDim / renderCrisis 三处 safe 调用 ——
+    //   三者宿主 DOM（#phThermoBody / #radar / #phCrisisBody）都在「🔒 已下架」页，本页渲染时恒早退，属死调用；
+    //   三卡处置见 renderDelisted 段注释（两卡删除 + 危机雷达并入海外宏观卡）。
     /* ~~ renderMarketFundFlow 已随卡下架移除 ~~ */
 
     // 2026-08-18 主人令：主力净额分时累计曲线（盘中分时+盘后定基合并）
@@ -14552,12 +14356,53 @@ h += '</div>'; // /ulPaneObserve
        + '<span style="font-size:15px;font-weight:700;color:' + ACC + ';">&#x1F30D; 新周期判定 · 海外宏观 + AI 大周期</span>'
        + '<span class="fresh" id="newCycleFresh">&#x2014;</span></div>';
     // ── ② 数据源行 ──
+    // 🔴 2026-09-16 主人令：删去原「· 自建宏观风险状态机（30Y 美债 / SOX / VIX / IG-HY 信用利差 /
+    //   美元日元 / 实际利率）」——该串为凭空添加：本卡从未读取这些指标，实现层只有 CRISIS_DATA 的
+    //   VIX + 美债 10Y（且无 SOX / IG-HY / 美元日元 / 实际利率），与逻辑页口径相互矛盾。
+    //   现如实标注真实来源。
     h += '<div style="font-size:11.5px;color:var(--dim);margin-bottom:10px;">数据源：雪球 <b style="color:var(--txt);">@' + _e(p.name || '白河愁博士') + '</b>'
        + (p.uid ? '（uid ' + _e(p.uid) + '）' : '')
-       + ' · 自建宏观风险状态机（30Y 美债 / SOX / VIX / IG-HY 信用利差 / 美元日元 / 实际利率）'
+       + ' · 宏观硬指标 window.CRISIS_DATA（货币=USD/CNY 中间价 / 经济=中国制造业 PMI / 全球=VIX + 美债10Y 动态计算）'
        + ' · 当期原文 ' + posts.length + ' 条' + (replies.length ? ' + 回复 ' + replies.length + ' 条' : '')
        + (st.latest_main_time ? ' · 最新 ' + _e(st.latest_main_time) : '')
        + (st.stale_days != null ? ' · 停更 ' + st.stale_days + ' 天' : '') + '</div>';
+    // ── ②b 宏观硬指标区（原「📊 危机雷达」卡并入 · 数据 window.CRISIS_DATA）──
+    //   2026-09-16 主人令：「把危机雷达和这卡合并不就得了」——卡名含「海外宏观」而卡内无一条海外宏观
+    //   数据（全是白河愁观点 + AI 转述，名字对内容过度承诺）；站内真含海外宏观硬指标的正是危机雷达
+    //   （CRISIS_DATA：货币=USD/CNY、经济=中国 PMI、全球=基于 VIX + 美债10Y 动态计算）⇒ 并入本卡。
+    //   算法与旧卡逐字一致：综合指数 = 货币×40% + 经济×35% + 全球×25%；
+    //   分档 ≥70 危险 / ≥50 警惕 / ≥30 关注 / 其余安全。展示复用 .ph-crisis-* 四个类（与已下架页同款）。
+    //   空态铁律：CRISIS_DATA 未注入 / score 缺失 ⇒ 如实空态，不填 0、不编造。
+    (function(){
+      var CR = window.CRISIS_DATA || {};
+      var inds = CR.indicators || {};
+      var cats = {'货币': [], '经济': [], '全球': []};
+      Object.keys(inds).forEach(function(k){ var it = inds[k]; if(it && cats[it.cat] && it.score != null) cats[it.cat].push(it.score); });
+      var avg = function(a){ return a.length ? a.reduce(function(s2, x){ return s2 + x; }, 0) / a.length : 0; };
+      var mS = Math.round(avg(cats['货币']) * 100), eS = Math.round(avg(cats['经济']) * 100), gS = Math.round(avg(cats['全球']) * 100);
+      var idx = Math.round(mS * 0.40 + eS * 0.35 + gS * 0.25);
+      var lv = function(s2){ return s2 >= 70 ? ['危险', '#ef5350'] : s2 >= 50 ? ['警惕', '#ff9800'] : s2 >= 30 ? ['关注', '#ffd54f'] : ['安全', '#4caf50']; };
+      h += '<div style="background:rgba(244,63,94,.06);border:1px solid rgba(244,63,94,.28);border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+      h += '<div style="font-size:11.5px;font-weight:700;color:#f43f5e;margin-bottom:7px;">&#x1F4CA; 宏观硬指标 · 危机雷达（尾部风险）'
+         + '<span style="font-weight:400;color:var(--dim);margin-left:8px;">window.CRISIS_DATA · 更新于 ' + _e(CR.update_time || '—') + '</span></div>';
+      if(CR.score != null){
+        var w = lv(idx);
+        h += '<div class="ph-crisis-index" style="color:' + w[1] + '">' + idx
+           + '<span style="font-size:12px;color:var(--dim);font-weight:400"> /100 · ' + w[0] + '</span></div>';
+        h += '<div class="ph-crisis-cats">';
+        [['货币 40%', mS], ['经济 35%', eS], ['全球 25%', gS]].forEach(function(pair){
+          var c2 = lv(pair[1])[1];
+          h += '<div class="ph-crisis-row"><span>' + pair[0] + '</span>'
+             + '<div class="ph-crisis-bar"><div style="height:100%;width:' + Math.round(pair[1]) + '%;background:' + c2 + ';border-radius:4px"></div></div>'
+             + '<b style="color:' + c2 + ';width:34px;text-align:right">' + Math.round(pair[1]) + '</b></div>';
+        });
+        h += '</div>';
+        if(CR.note) h += '<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.7">' + _e(CR.note) + '</div>';
+      } else {
+        h += '<div style="font-size:11.5px;color:var(--dim);text-align:center;padding:6px 0;">宏观硬指标暂不可用（window.CRISIS_DATA 未注入）</div>';
+      }
+      h += '</div>';
+    })();
     // ── ③ 分析块：核心 / 用法 / 限制 ──
     h += '<div style="background:rgba(' + RGB + ',.08);border:1px solid rgba(' + RGB + ',.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
        + '<b style="color:' + ACC + ';">&#x1F4CC; 核心：</b>把白河愁博士的<b>当期主线</b>与我方<b>跨源交叉验证</b>并列对照 —— 讲清「他怎么说 / 我怎么判」。<br>'
@@ -15374,23 +15219,11 @@ h+='      </div>';
 h+='      <div class="note" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>';
 h+='    </div>';
 
-    /* ===== 🌐 下架雷达组（2026-08-29 主人令「盘中三卡放到涨跌家数统计下方」+ 一劳永逸修复"闪现"问题）
-       三张宏观雷达卡：市场温度计·分项 / 六维共振雷达·战术层 / 危机雷达 */
-    // 2026-08-31：已下架三卡（温度计/六维/危机）改一行 3 列均分，避免危机雷达独占一行
-    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">';
-    h+='  <div class="card" style="margin-bottom:0;">';
-    h+='    <h3><span class="ic">🌡️</span>市场温度计 · 分项 <span class="fresh" id="phThermoTime">—</span></h3>';
-    h+='    <div id="phThermoBody"><div class="ipo-empty">温度计数据加载中…</div></div>';
-    h+='  </div>';
-    h+='  <div class="card" style="margin-bottom:0;">';
-    h+='    <h3><span class="ic">🕸️</span>六维共振雷达 · 战术层 <span class="fresh" id="phRadarTime">—</span></h3>';
-    h+='    <svg class="radar" style="display:block;margin:0 auto" width="220" height="200" viewBox="-110 -110 220 220" id="radar"></svg>';
-    h+='  </div>';
-    h+='  <div class="card" style="margin-bottom:0;border-left:4px solid #f43f5e;">';
-    h+='    <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">📊</span>危机雷达 <span class="fresh" id="phCrisisTime">—</span></h3>';
-    h+='    <div id="phCrisisBody"><div class="ipo-empty">危机数据加载中…</div></div>';
-    h+='  </div>';
-    h+='</div>';
+    /* 🗑 2026-09-16 主人令：本段原为「🌐 下架雷达组」3 列网格（市场温度计·分项 / 六维共振雷达·战术层 /
+       危机雷达 三卡壳）。按主人令删前两卡、危机雷达并入「🌐 新周期判定 · 海外宏观 + AI 大周期」
+       ⇒ 整组撤除（该页「📈 上证+深证成交金额」「🏘️ 涨跌家数统计」两卡保留不动）。
+       ⚠️ 未办事项（记录，非本卡范围）：.ph-crisis-index / .ph-crisis-cats / .ph-crisis-row /
+          .ph-crisis-bar 四个 CSS 类**保留**，因合并卡的硬指标区复用同一套条形样式。 */
 
     /* ===== 🌙 盘后 ===== */
 h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167,139,250,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#a78bfa;border-radius:8px;margin:16px 0 10px 0;">🌙 盘后（收盘后复盘）</div>';
@@ -15440,9 +15273,8 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     // 2026-09-07 主人令：宽基ETF卡恢复柱状图形态（数据仍东财五分类，不回退旧口径图表函数——旧口径 fetch 链保持下线）。
     // 2026-08-29 一劳永逸：删 renderMacro 调用——opTab4 无 phMacroBody 抛 null 已被主人之前在 initPostMarket 9680 注释；
     //   下面 3 个 safe 调用使用与 initPostMarket 同样的窗口数据来源（line 9658-9660 已对齐）：
-    try{ if(window.renderThermo) window.renderThermo(window.SH_FIB||{}, window.MARGIN_DATA||{}, window.CFFEX_HOLDINGS||{}, {}, window.SECTOR_FUND_FLOW||{}); }catch(e){console.warn("已下架·温度计渲染失败",e);}
-    try{ if(window.renderSixDim)  window.renderSixDim(window.SH_FIB||{},  window.MARGIN_DATA||{}, window.CFFEX_HOLDINGS||{}, window.CRISIS_DATA||{}, window.SECTOR_FUND_FLOW||{}, window.MARKET_FUND_FLOW_DATA||{}); }catch(e){console.warn("已下架·六维共振渲染失败",e);}
-    try{ if(window.renderCrisis)  window.renderCrisis(window.CRISIS_DATA||{}); }catch(e){console.warn("已下架·危机雷达渲染失败",e);}
+    // 🗑 2026-09-16 主人令：此处原有温度计 / 六维 / 危机雷达三卡渲染调用，已随卡处置一并移除
+    //   （前两卡删除、危机雷达并入海外宏观卡的硬指标区）。下方资金流时间轴 / 成交额 / 涨跌家数不动。
     try{ if(window.renderMarketFundFlow) window.renderMarketFundFlow(window.MARKET_FUND_FLOW_DATA||{}); }catch(e){console.warn("已下架·资金流时间轴渲染失败",e);}
     try{ if(window.drawAmountChart) window.drawAmountChart(); }catch(e){console.warn("已下架·成交额渲染失败",e);}
     try{ if(window.drawUpDownChart) window.drawUpDownChart(); }catch(e){console.warn("已下架·涨跌家数渲染失败",e);}
