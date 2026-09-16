@@ -145,10 +145,12 @@ window.__domReadyFns=[];
      .rc-tab-btn.active / .lg-tab.active，独缺 .obs-tab.active —— 颜色与下划线又是在渲染时
      用行内样式写死的 ⇒ 点「📊 大盘观测」后绿色横杆仍留在「🌍 宏观观测」。
      此处补齐 CSS，与其余四族子页签统一为「CSS + classList」机制（渲染侧不再写死行内色）。 */
-  .obs-tab{padding:8px 18px;font-size:13px;font-weight:700;color:var(--sub);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s}
-  .obs-tab:hover{color:var(--txt)}
-  .obs-tab[data-obs="macro"].active{color:#34d399;border-bottom-color:#34d399}
-  .obs-tab[data-obs="market"].active{color:#c8a2e8;border-bottom-color:#c8a2e8}
+  /* 2026-09-16 主人令：观测平台两个子页签「字体放大、显著一些」
+     13px/700/sub色 → 15px/800/txt色；下划线 2→3px；padding 加大；选中态加同色微光 */
+  .obs-tab{padding:10px 24px;font-size:15px;font-weight:800;color:var(--txt);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;transition:all .2s}
+  .obs-tab:hover{color:#fff}
+  .obs-tab[data-obs="macro"].active{color:#34d399;border-bottom-color:#34d399;text-shadow:0 0 8px rgba(52,211,153,.5)}
+  .obs-tab[data-obs="market"].active{color:#c8a2e8;border-bottom-color:#c8a2e8;text-shadow:0 0 8px rgba(200,162,232,.5)}
 
   main{padding:22px 20px 60px;max-width:1320px;margin:0 auto;overflow:visible}
   section{display:none;animation:fade .25s ease}
