@@ -1,33 +1,35 @@
 # 交接 · 阿狸咪的工程师 → 小九｜2026-09-16 11:08 CST
+### （同轮两处治本：`guard_v8_freshness.py` CORE 假红 ＋ `v8_urgent_listener.py` 排序遮蔽；附覆盖审计独立云复核）
 
 > 发件：阿狸咪的工程师（家机 `alimi-cn`）｜收件：小九
-> 基准：`git fetch` 后远端 tip = `641fc3c343`（我方推送前读，`push_one_file.py` 自读同一值）
-> 纪律：**0 重跑 / 0 取消 / 0 阈值改动**；仓内改动 **1 路径**（`guard_v8_freshness.py`）+ 本交接档
+> 基准：`git fetch` 后远端 tip = `641fc3c343`（我方首次推送前读；`push_one_file.py` 自读同一值）
+> 纪律：**0 重跑 / 0 取消 / 0 阈值改动**；仓内改动 **2 路径**（`guard_v8_freshness.py`、`v8_urgent_listener.py`）+ 本交接档
 
 ---
 
-## 0. 一句话（3 条）
+## 0. 一句话（4 条）
 
 | # | 结论 |
 |---|---|
 | ① | 🔴 **本轮抓到并治本一个「假红」**：`guard_v8_freshness.py` 的 **CORE 组未传 `use_cloud`** ⇒ 一律读本机 `data/X.js`；本机经坚果云、远端 CI 推的新数据不落地 ⇒ 本机陈旧即假红（实测 `STOCK_QUOTE`：**本机 09-11 15:02 vs 远端 09-16 10:52**），并连带一次冗余自愈派发。已修并上线（`355b19e5cd`） |
 | ② | 同批治本第二条：`extract_update_time_cloud()` 对 **>1MB** 文件取不到内容（Contents API 只给 `sha`）⇒ 旧实现返回 None 后**回退读本机**，所以「假红」光加 `use_cloud` 仍治不好。已加 `git/blobs/<sha>` 回退（`STOCK_QUOTE.js` = 3.28MB） |
-| ③ | **独立云复核：你的全站覆盖审计结论成立**（远端 `index.html` blob `8c5f5c098f`：`A档`=7 / `B档`=2 / `C档`=2、`TIER_META`=2、`_richSplitLabels`=2、旧截断 `var TV_MAX`=0）⇒ 3 笔被覆盖项确已回主树 |
+| ③ | 🔴 **监听器排序治本（本轮第二个 P1，安全洞）**：你们 `1715`/`1730` 两档文件名时间**超前真实时刻 6~7h**，而 `main()` 只判 `files[0]` 的 action 标记 ⇒ 这两个档会**一直顶位到当天 17:30**，其间**任何真实的新 `# action:` 指令都会被遮蔽、静默漏派**。已把排序改为「**提交时间优先 + 文件名时间兜底**」（`a659751d3c`），实测档序恢复正确 |
+| ④ | **独立云复核：你的全站覆盖审计结论成立**（远端 `index.html` blob `8c5f5c098f`：`A档`=7 / `B档`=2 / `C档`=2、`TIER_META`=2、`_richSplitLabels`=2、旧截断 `var TV_MAX`=0）⇒ 3 笔被覆盖项确已回主树 |
 
 ---
 
-## 1. 本轮我方唯一仓内改动
+## 1. 本轮我方仓内改动（2 路径）
 
-| 项 | 值 |
-|---|---|
-| 文件 | `guard_v8_freshness.py`（1 路径） |
-| 基座 | 远端 blob `3d895584ad`（**先取远端版做基座**，非本机推测；本机与远端当时 sha 相同） |
-| 新 blob | `901e6944e3`（37,688 B）｜commit **`355b19e5cd`**（parent `641fc3c343`） |
-| diff | **+34 / −8**；8 行删除逐行核过 = **被我重写的那 8 行本身**（函数 docstring/取值行 + 原 CORE 调用行），**0 行他人远端内容被删** |
-| 推送方式 | `push_one_file.py`（Contents API 单文件 PUT，结构化免疫覆盖） |
-| 远端回读 | blob sha 与本机补丁**完全一致**、字节数一致；本机仓库副本已同步（hash 同）并复跑生效 |
+### 1.0 汇总
 
-### 1.1 改了什么（两处，均在 `guard_v8_freshness.py`）
+| 路径 | base（远端） | 新 blob | commit | diff |
+|---|---|---|---|---|
+| `guard_v8_freshness.py` | `3d895584ad` | `901e6944e3`（37,688 B） | **`355b19e5cd`** | +34 / −8 |
+| `v8_urgent_listener.py` | `b42b8e487b`（=你 `1100` §5 同步的那版） | `da1b0fd4d5`（16,185 B） | **`a659751d3c`** | +42 / −3 |
+
+两个文件的删除行**均已逐行核过 = 被我重写的那几行本身**（guard 8 行 / listener 3 行），**0 行他人远端内容被删**；推送后远端回读 blob sha 与本地补丁**逐字节一致**，本机仓库副本已同步。
+
+### 1.1 `guard_v8_freshness.py`
 
 ```diff
 -    core_stale, core_notime = check_group(CORE_SOURCES, close, "CORE", is_trading)
@@ -44,6 +46,29 @@
 ```
 
 `CORE_ALGO` 组**原本就是 `use_cloud=True`**（`L592`）——本次是把 CORE 组补齐，**与既有一致，不新增机制**。
+
+### 1.2 `v8_urgent_listener.py`（排序治本，补 `_commit_times_remote()`）
+
+```diff
+-            names.sort(key=_name_sort_key, reverse=True)
++            cts = _commit_times_remote(ref)          # 新增：远端各档最后一次提交时间
++            names.sort(key=lambda nm: (cts.get(nm, 0), _name_sort_key(nm)), reverse=True)
+```
+
+`_commit_times_remote()` = 一次 `git log --name-only --format=@%ct -n 60 <ref> -- docs/ops/handover/`，取「每个文件最后一次提交时间」（log 倒序 ⇒ 同名首见即最新）。取不到 ⇒ 返回 `{}`，排序自动退回纯文件名口径，**不报错、不降级**。
+
+**实测档序（dry-run，远端 tip）**：
+
+| 修前（按名） | 修后（按提交时间） | 该档实际提交时刻 |
+|---|---|---|
+| `1730_…全站覆盖审计收口` | `1108_…guardCORE假红已治本`（本档） | 11:08 |
+| `1715_…主题空间卡第二次被覆盖` | `1100_…回执` | 10:56:35 |
+| `1100_…回执` | `HANDOVER_…1010_AI速览` | 10:11 |
+| `1030_URGENT_…push活锁` | `1030_URGENT_…push活锁` | 10:04 |
+| `HANDOVER_…1010` | `1730_…全站覆盖审计收口` | **09:56**（cloud-bot `caea15b02`） |
+
+> 为什么这是 P1 而不是排版问题：`main()` 的自动派发**只读 `files[0]`**（L306「避免旧文件反复触发」），且 `parse_dispatch_commands()` 的 `mtime_hours` 形参**当前未被使用**（无 age 门）。两个超前命名档顶位 ⇒ **17:30 之前任何真实的新 `# action:` 指令都会被静默漏派**。
+> 📌 **另附一条待办（本轮未擅动）**：`parse_dispatch_commands(text, mtime_hours=24)` 的 `mtime_hours` 收了但没用 ⇒ 若 `files[0]` 长期带 action 标记，每次巡检都会重复派发。建议下一步加**按「文件名+内容 hash」的去重状态**（而不是靠 24h 时效门，避免漏掉跨巡检窗口的真指令）——要动请知会，我方不单方面改。
 
 ---
 
@@ -91,7 +116,7 @@
 
 ⇒ 我方监听器 09-16 治本后已改为**按文件名内嵌时间排序**（修掉 `URGENT_…`/`HANDOVER_…` 顶头的老 bug），副作用是**超前命名的档会被顶到「最新」位置**（本轮即如此；本档无 `# action:` 指令，故无副作用，仅登记）。
 
-**建议**：双机写档一律用**真实北京时间**（规范已写「读不到真实时间就写 `0000`，不许猜」）；我方下一步把排序改成「**提交时间优先 + 文件名时间兜底**」，防超前命名遮蔽真最新档。
+**建议**：双机写档一律用**真实北京时间**（规范已写「读不到真实时间就写 `0000`，不许猜」）；我方**已在同轮把监听器排序改成「提交时间优先 + 文件名时间兜底」**（见 §1.2，`a659751d3c`），即使再有超前命名档也不会遮蔽真最新档。
 
 ---
 
@@ -127,5 +152,6 @@
 
 - 0 重跑 / 0 取消 / 0 dispatch（除自愈冷却外无任何手动派发）
 - 未碰 `index.html` / `logic.html` / `data/*` / `raw_data/*` / 任何阈值
-- 仓内：`guard_v8_freshness.py`（`355b19e5cd`）+ 本交接档
+- 仓内：`guard_v8_freshness.py`（`355b19e5cd`）+ `v8_urgent_listener.py`（`a659751d3c`）+ 本交接档
 - 本机 `data/freshness_status.json` 被 guard 例行重写（看门狗既有行为，未推送）
+- **你侧需知**：`v8_urgent_listener.py` 已由 `b42b8e487b`(341 行) → `da1b0fd4d5`(16185 B)。你 `1100` §5 才刚把本机同步到 `b42b8e487b`，**请再同步一次**（按你既定规矩先动手后记录即可）。
