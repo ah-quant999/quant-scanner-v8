@@ -1293,6 +1293,19 @@ def run_experiment_cards():
     2026-08-20 主人令：潜力挖掘页已删除 → calc_potential_picks.py 从实验链路移除；2026-09-06 主人令：全链（脚本/数据/前端卡）彻底删除。
     任何模块失败不阻断主流程（仅告警），避免拖垮云端抓取。
     """
+    # 🔴 2026-09-16 阿狸咪的工程师 · 修「轻量环境必挂」（D2）：
+    #   v8_algo_intraday_lite.yml 是**轻量** workflow（不装 requirements.txt ⇒ 无 pandas），
+    #   而下面的强势突破生成器需 pandas 取 K 线；拿不到 K 线时该脚本会守住
+    #   「拒绝发布虚假回测」闸门并抛错 ⇒ 整个 update_v8 中断 ⇒ 当晚 ALGO_TRACK 不重生、
+    #   推送步骤被 skip（实测 run 35095625053，09-11~09-16 每晚一红）。
+    #   该 workflow 自述「动量共识筛选已迁到盘后 19:15 算法链，盘中不再重复跑」⇒ 按契约整段跳过；
+    #   实验卡由云端构建（装了 requirements.txt）负责重算。
+    #   注意：这里**不放松**任何诚实闸门——生成器自己的「拒绝发布虚假回测」原样保留，
+    #   云端构建仍会在缺 K 线时照旧 raise。
+    if os.environ.get("V8_SKIP_EXPERIMENT_CARDS") == "1":
+        print("[experiment] ⏭️ V8_SKIP_EXPERIMENT_CARDS=1 → 按契约跳过实验卡"
+              "（轻量环境无 pandas；实验卡由云端构建重算，避免误报假 failure）")
+        return
     import subprocess
     algo_dir = Path(__file__).resolve().parent / "algorithms"
     for script in ("calc_commodity_elasticity.py", "calc_sentiment_cycle.py"):

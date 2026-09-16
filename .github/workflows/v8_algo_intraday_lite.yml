@@ -56,6 +56,13 @@ jobs:
       TZ: Asia/Shanghai
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       V8_PUSH: "1"
+      # 🔴 2026-09-16 阿狸咪的工程师：本 workflow 是**轻量**环境（不装 requirements.txt ⇒ 无 pandas），
+      #   而 update_v8.py 会级联到 run_experiment_cards（gen_strong_breakout 需 pandas 取 K 线）。
+      #   拿不到 K 线时脚本会守住「拒绝发布虚假回测」闸门并抛错，导致整个 update_v8 中断、
+      #   当晚 ALGO_TRACK 不重生、推送步骤被 skip（实测 run 35095625053，09-11~09-16 每晚一红）。
+      #   本 workflow 自述「动量共识筛选已迁到盘后 19:15 算法链，盘中不再重复跑」⇒ 按契约跳过实验卡，
+      #   实验卡由云端构建（装了 requirements.txt）负责重算。
+      V8_SKIP_EXPERIMENT_CARDS: "1"
     defaults:
       run:
         shell: bash
@@ -79,7 +86,12 @@ jobs:
           # 🔴 2026-09-08 主人令「禁止假 success」：原 set +e + echo + 无条件 exit 0
           #    会让 gen_algo_track 崩溃也显示绿色 → ALGO_TRACK 停更无人知。
           #    改为捕获真实退出码，非零即让 job 变红。
-          rc=$?
+          # 🔴 2026-09-16 阿狸咪的工程师「假 success 回归」修复：
+          #   2026-09-08 e190e5fc39 为补退出码捕获，把真正的调用行**误删**——
+          #   `rc=$?` 取的是本 shell 上一条命令（新 shell 恒为 0）⇒ 本步骤恒定绿、
+          #   脚本从未执行。下面这行与 09-03 版原文等价。
+          rc=0
+          python algorithms/gen_algo_track.py || rc=$?
           echo "gen_algo_track exit: $rc"
           if [ "$rc" != "0" ]; then
             echo "::error::gen_algo_track.py 失败（exit=$rc），ALGO_TRACK 未刷新"

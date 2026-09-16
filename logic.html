@@ -1964,7 +1964,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td rowspan="5"><b>盘中</b><br>09:30-<br>15:00</td><td>09:40-15:00 每 20 分共 <b>14 档</b> <code>v8_cn_fetch_intraday_lemoncat</code></td><td>准点档调度器 → 派发 <code>v8_cn_fetch_cloud</code>(intraday) → 失败转 cn 兜底</td><td>调度器 GitHub ubuntu；被派发抓取跑云端 ubuntu，失败转小九 cn</td></tr>
           <tr><td>09:00-15:50 每 10 分 <code>v8_intraday_snapshot</code></td><td>板块资金日内快照</td><td>云端 ubuntu</td></tr>
           <tr><td>每 30 分 <code>v8_stock_quote_refresh</code> + <code>v8_risk_gauge</code></td><td>行情 / 风险温度计</td><td>cn self-hosted / 云端 ubuntu</td></tr>
-          <tr><td>11:00 / 13:00 / 15:00 <code>v8_algo_intraday_lite</code></td><td>盘中算法追踪（轻量）</td><td>云端 ubuntu</td></tr>
+          <tr><td>11:00 / 13:00 / 15:00 <code>v8_algo_intraday_lite</code></td><td>盘中算法追踪（轻量）：跑 <code>gen_algo_track</code> 刷新三算法追踪（ALGO_TRACK）；<b>不重算盘后实验卡</b>（本环境不装 requirements.txt，实验卡归云端构建）</td><td>云端 ubuntu</td></tr>
           <tr><td>每 30 分 <code>v8_health_patrol</code>；每 15 分 <code>v8_cache_buster_reconcile</code></td><td>巡检 / 缓存戳对齐（全天）</td><td>云端 ubuntu</td></tr>
           <tr><td rowspan="3"><b>盘后</b><br>15:05-<br>次日<br>09:00</td><td>16:30 <code>v8_cn_fetch_experiments</code></td><td>实验卡（暂未上架区）</td><td>云端 ubuntu</td></tr>
           <tr><td><b>16:40 / 18:10 / 20:00 / 21:00 / 22:30 / 00:30 / 06:00 / 08:00</b> 八个唤醒点 <code>v8_algo_cloud</code></td><td>跑哪批由闸门定：<b>A 采集 → B 选股 → D 汇总 → E 回测</b></td><td><code>[self-hosted, cn]</code> 双机谁空谁跑</td></tr>
