@@ -2481,17 +2481,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
       <div id="limitUpHeatContent" class="limit-up-content">加载中…</div>
       <div id="limitUpHeatHistWrap" style="display:none;margin-top:10px;">
-        <!-- 🔁 2026-09-16 主人令（合并查询）：「🗂 历史矩阵」与「📚 板块周期档案」原为两个独立折叠区，
-             需点两次才能看全 —— 现**合并为一个折叠区**，一次点开即同时展开全部历史与周期档案。
-             🗂 2026-09-16 主人令「放宽，用于累积」：板块周期档案为累积型重要数据
-             （源自 data/SECTOR_CYCLE_ARCHIVE.js ← raw_data/sector_cycle.json，PROTECTED_FILES.json 登记在册），
-             记录每个板块「启动 → 退潮」的完整周期，可跨月跨年回查。 -->
-        <button type="button" id="limitUpFoldBtn" class="lu-fold-btn">🗂 展开历史与周期档案</button>
+        <!-- 🔁 2026-09-16 主人令（合并查询）：原「🗂 历史矩阵」与「📚 板块周期档案」两独立折叠区合并为一个。
+             2026-09-16 追加令：历史矩阵整张大表不再前端展示，仅后台 data/LIMIT_UP_HEATMAP.js 累积记录，历史不丢。
+             🗂 板块周期档案为累积型重要数据（源自 data/SECTOR_CYCLE_ARCHIVE.js ← raw_data/sector_cycle.json，
+             PROTECTED_FILES.json 登记在册），记录每个板块「启动 → 退潮」完整周期，可跨月跨年回查。 -->
+        <button type="button" id="limitUpFoldBtn" class="lu-fold-btn">📚 展开板块周期档案</button>
         <div id="limitUpFoldBody" style="display:none">
           <div class="lu-part">
-            <div class="lu-part-title">🗂 历史矩阵 · 全量 <span id="limitUpFoldHistN">—</span> 个交易日（主表默认只看最近 20 日）</div>
-            <div id="limitUpHeatHistory" class="limit-up-content"></div>
-          </div>
           <div class="lu-part">
             <div class="lu-part-title">📚 板块周期档案 · <span id="limitUpFoldCycN">—</span></div>
             <div id="limitUpCycleArchive" class="limit-up-content"></div>
@@ -9558,24 +9554,15 @@ function renderLimitUpHeatmap(){
   contentEl.innerHTML=buildTable(_startIdx)+_legend;
   card.style.display='block';
 
-  /* ③ 卡底「历史 + 周期档案」合并折叠区（2026-09-16 主人令：两个折叠区合并为一个，一次点开全查到）
-        · 历史矩阵：主表只展示最近 SHOW_DAYS 日，更早交易日全量收纳于此（让历史可查）；
+  /* ③ 卡底「板块周期档案」折叠区（2026-09-16 主人令：原「历史矩阵 + 周期档案」两折叠区合并为一个；
+        2026-09-16 追加令：历史矩阵整张大表不再前端展示，仅后台 data/LIMIT_UP_HEATMAP.js 累积记录，历史不丢）
         · 板块周期档案：累积型，见下方 IIFE（记录每个板块「启动 → 退潮」完整周期）。
-     两块统一由 _foldBtn 一个按钮控制；_foldMeta 收集内容量用于生成按钮文案。 */
+     统一由 _foldBtn 一个按钮控制；_foldMeta 收集内容量用于生成按钮文案。 */
   var _foldWrap=document.getElementById('limitUpHeatHistWrap');
   var _foldBtn=document.getElementById('limitUpFoldBtn');
   var _foldBody=document.getElementById('limitUpFoldBody');
-  var _histEl=document.getElementById('limitUpHeatHistory');
   var _cycEl=document.getElementById('limitUpCycleArchive');
-  var _foldMeta={histDays:0, cycCount:0, cycSecs:0, cycOngoing:0};
-
-  /* ① 历史矩阵（全量列） */
-  if(_histEl && _displayDates.length>SHOW_DAYS){
-    _histEl.innerHTML=buildTable(0);
-    _foldMeta.histDays=_displayDates.length;
-  }
-  var _foldHistN=document.getElementById('limitUpFoldHistN');
-  if(_foldHistN) _foldHistN.textContent=String(_foldMeta.histDays||_displayDates.length);
+  var _foldMeta={cycCount:0, cycSecs:0, cycOngoing:0};
 
   /* 📚 2026-09-16 主人令「几几年几月什么板块启动，到什么时间结束…甚至可以算出每个板块的周期」：
      把累积型板块周期档案（data/SECTOR_CYCLE_ARCHIVE.js）渲染进合并折叠区，
@@ -9732,15 +9719,14 @@ function renderLimitUpHeatmap(){
     }
   })();
 
-  /* ④ 合并折叠区统一控制：一个按钮同时展开/收起「历史矩阵 + 板块周期档案」 */
+  /* ④ 折叠区统一控制：一个按钮展开/收起「板块周期档案」（历史矩阵按主人令不再前端展示） */
   if(_foldWrap && _foldBtn && _foldBody){
-    if(_foldMeta.histDays>0 || _foldMeta.cycCount>0){
+    if(_foldMeta.cycCount>0){
       _foldWrap.style.display='block';
       var _foldTxt=function(open){
         var parts=[];
-        if(_foldMeta.histDays>0) parts.push(_foldMeta.histDays+' 个交易日');
         if(_foldMeta.cycCount>0) parts.push(_foldMeta.cycCount+' 个周期 · '+_foldMeta.cycSecs+' 板块');
-        return (open?'🗂 收起历史与周期档案（':'🗂 展开历史与周期档案（')+parts.join(' · ')+'）';
+        return (open?'📚 收起板块周期档案（':'📚 展开板块周期档案（')+parts.join(' · ')+'）';
       };
       _foldBtn.innerHTML=_foldTxt(false);
       if(!_foldBtn.__v8FoldBound){
