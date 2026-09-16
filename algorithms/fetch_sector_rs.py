@@ -59,7 +59,7 @@ def _save_phase_snapshot(sectors, update_time_str, today_str):
     """把今日 phase 快照写入 raw_data/sector_phase_history.json（累积历史）。
 
     格式：{"version":1, "snaps":[{"date","update_time","phases":{name→phase}}]}
-    同一日重复跑 → 覆盖当日；新一日 → append；最多保留 30 天（防止 raw_data 无限增长）。
+    同一日重复跑 → 覆盖当日；新一日 → append；**永久保留**（2026-09-16 主人令改，用于板块周期档案）。
     """
     phases = {s['name']: _phase_of(s) for s in sectors if s.get('name')}
     if not phases:
@@ -84,8 +84,11 @@ def _save_phase_snapshot(sectors, update_time_str, today_str):
         "rule_ver": PHASE_RULE_VER,   # 2026-08-31：规则版本，前端只对比同版本快照防假迁移
         "phases": phases,
     })
-    # 保留最近 30 天
-    snaps = snaps[-30:]
+    # 🔴 2026-09-16 主人令「放宽，用于累积」：取消 30 天截断，永久保留。
+    #   原 `snaps = snaps[-30:]` 会把板块周期快照永久砍到 30 天，
+    #   而板块周期（启动→退潮）往往跨数月 ⇒ 30 天根本看不出一个完整周期。
+    #   ⚠️ 本文件是**累积型重要档案**，禁止再加任何 `[-N:]` 截断。
+    #   # 永久保留（原为 snaps = snaps[-30:]）
 
     history["version"] = 1
     history["rule_ver"] = PHASE_RULE_VER

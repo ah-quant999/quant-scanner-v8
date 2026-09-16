@@ -248,18 +248,72 @@ def _check_dates_integrity(existing_dates):
     """检查已有日期序列（剔除 API 拉不到的历史后 ≤30 列也可通过）。"""
     if not existing_dates:
         return False, "无日期序列"
-    if len(existing_dates) > 30:
-        return False, f"日期超过30列 ({len(existing_dates)})"
+    # 🔴 2026-09-16 主人令「放宽，用于累积」：取消 30 列上限。
+    #   原上限是为「矩阵只展示近30日」设计；现在要**永久累积**做板块周期档案，
+    #   列数会随年月增长（1年≈243列 / 5年≈1215列），故不再限制上限。
+    #   仅保留「上限之下的健康检查」：重复日期、非交易日等仍会被下方逻辑揪出。
+    if len(existing_dates) > 1200:
+        return False, f"日期超过1200列 ({len(existing_dates)})，疑似数据异常"
     if len(existing_dates) != len(set(existing_dates)):
         return False, "存在重复日期"
     expected = get_trade_dates(30)
     expected_labels = {datetime.strptime(d, "%Y%m%d").strftime("%m/%d") for d in expected}
     actual_set = set(existing_dates)
-    extra = actual_set - expected_labels
-    if extra:
-        return False, f"包含非最近30日日期 {sorted(extra)}"
+    # 🔴 2026-09-16 主人令「放宽，用于累积」：这里原本还会检查
+    #   `extra = actual_set - expected_labels` ⇒ 只要出现「近30个交易日之外」的日期
+    #   就判异常并触发**全量重建** ⇒ 永久累积的历史会被反复判死、反复重建，
+    #   实测直接导致「累积 39 列 → 判异常 → 重建回 30 列」的越攒越少。
+    #   现改为：**超范围日期不再是异常**（那正是我们要保留的历史）。
+    #   仅保留「未来日期」这一条真异常判据（未来日期必是脏数据）。
+    today_label = datetime.now().strftime("%m/%d")
+    _ty, _tm, _td = datetime.now().year, datetime.now().month, datetime.now().day
+    future = [x for x in actual_set
+              if _is_future_label(x, _ty, _tm, _td)]
+    if future:
+        return False, f"包含未来日期 {sorted(future)}"
     # 🛡 2026-09-02 主人令根治：允许 dates < 30 列（API 拉不到的历史被剔除后变短，例如只有 15 列）
     return True, "OK"
+
+
+def _is_future_label(label, ty, tm, td):
+    """判断 MM/DD 标签是否「未来」（按最近 1 年内的合理区间判定）。
+    只处理 MM/DD；跨年场景下若月份比当前大 2 个月以上，视为去年（不算未来）。"""
+    try:
+        mm, dd = int(label[:2]), int(label[3:5])
+    except Exception:
+        return False
+    if (mm, dd) > (tm, td):
+        # 比当前月日大：可能是「未来」也可能是「去年同月」
+        # 若月份跨度 <= 6 个月，认为是未来（脏数据）；超过则认为是去年历史
+        diff = (mm - tm) if mm >= tm else (mm + 12 - tm)
+        if diff <= 6:
+            return True
+    return False
+
+
+def _gen_cycle_archive():
+    """🔴 2026-09-16 主人令「放宽，用于累积」：热力矩阵产出后自动联动生成板块周期档案。
+
+    把累积长表 raw_data/limit_up_heatmap.json 翻译成可读的周期档案
+    （每个板块的「启动 → 退潮」区间，可逐年回查）→ data/SECTOR_CYCLE_ARCHIVE.js
+
+    该档案属**累积型重要文件**（登记于 PROTECTED_FILES.json，
+    由 guard_protected_files.py 守卫，禁止误删）。
+    本步骤失败**不得中断**主流程（热力矩阵已落盘），只打印警告。
+    """
+    try:
+        import importlib.util
+        _p = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          "build_sector_cycle_archive.py")
+        if not os.path.exists(_p):
+            print("  ⚠️ 未找到 build_sector_cycle_archive.py，跳过板块周期档案")
+            return
+        _spec = importlib.util.spec_from_file_location("_bsca", _p)
+        _mod = importlib.util.module_from_spec(_spec)
+        _spec.loader.exec_module(_mod)
+        _mod.build()
+    except Exception as e:
+        print(f"  ⚠️ 板块周期档案生成失败（不影响热力矩阵）: {e}")
 
 
 def needs_rebuild(existing):
@@ -426,7 +480,11 @@ def main():
             new_dates = ed[:idx] + [today_str] + ed[idx + 1:]
         else:
             new_dates = (ed[-29:] + [today_str]) if len(ed) >= 29 else (ed + [today_str])
-        new_dates = new_dates[-30:]
+        # 🔴 2026-09-16 主人令「放宽，用于累积」：不再截断，永久保留全部历史列。
+        #   原 `new_dates[-30:]` 会把累积的板块周期档案永久砍到 30 日。
+        #   现改为**只增不减**；数据源(东财)本身只给 1 个月，历史靠每日增量攒出来。
+        #   ⚠️ 本文件有**两处**同构分支（增量路径 + 兜底路径），必须同改。
+        #   # 永久保留（原为 new_dates = new_dates[-30:]）
 
         # 用「日期→板块→数值」映射做精确对齐，避免丢列/错位
         old_by_date = {}
@@ -483,6 +541,11 @@ def main():
         total = sum(s["data"])
         print(f"     {s['name']}: {s['data']}  (累计{total})")
     print(f"\n  输出: {OUTPUT}")
+
+    # 🔴 2026-09-16 主人令「放宽，用于累积」：热力矩阵产出后自动联动生成板块周期档案
+    #   来源 raw_data/limit_up_heatmap.json（累积长表）→ data/SECTOR_CYCLE_ARCHIVE.js
+    #   该档案属累积型重要文件（登记于 PROTECTED_FILES.json），失败不得中断主流程。
+    _gen_cycle_archive()
 
 
 def generate():
@@ -541,6 +604,45 @@ def generate():
         if not days_data:
             return None
         new_dates, new_sectors = build_heatmap(days_data)
+        # 🔴 2026-09-16 主人令「放宽，用于累积」：全量重建时**合并**已有更长历史。
+        #   根因：API 只能回拉近 30 日 ⇒ 重建后 dates 仅 30 列，
+        #   若不合并，之前累积的几个月历史会被这次重建**整体抹掉**（重演「越攒越少」）。
+        #   策略：以「已有历史」为底，用新拉到的数据**覆盖同日期**，保留旧日期。
+        if existing_dates:
+            _old_by_date = {}
+            for _i, _dd in enumerate(existing_dates):
+                _old_by_date[_dd] = {
+                    _s["name"]: (_s["data"][_i] if _i < len(_s["data"]) else 0)
+                    for _s in existing.get("sectors", [])
+                }
+            _new_by_date = {}
+            for _i, _dd in enumerate(new_dates):
+                _new_by_date[_dd] = {
+                    _s["name"]: (_s["data"][_i] if _i < len(_s["data"]) else 0)
+                    for _s in new_sectors
+                }
+            # 合并日期：按原顺序，旧的在前，新增追加在后，去重
+            _merged = []
+            _seen = set()
+            for _dd in list(existing_dates) + list(new_dates):
+                if _dd not in _seen:
+                    _merged.append(_dd)
+                    _seen.add(_dd)
+            # 板块并集：沿用重建结果的板块集（口径最新），补上旧数据里有的日期
+            _all_names = [x["name"] for x in new_sectors]
+            _merged_sectors = []
+            for _name in _all_names:
+                _row = []
+                for _dd in _merged:
+                    if _dd in _new_by_date and _name in _new_by_date[_dd]:
+                        _row.append(_new_by_date[_dd][_name])
+                    else:
+                        _row.append(_old_by_date.get(_dd, {}).get(_name, 0))
+                _merged_sectors.append({"name": _name, "data": _row})
+            _added = len(_merged) - len(new_dates)
+            if _added > 0:
+                print(f"  🗂 重建合并：保留 {_added} 个历史列（{len(new_dates)} → {len(_merged)} 列）")
+            new_dates, new_sectors = _merged, _merged_sectors
     else:
         today = datetime.now()
         today_str = today.strftime("%m/%d")
@@ -599,7 +701,11 @@ def generate():
             new_dates = ed[:idx] + [today_str] + ed[idx + 1:]
         else:
             new_dates = (ed[-29:] + [today_str]) if len(ed) >= 29 else (ed + [today_str])
-        new_dates = new_dates[-30:]
+        # 🔴 2026-09-16 主人令「放宽，用于累积」：不再截断，永久保留全部历史列。
+        #   原 `new_dates[-30:]` 会把累积的板块周期档案永久砍到 30 日。
+        #   现改为**只增不减**；数据源(东财)本身只给 1 个月，历史靠每日增量攒出来。
+        #   ⚠️ 本文件有**两处**同构分支（增量路径 + 兜底路径），必须同改。
+        #   # 永久保留（原为 new_dates = new_dates[-30:]）
         old_by_date = {}
         for i, dd in enumerate(existing_dates):
             old_by_date[dd] = {
@@ -645,6 +751,7 @@ def generate():
     with open(OUTPUT, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
     print(f"\n  ✅ 热力矩阵: {len(result['dates'])} 日 × {len(result['sectors'])} 板块")
+    _gen_cycle_archive()
     return result
 
 

@@ -46,3 +46,7 @@ logic.html          -text -eol
 # 若行尾被平台转换则 sha 变化 ⇒ 戳与实际部署文件不符 ⇒ CDN 按旧 URL 吐旧副本。
 data/*.js           text eol=lf
 raw_data/*.json     text eol=lf
+
+# 🔴 累积型重要档案（禁止误删）—— 由 guard_protected_files.py 守卫
+data/SECTOR_CYCLE_ARCHIVE.js -diff -merge
+PROTECTED_FILES.json -diff -merge

@@ -84,6 +84,11 @@ DATA_SOURCES = {
     "market_fund_flow_data.json":  "MARKET_FUND_FLOW_DATA",
     "w52_high.json":               "W52_HIGH",
     "limit_up_heatmap.json":       "LIMIT_UP_HEATMAP",
+    # 🔴 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要档案）
+    #   由 build_sector_cycle_archive.py 从 limit_up_heatmap.json 派生，
+    #   记录每个板块「启动→退潮」区间，可逐年回查。
+    #   ⚠️ 本文件在 PROTECTED_FILES.json 清单内，禁止误删（见 guard_protected_files.py）。
+    "sector_cycle.json":           "SECTOR_CYCLE_ARCHIVE",
     "limit_up_broken.json":        "LIMIT_UP_BROKEN",
     # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：ANALYST_RATINGS 前端零引用，
     #   由 generate_top10.py 附带产出但无渲染消费，停止发布 js。

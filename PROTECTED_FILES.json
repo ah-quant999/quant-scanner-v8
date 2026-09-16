@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "updated": "2026-09-16",
+  "rule": "🔴 本清单中的文件是**长期累积数据**，删除后无法恢复。任何清理/瘦身/白名单脚本必须先读本清单并**跳过**这些路径。",
+  "owner": "小九 / 阿狸咪",
+  "files": [
+    {
+      "path": "data/SECTOR_CYCLE_ARCHIVE.js",
+      "kind": "accumulative-archive",
+      "since": "2026-09-16",
+      "why": "板块周期档案。记录每个板块「启动→退潮」区间，用于逐年回查与周期统计。数据源（东财涨停池）只保留最近 1 个月，历史**无法重新拉取**，删除即永久丢失。",
+      "generator": "build_sector_cycle_archive.py",
+      "never": [
+        "git rm",
+        "加入任何清理白名单",
+        "作为临时产物删除",
+        "加入 .gitignore"
+      ]
+    },
+    {
+      "path": "raw_data/limit_up_heatmap.json",
+      "kind": "accumulative-rawdata",
+      "since": "2026-09-16",
+      "why": "涨停热力矩阵累积长表。已从 git 历史回补 07/20 起的数据，并改为**永久保留**（原为只留 30 日）。是 SECTOR_CYCLE_ARCHIVE 的唯一数据源。",
+      "generator": "fetch_limit_up_heatmap_v8.py",
+      "never": [
+        "git rm",
+        "回退到 30 日截断版本",
+        "加入清理白名单"
+      ]
+    },
+    {
+      "path": "raw_data/sector_phase_history.json",
+      "kind": "accumulative-rawdata",
+      "since": "2026-09-16",
+      "why": "板块周期快照累积历史。原为只留 30 天，2026-09-16 改为永久保留。板块周期常跨数月，30 天看不出完整周期。",
+      "generator": "algorithms/fetch_sector_rs.py",
+      "never": [
+        "git rm",
+        "回退到 30 天截断版本",
+        "加入清理白名单"
+      ]
+    }
+  ]
+}
