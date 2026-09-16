@@ -7,6 +7,7 @@ import urllib.request, urllib.error
 import http.client
 import time as _time
 import subprocess
+import threading
 from zoneinfo import ZoneInfo
 
 CST = ZoneInfo("Asia/Shanghai")
@@ -32,7 +33,59 @@ if not TOKEN:
     print("❌ 缺少 GITHUB_TOKEN"); sys.exit(1)
 
 
-def api(method, path, data=None):
+# ═══════════════════════════════════════════════════════════════════════════
+# 🛡 2026-09-17 一劳永逸加固（阿狸咪的工程师）
+#   【症状】2026-09-16 20:25 派发的算法链 run #1883 在「📤 唯一推送」步**僵死 3h55m**
+#     （job 日志端点返回 BlobNotFound ⇒ 进程已死但状态未上报），
+#     占死 v8-algo-cloud 并发组 ⇒ #1884 cancelled / #1885 排队 1h21m
+#     ⇒ 回测批（E）与因子实验室整夜没落盘，前端「因子」卡停在 2 天前。
+#   【机制·源码实测】本脚本主循环对**每个变更的 .json** 都会
+#     api("GET", /git/blobs/{远端sha}) 取时间戳做防倒退比对，而 api() 的 GET
+#     有 3 次重试、每次 timeout=300s ⇒ 单请求最坏 906s；
+#     blob 上传循环更是 BLOB_MAX_TRY=8 × 300s。网络劣化时总时长**无上限**，
+#     只有 job 级 timeout-minutes=360 兜底 ⇒ 最坏堵满 6 小时。
+#   【加固】① 心跳式看门狗：连续 PUSH_IDLE_LIMIT_SEC 秒**无任何进展**才判挂死强退
+#            （正常慢速推送每处理完一个文件就 _beat()，不会误杀）；
+#          ② 小请求不再吃 300s 超时（防倒退 blob 查询 45s / index.html 90s）。
+#   【为何强退而非静默跳过】退出码非 0 才会让 run 失败并**释放并发组**，
+#     下轮派发自动续推；静默 exit 0 = 假成功，正是主人明令禁止的。
+# ═══════════════════════════════════════════════════════════════════════════
+_PUSH_HEART = [_time.time()]
+_IDLE_LIMIT = int(os.environ.get("PUSH_IDLE_LIMIT_SEC", "480"))
+
+
+def _beat(what=""):
+    """标记「本轮有进展」。任何一次成功的网络往返 / 文件处理都应调用。"""
+    _PUSH_HEART[0] = _time.time()
+    if what:
+        print("      ⏱ 心跳 " + str(what), flush=True)
+
+
+def _start_watchdog():
+    def _wd():
+        while True:
+            _time.sleep(10)
+            idle = _time.time() - _PUSH_HEART[0]
+            if idle > _IDLE_LIMIT:
+                print("=" * 78, flush=True)
+                print("⏱ 推送已 %d 秒无任何进展（> 上限 %d 秒）⇒ 判定跨境网络挂死。"
+                      % (int(idle), _IDLE_LIMIT), flush=True)
+                print("   本进程立即退出（exit 1）：让 v8-algo-cloud 并发组释放，"
+                      "避免整条算法链被单步堵死 6 小时。", flush=True)
+                print("   已上传成功的 blob 仍在 GitHub 侧（未提交 tree/commit 不影响 main），"
+                      "下轮派发会自动续推。", flush=True)
+                print("   若确认只是「很慢」而非挂死，把环境变量 PUSH_IDLE_LIMIT_SEC 调大即可。",
+                      flush=True)
+                print("=" * 78, flush=True)
+                try:
+                    sys.stdout.flush()
+                except Exception:
+                    pass
+                os._exit(1)
+    threading.Thread(target=_wd, daemon=True).start()
+
+
+def api(method, path, data=None, timeout=300):
     url = API + path
     headers = {
         "Authorization": f"Bearer {TOKEN}",
@@ -57,7 +110,7 @@ def api(method, path, data=None):
     last_msg = ""
     for i in range(attempts):
         try:
-            with urllib.request.urlopen(req, timeout=300) as r:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
                 txt = r.read().decode("utf-8")
                 return json.loads(txt) if txt else {}
         except urllib.error.HTTPError as e:
@@ -434,6 +487,10 @@ def _local_tree_fallback(base_sha):
 
 
 def main():
+    # 🛡 2026-09-17：心跳看门狗。无进展超 PUSH_IDLE_LIMIT_SEC 即强退，
+    #   绝不让「唯一推送」单步堵死整条算法链（#1883 僵尸事件根治）。
+    _start_watchdog()
+
     # 2026-08-22 来源驱动增量推送（主人令升级）：支持 PUSH_FILES 环境变量（逗号分隔相对路径）。
     #   - 有 PUSH_FILES：只处理清单内文件（workflow 用 git status 收集"本次 changed"，聚焦且不漏）；
     #   - 无 PUSH_FILES：回退全量 walk_raw + walk_extra（兼容旧调用/本地手动跑）。
@@ -525,6 +582,7 @@ def main():
         # (1) 内容完全一致：直接复用远端 sha，省一次 blob 上传
         if remote_sha and local_sha == remote_sha:
             unchanged += 1
+            _beat()
             continue
         # (2) 内容不同：比对时间戳，本地更旧则保留远端版本，绝不覆盖
         # 🛡 2026-09-13 一劳永逸：**累积继承型池类产物**豁免本守卫。
@@ -548,7 +606,8 @@ def main():
                 and path not in _NO_REGRESSION_GUARD):
             lts = _content_ts(content)
             if lts:
-                rb = api("GET", f"/repos/{REPO}/git/blobs/{remote_sha}")
+                # 🛡 2026-09-17：小请求不再吃 300s 超时（3 次重试最坏 906s → 现 141s）
+                rb = api("GET", f"/repos/{REPO}/git/blobs/{remote_sha}", timeout=45)
                 if "__error__" not in rb and rb.get("encoding") == "base64":
                     try:
                         rts = _content_ts(base64.b64decode(rb["content"]))
@@ -556,6 +615,7 @@ def main():
                         rts = None
                     if rts and lts < rts:
                         regressed.append((path, lts, rts))
+                        _beat()
                         continue
         # -------------------------------------------------------------------
         payload = {"content": base64.b64encode(content).decode(), "encoding": "base64"}
@@ -590,8 +650,11 @@ def main():
             code = (b or {}).get("__error__")
             print(f"  ⚠️ 跳过（{BLOB_MAX_TRY} 次均失败，HTTP {code}）: {path}")
             failed_paths.append(path)
+            _beat()
             continue
         new_entries[path] = b["sha"]
+        _beat()
+        _beat()
 
     # ── 2026-08-15 根治「cn 单独推送 5 个 extra 文件后 ?v 失配」────────────
     # 仅当本次确实推送了 5 个 extra 文件中的一个，才原子更新 index.html 对应 ?v，
@@ -600,7 +663,8 @@ def main():
     # 绝不因此阻断整批 raw_data 推送。
     extra_changed = {p: files[p] for p in _EXTRA_FILES if p in new_entries}
     if extra_changed:
-        idx_meta = api("GET", f"/repos/{REPO}/contents/index.html")
+        # 🛡 2026-09-17：index.html（1.2MB）走短超时，避免大响应挂死拖垮整轮
+        idx_meta = api("GET", f"/repos/{REPO}/contents/index.html", timeout=90)
         if "__error__" not in idx_meta and "content" in idx_meta:
             idx_text = base64.b64decode(idx_meta["content"]).decode("utf-8", "replace")
             new_idx, idx_changed = _stamp_index_v(idx_text, extra_changed)

@@ -2879,7 +2879,7 @@ function fmtSigned(v){
       <button class="st-tab active" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
       <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
-      <button class="st-tab" data-st="life" onclick="switchSt('life')">📡 强势跟踪 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">原高手强势股跟踪</span></button>
+      <button class="st-tab" data-st="life" onclick="switchSt('life')">📡 强势跟踪</button>
       <button class="st-tab" data-st="fa" onclick="switchSt('fa')">🧪 因子 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐</span></button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·0⭐观测</span></button>
     </div>
@@ -3146,7 +3146,7 @@ function fmtSigned(v){
          另两个效果不佳，连同各自回测表一并下架（数据层不动，照常回测，只是不上屏）。 -->
     <div id="st-life" class="st-pane">
       <div class="card" id="imaStrongBody" style="border-left:4px solid #a78bfa;">
-        <div class="note" style="padding:20px;text-align:center;color:var(--dim);">📡 强势跟踪（原高手强势股跟踪）加载中…</div>
+        <div class="note" style="padding:20px;text-align:center;color:var(--dim);">📡 强势跟踪 加载中…</div>
       </div>
       <div class="card" id="imaBackCard" style="border-left:4px solid #a78bfa;margin-top:14px;">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
@@ -4842,7 +4842,7 @@ function fmtSigned(v){
        数据源 window.IMA_STRONG_BACKTEST（真实日K · 已扣双边 0.30%），
        由 __strongTrackBacktest() 适配成 _renderPeriodBacktestCard 认的 by_period 结构。
        ⚠️ 它来自 ima 外部同步，不进 v8 星级委员会 ⇒ 卡头显示「—」，不硬凑星。 */
-    {key:'strongtrack',name:'强势跟踪',     stars:0, icon:'📡', desc:'原「高手强势股跟踪」· ima 真实首次入选日 · 信号层回测', color:'#a78bfa', var:'__strongTrackBacktest'},
+    {key:'strongtrack',name:'强势跟踪',     stars:0, icon:'📡', desc:'ima 真实首次入选日 · 信号层回测', color:'#a78bfa', var:'__strongTrackBacktest'},
   ];
   // 2026-09-03 主人令：cockpit/allsite 大牛股/全站精选 全部移出回测区，DELISTED 保留为空数组
   //   (防止 _renderBacktestCardsFrom 空引用报错)。如需历史胜率回溯请前往逻辑详解页相关章节。
@@ -6514,7 +6514,7 @@ function fmtSigned(v){
         window.__imaRetry = (window.__imaRetry || 0) + 1;
         setTimeout(window.__renderImaStrongStock, 700);
       } else {
-        dst.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">📡 强势跟踪（原高手强势股跟踪 · ima 自动同步）<br><span style="font-size:11px">数据加载中…若长时间为空请硬刷新 (Ctrl/Cmd+F5)</span></div>';
+        dst.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">📡 强势跟踪（ima 自动同步）<br><span style="font-size:11px">数据加载中…若长时间为空请硬刷新 (Ctrl/Cmd+F5)</span></div>';
       }
       return;
     }
