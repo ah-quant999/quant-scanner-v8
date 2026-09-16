@@ -2103,25 +2103,52 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
               // 盘中快照：昨日数据可保留到今日 09:00 前，09:00 后清空等盘中刷新
               // 2026-08-16 修复：非交易日（周末/节假日）不判 stale，保留最近一个交易日数据
               var dayOfWeek = new Date(parseInt(mm[1],10), parseInt(mm[2],10)-1, parseInt(mm[3],10)).getDay();
-              var isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+              // 🛡 2026-09-16 修复缺陷2：原用 mm（=**今天**）算 dayOfWeek ⇒ 跨周末后
+              //   周一开盘必漏豁免（周五数据在周一 09:00 后被清空）。正确语义 = 今天若是周一或周末则不判陈旧。
+              var isWeekend = (dayOfWeek === 0 || dayOfWeek === 6 || dayOfWeek === 1);
               if(!isSameDay && !isWeekend && minutes >= 540){
                 isStale=true;
               }
             }
           }
         }
-        if(!d || !d.gen_time || isStale){
+        /* 🛡 2026-09-16 主人令「AI速览打不开了，紧急修复」（根因修复）
+           ------------------------------------------------------------
+           旧实现：isStale ⇒ 整卡清空为「AI市场速览数据暂不可用」+ return。
+           根因：把「**数据不是今天产的**」等同于「**没有数据**」。
+             本卡 intraday 档在 09:00–09:25 之间必然还没产出
+             （盘前 08:25 cron 只跑 premarket 档，intraday 首班等本机调度器派发），
+             而守卫恰在 09:00 开闸 ⇒ **每交易日 09:00 到首班盘中刷新之间，卡片 100% 空白**。
+             另：isWeekend 判的是「今天」而非「产出日」，跨周末后周一开盘必漏豁免。
+           修法（三档处置，信息不丢失）：
+             ① 无 d / 无 gen_time        ⇒ 真·无数据，保留空态（这种情况罕见）；
+             ② 数据陈旧（跨日且已过阈值）⇒ **照常渲染全部内容**，仅在卡片顶部加一条
+                黄色提示条说明「这是上一交易日的数据、正在等盘中刷新」；
+             ③ 数据当日               ⇒ 原样渲染，无提示。
+           为什么不是「直接删掉守卫」：陈旧确实是真实状态，主人需要知道；
+             但「陈旧」的呈现方式应是**在内容之上加一句说明**，而不是把内容整卡抹掉。
+           ============================================================ */
+        if(!d || !d.gen_time){
           contentEl.innerHTML='<div class="ipo-empty">AI市场速览数据暂不可用</div>';
           if(timeEl) timeEl.innerHTML = '<span style="font-size:11px;color:var(--dim)">—</span>';
           return;
         }
+        // 陈旧**不再** return，改为顶部提示条（下方 var h='' 之后拼首位）
+        var _staleBanner = isStale
+          ? '<div style="display:flex;align-items:center;gap:6px;padding:6px 12px;margin-bottom:8px;'
+            + 'background:rgba(251,191,36,.10);border:1px solid rgba(251,191,36,.38);border-radius:8px;'
+            + 'font-size:11.5px;line-height:1.5;color:#fbbf24;">'
+            + '<span style="font-weight:800;">⚠️ 上一交易日数据</span>'
+            + '<span style="color:var(--sub);">数据时间 <b style="color:#fbbf24;">'+d.gen_time.slice(5,16)+'</b>'
+            + '（'+d.market_status+'档），正在等盘中首班刷新 …</span></div>'
+          : '';
         if(timeEl){
           // 🛡️ 2026-09-13 主人令：本卡属「实时数据」页（盘中实时观察卡，09:25 起持续刷新），
           //   时段语义固定为**盘中**。旧实现按产出时刻自动判 ⇒ 15:3x 最后一次刷新
           //   被判「盘后」（主人截图实证：15:40 盘后）——盘中卡不该因收盘后刷一次就变盘后。
           timeEl.innerHTML = _uBadge('盘中', '短线', d.gen_time);
         }
-        var h='';
+        var h=_staleBanner;   // 2026-09-16：陈旧数据顶部提示条（无陈旧时为空串）
 
         /* ===== ⚖️ AI市场速览 = 全站唯一择时关口（2026-09-14 主人令） =====
            本函数聚合：① 仓位依据（来自 v8MarketGate 盘后回测 regime，唯一有回测证据）；
@@ -2149,8 +2176,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
            ③ 结论文本 / 配色 / 调和语逻辑一律不动（只动版式）。 */
         var _chip=function(txt,clr){ return '<span style="font-size:10px;font-weight:700;color:'+clr+';background:'+clr+'22;'
          + 'border:1px solid '+clr+'66;padding:0 5px;border-radius:4px;white-space:nowrap;">'+txt+'</span>'; };
-        var _pill=function(txt,clr){ return '<span style="font-weight:700;color:'+clr+';background:rgba(255,255,255,.08);'
-         + 'border:1px solid '+clr+'59;padding:1px 8px;border-radius:6px;white-space:nowrap;">'+txt+'</span>'; };
+        /* 2026-09-16 主人令：「AI速览这个全站唯一的评判，改成外发光」。
+           原样式 = 扁平底(rgba(255,255,255,.08)) + 1px 同色边 → 视觉与普通胶囊同档、不够"唯一裁决源"的分量。
+           改为外发光：① 去掉扁平灰底，改极淡同色底(2e)保住可读性；
+           ② 边框降至 1px 同色 82 提高锐度；
+           ③ 叠两层同色外发光（近圈 4px 强 + 远圈 10px 弱）营造光晕；
+           ④ 文字加同色 text-shadow 让字本身也"发亮"。 */
+        var _pill=function(txt,clr){ return '<span style="font-weight:700;color:'+clr+';background:'+clr+'2e;'
+         + 'border:1px solid '+clr+'82;padding:1px 8px;border-radius:6px;white-space:nowrap;'
+         + 'box-shadow:0 0 4px '+clr+'99,0 0 10px '+clr+'4d;'
+         + 'text-shadow:0 0 5px '+clr+'b3;">'+txt+'</span>'; };
         h+='<div style="display:flex;flex-direction:column;gap:4px;padding:7px 12px;margin-bottom:8px;'
          + 'background:'+_ga.color+'12;border:1px solid '+_ga.color+'59;border-radius:8px;font-size:11.5px;line-height:1.6;">'
          + '<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">'
