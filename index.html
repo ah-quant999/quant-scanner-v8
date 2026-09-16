@@ -9410,6 +9410,15 @@ window.__renderV8CalFull();
 })();
 
 /* ===== 打新速览：动态加载 + 内嵌兜底 ===== */
+
+/* 🔴 2026-09-16 主人令「还是看不了！一劳永逸修复」根因②：
+   renderLimitUpHeatmap 定义在本 script 块顶层，但**全站无任何调用点**
+   ⇒ 涨停热力矩阵卡永久停在 HTML 写死的「加载中…」。
+   （根因①即上方 L8963-8972 的 _nowLuh 未声明，已由前序提交修复；
+     但仅修根因①不解决「没人调用」，故卡片仍看不了 —— 本次补上调用链。）
+   此处导出到 window.__renderLimitUpHeatmap（沿用站内 __renderXxx 命名范式），
+   由页面末尾 initCardBadges 块统一触发（含 400/1200ms 延迟重试 + 1.5s 自愈轮询）。 */
+window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
 </script>
 <script>
 /* ===== 打新速览 v8（独立脚本块：绝不被其他脚本错误拖垮） =====
@@ -16404,6 +16413,12 @@ window.__renderV8CalToday();
   }
   // 实时数据区：情绪周期·连板天梯（迁到涨停热力矩阵上方）
   tryRun('renderCycleLadderCard', window.__renderCycleLadderCard, 'cycle-ladder init');
+  // 🔴 2026-09-16 主人令「还是看不了！一劳永逸修复」：补上 renderLimitUpHeatmap 的调用链。
+  //   三保险：① 立即调用 ② 400/1200ms 延迟重试（覆盖 defer 数据脚本晚于本 IIFE 执行）
+  //   ③ 1.5s 永久自愈轮询（见下方 selfHealLimitUpHeat，与 ceBody 同范式）。
+  tryRun('renderLimitUpHeatmap', window.__renderLimitUpHeatmap, 'limit-up-heatmap init');
+  setTimeout(function(){ tryRun('renderLimitUpHeatmap-late', window.__renderLimitUpHeatmap, 'limit-up-heatmap late retry'); }, 400);
+  setTimeout(function(){ tryRun('renderLimitUpHeatmap-late2', window.__renderLimitUpHeatmap, 'limit-up-heatmap late2 retry'); }, 1200);
   // 2026-08-16 修复：商品涨价弹性榜也在实时数据区，需在此处触发渲染（之前仅在盘后数据/选股策略>潜力参考触发）
   tryRun('fillCommodityElasticity', window._fillCommodityElasticity, 'commodity elasticity init');
   // 🛡 2026-08-19 主人令一劳永逸式修复：商品涨价弹性榜的 defer 脚本（line 1249 data/COMMODITY_ELASTICITY.js）
@@ -16425,6 +16440,24 @@ window.__renderV8CalToday();
         }
       }
       setTimeout(selfHealCeBody, 1000);
+    })();
+  }
+  // 🛡 2026-09-16 主人令「还是看不了！一劳永逸修复」第三道保险：涨停热力矩阵自愈轮询。
+  //   与 ceBody 同范式——每 1.5 秒检查 limitUpHeatContent 是否仍是「加载中…」，是则重渲染（幂等）。
+  //   三重兜底（init 调用 + 延迟重试 + 本永久轮询）叠加后，任一环节失效
+  //   （数据脚本晚到 / CDN 旧版 / 被其他提交覆盖）都能自愈，卡片不会再永久空着。
+  if(typeof window !== 'undefined' && !window.__luhHealStarted){
+    window.__luhHealStarted = true;
+    (function selfHealLimitUpHeat(){
+      var dst = document.getElementById('limitUpHeatContent');
+      if(dst){
+        var html = dst.innerHTML || '';
+        var isLoading = !html || html.indexOf('加载中') >= 0;
+        if(isLoading && typeof window.__renderLimitUpHeatmap === 'function'){
+          try{ window.__renderLimitUpHeatmap(); }catch(e){ console.warn('[limitUpHeat heal]', e); }
+        }
+      }
+      setTimeout(selfHealLimitUpHeat, 1500);
     })();
   }
   // ⛓ 任何后续切到 fv/crds tab 也只是再跑一次幂等
