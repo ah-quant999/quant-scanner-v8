@@ -3,7 +3,8 @@
 """
 v8_urgent_listener.py — 紧急指令监听 + 健康检查（v8 去 v6 化版）
 =========================================================
-监听 docs/ops/handover/ 下的紧急文件（*_URGENT_*.md，唯一交接目录），读取最新内容并：
+监听 docs/ops/handover/ 下的交接档（唯一交接目录；🔴 2026-09-16 起**全部 .md**，
+不再只认 *_URGENT_*.md —— 见下方 `_scan_handover_files_remote` 注释），读取最新内容并：
 1. 运行 guard_v8_freshness.py 生成数据新鲜度报告；
 2. 根据文件内容中的关键词自动 dispatch 对应 workflow；
 3. 输出摘要供 automation 向主人汇报。
@@ -100,8 +101,42 @@ def _hours_from_name(name):
     return (datetime.now(timezone(timedelta(hours=8))) - dt).total_seconds() / 3600.0
 
 
-def _scan_urgent_files_remote(ref):
-    """远端 tip 下的 *_URGENT_*.md 清单。返回 [文件名] 或 None（不可用）。"""
+def _name_sort_key(name):
+    """交接档排序键 = 文件名内嵌的日期时间（供升序排序）。
+
+    2026-09-16 新增：覆盖面放宽到全部交接档后，**单纯按文件名字符串倒序会出错** ——
+    遗留命名 ``URGENT_20260914_…`` / ``HANDOVER_…`` / ``AUDIT_…`` 的首字符
+    'U'/'H'/'A' ASCII 码大于 ``2026-…`` 的 '2' ⇒ 这些**旧档会被排到最前**，
+    把真正最新的交接挤出视野（实测：放宽首跑把 09-14 的 URGENT 排到了 09-16 前面）。
+    改按内嵌时间排序；两种口径都认：
+      · ``YYYY-MM-DD[_ ]HHMM``（现行命名，也认只有日期的 ``YYYY-MM-DD_``）
+      · ``YYYYMMDD_HHMM``（遗留命名）
+    无任何时间戳者归 ``datetime.min`` ⇒ 排最后，不污染头部。
+    """
+    for pat in (r"(\d{4})-(\d{2})-(\d{2})[_\s]?(\d{2})?(\d{2})?",
+                r"(\d{4})(\d{2})(\d{2})[_\s](\d{2})(\d{2})"):
+        m = re.search(pat, name)
+        if not m:
+            continue
+        try:
+            return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)),
+                            int(m.group(4) or 0), int(m.group(5) or 0))
+        except ValueError:
+            continue
+    return datetime.min
+
+
+def _scan_handover_files_remote(ref):
+    """远端 tip 下的【全部】交接档清单（.md）。返回 [文件名] 或 None（不可用）。
+
+    2026-09-16 放宽（P1 治本）：原先只认 ``*_URGENT_*.md`` ⇒ 小九的普通交接档
+    （``…_回执_…`` / ``HANDOVER_…`` / ``…_交接_…``）被整批漏读。实测 09-15 23:05
+    之后到 09-16 08:42 新增 13 份档（含小九 2150 档的 2139 全站 404 P0、
+    09-16 0830 主题空间卡二次覆盖 P0）**全部未进监听视野**。
+    ⇒ URGENT 从「过滤器」降为「标注」，覆盖面 = 全部交接档。
+    自动 dispatch 的安全性不靠文件名，由 ``parse_dispatch_commands`` 的
+    显式标记（``[ACTION]`` / ``!dispatch`` / ``# action:``）兜底 ⇒ 放宽不增风险。
+    """
     out = _git(["ls-tree", "-r", "--name-only", ref, "--", HANDOVER_REL + "/"])
     if out is None:
         return None
@@ -111,7 +146,7 @@ def _scan_urgent_files_remote(ref):
         if not rel or not rel.startswith(HANDOVER_REL + "/"):
             continue
         base = rel[len(HANDOVER_REL) + 1:]
-        if "_URGENT_" not in base or not base.endswith(".md"):
+        if not base.endswith(".md"):
             continue
         if base.startswith(("README", "_")):
             continue
@@ -127,16 +162,19 @@ def _fetch_remote():
 
 
 def recent_urgent_files(n=5):
-    """按【文件名倒序】= 时间倒序取最近 N 份（不用 mtime）。
+    """按【文件名内嵌时间】倒序取最近 N 份交接档（不用 mtime，也不用裸字符串序）。
+
+    覆盖面 = **全部**交接档（2026-09-16 放宽；原只认 *_URGENT_*.md，见
+    _scan_handover_files_remote 注释）。URGENT 只在输出里加 🔴 标注，不作过滤。
 
     远端优先；git 不可用时降级读本机工作树（并在输出里显式标注，不掩盖降级）。
     """
     _fetch_remote()
     ref = _remote_ref()
     if ref:
-        names = _scan_urgent_files_remote(ref)
+        names = _scan_handover_files_remote(ref)
         if names:
-            names.sort(reverse=True)
+            names.sort(key=_name_sort_key, reverse=True)
             return [{"name": nm, "repo_path": f"{HANDOVER_REL}/{nm}",
                      "src": "remote", "ref": ref, "local": HANDOVER_DIR / nm}
                     for nm in names[:n]]
@@ -144,9 +182,9 @@ def recent_urgent_files(n=5):
     d = HANDOVER_DIR
     if not d.is_dir():
         return []
-    local = sorted((p for p in d.glob("*_URGENT_*.md")
+    local = sorted((p for p in d.glob("*.md")
                     if not p.name.startswith(("README", "_"))),
-                   key=lambda p: p.name, reverse=True)
+                   key=lambda p: _name_sort_key(p.name), reverse=True)
     return [{"name": p.name, "repo_path": None, "src": "local",
              "ref": None, "local": p} for p in local[:n]]
 
@@ -251,7 +289,8 @@ def main():
     src = files[0]["src"] if files else "-"
     src_txt = {"remote": f"远端优先（{files[0]['ref']}）", "local": "⚠️ 降级：本机工作树（可能陈旧）",
                "-": "-"}[src]
-    out.append(f"## 最近 urgent 文件（{len(files)} 个）｜来源：{src_txt}")
+    urgent_n = sum(1 for f in files if "_URGENT_" in f["name"])
+    out.append(f"## 最近交接档（{len(files)} 个，其中 URGENT {urgent_n} 个）｜来源：{src_txt}")
     if not files:
         out.append("- 无")
     dispatch_cmds = []
@@ -259,7 +298,8 @@ def main():
         head = read_head(item, 40)
         age_h = item_age_hours(item)
         stamp = f"{age_h:.1f}h" if age_h == age_h else "n/a"
-        out.append(f"- **{item['name']}** (距文件名时间={stamp}，仅参考；排序以文件名为准)")
+        flag = "🔴 URGENT " if "_URGENT_" in item["name"] else "📄 "
+        out.append(f"- {flag}**{item['name']}** (距文件名时间={stamp}，仅参考；排序以文件名为准)")
         out.append("```markdown")
         out.append(head)
         out.append("```")
@@ -280,7 +320,7 @@ def main():
     out.append("")
     out.append("## 自动 dispatch")
     if not dispatch_cmds:
-        out.append("- 最新 urgent 文件未识别到自动 dispatch 指令，无需操作。")
+        out.append("- 最新交接档未识别到自动 dispatch 指令，无需操作。")
     else:
         for reason, wf, payload in dispatch_cmds:
             if dry:
