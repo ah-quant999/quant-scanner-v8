@@ -3917,8 +3917,25 @@ def main(category=None, only=None):
                 "fail": sum(1 for v in _run_status.values() if v.get("status") == "fail"),
             },
         }
-        with open(RAW_DIR / "runner_status.json", "w", encoding="utf-8") as f:
-            json.dump(runner_status, f, ensure_ascii=False, separators=(",", ":"), default=str)
+        # 🛡 2026-09-16 并集写（主人令「运维页一直被覆盖成旧版，一劳永逸」）：
+        #   raw_data/runner_status.json 有两个写入者，字段集互不重叠 ——
+        #     本文件（抓取链）：run_time / category / hostname / modules / summary
+        #     v8_runner_guard.py（健康巡检）：update_time / status / process / service /
+        #                                    worker_logs / github / runner_env / actions_taken / message
+        #   旧实现整文件盲覆盖 ⇒ 互相抹字段（guard 抹掉 run_time 会让前端渲染
+        #   「暂无 runner 状态」）。此处先铺旧键再覆盖本次抓取键，保住健康字段。
+        _rs_path = RAW_DIR / "runner_status.json"
+        _merged = {}
+        try:
+            if _rs_path.exists():
+                _old_rs = json.loads(_rs_path.read_text(encoding="utf-8"))
+                if isinstance(_old_rs, dict):
+                    _merged.update(_old_rs)
+        except Exception:
+            pass
+        _merged.update(runner_status)
+        with open(_rs_path, "w", encoding="utf-8") as f:
+            json.dump(_merged, f, ensure_ascii=False, separators=(",", ":"), default=str)
         print(f"📋 runner_status: {runner_status['summary']}")
     except Exception as e:
         print(f"  ⚠️ 写入 runner_status 失败: {e}")

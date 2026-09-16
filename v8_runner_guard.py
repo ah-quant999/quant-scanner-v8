@@ -526,11 +526,33 @@ def send_alert(subject, body):
 
 
 def write_status_file(status_dict):
-    """写入 raw_data/runner_status.json。"""
+    """写入 raw_data/runner_status.json（🛡 2026-09-16 并集写，不再盲覆盖）。
+
+    🔴 根因（2026-09-16 20:xx 实测取证，主人令「运维页一直被覆盖成旧版，一劳永逸」）：
+      本文件有**两个写入者，字段集互不重叠**，旧实现两边都是整文件盲覆盖 ——
+        · cloud_fetch_v8.py（抓取链）：run_time / category / hostname / modules / summary
+        · 本守卫（健康巡检）：update_time / status / process / service / worker_logs /
+                              github / runner_env / actions_taken / message
+      谁后写谁把对方字段整段抹掉：
+        guard 抹掉 run_time ⇒ update_v8.py 把 modules 补成全 skip（实测 73/73 skip）
+        ⇒ 前端 renderRunnerTrack 的 `if(!rs || !rs.run_time)` 命中
+        ⇒ 运维页「数据健康总览」渲染「暂无 runner 状态」＝主人看到的「被覆盖成旧版」。
+      修法：**读旧文件 → 先铺旧键 → 再用本次健康字段覆盖同名键**（并集写）。
+      守卫只拥有自己的健康字段，绝不越权删除抓取链的 run_time / modules / summary。
+    """
     RAW_DIR = Path(__file__).resolve().parent / "raw_data"
     RAW_DIR.mkdir(exist_ok=True)
     path = RAW_DIR / "runner_status.json"
-    path.write_text(json.dumps(status_dict, ensure_ascii=False, indent=2), encoding="utf-8")
+    merged = {}
+    try:
+        if path.exists():
+            _old = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(_old, dict):
+                merged.update(_old)
+    except Exception as e:
+        print(f"[WARN] 读取旧 runner_status.json 失败，按新建处理: {e}")
+    merged.update(status_dict)
+    path.write_text(json.dumps(merged, ensure_ascii=False, indent=2), encoding="utf-8")
     return path
 
 
@@ -565,6 +587,7 @@ def push_status_file(path):
         req = urllib.request.Request(api, headers=headers, method="GET")
         sha = None
         remote_b64 = ""
+        remote_json = None
         try:
             with urllib.request.urlopen(req, timeout=25) as r:
                 remote = json.loads(r.read().decode("utf-8"))
@@ -573,6 +596,25 @@ def push_status_file(path):
         except urllib.error.HTTPError as e:
             if e.code != 404:
                 return False, f"GET sha 失败: HTTP {e.code}"
+        # 1.5) 🛡 2026-09-16 跨机并集：远端可能已被 cloud_fetch 写入更新的抓取链字段，
+        #      本地守卫的 health 字段与它的 run_time/modules/summary 字段集互不重叠
+        #      ⇒ 取 (远端 ∪ 本地)，本地优先，避免任何一方被抹掉。
+        if remote_b64:
+            try:
+                remote_json = json.loads(base64.b64decode(
+                    remote_b64.replace("\n", "")).decode("utf-8"))
+            except Exception:
+                remote_json = None
+        if isinstance(remote_json, dict):
+            try:
+                local_json = json.loads(content.decode("utf-8"))
+            except Exception:
+                local_json = None
+            if isinstance(local_json, dict):
+                union = dict(remote_json)
+                union.update(local_json)
+                content = json.dumps(union, ensure_ascii=False,
+                                     indent=2).encode("utf-8")
         # 2) 远端内容与本地相同 → 跳过推送
         if sha and remote_b64:
             try:
