@@ -387,36 +387,53 @@ def parse_dispatch_commands(text, mtime_hours=24):
 
 
 def _strip_code(text):
-    """去掉围栏代码块与行内 ``code`` 片段。
+    """去掉围栏代码块与行内 ``code`` 片段（**含双反引号**）。
 
-    交接档经常**引用**指令标记来讨论它（实测小九 `1320` 回执正文里就原样写了
-    ``# action:`` 作说明）⇒ 不剥引用就扫描多档会**误派**。
+    交接档经常**引用**指令标记来讨论它（实测小九 `1320` 回执、以及本机 `1322` 档
+    都原样写了标记做示例）⇒ 不剥引用就会**误派**。
+    🔴 2026-09-16 实测补刀：只按**单**反引号配对会漏 —— 写 ``` `` `示例` `` ``` 这种
+    「双反引号包行内反引号」的写法，配对会错位，示例标记**活下来**并真的触发了派发。
+    ⇒ 必须先剥双反引号对，再剥单反引号对。
     """
     text = re.sub(r"```.*?```", "", text, flags=re.S)
     text = re.sub(r"~~~.*?~~~", "", text, flags=re.S)
+    text = re.sub(r"``.+?``", "", text, flags=re.S)
     text = re.sub(r"`[^`\n]*`", "", text)
     return text
 
 
+# 🔴 指令行的**严格语法**（多档扫描的误派防火墙）：
+#   整行 = [行首装饰] + [标记] + dispatch + <workflow 名> + [收尾标点]，**其余一律不算**。
+#   · 行首装饰：`>`/`-`/`*`/`•` 与 `#`(≤3 个)
+#   · 标记：`[ACTION]` / `ACTION:`（大小写不敏感）/ `!dispatch`
+#   · workflow 名必须**显式**给出且在 WF_MAP 中；**不做关键词推断**
+# 为什么要「整行唯一」：草案版只要求「行内含标记 + 行内含 dispatch <wf>」⇒
+#   实测**本机自写的测试档**（正文里举例 `- [ACTION] dispatch algo_cloud`）把自己
+#   判成了指令，误派 2 次（cn_fetch_cloud + algo_cloud）。收紧到「整行唯一位」后
+#   任何「引用/举例/表格行」都不再命中。
+_DIRECTIVE_RE = re.compile(
+    r"^\s*[>\-*•]*\s*#{0,3}\s*"
+    r"(?:(?:\[ACTION\]|ACTION:)\s*dispatch|!dispatch)\s+"
+    r"([A-Za-z_][A-Za-z_0-9]*)\s*[.。！!]*\s*$", re.I)
+
+
 def explicit_directives(text):
-    """**收紧版**指令识别：只认「独立成行的显式指令 + 档内显式命名的 workflow」。
+    """**收紧版**指令识别：只认「独立成行、语法唯一」的显式指令 + 档内显式 workflow 名。
 
     2026-09-16 P-A 治本（第三步）：原实现只对 ``files[0]`` 判 action 标记 ⇒ 一旦
     排序把旧档（含超前命名档）顶到首位，真实新指令就被静默漏派。放宽扫描面必须同时
-    把误派风险压到最低 ⇒ 对 ``files[1:]`` 只接受：
-      ① 独立成行（可带 ``-``/``*``/``>``/``#`` 前缀）的 ``[ACTION]`` / ``ACTION:`` /
-         ``!dispatch`` / ``# action:`` 行；
-      ② 该行内**显式出现** ``dispatch <workflow 名>``（不做关键词推断）。
-    风险实测：对近 30 档扫出 0 条误派（见交接档测试记录）。
+    把误派风险压到最低 ⇒ 对 ``files[1:]`` 只接受 ``_DIRECTIVE_RE`` 那种**整行唯一**
+    的写法（见其上方注释；一经实测收紧：自测档误派 2 次 → 0 次）。
     """
     cmds = []
     for line in _strip_code(text).splitlines():
-        s = line.strip().lstrip("*->#").strip()
-        if not re.match(r"^(?:\[ACTION\]|ACTION:|!dispatch\b|action:)", s, re.I):
+        m = _DIRECTIVE_RE.match(line)
+        if not m:
             continue
-        for key, (wf, payload) in WF_MAP.items():
-            if re.search(rf"\bdispatch\s+{key.replace('_', '[_-]?')}\b", s, re.I):
-                cmds.append((f"显式指令行 dispatch {key}", wf, payload))
+        key = m.group(1).lower()
+        if key in WF_MAP:
+            wf, payload = WF_MAP[key]
+            cmds.append((f"显式指令行 dispatch {key}", wf, payload))
     return cmds
 
 
