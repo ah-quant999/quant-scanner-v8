@@ -1809,6 +1809,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/MOMENTUM_FILTER.js?v=1789557198" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=1789557198" defer></script>
+    <script src="data/STRONG_BREAKOUT_BACKTEST.js?v=1789557198" defer></script>
+    <script src="data/IMA_STRONG_BACKTEST.js?v=1789557198" defer></script>
     <script src="data/CRDS_BACKTEST.js?v=1789557198" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -3148,6 +3150,30 @@ function fmtSigned(v){
         <div class="note" style="padding:20px;text-align:center;color:var(--dim);">📡 高手强势股跟踪（ima 自动同步）加载中…</div>
       </div>
       <!-- 2026-09-03 主人令：因子实验室迁至「暂未上架」（★★ 观测仓·调试与回测中；升 4⭐ 再转正选股策略子页），此处移除 -->
+      <div class="card" id="lifeBackCard" style="border-left:4px solid #38bdf8;margin-top:14px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 回测 N 日胜率（信号层） - 历史</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>
+        </div>
+        <div class="note" id="lifeBackNote">加载中…</div>
+        <table id="lifeBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>中位数</th><th>最好</th><th>最差</th><th>最大回撤</th></tr></thead><tbody id="lifeBackBody"></tbody></table>
+      </div>
+      <div class="card" id="sbBackCard" style="border-left:4px solid #ef5350;margin-top:14px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 回测 N 日胜率（信号层） - 历史</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>
+        </div>
+        <div class="note" id="sbBackNote">加载中…</div>
+        <table id="sbBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>中位数</th><th>最好</th><th>最差</th><th>最大回撤</th></tr></thead><tbody id="sbBackBody"></tbody></table>
+      </div>
+      <div class="card" id="imaBackCard" style="border-left:4px solid #a78bfa;margin-top:14px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 回测 N 日胜率（信号层） - 历史</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>
+        </div>
+        <div class="note" id="imaBackNote">加载中…</div>
+        <table id="imaBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>中位数</th><th>最好</th><th>最差</th><th>最大回撤</th></tr></thead><tbody id="imaBackBody"></tbody></table>
+      </div>
     </div><!--/st-life-->
 
 
@@ -8140,7 +8166,7 @@ window.__renderIndexObserve = function(){
   // 数据源：raw_data/factor_progress.json（由 gen_factor_progress.py 根据 FACTOR_AUDIT + 主人分批决策生成）
   window.__fpRetry = 0;
 
-  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderBtExtraPane(); }catch(e){} try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderObsPlatform(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeObserve(); }catch(e){} try{ window.__renderIndexObserve(); }catch(e){} try{ window.__renderFactorAudit(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} }
+  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderBtExtraPane(); }catch(e){} try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderObsPlatform(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeObserve(); }catch(e){} try{ window.__renderIndexObserve(); }catch(e){} try{ window.__renderFactorAudit(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} } try{ window.renderLifeBacktests(); }catch(e){}
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
   } else {
@@ -13892,7 +13918,71 @@ window.showRestrictedItems = showRestrictedItems;
     }).join('');
   }
 
-  function fvRenderSelf(track){
+function lifeRenderBacktest(bodyId, noteId, periods, meta){
+    var body = document.getElementById(bodyId);
+    var note = document.getElementById(noteId);
+    if(!body) return;
+    if(!periods || typeof periods!=='object'){
+      if(note) note.textContent='回测数据未加载';
+      body.innerHTML='<tr><td colspan="8" style="color:var(--sub);text-align:center">回测数据未加载</td></tr>';
+      return;
+    }
+    var keys = Object.keys(periods).map(function(k){ return [parseInt(String(k).replace('d',''),10), k]; })
+                  .filter(function(p){ return !isNaN(p[0]); })
+                  .sort(function(a,b){ return a[0]-b[0]; });
+    if(note && meta){
+      note.textContent = (meta.method||'') + (meta.total_signals!=null?'；信号 '+meta.total_signals+' 笔':'') + (meta.signal_date_range?'；区间 '+meta.signal_date_range:'') + (meta.generated?'；数据截至 '+rel(meta.generated):'');
+    }
+    if(!keys.length){
+      body.innerHTML='<tr><td colspan="8" style="color:var(--sub);text-align:center">回测分层尚未产出（待回测批运行）</td></tr>';
+      return;
+    }
+    body.innerHTML = keys.map(function(p){
+      var k=p[0], v=periods[p[1]]||{};
+      var immature = (v.samples==null || v.samples===0);
+      var samp = immature ? '<span style="color:var(--dim)">0（未成熟）</span>' : (v.samples==null?'—':v.samples);
+      function wrap(val, cls){
+        if(immature || val==null) return '<td style="color:var(--dim)">—</td>';
+        return '<td'+(cls?' '+cls:'')+'>'+val+'</td>';
+      }
+      return '<tr>'
+        + '<td>T+'+k+'日</td>'
+        + '<td>'+samp+'</td>'
+        + wrap(fvNum(v.win_rate,1)+'%', immature?'':pnlClass(v.win_rate!=null?v.win_rate-50:null))
+        + wrap(fvPct(v.avg_return), immature?'':pnlClass(v.avg_return))
+        + wrap(fvPct(v.median_return), '')
+        + wrap(fvPct(v.best_return), 'class="up"')
+        + wrap(fvPct(v.worst_return), 'class="down"')
+        + wrap(v.max_drawdown==null?'—':fvNum(v.max_drawdown,2)+'%', 'class="down"')
+        + '</tr>';
+    }).join('');
+  }
+
+  window.renderLifeBacktests = function(){
+    try{
+      var trk = window.ALGO_TRACK;
+      var lh = trk && trk.algos && trk.algos[0] && trk.algos[0].stats && trk.algos[0].stats.by_horizon;
+      lifeRenderBacktest('lifeBackBody','lifeBackNote', lh, {
+        method:'口径：信号日收盘买入，持有 N 日收盘卖出（真实日K，扣双边 0.30%）'
+      });
+    }catch(e){ console.warn('生命周期回测渲染失败',e); }
+    try{
+      var sb = window.STRONG_BREAKOUT_BACKTEST;
+      lifeRenderBacktest('sbBackBody','sbBackNote', sb && sb.periods, {
+        method: sb && sb.method, total_signals: sb && sb.total_signals,
+        signal_date_range: sb && sb.signal_date_range, generated: sb && sb.generated
+      });
+    }catch(e){ console.warn('强势突破回测渲染失败',e); }
+    try{
+      var im = window.IMA_STRONG_BACKTEST;
+      lifeRenderBacktest('imaBackBody','imaBackNote', im && im.periods, {
+        method: im && im.method, total_signals: im && im.total_signals,
+        signal_date_range: im && im.signal_date_range, generated: im && im.generated
+      });
+    }catch(e){ console.warn('IMA 回测渲染失败',e); }
+  };
+
+                    function fvRenderSelf(track){
     var note=$('fvSelfNote'), body=$('fvSelfBody');
     if(!body) return;
     var sb = (track && track.self_backtest) || null;
@@ -14145,6 +14235,7 @@ window.showRestrictedItems = showRestrictedItems;
     if(n==='life' && typeof window.__renderLifecycleSection==='function') setTimeout(window.__renderLifecycleSection, 30);
     if(n==='life' && typeof window.__renderImaStrongStock==='function') setTimeout(window.__renderImaStrongStock, 30);
     if(n==='life' && typeof window.__renderStrongBreakout==='function') setTimeout(window.__renderStrongBreakout, 30);
+    if(n==='life' && typeof window.renderLifeBacktests==='function') setTimeout(window.renderLifeBacktests, 60);
     // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
     if(n==='fa'){
       if(typeof window.__renderFactorPane==='function') setTimeout(window.__renderFactorPane, 30);

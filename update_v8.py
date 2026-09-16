@@ -139,6 +139,17 @@ DATA_SOURCES = {
     #   refresh 工作流为唯一写入方，根因消除。其余卡仍由本映射正常重建。
     "avg_price_data.json":         "AVG_PRICE_DATA",
     "algo_track.json":              "ALGO_TRACK",   # 2026-08-15 三算法独立追踪（四量终极/板块龙头/大牛股猎手）
+    "strong_breakout_backtest.json": "STRONG_BREAKOUT_BACKTEST",  # 2026-09-16 生命周期子页·强势突破信号层真实回测
+    "ima_strong_backtest.json":      "IMA_STRONG_BACKTEST",       # 2026-09-16 生命周期子页·高手强势股跟踪信号层真实回测
+
+
+
+
+
+
+
+
+
     "weekend_meta_report.json":      "WEEKEND_META_REPORT",
     # 🛡 2026-08-29 一劳永逸式修复：DELISTED_STOCKS 已删（1MB 死数据，全站 0 渲染引用，renderDelisted 走 CANDIDATE）
     # 映射移除后 update_v8.py 不再尝试写 data/DELISTED_STOCKS.js；data/HEALTH_CHECK.js 健康巡检条目待下次跑批自动收敛
@@ -303,6 +314,17 @@ CATEGORY_MAP = {
     "AVG_PRICE_DATA": "intraday,post_close",
     # 2026-08-15：ALGO_TRACK 依赖 FINAL_RECOMMEND_DATA + FOUR_VOLUME，归属盘后
     "ALGO_TRACK": "post_close",
+    "STRONG_BREAKOUT_BACKTEST": "post_close",  # 2026-09-16 信号层真实回测（与 FOUR_VOLUME 同盘后节奏）
+    "IMA_STRONG_BACKTEST":      "post_close",
+    
+    
+    
+    
+    
+    
+    
+    
+    
     # 2026-08-19：INDEX_HISTORY（5年K线）数据源（盘后跑，与算法链节奏一致）
     "INDEX_HISTORY": "post_close",
     # 2026-08-19：板块推荐框架数据源（盘后跑宏观+板块融合；MACRO.js 已删孤儿→不注册）
@@ -1332,6 +1354,35 @@ def run_experiment_cards():
             print(f"[experiment]   ⚠️ gen_strong_breakout 异常: {e}")
     else:
         print("[experiment] ⚠️ 缺失 scripts/gen_strong_breakout.py，跳过")
+        life_bt_py = Path(__file__).resolve().parent / "algorithms" / "backtest_life_cards.py"
+        try:
+            print(f"[experiment] ▶ backtest_life_cards.py ({datetime.now():%H:%M:%S})")
+            r = subprocess.run([sys.executable, str(life_bt_py)], capture_output=True, text=True, timeout=900)
+            if r.returncode != 0:
+                print(f"[experiment]   ❌ backtest_life_cards 退出码 {r.returncode}")
+                if r.stderr: print(r.stderr[-400:])
+            else:
+                print("[experiment]   ✅ backtest_life_cards 完成（强势突破/高手强势股跟踪 真实信号层回测已产出）")
+        except Exception as e:
+            print(f"[experiment]   ⚠️ backtest_life_cards 异常: {e}")
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 
     # 2026-08-16 主人令：动量共识筛选器（读 data/STOCK_MOMENTUM_STATE_V2.js + STOCK_QUOTE + SECTOR_RS）
     filter_py = Path(__file__).resolve().parent / "scripts" / "momentum_common_filter.py"
