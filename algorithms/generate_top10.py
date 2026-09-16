@@ -666,6 +666,167 @@ def _p4_partial(full, ratio):
     return v if v else (1 if full > 0 else -1)
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 🔴 P5 walk-forward 达标因子（2026-09-16 主人令）
+#   原话：「这些马上回测，不好的不要的就删除，留下可用的优质因子，全部接入。
+#          不要整个版面都在等待，一直也解决不了！」
+#
+# 真源：raw_data/factor_walkforward.json（algorithms/factor_walkforward.py 跑出，2026-09-16 首跑）
+#   判据：IR_OOS > 0.3 且 ≥4/5 年 Top 层「跑赢同期全池等权基准」占比 > 55%
+#   首跑 8 个 K 线因子 → 达标 2 / 删除 6：
+#     ✅ amt60     60 日成交额中位数（低流动性溢价） hold=10  IR_OOS 0.877
+#                  利差 +0.947%/10日 · OOS 利差 +0.745% · Top 跑赢基准率 64.7% · 7/8 年 >55%
+#     ✅ turntrend 换手率趋势（20日均量/240日均量 取负 = 缩量=强势） hold=5  IR_OOS 0.872
+#                  利差 +0.392%/5 日 · OOS 利差 +0.432% · Top 跑赢基准率 60.2% · 7/8 年 >55%
+#     ❌ 删除（不进评分）：mom12_1 / resid_mom / max20 / ivol60 / overnight20 / vol60
+#
+# 权重口径（与 P4 同构，禁特立独行）：
+#   · 分层：walk-forward 用全市场五分位(L1 最强)；本处取【候选池内分位】前 20% / 20~40% 两档。
+#     理由：本因子只用于「池内排序」，池内分位才是落地口径；walk-forward 验证的是方向与强度。
+#     ⚠️ 已知口径偏离（已留痕）：未按「金股池 subset」复跑 walk-forward，池内单调性列为下一轮待办。
+#   · 满额档 +6 / 次档 +3：6 与 P4 单因子上限 ±6 对齐（同为 K 线可得单因子的权限），
+#     两因子合计上限 +12 < P3 四因子合计 +13，远小于单信号上限 ±30。
+#   · 闸门：仅当 factor_walkforward.json 里 verdict=PASS 才启用（未来复跑不达标 ⇒ 自动失效）；
+#     edge 只用于方向与启用判定，**不做放大系数** —— walk-forward edge 的单位（%/持有期）
+#     与 P2 信号 edge（事件频率口径）不同，直接乘 2.5 会把 0.95% 压成 +2 分，
+#     反而低于尚未回测的 P3 因子（≤+13），属口径倒挂。
+#   · 只加分不扣分：反向档位在 walk-forward 里无显著负 edge，不给凭空的惩罚。
+#   · amt60 附加流动性下限：60 日均成交额 < 3000 万元 ⇒ 不给分（过滤仙股 / 容量不可用）。
+#     ⚠️ 这是对原始回测口径的**保守偏离**：原始回测用全市场五分位 + 平坦 0.20% 往返成本，
+#     未计入极低流动性个股的真实冲击成本 ⇒ 本处只减不增，方向安全。
+#     ⚠️ 量纲铁证：kline_cache.volume 单位为「手」（实测 000039 2026-09-11 缓存 322622
+#        对 新浪 32,262,172 股，恰好 ×100）⇒ 成交额 = vol × 100 × close。
+#        兜底源 akshare.stock_zh_a_daily 的 volume 为「股」⇒ 量纲不一致。
+#        本处用「量纲哨兵」识别（池内中位成交额须落在 A 股常识区间），哨兵报警时
+#        **自动放弃绝对下限过滤**，绝不因量纲问题静默把整列因子清零（首版实测踩过）。
+#   · 候选池 < 20 只 ⇒ 全 0（分位无意义，不硬造）。
+# ─────────────────────────────────────────────────────────────────────────────
+P5_FALLBACK = {
+    "amt60":     {"hold": 10, "edge10": 0.947, "n": 170},
+    "turntrend": {"hold": 5,  "edge10": 0.392, "n": 171},
+}
+P5_TIER_FULL, P5_TIER_HALF = 6, 3
+P5_TOP_Q, P5_MID_Q = 0.20, 0.40
+P5_MIN_POOL = 20
+P5_MIN_EDGE = 0.30                              # |利差| 低于此不启用（防噪）
+P5_AMT60_FLOOR_YUAN = 3000.0 * 10000.0          # 60 日均成交额下限 3000 万元
+P5_AMT_MEDIAN_LO, P5_AMT_MEDIAN_HI = 1.0e8, 2.0e10   # 量纲哨兵：池内中位应落在 1 亿~200 亿
+
+P5_ON, P5_EDGE, P5_META = {}, {}, {}
+_P5_PCT = {}                                    # 候选池内分位缓存（main 入口一次预扫）
+try:
+    _fw5 = load_json(os.path.join(DATA_DIR, "factor_walkforward.json"), {})
+    for _k5, _r5 in (_fw5.get("factors") or {}).items():
+        if _k5 not in P5_FALLBACK:
+            continue
+        _sp5 = _r5.get("spread_avg_pct")
+        if _r5.get("verdict") != "PASS" or _sp5 is None or abs(float(_sp5)) < P5_MIN_EDGE:
+            P5_ON[_k5] = False                  # 未达标/证据不足 ⇒ 自动失效
+            continue
+        P5_ON[_k5] = True
+        P5_EDGE[_k5] = {"hold": int(_r5.get("hold") or 10), "edge10": float(_sp5),
+                        "n": int(_r5.get("n_points") or 0)}
+        P5_META[_k5] = {"ir_oos": _r5.get("ir_oos"), "beat_base": _r5.get("beat_base_rate"),
+                        "years": _r5.get("years_beat_gt55"), "years_total": _r5.get("years_total"),
+                        "run_at": _fw5.get("update_time")}
+except Exception as _e5:
+    print(f"  ⚠️ P5 walk-forward 权重加载失败，回退硬编码默认: {_e5}")
+for _k5, _v5 in P5_FALLBACK.items():
+    P5_EDGE.setdefault(_k5, dict(_v5))
+    P5_ON.setdefault(_k5, True)
+
+
+def _p5_turntrend_metrics(code):
+    """换手率趋势原始比 = mean(vol[-20:]) / mean(vol[-240:])；越小越强（缩量）。
+    数据不足 240 根返回 None（宁缺毋假）。"""
+    recs = _load_kline_full(code)
+    if len(recs) < 240:
+        return None
+    v = [float(r.get("volume") or 0) for r in recs]
+    base = sum(v[-240:]) / 240.0
+    if base <= 0:
+        return None
+    return (sum(v[-20:]) / 20.0) / base
+
+
+def _p5_amt60_metrics(code):
+    """60 日均成交额（元）= mean(vol[-60:]) × 100 × mean(close[-60:])；越小越强。
+    ⚠️ ×100 的理由见上方 P5 段头注「量纲铁证」（kline_cache.volume 单位为「手」）。
+    数据不足 60 根返回 None。"""
+    recs = _load_kline_full(code)
+    if len(recs) < 60:
+        return None
+    seg = recs[-60:]
+    v = sum(float(r.get("volume") or 0) for r in seg) / 60.0
+    c = sum(float(r.get("close") or 0) for r in seg) / 60.0
+    return v * 100.0 * c
+
+
+def _p5_percentile(values):
+    """{code: value} → {code: 分位(0~1，1=值最大)}；缺失值不参与分位；样本不足返回 {}。"""
+    ok = {c: v for c, v in values.items() if v is not None}
+    n = len(ok)
+    if n < P5_MIN_POOL:
+        return {}
+    out = {}
+    for i, (c, _v) in enumerate(sorted(ok.items(), key=lambda kv: kv[1])):
+        out[c] = (i + 0.5) / n
+    return out
+
+
+def _p5_tier_score(pct):
+    """分位 → 分档分。本处两个因子的原始量都是「越小越强」⇒ strength = 1 − pct。"""
+    if pct is None:
+        return 0
+    strength = 1.0 - pct
+    if strength >= 1.0 - P5_TOP_Q:
+        return P5_TIER_FULL
+    if strength >= 1.0 - P5_MID_Q:
+        return P5_TIER_HALF
+    return 0
+
+
+def p5_prepass(codes):
+    """候选池一次预扫：算 turntrend / amt60 原始值 → 池内分位 → 全局缓存 _P5_PCT。"""
+    global _P5_PCT
+    raw_t, raw_a = {}, {}
+    for c in codes:
+        try:
+            if P5_ON.get("turntrend"):
+                raw_t[c] = _p5_turntrend_metrics(c)
+            if P5_ON.get("amt60"):
+                raw_a[c] = _p5_amt60_metrics(c)
+        except Exception:
+            continue
+    # ── amt60 流动性下限 + 量纲哨兵 ──
+    #   量纲哨兵：池内中位 60 日成交额必须落在 A 股常识区间（1 亿~200 亿）。
+    #   落在区间外 ⇒ 兜底源量纲与 kline_cache 不一致（akshare volume 为「股」）
+    #   ⇒ **放弃绝对下限过滤**，只保留分位加分（绝不静默清零整列因子）。
+    _av = sorted(v for v in raw_a.values() if v)
+    _amed = _av[len(_av) // 2] if _av else 0
+    _floor_on = bool(_av) and (P5_AMT_MEDIAN_LO <= _amed <= P5_AMT_MEDIAN_HI)
+    if _av and not _floor_on:
+        print(f"  ⚠️ P5 amt60 量纲哨兵报警：池内中位 60 日成交额 {_amed / 1e8:.3f} 亿 "
+              f"不在常识区间 {P5_AMT_MEDIAN_LO / 1e8:.1f}~{P5_AMT_MEDIAN_HI / 1e8:.0f} 亿 "
+              f"⇒ 本轮放弃绝对下限过滤（仅保留分位加分）")
+    pt, pa = _p5_percentile(raw_t), _p5_percentile(raw_a)
+    out = {}
+    for c in codes:
+        rec = {}
+        if c in pt:
+            rec["turntrend"] = pt[c]
+        if c in pa:
+            _amtc = raw_a.get(c)
+            if (not _floor_on) or (_amtc is not None and _amtc >= P5_AMT60_FLOOR_YUAN):
+                rec["amt60"] = pa[c]
+        if rec:
+            out[c] = rec
+    _P5_PCT = out
+    print(f"     P5 分位覆盖：turntrend {len(pt)}/{len(codes)} · amt60 {len(pa)}/{len(codes)}"
+          f" · 下限过滤={'开' if _floor_on else '关'} · 池内中位成交额 {_amed / 1e8:.2f} 亿")
+    return out
+
+
 def _migrate_old_top10_scores(hist_dir):
     """将历史 top10_daily_YYYYMMDD.json 中旧 raw 评分（>100）统一归一化到 0~100，
     保证回测与阈值口径一致。
@@ -897,6 +1058,23 @@ def main():
             if tags:
                 ind_map[clean] = tags
 
+    # ── 3.5 P5 预扫（2026-09-16）：候选池内分位一次算好，供循环内 O(1) 取用 ──
+    _p5_codes = []
+    for _k5, _s5 in gp_stocks.items():
+        _c5 = _s5.get("code", "") or _k5.replace("sz_", "").replace("sh_", "").replace("hk_", "")
+        if _c5:
+            _p5_codes.append(_c5)
+    _p5_codes = sorted(set(_p5_codes))
+    _p5_map = p5_prepass(_p5_codes)
+    print(f"  🧪 P5 walk-forward 因子：池内分位覆盖 {len(_p5_map)}/{len(_p5_codes)} 只 · "
+          f"启用 {[k for k, v in P5_ON.items() if v]}")
+    for _k5 in P5_FALLBACK:
+        _m5 = P5_META.get(_k5) or {}
+        if P5_ON.get(_k5):
+            print(f"     ✅ {_k5}：hold={P5_EDGE[_k5]['hold']}d 利差={P5_EDGE[_k5]['edge10']:.3f}% "
+                  f"IR_OOS={_m5.get('ir_oos')} 跑赢基准率={_m5.get('beat_base')}% "
+                  f"({_m5.get('years')}/{_m5.get('years_total')} 年)")
+
     # ── 4. 计算多维共振评分 ──
     scored = []
     VETO_COUNT = 0  # 质差一票否决计数（2026-09-07 主人令）
@@ -1028,6 +1206,24 @@ def main():
                 p4_score += _s_rm
                 p4_detail.append(f"残差动量{_rm:+.1f}%{_s_rm:+d}")
         enhance += p4_score
+
+        # ── P5 walk-forward 达标因子（2026-09-16 主人令「全部接入」）──
+        # amt60 60日成交额中位数 @10日档 + turntrend 换手率趋势 @5日档
+        # 口径/权重/闸门依据见模块顶部 P5 段头注（含已知口径偏离留痕）
+        p5_score = 0
+        p5_detail = []
+        _p5rec = _P5_PCT.get(raw_code) or {}
+        for _p5n, _p5lab in (("amt60", "低成交额"), ("turntrend", "换手率趋势")):
+            if not P5_ON.get(_p5n):
+                continue
+            _p5pct = _p5rec.get(_p5n)
+            if _p5pct is None:
+                continue
+            _s5 = _p5_tier_score(_p5pct)
+            if _s5:
+                p5_score += _s5
+                p5_detail.append(f"{_p5lab}池内前{int(round((1 - _p5pct) * 100))}%{_s5:+d}")
+        enhance += p5_score
 
         # ── 技术形态分 (2026-07-26): 把驾驶舱 A 档条件合并进主站打分 ──
         # 条件：上涨趋势 + 机构变红 + RSI<68 + 20日涨幅<35% + EMA>=5 + 非涨停
@@ -1253,6 +1449,7 @@ def main():
                 "breakout": 5 if breakout_5d else 0,
                 "research": research_score,
                 "p4": p4_score,
+                "p5": p5_score,
                 "signals": {
                     "chan": has_chan,
                     "jinzuan": has_qizhang or has_huangzhu,
@@ -1271,6 +1468,7 @@ def main():
                 "quality": quality_detail,
                 "research": " | ".join(research_detail) if research_detail else "",
                 "p4": " | ".join(p4_detail) if p4_detail else "",
+                "p5": " | ".join(p5_detail) if p5_detail else "",
             },
         })
 
@@ -1317,6 +1515,7 @@ def main():
             "score_breakout": bd.get("breakout", 0),
             "score_research": bd.get("research", 0),
             "score_p4": bd.get("p4", 0),
+        "score_p5": bd.get("p5", 0),
             "win_rate": s.get("win_rate", None),
             "quality_grade": s.get("quality_grade", ""),
             "signals": bd["signals"],
@@ -1328,6 +1527,7 @@ def main():
             "quality_detail": dt.get("quality", ""),
             "research_detail": dt.get("research", ""),
             "p4_detail": dt.get("p4", ""),
+        "p5_detail": dt.get("p5", ""),
         })
 
     count_80plus = sum(1 for s in scored if s.get("total_score", 0) >= 80)

@@ -7118,43 +7118,14 @@ function fmtSigned(v){
       + '<div style="background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
       + '<b style="color:#22d3ee;">&#x1F4CC; 核心：</b>仅验证 2 个单因子（异常换手率、ROE_TTM 大市值档），<b style="color:#ef5350">独立分层回测 OOS 未达标，尚未转正</b>。<br>'
       + '<b style="color:#22d3ee;">&#x1F4A1; 用法：</b>达标（利差>0 + Top胜率≥55% + OOS同号）后升3⭐，再扩样本后升4⭐转正。<br>'
-      + '<b style="color:#22d3ee;">&#x26A0; 限制：</b>当前 2⭐ 观测仓，<b>不可用于选股评分</b>；已产出回测结果但未通过门槛（详见下方 📊）。</div>'
+      + '<b style="color:#22d3ee;">&#x26A0; 限制：</b>当前 2⭐ 观测仓，<b>不可用于选股评分</b>；已产出回测结果但未通过门槛（回测明细见「策略回测」页 🧪 因子实验室回测卡）。</div>'
       + gateBanner
       + '<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">重点池 '+_e(m.n_universe)+' 只 · 异常换手率有效 '+_e(m.n_at_valid)+' · ROE大市值档 '+_e(m.n_roe_large)+'　'
       + '<span style="color:#22c55e">●</span>缩量强势 <span style="color:#ef5350">●</span>放量弱势</div>'
       + _focusBlock('① 异常换手率（缩量=多，因子越高越强势）','#22d3ee',atFocus,'at','at','完整榜单：Top30 强势 + Bottom10 放量弱势')
       + _focusBlock('② ROE(TTM) 全市场主板·大市值档（成交额代理 Top1/3）','#38bdf8',roeFocus,'roe','roe','完整榜单：ROE Top30')
       + '<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5;">口径：异常换手率=当月换手率÷过去12月均值（缩量→低关注→强势），仍用重点池(351只)；ROE_TTM=近4个单季 roeAvg 差分求和（2026-09-11 口径修正：baostock roeAvg 为财年内累计值，原直接累加4季属跨年重复计算），全市场主板·大市值档(成交额top1/3)。IC 显著（Spearman IC t=4.3 / 3.3），<b style="color:#ef5350">但独立分层回测的样本外（OOS）利差为负、Top 层胜率未过 55% 门槛 ⇒ 属样本内显著、样本外失效，不构成 edge 证据</b>。🟢可关注=择时开放且因子进入前20%分位。仅研究参考，非买卖建议。</div>'
-      + '<div style="font-size:11px;color:#fbbf24;margin-top:6px;line-height:1.5;">⭐ 升级路径（2026-09-03 主人令）：现为 ★★ 观测仓——独立分层回测已挂链自动产出（见下📊，升3⭐判据：利差>0+Top胜率≥55%+OOS同号）；剩全市场扫描数据侧开启后复验，达标升 4⭐ 转正「选股策略」子页。</div>'
-      + (function(){
-          var BT = window.FACTOR_LAB_BACKTEST;
-          if(!BT || !BT.abnormal_volume || BT.abnormal_volume.error)
-            return '<div style="font-size:11px;color:var(--dim);margin-top:10px;padding:8px 10px;border:1px dashed rgba(148,163,184,.3);border-radius:8px;">📊 独立分层回测：⏳ 数据生成中（已挂链回测批，产出后自动显示）</div>';
-          var A = BT.abnormal_volume, R = BT.roe_largecap || {};
-          function _num(v,d){ return (v==null||isNaN(v))?'—':Number(v).toFixed(d==null?2:d); }
-          var L = A.layers||{};
-          function _row(lb,st,color){
-            if(!st) return '';
-            return '<tr>'
-              +'<td style="padding:2px 6px;color:'+color+';font-weight:600;">'+lb+'</td>'
-              +'<td style="padding:2px 6px;">'+_num(st.avg_10d,2)+'%</td>'
-              +'<td style="padding:2px 6px;">'+_num(st.win_10d,1)+'%</td>'
-              +'<td style="padding:2px 6px;">'+(st.nav_mdd_10d!=null?_num(st.nav_mdd_10d,1)+'%':'—')+'</td></tr>';
-          }
-          var verdict = A.verdict_3star==='PASS'
-            ? '<span style="color:#22c55e;font-weight:700;">✅ 达 3⭐ 证据</span>'
-            : '<span style="color:#fbbf24;font-weight:600;">⏳ 未达标（继续观测）</span>';
-          var ex = R.excess_10d;
-          return '<div style="margin-top:10px;padding:8px 10px;border:1px solid rgba(148,163,184,.2);border-radius:8px;background:rgba(148,163,184,.05);">'
-            + '<div style="font-size:11.5px;font-weight:700;margin-bottom:4px;">📊 独立分层回测（每10交易日调仓 · 次日开盘入场 · 扣0.20%成本） '+verdict+'</div>'
-            + '<table style="width:100%;border-collapse:collapse;font-size:10.5px;">'
-            + '<tr style="color:var(--dim);"><td style="padding:2px 6px;">层</td><td style="padding:2px 6px;">10日净均收</td><td style="padding:2px 6px;">胜率</td><td style="padding:2px 6px;">净值回撤</td></tr>'
-            + _row('L1(缩量最强)',L['1'],'#ef5350') + _row('L2',L['2'],'var(--fg)') + _row('L3',L['3'],'var(--fg)') + _row('L4',L['4'],'var(--fg)') + _row('L5(放量最弱)',L['5'],'#26a69a')
-            + '</table>'
-            + '<div style="font-size:10.5px;color:var(--dim);margin-top:4px;line-height:1.5;">异常量比 Top−Bottom 利差 '+_num(A.spread_top_bottom_10d_pct,2)+'%/10日 · 样本外(OOS) '+_num(A.spread_oos_pct,2)+'% · '+_e(A.n_points)+' 个调仓点 · '
-            + (ex!=null ? 'ROE Top30 超额 '+_num(ex,2)+'%/10日（当期分组回看，弱证据）' : '')
-            + '</div></div>';
-        })()
+      + '<div style="font-size:11px;color:#fbbf24;margin-top:6px;line-height:1.5;">⭐ 升级路径（2026-09-03 主人令）：现为 ★★ 观测仓——独立分层回测已挂链自动产出（回测明细见「策略回测」页 🧪 因子实验室回测卡；升3⭐判据：利差>0+Top胜率≥55%+OOS同号）；剩全市场扫描数据侧开启后复验，达标升 4⭐ 转正「选股策略」子页。</div>'
       + '</div>';
     dst.innerHTML = html;
     // 弹窗：完整榜单（复用闭包内 row() 与全量数组，2026-09-03 主人令）
@@ -8045,14 +8016,36 @@ window.__renderIndexObserve = function(){
       if(p === '中') return '#fbbf24';
       return '#94a3b2';
     }
+    /* P2-PATCHED 2026-09-16 主人令「这个表这两天一直在说也没改！」：
+       把 walk-forward 真结果叠回上半审计表 —— 已达标并接入的标 ✅、回测不达标已弃用的标 ⛔，
+       免得「v8状态」永远停在「未使用 / 待接入」。真源 = FACTOR_PROGRESS（台账），前端只读不编。 */
+    function _wfOverlay(name){
+      var _i2, _pf = (P.factors || []);
+      for(_i2 = 0; _i2 < _pf.length; _i2++){
+        if(_pf[_i2].name === name && _pf[_i2].backtest_status === 'done'){
+          var _ir = (_pf[_i2].oos_ir == null ? '' : (' · IR_OOS ' + _pf[_i2].oos_ir));
+          return { chip: '<span style="margin-left:5px;font-size:10px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.14);padding:1px 5px;border-radius:4px;">✅ 回测达标' + _ev(_ir) + '</span>',
+                   status: '<span style="color:#22c55e;">已接入评分</span>' };
+        }
+      }
+      var _rt = (pst.retired_by_backtest || []);
+      for(_i2 = 0; _i2 < _rt.length; _i2++){
+        if(_rt[_i2].name === name){
+          return { chip: '<span style="margin-left:5px;font-size:10px;font-weight:600;color:#ef5350;background:rgba(239,83,80,.14);padding:1px 5px;border-radius:4px;">⛔ 回测不达标</span>',
+                   status: '<span style="color:#ef5350;">已弃用·不再接入</span>' };
+        }
+      }
+      return null;
+    }
     var rows = F.factors.map(function(f){
       var sc = statusColor(f.v8_status);
       var pc = priorityColor(f.priority);
+      var _wo = _wfOverlay(f.name);
       return '<tr>'
-        + '<td style="padding:6px 8px;font-size:12px;font-weight:700;color:var(--txt);">' + _ev(f.name) + '</td>'
+        + '<td style="padding:6px 8px;font-size:12px;font-weight:700;color:var(--txt);">' + _ev(f.name) + (_wo ? _wo.chip : '') + '</td>'
         + '<td style="padding:6px 8px;font-size:11px;color:var(--sub);">' + _ev(f.label) + '</td>'
         + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">' + _ev(f.screenshot_logic) + '</td>'
-        + '<td style="padding:6px 8px;font-size:11px;font-weight:700;color:' + sc + ';">' + _ev(f.v8_status) + '</td>'
+        + '<td style="padding:6px 8px;font-size:11px;font-weight:700;color:' + sc + ';">' + (_wo ? _wo.status : _ev(f.v8_status)) + '</td>'
         + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">' + _ev(f.data_source) + '</td>'
         + '<td style="padding:6px 8px;font-size:11px;font-weight:700;color:' + pc + ';">' + _ev(f.priority) + '</td>'
         + '</tr>';
@@ -8104,7 +8097,7 @@ window.__renderIndexObserve = function(){
       + '&#x1F4A1; <b style="color:#22c55e;">解析</b>：当前 v8 <code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">quality</code> 维度仅 ROE + 营收增长 + grade + news，<b>5 个真正缺失</b>（GPOA / 经营现金流-总资产 / 盈利收益率 E/P / 总市值 / 60 日成交额中位数）。'
       + '红色缺失项接入 <code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">generate_top10.py</code> 前，<b>必须先跑 walk-forward 回测按 edge 定权重，禁止直接硬编码高分</b>；'
       + '上线条件 = <b>OOS IR &gt; 0.3</b> 且 <b>4/5 年胜率 &gt; 55%</b>（主人 2026-09-09 22:31 决策的分批 walk-forward 计划：B1 高优 / B2 中优 / B3 已覆盖）。'
-      + '<br>&#x26A0; <b style="color:#22c55e;">限制</b>：基于截图逻辑人工审计；<b>walk-forward 一个都还没跑（done 0/7）</b>，故缺失项<b>暂不具备接入条件</b>。'
+      + '<br>&#x26A0; <b style="color:#22c55e;">限制</b>：基于截图逻辑人工审计（原先写死的 done 计数已删除，改由台账实时统计）；walk-forward 台账共 <b>' + (pst.total || 0) + '</b> 项：done <b style="color:#22c55e;">' + (pst.done || 0) + '</b> · 不达标删除 <b style="color:#ef5350;">' + ((pst.retired_by_backtest || []).length) + '</b> · 仍 pending <b>' + (pst.pending || 0) + '</b>，故仍 pending 的条目<b>暂不具备接入条件</b>。'
       + '</div></div>'
       + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">'
       + '<div style="background:rgba(239,83,80,.06);border:1px solid rgba(239,83,80,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">缺失/未直接用</div><div style="font-size:20px;font-weight:800;color:#ef5350;">' + (st.missing || 0) + '</div></div>'
@@ -8127,8 +8120,8 @@ window.__renderIndexObserve = function(){
       + gaps
       + '</div>'
       + '<div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);margin-bottom:14px;">'
-      + '⚠️ <b style="color:#22c55e;">禁止直接硬编码高分</b>：红色缺失项接入 generate_top10.py 前，必须先跑 walk-forward 回测确定真实 edge；OOS IR / sharpe / max_dd 必须由 walk-forward 真实跑出，由小九回填后再 dispatch 重跑 '
-      + '<code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">gen_factor_progress.py</code>。本卡只做展示与跟踪，<b>不回填数据</b>。'
+      + '⚠️ <b style="color:#22c55e;">禁止直接硬编码高分</b>：缺失项接入 generate_top10.py 前，必须先跑 walk-forward 回测确定真实 edge；OOS IR / sharpe / max_dd 必须由 walk-forward 真实跑出。'
+      + '<b>回填链路（2026-09-16 起全自动，无需人工）</b>：<code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">algorithms/factor_walkforward.py</code> 真跑 → <code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">raw_data/factor_walkforward.json</code> → <code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">scripts/gen_factor_progress.py</code> 套用（达标 done+接入 / 不达标删除）→ 本卡自动显示。'
       + '</div>'
       // ===== 下半：walk-forward 补缺进度（原独立卡，2026-09-13 合并） =====
       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px 0;padding-top:12px;border-top:1px dashed rgba(148,163,184,.3);">'
@@ -12020,11 +12013,23 @@ function drawUpDownChart(){
     }
     const modules = rs.modules || {};
     const summary = rs.summary || {};
-    const total = summary.total || Object.keys(modules).length;
-    const ok = summary.ok || 0;
-    const fail = summary.fail || 0;
-    const empty = summary.empty || 0;
-    const staleCount = Object.values(modules).filter(function(m){ return m && m.status === 'stale'; }).length;
+    /* P2-PATCHED 2026-09-16 主人令（一劳永逸·修「本周期运行 -51」）：
+       旧写法 total 取 summary.total（本批 11 个模块），而 skipCount 却对 modules 全量
+       （73~75 个注册模块）统计 ⇒ 两个口径**不同源**。只要 modules 与 summary 由
+       不同写入者分别产出（health 守卫写 modules、抓取链写 summary），
+       runCount = 11 − 62 = −51 就稳定复现。
+       现计数一律从 modules 自身统计：口径天然自洽，runCount 恒 ≥ 0；
+       summary 只在 modules 为空时兜底，不参与交叉相减。 */
+    const _mk = Object.keys(modules);
+    const _cntBy = function(s){
+      return _mk.filter(function(k){ var m = modules[k]; return m && m.status === s; }).length;
+    };
+    const _hasMods = _mk.length > 0;
+    const total = _hasMods ? _mk.length : (summary.total || 0);
+    const ok = _hasMods ? _cntBy('ok') : (summary.ok || 0);
+    const fail = _hasMods ? _cntBy('fail') : (summary.fail || 0);
+    const empty = _hasMods ? _cntBy('empty') : (summary.empty || 0);
+    const staleCount = _hasMods ? _cntBy('stale') : 0;
     // 2026-09-13 主人令（一劳永逸）：RUNNER_STATUS 模块状态实为四态，此前漏判 skip 导致「本周期未运行」
     //   被并入红分支 → 非轮次所在节点整片飘红（实测 72/73 为 skip、summary.fail=0，属正常分批调度，非故障）。
     //   现统一四态：ok=绿(正常) / empty=黄(返回空) / skip=灰(本周期未运行·正常) / fail=红(真失败)。
@@ -12044,8 +12049,9 @@ function drawUpDownChart(){
            : s === 'limited' ? '受限可用'
            : '失败';
     }
-    const skipCount = Object.values(modules).filter(function(m){ return m && m.status === 'skip'; }).length;
-    const runCount = total - skipCount;
+    const skipCount = _cntBy('skip');
+    /* 🛡 双保险：口径已同源，仍显式不容许负数（历史上正是此处吐过 -51） */
+    const runCount = Math.max(0, total - skipCount);
     // staleCount>0 亦属「离线空」灰系，不再拉红；仅 fail>0 才红灯。
     const statusColor = fail > 0 ? 'var(--up)' : (empty > 0 ? 'var(--gold)' : ((staleCount > 0 || (skipCount > 0 && ok === 0)) ? 'var(--gold)' : 'var(--down)'));
     const statusText = fail > 0 ? ('有失败 ' + fail + ' 项')

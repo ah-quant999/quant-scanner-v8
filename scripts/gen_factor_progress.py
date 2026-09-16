@@ -31,6 +31,16 @@ WF_MAP = {
     "60日成交额中位数":    "amt60",
 }
 
+# 🆕 2026-09-16 主人令「留下可用的优质因子，全部接入」：
+#   达标的因子已真正接进 algorithms/generate_top10.py :: P5 段（不是「待接入」）。
+#   口径：候选池内分位前 20% ⇒ +6 分 / 20~40% ⇒ +3 分；仅 verdict=PASS 才启用；
+#         amt60 另有 3000 万元成交额下限（含量纲哨兵）；权重与偏离依据见 P5 段头注。
+#   ⚠️ 未列入本表的达标因子 ⇒ deploy_status 仍为「待接入」，不允许虚报已接入。
+P5_INTEGRATED = {
+    "turntrend": "P5 分档 +6/+3（hold=5d，换手率趋势·缩量=强势）",
+    "amt60":     "P5 分档 +6/+3（hold=10d，60日成交额中位数·低流动性溢价）",
+}
+
 
 def _load_walkforward():
     """读 factor_walkforward.json → ({因子键: 结果}, update_time)。缺失/损坏返回空。"""
@@ -263,12 +273,19 @@ def main():
             p["top_win_avg"] = r.get("top_win_avg")
             p["base_win_avg"] = r.get("base_win_avg")
             p["spread_oos_pct"] = r.get("spread_oos_pct")
-            p["deploy_status"] = "已达标·待接入 generate_top10.py"
+            _p5note = P5_INTEGRATED.get(key)
+            if _p5note:
+                p["deploy_status"] = "✅ 已接入 generate_top10.py"
+                p["integrated_detail"] = _p5note
+            else:
+                p["deploy_status"] = "已达标·待接入 generate_top10.py"
             p["notes"] = (f"✅ walk-forward 达标（{r.get('date_from')}~{r.get('date_to')}，"
                           f"{r.get('n_points')} 个调仓点，hold={r.get('hold')}d）："
                           f"IR_OOS={r.get('ir_oos')} · Top跑赢基准率={r.get('beat_base_rate')}% · "
                           f"Top绝对胜率={r.get('top_win_avg')}%（基准{r.get('base_win_avg')}%）· "
-                          f"Top回撤={r.get('max_drawdown_top_pct')}%。")
+                          f"Top回撤={r.get('max_drawdown_top_pct')}%。"
+                          + (f" 🔌 已接入：{_p5note}；口径=候选池内分位分档（非硬编码），"
+                             f"未来复跑 verdict≠PASS 会自动失效。" if _p5note else ""))
             kept.append(p)
             n_done_wf += 1
         else:
@@ -280,7 +297,9 @@ def main():
                 "spread_oos_pct": r.get("spread_oos_pct"),
             })
     progress = kept
-    print(f"  ⇒ 达标 done {n_done_wf} 个 · 不达标删除 {len(retired)} 个 · 仍 pending {len(progress) - n_done_wf} 个")
+    _n_int = sum(1 for _p2 in progress if _p2.get("deploy_status", "").startswith("✅ 已接入"))
+    print(f"  ⇒ 达标 done {n_done_wf} 个（其中已接入 generate_top10.py: {_n_int} 个）"
+          f" · 不达标删除 {len(retired)} 个 · 仍 pending {len(progress) - n_done_wf} 个")
 
     # 全局进度汇总
     n_total = len(progress)
@@ -314,6 +333,11 @@ def main():
             "walkforward_run_at": wf_time,
             "walkforward_done": n_done_wf,
             "walkforward_retired": len(retired),
+            # 🆕 2026-09-16：已真正接进 generate_top10.py :: P5 段的因子（可审计）
+            "walkforward_integrated": sorted(p2["name"] for p2 in progress
+                                             if p2.get("backtest_status") == "done"
+                                             and WF_MAP.get(p2["name"]) in P5_INTEGRATED),
+            "integrated_into": "algorithms/generate_top10.py :: P5 段（候选池内分位前20%=+6 / 20~40%=+3）",
             "retired_by_backtest": retired,   # 不达标被删的条目（仅汇总备忘，不留 pending 遗体）
         },
         "factors": progress,
