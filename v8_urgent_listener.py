@@ -108,16 +108,22 @@ def _remote_ref():
 
 
 def _hours_from_name(name):
-    """从交接文件名前缀 YYYY-MM-DD_HHmm 推小时数（不依赖 mtime：坚果云会重写 mtime）。"""
-    m = re.match(r"(\d{4})-(\d{2})-(\d{2})_(\d{2})(\d{2})", name)
-    if not m:
+    """从交接文件名内嵌时间推小时数（不依赖 mtime：坚果云会重写 mtime）。
+
+    2026-09-16 治本（P2，小九 `1520` §3.4 点名我方认领；采纳其**乙案**）：
+    原实现用 ``re.match``（**行首锚定**），只认「文件名**以** ``YYYY-MM-DD_HHMM``
+    开头」⇒ ``HANDOVER_<…>_YYYY-MM-DD_HHMM_`` 家族（前缀 ``HANDOVER_``）**恒返回
+    None** ⇒ 被 ``(_hours_from_name(nm) or 1e9) <= 120`` 判为「不在窗口」而**整族
+    排除在 API 精算之外**，继续携带 graft 假值、靠文件名兜底排序。因今日文件名
+    时间恰好真实而「看起来对」⇒ 静默假治本（判据 62）。
+
+    现改为**委托唯一真源** ``_name_sort_key()``（``re.search``，不锚定）⇒ 排序
+    与「是否进精算窗口」**同一个口径**，消除同名两答案（判据 65）。
+    """
+    dt = _name_sort_key(name)
+    if dt == datetime.min:          # 无任何时间戳 ⇒ 与排序同口径，视为不可知
         return None
-    try:
-        dt = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)),
-                      int(m.group(4)), int(m.group(5)),
-                      tzinfo=timezone(timedelta(hours=8)))
-    except ValueError:
-        return None
+    dt = dt.replace(tzinfo=timezone(timedelta(hours=8)))
     return (datetime.now(timezone(timedelta(hours=8))) - dt).total_seconds() / 3600.0
 
 
