@@ -129,7 +129,20 @@ WARN_SOURCES = {
     "CFFEX_HOLDINGS": 72,
     "CAPITAL_FLOW_DATA": 26,
     "MARKET_FUND_FLOW_DATA": 26,
-    "ANALYST_RATINGS": 72,
+    # 🧹 2026-09-16 阿狸咪的工程师：ANALYST_RATINGS **已退役摘除**（原阈值 72）。
+    #    依据（三处独立取证，双机复核）：① 前端零引用 —— index.html L565/590 仅存注释
+    #    「2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入」；
+    #    ② 生产者已断 —— update_v8.py L90/L201 的转换映射于 09-11 被小九按「死数据清理·P1」
+    #    注释移除 ⇒ `data/ANALYST_RATINGS.js` **结构上永不生成**；③ 远端 `data/` 无该文件。
+    #    ⇒ 留在本表则每轮巡检必报 🟡「文件缺失」，属**结构性恒黄灯**：它永远无法转绿，
+    #    只会稀释真红的信噪比（与 09-14 LHB_7D、09-04 COCKPIT_* 同族病，同法处置）。
+    #    ⚠️ 回滚：从 08-31 及更早提交取回 data/ANALYST_RATINGS.js，恢复 update_v8.py 两处
+    #    映射（L90 / L201），并把本条阈值 72 加回本表。
+    #    🔴 遗留（另立待办，不在本表职责面内）：`cloud_fetch_v8.py` L76/L108/L3802 **仍在
+    #    盘前 08:25 拉取** `raw_data/analyst_ratings.json`（远端该 raw 确实存在）⇒ 该 raw
+    #    **无消费方 = 纯死拉取**（浪费云端每轮盘前配额），宜随本轮退役一并摘除；本轮未动
+    #    该主抓取脚本（避免在监巡轮次碰数据管线）。
+    # "ANALYST_RATINGS": 72,
     "EXPERIMENT": 72,
     "GOLD_POOL": 48,
     "CANDIDATE": 48,
@@ -608,14 +621,26 @@ def main():
     close = last_trade_day_close(now)
 
     # token 提前加载：CORE_SOURCES_ALGO 需读云端 update_time 避免本地滞后
+    # 🔴 2026-09-16 治本（阿狸咪的工程师）：原实现把「是否派发」与「能否云复核」
+    #    耦合在同一个 token 上，而 `--no-self-heal` **在全脚本其它任何地方都未被引用**
+    #    （grep 仅 argparse 定义 + 本行）⇒ 所谓「不派发」完全是靠 token=None 让
+    #    dispatch_* 报「未找到 GitHub token」这一**副作用**兜出来的。
+    #    后果：诊断模式连带关掉云复核 ⇒ CORE/CORE_ALGO 退回读**本机** data/X.js
+    #    （本机经坚果云同步、远端 CI 推的新数据不落地）⇒ **假红**。
+    #    同机同一时刻实测（2026-09-16 15:4x）：正常跑 CORE 红 **4** 个；
+    #    `--no-self-heal` 红 **16** 个，多出的 12 个纯由 token=None 造成
+    #    ⇒ 违背该开关自己的契约「仅检查不派发」，会误导排查方向。
+    #    修法：**云复核与派发脱钩** —— 另取 `check_token` 专供 check_group；
+    #    `token` 仍按原样（诊断时为 None）⇒ **不触碰任何派发路径，零新增派发风险**。
     token = None if args.no_self_heal else _load_token()
+    check_token = _load_token()      # 只读云复核用；_load_token 取不到时返回 None（不抛）
 
     # 🔴 2026-09-16 治本：CORE 组原先**未传 token/use_cloud** ⇒ 一律读本机 data/X.js。
     # 本机经坚果云同步、远端 CI 推的新数据不落地 ⇒ 本机陈旧即**假红**（本轮实测
     # STOCK_QUOTE：本机 09-11 15:02 vs 远端 09-16 10:52）⇒ 连带冗余自愈派发。
     # CORE_ALGO 组早已 use_cloud=True（见下一行），此处补齐保持一致。
-    core_stale, core_notime = check_group(CORE_SOURCES, close, "CORE", is_trading, token=token, use_cloud=True)
-    algo_stale, algo_notime = check_group(CORE_SOURCES_ALGO, close, "CORE_ALGO", is_trading, token=token, use_cloud=True)
+    core_stale, core_notime = check_group(CORE_SOURCES, close, "CORE", is_trading, token=check_token, use_cloud=True)
+    algo_stale, algo_notime = check_group(CORE_SOURCES_ALGO, close, "CORE_ALGO", is_trading, token=check_token, use_cloud=True)
     core_stale += algo_stale
     core_notime += algo_notime
     # 🛡 2026-09-08 盘中更新审计：STOCK_QUOTE 仅连续竞价时段(09:30-11:30/13:00-15:00)才刷新，
