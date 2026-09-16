@@ -2935,17 +2935,18 @@ function fmtSigned(v){
         <div id="ttCatalyst"></div>
       </div>
       <div class="card">
-        <h3><span class="ic">📊</span>回测 N 日胜率（信号层） - 历史</h3>
+        <h3><span class="ic">📊</span>回测 N 日胜率（信号层） - 历史<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:6px;">✅ 真实数据回测</span></h3>
+        <!-- 2026-09-16 主人令：四量/三重子页历史回测卡统一挂「✅ 真实数据回测」标注 -->
         <div class="note" id="ttBackNote">加载中…</div>
         <table id="ttBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>最佳</th><th>最差</th></tr></thead><tbody id="ttBackBody"></tbody></table>
       </div>
       <div class="card">
-        <h3><span class="ic">⚖️</span>严格 vs 宽松 - 历史</h3>
+        <h3><span class="ic">⚖️</span>严格 vs 宽松 - 历史<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:6px;">✅ 真实数据回测</span></h3>
         <div class="note">严格=总评分≥70共振；宽松=信号≥2。同口径 baostock 真实收盘价滚动回测。</div>
         <table id="ttSvl"><thead><tr><th>持有期</th><th>严格胜率</th><th>严格均收</th><th>宽松胜率</th><th>宽松均收</th></tr></thead><tbody id="ttSvlBody"></tbody></table>
       </div>
       <div class="card">
-        <h3><span class="ic">🎚</span>阈值敏感性 - 历史</h3>
+        <h3><span class="ic">🎚</span>阈值敏感性 - 历史<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:6px;">✅ 真实数据回测</span></h3>
         <div class="note">不同总评分门槛的 5 日回测表现（不改动实盘规则，仅测试）。样本少时结论仅供参考。</div>
         <table id="ttThr"><thead><tr><th>门槛</th><th>样本</th><th>5日胜率</th><th>5日均收</th><th>最佳胜率</th><th>最佳持有</th></tr></thead><tbody id="ttThrBody"></tbody></table>
       </div>
@@ -3030,12 +3031,12 @@ function fmtSigned(v){
         <div id="fvAlerts"></div>
       </div>
       <div class="card">
-        <h3><span class="ic">📊</span>回测 N 日胜率（信号层 · 近5年） - 历史</h3>
+        <h3><span class="ic">📊</span>回测 N 日胜率（信号层 · 近5年） - 历史<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:6px;">✅ 真实数据回测</span></h3>
         <div class="note" id="fvBackNote">加载中…</div>
         <table id="fvBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>最好</th><th>最差</th><th>最大回撤</th><th>夏普</th></tr></thead><tbody id="fvBackBody"></tbody></table>
       </div>
       <div class="card">
-        <h3><span class="ic">🔁</span>前向累积跟踪（上线以来 · 真实收盘价） - 历史</h3>
+        <h3><span class="ic">🔁</span>前向累积跟踪（上线以来 · 真实收盘价） - 历史<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:6px;">✅ 真实数据（前向累积）</span></h3>
         <div class="note" id="fvSelfNote">加载中…</div>
         <table id="fvSelf"><thead><tr><th>持有期</th><th>成熟样本</th><th>胜率</th><th>平均收益</th></tr></thead><tbody id="fvSelfBody"></tbody></table>
       </div>
@@ -5951,6 +5952,54 @@ function fmtSigned(v){
           +  '</td>'
           +  '</tr>';
       });
+      /* 🧬 2026-09-16 主人令（第三轮）：「选股生命周期既然已经是选股策略进算法链了，
+         就要加进去」⇒ 生命周期以**独立行**进本总表。
+         口径警示（与下方独立块一致，不能省）：生命周期回测入场＝入池日收盘（持有管理），
+         与选股策略「信号日收盘」不同 ⇒ **不赋名次、不进胜率排名**，数字如实陈列；
+         数据源 window.ALGO_TRACK（algos[0].stats.by_horizon），与下方独立块同源同值。
+         样本 ≥MINS 的档里取胜率最优为「最佳持有期」；无成熟档则显示「样本积累中」。 */
+      (function(){
+        var _AT = window.ALGO_TRACK || {};
+        var _agL = (_AT.algos || [])[0];
+        var _stL = _agL && _agL.stats;
+        if(!_stL) return;
+        var _bhL = _stL.by_horizon || {};
+        var _hsL = _AT.horizons || [];
+        var _bestL = null, _anyL = null;
+        _hsL.forEach(function(hd){
+          var r = _bhL[String(hd)];
+          if(!r) return;
+          if((r.samples||0) > 0 && r.win_rate != null && !_anyL) _anyL = { hold: hd, samples: r.samples, win_rate: r.win_rate, avg_return: r.avg_return };
+          if((r.samples||0) < MINS || r.win_rate == null) return;
+          if(!_bestL || r.win_rate > _bestL.win_rate
+             || (r.win_rate === _bestL.win_rate && (r.avg_return||0) > (_bestL.avg_return||0))){
+            _bestL = { hold: hd, samples: r.samples, win_rate: r.win_rate, avg_return: r.avg_return };
+          }
+        });
+        var _lifeTag = '<span title="独立策略 · 持有管理口径：入场＝入池日收盘（选股策略为信号日收盘），'
+          + '两者回答不同问题 ⇒ 不参与选股策略胜率排名，数字如实陈列。详见下方「🎯 选股生命周期」独立块。"'
+          + ' style="font-size:9.5px;color:#a78bfa;background:rgba(167,139,250,.13);'
+          + 'border:1px solid rgba(167,139,250,.4);padding:1px 5px;border-radius:8px;'
+          + 'white-space:nowrap;margin-left:5px;">独立口径</span>';
+        if(_bestL){
+          h += '<tr style="border-bottom:1px solid var(--border2);">'
+            +  '<td style="padding:6px;color:var(--sub);font-weight:700;">—</td>'
+            +  '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">🧬 选股生命周期' + _lifeTag + '</td>'
+            +  '<td style="padding:6px;color:var(--dim);font-size:11px;" title="持有管理口径不入选股策略评星体系">—</td>'
+            +  '<td style="padding:6px;color:var(--txt);font-size:11px;font-weight:700;white-space:nowrap;">持有 '+_bestL.hold+' 日</td>'
+            +  '<td style="padding:6px;">'+_sampleCell({sample:_bestL.samples})+'</td>'
+            +  '<td style="padding:6px;font-weight:700;color:'+_colorNum(_bestL.win_rate)+';">'+_n(_bestL.win_rate)+'%</td>'
+            +  '<td style="padding:6px;font-weight:700;color:'+_colorPL(_bestL.avg_return)+';">'+_sgn(_bestL.avg_return)+_n(_bestL.avg_return,2)+'%</td>'
+            +  '<td style="padding:6px;color:var(--dim);font-size:11px;white-space:nowrap;">入池日收盘 · 持有管理</td>'
+            +  '</tr>';
+        } else {
+          h += '<tr style="border-bottom:1px solid var(--border2);color:var(--dim);">'
+            +  '<td style="padding:6px;">—</td>'
+            +  '<td style="padding:6px;white-space:nowrap;">🧬 选股生命周期' + _lifeTag + '</td>'
+            +  '<td style="padding:6px;font-size:11px;" colspan="6">⏳ 样本积累中（持有管理口径：入场＝入池日收盘，与选股策略排名口径不同，不参与排名）</td>'
+            +  '</tr>';
+        }
+      })();
       INS.forEach(function(r){
         h += '<tr style="border-bottom:1px solid var(--border2);color:var(--dim);">'
           +  '<td style="padding:6px;">—</td>'
@@ -13667,25 +13716,44 @@ window.showRestrictedItems = showRestrictedItems;
     let h='';
     if(meta.track_start)h+='<div class="tp-detail">追踪起始：'+meta.track_start+(meta.last_update?' · 最后更新 '+rel(meta.last_update):'')+'</div>';
     if(!dates.length){h+='<div class="tp-empty">暂无每日入选记录。</div>';$('ttHistory').innerHTML=h;return;}
-    dates.forEach(d=>{
+    /* 2026-09-16 主人令：历史查询按**自然月**折叠 —— 当月全部展开，
+       前一自然月及更早按月折叠（<details>，点击展开查询），不再无限长铺。 */
+    const months={};
+    dates.forEach(d=>{const m=d.slice(0,7);(months[m]=months[m]||[]).push(d);});
+    const mkeys=Object.keys(months).sort().reverse();
+    const renderDay=(d)=>{
       const arr=(hist[d]||[]).slice().sort((a,b)=>{
         const sa=(track[a.code]||{}).status||'near';
         const sb=(track[b.code]||{}).status||'near';
         const order={strict:0,near:1,dropped:2};
         return (order[sa]??1)-(order[sb]??1);
       });
-      h+='<div class="tp-hist-date">📅 '+d+' · '+arr.length+' 只</div>';
-      h+='<div class="tp-hist-grid">';
-      arr.forEach(s=>{
-        const t=track[s.code]||{};
+      let s='<div class="tp-hist-date">📅 '+d+' · '+arr.length+' 只</div>';
+      s+='<div class="tp-hist-grid">';
+      arr.forEach(s2=>{
+        const t=track[s2.code]||{};
         const stBadge=t.status==='strict'?'<span class="tp-badge cons">严格</span>':t.status==='dropped'?'<span class="tp-badge near" style="background:rgba(244,73,93,.16);color:var(--up)">已掉出</span>':'<span class="tp-badge near">差一步</span>';
         const pnl=t.pnl_pct==null?'':('<span '+pnlClass(t.pnl_pct)+' style="font-weight:700">'+(t.pnl_pct>0?'+':'')+Number(t.pnl_pct).toFixed(2)+'%</span>');
-        h+='<div class="tp-hist-cell">'+
-          '<div class="tp-hd"><span class="tp-code">'+(s.code||'')+'</span><span class="tp-name" title="'+(s.name||'')+'">'+(s.name||'')+'</span></div>'+
-          '<div class="tp-foot">'+stBadge+'<span style="color:var(--sub);font-size:11px">评分 '+(s.total_score||'-')+'</span>'+pnl+'</div>'+
+        s+='<div class="tp-hist-cell">'+
+          '<div class="tp-hd"><span class="tp-code">'+(s2.code||'')+'</span><span class="tp-name" title="'+(s2.name||'')+'">'+(s2.name||'')+'</span></div>'+
+          '<div class="tp-foot">'+stBadge+'<span style="color:var(--sub);font-size:11px">评分 '+(s2.total_score||'-')+'</span>'+pnl+'</div>'+
           '</div>';
       });
-      h+='</div>';
+      return s+'</div>';
+    };
+    mkeys.forEach((m,mi)=>{
+      const ds=months[m];
+      const total=ds.reduce((a,d)=>a+((hist[d]||[]).length||0),0);
+      if(mi===0){
+        h+='<div class="tp-hist-date" style="color:var(--up);font-weight:700;">📅 本月 '+m+' · '+ds.length+' 个信号日 · '+total+' 只</div>';
+        ds.forEach(d=>{h+=renderDay(d);});
+      }else{
+        h+='<details style="margin:8px 0;border:1px solid var(--border);border-radius:8px;overflow:hidden;">'
+          +'<summary style="cursor:pointer;padding:8px 12px;background:rgba(148,163,184,.07);font-size:12px;font-weight:600;color:var(--sub);list-style:none;user-select:none;">📅 '+m+' · '+ds.length+' 个信号日 · '+total+' 只 <span style="color:var(--dim);font-weight:400;font-size:11px;">（点击展开查询）</span></summary>'
+          +'<div style="padding:4px 12px 10px;">';
+        ds.forEach(d=>{h+=renderDay(d);});
+        h+='</div></details>';
+      }
     });
     $('ttHistory').innerHTML=h;
   }
@@ -13862,7 +13930,12 @@ window.showRestrictedItems = showRestrictedItems;
       + (meta.last_price_date ? ' · 最新价日 '+meta.last_price_date : '')
       + (meta.last_update ? ' · 最后更新 '+rel(meta.last_update) : '') + '</div>';
     if(!dates.length){ h += '<div class="tp-empty">暂无每日入选记录。</div>'; box.innerHTML=h; return; }
-    dates.slice(0,30).forEach(function(d){
+    /* 2026-09-16 主人令：历史查询按**自然月**折叠 —— 当月全部展开，
+       前一自然月及更早按月折叠（<details>，点击展开查询）；同时解除原「仅显示 30 个信号日」截断。 */
+    var months = {};
+    dates.forEach(function(d){ var m=d.slice(0,7); (months[m]=months[m]||[]).push(d); });
+    var mkeys = Object.keys(months).sort().reverse();
+    var renderDay = function(d){
       var arr = (hist[d]||[]).slice();
       var order = { active:0, dropped:1 };
       arr.sort(function(a,b){
@@ -13870,21 +13943,34 @@ window.showRestrictedItems = showRestrictedItems;
         var sb=(latest[(b.code||'')]||{}).status||'active';
         return (order[sa]===undefined?0:order[sa]) - (order[sb]===undefined?0:order[sb]);
       });
-      h += '<div class="tp-hist-date">📅 '+d+' · '+arr.length+' 只</div><div class="tp-hist-grid">';
-      arr.forEach(function(s){
-        var t = latest[s.code] || {};
+      var s = '<div class="tp-hist-date">📅 '+d+' · '+arr.length+' 只</div><div class="tp-hist-grid">';
+      arr.forEach(function(s2){
+        var t = latest[s2.code] || {};
         var st = t.status==='active'
           ? '<span class="tp-badge cons">在池</span>'
           : (t.status==='dropped' ? '<span class="tp-badge near" style="background:rgba(244,73,93,.16);color:var(--up)">已掉出</span>' : '');
         var pnl = (t.pnl_pct==null) ? '' : ('<span '+pnlClass(t.pnl_pct)+' style="font-weight:700">'+fvPct(t.pnl_pct)+'</span>');
-        h += '<div class="tp-hist-cell">'
-          + '<div class="tp-hd"><span class="tp-code">'+(s.code||'')+'</span><span class="tp-name" title="'+(s.name||'')+'">'+(s.name||'')+'</span></div>'
-          + '<div class="tp-foot">'+st+'<span style="color:var(--sub);font-size:11px">'+((s.qd)?'QD':'')+'</span>'+pnl+'</div>'
+        s += '<div class="tp-hist-cell">'
+          + '<div class="tp-hd"><span class="tp-code">'+(s2.code||'')+'</span><span class="tp-name" title="'+(s2.name||'')+'">'+(s2.name||'')+'</span></div>'
+          + '<div class="tp-foot">'+st+'<span style="color:var(--sub);font-size:11px">'+((s2.qd)?'QD':'')+'</span>'+pnl+'</div>'
           + '</div>';
       });
-      h += '</div>';
+      return s + '</div>';
+    };
+    mkeys.forEach(function(m,mi){
+      var ds = months[m];
+      var total = ds.reduce(function(a,d){ return a + (((hist[d]||[]).length)||0); }, 0);
+      if(mi===0){
+        h += '<div class="tp-hist-date" style="color:var(--up);font-weight:700;">📅 本月 '+m+' · '+ds.length+' 个信号日 · '+total+' 只</div>';
+        ds.forEach(function(d){ h += renderDay(d); });
+      }else{
+        h += '<details style="margin:8px 0;border:1px solid var(--border);border-radius:8px;overflow:hidden;">'
+           + '<summary style="cursor:pointer;padding:8px 12px;background:rgba(148,163,184,.07);font-size:12px;font-weight:600;color:var(--sub);list-style:none;user-select:none;">📅 '+m+' · '+ds.length+' 个信号日 · '+total+' 只 <span style="color:var(--dim);font-weight:400;font-size:11px;">（点击展开查询）</span></summary>'
+           + '<div style="padding:4px 12px 10px;">';
+        ds.forEach(function(d){ h += renderDay(d); });
+        h += '</div></details>';
+      }
     });
-    if(dates.length>30) h += '<div class="tp-detail" style="margin-top:6px">仅显示最近 30 个信号日，共 '+dates.length+' 个。</div>';
     box.innerHTML=h;
   }
 
