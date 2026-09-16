@@ -15,6 +15,33 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 SRC = REPO / "data" / "FACTOR_AUDIT.js"
 DST = REPO / "raw_data" / "factor_progress.json"
+# 🆕 2026-09-16 主人令「这些马上回测…不要整个版面都在等待」：
+#   由 algorithms/factor_walkforward.py 跑出的真回测结果，供本 fetcher 判 done / 删除。
+WF_JSON = REPO / "raw_data" / "factor_walkforward.json"
+
+# 台账因子名 → 回测引擎因子键（algorithms/factor_walkforward.py :: FACTOR_DEFS）
+WF_MAP = {
+    "12-1 跨周期动量":     "mom12_1",
+    "残差动量":            "resid_mom",
+    "最大日收益 MAX":      "max20",
+    "特质波动率 IVOL":     "ivol60",
+    "换手率趋势":          "turntrend",
+    "隔夜跳空累积":        "overnight20",
+    "60日波动率":          "vol60",
+    "60日成交额中位数":    "amt60",
+}
+
+
+def _load_walkforward():
+    """读 factor_walkforward.json → ({因子键: 结果}, update_time)。缺失/损坏返回空。"""
+    if not WF_JSON.exists():
+        return {}, None
+    try:
+        d = json.loads(WF_JSON.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"  [WARN] factor_walkforward.json 解析失败，按无结果处理: {e}")
+        return {}, None
+    return (d.get("factors") or {}), d.get("update_time")
 
 # 主人 2026-09-09 22:31 决定（"分批回测"）：
 #   批次 1（高优 3 个，质量+价值稳健维度）：GPOA / 经营现金流-总资产 / 盈利收益率 E/P
@@ -211,6 +238,50 @@ def main():
             "notes": "待回测候选：达标即接入 generate_top10.py；不达标则从台账删除该条",
         })
 
+    # ── 🆕 2026-09-16 主人令：套用 walk-forward 真结果 ──────────────────────
+    #    「这些马上回测，不好的不要的就删除，留下可用的优质因子，全部接入。
+    #      不要整个版面都在等待，一直也解决不了！」
+    #    台账规则 ②（达标⇒done+回填 oos_ir）/ ③（不达标⇒删除该条，不留遗体）。
+    wf, wf_time = _load_walkforward()
+    print(f"  walk-forward 结果: {len(wf)} 个因子"
+          + (f"（{wf_time}）" if wf_time else "（无 —— factor_walkforward.json 缺失）"))
+    kept, retired = [], []
+    n_done_wf = 0
+    for p in progress:
+        key = WF_MAP.get(p["name"])
+        r = wf.get(key) if key else None
+        if not r or not r.get("verdict"):
+            kept.append(p)          # 无回测结果 ⇒ 保持 pending（仍待数据/待跑）
+            continue
+        if r["verdict"] == "PASS":
+            p["backtest_status"] = "done"
+            p["oos_ir"] = r.get("ir_oos")
+            p["sharpe_oos"] = r.get("sharpe_oos")
+            p["max_drawdown_oos"] = r.get("max_drawdown_top_pct")
+            p["last_run_at"] = wf_time
+            p["beat_base_rate"] = r.get("beat_base_rate")
+            p["top_win_avg"] = r.get("top_win_avg")
+            p["base_win_avg"] = r.get("base_win_avg")
+            p["spread_oos_pct"] = r.get("spread_oos_pct")
+            p["deploy_status"] = "已达标·待接入 generate_top10.py"
+            p["notes"] = (f"✅ walk-forward 达标（{r.get('date_from')}~{r.get('date_to')}，"
+                          f"{r.get('n_points')} 个调仓点，hold={r.get('hold')}d）："
+                          f"IR_OOS={r.get('ir_oos')} · Top跑赢基准率={r.get('beat_base_rate')}% · "
+                          f"Top绝对胜率={r.get('top_win_avg')}%（基准{r.get('base_win_avg')}%）· "
+                          f"Top回撤={r.get('max_drawdown_top_pct')}%。")
+            kept.append(p)
+            n_done_wf += 1
+        else:
+            # ③ 不达标 ⇒ 从台账删除，不留遗体（仅在 summary 里留一条汇总备忘）
+            retired.append({
+                "name": p["name"], "pool": p.get("pool", "?"),
+                "ir_oos": r.get("ir_oos"), "beat_base_rate": r.get("beat_base_rate"),
+                "top_win_avg": r.get("top_win_avg"), "base_win_avg": r.get("base_win_avg"),
+                "spread_oos_pct": r.get("spread_oos_pct"),
+            })
+    progress = kept
+    print(f"  ⇒ 达标 done {n_done_wf} 个 · 不达标删除 {len(retired)} 个 · 仍 pending {len(progress) - n_done_wf} 个")
+
     # 全局进度汇总
     n_total = len(progress)
     n_pending = sum(1 for p in progress if p["backtest_status"] == "pending")
@@ -239,6 +310,11 @@ def main():
             "from_audit": n_audit,          # 主人截图因子表（2026-09-09）
             "from_candidate": n_cand,       # 待回测候选台账（2026-09-15）
             "batches": batch_done,
+            # 🆕 2026-09-16 walk-forward 实跑归因（可审计）
+            "walkforward_run_at": wf_time,
+            "walkforward_done": n_done_wf,
+            "walkforward_retired": len(retired),
+            "retired_by_backtest": retired,   # 不达标被删的条目（仅汇总备忘，不留 pending 遗体）
         },
         "factors": progress,
     }
