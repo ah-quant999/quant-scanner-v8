@@ -498,22 +498,44 @@ def extract_update_time(path: Path):
 
 
 def extract_update_time_cloud(var: str, token: str):
-    """从 GitHub Contents API 读取 data/X.js 的 update_time（避免本地滞后）。"""
+    """从 GitHub Contents API 读取 data/X.js 的 update_time（避免本地滞后）。
+
+    2026-09-16 治本（两处，均为「假红」根因）：
+
+    ① **>1MB 文件回退 blob API**：Contents API 对 >1MB 的文件只给 `sha`、`content`
+       为空串（本仓 `STOCK_QUOTE.js` 3.28MB）。旧实现解出空串 ⇒ 正则不中 ⇒ 返回
+       None ⇒ 调用方回退读**本机**文件 ⇒ 「本机陈旧 + 远端新鲜」的模块继续假红。
+       实测：本轮 `STOCK_QUOTE` 判「更新于 09-11 15:02 落后 3 个交易日」，云复核为
+       **远端 09-16 10:52:06（盘中最新）** ⇒ 假红还连带一次冗余自愈派发。
+       现 content 为空时改走 `git/blobs/<sha>`（支持至 100MB）。
+
+    ② 该函数被 `use_cloud=True` 的调用方使用；CORE 组见 check_group 调用处。
+    """
     import base64
     hdr = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
     }
-    url = f"https://api.github.com/repos/{REPO}/contents/data/{var}.js"
-    req = urllib.request.Request(url, headers=hdr)
+    base = f"https://api.github.com/repos/{REPO}"
     try:
+        url = f"{base}/contents/data/{var}.js"
+        req = urllib.request.Request(url, headers=hdr)
         with urllib.request.urlopen(req, timeout=30) as r:
-            data = json.loads(r.read().decode("utf-8"))
-        content = base64.b64decode(data.get("content", "")).decode("utf-8", errors="ignore")
-        m = re.search(r'"update_time"\s*:\s*"([^"]+)"', content)
+            meta = json.loads(r.read().decode("utf-8"))
+        content = meta.get("content") or ""
+        if not content.strip():
+            # >1MB：Contents API 不返回 content，只给 sha ⇒ 取 blob
+            sha = meta.get("sha")
+            if not sha:
+                return None
+            req2 = urllib.request.Request(f"{base}/git/blobs/{sha}", headers=hdr)
+            with urllib.request.urlopen(req2, timeout=60) as r2:
+                content = json.loads(r2.read().decode("utf-8")).get("content") or ""
+        text = base64.b64decode(content).decode("utf-8", errors="ignore")
+        m = re.search(r'"update_time"\s*:\s*"([^"]+)"', text)
         if not m:
-            m = re.search(r'"calc_time"\s*:\s*"([^"]+)"', content)
+            m = re.search(r'"calc_time"\s*:\s*"([^"]+)"', text)
         if not m:
             return None
         return _parse_ts(m.group(1))
@@ -588,7 +610,11 @@ def main():
     # token 提前加载：CORE_SOURCES_ALGO 需读云端 update_time 避免本地滞后
     token = None if args.no_self_heal else _load_token()
 
-    core_stale, core_notime = check_group(CORE_SOURCES, close, "CORE", is_trading)
+    # 🔴 2026-09-16 治本：CORE 组原先**未传 token/use_cloud** ⇒ 一律读本机 data/X.js。
+    # 本机经坚果云同步、远端 CI 推的新数据不落地 ⇒ 本机陈旧即**假红**（本轮实测
+    # STOCK_QUOTE：本机 09-11 15:02 vs 远端 09-16 10:52）⇒ 连带冗余自愈派发。
+    # CORE_ALGO 组早已 use_cloud=True（见下一行），此处补齐保持一致。
+    core_stale, core_notime = check_group(CORE_SOURCES, close, "CORE", is_trading, token=token, use_cloud=True)
     algo_stale, algo_notime = check_group(CORE_SOURCES_ALGO, close, "CORE_ALGO", is_trading, token=token, use_cloud=True)
     core_stale += algo_stale
     core_notime += algo_notime
