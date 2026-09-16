@@ -1,8 +1,21 @@
 {
-  "update_time": "2026-09-16 18:27:37",
-  "run_start": "2026-09-16 18:19:54",
-  "ok": 13,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-09-16 22:05:26",
+  "run_start": "2026-09-16 20:36:31",
+  "ok": 24,
+  "fail": 3,
+  "failed_scripts": [
+    {
+      "script": "v8/factor_lab_gen.py",
+      "reason": "退出码 1 | IndexError: list index out of range"
+    },
+    {
+      "script": "strategy_four_volume.py",
+      "reason": "监督器静默杀(>15min 无输出)"
+    },
+    {
+      "script": "refresh_dividend_cninfo.py",
+      "reason": "监督器静默杀(>15min 无输出)"
+    }
+  ],
   "skipped_by_time_gate": []
 }
