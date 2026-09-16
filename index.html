@@ -624,7 +624,7 @@ window.__domReadyFns=[];
     <!-- 2026-09-10 一劳永逸：AI 解析 insights 拆成独立文件 data/maharo_insights.js（window.MAHORO_INSIGHTS），
          与云端每日重生成的 maharo_macro.js 解耦，避免被云端浅版覆盖回退 -->
     <!-- 🔴 2026-09-13 主人令「没用的就删」：data/maharo_macro.js 注入行已删。
-         该文件在远端**从未存在**（未被 gitignore，只是从未推送）⇒ 每次访问
+         该文件在远端（从未存在）（未被 gitignore，只是从未推送）⇒ 每次访问
          一个 404 + 一条 Console 报错。其消费方 renderMahoroCard() 现读
          window.MAHORO_INSIGHTS（下一行的独立文件，云端重生成不会覆盖），
          故删此行零功能损失。若日后云端产出 maharo_macro.js，恢复本行即可。 -->
@@ -1742,7 +1742,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
     <script src="data/FACTOR_LAB.js?v=1789532391" defer></script>
-<!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
+<!-- 🟢 2026-09-16 主人令（「你缺的是生命周期的回测」）：
+     ALGO_TRACK.js 再度注入 —— 它是「选股生命周期（实盘持仓池）」回测的唯一真源，
+     内含 by_horizon（真实持仓池分档前向收益）+ unrealized（当日浮动）。
+     2026-08-31 曾因「前端零引用」停止注入（省 42.4 KB）——现回测页需要它，故恢复。 -->
+    <script src="data/ALGO_TRACK.js?v=X" defer></script>
 <script src="data/ETF_PULSE.js?v=1789532391" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=1789532391" defer></script>
 <script src="data/TOP10_DAILY.js?v=1789532391" defer></script>
@@ -4540,11 +4544,49 @@ function fmtSigned(v){
   window.__STAR_KIND = { '候选池': 'pool', '金股池': 'pool', '黄金池': 'pool' };   // 基础股池（上游水源·不评星/不进榜/不回测）
   window.__STAR_PROFILE_OF = {                                    // 信号性质 → 权重档
     '三重共识': 'medium', '四量终极': 'long', '逆势龙头': 'short',
-    'K线信号层': 'short', '强势突破': 'short'
+    'K线信号层': 'short', '强势突破': 'short',
+    /* 🔴 2026-09-16 主人令「因子实验室先按 4⭐ 挂，可以标注，后续升级要抓紧」：
+       此前它**未登记** ⇒ 隐式落到 'medium' 默认档。现**显式登记 medium**，
+       把「有意为之」写死，杜绝以后有人误以为它是漏登记。
+       ⚠️ 其 4⭐ 的真实性存疑（长档依赖大盘 β，已由 __BETA_DEP_FLAG 标注）：
+          250 日 L1(最强分位) 胜率 79.8%，而 L5(最弱分位) 也有 70.9%
+          ⇒ 长档收益绝大部分是大盘 β；且异常换手因子样本外多空价差 −0.042%（无预测力）。
+       升级方向 = **换因子**（让 L1 与 L5 拉开差距），不是调权重。 */
+    '因子实验室': 'medium'
   };
   /* 人工覆写口（默认为空；仅在主人明令固定某卡星级时使用，不藏在算法里）。
      2026-09-13 主人令「三重共识 4⭐ 不变」→ 固定为 4。 */
   window.__MODULE_STARS_OVERRIDE = { '三重共识': 4 };
+
+  /* ⚠️ 星级「真实性标注」表（2026-09-16 主人令「可以标注」）——
+     与 __MODULE_STARS_OVERRIDE（改星级）**职责分离**：本表**只加标注、不动星级**。
+     用途：某些卡星级虽达标，但其数据基础有已知缺陷，必须在星级旁显式告知，
+     否则星级会误导（主人原话：「现在是靠 β 撑的」）。
+     short = 角标文字；tip = 悬浮解释。 */
+  window.__BETA_DEP_FLAG = {
+    '因子实验室': {
+      short: '⏳ 升级中',
+      tip: '长档依赖 β · 样本外无效：持有 250 日 L1(最强分位) 胜率 79.8%，'
+         + '而 L5(最弱分位) 也有 70.9% —— 长档收益绝大部分是大盘 β；'
+         + '异常换手因子样本外多空价差 −0.042%（无预测力）。'
+         + '主人 2026-09-16 令：先按 4⭐ 挂，标注；后续将持续升级。'
+    }
+  };
+  /* 取某卡的标注（无则返回 null） */
+  window.__betaDepOf = function(card){
+    var f = (window.__BETA_DEP_FLAG || {})[card];
+    return f ? f : null;
+  };
+  /* 渲染标注角标（无标注返回空串，调用侧可无脑拼接） */
+  window.__betaDepHTML = function(card){
+    var f = window.__betaDepOf(card);
+    if(!f) return '';
+    return '<span title="' + String(f.tip).replace(/"/g, '&quot;') + '" '
+         + 'style="margin-left:6px;padding:1px 7px;border-radius:9px;font-size:10px;'
+         + 'font-weight:700;color:#fbbf24;background:rgba(251,191,36,.13);'
+         + 'border:1px solid rgba(251,191,36,.38);white-space:nowrap;cursor:help;">'
+         + f.short + '</span>';
+  };
 
   /* 从聚合产物抽出某卡的「多期真实样本」；无样本/未到期的档**一律不进**。
      🔴 同一张卡可能有多个门槛档（三重共识＝共振≥2 / 70-79 / ≥80 三档），
@@ -4938,7 +4980,19 @@ function fmtSigned(v){
   function _renderPeriodBacktestCard(meta, data){
     var html = '<div style="margin:14px 0;border-left:4px solid '+meta.color+';" class="card">';
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-    html += '<span style="font-size:15px;font-weight:700;color:'+meta.color+';">'+meta.icon+' '+meta.name+'</span>';html += '<span style="font-size:10px;font-weight:700;color:#14b8a6;background:rgba(20,184,166,.14);border:1px solid rgba(20,184,166,.35);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:4px;">📈 选股策略</span>';
+    html += '<span style="font-size:15px;font-weight:700;color:'+meta.color+';">'+meta.icon+' '+meta.name+'</span>';
+    /* 🔴 2026-09-16 主人令「这个不是选股策略，就不要写出造成混淆」：
+       本函数是**所有周期回测卡共用**的，原写死「📈 选股策略」标签，
+       会把「K线信号层」等**非选股策略**的卡也硬贴成选股策略 ⇒ 故需按卡真实身份渲染。
+       判据从数据层派生（meta._rt.kind / meta._rt.page），不硬编码卡名。 */
+    var _rt = meta._rt || {};
+    if(_rt.kind !== 'pool' && _rt.page === '选股策略'){
+      html += '<span style="font-size:10px;font-weight:700;color:#14b8a6;background:rgba(20,184,166,.14);border:1px solid rgba(20,184,166,.35);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:4px;">📈 选股策略</span>';
+    } else if(_rt.kind === 'pool'){
+      html += '<span style="font-size:10px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:4px;">🧺 基础股池</span>';
+    } else {
+      html += '<span style="font-size:10px;font-weight:700;color:var(--sub);background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:4px;">📉 信号参考数据</span>';
+    }
     html += '<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>';
     html += '<span style="font-size:11px;color:var(--dim);">'+meta.desc+'</span>';
     var _starBadge;
@@ -5013,7 +5067,13 @@ function fmtSigned(v){
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
     html += '<span style="font-size:15px;font-weight:700;color:#22d3ee;">🧪 因子实验室回测</span>';
     html += '<span style="font-size:11px;color:var(--dim);">五分位分层 · 异常量比 + ROE_TTM 大市值</span>';
-    html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#22d3ee22;color:#22d3ee;border:1px solid #22d3ee59;">📈 选股策略</span>';
+    /* 🔴 2026-09-16 主人令「这个不是选股策略，就不要写出造成混淆」：
+       原为「📈 选股策略」标签 —— 但本卡是因子分层**研究**，不是选股策略（不产出股票池）。
+       现改为中性的「🧪 因子分层研究」，与选股策略标签彻底区分。 */
+    html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#94a3b822;color:var(--sub);border:1px solid #94a3b84d;">🧪 因子分层研究</span>';
+    /* ⚠️ 2026-09-16 主人令「先按 4⭐ 挂，可以标注」：本卡星级靠长档 β 撑起，
+       在标题行显式挂「⏳ 升级中」标注（只加标注，不动星级）。 */
+    if(typeof window.__betaDepHTML === 'function') html += window.__betaDepHTML('因子实验室');
     html += '<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>';
     var _fb = data.abnormal_volume || {};
     var _verdict = _fb.verdict_3star;
@@ -5557,7 +5617,42 @@ function fmtSigned(v){
       var R = (A.ranking || []).filter(function(r){
         return ((window.__STAR_KIND || {})[r.card]) !== 'pool';
       });
-      var INS = (A.insufficient || []).slice();
+      /* 🔴🔴 2026-09-16 主人令（原话：「只要选股策略里除了不需要回测
+         上游水源的两个股池，其他有上星的方法都要回测也只要回测它们就够了」）——
+         本表口径收窄为：**只收「选股策略页的有星卡」**。
+         三层判据（不硬编码卡名，全部从数据层派生）：
+           ① kind !== 'pool'    —— 两个上游股池（候选池/金股池）已在上一层排除
+           ② cat  === 'trade'    —— 只收交易型策略；cat='signal' 的 K线信号层是参考数据，不是选股策略
+           ③ page === '选股策略'  —— 只收已在「选股策略」子页上架的策略；
+                              「暂未上架」（如强势突破）不在选股策略页，因此不进本表
+         被排除的卡不清数据、不停回测，改在表下方以「不列入回测排名」逐卡列出
+         （诚实留痕：主人要求「我要最真实的」，不能静默消失）。 */
+      var _inScope = function(r){
+        if(((window.__STAR_KIND || {})[r.card]) === 'pool') return false;
+        if(r.cat !== 'trade') return false;
+        if(r.page !== '选股策略') return false;
+        return true;
+      };
+      /* 🔴 2026-09-16 修正：不能只取 is_primary！
+         实证：K线信号层 108 行的 is_primary 全为 0（它本就不是选股策略，
+         没有「主口径」概念），若只取 is_primary 会导致它**静默消失**。
+         现改为按卡聚合：凡在 A.rows 里出现、且不在口径内的卡，
+         以其**最佳档**（样本≥30 中胜率最高）作为代表行；无合格档则取样本最大一行。 */
+      var _exByCard = {}, _exOrder = [];
+      (A.rows || []).forEach(function(r){
+        if(_inScope(r)) return;
+        var c = r.card;
+        if(_exOrder.indexOf(c) < 0) _exOrder.push(c);
+        var cur = _exByCard[c];
+        var okNew = (r.sample||0) >= MINS && r.win_rate != null;
+        var okCur = cur && (cur.sample||0) >= MINS && cur.win_rate != null;
+        if(!cur) { _exByCard[c] = r; return; }
+        if(okNew && !okCur) { _exByCard[c] = r; return; }
+        if(okNew && okCur && r.win_rate > cur.win_rate) { _exByCard[c] = r; return; }
+        if(!okNew && !okCur && (r.sample||0) > (cur.sample||0)) _exByCard[c] = r;
+      });
+      var _exList = _exOrder.map(function(c){ return _exByCard[c]; });
+      var INS = (A.insufficient || []).filter(_inScope);
       if(!R.length && !INS.length) return '';
       var _STARKEY = { '三重共识':'triple', '四量终极':'fourvolume', '逆势龙头':'crds', '候选池':'candidate', '金股池':'goldpool' };
       function _n(v,d){ return (v==null || isNaN(v)) ? '—' : Number(v).toFixed(d==null?1:d); }
@@ -5606,7 +5701,11 @@ function fmtSigned(v){
          口径 = 跨该策略全部持有期（ranking_all）扫描，取「胜率×收益」综合最优档。
          排序规则（明示、可复核）：先按胜率降序，胜率相同再按平均收益降序，
          且样本必须 ≥ MINS（同主表门槛，绝不拿小样本冒充「最佳」）。 */
-      var _RA = (A.ranking_all || []);
+      /* 🔴🔴 2026-09-16 主人令口径收窄的**真正落点**（jsdom 实证修正）：
+         主表渲染走的是 _RA = ranking_all（153 条），不是 R = ranking（4 条）。
+         只过滤 R ⇒ 主表实际没变（K线信号层/强势突破/逆势龙头 仍在表上）。
+         现 _RA 统一过 _inScope，与 R 同源。 */
+      var _RA = (A.ranking_all || []).filter(_inScope);
       var _bestHoldOf = {};
       _RA.forEach(function(r){
         if((r.sample||0) < MINS) return;          // 样本门槛
@@ -5689,7 +5788,7 @@ function fmtSigned(v){
               txt: '长档依赖 · 样本外无效',
               tip: '持有250日 L1(最强分位) 胜率 ' + _l1.win_250d + '%，'
                  + '而 L5(最弱分位) 也有 ' + _l5.win_250d + '% —— 长档收益绝大部分是大盘 β，'
-                 + '不是因子选出来的；异常换手因子**样本外**多空价差 ' + av.spread_oos_pct + '%（无预测力），'
+                 + '不是因子选出来的；异常换手因子<b>样本外</b>多空价差 ' + av.spread_oos_pct + '%（无预测力），'
                  + '样本内 ' + av.spread_in_sample_pct + '% ⇒ 典型过拟合特征。'
                  + '该卡 4⭐ 由 T+90/T+180 长档拉起，T+1 胜率仅 ' + _l1.win_1d + '% 不过半。'
             };
@@ -5744,7 +5843,7 @@ function fmtSigned(v){
         if(!sh || !bestRow || sh.mono === 'up') return '';
         if(sh.range <= 15) return '';
         var w = sh.worst;
-        return '<span title="本卡 ' + sh.n + ' 个可选档位**非单调**（胜率在 ' + _n(sh.min) + '% ~ ' + _n(sh.max)
+        return '<span title="本卡 ' + sh.n + ' 个可选档位<b>非单调</b>（胜率在 ' + _n(sh.min) + '% ~ ' + _n(sh.max)
              + '% 之间跳动，极差 ' + _n(sh.range) + 'pp）⇒ 取「最大值」有挑选成分：'
              + '同卡最差档「' + String((w.row||{}).label||'') + ' · ' + String((w.row||{}).hold||'') + '」仅 '
              + _n(w.wr) + '%（n=' + ((w.row||{}).sample||0) + '）。不等于该策略稳定能力。"'
@@ -5851,6 +5950,166 @@ function fmtSigned(v){
           +  '要横向比较<b>选股能力</b>请看最右列「主口径」（不挑档、公平横比）。'
           +  '</div></div>';
       }
+      /* ── 不列入本页回测排名（诚实留痕）──
+         主人 2026-09-16 口径：回测页只回测「选股策略子页已上架的有星策略」。
+         以下卡**仍在窗口里正常回测**（数据不删、不停更），只是不进本页排名。
+         列出来是为了可核查，不静默消失。 */
+      if(_exList && _exList.length){
+        h += '<div style="margin-top:14px;padding:10px 12px;border-radius:8px;'
+           + 'background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.2);">';
+        h += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;">'
+           + '📎 不列入本页回测排名（' + _exList.length + ' 项·可核查）</div>';
+        h += '<div style="font-size:11px;color:var(--dim);line-height:1.75;">';
+        _exList.forEach(function(r){
+          var why = (r.cat === 'signal') ? '信号参考数据（非选股策略）'
+                  : (r.page === '暂未上架') ? '暂未上架（未进选股策略页）'
+                  : (r.page === '策略回测') ? '信号参考数据（下方有专属回测块）'
+                  : '不在选股策略页';
+          h += '<div>· <b style="color:var(--sub);">' + (r.icon||'') + ' ' + r.card + '</b>'
+             + ' —— ' + why
+             + '（仍在回测：' + (r.label||'') + '，样本 ' + (r.sample==null?'—':r.sample) + '）</div>';
+        });
+        h += '</div>';
+        h += '<div style="font-size:10.5px;color:var(--dim);margin-top:6px;line-height:1.65;">'
+      }
+      /* ══════════════════════════════════════════════════════════════════
+         🎯 选股生命周期回测（2026-09-16 主人令 · 第二轮纠正）
+
+         主人原话①：「强势突破只是生命周期里的一种吧，你缺的是生命周期的回测」
+         主人原话②：「生命周期是一个策略，四量是另外一个策略，你不能把它们两个放在一起」
+
+         【定位：它自己就是一个策略，不是谁的附属】
+           · 选股策略（四量终极 / 三重共识 / 逆势龙头 …）回答「**怎么选出票**」
+           · 生命周期策略（本块）回答「**选出来之后怎么拿**」
+             —— 入池 → 状态判定（强势/回调/见顶/走弱）→ 买卖点 → 出池
+           两者是**并列的独立策略**，不是父子关系。故本块自成一格，
+           **不隶属任何选股策略**，也不打任何选股策略的名号。
+
+         【两个口径的区别（必须说清，否则会误读）】
+           A · 上方主表（BACKTEST_ALL_ALGOS 系）—— 选股策略回测，入场＝信号日收盘
+               回答「这个**选股方法**有没有 alpha」
+           B · 本块（ALGO_TRACK.by_horizon）—— 生命周期回测，入场＝入池日收盘
+               回答「**选中之后拿得对不对**」
+           入场时点不同，数值必然不同，**不是矛盾，是回答两个不同的问题**。
+
+         【诚实铁律】样本 null → 显示「—」，绝不用 0 冒充；不美化亏损。
+         ══════════════════════════════════════════════════════════════════ */
+      try{
+        var AT = window.ALGO_TRACK || {};
+        var _ag0 = (AT.algos || [])[0];
+        if(_ag0 && _ag0.stats){
+          var _st = _ag0.stats || {};
+          var _bh = _st.by_horizon || {};
+          var _hs = AT.horizons || [];
+          var _r2 = function(v, d){ return (v==null) ? '—' : (Number(v).toFixed(d==null?2:d)); };
+          var _wrC = function(v){ return (v==null) ? 'var(--dim)' : (v>=55?'#ef5350':(v<45?'#26a69a':'var(--txt)')); };
+          var _arC = function(v){ return (v==null) ? 'var(--dim)' : (v>0?'#ef5350':(v<0?'#26a69a':'var(--txt)')); };
+
+          h += '<div style="margin:20px 0 0;" class="card">';
+          /* 头部：只用「生命周期」自称，不带任何选股策略名 */
+          h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
+          h += '<span style="font-size:15px;font-weight:700;color:#a78bfa;">\U0001f3af \u9009\u80a1\u751f\u547d\u5468\u671f</span>';
+          h += '<span style="font-size:10px;font-weight:700;color:#a78bfa;background:rgba(167,139,250,.13);'
+             + 'border:1px solid rgba(167,139,250,.4);padding:1px 7px;border-radius:10px;white-space:nowrap;">'
+             + '\U0001f9fa \u72ec\u7acb\u7b56\u7565 \u00b7 \u6301\u6709\u7ba1\u7406</span>';
+          h += '<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;'
+             + 'border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">'
+             + '\u2705 \u771f\u5b9e\u6570\u636e\u56de\u6d4b</span>';
+          if(AT.update_time){
+            h += '<span style="font-size:11px;color:var(--dim);">\u66f4\u65b0\u4e8e ' + AT.update_time + '</span>';
+          }
+          h += '</div>';
+          h += '<div style="font-size:11.5px;color:var(--sub);line-height:1.85;margin-bottom:10px;">'
+             + '\u9009\u80a1\u7b56\u7565\u53ea\u89e3\u51b3\u300c<b>\u600e\u4e48\u9009</b>\u300d\uff1b\u9009\u51fa\u6765\u4e4b\u540e\u8fd8\u8981\u7ba1\u6301\u4ed3\u2014\u2014'
+             + '<b style="color:#a78bfa;">\u5165\u6c60 \u2192 \u72b6\u6001\u5224\u5b9a\uff08\u5f3a\u52bf / \u56de\u8c03 / \u89c1\u9876 / \u8d70\u5f31\uff09\u2192 \u4e70\u5356\u70b9 \u2192 \u51fa\u6c60</b>\u3002'
+             + '\u672c\u5757\u5bf9\u8fd9\u5957\u300c\u6301\u6709\u7ba1\u7406\u300d\u9010\u65e5\u8ddf\u8e2a\u4ea7\u51fa\u7684<b style="color:#a78bfa;">\u771f\u5b9e\u524d\u5411\u6536\u76ca</b>'
+             + '\uff0c\u56de\u7b54\u300c\u9009\u4e2d\u4e4b\u540e\u62ff\u5f97\u5bf9\u4e0d\u5bf9\u300d\u3002'
+             + '</div>';
+
+          /* 口径差异警示 */
+          h += '<div style="margin:0 0 12px;padding:9px 12px;background:rgba(251,191,36,.07);'
+             + 'border:1px solid rgba(251,191,36,.3);border-left:3px solid #fbbf24;border-radius:8px;'
+             + 'font-size:11px;line-height:1.8;color:var(--sub);">'
+             + '<b style="color:#fbbf24;">\u26a0\ufe0f \u4e0e\u4e0a\u65b9\u4e3b\u8868<b>\u53e3\u5f84\u4e0d\u540c</b>\uff0c\u6570\u503c\u4e0d\u53ef\u76f4\u63a5\u6bd4\u8f83</b><br>'
+             + '<b>\u4e0a\u65b9\u4e3b\u8868</b>\uff1a\u9009\u80a1\u7b56\u7565\u56de\u6d4b\uff0c\u5165\u573a\uff1d<b>\u4fe1\u53f7\u65e5</b>\u6536\u76d8 \u2192 \u56de\u7b54\u300c\u9009\u80a1<b>\u65b9\u6cd5</b>\u6709\u6ca1\u6709 alpha\u300d<br>'
+             + '<b>\u672c\u5757</b>\uff1a\u751f\u547d\u5468\u671f\u56de\u6d4b\uff0c\u5165\u573a\uff1d<b>\u5165\u6c60\u65e5</b>\u6536\u76d8 \u2192 \u56de\u7b54\u300c\u9009\u4e2d\u4e4b\u540e<b>\u62ff\u5f97\u5bf9\u4e0d\u5bf9</b>\u300d<br>'
+             + '\u5165\u573a\u65f6\u70b9\u4e0d\u540c\uff0c\u4e24\u8005\u6570\u503c\u5fc5\u7136\u4e0d\u540c \u2014\u2014 \u4e0d\u662f\u77db\u76fe\uff0c\u662f<b>\u56de\u7b54\u4e24\u4e2a\u4e0d\u540c\u7684\u95ee\u9898</b>\u3002'
+             + '</div>';
+
+          /* 池概况 */
+          h += '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">';
+          var _cards = [
+            ['\u5f53\u524d\u8ddf\u8e2a\u6c60', (_st.tracking==null?'—':_st.tracking)+' \u53ea'],
+            ['\u4eca\u65e5\u5165\u6c60\u4fe1\u53f7', (_st.today_signals==null?'—':_st.today_signals)+' \u53ea'],
+            ['\u5df2\u51fa\u6c60\u5f52\u6863', (_st.history_samples==null?'—':_st.history_samples)+' \u7b14'],
+            ['\u8ddf\u8e2a\u7a97\u53e3', (AT.window_days==null?'—':AT.window_days)+' \u5929']
+          ];
+          _cards.forEach(function(c){
+            h += '<div style="flex:1;min-width:120px;padding:8px 12px;background:rgba(167,139,250,.06);'
+               + 'border:1px solid rgba(167,139,250,.22);border-radius:9px;">'
+               + '<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px;">' + c[0] + '</div>'
+               + '<div style="font-size:15px;font-weight:700;color:var(--txt);">' + c[1] + '</div>'
+               + '</div>';
+          });
+          h += '</div>';
+
+          /* 分档前向收益表 */
+          if(!_hs.length){
+            h += '<div style="font-size:11px;color:var(--dim);padding:10px;text-align:center;'
+               + 'background:rgba(148,163,184,.06);border-radius:8px;">\u23f3 \u5206\u6863\u6570\u636e\u7d2f\u79ef\u4e2d\u2026</div>';
+          } else {
+            h += '<div style="overflow-x:auto;">';
+            h += '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+            h += '<thead><tr style="border-bottom:1px solid var(--border);">';
+            ['\u6301\u6709\u671f','\u6837\u672c n','\u80dc\u7387','\u5747\u6536\u76ca','\u4e2d\u4f4d\u6570','\u6700\u4f73','\u6700\u5dee'].forEach(function(t, i){
+              h += '<th style="padding:6px;text-align:' + (i? 'right':'left') + ';color:var(--sub);font-weight:600;">' + t + '</th>';
+            });
+            h += '</tr></thead><tbody>';
+            var _any = false;
+            _hs.forEach(function(hd){
+              var r = _bh[String(hd)];
+              if(!r) return;
+              _any = true;
+              var _n = r.samples;
+              var _gray = (_n == null || _n === 0);
+              /* 🔴 2026-09-16 诚实铁律修正：samples==0 的真实语义是「尚无样本」，
+                 必须显示「—」而不是 0（0 会被读成「有 0 个样本的 0% 胜率」）。
+                 判据与 win_rate==null 一致：无样本 ⇒ 全列「—」。 */
+              if(_n === 0 || _n == null) _n = null;
+              h += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+              h += '<td style="padding:6px;color:var(--txt);font-weight:600;">T+' + hd + '</td>';
+              h += '<td style="padding:6px;text-align:right;color:' + (_gray?'var(--dim)':'var(--txt)') + ';">'
+                 + (_n==null?'—':_n) + '</td>';
+              h += '<td style="padding:6px;text-align:right;font-weight:700;color:' + _wrC(r.win_rate) + ';">'
+                 + _r2(r.win_rate, 1) + (r.win_rate==null?'':'%') + '</td>';
+              h += '<td style="padding:6px;text-align:right;font-weight:700;color:' + _arC(r.avg_return) + ';">'
+                 + _r2(r.avg_return) + (r.avg_return==null?'':'%') + '</td>';
+              h += '<td style="padding:6px;text-align:right;color:var(--sub);">'
+                 + _r2(r.median_return) + (r.median_return==null?'':'%') + '</td>';
+              h += '<td style="padding:6px;text-align:right;color:#ef5350;">'
+                 + _r2(r.best_return) + (r.best_return==null?'':'%') + '</td>';
+              h += '<td style="padding:6px;text-align:right;color:#26a69a;">'
+                 + _r2(r.worst_return) + (r.worst_return==null?'':'%') + '</td>';
+              h += '</tr>';
+            });
+            h += '</tbody></table></div>';
+            if(!_any){
+              h += '<div style="font-size:11px;color:var(--dim);margin-top:6px;">\u23f3 \u6837\u672c\u7d2f\u79ef\u4e2d\uff08\u5c1a\u672a\u51fa\u73b0\u6709\u6548\u6837\u672c\u6863\uff09</div>';
+            }
+          }
+
+          /* 口径与成本自述 */
+          h += '<div style="font-size:10.5px;color:var(--dim);margin-top:12px;line-height:1.75;'
+             + 'padding-top:9px;border-top:1px dashed rgba(148,163,184,.2);">'
+             + '<b>\u53e3\u5f84</b>\uff1a\u5165\u6c60\u65e5\u6536\u76d8\u4e3a\u57fa\u51c6\uff0c\u9010\u65e5\u8ffd\u8e2a\u5230\u4eca\u65e5\u7684\u524d\u5411\u6536\u76ca\uff1b'
+             + '\u4e0d\u542b\u4e2d\u9014\u6b62\u635f\u6b62\u76c8\uff08\u5373\u300c\u4e00\u76f4\u62ff\u7740\u4e0d\u52a8\u300d\u7684\u57fa\u51c6\u7ebf\uff09\u3002<br>'
+             + '<b>\u6210\u672c</b>\uff1a\u5df2\u6263\u53cc\u8fb9 ' + _r2(AT.cost_pct_roundtrip, 2) + '%\uff1b'
+             + '<b>\u6837\u672c</b>\uff1a\u65e0\u5386\u53f2\u6837\u672c\u65f6\u4e3a null\uff08\u524d\u7aef\u663e\u793a \u2014\uff09\uff0c'
+             + '\u7edd\u4e0d\u7528 0 \u5192\u5145\u3002'
+             + '</div>';
+          h += '</div>';
+        }
+      }catch(_e){ try{ console.warn('[btOverview\u00b7lifecycle]', _e); }catch(__){} }
       return h;
     }catch(e){ try{ console.warn('[btOverview]', e); }catch(_e){} return ''; }
   };
