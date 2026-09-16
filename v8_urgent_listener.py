@@ -6,8 +6,16 @@ v8_urgent_listener.py — 紧急指令监听 + 健康检查（v8 去 v6 化版�
 监听 docs/ops/handover/ 下的交接档（唯一交接目录；🔴 2026-09-16 起**全部 .md**，
 不再只认 *_URGENT_*.md —— 见下方 `_scan_handover_files_remote` 注释），读取最新内容并：
 1. 运行 guard_v8_freshness.py 生成数据新鲜度报告；
-2. 根据文件内容中的关键词自动 dispatch 对应 workflow；
+2. 扫描交接档中的**显式指令**（第 1 档=显式标记+关键词推断；其余档=显式指令行+
+   显式 workflow 名），自动 dispatch 对应 workflow；去重=**文件名+内容 hash**；
 3. 输出摘要供 automation 向主人汇报。
+
+🔴 2026-09-16 治本（第三步，P-A）：排序「提交时间优先」在**浅克隆**下会被 graft 边界
+污染（一批档拿到同一个假 ``%ct``，不是「取不到」⇒ 原容错不触发、静默退化成文件名口径）
+⇒ ① 新增退化检测 ``_is_degenerate_times``；② 检出后退化时对有界近档走 GitHub Commits
+API 精算真值 ``_api_commit_ts``（≤12 次请求），失败才退回文件名口径**并在输出显式标注**；
+③ 派发权不再单挂 ``files[0]``（``scan_dispatch`` 扫前 8 档 + hash 去重），
+即使排序把超前命名档顶到首位，真实新指令也不会被静默漏派。
 
 🔴 2026-09-15 修复（漏读高危）：清单与正文**远端优先**（best-effort git fetch → FETCH_HEAD /
 origin/main → git ls-tree / git show），仅当 git 不可用时才降级本机工作树并在输出显式标注。
@@ -20,13 +28,15 @@ origin/main → git ls-tree / git show），仅当 git 不可用时才降级本�
   python v8_urgent_listener.py --no-fetch   # 跳过 git fetch（离线/调试）
 """
 import glob
+import hashlib
 import json
 import os
 import re
 import subprocess
 import sys
-import urllib.request
 import urllib.error
+import urllib.parse
+import urllib.request
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -35,6 +45,16 @@ HANDOVER_DIR = BASE / "docs" / "ops" / "handover"   # 2026-09-10 起唯一交接
 URGENT_DIR = BASE / "docs" / "ops" / "urgent"        # 已停用（历史目录，勿再写入）
 REPO = "ah-quant999/quant-scanner-v8"
 HANDOVER_REL = "docs/ops/handover"                   # 仓库内相对路径（远端读取用）
+
+# ---- 2026-09-16 治本（第三步）：浅克隆排序退化处置 + 派发面不再单挂 files[0] ----
+GRAFT_MIN_ENTRIES = 5      # 条数少于这个值不判退化（样本太小）
+GRAFT_UNIQUE_RATIO = 0.1   # 唯一时间戳占比低于此 ⇒ 判为 graft 边界退化
+API_TS_MAX = 12            # 退化时最多走 API 精算的档数（有界，防请求风暴）
+API_TS_WINDOW_H = 120      # 只对「文件名时间在近 N 小时」的档做 API 精算
+ACTION_SCAN_N = 8          # 显式指令扫描档数（原实现只判 files[0]）
+DISPLAY_N = 5              # 输出里展开正文的档数（其余只列名）
+ACTION_STATE = BASE / "data" / "_urgent_dispatch_state.json"   # 派发去重状态
+SORT_DIAG = {"mode": "-", "api_n": 0, "degenerate": False, "entries": 0, "unique": 0}
 
 # workflow 文件名 -> dispatch payload
 WF_MAP = {
@@ -190,6 +210,54 @@ def _commit_times_remote(ref, limit=60):
     return res
 
 
+def _is_degenerate_times(cts):
+    """判 ``_commit_times_remote`` 的结果是否被 **graft 边界** 污染（浅克隆）。
+
+    2026-09-16 P-A 治本（小九 `1320` 回执 §2 认领项）：
+    浅克隆里 graft 边界 commit 在 ``git log --name-only`` 下**被当成 root**（父缺失）
+    ⇒ 它的 ``%ct`` 被安给该 commit 树的**全部**档，于是「取到了同一个错值」而不是
+    「取不到」——原实现的容错（取不到才退 ``{}``）**根本不会触发**，
+    「提交时间优先」静默退化成纯文件名口径，且**不报错**（与判据 59/94 同源）。
+    实测：阿狸咪机 325 档 / 3 个唯一值（323 档同值）；小九机 324 档 / 1 个唯一值。
+    """
+    if len(cts) < GRAFT_MIN_ENTRIES:
+        return False
+    return len(set(cts.values())) < max(2, int(len(cts) * GRAFT_UNIQUE_RATIO))
+
+
+def _api_commit_ts(names):
+    """走 GitHub Commits API 取交接档**权威**提交时间 ``{档名: epoch 秒}``。
+
+    ``GET /repos/{repo}/commits?path=<rel>&per_page=1`` ⇒ ``[0].commit.committer.date``。
+    绕开浅克隆（不依赖本地历史深度）。**只对有界的一小撮档调用**（调用方已按
+    文件名时间收紧到近 ``API_TS_WINDOW_H`` 小时、上限 ``API_TS_MAX``），防请求风暴。
+    任一步失败 ⇒ 该档跳过；全失败 ⇒ 返回 ``{}``（不报错，调用方退回文件名口径）。
+    """
+    token = _load_token()
+    if not token or not names:
+        return {}
+    out = {}
+    for nm in names:
+        path = urllib.parse.quote(f"{HANDOVER_REL}/{nm}")
+        req = urllib.request.Request(
+            f"https://api.github.com/repos/{REPO}/commits?path={path}&per_page=1",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=25) as r:
+                arr = json.loads(r.read().decode("utf-8", "replace"))
+            iso = arr[0]["commit"]["committer"]["date"]
+            out[nm] = int(datetime.strptime(iso, "%Y-%m-%dT%H:%M:%SZ")
+                          .replace(tzinfo=timezone.utc).timestamp())
+        except Exception:
+            continue
+    return out
+
+
 def _fetch_remote():
     """尽力刷新 FETCH_HEAD / origin/main（只动 .git 引用，不碰工作树）。失败不报错。"""
     if "--no-fetch" in sys.argv:
@@ -212,6 +280,21 @@ def recent_urgent_files(n=5):
         names = _scan_handover_files_remote(ref)
         if names:
             cts = _commit_times_remote(ref)
+            SORT_DIAG.update({"mode": "提交时间优先", "api_n": 0, "degenerate": False,
+                              "entries": len(cts), "unique": len(set(cts.values()))})
+            if _is_degenerate_times(cts):
+                # 甲：判定退化（不假装治本）；乙：对有界近档走 API 取真值
+                SORT_DIAG["degenerate"] = True
+                cands = [nm for nm in names
+                         if (_hours_from_name(nm) or 1e9) <= API_TS_WINDOW_H]
+                cands.sort(key=_name_sort_key, reverse=True)
+                api = _api_commit_ts(cands[:API_TS_MAX])
+                if api:
+                    cts.update(api)
+                    SORT_DIAG.update({"mode": "提交时间优先（API 精算）",
+                                      "api_n": len(api), "degenerate": False})
+                else:
+                    SORT_DIAG["mode"] = "⚠️ 文件名口径（提交时间不可信）"
             names.sort(key=lambda nm: (cts.get(nm, 0), _name_sort_key(nm)),
                        reverse=True)
             return [{"name": nm, "repo_path": f"{HANDOVER_REL}/{nm}",
@@ -228,17 +311,25 @@ def recent_urgent_files(n=5):
              "ref": None, "local": p} for p in local[:n]]
 
 
-def read_head(item, lines=50):
-    """读文件前 N 行：远端优先（git show <ref>:<path>），失败降级本机工作树。"""
+def read_text(item):
+    """读整份文件：远端优先（git show <ref>:<path>），失败降级本机工作树。
+
+    2026-09-16 新增：显式指令可能出现在档末（如「## 8. 明确不做」之后的派发行），
+    只看前 40 行会漏 ⇒ 派发判定改用全文。
+    """
     if item.get("src") == "remote":
-        txt = _git(["show", f"{item['ref']}:{item['repo_path']}"], timeout=30)
+        txt = _git(["show", f"{item['ref']}:{item['repo_path']}"], timeout=40)
         if txt is not None:
-            return "".join(txt.splitlines(keepends=True)[:lines])
+            return txt
     try:
-        with open(item["local"], encoding="utf-8") as f:
-            return "".join(f.readlines()[:lines])
+        return item["local"].read_text(encoding="utf-8", errors="replace")
     except Exception as e:
         return f"[读取失败: {e}]"
+
+
+def read_head(item, lines=50):
+    """读文件前 N 行：远端优先，失败降级本机工作树（供输出摘要用）。"""
+    return "".join(read_text(item).splitlines(keepends=True)[:lines])
 
 
 def item_age_hours(item):
@@ -295,6 +386,104 @@ def parse_dispatch_commands(text, mtime_hours=24):
     return cmds
 
 
+def _strip_code(text):
+    """去掉围栏代码块与行内 ``code`` 片段。
+
+    交接档经常**引用**指令标记来讨论它（实测小九 `1320` 回执正文里就原样写了
+    ``# action:`` 作说明）⇒ 不剥引用就扫描多档会**误派**。
+    """
+    text = re.sub(r"```.*?```", "", text, flags=re.S)
+    text = re.sub(r"~~~.*?~~~", "", text, flags=re.S)
+    text = re.sub(r"`[^`\n]*`", "", text)
+    return text
+
+
+def explicit_directives(text):
+    """**收紧版**指令识别：只认「独立成行的显式指令 + 档内显式命名的 workflow」。
+
+    2026-09-16 P-A 治本（第三步）：原实现只对 ``files[0]`` 判 action 标记 ⇒ 一旦
+    排序把旧档（含超前命名档）顶到首位，真实新指令就被静默漏派。放宽扫描面必须同时
+    把误派风险压到最低 ⇒ 对 ``files[1:]`` 只接受：
+      ① 独立成行（可带 ``-``/``*``/``>``/``#`` 前缀）的 ``[ACTION]`` / ``ACTION:`` /
+         ``!dispatch`` / ``# action:`` 行；
+      ② 该行内**显式出现** ``dispatch <workflow 名>``（不做关键词推断）。
+    风险实测：对近 30 档扫出 0 条误派（见交接档测试记录）。
+    """
+    cmds = []
+    for line in _strip_code(text).splitlines():
+        s = line.strip().lstrip("*->#").strip()
+        if not re.match(r"^(?:\[ACTION\]|ACTION:|!dispatch\b|action:)", s, re.I):
+            continue
+        for key, (wf, payload) in WF_MAP.items():
+            if re.search(rf"\bdispatch\s+{key.replace('_', '[_-]?')}\b", s, re.I):
+                cmds.append((f"显式指令行 dispatch {key}", wf, payload))
+    return cmds
+
+
+def _load_action_state():
+    """派发去重状态 ``{档名: 内容 sha1 前 16 位}``（缺失/损坏 ⇒ {}）。"""
+    try:
+        d = json.loads(ACTION_STATE.read_text(encoding="utf-8"))
+        return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def _save_action_state(state):
+    """只留最近 300 条（dict 保序），防状态文件无限增长。失败不阻断。"""
+    try:
+        ACTION_STATE.parent.mkdir(parents=True, exist_ok=True)
+        if len(state) > 300:
+            for k in list(state)[:len(state) - 300]:
+                state.pop(k, None)
+        ACTION_STATE.write_text(json.dumps(state, ensure_ascii=False, indent=1),
+                                encoding="utf-8")
+    except Exception:
+        pass
+
+
+def scan_dispatch(files, dry=False):
+    """扫描前 ``ACTION_SCAN_N`` 档的显式指令并派发。返回 (输出行列表, 实际派发数)。
+
+    去重口径（2026-09-16 补齐原待办）：``文件名 + 内容 sha1`` —— **不用时效门**
+    （24h 门会漏掉跨巡检窗口的真指令），同一档内容不变则只处置一次；
+    派发失败**不登记** ⇒ 下一轮自动重试。
+    ``files[0]`` 维持原口径（显式标记 + 关键词推断）；``files[1:]`` 走收紧口径
+    （``explicit_directives``：显式行 + 显式 workflow 名）。
+    """
+    lines = []
+    state = {} if dry else _load_action_state()
+    todo = []          # [(档名, content_hash, [(reason, wf, payload)])]
+    for i, item in enumerate(files[:ACTION_SCAN_N]):
+        text = read_text(item)
+        h = hashlib.sha1(text.encode("utf-8", "replace")).hexdigest()[:16]
+        if state.get(item["name"]) == h:
+            continue
+        cmds = (parse_dispatch_commands(text, item_age_hours(item)) if i == 0
+                else explicit_directives(text))
+        todo.append((item["name"], h, cmds))
+    n = 0
+    for name, h, cmds in todo:
+        if not cmds:
+            state[name] = h          # 无指令 ⇒ 登记（内容变了才会重扫）
+            continue
+        ok_all = True
+        for reason, wf, payload in cmds:
+            if dry:
+                lines.append(f"- [DRY-RUN] {name}：{reason} → 将 dispatch `{wf}`")
+                continue
+            ok, msg = dispatch_workflow(wf, payload)
+            ok_all = ok_all and ok
+            lines.append(f"- {'✅' if ok else '❌'} {name}：{reason} → `{wf}`：{msg}")
+            if ok:
+                n += 1
+        if ok_all:
+            state[name] = h          # 失败 ⇒ 不登记，下一轮重试
+    if not dry:
+        _save_action_state(state)
+    return lines, n
+
+
 def dispatch_workflow(wf_name, payload):
     token = _load_token()
     if not token:
@@ -324,27 +513,31 @@ def main():
     now = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
     out = [f"# v8 紧急指令监听 ({now})", ""]
 
-    files = recent_urgent_files()
+    files = recent_urgent_files(ACTION_SCAN_N)
     src = files[0]["src"] if files else "-"
     src_txt = {"remote": f"远端优先（{files[0]['ref']}）", "local": "⚠️ 降级：本机工作树（可能陈旧）",
                "-": "-"}[src]
     urgent_n = sum(1 for f in files if "_URGENT_" in f["name"])
     out.append(f"## 最近交接档（{len(files)} 个，其中 URGENT {urgent_n} 个）｜来源：{src_txt}")
+    out.append(f"- 排序口径：{SORT_DIAG['mode']}（提交时间条目 {SORT_DIAG['entries']} / "
+               f"唯一值 {SORT_DIAG['unique']}"
+               + (f" / API 精算 {SORT_DIAG['api_n']} 档" if SORT_DIAG["api_n"] else "")
+               + ("；⚠️ 检出 graft 退化，已按兜底口径排序" if SORT_DIAG["degenerate"] else "") + "）")
     if not files:
         out.append("- 无")
-    dispatch_cmds = []
     for i, item in enumerate(files):
+        if i >= DISPLAY_N:            # 仅展开前 N 档；其余仍在派发扫描面内
+            out.append(f"- … 另有 {len(files) - DISPLAY_N} 档在派发扫描面内（未展开）："
+                       + "、".join(f["name"] for f in files[DISPLAY_N:]))
+            break
         head = read_head(item, 40)
         age_h = item_age_hours(item)
         stamp = f"{age_h:.1f}h" if age_h == age_h else "n/a"
         flag = "🔴 URGENT " if "_URGENT_" in item["name"] else "📄 "
-        out.append(f"- {flag}**{item['name']}** (距文件名时间={stamp}，仅参考；排序=提交时间优先+文件名兜底)")
+        out.append(f"- {flag}**{item['name']}** (距文件名时间={stamp}，仅参考；位次={i + 1})")
         out.append("```markdown")
         out.append(head)
         out.append("```")
-        # 只有最近 1 个文件参与自动 dispatch（避免旧文件反复触发）
-        if i == 0:
-            dispatch_cmds = parse_dispatch_commands(head, age_h)
 
     # 健康检查
     out.append("")
@@ -355,18 +548,17 @@ def main():
     out.append(stdout[:1500])
     out.append("```")
 
-    # 自动 dispatch
+    # 自动 dispatch（2026-09-16：扫描面前 8 档，带 文件名+内容 hash 去重）
     out.append("")
     out.append("## 自动 dispatch")
-    if not dispatch_cmds:
-        out.append("- 最新交接档未识别到自动 dispatch 指令，无需操作。")
+    out.append(f"- 扫描面：前 {ACTION_SCAN_N} 档（第 1 档=显式标记+关键词推断；"
+               f"其余=显式指令行+显式 workflow 名）｜去重=文件名+内容 hash")
+    dlines, n_dispatched = scan_dispatch(files, dry=dry)
+    if not dlines and not n_dispatched:
+        out.append("- 无新增派发指令（前 8 档已判过或均无显式指令）。")
     else:
-        for reason, wf, payload in dispatch_cmds:
-            if dry:
-                out.append(f"- [DRY-RUN] {reason} → 将 dispatch `{wf}` payload={payload}")
-            else:
-                ok, msg = dispatch_workflow(wf, payload)
-                out.append(f"- {'✅' if ok else '❌'} {reason} → `{wf}`: {msg}")
+        out.extend(dlines)
+        out.append(f"- 本轮实际派发 **{n_dispatched}** 次。")
 
     print("\n".join(out))
     return 0
