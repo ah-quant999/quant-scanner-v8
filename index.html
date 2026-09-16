@@ -99,10 +99,13 @@ window.__domReadyFns=[];
      修复：head 内 30 分钟自动刷新（meta refresh 是客户端指令，github.io 服务器
      Cache-Control 头无法覆盖），保证长期打开的 tab 也总能拿到最新 ?v+data。
      服务器侧 Cache-Control: max-age=600 + no-cache meta 双保险防止磁盘缓存。 -->
-<!-- 🛡 2026-08-21 移除 meta refresh：Chrome 124+ 已弃用（Issues 报告"Deprecated feature used"）。
-     ✅ 2026-09-14 一劳永逸补实现：原注释承诺「每 2 分钟探测远端 HEALTH_CHECK.js → 自动 reload」，
-        但该脚本从未被写出（全文搜 120000/hbReload/自愈刷新 均 0 命中）→ 主站刷新实际只剩单腿。
-        现由底部 __v8LiveDataProbe 真实实现（HEAD 探测 Last-Modified，交易时段 2 分钟 / 其余 15 分钟）。 -->
+<!-- 🛡 主站自动整页刷新（纯定时，无「数据变化即刷」机制）。
+     2026-09-16 主人令最终规则（全北京时间，与访客本机时区彻底解耦）：
+       盘中(交易日 09:30–11:30 / 13:00–15:00): 每 15 分钟（午休 11:30–13:00 无新数据，归入 1 小时）
+       收盘后(交易日 15:00–23:00): 每 1 小时
+       夜间(23:00–次日 07:00): 不刷新
+       非交易日(周末/法定假期 07:00–23:00): 每 2 小时
+     实现见底部 __v8SmartRefreshStarted（含 2026 休市日）。旧「数据变化即刷」(__v8LiveDataProbe) 已移除。 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
@@ -16857,78 +16860,85 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 </script>
 
 
-<!-- 2026-09-08 主人令：智能时段整页硬刷新兜底（与上方「数据变化即刷新」自愈互补）。
-     规则：① 交易日开盘时段 09:30-14:59 → 每 15 分钟；② 收盘后 / 午休 / 周末 / 非交易时段 → 每 1 小时；
-           ③ 夜间 22:00-次日 07:00 → 不刷新。location.reload(true) 强制绕过所有缓存。 -->
+<!-- ===== 独立脚本：主站自动整页刷新（2026-09-16 主人令，纯定时） ===== -->
 <script>
-/* ════════ 智能时段整页硬刷新（2026-09-14 一劳永逸重写）════════
-   🔴 旧版三处致命缺陷：
-   ① 时区：用 new Date().getHours()/getDay() = **访客本机时区**。访客机若为 UTC
-      （VPN/境外/系统时区设错），北京盘中 10:55 → 取成 UTC 02:55 → 命中 t<7*60
-      → return Infinity → **页面永久不刷新**。这是「自动刷新好像没了」的头号根因。
-   ② 节流：setInterval 在后台标签页会被浏览器压到 1 次/分甚至 1 次/时，到期判定被拖延。
-   ③ 无兜底：标签页长时间隐藏后回到前台，不校验是否早已过期。
-   现全部根治：北京时间固定基准（与访客时区彻底解耦）+ setTimeout 单发重算 +
-   可见性恢复即校验 + 陈旧硬上限强刷。
-   规则：交易日 09:29-15:01 → 15 分钟；其余 07:00-22:00 → 1 小时；22:00-07:00 不刷新。
-   ⚠️ 本脚本与 __v8LiveDataProbe 互补：本脚本是「时间到就刷」，探针是「数据变了才刷」。 */
+/* 🛡 2026-09-16 主人令：主站自动刷新改回「按交易时段定时刷新」（取代旧「数据变化即刷新」）
+   根因：旧机制盘中 2 分钟探测 HEALTH_CHECK 变化即 reload、收盘后 15 分钟、周末 15 分钟，
+        且「数据一变就刷」→ 云端盘后一部署整页就拽一次，主人感受「收盘后还在频繁刷新」。
+   规则（全北京时间，与访客本机时区彻底解耦）：
+     盘中(交易日 09:30–11:30 / 13:00–15:00): 每 15 分钟（午休 11:30–13:00 无新数据，归入 1 小时）
+     收盘后(交易日 15:00–23:00): 每 1 小时
+     夜间(23:00–次日 07:00): 不刷新
+     非交易日(周末/法定假期 07:00–23:00): 每 2 小时
+   实现：北京时间基准 + setTimeout 单发递归（避免后台标签页被节流导致漂移）
+        + 切回前台超时即刷兜底（不超过本时段间隔绝不误刷）。
+   2026 休市日(上交所公告，无调休补班)：元旦1/1-3、春节2/14-23、清明4/4-6、
+       劳动5/1-5、端午6/19-21、中秋9/25-27、国庆10/1-7。 */
 (function(){
-  if(window.__v8SmartRefresh) return;
-  window.__v8SmartRefresh = true;
-  var MIN = 60 * 1000;
-  /* 🔴 北京时间固定基准：不依赖访客本机时区 */
+  if(window.__v8SmartRefreshStarted) return;
+  window.__v8SmartRefreshStarted = true;
+
+  // —— 2026 年 A股休市日（MM-DD；周末本就排除，完整列出便于核对）——
+  var HOLS_2026 = new Set([
+    '01-01','01-02','01-03',
+    '02-14','02-15','02-16','02-17','02-18','02-19','02-20','02-21','02-22','02-23',
+    '04-04','04-05','04-06',
+    '05-01','05-02','05-03','05-04','05-05',
+    '06-19','06-20','06-21',
+    '09-25','09-26','09-27',
+    '10-01','10-02','10-03','10-04','10-05','10-06','10-07'
+  ]);
+
   function _bj(){ return new Date(Date.now() + 8 * 3600 * 1000); }
-  function _bjHM(d){ return d.getUTCHours() * 60 + d.getUTCMinutes(); }
-  function _bjDay(d){ return d.getUTCDay(); }
-  function _refreshIvMs(){
-    var d = _bj(), t = _bjHM(d), day = _bjDay(d);
-    if(t >= 22 * 60 || t < 7 * 60) return Infinity;              // 夜间不刷新
-    if(day >= 1 && day <= 5){
-      /* 🔴 2026-09-14 修正：原写成 t>=9*60+29 && t<15*60+1 一条连续区间，
-         把 11:30-13:00 午休也当成高频段（vm 沙箱用例 12:00 实测返回 15 分钟而非
-         60 分钟 → 已抓到）。午休 2 小时无新数据，高频刷新纯属浪费跨境带宽。 */
-      var am = (t >= 9 * 60 + 29 && t < 11 * 60 + 30);
-      var pm = (t >= 13 * 60 && t < 15 * 60 + 1);
-      if(am || pm) return 15 * MIN;                              // 交易时段 15 分
+  function _bjHM(){ var d=_bj(); return d.getUTCHours()*60 + d.getUTCMinutes(); }
+  function _isTradingDay(){
+    var d=_bj(), wd=d.getUTCDay();                       // 0=周日 6=周六
+    if(wd===0||wd===6) return false;
+    var mm=String(d.getUTCMonth()+1).padStart(2,'0');
+    var dd=String(d.getUTCDate()).padStart(2,'0');
+    return !HOLS_2026.has(mm+'-'+dd);
+  }
+  // 本时段目标刷新间隔(ms)；返回 0 = 当前处于「不刷新」窗口（夜间）
+  function _targetIntervalMs(){
+    var t=_bjHM();                                       // 0..1439
+    if(t < 7*60 || t >= 23*60) return 0;                 // 夜间 23:00–07:00 不刷新
+    if(_isTradingDay()){
+      // 盘中(交易时段) 09:30–11:30 与 13:00–15:00 → 15 分钟；午休 11:30–13:00 市场休市无新数据，归入「1 小时」
+      var am = (t >= 9*60+30 && t < 11*60+30);
+      var pm = (t >= 13*60 && t < 15*60);
+      if(am || pm) return 15*60*1000;                    // 盘中 → 15 分钟
+      return 60*60*1000;                                 // 午休 / 收盘后 15:00–23:00 → 1 小时
     }
-    return 60 * MIN;                                             // 午休/盘后/周末 1 小时
+    return 2*60*60*1000;                                 // 非交易日 07:00–23:00 → 2 小时
   }
-  function _doReload(why){
-    try{ var p=window._cstParts?window._cstParts(new Date()):null; window.__v8LastReload = why + '@' + (p?p.y+'-'+String(p.m).padStart(2,'0')+'-'+String(p.d).padStart(2,'0')+' '+String(p.hh).padStart(2,'0')+':'+String(p.mm).padStart(2,'0'):new Date().toISOString()); location.reload(true); }catch(e){}
-  }
-  var last = Date.now();
-  try{ var _s = sessionStorage.getItem('v8LastRefresh'); if(_s && +_s > 0) last = +_s; }catch(e){}
-  function _markLast(){
-    last = Date.now();
-    try{ sessionStorage.setItem('v8LastRefresh', String(last)); }catch(e){}
+
+  var _last = Date.now();
+  function _maybeReload(){
+    var iv = _targetIntervalMs();
+    if(iv === 0) return false;                           // 夜间不刷
+    if((Date.now() - _last) >= iv){
+      _last = Date.now();
+      try{ location.reload(); }catch(e){}
+      return true;                                      // 本页即将销毁
+    }
+    return false;
   }
   function _tick(){
-    var iv = _refreshIvMs();
-    var elapsed = Date.now() - last;
-    if(iv !== Infinity && elapsed >= iv){ _markLast(); _doReload('timer'); return; }
-    var hidden = false; try{ hidden = document.visibilityState === 'hidden'; }catch(e){}
-    var base = hidden ? 5 * MIN : 30 * 1000;                     // 后台 5 分钟探一次，前台 30 秒
-    var remain = (iv === Infinity) ? base : Math.max(base, Math.min(base, iv - elapsed));
-    if(remain < 15 * 1000) remain = 15 * 1000;
-    setTimeout(_tick, remain);
+    if(_maybeReload()) return;
+    var iv = _targetIntervalMs();
+    setTimeout(_tick, iv === 0 ? 5*60*1000 : 60*1000);   // 夜间每5分回看天亮；其余每分钟检查距上次刷新耗时
   }
-  /* 兜底①：标签页回到前台时立刻校验是否早已过期（后台节流下的救命腿） */
+  // 切回前台：超过本时段间隔才立即刷新（兜底，不超时不误刷）
   try{
     document.addEventListener('visibilitychange', function(){
-      if(document.visibilityState === 'visible'){
-        var iv = _refreshIvMs();
-        if(iv !== Infinity && Date.now() - last >= iv){ _markLast(); _doReload('visible'); }
-      }
+      if(document.visibilityState === 'visible' && _maybeReload()) return;
     }, false);
   }catch(e){}
-  /* 兜底②：陈旧硬上限（交易时段 45 分钟 / 其余 3 小时）—— 即便判定逻辑出错也绝不"永不刷新" */
+  // 兜底：陈旧硬上限（4 小时）—— 即便时段判定逻辑出错，也绝不「永不刷新」
   setInterval(function(){
-    var iv = _refreshIvMs();
-    if(iv === Infinity) return;
-    var hardLimit = (iv <= 15 * MIN) ? 45 * MIN : 3 * 60 * MIN;
-    if(Date.now() - last >= hardLimit){ _markLast(); _doReload('stale-hard'); }
-  }, 5 * MIN);
-  _tick();
+    if((Date.now() - _last) >= 4*60*60*1000){ _last = Date.now(); try{ location.reload(); }catch(e){} }
+  }, 5*60*1000);
+  setTimeout(_tick, 30*1000);   // 首屏稳定 30s 后接管刷新，避免与首屏渲染争抢
 })();
 </script>
 
