@@ -1,1 +1,371 @@
-window.SECTOR_CYCLE_ARCHIVE = {"update_time":"2026-09-16 18:53:52","version":1,"source":"raw_data/limit_up_heatmap.json","params":{"hot_min":3,"cycle_gap":3,"min_len":1},"range":["07/20","09/16"],"columns":39,"cycle_count":26,"cycles":[{"sector":"其他","start":"07/20","end":"09/16","start_idx":0,"end_idx":38,"days":39,"hot_days":39,"peak":296,"peak_date":"09/01","total":3101,"ongoing":true},{"sector":"医药","start":"07/20","end":"09/16","start_idx":0,"end_idx":38,"days":39,"hot_days":39,"peak":82,"peak_date":"08/20","total":792,"ongoing":true},{"sector":"消费电子","start":"07/20","end":"07/22","start_idx":0,"end_idx":2,"days":3,"hot_days":3,"peak":6,"peak_date":"07/21","total":13,"ongoing":false},{"sector":"电力","start":"07/20","end":"08/24","start_idx":0,"end_idx":21,"days":22,"hot_days":21,"peak":12,"peak_date":"07/20","total":154,"ongoing":false},{"sector":"AI算力","start":"07/21","end":"08/19","start_idx":1,"end_idx":18,"days":18,"hot_days":17,"peak":9,"peak_date":"08/13","total":101,"ongoing":false},{"sector":"半导体","start":"07/22","end":"08/21","start_idx":2,"end_idx":20,"days":19,"hot_days":16,"peak":10,"peak_date":"08/10","total":84,"ongoing":false},{"sector":"通信设备","start":"07/22","end":"07/23","start_idx":2,"end_idx":3,"days":2,"hot_days":2,"peak":4,"peak_date":"07/22","total":8,"ongoing":false},{"sector":"机器人","start":"07/23","end":"09/10","start_idx":3,"end_idx":34,"days":32,"hot_days":31,"peak":27,"peak_date":"09/03","total":354,"ongoing":false},{"sector":"地产链","start":"07/24","end":"07/28","start_idx":4,"end_idx":6,"days":3,"hot_days":3,"peak":3,"peak_date":"07/24","total":9,"ongoing":false},{"sector":"新能源车","start":"07/28","end":"07/30","start_idx":6,"end_idx":8,"days":3,"hot_days":3,"peak":7,"peak_date":"07/30","total":16,"ongoing":false},{"sector":"消费电子","start":"07/28","end":"07/30","start_idx":6,"end_idx":8,"days":3,"hot_days":3,"peak":5,"peak_date":"07/30","total":11,"ongoing":false},{"sector":"白酒消费","start":"07/29","end":"09/10","start_idx":7,"end_idx":34,"days":28,"hot_days":27,"peak":33,"peak_date":"09/08","total":280,"ongoing":false},{"sector":"军工","start":"08/10","end":"08/11","start_idx":11,"end_idx":12,"days":2,"hot_days":2,"peak":5,"peak_date":"08/10","total":8,"ongoing":false},{"sector":"地产链","start":"08/10","end":"09/09","start_idx":11,"end_idx":33,"days":23,"hot_days":23,"peak":25,"peak_date":"08/31","total":140,"ongoing":false},{"sector":"通信设备","start":"08/10","end":"08/25","start_idx":11,"end_idx":22,"days":12,"hot_days":11,"peak":4,"peak_date":"08/10","total":40,"ongoing":false},{"sector":"新能源车","start":"08/11","end":"09/16","start_idx":12,"end_idx":38,"days":27,"hot_days":22,"peak":20,"peak_date":"09/01","total":169,"ongoing":true},{"sector":"消费电子","start":"08/12","end":"09/16","start_idx":13,"end_idx":38,"days":26,"hot_days":20,"peak":15,"peak_date":"09/03","total":155,"ongoing":true},{"sector":"军工","start":"08/18","end":"08/18","start_idx":17,"end_idx":17,"days":1,"hot_days":1,"peak":3,"peak_date":"08/18","total":3,"ongoing":false},{"sector":"AI算力","start":"08/25","end":"09/16","start_idx":22,"end_idx":38,"days":17,"hot_days":16,"peak":25,"peak_date":"09/01","total":163,"ongoing":true},{"sector":"军工","start":"08/27","end":"09/14","start_idx":24,"end_idx":36,"days":13,"hot_days":12,"peak":24,"peak_date":"09/09","total":90,"ongoing":false},{"sector":"电力","start":"08/28","end":"09/16","start_idx":25,"end_idx":38,"days":14,"hot_days":14,"peak":12,"peak_date":"09/09","total":99,"ongoing":true},{"sector":"通信设备","start":"08/31","end":"09/16","start_idx":26,"end_idx":38,"days":13,"hot_days":13,"peak":8,"peak_date":"09/02","total":61,"ongoing":true},{"sector":"半导体","start":"09/01","end":"09/01","start_idx":27,"end_idx":27,"days":1,"hot_days":1,"peak":4,"peak_date":"09/01","total":4,"ongoing":false},{"sector":"半导体","start":"09/08","end":"09/16","start_idx":32,"end_idx":38,"days":7,"hot_days":7,"peak":15,"peak_date":"09/16","total":64,"ongoing":true},{"sector":"光伏","start":"09/15","end":"09/16","start_idx":37,"end_idx":38,"days":2,"hot_days":2,"peak":4,"peak_date":"09/15","total":8,"ongoing":true},{"sector":"机器人","start":"09/16","end":"09/16","start_idx":38,"end_idx":38,"days":1,"hot_days":1,"peak":6,"peak_date":"09/16","total":6,"ongoing":true}],"republish_time":"2026-09-16 19:03:44"};
+// ═══════════════════════════════════════════════════════════════════════
+// 🔴🔴 重要档案文件 · 禁止删除 · 禁止 git rm · 禁止加入清理白名单 🔴🔴
+//
+// 板块周期档案（SECTOR_CYCLE_ARCHIVE）
+//   —— 由 raw_data/limit_up_heatmap.json 的累积长表派生，记录每个板块的
+//      「启动 → 退潮」周期区间（几几年几月启动、几月结束），可逐年回查。
+//
+// ⚠️ 本文件是**长期累积数据**，价值随年月增长，一旦删除无法恢复
+//    （涨停数据源只保留最近 1 个月，历史无法重新拉取）。
+//    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
+//
+// 生成器：build_sector_cycle_archive.py
+// 最后更新：2026-09-16 18:53:52
+// ═══════════════════════════════════════════════════════════════════════
+
+window.SECTOR_CYCLE_ARCHIVE = {
+  "update_time": "2026-09-16 18:53:52",
+  "version": 1,
+  "source": "raw_data/limit_up_heatmap.json",
+  "params": {
+    "hot_min": 3,
+    "cycle_gap": 3,
+    "min_len": 1
+  },
+  "range": [
+    "07/20",
+    "09/16"
+  ],
+  "columns": 39,
+  "cycle_count": 26,
+  "cycles": [
+    {
+      "sector": "其他",
+      "start": "07/20",
+      "end": "09/16",
+      "start_idx": 0,
+      "end_idx": 38,
+      "days": 39,
+      "hot_days": 39,
+      "peak": 296,
+      "peak_date": "09/01",
+      "total": 3101,
+      "ongoing": true
+    },
+    {
+      "sector": "医药",
+      "start": "07/20",
+      "end": "09/16",
+      "start_idx": 0,
+      "end_idx": 38,
+      "days": 39,
+      "hot_days": 39,
+      "peak": 82,
+      "peak_date": "08/20",
+      "total": 792,
+      "ongoing": true
+    },
+    {
+      "sector": "消费电子",
+      "start": "07/20",
+      "end": "07/22",
+      "start_idx": 0,
+      "end_idx": 2,
+      "days": 3,
+      "hot_days": 3,
+      "peak": 6,
+      "peak_date": "07/21",
+      "total": 13,
+      "ongoing": false
+    },
+    {
+      "sector": "电力",
+      "start": "07/20",
+      "end": "08/24",
+      "start_idx": 0,
+      "end_idx": 21,
+      "days": 22,
+      "hot_days": 21,
+      "peak": 12,
+      "peak_date": "07/20",
+      "total": 154,
+      "ongoing": false
+    },
+    {
+      "sector": "AI算力",
+      "start": "07/21",
+      "end": "08/19",
+      "start_idx": 1,
+      "end_idx": 18,
+      "days": 18,
+      "hot_days": 17,
+      "peak": 9,
+      "peak_date": "08/13",
+      "total": 101,
+      "ongoing": false
+    },
+    {
+      "sector": "半导体",
+      "start": "07/22",
+      "end": "08/21",
+      "start_idx": 2,
+      "end_idx": 20,
+      "days": 19,
+      "hot_days": 16,
+      "peak": 10,
+      "peak_date": "08/10",
+      "total": 84,
+      "ongoing": false
+    },
+    {
+      "sector": "通信设备",
+      "start": "07/22",
+      "end": "07/23",
+      "start_idx": 2,
+      "end_idx": 3,
+      "days": 2,
+      "hot_days": 2,
+      "peak": 4,
+      "peak_date": "07/22",
+      "total": 8,
+      "ongoing": false
+    },
+    {
+      "sector": "机器人",
+      "start": "07/23",
+      "end": "09/10",
+      "start_idx": 3,
+      "end_idx": 34,
+      "days": 32,
+      "hot_days": 31,
+      "peak": 27,
+      "peak_date": "09/03",
+      "total": 354,
+      "ongoing": false
+    },
+    {
+      "sector": "地产链",
+      "start": "07/24",
+      "end": "07/28",
+      "start_idx": 4,
+      "end_idx": 6,
+      "days": 3,
+      "hot_days": 3,
+      "peak": 3,
+      "peak_date": "07/24",
+      "total": 9,
+      "ongoing": false
+    },
+    {
+      "sector": "新能源车",
+      "start": "07/28",
+      "end": "07/30",
+      "start_idx": 6,
+      "end_idx": 8,
+      "days": 3,
+      "hot_days": 3,
+      "peak": 7,
+      "peak_date": "07/30",
+      "total": 16,
+      "ongoing": false
+    },
+    {
+      "sector": "消费电子",
+      "start": "07/28",
+      "end": "07/30",
+      "start_idx": 6,
+      "end_idx": 8,
+      "days": 3,
+      "hot_days": 3,
+      "peak": 5,
+      "peak_date": "07/30",
+      "total": 11,
+      "ongoing": false
+    },
+    {
+      "sector": "白酒消费",
+      "start": "07/29",
+      "end": "09/10",
+      "start_idx": 7,
+      "end_idx": 34,
+      "days": 28,
+      "hot_days": 27,
+      "peak": 33,
+      "peak_date": "09/08",
+      "total": 280,
+      "ongoing": false
+    },
+    {
+      "sector": "军工",
+      "start": "08/10",
+      "end": "08/11",
+      "start_idx": 11,
+      "end_idx": 12,
+      "days": 2,
+      "hot_days": 2,
+      "peak": 5,
+      "peak_date": "08/10",
+      "total": 8,
+      "ongoing": false
+    },
+    {
+      "sector": "地产链",
+      "start": "08/10",
+      "end": "09/09",
+      "start_idx": 11,
+      "end_idx": 33,
+      "days": 23,
+      "hot_days": 23,
+      "peak": 25,
+      "peak_date": "08/31",
+      "total": 140,
+      "ongoing": false
+    },
+    {
+      "sector": "通信设备",
+      "start": "08/10",
+      "end": "08/25",
+      "start_idx": 11,
+      "end_idx": 22,
+      "days": 12,
+      "hot_days": 11,
+      "peak": 4,
+      "peak_date": "08/10",
+      "total": 40,
+      "ongoing": false
+    },
+    {
+      "sector": "新能源车",
+      "start": "08/11",
+      "end": "09/16",
+      "start_idx": 12,
+      "end_idx": 38,
+      "days": 27,
+      "hot_days": 22,
+      "peak": 20,
+      "peak_date": "09/01",
+      "total": 169,
+      "ongoing": true
+    },
+    {
+      "sector": "消费电子",
+      "start": "08/12",
+      "end": "09/16",
+      "start_idx": 13,
+      "end_idx": 38,
+      "days": 26,
+      "hot_days": 20,
+      "peak": 15,
+      "peak_date": "09/03",
+      "total": 155,
+      "ongoing": true
+    },
+    {
+      "sector": "军工",
+      "start": "08/18",
+      "end": "08/18",
+      "start_idx": 17,
+      "end_idx": 17,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 3,
+      "peak_date": "08/18",
+      "total": 3,
+      "ongoing": false
+    },
+    {
+      "sector": "AI算力",
+      "start": "08/25",
+      "end": "09/16",
+      "start_idx": 22,
+      "end_idx": 38,
+      "days": 17,
+      "hot_days": 16,
+      "peak": 25,
+      "peak_date": "09/01",
+      "total": 163,
+      "ongoing": true
+    },
+    {
+      "sector": "军工",
+      "start": "08/27",
+      "end": "09/14",
+      "start_idx": 24,
+      "end_idx": 36,
+      "days": 13,
+      "hot_days": 12,
+      "peak": 24,
+      "peak_date": "09/09",
+      "total": 90,
+      "ongoing": false
+    },
+    {
+      "sector": "电力",
+      "start": "08/28",
+      "end": "09/16",
+      "start_idx": 25,
+      "end_idx": 38,
+      "days": 14,
+      "hot_days": 14,
+      "peak": 12,
+      "peak_date": "09/09",
+      "total": 99,
+      "ongoing": true
+    },
+    {
+      "sector": "通信设备",
+      "start": "08/31",
+      "end": "09/16",
+      "start_idx": 26,
+      "end_idx": 38,
+      "days": 13,
+      "hot_days": 13,
+      "peak": 8,
+      "peak_date": "09/02",
+      "total": 61,
+      "ongoing": true
+    },
+    {
+      "sector": "半导体",
+      "start": "09/01",
+      "end": "09/01",
+      "start_idx": 27,
+      "end_idx": 27,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 4,
+      "peak_date": "09/01",
+      "total": 4,
+      "ongoing": false
+    },
+    {
+      "sector": "半导体",
+      "start": "09/08",
+      "end": "09/16",
+      "start_idx": 32,
+      "end_idx": 38,
+      "days": 7,
+      "hot_days": 7,
+      "peak": 15,
+      "peak_date": "09/16",
+      "total": 64,
+      "ongoing": true
+    },
+    {
+      "sector": "光伏",
+      "start": "09/15",
+      "end": "09/16",
+      "start_idx": 37,
+      "end_idx": 38,
+      "days": 2,
+      "hot_days": 2,
+      "peak": 4,
+      "peak_date": "09/15",
+      "total": 8,
+      "ongoing": true
+    },
+    {
+      "sector": "机器人",
+      "start": "09/16",
+      "end": "09/16",
+      "start_idx": 38,
+      "end_idx": 38,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 6,
+      "peak_date": "09/16",
+      "total": 6,
+      "ongoing": true
+    }
+  ]
+};
