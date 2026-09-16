@@ -1025,12 +1025,51 @@ def _supervised_run(script, path, timeout):
     return rc, last_lines, killed_reason
 
 
-def step_run(order=None):
+def _freshness_baseline(stage):
+    """🛡 2026-09-17 一劳永逸（D 批整夜不出·根因二）：门控「新鲜度基线」按批次语义取。
+
+    病根（09-17 00:00~06:30 实测三连栽）：
+      门控以 `run_start = datetime.now()`（本批启动时刻）判定输入是否新鲜。
+      但 B/D/E 批**是分批跑的**，其输入由上批产出并已推送，mtime 必然**早于**本批启动：
+        - A 批 04:31 产出 lhb_data.json / sector_rs.json / stock_profile.json
+        - D 批 06:27 启动 → 这三个 mtime 比 run_start 早 1h56m → 判「陈旧」
+        - 门控重跑生成器（fetch_lhb/fetch_sector_rs/gen_stock_profile 各数分钟），
+          重跑产物 mtime 仍可能落在 run_start 之前（并发/时钟/写序），复检仍陈旧
+        - → `_final_recommend_gate` 返回 False → **跳过 final_recommend，本轮不产出**
+        - → 但 job 退出码 0（脚本 continue-on-error）→ **job 绿色「假成功」**
+        - → 线上 FINAL_RECOMMEND_DATA.js 整夜停在昨日 → 主人「6 点了还没出数据」
+
+    修法（口径对齐，不是放宽）：
+      * 全链（stage=None）：输入确应由本轮自产 → 基线 = run_start（原口径不变，最严）。
+      * 显式分批（stage in A/B/D/E）：该批输入由**上游批次**产出，判定基线改用
+        「数据日盘后就绪下限」`FLOOR_TRADING=(16,30)`（与 .github/scripts/v8_stage_gate.py
+        同一常量、同一语义）——只要输入是本数据日 16:30 之后产出的，就属「今日盘后新鲜」。
+      * 这样既不放过陈旧数据（昨日产物仍会被判 STALE），也**不再要求后批的输入
+        「比后批本身还新」**这个物理上不可能的事。
+    """
+    if stage is None:
+        return datetime.now()
+    # 数据日：与全链路同一中枢（交易日内=今天；非交易日/09:00 前=最近交易日）
+    try:
+        _d = _last_trading_day()
+    except Exception:
+        _d = datetime.now().date()
+    try:
+        base = datetime(_d.year, _d.month, _d.day, 16, 30)
+    except Exception:
+        base = datetime.now()
+    print(f"  🧭 新鲜度基线（stage={stage} 分批模式）：{base:%Y-%m-%d %H:%M}"
+          f"（数据日 {_d} 的盘后就绪下限；全链模式才用 run_start=now）")
+    return base
+
+
+def step_run(order=None, stage=None):
     if order is None:
         order = ORDER
     print(f"\n[1] 运行算法链（{len(order)} 个）")
     # 记录本轮启动时间，供 final_recommend 门控判断「输入是否本轮新鲜产出」
-    run_start = datetime.now()
+    # 🛡 2026-09-17：分批模式（stage 显式）改用「数据日盘后基线」，见 _freshness_baseline 注释。
+    run_start = _freshness_baseline(stage)
     # 🔴 盘后选股策略统一门控：18:00 前跳过所有选股脚本
     picking_ready = _is_post_close_picking_ready()
     # 🛡 2026-09-11 一劳永逸：链级判定必须显式传给子脚本，杜绝「两套时间门打架」。
@@ -1309,7 +1348,7 @@ def main():
             print("\n[2.5-2.7] ⏭️ 跳过 LHB 历史累积 + LHB 7日累计 + v8 选股生命周期（非交易日或盘后策略未就绪）")
     else:
         print(f"\n[2.5-2.7] ⏭️ 跳过 LHB 历史累积 + 生命周期前置（stage={stage}，A/C/E 批不承担该职责）")
-    step_run(order=order)
+    step_run(order=order, stage=stage)
     n = step_stage()
     step_push()
     print(f"\n=== 完成。staged {n} 个文件 ===")
