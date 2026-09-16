@@ -1,6 +1,6 @@
 {
  "month": "2026年9月",
- "update_time": "2026-09-15 18:15",
+ "update_time": "2026-09-16 08:19",
  "legend": [
   {
    "title": "重要政策",
@@ -271,29 +271,29 @@
     {
      "num": 15,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇺🇸 FOMC议息会议第1天",
        "cls": "fomc",
-       "released": false
+       "released": true
       },
       {
        "text": "🇨🇳 工业增加值/社零/固投",
        "cls": "data",
-       "released": false
+       "released": true
       },
       {
        "text": "🇨🇳 MLF操作",
        "cls": "cb",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 16,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇺🇸 FOMC利率决议",
