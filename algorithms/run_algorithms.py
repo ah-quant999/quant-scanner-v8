@@ -151,6 +151,10 @@ ORDER = [
     "fetch_inst_trade.py",
     "fetch_sector_rs.py",
     "fetch_lhb.py",
+    # 🛡 2026-09-17 对齐修复：STAGES["A"] 已挂 scripts/fetch_sector_leaders.py（主升板块龙头股，
+    #   必须紧跟 fetch_sector_rs.py 依赖其 SECTOR_RS.js 判档）但 ORDER 漏挂 → 入口自校验
+    #   assert _STAGE_UNION == set(ORDER) 炸链（09-07 同类问题复发）。此处补挂对齐。
+    "scripts/fetch_sector_leaders.py",
     # 🛡 2026-08-20 一劳永逸：5 年长 K 线 fetcher 补入算法链（此前无任何调度方，
     #   且只写 out/ 不 bridge raw_data/ → INDEX_HISTORY 永不更新）。
     # 🛡 2026-08-29 主人令：补跑第二基准（中证1000 / 国证A指），判断 +6% excess 是 alpha 还是风格 beta。
