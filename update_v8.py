@@ -1186,7 +1186,14 @@ def _post_build_extras():
 
 
 
+# 🔴 2026-09-17 阿狸咪的工程师（P-6 落盘）：当前构建类别，供 run_experiment_cards()
+#   做「开关 vs 盘后构建」互斥断言（见该函数内）。由 build() 显式写入。
+_CURRENT_BUILD_CATEGORY = None
+
+
 def build(category=None, detect_changes=False):
+    global _CURRENT_BUILD_CATEGORY
+    _CURRENT_BUILD_CATEGORY = category
     if not RAW_DIR.exists():
         print(f"⚠️  raw_data/ 目录不存在（{RAW_DIR}）。保持既有 data/*.js 不变。")
         return 0
@@ -1303,6 +1310,17 @@ def run_experiment_cards():
     #   注意：这里**不放松**任何诚实闸门——生成器自己的「拒绝发布虚假回测」原样保留，
     #   云端构建仍会在缺 K 线时照旧 raise。
     if os.environ.get("V8_SKIP_EXPERIMENT_CARDS") == "1":
+        # 🔴 2026-09-17 阿狸咪的工程师（P-6 落盘）：**互斥断言** —— 防未来有人把
+        #   `V8_SKIP_EXPERIMENT_CARDS: "1"` 照抄到盘后构建里（`--category post_close`）。
+        #   契约：该开关只为「轻量环境无 pandas」而生（v8_algo_intraday_lite.yml 盘中轻量链）；
+        #   盘后构建**必须**重算实验卡（强势突破/商品弹性/情绪周期），否则盘后产物永久缺卡。
+        #   前置核实（本机全仓穷举）：全仓 workflow 中仅 v8_algo_intraday_lite.yml 设该开关，
+        #   且它跑的是 `python update_v8.py`（无 --category）⇒ 断言不会误伤任何现有 CI。
+        if _CURRENT_BUILD_CATEGORY == "post_close":
+            print("[experiment] ⛔ 契约冲突：`--category post_close` 与 "
+                  "`V8_SKIP_EXPERIMENT_CARDS=1` 互斥 —— 盘后构建必须重算实验卡，"
+                  "该开关仅适用于无 pandas 的盘中轻量环境。请去掉开关或改用 `--category intraday`。")
+            raise SystemExit(1)
         print("[experiment] ⏭️ V8_SKIP_EXPERIMENT_CARDS=1 → 按契约跳过实验卡"
               "（轻量环境无 pandas；实验卡由云端构建重算，避免误报假 failure）")
         return

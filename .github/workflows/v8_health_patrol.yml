@@ -189,16 +189,32 @@ jobs:
             echo "::error::v8_health_check.py 执行失败（exit=$_HC_RC），回查结果不可信，判定为失败"
             exit 1
           fi
-          # 同上：`|| true` + ${VAR:-0} 兜底，避免 grep 无匹配时污染 step outputs
-          # 并使下面 `[ "$REMAIN_FAIL" -gt 0 ]` 因变量含换行而报 "integer expression expected"。
-          REMAIN_FAIL=$(grep -c '"status": "fail"' verify_output.txt 2>/dev/null || true)
-          NEW_OK=$(grep -c '"status": "ok"' verify_output.txt 2>/dev/null || true)
-          REMAIN_FAIL="${REMAIN_FAIL:-0}"; NEW_OK="${NEW_OK:-0}"
+          # 🔴🔴 2026-09-17 阿狸咪的工程师 · 落地 P-2「判据同源化」（小九 20:25 回执 §6.2 授权）：
+          #   原两条判据**实测恒为 0** ⇒ 该闸门形同虚设（**假绿灯**，与 09-08 修 `|| true` 的初衷相反方向）：
+          #     v8_health_check.py 打印的是人类可读的 `  [FAIL] 页面/名称: message`，
+          #     全仓并无任何 `"status": "fail"` 文本 ⇒ grep -c 永远数到 0 ⇒
+          #       ① REMAIN_FAIL 恒 0 ⇒「自愈闭环未达成」升级告警**永不触发**；
+          #       ② NEW_OK 恒 0 ⇒ 下面打印「✅ 自愈闭环达成：0 项全 OK」（误导读者）。
+          #   实证（本机 API 取 run 日志，非推测）：run#3535 / #3534 / #3532（2026-09-17）
+          #     的 verify 输出里 `"status": "fail"` 命中 **0** 次（唯一命中是脚本源码回显自身）。
+          #   ⇒ 判据改为与**脚本真实输出格式**同源（`^  [FAIL]`，脚本 L2995 的打印格式）。
+          #   ⚠️ **不可只修判据**：原判据恒 0 等于「永不报警」，一旦改成能报警，
+          #      「自愈派发去抖/冷却期跳过 ⇒ 本轮数据未变 ⇒ 回查仍 fail」这种**正常中间态**
+          #      会立刻变成每晚假红灯（回流本轮之前的病）。故判据升级为
+          #      **「是否比自愈前更差」**：回查 fail 数 > 自愈前 fail 数 ⇒ 才报错（真恶化），
+          #      否则视为「闭环或未恶化」，不制造假 failure。
+          #   另：`|| true` + ${VAR:-0} 兜底保留，避免 grep 无匹配污染 step outputs /
+          #      变量含换行导致 `-gt` 报 "integer expression expected"。
+          FAIL_BEFORE=$(grep -c '^  \[FAIL\]' heal_output.txt 2>/dev/null || true)
+          REMAIN_FAIL=$(grep -c '^  \[FAIL\]' verify_output.txt 2>/dev/null || true)
+          NEW_OK=$(grep -m1 '^\[INFO\] 总体:' verify_output.txt 2>/dev/null | sed -n "s/.*'ok': \([0-9]*\).*/\1/p" || true)
+          FAIL_BEFORE="${FAIL_BEFORE:-0}"; REMAIN_FAIL="${REMAIN_FAIL:-0}"; NEW_OK="${NEW_OK:-0}"
           echo "verify_fail=$REMAIN_FAIL" >> "$GITHUB_OUTPUT"
           echo "verify_ok=$NEW_OK" >> "$GITHUB_OUTPUT"
-          if [ "$REMAIN_FAIL" -gt 0 ]; then
-            echo "🚨 自愈后仍有 $REMAIN_FAIL 项 fail，可能结构性断点（algo_run→bridge_raw_data 未生效等），已发邮件升级"
-            echo "::error::自愈闭环未达成 — $REMAIN_FAIL 项 10 分钟后仍 fail（详见 verify_output.txt）"
+          echo "📊 自愈前 fail=$FAIL_BEFORE → 回查 fail=$REMAIN_FAIL（OK 项 $NEW_OK）"
+          if [ "$REMAIN_FAIL" -gt "$FAIL_BEFORE" ]; then
+            echo "🚨 自愈后 fail 项**上升**（$FAIL_BEFORE → $REMAIN_FAIL），可能结构性断点（algo_run→bridge_raw_data 未生效等），已发邮件升级"
+            echo "::error::自愈闭环未达成 — fail 项由 $FAIL_BEFORE 增到 $REMAIN_FAIL（10 分钟后回查，详见 verify_output.txt）"
             # 🛡 2026-08-19 阿狸咪根治（health_patrol 死 37h 根因）：
             # 原版这段用多行 python -c（含换行 + 单引号字符串），YAML 解析时把换行当成
             # 字符串内的 \n，但 Python 看到的是多行字符串需要三引号包裹 → SyntaxError →
@@ -206,7 +222,7 @@ jobs:
             # 修复：抽到独立脚本 scripts/write_self_heal_escalation.py，单行调用。
             REMAIN_FAIL="$REMAIN_FAIL" python scripts/write_self_heal_escalation.py
           else
-            echo "✅ 自愈闭环达成：$NEW_OK 项全 OK"
+            echo "✅ 自愈闭环达成/未恶化：自愈前 $FAIL_BEFORE 项 → 回查 $REMAIN_FAIL 项（OK 项 $NEW_OK）"
           fi
 
       - name: "🚨 缺口兜底：近 6 分钟无 cn_fetch / algo_run 完成就派发"
