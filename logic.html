@@ -4041,6 +4041,21 @@ window.__renderV8CalFull();
     var dom=$('sfIntradayChart');
     if(!dom) return;
     var d=window.SECTOR_FUND_FLOW_INTRADAY;
+    // 🛡 2026-09-17 主人令（截图实锤）：「这个是昨天的！盘前要清空！」
+    //    「交易日 9 点 20 分后，不再显示昨天的旧值」
+    // 🔴 根因：数据端在今日尚未抓到快照时，d.snapshots 里装的仍是昨日全天快照，
+    //    而 date 字段为昨日 ⇒ 09:20 后前端把昨日曲线当今日显示。
+    // 🛠 修法：09:20 后（非盘前）若 d.date 非今日，直接清空显示，绝不贴昨日值。
+    //    （与 index.html:renderSfIntradayChart 口径严格一致，禁两处特立独行）
+    var _nowParts = window._cstParts ? window._cstParts(new Date()) : null;
+    var _isPreMarket = _nowParts && (_nowParts.hh < 9 || (_nowParts.hh === 9 && _nowParts.mm < 20));
+    var _todayStr = window._fmtDateCST ? window._fmtDateCST(new Date()) : (new Date().toISOString().slice(0,10));
+    var _isDataToday = ((d && d.date) || _todayStr) === _todayStr;
+    if(!_isPreMarket && !_isDataToday){
+      dom.innerHTML='<div class="ipo-empty">📭 等待今日盘中数据（每30分快照，09:20 后不再显示上一交易日）</div>';
+      var tElStale=$('sfIntradayTime'); if(tElStale) tElStale.innerHTML='—';
+      return;
+    }
     if(!d || !d.snapshots || d.snapshots.length<1){
       dom.innerHTML='<div class="ipo-empty">📭 暂无盘中分时数据（盘中每30分快照，盘前自动清空）</div>';
       var tEl=$('sfIntradayTime'); if(tEl) tEl.innerHTML='—';
