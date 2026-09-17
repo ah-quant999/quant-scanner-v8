@@ -64,6 +64,24 @@ jobs:
 
           def in_window(a, b):
               return a <= hhmm <= b
+          # 🆕 2026-09-17 阿狸咪（拍-16 / 判据 90）：dispatch + cancel 统一留痕（纯观测）。
+          #   🔴 本 workflow 跑在**临时** ubuntu runner ⇒ 本地文件跑完即丢 ⇒ 只写
+          #     Actions step summary（每个 run 页面即时可查）+ 日志。
+          #   有意不推仓：本 workflow 每分钟一次调度，入库会造成 commit 风暴。
+          #   🔴 异常安全：整段 try/except，留痕绝不影响主流程。
+          def audit(event, **kw):
+              try:
+                  ts = cst.strftime("%Y-%m-%d %H:%M:%S")
+                  detail = " ".join("{}={}".format(k, str(v).replace(chr(10), " ")[:80])
+                                    for k, v in kw.items())
+                  print("[audit] {} {} {}".format(ts, event, detail))
+                  import os as _os3
+                  sp = _os3.environ.get("GITHUB_STEP_SUMMARY")
+                  if sp:
+                      with open(sp, "a", encoding="utf-8") as f:
+                          f.write("- `{}` **{}** {}\n".format(ts, event, detail))
+              except Exception:
+                  pass
 
           # 交易时段 → 自适应类别
           cat = None
@@ -160,7 +178,12 @@ jobs:
                           try:
                               urllib.request.urlopen(req2, timeout=20)
                               print(f"[watchdog] 🔓 破锁：取消卡死 cloud run#{x['id']}（龄{age_min:.0f}分，释放 concurrency）")
+                              audit("cancel", target="cloud_stuck_lock", run=x['id'],
+                                    age_min=round(age_min, 1), ok=True, why="lock_release")
                           except Exception as e:
+                              audit("cancel", target="cloud_stuck_lock", run=x['id'],
+                                    age_min=round(age_min, 1), ok=False, why="lock_release",
+                                    err=str(e)[:120])
                               print(f"[watchdog] 取消 run#{x['id']} 失败: {e}")
               except Exception as e:
                   print(f"[watchdog] 破锁查询失败: {e}")
@@ -175,12 +198,16 @@ jobs:
                       capture_output=True, text=True, check=False)
                   print(r.stdout.strip(), r.stderr.strip())
                   print(f"[watchdog] 🛰️ 已派 selfhosted {category}（云端拥堵/刚失败兜底）")
+                  audit("dispatch", path="selfhosted", cat=category, ok=(r.returncode == 0),
+                        trigger="cloud_congested_or_failed")
                   return
               r = subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
                                 "-f", f"category={category}"],
                                capture_output=True, text=True, check=False)
               print(r.stdout.strip(), r.stderr.strip())
               print(f"[watchdog] ☁️ 已派云端 {category}")
+              audit("dispatch", path="cloud_main", cat=category, ok=(r.returncode == 0),
+                    trigger="stale_probe")
 
           stale, newest = [], None
           for fn in files:

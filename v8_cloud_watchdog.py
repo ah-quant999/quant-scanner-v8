@@ -425,7 +425,12 @@ def _algo_recover(run_id, run_number):
     """算法链卡死兜底：cancel 当前 run + repository_dispatch trigger_algo 重派。
     受全局派发冷却节流，避免重复派发风暴。"""
     try:
-        if not _global_dispatch_allowed()[0]:
+        _al_ok, _al_why = _global_dispatch_allowed()
+        if not _al_ok:
+            # 判据 90：必须留「被冷却跳过」的痕，否则日后的「0 次派发」无法区分
+            #   「本不该派」与「想派被冷却拦」。
+            _audit("cancel_skipped_by_cooldown", run=run_number, run_id=run_id,
+                   kind="algo_stuck", why=_al_why)
             print(f"[HEAL] algo 链 run #{run_number} 卡死，但处于全局派发冷却中，跳过重派")
             return
         # ① cancel 卡死 run
@@ -433,7 +438,10 @@ def _algo_recover(run_id, run_number):
         try:
             req = urllib.request.Request(cancel_url, headers=HEADERS, method="POST")
             urllib.request.urlopen(req, timeout=30).read()
+            _audit("cancel", run=run_number, run_id=run_id, ok=True, why="algo_stuck")
         except Exception as e:
+            _audit("cancel", run=run_number, run_id=run_id, ok=False, why="algo_stuck",
+                   err=str(e)[:120])
             print(f"[WARN] cancel algo run #{run_number} 失败: {e}")
         # ② repository_dispatch 重派 trigger_algo（v8_algo_cloud.yml 已注册该 types）
         disp_url = f"https://api.github.com/repos/{REPO}/dispatches"
@@ -445,7 +453,11 @@ def _algo_recover(run_id, run_number):
         try:
             with urllib.request.urlopen(req2, timeout=30) as r:
                 print(f"[HEAL] algo 链 run #{run_number} 卡死 → 已 cancel + 重派 trigger_algo (HTTP {r.status})")
+                _audit("dispatch", path="algo_recover", event_type="trigger_algo",
+                       ok=True, http=r.status, stuck_run=run_number)
         except Exception as e:
+            _audit("dispatch", path="algo_recover", event_type="trigger_algo",
+                   ok=False, stuck_run=run_number, err=str(e)[:120])
             print(f"[WARN] 重派 trigger_algo 失败: {e}")
         _record_global_dispatch()
     except Exception as e:
@@ -1006,6 +1018,61 @@ def _record_global_dispatch():
         pass
 
 
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🆕 2026-09-17 阿狸咪（拍-16 / 判据 90）：dispatch + cancel 统一留痕（**纯观测**）
+# ═══════════════════════════════════════════════════════════════════════════
+# 为什么必须**主动**留痕：GitHub 的 cancel 动作**不写入 run 对象任何字段**
+#   （无 actor、无 reason 可查）⇒ 「谁取消了这一轮」在 API 面上天然不可归因。
+# 为什么必须同时覆盖「被冷却跳过」：否则会出现「留痕显示 0 次派发，但无法区分
+#   『本不该派』与『想派被冷却拦』」（判据 90：冷却状态不可跨机观测）。
+#
+# 🔴 持久化边界（诚实声明，勿误读）：
+#   ① 本机 .workbuddy/v8_dispatch_audit.jsonl —— 本看门狗运行在**小九机**
+#      （见 RUNNER_DIR = D:/actions-runner-v8），故该文件在小九机上持久、可跨轮累积；
+#      但 .workbuddy/ 是 gitignored ⇒ **不入仓、不跨机**。
+#   ② 若存在 GITHUB_STEP_SUMMARY ⇒ 同时写 Actions step summary，run 页面即时可查。
+#   有意**不推仓**：本看门狗被外部调度**每分钟**调用一次，若每轮提交该文件会产生
+#   「每分钟一个 commit」的风暴（与 2026-08-22 派发风暴同级）⇒ 故不做。
+#   ⇒ 跨机核对仍需人工把本文件 / step summary 贴进交接件。
+#
+# 🔴 异常安全：整段 try/except —— 留痕绝不允许影响看门狗主流程。
+_AUDIT_LOG = Path(".workbuddy/v8_dispatch_audit.jsonl")
+_AUDIT_MAX_BYTES = 512 * 1024
+
+
+def _audit(event, **kw):
+    """dispatch / cancel / 冷却跳过 统一留痕。纯观测，异常安全。"""
+    try:
+        rec = {
+            "ts": datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S"),
+            "event": event,
+            "runner": os.environ.get("RUNNER_NAME") or os.environ.get("COMPUTERNAME", ""),
+            "gh_run": os.environ.get("GITHUB_RUN_ID", ""),
+        }
+        rec.update(kw)
+        try:
+            _AUDIT_LOG.parent.mkdir(parents=True, exist_ok=True)
+            with open(_AUDIT_LOG, "a", encoding="utf-8") as f:
+                f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            if _AUDIT_LOG.stat().st_size > _AUDIT_MAX_BYTES:     # 上限保护：只留最近 500 行
+                tail = _AUDIT_LOG.read_text(encoding="utf-8").splitlines()[-500:]
+                _AUDIT_LOG.write_text("\n".join(tail) + "\n", encoding="utf-8")
+        except Exception:
+            pass
+        sp = os.environ.get("GITHUB_STEP_SUMMARY")
+        if sp:
+            with open(sp, "a", encoding="utf-8") as f:
+                f.write("- `%s` **%s** %s\n" % (
+                    rec["ts"], event,
+                    " ".join("%s=%s" % (k, str(v).replace("\n", " ")[:80])
+                             for k, v in kw.items() if k not in ("err",))
+                    + (("  err=`%s`" % str(kw.get("err"))[:120]) if kw.get("err") else "")))
+    except Exception:
+        pass
+
+
+
 def auto_dispatch_with_fallback(cat):
     """2026-08-18 主人令：优先派发云端 ubuntu-latest（v8_cn_fetch_cloud.yml）；
     若其最近 failure 或派发失败，自动切到小九 self-hosted cn 应急兜底。
@@ -1019,6 +1086,8 @@ def auto_dispatch_with_fallback(cat):
     """
     allowed, reason = _global_dispatch_allowed()
     if not allowed:
+        # 判据 90：留「被冷却跳过」的痕（这是本函数最容易产生「0 派发不可解释」的分支）。
+        _audit("dispatch_skipped_by_cooldown", cat=cat, why=reason)
         # 2026-08-24 根因修复：30 分钟全局派发冷却中 = 近期已成功派发，无需再派，
         # 属「安全跳过」而非失败。原 return False 被看门狗当成管线故障，
         # 造成每小时一封 auto_dispatch 失败邮件轰炸（数据其实在正常刷新）。
@@ -1030,16 +1099,22 @@ def auto_dispatch_with_fallback(cat):
         fh_ok, fh_msg = dispatch_selfhosted_fallback(cat)
         if fh_ok:
             _record_global_dispatch()
+        _audit("dispatch", path="selfhosted_fallback", cat=cat, ok=fh_ok,
+               trigger="cloud_latest_failure", msg=str(fh_msg)[:100])
         return fh_ok, f"云端主力最近 failure → {fh_msg}"
     # 正常路径：尝试派发云端主力 workflow
     d_ok, d_msg = auto_dispatch(cat)
     if d_ok:
         _record_global_dispatch()
+        _audit("dispatch", path="cloud_main", cat=cat, ok=True, msg=str(d_msg)[:100])
         return True, d_msg
     # 派发失败：触发 self-hosted 兜底（受 3 重门控约束）
     fh_ok, fh_msg = dispatch_selfhosted_fallback(cat)
     if fh_ok:
         _record_global_dispatch()
+    _audit("dispatch", path="selfhosted_fallback", cat=cat, ok=fh_ok,
+           trigger="cloud_dispatch_failed", msg=str(fh_msg)[:100],
+           cloud_msg=str(d_msg)[:100])
     return fh_ok, f"云端派发失败({d_msg}) → {fh_msg}"
 
 
