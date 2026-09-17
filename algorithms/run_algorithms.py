@@ -298,6 +298,13 @@ STAGES = {
         "scripts/fetch_index_history.py",   # → raw_data/index_history.json（INDEX_HISTORY.js 上游；cloud-only 护栏，09-11 正式挂 A 批）
         "fetch_inst_trade.py",
         "fetch_sector_rs.py", "fetch_lhb.py",
+        # 🚀 2026-09-17 主人令：「主升有没有龙头股或者推荐股，要不不知道买什么」
+        #   「暂未上架 > 概念/行业 → ETF·龙头 参考」卡下方「主升板块 · 龙头股」块的数据上游。
+        #   ⚠️ 必须紧跟 fetch_sector_rs.py —— 它读 data/SECTOR_RS.js 判定「主升」档板块，
+        #      再调东财 push2delay 拉板块成分股取涨幅前 5。前置依赖，顺序不可调换。
+        #   产出：raw_data/sector_leaders.json + data/SECTOR_LEADERS.js（window.SECTOR_LEADERS）
+        #   独立链路：本脚本失败不影响 SECTOR_RS 及任何现有卡片。
+        "scripts/fetch_sector_leaders.py",
         "fetch_orphan_suspension.py", "fetch_orphan_market_alerts.py",
         "fetch_orphan_nt_data.py", "fetch_orphan_sector_fund_flow.py"],
     "B": [  # 选股批（~18:10 CST，盘后数据齐）：核心选股策略
