@@ -76,6 +76,7 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "scripts/fetch_valuation_percentile.py": 1200,  # akshare stock_index_pe_lg（理杏仁），单接口
     "scripts/fetch_index_value_framework.py": 900,  # 读本地 INDEX_HISTORY.js + numpy 计算
     # 🆕 2026-09-11：全算法回测汇总——纯本地读 data/*.js + raw_data/algo_track.json，零网络
+    "gen_market_bench.py": 900,   # 🆕 2026-09-17：3120 只×250 根纯本地计算（交接单口径 timeout 900s）
     "gen_backtest_all_algos.py": 900,
     # 🆕 2026-09-15 主人令（四量终极「自己的一整套系统」）：两个脚本均为**纯本地计算**——
     #   history 读 data/FOUR_VOLUME.js + raw_data/stock_quote.json（全市场快照，一次载入、
@@ -275,6 +276,12 @@ ORDER = [
 #   与回测家族同例会：必须在聚合器gen_backtest_all_algos.py **之前**，
     #   否则聚合器读不到本轮产物。
     "scripts/algo_backtest_compare.py",   # → data/ALGO_BACKTEST_COMPARE.js（H反推 / 高手画像版H反推 / 强势突破 同口径对比）
+    # 🆕 2026-09-17 小九的股票专家（主人令「星级基准超额数据缺失→从回测产物侧补」）：
+    #   全市场等权基准生成器（2026-09-17 阿狸咪的工程师新增）。交接单声称已挂 E 批
+    #   （ORDER[47]）但远端实测缺失（疑被裸 rebase 洗掉）——此处补挂对齐。
+    #   ⚠️ 必须在聚合器 gen_backtest_all_algos.py 之前（聚合器按各卡信号区间读基准求平均）。
+    #   ⚠️ 与 STAGES["E"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
+    "gen_market_bench.py",   # → raw_data/market_bench.json（与策略同口径的全市场等权基准）
     "gen_backtest_all_algos.py",   # → raw_data/backtest_all_algos.json + data/BACKTEST_ALL_ALGOS.js
 
     # 🆕 2026-09-13 主人令「PE/PB 方案 A 落地」：中信证券(sh.600030)历史估值双卡。
@@ -371,6 +378,8 @@ STAGES = {
         #   读 B 批 track_h_auto_buy.py 的 data/H_AUTO_BUY_TRACK.js + 构建链的
         #   data/STOCK_MOMENTUM_STATE_V2.js，聚合出 H反推 / 高手画像版 / 强势突破 三套同口径指标。
         #   ⚠️ 必须在聚合器之前。
+        # 🆕 2026-09-17 补挂（同 ORDER 说明）：基准生成器必须在聚合器之前（成对修改，防 assert 崩链）
+        "gen_market_bench.py",
         "scripts/algo_backtest_compare.py",   # → data/ALGO_BACKTEST_COMPARE.js（本卡无 raw_data 中间件，脚本直写 data/）
         "gen_backtest_all_algos.py",   # → data/BACKTEST_ALL_ALGOS.js（策略回测页总览）
         # 🛡 2026-09-07 主人令「互踢/暴风/覆盖不想再看到·方案 B 一劳永逸根治」：
