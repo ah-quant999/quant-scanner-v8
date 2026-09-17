@@ -25,7 +25,7 @@ import re
 import sys
 import time
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(ROOT, "raw_data")
@@ -660,18 +660,43 @@ def main():
     # 🛡 2026-09-09 主人令：最终推荐必须等因子实验室产出后才能推荐（因子为更好选股而存在）。
     #   校验 FACTOR_LAB.js 为当日新鲜；缺失/陈旧则有限等待（覆盖 B 批生成器偶发延迟），超时仍不可用则降级跳过融合。
     fl = None
+    _fl_degraded = False   # 🔴 2026-09-17：因子因**内容陈旧**而降级（透到 data_degraded，不许静默）
+    _fl_last_dd = ""       # 诊断用：最近一次读到的因子 data_date（日志/降级说明里回显）
     _today = datetime.now().strftime("%Y-%m-%d")
     _fl_max_wait = 0 if V8_OFFLINE else 20  # 离线模式本机无 baostock 注定取不到 FACTOR_LAB，直接跳过等待
+    # 🔴 2026-09-17 阿狸咪的工程师：非交易周（周六/周日）豁免 —— 周末 baostock 无新数据，
+    #   因子的 data_date 合理地停在本周最后交易日（周五）。不豁免会把「周末正常产物」误判成陈旧。
+    #   ⚠️ 残留边界（已登记交接件）：法定节假日不在豁免内（本仓无节假日历），节假日当天可能多
+    #   一次**保守方向**的降级 —— 宁可少用一次因子，也不用昨日数据冒充今日（禁假新鲜）。
+    _fl_wd = datetime.now().weekday()   # 0=周一 … 6=周日
+    _fl_floor = ((datetime.now() - timedelta(days=_fl_wd - 4)).strftime("%Y-%m-%d")
+                 if _fl_wd >= 5 else _today)
     for _wi in range(_fl_max_wait):  # 最多等 ~20min（正常 19:40 前 B 批已产完，此处通常 0 等待）
         _cand = load_js("FACTOR_LAB.js", "FACTOR_LAB")
-        if _cand and str(_cand.get("update_time", "")).startswith(_today):
+        # 🔴 2026-09-17 阿狸咪的工程师（小九 20:25 回执第⑤项授权落地）：**内容级新鲜校验**。
+        #   原实现只看 update_time 的**日期**是否=今天 ⇒ 2026-09-17 04:49 那版
+        #   （update_time 日期=09-17，但 data_date=2026-09-16、用的是 09-16 的池）
+        #   **整轮被当新鲜** ⇒「用昨日因子算今日推荐」，当日生产事故的直接成因。
+        #   现要求 data_date 亦达「数据日」。边界（小九指定，逐条落实）：
+        #     ① data_date 滞后 ⇒ **不判失败中止**，仍等满 _fl_max_wait 后降级（fl=None）并置
+        #        data_degraded=True —— 否则会造出比现状更糟的「D 批不出推荐」；
+        #     ② 老版本产物无 data_date 字段 ⇒ 回退 update_time 单口径（保守兼容）。
+        _fl_dd = str((_cand or {}).get("data_date") or "").strip()
+        _fl_dd_ok = (not _fl_dd) or (_fl_dd == _today) or (_fl_wd >= 5 and _fl_dd >= _fl_floor)
+        if _cand and str(_cand.get("update_time", "")).startswith(_today) and _fl_dd_ok:
             fl = _cand
             break
+        if _cand and _fl_dd and not _fl_dd_ok:
+            _fl_last_dd = _fl_dd
         # 💓 2026-09-12 主人令·方案①：等待 FACTOR_LAB 当日新鲜数据期间逐分钟打印心跳，
         #   避免被 run_algorithms 监督器 15min 静默杀（SILENCE_KILL_SEC=900）误杀——
         #   误杀会让 final_recommend 永远跑不到出结果那步，FINAL_RECOMMEND_DATA 永久停旧版。
         #   纯打印、不改任何数据口径/筛选条件，仅保活；FACTOR_LAB 就绪即 break，永不伪造数据。
-        print(f"  💓 等待 FACTOR_LAB.js 当日新鲜数据（因子实验室）… 已等 {_wi+1}/{_fl_max_wait} 分钟", flush=True)
+        _fl_hint = ("；周末豁免 data_date≥%s" % _fl_floor) if _fl_wd >= 5 else ""
+        if _fl_last_dd:
+            _fl_hint += "；当前 data_date=%s" % _fl_last_dd
+        print(f"  💓 等待 FACTOR_LAB.js 当日新鲜数据（因子实验室，要求 data_date={_today}{_fl_hint}）"
+              f"… 已等 {_wi+1}/{_fl_max_wait} 分钟", flush=True)
         time.sleep(60)
     if fl:
         _at_top = (fl.get("abnormal_turnover") or {}).get("top") or []
@@ -731,7 +756,10 @@ def main():
             if key in _weak:
                 r["signals"].append("放量弱势")
     else:
-        print("[warn] FACTOR_LAB.js 缺失/非当日，等待 %d 次后仍不可用，跳过因子实验室方案B融合（降级推荐）" % 20)
+        _fl_degraded = True
+        print("[warn] FACTOR_LAB.js 缺失/内容陈旧（update_time 或 data_date 未达 %s%s），"
+              "等待 %d 次后仍不可用，跳过因子实验室方案B融合（降级推荐）"
+              % (_today, ("（实际 data_date=%s）" % _fl_last_dd) if _fl_last_dd else "", 20))
 
     # ── 第8.5节 高手共振（外部共振源之一：ima 高手强势股跟踪池）──
     # 与 v8 选股池 code 命中且 IMA 状态仍有效（非见顶/走弱）→ 独立外部共识信号，最终分 +1
@@ -740,7 +768,22 @@ def main():
     # 🔴 2026-09-11 A 类修复：原实现只判 `if ima:`，**从不校验 update_time** → 文件陈旧时
     #   仍照常给 +1.0 共振分（假成功）。
     _ima_ut = str((ima or {}).get("update_time") or "")[:10]
-    if ima and _ima_ut != _today:
+    # 🔴 2026-09-17 阿狸咪的工程师：**同类缺陷第二处**（与上面 FACTOR_LAB 同一个病因）。
+    #   `update_time` 是**抓取时刻** —— 源笔记停更时它每天照变，只看它 = 放行假新鲜。
+    #   实证（2026-09-17 主人截图质疑「都没变化啊」）：源分享页 document.title
+    #   =「强势股跟踪日报 2026-09-02」、页内自述「更新时间：2026.09.02 15:41」、
+    #   每行「最新交易日」= 2026-09-02；而卡片自 09-03 起每天忠实抓同一份静止笔记，
+    #   价格字段指纹（207238cb37e4）连续 20 次抓取一字未改，update_time 却天天是「今天」
+    #   ⇒ 本块会把 **09-02 的名单**当成今日共识给 +1.0 分（静默污染最终推荐）。
+    #   修法（与抓取端同日补丁配套）：抓取端落 data_date/source_stale ⇒ 源侧停更即不参与
+    #   共振加分；源恢复当天即自动回来。边界：老产物无这两个字段 ⇒ 不判停更（保守兼容），
+    #   此时退回原有「update_time 非当日才跳过」的单口径判断。
+    _ima_dd = str((ima or {}).get("data_date") or "").strip()
+    if ima and ((ima or {}).get("source_stale") is True or (_ima_dd and _ima_dd != _today)):
+        print(f"[warn] ⚠️ IMA_STRONG_STOCK 源侧停更（data_date={_ima_dd or '缺失'} / "
+              f"update_time={_ima_ut or '缺失'}）→ 跳过高手共振融合（内容级判据，非抓取失败）")
+        ima = {}
+    elif ima and _ima_ut != _today:
         print(f"[warn] ⚠️ IMA_STRONG_STOCK 非当日（update_time={_ima_ut or '缺失'}）→ 跳过高手共振融合")
         ima = {}
     if ima:
@@ -1136,7 +1179,12 @@ def main():
     #   **必须写进产物并透到前端** —— 主人拍板原话：「宁可给带降级标记的结果，
     #   也不要永久空白（标记可见就不算假成功）」。没有这行，降级放行出来的
     #   最终推荐会和正常结果长得一模一样 ⇒ 又变成一种新的假成功。
-    _degraded = str(os.environ.get("DEGRADED_UPSTREAM", "")).strip() == "1"
+    # 🔴 2026-09-17 阿狸咪的工程师：**因子内容级降级也计入 data_degraded**。
+    #   原先只认 DEGRADED_UPSTREAM 环境变量 ⇒「因子用昨日数据算今日推荐」这件事
+    #   在前端/看板上**完全不可见**（09-17 事故：04:49 那版 data_date=09-16 被当新鲜）。
+    #   主人拍板原话：「宁可给带降级标记的结果，也不要永久空白（标记可见就不算假成功）」
+    #   —— 因子降级同理，必须显形。
+    _degraded = (str(os.environ.get("DEGRADED_UPSTREAM", "")).strip() == "1") or _fl_degraded
     _degrade_lag = str(os.environ.get("DEGRADE_LAG_DAYS", "")).strip()
 
     result = {

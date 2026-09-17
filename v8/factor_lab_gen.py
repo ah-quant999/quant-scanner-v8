@@ -129,6 +129,11 @@ def resolve_data_date(max_back=10, min_rows=1000):
     d = dt.datetime.now().date()
     t0 = time.time()
     TOTAL_LIMIT = 300  # 单轮探测总超时硬上限（秒），防止任何意外静默挂死
+    # 🔴 2026-09-17 阿狸咪的工程师：区分「**登录持续失败**（账号/IP 级故障，error_code=10001011
+    #   黑名单用户）」与「**数据真的未生成**」。原实现两者都走「探满 max_back 天 → return None」，
+    #   调用方统一报「近 10 个自然日均无数据」，把账号级故障误述成数据未生成（问责面失真）。
+    _login_fail = 0
+    _last_login_code = ""
     for i in range(max_back):
         day = (d - dt.timedelta(days=i)).strftime("%Y-%m-%d")
         # 🔴 2026-09-08 真根因修复：实测「先查 0 行日(盘前/凌晨=今天) 再查回退日」时，
@@ -141,6 +146,8 @@ def resolve_data_date(max_back=10, min_rows=1000):
                 pass
             lg = bs.login()
             if lg.error_code != '0':
+                _login_fail += 1
+                _last_login_code = lg.error_code
                 log("⚠️ 数据日探测重登录失败", lg.error_code, "at", day)
             else:
                 log("数据日探测重登录", f"i={i} {day}")
@@ -159,6 +166,10 @@ def resolve_data_date(max_back=10, min_rows=1000):
                 log("数据日回退", f"{d.strftime('%Y-%m-%d')} → {day}（baostock 当日数据未生成，回退 {i} 天）")
             return day
         log("数据日探测", f"[{i+1}/{max_back}] {day}: {n} 行（不足 {min_rows}），继续回退")
+    # 🔴 2026-09-17：把「登录持续失败」显式定性（调用方据此以非零退出上报，而不是静默 return）
+    if _login_fail:
+        log("ERROR: baostock 登录持续失败 %d 次（末次 error_code=%s）⇒ 判定为**账号/IP 级故障**，"
+            "非「数据未生成」" % (_login_fail, _last_login_code))
     return None
 
 
@@ -421,14 +432,42 @@ def _start_heartbeat(sec=30):
 def main():
     _start_heartbeat()
     lg = bs.login(); log("login", lg.error_code)
+    # 🔴 2026-09-17 阿狸咪的工程师（小九 20:25 回执第③项授权落地）：**登录失败必须非零退出**。
+    #   原实现只 `log("login", error_code)` 从不检查返回值 ⇒ 小九机 baostock 被拉黑时
+    #   （error_code=10001011「黑名单用户」）本脚本走「探测 10 天全空 → return」，
+    #   退出码恒为 0 ⇒ run_algorithms 监督器判 ✅ ok ⇒ **整链零红灯、无人知道今日因子没产出**。
+    #   这正是 2026-09-17「算法只差因子没出」事故的直接成因（当时的现场证据：
+    #   ▶ v8/factor_lab_gen.py 起跑↔结束仅 10 秒、输出仅一行、却报退出码 0）。
+    #   对照既有诚实范式 algorithms/strategy_four_volume_60m.py：「baostock 无法启动 ⇒
+    #   退出码 1 + 保留上次真实产物」。本脚本同样不写任何产物，只是把退出码改对（禁假成功）。
+    if lg.error_code != '0':
+        log("ERROR: baostock 登录失败，中止（不产出空 FACTOR_LAB）", lg.error_code, lg.error_msg)
+        print("⛔ baostock 登录失败：error_code=%s %s ⇒ 本轮不产出任何产物"
+              "（保留上次真实 FACTOR_LAB），以退出码 1 上报失败" % (lg.error_code, lg.error_msg),
+              flush=True)
+        try:
+            bs.logout()
+        except Exception:
+            pass
+        sys.exit(1)
     # 🔴 2026-09-08 一劳永逸：先解析「baostock 真正已生成数据」的日期并覆盖全局 KL_END。
     #    原实现用「今天」去查，盘前/凌晨必返回 0 行 → universe 0 → 保护性中止 → FACTOR_LAB 停更
     #    （2026-09-05 起连续断更的真根因，此前误判为冷启动慢）。
     global KL_END, ASOF_YM, ASOF_Q
     _dd = resolve_data_date()
     if not _dd:
-        log("ERROR: 近 10 个自然日 baostock 均无数据，中止（不产出空 FACTOR_LAB）")
-        bs.logout(); return
+        # 🔴 2026-09-17 阿狸咪的工程师：原为 `bs.logout(); return` ⇒ **退出码 0** ⇒ 监督器判
+        #   ✅ ok ⇒「因子今天没出」却整链零红灯（2026-09-17 事故）。产物语义**不变**
+        #   （仍不写空 FACTOR_LAB、仍保留上次真实产物），只把失败如实上报为退出码 1。
+        log("ERROR: 数据日解析失败（baostock 登录失败或近 10 个自然日均无数据），中止"
+            "（不产出空 FACTOR_LAB）")
+        print("⛔ 数据日解析失败 ⇒ 本轮不产出任何产物（保留上次真实 FACTOR_LAB），"
+              "以退出码 1 上报失败", flush=True)
+        try:
+            bs.logout()
+        except Exception:
+            pass
+        sys.exit(1)
     KL_END = _dd
     ASOF_YM = KL_END[:7]
     ASOF_Q = "%dQ%d" % (int(KL_END[:4]), (int(KL_END[5:7]) - 1) // 3 + 1)
@@ -710,6 +749,13 @@ def main():
     ok = _push_with_clean_tree()
     bs.logout()
     log("DONE", "success" if ok else "FAILED_PUSH")
+    # 🔴 2026-09-17 阿狸咪的工程师：**同类假成功第二处** —— 原实现在 push 失败时仍以退出码 0
+    #   结束（只 log FAILED_PUSH）⇒ 产物已算出但没推上仓，下游各机仍吃旧 FACTOR_LAB，
+    #   而监督器判 ✅ ok。与 §1 同一个病：日志里有失败字样，退出码却是成功。
+    if not ok:
+        print("⛔ 产物已算出，但 git push 失败 ⇒ 远端仍为旧 FACTOR_LAB；以退出码 1 上报失败",
+              flush=True)
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
