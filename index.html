@@ -6720,6 +6720,19 @@ function fmtSigned(v){
     if(D.note_url) html += '<a href="'+_e(D.note_url)+'" target="_blank" style="font-size:11px;color:#a78bfa;text-decoration:none;">原帖↗</a>';
     // 🛡 2026-09-04 一劳永逸：同上，不再 slice(0,16)，传完整时间戳给 _fmtAshareRel
     if(typeof _uBadge === 'function') html += _uBadge('auto','短线',(D.update_time||''));
+    /* 🔴 2026-09-17 主人令「杜绝一切假成功」· 阿狸咪的工程师
+       ── 根因：本卡「更新于」用的是 D.update_time（**抓取时刻**），而源笔记实际停在
+          2026-09-02（源页 document.title「强势股跟踪日报 2026-09-02」、页内自述
+          「更新时间：2026.09.02 15:41」、每行「最新交易日」= 2026-09-02）；产物价格
+          字段指纹自 09-03 起连续 20 次抓取一字未改。而 09-14 主人令已把全站
+          「陈旧红胶囊」分支**整段删除**（日频误报）⇒ 源停更 15 天，页面零提示，
+          胶囊照旧显示「今日 15:53 盘后」= 假新鲜。
+       ── 修法：只加不改 —— 源侧自带 data_date/source_stale 时追加一枚**内容级**红胶囊。
+          判据来自源自身标注（不是 SLA 猜测），故「今日批次尚未产出」不会误报，
+          也不会把 09-14 删掉的那个误报机制放回来。 */
+    if(D.source_stale && D.data_date){
+      html += '<span title="源笔记「'+_e(D.source_title||'ima 分享页')+'」自述更新时间 '+_e(D.source_updated_at||'?')+'｜最新交易日 '+_e(D.data_date)+'｜距今 '+(D.stale_days)+' 天｜源侧停更，非抓取失败" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:700;background:rgba(239,83,80,.14);color:#ef5350;border:1px solid rgba(239,83,80,.45);white-space:nowrap">⚠️ 源停更 '+(D.stale_days)+' 天 · 数据日 '+_e(D.data_date)+'</span>';
+    }
     // 已跟踪 N（语义真实，非已入仓）
     html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);white-space:nowrap">📋 已跟踪 <b style="margin-left:2px">'+(D.stocks?D.stocks.length:0)+'</b></span>';
     if(_reso>0) html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);white-space:nowrap">🏆 高手共振 <b style="margin-left:2px">'+_reso+'</b></span>';

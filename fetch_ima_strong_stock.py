@@ -68,7 +68,7 @@ def to_int(s):
 def _take_field(lines, j, n, kind):
     """按类型取第 j 项，返回 (值, 是否消费指针)。
 
-    kind: 'date' | 'float' | 'int' | 'status' | 'text'
+    kind: 'date' | 'float' | 'int' | 'status' | 'text' | 'buy_point'
 
     规则（这是阻断「字段串位」的核心）：
       · 行尾越界         ⇒ (None, False)  —— 不消费
@@ -112,6 +112,18 @@ def _take_field(lines, j, n, kind):
         if _STATUS_SHAPE.match(v):
             return (v, True)
         return ("", False)
+    if kind == "buy_point":
+        # 🔴 2026-09-17 阿狸咪的工程师 追加（与小九 2115 件 §3 建议同源，我方落地）：
+        #   买点提示格**不可能**是纯 `YYYY-MM-DD`。出现日期形状只有一种成因 ——
+        #   该行 status 格缺失时，落在那格的值形状不像状态 ⇒ 上面 status 分支判
+        #   「不消费」并留痕；紧接着**无条件接受任何值**的 text 型 buy_point 把它
+        #   原样吃掉，再让 trade_date 顺移一格 ⇒ 表面「status 已留痕」，实则
+        #   **换了个字段继续串位**。这与 status 分支踩的是同一个坑：text 型无条件
+        #   接受 = 串位放大器。故按同一思路收口 —— **只认形状、不认内容**：
+        #   日期形状 ⇒ 不消费，缺口由 `_parse_missing` 显式留痕（绝不静默）。
+        if DATE_RE.match(v):
+            return ("", False)
+        return (v, True)
     if kind == "text":
         return (v, True)
     return (None, False)
@@ -174,7 +186,7 @@ def extract_from_inner_text(text):
         take("drawdown_pct",   "float",  None)
         take("consecutive_up", "int",    None)
         take("status",         "status", "")
-        take("buy_point",      "text",   "")
+        take("buy_point",      "buy_point", "")
         take("trade_date",     "date",   "")
         # 🔴 2026-09-17：状态词**尚未登记**进 STATUS_SET 时，保留原值并显式打标
         #   `status_unknown: true`，而**不是静默清空** —— 让 ima 新添的状态词
@@ -187,6 +199,34 @@ def extract_from_inner_text(text):
         stocks.append(rec)
         i = j
     return stocks
+
+
+def parse_note_meta(text):
+    """🔴 2026-09-17 阿狸咪的工程师 新增：提取**源笔记自述的元数据**。
+
+    动因（实测，非推测）：本卡 2026-09-17 被主人质疑「都没变化啊」。
+    取证结果——源分享页 `document.title` = 「强势股跟踪日报 2026-09-02」，
+    页内自述「更新时间：2026.09.02 15:41」，**每行「最新交易日」全为 2026-09-02**；
+    而本脚本自 09-03 起每天忠实抓取这份**静止**的笔记，产物价格字段指纹
+    （`207238cb37e4`）连续 20 次抓取一字未改 ⇒ 前端却因 `update_time` 用的是
+    **抓取时刻** 而显示「更新于 今日 15:53 盘后」= **假新鲜**。
+
+    故把源自身的日期落进产物：`source_title` / `source_updated_at` / `data_date`
+    / `stale_days` / `source_stale`。**这是内容级判据，不是 SLA 猜测** ——
+    只在源自己标明的数据日落后时才置 stale，日频「今日批次未出」不会误报。
+    """
+    meta = {}
+    for raw in text.split("\n"):
+        ln = raw.replace("\ufeff", "").replace("\u200b", "").strip()
+        if not ln:
+            continue
+        if "source_title" not in meta and re.match(r"^强势股跟踪日报", ln):
+            meta["source_title"] = ln[:48]
+        m = re.search(r"更新时间\s*[：:]\s*(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})\s+(\d{1,2}):(\d{2})", ln)
+        if m and "source_updated_at" not in meta:
+            y, mo, d, hh, mi = m.groups()
+            meta["source_updated_at"] = "%s-%02d-%02d %02d:%s" % (y, int(mo), int(d), int(hh), mi)
+    return meta
 
 
 def parse_summary(text):
@@ -261,10 +301,12 @@ def fetch(url, inspect=False):
             print("⚠️ innerText 解析为 0，尝试表格解析")
             stocks = extract_via_table(page)
         summary = parse_summary(inner)
+        meta = parse_note_meta(inner)
         browser.close()
 
     print(f"✅ 解析到 {len(stocks)} 只股票；汇总: {summary}")
-    return {"summary": summary, "stocks": stocks}
+    print(f"🏷️ 源笔记自述: {meta.get('source_title') or '?'} · 更新时间 {meta.get('source_updated_at') or '?'}")
+    return {"summary": summary, "stocks": stocks, "meta": meta}
 
 
 def main():
@@ -301,11 +343,32 @@ def main():
                  "恒为 0 表示行结构与 HTML 列序完全对齐。"),
     }
 
+    # 🔴 2026-09-17 阿狸咪的工程师：「源数据日」判据（**内容级**，不是 SLA 猜测）。
+    #   权威数据日取「每行最新交易日」的最大值；全部缺失时回退到源笔记自述更新时间。
+    #   源若按日更新 ⇒ data_date 每天前进；源若停更 ⇒ data_date 原地不动 ⇒ source_stale 置真。
+    #   为什么不能用 update_time 判：update_time 是**抓取时刻**，抓一份静止的源它也每天变，
+    #   正是这个语义错配让本卡停更 15 天却仍显示「更新于 今日 15:53 盘后」。
+    meta = data.get("meta") or {}
+    _tx = datetime.now(timezone(timedelta(hours=8)))
+    _trade_dates = sorted(str(_s.get("trade_date") or "").strip()
+                          for _s in data["stocks"] if str(_s.get("trade_date") or "").strip())
+    _data_date = _trade_dates[-1] if _trade_dates else str(meta.get("source_updated_at") or "")[:10]
+    try:
+        _stale_days = (_tx.date() - datetime.strptime(_data_date, "%Y-%m-%d").date()).days
+    except Exception:
+        _stale_days = None
+
     out = {
         # 🛡 2026-09-04：固定北京时间——云端 runner 是 UTC，旧写法 now() 让卡片把 20:17 显示成 12:17
-        "update_time": datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S"),
+        "update_time": _tx.strftime("%Y-%m-%d %H:%M:%S"),
         "source": "ima",
         "note_url": args.url,
+        # 🔴 源自身的时间刻度（前端「更新于」**不得再拿抓取时刻冒充数据新鲜**）
+        "source_title": meta.get("source_title") or "",
+        "source_updated_at": meta.get("source_updated_at") or "",
+        "data_date": _data_date,
+        "stale_days": _stale_days,
+        "source_stale": bool(_stale_days is not None and _stale_days > 0),
         "summary": data["summary"],
         "parse_health": parse_health,
         "stocks": data["stocks"],
@@ -314,6 +377,14 @@ def main():
           f"无首次入选日 {parse_health['no_first_selected']} 只"
           f"（{parse_health['no_first_selected_pct']}%）· "
           f"字段串位 {sum(_missing_fields.values())} 次 {_missing_fields or ''}")
+    # 🔴 2026-09-17：抓取成功 ≠ 数据新鲜。源侧停更必须吼出来（这是「杜绝假成功」的落点）
+    if out["source_stale"]:
+        print(f"⛔ 源停更告警：源笔记「{out['source_title'] or '?'}」自述更新时间 "
+              f"{out['source_updated_at'] or '?'}，最新交易日 {out['data_date']} ⇒ "
+              f"**已 {out['stale_days']} 天无新数据**。本次抓取成功但内容与上一期相同"
+              f"（源侧停更，不是抓取失败）。")
+    else:
+        print(f"📅 源数据日 {out['data_date']}（新鲜）· 源自述更新时间 {out['source_updated_at'] or '?'}")
 
     os.makedirs(RAW_DIR, exist_ok=True)
     os.makedirs(DATA_DIR, exist_ok=True)
