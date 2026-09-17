@@ -330,7 +330,17 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
             "signal": "yellow",
         })
 
-    # 3. ETF 资金流向：【分类概览 ｜ 净流入TOP5 ｜ 净流出TOP5】
+    # 3. ETF 资金流向：【全市场合计总额 ｜ 净流入TOP5 ｜ 净流出TOP5】
+    # 🛡 2026-09-17 主人令（截图核查·最终口径）「行业那个删除吧，我只要总额和流入流出TOP5」：
+    #   本条只留三段 —— ①「全市场ETF合计净流入/流出 X亿」总额
+    #                    ②「净流入TOP5：」具体品种 5 只
+    #                    ③「净流出TOP5：」具体品种 5 只（另起一行）
+    #   删除的两段（连同其唯一调用者 `_etf_cat_name` 一并删除，不留死代码）：
+    #     · 分类概览「XXETF 净流入 +X.XX亿」（≥+5亿 才报，如「行业ETF 净流入 +7.56亿」）
+    #       —— 分类名+分类合计与单只榜 TOP5 不同源，读者会误以为该分类就是第一；
+    #          且它挤在总额与 TOP5 之间，主人明确不要。
+    #     · 分类兜底「XXETF 净流出」（etf_daily 排名缺失时才出）—— 同属分类口径，一并删除；
+    #          净流出 TOP5 缺失时本条只留「总额 + 净流入TOP5」，不用分类数字替代。
     # 🛡 2026-09-16 主人令「写出具体的TOP5流入和流出」：
     #   原写法只报分类第一名（「宽基ETF 净流入 +31.49亿，资金借道 ETF 布局宽基」），
     #   看不出钱具体进了哪只 ETF，且分类第一名以外的信息全丢。
@@ -376,29 +386,12 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
                 break
         return _out
 
-    def _etf_cat_name(_cat, _direction):
-        """ETF 分类名 → 可读标签。
-
-        🛡 2026-09-17 主人令（截图核查）：原实现分类为「行业」时，去 股票板块资金榜
-           (SECTOR_FUND_FLOW.sectors_in) 取 type=='行业' 第一名（如「汽车」37 亿级）硬拼成
-           「汽车行业ETF」，但数字却来自 ETF 分类「行业」的合计（29 只行业类 ETF 加总 7.56 亿级），
-           名字与数字跨文件不同源 ⇒ 读起来像「汽车是 ETF 净流入第一」，而单只榜 TOP5 里
-           根本没有汽车（实测 0 只），自相矛盾。
-           既已确认「行业」就是 ETF 分类口径本身，直接返回分类名即可；若日后要给这一句标注
-           具体行业，应从本分类内 top_inflow 取第一名，而非跨文件借用股票板块榜。
-        """
-        return _cat
-
-    if etf_heat and "categories" in etf_heat:
-        _cats = etf_heat["categories"]
-        _relevant = {"宽基", "行业", "主题", "跨境", "商品", "策略"}   # 排除货币/债券/其他
-        # 🛡 兼容旧结构（list）与新结构（dict with net_inflow_yi）
-        cat_nets = [(_n, _cats[_n].get("net_inflow_yi", 0)) for _n in _relevant
-                    if _n in _cats and isinstance(_cats[_n], dict)]
-        cat_nets.sort(key=lambda x: x[1], reverse=True)
-    else:
-        cat_nets = []
-
+    # 🛡 2026-09-17 主人令「行业那个删除吧，我只要总额和流入流出TOP5」：
+    #   `_etf_cat_name`（ETF 分类名 → 可读标签）与 `cat_nets`（ETF 分类合计排序）
+    #   原本只服务「分类概览 / 分类兜底」两段，随这两段一并删除 ⇒ 不留死代码。
+    #   历史坑（记录以免后人重新引入）：`_etf_cat_name` 曾对分类「行业」跨文件借名
+    #   （从股票板块资金榜取 type=='行业' 第一名「汽车」硬拼成「汽车行业ETF」），
+    #   而数字来自 ETF 分类「行业」的合计 ⇒ 名字与数字不同源、与单只榜 TOP5 自相矛盾。
     _etf_in5 = _etf_top5("top_inflow")
     _etf_out5 = _etf_top5("top_outflow")
     _etf_parts = []
@@ -426,9 +419,8 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
             f'{"流入" if _total_net_yi >= 0 else "流出"} {_total_net_yi:+.2f}亿</span></span>'
         )
 
-    if cat_nets and cat_nets[0][1] >= 5:
-        # 分类概览（保留原有判断口径与阈值：≥+5亿 才报）
-        _etf_parts.append("%sETF 净流入 %+.2f亿" % (_etf_cat_name(cat_nets[0][0], "in"), cat_nets[0][1]))
+    # 🛡 2026-09-17 主人令：原「分类概览」段（cat_nets[0] ≥ +5亿 时报「XXETF 净流入 +X.XX亿」，
+    #   即用户截图中 ETF资金条里的「行业ETF 净流入 +7.56亿」）**已删除** —— 主人只要总额 + 流入流出TOP5。
     if _etf_in5:
         # 品种之间不再用「、」分隔：各品种已是 inline-block 小块（自带右间距），
         # 中文顿号挤在两行块的基线上会错位。
@@ -442,9 +434,8 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
         #     已确认无任何脚本解析本条文本（update_v8 / audit_empty_cards / logic.html
         #     均只读键名或整体存在性）⇒ 引入 <br> 安全。
         _etf_parts.append("<br>" + "净流出TOP5：" + "".join(_etf_out5))
-    elif len(cat_nets) >= 2 and cat_nets[-1][1] <= -3:
-        # 兜底：etf_daily 排名缺失时改用分类口径的净流出，避免整条丢信息
-        _etf_parts.append("<br>" + "%sETF 净流出 %+.2f亿" % (_etf_cat_name(cat_nets[-1][0], "out"), cat_nets[-1][1]))
+    # 🛡 2026-09-17 主人令：原「分类兜底」段（etf_daily 排名缺失时改用分类口径净流出）
+    #   **已删除** —— 同属 ETF 分类口径，本次一并下线；净流出 TOP5 缺失时本条只留总额+流入。
     if _etf_parts:
         # 「 ｜ 」只在「同段内」连接；含 <br> 的段自身已换行，故先按段拼再整体 join。
         _etf_text = ""
