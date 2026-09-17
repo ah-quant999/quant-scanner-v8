@@ -389,6 +389,30 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
     _etf_in5 = _etf_top5("top_inflow")
     _etf_out5 = _etf_top5("top_outflow")
     _etf_parts = []
+
+    # 🛡 2026-09-17 主人令「总额要写在流入前面」：
+    #   要求把「全市场 ETF 合计净流入」从 etf_insight（卡片底部小字）**提到本条第 1 段**，
+    #   放在「净流入TOP5」之前 ⇒ 读者第一眼就看到总量级。
+    #   🔴 同时修口径失真（本改动的前提）：原 `net_total` 取的是
+    #     `sum(top_inflow) + sum(top_outflow)`，即**两个 TOP5 之和**（10 只 ETF），
+    #     却贴「全市场 ETF 合计净流入」标签 ⇒ 实测 09-17 线上显示 +1.01亿，
+    #     而 etf_daily_monitor.json 的 `total_net`（全市场 1605 只真实合计）= +47.39亿，
+    #     相差 47 倍。既然要挪到最显眼位置，必须用真实合计，否则是放大版失真。
+    #     优先取 `total_net`；缺失时**降级为不显示总额**，绝不用 TOP5 之和冒充全市场。
+    _total_net_yi = None
+    if isinstance(etf_daily, dict) and etf_daily.get("total_net") is not None:
+        try:
+            _total_net_yi = float(etf_daily["total_net"]) / 1e8
+        except (TypeError, ValueError):
+            _total_net_yi = None
+    if _total_net_yi is not None:
+        _tn_color = "#ef5350" if _total_net_yi >= 0 else "#26a69a"   # 红涨绿跌铁律
+        _etf_parts.append(
+            '<span style="white-space:nowrap;">全市场ETF合计净'
+            f'<span style="color:{_tn_color};font-weight:600;">'
+            f'{"流入" if _total_net_yi >= 0 else "流出"} {_total_net_yi:+.2f}亿</span></span>'
+        )
+
     if cat_nets and cat_nets[0][1] >= 5:
         # 分类概览（保留原有判断口径与阈值：≥+5亿 才报）
         _etf_parts.append("%sETF 净流入 %+.2f亿" % (_etf_cat_name(cat_nets[0][0], "in"), cat_nets[0][1]))
@@ -397,15 +421,29 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
         # 中文顿号挤在两行块的基线上会错位。
         _etf_parts.append("净流入TOP5：" + "".join(_etf_in5))
     if _etf_out5:
-        _etf_parts.append("净流出TOP5：" + "".join(_etf_out5))
+        # 🛡 2026-09-17 主人令「流出换到第二行」：
+        #   原写法把「净流出TOP5」接在同一条的「 ｜ 」之后，与流入挤在一行里，
+        #   两段各含 5 个 inline-block 小方块 ⇒ 单行过长、右侧被卡片宽度截断。
+        #   改为在本段前置一个「<br>」硬换行，"净流出TOP5" 另起一行（不再用 ｜ 连接）。
+        #   ⚠️ 前端 anomalies 渲染走 innerHTML（index.html 内 h+=a.text），<br> 原样生效；
+        #     已确认无任何脚本解析本条文本（update_v8 / audit_empty_cards / logic.html
+        #     均只读键名或整体存在性）⇒ 引入 <br> 安全。
+        _etf_parts.append("<br>" + "净流出TOP5：" + "".join(_etf_out5))
     elif len(cat_nets) >= 2 and cat_nets[-1][1] <= -3:
         # 兜底：etf_daily 排名缺失时改用分类口径的净流出，避免整条丢信息
-        _etf_parts.append("%sETF 净流出 %+.2f亿" % (_etf_cat_name(cat_nets[-1][0], "out"), cat_nets[-1][1]))
+        _etf_parts.append("<br>" + "%sETF 净流出 %+.2f亿" % (_etf_cat_name(cat_nets[-1][0], "out"), cat_nets[-1][1]))
     if _etf_parts:
+        # 「 ｜ 」只在「同段内」连接；含 <br> 的段自身已换行，故先按段拼再整体 join。
+        _etf_text = ""
+        for _i, _seg in enumerate(_etf_parts):
+            if _seg.startswith("<br>"):
+                _etf_text += _seg                      # 自带换行，不再前置 ｜
+            else:
+                _etf_text += (" ｜ " if _i else "") + _seg
         anomalies.append({
             "tag": "ETF资金",
             "emoji": "💰",
-            "text": " ｜ ".join(_etf_parts),
+            "text": _etf_text,
             "color": "gold",
             "signal": "green" if _etf_in5 else "red",
         })
@@ -730,9 +768,11 @@ def main():
     # ETF 资金解读（类似截图风格）
     etf_insight = []
     if etf_daily and etf_daily.get("top_inflow") and etf_daily.get("top_outflow"):
-        net_total = sum(x.get("net", 0) for x in etf_daily.get("top_inflow", [])) + \
-                    sum(x.get("net", 0) for x in etf_daily.get("top_outflow", []))
-        etf_insight.append(f"全市场 ETF 合计净流入 {net_total/1e8:+.2f}亿")
+        # 🛡 2026-09-17 主人令「总额要写在流入前面」口径对齐（必须与 anomalies ETF资金条同源）：
+        #   本条总额已提到 anomalies ETF资金条第 1 段（卡片上方醒目位），此处**不再重复报总额**，
+        #   避免同页出现两个「合计净流入」且口径不一致（实测 09-17：旧 TOP5 之和 +1.01亿
+        #   vs 真全市场 total_net +47.39亿，差 47 倍）。
+        #   若确有 total_net 只保留在本条做补充说明，也不重复渲染 —— 直接跳过总额行。
         # 科技类净流出提示
         tech_out = [x for x in etf_daily.get("top_outflow", [])
                     if any(k in x.get("name", "") for k in ["科创", "创业板", "半导体", "芯片", "通信"])]
