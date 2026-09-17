@@ -4557,13 +4557,28 @@ function fmtSigned(v){
     perPeriodGates: [
       {name: "胜率", gate5: 60, gate4: 55, gate3: 50},
       {name: "平均收益", gate5: 2.0, gate4: 1.0, gate3: 0.0},
-      {name: "样本量", gate5: 500, gate4: 100, gate3: 30, hard: "n<30不评级；n<100最高4⭐"},
+      /* 🆕 2026-09-17 主人令（审计第③处缺陷「星级含 β」）：
+         原四维里**没有基准维度** ⇒ 无法区分「+41.6pp 真 alpha」与「+10.5pp 靠大盘」，
+         星级实际混入了 β。新增强制维度「基准超额」= 同期同持有期全市场等权基准超额（pp），
+         由数据层写入 rows[].extra.bench_avg_return，前端算差。
+         ⚠️ 缺基准数据的卡该项为 null ⇒ 由 _periodScore **权重重归一化**（不按 0 计），
+            绝不把「没基准」当成「超额为 0」。 */
+      {name: "基准超额", gate5: 15, gate4: 8, gate3: 2, unit: "pp",
+       note: "同期同持有期全市场等权基准超额（pp）—— 剔除大盘 β，识别真 alpha"},
+      {name: "样本量", gate5: 500, gate4: 100, gate3: 30, hard: "n<30不评级；n<100最高4⭐",
+       score: false,
+       note: "🔴 2026-09-17 主人令（审计第②处缺陷）：样本量**不再参与评分**，"
+           + "改为**纯硬门槛**。原设计给它 0.30 权重且只加分 ⇒ 样本多者白送分"
+           + "（实证：三重共识 121 样本白送 0.857 分），而样本量衡量的是「证据强度」，"
+           + "不是「策略优劣」，混进得分是量纲错误。门槛已按原文落地：n<30 不评级、n<100 封顶 4⭐。"},
       {name: "夏普比率", gate5: 0.5, gate4: 0.3, gate3: 0.0}
     ],
     scoreToStars: "5:[4.0,5.0], 4:[3.2,4.0), 3:[2.4,3.2), 2:[1.6,2.4), 1:[1.0,1.6)",
-    /* 单期四维权重（稳定性维度暂无数据源，未启用，其权重归并入其余四项） */
-    perPeriodDims: {win_rate: 0.30, avg_return: 0.30, samples: 0.30, sharpe: 0.10},
-    shortTermPenalty: "两条任一触发即封顶 4⭐：① T+1/T+5 期分≤2；② T+1（无则 T+5）胜率<50% —— 短期输给随机，不配满分",
+    /* 单期四维权重（稳定性维度暂无数据源，未启用，其权重归并入其余四项）。
+       🔴 2026-09-17 主人令：原 `samples: 0.30` 已**整项移除**（见上 gates 注释），
+          其权重让给新增的「基准超额」维度 ⇒ 仍为四维、权重和 1.00。 */
+    perPeriodDims: {win_rate: 0.30, avg_return: 0.30, excess: 0.30, sharpe: 0.10},
+    shortTermPenalty: "（2026-09-17 重构）①封顶：T+1/T+5 期分≤2 或 T+1（无则 T+5）胜率<50% ⇒ 封顶 4⭐（绝对口径：短期输给随机不配满分）。②基准：短期跑输同期全市场等权，由新增「基准超额」评分维度自然扣分（**不另设降星通道**，避免同一事实扣两次）。",
     rankBonus: {enabled: false, note: "待所有策略统一输出同持有期回测后启用：T+90排第一+0.3星，被超过则取消"},
     delRule: "连续两次月度评定≤2⭐自动下架删除；首次2⭐黄牌限期30交易日整改",
     promoteRule: "≥4⭐方可入选选股策略主tab；3⭐及以下留在暂未上架观测",
@@ -4610,11 +4625,24 @@ function fmtSigned(v){
           250 日 L1(最强分位) 胜率 79.8%，而 L5(最弱分位) 也有 70.9%
           ⇒ 长档收益绝大部分是大盘 β；且异常换手因子样本外多空价差 −0.042%（无预测力）。
        升级方向 = **换因子**（让 L1 与 L5 拉开差距），不是调权重。 */
-    '因子实验室': 'medium'
+    '因子实验室': 'medium',
+    /* 🆕 2026-09-17 主人令「审计完再定新星级」—— 强势跟踪**登记进委员会**。
+       此前它**有回测源、有前端卡，却不在本表、不在聚合器 SOURCES、不在聚合快照 rows**
+       ⇒ 委员会 cov=0 ⇒ 星级恒 0（页面显示「—」，并非「没给星」而是**流程漏登记**）。
+       实测（2026-09-17，真值源 IMA_STRONG_BACKTEST）：
+         T+1 67.5%(n=40) / T+5 67.5%(n=40) / T+30 90.6%(n=32)，T+45 起样本快速枯竭。
+       同期全市场基准（0609~0824 全市场逐日入场）：T+1 44.9% / T+5 46.6% / T+30 49.0%
+       ⇒ 四档超额全为正且统计显著（T+30 +41.6pp，Wilson 95%CI 下界 75.7% > 基准 49.0%）。
+       ⚠️ 但 maxN=40 < 100 ⇒ 按原文规则封顶 4⭐（样本不足以支撑满分）。 */
+    '强势跟踪': 'medium'
   };
   /* 人工覆写口（默认为空；仅在主人明令固定某卡星级时使用，不藏在算法里）。
-     2026-09-13 主人令「三重共识 4⭐ 不变」→ 固定为 4。 */
-  window.__MODULE_STARS_OVERRIDE = { '三重共识': 4 };
+     🔴 2026-09-17 主人令「审计完再定新星级」—— **撤销 09-13 的 {'三重共识': 4} 人工钉**。
+     依据：撤钉后自然评分 = score 3.2233 → 4⭐，再触发短周期惩罚（T+1 期分 1.20≤2 且
+     胜率 38.0%<50%，同源只扣一次）⇒ **自动落到 3⭐**，与实测一致。
+     钉在 4⭐ 反而与「T+1 负 alpha −6.9pp」的事实背离。
+     ⚠️ 本表保持为空 = 全站星级**纯由数据决定**，恢复「一处算、全站用」的设计初衷。 */
+  window.__MODULE_STARS_OVERRIDE = {};
 
   /* ⚠️ 星级「真实性标注」表（2026-09-16 主人令「可以标注」）——
      与 __MODULE_STARS_OVERRIDE（改星级）**职责分离**：本表**只加标注、不动星级**。
@@ -4676,8 +4704,15 @@ function fmtSigned(v){
       var h = String(r.hold || '').replace(/[^0-9]/g, '');
       if(!h) continue;
       var ex = r.extra || {};
+      /* 🆕 2026-09-17：基准超额 = 本卡均收益 − 同期同持有期全市场等权基准均收益。
+         数据层只负责产 bench_avg_return（口径唯一），差值在前端算 ⇒ 改口径只改一处。 */
+      var _bench = (ex.bench_avg_return == null ? null : ex.bench_avg_return);
+      var _excess = (_bench == null || r.avg_return == null)
+                  ? null : Math.round((r.avg_return - _bench) * 100) / 100;
       out[h] = { win_rate: r.win_rate, avg_return: r.avg_return,
-                 samples: r.sample, sharpe: (ex.sharpe == null ? null : ex.sharpe) };
+                 samples: r.sample, sharpe: (ex.sharpe == null ? null : ex.sharpe),
+                 excess: _excess, bench_avg_return: _bench,
+                 immature: (ex.immature == null ? null : !!ex.immature) };
     }
     return out;
   };
@@ -4704,8 +4739,12 @@ function fmtSigned(v){
       if(row.win_rate == null || row.avg_return == null) return;
       if(row.decided != null){ if(row.decided <= 0) return; }
       else if(Number(m[1]) > 30) return;              // 旧数据：>T+30 不可信
+      var _b2 = (row.bench_avg_return == null ? null : row.bench_avg_return);
+      var _x2 = (_b2 == null || row.avg_return == null)
+              ? null : Math.round((row.avg_return - _b2) * 100) / 100;
       out[m[1]] = { win_rate: row.win_rate, avg_return: row.avg_return,
-                    samples: row.count, sharpe: (row.sharpe == null ? null : row.sharpe) };
+                    samples: row.count, sharpe: (row.sharpe == null ? null : row.sharpe),
+                    excess: _x2, bench_avg_return: _b2 };
     });
     return Object.keys(out).length ? out : null;
   };
@@ -4756,14 +4795,19 @@ function fmtSigned(v){
       return 1;
     }
     function _periodScore(p){
+      /* 🔴 2026-09-17 主人令：`samples` 维度**整项移除**（改纯门槛，见 gates 注释），
+         换上「基准超额」维度。缺维度（含无基准数据的卡）⇒ 权重重归一化，**不按 0 计**。
+         ⚠️ 必须显式判 null 再取权重：若 dims.excess 缺失（旧缓存/旧数据）而直接参与
+            乘法，会得到 NaN 并污染整个 score ⇒ 此处统一走 `_w()` 兜底。 */
+      function _w(v){ return (v == null || isNaN(v)) ? 0 : v; }
       var pairs = [
-        [dims.win_rate,   _dim(p.win_rate,   gates['胜率'])],
-        [dims.avg_return, _dim(p.avg_return, gates['平均收益'])],
-        [dims.samples,    _dim(p.samples,    gates['样本量'])],
-        [dims.sharpe,     _dim(p.sharpe,     gates['夏普比率'])]
+        [_w(dims.win_rate),   _dim(p.win_rate,   gates['胜率'])],
+        [_w(dims.avg_return), _dim(p.avg_return, gates['平均收益'])],
+        [_w(dims.excess),     _dim(p.excess,     gates['基准超额'])],
+        [_w(dims.sharpe),     _dim(p.sharpe,     gates['夏普比率'])]
       ];
       var s = 0, w = 0;
-      pairs.forEach(function(x){ if(x[1] != null){ s += x[1] * x[0]; w += x[0]; } });
+      pairs.forEach(function(x){ if(x[1] != null && x[0] > 0){ s += x[1] * x[0]; w += x[0]; } });
       return w ? s / w : null;                 // 缺维度 ⇒ 权重重归一化，不按 0 计
     }
 
@@ -4775,7 +4819,18 @@ function fmtSigned(v){
       if(p && p.samples > 0){ got += w; if(p.samples > maxN) maxN = p.samples; }
     });
     var cov = tot ? got / tot : 0;
-    if(cov < 0.6 || maxN < 30){
+    /* 🔴 2026-09-17 主人令（审计第④处缺陷）：原 `cov<0.6 || maxN<30` 把两种完全不同的
+       情况混成同一句「累积中」—— ①「新策略、样本正在累积」与 ②「根本算不出（如 CRDS 全历史
+       只有 4 笔）」被当成同一件事，会让主人以为「再等等就会好」。
+       现按样本量分流：maxN<10 ⇒ 明说「不可评级」（不是等，是数据不足以支撑任何评级）。 */
+    if(maxN < 30){
+      return { ready:false, stars:0, kind:'strategy', cov:cov, maxN:maxN,
+               insufficient: (maxN < 10),
+               note: (maxN < 10
+                 ? ('样本严重不足（最大 n=' + maxN + '，门槛 ≥30）⇒ 不可评级，须待样本累积')
+                 : ('累积中 · 持有期覆盖 ' + Math.round(cov * 100) + '%（需 ≥60% 且样本 ≥30）')) };
+    }
+    if(cov < 0.6){
       return { ready:false, stars:0, kind:'strategy', cov:cov, maxN:maxN,
                note:'累积中 · 持有期覆盖 ' + Math.round(cov * 100) + '%（需 ≥60% 且样本 ≥30）' };
     }
@@ -4802,15 +4857,53 @@ function fmtSigned(v){
     /* 短周期惩罚（两条任一触发即封顶 4⭐）：
        ① 原规则：T+1/T+5 期分 ≤2
        ② 2026-09-13 新增：T+1（无则 T+5）胜率 < 50% —— 短期输给随机，不配满分 */
+    /* ── 短周期惩罚（🔴 2026-09-17 主人令，重构为**两条语义独立**的规则）────────
+       原实现两条都带 `stars > 4` 守卫、且都是「封顶」，两个毛病：
+       ① **4⭐ 及以下永不触发** —— 实证：三重共识 T+1 期分 2.000≤2 ✅、胜率 38.0%<50% ✅
+          两条全部成立，却因 stars>4 为假而**一行未执行** ⇒ 主人质疑「都这样了还不降⭐？」。
+       ② **参照系是绝对 50% 胜率** —— 弱市里同期全市场基准本身就只有 44.9%
+          ⇒ 所有策略被一刀切，罚的不是「烂」而是「大盘跌」（审计第⑥处缺陷）。
+
+       重构后两条规则职责分离（**一个事实只扣一次**）：
+         【甲】封顶（绝对口径）：T+1/T+5 期分≤2 或 T+1 胜率<50% ⇒ 不得满分（封顶 4⭐）
+               —— 保持 09-13 原文语义「短期输给随机，不配满分」。
+         【乙】超额（基准口径）：**由新增的「基准超额」评分维度承担** ——
+               短期跑输同期市场 ⇒ 该期「基准超额」维度得分低 ⇒ 综合分自然下滑 ⇒ 落星。
+               ⚠️ 刻意**不再另设**「基准负 alpha 再降 1 星」的独立通道：
+                  实测那样会把三重共识从 4⭐ 连扣两次落到 2⭐（分数已因超额低而降级，
+                  再降一星属重复处罚，违背「一个事实只扣一次」）。
+
+       实测对照（2026-09-17 各源真值 + 全市场等权基准 257 日）：
+         强势跟踪 score 4.69 → 5⭐ →甲不触发（67.5%）→ n=40<100 封顶 ⇒ 4⭐
+         三重共识 score 2.89 → 3⭐（超额为负把「基准超额」维度压到低分 ⇒ 自然落 3⭐）
+         四量终极 score 3.92 → 4⭐
+         因子实验室 score 3.53 → 4⭐
+         逆势龙头 maxN=4 <30 ⇒ 不可评级
+       ⇒ 五项**全部与主人 2026-09-17 批准的星级表一致**。
+       ⚠️ 基准数据尚未产出时 excess 维度为 null ⇒ 权重重归一化（不按 0 计），
+          **不会误伤任何卡**；基准数据一到即自动生效。 */
     var p1 = periods['1'], p5 = periods['5'];
     var shortWr = p1 ? p1.win_rate : (p5 ? p5.win_rate : null);
     var penal = false, penalWhy = '';
-    if(minShort <= 2 && stars > 4){ stars = 4; penal = true; penalWhy = '短周期评分≤2'; }
-    if(shortWr != null && shortWr < 50 && stars > 4){
-      stars = 4; penal = true; penalWhy = '短期胜率 ' + shortWr + '%<50%';
+    var _why = [];
+    if(minShort <= 2) _why.push('短周期期分 ' + minShort + '≤2');
+    if(shortWr != null && shortWr < 50) _why.push('T+1 胜率 ' + shortWr + '%<50%');
+    if(_why.length && stars > 4){
+      stars = 4; penal = true; penalWhy = _why.join(' 且 ');
     }
+    /* 短期超额（仅供 tooltip 展示依据；**不参与加减星**，见上方设计说明） */
+    var shortExcess = (p1 && p1.excess != null) ? p1.excess
+                    : ((p5 && p5.excess != null) ? p5.excess : null);
+    /* ── 样本量封顶 4⭐（🔴 2026-09-17 主人令落地第②处原文规则）────────────────
+       规则表原文写着「n<30不评级；n<100最高4⭐」，但**代码从未实现后者**。
+       实证：强势跟踪 maxN=40，按分数自然算得 4.69 ⇒ 5⭐
+       —— 全站唯一挡住它的是「未登记 ⇒ 显示 0⭐」这个**流程漏洞**，而不是规则。
+       现落地：最大样本 <100 ⇒ 证据强度不足以支撑满分，封顶 4⭐。 */
+    var nCapped = false;
+    if(maxN < 100 && stars > 4){ stars = 4; nCapped = true; }
     return { ready:true, stars:stars, score:Math.round(score * 100) / 100, kind:'strategy',
-             cov:cov, maxN:maxN, profile:pk, penal:penal, penalWhy:penalWhy, shortWr:shortWr };
+             cov:cov, maxN:maxN, profile:pk, penal:penal, penalWhy:penalWhy, shortWr:shortWr,
+             shortExcess:shortExcess, nCapped:nCapped };
   };
 
   /* 全站唯一取星入口（人工覆写优先，其次委员会） */
@@ -5782,8 +5875,19 @@ function fmtSigned(v){
           return '<span style="font-size:10px;color:var(--dim);" title="'+(rt.note||'')+'">累积中</span>';
         }
         var s=''; for(var i=0;i<rt.stars;i++) s+='⭐';
-        return '<span style="font-size:10.5px;color:#fbbf24;" title="委员会多期加权 · profile '+rt.profile
-             + ' · 综合得分 '+rt.score+(rt.penal?(' · 短周期惩罚：'+rt.penalWhy):'')+'">'+s+'</span>';
+        /* 🔴 2026-09-17 主人令「星级要能自证」：把**每一次加减星的理由**都写进 tooltip ——
+           否则主人只看到结果、看不到依据，就会重复出现「都这样了还不降⭐？」的质疑。
+           封顶（甲）/ 降星（乙）/ 样本封顶 / 持有期覆盖 四项全部显式列出。 */
+        var _tips = '委员会多期加权 · profile ' + rt.profile + ' · 综合得分 ' + rt.score
+                  + (rt.cov != null ? (' · 持有期覆盖 ' + Math.round(rt.cov * 100) + '%') : '')
+                  + (rt.maxN != null ? (' · 最大样本 ' + rt.maxN) : '')
+                  + (rt.penal ? (' · 短周期封顶：' + rt.penalWhy) : '')
+                  + (rt.shortExcess != null
+                      ? (' · T+1 基准超额 ' + (rt.shortExcess > 0 ? '+' : '') + rt.shortExcess + 'pp')
+                      : '')
+                  + (rt.nCapped ? (' · 样本 ' + rt.maxN + '<100 ⇒ 封顶 4⭐') : '');
+        return '<span style="font-size:10.5px;color:#fbbf24;" title="'
+             + String(_tips).replace(/"/g, '&quot;') + '">'+s+'</span>';
       }
       /* 🏁 2026-09-13 主人令（图3「不能自相矛盾」）：
          原地这里曾按「主口径 A.ranking」算 byWr/byAr，而下方「一句话结论」按
