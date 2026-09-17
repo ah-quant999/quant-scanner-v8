@@ -4,6 +4,8 @@
 # 但 api.github.com 可达。故用 Git Database API 以「单次 commit」方式提交 raw_data。
 import os, sys, json, base64, hashlib, datetime, re
 import urllib.request, urllib.error
+import urllib.parse
+from urllib.parse import quote
 import http.client
 import time as _time
 import subprocess
@@ -147,6 +149,106 @@ def api(method, path, data=None, timeout=300):
     return {"__error__": "network", "__msg__": last_msg}
 
 
+def _api_get_raw(path, timeout=120, max_bytes=None):
+    """GET 取「正文」而非 JSON（raw 通道）。
+
+    🔴 为什么必须存在：`GET /git/blobs/<sha>` 返回 base64 JSON，GitHub 对**大响应**
+       的传输在中途断流时，urllib 抛 IncompleteRead 且**无法续传**；
+       而 `GET /contents/<path>?ref=<sha>` 配 `Accept: application/vnd.github.raw`
+       是**直出正文**、命中 max_bytes 即停（只读头部），单次成功率远高于 git/blobs。
+
+    🔴🔴 2026-09-17 关键实测（阿狸咪的工程师）——**`Accept` 与 `X-GitHub-Api-Version`
+       两者不能同用**！同一 URL、同一 token，仅差请求头：
+         Accept: application/vnd.github.raw + X-GitHub-Api-Version: 2022-11-28 → IncompleteRead（必失败）
+         Accept: application/vnd.github.raw（**不带版本头**）→ OK 逐字节全量（必成功）
+       ⇒ 本函数**刻意不发** `X-GitHub-Api-Version`。
+    🔴🔴🔴 同夜更深一层的真根因：Windows+OpenSSL 在 ~1.2MB 处把 TLS 连接被中段
+       误标为 `FileNotFoundError(2)`，http.client 则抛 `IncompleteRead`。已读到的
+       **部分字节对「取头部时间戳」仍可用**（v8 所有 raw_data JSON 的 update_time
+       都在文件头部）。故 max_bytes 模式下：达到上限或已攒够头部即返回部分字节
+       （best-effort），不再把断流当失败 —— 这正是 E 批守卫 488s 超时的根因解法。
+    返回 (bytes, err_str)；成功时 err_str 为空串。
+    """
+    url = API + path
+    headers = {
+        "Authorization": f"Bearer {TOKEN}",
+        "Accept": "application/vnd.github.raw",
+    }
+    last = ""
+    buf = bytearray()
+    _HEAD_MIN = 65536  # 头部时间戳足够用的下限
+    for i in range(4):  # 4 次（含首试），每次新建连接
+        req = urllib.request.Request(url, headers=headers, method="GET")
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                buf = bytearray()
+                while True:
+                    chunk = r.read(262144)
+                    if not chunk:
+                        return bytes(buf), ""
+                    buf.extend(chunk)
+                    if max_bytes and len(buf) >= max_bytes:
+                        return bytes(buf[:max_bytes]), ""
+        except urllib.error.HTTPError as e:
+            body = ""
+            try:
+                body = e.read().decode("utf-8", "replace")[:300]
+            except Exception:
+                pass
+            print(f"  ⚠️ RAW GET {path} -> HTTP {e.code}")
+            if e.code in (500, 502, 503, 504, 429) and i < 3:
+                _time.sleep(2 ** i)
+                last = f"HTTP {e.code}"
+                continue
+            return b"", f"HTTP {e.code} {body}"
+        except (TimeoutError, urllib.error.URLError, OSError,
+                http.client.HTTPException) as e:
+            last = f"{type(e).__name__}: {e}"
+            print(f"  ⚠️ RAW GET {path} -> 网络异常 {last}")
+            # best-effort：已达上限或已攒够头部 → 部分字节即可取时间戳，直接返回
+            if max_bytes and len(buf) >= min(max_bytes, _HEAD_MIN):
+                return bytes(buf), ""
+            if i < 3:
+                _time.sleep(2 ** i)
+    # 重试耗尽：若已攒够头部仍返回部分字节；否则报错
+    if max_bytes and len(buf) >= _HEAD_MIN:
+        return bytes(buf), ""
+    return b"", last
+
+
+def _blob_text(commit_ref, path, blob_sha=None, max_bytes=None, local_size=None):
+    """取远端某路径在指定 commit 上的**正文文本**（优先 raw 通道，退 base64 JSON）。
+
+    🔴 通道选择依据（2026-09-17 本机 + 云端 E 批双实测）：
+       · `contents/<path>?ref=<commit_ref>` + `Accept: application/vnd.github.raw`
+         （**不带** X-GitHub-Api-Version）：1.2MB 级一次成功率远高于 git/blobs；
+         配合 max_bytes 只读头部，几乎不撞 ~1.2MB 传输墙。
+       · `git/blobs/<blob_sha>`：返回 base64 JSON，1.2MB 级必现 IncompleteRead，
+         99MB 级超时/挂死 —— 是 E 批 13 个产物零推送的元凶。
+    🔴🔴 关键（已实测抓出）：`contents?ref=` 只认 commit/branch/tag **ref**，
+          **绝不认 blob sha**；而 `git/blobs` 才认 blob sha。两通道必须分别传
+          commit_ref 与 blob_sha，否则会出现「404 → 回落 git/blobs 又截断」的假成功。
+    返回 (text_or_None, 通道名)。
+    """
+    if path and commit_ref:
+        cap = max_bytes if max_bytes else 3 * 1024 * 1024
+        b, err = _api_get_raw(
+            f"/repos/{REPO}/contents/{quote(path, safe='')}?ref={commit_ref}",
+            timeout=120, max_bytes=cap)
+        if not err and b:
+            return b.decode("utf-8", "replace"), "contents-raw"
+        if err:
+            print(f"  ⚠️ raw 通道失败（{path} @ {str(commit_ref)[:10]}）: {err[:120]}")
+    # 退路：base64 JSON（用 blob_sha；仅小文件；大文件此处必失败 → 交给调用方兜底）
+    if blob_sha:
+        rb = api("GET", f"/repos/{REPO}/git/blobs/{blob_sha}", timeout=45)
+        if "__error__" not in rb and rb.get("encoding") == "base64":
+            try:
+                return base64.b64decode(rb["content"]).decode("utf-8", "replace"), "blobs-b64"
+            except Exception:
+                return None, "blobs-b64-decode-fail"
+    return None, "none"
+
 # 🛡 2026-09-08 审计产物保护（主人令）：审计轨迹只由本机审计脚本经 git 推送（audit_history.json / audit_nightly.log），
 #   绝不走 api_push_raw 裸推。否则 cn runner 工作区里的旧审计文件会经 Git Database API 覆盖 main 上的新版，
 #   吞掉历史审计轨迹（实测 09-08 多轮审计记录丢失）。此处 + main() PUSH_FILES 分支双重跳过。
@@ -221,22 +323,46 @@ def _blob_sha(content: bytes) -> str:
     return h.hexdigest()
 
 
+# 🔴 2026-09-17 加固：传输层断流时远端读取是**截断**的，完整 JSON 解析必失败。
+#   故用正则扫描头部字节兜底，仍能命中顶层时间戳（v8 所有 raw_data JSON 的
+#   update_time 均在文件头部，截断不影响）。
+_TS_RE = re.compile(
+    rb'"(?:update_time|gen_time|calc_time|run_time|fetch_time|snapshot_time)"'
+    rb'\s*:\s*"(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2})')
+
 def _content_ts(content: bytes):
-    """从 JSON 内容里取顶层时间戳（精确到分钟的字符串），取不到返回 None。"""
-    try:
-        obj = json.loads(content.decode("utf-8"))
-    except Exception:
-        return None
-    if not isinstance(obj, dict):
+    """从 JSON 内容里取顶层时间戳（归一为「YYYY-MM-DD HH:MM」分钟级字符串），取不到返回 None。
+
+    🔴 2026-09-17 加固：远端守卫读取可能因传输层断流而**截断**（见 _api_get_raw）。
+       完整 JSON 解析会失败，故先试 json.loads；失败再用正则扫描头部字节，
+       仍能命中顶层时间戳（v8 所有 raw_data JSON 的 update_time 均在文件头部）。
+    🔴 两种路径**必须归一为同一格式**（分钟级、无尾冒号），否则 guards 的
+       `lts < rts` 字符串比较会因精度不一致而误判。
+    """
+    if not content:
         return None
     best = None
-    for k in _TS_KEYS:
-        v = obj.get(k)
-        if isinstance(v, str) and len(v) >= 16 and v[4] == "-":
-            s = v[:16]
-            if best is None or s > best:
-                best = s
-    return best
+    try:
+        obj = json.loads(content.decode("utf-8"))
+        if isinstance(obj, dict):
+            for k in _TS_KEYS:
+                v = obj.get(k)
+                if isinstance(v, str) and len(v) >= 16 and v[4] == "-":
+                    s = v[:16].replace("T", " ").rstrip(":")  # → YYYY-MM-DD HH:MM
+                    if len(s) >= 15 and s[4] == "-" and s[10] == " ":
+                        if best is None or s > best:
+                            best = s
+    except Exception:
+        pass
+    if best:
+        return best
+    # 兜底：正则扫描（兼容截断）—— 仅扫前 1MB 字节足矣
+    m = _TS_RE.search(content[:1 << 20])
+    if m:
+        s = m.group(1).decode("ascii").replace("T", " ")
+        return s  # 已是 YYYY-MM-DD HH:MM（15 字符）
+    return None
+
 
 
 def walk_extra():
@@ -571,6 +697,7 @@ def main():
     failed_paths = []
     unchanged = 0
     regressed = []
+    _guard_miss = []
     for path, content in files.items():
         # ---- 2026-08-09 防倒退守卫 ----------------------------------------
         # 根因：walk_raw() 全量读本地 raw_data/，而云端 job 从 checkout 到 push
@@ -606,17 +733,28 @@ def main():
                 and path not in _NO_REGRESSION_GUARD):
             lts = _content_ts(content)
             if lts:
-                # 🛡 2026-09-17：小请求不再吃 300s 超时（3 次重试最坏 906s → 现 141s）
-                rb = api("GET", f"/repos/{REPO}/git/blobs/{remote_sha}", timeout=45)
-                if "__error__" not in rb and rb.get("encoding") == "base64":
-                    try:
-                        rts = _content_ts(base64.b64decode(rb["content"]))
-                    except Exception:
-                        rts = None
-                    if rts and lts < rts:
-                        regressed.append((path, lts, rts))
-                        _beat()
-                        continue
+                # 🛡 2026-09-17 一劳永逸（阿狸咪的工程师）：**取远端时间戳改走
+                #   contents?ref= raw 通道**（只读头部 256KB，绕开 ~1.2MB 传输墙），
+                #   并传 commit_ref=base_sha（contents?ref= 只认 commit/branch，绝不认
+                #   blob sha；git/blobs 才认 blob sha）。旧实现 `GET /git/blobs/{sha}`
+                #   在 1.2MB 级必现 IncompleteRead（E 批铁证 fe205ffe9383 → 9.9M/104M），
+                #   三次重试又复用 req 零退避连败 ⇒ 488s 无进展 ⇒ 看门狗强退 ⇒ 整批 13 个产物零推送。
+                rtext, _chan = _blob_text(base_sha, path, remote_sha, max_bytes=256 * 1024)
+                rts = _content_ts(rtext.encode("utf-8")) if rtext else None
+                if rts and lts < rts:
+                    regressed.append((path, lts, rts))
+                    _beat()
+                    continue
+                if rtext and not rts:
+                    # 通道通了、只是该 JSON 顶层没有可识别时间戳 ⇒ 正常放行
+                    pass
+                elif not rtext:
+                    # 🔴🔴 通道**本身**失败（raw + base64 双通道皆不可用）≠「本地更新」。
+                    #   此时若静默放行，等于用 checkout 时刻的旧内容覆盖远端新版 ——
+                    #   正是 08-09 大范围数据回退故障的成因（守卫完全失效）。
+                    #   故累计计数，超阈值即**中止整轮**（宁可不推，绝不倒退）。
+                    _guard_miss.append(path)
+                _beat()
         # -------------------------------------------------------------------
         payload = {"content": base64.b64encode(content).decode(), "encoding": "base64"}
         b = None
@@ -661,6 +799,20 @@ def main():
     # 使 ?v 与本次落库内容严格一致，消除「新数据上线 ~ reconcile 跑之前」的失配窗口。
     # 若 index.html 拉取/改写/上传任一步失败，则跳过（交由 reconcile workflow 自愈），
     # 绝不因此阻断整批 raw_data 推送。
+
+    # 🔴 2026-09-17 守卫通道失效闸门（阿狸咪的工程师）：若远端时间戳通道本身
+    #   大面积失败（raw + base64 双通道皆不可用），说明是通道故障而非「本地更新」；
+    #   此时静默放行 = 用本地旧内容覆盖远端（08-09 数据回退事故根因）。
+    #   超阈值即**中止整轮**（宁可不推，绝不倒退）。默认阈值 3，可用 GUARD_MISS_ABORT 调。
+    _gm_limit = int(os.environ.get("GUARD_MISS_ABORT", "3"))
+    if _guard_miss and len(_guard_miss) >= _gm_limit:
+        print("❌ 守卫通道失效闸门触发：%d 个文件通道失败 ≥ 阈值 %d，中止整轮（宁可不推）"
+              % (len(_guard_miss), _gm_limit))
+        sys.exit(7)
+    if _guard_miss:
+        print("⚠️ 守卫通道部分失败（%d 个，未达阈值，照常推送）：%s"
+              % (len(_guard_miss), ", ".join(_guard_miss[:10])))
+
     extra_changed = {p: files[p] for p in _EXTRA_FILES if p in new_entries}
     if extra_changed:
         # 🛡 2026-09-17：index.html（1.2MB）走短超时，避免大响应挂死拖垮整轮
