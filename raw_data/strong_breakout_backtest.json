@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-17 07:48:54",
+ "generated": "2026-09-17 18:21:15",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -23,7 +23,7 @@
  ],
  "card": "强势突破",
  "signal_source": "raw_data/strong_breakout_history.json（逐日真实信号账本）",
- "total_signals": 163,
+ "total_signals": 151,
  "signal_days": 7,
  "signal_date_range": "2026-09-03 ~ 2026-09-17",
  "periods": {

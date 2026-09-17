@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-17 16:39:17",
+ "generated": "2026-09-17 18:21:15",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -27,7 +27,7 @@
  "skipped_no_signal_date": 72,
  "signal_days": 25,
  "signal_date_range": "2026-06-09 ~ 2026-08-24",
- "ima_update_time": "2026-09-16 20:52:33",
+ "ima_update_time": "2026-09-17 15:53:26",
  "periods": {
   "1d": {
    "samples": 40,
