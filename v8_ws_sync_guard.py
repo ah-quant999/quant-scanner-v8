@@ -75,11 +75,18 @@ CRITICAL = [
     "algorithms/backtest_comprehensive.py",
     "algorithms/gen_algo_track.py",
     "algorithms/gen_market_brief.py",
-    "algorithms/build_unlisted_panel.py",
+    # 🔴 2026-09-18 阿狸咪的工程师·零幽灵路径更正（独立实测复核，见 HANDOVER 09-18 回执）：
+    #   原写 `algorithms/build_unlisted_panel.py` 与下方 `.github/scripts/v8_t1_guard.py`
+    #   在远端 main **均不存在**（contents API 实测）⇒ 恒进 missing 列表打印「⚠️ 缺失」，
+    #   制造噪声并误导后来人以为「漏推了文件」。真身位置如下两行，均为 2026-09-13/14
+    #   `scripts/` 归位后的实际落点：
+    #     · scripts/build_unlisted_panel.py（生成 data/UNLISTED_PANEL.js）
+    #     · v8_t1_guard.py（仓根；由 .github/workflows/v8_t1_guard.yml 在仓根执行）
+    "scripts/build_unlisted_panel.py",
     "v8/backtest_crds.py",
     "v8/factor_lab_gen.py",
     ".github/scripts/v8_stage_gate.py",
-    ".github/scripts/v8_t1_guard.py",
+    "v8_t1_guard.py",
 ]
 
 
