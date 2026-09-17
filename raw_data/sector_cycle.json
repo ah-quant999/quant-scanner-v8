@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-17 01:15:35",
+  "update_time": "2026-09-17 09:31:09",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -12,7 +12,7 @@
     "09/17"
   ],
   "columns": 30,
-  "cycle_count": 21,
+  "cycle_count": 20,
   "cycles": [
     {
       "sector": "AI算力",
@@ -37,20 +37,20 @@
       "hot_days": 30,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 2846,
+      "total": 2825,
       "ongoing": true
     },
     {
       "sector": "医药",
       "start": "08/03",
-      "end": "09/17",
+      "end": "09/16",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 30,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 29,
       "peak": 82,
       "peak_date": "08/20",
-      "total": 717,
+      "total": 712,
       "ongoing": true
     },
     {
@@ -119,19 +119,6 @@
       "ongoing": false
     },
     {
-      "sector": "地产链",
-      "start": "08/10",
-      "end": "09/09",
-      "start_idx": 1,
-      "end_idx": 23,
-      "days": 23,
-      "hot_days": 23,
-      "peak": 25,
-      "peak_date": "08/31",
-      "total": 140,
-      "ongoing": false
-    },
-    {
       "sector": "通信设备",
       "start": "08/10",
       "end": "08/25",
@@ -154,7 +141,7 @@
       "hot_days": 23,
       "peak": 20,
       "peak_date": "09/01",
-      "total": 172,
+      "total": 173,
       "ongoing": true
     },
     {
@@ -167,7 +154,7 @@
       "hot_days": 21,
       "peak": 15,
       "peak_date": "09/03",
-      "total": 160,
+      "total": 158,
       "ongoing": true
     },
     {
@@ -193,7 +180,7 @@
       "hot_days": 17,
       "peak": 25,
       "peak_date": "09/01",
-      "total": 172,
+      "total": 168,
       "ongoing": true
     },
     {
@@ -212,14 +199,14 @@
     {
       "sector": "电力",
       "start": "08/28",
-      "end": "09/17",
+      "end": "09/16",
       "start_idx": 15,
-      "end_idx": 29,
-      "days": 15,
-      "hot_days": 15,
+      "end_idx": 28,
+      "days": 14,
+      "hot_days": 14,
       "peak": 12,
       "peak_date": "09/09",
-      "total": 107,
+      "total": 99,
       "ongoing": true
     },
     {
@@ -232,7 +219,7 @@
       "hot_days": 14,
       "peak": 8,
       "peak_date": "09/02",
-      "total": 66,
+      "total": 64,
       "ongoing": true
     },
     {
@@ -258,20 +245,20 @@
       "hot_days": 8,
       "peak": 15,
       "peak_date": "09/16",
-      "total": 79,
+      "total": 74,
       "ongoing": true
     },
     {
       "sector": "光伏",
       "start": "09/15",
-      "end": "09/17",
+      "end": "09/16",
       "start_idx": 27,
-      "end_idx": 29,
-      "days": 3,
-      "hot_days": 3,
+      "end_idx": 28,
+      "days": 2,
+      "hot_days": 2,
       "peak": 4,
       "peak_date": "09/15",
-      "total": 12,
+      "total": 8,
       "ongoing": true
     },
     {
@@ -284,7 +271,7 @@
       "hot_days": 2,
       "peak": 6,
       "peak_date": "09/16",
-      "total": 12,
+      "total": 9,
       "ongoing": true
     }
   ]
