@@ -594,6 +594,7 @@ def main():
     # market映射
     setcode_map = {"hk": "31", "sh": "1", "sz": "0", "bj": "2"}
     
+    _snap_n = 0  # 2026-09-18：明细快照落盘计数器（见下方「每 25 只一写」）
     for key, s in gp_stocks.items():
         code = s.get("code", "")
         mkt = s.get("market", "")
@@ -704,12 +705,17 @@ def main():
         #      一旦流程在收尾前中断，残留产物体积翻倍（126.9 MB vs 72.6 MB）；
         #   ② IO 浪费：快照随 stock_results 累积逐次变大、221 只共写 221 次全量，
         #      是本脚本耗时的大头之一。统一走 _dump_json（紧凑 + 体积护栏）。
-        _dump_json({
-            "calc_time": TODAY,
-            "method": f"baostock 日K全量回测({TDX_BARS}根·约{round(TDX_BARS / 244)}年) (T+{', T+'.join(map(str, HOLD_DAYS))})",
-            "gold_pool_size": len(gp_stocks),
-            "stocks": stock_results,
-        }, _STOCK_CACHE)   # 2026-09-18：半成品明细改写缓存路径，产品产物 OUT 只出汇总
+        # 2026-09-18：明细快照由「每只一写」改为「每 25 只一写」——原实现 221 只共写 221 次
+        #   全量明细（云端 runner 上写随即被 git clean 清掉、无人读取），是本脚本耗时的大头之一。
+        #   保留周期性落盘以防长跑中断，IO 次数压到约 1/25。
+        _snap_n += 1
+        if _snap_n % 25 == 0:
+            _dump_json({
+                "calc_time": TODAY,
+                "method": f"baostock 日K全量回测({TDX_BARS}根·约{round(TDX_BARS / 244)}年) (T+{', T+'.join(map(str, HOLD_DAYS))})",
+                "gold_pool_size": len(gp_stocks),
+                "stocks": stock_results,
+            }, _STOCK_CACHE)   # 2026-09-18：半成品明细写缓存路径，产品产物 OUT 只出汇总
     
     # ── 汇总统计 ──
     log(f"\n{'='*60}")
