@@ -357,11 +357,20 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
             #     本条的 signal 为显式给定，`_fallbackLight()` 不会被调用 ⇒ 带标签安全；
             #     已全仓核查：无任何脚本解析本条文本（update_v8/audit_empty_cards/
             #     logic.html 均只读键名或整体存在性）。
+            # 🛡 2026-09-17 主人令「流入流出的那些ETF字体全部调小，合计的大小不变」：
+            #   仅**品种小块**（名称+金额、代码小字）整体降一档字号，让 5×2 两行并排
+            #   更紧凑；本条里其余文字（「全市场ETF合计净流入/流出」总额、
+            #   「净流入/流出TOP5」标签、分类概览）**一律保持容器默认 13px 不变**。
+            #   实现方式：不给外层块设字号（否则会连带放大/缩小整段），而是分别落到
+            #   两行内层 span —— 名称金额行 12px、代码行 11px→10px，
+            #   两档等比递减，层次不丢（"合计的大小不变" 由此保证）。
+            #   ⚠️ 前端 anomalies 渲染走 innerHTML（index.html 内 h+=a.text），
+            #     内联 font-size 原样生效；已确认无任何脚本解析本条文本。
             _out.append(
                 '<span style="display:inline-block;vertical-align:top;'
                 'margin:0 16px 0 0;line-height:1.45;white-space:nowrap;">'
-                f'{_x.get("name", "")} {_net:+.2f}亿<br>'
-                f'<span style="font-size:11px;color:#cbd5e1;">{_x.get("code", "")}</span></span>'
+                f'<span style="font-size:12px;">{_x.get("name", "")} {_net:+.2f}亿</span><br>'
+                f'<span style="font-size:10px;color:#cbd5e1;">{_x.get("code", "")}</span></span>'
             )
             if len(_out) >= 5:
                 break
