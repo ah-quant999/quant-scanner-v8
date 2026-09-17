@@ -518,7 +518,11 @@ jobs:
             printf '%s\n' "$OUT" | grep -E '^(proceed=|chain_|ready_|cst_hour=|DEGRADED_UPSTREAM=|degrade_lag_days=)' | sed 's/^/    /'
           } >> "$GITHUB_STEP_SUMMARY"
           if [ "$OK" != "true" ]; then
-            echo "::error title=v8-stage-gate-blocked::上游未就绪，已拒绝执行 ${TGT} 批 —— ${REASON}"
+            # 🛡 2026-09-17 主人令「分流」：本 ::error 的 title 固定为 `v8-stage-gate-reject`，
+            #   作为「闸门正常拒绝」的机器可读标记（区别于真故障）。
+            #   看门狗/看板据此把「上游未就绪的正常拒绝」与「算法链真跑挂」分开渲染。
+            #   红灯语义不变（主人明令「上游未就绪必须红灯 + 拒绝执行」）。
+            echo "::error title=v8-stage-gate-reject::上游未就绪，已拒绝执行 ${TGT} 批 —— ${REASON}（合规拒绝，非故障）"
             exit 1
           fi
           if [ "${TGT:-NONE}" = "NONE" ]; then
@@ -844,6 +848,12 @@ jobs:
             echo "| B 批就绪（闸门同源） | ${B_FRESH:-?} / ${B_OK:-?} |";
             echo "| D 批最终推荐（闸门同源） | ${D_FRESH:-?} / ${D_OK:-?} |"; } >> "$GITHUB_STEP_SUMMARY"
 
+          # 🔴 2026-09-17 主人令「看板红灯分流」——权威判据（看门狗/看板按 step 结论分流，勿只看 conclusion）：
+          #   step8「批次闸门」=failure 且 本步= failure  ⇒ **闸门正常拒绝**（上游未就绪），
+          #        ::error title=`v8-stage-gate-reject` ⇒ 不告警、只在看板显示「合规拒绝」。
+          #   step8=success 且 本步=failure                  ⇒ **真故障**（算法链跑了但产物不合格），
+          #        ::error title=`v8-algo-stale` / `v8-algo-failed` / `v8-algo-no-gate` ⇒ 必须告警。
+          #   仅看 run.conclusion 会把两者混为一谈 ⇒ 每轮红灯 ⇒ 真 P0 被埋（本次事故教训）。
           if [ "${KIND:-none}" = "none" ]; then
             echo "::notice title=v8-algo-holiday::休市日（无 T+1 需求），不跑算法链（合规）"; exit 0
           fi
@@ -853,7 +863,7 @@ jobs:
             echo "::notice title=v8-algo-market-hours::盘中时段(CST ${HHMM})拒绝算法链长任务 —— 保护盘中数据 + 释放 cn runner（合规，非故障）"; exit 0
           fi
           if [ "$OK" != "true" ]; then
-            echo "::error title=v8-algo-gate-blocked::上游未就绪，本批已被批次闸门拒绝执行（目标 ${TGT}）——这不是成功"; exit 1
+            echo "::error title=v8-stage-gate-reject::上游未就绪，本批已被批次闸门拒绝执行（目标 ${TGT}）——合规拒绝，非故障"; exit 1
           fi
           if [ -z "$TGT" ]; then
             echo "::error title=v8-algo-no-gate::批次闸门未产出判定（脚本异常）—— 不能当成功，请排查"; exit 1
