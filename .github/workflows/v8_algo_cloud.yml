@@ -479,7 +479,14 @@ jobs:
           #   （跑哪批永远由内容级就绪判定 —— 防止 force 派发重跑 A 批冲掉已到手的龙虎榜）
           FORCE=""
           { [ "${{ github.event.inputs.force_run }}" = "true" ] || [ "${{ github.event.inputs.bypass_time_gate }}" = "true" ]; } && FORCE="--force"
-          OUT=$(python .github/scripts/v8_stage_gate.py --root . --explicit-stage "$EX_STAGE" $FORCE)
+          # 🆕 2026-09-17 修法A（E批死循环根治·主人令「全站口径统一·对齐」）：
+          #   派发器按 chain_day(数据日) 预判就绪 ⇒ 线上闸门必须用**同一数据日**裁决，
+          #   否则「派发器 ready_B=8/9 放行 vs 闸门 ready_B=0/9 拒绝」的参数口径分裂永不收敛
+          #   （实证：同一 gate 同 data，只差 --today 即结论相反）。带 chain_day 的派发才透传。
+          EX_DAY="${{ github.event.inputs.chain_day || github.event.client_payload.chain_day || '' }}"
+          DAYARG=""
+          [ -n "$EX_DAY" ] && DAYARG="--today $EX_DAY"
+          OUT=$(python .github/scripts/v8_stage_gate.py --root . --explicit-stage "$EX_STAGE" $DAYARG $FORCE)
           echo "$OUT"
           echo "$OUT" >> "$GITHUB_OUTPUT"
           OK=$(printf '%s' "$OUT" | grep -m1 '^stage_ok=' | cut -d= -f2)
