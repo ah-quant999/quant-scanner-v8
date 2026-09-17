@@ -6201,6 +6201,42 @@ function fmtSigned(v){
         return '<span title="' + _esc(t) + '" style="color:' + col + ';font-weight:' + (n < 100 ? '700' : '400') + ';">'
              + n + (n < 100 ? ' ⚠' : '') + '</span>';
       }
+      /* 🆕 2026-09-17 阿狸咪的工程师：「源时点」单元格 —— **只摊时点、不下结论**。
+         ── 依据主人 2026-09-14 令：「主人要判『是否新鲜』看时间即可，
+            **不需要一条会误报的红字来替主人下结论**」。故本格只显示时点，不判陈旧。
+         ── 口径（两级，**现场真值优先**）：
+              ① 若该行已声明真值源（r.srcFixed，见本文件上方「四量终极」同源校正块），
+                 则**现场**从 window[<真值源>] 读 update_time —— 与本行数字**同源同时点**，
+                 杜绝"同一行两个时点"（主人 09-16 原话：「不一致会引起误会」）；
+              ② 否则用聚合器已算好的 r.source_time（gen_backtest_all_algos.py judge_fresh）。
+            🔴 为什么必须加①：实测本产物 r.source_time='2026-09-17 07:18'（聚合器 16:31 跑时
+               源还没刷），而真值源现在 ut='2026-09-17 18:32:41' —— 若照搬聚合快照，
+               主人会看到"源停在早上"的**旧时点**，反成新误导。
+         🔴 边界（防误标，本轮实证）：
+           · 前端**合成行**（强势跟踪 / 逆势龙头校正行）无 source_time
+             ⇒ `undefined` 必须走「—」分支，**绝不显示 0 / 绝不标陈旧**；
+           · `null`（聚合器读不到源）同样走「—」。
+         不显示 r.fresh：理由见 A6-1 注释（快照判断会谎报陈旧）。 */
+      function _srcCell(r){
+        var t = '';
+        /* ① 现场真值源优先（与 r.srcFixed 声明的源严格同源） */
+        try{
+          var _sv = r && r.srcFixed;
+          if(_sv && window[_sv] && window[_sv].update_time){
+            t = String(window[_sv].update_time);
+          }
+        }catch(e){}
+        /* ② 回落聚合器时点 */
+        if(!t && r && r.source_time) t = String(r.source_time);
+        if(!t) return '<span style="color:var(--dim);" title="本行无源自述时点（前端合成行，或该真值源产物未登记 update_time），不代表数据异常">—</span>';
+        /* 只保留到分钟（与聚合器 source_time 同精度，避免同列两种精度） */
+        t = t.replace('T',' ').slice(0,16);
+        var _live = (r && r.srcFixed) ? '（现场读取真值源 ' + String(r.srcFixed) + '）' : '（聚合快照登记）';
+        var _tip = '本行数字来自该策略真值源产物的自述更新时间：' + t + _live
+                 + '。这是源自身的产出时点，与页面刷新无关 —— 主人据此判断新鲜度即可。';
+        return '<span style="color:var(--sub);font-size:11px;white-space:nowrap;" title="'
+             + _esc(_tip) + '">' + _esc(t) + '</span>';
+      }
       function _betaCell(card){
         var bw = _betaWarn[card];
         if(!bw) return '';
@@ -6224,7 +6260,18 @@ function fmtSigned(v){
          + ' <span style="color:#7dd3fc;">ⓘ</span></span></div>';
       h += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
       h += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      ['#','策略','星级','最佳持有期','样本 n','胜率','平均收益'].forEach(function(x){
+      /* 🆕 2026-09-17 阿狸咪的工程师 追加「源时点」列（源自述，不下结论）
+         ── 依据主人 2026-09-14 令（见本文件 line 1040-1058 的 _staleMark 注释）：
+            「主人要判『是否新鲜』看时间即可，**不需要一条会误报的红字来替主人下结论**」。
+         ── 故本列**只摊时点、不判陈旧**：原样显示该策略真值源产物的 update_time
+            （聚合器 judge_fresh 已算好的 source_time），主人自行判断。
+         ── 为什么不做陈旧告警：本仓数据以**日频**为主，"今日批次尚未产出"是正常
+            中间态，按 SLA 判停更必然误报（09-14 已因此整段删除该机制，删干净）。
+         ── 🔴 为什么不用 r.fresh：fresh 是**聚合器跑批那一刻**的快照判断，
+            而真值源在盘后链跑完后才刷新 ⇒ 直接上屏会谎报"陈旧"（本轮实测：
+            四量终极快照判 false/07:18 但源实际 18:32 已刷，因子实验室同理）
+            ⇒ 正是主人最恨的假 failure。故 fresh 一律不消费。 */
+      ['#','策略','星级','最佳持有期','样本 n','胜率','平均收益','源时点'].forEach(function(x){
         h += '<th style="padding:6px;text-align:left;color:var(--sub);white-space:nowrap;">'+x+'</th>';
       });
       h += '</tr></thead><tbody>';
@@ -6239,6 +6286,7 @@ function fmtSigned(v){
           +  '<td style="padding:6px;">'+_sampleCell(r)+'</td>'
           +  '<td style="padding:6px;font-weight:700;color:'+_colorNum(r.win_rate)+';">'+_n(r.win_rate)+'%</td>'
           +  '<td style="padding:6px;font-weight:700;color:'+_colorPL(r.avg_return)+';">'+_sgn(r.avg_return)+_n(r.avg_return,2)+'%</td>'
+          +  '<td style="padding:6px;">'+_srcCell(r)+'</td>'
           +  '</tr>';
       });
       INS.forEach(function(r){
@@ -6248,7 +6296,7 @@ function fmtSigned(v){
           +  '<td style="padding:6px;font-size:11px;">累积中</td>'
           +  '<td style="padding:6px;white-space:nowrap;">持有 '+String(r.hold||'—').replace(/^T\+/,'')+' 日</td>'
           +  '<td style="padding:6px;">'+(r.sample||0)+'</td>'
-          +  '<td style="padding:6px;" colspan="3">⚠️ 样本不足 '+MINS+'，不参与排名、不做下架评估</td>'
+          +  '<td style="padding:6px;" colspan="4">⚠️ 样本不足 '+MINS+'，不参与排名、不做下架评估</td>'
           +  '</tr>';
       });
       h += '</tbody></table></div>';
