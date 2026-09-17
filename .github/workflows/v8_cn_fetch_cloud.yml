@@ -988,6 +988,9 @@ jobs:
           #    实测 09-17：主链 4 轮（自身 schedule）/ 兜底链 27 轮（10:05-15:02）。
           #    ⇒ 与兜底链头部契约「平时不跑、仅哨兵 v3 接单超时派发」存在口径冲突，
           #      列为**待拍板项**；本轮只留痕、不改行为（避免给云端刷无用 run）。
+          #    ↳ 结构层修法（甲＝relay ② 改派主链·须与保底联动／乙＝抓取脚本源级重试+第三源／
+          #      丙＝勿把盘中主力挂 cron）见：
+          #      docs/ops/handover/2026-09-17_1525_URGENT_STOCK_QUOTE盘中刷新漂移海外IP兜底链致双源全灭.md
           try:
               api("POST",
                   f"https://api.github.com/repos/{repo}/actions/workflows/v8_stock_quote_refresh_cloud.yml/dispatches",
