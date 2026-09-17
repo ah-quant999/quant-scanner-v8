@@ -5921,16 +5921,46 @@ function fmtSigned(v){
            它验的是入选门槛）；
          · 持有期覆盖不足 / 样本不足 → 「累积中」，不硬凑星级。 */
       function _stars(card){
-        /* 2026-09-17 主人令：诚实显示真实实算分（带小数），不整数化、不人为封顶。 */
+        /* 2026-09-13 主人令「统一测算标准」：星级一律取全站唯一真源。
+           ⚠️ 人工覆写口必须与 __committeeStarHTML / __committeeStarsOf 同源 ——
+              回测卡走覆写口，本表若只走 __committeeRate（不读覆写），
+              同一策略就会出现两个星级，那正是主人要根治的病。 */
+        var _ov = (window.__MODULE_STARS_OVERRIDE || {})[card];
+        if(_ov != null){
+          var _s=''; for(var _i=0;_i<_ov;_i++) _s+='⭐';
+          return '<span style="font-size:10.5px;color:#fbbf24;" title="主人令人工固定 '
+               + _ov + '⭐（不随回测数据自动升降）">'+_s+'</span>';
+        }
+        var rt = (typeof window.__committeeRate === 'function') ? window.__committeeRate(card) : null;
+        if(!rt) return '';
+        if(rt.kind === 'pool'){
+          var _pw = rt.weak
+            ? '<span title="主口径胜率低于 45% 下架红线，列入观察（数据随回测自动更新）"'
+              + ' style="font-size:9.5px;color:#fbbf24;background:rgba(251,191,36,.12);'
+              + 'border:1px solid rgba(251,191,36,.35);padding:1px 5px;border-radius:8px;'
+              + 'white-space:nowrap;margin-left:3px;">观察</span>'
+            : '';
+          return '<span title="基础股池：不评星级，只验入选门槛（'+(rt.note||'')+'）"'
+               + ' style="font-size:10px;color:#38bdf8;background:rgba(56,189,248,.12);'
+               + 'border:1px solid rgba(56,189,248,.32);padding:1px 6px;border-radius:8px;white-space:nowrap;">基础股池</span>'
+               + _pw;
+        }
+        if(!rt.ready){
+          return '<span style="font-size:10px;color:var(--dim);" title="'+(rt.note||'')+'">累积中</span>';
+        }
+        /* 🔴 2026-09-17 主人令：①「诚实显示真实实算分」—— 带小数、不整数化、不人为封顶，
+              与 window.__committeeStarHTML 全站唯一出口同口径；②「星级要能自证」——
+              每次加减星的理由（短周期封顶 / 样本封顶 / 持有期覆盖 / T+1 基准超额）全部写进 tooltip。 */
         var s = (rt.score == null ? '–' : rt.score) + '⭐';
         var _tips = '委员会多期加权 · profile ' + rt.profile + ' · 综合得分 ' + rt.score
                   + (rt.cov != null ? (' · 持有期覆盖 ' + Math.round(rt.cov * 100) + '%') : '')
                   + (rt.maxN != null ? (' · 最大样本 ' + rt.maxN) : '')
+                  + (rt.penal ? (' · 短周期封顶：' + rt.penalWhy) : '')
                   + (rt.shortExcess != null
                       ? (' · T+1 基准超额 ' + (rt.shortExcess > 0 ? '+' : '') + rt.shortExcess + 'pp')
-                      : '');
+                      : '')
+                  + (rt.nCapped ? (' · 样本 ' + rt.maxN + '<100 ⇒ 封顶 4⭐') : '');
         return '<span style="font-size:10.5px;color:#fbbf24;" title="'
-             + String(_tips).replace(/"/g, '&quot;') + '">'+s+'</span>';
              + String(_tips).replace(/"/g, '&quot;') + '">'+s+'</span>';
       }
       /* 🏁 2026-09-13 主人令（图3「不能自相矛盾」）：
