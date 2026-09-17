@@ -17,6 +17,7 @@
 """
 
 import json, os, sys, time, subprocess
+import re   # 2026-09-17：议息解析器（_fed_* 系列）在模块级用 re，原文件仅在函数内局部 import
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -237,6 +238,47 @@ def _is_empty_payload(obj):
     return False
 
 
+def _safe_json_dumps(obj) -> str:
+    """🛡 2026-09-17 主人令（一劳永逸 · 非法 JSON 根治）
+
+    背景：json.dump 默认 allow_nan=True，会把 float('nan') / ±inf 写成裸
+    `NaN` / `Infinity`（**非法 JSON**）：
+      · 前端若用 JSON.parse 解析 → 直接抛错；
+      · Python json.loads 虽宽容能读，但数据已被污染（NaN 参与比较/计算全是假值）。
+    实测：data/MACRO_DATA.js 的 cpi[] 里出现过 `"今值":NaN,"预测值":NaN`
+    （akshare 最新一期未公布 ⇒ DataFrame 该行是 NaN，to_dict() 原样带出）。
+
+    做法：递归遍历，把 NaN/Infinity 一律转成 None（标准 null），并强制
+    allow_nan=False 让任何漏网的 NaN 直接抛错（宁可这里炸，也不写非法 JSON 进仓库）。
+    """
+    import math as _math
+    import json as _json
+
+    def _norm(v, _depth=0):
+        if _depth > 30:
+            return None
+        if v is None or isinstance(v, (bool, int, str)):
+            return v
+        if isinstance(v, float):
+            return None if (_math.isnan(v) or _math.isinf(v)) else v
+        if isinstance(v, dict):
+            return {(_norm(k, _depth + 1) if not isinstance(k, str) else k): _norm(x, _depth + 1)
+                    for k, x in v.items()}
+        if isinstance(v, (list, tuple, set)):
+            return [_norm(x, _depth + 1) for x in v]
+        # numpy / pandas 标量兜底
+        for attr in ("item", "tolist"):
+            if hasattr(v, attr):
+                try:
+                    return _norm(getattr(v, attr)(), _depth + 1)
+                except Exception:
+                    pass
+        return None
+
+    return _json.dumps(_norm(obj), ensure_ascii=False, separators=(",", ":"),
+                       default=str, allow_nan=False)
+
+
 def save(var, obj):
     fname = VAR_TO_RAW.get(var)
     if not fname:
@@ -251,7 +293,12 @@ def save(var, obj):
     obj["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")
     path = RAW_DIR / fname
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(obj, f, ensure_ascii=False, separators=(",", ":"), default=str)
+        # 🛡 2026-09-17 主人令（一劳永逸 · 非法 JSON 根治）：
+        #   json.dump 默认 allow_nan=True，会把 float('nan')/inf 写成裸 NaN/Infinity
+        #   （非法 JSON：前端 JSON.parse 抛错，Python json.loads 虽宽容但污染数据）。
+        #   统一走 _safe_json_dumps —— 递归把所有 NaN/Infinity 转 None（标准 null），
+        #   从落盘这一层彻底封死「任何源再漏 NaN 就写进仓库」的可能。
+        f.write(_safe_json_dumps(obj))
     print(f"  ✅ {var} → raw_data/{fname}")
 
 
@@ -312,6 +359,24 @@ _EM_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/120.0 Safari/537.36",
     "Referer": "https://data.eastmoney.com/zjlx/detail.html",
+    "Accept": "*/*",
+}
+
+# ── 美联储议息官方源（2026-09-17 主人令·根治：新增议息数据链路）─────────────
+# 背景：原 f_macro_brief() 是纯规则引擎，只读 global_macro/monetary/commodities，
+#   完全没有「议息」这一输入 ⇒ 无论重发多少次都写不出加息，且原油条目硬编码
+#   「可能推迟美联储降息节奏」在加息周期里方向完全错误。
+# 数据源选型（均已实测）：
+#   ✅ federalreserve.gov/json/ne-press.json —— 官方全量新闻 JSON，可达，
+#      含 pt="Monetary Policy" + t="Federal Reserve issues FOMC statement" 条目及声明链接。
+#   ❌ FRED DFEDTARL/DFEDTARU —— 决议次日仍返回决议前值（实测 3.50/3.75），
+#      不能作事件源，仅可事后交叉校验。
+#   ❌ akshare macro_bank_usa_interest_rate() —— 数据只到 2025-10-30，严重滞后。
+_FED_NEWS_JSON = "https://www.federalreserve.gov/json/ne-press.json"
+_FED_BASE = "https://www.federalreserve.gov"
+_FED_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "*/*",
 }
 
@@ -914,6 +979,57 @@ def f_macro_brief():
         # 置顶：日本加息是当前最影响亚太的风险事件之一，确保进入今日判定前3条
         news.insert(0, jp)
 
+    # ── 美联储议息决定（2026-09-17 主人令·根治：新增议息数据链路）────────────
+    # 🛡 必须 insert(0) **绝对置顶**：index.html 只渲染 news.slice(0,4)（前 4 条），
+    #   议息是全球资产定价最核心的变量，插在后面的任何位置都会被前端截断掉、用户看不见。
+    #   本块在日元 insert(0) 之后执行 ⇒ 议息最终占据第 1 条。
+    # 数据源：macro_data.json 的 fed_decision（由 _fetch_fed_decision 从美联储官网抓取）。
+    # ⚠️ 抓不到就不生成该条（不臆造），也不影响其他条目。
+    _fed = macro.get("fed_decision") or {}
+    if isinstance(_fed, dict) and _fed.get("action"):
+        try:
+            _act = _fed.get("action")
+            _mag = int(_fed.get("magnitude_bp") or 0)
+            _lo = _fed.get("target_lower")
+            _hi = _fed.get("target_upper")
+            _plo = _fed.get("prev_lower")
+            _phi = _fed.get("prev_upper")
+            _rng = ""
+            if _lo is not None and _hi is not None:
+                _rng = f"{_lo:.2f}%-{_hi:.2f}%"
+            _prev_rng = ""
+            if _plo is not None and _phi is not None:
+                _prev_rng = f"（由 {_plo:.2f}%-{_phi:.2f}% {'上调' if _act=='加息' else '下调' if _act=='降息' else '维持'}）"
+            _vote = _fed.get("vote") or ""
+            _vote_txt = f"，{_vote} 票通过" if _vote else ""
+
+            if _act == "加息":
+                _txt = (f"美联储 FOMC 宣布加息 {_mag}bp 至 {_rng}{_prev_rng}{_vote_txt}。"
+                        f"无风险利率抬升压制全球风险资产估值，美元走强施压人民币汇率与外资流入；"
+                        f"A 股高估值成长/外资重仓板块承压，关注红利与低估值防御方向。")
+                # 🛡 2026-09-17 主人令：tag 末尾带 ⚠️ ⇒ 计入下方 risk_factors。
+                #   原 tag「🇺🇸 美联储」不含任何 emoji 判定符，导致加息这种
+                #   重大紧缩事件对 a_impact 档位的影响权重为 0（实测确证）。
+                _tag = "🇺🇸 美联储 ⚠️"
+            elif _act == "降息":
+                _txt = (f"美联储 FOMC 宣布降息 {_mag}bp 至 {_rng}{_prev_rng}{_vote_txt}。"
+                        f"全球流动性宽松预期升温，利好风险资产估值与外资流入；"
+                        f"A 股科技成长/券商等利率敏感板块相对受益。")
+                # 降息计入 benign_factors（📈）
+                _tag = "🇺🇸 美联储 📈"
+            else:
+                _txt = (f"美联储 FOMC 宣布维持利率不变（{_rng}）{_prev_rng}{_vote_txt}。"
+                        f"政策进入观察期，市场焦点转向后续经济数据与官员表态；"
+                        f"A 股延续自身节奏，关注结构性与资金流向机会。")
+                # 维持不变：中性事件，不参与风险/利好计数
+                _tag = "🇺🇸 美联储"
+
+            # 日期：注明决议日，避免用户误以为是当日事件
+            _d = str(_fed.get("date") or "")
+            news.insert(0, {"tag": _tag, "text": _txt, "_fed_date": _d})
+        except Exception as _e:
+            print(f"  ⚠️ 议息条目生成失败: {_e}")
+
     # 黄金
     if gold:
         if gold > 4300:
@@ -922,9 +1038,22 @@ def f_macro_brief():
             news.append({"tag": "🥇 大宗", "text": f"COMEX 黄金回落至 ${gold:.0f}/oz，避险需求降温。风险偏好修复时资金可能从黄金回流股市。"})
 
     # 原油
+    # 🔴 2026-09-17 主人令·根治（原为 P0 方向性错误）：
+    #   原文案硬编码「可能推迟美联储降息节奏」——在加息周期里方向完全反了。
+    #   现改为**按 fed_decision 动态生成**：有议息数据就按真实方向说，
+    #   没有议息数据就只说油价本身（不再对货币政策方向妄下结论）。
     if oil:
+        _fed_for_oil = macro.get("fed_decision") or {}
+        _fed_dir_txt = ""
+        if isinstance(_fed_for_oil, dict) and _fed_for_oil.get("action"):
+            if _fed_for_oil["action"] == "加息":
+                _fed_dir_txt = "叠加美联储加息周期，通胀读数对政策路径更敏感。"
+            elif _fed_for_oil["action"] == "降息":
+                _fed_dir_txt = "美联储处于降息周期，通胀回升或放缓宽松节奏。"
+            else:
+                _fed_dir_txt = "美联储维持利率不变，通胀读数影响后续政策路径。"
         if oil > 85:
-            news.append({"tag": "🛢️ 大宗", "text": f"WTI 原油突破 $85/bbl，通胀预期升温。可能推迟美联储降息节奏，对 A 股新能源/化工有成本传导影响。"})
+            news.append({"tag": "🛢️ 大宗", "text": f"WTI 原油突破 $85/bbl，通胀预期升温。{_fed_dir_txt}对 A 股新能源/化工有成本传导影响。"})
         elif oil < 72:
             news.append({"tag": "🛢️ 大宗", "text": f"WTI 原油跌破 $72/bbl，能源成本下降。利好交运/化工等中下游行业，但反映全球需求疲软。"})
 
@@ -978,6 +1107,185 @@ def f_macro_brief():
         "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
         "auto": True,
     }
+
+
+def _fed_parse_pct(tok):
+    """把美联储声明里的利率写法解析为 float。
+
+    支持三种写法（均来自官方声明原文）：
+      - 混合数 '3-3/4'  → 3.75（目标区间上下限的标准写法）
+      - 带空格   '3 3/4' → 3.75
+      - 裸分数   '1/4'   → 0.25（**加息/降息幅度**用的就是这种）
+    🔴 2026-09-17 实测踩坑：首版只处理了 'N-D/D'，漏了裸分数 '1/4'
+       ⇒ magnitude_bp 恒为 0（声明原文 "by 1/4 percentage point" 抓不到）。
+    """
+    tok = (tok or "").strip().rstrip("%").strip()
+    m = re.fullmatch(r"(\d+)-(\d)/(\d)", tok)
+    if m:
+        return int(m.group(1)) + int(m.group(2)) / int(m.group(3))
+    m = re.fullmatch(r"(\d+)\s+(\d)/(\d)", tok)
+    if m:
+        return int(m.group(1)) + int(m.group(2)) / int(m.group(3))
+    m = re.fullmatch(r"(\d+)/(\d+)", tok)
+    if m:
+        return int(m.group(1)) / int(m.group(2))
+    try:
+        return float(tok)
+    except Exception:
+        return None
+
+
+def _fed_strip_html(seg):
+    """去标签 + 实体解码 + 压缩空白。"""
+    seg = re.sub(r"<script[\s\S]*?</script>", " ", seg)
+    seg = re.sub(r"<style[\s\S]*?</style>", " ", seg)
+    seg = re.sub(r"<[^>]+>", " ", seg)
+    for a, b in (("&#160;", " "), ("&nbsp;", " "), ("&amp;", "&"),
+                 ("&#8217;", "'"), ("&rsquo;", "'"), ("&#8212;", "—"),
+                 ("&#8211;", "–"), ("\u2013", "–")):
+        seg = seg.replace(a, b)
+    return re.sub(r"\s+", " ", seg).strip()
+
+
+def _fed_fetch_article(url, timeout=25):
+    """抓 FOMC 声明正文。
+
+    🔴 2026-09-17 两个实测坑（均会导致正文抽取失败）：
+      1) 必须显式 r.encoding='utf-8' —— requests 对 .htm 默认按 ISO-8859-1 解码，
+         会把正文里的连接号 – 解成乱码 'â'，后续正则匹配「12 – 0 vote」直接失配。
+      2) 官网页面 82630 字符，前 66879 字符全是导航菜单 ⇒ 必须用 id="article"
+         切片，否则去标签后前 1500+ 字符全是 About the Fed / Supervision 菜单文本。
+    """
+    r = _requests.get(url, headers=_FED_HEADERS, timeout=timeout)
+    r.raise_for_status()
+    r.encoding = "utf-8"
+    html = r.text
+    i = html.find('id="article"')
+    seg = html[i:i + 20000] if i >= 0 else html
+    return _fed_strip_html(seg)
+
+
+def _fed_parse_statement(txt, url, dt):
+    """从 FOMC 声明正文抽取议息结果。
+
+    ⚠️ 铁律：任何一项抽不到就返回 None，**绝不臆造**（主人令「一定要确保数据的真实性」）。
+    """
+    low = (txt or "").lower()
+    m = re.search(r"decided to (raise|lower|maintain|keep)\s+(?:the\s+)?"
+                  r"target range for the federal funds rate", low)
+    if not m:
+        return None
+    verb = m.group(1)
+    action = {"raise": "加息", "lower": "降息", "maintain": "维持", "keep": "维持"}[verb]
+
+    # 幅度：单独在短文本里抓，不并入上面的长正则（长正则易因转义差异漏配）
+    mag = None
+    mm = re.search(r"federal funds rate\s+by\s+([0-9]+/[0-9]+|[0-9.]+)\s+percentage point", low)
+    if mm:
+        mag = _fed_parse_pct(mm.group(1))
+    else:
+        mm2 = re.search(r"federal funds rate\s+by\s+([0-9.]+)\s+basis point", low)
+        if mm2:
+            mag = float(mm2.group(1)) / 100.0
+
+    # 目标区间
+    rng = None
+    mr = re.search(r"target range for the federal funds rate\s+to\s+"
+                   r"([0-9]+(?:-\d/\d)?)\s+to\s+([0-9]+(?:-\d/\d)?)\s+percent", low)
+    if mr:
+        lo, hi = _fed_parse_pct(mr.group(1)), _fed_parse_pct(mr.group(2))
+        if lo is not None and hi is not None:
+            rng = (lo, hi)
+    if rng is None:
+        for pat in (r"target range for the federal funds rate(?:.{0,40}?)(?:to|at)\s*"
+                    r"([0-9]+(?:-\d/\d)?)\s*(?:to|-)\s*([0-9]+(?:-\d/\d)?)\s*percent",
+                    r"target range(?:.{0,40}?)(?:to|at)\s*"
+                    r"([0-9]+(?:-\d/\d)?)\s*(?:to|-)\s*([0-9]+(?:-\d/\d)?)\s*percent"):
+            m2 = re.search(pat, low)
+            if m2:
+                lo, hi = _fed_parse_pct(m2.group(1)), _fed_parse_pct(m2.group(2))
+                if lo is not None and hi is not None:
+                    rng = (lo, hi)
+                    break
+    if rng is None:
+        return None
+
+    # 投票
+    mv = re.search(r"approved the following statement for release by a\s*"
+                   r"(\d+)\s*[–\-—]\s*(\d+)\s*vote", low)
+    vote = f"{mv.group(1)}–{mv.group(2)}" if mv else None
+    unanimous = bool(mv and int(mv.group(2)) == 0)
+
+    # 上期区间：由本次区间 + 幅度反推（加息→下界减；降息→下界加）
+    prev = None
+    if mag:
+        if action == "加息":
+            prev = (round(rng[0] - mag, 4), round(rng[1] - mag, 4))
+        elif action == "降息":
+            prev = (round(rng[0] + mag, 4), round(rng[1] + mag, 4))
+
+    return {
+        "action": action,
+        "action_en": verb,
+        "magnitude_bp": int(round(mag * 100)) if mag else 0,
+        "target_lower": rng[0],
+        "target_upper": rng[1],
+        "prev_lower": prev[0] if prev else None,
+        "prev_upper": prev[1] if prev else None,
+        "vote": vote,
+        "unanimous": unanimous,
+        "statement_url": url,
+        "date": dt.strftime("%Y-%m-%d"),
+        "source": "federalreserve.gov",
+    }
+
+
+def _fetch_fed_decision(lookback_days=5, timeout=25):
+    """抓取最近一次 FOMC 议息决定（官方源：federalreserve.gov）。
+
+    🔴 2026-09-17 两个实测坑：
+      1) ne-press.json 带 **UTF-8 BOM**（\\xef\\xbb\\xbf）⇒ 必须 utf-8-sig 解码，
+         直接用 utf-8 会 JSONDecodeError 崩掉。
+      2) 该 JSON **不按时间排序**（实测 9/16 的两条排在 9/10、9/11 之前，
+         因它按发布主体分组）⇒ 绝不能取首条，必须自己按日期倒排筛窗口。
+    另注：FRED 的 DFEDTARL/DFEDTARU **不作事件源** —— 实测决议次日仍返回决议前值
+    （3.50 / 3.75），无法判事件；只能作为事后交叉校验。
+    """
+    try:
+        r = _requests.get(_FED_NEWS_JSON, headers=_FED_HEADERS, timeout=timeout)
+        r.raise_for_status()
+        data = json.loads(r.content.decode("utf-8-sig"))
+    except Exception as e:
+        print(f"  ⚠️ 美联储官网新闻 JSON 抓取失败: {e}")
+        return None
+
+    cutoff = now_cst().replace(tzinfo=None) - timedelta(days=lookback_days)
+    cands = []
+    for it in data if isinstance(data, list) else []:
+        if not isinstance(it, dict) or it.get("pt") != "Monetary Policy":
+            continue
+        if "FOMC statement" not in str(it.get("t", "")):
+            continue
+        try:
+            dt = datetime.strptime(str(it.get("d", "")), "%m/%d/%Y %I:%M:%S %p")
+        except Exception:
+            continue
+        if dt < cutoff:
+            continue
+        cands.append((dt, it))
+    cands.sort(key=lambda x: x[0], reverse=True)   # JSON 非时间序，必须自己排
+
+    for dt, it in cands:
+        url = _FED_BASE + str(it.get("l", ""))
+        try:
+            txt = _fed_fetch_article(url, timeout=timeout)
+        except Exception as e:
+            print(f"  ⚠️ FOMC 声明正文抓取失败 {url}: {e}")
+            continue
+        d = _fed_parse_statement(txt, url, dt)
+        if d:
+            return d
+    return None
 
 
 def _fetch_us_overnight_em():
@@ -1786,14 +2094,59 @@ def f_macro_data():
         }
 
     # 1) CPI / PMI 数组（保留原 flat schema 兼容）
+    # 🛡 2026-09-17 主人令（一劳永逸 · NaN 污染根治）：
+    #   akshare 的 macro_china_cpi_yearly / macro_china_pmi_yearly 在「最新一期尚未公布」时
+    #   该行数值为 NaN，df.to_dict() 会把 NaN 原样带出 ⇒ json.dump 默认 allow_nan=True
+    #   写出裸 NaN（非法 JSON，前端 JSON.parse 会抛错，Python json.loads 虽宽容但属污染）。
+    #   修法：统一走 _clean_nan —— 把 NaN/NaT/±inf 一律转成 null，且剔除全空行。
+    def _clean_nan(rows):
+        """DataFrame.to_dict 结果 → 合法 JSON 友好结构（NaN/NaT/inf → None）"""
+        import math
+        out_rows = []
+        for r in (rows or []):
+            if not isinstance(r, dict):
+                continue
+            # 日期类字段可能是 Timestamp / NaT，统一转字符串
+            item = {}
+            for k, v in r.items():
+                try:
+                    if v is None:
+                        item[str(k)] = None
+                        continue
+                    # pd.isna 覆盖 float('nan') / np.nan / pd.NaT
+                    try:
+                        import pandas as _pd
+                        if _pd.isna(v):
+                            item[str(k)] = None
+                            continue
+                    except Exception:
+                        pass
+                    if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
+                        item[str(k)] = None
+                        continue
+                    if hasattr(v, "isoformat"):
+                        item[str(k)] = v.isoformat()
+                        continue
+                    item[str(k)] = v
+                except Exception:
+                    item[str(k)] = None
+            # 🔴 只保留「数值列至少有一个非空」的行（过滤未公布的空壳行）
+            has_val = any(
+                (not str(k).startswith(("日期", "商品", "指标", "date"))) and (v is not None)
+                for k, v in item.items()
+            )
+            if has_val:
+                out_rows.append(item)
+        return out_rows
+
     try:
         cpi = get_ak().macro_china_cpi_yearly()
-        out["cpi"] = cpi.tail(6).to_dict(orient="records") if cpi is not None else []
+        out["cpi"] = _clean_nan(cpi.tail(6).to_dict(orient="records")) if cpi is not None else []
     except Exception:
         out.setdefault("cpi", [])
     try:
         pmi = get_ak().macro_china_pmi_yearly()
-        out["pmi"] = pmi.tail(6).to_dict(orient="records") if pmi is not None else []
+        out["pmi"] = _clean_nan(pmi.tail(6).to_dict(orient="records")) if pmi is not None else []
     except Exception:
         out.setdefault("pmi", [])
 
@@ -2034,6 +2387,29 @@ def f_macro_data():
             print(f"    ⚠️ akshare fallback 整体失败: {e}")
 
     print(f"    ✅ 全球宏观结果: { {k: v.get('value') or v.get('price') for k, v in gm.items()} }")
+
+    # 8) 美联储议息决定（2026-09-17 主人令·根治：新增议息数据链路）
+    #    写入顶层 fed_decision，供 f_macro_brief() 生成议息专项条目 + 校正方向文案。
+    #    ⚠️ 抓不到就**保持原值/留空**，绝不臆造（主人令「一定要确保数据的真实性」）。
+    #    注意：本块写在 return 之前，且失败不影响 other 模块（单源 try/except）。
+    try:
+        _fed = _fetch_fed_decision()
+        if _fed:
+            out["fed_decision"] = _fed
+            print(f"    ✅ 美联储议息: {_fed['action']} {_fed['magnitude_bp']}bp "
+                  f"→ {_fed['target_lower']}%-{_fed['target_upper']}% "
+                  f"(上期 {_fed['prev_lower']}%-{_fed['prev_upper']}%, 投票 {_fed['vote']})")
+        else:
+            # 保留旧值（若曾抓到过）——议息是低频事件，上次结论仍有参考价值
+            _old = out.get("fed_decision")
+            if _old:
+                print(f"    ⚠️ 本次未抓到新议息决定，保留上次: {_old.get('date')} "
+                      f"{_old.get('action')} {_old.get('magnitude_bp')}bp")
+            else:
+                print("    ⚠️ 本次未抓到美联储议息决定（保持空，不臆造）")
+    except Exception as e:
+        print(f"    ⚠️ 美联储议息抓取异常: {e}")
+
     return out
 
 def f_crisis_data():
