@@ -49,6 +49,10 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   「超时 >45min」杀掉 → 无产物 → B 批 2/3 → target_stage 恒为 B → D/E 永不执行
     #   （FINAL_RECOMMEND_DATA 停在昨日的结构性真凶）。放宽到 90min 留足余量。
     "calc_crds.py": 5400,        # 逆势龙头 CRDS（全池遍历，实测需 >45min）
+    # 2026-09-18：backtest_tdx 产品产物不再含逐笔明细（体积根治），续跑明细缓存
+    #   raw_data/_tdx_cache/ 被 .gitignore 排除 ⇒ 云端 runner 每轮需全量重取 221 只日K
+    #   （原先靠复用上轮明细仅 ~40s）。给足 90min 总预算，防被 30min 默认超时误杀而再次停更。
+    "backtest_tdx.py": 5400,
     "gen_stock_profile.py": 2700,
     "factor_lab_backtest.py": 1800,  # 🆕 700日长历史抓取+五分位分层回测（cn ~5min / 云端 ~15min）
     # 🛡 2026-09-07 一劳永逸：H 反推对「全市场涨幅≥3%」的数百只逐只取前 4 日均量。
@@ -969,6 +973,9 @@ SILENCE_OVERRIDE = {
     #   照既有范式双保险：① 脚本自带心跳（strategy_four_volume.py 已补，60s 一片，带 flush）
     #   ② 此处给静默预算兜底。日后新增「长跑 + 长段落无输出」脚本，同样两处一起加。
     "strategy_four_volume.py": 3600,
+    # 2026-09-18：同型 —— backtest_tdx 全量重算期间逐只取数、段落间可长时间无 stdout，
+    #   全局 900s 静默杀会误杀 ⇒ 给 1h 静默预算（总时长仍受上方 5400s 超时约束）。
+    "backtest_tdx.py": 3600,
 }
 
 

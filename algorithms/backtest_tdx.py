@@ -218,10 +218,20 @@ def log(msg):
 #   单文件硬限 ⇒ push 必被拒（能跑完却推不上去的隐性故障）。改为统一入口紧凑序列化
 #   （零信息损失，126.9 MB → 72.6 MB），并加 95 MB 体积告警护栏提前暴露。
 _FMT_SEP = (",", ":")
-_SIZE_WARN = 95 * 1024 * 1024
+# 2026-09-18 阿狸咪的工程师·体积护栏收紧（P0 根治）：
+#   原值 95 MB 形同虚设——产物实测 72.6 MB 时护栏从未触发，而此时已超 GitHub
+#   建 blob 上限 ⇒ E 批每天 8 次重试全报 HTTP 422、线上产物永久停在 09-14。
+#   产品产物现只含汇总（正常 100 KB 量级），任何超过 5 MB 都说明明细又被写回，须立即暴露。
+_SIZE_WARN = 5 * 1024 * 1024
+# 明细缓存路径（raw_data/_tdx_cache/ 已在 .gitignore ⇒ 不入仓、不推送）：
+#   仅供本机/同一 runner 工作目录内的断点续跑；产品产物 OUT 不再含明细（见文件末写出处）。
+_STOCK_CACHE = os.path.join(DATA_DIR, "_tdx_cache", "backtest_tdx_stocks.json")
 
 def _dump_json(obj, path):
     """统一写出入口：紧凑序列化 + 体积护栏（防「能跑但推不上去」的隐性故障）。"""
+    _pd = os.path.dirname(path)
+    if _pd:
+        os.makedirs(_pd, exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(obj, fh, ensure_ascii=False, separators=_FMT_SEP)
     try:
@@ -546,12 +556,20 @@ def main():
         log("⚠️ 历史金股池快照不足，回测仍含幸存者偏差（会随着每日快照累积逐步消除）")
     
     # 读取现有回测结果（用于增量追加）
+    # 2026-09-18：产品产物 OUT 已不再写明细 ⇒ 续跑优先读明细缓存（不入仓），
+    #   并保留对旧版 OUT（含 stocks）的兼容读取，使本次迁移首轮仍可复用历史明细。
     existing = {}
-    try:
-        existing = json.load(open(OUT, "r", encoding="utf-8"))
-        log(f"读取已有回测: {len(existing.get('stocks', {}))} 只")
-    except:
-        pass
+    for _cache_p in (_STOCK_CACHE, OUT):
+        try:
+            _cand = json.load(open(_cache_p, "r", encoding="utf-8"))
+        except Exception:
+            continue
+        if isinstance(_cand, dict) and _cand.get("stocks"):
+            existing = _cand
+            log(f"读取已有回测: {len(existing.get('stocks', {}))} 只 ← {os.path.basename(_cache_p)}")
+            break
+    if not existing:
+        log("无可复用明细（首次或缓存缺失）⇒ 本轮全量重算")
     
     # 🔴 2026-09-14 小九审计修复：陈旧口径条目不得进入汇总（口径混用治本·P0）。
     #   原实现 stock_results 直接继承整份旧产物，而下方 summary / opt_summary 均
@@ -691,7 +709,7 @@ def main():
             "method": f"baostock 日K全量回测({TDX_BARS}根·约{round(TDX_BARS / 244)}年) (T+{', T+'.join(map(str, HOLD_DAYS))})",
             "gold_pool_size": len(gp_stocks),
             "stocks": stock_results,
-        }, OUT)
+        }, _STOCK_CACHE)   # 2026-09-18：半成品明细改写缓存路径，产品产物 OUT 只出汇总
     
     # ── 汇总统计 ──
     log(f"\n{'='*60}")
@@ -796,7 +814,17 @@ def main():
         "survivor_bias_warning": survivor_bias_warning,
         "pool_snapshots_used": snapshots_used,
         "summary": {},
-        "stocks": stock_results,
+        # 2026-09-18 阿狸咪的工程师·产物体积根治（P0 · 一劳永逸）：
+        #   原此处写 "stocks": stock_results（逐只逐日明细），紧凑序列化后仍 72.6 MB
+        #   ⇒ 超 GitHub 建 blob 上限，E 批每天 8 次重试全报 HTTP 422
+        #   （Sorry, your input was too large to process）⇒ 线上 raw_data/backtest_tdx.json
+        #   永久停在 2026-09-14，而脚本与桥接每天 success（「能跑完却推不上去」的隐性停更）。
+        #   消费方核查（全部只读汇总，明细零消费者）：
+        #     · update_v8.py::_make_lite('BACKTEST_TDX') → update_time/calc_time/method/
+        #       gold_pool_size/stocks_analyzed/summary + 口径审计字段
+        #     · export_optimized_strategy.py → optimized_summary / summary.ge3_signals
+        #     · 前端读 data/BACKTEST_TDX.js（经 _make_lite 裁剪，本就无明细）
+        #   明细改由 _STOCK_CACHE 承载（不入仓），本轮内存统计口径零变化。
     }
     
     print(f"\n{'='*60}")
