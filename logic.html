@@ -1422,9 +1422,18 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
           <tr><td>① A 采集</td><td>就绪 <b>12/13</b> 项（<b>4 项必中</b>：<code>LHB_DATA.js</code> / <code>lhb_data.json</code> / <code>AVG_PRICE_DATA.js</code> / <code>ETF_NET_SUBSCRIPTION.js</code>；另有 sector_rs / stock_profile / fundamental_quality / stock_quote / inst_trade / suspension_alert / nt_data / sector_fund_flow_trend / market_alerts）· <b>12</b> 个脚本<br><span style="color:var(--sub)">2026-09-11：清单由 3 项扩到 10 项 —— 旧版只看 3 个代表产物，其余 6 个产物陈旧时闸门仍判「A 已就绪」，那些卡便整日红灯无人重跑。<br>2026-09-13：扩到 13 项（就绪线 12，容忍 6 项陈旧）；新纳入的 3 项为<b>逐项必中</b>——采纳「must 与 need 计数无关、直接否决」的方案，任一陈旧即判未就绪，根治「坏 1 项仍放行」的弱拦截。<b>同日 23:5x P0 修正</b>：原拟纳入的 9 项中有 7 项在仓库中<b>并不存在</b>（其中 ETF 申购赎回旧口径已于 09-06 全链下线），若留在必中清单会让 A 批<b>永久不就绪</b>；已改为上述真实产物，并立规「纳入闸门清单前必须逐项验证文件存在」。</span></td></tr>
           <tr><td>② B 选股</td><td>就绪 <b>8/9</b> 项（<b>三重共识 / 四量终极 / 逆势龙头 必新</b> + ai_insights_compare / factor_audit / factor_progress / valuation_percentile / index_value_framework / gold_pool；<b>只容忍 1 项不新鲜</b>）· <b>27</b> 个脚本（<code>v8/factor_lab_gen.py</code> 最前，baostock 冷启动 50-90min）<br><span style="color:var(--sub)">2026-09-11：清单由 3 项扩到 9 项 —— 原版 3 项鲜活即判「B 已就绪」→ 空转 → 9 张卡整日红灯。<br>2026-09-13：三重共识 / 四量终极 / 逆势龙头 由「计入 8/9」升为 <b>必新项（must）</b> —— 8/9 只是计数，表达不了「哪几项必新」，陈旧项恰为这三张核心卡时闸门仍放行。</span></td></tr>
           <tr><td>③ D 汇总</td><td>最终推荐 <b>1/1</b>（<code>FINAL_RECOMMEND_DATA.js</code>）· 仅 <code>final_recommend.py</code></td></tr>
-          <tr><td>④ E 回测</td><td><code>CRDS_BACKTEST.js</code>/<code>BACKTEST_TDX.js</code> 至少 1 项
-+ <code>BACKTEST_ALL_ALGOS.js</code>（<b>2/3</b> 项，且全算法回测汇总 <b>必新（must）</b> ——
-need 只是计数，只计 2/3 时它陈旧也会被放行）· <b>8</b> 个脚本<br>
+          <tr><td>④ E 回测</td><td><b>两项必新（must）</b>：<code>BACKTEST_ALL_ALGOS.js</code> +
+<code>BACKTEST_TDX.js</code>；第 3 项 <code>CRDS_BACKTEST.js</code> 计入 <b>2/3</b>（must
+两项全中即就绪，第 3 项不参与否决）· <b>8</b> 个脚本<br>
+<span style="color:var(--sub);">🔴 2026-09-18 阿狸咪的工程师（<b>双盲区根治</b>）：
+<code>BACKTEST_TDX.js</code> 由「任一」位升为<b>必新（must）</b>。原它只占 need=2 的「任一」位 ⇒
+陈旧<b>不阻塞</b>就绪；而 <code>v8_health_check.py</code> 的 <code>_LOW_FREQ_FILES</code>
+又把它列入低频豁免（理由「参数变更才重跑」<b>已过时</b>）⇒ 陈旧<b>不告警</b> ——
+<b>两个监控都不覆盖</b>。后果：产物 <code>raw_data/backtest_tdx.json</code> 含
+12 档 × 221 只逐笔明细、涨到 <b>76 MB</b>，推送每次 <code>HTTP 422</code>（超 GitHub 单文件上限），
+线上产物永久停在 <b>09-14</b> —— <b>停更 4 天而全链零红灯</b>。本轮三处同时闭环：
+① 闸门提 must；② 巡检摘除低频豁免；③ 该产物源只写汇总（逐笔明细改入不入仓的明细缓存，
+仅作同 runner 断点续跑用，且须「当日 + 2 小时内」双条件才复用，杜绝旧明细盖上新时间戳）。</span><br>
 <span style="color:var(--sub);">🔴 2026-09-14 主人令：候选池 / 金股池（=黄金池）是算法<b>上游水源</b>，
 不是策略、<b>不回测</b> ⇒ 原 CANDIDATE_BACKTEST / GOLD_POOL_BACKTEST 两项已从清单移除。</span></td></tr>
         </table>
