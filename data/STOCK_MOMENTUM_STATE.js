@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-17 23:58",
- "generated": "2026-09-17 23:58",
+ "update_time": "2026-09-18 00:27",
+ "generated": "2026-09-18 00:27",
  "meta": {
-  "generated": "2026-09-17 23:58",
+  "generated": "2026-09-18 00:27",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 10,
+  "total_days": 11,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -2881,6 +2881,440 @@ window.STOCK_MOMENTUM_STATE = (function() {
   },
   {
    "date": "2026-09-17",
+   "categories": {
+    "突破": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 9.971,
+      "price": 15.0,
+      "category": "突破"
+     },
+     {
+      "code": "688004",
+      "name": "博汇科技",
+      "change_pct": 12.903,
+      "price": 37.1,
+      "category": "突破"
+     },
+     {
+      "code": "600540",
+      "name": "新赛股份",
+      "change_pct": 3.416,
+      "price": 5.45,
+      "category": "突破"
+     },
+     {
+      "code": "688137",
+      "name": "近岸蛋白",
+      "change_pct": 18.75,
+      "price": 99.75,
+      "category": "突破"
+     },
+     {
+      "code": "600792",
+      "name": "云煤能源",
+      "change_pct": 10.103,
+      "price": 5.34,
+      "category": "突破"
+     },
+     {
+      "code": "300741",
+      "name": "华宝股份",
+      "change_pct": 20.009,
+      "price": 27.17,
+      "category": "突破"
+     },
+     {
+      "code": "300290",
+      "name": "ST荣科",
+      "change_pct": 3.652,
+      "price": 7.38,
+      "category": "突破"
+     },
+     {
+      "code": "002870",
+      "name": "香山股份",
+      "change_pct": 5.334,
+      "price": 50.75,
+      "category": "突破"
+     },
+     {
+      "code": "003006",
+      "name": "百亚股份",
+      "change_pct": 3.193,
+      "price": 20.04,
+      "category": "突破"
+     },
+     {
+      "code": "000523",
+      "name": "红棉股份",
+      "change_pct": 3.058,
+      "price": 3.37,
+      "category": "突破"
+     },
+     {
+      "code": "603757",
+      "name": "大元泵业",
+      "change_pct": 3.332,
+      "price": 66.36,
+      "category": "突破"
+     },
+     {
+      "code": "000626",
+      "name": "远大控股",
+      "change_pct": 4.225,
+      "price": 8.88,
+      "category": "突破"
+     },
+     {
+      "code": "300808",
+      "name": "久量股份",
+      "change_pct": 14.869,
+      "price": 21.94,
+      "category": "突破"
+     },
+     {
+      "code": "600313",
+      "name": "农发种业",
+      "change_pct": 5.621,
+      "price": 7.14,
+      "category": "突破"
+     },
+     {
+      "code": "603626",
+      "name": "科森科技",
+      "change_pct": 10.026,
+      "price": 21.29,
+      "category": "突破"
+     },
+     {
+      "code": "601952",
+      "name": "苏垦农发",
+      "change_pct": 3.104,
+      "price": 9.3,
+      "category": "突破"
+     },
+     {
+      "code": "300553",
+      "name": "集智股份",
+      "change_pct": 10.519,
+      "price": 65.98,
+      "category": "突破"
+     },
+     {
+      "code": "001326",
+      "name": "联域股份",
+      "change_pct": 8.372,
+      "price": 92.55,
+      "category": "突破"
+     },
+     {
+      "code": "301133",
+      "name": "金钟股份",
+      "change_pct": 3.047,
+      "price": 27.39,
+      "category": "突破"
+     },
+     {
+      "code": "603236",
+      "name": "移远通信",
+      "change_pct": 5.621,
+      "price": 73.66,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 9.971,
+      "price": 15.0,
+      "category": "加速"
+     },
+     {
+      "code": "688004",
+      "name": "博汇科技",
+      "change_pct": 12.903,
+      "price": 37.1,
+      "category": "加速"
+     },
+     {
+      "code": "600540",
+      "name": "新赛股份",
+      "change_pct": 3.416,
+      "price": 5.45,
+      "category": "加速"
+     },
+     {
+      "code": "688137",
+      "name": "近岸蛋白",
+      "change_pct": 18.75,
+      "price": 99.75,
+      "category": "加速"
+     },
+     {
+      "code": "600792",
+      "name": "云煤能源",
+      "change_pct": 10.103,
+      "price": 5.34,
+      "category": "加速"
+     },
+     {
+      "code": "300741",
+      "name": "华宝股份",
+      "change_pct": 20.009,
+      "price": 27.17,
+      "category": "加速"
+     },
+     {
+      "code": "300290",
+      "name": "ST荣科",
+      "change_pct": 3.652,
+      "price": 7.38,
+      "category": "加速"
+     },
+     {
+      "code": "002870",
+      "name": "香山股份",
+      "change_pct": 5.334,
+      "price": 50.75,
+      "category": "加速"
+     },
+     {
+      "code": "003006",
+      "name": "百亚股份",
+      "change_pct": 3.193,
+      "price": 20.04,
+      "category": "加速"
+     },
+     {
+      "code": "000523",
+      "name": "红棉股份",
+      "change_pct": 3.058,
+      "price": 3.37,
+      "category": "加速"
+     },
+     {
+      "code": "603757",
+      "name": "大元泵业",
+      "change_pct": 3.332,
+      "price": 66.36,
+      "category": "加速"
+     },
+     {
+      "code": "000626",
+      "name": "远大控股",
+      "change_pct": 4.225,
+      "price": 8.88,
+      "category": "加速"
+     },
+     {
+      "code": "300808",
+      "name": "久量股份",
+      "change_pct": 14.869,
+      "price": 21.94,
+      "category": "加速"
+     },
+     {
+      "code": "600313",
+      "name": "农发种业",
+      "change_pct": 5.621,
+      "price": 7.14,
+      "category": "加速"
+     },
+     {
+      "code": "603626",
+      "name": "科森科技",
+      "change_pct": 10.026,
+      "price": 21.29,
+      "category": "加速"
+     },
+     {
+      "code": "601952",
+      "name": "苏垦农发",
+      "change_pct": 3.104,
+      "price": 9.3,
+      "category": "加速"
+     },
+     {
+      "code": "300553",
+      "name": "集智股份",
+      "change_pct": 10.519,
+      "price": 65.98,
+      "category": "加速"
+     },
+     {
+      "code": "001326",
+      "name": "联域股份",
+      "change_pct": 8.372,
+      "price": 92.55,
+      "category": "加速"
+     },
+     {
+      "code": "301133",
+      "name": "金钟股份",
+      "change_pct": 3.047,
+      "price": 27.39,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 9.971,
+      "price": 15.0,
+      "category": "短线选股"
+     },
+     {
+      "code": "688004",
+      "name": "博汇科技",
+      "change_pct": 12.903,
+      "price": 37.1,
+      "category": "短线选股"
+     },
+     {
+      "code": "600540",
+      "name": "新赛股份",
+      "change_pct": 3.416,
+      "price": 5.45,
+      "category": "短线选股"
+     },
+     {
+      "code": "688137",
+      "name": "近岸蛋白",
+      "change_pct": 18.75,
+      "price": 99.75,
+      "category": "短线选股"
+     },
+     {
+      "code": "600792",
+      "name": "云煤能源",
+      "change_pct": 10.103,
+      "price": 5.34,
+      "category": "短线选股"
+     },
+     {
+      "code": "300741",
+      "name": "华宝股份",
+      "change_pct": 20.009,
+      "price": 27.17,
+      "category": "短线选股"
+     },
+     {
+      "code": "300290",
+      "name": "ST荣科",
+      "change_pct": 3.652,
+      "price": 7.38,
+      "category": "短线选股"
+     },
+     {
+      "code": "002870",
+      "name": "香山股份",
+      "change_pct": 5.334,
+      "price": 50.75,
+      "category": "短线选股"
+     },
+     {
+      "code": "003006",
+      "name": "百亚股份",
+      "change_pct": 3.193,
+      "price": 20.04,
+      "category": "短线选股"
+     },
+     {
+      "code": "000523",
+      "name": "红棉股份",
+      "change_pct": 3.058,
+      "price": 3.37,
+      "category": "短线选股"
+     },
+     {
+      "code": "603757",
+      "name": "大元泵业",
+      "change_pct": 3.332,
+      "price": 66.36,
+      "category": "短线选股"
+     },
+     {
+      "code": "000626",
+      "name": "远大控股",
+      "change_pct": 4.225,
+      "price": 8.88,
+      "category": "短线选股"
+     },
+     {
+      "code": "300808",
+      "name": "久量股份",
+      "change_pct": 14.869,
+      "price": 21.94,
+      "category": "短线选股"
+     },
+     {
+      "code": "600313",
+      "name": "农发种业",
+      "change_pct": 5.621,
+      "price": 7.14,
+      "category": "短线选股"
+     },
+     {
+      "code": "603626",
+      "name": "科森科技",
+      "change_pct": 10.026,
+      "price": 21.29,
+      "category": "短线选股"
+     },
+     {
+      "code": "601952",
+      "name": "苏垦农发",
+      "change_pct": 3.104,
+      "price": 9.3,
+      "category": "短线选股"
+     },
+     {
+      "code": "300553",
+      "name": "集智股份",
+      "change_pct": 10.519,
+      "price": 65.98,
+      "category": "短线选股"
+     },
+     {
+      "code": "001326",
+      "name": "联域股份",
+      "change_pct": 8.372,
+      "price": 92.55,
+      "category": "短线选股"
+     },
+     {
+      "code": "301133",
+      "name": "金钟股份",
+      "change_pct": 3.047,
+      "price": 27.39,
+      "category": "短线选股"
+     },
+     {
+      "code": "603236",
+      "name": "移远通信",
+      "change_pct": 5.621,
+      "price": 73.66,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "603236",
+      "name": "移远通信",
+      "change_pct": 5.621,
+      "price": 73.66,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-09-18",
    "categories": {
     "突破": [
      {
