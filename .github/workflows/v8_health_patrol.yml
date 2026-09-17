@@ -172,9 +172,20 @@ jobs:
           # 🔴 2026-09-08 主人令「禁止假 success」：原 `|| true` 会连「health_check 脚本
           #    本身崩溃（无输出）」一起吞掉 → REMAIN_FAIL 数到 0 → 判定通过 → 假绿灯。
           #    改用 PIPESTATUS[0] 捕获真实退出码，脚本崩溃即红。
+          # 🔴 2026-09-17 阿狸咪修正（拍-7 落地）：上面「崩溃即红」的判据过宽——
+          #    v8_health_check.py 的退出码语义实测只有 0 / 2 两种正常值：
+          #      0 = overall ok ／ 2 = 跑通但有发现项（**正常语义**）
+          #      见脚本末 `sys.exit(0 if report["overall"] == "ok" else 2)`；
+          #      1 = Python 未捕获异常（真崩溃）。
+          #    原 `!= "0"` 把 2 也判「执行失败」⇒ ① 恒红假告警（狼来了）；
+          #    ② `exit 1` 使本 step 失败 ⇒ 后续默认 if:success() 的「自愈失败升级」
+          #       step 不再运行 ⇒ 真故障的升级通道被假故障堵死。
           python v8_health_check.py --no-heal 2>&1 | tee verify_output.txt
           _HC_RC=${PIPESTATUS[0]}
-          if [ "$_HC_RC" != "0" ]; then
+          if [ "$_HC_RC" = "2" ]; then
+            echo "ℹ️ v8_health_check.py exit=2 = 跑通但有发现项（正常语义），回查继续"
+          fi
+          if [ "$_HC_RC" != "0" ] && [ "$_HC_RC" != "2" ]; then
             echo "::error::v8_health_check.py 执行失败（exit=$_HC_RC），回查结果不可信，判定为失败"
             exit 1
           fi

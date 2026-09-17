@@ -67,7 +67,7 @@ jobs:
                 echo "✅ 当天修改已推送入库（防覆盖）"; break
               fi
               echo "⚠️ push 被拒，fetch+rebase 后重试 ($i/3)"
-              git fetch origin main && git rebase FETCH_HEAD || { git rebase --abort || true; break; }
+              git fetch origin main && git -c rebase.autoStash=true rebase FETCH_HEAD || { git rebase --abort || true; break; }  # 🔴 2026-09-17 阿狸咪：加 autoStash —— 裸 rebase 遇脏树会启动前即被拒，3 次重试全空转
             done
           else
             echo "无待推送修改"
@@ -82,7 +82,7 @@ jobs:
           for i in 1 2 3; do
             if git push origin HEAD:main 2>/dev/null; then echo "✅ 备份已推送"; break; fi
             echo "⚠️ 推送被拒或无新内容，fetch+rebase 后重试 ($i/3)"
-            git fetch origin main && git rebase FETCH_HEAD || { git rebase --abort || true; break; }
+            git fetch origin main && git -c rebase.autoStash=true rebase FETCH_HEAD || { git rebase --abort || true; break; }  # 🔴 2026-09-17 阿狸咪：加 autoStash —— 裸 rebase 遇脏树会启动前即被拒，3 次重试全空转
           done
 
       - name: "📦 v6 备份保留策略断言（主人令：v8 稳定一周前不删）"

@@ -53,6 +53,11 @@ jobs:
     #   不设则吃默认 50，checkout/git clean 批量删必被拦。
     env:
       CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
+      # 🔴 2026-09-17 阿狸咪（拍-8 落地）：cn runner（Windows）默认 GBK ——
+      #   python 打印 emoji/中文会 UnicodeEncodeError('gbk') 崩链。job 级强制
+      #   UTF-8，与 v8_algo_cloud.yml / v8_stock_quote_refresh.yml 同口径。
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
     # 🔴 2026-08-30 22:3x 抬高 job 墙钟（实测本 workflow run 33309687912 跑满
     #   25 分钟被硬杀，杀点是推送步 13.8 分钟未完成 → 数据抓到却推不上 main）。
     timeout-minutes: 50

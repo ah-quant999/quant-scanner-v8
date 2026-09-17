@@ -196,6 +196,6 @@ jobs:
             if git push "$REPO" HEAD:main; then
               echo "✅ 清理已提交（第 $i 次）"; exit 0
             fi
-            git fetch "$REPO" main && git rebase FETCH_HEAD || { git rebase --abort; exit 1; }
+            git fetch "$REPO" main && git -c rebase.autoStash=true rebase FETCH_HEAD || { git rebase --abort; exit 1; }  # 🔴 2026-09-17 阿狸咪：加 autoStash —— 裸 rebase 遇脏树会启动前即被拒，3 次重试全空转
           done
           echo "❌ 3 次重试后仍失败"; exit 1

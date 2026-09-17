@@ -59,6 +59,11 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # self-hosted runner 上 WorkBuddy safe-delete 批量删除守卫阈值
       CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
+      # 🔴 2026-09-17 阿狸咪（拍-8 落地）：cn runner（Windows）默认 GBK ——
+      #   python 打印 emoji/中文会 UnicodeEncodeError('gbk') 崩链。job 级强制
+      #   UTF-8，与 v8_algo_cloud.yml / v8_stock_quote_refresh.yml 同口径。
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
     defaults:
       run:
         working-directory: ${{ github.workspace }}

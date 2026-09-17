@@ -136,6 +136,11 @@ jobs:
       CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
       V8_PUSH: "1"
       V6_DATA_DIR: "E:\\workspace\\quant-scanner-v8\\data"
+      # 🔴 2026-09-17 阿狸咪（拍-8 落地）：cn runner（Windows）默认 GBK ——
+      #   python 打印 emoji/中文会 UnicodeEncodeError('gbk') 崩链。job 级强制
+      #   UTF-8，与 v8_algo_cloud.yml / v8_stock_quote_refresh.yml 同口径。
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
     defaults:
       run:
         working-directory: ${{ github.workspace }}

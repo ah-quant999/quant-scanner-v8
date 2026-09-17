@@ -19,6 +19,22 @@ import subprocess
 import time
 import threading
 
+# 🔴🔴 2026-09-17 阿狸咪（拍-8 落地）：cn runner（Windows）默认 GBK 终端 ⇒
+#   本编排器拉起的子脚本若 print emoji/中文，会在子进程里抛
+#   UnicodeEncodeError('gbk') 崩掉整条盘后链（实测「整条 19:15 链 0 执行」）。
+#   修法用**模块级自举**而非逐点给 subprocess 传 env= —— 本文件有 9 处
+#   subprocess 调用点（Popen / run），逐点改必漏；而 os.environ 会被**所有**
+#   未显式传 env= 的子进程继承 ⇒ 一处生效、全域覆盖，最彻底。
+#   （job env 层已在 3 个 [self-hosted, cn] workflow 补同名变量，此处为兜底。）
+os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+os.environ.setdefault("PYTHONUTF8", "1")
+try:
+    import sys as _sys
+    _sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    _sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass   # 老 Python(<3.7) 或 stdout 被替换为非 TextIOWrapper：静默兜底，不阻断
+
 # ── 单脚本超时（2026-08-31 一劳永逸修复）──────────────────────────────────
 # 背景：原代码把 1800s 硬编码在两处 subprocess.run，实测 run 33316835316 中
 #   某些脚本网络重活可能超时，故默认阈值可配并允许单脚本放宽。

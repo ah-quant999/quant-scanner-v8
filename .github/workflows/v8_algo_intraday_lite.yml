@@ -156,6 +156,6 @@ jobs:
               echo "✅ pushed: $msg"; exit 0
             fi
             echo "⚠️ push 被拒（并发互踩），fetch+rebase 后重试 ($i/3)"
-            git fetch origin main && git rebase FETCH_HEAD || { git rebase --abort || true; exit 1; }
+            git fetch origin main && git -c rebase.autoStash=true rebase FETCH_HEAD || { git rebase --abort || true; exit 1; }  # 🔴 2026-09-17 阿狸咪：加 autoStash —— 裸 rebase 遇脏树会启动前即被拒，3 次重试全空转
           done
           echo "❌ 3 次重试后仍失败"; exit 1
