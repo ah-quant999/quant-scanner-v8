@@ -1087,10 +1087,21 @@ def f_macro_brief():
     risk_factors = sum(1 for n in news if any(k in n["tag"] for k in ["😰", "🚨", "⚠️"]))
     benign_factors = sum(1 for n in news if any(k in n["tag"] for k in ["😌", "📈"]))
 
+    # 🛡 2026-09-17 主人令·全站口径统一（档梯连续）：
+    #   原档梯 risk≥3 偏空 / risk≥2 谨慎 / (benign≥2 且 risk==0) 偏多 / else 中性
+    #   ⇒ **risk==1 与 risk==0 同落「中性」**（档梯断了一级）。
+    #   后果实证：2026-09-17 主人令给「🇺🇸 美联储（加息）」tag 补 ⚠️ 使之计入风险权重，
+    #   但单个风险因子（risk=1）依旧输出「中性」= 该改动对单事件**完全空转**（改了没生效）。
+    #   现补回缺失档位：risk==1 → 中性偏谨慎，仓位与「中性」明确区分（5成 vs 5-6成），
+    #   档梯单调连续：3+→偏空 / 2→谨慎 / 1→中性偏谨慎 / 0(且benign≥2)→偏多 / 0→中性。
+    #   前端 index.html 对 a_impact 只按子串染色（含「偏空」→跌色、含「偏多」→涨色、其余默认色），
+    #   「中性偏谨慎」不含上述子串 ⇒ 落默认色，与既有「谨慎」档同色（口径一致，无需改前端）。
     if risk_factors >= 3:
         a_impact = "偏空：多重风险信号叠加，建议防守为主，控制仓位在 5 成以下，聚焦确定性高的红利/防御板块。"
     elif risk_factors >= 2:
         a_impact = "谨慎：存在 2-3 个风险因素，建议中性偏低仓位（5-6成），回避高波动题材，关注抗跌板块。"
+    elif risk_factors == 1:
+        a_impact = "中性偏谨慎：存在 1 个风险因素，建议半仓左右（5成），保留现金等右侧信号，优先低波动与确定性方向。"
     elif benign_factors >= 2 and risk_factors == 0:
         a_impact = "偏多：宏观环境友好，可积极布局（6-7成仓），关注受益于当前宏观主题的板块。"
     else:

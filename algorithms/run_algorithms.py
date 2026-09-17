@@ -294,6 +294,11 @@ ORDER = [
     #   ⚠️ 与 STAGES["E"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
     "v8/fetch_citic_pe.py",       # → raw_data/citic_pe_history.json（baostock 增量，断点续跑）
     "v8/gen_citic_pe.py",         # → data/CITIC_PE_THERMO.js + data/CITIC_PE_BACKTEST.js（须在 fetcher 之后）
+    # 🆕 2026-09-17 主人令·全站口径统一（⑭）：factor_walkforward 引擎补挂主链 E 批最末。
+    #   前端「待回测候选台账」A 组 6 因子长期 pending 根因=发动机从未点火（仅 09-16 手动跑过 1 次）。
+    #   产出 raw_data/factor_walkforward.json → scripts/gen_factor_progress.py 判 done/删除 + generate_top10.py 仅 PASS 启用。
+    #   ⚠️ 与 STAGES["E"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
+    "factor_walkforward.py",   # → raw_data/factor_walkforward.json（walk-forward 回测，全市场 K 线）
     ]
 
 
@@ -378,9 +383,8 @@ STAGES = {
         #   读 B 批 track_h_auto_buy.py 的 data/H_AUTO_BUY_TRACK.js + 构建链的
         #   data/STOCK_MOMENTUM_STATE_V2.js，聚合出 H反推 / 高手画像版 / 强势突破 三套同口径指标。
         #   ⚠️ 必须在聚合器之前。
-        # 🆕 2026-09-17 补挂（同 ORDER 说明）：基准生成器必须在聚合器之前（成对修改，防 assert 崩链）
-        "gen_market_bench.py",
         "scripts/algo_backtest_compare.py",   # → data/ALGO_BACKTEST_COMPARE.js（本卡无 raw_data 中间件，脚本直写 data/）
+        "gen_market_bench.py",   # → raw_data/market_bench.json（全市场等权基准，与策略同口径）
         "gen_backtest_all_algos.py",   # → data/BACKTEST_ALL_ALGOS.js（策略回测页总览）
         # 🛡 2026-09-07 主人令「互踢/暴风/覆盖不想再看到·方案 B 一劳永逸根治」：
         #   原 D 批首脚本(factor_lab 生成器)冷启动 50-90min（注释自述），串行堵在
@@ -396,6 +400,8 @@ STAGES = {
         #   ⚠️ 与上方 ORDER 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
         "v8/fetch_citic_pe.py",   # → raw_data/citic_pe_history.json
         "v8/gen_citic_pe.py",     # → data/CITIC_PE_THERMO.js + CITIC_PE_BACKTEST.js
+        # 🆕 2026-09-17 主人令·全站口径统一（⑭）：factor_walkforward 引擎补挂主链 E 批最末（与 ORDER 同位置，成对修改）
+        "factor_walkforward.py",   # → raw_data/factor_walkforward.json（walk-forward 回测，全市场 K 线）
     ],
     "D": [  # 汇总批（~20:00 CST，依赖全部）：仅 final_recommend（LHB历史/7d/生命周期/factor_lab_gen 前置到 B 批·互踢暴风根治）
         "final_recommend.py",   # 必需上游 = B 批产物（CRDS/TOP10/三重共识/crisis/sector_rs/stock_profile/triple_track）
@@ -404,13 +410,19 @@ STAGES = {
 # 🛡 2026-09-04 主人令：回测批需要「选股脚本以回测模式运行」——runner 对所有脚本无参调用，
 #   故按脚本注入环境变量（strategy_four_volume.py 读 V8_BACKTEST_YEARS>0 时同时跑近 N 年回测
 #   并补写 data/FOUR_VOLUME_BACKTEST.js）。仅影响 E 回测批；B 选股批无注入、保持轻快。
+# 🔴 2026-09-17 主人令·全站口径统一（作用域根治）：
+#   原键 = **脚本名**（"strategy_four_volume.py"），但该脚本同时在 B（选股）与 E（回测）两批出现
+#   ⇒ 键无法区分批次，B 批也被注入 V8_BACKTEST_YEARS=5；且注入写的是**进程级** os.environ
+#   且从不还原 ⇒ B 批注入后残留，D 批 _gate_hardwait_four_volume 重跑 strategy_four_volume.py
+#   的子进程继承 =5 ⇒ 症状「D 批跑 5 年回测」。
+#   现键改为 (stage, script) 二元组，精确到批次；注入侧配套「跑完即还原」（见 step_run）。
 SCRIPT_ENV = {
     # 🔴 2026-09-13 主人令（档位扩至 250 交易日）：3 → 5 年。
     #   根因：years=3 时 bars≈810 根，扣掉信号检测窗口后 T+180/T+250 落在区间外
     #   ⇒ 两档恒零样本（前端只能显示「累积中」），并非策略失效而是**回看区间不够**。
     #   years=5 → bars = max(DAILY_BARS, 5*250+250=1500) 足以覆盖 250 交易日最长持有。
-    "strategy_four_volume.py": {"V8_BACKTEST_YEARS": "5"},
-    "backtest_expectancy.py": {"V8_USE_BAOSTOCK": "1"},   # 🆕 runner 用 baostock 拉全量K线，产出新鲜回测
+    ("E", "strategy_four_volume.py"): {"V8_BACKTEST_YEARS": "5"},
+    ("E", "backtest_expectancy.py"): {"V8_USE_BAOSTOCK": "1"},   # 🆕 runner 用 baostock 拉全量K线，产出新鲜回测
 }
 # 自校验：STAGES 并集必须精确覆盖 ORDER（无遗漏/多余，保证分批模式不丢脚本）
 _STAGE_UNION = set()
@@ -755,26 +767,53 @@ def _gate_ensure_inputs(inputs_map, base_dir, run_start, soft=False):
     return (True, bad) if soft else (len(bad) == 0, bad)
 
 
-def _gate_hardwait_four_volume(run_start, max_retry=3, wait_sec=90):
+def _gate_hardwait_four_volume(run_start, max_retry=3, wait_sec=90, total_budget_sec=None):
     """🛡 2026-09-10 主人令：四量终极其日线版(FOUR_VOLUME.js)硬等待。
     盘后 final_recommend 必须等日线四量今日新鲜产出；非今日则重跑 strategy_four_volume.py 并 sleep 等待，
     最多 max_retry 次。成功产出当日数据→返回 True；超时仍陈旧→返回 False（gate 据此拒绝产出，不用陈旧）。
-    区别于旧软告警：旧逻辑陈旧也照常产出（用旧）；本函数实现主人诉求"停下等重算出来再继续"。"""
+    区别于旧软告警：旧逻辑陈旧也照常产出（用旧）；本函数实现主人诉求"停下等重算出来再继续"。
+
+    🔴 2026-09-17 主人令·全站口径统一（补总预算 · 与 max_retry 互补）：
+      实测单次重跑 strategy_four_volume.py ~55min（9.5s/只 × ~350 只，逐只 HTTP）。
+      原实现只有「次数上限 3」而**没有时间上限** ⇒ 最坏 3×5400s(SCRIPT_TIMEOUT_OVERRIDE)
+      + 2×90s ≈ 4.5h，足以把整夜盘后链拖死（D 批在拒绝产出之前先空等数小时）。
+      现加显式 wall-clock 总预算（默认 5400s=90min，可用 V8_FV_HARDWAIT_BUDGET 覆盖）：
+        · 每次重跑**前**检查预算，耗尽 → 立即返回 False（沿用既有语义「拒绝用陈旧数据产出」，不造假）；
+        · 重跑的 subprocess timeout 收敛为「剩余预算」（下限 600s），使总耗时**有界**而非线性叠加；
+        · 预算正常时（首轮剩余=5400s）行为与改动前**完全一致**，不误杀单次合法重跑。
+    """
     import time
+    if total_budget_sec is None:
+        try:
+            total_budget_sec = int(os.environ.get("V8_FV_HARDWAIT_BUDGET", "5400"))
+        except ValueError:
+            total_budget_sec = 5400
+    _t0 = time.time()
     fpath = os.path.join(V8_ROOT, "data", "FOUR_VOLUME.js")
     prod = os.path.join(ALGO, "strategy_four_volume.py")
     for attempt in range(1, max_retry + 1):
         if os.path.exists(fpath) and datetime.fromtimestamp(os.path.getmtime(fpath)) >= run_start:
             return True
-        print(f"  ⏳ 四量终极其日线版非今日(run_start={run_start})，第{attempt}/{max_retry}次重跑 strategy_four_volume.py 并等待{wait_sec}s")
+        _used = time.time() - _t0
+        if _used >= total_budget_sec:
+            print(f"  🛑 四量硬等待总预算耗尽（已等 {_used/60:.0f}min ≥ 上限 {total_budget_sec/60:.0f}min）"
+                  f"，停止重跑；本项按「陈旧·拒绝产出」处理")
+            return False
+        print(f"  ⏳ 四量终极其日线版非今日(run_start={run_start})，第{attempt}/{max_retry}次重跑 strategy_four_volume.py 并等待{wait_sec}s"
+              f"（预算余额 {(total_budget_sec-_used)/60:.0f}min）")
         try:
             _gto = _script_timeout("strategy_four_volume.py")
+            # 收敛到剩余预算（下限 600s）：保证整段硬等待总耗时 ≤ 预算 + 600s，而非 3×5400s 叠加
+            _gto = max(600, min(_gto, int(total_budget_sec - _used)))
             r = subprocess.run([PY, prod], cwd=ALGO, capture_output=True, text=True, timeout=_gto)
             print(f"     {'✅' if r.returncode == 0 else '⚠️ 退出码 ' + str(r.returncode)} 重跑 strategy_four_volume.py")
         except Exception as e:
             print(f"     ❌ 重跑 strategy_four_volume.py 异常: {e}")
         if os.path.exists(fpath) and datetime.fromtimestamp(os.path.getmtime(fpath)) >= run_start:
             return True
+        if time.time() - _t0 >= total_budget_sec:
+            print(f"  🛑 四量硬等待总预算耗尽（重跑后已用 {(time.time()-_t0)/60:.0f}min），停止重试")
+            return False
         if attempt < max_retry:
             time.sleep(wait_sec)
     return False
@@ -1148,40 +1187,53 @@ def step_run(order=None, stage=None):
         #   —— 实时写心跳 + 静默超时即杀进程续跑（永不再 30~60min 死等单脚本卡死）。
         # 🛡 2026-09-04：链内脚本统一打标 V8_IN_CHAIN=1（v8/ 独立脚本据此跳过自带 git 推送，防双推插针）
         os.environ["V8_IN_CHAIN"] = "1"
-        # 🛡 2026-09-04：按脚本注入环境变量（SCRIPT_ENV，如 E 回测批让 strategy_four_volume 跑回测模式）
-        for _ek, _ev in SCRIPT_ENV.get(script, {}).items():
+        # 🛡 2026-09-04：按「阶段+脚本」注入环境变量（SCRIPT_ENV，如 E 回测批让 strategy_four_volume 跑回测模式）
+        # 🔴 2026-09-17 主人令·全站口径统一：注入必须**用完即还原**（finally 兜底）。
+        #   原写法 `os.environ[k]=v` 直写进程级 env 且从不还原 ⇒ 残留到后续脚本/后续批次，
+        #   与「键=脚本名」叠加后产生「B 批/D 批跑 5 年回测」（详见 SCRIPT_ENV 上方说明）。
+        _injected = {}
+        for _ek, _ev in SCRIPT_ENV.get((stage, script), {}).items():
+            _injected[_ek] = os.environ.get(_ek)
             os.environ[_ek] = _ev
         _to = _script_timeout(script)
         _sl = _silence_budget(script)  # 该脚本的实际静默预算（SILENCE_OVERRIDE 优先）
         try:
-            rc, last_lines, killed_reason = _supervised_run(script, path, _to)
-        except Exception as e:
-            fail += 1
-            print(f"     ❌ 监督执行异常: {e}")
-            FAILED_SCRIPTS.append((script, f"监督执行异常 {e}"))
-            continue
-        if killed_reason == "silence":
-            fail += 1
-            print(f"     💀 静默卡死(>{_sl//60}min 无输出)，监督器已终止并续跑下一脚本")
-            FAILED_SCRIPTS.append((script, f"监督器静默杀(>{_sl//60}min 无输出)"))
-            continue
-        if killed_reason == "timeout":
-            fail += 1
-            print(f"     ⏱️ 硬超时(>{_to // 60:.0f}min)，监督器终止并续跑")
-            FAILED_SCRIPTS.append((script, f"超时 >{_to // 60:.0f}min"))
-            continue
-        if rc == 0:
-            ok += 1
-            last = last_lines[-1] if last_lines else ""
-            print(f"     ✅ ok | {last[:80]}")
-        else:
-            fail += 1
-            print(f"     ⚠️ 退出码 {rc}")
-            tail = "\n".join(last_lines[-3:])
-            print("     " + tail.replace("\n", "\n     ")[:400])
-            # 🛡 2026-08-28：抓取末行作为失败原因，供链尾闸门/运维面板定位
-            reason = last_lines[-1] if last_lines else f"退出码 {rc}"
-            FAILED_SCRIPTS.append((script, f"退出码 {rc} | {reason[:160]}"))
+            try:
+                rc, last_lines, killed_reason = _supervised_run(script, path, _to)
+            except Exception as e:
+                fail += 1
+                print(f"     ❌ 监督执行异常: {e}")
+                FAILED_SCRIPTS.append((script, f"监督执行异常 {e}"))
+                continue
+            if killed_reason == "silence":
+                fail += 1
+                print(f"     💀 静默卡死(>{_sl//60}min 无输出)，监督器已终止并续跑下一脚本")
+                FAILED_SCRIPTS.append((script, f"监督器静默杀(>{_sl//60}min 无输出)"))
+                continue
+            if killed_reason == "timeout":
+                fail += 1
+                print(f"     ⏱️ 硬超时(>{_to // 60:.0f}min)，监督器终止并续跑")
+                FAILED_SCRIPTS.append((script, f"超时 >{_to // 60:.0f}min"))
+                continue
+            if rc == 0:
+                ok += 1
+                last = last_lines[-1] if last_lines else ""
+                print(f"     ✅ ok | {last[:80]}")
+            else:
+                fail += 1
+                print(f"     ⚠️ 退出码 {rc}")
+                tail = "\n".join(last_lines[-3:])
+                print("     " + tail.replace("\n", "\n     ")[:400])
+                # 🛡 2026-08-28：抓取末行作为失败原因，供链尾闸门/运维面板定位
+                reason = last_lines[-1] if last_lines else f"退出码 {rc}"
+                FAILED_SCRIPTS.append((script, f"退出码 {rc} | {reason[:160]}"))
+        finally:
+            # 🛡 2026-09-17：原值还原（原本没有 → 摘除），杜绝 SCRIPT_ENV 跨脚本/跨批泄漏
+            for _ek, _pv in _injected.items():
+                if _pv is None:
+                    os.environ.pop(_ek, None)
+                else:
+                    os.environ[_ek] = _pv
     print(f"  算法运行: 成功 {ok} / 失败 {fail}")
     # 🛡 2026-08-28 一劳永逸：失败清单汇总 —— 过去被 continue-on-error 静默吞掉，
     #   导致 08-28 候选池停更 1.9 天仍无人知晓。现在必须显式列出。
