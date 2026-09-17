@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-17 20:02:52",
-  "run_start": "2026-09-17 19:59:06",
-  "ok": 1,
-  "fail": 0,
+  "update_time": "2026-09-18 01:26:27",
+  "run_start": "2026-09-18 01:04:34",
+  "ok": 12,
+  "fail": 1,
   "failed_scripts": [
     {
-      "script": "strategy_four_volume_60m.py",
-      "reason": "四量60m 输入陈旧（FOUR_VOLUME_60M.js(仍陈旧)）——已回退日线版，计为失败项"
+      "script": "v8/fetch_citic_pe.py",
+      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
     }
   ],
   "skipped_by_time_gate": []
