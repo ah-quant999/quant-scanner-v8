@@ -452,6 +452,67 @@ def _algo_recover(run_id, run_number):
         print(f"[WARN] algo 链自愈异常: {e}")
 
 
+# ═══ 2026-09-17 主人令「看板红灯分流」：盘后算法链 run 的「合规拒绝」vs「真故障」判定 ═══
+#   背景：run#1891~1920 期间，每轮 dispatch 都被批次闸门以「上游未就绪」合规拒绝，
+#         但 run.conclusion 一律是 failure ⇒ 看门狗每轮告警 ⇒ 真 P0 被埋（2026-09-16 事故）。
+#   判据（实测 4/4 正确，见 HANDOVER 2026-09-17 看门狗分流）：
+#     step「批次闸门」=failure 且 step「结果问责」=failure ⇒ 闸门正常拒绝（下游全 skipped）
+#     step「批次闸门」=success 且 step「结果问责」=failure ⇒ 真故障（算法跑了、产物不合格）
+#     step「批次闸门」=success 且 step「结果问责」=success ⇒ OK
+#   ⚠️ 为何不 grep 日志字符串：闸门拒绝的 ::error title 历史上有两套（v8-stage-gate-blocked /
+#      v8-stage-gate-reject），且 workflow 脚本源码会被日志回显 ⇒ 字符串匹配不可靠。
+#      step 结论是 GitHub 权威字段，不受文案变更影响。
+_ALGO_GATE_STEP_KEYS = ("批次闸门", "盘中静默闸门")
+_ALGO_ACCT_STEP_KEY = "结果问责"
+
+
+def _algo_step_conclusions(run_id):
+    """取 run 的 (闸门步结论列表, 问责步结论列表, 失败步名列表)。
+
+    失败时返回 (None, None, None) —— 调用方按「判据不可得」走保守路径（照常告警）。
+    """
+    if not run_id:
+        return None, None, None
+    d = api_get(f"https://api.github.com/repos/{REPO}/actions/runs/{run_id}/jobs")
+    if "__error__" in d:
+        return None, None, None
+    gate, acct, failed_names = [], [], []
+    for job in d.get("jobs", []) or []:
+        for s in job.get("steps", []) or []:
+            nm = s.get("name") or ""
+            con = s.get("conclusion")
+            if any(k in nm for k in _ALGO_GATE_STEP_KEYS):
+                gate.append(con)
+            if _ALGO_ACCT_STEP_KEY in nm:
+                acct.append(con)
+            if con == "failure":
+                failed_names.append(nm)
+    return gate, acct, failed_names
+
+
+def classify_algo_run(run_id):
+    """返回 (kind, why)。kind ∈ {gate_reject, real_failure, ok, unknown}。
+
+    gate_reject  —— 闸门合规拒绝：非故障、不告警，看板显示「合规拒绝」。
+    real_failure —— 真故障：必须告警。
+    unknown      —— 判据不可得（API 失败 / 步名变更）⇒ 调用方按真故障处理（宁可误报不漏报）。
+    """
+    gate, acct, failed = _algo_step_conclusions(run_id)
+    if gate is None:
+        return "unknown", "未能取到 run 的 step 结论（API 错误），按真故障保守处理"
+    gate_failed = ("failure" in gate) if gate else None
+    acct_failed = ("failure" in acct) if acct else None
+    if gate_failed and acct_failed:
+        return "gate_reject", "闸门正常拒绝（上游未就绪），下游步骤全部 skipped —— 合规，非故障"
+    if gate_failed is False and acct_failed:
+        return "real_failure", "闸门已放行但结果问责未通过（算法跑了、产物不合格）"
+    if gate_failed and acct_failed is False:
+        return "real_failure", "闸门步 failure 而问责步 success（口径异常）"
+    if gate_failed is False and acct_failed is False:
+        return "ok", "闸门放行 + 问责通过"
+    return "unknown", f"步名未命中（gate={gate} acct={acct}），按真故障保守处理"
+
+
 def check_algo_chain():
     """监督盘后算法链 run_algorithms 的运行状态（2026-09-01 主人令·监督跑算法更先进）。
 
@@ -504,10 +565,31 @@ def check_algo_chain():
     con = run.get("conclusion")
     created = utc_to_cst(run["created_at"])
     age_min = (now_cst - created).total_seconds() / 60
+    created_str = created.strftime("%m-%d %H:%M") if created else "?"
+    r_num_done = run.get("run_number")
+
+    # 🔴 2026-09-17 主人令「看板红灯分流」（承接 09-16 盘后链整夜不出事故）：
+    #   闸门正常拒绝（上游未就绪）与真故障的 run.conclusion **都是 failure**，
+    #   旧实现一律 is_failure=True ⇒ 每轮告警 ⇒ 真 P0 被埋。
+    #   ⇒ 按 step 结论分流：合规拒绝不告警（只标注），真故障照常告警。
+    kind, why = classify_algo_run(run.get("id"))
+    is_failure = (status == "completed" and con == "failure") or (kind == "real_failure")
+
+    if status == "completed" and con == "failure" and kind == "gate_reject":
+        # 合规拒绝：单看 conclusion 是 failure，但这是**闸门按设计拒绝**，
+        # 不是管线故障。返回 ok=True（不触发告警/自愈），detail 标注留痕。
+        return True, (f"algo 链 run #{r_num_done} 合规拒绝 @ {created_str} "
+                      f"(age {fmt_age(age_min)}) —— {why}"), False
+
     ok = status == "completed" and con == "success"
-    is_failure = status == "completed" and con == "failure"
-    detail = f"algo 链 {status}/{con} @ {created.strftime('%m-%d %H:%M')} (age {fmt_age(age_min)})"
-    # 盘后窗口内距上次成功过久 → 漏跑
+    detail = f"algo 链 {status}/{con} @ {created_str} (age {fmt_age(age_min)})"
+    if kind == "real_failure":
+        detail += f" | ⚠ {why}"
+    elif kind == "gate_reject":
+        detail += f" | {why}"
+    elif kind == "unknown" and status == "completed" and con == "failure":
+        detail += f" | ⚠ {why}"
+    # 盘后窗口内距上次成功过久 → 漏跑（合规拒绝不算「成功」，故不参与新鲜度判断）
     if ok and age_min > ALGO_STALE_MIN and in_schedule_window("algo", now_cst):
         ok = False
         detail += (f" | 距上次成功 {fmt_age(age_min)} > {fmt_age(ALGO_STALE_MIN)}"
