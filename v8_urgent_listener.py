@@ -10,6 +10,14 @@ v8_urgent_listener.py — 紧急指令监听 + 健康检查（v8 去 v6 化版�
    显式 workflow 名），自动 dispatch 对应 workflow；去重=**文件名+内容 hash**；
 3. 输出摘要供 automation 向主人汇报。
 
+🔴 2026-09-17 治本（第四步，P1，判据 95）：上一步的 API 精算**自己制造了档序倒挂** ——
+graft 假值 = tip 提交时刻（≈ 此刻，实测 354 档同值），比任何真实提交时间都**大**；把 API
+真值 ``update`` 进同一张 cts 表后，刚拿到真值的 12 档**真最新**被自己沉到 354 档之末
+（实测显示位次 1 = 名字时间第 13 位；最新档与 URGENT 档整批不可见 ⇒ 监控面与派发扫描面
+同时瞎，且日志还打「提交时间优先（API 精算）/ degenerate=False」= 假成功）。现在：
+① **禁** ``cts.update(api)``，改为 `api_set` + `cts=dict(api)` **两层排序**（有真值者按真值
+倒序置顶，其余按文件名时间兜底）；② 退化标记**保持 True** 不伪装健康。
+
 🔴 2026-09-16 治本（第三步，P-A）：排序「提交时间优先」在**浅克隆**下会被 graft 边界
 污染（一批档拿到同一个假 ``%ct``，不是「取不到」⇒ 原容错不触发、静默退化成文件名口径）
 ⇒ ① 新增退化检测 ``_is_degenerate_times``；② 检出后退化时对有界近档走 GitHub Commits
@@ -288,6 +296,7 @@ def recent_urgent_files(n=5):
             cts = _commit_times_remote(ref)
             SORT_DIAG.update({"mode": "提交时间优先", "api_n": 0, "degenerate": False,
                               "entries": len(cts), "unique": len(set(cts.values()))})
+            api_set = set()
             if _is_degenerate_times(cts):
                 # 甲：判定退化（不假装治本）；乙：对有界近档走 API 取真值
                 SORT_DIAG["degenerate"] = True
@@ -296,13 +305,19 @@ def recent_urgent_files(n=5):
                 cands.sort(key=_name_sort_key, reverse=True)
                 api = _api_commit_ts(cands[:API_TS_MAX])
                 if api:
-                    cts.update(api)
-                    SORT_DIAG.update({"mode": "提交时间优先（API 精算）",
-                                      "api_n": len(api), "degenerate": False})
+                    # 🔴 2026-09-17 治本（P1，判据 95）：**禁** ``cts.update(api)`` ——
+                    # graft 假值 = tip 提交时刻（≈ 此刻，实测 354 档同值 / 08:09:40），比
+                    # 任何真实提交时间都**大**；混进同一量纲比大小 ⇒ 刚拿到真值的 12 档
+                    # **真最新**被自己沉到 354 档之末（实测显示位次 1 掉成名字时间第 13 位，
+                    # 最新档 + URGENT 档整批不可见；派发扫描面同瞎）。改为**两层排序**：
+                    # 组 1 = 有 API 真值者（按真值倒序），组 2 = 其余（按文件名时间倒序）。
+                    api_set, cts = set(api), dict(api)
+                    SORT_DIAG.update({"mode": f"提交时间优先（API 精算 {len(api)} 档 + 文件名兜底）",
+                                      "api_n": len(api)})
                 else:
                     SORT_DIAG["mode"] = "⚠️ 文件名口径（提交时间不可信）"
-            names.sort(key=lambda nm: (cts.get(nm, 0), _name_sort_key(nm)),
-                       reverse=True)
+            names.sort(key=lambda nm: (nm in api_set, cts.get(nm, 0),
+                                       _name_sort_key(nm)), reverse=True)
             return [{"name": nm, "repo_path": f"{HANDOVER_REL}/{nm}",
                      "src": "remote", "ref": ref, "local": HANDOVER_DIR / nm}
                     for nm in names[:n]]
@@ -545,7 +560,7 @@ def main():
     out.append(f"- 排序口径：{SORT_DIAG['mode']}（提交时间条目 {SORT_DIAG['entries']} / "
                f"唯一值 {SORT_DIAG['unique']}"
                + (f" / API 精算 {SORT_DIAG['api_n']} 档" if SORT_DIAG["api_n"] else "")
-               + ("；⚠️ 检出 graft 退化，已按兜底口径排序" if SORT_DIAG["degenerate"] else "") + "）")
+               + ("；⚠️ 检出 graft 退化（git 提交时间不可信），排序已分层兜底" if SORT_DIAG["degenerate"] else "") + "）")
     if not files:
         out.append("- 无")
     for i, item in enumerate(files):
@@ -578,7 +593,7 @@ def main():
                f"其余=显式指令行+显式 workflow 名）｜去重=文件名+内容 hash")
     dlines, n_dispatched = scan_dispatch(files, dry=dry)
     if not dlines and not n_dispatched:
-        out.append("- 无新增派发指令（前 8 档已判过或均无显式指令）。")
+        out.append(f"- 无新增派发指令（前 {ACTION_SCAN_N} 档已判过或均无显式指令）。")
     else:
         out.extend(dlines)
         out.append(f"- 本轮实际派发 **{n_dispatched}** 次。")
