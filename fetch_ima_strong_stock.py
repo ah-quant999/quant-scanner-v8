@@ -151,11 +151,35 @@ def extract_from_inner_text(text):
       ② 逐条留痕 ⇒ 每条记录带 `_parse_missing`（哪些字段空/类型不符），上层落盘统计。
          **绝不静默丢弃** —— 要让「缺多少、缺在哪」一眼可见。
     """
-    # 🔴 2026-09-17：清掉 BOM / 零宽字符。实测真实页面抓下来的 innerText 里
-    #   有 25 个字段值是 '\ufeff'（BOM），会被当成「有内容但类型不符」⇒ 误判为串位。
-    #   这是数据清洗，不是格式猜测 —— 只剔零宽不可见字符，不改任何可见内容。
-    lines = [l.replace("\ufeff", "").replace("\u200b", "").replace("\u200e", "").strip()
-             for l in text.split("\n")]
+    # 🔴🔴 2026-09-18 阿狸咪的工程师 根治（主人令「回测必须真实、不得造假」专项）：
+    #   **innerText 里「空单元格」占 2 行**（'\ufeff' + 紧随的空串），非空单元格只占 1 行。
+    #   上一版把 BOM **无条件 replace 掉** ⇒ 空单元格被拆成 2 个空 token，与「2 个真空行」
+    #   再也无法区分；而解析按「1 字段 1 token」推进 ⇒ 每遇一个空「行业」格后续整体左移，
+    #   加上类型校验让指针**卡住不消费** ⇒ base_price..trade_date 六字段全塌进 _parse_missing。
+    #
+    #   实证（真实页面 dump，1521 行 / 112 只，可复现；见 docs/ops/audit/ 同名报告）：
+    #     修复前 field_missing_counts = {base_price:72, latest_price:72, change_pct:72,
+    #       drawdown_pct:72, status:70, trade_date:70}，有效 first_selected 仅 **40/112**
+    #       —— 与线上产物 `parse_health` **逐项完全一致**（⇒ 根因确认，非推测）；
+    #     修复后 first_selected **112/112**，缺失归 0（仅剩 2 条真实无价的记录）。
+    #   下游后果（为什么当事故修）：first_selected 为空者被回测 `one_trade()` 静默丢弃
+    #   （skipped=72），样本从 112 掉到 40 会让回测**系统性偏乐观**
+    #   （T+1 40 条 67.5% vs 全量 176 条 50.6%，差 17pp）。
+    #
+    #   正解：**折叠**（不是 strip、不是 replace）—— 把 '\ufeff'+紧随空串并成 **1 个空 token**，
+    #   使「空单元格」与「非空格」在 token 级同构（都是 1 个）。
+    raw_lines = text.split("\n")
+    lines = []
+    _k = 0
+    while _k < len(raw_lines):
+        if (raw_lines[_k] == "\ufeff"
+                and _k + 1 < len(raw_lines) and not raw_lines[_k + 1].strip()):
+            lines.append("")          # 空单元格 = BOM 行 + 空行 → 1 个 token
+            _k += 2
+            continue
+        lines.append(raw_lines[_k].replace("\ufeff", "").replace("\u200b", "")
+                     .replace("\u200e", "").strip())
+        _k += 1
     stocks = []
     i, n = 0, len(lines)
     while i < n:
@@ -373,6 +397,30 @@ def main():
         "parse_health": parse_health,
         "stocks": data["stocks"],
     }
+    # 🔴🔴 2026-09-18 阿狸咪的工程师 新增：**生产者自检**（杜绝「旧脚本假成功」）
+    #   为什么放在生产脚本里而不是 CI 的独立 step：本仓 PAT 无 `workflow` scope，
+    #   改 .github/workflows/ 会 403，故把断言内聚到生产者自身（**谁产出谁负责**），
+    #   且这样连「人工跑一次」也受同样保护。配套事后审计见 verify_ima_sync.py。
+    #
+    #   真因实证：本脚本 09-17 21:53 上线新版（五字段 + 折叠修复），而 CI cron 是
+    #   CST 15:45 ⇒ 当天早已用旧脚本跑完 ⇒ 五字段至今一次未写出、前端红胶囊判据恒假、
+    #   回测样本被砍到 40/112，**而整条链全绿、无人知晓**。故形状不对必须立刻红。
+    _viol = []
+    for _k in ("data_date", "source_stale", "stale_days", "source_updated_at", "source_title"):
+        if _k not in out:
+            _viol.append("产物缺字段 %s" % _k)
+    if parse_health.get("no_first_selected"):
+        _viol.append("no_first_selected=%s（应恒为 0，否则空单元格折叠修复失效）"
+                     % parse_health["no_first_selected"])
+    if parse_health.get("field_missing_counts"):
+        _viol.append("field_missing_counts 非空 %s（解析串位复发）"
+                     % parse_health["field_missing_counts"])
+    if _viol:
+        print("❌ 产物自检失败 —— 拒绝写出坏产物：")
+        for _v in _viol:
+            print("   · " + _v)
+        raise SystemExit(1)
+
     print(f"🩺 解析健康度: 总 {parse_health['total']} 只 · "
           f"无首次入选日 {parse_health['no_first_selected']} 只"
           f"（{parse_health['no_first_selected_pct']}%）· "
