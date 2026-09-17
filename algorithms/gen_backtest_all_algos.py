@@ -128,6 +128,28 @@ SOURCES = [
          var="FACTOR_LAB_BACKTEST", rel="data/FACTOR_LAB_BACKTEST.js",
          parser="factor_lab", label_prefix="", primary=f"L1最强分位 T+{FACTOR_PRIMARY_HOLD}",
          method="因子五分位分层超额（每10交易日调仓·次一交易日开盘入场）"),
+    # 🆕 2026-09-17 阿狸咪的工程师（小九 2018 件 §四-5 · 主人令「今晚全部完成」）
+    #   强势跟踪（原「高手强势股跟踪」）。补上本条即闭环前端源码里写明的待办：
+    #     index.html L6007-6012「⚠️ 数据层待办：让 E 批把它并入 BACKTEST_ALL_ALGOS，
+    #       届时本合成行自动被真行取代（同卡名去重）」。
+    #   前端合成行（L6013-6039）已实现「页面若已有同名 card 行 ⇒ 直接 return 不合成」
+    #   ⇒ 本条一生效，合成行**自动让位**，无需改前端一行代码。
+    #   🔴 chain_member=False 的依据（实测，非推测）：
+    #     · update_v8.py L318  `"IMA_STRONG_BACKTEST": "post_close"` ⇒ 盘后归属；
+    #     · 它由 algorithms/backtest_life_cards.py 在 update_v8.py 的 experiment 段
+    #       调用产出（L1371-1385），**不在** algorithms/run_algorithms.py 的 E 批名单里
+    #       ⇒ 不得标成链成员，否则会被读成「E 批会刷新它」而掩盖真停更。
+    #     · 兜底告警由 v8_health_check.py 的 IMA_STRONG_BACKTEST（max_age=1440）负责。
+    #   ⚠️ 与 parse_by_period 的差异（结构不同构，已实测）：
+    #     四量/CRDS 走 summary.by_period；本产物走**顶层 periods**（键 '1d'/'3d'…）。
+    dict(card="强势跟踪", kind="strategy", page="选股策略", icon="📡", cat="trade",
+         var="IMA_STRONG_BACKTEST", rel="data/IMA_STRONG_BACKTEST.js",
+         parser="ima_strong", label_prefix="持有", primary=None,
+         method="信号日次一交易日开盘买入、持有 N 个真实交易日收盘卖出（真实日K · 已扣双边 0.30%）",
+         chain_member=False,
+         chain_note="非算法链成员：由 update_v8.py 的 experiment 段调用 "
+                    "algorithms/backtest_life_cards.py 产出，归属 post_close；"
+                    "真停更由 v8_health_check.py 的 IMA_STRONG_BACKTEST(max_age=1440) 兜底告警"),
 ]
 
 # 🆕 2026-09-13 主人令：全部接入算法链的选股策略统一 10 档（同源 HOLD_LADDER）。
@@ -470,6 +492,80 @@ def parse_by_period(src, obj):
     return rows
 
 
+# 🔴 2026-09-17 阿狸咪的工程师 新增（主人令「今晚全部完成」· 小九 2018 件 §四-5）
+#   「强势跟踪」并入本总表。**动因是前端源码里写明的待办**（index.html L6007-6012）：
+#      「强势跟踪（原高手强势股跟踪）升为本页正式算法，必须进总表，否则『哪个算法
+#        最佳』就缺一员。它暂未被 gen_backtest_all_algos.py 收进 BACKTEST_ALL_ALGOS
+#        ⇒ 此处前端合成一行；⚠️ 数据层待办：让 E 批把它并入 BACKTEST_ALL_ALGOS，
+#        届时本合成行自动被真行取代（同卡名去重）。」
+#   实测缺口（非推测）：现产物 rows=183 行、各 card 行数
+#      {K线信号层:108, 三重共识:36, 四量终极:12, 逆势龙头:12, 因子实验室:12, 强势突破:3}
+#      —— **无「强势跟踪」**。
+#   为何当初没并能进来：本产物结构与四量/CRDS **不同构** —— 它把档位放在**顶层 `periods`
+#      （键 '1d'/'3d'…）**，而那两个走 `summary.by_period`（键 '1'/'3'…），
+#      故现成的 parse_by_period 取不到数（会返回「无 by_period 数据」）。此处按真实结构新写。
+def parse_ima_strong(src, obj):
+    """IMA_STRONG_BACKTEST：**顶层 periods**（'1d'/'3d'…），每个持有期一行。
+
+    与前端 `window.__strongTrackBacktest()` 适配器**同源同口径**（该适配器把这层
+    转成 summary.by_period 喂给策略回测页的单卡渲染器）：两处判据必须一致，否则
+    同一策略在「总表」与「单卡」上会显示不同档位 —— 正是主人 2026-09-16 令
+    「我只要真实数据最准确的回测…不要不一致会引起误会」要根治的形态。
+
+    诚实铁律（主人令⑭，本处与 _mk_row 双重保障）：
+      · `samples == 0`（含 `immature: true` 的未成熟档）⇒ 胜率/收益**一并不取**，
+        交由 _mk_row 归 null + 标「累积中」；**绝不把「算不出」显示成「算出来且很差」**。
+      · 源里键名是 `1d` 而非 `1` ⇒ 用 `_hold_days_of` 提数字（它本就是为此写的，
+        注释原文：「`_num()` 吃不下 `hold_20d` 这种键 ⇒ 单独补一层数字提取」）。
+    """
+    per = (obj or {}).get("periods") or {}
+    if not per:
+        return [_mk_row(src, "—", None, None, None, None, status="无 periods 数据")]
+    # 与 parse_by_period 同款排序：键解析不出数字的排最后，其余按档位升序
+    keys = sorted(per.keys(), key=lambda x: (_hold_days_of(x) is None, _hold_days_of(x) or 0))
+    rows = []
+    for k in keys:
+        r = per.get(k) or {}
+        hd = _hold_days_of(k)
+        n = _num(r.get("samples"))
+        lead = (r.get("win_rate") and r.get("avg_return") is not None) or (n or 0) > 0
+        rows.append(_mk_row(
+            src, f"持有 T+{hd if hd is not None else k}", n,
+            (r.get("win_rate") if lead else None),
+            (r.get("avg_return") if lead else None),
+            f"T+{hd if hd is not None else k}",
+            extra={"best_return": _num(r.get("best_return")),
+                   "worst_return": _num(r.get("worst_return")),
+                   "max_drawdown": _num(r.get("max_drawdown")),
+                   "median_return": _num(r.get("median_return")),
+                   "win": _int(r.get("win")), "loss": _int(r.get("loss")),
+                   "immature": bool(r.get("immature")),
+                   "signal_date_range": obj.get("signal_date_range"),
+                   "cost_pct_roundtrip": _num(obj.get("cost_pct_roundtrip")),
+                   "price_source": obj.get("price_source")},
+            status=(None if (n or 0) > 0
+                    else ("该档未成熟（历史信号尚不足以覆盖此持有期，累积中）"
+                          if r.get("immature") else "样本为 0（尚无历史信号）")),
+        ))
+    # 主口径 = 样本达门槛里胜率最高档（与前端合成行 __strongTrackBacktest 的取法**逐字一致**）
+    #   前端原文：样本<MINS 跳过；胜率降序；胜率相同取收益高者。
+    #   此处 MINS 取本文件同一常量 MIN_SAMPLES（=产物 min_samples，前端读的就是它）⇒ 两侧同门槛。
+    #   ⚠️ _primary_override 必须置在**那一行自己**身上（由 build() pop 到该行），
+    #      不可写 rows[0] —— 否则等于把主口径钉在 T+1 上（与「最佳档」语义不符）。
+    best = None
+    for r in rows:
+        n = r["sample"] or 0
+        if n < MIN_SAMPLES or r["win_rate"] is None:
+            continue
+        if (best is None or r["win_rate"] > best["win_rate"]
+                or (r["win_rate"] == best["win_rate"]
+                    and (r["avg_return"] or 0) > (best["avg_return"] or 0))):
+            best = r
+    if best is not None:
+        best["_primary_override"] = best["label"]
+    return rows
+
+
 def parse_tdx(src, obj):
     """BACKTEST_TDX.summary：每类 K 线信号 × **每个持有期档位** 一行。
 
@@ -617,6 +713,7 @@ def parse_factor_lab(src, obj):
 PARSERS = {
     "comprehensive": parse_comprehensive,
     "by_period": parse_by_period,
+    "ima_strong": parse_ima_strong,      # 🆕 2026-09-17 强势跟踪（顶层 periods 结构）
 
     "tdx": parse_tdx,
     "algo_compare": parse_algo_compare,
