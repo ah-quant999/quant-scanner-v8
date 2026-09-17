@@ -1868,7 +1868,16 @@ _OCR_DEPENDENCY_FILES = {
 _LOW_FREQ_FILES = {
     # 2026-09-13：STOCK_PROFILE 已随 data/STOCK_PROFILE.js 停产移除
     "WEEKEND_META_REPORT", "PORTFOLIO", "PORTFOLIO_COST",
-    "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY", "BACKTEST_TDX",
+    "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY",
+    # 🔴 2026-09-18 阿狸咪的工程师（摘除 BACKTEST_TDX · 双盲区根治）：
+    #   原列此处的理由「回测结果（参数变更才重跑）」**已过时** —— 它现为 E 批每日回测
+    #   产物，本就该每日刷新。留在本白名单（陈旧降级为「>7 天才告警」）的直接后果实测：
+    #   E 批链推送 raw_data/backtest_tdx.json（涨到 76 MB）连续 4 天 HTTP 422 失败、
+    #   线上 data/BACKTEST_TDX.js 停在 09-14，而本巡检**全程零告警** ⇒ 停更 4 天无人知晓。
+    #   它与 v8_stage_gate.py 的 E 批判据（BACKTEST_TDX 原只在 need=2 的「任一」位）
+    #   构成**双盲区**：闸门不阻塞、巡检不告警。本轮两端同时闭环（闸门提 must + 此处摘除）。
+    #   参照同一事故家族：L153 附近早有注释写明另一产物「刻意**不进** _LOW_FREQ_FILES：
+    #   它是每日回测批产物，本就该每日刷新」—— 本条即按同一口径对齐。
     "HEALTH_CHECK", "RUNNER_STATUS_HEALTH",
     "WEEKEND_RUN",
     "maharo_macro",  # 2026-09-08 一劳永逸：本机 cookie 拉取(云端无权限)，家里机离线会陈旧 -> 7天容忍仅告警

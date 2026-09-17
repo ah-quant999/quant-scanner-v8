@@ -127,7 +127,7 @@ _ALWAYS_PUSH = {
     "raw_data/market_alerts.json",         # READY_SPEC["A"].items
     "data/FINAL_RECOMMEND_DATA.js",        # READY_SPEC["D"].items（need=1，零余量，最高危）
     "data/CRDS_BACKTEST.js",               # READY_SPEC["E"].items
-    "data/BACKTEST_TDX.js",                # READY_SPEC["E"].items
+    "data/BACKTEST_TDX.js",                # READY_SPEC["E"].must（2026-09-18 由 items 提为 must —— 双盲区根治，见 v8_stage_gate.py E 段注释）
     # ── 🛡 2026-09-13 同步 stage_gate 的「A 批 9 项纳入」────────────────
     #   契约同前：凡 READY_SPEC[*] 的 items 一律纳入本白名单（一一对应，可断言）。
     #   漏加 ⇒ 内容天然稳定的项被判伪变更 ⇒ update_time 恒旧 ⇒ A 批每轮重跑永不收敛。

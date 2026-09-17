@@ -278,7 +278,22 @@ READY_SPEC: dict[str, dict] = {
     #   同时删除 algorithms/backtest_pools.py 与 data/{CANDIDATE,GOLD_POOL}_BACKTEST.js。
     "E": {"items": ["data/CRDS_BACKTEST.js", "data/BACKTEST_TDX.js",
                     "data/BACKTEST_ALL_ALGOS.js"], "need": 2,
-          "must": ["data/BACKTEST_ALL_ALGOS.js"]},
+          # 🔴 2026-09-18 阿狸咪的工程师（双盲区根治·P0）：must 补入 BACKTEST_TDX。
+          #   根因（实测闭环）：原它只占 items（need=2 的「任一」位）⇒ 陈旧**不阻塞**就绪；
+          #   而 v8_health_check.py::_LOW_FREQ_FILES 又把它列为低频豁免 ⇒ 陈旧**不告警**
+          #   ⇒ **两个监控都不覆盖**。后果：raw_data/backtest_tdx.json 涨到 76,078,046 B
+          #   （12 档 × 221 只逐笔明细），推送 POST /git/blobs 每次 HTTP 422
+          #   （超 GitHub 单文件上限），线上 data/BACKTEST_TDX.js 永久停在 09-14
+          #   —— **停更 4 天而全链零红灯**。（与主人 09-12 点名的 BACKTEST_ALL_ALGOS
+          #   「静默不产出无人知晓」同型同因，属同一事故家族第二次复发。）
+          #   ✅ 不变式核验（must ⊆ _ALWAYS_PUSH，缺一即「永久不收敛」）：
+          #      data/BACKTEST_TDX.js 已在 dedup_fetch_manifest.py::_ALWAYS_PUSH（L130）
+          #      ⇒ 不会被去重器判「伪变更」丢弃 ⇒ update_time 能前进 ⇒ must 可满足。
+          #   ✅ 可达性核验（防 must 恒 STALE）：它与 BACKTEST_ALL_ALGOS 同批同源产出；
+          #      凌晨档由 _cand() 的「+24h」解释匹配（01:23 → 25:23 ≥ 16:30）⇒ 不恒 STALE。
+          #   ✅ 代价可控：need=2 且 must 两项 ⇒ 判定等价于「这两项必须新」，第 3 项
+          #      CRDS_BACKTEST 不参与否决（保留原有容错语义，不引入「三项全中」过紧约束）。
+          "must": ["data/BACKTEST_ALL_ALGOS.js", "data/BACKTEST_TDX.js"]},
 }
 
 # 各批上游：上游不就绪则拒绝开跑（顺序闸门 · 一环套一环）

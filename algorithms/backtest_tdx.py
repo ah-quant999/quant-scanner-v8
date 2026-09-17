@@ -555,21 +555,36 @@ def main():
     if survivor_bias_warning:
         log("⚠️ 历史金股池快照不足，回测仍含幸存者偏差（会随着每日快照累积逐步消除）")
     
-    # 读取现有回测结果（用于增量追加）
-    # 2026-09-18：产品产物 OUT 已不再写明细 ⇒ 续跑优先读明细缓存（不入仓），
-    #   并保留对旧版 OUT（含 stocks）的兼容读取，使本次迁移首轮仍可复用历史明细。
+    # 读取当日明细缓存（用于断点续跑）
+    # 🔴 2026-09-18 阿狸咪的工程师·P0 修正（禁「旧数据盖新时间戳」）：
+    #   上一版曾回退读产品产物 OUT。但迁移首轮线上 OUT 仍是**旧版含明细**的产物，
+    #   而本文件主循环对已存在的 key 会 `continue` **整只跳过**（见下方「跳过已处理的」）⇒
+    #   结果 = 历史明细的统计 + 全新 update_time —— 前端显示「今日已更新」而数据实为历史，
+    #   直接违反首条铁律「数据新鲜真实」（也是主人点名的「旧结果冒充新结果」）。
+    #   ⇒ **永不回退读 OUT**。复用条件须**两者同时满足**，缺一即全量重算：
+    #     ① calc_time == 今天（跨日缓存一律丢弃）
+    #     ② 缓存文件 2 小时内写过（防「同日早盘缓存被晚间档复用」——早盘 K 线尚未收盘）
     existing = {}
-    for _cache_p in (_STOCK_CACHE, OUT):
-        try:
-            _cand = json.load(open(_cache_p, "r", encoding="utf-8"))
-        except Exception:
-            continue
-        if isinstance(_cand, dict) and _cand.get("stocks"):
-            existing = _cand
-            log(f"读取已有回测: {len(existing.get('stocks', {}))} 只 ← {os.path.basename(_cache_p)}")
-            break
+    _cache_age = None
+    try:
+        _cache_age = time.time() - os.path.getmtime(_STOCK_CACHE)
+    except OSError:
+        pass
+    try:
+        _cand = json.load(open(_STOCK_CACHE, "r", encoding="utf-8"))
+    except Exception:
+        _cand = None
+    if (isinstance(_cand, dict) and _cand.get("stocks")
+            and _cand.get("calc_time") == TODAY
+            and _cache_age is not None and _cache_age < 7200):
+        existing = _cand
+        log(f"复用当日明细缓存: {len(existing.get('stocks', {}))} 只 "
+            f"(calc_time={_cand.get('calc_time')}, {_cache_age / 60:.0f} 分钟前)")
+    elif isinstance(_cand, dict) and _cand.get("stocks"):
+        _age_s = "n/a" if _cache_age is None else ("%.0f 分钟" % (_cache_age / 60))
+        log(f"丢弃陈旧明细缓存 (calc_time={_cand.get('calc_time')}, 年龄={_age_s}) ⇒ 本轮全量重算")
     if not existing:
-        log("无可复用明细（首次或缓存缺失）⇒ 本轮全量重算")
+        log("无可复用当日明细 ⇒ 本轮全量重算（数据必然最新）")
     
     # 🔴 2026-09-14 小九审计修复：陈旧口径条目不得进入汇总（口径混用治本·P0）。
     #   原实现 stock_results 直接继承整份旧产物，而下方 summary / opt_summary 均
