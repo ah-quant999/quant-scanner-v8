@@ -648,13 +648,20 @@ def main():
     if not _is_market_open(now):
         core_stale = [(v, r) for (v, r) in core_stale if v != "STOCK_QUOTE"]
         core_notime = [v for v in core_notime if v != "STOCK_QUOTE"]
-    warn_stale, warn_notime = check_group(WARN_SOURCES, close, "WARN", is_trading)
+    # 🔴 2026-09-17 治本（阿狸咪，与 09-16 CORE/CORE_ALGO 同源）：WARN/FROZEN 原先
+    # **未传 token/use_cloud** ⇒ 一律读本机 data/X.js。本机经坚果云同步、远端 CI 推的
+    # 新数据不落地 ⇒ 本机滞后即**假黄灯**（09-17 实测：本机 SECTOR_FUND_FLOW 等 4 项
+    # 09-16 18:5x，而远端同日 18:28~18:29 全新鲜；TRIPLE_HISTORY 本机 09-15 23:25 vs
+    # 远端 09-17 05:23）⇒ 恒黄 5 项造成**告警疲劳**，真黄灯被淹没。
+    # 传 token 后逐文件走云端读；**取不到仍回退本机**（check_group L580 内建兜底）
+    # ⇒ 行为只增不减、零新增误报。
+    warn_stale, warn_notime = check_group(WARN_SOURCES, close, "WARN", is_trading, token=check_token, use_cloud=True)
     # 🛡 2026-09-08 NT_DATA 盘前 180min 豁免：NT_DATA 是 ETF 实时异动，盘前本就不刷新，
     #    06:30-09:30 之间陈旧不告警、不派发，避免清晨误报。
     if _is_premarket_window(now, 180):
         warn_stale = [(v, r) for (v, r) in warn_stale if v != "NT_DATA"]
         warn_notime = [v for v in warn_notime if v != "NT_DATA"]
-    frozen_stale, frozen_notime = check_group(FROZEN_SOURCES, close, "FROZEN", is_trading)
+    frozen_stale, frozen_notime = check_group(FROZEN_SOURCES, close, "FROZEN", is_trading, token=check_token, use_cloud=True)
 
     def _with_cat(items):
         def _cat(var):
