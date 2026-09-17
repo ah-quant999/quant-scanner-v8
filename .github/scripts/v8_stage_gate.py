@@ -284,7 +284,20 @@ READY_SPEC: dict[str, dict] = {
 # 各批上游：上游不就绪则拒绝开跑（顺序闸门 · 一环套一环）
 # 🔴 2026-09-11 主人令「一劳永逸」：A→B→D→E 严格串联，下游批**必须等上游批产出"当日"数据**
 #   才放行（PREREQ 上游未就绪 → stage_ok=false → 调用方红灯拒绝 + 邮件告警）。
-PREREQ: dict[str, str | None] = {"A": None, "B": "A", "D": "B", "E": "D"}
+# 🔴🔴 2026-09-17 主人令「看板一大片红灯·一劳永逸」（小九）：E 的上游由 D 改为 B —— 解「E 被 D 单点串死」的当晚级死锁。
+#   病根（09-17 实测，7 项红灯）：E 批 PREREQ=D + SEQ_REF=E←FINAL_RECOMMEND_DATA，而 D 的上游 B 因
+#     factor_lab_gen 冷启动 50-90min 常拖到 04:30 才完 ⇒ D 06:26 才开跑 ⇒ E 要再等一整轮唤醒，
+#     而 08:00 那档已在夜窗末班（接力推进器 08:59 收工、09:00 进入新数据日）⇒ E 被挤掉，
+#     产物停 09-16 05:12，次日看板 all_* 回测类 7 项全红（超 1440min 红线 26h）。
+#   **依据（逐脚本核验，非推断）**：E 批 14 个脚本**零个**读 data/FINAL_RECOMMEND_DATA.js——
+#     真实输入 = gold_pool.json / history/top10_daily_*.json / factor_lab.json /
+#     H_AUTO_BUY_TRACK.js / CRDS 信号 ⇒ **全部来自 A 或 B 批**。
+#     gen_backtest_all_algos.py 的 SOURCES 登记表 6 条全部指向 **E 批自产**的同级产物。
+#   ⇒ 「E 依赖 D」是历史残留的过严依赖；E 与 D 实为**平行兄弟**（同依赖 B）。
+#   ⚠️ 不可反向操作：factor_lab_gen **必须留在 B 批**——final_recommend.py L661-674 硬等
+#     data/FACTOR_LAB.js 当日新鲜（_fl_max_wait=20，逐分钟打印心跳），挪到 E 批会让 D 吃陈旧因子。
+#   ⚠️ E 仍排在 D 之后跑（见下方自愈段 for 顺序）：汇总先上线、回测后跑，业务语义不变。
+PREREQ: dict[str, str | None] = {"A": None, "B": "A", "D": "B", "E": "B"}
 
 # 盘后链「起点」（该时刻之前不跑任何批）
 # 🔴 2026-09-11 主人令「一劳永逸」：16:00 → 18:00。全部当日交易数据（龙虎榜 16:30 后、
@@ -410,7 +423,13 @@ def _escape_gate(root: str, day: str) -> tuple[bool, str, int]:
 SEQ_REF: dict[str, str] = {
     "B": "data/LHB_DATA.js",             # A 批核心标志（17:30 落盘后不再变）
     "D": "data/TRIPLE_CONSENSUS.js",     # B 批代表产物
-    "E": "data/FINAL_RECOMMEND_DATA.js", # D 批产物
+    # 🔴🔴 2026-09-17 一劳永逸（小九，同 PREREQ 处说明）：原值 = "data/FINAL_RECOMMEND_DATA.js"（D 批产物）。
+    #   该基准把 E 的「就绪」判定绑死在 D 的时间戳上（check_ready L444-454：E 产物早于基准即判未就绪需重算），
+    #   与 PREREQ 双锁叠加 ⇒ 即使 PREREQ 改了，E 仍会被本行卡住。故必须同改。
+    #   新值 = B 批代表产物，与 D 同基准（语义自洽：E 与 D 同依赖 B，互为平行兄弟）。
+    #   ⚠️ 基准须满足「单一来源、写一次就固定」：TRIPLE_CONSENSUS.js 由 B 批 gen_triple_consensus.py
+    #     一次产出，不被后续抓取链刷新 ⇒ 符合要求。
+    "E": "data/TRIPLE_CONSENSUS.js",     # B 批代表产物（2026-09-17 由 D 批产物改；解 E 被 D 串死）
 }
 
 
@@ -600,15 +619,43 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool):
                 day, kind, out())
 
     # ── 1) 显式 stage（人工应急）—— 仍必须过上游顺序闸门 ─────────────────────
+    _explicit_yield = ""   # 显式批「已就绪让位」留痕（写进 §3 reason，可见即可纠偏）
     if explicit in ("A", "B", "D", "E"):
         pre = PREREQ[explicit]
-        if pre is None:
-            return (explicit, True, f"显式 {explicit}（最上游，无前置）", day, kind, out())
-        if ready[pre][0]:
-            return (explicit, True, f"显式 {explicit}，前置 {pre} 已就绪({ready[pre][1]})", day, kind, out())
-        return (explicit, False,
-                f"⛔ 显式 {explicit} 但前置 {pre} 未就绪({ready[pre][1]}) —— 拒绝执行，"
-                f"否则会用陈旧数据算出假新鲜产物", day, kind, out())
+        # 🔴🔴 2026-09-17 一劳永逸（主人令「看板一大片红灯」· 小九）：解「显式 stage 单点占轮」。
+        #   病根：本分支原为**无条件尊重显式意图**并直接 return —— 只要某个派发源带了
+        #     client_payload.stage（实测存在多个：`v8 只补缺批·自动接力` 显式带 stage、
+        #     `v8盘后链A档派发` 带 stage=A、`v8 E档回测批·今晚一次性兜底派发` 带 stage=E、
+        #     `scripts/alimi_bell.py` 带 stage=E），gate 就当轮只跑那一批，
+        #     **完全不看别的批是否更缺** ⇒ E 批即使最陈旧、前置也已满足，仍拿不到夜窗名额。
+        #   实证（09-17）：06:26 那轮 reason=「显式 D，前置 B 已就绪(8/9)」→ 全轮只跑 D，
+        #     而 E 批 7 个回测产物停 09-16 05:12（超 1440min 红线 26h）→ 次日看板一片红。
+        #   ⇒ 与另一处「自愈段串行遮蔽」（见下方 §3）是**同一根因的两个单点**，须同解。
+        #   **修法**：仅当「显式批**自身已就绪**」时让位 —— 此时跑它纯属重复劳动
+        #     （幂等但白烧一个夜窗名额），交回下方 §3 自愈段按「缺什么跑什么」选真正最缺的批。
+        #   零回归 + 人工意图不丢：
+        #     · 显式批**未就绪**            → 与旧完全一致（放行 or 拒执行），人工意图 100% 尊重
+        #     · 显式批**已就绪 + 其它批缺**  → 让位，且 reason 显式标注「已就绪让位」+ 原显式值
+        #                                     （日志可见 ⇒ 人工若确需强跑，去掉 stage 语义或先改就绪状态即可）
+        #     · 显式批**已就绪 + 全都就绪**  → 让位后 §3 落到 NONE（合规空转，旧语义本就该空转）
+        #   ⚠️ **A 批（采集批）排除在让位之外**（2026-09-17 小九判据，演练 S6 实证）：
+        #     人工派 stage=A 的意图几乎必然包含「我要刷新一次采集」（数据源抖动/限流恢复后的
+        #     急救）——**重采必须真跑**，让位会吞掉这个急救动作。而 D/E 是**计算批**，
+        #     产物就绪即幂等、重跑纯属浪费一个夜窗名额 ⇒ **只有计算批（B/D/E）让位**。
+        #     （B 亦为计算批：其产物 TRIPLE_CONSENSUS 等由当日 A 数据算出，就绪即幂等。）
+        _yield_ok = (explicit != "A"
+                     and ready[explicit][0] and pre is not None and ready[pre][0])
+        if _yield_ok:
+            _explicit_yield = (f"显式 {explicit} 已就绪，让位给最缺批"
+                               f"（原显式意图未执行；若需强跑 {explicit} 请先使其不就绪）")
+        else:
+            if pre is None:
+                return (explicit, True, f"显式 {explicit}（最上游，无前置）", day, kind, out())
+            if ready[pre][0]:
+                return (explicit, True, f"显式 {explicit}，前置 {pre} 已就绪({ready[pre][1]})", day, kind, out())
+            return (explicit, False,
+                    f"⛔ 显式 {explicit} 但前置 {pre} 未就绪({ready[pre][1]}) —— 拒绝执行，"
+                    f"否则会用陈旧数据算出假新鲜产物", day, kind, out())
 
     # ── 2) 时间闸：盘后链起点（交易日 18:00 = START_TRADING / T+1 日 08:00 = START_T1；
     #   🔴 2026-09-11 修正：此处原写「交易日 16:00」是过时口径（起点常量已改 18:00），--force 跳过）────
@@ -635,11 +682,32 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool):
     _is_backfill = (day != (now.date() if hh >= _NIGHT_CUT
                                   else now.date() - dt.timedelta(days=1)))
     _stages_to_try = ["A", "B", "D", "E"]
+    # 🔴🔴 2026-09-17 一劳永逸（主人令「看板一大片红灯」· 小九）：解「串行遮蔽」。
+    #   旧行为：`for _s in [...]: if ready: continue; ... return` —— 遇**第一个**未就绪即 return。
+    #     后果：D 未就绪时循环在 _s="D" 就返回，**排在后面的 E 连被看见的机会都没有**，
+    #     哪怕 E 自身前置已满足、已可跑。E 于是永远排在链尾、永远最容易被夜窗挤掉
+    #     （09-17 实测：B 04:30 才完 → D 06:26 才开跑 → E 等下一轮已跨出夜窗 → 7 项红灯）。
+    #   新行为：保持 A→B→D→E **优先级顺序不变**，但**前置批未就绪者跳过本批、不遮蔽后续批**。
+    #     于是「E 前置（现为 B）已就绪」时，即使 D 因故跑不动，E 仍能被选中 ⇒ 可达性不再被单点掐死。
+    #   ⚠️ 零回归保证（逐场景）：
+    #     · B 未就绪（正常夜）            → D/E 均因前置 B 未就绪而跳过 → 仍返回 "B"（同旧）
+    #     · B 就绪、D 未就绪、E 未就绪     → D 前置 B 已就绪 ⇒ 先返回 "D"（同旧，汇总仍先跑）
+    #     · B 就绪、D 就绪、E 未就绪       → D 被 continue，返回 "E"（同旧）
+    #     · B 就绪、D 不可回填被跳过、E 未就绪 → 旧逻辑可能落到 NONE；新逻辑返回 "E"（**本次收益**）
+    _skip_why: dict[str, str] = {}
     for _s in _stages_to_try:
         if ready[_s][0]:
             continue
         if _is_backfill and not _backfill_feasible(root, _s, day):
+            _skip_why[_s] = "回填不可能（上游已被后续日覆盖）"
             continue  # 上游已全被后续日覆盖 → 回填不可能，跳过该 stage
+
+        # 🆕 前置就绪校验：前置未就绪 ⇒ 本批跳过（沿用陈旧上游只会算出假新鲜产物），
+        #   但**继续看后面的批**，不遮蔽。
+        _pre = PREREQ.get(_s)
+        if _pre and not ready[_pre][0]:
+            _skip_why[_s] = f"前置 {_pre} 未就绪({ready[_pre][1]})"
+            continue
 
         # 原有放行逻辑（逃生门 + 正常）
         if _s == "A" and _escape[0]:
@@ -652,18 +720,26 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool):
             "A": f"A 未就绪({ready['A'][1]}) -> 跑采集批",
             "B": f"A 就绪({ready['A'][1]}) B 未就绪({ready['B'][1]}) -> 跑选股批",
             "D": f"B 就绪({ready['B'][1]}) D 未就绪({ready['D'][1]}) -> 跑汇总批(最终推荐)",
-            "E": f"D 就绪({ready['D'][1]}) E 未就绪({ready['E'][1]}) -> 跑回测批",
+            "E": f"B 就绪({ready['B'][1]}) E 未就绪({ready['E'][1]}) -> 跑回测批",
         }
-        return (_s, True, _reason_map[_s], day, kind, out())
+        _extra = ("；" + "、".join(f"{k} 跳过({v})" for k, v in _skip_why.items())) if _skip_why else ""
+        # 🆕 显式让位留痕（见 §1）：让人工从 reason 立刻看出「我派的批没跑」及原因，可即时纠偏
+        _ey = (f"；[{_explicit_yield}]" if _explicit_yield else "")
+        return (_s, True, _reason_map[_s] + _extra + _ey, day, kind, out())
 
     # 所有非就绪 stage 都不可能回填？
     if _is_backfill:
         _imp = [s for s in ("A","B","D","E") if not ready[s][0]]
         if _imp:
+            _why = ("；" + "、".join(f"{k}={v}" for k, v in _skip_why.items())) if _skip_why else ""
+            _ey2 = (f"；[{_explicit_yield}]" if _explicit_yield else "")
             return ("NONE", True,
-                    f"回填目标 {day} 的 {_imp} 全被后续日覆盖->不可能->空转等本日起点",
+                    f"回填目标 {day} 的 {_imp} 全被后续日覆盖->不可能->空转等本日起点{_why}{_ey2}",
                     day, kind, out())
-    return ("NONE", True, "四批产物均已就绪 -> 空转（合规，真成功）", day, kind, out())
+    return ("NONE", True,
+            "四批产物均已就绪 -> 空转（合规，真成功）"
+            + (f"；[{_explicit_yield}]" if _explicit_yield else ""),
+            day, kind, out())
 
 
 def main() -> int:
