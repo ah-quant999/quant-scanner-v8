@@ -10396,8 +10396,19 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     //    ③ 仅当处于盘前时段（<09:20）才允许回退显示上一交易日曲线（保留 09-01 主人令的原意）。
     var _nowParts = window._cstParts ? window._cstParts(new Date()) : null;
     var _isPreMarket = _nowParts && (_nowParts.hh < 9 || (_nowParts.hh === 9 && _nowParts.mm < 20));
-    var _todayStr = window._fmtDateCST ? window._fmtDateCST(new Date()) : (new Date().toISOString().slice(0,10));
-    var _dataDate = d.date || _todayStr;
+    // 🔴 2026-09-17 P0 修正：原用 window._fmtDateCST(new Date()) 取「今日」，
+    //    但 toLocaleDateString('zh-CN') 返回的是『2026/09/17』（斜杠），
+    //    而数据端 d.date 是『2026-09-17』（横杠）⇒ 字符串永不相等
+    //    ⇒ _isDataToday 恒 false ⇒ 一过 09:20 就永久清空（主人截图实锤）。
+    //    改用 _cstParts 手工拼 YYYY-MM-DD，与数据端 date 字段严格同格式。
+    var _todayStr = (function(){
+      var _tp = window._cstParts ? window._cstParts(new Date()) : null;
+      if(_tp && _tp.y){ return _tp.y + '-' + ('0'+_tp.m).slice(-2) + '-' + ('0'+_tp.d).slice(-2); }
+      var _td = new Date();
+      return _td.getFullYear() + '-' + ('0'+(_td.getMonth()+1)).slice(-2) + '-' + ('0'+_td.getDate()).slice(-2);
+    })();
+    // 数据端 date 可能带时间后缀（如 '2026-09-17 10:00:00'）⇒ 统一截断到 10 位再比
+    var _dataDate = String(d.date || _todayStr).slice(0, 10);
     // 数据整体是否为「今日」（date 字段口径）。非今日 ⇒ 盘中不得直接展示
     var _isDataToday = (_dataDate === _todayStr);
     var snaps = d.snapshots || [];
