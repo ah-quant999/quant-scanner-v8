@@ -74,8 +74,18 @@ def _http(url, timeout=20, retries=3, referer="https://finance.sina.com.cn/"):
             except (UnicodeDecodeError, TypeError):
                 return raw.decode("gbk", "replace")  # sina/腾讯兜底
         except urllib.error.HTTPError as e:
-            if 400 <= e.code < 500:
-                raise  # 4xx 客户端错误：不重试，立即失败
+            # 🔴 2026-09-17 主人令·一劳永逸（D 批整夜不出·根因④）：
+            #   501 Not Implemented 属「服务器不具备此功能」的**确定性失败**，
+            #   与 4xx 同性质 —— 重试 100 次也是 501。原判定 `400 <= code < 500`
+            #   **漏掉了 501**（501 不 < 500），于是落入下面重试分支：
+            #     sleep(1) → sleep(3) → sleep(5) = 白等 9 秒，然后才换域成功。
+            #   实测（2026-09-17 07:10，5 只样本逐只计时）：
+            #     web.ifzq.gtimg.cn 本机恒 501（0.15s 即返回）
+            #     → 每只票白撞 3 次 + 白等 9s → 单只 9.45s（其中 9s 是纯 sleep）
+            #     → 350 只活跃股池 ≈ 55.2 分钟（实测外推）
+            #   修复后单只 0.13s（备用域实测），350 只 ≈ 45 秒。
+            if 400 <= e.code < 500 or e.code == 501:
+                raise  # 4xx / 501：客户端/确定性错误，不重试，立即失败
             last = e
             time.sleep(1 + i * 2)
         except Exception as e:  # 连接重置/超时/5xx 等瞬时错误才重试
@@ -84,14 +94,31 @@ def _http(url, timeout=20, retries=3, referer="https://finance.sina.com.cn/"):
     raise last or RuntimeError("no attempts")
 
 
+_DEAD_HOSTS = set()   # 🆕 2026-09-17：本进程内已确认失效的 K 线域名（见 _kline_json 注释）
+
+
 def _kline_json(param, timeout=20):
-    """域名级故障转移拉 K 线 JSON（2026-09-11）：web.ifzq 域名级 501 时自动切 proxy 域。"""
+    """域名级故障转移拉 K 线 JSON（2026-09-11）：web.ifzq 域名级 501 时自动切 proxy 域。
+
+    🛡 2026-09-17 主人令·一劳永逸（D 批整夜不出·根因④·第二次修复）：
+      原实现「每只票都重新试一遍主域」——主域恒 501 时，350 只票就要白撞 350 次。
+      实测（07:10，5 只样本）：单只 9.45s，其中 9s 是 _http 的重试退避纯 sleep，
+      真正的数据请求只花 0.13~0.16s。350 只活跃股池 ≈ **55.2 分钟**，
+      再叠加 `_gate_hardwait_four_volume` 的最多 3 次重跑 → 整夜跑不完。
+      ⇒ 进程内「拉黑」已失效域名：首次失败即加入 _DEAD_HOSTS，后续直接跳过。
+      注意：**进程级**而非磁盘级 —— 每次新进程仍会重试主域，
+      WAF 恢复后下一个 run 自动用回主域，不留残留状态。
+    """
     last = None
     for _host in KLINE_HOSTS:
+        if _host in _DEAD_HOSTS:
+            continue                          # 已确认失效，本进程内不再重试
         try:
             return json.loads(_http(f"{_host}?param={param}", referer="https://gu.qq.com/", timeout=timeout))
         except Exception as _e:  # noqa: BLE001
-            print(f"  [GTimg] {_host.split('/')[2]} 失败: {_e}")
+            _DEAD_HOSTS.add(_host)
+            # 只在「首次拉黑」时打日志：否则 350 只票会刷 350 行同一条噪声
+            print(f"  [GTimg] {_host.split('/')[2]} 失败: {_e} → 本进程内拉黑该域，后续直连下一域")
             last = _e
     raise last or RuntimeError("no kline host attempts")
 
