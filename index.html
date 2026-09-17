@@ -16125,6 +16125,162 @@ hm += '</div>'; // /ulPaneFactor
   //     ⇒ 本卡一律以【最新真实收盘】重算这三项；WAVE_ELLIOTT 缺失时退回 SH_FIB 原值并显式标注「前一交易日」。
   //     ⚠️ 本卡未改任何数据源、未补造数值；数据层根因（SH_FIB 取数差一日）已报小九修 fetch 脚本。
   window.__fwRetry = 0;
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 🧭 大盘 4 卡汇总解析（2026-09-17 主人令：放在「📊 大盘观测」最顶部）
+  //   目的：把下方 4 卡（波浪 / 斐波窗口 / 中信PE / 指数估值）收敛成「同向 or 分歧」一句话 + 4 行摘要。
+  //   取数口径（全部真实字段，缺则如实空态，绝不填 0、绝不编造）：
+  //     · 波浪位置  ← WAVE_ELLIOTT.meta.{date,last,pct} + marks[]（与卡1同源）
+  //     · 斐波时间窗 ← SH_FIB.windows[] / current{}（与卡2同源；本卡为【收盘价】口径）
+  //     · PE 分位   ← CITIC_PE_THERMO.{current,percentile,signal} + CITIC_PE_BACKTEST.result（与卡3同源）
+  //     · 指数估值分位 ← VALUATION_PERCENTILE.{indices,strategy}（与卡4同源）
+  //   配色：全站红涨绿跌铁律（#ef5350 涨/多，#26a69a 跌/空）
+  // ═══════════════════════════════════════════════════════════════════════════════
+  window.__renderObsSummary = function(){
+    var dst = document.getElementById('obsSummaryBody');
+    if(!dst) return;
+    var _eS = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+    var UP='#ef5350', DN='#26a69a', MID='#fbbf24', DIM='var(--dim)', TXT='var(--txt)', SUB='var(--sub)';
+
+    var W = window.WAVE_ELLIOTT || {};
+    var F = window.SH_FIB || {};
+    var T = window.CITIC_PE_THERMO || {};
+    var B = window.CITIC_PE_BACKTEST || {};
+    var V = window.VALUATION_PERCENTILE || {};
+
+    // 四卡数据齐备度自检（缺哪张就如实标注，不阻塞其它卡）
+    var okW = !!(W.meta && W.meta.date);
+    var okF = !!(F.windows && F.windows.length);
+    var okT = !!(T.current && T.current.pe_ttm != null);
+    var okV = !!(V.indices && V.indices.length);
+    if(!okW && !okF && !okT && !okV){
+      if(window.__obsSumRetry < 20){ window.__obsSumRetry = (window.__obsSumRetry||0)+1; setTimeout(window.__renderObsSummary, 500); return; }
+      dst.innerHTML = '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+        + '<span style="font-size:15px;font-weight:700;color:#a78bfa;">🧭 大盘 4 卡汇总解析</span></div>'
+        + '<div class="note" style="padding:16px;text-align:center;color:var(--dim);">4 卡数据均未到位（WAVE_ELLIOTT / SH_FIB / CITIC_PE / VALUATION_PERCENTILE）</div>';
+      return;
+    }
+    window.__obsSumRetry = 0;
+
+    // ── 逐卡提取「方向信号」：+1 偏多 / -1 偏空 / 0 中性 ──────────────────────
+    var sigs = [], notes = [];
+
+    // ① 波浪位置
+    var wTxt = '—', wDir = 0, wWhy = '';
+    if(okW){
+      var wLast = W.meta.last, wPct = W.meta.pct;
+      var wMarks = W.marks || [];
+      var hiM = null, newM = null;
+      for(var i=0;i<wMarks.length;i++){
+        var m = wMarks[i]; if(!m || !m.coord) continue;
+        if(!hiM || m.coord[1] > hiM.coord[1]) hiM = m;
+        if(!newM || m.coord[0] > newM.coord[0]) newM = m;
+      }
+      var distPct = (hiM && hiM.coord[1]) ? (wLast - hiM.coord[1]) / hiM.coord[1] * 100 : null;
+      wTxt = '\u73b0\u4ef7 ' + (+wLast).toFixed(2) + '\uff08' + (wPct>0?'+':'') + (+wPct).toFixed(2) + '%\uff09';
+      if(distPct != null) wTxt += ' \u00b7 \u8ddd\u672c\u8f6e\u9ad8\u70b9 ' + distPct.toFixed(2) + '%';
+      wDir = (distPct != null && distPct < -10) ? -1 : ((wPct != null && wPct>0) ? 1 : ((wPct != null && wPct<0) ? -1 : 0));
+      wWhy = distPct != null ? ('\u56de\u8c03 ' + Math.abs(distPct).toFixed(1) + '%') : '';
+      sigs.push({n:'波浪位置', d:wDir, t:wTxt, c:(wPct>0?UP:(wPct<0?DN:MID))});
+    } else { sigs.push({n:'波浪位置', d:0, t:'数据未到位', c:DIM}); }
+
+    // ② 斐波时间窗
+    var fTxt='—', fDir=0;
+    if(okF){
+      var fut = null, trig = [];
+      for(var j=0;j<F.windows.length;j++){
+        var w = F.windows[j];
+        if(!fut && w.status === 'future') fut = w;
+        if(w.status === 'triggered' || w.status === 'tracking') trig.push(w);
+      }
+      if(trig.length){ fTxt = '\u5df2\u89e6\u53d1 ' + trig.map(function(x){return x.name;}).join('/'); fDir = 0; }
+      if(fut) fTxt += (trig.length ? ' \u00b7 ' : '') + '\u4e0b\u4e2a ' + fut.name + ' \u8ddd\u4eca ' + (fut.days_left>=0?fut.days_left:0) + ' \u5929';
+      if(!fTxt || fTxt==='—'){ fTxt = '\u6682\u65e0\u89e6\u53d1/\u5f85\u89c2\u7a97\u53e3'; }
+      sigs.push({n:'斐波时间窗', d:fDir, t:fTxt, c:'#38bdf8'});
+    } else { sigs.push({n:'斐波时间窗', d:0, t:'数据未到位', c:DIM}); }
+
+    // ③ 中信 PE 分位
+    var tTxt='—', tDir=0;
+    if(okT){
+      var pe = T.current.pe_ttm, pr = (T.percentile||{}).pe_rank, sg = T.signal||{};
+      var thr = sg.pe_threshold || {};
+      tTxt = 'PE ' + (+pe).toFixed(2) + ' \u00b7 \u5206\u4f4d ' + (pr!=null?(+pr).toFixed(1)+'%':'—') + ' \u00b7 ' + (sg.label||'—');
+      if(thr.value != null) tTxt += '\uff08\u4f4e\u4f30\u7ebf ' + thr.value + '\uff09';
+      // 分位越低越偏多（低估）；越高越偏空
+      if(pr != null){ tDir = pr < 20 ? 1 : (pr > 50 ? -1 : 0); }
+      sigs.push({n:'中信PE分位', d:tDir, t:tTxt, c:(pr!=null && pr<20 ? UP : (pr!=null && pr>50 ? DN : MID))});
+    } else { sigs.push({n:'中信PE分位', d:0, t:'数据未到位', c:DIM}); }
+
+    // ④ 指数估值分位
+    var vTxt='—', vDir=0;
+    if(okV){
+      var hi5 = 0, lo5 = 1, n5 = 0, names = [];
+      for(var k=0;k<V.indices.length;k++){
+        var x = V.indices[k];
+        if(x.percentile_5y == null) continue;
+        n5++; hi5 = Math.max(hi5, x.percentile_5y); lo5 = Math.min(lo5, x.percentile_5y);
+        names.push(x.name);
+      }
+      var st = V.strategy || {};
+      if(n5){
+        vTxt = '\u4e09\u5927\u6307\u6570 5\u5e74\u5206\u4f4d ' + Math.round(lo5*100) + '%~' + Math.round(hi5*100) + '%';
+        if(st.overall) vTxt += ' \u00b7 ' + st.overall;
+        vDir = hi5 > 0.7 ? -1 : (hi5 < 0.3 ? 1 : 0);
+        sigs.push({n:'指数估值分位', d:vDir, t:vTxt, c:(hi5 > 0.7 ? DN : (hi5 < 0.3 ? UP : MID))});
+      } else { sigs.push({n:'指数估值分位', d:0, t:'分位数据缺失', c:DIM}); }
+    } else { sigs.push({n:'指数估值分位', d:0, t:'数据未到位', c:DIM}); }
+
+    // ── 汇总判据：同向 or 分歧 ────────────────────────────────────────────────
+    var upN = 0, dnN = 0, neuN = 0;
+    sigs.forEach(function(s){ if(s.d > 0) upN++; else if(s.d < 0) dnN++; else neuN++; });
+    var verdict, vColor, vIcon;
+    if(upN >= 3 && dnN === 0){ verdict = '4 卡总体偏多（' + upN + ' 多 / ' + neuN + ' 中性）'; vColor = UP; vIcon='🟥'; }
+    else if(dnN >= 3 && upN === 0){ verdict = '4 卡总体偏空（' + dnN + ' 空 / ' + neuN + ' 中性）'; vColor = DN; vIcon='🟩'; }
+    else if(upN > 0 && dnN > 0){ verdict = '4 卡出现分歧（' + upN + ' 多 vs ' + dnN + ' 空 / ' + neuN + ' 中性）\u2014\u2014\u4fe1\u53f7\u4e0d\u4e00\u81f4\uff0c\u4ee5\u4ed3\u4f4d\u63a7\u5236\u4e3a\u4e3b'; vColor = MID; vIcon='\u26A0\uFE0F'; }
+    else { verdict = '4 卡暂无明确方向（' + neuN + ' 中性）'; vColor = DIM; vIcon='\u26AA'; }
+
+    // ── 拼版式 ───────────────────────────────────────────────────────────────
+    var h = '';
+    h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+      + '<span style="font-size:15px;font-weight:700;color:#a78bfa;">🧭 大盘 4 卡汇总解析</span>'
+      + '<span style="font-size:11.5px;color:' + DIM + ';">下方 4 卡同向 / 分歧一句话收敛 \u00b7 \u8bfb\u771f\u5b9e\u5b57\u6bb5\uff0c\u7f3a\u5219\u7a7a\u6001</span>'
+      + '</div>';
+
+    // 一句话结论（置顶醒目）
+    h += '<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:10px 13px;margin-bottom:11px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;">'
+      + '<span style="font-size:16px;">' + vIcon + '</span>'
+      + '<span style="font-size:14.5px;font-weight:800;color:' + vColor + ';">' + _eS(verdict) + '</span>'
+      + '</div>';
+
+    // 4 行分卡摘要（左侧色条标识归属）
+    h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;">';
+    var barC = ['#f472b6','#38bdf8','#fbbf24','#60a5fa'];
+    for(var q=0;q<sigs.length;q++){
+      var s2 = sigs[q];
+      var dirTxt = s2.d > 0 ? '\u504f\u591a' : (s2.d < 0 ? '\u504f\u7a7a' : '\u4e2d\u6027');
+      h += '<div style="background:rgba(148,163,184,.07);border:1px solid rgba(148,163,184,.22);border-left:3px solid ' + barC[q] + ';border-radius:7px;padding:9px 11px;">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:5px;">'
+        + '<span style="font-size:11.5px;font-weight:700;color:' + barC[q] + ';">' + _eS(s2.n) + '</span>'
+        + '<span style="font-size:11px;font-weight:700;color:' + s2.c + ';">' + dirTxt + '</span>'
+        + '</div>'
+        + '<div style="font-size:11.5px;color:' + TXT + ';line-height:1.6;">' + _eS(s2.t) + '</div>'
+        + '</div>';
+    }
+    h += '</div>';
+
+    // 口径与数据时点
+    var stamps = [];
+    if(okW) stamps.push('\u6ce2\u6d6a ' + _eS(W.meta.date));
+    if(okT) stamps.push('\u4e2d\u4fe1PE ' + _eS(T.data_date||''));
+    if(okV){ stamps.push('\u6307\u6570\u4f30\u503c ' + _eS((V.indices[0]||{}).date||'')); }
+    if(okF) stamps.push('\u6590\u6ce2 ' + _eS((F.current||{}).peak_date||''));
+    h += '<div style="margin-top:10px;padding:8px 10px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.2);border-radius:7px;font-size:11px;line-height:1.7;color:' + SUB + ';">'
+      + '📌 \u53e3\u5f84\uff1a\u672c\u5361\u4e3a\u4e0b\u65b9 4 \u5361\u7684\u6536\u655b\u8bfb\u6570\uff0c\u4e0d\u65b0\u589e\u4efb\u4f55\u9884\u6d4b\uff1b\u5206\u4f4d\u8d8a\u4f4e\u8d8a\u504f\u591a\uff08\u4f4e\u4f30\uff09\u3001\u8d8a\u9ad8\u8d8a\u504f\u7a7a\uff08\u9ad8\u4f30\uff09\u3002\u7ea2\u6da8\u7eff\u8dcc\u3002'
+      + '<br>🕑 \u6570\u636e\u65f6\u70b9\uff1a' + (stamps.length ? _eS(stamps.join(' \u00b7 ')) : '\u2014')
+      + '</div>';
+
+    dst.innerHTML = h;
+  };
+
   window.__renderFibWindow = function(){
     var dst = document.getElementById('fibWindowBody');
     if(!dst){ if(window.__fwRetry < 20){ window.__fwRetry++; setTimeout(window.__renderFibWindow, 400); } return; }
@@ -16209,7 +16365,7 @@ h+=`</div>`;
     tab = tab || window.__obsActivePane || 'macro';
     if(tab !== 'macro' && tab !== 'market') tab = 'macro';
     var names = (tab === 'market')
-      ? ['__renderElliottWave', '__renderFibWindow', '__renderCiticPeObserve', '__renderIndexObserve']
+      ? ['__renderObsSummary', '__renderElliottWave', '__renderFibWindow', '__renderCiticPeObserve', '__renderIndexObserve']
       : [];
     var probe = document.getElementById(tab === 'market' ? 'elliottWaveBody' : 'maharoCard');
     if(probe) probe.setAttribute('data-obspane', tab);
@@ -16217,6 +16373,7 @@ h+=`</div>`;
     // 🛡 2026-09-15 方案3（主人拍板 1+3 组合）：渲染异常/函数缺失不再静默吞——页面内可见降级，
     //   防「渲染 THROW ⇒ 控制台一行 ⇒ 页面留白」式静默卡死；正常路径零改动。
     var __obsFB = {
+      __renderObsSummary: ['obsSummaryBody', 'obsSummaryBody', '&#x1F9ED; 大盘 4 卡汇总解析'],
       __renderElliottWave: ['elliottWaveInner', 'elliottWaveBody', '&#x1F30A; 艾略特波浪 · 深度分析'],
       __renderFibWindow: ['fibWindowBody', 'fibWindowInner', '&#x1F9EC; 斐波那契F观测窗'],
       __renderCiticPeObserve: ['citicPeObserveBody', 'citicPeObserveInner', '&#x1F321; 中信 PE 观测'],
@@ -16357,6 +16514,10 @@ h+=`</div>`;
     hm += '</div>'; // /obsPaneMacro
     // ══ 子页②：📊 大盘观测（4 卡 · 2026-09-15 主人令：原「大盘观察」整页迁入并改名 + 斐波那契F观测窗迁入）══
     hm += '<div id="obsPaneMarket" style="display:' + (_act==='market' ? 'block' : 'none') + ';">';
+    // ── 卡０：大盘 4 卡汇总解析（2026-09-17 主人令：放在大盘观测最顶部）──
+    //   读数口径：WAVE_ELLIOTT / CITIC_PE_THERMO / CITIC_PE_BACKTEST / VALUATION_PERCENTILE / SH_FIB；缺则如实空态
+    hm += '<div class="card" id="obsSummaryBody" style="margin-bottom:16px;border-left:4px solid #a78bfa;">'
+       + '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">🧭 大盘 4 卡汇总解析 加载中…</div></div>';
     // ── 卡1：艾略特波浪 · 深度分析（容器 id / 渲染函数 __renderElliottWave 均未变，仅换宿主）──
     hm += '<div class="card" id="elliottWaveBody" style="margin-bottom:16px;border-left:4px solid #f472b6;">'
        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
