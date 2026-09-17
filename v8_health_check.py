@@ -1853,7 +1853,9 @@ _WINDOW_VAR_ALIASES = {
 #   STOCK_PROFILE 个股资料库（月度刷新） / WEEKEND_META_REPORT 周末复盘（周末生成）
 #   PORTFOLIO 用户真实持仓（手动更新） / PORTFOLIO_COST 持仓成本基准（手动）
 #   CONCEPT_ETF_MAP 概念ETF静态映射（研究参考） / OPTIMIZED_STRATEGY 优化策略（回测产物）
-#   BACKTEST_TDX 回测结果（参数变更才重跑） / BLOAT_CHECK 体积检查（build 时） / HEALTH_CHECK 本检查自产
+#   BLOAT_CHECK 体积检查（build 时） / HEALTH_CHECK 本检查自产
+#   （BACKTEST_TDX 已于 2026-09-18 移出本白名单 —— 它是 E 批每日产物，
+#     原「参数变更才重跑」的理由已过时；详见下方 2026-09-18 摘除说明。）
 #   RUNNER_STATUS_HEALTH runner 心跳（1 分钟级自愈，另有专门检查）
 # 🛡 2026-08-18 一劳永逸补入：
 #   WEEKEND_RUN 周度运行汇总（周末/月初自动跑，工作日基本无变化）→ 加入白名单避免误报 warn

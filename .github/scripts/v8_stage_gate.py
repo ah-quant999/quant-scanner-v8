@@ -49,9 +49,13 @@
            🔴 `AVG_PRICE_DATA` 现为**非 must**：cloud_fetch_v8 的 post_close 档不写其时戳（仅 intraday 写）⇒ 放回 must 会立即复现锁死；须待「方案乙」落地后方可考虑加回。
   B 选股批：9 项产物中 ≥8 项鲜活 + 三重共识/四量终极/逆势龙头（must）必新  ← 以 READY_SPEC["B"] 为唯一真源
   D 汇总批：最终推荐                              → 1/1
-  E 回测批：CRDS 回测 / TDX 回测（任一）+ 全算法回测汇总 → 2/3
-            ⚠️ must=[BACKTEST_ALL_ALGOS]：need 只是**纯计数**，表达不了「哪几项必新」
-               ⇒ 若陈旧项恰为 BACKTEST_ALL_ALGOS 仍会判就绪；must 补齐该漏洞。
+  E 回测批：全算法回测汇总 + TDX 回测（**两项必新 must**）+ CRDS 回测 → 2/3 项
+            ⚠️ 原 must 仅 [BACKTEST_ALL_ALGOS]：need 是**纯计数**，表达不了「哪几项必新」；
+               只占「任一」位的 BACKTEST_TDX 陈旧时**不阻塞**就绪，而健康检查又把它列低频豁免
+               ⇒ **双盲区**。实测后果（2026-09-18）：其产物涨到 76 MB 超 GitHub 单文件上限，
+               推送每次 HTTP 422，线上停更 4 天而**全链零红灯**。现 must 补为两项；第 3 项 CRDS
+               不参与否决（不引入「三项全中」过紧约束）。⚠️ 提 must 前必核不变式：
+               must ⊆ dedup_fetch_manifest.py::_ALWAYS_PUSH。
             🔴 2026-09-14 主人令更正：候选池 / 金股池(=黄金池) 是算法**上游水源**、
                不是选股策略 ⇒ **不需要回测**。原 CANDIDATE_BACKTEST / GOLD_POOL_BACKTEST
                两项已从 items/must 移除（并删除 algorithms/backtest_pools.py）。
