@@ -1,16 +1,12 @@
 {
-  "update_time": "2026-09-17 18:52:12",
-  "run_start": "2026-09-17 18:29:01",
-  "ok": 25,
-  "fail": 2,
+  "update_time": "2026-09-17 20:02:52",
+  "run_start": "2026-09-17 19:59:06",
+  "ok": 1,
+  "fail": 0,
   "failed_scripts": [
     {
       "script": "strategy_four_volume_60m.py",
-      "reason": "退出码 1 |      → 保留上次真实产物（不写假 0），本脚本以退出码 1 上报失败"
-    },
-    {
-      "script": "refresh_dividend_cninfo.py",
-      "reason": "监督器静默杀(>15min 无输出)"
+      "reason": "四量60m 输入陈旧（FOUR_VOLUME_60M.js(仍陈旧)）——已回退日线版，计为失败项"
     }
   ],
   "skipped_by_time_gate": []
