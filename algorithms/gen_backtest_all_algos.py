@@ -298,6 +298,86 @@ def _hold_days_of(key):
     return int(m.group(1)) if m else None
 
 
+# ── 🆕 2026-09-17 小九的股票专家（主人令「星级基准超额数据缺失→从回测产物侧补」）──────
+# 基准超额数据层接线：raw_data/market_bench.json（gen_market_bench.py 产出，与策略
+# 同入场/出场/成本口径）→ rows[].extra.bench_avg_return / bench_win_rate / bench_days。
+# 口径唯一：基准只在数据层算、差值在前端算（index.html __committeePeriods 已按此约定消费）。
+# 诚实铁律：按「该行真实信号区间 ∩ 基准覆盖区间」求平均；区间不可解析 → 不写（前端显示 —）；
+# 覆盖 <10 个基准交易日 → 不写（宁缺勿滥）；覆盖不满时附 bench_from/bench_to 供核查（不冒充全覆盖）。
+_BENCH_RANGE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})\s*~\s*(\d{4}-\d{2}-\d{2})")
+_BENCH_YEARS_RE = re.compile(r"近\s*(\d+)\s*年")
+_BENCH_MIN_DAYS = 10
+
+
+def _load_bench(root):
+    try:
+        p = os.path.join(str(root), "raw_data", "market_bench.json")
+        with open(p, encoding="utf-8") as f:
+            bd = (json.load(f) or {}).get("by_date") or {}
+        return bd or None
+    except Exception:
+        return None
+
+
+def _bench_range_of(text, day):
+    """signal_date_range 文案 → (start, end)；支持 'YYYY-MM-DD ~ YYYY-MM-DD' 与 '近 N 年'。"""
+    if not text:
+        return None
+    t = str(text)
+    m = _BENCH_RANGE_RE.search(t)
+    if m:
+        a, b = m.group(1), m.group(2)
+        return (a, b) if a <= b else (b, a)
+    m = _BENCH_YEARS_RE.search(t)
+    if m and day:
+        try:
+            d0 = dt.datetime.strptime(str(day), "%Y-%m-%d").date()
+        except Exception:
+            return None
+        start = (d0 - dt.timedelta(days=365 * int(m.group(1)))).strftime("%Y-%m-%d")
+        return (start, str(day))
+    return None
+
+
+def _attach_bench(rows, bench, day):
+    n_att = 0
+    if not bench:
+        return 0
+    for r in rows:
+        if r.get("hold") is None:
+            continue
+        hd = _hold_days_of(r["hold"])
+        if hd is None:
+            continue
+        src_rng = r.pop("_src_range", None)
+        rng = (_bench_range_of((r.get("extra") or {}).get("signal_date_range"), day)
+               or src_rng)
+        if not rng:
+            continue
+        start, end = rng
+        vals, wins, days_hit = [], [], []
+        for d, per in bench.items():
+            if start <= d <= end:
+                b = per.get(str(hd)) or {}
+                if b.get("avg") is not None:
+                    vals.append(b["avg"])
+                    wins.append(b.get("win"))
+                    days_hit.append(d)
+        if len(vals) < _BENCH_MIN_DAYS:
+            continue
+        ex = r.setdefault("extra", {})
+        ex["bench_avg_return"] = round(sum(vals) / len(vals), 4)
+        _w = [x for x in wins if x is not None]
+        if _w:
+            ex["bench_win_rate"] = round(sum(_w) / len(_w), 2)
+        ex["bench_days"] = len(vals)
+        if days_hit[0] > start or days_hit[-1] < end:
+            ex["bench_from"] = days_hit[0]
+            ex["bench_to"] = days_hit[-1]
+        n_att += 1
+    return n_att
+
+
 def parse_comprehensive(src, obj):
     """BACKTEST_COMPREHENSIVE：共振三档 × **每个持有期一行**（统一 10/12 档矩阵）。
 
@@ -578,7 +658,16 @@ def build(root, day, kind, note, extra_note=""):
                     f"源未在数据日 {day} 刷新（最后 {r['source_time'] or '未知'}）"
             ov = r.pop("_primary_override", None)
             r["is_primary"] = bool(ov) if ov is not None else (r["label"] == src.get("primary"))
+            # 🆕 2026-09-17 基准超额接线：记下该源 summary 的信号区间（供统一补基准）
+            r["_src_range"] = (_bench_range_of(((obj or {}).get("summary") or {})
+                                               .get("signal_date_range"), day) if obj else None)
             rows.append(r)
+
+    # ── 🆕 2026-09-17 基准超额统一接线（主人令「全站口径统一·诚实」）────────────
+    _bench = _load_bench(root)
+    _bench_n = _attach_bench(rows, _bench, day)
+    print("[bench] 基准超额接线：%d/%d 行补 bench_avg_return" % (_bench_n, len(rows))
+          + ("" if _bench else "（raw_data/market_bench.json 不存在或为空 → 本轮不补，前端显示 —）"))
 
     # ── 卡级主表（主人要的「按收益率和胜率从高到低排序」）──
     #   🔴 诚实性铁律①：**只比同口径**。主表每张卡只取 1 行「既定主口径」，
@@ -656,6 +745,9 @@ def build(root, day, kind, note, extra_note=""):
     return {
         "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
         "data_day": day,
+        "bench_note": ("基准超额口径：extra.bench_avg_return = 各卡信号区间∩基准覆盖区间的"
+                       "全市场等权基准均收益（gen_market_bench.py，与策略同入场/出场/成本口径）；"
+                       "前端以 avg_return − bench 求差；区间覆盖不满时附 bench_from/bench_to 供核查。"),
         "chain_kind": kind,
         "chain_note": note + (("；" + extra_note) if extra_note else ""),
         "min_samples": MIN_SAMPLES,
