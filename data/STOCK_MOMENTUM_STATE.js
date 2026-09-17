@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-17 18:21",
- "generated": "2026-09-17 18:21",
+ "update_time": "2026-09-17 19:17",
+ "generated": "2026-09-17 19:17",
  "meta": {
-  "generated": "2026-09-17 18:21",
+  "generated": "2026-09-17 19:17",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 10,
   "days_with_consensus": 0,
@@ -2891,6 +2891,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "688004",
+      "name": "博汇科技",
+      "change_pct": 12.903,
+      "price": 37.1,
+      "category": "突破"
+     },
+     {
       "code": "600540",
       "name": "新赛股份",
       "change_pct": 3.416,
@@ -2898,10 +2905,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "688004",
-      "name": "博汇科技",
-      "change_pct": 12.903,
-      "price": 37.1,
+      "code": "688137",
+      "name": "近岸蛋白",
+      "change_pct": 18.75,
+      "price": 99.75,
       "category": "突破"
      },
      {
@@ -3010,10 +3017,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "605058",
-      "name": "澳弘电子",
-      "change_pct": 9.993,
-      "price": 48.76,
+      "code": "603236",
+      "name": "移远通信",
+      "change_pct": 5.621,
+      "price": 73.66,
       "category": "突破"
      }
     ],
@@ -3026,6 +3033,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
+      "code": "688004",
+      "name": "博汇科技",
+      "change_pct": 12.903,
+      "price": 37.1,
+      "category": "加速"
+     },
+     {
       "code": "600540",
       "name": "新赛股份",
       "change_pct": 3.416,
@@ -3033,10 +3047,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "688004",
-      "name": "博汇科技",
-      "change_pct": 12.903,
-      "price": 37.1,
+      "code": "688137",
+      "name": "近岸蛋白",
+      "change_pct": 18.75,
+      "price": 99.75,
       "category": "加速"
      },
      {
@@ -3154,6 +3168,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688004",
+      "name": "博汇科技",
+      "change_pct": 12.903,
+      "price": 37.1,
+      "category": "短线选股"
+     },
+     {
       "code": "600540",
       "name": "新赛股份",
       "change_pct": 3.416,
@@ -3161,10 +3182,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "688004",
-      "name": "博汇科技",
-      "change_pct": 12.903,
-      "price": 37.1,
+      "code": "688137",
+      "name": "近岸蛋白",
+      "change_pct": 18.75,
+      "price": 99.75,
       "category": "短线选股"
      },
      {
@@ -3273,19 +3294,19 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "605058",
-      "name": "澳弘电子",
-      "change_pct": 9.993,
-      "price": 48.76,
+      "code": "603236",
+      "name": "移远通信",
+      "change_pct": 5.621,
+      "price": 73.66,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "605058",
-      "name": "澳弘电子",
-      "change_pct": 9.993,
-      "price": 48.76,
+      "code": "603236",
+      "name": "移远通信",
+      "change_pct": 5.621,
+      "price": 73.66,
       "category": "强势股"
      }
     ]
