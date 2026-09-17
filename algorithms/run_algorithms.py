@@ -821,7 +821,9 @@ def _gate_hardwait_four_volume(run_start, max_retry=3, wait_sec=90, total_budget
             _gto = _script_timeout("strategy_four_volume.py")
             # 收敛到剩余预算（下限 600s）：保证整段硬等待总耗时 ≤ 预算 + 600s，而非 3×5400s 叠加
             _gto = max(600, min(_gto, int(total_budget_sec - _used)))
-            r = subprocess.run([PY, prod], cwd=ALGO, capture_output=True, text=True, timeout=_gto)
+            _fv_env = dict(os.environ)
+            _fv_env["V8_BACKTEST_YEARS"] = "5"  # 防重跑写回3年降级档，与L440 SCRIPT_ENV(E批)同口径
+            r = subprocess.run([PY, prod], cwd=ALGO, capture_output=True, text=True, timeout=_gto, env=_fv_env)
             print(f"     {'✅' if r.returncode == 0 else '⚠️ 退出码 ' + str(r.returncode)} 重跑 strategy_four_volume.py")
         except Exception as e:
             print(f"     ❌ 重跑 strategy_four_volume.py 异常: {e}")
