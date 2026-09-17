@@ -982,6 +982,12 @@ jobs:
           #    原设计依赖「哨兵 e7b2e732 + 4 个时间点兜底」，五个 automation 全 PAUSED
           #    → 实证 09-11 全天 STOCK_QUOTE 停在昨日 15:03，靠人工兜底才刷新一次。
           #    现挂到本链上，与抓取同频（约 15-18 分钟一次），不再依赖任何本机定时器。
+          #    🔴 2026-09-17 阿狸咪的工程师·口径补注（判据 92）：此处派发的是 **云端兜底链**
+          #    （v8_stock_quote_refresh_cloud.yml，ubuntu-latest·美国 IP）；**主链**
+          #    （v8_stock_quote_refresh.yml，[self-hosted, cn]·中国 IP）不在本链派发面内。
+          #    实测 09-17：主链 4 轮（自身 schedule）/ 兜底链 27 轮（10:05-15:02）。
+          #    ⇒ 与兜底链头部契约「平时不跑、仅哨兵 v3 接单超时派发」存在口径冲突，
+          #      列为**待拍板项**；本轮只留痕、不改行为（避免给云端刷无用 run）。
           try:
               api("POST",
                   f"https://api.github.com/repos/{repo}/actions/workflows/v8_stock_quote_refresh_cloud.yml/dispatches",

@@ -217,7 +217,14 @@ from collections import defaultdict
 REPO = "ah-quant999/quant-scanner-v8"
 CN_WORKFLOW_ID = 327687211   # 🇨🇳 v8 中国数据抓取(云端)（v8_cn_fetch_cloud.yml）
 ALGO_WORKFLOW_ID = 324119592  # ☁️ v8 盘后算法链（v8_algo_cloud.yml）
-STOCK_QUOTE_WORKFLOW_ID = 336548691  # 📈 v8 STOCK_QUOTE 轻量 refresh（v8_stock_quote_refresh.yml，云端 ubuntu-latest）
+# 🔴 2026-09-17 阿狸咪的工程师·口径纠正（判据 92「注释与实体错配」）：
+#   本行原注「云端 ubuntu-latest」与**实体相反** —— 336548691 的官方档案 path =
+#   .github/workflows/v8_stock_quote_refresh.yml，其 job 已于 2026-09-08 主人令回迁
+#   runs-on=[self-hosted, cn]（小九单位机·中国 IP，绕开美国 IP 盘中反爬）。
+#   ⇒ 本常量派发的是**主链（小九单位机）**：小九机离线时该 run 只会**排队**，不会
+#     自动改派云端；离线兜底由哨兵 v3 派发 v8_stock_quote_refresh_cloud.yml 承担
+#     （仓内另有 1 处派发点：v8_cn_fetch_cloud.yml relay ②，同样指向该兜底链）。
+STOCK_QUOTE_WORKFLOW_ID = 336548691
 SELFHEAL_PATH = DATA_DIR / "freshness_selfheal.json"
 SELFHEAL_COOLDOWN_MIN = 30   # 同 category 自愈派发冷却，避免每小时重复派发刷爆 runner
 
@@ -330,7 +337,8 @@ def _dispatch_algo(token):
 
 
 def _dispatch_stock_quote(token):
-    """派发 v8_stock_quote_refresh.yml（云端 ubuntu-latest）重抓个股行情，用于 STOCK_QUOTE stale 自愈。"""
+    """派发 v8_stock_quote_refresh.yml（主链 · [self-hosted, cn] 小九单位机）重抓个股行情，
+    用于 STOCK_QUOTE stale 自愈。小九机离线时本 run 仅排队，离线兜底见哨兵 v3。"""
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{STOCK_QUOTE_WORKFLOW_ID}/dispatches"
     hdr = {
         "Authorization": f"Bearer {token}",
@@ -349,7 +357,7 @@ def _dispatch_stock_quote(token):
 
 
 def _heal_stock_quote(token, sh, now, items):
-    """STOCK_QUOTE 专属自愈：30min 冷却去重 + 派发 v8_stock_quote_refresh.yml（云端）。"""
+    """STOCK_QUOTE 专属自愈：30min 冷却去重 + 派发 v8_stock_quote_refresh.yml（主链 self-hosted）。"""
     last = sh.get("stock_quote", {}).get("ts")
     if last:
         try:
@@ -362,7 +370,7 @@ def _heal_stock_quote(token, sh, now, items):
     ok, msg = _dispatch_stock_quote(token)
     if ok:
         sh["stock_quote"] = {"ts": now.strftime("%Y-%m-%d %H:%M:%S"), "vars": [v for v, _ in items]}
-        print(f"  [自愈✓] 派发 stock_quote(云端) 刷新 {', '.join(v for v, _ in items)}（HTTP {msg}）")
+        print(f"  [自愈✓] 派发 stock_quote(主链 self-hosted) 刷新 {', '.join(v for v, _ in items)}（HTTP {msg}）")
         return True
     else:
         print(f"  [自愈✗] stock_quote 派发失败: {msg}（{', '.join(v for v, _ in items)}）")
