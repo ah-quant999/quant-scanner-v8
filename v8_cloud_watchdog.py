@@ -467,17 +467,20 @@ _ALGO_ACCT_STEP_KEY = "结果问责"
 
 
 def _algo_step_conclusions(run_id):
-    """取 run 的 (闸门步结论列表, 问责步结论列表, 失败步名列表)。
+    """取 run 的 (闸门步结论列表, 问责步结论列表, 失败步名列表, job 数)。
 
-    失败时返回 (None, None, None) —— 调用方按「判据不可得」走保守路径（照常告警）。
+    失败时返回 (None, None, None, None) —— 调用方按「判据不可得」走保守路径。
+    job 数为 0 表示该 run 的 job 从未启动（被 concurrency 抢占后 cancel 的僵尸 run），
+    这与「取不到判据」语义不同：它天然不应告警。
     """
     if not run_id:
-        return None, None, None
+        return None, None, None, None
     d = api_get(f"https://api.github.com/repos/{REPO}/actions/runs/{run_id}/jobs")
     if "__error__" in d:
-        return None, None, None
+        return None, None, None, None
+    jobs = d.get("jobs", []) or []
     gate, acct, failed_names = [], [], []
-    for job in d.get("jobs", []) or []:
+    for job in jobs:
         for s in job.get("steps", []) or []:
             nm = s.get("name") or ""
             con = s.get("conclusion")
@@ -487,30 +490,58 @@ def _algo_step_conclusions(run_id):
                 acct.append(con)
             if con == "failure":
                 failed_names.append(nm)
-    return gate, acct, failed_names
+    return gate, acct, failed_names, len(jobs)
 
 
-def classify_algo_run(run_id):
-    """返回 (kind, why)。kind ∈ {gate_reject, real_failure, ok, unknown}。
+def classify_algo_run(run_id, run_conclusion=None):
+    """返回 (kind, why)。kind ∈ {gate_reject, real_failure, ok, no_job, cancelled, unknown}。
 
     gate_reject  —— 闸门合规拒绝：非故障、不告警，看板显示「合规拒绝」。
-    real_failure —— 真故障：必须告警。
-    unknown      —— 判据不可得（API 失败 / 步名变更）⇒ 调用方按真故障处理（宁可误报不漏报）。
+    real_failure —— 真故障：必须告警。**仅在 run.conclusion == "failure" 时成立。**
+    no_job       —— run 的 job 从未启动（被 concurrency 抢占后 cancel 的僵尸 run）：
+                    非故障、不告警。
+    cancelled    —— run 被取消（conclusion == "cancelled"，非 failure）：
+                    算法被外部打断，不算故障、不告警。
+    unknown      —— 判据不可得（API 失败 / 步名变更）：调用方按真故障处理（宁可误报不漏报）。
+
+    ⚠️ 2026-09-17 实测校正（run#1896）：run.conclusion=cancelled 时 step9「运行盘后算法链」
+       也是 cancelled（非 failure），而 step17「结果问责」仍可能 failure ⇒ 若不加
+       conclusion 前置门，会把「被取消的 run」误判成 real_failure ⇒ 又一轮误报。
+       ⇒ 硬规则：conclusion != "failure" 的 run，永不判 real_failure。
     """
-    gate, acct, failed = _algo_step_conclusions(run_id)
+    gate, acct, failed, n_jobs = _algo_step_conclusions(run_id)
     if gate is None:
         return "unknown", "未能取到 run 的 step 结论（API 错误），按真故障保守处理"
+    if n_jobs == 0:
+        # 2026-09-17：实测 run#1889/1890/1892（schedule，cancelled）job 列表为空 ——
+        # concurrency 抢占后 job 从未启动。这类 run 什么都没跑，判真故障是误报。
+        return "no_job", "该 run 的 job 从未启动（被 concurrency 抢占后取消）—— 合规空转，非故障"
+    # ⚠️ 2026-09-17 实测校正（run#1882）：GitHub 对「未被执行的步」有时返回
+    #   conclusion=None（不是 skipped）。若把 None 当成「通过」，会把真实 failure
+    #   吞成 ok（r#1882 就是 con=failure / gate=success / acct=None ⇒ 误判 ok）。
+    #   ⇒ 只把显式 "success" 当作通过；None/其他一律视为「无结论」。
+    gate_ok = ("success" in gate) if gate else None
+    acct_ok = ("success" in acct) if acct else None
     gate_failed = ("failure" in gate) if gate else None
     acct_failed = ("failure" in acct) if acct else None
     if gate_failed and acct_failed:
         return "gate_reject", "闸门正常拒绝（上游未就绪），下游步骤全部 skipped —— 合规，非故障"
+    # 🔴 硬门：非 failure 结论的 run 一律不判真故障（见 docstring run#1896 实证）
+    if run_conclusion is not None and run_conclusion != "failure":
+        if gate_ok and acct_ok:
+            return "ok", "闸门放行 + 问责通过"
+        return "cancelled", (f"run 结论为 {run_conclusion}（非 failure）—— "
+                             f"算法被外部打断（gate={gate} acct={acct}），非故障")
+    # run_conclusion == "failure"（或未传）：
+    if gate_ok and acct_ok:
+        return "ok", "闸门放行 + 问责通过"
     if gate_failed is False and acct_failed:
         return "real_failure", "闸门已放行但结果问责未通过（算法跑了、产物不合格）"
     if gate_failed and acct_failed is False:
         return "real_failure", "闸门步 failure 而问责步 success（口径异常）"
-    if gate_failed is False and acct_failed is False:
-        return "ok", "闸门放行 + 问责通过"
-    return "unknown", f"步名未命中（gate={gate} acct={acct}），按真故障保守处理"
+    # 兜底：run=failure 但闸门/问责取不到明确结论（如 acct=None）⇒ 真故障，宁可误报不漏报。
+    return "real_failure", (f"run 结论 failure 但闸门/问责步结论不完整"
+                            f"（gate={gate} acct={acct}）—— 按真故障保守处理")
 
 
 def check_algo_chain():
@@ -572,7 +603,9 @@ def check_algo_chain():
     #   闸门正常拒绝（上游未就绪）与真故障的 run.conclusion **都是 failure**，
     #   旧实现一律 is_failure=True ⇒ 每轮告警 ⇒ 真 P0 被埋。
     #   ⇒ 按 step 结论分流：合规拒绝不告警（只标注），真故障照常告警。
-    kind, why = classify_algo_run(run.get("id"))
+    #   ⚠️ 必须把 run 自身的 conclusion 传进去：run 被 cancelled 时 step17 问责也可能
+    #      failure，不传会把「被取消」误判成真故障（run#1896 实证）。
+    kind, why = classify_algo_run(run.get("id"), run_conclusion=con)
     is_failure = (status == "completed" and con == "failure") or (kind == "real_failure")
 
     if status == "completed" and con == "failure" and kind == "gate_reject":
@@ -580,6 +613,22 @@ def check_algo_chain():
         # 不是管线故障。返回 ok=True（不触发告警/自愈），detail 标注留痕。
         return True, (f"algo 链 run #{r_num_done} 合规拒绝 @ {created_str} "
                       f"(age {fmt_age(age_min)}) —— {why}"), False
+
+    if kind in ("no_job", "cancelled"):
+        # ① no_job：job 从未启动的僵尸 run（被 concurrency 抢占后 cancel）；
+        # ② cancelled：run 被外部取消（conclusion=cancelled），算法被中途打断。
+        # 两者都不是「算法失败」⇒ 返回 ok=True 不告警，detail 留痕。
+        return True, (f"algo 链 run #{r_num_done} {status}/{con} @ {created_str} "
+                      f"(age {fmt_age(age_min)}) —— {why}"), False
+
+    # 🛡 2026-09-17 补：kind==ok 但 run 被 cancelled（外部取消，非算法故障）。
+    #   实测 run#1888/1891/1895/1897：闸门 success + 问责 success，但 run.conclusion=cancelled
+    #   （多为我方派发/重派前主动 cancel 或 concurrency 顶掉）。旧口径 `con == "success"`
+    #   会判 ok=False ⇒ 又一轮误报。取消不是故障，返回 ok=True 不告警。
+    if kind == "ok" and con == "cancelled":
+        return True, (f"algo 链 run #{r_num_done} {status}/{con} @ {created_str} "
+                      f"(age {fmt_age(age_min)}) —— 闸门与问责均通过，run 被取消"
+                      f"（外部 cancel / concurrency 顶掉），非故障"), False
 
     ok = status == "completed" and con == "success"
     detail = f"algo 链 {status}/{con} @ {created_str} (age {fmt_age(age_min)})"
@@ -589,7 +638,7 @@ def check_algo_chain():
         detail += f" | {why}"
     elif kind == "unknown" and status == "completed" and con == "failure":
         detail += f" | ⚠ {why}"
-    # 盘后窗口内距上次成功过久 → 漏跑（合规拒绝不算「成功」，故不参与新鲜度判断）
+    # 盘后窗口内距上次成功过久 → 漏跑（合规拒绝/僵尸空转不算「成功」，故不参与新鲜度判断）
     if ok and age_min > ALGO_STALE_MIN and in_schedule_window("algo", now_cst):
         ok = False
         detail += (f" | 距上次成功 {fmt_age(age_min)} > {fmt_age(ALGO_STALE_MIN)}"
