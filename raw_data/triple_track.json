@@ -1,11 +1,101 @@
 {
-  "update_time": "2026-09-17 06:48:50",
+  "update_time": "2026-09-17 18:33:16",
   "data_date": "2026-09-17",
   "track_start": "2026-09-17",
   "history_days": 23,
   "strict_count": 0,
   "near_count": 10,
   "tracked": [
+    {
+      "code": "301308",
+      "name": "江波龙",
+      "market": "sz",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 34.8,
+      "quality_grade": "",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "MSCI中国",
+        "计算机、通信和其他电子设备制造业",
+        "2026中报预增",
+        "AI眼镜",
+        "深证100R",
+        "信创",
+        "AI手机",
+        "小米汽车"
+      ],
+      "signal_count": 1,
+      "enter_date": "2026-09-15",
+      "hold_days": 2,
+      "consecutive_days": 3,
+      "first_close": 328.5,
+      "current_close": 335.09,
+      "pnl_pct": 2.01,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "000977",
+      "name": "浪潮信息",
+      "market": "sz",
+      "board": "主板",
+      "status": "near",
+      "total_score": 31.1,
+      "quality_grade": "",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "国产软件",
+        "MSCI中国",
+        "计算机、通信和其他电子设备制造业",
+        "2026中报预增",
+        "元宇宙概念",
+        "车联网(车路云)",
+        "信创",
+        "百度概念"
+      ],
+      "signal_count": 1,
+      "enter_date": "2026-09-15",
+      "hold_days": 2,
+      "consecutive_days": 3,
+      "first_close": 68.76,
+      "current_close": 69.81,
+      "pnl_pct": 1.53,
+      "catalysts": []
+    },
+    {
+      "code": "300390",
+      "name": "天华新能",
+      "market": "sz",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 33.9,
+      "quality_grade": "",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "MSCI中国",
+        "计算机、通信和其他电子设备制造业",
+        "独角兽",
+        "2026一季报预增",
+        "深股通",
+        "固态电池",
+        "锂矿概念",
+        "医疗器械概念"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-09-15",
+      "hold_days": 2,
+      "consecutive_days": 3,
+      "first_close": 52.3,
+      "current_close": 52.67,
+      "pnl_pct": 0.71,
+      "catalysts": []
+    },
     {
       "code": "688795",
       "name": "摩尔线程",
@@ -22,10 +112,16 @@
       "enter_date": "2026-09-17",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 350.4,
-      "current_close": 350.4,
+      "first_close": 395.58,
+      "current_close": 395.58,
       "pnl_pct": 0.0,
-      "catalysts": []
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
     },
     {
       "code": "01109",
@@ -43,90 +139,6 @@
       "consecutive_days": 3,
       "first_close": 28.48,
       "current_close": 28.48,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "301308",
-      "name": "江波龙",
-      "market": "sz",
-      "board": "创业板",
-      "status": "near",
-      "total_score": 31.1,
-      "quality_grade": "",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "信创",
-        "深证100R",
-        "AI眼镜",
-        "AI手机",
-        "MSCI中国",
-        "2026中报预增",
-        "小米汽车",
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 2,
-      "enter_date": "2026-09-15",
-      "hold_days": 2,
-      "consecutive_days": 3,
-      "first_close": 328.5,
-      "current_close": 328.5,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "000977",
-      "name": "浪潮信息",
-      "market": "sz",
-      "board": "主板",
-      "status": "near",
-      "total_score": 31.1,
-      "quality_grade": "",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "信创",
-        "国产软件",
-        "元宇宙概念",
-        "百度概念",
-        "车联网(车路云)",
-        "MSCI中国",
-        "2026中报预增",
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 2,
-      "enter_date": "2026-09-15",
-      "hold_days": 2,
-      "consecutive_days": 3,
-      "first_close": 68.76,
-      "current_close": 68.76,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "300390",
-      "name": "天华新能",
-      "market": "sz",
-      "board": "创业板",
-      "status": "near",
-      "total_score": 30.2,
-      "quality_grade": "",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "2026一季报预增",
-        "锂矿概念",
-        "医疗器械概念",
-        "深股通",
-        "MSCI中国",
-        "固态电池",
-        "计算机、通信和其他电子设备制造业",
-        "独角兽"
-      ],
-      "signal_count": 2,
-      "enter_date": "2026-09-15",
-      "hold_days": 2,
-      "consecutive_days": 3,
-      "first_close": 52.3,
-      "current_close": 52.3,
       "pnl_pct": 0.0,
       "catalysts": []
     },
@@ -558,10 +570,10 @@
         "industry": "计算机、通信和其他电子设备制造业",
         "count": 4,
         "names": [
-          "摩尔线程",
           "江波龙",
           "浪潮信息",
-          "天华新能"
+          "天华新能",
+          "摩尔线程"
         ]
       }
     ],
@@ -575,19 +587,19 @@
         "count": 3
       },
       {
-        "sector": "信创",
-        "count": 2
-      },
-      {
         "sector": "2026中报预增",
         "count": 2
       },
       {
-        "sector": "深证100R",
-        "count": 1
+        "sector": "信创",
+        "count": 2
       },
       {
         "sector": "AI眼镜",
+        "count": 1
+      },
+      {
+        "sector": "深证100R",
         "count": 1
       },
       {
@@ -607,23 +619,19 @@
         "count": 1
       },
       {
-        "sector": "百度概念",
-        "count": 1
-      },
-      {
         "sector": "车联网(车路云)",
         "count": 1
       },
       {
+        "sector": "百度概念",
+        "count": 1
+      },
+      {
+        "sector": "独角兽",
+        "count": 1
+      },
+      {
         "sector": "2026一季报预增",
-        "count": 1
-      },
-      {
-        "sector": "锂矿概念",
-        "count": 1
-      },
-      {
-        "sector": "医疗器械概念",
         "count": 1
       },
       {
@@ -635,7 +643,11 @@
         "count": 1
       },
       {
-        "sector": "独角兽",
+        "sector": "锂矿概念",
+        "count": 1
+      },
+      {
+        "sector": "医疗器械概念",
         "count": 1
       }
     ],

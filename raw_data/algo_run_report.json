@@ -1,12 +1,16 @@
 {
-  "update_time": "2026-09-17 18:12:12",
-  "run_start": "2026-09-17 18:05:27",
-  "ok": 13,
-  "fail": 1,
+  "update_time": "2026-09-17 18:52:12",
+  "run_start": "2026-09-17 18:29:01",
+  "ok": 25,
+  "fail": 2,
   "failed_scripts": [
     {
-      "script": "scripts/fetch_sector_leaders.py",
-      "reason": "退出码 1 | AttributeError: 'bytes' object has no attribute 'encode'. Did you mean: 'decode'?"
+      "script": "strategy_four_volume_60m.py",
+      "reason": "退出码 1 |      → 保留上次真实产物（不写假 0），本脚本以退出码 1 上报失败"
+    },
+    {
+      "script": "refresh_dividend_cninfo.py",
+      "reason": "监督器静默杀(>15min 无输出)"
     }
   ],
   "skipped_by_time_gate": []
