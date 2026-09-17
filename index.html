@@ -9061,6 +9061,130 @@ function switchSec(sec,el){
     return h;
   }
 
+  /* ===== 算法现场评分（2026-09-17 主人令：三层结构 结论置顶/双口径/依据，前端实时算零体积） ===== */
+  function renderAlgoScore(item, code){
+    const nc = normCode(code);
+    const SQ = window.STOCK_QUOTE || {};
+    const sq = SQ.stocks || {};
+    const fc = item.full_code || ((item.market||'')+code);
+    const q = sq[fc];
+    if(!q || q.price==null) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🧮 算法现场评分：未收录</div>';
+
+    // === 口径①：策略命中（复用全站命中源） ===
+    const hits=[];
+    const top = window.TOP10_DAILY || {};
+    const trow = (top.top10||[]).find(r=>normCode(r.code)===nc);
+    if(trow) hits.push({name:'🧬 三重共识', detail:'排名 #'+trow.rank+' · 评分 '+trow.total_score});
+    const gp = window.GOLD_POOL || {};
+    const gstocks = gp.stocks || {};
+    const gkey = Object.keys(gstocks).find(k=>normCode(gstocks[k].code)===nc);
+    if(gkey) hits.push({name:'⭐ 金股池', detail:'累计信号 '+(gstocks[gkey].signal_count||0)});
+    const cd = window.CANDIDATE || {};
+    const cstocks = cd.stocks || {};
+    const ckey = Object.keys(cstocks).find(k=>normCode(cstocks[k].code)===nc);
+    if(ckey) hits.push({name:'🎯 候选池', detail:(cstocks[ckey].sources||[]).join(' / ')});
+    const crds = window.CRDS_CARD_DATA||{};
+    let crdsCond='';
+    if((crds.cond1_list||[]).find(r=>normCode(r.code)===nc)) crdsCond='条件① 逆势涨停';
+    else if((crds.cond2_list||[]).find(r=>normCode(r.code)===nc)) crdsCond='条件② 大跌日涨停';
+    else if((crds.cond3_list||[]).find(r=>normCode(r.code)===nc)) crdsCond='条件③ 强α';
+    if(crdsCond) hits.push({name:'🐉 逆势龙头', detail:crdsCond});
+    const fv = window.FOUR_VOLUME || {};
+    const frow = window._safeArr(fv.stocks).find(r=>normCode(r.code)===nc);
+    if(frow) hits.push({name:'🔥 四量终极', detail:'游资+机构+金叉+四路翻多'});
+    const hitN = hits.length;
+
+    // === 口径②：算法综合分（技术面+基本面+资金面，0-100） ===
+    const pct = q.pct||0;
+    const amount = q.amount||0;
+    let fTech = 50 + pct*3;
+    if(amount>3e8 && pct>0) fTech += 8;
+    else if(amount>3e8 && pct<0) fTech -= 6;
+    fTech = Math.max(0, Math.min(100, fTech));
+    const f = q.fundamental || {};
+    let fFund;
+    if(f.score!=null) fFund = f.score;
+    else { const gm={A:85,B:70,C:55,D:35}; fFund = f.grade ? gm[f.grade] : 50; }
+    let flowScore = 50;
+    const p = getProfile(code, item);
+    const concepts = (p&&p.concepts)||[];
+    const cr = window.CONCEPT_RANKING || {};
+    const clist = cr.list || cr.ranking || cr.data || [];
+    let netInflowYi = 0, matchedConcepts = 0;
+    concepts.forEach(function(c){
+      const row = clist.find(function(r){ return (r.name||r.concept||'')===c; });
+      if(row && row.net_inflow!=null){ netInflowYi += Number(row.net_inflow); matchedConcepts++; }
+    });
+    if(matchedConcepts>0){
+      const avgYi = netInflowYi/matchedConcepts/1e4;
+      flowScore += Math.max(-25, Math.min(35, avgYi*4));
+    }
+    const lhb = window.LHB_DATA || {};
+    const lrow = (lhb.stocks||[]).find(r=>normCode(r.code)===nc);
+    if(lrow){
+      const inst = (lrow.inst_net_万||0)/1e4;
+      const yz = (lrow.yz_net_万||0)/1e4;
+      flowScore += Math.max(-15, Math.min(20, (inst+yz)*1.5));
+    }
+    flowScore = Math.max(0, Math.min(100, flowScore));
+    const composite = Math.round(0.4*fTech + 0.3*fFund + 0.3*flowScore);
+
+    let gColor, verdict;
+    if(composite>=70) gColor='var(--up)';
+    else if(composite>=50) gColor='var(--gold)';
+    else gColor='var(--down)';
+    if(hitN>=3) verdict='🟢 算法+策略双强共振';
+    else if(composite>=70) verdict='🟢 算法偏多';
+    else if(composite<50) verdict='🔴 算法偏空';
+    else verdict='⏸ 算法中性';
+
+    let h='<div style="padding:12px;background:linear-gradient(135deg,rgba(167,139,250,.10),rgba(56,189,248,.04));border-radius:8px;border:1px solid rgba(167,139,250,.3);">';
+    // 层1 结论置顶
+    h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">';
+    h+='<span style="font-size:13px;font-weight:700;color:#a78bfa;">🧮 算法现场评分</span>';
+    h+='<span style="font-size:26px;font-weight:800;color:'+(composite>=70?'var(--up)':composite>=50?'var(--gold)':'var(--down)')+';">'+composite+'</span><span style="font-size:12px;color:var(--dim);">/100</span>';
+    h+='<span style="margin-left:auto;font-size:12px;font-weight:700;color:#fff;background:'+gColor+';padding:3px 10px;border-radius:8px;">'+verdict+'</span>';
+    h+='</div>';
+    // 层2 双口径
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">';
+    h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:8px;">';
+    h+='<div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:5px;">口径① 策略命中 <b style="color:'+(hitN>=3?'var(--up)':hitN>=1?'var(--gold)':'var(--dim)')+'">'+hitN+'</b> 项</div>';
+    if(hits.length){
+      h+='<div style="display:flex;flex-direction:column;gap:3px;">';
+      hits.forEach(function(hit){
+        h+='<div style="font-size:11px;color:var(--txt);"><b style="color:var(--gold);">'+hit.name+'</b> <span style="color:var(--dim);">'+hit.detail+'</span></div>';
+      });
+      h+='</div>';
+    } else {
+      h+='<div style="font-size:11px;color:var(--dim);">未命中任何选股策略</div>';
+    }
+    h+='</div>';
+    h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:8px;">';
+    h+='<div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:5px;">口径② 算法综合分</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:4px;">';
+    h+=_algoScoreBar('技术面', Math.round(fTech), '#38bdf8');
+    h+=_algoScoreBar('基本面', Math.round(fFund), '#22c55e');
+    h+=_algoScoreBar('资金面', Math.round(flowScore), '#fbbf24');
+    h+='</div></div>';
+    h+='</div>';
+    // 层3 依据（因子明细）
+    h+='<div style="font-size:11px;color:var(--sub);line-height:1.7;border-top:1px dashed var(--border);padding-top:8px;">';
+    h+='<div>📈 动量 <b style="color:'+(pct>=0?'var(--up)':'var(--down)')+'">'+(pct>=0?'+':'')+pct.toFixed(2)+'%</b> · 成交额 '+(amount>1e8?(amount/1e8).toFixed(2)+'亿':'-')+(amount>3e8?' · 放量':'')+'</div>';
+    if(f.roe!=null) h+='<div>🧬 ROE <b>'+f.roe.toFixed(1)+'%</b> · 营收增速 '+(f.revenue_growth!=null?(f.revenue_growth>=0?'+':'')+f.revenue_growth.toFixed(1)+'%':'-')+'</div>';
+    if(matchedConcepts>0) h+='<div>💧 所属概念资金净流入 <b style="color:'+(netInflowYi>=0?'var(--up)':'var(--down)')+'">'+(netInflowYi>=0?'+':'')+(netInflowYi/1e4).toFixed(2)+'亿</b>（'+matchedConcepts+' 个概念）</div>';
+    if(lrow) h+='<div>🐉 龙虎榜机构净买 <b style="color:'+(lrow.inst_net_万>=0?'var(--up)':'var(--down)')+'">'+fmtYi(lrow.inst_net_万)+'</b> · 游资净买 '+fmtYi(lrow.yz_net_万)+'</div>';
+    h+='</div>';
+    h+='</div>';
+    return h;
+  }
+  function _algoScoreBar(label, val, color){
+    val=Math.max(0,Math.min(100,val));
+    return '<div style="display:flex;align-items:center;gap:6px;font-size:10.5px;">'+
+      '<span style="width:34px;color:var(--dim);flex-shrink:0;">'+label+'</span>'+
+      '<span style="flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;">'+
+      '<span style="display:block;height:100%;width:'+val+'%;background:'+color+';"></span></span>'+
+      '<span style="width:24px;text-align:right;color:var(--txt);font-weight:600;">'+val+'</span></div>';
+  }
   function renderStrategyHits(item, code){
     const hits=[];
     const nc = normCode(code);
@@ -9188,6 +9312,7 @@ function switchSec(sec,el){
     h+=renderStopStop(item, code);
     h+=renderProfile(item, code);
     h+=renderStrategyHits(item, code);
+    h+=renderAlgoScore(item, code);
     h+=renderRelatedFlow(item, code);
     h+=renderLhb(item, code);
     h+='</div>';
