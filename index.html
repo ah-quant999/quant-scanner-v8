@@ -10383,14 +10383,23 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     var dom=$('sfIntradayChart');
     if(!dom) return;
     var d=window.SECTOR_FUND_FLOW_INTRADAY || {};
-    // 🛡 2026-09-01 主人令：9:30-15:00 曲线保留到次日开盘前，和大家一起盘前才清空。
-    //   盘前时段（<09:30）优先用 d.prev_snapshots / d.history 里的上一交易日完整快照；
-    //   若没有历史字段且今日 snapshots 为空，则提示等待开盘（不再说"盘前自动清空"）。
-    //   数据端 fetcher 需配合：收盘后不要覆盖/清空本文件，保留完整全天 snapshots。
+    // 🛡 2026-09-17 主人令（截图实锤）：「这个是昨天的！盘前要清空！」
+    //    「交易日 9 点 20 分后，不再显示昨天的旧值」
+    // 🔴 根因：原判定 `_isPreMarket = hh<9 || (hh==9 && mm<30)` ⇒ 09:20–09:30 已算「盘中」，
+    //    于是 _isPreMarket=false、不再走「回退历史快照」分支，但此时 d.snapshots
+    //    里装的仍是**昨日全天快照**（今日尚未开盘、尚未抓到新快照）
+    //    ⇒ 前端把这批昨日快照当成今日曲线画出来（主人 09:2x 截图实锤）。
+    // 🛠 修法（双保险）：
+    //    ① 盘前阈值 09:30 → **09:20**，与「集合竞价 09:20 起不可撤单」对齐；
+    //    ② 无论盘前/盘中，只要 `d.date` 不是今日（即数据整体是旧日期的），
+    //       **一律不画昨日快照**，改为明确提示「等待今日数据」，杜绝把昨日值当今日显示。
+    //    ③ 仅当处于盘前时段（<09:20）才允许回退显示上一交易日曲线（保留 09-01 主人令的原意）。
     var _nowParts = window._cstParts ? window._cstParts(new Date()) : null;
-    var _isPreMarket = _nowParts && (_nowParts.hh < 9 || (_nowParts.hh === 9 && _nowParts.mm < 30));
+    var _isPreMarket = _nowParts && (_nowParts.hh < 9 || (_nowParts.hh === 9 && _nowParts.mm < 20));
     var _todayStr = window._fmtDateCST ? window._fmtDateCST(new Date()) : (new Date().toISOString().slice(0,10));
     var _dataDate = d.date || _todayStr;
+    // 数据整体是否为「今日」（date 字段口径）。非今日 ⇒ 盘中不得直接展示
+    var _isDataToday = (_dataDate === _todayStr);
     var snaps = d.snapshots || [];
     if(_isPreMarket && (!snaps || snaps.length < 1)){
       if(d.prev_snapshots && d.prev_snapshots.length > 0){
@@ -10399,6 +10408,12 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
         // history 按日期降序，取第一条有 snapshots 的
         for(var hi=0; hi<d.history.length; hi++){ if(d.history[hi].snapshots && d.history[hi].snapshots.length){ snaps=d.history[hi].snapshots; _dataDate=d.history[hi].date; break; } }
       }
+    }
+    // 🔴 2026-09-17 主人令：盘前(09:20 后) 若数据仍是昨日 ⇒ 直接清空显示，绝不贴昨日曲线
+    if(!_isPreMarket && !_isDataToday){
+      dom.innerHTML='<div class="ipo-empty">📭 等待今日盘中数据（每30分快照，09:20 后不再显示上一交易日）</div>';
+      var tElStale=$('sfIntradayTime'); if(tElStale) tElStale.innerHTML='—';
+      return;
     }
     if(!snaps || snaps.length<1){
       dom.innerHTML='<div class="ipo-empty">📭 ' + (_isPreMarket ? '盘前等待开盘 · 上一交易日 9:30-15:00 曲线由数据端保留' : '暂无盘中分时数据（盘中每30分快照）') + '</div>';
