@@ -135,10 +135,28 @@ def one_trade(series, sig_date: str, n: int):
     return round(gross - COST_PCT, 2), round(mdd, 2)
 
 
+def _load_bench():
+    """全市场等权基准（gen_market_bench.py → raw_data/market_bench.json）；缺文件/解析失败 → {}。"""
+    p = RAW / "market_bench.json"
+    try:
+        return (json.loads(p.read_text(encoding="utf-8")) or {}).get("by_date") or {}
+    except Exception:
+        return {}
+
+
 def build_periods(signals, horizons=HORIZONS):
     """signals: [(code, date), ...] → periods dict"""
     periods = {}
+    # 🆕 2026-09-17 小九（主人令「全站口径统一·诚实」）：逐档补全市场等权基准。
+    #   基准源 raw_data/market_bench.json（与策略同入场/出场/成本口径）；
+        #   信号日**精确对齐**（sig_days 即本卡真实信号日）；基准缺该日/该档如实少算，
+    #   命中 <5 个基准日不写（宁缺勿滥）。基准是市场事实，与策略档位是否 immature 无关。
+    bench = _load_bench()
+    sig_days = sorted({d for _, d in signals})
     for n in horizons:
+        _bv = ([bench[d][str(n)] for d in sig_days
+                if d in bench and (bench[d].get(str(n)) or {}).get("avg") is not None]
+               if bench else [])
         rets, mdds = [], []
         for code, d in signals:
             r = one_trade(bars_of(code), d, n)
@@ -168,6 +186,12 @@ def build_periods(signals, horizons=HORIZONS):
             "worst_return": round(min(rets), 2),
             "max_drawdown": round(sum(mdds) / len(mdds), 2),
         }
+        if len(_bv) >= 5:
+            periods[key]["bench_avg_return"] = round(sum(x["avg"] for x in _bv) / len(_bv), 4)
+            _bw = [x.get("win") for x in _bv if x.get("win") is not None]
+            if _bw:
+                periods[key]["bench_win_rate"] = round(sum(_bw) / len(_bw), 2)
+            periods[key]["bench_days"] = len(_bv)
     return periods
 
 
