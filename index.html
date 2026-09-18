@@ -3087,7 +3087,8 @@ function fmtSigned(v){
     <b style="color:#22d3ee;">定位</b>：本页只研究「这个因子有没有区分度」，<b>不进选股层、不产出股票池</b>。<br>
     <b style="color:#22d3ee;">它做什么</b>：只对<b>已经选出来的股</b>做<b>加分 / 减分</b> —— 命中即加计入 <code style="background:rgba(34,211,238,.1);padding:1px 4px;border-radius:3px;">final_score</code> 让排序前移，不命中则不动；<b style="color:#fbbf24;">绝不会因为某只票命中某个因子就把它拉进池子</b>。<br>
     <b style="color:#22d3ee;">与左侧策略的区别</b>：四量终极 / 三重共识 / 强势跟踪 / 逆势龙头<b>各自产出股票池</b>；本页<b>不产池</b>，故与「逆势龙头」同为 <b>0⭐</b> 观测项，不参与星级评定。<br>
-    <b style="color:#22d3ee;">转正判据</b>：利差&gt;0 + Top 层胜率≥55% + 样本内外同号 —— 达标后才谈是否升格为独立策略。
+    <b style="color:#22d3ee;">与「策略回测」页的区别</b>：本页 = <b>因子分层研究</b>（五分位/看区分度）；「策略回测」页 🧪 因子实验室回测卡 = <b>同一因子的持仓口径回测</b>（L1 最强五分位持有期档）。两者是同一因子的两种切法，<b>勿对比名次</b>。<br>
+    <b style="color:#f59e0b;">无转正路径</b>（2026-09-18 主人令）：因子<b>不做选股、不产池</b> ⇒ <b>不评星级</b>，也<b>不存在「升格为独立策略」</b>一说。
     </div>
     </div>
     <div id="stFaHost"></div></div>
@@ -6917,35 +6918,10 @@ function fmtSigned(v){
     if(!dst) return;
     var _e = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
     var m = D.meta || {};
-    var at = (D.abnormal_turnover||{});
-    var roe = (D.roe_largecap||{});
-    var atTopArr = at.top||[], atBotArr = at.bottom||[], roeTopArr = roe.top||[];
-    var atVals = atTopArr.map(function(r){return r.factor_at;}).filter(function(v){return v!=null;});
-    var roeVals = roeTopArr.map(function(r){return r.roe_ttm;}).filter(function(v){return v!=null;});
-    function row(r, kind){
-      var code = _e(r.code), name = _e(r.name), close = r.close==null?'—':r.close.toFixed(2);
-      var accent = kind==='at' ? (r.factor_at>0 ? '#22c55e' : (r.factor_at<0?'#ef5350':'#64748b'))
-                                : '#38bdf8';
-      var main = kind==='at' ? ('abn='+(r.abn==null?'—':r.abn.toFixed(2))+' 因子='+(r.factor_at==null?'—':r.factor_at.toFixed(2)))
-                              : ('ROE_TTM='+(r.roe_ttm==null?'—':r.roe_ttm.toFixed(1))+'%');
-      var fv = kind==='at' ? r.factor_at : r.roe_ttm;
-      var g = (typeof window.v8FactorGate==='function') ? window.v8FactorGate(fv, kind==='at'?atVals:roeVals, 0.2) : {pass:false,reason:'',color:'#94a3b8'};
-      var badge = g.pass ? '<span style="color:#5ee0a0;font-size:11px;">🟢可关注</span>'
-                         : '<span style="color:'+g.color+';font-size:10px;">'+_e(g.reason)+'</span>';
-      // 2026-09-05 主人令（更正理解）：可关注列表改为横向网格「一行 3 只股票」，每只股票一个小卡（竖向：代码名+价 / 指标 / 可关注）
-      return '<div style="border:1px solid '+accent+'44;border-left:3px solid '+accent+';border-radius:8px;padding:6px 8px;font-size:12px;background:rgba(148,163,184,.05);">'
-        + '<div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><b>'+code+'</b> <span style="color:var(--sub);font-weight:400;">'+name+'</span></div>'
-        + '<div style="color:var(--dim);font-size:11px;margin-top:1px;">'+close+'</div>'
-        + '<div style="color:'+accent+';font-size:11px;margin-top:3px;white-space:nowrap;">'+main+'</div>'
-        + '<div style="margin-top:3px;">'+badge+'</div>'
-        + '</div>';
-    }
-    var atTop = atTopArr.map(function(r){return row(r,'at');}).join('')
-      || '<div class="note" style="color:var(--dim)">无有效数据</div>';
-    var atBot = atBotArr.map(function(r){return row(r,'at');}).join('')
-      || '<div class="note" style="color:var(--dim)">—</div>';
-    var roeTop = roeTopArr.map(function(r){return row(r,'roe');}).join('')
-      || '<div class="note" style="color:var(--dim)">无有效数据</div>';
+    /* 🔴 2026-09-18 主人令（图像取证③）「它说了不推荐股，这里好像不应该出现这个」：
+       原此处有 row()（股票小卡渲染）+ atVals/roeVals/atVals/atTop/atBot/roeTop 六个变量，
+       **全部只服务于已删除的「🟢可关注 N 只」横向网格与「完整榜单」弹窗** ⇒ 一并删除，
+       避免留下「未被调用但仍在构建 DOM 字符串」的死代码（轻量化 + 防口径回流）。 */
     /* 2026-09-14 主人令：全站择时关口统一收敛到 AI市场速览（v8IntradayGate）。
        因子实验室只展示「仓位依据 + 盘面观测」，不再独立显示「可开/不开」。 */
     var mkt = (typeof window.v8IntradayGate==='function') ? window.v8IntradayGate() : {ok:false,name:'未知',color:'#94a3b8',observation:'等待数据',verdict:'等待数据',regime:''};
@@ -6953,30 +6929,148 @@ function fmtSigned(v){
     var gateBanner = '<div style="font-size:12px;padding:5px 9px;border-radius:6px;margin-bottom:9px;background:'+(mkt.ok?'rgba(94,224,160,.12)':'rgba(255,107,129,.10)')+';color:'+(mkt.ok?'#5ee0a0':'#ff6b81')+';">'
       + '⚖ 择时闸门：'+mkt.name+' · '+mkt.observation+'<span style="font-size:10px;opacity:.75;">（短线·实时）</span> &nbsp;|&nbsp; 仓位依据：'+(mkt.ok?'✅ ':'⛔ ')+mkt.verdict+_regimeTxt2+'<span style="font-size:10px;opacity:.75;">（中线·回测）</span></div>';
 +mkt.verdict+_regimeTxt2+'</div>';
-    /* ═══ 2026-09-03 主人令：卡面只展示「🟢可关注」标的（2 种因子），完整榜单点击弹窗查看；
-       胶囊统一格式（更新时间紧跟卡名，删除靠右时间）；★★ 观测仓 · 调试与回测中，升 4⭐ 后转正「选股策略」子页 ═══ */
-    function _gatePass(r, kind){
-      var fv = kind==='at' ? r.factor_at : r.roe_ttm;
-      var g = (typeof window.v8FactorGate==='function') ? window.v8FactorGate(fv, kind==='at'?atVals:roeVals, 0.2) : {pass:false};
-      return !!(g && g.pass);
+    /* ═══════════════════════════════════════════════════════════════════════
+       🆕🔴 2026-09-18 主人令（4 条图像取证）—— 本卡**三段式**重构：
+         ① 列出**已接入算法链的全部因子**（角色/作用点/本日命中/为何这样）
+         ② 对**当天产生的股票**做**加减分的排列** ⇒ 主人原话「才会知道到底逻辑有没有出错」
+         ③ **待接入因子队列**：每天推进一种开始测试，达标 ⇒ 写入算法链并登记到上方 ①
+       🔴 已删除：原「🟢可关注 N 只」横向股票网格 + 「📄 完整榜单」弹窗
+         —— 本页自述「不进选股层、不产出股票池」，卡面却列「可关注」股票 = 自相矛盾（主人原话）。
+       数据源（全部产物真值，前端只读不编；缺失则**显式标注**，绝不伪造）：
+         · FINAL_RECOMMEND_DATA.factor_chain  —— 已接入因子清单 + 本日命中（final_recommend.py 落盘）
+         · FINAL_RECOMMEND_DATA.factor_trace  —— 当日池内票的因子动作（adj 严格照实现）
+         · FACTOR_PROGRESS.factors            —— 待接入队列（完整台账见本页下方 🧪 因子审计卡）
+       ═══════════════════════════════════════════════════════════════════════ */
+    var FR = window.FINAL_RECOMMEND_DATA || {};
+    var CH = FR.factor_chain || null;
+    var TR = FR.factor_trace || [];
+    var PG = window.FACTOR_PROGRESS || {};
+    var _secH = function(no, title, color){
+      return '<div style="font-weight:700;font-size:12.5px;margin:13px 0 4px;color:'+color+';">'+no+' '+title+'</div>';
+    };
+
+    // ── ① 已接入算法链的因子 ──
+    var chainBlock;
+    if(!CH || !((CH.integrated)||[]).length){
+      chainBlock = '<div class="note" style="color:var(--dim);padding:6px 0;">'
+        + ((CH && CH.skipped) ? ('本轮因子融合整体跳过：' + _e(CH.skip_reason || ''))
+                              : '待下一轮 D 批产出（算法链已就绪，产物字段 factor_chain）')
+        + '</div>';
+    }else{
+      var _roleColor = function(r){ return r==='扣分' ? '#26a69a' : (r==='加分' ? '#ef5350' : '#94a3b8'); };
+      // 🆕🔴 依据分级着色（主人问「扣分标准科学吗」）—— 三档严格按证据强度，不许美化：
+      //   未回测 = 红（无任何样本外证据）｜薄样本 = 橙（9 信号日实测，不足以定权重）｜
+      //   walk-forward = 绿（≥4/5 年 OOS 检验通过，才配给分）
+      var _evColor = function(e){
+        e = String(e||'');
+        if(e.indexOf('未回测') >= 0) return '#ef5350';
+        if(e.indexOf('薄样本') >= 0) return '#fb923c';
+        if(e.indexOf('walk-forward') >= 0) return '#22c55e';
+        return '#94a3b8';
+      };
+      chainBlock = '<div style="font-size:11px;color:var(--dim);margin:2px 0 6px;line-height:1.6;">'
+        + '计分口径：<code style="background:rgba(34,211,238,.1);padding:1px 4px;border-radius:3px;">'+_e(CH.score_formula||'')+'</code>'
+        + '　<span style="color:#22c55e;font-weight:700;">●</span> 真计入 final_score　'
+        + '<span style="color:#94a3b8;">○</span> 仅标注/展示（不参与计分）</div>'
+        + '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
+        + '<thead><tr style="color:var(--sub);text-align:left;">'
+        + '<th style="padding:4px 6px;">因子</th><th style="padding:4px 6px;">角色</th>'
+        + '<th style="padding:4px 6px;">作用点</th><th style="padding:4px 6px;">本日命中</th>'
+        + '<th style="padding:4px 6px;">依据强度</th><th style="padding:4px 6px;">为何这样</th></tr></thead><tbody>'
+        + (CH.integrated||[]).map(function(x){
+            var c = _roleColor(x.role);
+            var mk = x.scored ? '<span style="color:#22c55e;font-weight:700;">●</span>' : '<span style="color:#94a3b8;">○</span>';
+            var adjTxt = x.scored ? ('　<b style="color:'+c+';">'+(Number(x.adj)>0?'+':'')+Number(x.adj||0).toFixed(2)+'</b>') : '';
+            return '<tr style="border-top:1px solid rgba(148,163,184,.16);">'
+              + '<td style="padding:4px 6px;font-weight:700;color:var(--txt);">'+mk+' '+_e(x.name)+adjTxt+'</td>'
+              + '<td style="padding:4px 6px;font-weight:700;color:'+c+';">'+_e(x.role)+'</td>'
+              + '<td style="padding:4px 6px;color:var(--dim);">'+_e(x.where||'')+'</td>'
+              + '<td style="padding:4px 6px;font-weight:700;color:var(--txt);">'+_e(String(x.n_hit==null?'—':x.n_hit))+' 只</td>'
+              + '<td style="padding:4px 6px;font-weight:700;color:'+_evColor(x.evidence)+';white-space:nowrap;">'
+              +   (String(x.evidence||'')==='未回测'?'⚠️ ':'')+_e(x.evidence||'—')+'</td>'
+              + '<td style="padding:4px 6px;color:var(--sub);">'+_e(x.why||'')+'</td>'
+              + '</tr>';
+          }).join('')
+        + '</tbody></table>'
+        + (_e(CH.dedup_note||'') ? ('<div style="font-size:11px;color:var(--dim);margin-top:4px;">🛡 '+_e(CH.dedup_note)+'</div>') : '')
+        + (CH.evidence_note ? ('<div style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.75;'
+            + 'background:rgba(251,191,36,.07);border-left:3px solid #f59e0b;padding:6px 9px;border-radius:5px;">'
+            + '<b style="color:#f59e0b;">&#x1F4D0; 计分依据说明（2026-09-18 主人问「扣分标准科学吗」）</b><br>'
+            + _e(CH.evidence_note)+'</div>') : '');
     }
-    var atFocus = atTopArr.filter(function(r){ return _gatePass(r,'at'); });
-    var roeFocus = roeTopArr.filter(function(r){ return _gatePass(r,'roe'); });
-    // 🛡 2026-09-05 主人令（factor_lab 主卡只显示评分最高前 10 只）：其余点击 📄 完整榜单按钮查看；弹窗保持原样不动
-    var FL_DISPLAY_TOP_N = 10;
-    function _focusBlock(title, color, rows, kind, popKind, popLabel){
-      var showRows = rows.slice(0, FL_DISPLAY_TOP_N);
-      var inner = showRows.length
-        ? '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">'
-            + showRows.map(function(r){ return row(r,kind); }).join('') + '</div>'
-        : '<div class="note" style="color:var(--dim);padding:4px 0;">本期无可关注标的（择时闸门关闭或因子分位未进前 20%）</div>';
-      var suffix = rows.length > FL_DISPLAY_TOP_N
-        ? ' <span style="font-size:11px;color:var(--dim);font-weight:500;">· 仅展示前 '+FL_DISPLAY_TOP_N+' 只 / 共 '+rows.length+' 只（其余查看下方完整榜单）</span>'
-        : (rows.length > 0 ? ' <span style="font-size:11px;color:var(--dim);font-weight:500;">· 全部 '+rows.length+' 只</span>' : '');
-      return '<div style="font-weight:600;margin:8px 0 4px;color:'+color+';">'+title+' · 🟢可关注 <b>'+rows.length+'</b> 只'+suffix+'</div>'
-        + inner
-        + '<div style="margin:6px 0 2px;"><span onclick="window.__flPopup(\''+popKind+'\')" style="cursor:pointer;display:inline-block;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600;color:#22d3ee;border:1px solid rgba(34,211,238,.4);background:rgba(34,211,238,.08);">📄 '+popLabel+'</span></div>';
+
+    // ── ② 当日加减分排列 ──
+    var traceBlock;
+    if(!TR.length){
+      traceBlock = '<div class="note" style="color:var(--dim);padding:6px 0;">'
+        + ((CH && CH.skipped) ? '本轮因子融合整体跳过 ⇒ 无因子动作'
+                              : '当日池内票无一被因子触及（或待下一轮 D 批产出，产物字段 factor_trace）') + '</div>';
+    }else{
+      var _srt = TR.slice().sort(function(a,b){
+        return (Number(a.adj_total)||0) - (Number(b.adj_total)||0) || (Number(b.final_score)||0) - (Number(a.final_score)||0);
+      });
+      traceBlock = '<div style="font-size:11px;color:var(--dim);margin:2px 0 6px;">'
+        + '共 <b style="color:var(--txt);">'+TR.length+'</b> 只池内票被因子触及（扣分在前，同分按 final_score 降序）'
+        + '　<b style="color:#26a69a;">负</b>=扣分　<b style="color:#ef5350;">正</b>=加分　'
+        + '<span style="color:#94a3b8;">(仅标注)</span>=不改分</div>'
+        + '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
+        + '<thead><tr style="color:var(--sub);text-align:left;">'
+        + '<th style="padding:4px 6px;">股票</th><th style="padding:4px 6px;">因子动作</th>'
+        + '<th style="padding:4px 6px;">合计 adj</th><th style="padding:4px 6px;">final_score</th>'
+        + '<th style="padding:4px 6px;">共振源</th></tr></thead><tbody>'
+        + _srt.slice(0, 40).map(function(x){
+            var acts = (x.actions||[]).map(function(a){
+              var v = Number(a.adj||0);
+              var ac = v>0 ? '#ef5350' : (v<0 ? '#26a69a' : '#94a3b8');
+              return '<span style="color:'+ac+';margin-right:9px;white-space:nowrap;">'+_e(a.factor)
+                + (v===0 ? '<span style="font-size:10px;color:#94a3b8;">(仅标注)</span>'
+                         : ' <b>'+(v>0?'+':'')+v.toFixed(2)+'</b>') + '</span>';
+            }).join('');
+            var t = Number(x.adj_total||0);
+            var tc = t<0 ? '#26a69a' : (t>0 ? '#ef5350' : '#94a3b8');
+            return '<tr style="border-top:1px solid rgba(148,163,184,.16);">'
+              + '<td style="padding:4px 6px;"><b style="color:var(--txt);">'+_e(String(x.code))+'</b> <span style="color:var(--sub);">'+_e(x.name||'')+'</span></td>'
+              + '<td style="padding:4px 6px;">'+acts+'</td>'
+              + '<td style="padding:4px 6px;font-weight:700;color:'+tc+';">'+(t>0?'+':'')+t.toFixed(2)+'</td>'
+              + '<td style="padding:4px 6px;font-weight:700;color:var(--txt);">'+_e(String(x.final_score))+'</td>'
+              + '<td style="padding:4px 6px;color:var(--dim);">'+_e((x.sources||[]).join(' / '))+'</td>'
+              + '</tr>';
+          }).join('')
+        + '</tbody></table>'
+        + (TR.length > 40 ? '<div style="font-size:11px;color:var(--dim);margin-top:4px;">仅列前 40 只（扣分最重在前），全量见 data/FINAL_RECOMMEND_DATA.js 的 factor_trace</div>' : '');
     }
+
+    // ── ③ 待接入因子队列 ──
+    var _pf = (PG.factors || []);
+    var _bc = function(b){ return b===1 ? '#ef5350' : (b===2 ? '#fb923c' : '#94a3b8'); };
+    var _pi = function(s){
+      if(s === 'done') return '<span style="color:#22c55e;">✅ 已回测</span>';
+      if(s === 'in_progress') return '<span style="color:#fb923c;">⏳ 跑中</span>';
+      if(s === 'blocked') return '<span style="color:#ef5350;">⛔ 受阻</span>';
+      return '<span style="color:var(--dim);">⏸ 待测</span>';
+    };
+    var pendingBlock = _pf.length ? (
+      '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
+      + '<thead><tr style="color:var(--sub);text-align:left;">'
+      + '<th style="padding:4px 6px;">批次</th><th style="padding:4px 6px;">因子</th>'
+      + '<th style="padding:4px 6px;">说明</th><th style="padding:4px 6px;">数据源 / 缺口</th>'
+      + '<th style="padding:4px 6px;">状态</th></tr></thead><tbody>'
+      + _pf.map(function(f){
+          return '<tr style="border-top:1px solid rgba(148,163,184,.16);">'
+            + '<td style="padding:4px 6px;font-weight:800;color:'+_bc(f.batch)+';">B'+_e(String(f.batch))+'</td>'
+            + '<td style="padding:4px 6px;font-weight:700;color:var(--txt);">'+_e(f.name)+'</td>'
+            + '<td style="padding:4px 6px;color:var(--sub);">'+_e(f.label||'')+'</td>'
+            + '<td style="padding:4px 6px;color:var(--dim);">'+_e(f.data_source||'')+'</td>'
+            + '<td style="padding:4px 6px;">'+_pi(f.backtest_status)+'</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table>'
+      + '<div style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.65;">'
+      + '📋 <b>推进流程</b>（主人 2026-09-18 令）：<b>每天推进一种</b>因子开始测试 → '
+      + '<b style="color:#22c55e;">达标</b>（OOS IR&gt;0.3 且 ≥4/5 年 Top 层胜率&gt;55%）⇒ <b>写入算法链</b>，并登记到<b>上方 ①「已接入算法链的因子」</b>；'
+      + '<b style="color:#ef5350;">不达标</b> ⇒ 从台账删除，不留遗体。<br>'
+      + '完整台账（含缺口分析与本轮 walk-forward 结果）见本页下方 🧪 <b>因子审计</b>卡。</div>'
+    ) : '<div class="note" style="color:var(--dim);padding:6px 0;">台账（data/FACTOR_PROGRESS.js）未到位</div>';
     // 🛡 2026-09-04 主人令（image#1 真凶·一劳永逸）：原为 slice(5,16) 裸时间戳「🕐 更新 09-03 01:55」，
     //   既无「昨日/N天前」相对语义（主人误读成"今日凌晨"），也与全站「🦊 更新于 …」胶囊格式不一致。
     //   现统一走 _uBadge('盘后','中长线', …)：格式与全站一致 + 自动获得「⚠️ 已停更 N 天」陈旧告警。
@@ -7002,28 +7096,21 @@ function fmtSigned(v){
         })()
       + _flBadge
       + '</div>'
-      // 2026-09-13 主人令：更新于胶囊移到卡名后紧跟（与全站一致），解析块下移。
-      + '<div style="background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
-      /* 🔴 2026-09-18 主人令「到底因子们算啥？为什么上表中没有？矛盾且混乱啊」：
-         原核心块写「OOS 未达标 / 不可用于选股评分」= 过期结论（产物已 PASS）；
-         且**从未向主人说明这两个因子在本卡之外早已接入算法链**（作为共振加分源）。
-         现补三段：① 定位（因子=加分项，非选股策略）；② 已接入事实；③ 本卡与「策略回测」页的区别。 */
-      + '<b style="color:#22d3ee;">&#x1F9EA; 定位：</b><b>本卡是因子分层研究，不是选股策略</b> —— 它只回答「这个因子有没有区分度」，'
-      + '<b style="color:#22c55e">不产出股票池、不占选股策略身份</b>（虽与本页策略同处一个 tab，但它只是<b>加分项</b>）。<br>'
-      + '<b style="color:#22d3ee;">&#x1F4CC; 算法链中的角色：</b>两个因子已作为<b>共振加分源</b>接入 <code style="background:rgba(34,211,238,.1);padding:1px 4px;border-radius:3px;">final_recommend.py</code>：'
-      + '候选池里的票若命中该因子 ⇒ <b>加计入 final_score ⇒ 排序前移</b>，因此它们的正确叫法是<b>「加分项」</b>，'
-      + '<b>不是「选股策略」</b>（真正的选股发生在候选池那一层）。<br>'
-      + '<b style="color:#22d3ee;">&#x1F4A1; 用法：</b>本卡<b>不评星级</b>（2026-09-18 主人令：因子只是加分减分项，不是选股策略）；'
-      + '因子自身「转正为选股策略」的判据 = 利差&gt;0 + Top层胜率≥55% + OOS与IS同号。<br>'
-      + '<b style="color:#22d3ee;">&#x26A0; 与「策略回测」页的区别：</b>本页 = <b>因子分层研究</b>（五分位，看区分度）；'
-      + '「策略回测」页 🧪 因子实验室回测卡 = <b>同一因子的持仓口径回测</b>（L1 最强五分位的持有期档）。'
-      + '两者<b>不是两套结论，是同一因子的两种切法</b>，切勿对比名次。<br>'
-      + '<b style="color:#22d3ee;">&#x1F4CA; 当前状态：</b>见上方徽章（读产物真值，非写死）；明细见「策略回测」页 🧪 因子实验室回测卡。</div>'
+      // 🔴 2026-09-18 主人令「这里重复了，合并成一张」：
+      //   原卡内 5 行说明块（定位/算法链中的角色/用法/与策略回测页区别/当前状态）
+      //   与外层子页顶部 📌 明示块**内容重复**（同一页上下两张卡说同一件事）。
+      //   ⇒ 现整体移除，定位口径**唯一**收敛到子页顶部明示块，避免两处口径漂移。
+      + '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">'
+      + '&#x1F4CC; 定位与口径见本页顶部明示块（因子=加分/减分项，不产池、不评星级）。</div>'
       + gateBanner
       + '<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">重点池 '+_e(m.n_universe)+' 只 · 异常换手率有效 '+_e(m.n_at_valid)+' · ROE大市值档 '+_e(m.n_roe_large)+'　'
       + '<span style="color:#22c55e">●</span>缩量强势 <span style="color:#ef5350">●</span>放量弱势</div>'
-      + _focusBlock('① 异常换手率（缩量=多，因子越高越强势）','#22d3ee',atFocus,'at','at','完整榜单：Top30 强势 + Bottom10 放量弱势')
-      + _focusBlock('② ROE(TTM) 全市场主板·大市值档（成交额代理 Top1/3）','#38bdf8',roeFocus,'roe','roe','完整榜单：ROE Top30')
+      + _secH('①', '已接入算法链的因子（共 ' + ((CH && CH.integrated) || []).length + ' 项）', '#22d3ee')
+      + chainBlock
+      + _secH('②', '当日加减分排列 —— 验逻辑：当天哪只票被哪个因子加/减了多少分', '#38bdf8')
+      + traceBlock
+      + _secH('③', '待接入因子队列 —— 每天推进一种', '#a78bfa')
+      + pendingBlock
       + '<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5;">'
       + '口径：异常换手率=当月换手率÷过去12月均值（缩量→低关注→强势），仍用重点池(351只)；ROE_TTM=近4个单季 roeAvg 差分求和（2026-09-11 口径修正：baostock roeAvg 为财年内累计值，原直接累加4季属跨年重复计算），全市场主板·大市值档(成交额top1/3)。'
       + 'IC 显著（Spearman IC t=4.3 / 3.3）。'
@@ -7042,27 +7129,14 @@ function fmtSigned(v){
                + ' ⇒ <b style="color:' + _col + '">' + (_ok ? '样本内外同号、已过门槛' : '样本内外不同号或未过门槛，不构成 edge 证据') + '</b>';
         })()
       + '　（数据源 data/FACTOR_LAB_BACKTEST.js，update_time 见上）'
-      + '。🟢可关注=择时开放且因子进入前20%分位。仅研究参考，非买卖建议。</div>'
-      + '<div style="font-size:11px;color:#fbbf24;margin-top:6px;line-height:1.5;">⭐ 升级路径（2026-09-18 主人令）：本页<b>不评星级</b>（因子是加分项，不是选股策略）。转正判据：利差&gt;0 + Top胜率≥55% + OOS同号，且全市场扫描数据侧开启后复验通过 ⇒ 才谈升格为独立策略（回测明细见「策略回测」页 🧪 因子实验室回测卡）。</div>'
+      + '。仅研究参考，非买卖建议；本卡不列「可关注」股票（因子不产池、不推荐股）。</div>'
+      // 🔴 2026-09-18 主人令「它不转正吧，可以删了」：原「⭐ 升级路径 / 转正判据」整行删除
+      //   —— 因子不做选股、不产池 ⇒ 不存在升格为独立策略的路径，留着只会再次引发口径混乱。
       + '</div>';
     dst.innerHTML = html;
-    // 弹窗：完整榜单（复用闭包内 row() 与全量数组，2026-09-03 主人令）
-    window.__flPopup = function(kind){
-      var _title = kind==='at' ? '🧪 异常换手率 · 完整榜单' : '🧪 ROE(TTM) 大市值档 · 完整榜单';
-      var _body = kind==='at'
-        ? (atTop + '<div style="font-weight:600;margin:10px 0 4px;color:#f87171;">放量最严重（弱势）— Bottom 10</div>' + atBot)
-        : roeTop;
-      var mask = document.createElement('div');
-      mask.className = '_flmask';
-      mask.style.cssText = 'position:fixed;inset:0;background:rgba(2,6,17,.72);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;';
-      mask.onclick = function(ev){ if(ev.target===mask) mask.remove(); };
-      var box = document.createElement('div');
-      box.style.cssText = 'background:#0d1626;border:1px solid #243150;border-radius:12px;max-width:860px;width:100%;max-height:80vh;overflow-y:auto;padding:16px 18px;';
-      box.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><b style="font-size:14px;color:#e8f0ff;">'+_title+'</b>'
-        + '<span style="cursor:pointer;color:#93a4c4;font-size:20px;padding:0 6px;margin-left:auto;" onclick="this.closest(\'._flmask\').remove()">×</span></div>' + _body;
-      mask.appendChild(box);
-      document.body.appendChild(mask);
-    };
+    // 🔴 2026-09-18 主人令：原 window.__flPopup（「📄 完整榜单」弹窗）随「可关注」网格一并删除
+    //   —— 它的内容 = 因子榜 Top30/Bottom10 **股票列表**，同样会让「本页不推荐股」自相矛盾。
+    //   因子分位/分层明细的权威去处 = 「策略回测」页 🧪 因子实验室回测卡（持仓口径回测）。
   };
 
   // DOM ready hook

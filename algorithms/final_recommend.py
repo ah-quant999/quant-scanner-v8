@@ -77,11 +77,27 @@ from fundamental_helper import quality_veto  # noqa: E402  质差股一票否决
 #
 # 回退：V8_FUSION_NOISE_FILTER=0 → 恢复旧行为（全部原样 + ROE 原档），便于 A/B 与紧急回滚。
 # ═══════════════════════════════════════════════════════════════════════════
-NOISE_SOURCES = {"ROE_TTM", "异常换手率", "高手跟踪"}   # 仅前两者剔除；ROE_TTM 走降档分支
-FUSION_NEG_ALPHA = {"异常换手率", "高手跟踪"}          # 边际 < 0，整源剔除
 V8_FUSION_NOISE_FILTER = os.environ.get("V8_FUSION_NOISE_FILTER", "1").strip() != "0"
-# ROE_TTM 降档（弱正 +0.68pp ⇒ 保留但不再与强源同权）
-V8_ROE_DEMOTE = os.environ.get("V8_ROE_DEMOTE", "1").strip() != "0"
+# 🆕🔴 2026-09-18 主人令「因子只做加减分」＋ 主人问「扣分标准科学吗？别一开始就犯错」：
+#   放量弱势扣分（−0.5）是**本层唯一真正写进 final_score 的因子动作**，但它有两个问题：
+#     ① **格式 bug** 导致其**从未生效**（详见下方 _weak 集合处：norm_code 不剥点 ⇒ 恒不匹配；
+#        实测 29 轮 / 1333 条候选命中 **0 次**）——本补丁已修；
+#     ② 该分档**没有 walk-forward 回测依据**（bottom 榜从未回测），属「凭空的惩罚」，
+#        与 generate_top10.py P5 明文原则「反向档位无显著负 edge ⇒ 不给凭空的惩罚」冲突。
+#   ⇒ 处置：**不改其值**（改权重违反「绝不按短样本调权重」红线），只给**一键开关**：
+#        V8_FACTOR_WEAK_PENALTY=0 ⇒ −0.5 置 0（signals 照写、标签照展示，仅不减分）
+#      并在产物 factor_chain 里如实标注 evidence="未回测"，前端显示 ⚠️，处置权交主人。
+_WEAK_PENALTY_ON = os.environ.get("V8_FACTOR_WEAK_PENALTY", "1").strip() != "0"
+# 🔴🔴 2026-09-18 主人令「改好后审计一遍算法链，把因子参与选股的部分删除干净」——死代码清理：
+#   本处原有 NOISE_SOURCES / FUSION_NEG_ALPHA 两个集合 + V8_ROE_DEMOTE 开关 + _roe_score() 降档函数，
+#   实测**三者全无使用点**（判据「注释≠真值须实测」）：
+#     · NOISE_SOURCES / FUSION_NEG_ALPHA —— 全仓仅出现在本定义行，零引用；
+#     · _roe_score() 的返回值 sc 在原「维度2 ROE_TTM」循环里算完后**从未写入 source_scores / sources**
+#       （算完即弃）⇒ 注释所称「ROE_TTM 降档 1.0/0.75/0.5」**从未生效过**。
+#   ⇒ 现整体移除，杜绝「注释说有、实际没有」的静默假象。
+#   ⚠️ 将来若要让 ROE_TTM 真正计分：**必须先回测验证**（walk-forward 边际 edge>0 且 IS/OOS 同号、
+#      Top 层胜率 ≥55%）再接入，并同步更新 data/FACTOR_PROGRESS.js 台账为「已接入」；
+#      不可仅凭注释恢复。
 # ═══════════════════════════════════════════════════════════════════════════
 # 🔴 2026-09-18 改动12（主人令「都按你推荐的处理」）：融合器按边际 alpha 精选源。
 #   背景：11 源 walk-forward 横比（by_factor 边际 edge，剔 β）显示 3 正 8 负：
@@ -103,15 +119,7 @@ V8_ROE_DEMOTE = os.environ.get("V8_ROE_DEMOTE", "1").strip() != "0"
 #       不足以动它 —— 不改，等扩样结论。
 #   回退：V8_FUSION_ALPHA_SELECT=0 → 恢复旧行为（加分不设资格），便于 A/B 与紧急回滚。
 V8_FUSION_ALPHA_SELECT = os.environ.get("V8_FUSION_ALPHA_SELECT", "1").strip() != "0"
-_ROE_OLD_SCALE = {0: 2.0, 5: 1.5, 15: 1.0}      # 旧：前5=2.0 / 5~15=1.5 / 其余=1.0
-_ROE_NEW_SCALE = {0: 1.0, 5: 0.75, 15: 0.5}     # 新：整体降一档（等于把「与四量同权」改为「次级确认」）
-
-
-def _roe_score(i):
-    """ROE_TTM 源分：i 为名次索引。降档开关关闭时返回旧档。"""
-    if not (V8_FUSION_NOISE_FILTER and V8_ROE_DEMOTE):
-        return _ROE_OLD_SCALE[0] if i < 5 else (_ROE_OLD_SCALE[5] if i < 15 else _ROE_OLD_SCALE[15])
-    return _ROE_NEW_SCALE[0] if i < 5 else (_ROE_NEW_SCALE[5] if i < 15 else _ROE_NEW_SCALE[15])
+# （_ROE_OLD_SCALE / _ROE_NEW_SCALE / _roe_score 已于 2026-09-18 移除：返回值从未落盘 ⇒ 死代码）
 
 
 CRISIS_HIGH_THRESHOLD = 50  # 危机雷达≥50才并入逆势龙头
@@ -872,6 +880,13 @@ def main():
     fl = None
     _fl_degraded = False   # 🔴 2026-09-17：因子因**内容陈旧**而降级（透到 data_degraded，不许静默）
     _fl_last_dd = ""       # 诊断用：最近一次读到的因子 data_date（日志/降级说明里回显）
+    # 🆕🔴 2026-09-18 主人令「对当天产生的股票做加减分的排列，才会知道到底逻辑有没有出错」：
+    #   因子侧此前只往内存里的 tags/signals/reasons 写字，**产物完全不落盘** ⇒ 前端无从验证逻辑。
+    #   现于每条池内记录挂 factor_actions[]，并在产物顶层输出 factor_chain / factor_trace。
+    #   adj 语义**严格照实现**：能进 final_score 公式的才写非 0，仅展示的写 0（不许美化）。
+    _n_at_hit = 0          # 异常换手率：命中池内票数
+    _n_roe_hit = 0         # ROE_TTM：命中池内票数
+    _n_weak_hit = 0        # 放量弱势：扣分票数
     _today = datetime.now().strftime("%Y-%m-%d")
     _fl_max_wait = 0 if V8_OFFLINE else 20  # 离线模式本机无 baostock 注定取不到 FACTOR_LAB，直接跳过等待
     # 🔴 2026-09-17 阿狸咪的工程师：非交易周（周六/周日）豁免 —— 周末 baostock 无新数据，
@@ -943,6 +958,17 @@ def main():
                 r["sources"].append("异常换手率")
                 r["source_scores"]["异常换手率"] = round(sc, 2)
             r["signals"].append("缩量强势")
+            # 🆕 留痕（口径照实现）：NOISE_FILTER=1 时只写 tags ⇒ **不计共振、不计 strength、不进 final_score**
+            _n_at_hit += 1
+            r.setdefault("factor_actions", []).append({
+                "factor": "异常换手率",
+                "adj": 0.0 if V8_FUSION_NOISE_FILTER else round(sc, 2),
+                "scored": (not V8_FUSION_NOISE_FILTER),
+                "note": ("缩量强势 排名第%d／tags 展示，不计分（边际 −2.21pp 负 alpha ⇒ 整源剔除）"
+                         % (i + 1)) if V8_FUSION_NOISE_FILTER
+                        else ("缩量强势 排名第%d／计入 source_scores=%.2f（V8_FUSION_NOISE_FILTER=0 回退态）"
+                              % (i + 1, sc)),
+            })
             if s.get("first_date"):
                 r["enter_dates"].append(s["first_date"])
 
@@ -961,12 +987,22 @@ def main():
                 continue
             r = ensure(code, display_name, "", "")
             # 🔴 2026-09-18 改动2a：ROE_TTM 边际 +0.68pp = **弱正**（非负 alpha）
-            #   ⇒ 不剔除，但按「不与强源同权」降档（2.0/1.5/1.0 → 1.0/0.75/0.5）。
-            #   依据：阿狸咪实测 ROE_TTM 有该源均 −2.35%、无该源均 −3.03%，
-            #   虽是相对正贡献，但命中 89 条（数量优势）仍会淹没有效信号 ⇒ 降权而非清零。
-            sc = _roe_score(i)
-            sc *= (1.0 if _open_regime else 0.3)
+            #   ⇒ 与异常换手率同口径：**不写 sources / source_scores**（不计共振、不计 strength）。
+            #   依据：阿狸咪实测 ROE_TTM 有该源均 −2.35%、无该源均 −3.03%，虽是相对正贡献，
+            #   但命中 89 条（数量优势）仍会淹没有效信号；且命中率 43.9% ≈ 无选择性。
+            # 🔴🔴 2026-09-18 审计补正（主人令「才会知道到底逻辑有没有出错」）：
+            #   本处原有一行 `sc = _roe_score(i)` / `sc *= (1.0 if _open_regime else 0.3)`，
+            #   但 sc **从未写入任何计分字段**（算完即弃）⇒ 注释所称「降档加分」是**假的**。
+            #   现已删除该两行与 _roe_score() 定义；ROE_TTM 的真实角色 = **仅 signals/reasons 展示**。
             r["signals"].append("高ROE")
+            _n_roe_hit += 1
+            r.setdefault("factor_actions", []).append({
+                "factor": "ROE_TTM",
+                "adj": 0.0,
+                "scored": False,
+                "note": ("高ROE 排名第%d／signals+reasons 展示，不计分（边际 +0.68pp 弱正，不足与强源同权）"
+                         % (i + 1)),
+            })
             # 2026-09-03 主人令：补入选依据与行情（之前第1/2名 reason 空、无价格→分析不如第3名）
             r["reasons"].append(f"基本面因子 高ROE 排名第{i + 1}")
             # 🔴 2026-09-11 A 类修复：**不再从因子榜取价**。FACTOR_LAB 的 close 是
@@ -977,15 +1013,112 @@ def main():
             if s.get("first_date"):
                 r["enter_dates"].append(s["first_date"])
 
-        _weak = {norm_code(x.get("code")) for x in _at_bot if x.get("code")}
+        # 🔴🔴 2026-09-18 审计修复（主人问「扣分标准科学吗？别一开始就犯错」）——原写法有**格式 bug**：
+        #   原为 `_weak = {norm_code(x.get("code")) ...}`，而 norm_code 只去 sh/sz/bj/hk 前缀、**不剥点**
+        #   ⇒ norm_code("sh.600479") == ".600479"（带点）；
+        #   而 pool 的 key 一律是 norm_code(code).lstrip(".") == "600479"（无点）
+        #   ⇒ `if key in _weak` **恒为 False** ⇒ 「放量弱势」**从未写入过 signals**。
+        #   实测铁证（29 轮产物 / 1333 条候选）：signals 含「放量弱势」= **0 次**
+        #   （同期「缩量强势」410 次 /「高ROE」454 次 /「高手共振」37 次）
+        #   ⇒ L1160 的 weak_penalty(−0.5) **从未生效过一次**，是**死代码**。
+        #   ⚠️ 同类坑本文件已犯过一次：L706 注释「norm_code 不剥点 → pool key 带点 → lookup 全失配」，
+        #      当时只修了 ensure 侧，漏修此处。
+        #   修法：与 pool key 同口径 —— 补 `.lstrip('.')`。
+        _weak = {norm_code(x.get("code")).lstrip('.') for x in _at_bot if x.get("code")}
         for key, r in pool.items():
             if key in _weak:
                 r["signals"].append("放量弱势")
+                # 🆕 留痕：这是**唯一写进 final_score 的因子动作**
+                #   （L1160 weak_penalty：`0.5 if "放量弱势" in signals else 0.0` ⇒ final_score −0.5）
+                #   ⚠️ 但截至 2026-09-18，该分档**没有 walk-forward 回测依据**（bottom 榜从未回测），
+                #      属「凭空的惩罚」——与 generate_top10.py P5 的明文原则
+                #      「只加分不扣分：反向档位在 walk-forward 里无显著负 edge，不给凭空的惩罚」冲突。
+                #      ⇒ 本处**不改动它的值**（改权重违反「绝不按短样本调权重」红线），
+                #        但在产物里如实标注 evidence="未回测"，并在因子实验室卡上显示 ⚠️；
+                #        处置权交主人：回测出显著负 edge ⇒ 保留/加权；否则按 P5 原则降为「仅标注」。
+                #      开关：V8_FACTOR_WEAK_PENALTY=0 ⇒ 扣分置 0（仅写 signals 展示，一键回退）。
+                _n_weak_hit += 1
+                r.setdefault("factor_actions", []).append({
+                    "factor": "放量弱势",
+                    "adj": -0.5 if _WEAK_PENALTY_ON else 0.0,
+                    "scored": bool(_WEAK_PENALTY_ON),
+                    "evidence": "未回测",
+                    "note": ("FACTOR_LAB.bottom 命中 ⇒ signals「放量弱势」⇒ final_score −0.5（weak_penalty）"
+                             "　⚠️ 本档未经 walk-forward 回测，依据待补")
+                            if _WEAK_PENALTY_ON else
+                            ("FACTOR_LAB.bottom 命中 ⇒ 仅写 signals「放量弱势」展示（V8_FACTOR_WEAK_PENALTY=0）"),
+                })
+
+        # 🆕🔴 因子在算法链里的**真实计分作用**落盘（读实现行为，不写死文案）
+        _factor_chain_meta = {
+            "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "score_formula": "final_score = strength + resonance*1.5 + sec_add - weak_penalty",
+            "where": "algorithms/final_recommend.py :: 方案B 因子融合 + scored 计分",
+            "gate": {
+                "V8_FUSION_NOISE_FILTER": int(V8_FUSION_NOISE_FILTER),
+                "regime_open": bool(_open_regime),
+                "regime_coef_note": "非开仓期(_open_regime=False) 因子权重 ×0.3（仅对真计分的因子生效）",
+            },
+            "integrated": [
+                {"key": "weak", "name": "放量弱势", "role": "扣分",
+                 "scored": bool(_WEAK_PENALTY_ON), "adj": (-0.5 if _WEAK_PENALTY_ON else 0.0),
+                 "where": "scored 计分：final_score −0.5（weak_penalty）", "n_hit": _n_weak_hit,
+                 "evidence": "未回测",
+                 "why": "FACTOR_LAB 异常换手率 **bottom 档**（放量=弱势）命中池内票即扣分"
+                        "　⚠️ 三重问题（2026-09-18 实测取证）："
+                        "① **无依据** —— 本档从未纳入 walk-forward 回测"
+                        "（−2.21pp 是 **top 档**的实测值，bottom 档无同类证据），"
+                        "属「凭空的惩罚」，与 P5 明文原则「反向档位无显著负 edge 不给惩罚」冲突；"
+                        "② **设计上不相交** —— bottom 榜 = 极端放量股（abn 最大，弱势特征），"
+                        "而候选池由选股策略产出、天然偏缩量强势，两集合语义相反；"
+                        "实测 bottom ∩ pool = **0** ⇒ 本条几乎恒为 0 分；"
+                        "③ **代码失配（已修）** —— _weak 集合原缺 .lstrip('.') 导致恒不匹配，"
+                        "29 轮 / 1333 条候选命中 0 次"},
+                {"key": "abn", "name": "异常换手率", "role": "仅展示", "scored": False, "adj": 0.0,
+                 "where": "写 tags（V8_FUSION_NOISE_FILTER=1），不写 sources/source_scores", "n_hit": _n_at_hit,
+                 "evidence": "薄样本(9 信号日 / 85 命中)",
+                 "why": "实测边际 −2.21pp（负 alpha，命中 85 条）⇒ 整源剔除，不计共振/strength"},
+                {"key": "roe", "name": "ROE_TTM", "role": "仅展示", "scored": False, "adj": 0.0,
+                 "where": "写 signals「高ROE」+ reasons，不写 sources/source_scores", "n_hit": _n_roe_hit,
+                 "evidence": "薄样本(9 信号日 / 89 命中)",
+                 "why": "实测边际 +0.68pp（弱正，命中 89 条 ≈ 43.9% 覆盖率，无选择性）⇒ 不足与强源同权"},
+            ],
+            # 🔴 2026-09-18 主人问「扣分标准科学吗？别一开始就犯错」——本字段就是答案，**不许美化**：
+            #   · 唯一真进 final_score 的因子动作（放量弱势 −0.5）**没有任何回测依据**；
+            #   · 另两项的边际来自 **9 信号日薄样本**（阿狸咪实测），且按红线「绝不按短样本调权重」，
+            #     故一律**不计分**，只做展示；
+            #   · 真正经得起 walk-forward 检验的 K 线因子（amt60/turntrend，IR_OOS 0.877/0.872、
+            #     7/8 年 Top 层胜率 >55%）在 **候选池层（generate_top10.py P5，+6/+3）**，不在本层。
+            "evidence_note": ("计分依据分级："
+                              "①「未回测」= 无任何样本外证据（放量弱势）；"
+                              "②「薄样本」= 9 信号日实测边际，样本不足以定权重，故不计分（异常换手率/ROE_TTM/高手跟踪）；"
+                              "③「walk-forward」= ≥4/5 年 OOS 检验通过才给分（候选池层 P5 的 amt60/turntrend，+6/+3）。"
+                              "本层当前**没有任何因子持有第③级证据** ⇒ 除放量弱势外全部为 0 分，属**有意的保守**。"
+                              "　🔴 结论（2026-09-18 主人问「扣分标准科学吗？别一开始就犯错」）："
+                              "本层唯一记分的「放量弱势 −0.5」有**三重问题** —— ①无回测依据"
+                              "（bottom 榜从未回测）；②设计上不相交（bottom=极端放量股 vs 候选池=缩量强势，"
+                              "实测交集 0 ⇒ 几乎恒不触发）；③上游 _weak 集合曾因 norm_code 未剥点而恒失配"
+                              "（29 轮命中 0 次，本补丁已修）。⇒ **因子在本层的实际计分影响 = 0**，"
+                              "现状等于「全部只做标注」；要让它真正成为加减分项，须先补 walk-forward 回测"
+                              "（流程见下方 ③ 待接入队列 / 明细见本页 🧪 因子审计卡）。"),
+
+            "dedup_note": "因子只对**池内已有票**动作（_factor_in_pool 只查不建）⇒ 不产池、不决定谁能进榜",
+        }
     else:
         _fl_degraded = True
         print("[warn] FACTOR_LAB.js 缺失/内容陈旧（update_time 或 data_date 未达 %s%s），"
               "等待 %d 次后仍不可用，跳过因子实验室方案B融合（降级推荐）"
               % (_today, ("（实际 data_date=%s）" % _fl_last_dd) if _fl_last_dd else "", 20))
+        _factor_chain_meta = {
+            "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "score_formula": "final_score = strength + resonance*1.5 + sec_add - weak_penalty",
+            "where": "algorithms/final_recommend.py :: 方案B 因子融合",
+            "gate": {"V8_FUSION_NOISE_FILTER": int(V8_FUSION_NOISE_FILTER),
+                     "regime_open": bool(_open_regime)},
+            "integrated": [],
+            "skipped": True,
+            "skip_reason": "本轮 FACTOR_LAB.js 缺失/内容陈旧 ⇒ 方案B 因子融合整体跳过（数据降级）",
+        }
 
     # ── 第8.5节 高手共振（外部共振源之一：ima 高手强势股跟踪池）──
     # 与 v8 选股池 code 命中且 IMA 状态仍有效（非见顶/走弱）→ 独立外部共识信号，最终分 +1
@@ -1157,7 +1290,23 @@ def main():
         # 此处只对非板块龙头票加全局板块加分，避免板块被双重计价。
         sec_add = 0.0 if "板块龙头" in r["sources"] else sec_score
         # 方案B 放量弱势扣分：被异常换手率 bottom 命中的票，若同时被其他源选中则 −0.5
-        weak_penalty = 0.5 if "放量弱势" in r.get("signals", []) else 0.0
+        # 🔴🔴 2026-09-18 审计（主人问「扣分标准科学吗？别一开始就犯错」）——本行是全链**唯一**
+        #   给因子记分的落点，但它有**两个**问题，且必须同时说清：
+        #   ① **上行失配（已修）**：其数据源 `_weak` 集合原写 `{norm_code(x)}`，
+        #      而 norm_code 不剥点（norm_code("sh.600479")==".600479"），pool 的 key 却是
+        #      `norm_code(code).lstrip(".")`（=="600479"）⇒ `if key in _weak` **恒为 False**
+        #      ⇒ 「放量弱势」29 轮从未写入 signals ⇒ **本行 −0.5 从未执行过一次**（死代码）。
+        #   ② **依据缺失（未修，交主人）**：本档扣的是 FACTOR_LAB.bottom（放量榜），
+        #      而该榜**从未纳入 walk-forward 回测** —— 有实测边际的是 **top 榜**（−2.21pp），
+        #      两者不是同一集合。按 generate_top10.py P5 的明文原则
+        #      「只加分不扣分：反向档位在 walk-forward 里无显著负 edge，**不给凭空的惩罚**」，
+        #      本档属「凭空的惩罚」，**不应在无证据时给分**。
+        #   ⇒ 处置原则：**不改数值**（改权重违反「绝不按短样本调权重」红线，且底部榜 vs 顶部榜
+        #      谁负谁正尚无证据），改为**可开关 + 如实公示**：
+        #        V8_FACTOR_WEAK_PENALTY=1（默认）⇒ 维持 −0.5，产物标 evidence="未回测"
+        #        V8_FACTOR_WEAK_PENALTY=0        ⇒ 置 0（signals 照写、标签照展示，只是不减分）
+        #      待 bottom 榜 walk-forward 回测出显著负 edge ⇒ 保留并加权；否则按 P5 原则降为「仅标注」。
+        weak_penalty = (0.5 if _WEAK_PENALTY_ON else 0.0) if "放量弱势" in r.get("signals", []) else 0.0
         final_score = strength + resonance * 1.5 + sec_add - weak_penalty
         # 港股惩罚：用户主做 A 股，港股不应因多源共振天然霸榜
         if r.get("board") == "港股" or market_prefix(r.get("code", "")) == "hk":
@@ -1498,8 +1647,26 @@ def main():
                 "risk_reward": round(safe_float(x.get("risk_reward")), 2) if x.get("risk_reward") is not None else None,
                 "support": round(safe_float(x.get("support")), 2) if x.get("support") is not None else None,
                 "resistance": round(safe_float(x.get("resistance")), 2) if x.get("resistance") is not None else None,
+                # 🆕 2026-09-18：本票被哪些因子动作触及（[] = 未触及）；adj 严格照实现，仅展示的为 0
+                "factor_actions": x.get("factor_actions") or [],
             }
             for x in _top30
+        ],
+        # 🆕🔴 2026-09-18 主人令：因子实验室卡的「已接入因子 / 当日加减分排列」两段数据源。
+        #   factor_chain = 因子清单 + 本日命中统计（读实现行为）
+        #   factor_trace = 当日**全部**被因子触及的池内票（含 final_score），供「知道逻辑有没有出错」
+        "factor_chain": _factor_chain_meta,
+        "factor_trace": [
+            {
+                "code": x["key"],
+                "name": _resolve_name(x["key"], x["name"]),
+                "final_score": x["final_score"],
+                "resonance": x["resonance"],
+                "sources": sorted(set(x["sources"])),
+                "actions": x.get("factor_actions") or [],
+                "adj_total": round(sum(float(a.get("adj") or 0.0) for a in (x.get("factor_actions") or [])), 2),
+            }
+            for x in scored if x.get("factor_actions")
         ],
     }
 
