@@ -82,6 +82,27 @@ FUSION_NEG_ALPHA = {"异常换手率", "高手跟踪"}          # 边际 < 0，�
 V8_FUSION_NOISE_FILTER = os.environ.get("V8_FUSION_NOISE_FILTER", "1").strip() != "0"
 # ROE_TTM 降档（弱正 +0.68pp ⇒ 保留但不再与强源同权）
 V8_ROE_DEMOTE = os.environ.get("V8_ROE_DEMOTE", "1").strip() != "0"
+# ═══════════════════════════════════════════════════════════════════════════
+# 🔴 2026-09-18 改动12（主人令「都按你推荐的处理」）：融合器按边际 alpha 精选源。
+#   背景：11 源 walk-forward 横比（by_factor 边际 edge，剔 β）显示 3 正 8 负：
+#     正：sig_jinzuan +1.179 / sig_chan +0.898 / p4_lowvol45 +0.338（e5）
+#     负：quality −3.266 / sig_jigou −2.227 / sig_trend −2.085 / p4_resid10 −1.476 /
+#         p4_resid5 −1.080 / sector −0.525 / p4_lowvol55 −0.153 / fund −0.128
+#   精选(3正源) vs 全量(11源等权) 边际差 = +1.58pp。
+#   改动1 已让四量 src_score 按**动态 edge** 计分（负信号自动压 0），但存在
+#   **回流漏洞**：qd(+0.5) / 60m(+0.5~0.8) 加分可把「无任何正 edge 信号」的
+#   0 分票复活回独立源（负 alpha 借道回流，正是「单源票淹没强信号」的残余路径）。
+#   修法：加分只授予**有正 edge 资格**的票（基础分>0）；资格由运行期动态 edge
+#   自适应 —— 扩样复核（阿狸咪 40~60 信号日）后 edge 翻正的信号自动恢复，
+#   无需改代码（融合器不写死）。信号标签照常展示，仅不计分。
+#   逐项交待（诚实）：
+#     · p4_lowvol45（e5 +0.338）**不新增**入融合：edge10 = −3.18 与 e5 异号
+#       （generate_top10.py L513 同判据「证据矛盾，不启用」），薄样本证据不稳。
+#     · quality/fund 无融合入口（仅在回测诊断里度量），无需动刀；
+#     · sector 的 sec_add 板块加分是主人既定的独立机制、且薄样本 edge=−0.525
+#       不足以动它 —— 不改，等扩样结论。
+#   回退：V8_FUSION_ALPHA_SELECT=0 → 恢复旧行为（加分不设资格），便于 A/B 与紧急回滚。
+V8_FUSION_ALPHA_SELECT = os.environ.get("V8_FUSION_ALPHA_SELECT", "1").strip() != "0"
 _ROE_OLD_SCALE = {0: 2.0, 5: 1.5, 15: 1.0}      # 旧：前5=2.0 / 5~15=1.5 / 其余=1.0
 _ROE_NEW_SCALE = {0: 1.0, 5: 0.75, 15: 0.5}     # 新：整体降一档（等于把「与四量同权」改为「次级确认」）
 
@@ -739,6 +760,7 @@ def main():
         "trend": "上涨趋势",
         "form_A": "形态A",
     }
+    _alpha_skipped = 0   # 改动12：因「无正 edge 资格」被拦下的四量票数（诊断回显）
     for s in top10.get("top10") or []:
         code = s.get("code")
         if not code:
@@ -756,14 +778,22 @@ def main():
         #   读不到时回退硬编码默认值并已置 SIGNAL_EDGE_DEGRADED 降级标记。
         _edge = _signal_edge_of(_sig_d)
         src_score = max(0.0, min(4.5, 1.5 + _edge * 0.18))
-        if qd:
+        # 🔴 2026-09-18 改动12：按边际 alpha 精选源 —— 基础分≤0 = 无任何正 edge
+        #   信号命中（如纯 trend/jigou 负 alpha 组合）⇒ 不给加分资格，防负 alpha
+        #   票借 qd/60m 加分复活成独立源。资格随动态 edge 自适应（扩样后自动跟随）。
+        #   V8_FUSION_ALPHA_SELECT=0 可回退旧行为。
+        _alpha_qualified = (src_score > 0.0) or (not V8_FUSION_ALPHA_SELECT)
+        if V8_FUSION_ALPHA_SELECT and not _alpha_qualified:
+            _alpha_skipped += 1
+        if qd and _alpha_qualified:
             src_score += 0.5
         # ── 60min 多周期共振加分（同算法不同时间框架 = 经典共振）──
         _60m_item = _60m_hits.get(norm_code(code))
         if _60m_item:
             _60m_qd = bool(_60m_item.get("qd") or _60m_item.get("XG"))
             _60m_bonus = 0.8 if _60m_qd else 0.5
-            src_score += _60m_bonus
+            if _alpha_qualified:
+                src_score += _60m_bonus
             # 🔴 2026-09-11 A 类修复：标签必须与真实口径一致。_four_vol_src 非 60m
             #   （60m 陈旧/空壳回退日线）时不得再标「60min多周期共振」—— 那是日线共振。
             if _four_vol_src.startswith("60m"):
@@ -792,6 +822,9 @@ def main():
                 r["enter_dates"].append(s["enter_date"])
             elif top10.get("update_time"):
                 r["enter_dates"].append(top10["update_time"][:10])
+    # 🔴 2026-09-18 改动12：拦截情况回显（不许静默——被拦了多少只必须可见）
+    if V8_FUSION_ALPHA_SELECT and _alpha_skipped:
+        print(f"[改动12] alpha精选：{_alpha_skipped} 只四量票因无正edge信号命中被拦（不计独立源，标签仍展示）")
 
     # 2026-09-03 主人令：#4 全站精选 source 整段下线（allsite.* 不再读）
 
@@ -1389,6 +1422,11 @@ def main():
         "n_on10": dict(SIGNAL_N),
         "consistent": dict(SIGNAL_CONSISTENT),
         "loaded": dict(SIGNAL_EDGE_META or {}),
+        # 🔴 2026-09-18 改动12：alpha 精选运行时真相（回测复现/看板核对用）
+        "alpha_select": {
+            "enabled": bool(V8_FUSION_ALPHA_SELECT),
+            "skipped_no_positive_edge": int(_alpha_skipped),
+        },
     }
 
     result = {
