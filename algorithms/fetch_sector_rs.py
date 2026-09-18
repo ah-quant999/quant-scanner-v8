@@ -11,7 +11,8 @@ v2 (2026-06-26): 新增相对强度计算（板块vs大盘指数）
    - relative_20d = 板块20日涨跌 - 指数20日涨跌
    - 新增 strong_relative_5d / strong_relative_20d / anti_drop 排名
 """
-import json, os, sys, datetime, requests as req
+import json, os, sys, re, datetime, requests as req
+from collections import Counter
 from fetch_logger import record_success, record_failure
 import pandas as pd
 
@@ -55,12 +56,34 @@ def _phase_of(s):
     return '震荡'
 
 
-def _save_phase_snapshot(sectors, update_time_str, today_str):
-    """把今日 phase 快照写入 raw_data/sector_phase_history.json（累积历史）。
+def _is_weekend_date(dstr):
+    """字符串日期是否落在周末（A 股周末必无行情 ⇒ 该日快照必是前一交易日的重复）。"""
+    try:
+        return datetime.date.fromisoformat(str(dstr)[:10]).weekday() >= 5
+    except Exception:
+        return False
+
+
+def _save_phase_snapshot(sectors, update_time_str, data_date_str):
+    """把【数据日】的 phase 快照写入 raw_data/sector_phase_history.json（累积历史）。
 
     格式：{"version":1, "snaps":[{"date","update_time","phases":{name→phase}}]}
-    同一日重复跑 → 覆盖当日；新一日 → append；**永久保留**（2026-09-16 主人令改，用于板块周期档案）。
+    同一数据日重复跑 → 覆盖当日；新一日 → append；**永久保留**（2026-09-16 主人令改）。
+
+    🔴🔴 2026-09-19 一劳永逸（数据日口径，阿狸咪的工程师）：
+      第三个参数原传 `now_str[:10]`（**生成日**）而非数据日。周末/节假日/盘中预跑都会
+      写出与前一交易日**内容重复**的幻影快照。线上铁证（2026-09-19 07:5x 硬抓 Pages）：
+        · `data/SECTOR_RS.js` → data_date=2026-09-19（**周六**，A 股无该日行情）
+        · 快照 28 条内含 2026-09-19(周六) 与 2026-09-12(周六)
+        · 09-19 与 09-18 逐板块 phase **90/90 完全一致**
+        ⇒ 前端 `_prevSnap` 取到 09-18 ⇒ 板块周期卡「阶段迁移」恒 0，
+          **压掉了 09-17→09-18 真实的 66 处迁移**（该卡的核心结论被静默清零）。
+      现值改为传入「真 K 线日」（同花顺路径 = 各板块最后一根 K 线日期的众数），并顺带清污：
+        ① 晚于数据日的快照：无未来数据日的快照 ⇒ 必为生成日误标，剔除；
+        ② 周末日期的快照：周末无行情 ⇒ 必为前一交易日重复，剔除。
+      合法快照**永久保留、不截断**（主人 2026-09-16 令不变）。
     """
+    dd = str(data_date_str)[:10]
     phases = {s['name']: _phase_of(s) for s in sectors if s.get('name')}
     if not phases:
         log("  [phase_history] sectors 为空，跳过快照")
@@ -76,10 +99,22 @@ def _save_phase_snapshot(sectors, update_time_str, today_str):
             log(f"  [phase_history] 读历史失败: {e}，重建")
 
     snaps = history.get("snaps", [])
-    # 覆盖当日
-    snaps = [s for s in snaps if s.get("date") != today_str]
+    # 清污（先剔除非法项，再覆盖同一数据日）
+    _kept, _dropped = [], []
+    for _s in snaps:
+        _sd = str(_s.get("date", ""))[:10]
+        if (not _sd) or (_sd > dd) or _is_weekend_date(_sd):
+            _dropped.append(_sd or "?")
+            continue
+        _kept.append(_s)
+    if _dropped:
+        log(f"  [phase_history] 剔除 {len(_dropped)} 条非法快照"
+            f"（晚于数据日 {dd} / 周末重复）: {sorted(set(_dropped))}")
+    snaps = _kept
+    # 覆盖同一数据日
+    snaps = [s for s in snaps if s.get("date") != dd]
     snaps.append({
-        "date": today_str,
+        "date": dd,
         "update_time": update_time_str,
         "rule_ver": PHASE_RULE_VER,   # 2026-08-31：规则版本，前端只对比同版本快照防假迁移
         "phases": phases,
@@ -96,7 +131,7 @@ def _save_phase_snapshot(sectors, update_time_str, today_str):
     try:
         with open(PHASE_HISTORY_PATH, 'w', encoding='utf-8') as f:
             json.dump(history, f, ensure_ascii=False, indent=2)
-        log(f"  [phase_history] 已存今日快照 ({len(phases)} 板块 phase)，共 {len(snaps)} 天")
+        log(f"  [phase_history] 已存数据日 {dd} 快照 ({len(phases)} 板块 phase)，共 {len(snaps)} 天")
     except Exception as e:
         log(f"  [phase_history] 写历史失败: {e}")
 
@@ -224,6 +259,7 @@ def get_index_pct(api_recall):
 
         # 解析OHLCV表格：分隔线后 col[4] 是单日涨跌幅
         daily_pcts = []
+        last_date = None
         past_sep = False
         for line in content.split("\n"):
             line = line.strip()
@@ -237,6 +273,13 @@ def get_index_pct(api_recall):
             cols = [c.strip() for c in line.split("|")]
             if len(cols) < 5:
                 continue
+            # 🔴 2026-09-19：机会性提取该行的日期（前 3 列里找 YYYY-MM-DD）。
+            #   找到就用作数据日；找不到保持 None ⇒ 上游标 fetch_fallback，**不猜**。
+            for _c in cols[:3]:
+                _dm = re.search(r"(\d{4})[-/](\d{1,2})[-/](\d{1,2})", _c)
+                if _dm:
+                    last_date = "%s-%02d-%02d" % (_dm.group(1), int(_dm.group(2)), int(_dm.group(3)))
+                    break
             try:
                 pct_str = cols[4]
                 if pct_str and pct_str not in ('-', '--', ''):
@@ -249,6 +292,7 @@ def get_index_pct(api_recall):
             n = len(daily_pcts)
             def sum_pct(offset):
                 return round(sum(daily_pcts[-offset:]), 2) if n >= offset else round(sum(daily_pcts), 2)
+            idx.setdefault("_date", {})[name] = last_date
             idx[name] = {
                 "5d": sum_pct(5), "20d": sum_pct(20), "30d": sum_pct(30),
                 "60d": sum_pct(60), "90d": sum_pct(90), "180d": sum_pct(180), "52w": sum_pct(252),
@@ -290,11 +334,13 @@ def main():
 
         if len(sectors) >= 10 and has_long_windows:
             log(f"✓ 基准指数: {benchmark['name']} 5日{benchmark['5d']:.2f}% 20日{benchmark['20d']:.2f}% 52周{benchmark['52w']:.2f}%")
-            result = _build_result(sectors, benchmark, now_str, source="neodata")
+            _neo_dd = (idx.get("_date") or {}).get("hs300") or (idx.get("_date") or {}).get("sh")
+            result = _build_result(sectors, benchmark, now_str, source="neodata", data_date=_neo_dd)
             with open(OUT, 'w', encoding='utf-8') as f:
                 json.dump(result, f, ensure_ascii=False, indent=2)
-            log(f"✅ 已保存 (来源: neodata, {len(sectors)}板块)")
-            _save_phase_snapshot(sectors, now_str, now_str[:10])
+            log(f"✅ 已保存 (来源: neodata, {len(sectors)}板块, 数据日 {result.get('data_date')}"
+                f" [{result.get('data_date_source')}])")
+            _save_phase_snapshot(sectors, now_str, result.get("data_date") or now_str[:10])
             record_success(__file__)
             return
         else:
@@ -308,10 +354,19 @@ def main():
     try:
         import akshare as ak
         result = _fetch_via_ths(now_str)
+        # 🔴 2026-09-19：`_build_result` 在 sectors 全空时返回 None，其注释明写「拒绝写盘、
+        #   保留上一版」—— 但原调用方直接 json.dump(None) ⇒ 把产物写成字面量 `null`，
+        #   正好**覆盖**了它声称要保留的上一版（自相矛盾）。此处按注释语义落地。
+        if not result:
+            log("❌ 同花顺返回空：按 _build_result 声明语义**保留上一版**（不写盘、不留快照）")
+            record_failure(__file__, "同花顺返回 0 个板块，按语义保留上一版")
+            return
         with open(OUT, 'w', encoding='utf-8') as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
-        log(f"✅ 已保存 (来源: 同花顺, {len(result.get('sectors',[]))}板块)")
-        _save_phase_snapshot(result.get("sectors", []), now_str, now_str[:10])
+        log(f"✅ 已保存 (来源: 同花顺, {len(result.get('sectors',[]))}板块, "
+            f"数据日 {result.get('data_date')} [{result.get('data_date_source')}])")
+        _save_phase_snapshot(result.get("sectors", []), now_str,
+                             result.get("data_date") or now_str[:10])
         record_success(__file__)
         return
     except Exception as e:
@@ -333,8 +388,13 @@ WINDOWS = [
     ("90d", 90), ("180d", 180), ("52w", 252)
 ]
 
-def _build_result(sectors, benchmark, now_str, source="unknown"):
-    """构建最终结果 JSON（支持 5/20/30/60/90/180日及52周）"""
+def _build_result(sectors, benchmark, now_str, source="unknown", data_date=None):
+    """构建最终结果 JSON（支持 5/20/30/60/90/180日及52周）
+
+    data_date：**数据自身日**（真 K 线日）。取不到时回退 `now_str[:10]`（生成日）并把
+      data_date_source 标成 fetch_fallback —— 让下游一眼区分「真值 / 推断值」，
+      而不是把生成日冒充数据日（2026-09-19 阿狸咪修的就是这条）。
+    """
     for s in sectors:
         for key, _ in WINDOWS:
             pct_f = f"pct_{key}"
@@ -351,9 +411,15 @@ def _build_result(sectors, benchmark, now_str, source="unknown"):
         log(f"❌ 板块数据全空（来源 {source} 返回 0 个板块），拒绝写盘："
             f"不产出空 SECTOR_RS 污染前端（保留上一版）")
         return None
+    _dd = str(data_date)[:10] if data_date else now_str[:10]
     result = {
         "update_time": now_str,
-        "data_date": now_str[:10],   # 2026-08-18 补：板块周期卡比对锚点
+        # 2026-08-18 补：板块周期卡比对锚点；2026-09-19 修为**真 K 线日**（原为生成日）
+        "data_date": _dd,
+        # kline=真值（来自 K 线最后日期）｜fetch_fallback=推断值（只知生成日，下游勿当事实）
+        "data_date_source": "kline" if data_date else "fetch_fallback",
+        # 抓取日（事实）——与数据日**分开命名**，避免下游把两者混用
+        "fetch_date": now_str[:10],
         "data_available": True,
         "source": source,
         "sectors": sectors,
@@ -405,12 +471,17 @@ def _fetch_via_ths(now_str):
 
     # 2. 逐个获取历史数据计算涨跌幅
     sectors = []
+    _kdates = []      # 🔴 2026-09-19：各板块**最后一根 K 线日期**，用于求真数据日
     for i, name in enumerate(board_names):
         try:
             df = ak.stock_board_industry_index_ths(symbol=name, start_date=start_d_400, end_date=end_d)
             if df is None or len(df) < 2:
                 continue
             df['日期'] = pd.to_datetime(df['日期']) if '日期' in df.columns else pd.to_datetime(df.index)
+            try:
+                _kdates.append(df['日期'].iloc[-1].strftime("%Y-%m-%d"))
+            except Exception:
+                pass
 
             closes = df['收盘价'].values
             n = len(closes)
@@ -440,6 +511,17 @@ def _fetch_via_ths(now_str):
 
     log(f"  ✓ 成功获取 {len(sectors)} 个板块数据")
 
+    # 🔴 2026-09-19：真数据日 = 各板块最后一根 K 线日期的**众数**。
+    #   用众数而非 max：个别板块停牌/缺档时 max 会把离群日误当全局数据日。
+    _kdate = None
+    if _kdates:
+        _kdate = Counter(_kdates).most_common(1)[0][0]
+        _uq = sorted(set(_kdates))
+        log(f"  真 K 线日(众数) = {_kdate}（样本 {len(_kdates)} 板块，日期集合 {len(_uq)} 个，"
+            f"尾部 {_uq[-3:]}）")
+    else:
+        log("  ⚠️ 未取到任何 K 线日期 ⇒ data_date 回退生成日并标 fetch_fallback")
+
     # 3. 获取指数基准（用上证指数）
     try:
         sh_df = ak.stock_board_industry_index_ths(symbol='上证指数', start_date=start_d_400, end_date=end_d)
@@ -456,7 +538,7 @@ def _fetch_via_ths(now_str):
     except:
         benchmark = {"name": "上证指数(近似)", "5d": 0, "20d": 0, "30d": 0, "60d": 0, "90d": 0, "180d": 0, "52w": 0}
 
-    return _build_result(sectors, benchmark, now_str, source="同花顺")
+    return _build_result(sectors, benchmark, now_str, source="同花顺", data_date=_kdate)
 
 if __name__ == "__main__":
     main()

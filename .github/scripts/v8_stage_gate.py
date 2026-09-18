@@ -386,6 +386,32 @@ def read_ut(root: str, rel: str):
     return None
 
 
+def read_vintage(root: str, rel: str):
+    """读产物的**数据日**（data_date 字段）→ 'YYYY-MM-DD'；无则 None。
+
+    🔴 2026-09-19 阿狸咪（对齐 fetch_sector_rs.py 的 data_date 语义变更）：
+      data_date 原写**生成日**（now_str[:10]），已在生产侧修为**真 K 线日**。
+      本函数只用于**可见性**：把数据日写进 check_ready 明细，并标 `VINTAGE_LAG`
+      —— 让「产物的数据比它自称的旧」这件事**在日志里现形**。
+
+    🔴🔴 为什么**不**作为硬否决（勿擅自改成 ready=False）：
+      ① A 批 items=13 / need=11 ⇒ 单个文件的陈旧本就落在允许的 2 项容错额度内，
+         设硬否决**不改变**裁决结果，只会新增「该文件稍晚出稿 ⇒ 整批不就绪」的锁死面。
+      ② 逃生门 `_escape_gate` 用 `_newest`（读 update_time）算落后天数：
+         数据日陈旧而 update_time 新鲜时 lag=0 ⇒ **逃生门不会兜底**，
+         硬否决会直接把 B/D 批饿死（主人铁律：must 须由该批时窗内生产者产出，否则整链锁死）。
+      若将来要升为硬否决，**必须先把 _escape_gate 也改为按数据日判落后**，再改判据。
+    """
+    path = os.path.join(root, rel)
+    try:
+        with open(path, "r", encoding="utf-8", errors="ignore") as fh:
+            head = fh.read(20000)
+    except OSError:
+        return None
+    m = _DATE_RE.search(head)
+    return f"{m.group(1)}-{m.group(2)}-{m.group(3)}" if m else None
+
+
 def _cand(r):
     """把 (day, hh, mm) 展开成候选解释：原样 +（若 hh<6）归前一自然日的 24:xx。
 
@@ -478,6 +504,9 @@ SEQ_REF: dict[str, str] = {
 def check_ready(root: str, stage: str, day: str, floor: tuple[int, int], kind: str = "trading"):
     """返回 (是否就绪, '命中/总数', 明细)。
 
+    ⚠️ 2026-09-19 起，明细里可能出现 `VINTAGE_LAG(文件 数据日=X≠链数据日=Y)`
+       —— 这是**提示信息，不参与 ready 裁决**（改动判据前必读 read_vintage 注释）。
+
     kind='t1'（周六/假期首日）时放宽 A 采集批：T+1 日数据天然是「部分刷新」，
       若仍按交易日 3/3 + 龙虎榜必新，A 会永远不就绪 → 整条 T+1 链卡死（漏档）。
       放宽为「任一 A 产物当日刷新即视为采集完成」，把节奏交给 B/D/E 三批。
@@ -498,6 +527,10 @@ def check_ready(root: str, stage: str, day: str, floor: tuple[int, int], kind: s
             parts.append(f"{os.path.basename(it)}=STALE({r[0]} {r[1]:02d}:{r[2]:02d})")
         else:
             parts.append(f"{os.path.basename(it)}=MISS")
+        # 🔴 2026-09-19：数据日可见化（不改裁决；理由见 read_vintage 注释）
+        _vi = read_vintage(root, it)
+        if _vi and _vi != day:
+            parts.append(f"⚠️VINTAGE_LAG({os.path.basename(it)} 数据日={_vi}≠链数据日={day})")
         if it in must and not ok:
             must_ok = False
 
