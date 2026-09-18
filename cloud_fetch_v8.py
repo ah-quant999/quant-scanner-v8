@@ -74,7 +74,8 @@ VAR_TO_RAW = {
     "W52_HIGH": "w52_high.json",
     "ETF_PULSE": "etf_pulse.json",
     "ETF_DAILY_MONITOR": "etf_daily_monitor.json",
-    "ANALYST_RATINGS": "analyst_ratings.json",
+    # 🛡 2026-09-18 孤儿链清理（同上）
+    # "ANALYST_RATINGS": "analyst_ratings.json",
     "INDEX_QUOTES": "index_quotes.json",
     "EXPERIMENT": "experiment.json",
     "V8_CAL": "v8_cal.json",
@@ -93,8 +94,8 @@ VAR_TO_RAW = {
 # 变量名 → 更新时段（与 update_v8.py 的 CATEGORY_MAP 对齐）
 CATEGORY_MAP = {
     # 盘前
-    "V8_CAL": "premarket",
-    "IPO_DATA": "premarket",
+    "V8_CAL": "premarket,post_close",
+    "IPO_DATA": "premarket,post_close",
     "MARGIN_DATA": "premarket,post_close",
     # 2026-08-31：期指主力合约为盘中实时，放回实时数据页，改为 intraday 抓取
     "CFFEX_HOLDINGS": "intraday",
@@ -108,8 +109,9 @@ CATEGORY_MAP = {
     "CRISIS_DATA": "premarket,intraday",
     "MACRO_BRIEF": "premarket,intraday",
     "JUDGMENT_DATA": "premarket,intraday",
-    "NORTH_FUND": "premarket",
-    "ANALYST_RATINGS": "premarket",
+    "NORTH_FUND": "premarket,post_close",
+    # 🛡 2026-09-18 孤儿链清理（同上）
+    # "ANALYST_RATINGS": "premarket",
     # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
     "W52_HIGH": "premarket,post_close",
     # 盘中（ETF 二合一·盘中异动/资金热度、板块资金流向等实时场景。
@@ -4339,7 +4341,9 @@ def main(category=None, only=None):
         ("W52_HIGH", f_w52_high),
         ("ETF_PULSE", f_etf_pulse),
         ("ETF_DAILY_MONITOR", f_etf_daily_monitor),
-        ("ANALYST_RATINGS", f_analyst_ratings),
+        # 🛡 2026-09-18 孤儿链清理：ANALYST_RATINGS 前端零引用、注入侧映射已移除
+    #    ⇒ 抓了无注入无消费，纯浪费抓取预算。此处注销（保留 f_analyst_ratings 定义备查）。
+    # ("ANALYST_RATINGS", f_analyst_ratings),
         ("EXPERIMENT", f_experiment),
         ("V8_CAL", f_v8_cal),
         ("CANDIDATE_QUOTES", f_candidate_quotes),
