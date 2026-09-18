@@ -6965,20 +6965,61 @@ function fmtSigned(v){
       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
       + '<b style="font-size:15px;">🧪 因子截面观测 · 异常换手率 × ROE_TTM</b>'
       + '<span class="st-tab-star" data-card="因子实验室"></span>'
-      + '<span style="font-size:10px;font-weight:600;color:#ef5350;background:rgba(239,83,80,.12);padding:1px 6px;border-radius:4px;">回测未达标</span>'
+      /* 🔴 2026-09-18 主人令「这还写着回测不达标…矛盾且混乱啊」：
+         原为**写死**「回测未达标」徽章，与产物真值打架 ——
+         FACTOR_LAB_BACKTEST.js 实跑 verdict_3star=PASS（IS利差+0.975 / OOS利差+0.175 同号）。
+         现改为**读产物真值**：PASS→绿「回测已达标」，FAIL→红「回测未达标」，缺数据→灰「待回测」。
+         铁律：徽章是产物的投影，不是写死的文案。 */
+      + (function(){
+          var _B = window.FACTOR_LAB_BACKTEST || {};
+          var _v = ((_B.abnormal_volume || {}).verdict_3star || '').toUpperCase();
+          var _c = _v === 'PASS' ? '#22c55e' : (_v === 'FAIL' ? '#ef5350' : '#94a3b8');
+          var _t = _v === 'PASS' ? '✅ 回测已达标' : (_v === 'FAIL' ? '⛔ 回测未达标' : '⏳ 待回测');
+          return '<span style="font-size:10px;font-weight:600;color:' + _c + ';background:' + _c + '1f;padding:1px 6px;border-radius:4px;" title="读数源 data/FACTOR_LAB_BACKTEST.js · abnormal_volume.verdict_3star">' + _t + '</span>';
+        })()
       + _flBadge
       + '</div>'
       // 2026-09-13 主人令：更新于胶囊移到卡名后紧跟（与全站一致），解析块下移。
       + '<div style="background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
-      + '<b style="color:#22d3ee;">&#x1F4CC; 核心：</b>仅验证 2 个单因子（异常换手率、ROE_TTM 大市值档），<b style="color:#ef5350">独立分层回测 OOS 未达标，尚未转正</b>。<br>'
-      + '<b style="color:#22d3ee;">&#x1F4A1; 用法：</b>当前按<b>星级委员会统一口径</b>评级（见卡名旁 ⭐，鼠标悬浮看依据）；达标（利差>0 + Top胜率≥55% + OOS同号）后转正「选股策略」子页。<br>'
-      + '<b style="color:#22d3ee;">&#x26A0; 限制：</b>当前为<b>观测仓</b>（星级由委员会统一测算），<b>不可用于选股评分</b>；已产出回测结果但未通过门槛（回测明细见「策略回测」页 🧪 因子实验室回测卡）。</div>'
+      /* 🔴 2026-09-18 主人令「到底因子们算啥？为什么上表中没有？矛盾且混乱啊」：
+         原核心块写「OOS 未达标 / 不可用于选股评分」= 过期结论（产物已 PASS）；
+         且**从未向主人说明这两个因子在本卡之外早已接入算法链**（作为共振加分源）。
+         现补三段：① 定位（因子=加分项，非选股策略）；② 已接入事实；③ 本卡与「策略回测」页的区别。 */
+      + '<b style="color:#22d3ee;">&#x1F9EA; 定位：</b><b>本卡是因子分层研究，不是选股策略</b> —— 它只回答「这个因子有没有区分度」，'
+      + '<b style="color:#22c55e">不产出股票池、不进选股策略页</b>。<br>'
+      + '<b style="color:#22d3ee;">&#x1F4CC; 算法链中的角色：</b>两个因子已作为<b>共振加分源</b>接入 <code style="background:rgba(34,211,238,.1);padding:1px 4px;border-radius:3px;">final_recommend.py</code>：'
+      + '候选池里的票若命中该因子 ⇒ <b>加计入 final_score ⇒ 排序前移</b>，因此它们的正确叫法是<b>「加分项」</b>，'
+      + '<b>不是「选股策略」</b>（真正的选股发生在候选池那一层）。<br>'
+      + '<b style="color:#22d3ee;">&#x1F4A1; 用法：</b>本卡星级的唯一真源 = <b>星级委员会</b>（见卡名旁 ⭐，悬浮看依据）；'
+      + '因子自身「转正为选股策略」的判据 = 利差&gt;0 + Top层胜率≥55% + OOS与IS同号。<br>'
+      + '<b style="color:#22d3ee;">&#x26A0; 与「策略回测」页的区别：</b>本页 = <b>因子分层研究</b>（五分位，看区分度）；'
+      + '「策略回测」页 🧪 因子实验室回测卡 = <b>同一因子的持仓口径回测</b>（L1 最强五分位的持有期档）。'
+      + '两者<b>不是两套结论，是同一因子的两种切法</b>，切勿对比名次。<br>'
+      + '<b style="color:#22d3ee;">&#x1F4CA; 当前状态：</b>见上方徽章（读产物真值，非写死）；明细见「策略回测」页 🧪 因子实验室回测卡。</div>'
       + gateBanner
       + '<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">重点池 '+_e(m.n_universe)+' 只 · 异常换手率有效 '+_e(m.n_at_valid)+' · ROE大市值档 '+_e(m.n_roe_large)+'　'
       + '<span style="color:#22c55e">●</span>缩量强势 <span style="color:#ef5350">●</span>放量弱势</div>'
       + _focusBlock('① 异常换手率（缩量=多，因子越高越强势）','#22d3ee',atFocus,'at','at','完整榜单：Top30 强势 + Bottom10 放量弱势')
       + _focusBlock('② ROE(TTM) 全市场主板·大市值档（成交额代理 Top1/3）','#38bdf8',roeFocus,'roe','roe','完整榜单：ROE Top30')
-      + '<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5;">口径：异常换手率=当月换手率÷过去12月均值（缩量→低关注→强势），仍用重点池(351只)；ROE_TTM=近4个单季 roeAvg 差分求和（2026-09-11 口径修正：baostock roeAvg 为财年内累计值，原直接累加4季属跨年重复计算），全市场主板·大市值档(成交额top1/3)。IC 显著（Spearman IC t=4.3 / 3.3），<b style="color:#ef5350">但独立分层回测的样本外（OOS）利差为负、Top 层胜率未过 55% 门槛 ⇒ 属样本内显著、样本外失效，不构成 edge 证据</b>。🟢可关注=择时开放且因子进入前20%分位。仅研究参考，非买卖建议。</div>'
+      + '<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5;">'
+      + '口径：异常换手率=当月换手率÷过去12月均值（缩量→低关注→强势），仍用重点池(351只)；ROE_TTM=近4个单季 roeAvg 差分求和（2026-09-11 口径修正：baostock roeAvg 为财年内累计值，原直接累加4季属跨年重复计算），全市场主板·大市值档(成交额top1/3)。'
+      + 'IC 显著（Spearman IC t=4.3 / 3.3）。'
+      /* 🔴 2026-09-18 主人令「矛盾且混乱」：原**写死**「OOS 利差为负 ⇒ 样本外失效」
+         = 09-14 前后旧结论，与今日产物（OOS +0.175 同号、verdict PASS）打架。
+         现改为**读产物真值**动态渲染，正负自动着色，杜绝文案与产物脱钩。 */
+      + (function(){
+          var _B = window.FACTOR_LAB_BACKTEST || {};
+          var _a = _B.abnormal_volume || {};
+          if(_a.spread_oos_pct == null) return '独立分层回测：<b style="color:#94a3b8">待回测</b>。';
+          var _is = _a.spread_in_sample_pct, _oos = _a.spread_oos_pct;
+          var _ok = (_oos > 0) && ((_a.verdict_3star || '').toUpperCase() === 'PASS');
+          var _col = _ok ? '#22c55e' : '#f59e0b';
+          var _fmt = function(v){ return v == null ? '—' : (v > 0 ? '+' : '') + Number(v).toFixed(2) + '%'; };
+          return '独立分层回测：IS 利差 <b>' + _fmt(_is) + '</b> · OOS 利差 <b style="color:' + _col + '">' + _fmt(_oos) + '</b>'
+               + ' ⇒ <b style="color:' + _col + '">' + (_ok ? '样本内外同号、已过门槛' : '样本内外不同号或未过门槛，不构成 edge 证据') + '</b>';
+        })()
+      + '　（数据源 data/FACTOR_LAB_BACKTEST.js，update_time 见上）'
+      + '。🟢可关注=择时开放且因子进入前20%分位。仅研究参考，非买卖建议。</div>'
       + '<div style="font-size:11px;color:#fbbf24;margin-top:6px;line-height:1.5;">⭐ 升级路径（2026-09-17 主人令·统一按委员会）：星级一律取<b>星级委员会</b>唯一真源，本页不再单独升降星。转正判据：利差&gt;0 + Top胜率≥55% + OOS同号，且全市场扫描数据侧开启后复验通过 ⇒ 转正「选股策略」子页（回测明细见「策略回测」页 🧪 因子实验室回测卡）。</div>'
       + '</div>';
     dst.innerHTML = html;
@@ -7891,7 +7932,31 @@ window.__renderIndexObserve = function(){
       }
       return null;
     }
-    var rows = F.factors.map(function(f){
+    /* 🔴 2026-09-18 主人令「已接入的，为什么上表中没有？」：
+       实测真相 = 上半表 7 行**全部是「未使用/部分使用」的候选缺口**，
+       已接入算法链的因子（60日成交额中位数 / 换手率趋势）**本就不在该表**（该表设计是「缺口表」不是「全清单」）。
+       为避免主人再次误读「已接入的没登记」，此处**自 FACTOR_PROGRESS 动态追加已接入的对照行**（绿框），
+       数据源仍是台账，前端只读不编。 */
+    var _integratedRows = (function(){
+      var _out = '', _ints = (pst.walkforward_integrated || []);
+      var _pm = {};
+      (P.factors || []).forEach(function(x){ if(x && x.name) _pm[x.name] = x; });
+      _ints.forEach(function(nm){
+        var _f = _pm[nm] || {};
+        var _ir = (_f.oos_ir == null) ? '—' : (Number(_f.oos_ir).toFixed(2));
+        _out += '<tr style="background:rgba(34,197,94,.07);border-top:1.5px solid rgba(34,197,94,.35);">'
+          + '<td style="padding:6px 8px;font-size:12px;font-weight:700;color:var(--txt);">' + _ev(nm)
+          + '<span style="margin-left:5px;font-size:10px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.14);padding:1px 5px;border-radius:4px;">✅ 已接入算法链</span></td>'
+          + '<td style="padding:6px 8px;font-size:11px;color:var(--sub);">' + _ev(_f.label || '—') + '</td>'
+          + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">' + _ev(_f.data_source || '—') + '</td>'
+          + '<td style="padding:6px 8px;font-size:11px;font-weight:700;color:#22c55e;">✅ 已接入 generate_top10.py</td>'
+          + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">IR_OOS ' + _ir + '</td>'
+          + '<td style="padding:6px 8px;font-size:11px;font-weight:700;color:#22c55e;">已上线</td>'
+          + '</tr>';
+      });
+      return _out;
+    })();
+    var rows = _integratedRows + F.factors.map(function(f){
       var sc = statusColor(f.v8_status);
       var pc = priorityColor(f.priority);
       var _wo = _wfOverlay(f.name);
