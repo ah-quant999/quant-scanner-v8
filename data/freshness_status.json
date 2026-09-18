@@ -1,27 +1,38 @@
 {
-  "check_time": "2026-09-18 08:46:00",
-  "last_trade_close": "2026-09-17 15:30:00",
+  "check_time": "2026-09-18 15:49:24",
+  "last_trade_close": "2026-09-18 15:30:00",
   "is_trading_day": true,
-  "core_stale": [],
+  "core_stale": [
+    {
+      "var": "VOLATILITY",
+      "reason": "更新于 09-17 18:33，落后 2 个交易日（阈值 1.08333）",
+      "category": "post_close"
+    },
+    {
+      "var": "CRDS_CARD_DATA",
+      "reason": "更新于 09-17 20:00，落后 2 个交易日（阈值 1）",
+      "category": "algo"
+    }
+  ],
   "warn_stale": [],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 43,
-    "core_stale": 0,
+    "core_stale": 2,
     "warn_stale": 0,
     "frozen_stale": 0,
     "no_timestamp": 0
   },
   "category_map": {
-    "V8_CAL": "premarket",
-    "IPO_DATA": "premarket",
+    "V8_CAL": "premarket,post_close",
+    "IPO_DATA": "premarket,post_close",
     "NT_DATA": "premarket",
     "MARGIN_DATA": "premarket,post_close",
     "CFFEX_HOLDINGS": "intraday,post_close",
     "MACRO_DATA": "premarket,post_close",
     "CRISIS_DATA": "premarket,intraday",
-    "NORTH_FUND": "premarket",
+    "NORTH_FUND": "premarket,post_close",
     "SUSPENSION_ALERT": "premarket",
     "MARKET_ALERTS": "intraday,post_close",
     "OVERSEAS_MARKETS": "intraday,post_close",
