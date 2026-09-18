@@ -4818,9 +4818,16 @@ function fmtSigned(v){
      ⚠️ 与 __STAR_PROFILE_OF（权重档）、__STAR_KIND（股池）三表必须同口径：
         一张卡进委员会 = PROFILE_OF 有档 + 数据源可达。缺任一都是「流程漏登记」。 */
   window.__STAR_ALT_SOURCES = {
-    /* 强势跟踪：真值源 IMA_STRONG_BACKTEST（真实日K·已扣双边0.30%·信号层）。
-       实测 T+1 67.5%(n=40) / T+5 67.5%(n=40) / T+30 90.6%(n=32)，
-       四档超额全正且显著，但 maxN=40<100 ⇒ 按原文规则封顶 4⭐。 */
+    /* 强势跟踪：**备通道（兜底）**，登记源 = IMA_STRONG_BACKTEST（真实日K·已扣双边0.30%·信号层）。
+       🔴 2026-09-19 node 实测更正（原注释写「真值源」是**错的**，与生效路径不符）：
+         主通道 BACKTEST_ALL_ALGOS.rows 自 09-18 起已含 card='强势跟踪' 的 13 行，
+         键集与本通道**完全相同**（1/2/3/5/10/20/30/45/60/75/90/180/250），
+         而上方合并逻辑是 `if(out[k]) return;`（**主通道优先**）⇒ **本通道当前 0 贡献、被完全遮蔽**。
+         实测：抹掉 window.IMA_STRONG_BACKTEST ⇒ 星级**一字不变**（仍 4★/score 4.51/maxN 40）；
+               抹掉主通道行 ⇒ 落到本通道 ⇒ 4★/score 4.82/maxN 83。
+       ⇒ 判「强势跟踪星级的数据源」**必须看主通道**，即 E 批聚合器 algorithms/gen_backtest_all_algos.py
+         ← raw_data/ima_strong_backtest.json（**不是** data/IMA_STRONG_BACKTEST.js；两者会分叉）。
+       ⚠️ 本通道**保留作兜底**：主通道行若被移除或被零样本档过滤掉，它仍能顶上。 */
     '强势跟踪': {
       by_period: function(){
         var IM = window.IMA_STRONG_BACKTEST || {};
