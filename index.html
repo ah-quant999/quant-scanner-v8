@@ -2891,7 +2891,22 @@ function fmtSigned(v){
       <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span class="st-tab-star" data-card="三重共识"></span></button>
       <button class="st-tab" data-st="life" onclick="switchSt('life')">📡 强势跟踪 <span class="st-tab-star" data-card="强势跟踪"></span></button>
       <button class="st-tab" data-st="fa" onclick="switchSt('fa')">🧪 因子实验室 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">非策略·加分项</span></button>
-      <!-- 2026-09-18 晚 主人令「两边要统一口径并展示」：此处原为硬编码静态残渣「弱市专用·0★观测」（09-17 时逆势龙头 n=4 不可评级的旧状态），今 BACKTEST_ALL_ALGOS 实算逆势龙头 2.61⭐(n=87,cov95%)，静态星标与策略回顾表口径打架。现统一接全站唯一星级出口 st-tab-star chip（__committeeRate 实时计算），保留「弱市专用」用途提示。 -->
+      <!-- 2026-09-18 晚 原记录：此处硬编码「弱市专用·0★观测」被改为接 st-tab-star chip（__committeeRate 实时计算）。
+           🔴 2026-09-18 (g) 更正 —— 该次改动的**方向对（统一星级出口）**，但它引用的依据是错的，
+              而且它把一处**潜藏的口径漏洞显性化**了（主人随即截图质问「这个也评星么」）：
+              · 原文写「实算逆势龙头 2.61⭐(n=87,cov95%)」—— n=85（非 87）是 **T+1 期**的样本，
+                不是「参与评分的各期」的样本；
+              · 真正参与加权的 T+5 / T+30 **各只有 4 笔**（short 档两期合计权重 0.60），
+                实测 score **4.63**（非 2.61），且 **68% 的分数压在 4 笔样本上**；
+              · 同一份产物里它的 is_primary 主口径行 T+5(n=4) 已被自身标为
+                「样本 4 < 门槛 30 → 累积中，**不进主表排名**」——
+                即**主表说「不排名」、tab 显示 4.63⭐**，同一事实两处相反结论；
+              · 本页 L3098 卡内注释（09-06）与 logic.html「不挂星级」也都被它打破。
+              ⇒ 根因不在这次改动，在**闸门口径**：原取「各期样本最大值(maxN)」做门槛，
+                被 T+1 的 85 笔掩护了 T+5/T+30 各 4 笔。本次已把闸门改为
+                **minActiveN（参与评分的每一期都要达门槛）**，逆势龙头遂回到「不可评级」，
+                与主表 / 卡内 / logic.html **四处口径重新一致**。
+                另：本项与回测卡「逆势龙头CRDS」此前同名不同星，已用 starKey 统一。 -->
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span class="st-tab-star" data-card="逆势龙头"></span> <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span></button>
     </div>
 
@@ -4642,6 +4657,13 @@ function fmtSigned(v){
        （四量终极 / 三重共识 / 选股生命周期 / 因子 / 逆势龙头），其他的你不要乱加」——
        本表是**选股策略专属**的权重档登记处，只登记选股策略页上的卡
        （⚠️ 2026-09-18 补：因子实验室虽同页，但它是**加分项**、不产股票池 ⇒ **不登记**，见下方注释）。
+        🔴🔴 2026-09-18 (g) **本表语义定正 = 参评资格登记处**：未登记 ⇒ **不评星级**。
+           此前 `(PROFILE_OF||{})[card] || 'medium'` 会在未登记时**回落默认档**，
+           于是「撤销登记」只是从「显式」变「隐式」，评级照旧 —— 实测：
+             · 「因子实验室」撤登记后**仍算出 5⭐**（当日下午据注释宣称的「已不评星」不成立）
+             · 「K线信号层」09-16 已删登记，**仍算出 4⭐**
+           现由 __committeeRate 显式判「未登记 ⇒ kind='noreview' ⇒ 不评星级」，
+           使「登记/撤销登记」真正成为参评开关。
        此前误登记的两项已删除（它们不时选股策略，属"乱加"）：
          · ❌ 'K线信号层' —— cat=signal / kind=signal / is_primary 全 0，是技术信号参考层
          · ❌ '强势突破'   —— page=暂未上架，未进选股策略页（其定位见回测页"不列入排名"区块）
@@ -4657,7 +4679,12 @@ function fmtSigned(v){
        ⚠️ 原 09-16 那个 4⭐ 本已存疑（长档依赖大盘 β：250 日 L1 79.8% vs L5 70.9%，
           异常换手因子样本外多空价差 −0.042% 无预测力）。现改为**不评级**；
           「升级中」警示改由 __BETA_DEP_FLAG 挂在**卡片角标**上（与星级彻底解耦）。
-       ⚠️ 与「逆势龙头」对齐：两者同为本页 0⭐ 观测项（后者因 maxN 不足不可评级）。 */
+       ⚠️ 与「逆势龙头」对齐：两者同为本页**不评星**观测项。
+          🔴 2026-09-18 (g) 更正：原文写「后者因 maxN 不足不可评级」是**错的** ——
+             实测逆势龙头 maxN=**85**（足够），真正不足的是**参与评分各期的最小样本
+             minActiveN=4**（T+5/T+30 各 4 笔，合计权重 0.60）。闸门已由 maxN 改为
+             minActiveN，它才真的不可评级。（这也是「取最大值」这个口径本身的错：
+             一期大样本会掩护其余小样本期。） */
     /* 🆕 2026-09-17 主人令「审计完再定新星级」—— 强势跟踪**登记进委员会**。
        此前它**有回测源、有前端卡，却不在本表、不在聚合器 SOURCES、不在聚合快照 rows**
        ⇒ 委员会 cov=0 ⇒ 星级恒 0（页面显示「—」，并非「没给星」而是**流程漏登记**）。
@@ -4869,6 +4896,17 @@ function fmtSigned(v){
                            + _best.samples + ' ⇒ 列入观察')
                         : '') };
     }
+    /* 🔴🔴 2026-09-18 (g) 「撤销登记 = 不评星」必须真正生效 —— 原实现是**假的**。
+       实证（node 真实复算 data/BACKTEST_ALL_ALGOS.js @2026-09-18 20:47）：
+         · 「因子实验室」撤销 PROFILE_OF 登记后，pk 回落到默认 'medium' ⇒ **仍算出 5⭐**
+         · 「K线信号层」同因（09-16 已从表里删）⇒ **仍算出 4⭐**
+       即「撤销登记」只是从「显式登记」变成「隐式默认档」，评级照旧、只是没人看得见。
+       ⇒ 现明确：本表 = **参评资格登记处**。未登记 ⇒ 无参评资格 ⇒ 不评星级。
+       （pool 分支在上方，基础股池仍保留自己的专用提示与「<45% 列入观察」，不受影响。） */
+    if((window.__STAR_PROFILE_OF || {})[card] == null){
+      return { ready:false, stars:0, kind:'noreview', cov:0, maxN:0,
+               note:'不评星级：未登记参评资格（__STAR_PROFILE_OF 即参评资格登记处）' };
+    }
     var periods = window.__committeePeriods(card);
     /* 再并入「源文件 comparison」的多期（若该卡登记在 __STAR_COMPARISON_CARDS）——
        必须用**并集**：rows 里可能只有零星几档（零样本长档在上层被过滤掉），
@@ -4909,23 +4947,41 @@ function fmtSigned(v){
     }
 
     /* 覆盖度：profile 权重中「真有样本」的比例 */
-    var tot = 0, got = 0, maxN = 0;
+    var tot = 0, got = 0, maxN = 0, minActiveN = null;
     Object.keys(prof.weights).forEach(function(k){
       var w = prof.weights[k]; tot += w;
       var p = periods[k];
-      if(p && p.samples > 0){ got += w; if(p.samples > maxN) maxN = p.samples; }
+      if(p && p.samples > 0){
+        got += w;
+        if(p.samples > maxN) maxN = p.samples;
+        /* 🆕 2026-09-18 (g)：参与评分的每一期的**最小**样本 —— 闸门用它，而不是最大值 */
+        if(minActiveN == null || p.samples < minActiveN) minActiveN = p.samples;
+      }
     });
     var cov = tot ? got / tot : 0;
     /* 🔴 2026-09-17 主人令（审计第④处缺陷）：原 `cov<0.6 || maxN<30` 把两种完全不同的
        情况混成同一句「累积中」—— ①「新策略、样本正在累积」与 ②「根本算不出（如 CRDS 全历史
        只有 4 笔）」被当成同一件事，会让主人以为「再等等就会好」。
        现按样本量分流：maxN<10 ⇒ 明说「不可评级」（不是等，是数据不足以支撑任何评级）。 */
-    if(maxN < 30){
-      return { ready:false, stars:0, kind:'strategy', cov:cov, maxN:maxN,
-               insufficient: (maxN < 10),
-               note: (maxN < 10
-                 ? ('样本严重不足（最大 n=' + maxN + '，门槛 ≥30）⇒ 不可评级，须待样本累积')
-                 : ('累积中 · 持有期覆盖 ' + Math.round(cov * 100) + '%（需 ≥60% 且样本 ≥30）')) };
+    /* 🔴🔴 2026-09-18 (g) 闸门口径修正：maxN → **minActiveN**（主人令「逻辑不能出错」）
+       —— 原实现取「所有期样本的**最大值**」当门槛 ⇒ **一期大样本掩护其余小样本期**。
+       实证（2026-09-18 真值 data/BACKTEST_ALL_ALGOS.js）：
+         逆势龙头 maxN=**85**（全部来自 T+1），而真正参与加权的 T+5 / T+30 **各只有 4 笔**
+         （两者合计权重 0.60）⇒ score **4.63**、且 **68% 的分数压在 4 笔样本上**；
+         同一份产物里它的 is_primary 主口径行 T+5(n=4) 已被自身标为
+         「样本 4 < 门槛 30 → 累积中，**不进主表排名**」。
+         ⇒ 主表说「不排名」、tab 却显示 4.63⭐ —— 同一事实两处相反结论。
+       改口径后「证据强度」成为**结构性保证**，不再靠人工登记去挡。
+       实测零误伤（v2 对照）：三重共识 minN=42 / 四量终极 minN=1018 / 强势跟踪 minN=32
+       三张在用策略的 stars 与 score **逐字节不变**，仅逆势龙头（minN=4）转为不可评级。 */
+    var gateN = (minActiveN == null ? 0 : minActiveN);
+    if(gateN < 30){
+      return { ready:false, stars:0, kind:'strategy', cov:cov, maxN:maxN, minActiveN:gateN,
+               insufficient: (gateN < 10),
+               note: (gateN < 10
+                 ? ('样本严重不足（参与评分的最小期样本 n=' + gateN + '，门槛 ≥30）⇒ 不可评级，须待样本累积')
+                 : ('累积中 · 持有期覆盖 ' + Math.round(cov * 100)
+                    + '%（需 ≥60% 且**每一期**样本 ≥30；当前最小期 n=' + gateN + '）')) };
     }
     if(cov < 0.6){
       return { ready:false, stars:0, kind:'strategy', cov:cov, maxN:maxN,
@@ -4975,7 +5031,9 @@ function fmtSigned(v){
          三重共识 score 2.89 → 3⭐（超额为负把「基准超额」维度压到低分 ⇒ 自然落 3⭐）
          四量终极 score 3.92 → 4⭐
          因子实验室 score 3.53 → 4⭐（⚠️ 2026-09-18 主人令：已改为**不评星**，此行仅存历史留痕）
-         逆势龙头 maxN=4 <30 ⇒ 不可评级
+         逆势龙头 minActiveN=4 <30 ⇒ 不可评级
+           （🔴 2026-09-18 (g) 更正：原文写 maxN=4 —— 实测 maxN=85，不足的是
+             **参与评分各期的最小样本**；闸门同日由 maxN 改为 minActiveN）
        ⇒ 五项**全部与主人 2026-09-17 批准的星级表一致**。
        ⚠️ 基准数据尚未产出时 excess 维度为 null ⇒ 权重重归一化（不按 0 计），
           **不会误伤任何卡**；基准数据一到即自动生效。 */
@@ -4999,7 +5057,8 @@ function fmtSigned(v){
     var nCapped = false;
     if(maxN < 100 && stars > 4){ stars = 4; nCapped = true; }
     return { ready:true, stars:stars, score:Math.round(score * 100) / 100, kind:'strategy',
-             cov:cov, maxN:maxN, profile:pk, penal:penal, penalWhy:penalWhy, shortWr:shortWr,
+             cov:cov, maxN:maxN, minActiveN:(minActiveN == null ? null : minActiveN),
+             profile:pk, penal:penal, penalWhy:penalWhy, shortWr:shortWr,
              shortExcess:shortExcess, nCapped:nCapped };
   };
 
@@ -5026,7 +5085,12 @@ function fmtSigned(v){
     //   so at equal 4 stars the second array slot keeps it right under four-volume.
     //   Star basis: strict band resonance>=80, T+20 win rate 61.1% / avg +4.06% / Sharpe 0.42.
     {key:'triple',     name:'三重共识',     icon:'🧲', desc:'严格档共振≥80 历史回测', color:'#38bdf8', var:'__tripleBacktestAdapted'},
-    {key:'crds',       name:'逆势龙头CRDS', icon:'🐉', desc:'CRDS advanced 档历史回测', color:'#ef4444', var:'CRDS_BACKTEST'}, /* 2026-09-06 审计修复：弱市专用不评星，回测卡不再挂 3⭐ */
+    /* 🆕 2026-09-18 (g) 同名统一：本项 name 是「逆势龙头CRDS」，而星级表 key 是「逆势龙头」
+       ⇒ __renderBacktestCardsFrom 用 m.name 取星**取不到**（回落默认 medium 档，且
+       __committeePeriods 找不到同名行）⇒ 回测卡显示「累积中」；而 tab 按钮用「逆势龙头」
+       取到 4.63⭐ ⇒ **同一策略两处不同星**（正是 __renderCommitteeStars 注释要根治的问题）。
+       现加 starKey 显式指向星级表 key，显示名保持「逆势龙头CRDS」不变。 */
+    {key:'crds',       name:'逆势龙头CRDS', starKey:'逆势龙头', icon:'🐉', desc:'CRDS advanced 档历史回测', color:'#ef4444', var:'CRDS_BACKTEST'}, /* 2026-09-06 审计修复：弱市专用不评星，回测卡不再挂 3⭐ */
     /* 🆕 2026-09-16 主人令「生命周期三个算法里明显高手的更好 ⇒ 改为强势跟踪」：
        原「高手强势股跟踪」升为本页正式策略卡，名称统一为「强势跟踪」。
        数据源 window.IMA_STRONG_BACKTEST（真实日K · 已扣双边 0.30%），
@@ -5127,7 +5191,7 @@ function fmtSigned(v){
     /* 2026-09-13 主人令「统一测算标准」：回测卡星级不再是硬编码（原 __STRATEGY_BACKTESTS[].stars），
        一律实时取全站唯一真源 —— 与策略回测页主表**同源**，两处永不打架。 */
     (list||[]).slice().map(function(m){
-      var rt = (typeof window.__committeeRate === 'function') ? window.__committeeRate(m.name) : null;
+      var rt = (typeof window.__committeeRate === 'function') ? window.__committeeRate(m.starKey || m.name) : null;
       var o = {}; for(var k in m){ if(Object.prototype.hasOwnProperty.call(m,k)) o[k]=m[k]; }
       o._rt = rt; o.stars = (rt && rt.ready) ? rt.stars : 0;
       return o;
@@ -14244,8 +14308,22 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
            + ' style="font-size:10px;color:#38bdf8;background:rgba(56,189,248,.12);'
            + 'border:1px solid rgba(56,189,248,.32);padding:1px 6px;border-radius:8px;white-space:nowrap;">基础股池</span>';
     }
+    if(rt.kind === 'noreview'){
+      /* 🆕 2026-09-18 (g)：未登记参评资格 ⇒ 显示「不评星级」灰标签（而不是「累积中」）。
+         同时保留**数据基座警示角标**（__BETA_DEP_FLAG）—— 它只加标注、不动星级，
+         与星级彻底解耦（主人 09-16 令「可以标注」）。 */
+      var _bdN = (typeof window.__betaDepHTML === 'function') ? window.__betaDepHTML(card) : '';
+      return '<span title="'+(rt.note||'')+'" style="font-size:10px;color:#94a3b8;font-weight:500;'
+           + 'background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px;white-space:nowrap;">不评星级</span>' + _bdN;
+    }
     if(!rt.ready){
-      return '<span style="font-size:10px;color:var(--dim);" title="'+(rt.note||'')+'">累积中</span>';
+      /* 🆕 2026-09-18 (g)：把 __committeeRate 早已算好的 `insufficient` 分流**真正落到显示上**。
+         原实现两种情况都写「累积中」，会让主人以为「再等等就会好」——
+         而这正是 09-17 审计第④处缺陷点名的问题（「不可评级」与「累积中」被混成一句，
+         前者是**数据不足以支撑任何评级**，不是等的问题）。 */
+      var _txtN = rt.insufficient ? '不可评级' : '累积中';
+      var _bd2 = (typeof window.__betaDepHTML === 'function') ? window.__betaDepHTML(card) : '';
+      return '<span style="font-size:10px;color:var(--dim);" title="'+(rt.note||'')+'">'+_txtN+'</span>' + _bd2;
     }
     /* 2026-09-17 主人令：诚实显示真实实算分（带小数），不整数化、不人为封顶。 */
     var s = (rt.score == null ? '–' : rt.score) + '⭐';
