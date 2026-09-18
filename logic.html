@@ -1079,36 +1079,71 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <br><b>🔴 2026-09-18 主人令</b>：「这条只要告诉我超买超卖，不需要评判其他，把这个删除」——
         本卡自此<b>只报超买超卖</b>，已删除全部评判性内容：<b>📈 买/加 · 📋 关注</b>胶囊、<b>📉 卖/减</b>胶囊、
 <b>⚠ 破MA20 / 破MA60</b>警告（原第二行整行移除）。档位判定改为<b>纯位置口径</b>（只用 <code>position_vs_ma20/ma60</code>），
-不再引用单日涨跌与连涨连跌信号 ⇒ 语义上不构成任何买卖建议。</div>
-        <div class="logic-h">📊 超买超卖档位（2026-09-18 起为<b>纯位置口径</b>）</div>
+不再引用单日涨跌与连涨连跌信号 ⇒ 语义上不构成任何买卖建议。
+<br><b>🔴🔴 2026-09-18 主人令（治本）</b>：「这个平均股价的超买超卖干嘛要累积够了才算啊？不对吧」
++「肯定A，我肯定都选能治本的」。<b>原问题</b>：档位只读 <code>position_vs_ma20/ma60</code>，
+而这两字段在样本 &lt;20/&lt;60 个交易日时恒为 <code>null</code> ⇒ 档位恒空 ⇒ 该卡长期显示
+「⏳ 均线积累中 X/20 日」，指标无限期不可用（实测当时已有 15 条真实历史，15 日均线偏离 +2.44% 完全可用）。
+<b>治本</b>：引入<b>有效窗口</b>机制——取「当前样本支持的最大标准窗口」，样本够即用、随累积自动升档
+（≥5 用 MA5 → ≥10 用 MA10 → ≥15 用 MA15 → ≥20 用 MA20 → ≥60 用 MA60），
+全部为<b>真实历史算术均值</b>，绝不外推、绝不填充、绝不冒充；<code>ma20</code>/<code>ma60</code> 严格定义保持不变（正式口径）。
+<b>阈值按窗口缩放</b>：短窗口均线更贴近现价，偏离绝对值天然更小（实测平均绝对偏离 MA5=1.27% / MA10=1.63% / MA15=2.44%），
+若沿用 MA20 的 ±3/±5 会使 MA5~MA15 恒落中性区 ⇒ 等于换个方式继续不可用；故阈值系数 = 窗口/20，
+各档触发频率趋于一致，MA20 保持 ±3/±5 与原口径完全一致。</div>
+        <div class="logic-h">📊 超买超卖档位（2026-09-18 起为<b>纯位置口径 · 有效窗口</b>）</div>
+        <div class="logic-p">判定源 = <code>position_vs_ma_eff</code>（有效窗口偏离）。其缺失时回退
+<code>position_vs_ma20</code> / <code>position_vs_ma60</code>（向后兼容旧数据）。<b>阈值按窗口缩放</b>
+（系数 = 窗口 / 20，以 MA20 的 ±3/±5 为基准）——窗口越短、均线越贴近现价，阈值越小，各档触发频率趋于一致。
+档位胶囊<b>附窗口名</b>（如「🟠 偏高·超买·MA15」），判断依据对主人可见。</div>
         <table class="lg-table">
-          <tr><th>触发条件（满足其一即入档）</th><th>显示</th><th>含义</th></tr>
-          <tr><td><code>position_vs_ma20</code> &gt; 5% 或 <code>position_vs_ma60</code> &gt; 10%</td><td>🔴 高位·超买</td><td>明显高于均线</td></tr>
-          <tr><td><code>position_vs_ma20</code> &gt; 3% 或 <code>position_vs_ma60</code> &gt; 6%</td><td>🟠 偏高·超买</td><td>高于均线</td></tr>
-          <tr><td><code>position_vs_ma20</code> &lt; −5% 或 <code>position_vs_ma60</code> &lt; −8%</td><td>🟢 偏低·超卖</td><td>明显低于均线</td></tr>
-          <tr><td><code>position_vs_ma20</code> &lt; −3% 或 <code>position_vs_ma60</code> &lt; −5%</td><td>🟡 偏低·超卖</td><td>低于均线</td></tr>
-          <tr><td>两均线偏离均落在中性区间</td><td><b>不渲染档位</b></td><td>零信息量，不显示</td></tr>
-          <tr><td>均线未就绪（两值皆 <code>null</code>）</td><td>⏳ 均线积累中 X/20 日</td><td>只披露进度，<b>不下任何结论</b></td></tr>
+          <tr><th>有效窗口</th><th>偏高阈值</th><th>高位阈值</th><th>偏低阈值</th><th>低位阈值</th></tr>
+          <tr><td>MA5（样本 ≥5）</td><td>&gt; +0.75%</td><td>&gt; +1.25%</td><td>&lt; −0.75%</td><td>&lt; −1.25%</td></tr>
+          <tr><td>MA10（样本 ≥10）</td><td>&gt; +1.50%</td><td>&gt; +2.50%</td><td>&lt; −1.50%</td><td>&lt; −2.50%</td></tr>
+          <tr><td>MA15（样本 ≥15）</td><td>&gt; +2.25%</td><td>&gt; +3.75%</td><td>&lt; −2.25%</td><td>&lt; −3.75%</td></tr>
+          <tr><td>MA20（样本 ≥20）</td><td>&gt; +3.00%</td><td>&gt; +5.00%</td><td>&lt; −3.00%</td><td>&lt; −5.00%</td></tr>
+          <tr><td>MA60（样本 ≥60）</td><td>&gt; +9.00%</td><td>&gt; +15.00%</td><td>&lt; −9.00%</td><td>&lt; −15.00%</td></tr>
+        </table>
+        <div class="logic-p"><b>档位显示对照</b>（以有效窗口阈值为准，满足其一即入档）：</div>
+        <table class="lg-table">
+          <tr><th>触发条件</th><th>显示</th><th>含义</th></tr>
+          <tr><td>偏离 &gt; 高位阈值</td><td>🔴 高位·超买<i>·窗口</i></td><td>明显高于均线</td></tr>
+          <tr><td>偏离 &gt; 偏高阈值</td><td>🟠 偏高·超买<i>·窗口</i></td><td>高于均线</td></tr>
+          <tr><td>偏离 &lt; −高位阈值</td><td>🟢 偏低·超卖<i>·窗口</i></td><td>明显低于均线</td></tr>
+          <tr><td>偏离 &lt; −偏高阈值</td><td>🟡 偏低·超卖<i>·窗口</i></td><td>低于均线</td></tr>
+          <tr><td>偏离落在中性区间</td><td><b>不渲染档位</b></td><td>零信息量，不显示</td></tr>
+          <tr><td>样本 &lt;5（无任何可用窗口）</td><td>⏳ 均线积累中 X/5 日（满15/20日自动升档）</td><td>只披露进度，<b>不下任何结论</b></td></tr>
         </table>
         <div class="logic-p"><b>🔴 2026-09-18 主人令口径变更（重点）</b>：原「📉 卖出信号」「📈 买入信号」两张表已<b>整段删除</b>——
 本卡<b>只回答超买超卖</b>，不再产出「买/加」「卖/减」「关注」「可分批」等任何评判性内容；
 档位判定不再引用 <code>avg_change_pct</code>（单日暴涨暴跌）与 <code>history[]</code>（连涨连跌反转）信号，
 只由位置偏离决定 ⇒ 语义上不再构成买卖建议。开仓裁决仍以「🤖 AI速览」为全站唯一关口。</div>
         <div class="logic-h">数据源</div>
-        <div class="logic-p"><code>AVG_PRICE_DATA</code> 的 <code>avg_price</code>（当前均价）/ <code>position_vs_ma20</code> / <code>position_vs_ma60</code>（位置偏离，<b>档位判定的唯一依据</b>）。
-        <br><code>ma20</code> / <code>ma60</code> 为均线水位，仅用于算出上述偏离值，<b>不再直接上屏</b>（vs 行已于 2026-09-16 删除）。
+        <div class="logic-p"><code>AVG_PRICE_DATA</code> 的 <code>avg_price</code>（当前均价）/ <code>position_vs_ma_eff</code>（<b>有效窗口偏离，档位判定的首要依据</b>）；
+        其缺失时回退 <code>position_vs_ma20</code> / <code>position_vs_ma60</code>。
+        <br><b>有效窗口字段（2026-09-18 新增）</b>：<code>ma_eff</code>（有效窗口均线值）/
+        <code>ma_eff_window</code>（窗口名，如 <code>MA15</code>）/ <code>position_vs_ma_eff</code>（偏离%）/
+        <code>ma_short</code>（各档短窗口真值字典，如 <code>{ma5, ma10, ma15}</code>）/ <code>ma_eff_ready</code>（是否可用）。
+        <br><code>ma20</code> / <code>ma60</code> 为<b>正式口径</b>均线水位（严格 ≥20/≥60 样本才出值），
+        仅用于算出对应偏离值，<b>不再直接上屏</b>（vs 行已于 2026-09-16 删除）。
         <br><code>history[]</code> / <code>avg_change_pct</code> 仍由数据层产出（供 <code>history_days</code> 计算积累进度、供其他消费方），
         但<b>本卡渲染已不再读取</b>——连涨/连跌反转、单日暴涨暴跌两类信号随 2026-09-18 主人令一并删除。</div>
         <div class="logic-h">示例</div>
         <div class="logic-p">
-        · 中性：<code>position_vs_ma20=+1.0%</code> → <b>不渲染档位</b>（落在中性区间，零信息量）。<br>
-        · 偏高：<code>position_vs_ma20=+4.0%</code> → 🟠 偏高·超买。<br>
-        · 高位：<code>position_vs_ma20=+6.0%</code> 或 <code>position_vs_ma60=+11%</code> → 🔴 高位·超买（单腿满足即可入档）。<br>
-        · 偏低：<code>position_vs_ma20=−4.0%</code> → 🟡 偏低·超卖；<code>position_vs_ma60=−9%</code> → 🟢 偏低·超卖。<br>
-        · 未就绪：两值皆 <code>null</code> → ⏳ 均线积累中 15/20 日。</div>
+        · <b>实测（2026-09-18 线上真实数据）</b>：样本 15 条 ⇒ 有效窗口 <code>MA15</code>，
+        <code>ma_eff=28.1838</code>、<code>position_vs_ma_eff=+2.44%</code> &gt; +2.25%
+        → 渲染 <b>🟠 偏高·超买·MA15</b>。<i>（修复前该值读 null，卡片显示「⏳ 均线积累中 15/20 日」）</i><br>
+        · 中性：样本 15 条、偏离 <code>+1.0%</code> → <b>不渲染档位</b>（落在 ±2.25% 中性区间内）。<br>
+        · 高位：样本 15 条、偏离 <code>+4.0%</code> &gt; +3.75% → 🔴 高位·超买·MA15。<br>
+        · 偏低：样本 15 条、偏离 <code>−3.0%</code> → 🟡 偏低·超卖·MA15。<br>
+        · 升档：样本达 20 条 ⇒ 窗口自动切 <code>MA20</code>，阈值随之变为 ±3/±5（胶囊显示 ·MA20）。<br>
+        · 未就绪：样本 &lt;5 条（无任何可用窗口）→ ⏳ 均线积累中 X/5 日。</div>
         <div class="logic-h">代码位置</div>
-        <div class="logic-p"><code>index.html</code> 渲染在 <code>renderAiSummary()</code> IIFE 内「4b. 💰 平均股价」约 <b>L2300-2380</b>
-        （紧凑版一行 + 行末超买超卖胶囊；<b>2026-09-18 起已无第二行</b>——买卖信号面板与破线警告整段删除，2026-08-12 起不再有独立卡片容器）。</div>
+        <div class="logic-p"><code>index.html</code> 渲染在 <code>renderAiSummary()</code> IIFE 内「4b. 💰 平均股价」约 <b>L2320-2400</b>
+        （紧凑版一行 + 行末超买超卖胶囊；<b>2026-09-18 起已无第二行</b>——买卖信号面板与破线警告整段删除，2026-08-12 起不再有独立卡片容器）。
+        <br><b>2026-09-18 治本改动位置</b>：判定源三级回退 + 阈值按窗口缩放代码在「4b」IIFE 内，
+        <code>_pEff</code> / <code>_effW</code> / <code>_pvT</code> / <code>_k = _wNum/20</code> 一带。
+        <br><b>数据层产出位置</b>：<code>cloud_fetch_v8.py → f_avg_price()</code> 内，
+        <code>_MA_LADDER</code> 与 <code>ma_eff</code> / <code>ma_short</code> 计算段。</div>
       </div>
 
       
