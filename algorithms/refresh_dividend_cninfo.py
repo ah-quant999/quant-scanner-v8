@@ -39,6 +39,37 @@ DATA_DIR = HERE / "data"
 QUOTE_RAW = RAW_DIR / "stock_quote.json"
 TODAY = date.today()
 
+# 🛡 2026-09-18 一劳永逸（主人令「今日事件页没更新」根因修复 · 小九的工程师）：
+#   本脚本由云端 v8_cn_fetch_cloud.yml 的「💰 分红方案刷新」步调用，该 job 有
+#   timeout-minutes: 60 的**整体预算**，而抓取步已耗 ~23 分钟。实测本步历史耗时
+#   17~39 分钟（35200819678=2340s / 35232628293=1860s / 35290486459 撞墙=2179s），
+#   一旦吃满即把整个 job 拖死 → 其后「推送 raw_data / 重建 data/*.js / 上线 ?v」
+#   全部 skipped ⇒ **整批盘前数据报废**（V8_CAL/IPO_DATA 当日永久陈旧，
+#   即主人所报「今日事件页今天没更新」）。
+#   修法：给本脚本内置「总时长预算闸门」——到点即优雅收工并落盘已刷部分，
+#   保证永远早于 job 超时退出，让后续推送步一定能跑到。
+#   默认 900s（15min）；可用 --budget=秒 覆盖，或 --budget=0 关闭（本地不限时）。
+_BUDGET_S = 900
+for _a in sys.argv:
+    if _a.startswith("--budget="):
+        try:
+            _BUDGET_S = int(_a.split("=", 1)[1])
+        except Exception:
+            pass
+_T0 = time.time()
+
+
+def _budget_left():
+    """剩余预算秒数；_BUDGET_S<=0 表示不限时。"""
+    if _BUDGET_S <= 0:
+        return float("inf")
+    return _BUDGET_S - (time.time() - _T0)
+
+
+def _budget_out():
+    """预算是否已耗尽。"""
+    return _BUDGET_S > 0 and _budget_left() <= 0
+
 UNIVERSE_FILES = {
     "PORTFOLIO": DATA_DIR / "PORTFOLIO.js",
     "CANDIDATE": DATA_DIR / "CANDIDATE.js",
@@ -214,6 +245,14 @@ def main():
     failed = 0
     highlights = []
     for code in sorted(codes):
+        # 🛡 2026-09-18 预算闸门：到点即优雅收工（break 而非 return，保证后面落盘照跑）
+        if _budget_out():
+            print(f"⏱ 预算 {_BUDGET_S}s 已耗尽，优雅收工：本轮已处理 {updated + failed} 只，"
+                  f"未处理 {len(codes) - updated - failed} 只（留待下轮 or 本地补跑）")
+            break
+        if _budget_left() < 30:
+            print(f"⏱ 剩余预算 {_budget_left():.0f}s < 30s，停止扫描剩余票，避免拖死 job")
+            break
         c8 = code8_of(code)
         if c8 not in stocks:
             for pre in ("sh", "sz", "bj"):
@@ -228,6 +267,9 @@ def main():
                 df = ak.stock_dividend_cninfo(symbol=code)
                 break
             except Exception:
+                # 🛡 2026-09-18：重试前先看预算，别把最后的等待浪费在一次无望重试上
+                if _budget_left() < 10:
+                    break
                 time.sleep(2)
         if df is None:
             failed += 1
@@ -263,6 +305,10 @@ def main():
         time.sleep(0.05)  # 礼貌限速，避免 cninfo 限流
 
     print(f"📊 已更新分红方案: {updated} 只 / 失败跳过: {failed} 只")
+    # 🛡 2026-09-18：打印预算用量，便于云端日志归因（是否因预算不足提前收工）
+    if _BUDGET_S > 0:
+        print(f"⏱ 用时 {time.time() - _T0:.1f}s / 预算 {_BUDGET_S}s"
+              + ("（预算耗尽已优雅收工，剩余票留待下轮）" if _budget_out() else ""))
     for h in highlights:
         print(h)
 
