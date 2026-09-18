@@ -223,8 +223,27 @@ def _final_recommend_still_stale():
 #   不产生任何卡片数据，且正常 5-15 分钟即结束；若 in_progress 超 60 分钟必为挂死，
 #   取消它零数据损失、并立即释放并发槽给当晚 19:15 生成。
 #   绝不碰「>=18:00 创建」的盘后生成 run（那才是真正产出卡片的轮次），避免误杀真生成。
+# 🔴🔴 2026-09-19 02:3x 一劳永逸（阿狸咪的工程师 · 实测误杀事故 · 主人令「不要造成踩踏和暴风」）：
+#   【事故】run 35371751539（09-19 01:00:07 CST 创建，runner alimi-cn）在跑 B 批（选股批）第 77 分钟时
+#     被本看门狗 DELETE 取消 ⇒ 第 10~16 步（bridge / update_v8 / health_check / **链尾唯一推送**）
+#     全部 skipped、第 17 步「结果问责」failure ⇒ **77 分钟计算成果全丢、零推送**。
+#   【根因·前提被证伪】下方 stale 判据假设「正常 run 的 updated_at 会随步骤推进持续刷新」——**本仓为假**。
+#     实测：该 run 活跃推进 73 分钟期间 updated_at **恒为 17:00:14Z（= 启动时刻）**，
+#     因为 GitHub 只在**状态跃迁**时刷新它，步骤推进**不刷新**。
+#     ⇒ 任何以 updated_at 判死的阈值都无法区分「跑得久」与「跑挂了」；
+#       而 B 批首位的 v8/factor_lab_gen.py 冷启动 50~90 分钟（run_algorithms.py L349 注释自述），
+#       **结构性必然超过 60 分钟阈值**。
+#   【后果链】长批必被误杀 ⇒ 链尾「唯一推送」永不执行 ⇒ raw_data/ 与 data/ 时间戳分叉长期不自愈
+#     （实测 raw_data/ima_strong_backtest.json 停在 09-18 20:57:25，而同源 data/IMA_STRONG_BACKTEST.js
+#      已到 09-19 02:20:24）—— 这才是「数据不更新」真正的最上游根因。
+#   【修法】stale 陈旧度**仅保留为「疑似」信号**，追加**年龄硬条件**：
+#     只有当 run 年龄超过 job 级 timeout（v8_algo_cloud.yml timeout-minutes: 360）之后仍 in_progress，
+#     才判真僵尸。理由：09-02 起 job 级 360 / 第 9 步 320 分钟超时早已接住「真挂死」，
+#     本看门狗写于 08-24（当时尚无步级超时），其「抢在 19:15 生成前释放槽位」的原始职责**已被取代**；
+#     继续按 60 分钟抢跑只会误杀长批（净损失 >> 收益）。放行时**显式打印一行**，绝不静默。
 ZOMBIE_WF = "v8_algo_cloud.yml"
-ZOMBIE_STALE_MAX_MIN = 60  # run 最后更新(updated_at)超 60 分钟无进展即判定卡死僵尸（不论盘前盘后）
+ZOMBIE_STALE_MAX_MIN = 60   # updated_at 陈旧度：**仅「疑似」信号**，不足以单独判死
+ZOMBIE_MAX_AGE_MIN = 370    # 🔴 判死硬条件：run 年龄 > job 级 timeout(360) + 10 分钟余量仍 in_progress
 
 def api_delete(path):
     """DELETE 并返回 HTTP 状态码（204=成功；看门狗取消 run 用）。"""
@@ -244,11 +263,11 @@ def api_delete(path):
         return -1
 
 def kill_zombie_stale(now, wf=ZOMBIE_WF):
-    """取消「仍 in_progress/pending/queued 但最后更新超阈值静止」的 run，释放并发槽。
-    判定用 updated_at 陈旧度（而非创建时间）：正常 run 的 updated_at 会随步骤推进持续刷新，
-    卡死僵尸则静止不动——这样不论盘前盘后创建，只要静止超 ZOMBIE_STALE_MAX_MIN 分钟就清，
-    避免旧逻辑把 18:xx 创建的挂死 run 误当「盘后生成轮」保护而漏杀（曾导致占槽堵死当晚盘后链）。
-    真正在跑的盘后生成轮 updated_at 持续刷新，不会被误杀。"""
+    """取消「仍 in_progress/pending/queued 且**年龄超 job 级超时**」的 run，释放并发槽。
+    🔴 2026-09-19 更正（见上方事故注释）：原实现以 updated_at 陈旧度**单独**判死，其前提
+    「正常 run 的 updated_at 会随步骤推进持续刷新」**经实测证伪**（活跃推进 73 分钟恒定不动）
+    ⇒ 长跑批（B 批 factor_lab 50~90 分钟）被误杀。现叠加年龄硬条件 ZOMBIE_MAX_AGE_MIN，
+    并保留一行「放行不杀」的显式打印以便审计。"""
     d = api("GET", f"/repos/{REPO}/actions/workflows/{wf}/runs?per_page=30")
     runs = d.get("workflow_runs", []) if isinstance(d, dict) else []
     killed = 0
@@ -264,6 +283,18 @@ def kill_zombie_stale(now, wf=ZOMBIE_WF):
         stale_min = (now - ut).total_seconds() / 60.0
         if stale_min <= ZOMBIE_STALE_MAX_MIN:
             continue  # 仍在活跃推进，正常跑
+        # 🔴 2026-09-19：updated_at 陈旧 ≠ 真挂死（见上方事故注释）⇒ 必须叠加「年龄」硬条件
+        try:
+            _ca = datetime.datetime.fromisoformat(
+                r.get("created_at", "").replace("Z", "+00:00")).astimezone(CST)
+            age_min = (now - _ca).total_seconds() / 60.0
+        except Exception:
+            age_min = None
+        if age_min is None or age_min <= ZOMBIE_MAX_AGE_MIN:
+            print(f"  ⏳ run {r.get('id')} updated_at 陈旧 {stale_min:.0f} 分钟，但年龄仅 "
+                  f"{('未知' if age_min is None else format(age_min, '.0f'))} 分钟 "
+                  f"(< {ZOMBIE_MAX_AGE_MIN}) ⇒ 判为长跑批，**放行不杀**（09-19 事故注释）")
+            continue
         rid = r.get("id")
         print(f"  🧟 卡死僵尸 {wf} run {rid}（{stt} 最后更新 {ut.strftime('%H:%M')}CST，"
               f"已静止 {stale_min:.0f} 分钟），取消以释放并发槽")

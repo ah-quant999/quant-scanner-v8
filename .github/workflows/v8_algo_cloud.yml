@@ -108,6 +108,13 @@ permissions:
 concurrency:
   group: v8-algo-cloud
   cancel-in-progress: false
+  # 🛡 2026-09-19 一劳永逸（阿狸咪的工程师 · 对齐 cn fetch 已验证修法）：
+  #   本仓盘中/盘后派发密集，`cancel-in-progress: false` **只保护「正在运行」的 run**；
+  #   并发组默认「最多 1 running + 1 pending」，**新 run 到达时旧 pending 被无条件顶掉** ⇒
+  #   实测 09-19 01:45 排队的 run 35376253660 在 31 分钟后被 02:16:52 的新派发取消。
+  #   cn fetch 于 09-18 已用 `queue: max` 根治（官方 changelog：并发组可排队至 100，逐个执行不再互顶），
+  #   本链同病同治。`queue` 仅在 cancel-in-progress: false 时生效（本文件已满足）。
+  queue: max
 
 jobs:
   algo:
