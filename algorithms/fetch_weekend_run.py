@@ -33,11 +33,10 @@ HEALTH_REPORT = BASE / ".workbuddy" / "v8_health_report.json"
 WEEKLY_TRACK = [
     ("lhb_data.json",            "龙虎榜"),
     ("triple_history.json",      "三重共振历史"),
-    ("top10_daily.json",         "全站精选"),
-    ("/* cockpit 已下线 2026-09-03 */_tier_recommend.json", "驾驶舱分档"),
+    ("top10_daily.json",         "TOP10推荐池"),
     ("sector_rs.json",           "板块相对强度"),
     ("final_recommend.json",     "最终推荐池"),
-    ("gold_pool.json",           "金股池"),
+    ("gold_pool.json",           "黄金池"),
     ("candidate.json",           "候选池"),
     ("four_volume.json",         "四量终极"),
     ("crds_card_data.json",      "逆势龙头"),

@@ -3285,8 +3285,6 @@ function switchSec(sec,el){
                   || [];
     const goldList = (window.GOLD_POOL && (window.GOLD_POOL.stocks || window.GOLD_POOL.candidates))
                   || [];
-    // COCKPIT_TIER_RECOMMEND 已下线（2026-09-03）：cockList 恒空，下方 if(_in(cockList)) 自然跳过
-    const cockList = [];
     // CRDS 用 cond1_list/cond2_list/cond3_list/cond4_list（按实际 schema）
     const crds = window.CRDS_CARD_DATA||{};
     const crdsList = [].concat(crds.cond1_list||[], crds.cond2_list||[], crds.cond3_list||[], crds.cond4_list||[]);
@@ -3345,7 +3343,6 @@ function switchSec(sec,el){
     try {
       var fr = window.FINAL_RECOMMEND_DATA || {};
       var sff = (window.SECTOR_FUND_FLOW || {});
-      var cock = {};  // COCKPIT_TIER_RECOMMEND 已下线（2026-09-03），保留占位以防其他位置引用 cock
 
       // --- 收集主线板块 ---
       var sectors = [];
@@ -3533,7 +3530,7 @@ function switchSec(sec,el){
     const gstocks = gp.stocks || {};
     const gkey = Object.keys(gstocks).find(k=>normCode(gstocks[k].code)===nc);
     if(gkey) hits.push({name:'⭐ 金股池', color:'var(--up)', detail:'累计信号 '+(gstocks[gkey].signal_count||0)});
-    // 候选池（全站精选底层池）
+    // 候选池（CANDIDATE 池命中标记）
     const cd = window.CANDIDATE || {};
     const cstocks = cd.stocks || {};
     const ckey = Object.keys(cstocks).find(k=>normCode(cstocks[k].code)===nc);
@@ -6335,114 +6332,6 @@ window.showRestrictedItems = showRestrictedItems;
     return {text:txt};
   }
 
-  function renderAlgoCard(s,tier){
-    var qg=s.quality_grade||'';
-    var qColor=qg==='A'?'#7ee0a0':qg==='B'?'#b6e08a':qg==='C'?'#cfcfcf':qg==='D'?'#ff9aa8':'#999';
-    var qBg=qg==='A'?'rgba(126,224,160,.16)':qg==='B'?'rgba(182,224,138,.16)':qg==='C'?'rgba(207,207,207,.14)':qg==='D'?'rgba(255,154,168,.16)':'rgba(240,240,240,.10)';
-    var isHigh=(s.total_score||0)>=70;
-    var scoreColor=isHigh?'#ff6b81':'#c89bff';
-    var tierColor=tier==='A'?'#f4879b':'#7fb4ff';
-    var card='';
-    card+='<div style="background:#0f1a2e;border-left:4px solid '+tierColor+';border-radius:0 8px 8px 0;padding:10px 12px;display:flex;flex-direction:column;gap:5px;">';
-    card+='<div style="display:flex;justify-content:space-between;align-items:flex-start;">';
-    card+='<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">';
-    card+='<span style="font-size:9px;font-weight:700;color:#fff;background:'+tierColor+';border-radius:3px;padding:1px 5px;">'+tier+'</span>';
-    if(qg) card+='<span style="font-size:9px;font-weight:700;color:'+qColor+';background:'+qBg+';border-radius:3px;padding:1px 5px;">基本'+qg+'</span>';
-    if(isHigh) card+='<span style="font-size:9px;font-weight:700;color:#ff6b81;background:rgba(255,107,129,.14);border-radius:3px;padding:1px 5px;">重点</span>';
-    card+='</div>';
-    card+='<span style="font-weight:800;font-size:22px;color:'+scoreColor+';">'+s.total_score+'</span>';
-    card+='</div>';
-    card+='<div style="font-size:14px;font-weight:700;color:#e6eefc;">'+s.name+' <span style="font-size:10px;color:#8aa0c2;">'+s.market+' '+s.code+'</span></div>';
-    if(s.comment) card+='<div style="font-size:10px;color:#9fb0cc;line-height:1.4;">'+s.comment+'</div>';
-    card+='<div style="display:flex;gap:8px;font-size:10px;color:#9fb0cc;flex-wrap:wrap;">';
-    if(s.tech_score!=null) card+='<span>技术 <b>'+s.tech_score+'</b></span>';
-    if(s.rsi!=null) card+='<span>RSI <b>'+s.rsi+'</b></span>';
-    if(s.ret20!=null) card+='<span>20日 <b>'+(s.ret20>=0?'+':'')+s.ret20+'%</b></span>';
-    if(s.ema!=null) card+='<span>EMA <b>'+s.ema+'</b></span>';
-    card+='</div>';
-    if(s.quality_detail) card+='<div style="font-size:9px;color:#c89bff;background:rgba(200,155,255,.12);border-radius:3px;padding:2px 5px;line-height:1.4;">'+s.quality_detail+'</div>';
-    card+='</div>';
-    return card;
-  }
-  function buildAllsiteSelectionHTML(d){
-    var a=d.tier_a||[], b=d.tier_b||[], total=a.length+b.length;
-    var genTime=d.gen_time||d.data_time||'';
-    var h='';
-    h+='<div style="background:linear-gradient(135deg,#13243f,#0e2747);color:#cfe3ff;border:1px solid #244066;border-radius:10px;padding:14px 18px;margin-bottom:14px;">';
-    h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span style="font-size:22px;">🌐</span>';
-    h+='<div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">全站精选 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">⭐⭐⭐</span>';
-    if(genTime) h+=_uBadge('盘后', '中线', genTime);
-    // 「已跑完」胶囊：_runBadgeInfo.label 已含 ✅，不再额外加
-    var _fvInfo = window._runBadgeInfo(genTime);
-    if(_fvInfo.show){
-      h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);white-space:nowrap">'+_fvInfo.label+'</span>';
-    }
-    // 「已入仓」胶囊：2026-08-11 分三态时段守卫（盘前/盘中/盘后），
-    //  盘前/盘中显示 ⏳ 预览 N（蓝色），盘后才用原 🧺 MM-DD 已入仓 N（绿色）。
-    //  其他位置（L3954/L4170/L8146/L8494/L10391/L10839）都是盘后算法链本身就不盘中刷数据，保持原 _holdBadge 不动。
-    if(total>0){
-      var _phP = window._cstParts ? window._cstParts(new Date()) : null;
-      var _phIsPre  = _phP && (_phP.hh < 9 || (_phP.hh === 9 && _phP.mm < 30));
-      var _phIsPost = _phP && _phP.hh >= 15;
-      if(!_phIsPost){
-        var _phLbl = _phIsPre ? '⏳ 待开盘' : '⏳ 盘中预览';
-        var _phDt = (genTime||'').match(/\d{4}-(\d{2})-(\d{2})/);
-        var _phDs = _phDt ? _phDt[1]+'-'+_phDt[2] : '';
-        h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#60a5fa;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.3);white-space:nowrap">📦 '+_phDs+' '+_phLbl+' '+total+'</span>';
-      } else {
-        var _phDt2 = (genTime||'').match(/\d{4}-(\d{2})-(\d{2})/);
-        var _phDs2 = _phDt2 ? _phDt2[1]+'-'+_phDt2[2] : '';
-        h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#60a5fa;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.3);white-space:nowrap">📦 '+_phDs2+' 已入库 '+total+'</span>';
-      }
-    }
-    h+='</div></div></div>';
-
-    // P0 择时门控横幅：与 v8MarketGate() 对齐
-    var _gate2 = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : null;
-    if(_gate2){
-      var _g2Color = _gate2.ok ? 'var(--down)' : 'var(--up)';
-      var _g2Icon = _gate2.ok ? '✅' : '⛔';
-      h+='<div style="background:rgba(15,23,42,.7);border:1px solid rgba(148,163,184,.18);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#dbe6f7;">';
-      h+='<b>'+_g2Icon+' 择时裁决：</b>'+(_gate2.verdict||'')+' <span style="color:'+_g2Color+';font-weight:700;">'+(_gate2.name||'')+'</span> · 建议持有 <b>T+10</b>';
-      if(!_gate2.ok){
-        h+='<br><span style="color:var(--up);">当前非开仓状态，A/B 档仅作观察，不宜新入场。</span>';
-      }
-      h+='</div>';
-    }
-
-    // 数据质量警示：若 A/B 档全部为港股（A股扫描缺失），挂红条提示，避免误导
-    if(total>0){
-      var _allSel = a.concat(b);
-      var _aShareCnt = _allSel.filter(function(s){ return s.market && !/港股|hk/i.test(s.market); }).length;
-      if(_aShareCnt===0){
-        // 2026-08-11 主人令：盘后跑批时间不应写死——盘中应该"下一轮盘中抓取"，盘后才说"盘后重刷"
-        //   2026-08-20：盘后算法链已改 19:15，文案同步
-        var _ph2 = window._cstParts ? window._cstParts(new Date()) : null;
-        var _ph2IsPost = _ph2 && _ph2.hh >= 15;
-        var _next = _ph2IsPost
-          ? '今日盘后跑批已完成，下一次盘后重刷约 20:00'
-          : '下一轮盘中抓取（一般 30 分钟内自动到位），也可手动触发 <code>v8_algo_cloud</code>';
-        h+='<div style="background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;padding:10px 14px;margin-bottom:14px;color:#ef5350;font-size:12px;line-height:1.6;font-family:\"PingFang SC\",\"Microsoft YaHei\",\"Hiragino Sans GB\",sans-serif;">'
-          +'<b>⚠️ A股数据缺失</b>：当前全站精选仅含港股，原因是盘后扫描时 A股活跃股池抓取失败。'+_next+'。'
-          +'</div>';
-      }
-    }
-    if(!total){ h+='<div class="note">当前无 A/B 档精选</div>'; }
-    else {
-      h+='<div style="background:#0f1a2e;border:1px solid #3a2230;border-radius:10px;padding:14px;margin-bottom:12px;">';
-      h+='<div style="font-size:15px;font-weight:700;color:#f4879b;margin-bottom:10px;display:flex;align-items:center;gap:8px;"><span style="background:#b3304a;color:#fff;font-size:11px;padding:2px 7px;border-radius:4px;">A档</span> 重点关注 · '+a.length+' 只</div>';
-      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">';
-      a.forEach(function(s){h+=renderAlgoCard(s,'A');});
-      h+='</div></div>';
-      h+='<div style="height:18px;"></div>';
-      h+='<div style="background:#0f1a2e;border:1px solid #1f3a5c;padding:14px;border-radius:10px;">';
-      h+='<div style="font-size:15px;font-weight:700;color:#7fb4ff;margin-bottom:10px;display:flex;align-items:center;gap:8px;"><span style="background:#1f5fae;color:#fff;font-size:11px;padding:2px 7px;border-radius:4px;">B档</span> 观察候选 · '+b.length+' 只</div>';
-      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">';
-      b.forEach(function(s){h+=renderAlgoCard(s,'B');});
-      h+='</div></div>';
-    }
-    return h;
-  }
   /* 2026-09-03 主人令：logic.html 内 renderAllsite 整段删除 */
 
 

@@ -18,7 +18,7 @@ verify_chain_outputs.py — v8 盘后算法链「产物完整性闸门」
        只在 stdout 打一行「⚠️ 退出码 N」，无人看、无汇总、无告警；
     ② workflow step「🧮 运行盘后算法链」用 `set +e` + `echo "algo exit: $?"`
        **显式丢弃退出码**，job 永远 success；
-    ③ 上游不动则下游全停（候选池是 CRDS / 最终推荐的共同底座），
+    ③ 上游不动则下游全停（候选池是 CRDS / RPS / 最终推荐的共同底座），
        但整条链没有任何「产物是否真的产出了」的校验环节。
 
 修复
@@ -58,29 +58,25 @@ ROOT = os.path.dirname(ALGO)
 #   故 data/*.js 层降为 warn-only（状态照常展示供运维面板消费，不参与判失败），
 #   raw_data 源头层保持严格判定，不放水。
 CRITICAL = [
-    ("候选池", "raw_data/candidate.json", True, "A"),
-    ("候选池(前端)", "data/CANDIDATE.js", False, "A"),
-    ("逆势龙头CRDS", "raw_data/crds_card_data.json", True, "B"),
-    ("逆势龙头(前端)", "data/CRDS_CARD_DATA.js", False, "B"),
-    ("全站精选TOP10", "raw_data/top10_daily.json", True, "B"),
-    ("全站精选(前端)", "data/TOP10_DAILY.js", False, "B"),
-    ("三重共识", "raw_data/triple_consensus.json", True, "B"),
-    ("三重共识(前端)", "data/TRIPLE_CONSENSUS.js", False, "B"),
-    ("四量终极", "data/FOUR_VOLUME.js", False, "B"),
-    ("四量终极60m", "data/FOUR_VOLUME_60M.js", False, "B"),
-    ("最终推荐", "raw_data/final_recommend.json", True, "D"),
-    ("最终推荐(前端)", "data/FINAL_RECOMMEND_DATA.js", False, "D"),
-    ("金股池", "raw_data/gold_pool.json", False, "A"),
+    ("候选池",       "raw_data/candidate.json",        True),
+    ("候选池(前端)", "data/CANDIDATE.js",              False),
+    ("逆势龙头CRDS", "raw_data/crds_card_data.json",   True),
+    ("逆势龙头(前端)", "data/CRDS_CARD_DATA.js",       False),
+    ("相对强度RPS",  "data/STOCK_RPS.js",              False),
+    ("TOP10推荐池", "raw_data/top10_daily.json",     True),
+    ("TOP10推荐池(前端)", "data/TOP10_DAILY.js",       False),
+    ("三重共识",     "raw_data/triple_consensus.json", True),
+    ("三重共识(前端)", "data/TRIPLE_CONSENSUS.js",     False),
+    ("四量终极",     "data/FOUR_VOLUME.js",            False),
+    ("四量终极60m",  "data/FOUR_VOLUME_60M.js",        False),
+    ("最终推荐",     "raw_data/final_recommend.json",  True),
+    ("最终推荐(前端)", "data/FINAL_RECOMMEND_DATA.js", False),
+    ("金股池",       "raw_data/gold_pool.json",        False),
     # 2026-08-28 主人令：mahoro 数据源不再跟踪，已从闸门清单移除
 ]
 
 # 时间戳字段名按优先级尝试（各生成器写法不统一，这里做兼容层）
 TS_KEYS = ["update_time", "updated_at", "updated", "last_update", "更新时间", "date", "trade_date"]
-
-# 🛡 2026-09-14 一劳永逸（阿狸咪的工程师）：产物 → 批次序号，供 --upto 批次窗口过滤。
-#   依据 PREREQ={"A":None,"B":"A","D":"B","E":"D"}（严格串联 A→B→D→E）。
-#   E 批回测产物不在本清单，故 ALL 与 E 同阶。
-STAGE_ORDER = {"A": 1, "B": 2, "D": 3, "E": 4, "ALL": 4}
 
 _TS_RE_CACHE = {}
 
@@ -146,10 +142,6 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--warn-only", action="store_true", help="只报告，不因陈旧而 exit 1")
     ap.add_argument("--date", default=None, help="基准交易日 YYYY-MM-DD（默认按 base_trade_date 推导）")
-    # 🛡 2026-09-14：批次窗口。B 批刚跑完时其下游 D 批尚未开始，
-    #   若仍要求 D 产物新鲜 ⇒ 时序上不可能满足 ⇒ 每轮 B 批 run 假红。
-    ap.add_argument("--upto", default="ALL",
-                    help="只校验「该批及其上游」的产物：A/B/D/E/ALL（默认 ALL）")
     args = ap.parse_args()
 
     today = args.date or base_trade_date(datetime.now(CST))
@@ -158,16 +150,8 @@ def main():
           f"{'（warn-only 模式）' if args.warn_only else ''}")
     print("=" * 72)
 
-    lim = STAGE_ORDER.get((args.upto or "ALL").upper(), STAGE_ORDER["ALL"])
-    print(f"🛡 批次窗口: --upto {args.upto} → 只校验批次 ≤ {lim} 的产物"
-          f"（{'A/B/D/E 全部' if lim >= 4 else '/'.join(k for k, v in STAGE_ORDER.items() if v <= lim and k != 'ALL')}）")
     rows = []
-    skipped = []
-    for name, rel, required, batch in CRITICAL:
-        # 🛡 该产物属下游批次 ⇒ 本轮窗口不涉及，交由对应轮次问责
-        if STAGE_ORDER.get(batch, STAGE_ORDER["ALL"]) > lim:
-            skipped.append((name, rel, batch))
-            continue
+    for name, rel, required in CRITICAL:
         path = os.path.join(ROOT, rel)
         ts, err = extract_ts(path)
         if err == "MISSING_FILE":
@@ -229,11 +213,6 @@ def main():
 
     print("-" * 72)
     print(f"✅ 新鲜 {ok_count} / ❌ 必需项失败 {len(bad_required)} / ⚠️ 时间戳盲区 {len(bad_ts)} / 共 {len(rows)}")
-    if skipped:
-        print(f"⏭️ 批次窗口外（属下游批，交由该批轮次问责）: {len(skipped)} 项")
-        for name, rel, batch in skipped:
-            print(f"    · {name}（{rel}）→ {batch} 批")
-
 
     # GitHub Actions Step Summary（在 Actions 页面直接可见，不用翻日志）
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
@@ -256,10 +235,6 @@ def main():
             "ok": ok_count,
             "failed_required": len(bad_required),
             "ts_blind": len(bad_ts),
-            "stage_window": (args.upto or "ALL"),
-            "skipped_out_of_window": [
-                {"name": n, "path": p, "batch": b} for n, p, b in skipped
-            ],
             "items": [
                 {"name": n, "path": p, "status": s, "ts": t, "required": r, "note": nt}
                 for n, p, s, t, r, nt in rows

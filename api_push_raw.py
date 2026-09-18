@@ -276,7 +276,7 @@ def walk_raw():
     #    保持原有防覆盖行为。
     _ALGO_RAW_PREFIXES = (
         "backtest",          # backtest_tdx.py / backtest_comprehensive.py 等
-        "cockpit_backtest",  # cockpit_backtest_now.py
+        # 2026-09-18 主人令：cockpit_backtest 前缀随驾驶舱下线彻底删除
         "optimized_strategy",# export_optimized_strategy.py
         "algo_track",         # gen_algo_track.py（2026-08-15 三算法追踪）
         "commodity_prices_cache",  # calc_commodity_elasticity.py westock 价格缓存（MCP 预抓取）
