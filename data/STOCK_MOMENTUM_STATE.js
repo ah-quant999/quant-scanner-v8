@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-18 17:35",
- "generated": "2026-09-18 17:35",
+ "update_time": "2026-09-18 17:55",
+ "generated": "2026-09-18 17:55",
  "meta": {
-  "generated": "2026-09-18 17:35",
+  "generated": "2026-09-18 17:55",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 11,
   "days_with_consensus": 0,
@@ -3484,13 +3484,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.53,
       "price": 3.0,
       "category": "突破"
-     },
-     {
-      "code": "301305",
-      "name": "朗坤科技",
-      "change_pct": 5.012,
-      "price": 25.98,
-      "category": "突破"
      }
     ],
     "加速": [
@@ -3747,13 +3740,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.53,
       "price": 3.0,
       "category": "短线选股"
-     },
-     {
-      "code": "301305",
-      "name": "朗坤科技",
-      "change_pct": 5.012,
-      "price": 25.98,
-      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -3839,13 +3825,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "丰林集团",
       "change_pct": 4.53,
       "price": 3.0,
-      "category": "强势股"
-     },
-     {
-      "code": "301305",
-      "name": "朗坤科技",
-      "change_pct": 5.012,
-      "price": 25.98,
       "category": "强势股"
      }
     ]
