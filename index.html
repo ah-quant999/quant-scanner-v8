@@ -14954,12 +14954,24 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         if(_hasL) h += '  </div>';
         h += '</div>';
       });
+      /* 🛡 2026-09-19 补（主人「对应清楚」续）：龙头股快照时间必须上卡面 —— 徽标读的是
+         SECTOR_RS.update_time，而明细来自 SECTOR_LEADERS 快照；两者不同日却只显示新鲜徽标
+         = 显示与实际不符。故快照时间常显，滞后即明示（禁止用新鲜徽标掩盖停更的快照）。 */
+      var slTs = (sl && sl.update_time) || '—';
+      var slLag = '';
+      (function(){
+        var rd = (rs && rs.data_date) || '', sd = (sl && sl.data_date) || '';
+        if(rd && sd && sd !== rd){
+          slLag = ' <b style="color:#f59e0b;">&#x26A0;&#xFE0F; 早于板块数据 ' + rd + '</b>';
+        }
+      })();
       /* 口径对账脚注：两卡计数一眼可验 */
       h += '<div style="font-size:10px;color:var(--dim);line-height:1.7;margin-top:6px;border-top:1px dashed var(--border);padding-top:6px;">'
          + '&#x1F517; 口径对账：本卡板块清单与「板块资金趋势」卡<b style="color:var(--sub);">同源同规则</b>（同一份 SECTOR_RS v'
          + (window.__PHASE_RULE_VER || 2) + ' · ' + ((rs && rs.update_time) || '—') + '）&#8658; 主升 <b style="color:#ef4444;">'
          + nUp + '</b> + 启动 <b style="color:#f59e0b;">' + nLaunch + '</b> 两卡计数必然一致；'
-         + '龙头股 = 东财板块成分股当日涨幅前 5（龙头字典覆盖 ' + Object.keys(dict).length + ' 个板块）。</div>';
+         + '龙头股 = 东财板块成分股当日涨幅前 5（龙头字典覆盖 ' + Object.keys(dict).length + ' 个板块）；'
+         + '龙头股快照 ' + slTs + slLag + '。</div>';
       body.innerHTML = h;
       card.style.display = 'block';
       /* 折叠交互：只挂一次（事件委托，重渲不叠加） */
