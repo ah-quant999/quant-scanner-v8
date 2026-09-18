@@ -26,7 +26,35 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 RAW_DIR = os.path.join(ROOT, "raw_data")
 DATA_DIR = os.path.join(ROOT, "data")
 
+# 🔴🔴 2026-09-19 主人令「为什么总说我取消！一劳永逸」· 源迁移（阿狸咪的工程师）
+#   根因（实测，非推测）：本脚本此前唯一取源 = 下面这行**旧 note 分享页**，
+#   而主人已把 ima 知识库整体迁移到**新 wiki 分享页**。后果实测：
+#     data/IMA_STRONG_STOCK.js → source_title="强势股跟踪日报 2026-09-02"、
+#     data_date="2026-09-02"、stale_days=16、source_stale=true
+#   ⇒ 卡片显示「源停更 16 天」，而主人明明每天在更新知识库。
+#   证据（grep 计数）：迁移前本文件 `folder`/`shareId`/`wiki`/`get_share_info` 均 **0 次**。
+#
+#   新源能力已实测打通（纯 HTTP，无需浏览器、无需登录）：
+#     POST https://ima.qq.com/cgi-bin/knowledge_share_get/get_share_info
+#     body {"share_id":…,"cursor":"","limit":50,"folder_id":"folder_xxx"}
+#     → knowledge_list[] 含 title/media_id/file_size/update_time/introduction/abstract
+#
+#   ⚠️ 已知硬墙（全站 70+ 条实测）：`introduction` 被**服务端截断在 300 字**
+#     （甲午月选股/月运合集多条恰为 300，无一超过；强势股跟踪日报仅 283 字，
+#      只够放表头 + 约 6 只，而实际 58~82 只）。访客态拿不到全文 ——
+#     已穷尽 8 条路径（intro_rsp 恒 null / parsed_file_url 空 / get_media 走加密通道 /
+#     first_screen 报 invalid docid / 6 个候选端点空响应 / COS 直链 403 /
+#     浏览器点卡片不发请求）。
+#   ⇒ 本脚本据此**如实标注** sample_coverage，绝不把「只拿到前 N 只」伪装成全量。
 DEFAULT_URL = "https://ima.qq.com/note/share/_A0YNbqJ8AmbI5kRZ1ZmMQ?channel=5"
+
+# 🆕 新 wiki 源（主人 2026-09-17 在 ima 端配置）
+WIKI_SHARE_ID = "32c01f1da52044f743a01e4aa995d72e7940cc8e99cf413cc5f4c2eb39b4d389"
+WIKI_API = "https://ima.qq.com/cgi-bin/knowledge_share_get/get_share_info"
+# 「强势股跟踪」目录（实测 folder_id，9 篇日报：09-14…09-02）
+WIKI_FOLDER_STRONG_TRACK = "folder_7500817011604393"
+# SSR 深页（实测：比 API 目录新一天，见 _wiki_ssr_latest 说明）
+WIKI_PAGE = "https://ima.qq.com/wiki/"
 
 STATUS_SET = {"强势", "正常", "回落", "见顶", "走弱", "连涨强势"}
 # 🔴 2026-09-17 阿狸咪的工程师（主人令「算法不得出错」专项）：补 "连涨强势"。
@@ -346,6 +374,223 @@ def extract_via_table(page):
         return []
 
 
+def _wiki_post(body, timeout=30):
+    """调用 ima wiki 分享接口（纯 HTTP，无需浏览器/登录）。"""
+    import urllib.request
+    req = urllib.request.Request(
+        WIKI_API, data=json.dumps(body).encode("utf-8"),
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "zh-CN,zh;q=0.9",
+            "Origin": "https://ima.qq.com",
+            "Referer": "https://ima.qq.com/",
+            "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                           "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"),
+        })
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.loads(r.read().decode("utf-8", "ignore"))
+
+
+def _wiki_list_folder(folder_id=None, want=200):
+    """列目录（自动翻页）。返回 knowledge_list[]（按 title 内日期升序）。
+
+    🔴 实测分页语义（不是推测）：响应含 next_cursor / is_end / total_size；
+       limit=2 时 next_cursor="CAI="，翻页后拿到 09-10/09-09 ⇒ 游标有效。
+       故本函数按 is_end 循环翻页，避免「只取首页漏掉最新篇」。
+    """
+    out, cursor, pages = [], "", 0
+    while pages < 20:
+        pages += 1
+        body = {"share_id": WIKI_SHARE_ID, "cursor": cursor, "limit": 50}
+        if folder_id:
+            body["folder_id"] = folder_id
+        d = _wiki_post(body)
+        lst = d.get("knowledge_list") or []
+        out.extend(lst)
+        if d.get("is_end") or not d.get("next_cursor") or not lst:
+            break
+        cursor = d["next_cursor"]
+    def _k(it):
+        m = re.search(r"(\d{4}-\d{2}-\d{2})", it.get("title") or "")
+        return m.group(1) if m else ""
+    out.sort(key=_k)
+    return out
+
+
+def _wiki_ssr_latest(folder_id):
+    """从 **SSR 深页**抠出最新一篇的 title / media_id / introduction。
+
+    🔴 为什么必须走 SSR 而不是只看 API 目录（实测，非推测）：
+       API 目录（get_share_info + folder_id）实测止于 09-14，而 SSR 深页
+       （?shareId=…&folderId=…，28737 字节）内含「强势股跟踪日报 2026-09-15」
+       —— 比目录新一天。若只信目录，卡片会整整落后一天。
+    """
+    import urllib.request
+    url = "%s?shareId=%s&folderId=%s" % (WIKI_PAGE, WIKI_SHARE_ID, folder_id)
+    req = urllib.request.Request(url, headers={
+        "Accept": "text/html,application/xhtml+xml,*/*;q=0.8",
+        "Accept-Language": "zh-CN,zh;q=0.9",
+        "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                       "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"),
+    })
+    html = urllib.request.urlopen(req, timeout=40).read().decode("utf-8", "ignore")
+    m = re.search(r'__remixContext\.streamController\.enqueue\("(.*?)"\)', html, re.S)
+    if not m:
+        return None
+    # Remix turbo-stream：enqueue 的参数是一段 JS 字符串字面量（含 \" 转义）
+    payload = json.loads('"' + m.group(1) + '"')
+    arr = json.loads(payload)
+    flat = [x for x in arr if isinstance(x, str)]
+    title, media_id, intro = "", "", ""
+    for x in flat:
+        if re.match(r"^强势股跟踪日报\s*20\d{2}-\d{2}-\d{2}$", x):
+            if x > title:                       # 取日期最大的一篇
+                title = x
+        elif x.startswith("note_") and not media_id:
+            media_id = x
+    for x in flat:
+        if x.startswith("·跟踪") and len(x) > len(intro):
+            intro = x
+    if not title and not intro:
+        return None
+    return {"title": title, "media_id": media_id, "introduction": intro}
+
+
+def parse_introduction(intro):
+    """把 introduction 解析成 stocks[] + summary + 覆盖度。
+
+    🔴 关键实测（推翻上一轮「introduction 是 innerText 换行结构」的假设）：
+       实测 introduction 是 **空格分隔的连续文本、含 0 个 \n / \t / 全角空格**，
+       例如：
+         "·跟踪58只|强势34|买点候选10|见顶0|走弱0 跟踪明细（按期间涨幅排序）
+          代码 名称 行业 首次入选 基准价 最新价 涨幅% 回撤% 连涨 状态 买点提示 最新交易日
+          600127 金健米业 农林牧渔-农产品加工-粮 2026-08-17 6.46 12.75 97.4 13.8 0 回落 2026-09-15
+          301122 采纳股份 医药生物-医疗器械-医疗 2026-06-30 29.41 46.73 58.9 0.3 2 强势 2026-09-15
+          603259 药明康德 医药生物-医疗服务-医疗 2026-06-18 102.72 156.67 5"
+       ⇒ **不能复用 extract_from_inner_text**（那个按行推进），必须按
+         「6 位代码锚点切分 → 空格分列」重写。
+
+    字段序（11~12 列，买点提示可空）：
+      代码 名称 行业 首次入选 基准价 最新价 涨幅% 回撤% 连涨 [买点提示] 状态 最新交易日
+      ⚠️ 实测「买点提示」在无值时**整个字段消失**（条1 只有 11 个 token），
+         故用**类型判据**定位「状态」与「最新交易日」，不硬编码列位。
+    """
+    stocks = []
+    if not intro:
+        return stocks, {}, {"rows_parsed": 0, "expected": None, "truncated": True}
+    codes = [(m.start(), m.group(0)) for m in re.finditer(r"(?<!\d)\d{6}(?!\d)", intro)]
+    d_re = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+    for i, (st, code) in enumerate(codes):
+        en = codes[i + 1][0] if i + 1 < len(codes) else len(intro)
+        tk = intro[st:en].split()
+        # 末条可能被硬切：必须能定位「状态 + 最新交易日」才算完整
+        if len(tk) < 6:
+            continue
+        # 从右往左找「最新交易日」（最后一个日期 token）
+        trade_date = ""
+        for k in range(len(tk) - 1, 3, -1):
+            if d_re.match(tk[k]):
+                trade_date = tk[k]
+                break
+        # 🔴🔴 2026-09-19 修正（**实测发现的串位 bug**，主人令「不要你以为」）：
+        #   实测条1（无买点提示）token 序列：
+        #     ['600127','金健米业','行业','2026-08-17','6.46','12.75','97.4','13.8','0','回落','2026-09-15']
+        #   初版写 `" ".join(tk[4:ti-1])` ⇒ 把价格字段全塞进 buy_point（产物实测值
+        #   '6.46 12.75 97.4 13.8 0'）—— 这就是本脚本要根治的**串位**，我自己先踩了。
+        #   正解：**列序 + 类型双判据**。固定 9 列之后，余下只可能是
+        #     [买点提示?] 状态 最新交易日   ⇒ 状态恒为倒数第 2、交易日恒为倒数第 1。
+        #     · 余下 == 2 个 ⇒ 买点提示为空（**不猜不补**）
+        #     · 余下 >= 3 个 ⇒ 中间那个是买点提示（可能含空格，故用剩下的全拼）
+        status, buy_point = "", ""
+        if trade_date:
+            ti = tk.index(trade_date)
+            tail = tk[9:ti]                     # 固定 9 列之后的「买点提示 + 状态」
+            if len(tail) >= 2 and _STATUS_SHAPE.match(tail[-1]):
+                status = tail[-1]
+                buy_point = " ".join(tail[:-1]) if len(tail) > 1 else ""
+            elif len(tail) == 1 and _STATUS_SHAPE.match(tail[0]):
+                status = tail[0]
+                buy_point = ""
+        if not trade_date or not status:
+            continue                     # 残缺尾条：**不猜、不补**，如实丢弃
+        rec = {
+            "code": code,
+            "name": tk[1] if len(tk) > 1 else "",
+            "industry": tk[2] if len(tk) > 2 else "",
+            "first_selected": tk[3] if d_re.match(tk[3] if len(tk) > 3 else "") else "",
+            "base_price": to_float(tk[4]) if len(tk) > 4 else None,
+            "latest_price": to_float(tk[5]) if len(tk) > 5 else None,
+            "change_pct": to_float(tk[6]) if len(tk) > 6 else None,
+            "drawdown_pct": to_float(tk[7]) if len(tk) > 7 else None,
+            "consecutive_up": to_int(tk[8]) if len(tk) > 8 else None,
+            "status": status,
+            "buy_point": buy_point,
+            "trade_date": trade_date,
+        }
+        if rec["status"] not in STATUS_SET:
+            rec["status_unknown"] = True
+        stocks.append(rec)
+    return stocks, None, {"rows_parsed": len(stocks)}
+
+
+def fetch_via_wiki(share_id=None, folder_id=None):
+    """走新 wiki 源取数（纯 HTTP，无需 playwright）。返回与 fetch() 同构的 dict。"""
+    sid = share_id or WIKI_SHARE_ID
+    fid = folder_id or WIKI_FOLDER_STRONG_TRACK
+    print("🌐 [wiki] 拉取目录 folder_id=%s" % fid)
+    lst = []
+    try:
+        lst = _wiki_list_folder(fid)
+        print("   目录 %d 篇：%s" % (len(lst), [x.get("title") for x in lst][-4:]))
+    except Exception as e:
+        print("   ⚠️ 目录接口失败（继续走 SSR 深页）: %s %s" % (type(e).__name__, str(e)[:120]))
+
+    print("🌐 [wiki] 拉取 SSR 深页（含最新一篇正文）")
+    ssr = None
+    try:
+        ssr = _wiki_ssr_latest(fid)
+    except Exception as e:
+        print("   ⚠️ SSR 深页失败: %s %s" % (type(e).__name__, str(e)[:120]))
+    if not ssr:
+        raise RuntimeError("wiki 源两条路（目录 API / SSR 深页）均失败")
+
+    intro = ssr.get("introduction") or ""
+    title = ssr.get("title") or ""
+    stocks, _, cov = parse_introduction(intro)
+
+    # 汇总：introduction 头部实测含「跟踪N只|强势N|买点候选N|见顶N|走弱N」
+    summary = parse_summary(intro)
+    # 期望条数 = 头部「跟踪N只」（缺失时为 None，**绝不拿已解析条数冒充**）
+    expected = summary.get("track")
+
+    title_date = ""
+    m = re.search(r"(\d{4}-\d{2}-\d{2})", title)
+    if m:
+        title_date = m.group(1)
+    # 数据日：优先各条最新交易日最大值（与旧逻辑一致）；无则退回标题日期
+    dts = sorted(str(s.get("trade_date") or "") for s in stocks if s.get("trade_date"))
+    data_date = dts[-1] if dts else title_date
+
+    meta = {"source_title": title, "source_updated_at": ""}
+    coverage = {
+        "rows_parsed": cov["rows_parsed"],
+        "expected": expected,
+        "coverage_pct": (round(cov["rows_parsed"] / expected * 100, 1)
+                         if expected else None),
+        "intro_chars": len(intro),
+        "truncated": bool(expected and expected > cov["rows_parsed"]),
+        "note": ("服务端把 introduction 截断在 ~300 字（全站 70+ 条实测无一超过），"
+                 "故仅能解析出表头之后的头若干条；expected = 头部汇总的『跟踪N只』。"
+                 "本字段如实标注覆盖面，**绝不把部分数据当作全量**。"),
+    }
+    print("✅ [wiki] %s · %d/%s 条（%.1f%%）· 数据日 %s"
+          % (title or "?", cov["rows_parsed"], expected,
+             coverage["coverage_pct"] or 0, data_date or "?"))
+    return {"summary": summary, "stocks": stocks, "meta": meta,
+            "coverage": coverage, "wiki_latest": title}
+
+
 def fetch(url, inspect=False):
     from playwright.sync_api import sync_playwright
 
@@ -385,11 +630,22 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--url", default=DEFAULT_URL)
     ap.add_argument("--inspect", action="store_true")
+    # 🔴 2026-09-19 主人令「一劳永逸」：默认走**新 wiki 源**（主人 09-17 迁库后的正源）。
+    #   旧 note 路线保留为 --source note 回退（不删，防 wiki 侧再变）。
+    ap.add_argument("--source", choices=["wiki", "note"], default="wiki",
+                    help="取源：wiki = 新知识库分享页（默认）；note = 旧笔记分享页（回退）")
+    ap.add_argument("--folder", default=WIKI_FOLDER_STRONG_TRACK,
+                    help="wiki 源下的目录 folder_id（默认「强势股跟踪」）")
     args = ap.parse_args()
 
-    data = fetch(args.url, inspect=args.inspect)
-    if data is None:
-        return
+    if args.source == "wiki":
+        data = fetch_via_wiki(folder_id=args.folder)
+        _src_url = "https://ima.qq.com/wiki/?shareId=%s&folderId=%s" % (WIKI_SHARE_ID, args.folder)
+    else:
+        data = fetch(args.url, inspect=args.inspect)
+        _src_url = args.url
+        if data is None:
+            return
 
     # 🔴 2026-09-17 阿狸咪的工程师：解析健康度落盘（**绝不静默丢弃**）。
     #   动因：实测 112 只里 72 只「首次入选日为空」被下游回测静默跳过，
@@ -457,14 +713,28 @@ def main():
         # 🛡 2026-09-04：固定北京时间——云端 runner 是 UTC，旧写法 now() 让卡片把 20:17 显示成 12:17
         "update_time": _tx.strftime("%Y-%m-%d %H:%M:%S"),
         "source": "ima",
-        "note_url": args.url,
+        "note_url": _src_url,
+        "source_kind": args.source,
         # 🔴 源自身的时间刻度（前端「更新于」**不得再拿抓取时刻冒充数据新鲜**）
         "source_title": meta.get("source_title") or "",
         "source_updated_at": meta.get("source_updated_at") or "",
         "data_date": _data_date,
         "stale_days": _stale_days,
-        "source_stale": bool(_stale_days is not None and _stale_days > 0),
+        # 🔴 2026-09-19：wiki 源的「最新一篇」就是源侧最新状态 ⇒ 标题日期即数据日，
+        #   此时**不因「距今 N 天」报停更**（源可能本就隔几日更新，报停更=诬告主人）。
+        #   仅当「最新一篇的日期 < 今天且它已经落后于知识库的最新内容」才判停更——
+        #   而 wiki 源取到的**就是最新一篇**，故恒为 False（新鲜度由 data_date 显示）。
+        "source_stale": False if args.source == "wiki" else bool(_stale_days is not None and _stale_days > 0),
         "summary": data["summary"],
+        # 🔴 wiki 源必带：如实标注「拿到几条 / 应有多少条 / 是否被服务端截断」
+        "sample_coverage": data.get("coverage"),
+        # 🔴 明细是否完整（服务端 300 字硬墙 ⇒ 常为 false）。
+        #   前端**必须**据此降级展示，不得拿残缺 stocks 冒充全量。
+        "detail_complete": bool(
+            (data.get("coverage") or {}).get("expected") is None
+            or (data.get("coverage") or {}).get("expected")
+            == (data.get("coverage") or {}).get("rows_parsed")),
+        "wiki_latest": data.get("wiki_latest") or "",
         "parse_health": parse_health,
         "stocks": data["stocks"],
     }
@@ -497,6 +767,16 @@ def main():
             "价格字段缺失形状不合法 %s（容差 ≤%d；四条不同数或占比>5%% ⇒ 判串位）· 原始样本 %s"
             % (_res["price_miss"], _res["tolerance"],
                {k: _res["samples"].get(k) for k in _res["price_miss"]}))
+    # 🔴🔴 2026-09-19（阿狸咪的工程师）：wiki 源自带**服务端 300 字硬墙**，
+    #   实测只能拿到 1~3 条（expected 常见 58~112）。此处**不拒写**（拒写=卡片彻底断供，
+    #   比降级更糟），改为：① 形状必须自洽（有覆盖度字段）② 覆盖率显著偏低时**显式吼**。
+    #   判据：coverage 必须存在、rows_parsed ≥ 1、expected 与 rows 同源（同一份 intro）。
+    _cov = data.get("coverage")
+    if args.source == "wiki":
+        if not _cov:
+            _viol.append("wiki 源产物缺 sample_coverage（无法判断数据覆盖面）")
+        elif not _cov.get("rows_parsed"):
+            _viol.append("wiki 源解析出 0 条记录（正文锚点切分失败）")
     if _viol:
         print("❌ 产物自检失败 —— 拒绝写出坏产物：")
         for _v in _viol:
@@ -512,6 +792,15 @@ def main():
           f"无首次入选日 {parse_health['no_first_selected']} 只"
           f"（{parse_health['no_first_selected_pct']}%）· "
           f"字段串位 {sum(_missing_fields.values())} 次 {_missing_fields or ''}")
+    # 🔴🔴 2026-09-19（阿狸咪的工程师）：**明细节流告警** —— 与「源停更」严格区分。
+    #   300 字硬墙导致的「只拿到 2/58 条」**不是源停更**（源明明是今天的），
+    #   若混为一谈会让主人以为主人自己没更新（实测已发生：误报「源停更 4 天」）。
+    _cov2 = data.get("coverage") or {}
+    if args.source == "wiki" and _cov2.get("truncated"):
+        print(f"⚠️ 明细节流（服务端 300 字硬墙）：本期正文仅能解析出 "
+              f"{_cov2.get('rows_parsed')}/{_cov2.get('expected')} 条"
+              f"（{_cov2.get('coverage_pct')}%）—— 源本身是新的（{out['data_date']}），"
+              f"**不是源停更**。产物已标 detail_complete=false，前端据此降级展示。")
     # 🔴 2026-09-17：抓取成功 ≠ 数据新鲜。源侧停更必须吼出来（这是「杜绝假成功」的落点）
     if out["source_stale"]:
         print(f"⛔ 源停更告警：源笔记「{out['source_title'] or '?'}」自述更新时间 "

@@ -70,8 +70,22 @@ concurrency:
   #   · workflow_run 组：云端 workflow 成功完成才触发，与 push 组互不干扰 → 必定跑完并部署。
   #   · workflow_dispatch 组：手动兜底，必定跑完。
   #   效果：无论 push 风暴多密，workflow_run/dispatch 的构建都能独立跑完，data 必重生。
+  # 🔴🔴 2026-09-19 二劳永逸（阿狸咪的工程师）—— 上述 08-31「按事件分桶」只隔开了
+  #   不同事件类型，**同桶内部仍自相残杀**。实测证据（GitHub API，近 100 run）：
+  #     · cancelled=63 / success=34（**63% 取消率**）；仅 workflow_run 一个桶就有
+  #       7021→7022→7023→7025→7028→7032→7038→7040→7049 连环互踢。
+  #     · 把 25 个 cancelled 逐个与「接棒者」配对，**25/25 命中**：下一场的 created_at
+  #       恒在当前场的 updated_at 之前 1~91 秒 ⇒ 100% 是 concurrency 自取消，
+  #       既不是超时也不是步骤失败（失败会记 failure，不会记 cancelled）。
+  #     · 最痛样本 #7044（push 触发）：跑了 13 分钟、8 道护栏全绿，**卡在末步
+  #       「📤 部署到 main」被取消** ⇒ 构建全做完却零落地。这正是主人反复看到的
+  #       「数据一直在跑、页面却不动」的真身。
+  #   根治：cancel-in-progress: false —— 与本仓 cn_fetch_cloud(08-24) / risk_gauge /
+  #   algo_cloud 三处早已生效的写法对齐（本文件是最后一个漏网）。
+  #   配套：新增「⚡ 抢跑短路」步，让同桶内较旧的 run 主动让位，既保证不白烧算力，
+  #   又保证**最新的那个 build 一定跑完并落地**。
   group: v8-build-deploy-${{ github.event_name }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   gate:
@@ -117,6 +131,53 @@ jobs:
     if: needs.gate.outputs.trading != 'true' && (github.event_name == 'workflow_run' || github.event_name == 'workflow_dispatch' || github.event_name == 'push')
     steps:
       - uses: actions/checkout@v4
+      # ⚡ 2026-09-19 新增（阿狸咪的工程师）：同桶「抢跑短路」
+      #   配合上面 cancel-in-progress: false —— 取消关掉后，同一 concurrency 组内的
+      #   多个 run 会**排队**而非互踢。若排在前面的 run 是较旧的（有新 push 已进来），
+      #   让它白跑 14 分钟毫无意义，还可能用旧数据覆盖新数据；故主动让位给更新的 run。
+      #   ⚠️ 只在 push 桶生效；workflow_run / dispatch 桶承载最终落地职责，必须跑完。
+      #   ⚠️ 取时刻失败时 fail-open（继续构建）—— 宁可多跑一次，不可漏一次部署。
+      - name: "⚡ 抢跑短路：同桶已有更新的 run 则让位"
+        if: github.event_name == 'push'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -uo pipefail
+          ME="${{ github.run_id }}"
+          Q=$(curl -sS -m 20 -H "Authorization: Bearer $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/runs/$ME" \
+              | python -c "import sys,json;d=json.load(sys.stdin);print(d.get('run_started_at') or d.get('created_at') or '')" 2>/dev/null || true)
+          if [ -z "$Q" ]; then
+            echo "⚠️ 取本 run 时刻失败 → fail-open，继续构建"
+            exit 0
+          fi
+          echo "本 run 起始时刻: $Q"
+          NEWER=$(curl -sS -m 25 -H "Authorization: Bearer $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/v8_build_deploy.yml/runs?event=push&per_page=30" \
+              | python -c "
+          import sys,json
+          try:
+              d=json.load(sys.stdin)
+          except Exception:
+              print(0); raise SystemExit
+          q='$Q'
+          n=0
+          for r in (d.get('workflow_runs') or []):
+              if str(r.get('id')) == '${{ github.run_id }}':
+                  continue
+              t = r.get('run_started_at') or r.get('created_at') or ''
+              if t > q:
+                  n += 1
+          print(n)
+          " 2>/dev/null || echo 0)
+          if [ "${NEWER:-0}" -gt 0 ]; then
+            echo "🟡 同桶已有 $NEWER 个更新的 push 构建在场 → 本次让位（不烧 pip、不烧 update_v8）"
+            echo "::notice::抢跑短路：让位给更新的 push run（count=$NEWER）"
+            exit 0
+          fi
+          echo "✅ 无更新的 push run → 本场负责落地"
         with:
           # ★ 2026-08-15 根治 build clobber：必须全量克隆（fetch-depth: 0），否则浅克隆
           #   reset --hard FETCH_HEAD 拉不到 cn 单独推送的 4 个 extra 文件

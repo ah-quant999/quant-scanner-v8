@@ -58,22 +58,42 @@ ROOT = os.path.dirname(ALGO)
 #   故 data/*.js 层降为 warn-only（状态照常展示供运维面板消费，不参与判失败），
 #   raw_data 源头层保持严格判定，不放水。
 CRITICAL = [
-    ("候选池",       "raw_data/candidate.json",        True),
-    ("候选池(前端)", "data/CANDIDATE.js",              False),
-    ("逆势龙头CRDS", "raw_data/crds_card_data.json",   True),
-    ("逆势龙头(前端)", "data/CRDS_CARD_DATA.js",       False),
-    ("相对强度RPS",  "data/STOCK_RPS.js",              False),
-    ("TOP10推荐池", "raw_data/top10_daily.json",     True),
-    ("TOP10推荐池(前端)", "data/TOP10_DAILY.js",       False),
-    ("三重共识",     "raw_data/triple_consensus.json", True),
-    ("三重共识(前端)", "data/TRIPLE_CONSENSUS.js",     False),
-    ("四量终极",     "data/FOUR_VOLUME.js",            False),
-    ("四量终极60m",  "data/FOUR_VOLUME_60M.js",        False),
-    ("最终推荐",     "raw_data/final_recommend.json",  True),
-    ("最终推荐(前端)", "data/FINAL_RECOMMEND_DATA.js", False),
-    ("金股池",       "raw_data/gold_pool.json",        False),
+    ("候选池",       "raw_data/candidate.json",        True,  "A"),
+    ("候选池(前端)", "data/CANDIDATE.js",              False, "A"),
+    ("逆势龙头CRDS", "raw_data/crds_card_data.json",   True,  "B"),
+    ("逆势龙头(前端)", "data/CRDS_CARD_DATA.js",       False, "B"),
+    ("相对强度RPS",  "data/STOCK_RPS.js",              False, "B"),
+    ("TOP10推荐池", "raw_data/top10_daily.json",     True,  "B"),
+    ("TOP10推荐池(前端)", "data/TOP10_DAILY.js",       False, "B"),
+    ("三重共识",     "raw_data/triple_consensus.json", True,  "B"),
+    ("三重共识(前端)", "data/TRIPLE_CONSENSUS.js",     False, "B"),
+    ("四量终极",     "data/FOUR_VOLUME.js",            False, "B"),
+    ("四量终极60m",  "data/FOUR_VOLUME_60M.js",        False, "B"),
+    ("最终推荐",     "raw_data/final_recommend.json",  True,  "D"),
+    ("最终推荐(前端)", "data/FINAL_RECOMMEND_DATA.js", False, "D"),
+    ("金股池",       "raw_data/gold_pool.json",        False, "A"),
     # 2026-08-28 主人令：mahoro 数据源不再跟踪，已从闸门清单移除
 ]
+
+# 🛡 2026-09-14 一劳永逸（阿狸咪的工程师）：产物 → 批次序号，供 --upto 批次窗口过滤。
+#   依据 PREREQ={"A":None,"B":"A","D":"B","E":"D"}（严格串联 A→B→D→E）。
+#   E 批回测产物不在本清单，故 ALL 与 E 同阶。
+#
+# 🔴🔴 2026-09-19 二劳永逸（阿狸咪的工程师）—— 本段曾在提交 6ef6f2be8f / cd1ccb3dd0
+#   的重写中**整体丢失**，而 workflow L913 仍在调用 `--upto "$TGT"`：
+#     $ python algorithms/verify_chain_outputs.py --date "$DAY" --upto D
+#     usage: verify_chain_outputs.py [-h] [--warn-only] [--date DATE]
+#     error: unrecognized arguments: --upto D
+#   ⇒ argparse 退出码 2 ⇒ `|| { echo "::error::..."; RC=1; }` 命中 ⇒ **每轮 run 假 failure**。
+#   实测证据（GitHub API + run 日志）：
+#     · run #1961（04:14）：问责输入 = 目标批=D 闸门放行=true 算法步骤=success
+#       B就绪=10/12(true) D最终推荐=1/1(true) ⇒ **所有判据均通过**，job 仍 failure；
+#       日志尾部唯一错误即上述 argparse「unrecognized arguments: --upto D」。
+#     · v8_algo_cloud 近 8 次 = 5 failure + 2 cancelled，其中 #1959/#1961 的
+#       **唯一失败步均为「🛡 结果问责」**，而算法与数据其实全部正常（ALGO_EXIT: 0）。
+#   ⇒ 本次把 batch 字段与窗口过滤**按原设计原样补回**（不改判据方向、不放水），
+#     根治「假 failure」——这正是主人令「禁止假 failure / 禁止假 success」的落点。
+STAGE_ORDER = {"A": 1, "B": 2, "D": 3, "E": 4, "ALL": 4}
 
 # 时间戳字段名按优先级尝试（各生成器写法不统一，这里做兼容层）
 TS_KEYS = ["update_time", "updated_at", "updated", "last_update", "更新时间", "date", "trade_date"]
@@ -142,6 +162,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--warn-only", action="store_true", help="只报告，不因陈旧而 exit 1")
     ap.add_argument("--date", default=None, help="基准交易日 YYYY-MM-DD（默认按 base_trade_date 推导）")
+    # 🛡 2026-09-14：批次窗口。B 批刚跑完时其下游 D 批尚未开始，
+    #   若仍要求 D 产物新鲜 ⇒ 时序上不可能满足 ⇒ 每轮 B 批 run 假红。
+    # 🔴 2026-09-19：本参数曾丢失致每轮假 failure，已补回（详见 STAGE_ORDER 上方注释）。
+    ap.add_argument("--upto", default="ALL",
+                    help="只校验「该批及其上游」的产物：A/B/D/E/ALL（默认 ALL）")
     args = ap.parse_args()
 
     today = args.date or base_trade_date(datetime.now(CST))
@@ -150,8 +175,17 @@ def main():
           f"{'（warn-only 模式）' if args.warn_only else ''}")
     print("=" * 72)
 
+    lim = STAGE_ORDER.get((args.upto or "ALL").upper(), STAGE_ORDER["ALL"])
+    _win_names = "/".join(k for k, v in STAGE_ORDER.items() if v <= lim and k != "ALL")
+    print(f"🛡 批次窗口: --upto {args.upto} → 只校验批次 ≤ {lim} 的产物"
+          f"（{'A/B/D/E 全部' if lim >= 4 else _win_names}）")
     rows = []
-    for name, rel, required in CRITICAL:
+    skipped = []
+    for name, rel, required, batch in CRITICAL:
+        # 🛡 该产物属下游批次 ⇒ 本轮窗口不涉及，交由对应轮次问责
+        if STAGE_ORDER.get(batch, STAGE_ORDER["ALL"]) > lim:
+            skipped.append((name, rel, batch))
+            continue
         path = os.path.join(ROOT, rel)
         ts, err = extract_ts(path)
         if err == "MISSING_FILE":
@@ -232,6 +266,10 @@ def main():
         report = {
             "update_time": datetime.now(CST).strftime("%Y-%m-%d %H:%M:%S"),
             "base_trade_date": today,
+            "stage_window": (args.upto or "ALL"),
+            "skipped_out_of_window": [
+                {"name": n, "path": p, "batch": b} for n, p, b in skipped
+            ],
             "ok": ok_count,
             "failed_required": len(bad_required),
             "ts_blind": len(bad_ts),
