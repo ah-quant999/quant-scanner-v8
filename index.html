@@ -9432,9 +9432,6 @@ window.v8SectorFlow = window.v8SectorFlow || (function(){
     const ckey = Object.keys(cstocks).find(k=>normCode(cstocks[k].code)===nc);
     if(ckey) hits.push({name:'🎯 候选池', color:'var(--cyan)', detail:(cstocks[ckey].sources||[]).join(' / ')});
     // COCKPIT_TIER_RECOMMEND 已下线（2026-09-03）：cp/cpa/cpb 占位变量连同 if(cpa)/else if(cpb) 命中 push 一起不再保留
-    const cp = {};       /* 已下线，留 {} 占位以防后续读 cp.XXX 抛错 */
-    const cpa = null;    /* cockpit.tier_a 已下线，永远为 null */
-    const cpb = null;    /* cockpit.tier_b 已下线，永远为 null */
     // 逆势龙头
     const crds = window.CRDS_CARD_DATA || {};
     let crdsCond='';
