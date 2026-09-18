@@ -201,8 +201,8 @@ ALL_MODULE_NAMES = sorted(n for n in DATA_SOURCES.values() if n not in _AUDIT_TR
 # 变量名 → 更新时段
 CATEGORY_MAP = {
     # 盘前（08:25 cn / 08:35 deploy）
-    "V8_CAL": "premarket",
-    "IPO_DATA": "premarket",
+    "V8_CAL": "premarket,post_close",
+    "IPO_DATA": "premarket,post_close",
     "NT_DATA": "premarket",
     "MARGIN_DATA": "premarket,post_close",
     # 2026-08-31：期指主力合约卡移回「实时数据」页，改为 intraday 盘中实时
@@ -213,7 +213,7 @@ CATEGORY_MAP = {
     #   intraday（两侧曾于 09-11 上午对齐为三档，本条即回归盘前+盘后两档），归盘后更新链。
     "MACRO_DATA": "premarket,post_close",
     "CRISIS_DATA": "premarket,intraday",
-    "NORTH_FUND": "premarket",
+    "NORTH_FUND": "premarket,post_close",
     # "ANALYST_RATINGS": "premarket",  # 2026-09-11 P1 死数据清理：映射已移除
     "SUSPENSION_ALERT": "premarket",
     "MARKET_ALERTS": "intraday,post_close",
