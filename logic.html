@@ -1075,48 +1075,47 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 <div class="card">
         <h3><span class="ic">💰</span>AI 行平均股价买卖信号面板（何时到高点卖/何时可以买）- 说明</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p">AI 主行平均股价下方的信号面板。基于 <code>AVG_PRICE_DATA</code> 的当前位置 / 均线偏离 / 单日涨跌 / 历史趋势四个维度自动计算买入或卖出信号，作为「市场水位」参考。<b>2026-08-31 口径归一 + tasks 补齐</b>：数据改由 <code>cloud_fetch_v8.py → f_avg_price()</code> 单点写入——用东财 <code>em_clist</code> 分页遍历全市场 5000+ 只个股取<b>算术平均股价</b>，与通达信 880003 的定义口径一致且云端稳定可达；原 <code>scripts/fetch_avg_price.py</code>（7 源拉 880003 日K）因排在推送步之后导致产物永不入库、且 7 源实测 100% 失败，已从 workflow 摘除（文件保留待官方源恢复）。<b>2026-08-31 修复</b>：因 <code>("AVG_PRICE_DATA", f_avg_price)</code> 被从 cloud_fetch tasks 列表遗漏，导致 health_check 报「超过阈值 120 分钟」黄灯，已补齐至 intraday 任务链。<b>MA 由 history 逐交易日累积</b>：满 20 / 60 个交易日后才给出 <code>position_vs_ma20</code> / <code>position_vs_ma60</code>，绝不用当日价冒充均线。<b>2026-09-16 主人令</b>：「vs 20 日线 / vs 60 日线」文本段（原含「历史 X/20 日」进度）已整段删除；<b>超买超卖（位置观测）胶囊移至该行末位并显著化</b>——金色 2px 边 + 外发光 + 13px 加粗，用作该行的收尾标识。均线未就绪期间该胶囊显示「⏳ 均线积累中 X/20 日」的未就绪态：只披露数据积累进度（承接原 vs 行承载的信息），<b>不给出任何档位、不构成买卖信号</b>；就绪后才按偏离档位着色（色随档位、金色外壳不变）。</div>
-        <div class="logic-h">📉 卖出信号（到高点要卖）</div>
+        <div class="logic-p">AI 主行平均股价下方的信号面板。基于 <code>AVG_PRICE_DATA</code> 的当前位置 / 均线偏离 / 单日涨跌 / 历史趋势四个维度自动计算买入或卖出信号，作为「市场水位」参考。<b>2026-08-31 口径归一 + tasks 补齐</b>：数据改由 <code>cloud_fetch_v8.py → f_avg_price()</code> 单点写入——用东财 <code>em_clist</code> 分页遍历全市场 5000+ 只个股取<b>算术平均股价</b>，与通达信 880003 的定义口径一致且云端稳定可达；原 <code>scripts/fetch_avg_price.py</code>（7 源拉 880003 日K）因排在推送步之后导致产物永不入库、且 7 源实测 100% 失败，已从 workflow 摘除（文件保留待官方源恢复）。<b>2026-08-31 修复</b>：因 <code>("AVG_PRICE_DATA", f_avg_price)</code> 被从 cloud_fetch tasks 列表遗漏，导致 health_check 报「超过阈值 120 分钟」黄灯，已补齐至 intraday 任务链。<b>MA 由 history 逐交易日累积</b>：满 20 / 60 个交易日后才给出 <code>position_vs_ma20</code> / <code>position_vs_ma60</code>，绝不用当日价冒充均线。<b>2026-09-16 主人令</b>：「vs 20 日线 / vs 60 日线」文本段（原含「历史 X/20 日」进度）已整段删除；<b>超买超卖（位置观测）胶囊移至该行末位并显著化</b>——金色 2px 边 + 外发光 + 13px 加粗，用作该行的收尾标识。均线未就绪期间该胶囊显示「⏳ 均线积累中 X/20 日」的未就绪态：只披露数据积累进度（承接原 vs 行承载的信息），<b>不给出任何档位、不构成买卖信号</b>；就绪后才按偏离档位着色（色随档位、金色外壳不变）。
+        <br><b>🔴 2026-09-18 主人令</b>：「这条只要告诉我超买超卖，不需要评判其他，把这个删除」——
+        本卡自此<b>只报超买超卖</b>，已删除全部评判性内容：<b>📈 买/加 · 📋 关注</b>胶囊、<b>📉 卖/减</b>胶囊、
+<b>⚠ 破MA20 / 破MA60</b>警告（原第二行整行移除）。档位判定改为<b>纯位置口径</b>（只用 <code>position_vs_ma20/ma60</code>），
+不再引用单日涨跌与连涨连跌信号 ⇒ 语义上不构成任何买卖建议。</div>
+        <div class="logic-h">📊 超买超卖档位（2026-09-18 起为<b>纯位置口径</b>）</div>
         <table class="lg-table">
-          <tr><th>触发条件</th><th>信号</th></tr>
-          <tr><td>position_vs_ma20 &gt; 5%</td><td>🔴 远超 MA20 +X% · 高估</td></tr>
-          <tr><td>position_vs_ma20 &gt; 3%</td><td>🟠 偏离 MA20 +X% · 关注止盈</td></tr>
-          <tr><td>position_vs_ma60 &gt; 10%</td><td>🔴 远超 MA60 +X% · 严重高估</td></tr>
-          <tr><td>position_vs_ma60 &gt; 6%</td><td>🟠 偏离 MA60 +X% · 中期高估</td></tr>
-          <tr><td>avg_change_pct &lt; -1.5%</td><td>⚠️ 单日暴跌 X% · 恐慌</td></tr>
-          <tr><td>连涨 2 天后转跌</td><td>⚡ 连涨后回调 · 注意风险</td></tr>
+          <tr><th>触发条件（满足其一即入档）</th><th>显示</th><th>含义</th></tr>
+          <tr><td><code>position_vs_ma20</code> &gt; 5% 或 <code>position_vs_ma60</code> &gt; 10%</td><td>🔴 高位·超买</td><td>明显高于均线</td></tr>
+          <tr><td><code>position_vs_ma20</code> &gt; 3% 或 <code>position_vs_ma60</code> &gt; 6%</td><td>🟠 偏高·超买</td><td>高于均线</td></tr>
+          <tr><td><code>position_vs_ma20</code> &lt; −5% 或 <code>position_vs_ma60</code> &lt; −8%</td><td>🟢 偏低·超卖</td><td>明显低于均线</td></tr>
+          <tr><td><code>position_vs_ma20</code> &lt; −3% 或 <code>position_vs_ma60</code> &lt; −5%</td><td>🟡 偏低·超卖</td><td>低于均线</td></tr>
+          <tr><td>两均线偏离均落在中性区间</td><td><b>不渲染档位</b></td><td>零信息量，不显示</td></tr>
+          <tr><td>均线未就绪（两值皆 <code>null</code>）</td><td>⏳ 均线积累中 X/20 日</td><td>只披露进度，<b>不下任何结论</b></td></tr>
         </table>
-        <div class="logic-h">📈 买入信号（可以买入）</div>
-        <table class="lg-table">
-          <tr><th>触发条件</th><th>信号</th></tr>
-          <tr><td>position_vs_ma20 &lt; -3%</td><td>🟢 低于 MA20 X% · 短期超卖</td></tr>
-          <tr><td>position_vs_ma20 &lt; -5%</td><td>🟢 深破 MA20 X% · 可关注</td></tr>
-          <tr><td>position_vs_ma60 &lt; -5%</td><td>🟢 低于 MA60 X% · 中期低估·分批</td></tr>
-          <tr><td>position_vs_ma60 &lt; -8%</td><td>🟢 深破 MA60 X% · 分批观测</td></tr>
-          <tr><td>avg_change_pct &gt; 1.5%</td><td>⚡ 单日暴涨 X% · 追高风险</td></tr>
-          <tr><td>连跌 2 天后转涨</td><td>🔄 连跌后首阳 · 反弹确认</td></tr>
-        </table>
-        <div class="logic-h">面板可视化设计</div>
-        <table class="lg-table">
-          <tr><th>信号组合</th><th>面板背景</th></tr>
-          <tr><td>仅卖出</td><td>🔴 红色 (rgba(239,68,68,.08))</td></tr>
-          <tr><td>仅买入</td><td>🟢 绿色 (rgba(34,197,94,.08))</td></tr>
-          <tr><td>同时有</td><td>🟠 橙色 (rgba(245,158,11,.06))</td></tr>
-          <tr><td>无信号</td><td>不显示面板</td></tr>
-        </table>
+        <div class="logic-p"><b>🔴 2026-09-18 主人令口径变更（重点）</b>：原「📉 卖出信号」「📈 买入信号」两张表已<b>整段删除</b>——
+本卡<b>只回答超买超卖</b>，不再产出「买/加」「卖/减」「关注」「可分批」等任何评判性内容；
+档位判定不再引用 <code>avg_change_pct</code>（单日暴涨暴跌）与 <code>history[]</code>（连涨连跌反转）信号，
+只由位置偏离决定 ⇒ 语义上不再构成买卖建议。开仓裁决仍以「🤖 AI速览」为全站唯一关口。</div>
         <div class="logic-h">数据源</div>
-        <div class="logic-p"><code>AVG_PRICE_DATA</code> 的 <code>avg_price</code> / <code>ma20</code> / <code>ma60</code> / <code>position_vs_ma20</code> / <code>position_vs_ma60</code> / <code>avg_change_pct</code> / <code>history[]</code>（近 N 日，用于连涨/连跌反转信号）。</div>
-        <div class="logic-h">今日示例（2026-08-11）</div>
-        <div class="logic-p"><code>avg_price=28.07 / ma20=28.07 / position_vs_ma20=0.0001%</code> → <b>无任何信号触发</b>（估值中性）。偏离变大时自动出信号。</div>
+        <div class="logic-p"><code>AVG_PRICE_DATA</code> 的 <code>avg_price</code>（当前均价）/ <code>position_vs_ma20</code> / <code>position_vs_ma60</code>（位置偏离，<b>档位判定的唯一依据</b>）。
+        <br><code>ma20</code> / <code>ma60</code> 为均线水位，仅用于算出上述偏离值，<b>不再直接上屏</b>（vs 行已于 2026-09-16 删除）。
+        <br><code>history[]</code> / <code>avg_change_pct</code> 仍由数据层产出（供 <code>history_days</code> 计算积累进度、供其他消费方），
+        但<b>本卡渲染已不再读取</b>——连涨/连跌反转、单日暴涨暴跌两类信号随 2026-09-18 主人令一并删除。</div>
+        <div class="logic-h">示例</div>
+        <div class="logic-p">
+        · 中性：<code>position_vs_ma20=+1.0%</code> → <b>不渲染档位</b>（落在中性区间，零信息量）。<br>
+        · 偏高：<code>position_vs_ma20=+4.0%</code> → 🟠 偏高·超买。<br>
+        · 高位：<code>position_vs_ma20=+6.0%</code> 或 <code>position_vs_ma60=+11%</code> → 🔴 高位·超买（单腿满足即可入档）。<br>
+        · 偏低：<code>position_vs_ma20=−4.0%</code> → 🟡 偏低·超卖；<code>position_vs_ma60=−9%</code> → 🟢 偏低·超卖。<br>
+        · 未就绪：两值皆 <code>null</code> → ⏳ 均线积累中 15/20 日。</div>
         <div class="logic-h">代码位置</div>
-        <div class="logic-p"><code>index.html</code> 渲染在 <code>renderAiSummary()</code> IIFE 内「4b. 💰 平均股价」约 L2225-2341（紧凑版 + 买卖信号面板 + 行末超买超卖胶囊，2026-08-12 起不再有独立卡片容器）。</div>
+        <div class="logic-p"><code>index.html</code> 渲染在 <code>renderAiSummary()</code> IIFE 内「4b. 💰 平均股价」约 <b>L2300-2380</b>
+        （紧凑版一行 + 行末超买超卖胶囊；<b>2026-09-18 起已无第二行</b>——买卖信号面板与破线警告整段删除，2026-08-12 起不再有独立卡片容器）。</div>
       </div>
 
       
 <div class="lg-pane" id="lg-ph">
       <!-- 🗑 2026-09-16 主人令：「🌡️ 市场温度计 · 分项」卡已删（数据源 SH_FIB 与「六维共振雷达」同源、
            分项口径与危机雷达/每日洞察重复）⇒ 本说明卡一并移除。SH_FIB 数据源未删，仍由
-           「🧪 斐波那契观测窗」与艾略特波浪卡消费。 -->
+           「🧪 斐波那契F观测窗」与艾略特波浪卡消费。 -->
 
       
       <div class="card">
@@ -1420,20 +1419,11 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
           <tr><td><b>触发源</b>（谁派都一样）</td><td>cron（不可靠，仅备份）/ 人工 <code>workflow_dispatch</code> / 本机「接力推进器」每小时 :10 —— <b>三个入口，同一个闸门</b></td></tr>
           <tr><td><b>批次闸门</b><br>（唯一决策点）</td><td><b>日历</b>（交易日 / T+1 数据日）+ <b>上游顺序</b>（下游产物必须晚于上游）+ <b>内容级就绪</b>（读产物内 <code>update_time</code>，不吃 git checkout 的 mtime）——一处判完，输出 <code>target_stage</code> / <code>stage_ok</code> / <code>proceed</code> / <code>reason</code></td></tr>
           <tr><td>① A 采集</td><td>就绪 <b>12/13</b> 项（<b>4 项必中</b>：<code>LHB_DATA.js</code> / <code>lhb_data.json</code> / <code>AVG_PRICE_DATA.js</code> / <code>ETF_NET_SUBSCRIPTION.js</code>；另有 sector_rs / stock_profile / fundamental_quality / stock_quote / inst_trade / suspension_alert / nt_data / sector_fund_flow_trend / market_alerts）· <b>12</b> 个脚本<br><span style="color:var(--sub)">2026-09-11：清单由 3 项扩到 10 项 —— 旧版只看 3 个代表产物，其余 6 个产物陈旧时闸门仍判「A 已就绪」，那些卡便整日红灯无人重跑。<br>2026-09-13：扩到 13 项（就绪线 12，容忍 6 项陈旧）；新纳入的 3 项为<b>逐项必中</b>——采纳「must 与 need 计数无关、直接否决」的方案，任一陈旧即判未就绪，根治「坏 1 项仍放行」的弱拦截。<b>同日 23:5x P0 修正</b>：原拟纳入的 9 项中有 7 项在仓库中<b>并不存在</b>（其中 ETF 申购赎回旧口径已于 09-06 全链下线），若留在必中清单会让 A 批<b>永久不就绪</b>；已改为上述真实产物，并立规「纳入闸门清单前必须逐项验证文件存在」。</span></td></tr>
-          <tr><td>② B 选股</td><td>就绪 <b>8/11</b> 项（<b>三重共识 / 四量终极 / 逆势龙头 必新</b> + ai_insights_compare / factor_audit / factor_progress / valuation_percentile / index_value_framework / gold_pool / 四量60m / 四量历史 / 四量跟踪；<b>只容忍 2 项不新鲜</b>）· <b>27</b> 个脚本（<code>v8/factor_lab_gen.py</code> 最前，baostock 冷启动 50-90min）<br><span style="color:var(--sub)">2026-09-11：清单由 3 项扩到 9 项 —— 原版 3 项鲜活即判「B 已就绪」→ 空转 → 9 张卡整日红灯。<br>2026-09-13：三重共识 / 四量终极 / 逆势龙头 由「计入 8/9」升为 <b>必新项（must）</b> —— 8/9 只是计数，表达不了「哪几项必新」，陈旧项恰为这三张核心卡时闸门仍放行。<br><b>2026-09-18：清单由 9 项扩到 11 项</b>（+<code>FOUR_VOLUME_60M.js</code> / <code>FOUR_VOLUME_HISTORY.js</code> / <code>FOUR_VOLUME_TRACK.js</code>，就绪线仍为 8 = 容忍 2 项）。根因：这三项<b>从未登记进本闸门</b>，而巡检侧 60m 又已按 09-11 主人令移出低频白名单 ⇒ <b>闸门不阻塞 + 巡检只报不做 = 双盲区</b>，60m 产物自 09-17 06:54 冻结逾 24h 而全链零阻塞。已加装机读护栏 <code>guard_double_blind.py</code>（三条不变式静态校验，接入 CI 硬门禁）结构上杜绝同型复发。</span></td></tr>
+          <tr><td>② B 选股</td><td>就绪 <b>8/9</b> 项（<b>三重共识 / 四量终极 / 逆势龙头 必新</b> + ai_insights_compare / factor_audit / factor_progress / valuation_percentile / index_value_framework / gold_pool；<b>只容忍 1 项不新鲜</b>）· <b>27</b> 个脚本（<code>v8/factor_lab_gen.py</code> 最前，baostock 冷启动 50-90min）<br><span style="color:var(--sub)">2026-09-11：清单由 3 项扩到 9 项 —— 原版 3 项鲜活即判「B 已就绪」→ 空转 → 9 张卡整日红灯。<br>2026-09-13：三重共识 / 四量终极 / 逆势龙头 由「计入 8/9」升为 <b>必新项（must）</b> —— 8/9 只是计数，表达不了「哪几项必新」，陈旧项恰为这三张核心卡时闸门仍放行。</span></td></tr>
           <tr><td>③ D 汇总</td><td>最终推荐 <b>1/1</b>（<code>FINAL_RECOMMEND_DATA.js</code>）· 仅 <code>final_recommend.py</code></td></tr>
-          <tr><td>④ E 回测</td><td><b>两项必新（must）</b>：<code>BACKTEST_ALL_ALGOS.js</code> +
-<code>BACKTEST_TDX.js</code>；第 3 项 <code>CRDS_BACKTEST.js</code> 计入 <b>2/3</b>（must
-两项全中即就绪，第 3 项不参与否决）· <b>8</b> 个脚本<br>
-<span style="color:var(--sub);">🔴 2026-09-18 阿狸咪的工程师（<b>双盲区根治</b>）：
-<code>BACKTEST_TDX.js</code> 由「任一」位升为<b>必新（must）</b>。原它只占 need=2 的「任一」位 ⇒
-陈旧<b>不阻塞</b>就绪；而 <code>v8_health_check.py</code> 的 <code>_LOW_FREQ_FILES</code>
-又把它列入低频豁免（理由「参数变更才重跑」<b>已过时</b>）⇒ 陈旧<b>不告警</b> ——
-<b>两个监控都不覆盖</b>。后果：产物 <code>raw_data/backtest_tdx.json</code> 含
-12 档 × 221 只逐笔明细、涨到 <b>76 MB</b>，推送每次 <code>HTTP 422</code>（超 GitHub 单文件上限），
-线上产物永久停在 <b>09-14</b> —— <b>停更 4 天而全链零红灯</b>。本轮三处同时闭环：
-① 闸门提 must；② 巡检摘除低频豁免；③ 该产物源只写汇总（逐笔明细改入不入仓的明细缓存，
-仅作同 runner 断点续跑用，且须「当日 + 2 小时内」双条件才复用，杜绝旧明细盖上新时间戳）。</span><br>
+          <tr><td>④ E 回测</td><td><code>CRDS_BACKTEST.js</code>/<code>BACKTEST_TDX.js</code> 至少 1 项
++ <code>BACKTEST_ALL_ALGOS.js</code>（<b>2/3</b> 项，且全算法回测汇总 <b>必新（must）</b> ——
+need 只是计数，只计 2/3 时它陈旧也会被放行）· <b>8</b> 个脚本<br>
 <span style="color:var(--sub);">🔴 2026-09-14 主人令：候选池 / 金股池（=黄金池）是算法<b>上游水源</b>，
 不是策略、<b>不回测</b> ⇒ 原 CANDIDATE_BACKTEST / GOLD_POOL_BACKTEST 两项已从清单移除。</span></td></tr>
         </table>
@@ -1698,23 +1688,20 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         · <b>参考止损 / 止盈</b>：由真实收盘价推导，<b>明确标注【参考】</b>—— 主板 -7%、创业板/科创板 -10%、止盈 +12%。<br>
         · <b>操作建议</b>：由组件真实标志模板生成，如「游资点火+机构托底，资金合力强，叠加均线金叉，回踩不破参考止损可持有；仓位建议≤2成」。非固定话术，依当日真实信号组合输出。<br>
         · <b>信号日</b>：该票最近一次触发 QD 共振的日期。</div>
-        <div class="logic-h">🛠 四量终极 60m · 产物四宗罪与硬告警（2026-09-11 根治 + 2026-09-18 双盲区根治）</div>
-        <div class="logic-p"><b>症状</b>：60m 共振徽章自 2026-09-08 起信号全废 —— 不是文件冻结，而是<b>每天产出一份 <code>total:0</code> 的假产物</b>，且连续多日零告警。根因是三个互相独立的缺陷（① 产物写错目录 / ② 没扫成写成没信号 / ③ 三层静默）。<b>2026-09-18 补第四宗</b>：前三条只修了「产物本身 + 巡检告警」，<b>闸门覆盖从未补齐</b> ⇒ 产物一旦真的冻结，闸门不阻塞、巡检只报不做，仍会静默停更（第三次复发，详见下表 ④）。</div>
+        <div class="logic-h">🛠 四量终极 60m · 产物三宗罪与硬告警（2026-09-11 根治）</div>
+        <div class="logic-p"><b>症状</b>：60m 共振徽章自 2026-09-08 起信号全废 —— 不是文件冻结，而是<b>每天产出一份 <code>total:0</code> 的假产物</b>，且连续多日零告警。根因是三个互相独立的缺陷，已一次性根除。</div>
         <table class="lg-table">
           <tr><th>#</th><th>缺陷</th><th>机理（实测证据）</th><th>修法</th></tr>
           <tr><td>①</td><td><b>产物写错目录</b></td><td><code>strategy_four_volume_60m.py</code> 内残留 v6 硬编码分支：只要本机存在 <code>E:/workspace/stock-scanner</code>，就把产物写进它的 <code>data/</code> 而非当前仓库。CI 日志实锤：同批相邻两行，日线版写 runner 工作区、60m 版写 <code>E:/workspace/stock-scanner\data\...</code>。双机 active-active → <b>哪台装了旧仓库哪台中招</b>。</td><td>删该分支，输出目录恒为 <code>V8_DATA_DIR</code>（最高优先）或脚本所在仓库 <code>ROOT/data</code>；新增日志回声 <code>[60m] DATA_DIR=…</code></td></tr>
           <tr><td>②</td><td><b>「没扫成」写成「今天没信号」</b></td><td>活跃股池为空（东财限流/冷却）时，脚本仍无条件写出<b>带新鲜时间戳</b>的 <code>total:0</code> 产物 → 前端把它当成「今天真的没有 60m 信号」。本地复现：股池 0 只 / 全程仅 11 秒 → 非超时、非登录失败，是源断连被静默吞掉。</td><td>新增异常类 <code>ScanUnavailable</code>，严格区分：<b>扫描未能执行</b> → 拒绝写产物 + 保留上次真实数据 + <b>退出码 1</b> 上报失败；<b>真扫完但 0 只命中</b> → 照写（合法结果）</td></tr>
           <tr><td>③</td><td><b>三层静默</b></td><td>健康检查把它放在低频白名单（<b>&gt;7 天</b>才告警）× 链尾闸门 <code>verify_chain_outputs.py</code> 仅 warn-only × 门控 <code>_final_recommend_gate()</code> 走 <code>soft=True</code> 只打印一行 → 冻结 3 天仍全绿。</td><td>移出低频白名单并正式登记 <code>CARD_DEFS</code>（<b>24h 红线</b>）；门控软告警 → <b>硬告警·计败不阻断</b>（写入 <code>algo_run_report.json</code> 的 <code>failed_scripts</code>，运维面板红灯可见）；超时预算 30 → <b>90 分钟</b></td></tr>
-          <tr><td>④</td><td><b>双盲区（闸门不覆盖 × 巡检只报不做）<br><span style="color:#fbbf24">2026-09-18 根治 · 事故家族第三次复发</span></b></td><td>第③宗罪只修了<b>巡检侧</b>（移出白名单 ⇒ 陈旧会亮红灯），<b>闸门侧从未修</b> —— <code>FOUR_VOLUME_60M.js</code> 自始至终不在批次闸门 <code>READY_SPEC["B"]</code> 的 <code>items</code> / <code>must</code> 中。后果链：产物陈旧 → 闸门<b>不阻塞</b>就绪（判「B 已就绪」→ <code>target_stage=NONE</code> 空转）→ <b>永不重跑</b>；而巡检照实报 fail 却无自愈能力 ⇒ 产物冻结逾 24h（09-17 06:54 起）而全链零阻塞。与 09-18 的 <code>BACKTEST_TDX.js</code> 冻结 4 天<b>完全同型同因</b>（该注释原文即「两个监控都不覆盖」）。</td><td>闸门 <code>items</code> 补入 <code>FOUR_VOLUME_60M.js</code> / <code>FOUR_VOLUME_HISTORY.js</code> / <code>FOUR_VOLUME_TRACK.js</code>（就绪线 8/11）；<code>_ALWAYS_PUSH</code> 同步（不变式）；<b>并加装机读护栏 <code>guard_double_blind.py</code></b>——三条不变式静态校验（闸门覆盖 / 去重白名单 / 巡检告警），AST 解析三张清单表，接入 CI 硬门禁。<b>前三次都是逐个人工补单个产物，故必然复发；本轮改为让机器断言「零特例」，结构上封死。</b></td></tr>
         </table>
         <div class="logic-h">现行口径（已生效，以此为准）</div>
         <div class="logic-p">· <b>输出目录</b>：恒为本仓库 <code>data/</code>（或 <code>V8_DATA_DIR</code> 指定），日志回声 <code>[60m] DATA_DIR=…</code>；<br>
         · <b>扫描未执行</b> → 硬失败（保留真实产物 + 退出码 1），<b>绝不写假 0</b>；<br>
         · <b>真 0 命中</b> → 照写（这是合法结果，不是假成功）；<br>
         · <b>硬告警双保险</b>：<code>CARD_DEFS</code> 24h 红线 + 门控「计败不阻断」；<br>
-        · <b>仍不阻断</b>最终推荐：<code>final_recommend.py</code> 自带「60m 非今日 → 回退日线版 <code>FOUR_VOLUME.js</code>」降级（硬门控会反复阻断整轮推荐、反而让站点展示更旧的产物）；<br>
-        · <b>闸门覆盖（2026-09-18 起）</b>：<code>data/FOUR_VOLUME_60M.js</code> 已登记进批次闸门 <code>READY_SPEC["B"].items</code>（就绪线 <b>8/11</b>）⇒ 它陈旧会<b>占用容错名额</b>，进而触发 B 批重跑（不再空转）；<br>
-        · <b>静态护栏（2026-09-18 起）</b>：<code>.github/scripts/guard_double_blind.py</code> 在 CI 硬门禁中断言三条不变式 —— ① 巡检的 <code>algo_run</code> 选股卡 ⊆ 闸门覆盖；② 闸门 <code>items ∪ must</code> ⊆ 去重白名单 <code>_ALWAYS_PUSH</code>（否则内容稳定时被判伪变更丢弃 ⇒ 永不收敛）；③ 闸门产物不得在低频白名单中。任一违反即<b>阻断部署</b>。</div>
+        · <b>仍不阻断</b>最终推荐：<code>final_recommend.py</code> 自带「60m 非今日 → 回退日线版 <code>FOUR_VOLUME.js</code>」降级（硬门控会反复阻断整轮推荐、反而让站点展示更旧的产物）。</div>
       </div>
 
       
@@ -1851,14 +1838,13 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       <div class="card">
         <h3><span class="ic">🌍</span>观测平台 - 说明</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p"><b style="color:var(--gold)">2026-09-15 主人令</b>：由原一级页「🌍 宏观观测」<b>升级为一级页「🌍 观测平台」</b>，仍挂主站最左侧（今日事件之前），<b>不锁</b>（访客可见）。平台下挂<b>两个同级子页</b>，子页顺序按主人令：<b>①🌍 宏观观测</b>——宏观/周期坐标，回答「周期处在哪里」（2026-09-18 起 1 卡：机构研究 · AI 解析建议）；<b>②📊 大盘观测</b>——由原「暂未上架 → 📊 大盘观察」整页迁入并改名，回答「大盘走到哪一步」，4 张卡。</div><div class="logic-h">两个子页总览</div><table class="lg-table"><tr><th>子页</th><th>卡数</th><th>卡片</th></tr><tr><td>🌍 宏观观测</td><td>2</td><td>📚 机构研究 · AI 解析建议<br>🌍 宏观景气背景 · K 型分层</td></tr><tr><td>📊 大盘观测</td><td>4</td><td>📊 艾略特波浪 · 深度分析<br>🧪 斐波那契观测窗<br>🌡️ 中信 PE 观测<br>📈 A股指数观测</td></tr></table><div class="logic-h">📊 大盘观测 · 4 张卡</div><div class="logic-p">· <b>📊 艾略特波浪 · 深度分析</b>（<code>elliottWaveBody</code>）：一行 6 列紧凑格 + <b>真实图形</b> = <code>window.WAVE_ELLIOTT</code> 700 个交易日真实收盘序列 + 6 个人工浪型拐点（①起/①顶/②底/③顶/④底/⑤高） + 三条真实关键位（本轮高点 / 最新拐点 / ④浪生命线）。<br>· <b>🧪 斐波那契观测窗</b>（<code>fibWindowBody</code>）：<b style="color:var(--gold)">2026-09-15 主人令由「🔒 已下架」盘前区迁入</b>，紧贴波浪卡下方。按斐波那契日数（F(3)/F(5)/F(8)/F(13)/F(21)/F(34)/F(55)）定位变盘窗口，回答「<b>何时</b>变盘」；上一张卡回答「<b>跌到哪</b>」，两者维度互补——主人明确令<b>不合卡</b>（理由：两卡都是盘后更新，差别不大）。数据源 <code>data/SH_FIB.js</code>，<b>更新任务</b>：<code>algorithms/fetch_sh_index_fib.py</code>（盘后算法链 A/B 批 · 盘后 18:00 链刷新）；不含未来数据，历史窗口触发/失效状态可逐条回查。</div><div class="logic-p"><b style="color:#ef5350">⚠️ 两卡口径必须分清（2026-09-15 阿狸咪的工程师「先修」项，已在前端显式标注）：</b>艾略特波浪卡用<b>最高价</b>口径（③顶 4258.86 @05-14），斐波那契F卡用<b>收盘价</b>口径（06-22 收盘 4163.10）——<b>两卡跌幅读数不同属正常，勿混比</b>。两端现已各自印出口径声明行，杜绝相邻矛盾读感。</div><div class="logic-p"><b style="color:#ef5350">⚠️ 已知数据层问题（小九待修，前端已兜底）：</b><code>SH_FIB.current</code> 的 <code>index / total_points / total_pct</code> 三字段写的是<b>前一交易日</b>收盘（2026-09-14 实测 3888.11，而当日真实收盘 = 3885.33；反推 <code>peak_close + total_points = 4163.10 − 274.99 = 3888.11</code>）；而 <code>days_down=60 / peak_date=2026-06-22 / peak_close=4163.10</code> 三项实测<b>正确</b>（06-22 → 09-14 在真实序列中恰好相隔 60 个交易日）。<br><b>前端兜底</b>：F卡一律以 <code>WAVE_ELLIOTT.series</code> 最新真实收盘重算这三项（现得 3885.33 / −277.77 / −6.67%），<code>WAVE_ELLIOTT</code> 缺失时退回 SH_FIB 原值并标注「前一交易日」。<b>未改任何数据源、未补造数值</b>；根因在取数脚本（差一日），须由小九修。</div>
-        <div class="logic-h">当前卡片（2026-09-18 起 1 卡）</div>
+        <div class="logic-p"><b style="color:var(--gold)">2026-09-15 主人令</b>：由原一级页「🌍 宏观观测」<b>升级为一级页「🌍 观测平台」</b>，仍挂主站最左侧（今日事件之前），<b>不锁</b>（访客可见）。平台下挂<b>两个同级子页</b>，子页顺序按主人令：<b>①🌍 宏观观测</b>——宏观/周期坐标，回答「周期处在哪里」；<b>②📊 大盘观测</b>——由原「暂未上架 → 📊 大盘观察」整页迁入并改名，回答「大盘走到哪一步」，4 张卡。</div><div class="logic-h">两个子页总览</div><table class="lg-table"><tr><th>子页</th><th>卡数</th><th>卡片</th></tr><tr><td>🌍 宏观观测</td><td>2</td><td>📚 机构研究 · AI 解析建议<br>🌍 宏观景气背景 · K 型分层</td></tr><tr><td>📊 大盘观测</td><td>4</td><td>📊 艾略特波浪 · 深度分析<br>🧪 斐波那契F观测窗<br>🌡️ 中信 PE 观测<br>📈 A股指数观测</td></tr></table><div class="logic-h">📊 大盘观测 · 4 张卡</div><div class="logic-p">· <b>📊 艾略特波浪 · 深度分析</b>（<code>elliottWaveBody</code>）：一行 6 列紧凑格 + <b>真实图形</b> = <code>window.WAVE_ELLIOTT</code> 700 个交易日真实收盘序列 + 6 个人工浪型拐点（①起/①顶/②底/③顶/④底/⑤高） + 三条真实关键位（本轮高点 / 最新拐点 / ④浪生命线）。<br>· <b>🧪 斐波那契F观测窗</b>（<code>fibWindowBody</code>）：<b style="color:var(--gold)">2026-09-15 主人令由「🔒 已下架」盘前区迁入</b>，紧贴波浪卡下方。按斐波那契日数（F(3)/F(5)/F(8)/F(13)/F(21)/F(34)/F(55)）定位变盘窗口，回答「<b>何时</b>变盘」；上一张卡回答「<b>跌到哪</b>」，两者维度互补——主人明确令<b>不合卡</b>（理由：两卡都是盘后更新，差别不大）。数据源 <code>data/SH_FIB.js</code>，盘后 18:00 链刷新；不含未来数据，历史窗口触发/失效状态可逐条回查。</div><div class="logic-p"><b style="color:#ef5350">⚠️ 两卡口径必须分清（2026-09-15 阿狸咪的工程师「先修」项，已在前端显式标注）：</b>艾略特波浪卡用<b>最高价</b>口径（③顶 4258.86 @05-14），斐波那契F卡用<b>收盘价</b>口径（06-22 收盘 4163.10）——<b>两卡跌幅读数不同属正常，勿混比</b>。两端现已各自印出口径声明行，杜绝相邻矛盾读感。</div><div class="logic-p"><b style="color:#ef5350">⚠️ 已知数据层问题（小九待修，前端已兜底）：</b><code>SH_FIB.current</code> 的 <code>index / total_points / total_pct</code> 三字段写的是<b>前一交易日</b>收盘（2026-09-14 实测 3888.11，而当日真实收盘 = 3885.33；反推 <code>peak_close + total_points = 4163.10 − 274.99 = 3888.11</code>）；而 <code>days_down=60 / peak_date=2026-06-22 / peak_close=4163.10</code> 三项实测<b>正确</b>（06-22 → 09-14 在真实序列中恰好相隔 60 个交易日）。<br><b>前端兜底</b>：F卡一律以 <code>WAVE_ELLIOTT.series</code> 最新真实收盘重算这三项（现得 3885.33 / −277.77 / −6.67%），<code>WAVE_ELLIOTT</code> 缺失时退回 SH_FIB 原值并标注「前一交易日」。<b>未改任何数据源、未补造数值</b>；根因在取数脚本（差一日），须由小九修。</div>
+        <div class="logic-h">两张卡</div>
         <table class="lg-table">
           <tr><th>卡片</th><th>内容</th><th>数据 / 刷新</th></tr>
           <tr><td>📚 机构研究 · AI 解析建议<br><span style="color:var(--dim);font-size:11px;">卡容器 <code>maharoCard</code></span></td><td>观澜台 / 金斧头 / 逻辑与思考 / 树枝报告 / 180K Research / 智堡 Wisburg / Vito行研札记 共 7 源，AI 阅读后按「日 → 周 → 月」三层撰写，新闻条目折叠为附录；标题行带「更新于」</td><td><code>data/maharo_macro.js</code>，每日 <b>08:30</b> 由本机 <code>maharo_daily_pull.py</code> 拉取生成</td></tr>
+          <tr><td>🌍 宏观景气背景 · K 型分层</td><td>K 型分化结构对照：扩张区（上端 · 红）/ 收缩区（下端 · 绿），含金融抑制模型框架要点</td><td>数据驱动（window.MACRO_KSHAPE）；源为沧海一土狗（公众号）K 型行业景气图，<b>⚡ 事件驱动 · 每日巡检</b>（「沧海一土狗文章巡检」发现新文即刷新，原每月1日自动化已停用）</td></tr>
         </table>
-        <div class="logic-h">2026-09-18 卡片迁出</div>
-        <div class="logic-p"><b style="color:var(--gold)">2026-09-18 主人令</b>：原「🌍 宏观景气背景 · K 型分层」已从本子页<b>整卡迁至「🔒 暂未上架 → 📊 观测类」</b>，位置在「🌐 新周期判定 · 海外宏观 + AI 大周期」（白河愁卡）<b>下方</b>。迁出依据：该卡数据源 <code>data/MACRO_KSHAPE.js</code> 的 <code>source</code> 字段<b>仅沧海一土狗单源</b>（name / title / url 各 1 条）⇒ 属「单一观点源」类，与白河愁卡（单源 @白河愁博士）同类，故归口到暂未上架。本子页现为 <b>1 卡</b>（页内保留的「📚 机构研究 · AI 解析建议」是 <b>7 源综合</b>，性质不同，故留）。</div>
         <div class="logic-h">为什么成立观测平台</div>
         <div class="logic-p">原「宏观观测」的两张卡原先埋在「暂未上架」最深处，要连点两层才看得到，实际使用率极低；<b style="color:var(--gold)">2026-09-12 主人令</b>提升为一级页。而「大盘观察」三张卡（艾略特波浪 / 中信 PE / A股指数）又留在「暂未上架 → 第二组子页」，与宏观观测同为「观测」性质却分处两地。<b style="color:var(--gold)">2026-09-15 主人令</b>：把两者收进同一个一级页「🌍 观测平台」，<b>宏观在左、大盘在右</b>，「观测」类信息一处看完，不再跨页找。<br>原先「🌐 新周期判定」卡因属<b>事件驱动 · 手动维护</b>（09-06 快照，一周即整体失效）不符合定位，已于 2026-09-14 按主人令移除；<b style="color:var(--gold)">2026-09-16 主人令</b>：该卡<b>已恢复至「🔒 暂未上架 → 📊 观测类」最下方</b>，并<b>接入现有数据源</b>（雪球 @白河愁博士 ⇒ <code>window.BAIHECHOU_MACRO</code>），同批开启<b>盘前日频更新解析</b>（工作日盘前 06:30 主跑、08:30 幂等兜底，由阿狸咪机自动化完成抓原文与 AI 出稿）——原「无自动刷新管线」的死卡根因已消除，09-06 那批静态快照数值（非农读数 / FOMC 概率 / 三情景概率）<b>全部清除</b>，不做旧数冒充新鲜。</div>
         <div class="logic-h">与「今日事件」的区别</div>
@@ -1926,7 +1912,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">定位</div>
         <div class="logic-p">仅管理员可见的实验区。放置已开发但尚未正式上架的卡片、调试工具或过渡性模块，避免在主站显示不稳定功能。</div>
         <div class="logic-h">当前内容</div>
-        <div class="logic-p">· <b>📊 观测类（唯一在册子页）</b>：概念/行业 → ETF·龙头 参考（板块/行业映射）/ 🔭 主题空间 · 概念资金热度（2026-09-11 由静态主题表改造为 SECTOR_FUND_FLOW 377 个概念/行业板块 × 主力净额 × 均涨跌的每日交叉，原版三项源日间不动被误读为死卡；<b style="color:var(--gold)">2026-09-13 主人令</b>：<b>主题清单不再写死</b> —— 改为「7 个长期主题（种子）+ 当日概念资金榜中未被种子覆盖的板块按主力净额降序取前 5（自动追加）」双轨重建，主题集合随每日行情变化）/ 🔮 AI 洞察 · 多源观点对比（<b>2026-09-15 已整卡迁往「🌍 观测平台 → 🌍 宏观观测」</b>，容器 <code>aiInsightsCompareBody</code> 未变）/ <b style="color:var(--gold)">🌐 新周期判定 · 海外宏观 + AI 大周期</b>（<code>baihechouBody</code>；<b>2026-09-16 主人令</b>：<b>恢复</b>并<b>接入现有数据源</b> 雪球 @白河愁博士 ⇒ <code>window.BAIHECHOU_MACRO</code>，版式＝一句话结论（当期主线）+ 双源对比（大盘/板块/仓位 三组，左原文右判断）+ 当期原文折叠；同批开启<b>盘前日频解析</b>（工作日盘前 06:30 自动抓原文并出稿，失败 08:30 兜底）；09-06 静态快照全部清除）；<b style="color:var(--gold)">2026-09-16 主人令（第二批）</b>：<b>&#x1F4CA; 危机雷达并入本卡</b> —— 卡内新增「&#x1F4CA; 宏观硬指标 · 危机雷达（尾部风险）」区（数据 <code>window.CRISIS_DATA</code>：货币 = USD/CNY 中间价 / 经济 = 中国制造业 PMI / 全球 = VIX + 美债 10Y 动态计算；综合指数 = 货币×40% + 经济×35% + 全球×25%，分档 ≥70 危险 / ≥50 警惕 / ≥30 关注），卡名「海外宏观」自此名副其实 —— 此前卡内<b>无一条海外宏观数据</b>，且数据源行里「自建宏观风险状态机（30Y 美债 / SOX / VIX / IG-HY 信用利差 / 美元日元 / 实际利率）」为<b>凭空添加、与实现不符</b>（实现层只有 VIX + 美债 10Y），已删；同批删除「🔒 已下架 → 🌐 下架雷达组」的「&#x1F321;&#xFE0F; 市场温度计 · 分项」「&#x1F578;&#xFE0F; 六维共振雷达 · 战术层」两卡，原三卡网格<b>整组撤除</b>（🔒 已下架页的成交金额 / 涨跌家数两卡不动；SH_FIB、CRISIS_DATA <b>数据源未删</b>，分别仍由斐波那契 F 观测窗 / 每日洞察消费）；同日 <b>🔭 主题空间 / 🔮 AI 洞察 两张被误删的卡已完整恢复</b>（卡容器 + 渲染函数 <code>__renderThemeValue</code> / <code>__renderAiInsightsCompare</code> + 数据注入 <code>data/AI_INSIGHTS_COMPARE.js</code> 三件同时补齐；原因见交接文档；<b>该统计口径链已于 2026-09-15 随 AI 洞察卡「统计→实情解析」重构整链下线</b>），共 3 张。<br>· <b style="color:var(--gold)">2026-09-15 主人令：「📊 大盘观察」整页迁出</b> —— 改名「<b>📊 大盘观测</b>」并挂到新建一级页「<b>🌍 观测平台</b>」（宏观观测右侧），卡片由 3 张增至 4 张（新增「🧪 斐波那契观测窗」← 原「🔒 已下架」盘前区迁入）。本页子 TAB 按钮行随之删除（只剩一个在册子页，无需页签）。去向与 4 卡清单见「🌍 观测平台」子 tab。<br>· <b>📈 A股波浪定位研报（离线产物 · 非页面卡片）</b>（客观数据层 <code>window.WAVE_ELLIOTT</code> + 主观研判模板 <code>v8/wave_report_template.html</code> + 渲染脚本 <code>v8/gen_wave_report.py</code>）为<b>离线研报产物</b>（<code>out/A股波浪定位-YYYYMMDD.html</code>），<b>不是本页卡片</b>；数据层由小九机交易日 16:00 日频刷新（三级降级源 腾讯→新浪→东财），阿狸咪机 git pull 后跑脚本即可零连接器出报告。<br>· <b style="color:#ef5350">⚠️ 已知数据层问题（待修）</b>：<code>SH_FIB.current.index</code> 实为<b>前一交易日收盘</b>（2026-09-14 实测 3888.11，而当日收盘 = 3885.33，且 change_pct 写 0），故本卡价格字段一律不取 SH_FIB。<br>· <b style="color:var(--gold)">2026-09-12 主人令：本页子页从 4 组收敛为 1 组</b> —— 「回测·框架 / 因子类 / 宏观类」三组共 9 张卡全部迁出：回测·框架 3 卡 → <b>策略回测页底部</b>；因子类 3 卡 → <b>选股策略 → 🧪 因子</b> 子页（逆势龙头左侧）；宏观类 3 卡 → 新建一级页 <b>🌍 宏观观测</b>（主站最左）。原 4 按钮子页签导航行随迁一并删除。去向对照见下方「子页去向对照」。<br>· <b>实验选股调试专区</b>：三重起涨 / CRDS逆势 / 候选池等验证中模块。<br>· <b>今日判定 · 环境态势</b>：已迁回「今日事件」页，此处不再重复。<br>· <b style="color:var(--gold)">2026-08-29 → 2026-09-15 主人令</b>：🧪 斐波那契观测窗 两度迁址，现归「<b>🌍 观测平台 → 📊 大盘观测</b>」（艾略特波浪卡下方）；「🔒 已下架」的盘前分组因清空已一并移除。<br><b style="color:var(--gold)">2026-09-18 主人令</b>：本子页新增 <b>🌍 宏观景气背景 · K 型分层</b>（由「🌍 观测平台 → 🌍 宏观观测」整卡迁入，位于白河愁卡下方；数据源 <code>data/MACRO_KSHAPE.js</code>，渲染函数 <code>__renderMacroKShape()</code>，容器 <code>#macroKShapeBody</code>，派发见 <code>renderUnlisted()</code> 尾部）。</div>
+        <div class="logic-p">· <b>📊 观测类（唯一在册子页）</b>：概念/行业 → ETF·龙头 参考（板块/行业映射）/ 🔭 主题空间 · 概念资金热度（2026-09-11 由静态主题表改造为 SECTOR_FUND_FLOW 377 个概念/行业板块 × 主力净额 × 均涨跌的每日交叉，原版三项源日间不动被误读为死卡；<b style="color:var(--gold)">2026-09-13 主人令</b>：<b>主题清单不再写死</b> —— 改为「7 个长期主题（种子）+ 当日概念资金榜中未被种子覆盖的板块按主力净额降序取前 5（自动追加）」双轨重建，主题集合随每日行情变化）/ 🔮 AI 洞察 · 多源观点对比（<b>2026-09-15 已整卡迁往「🌍 观测平台 → 🌍 宏观观测」</b>，容器 <code>aiInsightsCompareBody</code> 未变）/ <b style="color:var(--gold)">🌐 新周期判定 · 海外宏观 + AI 大周期</b>（<code>baihechouBody</code>；<b>2026-09-16 主人令</b>：<b>恢复</b>并<b>接入现有数据源</b> 雪球 @白河愁博士 ⇒ <code>window.BAIHECHOU_MACRO</code>，版式＝一句话结论（当期主线）+ 双源对比（大盘/板块/仓位 三组，左原文右判断）+ 当期原文折叠；同批开启<b>盘前日频解析</b>（工作日盘前 06:30 自动抓原文并出稿，失败 08:30 兜底）；09-06 静态快照全部清除）；<b style="color:var(--gold)">2026-09-16 主人令（第二批）</b>：<b>&#x1F4CA; 危机雷达并入本卡</b> —— 卡内新增「&#x1F4CA; 宏观硬指标 · 危机雷达（尾部风险）」区（数据 <code>window.CRISIS_DATA</code>：货币 = USD/CNY 中间价 / 经济 = 中国制造业 PMI / 全球 = VIX + 美债 10Y 动态计算；综合指数 = 货币×40% + 经济×35% + 全球×25%，分档 ≥70 危险 / ≥50 警惕 / ≥30 关注），卡名「海外宏观」自此名副其实 —— 此前卡内<b>无一条海外宏观数据</b>，且数据源行里「自建宏观风险状态机（30Y 美债 / SOX / VIX / IG-HY 信用利差 / 美元日元 / 实际利率）」为<b>凭空添加、与实现不符</b>（实现层只有 VIX + 美债 10Y），已删；同批删除「🔒 已下架 → 🌐 下架雷达组」的「&#x1F321;&#xFE0F; 市场温度计 · 分项」「&#x1F578;&#xFE0F; 六维共振雷达 · 战术层」两卡，原三卡网格<b>整组撤除</b>（🔒 已下架页的成交金额 / 涨跌家数两卡不动；SH_FIB、CRISIS_DATA <b>数据源未删</b>，分别仍由斐波那契 F 观测窗 / 每日洞察消费）；同日 <b>🔭 主题空间 / 🔮 AI 洞察 两张被误删的卡已完整恢复</b>（卡容器 + 渲染函数 <code>__renderThemeValue</code> / <code>__renderAiInsightsCompare</code> + 数据注入 <code>data/AI_INSIGHTS_COMPARE.js</code> 三件同时补齐；原因见交接文档；<b>该统计口径链已于 2026-09-15 随 AI 洞察卡「统计→实情解析」重构整链下线</b>），共 3 张。<br>· <b style="color:var(--gold)">2026-09-15 主人令：「📊 大盘观察」整页迁出</b> —— 改名「<b>📊 大盘观测</b>」并挂到新建一级页「<b>🌍 观测平台</b>」（宏观观测右侧），卡片由 3 张增至 4 张（新增「🧪 斐波那契F观测窗」← 原「🔒 已下架」盘前区迁入）。本页子 TAB 按钮行随之删除（只剩一个在册子页，无需页签）。去向与 4 卡清单见「🌍 观测平台」子 tab。<br>· <b>📈 A股波浪定位研报（离线产物 · 非页面卡片）</b>（客观数据层 <code>window.WAVE_ELLIOTT</code> + 主观研判模板 <code>v8/wave_report_template.html</code> + 渲染脚本 <code>v8/gen_wave_report.py</code>）为<b>离线研报产物</b>（<code>out/A股波浪定位-YYYYMMDD.html</code>），<b>不是本页卡片</b>；数据层由小九机交易日 16:00 日频刷新（三级降级源 腾讯→新浪→东财），阿狸咪机 git pull 后跑脚本即可零连接器出报告。<br>· <b style="color:#ef5350">⚠️ 已知数据层问题（待修）</b>：<code>SH_FIB.current.index</code> 实为<b>前一交易日收盘</b>（2026-09-14 实测 3888.11，而当日收盘 = 3885.33，且 change_pct 写 0），故本卡价格字段一律不取 SH_FIB。<br>· <b style="color:var(--gold)">2026-09-12 主人令：本页子页从 4 组收敛为 1 组</b> —— 「回测·框架 / 因子类 / 宏观类」三组共 9 张卡全部迁出：回测·框架 3 卡 → <b>策略回测页底部</b>；因子类 3 卡 → <b>选股策略 → 🧪 因子</b> 子页（逆势龙头左侧）；宏观类 3 卡 → 新建一级页 <b>🌍 宏观观测</b>（主站最左）。原 4 按钮子页签导航行随迁一并删除。去向对照见下方「子页去向对照」。<br>· <b>实验选股调试专区</b>：三重起涨 / CRDS逆势 / 候选池等验证中模块。<br>· <b>今日判定 · 环境态势</b>：已迁回「今日事件」页，此处不再重复。<br>· <b style="color:var(--gold)">2026-08-29 → 2026-09-15 主人令</b>：🧪 斐波那契F观测窗 两度迁址，现归「<b>🌍 观测平台 → 📊 大盘观测</b>」（艾略特波浪卡下方）；「🔒 已下架」的盘前分组因清空已一并移除。</div>
         <div class="logic-h">与正式区关系</div>
         <div class="logic-p">经主人确认稳定的模块会逐步提升到一级 Tab 或正式卡片；确认废弃的模块会移除。用户不应把暂未上架内容作为买卖依据。</div>
       </div>
@@ -1946,12 +1932,12 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><th>原位置</th><th>卡片（卡容器 id）</th><th>新位置</th><th>渲染入口 / 宿主</th></tr>
           <tr><td>📊 中信 PE&lt;10 历史回测（<code>citicPeBacktestBody</code>）</td></tr>
           <tr><td>📈 指数估值中枢 · 价格档位+趋势门控（<code>indexValueFrameworkBody</code>）</td></tr>
-          <tr><td>暂未上架 · 观测类</td><td>🌍 宏观景气背景 · K 型分层（<code>macroKShapeBody</code>）<br><span style="color:var(--dim);font-size:11px;">2026-09-18 由「🌍 观测平台 → 🌍 宏观观测」迁入，位于白河愁卡下方</span></td><td>🔒 暂未上架 → 📊 观测类<br>（白河愁卡下方）</td><td><code>__renderMacroKShape()</code> → <code>#macroKShapeBody</code><br>派发：<code>renderUnlisted()</code> 尾部（退避 0/600/1800ms）</td></tr>
-    <tr><td rowspan="3">暂未上架 · 因子类</td><td>🧪 因子实验室 · 异常换手率 / ROE_TTM（<code>factorLabBody</code>）</td><td rowspan="3">选股策略 → 🧪 因子<br>（逆势龙头左侧）</td><td rowspan="3"><code>__renderFactorPane()</code> → <code>#stFaHost</code></td></tr>
+          <tr><td rowspan="3">暂未上架 · 因子类</td><td>🧪 因子实验室 · 异常换手率 / ROE_TTM（<code>factorLabBody</code>）</td><td rowspan="3">选股策略 → 🧪 因子<br>（逆势龙头左侧）</td><td rowspan="3"><code>__renderFactorPane()</code> → <code>#stFaHost</code></td></tr>
           <tr><td>📊 因子审计：v8 选股 vs 质量价值中小盘多因子（<code>factorAuditBody</code>）</td></tr>
           <tr><td>🧪 因子补缺 · walk-forward 进度（<code>factorProgressBody</code>）</td></tr>
           <tr><td rowspan="2">暂未上架 · 宏观类</td><td>📚 机构研究 · AI 解析建议（<code>maharoCard</code>）</td><td rowspan="3">🌍 观测平台 → 🌍 宏观观测（子页 · 左）</td><td rowspan="3"><code>__renderObsPlatform()</code> → <code>#obsHost</code></td></tr>
-              </table>
+          <tr><td>🌍 宏观景气背景 · K 型分层（静态内联）</td></tr>
+        </table>
         <div class="logic-p"><b>迁移方式</b>：三组卡片的容器 id 全部保留，只换宿主容器（<code>#btExtraHost</code> / <code>#stFaHost</code> / <code>#obsHost</code>）。触发入口：<code>_renderPostReady()</code> 与各自的 <code>switchSec / switchSt</code> 分支。</div><div class="logic-h" style="color:#fbbf24;">⚠️ 2026-09-12 第一次搬迁的缺陷与修复（防复发）</div><div class="logic-p" style="border-left:3px solid #fbbf24;padding-left:10px;"><b>现象</b>：🌍 宏观观测页「📚 机构研究 · AI 解析建议」卡永久停在「加载中…」，策略回测页底部 3 卡与选股策略「🧪 因子」子页 3 卡同样恒空——<b>共 9 张卡</b>。<br><b>根因</b>：搬迁只搬了「容器骨架」，<b>没有把填充它的渲染函数调用一起搬</b>。骨架函数（<code>__renderBtExtraPane / __renderFactorPane / __renderMacroPane</code>）只把占位卡 HTML 写进宿主，而真正填充占位卡的 7 个渲染函数（<code>__renderRpsAudit / __renderCiticPeBacktest / __renderIndexValueFramework / __renderFactorLab / __renderFactorAudit / __renderFactorProgress / _fillMahoroCard</code>）的调用点仍留在 <code>renderUnlisted()</code> 里；宿主迁走后那里不再渲染这三块，于是除非恰好进过「暂未上架」页，否则这些卡永远不会被填充。其中 <code>_fillMahoroCard</code> 全局仅此一处调用，故宏观页必然空白。<br><b>修复</b>：在每个骨架函数的 <code>_host.innerHTML = hm;</code> 之后就地追加对应的填充调用（顺序不可颠倒——骨架先入 DOM，填充函数才找得到容器），并把 <code>renderUnlisted()</code> 尾部相应调用收窄为「仅观测类 5 卡」。<br><b>口径修正</b>：上一版此处写「渲染函数按 id 取容器，故迁页零改动」——只说对一半。<b>容器骨架零改动 ≠ 迁页零改动</b>，<b>填充调用必须随宿主一起搬</b>。<br><b>防复发检查项</b>（今后任何卡片迁页均须逐条过）：① 新宿主骨架函数体内是否含该卡填充函数的调用；② 旧宿主（<code>renderUnlisted</code>）是否已移除对已迁走容器的调用；③ 填充函数内 <code>getElementById</code> 的容器 id 是否确实出现在新骨架里；④ <code>__stRetryTab</code> / 自愈轮询的判据是否指向已迁走的容器 id（会永假 → 无限重渲）。</div>
       </div>
 
@@ -7412,7 +7398,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,
       <div class="ph-fib-badge" id="phFibBadge">--</div>
     </div>`;
     h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">`;
-    h+=v8CardHeader('🧪','斐波那契观测窗','','update_time',window.SH_FIB);
+    h+=v8CardHeader('🧪','斐波那契F观测窗','','update_time',window.SH_FIB);
     var _fib2=window.SH_FIB||{};
     h+=`<div style="padding:12px 14px;">`;
     if(_fib2.windows&&_fib2.windows.length){
