@@ -28,6 +28,17 @@ PHASE_RULE_VER = 2
 PHASES = ("主升", "启动")
 LEVEL_SUFFIX = ("Ⅲ", "Ⅱ", "Ⅰ")   # 东财板块级后缀（同花顺名不带）
 
+# 人工别名表（2026-09-19 阿狸咪的工程师·主人令「两卡对应清楚」配套）：
+#   实测 42 个主升/启动板块里「塑料制品 / 橡胶制品 / 汽车服务及其他」三个，精确名与去级后缀归一都匹配不上；
+#   旧版 `continue` 直接静默丢弃该板块 ⇒ 前端「启动 · N 个板块」与「板块资金趋势」卡计数对不上且无任何提示。
+#   ⚠️ 只放两侧语义等价、已人工确认的映射；新增前必须核对两侧成分股范围，防张冠李戴。
+#   命中别名时产物标记 match="alias:*"，便于审计追溯。
+MANUAL_ALIAS = {
+    "塑料制品": "塑料",           # 申万二级「塑料制品」↔ 东财「塑料」
+    "橡胶制品": "橡胶",           # ↔ 东财「橡胶」
+    "汽车服务及其他": "汽车服务",   # ↔ 东财「汽车服务」
+}
+
 UA = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
     "Referer": "https://quote.eastmoney.com/",
@@ -90,6 +101,24 @@ def _norm(nm):
         if nm.endswith(suf):
             return nm[:-1]
     return nm
+
+
+def _resolve_bk(nm, exact, norm):
+    """三档匹配板块代码：① 东财精确名 ② 去 Ⅰ/Ⅱ/Ⅲ 级后缀归一 ③ 人工别名表。
+    返回 (bk, how)；how ∈ {exact, norm, alias:exact, alias:norm, ""}；全失败 (None, "")。"""
+    if nm in exact:
+        return exact[nm], "exact"
+    k = _norm(nm)
+    if k in norm:
+        return norm[k], "norm"
+    al = MANUAL_ALIAS.get(nm)
+    if al:
+        if al in exact:
+            return exact[al], "alias:exact"
+        ka = _norm(al)
+        if ka in norm:
+            return norm[ka], "alias:norm"
+    return None, ""
 
 
 def fetch_em_boards():
@@ -162,6 +191,9 @@ def build():
         return None
     _dd = rs.get("data_date")
     src_date = str(_dd)[:10] if _dd else ""
+    # 审计追溯：本产物完全派生自 SECTOR_RS，记录其版本戳，便于判断是否与前端同源同批
+    log("source SECTOR_RS: update_time=%s data_date=%s sectors=%d"
+        % (rs.get("update_time"), rs.get("data_date"), len(rs.get("sectors") or [])))
     leaders_all = []
     for s in rs["sectors"]:
         nm = s.get("name")
@@ -176,14 +208,23 @@ def build():
     log("phases: %s" % "、".join("%s(%s)" % (x["name"], x["phase"]) for x in leaders_all))
     sectors_out = []
     n_fail = 0
+    n_nomatch = 0
     if leaders_all:
         boards_exact, boards_norm = fetch_em_boards()
         log("em boards: exact=%d norm=%d" % (len(boards_exact), len(boards_norm)))
         for x in leaders_all:
             nm = x["name"]
-            bk = boards_exact.get(nm) or boards_norm.get(_norm(nm))
+            bk, how = _resolve_bk(nm, boards_exact, boards_norm)
             if not bk:
-                log("skip(no-match-even-norm): %s（同花顺名在东财无对应板块，需人工别名表）" % nm)
+                # 🎯 2026-09-19 主人令·两卡对应：不再静默丢板块！保留 + no_match=1，
+                #   前端明示「该板块在东财无对应行业板块，需人工别名表补」⇒ 两卡计数因此对齐。
+                n_nomatch += 1
+                log("no-match: %s（东财无对应板块；已保留 + no_match=1，请补 MANUAL_ALIAS）" % nm)
+                sectors_out.append({
+                    "name": nm, "bk": None, "phase": x.get("phase", "主升"),
+                    "pct_5d": x.get("pct_5d"), "pct_20d": x.get("pct_20d"),
+                    "cons_count": 0, "leaders": [], "no_match": 1, "match": "",
+                })
                 continue
             try:
                 cons = fetch_cons_safe(bk)
@@ -193,13 +234,13 @@ def build():
                 sectors_out.append({
                     "name": nm, "bk": bk, "phase": x.get("phase", "主升"),
                     "pct_5d": x.get("pct_5d"), "pct_20d": x.get("pct_20d"),
-                    "cons_count": 0, "leaders": [], "leaders_error": 1,
+                    "cons_count": 0, "leaders": [], "leaders_error": 1, "match": how,
                 })
                 continue
             sectors_out.append({
                 "name": nm, "bk": bk, "phase": x.get("phase", "主升"),
                 "pct_5d": x.get("pct_5d"), "pct_20d": x.get("pct_20d"),
-                "cons_count": len(cons), "leaders": cons[:TOP_N],
+                "cons_count": len(cons), "leaders": cons[:TOP_N], "match": how,
             })
             time.sleep(0.3)
     payload = {
@@ -207,7 +248,10 @@ def build():
         "data_date": src_date, "rule_ver": PHASE_RULE_VER, "top_n": TOP_N,
         "source": "东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期",
         "phase": "主升+启动", "sector_count": len(sectors_out), "sectors": sectors_out,
-        "note": "板块归属按同花顺行业分类；个股涨幅/价格为东方财富实时口径；leaders_error=1 表示个股行情本轮抓取失败待补抓",
+        "nomatch_count": n_nomatch, "leaders_fail_count": n_fail,
+        "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；"
+                "个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；"
+                "no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*)",
     }
     with open(OUT_RAW, "wb") as f:
         f.write(json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8"))
@@ -220,9 +264,9 @@ def build():
         _cnt.setdefault(p, [0, 0])
         _cnt[p][0] += 1 if x.get("leaders") else 0
         _cnt[p][1] += 1
-    log("OK %s js_bytes=%d leaders_fail=%d" % (
+    log("OK %s js_bytes=%d leaders_fail=%d no_match=%d" % (
         " ".join("%s(%d/%d)" % (p, v[0], v[1]) for p, v in sorted(_cnt.items(), key=lambda kv: _po.get(kv[0], 9))),
-        len(body), n_fail))
+        len(body), n_fail, n_nomatch))
     return payload
 
 
