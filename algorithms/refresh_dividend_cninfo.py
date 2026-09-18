@@ -31,6 +31,54 @@ from datetime import datetime, date
 
 import akshare as ak
 
+# 🛡 2026-09-18 P1 根治「单次调用挂死 ⇒ 整条 cn 链被并发组堵死 8.6h」：
+#   【事故】run #35321312858 在云端卡在「分红方案刷新」步 **8.6 小时**，
+#     导致 concurrency 组（cancel-in-progress:false + queue:max）
+#     后续 3 个 run 全部 pending 8.5h ⇒ 整条 cn 抓取链零产出。
+#   【根因】预算闸门 _budget_out() 只在**循环顶部**求值；而
+#     `ak.stock_dividend_cninfo()` 内部 requests **无超时**，
+#     一旦服务端半死连接保持不返回，本次调用**永久阻塞** ——
+#     闸门再也不会被求值，step 级 timeout-minutes:20 也未生效（实测）。
+#   ⇒ 任何「只在循环顶部检查」的预算闸门，都防不住**调用内部挂死**。
+#   【修法】给单次网络调用加**硬超时**：每次调用新建 daemon 线程 + join(timeout)，
+#     超时即判失败并 continue，绝不让单次调用无限期占用。
+#     🔴 两个必须点：① 用 daemon 线程且**不 join 无限等** ⇒ 进程可立即退出；
+#       ② **每次新建线程、不用共享 ThreadPoolExecutor** ⇒ 否则一次超时会把 worker
+#          永久占住，使后续正常调用也被排在后面而假超时（实测复现过）。
+import threading
+
+_CALL_TIMEOUT_S = 20      # 单次 cninfo 调用硬上限（正常响应 <2s，20s 极宽松）
+
+
+def _call_with_timeout(fn, timeout=_CALL_TIMEOUT_S, **kw):
+    """在独立线程里执行 fn(**kw)，超过 timeout 秒即放弃（抛 TimeoutError）。
+
+    🔴 两个必须这么写的理由（2026-09-18 实测踩出）：
+      1. **绝不 join 阻塞的线程** ⇒ 用 daemon=True，超时后线程被丢弃，进程可立即退出。
+      2. **绝不用共享线程池** ⇒ 首次用 `ThreadPoolExecutor(max_workers=1)` 时，
+         一次超时后那个 worker 仍被挂死的调用占据，**下一次正常调用会被排在后面**，
+         导致 `timeout=20` 的快调用也照超时（实测复现）。
+         ⇒ 改为**每次调用新建单次线程**，互不污染。
+    """
+    import threading
+
+    _box = {}
+
+    def _run():
+        try:
+            _box["v"] = fn(**kw)
+        except BaseException as e:      # noqa: BLE001 —— 异常要原样带回主线程
+            _box["e"] = e
+
+    th = threading.Thread(target=_run, daemon=True)   # daemon ⇒ 不阻塞进程退出
+    th.start()
+    th.join(timeout)                                   # 只等 timeout 秒
+    if th.is_alive():
+        raise TimeoutError(f"单次调用超时(>{timeout}s)")
+    if "e" in _box:
+        raise _box["e"]
+    return _box.get("v")
+
 HERE = __import__("pathlib").Path(__file__).resolve().parent
 while not (HERE / "raw_data").exists() and HERE.parent != HERE:
     HERE = HERE.parent
@@ -264,7 +312,12 @@ def main():
         df = None
         for _ in range(3):
             try:
-                df = ak.stock_dividend_cninfo(symbol=code)
+                # 🛡 2026-09-18：改为带硬超时的调用，杜绝单次挂死拖死全链（见文件头注释）
+                df = _call_with_timeout(ak.stock_dividend_cninfo, symbol=code)
+                break
+            except TimeoutError as _te:
+                # 超时属「半死连接」，重试一次意义不大，直接计数跳过
+                print(f"⏱ {code} {_te}，跳过")
                 break
             except Exception:
                 # 🛡 2026-09-18：重试前先看预算，别把最后的等待浪费在一次无望重试上
