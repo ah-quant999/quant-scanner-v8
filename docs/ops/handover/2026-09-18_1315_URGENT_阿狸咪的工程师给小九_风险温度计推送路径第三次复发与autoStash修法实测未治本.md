@@ -109,7 +109,11 @@
 
 ⇒ **脏的不是它自己写的产物**，而是**检出树里既有的 CRLF blob**。这与 09-15 那轮的「CI 树恒脏」同族（当时权威计数 38 个受管辖 CRLF 文件）。
 
-⚠️ **明确未证（不许谎报）**：以上「Linux hosted runner 检出后即显 ` M`」这一环，**只在 Windows 侧复现过**（09-15 合成复现，判据 41）；本轮本机 `github.com:443` git 端口不通，**无法在容器内复现**。故**不把它写成已证根因**。
+⚠️ **证据边界要分清（不许谎报）**：
+
+- ✅ **已证**：「**rebase 时刻树确实是脏的**」—— 本档 `run 35301969887` 跑在 **GitHub 托管 `ubuntu-latest`**（`runner_name=GitHub Actions …`），其日志逐字给出 `error: cannot rebase: You have unstaged changes.` ⇒ **「CI 树会脏」不是 Windows 特有现象，Linux 托管机同样发生。**
+- ❌ **未证**：脏的**成因**是否就是「检出即脏（CRLF blob + `text eol=lf` 归一化不等）」。该机制**只在 Windows 侧合成复现过**（09-15，判据 41）；本轮本机 `github.com:443` git 端口不通，**无法在容器内复现** ⇒ **不写成已证根因**，只作首要嫌疑。
+- ② 因为成因未证，**修法不应依赖它** —— 甲方案（§6）不管脏树也能落地。
 
 **30 秒定位法（一行，零行为改动）**：在 `git push` 之前插 `git status --porcelain`，在 rebase 之前插 `git stash list`；谁冒出来谁是真凶。
 **但它不是修法前置** —— 甲方案不管脏树也能落地。
