@@ -164,6 +164,16 @@ jobs:
       - name: "🛡️ Pre-deploy audit（CI 自动门禁，2026-09-05 启用）"
         run: python .github/scripts/pre_deploy_audit.py
 
+      # 🛡 2026-09-18 小九（双盲区根治·P0 · 事故家族第三次复发）：
+      #   「双盲区」= 同一产物**闸门不覆盖 + 巡检不告警** ⇒ 冻结数日而全链零红灯。
+      #   历史：09-11 FOUR_VOLUME_60M 冻结 3 天 / 09-18 BACKTEST_TDX 冻结 4 天 /
+      #        09-18 FOUR_VOLUME_60M 再次冻结逾 24h。
+      #   前两次都是**针对单个产物打补丁**，没有校验「全部卡是否都在闸门覆盖内」
+      #   ⇒ 同型必然复发。本步骤把「零特例」立成静态可断言校验，结构上封死第四次。
+      #   ⚠️ 只读校验（AST 解析三个文件的清单表），不改任何数据、不触网络，秒级完成。
+      - name: "🛡️ 护栏：双盲区静态校验（闸门覆盖 / 去重白名单 / 巡检告警 三条不变式）"
+        run: python .github/scripts/guard_double_blind.py
+
       - name: "🛡️ 部署前校验：关键 data/*.js 非空（防空 raw_data 覆盖成 shell 致整站空）"
         run: python v8_deploy_guard.py
 

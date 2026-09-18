@@ -102,6 +102,16 @@ _ALWAYS_PUSH = {
     #   实测该文件仅 23 KB，白名单化带来的每日多推开销可忽略。
     #   ⇒ 规则：凡 READY_SPEC[*]["must"] 中的产物，一律纳入本白名单（一一对应，可断言）。
     "data/LHB_DATA.js",               # READY_SPEC["A"].must
+    # 🛡 2026-09-18 小九（双盲区根治·P0 · 事故家族第三次复发）：
+    #   READY_SPEC["B"].items 新增 data/FOUR_VOLUME_60M.js ⇒ 依上述**零特例不变式**
+    #   必须同步进本白名单，否则它一旦「内容天然稳定」（60m 命中数相同 ⇒ 剥掉 update_time
+    #   后逐字节相同）就会被本去重器判「伪变更」丢弃 ⇒ update_time 恒旧 ⇒ B 批恒判未就绪
+    #   ⇒ **永久不收敛**（比不加更危险，正是 L85-87 已警示过的路径）。
+    "data/FOUR_VOLUME_60M.js",        # READY_SPEC["B"].items
+    #   同轮（2026-09-18）一并纳入：四量终极自建系统两产物（09-15 新增，闸门漏登记）。
+    #   同受「READY_SPEC items ⊆ _ALWAYS_PUSH」不变式约束。
+    "data/FOUR_VOLUME_HISTORY.js",    # READY_SPEC["B"].items
+    "data/FOUR_VOLUME_TRACK.js",      # READY_SPEC["B"].items
     # 🛡 2026-09-13 一劳永逸（小九周末审计 P2 采纳 · 主人令「按你顺序都做」）：
     #   **READY_SPEC[*] 的 items 与 must 全部纳入**（零特例，机器可断言）。
     #   原不变式只覆盖 must，但 items 同样参与 need 的命中计数 ⇒ 任一项被本去重器判

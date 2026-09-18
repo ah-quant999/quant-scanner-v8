@@ -237,6 +237,29 @@ READY_SPEC: dict[str, dict] = {
             #   本项保留为「上游新鲜度抵押」：它鲜活即证明采集批正常。
             #   need=8 的容错语义与 items 清单均未改动。
             "raw_data/gold_pool.json",
+            # 🛡 2026-09-18 小九（双盲区根治·P0 · 事故家族第三次复发）：补入 FOUR_VOLUME_60M.js。
+            #   根因（实测闭环）：该项**既不在 items 也不在 must**，而 v8_health_check.py 的
+            #   _LOW_FREQ_FILES 于 09-11 已按主人令把它移出（max_age=1440 硬告警）
+            #   ⇒ 闸门不覆盖（陈旧不阻塞就绪 → target=NONE 空转 → **永不重跑**）
+            #     + 健康检查只报不做 ⇒ 产物自 09-17 06:54 冻结逾 24h 而全链「零阻塞」。
+            #   与 09-18 阿狸咪修的 BACKTEST_TDX 属**同一事故家族**
+            #   （注释原文：「两个监控都不覆盖」），本次为第三次复发 ⇒ 另加机器可断言护栏。
+            #   ✅ 可达性核验：它与 data/FOUR_VOLUME.js 同批同源（ORDER 190/191，STAGES["B"]），
+            #      nightly 夜窗 00:00~08:59 由 picking 门控放行（run_algorithms.py L627）
+            #      ⇒ 不恒 STALE；实测 runner 环境(CLOUD_RUNNER=true)全链 96s 跑通、命中 11 只。
+            #   ✅ 不变式核验：已同步纳入 dedup_fetch_manifest.py::_ALWAYS_PUSH（见该文件）。
+            #   ⚠️ need 仍为 8（10 项容忍 2 项不新鲜）—— 60m 是「加分因子」，
+            #      不因此收紧要挟整条 B 批；它参与计数即可驱散空转。
+            "data/FOUR_VOLUME_60M.js",
+            # 🛡 2026-09-18 小九（同轮双盲区根治·家族第四次同型）：四量终极自建系统两产物。
+            #   2026-09-15 主人令「四量也要像三重共识有自己的整套系统」新增
+            #   update_four_volume_history.py / gen_four_volume_track.py（STAGES["B"] ORDER 200+），
+            #   但**未同步登记进本闸门** ⇒ 与 60m 完全同型的「闸门不覆盖」盲区。
+            #   本轮由 guard_double_blind.py（机器可断言护栏）自动发现，非人工逐个补。
+            #   ✅ 可达性：与 data/FOUR_VOLUME.js 同批同源（读它刚产的当日新鲜账本）。
+            #   ✅ 不变式：已同步纳入 dedup_fetch_manifest.py::_ALWAYS_PUSH。
+            "data/FOUR_VOLUME_HISTORY.js",
+            "data/FOUR_VOLUME_TRACK.js",
         ],
         "need": 8,
         # need 用 8/9：3 个核心选股产物 + 5 个收编产物 + gold_pool，即「只容忍 1 项不新鲜」。
