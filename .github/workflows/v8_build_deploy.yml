@@ -131,8 +131,14 @@ jobs:
     if: needs.gate.outputs.trading != 'true' && (github.event_name == 'workflow_run' || github.event_name == 'workflow_dispatch' || github.event_name == 'push')
     steps:
       - uses: actions/checkout@v4
+        with:
+          # ★ 2026-08-15 根治 build clobber：必须全量克隆（fetch-depth: 0），否则浅克隆
+          #   reset --hard FETCH_HEAD 拉不到 cn 单独推送的 4 个 extra 文件
+          #   最新 blob，本地副本落后 → ?v 算成陈旧值 → CDN 吐旧副本。全量克隆保证
+          #   reset 后本地 data/*.js 与线上严格一致，?v 一律取本地文件即权威。
+          fetch-depth: 0
       # ⚡ 2026-09-19 新增（阿狸咪的工程师）：同桶「抢跑短路」
-      #   配合上面 cancel-in-progress: false —— 取消关掉后，同一 concurrency 组内的
+      #   配合上面的 cancel-in-progress: false —— 取消关掉后，同一 concurrency 组内的
       #   多个 run 会**排队**而非互踢。若排在前面的 run 是较旧的（有新 push 已进来），
       #   让它白跑 14 分钟毫无意义，还可能用旧数据覆盖新数据；故主动让位给更新的 run。
       #   ⚠️ 只在 push 桶生效；workflow_run / dispatch 桶承载最终落地职责，必须跑完。
@@ -156,16 +162,17 @@ jobs:
           NEWER=$(curl -sS -m 25 -H "Authorization: Bearer $GITHUB_TOKEN" \
               -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/${{ github.repository }}/actions/workflows/v8_build_deploy.yml/runs?event=push&per_page=30" \
-              | python -c "
-          import sys,json
+              | ME_ID="${{ github.run_id }}" Q_AT="$Q" python -c "
+          import os,sys,json
           try:
               d=json.load(sys.stdin)
           except Exception:
               print(0); raise SystemExit
-          q='$Q'
+          q=os.environ.get('Q_AT') or ''
+          me=os.environ.get('ME_ID') or ''
           n=0
           for r in (d.get('workflow_runs') or []):
-              if str(r.get('id')) == '${{ github.run_id }}':
+              if str(r.get('id')) == me:
                   continue
               t = r.get('run_started_at') or r.get('created_at') or ''
               if t > q:
@@ -178,12 +185,6 @@ jobs:
             exit 0
           fi
           echo "✅ 无更新的 push run → 本场负责落地"
-        with:
-          # ★ 2026-08-15 根治 build clobber：必须全量克隆（fetch-depth: 0），否则浅克隆
-          #   reset --hard FETCH_HEAD 拉不到 cn 单独推送的 4 个 extra 文件
-          #   最新 blob，本地副本落后 → ?v 算成陈旧值 → CDN 吐旧副本。全量克隆保证
-          #   reset 后本地 data/*.js 与线上严格一致，?v 一律取本地文件即权威。
-          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
