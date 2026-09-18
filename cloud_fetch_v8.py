@@ -84,7 +84,10 @@ VAR_TO_RAW = {
     "OVERSEAS_MARKETS": "overseas_markets.json",
     "RESTRICTED_RELEASE": "restricted_release.json",
     "PERFORMANCE_FORECAST": "performance_forecast.json",
-    "AVG_PRICE_DATA": "avg_price_data.json",  # 2026-08-31 修复：f_avg_price 已加入 tasks，必须对应 raw_data/avg_price_data.json，否则 save() 因 fname=None 直接返回，数据永不被写入
+    "AVG_PRICE_DATA": "avg_price_data.json",
+    # 2026-09-18：880003 主口径（真 MA + 历史回填）。本函数自写合并结果，
+    # 但登记项必须存在，否则 run() 的状态记录与 save() 的兜底路径会静默失效。
+    "AVG_PRICE_880003": "avg_price_data.json",  # 2026-08-31 修复：f_avg_price 已加入 tasks，必须对应 raw_data/avg_price_data.json，否则 save() 因 fname=None 直接返回，数据永不被写入
 }
 
 # 变量名 → 更新时段（与 update_v8.py 的 CATEGORY_MAP 对齐）
@@ -149,6 +152,8 @@ CATEGORY_MAP = {
     #   position_vs_ma20/ma60 恒 null → v8_health_check 常年判「关键字段空值」黄灯。
     #   本函数是该文件唯一写入者（standalone fetch_avg_price.py 步骤已从 workflow 摘除）。
     "AVG_PRICE_DATA": "intraday",
+    # 2026-09-18：880003 主口径随等权同档（intraday），保证每轮都刷新 MA 与历史
+    "AVG_PRICE_880003": "intraday",
     "OVERSEAS_MARKETS": "intraday",  # 亚太市场(日经/恒生/KOSPI/台湾)：交易时段实时更新，盘中每轮刷新
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告，日频更新即可
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：注释写「盘后数据页」却只在盘前抓 —— 语义错配。
@@ -3649,7 +3654,7 @@ def _clear_intraday_for_premarket(category, only=None):
     #   开盘后由 intraday_snapshot.py 自然覆盖为当日数据（符合「第二天开盘前才清空」）。
     # 2026-09-08：MACRO_DATA 加入保留名单——LPR/M2/CPI/PMI/中美利差/汇率/商品为日级/月级宏观
     #   指标，与开盘无关，此前因 CATEGORY_MAP 含 intraday 被盘前清成「暂不可用」（第 4 次同类误伤）。
-    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP", "ETF_DAILY_MONITOR", "CONCEPT_RANKING", "CFFEX_HOLDINGS", "AVG_PRICE_DATA", "SECTOR_FUND_FLOW_INTRADAY", "MACRO_DATA"}
+    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP", "ETF_DAILY_MONITOR", "CONCEPT_RANKING", "CFFEX_HOLDINGS", "AVG_PRICE_DATA", "AVG_PRICE_880003", "SECTOR_FUND_FLOW_INTRADAY", "MACRO_DATA"}
 
     for var, cat in CATEGORY_MAP.items():
         if "intraday" not in [x.strip() for x in cat.split(",")]:
@@ -4000,6 +4005,112 @@ def main(category=None, only=None):
             "up_down_last_date": up_down_last_date,
         }
 
+    def _fetch_880003_history(days=130):
+        """通达信平均股价 880003 官方指数日K（东财 push2his，双 secid 兜底）。
+        这是「平均股价」这个指标的官方本体；只读历史，不做任何估算。
+        返回 [(date, close), ...] 升序；失败返回 []。
+        """
+        for secid in ("88.0003", "90.0003"):
+            try:
+                r = _requests.get(
+                    "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+                    params={
+                        "secid": secid, "klt": "101", "fqt": "1",
+                        "fields1": "f1,f2,f3,f4,f5,f6",
+                        "fields2": "f51,f52,f53,f54,f55,f56,f57",
+                        "beg": "0", "end": "20500101", "lmt": str(days + 20),
+                        "ut": "fa5fd1943c7b386f172d6893dbfba1a9",
+                        "_": int(time.time() * 1000),
+                    },
+                    headers=_EM_HEADERS, timeout=25,
+                )
+                j = r.json()
+                kl = ((j.get("data") or {}).get("klines")) or []
+                recs = []
+                for ln in kl:
+                    p = ln.split(",")
+                    if len(p) >= 3:
+                        try:
+                            recs.append((p[0], float(p[2])))
+                        except ValueError:
+                            continue
+                if len(recs) >= 2:
+                    print(f"  [880003] secid={secid} 取到 {len(recs)} 根日K "
+                          f"({recs[0][0]} ~ {recs[-1][0]})")
+                    return recs
+            except Exception as e:
+                print(f"  [880003] secid={secid} 失败: {e}")
+        return []
+
+    def f_avg_price_880003():
+        """🛡 2026-09-18（主人令「肯定A·治本」）：平均股价主口径 = 通达信 880003 官方指数。
+        分工（与 f_avg_price 全A等权自算）：
+          - 本函数：写 ma20/ma60/position_*/history_880003（真 MA，历史一次到位）
+          - f_avg_price：写 avg_price 等「当前价」字段（等权口径，保持卡片既有外观）
+        两者合并写同一 raw_data/avg_price_data.json，字段分离，避免跨口径混算。
+        """
+        series = _fetch_880003_history(130)
+        if len(series) < 2:
+            print("  [880003] 历史取数失败 → 不覆盖既有文件（等权口径兜底）")
+            return {}
+        series = sorted(series, key=lambda x: x[0])
+        closes = [s[1] for s in series]
+        dates = [s[0] for s in series]
+        cur = closes[-1]
+        prev = closes[-2] if len(closes) > 1 else None
+
+        # 真 MA：样本不足一律 None，绝不用 min() 伪装
+        ma20 = round(sum(closes[-20:]) / 20, 4) if len(closes) >= 20 else None
+        ma60 = round(sum(closes[-60:]) / 60, 4) if len(closes) >= 60 else None
+        pos20 = round((cur / ma20 - 1) * 100, 4) if ma20 else None
+        pos60 = round((cur / ma60 - 1) * 100, 4) if ma60 else None
+
+        hist = []
+        for i, (d, c) in enumerate(series[-130:]):
+            pc = series[i - 1][1] if i > 0 else None
+            hist.append({
+                "date": d,
+                "avg_price": c,
+                "avg_change_pct": round((c / pc - 1) * 100, 4) if pc else 0.0,
+            })
+
+        n = len(closes)
+        print(f"  [880003] 主口径: date={dates[-1]} close={cur} "
+              f"ma20={ma20} ma60={ma60} 样本={n}")
+
+        out_path = RAW_DIR / "avg_price_data.json"
+        base = {}
+        if out_path.exists():
+            try:
+                base = json.loads(out_path.read_text(encoding="utf-8")) or {}
+            except Exception:
+                base = {}
+        merged = dict(base)
+        merged.update({
+            "index_880003": cur,
+            "index_880003_prev": prev,
+            "index_880003_change_pct": round((cur / prev - 1) * 100, 4) if prev else None,
+            "index_880003_date": dates[-1],
+            "ma20": ma20,
+            "ma60": ma60,
+            "position_vs_ma20": pos20,
+            "position_vs_ma60": pos60,
+            "ma20_ready": n >= 20,
+            "ma60_ready": n >= 60,
+            "ma_caliber": "通达信880003(官方指数)",
+            "history_days": len(hist),
+            "history_880003": hist,
+        })
+        # 等权口径已有 avg_price 时保留（卡片外观不变）；缺失才用 880003 兜底
+        if merged.get("avg_price") is None:
+            merged["avg_price"] = cur
+            merged["date"] = dates[-1]
+            merged["history"] = hist
+            merged["history_caliber"] = "通达信880003(官方指数)"
+        out_path.write_text(json.dumps(merged, ensure_ascii=False, indent=2),
+                            encoding="utf-8")
+        return merged
+
     def f_avg_price():
         """全A等权平均股价：通过 em_clist(push2delay) 取全市场个股最新价/涨跌幅，
         算等权均价 + 等权涨跌幅，并记录历史算 20/60 日水位。
@@ -4133,12 +4244,17 @@ def main(category=None, only=None):
             })
             hist = sorted(hist, key=lambda x: x.get("date", ""))[-60:]
 
+            # 🔴 2026-09-18 根因修复（主人「累积够了才算不对吧」质疑）：
+            #   原实现 sum(prices[-20:]) / min(20, len(prices)) —— 用 min() 绕开样本检查，
+            #   15 条时 20 日切片与 60 日切片返回同一批数据 ⇒ ma20 == ma60 == 15 日均值，
+            #   把「N 日均值」冒充成 MA20/MA60（实测线上两字段同为 28.1902）。
+            #   现改为：真 MA，样本不足一律 None，绝不写假值。
             prices = [r["avg_price"] for r in hist]
-            ma20 = sum(prices[-20:]) / min(20, len(prices)) if prices else avg_price
-            ma60 = sum(prices[-60:]) / min(60, len(prices)) if prices else avg_price
+            ma20 = round(sum(prices[-20:]) / 20, 4) if len(prices) >= 20 else None
+            ma60 = round(sum(prices[-60:]) / 60, 4) if len(prices) >= 60 else None
 
-            pos20 = (avg_price - ma20) / ma20 * 100 if ma20 else 0
-            pos60 = (avg_price - ma60) / ma60 * 100 if ma60 else 0
+            pos20 = (avg_price - ma20) / ma20 * 100 if ma20 else None
+            pos60 = (avg_price - ma60) / ma60 * 100 if ma60 else None
 
             # 🔴 2026-08-30 根因修复：history 不足时 ma = mean(history[-20:]) 会退化成
             #   「当日均价自身」（只有 1 条时 ma20 = ma60 = avg_price），
@@ -4153,14 +4269,16 @@ def main(category=None, only=None):
                 "avg_change_pct": round(avg_change, 4),
                 "prev_avg_price": round(prev_price, 4) if prev_price else None,
                 "count": count,
-                "ma20": round(ma20, 4),
-                "ma60": round(ma60, 4),
-                "position_vs_ma20": round(pos20, 4) if _n >= 20 else None,
-                "position_vs_ma60": round(pos60, 4) if _n >= 60 else None,
+                # 🔴 2026-09-18：样本不足写 null，不再用 min() 伪装；MA 由 880003 主口径覆盖
+                "ma20": ma20,
+                "ma60": ma60,
+                "position_vs_ma20": round(pos20, 4) if pos20 is not None else None,
+                "position_vs_ma60": round(pos60, 4) if pos60 is not None else None,
                 "ma20_ready": _n >= 20,
                 "ma60_ready": _n >= 60,
                 "history": hist,
                 "history_days": _n,
+                "history_caliber": "全A等权自算",
             }
         except Exception as e:
             print(f"  ⚠️ 平均股价获取失败: {e}")
@@ -4171,6 +4289,7 @@ def main(category=None, only=None):
         ("ETF_NET_SUBSCRIPTION", f_etf_net_subscription),  # 2026-09-11 主人 P1：真实份额申赎（上交所日环比）
         ("SECTOR_FUND_FLOW", f_sector_fund_flow),
         ("AVG_PRICE_DATA", f_avg_price),
+        ("AVG_PRICE_880003", f_avg_price_880003),
         ("INDEX_QUOTES", f_index_quotes),
         ("CONCEPT_RANKING", f_concept_ranking),
         ("IPO_DATA", f_ipo_data),
