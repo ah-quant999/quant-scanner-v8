@@ -129,6 +129,47 @@ def _take_field(lines, j, n, kind):
     return (None, False)
 
 
+PRICE_FIELDS = ("base_price", "latest_price", "change_pct", "drawdown_pct")
+
+
+def classify_residue(missing_counts, total, samples=None):
+    """把「字段缺失」分级：良性(无报价) / 结构性命中(串位)。返回 dict。
+
+    🔴🔴 2026-09-18 阿狸咪的工程师 新增（根因见文件末 ISSUE-IMA-01）。
+
+    为什么必须分级（而不是「非空即红」）：
+      · **规格自证**：本文件修复说明写明修完后「缺失归 0，仅剩 2 条真实无价的记录」
+        ⇒ 这 2 条是**预期内**的，非空即红＝护栏比规格更严，属自相矛盾（判据 114）。
+      · **语义已变**：`_take_field` 对空串是**消费指针**，所以现在一次 miss 不再等于
+        「串位」，而等于「格子非空但非预期类型」—— 「无报价」正是这个形状。
+      · 但**不能一律放行**：真串位（如 status/trade_date 缺失）必须继续红。
+
+    判据（全部满足才算良性）：
+      ① 缺失字段**只有**那四条价格字段（任何结构性字段缺失 ⇒ 直接判串位）；
+      ② 四条**缺失条数完全相同**（同一批记录整体无价；若不同 ⇒ 各自串位，仍红）；
+      ③ 缺失数 ≤ 容差 max(2, 5%×总数)（占比过大 ⇒ 列序或页面结构变了，仍红）。
+
+    纯函数、无副作用 ⇒ 可被回归用例直接调用（见 _t_ima_guard.py），
+    不必「只能跑整条 CI 才知道对不对」。
+    """
+    fmc = {k: v for k, v in (missing_counts or {}).items() if v}
+    price_miss = {k: v for k, v in fmc.items() if k in PRICE_FIELDS}
+    other_miss = {k: v for k, v in fmc.items() if k not in PRICE_FIELDS}
+    tol = max(2, int(round(total * 0.05))) if total else 0
+    same_n = (len(set(price_miss.values())) == 1) if price_miss else False
+    benign = bool(price_miss) and not other_miss and same_n and \
+        list(price_miss.values())[0] <= tol
+    return {
+        "benign": benign,
+        "price_miss": price_miss,
+        "other_miss": other_miss,
+        "tolerance": tol,
+        "same_n": same_n,
+        "no_price_records": price_miss.get("base_price", 0),
+        "samples": {k: list((samples or {}).get(k, [])) for k in fmc},
+    }
+
+
 def extract_from_inner_text(text):
     """按字段类型解析 innerText，容忍行业/买点提示为空。
 
@@ -161,7 +202,8 @@ def extract_from_inner_text(text):
     #     修复前 field_missing_counts = {base_price:72, latest_price:72, change_pct:72,
     #       drawdown_pct:72, status:70, trade_date:70}，有效 first_selected 仅 **40/112**
     #       —— 与线上产物 `parse_health` **逐项完全一致**（⇒ 根因确认，非推测）；
-    #     修复后 first_selected **112/112**，缺失归 0（仅剩 2 条真实无价的记录）。
+    #     修复后 first_selected **112/112**，缺失归 0（仅剩 2 条真实无价的记录 ——
+    #     这 2 条**不是 bug**，故产物自检必须**放行**它们；分级判据见 classify_residue）。
     #   下游后果（为什么当事故修）：first_selected 为空者被回测 `one_trade()` 静默丢弃
     #   （skipped=72），样本从 112 掉到 40 会让回测**系统性偏乐观**
     #   （T+1 40 条 67.5% vs 全量 176 条 50.6%，差 17pp）。
@@ -188,6 +230,7 @@ def extract_from_inner_text(text):
             continue
         rec = {"code": lines[i]}
         miss = []
+        missvals = {}
         j = i + 1
 
         def take(field, kind, default):
@@ -197,6 +240,10 @@ def extract_from_inner_text(text):
                 j += 1
             else:
                 miss.append(field)
+                # 🔴 2026-09-18 阿狸咪的工程师：连**原始 token** 一起留证。
+                #   只记「缺了几次」无法区分「格子里是无报价符号」与「列序真变了」；
+                #   留原文才可判、可审、可复现（绝不静默原则的落点）。
+                missvals[field] = lines[j] if j < n else "<越界>"
             rec[field] = default if val is None else val
 
         # 固定列序（与 extract_via_table 的 HTML 列序一致）——**不再用「类型猜测」判行业**：
@@ -220,6 +267,7 @@ def extract_from_inner_text(text):
             rec["status_unknown"] = True
         if miss:
             rec["_parse_missing"] = miss
+            rec["_parse_missing_vals"] = missvals
         stocks.append(rec)
         i = j
     return stocks
@@ -349,10 +397,15 @@ def main():
     #   让「回测吃到偏乐观样本」潜伏了不知多久。故把缺口统计**写进产物本身**，
     #   让任何一方（前端/审计/另一台机）都能一眼看见。
     _missing_fields = {}
+    _missing_samples = {}
     _no_sig_date = 0
     for _s in data["stocks"]:
         for _f in (_s.get("_parse_missing") or []):
             _missing_fields[_f] = _missing_fields.get(_f, 0) + 1
+        for _f, _v in (_s.get("_parse_missing_vals") or {}).items():
+            _missing_samples.setdefault(_f, [])
+            if len(_missing_samples[_f]) < 5:
+                _missing_samples[_f].append(_v)
         if not str(_s.get("first_selected") or "").strip():
             _no_sig_date += 1
     parse_health = {
@@ -361,11 +414,29 @@ def main():
         "no_first_selected_pct": (round(_no_sig_date / len(data["stocks"]) * 100, 1)
                                   if data["stocks"] else 0),
         "field_missing_counts": _missing_fields,
+        # 🔴🔴 2026-09-18 阿狸咪的工程师 修正（ISSUE-IMA-01，判据 114）：
+        #   上面的修复说明**自己就写明**「修复后缺失归 0，仅剩 2 条真实无价的记录」，
+        #   而旧护栏写「非空即拒写」⇒ 规格与护栏打架，护栏错。且语义已变：空串现在
+        #   会**消费指针**，故 miss 不再代表「串位」，而是「格非空且非预期类型」。
+        #   ⇒ 产物里补两样东西：原始 token 留证，以及「良性残留」的显式登记。
+        "field_missing_samples": _missing_samples,
         "note": ("no_first_selected = 无首次入选日的记录数；下游回测无法为其定位信号日 ⇒ "
                  "会被排除。此数必须与回测侧 skipped_no_signal_date 对得上，否则说明"
-                 "解析或筛选有分歧。field_missing_counts = 各字段类型校验未通过（串位）次数，"
-                 "恒为 0 表示行结构与 HTML 列序完全对齐。"),
+                 "解析或筛选有分歧。field_missing_counts = 各字段类型校验未通过次数"
+                 "（空单元格会消费指针，故这里只统计『非空但非预期类型』的格子）；"
+                 "field_missing_samples = 这些格子的原始文本（留证，绝不静默）。"
+                 "no_price_records/no_price_codes = 确认「无报价」的记录数与代码表；"
+                 "benign_residue=True 表示本次残留已按「无报价」放行（判据见 classify_residue）。"),
     }
+    # ── 残留分级（只有「四条价格字段同数缺失且 ≤5%」才算良性「无报价」）──
+    _res = classify_residue(_missing_fields, len(data["stocks"]), _missing_samples)
+    parse_health["residue_tolerance"] = _res["tolerance"]
+    parse_health["benign_residue"] = _res["benign"]
+    parse_health["no_price_records"] = _res["no_price_records"]
+    parse_health["no_price_codes"] = [
+        [_s.get("code"), _s.get("name")]
+        for _s in data["stocks"]
+        if "base_price" in (_s.get("_parse_missing") or [])][:20]
 
     # 🔴 2026-09-17 阿狸咪的工程师：「源数据日」判据（**内容级**，不是 SLA 猜测）。
     #   权威数据日取「每行最新交易日」的最大值；全部缺失时回退到源笔记自述更新时间。
@@ -412,15 +483,31 @@ def main():
     if parse_health.get("no_first_selected"):
         _viol.append("no_first_selected=%s（应恒为 0，否则空单元格折叠修复失效）"
                      % parse_health["no_first_selected"])
-    if parse_health.get("field_missing_counts"):
-        _viol.append("field_missing_counts 非空 %s（解析串位复发）"
-                     % parse_health["field_missing_counts"])
+    # 🔴🔴 2026-09-18 阿狸咪的工程师：旧护栏「field_missing_counts 非空即拒写」已废
+    #   （ISSUE-IMA-01：规格允许「仅剩 2 条真实无价的记录」，护栏却要求恒 0 ⇒ 自相矛盾，
+    #    上线后首跑即把整条链打死，产物停更 >26h）。改为**分级判据**：
+    #    结构性字段缺失 ⇒ 红；价格字段形状不合法 ⇒ 红；只有「四条同数缺失且 ≤5%」放行。
+    #    ⚠️ 放行 ≠ 放过：仍写进产物（no_price_records/no_price_codes）并打印 warn。
+    if _res["other_miss"]:
+        _viol.append("结构性字段缺失 %s（解析串位复发）· 原始样本 %s"
+                     % (_res["other_miss"],
+                        {k: _res["samples"].get(k) for k in _res["other_miss"]}))
+    elif _res["price_miss"] and not _res["benign"]:
+        _viol.append(
+            "价格字段缺失形状不合法 %s（容差 ≤%d；四条不同数或占比>5%% ⇒ 判串位）· 原始样本 %s"
+            % (_res["price_miss"], _res["tolerance"],
+               {k: _res["samples"].get(k) for k in _res["price_miss"]}))
     if _viol:
         print("❌ 产物自检失败 —— 拒绝写出坏产物：")
         for _v in _viol:
             print("   · " + _v)
         raise SystemExit(1)
 
+    if parse_health.get("benign_residue"):
+        print(f"⚠️ 良性残留（放行）：{parse_health['no_price_records']} 条记录无报价 "
+              f"{parse_health['no_price_codes']} —— 四条价格字段同数缺失且 ≤"
+              f"{parse_health['residue_tolerance']} 条容差，判为「源笔记本身无价」，"
+              f"非串位；已写入 parse_health.no_price_records 供审计。")
     print(f"🩺 解析健康度: 总 {parse_health['total']} 只 · "
           f"无首次入选日 {parse_health['no_first_selected']} 只"
           f"（{parse_health['no_first_selected_pct']}%）· "
