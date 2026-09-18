@@ -674,6 +674,8 @@ window.__domReadyFns=[];
   <script src="data/AVG_PRICE_DATA.js?v=1789723185" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=1789723185" defer></script>
+    <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
+    <script src="data/SECTOR_LEADERS.js?v=1789720329" defer></script>
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
     <script src="data/PORTFOLIO.js?v=1789723185" defer></script>
     <script>
@@ -14605,7 +14607,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       //   数据源 window.SECTOR_LEADERS（data/SECTOR_LEADERS.js，盘后日频生成，
       //   生成器 scripts/fetch_sector_leaders.py）。
       //   ⚠️ 独立链路：SECTOR_LEADERS 拿不到就整块不渲染（不显示空壳）。
-      _fillSectorLeaders(cEl);
+      _fillSectorLeaders();
       var em = window.CONCEPT_ETF_MAP || {};
       var tm=document.getElementById('prEtfFresh');
       var _etfSrcTs = (window.CONCEPT_RANKING||{}).update_time || (window.SECTOR_FUND_FLOW||{}).update_time || em.update_time || null;
@@ -14614,46 +14616,55 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     }catch(e){ console.warn('ETF龙头渲染失败',e); }
   };
 
-  /* 🚀 2026-09-17 主人令：主升板块 → 龙头股（实时）
-     需求原话：「主升有没有龙头股或者推荐股，要不不知道买什么」。
-     位置：主人指定「放到『暂未上架』页」——即本卡（概念/行业 → ETF·龙头 参考）下方。
-     数据：window.SECTOR_LEADERS（data/SECTOR_LEADERS.js）
-           · sectors[].name        主升板块名（同花顺行业分类）
-           · sectors[].pct_5d/20d  该板块 5/20 日涨幅
-           · sectors[].leaders[]   该板块当日涨幅前 N 只（code/name/price/chg/main_net）
-     口径：
-       · 板块范围 —— 只取「主升」档（pct_5d>3 且 pct_20d>5），与「板块资金趋势」卡同规则；
-       · 排序     —— 板块内**当日涨幅降序**（主人 2026-09-17 选定）；
-       · 数据源   —— 东方财富板块成分股（板块归属走同花顺，二者实测成分股重合 98%+）。
-     ⚠️ 护栏：
-       · 无 SECTOR_LEADERS / 无主升板块 ⇒ **整块不渲染**（不产出空壳卡）；
-       · 不覆盖既有列表：本块 append 到 dbgEtfMapBody 末尾，既有 ETF 映射列表保持原样。 */
-  window._fillSectorLeaders = function(cEl){
+  /* 🚀 2026-09-18 主人令：主升/启动 板块 → 龙头股（实时）· 独立卡（观测类首卡）
+   需求原话：「板块主升和启动的具体龙头股，放在暂未上架页这个卡上方」。
+   沿革：09-17 版 (a)只取「主升」档 (b)追加在 ETF·龙头参考卡内部下方 (c)漏 data/SECTOR_LEADERS.js
+   注入行 ⇒ window.SECTOR_LEADERS 恒 undefined、整块恒不渲染（死块）。本版三项全治：
+     ① 生成器 scripts/fetch_sector_leaders.py 扩 主升+启动（板块带 phase 字段）；
+     ② 独立卡置于「概念/行业 → ETF·龙头 参考」卡上方（#sectorLeadersCard）；
+     ③ index.html 补 <script src="data/SECTOR_LEADERS.js"> 注入。
+   口径：主升=5日>3%且20日>5%；启动=5日>1.5%且20日>-8%（与「板块资金趋势」卡/生成器 _phase_of 三处同规则）。
+   ⚠️ 护栏：无数据 ⇒ 卡保持 display:none（不产出空壳卡）；body.innerHTML 幂等重渲（重复调用不叠加）。 */
+  window._fillSectorLeaders = function(){
     try{
+      var card = document.getElementById('sectorLeadersCard');
+      var body = document.getElementById('sectorLeadersBody');
+      if(!card || !body) return;
       var sl = window.SECTOR_LEADERS || null;
-      if(!sl || !sl.sectors || !sl.sectors.length){
-        // 无数据 / 今日无主升板块 ⇒ 不渲染任何东西（连标题都不出，避免死卡）
-        return;
+      var rows = ((sl && sl.sectors) || []).filter(function(s){ return s && s.leaders && s.leaders.length; });
+      if(!rows.length) return;                    /* 无数据 ⇒ 保持隐藏（不渲染空壳） */
+      var fb = document.getElementById('prLeadersFresh');
+      if(fb){
+        var ts = (sl && sl.update_time) || '';
+        if(typeof _uBadge === 'function'){ try{ fb.innerHTML = _uBadge('auto','盘后', ts); }catch(e2){ fb.textContent = ts; } }
+        else { fb.textContent = ts; }
       }
-      var rows = sl.sectors.filter(function(s){ return s && s.leaders && s.leaders.length; });
-      if(!rows.length) return;
-
-      var h = '';
-      h += '<div id="sectorLeadersBox" style="margin-top:14px;border-top:1px dashed rgba(56,189,248,.25);padding-top:12px;">';
-      h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:9px;">';
-      h += '  <span style="font-size:13px;font-weight:700;color:#ef4444;">&#x1F680; 主升板块 &#183; 龙头股</span>';
-      h += '  <span style="font-size:11px;color:var(--dim);">板块内当日涨幅前 ' + (sl.top_n || 5) + ' &#183; 实时</span>';
-      h += '  <span style="font-size:11px;color:var(--dim);">数据 ' + (sl.update_time || '—') + '</span>';
-      h += '</div>';
-
+      /* 主升在前、启动在后（生成器已排序，这里兜底再排一次；老数据无 phase 视为主升） */
+      var po = {'主升':0,'启动':1};
+      rows = rows.slice().sort(function(a,c){
+        var pa = po[a.phase]!=null?po[a.phase]:9, pc = po[c.phase]!=null?po[c.phase]:9;
+        return pa-pc || ((c.pct_5d||0)-(a.pct_5d||0));
+      });
+      var h = '', cur = null;
       rows.forEach(function(s){
+        var ph = s.phase || '主升';
+        if(ph !== cur){
+          cur = ph;
+          var isUp = (ph === '主升');
+          var n = 0; rows.forEach(function(x){ if((x.phase||'主升')===ph) n++; });
+          h += '<div style="display:flex;align-items:center;gap:8px;margin:4px 0 7px;">'
+             + '<span style="font-size:13px;font-weight:700;color:' + (isUp ? '#ef4444' : '#f59e0b') + ';">'
+             + (isUp ? '&#x1F680; 主升' : '&#x1F4C8; 启动') + ' &#183; ' + n + ' 个板块</span>'
+             + '<span style="flex:1;height:1px;background:var(--border);"></span></div>';
+        }
         var d5 = (s.pct_5d >= 0 ? '+' : '') + (s.pct_5d || 0).toFixed(1) + '%';
-        var d20 = (s.pct_20d >= 0 ? '+' : '') + (s.pct_20d || 0).toFixed(1) + '%';
+        var d20v = s.pct_20d || 0;
+        var d20 = (d20v >= 0 ? '+' : '') + d20v.toFixed(1) + '%';
         h += '<div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);margin-bottom:7px;">';
         /* 板块标题行 */
         h += '  <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:7px;">';
-        h += '    <span style="font-weight:700;color:#ef4444;font-size:13px;">' + s.name + '</span>';
-        h += '    <span style="font-size:11px;color:var(--sub);">5日 <b style="color:var(--up);">' + d5 + '</b> &#183; 20日 <b style="color:var(--up);">' + d20 + '</b></span>';
+        h += '    <span style="font-weight:700;color:var(--txt);font-size:13px;">' + s.name + '</span>';
+        h += '    <span style="font-size:11px;color:var(--sub);">5日 <b style="color:var(--up);">' + d5 + '</b> &#183; 20日 <b style="color:' + (d20v>=0?'var(--up)':'var(--down)') + ';">' + d20 + '</b></span>';
         h += '    <span style="font-size:10px;color:var(--dim);">成分股 ' + (s.cons_count || 0) + ' 只</span>';
         h += '  </div>';
         /* 个股行内并列 */
@@ -14670,14 +14681,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         h += '  </div>';
         h += '</div>';
       });
-
-      h += '<div style="font-size:11px;color:var(--dim);line-height:1.6;">&#x26A0;&#xFE0F; 「主升」= 板块 5 日&gt;3% 且 20 日&gt;5%（与「板块资金趋势」卡同规则）；'
-         + '个股为板块内当日涨幅排序，<b style="color:#fbbf24">非推荐信号，不构成投资建议</b>。</div>';
-      h += '</div>';
-
-      /* append：保留既有 ETF 映射列表，本块只往后追加 */
-      cEl.insertAdjacentHTML('beforeend', h);
-    }catch(e){ console.warn('主升龙头股渲染失败', e); }
+      body.innerHTML = h;
+      card.style.display = 'block';
+    }catch(e){ console.warn('主升启动龙头股渲染失败', e); }
   };
 
 
@@ -14826,6 +14832,17 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
 //     同批开启盘前日频更新解析（工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿）。原卡为静态快照死卡，详见 R3/R4 注释。
 //   概念ETF龙头参考
 h += '<div id="ulPaneObserve" style="display:block;">';
+// 🚀 2026-09-18 主人令：主升/启动 板块·龙头股 独立卡（观测类首卡，置于「概念/行业 → ETF·龙头 参考」卡上方）
+//   数据 window.SECTOR_LEADERS（data/SECTOR_LEADERS.js，scripts/fetch_sector_leaders.py 盘后生成）。
+//   无数据 ⇒ 整卡保持 display:none（不产出空壳卡）。
+h += '<div class="card" id="sectorLeadersCard" style="display:none;margin-bottom:16px;border-left:4px solid #ef4444;">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+   + '<span style="font-size:15px;font-weight:700;color:#ef4444;">&#x1F680; 主升/启动 板块 &#183; 龙头股</span>'
+   + '<span class="fresh" id="prLeadersFresh">&#x2014;</span>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 · 板块周期龙头（当日涨幅前5）</span></div>'
+   + '<div id="sectorLeadersBody"><div class="note">加载中&#x2026;</div></div>'
+   + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 「主升/启动」判定与「板块资金趋势」卡同规则（主升 5日&gt;3%且20日&gt;5%；启动 5日&gt;1.5%且20日&gt;-8%）；个股为板块内当日涨幅排序，<b style="color:#fbbf24">非推荐信号，不构成投资建议</b>。</div></div>';
+
 h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#38bdf8;">&#x1F4CC; 概念/行业 &#x2192; ETF·龙头 参考</span>'
