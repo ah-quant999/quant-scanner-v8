@@ -76,6 +76,20 @@ concurrency:
   # 留下半截 JSON → 数据清空（共振日历反复「数据又没了」、主力净额曲线断档均源于此）。
   # 配合 token 修复 + 僵尸看门狗形成双保险。
   cancel-in-progress: false
+  # 🛡 2026-09-18 一劳永逸·第二重（主人令「今日事件页今天怎么没更新」根因修复之二 · 小九的工程师）：
+  #   【问题】今日事件页 V8_CAL/IPO_DATA 当日未更新，除「分红步拖死 job」外还有**第二条腿**：
+  #     本仓盘中 20 分钟粒度派发 + 盘中自接力叠加 ⇒ 每有新 run 到达，**旧 pending run 被无条件顶掉**。
+  #   【机制·官方文档背书】`cancel-in-progress: false` **只保护「正在运行」的 run**；
+  #     concurrency 组默认「最多 1 running + 1 pending」，新 run 到达时
+  #     **旧 pending 一律被取消**，新 run 占住 pending 位。
+  #     实测代价：09-18 全天 39 轮 run 中 **11 轮 cancelled（28%）**；09-17 为 6/42（14%）。
+  #     其中 #35315423241(06:33:51) 与 #35315463560(06:34:25) 仅隔 34 秒即互顶。
+  #   【修法】GitHub 2026-05-07 changelog「Concurrency groups now allow larger queues」新增
+  #     `queue: max`：并发组可排队至 100 个 run，逐个依次执行、不再互顶。
+  #     保持 `cancel-in-progress: false` 不变（不破坏 2026-08-24 已定的「不杀正在写文件的 run」）。
+  #   【安全性】`queue` 仅在 `cancel-in-progress: false`（或未设）时生效 —— 本文件已满足；
+  #     job 的 `timeout-minutes` 只计 job 自身执行时长、**不含排队时间** ⇒ 排队变多不会触发超时。
+  queue: max
 
 jobs:
   fetch:
