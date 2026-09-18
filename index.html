@@ -1218,9 +1218,7 @@ function __judgmentCandidatesHTML(){
   var SP = window.STOCK_PROFILE || {};
   var sp = SP.profiles || {};
   var SFF = window.SECTOR_FUND_FLOW || {};
-  var sffTop = (SFF.top_list || []);
-  var sffMap = {};
-  sffTop.forEach(function(x){ if(x && x.name) sffMap[x.name] = x; });
+  /* 💧 关联板块资金流向统一走 window.v8SectorFlow（2026-09-18），sffTop/sffMap 不再自建 */
 
   // ---- 市场环境 ----
   var jd = window.JUDGMENT_DATA || {};
@@ -1344,9 +1342,8 @@ function __judgmentCandidatesHTML(){
         s.rr = s.riskPct > 0 ? s.rewardPct / s.riskPct : 0;
       }
     }
-    // 匹配关联板块资金（取个股概念命中且净流入前 3）
-    var matched = (s.concepts || []).map(function(c){ return sffMap[c]; }).filter(function(x){ return !!x; })
-      .sort(function(a,b){ return (b.net_inflow||0) - (a.net_inflow||0); }).slice(0,3);
+    // 关联板块资金（统一走 window.v8SectorFlow，取概念命中且按净额前 3）
+    var matched = (window.v8SectorFlow ? window.v8SectorFlow.match(s.concepts, 3) : []);
     s.sectorFlow = matched;
   });
 
@@ -1439,7 +1436,7 @@ function __judgmentCandidatesHTML(){
     var sectorLine = '';
     if(s.sectorFlow && s.sectorFlow.length){
       sectorLine = '<div class="tp-detail">关联板块资金：' + s.sectorFlow.map(function(x){
-        var net = x.net_inflow || 0;
+        var net = x.value || 0;
         var color = net>=0 ? 'var(--up)' : 'var(--down)';
         return '<span style="color:'+color+'">'+x.name+' '+(net>=0?'+':'')+net.toFixed(1)+'亿</span>';
       }).join(' · ') + '</div>';
@@ -1916,9 +1913,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <li>📊 <b>实时行情</b>：现价、涨跌幅、成交量/额、今开/昨收/最高/最低</li>
           <li>📐 <b>环境摘要（仅持仓时显示）</b>：持仓成本（实时行情卡内）</li>
           <li>🎯 <b>止盈止损</b>：止损位、目标位、盈亏比、操作建议</li>
-          <li>🏷 <b>概念行业概览</b>：板块、行业、题材概念标签</li>
+          <li>🏷 <b>概念行业概览</b>：板块、行业、题材概念标签（含 💧 关联板块资金流向，按净额排序取前 8）</li>
           <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、逆势龙头、四量终极</li>
-          <li>💧 <b>关联板块资金流向</b>：该股所属概念/板块当日资金流向</li>
           <li>🐉 <b>龙虎榜</b>：上榜日期、机构/游资净买、上榜原因</li>
           <li>🚫 <b>停牌识别</b>：停牌状态与原因</li>
           <li>🌾 <b>基本面画像</b>：综合评级、ROE、营收增速、EPS、股息率、分红方案等</li>
@@ -8720,8 +8716,8 @@ function switchSec(sec,el){
 
   /* 2026-08-06 主人令：「永远空着的卡就删除，不要每只都空着不好看」
      - 已删除 7 个重复/永远空函数：renderMulti / renderGoldPool / renderInst / renderPriceTrend / renderEma / renderReport / renderMahoro
-     - renderStrategyHits / renderRelatedFlow / renderLhb / renderSuspension 已改为「找不到就返回 ''」（不渲染占位）
-     - 个股查询网格仅含：renderQuote / renderStopStop / renderProfile / renderStrategyHits / renderRelatedFlow / renderLhb / renderSuspension
+     - renderStrategyHits / renderLhb / renderSuspension 已改为「找不到就返回 ''」（不渲染占位）
+     - 个股查询网格仅含：renderQuote / renderStopStop / renderProfile / renderStrategyHits / renderLhb / renderSuspension
      - 数据有就显示，没就整张不渲染 → 网格自动重排不空卡 */
 
   function renderLhb(item, code){
@@ -9228,6 +9224,40 @@ function switchSec(sec,el){
     return h;
   }
 
+window.v8SectorFlow = window.v8SectorFlow || (function(){
+  // 全站唯一「关联板块资金流向」口径（2026-09-18 根治 4 处分叉 + 3 处硬 bug）
+  // 数据源：SECTOR_FUND_FLOW（sectors_in + sectors_out），字段 net=主力净流入(亿元) / chg=涨跌幅%
+  // CONCEPT_RANKING 无资金流字段（真实键 items，非 list/ranking/data），故概念资金流统一走 SECTOR_FUND_FLOW 名称匹配
+  var BROAD = {'融资融券':1,'沪股通':1,'深股通':1,'MSCI中国':1,'标准普尔':1,'富时罗素':1};
+  var _map = null, _ts = null;
+  function buildMap(){
+    var sf = window.SECTOR_FUND_FLOW || {};
+    var ts = String(sf.update_time || '');
+    if(_map && _ts === ts) return _map;
+    var m = {};
+    (sf.sectors_in || []).concat(sf.sectors_out || []).forEach(function(r){
+      var n = r && (r.name || r.sector_name);
+      if(n && m[n] === undefined) m[n] = r;
+    });
+    _map = m; _ts = ts; return m;
+  }
+  return {
+    BROAD: BROAD,
+    map: buildMap,
+    match: function(concepts, limit, minKeep){
+      var m = buildMap(), cs = concepts || [];
+      if(!cs.length) return [];
+      var hit = cs.filter(function(c){ return m[c] && m[c].net != null && !isNaN(Number(m[c].net)); });
+      var narrow = hit.filter(function(c){ return !BROAD[c]; });
+      if(narrow.length >= (minKeep == null ? 2 : minKeep)) hit = narrow;
+      var rows = hit.map(function(c){
+        return { name:c, type:m[c].type || '概念', value:Number(m[c].net), pct:m[c].chg };
+      });
+      rows.sort(function(a,b){ return Math.abs(b.value) - Math.abs(a.value); });
+      return limit ? rows.slice(0, limit) : rows;
+    }
+  };
+})();
   function renderProfile(item, code){
     const p = getProfile(code, item);
     const board = item.board_label || (p && p.board) || '-';
@@ -9240,6 +9270,23 @@ function switchSec(sec,el){
     h+='<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;">'+
         tags.map(function(t){return '<span style="display:inline-block;background:var(--bg);border:1px solid var(--border);color:var(--txt);padding:2px 8px;border-radius:12px;font-size:11px;">'+t+'</span>';}).join('')+
         (tags.length?'':'<span style="color:var(--dim)">无题材概念</span>')+'</div>';
+    // 关联板块资金流向（并入概念胶囊下方，统一走 window.v8SectorFlow）
+    const flowRows = (window.v8SectorFlow ? window.v8SectorFlow.match((p.concepts||[]), 0) : []);
+    if(flowRows.length){
+      const FMAX = 8;
+      h+='<div style="margin-top:10px;border-top:1px dashed var(--border);padding-top:9px;">';
+      h+='<div style="font-size:12px;font-weight:700;color:var(--up);margin-bottom:6px;">💧 关联板块资金流向 <span style="color:var(--dim);font-weight:400;font-size:11px;">· 主力净额(亿)</span></div>';
+      h+='<div style="display:flex;flex-direction:column;gap:5px;">';
+      flowRows.slice(0, FMAX).forEach(function(r){
+        const col = r.value>=0 ? 'var(--up)' : 'var(--down)';
+        const pctStr = r.pct!=null ? (' · '+fmtPct(r.pct)) : '';
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">'+
+           '<span style="color:var(--sub);">['+r.type+'] '+r.name+'</span>'+
+           '<span style="color:'+col+';font-weight:600;">'+(r.value>=0?'+':'')+Math.abs(r.value).toFixed(2)+'亿'+pctStr+'</span></div>';
+      });
+      if(flowRows.length > FMAX) h+='<div style="font-size:11px;color:var(--dim);">… 另 '+(flowRows.length-FMAX)+' 个关联概念（按净额降序，仅列前 '+FMAX+'）</div>';
+      h+='</div></div>';
+    }
     h+='</div></div>';
     return h;
   }
@@ -9291,15 +9338,12 @@ function switchSec(sec,el){
     let flowScore = 50;
     const p = getProfile(code, item);
     const concepts = (p&&p.concepts)||[];
-    const cr = window.CONCEPT_RANKING || {};
-    const clist = cr.list || cr.ranking || cr.data || [];
+    // 资金面：统一走 window.v8SectorFlow（主力净额亿元，不再 /1e4、不再依赖 CONCEPT_RANKING 不存在的 net_inflow 字段）
+    const flowRows = (window.v8SectorFlow ? window.v8SectorFlow.match(concepts, 0) : []);
     let netInflowYi = 0, matchedConcepts = 0;
-    concepts.forEach(function(c){
-      const row = clist.find(function(r){ return (r.name||r.concept||'')===c; });
-      if(row && row.net_inflow!=null){ netInflowYi += Number(row.net_inflow); matchedConcepts++; }
-    });
+    flowRows.forEach(function(r){ netInflowYi += r.value; matchedConcepts++; });
     if(matchedConcepts>0){
-      const avgYi = netInflowYi/matchedConcepts/1e4;
+      const avgYi = netInflowYi/matchedConcepts;
       flowScore += Math.max(-25, Math.min(35, avgYi*4));
     }
     const lhb = window.LHB_DATA || {};
@@ -9354,7 +9398,7 @@ function switchSec(sec,el){
     h+='<div style="font-size:11px;color:var(--sub);line-height:1.7;border-top:1px dashed var(--border);padding-top:8px;">';
     h+='<div>📈 动量 <b style="color:'+(pct>=0?'var(--up)':'var(--down)')+'">'+(pct>=0?'+':'')+pct.toFixed(2)+'%</b> · 成交额 '+(amount>1e8?(amount/1e8).toFixed(2)+'亿':'-')+(amount>3e8?' · 放量':'')+'</div>';
     if(f.roe!=null) h+='<div>🧬 ROE <b>'+f.roe.toFixed(1)+'%</b> · 营收增速 '+(f.revenue_growth!=null?(f.revenue_growth>=0?'+':'')+f.revenue_growth.toFixed(1)+'%':'-')+'</div>';
-    if(matchedConcepts>0) h+='<div>💧 所属概念资金净流入 <b style="color:'+(netInflowYi>=0?'var(--up)':'var(--down)')+'">'+(netInflowYi>=0?'+':'')+(netInflowYi/1e4).toFixed(2)+'亿</b>（'+matchedConcepts+' 个概念）</div>';
+    if(matchedConcepts>0) h+='<div>💧 关联概念资金净流入 <b style="color:'+(netInflowYi>=0?'var(--up)':'var(--down)')+'">'+(netInflowYi>=0?'+':'')+Math.abs(netInflowYi).toFixed(2)+'亿</b>（'+matchedConcepts+' 个关联概念）</div>';
     if(lrow) h+='<div>🐉 龙虎榜机构净买 <b style="color:'+(lrow.inst_net_万>=0?'var(--up)':'var(--down)')+'">'+fmtYi(lrow.inst_net_万)+'</b> · 游资净买 '+fmtYi(lrow.yz_net_万)+'</div>';
     h+='</div>';
     h+='</div>';
@@ -9416,47 +9460,9 @@ function switchSec(sec,el){
     return h;
   }
 
-  function renderRelatedFlow(item, code){
-    const p = getProfile(code);
-    if(!p) return '';
-    const concepts = (p.concepts||[]).slice(0,8);
-    const industry = p.industry || '';
-    const rows=[];
-    // 概念资金流匹配
-    const cr = window.CONCEPT_RANKING || {};
-    const clist = cr.list || cr.ranking || cr.data || [];
-    concepts.forEach(function(c){
-      const row = clist.find(function(r){ return (r.name||r.concept||'')===c; });
-      if(row && row.net_inflow!=null){
-        const v=Number(row.net_inflow);
-        rows.push({name:c, type:'概念', value:v, pct:row.pct_day});
-      }
-    });
-    // 行业/板块资金流匹配
-    const sf = window.SECTOR_FUND_FLOW || {};
-    const sall = (sf.sectors_in||[]).concat(sf.sectors_out||[]);
-    if(industry && sall.length){
-      const srow = sall.find(function(r){
-        const n=(r.name||r.sector_name||'');
-        return industry.indexOf(n)!==-1 || n.indexOf(industry.replace(/.*业/,''))!==-1;
-      });
-      if(srow && srow.net!=null) rows.push({name:srow.name||srow.sector_name, type:'板块', value:Number(srow.net), pct:srow.chg});
-    }
-    if(!rows.length) return '';
-    rows.sort(function(a,b){ return Math.abs(b.value)-Math.abs(a.value); });
-    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
-    h+='<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:8px;">💧 关联板块资金流向</div>';
-    h+='<div style="display:flex;flex-direction:column;gap:6px;">';
-    rows.slice(0,6).forEach(function(r){
-      const color = r.value>=0?'var(--up)':'var(--down)';
-      const pctStr = r.pct!=null?(' · '+fmtPct(r.pct)) :'';
-      h+='<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">';
-      h+='<span><span style="color:var(--dim);">['+r.type+']</span> '+r.name+'</span>';
-      h+='<span style="color:'+color+';font-weight:600;">'+(r.value>=0?'+':'')+fmtYi(r.value)+pctStr+'</span></div>';
-    });
-    h+='</div></div>';
-    return h;
-  }
+  /* 💧 renderRelatedFlow 已删除（2026-09-18）：其「关联板块资金流向」内容并入 renderProfile 卡内，
+     统一走 window.v8SectorFlow（修复原 3 处硬 bug：CONCEPT_RANKING 键名错配 / industry 贪婪替换错配 / net 单位亿元被 fmtYi 缩 1e4）。
+     doV8Query 网格不再单独调用。 */
 
   window.doV8Query = function(){
     const input = _q$('v8QueryInput');
@@ -9486,7 +9492,7 @@ function switchSec(sec,el){
 
     // 2026-08-06 主人令·监控"未收录"：网格只放「有数据才显示」的卡
     //  - renderQuote / StopStop / Profile：全市场 5537 只覆盖（必有）
-    //  - renderStrategyHits / RelatedFlow / Lhb：含"找不到就不渲染整张"守卫
+    //  - renderStrategyHits / Lhb：含"找不到就不渲染整张"守卫
     //  - 删除原 renderMulti(renderStrategyHits 已含)/ GoldPool(重复)/ Report / Mahoro / Inst / PriceTrend / Ema（事件型永远空）
     // ⚡ 操作信号置顶（2026-08-12 主人令：要的是买卖判断，不纯是数据 → 结论先行，数据在后）
     h+=renderTradeSignals(item, code);
@@ -9496,7 +9502,7 @@ function switchSec(sec,el){
     h+=renderProfile(item, code);
     h+=renderStrategyHits(item, code);
     h+=renderAlgoScore(item, code);
-    h+=renderRelatedFlow(item, code);
+    /* 💧 关联板块资金流向已并入 renderProfile 卡内（2026-09-18） */
     h+=renderLhb(item, code);
     h+='</div>';
     h+=renderSuspension(item, code);
@@ -16548,10 +16554,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       p.push('回踩不破参考止损可持有');
       return p.join('，')+'；仓位建议≤2成';
     }
-    var _sffMap={};
-    if(window.SECTOR_FUND_FLOW&&window.SECTOR_FUND_FLOW.sectors_in){
-      window.SECTOR_FUND_FLOW.sectors_in.forEach(function(x){ if(x&&x.name) _sffMap[x.name]=x; });
-    }
+    /* 💧 关联板块资金流向统一走 window.v8SectorFlow（2026-09-18），不再自建 _sffMap */
     var _rows = stocks.map(function(s){
       var _key=(s.market||'')+(s.code||'');
       var _q=(window.STOCK_QUOTE&&window.STOCK_QUOTE.stocks)?window.STOCK_QUOTE.stocks[_key]:null;
@@ -16569,13 +16572,10 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
         ['主力金叉', s.components&&s.components['主力金叉']]
       ];
       var _chips=_cmp.map(function(c){ return _fvCompChip(c[0], !!c[1]); }).join('');
-      var _BROAD={'融资融券':1,'沪股通':1,'深股通':1,'MSCI中国':1,'标准普尔':1,'富时罗素':1};
-      var _flowNames=_conc.filter(function(n){ return _sffMap[n] && !_BROAD[n]; });
-      if(_flowNames.length<2){ _flowNames=_conc.filter(function(n){ return _sffMap[n]; }); }
-      _flowNames.sort(function(a,b){ return (_sffMap[b].net||0)-(_sffMap[a].net||0); });
-      var _flow=_flowNames.slice(0,3).map(function(n){
-        var x=_sffMap[n]; var _up=(x.net||0)>=0;
-        return '<span>'+n+' <b style="color:'+(_up?'#f4495d':'#1fd17b')+'">'+( _up?'+':'')+(_fvNum(x.net,1))+'亿</b> <span style="color:'+((x.chg||0)>=0?'#f4495d':'#1fd17b')+'">'+( (x.chg||0)>=0?'+':'')+(_fvNum(x.chg,2))+'%</span></span>';
+      var _flowRows=(window.v8SectorFlow ? window.v8SectorFlow.match(_conc, 3) : []);
+      var _flow=_flowRows.map(function(r){
+        var _up=(r.value||0)>=0;
+        return '<span>'+r.name+' <b style="color:'+(_up?'#f4495d':'#1fd17b')+'">'+( _up?'+':'')+(_fvNum(r.value,1))+'亿</b> <span style="color:'+((r.pct||0)>=0?'#f4495d':'#1fd17b')+'">'+( (r.pct||0)>=0?'+':'')+(_fvNum(r.pct,2))+'%</span></span>';
       }).join('<span style="color:var(--border);margin:0 6px;">·</span>');
       var _stopPct=(s.board_label&&/创业板|科创板/.test(s.board_label))?0.90:0.93;
       var _close=(s.close!=null)?s.close:_price;
