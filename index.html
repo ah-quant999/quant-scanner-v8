@@ -4826,7 +4826,13 @@ function fmtSigned(v){
          实测：抹掉 window.IMA_STRONG_BACKTEST ⇒ 星级**一字不变**（仍 4★/score 4.51/maxN 40）；
                抹掉主通道行 ⇒ 落到本通道 ⇒ 4★/score 4.82/maxN 83。
        ⇒ 判「强势跟踪星级的数据源」**必须看主通道**，即 E 批聚合器 algorithms/gen_backtest_all_algos.py
-         ← raw_data/ima_strong_backtest.json（**不是** data/IMA_STRONG_BACKTEST.js；两者会分叉）。
+         ← **data/IMA_STRONG_BACKTEST.js**（其 SOURCES 表登记 `rel=` 就是本文件，build() 走 `load_js_var(src["rel"])`）。
+       🔴 2026-09-19 02:0x 二次更正（我 01:4x 那次更正本身写错了一处）：
+         原文写「← raw_data/ima_strong_backtest.json」是**错的**。实测枚举全仓读者：
+         raw_data 那份 ← algorithms/backtest_life_cards.py（写出方）+ update_v8.py L143 桥接映射；
+         **聚合器不读它**。两文件确实会分叉（raw_data 停在 09-17/skipped=72；data 已是
+         09-18 23:30/skipped=0/n=83），但**分叉不影响星级** ⇒ 判「某卡数据源陈旧」必须落到
+         **聚合器真正读的那个文件**上，别看错层（我上一轮就是这么错的）。
        ⚠️ 本通道**保留作兜底**：主通道行若被移除或被零样本档过滤掉，它仍能顶上。 */
     '强势跟踪': {
       by_period: function(){
