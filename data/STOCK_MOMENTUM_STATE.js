@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-18 19:57",
- "generated": "2026-09-18 19:57",
+ "update_time": "2026-09-18 20:29",
+ "generated": "2026-09-18 20:29",
  "meta": {
-  "generated": "2026-09-18 19:57",
+  "generated": "2026-09-18 20:29",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 11,
   "days_with_consensus": 0,
@@ -3374,6 +3374,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "300153",
+      "name": "科泰电源",
+      "change_pct": 6.429,
+      "price": 28.97,
+      "category": "突破"
+     },
+     {
+      "code": "301086",
+      "name": "鸿富瀚",
+      "change_pct": 6.398,
+      "price": 165.79,
+      "category": "突破"
+     },
+     {
       "code": "300943",
       "name": "春晖智控",
       "change_pct": 3.913,
@@ -3388,6 +3402,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "301366",
+      "name": "一博科技",
+      "change_pct": 12.045,
+      "price": 74.42,
+      "category": "突破"
+     },
+     {
       "code": "603626",
       "name": "科森科技",
       "change_pct": 10.005,
@@ -3399,6 +3420,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "集智股份",
       "change_pct": 4.092,
       "price": 68.68,
+      "category": "突破"
+     },
+     {
+      "code": "688678",
+      "name": "福立旺精密",
+      "change_pct": 6.563,
+      "price": 24.68,
       "category": "突破"
      },
      {
@@ -3444,6 +3472,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "688090",
+      "name": "瑞松科技",
+      "change_pct": 10.247,
+      "price": 86.61,
+      "category": "突破"
+     },
+     {
       "code": "688719",
       "name": "爱科赛博",
       "change_pct": 5.164,
@@ -3476,6 +3511,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "世联行",
       "change_pct": 9.886,
       "price": 2.89,
+      "category": "突破"
+     },
+     {
+      "code": "300623",
+      "name": "捷捷微电",
+      "change_pct": 7.262,
+      "price": 35.3,
       "category": "突破"
      },
      {
@@ -3544,6 +3586,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
+      "code": "300153",
+      "name": "科泰电源",
+      "change_pct": 6.429,
+      "price": 28.97,
+      "category": "加速"
+     },
+     {
+      "code": "301086",
+      "name": "鸿富瀚",
+      "change_pct": 6.398,
+      "price": 165.79,
+      "category": "加速"
+     },
+     {
       "code": "300943",
       "name": "春晖智控",
       "change_pct": 3.913,
@@ -3558,6 +3614,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
+      "code": "301366",
+      "name": "一博科技",
+      "change_pct": 12.045,
+      "price": 74.42,
+      "category": "加速"
+     },
+     {
       "code": "603626",
       "name": "科森科技",
       "change_pct": 10.005,
@@ -3569,6 +3632,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "集智股份",
       "change_pct": 4.092,
       "price": 68.68,
+      "category": "加速"
+     },
+     {
+      "code": "688678",
+      "name": "福立旺精密",
+      "change_pct": 6.563,
+      "price": 24.68,
       "category": "加速"
      }
     ],
@@ -3630,6 +3700,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "300153",
+      "name": "科泰电源",
+      "change_pct": 6.429,
+      "price": 28.97,
+      "category": "短线选股"
+     },
+     {
+      "code": "301086",
+      "name": "鸿富瀚",
+      "change_pct": 6.398,
+      "price": 165.79,
+      "category": "短线选股"
+     },
+     {
       "code": "300943",
       "name": "春晖智控",
       "change_pct": 3.913,
@@ -3644,6 +3728,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "301366",
+      "name": "一博科技",
+      "change_pct": 12.045,
+      "price": 74.42,
+      "category": "短线选股"
+     },
+     {
       "code": "603626",
       "name": "科森科技",
       "change_pct": 10.005,
@@ -3655,6 +3746,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "集智股份",
       "change_pct": 4.092,
       "price": 68.68,
+      "category": "短线选股"
+     },
+     {
+      "code": "688678",
+      "name": "福立旺精密",
+      "change_pct": 6.563,
+      "price": 24.68,
       "category": "短线选股"
      },
      {
@@ -3700,6 +3798,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688090",
+      "name": "瑞松科技",
+      "change_pct": 10.247,
+      "price": 86.61,
+      "category": "短线选股"
+     },
+     {
       "code": "688719",
       "name": "爱科赛博",
       "change_pct": 5.164,
@@ -3732,6 +3837,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "世联行",
       "change_pct": 9.886,
       "price": 2.89,
+      "category": "短线选股"
+     },
+     {
+      "code": "300623",
+      "name": "捷捷微电",
+      "change_pct": 7.262,
+      "price": 35.3,
       "category": "短线选股"
      },
      {
@@ -3786,6 +3898,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "688090",
+      "name": "瑞松科技",
+      "change_pct": 10.247,
+      "price": 86.61,
+      "category": "强势股"
+     },
+     {
       "code": "688719",
       "name": "爱科赛博",
       "change_pct": 5.164,
@@ -3818,6 +3937,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "世联行",
       "change_pct": 9.886,
       "price": 2.89,
+      "category": "强势股"
+     },
+     {
+      "code": "300623",
+      "name": "捷捷微电",
+      "change_pct": 7.262,
+      "price": 35.3,
       "category": "强势股"
      },
      {
