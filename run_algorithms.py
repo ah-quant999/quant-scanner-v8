@@ -83,6 +83,12 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   与三重同族给出 900s 显式预算（避免走默认 1800s 拖长 B 批，B 批在 D 批 20:00 关键路径上）。
     "update_four_volume_history.py": 900,
     "gen_four_volume_track.py": 900,
+    # 🛡 2026-09-18 小九（改动5 配套登记）：backtest_expectancy.py 由 E 批(21:00) 前移至 B 批尾，
+    #   进入 D 批 20:00 的关键路径 ⇒ 必须显式给预算，避免走默认 1800s 在源抖动时拖长 B 批。
+    #   该脚本 = 纯本地 walk-forward（读 raw_data/history/top10_daily_*.json 逐日账本 + K 线缓存），
+    #   零网络重活；同族「读同一份账本」的 backtest_comprehensive.py 亦为纯本地。
+    #   给 1800s（= 原默认档）显式固化：既不改行为，又把「故意值」与「忘记登记」区分开。
+    "backtest_expectancy.py": 1800,
 }
 
 
@@ -190,6 +196,20 @@ ORDER = [
     #   → raw_data/final_recommend.json + data/FINAL_RECOMMEND_DATA.js（Top5 + 全量推荐池）
     # 🛡 2026-08-26 一劳永逸：原排在 ORDER 前部，可能先于部分选股脚本完成就产出推荐。
     #   现整体移至 ORDER 末尾（见下方 track_h_auto_buy.py 之后），确保所有选股策略数据跑完后再汇总。
+    # 🔴 2026-09-18 小九（架构级时序缺口根治）：backtest_expectancy.py 从 ORDER 原位
+    #   （原 index=43，晚于 final_recommend 的 index=40）**前移到此处**。
+    #   缺口本体：它产 raw_data/backtest_expectancy.json（四信号 edge：jinzuan/chan/trend/jigou），
+    #   唯一消费者是 final_recommend.py —— 而原调度把它排在消费者**之后**（全链模式）
+    #   且在**下一批**（E 批 21:00，分批模式）⇒ 两种模式下消费者都只能读到**前一日** edge，
+    #   当日新算的 edge 白算一轮，直接用在了最终推荐的 source_scores 上。
+    #   修法（双模式同时闭环）：
+    #     * 全链模式：本行前移 ⇒ ORDER 内 生产(index 新) < 消费(final_recommend) ✅
+    #     * 分批模式：STAGES 成对改 —— 由 E 批(21:00) 迁至 B 批尾（见 STAGES["B"] 尾部）✅
+    #   依赖满足：它读 raw_data/top10_daily.json 逐日账本（generate_top10.py 产，ORDER index=27，
+    #   远在本行之前）；forward-return 回填读 raw_data/history/ 与 K 线，均无 B 批尾部依赖。
+    #   ⚠️ 与 STAGES 成对修改；模块级 assert(_STAGE_UNION == set(ORDER)) 兜底。
+    #   ⚠️ 时间预算：默认 1800s；纯本地 walk-forward，无网络重活。
+    "backtest_expectancy.py",         # → raw_data/backtest_expectancy.json（四信号 edge，final_recommend 消费）
     "gen_algo_track.py",                # → ALGO_TRACK.js（四量终极/板块龙头/大牛股猎手 独立追踪，2026-08-15 落地）
     # ── 2026-08-17 主人怒令「每个前端的算法都全面审计」补入：之前完全不调度，前端卡永远陈旧 ──
     "calc_sentiment_cycle.py",          # → data/SENTIMENT_CYCLE.js（情绪周期，读 LIMIT_UP_HEATMAP；之前无任何 workflow 调用 = 孤儿）
@@ -236,7 +256,11 @@ ORDER = [
     # 🛡 2026-09-07 修复：以下两脚本曾只挂 E 批 STAGES、漏挂 ORDER → 模块级自校验
     #   `_STAGE_UNION == set(ORDER)` 断言崩（仅STAGES有两脚本），盘后链启动即死、0 产出。
     #   此前被 V5 心跳闸门跳过链本体掩盖，2026-09-07 17:40 #1579 首次真跑暴露。
-    "backtest_expectancy.py",         # → raw_data/backtest_expectancy.json（期望收益回测，与 E 批同位）
+    # 🔴 2026-09-18 小九更正（原注「与 E 批同位」已作废）：本脚本的调度点**已整体前移**，
+    #   原位置（此处，ORDER index=43）**晚于**它的唯一消费者 final_recommend.py
+    #   （ORDER index=40）⇒ **全链模式下消费者先跑、生产者后跑 = 时序倒挂**，
+    #   final_recommend 只能读到「上一轮遗留的 edge」。
+    #   现整行迁移至 final_recommend.py（下方 L228）**之前**，见该处说明。
     # 🔴 2026-09-14 主人令更正（作废原 09-13 令）：「金股池和候选股池是算法的上游水源，
     #   不是策略，不需要回测！」候选池 / 金股池(=黄金池) 是 B 批产出的**基础股池**，
     #   供下游策略取用，本身无买卖点 ⇒ 拿 T+1 胜率考核它们必然误导
@@ -346,6 +370,15 @@ STAGES = {
         "scripts/gen_factor_progress.py",           # → raw_data/factor_progress.json（读 factor_audit）
         "scripts/fetch_valuation_percentile.py",    # → raw_data/valuation_percentile.json（A股指数 PE 分位）
         "scripts/fetch_index_value_framework.py",   # → raw_data/index_value_framework.json（指数中枢+趋势门控）
+        # 🆕 2026-09-18 小九（架构级时序缺口根治·详见 ORDER 同位说明）：
+        #   四信号 edge（jinzuan/chan/trend/jigou）的生产者前移到 B 批**尾**。
+        #   为什么是「尾部而非最前」：它读 B 批同批产出的 raw_data/top10_daily.json 逐日账本
+        #   （generate_top10.py → raw_data/history/top10_daily_YYYYMMDD.json）做 walk-forward，
+        #   必须等这些账本本批写完才能开始 ⇒ 只能排在 B 批所有选股脚本之后。
+        #   收益：B(18:10) 起跑 → 本脚本约 19:00 落盘 → D 批(20:00) final_recommend 拿到**当日** edge。
+        #   代价：B 批尾部增加约 10~30min（纯本地 walk-forward，无网络重活 → 不会被静默杀误杀）。
+        # ⚠️ 与 STAGES["E"] 同位置成对修改，否则模块级 assert 崩链。
+        "backtest_expectancy.py",   # → raw_data/backtest_expectancy.json（四信号 edge，D 批消费者）
     ],
     # 🛡 2026-09-04 主人令「策略全部数据出来→最终数据上线→然后才是回测」时序重排：
     #   原 C(回测 19:15) 在 D(final_recommend 20:00) 之前 → 回测汇总胶囊早于最终推荐，时序倒挂。
@@ -353,7 +386,12 @@ STAGES = {
     #   键名 C 退役；回测批内容原样迁入 E，另收编 strategy_four_volume.py（回测模式，SCRIPT_ENV 注入）。
     "E": [  # 回测批（~21:00 CST，最终推荐上线后）：backtest 全家 + 因子实验室分层回测（生成器已前置到 B 批）
         "backtest_tdx.py", "backtest_comprehensive.py",
-        "backtest_expectancy.py",          # 🆕 期望收益回测：walk-forward 产出 raw_data/backtest_expectancy.json
+        # 🗑 2026-09-18 小九（架构级时序缺口根治）：backtest_expectancy.py 已**前移至 B 批尾**。
+        #   原缺口：它产 raw_data/backtest_expectancy.json（四信号 edge），而唯一消费者
+        #   final_recommend.py 在 **D 批(20:00)** 跑，本脚本却在 **E 批(21:00)** 跑
+        #   ⇒ final_recommend 永远读到**前一天**的 edge，当日盘中/盘后新算的 edge 白算一轮。
+        #   现调度点改为 B 批尾：B(18:10) 起跑 → edge 19:00 前后落盘 → D(20:00) 必吃当日新鲜值。
+        #   ⚠️ 与 ORDER 同位置成对修改；模块级 assert(_STAGE_UNION == set(ORDER)) 会兜底校验。
         "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
 
         # 🛡 2026-09-09 主人令：因子实验室「生成器」已前置到 B 批最前（必须在 final_recommend 前产完），
@@ -401,7 +439,10 @@ SCRIPT_ENV = {
     #   ⇒ 两档恒零样本（前端只能显示「累积中」），并非策略失效而是**回看区间不够**。
     #   years=5 → bars = max(DAILY_BARS, 5*250+250=1500) 足以覆盖 250 交易日最长持有。
     "strategy_four_volume.py": {"V8_BACKTEST_YEARS": "5"},
-    "backtest_expectancy.py": {"V8_USE_BAOSTOCK": "1"},   # 🆕 runner 用 baostock 拉全量K线，产出新鲜回测
+    # 🔴 2026-09-18 小九更正：本注入对 **B 批与 E 批同样生效**（按脚本名查表，与批次无关）。
+    #   backtest_expectancy.py 调度点已前移至 B 批尾（见 STAGES["B"]），此处维持原值不动：
+    #   V8_USE_BAOSTOCK=1 ⇒ runner 侧走 baostock 拉全量 K 线，产出新鲜 edge。
+    "backtest_expectancy.py": {"V8_USE_BAOSTOCK": "1"},   # runner 用 baostock 拉全量K线，产出新鲜 edge（B 批尾执行）
 }
 # 自校验：STAGES 并集必须精确覆盖 ORDER（无遗漏/多余，保证分批模式不丢脚本）
 _STAGE_UNION = set()
