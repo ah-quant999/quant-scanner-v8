@@ -2325,16 +2325,50 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
                 不引用任何信号数组 ⇒ 不会再有「买卖」语义。
              ── 均线未就绪（两值皆 null）时给显式未就绪态，绝不用 0 / 假档位冒充（2026-09-11 铁律）。
              ── 免责小字保留（「仅观测 · 开仓以 AI速览 ⚖ 裁决为准」）——它是「不做评判」的声明。 */
+          /* 🔴🔴 2026-09-18 治本（主人「干嘛要累积够了才算？不对吧」+「肯定A·治本」）：
+             【问题】原判定只读 position_vs_ma20 / position_vs_ma60。这两个字段在样本
+                    <20/<60 时恒为 null ⇒ 档位恒空 ⇒ 前端永远显示「⏳ 均线积累中 15/20日」，
+                    指标无限期不可用。而实测 15 条真实历史已足以给出 15 日均线偏离（+2.44%），
+                    「必须满 20 条才启动」是死板门槛。
+             【治本】判定源改为三级回退：
+                    ① position_vs_ma_eff（有效窗口：样本够就出真值，随累积自动升档 MA5→MA20→MA60）
+                    ② position_vs_ma20 / position_vs_ma60（旧字段，向后兼容旧数据）
+                    ③ 皆无 → 显式未就绪态（绝不用 0 / 假档位冒充，2026-09-11 铁律）
+             【阈值·按窗口缩放（本轮关键补充·含一次方向纠错）】
+                    短窗口均线更贴近现价 ⇒ 偏离【绝对值天然更小】。实测本序列平均绝对偏离：
+                      MA5=1.27% / MA10=1.63% / MA15=2.44% —— 窗口越短，偏离越小。
+                    若沿用 MA20 的 ±3/±5 固定阈值，MA5~MA15 会长期落在中性区
+                    （实测 MA15 当前 +2.44% < 3 ⇒ 恒不触发）⇒ 等于「换个方式继续不可用」。
+                    ⚠️ 首版把缩放写成 20/窗口（系数>1 ⇒ 阈值变大）——方向反了，
+                      被真实渲染验证当场打回（MA15 阈值算成 4.0，2.44% 仍不触发）。
+                    正确方向：系数 = 窗口/20。窗口越短阈值越小，各档触发频率趋于一致：
+                      MA5  → ±0.75 / ±1.25      MA10 → ±1.5 / ±2.5
+                      MA15 → ±2.25 / ±3.75      MA20 → ±3.0 / ±5.0（基准，与原口径一致）
+                      MA60 → ±9.0 / ±15.0
+                    校准依据：本序列 MA5 平均绝对偏离 1.27% ⇒ ±0.75/±1.25 使其有档可报；
+                              MA15 当前 +2.44% > ±2.25 ⇒ 正确报出「偏高·超买」。
+             【口径】仍为纯位置判定（只看偏离方向与幅度），不引入买卖语义。
+                     档位后附窗口名（如 ·MA15），让主人看得见判断依据。 */
+          var _pEff=ap.position_vs_ma_eff, _effW=ap.ma_eff_window;
           var _p20=ap.position_vs_ma20, _p60=ap.position_vs_ma60;
+          // 有效窗口优先；其缺位时回退旧双字段
+          var _pv  = (_pEff!=null) ? _pEff : ((_p20!=null) ? _p20 : _p60);
+          var _pvT = (_pEff!=null) ? ('·'+(_effW||'')) : ((_p20!=null) ? '·MA20' : (_p60!=null ? '·MA60' : ''));
+          // 按窗口缩放阈值：以 MA20 的 ±3/±5 为基准，系数 = 窗口宽度/20（短窗口→阈值更小）
+          var _wNum = 20;
+          if(_pEff!=null){
+            var _mm=String(_effW||'').match(/(\d+)/);
+            if(_mm) _wNum = Math.max(5, Math.min(60, parseInt(_mm[1],10)));
+          } else if(_p20==null && _p60!=null){ _wNum = 60; }
+          var _k = _wNum/20;
+          var _t1 = 3*_k, _t2 = 5*_k;      // 偏高/高位 阈值（负数用同值取反）
           var _verdict='', _vClr='var(--gold)';
-          var _hi1 = (_p20!=null && _p20>3)  || (_p60!=null && _p60>6);
-          var _hi2 = (_p20!=null && _p20>5)  || (_p60!=null && _p60>10);
-          var _lo1 = (_p20!=null && _p20<-3) || (_p60!=null && _p60<-5);
-          var _lo2 = (_p20!=null && _p20<-5) || (_p60!=null && _p60<-8);
-          if(_hi2){ _verdict='🔴 高位·超买'; _vClr='#f87171'; }
-          else if(_hi1){ _verdict='🟠 偏高·超买'; _vClr='#fbbf24'; }
-          else if(_lo2){ _verdict='🟢 偏低·超卖'; _vClr='#4ade80'; }
-          else if(_lo1){ _verdict='🟡 偏低·超卖'; _vClr='#fbbf24'; }
+          if(_pv!=null){
+            if(_pv> _t2)      { _verdict='🔴 高位·超买'+_pvT; _vClr='#f87171'; }
+            else if(_pv> _t1) { _verdict='🟠 偏高·超买'+_pvT; _vClr='#fbbf24'; }
+            else if(_pv< -_t2){ _verdict='🟢 偏低·超卖'+_pvT; _vClr='#4ade80'; }
+            else if(_pv< -_t1){ _verdict='🟡 偏低·超卖'+_pvT; _vClr='#fbbf24'; }
+          }
           /* 2026-09-15 主人令（第二轮）：「这个第二行的中性观望不需要了，删除吧」——
              位置无偏离（中性）时 _verdict 留空，不渲染档位（零信息量）。 */
           /* 2026-09-15 主人令（第二轮）：「这个第二行的中性观望不需要了，删除吧」——
@@ -2369,7 +2403,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
                 本轮收敛到与同卡「📋 关注」胶囊同档（11.5px/700/1.5px 边/无发光/纯色低透底），
                 仅保留「可见性」这一核心成果：胶囊照常展示，未就绪态（⏳ 积累进度）不退化。 */
           var _ovTxt=_verdict, _ovClr=_vClr;
-          if(!_verdict){ _ovTxt='⏳ 均线积累中 '+_hd+'/20日'; _ovClr='var(--gold)'; }
+          /* 2026-09-18 治本：阈值 20 → 5。数据层最小可用窗口是 MA5，
+             故只有样本 <5 条才是真正不可用；5~19 条会走有效窗口给出真档位，
+             不会落到本分支。文案带上「满20后转亚」提示，主人知道会持续升档。 */
+          if(!_verdict){ _ovTxt='⏳ 均线积累中 '+_hd+'/5日（满15/20日自动升档）'; _ovClr='var(--gold)'; }
           h+='<span style="font-size:10px;color:var(--dim);opacity:.75;">🔭 仅观测 · 开仓以 AI速览 ⚖ 裁决为准</span>';
           h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:rgba(251,191,36,.12);border:1.5px solid rgba(251,191,36,.5);font-size:11.5px;font-weight:700;color:'+_ovClr+';">📊 超买超卖 '+_ovTxt+'</span>';
           h+='</div>';
