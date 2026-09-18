@@ -16,7 +16,38 @@ SH_OUT = os.path.join(DATA_DIR, "sh_index_fib.json")
 SZ_OUT = os.path.join(DATA_DIR, "sz_index_fib.json")
 
 # Fib 时间窗口 — 从基准日期动态计算
-FIB_BASE_DATE = "2026-05-22"  # 上证指数最近一个重要转折点，修改此日期即可自动推算全部窗口
+# 🔴 2026-09-18 P2 现场记录：本值停在 2026-05-22，而脚本自算峰值为 2026-07-01，
+#   基准比真实转折点早 40 天 ⇒ 7 档窗口全部过期、窗口真空逾 64 天且零告警。
+#   现已改为 main() 中可用实测峰值自动覆盖（见 resolve_base_date），
+#   本常量仅作**兜底默认值**（取不到历史数据时使用）。
+FIB_BASE_DATE = "2026-05-22"  # 兜底默认；正常运行由 resolve_base_date() 用实测峰值覆盖
+
+
+def resolve_base_date(history, fallback=FIB_BASE_DATE):
+    """用实测历史的最近显著高点作基准日（YYYY-MM-DD），取不到则用兜底常量。
+
+    判据与 calc_down_stats 同源（保证基准与「峰值」口径一致）：
+      在最近 N 根 K 线里取收盘最高那根的日期；要求其后确有回撤（否则不算转折点）。
+    """
+    try:
+        if not history or len(history) < 10:
+            return fallback
+        rows = [r for r in history if r.get("date") and r.get("close") is not None]
+        if len(rows) < 10:
+            return fallback
+        peak = max(rows, key=lambda r: r["close"])
+        i = rows.index(peak)
+        after = rows[i + 1:]
+        if not after:
+            return fallback
+        low_after = min(r["close"] for r in after)
+        # 峰值后回撤 >=2% 才算有效转折点；否则用兜底（避免基准跟着新高乱飘）
+        if (low_after - peak["close"]) / peak["close"] <= -0.02:
+            d = peak["date"].replace("-", "")
+            return f"{d[:4]}-{d[4:6]}-{d[6:8]}"
+        return fallback
+    except Exception:
+        return fallback
 FIB_LEVELS = [3, 5, 8, 13, 21, 34, 55]
 FIB_DESC = {
     3: "小反弹窗口", 5: "短期变盘", 8: "8日变盘",
@@ -209,22 +240,35 @@ def build_windows(windows, history, today_str):
         result.append(entry)
     return result, reversal_date
 
-def calc_next_cycle(anchor_date, today_str):
-    """推算下一轮周期"""
-    weeks = datetime.strptime(today_str, "%Y-%m-%d") - datetime.strptime(anchor_date, "%Y-%m-%d")
-    if weeks.days <= 0:
+def calc_next_cycle(anchor_date, today_str, max_cycles=6):
+    """推算下一轮周期（支持多轮递推）
+
+    🔴 2026-09-18 P2 修复：原实现只算「anchor + n*1.4」一轮，锚点稍旧就整组落在过去
+    ⇒ 返回空 ⇒ 调用方拿不到窗口但无任何信号（静默真空）。
+    实测：锚=2026-07-16（最后窗口日）时，单轮 7 档全过期，
+          改多轮后 cycle=1 即命中 F(55)=2026-10-01。
+    故改为 cycle 递增：先取最近一组「有未来窗口」的推算结果。
+    """
+    anchor = datetime.strptime(anchor_date, "%Y-%m-%d")
+    today_d = datetime.strptime(today_str, "%Y-%m-%d")
+    if (today_d - anchor).days < 0:
         return []
     fibs = [3, 5, 8, 13, 21, 34, 55]
-    next_wins = []
-    anchor = datetime.strptime(anchor_date, "%Y-%m-%d")
-    for n in fibs:
-        d = anchor + timedelta(days=int(n*1.4))
-        while d.weekday() >= 5:
-            d += timedelta(days=1)
-        ds = d.strftime("%Y-%m-%d")
-        if ds > today_str:
-            next_wins.append({"name": f"F({n})", "date": ds, "desc": f"下轮{n}日"})
-    return next_wins
+    for cycle in range(1, max_cycles + 1):
+        group = []
+        for n in fibs:
+            d = anchor + timedelta(days=int(n * 1.4 * cycle))
+            while d.weekday() >= 5:
+                d += timedelta(days=1)
+            ds = d.strftime("%Y-%m-%d")
+            if ds > today_str:
+                group.append({"name": f"F({n})", "date": ds, "desc": f"下轮{n}日"})
+        if group:
+            # 记录轮次，供 judgement 展示「已续命第 N 轮」
+            for g in group:
+                g["_cycle"] = cycle
+            return group
+    return []
 
 def fetch_realtime():
     """获取实时行情"""
@@ -268,23 +312,41 @@ def _roll_forward(tracked_wins, reversal_date, today_str):
     if has_future:
         return tracked_wins, []
 
-    # 锚点选择：优先 confirmed 反转日 → 最后有数据的窗口 → 原始 reversal_date
+    # 锚点选择（四级兜底，2026-09-18 P2 修复：原三级会在全 passed 时静默返回空）
+    #   ① confirmed 反转日（triggered 窗口）
+    #   ② 显式传入的 reversal_date
+    #   ③ 最后有 observation 的窗口
+    #   ④ 🔴 新增：**最后一个窗口日**（无条件）—— 只要还有窗口就一定有锚，
+    #      彻底封死「anchor=None → 静默 return 空」这条路。
+    #      实测现场：7 档全 passed 且无 observation ⇒ 原实现在此必空。
     anchor = reversal_date
+    anchor_src = "reversal_date" if reversal_date else ""
     candidates = [w for w in tracked_wins if w.get("status") == "triggered"]
     if candidates:
         anchor = candidates[-1]["date"]
+        anchor_src = "triggered"
     elif not anchor:
-        # 兜底：取最后一个有 observation 的窗口
         obs_candidates = [w for w in tracked_wins if w.get("observation")]
         if obs_candidates:
             anchor = obs_candidates[-1]["date"]
+            anchor_src = "observation"
+        elif tracked_wins:
+            dated = [w for w in tracked_wins if w.get("date")]
+            if dated:
+                anchor = max(dated, key=lambda w: w["date"])["date"]
+                anchor_src = "last_window"
 
     if not anchor:
-        return tracked_wins, []
+        # 到这里说明连一个带日期的窗口都没有 —— 属于硬故障，必须可见
+        return tracked_wins, [{"error": "no_anchor",
+                               "detail": "无任何可用锚点（窗口为空或全无 date）"}]
 
     next_cycle = calc_next_cycle(anchor, today_str)
     if not next_cycle:
-        return tracked_wins, []
+        # 有锚却推不出未来窗口（锚点在未来 / 递推轮次耗尽）—— 记录原因，不静默
+        return tracked_wins, [{"error": "no_next_cycle",
+                               "detail": f"锚点 {anchor}（来源 {anchor_src}）递推后仍无未来窗口",
+                               "anchor": anchor, "anchor_src": anchor_src}]
 
     # 把 next_cycle 升级为主窗口（标记 rolled=True）
     for nw in next_cycle:
@@ -306,7 +368,8 @@ def _roll_forward(tracked_wins, reversal_date, today_str):
 
     # 递归：如果滚动后的窗口也全过了，继续滚（最多防2层避免无限）
     all_still_past = not any(w["status"] in ("future", "active") for w in extended)
-    if all_still_past and len([w for w in extended if w.get("rolled")]) <= 7:
+    if all_still_past and len([w for w in extended if w.get("rolled")]) <= 70:
+        # 递归续命：把本层锚点作为下一层的 reversal_date，保证锚持续前移
         return _roll_forward(extended, anchor, today_str)
 
     return extended, []
@@ -369,18 +432,40 @@ def build_fib_json(windows, index_data, history):
         elif future:
             f = future[0]
             judgement["key_window"] = f"🎯 下个窗口: {f['name']}（{f['date']}）"
+        else:
+            # 🔴 2026-09-18 P2：无 confirmed 反转、且无 tracking/future 窗口
+            #   （现场：7 档全 passed）时，next_cycle 原本恒空、key_window 恒空。
+            #   改用「最后窗口日」为锚试算一轮，让卡面至少有下轮参考窗口。
+            _dated = [w for w in tracked_wins if w.get("date")]
+            if _dated:
+                _anchor = max(_dated, key=lambda w: w["date"])["date"]
+                next_cycle = calc_next_cycle(_anchor, today_str)
+                if next_cycle:
+                    judgement["key_window"] = (
+                        f"📐 无反转确认，以末窗({_anchor})推算下轮 → "
+                        f"{next_cycle[0]['name']}({next_cycle[0]['date']})")
 
     # ── 自动滚动续命：所有原始窗口走完后以下一轮替代 ──
-    tracked_wins, _ = _roll_forward(tracked_wins, reversal_date, today_str)
+    tracked_wins, roll_diag = _roll_forward(tracked_wins, reversal_date, today_str)
+
+    # 🔴 2026-09-18 P2：续命失败不再静默 —— 写进 judgement 让卡面可见
+    if roll_diag:
+        d0 = roll_diag[0] if isinstance(roll_diag, list) else roll_diag
+        judgement["roll_error"] = d0.get("detail", str(d0))
+        judgement["key_window"] = "⚠ 窗口续命失败：" + judgement["roll_error"]
+
     # 滚动后更新 judgement
     rolled_count = len([w for w in tracked_wins if w.get("rolled")])
     if rolled_count > 0:
         future_after = [w for w in tracked_wins if w["status"] == "future"]
         active_after = [w for w in tracked_wins if w["status"] == "active"]
+        # 轮次取自上一步 calc_next_cycle 写入的 _cycle，比原来 `//7+1` 的估算准确
+        cyc = next((w.get("_cycle") for w in tracked_wins if w.get("rolled") and w.get("_cycle")), None)
+        tag = f"第{cyc}轮" if cyc else f"第{rolled_count//7+1}轮"
         if future_after:
-            judgement["key_window"] = f"🔄 已续命第{rolled_count//7+1}轮 → {future_after[0]['name']}({future_after[0]['date']})"
+            judgement["key_window"] = f"🔄 已续命{tag} → {future_after[0]['name']}({future_after[0]['date']})"
         elif active_after:
-            judgement["key_window"] = f"🔄 已续命中 → {active_after[0]['name']}({active_after[0]['date']})"
+            judgement["key_window"] = f"🔄 已续命{tag}中 → {active_after[0]['name']}({active_after[0]['date']})"
 
     return {
         "current": current, "windows": tracked_wins,
@@ -398,13 +483,19 @@ def main():
     sz_history = fetch_index_history('sz.399001', 120)
     print(f"  ✓ 上证{len(sh_history)}天, 深证{len(sz_history)}天")
     
-    for code, windows, history, out_path, idx_data, label in [
+    for code, _windows_static, history, out_path, idx_data, label in [
         ("sh", SH_FIB_WINDOWS, sh_history, SH_OUT, sh_data, "上证"),
         ("sz", SZ_FIB_WINDOWS, sz_history, SZ_OUT, sz_data, "深证"),
     ]:
         if not history:
             print(f"  ⚠️ {label}无数据")
             continue
+        # 🔴 2026-09-18 P2：基准日按实测峰值动态解析，避免硬编码基准过期后窗口全废
+        base = resolve_base_date(history)
+        windows = [{"name": f"F({n})",
+                    "date": (datetime.strptime(base, "%Y-%m-%d") + timedelta(days=n)).strftime("%Y-%m-%d"),
+                    "desc": FIB_DESC.get(n, "")} for n in FIB_LEVELS]
+        print(f"  📅 {label} 基准日: {base}（兜底常量 {FIB_BASE_DATE}）")
         fib = build_fib_json(windows, idx_data, history)
         
         # 打印状态
