@@ -2324,7 +2324,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
              ── 判定口径改为**纯位置**：只看 position_vs_ma20 / position_vs_ma60 的偏离方向与幅度，
                 不引用任何信号数组 ⇒ 不会再有「买卖」语义。
              ── 均线未就绪（两值皆 null）时给显式未就绪态，绝不用 0 / 假档位冒充（2026-09-11 铁律）。
-             ── 免责小字保留（「仅观测 · 开仓以 AI速览 ⚖ 裁决为准」）——它是「不做评判」的声明。 */
+             ── 2026-09-18 主人令（第五轮）：免责小字「🔭 仅观测 · 开仓以 AI速览 ⚖ 裁决为准」整段删除——本行只留数据 + 超买超卖胶囊。 */
           /* 🔴🔴 2026-09-18 治本（主人「干嘛要累积够了才算？不对吧」+「肯定A·治本」）：
              【问题】原判定只读 position_vs_ma20 / position_vs_ma60。这两个字段在样本
                     <20/<60 时恒为 null ⇒ 档位恒空 ⇒ 前端永远显示「⏳ 均线积累中 15/20日」，
@@ -2397,7 +2397,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
                 整块不渲染 ⇒ 页面**根本看不到「超买超卖」这个指标的存在**，主人无从知晓它是否在工作。
                 现改为显式给出未就绪态，并承接已删的「vs 20/60 日线」行原本承载的积累进度（⏳ X/20 日）；
                 绝不用 0 / 假档位冒充（2026-09-11 铁律）。
-             口径不变：只报位置观测，开仓仍以 AI速览 ⚖ 裁决为准（免责小字保留、仅前移）。
+             口径不变：只报位置观测。（2026-09-18 主人令：原免责小字已整段删除。）
              ④ 2026-09-16 主人令（第四轮）：「这个超买超卖不用这么大提示。」
                 第三轮为「显著标识」把视觉权重拉得很重（2px 金边+10px 发光+13px/800+渐变底），
                 本轮收敛到与同卡「📋 关注」胶囊同档（11.5px/700/1.5px 边/无发光/纯色低透底），
@@ -2407,7 +2407,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
              故只有样本 <5 条才是真正不可用；5~19 条会走有效窗口给出真档位，
              不会落到本分支。文案带上「满20后转亚」提示，主人知道会持续升档。 */
           if(!_verdict){ _ovTxt='⏳ 均线积累中 '+_hd+'/5日（满15/20日自动升档）'; _ovClr='var(--gold)'; }
-          h+='<span style="font-size:10px;color:var(--dim);opacity:.75;">🔭 仅观测 · 开仓以 AI速览 ⚖ 裁决为准</span>';
           h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:rgba(251,191,36,.12);border:1.5px solid rgba(251,191,36,.5);font-size:11.5px;font-weight:700;color:'+_ovClr+';">📊 超买超卖 '+_ovTxt+'</span>';
           h+='</div>';
 
