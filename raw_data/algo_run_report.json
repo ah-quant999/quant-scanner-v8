@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-18 20:49:24",
-  "run_start": "2026-09-18 19:57:52",
-  "ok": 12,
+  "update_time": "2026-09-19 03:19:47",
+  "run_start": "2026-09-19 02:18:20",
+  "ok": 26,
   "fail": 1,
   "failed_scripts": [
     {
-      "script": "backtest_expectancy.py",
-      "reason": "监督器静默杀(>15min 无输出)"
+      "script": "refresh_stock_metadata.py",
+      "reason": "超时 >30min"
     }
   ],
   "skipped_by_time_gate": []
