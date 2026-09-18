@@ -683,7 +683,7 @@ window.__domReadyFns=[];
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=1789733032" defer></script>
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
-    <script src="data/SECTOR_LEADERS.js?v=1789733032" defer></script>
+    <script src="data/SECTOR_LEADERS.js?v=1789733000" defer></script>
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
     <script src="data/PORTFOLIO.js?v=1789733032" defer></script>
     <script>
@@ -14630,7 +14630,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
    注入行 ⇒ window.SECTOR_LEADERS 恒 undefined、整块恒不渲染（死块）。本版三项全治：
      ① 生成器 scripts/fetch_sector_leaders.py 扩 主升+启动（板块带 phase 字段）；
      ② 独立卡置于「概念/行业 → ETF·龙头 参考」卡上方（#sectorLeadersCard）；
-     ③ index.html 补 <script src="data/SECTOR_LEADERS.js?v=1789733032"> 注入。
+     ③ index.html 补 <script src="data/SECTOR_LEADERS.js?v=1789733000"> 注入。
    口径：主升=5日>3%且20日>5%；启动=5日>1.5%且20日>-8%（与「板块资金趋势」卡/生成器 _phase_of 三处同规则）。
    ⚠️ 护栏：无数据 ⇒ 卡保持 display:none（不产出空壳卡）；body.innerHTML 幂等重渲（重复调用不叠加）。 */
   window._fillSectorLeaders = function(){
@@ -14639,7 +14639,10 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       var body = document.getElementById('sectorLeadersBody');
       if(!card || !body) return;
       var sl = window.SECTOR_LEADERS || null;
-      var rows = ((sl && sl.sectors) || []).filter(function(s){ return s && s.leaders && s.leaders.length; });
+      /* 2026-09-18 晚 二修（主人令「只显示了主升，启动丢了」）：不再静默丢弃无龙头板块——
+         生成器现对「个股行情抓取失败」的板块保留 leaders=[] + leaders_error=1，
+         本卡照常展示板块并明示「待补抓」，保证与「板块资金趋势」卡的主升/启动口径一致。 */
+      var rows = ((sl && sl.sectors) || []).filter(function(s){ return s && s.name; });
       if(!rows.length) return;                    /* 无数据 ⇒ 保持隐藏（不渲染空壳） */
       var fb = document.getElementById('prLeadersFresh');
       if(fb){
@@ -14673,11 +14676,13 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         h += '  <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:7px;">';
         h += '    <span style="font-weight:700;color:var(--txt);font-size:13px;">' + s.name + '</span>';
         h += '    <span style="font-size:11px;color:var(--sub);">5日 <b style="color:var(--up);">' + d5 + '</b> &#183; 20日 <b style="color:' + (d20v>=0?'var(--up)':'var(--down)') + ';">' + d20 + '</b></span>';
-        h += '    <span style="font-size:10px;color:var(--dim);">成分股 ' + (s.cons_count || 0) + ' 只</span>';
+        h += '    <span style="font-size:10px;color:var(--dim);">成分股 ' + (s.leaders_error ? '—' : (s.cons_count || 0) + ' 只') + '</span>';
         h += '  </div>';
-        /* 个股行内并列 */
-        h += '  <div style="display:flex;flex-wrap:wrap;gap:6px 10px;">';
-        s.leaders.forEach(function(p, idx){
+        /* 个股行内并列（2026-09-18 二修：抓取失败板块明示待补抓，不再静默消失） */
+        var _hasL = s.leaders && s.leaders.length;
+        if(_hasL) h += '  <div style="display:flex;flex-wrap:wrap;gap:6px 10px;">';
+        else h += '  <div style="font-size:11px;color:#fbbf24;background:rgba(251,191,36,.07);border:1px dashed rgba(251,191,36,.35);border-radius:6px;padding:6px 9px;">&#x26A0;&#xFE0F; 龙头股行情本轮抓取失败，待下轮盘后自动补抓（板块阶段判定不受影响）</div>';
+        (s.leaders || []).forEach(function(p, idx){
           var col = (p.chg >= 0) ? 'var(--up)' : 'var(--down)';
           h += '<span style="display:inline-flex;align-items:baseline;gap:5px;padding:3px 8px;border-radius:5px;background:rgba(255,255,255,.04);border-left:3px solid ' + col + ';font-size:12px;white-space:nowrap;">';
           h += '  <span style="color:var(--dim);font-size:10px;">' + (idx + 1) + '</span>';
@@ -14686,7 +14691,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
           h += '  <span style="color:' + col + ';font-weight:700;">' + (p.chg >= 0 ? '+' : '') + p.chg.toFixed(2) + '%</span>';
           h += '</span>';
         });
-        h += '  </div>';
+        if(_hasL) h += '  </div>';
         h += '</div>';
       });
       body.innerHTML = h;
@@ -16959,7 +16964,10 @@ h+=`</div>`;
        ? ('来源：<a href="' + (_kSrc.url || '#') + '" target="_blank" style="color:var(--link);">沧海一土狗 · ' + _kSrc.title + '</a> · ' + (_kSrc.date || ''))
        : '来源：沧海一土狗';
      function _kShapeRow(o, c){ return '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">' + o.name + '</span><b style="color:' + c + ';">' + o.val + '</b></div>'; }
-     _h += '<div class="card" id="macroKShapeBody" style="margin-bottom:16px;border-left:4px solid #fbbf24;">'
+     /* 🛡 2026-09-18 晚 二修（主人令「这个卡左侧不要两个圆弧括号」）：原此处又自建一张 .card 同名卡，
+        与 renderUnlisted 里的壳卡 #macroKShapeBody 卡中嵌卡 ⇒ 两道金色圆角左边条并排（视觉=左侧两个圆弧括号），
+        且产生重复 id。本函数只负责往壳卡里填内容；卡壳样式（含唯一一道金色左边条）归壳卡所有。 */
+     _h += '<div>'
         // ── ① 标题行（置顶）：卡名 + 频率 badge + 数据源 ──
         + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
         + '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🌍 宏观景气背景 · K 型分层</span>'
