@@ -115,12 +115,12 @@ CARD_DEFS = [
     # 且会白占 25 分钟 debounce 锁导致真正需要的派发被跳过（与 155 轮 NT_DATA 同一类缺陷）。
     # 故统一显式覆盖 heal_cat="algo_run"。
     # 🛡 2026-09-17 主人令·全站口径统一（看板名/页对齐前端真实卡）：原两项失配——
-    #   ① name「市场温度计」指向 2026-08-29 已删除的卡（数据源 SH_FIB 现由「🧪 斐波那契F观测窗」
+    #   ① name「市场温度计」指向 2026-08-29 已删除的卡（数据源 SH_FIB 现由「🧪 斐波那契观测窗」
     #      与艾略特波浪卡消费）⇒ 看板显示一个页面上不存在的卡名。
     #   ② page「盘后数据」失配：该卡 2026-09-15 主人令整卡迁「🌍 观测平台 > 📊 大盘观测」。
     #   前端 _PAGE_ORDER 首项即「观测平台」（= 导航 TAB 真实顺序）⇒ 改 page 即自动归位，
     #   无需动 index.html（热文件）。heal_cat 已显式=algo_run，page 改动不影响自愈派发口径。
-    {"id": "SH_FIB", "name": "斐波那契F观测窗", "page": "观测平台", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "heal_cat": "algo_run", "raw_file": "sh_fib.json"},  # 🛡 2026-09-10 一劳永逸：raw_file 用于「raw已新/js待D批重建」窗口交叉校验，根治误报 fail
+    {"id": "SH_FIB", "name": "斐波那契观测窗", "page": "观测平台", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "heal_cat": "algo_run", "raw_file": "sh_fib.json", "producer": "algorithms/fetch_sh_index_fib.py"},  # 🛡 2026-09-18 主人令「别后续找不到更新任务对应不上」：新增 producer 字段，看板卡名 → 产出脚本 直接可反查  # 🛡 2026-09-10 一劳永逸：raw_file 用于「raw已新/js待D批重建」窗口交叉校验，根治误报 fail
     # 🛡 2026-09-02 一劳永逸（主人令「运维还有错」）：SIX_DIM_RADAR 是 derived 项
     #   （前端 renderSixDim 直接读 SH_FIB 派生六维评分视图,无独立 SIX_DIM_RADAR.js 文件）。
     #   原 CARD_DEFS 登记让它绑死 SH_FIB 检查 → SH_FIB 老化超时同步误报 red。
