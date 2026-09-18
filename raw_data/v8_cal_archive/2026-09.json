@@ -1,6 +1,6 @@
 {
  "month": "2026年9月",
- "update_time": "2026-09-17 16:43",
+ "update_time": "2026-09-18 15:14",
  "legend": [
   {
    "title": "重要政策",
@@ -305,13 +305,13 @@
     {
      "num": 17,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": []
     },
     {
      "num": 18,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "中金所IF/IH/IC/IM股指期货交割",
