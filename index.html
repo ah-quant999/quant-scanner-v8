@@ -2884,7 +2884,7 @@ function fmtSigned(v){
   <section id="sec-st">
     <div class="sec-head" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h2 style="margin:0;">🎯 选股策略</h2>
-      <span class="tag">选股池 · 四量终极 · 三重共识 · 选股生命周期 · 因子 · 逆势龙头(CRDS)</span>
+      <span class="tag">选股池 · 四量终极 · 三重共识 · 选股生命周期 · 因子实验室 · 逆势龙头(CRDS)</span>
     </div>
     <!-- 建议持有期纪律 banner 已于 2026-08-30 移至逻辑详解页「选股策略·持有期纪律」段，此处不再展示（避免客户可看区域堆文字） -->
     <!-- TAB 按钮行（横排，独立于内容区） -->
@@ -2894,7 +2894,7 @@ function fmtSigned(v){
       <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span class="st-tab-star" data-card="四量终极"></span></button>
       <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span class="st-tab-star" data-card="三重共识"></span></button>
       <button class="st-tab" data-st="life" onclick="switchSt('life')">📡 强势跟踪 <span class="st-tab-star" data-card="强势跟踪"></span></button>
-      <button class="st-tab" data-st="fa" onclick="switchSt('fa')">🧪 因子 <span class="st-tab-star" data-card="因子实验室"></span></button>
+      <button class="st-tab" data-st="fa" onclick="switchSt('fa')">🧪 因子实验室 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">非策略·加分项</span></button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·0⭐观测</span></button>
     </div>
 
@@ -3079,7 +3079,21 @@ function fmtSigned(v){
 
     <!-- ===== TAB 页面：逆势龙头(CRDS) ===== -->
     <!-- 2026-09-12 主人令：因子子页（原「暂未上架 > 因子类」迁入），置于逆势龙头左侧 -->
-    <div id="st-fa" class="st-pane"><div id="stFaHost"></div></div>
+    <!-- 🛡 2026-09-18 主人令：「因子只是加分减分项，不是选股策略」—— 子页名统一「因子实验室」（原「🧪 因子」），顶部明示非选股层，并与「逆势龙头」对齐不评星级 -->
+    <div id="st-fa" class="st-pane">
+    <div class="card" style="border-left:4px solid #94a3b8;margin-bottom:14px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+    <span style="font-size:15px;font-weight:700;color:var(--txt);">🧪 因子实验室</span>
+    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#94a3b822;color:var(--sub);border:1px solid #94a3b84d;">非选股策略 · 不评星级</span>
+    </div>
+    <div style="font-size:12px;line-height:1.8;color:var(--sub);">
+    <b style="color:#22d3ee;">定位</b>：本页只研究「这个因子有没有区分度」，<b>不进选股层、不产出股票池</b>。<br>
+    <b style="color:#22d3ee;">它做什么</b>：只对<b>已经选出来的股</b>做<b>加分 / 减分</b> —— 命中即加计入 <code style="background:rgba(34,211,238,.1);padding:1px 4px;border-radius:3px;">final_score</code> 让排序前移，不命中则不动；<b style="color:#fbbf24;">绝不会因为某只票命中某个因子就把它拉进池子</b>。<br>
+    <b style="color:#22d3ee;">与左侧策略的区别</b>：四量终极 / 三重共识 / 强势跟踪 / 逆势龙头<b>各自产出股票池</b>；本页<b>不产池</b>，故与「逆势龙头」同为 <b>0⭐</b> 观测项，不参与星级评定。<br>
+    <b style="color:#22d3ee;">转正判据</b>：利差&gt;0 + Top 层胜率≥55% + 样本内外同号 —— 达标后才谈是否升格为独立策略。
+    </div>
+    </div>
+    <div id="stFaHost"></div></div>
 
     <div id="st-crds" class="st-pane"><div class="card" id="stv8CrdsCard">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
@@ -4628,20 +4642,24 @@ function fmtSigned(v){
   window.__STAR_PROFILE_OF = {                                    // 信号性质 → 权重档
     /* 🔴🔴 2026-09-16 主人令（第三轮纠偏）：「现在的选股策略只要这几个
        （四量终极 / 三重共识 / 选股生命周期 / 因子 / 逆势龙头），其他的你不要乱加」——
-       本表是**选股策略专属**的权重档登记处，只登记选股策略页上的卡。
+       本表是**选股策略专属**的权重档登记处，只登记选股策略页上的卡
+       （⚠️ 2026-09-18 补：因子实验室虽同页，但它是**加分项**、不产股票池 ⇒ **不登记**，见下方注释）。
        此前误登记的两项已删除（它们不时选股策略，属"乱加"）：
          · ❌ 'K线信号层' —— cat=signal / kind=signal / is_primary 全 0，是技术信号参考层
          · ❌ '强势突破'   —— page=暂未上架，未进选股策略页（其定位见回测页"不列入排名"区块）
        清掉后这两张卡不再获得任何选股策略口径的评级待遇。 */
     '三重共识': 'medium', '四量终极': 'long', '逆势龙头': 'short',
-    /* 🔴 2026-09-16 主人令「因子实验室先按 4⭐ 挂，可以标注，后续升级要抓紧」：
-       此前它**未登记** ⇒ 隐式落到 'medium' 默认档。现**显式登记 medium**，
-       把「有意为之」写死，杜绝以后有人误以为它是漏登记。
-       ⚠️ 其 4⭐ 的真实性存疑（长档依赖大盘 β，已由 __BETA_DEP_FLAG 标注）：
-          250 日 L1(最强分位) 胜率 79.8%，而 L5(最弱分位) 也有 70.9%
-          ⇒ 长档收益绝大部分是大盘 β；且异常换手因子样本外多空价差 −0.042%（无预测力）。
-       升级方向 = **换因子**（让 L1 与 L5 拉开差距），不是调权重。 */
-    '因子实验室': 'medium',
+    /* 🔴🔴 2026-09-18 主人令（第四轮纠偏）：「因子只是加分减分项，不是选股策略」——
+       ⇒ **因子实验室不评星级**：本表不再登记它（原 2026-09-16 的 'medium' 登记作废）。
+       撤销登记后，两个派生问题自动消解（它们本由「位置在选股策略页」错误推导而来）：
+         ① promoteRule「≥4⭐方可入选选股策略主tab」的自举悖论 —— 它因**位置**拿星，
+            又因拿星而"达标可入选选股策略页"；
+         ② 本表自述「只登记选股策略页上的卡」被它污染 —— 虽同页，但它是**加分项**
+            不是策略：位置在，身份不在。
+       ⚠️ 原 09-16 那个 4⭐ 本已存疑（长档依赖大盘 β：250 日 L1 79.8% vs L5 70.9%，
+          异常换手因子样本外多空价差 −0.042% 无预测力）。现改为**不评级**；
+          「升级中」警示改由 __BETA_DEP_FLAG 挂在**卡片角标**上（与星级彻底解耦）。
+       ⚠️ 与「逆势龙头」对齐：两者同为本页 0⭐ 观测项（后者因 maxN 不足不可评级）。 */
     /* 🆕 2026-09-17 主人令「审计完再定新星级」—— 强势跟踪**登记进委员会**。
        此前它**有回测源、有前端卡，却不在本表、不在聚合器 SOURCES、不在聚合快照 rows**
        ⇒ 委员会 cov=0 ⇒ 星级恒 0（页面显示「—」，并非「没给星」而是**流程漏登记**）。
@@ -4680,7 +4698,8 @@ function fmtSigned(v){
       tip: '长档依赖 β · 样本外无效：持有 250 日 L1(最强分位) 胜率 79.8%，'
          + '而 L5(最弱分位) 也有 70.9% —— 长档收益绝大部分是大盘 β；'
          + '异常换手因子样本外多空价差 −0.042%（无预测力）。'
-         + '主人 2026-09-16 令：先按 4⭐ 挂，标注；后续将持续升级。'
+         + '⚠️ 2026-09-18 主人令：本项**不是星级**，是挂在卡片角标上的数据基座警示；'
+         + '因子实验室已改为**不评星级**（见 __STAR_PROFILE_OF 注释）。'
     }
   };
   /* 取某卡的标注（无则返回 null） */
@@ -4957,7 +4976,7 @@ function fmtSigned(v){
          强势跟踪 score 4.69 → 5⭐ →甲不触发（67.5%）→ n=40<100 封顶 ⇒ 4⭐
          三重共识 score 2.89 → 3⭐（超额为负把「基准超额」维度压到低分 ⇒ 自然落 3⭐）
          四量终极 score 3.92 → 4⭐
-         因子实验室 score 3.53 → 4⭐
+         因子实验室 score 3.53 → 4⭐（⚠️ 2026-09-18 主人令：已改为**不评星**，此行仅存历史留痕）
          逆势龙头 maxN=4 <30 ⇒ 不可评级
        ⇒ 五项**全部与主人 2026-09-17 批准的星级表一致**。
        ⚠️ 基准数据尚未产出时 excess 维度为 null ⇒ 权重重归一化（不按 0 计），
@@ -6970,8 +6989,8 @@ function fmtSigned(v){
     var html = ''
       + '<div style="padding:14px 16px;">'
       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-      + '<b style="font-size:15px;">🧪 因子截面观测 · 异常换手率 × ROE_TTM</b>'
-      + '<span class="st-tab-star" data-card="因子实验室"></span>'
+      + '<b style="font-size:15px;">🧪 因子实验室 · 异常换手率 × ROE_TTM</b>'
+      + '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#94a3b822;color:var(--sub);border:1px solid #94a3b84d;">非选股策略 · 不评星级</span>'
       /* 🔴 2026-09-18 主人令「这还写着回测不达标…矛盾且混乱啊」：
          原为**写死**「回测未达标」徽章，与产物真值打架 ——
          FACTOR_LAB_BACKTEST.js 实跑 verdict_3star=PASS（IS利差+0.975 / OOS利差+0.175 同号）。
@@ -6993,11 +7012,11 @@ function fmtSigned(v){
          且**从未向主人说明这两个因子在本卡之外早已接入算法链**（作为共振加分源）。
          现补三段：① 定位（因子=加分项，非选股策略）；② 已接入事实；③ 本卡与「策略回测」页的区别。 */
       + '<b style="color:#22d3ee;">&#x1F9EA; 定位：</b><b>本卡是因子分层研究，不是选股策略</b> —— 它只回答「这个因子有没有区分度」，'
-      + '<b style="color:#22c55e">不产出股票池、不进选股策略页</b>。<br>'
+      + '<b style="color:#22c55e">不产出股票池、不占选股策略身份</b>（虽与本页策略同处一个 tab，但它只是<b>加分项</b>）。<br>'
       + '<b style="color:#22d3ee;">&#x1F4CC; 算法链中的角色：</b>两个因子已作为<b>共振加分源</b>接入 <code style="background:rgba(34,211,238,.1);padding:1px 4px;border-radius:3px;">final_recommend.py</code>：'
       + '候选池里的票若命中该因子 ⇒ <b>加计入 final_score ⇒ 排序前移</b>，因此它们的正确叫法是<b>「加分项」</b>，'
       + '<b>不是「选股策略」</b>（真正的选股发生在候选池那一层）。<br>'
-      + '<b style="color:#22d3ee;">&#x1F4A1; 用法：</b>本卡星级的唯一真源 = <b>星级委员会</b>（见卡名旁 ⭐，悬浮看依据）；'
+      + '<b style="color:#22d3ee;">&#x1F4A1; 用法：</b>本卡<b>不评星级</b>（2026-09-18 主人令：因子只是加分减分项，不是选股策略）；'
       + '因子自身「转正为选股策略」的判据 = 利差&gt;0 + Top层胜率≥55% + OOS与IS同号。<br>'
       + '<b style="color:#22d3ee;">&#x26A0; 与「策略回测」页的区别：</b>本页 = <b>因子分层研究</b>（五分位，看区分度）；'
       + '「策略回测」页 🧪 因子实验室回测卡 = <b>同一因子的持仓口径回测</b>（L1 最强五分位的持有期档）。'
@@ -7027,7 +7046,7 @@ function fmtSigned(v){
         })()
       + '　（数据源 data/FACTOR_LAB_BACKTEST.js，update_time 见上）'
       + '。🟢可关注=择时开放且因子进入前20%分位。仅研究参考，非买卖建议。</div>'
-      + '<div style="font-size:11px;color:#fbbf24;margin-top:6px;line-height:1.5;">⭐ 升级路径（2026-09-17 主人令·统一按委员会）：星级一律取<b>星级委员会</b>唯一真源，本页不再单独升降星。转正判据：利差&gt;0 + Top胜率≥55% + OOS同号，且全市场扫描数据侧开启后复验通过 ⇒ 转正「选股策略」子页（回测明细见「策略回测」页 🧪 因子实验室回测卡）。</div>'
+      + '<div style="font-size:11px;color:#fbbf24;margin-top:6px;line-height:1.5;">⭐ 升级路径（2026-09-18 主人令）：本页<b>不评星级</b>（因子是加分项，不是选股策略）。转正判据：利差&gt;0 + Top胜率≥55% + OOS同号，且全市场扫描数据侧开启后复验通过 ⇒ 才谈升格为独立策略（回测明细见「策略回测」页 🧪 因子实验室回测卡）。</div>'
       + '</div>';
     dst.innerHTML = html;
     // 弹窗：完整榜单（复用闭包内 row() 与全量数组，2026-09-03 主人令）
@@ -11981,7 +12000,7 @@ function drawUpDownChart(){
           '<tr id="freshRowCandidateSrc" style="display:none"><td colspan="3" id="freshCandidateSources" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"></td></tr>'+
           '<tr id="freshRowGold"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">金股池</td><td id="freshTimeGold" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">--</td><td id="freshStatusGold" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>待扫描</td></tr>'+
           '<tr id="freshRowConcept"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">概念映射</td><td id="freshTimeConcept" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">--</td><td id="freshStatusConcept" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>待扫描</td></tr>'+
-          '<tr id="freshRowFactorLab"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">🧪 因子截面观测 <span style="font-size:10px;color:var(--dim)">(异常换手率·重点池 / ROE·全市场主板)</span></td><td id="freshTimeFactorLab" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">--</td><td id="freshStatusFactorLab" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>待扫描</td></tr>'+
+          '<tr id="freshRowFactorLab"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">🧪 因子实验室 <span style="font-size:10px;color:var(--dim)">(异常换手率·重点池 / ROE·全市场主板)</span></td><td id="freshTimeFactorLab" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">--</td><td id="freshStatusFactorLab" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>待扫描</td></tr>'+
         '</tbody></table>'+
       '</div>';
 
@@ -14177,7 +14196,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       if(typeof window.__renderFactorAudit==='function') setTimeout(window.__renderFactorAudit, 30);
     }
     // 2026-09-06 审计修复：__renderFactorLab 死调用移除（当时该容器在暂未上架·实验区，life tab 无此容器）
-    // 2026-09-12 更新：因子实验室已迁入本页 🧪 因子 子页，其渲染由上方 if(n==='fa') 分支负责，故此处仍不挂 life。
+    // 2026-09-12 更新：因子实验室已迁入本页 🧪 因子实验室 子页，其渲染由上方 if(n==='fa') 分支负责，故此处仍不挂 life。
+  // 2026-09-18 主人令：子页名统一「因子实验室」（原「🧪 因子」），且不评星级（因子=加分项，非选股策略）。
     // 🛡 2026-09-02 主人令根治：切换后立即启动「子 tab 数据就绪重试」（见 __stRetryTab），消除 defer 未注入导致的首渲空卡
     try{ window.__stRetryTab(n); }catch(e){}
     // 🔴 2026-09-17 主人令「统一口径不要打架」：切 tab 时重渲所有静态星级占位
@@ -14192,7 +14212,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       tc:function(){return !!(window.TRIPLE_CONSENSUS||window.TRIPLE_TRACK);},
       crds:function(){return !!window.CRDS_CARD_DATA;},
       life:function(){return !!(window.V8_POOL_TRACKER&&window.V8_POOL_TRACKER.items&&window.V8_POOL_TRACKER.items.length);},
-      // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
+      // 2026-09-12 主人令：因子实验室子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
       fa:function(){return !!(window.FACTOR_LAB||window.FACTOR_LAB_BACKTEST);}
     };
     var _chk=_map[n]||function(){return true;};
@@ -14902,7 +14922,7 @@ h += '</div>'; // /ulPaneObserve
 //     · 回测·框架 3 卡  RPS 30天样本考核（已删）/ 中信PE观测（已并到暂未上架）/ 指数观测（已并到暂未上架）
 //       → 策略回测页底部 #btExtraHost（__renderBtExtraPane）现仅保留其它回测类卡壳
 //     · 因子类   3 卡  因子实验室 / 因子审计 / 因子补缺进度
-//       → 选股策略 → 🧪 因子 子页 #stFaHost（__renderFactorPane），位于逆势龙头左侧
+//       → 选股策略 → 🧪 因子实验室 子页 #stFaHost（__renderFactorPane），位于逆势龙头左侧（2026-09-18：非策略·加分项·不评星）
 //     · 宏观类   3 卡  机构研究·AI解析 / 新周期判定 / 宏观景气背景·K型分层
 //       （2026-09-13 主人令：「新周期判定」已下沉至「暂未上架 → 观测类」最下方
 //         ⇒ 宏观观测页现为 2 卡：机构研究·AI解析 + 宏观景气背景·K型分层）

@@ -724,6 +724,17 @@ def main():
                 r["name"] = fix_name(code, name)
         return r
 
+    def _factor_in_pool(code):
+        """因子侧专用：**只查不建**。返回该票是否已被其他源选进 pool。
+
+        🔴🔴 2026-09-18 主人令：「因子只是加分减分项，不是选股策略」。
+           ensure() 对**不在池内**的票会新建记录（pool 是 defaultdict）⇒ 因子榜的票会被
+           无条件创造进最终推荐候选集，那是「因子参与选股」，不是「加分」。
+           本函数只做成员判断 ⇒ 因子只能给**已经选出来的股**加减分。
+        ⚠️ 探测绝不能用 pool[_nc]：defaultdict 取值会**创建空记录并留在池里**，
+           那正是本判据要禁止的「进池」，故必须先 in 判断。"""
+        return norm_code(code).lstrip('.') in pool
+
     # 1) 三重共识
     for s in triple.get("stocks") or []:
         code = s.get("code")
@@ -915,6 +926,11 @@ def main():
             _nm = _stock_name_map()
             display_name = (_nm.get(_pure6) or _nm.get(_pure) or _nm.get(code)
                            or (profiles.get(_pure6) or {}).get("name") or s.get("name") or "")
+            # 🔴🔴 2026-09-18 主人令：因子不产池 —— 只给「已被其他源选出的票」加减分。
+            #   原为 r = ensure(...)：ensure 会对不在池内的票**新建记录**（pool 是 defaultdict）
+            #   ⇒ 等于让因子榜 30 只票无条件进入最终推荐候选集。现改为未在池内即跳过。
+            if not _factor_in_pool(code):
+                continue
             r = ensure(code, display_name, "", "")
             sc = 2.0 if i < 5 else (1.5 if i < 15 else 1.0)
             sc *= (1.0 if _open_regime else 0.3)
@@ -940,6 +956,9 @@ def main():
             _nm = _stock_name_map()
             display_name = (_nm.get(_pure6) or _nm.get(_pure) or _nm.get(code)
                            or (profiles.get(_pure6) or {}).get("name") or s.get("name") or "")
+            # 🔴🔴 2026-09-18 主人令：同上（因子不产池）。ROE_TTM 只对已在池内的票降档加分。
+            if not _factor_in_pool(code):
+                continue
             r = ensure(code, display_name, "", "")
             # 🔴 2026-09-18 改动2a：ROE_TTM 边际 +0.68pp = **弱正**（非负 alpha）
             #   ⇒ 不剔除，但按「不与强源同权」降档（2.0/1.5/1.0 → 1.0/0.75/0.5）。
@@ -1381,20 +1400,13 @@ def main():
         })
     # ── end 双轨 ──
 
-    # 方案B：因子候选（异常换手率/ROE_TTM）因权重低常落在 top30 之后，需强制纳入候选池，否则方案B不可见
+    # 🔴🔴 2026-09-18 主人令：「因子只是加分减分项，不是选股策略」——
+    #   此处原有一段 `_factor_extra`：把 30 名之外带因子标签的票**强制纳入候选池**
+    #   （其原注释自述"否则方案B不可见"）⇒ 这是「因子参与选股」的第二处 ——
+    #   因子不仅能决定谁进池，还能把已排在池外的票**捞回池内**。已**整体删除**。
+    #   现状：候选池 = scored[:30]，纯由各源得分决定；因子只在**得分阶段**加减分
+    #   （命中 ⇒ source_scores 加权 / 放量弱势 ⇒ −0.5），不再影响**谁能进池**。
     _top30 = scored[:30]
-    _top30_keys = {x["key"] for x in _top30}
-    # 🔴 2026-09-18 改动2a 连带修复：噪音源不再进 sources ⇒ 原判据恒为空 ⇒
-    #   候选池会静默少一批「基本面/异动」票（信息丢失，但**不影响排名**，因它捞的是
-    #   已过滤后的 scored）。现改为按 tags 捞回：展示信息保留，且它们本就在 scored 里、
-    #   分数已按无噪音源重算，不会被重新抬进 top5。
-    _factor_extra = [
-        x for x in scored[30:]
-        if (set(x.get("tags") or []) & NOISE_SOURCES
-            or "异常换手率" in x["sources"] or "ROE_TTM" in x["sources"]
-            or "高手跟踪" in x["sources"])
-        and x["key"] not in _top30_keys
-    ]
 
     # 🚪 数据降级标记（2026-09-12 主人令·一劳永逸）：
     #   上游（A 采集批）长坏 >2 交易日时，批次闸门会降级放行 B 批，并把
@@ -1487,7 +1499,7 @@ def main():
                 "support": round(safe_float(x.get("support")), 2) if x.get("support") is not None else None,
                 "resistance": round(safe_float(x.get("resistance")), 2) if x.get("resistance") is not None else None,
             }
-            for x in (_top30 + _factor_extra)
+            for x in _top30
         ],
     }
 

@@ -731,9 +731,14 @@ try:
                         "run_at": _fw5.get("update_time")}
 except Exception as _e5:
     print(f"  ⚠️ P5 walk-forward 权重加载失败，回退硬编码默认: {_e5}")
+# 🔴 2026-09-18 审计修复（阿狸咪的工程师）：原 `P5_ON.setdefault(_k5, True)` 在
+#   factor_walkforward.json **缺失 / 解析失败**时会**默认启用**两个因子 ⇒ 绕过上方
+#   「仅当 verdict=PASS 才启用」的闸门，等于未验证就给分（静默假成功）。
+#   改为安全默认 **False**（宁缺毋假）：证据不到 ⇒ 不加分，绝不静默给分。
+#   P5_EDGE 仍保留兜底值 —— 它只在 P5_ON=True 时才被读取，不影响判据。
 for _k5, _v5 in P5_FALLBACK.items():
     P5_EDGE.setdefault(_k5, dict(_v5))
-    P5_ON.setdefault(_k5, True)
+    P5_ON.setdefault(_k5, False)
 
 
 def _p5_turntrend_metrics(code):

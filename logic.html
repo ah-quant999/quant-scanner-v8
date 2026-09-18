@@ -1616,14 +1616,14 @@ need 只是计数，只计 2/3 时它陈旧也会被放行）· <b>8</b> 个脚�
           <tr><td>18:10 B批选股</td><td>三重共识/CRDS/四量终极/选股生命周期</td><td>云端 v8_algo_cloud (--stage B)</td><td>选股策略各子 tab</td></tr>
           <tr><td>21:00 E批回测+因子实验室</td><td>趋势/综合/逆势龙头/四量回测 + <b>因子实验室生成(v8/factor_lab_gen.py，2026-09-07 从 D 摘出·治互踢暴风)</b> + <b>全市场等权基准(gen_market_bench.py，2026-09-17 新增·聚合器之前)</b> + <b>全算法回测汇总(gen_backtest_all_algos.py，2026-09-11 新增·批内最末)</b></td><td>云端 v8_algo_cloud (--stage E)</td><td>策略回顾·回测区 + 因子实验室卡</td></tr>
           <tr><td>20:00 D批汇总</td><td>仅 final_recommend（LHB历史/7d/生命周期由 B 批主流程前置）</td><td>云端 v8_algo_cloud (--stage D)</td><td>今日推荐候选池·Top3</td></tr>
-          <tr><td>本地因子(盘后/周末)</td><td>异常换手率(重点池) + ROE(TTM)全市场主板 · 因子实验室卡</td><td>小九本机 baostock 生成 → push main</td><td>选股策略·🧬生命周期 tab</td></tr>
+          <tr><td>本地因子(盘后/周末)</td><td>异常换手率(重点池) + ROE(TTM)全市场主板 · 因子实验室卡</td><td>小九本机 baostock 生成 → push main</td><td>选股策略·因子实验室 tab（非策略·加分项）</td></tr>
         </table>
       </div>
 
 <div class="card">
               <div class="card">
-        <h3><span class="ic">🧪</span>因子实验室（<b>2026-09-12 主人令：已从「暂未上架」迁入「选股策略 → 🧪 因子」子页</b>，位于逆势龙头左侧 · ⭐⭐）</h3>
-        <div class="logic-p">把 v2 回测验证显著的单因子做成「可观测截面排名 + 择时闸门」，作为选股策略的<b>因子观察层</b>。两个因子<b>均已通过 D 批 final_recommend 的「方案B融合」进入最终推荐加权</b>（前 5 名 +2.0 / 6-15 名 +1.5 / 16-30 名 +1.0，非开仓期 ×0.3，见上方「最终推荐」计分表第 4/5 项）——即最终推荐在因子实验室产出当日新鲜结果后才生成，缺失/陈旧则降级跳过融合。卡片本身则作为<b>因子观察层</b>展示截面排名。<b>2026-09-04 主人令</b>：先在<b>暂未上架</b>里调试和回测；<b>2026-09-10 主人令</b>：已在该页下方成立「🧪 因子实验室」独立子页（3 张因子卡迁入），升级到 ⭐⭐⭐⭐（4 星）后再考虑迁回选股策略页。</div>
+        <h3><span class="ic">🧪</span>因子实验室（<b>2026-09-12 主人令：已从「暂未上架」迁入「选股策略 → 因子实验室」子页</b>，位于逆势龙头左侧 · <b>不评星级</b>）</h3>
+        <div class="logic-p">把 v2 回测验证显著的单因子做成「可观测截面排名 + 择时闸门」，作为选股策略的<b>因子观察层</b>。两个因子<b>均已通过 D 批 final_recommend 的「方案B融合」进入最终推荐加权</b>（前 5 名 +2.0 / 6-15 名 +1.5 / 16-30 名 +1.0，非开仓期 ×0.3，见上方「最终推荐」计分表第 4/5 项）——即最终推荐在因子实验室产出当日新鲜结果后才生成，缺失/陈旧则降级跳过融合。卡片本身则作为<b>因子观察层</b>展示截面排名。<b>2026-09-04 主人令</b>：先在<b>暂未上架</b>里调试和回测；<b>2026-09-10 主人令</b>：已在该页下方成立「🧪 因子实验室」独立子页（3 张因子卡迁入）。<b>🔴 2026-09-18 主人令（第四轮纠偏）</b>：「因子只是加分减分项，不是选股策略」—— <b>因子实验室不评星级</b>（原 4⭐ 登记作废），子页名统一「因子实验室」，并在子页顶部明示「不进选股层、不产出股票池」；因子只对<b>已经选出来的股</b>做加分/减分，绝不因命中因子把票拉进池子。升格判据不变：利差&gt;0 + Top层胜率≥55% + 样本内外同号。</div>
         <div class="logic-h">当前因子</div>
         <table class="lg-table">
           <tr><th>因子</th><th>定义</th><th>显著性</th><th>展示</th></tr>
@@ -1657,7 +1657,7 @@ need 只是计数，只计 2/3 时它陈旧也会被放行）· <b>8</b> 个脚�
         <div class="logic-p"><b>⚠️ 变更留痕（2026-09-18）</b>：<b>换手率趋势</b>此前已接入 P5 段；在 <code>raw_data/factor_walkforward.json</code> 更新至 <code>2026-09-18 07:12:42</code> 后，其 <code>verdict</code> 由 PASS 变为 <b>FAIL</b>（年度跑赢基准率 &gt;55% 的年份为 5/8）⇒ P5 段已<b>自动停止</b>给它加权，台账「已接入」清单同步移除。此变更已在 <code>raw_data/factor_progress.json</code> 的 <code>retired_by_backtest[].was_p5_integrated</code> 字段留痕，前端只读该真值，<b>不再写死</b>。</div>
         <div class="logic-p"><b>⚠️ 读取本表须知</b>：这是<b>弃用遗体清单</b>，不是「待接入候选」（待接入的见卡片下半「walk-forward 进度」表）。当初卡片上会出现「⛔ 回测不达标」红标，是前端 <code>_wfOverlay()</code> 把本清单叠回审计表所致；<b>2026-09-18 起</b>徽章改为<b>读产物真值</b>（<code>FACTOR_LAB_BACKTEST.verdict_3star</code>），不再写死文案 —— 以消除「徽章说未达标、产物说已达标」的自相矛盾。</div>
         <div class="logic-h">4⭐ 升级路线图</div>
-        <div class="logic-p">1) 先在暂未上架跑分层回测（信号 vs 次日开盘收益、胜率、回撤、OOS 稳定性）；<br>2) 只有当因子策略本身达到 ⭐⭐⭐⭐ 可信度，且与现有选股策略低相关时；<br>3) 才考虑把它从「暂未上架 → 🧪 因子实验室」迁入选股策略页（<b>加权已在 2026-09-09 起生效</b>）。<br><b style="color:var(--gold)">✅ 2026-09-12 主人令：入口迁移已执行</b> —— 三张卡（因子实验室 / 因子审计 / 因子补缺 walk-forward 进度）整体迁入「<b>选股策略 → 🧪 因子</b>」子页（逆势龙头左侧 · ⭐⭐）。选股策略子页现行顺序：<b>选股池 → 四量终极(⭐⭐⭐⭐⭐) → 三重共识(⭐⭐⭐⭐) → 选股生命周期(⭐⭐⭐) → 因子(⭐⭐) → 逆势龙头</b>（2026-09-12 令：五星级模块置于四星级左侧，因子置于逆势龙头左侧）。</div>
+        <div class="logic-p">1) 先在暂未上架跑分层回测（信号 vs 次日开盘收益、胜率、回撤、OOS 稳定性）；<br>2) 只有当因子策略本身达到 ⭐⭐⭐⭐ 可信度，且与现有选股策略低相关时；<br>3) 才考虑把它从「暂未上架 → 🧪 因子实验室」迁入选股策略页（<b>加权已在 2026-09-09 起生效</b>）。<br><b style="color:var(--gold)">✅ 2026-09-12 主人令：入口迁移已执行</b> —— 三张卡（因子实验室 / 因子审计 / 因子补缺 walk-forward 进度）整体迁入「<b>选股策略 → 因子实验室</b>」子页（逆势龙头左侧 · <b>不评星级</b>，2026-09-18 令：因子是加分项非策略）。选股策略子页现行顺序：<b>选股池 → 四量终极(⭐⭐⭐⭐⭐) → 三重共识(⭐⭐⭐⭐) → 选股生命周期(⭐⭐⭐) → 因子实验室(加分项·不评星) → 逆势龙头</b>（2026-09-12 令：五星级模块置于四星级左侧，因子置于逆势龙头左侧）。</div>
       </div>
 
 <div class="card">
@@ -1990,7 +1990,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><th>原位置</th><th>卡片（卡容器 id）</th><th>新位置</th><th>渲染入口 / 宿主</th></tr>
           <tr><td>📊 中信 PE&lt;10 历史回测（<code>citicPeBacktestBody</code>）</td></tr>
           <tr><td>📈 指数估值中枢 · 价格档位+趋势门控（<code>indexValueFrameworkBody</code>）</td></tr>
-          <tr><td rowspan="3">暂未上架 · 因子类</td><td>🧪 因子实验室 · 异常换手率 / ROE_TTM（<code>factorLabBody</code>）</td><td rowspan="3">选股策略 → 🧪 因子<br>（逆势龙头左侧）</td><td rowspan="3"><code>__renderFactorPane()</code> → <code>#stFaHost</code></td></tr>
+          <tr><td rowspan="3">选股策略 · 因子实验室（<b>非策略·加分项</b>）</td><td>🧪 因子实验室 · 异常换手率 / ROE_TTM（<code>factorLabBody</code>）</td><td rowspan="3">选股策略 → 因子实验室<br>（逆势龙头左侧 · 不评星）</td><td rowspan="3"><code>__renderFactorPane()</code> → <code>#stFaHost</code></td></tr>
           <tr><td>📊 因子审计：v8 选股 vs 质量价值中小盘多因子（<code>factorAuditBody</code>）</td></tr>
           <tr><td>🧪 因子补缺 · walk-forward 进度（<code>factorProgressBody</code>）</td></tr>
           <tr><td rowspan="2">暂未上架 · 宏观类</td><td>📚 机构研究 · AI 解析建议（<code>maharoCard</code>）</td><td rowspan="3">🌍 观测平台 → 🌍 宏观观测（子页 · 左）</td><td rowspan="3"><code>__renderObsPlatform()</code> → <code>#obsHost</code></td></tr>
