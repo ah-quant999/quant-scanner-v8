@@ -3121,6 +3121,18 @@ function fmtSigned(v){
           <span id="stcrdsHoldBadge" style="display:none;margin-left:6px;vertical-align:middle;"></span>
         </div>
         <div id="stcrdsCoverage" style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.6;"></div>
+        <!-- 🌡 ️ 2026-09-19 主人令：危机雷达 → 逆势龙头有效性判据（顶部紧凑条，不占大版面）
+             口径说明：危机雷达 = 宏观风险温度计（货币/经济/全球 三维），分高=危机深；逆势龙头是弱市专用策略 ⇒ 分越高越适用。
+             ★ 与下方「大盘判断」是两个不同维度（前者宏观低频、后者日频方向），可能不同步，勿只看一个。 -->
+        <div id="stcrdsGateBox" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:6px;background:var(--bg2);border-left:4px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:12px;font-weight:600;color:var(--sub);">🌡️ 危机雷达</span>
+            <span id="stcrdsCrisisScore" style="font-size:12px;font-weight:700;color:var(--txt);"></span>
+            <span id="stcrdsCrisisVerdict" style="font-size:12px;font-weight:700;padding:1px 8px;border-radius:8px;color:#fff;"></span>
+            <span id="stcrdsCrisisToggle" style="margin-left:auto;font-size:11px;color:var(--dim);cursor:pointer;user-select:none;">ⓘ 判据表 ▾</span>
+          </div>
+          <div id="stcrdsCrisisDetail" style="display:none;margin-top:7px;font-size:11px;color:var(--dim);line-height:1.7;"></div>
+        </div>
         <div id="stcrdsMarketContext" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:6px;background:var(--bg2);border-left:4px solid var(--border);">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <span style="font-size:12px;font-weight:600;color:var(--sub);">大盘判断</span>
@@ -3183,6 +3195,16 @@ function fmtSigned(v){
           </div>
         </div>
         <div id="stcrdsHistory" style="font-size:11px;color:var(--dim);"></div>
+        <!-- 📈 2026-09-19 主人令：逆势龙头页底部 —— 真实回测
+             数据源 window.CRDS_BACKTEST（v8/backtest_crds.py 产出）：信号日次一交易日开盘买入、持有 N 日收盘卖出（前复权 · 已扣双边 0.30%）。
+             🔴 诚实铁律：不改数、不插值、不用 0 冒充——没样本就显示「—」。 -->
+        <div id="stcrdsBtBox" style="display:none;margin-top:14px;padding:0;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+            <span style="font-size:13px;font-weight:700;color:var(--txt);">📈 逆势龙头 · 真实回测</span>
+            <span id="stcrdsBtScope" style="font-size:11px;color:var(--dim);"></span>
+          </div>
+          <div id="stcrdsBtBody"><div class="note">加载中…</div></div>
+        </div>
       </div></div><!--/st-crds-->
 
     <!-- ===== TAB 页面：强势跟踪（原「选股生命周期」子页 · 2026-09-16 主人令改名精简） =====
@@ -6380,30 +6402,86 @@ function fmtSigned(v){
         h += '<th style="padding:6px;text-align:left;color:var(--sub);white-space:nowrap;">'+x+'</th>';
       });
       h += '</tr></thead><tbody>';
-      byWr.forEach(function(r,i){
+      /* 🔴 2026-09-19 主人令（原话：「这里为啥有两个逆势龙头？这里就不该把因子实验室和
+         逆势龙头和主策略写在一起，把这两个不编号，和三个策略空一行写在最下面」）
+         ── 主表分两组，判据**全部派生自数据层，不硬编码卡名**：
+            ① 参与评级的选股策略（编号 1..N）= __committeeRate(card).ready === true
+               实测命中：强势跟踪 / 四量终极 / 三重共识（均已在 __STAR_PROFILE_OF 登记且样本达标）；
+            ② 观测 · 研究类（**不编号**，空一行后置底）= ready !== true
+               实测命中：因子实验室（未登记参评资格，2026-09-18 主人令撤销）
+                         逆势龙头（已登记但 minActiveN=4 < 30 ⇒ 不可评级）。
+           判据为何用 ready 而非 _stars()：_stars() 对「基础股池」也返回非空徽章，
+           而 ready 是同一真源（__committeeRate）里「算得出真实分数」的唯一标志。
+         ── 同名去重：同一张卡若同时出现在主表（最佳持有期口径）与 insufficient
+           （主口径样本不足），**不再各占一行** —— insufficient 行改为挂在该卡主行下
+           方的缩进子行，卡名不重复 ⇒ 消除「同一策略出现两次」。
+           兜底：若某 insufficient 卡在主表无对应行，仍单独列出 —— 绝不静默丢数据。 */
+      var _isRated = function(card){
+        try{
+          var rt = (typeof window.__committeeRate === 'function') ? window.__committeeRate(card) : null;
+          if(!rt) return false;
+          if(rt.kind === 'pool') return false;
+          return !!rt.ready;
+        }catch(e){ return false; }
+      };
+      var _rated = [], _unrated = [];
+      byWr.forEach(function(r){ (_isRated(r.card) ? _rated : _unrated).push(r); });
+      var _insByCard = {};
+      INS.forEach(function(r){ (_insByCard[r.card] = _insByCard[r.card] || []).push(r); });
+      function _insSubRows(card){
+        var arr = _insByCard[card];
+        if(!arr || !arr.length) return '';
+        return arr.map(function(r){
+          return '<tr style="border-bottom:1px solid var(--border2);color:var(--dim);">'
+            +  '<td style="padding:4px 6px;"></td>'
+            +  '<td style="padding:4px 6px 4px 24px;font-size:11px;white-space:nowrap;">└ 主口径 '
+            +     _esc(String(r.label || ('持有 ' + String(r.hold||'')))) + '</td>'
+            +  '<td style="padding:4px 6px;font-size:11px;">累积中</td>'
+            +  '<td style="padding:4px 6px;font-size:11px;white-space:nowrap;">持有 '
+            +     String(r.hold||'—').replace(/^T\+/,'') + ' 日</td>'
+            +  '<td style="padding:4px 6px;font-size:11px;">' + (r.sample||0) + '</td>'
+            +  '<td style="padding:4px 6px;font-size:11px;" colspan="4">⚠️ 样本 < ' + MINS
+            +     ' ⇒ 不参与排名、不做下架评估（该策略「最佳持有期」行见上方）</td></tr>';
+        }).join('');
+      }
+      function _btMainRow(r, num){
         h += '<tr style="border-bottom:1px solid var(--border2);">'
-          +  '<td style="padding:6px;color:var(--sub);font-weight:700;">'+(i+1)+'</td>'
-          +  '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">'+_esc((r.icon||'')+r.card)
+          +  '<td style="padding:6px;color:var(--sub);font-weight:700;">' + num + '</td>'
+          +  '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">' + _esc((r.icon||'')+r.card)
           +     _stars(r.card) + _provBadge(r.card, r) + _betaCell(r.card) + '</td>'
           +  '<td style="padding:6px;color:var(--dim);font-size:11px;white-space:nowrap;">'
           +     (_stars(r.card) ? '' : (r.card === '强势跟踪' ? '未评星（外部源）' : '累积中')) + '</td>'
-          +  '<td style="padding:6px;color:var(--txt);font-size:11px;font-weight:700;white-space:nowrap;">持有 '+_holdDays(r)+' 日</td>'
-          +  '<td style="padding:6px;">'+_sampleCell(r)+'</td>'
-          +  '<td style="padding:6px;font-weight:700;color:'+_colorNum(r.win_rate)+';">'+_n(r.win_rate)+'%</td>'
-          +  '<td style="padding:6px;font-weight:700;color:'+_colorPL(r.avg_return)+';">'+_sgn(r.avg_return)+_n(r.avg_return,2)+'%</td>'
-          +  '<td style="padding:6px;">'+_srcCell(r)+'</td>'
-          +  '</tr>';
-      });
-      INS.forEach(function(r){
-        h += '<tr style="border-bottom:1px solid var(--border2);color:var(--dim);">'
-          +  '<td style="padding:6px;">—</td>'
-          +  '<td style="padding:6px;white-space:nowrap;">'+_esc((r.icon||'')+r.card)+_stars(r.card)+'</td>'
-          +  '<td style="padding:6px;font-size:11px;">累积中</td>'
-          +  '<td style="padding:6px;white-space:nowrap;">持有 '+String(r.hold||'—').replace(/^T\+/,'')+' 日</td>'
-          +  '<td style="padding:6px;">'+(r.sample||0)+'</td>'
-          +  '<td style="padding:6px;" colspan="4">⚠️ 样本不足 '+MINS+'，不参与排名、不做下架评估</td>'
-          +  '</tr>';
-      });
+          +  '<td style="padding:6px;color:var(--txt);font-size:11px;font-weight:700;white-space:nowrap;">持有 ' + _holdDays(r) + ' 日</td>'
+          +  '<td style="padding:6px;">' + _sampleCell(r) + '</td>'
+          +  '<td style="padding:6px;font-weight:700;color:' + _colorNum(r.win_rate) + ';">' + _n(r.win_rate) + '%</td>'
+          +  '<td style="padding:6px;font-weight:700;color:' + _colorPL(r.avg_return) + ';">' + _sgn(r.avg_return) + _n(r.avg_return,2) + '%</td>'
+          +  '<td style="padding:6px;">' + _srcCell(r) + '</td>'
+          +  '</tr>'
+          +  _insSubRows(r.card);
+      }
+      _rated.forEach(function(r, i){ _btMainRow(r, i + 1); });
+      if(_unrated.length){
+        /* 空一行（主人：「和三个策略空一行写在最下面」）+ 分组标题，然后不编号列出 */
+        h += '<tr style="height:10px;"><td colspan="8" style="padding:0;"></td></tr>';
+        h += '<tr><td colspan="8" style="padding:3px 6px;font-size:11px;color:var(--dim);'
+          +  'border-bottom:1px solid var(--border2);">观测 · 研究类 —— 不评星级、不编号（与上方选股策略分组）</td></tr>';
+        _unrated.forEach(function(r){ _btMainRow(r, '—'); });
+      }
+      (function(){
+        var _shown = {};
+        _rated.concat(_unrated).forEach(function(r){ _shown[r.card] = 1; });
+        INS.forEach(function(r){
+          if(_shown[r.card]) return;
+          h += '<tr style="border-bottom:1px solid var(--border2);color:var(--dim);">'
+            +  '<td style="padding:6px;">—</td>'
+            +  '<td style="padding:6px;white-space:nowrap;">' + _esc((r.icon||'')+r.card) + _stars(r.card) + '</td>'
+            +  '<td style="padding:6px;font-size:11px;">累积中</td>'
+            +  '<td style="padding:6px;white-space:nowrap;">持有 ' + String(r.hold||'—').replace(/^T\+/,'') + ' 日</td>'
+            +  '<td style="padding:6px;">' + (r.sample||0) + '</td>'
+            +  '<td style="padding:6px;" colspan="4">⚠️ 样本不足 ' + MINS + '，不参与排名、不做下架评估</td>'
+            +  '</tr>';
+        });
+      })();
       h += '</tbody></table></div>';
 
       /* ── 一句话结论（🔴 2026-09-16：合并时原样保留并增强 —— 首屏第一句必须是可执行结论）──
@@ -16703,6 +16781,160 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     var safe=function(fn){try{fn();}catch(e){console.warn('运维子页渲染失败',e);}};
     /* 2026-09-03 主人令：renderAllsite / renderCockpit / renderHunter 调用入口已删（cockpit/allsite/hunter 全方位下线） */
     safe(function(){ renderV8Crds('st'); });
+    /* 🌡 ️ + 📈 2026-09-19 主人令：逆势龙头页 首尾两块
+       ① 顶部 = 危机雷达判据（分值 → 当日逆势龙头有效性）
+       ② 底部 = CRDS 真实回测（逐持有期档）。
+       两块均独立于 renderV8Crds（零侵入），并自带 600ms×30 自愈轮询：
+       data/*.js 是 defer，固定顺序下本函数可能先于数据执行。 */
+    function renderCrdsGateAndBt(){
+      var tried = 0;
+      function _esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+      function _n(v,d){ return (v==null||isNaN(v))?'\u2014':Number(v).toFixed(d==null?1:d); }
+      function _pl(v){ return (v==null||isNaN(v))?'var(--sub)':(Number(v)>=0?'#ef5350':'#26a69a'); }
+      function _sgn(v){ return (v==null||isNaN(v))?'':(Number(v)>=0?'+':''); }
+
+      /* ── 顶部：危机雷达 → 有效性 ── */
+      var box = document.getElementById('stcrdsGateBox');
+      if(box){
+        var C = window.CRISIS_DATA || null;
+        if(C && C.score!=null){
+          var sc = Number(C.score), lv = C.level || '';
+          /* 分档映射（策略逻辑映射，非统计标定）：危机越深，逆势越有效 */
+          var VER;
+          if(sc >= 70)      VER = {t:'强有效（重点启用）', c:'#ef5350', s:'★★★'};
+          else if(sc >= 50) VER = {t:'有效（可启用）',     c:'#f59e0b', s:'★★'};
+          else if(sc >= 30) VER = {t:'观察（暂不并入）',   c:'#BA7517', s:'★'};
+          else              VER = {t:'不适用（市场无逆势需求）', c:'#64748b', s:'✗'};
+          var se = document.getElementById('stcrdsCrisisScore');
+          if(se) se.innerHTML = '<b>'+_n(sc,1)+'</b> 分 · '+_esc(lv);
+          var ve = document.getElementById('stcrdsCrisisVerdict');
+          if(ve){ ve.textContent = '逆势龙头 '+VER.s+' '+VER.t; ve.style.backgroundColor = VER.c; }
+          box.style.borderLeftColor = VER.c;
+          /* 判据表 + 可达性如实标注（不隐藏） */
+          var de = document.getElementById('stcrdsCrisisDetail');
+          if(de){
+            var rows = [
+              ['≥ 70', '危机',   '★★★ 强有效', '重点启用'],
+              ['50 – 70', '警惕',   '★★ 有效',   '可启用'],
+              ['30 – 50', '关注',   '★ 观察',    '暂不并入最终推荐'],
+              ['< 30',   '平稳',   '✗ 不适用',  '市场无逆势需求']
+            ];
+            var hh = '<table style="width:100%;border-collapse:collapse;font-size:11px;">'
+                   + '<thead><tr style="color:var(--sub);border-bottom:1px solid var(--border2);">'
+                   + '<th style="padding:3px 6px;text-align:left;">危机雷达</th>'
+                   + '<th style="padding:3px 6px;text-align:left;">等级</th>'
+                   + '<th style="padding:3px 6px;text-align:left;">逆势龙头有效性</th>'
+                   + '<th style="padding:3px 6px;text-align:left;">操作含义</th></tr></thead><tbody>';
+            rows.forEach(function(r){
+              var hit = (r[1] === lv);
+              hh += '<tr style="border-bottom:1px solid var(--border2);">'
+                  + '<td style="padding:3px 6px;' + (hit?'font-weight:700;color:var(--txt);':'') + '">' + r[0] + '</td>'
+                  + '<td style="padding:3px 6px;' + (hit?'font-weight:700;color:var(--txt);':'') + '">' + r[1]
+                  + (hit?' <span style="color:#fbbf24;">← 当前</span>':'') + '</td>'
+                  + '<td style="padding:3px 6px;' + (hit?'font-weight:700;color:var(--txt);':'') + '">' + r[2] + '</td>'
+                  + '<td style="padding:3px 6px;' + (hit?'font-weight:700;color:var(--txt);':'') + '">' + r[3] + '</td></tr>';
+            });
+            hh += '</tbody></table>';
+            hh += '<div style="margin-top:7px;line-height:1.75;">'
+                + '三维拆解：货币 ' + _n(C.currency,3) + ' · 经济 ' + _n(C.economy,3)
+                + ' · 全球 ' + _n(C.global,3) + ' （权重 0.40 / 0.35 / 0.25）<br>'
+                + '阀值来源：final_recommend.py 的 CRISIS_HIGH_THRESHOLD = 50'
+                + '（仅控制「是否并入最终推荐」，不影响本页卡片展示）<br>'
+                + '<span style="color:#fbbf24;">⚠ 可达性如实说明：</span>'
+                + '本分数近期长期贴近中位区，距 50 阀值有距离；'
+                + '该阀值当前无回测标定依据，请与下方「大盘判断」叠加使用。<br>'
+                + '更新时间：' + _esc(C.update_time || '—') + '（盘前/盘中刷新）</div>';
+            de.innerHTML = hh;
+            var tg = document.getElementById('stcrdsCrisisToggle');
+            if(tg && !tg.__wired){
+              tg.__wired = 1;
+              tg.onclick = function(){
+                var open = de.style.display !== 'none';
+                de.style.display = open ? 'none' : 'block';
+                tg.innerHTML = open ? 'ⓘ 判据表 ▾' : 'ⓘ 判据表 ▴';
+              };
+            }
+          }
+          box.style.display = 'block';
+        } else if(tried > 12){
+          var se2 = document.getElementById('stcrdsCrisisScore');
+          if(se2) se2.textContent = '数据未生成（CRISIS_DATA 缺失）';
+          box.style.display = 'block';
+        }
+      }
+
+      /* ── 底部：CRDS 真实回测（逐持有期档） ── */
+      var bbox = document.getElementById('stcrdsBtBox');
+      var BT = window.CRDS_BACKTEST || null;
+      if(bbox && BT && BT.summary){
+        var sm = BT.summary, bp = sm.by_period || {};
+        var keys = Object.keys(bp).map(function(k){ return parseInt(k,10); })
+                   .filter(function(k){ return !isNaN(k); }).sort(function(a,b){ return a-b; });
+        if(keys.length){
+          var sig = BT.signals || [];
+          var days = {}; sig.forEach(function(x){ if(x && x.signal_date) days[x.signal_date] = 1; });
+          var nDay = Object.keys(days).length;
+          var sc = document.getElementById('stcrdsBtScope');
+          var _bps = (sm.cost_bps_per_side != null) ? Number(sm.cost_bps_per_side) : 15;
+          var _nSig = (sm.total_signals != null) ? sm.total_signals : '—';
+          var _nBt  = sig ? sig.length : 0;
+          if(sc) sc.innerHTML = '口径：信号日次一交易日开盘买入、持有 N 日收盘卖出'
+            + '（前复权 · 已扣双边 ' + _n(_bps*2/100, 2) + '%（单边 ' + _bps + 'bp））'
+            + '｜ 信号 ' + _esc(_nSig) + ' 条，其中 <b style="color:#fbbf24;">' + _nBt + ' 条</b>有可用 K 线、进入回测'
+            + '｜ <b style="color:#fbbf24;">' + nDay + ' 个独立信号日</b>'
+            + '｜ ' + _esc(sm.signal_date_range||'—');
+          var h = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">'
+                + '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+          ['持有期','样本 n','胜率','平均收益','最好','最差','盈亏比','夏普'].forEach(function(x){
+            h += '<th style="padding:6px;text-align:left;color:var(--sub);white-space:nowrap;">'+x+'</th>';
+          });
+          h += '</tr></thead><tbody>';
+          keys.forEach(function(k){
+            var r = bp[String(k)] || bp[k] || {};
+            var nS = r.samples || 0, thin = nS < 30;
+            h += '<tr style="border-bottom:1px solid var(--border2);' + (thin?'':'') + '">'
+               + '<td style="padding:6px;font-weight:700;color:var(--txt);white-space:nowrap;">T+' + k + '</td>'
+               + '<td style="padding:6px;color:' + (thin?'var(--dim)':'var(--sub)') + ';font-weight:' + (thin?'700':'400') + ';">'
+               +   nS + (thin?' ⚠':'') + '</td>'
+               + '<td style="padding:6px;font-weight:700;color:' + (r.win_rate==null?'var(--dim)':'#fbbf24') + ';">'
+               +   (r.win_rate==null?'\u2014':_n(r.win_rate)+'%') + '</td>'
+               + '<td style="padding:6px;font-weight:700;color:' + _pl(r.avg_return) + ';">'
+               +   (r.avg_return==null?'\u2014':_sgn(r.avg_return)+_n(r.avg_return,2)+'%') + '</td>'
+               + '<td style="padding:6px;color:' + _pl(r.best_return) + ';">'
+               +   (r.best_return==null?'\u2014':_sgn(r.best_return)+_n(r.best_return,2)+'%') + '</td>'
+               + '<td style="padding:6px;color:' + _pl(r.worst_return) + ';">'
+               +   (r.worst_return==null?'\u2014':_sgn(r.worst_return)+_n(r.worst_return,2)+'%') + '</td>'
+               + '<td style="padding:6px;color:var(--sub);">' + _n(r.profit_loss_ratio,2) + '</td>'
+               + '<td style="padding:6px;color:var(--sub);">' + _n(r.sharpe_ratio,2) + '</td></tr>';
+          });
+          h += '</tbody></table></div>';
+          h += '<div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.75;">'
+             + '<span style="color:#fbbf24;">⚠ 样本独立性提醒（诚实铁律）：</span>'
+             + '上表的「n」是<b>信号条数</b>，不是独立样本数 —— '
+             + '本回测仅覆盖 <b>' + nDay + ' 个交易日</b>（' + Object.keys(days).sort().join('、') + '），'
+             + '同一日内的多只个股共享同一份大盘环境 ⇒ 实际独立期数远低于 n。'
+             + '请勿把 n=85 读成「85 个独立样本」。<br>'
+             + '主口径 T+5 / T+10 / T+20 / T+30 样本均 < 30 ⇒ 样本不足，不参与星级与排名。<br>'
+             + '数据源：' + _esc(sm.update_time || BT.update_time || '—') + '（v8/backtest_crds.py）</div>';
+          var bb = document.getElementById('stcrdsBtBody');
+          if(bb) bb.innerHTML = h;
+          bbox.style.display = 'block';
+        }
+      } else if(bbox && tried > 12){
+        var bb2 = document.getElementById('stcrdsBtBody');
+        if(bb2 && bb2.innerHTML.indexOf('加载中') >= 0){
+          bb2.innerHTML = '<div class="note">回测数据未就绪（CRDS_BACKTEST 缺失），等待 v8/backtest_crds.py 产出。</div>';
+          bbox.style.display = 'block';
+        }
+      }
+
+      tried++;
+      var doneC = !!(window.CRISIS_DATA && window.CRISIS_DATA.score != null);
+      var doneB = !!(window.CRDS_BACKTEST && window.CRDS_BACKTEST.summary);
+      if((doneC && doneB) || tried > 30) return;
+      setTimeout(renderCrdsGateAndBt, 600);
+    }
+    safe(function(){ renderCrdsGateAndBt(); });
     // 数据健康总览由 renderRunnerTrack 统一渲染（含文件新鲜度+上游诊断），此处不再独立调用
   }
   window.__renderOps=renderOps;
