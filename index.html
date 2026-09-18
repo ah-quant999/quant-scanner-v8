@@ -2895,7 +2895,8 @@ function fmtSigned(v){
       <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span class="st-tab-star" data-card="三重共识"></span></button>
       <button class="st-tab" data-st="life" onclick="switchSt('life')">📡 强势跟踪 <span class="st-tab-star" data-card="强势跟踪"></span></button>
       <button class="st-tab" data-st="fa" onclick="switchSt('fa')">🧪 因子实验室 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">非策略·加分项</span></button>
-      <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·0⭐观测</span></button>
+      <!-- 2026-09-18 晚 主人令「两边要统一口径并展示」：此处原为硬编码静态残渣「弱市专用·0★观测」（09-17 时逆势龙头 n=4 不可评级的旧状态），今 BACKTEST_ALL_ALGOS 实算逆势龙头 2.61⭐(n=87,cov95%)，静态星标与策略回顾表口径打架。现统一接全站唯一星级出口 st-tab-star chip（__committeeRate 实时计算），保留「弱市专用」用途提示。 -->
+      <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span class="st-tab-star" data-card="逆势龙头"></span> <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span></button>
     </div>
 
     <!-- ===== 2026-09-02 主人令：大牛股猎手 / 全站精选 与选股策略高度重复，彻底删除；四量终极迁回选股策略子页 ===== -->
