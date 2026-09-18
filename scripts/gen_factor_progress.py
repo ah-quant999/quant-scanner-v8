@@ -36,10 +36,43 @@ WF_MAP = {
 #   口径：候选池内分位前 20% ⇒ +6 分 / 20~40% ⇒ +3 分；仅 verdict=PASS 才启用；
 #         amt60 另有 3000 万元成交额下限（含量纲哨兵）；权重与偏离依据见 P5 段头注。
 #   ⚠️ 未列入本表的达标因子 ⇒ deploy_status 仍为「待接入」，不允许虚报已接入。
+# 🔴 2026-09-18 小九（主人令「我不要漂亮数据」· 消除台账假报）：
+#   原实现把 turntrend / amt60 **写死**为「已接入」⇒ 与 generate_top10.py 的
+#   运行期门控脱钩。实测后果：最新 factor_walkforward.json（2026-09-18 07:12:42）
+#   里 turntrend 的 verdict 已由 PASS 变 **FAIL**（years_beat_gt55 5/8 = 62.5% < 80%），
+#   generate_top10.py 已**自动停止**给它加权，而本台账仍报「✅ 已接入」= 假报。
+#   故改为：本表只登记「曾通过并接入过的因子」+ 其档位说明（静态文案），
+#   **是否仍生效一律由 _p5_on() 运行期按最新 verdict 判定**（与 generate_top10.py 同判据）。
 P5_INTEGRATED = {
     "turntrend": "P5 分档 +6/+3（hold=5d，换手率趋势·缩量=强势）",
     "amt60":     "P5 分档 +6/+3（hold=10d，60日成交额中位数·低流动性溢价）",
 }
+# 与 algorithms/generate_top10.py 完全同判据（禁特立独行）：
+#   P5_MIN_EDGE=0.30 · 启用条件 = verdict=="PASS" 且 spread_avg_pct 非空 且 |spread_avg_pct| >= 0.30
+P5_MIN_EDGE = 0.30
+
+
+def _p5_on(key, r):
+    """该因子在**最新回测**下是否仍在 generate_top10.py 的 P5 段生效。
+
+    与 algorithms/generate_top10.py 的 P5_ON 判定逐字同构：
+        _r5.get("verdict") != "PASS" or _sp5 is None or abs(float(_sp5)) < P5_MIN_EDGE
+        ⇒ P5_ON = False
+    返回 (bool, 判据说明字符串)。任何异常一律返回 False（宁可保守少报，绝不虚报）。
+    """
+    if key not in P5_INTEGRATED:
+        return False, "未登记为 P5 因子"
+    try:
+        if (r or {}).get("verdict") != "PASS":
+            return False, "verdict=%s" % ((r or {}).get("verdict") or "缺失")
+        sp = (r or {}).get("spread_avg_pct")
+        if sp is None:
+            return False, "spread_avg_pct 缺失"
+        if abs(float(sp)) < P5_MIN_EDGE:
+            return False, "|利差 %.4f| < 门槛 %.2f" % (float(sp), P5_MIN_EDGE)
+        return True, "verdict=PASS 且 |利差 %.4f| ≥ %.2f" % (float(sp), P5_MIN_EDGE)
+    except Exception as e:
+        return False, "判定异常(%s)" % e
 
 
 def _load_walkforward():
@@ -274,9 +307,15 @@ def main():
             p["base_win_avg"] = r.get("base_win_avg")
             p["spread_oos_pct"] = r.get("spread_oos_pct")
             _p5note = P5_INTEGRATED.get(key)
-            if _p5note:
+            _on5, _on5_why = _p5_on(key, r)        # 🔴 2026-09-18：运行期按最新 verdict 判定
+            if _p5note and _on5:
                 p["deploy_status"] = "✅ 已接入 generate_top10.py"
                 p["integrated_detail"] = _p5note
+            elif _p5note and not _on5:
+                # 曾登记为 P5 因子但最新回测未过门槛 ⇒ **如实报未接入**（不虚报）
+                p["deploy_status"] = "已达标·待接入 generate_top10.py"
+                p["integrated_detail"] = ""
+                p["p5_gate_note"] = "曾被登记为 P5 因子，但最新回测未过 P5 门槛（%s）⇒ P5 段已自动停止加权" % _on5_why
             else:
                 p["deploy_status"] = "已达标·待接入 generate_top10.py"
             p["notes"] = (f"✅ walk-forward 达标（{r.get('date_from')}~{r.get('date_to')}，"
@@ -290,11 +329,20 @@ def main():
             n_done_wf += 1
         else:
             # ③ 不达标 ⇒ 从台账删除，不留遗体（仅在 summary 里留一条汇总备忘）
+            # 🔴 2026-09-18 小九：若该因子**曾登记为 P5 已接入因子**，必须在备忘里留痕
+            #   —— 否则主人只能看到「它消失了」，无法知道「它曾接入过、现已因复跑不达标而停用」。
+            #   这是「不要漂亮数据」的配套：从有到无的**变化本身**也要如实记录。
+            _was_p5 = WF_MAP.get(p["name"]) in P5_INTEGRATED
             retired.append({
                 "name": p["name"], "pool": p.get("pool", "?"),
                 "ir_oos": r.get("ir_oos"), "beat_base_rate": r.get("beat_base_rate"),
                 "top_win_avg": r.get("top_win_avg"), "base_win_avg": r.get("base_win_avg"),
                 "spread_oos_pct": r.get("spread_oos_pct"),
+                "was_p5_integrated": bool(_was_p5),
+                "p5_gate_note": (
+                    "⚠️ 本因子此前已接入 generate_top10.py :: P5 段，但本次复跑未过 P5 门槛"
+                    "（%s）⇒ 已自动停止加权，并从已接入清单移除。"
+                    % (_p5_on(WF_MAP.get(p["name"]), r)[1])) if _was_p5 else None,
             })
     progress = kept
     _n_int = sum(1 for _p2 in progress if _p2.get("deploy_status", "").startswith("✅ 已接入"))
@@ -334,9 +382,19 @@ def main():
             "walkforward_done": n_done_wf,
             "walkforward_retired": len(retired),
             # 🆕 2026-09-16：已真正接进 generate_top10.py :: P5 段的因子（可审计）
-            "walkforward_integrated": sorted(p2["name"] for p2 in progress
-                                             if p2.get("backtest_status") == "done"
-                                             and WF_MAP.get(p2["name"]) in P5_INTEGRATED),
+            # 🔴 2026-09-18：本清单必须与「P5 门控真实生效」一致 ——
+            #   原判据只看「是否登记在 P5_INTEGRATED」，不看最新 verdict ⇒ 会把
+            #   已 FAIL 的 turntrend 继续报成「已接入」（假报）。现改为运行期 _p5_on 门控。
+            "walkforward_integrated": sorted(
+                p2["name"] for p2 in progress
+                if p2.get("backtest_status") == "done"
+                and _p5_on(WF_MAP.get(p2["name"]), wf.get(WF_MAP.get(p2["name"])))[0]),
+            # 🆕 2026-09-18：曾登记为 P5 因子、但最新回测未过门槛 ⇒ 已自动停止加权（如实留痕）
+            "walkforward_p5_suspended": sorted(
+                p2["name"] for p2 in progress
+                if p2.get("backtest_status") == "done"
+                and WF_MAP.get(p2["name"]) in P5_INTEGRATED
+                and not _p5_on(WF_MAP.get(p2["name"]), wf.get(WF_MAP.get(p2["name"])))[0]),
             "integrated_into": "algorithms/generate_top10.py :: P5 段（候选池内分位前20%=+6 / 20~40%=+3）",
             "retired_by_backtest": retired,   # 不达标被删的条目（仅汇总备忘，不留 pending 遗体）
         },
