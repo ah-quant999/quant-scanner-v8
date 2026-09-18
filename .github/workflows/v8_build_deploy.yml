@@ -37,6 +37,10 @@ on:
       - 'guard_index_sections.py'
       - 'guard_v8_freshness.py'
       - 'v8_deploy_guard.py'
+      # 🛡 2026-09-18 盘中链首跑探活护栏（P1）：改本脚本也要触发部署，
+      #   否则脚本更新永远不生效（探活 step 挂在下方 intraday_patrol job）。
+      - '.github/scripts/guard_intraday_firstrun.py'
+      - '.github/scripts/guard_double_blind.py'
       - 'algorithms/**'
       - 'v8_postclose_guard.py'
       - 'data/.workbuddy/**'   # 自愈调度锁文件改动也会触发重新构建 HEALTH_CHECK.js
@@ -376,3 +380,56 @@ jobs:
             python guard_v6_memo.py
           done
           echo "❌ 3 次重试后仍失败"; exit 1
+
+
+  # ══════════════════════════════════════════════════════════════════════
+  # 🛡 盘中链首跑探活（P1 · 2026-09-18 主人令）
+  # ══════════════════════════════════════════════════════════════════════
+  # 事故：2026-09-18 09:2x 主人反馈「开盘了，实时数据还都是旧数据」。
+  #   取证（全部实测）：
+  #     ① 三条盘中链今日 run 数 = 0
+  #     ② 不是 cron 配置错、不是 runner 离线 —— 全仓今日 event 分布
+  #        dynamic 84 / workflow_dispatch 34 / push 16 / workflow_run 13 / schedule **仅 3**
+  #        ⇒ GitHub schedule 大面积哑火
+  #     ③ 现有守卫为何没拦住：v8_cn_fetch_watchdog 只有 schedule 入口 ⇒ 自身一起哑；
+  #        v8_health_patrol 的 schedule 部分也哑，仅靠 workflow_run 跑了 5 次。
+  #        ⇒ 教训：**任何以 schedule 为唯一入口的守卫，都会在 schedule 哑火时一起哑。**
+  #
+  # 本 job 的设计（逐条对齐上面教训）：
+  #   · 走 push / workflow_run / workflow_dispatch 三路，**不依赖 schedule**。
+  #   · 与 build job 互补：build 只在非盘中跑，本 job 只在盘中跑。
+  #   · 双判据：每链 = (今日有效 run 数 ≥ 1) AND (其绑定产物 age ≤ 阈值)。
+  #     只看 run 数会误报（他链兜底时数据其实健康）；只看数据陈旧会漏报（双盲区形态）。
+  #   · 识别假成功：run 顶层 conclusion=success 但工作 job 全 skipped
+  #     （实测 v8_algo_intraday_lite #178：gate=success + algo_track_lite=skipped）。
+  #   · 识别「设计上盘中不跑」：v8_algo_intraday_lite 有 trading 硬闸门 ⇒
+  #     用 morning_only 模式，只在 09:05-09:25 判「09:00 档是否派发」，出窗后不再误伤。
+  #   · 防雪崩：每链每日最多自动补派 1 次（锁文件落 runner 临时目录，不落仓防自激）。
+  #   · 永不阻断：任何异常 exit 0，调用处再包一层 `|| true`。
+  intraday_patrol:
+    needs: [gate]
+    # 🔴 与 build 严格互补：只在交易时段跑（build 是 != 'true'）
+    if: needs.gate.outputs.trading == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: write        # 自动补派需要 actions:write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: "🩺 状态机自检（不触网，8 例判定矩阵）"
+        # 先自检再探活：状态机逻辑倒挂比漏报更危险（会把真故障判成正常）
+        run: python .github/scripts/guard_intraday_firstrun.py --self-test
+
+      - name: "🔍 三条盘中链首跑探活（run 数 + 产物新鲜度 双判据）"
+        env:
+          # 优先用 admin PAT（有 actions:write，可自动补派）；
+          # 无该 secret 时脚本自动降级为「只报告」，不会失败
+          V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        # `|| true`：探活自身绝不阻断本工作流（它只负责告警/补派）
+        run: python .github/scripts/guard_intraday_firstrun.py --dispatch || true
