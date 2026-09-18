@@ -320,23 +320,6 @@ jobs:
       # 两步经 api_push_raw(Contents API) 自动上线——不再走 run_dividend_refresh.py 的本地 SSH 自推
       # （云端 runner 无 SSH 凭据，自推会失败）。cninfo 为境内源，云端偶发超时则 continue-on-error 跳过，
       # 由小九机「分红刷新」监督 automation 检测后作为应急兜底本地补跑。
-      - name: "💰 分红方案刷新（cninfo·云端主跑）"
-        id: soft_1
-        if: (steps.cat.outputs.category == 'premarket' || steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all') && steps.td.outputs.proceed != 'false'
-        continue-on-error: true
-        shell: bash
-        run: |
-          python algorithms/refresh_dividend_cninfo.py
-
-          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
-          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
-          #   同款静默失败（脚本崩了、job 全绿、无人知晓）。
-          _v8_rc=$?
-          if [ "$_v8_rc" != "0" ]; then
-            echo "::error title=v8-softfail:soft_1(exit=$_v8_rc)::💰 分红方案刷新（cninfo·云端主跑） 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
-            exit 1
-          fi
-
       # 🗑 2026-09-11 主人 P3（清理孤儿链）：原 soft_2「ETF 申购赎回（东财口径）」整步删除。
       #   原因：该链 fetcher 一直在跑、raw_data/etf_subscription_em.json 一直产出，
       #   但 update_v8.py 侧的注入映射早已被注释掉 → data/ETF_SUBSCRIPTION_EM.js 从不生成、
@@ -735,6 +718,47 @@ jobs:
       #   上面各消费步保留 continue-on-error（不阻断 job，尊重 2026-08-18 软失败策略），
       #   但每步失败已单独打 ::error:: annotation；这里再做一次集中汇总，
       #   让巡检一眼看到本轮有哪些软失败——而不是翻遍日志才发现问题。
+      # 🛡 2026-09-18 一劳永逸（主人令「今日事件页没更新」根因修复 · 小九的工程师）：
+      #   【事故】09-18 08:16 盘前轮 35290486459：step9 抓取 success（耗 23min）→
+      #     step10「💰 分红方案刷新」卡死 36min → job 级 timeout-minutes:60 撞死 →
+      #     step18/19/20/23/24（推送 raw_data / 桥接 / 重建 data/*.js / 推送 data /
+      #     原子提交 ?v）**全部 skipped** ⇒ 本批盘前数据整批报废。
+      #     后果具体化为：V8_CAL 与 IPO_DATA 只挂 category=premarket（无 intraday/post_close
+      #     兜底），当日再无人重跑 ⇒ 「今日事件详情」「打新速览」两张卡全日陈旧
+      #     （主人截图所报「今日事件页今天没更新」）。
+      #   【历史证据】该步单步耗时 17~39min（35200819678=2340s / 35232628293=1860s /
+      #     35197088557=1010s），而抓取步稳定耗 23min ⇒ **必然反复撞 60min 天花板**，
+      #     不是偶发，是结构性缺陷。
+      #   【修法】本步原位于「📤 推送 raw_data/」之前 —— 今整体**后移**到**整条推送/重建/上线链的最末尾**
+      #     （「📤 推送 raw_data」→「🔗 桥接」→「🔄 重生成 data/*.js」→「📤 推送 data」→「🛡️ 原子提交 ?v」之后），
+      #     并加步级 timeout-minutes:20 硬超时（脚本内另有 900s 预算闸门，双保险）。
+      #     ⇒ 即便本步再次超时，也只影响分红数据本身，推送链/重建链/上线链一律不受牵连。
+      #     ⇒ 「fail-soft 步骤绝不允许排在关键推送之前」这条铁律在此落地。
+      #   【为何必须放到"最末"而非"仅推送 raw_data 之后"】核验实测：推送类步骤共 3 个 ——
+      #     「📤 推送 raw_data」(pos13) /「📤 推送重建的 data/*.js」(pos20) /
+      #     「🛡️ 原子提交 index.html ?v」(pos21)。若只后移到 pos14，仍挡在 pos20/21 之前，
+      #     一旦 hang 则 data/*.js 与 ?v 依旧上不了线 —— 主人的卡照样陈旧（因为
+      #     data/V8_CAL.js 重建完却推不出去）。⇒ 正确位置 = 全部推送动作之后。
+      - name: "💰 分红方案刷新（cninfo·云端主跑）"
+        id: soft_1
+        if: (steps.cat.outputs.category == 'premarket' || steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all') && steps.td.outputs.proceed != 'false'
+        continue-on-error: true
+        timeout-minutes: 20
+        shell: bash
+        run: |
+          # 🛡 2026-09-18：脚本内置 900s 总时长预算闸门（到点优雅落盘已刷部分，
+          #   保证早于步级 20min 超时退出）；此处再传 --budget 显式覆盖，双保险。
+          python algorithms/refresh_dividend_cninfo.py --budget=900
+
+          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
+          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
+          #   同款静默失败（脚本崩了、job 全绿、无人知晓）。
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:soft_1(exit=$_v8_rc)::💰 分红方案刷新（cninfo·云端主跑） 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
+
       - name: "📢 软失败汇总告警（不阻断 job，但强制 annotation）"
         if: always()
         shell: bash
