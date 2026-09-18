@@ -3490,7 +3490,7 @@ function fmtSigned(v){
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">📅 机游共振日历 ' + window._rcDataDateBadge() + '</span>';
+    h += '<span class="cal-title">📅 机游共振日历 ' + window._rcDataDateBadge() + (window._uBadge ? window._uBadge('盘后','短线',updateTime) : '') + '</span>';
     h += '<span class="cal-meta">'
        + '<button class="cal-nav-btn" onclick="_jyCalPrev()" title="上个月">◀</button>'
        + ' <span id="jyCalYearMonth">' + year + '年' + (month+1) + '月</span> '
@@ -3928,7 +3928,7 @@ function fmtSigned(v){
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + window._rcDataDateBadge() + '</span>';
+    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + window._rcDataDateBadge() + (window._uBadge ? window._uBadge('盘后','短线',(window.LHB_DATA && window.LHB_DATA.update_time) || NF.update_time) : '') + '</span>';
     h += '<span class="cal-meta">'
        + '<button class="cal-nav-btn" onclick="_northCalPrev()" title="上个月">◀</button>'
        + ' <span id="northCalYearMonth">' + year + '年' + (month+1) + '月</span> '
