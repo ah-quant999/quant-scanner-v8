@@ -84,7 +84,15 @@ CARD_DEFS = [
     #   按既有 manual_dep 范式登记（同 UNLISTED_PANEL）：超阈值降级为 limited（🔒 受限可用），
     #   面板显示「等外部策展」而非「陈旧」，自愈链也不会做永远无效的派发。
     #   ⚠️ 只登记这一个事件驱动卡，不放松任何算法产物的红线。
-    {"id": "MACRO_KSHAPE", "name": "宏观K型分层", "page": "暂未上架·观测类", "freq": "事件驱动(每日巡检)", "max_age": 10080, "key_fields": ["data_point"], "manual_dep": True, "producer": "沧海一土狗文章巡检自动化（每日 21:00）", "manual_note": "2026-09-15 19:27 ae30ea7a1 起改为事件驱动 daily poll（提交原文：convert to event-driven daily poll / stop monthly automation）：由「沧海一土狗文章巡检」自动化按日巡视，发现新文才刷新，无新文保持上次策展值；非算法产物。"},
+    {"id": "MACRO_KSHAPE", "name": "宏观K型分层", "page": "暂未上架·观测类", "freq": "事件驱动(每日巡检)", "max_age": 10080, "key_fields": ["data_point"], "manual_dep": True, "producer": "沧海一土狗文章巡检自动化（每日 21:00）", "manual_note": "事件驱动 · 无自动刷新（非故障）：2026-09-15 19:27 ae30ea7a1 起由「沧海一土狗文章巡检」自动化按日巡视，发现新文才刷新，无新文保持上次策展值；非算法产物。"},
+    # 🛡 2026-09-18 一劳永逸（阿狸咪的工程师 · 补监控盲区）：
+    #   此前「新周期判定」卡的巡检只有 all_BAIHECHOU_MACRO，它读顶层 update_time = **原文抓取时刻**，
+    #   于是 09-18 实测盲区成立：原文 09:14 新鲜（ok ✅）而 AI 解析停在 09-17 06:38（断链 🔴），
+    #   巡检**全程零告警**。与「BACKTEST_TDX 双盲区」同型（判据：有产物 ≠ 有当期内容）。
+    #   本项独立校验解析文件（window.BAIHECHOU_ANALYSIS，顶层 update_time = 解析出稿时刻）。
+    #   日频 06:30 主跑 / 08:30 兜底 ⇒ 1560min（26h）红线留足跨夜与兜底重试余量。
+    {"id": "BAIHECHOU_ANALYSIS", "name": "新周期判定·AI解析", "page": "暂未上架·观测类", "freq": "工作日盘前(06:30 主跑/08:30 兜底)", "max_age": 1560, "key_fields": ["verdict", "sections", "generated_at"], "weekend_update": False},
+
     # 实时数据
     {"id": "INDEX_QUOTES", "name": "全球指数 / 股指期货", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["items"]},
     {"id": "ETF_PULSE", "name": "ETF 盘中异动", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["etfs"]},
@@ -224,7 +232,15 @@ CARD_DEFS = [
     # · UNLISTED_PANEL  ← data/UNLISTED_PANEL.js  注入 window.UNLISTED_PANEL（暂未上架模块去向索引）
     # · AVG_PRICE_DATA  ← data/AVG_PRICE_DATA.js  注入 window.AVG_PRICE_DATA（通达信880003 平均股价）
 
-    {"id": "UNLISTED_PANEL", "name": "暂未上架模块索引", "page": "运维", "freq": "手动策划", "max_age": 10080, "key_fields": ["modules", "meta"], "_window_var": "UNLISTED_PANEL", "heal_cat": "algo_run", "manual_dep": True, "manual_note": "由 scripts/build_unlisted_panel.py 手动生成（AI 策划实验模块去向，主人推送）"},
+    # 🛡 2026-09-18 一劳永逸（阿狸咪的工程师 · 修「灰灯文案不明」）：
+    #   原写法两处不妥 ——
+    #   ① heal_cat="algo_run" 是**误配**：手动策划的静态索引挂「算法链自愈」= 无意义派发
+    #      （algo_run 跑完也不会重新策划模块去向）。已删除该键，与本项「非自动产出」的
+    #      真实性质对齐（同族 MACRO_KSHAPE 就未设 heal_cat）。
+    #   ② 文案只说「手动生成」，主人看图仍疑「是不是坏了」。改为**前置性质声明**
+    #      「静态索引 · 无自动刷新」+ 快照日期，与前端同卡徽章（index.html 15921 行
+    #      「📋 静态索引 · 无自动刷新」）口径一致 —— 同一事实两处不同说法本身就是矛盾源。
+    {"id": "UNLISTED_PANEL", "name": "暂未上架模块索引", "page": "运维", "freq": "手动策划", "max_age": 10080, "key_fields": ["modules", "meta"], "_window_var": "UNLISTED_PANEL", "manual_dep": True, "manual_note": "静态索引 · 无自动刷新（非故障）：模块去向由主人拍板，内容变更才由 scripts/build_unlisted_panel.py 手动重建；快照 2026-09-06"},
     # 🛡 2026-08-31 一劳永逸（主人「运维还有失败亮黄灯」令）：
     #   position_vs_ma20 / position_vs_ma60 在 history 累积满 20 / 60 个交易日之前
     #   【按设计】就是 None（数据层刻意不给假水位，见 cloud_fetch_v8.f_avg_price 注释），
@@ -1784,6 +1800,16 @@ def check_data_cards():
         intentional_empty = data.get("available") is False
         if not weekend_skip and not prem_cleared_expected and not intentional_empty:
             for f in d["key_fields"]:
+                # 🛡 2026-09-18 一劳永逸（阿狸咪的工程师 · 修「平均股价」常年黄灯）：
+                #   数据自带就绪标志时以它为准 —— key_fields 含 f 且 data 里存在 f + "_ready"
+                #   且其为 False，即「该字段数学上尚不可算」（如均值窗口未满），属**合法空值**，
+                #   不是缺数。实测证据：data/AVG_PRICE_DATA.js 里 ma20=null / ma60=null 同时
+                #   ma20_ready=false / ma60_ready=false / history_days=15（< 20）⇒ 前端本就显示
+                #   「⏳ 均线积累中 15/20 日」的未就绪态，而后端却报「关键字段空值：ma20, ma60」
+                #   黄灯 ⇒ 伪告警（运维页常年黄灯）。
+                #   通用机制（不特判单卡）：任何卡只要提供 <字段>_ready 即自动受此保护。
+                if f + "_ready" in data and data.get(f + "_ready") is False:
+                    continue
                 v = data.get(f)
                 # 🔴 2026-08-17 一劳永逸修复：原 line 944 把 v == [] 当"空值"会误报
                 # 三重共识 0 只 = 弱市真实状态（不是"空值"！），扫到的 stocks=[] 应该算合法

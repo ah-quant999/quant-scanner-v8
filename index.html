@@ -659,7 +659,15 @@ window.__domReadyFns=[];
          故删此行零功能损失。若日后云端产出 maharo_macro.js，恢复本行即可。 -->
     <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20260911） -->
     <script src="data/maharo_insights.js?v=20260910" defer></script>
-    <script src="data/BAIHECHOU_MACRO.js?v=1789731101" defer></script><!-- 🌐 新周期判定 · 海外宏观 + AI 大周期（数据源：雪球 @白河愁博士；工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿 · window.BAIHECHOU_MACRO） -->
+    <script src="data/BAIHECHOU_MACRO.js?v=1789731101" defer></script>
+    <!-- 🛡 2026-09-18 一劳永逸（阿狸咪的工程师）：AI 解析拆成独立文件 data/BAIHECHOU_ANALYSIS.js
+         （window.BAIHECHOU_ANALYSIS），与每日重抓的 window.BAIHECHOU_MACRO **解耦**。
+         根因实测：09-18 06:31 本机推送的当期解析（7fd2ac048f，17334 B）被 09:16 一次
+         「data: 白河愁每日更新」整文件覆盖（c4fc6e3b0e，17164 B，解析回退到 09-17）——
+         该抓取方用自己陈旧的本地副本做基线（fetch_baihechou_v8.load_existing_analysis
+         从本地文件救 analysis），抓新原文后整文件覆盖。解析独立成文件后，抓取方无论
+         本地多旧都不可能再覆盖它（同 data/maharo_insights.js 范式，2026-09-10 已验证）。 -->
+    <script src="data/BAIHECHOU_ANALYSIS.js?v=1789731101" defer></script><!-- 🌐 新周期判定 · 海外宏观 + AI 大周期（数据源：雪球 @白河愁博士；工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿 · window.BAIHECHOU_MACRO） -->
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=1789731101" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
@@ -14952,7 +14960,9 @@ h += '</div>'; // /ulPaneObserve
       host.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F30D; 新周期判定 · 海外宏观 + AI 大周期 原文暂未抓取（工作日盘前 06:30 自动任务 · 失败 08:30 兜底）</div>';
       return;
     }
-    var p = d.profile || {}, st = d.stats || {}, ana = d.analysis || {};
+    // 🛡 2026-09-18 一劳永逸：解析优先取独立文件 window.BAIHECHOU_ANALYSIS（防被重抓方覆盖回退），
+    //   缺失时回退 d.analysis（向后兼容，老产物照常渲染）。
+    var p = d.profile || {}, st = d.stats || {}, ana = window.BAIHECHOU_ANALYSIS || d.analysis || {};
     var secs = (ana.sections && ana.sections.length) ? ana.sections : [];
     var posts = d.posts || [], replies = d.replies || [];
     var ACC = '#60a5fa', RGB = '96,165,250', ORG = '#fbbf24';
