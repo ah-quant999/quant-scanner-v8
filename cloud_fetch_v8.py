@@ -85,6 +85,10 @@ VAR_TO_RAW = {
     "OVERSEAS_MARKETS": "overseas_markets.json",
     "RESTRICTED_RELEASE": "restricted_release.json",
     "PERFORMANCE_FORECAST": "performance_forecast.json",
+    # 🆕 2026-09-19 主人令：「隔夜美股强势 → A股/港股 映射」观测卡。
+    #   生成器 scripts/fetch_us_hk_map.py（前缀运行时发现 + 名称一致性闸门）。
+    #   ⚠️ 本表必须登记：否则 save() 取不到 fname 会直接 return，raw 永不落盘。
+    "US_HK_MAP": "us_hk_map.json",
     "AVG_PRICE_DATA": "avg_price_data.json",
     # 2026-09-18：880003 主口径（真 MA + 历史回填）。本函数自写合并结果，
     # 但登记项必须存在，否则 run() 的状态记录与 save() 的兜底路径会静默失效。
@@ -163,6 +167,13 @@ CATEGORY_MAP = {
     #   加 post_close，使盘后档(17:20/18:20/19:20)必定重抓，与页面语义对齐。
     "RESTRICTED_RELEASE": "premarket,post_close",
     "PERFORMANCE_FORECAST": "premarket,post_close",
+    # 🆕 2026-09-19 主人令：「隔夜美股强势 → A股/港股 映射」——只挂 premarket 单档。
+    #   ① 语义天然对齐：08:25 抓取时美东上一交易日已收盘 ⇒ 拿到的就是「隔夜」收盘，
+    #      update_v8.py 侧 CATEGORY_MAP 同步登记 premarket（两表必须同档）。
+    #   ② 必要且充分：主人令「每日盘前必须更新完成」；盘中/盘后美股休市或数据未更新，
+    #      重抓无新信息，只会白耗 20 分钟一轮的抓取预算。
+    #   🔴 禁止挂 intraday —— 会把「隔夜」卡刷成盘中语义，违反卡片时区口径铁律。
+    "US_HK_MAP": "premarket",
 }
 
 _ak = None
@@ -1468,6 +1479,32 @@ def f_overseas_markets():
         "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
         "auto": True,
     }
+
+
+def f_us_hk_map():
+    """隔夜美股强势标的 → A股/港股 映射（注册于 US_HK_MAP → premarket，08:25 盘前单档）。
+
+    · 时区口径：08:25 抓取时美东上一交易日已收盘 ⇒ 本卡是「隔夜」语义，
+      前端与文案**禁止**写成「实时 / 今日」。
+    · 数据源：东财延迟镜像 push2delay（与报价同日同源），一次点名即取全多周期动量；
+      隔夜交易日按 America/New_York 换算（用 CST 取日期会把 09-18 收盘误标成 09-19）。
+    · 明细逻辑在 scripts/fetch_us_hk_map.py：交易所前缀运行时发现（禁硬编码）+ 映射对
+      名称一致性闸门（US 东财名 × HK 腾讯独立源名，不符即整对剔除、计入 gate 统计）。
+    · 返回 None 时由 run() 走重试；本函数不抛异常，避免单个数据源打挂整轮 job。
+    """
+    import importlib.util as _ilu
+    _p = ROOT / "scripts" / "fetch_us_hk_map.py"
+    if not _p.exists():
+        print("  ⚠️ US_HK_MAP: 生成器缺失 %s" % _p)
+        return None
+    try:
+        _spec = _ilu.spec_from_file_location("_v8_us_hk_map", str(_p))
+        _mod = _ilu.module_from_spec(_spec)
+        _spec.loader.exec_module(_mod)
+        return _mod.build()
+    except Exception as _e:  # noqa: BLE001
+        print("  ⚠️ US_HK_MAP: 生成器执行异常 %s" % _e)
+        return None
 
 
 def run(label, fn, retries=2):
@@ -4355,6 +4392,7 @@ def main(category=None, only=None):
         # 2026-08-30：盘后数据页新增
         ("RESTRICTED_RELEASE", f_restricted_release),
         ("PERFORMANCE_FORECAST", f_performance_forecast),
+        ("US_HK_MAP", f_us_hk_map),   # 🆕 2026-09-19 隔夜美股强势 → A股/港股 映射
     ]
 
     def f_four_volume():

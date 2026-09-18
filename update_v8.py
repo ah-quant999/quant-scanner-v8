@@ -190,6 +190,11 @@ DATA_SOURCES = {
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告
     "restricted_release.json":    "RESTRICTED_RELEASE",
     "performance_forecast.json":  "PERFORMANCE_FORECAST",
+    # 🆕 2026-09-19 主人令：「隔夜美股强势 → A股/港股 映射」观测卡。
+    #   raw_data/us_hk_map.json 由 cloud_fetch_v8.py 的 f_us_hk_map() 盘前(08:25)产出；
+    #   ⚠️ 本表必须登记：否则 update_v8 永不生成 data/US_HK_MAP.js —— 与 2026-08-18 的
+    #   overseas_markets.json 漏挂属同一类「raw 已新、js 永旧」半截更新事故。
+    "us_hk_map.json":             "US_HK_MAP",
 }
 
 # 🆕 2026-09-05 主人令一劳永逸：运维看板全量覆盖 + 审计轨迹
@@ -338,6 +343,11 @@ CATEGORY_MAP = {
     #   注释写着「盘后数据页」却只在盘前重建 data/*.js —— 盘后重抓了 raw 却不重生成 js，半截更新。
     "RESTRICTED_RELEASE": "premarket,post_close",
     "PERFORMANCE_FORECAST": "premarket,post_close",
+    # 🆕 2026-09-19 主人令：「隔夜美股强势 → A股/港股 映射」。
+    #   ⚠️ 必须与 cloud_fetch_v8.py 侧同档（两处均为 premarket 单档）：
+    #   抓取侧挂 A 档、注入侧挂 B 档 = 「raw 已新、data/*.js 不重建」的半截更新。
+    #   只挂 premarket 的理由见 cloud_fetch_v8.py 同条注释（隔夜语义 + 不耗盘中预算）。
+    "US_HK_MAP": "premarket",
 }
 
 CATEGORY_LABEL = {

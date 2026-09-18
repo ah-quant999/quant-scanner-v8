@@ -110,8 +110,16 @@ def check_data_integrity():
         return (False, "data/ 目录不存在")
     js = list(data_dir.glob("*.js"))
     n = len(js)
-    if n < 90 or n > 110:
-        return (False, f"data/*.js 数量={n} 超出合理范围 [90,110]")
+    # 🔴 2026-09-19 阿狸咪的工程师（结构性拦路石根治）
+    #   原上界硬卡 110，而远端实测 data/*.js 根级已达 110（09-14=105 → 09-19=110，5 天 +5）
+    #   ⇒ 任何新卡片产出 data/*.js 都会立刻打挂本门禁，并阻断 v8_build_deploy.yml 与
+    #     v8_cn_fetch_cloud.yml 的整条部署链（两处都调用本脚本）。
+    #   「上界」只用于探测异常暴增，不是容量规划；「下界 90」才是本门禁的真正防线
+    #   （防坚果云同步层误删导致空白部署），故下界保持不动，上界给 20 个卡位余量。
+    #   提为具名常量：原先两个数字写在错误字符串里，调零散易漏改。
+    DATA_JS_MIN, DATA_JS_MAX = 90, 130
+    if n < DATA_JS_MIN or n > DATA_JS_MAX:
+        return (False, f"data/*.js 数量={n} 超出合理范围 [{DATA_JS_MIN},{DATA_JS_MAX}]")
     # 健康文件最小字节
     too_small = [p.name for p in js if p.stat().st_size < 100]
     if too_small:

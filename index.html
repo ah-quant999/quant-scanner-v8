@@ -644,6 +644,10 @@ window.__domReadyFns=[];
     <script src="data/CRISIS_DATA.js?v=1789768340" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=1789768340" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=1789768340" defer></script>
+<!-- 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测卡）。
+     数据由 cloud_fetch_v8.py::f_us_hk_map() 盘前 08:25 单档生成 → raw_data/us_hk_map.json
+     → update_v8.py → data/US_HK_MAP.js（window.US_HK_MAP）。此处漏注入 = 死块（恒 undefined）。 -->
+<script src="data/US_HK_MAP.js?v=1789768340" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
     <script src="data/H_AUTO_BUY.js?v=1789768340" defer></script>
@@ -14886,6 +14890,157 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
      ③ index.html 补 <script src="data/SECTOR_LEADERS.js?v=1789768340"> 注入。
    口径：主升=5日>3%且20日>5%；启动=5日>1.5%且20日>-8%（与「板块资金趋势」卡/生成器 _phase_of 三处同规则）。
    ⚠️ 护栏：无数据 ⇒ 卡保持 display:none（不产出空壳卡）；body.innerHTML 幂等重渲（重复调用不叠加）。 */
+  /* ═══ 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射 · 填充函数 ═══
+     宿主：暂未上架 > 📡 观测类 #usHkMapCard（紧随「主升/启动 板块·龙头股」之后）
+     数据链：cloud_fetch_v8.py::f_us_hk_map()（CATEGORY_MAP = premarket 单档，08:25 盘前）
+             → raw_data/us_hk_map.json → update_v8.py → data/US_HK_MAP.js → window.US_HK_MAP
+     口径铁律：本卡是「隔夜」——美东最近一个交易日收盘。**禁止**写成「实时 / 今日」，
+             也**禁止**把它挂到 intraday 档（会把隔夜语义刷成盘中语义）。
+     映射分级：中概 ADR ↔ 港股 = 同一公司（已过双侧名称闸门，gen 侧剔除不符者）；
+             美股 ETF → A/港股/指数 = 同类主题对位，非完全同标的 ⇒ 卡内如实标注。
+     护栏：无数据 ⇒ 整卡 display:none（不产空壳）+ 600ms×30 自愈轮询补渲（与
+           _fillSectorLeaders / _fillEtfMap 同范式，覆盖 defer 脚本加载窗口）。 */
+  window._fillUsHkMap = function(){
+    try{
+      var card = document.getElementById('usHkMapCard');
+      var body = document.getElementById('usHkMapBody');
+      if(!card || !body) return;
+      var d = window.US_HK_MAP || null;
+      if(!d || !(d.items && d.items.length)){
+        if(!window.__uhkRetryTimer){
+          window.__uhkRetryN = 0;
+          window.__uhkRetryTimer = setInterval(function(){
+            window.__uhkRetryN++;
+            var r2 = window.US_HK_MAP;
+            if(r2 && r2.items && r2.items.length){
+              clearInterval(window.__uhkRetryTimer); window.__uhkRetryTimer = null; window.__uhkRetryN = 0;
+              try{ window._fillUsHkMap(); }catch(e){}
+            } else if(window.__uhkRetryN > 30){
+              clearInterval(window.__uhkRetryTimer); window.__uhkRetryTimer = null; window.__uhkRetryN = 0;
+            }
+          }, 600);
+        }
+        return;
+      }
+      if(window.__uhkRetryTimer){ clearInterval(window.__uhkRetryTimer); window.__uhkRetryTimer = null; window.__uhkRetryN = 0; }
+
+      var _esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+      var _pct = function(v){ if(v == null || isNaN(v)) return '—'; var n = Number(v); return (n > 0 ? '+' : '') + n.toFixed(2) + '%'; };
+      var _col = function(v){ if(v == null || isNaN(v)) return 'var(--dim)'; var n = Number(v); return n > 0 ? 'var(--up)' : (n < 0 ? 'var(--down)' : 'var(--sub)'); };
+      var TAG_C = {'强势':'#f4495d','短期反弹':'#fbbf24','中期强·短期回调':'#38bdf8','弱势':'#5f7099','无数据':'#5f7099'};
+      var h = '';
+
+      /* ── ① 隔夜大盘锚（三大指数，显式 secid 取，非探测）── */
+      var ai = d.us_indices || [];
+      if(ai.length){
+        h += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 11px;margin-bottom:10px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.25);border-radius:7px;font-size:12.5px;">';
+        h += '<span style="color:#a78bfa;font-weight:700;">&#x1F6F0; 隔夜美股大盘</span>';
+        ai.forEach(function(a){
+          h += '<span style="color:var(--sub);">' + _esc(a.name)
+             + ' <b style="color:' + _col(a.pct) + ';">' + _pct(a.pct) + '</b>'
+             + (a.price == null ? '' : ' <span style="color:var(--dim);">' + Number(a.price).toFixed(2) + '</span>')
+             + '</span>';
+        });
+        var _bc = (String(d.bias || '').indexOf('偏强') >= 0) ? 'var(--up)'
+                : ((String(d.bias || '').indexOf('偏弱') >= 0) ? 'var(--down)' : 'var(--sub)');
+        h += '<span style="margin-left:auto;font-weight:700;color:' + _bc + ';">' + _esc(d.bias || '') + '</span>';
+        h += '</div>';
+      }
+
+      /* ── ② 分组表（ADR / ETF 两类映射分开列，避免口径混淆）── */
+      var items = d.items || [];
+      var GROUPS = [
+        { k:'ADR', t:'&#x1F1E8;&#x1F1F3; 中概 ADR 强势 → 港股同标的', s:'同一家公司两地上市（已过双侧中文名闸门）' },
+        { k:'ETF', t:'&#x1F4E6; 美股 ETF 强势 → A股 / 港股 / 指数', s:'同类主题对位（非完全同标的）' }
+      ];
+      var DEF_ROWS = 10;
+      var _rows = function(list){
+        var o = '';
+        list.forEach(function(x){
+          var m = x.mom || {};
+          var tc = TAG_C[x.tag] || 'var(--sub)';
+          o += '<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px dashed var(--border);font-size:12.5px;flex-wrap:wrap;">'
+             + '<span style="font-weight:700;color:var(--txt);min-width:56px;">' + _esc(x.us) + '</span>'
+             + '<span style="color:var(--sub);min-width:112px;flex:0 1 auto;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + _esc(x.us_name) + '">' + _esc(x.us_name) + '</span>'
+             + '<span style="color:' + _col(m.d5) + ';font-weight:700;min-width:72px;">5日 ' + _pct(m.d5) + '</span>'
+             + '<span style="color:' + _col(m.d20) + ';min-width:72px;">20日 ' + _pct(m.d20) + '</span>'
+             + '<span style="color:' + _col(m.d60) + ';min-width:72px;">60日 ' + _pct(m.d60) + '</span>'
+             + '<span style="font-size:10px;background:rgba(255,255,255,.06);color:' + tc + ';padding:1px 6px;border-radius:4px;">' + _esc(x.tag || '') + '</span>';
+          if(x.inverse){
+            o += '<span style="font-size:10px;background:rgba(251,191,36,.15);color:#fbbf24;padding:1px 6px;border-radius:4px;" title="做空/反向 ETF：其涨幅高代表对应中国/主题资产走弱，方向与右侧映射标的**相反**">反向 &#183; 方向相反</span>';
+          }
+          o += '<span style="margin-left:auto;color:var(--cyan);font-weight:600;">&#x2192; ';
+          o += (x.targets || []).map(function(t){
+                 return '<span style="white-space:nowrap;">' + _esc(t.label) + ' <b>' + _esc(t.code) + '</b> <span style="color:var(--sub);font-weight:400;">' + _esc(t.name) + '</span></span>';
+               }).join('<span style="color:var(--dim);"> | </span>');
+          o += '</span></div>';
+        });
+        return o;
+      };
+      GROUPS.forEach(function(g, gi){
+        var arr = items.filter(function(x){ return x.kind === g.k; });
+        if(!arr.length) return;
+        var up = arr.filter(function(x){ return x.mom && x.mom.d5 != null && Number(x.mom.d5) > 0 && !x.inverse; });
+        var other = arr.filter(function(x){ return up.indexOf(x) < 0; });
+        var head = up.slice(0, DEF_ROWS);
+        var rest = up.slice(DEF_ROWS).concat(other);
+        var gid = 'uhkG' + gi;
+        h += '<div style="margin-top:' + (gi ? '14px' : '0') + ';">';
+        h += '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:2px;">'
+           + '<span style="font-size:13px;font-weight:700;color:var(--txt);">' + g.t + '</span>'
+           + '<span style="font-size:11px;color:var(--dim);">' + g.s + ' &#183; 共 ' + arr.length + ' 项，其中 5 日上涨 <b style="color:var(--up);">' + up.length + '</b> 项</span></div>';
+        if(!head.length){
+          h += '<div class="note" style="padding:10px;color:var(--dim);">本组本次无「5 日上涨」标的（整组走弱），详见下方展开区</div>';
+        } else {
+          h += _rows(head);
+        }
+        if(rest.length){
+          h += '<div id="' + gid + '" style="display:none;">' + _rows(rest) + '</div>';
+          h += '<div class="uhk-toggle" data-t="' + gid + '" data-lbl="展开其余 ' + rest.length + ' 项（含走弱标的）" '
+             + 'style="cursor:pointer;font-size:11.5px;color:var(--cyan);padding:6px 0;user-select:none;">&#x25BC; 展开其余 ' + rest.length + ' 项（含走弱标的）</div>';
+        }
+        h += '</div>';
+      });
+
+      /* ── ③ 口径 / 闸门对账 / 免责（每卡必带，可一眼验真）── */
+      var gt = d.gate || {};
+      var dm = ((gt.target_missing || []).length);
+      h += '<div style="font-size:10.5px;color:var(--dim);line-height:1.75;margin-top:12px;border-top:1px dashed var(--border);padding-top:8px;">'
+         + '&#x1F517; <b>口径</b>：本卡为 <b style="color:var(--sub);">隔夜</b> 口径 —— 数据为美东 '
+         + _esc(d.data_date || '&#8212;') + ' 收盘（北京时间 08:25 盘前抓取，此时美股已收盘，故非实时、非今日）；排序 = '
+         + _esc(d.sort_rule || '5 日涨幅降序') + '。<br>'
+         + '&#x1F6E1; <b>闸门</b>：中概映射对 ' + (gt.adr_ok || 0) + '/' + (gt.adr_pairs || 0)
+         + ' 通过「美股中文名 &#215; 港股中文名（腾讯独立源）」一致性校验；ETF 对位 ' + (gt.etf_ok || 0) + '/' + (gt.etf_pairs || 0)
+         + '，映射目标未取到 ' + dm + ' 项。名称不符者整对剔除，不静默降级。<br>'
+         + '&#x26A0;&#xFE0F; ETF &#8594; A/港股为同类主题对位（非完全同标的）；ADR &#8596; 港股为同一公司，但两地价差与流动性不同。'
+         + '<b style="color:#fbbf24;">仅供盘前风险偏好参考，不构成投资建议。</b></div>';
+
+      body.innerHTML = h;
+      card.style.display = 'block';
+
+      var fb = document.getElementById('usHkFresh');
+      if(fb){
+        var ts = d.update_time || '';
+        if(typeof _uBadge === 'function'){ try{ fb.innerHTML = _uBadge('auto', '隔夜', ts); }catch(e2){ fb.textContent = ts; } }
+        else { fb.textContent = ts; }
+      }
+      /* 折叠交互：只挂一次（事件委托，重渲不叠加） */
+      if(!window.__uhkToggleInited){
+        window.__uhkToggleInited = true;
+        document.addEventListener('click', function(e){
+          var tg = (e.target && e.target.closest) ? e.target.closest('.uhk-toggle') : null;
+          if(!tg) return;
+          var box = document.getElementById(tg.getAttribute('data-t'));
+          if(!box) return;
+          var isOpen = (box.style.display !== 'none');
+          box.style.display = isOpen ? 'none' : 'block';
+          var lbl = tg.getAttribute('data-lbl') || '';
+          tg.innerHTML = isOpen ? ('&#x25BC; ' + lbl) : '&#x25B2; 收起';
+        });
+      }
+    }catch(e){ console.warn('隔夜美股映射卡渲染失败', e); }
+  };
+
   window._fillSectorLeaders = function(){
     /* ═══ 🎯 2026-09-19 主人令·单一真源重写（旧版见 git 历史）═══
        旧版直接从 window.SECTOR_LEADERS 读板块清单与 phase/pct_5d/pct_20d ⇒ 与「板块资金趋势」卡
@@ -15195,6 +15350,22 @@ h += '<div class="card" id="sectorLeadersCard" style="display:none;margin-bottom
 
 h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+// ═══ 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测类第 2 卡）═══
+//   需求原话：「没错就是隔夜的，我只要近期涨幅好的个股或者ETF映射到A港股的就够了。
+//             每日盘前必须更新完成，任务设置好。」
+//   位置：暂未上架 > 📡 观测类，紧随「🚀 主升/启动 板块·龙头股」（观测类首卡）之后。
+//   数据 window.US_HK_MAP（data/US_HK_MAP.js ← cloud_fetch_v8.py::f_us_hk_map()，
+//         盘前 08:25 单档生成；生成器 scripts/fetch_us_hk_map.py）。
+//   无数据 ⇒ 整卡保持 display:none（不产出空壳卡）；填充见 window._fillUsHkMap（600ms×30 自愈）。
+h += '<div class="card" id="usHkMapCard" style="display:none;margin-bottom:16px;border-left:4px solid #a78bfa;">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+   + '<span style="font-size:15px;font-weight:700;color:#a78bfa;">&#x1F319; 隔夜美股强势 &#183; 映射 A/港股</span>'
+   + '<span class="fresh" id="usHkFresh">&#x2014;</span>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 隔夜口径（美东收盘，非实时）</span></div>'
+   + '<div id="usHkMapBody"><div class="note">加载中&#x2026;</div></div></div>';
+
+h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#38bdf8;">&#x1F4CC; 概念/行业 &#x2192; ETF·龙头 参考</span>'
    + '<span class="fresh" id="prEtfFresh">&#x2014;</span>'
    + '<span style="font-size:12px;color:var(--dim);">观测类 · 板块/行业映射</span></div>'
@@ -15269,6 +15440,9 @@ h += '</div>'; // /ulPaneObserve
     // ═══ 2026-09-02 主人令：暂未上架 = 调试专区原 3 张卡平铺（AI预测/潜力挖掘/ETF龙头参考）══
     // 🛡 2026-09-02 主人令：ETF·龙头参考 抽为独立函数 + 自愈重试（原内联，defer 未就绪即永久空卡）
     window._fillEtfMap();
+    /* 🌙 2026-09-19：隔夜美股强势 → A股/港股 映射卡派发（与 _fillEtfMap 同在 renderUnlisted
+       尾部，覆盖首渲即可触发；defer 数据未到时由 _fillUsHkMap 内部 600ms×30 自愈轮询补渲）。 */
+    window._fillUsHkMap();
     try{ if(typeof window.__renderNewCycleJudge==='function') window.__renderNewCycleJudge(); }catch(e){}
     // 2026-09-12 搬迁收口：因子实验室 / 中信PE回测 / 指数估值中枢 /
     //   因子审计 / 因子补缺进度 / maharo 机构研究 共 7 卡的容器已迁出本页，
