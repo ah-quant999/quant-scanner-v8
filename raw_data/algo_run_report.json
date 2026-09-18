@@ -1,13 +1,8 @@
 {
-  "update_time": "2026-09-19 03:19:47",
-  "run_start": "2026-09-19 02:18:20",
-  "ok": 26,
-  "fail": 1,
-  "failed_scripts": [
-    {
-      "script": "refresh_stock_metadata.py",
-      "reason": "超时 >30min"
-    }
-  ],
+  "update_time": "2026-09-19 04:30:54",
+  "run_start": "2026-09-19 04:20:43",
+  "ok": 1,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }

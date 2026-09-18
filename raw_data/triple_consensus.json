@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-19 02:33:05",
+  "update_time": "2026-09-19 04:20:43",
   "data_time": "2026-09-19 02:24:43",
   "count": 2,
   "near_miss_count": 8,
@@ -30,13 +30,13 @@
       },
       "sectors": [
         "计算机、通信和其他电子设备制造业",
-        "2026中报预增",
         "AI手机",
-        "AI眼镜",
-        "深证100R",
         "MSCI中国",
-        "小米汽车",
-        "信创"
+        "2026中报预增",
+        "AI眼镜",
+        "信创",
+        "深证100R",
+        "小米汽车"
       ],
       "fund_detail": "",
       "sector_detail": "国产芯片+229.9亿",
@@ -93,14 +93,14 @@
         "form_A": false
       },
       "sectors": [
-        "2026中报预增",
-        "HS300",
-        "上证180",
         "周期股",
+        "HS300",
+        "电气机械和器材制造业",
         "MSCI中国",
+        "上证180",
         "沪股通",
-        "2026一季报预增",
-        "电气机械和器材制造业"
+        "2026中报预增",
+        "2026一季报预增"
       ],
       "fund_detail": "",
       "sector_detail": "国产芯片+229.9亿",
@@ -152,14 +152,14 @@
         "form_A": false
       },
       "sectors": [
-        "稀缺资源",
-        "2026中报预增",
         "HS300",
-        "昨日高振幅",
         "磷化工",
-        "MSCI中国",
+        "昨日高振幅",
         "有色金属矿采选业",
-        "大盘股"
+        "大盘股",
+        "稀缺资源",
+        "MSCI中国",
+        "2026中报预增"
       ],
       "enter_date": "2026-08-17",
       "industry": "有色金属矿采选业",
@@ -210,14 +210,14 @@
         "form_A": false
       },
       "sectors": [
-        "计算机、通信和其他电子设备制造业",
+        "锂矿概念",
         "医疗器械概念",
         "独角兽",
-        "锂矿概念",
+        "计算机、通信和其他电子设备制造业",
+        "固态电池",
         "MSCI中国",
         "深股通",
-        "2026一季报预增",
-        "固态电池"
+        "2026一季报预增"
       ],
       "enter_date": "2026-09-15",
       "industry": "计算机、通信和其他电子设备制造业",
@@ -274,13 +274,13 @@
         "form_A": false
       },
       "sectors": [
-        "科技风格",
-        "上证50",
         "HS300",
-        "软件和信息技术服务业",
-        "Kimi概念",
-        "MSCI中国",
         "AI应用",
+        "软件和信息技术服务业",
+        "MSCI中国",
+        "Kimi概念",
+        "上证50",
+        "科技风格",
         "2026一季报预增"
       ],
       "enter_date": "2026-09-19",
@@ -331,14 +331,14 @@
         "form_A": false
       },
       "sectors": [
-        "2026中报预增",
-        "资本市场服务",
+        "金融地产风格",
         "HS300",
-        "MSCI中国",
-        "行业龙头",
         "参股银行",
+        "MSCI中国",
+        "2026中报预增",
         "互联网金融",
-        "金融地产风格"
+        "行业龙头",
+        "资本市场服务"
       ],
       "enter_date": "2026-09-19",
       "industry": "资本市场服务",
@@ -393,13 +393,13 @@
         "form_A": false
       },
       "sectors": [
-        "工业互联",
         "HS300",
-        "人形机器人",
-        "深证100R",
-        "MSCI中国",
-        "深股通",
+        "工业互联",
         "电气机械和器材制造业",
+        "MSCI中国",
+        "人形机器人",
+        "深股通",
+        "深证100R",
         "小米汽车"
       ],
       "enter_date": "2026-09-18",
@@ -459,14 +459,14 @@
         "form_A": false
       },
       "sectors": [
-        "工业互联",
-        "专用设备制造业",
-        "HS300",
-        "机构重仓",
         "一带一路",
+        "HS300",
+        "专用设备制造业",
+        "参股银行",
+        "工业互联",
         "MSCI中国",
-        "行业龙头",
-        "参股银行"
+        "机构重仓",
+        "行业龙头"
       ],
       "enter_date": "2026-09-18",
       "industry": "专用设备制造业",
@@ -496,34 +496,6 @@
       ]
     },
     {
-      "code": "09866",
-      "name": "09866",
-      "market": "hk",
-      "board": "港股",
-      "total_score": 33.5,
-      "top10_rank": 10,
-      "a_score": 0,
-      "quality_grade": "",
-      "in_top10": true,
-      "in_tier_a": false,
-      "in_tier_b": false,
-      "in_good_fund": false,
-      "miss_steps": 1,
-      "close": 28.74,
-      "pct_chg": -2.04,
-      "pct_chg_20d": 0,
-      "signals": {
-        "chan": true,
-        "jinzuan": true,
-        "jigou": false,
-        "trend": false,
-        "form_A": false
-      },
-      "sectors": [],
-      "enter_date": "2026-09-12",
-      "industry": ""
-    },
-    {
       "code": "00291",
       "name": "华润啤酒",
       "market": "hk",
@@ -539,6 +511,34 @@
       "miss_steps": 1,
       "close": 18.25,
       "pct_chg": -0.27,
+      "pct_chg_20d": 0,
+      "signals": {
+        "chan": true,
+        "jinzuan": true,
+        "jigou": false,
+        "trend": false,
+        "form_A": false
+      },
+      "sectors": [],
+      "enter_date": "2026-09-12",
+      "industry": ""
+    },
+    {
+      "code": "09866",
+      "name": "09866",
+      "market": "hk",
+      "board": "港股",
+      "total_score": 33.5,
+      "top10_rank": 10,
+      "a_score": 0,
+      "quality_grade": "",
+      "in_top10": true,
+      "in_tier_a": false,
+      "in_tier_b": false,
+      "in_good_fund": false,
+      "miss_steps": 1,
+      "close": 28.74,
+      "pct_chg": -2.04,
       "pct_chg_20d": 0,
       "signals": {
         "chan": true,
