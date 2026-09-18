@@ -44,6 +44,55 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from name_utils import norm_code, fix_name, strip_entitlement_prefix, STANDARD_NAME_MAP  # noqa: E402
 from fundamental_helper import quality_veto  # noqa: E402  质差股一票否决（2026-09-07 主人令）
 
+# ═══════════════════════════════════════════════════════════════════════════
+# 🔴🔴 2026-09-18 主人令「噪音不该进池」·改动2a：噪音源前置过滤
+# ───────────────────────────────────────────────────────────────────────────
+# 判据（命中率 = 该源在候选池中的覆盖率；覆盖率越高越无选择性）：
+#   ROE_TTM 43.9% / 异常换手率 39.8%  ⇒ ≈ 无选择性（谁都能命中，无选股信息量）
+#   vs 四量终极 17.1% / 高手跟踪 3.8% / 三重共识 1.8%（强选择性）
+# 实测问题：12 个真账本 top5 的 60 席中，10 席（16.7%）是「纯弱源单源」——
+#   只被此二源之一命中，靠 base 1.5~2.0 + 共振 1.5 = 3.0~3.5 进榜。
+# 改法：二源不再写 sources/source_scores ⇒ 不计共振、不计 strength ⇒ 无入池资格；
+#       改写入 tags（展示用），signals 标签（高ROE/缩量强势）保留不变。
+# 回退：V8_FUSION_NOISE_FILTER=0 → 恢复旧行为（旧写法），便于 A/B 验证。
+# ═══════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════════
+# 🔴 2026-09-18 改动2a（**已按阿狸咪真回测证据修订**）
+#
+# 证据来源（阿狸咪 2026-09-18 真回测，9 信号日 / 463 条 / 170 只 / T+5 有效池 200 条）：
+#   源            命中数   有该源均%   无该源均%   边际      有/无胜率
+#   四量终极        25      +0.92      −3.24     +4.17pp   52.0 vs 18.9
+#   ROE_TTM        89      −2.35      −3.03     +0.68pp   22.5 vs 23.4   ← 弱正，非负
+#   高手跟踪        13      −4.37      −2.61     −1.76pp   30.8 vs 22.5   ← 负 alpha
+#   异常换手率      85      −4.00      −1.78     −2.21pp   16.5 vs 27.8   ← 负 alpha
+#   （她的原文结论：负 alpha 源与唯一正源同拿 +1.0 权重，于是数量优势把有效信号淹没。）
+#
+# ⚠️ 与「命中率判据」的关键差异（我方 12 账本复现 43.9%/39.8% 只是命中率，无收益）：
+#   命中率低 ≠ 有正 alpha。高手跟踪命中率仅 3.8% 却被实测为 −1.76pp ⇒ 现按**真回测**取舍。
+#
+# 裁定（严守阿狸咪自划红线）：
+#   ✅ P0-c「隔离负 alpha 源」——只剔除**边际为负**的两个源（不做权重重估）
+#   ❌ P0-a「源权重 ∝ 实测边际」——她明确否决「绝不按 9 天调权重」⇒ 权重一律不动
+#   ⚠️ ROE_TTM 边际 +0.68pp（弱正）⇒ **不清零**，只降档：2.0/1.5/1.0 → 1.0/0.75/0.5
+#
+# 回退：V8_FUSION_NOISE_FILTER=0 → 恢复旧行为（全部原样 + ROE 原档），便于 A/B 与紧急回滚。
+# ═══════════════════════════════════════════════════════════════════════════
+NOISE_SOURCES = {"ROE_TTM", "异常换手率", "高手跟踪"}   # 仅前两者剔除；ROE_TTM 走降档分支
+FUSION_NEG_ALPHA = {"异常换手率", "高手跟踪"}          # 边际 < 0，整源剔除
+V8_FUSION_NOISE_FILTER = os.environ.get("V8_FUSION_NOISE_FILTER", "1").strip() != "0"
+# ROE_TTM 降档（弱正 +0.68pp ⇒ 保留但不再与强源同权）
+V8_ROE_DEMOTE = os.environ.get("V8_ROE_DEMOTE", "1").strip() != "0"
+_ROE_OLD_SCALE = {0: 2.0, 5: 1.5, 15: 1.0}      # 旧：前5=2.0 / 5~15=1.5 / 其余=1.0
+_ROE_NEW_SCALE = {0: 1.0, 5: 0.75, 15: 0.5}     # 新：整体降一档（等于把「与四量同权」改为「次级确认」）
+
+
+def _roe_score(i):
+    """ROE_TTM 源分：i 为名次索引。降档开关关闭时返回旧档。"""
+    if not (V8_FUSION_NOISE_FILTER and V8_ROE_DEMOTE):
+        return _ROE_OLD_SCALE[0] if i < 5 else (_ROE_OLD_SCALE[5] if i < 15 else _ROE_OLD_SCALE[15])
+    return _ROE_NEW_SCALE[0] if i < 5 else (_ROE_NEW_SCALE[5] if i < 15 else _ROE_NEW_SCALE[15])
+
+
 CRISIS_HIGH_THRESHOLD = 50  # 危机雷达≥50才并入逆势龙头
 SECTOR_TOP_N = 15
 TOP_N = 5  # 2026-08-13 主人令：从 3 扩到 5（共振优先 + 分数其次，覆盖更多共识强票）
@@ -127,6 +176,120 @@ def load_json(name):
     except Exception as e:
         print(f"[warn] 读取失败 {name}: {e}")
         return {}
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🔴🔴 2026-09-18 主人令「融合器不能写死」·一劳永逸修复（改动1：去硬编码）
+# ───────────────────────────────────────────────────────────────────────────
+# 问题：本文件原 L590 把四信号 edge 写死为常量字典。而 edge 的真源是
+#   raw_data/backtest_expectancy.json（E 批 walk-forward 回测产出，每日刷新）。
+#   实测漂移（2026-09-18 07:06:51 线上真值 vs 写死值）：
+#       jinzuan  8.11  →  8.581   (+0.471)
+#       chan     3.68  →  4.408   (+0.728)
+#       trend   -7.54  → -7.495   (+0.045)
+#       jigou  -10.36  → -9.422   (+0.938)
+#   ⇒ src_score 偏差 0.008~0.169，且回测重跑后**永不自动刷新**（写死即错）。
+#
+# 修法：运行期从 backtest_expectancy.json 动态加载（照抄 generate_top10.py:83-112
+#   的成熟写法，保持全站同口径），读不到则回退硬编码默认值 **并显式告警 +
+#   置降级标记**（绝不静默用旧值 —— 静默是主人反复强调的红线）。
+#
+# 时序说明（重要）：本脚本属 D 批（20:00），而 backtest_expectancy 属 E 批（21:00）
+#   ⇒ 当前读到的是**前一日**的 edge（架构级时序倒挂）。改动5 会把
+#   backtest_expectancy 前置到 B 批尾（18:10 后），此后本块读到当日值。
+#   在那之前，本块读到的是 T-1 值 —— 但已比「永久不变的硬编码」准确。
+# ═══════════════════════════════════════════════════════════════════════════
+SIGNAL_EDGE_DEFAULT = {
+    "jinzuan": 8.11,
+    "chan":    3.68,
+    "trend":  -7.54,
+    "jigou": -10.36,
+}
+# 信号英文键 → by_factor 中的键名
+_SIG_FACTOR_KEY = {
+    "jinzuan": "sig_jinzuan",
+    "chan":    "sig_chan",
+    "trend":   "sig_trend",
+    "jigou":   "sig_jigou",
+}
+
+SIGNAL_EDGE = dict(SIGNAL_EDGE_DEFAULT)   # 生效值（动态覆盖后）
+SIGNAL_N = {}                             # 样本量（诊断/回显用）
+SIGNAL_CONSISTENT = {}                    # T+5 与 T+10 符号是否一致
+SIGNAL_EDGE_SOURCE = "hardcoded"          # hardcoded=回退默认 | backtest_expectancy@<generated>
+SIGNAL_EDGE_DEGRADED = False              # True = 动态加载失败（降级），透传到产物
+
+def _load_signal_edge_dynamic():
+    """运行期加载四信号 edge。返回 (edge_dict, meta)。失败回退默认值并标降级。"""
+    global SIGNAL_EDGE_SOURCE, SIGNAL_EDGE_DEGRADED
+    edge = dict(SIGNAL_EDGE_DEFAULT)
+    meta = {}
+    bt_path = os.path.join(RAW, "backtest_expectancy.json")
+    try:
+        if not os.path.exists(bt_path):
+            raise FileNotFoundError(bt_path)
+        with open(bt_path, encoding="utf-8") as f:
+            bt = json.load(f)
+        by_factor = bt.get("by_factor") or {}
+        if not by_factor:
+            raise ValueError("by_factor 为空")
+        _hit = 0
+        for name, fkey in _SIG_FACTOR_KEY.items():
+            v = by_factor.get(fkey) or {}
+            e10 = v.get("edge10")
+            if e10 is None or (isinstance(e10, str) and not e10.strip()):
+                continue
+            try:
+                edge[name] = float(e10)
+            except (TypeError, ValueError):
+                continue
+            SIGNAL_N[name] = int(v.get("n_on10") or 0)
+            SIGNAL_CONSISTENT[name] = ((float(v.get("edge5") or 0) > 0)
+                                       == (float(e10) > 0))
+            _hit += 1
+        if _hit == 0:
+            raise ValueError("四信号 edge10 全部缺失")
+        # 🔴 2026-09-18 小九实测修正（推送前拦下）：产物字段真实位置是
+        #   **meta.generated**（实测 raw_data/backtest_expectancy.json：
+        #   meta = {generated, method, horizons, n_snapshots, date_range, ...}），
+        #   顶层并无 generated/update_time。原写法只读顶层 ⇒ 恒取到 "?"，
+        #   等于「来源版本号失效」——降级诊断失效、交接档无法核对用的是哪一版 edge。
+        #   故改为 meta 优先 + 顶层兼容回退（老产物/上游改版都不致静默取空）。
+        _meta = bt.get("meta") or {}
+        gen = str(_meta.get("generated") or _meta.get("update_time")
+                  or bt.get("generated") or bt.get("update_time") or "?")
+        SIGNAL_EDGE_SOURCE = f"backtest_expectancy@{gen}"
+        meta = {"generated": gen, "hit": _hit,
+                "n_snapshots": _meta.get("n_snapshots", bt.get("n_snapshots")),
+                "date_range": _meta.get("date_range")}
+        print(f"[信号edge] ✅ 动态加载 {_hit}/4 源 ← {SIGNAL_EDGE_SOURCE}")
+        for _n in _SIG_FACTOR_KEY:
+            _d = SIGNAL_EDGE_DEFAULT.get(_n, 0.0)
+            _v = edge.get(_n, 0.0)
+            _flag = "" if abs(_v - _d) < 1e-9 else f"  (写死值 {_d:+.2f} 漂移 {_v - _d:+.3f})"
+            print(f"    {_n:8s} {_v:+8.3f}  n={SIGNAL_N.get(_n, 0)}{_flag}")
+    except Exception as e:
+        SIGNAL_EDGE_DEGRADED = True
+        SIGNAL_EDGE_SOURCE = f"hardcoded(fallback: {e})"
+        print(f"[信号edge] ⚠️ 动态加载失败，回退硬编码默认值（已标降级）: {e}")
+        for _n in _SIG_FACTOR_KEY:
+            print(f"    {_n:8s} {edge[_n]:+8.3f}  (硬编码)")
+    return edge, meta
+
+
+SIGNAL_EDGE, SIGNAL_EDGE_META = _load_signal_edge_dynamic()
+
+
+def _signal_edge_of(code_signals):
+    """给定某票的 signals dict，按**当前生效的** edge 加权求和。
+    与旧写死实现同语义，仅数据源改为运行期动态值。"""
+    if not code_signals:
+        return 0.0
+    tot = 0.0
+    for k, v in code_signals.items():
+        if v:
+            tot += SIGNAL_EDGE.get(k, 0.0)
+    return tot
 
 
 
@@ -511,7 +674,8 @@ def main():
         "industry": "",
         "concepts": [],
         "reasons": [],
-        "signals": [],           # 中文信号标签
+        "signals": [],
+        "tags": [],           # 中文信号标签
         "enter_dates": [],         # 各源记录的入选日
         "sector_hits": [],         # 板块命中（带涨幅）
     })
@@ -587,8 +751,10 @@ def main():
         #   现改用与 generate_top10.py 同源的 walk-forward T+10 边际加权（jinzuan+8.11/chan+3.68/
         #   trend-7.54/jigou-10.36）：正edge组合高分、负edge组合压到0（剔除），与回测证据方向一致。
         _sig_d = s.get("signals", {}) or {}
-        _edge = sum({"jinzuan": 8.11, "chan": 3.68, "trend": -7.54, "jigou": -10.36}.get(k, 0.0)
-                    for k, v in _sig_d.items() if v)
+        # 🔴 2026-09-18 改动1：edge 改由模块级 SIGNAL_EDGE 提供（运行期从
+        #   backtest_expectancy.json 动态加载，见文件头 _load_signal_edge_dynamic）。
+        #   读不到时回退硬编码默认值并已置 SIGNAL_EDGE_DEGRADED 降级标记。
+        _edge = _signal_edge_of(_sig_d)
         src_score = max(0.0, min(4.5, 1.5 + _edge * 0.18))
         if qd:
             src_score += 0.5
@@ -719,8 +885,14 @@ def main():
             r = ensure(code, display_name, "", "")
             sc = 2.0 if i < 5 else (1.5 if i < 15 else 1.0)
             sc *= (1.0 if _open_regime else 0.3)
-            r["sources"].append("异常换手率")
-            r["source_scores"]["异常换手率"] = round(sc, 2)
+            # 🔴 2026-09-18 改动2a：异常换手率 = 负 alpha 源（边际 −2.21pp，命中 85 条）
+            #   ⇒ 整源剔除、不进 sources（不计共振/strength）；写 tags 仅作展示。
+            #   V8_FUSION_NOISE_FILTER=0 可回退旧行为。
+            if V8_FUSION_NOISE_FILTER:
+                r["tags"].append("异常换手率")
+            else:
+                r["sources"].append("异常换手率")
+                r["source_scores"]["异常换手率"] = round(sc, 2)
             r["signals"].append("缩量强势")
             if s.get("first_date"):
                 r["enter_dates"].append(s["first_date"])
@@ -736,10 +908,12 @@ def main():
             display_name = (_nm.get(_pure6) or _nm.get(_pure) or _nm.get(code)
                            or (profiles.get(_pure6) or {}).get("name") or s.get("name") or "")
             r = ensure(code, display_name, "", "")
-            sc = 2.0 if i < 5 else (1.5 if i < 15 else 1.0)
+            # 🔴 2026-09-18 改动2a：ROE_TTM 边际 +0.68pp = **弱正**（非负 alpha）
+            #   ⇒ 不剔除，但按「不与强源同权」降档（2.0/1.5/1.0 → 1.0/0.75/0.5）。
+            #   依据：阿狸咪实测 ROE_TTM 有该源均 −2.35%、无该源均 −3.03%，
+            #   虽是相对正贡献，但命中 89 条（数量优势）仍会淹没有效信号 ⇒ 降权而非清零。
+            sc = _roe_score(i)
             sc *= (1.0 if _open_regime else 0.3)
-            r["sources"].append("ROE_TTM")
-            r["source_scores"]["ROE_TTM"] = round(sc, 2)
             r["signals"].append("高ROE")
             # 2026-09-03 主人令：补入选依据与行情（之前第1/2名 reason 空、无价格→分析不如第3名）
             r["reasons"].append(f"基本面因子 高ROE 排名第{i + 1}")
@@ -801,8 +975,14 @@ def main():
             _k = key.lstrip('.') if key.startswith('.') else key
             if _k in _ima_norm:
                 sc = 1.0 * (1.0 if _open_regime else 0.3)
-                r["sources"].append("高手跟踪")
-                r["source_scores"]["高手跟踪"] = round(sc, 2)
+                # 🔴 2026-09-18 改动2a：高手跟踪 = 负 alpha 源（边际 −1.76pp / 13 命中 / 胜率 30.8 vs 22.5）
+                #   这里原本给它 **固定 +1.0**，与四量终极同权 ⇒ 正是「数量优势淹没有效信号」的来源之一。
+                #   ⇒ 整源剔除、不进 sources（不计共振/strength）；写 tags 仅作展示。
+                if V8_FUSION_NOISE_FILTER:
+                    r["tags"].append("高手跟踪")
+                else:
+                    r["sources"].append("高手跟踪")
+                    r["source_scores"]["高手跟踪"] = round(sc, 2)
                 r["signals"].append("高手共振")
                 r["reasons"].append("高手强势股跟踪池共振（IMA 状态有效）")
                 _hit += 1
@@ -1171,7 +1351,17 @@ def main():
     # 方案B：因子候选（异常换手率/ROE_TTM）因权重低常落在 top30 之后，需强制纳入候选池，否则方案B不可见
     _top30 = scored[:30]
     _top30_keys = {x["key"] for x in _top30}
-    _factor_extra = [x for x in scored[30:] if ("异常换手率" in x["sources"] or "ROE_TTM" in x["sources"]) and x["key"] not in _top30_keys]
+    # 🔴 2026-09-18 改动2a 连带修复：噪音源不再进 sources ⇒ 原判据恒为空 ⇒
+    #   候选池会静默少一批「基本面/异动」票（信息丢失，但**不影响排名**，因它捞的是
+    #   已过滤后的 scored）。现改为按 tags 捞回：展示信息保留，且它们本就在 scored 里、
+    #   分数已按无噪音源重算，不会被重新抬进 top5。
+    _factor_extra = [
+        x for x in scored[30:]
+        if (set(x.get("tags") or []) & NOISE_SOURCES
+            or "异常换手率" in x["sources"] or "ROE_TTM" in x["sources"]
+            or "高手跟踪" in x["sources"])
+        and x["key"] not in _top30_keys
+    ]
 
     # 🚪 数据降级标记（2026-09-12 主人令·一劳永逸）：
     #   上游（A 采集批）长坏 >2 交易日时，批次闸门会降级放行 B 批，并把
@@ -1184,8 +1374,22 @@ def main():
     #   在前端/看板上**完全不可见**（09-17 事故：04:49 那版 data_date=09-16 被当新鲜）。
     #   主人拍板原话：「宁可给带降级标记的结果，也不要永久空白（标记可见就不算假成功）」
     #   —— 因子降级同理，必须显形。
-    _degraded = (str(os.environ.get("DEGRADED_UPSTREAM", "")).strip() == "1") or _fl_degraded
+    # 🔴 2026-09-18 改动1：信号 edge 动态加载失败亦视为降级（不许静默用写死值）
+    _degraded = ((str(os.environ.get("DEGRADED_UPSTREAM", "")).strip() == "1")
+                 or _fl_degraded or SIGNAL_EDGE_DEGRADED)
     _degrade_lag = str(os.environ.get("DEGRADE_LAG_DAYS", "")).strip()
+
+    # 🔴 2026-09-18 改动1：在产物里固化「本次用的是哪一版 edge」——
+    #   改动4 的最终推荐回测要靠它复现历史打分（否则回测用的是今天的分不是当天的分）。
+    _signal_edge_meta = {
+        "source": SIGNAL_EDGE_SOURCE,
+        "degraded": bool(SIGNAL_EDGE_DEGRADED),
+        "effective": {k: round(float(v), 4) for k, v in SIGNAL_EDGE.items()},
+        "hardcoded_default": dict(SIGNAL_EDGE_DEFAULT),
+        "n_on10": dict(SIGNAL_N),
+        "consistent": dict(SIGNAL_CONSISTENT),
+        "loaded": dict(SIGNAL_EDGE_META or {}),
+    }
 
     result = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -1195,6 +1399,8 @@ def main():
         "total_candidates": len(scored),
         "top_n": _effective_top_n,
         "data_degraded": _degraded,
+        # 🔴 2026-09-18 改动1：信号 edge 的运行时真相（来源/生效值/降级/样本量）
+        "signal_edge": _signal_edge_meta,
         "degrade_note": (
             f"⚠️ 数据降级：上游采集（A 批）已落后 {_degrade_lag or '?'} 个交易日（阈值 2），"
             f"本结果为「降级放行」产物 —— 排序与信号有效，但底层行情可能不是最新交易日。"
