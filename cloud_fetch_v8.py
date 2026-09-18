@@ -4256,6 +4256,34 @@ def main(category=None, only=None):
             pos20 = (avg_price - ma20) / ma20 * 100 if ma20 else None
             pos60 = (avg_price - ma60) / ma60 * 100 if ma60 else None
 
+            # 🔴🔴 2026-09-18 治本（主人「干嘛要累积够了才算？不对吧」+「肯定A·治本」）：
+            #   【问题】上一轮去掉 min() 伪装后，样本<20 时 ma20/ma60 一律 None
+            #          ⇒ 前端永远显示「⏳ 均线积累中 15/20日」，指标卡死在不可用态。
+            #          但实测 15 条真实历史已足以给出有意义的均值（15 日偏离 +2.44%），
+            #          「必须满 20 条才启动」是死板门槛，不是技术必需。
+            #   【治本】新增「有效窗口」机制：取【当前样本支持的最大标准窗口】。
+            #          >=60 → MA60；>=20 → MA20；>=15 → MA15；>=10 → MA10；>=5 → MA5。
+            #          全部是【真实历史算术均值】，绝不外推、绝不填充、绝不冒充。
+            #          随样本逐日累积自动升档（MA15 → MA20 → MA60），无需人工干预。
+            #   【口径】ma20/ma60 严格定义保持不变（正式口径，供将来切换）；
+            #          本组新字段只做「当下能用就用」，语义分离、互不污染。
+            _MA_LADDER = ((60, "MA60"), (20, "MA20"), (15, "MA15"), (10, "MA10"), (5, "MA5"))
+            ma_eff = ma_eff_window = None
+            for _w, _nm in _MA_LADDER:
+                if len(prices) >= _w:
+                    ma_eff = round(sum(prices[-_w:]) / _w, 4)
+                    ma_eff_window = _nm
+                    break
+            pos_eff = (avg_price - ma_eff) / ma_eff * 100 if ma_eff else None
+            # 各档短窗口真值（样本够才出，便于前端/审计逐档核对）
+            ma_short = {}
+            for _w, _nm in _MA_LADDER:
+                if len(prices) >= _w:
+                    ma_short[_nm.lower()] = round(sum(prices[-_w:]) / _w, 4)
+            if ma_eff_window:
+                print(f"  [平均股价] 有效窗口 {ma_eff_window}={ma_eff} "
+                      f"偏离={round(pos_eff, 4)}%  样本={len(prices)}")
+
             # 🔴 2026-08-30 根因修复：history 不足时 ma = mean(history[-20:]) 会退化成
             #   「当日均价自身」（只有 1 条时 ma20 = ma60 = avg_price），
             #   position_vs_ma20 恒 ≈ -0.0001 < 0 → 前端卡片常年虚假显示「破MA20/破MA60」。
@@ -4276,6 +4304,12 @@ def main(category=None, only=None):
                 "position_vs_ma60": round(pos60, 4) if pos60 is not None else None,
                 "ma20_ready": _n >= 20,
                 "ma60_ready": _n >= 60,
+                # 🔴 2026-09-18 治本：有效窗口（能用即用，随样本自动升档）
+                "ma_eff": ma_eff,
+                "ma_eff_window": ma_eff_window,
+                "position_vs_ma_eff": round(pos_eff, 4) if pos_eff is not None else None,
+                "ma_short": ma_short,
+                "ma_eff_ready": ma_eff is not None,
                 "history": hist,
                 "history_days": _n,
                 "history_caliber": "全A等权自算",
