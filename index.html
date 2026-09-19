@@ -15481,19 +15481,6 @@ h += '<div class="card" id="sectorLeadersCard" style="display:none;margin-bottom
 //   卡的【卡头】与【卡身】之间 ⇒ 该卡头独占一张空壳 .card（.card 自带 border-radius:14px）⇒ 渲染成
 //   主人看到的「蓝色圆弧括号」，并把其后 5 张卡全部包进去。已整段删除 ⇒ 观测类 6 张卡恢复平级。
 //   自证：观测类 pane 生成段 div 净差由 +2 → 0。
-// ═══ 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测类第 2 卡）═══
-//   需求原话：「没错就是隔夜的，我只要近期涨幅好的个股或者ETF映射到A港股的就够了。
-//             每日盘前必须更新完成，任务设置好。」
-//   位置：暂未上架 > 📡 观测类，紧随「🚀 主升/启动 板块·龙头股」（观测类首卡）之后。
-//   数据 window.US_HK_MAP（data/US_HK_MAP.js ← cloud_fetch_v8.py::f_us_hk_map()，
-//         盘前 08:25 单档生成；生成器 scripts/fetch_us_hk_map.py）。
-//   无数据 ⇒ 整卡保持 display:none（不产出空壳卡）；填充见 window._fillUsHkMap（600ms×30 自愈）。
-h += '<div class="card" id="usHkMapCard" style="display:none;margin-bottom:16px;border-left:4px solid #a78bfa;">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
-   + '<span style="font-size:15px;font-weight:700;color:#a78bfa;">&#x1F319; 隔夜美股强势 &#183; 映射 A/港股</span>'
-   + '<span class="fresh" id="usHkFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 隔夜口径（美东收盘，非实时）</span></div>'
-   + '<div id="usHkMapBody"><div class="note">加载中&#x2026;</div></div></div>';
 
 h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
@@ -15511,6 +15498,20 @@ h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;
 // 2026-09-14 主人令：恢复被删的两张观测卡（卡容器 + 函数定义 + 数据注入三件同时补齐，避免只补壳子变恒空）
 // 🚚 2026-09-15 主人令：AI 洞察·多源观点对比 整卡迁往「🌍 观测平台 > 🌍 宏观观测」（K 型分层卡上方），
 //   容器 id 未变 ⇒ 本页不再渲染它；观测类 pane 现为 1 卡（主题空间），派发名单同步收窄为 __renderThemeValue。
+// ═══ 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测类第 3 卡）═══
+//   需求原话：「没错就是隔夜的，我只要近期涨幅好的个股或者ETF映射到A港股的就够了。
+//             每日盘前必须更新完成，任务设置好。」
+//   位置：暂未上架 > 📡 观测类，位于「🔭 主题空间 · 概念资金热度」卡上方
+//         （2026-09-19 21:35 主人令：由观测类第 2 卡下移至本位置）。
+//   数据 window.US_HK_MAP（data/US_HK_MAP.js ← cloud_fetch_v8.py::f_us_hk_map()，
+//         盘前 08:25 单档生成；生成器 scripts/fetch_us_hk_map.py）。
+//   无数据 ⇒ 整卡保持 display:none（不产出空壳卡）；填充见 window._fillUsHkMap（600ms×30 自愈）。
+h += '<div class="card" id="usHkMapCard" style="display:none;margin-bottom:16px;border-left:4px solid #a78bfa;">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+   + '<span style="font-size:15px;font-weight:700;color:#a78bfa;">&#x1F319; 隔夜美股强势 &#183; 映射 A/港股</span>'
+   + '<span class="fresh" id="usHkFresh">&#x2014;</span>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 隔夜口径（美东收盘，非实时）</span></div>'
+   + '<div id="usHkMapBody"><div class="note">加载中&#x2026;</div></div></div>';
 h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-left:4px solid var(--cyan);"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52D; 主题空间 · 概念资金热度 加载中&#x2026;</div></div>';
 // ═══ 2026-09-16 主人令：恢复「&#x1F30D; 新周期判定 · 海外宏观 + AI 大周期」并接入现有数据源 ═══
 //   沿革（全部有据可查）：2026-09-06 23:19 建卡（原在「宏观观测」）→ 2026-09-13 23:03 主人令
