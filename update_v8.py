@@ -171,6 +171,14 @@ DATA_SOURCES = {
     #   raw_data/ai_insights_compare.json 一并从仓库下线，此后不再重建。
     # 2026-09-10 主人令：因子补缺 walk-forward 进度跟踪卡（暂未上架），源 FACTOR_AUDIT
     "factor_progress.json":         "FACTOR_PROGRESS",
+    # 🆕🔴 2026-09-19 主人令（阿狸咪的工程师）：walk-forward 真值上站，供「🧪 已纳入因子」
+    #   与「🧮 每日因子计算」两卡读 P5 段 verdict —— 前端据此把「verdict=PASS 才真计分」
+    #   如实投影，绝不写死文案。
+    #   为什么必须补这条映射：实测 index.html 里 `FACTOR_WALKFORWARD` 命中 **0** 次、
+    #   data/FACTOR_WALKFORWARD.js **不存在** => 若不补，新卡 P5 段将**永远显示「已停用」**
+    #   （假结论，且正是主人最恨的「版面全在等待」）。
+    #   ⚠️ _make_lite() 无本键分支 => **全量透传**（文件实测仅 21.7KB，无需裁剪）。
+    "factor_walkforward.json":      "FACTOR_WALKFORWARD",
     # 🛡 2026-08-26 一劳永逸根因修复：原 DATA_SOURCES 漏挂 final_recommend.json 映射，
     #   该 .js 仅由算法脚本 final_recommend.py 写入，而云端 build 的 update_v8 步骤
     #   不覆盖它 → data/FINAL_RECOMMEND_DATA.js 站点读的 window.* 永远停在 08-22（源 raw_data 已是 08-25 新鲜）。
