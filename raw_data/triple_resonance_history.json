@@ -1032,9 +1032,9 @@
     "09987": {
       "enter_date": "2026-09-12",
       "enter_close": 338.6,
-      "last_date": "2026-09-18",
+      "last_date": "2026-09-19",
       "last_close": 333.0,
-      "status": "dropped",
+      "status": "near",
       "streak": 7,
       "total_days": 6
     },
@@ -1213,7 +1213,7 @@
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-09-19 09:06:47"
+    "last_update": "2026-09-19 14:49:35"
   },
   "2026-08-18": [
     {
@@ -1808,7 +1808,7 @@
       "status": "near"
     }
   ],
-  "update_time": "2026-09-19 09:06:47",
+  "update_time": "2026-09-19 14:49:35",
   "2026-08-30": [
     {
       "code": "300475",
@@ -3656,41 +3656,18 @@
       "board": "创业板",
       "close": 346.96,
       "pct_chg": 3.54,
-      "total_score": 42.2,
+      "total_score": 42.9,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "计算机、通信和其他电子设备制造业",
-        "AI手机",
-        "MSCI中国",
-        "2026中报预增",
+        "小米汽车",
         "AI眼镜",
-        "信创",
-        "深证100R",
-        "小米汽车"
-      ],
-      "signal_count": 1,
-      "status": "strict"
-    },
-    {
-      "code": "605117",
-      "name": "德业股份",
-      "market": "sh",
-      "board": "主板",
-      "close": 0,
-      "pct_chg": 0,
-      "total_score": 33.7,
-      "quality_grade": "A",
-      "industry": "电气机械和器材制造业",
-      "sectors": [
-        "周期股",
-        "HS300",
-        "电气机械和器材制造业",
         "MSCI中国",
-        "上证180",
-        "沪股通",
+        "信创",
         "2026中报预增",
-        "2026一季报预增"
+        "AI手机",
+        "计算机、通信和其他电子设备制造业",
+        "深证100R"
       ],
       "signal_count": 1,
       "status": "strict"
@@ -3702,18 +3679,18 @@
       "board": "主板",
       "close": 17.51,
       "pct_chg": 0.92,
-      "total_score": 44.1,
+      "total_score": 45.3,
       "quality_grade": "B",
       "industry": "有色金属矿采选业",
       "sectors": [
+        "MSCI中国",
+        "稀缺资源",
+        "有色金属矿采选业",
+        "昨日高振幅",
         "HS300",
         "磷化工",
-        "昨日高振幅",
-        "有色金属矿采选业",
-        "大盘股",
-        "稀缺资源",
-        "MSCI中国",
-        "2026中报预增"
+        "2026中报预增",
+        "大盘股"
       ],
       "signal_count": 2,
       "status": "near"
@@ -3725,18 +3702,18 @@
       "board": "创业板",
       "close": 54.2,
       "pct_chg": 2.9,
-      "total_score": 40.2,
+      "total_score": 41.4,
       "quality_grade": "",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "锂矿概念",
-        "医疗器械概念",
-        "独角兽",
-        "计算机、通信和其他电子设备制造业",
         "固态电池",
         "MSCI中国",
         "深股通",
-        "2026一季报预增"
+        "锂矿概念",
+        "医疗器械概念",
+        "2026一季报预增",
+        "独角兽",
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 2,
       "status": "near"
@@ -3748,18 +3725,18 @@
       "board": "科创板",
       "close": 223.61,
       "pct_chg": 0.25,
-      "total_score": 39.1,
+      "total_score": 40.4,
       "quality_grade": "B",
       "industry": "软件和信息技术服务业",
       "sectors": [
-        "HS300",
-        "AI应用",
-        "软件和信息技术服务业",
         "MSCI中国",
         "Kimi概念",
         "上证50",
         "科技风格",
-        "2026一季报预增"
+        "软件和信息技术服务业",
+        "2026一季报预增",
+        "HS300",
+        "AI应用"
       ],
       "signal_count": 2,
       "status": "near"
@@ -3771,17 +3748,17 @@
       "board": "主板",
       "close": 26.54,
       "pct_chg": 1.45,
-      "total_score": 37.3,
+      "total_score": 38.5,
       "quality_grade": "D",
       "industry": "资本市场服务",
       "sectors": [
-        "金融地产风格",
-        "HS300",
-        "参股银行",
         "MSCI中国",
-        "2026中报预增",
-        "互联网金融",
         "行业龙头",
+        "参股银行",
+        "互联网金融",
+        "HS300",
+        "2026中报预增",
+        "金融地产风格",
         "资本市场服务"
       ],
       "signal_count": 2,
@@ -3794,18 +3771,18 @@
       "board": "创业板",
       "close": 52.45,
       "pct_chg": 1.67,
-      "total_score": 36.2,
+      "total_score": 37.5,
       "quality_grade": "C",
       "industry": "电气机械和器材制造业",
       "sectors": [
-        "HS300",
-        "工业互联",
         "电气机械和器材制造业",
+        "小米汽车",
         "MSCI中国",
-        "人形机器人",
         "深股通",
-        "深证100R",
-        "小米汽车"
+        "工业互联",
+        "HS300",
+        "人形机器人",
+        "深证100R"
       ],
       "signal_count": 2,
       "status": "near"
@@ -3817,33 +3794,19 @@
       "board": "主板",
       "close": 18.07,
       "pct_chg": -0.61,
-      "total_score": 34.8,
+      "total_score": 36.0,
       "quality_grade": "C",
       "industry": "专用设备制造业",
       "sectors": [
-        "一带一路",
-        "HS300",
-        "专用设备制造业",
-        "参股银行",
-        "工业互联",
-        "MSCI中国",
         "机构重仓",
-        "行业龙头"
+        "MSCI中国",
+        "行业龙头",
+        "参股银行",
+        "一带一路",
+        "工业互联",
+        "HS300",
+        "专用设备制造业"
       ],
-      "signal_count": 2,
-      "status": "near"
-    },
-    {
-      "code": "00291",
-      "name": "华润啤酒",
-      "market": "hk",
-      "board": "港股",
-      "close": 18.25,
-      "pct_chg": -0.27,
-      "total_score": 33.5,
-      "quality_grade": "",
-      "industry": "",
-      "sectors": [],
       "signal_count": 2,
       "status": "near"
     },
@@ -3854,7 +3817,35 @@
       "board": "港股",
       "close": 28.74,
       "pct_chg": -2.04,
-      "total_score": 33.5,
+      "total_score": 34.8,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "00291",
+      "name": "华润啤酒",
+      "market": "hk",
+      "board": "港股",
+      "close": 18.25,
+      "pct_chg": -0.27,
+      "total_score": 34.8,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "09987",
+      "name": "百胜中国",
+      "market": "hk",
+      "board": "港股",
+      "close": 333.0,
+      "pct_chg": -0.83,
+      "total_score": 34.8,
       "quality_grade": "",
       "industry": "",
       "sectors": [],

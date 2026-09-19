@@ -1,15 +1,15 @@
 {
-  "update_time": "2026-09-19 10:21:56",
+  "update_time": "2026-09-19 14:44:32",
   "data_time": "2026-09-19 15:30:00",
-  "total_scanned": 533,
+  "total_scanned": 516,
   "scan_stats": {
-    "candidates": 537,
-    "succeeded": 533,
+    "candidates": 520,
+    "succeeded": 516,
     "failed": 4,
-    "kline_source_used": "本地缓存(主源 529/533 只)",
-    "elapsed_sec": 92.5,
-    "throughput_per_sec": 5.8,
-    "cache_fresh": 529,
+    "kline_source_used": "本地缓存(主源 512/516 只)",
+    "elapsed_sec": 23.8,
+    "throughput_per_sec": 21.8,
+    "cache_fresh": 512,
     "cache_miss": 8,
     "cache_stale": 0,
     "net_tx": 8,
@@ -350,17 +350,17 @@
     },
     {
       "code": "000100",
-      "name": "000100",
+      "name": "TCL科技",
       "board_label": "主板"
     },
     {
       "code": "000560",
-      "name": "珠江船务",
+      "name": "我爱我家",
       "board_label": "主板"
     },
     {
       "code": "000564",
-      "name": "中创智领",
+      "name": "供销大集",
       "board_label": "主板"
     },
     {
@@ -370,12 +370,12 @@
     },
     {
       "code": "000620",
-      "name": "大唐西市",
+      "name": "盈新发展",
       "board_label": "主板"
     },
     {
       "code": "000630",
-      "name": "隽泰控股",
+      "name": "铜陵有色",
       "board_label": "主板"
     },
     {
@@ -390,22 +390,22 @@
     },
     {
       "code": "000725",
-      "name": "000725",
+      "name": "京东方Ａ",
       "board_label": "主板"
     },
     {
       "code": "000735",
-      "name": "000735",
+      "name": "罗 牛 山",
       "board_label": "主板"
     },
     {
       "code": "000737",
-      "name": "湾区发展",
+      "name": "北方铜业",
       "board_label": "主板"
     },
     {
       "code": "000807",
-      "name": "上海实业环境",
+      "name": "云铝股份",
       "board_label": "主板"
     },
     {
@@ -420,12 +420,12 @@
     },
     {
       "code": "000833",
-      "name": "华讯",
+      "name": "粤桂股份",
       "board_label": "主板"
     },
     {
       "code": "000878",
-      "name": "金朝阳集团",
+      "name": "云南铜业",
       "board_label": "主板"
     },
     {
@@ -435,7 +435,7 @@
     },
     {
       "code": "000933",
-      "name": "中证医药",
+      "name": "神火股份",
       "board_label": "主板"
     },
     {
@@ -560,7 +560,7 @@
     },
     {
       "code": "002536",
-      "name": "百乐皇宫",
+      "name": "飞龙股份",
       "board_label": "主板"
     },
     {
@@ -584,13 +584,8 @@
       "board_label": "主板"
     },
     {
-      "code": "002600",
-      "name": "领益智造",
-      "board_label": "主板"
-    },
-    {
       "code": "002602",
-      "name": "万物云",
+      "name": "世纪华通",
       "board_label": "主板"
     },
     {
@@ -610,7 +605,7 @@
     },
     {
       "code": "002881",
-      "name": "武汉有机",
+      "name": "美格智能",
       "board_label": "主板"
     },
     {
@@ -726,11 +721,6 @@
     {
       "code": "300243",
       "name": "瑞丰高材",
-      "board_label": "创业板"
-    },
-    {
-      "code": "300252",
-      "name": "金信诺",
       "board_label": "创业板"
     },
     {
@@ -851,11 +841,6 @@
     {
       "code": "300593",
       "name": "新雷能",
-      "board_label": "创业板"
-    },
-    {
-      "code": "300607",
-      "name": "拓斯达",
       "board_label": "创业板"
     },
     {
@@ -1084,11 +1069,6 @@
       "board_label": "创业板"
     },
     {
-      "code": "301357",
-      "name": "北方长龙",
-      "board_label": "创业板"
-    },
-    {
       "code": "301366",
       "name": "一博科技",
       "board_label": "创业板"
@@ -1156,11 +1136,6 @@
     {
       "code": "600103",
       "name": "青山纸业",
-      "board_label": "主板"
-    },
-    {
-      "code": "600104",
-      "name": "上汽集团",
       "board_label": "主板"
     },
     {
@@ -1279,18 +1254,8 @@
       "board_label": "主板"
     },
     {
-      "code": "600711",
-      "name": "盛屯矿业",
-      "board_label": "主板"
-    },
-    {
       "code": "600737",
       "name": "中粮糖业",
-      "board_label": "主板"
-    },
-    {
-      "code": "600744",
-      "name": "华银电力",
       "board_label": "主板"
     },
     {
@@ -1376,11 +1341,6 @@
     {
       "code": "601606",
       "name": "长城军工",
-      "board_label": "主板"
-    },
-    {
-      "code": "601857",
-      "name": "中国石油",
       "board_label": "主板"
     },
     {
@@ -1515,12 +1475,12 @@
     },
     {
       "code": "688001",
-      "name": "苏州华兴源创科技",
+      "name": "XD华兴源",
       "board_label": "科创板"
     },
     {
       "code": "688002",
-      "name": "睿创微纳",
+      "name": "XD睿创微",
       "board_label": "科创板"
     },
     {
@@ -1560,7 +1520,7 @@
     },
     {
       "code": "688031",
-      "name": "星环科技",
+      "name": "星环科技-U",
       "board_label": "科创板"
     },
     {
@@ -1660,7 +1620,7 @@
     },
     {
       "code": "688213",
-      "name": "思特威",
+      "name": "思特威-W",
       "board_label": "科创板"
     },
     {
@@ -1670,7 +1630,7 @@
     },
     {
       "code": "688220",
-      "name": "翱捷科技",
+      "name": "翱捷科技-U",
       "board_label": "科创板"
     },
     {
@@ -1730,7 +1690,7 @@
     },
     {
       "code": "688343",
-      "name": "云天励飞",
+      "name": "云天励飞-U",
       "board_label": "科创板"
     },
     {
@@ -1860,7 +1820,7 @@
     },
     {
       "code": "688549",
-      "name": "中巨芯",
+      "name": "中巨芯-U",
       "board_label": "科创板"
     },
     {
@@ -1870,7 +1830,7 @@
     },
     {
       "code": "688561",
-      "name": "奇安信",
+      "name": "奇安信-U",
       "board_label": "科创板"
     },
     {
@@ -1945,12 +1905,12 @@
     },
     {
       "code": "688783",
-      "name": "西安奕材",
+      "name": "西安奕材-U",
       "board_label": "科创板"
     },
     {
       "code": "688795",
-      "name": "摩尔线程",
+      "name": "摩尔线程-U",
       "board_label": "科创板"
     },
     {
@@ -1965,7 +1925,7 @@
     },
     {
       "code": "688802",
-      "name": "沐曦股份",
+      "name": "沐曦股份-U",
       "board_label": "科创板"
     },
     {
@@ -2283,19 +2243,19 @@
     },
     {
       "code": "000100",
-      "name": "000100",
+      "name": "TCL科技",
       "score": 0,
       "enter_date": "2026-09-19"
     },
     {
       "code": "000560",
-      "name": "珠江船务",
+      "name": "我爱我家",
       "score": 0,
       "enter_date": "2026-09-19"
     },
     {
       "code": "000564",
-      "name": "中创智领",
+      "name": "供销大集",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -2307,13 +2267,13 @@
     },
     {
       "code": "000620",
-      "name": "大唐西市",
+      "name": "盈新发展",
       "score": 0,
       "enter_date": "2026-09-19"
     },
     {
       "code": "000630",
-      "name": "隽泰控股",
+      "name": "铜陵有色",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -2325,25 +2285,25 @@
     },
     {
       "code": "000725",
-      "name": "000725",
+      "name": "京东方Ａ",
       "score": 0,
       "enter_date": "2026-09-19"
     },
     {
       "code": "000735",
-      "name": "000735",
+      "name": "罗 牛 山",
       "score": 0,
       "enter_date": "2026-09-19"
     },
     {
       "code": "000737",
-      "name": "湾区发展",
+      "name": "北方铜业",
       "score": 0,
       "enter_date": "2026-09-19"
     },
     {
       "code": "000807",
-      "name": "上海实业环境",
+      "name": "云铝股份",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -2355,13 +2315,13 @@
     },
     {
       "code": "000833",
-      "name": "华讯",
+      "name": "粤桂股份",
       "score": 0,
       "enter_date": "2026-09-19"
     },
     {
       "code": "000878",
-      "name": "金朝阳集团",
+      "name": "云南铜业",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -2373,7 +2333,7 @@
     },
     {
       "code": "000933",
-      "name": "中证医药",
+      "name": "神火股份",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -2481,7 +2441,7 @@
     },
     {
       "code": "002536",
-      "name": "百乐皇宫",
+      "name": "飞龙股份",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -2492,14 +2452,8 @@
       "enter_date": "2026-09-19"
     },
     {
-      "code": "002600",
-      "name": "领益智造",
-      "score": 0,
-      "enter_date": "2026-09-19"
-    },
-    {
       "code": "002602",
-      "name": "万物云",
+      "name": "世纪华通",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -2517,7 +2471,7 @@
     },
     {
       "code": "002881",
-      "name": "武汉有机",
+      "name": "美格智能",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -2644,12 +2598,6 @@
     {
       "code": "300243",
       "name": "瑞丰高材",
-      "score": 0,
-      "enter_date": "2026-09-19"
-    },
-    {
-      "code": "300252",
-      "name": "金信诺",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -2788,12 +2736,6 @@
     {
       "code": "300593",
       "name": "新雷能",
-      "score": 0,
-      "enter_date": "2026-09-19"
-    },
-    {
-      "code": "300607",
-      "name": "拓斯达",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -3056,12 +2998,6 @@
       "enter_date": "2026-09-19"
     },
     {
-      "code": "301357",
-      "name": "北方长龙",
-      "score": 0,
-      "enter_date": "2026-09-19"
-    },
-    {
       "code": "301366",
       "name": "一博科技",
       "score": 0,
@@ -3130,12 +3066,6 @@
     {
       "code": "600096",
       "name": "云天化",
-      "score": 0,
-      "enter_date": "2026-09-19"
-    },
-    {
-      "code": "600104",
-      "name": "上汽集团",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -3248,18 +3178,6 @@
       "enter_date": "2026-09-19"
     },
     {
-      "code": "600711",
-      "name": "盛屯矿业",
-      "score": 0,
-      "enter_date": "2026-09-19"
-    },
-    {
-      "code": "600744",
-      "name": "华银电力",
-      "score": 0,
-      "enter_date": "2026-09-19"
-    },
-    {
       "code": "600869",
       "name": "远东股份",
       "score": 0,
@@ -3346,12 +3264,6 @@
     {
       "code": "601606",
       "name": "长城军工",
-      "score": 0,
-      "enter_date": "2026-09-19"
-    },
-    {
-      "code": "601857",
-      "name": "中国石油",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -3489,13 +3401,13 @@
     },
     {
       "code": "688001",
-      "name": "苏州华兴源创科技",
+      "name": "XD华兴源",
       "score": 0,
       "enter_date": "2026-09-19"
     },
     {
       "code": "688002",
-      "name": "睿创微纳",
+      "name": "XD睿创微",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -3537,7 +3449,7 @@
     },
     {
       "code": "688031",
-      "name": "星环科技",
+      "name": "星环科技-U",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -3651,7 +3563,7 @@
     },
     {
       "code": "688213",
-      "name": "思特威",
+      "name": "思特威-W",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -3663,7 +3575,7 @@
     },
     {
       "code": "688220",
-      "name": "翱捷科技",
+      "name": "翱捷科技-U",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -3729,7 +3641,7 @@
     },
     {
       "code": "688343",
-      "name": "云天励飞",
+      "name": "云天励飞-U",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -3885,7 +3797,7 @@
     },
     {
       "code": "688549",
-      "name": "中巨芯",
+      "name": "中巨芯-U",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -3897,7 +3809,7 @@
     },
     {
       "code": "688561",
-      "name": "奇安信",
+      "name": "奇安信-U",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -3987,13 +3899,13 @@
     },
     {
       "code": "688783",
-      "name": "西安奕材",
+      "name": "西安奕材-U",
       "score": 0,
       "enter_date": "2026-09-19"
     },
     {
       "code": "688795",
-      "name": "摩尔线程",
+      "name": "摩尔线程-U",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -4011,7 +3923,7 @@
     },
     {
       "code": "688802",
-      "name": "沐曦股份",
+      "name": "沐曦股份-U",
       "score": 0,
       "enter_date": "2026-09-19"
     },
@@ -4048,7 +3960,7 @@
   ],
   "detail": {
     "000039": {
-      "name": "上证信息",
+      "name": "中集集团",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4063,7 +3975,7 @@
       "board_label": "主板"
     },
     "000591": {
-      "name": "中国高精密",
+      "name": "太阳能",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4078,7 +3990,7 @@
       "board_label": "主板"
     },
     "002028": {
-      "name": "映美控股",
+      "name": "思源电气",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4153,7 +4065,7 @@
       "board_label": "主板"
     },
     "002422": {
-      "name": "四川科伦药业",
+      "name": "科伦药业",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4243,7 +4155,7 @@
       "board_label": "主板"
     },
     "300979": {
-      "name": "300979",
+      "name": "华利集团",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4423,7 +4335,7 @@
       "board_label": "主板"
     },
     "000100": {
-      "name": "000100",
+      "name": "TCL科技",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4467,23 +4379,8 @@
       "market_label": "sz",
       "board_label": "主板"
     },
-    "000426": {
-      "name": "兴业银锡",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.34,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "主板"
-    },
     "000560": {
-      "name": "珠江船务",
+      "name": "我爱我家",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4498,7 +4395,7 @@
       "board_label": "主板"
     },
     "000564": {
-      "name": "中创智领",
+      "name": "供销大集",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4528,7 +4425,7 @@
       "board_label": "主板"
     },
     "000620": {
-      "name": "大唐西市",
+      "name": "盈新发展",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4543,7 +4440,7 @@
       "board_label": "主板"
     },
     "000630": {
-      "name": "隽泰控股",
+      "name": "铜陵有色",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4588,7 +4485,7 @@
       "board_label": "主板"
     },
     "000703": {
-      "name": "000703",
+      "name": "恒逸石化",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4603,7 +4500,7 @@
       "board_label": "主板"
     },
     "000725": {
-      "name": "000725",
+      "name": "京东方Ａ",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4618,7 +4515,7 @@
       "board_label": "主板"
     },
     "000735": {
-      "name": "000735",
+      "name": "罗 牛 山",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4633,7 +4530,7 @@
       "board_label": "主板"
     },
     "000737": {
-      "name": "湾区发展",
+      "name": "北方铜业",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4648,7 +4545,7 @@
       "board_label": "主板"
     },
     "000807": {
-      "name": "上海实业环境",
+      "name": "云铝股份",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4693,7 +4590,7 @@
       "board_label": "主板"
     },
     "000833": {
-      "name": "华讯",
+      "name": "粤桂股份",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4708,7 +4605,7 @@
       "board_label": "主板"
     },
     "000878": {
-      "name": "金朝阳集团",
+      "name": "云南铜业",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4738,7 +4635,7 @@
       "board_label": "主板"
     },
     "000933": {
-      "name": "中证医药",
+      "name": "神火股份",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -5293,7 +5190,7 @@
       "board_label": "主板"
     },
     "002536": {
-      "name": "百乐皇宫",
+      "name": "飞龙股份",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -5397,23 +5294,8 @@
       "market_label": "sz",
       "board_label": "主板"
     },
-    "002600": {
-      "name": "领益智造",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.95,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "主板"
-    },
     "002602": {
-      "name": "万物云",
+      "name": "世纪华通",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -5518,7 +5400,7 @@
       "board_label": "主板"
     },
     "002881": {
-      "name": "武汉有机",
+      "name": "美格智能",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -5967,21 +5849,6 @@
       "market_label": "sz",
       "board_label": "创业板"
     },
-    "300191": {
-      "name": "潜能恒信",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.42,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
     "300196": {
       "name": "长海股份",
       "score": 0,
@@ -6083,21 +5950,6 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 3.61,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
-    "300252": {
-      "name": "金信诺",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 2.3,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6447,21 +6299,6 @@
       "market_label": "sz",
       "board_label": "创业板"
     },
-    "300438": {
-      "name": "鹏辉能源",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.06,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
     "300442": {
       "name": "润泽科技",
       "score": 0,
@@ -6777,21 +6614,6 @@
       "market_label": "sz",
       "board_label": "创业板"
     },
-    "300602": {
-      "name": "飞荣达",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.22,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
     "300604": {
       "name": "长川科技",
       "score": 0,
@@ -6803,21 +6625,6 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.46,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
-    "300607": {
-      "name": "拓斯达",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.79,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7857,21 +7664,6 @@
       "market_label": "sz",
       "board_label": "创业板"
     },
-    "301357": {
-      "name": "北方长龙",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.56,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
     "301366": {
       "name": "一博科技",
       "score": 0,
@@ -8098,7 +7890,7 @@
       "board_label": "创业板"
     },
     "301666": {
-      "name": "大普微",
+      "name": "大普微-UW",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -8228,21 +8020,6 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.82,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "主板"
-    },
-    "600104": {
-      "name": "上汽集团",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 3.96,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8817,21 +8594,6 @@
       "market_label": "sh",
       "board_label": "主板"
     },
-    "600711": {
-      "name": "盛屯矿业",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.67,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "主板"
-    },
     "600721": {
       "name": "百花医药",
       "score": 0,
@@ -8873,21 +8635,6 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 2.96,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "主板"
-    },
-    "600744": {
-      "name": "华银电力",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 1,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 3.2,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -9132,21 +8879,6 @@
       "market_label": "sh",
       "board_label": "主板"
     },
-    "601212": {
-      "name": "白银有色",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.12,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "主板"
-    },
     "601288": {
       "name": "农业银行",
       "score": 0,
@@ -9248,21 +8980,6 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.78,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "主板"
-    },
-    "601857": {
-      "name": "中国石油",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.68,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -9612,21 +9329,6 @@
       "market_label": "sh",
       "board_label": "主板"
     },
-    "603799": {
-      "name": "华友钴业",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.36,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "主板"
-    },
     "603893": {
       "name": "瑞芯微",
       "score": 0,
@@ -9793,7 +9495,7 @@
       "board_label": "主板"
     },
     "688001": {
-      "name": "苏州华兴源创科技",
+      "name": "XD华兴源",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -9808,7 +9510,7 @@
       "board_label": "科创板"
     },
     "688002": {
-      "name": "睿创微纳",
+      "name": "XD睿创微",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -9958,7 +9660,7 @@
       "board_label": "科创板"
     },
     "688031": {
-      "name": "星环科技",
+      "name": "星环科技-U",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -10088,21 +9790,6 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.71,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "科创板"
-    },
-    "688099": {
-      "name": "晶晨股份",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.34,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10513,7 +10200,7 @@
       "board_label": "科创板"
     },
     "688213": {
-      "name": "思特威",
+      "name": "思特威-W",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -10543,7 +10230,7 @@
       "board_label": "科创板"
     },
     "688220": {
-      "name": "翱捷科技",
+      "name": "翱捷科技-U",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -10797,23 +10484,8 @@
       "market_label": "sh",
       "board_label": "科创板"
     },
-    "688318": {
-      "name": "财富趋势",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.18,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "科创板"
-    },
     "688322": {
-      "name": "奥比中光",
+      "name": "奥比中光-W",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -10858,7 +10530,7 @@
       "board_label": "科创板"
     },
     "688343": {
-      "name": "云天励飞",
+      "name": "云天励飞-U",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -11067,21 +10739,6 @@
       "market_label": "sh",
       "board_label": "科创板"
     },
-    "688392": {
-      "name": "骄成超声",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.35,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "科创板"
-    },
     "688396": {
       "name": "华润微",
       "score": 0,
@@ -11188,7 +10845,7 @@
       "board_label": "科创板"
     },
     "688469": {
-      "name": "芯联集成",
+      "name": "芯联集成-U",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -11323,7 +10980,7 @@
       "board_label": "科创板"
     },
     "688525": {
-      "name": "佰维存储",
+      "name": "XD佰维存",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -11428,7 +11085,7 @@
       "board_label": "科创板"
     },
     "688549": {
-      "name": "中巨芯",
+      "name": "中巨芯-U",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -11458,7 +11115,7 @@
       "board_label": "科创板"
     },
     "688561": {
-      "name": "奇安信",
+      "name": "奇安信-U",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -11758,7 +11415,7 @@
       "board_label": "科创板"
     },
     "688702": {
-      "name": "盛科通信",
+      "name": "盛科通信-U",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -11818,7 +11475,7 @@
       "board_label": "科创板"
     },
     "688783": {
-      "name": "西安奕材",
+      "name": "西安奕材-U",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -11833,7 +11490,7 @@
       "board_label": "科创板"
     },
     "688795": {
-      "name": "摩尔线程",
+      "name": "摩尔线程-U",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -11878,7 +11535,7 @@
       "board_label": "科创板"
     },
     "688802": {
-      "name": "沐曦股份",
+      "name": "沐曦股份-U",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -12013,7 +11670,7 @@
       "board_label": "科创板"
     },
     "688836": {
-      "name": "宇树科技",
+      "name": "宇树科技-W",
       "score": 0,
       "conds": 0,
       "cond1": false,
