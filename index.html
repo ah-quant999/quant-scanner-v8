@@ -3148,6 +3148,26 @@ function fmtSigned(v){
     </div>
     <div id="dfcHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">&#x1F9EE; 每日因子计算加载中&#x2026;</div></div>
     </div>
+    <!-- ═══════════════════════════════════════════════════════════════
+         🏆 当日因子计分榜（2026-09-19 主人令新建）
+           原话：「这张专门成立一张，把当天进候选池股票的各种因子加减分全列出来，
+                  按分数从高到低排列，最顶部的就是最终推荐的几只了，一目了然为什么选这几只」
+         数据源：data/TOP10_DAILY.js（generate_top10.py 落盘，每票 11 维因子分 + 文字明细，已按 total_score 降序）
+         🏷「最终推荐」标记 ← FINAL_RECOMMEND_DATA.stocks 当日实际推荐名单（代码精确匹配）
+         ═══════════════════════════════════════════════════════════════ -->
+    <div class="card" id="dailyScoreboardCard" style="border-left:4px solid #f59e0b;margin-top:16px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+    <span style="font-size:15px;font-weight:700;color:var(--txt);">🏆 当日因子计分榜</span>
+    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">候选池 top20 · 按总分降序</span>
+    <span id="dsbBadge" style="font-size:10px;color:var(--dim);"></span>
+    </div>
+    <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px;">
+    <b style="color:#f59e0b;">怎么读</b>：候选池每只票的<b>各因子加减分</b>逐项列出（<span style="color:#ef5350;">红=加分</span> / <span style="color:#26a69a;">绿=扣分</span> / 灰=0），按
+    <code style="background:rgba(245,158,11,.1);padding:1px 4px;border-radius:3px;">total_score</code> 从高到低排列 ——
+    <b style="color:#ef5350;">最顶部的就是最终推荐</b>；标 🏷「最终推荐」= 当日 FINAL_RECOMMEND 实际推荐名单。
+    </div>
+    <div id="dsbHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">&#x1F3C6; 当日因子计分榜加载中&#x2026;</div></div>
+    </div>
     <div id="stFaHost"></div></div>
 
     <div id="st-crds" class="st-pane"><div class="card" id="stv8CrdsCard">
@@ -7392,6 +7412,90 @@ function fmtSigned(v){
   };
   window.__dailyFactorCalcReady = true;
 
+  // ═════════════════════════════════════════════════════════════════════════
+  // 🏆 当日因子计分榜（2026-09-19 主人令新建）
+  //   原话：「这张专门成立一张，把当天进候选池股票的各种因子加减分全列出来，
+  //          按分数从高到低排列，最顶部的就是最终推荐的几只了，一目了然为什么选这几只」
+  //   数据源：data/TOP10_DAILY.js 的 top20（generate_top10.py 落盘，每票 11 维因子分 + 文字明细，
+  //           已按 total_score 降序 —— 本卡**照产物原序渲染，不重排**，顶部即最高分）。
+  //   🏷「最终推荐」标记 ← FINAL_RECOMMEND_DATA.stocks 当日实际推荐名单（代码数字位精确匹配）。
+  //   口径注：本榜 = generate_top10.py 的 total_score 评分体系（决定排序的主力分）；
+  //           「已纳入因子」卡的 factor_chain（放量弱势 weak_penalty 等）是推荐层二次微调，
+  //           两层口径各自如实、不混排。
+  // ═════════════════════════════════════════════════════════════════════════
+  window.__dsbRetry = 0;
+  window.__renderDailyScoreboard = function(){
+    var host = document.getElementById('dsbHost');
+    if(!host) return;
+    var _e = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+    var D = window.TOP10_DAILY;
+    var rows = (D && D.top10) || [];
+    if(!rows.length){
+      if(window.__dsbRetry < 15){ window.__dsbRetry++; setTimeout(window.__renderDailyScoreboard, 700); return; }
+      host.innerHTML = '<div class="note" style="padding:14px;text-align:center;color:var(--dim);">🏆 当日评分数据未到位（data/TOP10_DAILY.js）· 待算法链下一轮更新</div>';
+      return;
+    }
+    window.__dsbRetry = 0;
+    var FR = window.FINAL_RECOMMEND_DATA || {};
+    var _rec = {};
+    (FR.stocks||[]).forEach(function(x){ if(x && x.code != null) _rec[String(x.code).replace(/[^0-9]/g,'')] = true; });
+    var _vc = function(v){
+      var n = Number(v); if(isNaN(n)) n = 0;
+      if(n > 0) return '<b style="color:#ef5350;">+'+n+'</b>';
+      if(n < 0) return '<b style="color:#26a69a;">'+n+'</b>';
+      return '<span style="color:#64748b;">0</span>';
+    };
+    // 12 维因子列（照 generate_top10.py breakdown 全量：base/enhance/form/fund/sector/inst/quality/backtest/breakout/research/p4/p5）
+    var FACTS = [
+      ['信号基础','score_base'], ['增强','score_enhance'], ['形态','score_form'],
+      ['资金','score_fund'], ['板块','score_sector'], ['机构','score_inst'],
+      ['质量','score_quality'], ['回测反哺','score_backtest'], ['5日突破','score_breakout'],
+      ['研究','score_research'], ['P4','score_p4'], ['P5','score_p5']
+    ];
+    var _detKeys = ['form_detail','fund_detail','sector_detail','inst_detail','quality_detail','research_detail','p4_detail','p5_detail'];
+    var h = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
+          + '<thead><tr style="background:rgba(148,163,184,.07);color:var(--sub);text-align:left;">'
+          + '<th style="padding:5px 6px;">#</th>'
+          + '<th style="padding:5px 6px;">股票</th>'
+          + FACTS.map(function(f){ return '<th style="padding:5px 6px;text-align:right;white-space:nowrap;">'+f[0]+'</th>'; }).join('')
+          + '<th style="padding:5px 6px;text-align:right;">总分</th>'
+          + '</tr></thead><tbody>';
+    rows.forEach(function(s, i){
+      var code = String(s.code==null?'':s.code).replace(/[^0-9]/g,'');
+      var isRec = !!_rec[code];
+      var tds = FACTS.map(function(f){ return '<td style="padding:5px 6px;text-align:right;">'+_vc(s[f[1]])+'</td>'; }).join('');
+      var dets = [];
+      _detKeys.forEach(function(k){ var v = String(s[k]==null?'':s[k]).trim(); if(v) dets.push(v); });
+      h += '<tr style="border-top:1px solid rgba(148,163,184,.16);'+(isRec?'background:rgba(239,83,80,.06);':'')+'">'
+         + '<td style="padding:5px 6px;color:var(--dim);">'+(i+1)+'</td>'
+         + '<td style="padding:5px 6px;white-space:nowrap;"><b style="color:var(--txt);">'+_e(s.name||'')+'</b> <span style="color:var(--dim);">'+_e(code)+'</span>'
+         + (isRec ? ' <span style="font-size:10px;font-weight:700;color:#ef5350;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);padding:1px 6px;border-radius:8px;white-space:nowrap;">🏷 最终推荐</span>' : '')
+         + '</td>'
+         + tds
+         + '<td style="padding:5px 6px;text-align:right;"><b style="color:#fbbf24;font-size:12.5px;">'+_e(s.total_score)+'</b></td>'
+         + '</tr>'
+         + (dets.length
+            ? '<tr style="'+(isRec?'background:rgba(239,83,80,.06);':'')+'"><td></td>'
+              + '<td colspan="'+(FACTS.length+2)+'" style="padding:0 6px 7px;font-size:10.5px;color:var(--dim);line-height:1.6;">'
+              + _e(dets.join(' ｜ ')) + '</td></tr>'
+            : '');
+    });
+    h += '</tbody></table></div>';
+    var _ts = (D.total_scored == null) ? '' : ('　全池评分 <b style="color:var(--txt);">'+_e(D.total_scored)+'</b> 只（明细落盘 top'+rows.length+'）');
+    h += '<div style="font-size:10.5px;color:var(--dim);margin-top:9px;line-height:1.75;">'
+       + '口径：本榜 = <code>algorithms/generate_top10.py</code> 的 total_score 评分体系（决定排序的主力分，产物原序=已降序）；'
+       + '「已纳入因子」卡的 factor_chain（如放量弱势 weak_penalty）是推荐层的二次微调，两层各自如实、不混排。'
+       + '因子列缺失记 0。数据源 data/TOP10_DAILY.js'
+       + (D.update_time ? (' · 更新于 <b>'+_e(D.update_time)+'</b>') : '')
+       + '。仅研究参考，非买卖建议。</div>';
+    host.innerHTML = h;
+    var bd = document.getElementById('dsbBadge');
+    if(bd){
+      var _nRec = rows.filter(function(x){ return _rec[String(x.code==null?'':x.code).replace(/[^0-9]/g,'')]; }).length;
+      bd.innerHTML = '共 <b style="color:var(--txt);">'+rows.length+'</b> 只 · <b style="color:#ef5350;">'+_nRec+'</b> 只在当日推荐名单' + _ts;
+    }
+  };
+
   window.__renderFactorLab = function(){
     var D = window.FACTOR_LAB;
     if(!D){
@@ -7412,11 +7516,13 @@ function fmtSigned(v){
     var _regimeTxt2 = mkt.regime ? '（'+mkt.regime+'）' : '';
     var gateBanner = '<div style="font-size:12px;padding:5px 9px;border-radius:6px;margin-bottom:9px;background:'+(mkt.ok?'rgba(94,224,160,.12)':'rgba(255,107,129,.10)')+';color:'+(mkt.ok?'#5ee0a0':'#ff6b81')+';">'
       + '⚖ 择时闸门：'+mkt.name+' · '+mkt.observation+'<span style="font-size:10px;opacity:.75;">（短线·实时）</span> &nbsp;|&nbsp; 仓位依据：'+(mkt.ok?'✅ ':'⛔ ')+mkt.verdict+_regimeTxt2+'<span style="font-size:10px;opacity:.75;">（中线·回测）</span></div>';
-+mkt.verdict+_regimeTxt2+'</div>';
+/* 🔴 2026-09-19 清理：原此处有一行 gateBanner 赋值后的孤儿表达式 `+mkt.verdict+...;'`（无作用死代码），删除。 */
     /* ═══════════════════════════════════════════════════════════════════════
        🆕🔴 2026-09-18 主人令（4 条图像取证）—— 本卡**三段式**重构：
          ① 列出**已接入算法链的全部因子**（角色/作用点/本日命中/为何这样）
          ② 对**当天产生的股票**做**加减分的排列** ⇒ 主人原话「才会知道到底逻辑有没有出错」
+           （🔴 2026-09-19 主人令「这张专门成立一张」：② 已迁出成独立卡「🏆 当日因子计分榜」，
+              读 TOP10_DAILY.top20 全量 11 维因子分，见下方 __renderDailyScoreboard / dsbHost）
          ③ **待接入因子队列**：每天推进一种开始测试，达标 ⇒ 写入算法链并登记到上方 ①
        🔴 已删除：原「🟢可关注 N 只」横向股票网格 + 「📄 完整榜单」弹窗
          —— 本页自述「不进选股层、不产出股票池」，卡面却列「可关注」股票 = 自相矛盾（主人原话）。
@@ -7427,7 +7533,7 @@ function fmtSigned(v){
        ═══════════════════════════════════════════════════════════════════════ */
     var FR = window.FINAL_RECOMMEND_DATA || {};
     var CH = FR.factor_chain || null;
-    var TR = FR.factor_trace || [];
+    /* 2026-09-19：原 `var TR = FR.factor_trace || []` 随 ② 段迁出删除（避免未被调用的死变量）。 */
     var PG = window.FACTOR_PROGRESS || {};
     var _secH = function(no, title, color){
       return '<div style="font-weight:700;font-size:12.5px;margin:13px 0 4px;color:'+color+';">'+no+' '+title+'</div>';
@@ -7476,54 +7582,19 @@ function fmtSigned(v){
               + '</tr>';
           }).join('')
         + '</tbody></table>'
-        + (_e(CH.dedup_note||'') ? ('<div style="font-size:11px;color:var(--dim);margin-top:4px;">🛡 '+_e(CH.dedup_note)+'</div>') : '')
-        + (CH.evidence_note ? ('<div style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.75;'
-            + 'background:rgba(251,191,36,.07);border-left:3px solid #f59e0b;padding:6px 9px;border-radius:5px;">'
-            + '<b style="color:#f59e0b;">&#x1F4D0; 计分依据说明（2026-09-18 主人问「扣分标准科学吗」）</b><br>'
-            + _e(CH.evidence_note)+'</div>') : '');
+        + (_e(CH.dedup_note||'') ? ('<div style="font-size:11px;color:var(--dim);margin-top:4px;">🛡 '+_e(CH.dedup_note)+'</div>') : '');
+        /* 🔴 2026-09-19 主人令（图像取证）：「因子实验室里这句删除」——
+           原「📐 计分依据说明（2026-09-18 扣分标准科学吗）」长文块整块移除，不再渲染。
+           证据分级口径唯一收敛到「🧮 每日因子计算」卡底部「依据强度分级」图例，不两处重复。 */
     }
 
-    // ── ② 当日加减分排列 ──
-    var traceBlock;
-    if(!TR.length){
-      traceBlock = '<div class="note" style="color:var(--dim);padding:6px 0;">'
-        + ((CH && CH.skipped) ? '本轮因子融合整体跳过 ⇒ 无因子动作'
-                              : '当日池内票无一被因子触及（或待下一轮 D 批产出，产物字段 factor_trace）') + '</div>';
-    }else{
-      var _srt = TR.slice().sort(function(a,b){
-        return (Number(a.adj_total)||0) - (Number(b.adj_total)||0) || (Number(b.final_score)||0) - (Number(a.final_score)||0);
-      });
-      traceBlock = '<div style="font-size:11px;color:var(--dim);margin:2px 0 6px;">'
-        + '共 <b style="color:var(--txt);">'+TR.length+'</b> 只池内票被因子触及（扣分在前，同分按 final_score 降序）'
-        + '　<b style="color:#26a69a;">负</b>=扣分　<b style="color:#ef5350;">正</b>=加分　'
-        + '<span style="color:#94a3b8;">(仅标注)</span>=不改分</div>'
-        + '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
-        + '<thead><tr style="color:var(--sub);text-align:left;">'
-        + '<th style="padding:4px 6px;">股票</th><th style="padding:4px 6px;">因子动作</th>'
-        + '<th style="padding:4px 6px;">合计 adj</th><th style="padding:4px 6px;">final_score</th>'
-        + '<th style="padding:4px 6px;">共振源</th></tr></thead><tbody>'
-        + _srt.slice(0, 40).map(function(x){
-            var acts = (x.actions||[]).map(function(a){
-              var v = Number(a.adj||0);
-              var ac = v>0 ? '#ef5350' : (v<0 ? '#26a69a' : '#94a3b8');
-              return '<span style="color:'+ac+';margin-right:9px;white-space:nowrap;">'+_e(a.factor)
-                + (v===0 ? '<span style="font-size:10px;color:#94a3b8;">(仅标注)</span>'
-                         : ' <b>'+(v>0?'+':'')+v.toFixed(2)+'</b>') + '</span>';
-            }).join('');
-            var t = Number(x.adj_total||0);
-            var tc = t<0 ? '#26a69a' : (t>0 ? '#ef5350' : '#94a3b8');
-            return '<tr style="border-top:1px solid rgba(148,163,184,.16);">'
-              + '<td style="padding:4px 6px;"><b style="color:var(--txt);">'+_e(String(x.code))+'</b> <span style="color:var(--sub);">'+_e(x.name||'')+'</span></td>'
-              + '<td style="padding:4px 6px;">'+acts+'</td>'
-              + '<td style="padding:4px 6px;font-weight:700;color:'+tc+';">'+(t>0?'+':'')+t.toFixed(2)+'</td>'
-              + '<td style="padding:4px 6px;font-weight:700;color:var(--txt);">'+_e(String(x.final_score))+'</td>'
-              + '<td style="padding:4px 6px;color:var(--dim);">'+_e((x.sources||[]).join(' / '))+'</td>'
-              + '</tr>';
-          }).join('')
-        + '</tbody></table>'
-        + (TR.length > 40 ? '<div style="font-size:11px;color:var(--dim);margin-top:4px;">仅列前 40 只（扣分最重在前），全量见 data/FINAL_RECOMMEND_DATA.js 的 factor_trace</div>' : '');
-    }
-
+    /* 🔴 2026-09-19 主人令（图像取证）：「我的意思是这张专门成立一张，把当天进候选池股票的
+       各种因子加减分全列出来，按分数从高到低排列，最顶部的就是最终推荐的几只了，一目了然为什么选这几只」
+       ⇒ 原 ②「当日加减分排列」（factor_trace，仅触发的 4 只、adj 全 0）整块迁出本卡，
+          独立成新卡「🏆 当日因子计分榜」（st-fa 子页、「🧮 每日因子计算」卡下方，dsbHost）：
+       · 数据源 = TOP10_DAILY.top20（generate_top10.py 落盘，每票 11 维因子分 + 文字明细，已按总分降序）
+       · 顶部即高分区，当日 FINAL_RECOMMEND 推荐名单逐行打「🏷 最终推荐」标
+       · factor_trace 旧表（4 只、adj 恒 0）信息量不足，弃用 */
     // 🛡 2026-09-04 主人令（image#1 真凶·一劳永逸）：原为 slice(5,16) 裸时间戳「🕐 更新 09-03 01:55」，
     //   既无「昨日/N天前」相对语义（主人误读成"今日凌晨"），也与全站「🦊 更新于 …」胶囊格式不一致。
     //   现统一走 _uBadge('盘后','中长线', …)：格式与全站一致 + 自动获得「⚠️ 已停更 N 天」陈旧告警。
@@ -7563,10 +7634,9 @@ function fmtSigned(v){
       + gateBanner
       + '<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">重点池 '+_e(m.n_universe)+' 只 · 异常换手率有效 '+_e(m.n_at_valid)+' · ROE大市值档 '+_e(m.n_roe_large)+'　'
       + '<span style="color:#22c55e">●</span>缩量强势 <span style="color:#ef5350">●</span>放量弱势</div>'
-      + _secH('①', '已纳入算法链的因子（共 ' + ((CH && CH.integrated) || []).length + ' 项）', '#22d3ee')
+      + _secH('①', '算法链因子台账（共 ' + ((CH && CH.integrated) || []).length + ' 项　● 真计入 final_score ｜ ○ 仅标注不计分）', '#22d3ee')
       + chainBlock
-      + _secH('②', '当日加减分排列 —— 验逻辑：当天哪只票被哪个因子加/减了多少分', '#38bdf8')
-      + traceBlock
+      + '<div style="font-size:11.5px;color:var(--dim);margin-top:10px;">② 当日加减分排列已独立成新卡 <b style="color:#38bdf8;">🏆 当日因子计分榜</b>（本子页上方，「🧮 每日因子计算」卡下方）：候选池 top20 各因子加减分全列出，按总分降序，顶部即最终推荐。</div>'
       // 🔴 2026-09-19 主人令：「没被留下的可以完全删除了，也不用跟踪了」
       //   原 ③「待接入因子队列」整块移除 —— 台账已 0 pending（8 项无数据 + 7 项不达标全部删除），
       //   留着只会再次显示「等待」，与主人「不要整个版面都在等待」的令冲突。
@@ -17677,6 +17747,7 @@ hm += '</div>'; // /ulPaneFactor
     // 🔴 2026-09-12 补漏：同上（因子三卡原填充调用只留在 renderUnlisted）
     try{ if(typeof window.__renderFactorLab==='function') window.__renderFactorLab(); }catch(e){ console.warn('因子实验室卡渲染失败', e); }
     try{ if(typeof window.__renderDailyFactorCalc==='function') window.__renderDailyFactorCalc(); }catch(e){ console.warn('每日因子计算卡渲染失败', e); }
+    try{ if(typeof window.__renderDailyScoreboard==='function') window.__renderDailyScoreboard(); }catch(e){ console.warn('当日因子计分榜渲染失败', e); }
     try{ if(typeof window.__renderFactorAudit==='function') window.__renderFactorAudit(); }catch(e){ console.warn('因子审计卡渲染失败', e); }
   };
   // ═══ 🧪 斐波那契观测窗（2026-09-15 主人令：由「🔒 已下架」盘前区迁入「🌍 观测平台 > 📊 大盘观测」）═══
