@@ -14189,7 +14189,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
   window.renderLifeBacktests = function(){
     /* 🗑️ 2026-09-16 主人令：选股生命周期 / 强势突破 两个算法本页下架，
        其回测表（#lifeBack / #sbBack）已随卡片一并移除 ⇒ 此处不再渲染（lifeRenderBacktest 有 !body 守卫，删了也不会报错）。
-       数据层 ALGO_TRACK / STRONG_BREAKOUT_BACKTEST 保持不动，照常回测。 */
+       数据层 ALGO_TRACK 保持不动，照常回测；原强势突破回测数据层已随 2026-09-19 全站删除一并移除。 */
     try{
       var im = window.IMA_STRONG_BACKTEST;
       lifeRenderBacktest('imaBackBody','imaBackNote', im && im.periods, {
