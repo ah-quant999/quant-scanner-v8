@@ -4658,8 +4658,85 @@ function fmtSigned(v){
       h += '</div>';
     } else { h += '<div style="color:var(--dim);font-size:12px">暂无游资独买信号</div>'; }
     h += '</div>';
-    h += '</div>'; // insight-grid 机游
+    // ===== 📊 月度汇总 · 三方共振净流入/净流出 TOP10（2026-09-20 主人令）=====
+    //   口径：三方 = 龙虎榜席位的「机构 + 北向 + 游资」三方（seats 结构），
+    //        个股单日三方净额 = (机构buy-机构sell)+(北向buy-北向sell)+(游资buy-游资sell)。
+    //        当月 = 自然月内所有有龙虎榜数据的交易日，同股跨日累加（同一股票多次上榜则金额相加）。
+    //   排序：净额 > 0 取 TOP10 降序（流入）；净额 < 0 取 TOP10 升序（流出，跌得最狠在前）。
+    //   排版：与「机游共振日历 · 月度汇总」共用 .month-summary/.ms-col/.ms-item 类，保证视觉一致。
+    (function(){
+      var days = (window._rcDays ? window._rcDays() : []) || [];
+      if(!days.length) return;
 
+      // 取「最新有数据的交易日」所属的自然月作为汇总月（与机游月度汇总同口径，不依赖访客本机时区）
+      var lastIso = String(days[days.length-1].iso || '');
+      if(lastIso.length !== 10) return;
+      var _my = parseInt(lastIso.slice(0,4),10), _mm = parseInt(lastIso.slice(5,7),10);
+      var _mLabel = _my + '年' + _mm + '月';
+
+      var _mDays = days.filter(function(d){
+        var iso = String(d.iso || '');
+        return iso.length===10 && parseInt(iso.slice(0,4),10)===_my && parseInt(iso.slice(5,7),10)===_mm;
+      });
+      if(!_mDays.length) return;
+      var _latestDay = String(_mDays[_mDays.length-1].iso);
+
+      // 同股跨日累加三方净额
+      var _agg = {};
+      _mDays.forEach(function(d){
+        (d.stocks || []).forEach(function(s){
+          var code = s.code || '';
+          if(!code) return;
+          var seats = s.seats || {};
+          var net = 0, has = false;
+          ['机构','北向','游资'].forEach(function(k){
+            var seat = seats[k];
+            if(!seat) return;
+            var v = (seat.buy||0) - (seat.sell||0);
+            if(seat.buy!=null || seat.sell!=null){ has = true; }
+            net += v;
+          });
+          // 无 seats 明细时降级用主字段（inst_net_万 + yz_net_万），北向无主字段则不计
+          if(!has){
+            net = (s.inst_net_万||0) + (s.yz_net_万||0);
+          }
+          if(!net) return;
+          if(!_agg[code]) _agg[code] = {code:code, name:s.name||'', net:0, days:0};
+          _agg[code].net += net;
+          _agg[code].days += 1;
+        });
+      });
+
+      var _list = Object.keys(_agg).map(function(k){ return _agg[k]; });
+      var _in  = _list.filter(function(x){ return x.net > 0; }).sort(function(a,b){ return b.net - a.net; }).slice(0,10);
+      var _out = _list.filter(function(x){ return x.net < 0; }).sort(function(a,b){ return a.net - b.net; }).slice(0,10);
+
+      h += '<h3 style="margin-top:22px;font-size:15px;color:var(--txt)">📊 月度汇总 <span style="font-size:11px;color:var(--dim);font-weight:400">· ' + _mLabel + '三方共振净买卖（机构+北向+游资 · 仅当月 · 最新交易日 ' + _latestDay + '）</span></h3>';
+      h += '<div class="month-summary">';
+      if(!_in.length && !_out.length){
+        h += '<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:28px 12px;font-size:13px;background:var(--bg2);border:1px dashed var(--border);border-radius:10px;">📭 ' + _mLabel + ' 暂无三方共振席位数据</div>';
+      } else {
+        h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--up)">▲</span> 净流入TOP10</div>';
+        if(_in.length){
+          _in.forEach(function(s, idx){
+            h += '<div class="ms-item"><span>' + (idx+1) + _rcEsc(s.name) + '<span class="ms-code">' + _rcEsc(s.code) + '</span></span><span class="ms-val c-up">' + _rcFmtYi(s.net) + '</span></div>';
+          });
+        } else { h += '<div style="color:var(--dim);font-size:12px;padding:6px 0">本期无净流入标的</div>'; }
+        h += '</div>';
+
+        h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--down)">▼</span> 净流出TOP10</div>';
+        if(_out.length){
+          _out.forEach(function(s, idx){
+            h += '<div class="ms-item"><span>' + (idx+1) + _rcEsc(s.name) + '<span class="ms-code">' + _rcEsc(s.code) + '</span></span><span class="ms-val c-down">' + _rcFmtYi(s.net) + '</span></div>';
+          });
+        } else { h += '<div style="color:var(--dim);font-size:12px;padding:6px 0">本期无净流出标的</div>'; }
+        h += '</div>';
+      }
+      h += '</div>';
+      h += '<div style="margin-top:10px;font-size:10px;color:var(--dim);text-align:center;line-height:1.6">';
+      h += '口径：龙虎榜席位「机构 + 北向 + 游资」三方净买卖，同一股票当月多次上榜按金额累加 · 当月共 ' + _mDays.length + ' 个交易日<br>';
+      h += '仅供参考，不构成投资建议</div>';
+    })();
 
     c.innerHTML = h;
     window.__insightRendered = true;
@@ -10977,11 +11054,31 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
 
     // 趋势双卡：资金净额趋势 + 价格相对强度
     function sfMiniTrend(title, dataArr, key) {
-      const inList = (dataArr || []).filter(s => (s[key] || 0) > 0).sort((a, b) => b[key] - a[key]).slice(0, 6);
-      const outList = (dataArr || []).filter(s => (s[key] || 0) < 0).sort((a, b) => a[key] - b[key]).slice(0, 6);
       const isPct = key.indexOf('pct') >= 0;
       const unit = isPct ? '%' : '亿';
-      let c = '<div class="sf-trend-card"><div style="font-size:12px;font-weight:700;text-align:center;padding:7px 0;background:#534ab7;color:#fff;">' + title + '</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;">';
+      // 🔴 2026-09-20 主人令（数据必须真实）：累计型字段（net_Nd）必须带真实天数。
+      //   旧实现把「不足 N 天却用现有天数求和」的值直接标成「20日」展示，
+      //   实测芯片概念 20日=4475.9亿实为 13 天累计，真实 20 日 ≈ -657 亿（方向相反）。
+      //   现口径：后端已改为「满窗才出数」，前端只展示天数达标的记录，并把天数标在角标上。
+      const _dm = isPct ? null : /^net_(\d+)d$/.exec(key);
+      const _needN = _dm ? parseInt(_dm[1], 10) : 0;
+      const _daysKey = _needN ? ('net_' + _needN + 'd_days') : null;
+      // 天数达标判定：无天数元数据时（老数据）不臆断，按达标处理但角标显示「?」
+      function _dayOK(s){
+        if(!_needN) return true;
+        var d = s[_daysKey];
+        if(d == null) return true;
+        return d >= _needN;
+      }
+      const _src = (dataArr || []).filter(_dayOK);
+      const _skipped = (dataArr || []).length - _src.length;
+      const inList = _src.filter(s => (s[key] || 0) > 0).sort((a, b) => b[key] - a[key]).slice(0, 6);
+      const outList = _src.filter(s => (s[key] || 0) < 0).sort((a, b) => a[key] - b[key]).slice(0, 6);
+      var _hint = '';
+      if(_needN && _skipped > 0){
+        _hint = '<span title="本地历史不足 ' + _needN + ' 个交易日的板块已剔除，避免用不足天数求和冒充' + _needN + '日累计" style="font-size:10px;font-weight:400;opacity:.85;margin-left:5px;">· 满' + _needN + '日</span>';
+      }
+      let c = '<div class="sf-trend-card"><div style="font-size:12px;font-weight:700;text-align:center;padding:7px 0;background:#534ab7;color:#fff;">' + title + _hint + '</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;">';
       c += '<div><div style="font-size:12px;color:var(--up);font-weight:700;margin-bottom:4px;">' + (isPct ? '领涨' : '流入') + '</div>';
       if (inList.length) {
         inList.forEach(function(s) {

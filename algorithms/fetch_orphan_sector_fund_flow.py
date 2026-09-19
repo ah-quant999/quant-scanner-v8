@@ -371,7 +371,30 @@ def fetch_neodata_5d20d_supplement(sector_names):
 
 
 def fetch_akshare_ths_5d20d_backup(sector_names):
-    """neodata 不可用时的备用方案：同花顺行业指数历史(涨跌幅) + 东财当日资金流估算（标注 source）"""
+    """🔴 2026-09-20 主人令（数据真实性）：本函数已**停用**。
+
+    停用原因（旧实现量纲错误，会产出假数据）：
+        旧公式  net_5d_est = 区间成交额 × 区间涨幅 / 100
+        把「成交额」乘上「涨跌幅」当成「主力资金净流入」——两者量纲根本不是一回事：
+        成交额是买卖双方对撞的总量，涨跌幅只是价格变化率；
+        两者相乘既不等于净流入，也与净流入无稳定相关。
+    实测危害（2026-09-18 数据，芯片概念）：
+        v8 线上 net_5d = 2588 亿，而权威口径同日 net_5d = 339 亿（虚高 7.6 倍）；
+        v8 线上 net_20d = +4476 亿，权威口径 net_20d = -657 亿（**方向相反**）。
+        外部口径参照：东方财富 push2his 板块资金流 / 腾讯自选股板块 mainNetInflow5d。
+
+    替代方案（按优先级，均已在本文件其他函数中实现，保留真实性）：
+        ① P0 本地 history 逐日累加（真实每日主力净额，满窗才出数）
+        ② P1 akshare 东财真实历史接口 _fetch_akshare_real_5d20d（净额字段逐日求和）
+        ③ neodata / westock 外部精确源
+    本函数保留签名与返回值形状（返回空 dict）仅为兼容调用方，不再产出任何估算值。
+    """
+    print("  ⛔ [估算源已停用] fetch_akshare_ths_5d20d_backup 因量纲错误（成交额×涨幅≠资金净额）于 2026-09-20 下线，改用真实源")
+    return {}
+
+
+def _fetch_akshare_ths_5d20d_backup_DISABLED(sector_names):
+    """历史实现（仅存档，不调用）：量纲错误的估算公式。"""
     import akshare as ak_mod
     result = {}
     try:
@@ -788,20 +811,25 @@ def fetch_sector_flow():
                         if item.get("source") not in ("东财历史", "同花顺估算", "neodata"):
                             item["source"] = "本地累加"
                         hist_5d_count += 1
-                    # 20日: 真实历史 >=8 天即可出数（本地约 9 天，避免空窗）
-                    if len(nets) >= 8:
-                        n20 = round(sum(nets[-20:]) if len(nets) >= 20 else sum(nets), 2)
+                    # 20日: 🔴 2026-09-20 主人令「数据必须真实」修复：
+                    #   旧实现 `sum(nets[-20:]) if len(nets)>=20 else sum(nets)` 在历史只有 13 天时
+                    #   把「13日累计」冒充「20日」写进 net_20d，前端标签却仍写「20日」→ 数字虚高且无法分辨。
+                    #   实测：芯片概念 net_20d=4475.9 实为 13 天累计；同期真实 20 日主力净额 ≈ -657 亿（方向相反）。
+                    #   新口径：**天数不够就不出数**（保持 0/None，前端显示「暂无」），只认真正满窗的累计。
+                    _NEED20 = 20
+                    if len(nets) >= _NEED20:
+                        n20 = round(sum(nets[-_NEED20:]), 2)
                         if item.get("net_20d") in (None, 0) and n20 != 0:
                             item["net_20d"] = n20
-                            item["net_20d_days"] = min(len(nets), 20)
+                            item["net_20d_days"] = _NEED20
                             hist_20d_count += 1
-                    # 60日: 真实历史 >=5 天即可出数（2026-08-27 修复：原阈值20天导致
-                    #   history最多19天→零个板块达标→60日恒空。改为与5d一致，有几天出几天）
-                    if len(nets) >= 5:
-                        n60 = round(sum(nets[-60:]) if len(nets) >= 60 else sum(nets), 2)
+                    # 60日: 同 20日 口径——满 60 天才出数，不足则留空（不再用不足天数冒充）
+                    _NEED60 = 60
+                    if len(nets) >= _NEED60:
+                        n60 = round(sum(nets[-_NEED60:]), 2)
                         if item.get("net_60d") in (None, 0) and n60 != 0:
                             item["net_60d"] = n60
-                            item["net_60d_days"] = min(len(nets), 60)
+                            item["net_60d_days"] = _NEED60
                             hist_60d_count += 1
             print(f"  📊 [P0本地累加] 5日={hist_5d_count} 20日={hist_20d_count} 60日={hist_60d_count} (来自{len(hist_data)}个板块history)")
         except Exception as e:
@@ -954,12 +982,12 @@ def fetch_sector_flow():
         if item.get("net_10d") in (None, 0) and net_10d_val != 0 and len(real_10) >= 8:
             item["net_10d"] = net_10d_val
             item["net_10d_days"] = len(real_10)
-        # 20日: >=8 天出数，避免空窗（本地约 9 天可用）
-        if item.get("net_20d") in (None, 0) and net_20d_val != 0 and len(real_20) >= 8:
+        # 20日: 🔴 2026-09-20 主人令：满 20 天才出数（旧版 >=8 天即用 sum(real_20) 冒充 20 日累计）
+        if item.get("net_20d") in (None, 0) and net_20d_val != 0 and len(real_20) >= 20:
             item["net_20d"] = net_20d_val
             item["net_20d_days"] = len(real_20)
-        # 60日: >=5 天出数（2026-08-27 修复：原20天导致history不足时恒空）
-        if item.get("net_60d") in (None, 0) and net_60d_val != 0 and len(real_60) >= 5:
+        # 60日: 同口径，满 60 天才出数（旧版 >=5 天即出数，天数不足会虚高）
+        if item.get("net_60d") in (None, 0) and net_60d_val != 0 and len(real_60) >= 60:
             item["net_60d"] = net_60d_val
             item["net_60d_days"] = len(real_60)
         # 兜底：写实 *_days 字段，sectors_in/out 同步时不再乱 fallback
