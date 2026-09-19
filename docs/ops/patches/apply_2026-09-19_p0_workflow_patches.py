@@ -2,7 +2,12 @@
 # -*- coding: utf-8 -*-
 """docs/ops/patches/apply_2026-09-19_p0_workflow_patches.py
 
-一键应用两份「改 CI workflow」的 P0 补丁（阿狸咪的 PAT 无 workflow scope ⇒ 须由有权限方执行）。
+一键应用三份「改 CI workflow」的补丁（阿狸咪的 PAT 无 workflow scope ⇒ 须由有权限方执行）。
+
+【三份补丁】
+  P0-2  index.html 被 build 静默盖回（根因：备份→reset→盖回，条件在 CI 恒真）
+  P0-3  build gate 只判时钟不判交易日（非交易日盘中窗 build 静默 skip、run 仍绿 = 假成功）
+  P0-1  cn_fetch 接线 fetch_sector_leaders.py（板块龙头股字典随 SECTOR_RS 同轮）
 
 【为什么要有这个脚本，而不是只给 .patch】
   实测（2026-09-19 08:2x，本机）：
@@ -10,7 +15,14 @@
       不认「已经插过」）⇒ 裸 patch 有插重风险。
     · P0-2 的补丁自带保护（二次应用 patch 自报 "Reversed (or previously applied)" 并跳过），
       但会留下 .rej/.orig 垃圾文件。
+    · P0-3 是**插入型**补丁（同 P0-1）⇒ 同样非幂等。
   本脚本：**先判已应用 ⇒ 跳过；未应用 ⇒ dry-run 通过才真跑；跑完逐项自证；清理垃圾**。
+
+【P0-2 与 P0-3 作用于同一文件 —— 顺序已验证无关】
+  实测（2026-09-19 13:2x，对基线 blob 6c109d291a82 / 35445 B）：
+    顺序 A：P0-2 → P0-3  两序 rc 均 0，交叉自证成立
+    顺序 B：P0-3 → P0-2  第二序 patch 报 offset 34 lines 后成功
+    两序最终产物 sha256 前 16 位 = 41907fe9055d11e8（逐字节一致）⇒ 顺序无关。
 
 【用法】（在仓库根目录执行）
     python docs/ops/patches/apply_2026-09-19_p0_workflow_patches.py            # 应用 + 自证
@@ -33,6 +45,20 @@ JOBS = [
         "check": lambda s: (s.count("index.html.manual") == 0
                             and s.count("git reset --hard FETCH_HEAD") == 7),
         "expect": "index.html.manual == 0（原 4）、reset --hard FETCH_HEAD == 7（原 9）",
+    },
+    {
+        "id": "P0-3",
+        "name": "build gate 只判时钟不判交易日（非交易日盘中窗 build 静默 skip、run 仍绿 = 假成功）",
+        "target": ".github/workflows/v8_build_deploy.yml",
+        "patch": "v8_build_deploy_gate_trading_day.patch",
+        "already": lambda s: "id: td_run" in s,
+        "check": lambda s: ("id: td_run" in s
+                            and 'IF_TD=' in s
+                            and "date +%u" in s
+                            and s.count('echo "trading=') == 1
+                            and s.count("is_trading_day: ${{ steps.td_run.outputs.is_trading_day }}") == 1),
+        "expect": ("gate 三步齐备 td(checkout)+td_run(日历)+t(判据)；trading 输出唯一；"
+                   "周末短路 date +%u 在位；outputs 暴露 is_trading_day"),
     },
     {
         "id": "P0-1",
@@ -133,10 +159,12 @@ def main():
     for p in to_push or ["（本次无需改动：均已应用）"]:
         print("   git add %s" % p)
     if to_push:
-        print('   git commit -m "fix(ci): 应用 P0-1/P0-2 workflow 补丁（接口/防覆盖）"')
+        print('   git commit -m "fix(ci): 应用 P0-1/P0-2/P0-3 workflow 补丁（接口/防覆盖/交易日闸门）"')
         print("   git push origin main")
-    print("   推送后请回执阿狸咪：`git show origin/main:%s | grep -c 'index.html.manual'` 期望 0"
-          % ".github/workflows/v8_build_deploy.yml")
+    print("   推送后请回执阿狸咪（三条，期望 0 / 有 td_run / 1）：")
+    print("     git show origin/main:.github/workflows/v8_build_deploy.yml | grep -c 'index.html.manual'")
+    print("     git show origin/main:.github/workflows/v8_build_deploy.yml | grep -c 'id: td_run'")
+    print("     git show origin/main:.github/workflows/v8_cn_fetch_cloud.yml | grep -c 'id: soft_13b'")
     return 0
 
 
