@@ -143,7 +143,16 @@ def _save_phase_snapshot(sectors, update_time_str, data_date_str):
     history["rule_ver"] = PHASE_RULE_VER
     history["snaps"] = snaps
     try:
-        with open(PHASE_HISTORY_PATH, 'w', encoding='utf-8') as f:
+        # 🔴🔴 2026-09-19（阿狸咪的工程师）：**必须显式 newline='\n'**。
+        #   本文件由两条链在**两台不同 OS** 的机器上轮流写：
+        #     · cn_fetch 主表 soft_6（runs-on: ubuntu-latest，写 LF）
+        #     · 算法 A 批 v8_algo_cloud（runs-on: [self-hosted, cn] = Windows，写 CRLF）
+        #   Windows 文本模式下 open(..., 'w') 默认把 \n 翻译成 os.linesep=\r\n ⇒
+        #   每次换机器写就翻转行尾 ⇒ **整份文件逐行全变**（线上实测：每轮 4840 行
+        #   无谓 diff，字节差恰 = 行数 2420 × 1，而内容其实只改了 1 行 update_time）。
+        #   stage_to_raw.py L116 早已确立同一规范（「统一用 LF（newline='\n'），避免
+        #   Windows 下 CRLF 与仓库原格式不一致产生巨量 diff」），本文件是漏网点。
+        with open(PHASE_HISTORY_PATH, 'w', encoding='utf-8', newline='\n') as f:
             json.dump(history, f, ensure_ascii=False, indent=2)
         log(f"  [phase_history] 已存数据日 {dd} 快照 ({len(phases)} 板块 phase)，共 {len(snaps)} 天")
     except Exception as e:
@@ -350,7 +359,8 @@ def main():
             log(f"✓ 基准指数: {benchmark['name']} 5日{benchmark['5d']:.2f}% 20日{benchmark['20d']:.2f}% 52周{benchmark['52w']:.2f}%")
             _neo_dd = (idx.get("_date") or {}).get("hs300") or (idx.get("_date") or {}).get("sh")
             result = _build_result(sectors, benchmark, now_str, source="neodata", data_date=_neo_dd)
-            with open(OUT, 'w', encoding='utf-8') as f:
+            # 同快照：OUT 现为多行产物（直写 raw_data/sector_rs.json），行尾同样必须锁 LF。
+            with open(OUT, 'w', encoding='utf-8', newline='\n') as f:
                 json.dump(result, f, ensure_ascii=False, indent=2)
             log(f"✅ 已保存 (来源: neodata, {len(sectors)}板块, 数据日 {result.get('data_date')}"
                 f" [{result.get('data_date_source')}])")
@@ -375,7 +385,7 @@ def main():
             log("❌ 同花顺返回空：按 _build_result 声明语义**保留上一版**（不写盘、不留快照）")
             record_failure(__file__, "同花顺返回 0 个板块，按语义保留上一版")
             return
-        with open(OUT, 'w', encoding='utf-8') as f:
+        with open(OUT, 'w', encoding='utf-8', newline='\n') as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
         log(f"✅ 已保存 (来源: 同花顺, {len(result.get('sectors',[]))}板块, "
             f"数据日 {result.get('data_date')} [{result.get('data_date_source')}])")
@@ -391,7 +401,7 @@ def main():
     empty_lists.update({f"strong_relative_{k}": [] for k, _ in WINDOWS})
     result = {"update_time": now_str, "data_date": now_str[:10], "data_available": False, "sectors": [], "weak_5d": [], "anti_drop": [],
               "index": {}, **empty_lists}
-    with open(OUT, 'w', encoding='utf-8') as f:
+    with open(OUT, 'w', encoding='utf-8', newline='\n') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
     log(f"⚠️ 所有数据源均失败，写入空结构")
     record_failure(__file__, "所有数据源均失败，写入空结构")
