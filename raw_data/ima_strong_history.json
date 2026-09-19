@@ -1,0 +1,1018 @@
+{
+ "update_time": "2026-09-19 17:34:49",
+ "source": "ima",
+ "source_kind": "archive",
+ "source_title": "强势股跟踪日报 2026-09-02",
+ "data_date": "2026-09-02",
+ "note": "强势股跟踪**历史全量归档**（源方 2026-09-02 日报的跟踪池 112 只，状态含强势/正常/回落/见顶 —— 保留已回落与已见顶，防止幸存者偏差）。由 backtest_life_cards.py 与最新日报 raw_data/ima_strong_stock.json 合并去重使用：同一 code 取**最早** first_selected 作为真实信号日。⚠️ 本文件为冻结归档，不被 fetch_ima_strong_stock.py 覆写。",
+ "stocks": [
+  {
+   "code": "603269",
+   "name": "海鸥股份",
+   "industry": "机械设备-通用设备-其他",
+   "first_selected": "2026-06-09",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": "连涨强势"
+  },
+  {
+   "code": "002768",
+   "name": "国恩股份",
+   "industry": "基础化工-塑料制品-改性",
+   "first_selected": "2026-06-10",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤6.1%)"
+  },
+  {
+   "code": "300420",
+   "name": "五洋自控",
+   "industry": "机械设备-通用设备-其他",
+   "first_selected": "2026-06-12",
+   "trade_date": "2026-09-02",
+   "status": "见顶",
+   "buy_point": ""
+  },
+  {
+   "code": "600529",
+   "name": "山东药玻",
+   "industry": "",
+   "first_selected": "2026-06-16",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤7.1%)"
+  },
+  {
+   "code": "603259",
+   "name": "药明康德",
+   "industry": "医药生物-医疗服务-医疗",
+   "first_selected": "2026-06-18",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤7.0%)"
+  },
+  {
+   "code": "688131",
+   "name": "皓元医药",
+   "industry": "",
+   "first_selected": "2026-06-18",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤8.1%)"
+  },
+  {
+   "code": "002500",
+   "name": "山西证券",
+   "industry": "",
+   "first_selected": "2026-06-22",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": "回调买点(回撤10.5%)"
+  },
+  {
+   "code": "300592",
+   "name": "华凯易佰",
+   "industry": "",
+   "first_selected": "2026-06-22",
+   "trade_date": "2026-09-02",
+   "status": "见顶",
+   "buy_point": ""
+  },
+  {
+   "code": "600369",
+   "name": "西南证券",
+   "industry": "",
+   "first_selected": "2026-06-22",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": "回调买点(回撤10.7%)"
+  },
+  {
+   "code": "000828",
+   "name": "东莞控股",
+   "industry": "",
+   "first_selected": "2026-06-23",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": ""
+  },
+  {
+   "code": "002687",
+   "name": "乔治白",
+   "industry": "纺织服饰-服装家纺-服装",
+   "first_selected": "2026-06-23",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": ""
+  },
+  {
+   "code": "300927",
+   "name": "江天化学",
+   "industry": "基础化工-化学原料-其他",
+   "first_selected": "2026-06-23",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "603330",
+   "name": "天洋新材",
+   "industry": "基础化工-塑料制品-其他",
+   "first_selected": "2026-06-23",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "603903",
+   "name": "中持股份",
+   "industry": "",
+   "first_selected": "2026-06-24",
+   "trade_date": "2026-09-02",
+   "status": "见顶",
+   "buy_point": ""
+  },
+  {
+   "code": "688115",
+   "name": "思林杰",
+   "industry": "机械设备-通用设备-仪器",
+   "first_selected": "2026-06-24",
+   "trade_date": "2026-09-02",
+   "status": "见顶",
+   "buy_point": ""
+  },
+  {
+   "code": "688758",
+   "name": "赛分科技",
+   "industry": "医药生物-化学制药-原料",
+   "first_selected": "2026-06-29",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤9.3%)"
+  },
+  {
+   "code": "300562",
+   "name": "乐心医疗",
+   "industry": "医药生物-医疗器械-医疗",
+   "first_selected": "2026-06-30",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "301122",
+   "name": "采纳股份",
+   "industry": "医药生物-医疗器械-医疗",
+   "first_selected": "2026-06-30",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": "连涨强势"
+  },
+  {
+   "code": "301365",
+   "name": "矩阵股份",
+   "industry": "",
+   "first_selected": "2026-06-30",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤10.0%)"
+  },
+  {
+   "code": "000166",
+   "name": "申万宏源",
+   "industry": "",
+   "first_selected": "2026-07-01",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": "回调买点(回撤10.1%)"
+  },
+  {
+   "code": "000301",
+   "name": "东方盛虹",
+   "industry": "",
+   "first_selected": "2026-07-01",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": ""
+  },
+  {
+   "code": "000989",
+   "name": "短线买点",
+   "industry": "",
+   "first_selected": "2026-07-01",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤9.4%)"
+  },
+  {
+   "code": "001313",
+   "name": "粤海饲料",
+   "industry": "",
+   "first_selected": "2026-07-01",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "002458",
+   "name": "益生股份",
+   "industry": "",
+   "first_selected": "2026-07-01",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "002673",
+   "name": "西部证券",
+   "industry": "",
+   "first_selected": "2026-07-01",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "300192",
+   "name": "科德教育",
+   "industry": "社会服务-教育-教育Ⅲ",
+   "first_selected": "2026-07-01",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "601136",
+   "name": "首创证券",
+   "industry": "",
+   "first_selected": "2026-07-01",
+   "trade_date": "2026-09-02",
+   "status": "见顶",
+   "buy_point": ""
+  },
+  {
+   "code": "601319",
+   "name": "中国人保",
+   "industry": "",
+   "first_selected": "2026-07-01",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "601990",
+   "name": "南京证券",
+   "industry": "",
+   "first_selected": "2026-07-01",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "688318",
+   "name": "财富超势",
+   "industry": "",
+   "first_selected": "2026-07-01",
+   "trade_date": "2026-09-02",
+   "status": "见顶",
+   "buy_point": ""
+  },
+  {
+   "code": "601339",
+   "name": "百隆东方",
+   "industry": "",
+   "first_selected": "2026-07-02",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "002536",
+   "name": "飞龙股份",
+   "industry": "",
+   "first_selected": "2026-07-03",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "601872",
+   "name": "招商轮船",
+   "industry": "",
+   "first_selected": "2026-07-06",
+   "trade_date": "2026-09-02",
+   "status": "见顶",
+   "buy_point": ""
+  },
+  {
+   "code": "002084",
+   "name": "海鸥住工",
+   "industry": "轻工制造-家居用品-其他",
+   "first_selected": "2026-07-07",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": "连涨强势"
+  },
+  {
+   "code": "000017",
+   "name": "深中华A",
+   "industry": "纺织服饰-服装家纺-饰品",
+   "first_selected": "2026-07-09",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "002524",
+   "name": "光正眼科",
+   "industry": "",
+   "first_selected": "2026-07-10",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "600428",
+   "name": "中远海特",
+   "industry": "交通运输-港口航运-航运",
+   "first_selected": "2026-07-10",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤7.3%)"
+  },
+  {
+   "code": "600664",
+   "name": "哈药股份",
+   "industry": "医药生物-化学制药-化学",
+   "first_selected": "2026-07-10",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "603682",
+   "name": "锦和商管",
+   "industry": "商贸零售-零售-商业物业",
+   "first_selected": "2026-07-10",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "000059",
+   "name": "华锦股份",
+   "industry": "石油石化-石油加工贸易-",
+   "first_selected": "2026-07-13",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": "回调买点(回撤12.0%)"
+  },
+  {
+   "code": "600272",
+   "name": "开开实业",
+   "industry": "医药生物-医药商业-医药",
+   "first_selected": "2026-07-13",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "000703",
+   "name": "恒逸石化",
+   "industry": "基础化工-化学纤维-涤纶",
+   "first_selected": "2026-07-14",
+   "trade_date": "2026-09-02",
+   "status": "见顶",
+   "buy_point": ""
+  },
+  {
+   "code": "601700",
+   "name": "风范股份",
+   "industry": "电力设备-电网设备-线缆",
+   "first_selected": "2026-07-14",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": ""
+  },
+  {
+   "code": "601899",
+   "name": "紫金矿业",
+   "industry": "",
+   "first_selected": "2026-07-14",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "002742",
+   "name": "冀衡医药",
+   "industry": "医药生物-化学制药-化学",
+   "first_selected": "2026-07-15",
+   "trade_date": "2026-09-02",
+   "status": "见顶",
+   "buy_point": ""
+  },
+  {
+   "code": "002786",
+   "name": "银宝山新",
+   "industry": "",
+   "first_selected": "2026-07-15",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "300860",
+   "name": "锋尚文化",
+   "industry": "",
+   "first_selected": "2026-07-15",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤7.3%)"
+  },
+  {
+   "code": "600660",
+   "name": "福耀玻璃",
+   "industry": "",
+   "first_selected": "2026-07-15",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤7.9%)"
+  },
+  {
+   "code": "603151",
+   "name": "邦基科技",
+   "industry": "农林牧渔-农产品加工-畜",
+   "first_selected": "2026-07-15",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": "回调买点(回撤11.2%)"
+  },
+  {
+   "code": "300483",
+   "name": "首华燃气",
+   "industry": "石油石化-油气开采及服务",
+   "first_selected": "2026-07-20",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": ""
+  },
+  {
+   "code": "600737",
+   "name": "中粮糖业",
+   "industry": "农林牧渔-农产品加工-其",
+   "first_selected": "2026-07-20",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤8.9%)"
+  },
+  {
+   "code": "688475",
+   "name": "萤石网络",
+   "industry": "",
+   "first_selected": "2026-07-20",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤9.0%)"
+  },
+  {
+   "code": "600060",
+   "name": "海信视像",
+   "industry": "",
+   "first_selected": "2026-07-21",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "603296",
+   "name": "华勤技术",
+   "industry": "",
+   "first_selected": "2026-07-21",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": "回调买点(回撤10.0%)"
+  },
+  {
+   "code": "688002",
+   "name": "睿创微纳",
+   "industry": "",
+   "first_selected": "2026-07-21",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "301008",
+   "name": "宏昌科技",
+   "industry": "",
+   "first_selected": "2026-07-22",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤8.9%)"
+  },
+  {
+   "code": "301234",
+   "name": "五洲医疗",
+   "industry": "医药生物-医疗器械-医疗",
+   "first_selected": "2026-07-22",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": ""
+  },
+  {
+   "code": "603236",
+   "name": "移远通信",
+   "industry": "",
+   "first_selected": "2026-07-22",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": "连涨强势"
+  },
+  {
+   "code": "000685",
+   "name": "中山公用",
+   "industry": "",
+   "first_selected": "2026-07-23",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤9.5%)"
+  },
+  {
+   "code": "002141",
+   "name": "贤丰控股",
+   "industry": "电子-元件-印制电路板",
+   "first_selected": "2026-07-23",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": ""
+  },
+  {
+   "code": "002827",
+   "name": "高争民爆",
+   "industry": "基础化工-化学制品-民爆",
+   "first_selected": "2026-07-23",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "002998",
+   "name": "优彩资源",
+   "industry": "",
+   "first_selected": "2026-07-23",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "300214",
+   "name": "日科化学",
+   "industry": "基础化工-化学制品-其他",
+   "first_selected": "2026-07-23",
+   "trade_date": "2026-09-02",
+   "status": "见顶",
+   "buy_point": ""
+  },
+  {
+   "code": "300640",
+   "name": "德艺文创",
+   "industry": "",
+   "first_selected": "2026-07-23",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "600354",
+   "name": "敦煌种业",
+   "industry": "农林牧渔-种植业与林业-",
+   "first_selected": "2026-07-23",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤10.0%)"
+  },
+  {
+   "code": "600727",
+   "name": "鲁北化工",
+   "industry": "",
+   "first_selected": "2026-07-23",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": "回调买点(回撤10.2%)"
+  },
+  {
+   "code": "601059",
+   "name": "信达证券",
+   "industry": "",
+   "first_selected": "2026-07-23",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": ""
+  },
+  {
+   "code": "601555",
+   "name": "东吴证券",
+   "industry": "",
+   "first_selected": "2026-07-23",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": "回调买点(回撤10.0%)"
+  },
+  {
+   "code": "001230",
+   "name": "劲旅环境",
+   "industry": "环保-环境治理-固废治理",
+   "first_selected": "2026-07-27",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "003010",
+   "name": "若羽臣",
+   "industry": "",
+   "first_selected": "2026-07-28",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "600671",
+   "name": "天目药业",
+   "industry": "",
+   "first_selected": "2026-07-28",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "605179",
+   "name": "一鸣食品",
+   "industry": "食品饮料-饮料制造-乳品",
+   "first_selected": "2026-07-28",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "000623",
+   "name": "吉林敖东",
+   "industry": "",
+   "first_selected": "2026-07-29",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "066000",
+   "name": "诚志股份",
+   "industry": "",
+   "first_selected": "2026-07-29",
+   "trade_date": "",
+   "status": "",
+   "buy_point": ""
+  },
+  {
+   "code": "600177",
+   "name": "雅戈尔",
+   "industry": "",
+   "first_selected": "2026-07-29",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "600298",
+   "name": "安琪酵母",
+   "industry": "",
+   "first_selected": "2026-07-29",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": "连涨强势"
+  },
+  {
+   "code": "601375",
+   "name": "中原证券",
+   "industry": "",
+   "first_selected": "2026-07-29",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤6.3%)"
+  },
+  {
+   "code": "601666",
+   "name": "平煤股份",
+   "industry": "",
+   "first_selected": "2026-07-29",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤6.8%)"
+  },
+  {
+   "code": "002578",
+   "name": "闽发铝业",
+   "industry": "有色金属-工业金属-铝",
+   "first_selected": "2026-08-03",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤9.4%)"
+  },
+  {
+   "code": "603228",
+   "name": "景旺电子",
+   "industry": "电子-元件-印制电路板",
+   "first_selected": "2026-08-03",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤9.3%)"
+  },
+  {
+   "code": "603990",
+   "name": "麦迪科技",
+   "industry": "",
+   "first_selected": "2026-08-05",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": "回调买点(回撤10.6%)"
+  },
+  {
+   "code": "601225",
+   "name": "陕西煤业",
+   "industry": "",
+   "first_selected": "2026-08-06",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": ""
+  },
+  {
+   "code": "601699",
+   "name": "潞安环能",
+   "industry": "",
+   "first_selected": "2026-08-06",
+   "trade_date": "2026-09-02",
+   "status": "见顶",
+   "buy_point": ""
+  },
+  {
+   "code": "600227",
+   "name": "赤天化",
+   "industry": "基础化工-农化制品-氮肥",
+   "first_selected": "2026-08-07",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤9.1%)"
+  },
+  {
+   "code": "603998",
+   "name": "方盛制药",
+   "industry": "",
+   "first_selected": "2026-08-07",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": "回调买点(回撤10.8%)"
+  },
+  {
+   "code": "002142",
+   "name": "宁波银行",
+   "industry": "",
+   "first_selected": "2026-08-10",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "002329",
+   "name": "皇氏集团",
+   "industry": "",
+   "first_selected": "2026-08-10",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "002948",
+   "name": "青岛银行",
+   "industry": "",
+   "first_selected": "2026-08-10",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "300760",
+   "name": "迈瑞医疗",
+   "industry": "",
+   "first_selected": "2026-08-10",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "600926",
+   "name": "杭州银行",
+   "industry": "",
+   "first_selected": "2026-08-13",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": "连涨强势"
+  },
+  {
+   "code": "300865",
+   "name": "大宏立",
+   "industry": "机械设备-专用设备-能源",
+   "first_selected": "2026-08-14",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": "连涨强势"
+  },
+  {
+   "code": "000019",
+   "name": "深粮控股",
+   "industry": "",
+   "first_selected": "2026-08-17",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "002365",
+   "name": "永安药业",
+   "industry": "",
+   "first_selected": "2026-08-17",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤8.0%)"
+  },
+  {
+   "code": "600127",
+   "name": "金健米业",
+   "industry": "农林牧渔-农产品加工-粮",
+   "first_selected": "2026-08-17",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤6.3%)"
+  },
+  {
+   "code": "601952",
+   "name": "苏垦农发",
+   "industry": "",
+   "first_selected": "2026-08-17",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "603395",
+   "name": "红四方",
+   "industry": "基础化工-农化制品-复合",
+   "first_selected": "2026-08-17",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "300761",
+   "name": "立华股份",
+   "industry": "",
+   "first_selected": "2026-08-18",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": "回调买点(回撤10.2%)"
+  },
+  {
+   "code": "000560",
+   "name": "我爱我家",
+   "industry": "",
+   "first_selected": "2026-08-19",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "002332",
+   "name": "仙据制药",
+   "industry": "",
+   "first_selected": "2026-08-20",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": ""
+  },
+  {
+   "code": "001228",
+   "name": "永泰运",
+   "industry": "",
+   "first_selected": "2026-08-21",
+   "trade_date": "2026-09-02",
+   "status": "见顶",
+   "buy_point": ""
+  },
+  {
+   "code": "600179",
+   "name": "安通控股",
+   "industry": "",
+   "first_selected": "2026-08-21",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "920078",
+   "name": "族兴新材",
+   "industry": "",
+   "first_selected": "2026-08-21",
+   "trade_date": "",
+   "status": "",
+   "buy_point": ""
+  },
+  {
+   "code": "000712",
+   "name": "锦龙股份",
+   "industry": "非银金融-证券-证券Ⅲ",
+   "first_selected": "2026-08-24",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": ""
+  },
+  {
+   "code": "601101",
+   "name": "昊华能源",
+   "industry": "煤炭-煤炭开采加工-煤炭",
+   "first_selected": "2026-08-24",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤6.9%)"
+  },
+  {
+   "code": "002999",
+   "name": "天禾股份",
+   "industry": "",
+   "first_selected": "2026-08-25",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤6.1%)"
+  },
+  {
+   "code": "300642",
+   "name": "透景生命",
+   "industry": "",
+   "first_selected": "2026-08-25",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": ""
+  },
+  {
+   "code": "300740",
+   "name": "水羊股份",
+   "industry": "",
+   "first_selected": "2026-08-25",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "603132",
+   "name": "金徽股份",
+   "industry": "",
+   "first_selected": "2026-08-26",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  },
+  {
+   "code": "601233",
+   "name": "桐昆股份",
+   "industry": "",
+   "first_selected": "2026-08-27",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": ""
+  },
+  {
+   "code": "688620",
+   "name": "安凯微",
+   "industry": "",
+   "first_selected": "2026-08-27",
+   "trade_date": "2026-09-02",
+   "status": "正常",
+   "buy_point": "回调买点(回撤7.4%)"
+  },
+  {
+   "code": "301309",
+   "name": "万得凯",
+   "industry": "",
+   "first_selected": "2026-08-28",
+   "trade_date": "2026-09-02",
+   "status": "回落",
+   "buy_point": ""
+  },
+  {
+   "code": "603559",
+   "name": "中通国脉",
+   "industry": "",
+   "first_selected": "2026-08-28",
+   "trade_date": "2026-09-02",
+   "status": "强势",
+   "buy_point": ""
+  }
+ ]
+}

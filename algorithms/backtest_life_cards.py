@@ -11,7 +11,8 @@
   的 algos[0].stats.by_horizon 提供，本脚本不重复计算）：
 
   · 强势突破         信号源 raw_data/strong_breakout_history.json（逐日真实信号账本）
-  · 高手强势股跟踪    信号源 raw_data/ima_strong_stock.json（IMA 同步的真实入选日）
+  · 高手强势股跟踪    信号源 raw_data/ima_strong_stock.json（最新日报）
+                      ∪ raw_data/ima_strong_history.json（历史全量归档，防幸存者偏差）
 
   价格源 raw_data/kline_cache/<code>.json —— 本地真实日K缓存，
   与 algorithms/gen_algo_track.py / calc_crds.py 同源同口径（非估算、非模拟）。
@@ -305,18 +306,7 @@ def run_ima_strong():
     except Exception as e:
         print(f"  ⚠️ ima_strong_stock.json 解析失败: {e}")
         return
-    sigs, skipped = [], 0
-    for x in (obj.get("stocks") or []):
-        c = str(x.get("code") or "").strip()
-        d = str(x.get("first_selected") or "").strip()
-        if c and len(d) == 10 and d[4] == "-":
-            sigs.append((c, d))
-        else:
-            skipped += 1          # 无「首次入选日」的标的无法定位信号时点 —— 如实跳过
-    if not sigs:
-        print("  ⚠️ IMA 无可定位信号时点的标的，跳过")
-        return
-    days = sorted({d for _, d in sigs})
+
     # 🔴 源覆盖度守卫（2026-09-19）：消费上游标注，把「为什么样本这么少」写进产物。
     _qf, _qdeg, _qwhy = _source_quality(obj)
     if len(sigs) < SOURCE_COVERAGE_MIN_ROWS:
@@ -334,7 +324,12 @@ def run_ima_strong():
               f"信号日（{days[0]} ~ {days[-1]}）早已成熟，累积不会补足。")
     _emit("ima_strong_backtest.json", _envelope(
         card="高手强势股跟踪",
-        signal_source="raw_data/ima_strong_stock.json（IMA 同步的真实首次入选日）",
+        signal_source=("raw_data/ima_strong_stock.json（最新日报）"
+                       " ∪ raw_data/ima_strong_history.json（历史全量归档，含已回落/见顶）"),
+        signal_sources_merged={
+            "latest": len(_sig_latest), "history": len(_sig_hist), "merged": len(sigs),
+            "rule": "同 code 取最早 first_selected（真实首次入选日）；归档为冻结文件，不被 fetch 覆写",
+        },
         total_signals=len(sigs),
         skipped_no_signal_date=skipped,
         signal_days=len(days),
