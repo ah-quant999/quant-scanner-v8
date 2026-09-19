@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "faeee3b0b";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "9a811254f";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -613,46 +613,46 @@ window.__domReadyFns=[];
   .tp-hist-cell .tp-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
 </style>
-    <script src="data/ETF_INTRADAY_HEAT.js?v=1789814293" defer></script>
-    <script src="data/SECTOR_FUND_FLOW.js?v=1789814293" defer></script>
-    <script src="data/ETF_NET_SUBSCRIPTION.js?v=1789814293" defer></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=1789811322" defer></script>
+    <script src="data/SECTOR_FUND_FLOW.js?v=1789811322" defer></script>
+    <script src="data/ETF_NET_SUBSCRIPTION.js?v=1789811322" defer></script>
 
-    <script src="data/SECTOR_FUND_FLOW_TREND.js?v=1789814293" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=1789814293" defer></script>
-    <script src="data/DO_NOT_DELETE.js?v=1789814293" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_TREND.js?v=1789811322" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=1789811322" defer></script>
+    <script src="data/DO_NOT_DELETE.js?v=1789811322" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
-    <script src="data/SUSPENSION_ALERT.js?v=1789814293" defer></script>
-    <script src="data/GOLD_POOL.js?v=1789814293" defer></script>
+    <script src="data/SUSPENSION_ALERT.js?v=1789811322" defer></script>
+    <script src="data/GOLD_POOL.js?v=1789811322" defer></script>
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_PROFILE 不再单独下载（1.4MB 与 STOCK_LIST 100% 重复），由 STOCK_LIST 合成 -->
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
-    <script src="data/MACRO_DATA.js?v=1789814293" defer></script>
-    <script src="data/MACRO_BRIEF.js?v=1789814293" defer></script>
-    <script src="data/MACRO_KSHAPE.js?v=1789814293" defer></script><!-- 宏观景气K型分层（数据驱动·每日巡检） -->
-<script src="data/NT_DATA.js?v=1789814293" defer></script>
-<script src="data/LHB_DATA.js?v=1789814293" defer></script>
+    <script src="data/MACRO_DATA.js?v=1789811322" defer></script>
+    <script src="data/MACRO_BRIEF.js?v=1789811322" defer></script>
+    <script src="data/MACRO_KSHAPE.js?v=1789811322" defer></script><!-- 宏观景气K型分层（数据驱动·每日巡检） -->
+<script src="data/NT_DATA.js?v=1789811322" defer></script>
+<script src="data/LHB_DATA.js?v=1789811322" defer></script>
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
-<script src="data/CONCEPT_RANKING.js?v=1789814293" defer></script>
+<script src="data/CONCEPT_RANKING.js?v=1789811322" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
-<script src="data/INDEX_QUOTES.js?v=1789814293" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=1789814293" defer></script>
-<script src="data/MARGIN_DATA.js?v=1789814293" defer></script>
-<script src="data/CFFEX_HOLDINGS.js?v=1789814293" defer></script>
-<script src="data/IPO_DATA.js?v=1789814293" defer></script>
-    <script src="data/CRISIS_DATA.js?v=1789814293" defer></script>
-    <script src="data/JUDGMENT_DATA.js?v=1789814293" defer></script>
-    <script src="data/OVERSEAS_MARKETS.js?v=1789814293" defer></script>
+<script src="data/INDEX_QUOTES.js?v=1789811322" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=1789811322" defer></script>
+<script src="data/MARGIN_DATA.js?v=1789811322" defer></script>
+<script src="data/CFFEX_HOLDINGS.js?v=1789811322" defer></script>
+<script src="data/IPO_DATA.js?v=1789811322" defer></script>
+    <script src="data/CRISIS_DATA.js?v=1789811322" defer></script>
+    <script src="data/JUDGMENT_DATA.js?v=1789811322" defer></script>
+    <script src="data/OVERSEAS_MARKETS.js?v=1789811322" defer></script>
 <!-- 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测卡）。
      数据由 cloud_fetch_v8.py::f_us_hk_map() 盘前 08:25 单档生成 → raw_data/us_hk_map.json
      → update_v8.py → data/US_HK_MAP.js（window.US_HK_MAP）。此处漏注入 = 死块（恒 undefined）。 -->
-<script src="data/US_HK_MAP.js?v=1789814293" defer></script>
+<script src="data/US_HK_MAP.js?v=1789811322" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
-    <script src="data/H_AUTO_BUY.js?v=1789814293" defer></script>
-    <script src="data/H_AUTO_BUY_TRACK.js?v=1789814293" defer></script>
-    <script src="data/UNLISTED_PANEL.js?v=1789814293" defer></script>
+    <script src="data/H_AUTO_BUY.js?v=1789811322" defer></script>
+    <script src="data/H_AUTO_BUY_TRACK.js?v=1789811322" defer></script>
+    <script src="data/UNLISTED_PANEL.js?v=1789811322" defer></script>
     <!-- 2026-09-07 主人令：机构研究·maharo 聚合卡（本机 cookie 拉取，云端无权限；数据由 .workbuddy/maharo_daily_pull.py 每日生成 data/maharo_macro.js） -->
     <!-- 2026-09-10 一劳永逸：AI 解析 insights 拆成独立文件 data/maharo_insights.js（window.MAHORO_INSIGHTS），
          与云端每日重生成的 maharo_macro.js 解耦，避免被云端浅版覆盖回退 -->
@@ -663,7 +663,7 @@ window.__domReadyFns=[];
          故删此行零功能损失。若日后云端产出 maharo_macro.js，恢复本行即可。 -->
     <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=1789808204） -->
     <script src="data/maharo_insights.js?v=1789808204" defer></script>
-    <script src="data/BAIHECHOU_MACRO.js?v=1789814293" defer></script>
+    <script src="data/BAIHECHOU_MACRO.js?v=1789811322" defer></script>
     <!-- 🛡 2026-09-18 一劳永逸（阿狸咪的工程师）：AI 解析拆成独立文件 data/BAIHECHOU_ANALYSIS.js
          （window.BAIHECHOU_ANALYSIS），与每日重抓的 window.BAIHECHOU_MACRO **解耦**。
          根因实测：09-18 06:31 本机推送的当期解析（7fd2ac048f，17334 B）被 09:16 一次
@@ -671,25 +671,25 @@ window.__domReadyFns=[];
          该抓取方用自己陈旧的本地副本做基线（fetch_baihechou_v8.load_existing_analysis
          从本地文件救 analysis），抓新原文后整文件覆盖。解析独立成文件后，抓取方无论
          本地多旧都不可能再覆盖它（同 data/maharo_insights.js 范式，2026-09-10 已验证）。 -->
-    <script src="data/BAIHECHOU_ANALYSIS.js?v=1789814293" defer></script><!-- 🌐 新周期判定 · 海外宏观 + AI 大周期（数据源：雪球 @白河愁博士；工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿 · window.BAIHECHOU_MACRO） -->
+    <script src="data/BAIHECHOU_ANALYSIS.js?v=1789811322" defer></script><!-- 🌐 新周期判定 · 海外宏观 + AI 大周期（数据源：雪球 @白河愁博士；工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿 · window.BAIHECHOU_MACRO） -->
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
-    <script src="data/MARKET_REGIME.js?v=1789814293" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
-    <script src="data/RISK_GAUGE.js?v=1789814293" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
-    <script src="data/SECTOR_RECOMMENDATION.js?v=1789814293" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
-    <script src="data/WEEKEND_META_REPORT.js?v=1789814293" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
+    <script src="data/MARKET_REGIME.js?v=1789811322" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
+    <script src="data/RISK_GAUGE.js?v=1789811322" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
+    <script src="data/SECTOR_RECOMMENDATION.js?v=1789811322" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
+    <script src="data/WEEKEND_META_REPORT.js?v=1789811322" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
     <!-- 2026-09-13 阿狸咪的工程师：补注入 FRESHNESS_STATUS（2.7 KB）。
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=1789814293" defer></script>
-  <script src="data/AVG_PRICE_DATA.js?v=1789814293" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=1789811322" defer></script>
+  <script src="data/AVG_PRICE_DATA.js?v=1789811322" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
-    <script src="data/CONCEPT_ETF_MAP.js?v=1789814293" defer></script>
+    <script src="data/CONCEPT_ETF_MAP.js?v=1789811322" defer></script>
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
-    <script src="data/SECTOR_LEADERS.js?v=1789814293" defer></script>
+    <script src="data/SECTOR_LEADERS.js?v=1789811322" defer></script>
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
-    <script src="data/PORTFOLIO.js?v=1789814293" defer></script>
+    <script src="data/PORTFOLIO.js?v=1789811322" defer></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -1736,107 +1736,105 @@ function _buildJudgmentEnvHTML(d){
 }
 window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 </script>
-<script src="data/CRDS_CARD_DATA.js?v=1789814293" defer></script>
-<script src="data/TRIPLE_CONSENSUS.js?v=1789814293" defer></script>
-<script src="data/TRIPLE_TRACK.js?v=1789814293" defer></script>
-<script src="data/TRIPLE_HISTORY.js?v=1789814293" defer></script>
+<script src="data/CRDS_CARD_DATA.js?v=1789811322" defer></script>
+<script src="data/TRIPLE_CONSENSUS.js?v=1789811322" defer></script>
+<script src="data/TRIPLE_TRACK.js?v=1789811322" defer></script>
+<script src="data/TRIPLE_HISTORY.js?v=1789811322" defer></script>
 <!-- 🔴 2026-09-14 一劳永逸：V8_CAL.js 原为全页 head 内【唯一】无 defer 的脚本
      → 同步阻塞 HTML 解析（浏览器须停下等它下载+执行，才继续解析其后 93 个 defer 脚本与整个 body）。
      消费方全是 DOMContentLoaded 后的渲染回调 → 加 defer 语义不变。 -->
-<script src="data/V8_CAL.js?v=1789814293" defer></script>
-<script src="data/SH_FIB.js?v=1789814293" defer></script>
+<script src="data/V8_CAL.js?v=1789811322" defer></script>
+<script src="data/SH_FIB.js?v=1789811322" defer></script>
 <!-- 🗑 2026-09-15 主人令：统计链路整链下线——本卡已改读 window.MAHORO_INSIGHTS 直供实情解析，
      故不再注入 AI_INSIGHTS_COMPARE 数据文件（文件本身连同 fetcher 一并从仓库删除）。 -->
-<script src="data/WAVE_ELLIOTT.js?v=1789814293" defer></script>
-<script src="data/SZ_FIB.js?v=1789814293" defer></script>
-<script src="data/SECTOR_RS.js?v=1789814293" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=1789814293" defer></script>
-<script src="data/INST_TRADE.js?v=1789814293" defer></script>
-<script src="data/NORTH_FUND.js?v=1789814293" defer></script>
-<script src="data/MARKET_ALERTS.js?v=1789814293" defer></script>
-<script src="data/MARKET_FUND_FLOW_DATA.js?v=1789814293" defer></script>
-<script src="data/LIMIT_UP_HEATMAP.js?v=1789814293" defer></script>
+<script src="data/WAVE_ELLIOTT.js?v=1789811322" defer></script>
+<script src="data/SZ_FIB.js?v=1789811322" defer></script>
+<script src="data/SECTOR_RS.js?v=1789811322" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=1789811322" defer></script>
+<script src="data/INST_TRADE.js?v=1789811322" defer></script>
+<script src="data/NORTH_FUND.js?v=1789811322" defer></script>
+<script src="data/MARKET_ALERTS.js?v=1789811322" defer></script>
+<script src="data/MARKET_FUND_FLOW_DATA.js?v=1789811322" defer></script>
+<script src="data/LIMIT_UP_HEATMAP.js?v=1789811322" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
-<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=1789814293" defer></script>
-<script src="data/LIMIT_UP_BROKEN.js?v=1789814293" defer></script>
-<script src="data/VOLATILITY.js?v=1789814293" defer></script>
-<script src="data/CAPITAL_FLOW_DATA.js?v=1789814293" defer></script>
-<script src="data/SH_SZ_HISTORY.js?v=1789814293" defer></script>
-<script src="data/CANDIDATE.js?v=1789814293" defer></script>
-    <script src="data/FOUR_VOLUME.js?v=1789814293" defer></script>
-    <script src="data/FOUR_VOLUME_60M.js?v=1789814293" defer></script>
+<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=1789811322" defer></script>
+<script src="data/LIMIT_UP_BROKEN.js?v=1789811322" defer></script>
+<script src="data/VOLATILITY.js?v=1789811322" defer></script>
+<script src="data/CAPITAL_FLOW_DATA.js?v=1789811322" defer></script>
+<script src="data/SH_SZ_HISTORY.js?v=1789811322" defer></script>
+<script src="data/CANDIDATE.js?v=1789811322" defer></script>
+    <script src="data/FOUR_VOLUME.js?v=1789811322" defer></script>
+    <script src="data/FOUR_VOLUME_60M.js?v=1789811322" defer></script>
 
     <!-- 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」= 历史追踪 + 回测
          数据源：algorithms/update_four_volume_history.py（逐日账本+真实收盘价序列）
                 algorithms/gen_four_volume_track.py（持仓跟踪/告警/前向累积/聚类/重叠）
          经 update_v8.py 的 CATEGORY_MAP 生成 data/*.js 注入 window 变量。
          ?v= 由 scripts/reconcile_cache_busters.py 自动对齐，此处写任意值即可。 -->
-    <script src="data/FOUR_VOLUME_TRACK.js?v=1789814293" defer></script>
-    <script src="data/FOUR_VOLUME_HISTORY.js?v=1789814293" defer></script>
-    <script src="data/STOCK_STOP_DATA.js?v=1789814293" defer></script>
-<script src="data/BACKTEST_COMPREHENSIVE.js?v=1789814293" defer></script>
-<script src="data/BACKTEST_TDX.js?v=1789814293" defer></script>
+    <script src="data/FOUR_VOLUME_TRACK.js?v=1789811322" defer></script>
+    <script src="data/FOUR_VOLUME_HISTORY.js?v=1789811322" defer></script>
+    <script src="data/STOCK_STOP_DATA.js?v=1789811322" defer></script>
+<script src="data/BACKTEST_COMPREHENSIVE.js?v=1789811322" defer></script>
+<script src="data/BACKTEST_TDX.js?v=1789811322" defer></script>
 
-<script src="data/OPTIMIZED_STRATEGY.js?v=1789814293" defer></script>
-<script src="data/EXPERIMENT.js?v=1789814293" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=1789814293" defer></script>
+<script src="data/OPTIMIZED_STRATEGY.js?v=1789811322" defer></script>
+<script src="data/EXPERIMENT.js?v=1789811322" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=1789811322" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=1789814293" defer></script>
-    <script src="data/IMA_STRONG_STOCK.js?v=1789814293" defer></script>
+<script src="data/V8_POOL_TRACKER.js?v=1789811322" defer></script>
+    <script src="data/IMA_STRONG_STOCK.js?v=1789811322" defer></script>
     <!-- 🆕 2026-09-04 强势突破选股（高手算法反推版 v1，strong_breakout.py 盘后产出） -->
-    <script src="data/STRONG_BREAKOUT.js?v=1789814293" defer></script>
-    <script src="data/FACTOR_LAB_BACKTEST.js?v=1789814293" defer></script>
+    <script src="data/STRONG_BREAKOUT.js?v=1789811322" defer></script>
+    <script src="data/FACTOR_LAB_BACKTEST.js?v=1789811322" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
-<script src="data/BACKTEST_ALL_ALGOS.js?v=1789814293" defer></script>
+<script src="data/BACKTEST_ALL_ALGOS.js?v=1789811322" defer></script>
 <!-- 🔴 2026-09-14 主人令：「金股池和候选股池是算法的上游水源，不是策略，不需要回测！」
      原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
-    <script src="data/FACTOR_LAB.js?v=1789814293" defer></script>
+    <script src="data/FACTOR_LAB.js?v=1789811322" defer></script>
 <!-- 🟢 2026-09-16 主人令（「你缺的是生命周期的回测」）：
      ALGO_TRACK.js 再度注入 —— 它是「选股生命周期（实盘持仓池）」回测的唯一真源，
      内含 by_horizon（真实持仓池分档前向收益）+ unrealized（当日浮动）。
      2026-08-31 曾因「前端零引用」停止注入（省 42.4 KB）——现回测页需要它，故恢复。 -->
-    <script src="data/ALGO_TRACK.js?v=1789814293" defer></script>
-<script src="data/ETF_PULSE.js?v=1789814293" defer></script>
-<script src="data/ETF_DAILY_MONITOR.js?v=1789814293" defer></script>
-<script src="data/TOP10_DAILY.js?v=1789814293" defer></script>
-<script src="data/WEEKEND_RUN.js?v=1789814293" defer></script>
-<script src="data/W52_HIGH.js?v=1789814293" defer></script>
+    <script src="data/ALGO_TRACK.js?v=1789811322" defer></script>
+<script src="data/ETF_PULSE.js?v=1789811322" defer></script>
+<script src="data/ETF_DAILY_MONITOR.js?v=1789811322" defer></script>
+<script src="data/TOP10_DAILY.js?v=1789811322" defer></script>
+<script src="data/WEEKEND_RUN.js?v=1789811322" defer></script>
+<script src="data/W52_HIGH.js?v=1789811322" defer></script>
 <!-- 2026-08-30：盘后数据页新增解禁日历 + 业绩预告 -->
-<script src="data/RESTRICTED_RELEASE.js?v=1789814293" defer></script>
-<script src="data/PERFORMANCE_FORECAST.js?v=1789814293" defer></script>
+<script src="data/RESTRICTED_RELEASE.js?v=1789811322" defer></script>
+<script src="data/PERFORMANCE_FORECAST.js?v=1789811322" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=1789814293" defer></script>
-<script src="data/HB_XIAOJIU.js?v=1789814293" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=1789814293" defer></script>
-<script src="data/HEALTH_CHECK.js?v=1789814293" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=1789814293" defer></script>
+<script src="data/RUNNER_STATUS.js?v=1789811322" defer></script>
+<script src="data/HB_XIAOJIU.js?v=1789811322" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=1789811322" defer></script>
+<script src="data/HEALTH_CHECK.js?v=1789811322" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=1789811322" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
-    <script src="data/CITIC_PE_THERMO.js?v=1789814293" defer></script>
-    <script src="data/CITIC_PE_BACKTEST.js?v=1789814293" defer></script>
+    <script src="data/CITIC_PE_THERMO.js?v=1789811322" defer></script>
+    <script src="data/CITIC_PE_BACKTEST.js?v=1789811322" defer></script>
     <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
-    <script src="data/VALUATION_PERCENTILE.js?v=1789814293" defer></script>
-    <!-- 2026-09-09 主人令：A股质量价值中小盘多因子 vs v8 选股因子审计（暂未上架） -->
-    <script src="data/FACTOR_AUDIT.js?v=1789814293" defer></script>
+    <script src="data/VALUATION_PERCENTILE.js?v=1789811322" defer></script>
     <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
     <!-- 2026-09-10 主人令：因子补缺 walk-forward 进度跟踪卡（暂未上架·实验区最下方） -->
-    <script src="data/FACTOR_PROGRESS.js?v=1789814293" defer></script>
+    <script src="data/FACTOR_PROGRESS.js?v=1789811322" defer></script>
     <!-- 🆕 2026-09-19 主人令（阿狸咪的工程师）：walk-forward 真值（verdict / IR_OOS / 跑赢基准率），
          供「🧪 已纳入因子」+「🧮 每日因子计算」两卡读 P5 段闸门真值。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
-    <script src="data/FACTOR_WALKFORWARD.js?v=1789814293" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=1789814293" defer></script>
+    <script src="data/FACTOR_WALKFORWARD.js?v=1789811322" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=1789811322" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=1789814293" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=1789814293" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=1789814293" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=1789811322" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=1789811322" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=1789811322" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/FOUR_VOLUME_BACKTEST.js?v=1789814293" defer></script>
-    <script src="data/STRONG_BREAKOUT_BACKTEST.js?v=1789814293" defer></script>
-    <script src="data/IMA_STRONG_BACKTEST.js?v=1789814293" defer></script>
-    <script src="data/CRDS_BACKTEST.js?v=1789814293" defer></script>
+    <script src="data/FOUR_VOLUME_BACKTEST.js?v=1789811322" defer></script>
+    <script src="data/STRONG_BREAKOUT_BACKTEST.js?v=1789811322" defer></script>
+    <script src="data/IMA_STRONG_BACKTEST.js?v=1789811322" defer></script>
+    <script src="data/CRDS_BACKTEST.js?v=1789811322" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -2023,7 +2021,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       //   原 ok 仅校验 head 含卡名，但：defer 时序下需排序：
       //     1) HTML 分析到 line 1630+ 注册 ◐◦selfHealJudgmentHeader；
       //     2) HTML 继续分析到 line 10673 注册 v8CardHeader；
-      //     3) <script src="data/JUDGMENT_DATA.js?v=1789814293" defer> 和 <script src="data/MACRO_BRIEF.js?v=1789814293" defer> 在 HTML 分析完成后才异步执行；
+      //     3) <script src="data/JUDGMENT_DATA.js?v=1789811322" defer> 和 <script src="data/MACRO_BRIEF.js?v=1789811322" defer> 在 HTML 分析完成后才异步执行；
       //     4) 首次 initCardBadges / switchSec 触发 ◐◦renderJudgmentHeader 时，JUDGMENT_DATA.js 可能还没加载完；
       //     5) ts='' → v8CardHeader 返回的 HTML 中：卡名、副标题，但缺少「更新于」膠勢；
       //     6) 自愈校验 ok 通过（head.innerHTML.indexOf('今日判定')>=0）→ 永不重昆明；
@@ -3127,7 +3125,8 @@ function fmtSigned(v){
     </div>
     </div>
     <!-- ═══════════════════════════════════════════════════════════════
-         🧮 每日因子计算（2026-09-19 主人令新建）
+         🧮 每日因子计算（2026-09-19 主人令新建；同日二次令：与「已纳入因子」合并为一卡两步
+            第一步=本卡主体（每日打分引擎，generate_top10.py 投影）；第二步=已纳入因子（factorLabBody 容器内迁））
            原话：「每天如何给入选的股票们打分的全部在新卡列出来，新卡名字叫每日因子计算」
          数据源：algorithms/generate_top10.py 的**真实现**（P1~P5 段 + 形态/资金/板块/机构/基本面）
          🔴 铁律：本卡是代码的**投影**，每个权重都必须能在源码里指到行；
@@ -3136,6 +3135,7 @@ function fmtSigned(v){
     <div class="card" id="dailyFactorCalcCard" style="border-left:4px solid #38bdf8;margin-top:16px;">
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
     <span style="font-size:15px;font-weight:700;color:var(--txt);">🧮 每日因子计算</span>
+    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#38bdf822;color:#38bdf8;border:1px solid #38bdf84d;">第一步 · 每日打分</span>
     <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#38bdf822;color:#38bdf8;border:1px solid #38bdf84d;">入选后打分全表</span>
     <span id="dfcBadge" style="font-size:10px;color:var(--dim);"></span>
     </div>
@@ -3147,9 +3147,13 @@ function fmtSigned(v){
     <b style="color:#fbbf24;">因子只改排序，不决定谁能进池</b> —— 进池由 scanner 选股策略决定。
     </div>
     <div id="dfcHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">&#x1F9EE; 每日因子计算加载中&#x2026;</div></div>
+    <div style="border-top:1px dashed rgba(148,163,184,.35);margin:16px 0 0;"></div>
+    <div style="font-size:11.5px;color:var(--dim);margin:10px 0 6px;">▼ <b style="color:var(--sub);">第二步 · 已纳入因子</b> —— 哪些因子真进了算法链累积分（推荐层二次微调）</div>
+    <div id="factorLabBody"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">&#x1F9EA; 已纳入因子加载中&#x2026;</div></div>
     </div>
     <!-- ═══════════════════════════════════════════════════════════════
-         🏆 当日因子计分榜（2026-09-19 主人令新建）
+         🏆 当日因子计分榜（2026-09-19 主人令新建；同日二次令：标注「第三步」，为因子链条收口卡
+            顺序 = 因子实验室定位卡 → 第一步 每日因子计算（含第二步 已纳入因子） → 第三步 本卡）
            原话：「这张专门成立一张，把当天进候选池股票的各种因子加减分全列出来，
                   按分数从高到低排列，最顶部的就是最终推荐的几只了，一目了然为什么选这几只」
          数据源：data/TOP10_DAILY.js（generate_top10.py 落盘，每票 11 维因子分 + 文字明细，已按 total_score 降序）
@@ -3158,6 +3162,7 @@ function fmtSigned(v){
     <div class="card" id="dailyScoreboardCard" style="border-left:4px solid #f59e0b;margin-top:16px;">
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
     <span style="font-size:15px;font-weight:700;color:var(--txt);">🏆 当日因子计分榜</span>
+    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">第三步 · 当日榜单</span>
     <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">候选池 top20 · 按总分降序</span>
     <span id="dsbBadge" style="font-size:10px;color:var(--dim);"></span>
     </div>
@@ -3168,7 +3173,7 @@ function fmtSigned(v){
     </div>
     <div id="dsbHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">&#x1F3C6; 当日因子计分榜加载中&#x2026;</div></div>
     </div>
-    <div id="stFaHost"></div></div>
+    </div>
 
     <div id="st-crds" class="st-pane"><div class="card" id="stv8CrdsCard">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
@@ -7606,6 +7611,7 @@ function fmtSigned(v){
       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
       + '<b style="font-size:15px;">🧪 已纳入因子</b>'
       + '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#22c55e22;color:#22c55e;border:1px solid #22c55e4d;">已进算法链 · 真计分</span>'
+      + '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#22c55e22;color:#22c55e;border:1px solid #22c55e4d;">第二步</span>'
       // 🔴 2026-09-19 主人令：「把已纳入算法链的因子都写在这卡，改名叫已纳入因子」
       //   原卡名「🧪 因子实验室 · 异常换手率 × ROE_TTM」—— 那是**研究期**的两个候选因子，
       //   而现在它们一个已被判定不计分（异常换手率=仅展示）、一个仅展示（ROE_TTM），
@@ -8506,272 +8512,11 @@ window.__renderIndexObserve = function(){
     + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
 };
 
-  // ===== 📊 因子审计：v8 选股 vs 质量价值中小盘多因子（2026-09-09 主人令：暂未上架·实验区）=====
-  window.__faRetry = 0;
-  window.__renderFactorAudit = function(){
-    var dst = document.getElementById('factorAuditBody');
-    if(!dst) return;
-    var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
-    var F = window.FACTOR_AUDIT;
-    var P = window.FACTOR_PROGRESS;   // 2026-09-13 主人令：原进度卡并入本卡，故须两源俱到
-    if(!F || !F.factors || !F.factors.length || !P || !P.factors || !P.factors.length){
-      if(window.__faRetry < 25){ window.__faRetry++; setTimeout(window.__renderFactorAudit, 600); return; }
-      dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F4CA; 因子补缺与审计 数据未到位</div>';
-      return;
-    }
-    var st = F.summary || {};
-    var pst = P.summary || {};        // 进度口径汇总
-    function batchColor(b){ if(b === 1) return '#ef5350'; if(b === 2) return '#fb923c'; return '#94a3b8'; }
-    function progIcon(s){
-      if(s === 'done') return '<span style="color:#22c55e;">✅ done</span>';
-      if(s === 'in_progress') return '<span style="color:#fb923c;">⏳ 跑中</span>';
-      if(s === 'blocked') return '<span style="color:#ef5350;">⛔ blocked</span>';
-      return '<span style="color:var(--dim);">⏸ pending</span>';
-    }
-    function statusColor(s){
-      if(s === '已使用') return '#22c55e';
-      if(s === '部分使用') return '#fbbf24';
-      return '#ef5350';
-    }
-    function priorityColor(p){
-      if(p === '高') return '#ef5350';
-      if(p === '中') return '#fbbf24';
-      return '#94a3b2';
-    }
-    /* P2-PATCHED 2026-09-16 主人令「这个表这两天一直在说也没改！」：
-       把 walk-forward 真结果叠回上半审计表 —— 已达标并接入的标 ✅、回测不达标已弃用的标 ⛔，
-       免得「v8状态」永远停在「未使用 / 待接入」。真源 = FACTOR_PROGRESS（台账），前端只读不编。 */
-    function _wfOverlay(name){
-      var _i2, _pf = (P.factors || []);
-      for(_i2 = 0; _i2 < _pf.length; _i2++){
-        if(_pf[_i2].name === name && _pf[_i2].backtest_status === 'done'){
-          var _ir = (_pf[_i2].oos_ir == null ? '' : (' · IR_OOS ' + _pf[_i2].oos_ir));
-          return { chip: '<span style="margin-left:5px;font-size:10px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.14);padding:1px 5px;border-radius:4px;">✅ 回测达标' + _ev(_ir) + '</span>',
-                   status: '<span style="color:#22c55e;">已接入评分</span>' };
-        }
-      }
-      var _rt = (pst.retired_by_backtest || []);
-      for(_i2 = 0; _i2 < _rt.length; _i2++){
-        if(_rt[_i2].name === name){
-          return { chip: '<span style="margin-left:5px;font-size:10px;font-weight:600;color:#ef5350;background:rgba(239,83,80,.14);padding:1px 5px;border-radius:4px;">⛔ 回测不达标</span>',
-                   status: '<span style="color:#ef5350;">已弃用·不再接入</span>' };
-        }
-      }
-      return null;
-    }
-    /* 🔴 2026-09-18 主人令「已接入的，为什么上表中没有？」：
-       实测真相 = 上半表 7 行**全部是「未使用/部分使用」的候选缺口**，
-       已接入算法链的因子（60日成交额中位数 / 换手率趋势）**本就不在该表**（该表设计是「缺口表」不是「全清单」）。
-       为避免主人再次误读「已接入的没登记」，此处**自 FACTOR_PROGRESS 动态追加已接入的对照行**（绿框），
-       数据源仍是台账，前端只读不编。 */
-    var _integratedRows = (function(){
-      var _out = '', _ints = (pst.walkforward_integrated || []);
-      var _pm = {};
-      (P.factors || []).forEach(function(x){ if(x && x.name) _pm[x.name] = x; });
-      _ints.forEach(function(nm){
-        var _f = _pm[nm] || {};
-        var _ir = (_f.oos_ir == null) ? '—' : (Number(_f.oos_ir).toFixed(2));
-        _out += '<tr style="background:rgba(34,197,94,.07);border-top:1.5px solid rgba(34,197,94,.35);">'
-          + '<td style="padding:6px 8px;font-size:12px;font-weight:700;color:var(--txt);">' + _ev(nm)
-          + '<span style="margin-left:5px;font-size:10px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.14);padding:1px 5px;border-radius:4px;">✅ 已接入算法链</span></td>'
-          + '<td style="padding:6px 8px;font-size:11px;color:var(--sub);">' + _ev(_f.label || '—') + '</td>'
-          + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">' + _ev(_f.data_source || '—') + '</td>'
-          + '<td style="padding:6px 8px;font-size:11px;font-weight:700;color:#22c55e;">✅ 已接入 generate_top10.py</td>'
-          + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">IR_OOS ' + _ir + '</td>'
-          + '<td style="padding:6px 8px;font-size:11px;font-weight:700;color:#22c55e;">已上线</td>'
-          + '</tr>';
-      });
-      return _out;
-    })();
-    var rows = _integratedRows + F.factors.map(function(f){
-      var sc = statusColor(f.v8_status);
-      var pc = priorityColor(f.priority);
-      var _wo = _wfOverlay(f.name);
-      return '<tr>'
-        + '<td style="padding:6px 8px;font-size:12px;font-weight:700;color:var(--txt);">' + _ev(f.name) + (_wo ? _wo.chip : '') + '</td>'
-        + '<td style="padding:6px 8px;font-size:11px;color:var(--sub);">' + _ev(f.label) + '</td>'
-        + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">' + _ev(f.screenshot_logic) + '</td>'
-        + '<td style="padding:6px 8px;font-size:11px;font-weight:700;color:' + sc + ';">' + (_wo ? _wo.status : _ev(f.v8_status)) + '</td>'
-        + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">' + _ev(f.data_source) + '</td>'
-        + '<td style="padding:6px 8px;font-size:11px;font-weight:700;color:' + pc + ';">' + _ev(f.priority) + '</td>'
-        + '</tr>';
-    }).join('');
-    // —— 下半：walk-forward 进度（原「因子补缺·进度」卡）——
-    var progRows = (P.factors || []).map(function(f){
-      var bc = batchColor(f.batch);
-      return '<tr>'
-        + '<td style="padding:6px 8px;font-size:12px;font-weight:800;color:' + bc + ';">B' + _ev(f.batch) + '</td>'
-        + '<td style="padding:6px 8px;font-size:12px;font-weight:700;color:var(--txt);">' + _ev(f.name) + '</td>'
-        + '<td style="padding:6px 8px;font-size:11px;color:var(--sub);">' + _ev(f.label) + '</td>'
-        + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">' + _ev(f.data_source) + '</td>'
-        + '<td style="padding:6px 8px;font-size:11px;">' + progIcon(f.backtest_status) + '</td>'
-        + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">' + _ev(f.oos_ir == null ? '—' : (f.oos_ir.toFixed ? f.oos_ir.toFixed(2) : f.oos_ir)) + '</td>'
-        + '<td style="padding:6px 8px;font-size:11px;font-weight:600;color:var(--sub);">' + _ev(f.owner || '?') + '</td>'
-        + '<td style="padding:6px 8px;font-size:11px;color:var(--dim);">' + _ev(f.deploy_status) + '</td>'
-        + '</tr>';
-    }).join('');
-    var _batches = pst.batches || {};
-    var batchBars = [1,2,3].map(function(b){
-      var bs = _batches[b] || {total:0, pending:0, done:0};
-      var doneW = bs.total ? Math.round(bs.done / bs.total * 100) : 0;
-      return '<div style="margin-bottom:6px;">'
-        + '<div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:2px;">'
-        + '<span style="font-weight:700;color:' + batchColor(b) + ';">B' + b + ' · ' + bs.done + '/' + bs.total + '</span>'
-        + '<span style="color:var(--dim);">done ' + doneW + '%</span></div>'
-        + '<div style="display:flex;height:8px;border-radius:3px;overflow:hidden;background:rgba(148,163,184,.15);">'
-        + '<div style="width:' + doneW + '%;background:#22c55e;"></div>'
-        + '</div></div>';
-    }).join('');
-    var gaps = (st.key_gaps || []).map(function(g){
-      return '<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:5px;font-size:11.5px;line-height:1.6;color:var(--sub);">'
-        + '<span style="color:#22c55e;flex-shrink:0;">&#x2022;</span><span>' + _ev(g) + '</span></div>';
-    }).join('');
-    dst.innerHTML = ''
-      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
-      + '<b style="font-size:15px;">&#x1F4CA; 因子补缺与审计：v8 选股 vs 质量价值中小盘多因子</b>'
-      + '<span style="font-size:10px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);padding:1px 6px;border-radius:4px;">审计+跟踪</span>'
-      // 2026-09-13 主人令：原「因子补缺·walk-forward 进度」卡与本卡合并，取两源最新时间，只留一个「更新于」胶囊。
-      + _uBadge('盘后', '研究+进度', (F.update_time > P.update_time ? F.update_time : P.update_time), (F.source || P.source_update_time))
-      + '</div>'
-      // 2026-09-10 主人令：卡名下方加"核心内容 + 解析"
-      + '<div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.22);border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.7;">'
-      + '<div style="font-size:12px;color:var(--txt);margin-bottom:6px;">'
-      + '&#x1F4CC; <b style="color:#22c55e;">核心</b>：主人截图中的 7 个<b>质量+价值+中小盘</b>多因子（总市值 / 盈利收益率 E/P / GPOA / 经营现金流总资产比 / 负债总资产比 / 60日成交额中位数 / 60日波动率）'
-      + ' vs v8 <code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">generate_top10.py</code> 现状：<b>上半看覆盖状态（缺什么）</b>，<b>下半看 walk-forward 进度（跑到哪）</b>。'
-      + '</div>'
-      + '<div style="font-size:11.5px;color:var(--sub);">'
-      + '&#x1F4A1; <b style="color:#22c55e;">解析</b>：当前 v8 <code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">quality</code> 维度仅 ROE + 营收增长 + grade + news，<b>5 个真正缺失</b>（GPOA / 经营现金流-总资产 / 盈利收益率 E/P / 总市值 / 60 日成交额中位数）。'
-      + '红色缺失项接入 <code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">generate_top10.py</code> 前，<b>必须先跑 walk-forward 回测按 edge 定权重，禁止直接硬编码高分</b>；'
-      + '上线条件 = <b>OOS IR &gt; 0.3</b> 且 <b>4/5 年胜率 &gt; 55%</b>（主人 2026-09-09 22:31 决策的分批 walk-forward 计划：B1 高优 / B2 中优 / B3 已覆盖）。'
-      + '<br>&#x26A0; <b style="color:#22c55e;">限制</b>：基于截图逻辑人工审计（原先写死的 done 计数已删除，改由台账实时统计）；walk-forward 台账共 <b>' + (pst.total || 0) + '</b> 项：done <b style="color:#22c55e;">' + (pst.done || 0) + '</b> · 不达标删除 <b style="color:#ef5350;">' + ((pst.retired_by_backtest || []).length) + '</b> · 仍 pending <b>' + (pst.pending || 0) + '</b>，故仍 pending 的条目<b>暂不具备接入条件</b>。'
-      + '</div></div>'
-      + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">'
-      + '<div style="background:rgba(239,83,80,.06);border:1px solid rgba(239,83,80,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">缺失/未直接用</div><div style="font-size:20px;font-weight:800;color:#ef5350;">' + (st.missing || 0) + '</div></div>'
-      + '<div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">部分使用</div><div style="font-size:20px;font-weight:800;color:#fbbf24;">' + (st.partial || 0) + '</div></div>'
-      + '<div style="background:rgba(38,166,154,.06);border:1px solid rgba(38,166,154,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">已覆盖</div><div style="font-size:20px;font-weight:800;color:#26a69a;">' + (st.covered || 0) + '</div></div>'
-      + '<div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">总因子</div><div style="font-size:20px;font-weight:800;color:#22c55e;">' + (st.total || 0) + '</div></div>'
-      + '</div>'
-      + '<div style="overflow-x:auto;margin-bottom:12px;">'
-      + '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
-      + '<thead><tr style="background:rgba(34,197,94,.08);">'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">因子</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">标签</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">截图逻辑</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">v8状态</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">数据源</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">优先级</th>'
-      + '</tr></thead><tbody>' + rows + '</tbody></table></div>'
-      + '<div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.25);border-radius:7px;padding:10px 13px;margin-bottom:10px;">'
-      + '<div style="font-size:12px;font-weight:700;color:#22c55e;margin-bottom:8px;">关键缺口与接入建议</div>'
-      + gaps
-      + '</div>'
-      + '<div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);margin-bottom:14px;">'
-      + '⚠️ <b style="color:#22c55e;">禁止直接硬编码高分</b>：缺失项接入 generate_top10.py 前，必须先跑 walk-forward 回测确定真实 edge；OOS IR / sharpe / max_dd 必须由 walk-forward 真实跑出。'
-      + '<b>回填链路（2026-09-16 起全自动，无需人工）</b>：<code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">algorithms/factor_walkforward.py</code> 真跑 → <code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">raw_data/factor_walkforward.json</code> → <code style="background:rgba(34,197,94,.1);padding:1px 4px;border-radius:3px;">scripts/gen_factor_progress.py</code> 套用（达标 done+接入 / 不达标删除）→ 本卡自动显示。'
-      + '</div>'
-      // ===== 下半：walk-forward 补缺进度（原独立卡，2026-09-13 合并） =====
-      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px 0;padding-top:12px;border-top:1px dashed rgba(148,163,184,.3);">'
-      + '<b style="font-size:13.5px;color:#f59e0b;">&#x1F9EA; 下半 · walk-forward 补缺进度</b>'
-      + '<span style="font-size:10px;font-weight:600;color:#f59e0b;background:rgba(245,158,11,.12);padding:1px 6px;border-radius:4px;">跟踪中</span>'
-      + '</div>'
-      + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">'
-      + '<div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">总因子</div><div style="font-size:20px;font-weight:800;color:#f59e0b;">' + (pst.total || 0) + '</div></div>'
-      + '<div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">已 done</div><div style="font-size:20px;font-weight:800;color:#22c55e;">' + (pst.done || 0) + '</div></div>'
-      + '<div style="background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">pending</div><div style="font-size:20px;font-weight:800;color:#94a3b8;">' + (pst.pending || 0) + '</div></div>'
-      + '<div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--dim);">完成率</div><div style="font-size:20px;font-weight:800;color:#f59e0b;">' + (pst.total ? Math.round((pst.done||0) / pst.total * 100) : 0) + '%</div></div>'
-      + '</div>'
-      + '<div style="background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.2);border-radius:7px;padding:8px 12px;margin-bottom:12px;">'
-      + '<div style="font-size:12px;font-weight:700;color:#f59e0b;margin-bottom:8px;">分批进度</div>'
-      + batchBars
-      + '</div>'
-      + '<div style="overflow-x:auto;margin-bottom:12px;">'
-      + '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
-      + '<thead><tr style="background:rgba(245,158,11,.08);">'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">批</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">因子</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">标签</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">数据源</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">回测</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">OOS IR</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">owner</th>'
-      + '<th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--sub);">上线</th>'
-      + '</tr></thead><tbody>' + progRows + '</tbody></table></div>'
-      + '<div style="background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
-      + '&#x1F4CB; 计划口径：' + _ev(P.policy || '') + ''
-      + '</div>'
-      // ===== 🗑 已裁决删除（2026-09-19 主人令：「算不了就不再跟踪，直接删除」）=====
-      //   与「回测不达标」严格区分：那批是「跑过、没达标」（判断）；
-      //   这批是「前置数据不存在、根本跑不了」（事实）⇒ 分区展示，不混为一谈。
-      + _retiredSection(P);
-  };
-
-  // 已裁决删除区块（两类：前置数据不存在 / 回测不达标）
-  function _retiredSection(P){
-    var s = P.summary || {};
-    var rbt = s.retired_by_backtest || [];
-    var rnd = s.retired_no_data || [];
-    if(!rbt.length && !rnd.length) return '';
-    var h = '';
-    h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:16px 0 10px 0;padding-top:12px;border-top:1px dashed rgba(148,163,184,.3);">'
-       + '<b style="font-size:13.5px;color:#ef5350;">&#x1F5D1; 已裁决删除</b>'
-       + '<span style="font-size:10px;font-weight:600;color:#ef5350;background:rgba(239,83,80,.12);padding:1px 6px;border-radius:4px;">不留遗体 · 不占版面</span>'
-       + '</div>';
-    if(rnd.length){
-      h += '<div style="background:rgba(239,83,80,.05);border:1px solid rgba(239,83,80,.25);border-radius:7px;padding:9px 12px;margin-bottom:10px;">'
-         + '<div style="font-size:12px;font-weight:700;color:#ef5350;margin-bottom:6px;">'
-         + '&#x26D4; 前置数据不存在（' + rnd.length + ' 项）—— <b>根本算不了，故直接删除</b></div>'
-         + '<div style="font-size:11px;color:var(--sub);line-height:1.7;margin-bottom:7px;">'
-         + '★ 这不是「回测不达标」，而是<b style="color:#ef5350;">所需字段在现网数据里压根不存在</b> ⇒ 无论跑多久都出不来结论，'
-         + '留在台账只会让卡片永远显示「等待」。复活条件已写成规则（不靠人情）：补齐下表字段后移回候选池即可重跑。</div>'
-         + '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;">'
-         + '<thead><tr style="background:rgba(239,83,80,.08);">'
-         + '<th style="padding:5px 7px;text-align:left;color:var(--sub);">因子</th>'
-         + '<th style="padding:5px 7px;text-align:left;color:var(--sub);">缺什么字段</th>'
-         + '<th style="padding:5px 7px;text-align:left;color:var(--sub);">为何算不出</th>'
-         + '</tr></thead><tbody>'
-         + rnd.map(function(r){
-             return '<tr>'
-               + '<td style="padding:5px 7px;font-weight:700;color:var(--txt);">' + _ev(r.name) + '</td>'
-               + '<td style="padding:5px 7px;color:#ef5350;font-weight:600;">' + _ev(r.missing_fields) + '</td>'
-               + '<td style="padding:5px 7px;color:var(--dim);">' + _ev(r.why_unsolvable) + '</td>'
-               + '</tr>';
-           }).join('')
-         + '</tbody></table></div></div>';
-    }
-    if(rbt.length){
-      h += '<div style="background:rgba(148,163,184,.05);border:1px solid rgba(148,163,184,.25);border-radius:7px;padding:9px 12px;margin-bottom:10px;">'
-         + '<div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:6px;">'
-         + '&#x1F4C9; 回测不达标（' + rbt.length + ' 项）—— 跑过、没过的门槛（IR_OOS &gt; 0.3 且 ≥4/5 年跑赢基准 &gt; 55%）</div>'
-         + '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;">'
-         + '<thead><tr style="background:rgba(148,163,184,.08);">'
-         + '<th style="padding:5px 7px;text-align:left;color:var(--sub);">因子</th>'
-         + '<th style="padding:5px 7px;text-align:left;color:var(--sub);">IR_OOS</th>'
-         + '<th style="padding:5px 7px;text-align:left;color:var(--sub);">跑赢基准率</th>'
-         + '<th style="padding:5px 7px;text-align:left;color:var(--sub);">曾接入</th>'
-         + '</tr></thead><tbody>'
-         + rbt.map(function(r){
-             var _ir = r.ir_oos;
-             var _irc = (_ir != null && _ir > 0) ? '#26a69a' : '#ef5350';
-             return '<tr>'
-               + '<td style="padding:5px 7px;font-weight:700;color:var(--txt);">' + _ev(r.name) + '</td>'
-               + '<td style="padding:5px 7px;font-weight:700;color:' + _irc + ';">' + (_ir == null ? '—' : _ir) + '</td>'
-               + '<td style="padding:5px 7px;color:var(--sub);">' + (r.beat_base_rate == null ? '—' : r.beat_base_rate + '%') + '</td>'
-               + '<td style="padding:5px 7px;color:var(--dim);">' + (r.was_p5_integrated ? '⚠️ 曾接入，已自动停用' : '否') + '</td>'
-               + '</tr>';
-           }).join('')
-         + '</tbody></table></div></div>';
-    }
-    return h;
-  }
-  window.__retiredSection = _retiredSection;
-
-  
-
   // ===== 🧪 因子补缺 walk-forward 进度跟踪（2026-09-10 主人令：暂未上架·实验区最下方）=====
   // 数据源：raw_data/factor_progress.json（由 gen_factor_progress.py 根据 FACTOR_AUDIT + 主人分批决策生成）
   window.__fpRetry = 0;
 
-  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderBtExtraPane(); }catch(e){} try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderObsPlatform(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeObserve(); }catch(e){} try{ window.__renderIndexObserve(); }catch(e){} try{ window.__renderFactorAudit(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} try{ window.__renderDailyFactorCalc(); }catch(e){} } try{ window.renderLifeBacktests(); }catch(e){}
+  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderBtExtraPane(); }catch(e){} try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderObsPlatform(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeObserve(); }catch(e){} try{ window.__renderIndexObserve(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} try{ window.__renderDailyFactorCalc(); }catch(e){} } try{ window.renderLifeBacktests(); }catch(e){}
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
   } else {
@@ -11046,11 +10791,11 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=1789814293"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=1789811322"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=1789814293';
+        return 'data/IPO_DATA.js?v=1789811322';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
@@ -14813,7 +14558,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     else if(tab==='fa'){
       if(typeof window.__renderFactorPane==='function'){ try{ window.__renderFactorPane(); }catch(e){} }
       if(typeof window.__renderFactorLab==='function'){ try{ window.__renderFactorLab(); }catch(e){} }
-      if(typeof window.__renderFactorAudit==='function'){ try{ window.__renderFactorAudit(); }catch(e){} }
     }
   }
   /* ═══ 🔴🔴 2026-09-17 主人令「统一按委员会走，就是要统一口径，不要打架」═══════
@@ -14905,7 +14649,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       if(typeof window.__renderFactorPane==='function') setTimeout(window.__renderFactorPane, 30);
       if(typeof window.__renderFactorLab==='function') setTimeout(window.__renderFactorLab, 30);
       if(typeof window.__renderDailyFactorCalc==='function') setTimeout(window.__renderDailyFactorCalc, 30);
-      if(typeof window.__renderFactorAudit==='function') setTimeout(window.__renderFactorAudit, 30);
     }
     // 2026-09-06 审计修复：__renderFactorLab 死调用移除（当时该容器在暂未上架·实验区，life tab 无此容器）
     // 2026-09-12 更新：因子实验室已迁入本页 🧪 因子实验室 子页，其渲染由上方 if(n==='fa') 分支负责，故此处仍不挂 life。
@@ -15360,7 +15103,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
    注入行 ⇒ window.SECTOR_LEADERS 恒 undefined、整块恒不渲染（死块）。本版三项全治：
      ① 生成器 scripts/fetch_sector_leaders.py 扩 主升+启动（板块带 phase 字段）；
      ② 独立卡置于「概念/行业 → ETF·龙头 参考」卡上方（#sectorLeadersCard）；
-     ③ index.html 补 <script src="data/SECTOR_LEADERS.js?v=1789814293"> 注入。
+     ③ index.html 补 <script src="data/SECTOR_LEADERS.js?v=1789811322"> 注入。
    口径：主升=5日>3%且20日>5%；启动=5日>1.5%且20日>-8%（与「板块资金趋势」卡/生成器 _phase_of 三处同规则）。
    ⚠️ 护栏：无数据 ⇒ 卡保持 display:none（不产出空壳卡）；body.innerHTML 幂等重渲（重复调用不叠加）。 */
   /* ═══ 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射 · 填充函数 ═══
@@ -15751,7 +15494,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=1789814293';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=1789811322';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -15760,7 +15503,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=1789814293';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=1789811322';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -15886,8 +15629,8 @@ h += '</div>'; // /ulPaneObserve
 //   三组迁出去向（卡片容器 id 全部保留，仅换宿主；渲染函数按 id 取容器，故迁页零改动）：
 //     · 回测·框架 3 卡  RPS 30天样本考核（已删）/ 中信PE观测（已并到暂未上架）/ 指数观测（已并到暂未上架）
 //       → 策略回测页底部 #btExtraHost（__renderBtExtraPane）现仅保留其它回测类卡壳
-//     · 因子类   3 卡  因子实验室 / 因子审计 / 因子补缺进度
-//       → 选股策略 → 🧪 因子实验室 子页 #stFaHost（__renderFactorPane），位于逆势龙头左侧（2026-09-18：非策略·加分项·不评星）
+//     · 因子类   3 卡  因子实验室(已纳入因子) / 因子审计(2026-09-19 下线) / 因子补缺进度
+//       → 选股策略 → 🧪 因子实验室 子页（直挂静态卡，stFaHost 壳已删；__renderFactorPane 只做就地填充）
 //     · 宏观类   3 卡  机构研究·AI解析 / 新周期判定 / 宏观景气背景·K型分层
 //       （2026-09-13 主人令：「新周期判定」已下沉至「暂未上架 → 观测类」最下方
 //         ⇒ 宏观观测页现为 2 卡：机构研究·AI解析 + 宏观景气背景·K型分层）
@@ -17736,19 +17479,14 @@ hm += '</div>'; // /ulPaneBacktest
     //   renderUnlisted 里，宿主迁走后不再被触发 → 三卡恒「加载中」）
     // 2026-09-13 主人令：原回测卡 / 原指数中枢卡 已并入暂未上架合并卡，此处不再调用
   };
+  /* 🔴 2026-09-19 主人令（因子三卡整理）：
+     ① 「已纳入因子」（factorLabBody）并入「🧮 每日因子计算」卡作第二步，容器随静态 HTML 内迁；
+     ② 「📊 因子审计」卡整体下线（__renderFactorAudit / factorAuditBody / data/FACTOR_AUDIT.js 前端引用全删）；
+     ③ stFaHost 空壳骨架随之移除 —— 本函数只负责子页三卡的就地填充。 */
   window.__renderFactorPane = function(){
-    var hm = '';
-hm += '<div id="ulPaneFactor">';
-hm += '<div class="card" id="factorLabBody" style="margin-bottom:16px;border-left:4px solid #22d3ee;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F9EA; 因子实验室（异常换手率 · ROE_TTM 大市值档）加载中&#x2026;</div></div>';
-hm += '<div class="card" id="factorAuditBody" style="margin-bottom:16px;border-left:4px solid #22c55e;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4CA; 因子审计：v8 选股 vs 质量价值中小盘多因子 加载中&#x2026;</div></div>';
-hm += '</div>'; // /ulPaneFactor
-    var _host = document.getElementById('stFaHost');
-    if(_host) _host.innerHTML = hm;
-    // 🔴 2026-09-12 补漏：同上（因子三卡原填充调用只留在 renderUnlisted）
-    try{ if(typeof window.__renderFactorLab==='function') window.__renderFactorLab(); }catch(e){ console.warn('因子实验室卡渲染失败', e); }
+    try{ if(typeof window.__renderFactorLab==='function') window.__renderFactorLab(); }catch(e){ console.warn('已纳入因子卡渲染失败', e); }
     try{ if(typeof window.__renderDailyFactorCalc==='function') window.__renderDailyFactorCalc(); }catch(e){ console.warn('每日因子计算卡渲染失败', e); }
     try{ if(typeof window.__renderDailyScoreboard==='function') window.__renderDailyScoreboard(); }catch(e){ console.warn('当日因子计分榜渲染失败', e); }
-    try{ if(typeof window.__renderFactorAudit==='function') window.__renderFactorAudit(); }catch(e){ console.warn('因子审计卡渲染失败', e); }
   };
   // ═══ 🧪 斐波那契观测窗（2026-09-15 主人令：由「🔒 已下架」盘前区迁入「🌍 观测平台 > 📊 大盘观测」）═══
   //   卡位：紧贴「📊 艾略特波浪 · 深度分析」卡下方（主人令：两卡都盘后更新，差别不大，**不合卡**）
@@ -19174,12 +18912,12 @@ window.__renderV8CalToday();
 <script>
 (function(){
   var BIG=[
-    {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=1789814293'},
+    {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=1789811322'},
     // 🛡 2026-08-31 一劳永逸：STOCK_PROFILE.js(1.4MB) 与 STOCK_LIST 的 industry/concepts
     //   实测 9602 条【零差异】、且 45.9% 为空值 → 停止单独下载，改由 STOCK_LIST 到位后就地
     //   合成 window.STOCK_PROFILE，前端引用点(819/5979 行)零改动。省 1.4 MB 下载。
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=1789814293'},
-    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=1789814293'}
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=1789811322'},
+    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=1789811322'}
   ];
   function loadOne(item, done){
     var s=document.createElement('script');
