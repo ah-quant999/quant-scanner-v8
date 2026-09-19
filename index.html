@@ -3126,8 +3126,13 @@ function fmtSigned(v){
                   凡「未回测/薄样本」证据，一律如实标注，不许美化（沿用 09-18 主人令）。
          ═══════════════════════════════════════════════════════════════ -->
     <div class="card" id="dailyFactorCalcCard" style="border-left:4px solid #38bdf8;margin-top:16px;">
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+    <!-- 🔻 2026-09-19 主人令（图像取证）：①「更新于」徽章提到卡名正后方（全站规范：卡名置顶 + 更新于紧随，仍读产物真值不写死）
+         ②、卡名行右侧「回测 时间」删除（不重复占卡头） ③「第一步 · 每日打分 / 入选后打分全表 / 共 N 项」下移第二行 -->
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
     <span style="font-size:15px;font-weight:700;color:var(--txt);">🧮 每日因子计算</span>
+    <span id="dfcUpdSlot" style="display:inline-flex;align-items:center;gap:6px;"></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
     <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#38bdf822;color:#38bdf8;border:1px solid #38bdf84d;">第一步 · 每日打分</span>
     <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#38bdf822;color:#38bdf8;border:1px solid #38bdf84d;">入选后打分全表</span>
     <span id="dfcBadge" style="font-size:10px;color:var(--dim);"></span>
@@ -7327,8 +7332,9 @@ function fmtSigned(v){
     if(bd){
       var _n = 0;
       GROUPS.forEach(function(G){ _n += G.rows.length; });
-      bd.innerHTML = '共 <b style="color:var(--txt);">'+_n+'</b> 项'
-                   + (_fwAt ? ('　回测 '+_e(_fwAt.slice(5,16))) : '');
+      // 🔴 2026-09-19 主人令：卡头右侧「回测 09-19 18:25」删除
+      //   —— 卡头只留项数；回测口径与时间仍在页脚与「口径与独立分层回测明细」折叠内。
+      bd.innerHTML = '共 <b style="color:var(--txt);">'+_n+'</b> 项';
     }
   };
   window.__dailyFactorCalcReady = true;
@@ -7546,7 +7552,7 @@ function fmtSigned(v){
           var _t = _v === 'PASS' ? '✅ 回测已达标' : (_v === 'FAIL' ? '⛔ 回测未达标' : '⏳ 待回测');
           return '<span style="font-size:10px;font-weight:600;color:' + _c + ';background:' + _c + '1f;padding:1px 6px;border-radius:4px;" title="读数源 data/FACTOR_LAB_BACKTEST.js · abnormal_volume.verdict_3star">' + _t + '</span>';
         })()
-      + _flBadge
+      // 🔴 2026-09-19 主人令：「更新于」徽章已移到卡名正后方（见下方 dst.innerHTML 后的 dfcUpdSlot 注入）
       + '</div>'
       // 🔴 2026-09-18 主人令「这里重复了，合并成一张」：
       //   原卡内 5 行说明块（定位/算法链中的角色/用法/与策略回测页区别/当前状态）
@@ -7559,10 +7565,10 @@ function fmtSigned(v){
       + '<span style="color:#22c55e">●</span>缩量强势 <span style="color:#ef5350">●</span>放量弱势</div>'
       // 🔻 2026-09-19 主人令：第二步头部（徽章行/择时闸门/仓位依据/重点池行）静态保留，台账明细默认折叠
       + '<details style="margin-top:8px;">'
-      + '<summary style="cursor:pointer;font-size:12px;font-weight:600;color:#a78bfa;user-select:none;padding:4px 0;">▸ 展开 · ① 算法链因子台账（共 ' + ((CH && CH.integrated) || []).length + ' 项　● 真计入 final_score ｜ ○ 仅标注不计分）</summary>'
+      + '<summary style="cursor:pointer;font-size:12px;font-weight:600;color:#a78bfa;user-select:none;padding:4px 0;">▸ 展开 · 算法链因子台账（共 ' + ((CH && CH.integrated) || []).length + ' 项　● 真计入 final_score ｜ ○ 仅标注不计分）</summary>'
       + chainBlock
       + '</details>'
-      + '<div style="font-size:11.5px;color:var(--dim);margin-top:10px;">② 当日加减分排列已独立成新卡 <b style="color:#38bdf8;">🏆 当日因子计分榜</b>（本子页上方，「🧮 每日因子计算」卡下方）：候选池 top20 各因子加减分全列出，按总分降序，顶部即最终推荐。</div>'
+      + '<div style="font-size:11.5px;color:var(--dim);margin-top:10px;">当日加减分排列已独立成新卡 <b style="color:#38bdf8;">🏆 当日因子计分榜</b>（本子页上方，「🧮 每日因子计算」卡下方）：候选池 top20 各因子加减分全列出，按总分降序，顶部即最终推荐。</div>'
       // 🔴 2026-09-19 主人令：「没被留下的可以完全删除了，也不用跟踪了」
       //   原 ③「待接入因子队列」整块移除 —— 台账已 0 pending（8 项无数据 + 7 项不达标全部删除），
       //   留着只会再次显示「等待」，与主人「不要整个版面都在等待」的令冲突。
@@ -7592,6 +7598,11 @@ function fmtSigned(v){
       //   —— 因子不做选股、不产池 ⇒ 不存在升格为独立策略的路径，留着只会再次引发口径混乱。
       + '</div>';
     dst.innerHTML = html;
+    // 🔴 2026-09-19 主人令（图像取证）：「🦊 更新于 …」徽章从第二步头部
+    //   **移到「🧮 每日因子计算」卡名正后方** —— 全站规范「卡名置顶 + 更新于紧随」；
+    //   徽章仍读同一产物真值（D.update_time），不写死、停更告警照旧生效。
+    var _us = document.getElementById('dfcUpdSlot');
+    if(_us){ _us.innerHTML = _flBadge || ''; }
     // 🔴 2026-09-18 主人令：原 window.__flPopup（「📄 完整榜单」弹窗）随「可关注」网格一并删除
     //   —— 它的内容 = 因子榜 Top30/Bottom10 **股票列表**，同样会让「本页不推荐股」自相矛盾。
     //   因子分位/分层明细的权威去处 = 「策略回测」页 🧪 因子实验室回测卡（持仓口径回测）。
