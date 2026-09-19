@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-09-19 14:56:56",
-  "generated": "2026-09-19 14:56:56",
+  "update_time": "2026-09-19 15:42:23",
+  "generated": "2026-09-19 15:42:23",
   "period_start": "2026-09-07",
   "period_end": "2026-09-13",
   "stats": {
@@ -30,7 +30,7 @@
       "file": "top10_daily.json",
       "label": "TOP10推荐池",
       "status": "ok",
-      "update_time": "2026-09-19 14:44:57",
+      "update_time": "2026-09-19 15:20:27",
       "size_kb": 32.6
     },
     {
@@ -51,7 +51,7 @@
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-09-19 14:44:48",
+      "update_time": "2026-09-19 15:20:20",
       "size_kb": 952.2
     },
     {
@@ -71,8 +71,8 @@
       "file": "crds_card_data.json",
       "label": "逆势龙头",
       "status": "ok",
-      "update_time": "2026-09-19 14:44:32",
-      "size_kb": 250.7
+      "update_time": "2026-09-19 15:19:43",
+      "size_kb": 250.6
     }
   ],
   "source_note": "v8 周度运行汇总（轻量，离线可跑；由 algorithms/run_algorithms.py 周末链路调用）"
