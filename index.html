@@ -7245,7 +7245,7 @@ function fmtSigned(v){
       src: 'generate_top10.py L1372-1378',
       rows: [
         { f:'基本面质量分', w:'按 grade 档给分', dir:'正', ev:'规则式',
-          why:'复用 fundamental_helper，与驾驶舱同口径（含港股中性兜底、消息面加减分）', n:'497 只' },
+          why:'复用 fundamental_helper，含港股中性兜底、消息面加减分', n:'497 只' },
         { f:'质差一票否决', w:'直接出局', dir:'风控', ev:'规则式',
           why:'ST / 当期亏损 / 营收崩塌 ⇒ continue 跳过。⚠️ 刻意不用 D 档否决（银行券商低 ROE 被误标 D，属行业歧视非质差）', n:'—' }
       ]
@@ -9337,7 +9337,6 @@ function switchSec(sec,el){
                    ? (_len(_gpObj.stocks) ? _gpObj.stocks : [])
                    : (_gpObj.candidates || []);
     // COCKPIT 优先用 tier_a/tier_b（array 数组）合并 —— 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND 已全方位下线
-    const cockList = [];  /* 已下线 algorithm，列表永远为空 */
     // CRDS 用 cond1_list/cond2_list/cond3_list/cond4_list（按实际 schema）
     const crds = window.CRDS_CARD_DATA||{};
     const crdsList = [].concat(crds.cond1_list||[], crds.cond2_list||[], crds.cond3_list||[], crds.cond4_list||[]);
@@ -9345,7 +9344,6 @@ function switchSec(sec,el){
     const fourList = (window.FOUR_VOLUME && window.FOUR_VOLUME.stocks) || [];
     if(_in(candList)) hitN++;
     if(_in(goldList)) hitN++;
-    if(_in(cockList)) hitN++;
     if(_in(crdsList)) hitN++;
     if(_in(fourList)) hitN++;
     if(hitN>=3){ signals.push({t:hitN+' 策略共振命中',a:'强共识买点',c:'up'}); score+=2; }
@@ -9421,11 +9419,6 @@ function switchSec(sec,el){
         var st=fs[i]; if(!st) continue;
         stocks.push({code:st.code||'?',name:st.name||'?',score:st.final_score||0,
           src:(st.sources||[]).join('+'),stop:st.stop_loss,target:st.target_price});
-      }
-      // COCKPIT tier_a / tier_b 补充
-      var tiers=['tier_a','tier_b'];
-      for(var ti=0;ti<tiers.length;ti++){
-        /* COCKPIT_TIER_RECOMMEND 已下线（2026-09-03）：tier_a/tier_b 候选池入口整段删除 */
       }
       // COCKPIT_ADVICE 已下线（2026-09-03）：watch 补充整段删除
 
