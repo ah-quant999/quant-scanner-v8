@@ -1,0 +1,14 @@
+{
+  "fetched_at": "2026-09-19 13:01:52",
+  "fetched_tz": "CST+8",
+  "media_id": "note_85134884db3b8b9fc366f1c5dcf8fab3_75055558956481737500816604757970",
+  "title": "强势股跟踪日报 2026-09-15",
+  "data_date": "2026-09-15",
+  "kb_id": "7500816604757970",
+  "kb_name": "强势股跟踪",
+  "kb_creator": "梧谷枫灯",
+  "file_size": 27032,
+  "channel": "ima 知识库连接器 fetch_media_content（登录态；云端访客视角拿不到全文）",
+  "fetched_by": "阿狸咪的工程师",
+  "note": "本快照是「云端访客通道只能拿 290 字预览」的唯一解法：主人 ima 账号已订阅该知识库，经连接器可取全文。云端 fetch_ima_strong_stock.py --source auto 优先读本快照；快照缺失/过期(>72h)/坏 ⇒ 自动回退访客抓页，不劣化。"
+}

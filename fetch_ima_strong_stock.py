@@ -75,6 +75,34 @@ DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _STATUS_SHAPE = re.compile(r"^[\u4e00-\u9fa5A-Za-z]{2,8}$")
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+# 🔴🔴 2026-09-19（阿狸咪的工程师）**全文快照通道** —— 根治「卡片只显示 1 只」
+#
+# 真因（实测，非推测）：本脚本此前唯一的取源是**知识库分享页的访客视角**，
+#   服务端只下发 `introduction`，且**硬截断在 ~290 字**
+#   （全站 70+ 条实测 p75=291 / max=297，无一超过）
+#   ⇒ 一条完整记录至少 45 字 ⇒ **只能拿到头 1~2 条**
+#   ⇒ 线上产物 sample_coverage = 2/58（3.4%），前端「本页可得的 1 只」。
+#   ⚠️ 这**不是源停更**（源明明是 09-15 的），也**不是解析坏了**（同一份文本谁来都只有 290 字）。
+#
+# 正解：主人本人的 ima 账号**已订阅**该知识库（创建者「梧谷枫灯」）
+#   ⇒ 经 **ima 知识连接器**（登录态）`fetch_media_content` 可取 **全文**
+#   ⇒ 实测 2026-09-15 篇：27032 B / **56 条 / 96.6%**，
+#     且状态分布 {强势 34, 正常 20, 回落 2} 的「强势 34」与头部汇总**精确重合**
+#     ⇒ 可证无漏行、无串位（若漏行，34 这个数不可能恰好对上）。
+#
+# 落地分工（**职责单一，互不越界**）：
+#   · 本机（有登录态）：取全文 → 落 `raw_data/ima_strong_stock_full.md` + `.json`
+#   · 云端（本脚本）：**优先读快照**；快照缺失/过期/坏 ⇒ **自动回退**访客抓页
+#   ⇒ 快照断供时最坏退回「1~2 条 + 诚实降级」，**绝不劣化**。
+# ═══════════════════════════════════════════════════════════════════════════
+SNAPSHOT_MD = os.path.join(RAW_DIR, "ima_strong_stock_full.md")
+SNAPSHOT_META = os.path.join(RAW_DIR, "ima_strong_stock_full.json")
+# 快照有效期：源为**交易日更**，容一个周末 + 1 天缓冲 ⇒ 72h。
+# 为什么必须有：宁可退回 1~2 条，也**绝不拿三天前的名单冒充今天**（判据 84 同类）。
+SNAPSHOT_MAX_AGE_H = 72
+
+
 def is_date(s):
     return bool(s) and DATE_RE.match(s or "")
 
@@ -534,6 +562,158 @@ def parse_introduction(intro):
     return stocks, None, {"rows_parsed": len(stocks)}
 
 
+def parse_markdown_table(text):
+    """解析 ima **全文快照**（知识连接器 `fetch_media_content` 返回的 markdown 表）。
+
+    与 parse_introduction 的**本质区别**（这是本函数存在的全部理由）：
+
+    | | `introduction`（访客可见） | 全文快照（成员可见） |
+    |---|---|---|
+    | 长度 | 服务端硬截断 ~290 字 | 完整（实测 27KB） |
+    | 分隔 | **空格分隔的单行** | **管道分隔** markdown 表 |
+    | 空单元格 | **整个字段消失** ⇒ 列位漂移 | 保留为 `||` ⇒ **列位恒定** |
+    | 可解析条数 | 1~2 条 | 56 条（96.6%） |
+
+    ⇒ 全文通道**零串位风险**（12 列固定），不需要 parse_introduction 里那套
+      「类型判据 + 倒数第 2 列」兜底逻辑 —— 但两套解析器都要留着：
+      访客通道仍是快照断供时的唯一退路。
+
+    实测（2026-09-15 篇 56 条）：状态 {强势 34, 正常 20, 回落 2}、
+    买点提示 {观察期中 19, 跌破基准 10, 空 14, 回调买点 9, 连涨强势 3}。
+    """
+    stocks = []
+    for ln in (text or "").split("\n"):
+        s = ln.strip()
+        if not s.startswith("|"):
+            continue
+        cells = [c.strip() for c in s.strip("|").split("|")]
+        # 表头（「代码」开头）、分隔线（`---`）、`|||||||` 空行 全部在此滤掉
+        if len(cells) != 12 or not re.fullmatch(r"\d{6}", cells[0]):
+            continue
+        rec = {
+            "code": cells[0],
+            "name": cells[1],
+            "industry": cells[2],
+            "first_selected": cells[3] if DATE_RE.match(cells[3]) else "",
+            "base_price": to_float(cells[4]),
+            "latest_price": to_float(cells[5]),
+            "change_pct": to_float(cells[6]),
+            "drawdown_pct": to_float(cells[7]),
+            "consecutive_up": to_int(cells[8]),
+            "status": cells[9],
+            "buy_point": cells[10],
+            "trade_date": cells[11] if DATE_RE.match(cells[11]) else "",
+        }
+        if rec["status"] not in STATUS_SET:
+            rec["status_unknown"] = True
+        stocks.append(rec)
+    return stocks
+
+
+def load_snapshot():
+    """读**全文快照**，返回与 fetch_via_wiki() 同构的 dict。
+
+    任何异常都**返回 None 而非抛出** —— 调用方据此回退访客抓页，
+    绝不因「快照这一条可有可无的近路坏了」而把整条卡打死（对比：09-18 那次的
+    「护栏与规格打架 ⇒ 首跑即打死全链、产物停更 26h」，教训见 verify_ima_sync.py 注释）。
+    """
+    if not (os.path.exists(SNAPSHOT_MD) and os.path.exists(SNAPSHOT_META)):
+        print("ℹ️ [snapshot] 无全文快照（%s 不存在）⇒ 回退访客抓页"
+              % os.path.basename(SNAPSHOT_MD))
+        return None
+    try:
+        with open(SNAPSHOT_META, encoding="utf-8") as f:
+            snap = json.load(f)
+    except Exception as e:
+        print("⚠️ [snapshot] meta 不可解析：%s %s ⇒ 回退" % (type(e).__name__, str(e)[:100]))
+        return None
+    try:
+        with open(SNAPSHOT_MD, encoding="utf-8") as f:
+            md = f.read()
+    except Exception as e:
+        print("⚠️ [snapshot] 全文不可读：%s %s ⇒ 回退" % (type(e).__name__, str(e)[:100]))
+        return None
+    if not md.strip():
+        print("⚠️ [snapshot] 快照为空 ⇒ 回退")
+        return None
+
+    # ── 新鲜度：快照必须「够新」才敢用（判据 84 同类：拿旧名单冒充今天 = 最坏的一种谎）──
+    _fa = str(snap.get("fetched_at") or "")
+    age_h = None
+    try:
+        _dt = datetime.strptime(_fa, "%Y-%m-%d %H:%M:%S").replace(
+            tzinfo=timezone(timedelta(hours=8)))
+        age_h = (datetime.now(timezone(timedelta(hours=8))) - _dt).total_seconds() / 3600.0
+    except Exception:
+        age_h = None
+    if age_h is None:
+        print("⚠️ [snapshot] fetched_at 缺失或格式非法（%r）⇒ 回退（不猜龄）" % _fa[:40])
+        return None
+    if age_h > SNAPSHOT_MAX_AGE_H:
+        print("⚠️ [snapshot] 快照过期：fetched_at=%s · 已 %.1f h > %d h ⇒ 回退访客抓页"
+              % (_fa, age_h, SNAPSHOT_MAX_AGE_H))
+        return None
+    if age_h < -1:
+        print("⚠️ [snapshot] fetched_at 在未来（%.1f h）⇒ 时区口径可疑，回退" % age_h)
+        return None
+
+    stocks = parse_markdown_table(md)
+    if not stocks:
+        print("⚠️ [snapshot] 全文解析出 0 条（源格式可能已变）⇒ 回退访客抓页")
+        return None
+
+    title = ""
+    m = re.search(r"^#\s*(.+)$", md, re.M)
+    if m:
+        title = m.group(1).strip()
+    title = title or str(snap.get("title") or "")
+
+    summary = parse_summary(md)
+    expected = summary.get("track")          # 头部「跟踪N只」；缺失时 None，**绝不拿 rows 冒充**
+    dts = sorted(str(s.get("trade_date") or "") for s in stocks if s.get("trade_date"))
+    md_date = re.search(r"(\d{4}-\d{2}-\d{2})", title)
+    data_date = dts[-1] if dts else (md_date.group(1) if md_date else "")
+
+    # ── 🔴🔴 2026-09-19（阿狸咪的工程师）**状态对账** —— 判「真丢行」还是「源表格本就少行」──
+    #   实测 2026-09-15 篇：头部汇总「跟踪 58 只」，而表体**只有 56 行**
+    #   ⇒ 若只按 `rows < expected` 判，就会把「源方自己的 2 行差异」错判成我解析丢行，
+    #     进而 `detail_complete=false`、前端继续降级展示 —— **等于白接**。
+    #   故引入**内容级对账**：头部「强势 N」必须与实际 status=='强势' 条数相等。
+    #     相等 ⇒ 表体与汇总自洽（丢行必然破坏这个等式，因为丢行无法同时保住 34）⇒ 视为完整；
+    #     不等 ⇒ 真丢行/串位 ⇒ 保持 truncated=True，前端如实降级 + 脚本吼出来。
+    _strong_parsed = sum(1 for s in stocks if str(s.get("status") or "") == "强势")
+    _strong_expected = summary.get("strong")
+    _reconciled = (_strong_expected is None) or (_strong_expected == _strong_parsed)
+    coverage = {
+        "rows_parsed": len(stocks),
+        "expected": expected,
+        "coverage_pct": (round(len(stocks) / expected * 100, 1) if expected else None),
+        "source_chars": len(md),
+        "source_channel": "full-snapshot",
+        "snapshot_fetched_at": _fa,
+        "snapshot_age_h": round(age_h, 2),
+        "strong_expected": _strong_expected,
+        "strong_parsed": _strong_parsed,
+        "reconciled": _reconciled,
+        # truncated 语义 = **真的缺内容**（丢了行 / 被截断），而非「源方汇总与表体有差」
+        "truncated": bool(expected and expected > len(stocks) and not _reconciled),
+        "note": ("全文快照通道（ima 知识库成员连接器 fetch_media_content，登录态）"
+                 "⇒ 12 列恒定、零串位。rows_parsed < expected 时**优先怀疑源表格本身少行**"
+                 "（源方自述与表体可能差 1~2 行）；已用 `reconciled`（头部『强势 N』vs "
+                 "实际强势条数）做内容级对账，相等即视为完整，不等才判 truncated。"
+                 "⚠️ 与访客通道的『服务端 300 字硬墙』是两回事，勿混。"),
+    }
+    print("✅ [snapshot] %s · %d/%s 条（%.1f%%）· 数据日 %s · 快照龄 %.1f h · 对账 %s"
+          "（强势 头%s / 实%s）"
+          % (title or "?", len(stocks), expected, coverage["coverage_pct"] or 0,
+             data_date or "?", age_h,
+             "✅通过" if _reconciled else "🔴不一致",
+             _strong_expected, _strong_parsed))
+    return {"summary": summary, "stocks": stocks,
+            "meta": {"source_title": title, "source_updated_at": ""},
+            "coverage": coverage, "wiki_latest": title}
+
+
 def fetch_via_wiki(share_id=None, folder_id=None):
     """走新 wiki 源取数（纯 HTTP，无需 playwright）。返回与 fetch() 同构的 dict。"""
     sid = share_id or WIKI_SHARE_ID
@@ -632,18 +812,35 @@ def main():
     ap.add_argument("--inspect", action="store_true")
     # 🔴 2026-09-19 主人令「一劳永逸」：默认走**新 wiki 源**（主人 09-17 迁库后的正源）。
     #   旧 note 路线保留为 --source note 回退（不删，防 wiki 侧再变）。
-    ap.add_argument("--source", choices=["wiki", "note"], default="wiki",
-                    help="取源：wiki = 新知识库分享页（默认）；note = 旧笔记分享页（回退）")
+    ap.add_argument("--source", choices=["auto", "wiki", "note"], default="auto",
+                    help="取源：auto = 全文快照优先、缺失/过期则回退 wiki（**默认**）；"
+                         "wiki = 强制走知识库分享页访客视角（受 300 字硬墙）；"
+                         "note = 旧笔记分享页（最老的回退）")
     ap.add_argument("--folder", default=WIKI_FOLDER_STRONG_TRACK,
                     help="wiki 源下的目录 folder_id（默认「强势股跟踪」）")
     args = ap.parse_args()
 
-    if args.source == "wiki":
-        data = fetch_via_wiki(folder_id=args.folder)
+    # 🔴🔴 2026-09-19：`_eff_source` / `_detail_channel` 与 `args.source`（用户意图）**分开**——
+    #   因为 auto 模式下实际走哪条路是运行时决定的，产物必须如实记录**实际通道**，
+    #   否则前端/审计无法判断「这 56 条是全量还是降级」（判据：不许假成功）。
+    _eff_source = args.source
+    _detail_channel = "introduction"
+    if args.source in ("auto", "wiki"):
+        data = None
+        # auto ⇒ 先试**全文快照**（见 SNAPSHOT_MD 段：访客通道永远只有 1~2 条）
+        if args.source == "auto":
+            data = load_snapshot()
+            if data:
+                _detail_channel = "full-snapshot"
+        if data is None:
+            data = fetch_via_wiki(folder_id=args.folder)
+            _detail_channel = "introduction"
+        _eff_source = "wiki"
         _src_url = "https://ima.qq.com/wiki/?shareId=%s&folderId=%s" % (WIKI_SHARE_ID, args.folder)
     else:
         data = fetch(args.url, inspect=args.inspect)
         _src_url = args.url
+        _eff_source = "note"
         if data is None:
             return
 
@@ -714,7 +911,10 @@ def main():
         "update_time": _tx.strftime("%Y-%m-%d %H:%M:%S"),
         "source": "ima",
         "note_url": _src_url,
-        "source_kind": args.source,
+        "source_kind": _eff_source,
+        # 🔴 2026-09-19：实际明细通道。full-snapshot = 全文（56/58 条）；
+        #   introduction = 访客截断（1~2 条）。前端/审计据此判断是否降级展示。
+        "detail_channel": _detail_channel,
         # 🔴 源自身的时间刻度（前端「更新于」**不得再拿抓取时刻冒充数据新鲜**）
         "source_title": meta.get("source_title") or "",
         "source_updated_at": meta.get("source_updated_at") or "",
@@ -724,16 +924,17 @@ def main():
         #   此时**不因「距今 N 天」报停更**（源可能本就隔几日更新，报停更=诬告主人）。
         #   仅当「最新一篇的日期 < 今天且它已经落后于知识库的最新内容」才判停更——
         #   而 wiki 源取到的**就是最新一篇**，故恒为 False（新鲜度由 data_date 显示）。
-        "source_stale": False if args.source == "wiki" else bool(_stale_days is not None and _stale_days > 0),
+        "source_stale": False if _eff_source == "wiki" else bool(_stale_days is not None and _stale_days > 0),
         "summary": data["summary"],
         # 🔴 wiki 源必带：如实标注「拿到几条 / 应有多少条 / 是否被服务端截断」
         "sample_coverage": data.get("coverage"),
         # 🔴 明细是否完整（服务端 300 字硬墙 ⇒ 常为 false）。
         #   前端**必须**据此降级展示，不得拿残缺 stocks 冒充全量。
-        "detail_complete": bool(
-            (data.get("coverage") or {}).get("expected") is None
-            or (data.get("coverage") or {}).get("expected")
-            == (data.get("coverage") or {}).get("rows_parsed")),
+        # 🔴 2026-09-19 改判据：原先比 «expected == rows» ⇒ 快照通道 56≠58 被误判降级。
+        #   现统一用 coverage.truncated（= 真丢内容），两通道语义一致：
+        #     · 访客通道 2/58 ⇒ truncated=True ⇒ false（如实降级）
+        #     · 快照通道 56/58 但对账通过 ⇒ truncated=False ⇒ **true**（不再自贬）
+        "detail_complete": not bool((data.get("coverage") or {}).get("truncated")),
         "wiki_latest": data.get("wiki_latest") or "",
         "parse_health": parse_health,
         "stocks": data["stocks"],
@@ -772,7 +973,7 @@ def main():
     #   比降级更糟），改为：① 形状必须自洽（有覆盖度字段）② 覆盖率显著偏低时**显式吼**。
     #   判据：coverage 必须存在、rows_parsed ≥ 1、expected 与 rows 同源（同一份 intro）。
     _cov = data.get("coverage")
-    if args.source == "wiki":
+    if _eff_source == "wiki":
         if not _cov:
             _viol.append("wiki 源产物缺 sample_coverage（无法判断数据覆盖面）")
         elif not _cov.get("rows_parsed"):
@@ -796,11 +997,19 @@ def main():
     #   300 字硬墙导致的「只拿到 2/58 条」**不是源停更**（源明明是今天的），
     #   若混为一谈会让主人以为主人自己没更新（实测已发生：误报「源停更 4 天」）。
     _cov2 = data.get("coverage") or {}
-    if args.source == "wiki" and _cov2.get("truncated"):
+    # ⚠️ 2026-09-19 修正：快照通道**也必须**报 truncated（真是丢行时），
+    #   但**不得**把它说成「服务端 300 字硬墙」—— 那是访客通道专有的病因，混用即诬告。
+    if _detail_channel == "introduction" and _cov2.get("truncated"):
         print(f"⚠️ 明细节流（服务端 300 字硬墙）：本期正文仅能解析出 "
               f"{_cov2.get('rows_parsed')}/{_cov2.get('expected')} 条"
               f"（{_cov2.get('coverage_pct')}%）—— 源本身是新的（{out['data_date']}），"
               f"**不是源停更**。产物已标 detail_complete=false，前端据此降级展示。")
+    # 🔴 2026-09-19 新增：**全文通道若真丢行**，必须显式吼（别因为「有快照」就默认万事大吉）
+    if _detail_channel == "full-snapshot" and _cov2.get("truncated"):
+        print(f"⚠️ 全文快照丢行：解析出 {_cov2.get('rows_parsed')}/{_cov2.get('expected')} 条，"
+              f"且『强势』对账不一致（头 {_cov2.get('strong_expected')} / 实 "
+              f"{_cov2.get('strong_parsed')}）—— 不是源表格少行，**是解析或源结构变了**，"
+              f"请查 raw_data/ima_strong_stock_full.md 的表格列数。")
     # 🔴 2026-09-17：抓取成功 ≠ 数据新鲜。源侧停更必须吼出来（这是「杜绝假成功」的落点）
     if out["source_stale"]:
         print(f"⛔ 源停更告警：源笔记「{out['source_title'] or '?'}」自述更新时间 "
