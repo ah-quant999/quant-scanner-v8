@@ -101,15 +101,17 @@ SOURCES = [
          var="CRDS_BACKTEST", rel="data/CRDS_BACKTEST.js",
          parser="by_period", label_prefix="持有", primary="持有 T+5",
          method="信号日次一交易日开盘买入、持有 N 日收盘卖出（前复权·扣双边 0.3%）"),
-    dict(card="强势突破", kind="strategy", page="暂未上架", icon="🚀", cat="trade",
-         var="ALGO_BACKTEST_COMPARE", rel="data/ALGO_BACKTEST_COMPARE.js",
-         parser="algo_compare", label_prefix="", primary=None,
-         method="实盘入选样本同口径聚合（T+1~T+10 前向收益）",
-         # 🆕 2026-09-13 主人令：缺口闭环 —— scripts/algo_backtest_compare.py
-         #   已挂进 E 批（ORDER + STAGES，位于本聚合器之前），不再是孤儿。
-         #   原值 chain_member=False / chain_note="原为孤儿（未挂 STAGES）"。
-         chain_member=True,
-         chain_note=None),
+    # 🗑 2026-09-19 主人令：「强势突破」全站删除 ⇒ 本登记条目一并移除。
+    #   原条目：dict(card="强势突破", var="ALGO_BACKTEST_COMPARE",
+    #              rel="data/ALGO_BACKTEST_COMPARE.js", parser="algo_compare",
+    #              primary=None, chain_member=True)
+    #   删除理由（三条，均已实测）：
+    #     ① 该卡已于 2026-09-19 从全站删除（前端渲染函数 / 数据注入 / 回测源一并移除）；
+    #     ② 其数据源 data/ALGO_BACKTEST_COMPARE.js 亦已不存在（Pages 实测 404）；
+    #     ③ 保留登记会让本聚合器**持续产出「源不可读」行**，且因读到的旧数值仍在
+    #        产物中而**据陈旧数值发出下架提请**（实测：delist_advice「强势突破 胜率 15.9%」，
+    #        而该源当天已删）—— 已在下方 advice 循环加 fresh 护栏，双保险。
+    #   ⚠️ 不得再登记回本表；如日后要恢复，须先恢复前端卡与数据源。
     dict(card="K线信号层", kind="signal", page="策略回测", icon="📈", cat="signal",
          var="BACKTEST_TDX", rel="data/BACKTEST_TDX.js",
          parser="tdx", label_prefix="", primary=None,
@@ -608,53 +610,10 @@ def parse_tdx(src, obj):
     return rows
 
 
-def parse_algo_compare(src, obj):
-    """ALGO_BACKTEST_COMPARE：多算法同口径聚合，取 T+5 为主口径。
-
-    🔴 2026-09-13 小九审计修复（**假挂链**：挂了链却读不出数，比不挂更隐蔽）：
-      scripts/algo_backtest_compare.py 产物的真实结构是
-        {"generated":…, "metrics_def":…, "verdict":…,
-         "algorithms": {"h_reverse": {"name":…, "rule":…, "source":…,
-                                      "summary": {"n_samples":198, "horizons": {"t1":…,"t5":…}}}}}
-      而本函数原读 `obj["algos"] or obj["results"]`、且把 `n_samples`/`horizons`
-      当**顶层**键取 —— **顶层键名错 + 嵌套层级错**，双重读空 ⇒ 本卡恒返回
-      「产物无可用算法行（等待盘后累积）」，强势突破 / H反推 / 高手画像版 三行
-      **永远显示「—」**（产物实际有 71 / 198 / 27 条样本）。页面文案还把锅甩给「等待累积」。
-      ⇒ 现已兼容两层：顶层键 `algorithms`(真值) → `algos` → `results`；
-        样本/持有期改为「顶层优先、再取 summary」。
-    """
-    rows = []
-    algos = ((obj or {}).get("algorithms") or (obj or {}).get("algos")
-             or (obj or {}).get("results") or {})
-    if isinstance(algos, dict):
-        items = algos.items()
-    elif isinstance(algos, list):
-        items = [(a.get("key") or a.get("algo") or "", a) for a in algos]
-    else:
-        items = []
-    for k, a in items:
-        if not isinstance(a, dict):
-            continue
-        summ = a.get("summary") or {}
-        # 扁平结构与「嵌 summary」结构都要能读（见 docstring）
-        hs = (a.get("horizons") or summ.get("horizons") or {})
-        t5 = hs.get("t5") or {}
-        _n = _num(a.get("n_samples"))
-        if _n is None:
-            _n = _num(summ.get("n_samples"))
-        _nm = (a.get("name") or a.get("display_name") or k)
-        rows.append(_mk_row(
-            src, _nm, _n,
-            t5.get("win"), t5.get("avg"), "T+5",
-            extra={"hit": _num(t5.get("hit"))},
-            status=None if _n else "暂无足够可比历史（等待盘后累积）",
-            # 本产物聚合多个算法；只有「强势突破」那一行属于本卡，其余留给其自身卡位
-            primary=("强势" in str(_nm)),
-        ))
-    if not rows:
-        return [_mk_row(src, "—", None, None, None, None,
-                        status="产物无可用算法行（等待盘后累积）")]
-    return rows
+# 🗑 2026-09-19 主人令：「强势突破」全站删除 ⇒ parse_algo_compare() 一并移除（墓碑）。
+#   原函数读 data/ALGO_BACKTEST_COMPARE.js 的 algorithms.{h_reverse,strong_breakout,…}，
+#   其中仅「强势突破」那一行属本卡（primary=("强势" in name)）。卡已删、源已删 ⇒ 无调用方。
+#   如日后确需「H反推 / 高手画像版」同口径对比行，应**新开一张独立卡**并重写解析器，不要复活本函数。
 
 
 def parse_factor_lab(src, obj):
@@ -716,7 +675,7 @@ PARSERS = {
     "ima_strong": parse_ima_strong,      # 🆕 2026-09-17 强势跟踪（顶层 periods 结构）
 
     "tdx": parse_tdx,
-    "algo_compare": parse_algo_compare,
+    # 🗑 2026-09-19：algo_compare 解析器随「强势突破」全站删除一并摘除（见上墓碑）。
     "factor_lab": parse_factor_lab,
 }
 
@@ -804,6 +763,17 @@ def build(root, day, kind, note, extra_note=""):
             "reasons": reasons,
             "source_time": r.get("source_time"), "fresh": r.get("fresh"),
         }
+        if not r.get("fresh"):
+            # 🛡 2026-09-19 修正（实测踩到的真坑）：源文件被删除 / 本数据日未刷新时，
+            #   load_js_var 读不到新值，但**上一批读到的旧数值仍留在本产物里**，
+            #   于是 _is_low 照样命中、照样进 advice —— 本轮实测实例：「强势突破」的
+            #   数据源当天已被删除，产物却仍以「胜率 15.9% < 红线 45%」发出下架提请。
+            #   ⇒ 陈旧批次的数值客观正确、但**不足以作为下架依据**（下架是不可逆动作）。
+            #   只入观察名单，并明写原因；待源恢复刷新后自动回到正常判定。
+            entry["note"] = (f"源未在本数据日 {day} 刷新（数值可能陈旧），"
+                             "不提议下架，仅观察")
+            watch.append(entry)
+            continue
         if not r.get("chain_member"):
             # 源不在算法链内 → 数据可能残缺，**不可据此提议下架**（先修产出再评估）
             entry["note"] = r.get("chain_note") or "该源不在盘后算法链内"
