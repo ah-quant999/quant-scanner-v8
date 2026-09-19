@@ -5366,7 +5366,12 @@ function drawUpDownChart(){
     }
   }
   window.renderLgDnd = renderLgDnd;
-  renderLgDnd(); // 合并为单页后，DOMContentLoaded 时立即渲染防删清单（原 switchLg 切换触发已取消）
+  // 合并为单页后，原 switchLg('dnd') 触发已取消；DO_NOT_DELETE.js 是 defer 注入，必须等 DOMContentLoaded 后数据才就绪。
+  if(document.readyState === 'complete' || document.readyState === 'interactive'){
+    renderLgDnd();
+  } else {
+    document.addEventListener('DOMContentLoaded', renderLgDnd);
+  }
 
 
 
