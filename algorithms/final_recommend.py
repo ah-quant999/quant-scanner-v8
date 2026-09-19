@@ -1175,29 +1175,7 @@ def main():
     else:
         print("[warn] IMA_STRONG_STOCK.js 缺失，跳过高手共振融合")
 
-    # ── 第8.6节 强势突破共振（2026-09-04 主人令接入：外部共振源 strong_breakout core 前30）──
-    # 与 v8 选股池 code 命中且属 core（core_top_n=30，按 rank 排序截断）→ 独立外部共识信号，最终分 +1
-    # 择时控权：非开仓期(_open_regime=False) 权重 ×0.3（弱加成，与 IMA 同款）
-    sb = load_js("STRONG_BREAKOUT.js", "STRONG_BREAKOUT")
-    if sb:
-        _sb_core = [s for s in (sb.get("stocks") or []) if s.get("core") and s.get("code")]
-        _sb_core.sort(key=lambda x: safe_float(x.get("rank"), default=999.0))
-        _sb_core = _sb_core[:30]
-        _sb_norm = {norm_code(s.get("code")).lstrip('.'): s for s in _sb_core}
-        _hit = 0
-        for key, r in pool.items():
-            _k = key.lstrip('.') if key.startswith('.') else key
-            if _k in _sb_norm:
-                sc = 1.0 * (1.0 if _open_regime else 0.3)
-                r["sources"].append("强势突破")
-                r["source_scores"]["强势突破"] = round(sc, 2)
-                r["signals"].append("强势突破")
-                r["reasons"].append("强势突破共振（高手反推 core 前30）")
-                _hit += 1
-        print("[ok] 强势突破共振命中 v8 池 %d 只（core %d 只）" % (_hit, len(_sb_norm)))
-    else:
-        print("[warn] STRONG_BREAKOUT.js 缺失，跳过强势突破共振融合")
-
+    # 🗑 2026-09-19 主人令：原第8.6节「强势突破共振」已随强势突破全站删除而移除。
     # ── 第8.7节 动量共识共振（2026-09-04 主人令接入：外部共振源 momentum_common_filter 无未来函数版）──
     # 与 v8 选股池 code 命中（candidates = S1/S2/S3 三重规则过滤后名单）→ 独立外部共识信号，最终分 +1
     # 择时控权：非开仓期(_open_regime=False) 权重 ×0.3（弱加成，与 IMA 同款）

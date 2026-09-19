@@ -225,8 +225,7 @@ ORDER = [
     #   track_h_auto_buy.py 默认 emit-js（写 data/H_AUTO_BUY_TRACK.js，写 raw_data/h_auto_buy_history.json）。
     #   这两个之前一直在算法链外，导致反推算法即使跑出结果也没人调度、没人推送、没人可见。
     "auto_run_dn_algorithm.py",
-    #   2026-09-04 强势突破选股（高手反推 v1）：依赖当日 h_auto_buy 池，须在其后、track 前跑。
-    "strong_breakout.py",
+    # 🗑 2026-09-19 主人令：强势突破（strong_breakout.py）全站删除，不再调度。
     "track_h_auto_buy.py",
     # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：LHB_7D.js 前端零引用，
     #   停止调度 gen_lhb_7d.py，释放 B 批算力。
@@ -352,7 +351,7 @@ STAGES = {
         "refresh_dividend_cninfo.py",
         "refresh_stock_metadata.py", "fetch_weekend_run.py",   # 周末复盘/周度汇总（原 ORDER 漏挂 STAGE）
 
-        "auto_run_dn_algorithm.py", "strong_breakout.py", "track_h_auto_buy.py",
+        "auto_run_dn_algorithm.py", "track_h_auto_buy.py",
         # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：LHB_7D.js 前端零引用，停止调度 gen_lhb_7d.py。
         # "gen_lhb_7d.py",
 
@@ -558,7 +557,6 @@ STOCK_PICKING_SCRIPTS = {
     "gen_algo_track.py",             # 算法追踪
     "calc_sentiment_cycle.py",       # 情绪周期（读 LIMIT_UP_HEATMAP）
     "auto_run_dn_algorithm.py",      # H 反推算法
-    "strong_breakout.py",            # 强势突破选股（高手反推版，依赖当日 h_auto_buy 池）
     "track_h_auto_buy.py",           # H 反推跟踪
     "calc_volatility_watch.py",      # 波动率观察选股
     "gen_stock_stop.py",             # ATR 止损止盈（读候选宇宙日K）

@@ -139,7 +139,6 @@ DATA_SOURCES = {
     #   refresh 工作流为唯一写入方，根因消除。其余卡仍由本映射正常重建。
     "avg_price_data.json":         "AVG_PRICE_DATA",
     "algo_track.json":              "ALGO_TRACK",   # 2026-08-15 三算法独立追踪（四量终极/板块龙头/大牛股猎手）
-    "strong_breakout_backtest.json": "STRONG_BREAKOUT_BACKTEST",  # 2026-09-16 生命周期子页·强势突破信号层真实回测
     "ima_strong_backtest.json":      "IMA_STRONG_BACKTEST",       # 2026-09-16 生命周期子页·高手强势股跟踪信号层真实回测
 
 
@@ -327,7 +326,6 @@ CATEGORY_MAP = {
     "AVG_PRICE_DATA": "intraday,post_close",
     # 2026-08-15：ALGO_TRACK 依赖 FINAL_RECOMMEND_DATA + FOUR_VOLUME，归属盘后
     "ALGO_TRACK": "post_close",
-    "STRONG_BREAKOUT_BACKTEST": "post_close",  # 2026-09-16 信号层真实回测（与 FOUR_VOLUME 同盘后节奏）
     "IMA_STRONG_BACKTEST":      "post_close",
     
     
@@ -1413,7 +1411,7 @@ def run_experiment_cards():
     #   本脚本自己的 docstring 写的是「由 update_v8.py 的 experiment 段调用（紧随
     #   scripts/gen_strong_breakout.py 之后，确保读到当日最新信号账本）」——现按契约落地。
     #   失败仅告警、不阻断主链（与本段其它实验卡一致）；真停更由 v8_health_check.py 的
-    #   STRONG_BREAKOUT_BACKTEST / IMA_STRONG_BACKTEST（max_age 1440 分钟）兜底告警。
+    #   IMA_STRONG_BACKTEST（max_age 1440 分钟）兜底告警。（STRONG_BREAKOUT_BACKTEST 已随 2026-09-19 主人令删除强势突破而移除）
     life_bt_py = Path(__file__).resolve().parent / "algorithms" / "backtest_life_cards.py"
     if life_bt_py.exists():
         try:

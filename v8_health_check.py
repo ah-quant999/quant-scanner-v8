@@ -203,7 +203,7 @@ CARD_DEFS = [
     {"id": "FOUR_VOLUME_60M", "name": "四量终极60m", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
     # 🛡 2026-09-11 一劳永逸：4 个孤儿 algo_run 产物此前未注册 CARD_DEFS → 被 all_ 通用扫描按 1440min 红线误判 fail
     {"id": "ALGO_TRACK", "name": "算法追踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
-    {"id": "STRONG_BREAKOUT_BACKTEST", "name": "强势突破回测", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["periods"], "heal_cat": "algo_run"},
+    # 🗑 STRONG_BREAKOUT_BACKTEST 健康检查项已随 2026-09-19 主人令删除强势突破而移除。
     {"id": "IMA_STRONG_BACKTEST", "name": "高手强势股跟踪回测", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["periods"], "heal_cat": "algo_run"},
 
 

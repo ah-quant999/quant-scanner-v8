@@ -56,10 +56,71 @@ FETCH_DAYS = 800       # 拉取长历史（≈ 38 个月，覆盖 MIN_BARS 并�
 
 sys.path.insert(0, BASE)
 
-# 🛡 2026-09-15：复用 strong_breakout.py 的 `_fetch_kline`（gtimg 主源 → 新浪兜底，
-# 双域名级故障转移）作为长历史主源 —— 该实现已在盘后链稳定运行，不另造第三条取数路径。
-from strong_breakout import _fetch_kline as _fetch_hist  # noqa: E402
+# 🗑 2026-09-19 主人令：algorithms/strong_breakout.py 已随「强势突破」全站删除。
+#   本脚本只复用其取数层 —— 现将该实现（gtimg 双域名主源 → 新浪兜底）原样内联至此，
+#   逻辑与原 strong_breakout._fetch_kline 逐行一致，不再依赖已删除模块。
+_SB_UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
+def _sb_sym(code):
+    import re as _re
+    c = _re.sub(r"\D", "", str(code or ""))
+    if c.startswith(("6", "9")):
+        return "sh" + c
+    if c.startswith(("4", "8")):
+        return "bj" + c
+    return "sz" + c
+
+def _sb_kline_gtimg(code, n):
+    import urllib.request
+    s = _sb_sym(code)
+    d = None
+    _err = None
+    for _host in ("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
+                  "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/fqkline/get"):
+        try:
+            req = urllib.request.Request(f"{_host}?param={s},day,,,{n},qfq", headers=_SB_UA)
+            with urllib.request.urlopen(req, timeout=15) as r:
+                d = json.loads(r.read().decode("utf-8"))
+            break
+        except Exception as _e:  # noqa: BLE001
+            _err = _e
+            d = None
+    if d is None:
+        raise _err
+    node = d["data"][s]
+    k = node.get("qfqday") or node.get("day")
+    return [[row[0], float(row[1]), float(row[2]), float(row[3]),
+             float(row[4]), float(row[5])] for row in k]
+
+def _sb_kline_sina(code, n):
+    import urllib.request, re as _re
+    s = _sb_sym(code)
+    if s.startswith("bj"):
+        raise RuntimeError("sina: 不支持北交所")
+    url = (f"https://quotes.sina.cn/cn/api/jsonp_v2.php/var%20d=/"
+           f"CN_MarketDataService.getKLineData?symbol={s}&scale=240&ma=no&datalen={n}")
+    req = urllib.request.Request(url, headers=_SB_UA)
+    with urllib.request.urlopen(req, timeout=15) as r:
+        txt = r.read().decode("utf-8")
+    m = _re.search(r"\((\[.*\])\)", txt, _re.S)
+    if not m:
+        raise RuntimeError("sina: 响应解析失败")
+    arr = json.loads(m.group(1))
+    return [[row["day"], float(row["open"]), float(row["close"]), float(row["high"]),
+             float(row["low"]), float(row["volume"])] for row in arr]
+
+def _fetch_hist(code, n=800, retries=2):
+    """双源容灾：gtimg 主源 → 新浪兜底（原 strong_breakout._fetch_kline 内联版）。"""
+    last_err = None
+    for _ in range(retries + 1):
+        try:
+            return _sb_kline_gtimg(code, n)
+        except Exception as e:  # noqa: BLE001
+            last_err = e
+    try:
+        return _sb_kline_sina(code, n)
+    except Exception as e:  # noqa: BLE001
+        raise RuntimeError(f"kline {code}: gtimg={last_err} sina={e}")
 
 # ── 🛡 2026-09-15 小九的工程师：补回整层「取数层」─────────────────────────────
 # 本脚本自 2026-09-04 上线起**从未跑通过**：CACHE_DIR / _query_kline / _load_cache

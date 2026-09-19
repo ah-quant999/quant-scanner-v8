@@ -264,37 +264,7 @@ def _source_quality(obj: dict):
     return fields, bool(reasons), reasons
 
 
-# ── ① 强势突破 ────────────────────────────────────────────────────────────────
-def run_strong_breakout():
-    fp = RAW / "strong_breakout_history.json"
-    if not fp.exists():
-        print("  ⚠️ 缺 raw_data/strong_breakout_history.json，跳过强势突破回测")
-        return
-    try:
-        hist = json.loads(fp.read_text(encoding="utf-8"))
-    except Exception as e:
-        print(f"  ⚠️ strong_breakout_history.json 解析失败: {e}")
-        return
-    sigs = []
-    for d in sorted(k for k in hist if len(str(k)) == 10 and str(k)[4] == "-"):
-        for r in (hist.get(d) or []):
-            c = str(r.get("code") or "").strip()
-            if c:
-                sigs.append((c, d))
-    if not sigs:
-        print("  ⚠️ 强势突破账本为空，跳过")
-        return
-    days = sorted({d for _, d in sigs})
-    _emit("strong_breakout_backtest.json", _envelope(
-        card="强势突破",
-        signal_source="raw_data/strong_breakout_history.json（逐日真实信号账本）",
-        total_signals=len(sigs),
-        signal_days=len(days),
-        signal_date_range=f"{days[0]} ~ {days[-1]}",
-        periods=build_periods(sigs),
-    ))
-
-
+# 🗑 2026-09-19 主人令：① 强势突破回测卡已随强势突破全站删除而移除。
 # ── ② 高手强势股跟踪（IMA） ───────────────────────────────────────────────────
 def run_ima_strong():
     fp = RAW / "ima_strong_stock.json"
@@ -389,8 +359,7 @@ def run_ima_strong():
 def main():
     print(f"[backtest_life_cards] ▶ 选股生命周期子页面 · 信号层真实回测 ({datetime.now(CST):%H:%M:%S})")
     print(f"  价格源 raw_data/kline_cache（真实日K） · 成本口径 双边 {COST_PCT}%")
-    run_strong_breakout()
-    run_ima_strong()
+    run_ima_strong()   # （强势突破回测已随 2026-09-19 主人令删除）
     print("[backtest_life_cards] ✅ 完成")
     return 0
 
