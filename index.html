@@ -5708,6 +5708,25 @@ function fmtSigned(v){
     var b = window.__foldBtns[id];
     if(b && b.__foldLabel) b.innerHTML = b.__foldLabel;
   };
+  /* 🆕 2026-09-19 主人令「正常和回落的折叠」：__foldOpen 的**二级**版本 ——
+     用于嵌在已展开折叠区块内部的分组（如强势跟踪的 正常 / 回落 档）。
+     与一级折叠的区别：不换掉触发按钮文案表（自管 ▸/▾ 前缀），
+     且取消 72vh 限高（父层已限高，二级再限会出现套娃滚动条）。 */
+  window.__foldToggle = function(id, btn, title, html){
+    if(document.getElementById(id)){
+      window.__foldClose(id);
+      if(btn && btn.__g0){ btn.innerHTML = btn.__g0; }
+      return;
+    }
+    var box = window.__foldOpen(id, btn, title, html, true);
+    box.style.maxHeight = 'none';
+    box.style.margin = '6px 0 2px';
+    /* 与父级/主卡表格对齐：同样去掉左右内边距（标题行补回），使二级分组表落在同一条竖线 */
+    box.style.paddingLeft = '0';
+    box.style.paddingRight = '0';
+    if(box.firstElementChild){ box.firstElementChild.style.padding = '0 14px'; }
+    if(btn){ btn.__g0 = btn.__g0 || btn.innerHTML; btn.innerHTML = '▾ 收起 · ' + title; }
+  };
 
   /* 选股生命周期详情：原遮罩弹窗改就地折叠（2026-09-19 主人令：全站去弹窗）。
      走弱桶 / 待确认剔除 点击摘要后在其下方就地展开，再点一次收起。 */
@@ -6943,21 +6962,43 @@ function fmtSigned(v){
     });
     html += '</div>';
 
-    html += '<div style="font-weight:600;margin:2px 0 6px;color:#22c55e;">🟢 强势股 · '
-      + (_detailOK? '前 '+Math.min(10,_strongAll.length)+' 直接展示<b style="margin-left:4px;">'+_strongAll.length+'</b>'
+    /* 🎯 2026-09-19 主人令「这卡直接展示强势的，越强的排越强，正常和回落的折叠」 */
+    html += '<div style="font-weight:600;margin:2px 0 6px;color:#22c55e;">🟢 强势股 · 涨幅降序（越强越前） · '
+      + (_detailOK? '前 '+Math.min(10,_strongAll.length)+' / 共 <b style="margin-left:2px;">'+_strongAll.length+'</b> 只'
                    : '本页可得的 <b style="margin-left:4px;">'+_strongAll.length+'</b> 只')
-      + (_detailOK && D.stocks.length>_strongAll.length?' <span style="font-size:11px;color:var(--dim);font-weight:500;">· 其余点击下方查看</span>':'')
+      + (_detailOK && D.stocks.length>_strongAll.length?' <span style="font-size:11px;color:var(--dim);font-weight:500;">· 强势其余 + 正常/回落 见下方「全部标的」（正常/回落已折叠）</span>':'')
       + '</div>';
+    /* 🎯 2026-09-19 主人令「这个每列都没对齐，对齐了要不看的很乱」：
+       ── 根因：两处表格（主卡「强势前 10」/ 折叠里「全部标的」）都是 table-layout:auto，
+          列宽随各自内容长短漂移 ⇒ 同一份表头在两张表里对不上位置，视觉很乱。
+       ── 修法：抽出**唯一一份列定义 _COLS**（宽度 + 对齐），两处表格共用
+          <colgroup> + table-layout:fixed 锁死列位置；长文本（行业/买点提示/v8 命中）
+          统一 nowrap+ellipsis+title，既不撑列也不丢信息。 */
+    var _COLS = [
+      {t:'代码',     w:62,  a:'left'},
+      {t:'名称',     w:84,  a:'left'},
+      {t:'行业',     w:152, a:'left'},
+      {t:'首入选',   w:84,  a:'left'},
+      {t:'基准价',   w:66,  a:'right'},
+      {t:'最新价',   w:66,  a:'right'},
+      {t:'涨跌幅',   w:76,  a:'right'},
+      {t:'回撤',     w:62,  a:'right'},
+      {t:'连涨',     w:46,  a:'right'},
+      {t:'状态',     w:66,  a:'left'},
+      {t:'买点提示', w:0,   a:'left'},   /* w=0 ⇒ 弹性列，吃掉剩余宽度 */
+      {t:'v8 命中',  w:78,  a:'left'}
+    ];
+    function _td(a, extra){ return 'padding:5px 6px;text-align:'+a+';'+(extra||''); }
+    function _clip(){ return 'padding:5px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'; }
     function _tableHtml(list){
-      if(!list.length) return '<div class="note" style="text-align:center;color:var(--dim);padding:12px;">当前无强势标的</div>';
-      var h = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--sub);">';
-      h += '<thead><tr style="color:var(--dim);text-align:right;">'
-        + '<th style="padding:5px 6px;text-align:left;">代码</th><th style="padding:5px 6px;text-align:left;">名称</th>'
-        + '<th style="padding:5px 6px;text-align:left;">行业</th><th style="padding:5px 6px;text-align:left;">首入选</th>'
-        + '<th style="padding:5px 6px;">基准价</th><th style="padding:5px 6px;">最新价</th>'
-        + '<th style="padding:5px 6px;">涨跌幅</th><th style="padding:5px 6px;">回撤</th>'
-        + '<th style="padding:5px 6px;">连涨</th><th style="padding:5px 6px;text-align:left;">状态</th>'
-        + '<th style="padding:5px 6px;text-align:left;">买点提示</th><th style="padding:5px 6px;text-align:left;">v8 命中</th></tr></thead><tbody>';
+      if(!list.length) return '<div class="note" style="text-align:center;color:var(--dim);padding:12px;">当前无标的</div>';
+      var h = '<div style="overflow-x:auto;"><table style="width:100%;min-width:880px;border-collapse:collapse;font-size:11px;color:var(--sub);table-layout:fixed;">';
+      h += '<colgroup>';
+      _COLS.forEach(function(c){ h += '<col'+(c.w?' style="width:'+c.w+'px;"':'')+'>'; });
+      h += '</colgroup>';
+      h += '<thead><tr style="color:var(--dim);font-weight:600;">';
+      _COLS.forEach(function(c){ h += '<th style="'+_td(c.a)+'">'+c.t+'</th>'; });
+      h += '</tr></thead><tbody>';
       list.forEach(function(s){
         var dp=parseFloat(s.drawdown_pct);
         var dcol=isNaN(dp)?'var(--sub)':(dp>0?'#ef5350':(dp<0?'#26a69a':'var(--sub)'));
@@ -6971,18 +7012,18 @@ function fmtSigned(v){
           _v8Html = '<span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;color:'+_vc+';background:'+_vc+'22;">🏆 '+(window.__v8StatusLabel ? window.__v8StatusLabel[_vs]||_vs : _vs)+'</span>';
         }
         h += '<tr style="border-top:1px solid var(--border);">'
-          + '<td style="padding:5px 6px;color:var(--txt);font-weight:600;">'+(s.code||'')+'</td>'
-          + '<td style="padding:5px 6px;color:var(--txt);">'+_e(s.name||'')+'</td>'
-          + '<td style="padding:5px 6px;color:var(--dim);">'+_e(s.industry||'')+'</td>'
-          + '<td style="padding:5px 6px;color:var(--dim);">'+_e(s.first_selected||'')+'</td>'
-          + '<td style="padding:5px 6px;text-align:right;">'+_pr(s.base_price)+'</td>'
-          + '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+_pr(s.latest_price)+'</td>'
-          + '<td style="padding:5px 6px;text-align:right;color:'+_c(s.change_pct)+';font-weight:600;">'+_p(s.change_pct)+'</td>'
-          + '<td style="padding:5px 6px;text-align:right;color:'+dcol+';">'+_p(s.drawdown_pct)+'</td>'
-          + '<td style="padding:5px 6px;text-align:right;">'+(s.consecutive_up||0)+'</td>'
-          + '<td style="padding:5px 6px;"><span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;color:'+sc+';background:'+sc+'22;">'+_e(s.status||'')+'</span></td>'
-          + '<td style="padding:5px 6px;color:var(--dim);max-width:200px;">'+_e(s.buy_point||'')+'</td>'
-          + '<td style="padding:5px 6px;">'+_v8Html+'</td>'
+          + '<td style="'+_td('left','color:var(--txt);font-weight:600;')+'">'+(s.code||'')+'</td>'
+          + '<td style="'+_clip()+'color:var(--txt);" title="'+_e(s.name||'')+'">'+_e(s.name||'')+'</td>'
+          + '<td style="'+_clip()+'color:var(--dim);" title="'+_e(s.industry||'')+'">'+_e(s.industry||'')+'</td>'
+          + '<td style="'+_td('left','color:var(--dim);')+'">'+_e(s.first_selected||'')+'</td>'
+          + '<td style="'+_td('right')+'">'+_pr(s.base_price)+'</td>'
+          + '<td style="'+_td('right','color:var(--txt);')+'">'+_pr(s.latest_price)+'</td>'
+          + '<td style="'+_td('right','color:'+_c(s.change_pct)+';font-weight:600;')+'">'+_p(s.change_pct)+'</td>'
+          + '<td style="'+_td('right','color:'+dcol+';')+'">'+_p(s.drawdown_pct)+'</td>'
+          + '<td style="'+_td('right')+'">'+(s.consecutive_up||0)+'</td>'
+          + '<td style="'+_td('left')+'"><span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;color:'+sc+';background:'+sc+'22;">'+_e(s.status||'')+'</span></td>'
+          + '<td style="'+_clip()+'color:var(--dim);" title="'+_e(s.buy_point||'')+'">'+_e(s.buy_point||'')+'</td>'
+          + '<td style="'+_clip()+'">'+_v8Html+'</td>'
           + '</tr>';
       });
       h += '</tbody></table></div>';
@@ -6990,33 +7031,50 @@ function fmtSigned(v){
     }
     html += _tableHtml(_showRows);
     html += '<div style="margin:6px 0 2px;"><span class="_imaFoldTrigger" onclick="window.__imaFullPopup(this)" style="cursor:pointer;display:inline-block;padding:4px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#38bdf8;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.08);">📄 '
-      + (_detailOK? '全部标的（共 '+_allN+' 只）'
+      + (_detailOK? '全部标的（共 '+_allN+' 只：强势 '+_strongAll.length+' 只展开 + 正常/回落折叠）'
                    : '本页可得明细（共 '+_allN+' / 源 '+_srcTrack+' 只）')
       + '</span></div>';
     dst.innerHTML = html;
-  /* 2026-09-06 主人令：筛选胶囊 + 完整表格整体迁入弹窗（原主卡筛选行下线）
-     🛡 09:10 修复：__imaFullPopup / __imaSetFilter 原定义在渲染函数体【外部】，
-       引用的 D/_sortByChg/statusMap/_realByStatus/_allN/_tableHtml 均为渲染函数
-       局部变量 → 点击时 ReferenceError，「📄 全部标的」点不开。
-       现移入函数体内，闭包捕获局部变量；随每次渲染刷新闭包，行为一致。 */
+  /* 🔴 2026-09-19 主人令「强势的排前面、越强的排越前，正常和回落的折叠」：
+     ── 旧版把全部 status 混成一表按涨幅降序 ⇒ 回落股（自选以来区间涨幅 +97%）压在
+        榜首，视觉上像「回落的最强」，与「强势跟踪」的主题正好相反。
+     ── 新版：① 强势组**全部展开**且按涨幅降序（越强越前）；
+             ② 其余分档（正常 / 回落 / 见顶 / 走弱）**收进二级折叠**，默认不占版面；
+             ③ 下线原「全部/强势/正常…」筛选胶囊（分组已替代其作用，避免重复入口）。
+     分组明细表由 __imaGroupHtml 供给（同一渲染闭包内的 _grpHtml 缓存），
+     保证二级折叠展开时拿到的是**本次渲染**的数据，不会取到上一次的旧值。 */
+  var _grpHtml = {};
+  window.__imaGroupHtml = function(k){ return _grpHtml[k] || ''; };
   window.__imaFullPopup = function(btn){
     /* 2026-09-19 主人令：遮罩弹窗改就地折叠（再点一次触发按钮 = 收起） */
     if(document.getElementById('_imaFoldBox')){ window.__foldClose('_imaFoldBox'); return; }
-    var filter = window.__imaFilter || '全部';
-    var _rows = D.stocks.filter(function(s){ return filter==='全部' || (s.status||'')===filter; }).sort(_sortByChg);
-    var statuses = []; D.stocks.forEach(function(s){ var st=s.status||''; if(st && statuses.indexOf(st)<0) statuses.push(st); });
-    var caps = '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">';
-    ['全部'].concat(statuses).forEach(function(c){
-      var on=(c===filter); var col=c==='全部'?'#38bdf8':(statusMap[c]||'#94a3b8');
-      var _cn = (c==='全部') ? _allN : (_realByStatus[c]!=null?_realByStatus[c]:0);
-      caps += '<span onclick="window.__imaSetFilter(\''+c+'\')" style="cursor:pointer;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600;color:'+(on?col:'var(--sub)')+';background:'+(on?col+'22':'rgba(148,163,184,.12)')+';border:1px solid '+(on?col+'88':'rgba(148,163,184,.3)')+';">'+c+' <b>'+_cn+'</b></span>';
+    _grpHtml = {};
+    var _pick = function(k){ return D.stocks.filter(function(s){ return (s.status||'')===k; }).sort(_sortByChg); };
+    var body = '<div style="font-weight:600;font-size:12px;margin:0 0 6px;color:#22c55e;">🟢 强势 · 全部 <b>'+_strongAll.length+'</b> 只'
+      + '<span style="font-size:10.5px;color:var(--dim);font-weight:500;margin-left:6px;">（涨幅降序 · 越强越前）</span></div>';
+    body += _tableHtml(_strongAll);
+    var _foldRows = '';
+    ['正常','回落','见顶','走弱'].forEach(function(k){
+      var arr = _pick(k);
+      if(!arr.length) return;
+      _grpHtml[k] = _tableHtml(arr);
+      var col = statusMap[k] || '#94a3b8';
+      _foldRows += '<div style="margin:6px 0;"><span onclick="window.__foldToggle(\'_imaGrp_'+k+'\', this, \''+k+' '+arr.length+' 只\', window.__imaGroupHtml(\''+k+'\'))" style="cursor:pointer;display:inline-block;padding:3px 12px;border-radius:8px;font-size:11.5px;font-weight:600;color:'+col+';border:1px solid '+col+'55;background:'+col+'1a;">▸ '+k+' '+arr.length+' 只（点击展开）</span></div>';
     });
-    caps += '</div>';
-    window.__foldOpen('_imaFoldBox', btn,
-      '📡 强势跟踪 · ' + (_detailOK? '全部标的' : '本页可得明细（'+_allN+' / 源 '+_srcTrack+'）'),
-      caps + _tableHtml(_rows));
+    if(_foldRows){
+      body += '<div style="margin-top:12px;border-top:1px dashed var(--border);padding-top:10px;">'
+        + '<div style="font-size:11px;color:var(--dim);margin-bottom:4px;">📁 未达「强势」的分档已折叠（点击展开）</div>'
+        + _foldRows + '</div>';
+    }
+    var _box = window.__foldOpen('_imaFoldBox', btn,
+      '📡 强势跟踪 · ' + (_detailOK? ('全部标的（共 '+_allN+' 只 · 强势 '+_strongAll.length+'）') : ('本页可得明细（'+_allN+' / 源 '+_srcTrack+'）')),
+      body);
+    /* 🎯 与主卡表格**同一条竖线**：折叠区块默认左右各 14px 内边距会让内部表格整体内缩，
+       列宽虽一致但观感仍然「两套表」。此处去掉左右内边距（保留上下），标题行单独补回。 */
+    _box.style.paddingLeft = '0';
+    _box.style.paddingRight = '0';
+    if(_box.firstElementChild){ _box.firstElementChild.style.padding = '0 14px'; }
   };
-  window.__imaSetFilter = function(f){ window.__imaFilter = f; window.__foldClose('_imaFoldBox'); window.__imaFullPopup(document.querySelector('._imaFoldTrigger')); };
   }; /* ← 闭合 __renderImaStrongStock（__imaFullPopup/__imaSetFilter 已移入其体内） */
 
   // ===== 因子实验室（异常换手率 + ROE_TTM 大市值档）=====
