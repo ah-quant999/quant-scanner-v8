@@ -15412,8 +15412,12 @@ h += '<div class="card" id="sectorLeadersCard" style="display:none;margin-bottom
    + '<div id="sectorLeadersBody"><div class="note">加载中&#x2026;</div></div>'
    + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 「主升/启动」判定与「板块资金趋势」卡<b style="color:#f87171;">同源同规则</b>（同一份 SECTOR_RS 数据 + 同一个判定函数）&#8658; 两卡板块计数一致（主升 5日&gt;3%且20日&gt;5%；启动 5日&gt;1.5%且20日&gt;-8%）；个股为板块内当日涨幅排序，<b style="color:#fbbf24">非推荐信号，不构成投资建议</b>。</div></div>';
 
-h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+// 🔧 2026-09-19 主人令：此处原有一段「孤儿卡头」——
+//   `h += '<div class="card" style="...border-left:4px solid #38bdf8;">'` + 未闭合的 flex 头行（两个 div 都没闭合），
+//   系 09-19 06:13 新增「🌙 隔夜美股强势」卡时插入位置错误所致：插入点落在本页「概念/行业 → ETF·龙头 参考」
+//   卡的【卡头】与【卡身】之间 ⇒ 该卡头独占一张空壳 .card（.card 自带 border-radius:14px）⇒ 渲染成
+//   主人看到的「蓝色圆弧括号」，并把其后 5 张卡全部包进去。已整段删除 ⇒ 观测类 6 张卡恢复平级。
+//   自证：观测类 pane 生成段 div 净差由 +2 → 0。
 // ═══ 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测类第 2 卡）═══
 //   需求原话：「没错就是隔夜的，我只要近期涨幅好的个股或者ETF映射到A港股的就够了。
 //             每日盘前必须更新完成，任务设置好。」
