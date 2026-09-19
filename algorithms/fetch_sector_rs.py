@@ -3,7 +3,7 @@
 """
 板块相对强度 & 领涨/抗跌追踪
 用法：python fetch_sector_rs.py
-输出：data/sector_rs.json
+输出：raw_data/sector_rs.json（→ 由 update_v8.py 生成 data/SECTOR_RS.js 上线）
 
 v2 (2026-06-26): 新增相对强度计算（板块vs大盘指数）
    - 拉取上证指数/沪深300的5日/20日涨跌
@@ -17,7 +17,21 @@ from fetch_logger import record_success, record_failure
 import pandas as pd
 
 BASE = os.path.dirname(os.path.abspath(__file__))   # 迁移守卫漏注入（合并 import 行未匹配），此处补上
-OUT = os.path.join(BASE, "..", "out", "sector_rs.json")
+# 🔴 2026-09-19（阿狸咪的工程师）：`OUT` 由 `out/sector_rs.json`（**中间态**）改为
+#   **直写 `raw_data/sector_rs.json`** —— 与同一次运行写出的 `raw_data/sector_phase_history.json`
+#   同目录、同待遇，彻底消除「中间态搬运是否发生」这一不确定环节。
+#   线上实证的危害：`raw_data/sector_rs.json` 自 09-19 00:41 起冻结在旧产物
+#   （`data_date`=**生成日**、无 `data_date_source`），而同一时段快照文件已被新代码清污 ——
+#   即「快照侧生效、RS 侧未生效」。前端板块周期卡以 `SECTOR_RS.data_date` 为「今日」
+#   锚点串头部取「上一个不同日期的快照」做基线与迁移比对；`data_date` 是生成日时
+#   （周六/节假日）会取到与今日行情同日的快照 ⇒ **自比自 ⇒ 阶段迁移恒 0**，
+#   静默压掉真实迁移（该卡核心结论被清零）。
+#   消费位核对（本轮全仓扫描）：`update_v8.py` L17 `RAW_DIR = ROOT / "raw_data"`、
+#   L700 `sp = RAW_DIR / fname` ⇒ 它本就从 raw_data 读；`_make_lite` 无 SECTOR_RS 分支
+#   （全透传）⇒ 新字段可直达 `data/SECTOR_RS.js`。
+#   同步：`algorithms/stage_to_raw.py::SKIP_STAGE` 已登记 `sector_rs.json`（禁再搬 + 防
+#   REF_DATE 回填覆盖真 K 线日），`guard_raw_freshness.py` 复用 SKIP_STAGE ⇒ 自动跳过。
+OUT = os.path.join(BASE, "..", "raw_data", "sector_rs.json")
 NEODATA_URL = "https://copilot.tencent.com/agenttool/v1/neodata"
 
 # 2026-08-17 主人令：阶段快照存 raw_data/ 供前端"今日 vs 上次"对比

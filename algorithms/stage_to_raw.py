@@ -33,6 +33,15 @@ def now_cst():
 SKIP_STAGE = {
     "triple_consensus.json",
     "triple_track.json",
+    # 🔴 2026-09-19 阿狸咪的工程师：`sector_rs.json` 的生成器 fetch_sector_rs.py 已改为
+    #   **直写 raw_data/sector_rs.json**（原写 out/ 中间态再经本文件搬运）。理由两点：
+    #     ① 实测：raw_data/sector_rs.json 自 09-19 00:41 起冻结在旧产物（data_date=生成日），
+    #        而同一轮运行的 raw_data/sector_phase_history.json 已被清污 ⇒ 中间态这一环不可靠；
+    #     ② 下面的 REF_DATE 回填模式（周末/假期跑批）会把 data_date 改写成「推定交易日」，
+    #        而 fetch_sector_rs.py 现在写入的是【真 K 线日众数】（更准）⇒ 不得被推定值覆盖。
+    #   本文件语义即「生成器直写 raw_data 的产物不再搬运」⇒ 与本项完全一致。
+    #   guard_raw_freshness.py 复用本集合，命中即 continue ⇒ 自动跳过，零副作用。
+    "sector_rs.json",
 }
 
 # 2026-08-29 一劳永逸修复（根治 #1299 候选池被回退为陈旧 8/26 的根因）：
