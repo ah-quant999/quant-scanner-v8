@@ -306,7 +306,53 @@ def run_ima_strong():
     except Exception as e:
         print(f"  ⚠️ ima_strong_stock.json 解析失败: {e}")
         return
+    # 🔴 2026-09-19 阿狸咪的工程师：**双源并集**（根治「样本凭空少一半」+ 防幸存者偏差）
+    #   实测铁证（远端真值 data/BACKTEST_ALL_ALGOS.js 逐版比对）：
+    #     09-18 版  强势跟踪 T+1 n=40 / T+5 n=40 / T+30 n=32 ⇒ minActiveN=32 ⇒ 4★（有星）
+    #     09-19 版  强势跟踪 T+1 n=26 / T+5 n=20 / T+30 n=13 ⇒ minActiveN=13 ⇒ 星级静默消失
+    #   真因**不是算法、也不是 K 线覆盖**，是**信号集从 112 只缩到 56 只**：
+    #     上游 09-19 接入「全文通道」后只解析**最新一篇**日报（09-15 池 = 58 只，
+    #     其中 first_selected ≤ 08-05 的仅 19 只）；而 09-02 那篇是**全量累计池 112 只**
+    #     （含 37 只「回落」+ 12 只「见顶」= 已淘汰票）。
+    #   ⇒ 只留「当前仍强势」= **幸存者偏差**（回测必然虚高），且长持有期
+    #     （T+30 需 31 个交易日）样本必然不足 ⇒ 前端闸门（参与评分**每一期**样本 ≥30）
+    #     恒不通过 ⇒ 星级恒 0（卡片只显示「累积中」）。
+    #   ⇒ 正解：**最新日报 ∪ 历史全量归档**，同一 code 取**最早** first_selected
+    #     （= 真实首次入选日）。归档 raw_data/ima_strong_history.json 为**冻结文件**，
+    #     由 fetch_ima_strong_stock.py 之外的人工/脚本维护，故不会被日常抓取覆写。
+    def _load_sigs(_fp, _tag):
+        if not _fp.exists():
+            print(f"  · 无 {_fp.name}（{_tag}），跳过该源")
+            return [], 0
+        try:
+            _o = json.loads(_fp.read_text(encoding="utf-8"))
+        except Exception as _e:
+            print(f"  ⚠️ {_fp.name} 解析失败: {_e}")
+            return [], 0
+        _out, _sk = [], 0
+        for x in (_o.get("stocks") or []):
+            c = str(x.get("code") or "").strip()
+            d = str(x.get("first_selected") or "").strip()
+            if c and len(d) == 10 and d[4] == "-":
+                _out.append((c, d))
+            else:
+                _sk += 1      # 无「首次入选日」的标的无法定位信号时点 —— 如实跳过
+        print(f"  · {_tag} {_fp.name}: {len(_out)} 笔（跳过无信号日 {_sk}）")
+        return _out, _sk
 
+    _sig_latest, _sk_latest = _load_sigs(fp, "最新日报")
+    _sig_hist, _sk_hist = _load_sigs(RAW / "ima_strong_history.json", "历史全量归档")
+    _merged = {}
+    for c, d in _sig_hist + _sig_latest:
+        if c not in _merged or d < _merged[c]:
+            _merged[c] = d                     # 同 code 取最早 = 真实首次入选日
+    sigs = sorted(_merged.items(), key=lambda kv: (kv[1], kv[0]))
+    skipped = _sk_latest + _sk_hist
+    if not sigs:
+        print("  ⚠️ IMA 无可定位信号时点的标的，跳过")
+        return
+    print(f"  · 并集去重后 **{len(sigs)} 笔**（最新 {len(_sig_latest)} ∪ 归档 {len(_sig_hist)}）")
+    days = sorted({d for _, d in sigs})
     # 🔴 源覆盖度守卫（2026-09-19）：消费上游标注，把「为什么样本这么少」写进产物。
     _qf, _qdeg, _qwhy = _source_quality(obj)
     if len(sigs) < SOURCE_COVERAGE_MIN_ROWS:
