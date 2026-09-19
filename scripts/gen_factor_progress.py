@@ -133,6 +133,47 @@ PRIORITY_NOTE = {
 #       跌破 5% ⇒ 统计不显著，不予接入；
 #     · Bottom 层「一票否决」排除项 —— T+20 利差 −6~−7.75% 但仅前半段成立，
 #       后半段 8/8 组反转（不满足 OOS 同号），T+5/T+10 配对 p=0.35~0.72 不显著。
+#
+# 🔴🔴 2026-09-19 主人令·一劳永逸（阿狸咪的工程师）—— 「算不了的直接删除，不再跟踪」
+# ═══════════════════════════════════════════════════════════════════════════
+# 【主人原话】「我只想知道哪个因子加入后，对选出最终推荐有真正的帮助，就加那个，
+#             如果算不了就不再跟踪，直接删除」
+#
+# 【实测裁决依据（全部有铁证，可复跑）】
+#   ① 数据面：8 项财报因子所需字段（毛利/总资产/经营现金流/总负债/净利润/
+#      营业总收入/PE/EPS）在 raw_data/fundamental_quality.json（497 只，字段并集
+#      仅 ['grade','news','reason','revenue_growth','roe','score']）**全部缺失**；
+#   ② K 线面：raw_data/kline_cache（3120 只）字段仅
+#      ['date','open','close','high','low','volume'] —— **无股本 ⇒ 推不出总市值**
+#      ⇒ SIZE 因子亦不可算；
+#   ③ 上游面：algorithms/fetch_stock_quote_v8.py::merge_pe_pb_from_em() 确实抓到了
+#      pe_ttm/pb_mrq 并写入 quote_data（L390/L392），但 write_outputs() 的
+#      meta['fields'] 白名单（L334）**未声明这两键**，且全仓 pe_ttm/pb_mrq
+#      **零处读取**（grep 实测只有写入 2 行）⇒ PE 在内存里算出后被**静默丢弃**。
+#      属「上游标了、下游不读」结构病，是**独立缺陷**，不因本裁决而消失。
+#   ④ 时间面：本机可跑的全是 K 线因子（A 组 8 个），已于 2026-09-19 12:25:55
+#      跑完 walk-forward，结果 1 PASS / 7 FAIL（见 raw_data/factor_walkforward.json）；
+#      而财报因子连「能不能算」都不成立 ⇒ 一天内完成不成立，且无排期价值。
+#
+# 【裁决】B 组 3 条（F-Score / Accruals / 资产周转率）与 STOCK_QUOTE 审计来源的
+#   5 条（总市值 / 盈利收益率 E-P / GPOA / 经营现金流-总资产 / 负债-总资产）
+#   ⇒ 全部标记 RETIRED_NO_DATA，**从台账正文删除**，仅在 summary 留一条汇总备忘。
+#   ⚠️ 这不是「回测不达标」（那是规则③），而是「**前置数据不存在 ⇒ 永不可算**」，
+#      故在 category 上单列，不与 verdict=FAIL 混淆（区分事实与判断）。
+#   🔓 复活条件（写成规则而非人情）：fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq
+#      **且** fundamental_quality 扩到含总资产/毛利/经营现金流/负债/净利润/营收
+#      ⇒ 届时把对应条目从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑。
+RETIRED_NO_DATA = {
+    # name: (缺什么字段, 为何推不出)
+    "总市值":            ("缺总股本/总市值", "kline_cache 无股本字段；STOCK_QUOTE.stocks 无市值字段"),
+    "盈利收益率":        ("缺 PE/EPS", "pe_ttm 被 fetch_stock_quote_v8.py 白名单丢弃；fundamental.eps 恒为 null"),
+    "GPOA":              ("缺毛利/总资产", "fundamental_quality 无此二字段"),
+    "经营现金流/总资产": ("缺经营现金流/总资产", "fundamental_quality 无此二字段"),
+    "负债/总资产":       ("缺总负债/总资产", "fundamental_quality 无此二字段"),
+    "Piotroski F-Score": ("缺毛利/总资产/经营现金流/负债/营收", "同上，且 9 项中 7 项依赖缺失字段"),
+    "应计质量 Accruals": ("缺净利润/经营现金流/总资产", "fundamental_quality 无此三字段"),
+    "资产周转率":        ("缺营业收入/总资产", "fundamental_quality 无此二字段"),
+}
 # ═══════════════════════════════════════════════════════════════════════════
 CANDIDATE_POOL = [
     # ── A 组：数据就绪（kline_cache 已入仓，本机可立即 walk-forward）──
@@ -290,7 +331,30 @@ def main():
           + (f"（{wf_time}）" if wf_time else "（无 —— factor_walkforward.json 缺失）"))
     kept, retired = [], []
     n_done_wf = 0
+    retired_nodata = []                # 🔴 2026-09-19：前置数据不存在 ⇒ 直接删除
     for p in progress:
+        # 🔴🔴 2026-09-19 主人令·一劳永逸 —— 第 0 优先级：前置数据不存在 ⇒ 立即裁决出局
+        #   【主管线】主人原话：「如果算不了就不再跟踪，直接删除」
+        #   判据来自 RETIRED_NO_DATA（表内每条都附「缺哪个字段 + 为何推不出」）。
+        #   放在 walk-forward 分支**之前**：这类因子永远拿不到回测结果，
+        #   若走下方 `if not r: kept.append(p)` 会**永久 pending** ＝ 主人所指
+        #   「不要整个版面都在等待，一直也解决不了」。
+        if p["name"] in RETIRED_NO_DATA:
+            _miss, _why = RETIRED_NO_DATA[p["name"]]
+            retired_nodata.append({
+                "name": p["name"],
+                "label": p.get("label", "?"),
+                "pool": p.get("pool", "?"),
+                "category": "NO_DATA",              # 与 verdict=FAIL 严格区分（事实 vs 判断）
+                "missing_fields": _miss,
+                "why_unsolvable": _why,
+                "retired_at": wf_time or "",
+                "revive_rule": ("fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，"
+                                "且 fundamental_quality 扩到含所需字段后，"
+                                "从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"),
+            })
+            print(f"  🗑 删除（前置数据不存在）: {p['name']} — 缺 {_miss}")
+            continue
         key = WF_MAP.get(p["name"])
         r = wf.get(key) if key else None
         if not r or not r.get("verdict"):
@@ -347,7 +411,9 @@ def main():
     progress = kept
     _n_int = sum(1 for _p2 in progress if _p2.get("deploy_status", "").startswith("✅ 已接入"))
     print(f"  ⇒ 达标 done {n_done_wf} 个（其中已接入 generate_top10.py: {_n_int} 个）"
-          f" · 不达标删除 {len(retired)} 个 · 仍 pending {len(progress) - n_done_wf} 个")
+          f" · 回测不达标删除 {len(retired)} 个"
+          f" · 前置数据不存在删除 {len(retired_nodata)} 个"
+          f" · 仍 pending {len(progress) - n_done_wf} 个")
 
     # 全局进度汇总
     n_total = len(progress)
@@ -397,6 +463,14 @@ def main():
                 and not _p5_on(WF_MAP.get(p2["name"]), wf.get(WF_MAP.get(p2["name"])))[0]),
             "integrated_into": "algorithms/generate_top10.py :: P5 段（候选池内分位前20%=+6 / 20~40%=+3）",
             "retired_by_backtest": retired,   # 不达标被删的条目（仅汇总备忘，不留 pending 遗体）
+            # 🔴🔴 2026-09-19 主人令（阿狸咪的工程师）：「算不了就不再跟踪，直接删除」
+            #   与 retired_by_backtest **严格区分**：那批是「跑过、没达标」（判断），
+            #   这批是「前置数据不存在、根本跑不了」（事实）⇒ category 单列。
+            "retired_no_data": retired_nodata,
+            "retired_no_data_count": len(retired_nodata),
+            "policy_nodata": ("主人 2026-09-19 令：算不了的因子不再跟踪、直接从台账删除。"
+                              "★ 这不是「回测不达标」，而是「前置数据不存在 ⇒ 永不可算」；"
+                              "复活条件已写成规则（见每条 revive_rule），不靠人情。"),
         },
         "factors": progress,
     }
