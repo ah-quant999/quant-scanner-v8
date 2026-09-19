@@ -289,12 +289,14 @@ ORDER = [
     #   相对次序）：它要读 E 批其他脚本本轮刚产出的 CRDS_BACKTEST / BACKTEST_TDX /
     #   FOUR_VOLUME_BACKTEST / FACTOR_LAB_BACKTEST，先跑就会读到上一轮旧数。
     # 🆕 2026-09-13 主人令「只要接入算法链的选股策略，都要有回测」：
-    #   强势突破（algorithms/strong_breakout.py）早已挂 B 批，但其回测源
+    #   原「强势突破」（algorithms/strong_breakout.py，已于 2026-09-19 全站删除）的回测源
     #   scripts/algo_backtest_compare.py 一直是孤儿（ORDER/STAGES 均未挂）
-    #   ⇒ data/ALGO_BACKTEST_COMPARE.js 永不生成 ⇒ 聚合器里「强势突破」卡恒为 0 档。
+    #   ⇒ data/ALGO_BACKTEST_COMPARE.js 永不生成 ⇒ 聚合器里对应卡恒为 0 档。
+    #   （2026-09-19 强势突破卡删除后，本脚本仍在链上：它读 STOCK_MOMENTUM_STATE_V2，
+    #    产出「H反推 / 高手画像版H反推 / 动量状态」同口径对比，与已删模块无关。）
 #   与回测家族同例会：必须在聚合器gen_backtest_all_algos.py **之前**，
     #   否则聚合器读不到本轮产物。
-    "scripts/algo_backtest_compare.py",   # → data/ALGO_BACKTEST_COMPARE.js（H反推 / 高手画像版H反推 / 强势突破 同口径对比）
+    "scripts/algo_backtest_compare.py",   # → data/ALGO_BACKTEST_COMPARE.js（H反推 / 高手画像版H反推 / 动量状态 同口径对比）
     # 🆕 2026-09-17 小九的股票专家（主人令「星级基准超额数据缺失→从回测产物侧补」）：
     #   全市场等权基准生成器（2026-09-17 阿狸咪的工程师新增）。交接单声称已挂 E 批
     #   （ORDER[47]）但远端实测缺失（疑被裸 rebase 洗掉）——此处补挂对齐。

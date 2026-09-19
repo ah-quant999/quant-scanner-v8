@@ -1775,6 +1775,24 @@ final_score = strength + resonance × 1.5 + sec_add − weak_penalty
           <li><b>闸门前置</b>：因子/信号仅在回测判定达标后启用；未验证默认不加分（宁缺毋假，2026-09-18 修复静默默认启用 bug）。</li>
           <li><b>因子只加分不减选</b>：已选出的票才被因子加减分，因子不建池、不产股票列表。</li>
         </ul>
+
+        <div class="logic-h">八、三步链条：三张卡各算什么、怎么读（2026-09-19 主人令 · 与前端卡一一对应）</div>
+        <div class="logic-p">评分链在前端拆成三张卡。<b>第一步、第二步是静态口径（每天不变），第三步是每日计算（每天变）</b>；三卡同源：<code>algorithms/generate_top10.py</code> → <code>algorithms/final_recommend.py</code>。</div>
+        <table class="lg-table">
+          <tr><th>步</th><th>卡名（前端）</th><th>算什么（计算规则）</th><th>数据源</th><th>更新节奏</th></tr>
+          <tr><td>第一步</td><td>🧮 每日因子计算 · 每日打分</td><td>把<b>全部因子</b>逐项加总成 <code>raw_total</code>（P2 四信号 / P3 量能行为 / P4 研究因子 / P5 walk-forward / 形态 / 资金 / 板块 / 机构 / 基本面），再归一化排序。<b>因子只改排序、绝不决定谁能进池</b></td><td>代码投影（<code>generate_top10.py</code>，逐行附源码行号）</td><td><b>静态</b>。唯一例外：P5 两因子按 <code>raw_data/factor_walkforward.json</code> 的 <code>verdict</code> 取 PASS 才计分、FAIL 自动停用</td></tr>
+          <tr><td>第二步</td><td>🧪 已纳入因子</td><td>列出<b>真进算法链</b>的因子台账（● 真计入 final_score / ○ 仅标注不计分），并给出该卡的回测结论</td><td><code>data/FACTOR_PROGRESS.js</code> + <code>data/FACTOR_LAB_BACKTEST.js</code></td><td>台账<b>静态</b>；「✅ 回测已达标 / ⛔ 回测未达标 / ⏳ 待回测」徽章<b>随产物自动翻转</b>，不写死</td></tr>
+          <tr><td>第三步</td><td>🏆 当日因子计分榜</td><td>当日候选池 <b>top20</b> 每只票的<b>各因子加减分逐项列出</b>，按 <code>total_score</code> 从高到低排 —— <b>最顶部就是最终推荐</b>；标 🏷「最终推荐」的行 = 当日 FINAL_RECOMMEND 实际名单（代码精确匹配）</td><td><code>data/TOP10_DAILY.js</code>（top20） + <code>FINAL_RECOMMEND_DATA.stocks</code></td><td><b>每日盘后重算</b>（三卡里唯一每天变的）</td></tr>
+        </table>
+
+        <div class="logic-h">折叠规则（怎么读最快）</div>
+        <ul style="margin:6px 0 0 18px;font-size:13px;line-height:1.85;color:var(--txt);">
+          <li><b>默认折叠</b>：第一步的 26 项打分全表、第二步的「算法链因子台账」与「口径 / 独立分层回测明细」，默认收起，点「▸ 展开」才展 —— 明细不干扰每日读表。</li>
+          <li><b>常显不动</b>：第一步的「它做什么」说明行；第二步的徽章行（已进算法链·真计分 / 第二步 / 回测达标 / 更新时间）、择时闸门 · 仓位依据行、重点池统计行。</li>
+          <li><b>主展示</b>：第三步「🏆 当日因子计分榜」—— 每天只需看这张：顶部即最终推荐，逐项加减分说明「为什么选这几只」。</li>
+          <li><b>配色约定</b>：第一步蓝 · 第二步紫 · 第三步琥珀（各步独立配色，防止串读）；<b style="color:#ef5350">红=加分</b> / <b style="color:#26a69a">绿=扣分</b> / 灰=0（A 股红涨绿跌口径）。</li>
+        </ul>
+        <div class="logic-p">🔴 <b>已删除项（留痕，防复活）</b>：「强势突破」卡（含其回测对比）已按 2026-09-19 主人令<b>全站删除</b>（回测胜率 14.4% 破红线）：渲染函数 / 数据注入 / 算法与数据文件一并移除。其信号水源 <code>scripts/gen_strong_breakout.py</code> <b>保留</b>（供「动量共识」「强势跟踪」信号合成），故「选股生命周期」页现为 <b>2 卡</b>。</div>
       </div>
 
 <div class="card">

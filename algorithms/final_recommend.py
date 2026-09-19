@@ -179,8 +179,8 @@ def load_js(name, var_name):
             text = f.read()
         # 🔴 2026-09-11 一劳永逸修复（主人报「最终推荐/生命周期没算出来」排查中发现）：
         #   原逻辑要求 text **必须以 "window.<var>" 开头**才剥离前缀赋值。
-        #   但部分生成器会在文件头写 `/* ... */` 说明注释（如 strong_breakout.py 产出
-        #   的 data/STRONG_BREAKOUT.js），于是 startswith 判假 → 前缀不剥离
+        #   但部分生成器会在文件头写 `/* ... */` 说明注释（如某个策略生成器产出的
+        #   data/*.js），于是 startswith 判假 → 前缀不剥离
         #   → json.loads("/* ... */\nwindow.X = {...}") → line 1 column 1 直接炸
         #   → 该路共振源被【静默丢弃】（长期少一路融合，且只打一行 warn 不易察觉）。
         #   现改为：先剥所有 /* */ 注释块，再按 window. 前缀剥离。

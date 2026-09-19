@@ -208,8 +208,9 @@ def _load_cache_any(code):
 def _net_kline_records(code):
     """网络长历史（700 日）→ records list；不可达则 None。
 
-    复用 algorithms/strong_breakout.py 的 `_fetch_kline`（gtimg 主源 → 新浪兜底，
-    双域名级故障转移，已在盘后链稳定运行）——不另造第三条取数路径。
+    复用本文件内联的 `_fetch_hist`（原 algorithms/strong_breakout.py 的 `_fetch_kline`
+    逐行搬移而来：gtimg 主源 → 新浪兜底、双域名级故障转移；该模块已随 2026-09-19
+    「强势突破」全站删除而移除）—— 不另造第三条取数路径。
     返回行序为 [date, open, close, high, low, volume]（前复权）。
     """
     try:
@@ -253,7 +254,7 @@ def _load_klines(codes, workers):
 
     🛡 2026-09-15：原实现调用的 _query_kline / _load_cache 从未定义（NameError → 全链秒退，
     该脚本自 09-04 上线起从未产出过），现按原设计意图补齐：
-      ① 网络 700 日（gtimg→新浪，复用 strong_breakout._fetch_kline）——保证样本深度；
+      ① 网络 700 日（gtimg→新浪，走本文件内联的 _fetch_hist）——保证样本深度；
       ② 失败回落本地缓存（_rps_cache → kline_cache）——保证云端/断网时不空手而归。
     只读缓存会让样本深度掉到 251 日（NEED_MIN=261 都过不了），分层只剩个位数调仓点，
     等于用「能跑」换「不算数」，故网络仍是主源。

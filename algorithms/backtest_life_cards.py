@@ -6,11 +6,13 @@
            这三个做回测，要求用真实数据回测，并打上真实数据回测标识。
            一定要确保数据的真实性！」
 
-本脚本为「强势突破」「高手强势股跟踪」两张卡产出**真实**信号层回测
+本脚本为「高手强势股跟踪」卡产出**真实**信号层回测
+（原同时为「强势突破」卡产出的回测，已随 2026-09-19 主人令「强势突破」全站删除而移除）
 （第三张「选股生命周期」的回测由 algorithms/gen_algo_track.py → data/ALGO_TRACK.js
   的 algos[0].stats.by_horizon 提供，本脚本不重复计算）：
 
-  · 强势突破         信号源 raw_data/strong_breakout_history.json（逐日真实信号账本）
+  · （已删）强势突破   2026-09-19 主人令全站删除；其信号账本 raw_data/strong_breakout_history.json
+                      仍由 scripts/gen_strong_breakout.py 维护（供动量共识/强势跟踪信号合成），本脚本不再消费
   · 高手强势股跟踪    信号源 raw_data/ima_strong_stock.json（最新日报）
                       ∪ raw_data/ima_strong_history.json（历史全量归档，防幸存者偏差）
 

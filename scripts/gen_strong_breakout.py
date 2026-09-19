@@ -44,11 +44,13 @@ WINDOW_DAYS = 45
 #   展示窗口（WINDOW_DAYS=45）决定 uni / periods / STOCK_MOMENTUM_STATE 的统计口径，
 #   **不得改**；保留期（LEDGER_KEEP_DAYS）只决定落到
 #   raw_data/strong_breakout_history.json 的入选记录留多久。
-#   动因：生命周期页「强势突破」的信号层回测读的就是这份账本，而 T+45~T+250 长档要成熟
+#   动因：原「强势突破」信号层回测（已随 2026-09-19 主人令全站删除）读的就是这份账本，
+#         而 T+45~T+250 长档要成熟
 #   必须留得住 ≥250 个交易日的入选记录 —— 45 天窗口下长档**结构性永远只能是「未成熟」**。
 #   380 天与 algorithms/backtest_comprehensive.py 的 LOOKAHEAD_DAYS=380 同源
 #   （覆盖 250 交易日 ≈ 365 自然日 + 余量）。
-#   ⚠️ 该账本当前唯一消费方是 algorithms/backtest_life_cards.py（不发布前端），
+#   ⚠️ 2026-09-19 起该账本的「回测消费方」已随强势突破删除而消失（保留滚动写入，
+#     供回溯/研究取用；不发布前端）——
 #     故扩保留期不改任何屏上口径。
 LEDGER_KEEP_DAYS = 380
 # 🛡 2026-08-29 硬化：K线可用率低于阈值时直接失败，禁止发布「data_available=false」的虚假回测。
