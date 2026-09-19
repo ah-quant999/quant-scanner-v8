@@ -996,10 +996,22 @@ window.V8_CAL = {weeks:[],legend:[]};
     var today0 = new Date(+tp[0], +tp[1]-1, +tp[2]);
     var data0  = new Date(+dp[0], +dp[1]-1, +dp[2]);
     var diff = Math.round((today0 - data0) / 864e5);
-    if(diff >= 1 && !window._isAshareTradingDay(today0)){
-      return '上一交易日收盘 ' + hm;
-    }
+    // 🔴 2026-09-19 主人令（阿狸咪的工程师）—— 「上一交易日收盘」前缀会把当日时刻吞掉。
+    //   原实现：非交易日（周末）时 diff>=1 一律 return '上一交易日收盘 ' + hm，
+    //   而 hm 是**该时间戳自身的时分** ⇒ 金股池 update_time=2026-09-19 13:24（周六）
+    //   被渲染成「上一交易日收盘 13:24」，自相矛盾（收盘不可能在 13:24）。
+    //   更毒的是：周末本来就有链路在跑（云端抓数 / 算法链），今天新产生的时间戳
+    //   被贴上「上一交易日」标签 ⇒ 主人无法判断这份数据今天到底有没有更新。
+    //   正解：仅当「数据日期确实是上一交易日」（diff>=1）且今日非交易日的**盘前**
+    //   语义下才打该前缀；数据日期 == 今日（diff<=0）时一律按「今日 HH:MM」处理，
+    //   与是否交易日无关 —— 数据是今天的就直说今天。
     if(diff <= 0) return '今日 ' + hm;
+    if(diff >= 1 && !window._isAshareTradingDay(today0) && diff === 1){
+      // 今天是非交易日、数据落在昨天：展示为「上一交易日 HH:MM + (日期)」，
+      // 保留原语义但补日期，避免与今天新产生的时间戳混淆。
+      var dsFull = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+      return '上一交易日(' + dsFull + ') ' + hm;
+    }
     if(diff === 1) return '昨日 ' + hm;
     return diff + '天前 ' + hm;
   };
