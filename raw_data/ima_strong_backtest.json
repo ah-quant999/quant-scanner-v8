@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-19 06:51:25",
+ "generated": "2026-09-19 09:19:14",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -28,6 +28,26 @@
  "signal_days": 2,
  "signal_date_range": "2026-06-30 ~ 2026-08-17",
  "ima_update_time": "2026-09-19 05:52:20",
+ "source_coverage": {
+  "rows_parsed": 2,
+  "expected": 58,
+  "coverage_pct": 3.4,
+  "intro_chars": 285,
+  "truncated": true,
+  "note": "服务端把 introduction 截断在 ~300 字（全站 70+ 条实测无一超过），故仅能解析出表头之后的头若干条；expected = 头部汇总的『跟踪N只』。本字段如实标注覆盖面，**绝不把部分数据当作全量**。"
+ },
+ "source_detail_complete": false,
+ "source_data_date": "2026-09-15",
+ "source_stale": false,
+ "source_coverage_summary": "2/58",
+ "source_degrade_reasons": [
+  "源端截断（sample_coverage.truncated=true）",
+  "源覆盖率 3.4%（2/58）< 50.0%",
+  "上游标 detail_complete=false（明细不完整）",
+  "可比信号仅 2 笔 < 5 笔"
+ ],
+ "source_integrity": "degraded",
+ "backtest_representative": false,
  "periods": {
   "1d": {
    "samples": 2,
