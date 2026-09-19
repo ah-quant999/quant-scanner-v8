@@ -910,6 +910,7 @@ jobs:
           # ② 产物完整性（raw_data 源头层，选股/汇总/回测/全链适用；A 采集批不产这些，跳过）
           case "$TGT" in
             B|D|E|ALL)
+              python algorithms/check_cli_contract.py || echo "::warning title=v8-cli-contract::CLI 契约自检未通过，verify_chain_outputs.py 调用参数可能漂移，需人工核对"
               python algorithms/verify_chain_outputs.py --date "$DAY" --upto "$TGT" || { echo "::error::产物完整性闸门未通过（raw_data 源头层有陈旧/缺失），详见上方报告"; RC=1; } ;;
           esac
 
