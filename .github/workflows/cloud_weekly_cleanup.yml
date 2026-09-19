@@ -76,10 +76,15 @@ jobs:
           #     ② 正则 `[A-Z_0-9]+` **不匹配小写文件名** ⇒ 小写产物永远不在 referenced；
           #     ③ 保护名单用大写（"MAHORO_INSIGHTS"）而实际文件是小写（maharo_insights.js）
           #        ⇒ `var_name in PROTECTED_DATA` 恒 False，**保护形同虚设**。
-          #   实证（2026-09-20 00:08 本轮）：data/ALGO_BACKTEST_COMPARE.js（只被 logic.html 引用）
+          #   实证（2026-09-20 00:08 本轮）：data/ALGO_BACKTEST_COMPARE.js（当时只被 logic.html 引用）
           #   与 data/maharo_insights.js（小写名 + 保护名大小写不匹配）双双被删；
           #   后者令 pre_deploy_audit [6/8] 检出 index.html 404 断链
           #   ⇒ v8_build_deploy 自 #7127 起**连续 6 次 failure**，线上 index.html 停更。
+          #   ⚠️ 2026-09-20 补正：ALGO_BACKTEST_COMPARE.js 随后经查**全链已退役**
+          #     （其唯一消费卡属主人 09-02 明令删除的模块；CDP 实测 ul-pane 数=0 ⇒ 零生效路径），
+          #     故它不再是「被引用产物」，本次已连同生产/上传/死代码一并摘除。
+          #     maharo_insights.js 则是**真被误删的正常产物**，已恢复（21494 B）——
+          #     本行首要守护对象就是它这类「小写名 + 仅被非 index 页引用」的产物。
           #   ⇒ 修复原则：清理面必须 ⊇ 引用面，且与 check_html_refs 门禁**同口径（同 4 页）**，
           #     大小写一律归一比较。清理与门禁打架 = 每次清理都制造一次红灯。
           PAGES = ['index.html', 'logic.html', 'calendar.html', 'v6_memo.html']

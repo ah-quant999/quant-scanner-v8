@@ -107,11 +107,14 @@ SOURCES = [
     #              primary=None, chain_member=True)
     #   删除理由（三条，均已实测）：
     #     ① 该卡已于 2026-09-19 从全站删除（前端渲染函数 / 数据注入 / 回测源一并移除）；
-    #     ② 其数据源 data/ALGO_BACKTEST_COMPARE.js 亦已不存在（Pages 实测 404）；
+    #     ② 🔵 2026-09-20 补正：本行原写「其数据源 data/ALGO_BACKTEST_COMPARE.js 亦已不存在
+    #        （Pages 实测 404）」—— 该表述**当时正确、现已过时**：该产物曾在同日随
+    #        build 全红根治被恢复过一版。**当前状态（2026-09-20 摘链后）**：产物与生成脚本
+    #        scripts/algo_backtest_compare.py 已全链退役删除 ⇒ 确实不再存在（此点已重新成立）。
     #     ③ 保留登记会让本聚合器**持续产出「源不可读」行**，且因读到的旧数值仍在
     #        产物中而**据陈旧数值发出下架提请**（实测：delist_advice「强势突破 胜率 15.9%」，
     #        而该源当天已删）—— 已在下方 advice 循环加 fresh 护栏，双保险。
-    #   ⚠️ 不得再登记回本表；如日后要恢复，须先恢复前端卡与数据源。
+    #   ⚠️ 不得再登记回本表；如日后要恢复，须先恢复前端卡（主人令）与数据源。
     dict(card="K线信号层", kind="signal", page="策略回测", icon="📈", cat="signal",
          var="BACKTEST_TDX", rel="data/BACKTEST_TDX.js",
          parser="tdx", label_prefix="", primary=None,
@@ -613,7 +616,10 @@ def parse_tdx(src, obj):
 # 🗑 2026-09-19 主人令：「强势突破」全站删除 ⇒ parse_algo_compare() 一并移除（墓碑）。
 #   原函数读 data/ALGO_BACKTEST_COMPARE.js 的 algorithms.{h_reverse,strong_breakout,…}，
 #   其中仅「强势突破」那一行属本卡（primary=("强势" in name)）。卡已删、源已删 ⇒ 无调用方。
-#   如日后确需「H反推 / 高手画像版」同口径对比行，应**新开一张独立卡**并重写解析器，不要复活本函数。
+#   🔵 2026-09-20 补正（阿狸咪的工程师）：本产物与生成脚本 scripts/algo_backtest_compare.py
+#     **已全链退役删除**（前端死代码段 + 算法链 ORDER/STAGES + api_push 上传登记三处同步摘除），
+#     故本函数所依赖的源今后**永久不存在**。若本函数被复活会立刻抛 FileNotFoundError。
+#     如日后确需「H反推 / 高手画像版」同口径对比行，应**新开一张独立卡**并重写解析器，不要复活本函数。
 
 
 def parse_factor_lab(src, obj):

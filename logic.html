@@ -6648,60 +6648,23 @@ h+='</div>';  // /ulPaneDbg
 
     // ── 🎭 情绪周期 · 连板天梯（合并紧凑版）已迁到实时数据区，见 window.__renderCycleLadderCard ──
 
-    // ── pane1: 🚀 强势突破（3 卡：回测对比 + 动量共识 + H反推）──
-    h+='<div class="ul-pane" id="ulPaneStrong" style="display:'+(_ulAct==='strong'?'block':'none')+'">';
-    // ── 2026-08-30 主人令：强势突破 = H反推 + 动量共识 + 回测对比 三卡并列；本页速读删（属调试/展示性内容，移至逻辑详解） ──
-    // ── 📊 两套算法回测横向对比（2026-08-23 主人令：同一口径比胜率+收益率）──
-    //   2026-08-27 主人令修正：本卡依赖 H反推 + 动量共识(强势突破) 双卡盘后数据齐备后才应出数据
-    //   守卫逻辑：检查双卡 generated 时间是否均为当日盘后（≥15:00），否则显示"等待"而非中午就出
-    var _cmp = window.ALGO_BACKTEST_COMPARE;
-    var _habTime = (window.H_AUTO_BUY && window.H_AUTO_BUY.generated_at) ? String(window.H_AUTO_BUY.generated_at) : '';
-    var _mfTime = (window.MOMENTUM_FILTER && window.MOMENTUM_FILTER.generated) ? String(window.MOMENTUM_FILTER.generated) : '';
-    // 提取 HH:mm 部分做数值比较
-    function _extractHM(ts){ if(!ts) return -1; var m=ts.match(/(\d{1,2}):(\d{2})/); return m?parseInt(m[1])*60+parseInt(m[2]):-1; }
-    var _habHM = _extractHM(_habTime), _mfHM = _extractHM(_mfTime);
-    // 盘后阈值：15:00 = 900 分钟。双卡都 ≥ 15:00 才算盘后齐备
-    var _bothPostMarket = (_habHM >= 900 && _mfHM >= 900);
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">';
-    h+='<h3 style="font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">📊</span>两套算法回测对比 <span style="font-size:10px;color:#94a3b8;font-weight:400">H反推 vs 强势突破 · 同一口径</span>';
-    h+=_uBadge('盘后','对比',_cmp?_cmp.generated:null)+'</h3>';
-    if(!_cmp || !_cmp.algorithms){
-      h+='<div class="note">对比数据未生成（由 algo_backtest_compare.py 在构建末尾产出）</div>';
-    } else if(!_bothPostMarket){
-      // 盘前/盘中：双卡数据未齐备，不渲染对比表
-      h+='<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:10px 12px;font-size:12.5px;line-height:1.7;color:var(--sub);">';
-      h+='⏳ <b>等待盘后双卡数据齐备</b>：本卡需「H 反推短线买点」+「动量共识筛选」均更新后方可展示有效对比。<br>';
-      h+='当前状态：H反推 <b>'+(_habTime||'—')+'</b> · 动量共识 <b>'+(_mfTime||'—')+'</b> · 通常 20:00 前后自动齐备。</div>';
-    } else {
-      var _ha=_cmp.algorithms.h_reverse, _sb=_cmp.algorithms.strong_breakout;
-      var _hz=[['t1','T+1'],['t3','T+3'],['t5','T+5'],['t10','T+10']];
-      h+='<div style="font-size:11px;color:var(--dim);margin-bottom:6px;">胜率=该周期收益&gt;0占比；平均收益=样本均值%；命中率(≥5%)为原H反推定义。绿高优。</div>';
-      h+='<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;">';
-      h+='<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">算法</th>';
-      _hz.forEach(function(x){ h+='<th style="padding:6px 5px;text-align:center;color:var(--sub);">'+x[1]+'胜率</th><th style="padding:6px 5px;text-align:center;color:var(--sub);">'+x[1]+'均收益</th>'; });
-      h+='</tr></thead><tbody>';
-      [['h_reverse',_ha,'#38bdf8'],['strong_breakout',_sb,'#f59e0b']].forEach(function(rw){
-        var a=rw[1], col=rw[2];
-        var _sn=(a&&a.summary&&a.summary.n_samples)?a.summary.n_samples:0;
-        var _hzs=(a&&a.summary)?a.summary.horizons:null;
-        h+='<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-        h+='<td style="padding:5px 5px;font-weight:700;color:'+col+';white-space:nowrap;">'+(a?a.name:'?')+' <span style="color:var(--dim);font-weight:400;font-size:11px;">(n='+_sn+')</span></td>';
-        _hz.forEach(function(x){
-          var m=(_hzs)?_hzs[x[0]]:null;
-          var win=(m)?m.win:null, avg=(m)?m.avg:null;
-          h+='<td style="padding:5px 5px;text-align:center;color:'+(win!=null?(win>=50?'var(--up)':'var(--down)'):'var(--sub)')+';font-weight:600;">'+(win!=null?win+'%':'--')+'</td>';
-          h+='<td style="padding:5px 5px;text-align:center;color:'+(avg!=null?(avg>=0?'var(--up)':'var(--down)'):'var(--sub)')+';font-weight:600;">'+(avg!=null?(avg>0?'+':'')+avg+'%':'--')+'</td>';
-        });
-        h+='</tr>';
-      });
-      h+='</tbody></table></div>';
-      if(_cmp.verdict){
-        h+='<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:7px;padding:8px 10px;font-size:13px;line-height:1.7;color:var(--sub);margin-top:8px;">📌 结论：'+_cmp.verdict+'</div>';
-      }
-    }
-    h+='</div>';
-    h+='</div>';  // /两套算法回测对比卡
+    // ── 🗑 2026-09-20 摘除死代码（阿狸咪的工程师 · 主人令收口）──
+    //   原 pane1「🚀 强势突破（3 卡：回测对比 + 动量共识 + H反推）」的容器 div 与其首卡
+    //   「📊 两套算法回测对比」整段（原 L6651-6704）已删除，理由三条（均已实证，非推断）：
+    //     ① 主人 **2026-09-02 明令**：「强势突破 pane、模块去向索引、**两套算法回测对比** 全部删除」
+    //        （见 index.html renderUnlisted 内同源注记）；
+    //     ② 该 pane 容器（ulPaneStrong）**已不在 renderUnlisted 的生成列表**内 ——
+    //        CDP 真浏览器实测（2026-09-20 06:5x，走真实 switchSec('ul') 路径）：
+    //        panel.innerHTML.length=262174、ulPaneObserve=true，但 **ul-pane 数 = 0、
+    //        ulPaneStrong 非元素** ⇒ 本段属**零生效路径**的残留死代码，从未渲染；
+    //     ③ 其数据源 data/ALGO_BACKTEST_COMPARE.js 的生成（algorithms/run_algorithms.py）
+    //        与上传登记（api_push_raw.py）已同步摘除，产物不再产出。
+    //   ⚠️ 保留本节上方「本页 docstring 注记」中原有的 2026-09-19 script 引用摘除说明（见 <head> 内）。
+    //   ⚠️ 不得再恢复本段；如日后确需「H反推 / 高手画像版」同口径对比，
+    //      应**新开一张独立卡并重写渲染器与解析器**（与 gen_backtest_all_algos.py 墓碑同口径）。
+    //   ⚠️ 下方「🎯 动量共识筛选」卡**保留**：它属 ulPaneStrong 内的另一张卡，
+    //      且 pane 容器本就不生成 ⇒ 同样无生效路径，但主人未明令删该卡，按「判过时看有无生效路径」
+    //      铁律**只删有主人明令的段**，其余留待主人拍板，不擅自扩大删除面。
 
     // ── 🎯 动量共识筛选（2026-08-30 主人令：强势突破 3 卡之一）──
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';

@@ -65,11 +65,18 @@ SCRIPT_TOOL_PREFIXES = (
 )
 
 # 死数据豁免：纯前端/部署层变量、或"一 raw 产多 js"由独立生成器自管（gen 自带 update_time）
+# 🗑 2026-09-20（阿狸咪的工程师）：「ALGO_BACKTEST_COMPARE」已从本豁免表**移除**。
+#   原因：该产物连同生成脚本 scripts/algo_backtest_compare.py 已**全链退役删除**
+#   （前端死代码段 + algorithms/run_algorithms.py 的 ORDER/STAGES["E"] + api_push_raw.py
+#    上传登记，三处同步摘除）。留作豁免会与「产物已不存在」的事实矛盾，
+#    且掩盖真实缺口 —— 豁免的本意是「已知且正当的自管产物」，而非「已退役的幽灵」。
+#   ⚠️ 该变量在豁免表内的历史角色：曾因"一 raw 产多 js / 前端零引用"争议被两次
+#     加豁免又摘除（2026-09-11 停用生成器 → 09-13 恢复挂 E 批 → 09-20 终局退役）。
 DATA_VAR_EXEMPT = {
     "HEALTH_CHECK", "RUNNER_STATUS_HEALTH", "DO_NOT_DELETE_HTML",
     "CITIC_PE_THERMO", "CITIC_PE_BACKTEST",
     "MAHORO_MACRO", "MAHARO_PANEL",
-    "ALGO_BACKTEST_COMPARE", "AUDIT_TRAIL",
+    "AUDIT_TRAIL",
     "PORTFOLIO_DATA", "UNLISTED_PANEL",
 }
 

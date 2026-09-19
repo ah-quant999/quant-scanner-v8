@@ -389,10 +389,14 @@ def walk_extra():
         #   本文件不在 update_v8.py 的 raw→js 映射表内（由脚本自己直接写 data/），
         #   按本函数约定「需在此注册才能被 api_push 推到 main」。
         "data/BACKTEST_ALL_ALGOS.js",
-        # ── 🆕 2026-09-13 补入：强势突破回测源（scripts/algo_backtest_compare.py 产出）──
-        #   同样不在 update_v8.py 的 raw→js 映射表内（脚本直写 data/，无 raw 中间件），
-        #   不注册则算法链跑完也永不上传（与 BACKTEST_ALL_ALGOS.js 同型）。
-        "data/ALGO_BACKTEST_COMPARE.js",
+        # 🗑 2026-09-20 摘除登记（阿狸咪的工程师）：原登记项 "data/ALGO_BACKTEST_COMPARE.js"。
+        #   该产物由 scripts/algo_backtest_compare.py 直写 data/，2026-09-13 因「强势突破」回测源
+        #   而登记上传；现随该模块**全站删除**一并退役，理由（已实证）：
+        #     ① 其唯一消费卡「两套算法回测对比」属主人 2026-09-02 明令删除的模块；
+        #     ② CDP 真浏览器实测（2026-09-20）：切到「暂未上架」后 ul-pane 数 = 0，
+        #        ulPaneStrong 非元素 ⇒ 该卡**全站零生效路径**，产物无人可见；
+        #     ③ 生成脚本已同步从算法链 E 批摘除（algorithms/run_algorithms.py ORDER + STAGES）。
+        #   ⚠️ 不得再登记回本表；如日后恢复该卡，须先恢复前端渲染（主人令）再一并恢复生产与上传。
         "data/H_AUTO_BUY_TRACK.js",     # 反推算法累计胜率（每日跟踪 T+1/T+3/T+5/T+10）
         # 🧹 2026-09-15：data/LHB_7D.js 已随「无生产者 + 前端零引用」一并退役删除，
         #   故此处不再登记（原 2026-08-20 登记项作废）。

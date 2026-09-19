@@ -288,15 +288,18 @@ ORDER = [
     #   全算法回测汇总聚合器。放 ORDER **最末**⇒ 在 E 批内最后执行（同 stage 沿用 ORDER
     #   相对次序）：它要读 E 批其他脚本本轮刚产出的 CRDS_BACKTEST / BACKTEST_TDX /
     #   FOUR_VOLUME_BACKTEST / FACTOR_LAB_BACKTEST，先跑就会读到上一轮旧数。
-    # 🆕 2026-09-13 主人令「只要接入算法链的选股策略，都要有回测」：
-    #   原「强势突破」（algorithms/strong_breakout.py，已于 2026-09-19 全站删除）的回测源
-    #   scripts/algo_backtest_compare.py 一直是孤儿（ORDER/STAGES 均未挂）
-    #   ⇒ data/ALGO_BACKTEST_COMPARE.js 永不生成 ⇒ 聚合器里对应卡恒为 0 档。
-    #   （2026-09-19 强势突破卡删除后，本脚本仍在链上：它读 STOCK_MOMENTUM_STATE_V2，
-    #    产出「H反推 / 高手画像版H反推 / 动量状态」同口径对比，与已删模块无关。）
-#   与回测家族同例会：必须在聚合器gen_backtest_all_algos.py **之前**，
-    #   否则聚合器读不到本轮产物。
-    "scripts/algo_backtest_compare.py",   # → data/ALGO_BACKTEST_COMPARE.js（H反推 / 高手画像版H反推 / 动量状态 同口径对比）
+    # 🗑 2026-09-20 摘链（阿狸咪的工程师 · 主人令 + 真浏览器实测实证）：
+    #   原 2026-09-13 在此挂入 scripts/algo_backtest_compare.py（当时为「强势突破」补回测源），
+    #   现**正式摘除**，理由三条（逐条均已实证，非推断）：
+    #     ① 其产物的**唯一消费卡**「两套算法回测对比」属主人 **2026-09-02 明令删除**的模块
+    #        （见 index.html renderUnlisted 内注：「强势突破 pane、模块去向索引、两套算法回测对比 全部删除」）；
+    #     ② 该卡所在 pane（ulPaneStrong）**已不在 renderUnlisted 的生成列表**内 ——
+    #        CDP 真浏览器实测（2026-09-20 06:5x）：切到「暂未上架」后 panel.len=262174、
+    #        ulPaneObserve=true 但 **ul-pane 数 = 0、ulPaneStrong 非元素** ⇒ 全站零生效路径；
+    #     ③ 聚合器 gen_backtest_all_algos.py 对其**零硬依赖**（去注释后 scan/parse_algo_compare
+    #        调用点 0 处，仅 105-113 墓碑注释）⇒ 摘链无下游副作用。
+    #   ⚠️ STAGES["E"] 同步摘除（两处成对，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链）。
+    #   ⚠️ 不得再挂回；如日后要恢复该对比能力，须**先恢复前端卡**（主人令），再重写生成器与解析器。
     # 🆕 2026-09-17 小九的股票专家（主人令「星级基准超额数据缺失→从回测产物侧补」）：
     #   全市场等权基准生成器（2026-09-17 阿狸咪的工程师新增）。交接单声称已挂 E 批
     #   （ORDER[47]）但远端实测缺失（疑被裸 rebase 洗掉）——此处补挂对齐。
@@ -400,11 +403,8 @@ STAGES = {
         #   ⇒ 不做回测（原 backtest_pools.py 已删除，见 ORDER 同处说明）。
         # 🆕 2026-09-11 主人令：全算法回测汇总（按前端卡名、胜率/收益降序、低绩效提请下架）。
         #   ⚠️ 必须在 E 批**最后**——读同批其他脚本刚产出的回测产物 + D 批最终推荐。
-        # 🆕 2026-09-13（同上，ORDER 同源）：强势突破回测源补齐。
-        #   读 B 批 track_h_auto_buy.py 的 data/H_AUTO_BUY_TRACK.js + 构建链的
-        #   data/STOCK_MOMENTUM_STATE_V2.js，聚合出 H反推 / 高手画像版 / 强势突破 三套同口径指标。
-        #   ⚠️ 必须在聚合器之前。
-        "scripts/algo_backtest_compare.py",   # → data/ALGO_BACKTEST_COMPARE.js（本卡无 raw_data 中间件，脚本直写 data/）
+        # 🗑 2026-09-20 摘链（与上方 ORDER 同处 · 成对修改）：scripts/algo_backtest_compare.py 已摘除，
+        #   详见 ORDER 内三条实证理由（消费卡属主人 09-02 明令删除 / pane 已不生成 / 聚合器零硬依赖）。
         "gen_market_bench.py",   # → raw_data/market_bench.json（全市场等权基准，与策略同口径）
         "gen_backtest_all_algos.py",   # → data/BACKTEST_ALL_ALGOS.js（策略回测页总览）
         # 🛡 2026-09-07 主人令「互踢/暴风/覆盖不想再看到·方案 B 一劳永逸根治」：
