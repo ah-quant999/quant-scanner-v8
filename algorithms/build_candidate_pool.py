@@ -831,7 +831,17 @@ def _save_gold_pool(pool):
     for p in (GOLD_POOL_OUT, GOLD_POOL_STOCKS_OUT, GOLD_POOL_RAW):
         try:
             os.makedirs(os.path.dirname(p), exist_ok=True)
-            with open(p, "w", encoding="utf-8") as f:
+            # 🔴 2026-09-19 主人令·一劳永逸（阿狸咪的工程师）：显式钉死 LF 行尾。
+            #   本文件是 indent=2 的多行 pretty JSON，行尾差异会**逐行放大**：
+            #   实测 raw_data/sector_phase_history.json（同型多行 pretty、同批链路）
+            #   已因缺 newline='\n' 在双 OS 交替写入下翻成 CRLF（CR=2420，线上现取），
+            #   每轮产出 4840 行「假 diff」——`?v=` 缓存戳随内容 sha 变化，
+            #   前端被迫重下整份文件，且 git 历史被行尾噪音淹没。
+            #   Windows 上 open(...,'w') 默认 newline=None ⇒ \n 被转成 os.linesep(\r\n)；
+            #   本脚本双机（Windows runner / ubuntu-latest）都在写同一文件，
+            #   不显式指定则**必然**周期性翻转。
+            #   注：JSON 语义不受行尾影响，此处纯为消除假 diff 与缓存戳抖动。
+            with open(p, "w", encoding="utf-8", newline="\n") as f:
                 json.dump(pool, f, ensure_ascii=False, indent=2)
         except Exception as e:
             print(f"  ⚠️ 写 {p} 失败: {e}")
@@ -1272,4 +1282,30 @@ if __name__ == "__main__":
     from utils.time_gate import check_cloud_only
     if not check_cloud_only("algorithms/build_candidate_pool.py"):
         sys.exit(2)
+
+    # 🔴🔴 2026-09-19 主人令·一劳永逸（阿狸咪的工程师）—— 港股收盘前禁止派生金股池
+    #
+    # 【主人原话】「这逻辑不对，要等港股 16 点 10 分收盘后才能出股票池。」
+    #
+    # 【铁证】2026-09-18（周四交易日）raw_data/gold_pool.json 共三笔提交：
+    #     72e58b9313  15:20:50   ← 早于港股 16:00 收市
+    #     36c2c7c955  16:09:04   ← 早于 16:10 收盘竞价完成
+    #     b764d7d7fa  16:59:23
+    #   前两笔把 60 只港股（hk_00005 汇丰 / hk_00939 建行 / hk_00941 中国移动 /
+    #   hk_01211 比亚迪股份 …）的**盘中未定稿价**固化进池，前端金股池卡随之出「今日命中」。
+    #   元凶正是本脚本：v8_cn_fetch_cloud.yml 的 soft_8 步在 category=='post_close'
+    #   （最早 16:00）时执行 `python algorithms/build_candidate_pool.py`，而本脚本此前
+    #   只有 check_cloud_only（云端专属护栏）——**没有任何时间闸门**，16:00 一到就重建。
+    #
+    # 【为何用 check(['hk']) 而不是自己写时刻】时间口径必须全仓同源：所需就绪时刻
+    #   （港股 16:30 = 16:00 收市 + 16:10 收盘竞价 + 数据完整）已由
+    #   algorithms/utils/time_gate.py 的 MARKET_READY 唯一定义，本处只引用不另立一套。
+    #   该函数已内置①周末放行 ②凌晨补跑窗口（<09:00）按 24:xx+ 计有效时刻、沿用
+    #   **上一交易日**已齐数据 ③TIME_GATE_BYPASS=1 应急绕开 —— 三档语义正是本处所需。
+    #
+    # 【与既有闸门的分工】check_stock_picking_ready（≥18:00）管「选股策略」，
+    #   本闸门（≥16:30）管「池成员派生」，二者不是替代关系，故并存。
+    from utils.time_gate import check as _tg_check, markets_required as _tg_mk
+    _tg_check(_tg_mk(["hk"]), by="build_candidate_pool.py（金股池派生，需港股收盘后）")
+
     build()

@@ -42,6 +42,33 @@ SKIP_STAGE = {
     #   本文件语义即「生成器直写 raw_data 的产物不再搬运」⇒ 与本项完全一致。
     #   guard_raw_freshness.py 复用本集合，命中即 continue ⇒ 自动跳过，零副作用。
     "sector_rs.json",
+    # 🔴🔴 2026-09-19 二劳永逸（阿狸咪的工程师）—— 与 sector_rs.json **同一次运行、同一函数族**
+    #   产出，上一条只登记了 sector_rs.json，**漏了本项** ⇒ 本轮实测活体复发。
+    #
+    # 【铁证】raw_data/sector_phase_history.json 逐版对比（GitHub contents API 现取）：
+    #     sha 0bc59e673  09-19 13:24  CR=0     末档 update_time=2026-09-19 13:19   ← 正确
+    #     sha e3cb7bf92  09-19 13:33  CR=2420  末档 update_time=2026-09-19 10:23   ← 被回退
+    #   归一化行尾后**逐行 diff 只有 1 行**（L2324：13:19 → 10:23），
+    #   其余 2420 行差异**全部是行尾 CRLF** ⇒ 铁证：这是「整份换回旧版 + 行尾翻 CRLF」
+    #   的双重事故，不是时间戳漂移。
+    #
+    # 【真因】fetch_sector_rs.py 的 `_save_phase_snapshot()` 确已**直写 raw_data/** 且带
+    #   `newline='\n'`（该文件 4 处写盘点均已带）。但本文件 V6_TO_V8 表内**仍登记着**
+    #   `"sector_phase_history.json": "sector_phase_history.json"` ⇒ 搬运循环会从 `out/`
+    #   取**上一轮（或更早）的僵尸副本**，按「字节级复制」语义写回 raw_data/，
+    #   把刚写的 13:19 新快照整份换回 10:23 旧快照，同时把旧副本自带的 CRLF 一起带回来。
+    #   ⇒ 与 sector_rs.json 是**同一个错误的两个实例**，故修法必须同构。
+    #
+    # 【为何不靠 (2) 防僵尸守卫拦下】守卫比的是 out 源与 raw 目标的 `update_time`（到秒）。
+    #   本文件结构是 `{"snaps":[{...,"update_time":...}]}`，**顶层没有 update_time**，
+    #   `_ts_full()` 取不到值 ⇒ `s_ts and d_ts` 为假 ⇒ **守卫静默放行**。
+    #   （对照组：sector_rs.json 顶层就有 update_time，所以它当年是被守卫拦住的。）
+    #   ⇒ 凡「时间戳不在顶层」的产物，本文件的防僵尸守卫**一概失效**，必须靠 SKIP_STAGE。
+    #
+    # 【影响】① 板块周期卡当日新增档丢失（前端「今日 vs 上次」对比失真）；
+    #   ② 每轮产出 4840 行假 diff ⇒ `?v=` 缓存戳随内容 sha 变化 ⇒ CDN 被迫重下整份；
+    #   ③ git 历史被行尾噪音淹没，日后归因成本极高。
+    "sector_phase_history.json",
 }
 
 # 2026-08-29 一劳永逸修复（根治 #1299 候选池被回退为陈旧 8/26 的根因）：
