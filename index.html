@@ -453,11 +453,7 @@ window.__domReadyFns=[];
   /* 旧日历兼容（保留 modal 用） */
   .cal-month{font-size:16px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:10px}
 
-  .mask{position:fixed;inset:0;background:rgba(4,8,16,.78);z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
-  .mask.show{display:flex}
-  .modal{background:var(--card2);border:1px solid var(--border2);border-radius:16px;max-width:520px;width:100%;padding:22px;max-height:86vh;overflow:auto}
-  .modal h3{font-size:18px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-  .modal .close{margin-left:auto;cursor:pointer;color:var(--sub);font-size:22px;line-height:1}
+  /* 2026-09-19 主人令：.mask/.modal 遮罩弹窗样式随 lifeMask 删除一并清理（全站改就地折叠） */
   .mev{padding:10px 0;border-bottom:1px dashed var(--border);display:flex;gap:10px}
   .mev:last-child{border:0}
   .mev .e{font-size:18px;flex:0 0 auto}
@@ -5679,20 +5675,52 @@ function fmtSigned(v){
 
 
   /* ════════════════════════════════════════════════════════════════════
-     选股生命周期详情弹窗（2026-09-04 主人令：走弱桶 / 待确认剔除 不直接铺大网格）
+     全站弹窗改就地折叠（2026-09-19 主人令：全站点开不要遮罩弹窗，对齐板块周期档案折叠样式）
+     __foldOpen(id, btn, title, html, noSwap)：在触发元素之后就地插入折叠区块；
+     __foldClose(id)：移除折叠区块并还原触发按钮文案。
      ════════════════════════════════════════════════════════════════════ */
+  window.__foldBtns = window.__foldBtns || {};
+  window.__foldOpen = function(id, btn, title, html, noSwap){
+    var existed = document.getElementById(id);
+    if(existed) existed.remove();
+    var box = document.createElement('div');
+    box.id = id;
+    box.style.cssText = 'border:1px solid #243150;border-radius:10px;background:rgba(10,17,32,.55);margin:8px 0 4px;padding:12px 14px;max-height:72vh;overflow-y:auto;';
+    box.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><b style="font-size:13px;color:#e8f0ff;">' + title + '</b>'
+      + '<span style="cursor:pointer;color:#93a4c4;font-size:12px;padding:2px 10px;margin-left:auto;border:1px solid rgba(148,163,184,.35);border-radius:8px;" onclick="window.__foldClose(\'' + id + '\')">✕ 收起</span></div>' + html;
+    var anchor = btn || null;
+    var ref = anchor;
+    if(anchor){
+      ref = (anchor.tagName === 'SPAN' && anchor.parentElement && anchor.parentElement !== document.body) ? anchor.parentElement : anchor;
+      if(ref.parentElement){ ref.parentElement.insertBefore(box, ref.nextSibling); }
+      else { document.body.appendChild(box); }
+    } else {
+      document.body.appendChild(box);
+    }
+    window.__foldBtns[id] = noSwap ? null : (btn || null);
+    if(btn && !noSwap){ btn.__foldLabel = btn.innerHTML; btn.innerHTML = '▴ 收起（再点一次折叠）'; }
+    return box;
+  };
+  window.__foldClose = function(id){
+    var box = document.getElementById(id);
+    if(box) box.remove();
+    var b = window.__foldBtns[id];
+    if(b && b.__foldLabel) b.innerHTML = b.__foldLabel;
+  };
+
+  /* 选股生命周期详情：原遮罩弹窗改就地折叠（2026-09-19 主人令：全站去弹窗）。
+     走弱桶 / 待确认剔除 点击摘要后在其下方就地展开，再点一次收起。 */
   window.__lifeModalCache = window.__lifeModalCache || {};
-  window.openLifeModal = function(title, bodyHtml){
-    var t = document.getElementById('lifeModalTitle');
-    var b = document.getElementById('lifeModalBody');
-    var m = document.getElementById('lifeMask');
-    if(t) t.textContent = title || '';
-    if(b) b.innerHTML = bodyHtml || '';
-    if(m) m.classList.add('show');
+  window.openLifeModal = function(anchor, title, bodyHtml){
+    if(!anchor) return;
+    var id = anchor.__foldId || (anchor.__foldId = '_lifeFold_' + Math.floor(Math.random()*1e6));
+    if(document.getElementById(id)){ window.__foldClose(id); return; }
+    var box = window.__foldOpen(id, anchor, title, bodyHtml || '', true);
+    box.className = '_lifeFold';
   };
   window.closeLifeModal = function(){
-    var m = document.getElementById('lifeMask');
-    if(m) m.classList.remove('show');
+    var folds = document.querySelectorAll('._lifeFold');
+    for(var i=0;i<folds.length;i++){ folds[i].remove(); }
   };
 
   /* ════════════════════════════════════════════════════════════════════
@@ -5991,7 +6019,7 @@ function fmtSigned(v){
         }catch(e){ console.warn('[life] bucket filter', e); }
         if(b.key === 'weak'){
           window.__lifeModalCache.weak = _buildBucketGrid(bucketItems, b.border);
-          html += '<div style="border:1px solid '+b.border+';border-radius:8px;background:'+b.bg+';margin-bottom:8px;cursor:pointer;user-select:none;" onclick="openLifeModal(\''+b.label+' '+n+' 只\', window.__lifeModalCache.weak)">';
+          html += '<div style="border:1px solid '+b.border+';border-radius:8px;background:'+b.bg+';margin-bottom:8px;cursor:pointer;user-select:none;" onclick="openLifeModal(this, \''+b.label+' '+n+' 只\', window.__lifeModalCache.weak)">';
           html +=   '<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;">';
           html +=     '<span style="font-size:12px;font-weight:700;color:'+b.color+';">'+b.label+' '+n+'</span>';
           html +=     '<span style="font-size:10.5px;color:var(--dim);font-weight:500;">点击查看明细</span>';
@@ -6040,7 +6068,7 @@ function fmtSigned(v){
         });
         toRemoveHtml += '</div>';
         window.__lifeModalCache.toRemove = toRemoveHtml;
-        html += '<div style="border:1px solid rgba(239,83,80,.3);border-radius:8px;background:rgba(239,83,80,.04);margin:10px 0;cursor:pointer;user-select:none;" onclick="openLifeModal(\'⚠️ 待确认剔除（走弱/见顶） '+toRemove.length+' 只\', window.__lifeModalCache.toRemove)">';
+        html += '<div style="border:1px solid rgba(239,83,80,.3);border-radius:8px;background:rgba(239,83,80,.04);margin:10px 0;cursor:pointer;user-select:none;" onclick="openLifeModal(this, \'⚠️ 待确认剔除（走弱/见顶） '+toRemove.length+' 只\', window.__lifeModalCache.toRemove)">';
         html +=   '<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;">';
         html +=     '<span style="font-size:12.5px;font-weight:700;color:#ef5350;">⚠️ 待确认剔除（走弱/见顶，共 '+toRemove.length+' 只）</span>';
         html +=     '<span style="font-size:10.5px;color:var(--dim);font-weight:500;">点击查看明细 · 本机记录不污染主站</span>';
@@ -6921,16 +6949,11 @@ function fmtSigned(v){
       : (D.stocks.length > 0 ? ' <span style="font-size:11px;color:var(--dim);font-weight:500;">· 全部 '+D.stocks.length+' 只</span>' : '');
     html += '<div style="font-weight:600;margin:10px 0 4px;color:#ef5350;">核心标的 · 🟢（评分前 '+SB_DISPLAY_TOP_N+' 直接展示）<b style="margin-left:4px;">'+D.stocks.length+'</b>'+_suffix+'</div>'
       + _inner
-      + '<div style="margin:6px 0 2px;"><span onclick="window.__sbPopup()" style="cursor:pointer;display:inline-block;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600;color:#ef5350;border:1px solid rgba(239,83,80,.4);background:rgba(239,83,80,.08);">📄 完整榜单（Top '+D.stocks.length+'）</span></div>';
+      + '<div style="margin:6px 0 2px;"><span onclick="window.__sbPopup(this)" style="cursor:pointer;display:inline-block;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600;color:#ef5350;border:1px solid rgba(239,83,80,.4);background:rgba(239,83,80,.08);">📄 完整榜单（Top '+D.stocks.length+'）</span></div>';
     dst.innerHTML = html;
-    /* 🛡 弹窗：完整榜单（沿用原表格样式 + 新增「高手共振」列，2026-09-05 与 ima 卡同口径） */
-    window.__sbPopup = function(){
-      var mask = document.createElement('div');
-      mask.className = '_sbmask';
-      mask.style.cssText = 'position:fixed;inset:0;background:rgba(2,6,17,.72);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;';
-      mask.onclick = function(ev){ if(ev.target===mask) mask.remove(); };
-      var box = document.createElement('div');
-      box.style.cssText = 'background:#0d1626;border:1px solid #243150;border-radius:12px;max-width:960px;width:100%;max-height:80vh;overflow-y:auto;padding:16px 18px;';
+    /* 🛡 就地折叠：完整榜单（2026-09-19 主人令：全站弹窗改折叠；沿用原表格样式 + 「高手共振」列） */
+    window.__sbPopup = function(btn){
+      if(document.getElementById('_sbFoldBox')){ window.__foldClose('_sbFoldBox'); return; }
       var rows = '';
       D.stocks.forEach(function(s){
         var _v8 = _v8Map[s.code] || null;
@@ -6953,10 +6976,7 @@ function fmtSigned(v){
           + '<td style="padding:5px 6px;text-align:center;">'+_v8Cell+'</td>'
           + '</tr>';
       });
-      box.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><b style="font-size:14px;color:#e8f0ff;">⚡ 强势突破 · 完整榜单</b>'
-        + '<span style="font-size:11px;color:var(--dim);">（共 '+D.stocks.length+' 只 · 含「高手共振」= 与 v8 选股生命周期池交集）</span>'
-        + '<span style="cursor:pointer;color:#93a4c4;font-size:20px;padding:0 6px;margin-left:auto;" onclick="this.closest(\'._sbmask\').remove()">×</span></div>'
-        + '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--sub);">'
+      var _tbl = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--sub);">'
         + '<thead><tr style="color:var(--dim);text-align:right;">'
         + '<th style="padding:5px 6px;text-align:left;">代码</th><th style="padding:5px 6px;text-align:left;">名称</th>'
         + '<th style="padding:5px 6px;text-align:left;">行业</th>'
@@ -6965,8 +6985,9 @@ function fmtSigned(v){
         + '<th style="padding:5px 6px;">评分</th><th style="padding:5px 6px;">Core</th>'
         + '<th style="padding:5px 6px;">高手共振</th></tr></thead>'
         + '<tbody>'+rows+'</tbody></table></div>';
-      mask.appendChild(box);
-      document.body.appendChild(mask);
+      window.__foldOpen('_sbFoldBox', btn,
+        '⚡ 强势突破 · 完整榜单 <span style="font-size:11px;color:var(--dim);font-weight:500;">（共 '+D.stocks.length+' 只 · 含「高手共振」= 与 v8 选股生命周期池交集）</span>',
+        _tbl);
     };
   };
 
@@ -7124,7 +7145,7 @@ function fmtSigned(v){
       return h;
     }
     html += _tableHtml(_showRows);
-    html += '<div style="margin:6px 0 2px;"><span onclick="window.__imaFullPopup()" style="cursor:pointer;display:inline-block;padding:4px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#38bdf8;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.08);">📄 '
+    html += '<div style="margin:6px 0 2px;"><span class="_imaFoldTrigger" onclick="window.__imaFullPopup(this)" style="cursor:pointer;display:inline-block;padding:4px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#38bdf8;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.08);">📄 '
       + (_detailOK? '全部标的（共 '+_allN+' 只）'
                    : '本页可得明细（共 '+_allN+' / 源 '+_srcTrack+' 只）')
       + '</span></div>';
@@ -7134,7 +7155,9 @@ function fmtSigned(v){
        引用的 D/_sortByChg/statusMap/_realByStatus/_allN/_tableHtml 均为渲染函数
        局部变量 → 点击时 ReferenceError，「📄 全部标的」点不开。
        现移入函数体内，闭包捕获局部变量；随每次渲染刷新闭包，行为一致。 */
-  window.__imaFullPopup = function(){
+  window.__imaFullPopup = function(btn){
+    /* 2026-09-19 主人令：遮罩弹窗改就地折叠（再点一次触发按钮 = 收起） */
+    if(document.getElementById('_imaFoldBox')){ window.__foldClose('_imaFoldBox'); return; }
     var filter = window.__imaFilter || '全部';
     var _rows = D.stocks.filter(function(s){ return filter==='全部' || (s.status||'')===filter; }).sort(_sortByChg);
     var statuses = []; D.stocks.forEach(function(s){ var st=s.status||''; if(st && statuses.indexOf(st)<0) statuses.push(st); });
@@ -7145,20 +7168,11 @@ function fmtSigned(v){
       caps += '<span onclick="window.__imaSetFilter(\''+c+'\')" style="cursor:pointer;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600;color:'+(on?col:'var(--sub)')+';background:'+(on?col+'22':'rgba(148,163,184,.12)')+';border:1px solid '+(on?col+'88':'rgba(148,163,184,.3)')+';">'+c+' <b>'+_cn+'</b></span>';
     });
     caps += '</div>';
-    var mask=document.createElement('div');
-    mask.style.cssText='position:fixed;inset:0;background:rgba(2,6,17,.72);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;';
-    mask.onclick=function(ev){ if(ev.target===mask) mask.remove(); };
-    var box=document.createElement('div');
-    box.style.cssText='background:#0d1626;border:1px solid #243150;border-radius:12px;max-width:960px;width:100%;max-height:80vh;overflow-y:auto;padding:16px 18px;';
-    box.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><b style="font-size:14px;color:#e8f0ff;">📡 强势跟踪 · '
-      + (_detailOK? '全部标的' : '本页可得明细（'+_allN+' / 源 '+_srcTrack+'）')
-      + '</b>'
-      +'<span style="cursor:pointer;color:#93a4c4;font-size:20px;padding:0 6px;margin-left:auto;" onclick="this.parentElement.parentElement.remove()">×</span></div>'
-      + caps + _tableHtml(_rows);
-    mask.appendChild(box);
-    document.body.appendChild(mask);
+    window.__foldOpen('_imaFoldBox', btn,
+      '📡 强势跟踪 · ' + (_detailOK? '全部标的' : '本页可得明细（'+_allN+' / 源 '+_srcTrack+'）'),
+      caps + _tableHtml(_rows));
   };
-  window.__imaSetFilter = function(f){ window.__imaFilter = f; var _m=document.querySelector('div[style*="z-index:99998"]'); if(_m) _m.remove(); window.__imaFullPopup(); };
+  window.__imaSetFilter = function(f){ window.__imaFilter = f; window.__foldClose('_imaFoldBox'); window.__imaFullPopup(document.querySelector('._imaFoldTrigger')); };
   }; /* ← 闭合 __renderImaStrongStock（__imaFullPopup/__imaSetFilter 已移入其体内） */
 
   // ===== 因子实验室（异常换手率 + ROE_TTM 大市值档）=====
@@ -8845,13 +8859,7 @@ window.__renderIndexObserve = function(){
 </main>
 
 <!-- 2026-09-04 主人令：calMask 日历放大 modal 已删（死代码：openCal/closeCal 从未定义、calDate/calEvents 无人填充，点击 mask 即 ReferenceError 地雷；日历卡早已自带内联展示） -->
-<!-- 选股生命周期详情 modal（2026-09-04 主人令：走弱/待确认剔除 不直接铺大网格，点击摘要弹窗查看） -->
-<div class="mask" id="lifeMask" onclick="if(event.target===this)closeLifeModal()">
-  <div class="modal" style="max-width:920px;width:100%;">
-    <h3><span id="lifeModalTitle"></span><span class="close" onclick="closeLifeModal()">×</span></h3>
-    <div id="lifeModalBody"></div>
-  </div>
-</div>
+<!-- 2026-09-19 主人令：lifeMask 生命周期遮罩弹窗已删，走弱/待确认剔除改 openLifeModal(this,…) 就地折叠（__foldOpen） -->
 
 
 <!-- 管理员锁 -->
@@ -14043,19 +14051,14 @@ window.showRestrictedItems = showRestrictedItems;
       ? '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">' + _recentAlerts.slice(0, 15).map(function(a){ return '<div class="tp-alert '+a.level+'" style="margin:0;">'+a.text+'</div>'; }).join('') + '</div>'
       : '<div class="tp-empty">最近 '+TT_ALERT_RECENT_DAYS+' 个交易日无状态迁移告警'+needDaysMsg+'</div>';
     if(_oldAlerts.length){
-      window.__ttAlertPopup = function(){
-        var mask=document.createElement('div');
-        mask.style.cssText='position:fixed;inset:0;background:rgba(2,6,17,.72);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;';
-        mask.onclick=function(ev){ if(ev.target===mask) mask.remove(); };
-        var box=document.createElement('div');
-        box.style.cssText='background:#0d1626;border:1px solid #243150;border-radius:12px;max-width:680px;width:100%;max-height:80vh;overflow-y:auto;padding:16px 18px;';
-        box.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><b style="font-size:14px;color:#e8f0ff;">🔔 状态迁移 &amp; 告警 · 全部 '+alerts.length+' 条</b>'
-          +'<span style="cursor:pointer;color:#93a4c4;font-size:20px;padding:0 6px;margin-left:auto;" onclick="this.parentElement.parentElement.remove()">×</span></div>'
-          + alerts.map(function(a){ return '<div class="tp-alert '+a.level+'">'+a.text+'</div>'; }).join('');
-        mask.appendChild(box);
-        document.body.appendChild(mask);
+      window.__ttAlertPopup = function(btn){
+        /* 2026-09-19 主人令：遮罩弹窗改就地折叠（再点一次触发按钮 = 收起） */
+        if(document.getElementById('_ttAlertFoldBox')){ window.__foldClose('_ttAlertFoldBox'); return; }
+        window.__foldOpen('_ttAlertFoldBox', btn,
+          '🔔 状态迁移 &amp; 告警 · 全部 '+alerts.length+' 条',
+          alerts.map(function(a){ return '<div class="tp-alert '+a.level+'">'+a.text+'</div>'; }).join(''));
       };
-      _alertHtml += '<div style="margin-top:8px;text-align:center;"><span onclick="window.__ttAlertPopup()" style="cursor:pointer;display:inline-block;padding:4px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#fbbf24;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.08);">📄 全部告警（共 '+alerts.length+' 条 · 含更早 '+_oldAlerts.length+' 条）</span></div>';
+      _alertHtml += '<div style="margin-top:8px;text-align:center;"><span onclick="window.__ttAlertPopup(this)" style="cursor:pointer;display:inline-block;padding:4px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#fbbf24;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.08);">📄 全部告警（共 '+alerts.length+' 条 · 含更早 '+_oldAlerts.length+' 条）</span></div>';
     }
     $('ttAlerts').innerHTML=_alertHtml;
 
