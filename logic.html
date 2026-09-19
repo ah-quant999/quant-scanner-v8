@@ -34,7 +34,7 @@
   .btn{cursor:pointer;border:1px solid var(--border2);background:var(--card2);color:var(--txt);padding:5px 12px;border-radius:8px;font-size:12px;transition:.15s}
   .btn:hover{border-color:var(--cyan);color:var(--cyan)}
 
-  nav{position:sticky;top:48px;z-index:49;display:flex;gap:4px;padding:0 20px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto}
+  nav{position:sticky;top:48px;z-index:49;display:flex;gap:6px;padding:8px 20px;flex-wrap:wrap;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto}
   .tab{flex:0 0 auto;padding:12px 18px;cursor:pointer;color:var(--sub);font-weight:600;border-bottom:2px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:6px}
   .tab:hover{color:var(--txt)}
   .tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
@@ -518,9 +518,16 @@
   .lg-subtabs .lg-tab{cursor:pointer;padding:8px 16px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--sub);font-size:13px;font-weight:600;transition:.15s}
   .lg-subtabs .lg-tab:hover{border-color:var(--cyan);color:var(--txt)}
   .lg-subtabs .lg-tab.active{background:var(--cyan);color:#081018;border-color:var(--cyan)}
-  .lg-pane{display:none;animation:fade .25s ease}
+  .lg-pane{display:block;animation:fade .25s ease}
       .lg-pane.active{display:block;min-height:calc(100vh - 200px)}
-      .lg-pane .card{margin-bottom:16px}
+      /* 2026-09-19 合并为单页连续文档：顶部导航改为锚点目录，所有 pane 默认可见 */
+  .lg-tab{display:inline-block;padding:9px 15px;border-radius:9px;background:var(--card);border:1px solid var(--border);color:var(--sub);font-size:13.5px;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;transition:.15s}
+  .lg-tab:hover{border-color:var(--cyan);color:var(--txt)}
+  a.lg-tab:visited{color:var(--sub)}
+  .lg-subtabs{display:none}
+  .lg-section-title{font-size:22px;font-weight:800;margin:30px 0 14px;padding:6px 0 10px;border-bottom:2px solid var(--border2);color:var(--txt);scroll-margin-top:72px}
+  .lg-pane{scroll-margin-top:72px}
+  .lg-pane .card{margin-bottom:16px}
   .lg-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
   .lg-table th,.lg-table td{padding:7px 10px;border:1px solid var(--border);text-align:left}
   .lg-table th{background:var(--card2);color:var(--dim);font-weight:600}
@@ -793,32 +800,35 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <!-- ============ 逻辑详解（管理员） ============ -->
   <section id="sec-lg" class="active">
     <div class="sec-head"><h2>📖 逻辑详解</h2><span class="tag">仅管理员可见 · 指标/策略/安全口径</span></div>
-
-    <div class="lg-subtabs" id="lgSubtabs">
-      <div class="lg-tab" data-lg="obs" onclick="switchLg('obs',this)">🌍 观测平台</div>
-      <div class="lg-tab active" data-lg="td" onclick="switchLg('td',this)">📅 今日事件</div>
-      <div class="lg-tab" data-lg="rt" onclick="switchLg('rt',this)">📡 实时数据</div>
-      <div class="lg-tab" data-lg="ph" onclick="switchLg('ph',this)">🌙 盘后数据</div>
-      <div class="lg-tab" data-lg="rc" onclick="switchLg('rc',this)">🧲 共振日历</div>
-      <div class="lg-tab" data-lg="final" onclick="switchLg('final',this)">🏆 最终推荐</div>
-      <div class="lg-tab" data-lg="query" onclick="switchLg('query',this)">🔍 个股查询</div>
-      <div class="lg-tab" data-lg="st" onclick="switchLg('st',this)">🎯 选股策略</div>
-      <div class="lg-tab" data-lg="bt" onclick="switchLg('bt',this)">🔬 策略回测</div>
-      <div class="lg-tab" data-lg="ul" onclick="switchLg('ul',this)">🔒 暂未上架</div>
-      <div class="lg-tab" data-lg="op" onclick="switchLg('op',this)">🔒 运维</div>
-      <div class="lg-tab" data-lg="v6" onclick="switchLg('v6',this)">📦 v6备忘录</div>
-      <div class="lg-tab" data-lg="dnd" onclick="switchLg('dnd',this)">🛡️ 防删</div>
-    </div>
-
-    <!-- === 今日事件 === -->
-    <div class="lg-pane active" id="lg-td">
-      <div class="card" style="border-left:3px solid var(--gold);">
+<div class="card" style="border-left:3px solid var(--gold);">
         <h3><span class="ic">📖</span>逻辑详解页 · 使用说明（2026-09-01 重构）</h3>
         <div class="logic-h">本页定位</div>
         <div class="logic-p">按主站顶部导航（观测平台 / 今日事件 / 实时数据 / 盘后数据 / 共振日历 / 最终推荐 / 个股查询 / 选股策略 / 策略回测 / 暂未上架 / 已下架 / 运维）顺序，<b>逐一解说每个 tab 里有哪些卡片、每张卡片的用处、数据来源、算法逻辑、以及按市场常规的标注理由</b>。它是给管理员/开发者看的「使用说明书」，不是每日备份。</div>
         <div class="logic-h">更新规则</div>
         <div class="logic-p">主站新增/删除/重命名卡片时，必须同步更新本页对应子 tab；历史改动归档折叠在「🗄️ 历史改动归档」内，只供追溯，不得替代卡片说明书。</div>
       </div>
+
+
+    <div class="lg-subtabs" id="lgSubtabs">
+      <a class="lg-tab" data-lg="obs" href="#lg-obs">🌍 观测平台</a>
+      <a class="lg-tab" data-lg="td" href="#lg-td">📅 今日事件</a>
+      <a class="lg-tab" data-lg="rt" href="#lg-rt">📡 实时数据</a>
+      <a class="lg-tab" data-lg="ph" href="#lg-ph">🌙 盘后数据</a>
+      <a class="lg-tab" data-lg="rc" href="#lg-rc">🧲 共振日历</a>
+      <a class="lg-tab" data-lg="final" href="#lg-final">🏆 最终推荐</a>
+      <a class="lg-tab" data-lg="query" href="#lg-query">🔍 个股查询</a>
+      <a class="lg-tab" data-lg="st" href="#lg-st">🎯 选股策略</a>
+      <a class="lg-tab" data-lg="bt" href="#lg-bt">🔬 策略回测</a>
+      <a class="lg-tab" data-lg="ul" href="#lg-ul">🔒 暂未上架</a>
+      <a class="lg-tab" data-lg="op" href="#lg-op">🔒 运维</a>
+      <a class="lg-tab" data-lg="v6" href="#lg-v6">📦 v6备忘录</a>
+      <a class="lg-tab" data-lg="dnd" href="#lg-dnd">🛡️ 防删</a>
+    </div>
+
+    <!-- === 今日事件 === -->
+    <div class="lg-pane active" id="lg-td">
+      <h2 class="lg-section-title">📅 今日事件</h2>
+
 
                                                                                       
 
@@ -942,6 +952,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
                          
     
 <div class="lg-pane" id="lg-rt">
+<h2 class="lg-section-title">📡 实时数据</h2>
       <div class="card">
         <h3><span class="ic">🌟</span>AI市场速览 - 说明</h3>
         <div class="logic-h">定位</div>
@@ -1172,6 +1183,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
       
 <div class="lg-pane" id="lg-ph">
+<h2 class="lg-section-title">🌙 盘后数据</h2>
       <!-- 🗑 2026-09-16 主人令：「🌡️ 市场温度计 · 分项」卡已删（数据源 SH_FIB 与「六维共振雷达」同源、
            分项口径与危机雷达/每日洞察重复）⇒ 本说明卡一并移除。SH_FIB 数据源未删，仍由
            「🧪 斐波那契F观测窗」与艾略特波浪卡消费。 -->
@@ -1355,6 +1367,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
                          
     
 <div class="lg-pane" id="lg-rc">
+<h2 class="lg-section-title">🧲 共振日历</h2>
       <div class="card">
         <h3><span class="ic">🧲</span>共振日历 - 说明</h3>
         <div class="logic-h">三段结构</div>
@@ -1422,6 +1435,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
       
 <div class="lg-pane" id="lg-final">
+<h2 class="lg-section-title">🏆 最终推荐</h2>
       <div class="card">
         <h3><span class="ic">🏆</span>最终推荐 - 说明</h3>
         <div class="logic-h">定位</div>
@@ -1551,6 +1565,7 @@ need 只是计数，只计 2/3 时它陈旧也会被放行）· <b>8</b> 个脚�
       </div>
 
 <div class="lg-pane" id="lg-query">
+<h2 class="lg-section-title">🔍 个股查询</h2>
       <div class="card">
         <h3><span class="ic">🔍</span>个股查询 - 说明</h3>
         <div class="logic-h">定位</div>
@@ -1584,6 +1599,7 @@ need 只是计数，只计 2/3 时它陈旧也会被放行）· <b>8</b> 个脚�
       </div>
 
 <div class="lg-pane" id="lg-st">
+<h2 class="lg-section-title">🎯 选股策略</h2>
       <div class="card">
         <h3><span class="ic">🗂️</span>算法对比与可信度排序</h3>
         <table class="lg-table">
@@ -1996,6 +2012,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
     <!-- === 观测平台（2026-09-15 主人令：新建一级页 · 原「🌍 宏观观测」一级页升级为父级）
          其下两个同级子页：①🌍 宏观观测（左，2 卡）②📊 大盘观测（右，4 卡） === -->
     <div class="lg-pane" id="lg-obs">
+<h2 class="lg-section-title">🌍 观测平台</h2>
       <div class="card">
         <h3><span class="ic">🌍</span>观测平台 - 说明</h3>
         <div class="logic-h">定位</div>
@@ -2017,6 +2034,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 
     <!-- === 策略回测（2026-09-12 主人令：整页重写为「结论先行」，并接回迁入的回测·框架 3 卡） === -->
     <div class="lg-pane" id="lg-bt">
+<h2 class="lg-section-title">🧪 策略回测</h2>
       <div class="card">
         <h3><span class="ic">🔬</span>策略回测 - 说明（2026-09-12 整页重写）</h3>
         <div class="logic-h">为什么重写</div>
@@ -2068,6 +2086,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
     </div>
 
 <div class="lg-pane" id="lg-ul">
+<h2 class="lg-section-title">🔒 暂未上架</h2>
       <div class="card">
         <h3><span class="ic">🧪</span>暂未上架 - 说明</h3>
         <div class="logic-h">定位</div>
@@ -2103,6 +2122,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       </div>
 
 <div class="lg-pane" id="lg-op">
+<h2 class="lg-section-title">🔒 运维</h2>
       <div class="card">
         <h3><span class="ic">🗺️</span>盘前 / 盘中 / 盘后 权威划分表（2026-09-10 主人令 · 前端逐条核对）</h3>
         <div class="logic-p">本表是<b>唯一权威口径</b>。任何「某张卡为什么这个点没更新 / 该哪个时段刷」的疑问一律照本表核对，<b>不得凭印象</b>。表内每一条都取自仓库 workflow 文件里真实的 cron（UTC 已换算为 CST），并与线上实测 runs 交叉验证过。</div>
@@ -2833,6 +2853,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
                                                                                                                               
                                                                                                                                                            
     <div class="lg-pane" id="lg-v6" style="position:relative;">
+<h2 class="lg-section-title">📦 v6备忘录</h2>
       <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:12px;margin-bottom:10px;flex-wrap:wrap;">
         <span style="font-size:13px;font-weight:700;color:#38bdf8;">📦 v6 备忘录</span>
         <a class="v6MemoOpenLink" href="v6_memo.html?standalone=1" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#38bdf8;color:#0a0e17;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">🚀 直接打开（推荐，绕过 iframe）</a>
@@ -2852,6 +2873,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
     </div>
     
 <div class="lg-pane" id="lg-dnd">
+<h2 class="lg-section-title">🔒 已下架 / 🛡️ 防删 / 📜铁律</h2>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
         <div style="font-size:13px;color:var(--sub);">本子页面数据由 <code>DO_NOT_DELETE.md</code> 解析，<strong style="color:var(--gold);">修改 <code>DO_NOT_DELETE.md</code> 后运行 <code>python scripts/gen_do_not_delete_js.py</code> 同步</strong>；周日 23:00 <code>v8_cleanup.yml</code> 自动跑。</div>
         <div id="lg-dnd-stamp" style="font-size:12px;color:var(--sub);font-family:var(--mono);"></div>
@@ -8506,8 +8528,9 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 /* 逻辑详解页：默认展开第一个子页（今日事件）；与主站 switchLg 行为保持一致 */
 (function(){
   try{
-    var first = document.querySelector('.lg-tab');
-    if (first && typeof window.switchLg === 'function') window.switchLg(first.getAttribute('data-lg') || 'td', first);
+    // 2026-09-19 合并单页：所有 pane 默认可见，无需 switchLg 切换；仅保证 v6 备忘录 iframe 加载
+    var _vf = document.getElementById('v6MemoFrame');
+    if(_vf && (!_vf.src || _vf.src.indexOf('v6_memo')<0)){ _vf.src='v6_memo.html?standalone=1&t='+Date.now(); }
   }catch(e){ console.warn('[logic.html] 初始子页切换失败', e); }
   // 后台预渲染选股策略回测汇总，避免首次点击 st tab 空白
   setTimeout(function(){ try{ if(typeof window.__renderLgBacktest === 'function') window.__renderLgBacktest(); }catch(_){} }, 400);

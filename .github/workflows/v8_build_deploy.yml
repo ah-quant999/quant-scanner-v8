@@ -450,7 +450,7 @@ jobs:
             git rm --cached --ignore-unmatch \
               data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json \
               data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
-            git add data/ index.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
+            git add data/ index.html logic.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
               raw_data/sh_sz_history.json \
               raw_data/sector_fund_flow_history.json \
               raw_data/triple_resonance_history.json \
