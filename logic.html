@@ -782,10 +782,14 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=1789284978" defer></script>
   <script src="data/MOMENTUM_FILTER.js?v=1789284978" defer></script>
   <!-- 🗑 2026-09-19 主人令：「强势突破」全站删除 ⇒ 本引用移除。
-       原引用 data/ALGO_BACKTEST_COMPARE.js 已于 2026-09-19 移除（Pages 实测 404），
-       加载它只会 404 静默失败。其唯一消费方「两套算法回测对比」卡位于本页
-       renderUnlisted() 内，而本页无 sec-ul 容器 ⇒ 该卡无生效路径（死代码副本），
-       按「判过时看有无生效路径」铁律不动渲染函数，仅摘除失效引用。 -->
+       🔵 2026-09-20 补正（阿狸咪的工程师）：上方原注记「已于 2026-09-19 移除（Pages 实测 404）」
+          **当时正确、现已过时** —— 该轮实为短暂移除，随后恢复；真正的终局是 2026-09-20
+          全链退役（脚本 scripts/algo_backtest_compare.py 与产物本身均已删除）。
+          同时原注记「本页无 sec-ul 容器」亦不准确（本页实为无 sec-ul，但主站 index.html 有）。
+       ✅ 当前状态（今日终局）：产物 data/ALGO_BACKTEST_COMPARE.js 与生成脚本已全链退役删除，
+          故此处**永久不再需要**该 script 标签；其消费卡「📊 两套算法回测对比」整段死代码
+          也已于本页下方一并摘除（见 renderUnlisted 内 🗑 2026-09-20 墓志铭）。
+       🔴 反向警告：**不要**照 09-19 的旧口径把该 script 标签加回来。 -->
 </head>
 <body>
 <nav class="v8nav" style="padding:8px 12px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--line,#333)">
