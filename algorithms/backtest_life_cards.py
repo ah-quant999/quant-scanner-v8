@@ -26,6 +26,11 @@
 
 【诚实铁律】
   · 只输出真实可算出的数字；无成熟样本的档位如实标 immature
+  · 🔴 2026-09-19：**上游标了、下游必须读**。IMA 上游产物已如实落盘
+    `sample_coverage` / `detail_complete`（源端 ~300 字硬墙 ⇒ 只能解析出 1~3 条），
+    而本脚本原先只读 stocks[].code / first_selected ⇒ 以 n=2 出表，汇总表把该卡标成
+    「样本不足 → 累积中」，属**误归因**（那 2 笔信号日早已成熟，累积永不会补到门槛）。
+    现把源覆盖度一并搬进回测产物（不拒写，见 `_source_quality`）。
   · 回测窗口不足导致的档位缺失如实保留，不插值、不外推、不美化
   · max_drawdown 口径：每笔「持仓期内相对持仓期最高收盘价」的最大回撤，再取全样本均值
 
@@ -199,7 +204,10 @@ def _emit(name: str, payload: dict):
     p = RAW / name
     p.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
     n_ok = sum(1 for v in payload.get("periods", {}).values() if v.get("samples"))
-    print(f"  ✅ {name}  信号 {payload.get('total_signals')} 笔 · 成熟档 {n_ok}/{len(payload.get('periods', {}))}")
+    _tag = ("  ⚠️ 源覆盖度降级（backtest_representative=false）"
+            if payload.get("source_integrity") == "degraded" else "")
+    print(f"  ✅ {name}  信号 {payload.get('total_signals')} 笔 · "
+          f"成熟档 {n_ok}/{len(payload.get('periods', {}))}{_tag}")
 
 
 def _envelope(**kw):
@@ -215,6 +223,44 @@ def _envelope(**kw):
     }
     d.update(kw)
     return d
+
+
+# ── 源覆盖度守卫（2026-09-19 阿狸咪的工程师）──────────────────────────────────
+# 🔴 背景：上游 `fetch_ima_strong_stock.py` 早已如实标注 `sample_coverage` /
+#   `detail_complete`（源头是 ima 分享页的**服务端 ~300 字硬墙**，实测只能解析 1~3 条，
+#   expected 常见 58~112），但**下游无人消费** ⇒ 回测以 n=2 出表、汇总表标「累积中」= 误归因。
+# 🔴 处置与上游同一条铁律：**不拒写**（拒写 = 卡片彻底断供，比降级更糟），
+#   改为①把源覆盖度**搬进回测产物** ②把降级原因写成可读文本 ③运行时**显式吼一声**。
+#   ⇒ 任何下游 / 审计 / 交接都能一眼归因「样本为什么这么少」。
+SOURCE_COVERAGE_WARN_PCT = 50.0   # 覆盖率低于此 ⇒ 判 degraded
+SOURCE_COVERAGE_MIN_ROWS = 5      # 可比信号少于此 ⇒ 判 degraded（无论百分比）
+
+
+def _source_quality(obj: dict):
+    """→ (fields: dict, degraded: bool, reasons: list[str])。
+
+    只消费上游**已落盘**的标注，不自行推测源侧状态。
+    缺标注也算 degraded —— 「无法判定覆盖面」本身就是风险，禁止默认放行。
+    """
+    cov = obj.get("sample_coverage")
+    fields = {
+        "source_coverage": cov if isinstance(cov, dict) else None,
+        "source_detail_complete": obj.get("detail_complete"),
+        "source_data_date": obj.get("data_date"),
+        "source_stale": obj.get("source_stale"),
+    }
+    if not isinstance(cov, dict) or not cov:
+        return fields, True, ["上游产物缺 sample_coverage（无法判定数据覆盖面）"]
+    reasons = []
+    rows, exp, pct = cov.get("rows_parsed"), cov.get("expected"), cov.get("coverage_pct")
+    fields["source_coverage_summary"] = f"{rows}/{exp}"
+    if cov.get("truncated"):
+        reasons.append("源端截断（sample_coverage.truncated=true）")
+    if pct is not None and pct < SOURCE_COVERAGE_WARN_PCT:
+        reasons.append(f"源覆盖率 {pct}%（{rows}/{exp}）< {SOURCE_COVERAGE_WARN_PCT}%")
+    if obj.get("detail_complete") is False:
+        reasons.append("上游标 detail_complete=false（明细不完整）")
+    return fields, bool(reasons), reasons
 
 
 # ── ① 强势突破 ────────────────────────────────────────────────────────────────
@@ -271,6 +317,21 @@ def run_ima_strong():
         print("  ⚠️ IMA 无可定位信号时点的标的，跳过")
         return
     days = sorted({d for _, d in sigs})
+    # 🔴 源覆盖度守卫（2026-09-19）：消费上游标注，把「为什么样本这么少」写进产物。
+    _qf, _qdeg, _qwhy = _source_quality(obj)
+    if len(sigs) < SOURCE_COVERAGE_MIN_ROWS:
+        _qdeg = True
+        _qwhy = _qwhy + [f"可比信号仅 {len(sigs)} 笔 < {SOURCE_COVERAGE_MIN_ROWS} 笔"]
+    _qf["source_degrade_reasons"] = _qwhy
+    _qf["source_integrity"] = "degraded" if _qdeg else "ok"
+    _qf["backtest_representative"] = (not _qdeg)
+    if _qdeg:
+        print("  ⚠️ IMA 源覆盖度降级（**不拒写**：拒写=卡片断供，比降级更糟）——")
+        for _w in _qwhy:
+            print("     · " + _w)
+        print(f"     ⇒ 本卡 {len(sigs)} 笔信号的统计**不具代表性**。若汇总表显示"
+              f"「样本不足 → 累积中」，请改读为：**源端截断导致的结构性缺失**，"
+              f"信号日（{days[0]} ~ {days[-1]}）早已成熟，累积不会补足。")
     _emit("ima_strong_backtest.json", _envelope(
         card="高手强势股跟踪",
         signal_source="raw_data/ima_strong_stock.json（IMA 同步的真实首次入选日）",
@@ -279,6 +340,7 @@ def run_ima_strong():
         signal_days=len(days),
         signal_date_range=f"{days[0]} ~ {days[-1]}",
         ima_update_time=obj.get("update_time"),
+        **_qf,
         periods=build_periods(sigs),
     ))
 

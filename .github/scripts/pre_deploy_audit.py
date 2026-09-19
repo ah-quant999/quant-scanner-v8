@@ -3,13 +3,15 @@
 """
 v8 Pre-deploy audit（CI 自动门禁，2026-09-05 主人令一劳永逸落地）
 ================================================================
-目的：每次云端 build/deploy 前自动跑 **5** 项校验，任何一项失败 → 阻断 deploy。
+目的：每次云端 build/deploy 前自动跑 **8** 项校验，任何一项失败 → 阻断 deploy。
 等同「改后三件套」固化为 CI step，不再依赖人工记忆流程。
 
 五项校验：
   1. py_compile        —— 所有 *.py 文件 0 语法错误
   2. new Function      —— index.html 所有 inline <script> 0 语法错误（Node）
-  3. 完整性核对        —— data/*.js 数量在合理范围（90~110，与 HEAD 对齐）
+  3. 完整性核对        —— data/*.js 数量在下界 90 与**动态上界**之间
+                             （上界 = max(130, 声明面+20)；声明面 = DATA_SOURCES 注册 VAR
+                              ∪ 页面 <script src> 引用。2026-09-19 二次根治，见函数内注）
   4. align_logic_ops   —— 逻辑详解页与真 workflow 一致（EXIT 0）
   5. workflow YAML     —— .github/workflows/*.yml 对 GitHub 真正有效
                           （2026-09-11 新增：`3ce9dd972` 丢 run 块内一行缩进
@@ -103,28 +105,99 @@ def check_new_function():
     return (True, f"{len(blocks)} 个 inline script 块 0 错误")
 
 
+# ── [3/8] 判据：下界固定，上界**动态** ─────────────────────────────────────────
+# 🔴 2026-09-19 阿狸咪的工程师（第二跳：上界再也不能是固定数）
+#   第一跳（同日更早）只把上界 110 → 130：治住了「当时真值恰好贴顶」，
+#   但**余量仍随卡片增长单调消耗**（实测 09-14=105 → 09-19=111）⇒ 数周后必然再贴顶。
+#   而贴顶的后果不是「报个警」，是**同时打挂两条链**
+#   （v8_build_deploy.yml 与 v8_cn_fetch_cloud.yml 都调用本脚本）。
+#   第二跳改为**动态上界**：面 = 「应产出」的两个可程序化真源之并集
+#     · update_v8.py::DATA_SOURCES 的 VAR 名（每条注册 ⇒ 产出 data/<VAR>.js）
+#     · 页面里真实存在的 <script src="data/<NAME>.js"> 引用（index.html + logic.html）
+#   ⇒ 上界 = max(基线 130, 面 + 容差 20)。
+#   新增卡片**必然**同时抬高面（要么注册 DATA_SOURCES，要么加 <script src>）
+#   ⇒ 正常增长永不打挂本项；异常暴增（如某脚本把产物批量写进 data/）仍会被抓。
+#
+# 🔴 为什么**不**拿「当前实际个数」当上界依据：那是同义反复 —— 门槛恒等于被考核值，
+#   等于取消本项门禁。面只取**声明面**（注册表 / 页面引用），与 disk 实际数无关。
+# 🔴 取不到面（文件缺失/解析异常）⇒ 退回基线 130 并**打印原因**，禁静默降级。
+# 🔴 下界 90 未动：它才是本项的真正防线（防坚果云同步层误删 ⇒ 空白部署）。
+# ⚠️ 已知口径（**实测，非推测**，2026-09-19，防后人误推）：
+#   本处正则**不剥注释** ⇒ 注册面实测 **79**（严格口径 `^\s*"..."` 为 77，多出的 2 条是
+#   注释里的示例对）。对裁决**无影响**（保底 130 生效，79 与 77 都远低于 130-20）。
+#   之所以不改成 ast/剥注释版：本项是门禁，多一层解析就多一个「解析炸掉 ⇒ 两条链全停」的面，
+#   而这里的松动方向是**更宽容**（不会误杀）。若将来面逼近上界，再评估是否收紧。
+DATA_JS_MIN = 90                 # 真防线（不动）
+DATA_JS_BASELINE_MAX = 130       # 声明面取不到时的保底上界
+DATA_JS_FACE_TOLERANCE = 20      # 声明面之外的合法产物容差（未登记的临时/在途新增）
+
+
+def _data_js_face():
+    """→ (面大小 int, 说明 str)。面 = DATA_SOURCES 注册 VAR ∪ 页面 <script src> 引用。
+
+    两个来源各自失败都**不影响**另一个；两面都取不到才返回 (0, 原因)。
+    纯标准库实现（守本文件「零依赖」铁律）。
+    """
+    face, notes = set(), []
+
+    upd = ROOT / "update_v8.py"
+    if upd.exists():
+        try:
+            txt = upd.read_text(encoding="utf-8", errors="replace")
+            v = set(m.group(1) + ".js"
+                    for m in re.finditer(r'"[^"]+\.json"\s*:\s*"([A-Za-z0-9_]+)"', txt))
+            if v:
+                face |= v
+                notes.append("注册 %d" % len(v))
+            else:
+                notes.append("注册面解析为空")
+        except Exception as e:
+            notes.append("注册面读取失败(%s)" % type(e).__name__)
+    else:
+        notes.append("缺 update_v8.py")
+
+    ref = set()
+    for page in ("index.html", "logic.html"):
+        fp = ROOT / page
+        if not fp.exists():
+            continue
+        try:
+            h = fp.read_text(encoding="utf-8", errors="replace")
+            ref |= set(re.findall(r'src=["\'](?:\.\./)?data/([A-Za-z0-9_\-\.]+\.js)', h))
+        except Exception:
+            notes.append("%s 读取失败" % page)
+    if ref:
+        face |= ref
+        notes.append("引用 %d" % len(ref))
+
+    return len(face), "＋".join(notes) if notes else "空"
+
+
 def check_data_integrity():
-    """data/*.js 数量在合理范围（90~110），防止 Nutstore 误删导致空白部署。"""
+    """data/*.js 数量落在 [90, 动态上界]，且每个 ≥100 B，防止 Nutstore 误删导致空白部署。
+
+    上界为**动态**（声明面 + 容差，见上方 2026-09-19 注）；glob 非递归 ⇒ data/archive/* 不参与。
+    """
     data_dir = ROOT / "data"
     if not data_dir.exists():
         return (False, "data/ 目录不存在")
     js = list(data_dir.glob("*.js"))
     n = len(js)
-    # 🔴 2026-09-19 阿狸咪的工程师（结构性拦路石根治）
-    #   原上界硬卡 110，而远端实测 data/*.js 根级已达 110（09-14=105 → 09-19=110，5 天 +5）
-    #   ⇒ 任何新卡片产出 data/*.js 都会立刻打挂本门禁，并阻断 v8_build_deploy.yml 与
-    #     v8_cn_fetch_cloud.yml 的整条部署链（两处都调用本脚本）。
-    #   「上界」只用于探测异常暴增，不是容量规划；「下界 90」才是本门禁的真正防线
-    #   （防坚果云同步层误删导致空白部署），故下界保持不动，上界给 20 个卡位余量。
-    #   提为具名常量：原先两个数字写在错误字符串里，调零散易漏改。
-    DATA_JS_MIN, DATA_JS_MAX = 90, 130
-    if n < DATA_JS_MIN or n > DATA_JS_MAX:
-        return (False, f"data/*.js 数量={n} 超出合理范围 [{DATA_JS_MIN},{DATA_JS_MAX}]")
+    face, why = _data_js_face()
+    if face:
+        cmax = max(DATA_JS_BASELINE_MAX, face + DATA_JS_FACE_TOLERANCE)
+        bound = "%d（动态＝面 %d ＋ 容差 %d）" % (cmax, face, DATA_JS_FACE_TOLERANCE)
+    else:
+        cmax = DATA_JS_BASELINE_MAX
+        bound = "%d（基线·声明面取不到：%s）" % (cmax, why)
+    if n < DATA_JS_MIN or n > cmax:
+        return (False, "data/*.js 数量=%d 超出合理范围 [%d, %s]（面来源：%s）"
+                       % (n, DATA_JS_MIN, bound, why))
     # 健康文件最小字节
     too_small = [p.name for p in js if p.stat().st_size < 100]
     if too_small:
         return (False, f"data/ 下过小文件 {len(too_small)} 个: {too_small[:5]}")
-    return (True, f"data/*.js 数量={n}, 全部 > 100B")
+    return (True, f"data/*.js 数量={n}（上界 {bound}）, 全部 > 100B")
 
 
 def check_align_logic_ops():
