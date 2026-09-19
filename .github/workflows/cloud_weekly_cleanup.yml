@@ -70,9 +70,25 @@ jobs:
                           mapped_vars.add(var)
           print(f"[映射] json名 {len(mapped_files)} / 变量名 {len(mapped_vars)}")
 
-          # 读取 index.html 引用的 data/*.js
-          index = Path('index.html').read_text(encoding='utf-8')
-          referenced = set(re.findall(r'data/([A-Z_0-9]+)\.js', index))
+          # 🛡 2026-09-20 一劳永逸根治（本项第 3 次复发，前两次见 pre_deploy_audit [6/8] 注记）：
+          #   原逻辑三重缺陷叠加，导致「小写命名」或「只被非 index 页引用」的产物必被误删：
+          #     ① **只读 index.html** —— 站上共 4 页引用 data/*.js，未扫 logic/calendar/v6_memo；
+          #     ② 正则 `[A-Z_0-9]+` **不匹配小写文件名** ⇒ 小写产物永远不在 referenced；
+          #     ③ 保护名单用大写（"MAHORO_INSIGHTS"）而实际文件是小写（maharo_insights.js）
+          #        ⇒ `var_name in PROTECTED_DATA` 恒 False，**保护形同虚设**。
+          #   实证（2026-09-20 00:08 本轮）：data/ALGO_BACKTEST_COMPARE.js（只被 logic.html 引用）
+          #   与 data/maharo_insights.js（小写名 + 保护名大小写不匹配）双双被删；
+          #   后者令 pre_deploy_audit [6/8] 检出 index.html 404 断链
+          #   ⇒ v8_build_deploy 自 #7127 起**连续 6 次 failure**，线上 index.html 停更。
+          #   ⇒ 修复原则：清理面必须 ⊇ 引用面，且与 check_html_refs 门禁**同口径（同 4 页）**，
+          #     大小写一律归一比较。清理与门禁打架 = 每次清理都制造一次红灯。
+          PAGES = ['index.html', 'logic.html', 'calendar.html', 'v6_memo.html']
+          referenced = set()
+          for _pg in PAGES:
+              _fp = Path(_pg)
+              if _fp.exists():
+                  referenced |= set(re.findall(r'data/([A-Za-z_0-9]+)\.js',
+                                               _fp.read_text(encoding='utf-8')))
 
           # 🛡 2026-08-18 一劳永逸修复：原逻辑把「不在 DATA_SOURCES 映射」等同于 orphan，
           # 但 v8 大量生成器直写的 raw_data（尤其是历史累积账本）并不在 update_v8 映射里，
@@ -152,11 +168,19 @@ jobs:
                       print(f"[保护] 目录 {d.name}/ 保留")
 
           removed_data = []
+          # 🛡 2026-09-20：保护名与变量名统一**大写归一**比较 —— 否则 "MAHORO_INSIGHTS"
+          #   保护不了实际的小写文件 maharo_insights.js（本轮实测被删的直接原因之一）。
+          _PROT_UP = {str(x).upper() for x in PROTECTED_DATA}
+          _VAR_UP  = {str(x).upper() for x in mapped_vars}
+          _REF_UP  = {str(x).upper() for x in referenced}
           if DATA_DIR.exists():
               for p in DATA_DIR.glob('*.js'):
                   var_name = p.stem
                   json_name = var_name + '.json'
-                  if var_name in PROTECTED_DATA or json_name in PROTECTED_DATA:
+                  # 🔴 未跟踪（untracked）文件不删：本机侧每日生成、云端拉不到的产物
+                  #    （如 maharo_insights.js）在云端 checkout 里本就不存在，
+                  #    此判据只作后续增补说明，不改变既有语义。
+                  if var_name.upper() in _PROT_UP or json_name.upper() in _PROT_UP:
                       continue
                   # 🛡 2026-08-30 修复：原判断 `json_name not in mapped_files` 因大小写不匹配恒为 True，
                   #    实际等价于「只保留 referenced，其余全删」。改为四重判定：
@@ -164,7 +188,9 @@ jobs:
                   if (json_name not in mapped_files
                           and json_name.lower() not in mapped_files
                           and var_name not in mapped_vars
-                          and var_name not in referenced):
+                          and var_name.upper() not in _VAR_UP
+                          and var_name not in referenced
+                          and var_name.upper() not in _REF_UP):
                       p.unlink()
                       removed_data.append(p.name)
 

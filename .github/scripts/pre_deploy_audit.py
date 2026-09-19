@@ -293,12 +293,17 @@ def check_html_refs():
                         并新增第 8 项门禁「心跳产物名一致」防漂移复发。
         logic.html : data/ETF_SUBSCRIPTION_EM.js
         logic.html : data/ALGO_BACKTEST_COMPARE.js
-                    ↳ 🔵 2026-09-13 已闭环：该引用**已恢复且文件已重新产出**
-                      （scripts/algo_backtest_compare.py 重新挂进 E 批，
-                       位于聚合器 gen_backtest_all_algos.py 之前）。
-                      ⇒ 它现在**不再是 404**；上方列举仅作历史记录。
-                      ⚠️ 请勿再以本条为依据删除 logic.html 的该 script 标签：
-                        该标签支撑「两套算法回测对比」卡（logic.html L6707）。
+                    ↳ 🔵 2026-09-13 曾闭环（恢复引用 + 脚本重新挂 E 批）；
+                      🗑 **2026-09-20 已随「强势突破」全站删除正式摘除引用**（主人令）：
+                        该数据源已删除，其唯一消费卡位于 logic.html 的 renderUnlisted() 内，
+                        而本页**无 sec-ul 容器** ⇒ 该卡无生效路径（死代码副本）。
+                        ⇒ 摘除引用是正确收口，不是新的 404 断链。
+                      🔴 **反向警告（2026-09-20 更正）**：**不要**照 09-13 的旧注记把该
+                        script 标签加回来 —— 加回即立刻制造一处真 404 并打挂本门禁。
+                      ⚠️ 2026-09-20 另修：weekly cleanup 的 orphan 判定原先**只扫 index.html**
+                        且正则不匹配小写名 ⇒ 只被 logic.html 引用的产物会被它删掉，
+                        与本门禁形成「清理 vs 门禁」拉锯（实测打挂 6 次 build）。
+                        现已把清理侧引用面扩至同 4 页并大小写归一，两者口径一致。
 
     这类断链 py_compile 查不出、new Function 查不出、data 完整性查不出
     （文件本来就不该存在）、YAML 更查不出 —— 只有本项能拦。
