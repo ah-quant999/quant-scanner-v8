@@ -93,14 +93,49 @@ jobs:
     timeout-minutes: 5
     outputs:
       trading: ${{ steps.t.outputs.trading }}
+      is_trading_day: ${{ steps.td_run.outputs.is_trading_day }}
     steps:
+      # 🔴🔴 2026-09-19（阿狸咪的工程师）：原判据**只有时钟窗，没有星期/交易日维度**。
+      #    实证（我方 11:55 档，全天 28 个 run）：唯一被判 trading=true 的 #7073（10:34:05）
+      #    正是唯一 build=skipped 的那个；把原判据逐 run 复算与 build 真实结论比对 = 28/28 一致
+      #    ⇒ 排除偶发/并发/超时解释，这是判据自身的确定性行为。
+      #    危害：① 非交易日该窗内的 push（含 index.html 结构改动）拿不到 update_v8 重建与部署；
+      #          ② 主人「周末手动跑更新和部署」在手动手动派发时**也被 skip**（下方 build 的
+      #             if 白名单含 workflow_dispatch）⇒ 诉求直接落空；③ run 顶层全绿掩盖以上两点。
+      - id: td
+        continue-on-error: true      # 日历/checkout 异常不得掐断 gate（下方逻辑已保证不降级）
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: |
+            algorithms/check_trading_day.py
+            v8_date.py
+          sparse-checkout-cone-mode: false
+      - id: td_run
+        continue-on-error: true
+        shell: bash
+        run: |
+          # 复用仓库既有交易日历（v8_date.is_trading_day）。该脚本对「日历拉取失败」
+          # 保守视为交易日（不误伤工作日），并支持 V8_FORCE_RUN=1 强制视为交易日。
+          python algorithms/check_trading_day.py || true
       - id: t
         shell: bash
         run: |
           TH=$(TZ=Asia/Shanghai date +%-H); TM=$(TZ=Asia/Shanghai date +%-M)
+          DW=$(TZ=Asia/Shanghai date +%u)          # 1..7（1=周一；6=周六，7=周日）
           TR=0
           if { [ "$TH" -eq 9 ] && [ "$TM" -ge 25 ]; } || [ "$TH" -eq 10 ] || { [ "$TH" -eq 11 ] && [ "$TM" -le 30 ]; } || [ "$TH" -eq 13 ] || [ "$TH" -eq 14 ]; then TR=1; fi
+          # 🔴 2026-09-19 新增：交易时段判定叠加「交易日」维度（两层短路）。
+          #   短路一（周末）：date +%u 离线可判且**确定**（A 股周末必无行情）⇒ 恒判非盘中。
+          #   短路二（法定假日/调休）：由上面的交易日历明确输出 is_trading_day=false 时判非盘中。
+          #   🔴 安全边界：日历步骤失败 ⇒ 输出为空 ⇒ **保持原时钟判据不降级**。
+          #     否则工作日盘中一旦日历接口抖动，全量 build 会在盘中开跑，复发 2026-09-03
+          #     的盘中风暴（该风暴正是本闸门当初要根治的对象）。
+          IF_TD="${{ steps.td_run.outputs.is_trading_day }}"
+          if [ "$DW" -ge 6 ]; then TR=0; fi
+          if [ "$IF_TD" = "false" ]; then TR=0; fi
           echo "trading=$([ "$TR" -eq 1 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "is_trading_day=${IF_TD:-unknown}" >> "$GITHUB_OUTPUT"
           echo "🕒 当前北京时间 ${TH}:${TM} → 交易时段=$([ "$TR" -eq 1 ] && echo YES || echo NO)"
   build:
     needs: [gate]
@@ -285,13 +320,24 @@ jobs:
             #   **旧 index.html 被盖回新版本**，随后 git add index.html + push 因 fast-forward
             #   而成功 ⇒ 静默覆盖他人前端改动。这正是「改好又被盖回旧版」的机制之一。
             #   改为**仅在确有未提交改动时**才备份/恢复：原保护意图不变，覆盖漏洞消除。
-            if ! git diff --quiet -- index.html; then
-              cp index.html /tmp/index.html.manual
-              git reset --hard FETCH_HEAD
-              cp /tmp/index.html.manual index.html
-            else
-              git reset --hard FETCH_HEAD
-            fi
+            # 🔴🔴 2026-09-19 阿狸咪的工程师（第三次复发后根因修复）：
+            #   原「备份 → reset → 盖回」的意图是保护**人工未提交**的 index.html 改动。
+            #   但该前提在 CI 里不成立，且会造成静默覆盖：
+            #     · 本步之前已由 guard_v6_memo.py / 选择构建 / update_v8.py 改过 index.html
+            #       ⇒ `git diff --quiet -- index.html` 为假 ⇒ 走 then 分支；
+            #     · 备份到的却是 **checkout 时刻（陈旧）** 的内容；
+            #     · 若本 run 自触发到此刻期间远端有新 push，FETCH_HEAD 前进
+            #       ⇒ reset 拿到新内容、随后又被**陈旧备份盖回**；
+            #     · 下一句 git commit 的 parent 已是最新远端，push 天然 fast-forward
+            #       ⇒ **无冲突、无告警地静默覆盖他人前端改动**。
+            #   实证（三次）：09-18 21:42 `149d5a2a30`、09-19 07:22 `df63f016d1`、
+            #     以及 09-19 07:24 `2acd970321` 由另一趟 run 恢复（同一窗口内互相打架）。
+            #   判据铁证：`df63f016d1` 的 index.html 内 `var BUILD = "8164d8f62"`（= 被覆盖
+            #     那笔提交的 sha，说明 HEAD 已是新提交），但正文无该提交的新增块
+            #     ⇒ 证明磁盘上的文件不是 FETCH_HEAD 那份。
+            #   ⇒ 删除备份/盖回。CI 里人工前端改动一定是**已提交**的，reset 不会丢；
+            #     而脚本生成的改动（?v / v6 戳 / BUILD）在 reset 之后都会重跑。
+            git reset --hard FETCH_HEAD
             # 同步 cn runner 单独推送的 5 个 extra 文件（update_v8.py 不重建这些），
             #   确保 ?v 计算基于线上真实最新内容。
             git checkout FETCH_HEAD -- data/FOUR_VOLUME.js data/FOUR_VOLUME_60M.js data/STOCK_STOP_DATA.js data/FINAL_RECOMMEND_DATA.js
@@ -426,13 +472,24 @@ jobs:
             # 重试路径同样备份/恢复 index.html，避免人工前端改动被擦除
             # 🛡🛡 2026-09-16 一劳永逸（阿狸咪的工程师）·同上：重试路径存在同一覆盖源，
             #   改为仅在确有未提交改动时才备份/恢复（原因见上方主路径注释）。
-            if ! git diff --quiet -- index.html; then
-              cp index.html /tmp/index.html.manual
-              git reset --hard FETCH_HEAD
-              cp /tmp/index.html.manual index.html
-            else
-              git reset --hard FETCH_HEAD
-            fi
+            # 🔴🔴 2026-09-19 阿狸咪的工程师（第三次复发后根因修复）：
+            #   原「备份 → reset → 盖回」的意图是保护**人工未提交**的 index.html 改动。
+            #   但该前提在 CI 里不成立，且会造成静默覆盖：
+            #     · 本步之前已由 guard_v6_memo.py / 选择构建 / update_v8.py 改过 index.html
+            #       ⇒ `git diff --quiet -- index.html` 为假 ⇒ 走 then 分支；
+            #     · 备份到的却是 **checkout 时刻（陈旧）** 的内容；
+            #     · 若本 run 自触发到此刻期间远端有新 push，FETCH_HEAD 前进
+            #       ⇒ reset 拿到新内容、随后又被**陈旧备份盖回**；
+            #     · 下一句 git commit 的 parent 已是最新远端，push 天然 fast-forward
+            #       ⇒ **无冲突、无告警地静默覆盖他人前端改动**。
+            #   实证（三次）：09-18 21:42 `149d5a2a30`、09-19 07:22 `df63f016d1`、
+            #     以及 09-19 07:24 `2acd970321` 由另一趟 run 恢复（同一窗口内互相打架）。
+            #   判据铁证：`df63f016d1` 的 index.html 内 `var BUILD = "8164d8f62"`（= 被覆盖
+            #     那笔提交的 sha，说明 HEAD 已是新提交），但正文无该提交的新增块
+            #     ⇒ 证明磁盘上的文件不是 FETCH_HEAD 那份。
+            #   ⇒ 删除备份/盖回。CI 里人工前端改动一定是**已提交**的，reset 不会丢；
+            #     而脚本生成的改动（?v / v6 戳 / BUILD）在 reset 之后都会重跑。
+            git reset --hard FETCH_HEAD
             git checkout FETCH_HEAD -- data/FOUR_VOLUME.js data/FOUR_VOLUME_60M.js data/STOCK_STOP_DATA.js data/FINAL_RECOMMEND_DATA.js
             # 🔴 2026-08-18 根因修复：重试路径同样必须全量构建，不能用 --detect-changes
             #   （原因同上：reset 后 HEAD~1..HEAD 已无法反映 raw_data 的真实变化）。
