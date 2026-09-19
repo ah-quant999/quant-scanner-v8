@@ -3139,9 +3139,13 @@ function fmtSigned(v){
     <code style="background:rgba(56,189,248,.1);padding:1px 4px;border-radius:3px;">total_score</code>。
     <b style="color:#fbbf24;">因子只改排序，不决定谁能进池</b> —— 进池由 scanner 选股策略决定。
     </div>
+    <!-- 🔻 2026-09-19 主人令：第一步/第二步头部静态保留；明细全表默认折叠，主展示=第三步「当日因子计分榜」（每日计算） -->
+    <details style="margin:4px 0 0;">
+    <summary style="cursor:pointer;font-size:12px;font-weight:600;color:#38bdf8;user-select:none;padding:4px 0;">▸ 展开 · 第一步明细：26 项因子打分全表（静态口径 · 代码投影）</summary>
     <div id="dfcHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">&#x1F9EE; 每日因子计算加载中&#x2026;</div></div>
+    </details>
     <div style="border-top:1px dashed rgba(148,163,184,.35);margin:16px 0 0;"></div>
-    <div style="font-size:11.5px;color:var(--dim);margin:10px 0 6px;">▼ <b style="color:var(--sub);">第二步 · 已纳入因子</b> —— 哪些因子真进了算法链累积分（推荐层二次微调）</div>
+    <div style="font-size:11.5px;color:var(--dim);margin:10px 0 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">▼ <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#a78bfa22;color:#a78bfa;border:1px solid #a78bfa4d;">第二步 · 已纳入因子</span><span>—— 哪些因子真进了算法链累积分（推荐层二次微调）</span></div>
     <div id="factorLabBody"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">&#x1F9EA; 已纳入因子加载中&#x2026;</div></div>
     </div>
     <!-- ═══════════════════════════════════════════════════════════════
@@ -7504,7 +7508,8 @@ function fmtSigned(v){
       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
       + '<b style="font-size:15px;">🧪 已纳入因子</b>'
       + '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#22c55e22;color:#22c55e;border:1px solid #22c55e4d;">已进算法链 · 真计分</span>'
-      + '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#22c55e22;color:#22c55e;border:1px solid #22c55e4d;">第二步</span>'
+      // 🎨 2026-09-19 主人令：第二步用单独区别色（紫罗兰），与「已进算法链·真计分/回测已达标」的绿区分开
+      + '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#a78bfa22;color:#a78bfa;border:1px solid #a78bfa4d;">第二步</span>'
       // 🔴 2026-09-19 主人令：「把已纳入算法链的因子都写在这卡，改名叫已纳入因子」
       //   原卡名「🧪 因子实验室 · 异常换手率 × ROE_TTM」—— 那是**研究期**的两个候选因子，
       //   而现在它们一个已被判定不计分（异常换手率=仅展示）、一个仅展示（ROE_TTM），
@@ -7533,13 +7538,17 @@ function fmtSigned(v){
       + gateBanner
       + '<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">重点池 '+_e(m.n_universe)+' 只 · 异常换手率有效 '+_e(m.n_at_valid)+' · ROE大市值档 '+_e(m.n_roe_large)+'　'
       + '<span style="color:#22c55e">●</span>缩量强势 <span style="color:#ef5350">●</span>放量弱势</div>'
-      + _secH('①', '算法链因子台账（共 ' + ((CH && CH.integrated) || []).length + ' 项　● 真计入 final_score ｜ ○ 仅标注不计分）', '#22d3ee')
+      // 🔻 2026-09-19 主人令：第二步头部（徽章行/择时闸门/仓位依据/重点池行）静态保留，台账明细默认折叠
+      + '<details style="margin-top:8px;">'
+      + '<summary style="cursor:pointer;font-size:12px;font-weight:600;color:#a78bfa;user-select:none;padding:4px 0;">▸ 展开 · ① 算法链因子台账（共 ' + ((CH && CH.integrated) || []).length + ' 项　● 真计入 final_score ｜ ○ 仅标注不计分）</summary>'
       + chainBlock
+      + '</details>'
       + '<div style="font-size:11.5px;color:var(--dim);margin-top:10px;">② 当日加减分排列已独立成新卡 <b style="color:#38bdf8;">🏆 当日因子计分榜</b>（本子页上方，「🧮 每日因子计算」卡下方）：候选池 top20 各因子加减分全列出，按总分降序，顶部即最终推荐。</div>'
       // 🔴 2026-09-19 主人令：「没被留下的可以完全删除了，也不用跟踪了」
       //   原 ③「待接入因子队列」整块移除 —— 台账已 0 pending（8 项无数据 + 7 项不达标全部删除），
       //   留着只会再次显示「等待」，与主人「不要整个版面都在等待」的令冲突。
       //   同时 ②「当日加减分排列」改名为「每日因子计算」的入口说明（见新卡）。
+      + '<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:12px;font-weight:600;color:#a78bfa;user-select:none;padding:4px 0;">▸ 展开 · 口径与独立分层回测明细</summary>'
       + '<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5;">'
       + '口径：异常换手率=当月换手率÷过去12月均值（缩量→低关注→强势），仍用重点池(351只)；ROE_TTM=近4个单季 roeAvg 差分求和（2026-09-11 口径修正：baostock roeAvg 为财年内累计值，原直接累加4季属跨年重复计算），全市场主板·大市值档(成交额top1/3)。'
       + 'IC 显著（Spearman IC t=4.3 / 3.3）。'
@@ -7559,6 +7568,7 @@ function fmtSigned(v){
         })()
       + '　（数据源 data/FACTOR_LAB_BACKTEST.js，update_time 见上）'
       + '。仅研究参考，非买卖建议；本卡不列「可关注」股票（因子不产池、不推荐股）。</div>'
+      + '</details>'
       // 🔴 2026-09-18 主人令「它不转正吧，可以删了」：原「⭐ 升级路径 / 转正判据」整行删除
       //   —— 因子不做选股、不产池 ⇒ 不存在升格为独立策略的路径，留着只会再次引发口径混乱。
       + '</div>';
