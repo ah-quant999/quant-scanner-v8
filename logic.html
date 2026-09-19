@@ -1685,6 +1685,85 @@ need 只是计数，只计 2/3 时它陈旧也会被放行）· <b>8</b> 个脚�
       </div>
 
 <div class="card">
+        <h3><span class="ic">🧮</span>因子计分计算方法规则（真源：generate_top10.py → final_recommend.py）</h3>
+        <div class="logic-p"><b>本页只讲「分是怎么算出来的」——公式、权重、闸门、归一化口径，全部对标线上真代码并附行号，不记流水账。</b>任一维度的权重/阈值变动，以算法源文件为准，本页同步更新。</div>
+
+        <div class="logic-h">一、两层评分架构</div>
+        <div class="logic-p">选股评分分两层，串行执行：</div>
+        <table class="lg-table">
+          <tr><th>层</th><th>真源文件</th><th>输入</th><th>做什么</th><th>产出</th></tr>
+          <tr><td>① 单票综合评分</td><td><code>algorithms/generate_top10.py</code></td><td>候选池逐票</td><td>多维量化求和 → 择时门控乘子 → 归一化 0~100 → 排序取 Top20</td><td><code>TOP10_DAILY.top20</code></td></tr>
+          <tr><td>② 多源共振融合</td><td><code>algorithms/final_recommend.py</code></td><td>各策略源命中</td><td>对已进入候选的票做多源融合，加共振溢价</td><td><code>FINAL_RECOMMEND_DATA.stocks</code></td></tr>
+        </table>
+        <div class="logic-p">数据流：候选池 → 层①逐票打分排序取 Top20 → 层②把多策略源（三重共识/四量终极/因子实验室/高手跟踪/强势突破/动量共识）对这批票做融合，收敛出最终推荐。<b>因子只对「已选出的票」加减分，绝不因命中因子把票拉进池子</b>（2026-09-18 主人令）。</div>
+
+        <div class="logic-h">二、层① 单票评分公式（真源 L1388 / L1395 / L1401 / L1405 / L1415）</div>
+        <div class="logic-p" style="font-family:ui-monospace,monospace;background:rgba(255,255,255,.04);padding:8px 10px;border-radius:6px;line-height:1.7">
+raw_total = base + enhance + form_score + fund + sector_score + inst + quality_score + score_backtest<br>
+raw_total = raw_total × gate_multiplier        # 择时门控（失败语义保守）<br>
+total_score = clamp(0, 100, raw_total / 130 × 100)   # 归一化，NORM_DIVISOR=130（L45）<br>
+total_score = clamp(0, 100, total_score × regime_adj) # 行业风格微调 ±8%（L1410-1415）
+        </div>
+
+        <div class="logic-h">三、各维度权重与区间（真源 L1111-1341）</div>
+        <table class="lg-table">
+          <tr><th>维度</th><th>真源行</th><th>口径</th><th>区间</th></tr>
+          <tr><td>base 基础信号</td><td>L1111-1114</td><td>4 信号 edge×2.5（见下表），乘 P1 置信度收缩（n/120 与 T5/T10 符号一致性）</td><td>−45~+29</td></tr>
+          <tr><td>enhance 增强因子</td><td>L1117-1231</td><td>20日动量反向计分 + RSI 风控 + 连续共振(×2,上限8) + 5日突破(+5) + P3 研究量能(0~+13) + P4 残差动量/低波动(漂移门控) + P5 walk-forward 因子</td><td>−11~+21</td></tr>
+          <tr><td>form_score 形态</td><td>L1237-1260</td><td>EMA结构(+5/+3/+1) + 非涨停+2 + pct20&lt;35 +2 + RSI&lt;68 +2 + 形态A(金钻+缠论)+5 + 涨停−5</td><td>0~+16</td></tr>
+          <tr><td>fund 资金动力</td><td>L1263-1282</td><td>主力净流入(≥1亿+5 / &gt;0 +2 / ≤−1亿 −2) + 龙虎榜机构净买 +3</td><td>−2~+8</td></tr>
+          <tr><td>sector_score 板块共振</td><td>L1288-1329</td><td>取所属赛道<b>净流入最强单板块</b>（非求和，过滤业绩/指数/风格类非赛道标签）；&gt;5亿+5 / &gt;1亿+2 / &lt;−5亿−3</td><td>−3~+5</td></tr>
+          <tr><td>inst 机构/事件</td><td>L1332-1341</td><td>52周新高 +4 / 分析师关注 +3</td><td>0~+7</td></tr>
+          <tr><td>quality_score 基本面</td><td>fundamental_helper.quality_points</td><td>A级+40 / B级+5 / C级0 / D级−10；ST/当期亏损/营收崩塌触发一票否决不进评分</td><td>−10~+40</td></tr>
+          <tr><td>score_backtest 回测反哺</td><td>L1390-1398</td><td>按信号组合 walk-forward T+10 edge 直接修正，每 1% edge ≈ ±1 分</td><td>±10</td></tr>
+        </table>
+
+        <div class="logic-h">四、base 四信号权重（真源 L59-112，SIGNAL_EDGE×2.5，置信度收缩）</div>
+        <table class="lg-table">
+          <tr><th>信号</th><th>T+10 edge</th><th>分值(edge×2.5, clamp±30)</th><th>说明</th></tr>
+          <tr><td>金钻起涨/黄柱</td><td>+8.11</td><td style="color:var(--up)">+20</td><td>强正，重赏</td></tr>
+          <tr><td>缠论买</td><td>+3.68</td><td style="color:var(--up)">+9</td><td>温和正；T5 符号矛盾→置信度×0.5→有效+4</td></tr>
+          <tr><td>上涨趋势</td><td>−7.54</td><td style="color:var(--down)">−19</td><td>反向，原+25已纠正</td></tr>
+          <tr><td>机构变红</td><td>−10.36</td><td style="color:var(--down)">−26</td><td>强反向，追高被套，原+25已纠正</td></tr>
+        </table>
+        <div class="logic-p">权重<b>完全由 walk-forward 回测期望驱动</b>（运行期读取 <code>raw_data/backtest_expectancy.json</code> 覆盖默认值，读取失败回退硬编码）。P1 置信度收缩：样本少(n/120)或 T5/T10 符号矛盾→向 0 收缩，避免薄证据主导排名。</div>
+
+        <div class="logic-h">五、择时门禁乘子 gate_multiplier（真源 L949-986）</div>
+        <div class="logic-p" style="font-family:ui-monospace,monospace;background:rgba(255,255,255,.04);padding:8px 10px;border-radius:6px;line-height:1.7">
+open_multiplier = 1.0 if regime_open(grind/panic) else 0.65<br>
+ic_weight_adj   = clamp(0.85, 1.0, ic_weight)<br>
+regime_weight_adj = clamp(0.85, 1.0, regime_weight)<br>
+gate_multiplier = clamp(0.3, 1.05, open_multiplier × ic_weight_adj × regime_weight_adj)
+        </div>
+        <div class="logic-p">唯一真源 <code>regime_filter.get_current_regime_safe()</code>；取数失败/未知 ⇒ regime=null ⇒ 按<b>关门</b>处理（保守，不开仓、不加分）。绝不用旧缓存冒充「当日状态」。</div>
+
+        <div class="logic-h">六、层② 多源融合公式（真源 final_recommend.py L1287-1310）</div>
+        <div class="logic-p" style="font-family:ui-monospace,monospace;background:rgba(255,255,255,.04);padding:8px 10px;border-radius:6px;line-height:1.7">
+resonance   = len(set(各命中来源))          # 不同来源数<br>
+strength    = sum(source_scores.values())<br>
+final_score = strength + resonance × 1.5 + sec_add − weak_penalty
+        </div>
+        <table class="lg-table">
+          <tr><th>融合来源</th><th>角色</th><th>是否进 final_score</th></tr>
+          <tr><td>三重共识</td><td>主策略（2 独立维度一致才入选）</td><td>● 真计分</td></tr>
+          <tr><td>四量终极</td><td>主策略（4 重共振+5年回测）</td><td>● 真计分</td></tr>
+          <tr><td>强势突破</td><td>共振源（高手反推 v1）</td><td>● 真计分</td></tr>
+          <tr><td>动量共识</td><td>共振源（无未来函数筛选器）</td><td>● 真计分</td></tr>
+          <tr><td>高手跟踪(IMA)</td><td>外部情报共振（非算法产出）</td><td>● 真计分</td></tr>
+          <tr><td>因子实验室(异常换手率/ROE_TTM)</td><td>方案B融合·<b>当前仅标注不计分</b></td><td>○ 仅标注（唯一真计入=「放量弱势」−0.5 weak_penalty）</td></tr>
+        </table>
+        <div class="logic-p">因子实验室因子<b>仅当</b> <code>raw_data/factor_walkforward.json</code> 中 <code>verdict=PASS</code> 且 |利差|≥0.30 才启用（P5 段，L689/L722）；复跑不达标→<code>P5_ON=False</code> 自动停止加权，无需人工摘除。<b>数据缺失/陈旧⇒降级跳过融合，绝不静默造假。</b></div>
+
+        <div class="logic-h">七、关键口径铁律</div>
+        <ul style="margin:6px 0 0 18px;font-size:13px;line-height:1.85;color:var(--txt);">
+          <li><b>数据必须真实</b>：过期或 0 入选时绝不显示「已入仓」骗用户；取数失败→告警不阻断。</li>
+          <li><b>归一化口径</b>：NORM_DIVISOR=130（2026-08-28 由 250 校准）；历史快照已统一回刷，保证「≥80 精选 / ≥70 观察」阈值全日期一致。</li>
+          <li><b>闸门前置</b>：因子/信号仅在回测判定达标后启用；未验证默认不加分（宁缺毋假，2026-09-18 修复静默默认启用 bug）。</li>
+          <li><b>因子只加分不减选</b>：已选出的票才被因子加减分，因子不建池、不产股票列表。</li>
+        </ul>
+      </div>
+
+<div class="card">
         <h3><span class="ic">🥇</span>三重共识 - 说明</h3>
         <div class="logic-h">判定公式</div>
         <div class="logic-p">主站 TOP10（total_score ≥70） ∩ 基本面质量 A档，双维同时满足即共识。<b>2 个独立维度一致才入选</b>，命中即高质量。当前可信度 <b>4⭐</b>（<code>__committeeRate</code> 实算 score 3.30 —— 因 T+1 期分≤2 触发短周期封顶；★ 随回测数据自动更新，以选股策略页实时显示为准）。</div>
