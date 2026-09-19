@@ -6038,45 +6038,6 @@ function fmtSigned(v){
       });
       html += '</div>';
 
-      /* ─── ④ 待确认剔除（弹窗） ─── */
-      var toRemove = [];
-      try{
-        toRemove = (pt.items || []).filter(function(it){ return (it && (it.status==='weak'||it.status==='topped')) && !removedMap[it.code]; });
-      }catch(e){ console.warn('[life] toRemove filter', e); toRemove = []; }
-      if(toRemove && toRemove.length){
-        try{ toRemove = _sortBucket(toRemove, 'drawdown', false); }catch(e){ console.warn('[life] sortBucket', e); }
-        var _rmCodes = toRemove.map(function(it){ return (it && it.code) || ''; }).filter(Boolean);
-        var toRemoveHtml = '<div style="padding:8px 10px 2px;"><span onclick=\'window.__removeAllStocks(' + JSON.stringify(_rmCodes) + '); closeLifeModal();\' style="display:inline-block;padding:5px 12px;border-radius:6px;font-size:11.5px;font-weight:700;color:#ef5350;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.45);cursor:pointer;user-select:none;">⚠️ 全部剔除（' + toRemove.length + ' 只）</span></div>'
-          + '<div style="padding:6px 10px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;">';
-        toRemove.forEach(function(it){
-          var _code = (it && it.code) || '';
-          var _name = (it && it.name) || '';
-          var _drawdown = (it && typeof it.drawdown==='number') ? it.drawdown : 0;
-          var _status = (it && it.status) || '';
-          var statusCol = statusColor[_status] || 'var(--dim)';
-          toRemoveHtml += '<div style="padding:6px 8px;border:1px solid rgba(239,83,80,.3);border-radius:6px;background:rgba(15,23,42,.45);display:flex;flex-direction:column;gap:4px;min-width:0;">';
-          toRemoveHtml += '<div style="display:flex;align-items:center;gap:6px;min-width:0;">';
-          toRemoveHtml += '<span style="color:var(--txt);font-weight:700;font-size:11px;font-family:ui-monospace,monospace;white-space:nowrap;">'+_esc(_code)+'</span>';
-          toRemoveHtml += '<span style="color:var(--txt);font-size:10.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(_name)+'</span>';
-          toRemoveHtml += '</div>';
-          toRemoveHtml += '<div style="display:flex;align-items:center;gap:4px;margin-top:auto;min-width:0;">';
-          toRemoveHtml += '<span style="font-size:9px;color:'+statusCol+';padding:1px 4px;border-radius:4px;background:'+statusColor[_status]+'22;white-space:nowrap;">'+_esc(statusLabel[_status]||_status)+'</span>';
-          toRemoveHtml += _resoBadge(_code);
-          toRemoveHtml += '<span style="font-size:9px;color:var(--dim);white-space:nowrap;">回撤 '+_drawdown.toFixed(1)+'%</span>';
-          toRemoveHtml += '<span style="margin-left:auto;color:#38bdf8;font-size:10px;cursor:pointer;user-select:none;white-space:nowrap;" onclick="window.__removeStock(\''+_esc(_code)+'\'); closeLifeModal();">确认剔除 ✕</span>';
-          toRemoveHtml += '</div>';
-          toRemoveHtml += '</div>';
-        });
-        toRemoveHtml += '</div>';
-        window.__lifeModalCache.toRemove = toRemoveHtml;
-        html += '<div style="border:1px solid rgba(239,83,80,.3);border-radius:8px;background:rgba(239,83,80,.04);margin:10px 0;cursor:pointer;user-select:none;" onclick="openLifeModal(this, \'⚠️ 待确认剔除（走弱/见顶） '+toRemove.length+' 只\', window.__lifeModalCache.toRemove)">';
-        html +=   '<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;">';
-        html +=     '<span style="font-size:12.5px;font-weight:700;color:#ef5350;">⚠️ 待确认剔除（走弱/见顶，共 '+toRemove.length+' 只）</span>';
-        html +=     '<span style="font-size:10.5px;color:var(--dim);font-weight:500;">点击查看明细 · 本机记录不污染主站</span>';
-        html +=   '</div>';
-        html += '</div>';
-      }
-
       /* ─── ⑤ 选股策略回测（按用户反问 2026-09-02 22:50：回测都归到回测汇总 tab 了，不在选股 tab 里重复写一份）
            本页不再渲染战绩回测小条 / 模块回测卡，避免与回测汇总 tab 重复维护 ─── */
 
