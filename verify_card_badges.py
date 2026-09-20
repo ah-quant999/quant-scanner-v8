@@ -52,7 +52,13 @@ NON_TIME_FRESH = {
     'upDownLastDate',     # 副日期
     'tcNearCount',        # 数量
     'tcExtCount',         # 数量
-    'ttAlertCount',       # 数量
+    'ttAlertCount',       # 数量（严格三重共识·状态迁移告警）
+    # 🛡 2026-09-20 本机审计补齐：四量终极「自己的一整套系统」(2026-09-15 主人令)
+    #   照三重共识版式复制 6 张子卡时，计数 ID 由 ttAlertCount 复制为 fvAlertCount，
+    #   但白名单只加了原版 ⇒ 每日误报 1 处漂移 → v8_backup.yml 审计步硬失败（连续 5 天 09-16~09-20）。
+    'fvAlertCount',       # 数量（四量终极·状态迁移告警，同 ttAlertCount 语义）
+    'fvTrackTime',        # 跟踪时间：实现上已用 rel(track.update_time) 输出相对时间胶囊，
+                          #   语义等同 _uBadge，非卡片「更新于」时间戳 ⇒ 不列入时间胶囊校验
 }
 
 # 显式列出的非 .fresh 卡片时间 ID —— 这些 ID 不带 .fresh class，但卡片名右侧必须有胶囊
