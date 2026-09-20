@@ -208,14 +208,27 @@ jobs:
         #   铁证 run#34594585246（19:33，lemoncat-cn）：11:45:23 起 → 11:55:19 被超时打断，
         #   期间只处理了 4 个大文件的重试（blob retry 1 [raw]: IncompleteRead(...)）。
         #   后果：步失败 → 步骤 4~14 全 skipped → 「结果问责」红灯（同 17:30 / 18:05 三连）。
-        timeout-minutes: 25
+        # 🛡 2026-09-21 03:4x 阿狸咪二修（一劳永逸）：25 → 45 分钟，并同步抬高脚本内软预算（见下）。
+        #   实测 5 次真跑（#1971/#1993/#1995/#1996/#1997）：该步 1106~1124s，**最坏 1293s**（#1971）
+        #   ⇒ 25min(1500s) 余量仅 207s。更严重的是脚本内软预算默认 1080s 早已把「大文件重试」吃光：
+        #     `⏱ 预算 1080s 用尽，本轮剩余 855 个文件跳过（已同步 438）` → `OK source sync done: 438/1293`
+        #     （#1971 更差：387/1271）⇒ **每轮只同步约 1/3 就收尾 = 结构性半量**，而末尾 ROOT_REQUIRED
+        #     只查顶层子树存在性 ⇒ 半量照样放行。
+        #   真根因不是「文件多」而是**大文件在 cn 网络被 IncompleteRead 截断**（不换端点、换传输层）：
+        #     `SKIP failed download: index.html`（1.34MB）/ `data/LHB_HISTORY.js`（2.3MB）——
+        #     >1.8MB 一律下不全，各烧 4 次重试 (~3min) 后放弃 ⇒ 预算被这几个文件吃光。
+        #   故本轮四改：①raw 端点启用 gzip（本机实测 1,338,759B → 460,868B = 2.9×，比旧「b64 优先」
+        #   的 1,844,811B 省 4.0×）；②raw.githubusercontent CDN 分块续传兜底（实测 HTTP 206，1MiB/块，
+        #   单块失败只重下该块）；③软预算 1080→2400、硬超时 25→45；④同步不完整改为**硬失败**。
+        timeout-minutes: 45
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           set -e
           cat > "$RUNNER_TEMP/sync_src_v8cloud.py" <<'PYEOF'
-          import os, base64, json, hashlib, urllib.request, time, sys
+          import os, base64, gzip, http.client, json, hashlib, ssl, urllib.request, time, sys
+          import zlib
           token = os.environ["GITHUB_TOKEN"]
           REPO = "ah-quant999/quant-scanner-v8"
           H = {"Authorization": "Bearer " + token,
@@ -250,26 +263,140 @@ jobs:
                       time.sleep(min(2 ** i, 20))
               raise SystemExit("API fetch failed: %s (%s)" % (url, last))
 
-          def fetch_blob(sha, tries=4):
-              url = "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, sha)
-              raw_h = dict(H); raw_h["Accept"] = "application/vnd.github.raw"
+          # 🛡 2026-09-21 03:4x 阿狸咪（一劳永逸）：三层下载，每层都用 git blob sha1 自证。
+          #   本机已对两个新原语逐字节自证（sha1 与远端 blob 全等）：
+          #     A. API blob + Accept:raw + Accept-Encoding:gzip —— index.html 1,338,759B → **460,868B**。
+          #        旧注释「raw 在 >1MB 上截断」的真因是**传输量太大**（cn 网络长连接被切），不是端点坏了；
+          #        压缩后同一端点即可下全 ⇒ 旧版「b64 优先」是反向优化（b64+无压缩 = 1,844,811B，4.0× 冗余）。
+          #     B. raw.githubusercontent + Range —— 实测 HTTP 206 分块（1MiB/块），单块失败只需重下该块，
+          #        不必整文件重来 ⇒ 抗截断。该域在 cn 常被墙 ⇒ 先做一次 10s 探活，不通则整层跳过
+          #        （避免「每个大文件白等 90s」的二次伤害）。
+          #     C. API b64 —— 最后兜底（最费流量，仅当 A/B 都失败）。
+          RAW_CDN = "https://raw.githubusercontent.com/%s/main/%s"
+
+          def _decomp(body, ce):
+              if ce == "gzip":
+                  return gzip.decompress(body)
+              if ce == "deflate":
+                  return zlib.decompress(body)
+              return body
+
+          def _cdn_alive():
+              try:
+                  req = urllib.request.Request(RAW_CDN % (REPO, "README.md"),
+                                               headers={"User-Agent": "v8-sync"})
+                  # 20s：本机实测 10s 会偶发 read timeout（探活失败只是「少一层兜底」，但没必要误判）
+                  urllib.request.urlopen(req, timeout=20).read(16)
+                  return True
+              except Exception as e:
+                  print("  ℹ️ raw CDN 探活失败，本轮跳过分块续传层: %s" % e, flush=True)
+                  return False
+
+          CDN_OK = _cdn_alive()
+
+          # 🛡 2026-09-21 03:5x 阿狸咪：**连接复用（keep-alive）** —— 这是墙钟的真正主因。
+          #   旧版每个文件一次 `urllib.request.urlopen` = **每次重新 TLS 握手**。
+          #   本机同批同载荷实测：urllib 逐次 1.364s/文件 vs 复用单连接 0.495s/文件 = **2.75×**；
+          #   且本机冷启动实测约 0.8s/文件 ≈ cn runner 的 1100s/1293 文件 = 0.85s/文件 **同源**
+          #   ⇒ 1100s 里绝大部分是握手开销，不是数据量（1290 文件 × 0.85s ≈ 1100s，吻合）。
+          _API_CONN = [None]
+
+          def _api_conn():
+              if _API_CONN[0] is None:
+                  _API_CONN[0] = http.client.HTTPSConnection(
+                      "api.github.com", timeout=180, context=ssl.create_default_context())
+              return _API_CONN[0]
+
+          def _api_drop():
+              try:
+                  if _API_CONN[0] is not None:
+                      _API_CONN[0].close()
+              except Exception:
+                  pass
+              _API_CONN[0] = None
+
+          def _api_get(path, accept):
+              """复用单连接取一个 blob；失败即丢连接重建重试一次（中间盒常切 keep-alive）。"""
+              hdr = dict(H)
+              hdr["Accept"] = accept
+              hdr["Accept-Encoding"] = "gzip, deflate"
+              # 🔴 2026-09-21 阿狸咪（执行级复现抓到的生产级缺陷）：
+              #   `http.client` **不会自动加 User-Agent**（urllib 会加 Python-urllib/3.x）。
+              #   GitHub 行政规则对无 UA 请求直接 403：`Request forbidden by administrative
+              #   rules. Please make sure your request has a User-Agent`。实测同一 blob：
+              #   无 UA → 403；带 UA → 200（460,869B）。缺这一行 = 整步 100% 失败。
+              hdr["User-Agent"] = "v8-algo-cloud-sync"
               last = None
-              for i in range(tries):
-                  # b64 优先：raw 端点在 >1MB 文件上实测 IncompleteRead(截断)，b64 是 JSON 响应、长度可校验
-                  mode = "b64" if i % 2 == 0 else "raw"
+              for _ in range(2):
                   try:
-                      hdr = raw_h if mode == "raw" else H
-                      resp = urllib.request.urlopen(
-                          urllib.request.Request(url, headers=hdr), timeout=90)
+                      c = _api_conn()
+                      c.request("GET", path, headers=hdr)
+                      resp = c.getresponse()
                       body = resp.read()
-                      data = body if mode == "raw" else base64.b64decode(json.loads(body.decode())["content"])
-                      if sha_of(data) != sha:
-                          raise ValueError("sha mismatch (truncated?) got %d bytes" % len(data))
-                      return data
+                      if resp.status != 200:
+                          raise ValueError("HTTP %s" % resp.status)
+                      return body, resp.headers.get("Content-Encoding")
                   except Exception as e:
                       last = e
-                      print("  blob retry %d [%s]: %s" % (i + 1, mode, e), flush=True)
-                      time.sleep(min(2 ** i, 20))
+                      _api_drop()
+              raise last
+
+          def _fetch_api_gzip(sha):
+              body, ce = _api_get("/repos/%s/git/blobs/%s" % (REPO, sha),
+                                  "application/vnd.github.raw")
+              return _decomp(body, ce)
+
+          def _fetch_cdn_ranges(path, size, chunk=1 << 20):
+              buf = bytearray()
+              while len(buf) < size:
+                  end = min(len(buf) + chunk - 1, size - 1)
+                  req = urllib.request.Request(
+                      RAW_CDN % (REPO, path),
+                      headers={"Range": "bytes=%d-%d" % (len(buf), end),
+                               "User-Agent": "v8-sync"})
+                  with urllib.request.urlopen(req, timeout=120) as resp:
+                      part = resp.read()
+                  if not part:
+                      raise ValueError("分块返回空 @%d" % len(buf))
+                  buf += part
+              return bytes(buf)
+
+          def _fetch_api_b64(sha):
+              body, ce = _api_get("/repos/%s/git/blobs/%s" % (REPO, sha),
+                                  "application/vnd.github+json")
+              return base64.b64decode(json.loads(_decomp(body, ce).decode())["content"])
+
+          def _fetch_urllib_gzip(sha):
+              """兜底层（保留旧 urllib 路径）—— 不可省：
+                 `urllib` 会读 http(s)_proxy 环境变量并自动补 User-Agent，而 `http.client`
+                 **两者都不做**。若 runner 侧存在代理（单位机常见），keep-alive 两层会全灭；
+                 有这一层则最坏只是「慢」（退回旧路径 + gzip），而非整步失败。"""
+              url = "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, sha)
+              hdr = dict(H)
+              hdr["Accept"] = "application/vnd.github.raw"
+              hdr["Accept-Encoding"] = "gzip, deflate"
+              hdr["User-Agent"] = "v8-algo-cloud-sync"
+              resp = urllib.request.urlopen(urllib.request.Request(url, headers=hdr), timeout=180)
+              return _decomp(resp.read(), resp.headers.get("Content-Encoding"))
+
+          def fetch_blob(sha, path="", size=0, tries=3):
+              last = None
+              for i in range(tries):
+                  tiers = [("gzip", lambda: _fetch_api_gzip(sha))]
+                  if CDN_OK and size:
+                      tiers.append(("cdn", lambda: _fetch_cdn_ranges(path, size)))
+                  tiers.append(("urllib", lambda: _fetch_urllib_gzip(sha)))
+                  tiers.append(("b64", lambda: _fetch_api_b64(sha)))
+                  for name, fn in tiers:
+                      try:
+                          data = fn()
+                          if sha_of(data) != sha:
+                              raise ValueError("sha mismatch (truncated?) got %d bytes" % len(data))
+                          return data
+                      except Exception as e:
+                          last = e
+                          print("  blob retry %d [%s]: %s" % (i + 1, name, e), flush=True)
+                  time.sleep(min(2 ** i, 10))
               raise SystemExit("blob fetch failed: %s (%s)" % (sha, last))
 
           # [ALIMI 2026-09-12 v2] 分层 tree 枚举（一劳永逸）。
@@ -295,7 +422,14 @@ jobs:
           #   cn-chain P0 fixed in 9d989f5f5666.
           #   Half-sync is worse than no sync (it pushes a crippled tree up)
           #   => missing root subtree MUST hard-fail.
-          ROOT_REQUIRED = ("algorithms", "data", "raw_data", "scripts")
+          ROOT_REQUIRED = ("algorithms", "data", "raw_data", "scripts", "v8", ".github")
+          # 🛡 2026-09-21 03:4x 阿狸咪补两项（应答小九 §五.1「v8/ 是否应纳入」）：
+          #   · "v8" —— 实测是**主链依赖**，非旁枝：algorithms/run_algorithms.py 的 ORDER 含
+          #     v8/factor_lab_gen.py（B 批最前 → data/FACTOR_LAB.js）、v8/backtest_crds.py（E 批
+          #     → data/CRDS_BACKTEST.js）、v8/fetch_citic_pe.py + v8/gen_citic_pe.py（→ CITIC_PE_THERMO）。
+          #     缺 v8/ ⇒ 这些模块永久停更（历史上正是「零调度成孤儿」那批）。
+          #   · ".github" —— 本 workflow 自己就依赖它：.github/scripts/v8_stage_gate.py（批次唯一决策点）
+          #     与 dedup_fetch_manifest.py，全文被引用 10 处。缺它 ⇒ 闸门/清单双失败。
 
           def _pruned(path):
               """路径是否命中剪枝（须同时支持「目录条目」与「其下文件」两种形态）。
@@ -317,7 +451,8 @@ jobs:
                   return None
               out = []
               for e in d["tree"]:
-                  out.append((prefix + e["path"], e["type"], e["sha"]))
+                  # 🛡 2026-09-21 阿狸咪：带上 size —— 分块续传（CDN Range）必须先知道文件总长。
+                  out.append((prefix + e["path"], e["type"], e["sha"], e.get("size", 0)))
               return out
 
           def walk_tree(root_sha):
@@ -332,7 +467,7 @@ jobs:
                   _ents = _tree_entries(_sha, _prefix)
                   if _ents is None:
                       return _want, _heavy, False
-                  for _p, _t, _s in _ents:
+                  for _p, _t, _s, _sz in _ents:
                       if _t == "tree":
                           if _pruned(_p):
                               _heavy += 1        # 整棵子树剪枝，绝不发请求
@@ -344,7 +479,7 @@ jobs:
                           if _pruned(_p):
                               _heavy += 1
                               continue
-                          _want.append((_p, _s))
+                          _want.append((_p, _s, _sz))
               return _want, _heavy, True
 
           _root = get_json("https://api.github.com/repos/%s/git/trees/main" % REPO)
@@ -355,40 +490,61 @@ jobs:
               # 🛡 半量同步比不同步更危险（会把工作区残缺树推上去）→ 必须硬失败
               raise SystemExit("分层枚举未完整（want=%d complete=%s），拒绝冷启动同步"
                                % (len(want), _complete))
-          print("files to sync: %d (pruned subtrees/blobs: %d)" % (len(want), skipped_heavy), flush=True)
-          ok = 0; skipped = 0
-          # 🛡 2026-09-11 20:2x：脚本内软预算（默认 1080s = 18 分钟）。
-          #   超预算即收尾（已同步的文件保留），避免被 GitHub 硬杀在半途、且让日志有结论。
+          print("files to sync: %d (pruned subtrees/blobs: %d, cdn=%s)"
+                % (len(want), skipped_heavy, CDN_OK), flush=True)
+          ok = 0; skipped = 0; failed = []
+          tot_bytes = 0
+          # 🛡 2026-09-11 20:2x：脚本内软预算。
+          # 🛡 2026-09-21 03:4x 阿狸咪：1080 → 2400。旧值结构性倒挂（比实测耗时 1106~1293s 还小）
+          #   ⇒ 必然半量收尾（实测 438/1293）。关系铁律：软预算必须 < 步骤硬超时（45min=2700s）
+          #   且留足收尾余量（≥300s），否则「软预算先到 + 静默收尾」= 半量同步。
           _t0 = time.time()
-          BUDGET = float(os.environ.get("V8_SYNC_BUDGET", "1080"))
-          for p, sha in want:
+          BUDGET = float(os.environ.get("V8_SYNC_BUDGET", "2400"))
+          _budget_hit = False
+          for p, sha, _sz in want:
               if (time.time() - _t0) > BUDGET:
-                  print("  ⏱ 预算 %.0fs 用尽，本轮剩余 %d 个文件跳过（已同步 %d）"
+                  print("  ⏱ 预算 %.0fs 用尽，本轮剩余 %d 个文件未处理（已同步 %d）"
                         % (BUDGET, len(want) - ok, ok), flush=True)
+                  _budget_hit = True
                   break
               lp = os.path.join(".", p)
               if local_blob_sha(lp) == sha:
                   skipped += 1; ok += 1; continue
               try:
-                  data = fetch_blob(sha)
+                  data = fetch_blob(sha, p, _sz)
               except SystemExit:
-                  # 容错：任何文件下载失败都跳过而非整步死掉（非关键文件缺失好过全链阻塞）
-                  print("  SKIP failed download: %s" % p, flush=True)
-                  ok += 1; continue
+                  # 🛡 2026-09-21 阿狸咪：旧版此处 `ok += 1` ⇒ 失败文件被算进「已同步」，
+                  #   日志打出 `OK source sync done: N/N` = 假绿（实测 index.html 就走过这条路）。
+                  #   现改为单独计数并在收尾统一硬失败。
+                  print("  ❌ FAILED download: %s" % p, flush=True)
+                  failed.append(p); continue
               parent = os.path.dirname(lp)
               if parent:
                   os.makedirs(parent, exist_ok=True)
               with open(lp, "wb") as f:
                   f.write(data)
-              ok += 1
-          print("OK source sync done: %d/%d (unchanged: %d)" % (ok, len(want), skipped), flush=True)
+              ok += 1; tot_bytes += len(data)
+          print("OK source sync done: %d/%d (unchanged: %d, failed: %d, downloaded: %.1f MB, %.0fs)"
+                % (ok, len(want), skipped, len(failed), tot_bytes / 1048576.0, time.time() - _t0),
+                flush=True)
+
+          # 🛡 2026-09-21 03:4x 阿狸咪：**拒绝半量同步**（与上方 ROOT_REQUIRED 同旨，补它的盲区）。
+          #   ROOT_REQUIRED 只查顶层子树「存在性」，拦不住「顶层都在、但只同步了 1/3」这一实际发生过的形态。
+          #   半量比不同步更危险：链尾「唯一推送」会拿残缺工作区去推，而工作区里 index.html / data/*.js
+          #   若是上一轮的陈旧副本，会被当「当前源码」改写后推上线（前端回退 / 陈旧数据上线）。
+          #   故只允许两种结局：**全量成功** 或 **硬失败**（绝不静默降级）。
+          if _budget_hit or failed:
+              print("  🛑 同步不完整（budget_hit=%s, failed=%d）：%s"
+                    % (_budget_hit, len(failed), ", ".join(failed[:20]) or "-"), flush=True)
+              raise SystemExit("partial sync refused: synced %d/%d, failed %d, budget_hit=%s"
+                               % (ok, len(want), len(failed), _budget_hit))
 
           # P0 2026-09-20 xiaojiu: post-sync root-subtree self-check.
           #   Missing any required top-level subtree => hard fail. Better the
           #   chain goes red than a crippled workspace gets pushed upstream.
           _missing_root = [d for d in ROOT_REQUIRED
                            if not any(p == d or p.startswith(d + "/")
-                                      for p, _s in want)]
+                                      for p, _s, _z in want)]
           if _missing_root:
               raise SystemExit("root-required check failed: missing top-level"
                                " subtree(s) %s, refusing partial sync"
