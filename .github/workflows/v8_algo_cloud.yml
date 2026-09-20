@@ -88,6 +88,13 @@ on:
         description: '批次(留空=由批次闸门按内容级就绪自动判定，推荐留空)：A=采集 B=选股 D=汇总 E=回测 all=全链应急'
         type: string
         default: ''
+      # 2026-09-20 审计补（主人拍板「用周五数据重跑」）：数据日指定入参。
+      #   留空 = 按今天（原行为，零回归）。
+      #   消费链：inputs.chain_day -> EX_DAY -> v8_stage_gate.py --today <日>
+      chain_day:
+        description: '数据日(YYYY-MM-DD，留空=今天)：指定以哪一天为数据日重跑，例 2026-09-18'
+        type: string
+        default: ''
 
 permissions:
   contents: write
