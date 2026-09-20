@@ -5299,7 +5299,14 @@ function fmtSigned(v){
           🛡 2026-09-16 阿狸咪的工程师：原实现写死 null ⇒ 卡2「最佳/最差」列永远 —，
           而数据其实一直存在，只是没取。 */
   window.__tripleBacktestAdapted = function(){
-    if(window.__tripleBacktestCache) return window.__tripleBacktestCache;
+    /* 🔴 2026-09-20 阿狸咪的工程师：删掉结果缓存 —— 与 __strongTrackBacktest 同一铁律
+       （见下方「2026-09-16 实证踩坑：绝不能缓存」）。data/BACKTEST_COMPREHENSIVE.js 是
+       **defer 加载**，首屏渲染时 window.BACKTEST_COMPREHENSIVE 可能仍 undefined；
+       旧写法会把「空结果」（total_signals:0 / by_period:{}）写进 __tripleBacktestCache，
+       此后**数据即使已到位也永远返回空** ⇒ 三重共识回测卡永久显示「暂无历史回测信号」。
+       2026-09-20 受控复现实证：屏蔽该数据脚本 → 卡显示暂无；解除屏蔽并注入脚本
+       （BC.update_time=2026-09-19 17:58:29 已就位）后重渲染，卡仍为暂无 ⇒ 缓存固化成立。
+       本函数开销极小（一次遍历 12 个档位），改每次实时取数，数据一到即自动正确。 */
     var BC = window.BACKTEST_COMPREHENSIVE || {};
     var cmp = BC.comparison || {};
     /* 🛡 2026-09-16 阿狸咪的工程师：best/worst 真源（与 cmp 同源同口径，已实测逐项相等）*/
@@ -5332,7 +5339,6 @@ function fmtSigned(v){
       cost_adjusted: BC.cost_adjusted,
       by_period: byPeriod
     }};
-    window.__tripleBacktestCache = out;
     return out;
   };
 
@@ -5693,10 +5699,12 @@ function fmtSigned(v){
     try{ return String(c==null?'':c).toLowerCase().trim().replace(/^[.\s]*(sh|sz|bj)?[.\s]*/,''); }catch(e){ return String(c||''); }
   };
   window.__gaoshouSet = function(){
-    if(window.__gaoshouSetCache) return window.__gaoshouSetCache;
+    /* 🔴 2026-09-20 阿狸咪的工程师：同上，删掉结果缓存。data/IMA_STRONG_STOCK.js 亦为
+       **defer 加载**：首屏若未就绪，旧写法会把「空集」写进 __gaoshouSetCache，此后
+       __inGaoshouReso / __gaoshouResoCount 恒判 false ⇒ 高手共振口径永久失真。
+       构建开销仅为遍历该文件成员（几十条），极小，改每次实时取数。 */
     var _m = {};
     try{ ((window.IMA_STRONG_STOCK && window.IMA_STRONG_STOCK.stocks) || []).forEach(function(s){ if(s && s.code) _m[window.__v8NormCode(s.code)] = s; }); }catch(e){}
-    window.__gaoshouSetCache = _m;
     return _m;
   };
   window.__inGaoshouReso = function(code){ return !!window.__gaoshouSet()[window.__v8NormCode(code)]; };
@@ -6261,7 +6269,13 @@ function fmtSigned(v){
       /* 🗑️ 2026-09-20 主人令：原「β 依赖」审计警示块（_betaWarn['因子实验室']，
          判据 FACTOR_LAB_BACKTEST.abnormal_volume.spread_oos_pct<=0）随因子实验室行
          一并移除 —— 本表已无该行，警示无挂靠对象；样本外无效的结论由
-         最终推荐页「✅ 回测已达标」徽章（数据真值投影）继续承载。 */
+         最终推荐页「✅ 回测已达标」徽章（数据真值投影）继续承载。
+         🔴 2026-09-20 阿狸咪的工程师（补）：同一次删除**漏删了引用方** ——
+         下方 _betaCell() 函数体首行仍写 _betaWarn[card]，调用点在 _btMainRow 的
+         「策略」格。定义移除后每次渲染本表都抛
+         ReferenceError: _betaWarn is not defined，异常打断整个回测概览渲染，
+         其后的卡片（三重共识明细等）全部停在模板占位「暂无历史回测信号」。
+         现把该函数与其唯一调用点**一并删净**，杜绝悬空引用。 */
 
       /* ── 同卡档位形态 + 「挑选偏差」判据（2026-09-16 审计实证校准）──
          🔴 判据不能只看极差！实测：
@@ -6361,14 +6375,6 @@ function fmtSigned(v){
         return '<span style="color:var(--sub);font-size:11px;white-space:nowrap;" title="'
              + _esc(_tip) + '">' + _esc(t) + '</span>';
       }
-      function _betaCell(card){
-        var bw = _betaWarn[card];
-        if(!bw) return '';
-        return '<span title="' + _esc(bw.tip) + '"'
-             + ' style="font-size:9.5px;color:#ef5350;background:rgba(239,83,80,.12);'
-             + 'border:1px solid rgba(239,83,80,.35);padding:1px 5px;border-radius:8px;'
-             + 'white-space:nowrap;margin-left:5px;">' + _esc(bw.txt) + '</span>';
-      }
 
       var h = '';
       /* ── 唯一总表：算法 × 最佳持有期（合并原「最优组合榜」与「主对比表」）── */
@@ -6445,7 +6451,7 @@ function fmtSigned(v){
         h += '<tr style="border-bottom:1px solid var(--border2);">'
           +  '<td style="padding:6px;color:var(--sub);font-weight:700;">' + num + '</td>'
           +  '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">' + _esc((r.icon||'')+r.card)
-          +     _stars(r.card) + _provBadge(r.card, r) + _betaCell(r.card) + '</td>'
+          +     _stars(r.card) + _provBadge(r.card, r) + '</td>'
           +  '<td style="padding:6px;color:var(--dim);font-size:11px;white-space:nowrap;">'
           +     (_stars(r.card) ? '' : (r.card === '强势跟踪' ? '未评星（外部源）' : '累积中')) + '</td>'
           +  '<td style="padding:6px;color:var(--txt);font-size:11px;font-weight:700;white-space:nowrap;">持有 ' + _holdDays(r) + ' 日</td>'
