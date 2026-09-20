@@ -13,7 +13,26 @@
 import re
 import hashlib
 import pathlib
+import os
 import urllib.request
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 🛑 2026-09-20 阿狸咪的工程师 · 停写护栏（?v 口径已于 2026-09-10 主人令废除）
+# ══════════════════════════════════════════════════════════════════════════════
+# 本脚本写出的 ?v 是「sha1 内容哈希」口径，已被废除
+#   （原因：数据被回滚时哈希恰好等于旧版 ⇒ 浏览器永远吐旧数据，表现为「最终推荐回退到2天前」）。
+# 现行权威口径 = **单调 unix 秒令牌**，唯一实现 = update_v8.py::_data_file_update_time()，
+# 唯一正确调用方 = .github/workflows/v8_cache_buster_reconcile.yml
+#   （每 15 分钟 + 每次 data push：git fetch+reset --hard origin/main → python update_v8.py --only-cache-busters）。
+# ⇒ 本脚本已被取代。继续运行只会在 index.html 里写回废除口径，
+#   并被 v8_build_deploy.yml 提交前核验判为「?v 出现非 unix 秒令牌(旧内容哈希口径回潮)」。
+# 如需临时强制旧行为（**仅供取证，禁用于生产**）：设环境变量 V8_ALLOW_OBSOLETE_CB=1。
+if os.environ.get("V8_ALLOW_OBSOLETE_CB") != "1":
+    print("🛑 fix_cachebusters_cdn.py 已停用：?v 口径已于 2026-09-10 由内容哈希改为单调 unix 秒令牌")
+    print("   正解：python update_v8.py --only-cache-busters")
+    print("   （或交给 .github/workflows/v8_cache_buster_reconcile.yml 每 15 分钟自动对齐）")
+    print("   强制旧行为（仅取证）：V8_ALLOW_OBSOLETE_CB=1")
+    raise SystemExit(1)
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SITE = "https://ah-quant999.github.io/quant-scanner-v8"

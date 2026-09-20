@@ -59,6 +59,53 @@ def git_show(rel):
         return None
 
 
+def _check_cache_busters(txt):
+    """?v 形状门禁（替代 2026-09-10 已废除的「内容哈希比对」口径）。
+
+    🔴 2026-09-20 阿狸咪的工程师 · 根因修复：
+      原实现对每个 data/*.js **下载线上内容**算 sha1 前 10 位，与 index.html 里的 ?v 比对。
+      但 ?v 口径已于 2026-09-10 主人令改为**单调 unix 秒令牌**
+      （原因：内容哈希在数据回滚时恰好等于旧版 ⇒ 浏览器永远吐旧数据），
+      两者数学上永不相等 ⇒ 本检查**每天必然报 109 条假失配**，
+      进而触发 v8_daily_audit.yml 的「?v 失配自愈」步骤用**旧口径回写** index.html
+      （被 v8_build_deploy.yml 提交前核验判为「旧内容哈希口径回潮」），
+      形成「晚间旧口径写回 → 白天 build 再写回令牌」的每日往返。
+
+      令牌口径下「?v 与内容哈希相等」在定义上就不成立，**内容比对无意义**。
+      故改为形状门禁：只校验形态，不下载 data 文件。
+      真正的内容级一致性由 v8_cache_buster_reconcile.yml（每 15 分钟 + 每次 data push，
+      fetch+reset --hard origin/main → update_v8.py --only-cache-busters）保证。
+
+    附带收益：不再逐文件下载 109 个 data 文件（审计更快、CDN 压力更小）。
+    """
+    probs = []
+    pat = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?v=([0-9a-zA-Z]+))?\1')
+    missing, oldfmt, ok = [], [], 0
+    for m in pat.finditer(txt):
+        fname = m.group(2).split("/")[-1]
+        v = m.group(3)
+        if not v:
+            missing.append(fname)
+        elif not v.isdigit():
+            oldfmt.append("%s(?v=%s)" % (fname, v))
+        else:
+            ok += 1
+    if missing:
+        probs.append("?v缺失 %d 个（浏览器/CDN 会长期缓存旧副本）: %s"
+                     % (len(missing), ", ".join(missing[:8])))
+    if oldfmt:
+        probs.append("?v非单调unix秒令牌（旧内容哈希口径回潮）%d 个: %s"
+                     % (len(oldfmt), ", ".join(oldfmt[:8])))
+    # v6_memo.html 的 ?v 走**另一套**口径（原始字节 sha1 前 10 位 hex，由 guard_v6_memo.py 维护），
+    # 与 data/*.js 的令牌口径不同，不能混判。
+    v6s = [x for x in re.findall(r'v6_memo\.html(?:\?v=([0-9a-zA-Z]+))?', txt) if x]
+    bad6 = [x for x in v6s if not re.fullmatch(r'[0-9a-f]{10}', x)]
+    if bad6:
+        probs.append("v6_memo.html ?v 形态异常（应为 10 位内容哈希）: %s" % ", ".join(bad6[:5]))
+    print("  ?v 形状门禁：数字令牌 %d 个 / 缺失 %d / 旧口径 %d / v6 %d 个"
+          % (ok, len(missing), len(oldfmt), len(v6s)))
+    return probs
+
 def main():
     import argparse
     ap = argparse.ArgumentParser()
@@ -71,29 +118,12 @@ def main():
     if not args.cloud:
         subprocess.run(["git", "fetch", "origin", "main"], cwd=str(ROOT), timeout=60)
 
-    # 1) ?v 真失配
+    # 1) ?v 形状门禁（2026-09-20 阿狸咪的工程师：随 ?v 口径变更同步）
     idx_online = download("%s/index.html" % SITE)
     if isinstance(idx_online, tuple):
         problems.append("线上 index.html 下载失败: %s" % idx_online[1])
     else:
-        txt = idx_online.decode("utf-8", "replace")
-        pat = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?v=([0-9a-fA-F]{1,40}))?\1')
-        for m in pat.finditer(txt):
-            fname = m.group(2).split("/")[-1]
-            v = m.group(3)
-            remote = download("%s/data/%s" % (SITE, fname))
-            if isinstance(remote, tuple):
-                continue
-            calc = hashlib.sha1(neut(remote)).hexdigest()[:10]
-            if v != calc:
-                problems.append("?v失配: %s 线上?v=%s 实算=%s" % (fname, v, calc))
-        mv = re.search(r'v6_memo\.html(?:\?v=([0-9a-fA-F]{1,40}))?', txt)
-        if mv:
-            v6 = download("%s/v6_memo.html" % SITE)
-            if not isinstance(v6, tuple):
-                calc = hashlib.sha1(v6).hexdigest()[:10]
-                if mv.group(1) != calc:
-                    problems.append("?v失配: v6_memo.html 线上?v=%s 实算=%s" % (mv.group(1), calc))
+        problems += _check_cache_busters(idx_online.decode("utf-8", "replace"))
 
     # 2) 5 组件全链路（本地 vs 线上）
     # ⚠️ 2026-08-16 修正：本项目部署走「Contents API 直推 + build 重写」，本地 index.html 是
