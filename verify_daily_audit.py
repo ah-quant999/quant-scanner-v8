@@ -62,11 +62,14 @@ def get_today_origin_commits():
         return None  # 信号：无法判定
 
     # git log origin/main --since=YYYY-MM-DDT00:00:00+08:00 --until=tomorrow
+    # 🛡 2026-09-20 小九（本机审计修复）：改为输出「sha|作者名|作者邮箱|提交者名|主题」，
+    #   使自动化判定可依据【提交身份】而非仅【消息前缀】—— 见 is_auto_commit 说明。
+    #   兼容：旧调用方拿到的仍是 (short_sha, subject) 二元组，身份信息挂在第 3 元 dict 上。
     since = f"{today_cst}T00:00:00+08:00"
     rc, out, err = run([
         "git", "log", "origin/main",
         f"--since={since}",
-        "--format=%h %s",
+        "--format=%h%x1f%an%x1f%ae%x1f%cn%x1f%s",
     ], cwd=ROOT)
     if rc != 0:
         print(f"⚠️ git log origin/main 失败：{err}")
@@ -77,9 +80,14 @@ def get_today_origin_commits():
         line = line.strip()
         if not line:
             continue
-        parts = line.split(" ", 1)
-        if len(parts) == 2 and re.match(r"^[0-9a-f]+$", parts[0]):
-            commits.append((parts[0], parts[1]))
+        # %x1f = 单元分隔符，防 subject 内含分隔字符造成错位
+        parts = line.split("\x1f")
+        if len(parts) >= 5 and re.match(r"^[0-9a-f]+$", parts[0]):
+            commits.append((parts[0], parts[4], {
+                "an": parts[1], "ae": parts[2], "cn": parts[3],
+            }))
+        elif len(parts) == 2 and re.match(r"^[0-9a-f]+$", parts[0]):
+            commits.append((parts[0], parts[1], {}))   # 容错：老格式
     return commits
 
 
@@ -174,8 +182,57 @@ COMMIT_TYPE_PREFIX = re.compile(
 )
 
 
-def is_auto_commit(subject):
-    return any(subject.startswith(p) for p in AUTO_COMMIT_PREFIXES)
+# 🔴🔴 2026-09-20 小九（本机审计·一劳永逸）：自动化判定从「仅消息前缀」升级为
+#   「提交身份 + 消息前缀」双判，任一命中即视为自动化（取或）。
+#
+#   病根（实测）：线上近 400 条 commit 里，bot 身份但前缀未入白名单的有 71 条 ——
+#     github-actions[bot] 的 `v8 cn fetch:`(64) / `audit:` / `audit-heal:` / `v8 healthcheck:`、
+#     v8-cloud-bot 的 `v8 risk gauge:` 等。
+#   后果：verify_daily_audit 把它们当「人工 commit」要求关键词在交接档命中 → 永不命中
+#         → 「未提及比例 100% > 50%」→ 结构性硬失败 → v8_backup.yml 连续 5 天(09-16~09-20)阻断。
+#   为何不继续补前缀：每新增一个 workflow 就漏一个前缀（历史已反复发生），
+#     且 4 个 bot 身份在同一仓库共写，前缀枚举必然滞后。
+#   🔴 人工身份必须保持被审计（不得加入本集合）：
+#        ah-quant999 / xiaojiu / 小九的工程师 / 阿狸咪的工程师 / lemoncat-cn / 2814546@qq.com
+BOT_IDENTITIES = {
+    # ── 已知机器人身份（机器名 / 邮箱，任一字段命中即算自动化）──
+    "v8-cloud-bot", "v8-bot",
+    "github-actions[bot]", "GitHub",
+    "v8-cache-bot", "v8-backup-bot", "v8-deploy",
+    "v8-docs-bot", "v8-risk-bot",
+}
+BOT_EMAIL_MARKERS = (
+    "v8-bot@users.noreply.github.com",
+    "github-actions[bot]@users.noreply.github.com",   # 含 41898282+ 前缀，用后缀匹配
+    "bot@quant-scanner.local",
+    "@users.noreply.github.com",                       # 兜底：任何 noreply 机器人邮箱
+    "noreply@github.com",
+)
+
+
+def is_bot_identity(meta):
+    """按提交身份判定是否自动化（meta = {an, ae, cn}）。无法判定时返回 False（留人工审计）。"""
+    if not meta:
+        return False
+    an = (meta.get("an") or "").strip()
+    ae = (meta.get("ae") or "").strip().lower()
+    cn = (meta.get("cn") or "").strip()
+    if an in BOT_IDENTITIES or cn in BOT_IDENTITIES:
+        return True
+    for marker in BOT_EMAIL_MARKERS:
+        if ae.endswith(marker.lower()):
+            # 兜底标记收紧：明确人工邮箱不得误伤
+            if ae.startswith("2814546@"):
+                return False
+            return True
+    return False
+
+
+def is_auto_commit(subject, meta=None):
+    """自动化 commit 判定 = 消息前缀命中 OR 提交身份命中（取或）。"""
+    if any(subject.startswith(p) for p in AUTO_COMMIT_PREFIXES):
+        return True
+    return is_bot_identity(meta)
 
 
 def extract_keywords(subject):
@@ -216,8 +273,22 @@ def check_commits_audit(commits, handover_texts):
 
     all_text = "\n".join(t for _, t in handover_texts)
 
-    auto_commits   = [(s, sub) for s, sub in commits if is_auto_commit(sub)]
-    manual_commits = [(s, sub) for s, sub in commits if not is_auto_commit(sub)]
+    # 🛡 2026-09-20 三元组解包（sha, subject, meta）；meta 供身份判定用
+    def _split(c):
+        return (c[0], c[1], c[2] if len(c) > 2 else {})
+
+    _all = [_split(c) for c in commits]
+    auto_commits   = [(s, sub) for s, sub, mt in _all if is_auto_commit(sub, mt)]
+    manual_commits = [(s, sub) for s, sub, mt in _all if not is_auto_commit(sub, mt)]
+
+    # 诊断：被身份判定（非前缀）识别出来的自动化 commit，便于核验白名单是否覆盖到位
+    _by_identity = [(s, sub, mt.get("an") or "?")
+                    for s, sub, mt in _all
+                    if is_bot_identity(mt) and not any(sub.startswith(p) for p in AUTO_COMMIT_PREFIXES)]
+    if _by_identity:
+        print(f"  ℹ️ 其中 {len(_by_identity)} 条由【提交身份】判为自动化（消息前缀未覆盖）—— 已不计入人工审计")
+        for s, sub, who in _by_identity[:5]:
+            print(f"      · {s} [{who}] {sub[:60]}")
 
     not_mentioned = []
     for short, subj in manual_commits:
