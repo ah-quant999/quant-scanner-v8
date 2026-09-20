@@ -284,6 +284,19 @@ jobs:
           SKIP_PREFIX = ("backup", "docs", "raw_data/kline_cache",
                          "legacy_v6", "out", "tdx_formulas")
 
+          # P0 2026-09-20 xiaojiu: root-required whitelist.
+          #   This step prunes via SKIP_PREFIX (blacklist); data/ is NOT in it,
+          #   so data/*.js normally syncs. But there is NO root guard: if the
+          #   root-tree response is truncated cross-border (seen: 1.24MB/26.4s/
+          #   IncompleteRead) or any level errors out, pruning silently
+          #   under-syncs without failing => final_recommend.py reads a stale
+          #   data/FACTOR_LAB.js => 20 waits all fail => _fl_degraded=True =>
+          #   plan-B factor fusion is skipped 100%%. Same root cause as the
+          #   cn-chain P0 fixed in 9d989f5f5666.
+          #   Half-sync is worse than no sync (it pushes a crippled tree up)
+          #   => missing root subtree MUST hard-fail.
+          ROOT_REQUIRED = ("algorithms", "data", "raw_data", "scripts")
+
           def _pruned(path):
               """路径是否命中剪枝（须同时支持「目录条目」与「其下文件」两种形态）。
 
@@ -369,6 +382,19 @@ jobs:
                   f.write(data)
               ok += 1
           print("OK source sync done: %d/%d (unchanged: %d)" % (ok, len(want), skipped), flush=True)
+
+          # P0 2026-09-20 xiaojiu: post-sync root-subtree self-check.
+          #   Missing any required top-level subtree => hard fail. Better the
+          #   chain goes red than a crippled workspace gets pushed upstream.
+          _missing_root = [d for d in ROOT_REQUIRED
+                           if not any(p == d or p.startswith(d + "/")
+                                      for p, _s in want)]
+          if _missing_root:
+              raise SystemExit("root-required check failed: missing top-level"
+                               " subtree(s) %s, refusing partial sync"
+                               % _missing_root)
+          print("OK root required present: %s"
+                % (list(ROOT_REQUIRED),), flush=True)
           PYEOF
           python "$RUNNER_TEMP/sync_src_v8cloud.py"
 
