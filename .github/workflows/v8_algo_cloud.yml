@@ -891,6 +891,15 @@ jobs:
           if [ "${KIND:-none}" = "none" ]; then
             echo "::notice title=v8-algo-holiday::休市日（无 T+1 需求），不跑算法链（合规）"; exit 0
           fi
+          # 🛡 2026-09-20 阿狸咪的工程师（休市段第2天问责必红·一劳永逸根治配套）：
+          #   数据日(段首 chain_day) ≠ 实际运行日 ⇒ 我们正处在休市段第2天（或更后）。
+          #   各批脚本一律用 now 打 update_time，故产物戳落在「实际运行日」而非段首；
+          #   v8_stage_gate.py --recheck 已对此场景放宽为「戳落在运行日也判 OK」（交易日语义不变）。
+          #   此处仅补一条可见化 ::notice，说明为何产物日期≠数据日，便于人读排障，不改 RC。
+          TODAY_CST=$(python -c "import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(hours=8)).strftime('%Y-%m-%d'))")
+          if [ "${DAY:-}" != "${TODAY_CST}" ] && [ "${KIND:-}" = "t1" ]; then
+            echo "::notice title=v8-algo-holiday-2nd-day::数据日 ${DAY}（段首）≠ 实际运行日 ${TODAY_CST}（休市段第2天）—— 产物按运行日打戳，已按运行日口径核验（合规，非故障）"
+          fi
           # ⏰ 2026-09-11 小九的工程师：盘中时段闸门拦截 = 合规空转（非假成功，非故障）。
           #   必须在下方「OK 检查」之前返回，否则会打出「批完成·产物核验通过」的误导结论。
           if [ "${TGT:-}" = "MARKET_HOURS_BLOCKED" ]; then

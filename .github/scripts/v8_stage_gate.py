@@ -501,7 +501,8 @@ SEQ_REF: dict[str, str] = {
 }
 
 
-def check_ready(root: str, stage: str, day: str, floor: tuple[int, int], kind: str = "trading"):
+def check_ready(root: str, stage: str, day: str, floor: tuple[int, int],
+                kind: str = "trading", run_day: str | None = None):
     """返回 (是否就绪, '命中/总数', 明细)。
 
     ⚠️ 2026-09-19 起，明细里可能出现 `VINTAGE_LAG(文件 数据日=X≠链数据日=Y)`
@@ -510,6 +511,14 @@ def check_ready(root: str, stage: str, day: str, floor: tuple[int, int], kind: s
     kind='t1'（周六/假期首日）时放宽 A 采集批：T+1 日数据天然是「部分刷新」，
       若仍按交易日 3/3 + 龙虎榜必新，A 会永远不就绪 → 整条 T+1 链卡死（漏档）。
       放宽为「任一 A 产物当日刷新即视为采集完成」，把节奏交给 B/D/E 三批。
+
+    🛡 2026-09-20 一劳永逸（阿狸咪的工程师·休市段第2天问责必红根治）：
+      各批脚本一律用 `now` 写 update_time（实际运行日），因此「为过去的段首(chain_day)
+      在休市段第2天重跑/补跑」时，产物戳必落在**实际运行日(run_day)** 而非段首(day)
+      ⇒ 问责判据 `c[0]==day` 永不满足 ⇒ `ready_ok_B=false` ⇒ run 必 RC=1 假红。
+      修正：当 `run_day` 与 `day` 不同（即「为过去段首补跑/重跑」）时，允许产物戳落在
+      run_day 也判 OK。**交易日 run_day==day，语义完全不变**；本修正只对「运行日≠数据日」
+      的假日/补跑场景生效，且仍以 floor 时刻门槛守门（不会把陈旧产物放过）。
     """
     spec = READY_SPEC[stage]
     need = spec["need"]
@@ -517,12 +526,18 @@ def check_ready(root: str, stage: str, day: str, floor: tuple[int, int], kind: s
     if kind != "trading" and stage == "A":
         need, must = 1, []
     hit, must_ok, parts = 0, True, []
+    # 🛡 2026-09-20 休市段第2天根治：运行日≠数据日时，产物戳落在运行日也判 OK
+    _run_day_tol = bool(run_day and run_day != day)
     for it in spec["items"]:
         r = read_ut(root, it)
-        ok = bool(r and any(c[0] == day and (c[1], c[2]) >= floor for c in _cand(r)))
+        ok = bool(r and any(
+            ((c[0] == day) or (_run_day_tol and c[0] == run_day))
+            and (c[1], c[2]) >= floor
+            for c in _cand(r)))
         if ok:
             hit += 1
-            parts.append(f"{os.path.basename(it)}=OK({r[0]} {r[1]:02d}:{r[2]:02d})")
+            _tag = "·运行日" if (_run_day_tol and r[0] == run_day) else ""
+            parts.append(f"{os.path.basename(it)}=OK({r[0]} {r[1]:02d}:{r[2]:02d}{_tag})")
         elif r:
             parts.append(f"{os.path.basename(it)}=STALE({r[0]} {r[1]:02d}:{r[2]:02d})")
         else:
@@ -603,7 +618,7 @@ def chain_day(ref: dt.date, lookback: int = 0):
     return None, "none", "非交易日（休市，无 T+1 需求）"
 
 
-def _backfill_candidate(root: str, ref: dt.date):
+def _backfill_candidate(root: str, ref: dt.date, run_day: str | None = None):
     """上一数据日仍有未完成批次时返回 (day, kind, note, ready)，否则 None。
 
     🛡 2026-09-11 一劳永逸（闸门死区根治）：
@@ -624,7 +639,7 @@ def _backfill_candidate(root: str, ref: dt.date):
         return None
     pfloor = FLOOR_TRADING if pkind == "trading" else FLOOR_T1
     pday_s = pday.strftime("%Y-%m-%d")
-    pready = {s: check_ready(root, s, pday_s, pfloor, pkind) for s in READY_SPEC}
+    pready = {s: check_ready(root, s, pday_s, pfloor, pkind, run_day) for s in READY_SPEC}
     if all(pready[s][0] for s in ("A", "B", "D", "E")):
         return None
     missing = "/".join(s for s in ("A", "B", "D", "E") if not pready[s][0])
@@ -664,7 +679,7 @@ def _backfill_feasible(root: str, stage: str, tday: dt.date) -> bool:
     return True
 
 
-def decide(root: str, now: dt.datetime, explicit: str, force: bool):
+def decide(root: str, now: dt.datetime, explicit: str, force: bool, run_day: str | None = None):
     hh, mm = now.hour, now.minute
     ref = now.date()
     if hh < _NIGHT_CUT:             # 凌晨归前一自然日（夜间补跑窗口）
@@ -676,7 +691,9 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool):
 
     floor = FLOOR_TRADING if kind == "trading" else FLOOR_T1
     day_s = day.strftime("%Y-%m-%d")
-    ready = {s: check_ready(root, s, day_s, floor, kind) for s in READY_SPEC}
+    # 🛡 2026-09-20 休市段第2天根治：实际运行日（真实当前 CST 日期，不被 --today 演练参数污染）
+    _run_day_s = run_day or now.date().strftime("%Y-%m-%d")
+    ready = {s: check_ready(root, s, day_s, floor, kind, _run_day_s) for s in READY_SPEC}
 
     def out():
         return {f"ready_{s}": ready[s][1] for s in ("A", "B", "D", "E")}
@@ -741,7 +758,7 @@ def decide(root: str, now: dt.datetime, explicit: str, force: bool):
     if not force and eff < start:
         # 🛡 2026-09-11 一劳永逸（死区根治）：本数据日的链还没到起点，但**上一数据日**
         #   可能中途失败没跑完 —— 此时唯一正解是补跑上一数据日（见 _backfill_candidate）。
-        _bf = _backfill_candidate(root, ref)
+        _bf = _backfill_candidate(root, ref, _run_day_s)
         if _bf is None:
             return ("NONE", True,
                     f"⏸ 未到{note}盘后链起点（{start[0]:02d}:{start[1]:02d}，现 {hh:02d}:{mm:02d}）"
@@ -843,6 +860,11 @@ def main() -> int:
     if a.minute >= 0:
         now = now.replace(minute=a.minute)
 
+    # 🛡 2026-09-20 休市段第2天根治：--today/--hour 演练参数只改 `now`（用于「数据日/时窗」推演），
+    #   但「实际运行日」必须取**真实**当前 CST 日期 —— 否则 now.date() 被 --today 污染成数据日，
+    #   产物按真实运行日打戳与数据日不符时，run_day 容错永远不触发（本轮实测坑）。
+    _run_day = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=8)).date().strftime("%Y-%m-%d")
+
     explicit = (a.explicit_stage or "").strip().upper()
 
     # ── 链尾问责模式：只按「数据日 + 门槛」复核就绪度，避免链尾另写一套新鲜度规则 ──
@@ -866,7 +888,7 @@ def main() -> int:
         ds = d.strftime("%Y-%m-%d")
         lines = [f"recheck_day={ds}", f"recheck_kind={kind}"]
         for st in ("A", "B", "D", "E"):
-            ok, cnt, _det = check_ready(a.root, st, ds, floor, kind)
+            ok, cnt, _det = check_ready(a.root, st, ds, floor, kind, _run_day)
             lines.append(f"ready_{st}={cnt}")
             # 🛡 2026-09-11 一劳永逸（阿狸咪）：把闸门的**布尔裁决**一并透出。
             #   链尾问责步曾写死 `[ "$B_FRESH" = "3/3" ]`，而本契约 2026-09-11 已改为
@@ -876,7 +898,7 @@ def main() -> int:
         print("\n".join(lines))
         return 0
 
-    target, ok, reason, day, kind, rdy = decide(a.root, now, explicit, a.force)
+    target, ok, reason, day, kind, rdy = decide(a.root, now, explicit, a.force, _run_day)
     proceed = bool(ok and target != "NONE")
 
     lines = [
@@ -892,7 +914,7 @@ def main() -> int:
         lines.append(f"{k}={v}")
     floor = FLOOR_TRADING if kind == "trading" else FLOOR_T1
     day_s = day.strftime("%Y-%m-%d") if day else "-"
-    det = " | ".join(f"{s}:{check_ready(a.root, s, day_s, floor, kind)[2]}" for s in ("A", "B", "D", "E"))
+    det = " | ".join(f"{s}:{check_ready(a.root, s, day_s, floor, kind, _run_day)[2]}" for s in ("A", "B", "D", "E"))
     lines.append(f"detail={det}")
     body = "\n".join(lines)
 
