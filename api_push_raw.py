@@ -252,6 +252,24 @@ def _blob_text(commit_ref, path, blob_sha=None, max_bytes=None, local_size=None)
 # 🛡 2026-09-08 审计产物保护（主人令）：审计轨迹只由本机审计脚本经 git 推送（audit_history.json / audit_nightly.log），
 #   绝不走 api_push_raw 裸推。否则 cn runner 工作区里的旧审计文件会经 Git Database API 覆盖 main 上的新版，
 #   吞掉历史审计轨迹（实测 09-08 多轮审计记录丢失）。此处 + main() PUSH_FILES 分支双重跳过。
+# 🛡🛡 2026-09-20 防覆盖护栏（阿狸咪的工程师，家机 alimi-cn 三查实证后落码）：
+#   **index.html 绝不从本地推。** 三条铁证（均于 2026-09-20 08:5x 复跑过）：
+#     ① 本脚本 PUSH_FILES 分支是从**本地磁盘**读文件（open(_rel, "rb")），而云端 job
+#        从 checkout 到推送有数分钟窗口 ⇒ 读-改-写竞态，与 2026-08-09 数据回退事故同一根因；
+#     ② 本脚本两道守卫对它**双双失效**：守卫基线 existing 只收 raw_data/ + data/
+#        （_GUARD_PREFIXES）⇒ remote_sha=None ⇒「内容一致」与「防倒退」两条都不生效；
+#     ③ 数据类即便守卫失效也还有 path.endswith(".json") 兜底，而 index.html 是 .html
+#        ⇒ 连这层兜底都没有（双重豁免）。
+#   已在案的真实风险面：v8_cn_fetch_experiments.yml（cron 30 8 * * 1-5 = 每日 16:30 CST）
+#     把 index.html 放进 PUSH_FILES，且**全程没有任何 git fetch / reset** ⇒ 会把 checkout
+#     时刻的 index.html 以「最新 main」为 base_tree 提交回去 = 静默覆盖他人前端改动
+#     （无冲突、无告警、无 422）。
+#   夹具对照已证（docs/ops/handover/2026-09-20_*_api_push_raw防覆盖.md）：
+#     同一夹具下旧版把本地陈旧 index.html 推上去（True），新版不入提交（False）且其余文件照常推。
+#   ⇒ 正解：index.html 的 ?v 一律「**取远端最新正文**（raw 通道，绕开 Contents API 的
+#     1MB 截断）+ 就地重算单调令牌」后再随本提交原子落地，见 _stamp_remote_index_v；
+#     本地副本永不入队。
+_SKIP_LOCAL_PUSH = {"index.html"}
 _PROTECTED_RAW = {
     "raw_data/audit_history.json",
     "raw_data/audit_nightly.log",
@@ -448,6 +466,14 @@ _EXTRA_FILES = (
 _RE_V = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
 
 
+# ⚠️⚠️ 已废除口径（2026-09-10 主人令）——下面这个 sha1 内容哈希**不得再用于 index.html 的 ?v**：
+#   · 理由：内容哈希在「数据被回滚到旧内容」时哈希恰好等于旧版 ⇒ 浏览器缓存旧 ?v 永远吐旧数据
+#     （表现为「最终推荐回退到 2 天前」「盘中主线卡在旧时刻」）；
+#   · 现行口径 = 单调 unix 秒令牌（update_v8._data_file_update_time 与 _stamp_remote_index_v）；
+#   · 本仓已有核验会对十六进制形态报警并重写：
+#     v8_build_deploy.yml「?v 出现非 unix 秒令牌(旧内容哈希口径回潮)」。
+#   ⇒ 2026-09-20 起 index.html 的 ?v 一律走 _stamp_remote_index_v；两者仅作历史留痕。
+#     （已证本仓 workflows 内无其他调用点；如需彻底删除请先确认无外部 importer。）
 def _neutral_sha(content: bytes) -> str:
     """与 update_v8._rewrite / reconcile_cache_busters 完全一致的中性化哈希：
     先剔除 republish_time 的构建时间戳（非数据本体），再取 sha1 前 10 位。"""
@@ -475,6 +501,52 @@ def _stamp_index_v(index_text: str, changed: dict) -> tuple:
     new = _RE_V.sub(repl, index_text)
     return new, new != index_text
 
+def _stamp_remote_index_v(changed: dict, commit_ref: str):
+    """取**远端** index.html 正文（raw 通道，绕开 Contents API 的 1MB 截断），
+    对 changed 中每个 data/*.js 写入**单调部署令牌**（unix 秒）后就地提交；
+    返回新 blob sha（无需改动返回 None）。
+
+    🔴 基准必须是**远端正文**（commit_ref），绝不允许使用本地副本：本地是 checkout 快照，
+       直接上传会以「最新 main」为 base_tree 静默覆盖他人的前端改动（见 _SKIP_LOCAL_PUSH）。
+
+    🔴 ?v 口径 = **单调 unix 秒令牌**，与 update_v8._data_file_update_time 的 _UPDATE_TOKEN 同源。
+       为何不能用内容哈希：2026-09-10 主人令已改口径 —— 内容哈希在「数据被回滚到旧内容」时
+       哈希恰好等于旧版 ⇒ 浏览器缓存旧 ?v 永远吐旧数据（表现为「最终推荐回退到 2 天前」
+       「盘中主线卡在旧时刻」）。且本仓已有核验会对十六进制形态报警：
+       v8_build_deploy.yml「?v 出现非 unix 秒令牌(旧内容哈希口径回潮)」。
+       ⇒ 在此处写 sha1 形态 = 被判口径回潮并触发一次重写，禁止使用 _neutral_sha。
+
+    🔴 旧实现为何必须换掉（2026-09-20 实测）：旧代码走 `GET /contents/index.html` 取正文，
+       而 index.html 现为 1.36MB > Contents API 的 1MB 上限 ⇒ 返回 encoding="none" +
+       content=""（**键存在、值为空串**）⇒ base64 解出空串 ⇒ _stamp_index_v("") 恒无改动
+       ⇒ 打印「ℹ️ index.html ?v 已一致，无需改动」。**这是假成功**：既没对齐，也没说明
+       取不到正文。新实现改走 _blob_text（contents?ref= + raw，与守卫时间戳同一通道），
+       取不到正文时**显式告警**，绝不谎报「已一致」。
+    """
+    idx_text, _chan = _blob_text(commit_ref, "index.html", None, max_bytes=8 * 1024 * 1024)
+    if not idx_text:
+        print("  ⚠️ 取远端 index.html 正文失败（raw + base64 双通道皆不可用）→ ?v 交由 reconcile 自愈")
+        return None
+    tok = str(int(_time.time()))
+    _pat = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?v=[0-9A-Za-z]+)?([\'"])')
+
+    def _repl(m):
+        if m.group(2) in changed:
+            return f"{m.group(1)}{m.group(2)}?v={tok}{m.group(3)}"
+        return m.group(0)
+
+    new_idx = _pat.sub(_repl, idx_text)
+    if new_idx == idx_text:
+        print("  ℹ️ index.html 无需改动（本次变更文件不在 ?v 重写集内）")
+        return None
+    ib = api("POST", f"/repos/{REPO}/git/blobs",
+             {"content": base64.b64encode(new_idx.encode("utf-8")).decode(),
+              "encoding": "base64"})
+    if "__error__" in ib or "sha" not in ib:
+        print("  ⚠️ index.html blob 上传失败，?v 将交由 reconcile 自愈")
+        return None
+    print(f"  🔄 index.html ?v 已重写为单调令牌 {tok}（{len(changed)} 个文件）")
+    return ib["sha"]
 def _local_tree_paths(base_sha, want_prefixes):
     """用本地 git ls-tree 直接取「受管路径 → blob sha」，**零网络请求**。
 
@@ -636,6 +708,10 @@ def main():
         for _rel in [p.strip() for p in push_files_env.split(",") if p.strip()]:
             if _rel in _PROTECTED_RAW:  # 🛡 审计产物保护：绝不裸推
                 print(f"  🛡 跳过审计产物（不进 api_push 队列）: {_rel}")
+            if _rel in _SKIP_LOCAL_PUSH:
+                # 🛡 防覆盖：index.html 只从远端正文重算 ?v，绝不推本地字节（见 _SKIP_LOCAL_PUSH 取证）
+                print(f"  🛡 防覆盖：{_rel} 不从本地推（其 ?v 由远端正文就地重算）")
+                continue
                 continue
             if os.path.isfile(_rel):
                 with open(_rel, "rb") as _fh:
@@ -647,6 +723,11 @@ def main():
     else:
         files = walk_raw()
         files.update(walk_extra())
+        # 🛡 防覆盖：全量收集路径同样绝不让本地 index.html 入队（与 PUSH_FILES 分支同一道护栏）
+        for _p in list(files):
+            if _p in _SKIP_LOCAL_PUSH:
+                print(f"  🛡 防覆盖：{_p} 不从本地推（其 ?v 由远端正文就地重算）")
+                files.pop(_p)
     if not files:
         print("ℹ️ 无文件可推送，跳过"); sys.exit(0)
     print(f"待推送文件: 收集 {len(files)} 个 -> {sorted(files)[:5]} ...")
@@ -818,25 +899,17 @@ def main():
               % (len(_guard_miss), ", ".join(_guard_miss[:10])))
 
     extra_changed = {p: files[p] for p in _EXTRA_FILES if p in new_entries}
+    # 🛡🛡 2026-09-20 防覆盖（阿狸咪的工程师）：index.html 的 ?v 以**远端最新正文**为基准就地重算，
+    #   本地副本永不进提交（见 _SKIP_LOCAL_PUSH 取证）。同时换掉旧 contents 取正文的实现，
+    #   根治「>1MB ⇒ 取到空串 ⇒ 谎报『已一致』」的假成功。失败绝不阻断本批数据推送。
     if extra_changed:
-        # 🛡 2026-09-17：index.html（1.2MB）走短超时，避免大响应挂死拖垮整轮
-        idx_meta = api("GET", f"/repos/{REPO}/contents/index.html", timeout=90)
-        if "__error__" not in idx_meta and "content" in idx_meta:
-            idx_text = base64.b64decode(idx_meta["content"]).decode("utf-8", "replace")
-            new_idx, idx_changed = _stamp_index_v(idx_text, extra_changed)
-            if idx_changed:
-                ib = api("POST", f"/repos/{REPO}/git/blobs",
-                         {"content": base64.b64encode(new_idx.encode("utf-8")).decode(),
-                          "encoding": "base64"})
-                if "__error__" not in ib and "sha" in ib:
-                    new_entries["index.html"] = ib["sha"]
-                    print("✅ index.html ?v 已随 5 个 extra 文件原子更新")
-                else:
-                    print("  ⚠️ index.html blob 上传失败，?v 将交由 reconcile 自愈")
-            else:
-                print("ℹ️ index.html ?v 已一致，无需改动")
-        else:
-            print("  ⚠️ 拉取 index.html 失败，?v 将交由 reconcile 自愈")
+        try:
+            _ix_sha = _stamp_remote_index_v(extra_changed, base_sha)
+            if _ix_sha:
+                new_entries["index.html"] = _ix_sha
+                print("✅ index.html ?v 已随本批 extra 文件原子更新（基准=远端最新正文）")
+        except Exception as _e:
+            print(f"  ⚠️ index.html ?v 对齐异常（不影响本批数据推送）：{type(_e).__name__}: {_e}")
 
     print(f"📊 未变化 {unchanged} / 防倒退跳过 {len(regressed)} / 待更新 {len(new_entries)}")
     # 🛡 2026-08-22 规模巡检（主人令）：单次提交过大 = 全量重建/仓库膨胀信号，告警便于及时发现
