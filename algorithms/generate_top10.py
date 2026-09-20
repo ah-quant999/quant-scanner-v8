@@ -47,20 +47,26 @@ NORM_VERSION = 130          # 写入快照，供迁移函数识别是否已按�
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 🔴 P2 信号边缘权重（2026-09-05）：全部来自 walk-forward 回测 edge
-# 来源：raw_data/backtest_expectancy.json · by_factor · T+10 edge（全站默认持有 10 日口径）
-#   sig_jinzuan +8.11  → 强正，重赏
-#   sig_chan    +3.68  → 温和正（与金钻共振时组合 edge +8.37，全样本最优组合）
-#   sig_trend   -7.54  → 反向，惩罚（旧代码 +25 赏，与回测相反）
-#   sig_jigou   -10.36 → 强反向，重罚（旧代码 +25 赏，与回测相反）
-# 运行期尝试读取该 JSON 覆盖默认值，回测重跑后权重自动刷新；读取失败回退硬编码。
-# P1 硬化：signal_confidence 按样本量 + T+5/T+10 符号一致性做收缩，防过拟合（薄样本/矛盾证据→0）。
+# 🔴 P2 信号边缘权重（2026-09-05 建立；🔴 2026-09-20 改「可实盘 T+5 超额」口径 = 改动15）
+# 来源：raw_data/backtest_expectancy.json · by_factor · **excess5**
+#   旧口径是 by_factor.edge10（T+10 绝对收益差）：长持有期档被大盘 β 撑高 ⇒ β 假象。
+#   实证（2026-09-20 新口径重跑，46 交易日 2026-06-08~09-18）：
+#     sig_jinzuan 线上 edge10=+8.676 → 实盘 T+5 超额仅 +0.532（旧折算 ×2.5 = +20 分，应 +1 分）
+#     sig_chan    +4.647 → +0.759        sig_trend -7.593 → -1.532
+#     sig_jigou   -9.457 → -0.660
+# 现口径实测值：jinzuan +0.532 / chan +0.759 / trend -1.532 / jigou -0.660
+# 运行期读取该 JSON 覆盖默认值，回测重跑后权重自动刷新；读取失败回退上方默认（同为超额口径）。
+# P1 硬化：signal_confidence 按样本量 + **IS/OOS 分段超额同号**做收缩（跨期稳健性），
+#   防过拟合（薄样本/矛盾证据 → 收缩）。
 # ─────────────────────────────────────────────────────────────────────────────
+# 🔴 2026-09-20 口径改造（改动15）：默认值同步为「可实盘 T+5 超额 excess5」口径。
+#   旧默认是 T+10 edge（β 假象），若沿用会在「回测文件读不到」时静默退回错口径。
+#   取值 = 2026-09-20 新口径重跑（46 日，2026-06-08~09-18）by_factor.excess5。
 SIGNAL_EDGE_DEFAULT = {
-    "jinzuan": 8.11,
-    "chan":    3.68,
-    "trend":  -7.54,
-    "jigou":  -10.36,
+    "jinzuan": 0.532,
+    "chan":    0.759,
+    "trend":  -1.532,
+    "jigou":  -0.660,
 }
 SIGNAL_EDGE_TO_SCORE = 2.5   # 每 1% edge ≈ 2.5 分
 SIGNAL_SCORE_CAP, SIGNAL_SCORE_FLOOR = 30, -30
@@ -89,21 +95,49 @@ try:
                  "sig_trend": "trend", "sig_jigou": "jigou"}.get(_k)
         if not _name:
             continue
-        SIGNAL_EDGE[_name] = _v.get("edge10", SIGNAL_EDGE[_name])
-        SIGNAL_N[_name] = _v.get("n_on10", 0)
-        SIGNAL_CONSISTENT[_name] = (_v.get("edge5", 0) > 0) == (_v.get("edge10", 0) > 0)
+        # 🔴 2026-09-20 口径改造（改动15）：边权从 T+10 edge 改为「可实盘 T+5 超额 excess5」。
+        #   理由见文件头注释（T+10 被大盘 β 撑高，sig_jinzuan 被高估 20 倍）。
+        #   回退链：excess5 → edge5 → 保留默认（薄证据不猜）。
+        _e = _v.get("excess5")
+        if _e is None:
+            _e = _v.get("edge5")
+        if _e is not None:
+            SIGNAL_EDGE[_name] = _e
+        SIGNAL_N[_name] = _v.get("n_on5", 0)
+        # 🔴 一致性判据同步换成「IS / OOS 分段超额同号」——衡量**跨期稳健性**。
+        #   旧判据是 T+5/T+10 同号（同一批样本、持有期相邻，同号几乎是必然，几乎不触发收缩）。
+        #   新判据能抓住「只在一段样本里有效」的过拟合信号（如 sig_jinzuan：
+        #   IS ex5=+0.383 / OOS ex5=-0.072，符号翻转 ⇒ 收缩，但保留 0.5 下限不抹零）。
+        _iso = _v.get("excess_is") or {}
+        _oos = _v.get("excess_oos") or {}
+        _a = _iso.get("5") if isinstance(_iso, dict) else None
+        _b = _oos.get("5") if isinstance(_oos, dict) else None
+        if _a is None or _b is None:
+            SIGNAL_CONSISTENT[_name] = True      # 无分段数据 → 不收缩（不回退旧口径）
+        else:
+            SIGNAL_CONSISTENT[_name] = (_a > 0) == (_b > 0)
 except Exception as _e:
     print(f"  ⚠️ 回测边缘权重加载失败，用硬编码默认: {_e}")
 SIGNAL_SCORE = {k: _signal_score_from_edge(v) for k, v in SIGNAL_EDGE.items()}
 
 def signal_confidence(name):
-    """P1 证据置信度（0~1）：样本少或符号矛盾→收缩到 0，避免薄证据主导排名"""
+    """P1 证据置信度（0~1）：样本少或跨期不一致 → 收缩，避免薄证据主导排名。
+
+    🔴 2026-09-20（改动15）两处调整：
+      1. 收缩下限 0.5：原实现下「样本 <60 且跨期翻转」会乘到 0.25 甚至更低，
+         把有效信号直接抹零（实测 sig_jinzuan 新口径 n_on5=128 → min(1,128/120)=1.0，
+         但跨期翻转 ×0.5 = 0.5，若样本再薄就会 <0.25）。下限保证「有证据就仍有分量」。
+      2. 一致性判据由 signal_confidence 外部（模块级 SIGNAL_CONSISTENT）提供，
+         现为 IS/OOS 分段超额同号（跨期稳健性），不再是 T+5/T+10 同号。
+    """
     n = SIGNAL_N.get(name, 0)
     if n <= 0:
         return 1.0
     conf = min(1.0, n / 120.0)
     if not SIGNAL_CONSISTENT.get(name, True):
-        conf *= 0.5
+        conf = max(0.5, conf * 0.5)
+    else:
+        conf = max(0.5, conf)
     return conf
 
 def signal_edge_score(name, present):
@@ -111,7 +145,8 @@ def signal_edge_score(name, present):
         return 0
     return int(round(SIGNAL_SCORE.get(name, 0) * signal_confidence(name)))
 
-# P2 回测反哺：用 walk-forward by_signal T+10 edge 直接修正排名（替代原 cockpit T+3 胜率，已下线恒50）
+# P2 回测反哺：用 walk-forward by_signal **T+5 收益**直接修正排名
+# （替代原 cockpit T+3 胜率恒50；🔴 2026-09-20 改动15 从 T+10 edge 换 T+5 口径）
 BT_BY_SIGNAL = {}
 try:
     _bt2 = load_json(os.path.join(DATA_DIR, "backtest_expectancy.json"), {})
@@ -119,12 +154,25 @@ try:
 except Exception:
     BT_BY_SIGNAL = {}
 
-def bt_edge10_for(chan, jinzuan, jigou, trend):
-    """给定四信号布尔 (chan, jinzuan, jigou, trend) → walk-forward T+10 edge(%)；
-    组合缺失回退 0（中性）。key 格式与 backtest_expectancy.json by_signal 一致：'c,j,t,tr'"""
+def bt_excess5_for(chan, jinzuan, jigou, trend):
+    """给定四信号布尔 (chan, jinzuan, jigou, trend) → walk-forward **T+5 收益**(%)；
+    组合缺失回退 0（中性）。key 与 backtest_expectancy.json by_signal 一致：'c,j,t,tr'。
+
+    🔴 2026-09-20 口径改造（改动15）：原读 edge10（T+10 绝对收益差，被大盘 β 撑高）。
+    实证最刺眼的一条：组合 '1,1,0,0'（禅+金钻共振）旧口径 +7 分，
+    而它的 T+5 收益实为 **-0.827**（T+10 才是 +7.303）—— win10=72.5% 的假胜率
+    把「金钻+禅共振」这个看似最优组合送上了高分，实盘持有 5 日却是亏的。
+    现改读 T+5（与全站默认持有期一致）。
+    注：by_signal 层**未产出 excess 基线**（只有 by_factor 有 baseline），
+    故此处用 edge5 = T+5 在场收益（持有期已对齐实盘，但未剔 β）；
+    by_factor 层已改用真超额 excess5。
+    """
     key = f"{int(chan)},{int(jinzuan)},{int(jigou)},{int(trend)}"
-    rec = BT_BY_SIGNAL.get(key)
-    return float((rec or {}).get("edge10", 0) or 0)
+    rec = BT_BY_SIGNAL.get(key) or {}
+    return float(rec.get("edge5", 0) or 0)
+
+# 兼容旧调用名（防外部引用直接崩；内部已全部改新口径）
+bt_edge10_for = bt_excess5_for
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -942,8 +990,8 @@ def main():
     freshness_warn("行业概念映射", industry_map, max_age_days=2.0)
     print("  ────────────────")
 
-    # ── 2.5 回测反哺数据源（P2）：walk-forward by_signal T+10 edge ──
-    # 已在模块级 BT_BY_SIGNAL / bt_edge10_for() 加载（来自 raw_data/backtest_expectancy.json）。
+    # ── 2.5 回测反哺数据源（P2）：walk-forward by_signal T+5 收益（改动15 换口径） ──
+    # 已在模块级 BT_BY_SIGNAL / bt_excess5_for() 加载（来自 raw_data/backtest_expectancy.json）。
     # 原 cockpit_backtest.json 已下线，旧的 T+3 胜率反哺恒为 50，已整体替换。
 
     # ── 2.6 P0-1 择时门控（2026-08-30）：与前端 v8MarketGate() 对齐 ──
@@ -985,7 +1033,7 @@ def main():
           f"× regime_w={regime_weight:.2f}→{regime_weight_adj:.2f}({regime_action}) "
           f"→ 乘子={gate_multiplier:.3f}")
 
-    # P2：T+3 胜率反哺已替换为模块级 bt_edge10_for()（walk-forward T+10 edge），见下方 score_backtest。
+    # P2：T+3 胜率反哺已替换为模块级 bt_excess5_for()（walk-forward T+5 收益），见下方 score_backtest。
 
     # ── 3. 构建辅助查询映射 ──
     # 板块资金：板块名→净流入(亿)
@@ -1387,15 +1435,17 @@ def main():
         # ── 原始总分（各维度绝对加分之和）──
         raw_total = base + enhance + form_score + fund + sector_score + inst + quality_score
 
-        # ── 回测反哺（P2 重写 2026-09-05）：walk-forward 信号组合 T+10 edge 直接修正 ──
-        # edge 每 1% ≈ ±1 分，clamp ±10；组合缺失回退 0（中性）。
+        # ── 回测反哺（P2；🔴 2026-09-20 改动15）：walk-forward 信号组合 **T+5** 修正 ──
+        # T+5 收益每 1% ≈ ±1 分，clamp ±10；组合缺失回退 0（中性）。
+        # 旧版读 T+10 edge（被大盘 β 撑高）⇒ 8 个组合全为正分、无区分力；已换 T+5。
         sig_tuple = (has_chan, sig_jinzuan, has_jigou, has_trend)
-        bt_edge10 = bt_edge10_for(*sig_tuple)
-        score_backtest = max(-10, min(10, round(bt_edge10)))
+        bt_ex5 = bt_excess5_for(*sig_tuple)
+        score_backtest = max(-10, min(10, round(bt_ex5)))
         raw_total = raw_total + score_backtest
-        # T+10 胜率（用于前端展示，来自同一 walk-forward 回测；缺失组合回退 50）
+        # T+5 胜率（用于前端展示；改动15 从 win10 改 win5 —— T+10 胜率同样被 β 撑高：
+        #   by_signal "1,1,0,0" win10=72.5% 但 win5 仅 48.1%，展示 T+10 会误导主人）
         _wr_rec = BT_BY_SIGNAL.get(f"{int(has_chan)},{int(sig_jinzuan)},{int(has_jigou)},{int(has_trend)}")
-        win_rate = float((_wr_rec or {}).get("win10", 50.0)) if _wr_rec else 50.0
+        win_rate = float((_wr_rec or {}).get("win5", 50.0)) if _wr_rec else 50.0
 
         # 🚦 P0-1 门禁乘子：IC × Regime 联合微调（早于归一化，确保 max_score 口径一致）
         raw_total = raw_total * gate_multiplier
