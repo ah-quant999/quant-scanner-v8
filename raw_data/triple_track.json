@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-09-20 15:57:24",
-  "data_date": "2026-09-20",
-  "track_start": "2026-09-20",
-  "history_days": 26,
+  "update_time": "2026-09-20 17:24:39",
+  "data_date": "2026-09-19",
+  "track_start": "2026-09-19",
+  "history_days": 25,
   "strict_count": 1,
   "near_count": 9,
   "tracked": [
@@ -16,19 +16,19 @@
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "计算机、通信和其他电子设备制造业",
-        "2026中报预增",
         "小米汽车",
         "AI眼镜",
+        "MSCI中国",
         "信创",
-        "深证100R",
+        "2026中报预增",
         "AI手机",
-        "MSCI中国"
+        "计算机、通信和其他电子设备制造业",
+        "深证100R"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-15",
-      "hold_days": 5,
-      "consecutive_days": 6,
+      "hold_days": 4,
+      "consecutive_days": 5,
       "first_close": 328.5,
       "current_close": 346.96,
       "pnl_pct": 5.62,
@@ -50,19 +50,19 @@
       "quality_grade": "",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "计算机、通信和其他电子设备制造业",
         "固态电池",
+        "MSCI中国",
         "深股通",
-        "独角兽",
+        "锂矿概念",
         "医疗器械概念",
         "2026一季报预增",
-        "锂矿概念",
-        "MSCI中国"
+        "独角兽",
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-15",
-      "hold_days": 5,
-      "consecutive_days": 6,
+      "hold_days": 4,
+      "consecutive_days": 5,
       "first_close": 52.3,
       "current_close": 54.2,
       "pnl_pct": 3.63,
@@ -78,19 +78,19 @@
       "quality_grade": "B",
       "industry": "软件和信息技术服务业",
       "sectors": [
-        "软件和信息技术服务业",
-        "科技风格",
-        "AI应用",
+        "MSCI中国",
+        "Kimi概念",
         "上证50",
+        "科技风格",
+        "软件和信息技术服务业",
         "2026一季报预增",
         "HS300",
-        "Kimi概念",
-        "MSCI中国"
+        "AI应用"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-19",
-      "hold_days": 2,
-      "consecutive_days": 2,
+      "hold_days": 1,
+      "consecutive_days": 1,
       "first_close": 223.61,
       "current_close": 223.61,
       "pnl_pct": 0.0,
@@ -112,19 +112,19 @@
       "quality_grade": "D",
       "industry": "资本市场服务",
       "sectors": [
-        "2026中报预增",
-        "资本市场服务",
-        "金融地产风格",
-        "互联网金融",
-        "参股银行",
+        "MSCI中国",
         "行业龙头",
+        "参股银行",
+        "互联网金融",
         "HS300",
-        "MSCI中国"
+        "2026中报预增",
+        "金融地产风格",
+        "资本市场服务"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-19",
-      "hold_days": 2,
-      "consecutive_days": 2,
+      "hold_days": 1,
+      "consecutive_days": 1,
       "first_close": 26.54,
       "current_close": 26.54,
       "pnl_pct": 0.0,
@@ -147,18 +147,18 @@
       "industry": "电气机械和器材制造业",
       "sectors": [
         "电气机械和器材制造业",
-        "人形机器人",
-        "深股通",
         "小米汽车",
-        "HS300",
-        "深证100R",
+        "MSCI中国",
+        "深股通",
         "工业互联",
-        "MSCI中国"
+        "HS300",
+        "人形机器人",
+        "深证100R"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-18",
-      "hold_days": 3,
-      "consecutive_days": 3,
+      "hold_days": 2,
+      "consecutive_days": 2,
       "first_close": 52.45,
       "current_close": 52.45,
       "pnl_pct": 0.0,
@@ -174,19 +174,19 @@
       "quality_grade": "C",
       "industry": "专用设备制造业",
       "sectors": [
-        "专用设备制造业",
-        "一带一路",
-        "参股银行",
         "机构重仓",
+        "MSCI中国",
         "行业龙头",
-        "HS300",
+        "参股银行",
+        "一带一路",
         "工业互联",
-        "MSCI中国"
+        "HS300",
+        "专用设备制造业"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-18",
-      "hold_days": 3,
-      "consecutive_days": 3,
+      "hold_days": 2,
+      "consecutive_days": 2,
       "first_close": 18.07,
       "current_close": 18.07,
       "pnl_pct": 0.0,
@@ -204,8 +204,8 @@
       "sectors": [],
       "signal_count": 2,
       "enter_date": "2026-09-12",
-      "hold_days": 7,
-      "consecutive_days": 8,
+      "hold_days": 6,
+      "consecutive_days": 7,
       "first_close": 338.6,
       "current_close": 333.0,
       "pnl_pct": -1.65,
@@ -223,8 +223,8 @@
       "sectors": [],
       "signal_count": 2,
       "enter_date": "2026-09-12",
-      "hold_days": 8,
-      "consecutive_days": 9,
+      "hold_days": 7,
+      "consecutive_days": 8,
       "first_close": 29.7,
       "current_close": 28.74,
       "pnl_pct": -3.23,
@@ -242,8 +242,8 @@
       "sectors": [],
       "signal_count": 2,
       "enter_date": "2026-09-12",
-      "hold_days": 7,
-      "consecutive_days": 8,
+      "hold_days": 6,
+      "consecutive_days": 7,
       "first_close": 18.91,
       "current_close": 18.25,
       "pnl_pct": -3.49,
@@ -259,19 +259,19 @@
       "quality_grade": "B",
       "industry": "有色金属矿采选业",
       "sectors": [
-        "2026中报预增",
+        "MSCI中国",
         "稀缺资源",
         "有色金属矿采选业",
-        "大盘股",
         "昨日高振幅",
-        "磷化工",
         "HS300",
-        "MSCI中国"
+        "磷化工",
+        "2026中报预增",
+        "大盘股"
       ],
       "signal_count": 2,
       "enter_date": "2026-08-17",
-      "hold_days": 7,
-      "consecutive_days": 2,
+      "hold_days": 6,
+      "consecutive_days": 1,
       "first_close": 20.75,
       "current_close": 17.51,
       "pnl_pct": -15.61,
@@ -551,12 +551,6 @@
     },
     {
       "level": "warn",
-      "code": "605117",
-      "name": "德业股份",
-      "text": "德业股份(605117) 于 2026-09-19 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "warn",
       "code": "688099",
       "name": "晶晨股份",
       "text": "晶晨股份(688099) 于 2026-09-15 跌出共识（曾连续 4 日）"
@@ -613,7 +607,7 @@
       "level": "good",
       "code": "301308",
       "name": "江波龙",
-      "text": "江波龙(301308) 连续 6 日稳居严格共识（高质量）"
+      "text": "江波龙(301308) 连续 5 日稳居严格共识（高质量）"
     },
     {
       "level": "warn",
@@ -703,11 +697,11 @@
         "count": 3
       },
       {
-        "sector": "计算机、通信和其他电子设备制造业",
+        "sector": "小米汽车",
         "count": 2
       },
       {
-        "sector": "小米汽车",
+        "sector": "计算机、通信和其他电子设备制造业",
         "count": 2
       },
       {
@@ -723,11 +717,11 @@
         "count": 2
       },
       {
-        "sector": "参股银行",
+        "sector": "行业龙头",
         "count": 2
       },
       {
-        "sector": "行业龙头",
+        "sector": "参股银行",
         "count": 2
       },
       {
@@ -751,7 +745,7 @@
         "count": 1
       },
       {
-        "sector": "独角兽",
+        "sector": "锂矿概念",
         "count": 1
       },
       {
@@ -759,23 +753,7 @@
         "count": 1
       },
       {
-        "sector": "锂矿概念",
-        "count": 1
-      },
-      {
-        "sector": "软件和信息技术服务业",
-        "count": 1
-      },
-      {
-        "sector": "科技风格",
-        "count": 1
-      },
-      {
-        "sector": "AI应用",
-        "count": 1
-      },
-      {
-        "sector": "上证50",
+        "sector": "独角兽",
         "count": 1
       },
       {
@@ -783,7 +761,23 @@
         "count": 1
       },
       {
-        "sector": "资本市场服务",
+        "sector": "上证50",
+        "count": 1
+      },
+      {
+        "sector": "科技风格",
+        "count": 1
+      },
+      {
+        "sector": "软件和信息技术服务业",
+        "count": 1
+      },
+      {
+        "sector": "AI应用",
+        "count": 1
+      },
+      {
+        "sector": "互联网金融",
         "count": 1
       },
       {
@@ -791,7 +785,7 @@
         "count": 1
       },
       {
-        "sector": "互联网金融",
+        "sector": "资本市场服务",
         "count": 1
       },
       {
@@ -803,7 +797,7 @@
         "count": 1
       },
       {
-        "sector": "专用设备制造业",
+        "sector": "机构重仓",
         "count": 1
       },
       {
@@ -811,7 +805,7 @@
         "count": 1
       },
       {
-        "sector": "机构重仓",
+        "sector": "专用设备制造业",
         "count": 1
       },
       {
@@ -823,15 +817,15 @@
         "count": 1
       },
       {
-        "sector": "大盘股",
-        "count": 1
-      },
-      {
         "sector": "昨日高振幅",
         "count": 1
       },
       {
         "sector": "磷化工",
+        "count": 1
+      },
+      {
+        "sector": "大盘股",
         "count": 1
       }
     ],
@@ -962,23 +956,23 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-09-20",
-    "history_days": 26,
+    "track_start": "2026-09-19",
+    "history_days": 25,
     "summary": {
       "1d": {
-        "count": 37,
-        "win_rate": 18.92,
-        "avg_return": 1.2
+        "count": 35,
+        "win_rate": 20.0,
+        "avg_return": 1.27
       },
       "3d": {
-        "count": 26,
-        "win_rate": 34.62,
-        "avg_return": 0.68
-      },
-      "5d": {
         "count": 24,
         "win_rate": 33.33,
-        "avg_return": 0.47
+        "avg_return": 0.58
+      },
+      "5d": {
+        "count": 20,
+        "win_rate": 25.0,
+        "avg_return": -0.13
       },
       "10d": {
         "count": 14,
@@ -1337,8 +1331,7 @@
         "enter_date": "2026-09-15",
         "offsets": {
           "1d": 0.0,
-          "3d": 3.63,
-          "5d": 3.63
+          "3d": 3.63
         }
       },
       {
@@ -1347,8 +1340,7 @@
         "enter_date": "2026-09-15",
         "offsets": {
           "1d": 0.0,
-          "3d": 4.54,
-          "5d": 4.54
+          "3d": 4.54
         }
       },
       {
@@ -1357,8 +1349,7 @@
         "enter_date": "2026-09-15",
         "offsets": {
           "1d": 0.0,
-          "3d": 0.0,
-          "5d": 0.0
+          "3d": 0.0
         }
       },
       {
@@ -1367,8 +1358,7 @@
         "enter_date": "2026-09-15",
         "offsets": {
           "1d": 0.0,
-          "3d": 5.62,
-          "5d": 5.62
+          "3d": 5.62
         }
       },
       {
@@ -1376,8 +1366,7 @@
         "name": "摩尔线程",
         "enter_date": "2026-09-17",
         "offsets": {
-          "1d": 3.65,
-          "3d": 3.65
+          "1d": 3.65
         }
       },
       {
@@ -1385,8 +1374,7 @@
         "name": "中国平安",
         "enter_date": "2026-09-17",
         "offsets": {
-          "1d": 0.0,
-          "3d": 0.0
+          "1d": 0.0
         }
       },
       {
@@ -1401,22 +1389,6 @@
         "code": "300124",
         "name": "汇川技术",
         "enter_date": "2026-09-18",
-        "offsets": {
-          "1d": 0.0
-        }
-      },
-      {
-        "code": "688111",
-        "name": "金山办公",
-        "enter_date": "2026-09-19",
-        "offsets": {
-          "1d": 0.0
-        }
-      },
-      {
-        "code": "600030",
-        "name": "中信证券",
-        "enter_date": "2026-09-19",
         "offsets": {
           "1d": 0.0
         }
