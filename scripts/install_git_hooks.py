@@ -2,7 +2,12 @@
 # -*- coding: utf-8 -*-
 """install_git_hooks.py — 一键安装仓库 git hooks（幂等，双机各跑一次）
 
-当前只装一件事：**提交前凭据闸门**（`.githooks/pre-commit` → `scripts/secret_guard.py`）。
+装两件事：
+  1. **提交前凭据闸门**（`.githooks/pre-commit` → `scripts/secret_guard.py`）
+  2. **防覆盖闸门**（`.githooks/pre-push`）——🔴 2026-09-20 追加：
+     主机感知，**仅家机**（存在 ~/.workbuddy/v8_home_block_push）拦截
+     「会覆盖/改写远端 main 权威历史」的非快进推送（含 --force）；
+     小九机（lemoncat-cn）无标记 → 完全放行，行为与装前一致。
 
 为什么需要单独安装：
   git 的 `core.hooksPath` 是**本地配置**，不随仓库分发；`.git/hooks/` 也不入库。
@@ -21,6 +26,11 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WANT = ".githooks"
+HOOKS = ("pre-commit", "pre-push")
+
+
+def hook_path(name):
+    return os.path.join(ROOT, WANT, name)
 
 
 def git(*args, **kw):
