@@ -7378,6 +7378,22 @@ function fmtSigned(v){
       { k:'amt60', f:'60日成交额中位数', w:'+6 / +3 分', why:'低流动性溢价；池内前20%→+6、前20~40%→+3' },
       { k:'turntrend', f:'换手率趋势', w:'+6 / +3 分', why:'缩量=强势；20日均量÷240日均量取负' }
     ];
+    // 🆕 2026-09-20：P5 note 需要「本层因子实际达标情况」⇒ 先按产物整表统计（全量因子，非仅 _p5all）
+    var _fwAll = Object.keys(_fwF).map(function(k){ return _fwF[k]; });
+    var _fwN   = _fwAll.length;
+    var _fwPass= _fwAll.filter(function(r){ return String(r.verdict||'').toUpperCase() === 'PASS'; });
+    var _fwPassNames = _fwPass.map(function(r){ return r.label || r.id || ''; }).filter(Boolean);
+    var _fwWorst = null;   // 差得最少（缺口最小）的因子：用于「差 N 年」表述
+    _fwAll.forEach(function(r){
+      if (String(r.verdict||'').toUpperCase() === 'PASS') return;
+      var PN = (r.win_pass_n!=null)?r.win_pass_n:4;
+      // 🔴 只认产物字段 win_best_ok，缺失则跳过（不得拿 years_beat_gt55 冒充窗口值）
+      var WB = (r.win_best_ok!=null)?r.win_best_ok:null;
+      if (WB == null) return;
+      var gap = PN - WB;
+      if (_fwWorst === null || gap < _fwWorst.gap) _fwWorst = { gap: gap, name: r.label || r.id || '', wb: WB, pn: PN };
+    });
+
     _p5all.forEach(function(x){
       var r = _fwF[x.k] || {};
       var pass = (String(r.verdict||'').toUpperCase() === 'PASS');
@@ -7386,14 +7402,34 @@ function fmtSigned(v){
         f: x.f, w: pass ? x.w : '<span style="color:#94a3b8;font-weight:400;">已停用</span>',
         dir: pass ? '正' : '—',
         ev: pass ? 'walk-forward' : '未回测',
-        why: x.why + (r.ir_oos != null
-              ? '　｜IR_OOS ' + Number(r.ir_oos).toFixed(3)
-                + '，跑赢基准 ' + (r.beat_base_rate==null?'—':r.beat_base_rate+'%')
-                + '，达标 ' + (r.years_beat_gt55==null?'—':r.years_beat_gt55) + '/' + (r.years_total==null?'—':r.years_total) + ' 年'
-                + '（门槛：年度跑赢率≥80% ⇒ ' + (r.years_total==null?'':(( (Math.ceil(r.years_total*0.8)) ))) + '/'
-                + (r.years_total==null?'':r.years_total) + ' 年）'
-                + '　⇒ <b style="color:' + (pass?'#22c55e':'#ef5350') + ';">' + (pass?'verdict=PASS 真计分':'verdict=FAIL 自动停用') + '</b>'
-              : '　⇒ 无回测结果，闸门默认停用（宁缺毋假）'),
+        why: (function(){
+          if (r.ir_oos == null) return x.why + '　⇒ 无回测结果，闸门默认停用（宁缺毋假）';
+          // 🔴 2026-09-20 口径修正：判定 = IR_OOS>0.3 且「连续 5 年窗口内 ≥4 年达标（取最优窗口）」
+          //   恢复主人 2026-09-09 22:31 决策原文。旧实现为「全程年份占比 ≥80%」，
+          //   会随数据年份增长自动变严（8 年时等价「需 7/8 年」），已弃用。
+          //   优先读产物新字段 win_years/win_pass_n/win_best_ok；读不到则降级显示。
+          var WY = (r.win_years  != null) ? r.win_years  : 5;
+          var PN = (r.win_pass_n != null) ? r.win_pass_n : 4;
+          // 🔴 关键：WB 只认产物字段 win_best_ok。**不得**回退到 years_beat_gt55
+          //   —— 那是「全程达标年数」，贴上「窗口内最优 X/5」标签即错标口径（曾实测 5/8 被写成 5/5）。
+          var WB  = (r.win_best_ok != null) ? r.win_best_ok : null;
+          var hasWin = (r.win_best_ok != null);
+          var tot = (r.years_total != null) ? r.years_total : null;
+          var gateTxt = '（门槛：连续 ' + WY + ' 年窗口内 ≥' + PN + ' 年达标'
+                      + (tot != null && tot < WY ? '；当前仅 ' + tot + ' 年数据，不足一个窗口，按现有年份判' : '')
+                      + '）';
+          var winTxt = hasWin
+                     ? ('连续 ' + WY + ' 年窗口内最优 ' + WB + '/' + WY + ' 年达标')
+                     : '<span style="color:#94a3b8;font-weight:400;">（产物未含窗口字段，待算法重跑）</span>';
+          return x.why
+            + '　｜IR_OOS ' + Number(r.ir_oos).toFixed(3)
+            + '，跑赢基准 ' + (r.beat_base_rate==null?'—':r.beat_base_rate+'%')
+            + '，' + winTxt
+            + '（全程 ' + (r.years_beat_gt55==null?'—':r.years_beat_gt55) + '/' + (tot==null?'—':tot) + ' 年）'
+            + gateTxt
+            + '　⇒ <b style="color:' + (pass?'#22c55e':'#ef5350') + ';">'
+            + (pass?'verdict=PASS 真计分':'verdict=FAIL 自动停用') + '</b>';
+        })(),
         n: edge == null ? '—' : (Number(edge).toFixed(3) + '%')
       });
     });
@@ -7402,12 +7438,21 @@ function fmtSigned(v){
       color: '#22c55e',
       note: '闸门：仅当 factor_walkforward.json 里 verdict=PASS 才启用；复跑不达标 ⇒ 自动失效。'
           + '候选池 <20 只 ⇒ 全 0（分位无意义）。amt60 另设 60日均成交额 <3000万 ⇒ 不给分（滤仙股）。'
-          + '<br><b style="color:#cbd5e1;">为什么「已停用」：</b>判定 = IR_OOS &gt; 0.3 <b>且</b> 年度跑赢率 ≥ 80%'
-          + '（当前 8 年数据 ⇒ 需 7 年达标）。<b style="color:#ef5350;">12 个候选因子目前无一通过</b>，'
-          + '多数倒在「年度跑赢率」这一关（最好的 6/8 = 75%，差 1 年）。'
+          + '<br><b style="color:#cbd5e1;">判定口径：</b>IR_OOS &gt; 0.3 <b>且</b> '
+          + '<b>连续 5 年窗口内 ≥4 年</b> Top 层「跑赢同期全池等权基准」的调仓点占比 &gt; 55%（取最优窗口）。'
+          + '<br><b style="color:#cbd5e1;">本卡因子层实测：</b>'
+          + (_fwN
+              ? ('共 ' + _fwN + ' 个候选因子，当前 <b style="color:'
+                 + (_fwPass.length ? '#22c55e' : '#ef5350') + ';">'
+                 + (_fwPass.length ? _fwPass.length + ' 个 PASS' : '无一 PASS') + '</b>'
+                 + (_fwPass.length ? '（' + _fwPassNames.join(' / ') + '）' : '')
+                 + (_fwWorst && _fwWorst.gap > 0 ? ('；最接近的在达标年数上差 ' + _fwWorst.gap + ' 年（'
+                    + _fwWorst.wb + '/' + _fwWorst.pn + '）') : '')
+                 + '。')
+              : '<span style="color:#94a3b8;">未载入产物</span>')
           + '<br><b style="color:#22d3ee;">停用 ≠ 废弃（故不删因子）</b>：这是<b>动态闸门</b>，'
           + '每日盘后重跑，任一因子一旦转 PASS 会<b>自动恢复计分</b>；删掉就等于永久放弃这条路。'
-          + '需要留意的是：该判定随窗口滑动会翻转（同日新增一天数据即触发全历史重算），'
+          + '需要留意的是：该判定随窗口滑动会翻转（新增一天数据即触发全历史重算），'
           + '故「今天停用」不代表「永久失效」。',
       src: 'generate_top10.py L669-830',
       rows: _p5rows
