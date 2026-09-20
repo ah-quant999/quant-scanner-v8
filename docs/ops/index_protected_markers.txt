@@ -74,3 +74,5 @@ window.MAHORO_INSIGHTS|每日洞察数据源|2026-09-20
 _SIG_EDGE_SRC|P2 每日因子卡动态取值硬表镜像（小九 2026-09-20）|2026-09-20
 win_best_ok|P5 判定口径实现锚点（窗口内最优达标年数·产物字段；2026-09-20 13:19 由旧口径文案换锚，避合法改文案致阻断）|2026-09-20
 switchFinalTab|最终推荐页子页切换（因子实验室迁入）|2026-09-20
+function _renderPostReady|引导函数定义：DOMContentLoaded 初渲入口（__renderBacktestSection 等 11 渲染器）。0d3482be4 删死代码时误删定义→整页卡「加载中」|2026-09-20
+DOMContentLoaded', _renderPostReady|同上引导函数的调用点；与定义必须同处一个 script 块且定义在前（否则 ReferenceError）|2026-09-20
