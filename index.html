@@ -7440,16 +7440,21 @@ function fmtSigned(v){
           + '候选池 <20 只 ⇒ 全 0（分位无意义）。amt60 另设 60日均成交额 <3000万 ⇒ 不给分（滤仙股）。'
           + '<br><b style="color:#cbd5e1;">判定口径：</b>IR_OOS &gt; 0.3 <b>且</b> '
           + '<b>连续 5 年窗口内 ≥4 年</b> Top 层「跑赢同期全池等权基准」的调仓点占比 &gt; 55%（取最优窗口）。'
-          + '<br><b style="color:#cbd5e1;">本卡因子层实测：</b>'
+          + '<br><b style="color:#cbd5e1;">回测达标情况（全部候选因子）：</b>'
           + (_fwN
               ? ('共 ' + _fwN + ' 个候选因子，当前 <b style="color:'
                  + (_fwPass.length ? '#22c55e' : '#ef5350') + ';">'
-                 + (_fwPass.length ? _fwPass.length + ' 个 PASS' : '无一 PASS') + '</b>'
+                 + (_fwPass.length ? _fwPass.length + ' 个 verdict=PASS' : '无一 PASS') + '</b>'
                  + (_fwPass.length ? '（' + _fwPassNames.join(' / ') + '）' : '')
                  + (_fwWorst && _fwWorst.gap > 0 ? ('；最接近的在达标年数上差 ' + _fwWorst.gap + ' 年（'
                     + _fwWorst.wb + '/' + _fwWorst.pn + '）') : '')
                  + '。')
               : '<span style="color:#94a3b8;">未载入产物</span>')
+          + '<br><b style="color:#cbd5e1;">本卡实际计分范围：</b>'
+          + '<b>仅 ' + _p5all.length + ' 个</b>（'
+          + _p5all.map(function(x){ return x.f; }).join(' / ') + '）'
+          + ' —— 其余因子即使 verdict=PASS，也因<b>未实现计分函数</b>而不参与打分'
+          + '（见 <code>generate_top10.py</code> P5 段「不进评分」清单，属有意设计非缺陷）。'
           + '<br><b style="color:#22d3ee;">停用 ≠ 废弃（故不删因子）</b>：这是<b>动态闸门</b>，'
           + '每日盘后重跑，任一因子一旦转 PASS 会<b>自动恢复计分</b>；删掉就等于永久放弃这条路。'
           + '需要留意的是：该判定随窗口滑动会翻转（新增一天数据即触发全历史重算），'
