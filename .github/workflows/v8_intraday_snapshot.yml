@@ -94,6 +94,8 @@ jobs:
           git commit -q -m "snapshot: 板块资金日内快照 $(TZ=Asia/Shanghai date '+%F %H:%M') CST"
           for i in 1 2 3 4; do
             git fetch origin >/dev/null 2>&1
+            # 🛡 2026-09-20 小九：先清「虚拟脏」，否则 rebase 启动前即被拒（同 v8_risk_gauge 根因）
+            git checkout -- . 2>/dev/null || true
             if git -c rebase.autoStash=true rebase origin/main >/dev/null 2>&1; then  # 🔴 2026-09-17 阿狸咪：加 autoStash —— 裸 rebase 遇脏树会启动前即被拒，3 次重试全空转
               if git push origin HEAD:main 2>&1 | tail -2; then
                 echo "✅ 快照推送成功 (attempt=$i)"
