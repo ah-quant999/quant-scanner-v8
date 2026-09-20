@@ -275,6 +275,70 @@ _PROTECTED_RAW = {
     "raw_data/audit_nightly.log",
 }
 
+# ═══════════════════════════════════════════════════════════════════════════
+# 🗑 2026-09-21 一劳永逸（小九）：**已退役产物 · 拒绝回推表**
+#
+#   【问题 · 实测根因】
+#     2026-09-19 主人令「强势突破全站删除」(07d9690eb4) 已在 main 上生效，
+#     但**次日 8bc8275fdc（2026-09-20T13:13:05Z）把它整批推了回来**：
+#         algorithms/strong_breakout.py       added +265
+#         data/STRONG_BREAKOUT.js             added +2
+#         data/STRONG_BREAKOUT_BACKTEST.js    added +1
+#         raw_data/strong_breakout*.json      added ×15（含 _backtest 与 11 个逐日留档）
+#         scripts/algo_backtest_compare.py    added +189  ← 同日刚摘链的脚本，也被推回
+#
+#     机制：本脚本两条收集路径都**只看「本地磁盘有没有这个文件」，不看「它是否已被主人令退役」**：
+#       ① PUSH_FILES 分支 —— workflow 用
+#            `git status --porcelain raw_data/ data/ | awk '{print $2}'`
+#          收集变更清单；工作树里那份被删文件对 git 而言仍是「已删除的追踪文件」，
+#          照样出现在 porcelain 输出里 ⇒ 入队 ⇒ 复活；
+#       ② 无 PUSH_FILES 时回退 walk_raw() —— os.walk 全量遍历 raw_data/，仅按算法词根前缀
+#          + 后缀过滤，退役产物名不在排除表 ⇒ 全量推回。
+#     ⇒ 结果：「删了又被推回」的僵尸循环，且前端健康巡检按通用 24h 红线判 fail
+#       （实测 09-21 看板 all_STRONG_BREAKOUT = fail，红灯 3974 分钟 = 主人截图所指）。
+#
+#   【修法】与 index.html 的 _SKIP_LOCAL_PUSH 同一范式：**本地副本永不入队**。
+#     区别：_SKIP_LOCAL_PUSH 是「另有远端正文来源」，本表是「该产物已无生产方 ⇒ 永不该再出现」。
+#     ⚠️ 本表只拦「回推」，绝不删除远端已有文件（base_tree 继承语义天然保留）；
+#        远端清理由一次性删除提交完成，二者职责分离、互不干扰。
+#
+#   【维护约定】
+#     · 仅登记**经主人令退役**且**已从生产链摘除**的产物；不确定的一律不登记
+#       （宁可漏拦，不可误伤 —— 误登记会让真产物永久推不上去，是更严重的故障）；
+#     · 登记项须附「退役依据」注释，供后人复核；
+#     · 与 v8_health_check.py 的 _RETIRED_FILES 同源维护（两处口径须一致）。
+# ═══════════════════════════════════════════════════════════════════════════
+_RETIRED_ARTIFACTS = {
+    # 🗑 2026-09-19 主人令「强势突破全站删除」(commit 07d9690eb4，理由：胜率 14.4% 破红线)。
+    #   生产方 algorithms/strong_breakout.py 已从 run_algorithms.py 的 ORDER/STAGES 摘除；
+    #   前端 index.html 对 window.STRONG_BREAKOUT / STRONG_BREAKOUT_BACKTEST **0 引用**（实测）。
+    "data/STRONG_BREAKOUT.js",
+    "data/STRONG_BREAKOUT_BACKTEST.js",
+    "raw_data/strong_breakout.json",
+    "raw_data/strong_breakout_backtest.json",
+}
+# 按前缀兜底：raw_data/strong_breakout_YYYYMMDD.json（逐日留档）
+_RETIRED_PREFIXES = (
+    "raw_data/strong_breakout_20",   # 逐日留档 strong_breakout_20260903.json 等
+)
+# 白名单：即便命中前缀也放行
+_RETIRED_KEEP = {
+    # ⚠️ raw_data/strong_breakout_history.json 是「滚动账本」，
+    #   scripts/gen_strong_breakout.py（**仍在跑**，产出 STOCK_MOMENTUM_STATE/_V2）持续写入，
+    #   供回溯/研究取用。拦它会导致账本断供 —— 属误伤，故明确排除。
+    "raw_data/strong_breakout_history.json",
+}
+
+
+def _is_retired(rel):
+    """判定相对路径是否为「已退役产物」（拒绝回推）。"""
+    p = rel.replace("\\", "/")
+    if p in _RETIRED_KEEP:
+        return False
+    if p in _RETIRED_ARTIFACTS:
+        return True
+    return any(p.startswith(_pfx) for _pfx in _RETIRED_PREFIXES)
+
 
 # ═══════════════════════════════════════════════════════════════════════════
 # 🛡 2026-09-20 一劳永逸（小九）：**推边界行尾收口（EOL fold）**
@@ -835,6 +899,10 @@ def main():
                 # 🛡 防覆盖：index.html 只从远端正文重算 ?v，绝不推本地字节（见 _SKIP_LOCAL_PUSH 取证）
                 print(f"  🛡 防覆盖：{_rel} 不从本地推（其 ?v 由远端正文就地重算）")
                 continue
+            if _is_retired(_rel):
+                # 🗑 2026-09-21 防回推：该产物已随主人令退役，本地残留副本不得复活它
+                print(f"  🗑 防回推：{_rel} 属已退役产物，跳过（本地副本不复活）")
+                continue
                 continue
             if os.path.isfile(_rel):
                 with open(_rel, "rb") as _fh:
@@ -851,6 +919,12 @@ def main():
             if _p in _SKIP_LOCAL_PUSH:
                 print(f"  🛡 防覆盖：{_p} 不从本地推（其 ?v 由远端正文就地重算）")
                 files.pop(_p)
+        # 🗑 2026-09-21 防回推：全量路径同样剔除已退役产物（与 PUSH_FILES 分支同一道护栏）
+        _retired_hit = [_p for _p in list(files) if _is_retired(_p)]
+        for _p in _retired_hit:
+            files.pop(_p)
+        if _retired_hit:
+            print(f"  🗑 防回推：剔除 {len(_retired_hit)} 个已退役产物，不复活：{sorted(_retired_hit)[:5]} ...")
     # 🛡 2026-09-20 推边界行尾收口（见上方 fold_eol 注释）：必须在 _blob_sha/守卫之前
     fold_eol(files)
 

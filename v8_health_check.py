@@ -204,6 +204,12 @@ CARD_DEFS = [
     # 🛡 2026-09-11 一劳永逸：4 个孤儿 algo_run 产物此前未注册 CARD_DEFS → 被 all_ 通用扫描按 1440min 红线误判 fail
     {"id": "ALGO_TRACK", "name": "算法追踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     # 🗑 STRONG_BREAKOUT_BACKTEST 健康检查项已随 2026-09-19 主人令删除强势突破而移除。
+    # ⚠️ 2026-09-21 小九 · 纠正本行原有「已移除」表述的**虚报部分**：
+    #   实测该产物 data/STRONG_BREAKOUT_BACKTEST.js **当时并未被删**（只摘了这里的登记），
+    #   且次日 8bc8275fdc 把整批强势突破产物回推复活 ⇒ 落到下方 check_all_data_files 全扫，
+    #   09-21 实测 all_STRONG_BREAKOUT_BACKTEST = ok（停在 09-18，属定时炸弹）。
+    #   ⇒ 本轮已补做：① 删除两份产物；② 登记进 _LOW_FREQ_FILES（防复发，见该处注释）；
+    #     ③ api_push_raw.py 加 _RETIRED_ARTIFACTS 防回推。
     {"id": "IMA_STRONG_BACKTEST", "name": "高手强势股跟踪回测", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["periods"], "heal_cat": "algo_run"},
 
 
@@ -1938,10 +1944,38 @@ _LOW_FREQ_FILES = {
     #   残留后被 all_ 通用扫描按 1440min 红线判 fail（09-16 看板实测 2 红灯）。
     #   本轮已删产物；此处加护栏防「有人把旧产物放回」导致红灯复发。
     "CANDIDATE_BACKTEST", "GOLD_POOL_BACKTEST",
+    # 🗑 2026-09-21 一劳永逸（小九）：**强势突破残留产物 · 防红灯复发护栏**。
+    #
+    #   【问题】09-19 主人令「强势突破全站删除」(07d9690eb4) 生效后，产物却**被回推复活**
+    #     （8bc8275fdc，2026-09-20T13:13:05Z，机制见 api_push_raw.py::_RETIRED_ARTIFACTS），
+    #     于是落入 check_all_data_files 的全扫（DATA_DIR.glob("*.js")），
+    #     按通用 24h 红线判定 ⇒ 09-21 看板实测：
+    #        all_STRONG_BREAKOUT          = **fail**（红灯 3974 分钟，主人截图所指）
+    #        all_STRONG_BREAKOUT_BACKTEST = ok（停在 09-18，3 天后必然转 fail —— 定时炸弹）
+    #
+    #   【修法】本行按「L206 墓碑注释 + L1936 同族范式」补齐：
+    #     · 产物侧：由一次性提交删除（data/STRONG_BREAKOUT*.js + raw_data/strong_breakout_*.json）；
+    #     · 巡检侧：登记进本白名单，防「有人把旧产物放回」导致红灯复发（与 CANDIDATE_BACKTEST 同口径）；
+    #     · 推送侧：api_push_raw.py::_RETIRED_ARTIFACTS 拒绝本地副本回推（根治复活循环）。
+    #   ⚠️ 只登记这两个**已退役**产物，不放松任何在跑算法产物的红线。
+    #     与 api_push_raw.py::_RETIRED_ARTIFACTS 同源维护（两处口径须一致）。
+    "STRONG_BREAKOUT", "STRONG_BREAKOUT_BACKTEST",
     # 🔴 2026-09-11 主人令（选项A）：FOUR_VOLUME_60M **已移出本白名单**，并正式登记进 CARD_DEFS
     #   （「选股策略」段，max_age=1440）。原白名单把 24h 红线降到「>7天才告警」，
     #   导致该卡产物冻结 3 天（09-08→09-11）全程零告警。现由 check_data_cards 按 d.max_age 正常判定。
 }
+# 🗑 2026-09-21 一劳永逸（小九）：**已退役产物**子集 —— 从 _LOW_FREQ_FILES 中区分出来，
+#   只为让巡检文案说真话（「已退役」而非「低频/手动维护」）。
+#   为什么必须区分：这两份产物**已删除**，若沿用 LOW_FREQ 那句「低频/手动维护文件」文案，
+#   主人会读到「它还在正常使用」的错觉。
+#   判定口径：产物已随主人令退役、生产方已摘链、前端零引用、远端已删除。
+#   与 api_push_raw.py::_RETIRED_ARTIFACTS 同源维护（两处口径须一致）。
+_RETIRED_FILES = {
+    "STRONG_BREAKOUT",           # 强势突破（2026-09-19 主人令全站删除）
+    "STRONG_BREAKOUT_BACKTEST",  # 强势突破·信号层回测（同上）
+}
+
+
 def check_all_data_files():
     """全量审计 data/*.js：已登记 CARD_DEFS 的跳过（check_data_cards 管），其余全部按通用规则查。
 
@@ -2006,11 +2040,17 @@ def check_all_data_files():
         #   正确顺序：先看是否低频白名单 → 友好 OK；不在白名单才走时间戳 warn。
         if vid in _LOW_FREQ_FILES:
             rel = str(ts)[:19] if ts and ts != "--" else "—"
+            if vid in _RETIRED_FILES:
+                # 🗑 已退役产物：既已删除就不该再出现；此处若仍命中，说明有副本被放回（放行但不冒充正常）
+                _msg = (f"{p.name} **已随主人令退役**（产物已删；仅防「旧副本被放回」而复亮红灯）；"
+                        f"如再现请核查 api_push_raw.py::_RETIRED_ARTIFACTS 是否被绕过")
+            else:
+                _msg = f"{p.name} 低频/手动维护文件（白名单内，无时间戳属正常，{p.stat().st_size//1024}KB）"
             results.append({
                 "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
                 "status": "ok", "last_update": rel, "age_min": None,
                 "heal_cat": "algo_run",
-                "message": f"{p.name} 低频/手动维护文件（白名单内，无时间戳属正常，{p.stat().st_size//1024}KB）",
+                "message": _msg,
             })
             continue
         if dt is None:
