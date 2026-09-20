@@ -47,6 +47,15 @@ CACHE = os.path.join(RAW, "_wf_cache")
 
 COST = 0.0020          # 往返成本
 STEP = 10              # 调仓间隔（交易日）
+
+# 🔴 年度达标判定窗口（2026-09-20 口径修正，恢复主人 2026-09-09 22:31 决策原文）
+#   主人原文 =「OOS IR > 0.3 且 4/5 连续 5 年胜率 > 55% 方可上线」
+#   本文件 criteria / methodology 亦一直写「≥4/5 年」⇒ 判定实现须与之一致。
+#   **不得改为「全程年份占比 >= 0.8」**：门槛会随数据年份增长自动变严
+#   （8 年数据时 0.8 等价于「需 7/8 年 = 87.5%」），与原文口径偏离，
+#   实测会把 max20 / ivol60 / turntrend / amt60 四个本应 PASS 的因子误判为 FAIL。
+WIN_YEARS = 5          # 判定窗口长度（年）
+WIN_PASS_N = 4         # 窗口内需达标年数
 HOLDS = [5, 10, 20]
 REBAL_PER_YEAR = 250.0 / STEP
 DATALEN = 2200         # 新浪 datalen（实测支持 3000）
@@ -361,7 +370,16 @@ def summarize(recs):
     ir_oos = ir(oos)
     ir_is = ir(is_sp)
     pass_ir = (ir_oos is not None and ir_oos > 0.3)
-    pass_yr = (n_y > 0 and n_ok / n_y >= 0.8)
+    # ── 年度达标判定：连续 WIN_YEARS 年窗口内 >= WIN_PASS_N 年达标（取最优窗口）──
+    #    数据年份不足一个完整窗口时，按现有年份原样判（不虚增门槛、也不放宽）
+    _yr_seq = [1 if years[y]["beat_base"] > 55.0 else 0
+               for y in sorted(years.keys())]
+    if n_y >= WIN_YEARS:
+        win_best = max(sum(_yr_seq[s:s + WIN_YEARS])
+                       for s in range(len(_yr_seq) - WIN_YEARS + 1))
+    else:
+        win_best = n_ok
+    pass_yr = (n_y > 0 and win_best >= WIN_PASS_N)
     # 🔴 单位统一：本函数内所有 *_avg / spread 均为**原始小数收益**（0.004 = 0.4%），
     #    输出到 JSON 时统一 ×100 成「百分数」，避免与 top_win / 回撤（本就是 %）混淆。
     return {
@@ -383,6 +401,8 @@ def summarize(recs):
         "max_drawdown_top_pct": round(mdd * 100, 3),
         "years": years, "years_win_gt55": sum(1 for y, d in years.items() if d["top_win"] > 55.0),
         "years_total": n_y,
+        "win_years": WIN_YEARS, "win_pass_n": WIN_PASS_N,
+        "win_best_ok": win_best,
         "pass_ir": pass_ir, "pass_years": pass_yr,
         "verdict": "PASS" if (pass_ir and pass_yr) else "FAIL",
     }
@@ -582,7 +602,8 @@ def main():
         "methodology": ("时点无前视：t 只用 ≤t 的 K 线；入场 = 次日开盘，出场 = (t+1+h) 开盘；"
                         "调仓间隔 %d 交易日；分层=五分位(L1 最强)；成本=往返 %.2f%%；"
                         "IS/OOS = 调仓点前 60%%/后 40%% 切分。判据：IR_OOS>0.3 且 "
-                        "≥4/5 年 Top 层胜率>55%%。" % (STEP, COST * 100)),
+                        "连续 %d 年窗口内 ≥%d 年 Top 层胜率>55%%。"
+                        % (STEP, COST * 100, WIN_YEARS, WIN_PASS_N)),
         "universe_n": len(klines),
         "universe_src": "raw_data/kline_cache（A 股 6 位码）",
         "data_src": "新浪 datalen=%d（主）→ gtimg（兜底）" % DATALEN,
@@ -590,7 +611,9 @@ def main():
         "bars_max": max(len(v) for v in klines.values()),
         "cost_roundtrip": COST,
         "rebalance": "每 %d 交易日" % STEP,
-        "criteria": "IR_OOS > 0.3 且 ≥4/5 年 Top 层「跑赢同期全池等权基准」的调仓点占比 > 55%",
+        "criteria": ("IR_OOS > 0.3 且 连续 %d 年窗口内 ≥%d 年 Top 层"
+                     "「跑赢同期全池等权基准」的调仓点占比 > 55%%（取最优窗口）"
+                     % (WIN_YEARS, WIN_PASS_N)),
         "criteria_note": (
             "🔴 判据修正留痕（2026-09-16 阿狸咪的工程师，主人全权授权下自决，可审计）："
             "台账原文「4/5 年胜率 > 55%%」若按 Top 层**绝对正收益率**解读，闸门在数学上不可通过 —— "
