@@ -8349,6 +8349,12 @@ window.__renderIndexObserve = function(){
   // 数据源：raw_data/factor_progress.json（由 gen_factor_progress.py 根据 FACTOR_AUDIT + 主人分批决策生成）
   window.__fpRetry = 0;
 
+  /* 🔧 2026-09-20 21:52 阿狸咪的工程师：恢复被 0d3482be4 误删的 _renderPostReady 定义。
+     该提交在删 __renderFactorLab 死代码时把本函数连带删掉，但下方调用点仍在
+     ⇒ ReferenceError: _renderPostReady is not defined，策略回测区初始渲染全挂。
+     按该提交本意剔除 __renderFactorLab 调用，其余 11 个渲染函数实测均存活。 */
+  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderBtExtraPane(); }catch(e){} try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderObsPlatform(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeObserve(); }catch(e){} try{ window.__renderIndexObserve(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} try{ window.__renderDailyFactorCalc(); }catch(e){} } try{ window.renderLifeBacktests(); }catch(e){}
+
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
   } else {
