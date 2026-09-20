@@ -732,7 +732,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python - <<'PY'
-          import os, re, hashlib, base64, json, urllib.request
+          import os, re, time, hashlib, base64, json, urllib.request, urllib.error
           TOK = os.environ["GITHUB_TOKEN"]
           REPO = "ah-quant999/quant-scanner-v8"
           API = "https://api.github.com/repos/" + REPO
@@ -744,33 +744,46 @@ jobs:
           #   整文件 PUT 会把主线手改全部回退（实测 2026-09-12 一次 855 行 517+/338- 事故）。
           #   改为取【当前 main 的 index.html】原文，只把 ALGO_TRACK ?v 改掉再 PUT，主线手改一律保留。
           #   注：index.html > 1MB，Contents API 的 content 字段为空 → 用 blob API 取全文。
-          meta = json.loads(urllib.request.urlopen(urllib.request.Request(API + "/contents/index.html?ref=main", headers=H)).read())
-          _raw = urllib.request.urlopen(urllib.request.Request(
-              "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, meta["sha"]),
-              headers=dict(H, Accept="application/vnd.github.raw"))).read()
-          html = _raw.decode("utf-8")
-          p = os.path.join(ROOT, "data", "ALGO_TRACK.js")
-          # ★ 2026-08-16 审计修复：必须与 build/reconcile 的 ?v 计算逐字符一致——
-          #   ① 取原始字节（非 read().encode()，避免 Windows CRLF→LF 归一化致 sha 偏移）；
-          #   ② 中性化 republish_time 构建时间戳（_write_js 每次注入，否则 ?v 随构建时刻漂）。
-          #   否则写出的 ?v 与 reconcile 算出的不一致 → ALGO_TRACK 缓存戳失配 → CDN 吐旧副本。
-          if os.path.exists(p):
-              _b = open(p, "rb").read()
-              _neutral = re.sub(rb'"republish_time"\s*:\s*"[^"]*"', b'"republish_time":""', _b)
-              t = hashlib.sha1(_neutral).hexdigest()[:10]
-          else:
-              t = ""
-          if not t:
-              print("ALGO_TRACK.js 缺失，跳过")
-              raise SystemExit(0)
-          new = re.sub(r'(ALGO_TRACK\.js)\?v=\w+', r'\1?v=' + t, html)
-          if new == html:
-              print("ALGO_TRACK ?v 已是最新，无需推送")
-          else:
+          def _fetch_main_html():
+              """每次调用都重新取 main 的 index.html 真身（含 blob sha）——重试必须基于最新基线"""
+              _m = json.loads(urllib.request.urlopen(urllib.request.Request(
+                  API + "/contents/index.html?ref=main", headers=H), timeout=60).read())
+              _r = urllib.request.urlopen(urllib.request.Request(
+                  "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, _m["sha"]),
+                  headers=dict(H, Accept="application/vnd.github.raw")), timeout=120).read()
+              return _m["sha"], _r.decode("utf-8")
+
+          # ★ 2026-09-20 小九的工程师：原为「取一次真身 -> 单次 PUT」的裸推送。
+          #   本仓 index.html 是分钟级 churning 热文件（CI 每轮改 ?v=），单次 PUT 在并发改动下会
+          #   以 409 抛异常、整步失败（run 35496645199 的 step15 failure 即此形态；根因无法从日志证实 ——
+          #   本机 token 缺 actions:read，run/job 日志恒 403，故不臆断单一根因）。
+          #   改为「重试前重新取 main 真身 + 重算 sha」的乐观锁重试：既治并发 409，
+          #   也覆盖网络抖动；失败时打印响应正文，使下一次失败可诊断（不再是无信息抛栈）。
+          #   3 次仍失败 -> exit 1（绝不静默放过）。
+          meta_sha, html, _last_err = None, None, ""
+          for _att in range(1, 4):
+              meta_sha, html = _fetch_main_html()
+              new = re.sub(r'(ALGO_TRACK\.js)\?v=\w+', r'\1?v=' + t, html)
+              if new == html:
+                  print("ALGO_TRACK ?v 已是最新，无需推送（第 %d 次取真身校验）" % _att)
+                  break
               open(idx, "w", encoding="utf-8").write(new)
-              body = json.dumps({"message": "chore: 算法链后同步 ALGO_TRACK ?v（防覆盖）", "content": base64.b64encode(new.encode()).decode(), "sha": meta["sha"]}).encode()
-              req = urllib.request.Request(API + "/contents/index.html", data=body, headers=H, method="PUT")
-              print("push index.html ALGO_TRACK ?v:", urllib.request.urlopen(req).getcode(), "v=", t)
+              body = json.dumps({"message": "chore: 算法链后同步 ALGO_TRACK ?v（防覆盖）", "content": base64.b64encode(new.encode()).decode(), "sha": meta_sha}).encode()
+              try:
+                  req = urllib.request.Request(API + "/contents/index.html", data=body, headers=H, method="PUT")
+                  print("push index.html ALGO_TRACK ?v:", urllib.request.urlopen(req, timeout=180).getcode(), "v=", t)
+                  break
+              except urllib.error.HTTPError as _e:
+                  _last_err = "HTTP %s: %s" % (_e.code, _e.read().decode("utf-8", "replace")[:400])
+                  print("  第 %d 次 PUT 失败 -> %s；将重新取 main 真身后重试" % (_att, _last_err), flush=True)
+                  time.sleep(5 * _att)
+              except Exception as _e:
+                  _last_err = "%s: %s" % (type(_e).__name__, _e)
+                  print("  第 %d 次 PUT 异常 -> %s；将重试" % (_att, _last_err), flush=True)
+                  time.sleep(5 * _att)
+          else:
+              print("::error::index.html ALGO_TRACK ?v 推送 3 次均失败：%s" % _last_err)
+              raise SystemExit(1)
           PY
 
       # 🛡 2026-08-28 一劳永逸（主站审计 P0-1 根治）：链尾「产物完整性闸门」
