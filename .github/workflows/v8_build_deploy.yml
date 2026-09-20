@@ -307,7 +307,8 @@ jobs:
             #   FINAL_RECOMMEND_DATA) 只由 cn 直接推，update_v8 不重建，构建机 checkout
             #   若落后 cn 最新推送就会拿到旧内容算旧 ?v → CDN 吐旧副本。先 reset 到
             #   FETCH_HEAD 即拿到 cn 最新版，reconcile 即可对齐。
-            git fetch "$REPO" main
+            # 🛡 2026-09-21 小九：fetch 同样加硬超时（同源阻塞风险；断开即走下方 update_v8 重跑失败路径）
+            timeout 180 git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=60 fetch "$REPO" main
             # ★★ 2026-08-18 根因修复：build bot 不要擦除人工前端改动 ★★
             #   `git reset --hard FETCH_HEAD` 会把 index.html 上的人工 UI 修改（如 v6备忘录
             #   iframe 加载兜底、子 tab 顺序调整、卡片增删）全部擦回远端旧版。此处先备份
@@ -464,11 +465,25 @@ jobs:
               exit 0
             fi
             git commit -m "v8 build: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
-            if git push "$REPO" HEAD:main; then
+            # 🛡🛡 2026-09-21 小九（线上失败取证后加固）·推送硬超时
+            #   实证（2026-09-20，4 轮 failure 的失败步**恒为**本步）：
+            #     #7239 本步 2369s / #7233 1841s / #7229 2204s / #7225 2372s
+            #   不是逻辑错 —— 是 `git push` 撞上远端高频 churn（v8-cache-bot 每几分钟一推）
+            #   后**长时间无进展地阻塞**：Git 默认重试/退避无上限，卡住就不返回。
+            #   叠加「三次重试 × 每轮全量 update_v8(~4min)」，单步吃掉 30~40 分钟，
+            #   直逼 build job 的 60 分钟超时上限 ⇒ 随时被超时判 cancelled。
+            #   修法只加**超时护栏**，不改推送语义：
+            #     ① http.lowSpeedLimit/Time —— 传输 <1KB/s 持续 60s 即断开（Git 原生低速保护，
+            #        专治「连上但不传数据」；比外壳 timeout 更早触发、更省时间）
+            #     ② timeout 180 —— 每轮硬上限 3 分钟；三轮最坏 9 分钟，仍在预算内
+            #     ③ 断开**不视为致命**：继续走既有「fetch → 全量重建 → 重试」路径
+            #   ⇒ 最坏情况从「阻塞到 job 超时」变成「3 分钟后正常重试」。
+            _GITSLOW="-c http.lowSpeedLimit=1000 -c http.lowSpeedTime=60"
+            if timeout 180 git $_GITSLOW push "$REPO" HEAD:main; then
               echo "✅ 已部署 main（第 $i 次尝试，GitHub Pages 自动重建）"; exit 0
             fi
-            echo "⚠️ push 被拒（远端已前进），同步远端并按最新 raw_data 全量重建后重试 ($i/3)"
-            git fetch "$REPO" main
+            echo "⚠️ push 被拒/超时（远端已前进或传输停滞），同步远端并按最新 raw_data 全量重建后重试 ($i/3)"
+            timeout 180 git $_GITSLOW fetch "$REPO" main
             # 重试路径同样备份/恢复 index.html，避免人工前端改动被擦除
             # 🛡🛡 2026-09-16 一劳永逸（阿狸咪的工程师）·同上：重试路径存在同一覆盖源，
             #   改为仅在确有未提交改动时才备份/恢复（原因见上方主路径注释）。

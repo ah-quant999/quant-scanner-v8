@@ -3,10 +3,10 @@
 """
 v8 Pre-deploy audit（CI 自动门禁，2026-09-05 主人令一劳永逸落地）
 ================================================================
-目的：每次云端 build/deploy 前自动跑 **9** 项校验，任何一项失败 → 阻断 deploy。
+目的：每次云端 build/deploy 前自动跑 **11** 项校验，任何一项失败 → 阻断 deploy。
 等同「改后三件套」固化为 CI step，不再依赖人工记忆流程。
 
-九项校验：
+十一项校验：
   1. py_compile        —— 所有 *.py 文件 0 语法错误
   2. new Function      —— index.html 所有 inline <script> 0 语法错误（Node）
   3. 完整性核对        —— data/*.js 数量在下界 90 与**动态上界**之间
@@ -26,7 +26,13 @@ v8 Pre-deploy audit（CI 自动门禁，2026-09-05 主人令一劳永逸落地�
                           （2026-09-20 新增：全仓 34 个校验脚本无一覆盖该产物 ⇒
                            产物被反向覆盖回旧口径时静默无人拦。
                            本项**分档**：脚本口径漂移=阻断；产物未重跑=告警放行，
-                           防误杀 v8_build_deploy.yml 与 v8_cn_fetch_cloud.yml 两条链）
+                            防误杀 v8_build_deploy.yml 与 v8_cn_fetch_cloud.yml 两条链）
+  10. index 核心标记守卫 —— index.html 关键锚点在位（防「落后基线旧树」静默覆盖）
+                           （2026-09-20 阿狸咪新增）
+  11. defer 数据缓存守卫 —— defer 加载的数据源不得进「结果缓存」
+                           （2026-09-20 阿狸咪实证 + 小九固化为门禁：数据未就位即缓存
+                            空值 ⇒ 此后永空且全程不报错，属静默失效。
+                            详见 check_defer_cache_guard 内注）
 
 退出码：
   0  全部通过
@@ -649,6 +655,108 @@ def check_gate_headnote():
         return False, "；".join(fails[:4])
     return True, "闸门头注与 READY_SPEC 真源一致（项数/门槛/P0 专项）"
 
+def check_defer_cache_guard():
+    """[11/11] defer 数据 × 结果缓存 = 空结果永久固化（2026-09-20 阿狸咪实证·小九固化门禁）。
+
+    背景（阿狸咪 `2026-09-20_2323` 交接件 §二，含**受控复现**）：
+      `data/BACKTEST_COMPREHENSIVE.js` 等外链数据均为 **defer 加载**，而内联 <script>
+      在解析期先执行 ⇒ 首屏渲染时 `window.X` 可能仍 undefined。
+      此时若把「空结果」写进结果缓存（`window.__xxxCache = 空`），此后即便数据到位也
+      **永远返回空** ⇒ 卡片永久显示「暂无历史回测信号」。
+      受控复现（CDP `Network.setBlockedURLs` 屏蔽该脚本）：
+        ① 屏蔽 → 缓存写入 total_signals=0 ⇒ 卡显示「暂无」
+        ② 解除屏蔽 + 注入已就位数据 → **仍返回 0**（缓存被复用）⇒ 固化成立
+        ③ 修复版（不写缓存）同场景 → 恢复 127/12 档 ✅
+      已清理两处：`__tripleBacktestCache`（三重共识回测）、`__gaoshouSetCache`（高手共振）。
+      同仓先例：`__strongTrackBacktest` 自 2026-09-16 起注释即明写「绝不能缓存」。
+
+    为什么必须做成**门禁**（而非只修那两处）：
+      这类缺陷**完全不报错** —— `new Function` 语法检查通过、页面无 console error、
+      构建全绿，只是渲染结果恒空。属「静默失效」，只能靠结构不变式拦。
+
+    判据（纯结构，不看注释、不看运行时）：
+      ① 真源：index.html 中带 `defer` 的 `<script src="data/<NAME>.js">` ⇒ 延迟数据名集合 D
+      ② 扫 index.html 取出所有「结果缓存变量」赋值 `window.__<xx>Cache = ...`
+      ③ 对每个缓存变量所属的**函数体**（自上而下最近一个 `function`/`= function`），
+         若函数体内出现 D 中任一数据名（形如 `window.<NAME>`）⇒ **FAIL**
+
+    为什么这样判**不会误杀**：
+      · 只认 `window.__*Cache` 这一命名族（真缓存）；不碰 `__lifeModalCache` 这类
+        纯 DOM 片段缓存 —— 后者不读 defer 数据，故第 ③ 步自然不命中。
+      · 若某函数**先判数据就位再缓存**（合法写法），其函数体内仍会出现数据名 ⇒ 会命中。
+        这是**有意的摩擦力**：该函数应改为「数据未就位则 return，不写缓存」；
+        与其赌它写对了，不如强制它走「每次实时取数」这条已被实证正确的路。
+      · 数据名取自 **defer 清单真源**（index.html 自身），不硬编码名单。
+
+    维护纪律：新增 defer 数据源无需改本项（自动纳入）；**新增结果缓存**才会触发本项。
+      若有正当理由要缓存，请在缓存值里带上数据时间戳做失效判定，并在此处登记豁免。
+    """
+    idx = ROOT / "index.html"
+    if not idx.exists():
+        return True, "index.html 不存在（放行）"
+    try:
+        txt = idx.read_text(encoding="utf-8")
+    except Exception as e:
+        return False, "index.html 读取失败: %s" % e
+
+    # ① defer 数据源真源
+    defer_names = set()
+    for m in re.finditer(r'<script\s+src="data/([A-Za-z0-9_]+)\.js(?:\?v=[^"]*)?"([^>]*)>', txt):
+        if "defer" in (m.group(2) or "").lower():
+            defer_names.add(m.group(1))
+    if not defer_names:
+        return True, "未探测到 defer 数据源（放行，避免守卫自身成为单点）"
+
+    # ② 结果缓存变量
+    caches = sorted(set(re.findall(r'window\.(__[A-Za-z0-9_]*Cache[A-Za-z0-9_]*)\s*=', txt)))
+    if not caches:
+        return True, "无结果缓存变量（defer 数据 %d 个，0 风险）" % len(defer_names)
+
+    # ③ 定位每个缓存变量所属函数体
+    lines = txt.splitlines()
+    offenders = []
+    for var in caches:
+        # 找赋值行；若有多处，逐处查
+        for i, ln in enumerate(lines):
+            if not re.search(r'window\.' + re.escape(var) + r'\s*=', ln):
+                continue
+            # 向上找最近的函数起始（window.<fn> = function 或 function <fn>）
+            fn_start, fn_name = None, "?"
+            for j in range(i, max(-1, i - 400), -1):
+                m2 = re.search(r'(?:window\.)?([A-Za-z0-9_$]+)\s*=\s*function\s*\(', lines[j])
+                if m2:
+                    fn_start, fn_name = j, m2.group(1)
+                    break
+                m3 = re.search(r'function\s+([A-Za-z0-9_$]+)\s*\(', lines[j])
+                if m3:
+                    fn_start, fn_name = j, m3.group(1)
+                    break
+            if fn_start is None:
+                fn_start, fn_name = i, "(顶层)"
+            # 函数体：向下到大括号配平（最多 400 行，防失控）
+            depth, body_end = 0, min(len(lines), fn_start + 400)
+            started = False
+            for j in range(fn_start, min(len(lines), fn_start + 400)):
+                depth += lines[j].count("{") - lines[j].count("}")
+                if lines[j].count("{"):
+                    started = True
+                if started and depth <= 0:
+                    body_end = j
+                    break
+            body = "\n".join(lines[fn_start:body_end + 1])
+            hit = sorted(n for n in defer_names if ("window." + n) in body)
+            if hit:
+                offenders.append("%s() → 缓存 %s，却读 defer 数据 %s（第 %d 行）"
+                                 % (fn_name, var, "/".join(hit[:3]), i + 1))
+                break  # 同一变量报一次即可
+    if offenders:
+        return (False, "%d 处「defer 数据 × 结果缓存」空结果固化风险"
+                       "（数据未就位即缓存空值 ⇒ 此后永空，且全程不报错）:\n    "
+                % len(offenders) + "\n    ".join(offenders[:6]))
+    return (True, "defer 数据 %d 个 × 结果缓存 %d 个：0 处空结果固化风险"
+            % (len(defer_names), len(caches)))
+
+
 def check_index_markers():
     """[10/10] index.html 核心标记守卫（2026-09-20 阿狸咪新增·结构性封堵「旧树静默覆盖」）。
 
@@ -711,11 +819,13 @@ def main():
         ("[8/8] 心跳产物名一致", check_heartbeat_name_consistency),
         ("[9/9] 回测口径守卫", check_backtest_caliber),
         ("[10/10] index 核心标记守卫", check_index_markers),
+        ("[11/11] defer 数据缓存守卫", check_defer_cache_guard),
     ]
     print("=" * 60)
     print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；"
           "2026-09-13 扩至 6 项；2026-09-14 扩至 8 项；2026-09-20 扩至 9 项（回测口径守卫）；"
-          "同日扩至 10 项（[10/10] index.html 核心标记守卫·防旧树覆盖））")
+          "同日扩至 10 项（[10/10] index.html 核心标记守卫·防旧树覆盖）；"
+          "同日扩至 11 项（[11/11] defer 数据缓存守卫·防空结果固化））")
     print("=" * 60)
     fails = 0
     results = []
