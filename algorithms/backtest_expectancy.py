@@ -28,6 +28,26 @@ from datetime import datetime
 # ── 常量 ──
 HORIZONS = [3, 5, 10]
 SHRINK_K = 10
+
+# ════════════════════════════════════════════════════════════════
+# 交易口径常量（2026-09-20 主人拍板「改动①」：口径可配置 + 成本显式化）
+# ------------------------------------------------------------------
+# 背景：旧口径 forward_return 用「T 日收盘价」买入（p0 = kline[date]）——
+#   信号由当日收盘数据算出，却按当日收盘价成交，属前视偏差（无法实盘实现）。
+#   同时未扣任何交易成本，期望值系统性虚高。
+# 新口径（默认）：
+#   ENTRY_MODE = "next_open"  信号日 T → 次日 T+1 开盘价买入；
+#                             持有到 T+1+h 的开盘价卖出（h 个交易日）
+#                             若信号日/次日无开盘价则回退收盘价（并在 meta 记账）
+#   COST_ROUND_TRIP_PCT = 0.2 双边总成本（%），从每笔收益中扣除
+# 回退：设环境变量 V8_BT_LEGACY_ENTRY=1 可恢复旧口径（T 日收盘价、零成本），
+#   用于「新旧口径同源对比」，发布前可复核。切勿在正式产物中开启。
+# ════════════════════════════════════════════════════════════════
+COST_ROUND_TRIP_PCT = 0.2          # 双边总成本（%）：印花税+佣金+滑点
+# 口径开关（可用环境变量 V8_BT_LEGACY_ENTRY=1 恢复旧口径，供新旧对比；正式产物切勿开启）
+ENTRY_MODE = "close" if os.environ.get("V8_BT_LEGACY_ENTRY") == "1" else "next_open"
+LEGACY_ENTRY = ENTRY_MODE == "close"
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_ALGO = BASE_DIR   # 仓库部署时与原版一致：相对脚本自身目录
 DEFAULT_HIST = os.path.join(DEFAULT_ALGO, "..", "raw_data", "history")
@@ -169,26 +189,56 @@ def _bs_code(code, market=""):
 
 
 def load_kline_local(code, market, kline_cache):
+    """读本地 K 线缓存 → {date: {"close": c, "open": o}}（open 缺失时为 None）
+
+    🔴 命名回退（2026-09-20 修）：仓库内 K 线缓存存在两套命名体系——
+       ① 纯 6 位：`603993.json`（raw_data/kline_cache 口径）
+       ② 带市场前缀：`sh_603993.json` / `sh.603993.json`（algorithms/_opt_kline_cache 口径）
+    原实现只找 ②，导致 ① 全量落空（表现为 with_kline 意外为 0 或误判 partial）。
+    按 ③① ② 顺序逐个尝试，命中即用。
+    """
     bs = _bs_code(code, market) or f"sh.{code.zfill(6)}"
-    fname = bs.replace(".", "_") + ".json"
-    path = os.path.join(kline_cache, fname)
-    if not os.path.isfile(path):
-        path2 = os.path.join(kline_cache, f"{bs}.json")
-        if not os.path.isfile(path2):
-            return None
-        path = path2
+    c6 = bs.split(".")[-1]
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(os.path.join(kline_cache, f"{bs}.json"), "r", encoding="utf-8") as f:
             rows = json.load(f)
     except Exception:
+        rows = None
+        for _fn in (f"{bs}.json", f"{bs.replace('.', '_')}.json", f"{c6}.json"):
+            p = os.path.join(kline_cache, _fn)
+            if not os.path.isfile(p):
+                continue
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    rows = json.load(f)
+                break
+            except Exception:
+                continue
+    if not isinstance(rows, list):
         return None
     out = {}
     for r in rows:
+        if not isinstance(r, dict):
+            continue
         dt = r.get("date")
         cl = r.get("close")
-        if dt and cl is not None and not (isinstance(cl, float) and math.isnan(cl)):
-            out[dt] = float(cl)
-    return out
+        if not dt:
+            continue
+        if cl is None or (isinstance(cl, float) and math.isnan(cl)):
+            continue
+        try:
+            cl = float(cl)
+        except (TypeError, ValueError):
+            continue
+        op = r.get("open")
+        if op is not None and isinstance(op, float) and math.isnan(op):
+            op = None
+        try:
+            op = float(op) if op is not None else None
+        except (TypeError, ValueError):
+            op = None
+        out[dt] = {"close": cl, "open": op}
+    return out or None
 
 
 def load_kline_baostock(code, market, cache_dir):
@@ -201,7 +251,7 @@ def load_kline_baostock(code, market, cache_dir):
         return None
     try:
         rs = bs.query_history_k_data_plus(
-            bs_code, "date,close",
+            bs_code, "date,open,close",
             start_date="2025-01-01", end_date=datetime.now().strftime("%Y-%m-%d"),
             frequency="d", adjustflag="2",
         )
@@ -212,15 +262,18 @@ def load_kline_baostock(code, market, cache_dir):
         bs.logout()
     out = {}
     for r in rows:
-        if len(r) >= 2 and r[0] and r[1]:
+        if len(r) >= 3 and r[0] and r[2]:
             try:
-                out[r[0]] = float(r[1])
+                op = float(r[1]) if r[1] else None
+                out[r[0]] = {"close": float(r[2]),
+                             "open": op if (op and op > 0) else None}
             except ValueError:
                 pass
     if out and cache_dir:
         os.makedirs(cache_dir, exist_ok=True)
         with open(os.path.join(cache_dir, f"{bs_code}.json"), "w", encoding="utf-8") as f:
-            json.dump([{"date": k, "close": v} for k, v in sorted(out.items())], f)
+            json.dump([{"date": k, "open": v["open"], "close": v["close"]}
+                       for k, v in sorted(out.items())], f)
     return out
 
 
@@ -236,21 +289,88 @@ def get_kline(code, market, kline_cache, use_baostock):
     return None
 
 
-def forward_return(kline, date, h):
+# ── 前向收益（2026-09-20 口径改造，主人拍板「改动①」）──
+# 旧口径缺陷：p0 = kline[dates[i]]（信号日收盘）→ 前视偏差 + 零成本。
+# 新口径：T 日信号 → T+1 开盘买入 → T+1+h 开盘卖出，扣 COST_ROUND_TRIP_PCT。
+_FALLBACK_STAT = {"next_open": 0, "close_fallback": 0, "too_short": 0, "no_entry": 0}
+
+
+def closes_of(kline):
+    """从 {date:{"close":c,"open":o}} 取升序收盘价列表（P4 因子/残差动量用）。
+    🔴 口径统一助手：全脚本只此一处把 K 线字典转成价格序列，避免散落 `kline[d]`。"""
+    if not kline:
+        return []
+    return [kline[d]["close"] for d in sorted(kline.keys())]
+
+
+def dates_of(kline):
+    return sorted(kline.keys())
+
+
+def _px(rec, field):
+    """从 {date:{"close":c,"open":o}} 记录取价；open 缺失回退 close（并记账）"""
+    if rec is None:
+        return None
+    v = rec.get(field)
+    if v is None or v <= 0:
+        if field == "open":
+            v = rec.get("close")
+            if v is not None and v > 0:
+                _FALLBACK_STAT["close_fallback"] += 1
+                return float(v)
+        return None
+    return float(v)
+
+
+def forward_return(kline, date, h, cost_pct=None):
+    """前向收益(%)。
+
+    默认口径（ENTRY_MODE="next_open"）：
+      入场 = 信号日 T 的**下一个交易日**开盘价（T+1 open）
+      出场 = 从 T+1 起再数 h 个交易日的开盘价（T+1+h open）
+      收益 = (出场/入场 - 1)*100 - cost_pct
+    回退口径（LEGACY_ENTRY=True）：入场=出场基准均为 T 日收盘价，零成本（旧行为）。
+
+    🔴「未到期写 null」：前端还未走完 h 个交易日的样本一律返回 None（旧版返回 None 但
+      上层用 0 兜底填充，等效于「零收益样本」污染均值；本版由上层显式区分 None 与 0）。
+    """
     if not kline or date not in kline:
         return None
+    cost = COST_ROUND_TRIP_PCT if cost_pct is None else cost_pct
     dates = sorted(kline.keys())
     try:
         i = dates.index(date)
     except ValueError:
         return None
-    j = i + h
-    if j >= len(dates):
+
+    if LEGACY_ENTRY:
+        j = i + h
+        if j >= len(dates):
+            return None
+        p0 = _px(kline.get(dates[i]), "close")
+        p1 = _px(kline.get(dates[j]), "close")
+        if not p0 or not p1:
+            return None
+        return (p1 - p0) / p0 * 100.0
+
+    # 新口径：T+1 开盘入场
+    e = i + 1
+    if e >= len(dates):
+        _FALLBACK_STAT["too_short"] += 1
         return None
-    p0, p1 = kline[dates[i]], kline[dates[j]]
+    p0 = _px(kline.get(dates[e]), "open")
     if not p0:
+        _FALLBACK_STAT["no_entry"] += 1
         return None
-    return (p1 - p0) / p0 * 100.0
+    _FALLBACK_STAT["next_open"] += 1
+    j = e + h
+    if j >= len(dates):
+        _FALLBACK_STAT["too_short"] += 1
+        return None
+    p1 = _px(kline.get(dates[j]), "open")
+    if not p1:
+        return None
+    return (p1 - p0) / p0 * 100.0 - cost
 
 
 # ════════════════════════════════════════════════════════════════
@@ -296,7 +416,10 @@ def resid_momentum_pct(kline, date, mkt_kline, window=20, est=60):
         return None
     # 对齐两序列的公共日期（取个股日期为基准，向前 est+window 个交易日）
     dates = kd[max(0, i - est - window - 5):i + 1]
-    pairs = [(kline[d], mkt_kline[d]) for d in dates if d in mkt_kline]
+    _sc, _mc = closes_of(kline), closes_of(mkt_kline)
+    _smap = dict(zip(kd, _sc))
+    _mmap = dict(zip(md, _mc))
+    pairs = [(_smap[d], _mmap[d]) for d in dates if d in _smap and d in _mmap]
     if len(pairs) < est:
         return None
     sc = [p[0] for p in pairs]
@@ -333,15 +456,19 @@ def load_regime_series(algo_dir, use_baostock):
 # ════════════════════════════════════════════════════════════════
 # 4. 聚合（P4 扩展）
 # ════════════════════════════════════════════════════════════════
-def aggregate(snapshots, kline_fn, mkt_kline=None, regime_series=None, valid_codes=None):
+def aggregate(snapshots, kline_fn, mkt_kline=None, regime_series=None, valid_codes=None,
+              is_dates=None, oos_dates=None):
     """
     snapshots: [(date, [stock,...])]
-    kline_fn(code, market) -> {date:close} or None
-    mkt_kline: {date:close} 上证指数（P4 因子用）；None 则 P4 因子跳过
+    kline_fn(code, market) -> {date:{"close":c,"open":o}} or None
+    mkt_kline: {date:...} 上证指数（P4 因子用）；None 则 P4 因子跳过
     regime_series: {date: regime}（P4 门控诊断用）；空则跳过
     valid_codes: 有效A股参考集（噪声闸门）；None 回退全量计入
-    返回 (by_signal, by_factor, coverage, by_regime)
+    is_dates / oos_dates: IS/OOS 日期集合（改动③ 分段统计用）；None 则不分段
+    返回 (by_signal, by_factor, coverage, by_regime, by_factor_raw, fac_is, fac_oos)
     """
+    _is_dates = is_dates or set()
+    _oos_dates = oos_dates or set()
     by_signal = defaultdict(lambda: {h: [] for h in HORIZONS})
     factor_defs = {
         "fund": lambda s: (s.get("score_fund") or 0) > 0,
@@ -353,6 +480,9 @@ def aggregate(snapshots, kline_fn, mkt_kline=None, regime_series=None, valid_cod
         "sig_chan": lambda s: signal_tuple_of(s)[0],
     }
     by_factor = {f: {h: {"on": [], "off": []} for h in HORIZONS} for f in factor_defs}
+    # IS/OOS 分段原始池（改动③）：与 by_factor 同构，供 build_excess 分段算超额
+    by_factor_is = {f: {h: {"on": [], "off": []} for h in HORIZONS} for f in factor_defs}
+    by_factor_oos = {f: {h: {"on": [], "off": []} for h in HORIZONS} for f in factor_defs}
 
     # P4 因子桶（需要 kline+mkt，惰性计算并缓存 per (code,date)）
     p4_defs = {}
@@ -362,6 +492,8 @@ def aggregate(snapshots, kline_fn, mkt_kline=None, regime_series=None, valid_cod
             "p4_lowvol55": lambda closes, i, kd: (realized_vol_pct(closes, i, 20) or 999) <= 55,
         }
     by_factor.update({f: {h: {"on": [], "off": []} for h in HORIZONS} for f in p4_defs})
+    for _d in (by_factor_is, by_factor_oos):
+        _d.update({f: {h: {"on": [], "off": []} for h in HORIZONS} for f in p4_defs})
 
     # 残差动量：连续值，分档布尔（>5 / >10 / <-5 弱化桶）
     resid_cache = {}
@@ -370,6 +502,8 @@ def aggregate(snapshots, kline_fn, mkt_kline=None, regime_series=None, valid_cod
         "p4_resid10": lambda r: (r is not None) and (r > 10),
     }
     by_factor.update({f: {h: {"on": [], "off": []} for h in HORIZONS} for f in p4_resid_defs})
+    for _d in (by_factor_is, by_factor_oos):
+        _d.update({f: {h: {"on": [], "off": []} for h in HORIZONS} for f in p4_resid_defs})
 
     # 漂移门控诊断桶
     gate_open = {h: [] for h in HORIZONS}
@@ -411,7 +545,7 @@ def aggregate(snapshots, kline_fn, mkt_kline=None, regime_series=None, valid_cod
                 kd = sorted(kline.keys())
                 if date in kd:
                     i = kd.index(date)
-                    closes = [kline[d] for d in kd]
+                    closes = closes_of(kline)
                     for f, fn in p4_defs.items():
                         try:
                             fflags[f] = bool(fn(closes, i, kd))
@@ -437,10 +571,15 @@ def aggregate(snapshots, kline_fn, mkt_kline=None, regime_series=None, valid_cod
                     continue
                 coverage["occ_total"] += 1
                 by_signal[tup][h].append(ret)
+                # IS/OOS 分段（2026-09-20 改动③）
+                _seg = (by_factor_is if date in _is_dates else
+                        (by_factor_oos if date in _oos_dates else None))
                 for f, on in fflags.items():
                     if f not in by_factor:
                         continue
                     by_factor[f][h]["on" if on else "off"].append(ret)
+                    if _seg is not None:
+                        _seg[f][h]["on" if on else "off"].append(ret)
                 # 门控诊断
                 if gate_is_open is True:
                     gate_open[h].append(ret)
@@ -528,14 +667,111 @@ def aggregate(snapshots, kline_fn, mkt_kline=None, regime_series=None, valid_cod
         fac_gate_out[f] = rec
     reg_out["by_factor_gate"] = fac_gate_out
 
-    return sig_out, fac_out, coverage, reg_out
+    return sig_out, fac_out, coverage, reg_out, by_factor, by_factor_is, by_factor_oos
+
+
+# ════════════════════════════════════════════════════════════════
+# 4.5 超额基准基准线（2026-09-20 改动④：下架判据改「超额」）
+# --------------------------------------------------------------
+# 旧判据用「绝对收益 edge」⇒ 长持有期档被大盘 β 撑高（T+10 全线飘红实为 β 假象）。
+# 新判据：每笔样本收益 − 同期「全样本基线均值」（= 该 T+h 档位所有样本的平均收益，
+#   即市场/池子 β 的代理），得到 excess 超额。以超额排源、以超额判下架。
+# ════════════════════════════════════════════════════════════════
+def _split_is_oos(snapshots, is_ratio=0.6):
+    """按时间顺序切 IS（样本内）/ OOS（样本外）。返回 (is_dates_set, oos_dates_set)。"""
+    n = len(snapshots)
+    k = int(round(n * is_ratio))
+    k = max(1, min(n - 1, k)) if n >= 2 else n
+    is_set = set(d for d, _ in snapshots[:k])
+    oos_set = set(d for d, _ in snapshots[k:])
+    return is_set, oos_set
+
+
+def _baseline_by_h(bucket_map, h):
+    """给定 {key: [ret,...]} 求全样本均值（基准线）"""
+    allr = []
+    for rs in bucket_map.values():
+        allr.extend(rs)
+    return mean(allr)
+
+
+def _all_on_off_returns(fac_raw):
+    """把 {f: {h: {"on":[...], "off":[...]}}} 展平成 {f: {h: [...]}}（全样本池）"""
+    pools = {}
+    for f, hd in (fac_raw or {}).items():
+        pools[f] = {}
+        for h, d in (hd or {}).items():
+            pools[f][h] = list(d.get("on") or []) + list(d.get("off") or [])
+    return pools
+
+
+def build_excess(fac_out, fac_raw, fac_is, fac_oos, horizons=None):
+    """给 by_factor 补「超额」口径字段（改动④）：
+
+      excess{h}      = ret_on{h} − baseline{h}   baseline = 该 T+h 档全样本均值（β代理）
+      excess_is{h}   = IS 段在场均值 − IS 段全样本均值
+      excess_oos{h}  = OOS 段在场均值 − OOS 段全样本均值
+      verdict        = keep / watch / drop（按 T+5 超额，见 classify_verdict）
+    """
+    horizons = horizons or HORIZONS
+    pools = _all_on_off_returns(fac_raw)
+    out = {}
+    for f, rec in (fac_out or {}).items():
+        r = dict(rec)
+        r["baseline"] = {}
+        for h in horizons:
+            pool = (pools.get(f) or {}).get(h) or []
+            base = mean(pool)
+            r["baseline"][f"{h}"] = round(base, 3)
+            ret_on = rec.get(f"ret_on{h}")
+            r[f"excess{h}"] = round(ret_on - base, 3) if ret_on is not None else None
+        r["excess_is"] = _seg_excess(fac_is, f, horizons)
+        r["excess_oos"] = _seg_excess(fac_oos, f, horizons)
+        ex5 = r.get("excess5")
+        r["verdict"] = classify_verdict(ex5, rec.get("n_on5"), rec.get("edge5"))
+        r["verdict_basis"] = ("T+5 超额 (excess5=%.3f, n_on5=%s) 阈值 ±0.30pp；样本<30 一律 watch"
+                              % (ex5 if ex5 is not None else float("nan"), rec.get("n_on5")))
+        out[f] = r
+    return out
+
+
+def _seg_excess(fac_seg, f, horizons):
+    """分段（IS/OOS）在场超额：在场均值 − 该段全样本均值"""
+    seg = (fac_seg or {}).get(f)
+    if not seg:
+        return None
+    res = {}
+    for h in horizons:
+        on = seg.get(h, {}).get("on") or []
+        off = seg.get(h, {}).get("off") or []
+        if not on:
+            res[f"{h}"] = None
+            continue
+        res[f"{h}"] = round(mean(on) - mean(on + off), 3)
+    return res
+
+
+def classify_verdict(excess5, n_on5, exedge5=None):
+    """下架判据（2026-09-20 改动④）：以 T+5 超额为准。
+      excess5 >= +0.30pp 且 n>=30  → keep   保留
+      -0.30 < excess5 < +0.30      → watch  观察
+      excess5 <= -0.30pp           → drop   候选下架
+    样本不足(<30) 一律 watch（不得据薄样本下架）。
+    """
+    if excess5 is None or (n_on5 or 0) < 30:
+        return "watch"
+    if excess5 >= 0.30:
+        return "keep"
+    if excess5 <= -0.30:
+        return "drop"
+    return "watch"
 
 
 # ════════════════════════════════════════════════════════════════
 # 5. 自检（合成数据）
 # ════════════════════════════════════════════════════════════════
 def selftest():
-    print("=== 自检：收缩 / 胜率 / 期望 / P4 ===")
+    print("=== 自检：收缩 / 胜率 / 期望 / P4 / 新口径 ===")
     rs = [5.0, 5.0, 5.0]
     n = len(rs)
     assert abs(shrink_win(win_rate(rs), n) - (50 + (100 - 50) * n / (n + SHRINK_K))) < 1e-6
@@ -543,9 +779,37 @@ def selftest():
     big = [5.0] * 200
     assert abs(shrink(mean(big), 200) - 5.0 * 200 / (200 + SHRINK_K)) < 1e-6
     assert abs(win_rate([1.0, -1.0, 0.0]) - 100 / 3) < 1e-6
-    kl = {"2026-01-01": 100.0, "2026-01-02": 110.0, "2026-01-03": 121.0, "2026-01-04": 121.0}
-    assert abs(forward_return(kl, "2026-01-01", 1) - 10.0) < 1e-6
-    assert forward_return(kl, "2026-01-01", 10) is None
+
+    # ── 口径自检（2026-09-20 改动①）────────────────────────────
+    def mk(rows):
+        """rows: [(date, open, close)] → 新结构 K 线"""
+        return {d: {"close": c, "open": o} for d, o, c in rows}
+
+    kl = mk([("2026-01-01", 99.0, 100.0), ("2026-01-02", 110.0, 111.0),
+             ("2026-01-03", 121.0, 122.0), ("2026-01-04", 121.0, 121.0)])
+    if LEGACY_ENTRY:
+        # 旧口径：T 收盘 → T+h 收盘，零成本
+        assert abs(forward_return(kl, "2026-01-01", 1) - 10.0) < 1e-6, "旧口径 T+1 应为 +10%"
+    else:
+        # 新口径：T+1 开盘(110) → T+1+1 开盘(121) = +10%，再扣 0.2% 成本
+        r = forward_return(kl, "2026-01-01", 1)
+        assert abs(r - (10.0 - COST_ROUND_TRIP_PCT)) < 1e-6, f"新口径 T+1 应={10-COST_ROUND_TRIP_PCT}, 实={r}"
+        # 🔴 未到期必须 None（不得用 0 冒充）
+        assert forward_return(kl, "2026-01-01", 10) is None, "未到期应返回 None"
+        assert forward_return(kl, "2026-01-03", 1) is None, "序列尾端未到期应返回 None"
+        # 成本确实被扣（与零成本对照）
+        r0 = forward_return(kl, "2026-01-01", 1, cost_pct=0.0)
+        assert abs((r0 - r) - COST_ROUND_TRIP_PCT) < 1e-9, "成本未按 round-trip 扣除"
+        # open 缺失回退 close
+        kl_noopen = {"2026-01-01": {"close": 100.0, "open": None},
+                     "2026-01-02": {"close": 110.0, "open": None},
+                     "2026-01-03": {"close": 121.0, "open": None}}
+        r2 = forward_return(kl_noopen, "2026-01-01", 1)
+        assert r2 is not None and abs(r2 - (10.0 - COST_ROUND_TRIP_PCT)) < 1e-6, f"缺 open 应回退 close: {r2}"
+    # closes_of 口径统一助手
+    assert closes_of(kl) == [100.0, 111.0, 122.0, 121.0], "closes_of 应取升序收盘"
+    assert closes_of(None) == []
+
     # P4：恒定价格 → 波动率 0 → lowvol True；残差 = 个股收益 − β×市场收益
     # 合成 90 个交易日（est=60 + window=20 需要足量历史）
     import datetime as _dt
@@ -555,19 +819,72 @@ def selftest():
         if _d.weekday() < 5:
             _dates.append(_d.isoformat())
         _d += _dt.timedelta(days=1)
-    flat = {d: 100.0 for d in _dates}
-    assert realized_vol_pct(list(flat.values()), len(flat) - 1, 20) == 0.0
-    up_mkt = {d: 100.0 + i for i, d in enumerate(_dates)}
+    flat = {d: {"close": 100.0, "open": 100.0} for d in _dates}
+    assert realized_vol_pct(closes_of(flat), len(flat) - 1, 20) == 0.0
+    up_mkt = {d: {"close": 100.0 + i, "open": 100.0 + i} for i, d in enumerate(_dates)}
     rm = resid_momentum_pct(flat, _dates[-1], up_mkt)
     assert rm is not None and rm < 0, f"平价股对上涨市场残差应为负: {rm}"
     snap = [("2026-01-01", [{"code": "600000", "market": "sh",
                              "signals": {"chan": True, "jinzuan": False, "jigou": True, "trend": True},
                              "score_fund": 5, "score_sector": 0, "score_quality": 3}])]
-    sig, fac, cov, reg = aggregate(snap, lambda c, m: {**kl, **{f"2025-12-{d:02d}": 90.0 + d for d in range(1, 32)}},
-                                   mkt_kline=None, regime_series={"2026-01-01": "grind"})
-    assert abs(sig["1,0,1,1"]["ret3"] - round(21.0 / (1 + SHRINK_K), 3)) < 1e-6
+    _pre = {f"2025-12-{d:02d}": {"close": 90.0 + d, "open": 90.0 + d} for d in range(1, 32)}
+    sig, fac, cov, reg, _raw, _is, _oos = aggregate(
+        snap, lambda c, m: {**kl, **_pre},
+        mkt_kline=None, regime_series={"2026-01-01": "grind"},
+        is_dates={"2026-01-01"}, oos_dates=set())
+    if LEGACY_ENTRY:
+        assert abs(sig["1,0,1,1"]["ret3"] - round(21.0 / (1 + SHRINK_K), 3)) < 1e-6
+    else:
+        # T+1 开盘 110 → 需再数 3 个交易日，合成K线不足 ⇒ 该样本不成立
+        # 注意：样本被 None 淘汰后，by_signal 里根本不会产生该 key（这正是「未到期不计入」的体现）
+        assert "1,0,1,1" not in sig, f"新口径下样本不足不应产出该组合: {list(sig.keys())}"
+        assert cov["occ_total"] == 0, f"新口径下有效样本应为 0, 实={cov['occ_total']}"
     assert "p4_lowvol25" not in fac, "无市场K线时 P4 因子应跳过"
-    assert reg["gate_open"]["n3"] == 1 and reg["gate_open"]["n10"] == 0, "门控分桶错（合成K线仅够T+3）"
+    # 门控分桶：旧口径（T日收盘）下 2026-01-01 有 T+3 样本；新口径需 T+1 入场+再走 h 日，
+    # 合成K线不足 ⇒ 门控桶应为 0（这本身即「未到期不计入」的验证）
+    if LEGACY_ENTRY:
+        assert reg["gate_open"]["n3"] == 1 and reg["gate_open"]["n10"] == 0, "门控分桶错（合成K线仅够T+3）"
+    else:
+        assert reg["gate_open"]["n3"] == 0, f"新口径下门控桶应为 0, 实={reg['gate_open']['n3']}"
+
+    # ── 正向端到端：足够长的合成 K 线，验证「次日开盘」真的被用作入场价 ──
+    import datetime as _dt2
+    _ds = []
+    _x = _dt2.date(2026, 3, 2)
+    while len(_ds) < 30:
+        if _x.weekday() < 5:
+            _ds.append(_x.isoformat())
+        _x += _dt2.timedelta(days=1)
+    # 构造：close 恒为 open*1.01，open 每日 +2%（日线口径下 open/close 可追溯）
+    klong, px = {}, 100.0
+    for d in _ds:
+        klong[d] = {"open": px, "close": px * 1.01}
+        px *= 1.02
+    sigL = [(_ds[0], [{"code": "600000", "market": "sh",
+                       "signals": {"chan": True, "jinzuan": True, "jigou": False, "trend": False},
+                       "score_fund": 0, "score_sector": 0, "score_quality": 0}])]
+    sL, fL, cL, rL, rawL, isL, oosL = aggregate(sigL, lambda c, m: klong,
+                                                mkt_kline=None, regime_series={},
+                                                is_dates={_ds[0]}, oos_dates=set())
+    key = "1,1,0,0"
+    assert key in sL, f"正向用例应产出组合 {key}: {list(sL.keys())}"
+    # 入场 = _ds[1].open = 102.0，出场(h=3) = _ds[4].open = 102*1.02^3
+    # 收益 = (1.02^3 - 1)*100 - 成本
+    exp = ((1.02 ** 3) - 1) * 100.0 - COST_ROUND_TRIP_PCT
+    # 🔴 反收缩还原：ret = round(shrink(mean,n),3)，其中 shrink = mean * n/(n+k)
+    n3 = sL[key]["n3"]
+    got = sL[key]["ret3"] / (n3 / (n3 + SHRINK_K))   # 还原为原始均值
+    assert abs(got - exp) < 1e-2, f"次日开盘口径收益不符: 期望≈{exp:.4f}, 反收缩还原={got:.4f} (n3={n3})"
+    # 超额口径字段在位（须先过 build_excess —— 与 main() 同一路径）
+    # 注意：fac 的 key 是因子名（sig_jinzuan 等），不是信号组合 key
+    fL2 = build_excess(fL, rawL, isL, oosL)
+    fk = "sig_jinzuan"
+    assert fk in fL2, f"by_factor 应含 {fk}: {list(fL2.keys())}"
+    assert "excess5" in fL2[fk] and "verdict" in fL2[fk], "应产出 excess/verdict 字段"
+    assert "excess_is" in fL2[fk] and "excess_oos" in fL2[fk], "应产出 IS/OOS 分段超额"
+    assert fL2[fk]["verdict"] in ("keep", "watch", "drop"), f"verdict 取值非法: {fL2[fk]['verdict']}"
+    assert fL2[fk]["excess5"] is not None, "excess5 不应为 None（该因子有在场样本）"
+    assert isinstance(fL2[fk]["baseline"], dict), "应输出 baseline 基准线"
     print("✅ 全部自检通过")
 
 
@@ -622,13 +939,20 @@ def main():
         print(f"   分布: {dict(Counter(regime_series.values()))}")
 
     print(f"📈 聚合（cache={args.kline_cache}）")
-    sig, fac, cov, reg = aggregate(
+    is_dates, oos_dates = _split_is_oos(snapshots)
+    print(f"   IS/OOS 切分: IS={len(is_dates)}天 / OOS={len(oos_dates)}天"
+          f"  IS末={max(is_dates) if is_dates else '-'}  OOS首={min(oos_dates) if oos_dates else '-'}")
+    sig, fac, cov, reg, fac_raw, fac_is, fac_oos = aggregate(
         snapshots,
         lambda code, market: get_kline(code, market, args.kline_cache, args.use_baostock),
         mkt_kline=mkt,
         regime_series=regime_series,
         valid_codes=valid_codes,
+        is_dates=is_dates,
+        oos_dates=oos_dates,
     )
+    # 超额口径 + 下架判据（改动④）
+    fac = build_excess(fac, fac_raw, fac_is, fac_oos)
 
     out = {
         "meta": {
@@ -641,7 +965,24 @@ def main():
             "partial": (cov["with_kline"] < cov["stocks_total"]),
             "needs_refresh": (cov["with_kline"] < cov["stocks_total"]),
             "code_gate": ("valid_a_share_reference(%d)" % len(valid_codes)) if valid_codes else "none",
-            "note": "P4 版：含低波/残差动量因子与漂移门控诊断（sh.000001 市场代理）+ 噪声代码闸门",
+            # ── 口径元信息（2026-09-20 改动①②③④，可审计）──
+            "entry_mode": ENTRY_MODE,
+            "entry_note": ("次日开盘成交（T+1 open）：信号由 T 日收盘数据算出，最早只能 T+1 开盘买入；"
+                           "旧版用 T 日收盘价成交属前视偏差，已废弃"
+                           if not LEGACY_ENTRY else "旧口径：T 日收盘成交（仅供新旧对比，勿用于决策）"),
+            "cost_round_trip_pct": COST_ROUND_TRIP_PCT,
+            "cost_note": "双边总成本（印花税+佣金+滑点），已从每笔样本收益中扣除",
+            "is_oos": {
+                "is_ratio": 0.6,
+                "is_dates": len(is_dates), "oos_dates": len(oos_dates),
+                "is_range": [min(is_dates), max(is_dates)] if is_dates else None,
+                "oos_range": [min(oos_dates), max(oos_dates)] if oos_dates else None,
+                "note": "按时间顺序切分；OOS 段结论才是可外推的",
+            },
+            "downrank_basis": "T+5 超额（excess5）阈值 ±0.30pp，样本<30 一律 watch",
+            "entry_fallback_stat": dict(_FALLBACK_STAT),
+            "note": ("P4 版 + 次日开盘/扣成本/IS-OOS/超额判据（2026-09-20 口径改造）："
+                     "含低波/残差动量因子与漂移门控诊断（sh.000001 市场代理）+ 噪声代码闸门"),
         },
         "by_signal": sig,
         "by_factor": fac,
@@ -653,15 +994,22 @@ def main():
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
     print(f"✅ 写出: {args.out}")
+    print(f"   口径: entry={ENTRY_MODE} 成本={COST_ROUND_TRIP_PCT}%  "
+          f"IS/OOS={len(is_dates)}/{len(oos_dates)}天")
     print(f"   信号组合数: {len(sig)} | 因子数: {len(fac)}")
     print(f"   覆盖: 股票{nev(cov,'stocks_total')} / 有K线{nev(cov,'with_kline')} / 有效样本{nev(cov,'occ_total')} / P4评估{nev(cov,'p4_evaluated')}")
     print(f"   剔除源噪声脏码(出现次数): {nev(cov,'excluded_garbage')}")
     print(f"   部分数据: {out['meta']['partial']}")
-    print("   ── P4 因子 edge 速览 ──")
-    for f in ("p4_lowvol25", "p4_lowvol35", "p4_resid5", "p4_resid10"):
-        r = fac.get(f) or {}
-        print(f"   {f:14s} edge10={r.get('edge10')} (on n={r.get('n_on10')}, "
-              f"win_on={r.get('win_on10')}, off win={r.get('win_off10')})")
+    print(f"   入场回退统计: {_FALLBACK_STAT}")
+    print("   ── 因子超额速览（改动④：按 T+5 超额排序，判据 ±0.30pp）──")
+    _rows = sorted(((f, r.get("excess5"), r.get("excess3"), r.get("excess10"),
+                     r.get("n_on5"), r.get("verdict")) for f, r in fac.items()),
+                   key=lambda x: (x[1] if x[1] is not None else -999), reverse=True)
+    print(f"   {'因子':<14}{'ex3':>8}{'ex5':>8}{'ex10':>8}{'n_on5':>7}  判定")
+    for f, e5, e3, e10, n5, vd in _rows:
+        def _fm(v):
+            return f"{v:+.3f}" if isinstance(v, (int, float)) else "  -"
+        print(f"   {f:<14}{_fm(e3):>8}{_fm(e5):>8}{_fm(e10):>8}{str(n5):>7}  {vd}")
     print("   ── 漂移门控速览 (T+10) ──")
     go, gc = reg.get("gate_open", {}), reg.get("gate_closed", {})
     print(f"   开门: n={go.get('n10')} win={go.get('win10')}% ret={go.get('ret10')}%")
