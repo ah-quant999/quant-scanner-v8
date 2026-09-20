@@ -16,7 +16,7 @@
 
 不依赖 PyYAML；仅用 subprocess 调 git。
 """
-import os, re, sys, json, subprocess
+import os, re, sys, json, subprocess, time
 from datetime import datetime, timezone, timedelta
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -56,10 +56,34 @@ def run(cmd, cwd=ROOT):
 
 def get_today_origin_commits():
     """拉今天 (CST 00:00 起) origin/main 的全部 commit，return [(short_sha, subject), ...]"""
-    rc, out, err = run(["git", "fetch", "origin", "main"], cwd=ROOT)
-    if rc != 0:
-        print(f"⚠️ git fetch origin 失败：{err}（可能是 github.com:443 间歇中断）")
-        return None  # 信号：无法判定
+    # 🛡 2026-09-20 假绿根治（主人令「能纠错的都改好」）：
+    #   原写法 fetch 失败即 return None ⇒ 整项「commit 审计」被静默跳过 ⇒ exit 0 假绿，
+    #   网络抖动会让「当天人工 commit 未交接」这类真问题完全不可见。
+    #   现改为：① 重试 3 次（退避）消除瞬时抖动；
+    #           ② 三次全失败 → 回退按**本地 HEAD** 审计（CI checkout 即最新 main，
+    #              结果与 origin/main 等价；仅可能少计 fetch 之后新落的 commit）；
+    #           ③ 回退时发 ::warning:: 注解（Actions UI 显黄条 ⇒ 降级可见，不再静默）；
+    #           ④ 连 HEAD 都取不到才返回 None（保留原「无法判定」语义）。
+    ref = None
+    last_err = ""
+    for _i in range(3):
+        rc, out, err = run(["git", "fetch", "origin", "main"], cwd=ROOT)
+        if rc == 0:
+            ref = "origin/main"
+            break
+        last_err = err
+        if _i < 2:
+            time.sleep(2 + _i * 3)
+    if ref is None:
+        rc, out, err = run(["git", "rev-parse", "--verify", "HEAD"], cwd=ROOT)
+        if rc == 0 and out:
+            ref = "HEAD"
+            print("::warning title=v8-audit-fetch-degraded::git fetch origin main 连续 3 次失败"
+                  f"（{last_err}）→ 已回退按本地 HEAD 审计（checkout 即最新 main；"
+                  "结果可能少计 fetch 之后新落的 commit，请留意）")
+        else:
+            print(f"⚠️ git fetch origin 失败：{last_err}（可能是 github.com:443 间歇中断）")
+            return None  # 信号：无法判定
 
     # git log origin/main --since=YYYY-MM-DDT00:00:00+08:00 --until=tomorrow
     # 🛡 2026-09-20 小九（本机审计修复）：改为输出「sha|作者名|作者邮箱|提交者名|主题」，
@@ -67,7 +91,7 @@ def get_today_origin_commits():
     #   兼容：旧调用方拿到的仍是 (short_sha, subject) 二元组，身份信息挂在第 3 元 dict 上。
     since = f"{today_cst}T00:00:00+08:00"
     rc, out, err = run([
-        "git", "log", "origin/main",
+        "git", "log", ref,
         f"--since={since}",
         "--format=%h%x1f%an%x1f%ae%x1f%cn%x1f%s",
     ], cwd=ROOT)
