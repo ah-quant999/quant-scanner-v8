@@ -113,6 +113,10 @@ jobs:
           #   现改用 api_push_raw.py（GitHub Contents API，零 git fetch，免疫 cn git 墙）
           #   仅推「本次变更清单」（含 index.html，update_v8 已重写其 ?v），与
           #   v8_algo_cloud 链尾「📤 唯一推送」完全同构，无 ?v 失配窗口。
-          PUSH_FILES="data/VALUATION_PERCENTILE.js,data/FACTOR_AUDIT.js,data/INDEX_VALUE_FRAMEWORK.js,raw_data/valuation_percentile.json,raw_data/factor_audit.json,raw_data/index_value_framework.json,index.html" \
+          # 🛡 2026-09-20 阿狸咪的工程师：本 workflow 无 git sync，而 index.html 从未进守卫基线
+          #   （_GUARD_PREFIXES 只含 raw_data/ + data/，且防倒退还要求 .json）⇒ 该条目会把
+          #   checkout 快照静默盖回最新 main。护栏已在 api_push_raw 侧根治（本地 index.html 永不入提交），
+          #   此处一并摘除，避免被后续 workflow 抄成范式。?v 对齐由 v8_cache_buster_reconcile 自愈。
+          PUSH_FILES="data/VALUATION_PERCENTILE.js,data/FACTOR_AUDIT.js,data/INDEX_VALUE_FRAMEWORK.js,raw_data/valuation_percentile.json,raw_data/factor_audit.json,raw_data/index_value_framework.json" \
             python api_push_raw.py
           echo "✅ 实验卡 data/raw_data/index.html 已推送（Contents API）"
