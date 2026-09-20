@@ -1908,7 +1908,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <b style="color:#22d3ee;">定位</b>：本页只研究「这个因子有没有区分度」，<b>不进选股层、不产出股票池</b>。<br>
     <b style="color:#22d3ee;">它做什么</b>：只对<b>已经选出来的股</b>做<b>加分 / 减分</b> —— 命中即加计入 <code style="background:rgba(34,211,238,.1);padding:1px 4px;border-radius:3px;">final_score</code> 让排序前移，不命中则不动；<b style="color:#fbbf24;">绝不会因为某只票命中某个因子就把它拉进池子</b>。<br>
     <b style="color:#22d3ee;">与左侧策略的区别</b>：四量终极 / 三重共识 / 强势跟踪 / 逆势龙头<b>各自产出股票池</b>；本页<b>不产池</b>，故与「逆势龙头」同为 <b>0⭐</b> 观测项，不参与星级评定。<br>
-    <b style="color:#22d3ee;">与「策略回测」页的区别</b>：本页 = <b>因子分层研究</b>（五分位/看区分度）；「策略回测」页 🧪 因子实验室回测卡 = <b>同一因子的持仓口径回测</b>（L1 最强五分位持有期档）。两者是同一因子的两种切法，<b>勿对比名次</b>。<br>
+    <b style="color:#22d3ee;">与「策略回测」页的区别</b>：本页 = <b>因子分层研究</b>（五分位/看区分度）。（2026-09-20 主人令：策略回测页的 🧪 因子实验室回测卡<b>已整体移除</b> —— 它不是选股策略，不回测、不展示；因子跟踪只在最终推荐页。）<br>
     <b style="color:#f59e0b;">无转正路径</b>（2026-09-18 主人令）：因子<b>不做选股、不产池</b> ⇒ <b>不评星级</b>，也<b>不存在「升格为独立策略」</b>一说。
     </div>
     </div>
@@ -5435,11 +5435,12 @@ function fmtSigned(v){
 <!-- ============ 策略回测（统一 · 2026-08-13 主人令；2026-09-15 取消加锁） ============
      2026-09-16 主人令「统一口径、只留优质」重构：
        ① 口径只剩一套 —— 每个算法取自己「最佳持有期」的真实收益率与胜率（样本≥30）；
-       ② 下方按「四量终极 / 三重共识 / 强势跟踪 / 因子实验室 / 逆势龙头」展示，其余全部删除；
+       ② 下方按「四量终极 / 三重共识 / 强势跟踪 / 逆势龙头」展示，其余全部删除；
+          （2026-09-20 主人令：因子实验室亦退出本页 —— 不是选股策略，不回测不展示）
        ③ 「完整明细」折叠外壳删除，各策略逐档明细常驻展开。
      2026-09-15 主人令：取消加锁，全员可见。 -->
   <section id="sec-bt">
-    <div class="sec-head"><h2>📈 回测汇总</h2><span class="tag">四量 · 三重 · 强势跟踪 · 因子实验室 · 逆势龙头 · 一站看完</span><span class="fresh" id="btFresh">—</span></div>
+    <div class="sec-head"><h2>📈 回测汇总</h2><span class="tag">四量 · 三重 · 强势跟踪 · 逆势龙头 · 一站看完</span><span class="fresh" id="btFresh">—</span></div>
     <!-- 2026-09-15 主人令：真实数据回测声明横幅 -->
     <div style="margin:10px 0 4px;padding:10px 14px;background:rgba(34,197,94,.08);border:1.5px solid rgba(34,197,94,.4);border-radius:10px;font-size:12px;line-height:1.7;"><b style="color:#22c55e;">✅ 真实数据回测</b> — 本页全部胜率/收益率均由 <b>真实 A 股行情（baostock 全量日K·前复权）× 真实历史入选信号</b> 回测产出，每日盘后算法链自动重算＜无任何模拟/编造/好凑数据＞。每张卡自带数据时间与样本数，样本不足会明确标注「累积中/样本不足」，绝不把没样本画成 0。</div>
     <div id="btSummary" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 4px;padding:8px 12px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:10px;font-size:11.5px;"><span style="color:var(--dim);font-weight:600;">📊 回测总览</span><span style="color:var(--sub);">加载中…</span></div>
@@ -5451,7 +5452,8 @@ function fmtSigned(v){
 <script>
 /* ═══════════ 📈 策略回测（统一 · 2026-08-13；2026-09-16 口径收敛 + 精简）═══════════
    🏁 算法回测总表 — BACKTEST_ALL_ALGOS（+ 强势跟踪前端合成行）→ "每个算法的最佳持有期值多少"
-   各策略逐档明细卡 — 四量终极 / 三重共识 / 强势跟踪 / 因子实验室 / 逆势龙头
+   各策略逐档明细卡 — 四量终极 / 三重共识 / 强势跟踪 / 逆势龙头
+   🗑️ 2026-09-20 主人令：因子实验室回测卡已整体移出本页（非选股策略；因子跟踪只在最终推荐页）
    设计：简洁表格、胜率高亮（≥55% 绿 / ≤45% 红）、平均收益同色。
    🗑️ 2026-09-16 删除：综合回测卡、K线信号回测卡、完整明细折叠壳、生命周期独立块、
       星级委员会规则块、跨策略档位矩阵块（主人令「其他杂七杂八的都不要，看着太乱」）。
@@ -5613,163 +5615,11 @@ function fmtSigned(v){
      （partialLen 停在 16616）。现显式挂到 window，跨块可见。 */
 
 
-  /* ════════════════════════════════════════════════════════════════════
-     因子实验室独立分层回测卡（2026-09-13 主人令：把最新因子回测加入策略回测页）
-     数据源：window.FACTOR_LAB_BACKTEST（raw_data/factor_lab_backtest.json）
-     ════════════════════════════════════════════════════════════════════ */
-  function _renderFactorLabBacktest(){
-    var data = window.FACTOR_LAB_BACKTEST || {};
-    var html = '<div style="margin:14px 0;border-left:4px solid #22d3ee;" class="card">';
-    html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-    html += '<span style="font-size:15px;font-weight:700;color:#22d3ee;">🧪 因子实验室回测</span>';
-    html += '<span style="font-size:11px;color:var(--dim);">五分位分层 · 异常量比 + ROE_TTM 大市值</span>';
-    /* 🔴 2026-09-16 主人令「这个不是选股策略，就不要写出造成混淆」：
-       原为「📈 选股策略」标签 —— 但本卡是因子分层**研究**，不是选股策略（不产出股票池）。
-       现改为中性的「🧪 因子分层研究」，与选股策略标签彻底区分。 */
-    html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#94a3b822;color:var(--sub);border:1px solid #94a3b84d;">🧪 因子分层研究</span>';
-    /* ⚠️ 2026-09-16 主人令「先按 4⭐ 挂，可以标注」：本卡星级靠长档 β 撑起，
-       在标题行显式挂「⏳ 升级中」标注（只加标注，不动星级）。 */
-    if(typeof window.__betaDepHTML === 'function') html += window.__betaDepHTML('因子实验室');
-    html += '<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>';
-    var _fb = data.abnormal_volume || {};
-    var _verdict = _fb.verdict_3star;
-    var _vcolor = _verdict === 'PASS' ? '#22c55e' : '#ef5350';
-    html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:'+_vcolor+'22;color:'+_vcolor+';border:1px solid '+_vcolor+'59;">' + (_verdict || '—') + '</span>';
-    html += '</div>';
-
-    if(_fb && _fb.layers){
-      // 异常量比 五分位分层表
-      html += '<div style="font-size:12px;font-weight:700;color:var(--txt);margin:8px 0 6px;">异常量比（缩量=强势）五分位分层 · T+10</div>';
-      html += '<div style="overflow-x:auto;overflow-y:hidden;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
-      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      ['分层','样本','T+10胜率','T+10收益','T+20胜率','T+20收益'].forEach(function(x){
-        html += '<th style="padding:6px;text-align:center;color:var(--sub);white-space:nowrap;">'+x+'</th>';
-      });
-      html += '</tr></thead><tbody>';
-      var _layers = _fb.layers || {};
-      ['1','2','3','4','5'].forEach(function(k){
-        var L = _layers[k] || {};
-        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-        html += '<td style="padding:6px;text-align:center;color:var(--txt);font-weight:700;">L'+k+'</td>';
-        html += '<td style="padding:6px;text-align:center;color:var(--sub);">'+(L.n||0)+'</td>';
-        html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(L.win_10d)+';">'+(L.win_10d!=null?Number(L.win_10d).toFixed(1):'—')+'%</td>';
-        html += '<td style="padding:6px;text-align:center;color:'+_colorPL(L.avg_10d)+';">'+(L.avg_10d!=null?(L.avg_10d>0?'+':'')+Number(L.avg_10d).toFixed(2):'—')+'%</td>';
-        html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(L.win_20d)+';">'+(L.win_20d!=null?Number(L.win_20d).toFixed(1):'—')+'%</td>';
-        html += '<td style="padding:6px;text-align:center;color:'+_colorPL(L.avg_20d)+';">'+(L.avg_20d!=null?(L.avg_20d>0?'+':'')+Number(L.avg_20d).toFixed(2):'—')+'%</td>';
-        html += '</tr>';
-      });
-      html += '</tbody></table></div>';
-      html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;font-size:11px;">';
-      html += '<span style="padding:2px 8px;border-radius:6px;background:var(--bg2);color:var(--txt);border:1px solid var(--border);">Top-Bottom 利差 ' + (_fb.spread_top_bottom_10d_pct!=null?(_fb.spread_top_bottom_10d_pct>0?'+':'')+_fb.spread_top_bottom_10d_pct.toFixed(2):'—') + '%</span>';
-      html += '<span style="padding:2px 8px;border-radius:6px;background:var(--bg2);color:var(--txt);border:1px solid var(--border);">IS 利差 ' + (_fb.spread_in_sample_pct!=null?(_fb.spread_in_sample_pct>0?'+':'')+_fb.spread_in_sample_pct.toFixed(2):'—') + '%</span>';
-      html += '<span style="padding:2px 8px;border-radius:6px;background:var(--bg2);color:var(--txt);border:1px solid var(--border);">OOS 利差 ' + (_fb.spread_oos_pct!=null?(_fb.spread_oos_pct>0?'+':'')+_fb.spread_oos_pct.toFixed(2):'—') + '%</span>';
-      html += '</div>';
-    }
-
-    /* 🔴 2026-09-14 主人令（图3「这个也要按图4这个模式写」）：
-       因子实验室补「持有期档位表」—— 与「四量终极」卡**同格式同列**
-       （持有期 | 样本 | 胜率 | 平均收益 | 最佳 | 最差）。
-       口径 = L1 层（因子最强五分位）组合，即「因子选出的最强那 20% 标的」。
-       档位**动态发现**（扫描 win_Nd / avg_Nd 键）而非硬编码数组 ——
-       算法层补齐多少档就显示多少档，杜绝「产物加了档、前端漏改」再次发生。 */
-    if(_fb && _fb.layers && _fb.layers['1']){
-      var _L1 = _fb.layers['1'];
-      var _holds = [];
-      Object.keys(_L1).forEach(function(k){
-        var mm = /^win_(\d+)d$/.exec(k);
-        if(mm) _holds.push(Number(mm[1]));
-      });
-      _holds.sort(function(a, b){ return a - b; });
-      if(_holds.length){
-        var _costPct = (data.cost_roundtrip != null)
-          ? (Number(data.cost_roundtrip) * 100).toFixed(2) : '0.20';
-        /* 🔴 2026-09-15 主人令：把「累积进度」摆在表头 —— 一眼看到还差多少根。 */
-        var _da = data.data_accumulation || {};
-        var _accTip = (_da.accumulating_holds > 0)
-          ? ' <span style="font-size:11px;font-weight:700;color:#f59e0b;background:#f59e0b1a;border:1px solid #f59e0b59;border-radius:4px;padding:1px 6px;white-space:nowrap;">'
-            + '&#x23F3; ' + _da.accumulating_holds + '/' + (_da.holds_total || 12) + ' 档累积中'
-            + '（需 ' + (_da.min_bars_required || 761) + ' 根·当前最长 ' + (_da.max_bars_available || '?') + ' 根）</span>'
-          : '';
-        html += '<div style="font-size:12px;font-weight:700;color:var(--txt);margin:12px 0 6px;">'
-             +  '持有期档位 · L1 最强五分位'
-             +  ' <span style="font-size:11px;color:var(--dim);font-weight:500;">'
-             +  _holds.length + ' 档 · 信号日次一交易日开盘买入、持有到第 N 个交易日收盘卖出（前复权·已扣双边 '
-             +  _costPct + '%）</span>'
-             +  _accTip + '</div>';
-        html += '<div style="overflow-x:auto;overflow-y:hidden;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
-        html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-        ['持有期','样本','胜率','平均收益','最佳','最差'].forEach(function(x){
-          html += '<th style="padding:6px;text-align:' + (x === '持有期' ? 'left' : 'right')
-               +  ';color:var(--sub);white-space:nowrap;">' + x + '</th>';
-        });
-        html += '</tr></thead><tbody>';
-        _holds.forEach(function(hh){
-          var _n  = (_L1['n_' + hh + 'd'] != null) ? _L1['n_' + hh + 'd'] : _L1.n;
-          var _wr = _L1['win_' + hh + 'd'];
-          var _ar = _L1['avg_' + hh + 'd'];
-          var _bs = _L1['best_' + hh + 'd'];
-          var _ws = _L1['worst_' + hh + 'd'];
-          /* 🔴 2026-09-15 主人令（图2「拿不到就写累积中，直到累积到为止」）：
-             K 线不足 MIN_BARS(761)⇒该档无样本。此时**不得显示空白/0**，
-             必须显式标「累积中」并给出可用票数进度。 */
-          var _hs  = (((data.data_accumulation || {}).holds) || {})[hh + 'd'] || {};
-          var _acc = (_wr == null && _hs.status === 'accumulating');
-          html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-          html += '<td style="padding:6px;color:var(--txt);font-weight:700;white-space:nowrap;">T+' + hh + '天</td>';
-          html += '<td style="padding:6px;text-align:right;color:var(--sub);">'
-               + (_acc
-                  ? '<span style="color:#f59e0b;font-weight:700;white-space:nowrap;" title="需 ' + (_hs.need_bars || 761) + ' 根 K 线，当前可用 ' + (_hs.stocks_ready || 0) + '/' + (_hs.stocks_total || 0) + ' 只">累积中</span>'
-                  : (_n == null ? '—' : _n)) + '</td>';
-          html += '<td style="padding:6px;text-align:right;font-weight:700;color:' + (_wr == null ? 'var(--dim)' : _colorWR(_wr)) + ';">' + (_wr == null ? '—' : Number(_wr).toFixed(1) + '%') + '</td>';
-          html += '<td style="padding:6px;text-align:right;color:' + (_ar == null ? 'var(--dim)' : _colorPL(_ar)) + ';">' + (_ar == null ? '—' : (_ar > 0 ? '+' : '') + Number(_ar).toFixed(2) + '%') + '</td>';
-          html += '<td style="padding:6px;text-align:right;color:' + (_bs == null ? 'var(--dim)' : _colorPL(_bs)) + ';">' + (_bs == null ? '—' : (_bs > 0 ? '+' : '') + Number(_bs).toFixed(2) + '%') + '</td>';
-          html += '<td style="padding:6px;text-align:right;color:' + (_ws == null ? 'var(--dim)' : _colorPL(_ws)) + ';">' + (_ws == null ? '—' : (_ws > 0 ? '+' : '') + Number(_ws).toFixed(2) + '%') + '</td>';
-          html += '</tr>';
-        });
-        html += '</tbody></table></div>';
-      }
-    }
-
-    var _roe = data.roe_largecap || {};
-    if(_roe && _roe.top30_n){
-      html += '<div style="font-size:12px;font-weight:700;color:var(--txt);margin:12px 0 6px;">ROE_TTM 大市值 Top30 vs 全池等权</div>';
-      html += '<div style="overflow-x:auto;overflow-y:hidden;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
-      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      html += '<th style="padding:6px;text-align:left;color:var(--sub);">口径</th>';
-      html += '<th style="padding:6px;text-align:center;color:var(--sub);">T+10胜率</th>';
-      html += '<th style="padding:6px;text-align:center;color:var(--sub);">T+10收益</th>';
-      html += '<th style="padding:6px;text-align:center;color:var(--sub);">T+20胜率</th>';
-      html += '<th style="padding:6px;text-align:center;color:var(--sub);">T+20收益</th>';
-      html += '<th style="padding:6px;text-align:center;color:var(--sub);">超额(T+20)</th>';
-      html += '</tr></thead><tbody>';
-      html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-      html += '<td style="padding:6px;color:var(--txt);font-weight:700;">Top30</td>';
-      html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(_roe.top30_win_10d)+';">' + (_roe.top30_win_10d!=null?Number(_roe.top30_win_10d).toFixed(1):'—') + '%</td>';
-      html += '<td style="padding:6px;text-align:center;color:'+_colorPL(_roe.top30_avg_10d)+';">' + (_roe.top30_avg_10d!=null?(_roe.top30_avg_10d>0?'+':'')+Number(_roe.top30_avg_10d).toFixed(2):'—') + '%</td>';
-      html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(_roe.top30_win_20d)+';">' + (_roe.top30_win_20d!=null?Number(_roe.top30_win_20d).toFixed(1):'—') + '%</td>';
-      html += '<td style="padding:6px;text-align:center;color:'+_colorPL(_roe.top30_avg_20d)+';">' + (_roe.top30_avg_20d!=null?(_roe.top30_avg_20d>0?'+':'')+Number(_roe.top30_avg_20d).toFixed(2):'—') + '%</td>';
-      html += '<td style="padding:6px;text-align:center;color:'+_colorPL(_roe.excess_20d)+';">' + (_roe.excess_20d!=null?(_roe.excess_20d>0?'+':'')+Number(_roe.excess_20d).toFixed(2):'—') + '%</td>';
-      html += '</tr>';
-      html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-      html += '<td style="padding:6px;color:var(--txt);font-weight:700;">全池等权</td>';
-      html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(_roe.univ_avg_10d)+';">—</td>';
-      html += '<td style="padding:6px;text-align:center;color:'+_colorPL(_roe.univ_avg_10d)+';">' + (_roe.univ_avg_10d!=null?(_roe.univ_avg_10d>0?'+':'')+Number(_roe.univ_avg_10d).toFixed(2):'—') + '%</td>';
-      html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(_roe.univ_avg_20d)+';">—</td>';
-      html += '<td style="padding:6px;text-align:center;color:'+_colorPL(_roe.univ_avg_20d)+';">' + (_roe.univ_avg_20d!=null?(_roe.univ_avg_20d>0?'+':'')+Number(_roe.univ_avg_20d).toFixed(2):'—') + '%</td>';
-      html += '<td style="padding:6px;text-align:center;color:var(--sub);">基准</td>';
-      html += '</tr>';
-      html += '</tbody></table></div>';
-    }
-
-    html += '<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.5;">';
-    html += '方法：' + (data.rebalance || '每10个交易日调仓，次日开盘入场，扣往返成本 0.2%') + ' · 数据 ' + ((data.update_time||'').substring(0,16) || '—');
-    if(_fb.verdict_note) html += ' · <span style="color:var(--sub);">'+_esc(_fb.verdict_note)+'</span>';
-    if(_roe.methodology_limit) html += ' · <span style="color:#fbbf24;">ROE 局限：</span>'+_esc(_roe.methodology_limit);
-    html += '</div>';
-    html += '</div>';
-    return html;
-  }
-  window.__renderFactorLabBacktest = _renderFactorLabBacktest;
+    /* 🗑️ 2026-09-20 主人令（原话：「它不是选股策略，不需要在回测更不需要展示。
+     因子实验室只要在最终推荐页那边跟踪就好」）：
+     原「🧪 因子实验室回测」独立分层回测卡（_renderFactorLabBacktest，2026-09-13 加入）整卡移除。
+     数据链不动：algorithms/factor_lab_backtest.py 仍每日产出 FACTOR_LAB_BACKTEST ——
+     唯一消费方 = 最终推荐页「🧪 每日因子计算」卡的「✅ 回测已达标」徽章（产物投影铁律）。 */
 
   window._renderPeriodBacktestCard = _renderPeriodBacktestCard;
 
@@ -6199,6 +6049,12 @@ function fmtSigned(v){
         if(((window.__STAR_KIND || {})[r.card]) === 'pool') return false;
         if(r.cat !== 'trade') return false;
         if(r.page !== '选股策略') return false;
+        /* 🔴 2026-09-20 主人令（原话：「它不是选股策略，不需要在回测更不需要展示。
+           因子实验室只要在最终推荐页那边跟踪就好」）：
+           因子实验室在数据层自标 trade/选股策略，无法派生区分 ⇒ 在此按卡名排除。
+           其回测产物 FACTOR_LAB_BACKTEST 仍由算法链产出 —— 唯一消费方 =
+           最终推荐页「🧪 每日因子计算」卡的「✅ 回测已达标」徽章（产物投影铁律）。 */
+        if(r.card === '因子实验室') return false;
         return true;
       };
       /* 🔴 2026-09-16 修正：不能只取 is_primary！
@@ -6208,7 +6064,8 @@ function fmtSigned(v){
          以其**最佳档**（样本≥30 中胜率最高）作为代表行；无合格档则取样本最大一行。 */
       /* 🗑️ 2026-09-16 主人令「其他杂七杂八的都不要」：原「不列入本页回测排名」清单
          连同其聚合逻辑（_exByCard / _exOrder / _exList）一并删除 ——
-         本页现在只展示「四量终极 / 三重共识 / 强势跟踪 / 因子实验室 / 逆势龙头」。 */
+         本页现在只展示「四量终极 / 三重共识 / 强势跟踪 / 逆势龙头」。
+         （2026-09-20 主人令：因子实验室亦退出本页） */
       var INS = (A.insufficient || []).filter(_inScope);
       if(!R.length && !INS.length) return '';
       var _STARKEY = { '三重共识':'triple', '四量终极':'fourvolume', '逆势龙头':'crds', '候选池':'candidate', '金股池':'goldpool' };
@@ -6396,7 +6253,7 @@ function fmtSigned(v){
 
          主人已确认的口径（2026-09-16）：
            ① 排序主键 = 各卡「最佳持有期」胜率降序（保持原「最优组合榜」口径）；
-           ② 因子实验室「照实排 + 标长档依赖·样本外无效警示」；
+           ② （2026-09-20 主人令撤销：因子实验室已整体退出本页，见 _inScope 排除项）；
            ③ 形态 = 一张总表 + 一句话结论。
 
          🔴 为什么每行必须显示「最佳档样本 n」（本次审计实证）：
@@ -6414,28 +6271,10 @@ function fmtSigned(v){
       var _mainLabel = {};
       R.forEach(function(r){ _mainLabel[r.card] = r.label || '—'; });
 
-      /* ── 「β 依赖」审计结论（唯一一张已审计确认的卡，判据来自数据层而非硬编码数字）──
-         因子实验室：250 日 L1 79.8% vs L5 70.9%（全市场最差分位也有 70.9%）
-         ⇒ 长档收益绝大部分是大盘 β；且异常换手因子样本外多空价差 −0.042%（无预测力）。
-         判据取自 window.FACTOR_LAB_BACKTEST.abnormal_volume.spread_oos_pct <= 0。 */
-      var _betaWarn = {};
-      (function(){
-        try{
-          var FL = window.FACTOR_LAB_BACKTEST;
-          var av = FL && FL.abnormal_volume;
-          if(av && av.spread_oos_pct != null && Number(av.spread_oos_pct) <= 0){
-            var _l1 = (av.layers && av.layers['1']) || {}, _l5 = (av.layers && av.layers['5']) || {};
-            _betaWarn['因子实验室'] = {
-              txt: '长档依赖 · 样本外无效',
-              tip: '持有250日 L1(最强分位) 胜率 ' + _l1.win_250d + '%，'
-                 + '而 L5(最弱分位) 也有 ' + _l5.win_250d + '% —— 长档收益绝大部分是大盘 β，'
-                 + '不是因子选出来的；异常换手因子<b>样本外</b>多空价差 ' + av.spread_oos_pct + '%（无预测力），'
-                 + '样本内 ' + av.spread_in_sample_pct + '% ⇒ 典型过拟合特征。'
-                 + '该卡 4⭐ 由 T+90/T+180 长档拉起，T+1 胜率仅 ' + _l1.win_1d + '% 不过半。'
-            };
-          }
-        }catch(e){}
-      })();
+      /* 🗑️ 2026-09-20 主人令：原「β 依赖」审计警示块（_betaWarn['因子实验室']，
+         判据 FACTOR_LAB_BACKTEST.abnormal_volume.spread_oos_pct<=0）随因子实验室行
+         一并移除 —— 本表已无该行，警示无挂靠对象；样本外无效的结论由
+         最终推荐页「✅ 回测已达标」徽章（数据真值投影）继续承载。 */
 
       /* ── 同卡档位形态 + 「挑选偏差」判据（2026-09-16 审计实证校准）──
          🔴 判据不能只看极差！实测：
@@ -6683,7 +6522,7 @@ function fmtSigned(v){
           +  '① 长持有期档（如 T+250）收益含较大<b>大盘 β</b>，不等于选股能力；'
           +  '② 带「挑选偏差」标的卡，其高值来自非单调档位中的最大值，稳定性请对照该行样本 n。'
           +  '要看某算法的<b>逐档真实表现</b>（同一套扣费口径）：'
-          +  '因子实验室见下方「🧪 因子实验室回测」，其余见下方各策略明细表。'
+          +  '各算法的逐档真实表现见下方各策略明细表。'
           +  '</div></div>';
       }
       return h;
@@ -6735,7 +6574,8 @@ function fmtSigned(v){
          为何弃用原 _cnt：它从 BACKTEST_ALL_ALGOS.rows 数，而「强势跟踪」是前端合成行、
          「因子实验室」又是独立渲染 ⇒ 必然数成 4，与文案的 5 个名字打架。
          ⚠️ 将来增删本页策略：改这里 + 同步改下方 __renderBacktestSection 的渲染顺序。 */
-      var _PAGE = ['四量终极','三重共识','强势跟踪','因子实验室','逆势龙头'];
+      /* 🔴 2026-09-20 主人令：'因子实验室' 移出本页清单（非选股策略，不回测不展示）*/
+      var _PAGE = ['四量终极','三重共识','强势跟踪','逆势龙头'];
       pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(56,189,248,.10);color:#38bdf8;border:1px solid rgba(56,189,248,.3);">📋 本页策略 '+_PAGE.length+' 个<span style="font-weight:400;color:var(--sub);font-size:10px;">（'+_PAGE.join(' · ')+'）</span></span>');
 
       sum.innerHTML = '<span style="color:var(--dim);font-weight:600;">📊 实战回测</span><span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>' + (pills.length ? ' ' + pills.join(' ') : ' <span style="color:var(--sub);">暂无数据</span>');
@@ -6896,9 +6736,10 @@ function fmtSigned(v){
     // 2026-09-02 主人令：已下线模块的回测卡保持不可见（选股信号层全删；回测不再保留以免误用）
 
 
-    /* 🔴 2026-09-16 主人令「下方按四量、三重、新改名的强势跟踪、因子实验室、逆势龙头
+    /* 🔴 2026-09-16 主人令「下方按四量、三重、新改名的强势跟踪、逆势龙头
        这些展示就够了」—— 顺序由**调用顺序**显式决定，不再依赖星级排序后的偶然次序：
-         四量终极 / 三重共识 / 强势跟踪  →  🧪 因子实验室  →  逆势龙头CRDS
+         四量终极 / 三重共识 / 强势跟踪  →  逆势龙头CRDS
+         （2026-09-20 主人令：因子实验室退出本页）
        ⚠️ 上方 btSummary 的「📋 本页策略 N 个（…）」清单必须与本段一致——
           那是计数与文案的唯一真源，改这里请同步改那里，避免数目/名单打架。 */
     (function(){
@@ -6910,8 +6751,6 @@ function fmtSigned(v){
       if(typeof _rbc === 'function'){
         html += _rbc(_pick(['fourvolume','triple','strongtrack']));
       }
-      // 2026-09-13 主人令：因子实验室独立分层回测单独渲染（数据结构与 by_period 不同）
-      try{ if(typeof window.__renderFactorLabBacktest === 'function') html += window.__renderFactorLabBacktest(); }catch(e){ console.warn('[bt factor lab]', e); }
       if(typeof _rbc === 'function'){
         html += _rbc(_pick(['crds']));
       }
@@ -7869,7 +7708,8 @@ function fmtSigned(v){
     }
     // 🔴 2026-09-18 主人令：原 window.__flPopup（「📄 完整榜单」弹窗）随「可关注」网格一并删除
     //   —— 它的内容 = 因子榜 Top30/Bottom10 **股票列表**，同样会让「本页不推荐股」自相矛盾。
-    //   因子分位/分层明细的权威去处 = 「策略回测」页 🧪 因子实验室回测卡（持仓口径回测）。
+    //   因子分位/分层明细的权威去处 = 本页 🧪 因子实验室 子页（2026-09-20 主人令：
+    //   「策略回测」页回测展示卡已删 —— 不是选股策略，不回测不展示，跟踪只留最终推荐页）。
   };
 
   // DOM ready hook
