@@ -3,10 +3,10 @@
 """
 v8 Pre-deploy audit（CI 自动门禁，2026-09-05 主人令一劳永逸落地）
 ================================================================
-目的：每次云端 build/deploy 前自动跑 **11** 项校验，任何一项失败 → 阻断 deploy。
+目的：每次云端 build/deploy 前自动跑 **12** 项校验，任何一项失败 → 阻断 deploy。
 等同「改后三件套」固化为 CI step，不再依赖人工记忆流程。
 
-十一项校验：
+十二项校验：
   1. py_compile        —— 所有 *.py 文件 0 语法错误
   2. new Function      —— index.html 所有 inline <script> 0 语法错误（Node）
   3. 完整性核对        —— data/*.js 数量在下界 90 与**动态上界**之间
@@ -33,6 +33,13 @@ v8 Pre-deploy audit（CI 自动门禁，2026-09-05 主人令一劳永逸落地�
                            （2026-09-20 阿狸咪实证 + 小九固化为门禁：数据未就位即缓存
                             空值 ⇒ 此后永空且全程不报错，属静默失效。
                             详见 check_defer_cache_guard 内注）
+  12. 调用点定义守卫    —— index.html 内联脚本中「调用点存在但全文无定义」的
+                           `_xxx()` / `__xxx()` / `window.__xxx()` ⇒ 阻断。
+                          （2026-09-21 小九新增：`0d3482be4` 删 `__renderFactorLab`
+                           死代码时把紧邻的 `_renderPostReady` 一并删掉、调用点仍在 ⇒
+                           ReferenceError 致策略回测区初始渲染全挂。
+                           该形态**语法合法**，[2/8] 抓不到（已受控复现：11 项全绿放行）。
+                           详见 check_callee_defined 内注）
 
 退出码：
   0  全部通过
@@ -757,6 +764,292 @@ def check_defer_cache_guard():
             % (len(defer_names), len(caches)))
 
 
+def check_callee_defined():
+    """[12/12] 调用点 × 定义缺失守卫（2026-09-21 小九新增·封堵「删函数连带删邻函数」事故）。
+
+    背景（2026-09-20 实测事故，阿狸咪修复并留证于 index.html L8361-8364）：
+      提交 `0d3482be4`「🧹 删 __renderFactorLab 死代码」把**紧邻其上的
+      `_renderPostReady` 定义一并删掉**，但下方调用点仍在 ⇒
+      `ReferenceError: _renderPostReady is not defined` ⇒ **策略回测区初始渲染全挂**。
+
+    为什么既有的 [2/8] `new Function` **拦不住**（本项存在的唯一理由，已受控复现）：
+      语法畸形（如 `try` 裸露）会被 [2/8] 抓住；但**整块干净删除**后 JS **语法依然合法**，
+      [2/8] 报「28 个 inline script 块 0 错误」、11 项全绿 → deploy 放行（实测 rc=0）。
+      即：这类事故 100% 穿透全部既有门禁，属于**只在浏览器运行时才炸**的盲区。
+
+    判据（纯结构；只认「确定会 ReferenceError」的形态，不猜动态用法）：
+      真源 = index.html 自身内联 <script> 块（剔除注释与字符串字面量后）：
+        ① **裸标识符调用**：形如 `_renderPostReady()` 出现在**非定义位**、且
+           该标识符全文**无任何定义形态** ⇒ 进候选。
+           定义形态 = `function NAME(` / `NAME = function` / `NAME = (...) =>` /
+                       `var|let|const NAME =` / `window.NAME =` / `class NAME` /
+                       `function NAME` 声明 / 函数参数（`(NAME)` 参数位）/
+                       `NAME: function`（对象方法）。
+        ② **window.X 成员调用**：形如 `window.__renderXxx()` 且全文**无**
+           `window.__renderXxx =` / `function __renderXxx` ⇒ 进候选。
+        ③ **引用传递**：`setTimeout(X, …)` / `addEventListener('…', X)` 中的 X
+           （传引用同样会 ReferenceError）⇒ 进候选。
+        ④ **两档裁决**：
+           · 候选且**无** `typeof X === 'function'` / `window.X &&` 守卫
+             ⇒ ❌ **阻断**（一旦执行必炸，`0d3482be4` 即此档）
+           · 候选但**有**守卫 ⇒ ⚠️ **告警放行**（不炸，但功能恒不执行=静默失效；
+             实测存量命中 1 处 `__retryJudgmentRender`）。
+             该档故意不阻断：属存量问题，一阻断会立刻打挂两条部署链。
+
+    为什么这样判**不误杀**（关键）：
+      · **只查页面自建的「__ / 下划线前缀」族**，不查第三方 API
+        （`Math.max` / `JSON.parse` / `localStorage.getItem` 等一律不进候选）。
+      · **注释/字符串先剥离**：`'..._renderPostReady()...'` 与 `// _renderPostReady()`
+        不计入调用点。
+        🔴 剥离必须**等长替换**（保留换行）—— 否则行号整体前移，红字报的 L 无法对位原文。
+        🔴 且必须区分「除号 / 正则起点」—— 本仓含 `/[<>&"]/g` 这类正则，
+           朴素「遇 // 即注释」会吞掉其后大段代码（实测把 970KB 压到 286KB，
+           14 个真实定义集体消失 ⇒ 全盘误报）。
+      · **探测不到内联块/清单缺失 ⇒ 放行**，避免守卫自身成为新的单点阻断源。
+
+    维护纪律：**有意删除一个被调用的函数**时，必须同时改调用点（或加 `typeof` 守卫）
+      —— 这正是本项要建立的摩擦力；改完本项自然转绿，无需登记豁免。
+    """
+    idx = ROOT / "index.html"
+    if not idx.exists():
+        return True, "index.html 不存在（放行）"
+    try:
+        txt = idx.read_text(encoding="utf-8")
+    except Exception as e:
+        return False, "index.html 读取失败: %s" % e
+
+    # ── 只取内联 <script> 块（外链数据由 [6/8] 管；此处要看 JS 实体）──
+    #    同时记录每个块在**原 index.html 中的起始行号**，使红字里报的 L 号可直接对位原文。
+    blocks, base_lines = [], []
+    for m in re.finditer(r"<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>", txt, re.S):
+        base_lines.append(txt[:m.start(1)].count("\n") + 1)
+        blocks.append(m.group(1))
+    if not blocks:
+        return True, "未探测到内联 script 块（放行，避免守卫自身成为单点）"
+
+    # 用「块内行号 → 原 index.html 行号」的分段映射
+    def _to_orig(block_idx, inner_ln):
+        return base_lines[block_idx] + inner_ln - 1
+
+    raw = "\n".join(blocks)
+
+    # ── 剥离注释与字符串字面量（**等长替换**，保留换行 ⇒ 行号与原文一致）──
+    #    为什么必须剥离：注释里常写到「下方 _xxx() 调用点仍在」这种**描述旧 bug 的句子**，
+    #    计入调用点会产生大量假阳性（实测线上真身即命中一处纯注释）。
+    #    🔴 为什么必须是「等长替换」而非「删除」：删除会把后续行号整体前移，
+    #       红字里报的 L 号无法与 index.html 对位，排查时反而更费事。
+    #    🔴 为什么不能只做朴素字符扫描：本仓含大量正则字面量（如 `/[<>&"]/g`），
+    #       朴素的「遇 // 即行注释」会把正则内部当注释起点，进而**吞掉其后大段代码**
+    #       （实测：朴素版把 970KB 压到 286KB，14 个真实定义集体消失 ⇒ 全盘误报）。
+    #       故此处显式区分「除号 / 正则起点」，并跳过字符串内的转义。
+    def _strip_keep_len(t):
+        n = len(t)
+        buf = list(t)
+        i = 0
+        while i < n:
+            c = t[i]
+            # ① 块注释 /* ... */
+            if c == "/" and i + 1 < n and t[i + 1] == "*":
+                j = t.find("*/", i + 2)
+                j = n if j == -1 else j + 2
+                for k in range(i, j):
+                    if buf[k] != "\n":
+                        buf[k] = " "
+                i = j
+                continue
+            # ② HTML 注释 <!-- ... -->
+            if c == "<" and t.startswith("<!--", i):
+                j = t.find("-->", i + 4)
+                j = n if j == -1 else j + 3
+                for k in range(i, j):
+                    if buf[k] != "\n":
+                        buf[k] = " "
+                i = j
+                continue
+            # ③ 行注释 // ...（要求 // 前是空白或分隔符，排除 http:// 与正则）
+            if c == "/" and i + 1 < n and t[i + 1] == "/":
+                prev = t[i - 1] if i > 0 else "\n"
+                if prev in " \t\n;({[,=:!&|?+*%<>~^":
+                    j = t.find("\n", i)
+                    j = n if j == -1 else j
+                    for k in range(i, j):
+                        buf[k] = " "
+                    i = j
+                    continue
+            # ④ 字符串字面量（含模板串，处理转义）
+            if c in "\"'`":
+                q = c; j = i + 1
+                while j < n:
+                    if t[j] == "\\":
+                        j += 2; continue
+                    if t[j] == q:
+                        j += 1; break
+                    j += 1
+                for k in range(i, j):
+                    if buf[k] != "\n":
+                        buf[k] = " "
+                i = j
+                continue
+            # ⑤ 正则字面量：仅在「运算符位」出现的 / 才是正则起点
+            if c == "/":
+                k = i - 1
+                while k >= 0 and t[k] in " \t\n":
+                    k -= 1
+                p = t[k] if k >= 0 else ""
+                if p == "" or p in "(,=:[!&|?{};+-*%~^<>":
+                    j = i + 1; inclass = False
+                    while j < n:
+                        ch = t[j]
+                        if ch == "\\":
+                            j += 2; continue
+                        if ch == "[":
+                            inclass = True
+                        elif ch == "]":
+                            inclass = False
+                        elif ch == "/" and not inclass:
+                            j += 1; break
+                        elif ch == "\n":
+                            break
+                        j += 1
+                    for k2 in range(i, j):
+                        if buf[k2] != "\n":
+                            buf[k2] = " "
+                    i = j
+                    continue
+            i += 1
+        return "".join(buf)
+
+    try:
+        code = _strip_keep_len(raw)
+    except Exception:
+        code = raw
+    # 剥离前/后长度必须相等（等长替换不变式）；不等则退回原文（宁可有噪音，不可漏报）
+    if len(code) != len(raw):
+        code = raw
+
+    # ── 块内行号 → 原 index.html 行号的映射表 ──
+    #    raw 是各块用 "\n" 拼起来的；每个块的行数可知，据此把 raw 行号换算回原文行号。
+    _map, _acc = [], 0
+    for bi, b in enumerate(blocks):
+        nln = b.count("\n") + 1
+        _map.append((_acc, _acc + nln, bi))    # [start, end) 在原 raw 中的行区间
+        _acc += nln
+    def _orig_ln(raw_ln):
+        """raw（拼接串）的 1-based 行号 → 原 index.html 的 1-based 行号"""
+        for st, en, bi in _map:
+            if st <= raw_ln - 1 < en:
+                return _to_orig(bi, (raw_ln - 1) - st + 1)
+        return raw_ln
+
+    # ── ① 已定义的标识符集合 ──
+    defs = set()
+    defs |= set(re.findall(r"function\s+([A-Za-z_$][\w$]*)\s*\(", code))
+    defs |= set(re.findall(r"\b(?:var|let|const)\s+([A-Za-z_$][\w$]*)\s*=", code))
+    defs |= set(re.findall(r"\b([A-Za-z_$][\w$]*)\s*=\s*function\b", code))
+    defs |= set(re.findall(r"\b([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>", code))
+    defs |= set(re.findall(r"\b([A-Za-z_$][\w$]*)\s*=\s*[A-Za-z_$][\w$]*\s*=>", code))
+    defs |= set(re.findall(r"\bclass\s+([A-Za-z_$][\w$]*)", code))
+    # 🔴 window.X = ... 只认「赋值右侧是函数/值」的形态；且必须先剔除
+    #    `window.__renderFoo = function` 中的名字 —— 这是定义位，不是调用位。
+    defs |= set(re.findall(r"window\.([A-Za-z_$][\w$]*)\s*=(?!=)", code))
+    # 对象属性简写定义（本仓常见）：{ _renderXxx: function(){...} }
+    defs |= set(re.findall(r"([A-Za-z_$][\w$]*)\s*:\s*function\b", code))
+    # 函数形参（含解构之外的单标识符形参）
+    for ps in re.findall(r"function\s*[A-Za-z_$\w]*\s*\(([^)]*)\)", code):
+        for p in ps.split(","):
+            p = p.strip().split("=")[0].strip()
+            if re.fullmatch(r"[A-Za-z_$][\w$]*", p):
+                defs.add(p)
+    for ps in re.findall(r"\(([^)]*)\)\s*(?:=>|\{)", code):
+        for p in ps.split(","):
+            p = p.strip().split("=")[0].strip()
+            if re.fullmatch(r"[A-Za-z_$][\w$]*", p):
+                defs.add(p)
+    # for / catch 绑定
+    defs |= set(re.findall(r"\bfor\s*\(\s*(?:var|let|const)\s+([A-Za-z_$][\w$]*)", code))
+    defs |= set(re.findall(r"\bcatch\s*\(\s*([A-Za-z_$][\w$]*)", code))
+
+    # ── ② 候选调用点：仅「_ 前缀」与「__ 前缀」与「window.__ 前缀」族 ──
+    calls = {}   # name -> 首次出现行号
+    # window.__xxx(  形式
+    for m in re.finditer(r"window\.(__[A-Za-z0-9_$]+)\s*\(", code):
+        nm = m.group(1)
+        if nm not in calls:
+            calls[nm] = _orig_ln(code[:m.start()].count("\n") + 1)
+    # 裸 __xxx( / _xxx(  形式（排除紧跟 . 的成员调用，如 a._x()）
+    for m in re.finditer(r"(?<![\w$.])(__?[A-Za-z][A-Za-z0-9_$]*)\s*\(", code):
+        nm = m.group(1)
+        if nm in ("_", "__"):
+            continue
+        # 🔴 定义位排除（必须精确，否则「删定义」会被误认为「定义仍在」）：
+        #   ① `function NAME(`        —— 函数声明
+        #   ② `NAME(…){` 且前导为 `function` / `get` / `set` / `async`
+        #   ③ `NAME: function(`       —— 对象方法
+        #   ④ `NAME = function(` / `NAME = (…) =>`
+        pre = code[max(0, m.start() - 60):m.start()]
+        if re.search(r"(?:^|[^\w$])(?:function|get|set|async)\s*$", pre):
+            continue
+        if re.search(r"[:=]\s*$", pre):                      # NAME: function( 或 NAME = function(
+            continue
+        if nm not in calls:
+            calls[nm] = _orig_ln(code[:m.start()].count("\n") + 1)
+
+    # ── ③ 兜底分支豁免：typeof X === 'function' / window.X && / if(X) ──
+    #    🔴 本仓渲染器大量使用「先探测再调用」写法；这类调用**不会 ReferenceError**，
+    #       若判为缺陷会产生巨量假阳性（实测不豁免则 13 处误报）。
+    #    🔴 **必须在剥离前的 raw 上检测**，不能在 code 上：
+    #       等长剥离把字符串字面量 `'function'` 换成了空白 ⇒ 在 code 上匹配不到
+    #       `typeof X === 'function'` ⇒ 守卫识别失效、又把安全调用误判为硬缺陷
+    #       （实测 S5 场景即因此误报）。注释剥离与否不影响本判定，故用 raw 安全。
+    safe = set()
+    def _scan_safe(src):
+        for m in re.finditer(r"typeof\s+([A-Za-z_$][\w$.]*)\s*===?\s*['\"]function['\"]", src):
+            safe.add(m.group(1).split(".")[-1])
+        # window.X && ... 短路
+        for m in re.finditer(r"\bwindow\.(__?[A-Za-z0-9_$]+)\s*&&", src):
+            safe.add(m.group(1))
+        # if(X) / if(window.X) 形态
+        for m in re.finditer(r"if\s*\(\s*(?:window\.)?(__?[A-Za-z][A-Za-z0-9_$]*)\s*\)", src):
+            safe.add(m.group(1))
+    _scan_safe(raw)
+    # 兜底：即使 raw 扫描异常，也把 code 上的 typeof X 形态补进 safe
+    for m in re.finditer(r"typeof\s+([A-Za-z_$][\w$.]*)\s*===?\s*['\"]func", code):
+        safe.add(m.group(1).split(".")[-1])
+    # 引用传递（非调用）：setTimeout(X, …) / addEventListener('…', X)
+    #   —— 传引用同样会 ReferenceError，故一并纳入候选
+    for m in re.finditer(r"setTimeout\s*\(\s*(?:window\.)?(__?[A-Za-z][A-Za-z0-9_$]*)\s*,", code):
+        calls.setdefault(m.group(1), _orig_ln(code[:m.start()].count("\n") + 1))
+    for m in re.finditer(r"addEventListener\s*\(\s*['\"][^'\"]*['\"]\s*,\s*(?:window\.)?(__?[A-Za-z][A-Za-z0-9_$]*)\s*[,)]", code):
+        calls.setdefault(m.group(1), _orig_ln(code[:m.start()].count("\n") + 1))
+
+    # ── ④ 判定（**两档**，都与「运行期必炸」正交，故分开报告）──
+    #   档一（❌ 阻断）：调用点存在、全文无定义、**且无 typeof/&& 守卫**
+    #                    ⇒ 一旦执行必 ReferenceError，属硬事故（0d3482be4 即此档）。
+    #   档二（⚠️ 告警，不阻断）：有 typeof/&& 守卫但全文无定义
+    #                    ⇒ 不炸，但**功能恒不执行**（静默失效）。
+    #                      本仓实测命中 1 处：`__retryJudgmentRender`（L8814/L18222 调用，
+    #                      全文无 `window.__retryJudgmentRender =` 定义）⇒ 判定渲染重试
+    #                      从未生效。该档**故意不阻断** deploy：它是「既有存量问题」，
+    #                      一旦阻断会立刻打挂两条部署链；靠告警让它进入待修清单。
+    hard, soft = [], []
+    for nm, ln in sorted(calls.items(), key=lambda kv: kv[1]):
+        if nm in defs:
+            continue
+        if nm in safe:
+            soft.append("%s（L%d，有 typeof/&& 守卫）" % (nm, ln))
+        else:
+            hard.append("%s() 调用点 L%d，全文无定义且无守卫" % (nm, ln))
+    if hard:
+        return (False, "%d 处「无守卫的悬空调用」⇒ 运行期必 ReferenceError"
+                       "（语法层检测不出，仅在浏览器执行时炸）:\n    "
+                % len(hard) + "\n    ".join(hard[:8]))
+    if soft:
+        return (True, "⚠️ 无硬悬空调用；但发现 %d 处「有守卫的悬空调用」"
+                      "（不炸但功能恒不执行，属静默失效，建议修）: %s"
+                % (len(soft), "；".join(soft[:6])))
+    return (True, "内联 script 候选调用点 %d 个：全部有定义（0 处悬空）" % len(calls))
+
+
 def check_index_markers():
     """[10/10] index.html 核心标记守卫（2026-09-20 阿狸咪新增·结构性封堵「旧树静默覆盖」）。
 
@@ -820,12 +1113,14 @@ def main():
         ("[9/9] 回测口径守卫", check_backtest_caliber),
         ("[10/10] index 核心标记守卫", check_index_markers),
         ("[11/11] defer 数据缓存守卫", check_defer_cache_guard),
+        ("[12/12] 调用点定义守卫", check_callee_defined),
     ]
     print("=" * 60)
     print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；"
           "2026-09-13 扩至 6 项；2026-09-14 扩至 8 项；2026-09-20 扩至 9 项（回测口径守卫）；"
           "同日扩至 10 项（[10/10] index.html 核心标记守卫·防旧树覆盖）；"
-          "同日扩至 11 项（[11/11] defer 数据缓存守卫·防空结果固化））")
+          "同日扩至 11 项（[11/11] defer 数据缓存守卫·防空结果固化）；"
+          "2026-09-21 扩至 12 项（[12/12] 调用点定义守卫·防删函数连带删邻函数致 ReferenceError））")
     print("=" * 60)
     fails = 0
     results = []
