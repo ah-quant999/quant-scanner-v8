@@ -1,21 +1,21 @@
 {
-  "update_time": "2026-09-20 09:22:58",
+  "update_time": "2026-09-20 15:46:10",
   "data_time": "2026-09-20 15:30:00",
-  "total_scanned": 513,
+  "total_scanned": 516,
   "scan_stats": {
     "candidates": 520,
-    "succeeded": 513,
-    "failed": 7,
-    "kline_source_used": "本地缓存(主源 512/513 只)",
-    "elapsed_sec": 163.3,
-    "throughput_per_sec": 3.2,
+    "succeeded": 516,
+    "failed": 4,
+    "kline_source_used": "本地缓存(主源 512/516 只)",
+    "elapsed_sec": 32.1,
+    "throughput_per_sec": 16.2,
     "cache_fresh": 512,
     "cache_miss": 8,
     "cache_stale": 0,
-    "net_tx": 5,
+    "net_tx": 8,
     "net_mootdx": 0,
     "net_em": 0,
-    "kline_fail": 7,
+    "kline_fail": 4,
     "workers": 12,
     "budget_sec": 1500,
     "budget_skipped": 0,
@@ -300,6 +300,11 @@
       "code": "688260",
       "name": "昀冢科技",
       "board_label": "科创板"
+    },
+    {
+      "code": "688835",
+      "name": "高凯技术",
+      "board_label": "科创板"
     }
   ],
   "cond3_list": [
@@ -345,12 +350,12 @@
     },
     {
       "code": "000100",
-      "name": "TCL科技",
+      "name": "000100",
       "board_label": "主板"
     },
     {
       "code": "000560",
-      "name": "我爱我家",
+      "name": "珠江船务",
       "board_label": "主板"
     },
     {
@@ -365,12 +370,12 @@
     },
     {
       "code": "000620",
-      "name": "盈新发展",
+      "name": "大唐西市",
       "board_label": "主板"
     },
     {
       "code": "000630",
-      "name": "铜陵有色",
+      "name": "隽泰控股",
       "board_label": "主板"
     },
     {
@@ -395,12 +400,12 @@
     },
     {
       "code": "000737",
-      "name": "北方铜业",
+      "name": "湾区发展",
       "board_label": "主板"
     },
     {
       "code": "000807",
-      "name": "云铝股份",
+      "name": "上海实业环境",
       "board_label": "主板"
     },
     {
@@ -430,7 +435,7 @@
     },
     {
       "code": "000933",
-      "name": "神火股份",
+      "name": "中证医药",
       "board_label": "主板"
     },
     {
@@ -1942,6 +1947,11 @@
       "code": "688825",
       "name": "长鑫科技",
       "board_label": "科创板"
+    },
+    {
+      "code": "688826",
+      "name": "频准激光",
+      "board_label": "科创板"
     }
   ],
   "elite": [
@@ -2178,6 +2188,12 @@
       "enter_date": "2026-09-20"
     },
     {
+      "code": "688835",
+      "name": "高凯技术",
+      "score": 100,
+      "enter_date": "2026-09-20"
+    },
+    {
       "code": "002074",
       "name": "国轩高科",
       "score": 0,
@@ -2227,13 +2243,13 @@
     },
     {
       "code": "000100",
-      "name": "TCL科技",
+      "name": "000100",
       "score": 0,
       "enter_date": "2026-09-20"
     },
     {
       "code": "000560",
-      "name": "我爱我家",
+      "name": "珠江船务",
       "score": 0,
       "enter_date": "2026-09-20"
     },
@@ -2251,13 +2267,13 @@
     },
     {
       "code": "000620",
-      "name": "盈新发展",
+      "name": "大唐西市",
       "score": 0,
       "enter_date": "2026-09-20"
     },
     {
       "code": "000630",
-      "name": "铜陵有色",
+      "name": "隽泰控股",
       "score": 0,
       "enter_date": "2026-09-20"
     },
@@ -2281,13 +2297,13 @@
     },
     {
       "code": "000737",
-      "name": "北方铜业",
+      "name": "湾区发展",
       "score": 0,
       "enter_date": "2026-09-20"
     },
     {
       "code": "000807",
-      "name": "云铝股份",
+      "name": "上海实业环境",
       "score": 0,
       "enter_date": "2026-09-20"
     },
@@ -2317,7 +2333,7 @@
     },
     {
       "code": "000933",
-      "name": "神火股份",
+      "name": "中证医药",
       "score": 0,
       "enter_date": "2026-09-20"
     },
@@ -3934,11 +3950,17 @@
       "name": "长鑫科技",
       "score": 0,
       "enter_date": "2026-09-20"
+    },
+    {
+      "code": "688826",
+      "name": "频准激光",
+      "score": 0,
+      "enter_date": "2026-09-20"
     }
   ],
   "detail": {
     "000039": {
-      "name": "中集集团",
+      "name": "上证信息",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -3968,7 +3990,7 @@
       "board_label": "主板"
     },
     "002028": {
-      "name": "思源电气",
+      "name": "映美控股",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4133,7 +4155,7 @@
       "board_label": "主板"
     },
     "300979": {
-      "name": "华利集团",
+      "name": "300979",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4313,7 +4335,7 @@
       "board_label": "主板"
     },
     "000100": {
-      "name": "TCL科技",
+      "name": "000100",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4358,7 +4380,7 @@
       "board_label": "主板"
     },
     "000560": {
-      "name": "我爱我家",
+      "name": "珠江船务",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4403,7 +4425,7 @@
       "board_label": "主板"
     },
     "000620": {
-      "name": "盈新发展",
+      "name": "大唐西市",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4418,7 +4440,7 @@
       "board_label": "主板"
     },
     "000630": {
-      "name": "铜陵有色",
+      "name": "隽泰控股",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4463,7 +4485,7 @@
       "board_label": "主板"
     },
     "000703": {
-      "name": "恒逸石化",
+      "name": "000703",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4508,7 +4530,7 @@
       "board_label": "主板"
     },
     "000737": {
-      "name": "北方铜业",
+      "name": "湾区发展",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4523,7 +4545,7 @@
       "board_label": "主板"
     },
     "000807": {
-      "name": "云铝股份",
+      "name": "上海实业环境",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4613,7 +4635,7 @@
       "board_label": "主板"
     },
     "000933": {
-      "name": "神火股份",
+      "name": "中证医药",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -11613,6 +11635,51 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.57,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "科创板"
+    },
+    "688826": {
+      "name": "频准激光",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.53,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "科创板"
+    },
+    "688835": {
+      "name": "高凯技术",
+      "score": 100,
+      "conds": 1,
+      "cond1": false,
+      "cond2": true,
+      "cond3": false,
+      "zt_count": 1,
+      "zt_down_count": 1,
+      "af_peak": 23.26,
+      "vr_peak": 1.09,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "科创板"
+    },
+    "688836": {
+      "name": "宇树科技",
+      "score": 0,
+      "conds": 0,
+      "cond1": false,
+      "cond2": false,
+      "cond3": false,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.24,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"

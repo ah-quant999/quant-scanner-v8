@@ -1,8 +1,15 @@
 {
-  "update_time": "2026-09-20 09:50:20",
-  "run_start": "2026-09-20 09:19:50",
-  "ok": 1,
-  "fail": 0,
-  "failed_scripts": [],
-  "skipped_by_time_gate": []
+  "update_time": "2026-09-20 16:43:31",
+  "run_start": "2026-09-20 15:43:28",
+  "ok": 24,
+  "fail": 1,
+  "failed_scripts": [
+    {
+      "script": "refresh_stock_metadata.py",
+      "reason": "超时 >30min"
+    }
+  ],
+  "skipped_by_time_gate": [
+    "fetch_weekend_run.py"
+  ]
 }
