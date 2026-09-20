@@ -150,7 +150,7 @@ jobs:
         shell: powershell
         run: |
           $code = @'
-          import os, base64, json, hashlib, urllib.request, time
+          import os, base64, gzip, json, hashlib, http.client, ssl, urllib.request, time, zlib
           token = os.environ["GITHUB_TOKEN"]
           REPO = "ah-quant999/quant-scanner-v8"
           H = {"Authorization": "Bearer " + token,
@@ -187,31 +187,141 @@ jobs:
                       time.sleep(min(2 ** i, 20))
               raise SystemExit("API fetch failed: %s (%s)" % (url, last))
 
-          def fetch_blob(sha, tries=6):
-              # Prefer the raw media type: no base64 inflation (~26pct smaller payload),
-              # which is what kept truncating on this runner for the 1.3MB json
-              # (run#31005326516 / #31011155328: IncompleteRead at ~1.82MB of 1.86MB).
-              # Every attempt is sha-verified so a silent truncation can never be written.
-              url = "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, sha)
-              raw_h = dict(H)
-              raw_h["Accept"] = "application/vnd.github.raw"
+          # ===== 2026-09-21 alimi: four-tier transport (same fix as the cloud chain) =====
+          # Why (measured on THIS runner, not theory). The 09-20 run's own log shows the
+          # truncation storm this replaces:
+          #   blob retry 1 [raw]: IncompleteRead(1702572 bytes read, 1414 more expected)
+          #   blob retry 2 [b64]: IncompleteRead(2322328 bytes read, 25687 more expected)
+          #   blob retry 3 [raw]: <WinError 10060> connection attempt failed
+          #   -> 157s burned on ONE file; "tries=6" was the only thing keeping it alive.
+          # data/STOCK_QUOTE.js (4.06MB) and data/STOCK_LIST.js (2.09MB) are inside this
+          # step's sync scope; the moment either changes, 6 retries can all fail
+          # -> "blob fetch failed" -> SystemExit -> chain RED.
+          # Fix: same tiers as the cloud chain, every one sha1-verified before returning.
+          #   (1) gzip   API raw + Accept-Encoding  (2.9-4.0x smaller on the wire)
+          #   (2) CDN    raw.githubusercontent Range chunking (resumable on flaky links)
+          #   (3) urllib raw fallback (http.client does NOT read proxy env vars; urllib does)
+          #   (4) b64    API JSON, last resort
+          # plus keep-alive connection reuse (measured 2.75x: 1.364s -> 0.495s per file).
+          # NOTE: keep every line of this block ASCII-only - PowerShell 5.1 reads the
+          #       generated .py as ANSI/GBK and CJK bytes swallow quote terminators
+          #       (run#30860170070 died on a Chinese Write-Host string).
+          RAW_CDN = "https://raw.githubusercontent.com/%s/main/%%s" % REPO
+
+          def _decomp(body, ce):
+              if ce == "gzip":
+                  return gzip.decompress(body)
+              if ce == "deflate":
+                  return zlib.decompress(body)
+              return body
+
+          def _cdn_alive():
+              try:
+                  req = urllib.request.Request(RAW_CDN % "README.md",
+                                               headers={"User-Agent": "v8-cn-sync"})
+                  urllib.request.urlopen(req, timeout=20).read(16)
+                  return True
+              except Exception as e:
+                  print("  CDN probe failed, skipping range tier this round: %s" % e, flush=True)
+                  return False
+
+          CDN_OK = _cdn_alive()
+          _API_CONN = [None]
+
+          def _api_conn():
+              if _API_CONN[0] is None:
+                  _API_CONN[0] = http.client.HTTPSConnection(
+                      "api.github.com", timeout=180, context=ssl.create_default_context())
+              return _API_CONN[0]
+
+          def _api_drop():
+              try:
+                  if _API_CONN[0] is not None:
+                      _API_CONN[0].close()
+              except Exception:
+                  pass
+              _API_CONN[0] = None
+
+          def _api_get(path, accept):
+              # Keep-alive reuse. http.client does NOT auto-send User-Agent (urllib does),
+              # and GitHub's admin rules answer a UA-less request with 403:
+              #   "Request forbidden by administrative rules. Please make sure your
+              #    request has a User-Agent"  -- measured: no UA -> 403, with UA -> 200.
+              hdr = dict(H)
+              hdr["Accept"] = accept
+              hdr["Accept-Encoding"] = "gzip, deflate"
+              hdr["User-Agent"] = "v8-cn-sync"
               last = None
-              for i in range(tries):
-                  mode = "raw" if i % 2 == 0 else "b64"
+              for _ in range(2):
                   try:
-                      hdr = raw_h if mode == "raw" else H
-                      resp = urllib.request.urlopen(
-                          urllib.request.Request(url, headers=hdr), timeout=180)
+                      c = _api_conn()
+                      c.request("GET", path, headers=hdr)
+                      resp = c.getresponse()
                       body = resp.read()
-                      data = body if mode == "raw" else base64.b64decode(
-                          json.loads(body.decode())["content"])
-                      if sha_of(data) != sha:
-                          raise ValueError("sha mismatch (truncated?) got %d bytes" % len(data))
-                      return data
+                      if resp.status != 200:
+                          raise ValueError("HTTP %s" % resp.status)
+                      return body, resp.headers.get("Content-Encoding")
                   except Exception as e:
                       last = e
-                      print("  blob retry %d [%s]: %s" % (i + 1, mode, e), flush=True)
-                      time.sleep(min(2 ** i, 20))
+                      _api_drop()
+              raise last
+
+          def _fetch_api_gzip(sha):
+              body, ce = _api_get("/repos/%s/git/blobs/%s" % (REPO, sha),
+                                  "application/vnd.github.raw")
+              return _decomp(body, ce)
+
+          def _fetch_api_b64(sha):
+              body, ce = _api_get("/repos/%s/git/blobs/%s" % (REPO, sha),
+                                  "application/vnd.github+json")
+              return base64.b64decode(json.loads(_decomp(body, ce).decode())["content"])
+
+          def _fetch_urllib_raw(sha):
+              hdr = dict(H)
+              hdr["Accept"] = "application/vnd.github.raw"
+              hdr["Accept-Encoding"] = "gzip, deflate"
+              hdr["User-Agent"] = "v8-cn-sync"
+              resp = urllib.request.urlopen(
+                  urllib.request.Request(
+                      "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, sha),
+                      headers=hdr), timeout=180)
+              return _decomp(resp.read(), resp.headers.get("Content-Encoding"))
+
+          def _fetch_cdn_ranges(path, size, chunk=1 << 20):
+              buf = bytearray()
+              while len(buf) < size:
+                  end = min(len(buf) + chunk - 1, size - 1)
+                  req = urllib.request.Request(
+                      RAW_CDN % path,
+                      headers={"Range": "bytes=%d-%d" % (len(buf), end),
+                               "User-Agent": "v8-cn-sync"})
+                  part = urllib.request.urlopen(req, timeout=180).read()
+                  if not part:
+                      raise ValueError("empty range at offset %d" % len(buf))
+                  buf += part
+              return bytes(buf)
+
+          def fetch_blob(sha, path=None, size=None, tries=3):
+              # Four tiers; the first one whose payload sha1-matches wins.
+              last = None
+              tiers = [("gzip", lambda: _fetch_api_gzip(sha))]
+              if CDN_OK and size:
+                  tiers.append(("cdn", lambda: _fetch_cdn_ranges(path, size)))
+              tiers.append(("urllib", lambda: _fetch_urllib_raw(sha)))
+              tiers.append(("b64", lambda: _fetch_api_b64(sha)))
+              for i in range(tries):
+                  for name, fn in tiers:
+                      try:
+                          data = fn()
+                      except Exception as e:
+                          last = e
+                          print("  blob tier %s fail (round %d): %s" % (name, i + 1, e), flush=True)
+                          continue
+                      if len(data) and sha_of(data) == sha:
+                          return data
+                      last = ValueError("sha mismatch, got %d bytes" % len(data))
+                      print("  blob tier %s sha mismatch (%d bytes)" % (name, len(data)), flush=True)
+                  time.sleep(min(2 ** i, 20))
               raise SystemExit("blob fetch failed: %s (%s)" % (sha, last))
 
           # [ALIMI 2026-09-12] 分层 tree 枚举，别为筛 ~130 个源码文件去拉全仓 3961 条清单
@@ -232,7 +342,8 @@ jobs:
                       rel = e.get("path", "")
                       full = prefix + rel
                       if e.get("type") == "blob":
-                          out.append({"type": "blob", "path": full, "sha": e.get("sha")})
+                          out.append({"type": "blob", "path": full, "sha": e.get("sha"),
+                                      "size": e.get("size")})
                       elif e.get("type") == "tree" and depth < 3:
                           if any(full == p.split("/")[0] or full + "/" == p or p.startswith(full + "/")
                                  or full.startswith(p.rstrip("/") + "/") for p in prefixes):
@@ -257,17 +368,26 @@ jobs:
               # 🔴 2026-09-20 小九 P0 修复：新增 data/ 整目录（详见上方 _PREF 注释）
               if (p.startswith("algorithms/") or p.startswith("data/")
                       or p == "scripts/build_delisted.py" or ("/" not in p and p.endswith(".py"))):
-                  want.append((p, e["sha"]))
-          print("files to sync: %d" % len(want), flush=True)
+                  want.append((p, e["sha"], e.get("size") or 0))
+          print("files to sync: %d (cdn_range_tier=%s)" % (len(want), CDN_OK), flush=True)
 
           ok = 0
           skipped = 0
-          for p, sha in want:
+          failed = []
+          for p, sha, size in want:
               if local_blob_sha(p) == sha:
                   ok += 1
                   skipped += 1
                   continue
-              data = fetch_blob(sha)
+              try:
+                  data = fetch_blob(sha, path=p, size=size)
+              except SystemExit as e:
+                  # 2026-09-21: a file that never arrived must be LOUD. The old code let
+                  # fetch_blob's SystemExit kill the whole step with no per-file list;
+                  # the cloud chain's old code did worse (counted it as ok -> N/N false green).
+                  print("  FAILED download: %s (%s)" % (p, e), flush=True)
+                  failed.append(p)
+                  continue
               parent = os.path.dirname(p)
               if parent:
                   os.makedirs(parent, exist_ok=True)
@@ -275,9 +395,11 @@ jobs:
                   f.write(data)
               print("  updated %s (%d bytes)" % (p, len(data)), flush=True)
               ok += 1
-          print("OK source sync done: %d/%d (unchanged: %d)" % (ok, len(want), skipped), flush=True)
-          if ok != len(want):
-              raise SystemExit(1)
+          print("OK source sync done: %d/%d (unchanged: %d, failed: %d)"
+                % (ok, len(want), skipped, len(failed)), flush=True)
+          if failed:
+              raise SystemExit("source sync incomplete: %d file(s) failed, first: %s"
+                               % (len(failed), ", ".join(failed[:8])))
           '@
           # NOTE: must write a temp file then run it; passing code via `python -c` gets
           #       its double quotes stripped by the shell (run#30859885910).
