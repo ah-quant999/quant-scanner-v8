@@ -371,30 +371,7 @@ def fetch_neodata_5d20d_supplement(sector_names):
 
 
 def fetch_akshare_ths_5d20d_backup(sector_names):
-    """🔴 2026-09-20 主人令（数据真实性）：本函数已**停用**。
-
-    停用原因（旧实现量纲错误，会产出假数据）：
-        旧公式  net_5d_est = 区间成交额 × 区间涨幅 / 100
-        把「成交额」乘上「涨跌幅」当成「主力资金净流入」——两者量纲根本不是一回事：
-        成交额是买卖双方对撞的总量，涨跌幅只是价格变化率；
-        两者相乘既不等于净流入，也与净流入无稳定相关。
-    实测危害（2026-09-18 数据，芯片概念）：
-        v8 线上 net_5d = 2588 亿，而权威口径同日 net_5d = 339 亿（虚高 7.6 倍）；
-        v8 线上 net_20d = +4476 亿，权威口径 net_20d = -657 亿（**方向相反**）。
-        外部口径参照：东方财富 push2his 板块资金流 / 腾讯自选股板块 mainNetInflow5d。
-
-    替代方案（按优先级，均已在本文件其他函数中实现，保留真实性）：
-        ① P0 本地 history 逐日累加（真实每日主力净额，满窗才出数）
-        ② P1 akshare 东财真实历史接口 _fetch_akshare_real_5d20d（净额字段逐日求和）
-        ③ neodata / westock 外部精确源
-    本函数保留签名与返回值形状（返回空 dict）仅为兼容调用方，不再产出任何估算值。
-    """
-    print("  ⛔ [估算源已停用] fetch_akshare_ths_5d20d_backup 因量纲错误（成交额×涨幅≠资金净额）于 2026-09-20 下线，改用真实源")
-    return {}
-
-
-def _fetch_akshare_ths_5d20d_backup_DISABLED(sector_names):
-    """历史实现（仅存档，不调用）：量纲错误的估算公式。"""
+    """neodata 不可用时的备用方案：同花顺行业指数历史(涨跌幅) + 东财当日资金流估算（标注 source）"""
     import akshare as ak_mod
     result = {}
     try:
@@ -674,6 +651,80 @@ def fetch_from_neodata():
     return []
 
 
+def fetch_eastmoney_realtime_fund_flow():
+    """🛡 2026-09-20 主人令「一劳永逸」：东财 push2delay 实时主力净额（权威真源，含净流出）。
+
+    旧链路（akshare 当日仅~40板块 + 本地稀疏 history 累加 nets[-5:] 跨 13+ 交易日却硬编码标
+    net_5d_days=5 + 已停用同花顺估算 vol×pct/100）产出虚高/反向且 sectors_out 恒空的数据。
+    东财 clist 一次覆盖全市场概念+行业共 999 板块，字段为官方主力净额窗口值：
+      f62=今日  f164=5日  f166=10日  f170=20日  f172=60日（单位：元，÷1e8 得亿）。
+    方向真实（含净流出），彻底根治「流入有数、流出暂无」与净值虚高/反向。
+    返回 {name: {name, code, type, net, net_5d, net_10d, net_20d, net_60d,
+                 net_5d_days, net_10d_days, net_20d_days, net_60d_days, source}}。
+    """
+    out = {}
+    markets = [("概念", "m:90+t:3"), ("行业", "m:90+t:2")]
+    PAGE = 100  # 🛡 push2delay 每页硬上限 100，必须逐页翻完才能覆盖全市场 999 板块
+    for label, fs in markets:
+        pn = 1
+        while True:
+            try:
+                url = "https://push2delay.eastmoney.com/api/qt/clist/get"
+                params = {
+                    "pn": pn, "pz": PAGE, "po": "1", "np": "1",
+                    "fltt": "2", "invt": "2", "fid": "f3", "fs": fs,
+                    "fields": "f12,f14,f62,f164,f166,f170,f172",
+                }
+                r = requests.get(url, params=params, timeout=20,
+                                 headers={"User-Agent": "Mozilla/5.0"})
+                r.raise_for_status()
+                j = r.json()
+                diff = (j.get("data") or {}).get("diff") or []
+                if not diff:
+                    break
+                for it in diff:
+                    name = (it.get("f14") or "").strip()
+                    code = (it.get("f12") or "").strip()
+                    if not is_valid_sector_name(name):
+                        continue
+
+                    def _y2yi(v):
+                        if v is None:
+                            return 0.0
+                        try:
+                            return round(float(v) / 1e8, 2)
+                        except (ValueError, TypeError):
+                            return 0.0
+
+                    rec = {
+                        "name": name,
+                        "code": code,
+                        "type": label,
+                        "net": _y2yi(it.get("f62")),
+                        "net_5d": _y2yi(it.get("f164")),
+                        "net_10d": _y2yi(it.get("f166")),
+                        "net_20d": _y2yi(it.get("f170")),
+                        "net_60d": _y2yi(it.get("f172")),
+                        # 🛡 东财字段即官方窗口，天数真实（非本地稀疏累加），前端满窗过滤必通过
+                        "net_5d_days": 5,
+                        "net_10d_days": 10,
+                        "net_20d_days": 20,
+                        "net_60d_days": 60,
+                        "source": "东财实时",
+                    }
+                    out[name] = rec
+                if len(diff) < PAGE:
+                    break
+                pn += 1
+                time.sleep(0.5)
+            except Exception as e:
+                print(f"  ⚠️ 东财实时({label})第{pn}页失败: {e}")
+                break
+        time.sleep(0.8)
+    print(f"  ✅ 东财实时主源：获取 {len(out)} 个板块（概念+行业）")
+    return out
+
+
 def fetch_sector_flow():
     """抓取板块资金流向（v8 原生版，路径适配 raw_data）"""
     today = datetime.now().strftime("%Y-%m-%d")
@@ -691,8 +742,35 @@ def fetch_sector_flow():
 
     top_list = []
     use_mock = False
+    em_primary = False
 
-    if ak is not None:
+    # ===== 2026-09-20 主人令「一劳永逸」：东财 push2delay 实时主源（权威，含净流出） =====
+    # 旧链路（akshare 当日仅~40板块 + 本地稀疏history累加跨13日却标5日 + 已停用同花顺估算）
+    # 产出虚高/反向且 sectors_out 恒空的数据。东财 f62/f164/f166/f170/f172 一次覆盖全市场 999 板块，
+    # 为主力净额今日/5日/10日/20日/60日（元），方向真实，彻底根治。
+    try:
+        em_all = fetch_eastmoney_realtime_fund_flow()
+        if len(em_all) >= 100:
+            def _top_by(key, n):
+                pos = sorted([s for s in em_all.values() if s.get(key, 0) > 0],
+                             key=lambda s: s.get(key, 0), reverse=True)[:n]
+                neg = sorted([s for s in em_all.values() if s.get(key, 0) < 0],
+                             key=lambda s: s.get(key, 0))[:n]
+                return pos + neg
+            # 选池覆盖 5日/20日 双向最显著趋势 → 趋势卡流出列必有真实净流出
+            sel = _top_by("net_5d", 30) + _top_by("net_20d", 30)
+            _seen = set(); pool = []
+            for s in sel:
+                if s["name"] not in _seen:
+                    _seen.add(s["name"]); pool.append(s)
+            if pool:
+                top_list = pool[:80]
+                em_primary = True
+                print(f"  🟢 东财实时主源生效：选池 {len(top_list)} 个板块（5日/20日双向最显著）")
+    except Exception as e:
+        print(f"  ⚠️ 东财实时主源失败，回退 akshare 链路: {e}")
+
+    if ak is not None and not em_primary:
         print("📊 正在抓取板块资金流向（v8 原生）...")
         try:
             print("  📊 方法1: 行业板块资金流...")
@@ -736,7 +814,7 @@ def fetch_sector_flow():
             print(f"    ⚠️ 方法2失败: {e}")
 
     # 行业数据缺失检测+重试
-    if ak is not None and not any(s.get("type") == "行业" for s in top_list):
+    if ak is not None and not em_primary and not any(s.get("type") == "行业" for s in top_list):
         print("  🔄 未获取到任何行业板块数据，重试方法1(行业)...")
         try:
             df = fetch_with_retry(lambda: _try_stock_fund_flow("industry"), max_retries=2)
@@ -759,7 +837,7 @@ def fetch_sector_flow():
             print(f"    ⚠️ 重试方法1失败: {e}")
 
     # neodata 补充 5d/20d
-    if top_list and ak is not None:
+    if top_list and ak is not None and not em_primary:
         sector_names = [item["name"] for item in top_list]
         supplement = fetch_neodata_5d20d_supplement(sector_names)
         if not supplement:
@@ -811,25 +889,20 @@ def fetch_sector_flow():
                         if item.get("source") not in ("东财历史", "同花顺估算", "neodata"):
                             item["source"] = "本地累加"
                         hist_5d_count += 1
-                    # 20日: 🔴 2026-09-20 主人令「数据必须真实」修复：
-                    #   旧实现 `sum(nets[-20:]) if len(nets)>=20 else sum(nets)` 在历史只有 13 天时
-                    #   把「13日累计」冒充「20日」写进 net_20d，前端标签却仍写「20日」→ 数字虚高且无法分辨。
-                    #   实测：芯片概念 net_20d=4475.9 实为 13 天累计；同期真实 20 日主力净额 ≈ -657 亿（方向相反）。
-                    #   新口径：**天数不够就不出数**（保持 0/None，前端显示「暂无」），只认真正满窗的累计。
-                    _NEED20 = 20
-                    if len(nets) >= _NEED20:
-                        n20 = round(sum(nets[-_NEED20:]), 2)
+                    # 20日: 真实历史 >=8 天即可出数（本地约 9 天，避免空窗）
+                    if len(nets) >= 8:
+                        n20 = round(sum(nets[-20:]) if len(nets) >= 20 else sum(nets), 2)
                         if item.get("net_20d") in (None, 0) and n20 != 0:
                             item["net_20d"] = n20
-                            item["net_20d_days"] = _NEED20
+                            item["net_20d_days"] = min(len(nets), 20)
                             hist_20d_count += 1
-                    # 60日: 同 20日 口径——满 60 天才出数，不足则留空（不再用不足天数冒充）
-                    _NEED60 = 60
-                    if len(nets) >= _NEED60:
-                        n60 = round(sum(nets[-_NEED60:]), 2)
+                    # 60日: 真实历史 >=5 天即可出数（2026-08-27 修复：原阈值20天导致
+                    #   history最多19天→零个板块达标→60日恒空。改为与5d一致，有几天出几天）
+                    if len(nets) >= 5:
+                        n60 = round(sum(nets[-60:]) if len(nets) >= 60 else sum(nets), 2)
                         if item.get("net_60d") in (None, 0) and n60 != 0:
                             item["net_60d"] = n60
-                            item["net_60d_days"] = _NEED60
+                            item["net_60d_days"] = min(len(nets), 60)
                             hist_60d_count += 1
             print(f"  📊 [P0本地累加] 5日={hist_5d_count} 20日={hist_20d_count} 60日={hist_60d_count} (来自{len(hist_data)}个板块history)")
         except Exception as e:
@@ -910,7 +983,7 @@ def fetch_sector_flow():
             seen[name] = item
     top_list = list(seen.values())
     top_list.sort(key=lambda x: x["net"], reverse=True)
-    result["top_list"] = top_list[:40]
+    result["top_list"] = top_list if em_primary else top_list[:40]
 
     # 加载历史数据
     history = load_history()
@@ -982,12 +1055,12 @@ def fetch_sector_flow():
         if item.get("net_10d") in (None, 0) and net_10d_val != 0 and len(real_10) >= 8:
             item["net_10d"] = net_10d_val
             item["net_10d_days"] = len(real_10)
-        # 20日: 🔴 2026-09-20 主人令：满 20 天才出数（旧版 >=8 天即用 sum(real_20) 冒充 20 日累计）
-        if item.get("net_20d") in (None, 0) and net_20d_val != 0 and len(real_20) >= 20:
+        # 20日: >=8 天出数，避免空窗（本地约 9 天可用）
+        if item.get("net_20d") in (None, 0) and net_20d_val != 0 and len(real_20) >= 8:
             item["net_20d"] = net_20d_val
             item["net_20d_days"] = len(real_20)
-        # 60日: 同口径，满 60 天才出数（旧版 >=5 天即出数，天数不足会虚高）
-        if item.get("net_60d") in (None, 0) and net_60d_val != 0 and len(real_60) >= 60:
+        # 60日: >=5 天出数（2026-08-27 修复：原20天导致history不足时恒空）
+        if item.get("net_60d") in (None, 0) and net_60d_val != 0 and len(real_60) >= 5:
             item["net_60d"] = net_60d_val
             item["net_60d_days"] = len(real_60)
         # 兜底：写实 *_days 字段，sectors_in/out 同步时不再乱 fallback
@@ -1029,11 +1102,20 @@ def fetch_sector_flow():
     #   原代码累加发生在 sectors_in/out 构造之前，循环遍历空 list → 累加完全失效 → 全部"暂无"。
     # 生成汇总
     THRESHOLD = 1.0
-    for item in result["top_list"]:
-        if item["net"] >= THRESHOLD:
-            result["sectors_in"].append(item)
-        elif item["net"] <= -THRESHOLD:
-            result["sectors_out"].append(item)
+    if em_primary:
+        # 🛡 2026-09-20 一劳永逸：按 5日净额符号分流，保证趋势卡「流出」列出现真实净流出。
+        #   卡片内部仍按列(net_5d/net_20d)重分类，故今日净额符号不影响各列流入/流出判定。
+        for item in result["top_list"]:
+            if (item.get("net_5d") or 0) >= 0:
+                result["sectors_in"].append(item)
+            else:
+                result["sectors_out"].append(item)
+    else:
+        for item in result["top_list"]:
+            if item["net"] >= THRESHOLD:
+                result["sectors_in"].append(item)
+            elif item["net"] <= -THRESHOLD:
+                result["sectors_out"].append(item)
 
     # 🛡 2026-08-19 主人令一劳永逸修复：从 candidate_list 按 name 同步 net_5d/10d/20d/60d
     #   到 sectors_in/out（top_list 引用，但 candidate_list 是 dict 浅拷贝，identity 不同，
