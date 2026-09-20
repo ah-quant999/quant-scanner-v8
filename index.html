@@ -3004,7 +3004,7 @@ function fmtSigned(v){
   <section id="sec-st">
     <div class="sec-head" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h2 style="margin:0;">🎯 选股策略</h2>
-      <span class="tag">选股池 · 四量终极 · 三重共识 · 选股生命周期 · 因子实验室 · 逆势龙头(CRDS)</span>
+      <span class="tag">选股池 · 四量终极 · 三重共识 · 选股生命周期 · 逆势龙头(CRDS)</span>
     </div>
     <!-- 建议持有期纪律 banner 已于 2026-08-30 移至逻辑详解页「选股策略·持有期纪律」段，此处不再展示（避免客户可看区域堆文字） -->
     <!-- TAB 按钮行（横排，独立于内容区） -->
@@ -7645,7 +7645,7 @@ function fmtSigned(v){
     /* 🔴 2026-09-19 主人令（图像取证）：「我的意思是这张专门成立一张，把当天进候选池股票的
        各种因子加减分全列出来，按分数从高到低排列，最顶部的就是最终推荐的几只了，一目了然为什么选这几只」
        ⇒ 原 ②「当日加减分排列」（factor_trace，仅触发的 4 只、adj 全 0）整块迁出本卡，
-          独立成新卡「🏆 当日因子计分榜」（st-fa 子页、「🧮 每日因子计算」卡下方，dsbHost）：
+          独立成新卡「🏆 当日因子计分榜」（「最终推荐」页第 3 子 Tab · final-pane-fa、「🧮 每日因子计算」卡下方，dsbHost）：
        · 数据源 = TOP10_DAILY.top20（generate_top10.py 落盘，每票 11 维因子分 + 文字明细，已按总分降序）
        · 顶部即高分区，当日 FINAL_RECOMMEND 推荐名单逐行打「🏷 最终推荐」标
        · factor_trace 旧表（4 只、adj 恒 0）信息量不足，弃用 */
@@ -14708,15 +14708,10 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
        ⚠️ 仅删调度、未删函数定义（其余路径可能仍在调用，待确认后再删净）。 */
     /* 保留：__renderImaStrongStock（#imaStrongBody ✅ 活）+ renderLifeBacktests（回测真实产出） */
     if(n==='life' && typeof window.renderLifeBacktests==='function') setTimeout(window.renderLifeBacktests, 60);
-    // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
-    if(n==='fa'){
-      if(typeof window.__renderFactorPane==='function') setTimeout(window.__renderFactorPane, 30);
-      if(typeof window.__renderFactorLab==='function') setTimeout(window.__renderFactorLab, 30);
-      if(typeof window.__renderDailyFactorCalc==='function') setTimeout(window.__renderDailyFactorCalc, 30);
-    }
-    // 2026-09-06 审计修复：__renderFactorLab 死调用移除（当时该容器在暂未上架·实验区，life tab 无此容器）
-    // 2026-09-12 更新：因子实验室已迁入本页 🧪 因子实验室 子页，其渲染由上方 if(n==='fa') 分支负责，故此处仍不挂 life。
-  // 2026-09-18 主人令：子页名统一「因子实验室」（原「🧪 因子」），且不评星级（因子=加分项，非选股策略）。
+    // 🔴 2026-09-20 主人令：「🧪 因子实验室」已迁出本页（→「最终推荐」页第 3 子 Tab）
+    //   ⇒ 原 if(n==='fa') 渲染分支随之删除，渲染触发语义归位到 window.switchFinalTab('fa')。
+    //   历史沿革：2026-09-06 该卡容器在「暂未上架·实验区」，life tab 无此容器故不挂；
+    //             2026-09-12 迁入本页「因子」子页；2026-09-18 子页名统一「因子实验室」、不评星级。
     // 🛡 2026-09-02 主人令根治：切换后立即启动「子 tab 数据就绪重试」（见 __stRetryTab），消除 defer 未注入导致的首渲空卡
     try{ window.__stRetryTab(n); }catch(e){}
     // 🔴 2026-09-17 主人令「统一口径不要打架」：切 tab 时重渲所有静态星级占位
@@ -15745,7 +15740,7 @@ h += '</div>'; // /ulPaneObserve
 //     · 回测·框架 3 卡  RPS 30天样本考核（已删）/ 中信PE观测（已并到暂未上架）/ 指数观测（已并到暂未上架）
 //       → 策略回测页底部 #btExtraHost（__renderBtExtraPane）现仅保留其它回测类卡壳
 //     · 因子类   3 卡  因子实验室(已纳入因子) / 因子审计(2026-09-19 下线) / 因子补缺进度
-//       → 选股策略 → 🧪 因子实验室 子页（直挂静态卡，stFaHost 壳已删；__renderFactorPane 只做就地填充）
+//       → 最终推荐 → 🧪 因子实验室 子 Tab（2026-09-20 由「选股策略」页迁入，见 final-pane-fa；直挂静态卡，__renderFactorPane 只做就地填充）
 //     · 宏观类   3 卡  机构研究·AI解析 / 新周期判定 / 宏观景气背景·K型分层
 //       （2026-09-13 主人令：「新周期判定」已下沉至「暂未上架 → 观测类」最下方
 //         ⇒ 宏观观测页现为 2 卡：机构研究·AI解析 + 宏观景气背景·K型分层）
@@ -19010,6 +19005,15 @@ window.__renderV8CalToday();
     if(name==='cand' && !window.__finalCandRendered){
       window.__finalCandRendered = true;
       setTimeout(renderFinalCand, 30);
+    }
+    // 🔴 2026-09-20 主人令：「🧪 因子实验室」由「选股策略」页迁入本页第 3 子 Tab，
+    //   渲染触发随之语义归位到此（原 window.switchSt('fa') 分支已删）。
+    //   注：页面级 _renderPostReady 已在 DOMContentLoaded 无条件预渲
+    //   （__renderFactorPane 内部串起「已纳入因子 / 每日因子计算 / 当日因子计分榜」三卡），
+    //   此处仅作切换兜底重渲 + 数据就绪重试（复用 __stRetryTab 的 fa 分支）。
+    if(name==='fa'){
+      if(typeof window.__renderFactorPane==='function') setTimeout(window.__renderFactorPane, 30);
+      try{ window.__stRetryTab('fa'); }catch(e){}
     }
   };
 
