@@ -649,6 +649,56 @@ def check_gate_headnote():
         return False, "；".join(fails[:4])
     return True, "闸门头注与 READY_SPEC 真源一致（项数/门槛/P0 专项）"
 
+def check_index_markers():
+    """[10/10] index.html 核心标记守卫（2026-09-20 阿狸咪新增·结构性封堵「旧树静默覆盖」）。
+
+    背景（2026-09-20 实测事故，双方各自独立复核）：
+      10:43 小九推 A/B/C 三改（index.html +76/−18）；
+      10:53 另一侧用**落后基线**的本机树推「强势跟踪卡改造」——父提交是当时 tip，
+           但树里的 index.html 是旧版 ⇒ **快进提交**静默顶掉 A/B/C，CI 随后重建，
+           线上 index.html 退回旧版（1371317 B），A/B/C 全 x0。
+      `force:false` 拦不住（那本来就是快进）；「推送前断言线上 blob == 补丁基线」只在
+      推送侧、且换个脚本就失效 ⇒ 需要一道**部署期、与推送者无关**的门禁。
+
+    判据：真源 = docs/ops/index_protected_markers.txt（每行 `标记|说明|登记日期`）。
+      任一标记在 index.html 中 0 命中 ⇒ **FAIL 阻断 deploy**（Pages 保持上一版，
+      用户侧不受影响），并在红字里点名消失的标记。
+
+    维护纪律（有意的摩擦力）：
+      · 新增长期锚点（卡片渲染器 / 页面分节 / 数据源全局名）→ 追加一行；
+      · **有意删除功能** → 必须同步删除对应行，否则本项会红（这正是设计目的）；
+      · 清单文件缺失 ⇒ 放行并告警，避免守卫自身变成新的单点阻断源。
+    """
+    mf = ROOT / "docs" / "ops" / "index_protected_markers.txt"
+    if not mf.exists():
+        return True, "标记清单不存在（守卫未启用，放行）"
+    idx = ROOT / "index.html"
+    if not idx.exists():
+        return True, "index.html 不存在（由 [6/8] 负责，放行）"
+    try:
+        txt = idx.read_text(encoding="utf-8")
+    except Exception as e:
+        return False, "index.html 读取失败: %s" % e
+
+    rows, miss = 0, []
+    for ln in mf.read_text(encoding="utf-8").splitlines():
+        ln = ln.strip()
+        if not ln or ln.startswith("#"):
+            continue
+        parts = [x.strip() for x in ln.split("|")]
+        if len(parts) < 2 or not parts[0]:
+            continue
+        rows += 1
+        if parts[0] not in txt:
+            miss.append(parts[0])
+    if rows == 0:
+        return True, "标记清单为空（放行）"
+    if miss:
+        return False, ("%d/%d 条核心标记在 index.html 中消失（疑似被落后基线覆盖，或功能整块删除"
+                       "而未同步清单）：%s" % (len(miss), rows, "；".join(miss[:8])))
+    return True, "index.html 核心标记 %d/%d 全部在位（卡片/分节/数据源锚点）" % (rows, rows)
+
+
 def main():
     checks = [
         ("[1/8] py_compile", check_py_compile),
@@ -660,10 +710,12 @@ def main():
         ("[7/8] gate 头注一致", check_gate_headnote),
         ("[8/8] 心跳产物名一致", check_heartbeat_name_consistency),
         ("[9/9] 回测口径守卫", check_backtest_caliber),
+        ("[10/10] index 核心标记守卫", check_index_markers),
     ]
     print("=" * 60)
     print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；"
-          "2026-09-13 扩至 6 项；2026-09-14 扩至 8 项；2026-09-20 扩至 9 项）")
+          "2026-09-13 扩至 6 项；2026-09-14 扩至 8 项；2026-09-20 扩至 9 项（回测口径守卫）；"
+          "同日扩至 10 项（[10/10] index.html 核心标记守卫·防旧树覆盖））")
     print("=" * 60)
     fails = 0
     results = []
@@ -682,7 +734,7 @@ def main():
         for e in errors:
             print(f"  - {e}")
         sys.exit(1)
-    print("🎉 9 项全部通过 → deploy 可继续")
+    print(f"🎉 {len(checks)} 项全部通过 → deploy 可继续")
     sys.exit(0)
 
 
