@@ -46,6 +46,12 @@ logic.html          -text -eol
 # 若行尾被平台转换则 sha 变化 ⇒ 戳与实际部署文件不符 ⇒ CDN 按旧 URL 吐旧副本。
 data/*.js           text eol=lf
 raw_data/*.json     text eol=lf
+# 2026-09-20 阿狸咪补漏（同类根因：glob `*` 不跨 `/` ⇒ 上述两行漏掉子目录与 .json）
+#   data/*.js 漏掉 data/*.json；raw_data/*.json 漏掉 raw_data/history/*.json
+#   ⇒ 这两族里残留 CRLF blob 一直未被 fold_eol 收口。fold_eol 的判定真源是
+#     scripts/normalize_eol.py → git check-attr，故**补此规则即自动扩展收口范围**。
+data/*.json         text eol=lf
+raw_data/history/*.json  text eol=lf
 
 # 🔴 累积型重要档案（禁止误删）—— 由 guard_protected_files.py 守卫
 data/SECTOR_CYCLE_ARCHIVE.js -diff -merge
