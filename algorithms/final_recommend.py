@@ -223,16 +223,25 @@ def load_json(name):
 #   的成熟写法，保持全站同口径），读不到则回退硬编码默认值 **并显式告警 +
 #   置降级标记**（绝不静默用旧值 —— 静默是主人反复强调的红线）。
 #
+# 🔴 2026-09-20 追加（改动15）：加载字段由 edge10 改 excess5（可实盘 T+5 超额）。
+#   旧口径 T+10 是 edge(on−off) 绝对收益差，长持有期被大盘 β 撑高 ⇒ β 假象：
+#   sig_jinzuan 线上 edge10=+8.676 而实盘 T+5 超额仅 +0.532（虚高 16 倍）。
+#   一致性判据同步由「T+5/T+10 同号」改「IS/OOS 分段超额同号」（真跨期稳健性）。
+#
 # 时序说明（重要）：本脚本属 D 批（20:00），而 backtest_expectancy 属 E 批（21:00）
 #   ⇒ 当前读到的是**前一日**的 edge（架构级时序倒挂）。改动5 会把
 #   backtest_expectancy 前置到 B 批尾（18:10 后），此后本块读到当日值。
 #   在那之前，本块读到的是 T-1 值 —— 但已比「永久不变的硬编码」准确。
 # ═══════════════════════════════════════════════════════════════════════════
+# 🔴 2026-09-20 口径改造（改动15）：默认值同步为「可实盘 T+5 超额 excess5」口径。
+#   旧默认是 T+10 edge（β 假象），沿用会在「回测文件读不到」时静默退回错口径。
+#   取值 = 2026-09-20 新口径重跑（46 日 2026-06-08~09-18）by_factor.excess5，
+#   与 generate_top10.py::SIGNAL_EDGE_DEFAULT 严格同值（全站同口径铁律）。
 SIGNAL_EDGE_DEFAULT = {
-    "jinzuan": 8.11,
-    "chan":    3.68,
-    "trend":  -7.54,
-    "jigou": -10.36,
+    "jinzuan": 0.532,
+    "chan":    0.759,
+    "trend":  -1.532,
+    "jigou":  -0.660,
 }
 # 信号英文键 → by_factor 中的键名
 _SIG_FACTOR_KEY = {
@@ -244,7 +253,7 @@ _SIG_FACTOR_KEY = {
 
 SIGNAL_EDGE = dict(SIGNAL_EDGE_DEFAULT)   # 生效值（动态覆盖后）
 SIGNAL_N = {}                             # 样本量（诊断/回显用）
-SIGNAL_CONSISTENT = {}                    # T+5 与 T+10 符号是否一致
+SIGNAL_CONSISTENT = {}                    # IS/OOS 分段超额是否同号（改动15；旧为 T+5/T+10 同号）
 SIGNAL_EDGE_SOURCE = "hardcoded"          # hardcoded=回退默认 | backtest_expectancy@<generated>
 SIGNAL_EDGE_DEGRADED = False              # True = 动态加载失败（降级），透传到产物
 
@@ -265,19 +274,32 @@ def _load_signal_edge_dynamic():
         _hit = 0
         for name, fkey in _SIG_FACTOR_KEY.items():
             v = by_factor.get(fkey) or {}
-            e10 = v.get("edge10")
+            # 🔴 2026-09-20 口径改造（改动15）：从 edge10（T+10 绝对收益差）改读
+            #   excess5（T+5 超额 = 在场均值 − 全样本均值 = 剔 β 真 alpha）。
+            #   实证：sig_jinzuan 线上 edge10=+8.676 而实盘 T+5 超额仅 +0.532，
+            #   src_score = 1.5 + edge*0.18 会因此虚高 1.47 分（见下方 ×0.18 口径）。
+            #   回退链：excess5 → edge5 → 全缺则降级（不猜）。
+            e10 = v.get("excess5")
+            if e10 is None:
+                e10 = v.get("edge5")
             if e10 is None or (isinstance(e10, str) and not e10.strip()):
                 continue
             try:
                 edge[name] = float(e10)
             except (TypeError, ValueError):
                 continue
-            SIGNAL_N[name] = int(v.get("n_on10") or 0)
-            SIGNAL_CONSISTENT[name] = ((float(v.get("edge5") or 0) > 0)
-                                       == (float(e10) > 0))
+            SIGNAL_N[name] = int(v.get("n_on5") or 0)
+            # 一致性判据同步换「IS / OOS 分段超额同号」（跨期稳健性），
+            # 与 generate_top10.py 同口径。缺分段数据则不收缩。
+            _is5 = (v.get("excess_is") or {}).get("5") if isinstance(v.get("excess_is"), dict) else None
+            _os5 = (v.get("excess_oos") or {}).get("5") if isinstance(v.get("excess_oos"), dict) else None
+            if _is5 is None or _os5 is None:
+                SIGNAL_CONSISTENT[name] = True
+            else:
+                SIGNAL_CONSISTENT[name] = ((float(_is5) > 0) == (float(_os5) > 0))
             _hit += 1
         if _hit == 0:
-            raise ValueError("四信号 edge10 全部缺失")
+            raise ValueError("四信号 excess5/edge5 全部缺失")
         # 🔴 2026-09-18 小九实测修正（推送前拦下）：产物字段真实位置是
         #   **meta.generated**（实测 raw_data/backtest_expectancy.json：
         #   meta = {generated, method, horizons, n_snapshots, date_range, ...}），
@@ -299,7 +321,7 @@ def _load_signal_edge_dynamic():
             print(f"    {_n:8s} {_v:+8.3f}  n={SIGNAL_N.get(_n, 0)}{_flag}")
     except Exception as e:
         SIGNAL_EDGE_DEGRADED = True
-        SIGNAL_EDGE_SOURCE = f"hardcoded(fallback: {e})"
+        SIGNAL_EDGE_SOURCE = f"hardcoded(fallback: {e})"      # 改动15：默认值亦为超额口径
         print(f"[信号edge] ⚠️ 动态加载失败，回退硬编码默认值（已标降级）: {e}")
         for _n in _SIG_FACTOR_KEY:
             print(f"    {_n:8s} {edge[_n]:+8.3f}  (硬编码)")
