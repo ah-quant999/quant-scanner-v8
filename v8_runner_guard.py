@@ -654,7 +654,14 @@ def write_heartbeat(overall):
         "source": "v8_runner_guard",
     }
     try:
-        path.write_text(json.dumps(hb, ensure_ascii=False, indent=2), encoding="utf-8")
+        # 🔴 2026-09-20 CRLF 回潮根治（阿狸咪 2313 档 §六-③）：
+        #   原为 `path.write_text(...)`，Windows 下 newline=None ⇒ "\n" 落盘成 os.linesep="\r\n"。
+        #   而 push_heartbeat_file() 走 Contents API 直传 read_bytes()，
+        #   **绕过 .gitattributes 的 clean 过滤器** ⇒ CRLF 原样进远端 blob。
+        #   实证：raw_data/hb_xiaojiu.json 父 blob 实测 CR=5（122 B）；归一化后 CR=0（117 B）。
+        #   ⇒ 治本 = 写入侧显式 newline="\n"，只归一化 blob 属治标、必再回潮。
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
+            f.write(json.dumps(hb, ensure_ascii=False, indent=2))
         return path
     except Exception as e:
         print(f"[WARN] 心跳写入失败: {e}")

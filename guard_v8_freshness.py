@@ -459,7 +459,12 @@ def load_selfheal():
 
 def save_selfheal(d):
     try:
-        SELFHEAL_PATH.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+        # 🔴 2026-09-20 行尾防回潮（与 v8_runner_guard.write_heartbeat 同案）：
+        #   本文件落在 `data/*.json  eol=lf` 覆盖内，且经 Contents API 直传（绕过 clean 过滤器）。
+        #   原 `write_text(...)` 在 Windows 下 newline=None ⇒ "\n" 落盘成 CRLF ⇒ 远端 blob 带 CR。
+        #   当前 blob 实测 CR=0（519 B），属潜伏项，此处显式 newline="\n" 断根。
+        with open(SELFHEAL_PATH, "w", encoding="utf-8", newline="\n") as f:
+            f.write(json.dumps(d, ensure_ascii=False, indent=2))
     except Exception:
         pass
 

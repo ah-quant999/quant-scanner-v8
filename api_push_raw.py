@@ -313,6 +313,9 @@ _PROTECTED_RAW = {
 # ═══════════════════════════════════════════════════════════════════════════
 
 # 内联降级规则（与根 .gitattributes 同粒度；仅当 scripts/normalize_eol.py 不可用时启用）
+# 🔴 2026-09-20 补漏（阿狸咪 2313 档 §六-②）：远端 .gitattributes 新增
+#    `data/*.json` 与 `raw_data/history/*.json` 两条 eol=lf，本内联表须同步，
+#    否则真源模块缺失时会漏判这两族行尾。两条均不跨 `/`、不递归。
 _EOL_NEVER = {"logic.html"}
 _EOL_SUFFIX = (".yml", ".yaml", ".sh", ".py")
 _EOL_EXACT = {".gitattributes", "v6_memo.html", "v6_memo.golden.html"}
@@ -327,9 +330,13 @@ def _eol_expected_inline(rel: str) -> bool:
     parts = p.split("/")
     if len(parts) == 1 and parts[0].endswith(".html"):
         return True
-    if len(parts) == 2 and parts[0] == "data" and parts[1].endswith(".js"):
+    if len(parts) == 2 and parts[0] == "data" and (
+            parts[1].endswith(".js") or parts[1].endswith(".json")):
         return True
     if len(parts) == 2 and parts[0] == "raw_data" and parts[1].endswith(".json"):
+        return True
+    if (len(parts) == 3 and parts[0] == "raw_data" and parts[1] == "history"
+            and parts[2].endswith(".json")):
         return True
     return False
 

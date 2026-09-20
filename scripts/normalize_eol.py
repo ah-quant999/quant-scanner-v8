@@ -64,11 +64,20 @@ _LF_EXACT = {".gitattributes", "v6_memo.html", "v6_memo.golden.html"}
 def _fallback_expected(rel: str) -> bool:
     """降级判据：无 git 时按 .gitattributes 的字面规则复刻。
 
-    ⚠️ 刻意与 .gitattributes 保持**同粒度**：
+    ⚠️ 必须与 .gitattributes **逐条同粒度**，且**规则完整性同步维护**：
        `raw_data/*.json` 只匹配直接子文件，**不含** raw_data/history/*.json
        （fnmatch 的 `*` 不跨 `/`，与 gitattributes 语义一致）。
        对无属性文件做归一化反而会在本机侧制造新的「工作树 vs blob」差异，
-       故宁可少做，不可多做。
+       故宁可少做，不可多做 —— 但**该做的不能漏**。
+
+    🔴 2026-09-20 补漏（阿狸咪 2313 档 §六-② 点办）：
+       远端 .gitattributes 同日新增 `data/*.json` 与 `raw_data/history/*.json`
+       两条 eol=lf；本降级表当时**未同步** ⇒ git 不可用时会漏判这两族
+       （实测本机 `_fallback_expected('data/FOUR_VOLUME_BACKTEST.json')` = False，
+       与远端 `check-attr` 的 `eol: lf` 矛盾）。已在此补齐：
+         · `data/*.json`            只匹配直接子文件
+         · `raw_data/history/*.json` 只匹配该一层子目录
+       二者均**不**递归、**不**跨 `/`，与 gitattributes 语义严格一致。
     """
     p = rel.replace("\\", "/")
     if p in NEVER_TOUCH:
@@ -78,9 +87,13 @@ def _fallback_expected(rel: str) -> bool:
     parts = p.split("/")
     if len(parts) == 1 and parts[0].endswith(".html"):
         return True
-    if len(parts) == 2 and parts[0] == "data" and parts[1].endswith(".js"):
+    if len(parts) == 2 and parts[0] == "data" and (
+            parts[1].endswith(".js") or parts[1].endswith(".json")):
         return True
     if len(parts) == 2 and parts[0] == "raw_data" and parts[1].endswith(".json"):
+        return True
+    if (len(parts) == 3 and parts[0] == "raw_data" and parts[1] == "history"
+            and parts[2].endswith(".json")):
         return True
     return False
 
