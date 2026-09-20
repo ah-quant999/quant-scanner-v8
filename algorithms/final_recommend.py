@@ -1040,19 +1040,18 @@ def main():
                 _n_weak_hit += 1
                 r.setdefault("factor_actions", []).append({
                     "factor": "放量弱势",
-                    "adj": -0.5 if _WEAK_PENALTY_ON else 0.0,
-                    "scored": bool(_WEAK_PENALTY_ON),
-                    "evidence": "未回测",
-                    "note": ("FACTOR_LAB.bottom 命中 ⇒ signals「放量弱势」⇒ final_score −0.5（weak_penalty）"
-                             "　⚠️ 本档未经 walk-forward 回测，依据待补")
-                            if _WEAK_PENALTY_ON else
-                            ("FACTOR_LAB.bottom 命中 ⇒ 仅写 signals「放量弱势」展示（V8_FACTOR_WEAK_PENALTY=0）"),
+                    "adj": 0.0,
+                    "scored": False,
+                    "evidence": "已清除",
+                    "note": ("FACTOR_LAB.bottom 命中 ⇒ 仅写 signals「放量弱势」展示。"
+                             "2026-09-20 主人令：原 −0.5 扣分随第二套 final_score 公式一并清除"
+                             "（该档从未纳入 walk-forward 回测，属凭空的惩罚，且实测恒为 0）。"),
                 })
 
         # 🆕🔴 因子在算法链里的**真实计分作用**落盘（读实现行为，不写死文案）
         _factor_chain_meta = {
             "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "score_formula": "final_score = strength + resonance*1.5 + sec_add - weak_penalty",
+            "score_formula": "final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）",
             "where": "algorithms/final_recommend.py :: 方案B 因子融合 + scored 计分",
             "gate": {
                 "V8_FUSION_NOISE_FILTER": int(V8_FUSION_NOISE_FILTER),
@@ -1060,9 +1059,9 @@ def main():
                 "regime_coef_note": "非开仓期(_open_regime=False) 因子权重 ×0.3（仅对真计分的因子生效）",
             },
             "integrated": [
-                {"key": "weak", "name": "放量弱势", "role": "扣分",
-                 "scored": bool(_WEAK_PENALTY_ON), "adj": (-0.5 if _WEAK_PENALTY_ON else 0.0),
-                 "where": "scored 计分：final_score −0.5（weak_penalty）", "n_hit": _n_weak_hit,
+                {"key": "weak", "name": "放量弱势", "role": "仅标注",
+                 "scored": False, "adj": 0.0,
+                 "where": "2026-09-20 已随第二套 final_score 公式清除；仅写 signals 展示", "n_hit": _n_weak_hit,
                  "evidence": "未回测",
                  "why": "FACTOR_LAB 异常换手率 **bottom 档**（放量=弱势）命中池内票即扣分"
                         "　⚠️ 三重问题（2026-09-18 实测取证）："
@@ -1111,7 +1110,7 @@ def main():
               % (_today, ("（实际 data_date=%s）" % _fl_last_dd) if _fl_last_dd else "", 20))
         _factor_chain_meta = {
             "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "score_formula": "final_score = strength + resonance*1.5 + sec_add - weak_penalty",
+            "score_formula": "final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）",
             "where": "algorithms/final_recommend.py :: 方案B 因子融合",
             "gate": {"V8_FUSION_NOISE_FILTER": int(V8_FUSION_NOISE_FILTER),
                      "regime_open": bool(_open_regime)},
@@ -1284,11 +1283,16 @@ def main():
         #        V8_FACTOR_WEAK_PENALTY=1（默认）⇒ 维持 −0.5，产物标 evidence="未回测"
         #        V8_FACTOR_WEAK_PENALTY=0        ⇒ 置 0（signals 照写、标签照展示，只是不减分）
         #      待 bottom 榜 walk-forward 回测出显著负 edge ⇒ 保留并加权；否则按 P5 原则降为「仅标注」。
-        weak_penalty = (0.5 if _WEAK_PENALTY_ON else 0.0) if "放量弱势" in r.get("signals", []) else 0.0
-        final_score = strength + resonance * 1.5 + sec_add - weak_penalty
-        # 港股惩罚：用户主做 A 股，港股不应因多源共振天然霸榜
-        if r.get("board") == "港股" or market_prefix(r.get("code", "")) == "hk":
-            final_score -= HK_PENALTY
+        # 🔴🔴 2026-09-20 主人令：**第二套内部评分算法整段清除，不得回滚覆盖**。
+        #   被清除的公式：final_score = strength + resonance*1.5 + sec_add - weak_penalty
+        #   清除理由（已核证）：它与页面「因子计算」是对**同一件事**（谁最值得推荐）
+        #   的**重复计算**，且权重粗放 —— resonance 仅 ×1.5 即足以让因子分更低者反超
+        #   （实测：江波龙 42.9 反超洛阳钼业 45.3）⇒ 因子实验室文案
+        #   「最顶部的就是最终推荐」与实际名单自相矛盾。
+        #   weak_penalty 同清：该档从未纳入 walk-forward 回测（属"凭空的惩罚"，
+        #   违反 P5「反向档位无显著负 edge 不给惩罚」），且实测恒为 0（死代码）。
+        #   ⇒ 唯一口径：final_score := 因子榜 total_score（见下方统一赋值段）。
+        final_score = 0.0   # 占位，稍后由因子榜 total_score 覆写
         scored.append({
             **r,
             "key": key,
@@ -1299,10 +1303,43 @@ def main():
             "final_score": round(final_score, 2),
         })
 
-    # 排序：先按共振次数，再按综合分，再按源强度（多源共振优先）
-    # 2026-08-13 公平性修复：排序第一关键字改为 final_score（分数优先），
-    # 共振数/强度作次级 tie-breaker——公平计分后"最强"=分数最高，而非最多策略选中。
-    scored.sort(key=lambda x: (x["final_score"], x["resonance"], x["strength"]), reverse=True)
+    # ═══════════════════════════════════════════════════════════════════════
+    # 🔴🔴 2026-09-20 主人令（唯一口径 · 一劳永逸）：最终推荐 = 因子榜前 N 名
+    # ───────────────────────────────────────────────────────────────────────
+    # 页面上呈现的「因子计算」是唯一一套真实数据 —— TOP10_DAILY.top10，
+    # 按 total_score 降序落盘（来源 generate_top10.py，26 项因子加总归一化）。
+    # 本脚本原自造的第二套评分已在下方整段清除 ⇒ 此处以因子榜为唯一口径：
+    #   · final_score := 因子榜 total_score（同分）
+    #   · 名次        := 因子榜数组原序（同序）
+    #   使「最终推荐页」与「因子实验室」两页一眼对得上，不再各说各话。
+    #   跨策略共振/板块/弱势扣分**不再参与名次**；resonance/strength/sources
+    #   字段照旧输出、前端标签照旧展示（信息不丢失，只是不再左右排序）。
+    # ═══════════════════════════════════════════════════════════════════════
+    _ts_by_key, _ord_by_key = {}, {}
+    for _i, _s in enumerate(top10.get("top10") or []):
+        _c = _s.get("code")
+        if not _c:
+            continue
+        _k = norm_code(_c).lstrip(".")
+        if _k in _ts_by_key:
+            continue                      # 同票重复只认首次（榜上更靠前）
+        _ts_by_key[_k] = safe_float(_s.get("total_score"))
+        _ord_by_key[_k] = _i
+
+    _al_hit = 0
+    for _e in scored:
+        _k = _e.get("key") or norm_code(_e.get("code", "")).lstrip(".")
+        if _k in _ts_by_key:
+            _e["final_score"] = round(_ts_by_key[_k], 2)
+            _e["buy_score"] = _e["final_score"]
+            _e["_aligned_topfactor"] = True
+            _al_hit += 1
+    # 名次 = 因子榜原序；不在榜上的压到最后（理论上无：四量终极即因子榜来源）
+    scored.sort(key=lambda x: (
+        _ord_by_key.get(x.get("key") or norm_code(x.get("code", "")).lstrip("."), 10 ** 6),
+        -safe_float(x.get("final_score") or 0),
+    ))
+    print("  [唯一口径] final_score 取自因子榜 total_score，命中 %d/%d 只" % (_al_hit, len(scored)))
 
     # ── Top3 选取（2026-08-11 主人令：公平竞争，谁好谁上）──
     # 之前 A 股硬保底逻辑：先灌 A 股 + 余下从全局高分（已被 HK_PENALTY 减分）填。
@@ -1331,10 +1368,14 @@ def main():
     # 3) 双轨排名（2026-08-13 主人令：共振最强 + 分数最强分开展示）
     #    top = 分数最强（公平计分后"绝对最强"）
     #    consensus_top = 共振最强（多策略交叉验证，抗单一策略失效）
-    top.sort(key=lambda x: (x["final_score"], x["resonance"], x["strength"]), reverse=True)
+    # 2026-09-20 唯一口径：top 已按 scored 排好（= 因子榜 total_score 降序）。
+    # 此处**禁止再按 (final_score, resonance, strength) 重排** ——
+    # 共振数一旦作 tie-breaker 就会重新制造"第二套口径"，故该行整行删除。
     top = top[:_effective_top_n]
     # ── 共振最强副本（独立排序，不覆盖 top）──
-    consensus_sorted = sorted(scored, key=lambda x: (x["resonance"], x["final_score"], x["strength"]), reverse=True)
+    # 2026-09-20：本轨仅作展示（前端读 consensus_stocks 渲染标签）。
+    # 排序不再引用已被清除的第二套 final_score —— 仅按共振数（本轨的定义特征）。
+    consensus_sorted = sorted(scored, key=lambda x: (-(x.get("resonance") or 0), -safe_float(x.get("final_score") or 0)))
     consensus_top = consensus_sorted[:_effective_top_n]
     # ── end 公平竞争 ──
 
