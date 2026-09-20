@@ -47,7 +47,7 @@
 
 | 文件路径 | 内容描述 | 禁止删除原因 |
 |---------|---------|------------|
-| `data/*.js` (全部 107 个) | 前端数据注入层（window.X = {...}） | 全部由 update_v8.py 从 raw_data 构建，index.html 动态引用 |
+| `data/*.js` (全部 48 个) | 前端数据注入层（window.X = {...}） | 全部由 update_v8.py 从 raw_data 构建，index.html 动态引用 |
 | `data/STOCK_LIST.js` | 5202 只股票代码+名称+拼音首字母 | 个股查询唯一数据源，含 py 字段（_gen_pinyin.py 生成） |
 | `data/LHB_HISTORY.js` | 龙虎榜历史数据（最大文件 1.3MB） | 共振日历数据源 |
 
@@ -70,7 +70,7 @@
 
 | 文件路径 | 内容描述 | 禁止删除原因 |
 |---------|---------|------------|
-| `raw_data/*.json` (全部 152 个) | 数据抓取原始 JSON | data/*.js 的上游源，update_v8.py 构建输入 |
+| `raw_data/*.json` (全部 45 个) | 数据抓取原始 JSON | data/*.js 的上游源，update_v8.py 构建输入 |
 
 **注意**: `raw_data/` 由 cn runner 的 cloud_fetch_v8.py / algorithms/run_algorithms.py 产出，经 api_push_raw.py 推送。云端 weekly_cleanup 会清理 orphan，但不会删有映射的文件。
 
@@ -78,7 +78,7 @@
 | `raw_data/ic_gate.json` | IC 门禁 MVP 每日产物（策略 gate 信号 + ic_weight） | algorithms/generate_top10.py:614 下游消费；也供 gen_triple_consensus/calc_crds 准出门禁 |
 | `raw_data/strategy_regime_gate.json` | regime 每日门禁（按主人在 2026-08-19 利率上行期框架给各策略 weight） | 下游选股脚本 compute × weight |
 | `raw_data/avg_price.json` | 平均股价（通达信 880003）每日最新值 + 5 日历史 | 由 `scripts/fetch_avg_price.py` 产出；UI 评估后再接驾驶舱/暂未上架页 |
-| `raw_data/etf_subscription_em.json` | ETF 申购赎回东方财富分类聚合（5 类 + 亿元） | 旧宽基+亿份口径（data/ETF_SUBSCRIPTION.js / raw_data/etf_subscription.json）已于 2026-09-06 主人令轻量化全链删除 |
+| ~~`raw_data/etf_subscription_em.json`~~ | ETF 申购赎回东方财富分类聚合（5 类 + 亿元） | ❌ **已于 2026-09-11 整链删除**（死链：fetcher 从未进 main、注入映射已注释、前端 0 引用）；勿以本段为由复活。重建需求见 2026-09-20 周末分工交接档，API 未确认前不重建 |
 | `raw_data/freshness_sla.json` | 新鲜度 SLA 体检输出（最近 13 个核心 raw_data 文件的 update_time 状态） | `scripts/freshness_sla.py` 产出；挂 `v8_algo.yml 17:00` |
 
 
@@ -99,28 +99,6 @@
 
 ---
 
-
-## 🟠 前端 TAB 数据依赖映射（2026-09-19 审计新增）
-
-> 本表按 `index.html` 主导航 TAB 顺序组织，列出各 TAB 核心依赖的 `data/*.js` 与 `raw_data/*.json`。
-> 注意：全站所有 `data/*.js` 仍受上方「核心数据文件」通配保护；本表用于人工核对，避免 TAB 下线后遗留孤儿保护或新 TAB 漏登记关键文件。
-
-| 前端 TAB | 核心 data/*.js | 核心 raw_data/*.json | 备注 |
-|---------|---------------|---------------------|------|
-| **观测平台** |  |  |  |
-| **今日事件** | `data/JUDGMENT_DATA.js`、`data/MACRO_BRIEF.js` | `raw_data/judgment_data.json`、`raw_data/macro_brief.json` |  |
-| **实时数据** | `data/LIMIT_UP_HEATMAP.js`、`data/SECTOR_CYCLE_ARCHIVE.js` | `raw_data/limit_up_heatmap.json`、`raw_data/sector_cycle_archive.json` |  |
-| **盘后数据** |  |  |  |
-| **共振日历** | `data/BACKTEST_ALL_ALGOS.js`、`data/IMA_STRONG_BACKTEST.js`、`data/LHB_DATA.js` | `raw_data/backtest_all_algos.json`、`raw_data/ima_strong_backtest.json`、`raw_data/lhb_data.json` |  |
-| **最终推荐** |  |  |  |
-| **个股查询** |  |  |  |
-| **选股策略** | `data/ALGO_TRACK.js`、`data/FOUR_VOLUME_HISTORY.js`、`data/FOUR_VOLUME_TRACK.js`、`data/TOP10_DAILY.js` | `raw_data/algo_track.json`、`raw_data/four_volume_history.json`、`raw_data/four_volume_track.json` |  |
-| **策略回测** | `data/AI_INSIGHTS_COMPARE.js`、`data/FACTOR_LAB_BACKTEST.js`、`data/FOUR_VOLUME_BACKTEST.js`、`data/TOP10_DAILY.js`、`data/WAVE_ELLIOTT.js` | `raw_data/ai_insights_compare.json`、`raw_data/factor_lab_backtest.json`、`raw_data/four_volume_backtest.json` |  |
-| **暂未上架** |  |  |  |
-| **已下架** | — | — | TAB 已下线，数据链已删除 |
-| **运维** | `data/HB_XIAOJIU.js` | `raw_data/hb_xiaojiu.json` | 以运行时/体检数据为主 |
-
-> 发现新增/下线文件时，应先更新本表，再同步运行 `scripts/gen_do_not_delete_js.py` 刷新逻辑详解页「防删」子页。
 ## 🟠 核心脚本 (根目录 *.py)
 
 | 文件路径 | 内容描述 | 禁止删除原因 |
@@ -144,6 +122,7 @@
 
 | 文件路径 | 内容描述 | 禁止删除原因 |
 |---------|---------|------------|
+| `scripts/build_delisted.py` | 已下架股票目录生成器（2026-09-09 主人令整链下线后停用：main() 改为 no-op 并打印已下线；data/DELISTED.js 已删除、前端卡已删） | 已下线停用，保留占位避免遗留 import 报错；如需彻底删除可物理删（已不在 CRITICAL_FILES/v8_rollback_guard 受保护列表） |
 | `scripts/gen_lhb_7d.py` | 龙虎榜 7 日聚合生成器 | 阿狸咪 2026-09-08 修复漏挂 ORDER 的 P0（commit c54c5f44d），已挂链；缺失则 LHB 7日卡断更 |
 
 ---
@@ -156,10 +135,10 @@
 | `scripts/apply_ic_gate.py` | **Tier 1 第 1 步**：IC 门禁 MVP。读 factor_ic_report + factor_validate + h_auto_buy 累计胜率 → `raw_data/ic_gate.json` | 回测投入→选股质量变现的引擎；下游 generate_top10 / gen_triple_consensus / calc_crds 接入 |
 | `scripts/apply_regime_gate.py` | **Tier 1 第 2 步**：regime 自动门控。读 market_regime → `raw_data/strategy_regime_gate.json`（按利率上行/下行/平稳给各策略 weight） | regime 已算但未自动化→选股；按市道 gate 是 backtest_tdx 已发现差异的唯一免费 alpha |
 | `scripts/fetch_avg_price.py` | **新功能**：平均股价（通达信 880003）轻量 fetcher；东方财富 push2his | 主人 2026-08-29 周报期待；UI 评估后再接驾驶舱/暂未上架页 |
-| `scripts/fetch_etf_subscription_em.py` | **新功能**：ETF 申购赎回东方财富口径 fetcher（旧文件切到 5 类 + 亿元） | 主人 2026-08-29 新需求；旧 ETF_SUBSCRIPTION.js 宽基+亿份与东方财富分类不一致 |
+| ~~`scripts/fetch_etf_subscription_em.py`~~ | ❌ **新功能已删除**：ETF 申购赎回东方财富口径 fetcher（旧宽基+亿份切到 5 类 + 亿元） | 已于 2026-09-11 整链删除（死链下线：fetcher 未进 main、raw/注入/前端全 0 引用）。重建需东财真实报表名，见 2026-09-20 周末分工交接档，API 未确认前勿复活 |
 | `scripts/freshness_sla.py` | **Tier 1 第 3 步**：新鲜度 SLA 自动标红 + 告警。扫 raw_data/*.json update_time，缺数据/超时按 FRESHNESS_SLA 表拦截 | 主人 2026-08-29 反馈「图 14 卡在 8-04 没人告警」根因；挂 `v8_algo.yml 17:00` |
 
-**注意**: 上述 6 个脚本均 `py_compile` 0 错；fetcher（avg_price / etf_subscription_em）云端首次跑批时验证真实接口（本机可能因网络限制跑不通）。
+**注意**: 上述脚本（含已删除的 `fetch_etf_subscription_em.py`）原均 `py_compile` 0 错；fetcher `fetch_avg_price.py` 云端首次跑批时验证真实接口（本机可能因网络限制跑不通）。`fetch_etf_subscription_em.py` 已于 2026-09-11 整链删除，勿复活。
 
 ---
 
@@ -168,7 +147,7 @@
 | 目录/文件 | 内容描述 | 禁止删除原因 |
 |-----------|---------|------------|
 | `algorithms/run_algorithms.py` | 盘后算法链总控 | v8_algo_run.yml 唯一入口 |
-| `algorithms/*.py` (全部 74 个) | 选股/回测/龙虎榜/波动率等算法 | 算法链依赖，缺失则对应卡片冻结 |
+| `algorithms/*.py` (全部 23 个) | 选股/回测/龙虎榜/波动率等算法 | 算法链依赖，缺失则对应卡片冻结 |
 | `algorithms/verify_chain_consistency.py` | **2026-09-08 新增·一劳永逸（C收敛版）**：算法链结构一致性机器校验（ORDER↔STAGES 双表一致 / 孤儿脚本 / 数据断链 / 映射悬空），挂 `v8_algo_cloud.yml` 收尾硬性闸门 | 防漏挂/断链类暗灯再悄悄上线，缺失则失去结构性护栏 |
 | `algorithms/stage_to_raw.py` | 算法输出 → raw_data 格式转换 | run_algorithms.py 调用 |
 
