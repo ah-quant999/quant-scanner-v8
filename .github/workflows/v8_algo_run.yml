@@ -242,7 +242,11 @@ jobs:
 
               _walk(root, "", 0)
               return out
-          _PREF = ("algorithms/", "scripts/build_delisted.py")
+          # 🔴 2026-09-20 小九 P0 修复：同步范围原缺 data/ 整目录 ⇒
+          #   final_recommend 读 data/FACTOR_LAB.js 恒为上一轮残留 ⇒ 因子新鲜校验
+          #   20 次等待全败 ⇒ _fl_degraded=True ⇒ 方案B 因子融合 100% 跳过（永久性，非偶发）。
+          #   现把 data/ 纳入同步，令同轮算法链能读到本轮最新产物。
+          _PREF = ("algorithms/", "scripts/build_delisted.py", "data/")
           want = []
           for e in list_all_blobs(_PREF):
               if e.get("type") != "blob":
@@ -250,7 +254,9 @@ jobs:
               p = e["path"]
               # all of algorithms/ + scripts/build_delisted.py(下游护栏,_SANE_MAX>300 拒重建) + every root-level .py
               # 2026-09-01 主人令：把下游护栏脚本也纳入每轮同步，确保两层护栏都 100% 新鲜、7935 误判绝不二次出现
-              if p.startswith("algorithms/") or p == "scripts/build_delisted.py" or ("/" not in p and p.endswith(".py")):
+              # 🔴 2026-09-20 小九 P0 修复：新增 data/ 整目录（详见上方 _PREF 注释）
+              if (p.startswith("algorithms/") or p.startswith("data/")
+                      or p == "scripts/build_delisted.py" or ("/" not in p and p.endswith(".py"))):
                   want.append((p, e["sha"]))
           print("files to sync: %d" % len(want), flush=True)
 

@@ -1631,6 +1631,26 @@ def main():
         },
     }
 
+    def _build_degrade_note():
+        """按真实降级来源分别成文（上游降级 / 因子陈旧 / signal_edge 加载失败）。
+        2026-09-20 小九修复：替代原「一律说上游 A 批落后」的误导性单一文案。"""
+        _parts = []
+        if str(os.environ.get("DEGRADED_UPSTREAM", "")).strip() == "1":
+            _parts.append(
+                "上游采集（A 批）已落后 %s 个交易日（阈值 2）"
+                % (_degrade_lag or "?"))
+        if _fl_degraded:
+            _parts.append(
+                "因子实验室（FACTOR_LAB.js）未达数据日%s ⇒ 方案B 因子融合整体跳过"
+                % (("（实际 data_date=%s）" % _fl_last_dd) if _fl_last_dd else ""))
+        if SIGNAL_EDGE_DEGRADED:
+            _parts.append("signal_edge 动态加载失败 ⇒ 退回硬编码默认值")
+        if not _parts:
+            _parts.append("未标明来源（请查 factor_chain / signal_edge 明细）")
+        return ("⚠️ 数据降级：" + "；".join(_parts)
+                + "。本结果为「降级放行」产物 —— 排序与信号有效，但上述环节未达最新口径。"
+                + "请对照产物内 factor_chain / signal_edge 元数据判断适用范围。")
+
     result = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "crisis_score": round(crisis_score, 1),
@@ -1641,11 +1661,10 @@ def main():
         "data_degraded": _degraded,
         # 🔴 2026-09-18 改动1：信号 edge 的运行时真相（来源/生效值/降级/样本量）
         "signal_edge": _signal_edge_meta,
-        "degrade_note": (
-            f"⚠️ 数据降级：上游采集（A 批）已落后 {_degrade_lag or '?'} 个交易日（阈值 2），"
-            f"本结果为「降级放行」产物 —— 排序与信号有效，但底层行情可能不是最新交易日。"
-            f"请勿据此判断当日市场状态。" if _degraded else None
-        ),
+        # 🔴 2026-09-20 小九修复：原文案只讲 DEGRADED_UPSTREAM，而 _degraded 是三源或
+        #   （上游降级 / 因子内容陈旧 / 信号edge加载失败）⇒ 因子降级时却报「上游 A 批落后 ? 个交易日」，
+        #   既答非所问又暴露空值 ?，会把人引向错误排查方向。现按**真实来源**逐条分述。
+        "degrade_note": _build_degrade_note() if _degraded else None,
         "market_regime": {
             "date": _regime_date,
             "regime": _regime_name,
