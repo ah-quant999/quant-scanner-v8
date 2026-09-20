@@ -7289,22 +7289,70 @@ function fmtSigned(v){
     // ══════════════════════════════════════════════════════════════════
     var GROUPS = [];
 
+    // 🆕 2026-09-20 主人令（改动A）：P2 数值取「源码真值」，杜绝「算法改口径、卡片还挂旧值」。
+    //   背景：本卡原硬编码 T+10 原始 edge（+8.07/+3.86/−9.00/−7.24），
+    //   而源码 2026-09-20「改动15」已把口径改为 **T+5 超额**（0.532/0.759/−1.532/−0.660），
+    //   旧值量级夸大 5~10 倍，属「卡片挂错口径」。
+    //   真值链（三级，谁在谁优先）：
+    //     ① window.BACKTEST_EXPECTANCY.by_factor（回测产物 · 若浏览器侧可得）
+    //     ② SIGNAL_EDGE_DEFAULT 硬表 —— 与 algorithms/generate_top10.py 逐字对齐（**当前权威**）
+    //     ③ 都读不到 ⇒ 显示「未载入」，不编数
+    //   🔴 关键事实（2026-09-20 实测）：backtest_expectancy.json **不发布到 data/**，
+    //      算法侧运行时读本地文件，浏览器侧**永远拿不到** ⇒ 卡片必须自带硬表镜像。
+    //   分值 = round(edge × 2.5)，clamp ±30；负 edge ⇒ 反向惩罚（命中即扣分）。
+    var _SIG_EDGE_SRC = { jinzuan: 0.532, chan: 0.759, trend: -1.532, jigou: -0.660 };
+    var _SIG_EDGE_SRC_AT = '2026-09-20 · T+5 超额（46 日 2026-06-08~09-18）';
+    var _BE  = window.BACKTEST_EXPECTANCY || {};
+    var _beF = _BE.by_factor || {};
+    var _SIG_KEYS = { jinzuan:'sig_jinzuan', chan:'sig_chan', trend:'sig_trend', jigou:'sig_jigou' };
+    var _SIG_META = [
+      { f:'金钻（起涨/黄柱）', k:'jinzuan', d:'正' },
+      { f:'缠论买（日K）',     k:'chan',    d:'正' },
+      { f:'机构变红',         k:'jigou',   d:'反' },
+      { f:'上涨趋势',         k:'trend',   d:'反' }
+    ];
+    var _p2rows = _SIG_META.map(function(x){
+      var r = _beF[_SIG_KEYS[x.k]] || {};
+      var dyn  = (r.excess5 != null) ? r.excess5 : ((r.edge5 != null) ? r.edge5 : null);
+      var hard = (_SIG_EDGE_SRC[x.k] != null) ? _SIG_EDGE_SRC[x.k] : null;
+      var e    = (dyn != null) ? dyn : hard;
+      var useDyn = (dyn != null);
+      var sc = (e == null) ? null : Math.max(-30, Math.min(30, Math.round(e * 2.5)));
+      return {
+        f: x.f, dir: x.d,
+        _e: e, _sc: sc, _n: (dyn != null ? r.n_on5 : null),
+        _src: useDyn ? 'dyn' : (hard != null ? 'hard' : 'none'),
+        w: (e == null)
+             ? '<span style="color:#94a3b8;font-weight:400;">未载入</span>'
+             : ((e > 0 ? '+' : '') + Number(e).toFixed(3) + '% → '
+                + (sc > 0 ? '+' : '') + sc + ' 分'
+                + (useDyn ? '' : ' <span style="color:#94a3b8;font-weight:400;font-size:10.5px;">（源码硬表）</span>')),
+        why: (e == null)
+             ? '取值链全空 ⇒ 本卡不编数；算法侧按源码默认值计分'
+             : ('T+5 超额 ' + (e > 0 ? '+' : '') + Number(e).toFixed(3) + '%'
+                + (dyn != null && r.n_on5 != null ? '，n=' + r.n_on5 : '')
+                + ' ⇒ ' + (e < 0 ? '**反向惩罚**（命中扣 ' + Math.abs(sc) + ' 分）'
+                                 : '正向奖励（命中加 ' + sc + ' 分）')
+                + (useDyn ? '；取回测产物真值' : '；取源码硬表值')),
+        ev: (e == null ? '未回测' : 'walk-forward')
+      };
+    });
+    var _p2anyDyn = _p2rows.some(function(r){ return r._src === 'dyn'; });
+    var _p2at = (_p2anyDyn && (_BE.update_time || _BE.generated_at))
+              ? (_BE.update_time || _BE.generated_at)
+              : _SIG_EDGE_SRC_AT;
+
     GROUPS.push({
       title: 'P2 · 基础信号（四信号 edge × 置信度收缩）',
       color: '#ef5350',
-      note: '权重来自 walk-forward T+10 edge × 2.5；按样本量收缩防过拟合（signal_confidence）。'
-          + '单信号上限 ±30 分。机构变红/上涨趋势为**反向**（回测负 edge，扣分）。',
+      note: '权重 = T+5 超额 edge × 2.5，按样本量收缩防过拟合（signal_confidence）；单信号上限 ±30 分。'
+          + '**机构变红 / 上涨趋势为反向因子**：edge 为负 ⇒ **命中即扣分**。'
+          + (_p2anyDyn
+              ? '　取值：回测产物动态覆盖（真值随时刷新）。'
+              : '　取值：与源码 SIGNAL_EDGE_DEFAULT 逐字对齐的硬表（回测产物不发布到 data/，浏览器侧读不到，故用镜像）。')
+          + (_p2at ? '　口径：' + _p2at + '。' : ''),
       src: 'generate_top10.py L49-135',
-      rows: [
-        { f:'金钻（起涨/黄柱）', w:'+8.07% edge → +20 分', dir:'正', ev:'walk-forward',
-          why:'T+10 edge +8.073%，n=129，全样本最强正信号', n:'129' },
-        { f:'缠论买（日K）',     w:'+3.86% edge → +10 分', dir:'正', ev:'walk-forward',
-          why:'T+10 edge +3.860%，n=234，与金钻共振时组合最优', n:'234' },
-        { f:'机构变红',         w:'−9.00% edge → −23 分', dir:'反', ev:'walk-forward',
-          why:'T+10 edge −8.996%，n=286 ⇒ 反向惩罚（旧代码曾误当+25赏）', n:'286' },
-        { f:'上涨趋势',         w:'−7.24% edge → −18 分', dir:'反', ev:'walk-forward',
-          why:'T+10 edge −7.241%，n=174 ⇒ 反向惩罚（旧代码曾误当+25赏）', n:'174' }
-      ]
+      rows: _p2rows
     });
 
     GROUPS.push({
@@ -7342,6 +7390,8 @@ function fmtSigned(v){
               ? '　｜IR_OOS ' + Number(r.ir_oos).toFixed(3)
                 + '，跑赢基准 ' + (r.beat_base_rate==null?'—':r.beat_base_rate+'%')
                 + '，达标 ' + (r.years_beat_gt55==null?'—':r.years_beat_gt55) + '/' + (r.years_total==null?'—':r.years_total) + ' 年'
+                + '（门槛：年度跑赢率≥80% ⇒ ' + (r.years_total==null?'':(( (Math.ceil(r.years_total*0.8)) ))) + '/'
+                + (r.years_total==null?'':r.years_total) + ' 年）'
                 + '　⇒ <b style="color:' + (pass?'#22c55e':'#ef5350') + ';">' + (pass?'verdict=PASS 真计分':'verdict=FAIL 自动停用') + '</b>'
               : '　⇒ 无回测结果，闸门默认停用（宁缺毋假）'),
         n: edge == null ? '—' : (Number(edge).toFixed(3) + '%')
@@ -7351,7 +7401,14 @@ function fmtSigned(v){
       title: 'P5 · walk-forward 达标因子（唯一有第③级证据的一层）',
       color: '#22c55e',
       note: '闸门：仅当 factor_walkforward.json 里 verdict=PASS 才启用；复跑不达标 ⇒ 自动失效。'
-          + '候选池 <20 只 ⇒ 全 0（分位无意义）。amt60 另设 60日均成交额 <3000万 ⇒ 不给分（滤仙股）。',
+          + '候选池 <20 只 ⇒ 全 0（分位无意义）。amt60 另设 60日均成交额 <3000万 ⇒ 不给分（滤仙股）。'
+          + '<br><b style="color:#cbd5e1;">为什么「已停用」：</b>判定 = IR_OOS &gt; 0.3 <b>且</b> 年度跑赢率 ≥ 80%'
+          + '（当前 8 年数据 ⇒ 需 7 年达标）。<b style="color:#ef5350;">12 个候选因子目前无一通过</b>，'
+          + '多数倒在「年度跑赢率」这一关（最好的 6/8 = 75%，差 1 年）。'
+          + '<br><b style="color:#22d3ee;">停用 ≠ 废弃（故不删因子）</b>：这是<b>动态闸门</b>，'
+          + '每日盘后重跑，任一因子一旦转 PASS 会<b>自动恢复计分</b>；删掉就等于永久放弃这条路。'
+          + '需要留意的是：该判定随窗口滑动会翻转（同日新增一天数据即触发全历史重算），'
+          + '故「今天停用」不代表「永久失效」。',
       src: 'generate_top10.py L669-830',
       rows: _p5rows
     });
@@ -15728,14 +15785,19 @@ h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-lef
 //   ⚠ 研究快照，非推荐信号，不接入推荐链；数据静态内联，不依赖任何 data 源。
 h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #22d3ee;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
-   + '<span style="font-size:15px;font-weight:700;color:#22d3ee;">&#x1F9EC; 全市场画像 · 前向验证</span>'
-   + '<span class="fresh">研究快照 2026-09-19</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 · 研究结论（非推荐信号）</span></div>'
+   + '<span style="font-size:15px;font-weight:700;color:#94a3b8;">&#x1F6AB; 已否决 · 全市场画像因子</span>'
+   + '<span class="fresh" style="background:rgba(148,163,184,.16);color:#94a3b8;border-color:rgba(148,163,184,.35);">否决 2026-09-19</span>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 · 证伪留档（永不接入推荐链）</span></div>'
+   + '<div style="background:rgba(148,163,184,.08);border-left:3px solid #94a3b8;border-radius:0 6px 6px 0;padding:8px 11px;margin-bottom:10px;font-size:12px;line-height:1.75;color:var(--txt);">'
+   + '<b style="color:#cbd5e1;">一句话：</b>验证过「拿高手画像去全市场选股」这条路，'
+   + '<b style="color:#22c55e;">结论是走不通</b>，所以把证据留在这里，避免以后重复试错。'
+   + '看得懂就记住一句：<b style="color:#ef4444;">画像因子只在高手的小池子里有效，放大到全市场反而亏</b>。</div>'
    + '<div style="background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.25);border-radius:7px;padding:9px 11px;margin-bottom:10px;font-size:12px;line-height:1.7;color:var(--txt);">'
    + '<b style="color:#22d3ee;">&#x1F4CC; 结论：</b>把「高手画像因子」当全市场选股信号用，'
    + '<b style="color:#26a69a;">显著为负</b>；能通过严格验证的只有'
    + '<b style="color:#ef4444;">「中期未过热 / 低回撤」</b>分位区间，但幅度（T+20 约 +2%）'
-   + '<b style="color:#fbbf24;">远不及高手名单（T+20 +11.5%）</b>，故本轮结论：阶段内不能取代。</div>'
+   + '<b style="color:#fbbf24;">远不及高手名单（T+20 +11.5%）</b>，故结论：<b style="color:#94a3b8;">该口径不接入推荐链（已否决）</b>。'
+   + '<br><span style="color:var(--dim);font-size:11.5px;">跟踪 10 日实测：画像复合口径 <b style="color:#26a69a;">−2.33%（统计显著）</b>，三个子口径 T+10 全为负 ⇒ 达到否决条件。</span></div>'
    + '<div style="font-size:12px;color:var(--dim);margin:10px 0 2px;"><b>① 画像因子全市场 Top50（负向验证）</b></div>'
    + "<table style=\"width:100%;border-collapse:collapse;font-size:12px;margin:4px 0 2px;\"><thead><tr style=\"border-bottom:1px solid rgba(255,255,255,.12);\"><th style=\"text-align:left;padding:4px 8px;font-weight:600;color:var(--dim);font-size:11px;\">口径（每日取 Top50）</th><th style=\"text-align:right;padding:4px 8px;font-weight:600;color:var(--dim);font-size:11px;\">T+5 超额</th><th style=\"text-align:right;padding:4px 8px;font-weight:600;color:var(--dim);font-size:11px;\">T+10 超额</th><th style=\"text-align:right;padding:4px 8px;font-weight:600;color:var(--dim);font-size:11px;\">T+20 超额</th></tr></thead><tbody><tr style=\"border-bottom:1px solid rgba(255,255,255,.06);\"><td style=\"padding:4px 8px;color:var(--txt);\">画像 7 因子复合打分</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-1.12%*</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-2.33%*</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-5.41%*</td></tr><tr style=\"border-bottom:1px solid rgba(255,255,255,.06);\"><td style=\"padding:4px 8px;color:var(--txt);\">dist_60d_high 距60日高最近</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-1.04%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-2.13%*</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-6.34%*</td></tr><tr style=\"border-bottom:1px solid rgba(255,255,255,.06);\"><td style=\"padding:4px 8px;color:var(--txt);\">ma60_dev 偏离60日均线最多</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-1.03%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-2.17%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-6.75%*</td></tr><tr style=\"border-bottom:1px solid rgba(255,255,255,.06);\"><td style=\"padding:4px 8px;color:var(--txt);\">ret_60d 近60日涨幅最大</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-1.01%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-2.23%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-5.97%*</td></tr><tr style=\"border-bottom:1px solid rgba(255,255,255,.06);\"><td style=\"padding:4px 8px;color:var(--txt);\">vol_20d 波动最大</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-0.04%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-0.60%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#26a69a;\">-1.42%</td></tr><tr style=\"border-bottom:1px solid rgba(255,255,255,.06);\"><td style=\"padding:4px 8px;color:var(--txt);\">max_dd_20d 20日回撤最小</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+0.58%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+1.22%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+2.22%*</td></tr></tbody></table>"
    + '<div style="font-size:11px;color:var(--dim);margin:2px 0 10px;">* = 95% CI 不跨 0（bootstrap 2000 次，按交易日聚类）；红涨绿跌。追高口径 T+20 超额约 -6%。</div>'
@@ -15743,7 +15805,9 @@ h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #22d3ee;
    + "<table style=\"width:100%;border-collapse:collapse;font-size:12px;margin:4px 0 2px;\"><thead><tr style=\"border-bottom:1px solid rgba(255,255,255,.12);\"><th style=\"text-align:left;padding:4px 8px;font-weight:600;color:var(--dim);font-size:11px;\">口径（每日取 Top50）</th><th style=\"text-align:right;padding:4px 8px;font-weight:600;color:var(--dim);font-size:11px;\">T+5 超额</th><th style=\"text-align:right;padding:4px 8px;font-weight:600;color:var(--dim);font-size:11px;\">T+10 超额</th><th style=\"text-align:right;padding:4px 8px;font-weight:600;color:var(--dim);font-size:11px;\">T+20 超额</th></tr></thead><tbody><tr style=\"border-bottom:1px solid rgba(255,255,255,.06);\"><td style=\"padding:4px 8px;color:var(--txt);\">ret_60d 分位[10%,40%] 中期未过热</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+0.44%*</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+0.96%*</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+2.09%*</td></tr><tr style=\"border-bottom:1px solid rgba(255,255,255,.06);\"><td style=\"padding:4px 8px;color:var(--txt);\">dist_60d_high 分位[0%,30%] 离前高远</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+0.29%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+0.59%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+1.60%*</td></tr><tr style=\"border-bottom:1px solid rgba(255,255,255,.06);\"><td style=\"padding:4px 8px;color:var(--txt);\">max_dd_20d 分位[80%,100%] 回撤最小</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+0.36%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+0.65%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+1.31%*</td></tr><tr style=\"border-bottom:1px solid rgba(255,255,255,.06);\"><td style=\"padding:4px 8px;color:var(--txt);\">组合D 回撤小+不过热+不追高</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+0.34%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+0.78%</td><td style=\"text-align:right;padding:4px 8px;font-variant-numeric:tabular-nums;color:#ef4444;\">+2.35%*</td></tr></tbody></table>"
    + '<div style="font-size:11px;color:var(--dim);line-height:1.7;margin-top:8px;">⚠️ 口径：T+1 开盘买入、T+k 收盘卖出（同 v8 基线）；基准 = 同日全市场等权；已剔除 T+1 开盘涨停。'
    + '局限：面板仅覆盖 2084 只（kline_cache 历史深度不足），窗口 2026-05-27~2026-08-21；T+3/T+5 短期多数 CI 跨 0，仅 T+10/T+20 显著；07 月最强、06 月多为负。'
-   + '本卡为研究结论，<b style="color:#fbbf24;">不构成投资建议</b>。</div></div>';
+   + '本卡为研究结论，<b style="color:#fbbf24;">不构成投资建议</b>。'
+   + '<br><b style="color:#94a3b8;">保留理由</b>：这是<b>证伪留档</b>——记录「画像因子不能当全市场信号」这一已验结论，'
+   + '防止后续重复尝试同一条死路。若将来出现<b>新证据</b>（更长窗口 / 不同市场环境）推翻本结论，应新开验证而非直接复活本卡。</div></div>';
 // ═══ 2026-09-16 主人令：恢复「&#x1F30D; 新周期判定 · 海外宏观 + AI 大周期」并接入现有数据源 ═══
 //   沿革（全部有据可查）：2026-09-06 23:19 建卡（原在「宏观观测」）→ 2026-09-13 23:03 主人令
 //   「该卡纯静态内联、无 data 依赖/无生成器」⇒ 下沉至「暂未上架 · 观测类」最下方 → 2026-09-14 20:31
