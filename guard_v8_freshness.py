@@ -16,12 +16,85 @@
 运行：python guard_v8_freshness.py
 """
 
-import json, re, sys
+import json, re, sys, time, http.client
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data"
+
+# ── 2026-09-20 读超时加固（阿狸咪 09-19_2345 §三；小九落码）──────────────
+# 根因：urllib 的 `timeout=` 只约束**单次 recv**；对端保持连接却不再送字节时
+#       `r.read()` 可无限等待 ⇒ 单次卡住即整轮挂死（家机实测连续 7 次，零输出）。
+# 三条加固：① 整体读超时（分块读 + 截止时间）② IncompleteRead/SSLError 退避重试
+#           ③ 进度打印 + 总时限（即使再挂死，调用方也能拿到「检到第几项」）
+# 安全边界：超时/重试耗尽一律 `return None` ⇒ 走**现有**回退（本机文件 + 明确
+#           reason），与旧行为完全一致；不新增任何派发路径、不改阈值。
+_READ_DEADLINE_SEC = 20      # 单次 HTTP 响应体的整体读超时（旧 timeout=30 只管单次 recv）
+_RETRY_TIMES = 2             # IncompleteRead / SSLError 退避重试次数
+_RETRY_BACKOFF = (0.8, 1.6)  # 退避秒数
+_MAIN_TOTAL_SEC = 150        # main() 总时限（超时带已检结果退出，不静默挂死）
+
+
+def _read_all_deadline(resp, deadline_sec=_READ_DEADLINE_SEC):
+    """带**整体截止时间**的响应体读取（治本）。
+
+    替代 `resp.read()`：后者在「对端保持连接但不再送字节」时可无限等待。
+    返回 bytes；超时/异常返回 None（调用方回退到现有逻辑）。
+    """
+    end = time.monotonic() + deadline_sec
+    chunks = []
+    while True:
+        remain = end - time.monotonic()
+        if remain <= 0:
+            return None
+        try:
+            resp.fp.raw._sock.settimeout(min(remain, 5.0))
+        except Exception:
+            try:
+                resp.fp.raw.settimeout(min(remain, 5.0))
+            except Exception:
+                pass
+        try:
+            chunk = resp.read(65536)
+        except (TimeoutError, OSError):
+            continue
+        if not chunk:
+            break
+        chunks.append(chunk)
+        if len(chunk) < 65536:
+            # 小包通常意味着已读完；但保险起见再看一次
+            if time.monotonic() >= end:
+                break
+    return b"".join(chunks) if chunks else b""
+
+
+def _fetch_json(url, hdr, deadline_sec=_READ_DEADLINE_SEC, retries=_RETRY_TIMES):
+    """GET url → 解析 JSON。带整体读超时 + 退避重试（加固 ①②）。
+
+    返回 (obj, err)；obj 为 None 时 err 载明原因（供日志）。
+    """
+    last = None
+    for attempt in range(retries + 1):
+        try:
+            req = urllib.request.Request(url, headers=hdr)
+            with urllib.request.urlopen(req, timeout=deadline_sec) as r:
+                raw = _read_all_deadline(r, deadline_sec)
+            if raw is None:
+                last = "read-timeout(%ds)" % deadline_sec
+            elif not raw:
+                last = "empty-body"
+            else:
+                return json.loads(raw.decode("utf-8")), None
+        except http.client.IncompleteRead as e:
+            last = "IncompleteRead(partial=%d)" % len(getattr(e, "partial", b"") or b"")
+        except (TimeoutError, OSError) as e:
+            last = "%s: %s" % (type(e).__name__, str(e)[:60])
+        except Exception as e:
+            last = "%s: %s" % (type(e).__name__, str(e)[:60])
+        if attempt < retries:
+            time.sleep(_RETRY_BACKOFF[min(attempt, len(_RETRY_BACKOFF) - 1)])
+    return None, last
 
 # 2026 年中国A股休市区间（与 cloud_fetch_v8.py 保持一致；每年初同步更新）
 _HOLIDAY_RANGES_2026 = [
@@ -539,20 +612,24 @@ def extract_update_time_cloud(var: str, token: str):
         "X-GitHub-Api-Version": "2022-11-28",
     }
     base = f"https://api.github.com/repos/{REPO}"
+    # 2026-09-20 加固：改用 _fetch_json（整体读超时 + 退避重试），
+    # 替代原先裸 urlopen(...).read()（无整体超时 ⇒ 可无限挂起）。
     try:
-        url = f"{base}/contents/data/{var}.js"
-        req = urllib.request.Request(url, headers=hdr)
-        with urllib.request.urlopen(req, timeout=30) as r:
-            meta = json.loads(r.read().decode("utf-8"))
+        meta, err = _fetch_json(f"{base}/contents/data/{var}.js", hdr)
+        if meta is None:
+            print(f"    [cloud✗] {var}: {err}（回退本机文件）")
+            return None
         content = meta.get("content") or ""
         if not content.strip():
             # >1MB：Contents API 不返回 content，只给 sha ⇒ 取 blob
             sha = meta.get("sha")
             if not sha:
                 return None
-            req2 = urllib.request.Request(f"{base}/git/blobs/{sha}", headers=hdr)
-            with urllib.request.urlopen(req2, timeout=60) as r2:
-                content = json.loads(r2.read().decode("utf-8")).get("content") or ""
+            blob, err2 = _fetch_json(f"{base}/git/blobs/{sha}", hdr, deadline_sec=30)
+            if blob is None:
+                print(f"    [cloud✗] {var}(blob): {err2}（回退本机文件）")
+                return None
+            content = blob.get("content") or ""
         text = base64.b64decode(content).decode("utf-8", errors="ignore")
         m = re.search(r'"update_time"\s*:\s*"([^"]+)"', text)
         if not m:
@@ -578,7 +655,12 @@ def check_group(group, close, label, is_trading=True, token=None, use_cloud=Fals
     直接跳过（不计入 stale），信息不丢（仍可在 notime/打印中提示，但不阻断 exit）。
     """
     stale, notime = [], []
-    for var, max_hours in group.items():
+    _items = list(group.items())
+    _n = len(_items)
+    for _i, (var, max_hours) in enumerate(_items, 1):
+        # 🛡️ 2026-09-20 加固③：进度打印 —— 若整轮仍挂死，调用方能看到「检到第几项」
+        if use_cloud and token:
+            print(f"  [{label} {_i}/{_n}] {var}", flush=True)
         # 🛡️ 周末豁免：非交易日 + 盘中高频（<24h 阈值）不判陈旧
         if (not is_trading) and max_hours < 24:
             continue
@@ -628,6 +710,16 @@ def main():
     is_trading = _is_trading_day(now.date())
     close = last_trade_day_close(now)
 
+    # 🛡️ 2026-09-20 加固③：总时限。超时后**带已检结果**退出（exit 2），
+    # 而不是让调用方只看到「timed out」而不知检到第几项（旧痛点）。
+    _t0 = time.monotonic()
+
+    def _over_budget():
+        if time.monotonic() - _t0 > _MAIN_TOTAL_SEC:
+            print(f"⏰ 总时限 {_MAIN_TOTAL_SEC}s 已到，提前结束（已检部分结果可信）")
+            return True
+        return False
+
     # token 提前加载：CORE_SOURCES_ALGO 需读云端 update_time 避免本地滞后
     # 🔴 2026-09-16 治本（阿狸咪的工程师）：原实现把「是否派发」与「能否云复核」
     #    耦合在同一个 token 上，而 `--no-self-heal` **在全脚本其它任何地方都未被引用**
@@ -651,6 +743,10 @@ def main():
     algo_stale, algo_notime = check_group(CORE_SOURCES_ALGO, close, "CORE_ALGO", is_trading, token=check_token, use_cloud=True)
     core_stale += algo_stale
     core_notime += algo_notime
+    if _over_budget():
+        print(f"  已检 CORE={len(core_stale)} 陈旧 / {len(core_notime)} 无时间戳；"
+              f"WARN/FROZEN 未检（总时限）")
+        return 2
     # 🛡 2026-09-08 盘中更新审计：STOCK_QUOTE 仅连续竞价时段(09:30-11:30/13:00-15:00)才刷新，
     # 盘前/午休/盘后及非交易日本就冻结 → 仅交易时段判定陈旧，避免收盘后误报 + 冗余自愈派发。
     if not _is_market_open(now):
@@ -669,6 +765,9 @@ def main():
     if _is_premarket_window(now, 180):
         warn_stale = [(v, r) for (v, r) in warn_stale if v != "NT_DATA"]
         warn_notime = [v for v in warn_notime if v != "NT_DATA"]
+    if _over_budget():
+        print(f"  已检 CORE={len(core_stale)} / WARN={len(warn_stale)}；FROZEN 未检（总时限）")
+        return 2
     frozen_stale, frozen_notime = check_group(FROZEN_SOURCES, close, "FROZEN", is_trading, token=check_token, use_cloud=True)
 
     def _with_cat(items):
