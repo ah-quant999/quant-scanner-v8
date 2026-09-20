@@ -8811,7 +8811,7 @@ function switchSec(sec,el){
   if(sec==='td' && typeof window.__renderJudgmentBody==='function'){
     setTimeout(window.__renderJudgmentBody,60);
     setTimeout(window.__renderJudgmentHeader,60);
-    if(typeof window.__retryJudgmentRender==='function') setTimeout(window.__retryJudgmentRender, 200);
+    // 🗑 2026-09-21 小九：删除死调用 window.__retryJudgmentRender（全仓无该定义，恒不执行）。
   }
   // 2026-08-30：盘后数据补位卡（宏观/期指/解禁/业绩）切 tab 时重绘
   if(sec==='ph'){
@@ -8823,7 +8823,9 @@ function switchSec(sec,el){
     }, 80);
   }
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
-  if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
+  // 🗑 2026-09-21 小九：删除死调用 window._renderSecPh（全仓无该定义，恒不执行）。
+  //    上方 sec==='ph' 分支已用 renderFuturesMain/renderMacroSummary/renderRestrictedCalendar/
+  //    renderForecastCalendar 完成盘后卡重绘，功能无缺口。
   // 选股策略页：渲染入口改为 window.switchSt('pool')（2026-08-30 主人令：选股池为默认首 tab）
   // 2026-08-31 主人令：进入时填充「卡名后状态胶囊」——汇总 TRIPLE_CONSENSUS / FINAL_RECOMMEND_DATA / CRDS_CARD_DATA 等的更新态
   if(sec==='st' && typeof window.switchSt==='function') setTimeout(function(){
@@ -18219,7 +18221,7 @@ window.__renderV8CalToday();
       if(_jdRetryDone) return;
       _jdRetryDone = true;
       try{
-        if(typeof window.__retryJudgmentRender==='function') window.__retryJudgmentRender();
+        // 🗑 2026-09-21 小九：删除死调用 window.__retryJudgmentRender（同上，恒不执行）。
       }catch(e){ console.warn('[judgment DOMContentLoaded retry]', e); }
     }
     if(document.readyState === 'loading'){
