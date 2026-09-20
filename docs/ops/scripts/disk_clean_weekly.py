@@ -474,7 +474,6 @@ def batch_wb_caches():
     return items
 
 
-
 # ============================================================================
 # 批 9：安装残留即时清理（2026-09-20 · 阿狸咪的工程师 新增）
 # ----------------------------------------------------------------------------
@@ -625,32 +624,52 @@ _C_APPDATA = os.path.join(_HOME, "AppData")
 # 缓存子目录白名单（相对 AppData）。只加「纯缓存/纯日志/更新包残留」类，
 # 绝不加含用户配置/数据的目录（如 Roaming\kingsoft\office6\backup 之类的备份也要谨慎）。
 _C_CACHE_SUBDIRS = (
-    # ---- Local（纯缓存）----
+    # ========================================================================
+    # 🔴 2026-09-20 修正（A 方案·按"最高置信度"原则收敛）
+    #    逐条做 **存在性 + 内容语义** 双重验证后，抓出 3 类问题并移除：
+    #      1) Roaming\secoresdk\logs       → 路径**不存在**（原表写错，静默失效）→ 移除
+    #      2) Local\sogoupdf\fastocrx     → 95% 是 exe/dll（OCR 组件 + .mnn 模型）
+    #                                        ⇒ 删了会让搜狗PDF 的 OCR 失效 → 移除
+    #      3) Local\sogoupdf\ktool_update → 33% 是 exe/dll，顶层是 kdownload\ 下载载荷
+    #                                        ⇒ 保守不删程序组件 → 移除
+    #    🔴 准入铁律（三条全满足才收）：
+    #       (a) 路径**真实存在**（写错路径会让整批静默失效）
+    #       (b) 语义明确是 **缓存 / 日志 / 临时 / 下载器残留**（可自重建或装完即弃）
+    #       (c) **不含** exe/dll/模型等程序运行必需文件，且不含用户数据/配置
+    # ========================================================================
+    # ---- 包管理器缓存（删后自动重建）----
+    r"Local\npm-cache\_npx",                     # npx 临时包缓存（08-19 后未动，~1.1GB）
     r"Local\npm-cache\_cacache",
+    r"Local\npm-cache\_logs",
     r"Local\pip\Cache",
+    # ---- Windows 系统缓存（可重建）----
     r"Local\Microsoft\Windows\INetCache",
-    r"Local\Microsoft\Windows\Explorer",          # 缩略图缓存
+    r"Local\Microsoft\Windows\Explorer",        # 缩略图缓存
     r"Local\CrashDumps",
     r"Local\D3DSCache",
-    r"Local\Temp",                                 # 已在批5 覆盖，这里再兜一次（同标准）
-    # ---- 应用自身 cache 目录（按名字含 cache 的常见路径）----
-    r"Local\kingsoft\wps\cache",
-    r"Local\Tencent",
-    r"Local\sogoupdf\cache",
-    r"Local\MeituApp\Cache",
-    r"Local\winToolBox\cache",
-    r"Local\google\Chrome\User Data\Default\Cache",
+    r"Local\Temp",                                # 已在批5 覆盖，此处兜底（同标准）
+    # ---- 浏览器缓存（清后自动重建；不含书签/密码/历史）----
+    r"Local\Google\Chrome\User Data\Default\Cache",
+    r"Local\Google\Chrome\User Data\Default\Code Cache",
+    r"Local\Google\Chrome\User Data\Default\GPUCache",
+    r"Local\Microsoft\Edge\User Data\Default\Cache",
+    r"Local\Microsoft\Edge\User Data\Default\Code Cache",
+    r"Local\Microsoft\Edge\User Data\Default\GPUCache",
+    r"Local\Microsoft\Edge\User Data\ShaderCache",
     r"Local\360Chrome\Chrome\User Data\Default\Cache",
-    # ---- updater 残留（下载完的安装包，纯粹垃圾）----
+    r"Local\360Chrome\Chrome\User Data\Default\Code Cache",
+    # ---- 更新器残留（下载完的安装包，装完即无用）----
     r"Local\@guanjia-openclawelectron-updater",
-    r"Local\@genieworkbuddy-desktop-updater",
+    r"Local\@genieworkbuddy-desktop-updater",     # 注：desktop 是软件名，非"桌面"
     r"Local\qclaw-updater",
     r"Local\coze-updater",
     r"Local\yiyang-suite-updater",
-    # ---- Roaming（缓存/日志类，谨慎挑选）----
+    # ---- 应用日志类（非配置/非数据）----
+    r"Local\sogoupdf\log",
     r"Roaming\Tencent\Logs",
-    r"Roaming\Tencent\WeChat\radium\Cache",
-    r"Roaming\secoresdk\logs",
+    r"Roaming\Tencent\beacon",
+    r"Roaming\kingsoft\offlinelog",
+    r"Roaming\kingsoft\personalofflinecache",
     r"Roaming\Coze\Cache",
     r"Roaming\QQ\Cache",
 )
@@ -696,13 +715,9 @@ def batch_c_appcache():
     return items
 
 
-# 默认 all 跑 0~8# 批6：.workbuddy 会话日志>7天+重要文件硬保护，已按用户授权 2026-09-16 并入每晚23:00自动任务
+# 默认 all 跑 0~9# 批9：安装残留即时清理（独立门槛 6 小时，不受 7 天约束），2026-09-20 新增并入 all# 批6：.workbuddy 会话日志>7天+重要文件硬保护，已按用户授权 2026-09-16 并入每晚23:00自动任务
 # 批7：.workbuddy 四大纯缓存目录，2026-09-18 按主人令「C盘空间都快满了」新增并入 all
 # 批8：C 盘应用缓存（kingsoft/Tencent/npm-cache/各类 updater 残留），2026-09-18 新增
-# 批9：安装残留即时清理，2026-09-20 阿狸咪的工程师 新增并入 all
-#   🔴 根因：Temp 里 376 个 codebuddy-marketplace-install-* = 9.34 GB，
-#      寿命仅 0~4.3 天（平均 1.9 天），永远够不到批 5 的 7 天门槛 ⇒ 天天清不掉。
-#   故本批用独立门槛 6 小时（INSTALL_RESIDUE_HOURS），与「陈旧文件」解耦。
 ALL_DEFAULT = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
 BATCHES = {
@@ -714,8 +729,7 @@ BATCHES = {
     "5": ("C:用户临时与缓存", batch_appdata),
     "6": (".workbuddy 会话日志(>7天·重要文件硬保护)", batch_workbuddy_logs),
     "7": (".workbuddy 缓存目录(traces/logs/file-history/file-tree-manifests)", batch_wb_caches),
-    "8": ("C:盘应用缓存(kingsoft/Tencent/npm-cache/updater残留)", batch_c_appcache),
-    "9": ("安装残留即时清理(codebuddy-marketplace-install-* · >6h)", batch_install_residue),
+    "8": ("C:盘应用缓存(kingsoft/Tencent/npm-cache/updater残留)", batch_c_appcache),    "9": ("安装残留即时清理(codebuddy-marketplace-install-* · >6h·独立门槛)", batch_install_residue),
 }
 
 
