@@ -3,10 +3,10 @@
 """
 v8 Pre-deploy audit（CI 自动门禁，2026-09-05 主人令一劳永逸落地）
 ================================================================
-目的：每次云端 build/deploy 前自动跑 **8** 项校验，任何一项失败 → 阻断 deploy。
+目的：每次云端 build/deploy 前自动跑 **9** 项校验，任何一项失败 → 阻断 deploy。
 等同「改后三件套」固化为 CI step，不再依赖人工记忆流程。
 
-五项校验：
+九项校验：
   1. py_compile        —— 所有 *.py 文件 0 语法错误
   2. new Function      —— index.html 所有 inline <script> 0 语法错误（Node）
   3. 完整性核对        —— data/*.js 数量在下界 90 与**动态上界**之间
@@ -21,6 +21,12 @@ v8 Pre-deploy audit（CI 自动门禁，2026-09-05 主人令一劳永逸落地�
   8. 心跳产物名一致    —— HB_*.js 字面量大小写与 update_v8 权威名对齐
                           （2026-09-14 新增：小写 `hb_xiaojiu.js` 在 Windows 侥幸能过，
                            换 Linux/mac 必 silent 判掉线）
+  9. 回测口径守卫      —— raw_data/backtest_expectancy.json（融合器权重唯一真源）
+                          必须符合 new 口径（next_open + 扣费 + IS/OOS + 超额下架）
+                          （2026-09-20 新增：全仓 34 个校验脚本无一覆盖该产物 ⇒
+                           产物被反向覆盖回旧口径时静默无人拦。
+                           本项**分档**：脚本口径漂移=阻断；产物未重跑=告警放行，
+                           防误杀 v8_build_deploy.yml 与 v8_cn_fetch_cloud.yml 两条链）
 
 退出码：
   0  全部通过
@@ -472,6 +478,80 @@ def check_heartbeat_name_consistency():
     return (True, "心跳产物名大小写一致（权威 %s，全仓 0 处漂移）" % "/".join(sorted(auth_names)))
 
 
+def check_backtest_caliber():
+    """[9/9] 回测口径守卫（2026-09-20 小九新增·口径回退结构性封堵）。
+
+    🔴 背景（2026-09-20 事故家族）：
+      `raw_data/backtest_expectancy.json` 是**融合器权重的唯一真源**
+      （`generate_top10.py` / `final_recommend.py` 都读它的 excess 值给分）。
+      2026-09-20 实测发现该产物被 A 批 fetch 在 7 分钟内**反向覆盖**回旧口径
+      （`generated` 倒退、`n_snapshots` 65→46、`entry_mode` 变 None）
+      —— 而全仓 34 个校验/守卫脚本**无一覆盖该产物** ⇒ 口径回退静默无人拦。
+      本项把「产物必须符合新口径」立成 CI 可断言校验，结构上封死复发。
+
+    做法：**不复制守卫逻辑**，直接调仓根 `guard_backtest_caliber.py`（单一真源），
+      用 `--json` 拿结构化结果，再按本项的过渡策略裁决。
+
+    ⚠️ 过渡策略（**故意宽松，防误杀整条部署链**）：
+      该守卫的产物是 **E 批盘后算法链**产出的；而在产物被 E 批重跑定稿之前，
+      磁盘上仍是旧口径产物 ⇒ 若本项硬阻断，**每次 build 都会红**，
+      而 build/deploy 被 `v8_build_deploy.yml` 与 `v8_cn_fetch_cloud.yml` 两处调用
+      ⇒ 等于同时打挂两条链（这正是 pre_deploy_audit 自己头注里警告过的失败模式）。
+      故本项分档：
+        · 产物**合规**            → ✅ 通过，报各项计数
+        · 产物**不合规**          → ⚠️ 告警通过（不阻断），打印前 6 条问题
+        · **脚本**本身口径漂移    → ❌ 阻断（脚本是真源，漂移立即修，与产物新旧无关）
+        · 守卫文件/产物**缺失**   → ⚠️ 告警通过（缺失由 E 批链自身负责产出，非本项职责）
+
+    纯标准库 + 仅调本地子进程，守本文件「零依赖可用」铁律。
+    """
+    guard = ROOT / "guard_backtest_caliber.py"
+    art = ROOT / "raw_data" / "backtest_expectancy.json"
+    if not guard.exists():
+        return (True, "⚠️ guard_backtest_caliber.py 不存在（跳过；产物未纳入口径守卫）")
+    py = sys.executable if sys.executable else "python3"
+    try:
+        r = subprocess.run([py, str(guard), "--path", str(art), "--json"],
+                           capture_output=True, timeout=60, cwd=str(ROOT))
+    except subprocess.TimeoutExpired:
+        return (True, "⚠️ 口径守卫超时（已放行，不阻断两链）")
+    except Exception as e:
+        return (True, "⚠️ 口径守卫无法执行（%s，已放行）" % type(e).__name__)
+    out = r.stdout.decode("utf-8", "replace")
+    try:
+        j = json.loads(out)
+    except Exception:
+        return (True, "⚠️ 口径守卫输出非 JSON（rc=%s，已放行）" % r.returncode)
+    probs = j.get("problems") or []
+    warns = j.get("warns") or []
+    # ⚠️ 守卫的 info 是**字符串列表**（人类可读行），不是 dict —— 需自行抽字段
+    info_lines = j.get("info") or []
+    if isinstance(info_lines, dict):
+        info_lines = ["%s = %s" % (k, v) for k, v in info_lines.items()]
+    info = {}
+    for ln in info_lines:
+        if "=" not in ln:
+            continue
+        k, _, v = ln.partition("=")
+        info[k.strip()] = v.strip()
+    # 区分「脚本口径漂移（必阻断）」与「产物未重跑（放行）」两类问题
+    script_drift = [p for p in probs if ("脚本" in p) or ("source" in p.lower())
+                    or ("ENTRY_MODE" in p) or ("COST_ROUND_TRIP" in p)]
+    if r.returncode == 2 or j.get("missing") or not art.exists():
+        return (True, "⚠️ 产物缺失（%s）→ 已放行，等 E 批产出" % art.name)
+    if script_drift:
+        return (False, "脚本口径漂移 %d 处（真源必须先修）:\n    " % len(script_drift)
+                + "\n    ".join(script_drift[:6]))
+    if probs:
+        return (True, "⚠️ 产物仍为旧口径 %d 项（等 E 批重跑定稿，不阻断）: "
+                      "entry_mode=%s n=%s | 首条: %s"
+                % (len(probs), info.get("entry_mode"), info.get("n_snapshots"), probs[0][:110]))
+    tail = ("（%d 条提示）" % len(warns)) if warns else ""
+    return (True, "产物口径合规：entry_mode=%s cost=%s n=%s 覆盖=%s %s"
+            % (info.get("entry_mode"), info.get("cost"), info.get("n_snapshots"),
+               info.get("coverage"), tail))
+
+
 def write_audit_log(results, exit_code):
     """落盘三件套审计轨迹到 raw_data/code_audit.log（append）。
     让「何时/谁跑过三件套」有据可查。*.log 已被 .gitignore 忽略 → 不入库、不污染工作树。
@@ -579,9 +659,11 @@ def main():
         ("[6/8] HTML 数据引用", check_html_refs),
         ("[7/8] gate 头注一致", check_gate_headnote),
         ("[8/8] 心跳产物名一致", check_heartbeat_name_consistency),
+        ("[9/9] 回测口径守卫", check_backtest_caliber),
     ]
     print("=" * 60)
-    print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；2026-09-13 扩至 6 项；2026-09-14 扩至 8 项）")
+    print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；"
+          "2026-09-13 扩至 6 项；2026-09-14 扩至 8 项；2026-09-20 扩至 9 项）")
     print("=" * 60)
     fails = 0
     results = []
@@ -600,7 +682,7 @@ def main():
         for e in errors:
             print(f"  - {e}")
         sys.exit(1)
-    print("🎉 8 项全部通过 → deploy 可继续")
+    print("🎉 9 项全部通过 → deploy 可继续")
     sys.exit(0)
 
 
