@@ -67,7 +67,10 @@ jobs:
                 echo "✅ 当天修改已推送入库（防覆盖）"; break
               fi
               echo "⚠️ push 被拒，fetch+rebase 后重试 ($i/3)"
-              git fetch origin main && git -c rebase.autoStash=true rebase FETCH_HEAD || { git rebase --abort || true; break; }  # 🔴 2026-09-17 阿狸咪：加 autoStash —— 裸 rebase 遇脏树会启动前即被拒，3 次重试全空转
+              # 🛡 2026-09-20 小九：先清「虚拟脏」（本步改动已 commit，此处丢弃的仅为行尾虚拟差异），
+              #    否则 rebase 会在「启动前」即被拒（error: cannot rebase: You have unstaged changes）⇒ 重试全空转。
+              git checkout -- . 2>/dev/null || true
+              git fetch origin main && git -c rebase.autoStash=true rebase FETCH_HEAD || { git rebase --abort >/dev/null 2>&1 || true; continue; }  # 🔴 2026-09-17 阿狸咪：加 autoStash —— 裸 rebase 遇脏树会启动前即被拒，3 次重试全空转
             done
           else
             echo "无待推送修改"
@@ -82,7 +85,10 @@ jobs:
           for i in 1 2 3; do
             if git push origin HEAD:main 2>/dev/null; then echo "✅ 备份已推送"; break; fi
             echo "⚠️ 推送被拒或无新内容，fetch+rebase 后重试 ($i/3)"
-            git fetch origin main && git -c rebase.autoStash=true rebase FETCH_HEAD || { git rebase --abort || true; break; }  # 🔴 2026-09-17 阿狸咪：加 autoStash —— 裸 rebase 遇脏树会启动前即被拒，3 次重试全空转
+            # 🛡 2026-09-20 小九：先清「虚拟脏」（本步改动已 commit，此处丢弃的仅为行尾虚拟差异），
+            #    否则 rebase 会在「启动前」即被拒（error: cannot rebase: You have unstaged changes）⇒ 重试全空转。
+            git checkout -- . 2>/dev/null || true
+            git fetch origin main && git -c rebase.autoStash=true rebase FETCH_HEAD || { git rebase --abort >/dev/null 2>&1 || true; continue; }  # 🔴 2026-09-17 阿狸咪：加 autoStash —— 裸 rebase 遇脏树会启动前即被拒，3 次重试全空转
           done
 
       - name: "📦 v6 备份保留策略断言（主人令：v8 稳定一周前不删）"
