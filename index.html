@@ -4714,11 +4714,8 @@ function fmtSigned(v){
       var _out = _list.filter(function(x){ return x.net < 0; }).sort(function(a,b){ return a.net - b.net; }).slice(0,10);
 
       h += '<h3 style="margin-top:22px;font-size:15px;color:var(--txt)">📊 月度汇总 <span style="font-size:11px;color:var(--dim);font-weight:400">· ' + _mLabel + '三方共振净买卖（机构+北向+游资 · 仅当月 · 最新交易日 ' + _latestDay + '）</span></h3>';
-      // 口径说明（2026-09-20 主人令：自标题右侧移至标题下方）
-      h += '<div style="margin-top:8px;font-size:10px;color:var(--dim);text-align:center;line-height:1.6">';
-      h += '口径：龙虎榜席位「机构 + 北向 + 游资」三方净买卖，同一股票当月多次上榜按金额累加 · 当月共 ' + _mDays.length + ' 个交易日<br>';
-      h += '仅供参考，不构成投资建议</div>';
       // 两卡宽度对齐上方「机游共振（短线）」三卡：改三列网格（每列 ≈419px，与 .insight-grid 的 1fr1fr1fr 同宽）
+      //   2026-09-21 主人令：口径说明自「标题下方」移至「两卡右侧空白格」（第 3 列）。
       h += '<div class="month-summary" style="grid-template-columns:repeat(3,1fr);gap:12px">';
       if(!_in.length && !_out.length){
         h += '<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:28px 12px;font-size:13px;background:var(--bg2);border:1px dashed var(--border);border-radius:10px;">📭 ' + _mLabel + ' 暂无三方共振席位数据</div>';
@@ -4737,6 +4734,13 @@ function fmtSigned(v){
             h += '<div class="ms-item"><span>' + (idx+1) + _rcEsc(s.name) + '<span class="ms-code">' + _rcEsc(s.code) + '</span></span><span class="ms-val c-down">' + _rcFmtYi(s.net) + '</span></div>';
           });
         } else { h += '<div style="color:var(--dim);font-size:12px;padding:6px 0">本期无净流出标的</div>'; }
+        h += '</div>';
+
+        // 2026-09-21 主人令：口径说明落位第 3 列（两卡右侧原空白格），与两卡同高、内容垂直居中。
+        h += '<div class="ms-col ms-note" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;line-height:1.9">';
+        h += '<div style="font-size:10.5px;color:var(--dim)">口径：龙虎榜席位「机构 + 北向 + 游资」三方净买卖，同一股票当月多次上榜按金额累加</div>';
+        h += '<div style="font-size:10.5px;color:var(--dim);margin-top:6px">当月共 ' + _mDays.length + ' 个交易日</div>';
+        h += '<div style="font-size:10px;color:var(--dim);margin-top:10px;opacity:.85">仅供参考，不构成投资建议</div>';
         h += '</div>';
       }
       h += '</div>';
