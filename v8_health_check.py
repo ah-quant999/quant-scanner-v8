@@ -204,12 +204,6 @@ CARD_DEFS = [
     # 🛡 2026-09-11 一劳永逸：4 个孤儿 algo_run 产物此前未注册 CARD_DEFS → 被 all_ 通用扫描按 1440min 红线误判 fail
     {"id": "ALGO_TRACK", "name": "算法追踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     # 🗑 STRONG_BREAKOUT_BACKTEST 健康检查项已随 2026-09-19 主人令删除强势突破而移除。
-    # ⚠️ 2026-09-21 小九 · 纠正本行原有「已移除」表述的**虚报部分**：
-    #   实测该产物 data/STRONG_BREAKOUT_BACKTEST.js **当时并未被删**（只摘了这里的登记），
-    #   且次日 8bc8275fdc 把整批强势突破产物回推复活 ⇒ 落到下方 check_all_data_files 全扫，
-    #   09-21 实测 all_STRONG_BREAKOUT_BACKTEST = ok（停在 09-18，属定时炸弹）。
-    #   ⇒ 本轮已补做：① 删除两份产物；② 登记进 _LOW_FREQ_FILES（防复发，见该处注释）；
-    #     ③ api_push_raw.py 加 _RETIRED_ARTIFACTS 防回推。
     {"id": "IMA_STRONG_BACKTEST", "name": "高手强势股跟踪回测", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["periods"], "heal_cat": "algo_run"},
 
 
@@ -1944,38 +1938,10 @@ _LOW_FREQ_FILES = {
     #   残留后被 all_ 通用扫描按 1440min 红线判 fail（09-16 看板实测 2 红灯）。
     #   本轮已删产物；此处加护栏防「有人把旧产物放回」导致红灯复发。
     "CANDIDATE_BACKTEST", "GOLD_POOL_BACKTEST",
-    # 🗑 2026-09-21 一劳永逸（小九）：**强势突破残留产物 · 防红灯复发护栏**。
-    #
-    #   【问题】09-19 主人令「强势突破全站删除」(07d9690eb4) 生效后，产物却**被回推复活**
-    #     （8bc8275fdc，2026-09-20T13:13:05Z，机制见 api_push_raw.py::_RETIRED_ARTIFACTS），
-    #     于是落入 check_all_data_files 的全扫（DATA_DIR.glob("*.js")），
-    #     按通用 24h 红线判定 ⇒ 09-21 看板实测：
-    #        all_STRONG_BREAKOUT          = **fail**（红灯 3974 分钟，主人截图所指）
-    #        all_STRONG_BREAKOUT_BACKTEST = ok（停在 09-18，3 天后必然转 fail —— 定时炸弹）
-    #
-    #   【修法】本行按「L206 墓碑注释 + L1936 同族范式」补齐：
-    #     · 产物侧：由一次性提交删除（data/STRONG_BREAKOUT*.js + raw_data/strong_breakout_*.json）；
-    #     · 巡检侧：登记进本白名单，防「有人把旧产物放回」导致红灯复发（与 CANDIDATE_BACKTEST 同口径）；
-    #     · 推送侧：api_push_raw.py::_RETIRED_ARTIFACTS 拒绝本地副本回推（根治复活循环）。
-    #   ⚠️ 只登记这两个**已退役**产物，不放松任何在跑算法产物的红线。
-    #     与 api_push_raw.py::_RETIRED_ARTIFACTS 同源维护（两处口径须一致）。
-    "STRONG_BREAKOUT", "STRONG_BREAKOUT_BACKTEST",
     # 🔴 2026-09-11 主人令（选项A）：FOUR_VOLUME_60M **已移出本白名单**，并正式登记进 CARD_DEFS
     #   （「选股策略」段，max_age=1440）。原白名单把 24h 红线降到「>7天才告警」，
     #   导致该卡产物冻结 3 天（09-08→09-11）全程零告警。现由 check_data_cards 按 d.max_age 正常判定。
 }
-# 🗑 2026-09-21 一劳永逸（小九）：**已退役产物**子集 —— 从 _LOW_FREQ_FILES 中区分出来，
-#   只为让巡检文案说真话（「已退役」而非「低频/手动维护」）。
-#   为什么必须区分：这两份产物**已删除**，若沿用 LOW_FREQ 那句「低频/手动维护文件」文案，
-#   主人会读到「它还在正常使用」的错觉。
-#   判定口径：产物已随主人令退役、生产方已摘链、前端零引用、远端已删除。
-#   与 api_push_raw.py::_RETIRED_ARTIFACTS 同源维护（两处口径须一致）。
-_RETIRED_FILES = {
-    "STRONG_BREAKOUT",           # 强势突破（2026-09-19 主人令全站删除）
-    "STRONG_BREAKOUT_BACKTEST",  # 强势突破·信号层回测（同上）
-}
-
-
 def check_all_data_files():
     """全量审计 data/*.js：已登记 CARD_DEFS 的跳过（check_data_cards 管），其余全部按通用规则查。
 
@@ -2040,17 +2006,11 @@ def check_all_data_files():
         #   正确顺序：先看是否低频白名单 → 友好 OK；不在白名单才走时间戳 warn。
         if vid in _LOW_FREQ_FILES:
             rel = str(ts)[:19] if ts and ts != "--" else "—"
-            if vid in _RETIRED_FILES:
-                # 🗑 已退役产物：既已删除就不该再出现；此处若仍命中，说明有副本被放回（放行但不冒充正常）
-                _msg = (f"{p.name} **已随主人令退役**（产物已删；仅防「旧副本被放回」而复亮红灯）；"
-                        f"如再现请核查 api_push_raw.py::_RETIRED_ARTIFACTS 是否被绕过")
-            else:
-                _msg = f"{p.name} 低频/手动维护文件（白名单内，无时间戳属正常，{p.stat().st_size//1024}KB）"
             results.append({
                 "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
                 "status": "ok", "last_update": rel, "age_min": None,
                 "heal_cat": "algo_run",
-                "message": _msg,
+                "message": f"{p.name} 低频/手动维护文件（白名单内，无时间戳属正常，{p.stat().st_size//1024}KB）",
             })
             continue
         if dt is None:
@@ -2887,8 +2847,124 @@ def check_top10_history_depth():
     return results
 
 
-def build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh=None, history_depth=None, a_share_cov=None, all_data=None):
-    all_items = cards + raw + site_sync + runner + local_sync + dom + (signal_fresh or []) + (history_depth or []) + (a_share_cov or []) + (all_data or [])
+def check_guanlan_material_freshness():
+    """观澜台素材新鲜度检查（2026-09-21 新增）。
+
+    背景（主人报障「研报每天都有更新，为什么一直解读18号的？」）：
+      机构研究·AI解析卡的**唯一素材源**是本机 out/guanlan_reports.json，
+      生产者 algorithms/guanlan_extractor.py 当时**无任何定时调度** ——
+      仅 self_heal_monitor 在 watchlist 缺失时才跑一次，不做日常刷新。
+      且 out/ 被 .gitignore 忽略、与云端 runner 的 out/ 不共享
+      ⇒ 素材冻结 09-18 后，出稿 automation 每天照跑却只能反复解读同一批，
+        而旧巡检只看 data/*.js 的 mtime，**全程零告警**。
+
+    判据（关键：看素材内的**最大报告日期**，不是文件 mtime）：
+      - max_date >= 今日            → ok
+      - max_date == 上一交易日       → ok（盘前宽容窗，源当天可能还没发帖）
+      - 落后 >= 2 个交易日           → fail（真冻结）
+
+    page 用「内容审计」：素材刷新是本地计划任务，self_heal 无法派发云端修复。
+    """
+    results = []
+    rid = "guanlan_material"
+    rname = "观澜台素材新鲜度"
+
+    # out/ 在仓库根，DATA_DIR = Path("data") ⇒ 取其父目录
+    repo_root = DATA_DIR.parent
+    reports_path = repo_root / "out" / "guanlan_reports.json"
+    state_path = repo_root / "out" / "_guanlan_refresh_state.json"
+
+    if not reports_path.exists():
+        results.append({
+            "id": rid, "name": rname, "page": "内容审计", "status": "fail",
+            "message": f"素材文件不存在: {reports_path}（guanlan_extractor.py 从未成功产出）",
+        })
+        return results
+
+    try:
+        with open(reports_path, "r", encoding="utf-8") as f:
+            doc = json.load(f)
+    except Exception as e:
+        results.append({
+            "id": rid, "name": rname, "page": "内容审计", "status": "fail",
+            "message": f"素材解析失败: {e}",
+        })
+        return results
+
+    dates = []
+    for r in (doc.get("reports") or []):
+        ds = (r.get("date") or "").strip()
+        if ds:
+            try:
+                dates.append(datetime.strptime(ds, "%Y-%m-%d").date())
+            except Exception:
+                continue
+
+    if not dates:
+        results.append({
+            "id": rid, "name": rname, "page": "内容审计", "status": "fail",
+            "message": "素材内无任何带日期的报告（count=%s）" % doc.get("count"),
+        })
+        return results
+
+    max_date = max(dates)
+    today = datetime.now().date()
+
+    # 上一交易日（从今天往回找，最多回溯 10 天）
+    prev_td = None
+    d = today - timedelta(days=1)
+    for _ in range(10):
+        if _is_trading_day(d):
+            prev_td = d
+            break
+        d -= timedelta(days=1)
+
+    # 素材里是否有未解码的富文本实体（回归护栏）
+    undecoded = sum(1 for r in (doc.get("reports") or [])
+                    if "<e type=" in (r.get("raw_text") or ""))
+
+    lag_days = _count_trade_days(max_date, today) if max_date <= today else 0
+
+    if max_date >= today:
+        status = "ok"
+        msg = f"素材最新 {max_date}（今日），共 {doc.get('count')} 条"
+    elif prev_td and max_date >= prev_td:
+        status = "ok"
+        msg = f"素材最新 {max_date}（上一交易日 {prev_td}），盘前宽容窗内，共 {doc.get('count')} 条"
+    elif lag_days >= 2:
+        status = "fail"
+        msg = (f"素材冻结：最新报告日 {max_date}，落后今日 {today} 达 {lag_days} 个交易日"
+               f"（共 {doc.get('count')} 条）。"
+               f"检查计划任务 v8-guanlan-refresh 与 guanlan_extractor.py 运行情况")
+    else:
+        status = "warn"
+        msg = f"素材最新 {max_date}，落后今日 {today}（{lag_days} 个交易日），请留意"
+
+    if undecoded:
+        status = "fail" if status == "ok" else status
+        msg += f" | ⚠️ {undecoded} 条含未解码富文本实体(<e type=)"
+
+    # 附上刷新任务的最近自检状态（有则）
+    if state_path.exists():
+        try:
+            with open(state_path, "r", encoding="utf-8") as f:
+                st = json.load(f)
+            if not st.get("ok", True):
+                msg += " | 刷新任务自检失败: %s" % st.get("error", "?")
+                if status == "ok":
+                    status = "warn"
+        except Exception:
+            pass
+
+    results.append({
+        "id": rid, "name": rname, "page": "内容审计",
+        "status": status, "message": msg,
+    })
+    return results
+
+
+def build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh=None, history_depth=None, a_share_cov=None, all_data=None, guanlan_fresh=None):
+    all_items = cards + raw + site_sync + runner + local_sync + dom + (signal_fresh or []) + (history_depth or []) + (a_share_cov or []) + (all_data or []) + (guanlan_fresh or [])
     # 🛡 2026-09-12 ④：把计算/定义顺序写进 order，前端组内按此排序，与算法执行顺序一致
     for _i, _it in enumerate(all_items):
         _it["order"] = _i
@@ -3078,9 +3154,11 @@ def main():
     history_depth = check_top10_history_depth() or []
     # 🔴 2026-08-12 主人紧急令：算法输出全港股/A股缺失必须立即报警
     a_share_cov = check_a_share_coverage() or []
+    # 2026-09-21 新增：观澜台素材新鲜度（机构研究卡唯一素材源，此前零监控）
+    guanlan_fresh = check_guanlan_material_freshness() or []
     # 2026-08-30 一劳永逸：六个检查函数任意返回 None 都兜底成 [],避免 build_report(None) 直接崩
 
-    report = build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh, history_depth, a_share_cov=a_share_cov, all_data=all_data)
+    report = build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh, history_depth, a_share_cov=a_share_cov, all_data=all_data, guanlan_fresh=guanlan_fresh)
     # 2026-08-11 漏洞 #3：管线耗时趋势监控（必须在 build_report 后但 self_heal 前,以便发现异常时纳入自愈决策）
     try:
         _check_workflow_durations(report)

@@ -23,12 +23,14 @@ guanlan_extractor.py — 知识星球研报自动提取器（API优先 + Seleniu
              根因修复: cookie 名从 xq_a_token → zsxq_access_token
   2026-07-17  放弃摘星阁源(数据陈旧且未被候选池消费)，从 GROUPS 移除
 """
+import html
 import json
 import os
 import re
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 # 名称归一化共享模块（2026-08-14 抽出，消除与 final_recommend/build_candidate_pool/scanner 的重复）
@@ -517,6 +519,68 @@ def parse_stock_codes(text, name_index=None):
     return results
 
 
+# ══════════════════════════════════════════════════════════════
+# 知识星球富文本实体解码（2026-09-21 新增）
+# ══════════════════════════════════════════════════════════════
+# 背景：zsxq API 返回的 talk.text 是「富文本」，加粗/话题/外链被编码为
+#       <e type="..." title="<URL编码>" .../> 而非明文。旧代码直接把原文
+#       截断存进 raw_text ⇒ 下游（AI 解读 / 前端）看到的是一堆
+#       `<e type="text_bold" title="%E6%A0%87%E9%A2%98%EF%BC%9A" />`。
+#
+# 实测（2026-09-21 拉取的 20 条）：18/20 条含未解码实体，
+#       共 72 个（hashtag ×38 / text_bold ×31 / web ×3）。
+#
+# 解码规则（三种形态，均已实测确认）：
+#   <e type="text_bold" title="%E6%A0%87%E9%A2%98%EF%BC%9A" />
+#       → 「标题：」            （URL 解码后取纯文本）
+#   <e type="hashtag" hid="..." title="%23%E9%87%8E%E6%9D%91%23" />
+#       → 「#野村#」            （URL 解码后即为带 # 的话题串）
+#   <e type="web" href="..." title="%E6%97%A0%E8%AE%BA%E5%A6%82%E4%BD%95" style="book" />
+#       → 「无论如何」          （只取标题文字，丢弃链接，避免噪声）
+_RE_ZSXQ_ENTITY = re.compile(r'<e\s+[^>]*?/?>', re.S)
+_RE_ZSXQ_TITLE = re.compile(r'title="([^"]*)"', re.S)
+
+
+def decode_zsxq_entities(text):
+    """把知识星球富文本实体还原成可读纯文本。
+
+    幂等：对已解码文本再跑一次结果不变（无 <e ...> 可匹配时原样返回）。
+    """
+    if not text or '<e ' not in text:
+        return text
+
+    def _repl(m):
+        raw = m.group(0)
+        tm = _RE_ZSXQ_TITLE.search(raw)
+        if not tm:
+            return ''                      # 无 title 的实体直接剔除，不残留标签
+        val = tm.group(1)
+        try:
+            val = urllib.parse.unquote(val)
+        except Exception:
+            pass
+        return html.unescape(val)          # 二次处理 &amp; &#39; 之类
+
+    out = _RE_ZSXQ_ENTITY.sub(_repl, text)
+    # 收敛实体剔除后留下的多余空白（保留段落换行）
+    out = re.sub(r'[ \t]+\n', '\n', out)
+    out = re.sub(r'\n{3,}', '\n\n', out)
+    return out.strip()
+
+
+def extract_zsxq_title(text):
+    """从富文本里抽出「标题：」后的第一行作为报告标题；抽不到返回空串。"""
+    plain = decode_zsxq_entities(text or '')
+    for line in plain.splitlines():
+        s = line.strip()
+        if not s:
+            continue
+        m = re.match(r'^标题[：:]\s*(.+)$', s)
+        if m and m.group(1).strip():
+            return m.group(1).strip()[:200]
+    return ''
+
+
 def detect_institution(text):
     for kw in INSTITUTION_KEYWORDS:
         if kw in text[:300]:
@@ -574,9 +638,15 @@ def process_group(key, config, token):
         date = parse_api_time(create_time)
         dates.append(date)
 
+        # 2026-09-21 修复：先把富文本实体（<e type=... title="%XX.." />）还原成纯文本，
+        #   再做机构/评级/股票解析与入库。否则下游看到的是编码串，且「标题：」等
+        #   加粗分隔词丢失，语义被破坏。
+        text = decode_zsxq_entities(text)
+
         inst = detect_institution(text)
         rating = detect_rating(text)
         stocks = parse_stock_codes(text, NAME_INDEX)
+        title = extract_zsxq_title(text)
 
         # 有股票的才算研报
         if not stocks and inst == "未知机构":
@@ -585,6 +655,7 @@ def process_group(key, config, token):
         reports.append({
             "institution": inst,
             "rating": rating,
+            "title": title or (text.strip().splitlines()[0][:120] if text.strip() else ""),
             "date": date,
             "stocks": stocks,
             "topic_id": t.get("topic_id", ""),
