@@ -160,6 +160,11 @@ items:
       ② `git reflog -8` 不应再出现新的 `reset: moving to origin/main`
       ③ 观察一个完整交易日，确认无脚本再重埋
     verified_at: "2026-09-21 08:33（拆弹后即刻 + 推后复查，staged=0）— 但需一整日观察确认未复埋"
+    alimi_observe: >-
+      阿狸咪 2026-09-21 16:1x CST 交易日中段复查（按 verify_how ①）：本机
+      `git diff --cached --name-only | wc -l` = **0** ⇒ staged=0 仍成立、**未复埋**
+      （对照 09:45 轮拆弹前 staged=2）。verify_how ②③（reflog 无新 reset / 一整日复埋观察）
+      仍需到收盘后再收口，故本项 maintainer 留 pending-verify。
     updated: "2026-09-21 08:40"
 
   - id: alimi-same-family-check
@@ -477,7 +482,15 @@ items:
       ⚠️ **禁用「单次看到当日值」当生效证据** —— 全量构建本就偶发能给出当日值。
       ⑤ 同日对照：`data/BAIHECHOU_MACRO.js` 与 `data/BAIHECHOU_ANALYSIS.js` 的
       `update_time` 应落在同一天且相差 < 2h（双写语义）。
-    updated: "2026-09-21 15:10"
+      ✅ **阿狸咪 2026-09-21 16:1x CST 实测（按 ④ 频率量法 + ⑤ 同日对照，非单点观察）**：
+      ① `data/BAIHECHOU_ANALYSIS.js` 现 **update_time = generated_at = 2026-09-21 06:38**
+         （blob `5eadc4df7de8` / 2,753 B，原 09-18 版为 4,266 B）⇒ 已脱离 09-18 冻结、**属当日**；
+      ② 同日对照 `data/BAIHECHOU_MACRO.js` **update_time = 2026-09-21 06:35:49**
+         ⇒ 两文件同日、**相差 2 分 11 秒（< 2h）** ⇒ ⑤ 双写语义成立；
+      ③ 对照改前（`ANALYSIS` 冻结 09-18 06:31、提交历史仅 1 笔）⇒ **修复已生效**。
+      ⚠️ 仍**不**据单日宣称闭环：按 ④ 唯一硬判据须看 09-22 06:30 后的提交间隔中位
+      （预期 ≈24h、每日 1~2 笔），且本档只验了「当日值」这一必要非充分条件 ⇒ 留 pending-verify。
+    updated: "2026-09-21 16:18"
 
   - id: factorlab-conflict-tree-pollution
     priority: P2
@@ -570,7 +583,18 @@ items:
       改后观察 24h：5 条链各自的 `GET /actions/workflows/{wf}/runs` 中应出现 `event=schedule` 的 run
       （今日实测全为 `workflow_dispatch`）。**只看 schedule 事件，不看总 run 数**
       —— 自接力/手动派发会污染总数。
-    updated: "2026-09-21 09:33"
+      ✅ **阿狸咪 2026-09-21 16:1x CST 实测：schedule 事件已恢复**（严格按 verify_how：只看 schedule，不看总 run 数）。
+      今日 09-21 各链 schedule 命中（取 `event==schedule` 的 run，逐档核对时刻）：
+        · 看门狗 `#347126523` **1 档** @12:43
+        · SQ 主链 `#336548691` **2 档** @14:00 / 14:41
+        · 盘中准点档调度器 `#354533319` **3 档** @15:01 / 15:41 / 16:00
+        · 盘中算法追踪 `#337500527` **1 档** @13:53
+        · 板块资金日内快照 `#354648114` **1 档** @13:59
+      ⇒ **5 条链今日均出现 `event=schedule` 的 run，且全部 success**（非 workflow_dispatch 冒充）。
+      对照本项 09:33 记录「今日实测全为 workflow_dispatch」⇒ **注销已恢复**。
+      ⚠️ 仍留 pending-verify：schedule 命中有时段性不稳（09-18 上午 ~100 runs=0 的实测），
+      须再观察 1 个交易日确认非偶发命中 —— 不据单日宣布闭环。
+    updated: "2026-09-21 16:18"
 
   - id: intraday-guard-window-gap
     priority: P1
