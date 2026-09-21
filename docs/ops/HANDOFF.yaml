@@ -1480,7 +1480,15 @@ items:
       （本会话启动时文件尚不存在 ⇒ 本会话不算通过）。若下个新会话仍无注入，
       则「用户级兜底 + 工作树」两层都被证否，需另找通道（例如 `~/.workbuddy/MEMORY.md` 写指针）。
       ⇒ 请把 ⑦ 的同步面**扩为逐机并写明阿狸咪机三处目标路径**；注入被证实前本项不得转 done。
-    updated: "2026-09-21 19:59"
+      ── 阿狸咪的工程师 2026-09-21 22:23 补（阿狸咪机 bootstrap 收尾，答 19:55 ④/⑧本机部分）──
+      ✅ 小九交付的 `scripts/ai_entry_bootstrap.py` 已在阿狸咪机跑通（先 `git cat-file blob origin/main:…` 逐字节落盘再执行；**未跑字面 `git pull`**：本地 main 与远端分叉 106/9 ＋ 工作树 WIP，硬禁区不许碰）：
+        · 用户级两份 `~/.codebuddy/CODEBUDDY.md` ＋ `~/.workbuddy/CODEBUDDY.md` ← **682 B 路径无关指针**（20:4x 轮特意没落的「内容层」，本批按小九定稿口径落位），幂等复跑输出全「＝ 已一致」；
+        · `AGENTS.md` 由旧版 6,858 B（blob `07041df1be`）刷新至定稿版 **8,051 B**（md5 `b02eb0e1…` 与线上 blob 一致）；`.codebuddy/CODEBUDDY.md` 864 B 早已一致。
+      ⚠️ 本会话启动早于落盘 ⇒ 「会话启动即自动注入」本会话无法自证，**维持 `pending-verify`**：
+      待阿狸咪机下一个新会话以入口问答判定（「AGENTS.md 第一条让你做什么？」→ 应答：先读 `docs/ops/HANDOFF.yaml` 唯一状态源、防重复劳动）；
+      若新会话仍无注入，则「用户级兜底＋工作树」两层俱证否，需换通道。
+      📎 旁证（不属本项、提请小九复核）：`HANDOFF.ledger.json` 另有 5 项哈希陈旧（handoff-meta-future-timestamp / cnfetch-empty-shell-block / maharo-plan-b-three-editions / north-fund-dead-source-fix / stock-name-code-fallback，22:02 刷新后仍 30/36 自洽；本项旧值已溯源至 3817f22c6=20:39 版，规则=整块rstrip+updated归一化+含尾注释）。本批只刷本项，其余不擅改。
+    updated: "2026-09-21 22:23"
   - id: maharo-plan-b-three-editions
     priority: P2
     owner: 小九
