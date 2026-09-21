@@ -780,3 +780,58 @@ items:
       ⇒ 不构成「文档说谎」；且改前端会扩大午休窗口的推送面（禁踩踏）。
     verify_how: "与卡面文案一并做前端口径整理时同批修；改时须走分节守卫 + `?v` 竞态防护。"
     updated: "2026-09-21 12:37"
+  - id: all-generic-redline-false-positive
+    priority: P1
+    owner: shared
+    status: todo
+    what: >-
+      **HEALTH_CHECK 的两个 `all_*` fail 属「通用 24h 红线打到结构性低频产物」的假红灯**
+      （阿狸咪 2026-09-21 16:2x CST 实测定位；与 `baihechou-analysis-no-producer` 同族，
+      但后者是「无生产者」，本项是「有生产者、但节拍长于 24h / 已退役」）。实测（线上
+      `data/HEALTH_CHECK.js` blob `8fea4bc2698b`，update_time 15:49:24）：
+      summary = `{ok:118, warn:1, fail:2, limited:2, info:0, total:123}`，两条 fail 为：
+        · `all_ALGO_BACKTEST_COMPARE`：`ALGO_BACKTEST_COMPARE.js` 更新于 3 天前 16:25，
+          超通用红线 4219 分钟。**实测该产物 `update_time=2026-09-18 16:25:31`
+          （blob `6ff77503e8fd` / 1,505 B），且 `index.html` 与 `logic.html` 里
+          `<script src>` 引用数均为 0** ⇒ 全链已退役（`gen_backtest_all_algos.py` L105+
+          与 `cloud_weekly_cleanup.yml` L79/83 均已登记退役），但**文件仍在 `data/` 目录里**，
+          被 `check_all_data_files()` 动态扫描捞出来按 24h 红线判 fail ⇒ **孤儿产物假红灯**。
+        · `all_STOCK_LIST`：`STOCK_LIST.js` 更新于 3 天前 15:00，超通用红线 4219 分钟。
+          **实测其 `update_time` 取自上游 `raw_data/stock_names.json` 的 mtime**
+          （`update_v8.py::_write_js → _pick_ts`，顶层 list 分支包成
+          `{data:[...], update_time:源mtime, republish_time:now}`）；上游 `stock_names.json`
+          现 `update_time=2026-09-18 15:00`，而**其生产者 `algorithms/refresh_stock_metadata.py`
+          只挂在算法链的「周末批次」**（`run_algorithms.py` L219-221 weekend stage；
+          `v8_weekend_light.py` L98）⇒ **周一必 >48h**，落进 24h 通用红线 ⇒ 结构性假红灯。
+          注：`data/STOCK_LIST.js` 的 `republish_time=2026-09-20 16:54:24` 每轮构建都刷，
+          但 `update_time` 才是判龄依据（本仓既有铁律：`republish_time` 仅供排障/缓存戳，
+          前端与守卫都不得当数据时间）⇒ **不是白名单漂移、是真·节拍长于红线**。
+    fix: >-
+      两条分别处置，**勿合并**：
+      （A）退役孤儿：`data/ALGO_BACKTEST_COMPARE.js` 已全链退役且两页 0 引用 ⇒
+        按既有退役流程删除该文件（或加进 `check_all_data_files` 的退役跳过集，
+        与 `_OCR_DEPENDENCY_FILES` 同型）。**删除前须确认 `api_push_raw.py` 与
+        `cloud_weekly_cleanup.yml` 的删除感知并集不再把它带回**（该文件曾被周清理误删又复现，
+        见 `cloud_weekly_cleanup.yml` L79-83 的记录）。
+      （B）低频产物：`STOCK_LIST` 的判龄口径应改为**按其生产者节拍**（周度），
+        即登记进 `CARD_DEFS` 或加 `max_age` 特判（现 `guard_v8_freshness.py` L236
+        已有 `"STOCK_LIST": 24*30` 的 30 天口径 —— **两个守卫口径不一致本身就是 bug**：
+        新鲜度守卫给 30 天、健康检查给 24h ⇒ 一个绿一个红）。**统一到低频口径**，
+        或明确「全量 data 扫描跳过周度产物」。
+    evidence: >-
+      线上 `data/HEALTH_CHECK.js` blob `8fea4bc2698b`（15:49:24）summary + items 实测；
+      `data/ALGO_BACKTEST_COMPARE.js` blob `6ff77503e8fd` / 1,505 B / update_time 09-18 16:25:31；
+      `data/STOCK_LIST.js` blob `2124ec23363f` / 2,087,395 B / update_time 09-18 15:00:00
+      / republish_time 09-20 16:54:24；`raw_data/stock_names.json` blob `6ef7fe9c6068`
+      / update_time 09-18 15:00（提交历史 5 笔，最近一笔 09-20 16:50）；
+      `index.html` / `logic.html` 对 ALGO_BACKTEST_COMPARE 的 `<script src>` 引用 = 0/0。
+    verify_how: >-
+      ① 修后取线上 `HEALTH_CHECK.js`，断言 summary.fail 中**不再含** `all_ALGO_BACKTEST_COMPARE`
+      与 `all_STOCK_LIST`；② 断言两页 `data/` 已无 ALGO_BACKTEST_COMPARE 引用（0 处）；
+      ③ `guard_v8_freshness.py` 与 `v8_health_check.py` 对 STOCK_LIST 的口径**一致**
+      （现一为 30 天、一为 24h）—— 逐步比对两文件的该常量值，**禁只看其一**。
+      ⚠️ 禁用「单次看到 fail 消失」当生效证据：本项两条各有独立路径，须分别断言。
+    note: >-
+      阿狸咪本轮**未改任何代码**（本轮任务明令「只 detect + dispatch，不跑数据」），
+      只做实测取证与挂账。两条均**非数据事故**（无线上产物损坏），属守卫口径问题。
+    updated: "2026-09-21 16:22"
