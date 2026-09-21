@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-21 20:53",
- "generated": "2026-09-21 20:53",
+ "update_time": "2026-09-21 21:10",
+ "generated": "2026-09-21 21:10",
  "meta": {
-  "generated": "2026-09-21 20:53",
+  "generated": "2026-09-21 21:10",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 12,
   "days_with_consensus": 0,
@@ -3983,6 +3983,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "688205",
+      "name": "德科立光电子",
+      "change_pct": 10.584,
+      "price": 243.12,
+      "category": "突破"
+     },
+     {
       "code": "301046",
       "name": "能辉科技",
       "change_pct": 6.438,
@@ -4025,10 +4032,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "688678",
+      "name": "福立旺精密",
+      "change_pct": 13.169,
+      "price": 27.93,
+      "category": "突破"
+     },
+     {
       "code": "002514",
       "name": "*ST宝馨",
       "change_pct": 4.264,
       "price": 2.69,
+      "category": "突破"
+     },
+     {
+      "code": "300369",
+      "name": "绿盟科技",
+      "change_pct": 13.685,
+      "price": 9.47,
       "category": "突破"
      },
      {
@@ -4074,6 +4095,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "688112",
+      "name": "鼎阳科技",
+      "change_pct": 20.003,
+      "price": 91.79,
+      "category": "突破"
+     },
+     {
+      "code": "002080",
+      "name": "中材科技",
+      "change_pct": 9.997,
+      "price": 66.24,
+      "category": "突破"
+     },
+     {
       "code": "301086",
       "name": "鸿富瀚",
       "change_pct": 6.158,
@@ -4085,6 +4120,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "春晖智控",
       "change_pct": 4.413,
       "price": 35.49,
+      "category": "突破"
+     },
+     {
+      "code": "600601",
+      "name": "方正科技",
+      "change_pct": 5.172,
+      "price": 15.25,
+      "category": "突破"
+     },
+     {
+      "code": "688035",
+      "name": "德邦科技股份",
+      "change_pct": 8.804,
+      "price": 85.4,
       "category": "突破"
      },
      {
@@ -4113,13 +4162,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "宁波中百",
       "change_pct": 10.009,
       "price": 23.41,
-      "category": "突破"
-     },
-     {
-      "code": "688678",
-      "name": "福立旺精密",
-      "change_pct": 13.169,
-      "price": 27.93,
       "category": "突破"
      },
      {
@@ -4158,6 +4200,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "001389",
+      "name": "广合科技",
+      "change_pct": 9.998,
+      "price": 185.93,
+      "category": "突破"
+     },
+     {
       "code": "600318",
       "name": "新力金融",
       "change_pct": 3.924,
@@ -4172,10 +4221,31 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "688048",
+      "name": "长光华芯",
+      "change_pct": 5.915,
+      "price": 362.23,
+      "category": "突破"
+     },
+     {
+      "code": "300835",
+      "name": "龙磁科技",
+      "change_pct": 3.027,
+      "price": 192.66,
+      "category": "突破"
+     },
+     {
       "code": "000020",
       "name": "深华发Ａ",
       "change_pct": 10.031,
       "price": 14.26,
+      "category": "突破"
+     },
+     {
+      "code": "603268",
+      "name": "松发股份",
+      "change_pct": 6.514,
+      "price": 221.55,
       "category": "突破"
      },
      {
@@ -4207,10 +4277,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "688662",
+      "name": "广东富信科技",
+      "change_pct": 12.513,
+      "price": 107.9,
+      "category": "突破"
+     },
+     {
       "code": "603321",
       "name": "梅轮电梯",
       "change_pct": 5.571,
       "price": 7.58,
+      "category": "突破"
+     },
+     {
+      "code": "000002",
+      "name": "万 科Ａ",
+      "change_pct": 9.94,
+      "price": 3.65,
       "category": "突破"
      },
      {
@@ -4291,59 +4375,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "688139",
-      "name": "海尔生物",
-      "change_pct": 8.865,
-      "price": 34.14,
-      "category": "突破"
-     },
-     {
-      "code": "002343",
-      "name": "慈文传媒",
-      "change_pct": 3.243,
-      "price": 5.73,
-      "category": "突破"
-     },
-     {
-      "code": "000679",
-      "name": "大连友谊",
-      "change_pct": 3.266,
-      "price": 6.64,
-      "category": "突破"
-     },
-     {
-      "code": "002652",
-      "name": "扬子新材",
-      "change_pct": 3.456,
-      "price": 4.79,
-      "category": "突破"
-     },
-     {
-      "code": "002367",
-      "name": "康力电梯",
-      "change_pct": 9.982,
-      "price": 6.28,
-      "category": "突破"
-     },
-     {
-      "code": "300835",
-      "name": "龙磁科技",
-      "change_pct": 3.027,
-      "price": 192.66,
-      "category": "突破"
-     },
-     {
-      "code": "002264",
-      "name": "新 华 都",
-      "change_pct": 4.218,
-      "price": 7.66,
-      "category": "突破"
-     },
-     {
-      "code": "301337",
-      "name": "亚华电子",
-      "change_pct": 8.888,
-      "price": 28.3,
+      "code": "688123",
+      "name": "聚辰半导体",
+      "change_pct": 6.849,
+      "price": 156.0,
       "category": "突破"
      }
     ],
@@ -4367,6 +4402,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "新赛股份",
       "change_pct": 3.102,
       "price": 5.65,
+      "category": "加速"
+     },
+     {
+      "code": "688205",
+      "name": "德科立光电子",
+      "change_pct": 10.584,
+      "price": 243.12,
       "category": "加速"
      },
      {
@@ -4412,10 +4454,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
+      "code": "688678",
+      "name": "福立旺精密",
+      "change_pct": 13.169,
+      "price": 27.93,
+      "category": "加速"
+     },
+     {
       "code": "002514",
       "name": "*ST宝馨",
       "change_pct": 4.264,
       "price": 2.69,
+      "category": "加速"
+     },
+     {
+      "code": "300369",
+      "name": "绿盟科技",
+      "change_pct": 13.685,
+      "price": 9.47,
       "category": "加速"
      },
      {
@@ -4461,6 +4517,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
+      "code": "688112",
+      "name": "鼎阳科技",
+      "change_pct": 20.003,
+      "price": 91.79,
+      "category": "加速"
+     },
+     {
+      "code": "002080",
+      "name": "中材科技",
+      "change_pct": 9.997,
+      "price": 66.24,
+      "category": "加速"
+     },
+     {
       "code": "301086",
       "name": "鸿富瀚",
       "change_pct": 6.158,
@@ -4472,6 +4542,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "春晖智控",
       "change_pct": 4.413,
       "price": 35.49,
+      "category": "加速"
+     },
+     {
+      "code": "600601",
+      "name": "方正科技",
+      "change_pct": 5.172,
+      "price": 15.25,
+      "category": "加速"
+     },
+     {
+      "code": "688035",
+      "name": "德邦科技股份",
+      "change_pct": 8.804,
+      "price": 85.4,
       "category": "加速"
      },
      {
@@ -4500,13 +4584,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "宁波中百",
       "change_pct": 10.009,
       "price": 23.41,
-      "category": "加速"
-     },
-     {
-      "code": "688678",
-      "name": "福立旺精密",
-      "change_pct": 13.169,
-      "price": 27.93,
       "category": "加速"
      },
      {
@@ -4561,6 +4638,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688205",
+      "name": "德科立光电子",
+      "change_pct": 10.584,
+      "price": 243.12,
+      "category": "短线选股"
+     },
+     {
       "code": "301046",
       "name": "能辉科技",
       "change_pct": 6.438,
@@ -4603,10 +4687,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688678",
+      "name": "福立旺精密",
+      "change_pct": 13.169,
+      "price": 27.93,
+      "category": "短线选股"
+     },
+     {
       "code": "002514",
       "name": "*ST宝馨",
       "change_pct": 4.264,
       "price": 2.69,
+      "category": "短线选股"
+     },
+     {
+      "code": "300369",
+      "name": "绿盟科技",
+      "change_pct": 13.685,
+      "price": 9.47,
       "category": "短线选股"
      },
      {
@@ -4652,6 +4750,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688112",
+      "name": "鼎阳科技",
+      "change_pct": 20.003,
+      "price": 91.79,
+      "category": "短线选股"
+     },
+     {
+      "code": "002080",
+      "name": "中材科技",
+      "change_pct": 9.997,
+      "price": 66.24,
+      "category": "短线选股"
+     },
+     {
       "code": "301086",
       "name": "鸿富瀚",
       "change_pct": 6.158,
@@ -4663,6 +4775,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "春晖智控",
       "change_pct": 4.413,
       "price": 35.49,
+      "category": "短线选股"
+     },
+     {
+      "code": "600601",
+      "name": "方正科技",
+      "change_pct": 5.172,
+      "price": 15.25,
+      "category": "短线选股"
+     },
+     {
+      "code": "688035",
+      "name": "德邦科技股份",
+      "change_pct": 8.804,
+      "price": 85.4,
       "category": "短线选股"
      },
      {
@@ -4691,13 +4817,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "宁波中百",
       "change_pct": 10.009,
       "price": 23.41,
-      "category": "短线选股"
-     },
-     {
-      "code": "688678",
-      "name": "福立旺精密",
-      "change_pct": 13.169,
-      "price": 27.93,
       "category": "短线选股"
      },
      {
@@ -4736,6 +4855,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "001389",
+      "name": "广合科技",
+      "change_pct": 9.998,
+      "price": 185.93,
+      "category": "短线选股"
+     },
+     {
       "code": "600318",
       "name": "新力金融",
       "change_pct": 3.924,
@@ -4750,10 +4876,31 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688048",
+      "name": "长光华芯",
+      "change_pct": 5.915,
+      "price": 362.23,
+      "category": "短线选股"
+     },
+     {
+      "code": "300835",
+      "name": "龙磁科技",
+      "change_pct": 3.027,
+      "price": 192.66,
+      "category": "短线选股"
+     },
+     {
       "code": "000020",
       "name": "深华发Ａ",
       "change_pct": 10.031,
       "price": 14.26,
+      "category": "短线选股"
+     },
+     {
+      "code": "603268",
+      "name": "松发股份",
+      "change_pct": 6.514,
+      "price": 221.55,
       "category": "短线选股"
      },
      {
@@ -4785,10 +4932,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688662",
+      "name": "广东富信科技",
+      "change_pct": 12.513,
+      "price": 107.9,
+      "category": "短线选股"
+     },
+     {
       "code": "603321",
       "name": "梅轮电梯",
       "change_pct": 5.571,
       "price": 7.58,
+      "category": "短线选股"
+     },
+     {
+      "code": "000002",
+      "name": "万 科Ａ",
+      "change_pct": 9.94,
+      "price": 3.65,
       "category": "短线选股"
      },
      {
@@ -4869,59 +5030,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "688139",
-      "name": "海尔生物",
-      "change_pct": 8.865,
-      "price": 34.14,
-      "category": "短线选股"
-     },
-     {
-      "code": "002343",
-      "name": "慈文传媒",
-      "change_pct": 3.243,
-      "price": 5.73,
-      "category": "短线选股"
-     },
-     {
-      "code": "000679",
-      "name": "大连友谊",
-      "change_pct": 3.266,
-      "price": 6.64,
-      "category": "短线选股"
-     },
-     {
-      "code": "002652",
-      "name": "扬子新材",
-      "change_pct": 3.456,
-      "price": 4.79,
-      "category": "短线选股"
-     },
-     {
-      "code": "002367",
-      "name": "康力电梯",
-      "change_pct": 9.982,
-      "price": 6.28,
-      "category": "短线选股"
-     },
-     {
-      "code": "300835",
-      "name": "龙磁科技",
-      "change_pct": 3.027,
-      "price": 192.66,
-      "category": "短线选股"
-     },
-     {
-      "code": "002264",
-      "name": "新 华 都",
-      "change_pct": 4.218,
-      "price": 7.66,
-      "category": "短线选股"
-     },
-     {
-      "code": "301337",
-      "name": "亚华电子",
-      "change_pct": 8.888,
-      "price": 28.3,
+      "code": "688123",
+      "name": "聚辰半导体",
+      "change_pct": 6.849,
+      "price": 156.0,
       "category": "短线选股"
      }
     ],
@@ -4934,6 +5046,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "001389",
+      "name": "广合科技",
+      "change_pct": 9.998,
+      "price": 185.93,
+      "category": "强势股"
+     },
+     {
       "code": "600318",
       "name": "新力金融",
       "change_pct": 3.924,
@@ -4948,10 +5067,31 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "688048",
+      "name": "长光华芯",
+      "change_pct": 5.915,
+      "price": 362.23,
+      "category": "强势股"
+     },
+     {
+      "code": "300835",
+      "name": "龙磁科技",
+      "change_pct": 3.027,
+      "price": 192.66,
+      "category": "强势股"
+     },
+     {
       "code": "000020",
       "name": "深华发Ａ",
       "change_pct": 10.031,
       "price": 14.26,
+      "category": "强势股"
+     },
+     {
+      "code": "603268",
+      "name": "松发股份",
+      "change_pct": 6.514,
+      "price": 221.55,
       "category": "强势股"
      },
      {
@@ -4983,10 +5123,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "688662",
+      "name": "广东富信科技",
+      "change_pct": 12.513,
+      "price": 107.9,
+      "category": "强势股"
+     },
+     {
       "code": "603321",
       "name": "梅轮电梯",
       "change_pct": 5.571,
       "price": 7.58,
+      "category": "强势股"
+     },
+     {
+      "code": "000002",
+      "name": "万 科Ａ",
+      "change_pct": 9.94,
+      "price": 3.65,
       "category": "强势股"
      },
      {
@@ -5067,59 +5221,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "688139",
-      "name": "海尔生物",
-      "change_pct": 8.865,
-      "price": 34.14,
-      "category": "强势股"
-     },
-     {
-      "code": "002343",
-      "name": "慈文传媒",
-      "change_pct": 3.243,
-      "price": 5.73,
-      "category": "强势股"
-     },
-     {
-      "code": "000679",
-      "name": "大连友谊",
-      "change_pct": 3.266,
-      "price": 6.64,
-      "category": "强势股"
-     },
-     {
-      "code": "002652",
-      "name": "扬子新材",
-      "change_pct": 3.456,
-      "price": 4.79,
-      "category": "强势股"
-     },
-     {
-      "code": "002367",
-      "name": "康力电梯",
-      "change_pct": 9.982,
-      "price": 6.28,
-      "category": "强势股"
-     },
-     {
-      "code": "300835",
-      "name": "龙磁科技",
-      "change_pct": 3.027,
-      "price": 192.66,
-      "category": "强势股"
-     },
-     {
-      "code": "002264",
-      "name": "新 华 都",
-      "change_pct": 4.218,
-      "price": 7.66,
-      "category": "强势股"
-     },
-     {
-      "code": "301337",
-      "name": "亚华电子",
-      "change_pct": 8.888,
-      "price": 28.3,
+      "code": "688123",
+      "name": "聚辰半导体",
+      "change_pct": 6.849,
+      "price": 156.0,
       "category": "强势股"
      }
     ]
