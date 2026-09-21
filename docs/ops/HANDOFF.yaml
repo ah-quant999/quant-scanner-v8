@@ -26,8 +26,8 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 08:40"
-  updated_by: "小九(lemoncat-cn)"
+  updated: "2026-09-21 09:35"
+  updated_by: "小九(lemoncat-cn) + 阿狸咪(alimi-cn)"
   next_id_seq: 12
 
 items:
@@ -93,6 +93,12 @@ items:
       v8_rollback_guard 收敛为 restore_from_origin()、
       run_algorithms 双分支同改、4 处裸提交补 pathspec
     evidence: "commit 6c241f041 (2026-09-21 08:2x CST)，线上 8/8 blob 一致"
+    residual: >
+      阿狸咪机 2026-09-21 09:20 实测发现**第 9 处同族**：`v8_ws_sync_guard.py` L183 / L266 的
+      `git -C <repo> checkout <ref> -- <paths>` 同样**写主 index 且不 unstage**，
+      而 `algorithms/run_algorithms.py::main()` **每次跑批无条件**调它（`--heal`）⇒
+      staged 项会持续再生。当前**无引爆点**（algo 链推送走 `api_push_raw.py` 的 Contents API，
+      不经 git commit），属结构性残留。修法同前例：checkout 后补 `git reset -q HEAD -- <paths>`。
     verify_how: >
       ① 本机 `echo "staged=$(git diff --cached --name-only|wc -l)"` 应恒为 0
       ② `git reflog -8` 不应再出现新的 `reset: moving to origin/main`
@@ -103,7 +109,7 @@ items:
   - id: alimi-same-family-check
     priority: P0
     owner: 阿狸咪
-    status: todo
+    status: done
     what: >
       请阿狸咪机跑同族风险排查：其机若有同名脚本的本地副本（非从 main 拉取），
       可能仍是旧写法。若其机 staged 非 0，按 v8-git-stale-index-landmine §四 拆弹。
@@ -113,7 +119,25 @@ items:
       grep -rn 'checkout", "HEAD", "--", f"raw_data' --include=*.py . | grep -v __pycache__
       grep -rnE '"commit", "-m"' --include=*.py . | grep -v __pycache__ | grep -v script_sync_backup
       echo "staged=$(git diff --cached --name-only | wc -l)"
-    updated: "2026-09-21 08:40"
+    result: |
+      阿狸咪机 2026-09-21 09:1x 执行（仓库根 E:\workspace\stock-scanner；HEAD=2bd1b0dac == 远端 tip）。
+      ① 4 个命中文件（v8_health_check / v8_rollback_guard / run_algorithms 双分支）**与远端 blob 逐字节一致**
+         ⇒ 本机副本无旧写法；两个命中处均已带「checkout 后立刻 reset -q HEAD -- <path>」加固（逐行核过）。
+      ② 裸提交 7 处逐处定性：3 处**已补 pathspec**（run_dividend_refresh / v8_closing_data_refresh /
+         self_heal_monitor）；1 处本就带 `-- *rels`（strategy_four_volume_60m）；2 处在
+         `tempfile.mkdtemp()` 克隆出的**隔离临时仓**内（deploy_v8 / guard_v8，不碰本机主 index）；
+         余 1 处 = v8/factor_lab_gen.py L735 无 pathspec，但其前有 `reset --hard FETCH_HEAD` 清空 index
+         ⇒ 不属同族引爆链。
+      ③ 本机 `staged=2`（协议要求 0）⇒ 已按 §四 拆弹：index 备份到仓库外 → `git reset -q HEAD`
+         ⇒ **staged=0**。内容零损失（.gitattributes 工作树 blob 519093cb 未变；code_audit.log 仍在盘）。
+         ⚠️ 如实登记：这两个 staged 项**并非** 08:2x 所述「checkout 空转项」形态，而是**阿狸咪自己
+         09-21 早间的在途 WIP**（.gitattributes 残留 CRLF 收口；`git rm --cached raw_data/code_audit.log`
+         解除跟踪，见 .github/scripts/pre_deploy_audit.py 本机比远端多 8 行的注释）。拆弹只打散了
+         「意图状态」、未丢内容；需按原意图用**带 pathspec** 的提交重做（尚未做，待定）。
+      ④ 复扫面 .yml/.sh/.ps1：无同族命中。CI workflow 内的裸 `git commit` 跑在每次全新 checkout 的
+         runner 上（无长期 index）⇒ **结构性不属同族**，不列为缺陷。
+    verified_at: "2026-09-21 09:35 CST（阿狸咪机实测）"
+    updated: "2026-09-21 09:35"
 
   # ── P1 · 已知隐患 ─────────────────────────────────────────────────────
   - id: local-worktree-behind
