@@ -1,1 +1,1 @@
-window.HB_ALIMI = {"last_time":"2026-09-21 10:11:45","status":"ok","machine":"alimi-cn","source":"alimi_heartbeat","update_time":"2026-09-21 11:59:49","republish_time":"2026-09-21 12:00:30"};
+window.HB_ALIMI = {"last_time":"2026-09-21 10:11:45","status":"ok","machine":"alimi-cn","source":"alimi_heartbeat","update_time":"2026-09-21 12:02:24","republish_time":"2026-09-21 12:02:57"};
