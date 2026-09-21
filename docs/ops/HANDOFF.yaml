@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 12:02"
+  updated: "2026-09-21 12:31"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -293,7 +293,12 @@ items:
       ① 反测：删一个 item 跑门禁 ⇒ 应 FAIL 并点名消失的 id；恢复后应 PASS。
       ② 回滚反测：把 HANDOFF.yaml 换成旧版本（next_id_seq 变小）⇒ 应 FAIL。
       ③ 正测：当前树跑 pre_deploy_audit ⇒ 应 13/13 全绿。
-    status: pending-verify
+    status: done
+    evidence: >
+      ① 离线三项全过：正测 13/13 全绿 / 反测①（删 1 个 item）❌ 点名 strong-breakout-purge / 反测②（改未来时戳）❌ 点名 handoff-protocol(updated=2026-09-21 13:45) / 还原后复绿。
+      ② CI 实测（2026-09-21 12:2x（CI 实测：run 35560783525 / head_sha 5dca236a8e9a = **success**；`🛡️ Pre-deploy audit` = success 且下游 `📤 部署到 main` **未被 skipped** ⇒ 13/13 在 CI 里真跑过并通过））。
+      ③ 补丁：pre_deploy_audit.py 62896 → 68833 B，AST checks 12→13 项。
+    verified_at: "2026-09-21 12:34"
     updated: "2026-09-21 12:02"
 
   - id: handoff-skill-inrepo
@@ -317,6 +322,8 @@ items:
       ① 仓内路径 `docs/ops/skills/v8-handoff-gateway/SKILL.md` 存在且 frontmatter 可解析；
       ② 阿狸咪机按 `cp` 落盘后，本地 skill 的 sha256 与仓内一致（证明拿到的是同一版）；
       ③ 自足性：临时移走本地副本，仅按仓内文件 `cp` 能恢复出一份可用 skill。
+      ④ 小九机已完成：cp 后本地 sha256 == 仓内 sha256（40e49fc95a19a718）⇒ ②在小九机侧已验；
+         阿狸咪机侧待你 cp（故本项仍留 pending-verify，不代你宣称）。
     status: pending-verify
     updated: "2026-09-21 12:02"
 
@@ -364,7 +371,9 @@ items:
     verify_how: >
       ① 正测：当前树跑 `pre_deploy_audit.py` ⇒ `[13/13]` 应 PASS（无未来时戳）；
       ② 反测：把任一 item 的 `updated` 改成当前北京时间 +30min ⇒ 应 FAIL 并点名该项。
-    status: pending-verify
+    status: done
+    evidence: "离线反测②已实测 FAIL 并点名（updated=2026-09-21 13:45）；判据已随 [13/13] 进入 CI 并 success。"
+    verified_at: "2026-09-21 12:34"
     updated: "2026-09-21 12:02"
 
   - id: factorlab-commit-pathspec
