@@ -2715,6 +2715,12 @@ def check_site_dom(site_html=None):
     # 🛡 2026-09-11 移除 phMacroBody（opTab4 已删，HTML 中无此元素，DOM 检查永久 fail 假阳性）
     critical_ids = ["taskScheduleBody", "ttBackBody", "ttThrBody", "ttSvlBody", "ttTrackBody",
                     "stcrdsAdvBody", "stcrdsEliteBody", "runnerTrackBody", "healthCheckBody"]
+    # 🛡 2026-09-22 主人令「审计实打实」升级：下列容器由 JS 从 data/*.js 动态渲染，静态 HTML 内是空壳/
+    #   “加载中…”占位符属设计行为（2026-08-08 重构说明已载明），每日 audit 据此报 8 条**永久 warn 噪声**，
+    #   把 LHB/FOUR_VOLUME 等真问题稀释。修正：这些 id 仅做“存在性”检查（缺失=fail）；占位符态一律记 ok
+    #   （数据新鲜度由 check_data_cards 独立查），不再占用 warn 位 ⇒ 每日审计只暴露真实异常。
+    JS_RENDERED_OK = {"taskScheduleBody", "ttBackBody", "ttThrBody", "ttSvlBody", "ttTrackBody",
+                      "stcrdsAdvBody", "stcrdsEliteBody", "runnerTrackBody", "healthCheckBody"}
     results = []
     for cid in critical_ids:
         m = re.search(rf'id=["\']{re.escape(cid)}["\'][^>]*>(.*?)</[^>]+>', site_html, re.S)
@@ -2723,8 +2729,12 @@ def check_site_dom(site_html=None):
             continue
         content = m.group(1).strip()
         placeholder = content == "" or "加载中" in content or content == "--" or len(content) < 20
-        status = "warn" if placeholder else "ok"
-        msg = "静态占位符(JS渲染)" if placeholder else f"静态内容长度 {len(content)}"
+        if placeholder and cid in JS_RENDERED_OK:
+            status = "ok"
+            msg = "JS渲染占位（设计行为，数据层已独立校验）"
+        else:
+            status = "warn" if placeholder else "ok"
+            msg = "静态占位符(JS渲染)" if placeholder else f"静态内容长度 {len(content)}"
         results.append({"id": f"dom_{cid}", "name": f"DOM #{cid}", "page": "管线", "status": status, "message": msg})
     return results
 
