@@ -35,7 +35,7 @@ window.FOUR_VOLUME_60M={
   },
   {
    "code": "000002",
-   "name": "万科A",
+   "name": "000002",
    "market": "sz",
    "board_label": "主板",
    "close": 3.38,
@@ -556,4 +556,4 @@ window.FOUR_VOLUME_60M={
    "period": "60m"
   }
  ]
-}
+};
