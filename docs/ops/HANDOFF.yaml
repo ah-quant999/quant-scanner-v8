@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 11:40"
+  updated: "2026-09-21 11:45"
   updated_by: "小九(lemoncat-cn) + 阿狸咪(alimi-cn)"
   next_id_seq: 20
 
@@ -120,12 +120,15 @@ items:
     verify_how: >
       追加后等下一个 build **真跑** ⇒ `[10/10]` 报 ✅ 且 `build` job 不再 failure
       （判据：看 build job，**禁看 run 结论**；盘中 build=skipped 属设计）。
-      ⚠️ 现状：09:26 之后尚**无**「真跑 build」的档位（09:26:08 / 09:34:10 两档 build=skipped）
-      ⇒ 断阻已解除一事**尚未取得 CI 侧终验**，仅有离线复现证据。
+      ✅ **CI 侧终验已取得（阿狸咪 2026-09-21 11:45 CST 实测）**：11:35:27（workflow_run）与
+      11:36:27（push）两档 **`build` job 真跑 = success**（gate=success / build=success /
+      intraday=skipped；11:35 已出盘中窗故 build 真跑），即 `[10/10] Pre-deploy audit` 在 CI 上通过
+      ⇒ **断阻解除已被 run 验证**（不再只是离线复现）。
+      ⚠️ 本项**剩余待办唯一** = `ms-note-card` 尚未登记为第 35 条锚 ⇒ 该卡**保护缺失**，见 fix。
     fallback: >
       若 17:45 收盘前仍未追加，阿狸咪将在夜间窗口（18:00 后）按自身上线流程追加 `ms-note-card`
       为第 35 条（单文件 Contents API 直推，清单与 commit message 同步）。
-    updated: "2026-09-21 09:58"
+    updated: "2026-09-21 11:45"
 
   # ── P0 · 数据回滚防线 ──────────────────────────────────────────────────
   - id: stale-index-landmine
