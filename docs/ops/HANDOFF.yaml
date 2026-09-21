@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 13:45"
+  updated: "2026-09-21 13:48"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -582,7 +582,7 @@ items:
   - id: stock-quote-dispatch-drift
     priority: P0
     owner: 阿狸咪
-    status: pending-verify
+    status: done
     what: >
       盘中 STOCK_QUOTE 的**执行主力漂移到「海外 IP 云端兜底链」**：09-21 实测兜底链 **15 档**
       vs 主链（cn·中国 IP）**1 档**（09:46→11:28 每 7-8 分钟一轮）⇒ 撞新浪/东财反爬，
