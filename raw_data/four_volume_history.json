@@ -167,13 +167,13 @@
     "300657": {
       "enter_date": "2026-09-14",
       "enter_close": 37.07,
-      "last_date": "2026-09-14",
-      "last_close": 37.07,
-      "status": "dropped",
+      "last_date": "2026-09-21",
+      "last_close": 38.49,
+      "status": "active",
       "name": "弘信电子",
       "market": "sz",
       "streak": 1,
-      "total_days": 1,
+      "total_days": 2,
       "dropped_at": "2026-09-15"
     },
     "300568": {
@@ -469,273 +469,419 @@
       "enter_close": 81.37,
       "last_date": "2026-09-18",
       "last_close": 81.37,
-      "status": "active",
+      "status": "dropped",
       "name": "东微半导体",
       "market": "sh",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "688343": {
       "enter_date": "2026-09-18",
       "enter_close": 65.6,
       "last_date": "2026-09-18",
       "last_close": 65.6,
-      "status": "active",
+      "status": "dropped",
       "name": "云天励飞股份",
       "market": "sh",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "688200": {
       "enter_date": "2026-09-18",
       "enter_close": 407.93,
       "last_date": "2026-09-18",
       "last_close": 407.93,
-      "status": "active",
+      "status": "dropped",
       "name": "华峰测控",
       "market": "sh",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "002185": {
       "enter_date": "2026-09-18",
       "enter_close": 18.03,
       "last_date": "2026-09-18",
       "last_close": 18.03,
-      "status": "active",
+      "status": "dropped",
       "name": "华天科技",
       "market": "sz",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "688114": {
       "enter_date": "2026-09-18",
       "enter_close": 71.97,
       "last_date": "2026-09-18",
       "last_close": 71.97,
-      "status": "active",
+      "status": "dropped",
       "name": "华大智造",
       "market": "sh",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "688548": {
       "enter_date": "2026-09-18",
       "enter_close": 32.9,
       "last_date": "2026-09-18",
       "last_close": 32.9,
-      "status": "active",
+      "status": "dropped",
       "name": "广钢气体股份",
       "market": "sh",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "301205": {
       "enter_date": "2026-09-18",
       "enter_close": 323.64,
       "last_date": "2026-09-18",
       "last_close": 323.64,
-      "status": "active",
+      "status": "dropped",
       "name": "联特科技",
       "market": "sz",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "300661": {
       "enter_date": "2026-09-18",
       "enter_close": 125.13,
       "last_date": "2026-09-18",
       "last_close": 125.13,
-      "status": "active",
+      "status": "dropped",
       "name": "圣邦股份",
       "market": "sz",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "688820": {
       "enter_date": "2026-09-18",
       "enter_close": 142.87,
       "last_date": "2026-09-18",
       "last_close": 142.87,
-      "status": "active",
+      "status": "dropped",
       "name": "盛合晶微",
       "market": "sh",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "688385": {
       "enter_date": "2026-09-18",
       "enter_close": 59.59,
       "last_date": "2026-09-18",
       "last_close": 59.59,
-      "status": "active",
+      "status": "dropped",
       "name": "复旦微电",
       "market": "sh",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "688536": {
       "enter_date": "2026-09-18",
       "enter_close": 353.2,
       "last_date": "2026-09-18",
       "last_close": 353.2,
-      "status": "active",
+      "status": "dropped",
       "name": "思瑞浦股份",
       "market": "sh",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "300260": {
       "enter_date": "2026-09-18",
       "enter_close": 64.27,
       "last_date": "2026-09-18",
       "last_close": 64.27,
-      "status": "active",
+      "status": "dropped",
       "name": "新莱应材",
       "market": "sz",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "688388": {
       "enter_date": "2026-09-18",
       "enter_close": 30.88,
       "last_date": "2026-09-18",
       "last_close": 30.88,
-      "status": "active",
+      "status": "dropped",
       "name": "嘉元科技",
       "market": "sh",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "300475": {
       "enter_date": "2026-09-18",
       "enter_close": 174.32,
       "last_date": "2026-09-18",
       "last_close": 174.32,
-      "status": "active",
+      "status": "dropped",
       "name": "香农芯创",
       "market": "sz",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "300570": {
       "enter_date": "2026-09-18",
       "enter_close": 229.35,
       "last_date": "2026-09-18",
       "last_close": 229.35,
-      "status": "active",
+      "status": "dropped",
       "name": "太辰光",
       "market": "sz",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "300666": {
       "enter_date": "2026-09-18",
       "enter_close": 260.44,
       "last_date": "2026-09-18",
       "last_close": 260.44,
-      "status": "active",
+      "status": "dropped",
       "name": "江丰电子",
       "market": "sz",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "000021": {
       "enter_date": "2026-09-18",
       "enter_close": 36.95,
       "last_date": "2026-09-18",
       "last_close": 36.95,
-      "status": "active",
+      "status": "dropped",
       "name": "深科技",
       "market": "sz",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "300308": {
       "enter_date": "2026-09-18",
       "enter_close": 926.43,
       "last_date": "2026-09-18",
       "last_close": 926.43,
-      "status": "active",
+      "status": "dropped",
       "name": "中际旭创",
       "market": "sz",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "688729": {
       "enter_date": "2026-09-18",
       "enter_close": 24.9,
       "last_date": "2026-09-18",
       "last_close": 24.9,
-      "status": "active",
+      "status": "dropped",
       "name": "屹唐半导体股份",
       "market": "sh",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "605358": {
       "enter_date": "2026-09-18",
       "enter_close": 46.5,
       "last_date": "2026-09-18",
       "last_close": 46.5,
-      "status": "active",
+      "status": "dropped",
       "name": "立昂微",
       "market": "sh",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "300394": {
       "enter_date": "2026-09-18",
       "enter_close": 284.66,
       "last_date": "2026-09-18",
       "last_close": 284.66,
-      "status": "active",
+      "status": "dropped",
       "name": "天孚通信",
       "market": "sz",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "600641": {
       "enter_date": "2026-09-18",
       "enter_close": 37.3,
       "last_date": "2026-09-18",
       "last_close": 37.3,
-      "status": "active",
+      "status": "dropped",
       "name": "先导基电",
       "market": "sh",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "002384": {
       "enter_date": "2026-09-18",
       "enter_close": 196.15,
       "last_date": "2026-09-18",
       "last_close": 196.15,
-      "status": "active",
+      "status": "dropped",
       "name": "东山精密",
       "market": "sz",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "300346": {
       "enter_date": "2026-09-18",
       "enter_close": 56.0,
       "last_date": "2026-09-18",
       "last_close": 56.0,
-      "status": "active",
+      "status": "dropped",
       "name": "南大光电",
       "market": "sz",
       "streak": 1,
-      "total_days": 1
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
     },
     "688120": {
       "enter_date": "2026-09-18",
       "enter_close": 263.43,
       "last_date": "2026-09-18",
       "last_close": 263.43,
-      "status": "active",
+      "status": "dropped",
       "name": "华海清科",
       "market": "sh",
+      "streak": 1,
+      "total_days": 1,
+      "dropped_at": "2026-09-21"
+    },
+    "688662": {
+      "enter_date": "2026-09-21",
+      "enter_close": 107.9,
+      "last_date": "2026-09-21",
+      "last_close": 107.9,
+      "status": "active",
+      "name": "广东富信科技",
+      "market": "sh",
+      "streak": 1,
+      "total_days": 1
+    },
+    "300672": {
+      "enter_date": "2026-09-21",
+      "enter_close": 201.0,
+      "last_date": "2026-09-21",
+      "last_close": 201.0,
+      "status": "active",
+      "name": "国科微",
+      "market": "sz",
+      "streak": 1,
+      "total_days": 1
+    },
+    "688123": {
+      "enter_date": "2026-09-21",
+      "enter_close": 156.0,
+      "last_date": "2026-09-21",
+      "last_close": 156.0,
+      "status": "active",
+      "name": "聚辰半导体",
+      "market": "sh",
+      "streak": 1,
+      "total_days": 1
+    },
+    "600048": {
+      "enter_date": "2026-09-21",
+      "enter_close": 5.68,
+      "last_date": "2026-09-21",
+      "last_close": 5.68,
+      "status": "active",
+      "name": "保利发展",
+      "market": "sh",
+      "streak": 1,
+      "total_days": 1
+    },
+    "688048": {
+      "enter_date": "2026-09-21",
+      "enter_close": 362.23,
+      "last_date": "2026-09-21",
+      "last_close": 362.23,
+      "status": "active",
+      "name": "长光华芯",
+      "market": "sh",
+      "streak": 1,
+      "total_days": 1
+    },
+    "000725": {
+      "enter_date": "2026-09-21",
+      "enter_close": 6.07,
+      "last_date": "2026-09-21",
+      "last_close": 6.07,
+      "status": "active",
+      "name": "000725",
+      "market": "sz",
+      "streak": 1,
+      "total_days": 1
+    },
+    "688257": {
+      "enter_date": "2026-09-21",
+      "enter_close": 59.57,
+      "last_date": "2026-09-21",
+      "last_close": 59.57,
+      "status": "active",
+      "name": "新锐股份",
+      "market": "sh",
+      "streak": 1,
+      "total_days": 1
+    },
+    "000100": {
+      "enter_date": "2026-09-21",
+      "enter_close": 5.08,
+      "last_date": "2026-09-21",
+      "last_close": 5.08,
+      "status": "active",
+      "name": "000100",
+      "market": "sz",
+      "streak": 1,
+      "total_days": 1
+    },
+    "601288": {
+      "enter_date": "2026-09-21",
+      "enter_close": 6.91,
+      "last_date": "2026-09-21",
+      "last_close": 6.91,
+      "status": "active",
+      "name": "农业银行",
+      "market": "sh",
+      "streak": 1,
+      "total_days": 1
+    },
+    "603118": {
+      "enter_date": "2026-09-21",
+      "enter_close": 18.65,
+      "last_date": "2026-09-21",
+      "last_close": 18.65,
+      "status": "active",
+      "name": "共进股份",
+      "market": "sh",
+      "streak": 1,
+      "total_days": 1
+    },
+    "300604": {
+      "enter_date": "2026-09-21",
+      "enter_close": 282.53,
+      "last_date": "2026-09-21",
+      "last_close": 282.53,
+      "status": "active",
+      "name": "长川科技",
+      "market": "sz",
       "streak": 1,
       "total_days": 1
     }
@@ -745,212 +891,295 @@
       "2026-09-15": 72.95,
       "2026-09-16": 73.5,
       "2026-09-17": 72.4,
-      "2026-09-18": 73.13
+      "2026-09-18": 73.13,
+      "2026-09-21": 71.96
     },
     "300454": {
       "2026-09-15": 134.99,
       "2026-09-16": 133.58,
       "2026-09-17": 137.47,
-      "2026-09-18": 143.06
+      "2026-09-18": 143.06,
+      "2026-09-21": 143.25
     },
     "300568": {
       "2026-09-15": 15.56,
       "2026-09-16": 15.47,
       "2026-09-17": 15.28,
-      "2026-09-18": 15.9
+      "2026-09-18": 15.9,
+      "2026-09-21": 16.05
     },
     "300657": {
       "2026-09-15": 37.07,
       "2026-09-16": 36.99,
       "2026-09-17": 36.7,
-      "2026-09-18": 37.1
+      "2026-09-18": 37.1,
+      "2026-09-21": 38.49
     },
     "301526": {
       "2026-09-15": 31.8,
       "2026-09-16": 32.05,
       "2026-09-17": 32.16,
-      "2026-09-18": 31.18
+      "2026-09-18": 31.18,
+      "2026-09-21": 31.32
     },
     "600410": {
       "2026-09-15": 15.69,
       "2026-09-16": 15.79,
       "2026-09-17": 16.28,
-      "2026-09-18": 16.52
+      "2026-09-18": 16.52,
+      "2026-09-21": 17.19
     },
     "000981": {
       "2026-09-15": 3.02,
       "2026-09-16": 2.74,
       "2026-09-17": 3.01,
-      "2026-09-18": 3.0
+      "2026-09-18": 3.0,
+      "2026-09-21": 2.95
     },
     "300905": {
       "2026-09-15": 40.55,
       "2026-09-16": 39.9,
       "2026-09-17": 38.58,
-      "2026-09-18": 38.48
+      "2026-09-18": 38.48,
+      "2026-09-21": 38.76
     },
     "688090": {
       "2026-09-15": 77.55,
       "2026-09-16": 79.2,
       "2026-09-17": 78.56,
-      "2026-09-18": 86.61
+      "2026-09-18": 86.61,
+      "2026-09-21": 88.0
     },
     "002396": {
       "2026-09-16": 38.83,
       "2026-09-17": 38.2,
-      "2026-09-18": 38.9
+      "2026-09-18": 38.9,
+      "2026-09-21": 37.74
     },
     "300975": {
       "2026-09-16": 27.1,
       "2026-09-17": 26.25,
-      "2026-09-18": 27.01
+      "2026-09-18": 27.01,
+      "2026-09-21": 27.04
     },
     "600110": {
       "2026-09-16": 12.19,
       "2026-09-17": 11.87,
-      "2026-09-18": 12.28
+      "2026-09-18": 12.28,
+      "2026-09-21": 12.53
     },
     "605589": {
       "2026-09-16": 41.48,
       "2026-09-17": 40.38,
-      "2026-09-18": 41.09
+      "2026-09-18": 41.09,
+      "2026-09-21": 41.0
     },
     "688025": {
       "2026-09-16": 444.35,
       "2026-09-17": 435.0,
-      "2026-09-18": 442.56
+      "2026-09-18": 442.56,
+      "2026-09-21": 447.0
     },
     "688072": {
       "2026-09-16": 679.54,
       "2026-09-17": 694.0,
-      "2026-09-18": 720.06
+      "2026-09-18": 720.06,
+      "2026-09-21": 725.81
     },
     "688498": {
       "2026-09-16": 1750.94,
       "2026-09-17": 1784.66,
-      "2026-09-18": 1835.0
+      "2026-09-18": 1835.0,
+      "2026-09-21": 1838.56
     },
     "300398": {
       "2026-09-17": 37.12,
-      "2026-09-18": 38.35
+      "2026-09-18": 38.35,
+      "2026-09-21": 38.35
     },
     "300671": {
       "2026-09-17": 58.94,
-      "2026-09-18": 60.54
+      "2026-09-18": 60.54,
+      "2026-09-21": 60.12
     },
     "300725": {
       "2026-09-17": 46.31,
-      "2026-09-18": 47.22
+      "2026-09-18": 47.22,
+      "2026-09-21": 50.32
     },
     "600206": {
       "2026-09-17": 50.55,
-      "2026-09-18": 51.6
+      "2026-09-18": 51.6,
+      "2026-09-21": 51.32
     },
     "600487": {
       "2026-09-17": 68.49,
-      "2026-09-18": 69.49
+      "2026-09-18": 69.49,
+      "2026-09-21": 71.75
     },
     "603773": {
       "2026-09-17": 95.0,
-      "2026-09-18": 94.1
+      "2026-09-18": 94.1,
+      "2026-09-21": 95.96
     },
     "688222": {
       "2026-09-17": 37.68,
-      "2026-09-18": 39.97
+      "2026-09-18": 39.97,
+      "2026-09-21": 45.48
     },
     "688361": {
       "2026-09-17": 358.71,
-      "2026-09-18": 386.36
+      "2026-09-18": 386.36,
+      "2026-09-21": 386.99
     },
     "688521": {
       "2026-09-17": 196.1,
-      "2026-09-18": 205.18
+      "2026-09-18": 205.18,
+      "2026-09-21": 207.8
     },
     "000021": {
-      "2026-09-18": 36.95
+      "2026-09-18": 36.95,
+      "2026-09-21": 37.22
     },
     "002185": {
-      "2026-09-18": 18.03
+      "2026-09-18": 18.03,
+      "2026-09-21": 18.55
     },
     "002384": {
-      "2026-09-18": 196.15
+      "2026-09-18": 196.15,
+      "2026-09-21": 195.02
     },
     "300260": {
-      "2026-09-18": 64.27
+      "2026-09-18": 64.27,
+      "2026-09-21": 64.52
     },
     "300308": {
-      "2026-09-18": 926.43
+      "2026-09-18": 926.43,
+      "2026-09-21": 941.0
     },
     "300346": {
-      "2026-09-18": 56.0
+      "2026-09-18": 56.0,
+      "2026-09-21": 55.62
     },
     "300394": {
-      "2026-09-18": 284.66
+      "2026-09-18": 284.66,
+      "2026-09-21": 279.26
     },
     "300475": {
-      "2026-09-18": 174.32
+      "2026-09-18": 174.32,
+      "2026-09-21": 183.2
     },
     "300570": {
-      "2026-09-18": 229.35
+      "2026-09-18": 229.35,
+      "2026-09-21": 223.7
     },
     "300661": {
-      "2026-09-18": 125.13
+      "2026-09-18": 125.13,
+      "2026-09-21": 122.61
     },
     "300666": {
-      "2026-09-18": 260.44
+      "2026-09-18": 260.44,
+      "2026-09-21": 257.06
     },
     "301205": {
-      "2026-09-18": 323.64
+      "2026-09-18": 323.64,
+      "2026-09-21": 321.0
     },
     "600641": {
-      "2026-09-18": 37.3
+      "2026-09-18": 37.3,
+      "2026-09-21": 39.76
     },
     "605358": {
-      "2026-09-18": 46.5
+      "2026-09-18": 46.5,
+      "2026-09-21": 46.31
     },
     "688114": {
-      "2026-09-18": 71.97
+      "2026-09-18": 71.97,
+      "2026-09-21": 73.11
     },
     "688120": {
-      "2026-09-18": 263.43
+      "2026-09-18": 263.43,
+      "2026-09-21": 257.6
     },
     "688200": {
-      "2026-09-18": 407.93
+      "2026-09-18": 407.93,
+      "2026-09-21": 398.38
     },
     "688261": {
-      "2026-09-18": 81.37
+      "2026-09-18": 81.37,
+      "2026-09-21": 79.32
     },
     "688343": {
-      "2026-09-18": 65.6
+      "2026-09-18": 65.6,
+      "2026-09-21": 65.21
     },
     "688385": {
-      "2026-09-18": 59.59
+      "2026-09-18": 59.59,
+      "2026-09-21": 59.3
     },
     "688388": {
-      "2026-09-18": 30.88
+      "2026-09-18": 30.88,
+      "2026-09-21": 29.5
     },
     "688536": {
-      "2026-09-18": 353.2
+      "2026-09-18": 353.2,
+      "2026-09-21": 356.05
     },
     "688548": {
-      "2026-09-18": 32.9
+      "2026-09-18": 32.9,
+      "2026-09-21": 33.23
     },
     "688729": {
-      "2026-09-18": 24.9
+      "2026-09-18": 24.9,
+      "2026-09-21": 25.37
     },
     "688820": {
-      "2026-09-18": 142.87
+      "2026-09-18": 142.87,
+      "2026-09-21": 139.2
+    },
+    "000100": {
+      "2026-09-21": 5.08
+    },
+    "000725": {
+      "2026-09-21": 6.07
+    },
+    "300604": {
+      "2026-09-21": 282.53
+    },
+    "300672": {
+      "2026-09-21": 201.0
+    },
+    "600048": {
+      "2026-09-21": 5.68
+    },
+    "601288": {
+      "2026-09-21": 6.91
+    },
+    "603118": {
+      "2026-09-21": 18.65
+    },
+    "688048": {
+      "2026-09-21": 362.23
+    },
+    "688123": {
+      "2026-09-21": 156.0
+    },
+    "688257": {
+      "2026-09-21": 59.57
+    },
+    "688662": {
+      "2026-09-21": 107.9
     }
   },
   "_meta": {
     "track_start": "2026-09-14",
     "created": "2026-09-15 20:40:11",
-    "last_update": "2026-09-20 15:57:09",
-    "last_signal_date": "2026-09-18",
-    "last_hit_count": 25,
-    "last_price_date": "2026-09-18"
+    "last_update": "2026-09-21 19:08:31",
+    "last_signal_date": "2026-09-21",
+    "last_hit_count": 12,
+    "last_price_date": "2026-09-21"
   },
-  "update_time": "2026-09-20 15:57:09",
+  "update_time": "2026-09-21 19:08:31",
   "2026-09-15": [
     {
       "code": "300905",
@@ -2145,6 +2374,332 @@
       },
       "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
       "signal_date": "2026-09-18"
+    }
+  ],
+  "2026-09-21": [
+    {
+      "code": "688662",
+      "name": "广东富信科技",
+      "market": "sh",
+      "board": "科创板",
+      "close": 107.9,
+      "quote_close": 107.9,
+      "pct_chg": 12.51,
+      "turnover_rate": 13.62,
+      "fund_type": "混合",
+      "qd": true,
+      "yzc": true,
+      "jg": true,
+      "xc": true,
+      "four": true,
+      "components": {
+        "游资点火": true,
+        "机构托底": true,
+        "广度翻多": true,
+        "主力动量翻多": true,
+        "机构金叉": false,
+        "散户金叉": false,
+        "主力金叉": false
+      },
+      "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "signal_date": "2026-09-21"
+    },
+    {
+      "code": "300672",
+      "name": "国科微",
+      "market": "sz",
+      "board": "创业板",
+      "close": 201.0,
+      "quote_close": 201.0,
+      "pct_chg": 8.36,
+      "turnover_rate": 7.72,
+      "fund_type": "混合",
+      "qd": true,
+      "yzc": true,
+      "jg": true,
+      "xc": true,
+      "four": true,
+      "components": {
+        "游资点火": true,
+        "机构托底": true,
+        "广度翻多": true,
+        "主力动量翻多": true,
+        "机构金叉": false,
+        "散户金叉": false,
+        "主力金叉": false
+      },
+      "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "signal_date": "2026-09-21"
+    },
+    {
+      "code": "688123",
+      "name": "聚辰半导体",
+      "market": "sh",
+      "board": "科创板",
+      "close": 156.0,
+      "quote_close": 156.0,
+      "pct_chg": 6.85,
+      "turnover_rate": 7.08,
+      "fund_type": "混合",
+      "qd": true,
+      "yzc": true,
+      "jg": true,
+      "xc": true,
+      "four": true,
+      "components": {
+        "游资点火": true,
+        "机构托底": true,
+        "广度翻多": true,
+        "主力动量翻多": true,
+        "机构金叉": false,
+        "散户金叉": false,
+        "主力金叉": false
+      },
+      "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "signal_date": "2026-09-21"
+    },
+    {
+      "code": "600048",
+      "name": "保利发展",
+      "market": "sh",
+      "board": "主板",
+      "close": 5.68,
+      "quote_close": 5.68,
+      "pct_chg": 6.77,
+      "turnover_rate": 4.04,
+      "fund_type": "混合",
+      "qd": true,
+      "yzc": true,
+      "jg": true,
+      "xc": true,
+      "four": true,
+      "components": {
+        "游资点火": true,
+        "机构托底": true,
+        "广度翻多": true,
+        "主力动量翻多": true,
+        "机构金叉": false,
+        "散户金叉": false,
+        "主力金叉": false
+      },
+      "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "signal_date": "2026-09-21"
+    },
+    {
+      "code": "688048",
+      "name": "长光华芯",
+      "market": "sh",
+      "board": "科创板",
+      "close": 362.23,
+      "quote_close": 362.23,
+      "pct_chg": 5.92,
+      "turnover_rate": 8.68,
+      "fund_type": "混合",
+      "qd": true,
+      "yzc": true,
+      "jg": true,
+      "xc": true,
+      "four": true,
+      "components": {
+        "游资点火": true,
+        "机构托底": true,
+        "广度翻多": true,
+        "主力动量翻多": true,
+        "机构金叉": false,
+        "散户金叉": false,
+        "主力金叉": false
+      },
+      "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "signal_date": "2026-09-21"
+    },
+    {
+      "code": "300657",
+      "name": "弘信电子",
+      "market": "sz",
+      "board": "创业板",
+      "close": 38.49,
+      "quote_close": 38.49,
+      "pct_chg": 3.75,
+      "turnover_rate": 7.96,
+      "fund_type": "混合",
+      "qd": true,
+      "yzc": true,
+      "jg": true,
+      "xc": true,
+      "four": true,
+      "components": {
+        "游资点火": true,
+        "机构托底": true,
+        "广度翻多": true,
+        "主力动量翻多": true,
+        "机构金叉": false,
+        "散户金叉": false,
+        "主力金叉": false
+      },
+      "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "signal_date": "2026-09-21"
+    },
+    {
+      "code": "000725",
+      "name": "000725",
+      "market": "sz",
+      "board": "主板",
+      "close": 6.07,
+      "quote_close": 6.07,
+      "pct_chg": 2.53,
+      "turnover_rate": 5.06,
+      "fund_type": "混合",
+      "qd": true,
+      "yzc": true,
+      "jg": true,
+      "xc": true,
+      "four": true,
+      "components": {
+        "游资点火": true,
+        "机构托底": true,
+        "广度翻多": true,
+        "主力动量翻多": true,
+        "机构金叉": false,
+        "散户金叉": false,
+        "主力金叉": false
+      },
+      "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "signal_date": "2026-09-21"
+    },
+    {
+      "code": "688257",
+      "name": "新锐股份",
+      "market": "sh",
+      "board": "科创板",
+      "close": 59.57,
+      "quote_close": 59.57,
+      "pct_chg": 2.35,
+      "turnover_rate": 5.59,
+      "fund_type": "混合",
+      "qd": true,
+      "yzc": true,
+      "jg": true,
+      "xc": true,
+      "four": true,
+      "components": {
+        "游资点火": true,
+        "机构托底": true,
+        "广度翻多": true,
+        "主力动量翻多": true,
+        "机构金叉": false,
+        "散户金叉": false,
+        "主力金叉": false
+      },
+      "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "signal_date": "2026-09-21"
+    },
+    {
+      "code": "000100",
+      "name": "000100",
+      "market": "sz",
+      "board": "主板",
+      "close": 5.08,
+      "quote_close": 5.08,
+      "pct_chg": 1.8,
+      "turnover_rate": 2.86,
+      "fund_type": "混合",
+      "qd": true,
+      "yzc": true,
+      "jg": true,
+      "xc": true,
+      "four": true,
+      "components": {
+        "游资点火": true,
+        "机构托底": true,
+        "广度翻多": true,
+        "主力动量翻多": true,
+        "机构金叉": false,
+        "散户金叉": false,
+        "主力金叉": false
+      },
+      "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "signal_date": "2026-09-21"
+    },
+    {
+      "code": "601288",
+      "name": "农业银行",
+      "market": "sh",
+      "board": "主板",
+      "close": 6.91,
+      "quote_close": 6.91,
+      "pct_chg": 1.47,
+      "turnover_rate": 0.1,
+      "fund_type": "混合",
+      "qd": true,
+      "yzc": true,
+      "jg": true,
+      "xc": true,
+      "four": true,
+      "components": {
+        "游资点火": true,
+        "机构托底": true,
+        "广度翻多": true,
+        "主力动量翻多": true,
+        "机构金叉": false,
+        "散户金叉": true,
+        "主力金叉": false
+      },
+      "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "signal_date": "2026-09-21"
+    },
+    {
+      "code": "603118",
+      "name": "共进股份",
+      "market": "sh",
+      "board": "主板",
+      "close": 18.65,
+      "quote_close": 18.65,
+      "pct_chg": 1.19,
+      "turnover_rate": 16.11,
+      "fund_type": "混合",
+      "qd": true,
+      "yzc": true,
+      "jg": true,
+      "xc": true,
+      "four": true,
+      "components": {
+        "游资点火": true,
+        "机构托底": true,
+        "广度翻多": true,
+        "主力动量翻多": true,
+        "机构金叉": false,
+        "散户金叉": false,
+        "主力金叉": false
+      },
+      "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "signal_date": "2026-09-21"
+    },
+    {
+      "code": "300604",
+      "name": "长川科技",
+      "market": "sz",
+      "board": "创业板",
+      "close": 282.53,
+      "quote_close": 282.53,
+      "pct_chg": 1.0,
+      "turnover_rate": 4.24,
+      "fund_type": "混合",
+      "qd": true,
+      "yzc": true,
+      "jg": true,
+      "xc": true,
+      "four": true,
+      "components": {
+        "游资点火": true,
+        "机构托底": true,
+        "广度翻多": true,
+        "主力动量翻多": true,
+        "机构金叉": false,
+        "散户金叉": false,
+        "主力金叉": false
+      },
+      "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "signal_date": "2026-09-21"
     }
   ]
 }
