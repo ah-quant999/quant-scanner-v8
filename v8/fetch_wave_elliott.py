@@ -163,7 +163,9 @@ def raw_push(relpath, blob_path, commit_msg):
     if os.path.exists(idx):
         os.remove(idx)
     git(["read-tree", tree_sha], env=env)
-    blob = git(["hash-object", "-w", blob_path], env=env).stdout.strip()
+    # 用 --path=<仓库相对路径> 让 .gitattributes（text eol=lf）的属性查找生效；
+    # 只传绝对路径时属性匹配不到，CR 会被原样入库（CRLF 翻转复发根因之一）。
+    blob = git(["hash-object", "-w", "--path=" + relpath, blob_path], env=env).stdout.strip()
     git(["update-index", "--cacheinfo", "100644", blob, relpath], env=env)
     tree = git(["write-tree"], env=env).stdout.strip()
     # 范围守卫
@@ -293,7 +295,10 @@ def main():
         print("✗ 校验失败：marks/idx 为空"); sys.exit(1)
 
     # 7) 写回
-    with open(DATA, "w", encoding="utf-8") as f:
+    # 🔴 newline="\n" 必须显式指定：Windows 文本模式默认把 \n 转成 \r\n，会让入库 blob
+    # 违反 .gitattributes:47 `data/*.js text eol=lf`，且 hash-object 用绝对路径时属性不生效，
+    # 于是每轮都把纯 LF 文件偷偷变成含 CR 的 blob（2026-09-15~09-18 连续 4 轮复发）。
+    with open(DATA, "w", encoding="utf-8", newline="\n") as f:
         f.write(dump_js(new_obj))
     print("✓ 数据刷新：截至 %s 上证收 %s (%s%%) | %d 交易日 | 5指数/ %d 拐点(人工保留)"
           % (new_last_date, last, pct, len(dates), len(marks)))
