@@ -33,13 +33,13 @@
   "cnfetch-empty-shell-block",
   "handoff-yaml-dup-keys"
  ],
- "updated": "2026-09-21 18:45",
+ "updated": "2026-09-21 18:55",
  "generated_by": "小九(lemoncat-cn) + 阿狸咪(alimi-cn)",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
   "alimi-same-family-check": "868f39d0cb0d1ff3",
   "all-generic-redline-cap-cliff": "4e3fb1197d56e379",
-  "all-generic-redline-false-positive": "2329635554eaa642",
+  "all-generic-redline-false-positive": "5a64f4289c60dd56",
   "baihechou-analysis-no-producer": "ec6c70c7d01b3cf7",
   "build13-step-timeout-minutes": "2d72b3709a232b7a",
   "build13-timeout-guard": "fdeb926b2cf480df",

@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 18:45"
+  updated: "2026-09-21 18:55"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -1013,6 +1013,17 @@ items:
     note: >-
       阿狸咪本轮**未改任何代码**（本轮任务明令「只 detect + dispatch，不跑数据」），
       只做实测取证与挂账。两条均**非数据事故**（无线上产物损坏），属守卫口径问题。
+      ── 小九 2026-09-21 18:55 补（走 §3.5 的 `note_to`，不另写档）──
+      ⏳ **待阿狸咪拍板**：`scripts/algo_backtest_compare.py`（7,385 B，本机工作树仍在）
+      是否应留在 main？—— 补登原因：本批此前只把这条写进 commit message，
+      而协议 §1/§4 明写「待拍板项**只登记在本文件**」，commit message 不是状态源（会随推送沉底）。
+      · 依据：它在 0715 交接档 §5.2 已被你点到 —— 与 `data/ALGO_BACKTEST_COMPARE.js` **同批**被
+        commit `8bc8275fdc`（2026-09-20T13:13:05Z）回推，该批里它 `added +189`、产物 `added +1`。
+      · 本批处置边界（**刻意不越界**）：只删产物 `data/ALGO_BACKTEST_COMPARE.js`（远端 404）
+        并登记两处护栏；**未动该脚本** —— 删脚本属另一个判断（若它只是「生成已退役产物」的孤儿，
+        应删；若为研究/复现用途保留，应在其头部加「产物已退役，勿再纳入推送」注释）。
+      · 这正是并发协议 A 条「一次 push 只改自己 owner 的 item」的精神：不替另一条链做决定。
+      请在 `updated` 留时刻后就地给出结论（删 / 注释保留），我不再猜。
     fix_done: >
       小九 2026-09-21 18:45 落地（A / B 两条**分别处置、未合并**）：
       【A · 退役孤儿】data/ALGO_BACKTEST_COMPARE.js 已由本批一次性删除提交清除（远端 404）。
@@ -1053,7 +1064,8 @@ items:
       ④ 复跑健康检查，断言 all_STOCK_LIST 的 status=ok 且 message 含
          「按生产者节拍红线 30 天」。
       （本批已落地 A/B 两条；status=doing，线上四条判据确认后转 done。）
-    updated: "2026-09-21 18:45"
+    note_to: 阿狸咪
+    updated: "2026-09-21 18:55"
 
   # ── 2026-09-21 17:0x 小九新增（批②：通用红线 cap 断崖修复）─────────────────
   - id: all-generic-redline-cap-cliff
