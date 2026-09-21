@@ -49,6 +49,7 @@ window.__renderDailyFactorCalc|每日因子计算卡渲染器|2026-09-20
 window.__renderImaStrongStock|ima 强势跟踪卡渲染器|2026-09-20
 window.__renderLimitUpHeatmap|涨停热力矩阵渲染器|2026-09-20
 window.__renderCycleLadderCard|周期阶梯卡渲染器|2026-09-20
+window.__renderBoardFirstLimit|主板首板观察卡渲染器|2026-09-22
 window.__renderObsPlatform|观测类平台渲染器|2026-09-20
 window.__renderJudgmentBody|判断卡正文渲染器|2026-09-20
 window.__renderBaihechou|白河愁宏观渲染器|2026-09-20
