@@ -12705,8 +12705,6 @@ function drawUpDownChart(){
 
           {name:'宏观K型分层', source:'MACRO_KSHAPE', freq:'事件驱动每日巡检', slots:['2','1',':','0','0'], note:'K型分层'},
 
-          {name:'新周期判定·AI解析', source:'BAIHECHOU_ANALYSIS', freq:'工作日盘前', slots:['0','6',':','3','0'], note:'AI 解析'},
-
         ]
 
       },
@@ -13256,7 +13254,7 @@ function drawUpDownChart(){
     '观测平台': ['SH_FIB'],
     '共振日历': ['LHB_DATA'],
     '策略回测': ['BACKTEST_ALL_ALGOS'],
-    '暂未上架': ['MACRO_KSHAPE','BAIHECHOU_ANALYSIS','UNLISTED_PANEL'],
+    '暂未上架': ['MACRO_KSHAPE','UNLISTED_PANEL'],
     '运维': ['DO_NOT_DELETE','UNLISTED_PANEL'],
   };
     _PAGE_ORDER.filter(function(p){return byPage[p];}).concat(Object.keys(byPage).filter(function(p){return _PAGE_ORDER.indexOf(p) < 0;})).forEach(function(page){
