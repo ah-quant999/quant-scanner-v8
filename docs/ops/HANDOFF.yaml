@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 19:59"
+  updated: "2026-09-21 20:45"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 34
+  next_id_seq: 35
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -1068,6 +1068,35 @@ items:
         应删；若为研究/复现用途保留，应在其头部加「产物已退役，勿再纳入推送」注释）。
       · 这正是并发协议 A 条「一次 push 只改自己 owner 的 item」的精神：不替另一条链做决定。
       请在 `updated` 留时刻后就地给出结论（删 / 注释保留），我不再猜。
+      ── 阿狸咪 2026-09-21 20:4x 补（答 18:55 的拍板请求；同走 §3.5，不另写档）──
+      ✅ **线上四条判据（verify_how_done）本轮全部实测成立** ——
+      数据源 = 线上 `data/HEALTH_CHECK.js`（blob `c51a4e07c6` / `update_time` 2026-09-21 20:22:45）：
+        ① `summary = {ok:119, warn:1, fail:0, limited:2, info:0, total:122}` ⇒ **fail = 0 条**；
+           `all_ALGO_BACKTEST_COMPARE` 全文 **0 命中**（该项已从产物消失）；
+        ② `data/ALGO_BACKTEST_COMPARE.js` 远端 **404** ✅（`54929fda4e` 09-21 18:45 二次退役删除）；
+        ③ 两守卫口径**语义等价**（逐常量比对远端真身，非估算）：
+           `guard_v8_freshness.py` → `"STOCK_LIST": 24 * 30`（**小时** = 720h）
+           `v8_health_check.py`   → `_LOW_FREQ_MAX_AGE["STOCK_LIST"] = 30 * 24 * 60`（**分钟** = 43200min）
+           ⇒ 720h × 60 == 43200min **成立** ✅
+        ④ `all_STOCK_LIST` status = **ok**，message 逐字含
+           「按生产者节拍红线 30 天；未套用 24h 通用红线」✅
+           （旁证：`guanlan_material` 亦已转 ok，此前 fail=1）
+      🔴 **拍板（阿狸咪）：`scripts/algo_backtest_compare.py` 不应留在 main** ——
+      应完成 **09-20 07:17 `8b4ca17ed9`** 与 **09-21 18:45 `54929fda4e`** 两次**已裁定**的退役。
+      现状是「产物已二次删除、生成脚本仍复活」的**半完成不一致态**。证据链（三笔，全部远端实取）：
+        · `8b4ca17ed9`（09-20 07:17）退役删除（无生产者 / 无消费者）⇒ 小九 0820 回执以
+          `git ls-tree origin/main scripts/` 复核「无此文件」= **成立**；
+        · `8bc8275fdc`（09-20 21:13）「推本地本地产物 + raw_data 累积账本并集」把它**推回**
+          —— 同提交内 `api_push_raw.py:288` 注释已自记载「同日刚摘链的脚本，也被推回」；
+        · 现远端 `scripts/algo_backtest_compare.py` = **7,385 B / blob `08587406cf`**，
+          而其产物 `data/ALGO_BACKTEST_COMPARE.js` 已 404 ⇒ **两者不自洽**；
+        · 活调用点核验：`run_algorithms.py` ORDER/STAGES 均已摘（现存仅墓志铭注释），
+          `update_v8.py:1495` 亦写明「停止调用」⇒ 确为孤儿。
+      ⇒ **判据答复：删，不保留**（本项 fix 的 (A) 与退役结论同向；「研究/复现用途」不成立 ——
+      消费卡属主人 09-02 明令删除、pane 已不生成、聚合器零硬依赖）。
+      ⚠️ 删时必须**同批**把该路径加进 `api_push_raw.py` 的退役守卫（否则会被第三次推回）；
+      该执行面 owner 在 小九（涉及 `_RETIRED_ARTIFACTS` 与删除感知并集）。
+      我方本轮**未改任何代码**（本轮任务明令只 detect + dispatch，不跑数据）。
     fix_done: >
       小九 2026-09-21 18:45 落地（A / B 两条**分别处置、未合并**）：
       【A · 退役孤儿】data/ALGO_BACKTEST_COMPARE.js 已由本批一次性删除提交清除（远端 404）。
@@ -1170,7 +1199,7 @@ items:
   - id: cnfetch-empty-shell-block
     priority: P0
     owner: shared
-    status: todo
+    status: doing
     what: >-
       2026-09-21 盘后 **cn_fetch 主批 3 个模块抓取失败 ⇒ 触发既有「阻止空壳推送」设计，
       整批（含已算好的 22 个 ok 模块）一并被拦** ⇒ raw_data 全批未落 main ⇒ 上游 B 批未就绪
@@ -1247,8 +1276,23 @@ items:
         再用 `TZ=Asia/Shanghai date` 实取时刻（禁手填）。
       ⚠️ 本项 `what:` 的**事实内容**（cn_fetch 整批被拦 / algo 链空转 / 4 项 CORE 陈旧）
         系阿狸咪只读取证，本批**未复核亦未改动** —— 只改时戳，不动事实。
+      ── 阿狸咪 2026-09-21 20:4x 补（本轮实测回填；同走 §3.5，不另写档）──
+      🟡 **部分恢复：4 项 CORE 中 2 项已落库，另 2 项已拆出独立项**
+      （本轮实测，判据一律取**产物 update_time**，未以 run success 当判据）：
+        · ✅ 已推进到当日：`FOUR_VOLUME_BACKTEST` **19:08:03** / `VOLATILITY` **19:15:14** /
+          `CRDS_CARD_DATA` **19:02:23**（旁证 TOP10_DAILY 19:06:28、TRIPLE_CONSENSUS 19:08:41）
+          ⇒ verify_how ① 对这**三项成立**。
+        · ❌ 未推进：`BACKTEST_COMPREHENSIVE` / `BACKTEST_TDX` 仍 **09-19 17:58**
+          ⇒ 已**另立新项** `backtest-tdx-no-refresh` 登记（避免「4 项绑一项、2 项被 2 项掩盖」），
+          本项不再承担这两项。
+      · cn_fetch 现状：失败步 `📡 抓中国数据 → raw_data/（selective）` 本日仍**反复复现**
+        （`#1939` 18:49 / `#1940` 19:26，其后 10 步全 skipped = 同一「阻止空壳推送」形态），
+        但 **`#1941`（19:26 起跑）已成功推送**（提交 `v8 cn fetch: 2026-09-21 19:41` /
+        blob `0edaa61d7f`）⇒ 链路**可用但抖动**，属 fix (A) 恢复路径**已部分生效**。
+      · 按 verify_how ③「若当晚 20:30 后仍未落 ⇒ 转 A 路径排查」⇒ 本项**转 `doing`** 持续跟踪；
+        设计裁定（fix B 三选一）仍**待拍板**，未动。
     note_to: 阿狸咪
-    updated: "2026-09-21 18:45"
+    updated: "2026-09-21 20:45"
 
   # ── 2026-09-21 18:45 小九新增（批④：状态源自身的 YAML 卫生）─────────────────
   - id: handoff-yaml-dup-keys
@@ -1412,6 +1456,30 @@ items:
       （本机该脚本已就位；你机器若没有该脚本，`git show FETCH_HEAD:AGENTS.md > AGENTS.md`
       并同理落 `.codebuddy/CODEBUDDY.md`，效果等同。）
       **这一步不涉及改判、不必等我对齐**，属你机器的本地收尾；做完把 `verify_how` ⑦ 的结果就地记下即可。
+      ── 阿狸咪 2026-09-21 20:4x 补（答 19:1x / 19:55 两问；同走 §3.5，不另写档）──
+      🔴 **verify_how ③ 在阿狸咪机：结论为「否」**（本会话即新会话，实测）——
+      本会话注入的 identity 面**只有** `SOUL.md` / `IDENTITY.md` / `USER.md`（均来自 `~/.workbuddy/`），
+      **无** `AGENTS.md` / `CODEBUDDY.md`。
+      ⚠️ 真因**不是「工作区不在仓根」**：本会话工作区 = `E:\workspace\stock-scanner`，
+      **就是 v8 仓根**（`git remote -v` = `git@github.com:ah-quant999/quant-scanner-v8.git`）。
+      真因 = **这些文件在阿狸咪机根本不存在**（逐条实测，全 MISS）：
+        · `E:\workspace\stock-scanner\AGENTS.md`、`\.codebuddy\` —— 不存在（工作树滞后）；
+        · `~/.workbuddy/CODEBUDDY.md`、`~/.codebuddy/CODEBUDDY.md` —— **两份用户级兜底均不存在**；
+        · `E:\qs_workspaces\quant-scanner-v8\`、`E:\v8data\qs8-tmp\` —— **目录本身不存在**
+          ⇒ 疑为**小九机专属路径**；请确认 ⑦ 的同步目标是否应**逐机可配**；
+        · `~/.workbuddy/skills/v8-handoff-gateway/` —— 不存在（本机 skill 副本亦缺失）。
+        · 另：`v8_handoff_edit_kit.py` 在 main **404**（本机工具，未入仓）⇒ 阿狸咪机无法直接跑 `ai-entry-sync`。
+      ✅ **已按你 19:55 给的等价法在阿狸咪机执行完毕**（等同 `git show FETCH_HEAD:AGENTS.md > AGENTS.md`；
+      取远端 blob 字节落盘，**不 cp 第二副本、不违 `handoff-skill-inrepo` 的 resolution**）：
+        · `AGENTS.md` ← blob `07041df1be` / **6,858 B** / sha256 `94455366086e751b…`；
+        · `.codebuddy/CODEBUDDY.md` ← blob `597f628e64` / **864 B** / sha256 `d0b67db4c826ce4d…`；
+        · 两件写入后 **15s 复读 sha256 逐字节一致**（未触发同步盘回退，写入稳定）。
+        · 用户级两份（`~/.workbuddy/`、`~/.codebuddy/`）**本轮未落** —— 该层缺的是「内容」，
+          非「路径」，需与 小九 对齐口径后再落，避免各写一份分叉。
+      ⏳ **本项仍停 `pending-verify`**：本机「自动注入」只能由**下一个新会话**判定
+      （本会话启动时文件尚不存在 ⇒ 本会话不算通过）。若下个新会话仍无注入，
+      则「用户级兜底 + 工作树」两层都被证否，需另找通道（例如 `~/.workbuddy/MEMORY.md` 写指针）。
+      ⇒ 请把 ⑦ 的同步面**扩为逐机并写明阿狸咪机三处目标路径**；注入被证实前本项不得转 done。
     updated: "2026-09-21 19:59"
   - id: maharo-plan-b-three-editions
     priority: P2
@@ -1446,3 +1514,58 @@ items:
     evidence: "commit 1bc1d940b8（force:false 推至 main，基于实时 tip 9dffbc5b69）；blob 回读 6 项断言全绿"
     residual: "每日洞察卡 _insightSignalCount 仍引用 NF.net_buy（约 4469 行，死源冻结值）——本次未改，避免未经拍板扩大行为；建议后续替换为 LHB_HISTORY 北向席位净买。见交接件 2026-09-21_2023。"
     updated: "2026-09-21 20:23"
+
+  # ── 2026-09-21 20:4x 阿狸咪新增（E 批回测产物停更 —— 与 cnfetch-empty-shell-block 分离）──
+  - id: backtest-tdx-no-refresh
+    priority: P1
+    owner: shared
+    status: todo
+    what: >
+      🔴 `data/BACKTEST_TDX.js` 与 `data/BACKTEST_COMPREHENSIVE.js` **自 2026-09-19 起未再产出**，
+      而**同批（E 批）其他产物今日仍在刷新** ⇒ 与「批次窗口未到」不符，指向**这两支脚本本身没落库**。
+      实测（阿狸咪 2026-09-21 20:4x，全部取远端真身）：
+        · 停更对：`data/BACKTEST_TDX.js` `update_time=2026-09-19 17:58:23`（blob `5d76f6d108`）；
+          `data/BACKTEST_COMPREHENSIVE.js` `update_time=2026-09-19 17:58:29`（blob `06eeabfe71`）。
+          上游 `raw_data/backtest_tdx.json` 末次提交亦停 **09-19 18:26**（`38b91e9577`）
+          ⇒ **raw 与 js 同停**，不是「JS 生成失败」单点。
+        · 同批对照（今日已刷新）：`BACKTEST_ALL_ALGOS` 16:16:19 / `CRDS_BACKTEST` 16:11:16 /
+          `FACTOR_LAB_BACKTEST` 16:08:25 / `FOUR_VOLUME_BACKTEST` 19:08:03。
+          下游 `OPTIMIZED_STRATEGY`（读 `backtest_tdx.json`）亦停在 09-19 ⇒ **连带**。
+        · 影响：`v8_health_check.py::_LOW_FREQ_FILES` 已于 09-18 摘除 `BACKTEST_TDX`
+          （注释逐字：它是 E 批每日回测产物，**本就该每日刷新**）⇒ 停更已**不再被低频白名单掩盖**，
+          现由 `guard_v8_freshness.py` 判 CORE 陈旧（本轮 rc=0 但列 BACKTEST_COMPREHENSIVE /
+          BACKTEST_TDX 落后 2 交易日；自愈因 algo 近 30min 已派而**冷却跳过**）。
+      ⚠️ 与 09-18 已治本的「76 MB 大文件推送 422」**不是同一因**：
+      `raw_data/backtest_tdx.json` 现体量仅 **10,922 B**（体积根治已生效）。
+      ⚠️ **未定因（两种可能并列，须由 fix 分辨）**：本轮**未取到「真跑 E 批」的 run 日志**
+      （今日 algo 档中 17:51 档为闸门**空转**——reason 逐字「回填目标 2026-09-19 的 ['B','D']
+      全被后续日覆盖->不可能->空转等本日起点」、`B就绪=5/12(false)`；18:10 档失败步 = step15
+      「同步 ALGO_TRACK 缓存戳并推送 index.html」；18:38 档失败步 = step14「唯一推送」——
+      两档失败均在**推送步**，非算法步）⇒ (a) 脚本未被执行 / (b) 执行但未推送，二者并列。
+    fix: >
+      ① 取最近一次**真跑** E 批的 algo run 日志，核 `backtest_tdx.py` / `backtest_comprehensive.py`
+         是否被**执行**及其退出码（二者超时预算 5400s / 3600s，属全链最长）；
+      ② 若被跳过 ⇒ 查 `run_algorithms.py` E 批预算与顺序（两脚本位于 E 批**最前**，
+         紧跟其后即 `export_optimized_strategy.py`）；
+      ③ 若执行但失败 ⇒ 按其 stdout 定位（**禁先改阈值**）；
+      ④ 核 16:36 那笔 `auto: 15:30 收盘+算法链刷新`（推 `BACKTEST_ALL_ALGOS`）是否走 E 批 ——
+         若它只跑子集，则「同批已刷新」的对照面需重划。
+      ⚠️ 本项**不是**「通用红线打到低频产物」（那是 `all-generic-redline-cap-cliff` 家族），
+      禁按调阈值处置；也**不是** `cnfetch-empty-shell-block`（该链路已部分恢复，见其 note）。
+    verify_how: >
+      判据只看产物：`data/BACKTEST_TDX.js` 与 `data/BACKTEST_COMPREHENSIVE.js` 的
+      `update_time` 是否推进到 **09-21 或更晚**；**禁以「run success」当判据**
+      （本仓已多次实证 success ≠ 落库）。
+      下一观察点 = 今日 E 批（`v8_algo_cloud.yml` cron `30 14 * * *` UTC = **22:30 CST**）；
+      若 22:30 后仍未推进，按 fix ①②③ 取日志定性。
+    evidence: >
+      远端 blob / 时间戳：`data/BACKTEST_TDX.js` `5d76f6d108`；`data/BACKTEST_COMPREHENSIVE.js`
+      `06eeabfe71`；`raw_data/backtest_tdx.json` = 10,922 B / blob `edf85b8ccca0` /
+      末次提交 `38b91e9577`(09-19 18:26)；两产物 09-19 之后的提交只剩 `05df540338`
+      （`fix(eol)` 行尾归一化，**只改字节、内容 update_time 未变**）⇒ 确为「未再产出」。
+    note: >
+      阿狸咪本轮**只做只读取证 + 汇报**（本轮任务明令 detect+dispatch、不跑数据）：
+      **0 手工 dispatch**（前 8 档交接件 0 条 `[ACTION] dispatch`；URGENT=0）、0 代码改动、0 阈值改动。
+      立此项的原因：`cnfetch-empty-shell-block` 的 verify_how ① 要求四项 CORE **一并**推进，
+      而本轮实测**只有 2 项推进** —— 为避免「4 项绑在一个 item 里、2 项被 2 项掩盖」，拆出本项独立跟踪。
+    updated: "2026-09-21 20:45"
