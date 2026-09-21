@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-21 10:46:32",
+  "update_time": "2026-09-21 10:53:13",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -37,7 +37,7 @@
       "hot_days": 31,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 2972,
+      "total": 2977,
       "ongoing": true
     },
     {
