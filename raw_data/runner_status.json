@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-21 17:24:31",
+  "update_time": "2026-09-21 18:04:39",
   "status": "ok",
   "process": {
     "ok": true,
@@ -17,7 +17,7 @@
   "worker_logs": {
     "ok": true,
     "errors": [],
-    "scanned": 1,
+    "scanned": 0,
     "message": "最近日志无错误"
   },
   "github": {
