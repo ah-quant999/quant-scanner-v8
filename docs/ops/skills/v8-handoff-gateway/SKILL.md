@@ -156,6 +156,45 @@ items:
 | `blocked` | 等外部条件（等 run / 等对方 / 等拍板） | 否 |
 | `done` | **已验证生效**（须填 `verified_at`） | 可 |
 
+### 🔴 编辑状态源的 4 条硬约束（2026-09-21 批④ 实测入仓）
+
+改 `HANDOFF.yaml` **之前**逐条过。四条都踩过，且**四条都不会报错** —— 全是静默的。
+
+**1. 正文必须写进 `note: >` 块标量；`note_to` 只做收件人标记。**
+`note_to: 阿狸咪` 后面若不跟 `note`，对方按 §3.5 去读 `note` 会读到**空** ⇒
+你写了等于没写（**悬空 note_to**）。正文**不要**做成裸行接在别的字段后面 ——
+那样会被 YAML 归给**前一个字段**，`note` 仍为空。
+
+**2. 插新键前先 dump 目标 item 的 4 空格顶层键清单查重。**
+YAML 同 item 重复顶层键**取后者**，较早那份被**静默丢弃**，而 `grep` 还会说谎
+（明明写着 `todo`，生效的是 `doing`）。已有 `note:` 键时 ⇒ **追加进该块标量末尾**，不新建。
+
+```python
+# 查重（对某个 item）
+from collections import Counter
+import re
+blk = item_block(y, "<ID>")
+dup = {k: v for k, v in Counter(re.findall(r"(?m)^    ([A-Za-z_]\w*):", blk)).items() if v > 1}
+assert not dup, dup
+```
+
+**3. 改了 item 内容 ⇒ 同批刷新 `HANDOFF.ledger.json` 的 `id_content_hashes`。**
+官方口径（2026-09-21 实测复现）：
+
+```python
+blk = 从 "  - id: <ID>" 起到下一个 "  - id:" 前（含其前的 # ── 注释，**不切**）
+blk = re.sub(r"^(\s*updated:\s*).*$", r"\g<1><ts>", blk, flags=re.M)  # 归一化为**字面量** <ts>
+h   = hashlib.sha256(blk.rstrip().encode("utf-8")).hexdigest()[:16]
+```
+
+⚠️ 归一化值写**字面量 `<ts>`**，**不是新时间戳实值**（写实值会让锚静默失效）。
+⚠️ 该哈希**不在 CI 门禁里**（`pre_deploy_audit.py` 里 `id_content_hash` 命中 **0 处**）
+⇒ 漏刷不会红，只会让锚失效。
+
+**4. 一切时刻用 `TZ=Asia/Shanghai date` 实取。**
+未来时戳会污染本仓「取 MAX 时点」的新鲜度判据，并被 `[13/13]` 门禁抓住
+**硬阻断 deploy**（2026-09-21 18:25 CST 起实测阻断 4 轮 CI，下游部署步全 skipped）。
+
 ---
 
 ## 3. SOP
@@ -297,3 +336,17 @@ ledger 缺失 ⇒ 门禁**放行并告警**（守卫自身不得成为新的单�
 必须看**该 commit 对应的 CI run**，且看 **step 级**结论而非 run 级：
 - 门禁 step `success` **且下游部署 step 未 `skipped`** ⇒ 才说明门禁真的通过了（而不是被绕过）。
 - ⚠️ 注意 `continue-on-error: true` 的 step 在 API 里**恒报 success**，需靠「下游步是否 skipped」反推。
+
+### 6. 🔴 被静默覆盖的对象，可能不是业务改动，而是**防复发护栏**
+
+2026-09-21 批④ 实测：`v8_health_check.py` 的 `_RETIRED_FILES` / `_LOW_FREQ_FILES` 新增项，
+由一个提交加入、**40 分钟后**被另一个提交抹掉，后续 **4 个版本一路带病 18 小时**；
+期间推送侧（`api_push_raw.py`）护栏仍在 ⇒ **两侧口径分叉 18 小时且零红灯**。
+
+**为何比「覆盖业务改动」更凶**：业务改动下次提交或比对时可能被发现；
+**护栏丢了自己不会报错，直到事故复发才暴露** —— 而那时你早忘了它曾经存在。
+
+**纪律**：
+- 护栏类改动（白名单 / 退役集 / 阈值常量）**必须双端同批登记**，并在事后**逐版本取证**
+  （`git log -p` 数该符号在各版本的命中数），不能只查「业务逻辑在不在」。
+- 护栏应配**在位自检**（断言其存在且取值正确）并挂进门禁；否则任何一次读-改-写都可能再抹掉它。
