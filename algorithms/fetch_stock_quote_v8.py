@@ -39,14 +39,37 @@ def _safe_float(v):
         return None
 
 
+def _retry(fn, tries=3, backoff=(2, 5), label=""):
+    """源级重试（2026-09-21 阿狸咪的工程师·修法乙）。
+
+    实测 09-21 11:21 云端兜底链双源全灭：新浪返回 HTML（反爬拦截页 → JSONDecodeError）、
+    东财 RemoteDisconnected —— 二者都是**单次瞬断**：相邻档 11:28 即 success。
+    原实现每源只打一次（单 try），一次抖动就整轮 exit 1（前端行情卡随之静默滞后）。
+    本包装对「瞬断 / 限流抖动」有效；对「反爬窗口」无效（那是结构层修法甲·换中国 IP 主链解的）。
+
+    不改变任何字段映射与写入守卫：重试到顶仍抛异常，由上游原逻辑决定 fallback / 放弃。
+    """
+    last = None
+    for i in range(tries):
+        try:
+            return fn()
+        except Exception as e:
+            last = e
+            print(f"⚠️ {label} 第 {i + 1}/{tries} 次失败: {type(e).__name__} {str(e)[:60]}")
+            if i < tries - 1:
+                time.sleep(backoff[min(i, len(backoff) - 1)])
+    raise last
+
+
 def _fetch_all_spot_em():
     """东财全市场 A 股实时行情（akshare.stock_zh_a_spot_em）—— 新浪接口风控/抖动时的自动 fallback。
     2026-08-19 一劳永逸：新浪 stock_zh_a_spot 当日两次抖动（ConnectionError / JSONDecodeError 返回 HTML），
-    双源互备后任一路通都能出全量数据，杜绝「个股查询整表陈旧/错值」复发。"""
+    双源互备后任一路通都能出全量数据，杜绝「个股查询整表陈旧/错值」复发。
+    2026-09-21 补源级重试（修法乙）：单次瞬断不再直接放弃，3 次尝试 + 指数退避。"""
     try:
-        df = ak.stock_zh_a_spot_em()
+        df = _retry(ak.stock_zh_a_spot_em, tries=3, backoff=(2, 5), label="东财")
     except Exception as e:
-        print(f"⚠️ 东财A股行情也失败: {type(e).__name__} {str(e)[:60]}")
+        print(f"⚠️ 东财A股行情也失败（3 次重试后）: {type(e).__name__} {str(e)[:60]}")
         return {}
     df = df.rename(columns={
         '代码': 'code', '名称': 'name', '最新价': 'price', '涨跌额': 'change',
@@ -90,7 +113,7 @@ def fetch_all_spot():
     2026-08-19 一劳永逸：主源新浪 stock_zh_a_spot，失败自动 fallback 东财 stock_zh_a_spot_em，
     双源互备杜绝「整表陈旧/错值」复发。"""
     try:
-        df = ak.stock_zh_a_spot()
+        df = _retry(ak.stock_zh_a_spot, tries=3, backoff=(2, 5), label="新浪")
         # 字段中文化映射
         df = df.rename(columns={
             '代码': 'code', '名称': 'name', '最新价': 'price', '涨跌额': 'change',
@@ -122,7 +145,7 @@ def fetch_all_spot():
                 continue
         return out
     except Exception as e:
-        print(f"⚠️ 新浪A股行情失败: {type(e).__name__} {str(e)[:80]} → fallback 东财")
+        print(f"⚠️ 新浪A股行情失败（3 次重试后）: {type(e).__name__} {str(e)[:80]} → fallback 东财")
         return _fetch_all_spot_em()
 
 

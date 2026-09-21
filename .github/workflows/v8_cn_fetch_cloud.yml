@@ -1040,24 +1040,66 @@ jobs:
               print(f"[relay] ❌ 派发失败: {e} —— 链条断于此，由 v8_cn_fetch_watchdog(>45min) 恢复")
               sys.exit(0)
 
-          # ② 同频派发 STOCK_QUOTE 刷新
-          #    原设计依赖「哨兵 e7b2e732 + 4 个时间点兜底」，五个 automation 全 PAUSED
-          #    → 实证 09-11 全天 STOCK_QUOTE 停在昨日 15:03，靠人工兜底才刷新一次。
-          #    现挂到本链上，与抓取同频（约 15-18 分钟一次），不再依赖任何本机定时器。
-          #    🔴 2026-09-17 阿狸咪的工程师·口径补注（判据 92）：此处派发的是 **云端兜底链**
-          #    （v8_stock_quote_refresh_cloud.yml，ubuntu-latest·美国 IP）；**主链**
-          #    （v8_stock_quote_refresh.yml，[self-hosted, cn]·中国 IP）不在本链派发面内。
-          #    实测 09-17：主链 4 轮（自身 schedule）/ 兜底链 27 轮（10:05-15:02）。
-          #    ⇒ 与兜底链头部契约「平时不跑、仅哨兵 v3 接单超时派发」存在口径冲突，
-          #      列为**待拍板项**；本轮只留痕、不改行为（避免给云端刷无用 run）。
-          #    ↳ 结构层修法（甲＝relay ② 改派主链·须与保底联动／乙＝抓取脚本源级重试+第三源／
-          #      丙＝勿把盘中主力挂 cron）见：
-          #      docs/ops/handover/2026-09-17_1525_URGENT_STOCK_QUOTE盘中刷新漂移海外IP兜底链致双源全灭.md
+          # ② STOCK_QUOTE 刷新派发 —— 🛠 2026-09-21 阿狸咪的工程师·修法甲落地（结构层治本）
+          #    【同一 bug 二次出现】09-08 断档 8h → 09-17 双源全灭 27min → 09-21 11:21 再次全灭。
+          #    根因（09-17 URGENT 交接件已诊断，当时只留痕未改行为）：本 relay **无条件**派发
+          #    _cloud 兜底链（ubuntu-latest·**海外 IP**）⇒ 盘中执行主力从「中国 IP 主链」漂移到
+          #    「美国 IP 兜底链」⇒ 撞新浪/东财反爬 ⇒ 单轮 exit 1。09-21 实测派发已密到 **7-8 分钟**
+          #    （叠加多源派发），进一步加剧反爬命中；而 _cloud 头注契约本写明「仅主链接单超时才跑」。
+          #    【治本】改「主链优先 + 主链离线才兜底」门控，判据取主链最近一次 run（API 零成本、不 sleep）：
+          #      ① 主链 queued/in_progress 且未超时 → 在跑/刚派 → 不派（防叠加、防刷无用 run）
+          #      ② 主链 queued ≥ QUEUE_MAX 分仍未起 job → 判 cn runner 离线 → 派 _cloud 兜底
+          #      ③ 主链 completed：age < FRESH_MIN 且 success → 新鲜 → 不派
+          #                        age ≥ FRESH_MIN → 派**主链**（中国 IP·双源畅通）
+          #    【保底联动】不 sleep：主链若离线，下一轮 relay 自会看到 queued 时长增长而改派兜底。
+          #    ↳ 乙（抓取脚本源级重试）已于同日落地；丙（勿把盘中主力挂 cron）见 09-17 交接件。
+          MAIN_SQ  = "v8_stock_quote_refresh.yml"        # 主链·[self-hosted, cn]·中国 IP
+          CLOUD_SQ = "v8_stock_quote_refresh_cloud.yml"  # 兜底·ubuntu-latest·海外 IP
+          FRESH_MIN, QUEUE_MAX = 12, 10
+
+          def _sq_age(ts):
+              if not ts:
+                  return 1e9
+              try:
+                  return (now - datetime.datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(CST)).total_seconds() / 60
+              except Exception:
+                  return 1e9
+
+          def _sq_dispatch(name, label):
+              try:
+                  api("POST",
+                      f"https://api.github.com/repos/{repo}/actions/workflows/{name}/dispatches",
+                      {"ref": "main"})
+                  print(f"[relay] ✅ 已派发 STOCK_QUOTE {label}（{name}）")
+              except Exception as e:
+                  print(f"[relay] ⚠️ STOCK_QUOTE {label} 派发失败: {e}（不阻断接力主环）")
+
           try:
-              api("POST",
-                  f"https://api.github.com/repos/{repo}/actions/workflows/v8_stock_quote_refresh_cloud.yml/dispatches",
-                  {"ref": "main"})
-              print("[relay] ✅ 已派发 STOCK_QUOTE refresh（与抓取同频）")
+              d = json.loads(api("GET",
+                  f"https://api.github.com/repos/{repo}/actions/workflows/{MAIN_SQ}/runs?per_page=5").decode())
+              r0 = (d.get("workflow_runs") or [None])[0]
+              if r0 is None:
+                  print("[relay] 主链无历史 run → 派主链")
+                  _sq_dispatch(MAIN_SQ, "主链")
+              else:
+                  st  = r0.get("status")
+                  age = _sq_age(r0.get("updated_at") or r0.get("created_at"))
+                  if st in ("queued", "in_progress"):
+                      q = _sq_age(r0.get("created_at"))
+                      print(f"[relay] 主链在途 status={st} 已 {q:.1f} 分（updated {age:.1f} 分前）")
+                      if st == "queued" and q >= QUEUE_MAX:
+                          print(f"[relay] 主链排队 {q:.1f} 分 ≥ {QUEUE_MAX} 分未起 job ⇒ 判 cn runner 离线 → 派兜底")
+                          _sq_dispatch(CLOUD_SQ, "兜底")
+                      else:
+                          print("[relay] 主链在跑/刚派 → 本轮不派（防叠加）")
+                  else:
+                      concl = r0.get("conclusion")
+                      print(f"[relay] 主链最近档 conclusion={concl} updated {age:.1f} 分前")
+                      if concl == "success" and age < FRESH_MIN:
+                          print(f"[relay] 主链新鲜（{age:.1f} < {FRESH_MIN} 分）→ 本轮不派")
+                      else:
+                          _sq_dispatch(MAIN_SQ, "主链")
           except Exception as e:
-              print(f"[relay] ⚠️ STOCK_QUOTE 派发失败: {e}（不阻断接力主环）")
+              print(f"[relay] ⚠️ STOCK_QUOTE 门控异常: {e} → 保守派主链")
+              _sq_dispatch(MAIN_SQ, "主链")
           PY

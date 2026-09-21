@@ -576,11 +576,12 @@ def write_audit_log(results, exit_code):
         ⇒ gitignore 对它无效，它一直被自动任务反复提交（如 481fc4dd1）。
       · **本轮已做**：写侧显式 `newline="\\n"`（防 Windows 文本模式写 CRLF，
         导致「blob=LF / 工作树=CRLF」每次 add 都整文件转换）。
-      · **尚未做（可选 · 低优先级，勿误记为已完成）**：`git rm --cached` 解除跟踪，
-        使其真正回归「不入库」的设计意图。未做原因：该路径匹配 `v8_build_deploy.yml`
-        的 `on.push.paths: raw_data/**` ⇒ 推送会触发部署链；而收益仅「仓库少 ~3KB
-        + 少一次自动提交噪音」，按「盘中不推」纪律不值得现在做。
-      · **当前状态无害**：写侧已是 LF ⇒ 入库 blob 与工作树行尾一致、`git status` 不脏。
+      · **本轮已完成（2026-09-21 12:3x 阿狸咪的工程师·午休窗口）**：该路径已通过
+        Git Data API 从远端 tree 中删除（tree 项 sha=None）⇒ 正式回归「不入库」设计意图。
+        写侧行为不变：本函数仍照常 append 到本地 raw_data/code_audit.log（**只写不读**，
+        已核全仓无任何读取方），只是不再进入版本库；`.gitignore:14 *.log` 自此对它生效。
+      · **当前状态无害**：写侧已是 LF ⇒ 入库 blob 与工作树行尾一致；去跟踪后
+        `git status` 也不再出现它。
     """
     try:
         log_path = ROOT / "raw_data" / "code_audit.log"

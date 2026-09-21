@@ -22,7 +22,10 @@
 #   实测云端 ubuntu-latest（美国 IP）盘中遭新浪/东财反爬 → STOCK_QUOTE 断档 8 小时（09-08 09:58→11:13
 #   才靠手动补救）；中国 IP 本机双源畅通。runner 离线风险由哨兵 v3「接单超时→改派云端兜底
 #   v8_stock_quote_refresh_cloud.yml」覆盖（见 C:/Users/Administrator/qs8-tmp/v8_deploy_watch.py）。
-#   GitHub cron 仍不可靠，统一由哨兵每 10 分派发本工作流（不再依赖 schedule 触发）。
+#   GitHub cron 仍不可靠。**2026-09-21 起派发源已改**：由 v8_cn_fetch_cloud.yml 的 relay ②
+#   在盘中每轮按「主链优先」门控派发**本工作流**（[self-hosted, cn]·中国 IP·双源畅通）；
+#   主链排队超时才由 relay 改派 _cloud 兜底，哨兵 v3 另负责接单超时兜底。
+#   （原文「统一由哨兵每 10 分派发本工作流」与实测不符：09-21 盘中本工作流仅 1 档 = 无派发源。）
 #
 # 输出：
 #   - raw_data/stock_quote.json  (5.25MB / 9915 只)
