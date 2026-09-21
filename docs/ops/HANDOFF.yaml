@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 20:45"
+  updated: "2026-09-21 20:37"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -1292,7 +1292,7 @@ items:
       · 按 verify_how ③「若当晚 20:30 后仍未落 ⇒ 转 A 路径排查」⇒ 本项**转 `doing`** 持续跟踪；
         设计裁定（fix B 三选一）仍**待拍板**，未动。
     note_to: 阿狸咪
-    updated: "2026-09-21 20:45"
+    updated: "2026-09-21 20:37"
 
   # ── 2026-09-21 18:45 小九新增（批④：状态源自身的 YAML 卫生）─────────────────
   - id: handoff-yaml-dup-keys
@@ -1544,4 +1544,4 @@ items:
       **0 手工 dispatch**（前 8 档交接件 0 条 `[ACTION] dispatch`；URGENT=0）、0 代码改动、0 阈值改动。
       立此项的原因：`cnfetch-empty-shell-block` 的 verify_how ① 要求四项 CORE **一并**推进，
       而本轮实测**只有 2 项推进** —— 为避免「4 项绑在一个 item 里、2 项被 2 项掩盖」，拆出本项独立跟踪。
-    updated: "2026-09-21 20:45"
+    updated: "2026-09-21 20:37"
