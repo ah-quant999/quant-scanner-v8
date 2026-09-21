@@ -1354,7 +1354,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-h">危机监测·趋势对比</div>
         <div class="logic-p">监测SHIBOR隔夜、中美利差、PMI、社融增速、出口增速、VIX、铜金比共7项。与前值对比，趋势箭头↑恶化↓改善。评分：🔴2分危险 / 🟡1分关注 / 🟢0分安全；≥6高度警惕 / 3-5需要关注 / ＜3暂无异常。</div>
         <div class="logic-h">机构研究 · maharo 聚合卡 7 源备忘（2026-09-09 主人令）</div>
-        <div class="logic-p">本卡位于「宏观观测」页顶部，数据源 <code>data/maharo_macro.js</code> 由 <code>.workbuddy/maharo_daily_pull.py</code> 每日 08:30 拉取生成，7 个源为：<b>观澜台</b>（zsxq_guanlantai）、<b>金斧头</b>（zsxq_jinfutou）、<b>逻辑与思考</b>（zsxq_logic）、<b>树枝报告</b>（zsxq_shuzhi）、<b>180K Research</b>（zsxq_180kresearch）、<b>智堡 Wisburg</b>（gmail_wisburg）、<b>Vito行研札记</b>（zsxq_vito）。其中 5 个来自知识星球（zsxq_*），1 个来自 Gmail 订阅（智堡）。</div>
+        <div class="logic-p">本卡位于「宏观观测」页顶部，数据源 <code>data/maharo_insights.js</code>（window.MAHORO_INSIGHTS），由小九机自动化一日三档（盘前 08:50 / 午间 12:30 / 盘后 15:10）产出；旧 <code>maharo_daily_pull.py</code>→<code>maharo_macro.js</code>（每日 08:30）架构已于 2026-09-13 退役，7 个源为：<b>观澜台</b>（zsxq_guanlantai）、<b>金斧头</b>（zsxq_jinfutou）、<b>逻辑与思考</b>（zsxq_logic）、<b>树枝报告</b>（zsxq_shuzhi）、<b>180K Research</b>（zsxq_180kresearch）、<b>智堡 Wisburg</b>（gmail_wisburg）、<b>Vito行研札记</b>（zsxq_vito）。其中 5 个来自知识星球（zsxq_*），1 个来自 Gmail 订阅（智堡）。</div>
         <div class="logic-h">长文卡固定格式 · 唯一渲染入口（2026-09-15 主人令）</div>
         <div class="logic-p">
           <b>主人原话</b>：「本人判断那里要另起一行，不要连着写，而且这个一句话是这卡最关键的，用不同颜色写会很明显；三条主线的 1、2、3 点要加粗显示；口径不要连着写，要分段写，加点以示区分。<b>这些都要成为固定格式，不要我每次都说。</b>」<br>
@@ -2041,7 +2041,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">两张卡</div>
         <table class="lg-table">
           <tr><th>卡片</th><th>内容</th><th>数据 / 刷新</th></tr>
-          <tr><td>📚 机构研究 · AI 解析建议<br><span style="color:var(--dim);font-size:11px;">卡容器 <code>maharoCard</code></span></td><td>观澜台 / 金斧头 / 逻辑与思考 / 树枝报告 / 180K Research / 智堡 Wisburg / Vito行研札记 共 7 源，AI 阅读后按「日 → 周 → 月」三层撰写，新闻条目折叠为附录；标题行带「更新于」</td><td><code>data/maharo_macro.js</code>，每日 <b>08:30</b> 由本机 <code>maharo_daily_pull.py</code> 拉取生成</td></tr>
+          <tr><td>📚 机构研究 · AI 解析建议<br><span style="color:var(--dim);font-size:11px;">卡容器 <code>maharoCard</code></span></td><td>观澜台 / 金斧头 / 逻辑与思考 / 树枝报告 / 180K Research / 智堡 Wisburg / Vito行研札记 共 7 源，AI 阅读后按「日 → 周 → 月」三层撰写，新闻条目折叠为附录；标题行带「更新于」</td><td><code>data/maharo_insights.js</code>（window.MAHORO_INSIGHTS），由小九机自动化一日三档（盘前 08:50 / 午间 12:30 / 盘后 15:10）产出；旧 <code>maharo_daily_pull.py</code>→<code>maharo_macro.js</code>（每日 08:30）架构已于 2026-09-13 退役</td></tr>
           <tr><td>🌍 宏观景气背景 · K 型分层</td><td>K 型分化结构对照：扩张区（上端 · 红）/ 收缩区（下端 · 绿），含金融抑制模型框架要点</td><td>数据驱动（window.MACRO_KSHAPE）；源为沧海一土狗（公众号）K 型行业景气图，<b>⚡ 事件驱动 · 每日巡检</b>（「沧海一土狗文章巡检」发现新文即刷新，原每月1日自动化已停用）</td></tr>
         </table>
         <div class="logic-h">为什么成立观测平台</div>
