@@ -26,9 +26,9 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 09:58"
+  updated: "2026-09-21 09:50"
   updated_by: "小九(lemoncat-cn) + 阿狸咪(alimi-cn)"
-  next_id_seq: 13
+  next_id_seq: 19
 
 items:
 
@@ -217,6 +217,100 @@ items:
         __tripleBacktestAdapted() → 缓存 __tripleBacktestCache，却读 defer 数据 BACKTEST_COMPREHENSIVE（第 5332 行）
     source: "raw_data/code_audit.log 第 11/11 项守卫 FAIL"
     updated: "2026-09-21 08:40"
+
+  # ── P0 · 交接协议自身（2026-09-21 09:50 阿狸咪评审新增，共 6 项）──────
+  - id: handoff-concurrent-write
+    priority: P0
+    owner: shared
+    status: todo
+    what: >
+      状态源收敛为单文件后**新引入**的风险。改前多档各自独立（冲突只波及一份），
+      改后 `HANDOFF.yaml` 是唯一单文件 ⇒ 双机改**不同 item** 也会产生**行级 merge 冲突**。
+      本仓是 cache-bot 每 1.1–9.2min push 一次的高并发热点（见 cachebot-build-race），
+      单文件 × 高频推送 ⇒ 冲突面从「单档」放大为「整张挂账表」。
+      ⚠️ 截至 09:50 该文件仅 2 个提交，**尚未经历真正的双机并发** —— 风险未暴露 ≠ 不存在。
+    options:
+      A: 纪律层——一次 push 只改 owner 是自己的 item（写进本文件头注）
+      B: 结构层——按 owner 拆为 HANDOFF.小九.yaml / HANDOFF.阿狸咪.yaml + 只读汇总（从结构上消除行冲突）
+      C: 工具层——写前 git pull --rebase，冲突即 abort，禁裸 push
+    decided: >
+      阿狸咪建议 A+C 先上（零成本）；观察一周内若发生一次真实冲突即转 B。
+      此项 owner=shared，采纳与否请小九定（协议归你）。
+    updated: "2026-09-21 09:50"
+
+  - id: handoff-yaml-guard
+    priority: P0
+    owner: 小九
+    status: todo
+    what: >
+      🔴 状态源**自身无任何防覆盖门禁**。实测 `grep -rn "HANDOFF" .github/scripts/*.py` ⇒ 命中 **0**。
+      我们刚用两轮论证「防覆盖必须靠机器判据、不能靠人的自觉」（为此立了 [10/10] index 守卫），
+      而被本协议提升为**唯一权威来源**的文件，恰是全仓最缺保护的关键资产。
+      一旦被落后树 / 并发 push 静默覆盖，双机将**同时**失去「什么还没做」的唯一视图 ——
+      后果比 index.html 被覆盖更重（后者肉眼可见，前者无人察觉）。
+    fix: >
+      pre_deploy_audit.py 挂 [13/13]：断言 ① `len(items)` 不减少（新增允许，丢失即红）
+      ② `meta.next_id_seq` 单调不减。成本与 [10/10] 同型（纯读文件比大小），无网络依赖。
+    verify_how: "故意删一个 item 跑门禁 ⇒ 应 FAIL；恢复后应 PASS。"
+    updated: "2026-09-21 09:50"
+
+  - id: handoff-skill-inrepo
+    priority: P1
+    owner: shared
+    status: todo
+    what: >
+      协议载体**跨机不可达**：`v8-handoff-gateway` skill 放在 `~/.workbuddy/skills/`（纯本机路径，不进 git）。
+      实测：阿狸咪机 `~/.workbuddy/skills/` 下 **MISSING**；仓库内 `find -name "*handoff-gateway*"` **0 命中**。
+      ⇒ 协议自述目标「让 AI 会话自动遵守，**不靠人记**」对阿狸咪机**已落空**，只能靠人工转述或重写。
+    fix: >
+      SKILL.md 纳入仓库（如 docs/ops/skills/v8-handoff-gateway.md），双机各自 cp 到本地 skill 目录；
+      或加 sync 脚本在会话启动时比对版本号。这样协议才可版本化、可审计、可回滚。
+    updated: "2026-09-21 09:50"
+
+  - id: handoff-doc-rate-metric
+    priority: P1
+    owner: 小九
+    status: todo
+    what: >
+      规则**无强制机制 ⇒ 上线即被自己违反**（实证）：0845 新协议上线后，08:55 又新增一档，
+      其正文讲的正是**已在本文件登记的 `maharo-daily-s4u`** —— 按新规则应只改状态、不发档。
+      （属合理过渡期，非失误；但它证明：只靠约定的规则在高压高频节奏下必然回退到旧习惯 ——
+      与「判据 A 不可靠」同型。）另：0845 之后至 09:15 又新增 2 档（0855 / 0910）。
+    fix: >
+      加最轻机制（先可量化、再谈阻断）：每周统计一次 `docs/ops/handover/` 新增档数 +
+      「回执/催办类」档数，写入本文件 meta。超标即人工纠偏，成本近零。
+    verify_how: "观察一周（09-22 ~ 09-28）新档数是否落回 5–10/天 的目标区间。"
+    updated: "2026-09-21 09:50"
+
+  - id: handoff-meta-future-timestamp
+    priority: P2
+    owner: 小九
+    status: todo
+    what: >
+      ⚠️ 本文件出现**未来时间戳**：`gate-1010-marker-stale-ms-note` 的 `updated: "2026-09-21 09:58"`，
+      而该内容提交于 09:4x（commit c54476223），阿狸咪机 09:49:45 实取北京时间仍为 **09:49** ⇒ 时戳超前约 8min。
+      危害：本仓判新鲜度的既有铁律是「取 MAX 时点」，未来时戳会**污染 MAX 判据**，
+      让陈旧项看起来最新，并打乱按 `updated` 排序的阅读顺序。
+    fix: "写入前一律以 `TZ=Asia/Shanghai date` 实取；禁预估、禁手填未来时刻。"
+    updated: "2026-09-21 09:50"
+
+  - id: factorlab-commit-pathspec
+    priority: P2
+    owner: 小九
+    status: todo
+    what: >
+      **一处分歧待复核**（阿狸咪 09:2x 评审提出，小九 09:35 result 判「不属同族」）：
+      `v8/factor_lab_gen.py` L735 的 `git("commit","-m",…)` 无 pathspec。
+      小九判据：其前有 `reset --hard FETCH_HEAD` 清空 index ⇒ 不属引爆链。
+      阿狸咪不同意见：stash 冲突兜底分支的执行顺序是
+      `reset --hard FETCH_HEAD` → `stash pop` 冲突 → `checkout --theirs .` + **`git add .`（全量）**，
+      ⇒ add 发生在 reset **之后**，index 被重新填满；随后无 pathspec 的 commit 会连带提交。
+      唯一分歧点 = **「reset 在前」是否足以豁免后置的 `git add .`**。
+    fix: >
+      无论裁定如何，一行成本即可消除：该 commit 补 `--` + 明确 pathspec
+      （`index.html data/FACTOR_LAB.js raw_data/factor_lab.json`）。
+    verify_how: "读 v8/factor_lab_gen.py L718–L736 确认 add 与 reset 的先后；触发条件苛刻（需 stash pop 冲突），故列 P2。"
+    updated: "2026-09-21 09:50"
 
   # ── 已完成（保留近期项供追溯，每月清理一次）────────────────────────────
   - id: strong-breakout-purge
