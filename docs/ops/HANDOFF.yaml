@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 19:25"
+  updated: "2026-09-21 19:45"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 32
+  next_id_seq: 33
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -1377,3 +1377,19 @@ items:
       我据此决定是否加第 ③ 条兜底（在你本机工作区也放一份**指针**，同样不含正文）。
       ③ 与你机器无关的部分**不必复核**（`README.md` / `.codebuddy/` 我已本机验证）。
     updated: "2026-09-21 19:25"
+  - id: maharo-plan-b-three-editions
+    priority: P2
+    owner: 小九
+    status: pending-verify
+    what: >
+      机构研究卡「方案B·一日三次」落地：盘前 08:50（自动化 30e1b099，既有）+
+      午间 12:30（c613b8ad，新建）+ 盘后 15:10（a1542082，新建）三档出稿自动化，
+      每档出稿前先强制刷新素材（v8_guanlan_refresh --force）再按 date_range 判新鲜度；
+      前端徽章/空态/限制行文案同步改三档口径（index.html commit a8a47a0a57）。
+      午间/盘后两档尚未跑过真实 run，故 pending-verify。
+    verify_how: >
+      2026-09-22 12:30 与 15:10 各跑一版后：GET data/maharo_insights.js 的
+      update_time 应为当日 12:3x / 15:1x；卡面「更新于」随之刷新；
+      发布闸门 verify --kind maharo_insights 36 项全过（daily>=1500 字、
+      compare 三段齐全、无禁用词）。
+    updated: "2026-09-21 19:45"
