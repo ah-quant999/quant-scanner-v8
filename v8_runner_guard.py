@@ -556,6 +556,55 @@ def write_status_file(status_dict):
     return path
 
 
+# 🛡 2026-09-21 抓取链字段白名单（与 write_status_file 文档中的「cloud_fetch_v8.py 字段集」一致）
+CHAIN_KEYS = ("run_time", "category", "hostname", "modules", "summary")
+
+
+def _chain_block_newer(a, b):
+    """比较两份 status 的抓取链时间戳，返回**抓取链块较新**的那一方（无法判定时返回 None）。
+
+    判据只取 run_time（抓取链自报的本次抓取时刻），空值视为最旧。
+    """
+    if not isinstance(a, dict) or not isinstance(b, dict):
+        return None
+    ta = str(a.get("run_time") or "")
+    tb = str(b.get("run_time") or "")
+    if ta == tb:
+        return None
+    if not ta:
+        return b
+    if not tb:
+        return a
+    return a if ta > tb else b
+
+
+def union_status(remote_json, local_json):
+    """守卫并集写：健康字段本地优先；**抓取链 5 键整块取 run_time 较新的一方**。
+
+    🔴 根因（2026-09-21 13:2x 取证，GitHub commits 实证）：
+      旧实现 `union = dict(remote); union.update(local)` —— 「本地整文件优先」。
+      但本机 raw_data/runner_status.json 里**同时**含着抓取链字段的旧快照
+      （本机实测冻结在 2026-09-18 16:01:50 / category=post_close / summary total=14）。
+      抓取链（v8_cn_fetch 等）只写 runner 工作目录副本 + 远端，**从不写本机 E:/ 副本**
+      ⇒ 本机文件的链块永久冻结 ⇒ 守卫每轮把它推上去，**用 3 天前的链块覆盖远端的当日新鲜链块**。
+      实证：09-21 07:29~13:23 共 10 轮守卫推送，链块全部 = 2026-09-18 16:01:50。
+      只有抓取链在守卫之后紧接着再推一次（如 13:23:29→13:23:38 相隔 9s）才把远端救回来；
+      盘中链空档期（夜间/盘前）则远端会一直挂着陈旧链块 ⇒ 运维页「数据健康总览」误报停更。
+      修法：并集时**按 run_time 新鲜度整块择一**，守卫只赢健康字段，绝不拿旧链块盖新链块。
+    """
+    if not isinstance(remote_json, dict):
+        return None if not isinstance(local_json, dict) else dict(local_json)
+    merged = dict(remote_json)
+    if isinstance(local_json, dict):
+        merged.update(local_json)
+    newer = _chain_block_newer(remote_json, local_json)
+    if isinstance(newer, dict):
+        for k in CHAIN_KEYS:
+            if k in newer:
+                merged[k] = newer[k]
+    return merged
+
+
 def push_status_file(path):
     """推送 runner_status.json 到 main（Contents API 单文件直推，根治本地 git 死锁）。
 
@@ -611,10 +660,12 @@ def push_status_file(path):
             except Exception:
                 local_json = None
             if isinstance(local_json, dict):
-                union = dict(remote_json)
-                union.update(local_json)
-                content = json.dumps(union, ensure_ascii=False,
-                                     indent=2).encode("utf-8")
+                # 🛡 2026-09-21：改为「健康字段本地优先 + 抓取链块按 run_time 择新」
+                # （旧版无脑本地优先，会用本机冻结的旧链块覆盖远端新鲜链块，见 union_status 文档）
+                union = union_status(remote_json, local_json)
+                if isinstance(union, dict):
+                    content = json.dumps(union, ensure_ascii=False,
+                                         indent=2).encode("utf-8")
         # 2) 远端内容与本地相同 → 跳过推送
         if sha and remote_b64:
             try:
@@ -632,7 +683,15 @@ def push_status_file(path):
         body = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(api, data=body, headers=headers, method="PUT")
         with urllib.request.urlopen(req, timeout=25) as r:
-            return True, f"Contents API 已推送 (HTTP {r.status})"
+            code = r.status
+        # 3.5) 🛡 2026-09-21 回写本地：把并集结果（含远端新鲜抓取链块）回灌本机文件，
+        #      否则本机链块永久冻结在旧快照，下一轮又拿旧链块去覆盖远端（本缺陷的根因）。
+        #      仅本文件（raw_data/runner_status.json），不碰任何红线文件；失败不影响推送结论。
+        try:
+            path.write_bytes(content)
+        except Exception as e:
+            print(f"[WARN] 并集结果回写本地失败（不影响推送）: {e}")
+        return True, f"Contents API 已推送 (HTTP {code})"
     except urllib.error.HTTPError as e:
         return False, f"Contents API 失败: HTTP {e.code}: {e.read().decode('utf-8','replace')[:200]}"
     except Exception as e:
