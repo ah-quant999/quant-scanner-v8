@@ -1512,8 +1512,8 @@ items:
       经 Git Data API（base_tree + force:false）只推这 2 个登记路径，其余 83 个产物文件原样继承，未误推。
     verify_how: "线上核验：北向席位日历卡名=「北向席位日历」、徽章时间戳取自 LHB_HISTORY（非 NF）；每日洞察卡不再因 NF 停刷卡在等待就绪。待下一龙虎榜周期 + 实时站点核验。"
     evidence: "commit 1bc1d940b8（force:false 推至 main，基于实时 tip 9dffbc5b69）；blob 回读 6 项断言全绿"
-    residual: "每日洞察卡 _insightSignalCount 仍引用 NF.net_buy（约 4469 行，死源冻结值）——本次未改，避免未经拍板扩大行为；建议后续替换为 LHB_HISTORY 北向席位净买。见交接件 2026-09-21_2023。"
-    updated: "2026-09-21 20:23"
+    residual: "① 4469 残留已于同日 20:5x 收口（阿狸咪，全权授权）：_insightSignalCount 第4项改挂 LHB_DATA stocks[].seats.北向 净买>0 计 1（口径同北向席位日历卡 _nb_net_万），两处死变量 var NF 声明删除（4058/4410），注释对齐 LHB_HISTORY seats.北向；commit 992e7ac250（以线上真身 717f91ebbb 为基底补丁重放，force:false，仅替换 index.html，CI 缓存戳原样继承，回读逐字节一致；node 自检 28 块 0 错）。② 勘误：此前报告中「D FOUR_VOLUME/FOUR_VOLUME_60M 监控盲区」结论有误——两者早已登记 v8_health_check.py CARD_DEFS（202/210 行，max_age 360/1440min，heal_cat=algo_run，60M 已按 09-11 主人令移出低频白名单转硬告警），非盲区，无需补 SLA。误判根因：只查了 update_v8.py 映射表与不存在的 scripts/guard_v8_freshness.py，漏查 CARD_DEFS。"
+    updated: "2026-09-21 20:55"
 
   # ── 2026-09-21 20:4x 阿狸咪新增（E 批回测产物停更 —— 与 cnfetch-empty-shell-block 分离）──
   - id: backtest-tdx-no-refresh
