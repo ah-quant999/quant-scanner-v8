@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-09-21 09:34:41
+// 最后更新：2026-09-21 09:41:14
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-09-21 09:34:41",
+  "update_time": "2026-09-21 09:41:14",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 31,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 2937,
+      "total": 2948,
       "ongoing": true
     },
     {
@@ -78,7 +78,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 31,
       "peak": 82,
       "peak_date": "08/20",
-      "total": 738,
+      "total": 741,
       "ongoing": true
     },
     {
@@ -143,7 +143,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 25,
       "peak": 20,
       "peak_date": "09/01",
-      "total": 186,
+      "total": 192,
       "ongoing": true
     },
     {
@@ -167,9 +167,9 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "end_idx": 30,
       "days": 29,
       "hot_days": 23,
-      "peak": 17,
+      "peak": 19,
       "peak_date": "09/21",
-      "total": 194,
+      "total": 196,
       "ongoing": true
     },
     {
@@ -195,21 +195,21 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 19,
       "peak": 25,
       "peak_date": "09/01",
-      "total": 197,
+      "total": 198,
       "ongoing": true
     },
     {
       "sector": "军工",
       "start": "08/27",
-      "end": "09/17",
+      "end": "09/21",
       "start_idx": 13,
-      "end_idx": 28,
-      "days": 16,
-      "hot_days": 13,
+      "end_idx": 30,
+      "days": 18,
+      "hot_days": 14,
       "peak": 24,
       "peak_date": "09/09",
-      "total": 95,
-      "ongoing": false
+      "total": 101,
+      "ongoing": true
     },
     {
       "sector": "电力",
@@ -221,7 +221,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 17,
       "peak": 12,
       "peak_date": "09/09",
-      "total": 117,
+      "total": 118,
       "ongoing": true
     },
     {
@@ -260,7 +260,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 10,
       "peak": 15,
       "peak_date": "09/16",
-      "total": 96,
+      "total": 100,
       "ongoing": true
     },
     {
@@ -286,7 +286,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 4,
       "peak": 12,
       "peak_date": "09/18",
-      "total": 32,
+      "total": 34,
       "ongoing": true
     },
     {
