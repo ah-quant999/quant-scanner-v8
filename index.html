@@ -1813,10 +1813,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
     <script src="data/VALUATION_PERCENTILE.js?v=1789954729" defer></script>
     <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
-    <!-- 2026-09-10 主人令：因子补缺 walk-forward 进度跟踪卡（暂未上架·实验区最下方） -->
-    <script src="data/FACTOR_PROGRESS.js?v=1789954729" defer></script>
     <!-- 🆕 2026-09-19 主人令（阿狸咪的工程师）：walk-forward 真值（verdict / IR_OOS / 跑赢基准率），
-         供「🧪 已纳入因子」+「🧮 每日因子计算」两卡读 P5 段闸门真值。
+         供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=1789954729" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=1789954729" defer></script>
@@ -1913,8 +1911,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     </div>
     </div>
     <!-- ═══════════════════════════════════════════════════════════════
-         🧮 每日因子计算（2026-09-19 主人令新建；同日二次令：与「已纳入因子」合并为一卡两步
-            本卡 = 每日打分引擎（generate_top10.py 投影）的静态展示，与「🏆 当日因子计分榜」收口）
+         🧮 每日因子计算（2026-09-19 主人令新建；2026-09-20 主人令：原「已纳入因子」第二步已删，
+            本卡回归单卡单步 = 每日打分引擎（generate_top10.py 投影）的静态展示，与「🏆 当日因子计分榜」收口）
            原话：「每天如何给入选的股票们打分的全部在新卡列出来，新卡名字叫每日因子计算」
          数据源：algorithms/generate_top10.py 的**真实现**（P1~P5 段 + 形态/资金/板块/机构/基本面）
          🔴 铁律：本卡是代码的**投影**，每个权重都必须能在源码里指到行；
@@ -7132,8 +7130,6 @@ function fmtSigned(v){
     var _FW = window.FACTOR_WALKFORWARD || {};
     var _fwF = _FW.factors || {};
     var _fwAt = _FW.update_time || '';
-    // ── 动态覆盖：台账（已纳入因子清单）──
-    var _PG = window.FACTOR_PROGRESS || {};
 
     // ══════════════════════════════════════════════════════════════════
     // 分组数据（**照 generate_top10.py 真实现逐行抄**，权重复算可核）
@@ -7460,7 +7456,7 @@ function fmtSigned(v){
   //           已按 total_score 降序 —— 本卡**照产物原序渲染，不重排**，顶部即最高分）。
   //   🏷「最终推荐」标记 ← FINAL_RECOMMEND_DATA.stocks 当日实际推荐名单（代码数字位精确匹配）。
   //   口径注：本榜 = generate_top10.py 的 total_score 评分体系（决定排序的主力分）；
-  //           「已纳入因子」卡的 factor_chain（放量弱势 weak_penalty 等）是推荐层二次微调，
+  //           推荐层的 factor_chain（放量弱势 weak_penalty 等）是二次微调，
   //           两层口径各自如实、不混排。
   // ═════════════════════════════════════════════════════════════════════════
   window.__dsbRetry = 0;
@@ -7524,7 +7520,7 @@ function fmtSigned(v){
     var _ts = (D.total_scored == null) ? '' : ('　全池评分 <b style="color:var(--txt);">'+_e(D.total_scored)+'</b> 只（明细落盘 top'+rows.length+'）');
     h += '<div style="font-size:10.5px;color:var(--dim);margin-top:9px;line-height:1.75;">'
        + '口径：本榜 = <code>algorithms/generate_top10.py</code> 的 total_score 评分体系（决定排序的主力分，产物原序=已降序）；'
-       + '「已纳入因子」卡的 factor_chain（如放量弱势 weak_penalty）是推荐层的二次微调，两层各自如实、不混排。'
+       + '因子链 factor_chain（如放量弱势 weak_penalty）是推荐层的二次微调，两层各自如实、不混排。'
        + '因子列缺失记 0。数据源 data/TOP10_DAILY.js'
        + (D.update_time ? (' · 更新于 <b>'+_e(D.update_time)+'</b>') : '')
        + '。仅研究参考，非买卖建议。</div>';
@@ -15525,7 +15521,7 @@ h += '</div>'; // /ulPaneObserve
 //   三组迁出去向（卡片容器 id 全部保留，仅换宿主；渲染函数按 id 取容器，故迁页零改动）：
 //     · 回测·框架 3 卡  RPS 30天样本考核（已删）/ 中信PE观测（已并到暂未上架）/ 指数观测（已并到暂未上架）
 //       → 策略回测页底部 #btExtraHost（__renderBtExtraPane）现仅保留其它回测类卡壳
-//     · 因子类   3 卡  因子实验室(已纳入因子) / 因子审计(2026-09-19 下线) / 因子补缺进度
+//     · 因子类   2 卡  每日因子计算（原含「已纳入因子」第二步，2026-09-20 删） / 当日因子计分榜
 //       → 选股策略 → 🧪 因子实验室 子页（直挂静态卡，stFaHost 壳已删；__renderFactorPane 只做就地填充）
 //     · 宏观类   3 卡  机构研究·AI解析 / 新周期判定 / 宏观景气背景·K型分层
 //       （2026-09-13 主人令：「新周期判定」已下沉至「暂未上架 → 观测类」最下方
@@ -17378,10 +17374,12 @@ hm += '</div>'; // /ulPaneBacktest
     //   renderUnlisted 里，宿主迁走后不再被触发 → 三卡恒「加载中」）
     // 2026-09-13 主人令：原回测卡 / 原指数中枢卡 已并入暂未上架合并卡，此处不再调用
   };
-  /* 🔴 2026-09-19 主人令（因子三卡整理）：
-     ① 「已纳入因子」（factorLabBody）并入「🧮 每日因子计算」卡作第二步，容器随静态 HTML 内迁；
-     ② 「📊 因子审计」卡整体下线（__renderFactorAudit / factorAuditBody / data/FACTOR_AUDIT.js 前端引用全删）；
-     ③ stFaHost 空壳骨架随之移除 —— 本函数只负责子页三卡的就地填充。 */
+  /* 🔴 因子实验室子页渲染（2026-09-19 建；2026-09-20 主人令精简为两卡）：
+     ① 「📊 因子审计」卡下线（__renderFactorAudit / factorAuditBody / data/FACTOR_AUDIT.js 前端引用全删）；
+     ② 「已纳入因子」（factorLabBody）第二步删除 —— 其数据源 factor_chain.integrated 实测恒空
+        （skipped=true，skip_reason=「FACTOR_LAB.js 缺失/内容陈旧 ⇒ 方案B 因子融合整体跳过」），
+        且内容与「入选后打分全表」「🏆 当日因子计分榜」口径重复，故不再保留；
+     ③ stFaHost 空壳骨架已移除 —— 本函数只负责子页两卡的就地填充。 */
   window.__renderFactorPane = function(){
     try{ if(typeof window.__renderDailyFactorCalc==='function') window.__renderDailyFactorCalc(); }catch(e){ console.warn('每日因子计算卡渲染失败', e); }
     try{ if(typeof window.__renderDailyScoreboard==='function') window.__renderDailyScoreboard(); }catch(e){ console.warn('当日因子计分榜渲染失败', e); }
@@ -18797,7 +18795,7 @@ window.__renderV8CalToday();
     // 🔴 2026-09-20 主人令：「🧪 因子实验室」由「选股策略」页迁入本页第 3 子 Tab，
     //   渲染触发随之语义归位到此（原 window.switchSt('fa') 分支已删）。
     //   注：页面级 _renderPostReady 已在 DOMContentLoaded 无条件预渲
-    //   （__renderFactorPane 内部串起「已纳入因子 / 每日因子计算 / 当日因子计分榜」三卡），
+    //   （__renderFactorPane 内部串起「每日因子计算 / 当日因子计分榜」两卡），
     //   此处仅作切换兜底重渲 + 数据就绪重试（复用 __stRetryTab 的 fa 分支）。
     if(name==='fa'){
       if(typeof window.__renderFactorPane==='function') setTimeout(window.__renderFactorPane, 30);
