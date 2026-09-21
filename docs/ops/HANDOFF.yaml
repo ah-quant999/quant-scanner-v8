@@ -1,0 +1,167 @@
+# ============================================================================
+# 双机交接唯一状态源 · quant-scanner-v8
+# ============================================================================
+#
+# 🔴🔴 本文件是「什么还没做 / 谁在做 / 做到哪」的唯一权威来源。
+#
+# 规则（2026-09-21 主人批准，双机共同遵守）：
+#   1. 任何挂账、待办、待验证、待拍板项 —— **只登记在本文件**，不散落在交接档里。
+#   2. 查「还有什么没做完」= 读本文件，**不要翻 docs/ops/handover/ 的 518 个档**。
+#   3. 交接档只在**需要人拍板**或**跨机需知的结构性变更**时才写；
+#      技术细节写进**代码注释**，改动记录写进 **git commit message**。
+#   4. 严禁「回执档」「催办档」—— 收到 = 改本文件的状态字段。
+#   5. 本文件每项必须有 `updated`（时刻）；改状态时**就地更新**，不追加新条目。
+#
+# status 取值：
+#   todo            未开始
+#   doing           进行中（有 active owner）
+#   pending-verify  改动已上线，但**尚未被运行验证生效** ← 最易被误报为「已完成」
+#   blocked         等外部条件（如等 run、等对方）
+#   done            已验证生效（含验证证据）
+#
+# ⚠️ 判据纪律：`代码改了` ≠ `产物重跑了` ≠ `被 run 验证生效`。
+#    `pending-verify` 状态**不得**对外宣称「已修复」。必须填 `verified_at` 才算 done。
+#
+# 数据采集时刻：2026-09-21 08:40 CST（小九机实测）
+# ============================================================================
+
+meta:
+  updated: "2026-09-21 08:40"
+  updated_by: "小九(lemoncat-cn)"
+  next_id_seq: 12
+
+items:
+
+  # ── P0 · 部署链 ────────────────────────────────────────────────────────
+  - id: build13-timeout-guard
+    priority: P0
+    owner: shared
+    status: pending-verify
+    what: >
+      v8_build_deploy 第13步「部署到 main」超时护栏缺口。原 timeout 180 只包 git 命令(6min/轮)，
+      未包占时 70%+ 的 `python update_v8.py` 全量重建(~8min/轮)且失败仍重试 ⇒
+      每轮最坏 15min × 3 轮 = 45min。实测失败轮 step[13] 恒 ≥31.8min（38.8/36.1/31.8）。
+    fix: "第13步已加 timeout 300 + 失败即 exit 1；guard 加 timeout 120；cache-busters 加 timeout 180"
+    evidence: "commit 61bc3fc03070 (2026-09-21 08:09 CST)"
+    verify_how: >
+      等下一轮新代码 run 跑完，核对 ① step[13] 耗时是否落回 ≤20min
+      ② data/HEALTH_CHECK.js 的 updated 是否继续前进
+    verified_at: null
+    updated: "2026-09-21 08:40"
+
+  - id: cachebot-build-race
+    priority: P0
+    owner: 小九
+    status: todo
+    what: >
+      v8_cache_bot 与 build 抢 main 的结构性张力。cache-bot 实测每 1.1–9.2min 推一次 main
+      （多数 <4min，短于一次全量重建）⇒ build 每次 push 用「4分钟前基线」⇒ 必被拒是常态。
+      实测卡住的 38min 内 cache-bot 推了 7 次。
+    options:
+      A: reconcile 遇 build running 时让开
+      B: build 收口 ?v、reconcile 降频 30–60min 仅兜底
+      C: 只维持超时护栏、接受「多数轮 push 需重试一次」
+    decided: "按主人令『用最科学的方法』由小九自行决断 —— 倾向 B（职责单一化：build 是 ?v 的 owner）"
+    updated: "2026-09-21 08:40"
+
+  - id: concurrency-block-bucket
+    priority: P1
+    owner: 小九
+    status: todo
+    what: >
+      v8_build_deploy concurrency 排队制 + 僵尸 job ⇒ 一个卡住的 job 堵死同桶后续 run
+      （实测三态并存：running + pending ×2）。涉及跨桶语义，改动风险中。
+    updated: "2026-09-21 08:40"
+
+  - id: build13-step-timeout-minutes
+    priority: P2
+    owner: 小九
+    status: todo
+    what: "第13步仍无步级 timeout-minutes，仅靠 job 级 60min 兜底。命令级护栏已收敛，此项优先级降低。"
+    updated: "2026-09-21 08:40"
+
+  # ── P0 · 数据回滚防线 ──────────────────────────────────────────────────
+  - id: stale-index-landmine
+    priority: P0
+    owner: shared
+    status: pending-verify
+    what: >
+      陈旧暂存区地雷：自愈/巡检脚本用 `git checkout <ref> -- <path>` 写主 index（非只改工作树），
+      叠加本机 4 处裸 `git commit`（无 pathspec）⇒ 任一被 cron 触发即吞掉 staged 并推送 = 数据回滚。
+    fix: >
+      拆弹 staged 5→0；根治 8 文件：v8_health_check checkout 后补 unstage、
+      v8_rollback_guard 收敛为 restore_from_origin()、
+      run_algorithms 双分支同改、4 处裸提交补 pathspec
+    evidence: "commit 6c241f041 (2026-09-21 08:2x CST)，线上 8/8 blob 一致"
+    verify_how: >
+      ① 本机 `echo "staged=$(git diff --cached --name-only|wc -l)"` 应恒为 0
+      ② `git reflog -8` 不应再出现新的 `reset: moving to origin/main`
+      ③ 观察一个完整交易日，确认无脚本再重埋
+    verified_at: "2026-09-21 08:33（拆弹后即刻 + 推后复查，staged=0）— 但需一整日观察确认未复埋"
+    updated: "2026-09-21 08:40"
+
+  - id: alimi-same-family-check
+    priority: P0
+    owner: 阿狸咪
+    status: todo
+    what: >
+      请阿狸咪机跑同族风险排查：其机若有同名脚本的本地副本（非从 main 拉取），
+      可能仍是旧写法。若其机 staged 非 0，按 v8-git-stale-index-landmine §四 拆弹。
+    verify_how: |
+      cd <你机仓库根>
+      grep -rn 'checkout", "origin/main", "--"' --include=*.py . | grep -v __pycache__
+      grep -rn 'checkout", "HEAD", "--", f"raw_data' --include=*.py . | grep -v __pycache__
+      grep -rnE '"commit", "-m"' --include=*.py . | grep -v __pycache__ | grep -v script_sync_backup
+      echo "staged=$(git diff --cached --name-only | wc -l)"
+    updated: "2026-09-21 08:40"
+
+  # ── P1 · 已知隐患 ─────────────────────────────────────────────────────
+  - id: local-worktree-behind
+    priority: P1
+    owner: 小九
+    status: blocked
+    what: >
+      本机工作树 HEAD 落后 origin/main（实测 5→9 个提交，云端高频重写 ?v）。
+      是否全量对齐待定 —— 因本机有 36 项未暂存工作树改动，全量对齐会丢本机 WIP。
+    blocked_by: "需先判断哪些本机改动是有价值的 WIP、哪些是生成物噪音"
+    updated: "2026-09-21 08:40"
+
+  - id: maharo-daily-s4u
+    priority: P2
+    owner: 小九
+    status: todo
+    what: >
+      本机 v8-maharo-daily 计划任务是 S4U 且 LastTaskResult=1（已知隐患）。
+      属「日报链」，与素材链是两条链。根治需改 LogonType 并加 WakeToRun。
+    updated: "2026-09-21 08:40"
+
+  - id: defer-cache-empty-freeze
+    priority: P1
+    owner: 小九
+    status: todo
+    what: >
+      本机审计日志（raw_data/code_audit.log 03:51:09）报出 2 处「defer 数据 × 结果缓存」空结果固化风险：
+      数据未就位即缓存空值 ⇒ 此后永空且全程不报错。
+        __gaoshouSet() → 缓存 __gaoshouSetCache，却读 defer 数据 IMA_STRONG_STOCK（index.html 第 5696 行）
+        __tripleBacktestAdapted() → 缓存 __tripleBacktestCache，却读 defer 数据 BACKTEST_COMPREHENSIVE（第 5332 行）
+    source: "raw_data/code_audit.log 第 11/11 项守卫 FAIL"
+    updated: "2026-09-21 08:40"
+
+  # ── 已完成（保留近期项供追溯，每月清理一次）────────────────────────────
+  - id: strong-breakout-purge
+    priority: P1
+    owner: shared
+    status: done
+    what: "强势突破残留产物清除 + 防回推双层护栏；红灯 all_STRONG_BREAKOUT 已熄灭（fail 1→0）"
+    evidence: "commit cfe5d0bf978a；HEALTH_CHECK.js fail=0 @ 2026-09-21 07:53:47"
+    verified_at: "2026-09-21 08:12（实测 fail=0、items 无 STRONG_BREAKOUT）"
+    updated: "2026-09-21 08:40"
+
+  - id: handoff-protocol
+    priority: P1
+    owner: 小九
+    status: done
+    what: "建立本状态源 + 交接协议，替代「每事一档」；砍掉回执/催办档"
+    evidence: "本文件 + skill v8-handoff-gateway"
+    verified_at: "2026-09-21 08:45（建档）"
+    updated: "2026-09-21 08:40"

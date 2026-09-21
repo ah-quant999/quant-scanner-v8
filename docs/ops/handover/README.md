@@ -5,6 +5,45 @@
 
 ---
 
+## 🔴🔴 先读这里：当前挂账不在本目录（2026-09-21 主人批准）
+
+**「什么还没做 / 谁在做 / 做到哪」的唯一权威来源已迁移到：**
+
+```
+docs/ops/HANDOFF.yaml
+```
+
+**不要 `ls | head` 通读本目录**（现有 518 个档，绝大多数是过期中间状态）。
+
+```bash
+# 一眼看完所有未完成项
+python -c "
+import io,yaml
+d=yaml.safe_load(io.open('docs/ops/HANDOFF.yaml',encoding='utf-8').read())
+for i in d['items']:
+    if i['status']!='done':
+        print('[%-14s] %-28s %s' % (i['status'], i['id'], i['owner']))
+"
+```
+
+### 新增档规则（只许两种情况）
+
+| 允许 ✅ | 禁止 ❌ |
+|---|---|
+| **需要人拍板**（含选项对比 + 推荐 + 理由） | 回执档（「收到」「已核验」）→ 改 `HANDOFF.yaml` 状态字段 |
+| **跨机需知的结构性变更**（双机共同依赖的协议/口径） | 催办档（「还没回我」）→ 修 `HANDOFF.yaml` 的 `owner`/`verify_how` |
+| | 进度汇报 / 工作日志 → 写 **git commit message** |
+| | 技术细节说明 → 写**代码注释** |
+
+**实测病根（2026-09-21）**：单日峰值 62 档、单小时 9 档；
+「回执_未回执交接对齐」重复 **22 次 / 417 KB / 零技术内容**；同一标题重复 7 次。
+详见 skill `~/.workbuddy/skills/v8-handoff-gateway/SKILL.md`。
+
+> ⚠️ 本节与 §一「唯一目录」不冲突：§一 说的是**交接档放哪里**；
+> 本节说的是**状态放哪里**——状态不进 .md，进 `HANDOFF.yaml`。
+
+---
+
 ## 一、🔴 唯一目录
 
 ```
