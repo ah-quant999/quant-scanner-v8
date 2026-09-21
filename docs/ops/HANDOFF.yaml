@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 19:45"
+  updated: "2026-09-21 19:59"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -1332,6 +1332,19 @@ items:
          判据刻意宽松（不查内容哈希），避免任何文字修订都阻断部署。
       🔴 **三份新文件均不含协议正文**，只回答「往哪读」⇒ 尊重 `handoff-skill-inrepo` 的
       resolution（阿狸咪 16:23：不 cp 第二副本、认仓内为唯一权威），不制造「哪份为准」的歧义。
+      ⑦ **本地工作树同步（可达性第四形态，2026-09-21 19:3x 实测发现）**：
+        官方口径（CodeBuddy 文档 `/cli/memory` 原文）—— 记忆文件「**在启动时自动加载**」，
+        且项目级是「**从当前工作目录向上递归加载** `CODEBUDDY.md` 与 `AGENTS.md`」
+        （`/cli/codebuddy-dir` 另补：根目录 `AGENTS.md` 与 `.codebuddy/CODEBUDDY.md`「两种位置等效」）。
+        ⇒ **「自动加载」认的是「本地工作树」，不是「远端仓库」。**
+        而本仓常用 **API 隔离索引推送**（**按设计**绕过工作树）⇒ ①–④ 的文件虽已上线，
+        **双机本地工作树当时都没有** ⇒ 会话工作目录若＝仓根，**实际加载到 0**，入口形同不存在。
+        ⇒ 入库工具 `v8_handoff_edit_kit.py ai-entry-sync`：取三份真身逐字节落
+        `E:\qs_workspaces\quant-scanner-v8` ＋ `E:\v8data\qs8-tmp` ＋ 本机 skill 副本；
+        并把「推完入口文件必跑一次」写进 `AGENTS.md` §五 与本协议 §8。
+      ⑧ **本机用户级兜底**（覆盖「会话工作区不在 v8 仓根」的场景）：
+        `~/.codebuddy/CODEBUDDY.md` ＋ `~/.workbuddy/CODEBUDDY.md`（同一份 1020 B **指针**，不含正文）；
+        `~/.workbuddy/MEMORY.md`（WorkBuddy 用户级记忆，**所有项目注入**）亦已写入本入口指引。
     verify_how: >
       ① 双机可读性：任一台机 `git show <tip>:AGENTS.md` / `git show <tip>:.codebuddy/CODEBUDDY.md` 非空；
       ② 指针有效性（防「入口指了不存在的路」）：`AGENTS.md` 里出现的仓内路径**逐条存在**
@@ -1345,6 +1358,10 @@ items:
          ⇒ 证明 [14/14] 真的在 CI 里跑过（而不是又一次「改了但没被触发」）。
       ⑥ 反向测试（CI 侧）：在临时目录删掉 `AGENTS.md` ⇒ 本地跑 `pre_deploy_audit.py`
          **必须 FAIL 并点名**；还原后必须复绿。
+      ⑦ **本地加载通路（第四形态的验收，双机各自做）**：在各自仓根跑
+         `python ~/.workbuddy/scripts/v8_handoff_edit_kit.py ai-entry-sync`，
+         输出应**全部**为「＝ 已一致」；出现「↑ 已更新」＝ **上次漏同步**。
+         判据只认 **md5 与线上 blob 相同**（不看时间戳、不看 commit sha）。
     evidence: >
       ① 本批 commit `ae2a7cdc7a40`：`AGENTS.md`（新增，5949 B）/ `.codebuddy/CODEBUDDY.md`
          （新增，864 B）/ `README.md`（899 → 1682 B）/ `SKILL.md`（19564 → 22050 B，
@@ -1361,6 +1378,18 @@ items:
       ⑤ 实测数据源：小九机 `_gate.py` / `_gate2.py` / `_gate3.py` / `_gate4.py` /
          `_eol.py` / `_ins.py` / `_p9chk.py` / `_wf10.py` 输出，
          全部为 `api.github.com` 远端 blob 取证（非本地工作树）。
+      ⑥ **可达性验收通过（本项第三半）**：commit `cd186cd5e7f3`（仅改 `AGENTS.md`，
+         5949 → 6858 B，md5 `ae3bed970c8b`）触发了 run `35596070037`
+         （event＝`push`，`created_at` 2026-09-21T11:48:58Z ＝ **19:48:58 CST**）
+         ⇒ 证明 `push.paths` 补的 5 条**确实生效**（此前同类 commit 只触发
+         `pages build and deployment`，`v8 构建部署(云端ubuntu)` 根本不跑）。
+         推送用新建的通用净室推送器 `~/.workbuddy/scripts/v8_push_files.py`
+         （API 隔离索引、`force:false`、第 1 轮命中；**推送成功那一轮当场 API 回读 blob
+         逐字节自验** ＝ 一致 ⇒ 从根上消除「终验假设第 1 轮即推送轮」的坑）。
+      ⑦ **本地落盘实测（19:37–19:57 CST）**：`AGENTS.md` / `.codebuddy/CODEBUDDY.md` /
+         `SKILL.md` 各 × 三处（真身工作树 ＋ 老树 ＋ 本机 skill 副本）＋ 2 份用户级指针，
+         **逐处回读 md5 与线上 blob 相同**；`AGENTS.md` 6858 B `ae3bed970c8b`，
+         `SKILL.md` 28202 B `15ee7b7e8d09`（CR=0，§6<§7<§8 顺序断言通过）。
     note_to: 阿狸咪
     note: >
       2026-09-21 19:1x 小九 → 阿狸咪（走 §3.5 的 `note_to`，不另写档）。
@@ -1376,7 +1405,14 @@ items:
       则它不会注入 —— 请在 `verify_how` 就地记下「你的实际工作区路径 ＋ 观察结果」，
       我据此决定是否加第 ③ 条兜底（在你本机工作区也放一份**指针**，同样不含正文）。
       ③ 与你机器无关的部分**不必复核**（`README.md` / `.codebuddy/` 我已本机验证）。
-    updated: "2026-09-21 19:25"
+      ④ **19:55 补一条与你机器直接相关的**：上面 ⑦ 的「本地工作树同步」**在你机器上同样要做一次**。
+      若你的工作树也没有 `AGENTS.md` / `.codebuddy/CODEBUDDY.md`（大概率没有 —— 大家都用
+      API 隔离推送），请 `git fetch` 后在仓根跑：
+      `python ~/.workbuddy/scripts/v8_handoff_edit_kit.py ai-entry-sync`
+      （本机该脚本已就位；你机器若没有该脚本，`git show FETCH_HEAD:AGENTS.md > AGENTS.md`
+      并同理落 `.codebuddy/CODEBUDDY.md`，效果等同。）
+      **这一步不涉及改判、不必等我对齐**，属你机器的本地收尾；做完把 `verify_how` ⑦ 的结果就地记下即可。
+    updated: "2026-09-21 19:59"
   - id: maharo-plan-b-three-editions
     priority: P2
     owner: 小九

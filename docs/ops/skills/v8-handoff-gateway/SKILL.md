@@ -439,3 +439,47 @@ ledger 缺失 ⇒ 门禁**放行并告警**（守卫自身不得成为新的单�
 > **不能只查「存在性」**。存在性断言对「插错位置」零抵抗 ——
 > 这与本协议 §3 已记的「**断言比代码更容易写错**」是同一家族，但更隐蔽：
 > 代码是对的，只是**验收标准不够强**。
+
+---
+
+**补充（批⑧ 实测，2026-09-21 19:3x–19:5x）——
+可达性的「第四个形态」：文件确实到位，但**加载路径本身不通**。**
+
+前三个形态都默认了一个前提 ——「会话总能看到仓根的文件」。批⑧ 实测把这个前提也推翻了：
+
+- **官方口径**（CodeBuddy 文档 `/cli/memory` 原文）：记忆文件
+  「**在启动 CodeBuddy Code 时自动加载到上下文中**」，且项目级是
+  「**从当前工作目录向上递归加载**所有 `CODEBUDDY.md` 和 `AGENTS.md`」；
+  `/cli/codebuddy-dir` 补充：「也可将记忆文件放在根目录的 `AGENTS.md`（不在 `.codebuddy` 内），
+  **两种位置等效**」。
+  ⇒ **「自动加载」认的是「本地工作树」，不是「远端仓库」。**
+  （旁证：本机 `E:\workbuddy\resources\app.asar.unpacked\cli\product.json` 中
+  `AGENTS.md` 命中 7 次、`CODEBUDDY.md` 命中 13 次，机制确有实现。）
+
+- **实测缺口**：`AGENTS.md` / `.codebuddy/CODEBUDDY.md` 早在批⑤ 就已**上线**，
+  但**双机本地工作树都没有** —— 因为本仓常用 **API 隔离索引推送**（**按设计**绕过工作树）。
+  ⇒ 若会话工作目录指向仓根，**实际加载到 0** ⇒ **入口形同不存在**。
+
+**修法（已入库，与推仓同批执行）**：推完入口文件**必须**同步到本地工作树 ——
+
+```bash
+python C:/Users/Administrator/.workbuddy/scripts/v8_handoff_edit_kit.py ai-entry-sync
+```
+
+它取三份真身（`AGENTS.md` / `.codebuddy/CODEBUDDY.md` / 本文件）逐字节落到
+`E:\qs_workspaces\quant-scanner-v8` ＋ `E:\v8data\qs8-tmp` ＋ 本机 skill 副本
+`~/.workbuddy/skills/v8-handoff-gateway/`。
+
+**验收**：**重跑一次**，输出应**全部**为「＝ 已一致」；出现「↑ 已更新」＝ **上次漏同步**。
+判据只认 **md5 与线上 blob 相同**，不看时间戳、不看 commit sha。
+
+**本机用户级兜底**（覆盖「会话工作区不在 v8 仓根」的场景）：
+`~/.codebuddy/CODEBUDDY.md` ＋ `~/.workbuddy/CODEBUDDY.md`（**同一份 1020 B 指针**）——
+只做「把会话导到项目入口文件」，**不重复**任何项目内规则。
+（`~/.workbuddy/MEMORY.md` 是 WorkBuddy 的用户级记忆通道，**所有项目注入**，同样已写入本入口指引。）
+
+⚠️ **本门自身的可达性受限 —— 如实登记**：
+`docs/ops/skills/**`、`SECURITY_RULES.md`、`TIME_ORDER.md` **不在** `push.paths` 内
+⇒ **单独修改本文件不会触发** `build_deploy` ⇒ `[14/14]` 对这几项的检查属于
+「**随其他高频变更顺带执行**」，**不是即时**。
+这是上面「刻意不用 `docs/ops/**`」那条取舍的**已知代价**，写在这里以免后人误以为有即时门禁。
