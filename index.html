@@ -12503,7 +12503,7 @@ function drawUpDownChart(){
 
   const V8_PAGE_SCHEDULE = {
 
-    updated: '2026-08-06 16:25',
+    updated: '2026-09-22 05:30',
 
     source: 'GitHub Actions API + data/*.js 时间戳',
 
@@ -12513,7 +12513,8 @@ function drawUpDownChart(){
 
         id:'obs', icon:'🌍', name:'观测平台',
 
-        cards:[]
+        cards:[
+        ]
 
       },
 
@@ -12523,17 +12524,15 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'重要事件日历', source:'V8_CAL', freq:'每周日+月末', slots:['周日'], note:'非每日更新'},
+          {name:'今日事件详情', source:'JUDGMENT_DATA', freq:'每日盘前', slots:['0','8',':','2','5'], note:'环境态势综合判定'},
 
-          {name:'今日解禁', source:'RESTRICTED_RELEASE', freq:'每日盘前', slots:['08:25'], weekendUpdate:false, note:'今日限售股解禁家数与市值 TOP；一行4列、胶囊内部一行；当日无解禁也显示'},
+          {name:'今日解禁', source:'RESTRICTED_RELEASE', freq:'每日盘前', slots:['0','8',':','2','5'], note:'限售股解禁家数与市值 TOP'},
 
-          {name:'今日业绩预告', source:'PERFORMANCE_FORECAST', freq:'每日盘前', slots:['08:25'], weekendUpdate:false, note:'仅统计公告日为当日的预告（today_summary/today_items）；一行4列、胶囊内部一行；当日无新增也显示并附最近一批公告日期'},
+          {name:'今日业绩预告', source:'PERFORMANCE_FORECAST', freq:'每日盘前', slots:['0','8',':','2','5'], note:'当日预告统计'},
 
-          {name:'今日判定', source:'JUDGMENT_DATA', freq:'每日盘后', slots:['17:30'], weekendUpdate:false, note:'环境态势综合判定（仅交易日盘前更新）'},
+          {name:'打新速览', source:'IPO_DATA', freq:'每日盘后', slots:['1','7',':','3','0'], note:'新股评分'},
 
-          {name:'打新研判', source:'IPO_DATA', freq:'每日盘后', slots:['17:30'], weekendUpdate:false, note:'新股评分（仅交易日盘前更新）'},
-
-          {name:'市场提示', source:'NT_DATA', freq:'每日盘后', slots:['17:30'], weekendUpdate:false, note:'市场动态提示（仅交易日盘前更新）'}
+          {name:'重要事件日历', source:'V8_CAL', freq:'每周日+月末', slots:['周','日'], note:'中长线事件'},
 
         ]
 
@@ -12545,25 +12544,23 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'指数快览', source:'INDEX_QUOTES', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'上证/深证/创业/科创等核心指数；胶囊改小内部一行'},
+          {name:'指数快览', source:'INDEX_QUOTES', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'核心指数'},
 
-          {name:'亚太市场概览', source:'OVERSEAS_MARKETS', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'日经/恒生/KOSPI/台湾加权；intraday 每30分刷新；胶囊改小内部一行'},
+          {name:'亚太市场概览', source:'OVERSEAS_MARKETS', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'日经/恒生/KOSPI'},
 
-          {name:'ETF 盘中异动', source:'ETF_PULSE', freq:'盘中实时', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'T+0 资金流向'},
+          {name:'期指主力合约', source:'CFFEX_HOLDINGS', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'IF/IC/IM'},
 
-          {name:'板块资金流向', source:'SECTOR_FUND_FLOW', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'行业/概念资金流'},
+          {name:'涨停热力矩阵', source:'LIMIT_UP_HEATMAP', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'连板/炸板热度'},
 
-          {name:'行业树图 · 细分赛道', source:'SECTOR_FUND_FLOW', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'行业板块涨跌 treemap（强制显示「盘中」标签）'},
+          {name:'ETF盘中异动', source:'ETF_PULSE', freq:'盘中实时', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'T+0 资金流向'},
 
-          {name:'概念排名', source:'CONCEPT_RANKING', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'涨停概念追踪'},
+          {name:'主力净额分时累计曲线', source:'MARKET_FUND_FLOW_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'两市净流入'},
 
-          {name:'涨停热度', source:'LIMIT_UP_HEATMAP', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'连板/炸板热度 · 同时驱动「情绪周期·连板天梯」'},
+          {name:'商品涨价弹性榜', source:'COMMODITY_ELASTICITY', freq:'每日盘后', slots:['1','7',':','3','0'], note:'商品弹性'},
 
-          {name:'市场资金流向', source:'MARKET_FUND_FLOW_DATA', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'两市净流入'},
+          {name:'概念资金热力图', source:'CONCEPT_RANKING', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'涨停概念追踪'},
 
-          {name:'市场预警', source:'MARKET_ALERTS', freq:'盘中实时', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'量价异常预警'},
-
-          {name:'📐 平均股价', source:'AVG_PRICE_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'全A算术平均股价（＝通达信880003定义口径，cloud_fetch f_avg_price 单点写入；2026-08-31 修复：tasks 列表遗漏导致不刷新，已补齐）+ MA20/MA60 水位；盘前不清空（KEEP_VARS），history 逐交易日累积，满20/60日后才给水位信号'}
+          {name:'行业树图·细分赛道', source:'SECTOR_FUND_FLOW', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'行业涨跌 treemap'},
 
         ]
 
@@ -12575,40 +12572,19 @@ function drawUpDownChart(){
 
         cards:[
 
+          {name:'板块资金趋势', source:'SECTOR_RECOMMENDATION', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'收盘复盘+周期定位'},
 
-          // 🛡 2026-09-01 主人令修复：MARGIN_DATA 由 cloud_fetch_v8.f_margin_data（akshare stock_margin_sse）产出，
-          //   跟随 cn_fetch 每 30 分节奏、末班车 17:20；原写 17:30 与真实末班车错位。
-          //   注意：上交所两融为 T+1 披露，当日收盘后约 18:00+ 才发布，故内容日期天然滞后一个交易日；
-          //   akshare 接口失败时 f_margin_data 返回 None → 整个文件不重写 → update_time 停在上一交易日（真红灯，非误判）。
-          {name:'融资融券', source:'MARGIN_DATA', freq:'收盘后1次', slots:['17:20'], note:'两市融资余额（akshare stock_margin_sse；交易所 T+1 披露，内容日期滞后1个交易日属正常。若「最近」显示昨日 → 今日该接口抓取失败，需查云端 cn_fetch 日志）'},
+          {name:'日监控·主力净流入', source:'ETF_DAILY_MONITOR', freq:'盘中每30分+盘后定稿', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'ETF 主力净流入'},
 
-          {name:'日监控 · 主力净流入', source:'ETF_DAILY_MONITOR', freq:'盘中每30分 + 收盘后定稿', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30','17:20'], note:'全市场 ETF 当日主力净流入 TOP 排名（T+0 定基）；2026-09-11 主人令自「实时数据」页 ETF 三合一 Block3 独立成卡、迁至本页（市场宽度卡上方）；数据本体盘中每30分刷新 + 盘后三档(17:20/18:20/19:20)定稿，CATEGORY_MAP=intraday,post_close'},
+          {name:'资金热度·净申赎', source:'ETF_NET_SUBSCRIPTION', freq:'每日盘前', slots:['0','8',':','2','5'], note:'真实份额申赎'},
 
-          {name:'资金热度 · 净申赎', source:'ETF_NET_SUBSCRIPTION', freq:'每日盘前', slots:['08:25'], note:'上交所 ETF 真实份额申赎（数据日 T-1，交易所盘后披露，非实时）；2026-09-15 主人令自「实时数据」页 ETF 盘中异动·主力净额分时卡 Block2 迁至本页（日监控卡下方），容器 id 与渲染函数不变'},
-          {name:'市场宽度 · 新高家数与宽度评分', source:'W52_HIGH', freq:'收盘后1次', slots:['17:30'], note:'今日历史新高家数 + 宽度评分 + 领涨新高股 TOP8；胶囊改小内部一行'},
+          {name:'市场宽度·新高家数', source:'W52_HIGH', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'52周新高广度'},
 
-          {name:'期指主力合约', source:'CFFEX_HOLDINGS', freq:'盘中每30分', slots:['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'IF/IC/IM 主力合约（intraday 刷新，2026-08-31 迁回实时数据页）；胶囊改小内部一行'},
+          {name:'宏观数据速览', source:'MACRO_DATA', freq:'盘前+盘后', slots:['0','8',':','2','5','|','1','7',':','2','0'], note:'LPR/M2/CPI/PMI'},
 
-          {name:'宏观数据速览', source:'MACRO_DATA', freq:'盘前+盘后', slots:['08:25','17:20'], note:'LPR / M2 / CPI / PMI / 中美利差 / VIX / 商品；日级/月级数据不随盘中实时刷（2026-09-11 主人令移出 intraday）；胶囊改小内部一行'},
+          {name:'解禁日历', source:'RESTRICTED_RELEASE', freq:'每日盘前', slots:['0','8',':','2','5'], note:'未来 N 天解禁'},
 
-          {name:'解禁日历', source:'RESTRICTED_RELEASE', freq:'每日盘前', slots:['08:25'], note:'未来 7/30/60/90 天限售股解禁；列表排除今日并按日期升序'},
-
-          {name:'业绩预告', source:'PERFORMANCE_FORECAST', freq:'每日盘前', slots:['08:25'], note:'全报告期累计（预增/预减/预亏/不确定）与预增 TOP，非今日口径'},
-
-
-          {name:'盘后资金流向', source:'MARKET_FUND_FLOW_DATA', freq:'收盘后1次', slots:['17:30'], note:'全天资金总结'},
-
-          {name:'候选池', source:'CANDIDATE', freq:'收盘后1次', slots:['20:00'], note:'算法初筛名单（v8_algo_cloud 19:15 跑批，约20:00产出）'},
-
-          {name:'金股池', source:'GOLD_POOL', freq:'收盘后1次', slots:['17:30'], note:'精选标的'},
-
-          {name:'龙虎榜', source:'LHB_DATA', freq:'收盘后1次', slots:['17:30'], note:'机构/游资动向'},
-
-          {name:'机构买卖', source:'INST_TRADE', freq:'收盘后1次', slots:['17:30'], note:'机构专用通道'},
-
-          // 🛡 2026-09-01 主人令修复：原写 slots:['17:30']，但三重共识由 v8_algo_cloud 19:15 跑批产出，
-          //   17:30 槽位每天 17:30~19:15 之间必然标 ✗（对齐「选股策略」页同源卡的 19:15）——恒定假红。
-          {name:'三重共识', source:'TRIPLE_CONSENSUS', freq:'收盘后1次', slots:['19:15'], note:'多策略共振（v8_algo_cloud 19:15 跑批产出，与选股策略页同源）'}
+          {name:'业绩预告', source:'PERFORMANCE_FORECAST', freq:'每日盘前', slots:['0','8',':','2','5'], note:'全报告期预告'},
 
         ]
 
@@ -12618,7 +12594,25 @@ function drawUpDownChart(){
 
         id:'rc', icon:'🧲', name:'共振日历',
 
-        cards:[]
+        cards:[
+
+          {name:'最近交易日龙虎榜', source:'LHB_DATA', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'龙虎榜'},
+
+          {name:'周度汇总·机游共振', source:'LHB_DATA', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'机游共振'},
+
+          {name:'月度汇总·净买卖', source:'LHB_DATA', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'月度净买卖'},
+
+          {name:'最近交易日龙虎榜北向席位', source:'LHB_DATA', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'北向席位'},
+
+          {name:'周度汇总·北向席位', source:'LHB_DATA', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'北向周度'},
+
+          {name:'月度汇总·龙虎榜北向席位净买卖', source:'LHB_DATA', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'北向月度'},
+
+          {name:'净买卖TOP10', source:'LHB_DATA', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'北向净买 TOP10'},
+
+          {name:'月度汇总·三方共振净买卖', source:'LHB_DATA', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'三方共振'},
+
+        ]
 
       },
 
@@ -12626,7 +12620,13 @@ function drawUpDownChart(){
 
         id:'final', icon:'🏆', name:'最终推荐',
 
-        cards:[]
+        cards:[
+
+          {name:'最终推荐·Top5', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'聚合推荐'},
+
+          {name:'今日推荐候选池聚合', source:'CANDIDATE', freq:'收盘后1次', slots:['2','0',':','0','0'], note:'候选池聚合'},
+
+        ]
 
       },
 
@@ -12634,7 +12634,8 @@ function drawUpDownChart(){
 
         id:'query', icon:'🔍', name:'个股查询',
 
-        cards:[]
+        cards:[
+        ]
 
       },
 
@@ -12644,21 +12645,43 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'候选池（盘中/盘后）', source:'CANDIDATE', freq:'收盘后1次', slots:['20:00'], note:'算法初筛名单（v8_algo_cloud 19:15 跑批产出，无独立盘中更新）'},
+          {name:'金股池', source:'GOLD_POOL', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'精选标的'},
 
-          {name:'金股池', source:'GOLD_POOL', freq:'收盘后1次', slots:['19:15'], note:'精选标的'},
+          {name:'观测候选股池', source:'CANDIDATE', freq:'收盘后1次', slots:['2','0',':','0','0'], note:'上游水源'},
 
-          {name:'三重共识', source:'TRIPLE_CONSENSUS', freq:'收盘后1次', slots:['19:15'], note:'多策略共振'},
+          {name:'严格三重共识', source:'TRIPLE_CONSENSUS', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'最严共振'},
 
-          {name:'四量终极', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['19:15'], note:'目标池：主板/创业板/科创板成交额前80~100 + 港股前40~50；频率：盘后日线；回测：近3年 T+1/3/5/10/20 持有收益'},
+          {name:'优先观察(差1步)', source:'TRIPLE_CONSENSUS', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'差一步'},
 
+          {name:'扩展观察(差2步)', source:'TRIPLE_CONSENSUS', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'差两步'},
 
+          {name:'持仓盈亏跟踪', source:'H_AUTO_BUY', freq:'盘后', slots:['1','7',':','3','0'], note:'持仓盈亏'},
 
+          {name:'状态迁移&告警', source:'TRIPLE_CONSENSUS', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'状态迁移'},
 
+          {name:'催化剂兑现追踪', source:'CRDS_CARD_DATA', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'催化剂'},
 
-          {name:'逆势龙头', source:'CRDS_CARD_DATA', freq:'收盘后1次', slots:['19:15'], note:'CRDS逆势龙头精英池'}
+          {name:'回测N日胜率(信号层)', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'信号层回测'},
 
-          // 2026-09-01 删除：AI 预测 / 潜力挖掘 / ETF·龙头参考 三卡已下线
+          {name:'严格vs宽松', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'阈值对照'},
+
+          {name:'阈值敏感性', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'敏感性'},
+
+          {name:'板块聚类(相关性风险)', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'板块聚类'},
+
+          {name:'三重入选历史', source:'TRIPLE_HISTORY', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'入选历史'},
+
+          {name:'回测N日胜率(近5年)', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'近5年回测'},
+
+          {name:'前向累积跟踪', source:'FOUR_VOLUME_TRACK', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'前向累积'},
+
+          {name:'四量入选历史', source:'FOUR_VOLUME_HISTORY', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'四量历史'},
+
+          {name:'逆势龙头', source:'CRDS_CARD_DATA', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'CRDS 精英池'},
+
+          {name:'四量终极60m', source:'FOUR_VOLUME_60M', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'60m 量价'},
+
+          {name:'算法追踪', source:'ALGO_TRACK', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'算法链追踪'},
 
         ]
 
@@ -12668,7 +12691,11 @@ function drawUpDownChart(){
 
         id:'bt', icon:'🧪', name:'策略回测',
 
-        cards:[]
+        cards:[
+
+          {name:'全算法回测汇总', source:'BACKTEST_ALL_ALGOS', freq:'每日回测批', slots:['1','9',':','1','5'], note:'回测汇总'},
+
+        ]
 
       },
 
@@ -12676,7 +12703,15 @@ function drawUpDownChart(){
 
         id:'ul', icon:'🔒', name:'暂未上架',
 
-        cards:[]
+        cards:[
+
+          {name:'暂未上架模块索引', source:'UNLISTED_PANEL', freq:'手动策划', slots:['周','日'], note:'静态索引'},
+
+          {name:'宏观K型分层', source:'MACRO_KSHAPE', freq:'事件驱动每日巡检', slots:['2','1',':','0','0'], note:'K型分层'},
+
+          {name:'新周期判定·AI解析', source:'BAIHECHOU_ANALYSIS', freq:'工作日盘前', slots:['0','6',':','3','0'], note:'AI 解析'},
+
+        ]
 
       },
 
@@ -12684,7 +12719,8 @@ function drawUpDownChart(){
 
         id:'dl', icon:'🔒', name:'已下架',
 
-        cards:[]
+        cards:[
+        ]
 
       },
 
@@ -12694,32 +12730,26 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'中国数据抓取 (v8_cn_fetch_cloud)', source:'RUNNER_STATUS', freq:'工作日 cron · 云端', slots:['08:25','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:20'], note:'核心数据管线 · GitHub Actions 云端 ubuntu-latest 主链（含 17:20 龙虎榜收盘后刷新）'},
+          {name:'中国数据抓取(v8_cn_fetch_cloud)', source:'RUNNER_STATUS', freq:'工作日cron·云端', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'核心数据管线'},
 
-          {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日 8 唤醒点 16:40/18:10/20:00/21:00/22:30/00:30/06:00/08:00', slots:['19:15'], note:'候选池/金股池/三重共识/回测 · <b>跑在 self-hosted cn 双机（lemoncat-cn / alimi-cn），非 ubuntu-latest</b>（job 日志 runner_name 实证）· 批次由闸门按「缺什么跑什么」判定 · 冗余由本机每30分检查dispatch兜底 · 源码同步：git 直连为主，被墙时走 GitHub API 回退（2026-09-11 20:2x 修：排除 backup/docs/kline_cache 三个重目录 + b64 优先 + 软预算，step 超时 10→25min）'},
+          {name:'盘后算法链(v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'8唤醒点', slots:['1','9',':','1','5'], note:'候选池/金股池/三重共识'},
 
-          {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查 · 覆盖构建/部署/备份健康'},
+          {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['0','9',':','0','0','|','1','7',':','0','0'], note:'完整性检查'},
 
+          {name:'运维常态巡检(v8_health_patrol)', source:'HEALTH_CHECK', freq:'每30分云端cron', slots:['00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'], note:'全站巡检+自愈'},
 
-          {name:'运维常态巡检 (v8_health_patrol)', source:'HEALTH_CHECK', freq:'每30分(云端cron)', slots:['00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'], note:'v8_health_check.py --heal 全站42卡巡检+自动治愈 · 纯云端不依赖小九/阿狸咪'},
-
-          {name:'☁️ 持仓云端同步 (westock)', source:'PORTFOLIO_DATA', freq:'盘中每30分', slots:['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'westock 双机同步·实时持仓成本（操作信号面板②维止损锚点）',
-            // 🛡 2026-08-19 一劳永逸：westock 源可能未接入（用户没开云端联结）→ 整行不报红叉，免误报
-            //   sourceMissing → renderTaskSchedule 显示「待配置」灰槽而非 ✗
-            sourceMissing: true,
-          }
+          {name:'☁️持仓云端同步(westock)', source:'PORTFOLIO_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'实时持仓', sourceMissing:true},
 
         ]
 
-      }
-
-      ,
+      },
 
       {
 
         id:'lgd', icon:'🔒', name:'逻辑详解',
 
-        cards:[]
+        cards:[
+        ]
 
       },
 
@@ -12727,7 +12757,8 @@ function drawUpDownChart(){
 
         id:'fd', icon:'🗂', name:'全量数据',
 
-        cards:[]
+        cards:[
+        ]
 
       },
 
@@ -12735,7 +12766,8 @@ function drawUpDownChart(){
 
         id:'pl', icon:'🔧', name:'管线',
 
-        cards:[]
+        cards:[
+        ]
 
       },
 
@@ -12743,9 +12775,10 @@ function drawUpDownChart(){
 
         id:'ca', icon:'📋', name:'内容审计',
 
-        cards:[]
+        cards:[
+        ]
 
-      }
+      },
 
     ]
 
@@ -13220,16 +13253,14 @@ function drawUpDownChart(){
   //   ⚠️ 维护判据：本表顺序须与 index.html 各 <section> 内 <h3> 从上到下一致。
   //      未列入的 id 自动按 it.order 排到本组末尾（防页面新卡在看板掉队）。
   const _PAGE_CARD_ORDER = {
-    '实时数据': ['INDEX_QUOTES','CFFEX_HOLDINGS','LIMIT_UP_HEATMAP','ETF_PULSE','ETF_INTRADAY_HEAT',
-                 'SECTOR_FUND_FLOW','CONCEPT_RANKING','MARKET_FUND_FLOW_DATA','MARKET_ALERTS','AVG_PRICE_DATA'],
-    '盘后数据': ['SH_FIB','ETF_DAILY_MONITOR','MARGIN_DATA','FACTOR_LAB','FOUR_VOLUME_BACKTEST',
-                 'CRISIS_DATA','MARKET_REGIME','CANDIDATE','GOLD_POOL','LHB_DATA','INST_TRADE',
-                 'TRIPLE_CONSENSUS','SECTOR_RECOMMENDATION'],
-    '选股策略': ['GOLD_POOL','CANDIDATE','TRIPLE_CONSENSUS','FOUR_VOLUME','CRDS_CARD_DATA','FOUR_VOLUME_60M',
-                 'ALGO_TRACK','TRIPLE_HISTORY','FOUR_VOLUME_HISTORY','FOUR_VOLUME_TRACK','VOLATILITY',
-                 'STOCK_STOP_DATA','H_AUTO_BUY','H_AUTO_BUY_TRACK'],
-    '今日事件': ['JUDGMENT_DATA','MACRO_DATA','IPO_DATA','V8_CAL'],
+    '实时数据': ['INDEX_QUOTES','OVERSEAS_MARKETS','CFFEX_HOLDINGS','LIMIT_UP_HEATMAP','ETF_PULSE','MARKET_FUND_FLOW_DATA','COMMODITY_ELASTICITY','CONCEPT_RANKING','SECTOR_FUND_FLOW','ETF_INTRADAY_HEAT','AVG_PRICE_DATA'],
+    '盘后数据': ['SECTOR_RECOMMENDATION','ETF_DAILY_MONITOR','ETF_NET_SUBSCRIPTION','W52_HIGH','MACRO_DATA','RESTRICTED_RELEASE','PERFORMANCE_FORECAST','MARGIN_DATA','CANDIDATE','GOLD_POOL','LHB_DATA','INST_TRADE','TRIPLE_CONSENSUS','CRISIS_DATA','MARKET_REGIME','FACTOR_LAB','FOUR_VOLUME_BACKTEST'],
+    '选股策略': ['GOLD_POOL','CANDIDATE','TRIPLE_CONSENSUS','FOUR_VOLUME','CRDS_CARD_DATA','FOUR_VOLUME_60M','ALGO_TRACK','TRIPLE_HISTORY','FOUR_VOLUME_HISTORY','FOUR_VOLUME_TRACK','VOLATILITY','STOCK_STOP_DATA','H_AUTO_BUY','H_AUTO_BUY_TRACK','IMA_STRONG_BACKTEST'],
+    '今日事件': ['JUDGMENT_DATA','RESTRICTED_RELEASE','PERFORMANCE_FORECAST','IPO_DATA','V8_CAL'],
+    '观测平台': ['SH_FIB'],
+    '共振日历': ['LHB_DATA'],
     '策略回测': ['BACKTEST_ALL_ALGOS'],
+    '暂未上架': ['MACRO_KSHAPE','BAIHECHOU_ANALYSIS','UNLISTED_PANEL'],
     '运维': ['DO_NOT_DELETE','UNLISTED_PANEL'],
   };
     _PAGE_ORDER.filter(function(p){return byPage[p];}).concat(Object.keys(byPage).filter(function(p){return _PAGE_ORDER.indexOf(p) < 0;})).forEach(function(page){
