@@ -26,9 +26,9 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 09:35"
+  updated: "2026-09-21 09:45"
   updated_by: "小九(lemoncat-cn) + 阿狸咪(alimi-cn)"
-  next_id_seq: 12
+  next_id_seq: 13
 
 items:
 
@@ -79,6 +79,37 @@ items:
     status: todo
     what: "第13步仍无步级 timeout-minutes，仅靠 job 级 60min 兜底。命令级护栏已收敛，此项优先级降低。"
     updated: "2026-09-21 08:40"
+
+  # ── P0 · 部署链（2026-09-21 09:45 阿狸咪登记）─────────────────────────────
+  - id: gate-1010-marker-stale-ms-note
+    priority: P0
+    owner: 小九
+    status: todo
+    what: >
+      **[10/10] index 核心标记守卫正在阻断全部 deploy。** `docs/ops/index_protected_markers.txt`
+      L86 登记的锚点 `ms-col ms-note` 在 index.html 中已 0 命中 ⇒ 门禁报
+      「1/35 条核心标记在 index.html 中消失」⇒ 🚫 阻断 deploy。
+      实测：09:01 与 09:17 两档 `build` job 均 failure，失败步**唯一** = `🛡️ Pre-deploy audit`，
+      其后「双盲区静态校验 / 部署前校验 / 部署到 main」**全 skipped**。
+      时序铁证（逐版 index.html 计数）：08:41 树该串 **=1**（锚点当时有效）→
+      09:00 `4f87d6adfe`「ui(每日洞察): 月度汇总口径说明自第3列移至第二行通栏」把第 3 列容器
+      整块换掉（旧 `class="ms-col ms-note"` → 新 `ms-note-card` 系列）⇒ 现树 **=0**。
+      ⇒ 属纪律「有意改结构必须**同一提交同步清单行**」的**第 3 次**被违反（前两次 09-20 21:28 / 22:39）。
+    fix: >
+      把 L86 锚点 `ms-col ms-note` 换成 **`ms-note-card`**。换锚判别力已实测：
+      旧树(9cf20e8681 @08:41) **0** / 现树(main, blob a533718bbd) **4** ⇒ 对「换回旧版」的捕获力
+      与旧锚等价；且是代码级类名、**单 token 无空格**（旧锚把两个类名拼成一个子串，是本次失效的形式根源），
+      符合「只登记代码级」纪律。说明文字里的日期与备注同步改。**其余 34 条勿动。**
+    evidence: >
+      run 35550435412 / job 106184058468（09:17，build job failure，Pre-deploy audit 失败原文见日志
+      L515/L520）；09:01 档 `ui(每日洞察)…第3列移至第二行通栏` 同型。清单 blob e06c8b18b4；
+      index.html blob a533718bbd。
+    verify_how: >
+      改后等下一个 build **真跑** ⇒ `[10/10] index 核心标记守卫` 报 ✅ 且 `build` job 不再 failure
+      （判据：看 build job，**禁看 run 结论**；盘中 build=skipped 属设计）。
+    fallback: >
+      若 17:45 收盘前仍未修，阿狸咪将在夜间窗口（18:00 后）按自身上线流程换锚（同一提交同步清单行）。
+    updated: "2026-09-21 09:45"
 
   # ── P0 · 数据回滚防线 ──────────────────────────────────────────────────
   - id: stale-index-landmine
