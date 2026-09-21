@@ -1,13 +1,8 @@
 {
-  "update_time": "2026-09-21 19:27:19",
-  "run_start": "2026-09-21 18:39:39",
-  "ok": 25,
-  "fail": 1,
-  "failed_scripts": [
-    {
-      "script": "strategy_four_volume_60m.py",
-      "reason": "退出码 1 |      → 保留上次真实产物（不写假 0），本脚本以退出码 1 上报失败"
-    }
-  ],
+  "update_time": "2026-09-21 20:42:18",
+  "run_start": "2026-09-21 20:18:41",
+  "ok": 1,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }
