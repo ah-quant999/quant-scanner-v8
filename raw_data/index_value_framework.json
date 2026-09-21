@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-20 16:43:27",
+  "update_time": "2026-09-21 16:15:57",
   "source": "baostock 四指数日K（上证/沪深300/中证500/中证1000）",
   "note": "价格中枢框架迁移（QQQ/TQQQ → A股指数），基于收盘价布林带/EMA趋势，非PE估值分位",
   "indices": [
@@ -38,34 +38,14 @@
     {
       "name": "中证500",
       "code": "000905",
-      "latest_date": "2026-09-18",
-      "latest_close": 7799.61,
-      "ema20": 7738.9,
-      "ema60": 7901.52,
-      "ema120": 7967.27,
-      "ema250": 7703.03,
-      "boll_position": -0.393,
-      "bucket": "合理",
-      "trend_short": "下降",
-      "trend_long": "上升",
-      "gate": "空头/观望",
-      "gate_color": "绿"
+      "available": false,
+      "reason": "baostock 取数失败（网络/接口），下次刷新自动重试"
     },
     {
       "name": "中证1000",
       "code": "000852",
-      "latest_date": "2026-09-18",
-      "latest_close": 7687.59,
-      "ema20": 7585.92,
-      "ema60": 7718.46,
-      "ema120": 7838.37,
-      "ema250": 7683.18,
-      "boll_position": -0.319,
-      "bucket": "合理",
-      "trend_short": "下降",
-      "trend_long": "上升",
-      "gate": "空头/观望",
-      "gate_color": "绿"
+      "available": false,
+      "reason": "baostock 取数失败（网络/接口），下次刷新自动重试"
     }
   ]
 }

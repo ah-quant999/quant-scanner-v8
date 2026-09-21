@@ -1,13 +1,17 @@
 {
-"update_time": "2026-09-19 15:42:21",
-"total": 9644,
-"new_listings_count": 0,
+"update_time": "2026-09-21 16:06:16",
+"total": 9647,
+"new_listings_count": 3,
 "delisted_count": 0,
-"new_listings": [],
+"new_listings": [
+"02917 智算能建股权",
+"02930 卓越睿新（一百）",
+"06727 星环科技"
+],
 "delisted": [],
-"meta_enriched": 0,
+"meta_enriched": 3,
 "guard_tripped": false,
 "guard_reasons": [],
 "old_universe": 9644,
-"fresh_universe": 9644
+"fresh_universe": 9647
 }
