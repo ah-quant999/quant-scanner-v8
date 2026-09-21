@@ -1961,6 +1961,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="card" id="dailyScoreboardCard" style="border-left:4px solid #f59e0b;margin-top:16px;">
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
     <span style="font-size:15px;font-weight:700;color:var(--txt);">🏆 当日因子计分榜</span>
+    <span id="dsbUpdSlot" style="display:inline-flex;align-items:center;gap:6px;"></span>
     <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">当日榜单</span>
     <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">候选池 top20 · 按总分降序</span>
     <span id="dsbBadge" style="font-size:10px;color:var(--dim);"></span>
@@ -7458,6 +7459,8 @@ function fmtSigned(v){
       //   —— 卡头只留项数；回测口径与时间仍在页脚与「口径与独立分层回测明细」折叠内。
       bd.innerHTML = '共 <b style="color:var(--txt);">'+_n+'</b> 项';
     }
+    // 🦊 2026-09-21 补齐 09-19 主人令「更新于紧随卡名」：dfcUpdSlot 槽位此前声明后从未被填充（死槽位）
+    if(typeof setBadge === 'function'){ try{ var _td = window.TOP10_DAILY || {}; setBadge('dfcUpdSlot','auto','短线', _td.update_time || ''); }catch(e){} }
   };
   window.__dailyFactorCalcReady = true;
 
@@ -7538,6 +7541,8 @@ function fmtSigned(v){
        + (D.update_time ? (' · 更新于 <b>'+_e(D.update_time)+'</b>') : '')
        + '。仅研究参考，非买卖建议。</div>';
     host.innerHTML = h;
+    // 🦊 2026-09-21 主人令：卡头「更新于」胶囊（全站规范：卡名置顶 + 更新于紧随，读产物真值不写死）
+    if(typeof setBadge === 'function'){ try{ setBadge('dsbUpdSlot','auto','短线', D.update_time || ''); }catch(e){} }
     var bd = document.getElementById('dsbBadge');
     if(bd){
       var _nRec = rows.filter(function(x){ return _rec[String(x.code==null?'':x.code).replace(/[^0-9]/g,'')]; }).length;
