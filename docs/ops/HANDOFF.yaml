@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 12:37"
+  updated: "2026-09-21 13:45"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -601,8 +601,23 @@ items:
       ② 兜底链 `_cloud` 档数近零；③ relay step 日志出现「→ 本轮不派（防叠加）」或「派主链」。
       ⚠️ **只看「无 failure」不算通过** —— 本诊断的前提恰是「failure 很少但主力错位」。
       离线侧证据：门控 8 分支 mock 实测 8/8；workflow 结构自检 step 28→28；YAML×3 解析通过。
-    verified_at: null
-    updated: "2026-09-21 12:37"
+    verified_at: "2026-09-21 13:45（阿狸咪实测·两链条数反转成立）"
+    verify_result: >
+      ✅ **通过（2026-09-21 13:45 CST 盘中实测）**。逐条对上 verify_how：
+      ① 主链 `v8_stock_quote_refresh.yml`：修复后 12:31→13:45 实测 **2 档**（13:18:38 / 13:40:14，均 success，
+      间隔 ~22 分钟），对照修复前全天仅 1 档（09:26）⇒ **显著上升，主力已回到中国 IP 主链**；
+      ② 兜底链 `_cloud`：修复前 09:46→11:28 密到 **7-8 分钟一轮共 15 档**（含 10:08 / 11:21 两次双源全灭 failure）
+      ⇒ 修复后 12:31→13:45 仅 **2 档**（13:08:21 / 13:34:03，均 success），密度自 7-8 分降至 ~26 分
+      ⇒ **近零、已退回"仅接单超时才跑"的本义**；
+      ③ relay step 日志（run `35564920405` job `106224742793` step29）逐字命中两条目标分支：
+      `[relay] 主链最近档 conclusion=success updated 19.3 分前` → `[relay] ✅ 已派发 STOCK_QUOTE 主链（v8_stock_quote_refresh.yml）`
+      （age 19.3 ≥ FRESH_MIN=12 ⇒ 派主链，正确）；
+      下一档（run `35565397900` job `106226111354`）`[relay] 主链最近档 conclusion=success updated 5.0 分前`
+      → `[relay] 主链新鲜（5.0 < 12 分）→ 本轮不派`（防叠加，正确）。
+      ⇒ **两独立样本分别覆盖"派主链"与"不派"两个分支，三态门控在线上真跑生效**。
+      ⚠️ 前提核对：本次通过**不是**"看无 failure"（修复后两链本就都 success），而是**档数反转 + relay 门控日志**双证据。
+      证据源：GitHub Actions API runs/jobs + job logs（阿狸咪 2026-09-21 13:45 CST 实测）。
+    updated: "2026-09-21 13:45"
 
   - id: quote-third-source
     priority: P2
