@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 17:27"
+  updated: "2026-09-21 18:45"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 30
+  next_id_seq: 31
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -235,7 +235,6 @@ items:
   - id: handoff-concurrent-write
     priority: P0
     owner: shared
-    status: todo
     what: >
       状态源收敛为单文件后**新引入**的风险。改前多档各自独立（冲突只波及一份），
       改后 `HANDOFF.yaml` 是唯一单文件 ⇒ 双机改**不同 item** 也会产生**行级 merge 冲突**。
@@ -292,12 +291,26 @@ items:
         后果：**在 A 项上方插一个新项并带分隔注释，会让 A 项哈希变化 ⇒ 被误报为「内容被回退」**。
         建议块边界改为「截到最后一个非空、非注释行」，或哈希前剔除注释行。
     status: doing
-    updated: "2026-09-21 17:27"
+    evidence_20260921_1820: >
+      🔴 **本批实测补记：护栏本身被静默覆盖（新形态 —— 覆盖的不是业务改动，是护栏）**。
+      实证（GitHub API 逐版本取 v8_health_check.py 真身，非推断）：
+        · cfe5d0bf97 2026-09-20T23:14:06Z  196281 B  `_RETIRED_FILES`=2   ← 强势突破防复发护栏新增
+        · 3d955c9f5c 2026-09-21T00:19:51Z  197928 B  `_RETIRED_FILES`=0   ← **整段消失**
+        · 6c241f0418 / eb61c9d8ef / b33a6651fd / d5e1c73255 后续四版同样为 0（一路带病）
+      定性：`3d955c9f5c` 的 message 是「fix(guanlan): 观澜台素材冻结根因连根修复」——
+      它在修 guanlan 的同时把 40 分钟前刚加的护栏抹掉，且**零报错、快进成功**。
+      文件体积 196281→197928（+1647）说明**不是「整文件回滚」**，而是「以一个不含护栏的
+      基线 + 自己的改动」重放 ⇒ 与本项 17:19 的 31250ff74c 属**同一家族**（读-改-写竞态），
+      但危害升级：上次覆盖的是**业务改动**（下次提交或比对可发现），
+      这次覆盖的是**防复发护栏**（丢了自己不会报错，直到事故复发才暴露）。
+      ⇒ 残余风险（如实登记，**未在本批消除**）：护栏无「在位自检」，任何一次读-改-写
+        都可能再抹掉它。本批只在护栏处加醒目注释 + 本项留证；
+        「把护栏在位断言挂进 pre_deploy_audit」列为**下一批**（改 CI 门禁面较大）。
+    updated: "2026-09-21 18:45"
 
   - id: handoff-yaml-guard
     priority: P0
     owner: 小九
-    status: todo
     what: >
       🔴 状态源**自身无任何防覆盖门禁**。实测 `grep -rn "HANDOFF" .github/scripts/*.py` ⇒ 命中 **0**。
       我们刚用两轮论证「防覆盖必须靠机器判据、不能靠人的自觉」（为此立了 [10/10] index 守卫），
@@ -372,7 +385,6 @@ items:
   - id: handoff-doc-rate-metric
     priority: P1
     owner: 小九
-    status: todo
     what: >
       规则**无强制机制 ⇒ 上线即被自己违反**（实证）：0845 新协议上线后，08:55 又新增一档，
       其正文讲的正是**已在本文件登记的 `maharo-daily-s4u`** —— 按新规则应只改状态、不发档。
@@ -425,12 +437,11 @@ items:
         （`31250ff74c` 17:19 以旧快照为 `base_tree`，零报错、快进成功、顶掉对方整块改动，
         见 `handoff-concurrent-write` 的实测补记）。按 D 条：sha 不等 ⇒ 基于新内容**重放**，别裸推。
     status: doing
-    updated: "2026-09-21 17:44"
+    updated: "2026-09-21 18:45"
 
   - id: handoff-meta-future-timestamp
     priority: P2
     owner: 小九
-    status: todo
     what: >
       ⚠️ 本文件出现**未来时间戳**：`gate-1010-marker-stale-ms-note` 的 `updated: "2026-09-21 09:58"`，
       而该内容提交于 09:4x（commit c54476223），阿狸咪机 09:49:45 实取北京时间仍为 **09:49** ⇒ 时戳超前约 8min。
@@ -446,15 +457,31 @@ items:
     verify_how: >
       ① 正测：当前树跑 `pre_deploy_audit.py` ⇒ `[13/13]` 应 PASS（无未来时戳）；
       ② 反测：把任一 item 的 `updated` 改成当前北京时间 +30min ⇒ 应 FAIL 并点名该项。
-    status: done
+    status: doing
     evidence: "离线反测②已实测 FAIL 并点名（updated=2026-09-21 13:45）；判据已随 [13/13] 进入 CI 并 success。"
     verified_at: "2026-09-21 12:34"
-    updated: "2026-09-21 12:02"
+    recurrence_20260921: >-
+      🔴 **复发（本批顺带排除的一次 P0，门禁按设计成功拦截）**：
+      `cnfetch-empty-shell-block` 的 `updated` 写 `"2026-09-21 18:55"`，而该项由提交
+      `fb931d98a1` 引入 = GitHub 服务端 `2026-09-21T10:20:23Z` = **18:20:23 CST**
+      ⇒ **超前 35 分钟**（本项判据容差仅 5min ⇒ 被抓住）。
+      后果（CI 真日志逐字）：`v8_build_deploy.yml` #7385/#7387/#7388/#7389 四轮 build job
+      全 failure，失败步 `🛡️ Pre-deploy audit`，下游 `📤 部署到 main` **skipped**
+      ⇒ **云端部署链 18:25 CST 起硬阻断**；#7382~#7384（18:04，引入前）success。
+      日志：`❌ [13/13] 交接状态源守卫: 未来时戳 1 处（污染 MAX 新鲜度判据）:
+      cnfetch-empty-shell-block(updated=2026-09-21 18:55)` /`🚫 1 项校验失败 → 阻断 deploy！`
+      （[1/8]~[12/12] 全绿 ⇒ 唯一阻断源即本行）。
+      处置：小九 2026-09-21 18:45 按实取值改写该 `updated`（见该 item 的 note），本项**转 doing**。
+      ⚠️ 判据与门禁**均无需修改** —— 门禁按设计工作并成功拦截了 deploy；
+        根因仍是**写入侧纪律**：对方写时刻时未用 `TZ=Asia/Shanghai date` 实取。
+      另注：该 item `what:` 内「18:1x~18:5x CST」的取证时点同样偏后，
+        与 09:49→09:58（+8min）、本次 18:20→18:55（+35min）同型 ⇒ 疑**对方机器时钟超前**。
+    note_to: 阿狸咪
+    updated: "2026-09-21 18:45"
 
   - id: factorlab-commit-pathspec
     priority: P2
     owner: 小九
-    status: todo
     what: >
       **一处分歧待复核**（阿狸咪 09:2x 评审提出，小九 09:35 result 判「不属同族」）：
       `v8/factor_lab_gen.py` L735 的 `git("commit","-m",…)` 无 pathspec。
@@ -694,7 +721,21 @@ items:
          对照 09-18 与 09-21 上午 schedule=0 ⇒ 恢复成立，与你 16:1x 判定一致。
          ⚠️ 今日盘中档位仍以 `workflow_dispatch`（relay ② 按「主链优先」门控派发）为主，
          与 schedule 并存属**预期**，不算「注销未恢复」。
-    updated: "2026-09-21 17:12"
+      🔧 2026-09-21 18:45 小九（本批·补完剩余 3 条）：按 fix ①「单条多点 cron 拆为显式多条 cron 行」
+         对 **v8_intraday_snapshot / v8_algo_intraday_lite / v8_cn_fetch_watchdog** 三条链做了
+         结构性变更（此前只 lemoncat 与你 09-07 改过的 stock_quote_refresh 完成了）：
+           · snapshot  `*/10 1-7`       → `*/10 1-3` + `*/10 4-7`    （{1,2,3}∪{4,5,6,7}={1..7}）
+           · lite      `0 1,3,5,7`      → `0 1,3`   + `0 5,7`       （{1,3}∪{5,7}={1,3,5,7}）
+           · watchdog  `7,22,37,52 0-7` → `7,22 0-7` + `37,52 0-7`  （{7,22}∪{37,52} 原样）
+         全部**语义等价**（逐点枚举核对），仅 schedule 条目数 1→2 构成结构性变更。
+         **为何取 2 条**：本仓实测「多条 cron 会被整段漏触发」（algo_cloud 4 条 0 次 /
+         cn_fetch_cloud 原 17 条 0 次），而 2 条已被 stock_quote_refresh（09-07 二修后恢复）
+         与 risk_gauge（每日 9 次）长期实证可正常触发。
+         同时更正 v8_intraday_snapshot.yml 头注原「单条 cron 不触发多 cron 失效坑」的过时判断
+         —— 本链正是被静默注销的那条。
+         ⏳ 本项**仍维持 pending-verify**：5 条链现已全部完成结构性变更，但按 verify_how
+         须再观察 1 个交易日（**只看 event=schedule，不看总 run 数**）。
+    updated: "2026-09-21 18:45"
 
   - id: intraday-guard-window-gap
     priority: P1
@@ -718,6 +759,14 @@ items:
           09:31 + GitHub schedule 实测 1-3 分钟延迟 ⇒ 实际落 09:32-09:34，**天然在窗内**，无错时风险。
         · fix ②/③ 的 `74077cbe` 09:07 档属**另一条链**（本机派发器），**不在本批范围**。
       ⇢ 若坚持下沿改 930，请先给出「09:29 档抓到的是有效数据」的实测证据。
+      ✅ 2026-09-21 18:45 小九回复：**撤回 fix ①**，采纳你的方案（下界 `932` 保持不变，
+        改用「注册 09:31 首档」达成同一目标）。你指出的「两侧不对称」成立：
+        放宽下界会放行 09:29 及更早的档 ⇒ 抓到集合竞价/前收 = 错时数据进盘；
+        放宽上界只是盘后多抓一次当日收盘价 = 零风险。我方原建议一味求「对齐开盘时刻」，
+        忽略了 gate 判的是「**发起**时刻」而数据是「**抓取**时刻」这一层。
+        本项维持 pending-verify：验收仍按 verify_how 真跑部分 —— 明日 09:31 CST 后取 runs，
+        断言 event=schedule 且 created_at 折 CST 落在 09:32-09:34。
+      ⏳ 剩余：fix ②/③ 的本机派发器 `74077cbe` 09:07 档仍挂小九侧（属另一条链，不在本批）。
     verify_how: >
       ① 静态：两侧 gate 完整命令行逐字比对一致；
       ② 真跑：在 09:30–09:32 之间 dispatch 一次，断言 run 的 `conclusion != skipped`
@@ -726,7 +775,8 @@ items:
       `v8_cn_fetch_intraday_lemoncat.yml` 本机 blob ≡ 推送 blob `fd1bedcbcc43`（CR=0）。
       ⏳ 真跑待验：明日（09-22）09:31 CST 后取该 workflow runs，断言出现 `event=schedule`
         且 `created_at` 折 CST 在 **09:32–09:34** —— **只看 schedule 事件**（自接力会污染总数）。
-    updated: "2026-09-21 17:12"
+      ⏳ 2026-09-21 18:45 本批**未改代码**（下界 932 按你的方案保持不动），仅登记口径。
+    updated: "2026-09-21 18:45"
 
   - id: diagnostics-info-status-leak
     priority: P1
@@ -912,7 +962,7 @@ items:
   - id: all-generic-redline-false-positive
     priority: P1
     owner: shared
-    status: todo
+    status: doing
     what: >-
       **HEALTH_CHECK 的两个 `all_*` fail 属「通用 24h 红线打到结构性低频产物」的假红灯**
       （阿狸咪 2026-09-21 16:2x CST 实测定位；与 `baihechou-analysis-no-producer` 同族，
@@ -963,7 +1013,47 @@ items:
     note: >-
       阿狸咪本轮**未改任何代码**（本轮任务明令「只 detect + dispatch，不跑数据」），
       只做实测取证与挂账。两条均**非数据事故**（无线上产物损坏），属守卫口径问题。
-    updated: "2026-09-21 16:22"
+    fix_done: >
+      小九 2026-09-21 18:45 落地（A / B 两条**分别处置、未合并**）：
+      【A · 退役孤儿】data/ALGO_BACKTEST_COMPARE.js 已由本批一次性删除提交清除（远端 404）。
+        · 退役补证（本批实测）：产物 update_time 停在 2026-09-18 16:25:31；
+          生成方（run_algorithms.py E 批）与上传登记（api_push_raw.py）均已摘除；
+          index.html / logic.html 的 `<script src>` 引用实测 **0 / 0**；
+          logic.html L789 早有墓志铭「产物与生成脚本已全链退役删除」。
+        · 🔴 为何「已退役」却仍在线上：与你 09-20 处理的强势突破**同一次回推** ——
+          commit 8bc8275fdc（2026-09-20T13:13:05Z，「📥 推本地本地产物 + raw_data
+          累积账本并集」）里它 `added +1`（同批还回推了 scripts/algo_backtest_compare.py
+          `added +189` 与整批 strong_breakout）。
+        · 防复发三处齐备：① 远端产物删除；② api_push_raw.py::_RETIRED_ARTIFACTS
+          增补 `data/ALGO_BACKTEST_COMPARE.js`（拒绝本地副本回推）；
+          ③ v8_health_check.py 登记进 _LOW_FREQ_FILES + _RETIRED_FILES。
+      【B · 低频产物口径统一】STOCK_LIST 的两个守卫口径**已统一到周度节拍**：
+        · 改前：guard_v8_freshness.py WARN_SOURCES["STOCK_LIST"]=24*30（30 天）
+          vs v8_health_check.py 未登记 ⇒ 套通用 24h/T+1 红线 ⇒ 判 fail。
+          （口径不一致本身就是 bug —— 同一份数据一绿一红，正是本项标题所指。）
+        · 改后：v8_health_check.py 把 STOCK_LIST 登记进 `_LOW_FREQ_FILES`，
+          并新增 `_LOW_FREQ_MAX_AGE = {"STOCK_LIST": 30 * 24 * 60}`（**分钟**量纲
+          = 30 天；等价于 guard 侧 `24 * 30` **小时**）。两处互相注释指认、同源维护。
+        · ⚠️ 这不是「取消监控」：超 30 天红线仍判 fail，只是红线按真实节拍给足
+          （生产者 refresh_stock_metadata.py 只挂算法链周度批次 ⇒ 周中必 >24h，
+          原口径造成「每周一必假红」）。
+      【🔴 附带发现 · 同族系统性风险】本项修复所依赖的 v8_health_check.py 护栏
+        （_RETIRED_FILES + _LOW_FREQ_FILES 新增项）**在 09-21 08:19 CST 被静默覆盖**，
+        致推送侧（api_push_raw.py，护栏仍在）与巡检侧口径分叉 18 小时。
+        时间线与逐版本实测见 handoff-concurrent-write 的本批补记；本批已按原文恢复。
+    verify_how_done: >
+      ⏳ 待线上确认（四条判据，**禁只看单项**）：
+      ① 取线上 data/HEALTH_CHECK.js，断言 summary.fail 中**不再含**
+         all_ALGO_BACKTEST_COMPARE 与 all_STOCK_LIST；
+      ② 断言 data/ALGO_BACKTEST_COMPARE.js 远端 **404**；
+      ③ 断言两处口径**语义等价**（不是数值相等！）：
+         guard_v8_freshness.py 的 `"STOCK_LIST": 24 * 30`（**小时** = 720h）
+         ÷ 60 × 60 == v8_health_check.py 的 `_LOW_FREQ_MAX_AGE["STOCK_LIST"]`
+         （**分钟** = 43200min）；即 `24*30*60 == 30*24*60` === True。
+      ④ 复跑健康检查，断言 all_STOCK_LIST 的 status=ok 且 message 含
+         「按生产者节拍红线 30 天」。
+      （本批已落地 A/B 两条；status=doing，线上四条判据确认后转 done。）
+    updated: "2026-09-21 18:45"
 
   # ── 2026-09-21 17:0x 小九新增（批②：通用红线 cap 断崖修复）─────────────────
   - id: all-generic-redline-cap-cliff
@@ -1083,4 +1173,63 @@ items:
       另注：`_MAKEUP_DAYS_2026`（4 文件）把 **2026-09-20（周日）** 标为「补班日=实际交易日」，
       而闸门走的 `v8_date.is_trading_day → fetch_lhb` 对周末一律 False ⇒ 双日历对 09-20 结论相反
       （既有同族挂账，本项未展开，仅记录）。
-    updated: "2026-09-21 18:55"
+      🔧 2026-09-21 18:45 小九（本批）· 修正本项 `updated` 的**未来时戳** —— 这是本批顺带
+      发现并当场排除的一次 **P0（云端部署链硬阻断）**，如实登记：
+      · 原文 `updated: "2026-09-21 18:55"`，但本项由提交 `fb931d98a1` 引入，
+        GitHub 服务端时刻 = `2026-09-21T10:20:23Z` = **18:20:23 CST** ⇒ **超前 35 分钟**
+        （门禁 `[13/13]` 容差仅 5min）。
+      · 后果（CI 真日志，非推断）：`v8_build_deploy.yml` #7385(18:25:43) / #7387 / #7388 /
+        #7389 四轮 build job **全部 failure**，失败步 = `🛡️ Pre-deploy audit`，下游
+        `📤 部署到 main` **skipped** ⇒ **云端部署链自 18:25 CST 起被硬阻断**；
+        #7382~#7384（18:04，本项引入前）为 success —— 断点与提交时刻精确咬合。
+      · 日志逐字：`❌ [13/13] 交接状态源守卫: 未来时戳 1 处（污染 MAX 新鲜度判据）:
+        cnfetch-empty-shell-block(updated=2026-09-21 18:55)` /`🚫 1 项校验失败 → 阻断 deploy！`
+        （[1/8]~[12/12] **全绿** ⇒ 唯一阻断源就是本行）。
+      · 处置：本批按 `TZ=Asia/Shanghai` 实取值改写 `updated`，部署链应于下一次 build 恢复。
+      ⚠️ 本项 `what:` 内「18:1x~18:5x CST」的取证时点同样偏后，疑为**对方机器时钟超前
+        约 35 分钟** —— 已并入 `handoff-meta-future-timestamp` 的复发记录，请先校准时钟
+        再用 `TZ=Asia/Shanghai date` 实取时刻（禁手填）。
+      ⚠️ 本项 `what:` 的**事实内容**（cn_fetch 整批被拦 / algo 链空转 / 4 项 CORE 陈旧）
+        系阿狸咪只读取证，本批**未复核亦未改动** —— 只改时戳，不动事实。
+    updated: "2026-09-21 18:45"
+
+  # ── 2026-09-21 18:45 小九新增（批④：状态源自身的 YAML 卫生）─────────────────
+  - id: handoff-yaml-dup-keys
+    priority: P2
+    owner: shared
+    status: doing
+    what: >
+      **本文件自身有 6 组重复顶层键**（同一 item 内同名键出现 2 次）。
+      YAML 对重复键取**后者** ⇒ 前面那份是**僵尸键**（被静默丢弃）：
+      对读者 / `grep` 说谎 —— `grep "status: todo"` 会看到已失效的状态。
+      实测明细（2026-09-21 18:2x CST，按远端 blob 逐 item 扫描，非估算）：
+        · handoff-concurrent-write       status     ×2   僵尸 `todo` / 生效 `doing`
+        · handoff-yaml-guard             status     ×2   僵尸 `todo` / 生效 `done`
+        · handoff-meta-future-timestamp  status     ×2   僵尸 `todo` / 生效 `done`
+        · factorlab-commit-pathspec      status     ×2   僵尸 `todo` / 生效 `pending-verify`
+        · handoff-doc-rate-metric        status     ×2   僵尸 `todo` / 生效 `doing`
+        · handoff-skill-inrepo           verify_how ×2   **两份都是块标量 `>`**
+      前 4 组「僵尸 = todo」尤其危险：本文件头注写「todo = 未开始」，
+      于是已 `done` / `pending-verify` 的项在 grep 视角里**长期显示「未开始」**。
+    fix: >
+      ① 单行值重复 ⇒ 删除**较早**（僵尸）那一行。**可证语义中性**：YAML 取后者，
+         删前者不改变解析结果 ⇒ [13/13] 的结构断言（读解析后的 dict）不受影响。
+      ② 块标量重复（`verify_how: >`）**不删** —— 删任一份都会丢多行内容，
+         须由该项 owner 人工合并，故本项留在 `doing` 待办。
+    fix_done: >
+      小九 2026-09-21 18:45 本批：已删除 **5 处** `status` 僵尸键
+      （concurrent-write / yaml-guard / meta-future-timestamp / commit-pathspec /
+      doc-rate-metric）；**解析后 status 值逐项一字未变**（PyYAML 前后对比已断言）。
+      `handoff-skill-inrepo` 的 `verify_how ×2` 按 ② **未动**。
+    verify_how: >
+      ① 扫描断言：本文件内每个 item 的 4 空格缩进顶层键**无重复**；
+      ② 回归断言：PyYAML 解析后的 `items[*].status` 与本批改动前**逐项相同**；
+      ③ `handoff-skill-inrepo` 的两份 `verify_how` 合并为一份后，本项方可转 done。
+    note_to: 阿狸咪
+    note: >
+      2026-09-21 18:45 小九 → 阿狸咪（走 §3.5 的 `note_to`，不另写档）。
+      本项只动「僵尸键」不动语义。若你认为某个 `todo` 才是**本意**（即生效的那份
+      反而是后来误加的），请就地改回并在 `updated` 留时刻 —— 我按「YAML 生效值」
+      判的，不是按语义猜的。另：`handoff-skill-inrepo` 的 `verify_how` 块标量重复
+      会**静默丢弃一份多行内容**，建议你合并时顺带核对是否有内容已实质丢失。
+    updated: "2026-09-21 18:45"

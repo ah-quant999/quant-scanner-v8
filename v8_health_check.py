@@ -211,6 +211,12 @@ CARD_DEFS = [
     # 🛡 2026-09-11 一劳永逸：4 个孤儿 algo_run 产物此前未注册 CARD_DEFS → 被 all_ 通用扫描按 1440min 红线误判 fail
     {"id": "ALGO_TRACK", "name": "算法追踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     # 🗑 STRONG_BREAKOUT_BACKTEST 健康检查项已随 2026-09-19 主人令删除强势突破而移除。
+    # ⚠️ 2026-09-21 小九 · 纠正本行「已移除」表述的**虚报部分**：该产物当时并未被删（只摘了登记），
+    #   次日 8bc8275fdc 把整批强势突破产物回推复活 ⇒ 落入 check_all_data_files 全扫按 24h 红线判 fail。
+    #   已补做：① 删产物；② 登记进 _LOW_FREQ_FILES / _RETIRED_FILES；③ api_push_raw.py 加 _RETIRED_ARTIFACTS。
+    # 🔴 2026-09-21 18:45 小九（本批）· 同族第三例：data/ALGO_BACKTEST_COMPARE.js
+    #   （09-20 判定全链退役，实测 index.html / logic.html 的 <script src> 引用 = 0/0，
+    #    但产物仍在远端 data/，且被同一次回推提交 8bc8275fdc 复活）⇒ 本批一并删除并登记同上两处护栏。
     {"id": "IMA_STRONG_BACKTEST", "name": "高手强势股跟踪回测", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["periods"], "heal_cat": "algo_run"},
 
 
@@ -2006,10 +2012,68 @@ _LOW_FREQ_FILES = {
     #   残留后被 all_ 通用扫描按 1440min 红线判 fail（09-16 看板实测 2 红灯）。
     #   本轮已删产物；此处加护栏防「有人把旧产物放回」导致红灯复发。
     "CANDIDATE_BACKTEST", "GOLD_POOL_BACKTEST",
+    # 🗑 2026-09-21 一劳永逸（小九）：**强势突破残留产物 · 防红灯复发护栏**。
+    #   09-19 主人令「强势突破全站删除」(07d9690eb4) 生效后产物被 8bc8275fdc 回推复活，
+    #   落入 check_all_data_files 全扫按通用 24h 红线判 fail（09-21 看板实测 all_STRONG_BREAKOUT = fail）。
+    #   修法：产物侧由一次性提交删除；巡检侧登记本白名单；推送侧 api_push_raw.py::_RETIRED_ARTIFACTS 拒绝回推。
+    #   ⚠️ 只登记**已退役**产物，不放松任何在跑产物的红线。
+    #   🔴 本行曾于 2026-09-21T00:19Z 被 commit 3d955c9f5c 静默覆盖（见 HANDOFF.yaml
+    #      handoff-concurrent-write 的实测补记）⇒ 本批按 cfe5d0bf97 原文原样恢复。
+    "STRONG_BREAKOUT", "STRONG_BREAKOUT_BACKTEST",
+    # 🗑 2026-09-21 18:45 小九（本批）：**ALGO_BACKTEST_COMPARE · 同族第三例**
+    #   退役依据：产物 update_time 停在 2026-09-18 16:25:31（生成方 run_algorithms.py E 批与
+    #   上传登记 api_push_raw.py 均已摘除）；index.html / logic.html 的 <script src> 引用实测 0/0；
+    #   logic.html 早有墓志铭「产物与生成脚本已全链退役」。本批删除远端产物并登记护栏防回推。
+    "ALGO_BACKTEST_COMPARE",
+    # ⏱ 2026-09-21 18:45 小九（本批）：**STOCK_LIST 股票名录** —— 生产者
+    #   algorithms/refresh_stock_metadata.py **只挂算法链「周度批次」**
+    #   （run_algorithms.py weekend stage / v8_weekend_light.yml），周中必然 >24h。
+    #   实测（2026-09-21 看板）：all_STOCK_LIST = fail（age 4521min）—— 而产物
+    #   update_time 取自上游 raw_data/stock_names.json 的 mtime，本身是好的
+    #   ⇒ 属「每周一必现」的结构性**假红**。
+    #   ⚠️ 本行只把 STOCK_LIST 纳入白名单**门槛**；红线下界由下方
+    #      `_LOW_FREQ_MAX_AGE` 按真实节拍给足 —— **不是取消监控**（超节拍照报）。
+    #   ⚠️ 与 guard_v8_freshness.py::WARN_SOURCES 口径必须一致（同源维护）：
+    #      彼处 `"STOCK_LIST": 24 * 30` 是**小时**（=720h=30天）；
+    #      此处 `30 * 24 * 60` 是**分钟**（=43200min=30天）。**数值不同、语义等价。**
+    "STOCK_LIST",
     # 🔴 2026-09-11 主人令（选项A）：FOUR_VOLUME_60M **已移出本白名单**，并正式登记进 CARD_DEFS
     #   （「选股策略」段，max_age=1440）。原白名单把 24h 红线降到「>7天才告警」，
     #   导致该卡产物冻结 3 天（09-08→09-11）全程零告警。现由 check_data_cards 按 d.max_age 正常判定。
 }
+# 🗑 2026-09-21 一劳永逸（小九）：**已退役产物**子集 —— 从 _LOW_FREQ_FILES 中区分出来，
+#   只为让巡检文案说真话（「已退役」而非「低频/手动维护」）。
+#   判定口径：产物已随主人令退役、生产方已摘链、前端零引用、远端已删除。
+#   与 api_push_raw.py::_RETIRED_ARTIFACTS 同源维护（两处口径须一致）。
+#   🔴 本表曾于 2026-09-21T00:19Z 被 commit 3d955c9f5c 整段静默覆盖（同批的 _LOW_FREQ_FILES
+#      新增项也一并丢失），致推送侧与巡检侧护栏口径分叉 18 小时 ⇒ 本批按 cfe5d0bf97 原文恢复。
+_RETIRED_FILES = {
+    "STRONG_BREAKOUT",           # 强势突破（2026-09-19 主人令全站删除）
+    "STRONG_BREAKOUT_BACKTEST",  # 强势突破·信号层回测（同上）
+    "ALGO_BACKTEST_COMPARE",     # 两套算法回测对比（2026-09-20 全链退役，本批删除产物）
+}
+
+# ⏱ 2026-09-21（本批）小九：低频产物「按生产者节拍判龄」表 ——
+#   与 guard_v8_freshness.py::WARN_SOURCES **同源维护（两处口径须一致）**；
+#   口径不一致本身就是 bug —— 同一份数据两个守卫一绿一红。
+#   实证（2026-09-21）：guard_v8_freshness.py 给 "STOCK_LIST": 24*30（30 天），
+#   而本文件未登记 STOCK_LIST ⇒ 落入 check_all_data_files 的通用 24h/T+1 红线 ⇒ 判 fail。
+#   该 fail 属「每周一必现」的结构性假红：STOCK_LIST 的 update_time 取自上游
+#   raw_data/stock_names.json 的 mtime（update_v8.py::_write_js → _pick_ts），
+#   而其生产者 algorithms/refresh_stock_metadata.py 只挂在算法链「周度批次」
+#   （run_algorithms.py weekend stage；v8_weekend_light.yml）⇒ 周中必然 >24h。
+#   ⚠️ 本表**不是**取消监控：超节拍红线仍判 fail，只是红线按真实节拍给足（周末批没跑会照报）。
+#   🔴 量纲铁律：本表单位 = **分钟**（与同函数内 cap / age_min 同量纲）。
+#      同一语义「30 天」在两处写法**不同**，切勿「对齐数值」：
+#        · 此处  30 * 24 * 60 = 43200  **分钟**
+#        · guard_v8_freshness.py::WARN_SOURCES  24 * 30 = 720  **小时**
+#      （2026-09-21 本批曾误写为 `24 * 30` 分钟 = 仅 12 小时，比原 24h 通用红线**还紧**
+#        ⇒ 会造出新的每周一假红。已由真实量纲核对拦下并纠正。）
+_LOW_FREQ_MAX_AGE = {
+    "STOCK_LIST": 30 * 24 * 60,   # 股票名录 · 30 天（分钟量纲；生产者只挂算法链周度批次）
+}
+
+
 def check_all_data_files():
     """全量审计 data/*.js：已登记 CARD_DEFS 的跳过（check_data_cards 管），其余全部按通用规则查。
 
@@ -2074,11 +2138,41 @@ def check_all_data_files():
         #   正确顺序：先看是否低频白名单 → 友好 OK；不在白名单才走时间戳 warn。
         if vid in _LOW_FREQ_FILES:
             rel = str(ts)[:19] if ts and ts != "--" else "—"
+            if vid in _RETIRED_FILES:
+                # 🗑 已退役产物：既已删除就不该再出现；此处若仍命中，说明有副本被放回
+                #   （放行但不冒充正常 —— 文案须说真话，避免「它还在正常使用」的错觉）。
+                _msg = (f"{p.name} **已随主人令退役**（产物已删；仅防「旧副本被放回」而复亮红灯）；"
+                        f"如再现请核查 api_push_raw.py::_RETIRED_ARTIFACTS 是否被绕过")
+            elif vid in _LOW_FREQ_MAX_AGE and dt is not None:
+                # ⏱ 低频产物按「生产者节拍」判龄：不套用 24h 通用红线，但也**不放弃监控**。
+                _lfa = _LOW_FREQ_MAX_AGE[vid]
+                _age_lf = (now_cst() - dt).total_seconds() / 60
+                if _age_lf > _lfa:
+                    results.append({
+                        "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                        "status": "fail", "last_update": rel, "age_min": round(_age_lf, 1),
+                        "heal_cat": "algo_run",
+                        "message": (f"{p.name} 更新于 {rel}；超过低频红线 {int(_lfa)} 分钟"
+                                    f"（{_lfa // 1440} 天，按生产者节拍：算法链周度批次）"
+                                    f" —— 请检查周末批是否执行"
+                                    f"（run_algorithms.py weekend stage / v8_weekend_light.yml）"),
+                    })
+                    continue
+                results.append({
+                    "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                    "status": "ok", "last_update": rel, "age_min": round(_age_lf, 1),
+                    "heal_cat": "algo_run",
+                    "message": (f"{p.name} 低频产物，更新于 {rel}"
+                                f"（按生产者节拍红线 {_lfa // 1440} 天；未套用 24h 通用红线）"),
+                })
+                continue
+            else:
+                _msg = f"{p.name} 低频/手动维护文件（白名单内，无时间戳属正常，{p.stat().st_size//1024}KB）"
             results.append({
                 "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
                 "status": "ok", "last_update": rel, "age_min": None,
                 "heal_cat": "algo_run",
-                "message": f"{p.name} 低频/手动维护文件（白名单内，无时间戳属正常，{p.stat().st_size//1024}KB）",
+                "message": _msg,
             })
             continue
         if dt is None:

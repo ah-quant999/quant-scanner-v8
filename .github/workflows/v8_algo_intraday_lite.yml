@@ -16,7 +16,12 @@ on:
   schedule:
     # ⏰ 2026-08-19 一劳永逸：cron UTC 1/3/5/7 = CST 09:00/11:00/13:00/15:00，盘中每 2h 触发
     # 周末/节假日由 workflows 内部跳过（仓内交易日历 gate，与 v8_algo_cloud.yml 同套）
-    - cron: '0 1,3,5,7 * * 1-5'
+    # 🔴 2026-09-21（本批）小九 · 结构性变更：本链被 GitHub schedule 静默注销，
+    #   按 v8_stock_quote_refresh.yml 09-07 已验证做法把单条多点 cron 拆为两条显式行，
+    #   语义等价（{1,3} ∪ {5,7} = {1,3,5,7}），条目数 1→2 强制重新注册。
+    #   见 HANDOFF.yaml::intraday-chain-cron-deregistered。
+    - cron: '0 1,3 * * 1-5'   # CST 09:00 / 11:00
+    - cron: '0 5,7 * * 1-5'   # CST 13:00 / 15:00
   workflow_dispatch:
     inputs:
       note:

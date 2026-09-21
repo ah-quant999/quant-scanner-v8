@@ -316,6 +316,11 @@ _RETIRED_ARTIFACTS = {
     "data/STRONG_BREAKOUT_BACKTEST.js",
     "raw_data/strong_breakout.json",
     "raw_data/strong_breakout_backtest.json",
+    # 🗑 2026-09-21 18:45 小九（同族第三例）：ALGO_BACKTEST_COMPARE —— 与上面强势突破同一次回推
+    #   （8bc8275fdc 里它 added +1）。退役依据：产物 update_time 停在 09-18 16:25:31、
+    #   生成方（run_algorithms.py E 批）与上传登记均已摘除、两页 <script src> 引用实测 0/0。
+    #   远端产物已由本批一次性删除提交清除；本行只拦「本地残留副本回推复活」。
+    "data/ALGO_BACKTEST_COMPARE.js",
 }
 # 按前缀兜底：raw_data/strong_breakout_YYYYMMDD.json（逐日留档）
 _RETIRED_PREFIXES = (
@@ -902,7 +907,6 @@ def main():
             if _is_retired(_rel):
                 # 🗑 2026-09-21 防回推：该产物已随主人令退役，本地残留副本不得复活它
                 print(f"  🗑 防回推：{_rel} 属已退役产物，跳过（本地副本不复活）")
-                continue
                 continue
             if os.path.isfile(_rel):
                 with open(_rel, "rb") as _fh:
