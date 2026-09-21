@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-21 15:52:35",
+  "update_time": "2026-09-21 22:34:36",
   "source": "ima",
   "note_url": "https://ima.qq.com/wiki/?shareId=32c01f1da52044f743a01e4aa995d72e7940cc8e99cf413cc5f4c2eb39b4d389&folderId=folder_7500817011604393",
   "source_kind": "wiki",
@@ -23,7 +23,7 @@
     "source_chars": 4154,
     "source_channel": "full-snapshot",
     "snapshot_fetched_at": "2026-09-19 13:01:52",
-    "snapshot_age_h": 50.85,
+    "snapshot_age_h": 57.55,
     "strong_expected": 34,
     "strong_parsed": 34,
     "reconciled": true,
