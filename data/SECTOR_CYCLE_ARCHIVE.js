@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-09-21 09:56:12
+// 最后更新：2026-09-21 10:02:58
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-09-21 09:56:12",
+  "update_time": "2026-09-21 10:02:58",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 31,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 2961,
+      "total": 2964,
       "ongoing": true
     },
     {
@@ -78,7 +78,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 31,
       "peak": 82,
       "peak_date": "08/20",
-      "total": 747,
+      "total": 749,
       "ongoing": true
     },
     {
@@ -143,7 +143,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 25,
       "peak": 20,
       "peak_date": "09/01",
-      "total": 192,
+      "total": 193,
       "ongoing": true
     },
     {
@@ -195,7 +195,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 19,
       "peak": 25,
       "peak_date": "09/01",
-      "total": 201,
+      "total": 202,
       "ongoing": true
     },
     {
@@ -234,7 +234,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 16,
       "peak": 8,
       "peak_date": "09/02",
-      "total": 72,
+      "total": 73,
       "ongoing": true
     },
     {
@@ -260,7 +260,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 10,
       "peak": 15,
       "peak_date": "09/16",
-      "total": 100,
+      "total": 99,
       "ongoing": true
     },
     {
@@ -273,7 +273,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 5,
       "peak": 4,
       "peak_date": "09/15",
-      "total": 18,
+      "total": 19,
       "ongoing": true
     },
     {
@@ -284,9 +284,9 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "end_idx": 30,
       "days": 4,
       "hot_days": 4,
-      "peak": 13,
+      "peak": 17,
       "peak_date": "09/21",
-      "total": 38,
+      "total": 42,
       "ongoing": true
     },
     {
