@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 33
+  next_id_seq: 34
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -1429,3 +1429,20 @@ items:
       发布闸门 verify --kind maharo_insights 36 项全过（daily>=1500 字、
       compare 三段齐全、无禁用词）。
     updated: "2026-09-21 19:45"
+
+  - id: north-fund-dead-source-fix
+    priority: P1
+    owner: shared
+    status: pending-verify
+    what: >
+      九宝量化 v8「北向席位日历」卡与「每日洞察」卡原误用死源 NORTH_FUND（2024-05 停披露，stopped:true 仅机械刷时间戳）
+      作为就绪判据与徽章时间戳来源，致：① 卡名与 TAB「北向席位日历」不一致（原名「北向资金日历」）；
+      ② 门控/徽章依赖停更源，存在永久「等待就绪」风险；③ freshness_guard 标签未标注已停披露，命名不唯一。
+      修复：卡名对齐 TAB；门控(_resReady)与徽章改挂真实龙虎榜源 LHB_HISTORY；freshness_guard 标签改「北向资金(已停披露)」。
+    fix: >
+      index.html 3 处（卡名+徽章、每日洞察 _resReady 门控、catch 命名对齐）+ freshness_guard.py 1 处（标签唯一化）。
+      经 Git Data API（base_tree + force:false）只推这 2 个登记路径，其余 83 个产物文件原样继承，未误推。
+    verify_how: "线上核验：北向席位日历卡名=「北向席位日历」、徽章时间戳取自 LHB_HISTORY（非 NF）；每日洞察卡不再因 NF 停刷卡在等待就绪。待下一龙虎榜周期 + 实时站点核验。"
+    evidence: "commit 1bc1d940b8（force:false 推至 main，基于实时 tip 9dffbc5b69）；blob 回读 6 项断言全绿"
+    residual: "每日洞察卡 _insightSignalCount 仍引用 NF.net_buy（约 4469 行，死源冻结值）——本次未改，避免未经拍板扩大行为；建议后续替换为 LHB_HISTORY 北向席位净买。见交接件 2026-09-21_2023。"
+    updated: "2026-09-21 20:23"
