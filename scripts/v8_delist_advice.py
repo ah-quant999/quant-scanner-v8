@@ -324,6 +324,13 @@ def _notify(subject, body, dry=False):
         print("  --dry：不发信。主题预览：")
         print("   ", subject)
         return True
+    # [2026-09-21 主人令"做好的也不要发"] 下架建议改为静默：结论已落在
+    #   data/BACKTEST_ALL_ALGOS.js（策略回测页），不再邮件主动触达。
+    #   如需恢复 2026-09-12 拍板的邮件触达，设环境变量 V8_DELIST_EMAIL=1 即可。
+    if os.environ.get("V8_DELIST_EMAIL", "0") != "1":
+        print("  [静默] 邮件主动触达已按 2026-09-21 主人令关闭（结论见策略回测页）；"
+              "恢复请设 V8_DELIST_EMAIL=1")
+        return True   # 视为成功，仍落盘抑制状态以防被重发
     try:
         sys.path.insert(0, str(ROOT))
         from v8_send_alert import send_alert, LEVEL_STALE
