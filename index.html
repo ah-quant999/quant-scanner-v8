@@ -16608,13 +16608,16 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
         //   原走 _uBadge('手动','',d.update_time) → 命中原 72h SLA 兜底，超期即变红并追加
         //   「⚠️ 已停更 N 天」—— 对静态索引属**语义误报**（本就不会自动更新，何来"停更"）。
         //   改：显式「静态索引 · 无自动刷新」+ 快照日期；仅 >90d 才追加过期提示。
+//   沿革：2026-09-21 主人令 —— 该字段源自 2026-09-06 的一次人工拍板（模块去向索引定稿），
+//         并非「数据快照时间」，故文案统一为「上次拍板」；超期阈值 90 天不变。
+//         判据：此字段由 index.html 内联静态数组给定，无自动刷新链，不属陈旧告警范畴。
         var _idxBadge;
         try{
           var _snap = d.update_time || '--';
           var _ageD = (function(){ try{ var _sd = window._parseAsCST ? window._parseAsCST(_snap) : new Date(String(_snap).replace(' ','T')); return Math.floor((Date.now() - _sd.getTime())/86400000); }catch(e){ return NaN; } })();
           _idxBadge = '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#c4b5fd;background:rgba(196,181,253,.14);border:1px solid rgba(196,181,253,.4);letter-spacing:.5px;">&#x1F4CB; 静态索引 · 无自动刷新</span>'
-            + '<span style="font-size:11px;color:var(--dim);margin-left:6px;">快照 ' + _snap + '</span>'
-            + ((_ageD >= 90) ? '<span style="font-size:11px;color:#ef5350;margin-left:6px;">&#x26A0;&#xFE0F; 快照已过期 ' + _ageD + ' 天</span>' : '');
+            + '<span style="font-size:11px;color:var(--dim);margin-left:6px;">上次拍板 ' + _snap + '</span>'
+            + ((_ageD >= 90) ? '<span style="font-size:11px;color:#ef5350;margin-left:6px;">&#x26A0;&#xFE0F; 上次拍板已 ' + _ageD + ' 天</span>' : '');
         }catch(e){ _idxBadge = '<span class="fresh">'+(d.update_time||'--')+'</span>'; }
         h+='<h3><span class="ic">🧪</span>实验区·模块去向索引 '+_idxBadge+"</h3>";
         h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;padding:12px 14px;">';

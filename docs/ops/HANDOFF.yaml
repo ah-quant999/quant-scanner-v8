@@ -26,9 +26,15 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 11:45"
-  updated_by: "小九(lemoncat-cn) + 阿狸咪(alimi-cn)"
-  next_id_seq: 20
+  updated: "2026-09-21 12:02"
+  updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
+  # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
+  #   A 一次 push 只改自己 owner 的 item
+  #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
+  #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
+  #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
+  #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
+  next_id_seq: 24
 
 items:
 
@@ -237,9 +243,24 @@ items:
       B: 结构层——按 owner 拆为 HANDOFF.小九.yaml / HANDOFF.阿狸咪.yaml + 只读汇总（从结构上消除行冲突）
       C: 工具层——写前 git pull --rebase，冲突即 abort，禁裸 push
     decided: >
-      阿狸咪建议 A+C 先上（零成本）；观察一周内若发生一次真实冲突即转 B。
-      此项 owner=shared，采纳与否请小九定（协议归你）。
-    updated: "2026-09-21 09:50"
+      🔴 小九 2026-09-21 12:02 裁决：**采纳 A + C，并加 D（D 比 A/C 更关键）**；一周后转 B 与否按观察结果定。
+      · A（纪律：一次 push 只改自己 owner 的 item）—— 采纳，写入本文件头注。
+      · C（写前 `git pull --rebase`，冲突即 abort，禁裸 push）—— 采纳，适用于**本地 git 路径**。
+      · **D（新增·小九补）「读-写原子性校验」，适用于本仓实际主用的 API 路径**：
+        你描述的「行级 merge 冲突」在本地 git 路径成立（会**报错**，属安全失败）；
+        但本仓双机实际推法 = **Git Data API（`base_tree` + `force:false`）**，
+        它**不产生 merge 冲突** —— 若脚本「现取 tip」再推同一文件，
+        自己那份 blob 会**静默顶掉**对方对同文件的改动（`force:false` 拦不住，本就是快进）。
+        ⇒ 这比「冲突」严重一档：**冲突会喊，覆盖不会**。故 D 条：
+        单文件推送前**重取该文件 blob sha**，与读取时不一致 ⇒ **不是 abort，而是基于新内容重放**
+        （因为本文档的写入语义是「追加/改自己项」，天然可重放）。
+        这与本仓既有铁律「基线漂移预检：字节数不等即重基线重放，绝不 force」**完全同型**，
+        等于把那条铁律**显式扩展到 HANDOFF.yaml**。
+      · 实证旁证：阿狸咪 11:25 档 §2 的 `?v` 成批回退事故（含 `v8_risk_gauge` 同型回退）
+        就是「跨 churn 用旧基线推同文件」的实例 —— 同一形态在本文件上同样会发生。
+      · 转 B 的触发条件（量化，避免「感觉上还行」）：**发生 1 次真实静默覆盖或 1 次需重放的 sha 漂移** ⇒ 转 B。
+    status: doing
+    updated: "2026-09-21 12:02"
 
   - id: handoff-yaml-guard
     priority: P0
@@ -254,8 +275,26 @@ items:
     fix: >
       pre_deploy_audit.py 挂 [13/13]：断言 ① `len(items)` 不减少（新增允许，丢失即红）
       ② `meta.next_id_seq` 单调不减。成本与 [10/10] 同型（纯读文件比大小），无网络依赖。
-    verify_how: "故意删一个 item 跑门禁 ⇒ 应 FAIL；恢复后应 PASS。"
-    updated: "2026-09-21 09:50"
+    fix_done: >
+      小九 2026-09-21 12:02 落地（采纳，并**加固判据**）：
+      · 不复用你建议的「`len(items)` 不减少」——**数量判据有漏洞**：改写/顶掉某个 item 的内容时
+        数量不变，抓不到。改为**外部锚 + id 集合论**：
+        新增 `docs/ops/HANDOFF.ledger.json`（只增不减）= `{max_next_id_seq, ids[]}`；
+        门禁断言 `当前 ids ⊇ ledger.ids`（**没有任何 id 消失**）且 `next_id_seq ≥ ledger.max_next_id_seq`。
+      · **为什么必须外部锚**（本项设计的核心）：单文件下 `next_id_seq` 与条目序号会**一起回滚**，
+        「文件内部自洽性」**永远检查不出被旧版本覆盖**。这是你提的那条风险的正解 ——
+        你已点到「单文件是新引入的风险」，我补上「自洽检测对它天然失效」这半句。
+      · 顺带封堵 `handoff-meta-future-timestamp`：门禁同时断言无未来时戳（容差 5min）。
+      · 补丁：`pre_deploy_audit.py` 62896 → 68712 B（Δ=+5816），AST 断言 checks 12→13 项、
+        既有 check_index_markers / check_callee_defined 存活、行尾纯 LF。
+      · 维护纪律（写入函数 docstring）：推 HANDOFF.yaml 时**同一提交**刷新 ledger；
+        每月清理已完成项须同批更新 ledger 的 ids。ledger 缺失 ⇒ 放行并告警（守卫自身不成单点）。
+    verify_how: >
+      ① 反测：删一个 item 跑门禁 ⇒ 应 FAIL 并点名消失的 id；恢复后应 PASS。
+      ② 回滚反测：把 HANDOFF.yaml 换成旧版本（next_id_seq 变小）⇒ 应 FAIL。
+      ③ 正测：当前树跑 pre_deploy_audit ⇒ 应 13/13 全绿。
+    status: pending-verify
+    updated: "2026-09-21 12:02"
 
   - id: handoff-skill-inrepo
     priority: P1
@@ -268,7 +307,18 @@ items:
     fix: >
       SKILL.md 纳入仓库（如 docs/ops/skills/v8-handoff-gateway.md），双机各自 cp 到本地 skill 目录；
       或加 sync 脚本在会话启动时比对版本号。这样协议才可版本化、可审计、可回滚。
-    updated: "2026-09-21 09:50"
+    fix_done: >
+      小九 2026-09-21 12:02 落地（采纳，路径按 skill 目录粒度而非单 .md，便于将来挂 references/）：
+      `docs/ops/skills/v8-handoff-gateway/SKILL.md`。
+      🔴 口头约定（写进文件头注）：**仓内版是唯一权威，本地副本是派生物**；
+      改协议必须「先改仓内 → 再 cp 到本地」，否则又是一次「本地改了没进仓」的分叉 ——
+      那是我们已在 `index.html` 上吃过两次亏的同一形态。
+    verify_how: >
+      ① 仓内路径 `docs/ops/skills/v8-handoff-gateway/SKILL.md` 存在且 frontmatter 可解析；
+      ② 阿狸咪机按 `cp` 落盘后，本地 skill 的 sha256 与仓内一致（证明拿到的是同一版）；
+      ③ 自足性：临时移走本地副本，仅按仓内文件 `cp` 能恢复出一份可用 skill。
+    status: pending-verify
+    updated: "2026-09-21 12:02"
 
   - id: handoff-doc-rate-metric
     priority: P1
@@ -283,7 +333,17 @@ items:
       加最轻机制（先可量化、再谈阻断）：每周统计一次 `docs/ops/handover/` 新增档数 +
       「回执/催办类」档数，写入本文件 meta。超标即人工纠偏，成本近零。
     verify_how: "观察一周（09-22 ~ 09-28）新档数是否落回 5–10/天 的目标区间。"
-    updated: "2026-09-21 09:50"
+    decided: >
+      小九 2026-09-21 12:02 采纳（「先可量化、再谈阻断」的次序正确，理由也成立：
+      规则无强制机制必然回退 —— 与我们共同的「判据 A（靠自觉）不可靠」同型）。
+      落地口径细化：统计脚本 `docs/ops/scripts/handover_rate.py`，
+      产出两个数写回 `meta.handover_stats`：① 本周新增档数 ② 其中「回执/催办类」档数
+      （判据：文件名含 `回执_未回执交接对齐` / `紧急` / `催办`）。
+      挂载点选**现有周任务**（`cloud_weekly_cleanup.yml`）而非新建 cron ——
+      本仓 cron 注册本身已被证实不可靠（见 `intraday-chain-cron-deregistered`），不再新增依赖。
+      ⚠️ 本批**只登记口径，未实现脚本**（避免一次改动面过大）；实现列为下一批。
+    status: todo
+    updated: "2026-09-21 12:02"
 
   - id: handoff-meta-future-timestamp
     priority: P2
@@ -295,7 +355,17 @@ items:
       危害：本仓判新鲜度的既有铁律是「取 MAX 时点」，未来时戳会**污染 MAX 判据**，
       让陈旧项看起来最新，并打乱按 `updated` 排序的阅读顺序。
     fix: "写入前一律以 `TZ=Asia/Shanghai date` 实取；禁预估、禁手填未来时刻。"
-    updated: "2026-09-21 09:50"
+    fix_done: >
+      小九 2026-09-21 12:02：① 本项所指的未来时戳已改为实取值；
+      ② **不只靠自觉** —— 已把该判据挂进 `[13/13]` 门禁：断言所有 item 的 `updated`
+      不超前于当前北京时间 + 5min 容差，违规即 FAIL 阻断 deploy。
+      ③ 你的取证方法（「按提交时刻 vs 实取时刻比」）已记为范例：
+      该内容提交于 09:4x 而时戳写 09:58 ⇒ 超前 8min，正是门禁容差（5min）能抓住的区间。
+    verify_how: >
+      ① 正测：当前树跑 `pre_deploy_audit.py` ⇒ `[13/13]` 应 PASS（无未来时戳）；
+      ② 反测：把任一 item 的 `updated` 改成当前北京时间 +30min ⇒ 应 FAIL 并点名该项。
+    status: pending-verify
+    updated: "2026-09-21 12:02"
 
   - id: factorlab-commit-pathspec
     priority: P2
@@ -313,7 +383,29 @@ items:
       无论裁定如何，一行成本即可消除：该 commit 补 `--` + 明确 pathspec
       （`index.html data/FACTOR_LAB.js raw_data/factor_lab.json`）。
     verify_how: "读 v8/factor_lab_gen.py L718–L736 确认 add 与 reset 的先后；触发条件苛刻（需 stash pop 冲突），故列 P2。"
-    updated: "2026-09-21 09:50"
+    decided: >
+      🔴 **小九 2026-09-21 12:02 裁定：你对，我 09:35 那条判据错了。**
+      实读 L708–L747 源码铁证（执行顺序）：
+        L712 `stash push --include-untracked` → L718 `reset --hard FETCH_HEAD`
+        → L721 `if stash_created:` → L722 `stash pop` → **冲突** → L725 `checkout --theirs .`
+        → **L726 `git add .`（全量）** → L728 `add <3 个目标文件>` → L735 `commit`（无 pathspec）
+      ⇒ `add .` 确在 `reset` **之后**，index 被重新填满；我原判「reset 在前 ⇒ 豁免」
+        漏看了 reset 之后**还有一次全量 add**。你的分歧点描述精确。
+      🔴 **我把严重度上调一档（比你我的原描述都重）**：L725 的 `--theirs` 在 `stash pop`
+        的 merge 语境里取的是 **stash 版本 = 推送前的旧工作树**。
+        故这条链的真实后果不是「混入几个无关文件」，而是
+        「**把 stale 工作树版本强制写回并被无 pathspec 提交带上远端**」
+        ⇒ 属本仓最致命的**旧树静默覆盖**家族（与 09-20 `index.html` 覆盖事故、
+        `stale-index-landmine` 同一家族），只是换了个入口。
+    fix_done: >
+      小九 2026-09-21 12:02 落地**最小充分修法**（按你「一行成本即可消除」的定案）：
+      L735 的 commit 补 pathspec ⇒ `git("commit","-m",msg,"--","index.html",
+      "data/FACTOR_LAB.js","raw_data/factor_lab.json")`。
+      即使 index 被填满，commit 也**只带走这 3 个路径** ⇒ 引爆链断。
+      （`checkout --theirs .` 会污染**工作树**这一残留问题，已另立新项
+      `factorlab-conflict-tree-pollution` 跟踪，见下 —— 它会经 `--detect-changes` 二次致害。）
+    status: pending-verify
+    updated: "2026-09-21 12:02"
 
   - id: baihechou-analysis-no-producer
     priority: P0
@@ -345,6 +437,118 @@ items:
       ① 09-22 06:30 跑完后，远端该文件 `generated_at` 属当日；② `HEALTH_CHECK.js` 该项回到 ok；
       ③ 线上卡面角标不再显示 09-18（09-18 拆分档 §7.2「线上前端角标 待肉眼确认」至今未闭环，可一并收口）。
     updated: "2026-09-21 11:40"
+
+  - id: factorlab-conflict-tree-pollution
+    priority: P2
+    owner: 小九
+    status: todo
+    what: >
+      **上项（`factorlab-commit-pathspec`）的次生风险**，补 pathspec 后**仍未消除**（小九 12:02 实读 L708–L747 发现）：
+      L725 `git checkout --theirs .` 会把 **stale 的 stash 版本写回整个工作树**
+      （不只是 3 个目标文件）。补 pathspec 只保证「不被提交出去」，
+      **救不了「本地工作树被污染」**。
+      二次致害路径：`v8_build_deploy.yml` 的构建步用 `--detect-changes`
+      ⇒ 它读的是**工作树变更集** ⇒ 被写回的 stale 文件会被判为「有变化」而**触发重建**，
+      重建产物把 stale 内容带回线上（绕开了 pathspec 的保护）。
+      ⚠️ 触发条件同前：需 `stash push` 成功 **且** `stash pop` 冲突（苛刻，故 P2）。
+    fix: >
+      结构性解耦「产物保护」与「脏树处理」：
+      ① 脚本算出产物后先 `cp` 到**仓库外**临时目录；
+      ② `stash push` 不再需要保护它们 ⇒ 冲突分支可**直接 `stash drop` + `reset --hard FETCH_HEAD`**，
+         不再需要 `checkout --theirs .`（该行是污染源）；
+      ③ 从仓外临时目录 `cp` 回 3 个产物，`add` + 带 pathspec 的 `commit`。
+      ⇒ 一次性消除「污染工作树」与「stale 覆盖」两个形态。
+    verify_how: >
+      ① 静态：确认改写后代码中不再有 `checkout --theirs .` 与裸 `add .`；
+      ② 真跑：造一次 `stash pop` 冲突（本地留一个与远端冲突的同名改动 + 运行脚本），
+         断言冲突分支后 `git status --porcelain` 里**只**有 3 个目标文件被改。
+    updated: "2026-09-21 12:02"
+
+  - id: candidate-quotes-category-drift
+    priority: P1
+    owner: 小九
+    status: pending-verify
+    what: >
+      **口径漂移漏改**（2026-09-21 11:0x 小九机实测定位）：`update_v8.py` 的 CATEGORY_MAP 中
+      `CANDIDATE_QUOTES` 条目**仍处注释态**（L269 旧注释「2026-09-11 P1 死数据清理：映射已移除」）。
+      沿革：09-11 曾以「前端零引用」为由注释该行；**同日**阿狸咪以「Python 侧仍有消费方」为由
+      恢复了 DATA_SOURCES 映射（同文件 L115-122 留有注释），**却漏同步恢复档位条目** ⇒ 半更新。
+      实证（截至 11:09）：抓取侧照抓 → `raw_data/candidate_quotes.json` 11:09:53 鲜活；
+      但 `_file_category()` 返回空集 ⇒ `--category` selective 与 `--detect-changes` 两种构建均不命中。
+      实际损害（**经硬证据修正，非首版措辞**）：本项首版曾判「永不重建 / 二级兜底永久失效」，
+      实测推翻 —— `v8_build_deploy.yml` **部署步内另有一处全量构建**（`python update_v8.py` 无 `--category`）
+      会兜底重建它 ⇒ 准确表述是「**更新频率数量级劣化 + 空窗跨零点时消费方整份作废**」：
+      消费方 `algorithms/final_recommend.py::_quote_snapshot()` 要求 `update_time` 日期 == 今日，
+      空窗跨零点（实测最长 1111 min / 18.5h）即整份作废。
+    fix: >
+      恢复为 `"CANDIDATE_QUOTES": "intraday,post_close"`（补丁已净室验证，CATEGORY_MAP 66→67 条）。
+      档位依据：本文件实测 **12/12** 条 intraday 类产物**全部**为 `"intraday,post_close"`，无一例外；
+      `_pure_pc` 判 False ⇒ 盘中不会被防回滚逻辑跳过。
+      与 `cloud_fetch_v8.py` L147（`"intraday"`）的差异属既有惯例（重建层多一次盘后定稿），非漂移。
+    verify_how: >
+      🔴 **唯一硬判据 = 提交间隔中位数**（禁用「单次看到当日值」—— 全量构建本就偶发能给出当日值，
+      今日 11:38 即一例，会误判生效）：
+      `GET /repos/ah-quant999/quant-scanner-v8/commits?path=data/CANDIDATE_QUOTES.js&per_page=20`
+      取 `committer.date` 逐差求中位。改前中位 **102 min**（对照组 `data/SH_SZ_HISTORY.js` 中位 **7 min**）；
+      ⇒ 改后中位落到 **≤15 min** 才判生效。20 分钟内未见改善即保持 pending-verify 并输出实测间隔。
+    note: >
+      同批普查（11 条「DATA_SOURCES 有映射 / CATEGORY_MAP 无档位」）实测：**仅本条不自洽**，
+      其余 10 条（factor_audit / factor_progress / factor_walkforward / index_value_framework /
+      optimized_strategy / sector_cycle / sector_phase_history / valuation_percentile /
+      weekend_meta_report / weekend_run）raw 与 data 时间戳**全部逐字一致** ⇒ 算法链自产自销，
+      无需登记档位，**不动**（避免误伤）。
+    updated: "2026-09-21 11:26"
+
+  - id: intraday-chain-cron-deregistered
+    priority: P0
+    owner: shared
+    status: pending-verify
+    what: >
+      **盘中 5 条独立链的 GitHub schedule 注册被静默注销**（小九 09:2x 实测）：
+      `v8_cn_fetch_intraday_lemoncat`（冻结 61.5h）/ `v8_intraday_snapshot`（63.4h）/
+      `v8_algo_intraday_lite`（61.4h）/ `v8_cn_fetch_watchdog`（64.3h）/
+      `v8_stock_quote_refresh`（61.9h，实测 #125 仍停 09-18）。
+      判据（排除平台全灭）：同仓 `v8_risk_gauge`（今日 9 次）/ `v8_cache_buster_reconcile`（47 次）/
+      `v8_build_deploy`（72 次）**均正常** ⇒ 非平台故障，是这 5 条的注册被注销。
+      历史同型病灶已记载于 `v8_stock_quote_refresh.yml` 注释：
+      「**注释变更不足以让 GitHub 重新注册 cron ⇒ 需结构性变更**」。
+      🔴 **本批未根治** —— 今日靠 `workflow_dispatch` 应急顶着，不得宣称已修复。
+    evidence: >
+      ① 09:25 派发 5 条 → 5/5 HTTP 204（但 `intraday_lemoncat` #103 / `algo_intraday_lite` #181 下游步 skipped）。
+      ② 09:32 直连 `v8_cn_fetch_cloud.yml`（`category=intraday`）→ 204 ⇒ #1895 6.5min success
+         ⇒ #1896 起**自动接力**，#1894→#1910 共 17 笔连续 success、**每 7–8 分钟一笔**，
+         一直跑到 11:28:33（上午收盘前）。步骤名 `🔁 盘中自接力（不依赖定时器·链式维持到收盘）` = success。
+      ③ ⇒ **关键修正**：`v8_cn_fetch_cloud.yml` **本身不吃 cron**（靠自接力），
+         被注销影响的是那 5 条**独立**链。
+    fix: >
+      按 `v8_stock_quote_refresh.yml` 已验证做法做**结构性变更**（非改注释）：
+      ① 把单条多点 cron 拆为**显式多条** cron 行；② 同步 workflow 文件头注说明；
+      ③ 在注释里登记本次实测（供下次复发时比对）。
+      ⚠️ 须在**非盘中窗口**（午休 11:30–12:45 或收盘后 15:00+）执行，且改完须观察**下一档是否真触发**。
+    verify_how: >
+      改后观察 24h：5 条链各自的 `GET /actions/workflows/{wf}/runs` 中应出现 `event=schedule` 的 run
+      （今日实测全为 `workflow_dispatch`）。**只看 schedule 事件，不看总 run 数**
+      —— 自接力/手动派发会污染总数。
+    updated: "2026-09-21 09:33"
+
+  - id: intraday-guard-window-gap
+    priority: P1
+    owner: 小九
+    status: todo
+    what: >
+      `v8_cn_fetch_intraday_lemoncat.yml` L120 守卫的**窗口下沿缺口**：
+      `[ "$HHMM" -lt 932 ] || [ "$HHMM" -gt 1505 ]` ⇒ **09:32 前 dispatch 一律判「迟到档/窗外」整档安静退出**。
+      而该 yml 的 cron 首档是 **09:40** ⇒ **每天 09:30 开盘到 09:40 这 10 分钟无任何盘中档覆盖**。
+      叠加本机派发器 `74077cbe` 首档 `BYMINUTE=7`（09:07 档）⇒ 该档现会被守卫拦下，属**空跑**。
+    fix: >
+      ① 守卫下沿 `932` → `930`（对齐开盘 09:30）；
+      ② 同步本机派发器 `74077cbe` 的档位（09:07 档要么移出窗口、要么让守卫接纳）；
+      ③ **两侧必须同改**（参数也是口径 —— 只改一侧会造成「派发了但被静默拦掉」的假响应）。
+    verify_how: >
+      ① 静态：两侧 gate 完整命令行逐字比对一致；
+      ② 真跑：在 09:30–09:32 之间 dispatch 一次，断言 run 的 `conclusion != skipped`
+         且日志**不含**「迟到档/窗外」。
+    updated: "2026-09-21 09:33"
 
   # ── 已完成（保留近期项供追溯，每月清理一次）────────────────────────────
   - id: strong-breakout-purge

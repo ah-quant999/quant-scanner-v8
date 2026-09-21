@@ -266,7 +266,35 @@ CATEGORY_MAP = {
     "CONCEPT_RANKING": "intraday,post_close",
     "LIMIT_UP_HEATMAP": "intraday,post_close",
     "LIMIT_UP_BROKEN": "intraday,post_close",
-    # "CANDIDATE_QUOTES": "intraday",  # 2026-09-11 P1 死数据清理：映射已移除
+    # 🛡 2026-09-21 小九的工程师（P1 口径漂移漏改根治）：恢复 CANDIDATE_QUOTES 档位登记。
+    #   沿革：2026-09-11 曾以「前端零引用 / 死数据」为由注释掉本行；**同日**阿狸咪以「Python 侧
+    #   仍有消费方」为由**恢复了上方 DATA_SOURCES 映射**（见 L115-122 注释），但**漏同步恢复
+    #   本档位条目** ⇒ 两表口径不一致。
+    #
+    #   🔴 机制（已读 v8_build_deploy.yml 核实，勿按「不重建」理解）：
+    #   它**并非不重建** —— v8_build_deploy.yml 部署步内另有一处**全量构建**
+    #   （`python update_v8.py`，无 --category ⇒ target_files=全部 raw_data），靠该路径兜底。
+    #   真正的损害是**更新频率数量级劣化**：无档位 ⇒ _file_category() 返回空集 ⇒
+    #   `--category X` selective 与 `--detect-changes` 两条常规路径**都不命中**它 ⇒
+    #   只能等偶发的全量构建，盘中每 20 分钟一轮的刷新**完全吃不到**。
+    #
+    #   📊 硬证据（GitHub /commits?path= 实测最近 20 次提交间隔，2026-09-21 11:4x）：
+    #     · data/CANDIDATE_QUOTES.js     中位 **102 min**，最大 **1111 min（≈18.5h）**
+    #     · data/SH_SZ_HISTORY.js（已登记 intraday,post_close）中位 **7 min**  ← 对照
+    #     · 最长空窗实例：2026-09-20 17:07 → 2026-09-21 11:38
+    #
+    #   ⚠️ 实际损害：消费方 algorithms/final_recommend.py::_quote_snapshot() 要求
+    #   update_time 日期 == 今日，否则**整份作废** ⇒ 空窗一旦跨零点，该兜底当日即失效；
+    #   盘后算法链（约 17:00 起跑）之前若当日尚未发生全量构建，即命中此情形。
+    #
+    #   档位定夺 = "intraday,post_close"：
+    #     · intraday   —— 承载盘中每轮重建（核心诉求，把中位间隔拉回 ~7 min 量级）；
+    #       且 _pure_pc=False，不会被 L1265 防回滚逻辑跳过；
+    #     · post_close —— 盘后定稿一次；本文件实测 12/12 条 intraday 类产物**全部**为
+    #       "intraday,post_close"，无一例外，属既有惯例。
+    #   🔴 与 cloud_fetch_v8.py L147（"intraday"）的差异属「重建层比抓取层多一次盘后定稿」，
+    #      非漂移；两表须同改的只有「是否归某档」。
+    "CANDIDATE_QUOTES": "intraday,post_close",
     "SH_SZ_HISTORY": "intraday,post_close",
     "AI_MARKET_BRIEF": "intraday,post_close",
     # 🛡 2026-09-11 小九的工程师（三档归档普查·补「无档位」盲区）：

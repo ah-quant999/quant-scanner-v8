@@ -732,8 +732,21 @@ def main():
                 if attempt < max_retries:
                     continue
                 bs.logout(); return False
+            # 🔴 2026-09-21 小九（阿狸咪 09:2x 评审提出，我 09:35 首判「不属同族」经复核**推翻**）：
+            #   必须带 pathspec。执行顺序实读为：
+            #     L718 reset --hard FETCH_HEAD → L721 if stash_created → L722 stash pop
+            #     → 冲突 → L725 checkout --theirs . → **L726 git add .（全量）** → 本行 commit
+            #   `add .` 在 reset **之后** ⇒ index 被重新填满；而 L725 的 --theirs 取的是
+            #   **stash 版本 = 推送前的旧工作树** ⇒ 无 pathspec 的 commit 会把
+            #   **stale 工作树版本**一并推上远端 —— 属本仓最致命的「旧树静默覆盖」家族
+            #   （与 09-20 index.html 覆盖事故、stale-index-landmine 同族），只是换了个入口。
+            #   补 pathspec 后：即使 index 被填满，commit 也只带走这 3 个路径 ⇒ 引爆链断。
+            #   ⚠️ 残留：L725 `checkout --theirs .` 仍会污染**工作树**（非提交面），
+            #   会经 v8_build_deploy 的 --detect-changes 二次致害；已另立挂账
+            #   factorlab-conflict-tree-pollution（P2）跟踪，不在本处一并改（最小改动原则）。
             rc, o = git("commit", "-m",
-                "chore(v8): 因子实验室定时刷新(异常换手率重点池 + ROE全市场主板)")
+                "chore(v8): 因子实验室定时刷新(异常换手率重点池 + ROE全市场主板)",
+                "--", "index.html", "data/FACTOR_LAB.js", "raw_data/factor_lab.json")
             log("git commit rc=", rc, (o[-400:] if o else ""))
             # 5) 推送
             rc, o = git("push", "origin", "HEAD:refs/heads/main")

@@ -1,0 +1,31 @@
+{
+ "max_next_id_seq": 24,
+ "ids": [
+  "build13-timeout-guard",
+  "cachebot-build-race",
+  "concurrency-block-bucket",
+  "build13-step-timeout-minutes",
+  "gate-1010-marker-stale-ms-note",
+  "stale-index-landmine",
+  "alimi-same-family-check",
+  "local-worktree-behind",
+  "maharo-daily-s4u",
+  "defer-cache-empty-freeze",
+  "handoff-concurrent-write",
+  "handoff-yaml-guard",
+  "handoff-skill-inrepo",
+  "handoff-doc-rate-metric",
+  "handoff-meta-future-timestamp",
+  "factorlab-commit-pathspec",
+  "baihechou-analysis-no-producer",
+  "factorlab-conflict-tree-pollution",
+  "candidate-quotes-category-drift",
+  "intraday-chain-cron-deregistered",
+  "intraday-guard-window-gap",
+  "strong-breakout-purge",
+  "handoff-protocol"
+ ],
+ "updated": "2026-09-21 12:02",
+ "generated_by": "小九(lemoncat-cn)",
+ "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。"
+}

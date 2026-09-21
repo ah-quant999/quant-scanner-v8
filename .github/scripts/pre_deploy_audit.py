@@ -1112,6 +1112,120 @@ def check_index_markers():
     return True, "index.html 核心标记 %d/%d 全部在位（卡片/分节/数据源锚点）" % (rows, rows)
 
 
+
+def check_handoff_ledger():
+    """[13/13] 交接状态源守卫（2026-09-21 阿狸咪评审提出 · 小九落地）。
+
+    背景（阿狸咪 09:50 评审，实测证据）：
+      `grep -rn "HANDOFF" .github/scripts/*.py` 命中 **0** ——
+      我们刚用两轮论证「防覆盖必须靠机器判据、不能靠人的自觉」（为此立了
+      [10/10] index 守卫），而被本协议提升为**唯一权威来源**的
+      `docs/ops/HANDOFF.yaml`，恰是全仓最缺保护的关键资产。
+      一旦被落后树 / 并发 push 静默覆盖，双机将**同时**失去「什么还没做」
+      的唯一视图 —— 后果比 index.html 被覆盖更重（后者肉眼可见，前者无人察觉）。
+
+    判据设计（关键：单文件自洽**检测不到回滚**，必须外部锚）：
+      本文件是单文件、且 `next_id_seq` 与条目序号会**一起**回滚 ⇒
+      「文件内部自洽性」永远检查不出「被旧版本覆盖」。
+      故引入只增不减的外部锚 `docs/ops/HANDOFF.ledger.json`：
+        {"max_next_id_seq": N, "ids": [...], "updated": "..."}
+      · 断言 ids 当前集合 ⊇ ledger.ids（**没有任何 id 消失**；合法新增是超集，放行）
+      · 断言 meta.next_id_seq >= ledger.max_next_id_seq（单调不减）
+      ⇒ 「被旧版本覆盖」会让两条同时失败，必然被抓住。
+
+    维护纪律（有意的摩擦力）：
+      · 推 `HANDOFF.yaml` 时**同一提交**同步刷新 ledger（追加 id、抬高 max_next_id_seq）；
+      · 每月清理已完成项 ⇒ 须同批更新 ledger 的 ids（这正是「人工拍板」的时刻）；
+      · ledger 缺失 ⇒ 放行并告警（避免守卫自身变成新的单点阻断源）。
+
+    本项同时封堵 `handoff-meta-future-timestamp`（P2）：断言无未来时戳。
+    未来时戳会污染本仓「取 MAX 时点」的新鲜度铁律，让陈旧项看起来最新。
+    """
+    hy = ROOT / "docs" / "ops" / "HANDOFF.yaml"
+    if not hy.exists():
+        return False, "docs/ops/HANDOFF.yaml 不存在（唯一权威状态源缺失）"
+    try:
+        import yaml as _yaml
+    except Exception as e:
+        return True, "PyYAML 不可用（跳过交接守卫，放行）: %s" % e
+
+    try:
+        d = _yaml.safe_load(hy.read_text(encoding="utf-8"))
+    except Exception as e:
+        return False, "HANDOFF.yaml 解析失败（结构损坏）: %s" % e
+    if not isinstance(d, dict):
+        return False, "HANDOFF.yaml 顶层不是映射"
+
+    items = d.get("items") or []
+    if not isinstance(items, list) or not items:
+        return False, "HANDOFF.yaml 的 items 为空或非列表"
+
+    ALLOW = {"todo", "doing", "pending-verify", "blocked", "done"}
+    ids, bad = [], []
+    for i, it in enumerate(items):
+        if not isinstance(it, dict):
+            bad.append("items[%d] 非映射" % i); continue
+        _id = it.get("id")
+        if not _id:
+            bad.append("items[%d] 缺 id" % i); continue
+        ids.append(str(_id))
+        for k in ("priority", "owner", "status"):
+            if not it.get(k):
+                bad.append("%s 缺 %s" % (_id, k))
+        st = str(it.get("status") or "")
+        if st not in ALLOW:
+            bad.append("%s 的 status=%r 不在白名单 %s" % (_id, st, sorted(ALLOW)))
+        if st == "pending-verify" and not it.get("verify_how"):
+            bad.append("%s 为 pending-verify 但缺 verify_how（不得宣称已修复）" % _id)
+    if bad:
+        return False, "HANDOFF.yaml 结构违规 %d 处：%s" % (len(bad), "；".join(bad[:6]))
+
+    # ── 未来时戳（封堵 handoff-meta-future-timestamp）──────────────────────
+    from datetime import datetime, timedelta, timezone
+    # ⚠️ strptime 产出 naive，故须 strip tzinfo，否则 aware-naive 相减抛 TypeError
+    now_cst = (datetime.now(timezone.utc) + timedelta(hours=8)).replace(tzinfo=None)
+    TOL = timedelta(minutes=5)
+    fut = []
+    for it in items:
+        u = str(it.get("updated") or "")
+        if not u:
+            continue
+        try:
+            t = datetime.strptime(u[:16], "%Y-%m-%d %H:%M")
+        except Exception:
+            continue
+        if t - now_cst > TOL:
+            fut.append("%s(updated=%s)" % (it.get("id"), u))
+    if fut:
+        return False, ("未来时戳 %d 处（污染 MAX 新鲜度判据）: %s"
+                       % (len(fut), "；".join(fut[:5])))
+
+    # ── 外部锚比对 ────────────────────────────────────────────────────────
+    lg = ROOT / "docs" / "ops" / "HANDOFF.ledger.json"
+    if not lg.exists():
+        return True, "ledger 不存在（守卫未启用，放行）；items=%d" % len(items)
+    try:
+        L = json.loads(lg.read_text(encoding="utf-8"))
+    except Exception as e:
+        return False, "HANDOFF.ledger.json 解析失败: %s" % e
+
+    lost = [x for x in (L.get("ids") or []) if x not in set(ids)]
+    if lost:
+        return False, ("%d 个 item 从状态源消失（疑似被落后基线覆盖 / 误删）：%s"
+                       % (len(lost), "；".join(map(str, lost[:8]))))
+
+    cur_seq = (d.get("meta") or {}).get("next_id_seq")
+    old_seq = L.get("max_next_id_seq")
+    try:
+        if int(cur_seq) < int(old_seq):
+            return False, ("meta.next_id_seq 回退：当前 %s < ledger 记录 %s（状态源被回滚）"
+                           % (cur_seq, old_seq))
+    except Exception:
+        return False, "next_id_seq / max_next_id_seq 非整数（当前=%r ledger=%r）" % (cur_seq, old_seq)
+
+    return True, ("交接状态源完好：items=%d（ledger 锚 %d 个 id 全在）· next_id_seq=%s≥%s"
+                  % (len(items), len(L.get("ids") or []), cur_seq, old_seq))
+
 def main():
     checks = [
         ("[1/8] py_compile", check_py_compile),
@@ -1126,6 +1240,7 @@ def main():
         ("[10/10] index 核心标记守卫", check_index_markers),
         ("[11/11] defer 数据缓存守卫", check_defer_cache_guard),
         ("[12/12] 调用点定义守卫", check_callee_defined),
+        ("[13/13] 交接状态源守卫", check_handoff_ledger),
     ]
     print("=" * 60)
     print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；"
