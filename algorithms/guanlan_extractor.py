@@ -239,7 +239,11 @@ def _looks_clean(n):
         return False
     t = re.sub(r'(股份)?有限公司$', '', s)
     t = re.sub(r'[-‐][WSR]$', '', t)  # 容忍港股 -W/-S/-R 双重上市后缀
-    return 2 <= len(t) <= 8 and re.fullmatch(r'[一-鿿]+', t)
+    # 🛡 2026-09-21 一劳永逸（同 scanner._looks_clean_s）：纯汉字判定误杀 TCL科技/京东方Ａ
+    t = t.replace('Ａ', 'A').replace('Ｂ', 'B')
+    if not re.search(r'[一-鿿]', t):
+        return False
+    return 2 <= len(t) <= 8 and bool(re.fullmatch(r'[一-鿿A-Za-z0-9·]+', t))
 
 
 def resolve_guanlan_name(code, exchange, hint_name):

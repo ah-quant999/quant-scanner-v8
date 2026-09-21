@@ -792,9 +792,14 @@ def _looks_like_name(n):
     # 去掉常见后缀后判断长度与字符集
     t = re.sub(r'(股份)?有限公司$', '', s)
     t = re.sub(r'[（(].*?[)）]$', '', t)
-    if 2 <= len(t) <= 8 and re.fullmatch(r'[一-鿿]+', t):
-        return True
-    return False
+    # 🛡 2026-09-21 一劳永逸（同 scanner._looks_clean_s）：原纯汉字判定误杀 TCL科技/京东方Ａ。
+    #   放宽字符集后必须显式补回 ETF/基金/债/指数 拦截（原先靠纯汉字字符集间接挡掉）。
+    if any(k in t for k in ('ETF', '基金', '债', '指数')):
+        return False
+    t = t.replace('Ａ', 'A').replace('Ｂ', 'B')
+    if not re.search(r'[一-鿿]', t):
+        return False
+    return 2 <= len(t) <= 8 and bool(re.fullmatch(r'[一-鿿A-Za-z0-9·]+', t))
 
 
 def _em_secid_prefix(code):

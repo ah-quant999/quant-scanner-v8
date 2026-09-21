@@ -172,7 +172,7 @@ window.FOUR_VOLUME={
   },
   {
    "code": "000725",
-   "name": "000725",
+   "name": "恒都集团",
    "market": "sz",
    "board_label": "主板",
    "close": 6.07,
@@ -228,7 +228,7 @@ window.FOUR_VOLUME={
   },
   {
    "code": "000100",
-   "name": "000100",
+   "name": "MINIMAX-W",
    "market": "sz",
    "board_label": "主板",
    "close": 5.08,
@@ -339,4 +339,4 @@ window.FOUR_VOLUME={
    "enter_date": "2026-09-21"
   }
  ]
-};
+}

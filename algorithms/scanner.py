@@ -2403,15 +2403,26 @@ def _stock_names_map_s():
     if _SN_MAP_S is not None:
         return _SN_MAP_S
     _SN_MAP_S = {}
-    try:
-        with open(os.path.join(DATA_DIR, "stock_names.json"), "r", encoding="utf-8") as f:
-            for s in json.load(f):
-                c = (s.get("code") or "").strip()
-                n = (s.get("name") or "").strip()
-                if c and n:
-                    _SN_MAP_S[c.zfill(6)] = n
-    except Exception:
-        pass
+    # 🛡 2026-09-21 一劳永逸：原只读 DATA_DIR/stock_names.json，而 out/ 被 gitignore
+    #   → 云端 fresh 工作区该文件缺席（fetch_stock_names 失败/未跑时），三级回退塌方，
+    #   代码冒充名字（000725/000100 事故）。raw_data/stock_names.json 已入仓，永远可达。
+    _sn_paths = (
+        os.path.join(DATA_DIR, "stock_names.json"),
+        os.path.join(REPO_ROOT, "raw_data", "stock_names.json"),
+        os.path.join(BASE_DIR, "data", "stock_names.json"),
+    )
+    for _sn_p in _sn_paths:
+        try:
+            with open(_sn_p, "r", encoding="utf-8") as f:
+                for s in json.load(f):
+                    c = (s.get("code") or "").strip()
+                    n = (s.get("name") or "").strip()
+                    if c and n:
+                        _SN_MAP_S[c.zfill(6)] = n
+            if _SN_MAP_S:
+                break  # 首个可读且非空的来源即定
+        except Exception:
+            continue
     return _SN_MAP_S
 
 
@@ -2430,10 +2441,20 @@ def _em_name_s(code, market):
     else:
         return None
     try:
-        r = requests.get("https://push2.eastmoney.com/api/qt/stock/get",
-                         params={"secid": secid, "fields": "f57,f58"},
-                         headers=_EM_HEADERS_S, timeout=8)
-        if r.status_code == 200:
+        r = None
+        # 🛡 2026-09-21 一劳永逸：原单次请求无重试，云端偶发超时/限流即静默失败
+        #   → 该股塌到代码兜底。加 3 次重试（1s 退避）。
+        for _att in range(3):
+            try:
+                r = requests.get("https://push2.eastmoney.com/api/qt/stock/get",
+                                 params={"secid": secid, "fields": "f57,f58"},
+                                 headers=_EM_HEADERS_S, timeout=8)
+                if r.status_code == 200:
+                    break
+            except Exception:
+                r = None
+            time.sleep(1)
+        if r is not None and r.status_code == 200:
             d = r.json().get("data") or {}
             nm = (d.get("f58") or "").strip()
             if nm and not re.fullmatch(r'[0-9A-Za-z]+', nm):
@@ -2464,7 +2485,13 @@ def _looks_clean_s(n):
         return False
     t = re.sub(r'(股份)?有限公司$', '', s)
     t = re.sub(r'[-‐][WSR]$', '', t)  # 容忍港股 -W/-S/-R 双重上市后缀
-    return 2 <= len(t) <= 8 and re.fullmatch(r'[一-鿿]+', t)
+    # 🛡 2026-09-21 一劳永逸：原 re.fullmatch(r'[一-鿿]+') 只认纯汉字，
+    #   把 TCL科技(拉丁)、京东方Ａ(全角Ａ) 等合法混合名误判为脏 → 代码冒充名字。
+    #   现改为：归一全角字母后，须含≥1个汉字、且仅由 汉字/字母/数字/· 组成。
+    t = t.replace('Ａ', 'A').replace('Ｂ', 'B')
+    if not re.search(r'[一-鿿]', t):
+        return False
+    return 2 <= len(t) <= 8 and bool(re.fullmatch(r'[一-鿿A-Za-z0-9·]+', t))
 
 
 def resolve_clean_name_s(code, market, raw_name):
