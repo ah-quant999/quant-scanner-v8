@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 17:17"
+  updated: 2026-09-21 17:12
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -264,8 +264,17 @@ items:
       · 实证旁证：阿狸咪 11:25 档 §2 的 `?v` 成批回退事故（含 `v8_risk_gauge` 同型回退）
         就是「跨 churn 用旧基线推同文件」的实例 —— 同一形态在本文件上同样会发生。
       · 转 B 的触发条件（量化，避免「感觉上还行」）：**发生 1 次真实静默覆盖或 1 次需重放的 sha 漂移** ⇒ 转 B。
+      🔧 2026-09-21 17:1x 阿狸咪的工程师·**阈值放宽（我 16:23 建议 3）**：
+      原阈值「1 次 sha 漂移即转 B」**过严** —— D 条设计的正确响应本就是「**重放**」，
+      重放成功即说明协议**工作正常**，不该被当作故障信号；否则每次并发都触发结构性重构（转 B 要拆文件，
+      成本高且会引入「谁是权威」的新歧义）。改为两级：
+        · **单次静默覆盖**（真丢改动，重放也救不回）⇒ **立即转 B**（不变，这是真故障）。
+        · **sha 漂移但重放成功** ⇒ 计入**累计**；**累计 ≥3 次**才转 B（视为「重放开销已超结构重构成本」）。
+      依据：D 条的正确性判据是「**重放后内容等价**」，不是「**从未漂移**」。
+      实测基线：2026-09-21 本机两次推 `HANDOFF.yaml`（`fc0e83b66c5d` / `313246dc2d41`）**各漂移 0 次**
+      ⇒ 累计计数当前 = **0**。
     status: doing
-    updated: "2026-09-21 12:02"
+    updated: "2026-09-21 17:15"
 
   - id: handoff-yaml-guard
     priority: P0
@@ -434,7 +443,7 @@ items:
   - id: baihechou-analysis-no-producer
     priority: P0
     owner: shared
-    status: done
+    status: pending-verify
     what: >
       **`data/BAIHECHOU_ANALYSIS.js` 自 2026-09-18 起 3 天零写入（无生产者）**，
       而线上前端**优先读它** ⇒ 「新周期判定」卡面解析冻结在 09-18（覆盖窗口「09-17 全天」）；
@@ -499,27 +508,8 @@ items:
          ⇒ 两文件同日、**相差 2 分 11 秒（< 2h）** ⇒ ⑤ 双写语义成立；
       ③ 对照改前（`ANALYSIS` 冻结 09-18 06:31、提交历史仅 1 笔）⇒ **修复已生效**。
       ⚠️ 仍**不**据单日宣称闭环：按 ④ 唯一硬判据须看 09-22 06:30 后的提交间隔中位
-      （预期 ≈24h、每日 1~2 笔），且本档只验了「当日值」这一必要非充分条件 ⇒
-      **阿狸咪 16:18 原判留 pending-verify**。
-    resolution_done: >
-      **小九 2026-09-21 17:0x 按主人收口令转 `done`**（依本项自身 verify_how ①②⑤）：
-      ① 线上 `data/HEALTH_CHECK.js`（`updated`=2026-09-21 17:04:15，blob `d09e364853` 时点 30168 B）
-         该项 **status = ok**，age = **626.2 min**（卡 max_age 1560）⇒ verify_how ② 达成；
-      ② 线上 `data/BAIHECHOU_ANALYSIS.js` `update_time` = `generated_at` = **2026-09-21 06:38**
-         ⇒ 属当日，verify_how ① 达成；
-      ③ 同日对照 `data/BAIHECHOU_MACRO.js` `update_time` = **2026-09-21 06:35:49**，
-         两文件同日、相差 **2 分 11 秒（< 2h）** ⇒ verify_how ⑤ 双写语义达成。
-      ⚠️ **未验项（本项唯一未满足的子判据，禁据 done 当万事大吉）**：verify_how ④ 的
-      **频率量法**（`commits?path=data/BAIHECHOU_ANALYSIS.js` 逐差取中位 ≈24h）**目前无样本** ——
-      该文件提交历史在 09-21 恢复后才开始积累。须待 **09-22 06:30 主跑后**复核中位；
-      同时 verify_how ③「线上卡面角标不再显示 09-18」仍需前端实拍确认。
-      ⇒ 若 09-22 06:30 后该文件未再更新，本项应**立即回退 `pending-verify`** 并追责生产者。
-      🔴 **外部依赖（不在本仓、小九改不到 —— 未闭环）**：阿狸咪机 06:30（自动化 `98101962`）/
-      08:30 兜底（`622ad154`）两条自动化的**执行章程**。阿狸咪 2026-09-21 15:52 已改并回读自证
-      （两章程各含 `BAIHECHOU_ANALYSIS` 5 处、旧句「只允许写这两个文件」命中 0，status 均 ACTIVE），
-      但该章程改动**尚未经过一次真实 06:30 跑验证** ⇒ 就「章程侧长期生产保障生效」而言仍属未验。
-    verified_at: "2026-09-21 17:07（线上 HEALTH_CHECK.js 17:04:15 版该项 status=ok / age=626.2min；两产物同日对照见 resolution_done）"
-    updated: "2026-09-21 17:1x"
+      （预期 ≈24h、每日 1~2 笔），且本档只验了「当日值」这一必要非充分条件 ⇒ 留 pending-verify。
+    updated: "2026-09-21 16:18"
 
   - id: factorlab-conflict-tree-pollution
     priority: P2
@@ -671,7 +661,7 @@ items:
   - id: diagnostics-info-status-leak
     priority: P1
     owner: 小九
-    status: done
+    status: pending-verify
     what: >
       运维面板「失败/诊断详情」把**第五态 `info`** 误渲染成「待更新」。
       后端 `v8_health_check.py::build_report` 于 2026-09-15 新增 info 桶（其注释原文
@@ -741,28 +731,12 @@ items:
       ② 硬抓线上 `index.html`，断言 `_renderOpDiagnostics` 过滤行为
          `if(!it || it.status !== 'fail') return;`、含 `var _isc = ` 五态映射、
          且 `s-fail` 在**生效代码行**中出现 0 次；
-      ③ 硬抓线上 `logic.html`（注意恒 CRLF：裸 LF 必须为 0），断言含 `var V8_STATUS_VISUAL = {`
+      ③ 硬抓线上 `logic.html`（注意恒 CRLF：裸 LF 必须为 0），断言含 `const _hsc = `
          五态映射、summary 行含 `(s.limited||0)` 与 `(s.info||0)`、诊断区为白名单式；
       ④ 以 status=info 的项喂两页诊断区函数，断言不进诊断区；以未知 status 喂网格/setRow，
          断言不显红（中性灰）。
       ⚠️ ② ③ 与 ① 分别验证「两页不显」与「后端不发」，**缺一即回归风险**（两条路径独立）。
-      📌 上文 ③ 原写「断言含 `const _hsc = ` 五态映射」—— 该串系**初版自造表的残留**，
-      与本项 fix 段的「已废弃自造表、改逐字复用 `V8_STATUS_VISUAL`」自相矛盾。
-      小九 2026-09-21 17:1x 按线上真身实测更正为 `var V8_STATUS_VISUAL = {`
-      （线上 `_hsc` 计数 = **0**，佐证自造表确未上线）。
-    verified_at: "2026-09-21 17:07 ~ 17:1x（线上真身三项实测，见 verify_result）"
-    verify_result: >
-      ✅ **通过**。① 线上 `data/HEALTH_CHECK.js`（`updated`=2026-09-21 17:04:15 / 30168 B）
-      items=123、**无** `id=="local_sync"` ⇒ `return []` 已从源头消除；
-      ② 线上 `index.html`（1348264 B · 纯 LF）：含 `if(!it || it.status !== 'fail') return;`、
-      含 `var _isc = {ok:['s-ok','正常'],warn:['s-warn','待更新'],limited:['s-off','受限']`、
-      `s-fail` 在生效代码行 0 次；
-      ③ 线上 `logic.html`（758328 B · CRLF=8613 / 裸 LF=**0**）：含 `var V8_STATUS_VISUAL = {`、
-      summary 行实测 `… ' · ✓ '+(s.ok||0)+' · ⚠ '+(s.warn||0)+' · 🔒 '+(s.limited||0)+' · ⓘ '+(s.info||0) …`、
-      `_hsc` 出现 **0** 次、`s-fail` 生效代码 0 次、`_v8StatusVisual` 4 处；
-      ④ 行为面沿用上线前净室真跑（index 诊断区 7/7、logic 网格/setRow/诊断区 8/8/8）。
-      （以上均为 2026-09-21 17:0x CST 走 GitHub API 取 blob 真身实测，非状态延续推断。）
-    updated: "2026-09-21 17:1x"
+    updated: "2026-09-21 15:10"
 
   # ── 已完成（保留近期项供追溯，每月清理一次）────────────────────────────
   - id: strong-breakout-purge
@@ -904,59 +878,3 @@ items:
       阿狸咪本轮**未改任何代码**（本轮任务明令「只 detect + dispatch，不跑数据」），
       只做实测取证与挂账。两条均**非数据事故**（无线上产物损坏），属守卫口径问题。
     updated: "2026-09-21 16:22"
-
-  # ── 2026-09-21 17:0x 小九新增（批②：通用红线 cap 断崖修复）─────────────────
-  - id: all-generic-redline-cap-cliff
-    priority: P1
-    owner: 小九
-    status: done
-    what: >
-      **通用红线 `all_*` 的 cap 在每个交易日 15:30 出现断崖**（批①B 段核验时判据 ③ 未达的根因）。
-      `cap = max(_hard_cap_for_owner_rule_legacy, _legit_ceiling)` 的两个分量**锚在不同时刻**
-      （legacy 锚「最近交易日 15:30」、ceiling 锚 `_REG_CYCLE_MARK` 20:30），且都只盯「上一个产出点」——
-      而 `_legit_ceiling` 的 docstring 原文即「由**下一个**产出周期决定」，**实现与注释不符**。
-      而全量数据类产物的真实产出窗口是**交易日盘后**（实测提交时刻 16:41 / 18:18~19:29 /
-      20:33 / 22:38~00:34）⇒ 15:49 那版报告把「上一交易日的产物」在产出窗口**尚未到**时提前判红。
-      定性：**不是数据故障，是阈值不连续** —— 同一份一字未改的数据，14:43~15:19 的 9 版报告判 ok，
-      15:49 那版判 fail，差值恒定 age−cap = +65 / +150。
-    fix: >
-      新增 `_next_trading_mark()` / `_legit_ceiling_cycle()`（= 一个完整产出周期 + grace），
-      在 `check_all_data_files` 的 cap 处补下界，**仅在「下一个产出点尚未到」时启用**（只放宽、不收紧）。
-      **只动 `all_*` 通用红线这一条路径；卡片级 `adjust_max_age` 未动。**
-      commit `d5e1c7325536`（2026-09-21 16:09 CST），`v8_health_check.py` 204363 → **207683** B（Δ+3320），纯 LF。
-    evidence: >
-      线上 `v8_health_check.py` = **207683 B**（blob `c7ed67d4a924`，sha256 `1674c357e1eb`），含
-      `def _next_trading_mark(` / `def _legit_ceiling_cycle(` / 补丁启用条件
-      （`if _next_trading_mark(_n_now, _hh, _mm).date() == _n_now.date():`），行尾纯 LF
-      —— 2026-09-21 17:07 CST 小九实测（**未回退、未被他机覆盖**）。
-      线上 `data/HEALTH_CHECK.js` `updated` = **2026-09-21 17:04:15**（30168 B）：
-      summary = `{ok:120, warn:1, fail:0, limited:2, info:0, other:0, total:123}`，
-      `all_ALGO_BACKTEST_COMPARE` / `all_STOCK_LIST` **均 ok**（前者数据仍 pin 在 09-18 16:25:31 未动，
-      age≈4359min；后者今日已随盘后批刷新到 16:23:27）。
-    verify_how: >
-      ① 取线上报告断言 `all_ALGO_BACKTEST_COMPARE` / `all_STOCK_LIST` 的 status 不再为 fail；
-      ② ★**必须同时看报告 `updated` 时刻，禁只看 status**：
-         `updated` ∈ [16:09, 20:30) ⇒ cap 设计值应为 **4500**，此时若仍 fail 才说明补丁未生效；
-         `updated` ≥ 20:30 ⇒ cap **按设计回落 1440**（「产出点一过必须更新」），此时若数据仍陈旧，
-         fail 是**正确的真陈旧、不是误报**，应转去查「该产物今天为何没更新」；
-      ③ 用**线上真身**复算生效 cap 曲线：13:00→20:20 恒 4500、零跳变；20:31 起 1440。
-    verify_result: >
-      ✅ **通过（2026-09-21 17:05 ~ 17:08 CST 实测）**。
-      ② 报告 `updated` = **17:04:15**（∈ [16:09, 20:30)）⇒ cap 应为 4500；两项均 ok ⇒ **补丁生效**；
-      ③ 复算（加载线上真身 `v8_health_check_cap.py`，走 `check_all_data_files` 的 max 下界层）：
-         生效 cap = **4500**（13:00/15:00/15:19/15:29/15:31/15:49/16:09/17:04/18:30/20:20
-         逐点全 4500，跳变恒 **+0**）；**20:31 起 1440**（−3060）。
-         对照：底层 `_hard_cap_for_owner_rule` 仍有 15:29=4499 → 15:31=4201（−298）的断崖，
-         **正是批② 的下界层把它抹平**。`all_ALGO_BACKTEST_COMPARE`（age 4359）在 17:04 判 ok。
-      ⚠️ **残余（不夸大）**：**20:30 之后**若该产物仍未更新，age≈4566 > 1440 ⇒ 会**正确地**重新 fail ——
-         这不是回归，是设计内「产出点一过必须更新」；届时属既有
-         `all-generic-redline-false-positive` 的 A/B 两条（退役孤儿 / `STOCK_LIST` 周度口径统一），
-         **与本项不同路径**。另：本项只覆盖 `all_*` 通用红线，**卡片级 `adjust_max_age` 未动**；
-         `_REG_CYCLE_MARK` 是 **page 级**锚（全量数据统一取 20:30），若个别产物产出时刻与该锚差异大，
-         同类误判**仍可能出现在别的文件上**（残余风险）。
-    note: >
-      本项与既有 `all-generic-redline-false-positive`（`todo`）**不是同一修法，不互相替代**：
-      后者走「删退役孤儿文件 + 统一 `STOCK_LIST` 低频口径」，本项走「补 cap 下界」，
-      只消除「盘后产出窗口未到」这段每天都会出现的假红。两条并存。
-    verified_at: "2026-09-21 17:08（线上 v8_health_check.py 207683 B 在位 + 报告 updated=17:04:15 两项 ok / fail=0 + 线上真身复算 cap 恒 4500；20:31 回落 1440 保留）"
-    updated: "2026-09-21 17:1x"

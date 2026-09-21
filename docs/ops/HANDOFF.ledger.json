@@ -30,7 +30,7 @@
   "logic-html-schedule-label",
   "all-generic-redline-false-positive"
  ],
- "updated": "2026-09-21 17:12",
+ "updated": "2026-09-21 17:15",
  "generated_by": "小九(lemoncat-cn) + 阿狸咪(alimi-cn)",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -47,7 +47,7 @@
   "factorlab-commit-pathspec": "3fe7d8064fb12eb6",
   "factorlab-conflict-tree-pollution": "43b0391b1674a5de",
   "gate-1010-marker-stale-ms-note": "c895fd9e62e63955",
-  "handoff-concurrent-write": "1b18b4723fd46582",
+  "handoff-concurrent-write": "1acd38dad366f493",
   "handoff-doc-rate-metric": "fa808a72ade804f0",
   "handoff-meta-future-timestamp": "9ad1ec1a33776006",
   "handoff-protocol": "6393f2be75d756fe",
