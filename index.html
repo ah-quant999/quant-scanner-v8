@@ -4055,7 +4055,6 @@ function fmtSigned(v){
     var c = _rc$('northCalContainer');
     if(!c) return;
     try{
-    var NF = window.NORTH_FUND || {};
     // 🛡 2026-08-31：标题要显示「数据日期」，但原 lhbDate 定义在标题之后，
     //   这里先算一次最新数据日期（_rcDays() 是纯内存聚合，开销可忽略）。
     var _nbEarly = (window._rcDays() || []);
@@ -4407,7 +4406,6 @@ function fmtSigned(v){
     var SR = window.SECTOR_RS || {};
     var VOL = window.VOLATILITY || {};
     var IQ = window.INDEX_QUOTES || {};
-    var NF = window.NORTH_FUND || {};
     var LHB = window.LHB_DATA || {};
     // 兼容 stocks 字段为 dict/array 两种形态
     function _rcArr(x){ if(!x) return []; if(Array.isArray(x)) return x; if(typeof x==='object') return Object.values(x); return []; }
@@ -4443,7 +4441,8 @@ function fmtSigned(v){
     //   数据来源节奏：龙虎榜单飞 fetcher `v8_lhb_fetch` 每交易日 17:30 CST（cron `30 9 * * 1-5`）
     //   产出 LHB_DATA.js（机游共振 + 北向席位两卡共用），其余七路由 v8_algo_cloud 盘后链陆续产出。
     // 🔴 2026-09-13 主人令：「这个逻辑是在 2 个共振日历出来之后才能计算，时间一定是比 2 个共振后面。」
-    //   本卡内容**依赖**机游共振(LHB) + 北向席位(NF) 两路（上方 _resReady 已强制二者就绪），
+    //   本卡内容**依赖**机游共振(LHB_DATA) + 北向席位(LHB_HISTORY，seats['北向']) 两路
+    //   （上方 _resReady 已强制二者就绪），
     //   本卡成型时刻须 >= 这两路，故取四路中最大值（含 LHB）。
     //   2026-09-14 二次收窄：原八路含三路盘中实时源 => max 必落盘中，误标；只剔三路又会落到
     //   NORTH_FUND 08:51（stopped:true，每日仅机械刷时间戳）=> 反判盘前。故只取四路纯盘后产物。
@@ -4463,10 +4462,19 @@ function fmtSigned(v){
 
     var h = '';
     // Header：标题、🐻 胶囊、🧺 计数胶囊统一放同一行（与严格三重共识/四量终极格式一致）
+    // 🔴 2026-09-21 治本（阿狸咪）：原第 4 项读 NF.net_buy —— NORTH_FUND 自 2024-05 停披露
+    //   （stopped:true 仅机械刷时间戳），该计数是**冻结旧值**恒为 1，属死源残留。
+    //   改挂真实龙虎榜源 LHB_DATA（当日 stocks[].seats['北向']），口径与北向席位日历卡一致
+    //   （净买 = seats['北向'].buy - seats['北向'].sell，同卡内 _nb_net_万）：
+    //   当日存在北向席位净买入的股票 ⇒ 计 1；无 ⇒ 0（真实信号，不再冒充）。
+    var _nbHasNetBuy = _rcArr(LHB.stocks).some(function(s){
+      var _nb = (s.seats || {})['北向'];
+      return !!_nb && ((_nb.buy||0) - (_nb.sell||0)) > 0;
+    });
     var _insightSignalCount = _rcArr(CAND.stocks).length
       + _rcArr(LHB.stocks).filter(function(s){ return (s.inst_net_万||0)>0 && (s.yz_net_万||0)>0; }).length
       + (SR.sectors || []).length
-      + (NF.net_buy != null ? 1 : 0);
+      + (_nbHasNetBuy ? 1 : 0);
     h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">';
     h += '<span style="font-size:21px;font-weight:800;color:var(--txt)">📊 每日市场洞察</span>';
     // 2026-08-14 修复：时段标签动态判断（原写死"盘后"导致 08:16 盘前数据也显示"盘后"）
