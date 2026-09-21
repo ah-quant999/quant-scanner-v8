@@ -1754,6 +1754,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SECTOR_RS.js?v=1790026150" defer></script>
 <script src="data/SECTOR_PHASE_HISTORY.js?v=1790026150" defer></script>
 <script src="data/INST_TRADE.js?v=1790026150" defer></script>
+<script src="data/INST_COVERAGE.js?v=1790026300" defer></script><!-- 机构关注·暂未上架因子观测 window.INST_COVERAGE -->
 <script src="data/NORTH_FUND.js?v=1790026150" defer></script>
 <script src="data/MARKET_ALERTS.js?v=1790026150" defer></script>
 <script src="data/MARKET_FUND_FLOW_DATA.js?v=1790026150" defer></script>
@@ -15381,6 +15382,63 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
   };
 
 
+function __renderUnlockCover(){
+  // 🧪 暂未上架·因子观测卡（2026-09-22 阿狸咪）：限售解禁 + 机构关注（研报热度）
+  //   数据：window.RESTRICTED_RELEASE（已上线，每日盘前刷新）+ window.INST_COVERAGE（新包，源自 raw_data/analyst_ratings.json）
+  //   ⚠️ 候选因子观测，明确未纳入选股信号链；解禁为强事件（解禁前抛压），机构关注=研报热度榜（非严格覆盖家数），待离线回测验证后由主人拍板是否转正。
+  try{
+    var el = document.getElementById('unlockCoverBody');
+    if(!el) return;
+    var rr = window.RESTRICTED_RELEASE || {};
+    var cov = window.INST_COVERAGE || {};
+    var utRR = (rr && rr.update_time) ? rr.update_time : '—';
+    var utCov = (cov && cov.update_time) ? cov.update_time : '—';
+    var h = '';
+    // ── 限售解禁 ──
+    h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
+    h += '<span style="font-size:13px;font-weight:700;color:#fbbf24;">🔓 限售解禁 · 未来窗口</span>';
+    h += '<span class="fresh" id="ulRRTime">' + utRR + '</span></div>';
+    if(rr && rr.stats){
+      h += '<div style="font-size:12px;color:var(--sub);margin-bottom:8px;">未来解禁家数：7天 <b>' + rr.stats.d7 + '</b> · 30天 <b>' + rr.stats.d30 + '</b> · 60天 <b>' + rr.stats.d60 + '</b> · 90天 <b>' + rr.stats.d90 + '</b></div>';
+    }
+    if(rr && rr.items && rr.items.length){
+      h += '<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:12px;">';
+      var top = rr.items.slice(0, 8);
+      for(var i=0;i<top.length;i++){
+        var it = top[i];
+        h += '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--border2);">'
+           + '<span>' + it.name + ' <span style="color:var(--dim);">' + it.code + '</span></span>'
+           + '<span style="color:var(--warn);">' + it.date + ' · ' + it.amount + '</span></div>';
+      }
+      h += '</div>';
+    } else {
+      h += '<div class="note">解禁数据暂不可用</div>';
+    }
+    // ── 机构关注（研报热度）──
+    h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0 6px;">';
+    h += '<span style="font-size:13px;font-weight:700;color:#60a5fa;">🏦 机构关注 · 研报热度</span>';
+    h += '<span class="fresh" id="ulCovTime">' + utCov + '</span></div>';
+    var covList = (cov && cov.coverage) ? cov.coverage : [];
+    if(covList.length){
+      h += '<div style="display:flex;flex-direction:column;gap:3px;">';
+      for(var j=0;j<covList.length && j<10;j++){
+        var c = covList[j];
+        h += '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--border2);">'
+           + '<span>' + c.name + ' <span style="color:var(--dim);">' + c.code + '</span></span>'
+           + '<span style="color:var(--sub);">' + c.org + ' · ' + (c.rating || '—') + '</span></div>';
+      }
+      h += '</div>';
+    } else {
+      h += '<div class="note">机构关注数据暂不可用</div>';
+    }
+    h += '<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.6;">⚠️ 候选因子观测，<b style="color:#fbbf24">未纳入选股信号链</b>。解禁为强事件（解禁前抛压）；机构关注源自研报热度榜（非严格覆盖家数）。待离线回测验证收益率/胜率后，由主人拍板是否转正。</div>';
+    el.innerHTML = h;
+  }catch(e){
+    var el2 = document.getElementById('unlockCoverBody');
+    if(el2) el2.innerHTML = '<div class="note" style="color:var(--down);">因子观测卡渲染失败：' + String(e) + '</div>';
+  }
+}
+
   function renderUnlisted(){
     // 🛡 2026-08-20 一劳永逸加固（主人「新建 AI 预测空白 + v6 备忘录空白」）：
     //   1) $ 兜底：$ 是 IIFE 闭包变量，若因加载时序未就绪会 TypeError → 整页空白。
@@ -15591,6 +15649,7 @@ h += '<div class="card" id="baihechouBody" style="margin-bottom:16px;border-left
 //   ⚠ 同页同源只留一张壳，勿重复建；派发入口见 renderUnlisted 尾部 window.__renderMacroKShape 调用。
 h += '<div class="card" id="macroKShapeBody" style="margin-bottom:16px;border-left:4px solid #fbbf24;">'
    + '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F30D; 宏观景气背景 · K 型分层 加载中&#x2026;</div></div>';
+h += '<div class="card" id="unlockCoverCard" style="margin-bottom:16px;border-left:4px solid #fbbf24;">' + '<div id="unlockCoverBody"><div class="note">加载中…</div></div></div>';
 h += '</div>'; // /ulPaneObserve
 
 // ===== 📊 大盘观察 pane —— 🚚 2026-09-15 主人令：整页迁出 =====
@@ -15639,6 +15698,7 @@ h += '</div>'; // /ulPaneObserve
        尾部，覆盖首渲即可触发；defer 数据未到时由 _fillUsHkMap 内部 600ms×30 自愈轮询补渲）。 */
     window._fillUsHkMap();
     try{ if(typeof window.__renderNewCycleJudge==='function') window.__renderNewCycleJudge(); }catch(e){}
+    try{ if(typeof window.__renderUnlockCover==='function') window.__renderUnlockCover(); }catch(e){}
     // 2026-09-12 搬迁收口：因子实验室 / 中信PE回测 / 指数估值中枢 /
     //   因子审计 / 因子补缺进度 / maharo 机构研究 共 7 卡的容器已迁出本页，
     //   其填充调用随之迁至各新宿主的骨架函数尾部（__renderBtExtraPane /
