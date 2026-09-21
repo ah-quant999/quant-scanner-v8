@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 35
+  next_id_seq: 36
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -1569,3 +1569,26 @@ items:
       立此项的原因：`cnfetch-empty-shell-block` 的 verify_how ① 要求四项 CORE **一并**推进，
       而本轮实测**只有 2 项推进** —— 为避免「4 项绑在一个 item 里、2 项被 2 项掩盖」，拆出本项独立跟踪。
     updated: "2026-09-21 20:45"
+
+  - id: stock-name-code-fallback
+    priority: P1
+    owner: shared
+    status: pending-verify
+    what: >
+      四量终极卡（QD 共振命中）个股标题被代码冒充（000725/000100/000002）。
+      根因三层：① _looks_clean（scanner/build_candidate_pool/guanlan_extractor/calc_crds 四处同型）
+      用纯汉字 fullmatch 判干净名，把 TCL科技（拉丁）、京东方Ａ（全角Ａ）误杀；
+      ② scanner._stock_names_map_s 只读 DATA_DIR/stock_names.json，而 out/ 被 gitignore，
+      云端 fresh 工作区缺席 → 回退塌方；③ _em_name_s 单次请求无重试，偶发超时即弃。
+      另发现碰撞 bug：港股 5 位码（00725 恒都集团/00100 MINIMAX-W/00002 中电控股）zfill(6)
+      与深市 A 股码碰撞且排在 stock_names.json 后部 → 回退映射会把 A 股名顶成港股名（曾致一次
+      部署把三股误写为港股名，已同日纠正）。
+    fix: >
+      源级（commit ee6f21f1ce，force:false，6 文件一 commit）：① 四处 _looks_clean 改为
+      须含≥1 汉字 + [一-鿿A-Za-z0-9·] 字符集，显式拦 ETF/基金/债/指数；② _stock_names_map_s
+      增加 raw_data/stock_names.json（已入仓）回退路径并过滤港股条目；③ _em_name_s 3 次重试退避；
+      ④ data/FOUR_VOLUME.js + FOUR_VOLUME_60M.js 当前批次名字强制回填（京东方A/TCL科技/万科A）。
+    verify_how: "线上核验：raw HEAD=ee6f21f1ce，两个 data 文件递归扫描三股现名正确、港股误名零残留；scanner.py 含碰撞防御；py_compile 0 错；本地 resolve_clean_name_s 实测输出京东方A/TCL科技。明日算法链批次自然回归验证。"
+    evidence: "commit ee6f21f1ce；raw 抽检三股现名 ✅；map 6841 条含两股；_looks_clean_s(TCL科技)=True、(沪深300ETF)=False、(我们认为利好)=False"
+    residual: "calc_crds._is_safe_stock_name（mootdx 证券表除污）保持纯中文从严，系设计意图未动；HISTORY/TRACK 本批无缺名。前端无需改（s.name||'' 展示逻辑正确）。"
+    updated: "2026-09-21 22:01"
