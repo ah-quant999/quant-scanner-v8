@@ -245,6 +245,11 @@ ORDER = [
     #   🆕 2026-09-04 主人令：因子实验室(FACTOR_LAB.js)此前零调度成孤儿（运维红灯）——
     #      生成器(factor_lab 生成器)挂在 final_recommend 之前（final_recommend 方案B融合读它）。
 
+    # 🔴 2026-09-22 小九根治「架构级时序倒挂」：backtest_expectancy（四信号 edge 唯一生产者）必须排在
+    #   其唯一消费者 final_recommend（D批）之前。原 ORDER 把它排在 final_recommend 之后、STAGES 挂 E 批(21:00)
+    #   ⇒ final_recommend 永远读到 T-1 edge（根 run_algorithms.py 的修复版从未移植到本生产真身，修复永不生效）。
+    #   现前置到此（ORDER 内 生产<消费）+ STAGES 迁 B 批尾（见 STAGES["B"]），D批(20:00) 必吃当日 edge。
+    "backtest_expectancy.py",         # → raw_data/backtest_expectancy.json（四信号 edge，final_recommend 消费，须在 D批前产完）
     "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top5，管线最终产物，置于末尾）
     #   前端策略回顾卡长期为空/陈旧）。统一挂链尾（依赖各自历史/截面数据已就位）。
     #   三者失败均不影响选股结果，仅自身卡片可能不刷新。
@@ -256,7 +261,7 @@ ORDER = [
     # 🛡 2026-09-07 修复：以下两脚本曾只挂 E 批 STAGES、漏挂 ORDER → 模块级自校验
     #   `_STAGE_UNION == set(ORDER)` 断言崩（仅STAGES有两脚本），盘后链启动即死、0 产出。
     #   此前被 V5 心跳闸门跳过链本体掩盖，2026-09-07 17:40 #1579 首次真跑暴露。
-    "backtest_expectancy.py",         # → raw_data/backtest_expectancy.json（期望收益回测，与 E 批同位）
+    # 🆕 2026-09-22 小九：backtest_expectancy 已前置到 final_recommend 之前（见上方），E 批不再重复挂。
     # 🔴 2026-09-14 主人令更正（作废原 09-13 令）：「金股池和候选股池是算法的上游水源，
     #   不是策略，不需要回测！」候选池 / 金股池(=黄金池) 是 B 批产出的**基础股池**，
     #   供下游策略取用，本身无买卖点 ⇒ 拿 T+1 胜率考核它们必然误导
@@ -382,6 +387,10 @@ STAGES = {
         "scripts/gen_factor_progress.py",           # → raw_data/factor_progress.json（读 factor_audit）
         "scripts/fetch_valuation_percentile.py",    # → raw_data/valuation_percentile.json（A股指数 PE 分位）
         "scripts/fetch_index_value_framework.py",   # → raw_data/index_value_framework.json（指数中枢+趋势门控）
+        # 🔴 2026-09-22 小九：backtest_expectancy 前移至 B 批尾（与 ORDER 前置修复配套）。
+        #   它读 B 批同批产出的 raw_data/top10_daily.json 逐日账本做 walk-forward，须等 B 批选股脚本写完；
+        #   落盘约 19:00 → D批(20:00) final_recommend 拿到当日 edge。env 注入见 SCRIPT_ENV("B", ...)。
+        "backtest_expectancy.py",          # → raw_data/backtest_expectancy.json（四信号 edge，D批消费者）
     ],
     # 🛡 2026-09-04 主人令「策略全部数据出来→最终数据上线→然后才是回测」时序重排：
     #   原 C(回测 19:15) 在 D(final_recommend 20:00) 之前 → 回测汇总胶囊早于最终推荐，时序倒挂。
@@ -389,7 +398,6 @@ STAGES = {
     #   键名 C 退役；回测批内容原样迁入 E，另收编 strategy_four_volume.py（回测模式，SCRIPT_ENV 注入）。
     "E": [  # 回测批（~21:00 CST，最终推荐上线后）：backtest 全家 + 因子实验室分层回测（生成器已前置到 B 批）
         "backtest_tdx.py", "backtest_comprehensive.py",
-        "backtest_expectancy.py",          # 🆕 期望收益回测：walk-forward 产出 raw_data/backtest_expectancy.json
         "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
 
         # 🛡 2026-09-09 主人令：因子实验室「生成器」已前置到 B 批最前（必须在 final_recommend 前产完），
@@ -443,7 +451,7 @@ SCRIPT_ENV = {
     #   ⇒ 两档恒零样本（前端只能显示「累积中」），并非策略失效而是**回看区间不够**。
     #   years=5 → bars = max(DAILY_BARS, 5*250+250=1500) 足以覆盖 250 交易日最长持有。
     ("E", "strategy_four_volume.py"): {"V8_BACKTEST_YEARS": "5"},
-    ("E", "backtest_expectancy.py"): {"V8_USE_BAOSTOCK": "1"},   # 🆕 runner 用 baostock 拉全量K线，产出新鲜回测
+    ("B", "backtest_expectancy.py"): {"V8_USE_BAOSTOCK": "1"},   # 🔴 2026-09-22 小九：由 ("E",...) 改 ("B",...)，与生产 STAGES 迁 B 批尾配套（B批尾执行时注入 baostock 参考集）
 }
 # 自校验：STAGES 并集必须精确覆盖 ORDER（无遗漏/多余，保证分批模式不丢脚本）
 _STAGE_UNION = set()
@@ -452,6 +460,23 @@ for _s in STAGES.values():
 assert _STAGE_UNION == set(ORDER), (
     "STAGES 与 ORDER 不一致: 仅ORDER有=%s, 仅STAGES有=%s"
     % (set(ORDER) - _STAGE_UNION, _STAGE_UNION - set(ORDER))
+)
+
+# 🔴 2026-09-22 小九：架构级时序契约硬断言（防「修复只改假身 / 后人再倒挂」复发）。
+#   backtest_expectancy 是 final_recommend 的唯一四信号 edge 生产者，必须同时满足：
+#   ① ORDER 中排在 final_recommend 之前（全链模式 生产<消费）；
+#   ② 落在 STAGES["B"]（分批模式 B批18:10 早于 D批20:00 消费者）；
+#   ③ 不得留在 STAGES["E"]（E批21:00 晚于消费者 = 时序倒挂，final_recommend 读 T-1 edge）。
+_i_be = ORDER.index("backtest_expectancy.py") if "backtest_expectancy.py" in ORDER else -1
+_i_fr = ORDER.index("final_recommend.py") if "final_recommend.py" in ORDER else -1
+assert _i_be != -1 and _i_fr != -1 and _i_be < _i_fr, (
+    "时序倒挂: backtest_expectancy 必须在 ORDER 中排在 final_recommend 之前"
+)
+assert "backtest_expectancy.py" in STAGES.get("B", []), (
+    "backtest_expectancy 必须挂在 STAGES['B']（早于 D批 final_recommend 消费者）"
+)
+assert "backtest_expectancy.py" not in STAGES.get("E", []), (
+    "backtest_expectancy 不得留在 STAGES['E']（晚于消费者 = final_recommend 读 T-1 edge 的时序倒挂）"
 )
 
 def step_v8_self_sufficiency():

@@ -159,13 +159,12 @@ def main():
         if rank <= 10 and score >= top_threshold:
             top_map[normalize_code(s.get("code", ""))] = s
 
-    # 2) A 档 / B 档
+    # 2) A 档 / B 档 —— 🔴 2026-09-22 小九清理死分支：驾驶舱(分档)已于 09-03 下线，tier 恒为 {}，
+    #    tier_a/tier_b 永远为空 ⇒ 原 for 循环永不执行（纯死代码），a_map/b_map 恒空、in_a/in_b 恒 False。
+    #    保留空 dict 仅为兼容下方 `a_map.get`/`b_map.get` 调用；near_miss 现仅表示
+    #    「有 TOP10 精选但缺基本面 A 档 = 差1步」（单一维度，无 B 档来源）。
     a_map = {}
-    for s in tier.get("tier_a", []):
-        a_map[normalize_code(s.get("code", ""))] = s
     b_map = {}
-    for s in tier.get("tier_b", []):
-        b_map[normalize_code(s.get("code", ""))] = s
 
     # 3) 基本面 A 档
     fund_stocks = fundamental.get("stocks", {}) if isinstance(fundamental, dict) else {}
@@ -247,9 +246,9 @@ def main():
                 "in_tier_a": in_a,
                 "in_tier_b": bool(b),
                 "in_good_fund": in_fund,
-                # 距离严格共识还差几步（按质量档位感知）：
-                # A档候选只差1步（缺另一个条件即可严格）；B档候选相当于差2步（B→A一档，再到严格又一档）。
-                "miss_steps": 1 if in_a else (2 if b else 1),
+                # 距离严格共识还差几步：驾驶舱分档(09-03 下线)后仅剩「基本面 A 档」一个维度，
+                # near_miss = 有 TOP10 精选但缺基本面 A 档 ⇒ 恒为差1步（原 `2 if b` 分支因 tier 下线永不可达，已删）。
+                "miss_steps": 1,
                 "close": src.get("close", 0),
                 "pct_chg": src.get("pct_chg", 0),
                 "pct_chg_20d": src.get("pct_chg_20d", 0),

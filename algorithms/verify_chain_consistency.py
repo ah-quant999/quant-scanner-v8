@@ -144,6 +144,26 @@ def check_stages_order():
     return ok
 
 
+def check_edge_ordering():
+    """⑤ 架构级时序契约（严重）：backtest_expectancy 必须在 final_recommend 之前产完。
+    backtest_expectancy 是 final_recommend 唯一四信号 edge 生产者；若排在其后或挂 E 批(21:00)，
+    final_recommend(D批20:00) 只能读到 T-1 edge（架构级时序倒挂，2026-09-22 根治）。
+    与 algorithms/run_algorithms.py 内同文件硬断言双重保险——此处是 CI 闸门可见报告。"""
+    sys.path.insert(0, ALGO)
+    import run_algorithms as r
+    i_be = r.ORDER.index("backtest_expectancy.py") if "backtest_expectancy.py" in r.ORDER else -1
+    i_fr = r.ORDER.index("final_recommend.py") if "final_recommend.py" in r.ORDER else -1
+    in_b = "backtest_expectancy.py" in r.STAGES.get("B", [])
+    in_e = "backtest_expectancy.py" in r.STAGES.get("E", [])
+    ok = (i_be != -1 and i_fr != -1 and i_be < i_fr) and in_b and (not in_e)
+    if ok:
+        log("[OK]   ⑤ 时序契约: backtest_expectancy 在 final_recommend 之前且挂 STAGES['B']（早于 D批消费者）")
+    else:
+        log("[FAIL] ⑤ 时序契约破坏: backtest_expectancy 须在 ORDER 中< final_recommend 且 STAGES['B'] 且不在 STAGES['E']")
+        log(f"        ORDER idx be={i_be} fr={i_fr}; in_B={in_b} in_E={in_e}")
+    return ok
+
+
 def check_orphan_scripts():
     """② 孤儿脚本扫描（告警级）"""
     sys.path.insert(0, ALGO)
@@ -244,6 +264,14 @@ def main():
             severe = True
     except Exception as e:
         log(f"[FAIL] ① STAGES/ORDER 校验异常: {e}")
+        severe = True
+
+    # ⑤ 严重：架构级时序契约（backtest_expectancy 必须早于 final_recommend 消费者）
+    try:
+        if not check_edge_ordering():
+            severe = True
+    except Exception as e:
+        log(f"[FAIL] ⑤ 时序契约校验异常: {e}")
         severe = True
 
     # ② 孤儿脚本（告警）
