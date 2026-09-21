@@ -3374,6 +3374,12 @@ function fmtSigned(v){
       .ms-item{display:flex;justify-content:space-between;padding:4px 0;font-size:11.5px;border-bottom:1px solid rgba(255,255,255,.03)}
       .ms-code{color:var(--dim);font-family:monospace;font-size:10px}
       .ms-val{font-weight:700}
+      /* 口径卡：月度汇总第二行通栏（与上方两卡同宽，占满整行） */
+      .ms-note-card{grid-column:1/-1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+      .ms-note-card .ms-note-head{font-size:11px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:6px;margin-bottom:8px}
+      .ms-note-card .ms-note-tag{font-size:10px;font-weight:400;color:var(--dim);border:1px solid var(--border);border-radius:6px;padding:1px 6px;margin-left:auto}
+      .ms-note-body{display:flex;flex-wrap:wrap;gap:0 26px;font-size:11px;color:var(--dim);line-height:1.9}
+      .ms-note-body .ms-note-item{display:inline-flex;align-items:center;gap:5px;min-width:200px}
 
       /* 详情展开 */
       .cal-detail{margin-top:14px;border:1px solid var(--border);border-radius:12px;background:var(--card);overflow:hidden;display:none;max-height:78vh}
@@ -4716,7 +4722,7 @@ function fmtSigned(v){
       h += '<h3 style="margin-top:22px;font-size:15px;color:var(--txt)">📊 月度汇总 <span style="font-size:11px;color:var(--dim);font-weight:400">· ' + _mLabel + '三方共振净买卖（机构+北向+游资 · 仅当月 · 最新交易日 ' + _latestDay + '）</span></h3>';
       // 两卡宽度对齐上方「机游共振（短线）」三卡：改三列网格（每列 ≈419px，与 .insight-grid 的 1fr1fr1fr 同宽）
       //   2026-09-21 主人令：口径说明自「标题下方」移至「两卡右侧空白格」（第 3 列）。
-      h += '<div class="month-summary" style="grid-template-columns:repeat(3,1fr);gap:12px">';
+      h += '<div class="month-summary" style="grid-template-columns:repeat(2,1fr);gap:12px">';
       if(!_in.length && !_out.length){
         h += '<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:28px 12px;font-size:13px;background:var(--bg2);border:1px dashed var(--border);border-radius:10px;">📭 ' + _mLabel + ' 暂无三方共振席位数据</div>';
       } else {
@@ -4736,11 +4742,20 @@ function fmtSigned(v){
         } else { h += '<div style="color:var(--dim);font-size:12px;padding:6px 0">本期无净流出标的</div>'; }
         h += '</div>';
 
-        // 2026-09-21 主人令：口径说明落位第 3 列（两卡右侧原空白格），与两卡同高、内容垂直居中。
-        h += '<div class="ms-col ms-note" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;line-height:1.9">';
-        h += '<div style="font-size:10.5px;color:var(--dim)">口径：龙虎榜席位「机构 + 北向 + 游资」三方净买卖，同一股票当月多次上榜按金额累加</div>';
-        h += '<div style="font-size:10.5px;color:var(--dim);margin-top:6px">当月共 ' + _mDays.length + ' 个交易日</div>';
-        h += '<div style="font-size:10px;color:var(--dim);margin-top:10px;opacity:.85">仅供参考，不构成投资建议</div>';
+      }
+
+      // 2026-09-21 主人令：口径说明自「两卡右侧第 3 列」移至「第二行通栏」——
+      //   第 3 列在窄屏会被压成细条、与两卡不同高；第二行通栏后与上方两卡等宽，阅读更顺。
+      if(_in.length || _out.length){
+        h += '<div class="ms-note-card">';
+        h += '<div class="ms-note-head"><span style="color:#38bdf8">\u2261</span> 口径说明'
+           + '<span class="ms-note-tag">当月共 ' + _mDays.length + ' 个交易日</span></div>';
+        h += '<div class="ms-note-body">';
+        h += '<span class="ms-note-item">\u8303\u56f4\uff1a\u9f99\u864e\u699c\u5e2d\u4f4d\u300c\u673a\u6784 + \u5317\u5411 + \u6e38\u8d44\u300d\u4e09\u65b9\u51c0\u4e70\u5356</span>';
+        h += '<span class="ms-note-item">\u540c\u4e00\u80a1\u7968\u5f53\u6708\u591a\u6b21\u4e0a\u699c\u6309\u91d1\u989d\u7d2f\u52a0</span>';
+        h += '<span class="ms-note-item">\u6392\u5e8f\uff1a\u51c0\u989d\u964d\u5e8f\uff08\u6d41\u5165\uff09/ \u5347\u5e8f\uff08\u6d41\u51fa\uff09\u5404\u53d6 TOP10</span>';
+        h += '</div>';
+        h += '<div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--border);font-size:10px;color:var(--dim);opacity:.85">\u4ec5\u4f9b\u53c2\u8003\uff0c\u4e0d\u6784\u6210\u6295\u8d44\u5efa\u8bae</div>';
         h += '</div>';
       }
       h += '</div>';
