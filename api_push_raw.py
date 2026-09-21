@@ -321,6 +321,12 @@ _RETIRED_ARTIFACTS = {
     #   生成方（run_algorithms.py E 批）与上传登记均已摘除、两页 <script src> 引用实测 0/0。
     #   远端产物已由本批一次性删除提交清除；本行只拦「本地残留副本回推复活」。
     "data/ALGO_BACKTEST_COMPARE.js",
+    # 🗑 2026-09-22 主人令（阿狸咪的工程师）：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡
+    #   整卡下线 ⇒ 产物与生产者脚本同批退役。远端已由本次退役提交一次性删除；
+    #   本段只拦「本地残留副本回推复活」（同强势突破 / ALGO_BACKTEST_COMPARE 范式）。
+    "data/BAIHECHOU_MACRO.js",
+    "data/BAIHECHOU_ANALYSIS.js",
+    "raw_data/baihechou_posts.json",
 }
 # 按前缀兜底：raw_data/strong_breakout_YYYYMMDD.json（逐日留档）
 _RETIRED_PREFIXES = (

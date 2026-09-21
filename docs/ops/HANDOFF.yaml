@@ -1687,3 +1687,39 @@ items:
       是否为 backtest_expectancy@当日（非 T-1 硬编码回退）；另 verify_chain_consistency ⑤ 应 OK。验证通过即转 done 并填 verified_at。"
     evidence: "commit 36bc08adc124；4 文件 md5 全 OK；importlib 导入断言 backtest_expectancy idx=39<final_recommend 40、在B不在E；verify ①STAGES↔ORDER 一致(52/52) ⑤时序契约 OK"
     updated: "2026-09-22 05:30"
+
+  # ── 2026-09-22 06:59 阿狸咪新增（白河愁「新周期判定」整卡下线 + 同页新卡时序缺陷修复）──
+  - id: baihechou-card-removed-and-unlockcover-fix
+    priority: P1
+    owner: alimi-cn
+    status: done
+    what: >
+      主人 2026-09-22 早令（截图三问）：①「🌐 新周期判定 · 海外宏观 + AI 大周期」卡「删除干净，没看了」；
+      ②同页「解禁&机构关注」因子观测卡（commit 33499302c，09-22 05:31 上线）线上永久停在「加载中…」。
+      ③另核实「主题空间 · 概念资金热度」是否真在跑 —— 实证 main 上 data/SECTOR_FUND_FLOW.js 的
+      update_time=2026-09-21 20:43:52，与卡面「昨日 20:43」严丝合缝，盘后管线正常，**不是问题**。
+    fix: >
+      ① 整卡全链退役：index.html 删 <script src> 两行 / 卡壳 / 派发行 / 渲染函数+__renderBaihechou 别名；
+      删除 data/BAIHECHOU_MACRO.js、data/BAIHECHOU_ANALYSIS.js、raw_data/baihechou_posts.json、
+      scripts/{baihechou_daily,fetch_baihechou_v8,set_baihechou_analysis}.py（引用面实测**自闭合**：
+      6 资产仅互相引用，无 workflow / 云端 / 其他脚本引用）；v8_health_check.py 删 BAIHECHOU_ANALYSIS
+      巡检登记项 + 加 _LOW_FREQ_FILES / _RETIRED_FILES 双护栏（防旧产物被放回触发 all_ 假红）；
+      api_push_raw.py::_RETIRED_ARTIFACTS 加 3 条路径（拒绝本地残留副本回推复活）；
+      markers 换 __renderBaihechou→__renderUnlockCover；logic.html 两处现态注记；
+      本机自动化 98101962(06:30) / 622ad154(08:30) 按「PAUSED 不删」铁律停用（**未删**）。
+      window.CRISIS_DATA **只删卡壳不删源**（每日洞察 / 情绪周期仍在消费）。
+      ② 修 33499302c 时序缺陷：函数已声明但从未挂 window ⇒ 派发处
+      typeof window.__renderUnlockCover==='function' 恒 false ⇒ 静默跳过 ⇒ 卡永久「加载中」。
+      按 §41（声明→定义→调用）补 window.__renderUnlockCover = __renderUnlockCover;，
+      并补 markers 守卫登记（此前该卡未登记，属「建卡未登记」漏项）。
+    verify_how: "远端回读：index.html 零 BAIHECHOU 活代码（仅墓碑注释）且含
+      window.__renderUnlockCover = __renderUnlockCover; 唯一赋值行；3 个数据/脚本资产远端已不存在；
+      node --check 全站 inline 块 0 错；v8_health_check.py / api_push_raw.py py_compile 0 错；
+      markers 无 __renderBaihechou 有 __renderUnlockCover；两自动化 PAUSED 回读；
+      上线后硬刷新验证「新周期判定消失、解禁&机构关注渲染出数据」。"
+    evidence: "本机实测：引用面 grep 仅 scripts/ 三个文件互引（无 workflow / 云端引用）；
+      git ls-files 资产清单 6 条；自动化任务表两条已置 PAUSED（automation_update 回读）；
+      首次补丁打在落后 176 commit 的旧基线上，检出后按防覆盖铁律在最新 origin/main 上重做。"
+    residual: "raw_data/history/*.json 等冻结历史归档按原则未动；本机 06:30/08:30 自动化
+      仅 PAUSED 未删（铁律：禁删阿狸咪任务）；若日后要恢复卡，git 历史可完整回溯。"
+    updated: "2026-09-22 06:59"

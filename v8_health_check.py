@@ -85,20 +85,10 @@ CARD_DEFS = [
     #   面板显示「等外部策展」而非「陈旧」，自愈链也不会做永远无效的派发。
     #   ⚠️ 只登记这一个事件驱动卡，不放松任何算法产物的红线。
     {"id": "MACRO_KSHAPE", "name": "宏观K型分层", "page": "暂未上架·观测类", "freq": "事件驱动(每日巡检)", "max_age": 10080, "key_fields": ["data_point"], "manual_dep": True, "producer": "沧海一土狗文章巡检自动化（每日 21:00）", "manual_note": "事件驱动 · 无自动刷新（非故障）：2026-09-15 19:27 ae30ea7a1 起由「沧海一土狗文章巡检」自动化按日巡视，发现新文才刷新，无新文保持上次策展值；非算法产物。"},
-    # 🛡 2026-09-18 一劳永逸（阿狸咪的工程师 · 补监控盲区）：
-    #   此前「新周期判定」卡的巡检只有 all_BAIHECHOU_MACRO，它读顶层 update_time = **原文抓取时刻**，
-    #   于是 09-18 实测盲区成立：原文 09:14 新鲜（ok ✅）而 AI 解析停在 09-17 06:38（断链 🔴），
-    #   巡检**全程零告警**。与「BACKTEST_TDX 双盲区」同型（判据：有产物 ≠ 有当期内容）。
-    #   本项独立校验解析文件（window.BAIHECHOU_ANALYSIS，顶层 update_time = 解析出稿时刻）。
-    #   日频 06:30 主跑 / 08:30 兜底 ⇒ 1560min（26h）红线留足跨夜与兜底重试余量。
-    # 🛡 2026-09-21 小九（补 producer · 铁律「看板卡名 → 产出脚本」一行可反查）：
-    #   本项曾因「拆分只做一半」造出 3 天真红（详见 scripts/set_baihechou_analysis.py 头注）：
-    #   09-18 把 AI 解析拆成独立文件并让前端**优先读它**，但没给独立文件生产者 ⇒
-    #   它停在 09-18 06:31（提交历史仅 1 笔），本巡检判 fail（age 4692min）而前端卡面
-    #   解析冻结 —— 真红，非周末假红。补 producer 后登记项与产出方直接可查，不再靠翻档。
-    #   判龄口径：max_age=1560（26h，留足跨夜与 08:30 兜底重试）；其值为
-    #   独立文件顶层 update_time（= 解析出稿 generated_at），非原文抓取时刻。
-    {"id": "BAIHECHOU_ANALYSIS", "name": "新周期判定·AI解析", "page": "暂未上架·观测类", "freq": "工作日盘前(06:30 主跑/08:30 兜底)", "max_age": 1560, "key_fields": ["verdict", "sections", "generated_at"], "weekend_update": False, "producer": "scripts/set_baihechou_analysis.py（经 scripts/baihechou_daily.py finish 调用 · 本机/阿狸咪机 AI 解析步骤）"},
+    # 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡整卡下线
+    #   ⇒ BAIHECHOU_ANALYSIS 巡检登记项随卡删除（原 09-18 补监控盲区、09-21 补 producer
+    #   的完整条目见 git 历史）；产物与生产者脚本同批退役，见下方 _RETIRED_FILES 护栏。
+    #   ⚠️ window.CRISIS_DATA 数据源**保留**（每日洞察 / 情绪周期仍消费），不在退役范围。
 
     # 实时数据
     {"id": "INDEX_QUOTES", "name": "全球指数 / 股指期货", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["items"]},
@@ -2020,6 +2010,11 @@ _LOW_FREQ_FILES = {
     #   🔴 本行曾于 2026-09-21T00:19Z 被 commit 3d955c9f5c 静默覆盖（见 HANDOFF.yaml
     #      handoff-concurrent-write 的实测补记）⇒ 本批按 cfe5d0bf97 原文原样恢复。
     "STRONG_BREAKOUT", "STRONG_BREAKOUT_BACKTEST",
+    # 🗑 2026-09-22 主人令（阿狸咪的工程师）：**「新周期判定」白河愁卡整卡退役 · 护栏**。
+    #   卡已删、产物已删、生产者脚本已删、前端 0 引用 ⇒ 若有人把旧产物放回，
+    #   all_ 通用扫描会按 24h 红线判 fail。此处登记白名单防红灯复发（同强势突破范式）。
+    #   ⚠️ 只登记**已退役**产物，不放松任何在跑产物的红线。
+    "BAIHECHOU_MACRO", "BAIHECHOU_ANALYSIS",
     # 🗑 2026-09-21 18:45 小九（本批）：**ALGO_BACKTEST_COMPARE · 同族第三例**
     #   退役依据：产物 update_time 停在 2026-09-18 16:25:31（生成方 run_algorithms.py E 批与
     #   上传登记 api_push_raw.py 均已摘除）；index.html / logic.html 的 <script src> 引用实测 0/0；
@@ -2051,6 +2046,8 @@ _RETIRED_FILES = {
     "STRONG_BREAKOUT",           # 强势突破（2026-09-19 主人令全站删除）
     "STRONG_BREAKOUT_BACKTEST",  # 强势突破·信号层回测（同上）
     "ALGO_BACKTEST_COMPARE",     # 两套算法回测对比（2026-09-20 全链退役，本批删除产物）
+    "BAIHECHOU_MACRO",           # 新周期判定·海外宏观（2026-09-22 主人令整卡下线）
+    "BAIHECHOU_ANALYSIS",        # 新周期判定·AI解析（同上，同批退役）
 }
 
 # ⏱ 2026-09-21（本批）小九：低频产物「按生产者节拍判龄」表 ——

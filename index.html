@@ -657,15 +657,11 @@ window.__domReadyFns=[];
          故删此行零功能损失。若日后云端产出 maharo_macro.js，恢复本行即可。 -->
     <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20260921） -->
     <script src="data/maharo_insights.js?v=20260921" defer></script>
-    <script src="data/BAIHECHOU_MACRO.js?v=1790031455" defer></script>
-    <!-- 🛡 2026-09-18 一劳永逸（阿狸咪的工程师）：AI 解析拆成独立文件 data/BAIHECHOU_ANALYSIS.js
-         （window.BAIHECHOU_ANALYSIS），与每日重抓的 window.BAIHECHOU_MACRO **解耦**。
-         根因实测：09-18 06:31 本机推送的当期解析（7fd2ac048f，17334 B）被 09:16 一次
-         「data: 白河愁每日更新」整文件覆盖（c4fc6e3b0e，17164 B，解析回退到 09-17）——
-         该抓取方用自己陈旧的本地副本做基线（fetch_baihechou_v8.load_existing_analysis
-         从本地文件救 analysis），抓新原文后整文件覆盖。解析独立成文件后，抓取方无论
-         本地多旧都不可能再覆盖它（同 data/maharo_insights.js 范式，2026-09-10 已验证）。 -->
-    <script src="data/BAIHECHOU_ANALYSIS.js?v=1790031455" defer></script><!-- 🌐 新周期判定 · 海外宏观 + AI 大周期（数据源：雪球 @白河愁博士；工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿 · window.BAIHECHOU_MACRO） -->
+    <!-- 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡整卡下线（白河愁单源观点卡）。
+         data/BAIHECHOU_MACRO.js、data/BAIHECHOU_ANALYSIS.js、raw_data/baihechou_posts.json、
+         scripts/{baihechou_daily,fetch_baihechou_v8,set_baihechou_analysis}.py 与本机 06:30/08:30
+         自动化（98101962/622ad154，按铁律 PAUSED 不删）一并退役；window.CRISIS_DATA 宏观硬指标
+         仍被每日洞察/情绪周期消费 ⇒ 只删卡壳不删源。 -->
     <script src="data/BOARD_FIRST_LIMIT.js?v=1790031455" defer></script><!-- 🔥 主板首板 · 一进二观察（数据源：akshare.stock_zt_pool_em 完整涨停池 → 主板首板 + 基础口径过滤；盘后日更 · window.BOARD_FIRST_LIMIT） -->
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
@@ -10720,7 +10716,7 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
       applyData(window.IPO_DATA);
     }else{
       /* 🛡 2026-08-28 一劳永逸（主站审计 P1-8）：缓存戳 ?v= 从页面已注入的
-         「script src=data/IPO_DATA.js?v=1789910460」标签 实时读取，不再手写 hash。
+         「script src=data/IPO_DATA.js?v=1790031455」标签 实时读取，不再手写 hash。
          历史债务：本处注释写死一个旧 hash、实际引用是另一个、报错信息又写一遍，
          三处漂移；且手写 hash 不随构建更新 → CDN 吐旧副本 → 打新数据陈旧。
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
@@ -15470,6 +15466,10 @@ function __renderUnlockCover(){
   }
 }
 
+  // 🛡 2026-09-22（阿狸咪的工程师）：修复 33499302c 时序缺陷 —— 函数已声明但从未挂 window，
+  //   派发处 typeof window.__renderUnlockCover==='function' 恒 false ⇒ 静默跳过 ⇒ 卡永久「加载中」。
+  window.__renderUnlockCover = __renderUnlockCover;
+
   function renderUnlisted(){
     // 🛡 2026-08-20 一劳永逸加固（主人「新建 AI 预测空白 + v6 备忘录空白」）：
     //   1) $ 兜底：$ 是 IIFE 闭包变量，若因加载时序未就绪会 TypeError → 整页空白。
@@ -15665,15 +15665,8 @@ h += '<div class="card" id="usHkMapCard" style="display:none;margin-bottom:16px;
    + '<div id="usHkMapBody"><div class="note">加载中&#x2026;</div></div></div>';
 h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-left:4px solid var(--cyan);"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52D; 主题空间 · 概念资金热度 加载中&#x2026;</div></div>';
 
-// ═══ 2026-09-16 主人令：恢复「&#x1F30D; 新周期判定 · 海外宏观 + AI 大周期」并接入现有数据源 ═══
-//   沿革（全部有据可查）：2026-09-06 23:19 建卡（原在「宏观观测」）→ 2026-09-13 23:03 主人令
-//   「该卡纯静态内联、无 data 依赖/无生成器」⇒ 下沉至「暂未上架 · 观测类」最下方 → 2026-09-14 20:31
-//   随「移除观测类 3 卡(主题空间/AI洞察/新周期判定)」一并被删 ⇒ 内容永久停在 09-06，即死卡。
-//   本次恢复 = ①原样回来的卡名与双源对比版式 ②接入现有数据源（雪球 @白河愁博士 ⇒ window.BAIHECHOU_MACRO）
-//   ③开启盘前日频更新解析（工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿）。
-//   ⚠ 容器 id 沿用 baihechouBody（2026-09-15 小九为该数据源建的卡壳 id）：同页同源只留一张卡，不重复建壳。
-h += '<div class="card" id="baihechouBody" style="margin-bottom:16px;border-left:4px solid #60a5fa;">'
-   + '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F30D; 新周期判定 · 海外宏观 + AI 大周期 加载中&#x2026;</div></div>';
+// 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡壳已删（原 baihechouBody，
+//   见 git 历史；同批删渲染函数与派发，生产者/自动化一并退役）。
 // ═══ 🚚 2026-09-18 主人令：宏观景气背景 · K 型分层 由「🌍 观测平台 > 🌍 宏观观测」整卡迁入本页（白河愁卡下方）═══
 //   依据：该卡数据源（data/MACRO_KSHAPE.js）仅沧海一土狗单源 ⇒ 与白河愁卡（单源 @白河愁博士）同属「单一观点源」类。
 //   容器 id = macroKShapeBody（原为 obsPaneMacro 内联匿名块，无 id）；渲染函数 __renderMacroKShape（文件内同名定义）。
@@ -15728,7 +15721,6 @@ h += '</div>'; // /ulPaneObserve
     /* 🌙 2026-09-19：隔夜美股强势 → A股/港股 映射卡派发（与 _fillEtfMap 同在 renderUnlisted
        尾部，覆盖首渲即可触发；defer 数据未到时由 _fillUsHkMap 内部 600ms×30 自愈轮询补渲）。 */
     window._fillUsHkMap();
-    try{ if(typeof window.__renderNewCycleJudge==='function') window.__renderNewCycleJudge(); }catch(e){}
     try{ if(typeof window.__renderUnlockCover==='function') window.__renderUnlockCover(); }catch(e){}
     // 2026-09-12 搬迁收口：因子实验室 / 中信PE回测 / 指数估值中枢 /
     //   因子审计 / 因子补缺进度 / maharo 机构研究 共 7 卡的容器已迁出本页，
@@ -15742,159 +15734,8 @@ h += '</div>'; // /ulPaneObserve
     // try{ if(typeof window.__renderIndexObserve==='function') window.__renderIndexObserve(); }catch(e){}
   }
 
-  // ═══ 🌐 2026-09-16 主人令：新周期判定 · 海外宏观 + AI 大周期（唯一渲染入口）═══
-  //   数据源：window.BAIHECHOU_MACRO（雪球 @白河愁博士 uid 7251377368）
-  //     · posts / replies = 当期公开原文（工作日盘前 06:30 抓取（失败 08:30 兜底），Chrome/Edge headless 过 WAF）
-  //     · analysis = 同一批次由 AI 阅读原文后撰写：verdict（当期主线一句话）
-  //       + sections[{k:market|sector|position, tag, tension, delta, align}]（三段实情解析）
-  //   版式：卡名置顶 + 数据源 → 核心/用法/限制 → 一句话结论 → 双源对比三组 → 原文折叠 → 口径。
-  //   ⚠ 09-06 那批静态快照数值（非农读数 / FOMC 概率 / 三情景概率）一律不再保留 ——
-  //     静态数字会冒充新鲜数据（死卡根源），本卡所有内容全部来自当期数据，缺则如实空态。
-  //   空态铁律：原文未抓 ⇒「原文暂未抓取」；原文在、解析缺 ⇒「当期解析待出稿」。两者都不填 0、不编造。
-  window.__ncRetry = 0;
-  window.__renderNewCycleJudge = function(){
-    var host = document.getElementById('baihechouBody');
-    if(!host) return;
-    var _e = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
-    var d = window.BAIHECHOU_MACRO;
-    if(!d || !(d.posts && d.posts.length)){
-      if(window.__ncRetry < 40){ window.__ncRetry++; setTimeout(window.__renderNewCycleJudge, 600); return; }
-      host.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F30D; 新周期判定 · 海外宏观 + AI 大周期 原文暂未抓取（工作日盘前 06:30 自动任务 · 失败 08:30 兜底）</div>';
-      return;
-    }
-    // 🛡 2026-09-18 一劳永逸：解析优先取独立文件 window.BAIHECHOU_ANALYSIS（防被重抓方覆盖回退），
-    //   缺失时回退 d.analysis（向后兼容，老产物照常渲染）。
-    var p = d.profile || {}, st = d.stats || {}, ana = window.BAIHECHOU_ANALYSIS || d.analysis || {};
-    var secs = (ana.sections && ana.sections.length) ? ana.sections : [];
-    var posts = d.posts || [], replies = d.replies || [];
-    var ACC = '#60a5fa', RGB = '96,165,250', ORG = '#fbbf24';
-    var PEND = '当期解析待出稿（工作日盘前与原文同批写入）';
-    var h = '';
-    // ── ① 卡名行（置顶）+ 实时时段胶囊 ──（2026-09-16 主人令：删去频率 badge —— setBadge 已含「盘前/中长线 + 更新于」，静态频率说明属冗余）
-    h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-       + '<span style="font-size:15px;font-weight:700;color:' + ACC + ';">&#x1F30D; 新周期判定 · 海外宏观 + AI 大周期</span>'
-       + '<span class="fresh" id="newCycleFresh">&#x2014;</span></div>';
-    // ── ② 数据源行 ──
-    // 🔴 2026-09-16 主人令：删去原「· 自建宏观风险状态机（30Y 美债 / SOX / VIX / IG-HY 信用利差 /
-    //   美元日元 / 实际利率）」——该串为凭空添加：本卡从未读取这些指标，实现层只有 CRISIS_DATA 的
-    //   VIX + 美债 10Y（且无 SOX / IG-HY / 美元日元 / 实际利率），与逻辑页口径相互矛盾。
-    //   现如实标注真实来源。
-    h += '<div style="font-size:11.5px;color:var(--dim);margin-bottom:10px;">数据源：雪球 <b style="color:var(--txt);">@' + _e(p.name || '白河愁博士') + '</b>'
-       + (p.uid ? '（uid ' + _e(p.uid) + '）' : '')
-       + ' · 宏观硬指标 window.CRISIS_DATA（货币=USD/CNY 中间价 / 经济=中国制造业 PMI / 全球=VIX + 美债10Y 动态计算）'
-       + ' · 当期原文 ' + posts.length + ' 条' + (replies.length ? ' + 回复 ' + replies.length + ' 条' : '')
-       + (st.latest_main_time ? ' · 最新 ' + _e(st.latest_main_time) : '')
-       + (st.stale_days != null ? ' · 停更 ' + st.stale_days + ' 天' : '') + '</div>';
-    // ── ②b 宏观硬指标区（原「📊 危机雷达」卡并入 · 数据 window.CRISIS_DATA）──
-    //   2026-09-16 主人令：「把危机雷达和这卡合并不就得了」——卡名含「海外宏观」而卡内无一条海外宏观
-    //   数据（全是白河愁观点 + AI 转述，名字对内容过度承诺）；站内真含海外宏观硬指标的正是危机雷达
-    //   （CRISIS_DATA：货币=USD/CNY、经济=中国 PMI、全球=基于 VIX + 美债10Y 动态计算）⇒ 并入本卡。
-    //   算法与旧卡逐字一致：综合指数 = 货币×40% + 经济×35% + 全球×25%；
-    //   分档 ≥70 危险 / ≥50 警惕 / ≥30 关注 / 其余安全。展示复用 .ph-crisis-* 四个类（与已下架页同款）。
-    //   空态铁律：CRISIS_DATA 未注入 / score 缺失 ⇒ 如实空态，不填 0、不编造。
-    (function(){
-      var CR = window.CRISIS_DATA || {};
-      var inds = CR.indicators || {};
-      var cats = {'货币': [], '经济': [], '全球': []};
-      Object.keys(inds).forEach(function(k){ var it = inds[k]; if(it && cats[it.cat] && it.score != null) cats[it.cat].push(it.score); });
-      var avg = function(a){ return a.length ? a.reduce(function(s2, x){ return s2 + x; }, 0) / a.length : 0; };
-      var mS = Math.round(avg(cats['货币']) * 100), eS = Math.round(avg(cats['经济']) * 100), gS = Math.round(avg(cats['全球']) * 100);
-      var idx = Math.round(mS * 0.40 + eS * 0.35 + gS * 0.25);
-      var lv = function(s2){ return s2 >= 70 ? ['危险', '#ef5350'] : s2 >= 50 ? ['警惕', '#ff9800'] : s2 >= 30 ? ['关注', '#ffd54f'] : ['安全', '#4caf50']; };
-      h += '<div style="background:rgba(244,63,94,.06);border:1px solid rgba(244,63,94,.28);border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
-      h += '<div style="font-size:11.5px;font-weight:700;color:#f43f5e;margin-bottom:7px;">&#x1F4CA; 宏观硬指标 · 危机雷达（尾部风险）'
-         + '<span style="font-weight:400;color:var(--dim);margin-left:8px;">window.CRISIS_DATA · 更新于 ' + _e(CR.update_time || '—') + '</span></div>';
-      if(CR.score != null){
-        // 🔴 2026-09-17 主人令：本区「39px 大数字 + 三条分项长条」已移至 ④b（一句话结论下方），
-        //    并压缩为「1 行 3 列小胶囊」。此处仅保留分数存在性判定与 CR.note 口径说明。
-        h += '</div>';
-        if(CR.note) h += '<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.7">' + _e(CR.note) + '</div>';
-      } else {
-        h += '<div style="font-size:11.5px;color:var(--dim);text-align:center;padding:6px 0;">宏观硬指标暂不可用（window.CRISIS_DATA 未注入）</div>';
-      }
-      h += '</div>';
-    })();
-    // ── ③ 分析块：核心 / 用法 / 限制 ──
-    h += '<div style="background:rgba(' + RGB + ',.08);border:1px solid rgba(' + RGB + ',.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
-       + '<b style="color:' + ACC + ';">&#x1F4CC; 核心：</b>把白河愁博士的<b>当期主线</b>与我方<b>跨源交叉验证</b>并列对照 —— 讲清「他怎么说 / 我怎么判」。<br>'
-       + '<b style="color:' + ACC + ';">&#x1F4A1; 用法：</b>背景认知，辅助顶层仓位与行业配置（按 大盘 / 板块 / 仓位 三组）。<br>'
-       + '<b style="color:' + ACC + ';">&#x26A0; 限制：</b>来源为<b>个人公开观点</b>，非机构研报；解析为 <b>AI 转述 + 判断</b>，需回原文核对。</div>';
-    // ── ④ 一句话结论（当期主线）──
-    h += '<div style="background:rgba(' + RGB + ',.10);border:1px solid rgba(' + RGB + ',.45);border-radius:7px;padding:10px 12px;margin-bottom:10px;">'
-       + '<div style="font-size:11.5px;font-weight:700;color:' + ACC + ';margin-bottom:4px;">&#x1F4CC; 一句话结论（当期主线）</div>'
-       + (ana.verdict
-            ? '<div style="font-size:13px;font-weight:700;color:var(--txt);line-height:1.8;">' + _e(ana.verdict) + '</div>'
-            : '<div style="font-size:12px;color:var(--dim);">' + PEND + '</div>')
-       + (ana.window ? '<div style="font-size:10.5px;color:var(--dim);margin-top:6px;">口径窗口：' + _e(ana.window) + '</div>' : '')
-       + '</div>';
-      // ── ④b 宏观硬指标 · 单行三列小胶囊（2026-09-17 主人令：原 39 分大数字 + 三条长条太大）──
-      (function(){
-        var CR2 = window.CRISIS_DATA || {};
-        if(CR2.score == null) return;
-        var I2 = CR2.indicators || {};
-        var C2 = {'货币': [], '经济': [], '全球': []};
-        Object.keys(I2).forEach(function(k){ var it = I2[k]; if(it && C2[it.cat] && it.score != null) C2[it.cat].push(it.score); });
-        var a2 = function(x){ return x.length ? x.reduce(function(s3, y){ return s3 + y; }, 0) / x.length : 0; };
-        var mv = Math.round(a2(C2['货币']) * 100), ev = Math.round(a2(C2['经济']) * 100), gv = Math.round(a2(C2['全球']) * 100);
-        var ix = Math.round(mv * 0.40 + ev * 0.35 + gv * 0.25);
-        var L2 = function(s3){ return s3 >= 70 ? ['危险', '#ef5350'] : s3 >= 50 ? ['警惕', '#ff9800'] : s3 >= 30 ? ['关注', '#ffd54f'] : ['安全', '#4caf50']; };
-        var wp = L2(ix);
-        var x2 = function(lab, val){ var wv = L2(val); return '<div class="ph-crisis-pill"><i>' + lab + '</i><b style="color:' + wv[1] + '">' + val + '</b><span class="sep">·</span><span style="color:' + wv[1] + '">' + wv[0] + '</span></div>'; };
-        var sum = '<div class="" style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
-                + '<span style="font-size:11px;font-weight:700;color:#f43f5e;">&#x1F4CA; 宏观硬指标</span>'
-                + '<b style="font-size:15px;font-weight:800;color:' + wp[1] + ';">' + ix + '</b>'
-                + '<span style="font-size:10.5px;color:var(--dim);">/100 · ' + wp[0] + '</span>'
-                + '<span style="font-size:10.5px;color:var(--dim);margin-left:auto;">window.CRISIS_DATA · ' + _e(CR2.update_time || '—') + '</span></div>';
-        h += '<div style="background:rgba(244,63,94,.06);border:1px solid rgba(244,63,94,.28);border-radius:7px;padding:8px 10px;margin-bottom:10px;">'
-           + sum + '<div class="ph-crisis-pills">' + x2('货币', mv) + x2('经济', ev) + x2('全球', gv) + '</div></div>';
-      })();
-    // ── ⑤ 双源对比（大盘 / 板块 / 仓位 三组，逐组左原文右判断）──
-    h += '<div style="font-size:12px;font-weight:700;color:var(--txt);margin:6px 0 8px;">&#x1F50D; 双源对比 · <span style="color:#ef5350;">&#x1F534; 红字 = 我方与原文/共识的关键差异</span></div>';
-    if(secs.length){
-      h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:10px;margin-bottom:10px;">';
-      for(var i = 0; i < secs.length; i++){
-        var s = secs[i] || {};
-        var tl = s.tag || s.k || ('组 ' + (i + 1));
-        h += '<div style="background:rgba(' + RGB + ',.05);border:1px solid rgba(' + RGB + ',.25);border-radius:7px;padding:9px 11px;">'
-           + '<div style="font-size:12px;font-weight:700;color:' + ACC + ';margin-bottom:7px;">' + _e(tl) + '</div>'
-           + '<div style="border-left:2px solid rgba(251,191,36,.55);padding-left:8px;margin-bottom:7px;">'
-           + '<div style="font-size:11px;font-weight:700;color:' + ORG + ';margin-bottom:3px;">&#x1F9D1; 白河愁博士 · 当期原文要点</div>'
-           + '<div style="font-size:11.5px;line-height:1.72;color:var(--txt);">' + _e(s.delta || '—') + '</div></div>'
-           + '<div style="border-left:2px solid rgba(' + RGB + ',.55);padding-left:8px;">'
-           + '<div style="font-size:11px;font-weight:700;color:' + ACC + ';margin-bottom:3px;">&#x1F916; 我方跨源交叉验证</div>'
-           + '<div style="font-size:11.5px;line-height:1.72;color:var(--txt);margin-bottom:4px;"><b style="color:#ef5350;">① 分歧／矛盾：</b>' + _e(s.tension || '—') + '</div>'
-           + '<div style="font-size:11.5px;line-height:1.72;color:var(--txt);"><b style="color:' + ACC + ';">② 与更长周期：</b>' + _e(s.align || '—') + '</div>'
-           + '</div></div>';
-      }
-      h += '</div>';
-    } else {
-      h += '<div style="background:rgba(' + RGB + ',.04);border:1px dashed rgba(' + RGB + ',.35);border-radius:7px;padding:12px;margin-bottom:10px;font-size:11.5px;color:var(--dim);text-align:center;">' + PEND + '</div>';
-    }
-    // ── ⑥ 当期原文折叠（可回原文核对）──
-    var _blk = function(arr, lbl){
-      if(!arr || !arr.length) return '';
-      var out = '<div style="font-size:11px;font-weight:700;color:var(--dim);margin:6px 0 4px;">' + lbl + '</div>';
-      for(var j = 0; j < arr.length; j++){
-        var pt = arr[j] || {};
-        out += '<div style="padding:5px 8px;border-left:2px solid rgba(' + RGB + ',.35);background:rgba(' + RGB + ',.04);border-radius:5px;margin-bottom:5px;font-size:11.5px;line-height:1.6;">'
-             + '<span style="color:var(--dim);">' + _e(pt.time || '') + '</span> <span style="color:var(--txt);">' + _e(pt.text || '(图片帖)') + '</span></div>';
-      }
-      return out;
-    };
-    h += '<details style="background:rgba(' + RGB + ',.04);border:1px solid rgba(' + RGB + ',.2);border-radius:7px;padding:8px 12px;margin-bottom:10px;">'
-       + '<summary style="font-size:11.5px;font-weight:600;color:' + ACC + ';cursor:pointer;">&#x1F4C4; 当期原文（主帖 ' + posts.length + ' / 回复 ' + replies.length + '）· 点击核对</summary>'
-       + '<div style="margin-top:8px;">' + _blk(posts.slice(0, 12), '主帖') + _blk(replies.slice(0, 8), '回复') + '</div></details>';
-    // ── ⑦ 底部口径 ──
-    h += '<div style="background:rgba(' + RGB + ',.05);border:1px solid rgba(' + RGB + ',.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
-       + '&#x26A0;&#xFE0F; <b style="color:' + ACC + ';">展示型卡</b>：原文取自雪球公开帖文（工作日盘前 06:30 自动抓取 · 失败 08:30 兜底），解析由同一批次的 AI 步骤阅读原文后撰写，'
-       + '<b>AI 转述 + 判断</b>，不是量化统计、不替代个股信号；卡内个股名称均为<b>其原文提及</b>、非推荐，请回原文核对。'
-       + '原文更新于 ' + _e(d.update_time || '—') + ' · 解析出稿于 ' + _e(ana.generated_at || '—') + ' · 仅供研究参考，不构成个人投资建议。</div>';
-    host.innerHTML = h;
-    var fresh = document.getElementById('newCycleFresh');
-    if(fresh && typeof setBadge === 'function'){ try{ setBadge('newCycleFresh','盘前','中长线', (ana.generated_at || d.update_time || '')); }catch(e){} }
-  };
-  // 兼容别名：2026-09-15 小九版函数名转发到本卡（防历史调用点/外部引用名报错）
-  window.__renderBaihechou = function(){ try{ window.__renderNewCycleJudge(); }catch(e){} };
+  // 🗑 2026-09-22 主人令：「新周期判定」卡渲染函数（原 __renderNewCycleJudge / __renderBaihechou 别名）
+  //   已整块删除，见 git 历史；CRISIS_DATA 数据源保留（每日洞察/情绪周期仍消费）。
 
   function renderMahoroCard(){
     var host = document.getElementById('maharoCardBody');
