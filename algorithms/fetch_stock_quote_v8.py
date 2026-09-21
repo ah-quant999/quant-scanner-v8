@@ -261,6 +261,32 @@ def merge_industry_concepts(quote_data):
     return quote_data
 
 
+_REPORT_TAG = {"0331": "一季报", "0630": "半年报", "0930": "三季报", "1231": "年报"}
+
+
+def _recent_report_dates(n=6):
+    """最近 n 个「分红送配报告期」（YYYYMMDD，由近及远）。
+
+    🔴 2026-09-21 修复：akshare `stock_fhps_em(date=)` 的 date 参数语义就是
+    「分红送配报告期」，而该函数默认值被写死为 '20231231'。
+    本模块此前调用 `ak.stock_fhps_em()` **不传参** ⇒ 全市场分红恒取 2023 年报，
+    非重点池（cninfo 未覆盖）的票分红方案长期停在两年前。
+    """
+    today = datetime.date.today()
+    out = []
+    for y in (today.year, today.year - 1, today.year - 2):
+        for md in ("1231", "0930", "0630", "0331"):
+            if datetime.date(y, int(md[:2]), int(md[2:])) <= today:
+                out.append("%d%s" % (y, md))
+    out.sort(reverse=True)
+    return out[:n]
+
+
+def _report_period_cn(p):
+    """'20260630' → '2026半年报'（与 cninfo 的 report_period 口径一致）。"""
+    return ("%s%s" % (p[:4], _REPORT_TAG.get(p[4:], ""))) if p else None
+
+
 def _fmt_dividend_plan(r):
     """把 stock_fhps_em 的送转/现金比例字段转成人类可读的分红方案字符串。
     字段含义均为「每10股」：现金分红比例 4.2 = 10派4.2元；
@@ -302,10 +328,24 @@ def merge_dividend(quote_data):
         print("⚠️ akshare 未安装，跳过分红合并")
         return quote_data
     try:
-        df = ak.stock_fhps_em()
-        if df is None or len(df) == 0:
-            print("⚠️ stock_fhps_em 返回空")
+        import pandas as pd
+        dfs = []
+        _ps = _recent_report_dates(6)
+        for _p in _ps:
+            try:
+                _d = ak.stock_fhps_em(date=_p)
+            except Exception as _e:
+                print(f"⚠️ 分红报告期 {_p} 抓取失败: {_e}")
+                continue
+            if _d is None or len(_d) == 0:
+                continue
+            _d = _d.copy(); _d['__RP'] = _report_period_cn(_p)
+            dfs.append(_d)
+        if not dfs:
+            print("⚠️ stock_fhps_em 全部报告期返回空")
             return quote_data
+        df = pd.concat(dfs, ignore_index=True).drop_duplicates(subset=['代码'], keep='first')
+        print(f"📅 分红报告期 {[_report_period_cn(x) for x in _ps]} → 命中 {len(df)} 只")
         merged = 0
         for _, r in df.iterrows():
             code6 = str(r['代码']).strip()
@@ -316,7 +356,9 @@ def merge_dividend(quote_data):
             if code8 not in quote_data or code8.startswith('hk') or quote_data[code8].get('board') == 'ETF':
                 continue
             def _f(v):
-                try: return float(v)
+                try:
+                    f = float(v)
+                    return None if f != f else f     # NaN → None（防前端显示 NaN%）
                 except Exception: return None
             def _s(v):
                 try:
@@ -329,13 +371,19 @@ def merge_dividend(quote_data):
             existing = quote_data[code8].get('dividend') or {}
             new_desc = _fmt_dividend_plan(r)
             # 若已有 cninfo 的 desc（更权威），保留；否则用 stock_fhps_em 生成
-            desc = existing.get('desc') if existing.get('desc') else new_desc
+            # 🔴 2026-09-21 纠正：原先「已有 desc 就保留」会让旧版方案文字（曾恒取 2023 年报）
+            #   与新写入的 report_period 自相矛盾。改为东财最新报告期优先；
+            #   cninfo 刷新步骤在其后执行，仍会以 cninfo 为准覆盖。
+            desc = new_desc or existing.get('desc')
             quote_data[code8]['dividend'] = {
                 'yield': _f(r.get('现金分红-股息率')),     # 0.0244 = 2.44%
                 'cash_ratio': _f(r.get('现金分红-现金分红比例')),  # 9.8974%
                 'ex_date': _s(r.get('除权除息日')),
                 'progress': _s(r.get('方案进度')),
                 'desc': desc,
+                # 2026-09-21 新增：报告期 + 预案公告日（前端分红方案行据此写明「是哪一期的」）
+                'report_period': _s(r.get('__RP')),
+                'plan_date': ((_s(r.get('预案公告日')) or '')[:10] or None),
             }
             merged += 1
         print(f"✅ 合并分红配送：{merged}/{len(quote_data)} 只")
