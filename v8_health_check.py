@@ -2891,10 +2891,64 @@ def check_guanlan_material_freshness():
     state_path = repo_root / "out" / "_guanlan_refresh_state.json"
 
     if not reports_path.exists():
-        results.append({
-            "id": rid, "name": rname, "page": "内容审计", "status": "fail",
-            "message": f"素材文件不存在: {reports_path}（guanlan_extractor.py 从未成功产出）",
-        })
+        # 🔴 2026-09-21 修复（本检查当日上线时自带的**结构性假阳性**）：
+        #   out/ 被 .gitignore 忽略，云端/自托管 runner 的工作区都没有该目录
+        #   ⇒ 本文件在任何 CI 环境里**恒不存在**；若一律判 fail，就等于在健康面板
+        #     钉一枚**永不熄灭的假红灯**（实测 2026-09-21 12:03 线上 summary.fail=2
+        #     里就有一条是它，报文还误称"guanlan_extractor.py 从未成功产出"）。
+        #   改为判「本环境能不能判」，而不是「文件在不在」：
+        #     · 本机（存在 out/ 目录）→ 文件缺失确属异常，仍判 fail；
+        #     · 其余环境（CI、或本机无 out/ 的新克隆）→ 降级用**已提交进仓**的
+        #       data/maharo_insights.js 里出稿自述的「素材窗口 A ~ B」作次生信号
+        #       （该行由出稿 automation 每日写、随闸门推 main，云端可见）。
+        _is_ci = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+        if (not _is_ci) and (repo_root / "out").exists():
+            results.append({
+                "id": rid, "name": rname, "page": "内容审计", "status": "fail",
+                "message": f"素材文件不存在: {reports_path}（guanlan_extractor.py 从未成功产出）",
+            })
+            return results
+
+        _today = datetime.now().date()
+        _prev_td = None
+        _d = _today - timedelta(days=1)
+        for _ in range(10):
+            if _is_trading_day(_d):
+                _prev_td = _d
+                break
+            _d -= timedelta(days=1)
+
+        win_end = None
+        _ins = DATA_DIR / "maharo_insights.js"
+        try:
+            with open(_ins, "r", encoding="utf-8") as _f:
+                _m = re.search(r"素材窗口\s*(\d{4}-\d{2}-\d{2})\s*~\s*(\d{4}-\d{2}-\d{2})", _f.read())
+            if _m:
+                win_end = datetime.strptime(_m.group(2), "%Y-%m-%d").date()
+        except Exception:
+            win_end = None
+
+        if win_end is None:
+            results.append({
+                "id": rid, "name": rname, "page": "内容审计", "status": "limited",
+                "message": ("本工作区不含 out/guanlan_reports.json（out/ 被 .gitignore 忽略、双机不共享）"
+                            "⇒ 该素材新鲜度只在小九机（计划任务 v8-guanlan-refresh）可直判；"
+                            "且 data/maharo_insights.js 未自述素材窗口，本环境无法间接评估"),
+            })
+        elif win_end >= _today or (_prev_td and win_end >= _prev_td):
+            results.append({
+                "id": rid, "name": rname, "page": "内容审计", "status": "ok",
+                "message": (f"间接判据：出稿档自述素材窗口末端 {win_end}（今日 {_today}），"
+                            f"未落后；直判需在小九机（out/guanlan_reports.json）"),
+            })
+        else:
+            _lag = _count_trade_days(win_end, _today)
+            results.append({
+                "id": rid, "name": rname, "page": "内容审计", "status": "fail",
+                "message": (f"素材窗口末端 {win_end} 落后今日 {_today} 达 {_lag} 个交易日"
+                            f"（间接判据：data/maharo_insights.js 的素材窗口自述）"
+                            f"⇒ 查小九机计划任务 v8-guanlan-refresh 与 algorithms/guanlan_extractor.py"),
+            })
         return results
 
     try:
