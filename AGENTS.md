@@ -110,3 +110,17 @@
 
   它把 `AGENTS.md` / `.codebuddy/CODEBUDDY.md` / `SKILL.md` 逐字节落到**本地工作树**＋**本机 skill 副本**。
   验证：重跑一次，输出应全部为「＝ 已一致」（md5 与线上 blob 相同）；任一处打「↑ 已更新」即说明上次漏同步。
+
+- 🔴 **双机用户级目录互相独立**（2026-09-21 实测盲区，曾导致阿狸咪机「不知道入口文件」）：
+  小九机铺的 `~/.codebuddy/CODEBUDDY.md` 阿狸咪机**看不到**；且原先写死小九机路径
+  `E:\qs_workspaces\quant-scanner-v8`，对她机器是错的（盘符／路径不同）。
+  ⇒ **每台机必须单独铺自己的用户级指针**，且指针内容必须是**路径无关**版（已改为
+  `git -C <你的仓根> show origin/main:AGENTS.md` 这类与绝对路径无关的法子）。
+  - **小九机**（有专属工具）：推完入口文件跑
+    `python C:/Users/Administrator/.workbuddy/scripts/v8_handoff_edit_kit.py ai-entry-sync`
+    （同步本地工作树＋本机 skill 副本）。
+  - **阿狸咪机 / 其他任何机**（无小九机专属工具）：`git pull` 后在仓内跑
+    `python scripts/ai_entry_bootstrap.py`（仓内**自包含**脚本，自动探测仓根、写路径无关
+    用户级指针，不依赖小九机文件）。
+  - **最稳的一步**：直接把 WorkBuddy 会话工作目录设为 **v8 仓根** —— 仓内
+    `.codebuddy/CODEBUDDY.md` 会被自动加载，无需任何用户级指针。
