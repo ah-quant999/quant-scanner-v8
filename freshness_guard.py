@@ -53,7 +53,7 @@ FRESHNESS_RULES = {
     # ──盘前数据（08:15后有效至开盘）──
     "ipo_score.json":             {"threshold": 180, "category": "premarket", "label": "打新速览"},
     "margin_data.json":           {"threshold": 180, "category": "premarket", "label": "融资融券"},
-    "north_fund.json":            {"threshold": 60,  "category": "premarket", "label": "北向资金"},
+    "north_fund.json":            {"threshold": 60,  "category": "premarket", "label": "北向资金(已停披露)"},
     "analyst_ratings.json":       {"threshold": 360, "category": "premarket", "label": "分析师评级"},
     "macro_data.json":            {"threshold": 360, "category": "premarket", "label": "宏观数据"},
     # ──盘后数据（15:30后）──

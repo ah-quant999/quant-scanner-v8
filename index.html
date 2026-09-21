@@ -4066,7 +4066,7 @@ function fmtSigned(v){
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + window._rcDataDateBadge() + (window._uBadge ? window._uBadge('盘后','短线',(window.LHB_DATA && window.LHB_DATA.update_time) || NF.update_time) : '') + '</span>';
+    h += '<span class="cal-title">🌊 北向席位日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + window._rcDataDateBadge() + (window._uBadge ? window._uBadge('盘后','短线',(window.LHB_DATA && window.LHB_DATA.update_time) || (window.LHB_HISTORY && window.LHB_HISTORY.update_time) || '') : '') + '</span>';
     h += '<span class="cal-meta">'
        + '<button class="cal-nav-btn" onclick="_northCalPrev()" title="上个月">◀</button>'
        + ' <span id="northCalYearMonth">' + year + '年' + (month+1) + '月</span> '
@@ -4323,8 +4323,8 @@ function fmtSigned(v){
     c.innerHTML = h;
     window.__northCalRendered = true;
     }catch(e){
-      console.error('北向资金日历渲染失败', e);
-      c.innerHTML = '<div style="text-align:center;padding:40px;color:var(--dim);">北向资金日历加载失败，请刷新重试<br><span style="font-size:11px;">'+(e&&e.message?String(e.message):'未知错误')+'</span></div>';
+      console.error('北向席位日历渲染失败', e);
+      c.innerHTML = '<div style="text-align:center;padding:40px;color:var(--dim);">北向席位日历加载失败，请刷新重试<br><span style="font-size:11px;">'+(e&&e.message?String(e.message):'未知错误')+'</span></div>';
       window.__northCalRendered = false;
     }
   }
@@ -4416,7 +4416,7 @@ function fmtSigned(v){
     //   两路共振日历，必须等它们都就绪才开始计算；但本卡「更新于」时间戳
     //   不能跟着这两路共振日历一起变——否则盘后基础数据 15:xx 算好后会被
     //   龙虎榜 17:xx / 北向 22:xx 拖到很晚，徽章永远显示「今日盘后」。
-    var _resReady = !!(LHB.update_time && NF.update_time);
+    var _resReady = !!(LHB.update_time && (window.LHB_HISTORY && window.LHB_HISTORY.update_time));
     if (!_resReady) {
       c.innerHTML = '<div style="text-align:center;padding:40px;color:var(--dim);">等待机游共振与北向席位数据就绪…<br><span style="font-size:11px;">两路共振日历齐全后自动计算</span></div>';
       window.__insightRendered = false;
