@@ -8038,7 +8038,7 @@ function fmtSigned(v){
 
   // ===== 🔮 AI 洞察·多源观点对比（2026-09-15 主人令·方案A：「统计」→「实情解析」）=====
   // 宿主：🌍 观测平台 > 🌍 宏观观测（2026-09-15 由「暂未上架·观测类」整卡迁入，置于 K 型分层卡上方）
-  // 数据源：window.MAHORO_INSIGHTS —— 每日 08:50「AI 阅读后撰写」产出，与「机构研究·AI 解析建议」同源同稿。
+  // 数据源：window.MAHORO_INSIGHTS —— 每日 08:50 / 12:30 / 15:10「AI 阅读后撰写」产出，与「机构研究·AI 解析建议」同源同稿。
   //   三段实情解析由每日 AI 步骤直接写入 MAHORO_INSIGHTS.compare（三段各 3 行 + 顶部一句话结论），
   //   前端直读 ⇒ 与源卡同一时刻刷新（不再走 raw→update_v8 桥接，避免滞后一整天）。
   //   旧「统计」口径（极性百分条 / 板块绝对次数条 / 字数）与 scripts/fetch_ai_insights_compare.py
@@ -8068,7 +8068,7 @@ function fmtSigned(v){
       ['delta',   '&#x2461; 与本段上次相比的边际变化'],
       ['align',   '&#x2462; 与更长周期的分歧/一致']
     ];
-    var PENDING = '实情解析待出稿（每日 08:50 随 AI 解析同步产出）';
+    var PENDING = '实情解析待出稿（每日 08:50 / 12:30 / 15:10 随 AI 解析同步产出）';
     function segBlock(o){
       var s = SEG[o.k];
       var body = '';
@@ -8092,7 +8092,7 @@ function fmtSigned(v){
     dst.innerHTML = ''
       + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
       + '<b style="font-size:15px;">&#x1F52E; AI 洞察·多源观点对比</b>'
-      + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#8b5cf6;background:rgba(139,92,246,.16);border:1px solid rgba(139,92,246,.4);letter-spacing:.5px;">&#x1F4C6; 日更 · 每日 08:50</span>'
+      + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#8b5cf6;background:rgba(139,92,246,.16);border:1px solid rgba(139,92,246,.4);letter-spacing:.5px;">&#x1F4C6; 日更 · 盘前 08:50 / 午间 12:30 / 盘后 15:10</span>'
       + _uBadge('auto', '中长线', M.update_time, 'MAHORO_INSIGHTS 聚合 ' + srcN + ' 源 · AI 阅读后撰写')
       + '</div>'
       // 核心 / 解析（2026-09-15 主人令：口径由「统计」改为「实情解析」）
@@ -8129,7 +8129,7 @@ function fmtSigned(v){
       // 底部口径
       + '<div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
       + '&#x26A0;&#xFE0F; <b style="color:#8b5cf6;">展示型卡</b>：本卡与「机构研究 · AI 解析建议」<b>同源同稿</b>（window.MAHORO_INSIGHTS），'
-      + '由每日 08:50 的 AI 步骤阅读后撰写，<b>不抓新源、不增加新接口</b>。'
+      + '由每日 08:50 / 12:30 / 15:10 的 AI 步骤阅读后撰写，<b>不抓新源、不增加新接口</b>。'
       + '三段实情解析为 <b>AI 转述 + 判断</b>，其中个股名称一律为机构观点转述、非推荐，需回原文核对。'
       + '解析出稿于 ' + _ev(C.generated_at || '—') + ' · 数据源更新于 ' + _ev(M.update_time || '?') + ' · 仅供研究参考，不构成个人投资建议。'
       + '</div>';
@@ -17883,13 +17883,13 @@ h+=`</div>`;
        + '<span style="font-size:14px;font-weight:800;color:var(--cyan);flex:0 0 auto;white-space:nowrap;">机构研究 · AI 解析建议</span>'
        + '<span style="flex:0 0 auto;" id="maharoFresh">—</span>'
        // 2026-09-13 主人令：频率标注（日频 · 每日 08:50 出稿 / 08:30 更新正文）
-       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#34d399;background:rgba(52,211,153,.16);border:1px solid rgba(52,211,153,.4);letter-spacing:.5px;">📆 日更 · 每日 08:30</span>'
+       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#34d399;background:rgba(52,211,153,.16);border:1px solid rgba(52,211,153,.4);letter-spacing:.5px;">📆 日更 · 盘前 08:50 / 午间 12:30 / 盘后 15:10</span>'
        + '<span style="font-size:11px;color:var(--dim);margin-left:4px;flex:0 1 auto;min-width:120px;">观澜台/金斧头/逻辑与思考/树枝报告/180K Research/智堡 Wisburg/Vito行研札记 · AI 阅读后撰写</span></div>'
        // ── ② 分析块（卡名下方）：核心 / 用法 / 限制；与下方两卡版式统一 ──
        + '<div style="padding:0 14px;"><div style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.25);border-radius:8px;padding:10px 12px;margin:10px 0;line-height:1.7;font-size:12px;color:var(--txt);">'
        + '<b style="color:#34d399;">&#x1F4CC; 核心：</b>把机构研报原文交给 AI 阅读后写成可执行要点。<br>'
        + '<b style="color:#34d399;">&#x1F4A1; 用法：</b>盘前 5 分钟掌握机构共识与分歧，落到本日操作。<br>'
-       + '<b style="color:#34d399;">&#x26A0; 限制：</b>AI 摘要，判断需回原文核对；每日 08:50 出稿，正文 08:30 更新。</div></div>'
+       + '<b style="color:#34d399;">&#x26A0; 限制：</b>AI 摘要，判断需回原文核对；盘前 08:50 / 午间 12:30 / 盘后 15:10 三档出稿。</div></div>'
        + '<div id="maharoCardBody"><div class="note">加载中…</div></div></div>';
 
     // ═══ 🔮 2026-09-15 主人令：AI 洞察·多源观点对比 由「暂未上架·观测类」整卡迁入（置于 K 型分层卡上方）═══
