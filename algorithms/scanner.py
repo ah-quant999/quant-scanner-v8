@@ -2417,8 +2417,16 @@ def _stock_names_map_s():
                 for s in json.load(f):
                     c = (s.get("code") or "").strip()
                     n = (s.get("name") or "").strip()
-                    if c and n:
-                        _SN_MAP_S[c.zfill(6)] = n
+                    if not c or not n:
+                        continue
+                    # 🛡 2026-09-21 碰撞防御：港股 5 位码(00725恒都集团/00100 MINIMAX-W/00002中电控股)
+                    #   zfill(6) 后与深市 A 股码(000725/000100/000002)碰撞且排在文件后部，
+                    #   直接覆盖会把 A 股名顶成港股名 → 6 位映射只收 A 股(沪深)条目。
+                    fc = (s.get("full_code") or "").strip().lower()
+                    mkt = (s.get("market") or "").strip().lower()
+                    if fc.startswith("hk") or mkt == "hk":
+                        continue
+                    _SN_MAP_S[c.zfill(6)] = n
             if _SN_MAP_S:
                 break  # 首个可读且非空的来源即定
         except Exception:
