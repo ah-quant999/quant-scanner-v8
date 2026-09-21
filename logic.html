@@ -5427,7 +5427,10 @@ function drawUpDownChart(){
     watch.forEach(function(key){
       const m = modules[key];
       if(!m) return;
-      const color = m.status === 'ok' ? 'var(--down)' : (m.status === 'empty' ? 'var(--gold)' : 'var(--up)');
+      /* 🛡 2026-09-21 小九：同族补齐 —— Runner 模块 status 域（ok/empty/fail）白名单化，
+         未知取值不再落 else 误红（与上方 HEALTH_CHECK 五态同一纪律）。 */
+      const _msc = {ok:'var(--down)',empty:'var(--gold)',fail:'var(--up)'};
+      const color = _msc[m.status] || 'var(--dim)';
       const dot = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+color+';margin-right:4px;"></span>';
       watchHtml += '<span style="font-size:11px;color:var(--sub);margin-right:10px;">'+dot+key+'</span>';
     });
@@ -5956,6 +5959,44 @@ function drawUpDownChart(){
 
   window.renderTaskSchedule = renderTaskSchedule;
     // 🛡 2026-08-31 轻量化：window.V8_PAGE_SCHEDULE 为死赋值（全仓无定义、无读取），已删除。
+  /* ---- 状态视觉单一真相源（与 index.html 同源 · 2026-09-15 主人令一劳永逸） ----
+
+     🛡 2026-09-21 小九补入：真源 = index.html 的同名常量 `V8_STATUS_VISUAL`
+
+     （同一 status 全集：ok/warn/fail/limited/info/skip）。两页必须**逐字同口径** ——
+
+     改一处必须同改另一处，否则「同一状态在运维页与逻辑页显示成不同颜色」。
+
+     映射铁律（主人纪律：数据及时真实可靠，算法科学严谨）：
+
+       · ok/warn/fail/limited/info/skip = 已定义语义，按表渲染
+
+       · info/limited/skip = 真·不适用（环境不支持/语义不成立）→ 灰显，不算失败
+
+       · fail/warn = 真失败 → 红/黄，必须可见
+
+       · unknown（前端没接的 status）= 接线缺口 → 显红 ‼，绝不静默灰化（藏错=违背纪律）
+
+  */
+
+  var V8_STATUS_VISUAL = {
+    ok:      {color:'var(--down)', sym:'✓',  bg:'rgba(31,209,123,.06)',  border:'rgba(31,209,123,.2)'},
+    warn:    {color:'var(--gold)', sym:'⚠',  bg:'rgba(251,191,36,.06)',  border:'rgba(251,191,36,.2)'},
+    limited: {color:'var(--dim)',  sym:'🔒', bg:'rgba(147,164,196,.06)', border:'rgba(147,164,196,.25)'},
+    info:    {color:'var(--dim)',  sym:'ⓘ',  bg:'rgba(147,164,196,.06)', border:'rgba(147,164,196,.25)'},
+    skip:    {color:'var(--dim)',  sym:'—',  bg:'rgba(147,164,196,.06)', border:'rgba(147,164,196,.25)'},
+    fail:    {color:'var(--up)',   sym:'✗',  bg:'rgba(244,73,93,.06)',   border:'rgba(244,73,93,.2)'},
+    unknown: {color:'var(--up)',   sym:'‼',  bg:'rgba(244,73,93,.14)',   border:'rgba(244,73,93,.5)'}
+  };
+
+  function _v8StatusVisual(s){ return V8_STATUS_VISUAL[s] || V8_STATUS_VISUAL.unknown; }
+
+  window.V8_STATUS_VISUAL = V8_STATUS_VISUAL;
+
+  window._v8StatusVisual = _v8StatusVisual;
+
+
+
   /* ---- 前端健康巡检渲染 ---- */
 
   function renderHealthCheck(){
@@ -6001,11 +6042,17 @@ function drawUpDownChart(){
 
     const s = H.summary || {};
 
-    const overallColor = overall === 'ok' ? 'var(--down)' : (overall === 'warn' ? 'var(--gold)' : 'var(--up)');
+    /* 🛡 2026-09-21 小九：五态口径补齐 —— 原三元链把 limited/info/未知 全落 else ⇒ 显成红色「✗ 异常」假告警。
 
-    const overallText = overall === 'ok' ? '✓ 正常' : (overall === 'warn' ? '⚠ 警告' : '✗ 异常');
+       与主站 index.html renderHealthCheck 同口径：🔒 limited / ⓘ info / ‼ other 都必须显示，
 
-    if(sum) sum.innerHTML = '<span style="color:'+overallColor+'">'+overallText+'</span> · ✓ '+(s.ok||0)+' · ⚠ '+(s.warn||0)+' · ✗ '+(s.fail||0)+' / 共 '+(s.total||0)+' 项';
+       否则 summary 分项之和 ≠ total（后端 build_report 特意算这三项就是为了对账）。 */
+
+    const overallColor = overall === 'ok' ? 'var(--down)' : (overall === 'warn' ? 'var(--gold)' : (overall === 'fail' ? 'var(--up)' : 'var(--dim)'));
+
+    const overallText = overall === 'ok' ? '✓ 正常' : (overall === 'warn' ? '⚠ 警告' : (overall === 'fail' ? '✗ 异常' : '— 未知'));
+
+    if(sum) sum.innerHTML = '<span style="color:'+overallColor+'">'+overallText+'</span> · ✓ '+(s.ok||0)+' · ⚠ '+(s.warn||0)+' · 🔒 '+(s.limited||0)+' · ⓘ '+(s.info||0)+' · ✗ '+(s.fail||0)+(s.other?(' · ‼ '+(s.other||0)+' 接线缺口'):'')+' / 共 '+(s.total||0)+' 项';
 
     const byPage = {};
 
@@ -6027,13 +6074,13 @@ function drawUpDownChart(){
 
       byPage[page].forEach(function(it){
 
-        const color = it.status === 'ok' ? 'var(--down)' : (it.status === 'warn' ? 'var(--gold)' : 'var(--up)');
+        /* 🛡 2026-09-21 小九：改走**同源**映射（原三元链把 limited/info/未知 status 全落 else
 
-        const sym = it.status === 'ok' ? '✓' : (it.status === 'warn' ? '⚠' : '✗');
+           ⇒ 显成红色 ✗「异常」）。用的是与 index.html 同一份 V8_STATUS_VISUAL，杜绝两页口径打架。 */
 
-        const bg = it.status === 'ok' ? 'rgba(31,209,123,.06)' : (it.status === 'warn' ? 'rgba(251,191,36,.06)' : 'rgba(244,73,93,.06)');
+        const _vis = _v8StatusVisual(it.status);
 
-        const border = it.status === 'ok' ? 'rgba(31,209,123,.2)' : (it.status === 'warn' ? 'rgba(251,191,36,.2)' : 'rgba(244,73,93,.2)');
+        const color = _vis.color, sym = _vis.sym, bg = _vis.bg, border = _vis.border;
 
         html += '<div style="background:'+bg+';border:1px solid '+border+';border-radius:6px;padding:6px 8px;">';
 
@@ -7876,12 +7923,20 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       if(!timeEl || !statusEl) return;
       if(!item || !item.last_update){
         timeEl.textContent = '--';
-        statusEl.innerHTML = '<span class="status-dot s-warn"></span>待扫描';
+        /* 🛡 2026-09-21 小九：占位由黄点改灰点 —— 「待扫描」是中性状态而非警告，
+           与下方五态口径统一（灰=无此项/待扫描，红=接线缺口）。 */
+        statusEl.innerHTML = '<span class="status-dot s-off"></span>待扫描';
         return;
       }
       timeEl.textContent = item.last_update.slice(0,16).replace('T',' ');
-      var cls = item.status==='ok' ? 's-ok' : (item.status==='fail' ? 's-fail' : 's-warn');
-      var txt = item.status==='ok' ? '正常' : (item.status==='fail' ? '失败' : '待更新');
+      /* 🛡 2026-09-21 小九：① 原用 s-fail —— CSS 里根本没有这个类
+         （只有 .s-ok/.s-warn/.s-err/.s-off）⇒ **失败时圆点无色**（真 bug）。
+         ② limited/info 落 else 被显成「待更新」+ 黄点（误报）。
+         现与 V8_STATUS_VISUAL 同口径：limited/info/skip = 灰（真·不适用）；
+         unknown = 红（接线缺口必须可见，不得静默灰化）。 */
+      var _rsc = {ok:['s-ok','正常'],warn:['s-warn','待更新'],limited:['s-off','受限'],info:['s-off','不适用'],skip:['s-off','不适用'],fail:['s-err','失败']};
+      var _rs = _rsc[item.status] || ['s-err','未知'];
+      var cls = _rs[0], txt = _rs[1];
       statusEl.innerHTML = '<span class="status-dot '+cls+'"></span>'+txt;
     }
     setRow('Candidate', map['CANDIDATE']);
@@ -7960,8 +8015,14 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     // 2) HEALTH_CHECK 失败项
     var hc = window.HEALTH_CHECK || {};
     (hc.items || []).forEach(function(it){
-      if(!it || it.status === 'ok') return;
-      diags.push('文件 <b>'+it.id+'</b> '+(it.status==='fail'?'失败':'待更新')+'：最后更新 '+(it.last_update || '--')+(it.message ? ' · '+it.message : ''));
+      /* 🛡 2026-09-21 小九：黑名单 → 白名单（诊断区只列真失败）。
+         病灶：原只排除 ok ⇒ warn/limited/info 全进诊断区；info 项文案「CI 环境（一次性浅克隆）内本项语义不成立，跳过」
+         被显成「文件 local_sync 待更新」（主人 2026-09-21 截图那一行）。
+         黑名单每新增一个状态就漏一个 ⇒ 白名单一劳永逸（与 index.html _renderOpDiagnostics 同口径）。 */
+      if(!it || it.status !== 'fail') return;
+      /* 🛡 2026-09-21 小九：上方已白名单化（只 fail 可达）⇒ 原三元链的「待更新」分支是**死代码**，
+         按主人令彻底删除，不留半截引用（此前它正是把 info 项显成「文件 local_sync 待更新」的执行体）。 */
+      diags.push('文件 <b>'+it.id+'</b> 失败：最后更新 '+(it.last_update || '--')+(it.message ? ' · '+it.message : ''));
     });
     // 3) 候选股池来源归零
     var cand = window.CANDIDATE || {};

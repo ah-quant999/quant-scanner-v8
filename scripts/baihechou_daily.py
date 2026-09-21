@@ -60,10 +60,20 @@ SYNC_FILES = [
     'scripts/fetch_baihechou_v8.py',
     'scripts/set_baihechou_analysis.py',
 ]
+# 🛡 2026-09-21 小九（一劳永逸 · 补生产者链）：
+#   2026-09-18 把 AI 解析拆成独立文件 data/BAIHECHOU_ANALYSIS.js 并让**前端优先读它**
+#   （index.html: `window.BAIHECHOU_ANALYSIS || d.analysis`），但当时的拆分**只改了前端与注释**，
+#   本清单没加该文件 ⇒ 独立文件自 09-18 06:31 起 3 天零写入，而它因优先读把每日照常出新的
+#   MACRO.analysis 屏蔽掉，卡面解析冻结在 09-17 窗口、健康检查判 fail（age 4692min）。
+#   ⇒ 生产者链三处必须同修：本清单 + scripts/set_baihechou_analysis.py（双写）
+#     + 每日 AI 步骤章程（须写明产出该文件）。缺任一处，文件就没人写。
+#   注：**不进 SYNC_FILES** —— 该清单语义是「从远端拉待执行的脚本代码」，产物不该混入。
 PUSH_FILES = [
     'data/BAIHECHOU_MACRO.js',
+    'data/BAIHECHOU_ANALYSIS.js',
     'raw_data/baihechou_posts.json',
 ]
+ANA_JS = 'data/BAIHECHOU_ANALYSIS.js'
 DATA_JS = 'data/BAIHECHOU_MACRO.js'
 RAW_JSON = os.path.join(REPO_DIR, 'raw_data', 'baihechou_posts.json')
 
@@ -265,10 +275,21 @@ def cmd_verify(online=False):
         return 1
     ut, ga = _ut_of(txt), _ga_of(txt)
     ok = ut.startswith(today) and ga.startswith(today)
+    # 🛡 2026-09-21 小九（一劳永逸 · 拆假绿）：原判据**只看 MACRO** ⇒
+    #   独立文件（前端优先读的那份）停更 3 天，而这里天天判「今日已完成」= 假绿，
+    #   08:30 兜底的幂等守卫也因此永不触发（它以为已做完）。
+    #   ⇒ 补第二条硬判据：独立文件 update_time 亦须属当日。两文件都当日才算完成。
+    atxt = _remote_text(sha, ANA_JS)
+    aut = _ut_of(atxt) if atxt else ''
+    ana_ok = bool(aut) and aut.startswith(today)
+    ok = ok and ana_ok
     print('远端 tip      = %s' % sha)
     print('远端 update_time        = %s' % (ut or '?'))
     print('远端 analysis.generated_at = %s' % (ga or '?'))
-    print('今日(%s) 判定  = %s' % (today, '已完成' if ok else '未完成'))
+    print('远端 %s update_time = %s' % (ANA_JS, aut or ('(取不到)' if not atxt else '?')))
+    print('今日(%s) 判定  = %s' % (today,
+          '已完成（MACRO + 独立文件双当日）' if ok else
+          ('未完成（独立文件非当日 ⇒ 前端卡面仍会冻结，需写独立文件）' if not ana_ok else '未完成')))
     if online:
         b = req(PAGES + '/' + DATA_JS + '?t=' + str(int(time.time())), raw=True)
         if b:
@@ -305,6 +326,8 @@ def cmd_push(msg):
             r_ut, l_ut = _ut_of(rtxt), _ut_of(lt)
             print('  %-38s 远端 update_time=%s / 本地=%s' % (p, r_ut or '?', l_ut or '?'))
             if r_ut and l_ut and r_ut > l_ut:
+                # 2026-09-21：独立文件 data/BAIHECHOU_ANALYSIS.js 顶层已带 update_time（由
+                #   set_baihechou_analysis.py 写入）⇒ 本保护对它同样生效，无需特判。
                 print('  [STOP] 防倒退：远端产物比本地新 ⇒ 拒推本文件（避免覆盖他人新鲜产物）')
                 return 3
         b = req(API + '/git/blobs', 'POST',

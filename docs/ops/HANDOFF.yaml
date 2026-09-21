@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 13:48"
+  updated: "2026-09-21 15:10"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 27
+  next_id_seq: 28
 
 items:
 
@@ -418,8 +418,8 @@ items:
 
   - id: baihechou-analysis-no-producer
     priority: P0
-    owner: 阿狸咪
-    status: todo
+    owner: shared
+    status: pending-verify
     what: >
       **`data/BAIHECHOU_ANALYSIS.js` 自 2026-09-18 起 3 天零写入（无生产者）**，
       而线上前端**优先读它** ⇒ 「新周期判定」卡面解析冻结在 09-18（覆盖窗口「09-17 全天」）；
@@ -442,10 +442,39 @@ items:
       `HEALTH_CHECK.js` @2026-09-21 11:28:15 判该项 **fail**「更新于 3天前 06:31；超过阈值 313 分钟」
       （`v8_health_check.py` 该卡 max_age=1560min）—— **真红，非周末假红**。
       阿狸咪 2026-09-21 11:40 CST 实测（云读 Contents API + git/blobs + commits API）。
+    resolution: >
+      **小九 2026-09-21 13:2x 落地（代码侧三处同修 + 当日即时恢复）**。
+      定性：这不是「阈值太严」的误报，是**真红** —— 09-18 的拆分**只做了一半**：
+      前端注入了独立文件并**优先读它**，但没人写它。本项原 fix 的 ① 修在「推送清单」上，
+      那只解决「写好后推不出去」，没解决「根本没人写」⇒ 必须补**生产者本身**。
+      · ① 生产者（根因）：`scripts/set_baihechou_analysis.py` 由「只写 MACRO.analysis」
+        改为**双写**（同源同写独立文件，顶层回填 `update_time`=解析 `generated_at`）；
+        并加 `--rebuild-analysis-only` 开关，供「独立文件缺生产者」事故即时恢复
+        （把 MACRO 里已有当期解析搬过去，无需重跑 AI 出稿）。Δ=+3243 B。
+      · ② 推送清单：`scripts/baihechou_daily.py::PUSH_FILES` 增加该文件；
+        **刻意不进 SYNC_FILES**（该清单语义是「从远端拉待执行脚本代码」，产物不该混入）。Δ=+1934 B。
+      · ③ 判据去假绿：`cmd_verify` 原**只看 MACRO** ⇒ 独立文件停更 3 天仍判「今日已完成」
+        （08:30 幂等兜底因此永不触发）。现加第二条硬判据：独立文件 `update_time` 亦须属当日，
+        **两文件都当日才算完成**。真跑 4/4 反测通过（含本次病灶情形已能拦下）。
+      · ④ 即时恢复：用线上 MACRO 里已有的当日解析（`generated_at=2026-09-21 06:38`，非重跑 AI）
+        真跑 `--rebuild-analysis-only` 重建独立文件 —— 4266→**6005 B**，
+        `window` 覆盖由「09-17 全天」扩至「09-17 至 09-19」，判龄 4692.5→**380.3 min**（ok）。
+      · ⑤ 登记补 `producer`（v8_health_check.py 该卡）⇒「卡名 → 产出脚本」一行可反查。
+      ⚠️ **尚欠一半（故本项不置 done）**：阿狸咪机 06:30 主跑 / 08:30 兜底的**执行章程**仍须
+      写明「产出 data/BAIHECHOU_ANALYSIS.js」（原 fix ②）。代码已能写该文件，
+      但她那两条自动化的提示词不在本仓，小九改不到。**章程未改前，明日仍可能双文件只写其一**
+      —— 只是本项判据已改为「两文件都当日」，届时会如实报未完成（不再假绿）。
     verify_how: >
       ① 09-22 06:30 跑完后，远端该文件 `generated_at` 属当日；② `HEALTH_CHECK.js` 该项回到 ok；
       ③ 线上卡面角标不再显示 09-18（09-18 拆分档 §7.2「线上前端角标 待肉眼确认」至今未闭环，可一并收口）。
-    updated: "2026-09-21 11:40"
+      ④ **[小九补] 频率量法（唯一硬判据，禁用单点观察）**：
+      `GET /repos/ah-quant996/…/commits?path=data/BAIHECHOU_ANALYSIS.js&per_page=20` 取
+      `commit.committer.date` 逐差取中位。改前：提交历史**仅 1 笔**（无频率可言，3 天空窗）。
+      改后应与 MACRO 同频（每日 1~2 笔、中位 ≈ 24h，盘前档）。
+      ⚠️ **禁用「单次看到当日值」当生效证据** —— 全量构建本就偶发能给出当日值。
+      ⑤ 同日对照：`data/BAIHECHOU_MACRO.js` 与 `data/BAIHECHOU_ANALYSIS.js` 的
+      `update_time` 应落在同一天且相差 < 2h（双写语义）。
+    updated: "2026-09-21 15:10"
 
   - id: factorlab-conflict-tree-pollution
     priority: P2
@@ -558,6 +587,86 @@ items:
       ② 真跑：在 09:30–09:32 之间 dispatch 一次，断言 run 的 `conclusion != skipped`
          且日志**不含**「迟到档/窗外」。
     updated: "2026-09-21 09:33"
+
+  - id: diagnostics-info-status-leak
+    priority: P1
+    owner: 小九
+    status: pending-verify
+    what: >
+      运维面板「失败/诊断详情」把**第五态 `info`** 误渲染成「待更新」。
+      后端 `v8_health_check.py::build_report` 于 2026-09-15 新增 info 桶（其注释原文
+      「info 桶（真·不适用，非失败）」，不计 fail、不拉红 overall），但前端
+      `index.html::_renderOpDiagnostics` 的状态过滤仍停在「四态」（ok/limited/warn/fail），
+      **漏接 info** ⇒ info 项落进 `else` 分支被显示成「待更新」。
+      实测病灶（2026-09-21 12:43:32 线上 `HEALTH_CHECK.js`）：`local_sync` status=info、
+      message「CI 环境（一次性浅克隆）内本项语义不成立，跳过」，被渲染成
+      「文件 local_sync 待更新：最后更新 -- · CI 环境（一次性浅克隆）内本项语义不成立，跳过」
+      —— **文案自带「跳过」却被列为「待更新」**，自相矛盾且常驻诊断区。
+      属「后端发了前端没接的 status」家族（后端注释自己就警告过 `other>0` 即此症）。
+      同族普查（2026-09-21 线上真身实测）发现**逻辑详解页更严重**：`logic.html` 对第五态的
+      处理**一处都没有**（`status === 'info'` 与 `status === 'limited'` 计数均为 0），后果三连：
+      ① `renderHealthCheck` 网格四色三元链把 info/limited/未知全落 else ⇒ 渲染成**红色 ✗**
+      （比 index.html 的「待更新」更误）；② summary 只列 ok/warn/fail ⇒ 分项之和 ≠ total
+      （后端特意算 limited/info/other 就是为了对账）；③ 诊断区黑名单只排除 ok
+      ⇒ warn/limited/info 全进诊断区。
+      另有独立真 bug（与 info 无关）：两页 `setRow` 均用 class `s-fail`，而 CSS 里
+      **只有 .s-ok/.s-warn/.s-err/.s-off**（`.s-fail` 定义数 = 0）⇒ **失败时圆点无色**。
+      ⚠️ 与本批另一项（baihechou）性质相反：那条是**真红**，本条是**真误显**。
+    fix: >
+      **六处同修**（两页各三处 + 后端一处）。核心纪律：**黑名单 → 白名单** —— 本 bug 的
+      复发机制正是「后端一加状态、前端黑名单就漏一个」⇒ 一律改为「诊断区只列 fail、
+      颜色/文案走五态映射表 + 中性灰兜底」，未来新增状态默认不误红、也不静默漏掉。
+      index.html（3 处）：
+      ① `_renderOpDiagnostics` 过滤行由黑名单（只排除 ok/limited/warn）改为
+         `if(!it || it.status !== 'fail') return;`；
+      ② 同函数 `setRow` 改五态映射：`.s-err` 真红（取代无定义的 `s-fail`）、
+         `info`→`.s-off`+「不适用」、`limited`→「受限」、未知→中性「未知」；
+      ③ 上方注释「状态列另有 s-ok/s-fail/s-warn 三色点」类名同步更正为 s-ok/s-warn/s-err。
+      logic.html（4 处）：
+      ④ **补入与 index.html 逐字同源的** `V8_STATUS_VISUAL` + `_v8StatusVisual()`——
+         logic.html 此前完全没有这套机制（实测计数 = 0），网格四色改为消费它；
+      ⑤ 同函数 summary 行补 `🔒 limited · ⓘ info · ‼ other`（与 index.html 同口径），
+         overall 兜底 `unknown` 由红改中性灰；
+      ⑥ 诊断区过滤行同样白名单化；`setRow` 五态化（limited/info/skip = 灰、unknown = 红）。
+      🔴 自我纠错记录（本轮）：初版曾自造 `_hsc` 映射，把 limited 定为金色、unknown 定为灰 `?`，
+      与该文件早已存在的权威常量 `V8_STATUS_VISUAL`（2026-09-15 主人令「状态视觉单一真相源」）
+      **正好相反** ⇒ 已废弃自造表、改为逐字复用，并加「两页逐字一致」+「不得出现 _hsc」双断言防再犯。
+      ⚠️ 该常量在 index.html 是**单一真相源**：将来改配色/加状态，**必须两页同改**，否则
+      「同一状态在运维页与逻辑页显示成不同颜色」——这正是本次要根治的「特立独行」家族。
+      v8_health_check.py（1 处 · 源头）：
+      ⑦ `check_local_head_sync` 的 CI 分支由「返回 1 个 status=info 项」改为 `return []`
+         ——「语义不成立」的正确表达是**无此项**，不是「一个会被误显的项」。
+         （self_heal 按 iid 匹配派发，本项不在报告里即不派发；CI 内本就不该做本地 git 对齐。）
+      死代码同步清理：白名单化后诊断区 `'待更新'` 分支不可达 ⇒ 两页均已**彻底删除**，
+      不留半截引用（该分支正是把 info 显成「待更新」的执行体）。
+      ⚠️ 行尾纪律：`logic.html` 恒 CRLF（裸 LF 必须为 0），`index.html` 恒纯 LF —— 两页不同，
+      改错一侧会造成整文件行尾翻转的巨型 diff。
+      仅修前端会留下「后端仍发已知无意义的项」这一冗余源 ⇒ ⑦ 必须同批。
+    evidence: >
+      改前线上 `HEALTH_CHECK.js`（2026-09-21 12:43:32）summary=`{ok:120, warn:0, fail:1, limited:2, info:1, total:124}`，
+      items 中 `local_sync` 实际存在且 status=info（另一条 fail 即 baihechou 项）。
+      同族普查（2026-09-21 13:1x 取线上真身实测计数）：`index.html` 含 info 判定 0 处；
+      `logic.html` 含 `status === 'info'` / `status === 'limited'` 各 0 处；
+      两文件均出现 `s-fail` 而 CSS 中 `.s-fail` 定义数 = 0。
+      真跑（node 执行**从产物抽出的真实代码**，非手写复现）：
+      `index.html` setRow 8/8、诊断区 7/7；`logic.html` 网格 8/8、setRow 8/8、诊断区 8/8
+      —— 全部为「仅 fail 进诊断区、limited/info/skip 灰、unknown 红 ‼（接线缺口可见）」。
+      两页 `V8_STATUS_VISUAL` 逐字一致（真源 = index.html）；两页均无自造映射 `_hsc`。
+      另：`index.html` 改前/改后均 34/34 保护锚点齐备（不阻断 Pre-deploy audit）；
+      `logic.html` 不在该锚点门禁范围内（pre_deploy_audit 仅扫 index.html），
+      但其 4 页 `<script src>` 断链检查仍覆盖 logic.html，本批未增删任何 script 标签。
+    verify_how: >
+      ① 推上线后取线上 `HEALTH_CHECK.js`，断言 items 中**不存在** `id == "local_sync"`
+         （由 `return []` 从源头消除）；
+      ② 硬抓线上 `index.html`，断言 `_renderOpDiagnostics` 过滤行为
+         `if(!it || it.status !== 'fail') return;`、含 `var _isc = ` 五态映射、
+         且 `s-fail` 在**生效代码行**中出现 0 次；
+      ③ 硬抓线上 `logic.html`（注意恒 CRLF：裸 LF 必须为 0），断言含 `const _hsc = `
+         五态映射、summary 行含 `(s.limited||0)` 与 `(s.info||0)`、诊断区为白名单式；
+      ④ 以 status=info 的项喂两页诊断区函数，断言不进诊断区；以未知 status 喂网格/setRow，
+         断言不显红（中性灰）。
+      ⚠️ ② ③ 与 ① 分别验证「两页不显」与「后端不发」，**缺一即回归风险**（两条路径独立）。
+    updated: "2026-09-21 15:10"
 
   # ── 已完成（保留近期项供追溯，每月清理一次）────────────────────────────
   - id: strong-breakout-purge

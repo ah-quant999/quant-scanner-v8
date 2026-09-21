@@ -91,7 +91,14 @@ CARD_DEFS = [
     #   巡检**全程零告警**。与「BACKTEST_TDX 双盲区」同型（判据：有产物 ≠ 有当期内容）。
     #   本项独立校验解析文件（window.BAIHECHOU_ANALYSIS，顶层 update_time = 解析出稿时刻）。
     #   日频 06:30 主跑 / 08:30 兜底 ⇒ 1560min（26h）红线留足跨夜与兜底重试余量。
-    {"id": "BAIHECHOU_ANALYSIS", "name": "新周期判定·AI解析", "page": "暂未上架·观测类", "freq": "工作日盘前(06:30 主跑/08:30 兜底)", "max_age": 1560, "key_fields": ["verdict", "sections", "generated_at"], "weekend_update": False},
+    # 🛡 2026-09-21 小九（补 producer · 铁律「看板卡名 → 产出脚本」一行可反查）：
+    #   本项曾因「拆分只做一半」造出 3 天真红（详见 scripts/set_baihechou_analysis.py 头注）：
+    #   09-18 把 AI 解析拆成独立文件并让前端**优先读它**，但没给独立文件生产者 ⇒
+    #   它停在 09-18 06:31（提交历史仅 1 笔），本巡检判 fail（age 4692min）而前端卡面
+    #   解析冻结 —— 真红，非周末假红。补 producer 后登记项与产出方直接可查，不再靠翻档。
+    #   判龄口径：max_age=1560（26h，留足跨夜与 08:30 兜底重试）；其值为
+    #   独立文件顶层 update_time（= 解析出稿 generated_at），非原文抓取时刻。
+    {"id": "BAIHECHOU_ANALYSIS", "name": "新周期判定·AI解析", "page": "暂未上架·观测类", "freq": "工作日盘前(06:30 主跑/08:30 兜底)", "max_age": 1560, "key_fields": ["verdict", "sections", "generated_at"], "weekend_update": False, "producer": "scripts/set_baihechou_analysis.py（经 scripts/baihechou_daily.py finish 调用 · 本机/阿狸咪机 AI 解析步骤）"},
 
     # 实时数据
     {"id": "INDEX_QUOTES", "name": "全球指数 / 股指期货", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["items"]},
@@ -2466,9 +2473,17 @@ def check_local_head_sync():
     #   ⇒ 该判据在 CI 内**必然 FAIL** ⇒ health_patrol 的「🔁 自愈验证」step 必然 REMAIN_FAIL>0
     #   ⇒ 整轮红 + 升级邮件（近 72h 实测 9/47 = 19% 假红，持续 ≥18h）。
     #   本检查只在运维机（小九 / 阿狸咪本机）有意义，CI 内直接短路。
+    # 🛡 2026-09-21 小九（一劳永逸 · 从源头消除误显）：原返回一个 status=info 的报告项，
+    #   语义是「本项在 CI 内不成立」。但「不成立」的正确表达是**无此项**，不是「一个 info 项」：
+    #   · 前端 index.html 的 _renderOpDiagnostics 当时漏接第五态 info（后端 build_report
+    #     2026-09-15 新增），把它渲染成
+    #     「文件 local_sync 待更新：最后更新 -- · CI 环境（一次性浅克隆）内本项语义不成立，跳过」
+    #     —— 文案自带「跳过」却被列为「待更新」，自相矛盾且常驻运维「失败/诊断详情」。
+    #   · 即便前端已补齐 info（同批修复），后端再发一个「自知无意义」的项仍是冗余噪声。
+    #   ⇒ 直接 return []。本检查只在运维机（小九 / 阿狸咪本机）有意义，CI 内本就不存在此项。
+    #   （self_heal 按 iid 匹配派发，本项不在报告里即不派发 —— CI 内本就不该做本地 git 对齐。）
     if os.environ.get("GITHUB_ACTIONS") == "true":
-        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
-                 "status": "info", "message": "CI 环境（一次性浅克隆）内本项语义不成立，跳过"}]
+        return []
 
     try:
         local = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, timeout=10).strip()
