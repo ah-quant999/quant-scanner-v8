@@ -52,14 +52,41 @@ raw_data/*.json     text eol=lf
 #     scripts/normalize_eol.py → git check-attr，故**补此规则即自动扩展收口范围**。
 data/*.json         text eol=lf
 raw_data/history/*.json  text eol=lf
-# 2026-09-21 阿狸咪再补漏（同源根因第二处 · 判据 178 完整形态）
-#   09-20 只补了 data/ 与 raw_data/ 两族，**未按特征扫全仓** ⇒ docs/ops/** 仍残留
-#   「入库 blob 本身是 CRLF 且属性 unspecified」⇒ 该文件永久脏、工作树与 blob 永不等。
-#   实证：docs/ops/index_protected_markers.txt 入库 blob CR=78；本次改动后 git 提示
-#         「LF will be replaced by CRLF」⇒ 只归一化 blob 而不补规则必复发。
-#   本批同做两件（缺一不可）：① 补本规则；② 归一化该文件 blob（CR 87→0）。
+# 2026-09-21 阿狸咪再补漏（同源根因第二处）
+#   ⚠️ 更正 09-21 早先写入本段的错误表述：原文称该文件「永久脏」——**不成立**。
+#      实测：属性 unspecified 时 blob 与工作树**同为 CRLF** ⇒ git 判为一致，`git status` 全空。
+#      「永久脏」的**完整判据**是三元组：`i/crlf` **且** `attr 含 eol=lf` **且** `w/crlf`
+#      ——缺 attr 那一项就会把「一致态」误报成脏（笔者本轮踩过：awk 漏检 attr 项，
+#      误称「全仓 18 个永久脏」，实测真值为 **0 个**）。
+#   本规则的真实价值 = **预防**：一旦有人对同类加宽泛规则，这批文件会集体变真永久脏。
+#   两件同做：① 补本规则；② `git add` 令 clean filter 自动把 blob 归一为 LF（无需手工改工作树）。
 docs/ops/*.txt      text eol=lf
 
 # 🔴 累积型重要档案（禁止误删）—— 由 guard_protected_files.py 守卫
 data/SECTOR_CYCLE_ARCHIVE.js -diff -merge
 PROTECTED_FILES.json -diff -merge
+
+# ═══ 2026-09-21 主人授权（阿狸咪的工程师）：残留 CRLF blob 预防性收口 ═══
+# 【为什么做】以下文件「入库 blob = CRLF + 无 text 属性」⇒ 当前 git 判为**一致、并不脏**
+#   （实测 `git status` 全空、`git diff HEAD` 无差异）。但它们是**隐患**：一旦有人对同类
+#   加宽泛规则（如 `*.md text eol=lf`），这批会**集体变成真·永久脏**
+#   （判据三元组：i/crlf + attr 含 eol=lf + w/crlf ⇒ clean filter 输出 LF ≠ 库中 CRLF，永不等）。
+# 【为什么用窄规则】**刻意不写 `*.md` / `*` 等宽泛式**：本仓 .md 近千、路径分散，
+#   宽泛规则会让「下次谁 add 某个 md」就意外改写一个 blob ⇒ 就是踩踏/暴风的来源。
+#   逐族列窄规则，把影响面**精确锁定**在已知的这几个文件。
+# 【归一化命令 = `git add --renormalize <显式路径>`】**不是** 普通 `git add`！
+#   实测教训：普通 `git add` 对「内容未变（stat 未变）」的文件会**跳过 clean filter**，
+#   blob 保持 CRLF ⇒ 加规则后跑 `git add` 会**静默无效**（笔者本轮踩过）。
+#   只有 `--renormalize` 会强制对每个文件重跑 clean。
+# 【例外】logic.html 保持 `-text -eol` 不动 —— 其 blob **有意**存 CRLF，见上文 2026-09-13 段。
+.gitignore              text eol=lf
+DO_NOT_DELETE.md        text eol=lf
+PROTECTED_FILES.json    text eol=lf
+机构研究_关注词.txt      text eol=lf
+#
+# 【刻意**不做**的一项，留证以免后人重复踩】`docs/ops/handover/*.md`
+#   实测：该目录 **541 个** .md 的 blob 均为 CRLF。加 glob 规则 ⇒ 一次改写 541 个 blob。
+#   但它们是**审计凭据**，且当前处于「一致态、不脏、无任何实际危害」
+#   ⇒ 收益（纯预防）远小于代价（批量改写凭据 + 541 文件 diff 风暴 + 触发多 workflow）。
+#   故**只对计划内的单文件族收口，不动整目录**。若将来确要治理，须**单独开批次**并
+#   在交接件里显式公告影响面。

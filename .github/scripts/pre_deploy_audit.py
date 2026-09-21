@@ -567,8 +567,16 @@ def check_backtest_caliber():
 
 def write_audit_log(results, exit_code):
     """落盘三件套审计轨迹到 raw_data/code_audit.log（append）。
-    让「何时/谁跑过三件套」有据可查。*.log 已被 .gitignore 忽略 → 不入库、不污染工作树。
+    让「何时/谁跑过三件套」有据可查。
     日志失败绝不阻断 deploy（静默吞掉）。
+
+    2026-09-21 阿狸咪修正（原注释与实现漂移，判据「注释≠真值」）：
+      · 原文写「*.log 已被 .gitignore 忽略 → 不入库」——**与事实不符**：
+        .gitignore:14 的 `*.log` 只管**未跟踪**文件，而本文件早在规则生效前就已被跟踪
+        ⇒ gitignore 对它无效，它一直被自动任务反复提交（如 481fc4dd1）。
+      · 本批同做两件：① 写侧显式 `newline="\\n"`（防 Windows 文本模式写 CRLF，
+        导致「blob=LF / 工作树=CRLF」每次 add 都整文件转换）；② 上游 `git rm --cached`
+        解除跟踪，使其**真正**回归「不入库」的设计意图。
     """
     try:
         log_path = ROOT / "raw_data" / "code_audit.log"
@@ -585,7 +593,7 @@ def write_audit_log(results, exit_code):
         status = "PASS" if exit_code == 0 else "FAIL"
         head = f"[{ts}] env={env} commit={sha} result={status}"
         body = "\n".join(f"    {lb}: {'OK' if ok else 'FAIL'} - {msg}" for lb, ok, msg in results)
-        with open(log_path, "a", encoding="utf-8") as f:
+        with open(log_path, "a", encoding="utf-8", newline="\n") as f:
             f.write(head + "\n" + body + "\n\n")
     except Exception:
         pass

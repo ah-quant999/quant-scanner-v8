@@ -39,6 +39,22 @@
   python scripts/normalize_eol.py --root . --paths a.json b.js   # 只处理指定相对路径
   python scripts/normalize_eol.py --root . --json           # 机器可读摘要
 
+■ 🔴 真伪两分（2026-09-21 阿狸咪修正 · **改本文件前必读**）
+  同一份「工作树是 CRLF 且属性要 LF」的输出里，藏着**性质完全相反的两类**，
+  判据只有一条 —— **入库 blob 是否含 CR**（`_index_blob_cr()`）：
+    · **real（真问题，blob_cr > 0）**：入库 blob **本身**就是 CRLF，属性却要 LF
+      ⇒ clean filter 输出 LF ≠ 库中 CRLF ⇒ **结构性不等，必须收口**。本脚本**自动写入**。
+    · **cosmetic（非问题，blob_cr == 0）**：blob **已是 LF**，只是工作树是 CRLF
+      （Windows `core.autocrlf=true` 的正常检出态；clean 后 = LF = blob ⇒
+      `git status` **为空、git 判为不脏**）。改它只是「美化」，代价却是该文件会进
+      下一次 commit ⇒ **制造假 diff**（实测本仓一次牵动 **86 个**文件）。
+      ⇒ 本脚本**默认跳过不写**；确要一并改须显式 `--include-cosmetic`。
+  ⚠️ 历史教训：旧版把两类混在一个 `changed` 列表里报**并全部就地写入**，
+     导致「只是想修行尾」的结果是 86 个无关文件被改。
+  ⚠️ 与「补 .gitattributes 规则」的联动：补规则**不会**自动改 blob ——
+     普通 `git add` 对 stat 未变的文件会**跳过 clean filter**（静默无效），
+     必须 `git add --renormalize <显式路径>`（笔者 2026-09-21 实测踩过）。
+
 ■ 作为库使用（api_push_raw.py / api_put_file.py 的接入方式）
   spec = importlib.util.spec_from_file_location("normalize_eol", <本文件路径>)
   mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
@@ -178,7 +194,71 @@ def normalize_bytes(rel: str, content: bytes, exp) -> bytes:
     return to_lf(content)
 
 
-def run(root: str = ".", rels=None, check: bool = False):
+def _index_blob_cr(root: str, rels) -> dict:
+    """返回 {rel: 入库 blob 中 b'\\r' 的个数}（真伪问题的**唯一**判据）。
+
+    🔴 2026-09-21 阿狸咪新增（判据修正）—— 本函数存在的唯一理由：
+      原实现把两类**性质完全不同**的文件混在一个 changed 列表里报，并被就地写入：
+        · **real（真问题）**：blob_cr > 0 ⇒ 入库 blob **本身**是 CRLF，而属性要求 LF
+          ⇒ clean filter 输出 LF ≠ 库中 CRLF ⇒ 结构性不等，**必须**收口。
+        · **cosmetic（非问题）**：blob_cr == 0 ⇒ blob **已是 LF**，只是工作树是 CRLF
+          （Windows `core.autocrlf=true` 的正常检出态；clean 后 = LF = blob ⇒
+          `git status` **为空、并不脏**）。
+          此时把工作树改成 LF 只是「美化」，代价却是**这些文件会进下一次 commit
+          ⇒ 制造 N 个假 diff**（实测本仓一次会牵动 30+ 文件）。
+      故：**只有 real 才自动写入**；cosmetic 需显式 `--include-cosmetic`。
+
+    实现：`git ls-files -s` 取索引中每个路径的 blob sha，再用 `git cat-file --batch`
+      一次性批量读回内容数 CR（避免逐文件起进程）。两个调用共用同一 dict 顺序，
+      故 `--batch` 的返回顺序与输入严格对应。
+    """
+    out = {}
+    rels = [r for r in (rels or []) if r]
+    if not rels:
+        return out
+    try:
+        r = subprocess.run([_git_exe(), "ls-files", "-s", "-z", "--"] + rels,
+                           cwd=root, capture_output=True, timeout=300)
+        if r.returncode != 0:
+            return out
+        sha = {}
+        for rec in r.stdout.decode("utf-8", "replace").split("\0"):
+            if not rec or "\t" not in rec:
+                continue
+            head, path = rec.split("\t", 1)
+            f = head.split()
+            if len(f) >= 2:
+                sha[path] = f[1]
+        if not sha:
+            return out
+        order = list(sha.keys())
+        b = subprocess.run([_git_exe(), "cat-file", "--batch"],
+                           cwd=root, input=("\n".join(sha[k] for k in order) + "\n").encode("ascii"),
+                           capture_output=True, timeout=600)
+        if b.returncode != 0:
+            return out
+        buf, pos, idx = b.stdout, 0, 0
+        while pos < len(buf) and idx < len(order):
+            nl = buf.find(b"\n", pos)
+            if nl < 0:
+                break
+            hdr = buf[pos:nl].split()
+            pos = nl + 1
+            if len(hdr) < 3:
+                break
+            try:
+                size = int(hdr[2])
+            except ValueError:
+                break
+            out[order[idx]] = buf[pos:pos + size].count(b"\r")
+            pos += size + 1
+            idx += 1
+    except Exception:
+        return out
+    return out
+
+
+def run(root: str = ".", rels=None, check: bool = False, include_cosmetic: bool = False):
     root = os.path.abspath(root)
     if rels is None:
         rels = list_tracked(root)
@@ -203,12 +283,42 @@ def run(root: str = ".", rels=None, check: bool = False):
             continue
         changed.append({"path": rel, "before_bytes": len(data),
                         "after_bytes": len(new), "crlf_removed": data.count(b"\r\n")})
+
+    # ── 真伪分类（判据 = 入库 blob 是否含 CR）；写入只对 real ──
+    real, cosmetic = [], []
+    if changed:
+        bcr = _index_blob_cr(root, [c["path"] for c in changed])
+        for c in changed:
+            n = bcr.get(c["path"])
+            c["blob_cr"] = n
+            if n is None:
+                # 取不到 blob 信息（git 不可用等）⇒ 保守归入 real，宁做勿漏
+                c["kind"] = "real"
+                real.append(c)
+            elif n > 0:
+                c["kind"] = "real"
+                real.append(c)
+            else:
+                c["kind"] = "cosmetic"
+                cosmetic.append(c)
         if not check:
-            with open(full, "wb") as f:
-                f.write(new)
+            todo = real + (cosmetic if include_cosmetic else [])
+            for c in todo:
+                full = os.path.join(root, c["path"].replace("/", os.sep))
+                try:
+                    with open(full, "rb") as f:
+                        data = f.read()
+                    with open(full, "wb") as f:
+                        f.write(to_lf(data))
+                    c["written"] = True
+                except OSError:
+                    c["written"] = False
+
     return {"root": root, "attr_source": how, "candidates": len(rels),
             "lf_expected": int(sum(1 for v in exp.values() if v)),
-            "scanned": scanned, "changed": changed, "missing": missing,
+            "scanned": scanned, "changed": changed,
+            "real": real, "cosmetic": cosmetic, "missing": missing,
+            "include_cosmetic": bool(include_cosmetic),
             "check_only": bool(check)}
 
 
@@ -218,26 +328,44 @@ def main() -> int:
     ap.add_argument("--paths", nargs="*", default=None)
     ap.add_argument("--check", action="store_true", help="只报告，不写入")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--include-cosmetic", action="store_true",
+                    help="连同「仅工作树为 CRLF、入库 blob 已是 LF」的文件一起改"
+                         "（⚠️ 非必需，且会让这些文件进下一次 commit = 制造假 diff）")
     a = ap.parse_args()
-    res = run(a.root, a.paths, a.check)
+    res = run(a.root, a.paths, a.check, a.include_cosmetic)
     if a.json:
         print(json.dumps(res, ensure_ascii=False, indent=2))
         return 0
     print("🔧 行尾归一化（.gitattributes ⇒ eol=lf）")
     print("   判定依据=%s · 候选=%d · 其中应为LF=%d · 实扫=%d"
           % (res["attr_source"], res["candidates"], res["lf_expected"], res["scanned"]))
+
+    real, cosm = res["real"], res["cosmetic"]
     if not res["changed"]:
         print("   ✅ 无需改动（全部已是 LF，幂等）")
-    else:
-        print("   %s %d 个文件（CRLF → LF）:"
-              % ("将改动" if a.check else "已改动", len(res["changed"])))
-        for c in res["changed"]:
-            print("     %-52s -%d bytes（去 CR ×%d）"
+    if real:
+        print("   🔴 真问题 %d 个（**入库 blob 本身是 CRLF**、属性却要 LF ⇒ 结构性不等，必须收口）："
+              % len(real))
+        print("      %s：" % ("将写入" if a.check else "已写入"))
+        for c in real:
+            print("        %-50s -%d bytes（去 CR ×%d）"
                   % (c["path"], c["before_bytes"] - c["after_bytes"], c["crlf_removed"]))
+    else:
+        print("   ✅ 真问题 0 个（无「blob 为 CRLF 而属性要 LF」的结构性不一致）")
+    if cosm:
+        print("   ℹ️ 非问题 %d 个（入库 blob **已是 LF**，仅工作树为 CRLF" % len(cosm))
+        print("      ⇒ clean filter 后与 blob 一致、`git status` 为空、**git 判为不脏**；")
+        print("      改它们只是「美化」，代价是这些文件会进下一次 commit = **制造假 diff**）")
+        for c in cosm[:8]:
+            print("        %-50s (%d 处 CRLF)" % (c["path"], c["crlf_removed"]))
+        if len(cosm) > 8:
+            print("        … 其余 %d 个同类" % (len(cosm) - 8))
+        if not a.include_cosmetic:
+            print("      🛡 已**跳过不写**。确要一并改请显式加 `--include-cosmetic`。")
     if res["missing"]:
         print("   ⚠️ %d 个路径不存在（跳过）: %s" % (len(res["missing"]), res["missing"][:5]))
-    if a.check and res["changed"]:
-        print("   ℹ️ 本次为 --check（未写入）。去掉 --check 即就地规范化。")
+    if a.check and real:
+        print("   ℹ️ 本次为 --check（未写入）。去掉 --check 即只对上述「真问题」就地规范化。")
     return 0
 
 
