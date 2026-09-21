@@ -1,5 +1,5 @@
 {
- "max_next_id_seq": 37,
+ "max_next_id_seq": 38,
  "ids": [
   "build13-timeout-guard",
   "cachebot-build-race",
@@ -37,7 +37,8 @@
   "north-fund-dead-source-fix",
   "backtest-tdx-no-refresh",
   "stock-name-code-fallback",
-  "hk-shortcode-hkname-pollution"
+  "hk-shortcode-hkname-pollution",
+  "algo-edge-ordering-fix"
  ],
  "updated": "2026-09-21 22:57",
  "generated_by": "小九(lemoncat-cn) + 阿狸咪(alimi-cn)",
