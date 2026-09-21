@@ -44,6 +44,20 @@ on:
       - 'algorithms/**'
       - 'v8_postclose_guard.py'
       - 'data/.workbuddy/**'   # 自愈调度锁文件改动也会触发重新构建 HEALTH_CHECK.js
+      # 🛡 2026-09-21 小九（AI 入口 + 状态源守卫的**可达性**修复）：
+      #   实测盲区 —— 原 paths 不含 docs/ops/** 与入口文件 ⇒ 只改 HANDOFF.yaml 的 push
+      #   **完全不触发 build_deploy** ⇒ [13/13] 交接状态源守卫与 [14/14] AI 入口守卫
+      #   形同虚设（除非碰巧同批改了 paths 内文件）。
+      #   实测证据：commit `ae2a7cdc7a40`（改了 HANDOFF.yaml / AGENTS.md / SKILL.md /
+      #   README.md / .codebuddy/**）触发的 run **只有 1 条** —— `pages build and deployment`；
+      #   `v8 构建部署(云端ubuntu)` 根本没跑 ⇒ 状态源改动从未经过守卫验证。
+      #   这是「双盲区」形态（闸门不覆盖 + 巡检不告警）。
+      #   ⚠️ 只点这 5 项，**不用 `docs/ops/**`** —— 否则每次改交接档都触发一次全量构建（风暴）。
+      - 'AGENTS.md'
+      - '.codebuddy/**'
+      - 'docs/ops/HANDOFF.yaml'
+      - 'docs/ops/HANDOFF.ledger.json'
+      - '.github/scripts/pre_deploy_audit.py'
   workflow_run:
     workflows:
       - "🇨🇳 v8 中国数据抓取(cn·应急)"

@@ -1227,6 +1227,93 @@ def check_handoff_ledger():
     return True, ("交接状态源完好：items=%d（ledger 锚 %d 个 id 全在）· next_id_seq=%s≥%s"
                   % (len(items), len(L.get("ids") or []), cur_seq, old_seq))
 
+def check_ai_entry_files():
+    """[14/14] AI 会话入口在位守卫（2026-09-21 小九新增）。
+
+    背景（实测，非推断）：
+      协议已入仓、[13/13] 已在位，但 2026-09-21 19:0x 实测发现
+      **没有任何「会话启动即读取」的通道** ——
+        · 仓根 AGENTS.md / .codebuddy/ / CLAUDE.md / .cursorrules /
+          .github/copilot-instructions.md 全部不存在；
+        · 全仓 6476 个 blob 仅 1 处命中协议（即协议自身），零分发机制；
+        · skill 的 description 触发场景只覆盖「主人问交接」，**动手改文件不触发**。
+      ⇒ 「协议存在」≠「会话会读到」。本项守卫的正是这条通路**在位**。
+
+    为什么必须机器判据：
+      入口文件是**防复发护栏**的一种 —— 它丢了自己不会报错，直到下一次
+      「某个会话不知道协议 ⇒ 重复劳动 / 静默覆盖」才暴露。
+      2026-09-21 已实测过一次「护栏被静默覆盖、带病 18 小时、零红灯」。
+
+    判据（刻意宽松 —— 只查「存在性 + 关键指针 + 死链」，
+    不查内容哈希，避免任何文字修订都阻断部署）：
+      ① AGENTS.md 存在，且含 4 条必读指针
+         （HANDOFF.yaml / v8-handoff-gateway/SKILL.md / SECURITY_RULES.md / TIME_ORDER.md）
+      ② .codebuddy/CODEBUDDY.md 存在且指向 AGENTS.md
+      ③ README.md 指向 AGENTS.md
+      ④ **指针有效性**：AGENTS.md 点到的关键路径**真实存在**
+         （防「入口指了不存在的路」—— 那比没有入口更误导）
+
+    可达性前提（本项能被触发的前提，务必保持）：
+      `.github/workflows/v8_build_deploy.yml` 的 `push.paths` **必须**含
+      `AGENTS.md` / `.codebuddy/**`（2026-09-21 已补）。否则删入口不触发 CI ⇒ 守卫白设。
+
+    维护纪律：
+      · 确需重构入口（改名/迁移）⇒ **同一提交**改本函数的路径常量，不要绕过；
+      · 入口文件**不得**承载协议正文（正文唯一权威是
+        docs/ops/skills/v8-handoff-gateway/SKILL.md），本守卫不检查正文。
+    """
+    ag = ROOT / "AGENTS.md"
+    if not ag.exists():
+        return False, "AGENTS.md 缺失（AI 会话入口不在位 ⇒ 协议不会被自动发现）"
+    cb = ROOT / ".codebuddy" / "CODEBUDDY.md"
+    if not cb.exists():
+        return False, ".codebuddy/CODEBUDDY.md 缺失（项目级自动加载指针不在位）"
+
+    try:
+        at = ag.read_text(encoding="utf-8")
+        ct = cb.read_text(encoding="utf-8")
+    except Exception as e:
+        return False, "入口文件读取失败: %s" % e
+
+    POINTERS = [
+        "docs/ops/HANDOFF.yaml",
+        "docs/ops/skills/v8-handoff-gateway/SKILL.md",
+        "SECURITY_RULES.md",
+        "TIME_ORDER.md",
+    ]
+    miss = [p for p in POINTERS if p not in at]
+    if miss:
+        return False, ("AGENTS.md 缺必读指针 %d 条：%s（入口失效 ⇒ 会话读不到权威）"
+                       % (len(miss), "；".join(miss)))
+
+    if "AGENTS.md" not in ct:
+        return False, "CODEBUDDY.md 未指向 AGENTS.md（指针断链）"
+
+    rm = ROOT / "README.md"
+    if not rm.exists():
+        return False, "README.md 缺失"
+    try:
+        if "AGENTS.md" not in rm.read_text(encoding="utf-8"):
+            return False, "README.md 未指向 AGENTS.md（人读入口断链）"
+    except Exception as e:
+        return False, "README.md 读取失败: %s" % e
+
+    # ④ 指针有效性：AGENTS.md 里出现的仓内关键路径必须真实存在
+    EXIST = POINTERS + [
+        "index.html",
+        "docs/ops/HANDOFF.ledger.json",
+        "DO_NOT_DELETE.md",
+        "PROTECTED_FILES.json",
+        ".github/scripts/pre_deploy_audit.py",
+    ]
+    dead = [p for p in EXIST if p in at and not (ROOT / p).exists()]
+    if dead:
+        return False, "AGENTS.md 指向不存在的路径 %d 条：%s" % (len(dead), "；".join(dead))
+
+    return True, ("AI 入口在位：AGENTS.md(%d B) + .codebuddy/CODEBUDDY.md + README 指针齐全 · "
+                  "必读 %d 条 · 死链 0" % (len(at.encode("utf-8")), len(POINTERS)))
+
+
 def main():
     checks = [
         ("[1/8] py_compile", check_py_compile),
@@ -1242,13 +1329,16 @@ def main():
         ("[11/11] defer 数据缓存守卫", check_defer_cache_guard),
         ("[12/12] 调用点定义守卫", check_callee_defined),
         ("[13/13] 交接状态源守卫", check_handoff_ledger),
+        ("[14/14] AI 入口在位守卫", check_ai_entry_files),
     ]
     print("=" * 60)
     print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；"
           "2026-09-13 扩至 6 项；2026-09-14 扩至 8 项；2026-09-20 扩至 9 项（回测口径守卫）；"
           "同日扩至 10 项（[10/10] index.html 核心标记守卫·防旧树覆盖）；"
           "同日扩至 11 项（[11/11] defer 数据缓存守卫·防空结果固化）；"
-          "2026-09-21 扩至 12 项（[12/12] 调用点定义守卫·防删函数连带删邻函数致 ReferenceError））")
+          "2026-09-21 扩至 12 项（[12/12] 调用点定义守卫·防删函数连带删邻函数致 ReferenceError）；"
+          "同日扩至 13 项（[13/13] 交接状态源守卫·外部锚 ledger 防旧版本静默回滚）；"
+          "同日扩至 14 项（[14/14] AI 入口在位守卫·防「协议存在但没人会读」））")
     print("=" * 60)
     fails = 0
     results = []

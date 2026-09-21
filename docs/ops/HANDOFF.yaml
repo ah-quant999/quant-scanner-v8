@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 19:17"
+  updated: "2026-09-21 19:25"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -1318,6 +1318,18 @@ items:
       ③ `README.md` 补「AI 会话入口」节，指向 `AGENTS.md`；
       ④ 本协议 `SKILL.md`：`description` 补触发场景「**你要动 quant-scanner-v8 仓库的任何文件之前**」，
          并新增 §7「本协议如何被自动发现」记录本次实测与落地。
+      ⑤ **可达性修复（本项的第二半，2026-09-21 19:2x 实测发现）**：
+         `v8_build_deploy.yml` 的 `push.paths` 原本**不含** `docs/ops/**` 与入口文件
+         ⇒ 只改 `HANDOFF.yaml` / `AGENTS.md` 的 push **完全不触发 build_deploy**
+         ⇒ 连 [13/13] 交接状态源守卫都**从未被触发过**（除非碰巧同批改了 paths 内文件）。
+         实测证据：commit `ae2a7cdc7a40` 触发的 run **只有 1 条**
+         （`pages build and deployment`），`v8 构建部署(云端ubuntu)` 根本没跑。
+         ⇒ 已补 5 条 paths：`AGENTS.md` / `.codebuddy/**` / `docs/ops/HANDOFF.yaml` /
+         `docs/ops/HANDOFF.ledger.json` / `.github/scripts/pre_deploy_audit.py`
+         （**刻意不用 `docs/ops/**`**，否则每次改交接档都触发全量构建风暴）。
+      ⑥ 新增 CI 门禁 `[14/14] AI 入口在位守卫`（`pre_deploy_audit.py::check_ai_entry_files`）：
+         断言入口文件存在 + 4 条必读指针齐 + README/CODEBUDDY 指针不断链 + **死链 0**。
+         判据刻意宽松（不查内容哈希），避免任何文字修订都阻断部署。
       🔴 **三份新文件均不含协议正文**，只回答「往哪读」⇒ 尊重 `handoff-skill-inrepo` 的
       resolution（阿狸咪 16:23：不 cp 第二副本、认仓内为唯一权威），不制造「哪份为准」的歧义。
     verify_how: >
@@ -1327,12 +1339,28 @@ items:
       ③ 生效判定（**需下一批**，故本项停 `pending-verify`）：由本机另起一个新会话，
          确认 `AGENTS.md` / `CODEBUDDY.md` 是否**被自动注入上下文**；
          **仅当注入成立**，本项方可转 `done`；
-      ④ 反向测试：把 `AGENTS.md` 里某条指针路径改错 ⇒ 断言脚本应 FAIL。
+      ④ 反向测试：把 `AGENTS.md` 里某条指针路径改错 ⇒ 断言脚本应 FAIL；
+      ⑤ **可达性判据（本批已满足）**：本批 commit 必须触发 `v8 构建部署(云端ubuntu)`
+         且其中 `🛡️ Pre-deploy audit` step = success、下游 `📤 部署到 main` **未被 skipped**
+         ⇒ 证明 [14/14] 真的在 CI 里跑过（而不是又一次「改了但没被触发」）。
+      ⑥ 反向测试（CI 侧）：在临时目录删掉 `AGENTS.md` ⇒ 本地跑 `pre_deploy_audit.py`
+         **必须 FAIL 并点名**；还原后必须复绿。
     evidence: >
-      本批 commit：`AGENTS.md`（新增）/ `.codebuddy/CODEBUDDY.md`（新增）/
-      `README.md`（补节）/ `docs/ops/skills/v8-handoff-gateway/SKILL.md`（§7 新增）。
-      实测数据源：小九机 `_gate.py` / `_gate2.py` / `_gate3.py` / `_gate4.py` 输出
-      （全部为 `api.github.com` 远端 blob 取证，非本地工作树）。
+      ① 本批 commit `ae2a7cdc7a40`：`AGENTS.md`（新增，5949 B）/ `.codebuddy/CODEBUDDY.md`
+         （新增，864 B）/ `README.md`（899 → 1682 B）/ `SKILL.md`（19564 → 22050 B，
+         含新触发词 + §7）/ `HANDOFF.yaml` / `HANDOFF.ledger.json`。
+      ② 上线终验（**6/6 逐字节一致**，md5 实测）：AGENTS.md `1f436fb449f6` /
+         CODEBUDDY.md `255e1a208194` / README.md `a83161f7c4a6` / SKILL.md `a6820bf2c8ad` /
+         HANDOFF.yaml `0a7ae3e5a4ab` / ledger `ff9282c9eaff`；
+         Pages 真身第 2 轮全部命中（HTML 侧 200 且与本地逐字节相同）；
+         线上 ledger 32/32 自洽（第三次独立实现重算，全中）。
+      ③ 双机可读性已实测：`AGENTS.md` / `.codebuddy/CODEBUDDY.md` 在 `main` 上路径可达。
+      ④ **可达性盲区实测**：该 commit 触发的 run **只有 1 条**
+         （`pages build and deployment`，success），`v8 构建部署(云端ubuntu)` 未触发
+         ⇒ 证实 paths 过滤把状态源/入口改动挡在门外。
+      ⑤ 实测数据源：小九机 `_gate.py` / `_gate2.py` / `_gate3.py` / `_gate4.py` /
+         `_eol.py` / `_ins.py` / `_p9chk.py` / `_wf10.py` 输出，
+         全部为 `api.github.com` 远端 blob 取证（非本地工作树）。
     note_to: 阿狸咪
     note: >
       2026-09-21 19:1x 小九 → 阿狸咪（走 §3.5 的 `note_to`，不另写档）。
@@ -1348,4 +1376,4 @@ items:
       则它不会注入 —— 请在 `verify_how` 就地记下「你的实际工作区路径 ＋ 观察结果」，
       我据此决定是否加第 ③ 条兜底（在你本机工作区也放一份**指针**，同样不含正文）。
       ③ 与你机器无关的部分**不必复核**（`README.md` / `.codebuddy/` 我已本机验证）。
-    updated: "2026-09-21 19:15"
+    updated: "2026-09-21 19:25"
