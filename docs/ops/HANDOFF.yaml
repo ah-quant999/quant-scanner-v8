@@ -26,9 +26,9 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 09:50"
+  updated: "2026-09-21 11:40"
   updated_by: "小九(lemoncat-cn) + 阿狸咪(alimi-cn)"
-  next_id_seq: 19
+  next_id_seq: 20
 
 items:
 
@@ -311,6 +311,37 @@ items:
       （`index.html data/FACTOR_LAB.js raw_data/factor_lab.json`）。
     verify_how: "读 v8/factor_lab_gen.py L718–L736 确认 add 与 reset 的先后；触发条件苛刻（需 stash pop 冲突），故列 P2。"
     updated: "2026-09-21 09:50"
+
+  - id: baihechou-analysis-no-producer
+    priority: P0
+    owner: 阿狸咪
+    status: todo
+    what: >
+      **`data/BAIHECHOU_ANALYSIS.js` 自 2026-09-18 起 3 天零写入（无生产者）**，
+      而线上前端**优先读它** ⇒ 「新周期判定」卡面解析冻结在 09-18（覆盖窗口「09-17 全天」）；
+      同期 `data/BAIHECHOU_MACRO.js` 的 `analysis` 每天照常出新（今日 06:38，覆盖 09-17→09-19）
+      **却被前端忽略**。与 09-18 拆分档想修的「有产物 ≠ 有当期内容」同型家族，只是换了个文件。
+    fix: >
+      三处同修（缺一处就再漏）：
+      ① `scripts/baihechou_daily.py::PUSH_FILES` 增加 `data/BAIHECHOU_ANALYSIS.js`（SYNC_FILES 同补）；
+      ② 06:30 自动化（98101962）的执行原则章须显式写明产出该文件 —— 现章程写「只写
+      data/BAIHECHOU_MACRO.js 与 raw_data/baihechou_posts.json」，与 09-18 拆分档「该文件的生产者
+      只有 AI 解析步骤（阿狸咪机 06:30/08:30）」**直接打架**，两边都没落地，文件就没人写；
+      ③ 08:30 兜底（622ad154）的 verify 判据由 `MACRO.analysis.generated_at` 改为
+      **独立文件的 generated_at 属当日**（现判据天天绿，属假绿）。
+    evidence: >
+      远端 `data/BAIHECHOU_ANALYSIS.js`：顶层 `update_time`=`generated_at`=**2026-09-18 06:31**、4266 B、
+      提交历史**仅 1 笔** `c3a152ca63`（09-18 19:45 创建），此后 0 写入。
+      对照 `data/BAIHECHOU_MACRO.js`：`update_time=2026-09-21 06:35:49` / `analysis.generated_at=2026-09-21 06:38`、18732 B。
+      远端 `index.html`（blob `93db6406be5f`）逐字含 `var ana = window.BAIHECHOU_ANALYSIS || d.analysis || {};`
+      ⇒ 独立文件优先 ⇒ 陈旧内容抢占前端。
+      `HEALTH_CHECK.js` @2026-09-21 11:28:15 判该项 **fail**「更新于 3天前 06:31；超过阈值 313 分钟」
+      （`v8_health_check.py` 该卡 max_age=1560min）—— **真红，非周末假红**。
+      阿狸咪 2026-09-21 11:40 CST 实测（云读 Contents API + git/blobs + commits API）。
+    verify_how: >
+      ① 09-22 06:30 跑完后，远端该文件 `generated_at` 属当日；② `HEALTH_CHECK.js` 该项回到 ok；
+      ③ 线上卡面角标不再显示 09-18（09-18 拆分档 §7.2「线上前端角标 待肉眼确认」至今未闭环，可一并收口）。
+    updated: "2026-09-21 11:40"
 
   # ── 已完成（保留近期项供追溯，每月清理一次）────────────────────────────
   - id: strong-breakout-purge
