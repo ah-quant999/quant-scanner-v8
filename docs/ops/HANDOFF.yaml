@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 20:45"
+  updated: "2026-09-21 22:57"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -1291,8 +1291,25 @@ items:
         blob `0edaa61d7f`）⇒ 链路**可用但抖动**，属 fix (A) 恢复路径**已部分生效**。
       · 按 verify_how ③「若当晚 20:30 后仍未落 ⇒ 转 A 路径排查」⇒ 本项**转 `doing`** 持续跟踪；
         设计裁定（fix B 三选一）仍**待拍板**，未动。
+      ── 阿狸咪 2026-09-21 22:5x 补（本轮实测回填·verify_how ①② **完整成立**；同走 §3.5，不另写档）──
+      ✅ **① 四项 CORE **全部**推进到 09-21**（判据取产物 `update_time`，未以 run success 当判据；
+      上一轮 20:4x 时其中 2 项仍停 09-19，故拆出 `backtest-tdx-no-refresh` 独立跟踪，本项不再承担）：
+        · `FOUR_VOLUME_BACKTEST` **21:52:11**（blob `20c8607032`）；
+        · `VOLATILITY` **19:15:14**（blob `728d1c1f9c`）；
+        · `CRDS_CARD_DATA` **20:20:54**（blob `a2db3a07b3`）；
+        · `BACKTEST_COMPREHENSIVE` **21:16:00**（blob `59ce5263d6`）；
+        · `BACKTEST_TDX` **21:15:56**（blob `565ec21838`）。
+      ✅ **② algo 链真跑成立**：今日 18:10 / 18:38 / 20:15 / 20:50 四档 run 的
+      step9 `🧮 运行盘后算法链` conclusion 全为 **`success`**（非 skipped）
+      —— 对照本项 what 记录的「当日 26 档、step9 真跑 0 次（25 档 skipped）」**已反转**。
+      ✅ 旁证：`raw_data/backtest_tdx.json` 末次提交 **09-21 22:00:46**、cn_fetch 自 19:41 起持续成功推送
+      ⇒ fix (A)「等本批重跑落地」**路径确认生效**。
+      ⏳ **本项 status 维持 `doing`**：唯一未闭环项 = fix (B)「部分模块失败 ⇒ 整批不推」的**设计裁定**（三选一），
+      属**需人拍板**，阿狸咪不代拍亦未动代码（本机纪律：只 detect + dispatch）。
+      另：cn_fetch 失败步 `📡 抓中国数据 → raw_data/（selective）` 本日仍**抖动复现**
+      （东财 `push2delay` 家族）⇒ 根治仍需 (B) 的裁定结果，届时可结项。
     note_to: 阿狸咪
-    updated: "2026-09-21 20:45"
+    updated: "2026-09-21 22:57"
 
   # ── 2026-09-21 18:45 小九新增（批④：状态源自身的 YAML 卫生）─────────────────
   - id: handoff-yaml-dup-keys
@@ -1527,7 +1544,8 @@ items:
   - id: backtest-tdx-no-refresh
     priority: P1
     owner: shared
-    status: todo
+    status: pending-verify
+    verified_at: "2026-09-21 22:57"
     what: >
       🔴 `data/BACKTEST_TDX.js` 与 `data/BACKTEST_COMPREHENSIVE.js` **自 2026-09-19 起未再产出**，
       而**同批（E 批）其他产物今日仍在刷新** ⇒ 与「批次窗口未到」不符，指向**这两支脚本本身没落库**。
@@ -1576,7 +1594,27 @@ items:
       **0 手工 dispatch**（前 8 档交接件 0 条 `[ACTION] dispatch`；URGENT=0）、0 代码改动、0 阈值改动。
       立此项的原因：`cnfetch-empty-shell-block` 的 verify_how ① 要求四项 CORE **一并**推进，
       而本轮实测**只有 2 项推进** —— 为避免「4 项绑在一个 item 里、2 项被 2 项掩盖」，拆出本项独立跟踪。
-    updated: "2026-09-21 20:45"
+      ── 阿狸咪 2026-09-21 22:5x 补（本轮实测回填·本项**首验通过**；同走 §3.5，不另写档）──
+      ✅ **verify_how 判据已达成：两支产物均推进到 09-21**（判据只看产物，未以 run success 当判据）：
+        · `data/BACKTEST_TDX.js` `update_time` **2026-09-21 21:15:56**（blob `565ec21838`）
+          —— 原 `09-19 17:58:23` / blob `5d76f6d108`；
+        · `data/BACKTEST_COMPREHENSIVE.js` `calc_time` **2026-09-21 21:16:00**（blob `59ce5263d6`）
+          —— 原 `09-19 17:58:29` / blob `06eeabfe71`；
+        · 连带下游同步恢复：`OPTIMIZED_STRATEGY` **2026-09-21**（原停 09-19）；
+        · 上游 `raw_data/backtest_tdx.json` 末次提交 **09-21 22:00:46**（`b9809e667f`）
+          —— 原末次 `38b91e9577`(09-19 18:26) ⇒ **raw 与 js 双恢复**。
+      🔵 **未定因已收窄为 (a)**：本项 what 里并列的 (a)「脚本未被执行」/ (b)「执行但未推送」，
+      实测指向 **(a)** —— 今日 18:10 / 18:38 / 20:15 / 20:50 四档 algo run 的
+      step9「🧮 运行盘后算法链」**全部 `success`（真跑，非 skipped）**，
+      对照 18:10 档统计的「26 档 step9 真跑 0 次」⇒ **链已恢复真跑**；
+      4 档失败步分别为 step15 / step14 / step15 / step15（**全在推送步，非算法步**）
+      ⇒ **脚本本身未坏死**，此前停更是「整链空转/推送未落」的下游表现，与
+      `cnfetch-empty-shell-block` 同源（该链路 19:41 起恢复推送）。
+      ⇒ E 批 cron 观察点（`v8_algo_cloud.yml` `30 14 * * *` UTC = 22:30 CST）**判据已兑现**。
+      ⏳ **仍留 `pending-verify` 而非 done 的理由**：本轮是**首次**观测到该对产物恢复，
+      不足以排除「一次性」；须看 **09-22 E 批再次推进**方转 done
+      （本仓铁律：一次 success ≠ 常态；`success ≠ 落库` 亦已多次实证）。
+    updated: "2026-09-21 22:57"
 
   - id: stock-name-code-fallback
     priority: P1
