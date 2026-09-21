@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-21 19:27:14",
+  "update_time": "2026-09-21 23:15:49",
   "source": "baostock 四指数日K（上证/沪深300/中证500/中证1000）",
   "note": "价格中枢框架迁移（QQQ/TQQQ → A股指数），基于收盘价布林带/EMA趋势，非PE估值分位",
   "indices": [
@@ -22,20 +22,50 @@
     {
       "name": "沪深300",
       "code": "000300",
-      "available": false,
-      "reason": "baostock 取数失败（网络/接口），下次刷新自动重试"
+      "latest_date": "2026-09-21",
+      "latest_close": 4539.57,
+      "ema20": 4543.07,
+      "ema60": 4629.24,
+      "ema120": 4664.13,
+      "ema250": 4582.63,
+      "boll_position": -0.614,
+      "bucket": "低估",
+      "trend_short": "下降",
+      "trend_long": "上升",
+      "gate": "空头/观望",
+      "gate_color": "绿"
     },
     {
       "name": "中证500",
       "code": "000905",
-      "available": false,
-      "reason": "baostock 取数失败（网络/接口），下次刷新自动重试"
+      "latest_date": "2026-09-21",
+      "latest_close": 7850.48,
+      "ema20": 7749.53,
+      "ema60": 7899.85,
+      "ema120": 7965.34,
+      "ema250": 7704.2,
+      "boll_position": -0.335,
+      "bucket": "合理",
+      "trend_short": "下降",
+      "trend_long": "上升",
+      "gate": "空头/观望",
+      "gate_color": "绿"
     },
     {
       "name": "中证1000",
       "code": "000852",
-      "available": false,
-      "reason": "baostock 取数失败（网络/接口），下次刷新自动重试"
+      "latest_date": "2026-09-21",
+      "latest_close": 7766.33,
+      "ema20": 7603.1,
+      "ema60": 7720.03,
+      "ema120": 7837.18,
+      "ema250": 7683.84,
+      "boll_position": -0.247,
+      "bucket": "合理",
+      "trend_short": "下降",
+      "trend_long": "上升",
+      "gate": "空头/观望",
+      "gate_color": "绿"
     }
   ]
 }
