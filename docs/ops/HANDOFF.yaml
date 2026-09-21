@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 36
+  next_id_seq: 37
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -1600,3 +1600,28 @@ items:
     evidence: "commit ee6f21f1ce；raw 抽检三股现名 ✅；map 6841 条含两股；_looks_clean_s(TCL科技)=True、(沪深300ETF)=False、(我们认为利好)=False"
     residual: "calc_crds._is_safe_stock_name（mootdx 证券表除污）保持纯中文从严，系设计意图未动；HISTORY/TRACK 本批无缺名。前端无需改（s.name||'' 展示逻辑正确）。"
     updated: "2026-09-21 22:01"
+
+  - id: hk-shortcode-hkname-pollution
+    priority: P1
+    owner: shared
+    status: pending-verify
+    what: >
+      金股池/推荐链一批沪深条目顶着港股英文名（主人截图 000703 显示 FUTURE BRIGHT，
+      应为恒逸石化）。根因：scanner._em_name_s 与 build_candidate_pool._em_secid 的
+      「len(code)<=5 即当港股」隐式路由——代码丢失前导零（如 "703"）被发到东财 116
+      港股市场查回港股名（02602 万物云/00933 非凡领越/02028 映美控股…），金股池
+      09-07~09-15 入池条目中招；且池子 else 分支不刷 name，错名永久携带。
+      注：A+H 两地同名条目（招商银行/三花智控等）系合法，清扫规则已按
+      「名字==该码港股名 且 !=A 股权威名」精确判定，未误伤。
+    fix: >
+      源级+数据（commit e64d297cce，force:false，12 文件一 commit）：
+      ① 两处路由废除 len<=5 即港股，港股须显式 market==hk；
+      ② scanner 金股池老条目名字自愈（本轮 resolve 后顺刷 name）；
+      ③ build_candidate_pool 名表 hk 碰撞过滤；
+      ④ 数据清扫 80 处：GOLD_POOL/TOP10_DAILY/FINAL_RECOMMEND_DATA/TRIPLE_HISTORY +
+      raw_data 6 个 json（gold_pool 19 处/candidate 11 处/triple 系 5 处×3/推荐系 4 处×3），
+      以 raw_data/stock_names.json（ASH 6841 条）为权威回填。
+    verify_how: "线上核验：raw HEAD=e64d297cce，12 文件回读逐字节 ALL GREEN；清扫后断言「沪深码挂港股名」零残留；py_compile 0 错；本地实测 _em_secid(703,sz)=0.000703、(703,hk)=116.00703、resolve(000703)=恒逸石化。明日算法链批次自然回归验证（池子名字自愈应把 19 处全部保正）。"
+    evidence: "commit e64d297cce；总修正 80 处；ASH/HKM 双名表实测 000703=恒逸石化|FUTUREBRIGHT、002602=世纪华通|万物云"
+    residual: "历史归档（raw_data/history/*.json）按冻结历史原则未动，仍含错名快照；前端无需改。"
+    updated: "2026-09-21 22:35"
