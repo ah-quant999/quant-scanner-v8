@@ -52,6 +52,13 @@ raw_data/*.json     text eol=lf
 #     scripts/normalize_eol.py → git check-attr，故**补此规则即自动扩展收口范围**。
 data/*.json         text eol=lf
 raw_data/history/*.json  text eol=lf
+# 2026-09-21 阿狸咪再补漏（同源根因第二处 · 判据 178 完整形态）
+#   09-20 只补了 data/ 与 raw_data/ 两族，**未按特征扫全仓** ⇒ docs/ops/** 仍残留
+#   「入库 blob 本身是 CRLF 且属性 unspecified」⇒ 该文件永久脏、工作树与 blob 永不等。
+#   实证：docs/ops/index_protected_markers.txt 入库 blob CR=78；本次改动后 git 提示
+#         「LF will be replaced by CRLF」⇒ 只归一化 blob 而不补规则必复发。
+#   本批同做两件（缺一不可）：① 补本规则；② 归一化该文件 blob（CR 87→0）。
+docs/ops/*.txt      text eol=lf
 
 # 🔴 累积型重要档案（禁止误删）—— 由 guard_protected_files.py 守卫
 data/SECTOR_CYCLE_ARCHIVE.js -diff -merge
