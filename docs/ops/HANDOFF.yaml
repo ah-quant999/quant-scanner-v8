@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 15:10"
+  updated: 2026-09-21 17:12
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -604,12 +604,23 @@ items:
       对照本项 09:33 记录「今日实测全为 workflow_dispatch」⇒ **注销已恢复**。
       ⚠️ 仍留 pending-verify：schedule 命中有时段性不稳（09-18 上午 ~100 runs=0 的实测），
       须再观察 1 个交易日确认非偶发命中 —— 不据单日宣布闭环。
-    updated: "2026-09-21 16:18"
+      🔴 2026-09-21 17:1x 阿狸咪的工程师·本批（commit `7eb0574547de`）相关落地：
+      ① **补 09:31 首档**至 `v8_cn_fetch_intraday_lemoncat.yml`（原首档 09:40），与
+         `intraday-guard-window-gap` 合并为「盘中覆盖连续性」一个批次 —— 两项叠加才是真故障：
+         无 schedule + 首档前 dispatch 被守卫拦 ⇒ 09:30-09:40 **每日真空**（唯一每天真发生的故障）。
+      ② 同批窗口上界 `1505`→`1510`。
+      ③ **本项仍维持 pending-verify** —— 我只补首档，**未宣布闭环**（按 verify_how 须再观察 1 个交易日）。
+      ④ 我的独立复核（17:0x 硬抓 `GET /actions/workflows/v8_stock_quote_refresh.yml/runs`）：
+         主链今日 schedule **已恢复**（`06:00:17Z`=14:00 CST / `06:41:34Z`=14:41 CST 两档）；
+         对照 09-18 与 09-21 上午 schedule=0 ⇒ 恢复成立，与你 16:1x 判定一致。
+         ⚠️ 今日盘中档位仍以 `workflow_dispatch`（relay ② 按「主链优先」门控派发）为主，
+         与 schedule 并存属**预期**，不算「注销未恢复」。
+    updated: "2026-09-21 17:12"
 
   - id: intraday-guard-window-gap
     priority: P1
     owner: 小九
-    status: todo
+    status: pending-verify
     what: >
       `v8_cn_fetch_intraday_lemoncat.yml` L120 守卫的**窗口下沿缺口**：
       `[ "$HHMM" -lt 932 ] || [ "$HHMM" -gt 1505 ]` ⇒ **09:32 前 dispatch 一律判「迟到档/窗外」整档安静退出**。
@@ -619,11 +630,24 @@ items:
       ① 守卫下沿 `932` → `930`（对齐开盘 09:30）；
       ② 同步本机派发器 `74077cbe` 的档位（09:07 档要么移出窗口、要么让守卫接纳）；
       ③ **两侧必须同改**（参数也是口径 —— 只改一侧会造成「派发了但被静默拦掉」的假响应）。
+
+      🔴 2026-09-21 17:1x 阿狸咪的工程师·**落地时修正了 fix ①（未采纳）**：
+      放宽**下界**会放行 09:29 及更早的档 ⇒ 抓到集合竞价/前收 = **错时数据进盘**；
+      放宽**上界**只是盘后多抓一次**当日收盘价** = 零风险。两侧**不对称**，故改为：
+        · 上界 `1505` → `1510`（**已改**，见 commit `7eb0574547de`）
+        · 下界 `932` **保持不变**；改用**注册 09:31 首档**达成「覆盖 09:30 开盘」同一目标 ——
+          09:31 + GitHub schedule 实测 1-3 分钟延迟 ⇒ 实际落 09:32-09:34，**天然在窗内**，无错时风险。
+        · fix ②/③ 的 `74077cbe` 09:07 档属**另一条链**（本机派发器），**不在本批范围**。
+      ⇢ 若坚持下沿改 930，请先给出「09:29 档抓到的是有效数据」的实测证据。
     verify_how: >
       ① 静态：两侧 gate 完整命令行逐字比对一致；
       ② 真跑：在 09:30–09:32 之间 dispatch 一次，断言 run 的 `conclusion != skipped`
          且日志**不含**「迟到档/窗外」。
-    updated: "2026-09-21 09:33"
+      ✅ 2026-09-21 17:1x 静态部分已过：本机 `pre_deploy_audit` **13/13 全绿**；
+      `v8_cn_fetch_intraday_lemoncat.yml` 本机 blob ≡ 推送 blob `fd1bedcbcc43`（CR=0）。
+      ⏳ 真跑待验：明日（09-22）09:31 CST 后取该 workflow runs，断言出现 `event=schedule`
+        且 `created_at` 折 CST 在 **09:32–09:34** —— **只看 schedule 事件**（自接力会污染总数）。
+    updated: "2026-09-21 17:12"
 
   - id: diagnostics-info-status-leak
     priority: P1
