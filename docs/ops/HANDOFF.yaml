@@ -309,7 +309,6 @@ items:
   - id: handoff-skill-inrepo
     priority: P1
     owner: shared
-    status: todo
     what: >
       协议载体**跨机不可达**：`v8-handoff-gateway` skill 放在 `~/.workbuddy/skills/`（纯本机路径，不进 git）。
       实测：阿狸咪机 `~/.workbuddy/skills/` 下 **MISSING**；仓库内 `find -name "*handoff-gateway*"` **0 命中**。
@@ -325,12 +324,23 @@ items:
       那是我们已在 `index.html` 上吃过两次亏的同一形态。
     verify_how: >
       ① 仓内路径 `docs/ops/skills/v8-handoff-gateway/SKILL.md` 存在且 frontmatter 可解析；
-      ② 阿狸咪机按 `cp` 落盘后，本地 skill 的 sha256 与仓内一致（证明拿到的是同一版）；
-      ③ 自足性：临时移走本地副本，仅按仓内文件 `cp` 能恢复出一份可用 skill。
-      ④ 小九机已完成：cp 后本地 sha256 == 仓内 sha256（40e49fc95a19a718）⇒ ②在小九机侧已验；
-         阿狸咪机侧待你 cp（故本项仍留 pending-verify，不代你宣称）。
-    status: pending-verify
-    updated: "2026-09-21 12:02"
+    resolution: >
+      🔵 阿狸咪 2026-09-21 16:23 决定：**不 cp 本地副本，认仓内版为唯一权威**（见
+      `docs/ops/handover/2026-09-21_1623_阿狸咪的工程师给小九的工程师_回执确认_…md` §四）。理由三条：
+      · ① cp 会制造**第三个副本**，反而增加「哪份是权威」的歧义 —— 而本项纪律的**本意正是消灭这种歧义**；
+      · ② 阿狸咪机已有同族技能（`v8-triple-check-after-change`、`v8-handoff-coverage-audit` 等），
+           再放一份 `v8-handoff-gateway` 会**职责重叠**，违背「技能不膨胀」约束；
+      · ③ 认仓内为唯一权威即已达成目标：需引用时**从仓内路径读**（双机经 `git show` 均可达）
+           ⇒ 这**同时消灭了「本地改了没进仓」这一风险本身**（无本地副本 ⇒ 不可能分叉）。
+      ⚠️ 若小九认为「仓内路径不够用」，请给出具体场景（如会话启动无法读仓），阿狸咪再改回 cp。
+    verify_how: >
+      ① 仓内路径 `docs/ops/skills/v8-handoff-gateway/SKILL.md` 存在且 frontmatter 可解析（双机一致）；
+      ② 阿狸咪机**不存在** `~/.workbuddy/skills/v8-handoff-gateway/` —— 这是**预期**（按 resolution 决定），
+         不构成 FAIL；反测：若该目录出现 ⇒ 说明有人又 cp 了，须核对是否与仓内同版。
+      ③ 自足性：任何一机仅凭 `git show <tip>:docs/ops/skills/v8-handoff-gateway/SKILL.md` 即可拿到完整协议。
+      ④ 小九机已完成 cp（本地 sha256 == 仓内，40e49fc95a19a718）；阿狸咪机按「认仓内为唯一权威」不落盘。
+    status: done
+    updated: "2026-09-21 16:23"
 
   - id: handoff-doc-rate-metric
     priority: P1
