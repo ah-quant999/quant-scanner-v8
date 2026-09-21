@@ -135,6 +135,13 @@ def _stock_names_map():
                 c = (s.get("code") or "").strip()
                 n = (s.get("name") or "").strip()
                 if c and n:
+                    # 🛡 2026-09-21 碰撞防御：港股 5 位码 zfill(6) 会顶掉深市 A 股名
+                    #   (00703 FUTURE BRIGHT vs 000703 恒逸石化，同 scanner.py 同日修复)
+                    #   → 6 位映射只收沪深条目。
+                    fc = (s.get("full_code") or "").strip().lower()
+                    mkt = (s.get("market") or "").strip().lower()
+                    if fc.startswith("hk") or mkt == "hk":
+                        continue
                     _SN_MAP[c.zfill(6)] = n
     except Exception:
         pass
@@ -142,13 +149,16 @@ def _stock_names_map():
 
 
 def _em_secid(code, market):
-    c = str(code)
-    if market == "hk" or (c.isdigit() and len(c) <= 5):
-        return "116." + c.zfill(5)
+    # 🛡 2026-09-21 一劳永逸：原「len(c)<=5 即当港股」会把丢失前导零的 A 股码
+    #   (如 "703")发到 116 港股市场查回港股名(同 scanner.py 同日修复)。
+    #   港股必须显式 market=="hk" 才走 116。
+    c = str(code).zfill(6)
+    if market == "hk":
+        return "116." + str(code).zfill(5)
     if c.startswith(("6", "9")):
-        return "1." + c.zfill(6)
+        return "1." + c
     if c.startswith(("0", "3", "2", "8")):
-        return "0." + c.zfill(6)
+        return "0." + c
     return None
 
 

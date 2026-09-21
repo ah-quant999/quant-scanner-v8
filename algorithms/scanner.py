@@ -2439,13 +2439,17 @@ def _em_name_s(code, market):
     if key in _EM_NAME_CACHE_S:
         return _EM_NAME_CACHE_S[key]
     _EM_NAME_CACHE_S[key] = None
-    c = str(code)
-    if market == "hk" or (c.isdigit() and len(c) <= 5):
-        secid = "116." + c.zfill(5)
+    c = str(code).zfill(6)
+    # 🛡 2026-09-21 一劳永逸：原「len(c)<=5 即当港股」的隐式路由是重大 bug——
+    #   代码丢失前导零(如 "703")会被发到 116 港股市场查回港股名
+    #   (FUTURE BRIGHT/万物云/非凡领越... 顶掉 恒逸石化 等 A 股名)，
+    #   金股池 09-07~09-15 一批错名皆源于此。港股必须显式 market=="hk" 才走 116。
+    if market == "hk":
+        secid = "116." + str(code).zfill(5)
     elif c.startswith(("6", "9")):
-        secid = "1." + c.zfill(6)
+        secid = "1." + c
     elif c.startswith(("0", "3", "2", "8")):
-        secid = "0." + c.zfill(6)
+        secid = "0." + c
     else:
         return None
     try:
@@ -2704,6 +2708,12 @@ def update_gold_pool_from_scan(output):
             pool["stocks"][key]["max_signal"] = max(
                 pool["stocks"][key]["max_signal"], s["signal_count"])
             pool["stocks"][key]["signal_count"] = s["signal_count"]
+            # 🛡 2026-09-21 名字自愈：老条目曾因「短码误路由港股/碰撞」携带错名
+            #   (如 000703 被写成 FUTURE BRIGHT)，原 else 分支不刷 name → 错名永久携带。
+            #   本轮 s["name"] 已过修复后的 resolve_clean_name_s，顺刷正名。
+            _sn_new = (s.get("name") or "").strip()
+            if _sn_new and _sn_new != str(s.get("code", "")).strip():
+                pool["stocks"][key]["name"] = _sn_new
             pool["stocks"][key]["board_label"] = s.get("board_label", pool["stocks"][key].get("board_label", ""))
             pool["stocks"][key]["fund_type"] = s.get("fund_type", pool["stocks"][key].get("fund_type", ""))
             _merge_sources(pool["stocks"][key], ["信号≥2"] + cand_src)
