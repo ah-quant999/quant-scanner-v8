@@ -20,27 +20,25 @@ html>
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
     var KEY = "v8_build_sha";
+    var REFRESHED = "v8_build_refreshed";   // 跨标签页共享：是否已为当前 BUILD 刷新过
     var cached = localStorage.getItem(KEY);
-    if(cached && cached !== BUILD){
-      localStorage.setItem(KEY, BUILD);
-      if(location.href.indexOf('nocache=1')>=0) return;
-      var h = location.href.split('#');
-      var base = h[0];
-      var hash = h[1] ? '#' + h[1] : '';
-      var sep = base.indexOf('?')>=0 ? '&' : '?';
-      location.replace(base + sep + 'nocache=1' + hash);
+    // 已是当前版本：无需任何动作（含已带 nocache=1 的情况），杜绝多标签重复刷新
+    if(cached === BUILD) return;
+    // BUILD 已变：先看是否已有别的标签页为这个 BUILD 刷新过（跨标签共享位）
+    if(localStorage.getItem(REFRESHED) === BUILD){
+      // 已有「担当标签」刷新过，本标签只静默同步版本号，不再 location.replace（修复：多标签批量自刷）
+      try{ localStorage.setItem(KEY, BUILD); }catch(e){}
       return;
     }
-    localStorage.setItem(KEY, BUILD);
-    // 首次访问（或缓存被清）：仍兜底强制刷新一次，绕过磁盘缓存拿到最新版
-    if(location.href.indexOf('nocache=1')<0 && !sessionStorage.getItem('v8_nocache')){
-      sessionStorage.setItem('v8_nocache','1');
-      var h2 = location.href.split('#');
-      var b2 = h2[0];
-      var hs2 = h2[1] ? '#'+h2[1] : '';
-      var s2 = b2.indexOf('?')>=0 ? '&' : '?';
-      location.replace(b2 + s2 + 'nocache=1' + hs2);
-    }
+    // 本标签成为「刷新担当」：记下已为当前 BUILD 刷新，再 replace 自身一次
+    try{ localStorage.setItem(REFRESHED, BUILD); }catch(e){}
+    try{ localStorage.setItem(KEY, BUILD); }catch(e){}
+    if(location.href.indexOf('nocache=1')>=0) return;
+    var h = location.href.split('#');
+    var base = h[0];
+    var hash = h[1] ? '#' + h[1] : '';
+    var sep = base.indexOf('?')>=0 ? '&' : '?';
+    location.replace(base + sep + 'nocache=1' + hash);
   }catch(e){}
 })();
 </script>
