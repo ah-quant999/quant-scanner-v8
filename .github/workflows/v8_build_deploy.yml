@@ -444,7 +444,8 @@ jobs:
             #     写入者回潮 ⇒ 报警并重写一次。
             #   即便本 build 因 push 组 cancel-in-progress 被取消，v8_cache_buster_reconcile
             #   也会在 15 分钟内兜底纠正，双保险。
-            python update_v8.py --only-cache-busters
+            # 🛡 2026-09-21 小九：加硬超时（原无护栏，是本步 30min+ 的主要时间汇）
+            timeout 180 python update_v8.py --only-cache-busters
             python -c "import re,pathlib,collections,subprocess; idx=pathlib.Path('index.html').read_text(encoding='utf-8'); m=re.findall(r'data/[A-Z0-9_]+\.js\?v=([0-9a-zA-Z]{1,40})',idx); bad=sorted(set(v for v in m if not v.isdigit())); c=collections.Counter(m); print('::warning::?v 出现非 unix 秒令牌(旧内容哈希口径回潮): '+str(bad[:8])) if bad else print('OK 提交前核验: '+str(len(m))+' 个 ?v 均为 unix 秒令牌, token='+c.most_common(1)[0][0]+' x'+str(c.most_common(1)[0][1])); subprocess.run(['python','update_v8.py','--only-cache-busters'],check=True) if bad else None"
             # 🛡 安全：先把任何落入 data/ 的密钥/令牌文件从索引移除，避免一并由 git add 提交到
             #   公开仓库（git add 不会自动 unstage 已跟踪的敏感文件；此前 -f 曾把 .mahoro_cookies.txt 等强制入库）。
@@ -483,6 +484,21 @@ jobs:
               echo "✅ 已部署 main（第 $i 次尝试，GitHub Pages 自动重建）"; exit 0
             fi
             echo "⚠️ push 被拒/超时（远端已前进或传输停滞），同步远端并按最新 raw_data 全量重建后重试 ($i/3)"
+            # 🛡🛡 2026-09-21 小九（线上 7 轮 failure 取证后·补护栏缺口）
+            #   实证：加固 301b30acd5b7(09-21 04:03) 上线后，本步 **仍** 出现 failure：
+            #     #35543304050 本步 38.8min / #35541752440 36.1min / #35542922345 31.8min
+            #     成功轮本步 8.6~20.6min ⇒ 失败轮**恒**在 30min+，全部撞 job 级 60min 兜底。
+            #   为什么上一版护栏没兜住 —— 是因为它只包了两个 git 命令：
+            #     有护栏：fetch(≤3min) + push(≤3min)              合计 6min/轮
+            #     无护栏：update_v8.py 全量重建(≈8min) + guard_v6_memo + --only-cache-busters
+            #   而第13步的时间实际**有 70%+ 花在无护栏的 python 全量重建上**：
+            #     每轮最坏 ≈ 3+8+1+3 = 15min ⇒ 3 轮 ≈ 45min > 单步可用预算。
+            #   ⇒ 本轮把**所有**重量级动作一并纳入硬超时，使「单轮最坏」有上界：
+            #     第③④⑤项各加 timeout（重建 300s / guard 120s / cache-busters 180s），
+            #     并把不可省的「全量重建」错误**判为致命立即退出**（它失败即本轮无意义，
+            #     继续重试只会再烧 8 分钟 ⇒ 这正是 30min+ 的成因）。
+            #   预算（改后）：单轮最坏 3+5+2+3+3 = 16min，但**一旦重建失败即 exit 1**，
+            #     实际最坏 ≈ 3(首轮fetch)+5(重建)+3(push)+3(fetch)+5(重建) ≈ 19min 收敛。
             timeout 180 git $_GITSLOW fetch "$REPO" main
             # 重试路径同样备份/恢复 index.html，避免人工前端改动被擦除
             # 🛡🛡 2026-09-16 一劳永逸（阿狸咪的工程师）·同上：重试路径存在同一覆盖源，
@@ -508,10 +524,16 @@ jobs:
             git checkout FETCH_HEAD -- data/FOUR_VOLUME.js data/FOUR_VOLUME_60M.js data/STOCK_STOP_DATA.js data/FINAL_RECOMMEND_DATA.js
             # 🔴 2026-08-18 根因修复：重试路径同样必须全量构建，不能用 --detect-changes
             #   （原因同上：reset 后 HEAD~1..HEAD 已无法反映 raw_data 的真实变化）。
-            python update_v8.py
+            # 🛡 2026-09-21 小九：加硬超时 + 失败即致命退出。
+            #   原写法 `python update_v8.py` 一旦卡住/失败仍会继续下一轮 ⇒ 每轮白烧 ~8min，
+            #   三轮叠加正是实测 31.8~40.4min 的成因（成功轮仅 8.6~20.6min）。
+            #   重建是**不可省**的步骤：它失败则本轮产物不可信，继续重试毫无意义 ⇒ exit 1。
+            if ! timeout 300 python update_v8.py; then
+              echo "❌ 全量重建失败/超时(300s)，本轮不可信，立即终止（不再重试）"; exit 1
+            fi
             # ★ 同上：reset 已擦掉 v6 戳修正，重试路径也必须重跑 guard 对齐（否则重试成功的
             #   那一趟提交仍带旧 v6 戳，v6备忘录继续打不开）。
-            python guard_v6_memo.py
+            timeout 120 python guard_v6_memo.py || echo "⚠️ guard_v6_memo 超时/失败（非致命，保留现有戳）"
           done
           echo "❌ 3 次重试后仍失败"; exit 1
 
