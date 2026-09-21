@@ -1394,6 +1394,51 @@ def _recent_trading_mark(n, hh, mm):
     return n - timedelta(days=1)
 
 
+def _next_trading_mark(n, hh, mm):
+    """返回 > n 的最近一个「A 股交易日 hh:mm」（跨周末/长假自动前推）。
+
+    🛡 2026-09-21 小九新增：与 _recent_trading_mark 配对，用于求「产出周期跨度」。
+    """
+    tz = n.tzinfo or timezone(timedelta(hours=8))
+    d = n.date()
+    for _ in range(60):
+        if _is_trading_day(d):
+            t = datetime(d.year, d.month, d.day, hh, mm, tzinfo=tz)
+            if t > n:
+                return t
+        d += timedelta(days=1)
+    return n + timedelta(days=1)
+
+
+def _legit_ceiling_cycle(page, n=None):
+    """未登记产物通用的「产出周期跨度下界」：允许数据跨过【下一个产出点】一次。
+
+    🔴 2026-09-21 小九（实测铁证 · 一劳永逸）：
+      下邻 _legit_ceiling 的 docstring 原文即「由【下一个产出周期】决定」，
+      但它的实现只有 (n − 上一个产出点) + grace —— 只盯「上一个产出点」。
+      而全量数据类产物的真实产出窗口是【交易日盘后】（实测提交时刻分布：
+      16:41、18:18~19:29、20:33、22:38~00:34）。于是在「今天的产出窗口尚未到」
+      这段每天都会出现的合法空档里，它会把「上一交易日的产物」判成陈旧。
+
+      实测（09-21 当天，10 版报告逐版复现）：
+        · 13:5x/14:x/15:07/15:10/15:13/15:16/15:19 的 9 版报告：两项均 ok
+        · 15:49 那一版：两项均 fail、summary.fail 由 1 跳到 2
+        · 而这两个文件的内容【一字未改】（恒为 09-18 16:25:31 / 09-18 15:00）
+        · 差值恒定：all_ALGO_BACKTEST_COMPARE 恒 age−cap=+65，
+          all_STOCK_LIST 恒 age−cap=+150 ⇒ 不是数据变旧，是 cap 变紧
+        · cap 断崖实测：15:29=4499 → 15:31=4201（−298）→ 20:31=1440（−3030）
+
+    本函数返回「一个完整产出周期 + grace」，作为该页通用红线的下界。
+    只放宽、不收紧；且调用点仅在「下一个产出点尚未到」时启用（见 check_all_data_files），
+    因此当晚产出点一过即恢复严格口径，真故障不会被长期掩盖。
+    """
+    n = n or now_cst()
+    hh, mm = _REG_CYCLE_MARK.get(page, (20, 30))
+    cur = _recent_trading_mark(n, hh, mm)
+    nxt = _next_trading_mark(n, hh, mm)
+    return int((nxt - cur).total_seconds() / 60) + _REG_GRACE_MIN
+
+
 def _legit_ceiling(n, page, dual_page=None):
     """该类卡在 n 时刻「合法可容许的最大数据年龄」（分钟）—— 由下一个产出周期决定。
 
@@ -2049,6 +2094,16 @@ def check_all_data_files():
         # 此时 vid 已知 dt 不为 None，_LOW_FREQ_FILES 在上面已 continue 排除
         # 未知卡未登记 CARD_DEFS，按「全量数据」page 走（不分实时数据 2h 红线，避免误伤）
         cap = _hard_cap_for_owner_rule(page="全量数据")
+        # 🛡 2026-09-21 小九（一劳永逸 · 消除每个交易日都会出现的「盘后假红窗口」）：
+        #   通用红线还须不低于「一个完整产出周期」—— 详见 _legit_ceiling_cycle 的实测记录。
+        #   仅在【下一个产出点尚未到】时启用：今天的盘后产出窗口未到 ⇒ 上一交易日的产物
+        #   仍是最新可用数据 ⇒ 不得判 fail；当天产出点一过即恢复原严格口径。
+        #   实测：本补丁把 09-21 15:49 的 cap 由 4219 抬到 4500，两项误报消除，
+        #   同时「隔满一个产出周期仍未更新」者 age 仍会超过下界 ⇒ 真故障照报不误。
+        _n_now = now_cst()
+        _hh, _mm = _REG_CYCLE_MARK.get("全量数据", (20, 30))
+        if _next_trading_mark(_n_now, _hh, _mm).date() == _n_now.date():
+            cap = max(cap, _legit_ceiling_cycle("全量数据", n=_n_now))
         # 已登记 CARD_DEFS 的卡在 check_data_cards 用 d.max_age 判定；未知卡统一走 24h/T+1 红线
         status = "ok" if age_min <= cap else "fail"
         # 🛡 2026-08-19 修：OCR 人工依赖卡（MOMENTUM_FILTER / STOCK_MOMENTUM_STATE / V2）
