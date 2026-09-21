@@ -1990,7 +1990,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">定位</div>
         <div class="logic-p">全市场 A 股（5500+ 只）个股画像工具，不是选股算法，因此排在 tab 最左、不参与可信度排序。查任何股票都保证有数据（离线全市场行情缓存 + 行业概念 + 股息分红 + 止盈止损）。</div>
         <div class="logic-h">数据覆盖（2026-08-06 升级）</div>
-        <div class="logic-p">· <b>实时行情</b>：全市场 5537 只（价格/涨跌/今开/昨收/最高/最低/量额）<br>· <b>概念行业</b>：5198 只 board/industry/concepts<br>· <b>股息分红</b>：3637 只（股息率/EPS/BVPS/分红比例/除权除息日/方案进度）</div>
+        <div class="logic-p">· <b>实时行情</b>：全市场 5537 只（价格/涨跌/今开/昨收/最高/最低/量额）<br>· <b>概念行业</b>：5198 只 board/industry/concepts<br>· <b>股息分红</b>：3637 只（股息率/EPS/BVPS/每10股派现/除权除息日/进度）</div>
         <div class="logic-h">股息判断口径</div>
         <div class="logic-p">· 股息率 ≥2.5% → 高股息，适合长期持有收息<br>· 1.5%-2.5% → 中等股息，股息+成长兼顾<br>· &lt;1.5% → 低股息，偏成长型<br>· 无分红记录 → 显示"暂无分红记录"（不造假）</div>
         <div class="logic-h">分析类卡片说明（综合财务画像）</div>
@@ -3283,7 +3283,7 @@ function switchSec(sec,el){
     if(f.eps!=null) finLines.push({label:'每股收益 EPS', val:'¥'+f.eps.toFixed(2), clr:'var(--txt)'});
     if(dyPct!=null) finLines.push({label:'股息率', val:dyPct, clr:dyColor});
     if(bvpsStr!=null) finLines.push({label:'每股净资产 BVPS', val:'¥'+bvpsStr, clr:'var(--txt)'});
-    if(d.cash_ratio!=null && isFinite(d.cash_ratio)) finLines.push({label:'分红比例', val:d.cash_ratio.toFixed(2)+'%', clr:'var(--sub)'});
+    if(d.cash_ratio!=null && isFinite(d.cash_ratio)) finLines.push({label:'每10股派现', val:'¥'+d.cash_ratio.toFixed(2), clr:'var(--sub)'});
     if(d.net_profit_yoy!=null) finLines.push({label:'净利润同比增长', val:(d.net_profit_yoy>=0?'+':'')+(d.net_profit_yoy*100).toFixed(1)+'%', clr: d.net_profit_yoy>=0?'var(--up)':'var(--down)'});
     if(d.total_share_yi!=null) finLines.push({label:'总股本', val:d.total_share_yi.toFixed(2)+'亿', clr:'var(--sub)'});
     if(exStr) finLines.push({label:'除权除息日', val:exStr, clr:'var(--sub)'});

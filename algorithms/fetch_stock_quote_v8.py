@@ -17,6 +17,7 @@ v6 是 lazy 实时查询（akshare 按需调，慢）；v8 改成离线缓存（
 import akshare as ak
 import json
 import os
+import re
 import time
 import datetime
 import sys
@@ -264,7 +265,7 @@ def merge_industry_concepts(quote_data):
 _REPORT_TAG = {"0331": "一季报", "0630": "半年报", "0930": "三季报", "1231": "年报"}
 
 
-def _recent_report_dates(n=6):
+def _recent_report_dates(n=8):
     """最近 n 个「分红送配报告期」（YYYYMMDD，由近及远）。
 
     🔴 2026-09-21 修复：akshare `stock_fhps_em(date=)` 的 date 参数语义就是
@@ -309,6 +310,54 @@ def _fmt_dividend_plan(r):
     return "；".join(parts)
 
 
+_REPORT_TAG = {"0331": "一季报", "0630": "半年报", "0930": "三季报", "1231": "年报"}
+
+
+def _rp_key(rp):
+    """'2026半年报'/'2026-06-30' -> 20260630（可比整数）；无法解析 -> None。
+
+    用于判定「东财最新报告期」与「cninfo 最新已实施方案」谁更新（口径统一，见 #3）。
+    """
+    if not rp:
+        return None
+    s_ = str(rp).strip()
+    for t_, md_ in (("一季", "0331"), ("半年", "0630"), ("中报", "0630"), ("三季", "0930"), ("年报", "1231")):
+        if t_ in s_:
+            m_ = re.search(r"(\d{4})", s_)
+            return int("%s%s" % (m_.group(1), md_)) if m_ else None
+    m_ = re.search(r"(\d{4})\D?(\d{2})\D?(\d{2})", s_)
+    if m_:
+        return int("%s%s%s" % (m_.group(1), m_.group(2), m_.group(3)))
+    m_ = re.search(r"(\d{4})", s_)
+    return int("%s1231" % m_.group(1)) if m_ else None
+
+
+def _load_prev_dividends():
+    """载入上一版产物的 dividend 映射（raw_data 优先，data/STOCK_QUOTE.js 兜底）。
+
+    🔴 2026-09-21 根因修复：本模块原先在 merge_dividend 里写
+       `existing = quote_data[code8].get('dividend')`，而 quote_data 是本次**全新构建**的
+       ⇒ existing 恒为空 ⇒「保留 cninfo 更权威结果」是**死代码**。
+       叠加 v8_stock_quote_refresh.yml 每天 09:00-16:30 跑 16 次、cninfo 刷新一天仅数次，
+       cninfo 成果存活不足 30 分钟即被本模块全量重建覆盖。
+       线上实证：3550 只有分红数据的票，带 cninfo 特征字段（type/announce_date/record_date）的 = 0 只。
+    """
+    for p_ in (os.path.join(RAW_DIR, 'stock_quote.json'), os.path.join(DATA_DIR, 'STOCK_QUOTE.js')):
+        try:
+            if not os.path.exists(p_):
+                continue
+            t = open(p_, encoding='utf-8').read()
+            if p_.endswith('.js'):
+                t = t.split('=', 1)[1].rstrip().rstrip(';').strip()
+            d = json.loads(t)
+            m = {k: (v.get('dividend') or {}) for k, v in (d.get('stocks') or {}).items()}
+            print("📥 载入上一版分红映射：%d 只（%s）" % (len(m), os.path.basename(p_)))
+            return m
+        except Exception as e:
+            print("⚠️ 载入上一版分红失败 %s: %s" % (os.path.basename(p_), e))
+    return {}
+
+
 def merge_dividend(quote_data):
     """合并 akshare stock_fhps_em() 全市场分红配送 → 精简字段。
 
@@ -320,7 +369,15 @@ def merge_dividend(quote_data):
       ex_date: '2024-06-26',
       progress: '实施分配',
       desc: '10派4.2元' or '10送2转3派4.2元',
+      report_period: '2026半年报',
+      plan_date: '2026-08-15',
+      src: 'em' | 'cninfo',
     }
+
+    🔴 cash_ratio 语义 = **每10股派现元数**（不是百分比）。
+       实证：'10派2.49元' ↔ 2.49；'10派100元' ↔ 100.0。
+    🔴 与上一版产物**真合并**：保留 cninfo 独有字段（type/announce_date/record_date/eps/bvps/...）；
+       report_period 较新者胜出（同期或无法比较则 cninfo 优先）；东财无数据的票沿用上一版，不删除。
     """
     try:
         import akshare as ak
@@ -330,7 +387,7 @@ def merge_dividend(quote_data):
     try:
         import pandas as pd
         dfs = []
-        _ps = _recent_report_dates(6)
+        _ps = _recent_report_dates(8)
         for _p in _ps:
             try:
                 _d = ak.stock_fhps_em(date=_p)
@@ -347,6 +404,9 @@ def merge_dividend(quote_data):
         df = pd.concat(dfs, ignore_index=True).drop_duplicates(subset=['代码'], keep='first')
         print(f"📅 分红报告期 {[_report_period_cn(x) for x in _ps]} → 命中 {len(df)} 只")
         merged = 0
+        prev_div = _load_prev_dividends()
+        kept_cninfo = 0
+        restored = 0
         for _, r in df.iterrows():
             code6 = str(r['代码']).strip()
             if not code6.isdigit() or len(code6) != 6:
@@ -368,25 +428,42 @@ def merge_dividend(quote_data):
                     pass
                 if not v: return None
                 return str(v).strip()
-            existing = quote_data[code8].get('dividend') or {}
-            new_desc = _fmt_dividend_plan(r)
-            # 若已有 cninfo 的 desc（更权威），保留；否则用 stock_fhps_em 生成
-            # 🔴 2026-09-21 纠正：原先「已有 desc 就保留」会让旧版方案文字（曾恒取 2023 年报）
-            #   与新写入的 report_period 自相矛盾。改为东财最新报告期优先；
-            #   cninfo 刷新步骤在其后执行，仍会以 cninfo 为准覆盖。
-            desc = new_desc or existing.get('desc')
-            quote_data[code8]['dividend'] = {
-                'yield': _f(r.get('现金分红-股息率')),     # 0.0244 = 2.44%
-                'cash_ratio': _f(r.get('现金分红-现金分红比例')),  # 9.8974%
+            existing = prev_div.get(code8) or {}
+            em_div = {
+                'yield': _f(r.get('现金分红-股息率')),            # 0.0244 = 2.44%
+                'cash_ratio': _f(r.get('现金分红-现金分红比例')),   # 🔴 每10股派现元数（非 %）
                 'ex_date': _s(r.get('除权除息日')),
                 'progress': _s(r.get('方案进度')),
-                'desc': desc,
-                # 2026-09-21 新增：报告期 + 预案公告日（前端分红方案行据此写明「是哪一期的」）
+                'desc': _fmt_dividend_plan(r),
                 'report_period': _s(r.get('__RP')),
                 'plan_date': ((_s(r.get('预案公告日')) or '')[:10] or None),
+                'src': 'em',
             }
+            merged_div = dict(existing)
+            if existing.get('src') == 'cninfo' or existing.get('type') or existing.get('announce_date'):
+                # cninfo 成果（经权威实施公告核实）：报告期较新者胜，同期/无法比较则 cninfo 优先
+                k_prev, k_em = _rp_key(existing.get('report_period')), _rp_key(em_div.get('report_period'))
+                if k_prev is not None and (k_em is None or k_prev >= k_em):
+                    for k_, v_ in em_div.items():
+                        if merged_div.get(k_) in (None, '', 0):   # 只补齐缺口，不覆盖 cninfo
+                            merged_div[k_] = v_
+                    merged_div['src'] = 'cninfo'
+                    kept_cninfo += 1
+                else:
+                    merged_div.update(em_div)
+            else:
+                merged_div.update(em_div)
+            quote_data[code8]['dividend'] = merged_div
             merged += 1
-        print(f"✅ 合并分红配送：{merged}/{len(quote_data)} 只")
+        # 第二遍：东财近 8 期均无该票 ⇒ 沿用上一版（多为 cninfo 已核实的实施方案），不删除
+        for code8, v in quote_data.items():
+            if v.get('dividend') or code8.startswith('hk') or v.get('board') == 'ETF':
+                continue
+            pv = prev_div.get(code8)
+            if pv:
+                quote_data[code8]['dividend'] = pv
+                restored += 1
+        print(f"✅ 合并分红配送：{merged}/{len(quote_data)} 只 | 沿用 cninfo {kept_cninfo} 只 | 沿用上一版 {restored} 只")
     except Exception as e:
         print(f"⚠️ 分红合并失败: {e}")
     return quote_data

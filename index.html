@@ -1185,7 +1185,10 @@ function _holdBadge(dateStr, count, label){
  * 返回：{ok, badgeHTML, reason}
  * 异常规则：
  *   1. 解析出每股派息 / 股价 > 10%（即股息率超 10%）
- *   2. 分红比例（cash_ratio）> 80%
+ *   2. 方案金额与 cash_ratio 自相矛盾（🔴 2026-09-21 单位纠正）
+ *      cash_ratio 语义 = 每10股派现元数；原「cashRatio > 80 当 >80%」是单位误读 ——
+ *      实测吉比特 cash_ratio=100.0（10派100元）被误报「待核」，而 10派100元 对 348 元股价属正常。
+ *      故改为「desc 解析出的每股派现」与「cash_ratio/10」一致性校验，只抓真矛盾。
  *   3. 股息率 d.yield > 8%
  *   4. 方案文本金额异常大但无法解析（如 >50 元/10股）
  * 任一命中即标「待核」徽章并提示交叉核对。
@@ -1207,12 +1210,16 @@ window._dividendCheck = function(d, price){
     }
   }
   var yieldImplied = (perShare > 0 && price > 0) ? perShare / price : 0;
-  var cashRatio = (d.cash_ratio != null) ? parseFloat(d.cash_ratio) : 0;
+  var cashRatio = (d.cash_ratio != null) ? parseFloat(d.cash_ratio) : 0;   /* 每10股派现元数 */
   var yieldVal = (d.yield != null) ? parseFloat(d.yield) : 0;
-  if(yieldImplied > 0.10 || cashRatio > 80 || yieldVal > 0.08){
+  /* 单位自洽：cash_ratio 是「每10股派现元数」⇒ /10 应等于 desc 解析出的每股派现 */
+  var crPerShare = (cashRatio > 0) ? cashRatio / 10 : 0;
+  var crMismatch = (crPerShare > 0 && perShare > 0 &&
+                    Math.abs(crPerShare - perShare) > Math.max(0.01, perShare * 0.05));
+  if(yieldImplied > 0.10 || crMismatch || yieldVal > 0.08){
     var reasons = [];
     if(yieldImplied > 0.10) reasons.push('估算股息率 ' + (yieldImplied*100).toFixed(2) + '%，显著偏高');
-    if(cashRatio > 80) reasons.push('分红比例 ' + cashRatio.toFixed(1) + '%，超过常规水平');
+    if(crMismatch) reasons.push('方案金额与字段不一致（方案 ' + perShare.toFixed(2) + ' 元/股 vs 每10股派现 ' + cashRatio.toFixed(2) + ' 元）');
     if(yieldVal > 0.08) reasons.push('股息率 ' + (yieldVal*100).toFixed(2) + '%，超过 8%');
     return {ok:false, badge:'<span style="font-size:10px;background:rgba(239,68,68,.15);color:var(--down);padding:1px 6px;border-radius:4px;margin-left:4px;cursor:help" title="' + reasons.join('；') + '，请交叉核对东财/交易所公告">待核</span>', reason:reasons.join('；')};
   }
@@ -9144,7 +9151,7 @@ function switchSec(sec,el){
     if(f.eps!=null) finLines.push({label:'每股收益 EPS', val:'¥'+f.eps.toFixed(2), clr:'var(--txt)'});
     if(dyPct!=null) finLines.push({label:'股息率', val:dyPct, clr:dyColor});
     if(bvpsStr!=null) finLines.push({label:'每股净资产 BVPS', val:'¥'+bvpsStr, clr:'var(--txt)'});
-    if(d.cash_ratio!=null && isFinite(d.cash_ratio)) finLines.push({label:'分红比例', val:d.cash_ratio.toFixed(2)+'%', clr:'var(--sub)'});
+    if(d.cash_ratio!=null && isFinite(d.cash_ratio)) finLines.push({label:'每10股派现', val:'¥'+d.cash_ratio.toFixed(2), clr:'var(--sub)'});
     if(d.net_profit_yoy!=null) finLines.push({label:'净利润同比增长', val:(d.net_profit_yoy>=0?'+':'')+(d.net_profit_yoy*100).toFixed(1)+'%', clr: d.net_profit_yoy>=0?'var(--up)':'var(--down)'});
     if(d.total_share_yi!=null) finLines.push({label:'总股本', val:d.total_share_yi.toFixed(2)+'亿', clr:'var(--sub)'});
     if(exStr) finLines.push({label:'除权除息日', val:exStr, clr:'var(--sub)'});
@@ -16059,7 +16066,7 @@ h += '</div>'; // /ulPaneObserve
       if (dv && dv.cash_ratio != null){
         var dyColor = dv.cash_ratio >= 30 ? '#fbbf24' : (dv.cash_ratio >= 10 ? '#22c55e' : '#94a3b8');
         var prog = dv.progress && /实施|已/.test(dv.progress) ? '已实施' : (dv.progress || '预案');
-        dyChip = '<span style="margin-left:4px;font-size:9px;padding:0 3px;border-radius:2px;background:rgba(251,146,60,.12);color:'+dyColor+';font-weight:600;">💰'+dv.cash_ratio.toFixed(1)+'%</span>';
+        dyChip = '<span style="margin-left:4px;font-size:9px;padding:0 3px;border-radius:2px;background:rgba(251,146,60,.12);color:'+dyColor+';font-weight:600;">💰10派'+String(+dv.cash_ratio.toFixed(2))+'元</span>';
       }
       return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:10.5px;padding:1.5px 0;border-bottom:1px dashed rgba(148,163,184,.10);">'
         + '<span><b>'+s.name+'</b> <span style="color:var(--dim);font-size:9.5px;">'+s.code+' · '+(s.business_pct*100|0)+'%</span>'+dyChip+'</span>'
@@ -16241,7 +16248,7 @@ h += '</div>'; // /ulPaneObserve
         if (dv && dv.cash_ratio != null){
           var dC = dv.cash_ratio >= 30 ? '#fbbf24' : (dv.cash_ratio >= 10 ? '#22c55e' : '#94a3b8');
           var prog = dv.progress && /实施|已/.test(dv.progress) ? '已实施' : (dv.progress || '预案');
-          dyTag = '<span style="margin-left:4px;font-size:9.5px;padding:1px 5px;border-radius:3px;background:rgba(251,146,60,.15);color:'+dC+';font-weight:600;">💰'+dv.cash_ratio.toFixed(1)+'%·'+prog+'</span>';
+          dyTag = '<span style="margin-left:4px;font-size:9.5px;padding:1px 5px;border-radius:3px;background:rgba(251,146,60,.15);color:'+dC+';font-weight:600;">💰10派'+String(+dv.cash_ratio.toFixed(2))+'元·'+prog+'</span>';
           divCk = window._dividendCheck ? window._dividendCheck(dv, sq ? sq.price : 0) : {ok:true, badge:''};
         }
         html += '<span style="display:inline-block;padding:4px 10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:6px;font-size:12px;color:#22c55e;font-weight:600;">'+l.name+' <b style="color:var(--txt);margin-left:2px;">'+l.lbc+'板</b>'+dyTag+(divCk.badge||'')+'</span>';

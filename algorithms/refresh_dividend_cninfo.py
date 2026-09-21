@@ -263,10 +263,32 @@ def pick_latest_plan(df):
         "ex_date": (ex.isoformat() if ex else ""),
         "progress": progress,
         "cash_ratio": latest["cash"],
-        "report_period": (latest["rep"] or ""),
+        "report_period": _rp_tag(latest["rep"]),
         "type": (latest["type"] or ""),
         "desc": (latest["desc"] or ""),
+        # 🔴 2026-09-21 口径统一：标注来源，供 fetch_stock_quote_v8.merge_dividend 判定优先级
+        "src": "cninfo",
     }
+
+
+_REPORT_TAG = {"0331": "一季报", "0630": "半年报", "0930": "三季报", "1231": "年报"}
+
+
+def _rp_tag(rp):
+    """把 cninfo「报告时间」规范成与东财同形的 '2026半年报'。
+
+    东财 stock_fhps_em(date=) 产出 '2026半年报'；cninfo 的「报告时间」可能是
+    '2026-06-30' 等形式 ⇒ 统一成前者，避免两源口径打架。
+    """
+    if not rp:
+        return ""
+    s_ = str(rp).strip()
+    if any(t in s_ for t in ("年报", "半年报", "季报")):
+        return s_
+    m = re.search(r"(\d{4})\D?(\d{2})\D?(\d{2})", s_)
+    if not m:
+        return s_
+    return "%s%s" % (m.group(1), _REPORT_TAG.get("%s%s" % (m.group(2), m.group(3)), ""))
 
 
 def code8_of(code):
