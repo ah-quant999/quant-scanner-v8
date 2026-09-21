@@ -1,5 +1,5 @@
 {
- "max_next_id_seq": 29,
+ "max_next_id_seq": 30,
  "ids": [
   "build13-timeout-guard",
   "cachebot-build-race",
@@ -29,7 +29,8 @@
   "quote-third-source",
   "logic-html-schedule-label",
   "all-generic-redline-false-positive",
-  "all-generic-redline-cap-cliff"
+  "all-generic-redline-cap-cliff",
+  "cnfetch-empty-shell-block"
  ],
  "updated": "2026-09-21 17:44",
  "generated_by": "小九(lemoncat-cn) + 阿狸咪(alimi-cn)",

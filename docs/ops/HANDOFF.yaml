@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 29
+  next_id_seq: 30
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -1020,3 +1020,67 @@ items:
       只消除「盘后产出窗口未到」这段每天都会出现的假红。两条并存。
     verified_at: "2026-09-21 17:08（线上 v8_health_check.py 207683 B 在位 + 报告 updated=17:04:15 两项 ok / fail=0 + 线上真身复算 cap 恒 4500；20:31 回落 1440 保留）"
     updated: "2026-09-21 17:27"
+  # ── 2026-09-21 18:5x 阿狸咪新增（盘后抓取整批被「阻止空壳推送」拦下 ⇒ 盘后链整日空转）──
+  - id: cnfetch-empty-shell-block
+    priority: P0
+    owner: shared
+    status: todo
+    what: >-
+      2026-09-21 盘后 **cn_fetch 主批 3 个模块抓取失败 ⇒ 触发既有「阻止空壳推送」设计，
+      整批（含已算好的 22 个 ok 模块）一并被拦** ⇒ raw_data 全批未落 main ⇒ 上游 B 批未就绪
+      ⇒ **algo 链整日空转、当日盘后产物零提交**。链路逐环实测（18:1x~18:5x CST）：
+        · cn_fetch 批（15:54 起跑 → 18:08:48 收尾）末尾
+          `📋 runner_status: {'total': 31, 'ok': 22, 'empty': 6, 'fail': 3}`，紧接
+          `❌ 3 个模块抓取失败，整体任务标记失败，阻止空壳推送` ⇒ `exit code 1`。
+          失败面集中在**东财 `push2delay.eastmoney.com`**：`CANDIDATE_QUOTES` 6 批 ×3 重试全失败
+          （`Expecting value: line 1 column 1 (char 0)` / `Read timed out`）→「返回空，跳过」；
+          `JUDGMENT_DATA` 东财指数行情 3/3 失败；`SH_SZ_HISTORY` 沪深成交额 `RemoteDisconnected`
+          （沿用历史序列）。`empty` 6 项含 OVERSEAS_MARKETS / US_HK_MAP / EXPERIMENT /
+          RESTRICTED_RELEASE。
+        · **被连带的代价（同一轮四量已算完却被拦）**：日志逐字
+          `✅ 写出 .../data/FOUR_VOLUME.js（12 只命中）`、`四量终极回测: 1443 个信号,
+          T+5 胜率 52.5% / 均值 2.19% / 最大回撤 -6.32%`、
+          `✅ 写出 .../data/FOUR_VOLUME_BACKTEST.js（回测外壳刷新，1443 信号）`。
+        · algo 链当日 **26 档、step9「运行盘后算法链」真跑 0 次（25 档 skipped）**
+          （对照 09-18 同类 8 次 / 09-19 13 次）⇒ 闸门 `target_stage=NONE` / `proceed=false`，
+          reason 逐字 `回填目标 2026-09-19 的 ['B','D'] 全被后续日覆盖->不可能->空转等本日起点`，
+          问责逐字 `B就绪=5/12(false) D最终推荐=0/1(false)` ⇒ workflow 自标
+          `::notice 各批产物均已就绪或未到起点，本轮空转（合规）`。
+        · 直接后果：4 项 CORE 判陈旧（云端真值，非本机副本）—— VOLATILITY `09-20 15:57:37`、
+          BACKTEST_COMPREHENSIVE `09-19 17:58:29`、BACKTEST_TDX `09-19 17:58:23`、
+          CRDS_CARD_DATA `09-20 17:20:14`，**四项当日零提交**。
+    fix: >-
+      两条路径分开定，**勿合并**：
+      （A）**恢复**：等本批重跑落地 —— 派发已在飞（cn_fetch 1 档自 16:58 in_progress + 4 档 pending；
+          守卫自愈亦按 post_close / algo 派过）。东财 `push2delay` 恢复后 B 批落库即自然解锁 algo 链。
+      （B）**设计裁定（需人拍板，本项主体）**：「部分模块失败 ⇒ 整批不推」在**盘后唯一批次**上是
+          单点故障 —— 22 个 ok 模块（含已算好的四量 1443 信号）被 3 个 fail 连带清零。可选：
+          ① 维持整批拦（安全但一天数据全丢，即今日现状）；
+          ② 改**选择性推送**（fail 模块产物保留远端旧值、其余照推），并在 HEALTH_CHECK / 问责里
+             显式标出「本批 N 项未刷新」；
+          ③ 只对**B/D 依赖面白名单模块**失败才拦，其余降级 `::warning`。
+    evidence: >-
+      cn_fetch run `35575170140`（15:54→18:08:48 CST，job log 逐字；失败步 =
+      `📡 抓中国数据 → raw_data/（selective）`）及同刻 `35575168061`；
+      algo run `35585598744` / `35578853260` / `35580712260` / `35577419643` 的 steps 列表
+      （step9–step16 全 skipped，step8 闸门 success、step17 问责 success）；
+      4 项 CORE 产物 blob：VOLATILITY `a04a7ea86894`、BACKTEST_COMPREHENSIVE `06eeabfe71d2`、
+      BACKTEST_TDX `5d76f6d108a6`、CRDS_CARD_DATA `59d1c53e906b`。
+    verify_how: >-
+      ① **判「已恢复」只看产物落没落**：`data/FOUR_VOLUME_BACKTEST.js` /
+         `data/BACKTEST_COMPREHENSIVE.js` / `data/BACKTEST_TDX.js` / `data/CRDS_CARD_DATA.js`
+         的 `update_time` 是否推进到 **09-21**；**禁以「cn_fetch run success」当判据**
+         （本仓已多次实证 success ≠ 落库）。
+      ② 判 algo 链真跑：取当日任一 run 的 step9 `🧮 运行盘后算法链` **conclusion == success**
+         （非 skipped）。
+      ③ 若当晚 20:30 后仍未落 ⇒ 转（A）恢复路径排查，勿当阈值问题。
+    note: >-
+      阿狸咪本轮**只做只读取证 + 汇报**（本轮任务明令 detect+dispatch、不跑数据）：
+      **0 手工 dispatch**（前 8 档交接件 0 条 `[ACTION] dispatch`；URGENT=0）、0 代码改动、0 阈值改动。
+      ⚠️ 排雷：闸门 notice 里的「（休市段第2天）」是 `v8_algo_cloud.yml` 的**固定文案**
+      （源码 L1083 为字面量，非日历判定结论），**不得据此判「今日休市」**；
+      `_HOLIDAY_RANGES_2026` 中 09-21 不在假日区间（中秋 = 09-25~09-27）。
+      另注：`_MAKEUP_DAYS_2026`（4 文件）把 **2026-09-20（周日）** 标为「补班日=实际交易日」，
+      而闸门走的 `v8_date.is_trading_day → fetch_lhb` 对周末一律 False ⇒ 双日历对 09-20 结论相反
+      （既有同族挂账，本项未展开，仅记录）。
+    updated: "2026-09-21 18:55"
