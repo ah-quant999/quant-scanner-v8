@@ -98,3 +98,15 @@
 - 协议正文变更 ⇒ 改 `docs/ops/skills/v8-handoff-gateway/SKILL.md`，本文件**只需保持指针有效**。
 - 行尾 **LF**（与仓内其余根级 `.md` 一致）。
 - 引入背景与验收记录：`docs/ops/HANDOFF.yaml` → item `handoff-ai-entry-file`。
+- 🔴 **改完本文件（或 `SKILL.md`）必须同步到「会话实际工作目录」——否则等于没改。**
+  依据（CodeBuddy 官方文档 `/cli/memory` 原文）：记忆文件「**在启动时自动加载到上下文中**」，
+  且项目级是「**从当前工作目录向上递归加载**」`CODEBUDDY.md` 与 `AGENTS.md`。
+  ⇒ **文件只躺在远端 ＝ 没有会话会读到它。**
+  本仓常用 **API 隔离推送**（按设计绕过本地工作树）⇒ 推完**必跑一次本机同步**：
+
+  ```bash
+  python C:/Users/Administrator/.workbuddy/scripts/v8_handoff_edit_kit.py ai-entry-sync
+  ```
+
+  它把 `AGENTS.md` / `.codebuddy/CODEBUDDY.md` / `SKILL.md` 逐字节落到**本地工作树**＋**本机 skill 副本**。
+  验证：重跑一次，输出应全部为「＝ 已一致」（md5 与线上 blob 相同）；任一处打「↑ 已更新」即说明上次漏同步。
