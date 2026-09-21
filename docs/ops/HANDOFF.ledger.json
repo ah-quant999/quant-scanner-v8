@@ -1,5 +1,5 @@
 {
- "max_next_id_seq": 32,
+ "max_next_id_seq": 33,
  "ids": [
   "build13-timeout-guard",
   "cachebot-build-race",
@@ -32,9 +32,10 @@
   "all-generic-redline-cap-cliff",
   "cnfetch-empty-shell-block",
   "handoff-yaml-dup-keys",
-  "handoff-ai-entry-file"
+  "handoff-ai-entry-file",
+  "maharo-plan-b-three-editions"
  ],
- "updated": "2026-09-21 19:25",
+ "updated": "2026-09-21 19:45",
  "generated_by": "小九(lemoncat-cn) + 阿狸咪(alimi-cn)",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
