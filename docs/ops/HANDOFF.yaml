@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-21 12:31"
+  updated: "2026-09-21 12:37"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 24
+  next_id_seq: 27
 
 items:
 
@@ -577,3 +577,55 @@ items:
     evidence: "本文件 + skill v8-handoff-gateway"
     verified_at: "2026-09-21 08:45（建档）"
     updated: "2026-09-21 08:40"
+
+  # ── 2026-09-21 12:37 阿狸咪新增（STOCK_QUOTE 盘中漂移治本批次）─────────────
+  - id: stock-quote-dispatch-drift
+    priority: P0
+    owner: 阿狸咪
+    status: pending-verify
+    what: >
+      盘中 STOCK_QUOTE 的**执行主力漂移到「海外 IP 云端兜底链」**：09-21 实测兜底链 **15 档**
+      vs 主链（cn·中国 IP）**1 档**（09:46→11:28 每 7-8 分钟一轮）⇒ 撞新浪/东财反爬，
+      盘中 2 次「双源全灭」（10:08 / 11:21；错误签名 = 新浪返回 `'<'` 开头反爬 HTML、东财 RemoteDisconnected；
+      相邻档 11:28 即 success ⇒ 单次瞬断格）。根因 = `v8_cn_fetch_cloud.yml` relay ②
+      **无条件**派发 `_cloud` 兜底链（09-17 URGENT 交接件已诊断、当时只留痕未修 ⇒ **同一 bug 二次出现**）。
+    fix: >
+      relay ② 改「**主链优先 + 主链离线才兜底**」三态门控（FRESH_MIN=12 / QUEUE_MAX=10，**不 sleep**，
+      靠下一轮 relay 自然接管实现保底联动）；`fetch_stock_quote_v8.py` 新增 `_retry`
+      （新浪/东财各 3 次 + 退避 2/5s；`a_count<3000` 拒绝写输出的守卫**不动**）；
+      两份 STOCK_QUOTE workflow 头注口径同步。
+    evidence: "commit 5728c2175e3f（2026-09-21 12:31 CST）parent d9556121b6；回读 5/5 逐字节一致"
+    verify_how: >
+      等下午盘中（13:00 起）跑 2~3 档后核对**两链条数反转**：
+      ① 主链 `v8_stock_quote_refresh.yml` 档数显著上升（预期 ~12 分钟一档·中国 IP）；
+      ② 兜底链 `_cloud` 档数近零；③ relay step 日志出现「→ 本轮不派（防叠加）」或「派主链」。
+      ⚠️ **只看「无 failure」不算通过** —— 本诊断的前提恰是「failure 很少但主力错位」。
+      离线侧证据：门控 8 分支 mock 实测 8/8；workflow 结构自检 step 28→28；YAML×3 解析通过。
+    verified_at: null
+    updated: "2026-09-21 12:37"
+
+  - id: quote-third-source
+    priority: P2
+    owner: shared
+    status: todo
+    what: >
+      `fetch_stock_quote_v8.py` 仅新浪 + 东财双源，**反爬窗口内双源同时失效即整轮作废**
+      （本轮已由源级重试缓解「瞬断」，但不治「反爬窗口」——那靠主链中国 IP 解）。
+      候选第三源：腾讯 `qt.gtimg.cn`（akshare 侧接口名 `stock_zh_a_spot_qq`）。
+    blocker: >
+      本机 akshare 1.18.64 **无** `stock_zh_a_spot_qq`（实测 `hasattr=False`）；
+      云端 runner 的 akshare 版本可能不同 ⇒ 必须**先探测能力**（`hasattr`）再接入，
+      并加「解析行数 < 3000 即丢弃该源」守卫，防写坏全量行情。
+    updated: "2026-09-21 12:37"
+
+  - id: logic-html-schedule-label
+    priority: P2
+    owner: shared
+    status: todo
+    what: >
+      `logic.html` 调度矩阵两处**既有**偏差（非 09-21 引入）：L2156 把 `v8_stock_quote_refresh`
+      的执行机写成「云端 ubuntu」（实际主链 `runs-on: [self-hosted, cn]`；云端 ubuntu 的是 `_cloud` 副本）；
+      L2159 未区分主链/兜底。**本轮未改**：`logic.html` 并未描述 relay ② 的派发关系
+      ⇒ 不构成「文档说谎」；且改前端会扩大午休窗口的推送面（禁踩踏）。
+    verify_how: "与卡面文案一并做前端口径整理时同批修；改时须走分节守卫 + `?v` 竞态防护。"
+    updated: "2026-09-21 12:37"
