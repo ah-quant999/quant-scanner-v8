@@ -83,6 +83,33 @@ def git(args, timeout=60):
     )
 
 
+def restore_from_origin(relpath, timeout=30):
+    """🔴 2026-09-21 小九：还原单个文件并**即时撤销暂存**（陈旧暂存区地雷根治）。
+
+    原实现直接 `git checkout origin/main -- <path>`。但该命令是**写入 index** 的操作
+    （把该 path 的 origin/main 版本登记进 `.git/index`），并不只是改工作树 ⇒
+    每次自愈还原都会在主 index 留下 staged 项。
+
+    危害链：本机存在 4 处**裸 `git commit`（无 pathspec）**活脚本
+    （`algorithms/strategy_four_volume_60m.py:414`、`self_heal_monitor.py:262`、
+     `run_dividend_refresh.py:49`、`v8_closing_data_refresh.py:71`），
+    任一被 cron 触发即把这批 staged 一并提交推送 ⇒ 数据回滚。
+
+    实测（2026-09-21 08:2x）：本机 staged=5，其中 4 个与远端 blob 完全一致
+    （正是 checkout 留下的空转项）、1 个是本地审计日志。
+
+    修法：checkout 成功后**立刻** `reset -q HEAD -- <path>`。
+    ⚠️ 目标参数必须是 **HEAD 且带 pathspec** ⇒ 只 unstage 指定路径，
+       HEAD 与工作树分毫不动；**严禁** `reset --mixed origin/main`（会移动 HEAD）。
+
+    :return: 与 git() 同形的 CompletedProcess（供调用方查 returncode/stderr）
+    """
+    r = git(["checkout", "origin/main", "--", relpath], timeout=timeout)
+    if r.returncode == 0:
+        git(["reset", "-q", "HEAD", "--", relpath], timeout=timeout)
+    return r
+
+
 def fetch_origin_main():
     r = git(["fetch", "origin", "main"], timeout=90)
     return r.returncode == 0
@@ -142,7 +169,7 @@ def main():
             log("[FAIL] %s 本地缺失！疑似坚果云删除，将还原" % f, "FAIL")
             report["checks"].append({"file": f, "status": "fail", "detail": "local missing"})
             if not args.check_only:
-                r = git(["checkout", "origin/main", "--", f], timeout=30)
+                r = restore_from_origin(f, timeout=30)
                 if r.returncode == 0:
                     log("[HEAL] 已还原 %s (from origin/main)" % f, "HEAL")
                     actions.append("还原关键文件: " + f)
@@ -165,7 +192,7 @@ def main():
     elif local_html is None:
         log("[FAIL] 本地 index.html 缺失，将还原", "FAIL")
         if not args.check_only:
-            r = git(["checkout", "origin/main", "--", "index.html"], timeout=30)
+            r = restore_from_origin("index.html", timeout=30)
             if r.returncode == 0:
                 log("[HEAL] 已还原 index.html", "HEAL")
                 actions.append("还原 index.html")
@@ -192,7 +219,7 @@ def main():
                 log("[FAIL] 本地 index.html 被回退，缺失标记: %s" % ", ".join(local_missing), "FAIL")
                 report["checks"].append({"structural": "fail", "detail": "local reverted: " + ", ".join(local_missing)})
                 if not args.check_only:
-                    r = git(["checkout", "origin/main", "--", "index.html"], timeout=30)
+                    r = restore_from_origin("index.html", timeout=30)
                     if r.returncode == 0:
                         log("[HEAL] 已还原 index.html 到 origin/main（修复回退）", "HEAL")
                         actions.append("结构回退→还原 index.html")

@@ -67,9 +67,12 @@ if __name__ == "__main__":
     log("【commit + push】")
     shell(["git", "add", "-f", "data/*.js", "raw_data/*.json"], timeout=60)
     # fallback：accept-blue index.html 红线已经在 .gitignore 处理 (bloat check 接管)
+    # 🔴 2026-09-21 小九·纵深防御：补 pathspec（限定本步 add 的两个 glob），
+    #   杜绝吞掉陈旧暂存区（数据回滚地雷）。
     rc = run(["git", "-c", "user.name=jiubao", "-c", "user.email=bot@jiubao.local",
               "commit", "-m",
-              f"auto: 15:30 收盘+算法链刷新 {datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')}"],
+              f"auto: 15:30 收盘+算法链刷新 {datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')}",
+              "--", "data/", "raw_data/"],
              timeout=120)
     log(f"  commit exit={rc}")
 

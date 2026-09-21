@@ -988,6 +988,22 @@ def _heal_local_sync(pull_raw_data_only=False):
                     ["git", "checkout", "origin/main", "--", "raw_data/"],
                     check=True, capture_output=True, text=True, timeout=60
                 )
+                # 🔴 2026-09-21 小九·陈旧暂存区地雷根治（v8-git-stale-index-landmine 变体五同族）：
+                #   `git checkout <ref> -- <path>` 是**写入 index** 的操作（把该 path 的相对 ref
+                #   版本登记进 `.git/index`），并非只改工作树。巡检脚本每次走到本分支都会留下
+                #   staged 项；而本机存在 4 处**裸 `git commit`（无 pathspec）**活脚本
+                #   （algorithms/strategy_four_volume_60m.py / self_heal_monitor.py /
+                #    run_dividend_refresh.py / v8_closing_data_refresh.py），
+                #   任一被 cron 触发即会把这批 staged 一并提交推送 ⇒ 数据回滚。
+                #   实测（09-21 08:2x）：本机 staged=5，其中 4 个与远端 blob 完全一致
+                #   （checkout 留下的空转项）、1 个是本地审计日志。
+                #   修法：checkout 后**立刻**用 `reset -q HEAD -- <path>` 撤销暂存。
+                #   ⚠️ 目标参数必须是 **HEAD 且带 pathspec** —— 这样只 unstage 指定路径，
+                #      HEAD 与工作树**分毫不动**；严禁 `reset --mixed origin/main`（会移动 HEAD）。
+                subprocess.run(
+                    ["git", "reset", "-q", "HEAD", "--", "raw_data/"],
+                    capture_output=True, text=True, timeout=30
+                )
                 return True, f"已从 origin/main {remote[:7]} 拉取 raw_data/ 子树（{behind} 个 commit 落后）"
             except subprocess.CalledProcessError as e:
                 return False, f"raw_data/ 拉取失败: {e.stderr.strip()[:200]}"

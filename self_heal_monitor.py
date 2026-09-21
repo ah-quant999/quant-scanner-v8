@@ -259,7 +259,8 @@ def _push_candidate(merge_result):
             capture_output=True, text=True, cwd=str(ROOT), timeout=30
         )
         r = subprocess.run(
-            ["git", "commit", "-m", msg],
+            # 🔴 2026-09-21 小九·纵深防御：补 pathspec，杜绝吞掉陈旧暂存区（数据回滚地雷）。
+            ["git", "commit", "-m", msg, "--", str(CANDIDATE_FILE)],
             capture_output=True, text=True, cwd=str(ROOT), timeout=30
         )
         if r.returncode != 0 and "nothing to commit" not in (r.stdout + r.stderr):

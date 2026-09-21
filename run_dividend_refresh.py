@@ -46,8 +46,10 @@ def main():
         sys.exit(0)
 
     print("== 3/5 提交 ==")
+    # 🔴 2026-09-21 小九·纵深防御：补 pathspec，杜绝吞掉陈旧暂存区（数据回滚地雷）。
     run(["git", "commit", "-m",
-         "chore(v8/dividend): 每日cninfo分红方案刷新(重点池 持仓+候选+黄金)"], check=True)
+         "chore(v8/dividend): 每日cninfo分红方案刷新(重点池 持仓+候选+黄金)",
+         "--", "data/STOCK_QUOTE.js", "raw_data/stock_quote.json"], check=True)
 
     print("== 4/5 fetch + rebase 接远端 ==")
     run(["git", "fetch", "origin"], check=True)

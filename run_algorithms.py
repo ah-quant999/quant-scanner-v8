@@ -885,6 +885,13 @@ def _restore_empty_raw_outputs(run_start):
             try:
                 subprocess.run(["git", "checkout", "HEAD", "--", f"raw_data/{fname}"],
                                 cwd=V8_ROOT, capture_output=True, text=True, timeout=60)
+                # 🔴 2026-09-21 小九·陈旧暂存区地雷根治： 会**写入 index**
+                #   （把该 path 的 HEAD 版本登记进 .git/index）。本机存在 4 处**裸 git commit**
+                #   （无 pathspec）活脚本，任一被 cron 触发即把这批 staged 一并提交推送 ⇒ 回滚。
+                #   修法：checkout 后立刻 （只 unstage 该路径，
+                #   HEAD 与工作树分毫不动；严禁 reset --mixed origin/main —— 那会移动 HEAD）。
+                subprocess.run(["git", "reset", "-q", "HEAD", "--", f"raw_data/{fname}"],
+                                cwd=V8_ROOT, capture_output=True, text=True, timeout=30)
                 restored.append((fname, reason))
                 FAILED_SCRIPTS.append((fname, f"产物空/占位({reason})→已还原HEAD防写空"))
             except Exception as e:

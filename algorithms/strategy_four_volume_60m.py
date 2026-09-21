@@ -411,7 +411,8 @@ def auto_commit_and_mirror(paths):
             if st.stdout.strip():
                 msg = "data: 自动提交 60m 共振数据 " + ", ".join(
                     os.path.basename(p) for p in paths)
-                subprocess.run(["git", "commit", "-m", msg], cwd=repo, check=True)
+                # 🔴 2026-09-21 小九·纵深防御：补 pathspec，杜绝吞掉陈旧暂存区（数据回滚地雷）。
+                subprocess.run(["git", "commit", "-m", msg, "--", *rels], cwd=repo, check=True)
                 print(f"  ✅ 已提交至仓库 {repo}")
                 pr = subprocess.run(["git", "push", "origin", "main"], cwd=repo,
                                     capture_output=True, text=True)
