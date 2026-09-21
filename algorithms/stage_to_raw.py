@@ -355,13 +355,24 @@ def main():
         # （上一交易日收盘），避免周末跑批把日期错标成今天（周六无交易，数据实为上周五）。
         REF_DATE = os.environ.get("V8_REF_DATE")
         if REF_DATE and isinstance(obj, dict):
-            for _k in ("update_time", "calc_time", "gen_time", "run_time"):
+            for _k in ("calc_time", "gen_time", "run_time"):
                 if _k in obj:
                     obj[_k] = REF_DATE + " 15:00:00"
             for _k in ("date", "data_date"):
                 if _k in obj:
                     obj[_k] = REF_DATE
-            print(f"  🗓 回填模式：日期字段改写为参考交易日 {REF_DATE}")
+            # 🔴 2026-09-21 小九·一劳永逸修复（主人令「股池有问题」）：
+            #   update_time 已从覆写名单移除。它的项目口径是「本文件写入时刻」
+            #   （见上方 _add_timestamp：顶层无时戳时补 now_cst()），不是「数据归属日」。
+            #   原实现把它一并改成 "REF_DATE 15:00:00" 造成三重失真（均有线上实证）：
+            #     ① 前端 _fmtAshareRel 显示「更新于 N天前 15:00」，而数据其实是刚产出的 ——
+            #        2026-09-21 主人截图实证：gold_pool 的 update_time=2026-09-18 15:00:00
+            #        而 last_update=2026-09-20 15:46:26，同一文件两个时间字段自相矛盾；
+            #     ② v8_health_check 以 update_time 作通用 age 基准 ⇒ age 虚高、误报陈旧；
+            #     ③ api_push_raw._content_ts 读同一字段做防倒退守卫 ⇒ 判 lts<rts 永久拒推
+            #        （该脚本 L1005 注释已记录此自锁，此前只用豁免清单绕过、未治根）。
+            #   归属日由下方 date/data_date 承担，calc/gen/run_time 属计算时刻照旧改写。
+            print(f"  🗓 回填模式：归属日期改写为参考交易日 {REF_DATE}（update_time 保持真实产出时刻）")
         # 2026-08-18 补：sector_rs.json 兜底注入 data_date（板块周期卡比对锚点）
         if v8_name == "sector_rs.json" and isinstance(obj, dict):
             if not obj.get("data_date"):
