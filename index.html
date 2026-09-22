@@ -1964,14 +1964,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <span style="font-size:15px;font-weight:700;color:var(--txt);">🏆 当日因子计分榜</span>
     <span id="dsbUpdSlot" style="display:inline-flex;align-items:center;gap:6px;"></span>
     <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">最新一轮榜单</span>
-    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">候选池 top20 · 按总分降序</span>
+    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">推荐置顶同序 · 余按因子总分降序</span>
     <span id="dsbBadge" style="font-size:10px;color:var(--dim);"></span>
     </div>
     <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px;">
     <b style="color:#f59e0b;">怎么读</b>：候选池每只票的<b>各因子加减分</b>逐项列出（<span style="color:#ef5350;">红=加分</span> / <span style="color:#26a69a;">绿=扣分</span> / 灰=0），按
     <code style="background:rgba(245,158,11,.1);padding:1px 4px;border-radius:3px;">total_score</code> 从高到低排列 ——
     <b style="color:#ef5350;">最顶部的就是最终推荐</b>；标 🏷「最终推荐」= 当日 FINAL_RECOMMEND 实际推荐名单。
-    <br><span style="color:var(--dim);">⚠️ 本榜为<b>最新一轮盘后产物</b>（非实时）—— 产物日期见卡头「更新于」胶囊，与「最终推荐」名单口径各自独立、按代码精确匹配，不混排。</span>
+    <br><span style="color:var(--dim);">⚠️ 本榜为<b>最新一轮盘后产物</b>（非实时）—— 产物日期见卡头「更新于」胶囊，与「最终推荐」TopN 完全一致（权威序）。</span>
     </div>
     <div id="dsbHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">&#x1F3C6; 当日因子计分榜加载中&#x2026;</div></div>
     </div>
@@ -7523,6 +7523,33 @@ function fmtSigned(v){
     // 上述「↳」子项列（已含在「增强」列内，渲染时弱化，避免主人重复相加）
     var _SUBCOLS = { score_breakout:1, score_research:1, score_p4:1, score_p5:1 };
     var _detKeys = ['form_detail','fund_detail','sector_detail','inst_detail','quality_detail','research_detail','p4_detail','p5_detail'];
+    // 🔴 2026-09-23 一劳永逸修复：本榜排序以「最终推荐」为权威序，根除与最终推荐排名不一致
+    //   原逻辑直接按生成器序（total_score 降序）渲染，与 final_recommend.py 的 final_score 排序（且可纳入三重/四量等跨策略源）必然分叉。
+    //   现改为：① 最终推荐名单按 FR 同序置顶；② 其下按因子总分降序；③ FR 中含因子池外标的（跨策略源）也置顶并标注 ⊘。
+    var _codeOf = function(s){ return String(s.code==null?'':s.code).replace(/[^0-9]/g,''); };
+    var _frIdx = {};
+    (FR.stocks||[]).forEach(function(x, i){ if(x && x.code != null) _frIdx[String(x.code).replace(/[^0-9]/g,'')] = i; });
+    var _rest = rows.filter(function(s){ return !_frIdx.hasOwnProperty(_codeOf(s)); });
+    _rest.sort(function(a,b){ return (Number(b.total_score)||0) - (Number(a.total_score)||0); });
+    var _rowByCode = {}, _poolCodes = {};
+    rows.forEach(function(s){ var c=_codeOf(s); _rowByCode[c]=s; _poolCodes[c]=true; });
+    var _extraByCode = {};
+    (FR.stocks||[]).forEach(function(x){
+      if(!x || x.code == null) return;
+      var c = String(x.code).replace(/[^0-9]/g,'');
+      if(_poolCodes[c]) return;
+      var _r = { code:c, name:(x.name||c), total_score:(x.final_score!=null?x.final_score:'—'), _notInPool:true };
+      FACTS.forEach(function(f){ _r[f[1]] = 0; });
+      _extraByCode[c] = _r;
+    });
+    var _recRows = [];
+    (FR.stocks||[]).forEach(function(x){
+      if(!x || x.code == null) return;
+      var c = String(x.code).replace(/[^0-9]/g,'');
+      var _r = _rowByCode[c] || _extraByCode[c];
+      if(_r) _recRows.push(_r);
+    });
+    rows = _recRows.concat(_rest);
     // 🔴 2026-09-22：从产物取「真实公式三段」的真值，用于卡面如实披露（不写死、产物缺则降级）
     var _gi  = D.gate_info || {};
     var _gm  = (_gi.gate_multiplier != null) ? Number(_gi.gate_multiplier) : null;
@@ -15482,13 +15509,13 @@ function __renderUnlockCover(){
       h += '<div style="font-size:12px;color:var(--sub);margin-bottom:8px;">未来解禁家数：7天 <b>' + rr.stats.d7 + '</b> · 30天 <b>' + rr.stats.d30 + '</b> · 60天 <b>' + rr.stats.d60 + '</b> · 90天 <b>' + rr.stats.d90 + '</b></div>';
     }
     if(rr && rr.items && rr.items.length){
-      h += '<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:12px;">';
+      h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px 10px;margin-bottom:12px;">';
       var top = rr.items.slice(0, 8);
       for(var i=0;i<top.length;i++){
         var it = top[i];
-        h += '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--border2);">'
-           + '<span>' + it.name + ' <span style="color:var(--dim);">' + it.code + '</span></span>'
-           + '<span style="color:var(--warn);">' + it.date + ' · ' + it.amount + '</span></div>';
+        h += '<div style="font-size:11px;padding:4px 6px;border:1px solid var(--border2);border-radius:6px;background:rgba(255,255,255,0.03);min-width:0;">'
+           + '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><b style="color:var(--txt);">' + it.name + '</b> <span style="color:var(--dim);">' + it.code + '</span></div>'
+           + '<div style="color:var(--warn);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + it.date + ' · ' + it.amount + '">' + it.date + ' · ' + it.amount + '</div></div>';
       }
       h += '</div>';
     } else {
@@ -15500,12 +15527,12 @@ function __renderUnlockCover(){
     h += '<span class="fresh" id="ulCovTime">' + utCov + '</span></div>';
     var covList = (cov && cov.coverage) ? cov.coverage : [];
     if(covList.length){
-      h += '<div style="display:flex;flex-direction:column;gap:3px;">';
-      for(var j=0;j<covList.length && j<10;j++){
+      h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px 10px;">';
+      for(var j=0;j<covList.length && j<12;j++){
         var c = covList[j];
-        h += '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--border2);">'
-           + '<span>' + c.name + ' <span style="color:var(--dim);">' + c.code + '</span></span>'
-           + '<span style="color:var(--sub);">' + c.org + ' · ' + (c.rating || '—') + '</span></div>';
+        h += '<div style="font-size:11px;padding:4px 6px;border:1px solid var(--border2);border-radius:6px;background:rgba(255,255,255,0.03);min-width:0;">'
+           + '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><b style="color:var(--txt);">' + c.name + '</b> <span style="color:var(--dim);">' + c.code + '</span></div>'
+           + '<div style="color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + c.org + ' · ' + (c.rating || '—') + '">' + c.org + ' · ' + (c.rating || '—') + '</div></div>';
       }
       h += '</div>';
     } else {
