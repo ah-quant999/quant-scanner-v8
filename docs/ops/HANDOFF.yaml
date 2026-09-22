@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 22:50"
+  updated: "2026-09-23 04:55"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 58
+  next_id_seq: 59
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -300,6 +300,15 @@ items:
       （`base_tree` = 当时 tip 的 tree、`force:false`、PATCH **200 OK**）。
       **本地侧复核**：`git diff --cached --name-only | wc -l` = **0**（与 20:4x 轮一致，无复埋）。
     updated: "2026-09-23 00:01"
+
+    alimi_correct_20260923: >-
+      阿狸咪 2026-09-23 复核当前 main 代码：HANDOFF 09-22 备注点名的两处「checkout 后未 unstage」
+      —— v8_rollback_guard.py:107 与 v8_health_check.py:1002 —— 实际均已在 checkout 后落地
+      `git reset -q HEAD -- <path>`（rollback_guard L108-109、health_check L1017-1020）。
+      故「两处未被 fix 覆盖」是基于更早版本的过时判断，码面已修，本项 remain doing 的真正未决 =
+      09-22 20:26 那次 1.3MB→366KB「落后基线型 Contents API 覆盖」（commit 0320100b3f；
+      force:false 拦不住「基线落后型覆盖」，见 §30.1/§43），该机制已由 `require_full` 截断读守卫
+      （af4b42b75435）根治，待下一档 cn fetch 复验后转 pending-verify。
 
   - id: alimi-same-family-check
     priority: P0
@@ -2886,3 +2895,25 @@ items:
         ① 线上 index.html 仍以 `</html>` 结尾且字节数 ≥ 1,347,523（连续 3 次 cn fetch 后复查）；
         ② cn fetch 日志出现 `📄 正文不完整` / `🚨 拒绝使用` 时，说明守卫真的在拦（属预期，不是故障）；
         ③ 若仍出现截断，读 `_blob_text` 的 exp 与实际字节数，确认是否 size 元数据本身取失败。
+
+  - id: board-first-limit-automation
+    priority: P1
+    owner: 阿狸咪的工程师
+    status: done
+    what: >
+      主板首板·一进二观察卡（BOARD_FIRST_LIMIT）自动化接入。原卡 09-22 05:19 上线只落手动快照，
+      fetcher（algorithms/fetch_board_first_limit.py）从未接入任何 workflow ⇒ 数据停在 2026-09-21 23:23，
+      健康面板报「超过通用红线 1620 分钟」（主人 09-23 截图红警）。
+    fix: >
+      ① fetcher 挂进 v8_cn_fetch_cloud（board_first 步，continue-on-error + 软失败强制 annotation），
+      产物 raw_data/board_first_limit.json + data/BOARD_FIRST_LIMIT.js 由 soft_10/soft_14 增量推送步自动上线；
+      ② 首版只挂 post_close ⇒ 盘前 run 直接 skip，与「一劳永逸」相悖；
+      09-23 改为【每轮刷新】（去掉 post_close 闸门），fetcher 默认模式自带「向前回溯最近有池交易日(≤7日)」
+      + 「同日去重」⇒ 非交易时段 run 也能补抓最近交易日且天然幂等，不会空壳 / 重复推送。
+    evidence: >
+      commit bf7a4b24c4（接自动化 + 板块资金两类齐全断言 + ws_sync_guard 第9处拆弹）、
+      c21e4975f8（fetcher 回溯版）；09-23 阿狸咪手动补 09-22 数据（date=20260922, total=35, basic_pass=9）
+      直推 main，远端 update_time 由 2026-09-21 23:23 刷新至 2026-09-23 04:55。
+    verified_at: "2026-09-23 04:55 CST（阿狸咪手动补数据 + 直推，红警解除；自动化每轮刷新待下一档 cn fetch 终验）"
+    updated: "2026-09-23 04:55"
+    updated_by: 阿狸咪的工程师
