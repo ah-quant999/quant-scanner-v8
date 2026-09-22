@@ -84,6 +84,98 @@ def load_json(path, default=None):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 🔴 2026-09-22 新增：当日行情闸门（数据真实性修复）
+#   问题：TOP10 卡的 close/pct_chg 取自候选池 history 最后一根（= 上次算到该票那天的
+#   快照），实测滞后 1~3 个交易日（西部矿业 close=35.45 实为 09-17 价，当日应为 36.77），
+#   且部分票 close=0（德业股份/埃斯顿/国轩高科）⇒ 卡上显示 0、止损位/目标价算不出。
+#   口径与 algorithms/final_recommend.py 的 _quote_snapshot() **完全一致**（全站单一真源）：
+#     · 只认 update_time 日期 == 今日 的行情快照，否则整份作废（回退，**绝不伪造 0**）；
+#     · 数据源优先级：STOCK_QUOTE.js → CANDIDATE_QUOTES.js；
+#     · close/pct_chg **不参与任何评分**（仅展示 + 止损/目标价基准）⇒ 本改动不动评分口径。
+# ─────────────────────────────────────────────────────────────────────────────
+DATA_OUT = os.path.join(WORKSPACE, "..", "data")
+_QUOTE_SNAP_CACHE = None
+
+
+def _load_js_obj(name):
+    """读取 data/xxx.js（window.X = {...};）并返回 dict；任何失败返回 {}。"""
+    path = os.path.join(DATA_OUT, name)
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        text = re.sub(r"/\*.*?\*/", "", text, flags=re.S).strip()
+        if text.startswith("window."):
+            text = text.split("=", 1)[1]
+        obj = json.loads(text.strip().rstrip(";").strip())
+        return obj if isinstance(obj, dict) else {}
+    except Exception:
+        return {}
+
+
+def _num_or_none(x):
+    """严格数值化：None / "" / 不可解析 → None。**绝不把缺失伪造成 0.0**。"""
+    if x is None or x == "":
+        return None
+    try:
+        return float(x)
+    except (TypeError, ValueError):
+        return None
+
+
+def _code6(raw):
+    """从 sz301308 / sh_600000 / 301308 / hk00700 等取 6 位数字码。"""
+    digits = "".join(ch for ch in str(raw) if ch.isdigit())
+    return digits[-6:] if len(digits) >= 6 else ""
+
+
+def quote_snapshot():
+    """当日有效行情快照 {6位code: {"price","pct"}}，带日期校验；非当日 → 空 map。"""
+    global _QUOTE_SNAP_CACHE
+    if _QUOTE_SNAP_CACHE is not None:
+        return _QUOTE_SNAP_CACHE
+    today = datetime.now().strftime("%Y-%m-%d")
+    snap = {"date": None, "source": None, "map": {}}
+
+    _sq = _load_js_obj("STOCK_QUOTE.js")
+    if str(_sq.get("update_time") or "")[:10] == today:
+        m = {}
+        for k, v in (_sq.get("stocks") or {}).items():
+            if not isinstance(v, dict):
+                continue
+            c = _code6(k)
+            p = _num_or_none(v.get("price"))
+            if c and p:
+                m[c] = {"price": p, "pct": _num_or_none(v.get("pct"))}
+        if m:
+            snap = {"date": today, "source": "STOCK_QUOTE", "map": m}
+
+    if not snap["map"]:
+        _cq = _load_js_obj("CANDIDATE_QUOTES.js")
+        if str(_cq.get("update_time") or "")[:10] == today:
+            m = {}
+            for it in (_cq.get("items") or []):
+                if not isinstance(it, dict):
+                    continue
+                c = _code6(it.get("code"))
+                p = _num_or_none(it.get("price"))
+                if c and p:
+                    m[c] = {"price": p, "pct": _num_or_none(it.get("chg"))}
+            if m:
+                snap = {"date": today, "source": "CANDIDATE_QUOTES", "map": m}
+
+    _QUOTE_SNAP_CACHE = snap
+    if snap["map"]:
+        print(f"  💹 当日行情闸门启用：{snap['source']} @ {snap['date']}，覆盖 {len(snap['map'])} 只")
+    else:
+        print("  ⚠️ 无当日行情快照（STOCK_QUOTE / CANDIDATE_QUOTES 缺失或非当日）→ "
+              "close/pct_chg 回退候选池历史值（不伪造）")
+    return snap
+
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 🔴 P2 信号边缘权重（运行期加载）：必须在 load_json 定义之后执行
 # ─────────────────────────────────────────────────────────────────────────────
 SIGNAL_EDGE = dict(SIGNAL_EDGE_DEFAULT)
@@ -1390,6 +1482,12 @@ def main():
 
         # ── 止损位 / 目标价 ──
         close_price = latest.get("close") or s.get("close") or 0
+        # 🔴 2026-09-22：当日行情优先（候选池 history 的 close 滞后 1~3 日、甚至为 0）
+        _qcode = raw_code
+        _q = quote_snapshot()["map"].get(str(_qcode))
+        _q_price = _q.get("price") if _q else None
+        if _q_price:
+            close_price = _q_price
         # 近5日最低/最高收盘价（用于辅助计算）
         recent_closes = []
         sorted_hist_all = sorted(hist, key=lambda h: h.get("date", ""), reverse=False)
@@ -1405,7 +1503,11 @@ def main():
         stop_loss_method, target_price_method, risk_reward = "", "", 0
         if close_price and close_price > 0:
             _board = s.get("board_label", "") or board_from_code(raw_code)
-            _st = compute_stop_target_from_closes(recent_closes or [close_price], board=_board, strategy="general")
+            # 🔴 2026-09-22：止损/目标价基准须含当日收盘（历史序列最后一根滞后）
+            _stop_seq = list(recent_closes)
+            if _q_price and (not _stop_seq or _stop_seq[-1] != _q_price):
+                _stop_seq.append(_q_price)
+            _st = compute_stop_target_from_closes(_stop_seq or [close_price], board=_board, strategy="general")
             if _st:
                 stop_loss = _st["stop_loss"]
                 target_price = _st["target_price"]
@@ -1473,8 +1575,11 @@ def main():
             "market": s.get("market", ""),
             "board": s.get("board_label", ""),
             "sig_count": sig_count,
-            "close": latest.get("close") or s.get("close") or 0,
-            "pct_chg": latest.get("pct_chg") or s.get("pct_chg") or 0,
+            # 🔴 2026-09-22：展示价用当日行情（与止损基准同口径），无当日快照则回退历史值
+            "close": close_price or latest.get("close") or s.get("close") or 0,
+            "pct_chg": (_q["pct"] if (_q and _q.get("pct") is not None)
+                        else (latest.get("pct_chg") or s.get("pct_chg") or 0)),
+            "close_source": (quote_snapshot()["source"] if (_q and _q_price) else "history"),
             "pct_chg_20d": pct20 or 0,
             "breakout_5d": breakout_5d,
             "total_score": total,
@@ -1546,6 +1651,7 @@ def main():
             "sig_count": s["sig_count"],
             "close": s["close"],
             "pct_chg": s["pct_chg"],
+            "close_source": s.get("close_source", "history"),
             "pct_chg_20d": s["pct_chg_20d"],
             "breakout_5d": s.get("breakout_5d", False),
             "total_score": s["total_score"],
