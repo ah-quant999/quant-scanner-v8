@@ -1,5 +1,5 @@
 {
-  "max_next_id_seq": 48,
+  "max_next_id_seq": 50,
   "ids": [
     "build13-timeout-guard",
     "cachebot-build-race",
@@ -49,10 +49,12 @@
     "category-map-two-table-drift",
     "cloudfetch-us-hk-map-unknown-local-diff",
     "intraday-schedule-morning-absent",
-    "ima-snapshot-72h-expiry-trap"
+    "ima-snapshot-72h-expiry-trap",
+    "algo-step15-undefined-t",
+    "fourvolume-backtest-3y-downgrade"
   ],
-  "updated": "2026-09-22 17:03",
-  "generated_by": "小九(lemoncat-cn) + 阿狸咪(alimi-cn) （2026-09-22 13:55 阿狸咪刷新：+2 新项 / 2 项回填） （2026-09-22 16:2x 阿狸咪刷新：+1 新项 / 1 项转 done / 3 项回填） （2026-09-22 17:0x 小九现场终验收口：4 项转 done（category-map-two-table-drift / candidate-quotes-category-drift / factorlab-commit-pathspec / backtest-tdx-no-refresh）+ 10 项实测注记；0 新增 id / next_id_seq 仍 47）",
+  "updated": "2026-09-22 20:20",
+  "generated_by": "小九(lemoncat-cn) + 阿狸咪(alimi-cn) （2026-09-22 13:55 阿狸咪刷新：+2 新项 / 2 项回填） （2026-09-22 16:2x 阿狸咪刷新：+1 新项 / 1 项转 done / 3 项回填） （2026-09-22 17:0x 小九现场终验收口：4 项转 done（category-map-two-table-drift / candidate-quotes-category-drift / factorlab-commit-pathspec / backtest-tdx-no-refresh）+ 10 项实测注记；0 新增 id / next_id_seq 仍 47） （2026-09-22 20:2x 阿狸咪补登记：+2 新 id（algo-step15-undefined-t / fourvolume-backtest-3y-downgrade） / next_id_seq 48→50 / max_next_id_seq 48→50；两项均为「现场已实测但从未进状态源」的红线）",
   "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
   "id_content_hashes": {
     "algo-edge-ordering-fix": "17b731a53ed6f7e4",
@@ -102,7 +104,9 @@
     "stockquote-cachebuster-noop": "4588dbdc8794f0ce",
     "stockquote-noon-gap-relay-cancel": "b9a2956721afe3d6",
     "strong-breakout-purge": "f7c2151df2a4b0c6",
-    "unlockcover-factor-observation-card": "30fb30168e36e4f3"
+    "unlockcover-factor-observation-card": "30fb30168e36e4f3",
+    "algo-step15-undefined-t": "efc22d8be8c47bb1",
+    "fourvolume-backtest-3y-downgrade": "a192296d26dd03ad"
   },
   "id_content_hash_note": "每 id 内容哈希（sha256 前 16 位；计算时把该 item 的 updated 时间戳归一化为 <ts>，以排除纯时间漂移造成的假阳性）。用途：现「ids 集合」锚只能抓 item 消失或整体回滚，抓不到「id 仍在、但内容被旧版顶掉」—— 那恰是防覆盖要防的主类（见 factorlab-conflict-tree-pollution / stale-index-landmine 同型事故）。校验：按同一规则重算，逐 id 比对，不一致即视为内容被回退。（2026-09-21 阿狸咪的工程师 增补；建议 1 落地）（2026-09-21 18:45 小九补记：本批**全量重算**了 31 项哈希，并把新增 id 一并登记 ⇒ 外部锚 由「28/30 命中」变为「31/31 自洽」。⚠️ 复算方法：块边界 = 该项 `- id:` 起至下一个 `- id:` 前为止（**含**下一项前的 `# ──` 分隔注释 —— 该边界缺陷已在 HANDOFF.yaml 的 handoff-concurrent-write 内记录，建议改「截到最后一个非空非注释行」，本批不擅改以免与生成器分叉）。复算命令：按 item 切块 → 把块内 `updated:` 归一化为字面量 `<ts>` → rstrip() → sha256 前 16 位。）"
 }

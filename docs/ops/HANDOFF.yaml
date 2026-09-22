@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 48
+  next_id_seq: 50
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -2337,3 +2337,82 @@ items:
         （detail_channel=full-snapshot / reconciled=true / len(stocks)=56）。
       ⇒ 本项记的是**结构性缺陷**，不是当天的红 run（后者已随快照刷新转绿）。
     updated: '2026-09-22 17:08'
+
+  # ── P0 · 算法链收尾步（2026-09-22 20:20 阿狸咪现场登记）──────────────────
+  - id: algo-step15-undefined-t
+    priority: P0
+    owner: 阿狸咪
+    status: pending-verify
+    what: >
+      `v8_algo_cloud.yml` step15「🔄 同步 ALGO_TRACK 缓存戳 ?v 并推送 index.html」的内联 python
+      在 `re.sub(..., r'\1?v=' + t, html)` 与末尾 print 中引用变量 `t`，但**整个 heredoc 块内无任何
+      `t =` 赋值** ⇒ 确定性 `NameError: name 't' is not defined`（栈 `<stdin> line 32`）。
+      后果：**凡通过批次闸门的「真跑」档，收尾步必失败** ⇒ ① run 结论被拖成 `failure`
+      （该 yml 自身注释即自述「会把 run 拖成 failure，连带 build 被跳过」）；
+      ② ALGO_TRACK 的 ?v 永不由 algo 链对齐（目前仅靠 build/deploy 侧兜底对齐）。
+      实证（阿狸咪 2026-09-22 20:0x CST，全走 REST）：algo 近 40 档中 `conclusion=failure` 共 5 档，
+      **其中 4 档失败步唯一 = step15**：#2044(09-22 18:00, runner=alimi-cn) / #2026(09-21 20:50) /
+      #2025(09-21 20:15) / #2023(09-21 18:10)；另 1 档 #2024 失败步 = step14。
+      真跑档的 step14「唯一推送」均为 `success` ⇒ **数据零损失**，仅收尾缓存戳步失败。
+    fix: >
+      按全站 ?v 约定（2026-09-10 主人令：由内容哈希改为**单调 unix 秒令牌**；线上实测
+      `ALGO_TRACK.js?v=1790075211`）在乐观锁重试循环前补一行 `t = str(int(time.time()))`
+      （`time` 已在该 heredoc 的 import 列表内）。只加 1 行赋值 + 3 行注释，job/step 结构零改动。
+    evidence: >
+      阿狸咪 2026-09-22 20:12 CST 单文件 Contents API 直推，commit `c16e376ea6`，新 blob
+      `63cce8cb06f465ccf2c013b0721aae9776cf77d2`（80,941 B / 1,135 行）。
+      推前门禁：YAML `safe_load` 通过、jobs/steps 形状 `[('algo',16)]` 前后一致、
+      `run`+`with` 同存步 = 0；推前重取基线断言未漂移（`891afa0498`）；推后回读 blob 逐字节一致且含修复行。
+    verify_how: >
+      等**下一个通过闸门的真跑 algo 档**跑完 ⇒ 断言 ① step15 结论 = `success`；② run 结论 = `success`；
+      ③ step15 日志出现 `push index.html ALGO_TRACK ?v: 200 v= <10 位 epoch>`。
+      🔴 判据纪律：`build=skipped` 的闸门空转档其 step15 亦为 `skipped`，**不得当验证样本**。
+    updated: "2026-09-22 20:20"
+
+  # ── P1 · 数据口径红线（2026-09-22 20:20 阿狸咪补登记：此前 3 日只在哨兵技能、从未进状态源）──
+  - id: fourvolume-backtest-3y-downgrade
+    priority: P1
+    owner: shared
+    status: todo
+    what: >
+      四量终极回测外壳 `data/FOUR_VOLUME_BACKTEST.js` 的 `signal_date_range` **反复由「近 5 年」降到「近 3 年」**
+      —— 即主人 2026-09-16 令「不是真实的我不要」所禁的**回测口径降级覆盖**。
+      ⚠️ 本项此前**从未登记进本状态源**：阿狸咪哨兵 09-17 / 09-18 / 09-19 连续 3 日实测记录，
+      但只留在哨兵技能内，未进 HANDOFF ⇒ 无人认领（典型的「已定性 ≠ 已登记」）。现补登记。
+      本轮实测（阿狸咪 2026-09-22 20:0x CST，取远端真身）：
+      · tip `data/FOUR_VOLUME_BACKTEST.js` blob `cba060abce` / `update_time=2026-09-22 18:47:40` /
+        `total_signals=1428` / `signal_date_range="近 3 年"` ⇒ **当前在位的是错误档**。
+      · 上游 `raw_data/four_volume_backtest.json` 的 `years` 字段同步为 3（历史上最省事的「一次跳变」铁证）。
+      · 该路径近 6 次提交**全部**为 `v8 cn fetch: HH:MM`（committer=`GitHub` = Contents API 家族）：
+        09-22 18:27 / 19:03 / 19:40 与 09-21 19:41 / 20:43 / 22:00 ⇒ **写入者 = cn fetch 链**。
+      · 历史翻转参照：09-17 同日两次（19:05 五年 → 20:07 三年）；09-19 一天翻转 4 次
+        （02:32 三年 → 04:30 五年 → 09:06 三年 → 14:49 三年）⇒ **只能写「截至本轮 tip 为 X」，永不写「已修复」**。
+    note: >
+      **根因（已定位到写入者，机理待取证）**：
+      ① `cloud_fetch_v8.py::f_four_volume()`（L4548）以子进程跑 `algorithms/strategy_four_volume.py`，
+         而 `cloud_fetch_v8.py` 全文对 `V8_BACKTEST_YEARS` **零命中**（grep 0）⇒ 未注入，
+         落到 `strategy_four_volume.py` L620 `default=int(os.environ.get("V8_BACKTEST_YEARS", "3") or 3)`
+         ⇒ **云端刷新路由必出 3 年档**；仅 E 回测批经 `SCRIPT_ENV` 注入 5 年。
+      ② `strategy_four_volume.py` L415-435 **已有**「只允许同档或升档覆盖」的脚本级防降级护栏
+         （注释即自述 09-16 02:09 那次 5 年→3 年事故），但**今天仍降级成功** ⇒ 护栏未构成阻断。
+         **失效机理尚未取证，不臆断**。候选：a) 护栏判定 `_old_has_data` 依赖 `by_period` 内出现引号键，
+         旧档 `by_period` 为空则该条件不成立而放行；b) 实际写路径绕过该函数
+         （如 `update_v8.py` 由 Raw 侧映射生成 `.js`，护栏在被绕过的那一层之外）。
+    fix: >
+      ⚠️ **禁**「简单给 cn fetch 注入 `V8_BACKTEST_YEARS=5`」——那会让每轮盘后多跑
+      「全市场 × 5 年」回测，显著拉长 cn fetch 时长并可能撞上游超时，
+      与主人令③「不要造成踩踏和暴风」直接冲突。**先取机理，再定修法。**
+      方向（待拍板）：把口径护栏由「脚本级 + 读本机 checkout 文件」升级为**产物写入口的内容级 ratchet**
+      —— 无论谁写 `data/FOUR_VOLUME_BACKTEST.js` / `raw_data/four_volume_backtest.json`，
+      落盘前都比对**远端现值**的 `years`，只允许同档或升档；即「口径只能升不能降」
+      由统一写入口把守，而非依赖某个脚本自觉。
+    options:
+      A: 查清护栏失效机理后，仅修那一处判定（最小改动，但仍是脚本级自觉）
+      B: 把 ratchet 下沉到 `update_v8.py` / `api_push_raw.py` 的写入口（治「所有写者」，推荐）
+      C: cn fetch 路由显式注入年数（**禁**，见 fix 段理由）
+    verify_how: >
+      ① 复现实验：离线构造「远端 5 年档 + 本地 3 年跑」，确认护栏是否被调用、判定为何放行；
+      ② 修复后连看 ≥3 个盘后周期 ⇒ 断言 `signal_date_range` 恒为「近 5 年」，
+      且 `total_signals` **随重跑变化**（证明是新跑，而非旧档原样回推 —— 三字段须齐变才叫修复）。
+    updated: "2026-09-22 20:20"
+
