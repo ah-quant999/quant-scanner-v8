@@ -132,7 +132,7 @@ items:
   - id: gate-1010-marker-stale-ms-note
     priority: P0
     owner: 小九
-    status: todo
+    status: pending-verify
     what: >
       ⚠️ **09:58 阿狸咪复核：本项原描述已失效，勿按原文处置。**
       原文称「[10/10] index 核心标记守卫正在阻断全部 deploy」——该阻断**已不存在**：
@@ -165,7 +165,13 @@ items:
     fallback: >
       若 17:45 收盘前仍未追加，阿狸咪将在夜间窗口（18:00 后）按自身上线流程追加 `ms-note-card`
       为第 35 条（单文件 Contents API 直推，清单与 commit message 同步）。
-    updated: "2026-09-21 11:45"
+    fix_applied_20260923: >
+      ✅ 阿狸咪 2026-09-23 07:22 CST（master 授权·全做完批次）已落实 fix：**追加 `ms-note-card|每日洞察·月度汇总口径说明通栏卡容器|2026-09-21`
+      为清单第 35 条**（单 token、无空格，避旧锚把两类名拼成子串的形式失效）；并**删除已退役的 `window.__renderBaihechou` 锚点**
+      （该渲染器 09-22 主人令整卡退役，保留会致 [10/10] 0 命中红）—— 删除后离线复现 **34/34 在位，EXIT 0**。
+      离线 `pre_deploy_audit.py` 现 **12/12 全绿**（[1/8]~[8/8] + [9/9]回测 + [10/10]index标记 + [11/11]defer缓存 + [12/12]调用点定义）。
+      本项核心待办（补 ms-note-card 保护）已闭环；剩余 = 等下一个 CI build 真跑 [10/10] 终验（master 授权下由阿狸咪推进）。
+    updated: "2026-09-23 07:22"
 
   # ── P0 · 数据回滚防线 ──────────────────────────────────────────────────
   - id: stale-index-landmine
@@ -186,6 +192,8 @@ items:
       而 `algorithms/run_algorithms.py::main()` **每次跑批无条件**调它（`--heal`）⇒
       staged 项会持续再生。当前**无引爆点**（algo 链推送走 `api_push_raw.py` 的 Contents API，
       不经 git commit），属结构性残留。修法同前例：checkout 后补 `git reset -q HEAD -- <paths>`。
+      ✅ 阿狸咪 2026-09-23 07:15 CST 已在 `v8_ws_sync_guard.py` L183 / L266 两处 checkout 后补
+      `git reset -q HEAD -- <paths>`；py_compile 通过。待完整交易日观察 staged 是否复埋。
     verify_how: >
       ① 本机 `echo "staged=$(git diff --cached --name-only|wc -l)"` 应恒为 0
       ② `git reflog -8` 不应再出现新的 `reset: moving to origin/main`
@@ -464,7 +472,16 @@ items:
         再抹掉它。本批只在护栏处加醒目注释 + 本项留证；
         「把护栏在位断言挂进 `pre_deploy_audit`」已列为**下一批**（改 CI 门禁面较大）。
         〔09-22 17:0x 小九现场发现·机械守卫的静默失配〕按本文件 `meta` 第 E 条「推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json」做口径校准（用未编辑的线上 YAML 重算 `id_content_hashes`，断言与线上 ledger 逐项相同）：**48 项中 45 项一致、3 项失配**，且失配项**恰好就是 16:22 更新过的那 3 项**（probe-intraday-missing-market-alerts / category-map-two-table-drift / cloudfetch-us-hk-map-unknown-local-diff）⇒ 判定：哈希算法一致，差异 = **该次更新漏刷 ledger**。⚠️ 构造性缺陷：`[13/13]` 门禁只断言 `ids ⊇` 与 `next_id_seq >=`，**不校验 `id_content_hashes`** ⇒ 漏刷可长期静默存活，直到下一次校准才暴露。建议后续把「ledger 哈希 ≡ YAML 现算」纳入 [13/13]（或加一条 soft 告警）。本次重算已顺带修正这 3 项陈旧哈希。
-    updated: '2026-09-22 17:02'
+    ledger_fix_20260923: >
+      🔧 阿狸咪 2026-09-23 07:22 CST 重写 `docs/ops/HANDOFF.ledger.json`，修正小九 09-22 点出的缺陷并补齐外锚自洽：
+      ① **块边界修正**：原块边界把下一项前的 `# ──` 分隔注释也算入 ⇒ 上方插新项即误报「内容被回退」；
+         改为「截到最后一个非空、非注释行」；`id_content_hash_note` 已注明（2026-09-23 阿狸咪的工程师）。
+      ② **补登 21 个缺失 id**：yaml 中 `algo-step15-undefined-t` / `index-tail-truncation-2220` / `cn-fetch-writer-version-drift` /
+         `trunc-read-treated-as-success` 等 21 项此前从未进 ledger ⇒ 门禁 `ids ⊇` 断言看不见它们，覆盖可静默通过；
+         现 ledger `ids=60` 与 yaml `items=60` 完全对齐，`hashes=60`，`max_next_id_seq=59` == `next_id_seq=59`。
+      ③ 仍**未纳入** `[13/13]` 对 `id_content_hashes` 的校验（小九已建议，属 CI 面改动，列为下一批）。
+      外锚现已自洽，本项 D 条「读-写原子性」的外部证据链闭合：ledger 可正确捕获任何 id 消失。
+    updated: '2026-09-23 07:22'
 
   - id: handoff-yaml-guard
     priority: P0

@@ -181,13 +181,10 @@ def _heal_rules_first(ref, repo):
         print(f"  [rules] 🔴 备份 {rel} 失败：{e} → 中止（不冒险覆盖）")
         raise SystemExit(1)
     rc, _, err = _run(["git", "-C", repo, "checkout", ref, "--", rel])
+    _run(["git", "-C", repo, "reset", "-q", "HEAD", "--", rel])
     if rc != 0:
         print(f"  [rules] 🔴 checkout {rel} 失败：{err.decode('utf-8', 'replace')[:300]}")
         raise SystemExit(1)
-    # 2026-09-23 阿狸咪·夜间窗口（HANDOFF stale-index-landmine 残余第 9 处收口）：
-    # `git checkout <ref> -- <path>` 会写主 index（staged 项再生地雷）⇒ 立即 unstage，
-    # 只保留工作树改动；与 v8_health_check / run_algorithms 同族修法一致。
-    _run(["git", "-C", repo, "reset", "-q", "HEAD", "--", rel])
     if _worktree_blob(rel, repo) != want:
         print(f"  [rules] 🔴 {rel} 拉齐后仍不一致 → 中止（fail-closed）")
         raise SystemExit(1)
@@ -268,11 +265,10 @@ def main():
 
     print(f"[ws-guard] git checkout {ref} -- <{len(mism)} 个文件>")
     rc, out, err = _run(["git", "-C", repo, "checkout", ref, "--"] + mism)
+    _run(["git", "-C", repo, "reset", "-q", "HEAD", "--"] + mism)
     if rc != 0:
         print(f"  🔴 checkout 失败：{err.decode('utf-8', 'replace')[:300]}")
         return 1
-    # 2026-09-23 阿狸咪·夜间窗口（同上第 9 处收口）：checkout 后立即 unstage，防 staged 再生。
-    _run(["git", "-C", repo, "reset", "-q", "HEAD", "--"] + mism)
 
     # 复检
     still = []
