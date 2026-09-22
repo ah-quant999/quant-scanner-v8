@@ -7,7 +7,8 @@ update_triple_resonance_history.py — 三重共识历史快照累加器（本�
   1. 读取 data/triple_consensus.json（严格共识 stocks + 差一步 near_miss）
   2. 维护 data/triple_resonance_history.json（被 .gitignore 忽略，仅本地/云端构建读取）：
        - 每个交易日一个 key（YYYY-MM-DD）-> 当日入榜股票记录列表
-       - _stock_price_history: {code: {date: close}}  对所有"曾入榜"股票持续记录收盘价（含已掉出股，用 gold_pool 当前价续接，保证回测价序列连续）
+       - _stock_price_history: {code: {date: close}}  对所有"曾入榜"股票持续记录**真实**收盘价（含已掉出股续接）。
+         🔴 2026-09-22 价格源 = raw_data/stock_quote.json（A 批全市场快照），与 update_four_volume_history.py 文件头 §C 同口径；取不到价就不写该格。
        - _tracking_latest: {code: {enter_date, last_date, streak, total_days, status, enter_close, last_close}}
   3. 幂等：同一天重复运行只刷新当日快照，不重复累计 streak/total_days。
 
@@ -27,6 +28,7 @@ WORKSPACE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(WORKSPACE, "..", "raw_data")  # 🔴 2026-08-06 改 raw_data：fundamental/top10/backtest 输入均已持久化在 raw_data（out/ 被 gitignore 云端丢）
 OUTPUT = os.path.join(DATA_DIR, "triple_resonance_history.json")
 CONSENSUS_FILE = os.path.join(DATA_DIR, "triple_consensus.json")
+QUOTE_JSON = os.path.join(DATA_DIR, "stock_quote.json")   # A 批全市场行情快照 = 现价唯一真源
 META_PREFIX = "_"
 
 
@@ -42,30 +44,73 @@ def normalize_code(c):
     return str(c or "").replace("sh_", "").replace("sz_", "").replace("hk_", "").replace("bj_", "").replace("sh.", "").replace("sz.", "").replace("hk.", "").replace("bj.", "").strip()
 
 
-def _gp_latest(gp_stock):
-    """🛡 2026-08-28 修复：gold_pool.json 的 stock 没有 'latest.close'，
-    真实最新价/涨幅/信号数在 history[-1] 里。本函数统一读取，兜底旧的 latest 结构。"""
+def load_quote_snapshot():
+    """读 A 批全市场行情快照 raw_data/stock_quote.json。返回 (stocks_dict, 快照日期)。
+
+    口径与 update_four_volume_history.py 文件头 §C 完全一致：现价唯一来源是全市场快照，
+    **不是** gold_pool.history[-1]（那是"最后一次信号命中日"，非当日）。
+    """
+    q = load_json(QUOTE_JSON, {})
+    if not isinstance(q, dict):
+        return {}, ""
+    ut = str(q.get("update_time") or "")
+    d = ut[:10] if re.fullmatch(r"\d{4}-\d{2}-\d{2}", ut[:10] or "") else ""
+    st = q.get("stocks")
+    return (st if isinstance(st, dict) else {}), d
+
+
+def quote_price(quote_stocks, code):
+    """在当日全市场快照里按 sz/sh/bj 前缀取真实价；取不到返回 None（绝不用 0 冒充）。"""
+    c = normalize_code(code)
+    if not c or not isinstance(quote_stocks, dict):
+        return None
+    for pre in ("sz", "sh", "bj"):
+        rec = quote_stocks.get(pre + c)
+        if isinstance(rec, dict):
+            p = rec.get("price")
+            try:
+                if p is not None and float(p) > 0:
+                    return float(p)
+            except Exception:
+                pass
+    return None
+
+
+def _gp_latest(gp_stock, today=None):
+    """gold_pool 记录的「最近一次信号命中日」快照。
+
+    🔴 2026-09-22 阿狸咪根治：history[-1] 是**该股最后一次被信号命中的那天**，不是当日。
+       实测（69 只跟踪股 / 362 个可比格）：与真实日K不符率 69.6% —— 恒逸石化冻在 09-08 的
+       18.89（当日真值 16.81，偏差 −12.4%）、另有票直接是 0。
+       ⇒ **禁止**把它的 close 当当日价：只有 date == today 时才返回 close/pct_chg，
+         否则这两个字段一律 None（signal_count / date 仍返回，供信号统计用）。
+    """
     if not isinstance(gp_stock, dict):
         return {}
+    rec = {}
     hist = gp_stock.get("history") or []
     if isinstance(hist, list) and hist:
         last = hist[-1]
         if isinstance(last, dict):
-            return {
+            rec = {
                 "close": last.get("close"),
                 "pct_chg": last.get("pct_chg"),
                 "signal_count": last.get("signal_count"),
                 "date": last.get("date"),
             }
-    # 兜底旧结构（如有）
-    latest = gp_stock.get("latest") or {}
-    return {
-        "close": latest.get("close"),
-        "pct_chg": latest.get("pct_chg"),
-        "signal_count": latest.get("signal_count"),
-        "date": None,
-    }
-
+    if not rec:
+        latest = gp_stock.get("latest") or {}
+        rec = {
+            "close": latest.get("close"),
+            "pct_chg": latest.get("pct_chg"),
+            "signal_count": latest.get("signal_count"),
+            "date": None,
+        }
+    if today and str(rec.get("date")) != str(today):
+        rec["close"] = None
+        rec["pct_chg"] = None
+        rec["stale_price_dropped"] = True
+    return rec
 
 def build_gp_map(gold_pool):
     gp = gold_pool.get("stocks", {}) if isinstance(gold_pool, dict) else {}
@@ -85,6 +130,8 @@ def main():
     consensus = load_json(os.path.join(DATA_DIR, "triple_consensus.json"), {})
     gold_pool = load_json(os.path.join(DATA_DIR, "gold_pool.json"), {})
     gp_map = build_gp_map(gold_pool)
+    quote_stocks, quote_date = load_quote_snapshot()
+    print(f"  当日行情快照 stock_quote.json: {len(quote_stocks)} 只（{quote_date or '日期未知'}）")
 
     history = load_json(OUTPUT, {})
     # 仅保留真实日期 key（排除 _ 开头的 meta）
@@ -112,15 +159,18 @@ def main():
                 continue
             seen_codes.add(code)
             gp = gp_map.get(code, {})
-            gp_latest = _gp_latest(gp)
-            close = s.get("close") or gp_latest.get("close") or 0
+            gp_latest = _gp_latest(gp, today)
+            # 🔴 现价优先级：当日全市场快照 > consensus 记录价 > 当日信号快照；**绝不写 0**
+            close = (quote_price(quote_stocks, code)
+                     or (s.get("close") or None)
+                     or gp_latest.get("close"))
             rec = {
                 "code": code,
                 "name": s.get("name", gp.get("name", "")),
                 "market": s.get("market", gp.get("market", "")),
                 "board": s.get("board", gp.get("board", "")),
                 "close": close,
-                "pct_chg": s.get("pct_chg", gp_latest.get("pct_chg", 0)),
+                "pct_chg": s.get("pct_chg", gp_latest.get("pct_chg")),
                 "total_score": s.get("total_score", 0),
                 "quality_grade": s.get("quality_grade", gp.get("quality_grade", "")),
                 "industry": s.get("industry", gp.get("industry", "")),
@@ -138,18 +188,20 @@ def main():
         price_hist = {}
     all_ever = set(price_hist.keys()) | seen_codes
     for code in all_ever:
-        gp = gp_map.get(code, {})
-        gp_latest = _gp_latest(gp)
-        close = gp_latest.get("close")
+        # 🔴 2026-09-22 阿狸咪根治：当日价只认当日全市场快照（stock_quote.json）。
+        #    旧实现用 gold_pool.history[-1].close「续接」——那不是当日价（见 _gp_latest 注释），
+        #    实测污染 69.6% 的格子，且会把 0 写进序列。
+        close = quote_price(quote_stocks, code)
         if close is None and code in seen_codes:
-            # 当日入榜股优先用今日快照价
+            # 兜底：当日入榜票用它自己的记录价（覆盖港股等 stock_quote 不含的标的）
             for r in today_records:
                 if r["code"] == code:
                     close = r["close"]
                     break
-        if close is None:
-            continue
+        if not close or float(close) <= 0:
+            continue          # 取不到价 ⇒ 不写该格（绝不用 0 / 滞后价冒充）
         code_ph = price_hist.setdefault(code, {})
+        code_ph[today] = float(close)
         code_ph[today] = close
     history["_stock_price_history"] = price_hist
 

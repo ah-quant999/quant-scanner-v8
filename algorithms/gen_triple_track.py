@@ -5,7 +5,8 @@ gen_triple_track.py — 三重共识「历史追踪」跟踪 + 回测分析器
 
 读取：
   - data/triple_resonance_history.json  （update_triple_resonance_history.py 产出的本地累积）
-  - data/gold_pool.json                 （当前收盘价/最新）
+  - raw_data/stock_quote.json           （当日全市场行情快照 = 现价唯一真源）
+  - raw_data/gold_pool.json             （信号数/涨跌幅兜底；**其 history[-1].close 不是当日价**，仅当日校验通过才可用）
   - data/fundamental_quality.json       （催化剂 news.tags / 评分加减）
   - data/backtest_comprehensive.json    （baostock 真实收盘价滚动回测，信号层）
   - data/top10_daily.json               （TOP10≥70，用于全站精选重叠度）
@@ -38,6 +39,7 @@ OUT = os.path.join(DATA_DIR, "triple_track.json")
 # （复制自 gen_triple_consensus.py 时漏带常量），默认参数在定义时即求值 → 每轮 NameError 必崩，
 # out/triple_track.json 从未生成，前端「历史追踪」长期吃 08-04 僵尸数据。定义与 consensus 一致。
 META_FILE = os.path.join(WORKSPACE, "stock_industry_concepts.json")
+QUOTE_JSON = os.path.join(DATA_DIR, "stock_quote.json")   # A 批全市场行情快照 = 现价唯一真源
 
 
 def load_json(path, default=None):
@@ -59,19 +61,57 @@ def r2(x):
         return 0.0
 
 
-def _gp_latest_close(gp_stock):
-    """🛡 2026-08-28 修复：gold_pool.json 的 stock 没有 'latest.close'，
-    真实最新价在 history[-1].close。统一读取，兜底旧的 latest 结构。"""
+def load_quote_snapshot():
+    """读 A 批全市场行情快照 raw_data/stock_quote.json。返回 (stocks_dict, 快照日期)。
+
+    口径与 update_four_volume_history.py 文件头 §C 完全一致：现价唯一来源是全市场快照，
+    **不是** gold_pool.history[-1]（那是"最后一次信号命中日"，非当日）。
+    """
+    q = load_json(QUOTE_JSON, {})
+    if not isinstance(q, dict):
+        return {}, ""
+    ut = str(q.get("update_time") or "")
+    d = ut[:10] if re.fullmatch(r"\d{4}-\d{2}-\d{2}", ut[:10] or "") else ""
+    st = q.get("stocks")
+    return (st if isinstance(st, dict) else {}), d
+
+
+def quote_price(quote_stocks, code):
+    """在当日全市场快照里按 sz/sh/bj 前缀取真实价；取不到返回 None（绝不用 0 冒充）。"""
+    c = ncode(code)
+    if not c or not isinstance(quote_stocks, dict):
+        return None
+    for pre in ("sz", "sh", "bj"):
+        rec = quote_stocks.get(pre + c)
+        if isinstance(rec, dict):
+            p = rec.get("price")
+            try:
+                if p is not None and float(p) > 0:
+                    return float(p)
+            except Exception:
+                pass
+    return None
+
+
+def _gp_latest_close(gp_stock, today=None):
+    """gold_pool 记录的「最近一次信号命中日」收盘价 —— **不是当日价**。
+
+    🔴 2026-09-22 阿狸咪：只有 date == today 时才可信，否则返回 None。
+       实测 69 只跟踪股中 69.6% 的格子与真实日K不符（恒逸石化冻在 18.89，真值 16.81）。
+       调用方应优先用 quote_price()；本函数仅作当日校验通过的兜底。
+    """
     if not isinstance(gp_stock, dict):
         return None
     hist = gp_stock.get("history") or []
     if isinstance(hist, list) and hist:
         last = hist[-1]
         if isinstance(last, dict):
-            return last.get("close")
-    latest = gp_stock.get("latest") or {}
-    return latest.get("close")
-
+            if not today or str(last.get("date")) == str(today):
+                return last.get("close")
+    if not today:
+        latest = gp_stock.get("latest") or {}
+        return latest.get("close")
+    return None
 
 def load_meta_map(path=META_FILE):
     try:
@@ -109,6 +149,8 @@ def main():
 
     fq_stocks = fq.get("stocks", {}) if isinstance(fq, dict) else {}
     gp_stocks = gold_pool.get("stocks", {}) if isinstance(gold_pool, dict) else {}
+    quote_stocks, quote_date = load_quote_snapshot()
+    print(f"  当日行情快照 stock_quote.json: {len(quote_stocks)} 只（{quote_date or '日期未知'}）")
     meta_map = load_meta_map()
     price_hist = history.get("_stock_price_history", {})
     tracking = history.get("_tracking_latest", {})
@@ -136,10 +178,24 @@ def main():
         tr = tracking.get(code, {})
         enter_date = tr.get("enter_date", today)
         first_close = price_hist.get(code, {}).get(enter_date)
-        current_close = price_hist.get(code, {}).get(today) or _gp_latest_close(gp_stocks.get(code, {}))
+        # 🔴 2026-09-22：现价优先级 = 当日全市场快照 > 账本今日格 > 当日校验通过的信号快照
+        q_price = quote_price(quote_stocks, code)
+        led_price = price_hist.get(code, {}).get(today)
+        gp_price = _gp_latest_close(gp_stocks.get(code, {}), today)
+        if q_price is not None:
+            current_close, price_source = q_price, "quote"
+        elif led_price is not None:
+            current_close, price_source = led_price, "ledger"
+        elif gp_price is not None:
+            current_close, price_source = gp_price, "gold_pool"
+        else:
+            current_close, price_source = None, "none"
         pnl = None
-        if first_close and current_close and first_close > 0:
-            pnl = r2((current_close / first_close - 1) * 100)
+        try:
+            if first_close and current_close and float(first_close) > 0 and float(current_close) > 0:
+                pnl = r2((float(current_close) / float(first_close) - 1) * 100)
+        except Exception:
+            pnl = None
         hold_days = tr.get("total_days", 1)
         consecutive = tr.get("streak", 1)
 
@@ -178,6 +234,7 @@ def main():
             "first_close": first_close,
             "current_close": current_close,
             "pnl_pct": pnl,
+            "price_source": price_source,
             "catalysts": catalysts,
         })
     tracked.sort(key=lambda x: -(x["pnl_pct"] if x["pnl_pct"] is not None else -999))
@@ -211,9 +268,9 @@ def main():
         if tr.get("status") != "dropped":
             # 入选以来大幅回撤告警
             fc = price_hist.get(code, {}).get(tr.get("enter_date", ""))
-            cc = price_hist.get(code, {}).get(today)
-            if fc and cc and fc > 0:
-                p = (cc / fc - 1) * 100
+            cc = quote_price(quote_stocks, code) or price_hist.get(code, {}).get(today)
+            if fc and cc and float(fc) > 0:
+                p = (float(cc) / float(fc) - 1) * 100
                 if p <= -8:
                     alerts.append({"level": "warn", "code": code, "name": name,
                                    "text": f"{name}({code}) 入选以来回撤 {p:.1f}%（{tr.get('enter_date')} 起）"})
