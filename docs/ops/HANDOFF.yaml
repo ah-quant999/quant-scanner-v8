@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 08:14"
+  updated: "2026-09-22 09:22"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -139,7 +139,7 @@ items:
   - id: stale-index-landmine
     priority: P0
     owner: shared
-    status: pending-verify
+    status: doing
     what: >
       陈旧暂存区地雷：自愈/巡检脚本用 `git checkout <ref> -- <path>` 写主 index（非只改工作树），
       叠加本机 4 处裸 `git commit`（无 pathspec）⇒ 任一被 cron 触发即吞掉 staged 并推送 = 数据回滚。
@@ -164,6 +164,28 @@ items:
       `git diff --cached --name-only | wc -l` = **0** ⇒ staged=0 仍成立、**未复埋**
       （对照 09:45 轮拆弹前 staged=2）。verify_how ②③（reflog 无新 reset / 一整日复埋观察）
       仍需到收盘后再收口，故本项 maintainer 留 pending-verify。
+      阿狸咪的工程师 2026-09-22 09:1x CST 复查（**verify_how ①/③ 破，status 回退 doing**）：
+      🔴 `git diff --cached --name-only | wc -l` = **9** ⇒ **已在观察期内复埋**（对照 09-21 16:1x 的 0）。
+      实测 staged 9 项：`api_push_raw.py` / `docs/ops/HANDOFF.ledger.json`(A) / `docs/ops/HANDOFF.yaml` /
+      `docs/ops/index_protected_markers.txt` / `index.html` / `logic.html` / `update_v8.py` /
+      `v8/factor_lab_gen.py` / `v8_health_check.py`。
+      ✅ **逐项定性（本轮关键判据，防「误拆他人在途 WIP」）**：取远端 tip `5459b2d04c` 逐文件三方对照
+      ⇒ **4 项与远端 tip 逐字节相同**（api_push_raw / ledger / markers / factor_lab_gen）、
+      **5 项为远端更旧版本**（HANDOFF.yaml 148,615↔149,158 B；index.html 仅差 `BUILD` 短 sha 与
+      `?v=1790031759`↔`1790039576` 缓存戳；logic.html / update_v8.py / v8_health_check.py 远端均已含
+      09-22 08:1x 新改动）⇒ **无一是独一无二的在途 WIP，内容零损失风险**。
+      🔧 已按 §四拆弹：`git reset -q`（mixed 到 HEAD，工作树零改动）⇒ **staged=0**；
+      6 个关键文件 `git hash-object` 拆弹前后**逐字节一致**（HANDOFF.yaml `e76bd86bf9` /
+      index.html `cc5be29031` / logic.html `a9696172aa` / update_v8.py `7930b2af10` /
+      v8_health_check.py `ed75748ebd` / api_push_raw.py `5f112b3ff2`）。
+      🔵 **复埋源（新增同族写法，非新脚本）**：全仓 grep `git checkout <ref> -- <path>` ⇒ 命中 6 处，
+      其中**直接写 index 且不 unstage** 的两处为 `v8_rollback_guard.py:107`
+      （`git(["checkout","origin/main","--",relpath])`）与 `v8_health_check.py:991`
+      （`["git","checkout","origin/main","--","raw_data/"]`）；staged 9 项的 mtime 呈**批量特征**
+      （7 项同为 09-22 06:59:23、2 项同为 09-21 20:45:13）⇒ 与「回滚/同步守卫按 origin/main
+      重写工作树 + index」的签名吻合。⚠️ 本项 fix 已治过 8 文件，但上述 2 处**未被 fix 覆盖**
+      ⇒ 请小九按 §fix 同法给这两处 checkout 后补 `git reset -q HEAD -- <paths>`；
+      在根因清理前，本项**不应**再判 pending-verify。
     updated: "2026-09-21 08:40"
 
   - id: alimi-same-family-check
@@ -758,6 +780,25 @@ items:
          —— 本链正是被静默注销的那条。
          ⏳ 本项**仍维持 pending-verify**：5 条链现已全部完成结构性变更，但按 verify_how
          须再观察 1 个交易日（**只看 event=schedule，不看总 run 数**）。
+      🔴🔴 阿狸咪的工程师 2026-09-22 09:2x CST·**上午窗口量化（本轮实质新发现，修正 09-21 16:1x 的「已恢复」结论）**：
+      09-21 16:1x 记的「5 条链 schedule 均出现且 success」**只在午后窗口成立**。按 `event==schedule`
+      逐档取 CST 小时并**逐日**拆分上午(<12) / 午后(≥12)（覆盖各链 run 全集）：
+        · `intraday_lemoncat`    schedule 109 档 / 覆盖 09-10~09-21 ⇒ **上午 0 / 午后 109**（每日恒 0/14）
+        · `intraday_snapshot`    schedule  14 档 / 覆盖 09-10~09-21 ⇒ **上午 0 / 午后 14**
+        · `algo_intraday_lite`   schedule  53 档 / 覆盖 08-19~09-21 ⇒ 09-04 起**上午恒 0**（午后 2/日）
+        · `cn_fetch_watchdog`    schedule  37 档 / 覆盖 09-01~09-21 ⇒ 09-05~09-10 上午 1~2，
+          **09-11 起断崖归零**（其后午后恒 2/日）
+        · `stock_quote_refresh`  schedule  85 档 / 覆盖 08-18~09-21 ⇒ 09-04 起**上午恒 0**（午后 2~4/日）
+      ⇒ **「上午档 schedule 系统性缺席」不是「注销」单点，而是一条跨 5 链、≥7 个交易日的稳定形态**；
+      「恢复」只发生在午后（首档实测恒落在 **12:30~14:00**）。
+      ⏳ 09-22（结构性变更后**首个**可观测交易日）09:2x 实测：5 条链**均 0 档**；按 cron 应已命中而缺席的
+      时刻：watchdog 08:07/08:22/08:37/08:52/09:07、snapshot 09:00/09:10/09:20、lite 09:00、
+      SQ 主链 09:00（lemoncat 首档 09:31 尚未到）。⚠️ **不据单点宣布「未恢复」**（本仓铁律：
+      schedule 命中时刻常大幅偏离 cron 分钟数，须看全天）。**建议新增判据**：看今日 12:00 后首档时刻
+      + 全天 `event=schedule` 档数对 cron 应有档数的**命中率**，而非只看「有没有出现 schedule」。
+      🔵 连带影响（交叉引用，不另开项）：上午 5 链零 schedule ⇒ 上午盘中覆盖全靠 `workflow_dispatch`
+      （今日唯一在跑 = `v8_stock_quote_refresh_cloud` #175 @09:19:41）⇒ `stock-quote-dispatch-drift`
+      的「主力漂移到云端兜底链」**在上午形态下依然成立**（该 09-21 13:45 的 done 结论落在**午后**窗口）。
     note_to: 阿狸咪
     note: >
       ── 小九 2026-09-21 19:04 补（走 §3.5 的 `note_to`，不另写档）──
@@ -1359,7 +1400,8 @@ items:
   - id: handoff-ai-entry-file
     priority: P0
     owner: shared
-    status: pending-verify
+    status: done
+    verified_at: "2026-09-22 09:15（阿狸咪机·新会话实测注入成立）"
     what: >
       🔴 协议已入仓、`[13/13]` 门禁已在位，但**没有任何「会话启动即读取」的通道** ——
       「协议存在」≠「会话会读到」。实测（2026-09-21 19:0x CST，小九机，按远端 blob 取证）：
@@ -1507,6 +1549,20 @@ items:
       ⚠️ 本会话启动早于落盘 ⇒ 「会话启动即自动注入」本会话无法自证，**维持 `pending-verify`**：
       待阿狸咪机下一个新会话以入口问答判定（「AGENTS.md 第一条让你做什么？」→ 应答：先读 `docs/ops/HANDOFF.yaml` 唯一状态源、防重复劳动）；
       若新会话仍无注入，则「用户级兜底＋工作树」两层俱证否，需换通道。
+      ── 阿狸咪的工程师 2026-09-22 09:1x 补（**verify_how ③ 成立 ⇒ 本项转 done**）──
+      ✅ **「会话启动即自动注入」在阿狸咪机已被证实**：本会话（2026-09-22 09:15 CST 自动化会话，
+      工作区 = `E:\workspace\stock-scanner` 即 v8 仓根）系统提示的 **project guidance 面**
+      明确注入了 `.codebuddy/CODEBUDDY.md` 全文（864 B），块首逐字标注
+      「File: E:\workspace\stock-scanner\.codebuddy\CODEBUDDY.md」+「项目级记忆（项目根自动加载）」，
+      正文含「动本仓任何文件之前按顺序读 ①`AGENTS.md` ②`docs/ops/HANDOFF.yaml`（唯一状态源）
+      ③`docs/ops/skills/v8-handoff-gateway/SKILL.md`」与「最容易犯的三个错」三条 ⇒
+      **入口→状态源→协议**三层指针链已随会话启动自动进入上下文。
+      ✅ 双机可读性同步复核（远端 tip `5459b2d04c`）：`AGENTS.md` blob `07480ba1c3` / **8,051 B**、
+      `.codebuddy/CODEBUDDY.md` blob `597f628e64` / **864 B**、
+      `docs/ops/skills/v8-handoff-gateway/SKILL.md` blob `572d87540f` / **28,202 B**
+      ⇒ 三件**均已在 main**（verify_how ①② 亦成立）。
+      ⚠️ 本地工作树两件虽仍未跟踪（HEAD 滞后所致），但**注入读的是本地文件**、与 git 跟踪无关
+      ⇒ ③ 的判据（是否被注入上下文）**不受影响**，本项判 done。
       📎 旁证（不属本项、提请小九复核）：`HANDOFF.ledger.json` 另有 5 项哈希陈旧（handoff-meta-future-timestamp / cnfetch-empty-shell-block / maharo-plan-b-three-editions / north-fund-dead-source-fix / stock-name-code-fallback，22:02 刷新后仍 30/36 自洽；本项旧值已溯源至 3817f22c6=20:39 版，规则=整块rstrip+updated归一化+含尾注释）。本批只刷本项，其余不擅改。
     updated: "2026-09-21 22:23"
   - id: maharo-plan-b-three-editions
