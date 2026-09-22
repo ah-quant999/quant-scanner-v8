@@ -1941,7 +1941,8 @@ items:
     title: 根治 backtest_expectancy 时序倒挂（final_recommend 吃当日 edge）
     priority: P1
     owner: 小九
-    status: pending-verify
+    status: done
+    verified_at: "2026-09-22 21:58"
     created: "2026-09-22 05:30"
     what: >
       算法链编排器存在架构级时序倒挂：backtest_expectancy（四信号 edge 唯一生产者）原排在
@@ -1958,8 +1959,17 @@ items:
       commit 36bc08adc124；本地 importlib 断言 + verify ①⑤ 全过。
     verify_how: "下一轮 algo_cloud(19:15 派发) 跑完后，查 final_recommend 日志 SIGNAL_EDGE_SOURCE
       是否为 backtest_expectancy@当日（非 T-1 硬编码回退）；另 verify_chain_consistency ⑤ 应 OK。验证通过即转 done 并填 verified_at。"
+    verify_how_2: >
+      〔09-22 21:5x 实测终验·✅ 生效〕不依赖 run 日志（本机 token 缺 actions:read），改取**产物字段**为证：
+      data/FINAL_RECOMMEND_DATA.js（sha 060d646374，31478B）与 raw_data/final_recommend.json（sha 8b1f63d804，45721B）
+      两个独立产物一致给出 signal_edge.source=backtest_expectancy@2026-09-22 19:23:58、degraded=false、
+      loaded.n_snapshots=68、date_range=[2026-06-06,2026-09-22]；而产物 update_time=2026-09-22 20:34:56（.js 另带
+      republish_time 21:02:12）⇒ 消费者 D批 20:34 拿到的是当日 B批尾 19:23 产出的 edge，**T-1 倒挂已消失**、
+      亦非 hardcoded 回退。交叉核对：修复 commit 36bc08adc124 @ 09-21T21:49Z 落在 main 第 5 页第 68 位，
+      而今晚 run 35734906347(head efa21441528a @ 09-22T13:39Z) 与 run 35725918561(head b93852366e47 @ 09-22T12:13Z)
+      均在第 1 页（远晚于修复）⇒ 跑的确为修复后代码树，非「未到时机」。"
     evidence: "commit 36bc08adc124；4 文件 md5 全 OK；importlib 导入断言 backtest_expectancy idx=39<final_recommend 40、在B不在E；verify ①STAGES↔ORDER 一致(52/52) ⑤时序契约 OK"
-    updated: '2026-09-22 17:02'
+    updated: '2026-09-22 21:58'
 
   # ── 2026-09-22 06:59 阿狸咪新增（白河愁「新周期判定」整卡下线 + 同页新卡时序缺陷修复）──
     note: >
