@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 15:12"
+  updated: "2026-09-22 16:08"
   updated_by: 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 46
+  next_id_seq: 47
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -728,7 +728,7 @@ items:
   - id: intraday-chain-cron-deregistered
     priority: P0
     owner: shared
-    status: pending-verify
+    status: done
     what: >
       **盘中 5 条独立链的 GitHub schedule 注册被静默注销**（小九 09:2x 实测）：
       `v8_cn_fetch_intraday_lemoncat`（冻结 61.5h）/ `v8_intraday_snapshot`（63.4h）/
@@ -849,7 +849,20 @@ items:
       ⇒ **「上午档全 0」在 09-22 再次成立**（5 链 + cn_fetch_cloud 6/6 均上午 0），午后首档 **12:38**；
       命中率口径：5 链今日 schedule 合计 **5 档** vs cron 应有数十档 ⇒ 仍远低于应有值。
       ⏳ 本项**维持 `pending-verify`**（判据须连看 ≥2 个交易日；lemoncat 今日 0 档）。
-    updated: "2026-09-22 13:55"
+    alimi_verify_20260922_late: >-
+      ✅ **阿狸咪 2026-09-22 16:1x CST 终测（严格按本项 verify_how：只看 `event==schedule`，不看总 run 数）—— 最后一条空档已补齐，本项判据成立**：
+      · `v8_cn_fetch_intraday_lemoncat`（wf `354533319`）午后 schedule 出现 **5 档 @14:43 / 14:43(cancelled) / 15:23 / 15:45 / 15:56**（13:5x 档记为 0 档，现已补齐）
+        ⇒ **09-22 五链 5/5 全部出现 `event=schedule` 的 run**：
+        看门狗 2 档 @12:38 / 13:18、板块快照 1 档 @13:48、盘中算法 lite 1 档 @13:52、SQ 主链 2 档 @13:56 / 14:29、准点档调度器 5 档 @14:43–15:56
+        （另有旁证 `v8_cn_fetch_cloud` 1 档 @13:12）。
+      · 对照 **09-21 亦为 5/5**（看门狗 @12:43、SQ @14:00/14:41、准点档 @15:01/15:41/16:00、lite @13:53、快照 @13:59）
+        ⇒ **连续 2 个交易日 5/5 链均有 schedule 事件**，满足本项 verify_how「观察 24h / 再观察 1 个交易日」。
+      · 🔵 **结构性残留已拆出独立项**：本项原 what 的病灶（注册被静默注销 ⇒ schedule 恒 0）**已解除**；
+        但「**档位集中落在 12:38–15:56、上午档逐日恒 0、命中率远低于 cron 应有值**」是**另一形态**，
+        已另立 `intraday-schedule-morning-absent` 跟踪（避免两项互相掩盖）。
+        ⚠️ 本项转 done **不等于**「盘中覆盖已完整」—— `intraday-guard-window-gap`（09:30–09:40 真空）与
+        上述新项仍为 open。
+    updated: "2026-09-22 16:08"
 
   - id: intraday-guard-window-gap
     priority: P1
@@ -1711,7 +1724,18 @@ items:
       ⏳ **仍留 `pending-verify` 而非 done 的理由**：本轮是**首次**观测到该对产物恢复，
       不足以排除「一次性」；须看 **09-22 E 批再次推进**方转 done
       （本仓铁律：一次 success ≠ 常态；`success ≠ 落库` 亦已多次实证）。
-    updated: "2026-09-21 22:57"
+    alimi_verify_20260922_1620: >-
+      ⏳ **阿狸咪 2026-09-22 16:1x CST 复核（判据只看产物 `update_time`）—— 观察点尚未到，不作结论**：
+      · `data/BACKTEST_TDX.js` `update_time` 仍 **2026-09-21 21:15:56**（blob `565ec21838`）；
+        `data/BACKTEST_COMPREHENSIVE.js` 仍 **2026-09-21 21:16:00**（blob `59ce5263d6`）⇒ **均未推进**。
+      · 该状态与设计相符：E 批 cron = `v8_algo_cloud.yml` `30 14 * * *` UTC = **22:30 CST**，现 16:1x 未到窗口。
+        `guard_v8_freshness.py` 本轮（rc=0 / 43 模块）把两项列为「CORE 落后 2 交易日」，
+        但**自愈明示「algo 近 30min 已派发 ⇒ 冷却中跳过」** ⇒ 属预期，非新故障。
+      · 连带记录（同一 CORE 组）：`CRDS_CARD_DATA`（blob `a2db3a07b3`）`update_time` **2026-09-21 20:20:54** 亦停在此；
+        `VOLATILITY`（blob `728d1c1f9c`）`update_time` **2026-09-21 19:15:14**，
+        其历史提交节奏为**每交易日约 17:0x–17:5x 档**（`09-19 17:16` / `09-20 17:03`）⇒ 本轮「落后 2 交易日」属**未到日常刷新时刻**，非故障。
+      ⏳ 判据兑现时点：**今晚 22:30 E 批之后**回看四项是否推进；推进则本项转 done。
+    updated: "2026-09-22 16:08"
 
   - id: stock-name-code-fallback
     priority: P1
@@ -1756,7 +1780,19 @@ items:
         今日 algo 各档 step9 全为 `skipped`（空转）⇒ **尚无新样本**，故**维持 pending-verify**。
       · 附带建议（**未落码**，属另一项范围）：E 批推送前应加一次「名字保真」断言，
         否则同类覆盖会反复发生。
-    updated: "2026-09-22 11:47"
+    alimi_verify_20260922_1620: >-
+      ⏳ **阿狸咪 2026-09-22 16:1x CST 复核（务必按本条更正上一档的读法）**：
+      · 现 `main` 的 `data/FOUR_VOLUME.js`（blob `a52289a5a05b` / 8,171 B）`update_time` 仍 **2026-09-21 21:51:05**，
+        末次提交仍是 `b9809e667f`（09-21 22:00:46）⇒ **该文件今日根本没有重生成**；
+        `data/FOUR_VOLUME_60M.js`（blob `fd0e9e009fa9`）同样停在 09-21 批次。
+      · 逐条计数：`FOUR_VOLUME.js` 12 条中 name==code 仍为 **`000725` / `000100`**；`FOUR_VOLUME_60M.js` 19 条中仍 **`000002`**。
+      · 🔴 **结论（防误判）**：现况 = 「**09-21 22:00 E 批覆盖后未再被重算**」，
+        **不能读成「09-22 批次再次回归」**（今日尚无该批次产物）。本项 `what` 里的「in-flight 覆盖」定性**维持不变**。
+      · ⏳ 真观察点 = **今晚 E 批（`v8_algo_cloud.yml` cron `30 14 * * *` UTC = 22:30 CST）**
+        —— 该批必然 checkout 到含 `ee6f21f1ce` 修复的代码，届时看名字是否被正确回填：
+        正确 ⇒ 可转 done；仍为代码 ⇒ 说明源级修复未覆盖该产出路径（届时按 `fix` 三段复查）。
+      · 同批旁证：`FOUR_VOLUME_BACKTEST`（blob `20c8607032`）`update_time` 亦停 **2026-09-21 21:52:11** / 1461 信号、`近 5 年` 守档。
+    updated: "2026-09-22 16:08"
 
   - id: hk-shortcode-hkname-pollution
     priority: P1
@@ -1957,7 +1993,25 @@ items:
         （保留远端旧数据）`（13:38:01）⇒ 同批第三个静默空源未变。
       ✅ 小结：verify_how ① 对 `US_HK_MAP` 成立、对 `MARKET_ALERTS` **不成立** ⇒ status 维持 `todo`。
       本机本轮**只 detect + 报告**：0 dispatch / 0 代码改动 / 0 阈值改动。
-    updated: "2026-09-22 13:55"
+    alimi_verify_20260922_1620: >-
+      🔴 **阿狸咪 2026-09-22 16:1x CST 复核（按 verify_how：只看产物 `update_time`，禁以 run success 当判据）—— 源级失败确定性延续，且卡级红线出现「假绿窗口」**：
+      · `data/MARKET_ALERTS.js` `update_time` 仍 **2026-09-22 13:09:05**（距复核约 3h）⇒ 13:09 后再无成功抓取。
+      · **逐档日志铁证**（classic token + 手动跟 302 下 job 日志；本机网络受限故不走 listener）：`#1983`(14:10) 与 `#1982`(13:58) 两档 job 日志逐字
+        `❌ MARKET_ALERTS 失败(attempt 1/3)` / `(2/3)` / `(3/3): RuntimeError: fetch_orphan_market_alerts 调用异常(90s超时)`
+        → `🚫 MARKET_ALERTS 跳过，最终错误: ...90s超时`，紧随 `📋 runner_status: {'total': 20, 'ok': 19, 'empty': 0, 'fail': 1}`
+        —— **20 项恰好 1 项 fail 而 run 结论 success** ⇒ 软失败假绿（本项原记录形态逐字复现）。
+      · ⚠️ **本轮新增判据（重要，防误判为「已自愈」）**：`HEALTH_CHECK.js`（blob `1f5d16b34d85`，`updated` **15:54:16**）
+        summary 已由 `fail:1` 变 **`{ok:117, warn:3, fail:0, limited:2, total:122}`**
+        —— **这不是修复，而是「年龄未过阈值」造成的假绿**：13:09:05 距 15:54 约 165min < 该卡红线（45min→按卡级放大后的 240min 档），
+        故暂不报红；**按同一口径推算 ~17:1x 起会再次翻红**。
+        ⇒ **判据不得用「HEALTH_CHECK fail=0」，必须直接读 `data/MARKET_ALERTS.js` 的 `update_time`。**
+      · ℹ️ 排雷（防误读）：该文件今日 13:58 / 14:10 / 14:21 / 14:45 **有 4 笔提交且 blob 各不相同**，
+        但**变化内容只有 `republish_time`**（现 `2026-09-22 14:43:06`），`update_time` 纹丝不动
+        ⇒ 与全仓铁律「`republish_time` 每轮构建都刷 ⇒ 不得当数据时间」一致；**勿把这 4 笔提交读成数据在推进**。
+      · ③ `AVG_PRICE_880003` 同批复现：`⚠️ AVG_PRICE_880003: 空/无效数据，跳过写入（保留远端旧数据）`（14:58:03 / 15:02:23 两档）。
+      ✅ 小结：`US_HK_MAP` 仍保持自愈（`update_time` **2026-09-22 12:46:53**），`MARKET_ALERTS` **不成立** ⇒ status 维持 `todo`。
+      本机本轮**只 detect + 报告**：0 手工 dispatch / 0 代码改动 / 0 阈值改动。
+    updated: "2026-09-22 16:08"
   - id: stockquote-noon-gap-relay-cancel
     priority: P1
     owner: shared
@@ -2145,3 +2199,46 @@ items:
     verify_how: "主人给出处置结论；若上线则按 `US_HK_MAP` 同口径做三件终验。"
     evidence: "2026-09-22 实测：本地工作树 244802 B vs 当时线上 242772 B（差 +2030 B）；净室重放版 244099 B（=242772+1327）。已推送版 blob `889155fd77` 即重放版。"
     updated: "2026-09-22 15:12"
+  - id: intraday-schedule-morning-absent
+    priority: P1
+    owner: shared
+    status: todo
+    what: >
+      盘中类 workflow 的 **GitHub schedule 档位呈「上午恒 0」的结构性时段偏斜**，与
+      `intraday-chain-cron-deregistered`（注册被注销 ⇒ 恒 0，已 done）**不是同一形态**：
+      注册已恢复（连续 2 个交易日 5/5 链均有 `event=schedule`），但**命中时刻逐日全部落在午后**，
+      上午档（08:00–12:00）**连续多日 0 档**。阿狸咪 2026-09-22 16:1x 实测（只看 `event==schedule`）：
+      · `v8_cn_fetch_watchdog`（`347126523`）2 档 @**12:38** / 13:18（12:38 = 全链最早档）
+      · `v8_intraday_snapshot`（`354648114`）1 档 @13:48
+      · `v8_algo_intraday_lite`（`337500527`）1 档 @13:52
+      · `v8_stock_quote_refresh`（`336548691`）2 档 @13:56 / 14:29
+      · `v8_cn_fetch_intraday_lemoncat`（`354533319`）5 档 @14:43 / 14:43 / 15:23 / 15:45 / 15:56
+      · 旁证 `v8_cn_fetch_cloud`（`327687211`）1 档 @13:12
+      ⇒ **6 条链上午档合计 0 档；首档恒落 12:38–14:43**。历史同型：09-21 首档亦在 12:43 之后
+      （见 `intraday-chain-cron-deregistered` 的 `alimi_verify_20260922` / `_pm` 两档记录，
+      以及 09-22 上午档 6/6 全 0 的实测）。**命中率口径**：5 链 09-22 schedule 合计约 11 档
+      vs cron 应有多档 ⇒ 仍远低于应有值。
+    fix: >
+      **先诊断再动刀，禁调阈值/禁改 cron 条数凑数**。三选一取证方向：
+      ① 读 GitHub 侧「schedule 是否被延迟/丢弃」的替代指标 —— 对同一 workflow 增加
+         **独立的「档位对账」探针**（每小时比对「应有档数 vs 实际 schedule 档数」，只报数不改行为），
+         先坐实偏斜是**平台侧调度延迟**还是**仓内配置**；
+      ② 若为平台侧（GitHub 对低频 cron 的实测漂移），处置方向 = **护栏代偿**
+         （上午由自接力 / 本机派发器补档，与现有 `stock_quote_refresh` 的 relay 同型），
+         并同步把「上午档 0」登记进 `HEALTH_CHECK` 的链路级判据；
+      ③ 若为仓内（并发组/`cancel-in-progress` 让上午档被顶掉），按 `gh-dispatch-storm-diagnosis`
+         的口径收敛并发组。
+      ⚠️ 与 `intraday-guard-window-gap`（09:30–09:40 首档前真空）**有交集但不等价**：
+      本项范围是「08:00–12:00 全段 0 档」，后者只覆盖开盘前 10 分钟且病灶在守卫。
+    verify_how: >
+      ① 连续 ≥3 个交易日统计 6 条链 `event==schedule` 的**小时分布**（禁只看总档数、禁只看「有没有」），
+         断言「上午档数 > 0」；
+      ② 每条链**首档时刻**应稳定早于 12:00；
+      ③ 命中率（schedule 档数 ÷ cron 应有多少档）应显著高于当前水平。
+      本仓铁律：一次命中 ≠ 常态，须连看多日。
+    evidence: >
+      阿狸咪 2026-09-22 16:1x CST 只读 API 实测（本机不跑数据、不 dispatch）：
+      上列 6 条 workflow 的 `GET /actions/workflows/{id}/runs?per_page=100` 逐档过滤
+      `created_at`（CST）与 `event==schedule`；对照 09-21 同类统计（首档 12:43 之后）。
+      本机 09-22 上午档记录：6/6 链上午 schedule 全 0。
+    updated: "2026-09-22 16:08"
