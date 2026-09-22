@@ -1572,7 +1572,8 @@ def run(label, fn, retries=2):
             print(f"  ❌ {label} 失败(attempt {attempt+1}/{retries+1}): {type(e).__name__}: {e}")
             _run_status[label] = {"status": "fail", "msg": f"{type(e).__name__}: {str(e)[:80]}"}
             time.sleep(2)
-    print(f"  🚫 {label} 跳过，最终错误: {type(last_err).__name__}: {last_err}")
+    print(f"  🚫 {label} 重试耗尽仍失败（记 status=fail；单源不阻断整轮，≥%d 源才阻断）："
+          f"{type(last_err).__name__}: {last_err}" % _MIN_FATAL_SOURCES)
     time.sleep(0.5)
 
 
@@ -1581,6 +1582,22 @@ def run(label, fn, retries=2):
 # 失败不再阻断 job → 根治 selfhosted 因单源失败整轮 abort、云端拥堵时无兜底的顽疾。
 # 盘前/盘后/全量类别仍维持原语义（任一核心源失败即致命，防空壳推送）。
 _CRIT_INTRADAY = {"CANDIDATE_QUOTES", "INDEX_QUOTES"}
+
+# 🔴 2026-09-22 小九·一劳永逸：「单源上游抖动」不得作废整轮成果
+#   血证 cn_fetch #1989（2026-09-22 16:02 post_close 档，run id 35702688443）：
+#     ETF_DAILY_MONITOR 撞东方财富 push2delay.eastmoney.com 持续 502（3 次重试
+#     全失败）⇒ _run_status 记 fail(1 个) ⇒ 旧判据「post_close 任一 fail 即致命」
+#     ⇒ 整轮 exit 1 ⇒ step[10]-[29] 全部 skipped ⇒ 同轮**已成功的 12 个模块**
+#     （MARKET_FUND_FLOW_DATA / W52_HIGH / V8_CAL / PERFORMANCE_FORECAST 等）
+#     **全部不落盘**。日志原文：'❌ 1 个模块抓取失败，整体任务标记失败，阻止空壳推送'。
+#   判据修正（客观、不靠主观挑白名单）：
+#     单源失败(1) = 外部上游偶发（东财 502 / 反爬抖动），属**常态** ⇒ 不作废整轮；
+#     多源失败(≥2) = 系统性故障（网络中断 / 抓取链坏）⇒ 仍硬阻断，防空壳上线。
+#   ⚠️ 与「阻止空壳推送」不冲突：单源失败时该源 save() 未被调用 ⇒ 旧数据保留、
+#      不被空值覆盖，前端按 update_time 自然显示陈旧 ⇒ 有告警、无污染。
+#      反之「整轮不推」代价极大：12 个模块的新数据一起丢掉 ⇒ 全站集体陈旧。
+#   ⚠️ intraday 档行为**不变**（核心源白名单 _CRIT_INTRADAY 任一失败即阻断）。
+_MIN_FATAL_SOURCES = 2
 
 
 def _has_critical_failures(category):
@@ -1595,10 +1612,13 @@ def _has_critical_failures(category):
     if category == "intraday":
         fails = [k for k, v in _run_status.items()
                  if v.get("status") == "fail" and k in _CRIT_INTRADAY]
-    else:
-        fails = [k for k, v in _run_status.items()
-                 if v.get("status") == "fail" and k != "RUNNER_STATUS"]
-    return bool(fails)
+        return bool(fails)
+    fails = [k for k, v in _run_status.items()
+             if v.get("status") == "fail" and k != "RUNNER_STATUS"]
+    if len(fails) < _MIN_FATAL_SOURCES:
+        # 单源失败 = 上游偶发，不阻断整轮（血证见 _MIN_FATAL_SOURCES 处注释）
+        return False
+    return True
 
 # 涨停池缓存（limit_up_heatmap 复用；herding 消费方已于 2026-09-11 随「精选预判信号」卡下线删除）
 _zt_cache = {"date": None, "df": None}
