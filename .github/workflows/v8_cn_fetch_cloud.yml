@@ -553,6 +553,31 @@ jobs:
             exit 1
           fi
 
+      - name: "🏀 主板首板·一进二观察（fetch_board_first_limit，仅 post_close）"
+        id: board_first
+        # 2026-09-23 一劳永逸（主人令「一进二观察卡停更 2 天，修」·阿狸咪夜间窗口）：
+        #   该卡 09-22 05:19 上线时只落了手动快照，fetcher（algorithms/fetch_board_first_limit.py）
+        #   从未接入任何自动化（全仓 workflow 0 引用）⇒ 数据停在 2026-09-21 23:23，
+        #   健康面板报「超过通用红线 1620 分钟」。本步把它挂进盘后链：
+        #   仅 post_close（17:20/18:20/19:20 CST，涨停池收盘后已定稿）执行；
+        #   产物 raw_data/board_first_limit.json + data/BOARD_FIRST_LIMIT.js 由下方
+        #   soft_10/soft_14 推送步按 git status 增量自动上线，无需新增推送口。
+        #   脚本自身带两道护栏：① 抓空不覆盖（防空壳，同 cnfetch-empty-shell-block 族）
+        #   ② 同日去重（三档只落第一档，不产生重复推送）；显式传日期 = 手动回补强制覆盖。
+        #   软失败 + 强制 annotation（本文件 09-08 主人令范式）：一进二观察卡失败不拖垮
+        #   全链盘后数据，但必须在软失败汇总里可见。
+        if: steps.gate.outputs.skip != 'true' && steps.td.outputs.proceed != 'false' && steps.cat.outputs.category == 'post_close'
+        timeout-minutes: 10
+        continue-on-error: true
+        shell: bash
+        run: |
+          python algorithms/fetch_board_first_limit.py
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:board_first(exit=$_v8_rc)::🏀 主板首板·一进二观察抓取软失败，退出码 $_v8_rc。本步不阻断 job，请核对健康面板 BOARD_FIRST_LIMIT 卡新鲜度。"
+            exit 1
+          fi
+
       - name: "📤 推送 raw_data/ 到 main（来源驱动增量，Contents API）"
         id: soft_10
         # 🔴 2026-08-30 22:3x 同类 bug 一次清干净（实测 run 33312102792 / 33309687912
@@ -861,6 +886,7 @@ jobs:
         shell: bash
         env:
           V8_SF_soft_1: ${{ steps.soft_1.outcome }}
+          V8_SF_board_first: ${{ steps.board_first.outcome }}
           V8_SF_soft_3: ${{ steps.soft_3.outcome }}
           V8_SF_soft_4: ${{ steps.soft_4.outcome }}
           V8_SF_soft_5: ${{ steps.soft_5.outcome }}
@@ -878,7 +904,7 @@ jobs:
         run: |
           FAILED=""
           # 显式列出本 job 全部软失败步 id（生成期确定，不依赖 env 扫描，永不漏）
-          for sid in soft_1 soft_3 soft_4 soft_5 soft_6 soft_7 soft_8 soft_9 soft_10 soft_11 soft_12 soft_13 soft_14 soft_15 soft_16; do
+          for sid in soft_1 board_first soft_3 soft_4 soft_5 soft_6 soft_7 soft_8 soft_9 soft_10 soft_11 soft_12 soft_13 soft_14 soft_15 soft_16; do
             eval "v=\"\${V8_SF_$sid:-}\""
             if [ "$v" = "failure" ] || [ "$v" = "cancelled" ]; then
               FAILED="$FAILED $sid"

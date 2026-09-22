@@ -1868,6 +1868,7 @@ def f_sector_fund_flow():
     # 2026-08-05 修复：必须同时查降序(流入TOP)与升序(流出TOP)，否则 po='1' 只返回
     # 净流入条目，sectors_out 恒为空，导致“净额(行业)”只加不减、数字虚高。
     items = []
+    type_counts = {}
     for stype, fs in [("行业", "m:90 t:2"), ("概念", "m:90 t:3")]:
         # 降序取流入、升序取流出，合并去重（同名同类型以绝对值大者为准）
         by_key = {}
@@ -1886,8 +1887,20 @@ def f_sector_fund_flow():
                         "net": net,
                         "chg": round(float(r.get("f3") or 0), 2),
                     }
+        type_counts[stype] = len(by_key)
         items.extend(by_key.values())
     if not items:
+        return None
+    # 2026-09-23 一劳永逸（HANDOFF theme-value-concept-layer-zero·阿狸咪夜间窗口）：
+    # 「两类齐全」断言——行业(m:90 t:2)与概念(m:90 t:3)任一类型整体抓空
+    # （接口抖动/WAF 重置）时，绝不产出「只有行业」的半成品覆盖完整档
+    # （09-21 20:43 起多次发生：概念 0 条 → 主题空间·概念资金热度卡全零，
+    # 且 build 与 cn fetch 互相覆盖来回翻）。返回 None = 本轮不落盘，
+    # 保住上一轮完整档，下一轮自然重试；两类全空仍走上面的 return None。
+    _empty_types = [k for k, v in type_counts.items() if v == 0]
+    if _empty_types:
+        print("WARN f_sector_fund_flow: %s 抓空（两类齐全断言）→ 本轮不落盘"
+              % "/".join(_empty_types))
         return None
 
     # 2026-08-20 一劳永逸过滤噪声概念：标准普尔/富时罗素等是境外指数或成分标签，

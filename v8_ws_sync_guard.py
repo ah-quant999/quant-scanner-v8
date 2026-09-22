@@ -184,6 +184,10 @@ def _heal_rules_first(ref, repo):
     if rc != 0:
         print(f"  [rules] 🔴 checkout {rel} 失败：{err.decode('utf-8', 'replace')[:300]}")
         raise SystemExit(1)
+    # 2026-09-23 阿狸咪·夜间窗口（HANDOFF stale-index-landmine 残余第 9 处收口）：
+    # `git checkout <ref> -- <path>` 会写主 index（staged 项再生地雷）⇒ 立即 unstage，
+    # 只保留工作树改动；与 v8_health_check / run_algorithms 同族修法一致。
+    _run(["git", "-C", repo, "reset", "-q", "HEAD", "--", rel])
     if _worktree_blob(rel, repo) != want:
         print(f"  [rules] 🔴 {rel} 拉齐后仍不一致 → 中止（fail-closed）")
         raise SystemExit(1)
@@ -267,6 +271,8 @@ def main():
     if rc != 0:
         print(f"  🔴 checkout 失败：{err.decode('utf-8', 'replace')[:300]}")
         return 1
+    # 2026-09-23 阿狸咪·夜间窗口（同上第 9 处收口）：checkout 后立即 unstage，防 staged 再生。
+    _run(["git", "-C", repo, "reset", "-q", "HEAD", "--"] + mism)
 
     # 复检
     still = []

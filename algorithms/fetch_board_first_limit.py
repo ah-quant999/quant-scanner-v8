@@ -90,14 +90,40 @@ def build(date=None):
     return out, date, None
 
 def main():
+    # 2026-09-23 一劳永逸（主人令「一进二观察卡停更 2 天，修」·阿狸咪夜间窗口）：
+    # ① 空档不覆盖——涨停池抓空（非交易日/源未更新/接口抖动）时，绝不写
+    #    「total=0 + 新鲜 update_time」的空壳去覆盖好档（同族 cnfetch-empty-shell-block
+    #    的教训：空壳会让卡片显示 0 只且把新鲜度刷假绿）。
+    # ② 同日去重——盘后 post_close 三档（17:20/18:20/19:20 CST）只落第一档，
+    #    同一交易日重复采集不再产生假 diff / 重复推送（不踩踏）。
+    #    显式传日期参数（手动回补历史）时仍强制覆盖。
     date = sys.argv[1] if len(sys.argv) > 1 else None
+    explicit = date is not None
     out, used_date, err = build(date)
-    if out is None:
-        print('WARN:', err, '| date=', used_date)
-        out = {'update_time': _now_cst().strftime('%Y-%m-%d %H:%M:%S'), 'date': used_date,
-               'total': 0, 'basic_pass': 0, 'note': err or '空', 'items': []}
     raw_path = os.path.join(ROOT, 'raw_data', 'board_first_limit.json')
     js_path = os.path.join(ROOT, 'data', 'BOARD_FIRST_LIMIT.js')
+    if out is None:
+        existing_total = None
+        if os.path.exists(raw_path):
+            try:
+                with open(raw_path, 'r', encoding='utf-8') as f:
+                    existing_total = json.load(f).get('total')
+            except Exception:
+                existing_total = None
+        print('WARN:', err, '| date=', used_date,
+              '→ 不覆盖既有档（防空壳），保住 total=%s 的上一轮好档' % existing_total)
+        return
+    existing = None
+    if os.path.exists(raw_path):
+        try:
+            with open(raw_path, 'r', encoding='utf-8') as f:
+                existing = json.load(f)
+        except Exception:
+            existing = None
+    if not explicit and existing and existing.get('date') == out.get('date') and existing.get('total', 0) > 0:
+        print('SKIP: 交易日 %s 已采集（existing total=%s）→ 同日去重不重写'
+              % (out.get('date'), existing.get('total')))
+        return
     os.makedirs(os.path.dirname(raw_path), exist_ok=True)
     with open(raw_path, 'w', encoding='utf-8') as f:
         json.dump(out, f, ensure_ascii=False, indent=1)
