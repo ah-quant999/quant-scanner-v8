@@ -1,13 +1,12 @@
 {
-  "update_time": "2026-09-22 23:50:18",
+  "update_time": "2026-09-22 23:56:26",
   "status": "ok",
   "process": {
     "ok": true,
     "listener": true,
-    "worker": true,
+    "worker": false,
     "details": [
-      "runner.listener",
-      "runner.worker"
+      "runner.listener"
     ]
   },
   "service": {
