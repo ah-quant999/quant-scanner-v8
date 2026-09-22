@@ -1,5 +1,5 @@
 {
-  "max_next_id_seq": 40,
+  "max_next_id_seq": 42,
   "ids": [
     "build13-timeout-guard",
     "cachebot-build-race",
@@ -41,10 +41,12 @@
     "algo-edge-ordering-fix",
     "baihechou-card-removed-and-unlockcover-fix",
     "unlockcover-factor-observation-card",
-    "cnfetch-single-source-stale"
+    "cnfetch-single-source-stale",
+    "stockquote-noon-gap-relay-cancel",
+    "stockquote-cachebuster-noop"
   ],
-  "updated": "2026-09-22 06:59",
-  "generated_by": "小九(lemoncat-cn) + 阿狸咪(alimi-cn)",
+  "updated": "2026-09-22 13:55",
+  "generated_by": "小九(lemoncat-cn) + 阿狸咪(alimi-cn) （2026-09-22 13:55 阿狸咪刷新：+2 新项 / 2 项回填）",
   "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
   "id_content_hashes": {
     "build13-timeout-guard": "b57166725a0e8493",
@@ -66,7 +68,7 @@
     "baihechou-analysis-no-producer": "ec6c70c7d01b3cf7",
     "factorlab-conflict-tree-pollution": "43b0391b1674a5de",
     "candidate-quotes-category-drift": "06dc059c949eda93",
-    "intraday-chain-cron-deregistered": "a321c5274154ea4a",
+    "intraday-chain-cron-deregistered": "dea44a55a29a6c9f",
     "intraday-guard-window-gap": "5dc2be7ed104ea42",
     "diagnostics-info-status-leak": "5d02cefb87684015",
     "strong-breakout-purge": "f7c2151df2a4b0c6",
@@ -87,7 +89,9 @@
     "algo-edge-ordering-fix": "453227f28d8e8700",
     "baihechou-card-removed-and-unlockcover-fix": "c8250c317394a9cb",
     "unlockcover-factor-observation-card": "30fb30168e36e4f3",
-    "cnfetch-single-source-stale": "360344175380cdae"
+    "cnfetch-single-source-stale": "45ad688b5a5b5a76",
+    "stockquote-noon-gap-relay-cancel": "b9a2956721afe3d6",
+    "stockquote-cachebuster-noop": "5c25152e5f0e3d38"
   },
   "id_content_hash_note": "每 id 内容哈希（sha256 前 16 位；计算时把该 item 的 updated 时间戳归一化为 <ts>，以排除纯时间漂移造成的假阳性）。用途：现「ids 集合」锚只能抓 item 消失或整体回滚，抓不到「id 仍在、但内容被旧版顶掉」—— 那恰是防覆盖要防的主类（见 factorlab-conflict-tree-pollution / stale-index-landmine 同型事故）。校验：按同一规则重算，逐 id 比对，不一致即视为内容被回退。（2026-09-21 阿狸咪的工程师 增补；建议 1 落地）（2026-09-21 18:45 小九补记：本批**全量重算**了 31 项哈希，并把新增 id 一并登记 ⇒ 外部锚 由「28/30 命中」变为「31/31 自洽」。⚠️ 复算方法：块边界 = 该项 `- id:` 起至下一个 `- id:` 前为止（**含**下一项前的 `# ──` 分隔注释 —— 该边界缺陷已在 HANDOFF.yaml 的 handoff-concurrent-write 内记录，建议改「截到最后一个非空非注释行」，本批不擅改以免与生成器分叉）。复算命令：按 item 切块 → 把块内 `updated:` 归一化为字面量 `<ts>` → rstrip() → sha256 前 16 位。）"
 }

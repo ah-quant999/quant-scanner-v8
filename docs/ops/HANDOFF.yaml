@@ -26,15 +26,15 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 11:47"
-  updated_by: 小九(lemoncat-cn)
+  updated: "2026-09-22 13:55"
+  updated_by: 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 40
+  next_id_seq: 42
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -836,7 +836,20 @@ items:
       （实测 `INDEX_QUOTES` 11:12 / `ETF_PULSE` 11:13 / `MARKET_FUND_FLOW_DATA` 11:12 均新鲜）；
       但**盘前档（08:25）无代偿时即静默丢失** —— 本日 `US_HK_MAP` 冻结 27h 即与此直接相关
       （见新项 `cnfetch-single-source-stale`）。
-    updated: "2026-09-22 11:47"
+    alimi_verify_20260922_pm: >-
+      ✅ **阿狸咪 2026-09-22 13:5x CST 实测（严格按本项 verify_how：只看 `event==schedule`）—— 午后档已出现，
+      且与 09-22 09:45 记录的「上午恒 0 / 首档落 12:30–14:00」逐字吻合**：
+      · `v8_cn_fetch_watchdog`（wf `347126523`）：今日 schedule **2 档 @12:38 / 13:18**（首档 **12:38**，5 链最早）
+      · `v8_intraday_snapshot`（`354648114`）：**1 档 @13:48**
+      · `v8_algo_intraday_lite`（`337500527`）：**1 档 @13:52**
+      · `v8_stock_quote_refresh`（`336548691`）：**1 档 @13:56**（今日其余 7 档全 `workflow_dispatch`）
+      · `v8_cn_fetch_intraday_lemoncat`（`354533319`）：**schedule 仍 0**（今日仅 2 档 dispatch 09:35 / 11:51）
+        ⇒ **今日 5 链中唯一未出 schedule 的一条**，须重点观察。
+      · 旁证 `v8_cn_fetch_cloud`（`327687211`）：今日 schedule **1 档 @13:12**（首档亦落午后）。
+      ⇒ **「上午档全 0」在 09-22 再次成立**（5 链 + cn_fetch_cloud 6/6 均上午 0），午后首档 **12:38**；
+      命中率口径：5 链今日 schedule 合计 **5 档** vs cron 应有数十档 ⇒ 仍远低于应有值。
+      ⏳ 本项**维持 `pending-verify`**（判据须连看 ≥2 个交易日；lemoncat 今日 0 档）。
+    updated: "2026-09-22 13:55"
 
   - id: intraday-guard-window-gap
     priority: P1
@@ -1929,5 +1942,102 @@ items:
       **cn_fetch premarket**（`cloud_fetch_v8.py` `CATEGORY_MAP["US_HK_MAP"] = "premarket"`）
       ⇒ 自愈会去派**算法链**，对本案**结构性无效**（自愈空转）。修法：`heal_cat` 应按
       「该 var 的抓取类别」派生，而非一律 `algo_run`。
-    updated: "2026-09-22 11:47"
+    alimi_verify_20260922_pm: >-
+      ⏳ **阿狸咪 2026-09-22 13:5x CST 实测回填（按本项 verify_how：只看产物 `update_time`，禁以 run success 当判据）**：
+      · ① `MARKET_ALERTS` **仍陈旧**：`data/MARKET_ALERTS.js`（637 B）`update_time` 仍 **2026-09-21 15:58:22**；
+        `HEALTH_CHECK`（blob `d69afe502e75`，`updated` 13:35:56）逐字 `last_update 2026-09-21 20:51:06 /
+        age_min 1004.8 / message「更新于 昨日 20:51；超过阈值 45 分钟」` ⇒ **确定性故障延续到今日午后**。
+        同批日志再证（`#1977` @13:12 schedule）：`❌ attempt 1/3 ~ 3/3: fetch_orphan_market_alerts
+        调用异常(90s超时)`（13:40:24 / 13:41:56 / 13:43:28）→ `🚫 MARKET_ALERTS 跳过，最终错误`，
+        末行 `📋 runner_status: {'total': 20, 'ok': 19, 'empty': 0, 'fail': 1}` —— **20 项里恰好 1 项 fail**，
+        而 run 结论 **success** ⇒ 「软失败假绿」再次成立。
+      · ② `US_HK_MAP` **已自愈**（本项 what 记的 27h+ 冻结已解除）：`data/US_HK_MAP.js`（28,480 B）
+        `update_time` = **2026-09-22 12:46:53** ⇒ **本条可从本项摘除**（非 08:25 盘前档，属后续档补抓）。
+      · ③ `AVG_PRICE_880003` 仍复现：`#1977` 逐字 `⚠️ AVG_PRICE_880003: 空/无效数据，跳过写入
+        （保留远端旧数据）`（13:38:01）⇒ 同批第三个静默空源未变。
+      ✅ 小结：verify_how ① 对 `US_HK_MAP` 成立、对 `MARKET_ALERTS` **不成立** ⇒ status 维持 `todo`。
+      本机本轮**只 detect + 报告**：0 dispatch / 0 代码改动 / 0 阈值改动。
+    updated: "2026-09-22 13:55"
+  - id: stockquote-noon-gap-relay-cancel
+    priority: P1
+    owner: shared
+    status: todo
+    what: >-
+      2026-09-22 上午 STOCK_QUOTE（个股行情卡）**盘中停更 1h53m 而巡检全绿**（小九 12:21 交接件
+      `20260922_1221_..._盘中链断档自愈失败.md` 报，阿狸咪本轮独立复核成立）：产物
+      `data/STOCK_QUOTE.js` 冻在 **11:15:36**，直到 **13:51:14** 才恢复。链路四环：
+      · ① 专用主链 `.github/workflows/v8_stock_quote_refresh.yml`（`runs-on:[self-hosted,cn]`）
+        今日 7 档全为 `workflow_dispatch`：09:47 / 10:24 / 10:48 / **11:10 → 13:03 空窗 1h53m** /
+        13:03 / 13:25 / 13:47；**上午 schedule 档 0**（本仓既有同族形态，见
+        `intraday-chain-cron-deregistered`）。
+      · ② 兜底链 `_cloud` 今日仅 3 档（09:19 / 11:08 / 12:12）⇒ 未形成连续覆盖。
+      · ③ 真正断点 = **relay ② 载体 run 大面 cancelled** ⇒ 门控 Python 根本没执行到：
+        小九三级自愈派发 11:51 / 11:57 / 12:03 均 HTTP 204（GitHub 已受理），而
+        `v8_cn_fetch_cloud` #1978~#1981 长期 pending、`v8_cn_fetch_cloud_selfhosted` 今日 3 档
+        **全 cancelled**（09:47 / 12:03 / 12:04）⇒ **「dispatch 成功 ≠ 数据产出」同型第三次复现**。
+      · ④ **巡检盲区（本轮新证据）**：`data/HEALTH_CHECK.js`（`updated` 13:35:56）122 项里
+        **无 STOCK_QUOTE 卡级盘中项**（`freq` 含「盘中」的 11 项为 INDEX_QUOTES / ETF_PULSE /
+        ETF_INTRADAY_HEAT / SECTOR_FUND_FLOW / CONCEPT_RANKING / LIMIT_UP_HEATMAP /
+        MARKET_FUND_FLOW_DATA / MARKET_ALERTS / ETF_DAILY_MONITOR / CFFEX_HOLDINGS / AVG_PRICE_DATA），
+        只有通用项 `all_STOCK_QUOTE`（`freq:"—"`、`page:"全量数据"`、`heal_cat:"algo_run"`，实测
+        `status=ok / age_min=74.4`）⇒ 53 分钟冻结**结构性不会报红**；且 `heal_cat="algo_run"` 对
+        STOCK_QUOTE 是错配（其生产者是专用抓取链，非算法链）⇒ 自愈即使触发也派错链。
+      · ⑤ **当前态（本轮回填时刻）**：已自愈 —— 主链恢复 13:03 / 13:25 / 13:47 三档 success，
+        并出现今日首个 schedule 档 **13:56**；产物推进到 **13:51:14**。
+    fix: >-
+      （a）relay ② 载体 run 被 cancelled ⇒ 门控静默消失：建议把 relay ② 从「承载多次 dispatch
+          的云端 run」剥离为**轻量独立 workflow**（只做门控 + 派发，几十秒跑完），并给派发失败
+          加**独立告警出口**（当前 `except` 只 `print`，run 被 cancel 时整段逻辑静默消失）。
+      （b）巡检判据补齐：把 `data/STOCK_QUOTE.js` 的 `update_time` 纳入**卡级盘中判据**
+          （阈值 40 min，与 MARKET_ALERTS 的 45 min 同族），并把 `all_*` 的 `heal_cat`
+          按「该 var 的抓取类别」派生（现一律 `algo_run`）。
+      ⚠️ 与 `stock-quote-dispatch-drift`（已 done，结论落在 09-21 **午后**窗口）**不是同一形态**：
+      那条是「主力漂移到兜底链」，本条是「主链空窗 + relay 载体被 cancel ⇒ 门控未执行」。
+    evidence: >-
+      阿狸咪 2026-09-22 13:5x CST 实测（只读 API；未跑数据、未 dispatch）：
+      主链清单（wf `336548691`）今日 7 档（含 13:56 schedule）；兜底链 wf `352790648` 3 档；
+      `v8_cn_fetch_cloud_selfhosted` wf `336661558` 今日 3 档全 cancelled；
+      `data/STOCK_QUOTE.js` blob `184a884b7692`（4,465,702 B，>1MB ⇒ Contents API `content` 为空，
+      必须走 `git/blobs`）`update_time` = **2026-09-22 13:51:14**；
+      `data/HEALTH_CHECK.js` blob `d69afe502e75`（`updated` 13:35:56）summary
+      `{ok:119, warn:0, fail:1, limited:2, total:122}`，唯一 fail = `MARKET_ALERTS`
+      （见 `cnfetch-single-source-stale`）。
+    verify_how: >-
+      ① 主链 `v8_stock_quote_refresh.yml` 在**下一交易日**盘中（09:30–15:00）**逐档间隔 ≤ 25 分钟**
+        且**无 ≥60 分钟空窗**（只看 `created_at` 序列，禁只看「有没有 run」）；
+      ② relay ② 载体 run 的 `cancelled` 占比显著下降（今日 `_selfhosted` 3/3 cancelled）；
+      ③ `data/STOCK_QUOTE.js` 的 `age_min` 盘中恒 < 40，且已进 `HEALTH_CHECK` 卡级盘中项。
+      ⚠️ 首验通过也不得转 done —— 本仓反复实证「一次 success ≠ 常态」，须连看 ≥2 个交易日。
+    updated: "2026-09-22 13:55"
 
+  - id: stockquote-cachebuster-noop
+    priority: P2
+    owner: shared
+    status: todo
+    what: >-
+      `v8_stock_quote_refresh.yml` 的「更新 index.html 缓存戳」步**长期静默空跑并输出误导性告警**：
+      每轮日志逐字 `new STOCK_QUOTE.js sha10 = f50a66ab93` →（`#142` @13:47 CST）
+      `⚠️ index.html 中未找到 STOCK_QUOTE.js?v= 引用，可能已被外链替换；跳过 ?v 更新`。
+      🔴 **真根因（本轮定位）**：该步经 **Contents API** 读 `index.html`，而 `index.html` 现为
+      **1,341,429 B > 1 MB** ⇒ Contents API 的 `content` 字段**恒为空字符串**
+      （实测 `size=1341429 / len(content_field)=0 / encoding=none`）⇒ 正则 `re.subn` 永远返回 n=0
+      ⇒ 命中 `n==0` 分支打印上述**误判**（文件里明明有引用：`{name:'STOCK_QUOTE',
+      url:'data/STOCK_QUOTE.js?v=1790056383'}`）。与 `handoff-ai-entry-file` 同族的「大文件读不到」陷阱。
+      ℹ️ 附带事实：`index.html` 现存 **109 处 `?v=`**，其中 **108 处共享同一单调 unix 秒令牌**
+      `1790056383`（仅 `IPO_DATA.js` 为 `1790031455`）⇒ 全站缓存戳由**构建期**统一管理；
+      该步若真生效，反而会写入「内容 sha10」与既有「unix 令牌」口径打架。
+    fix: >-
+      二选一（倾向前者，符合「轻量化 + 禁膨胀」）：
+      ① **直接退役该步** —— 缓存戳已由构建期统一管（108/109 同 token），保留只会每轮 success
+         空跑并输出误导性告警；② 若确需链内自管，改走 `GET /git/blobs/<sha>` 取全文
+        （>1MB 唯一可行路径），并把替换值改为**单调 unix 秒令牌**（与全站口径一致），而非内容 sha10。
+    evidence: >-
+      主链 run `35692117200`（`#142`）job 日志逐字；`index.html` blob `8345084d374c`
+      （size 1,341,429 / Contents API `content` 空 / `encoding:none`）；109 处 `?v=` 令牌分布由本机
+      解析远端 blob 得出；workflow 源 `.github/workflows/v8_stock_quote_refresh.yml`
+      （`content_sha = sha1(...)[:10]`、`pattern = r'(data/STOCK_QUOTE\.js\?v=)([a-f0-9]+)'`）。
+    verify_how: >-
+      ① 下一档主链日志**不再出现**「未找到 STOCK_QUOTE.js?v= 引用」（或该步已删除）；
+      ② 若选择方案②，`index.html` 的 `data/STOCK_QUOTE.js?v=` 值应随内容变化**单调递增**，
+        并与其余 108 处口径一致（同为 unix 秒量级令牌）。
+    updated: "2026-09-22 13:55"
