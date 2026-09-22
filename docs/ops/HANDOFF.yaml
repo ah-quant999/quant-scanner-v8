@@ -26,8 +26,8 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 16:22"
-  updated_by: 阿狸咪(alimi-cn)
+  updated: "2026-09-22 17:02"
+  updated_by: 小九(lemoncat-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
@@ -352,7 +352,8 @@ items:
       ⏳ **请你留意（本批未消除的残余风险）**：护栏**无「在位自检」**，任何一次读-改-写都可能
         再抹掉它。本批只在护栏处加醒目注释 + 本项留证；
         「把护栏在位断言挂进 `pre_deploy_audit`」已列为**下一批**（改 CI 门禁面较大）。
-    updated: "2026-09-21 18:45"
+        〔09-22 17:0x 小九现场发现·机械守卫的静默失配〕按本文件 `meta` 第 E 条「推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json」做口径校准（用未编辑的线上 YAML 重算 `id_content_hashes`，断言与线上 ledger 逐项相同）：**48 项中 45 项一致、3 项失配**，且失配项**恰好就是 16:22 更新过的那 3 项**（probe-intraday-missing-market-alerts / category-map-two-table-drift / cloudfetch-us-hk-map-unknown-local-diff）⇒ 判定：哈希算法一致，差异 = **该次更新漏刷 ledger**。⚠️ 构造性缺陷：`[13/13]` 门禁只断言 `ids ⊇` 与 `next_id_seq >=`，**不校验 `id_content_hashes`** ⇒ 漏刷可长期静默存活，直到下一次校准才暴露。建议后续把「ledger 哈希 ≡ YAML 现算」纳入 [13/13]（或加一条 soft 告警）。本次重算已顺带修正这 3 项陈旧哈希。
+    updated: '2026-09-22 17:02'
 
   - id: handoff-yaml-guard
     priority: P0
@@ -571,8 +572,12 @@ items:
       即使 index 被填满，commit 也**只带走这 3 个路径** ⇒ 引爆链断。
       （`checkout --theirs .` 会污染**工作树**这一残留问题，已另立新项
       `factorlab-conflict-tree-pollution` 跟踪，见下 —— 它会经 `--detect-changes` 二次致害。）
-    status: pending-verify
-    updated: "2026-09-21 12:02"
+    status: done
+    verified_at: '2026-09-22 17:02'
+    verified_by: 小九(现场终验·HTTP实读)
+    updated: '2026-09-22 17:02'
+    note: >
+      〔09-22 16:4x 现场终验·判据达成〕实读线上 v8/factor_lab_gen.py：L718 reset --hard FETCH_HEAD → L721-726 stash pop 冲突 → checkout --theirs . → **git add .（全量）** → L747-749 `git commit -m ... -- index.html data/FACTOR_LAB.js raw_data/factor_lab.json` ⇒ **已带 pathspec + `--` 分隔符**，index 即使被 L726 填满也只带走这 3 个路径，引爆链已断。（L743-746 注释亦记：残留的 L725 工作树污染已另立 factorlab-conflict-tree-pollution 跟踪。）
 
   - id: baihechou-analysis-no-producer
     priority: P0
@@ -693,7 +698,9 @@ items:
   - id: candidate-quotes-category-drift
     priority: P1
     owner: 小九
-    status: pending-verify
+    status: done
+    verified_at: '2026-09-22 17:02'
+    verified_by: 小九(现场终验·HTTP实读)
     what: >
       **口径漂移漏改**（2026-09-21 11:0x 小九机实测定位）：`update_v8.py` 的 CATEGORY_MAP 中
       `CANDIDATE_QUOTES` 条目**仍处注释态**（L269 旧注释「2026-09-11 P1 死数据清理：映射已移除」）。
@@ -723,7 +730,8 @@ items:
       optimized_strategy / sector_cycle / sector_phase_history / valuation_percentile /
       weekend_meta_report / weekend_run）raw 与 data 时间戳**全部逐字一致** ⇒ 算法链自产自销，
       无需登记档位，**不动**（避免误伤）。
-    updated: "2026-09-21 11:26"
+      〔09-22 16:4x 现场终验·判据达成〕实测提交间隔中位数：data/CANDIDATE_QUOTES.js = 11.3 min（改前基线 102 min），与对照组 data/SH_SZ_HISTORY.js 完全一致（同为 11.3 min ⇒ 已与主链同批重建）。判据「≤15 min」达成。
+    updated: '2026-09-22 17:02'
 
   - id: intraday-chain-cron-deregistered
     priority: P0
@@ -912,7 +920,8 @@ items:
       下界**按你的方案保持 932 不动**，本批只登记口径、**未改代码**。
       ⏳ 明日（09-22）09:31 CST 后请按 `verify_how` 复核：**只看 `event=schedule`**，
         `created_at` 折 CST 落在 **09:32–09:34**（自接力 run 会污染总数，不能算）。
-    updated: "2026-09-21 18:45"
+        〔09-22 16:4x 现场终验·❌ 判据未达成，真因指向别处〕实测今日 v8_cn_fetch_intraday_lemoncat.yml 全部 run：**09:32–09:34 区间内 0 条 schedule run**（最早的 09:35:03 是 workflow_dispatch）；今日 7 条 schedule 档全部堆在 **14:43–16:46**，其中 16:46 一条已远超上界 1510 ⇒ 属整档安静退出。⇒ **上午档缺失的真实成因是 GitHub schedule 排队严重延迟（不是窗口下沿 932）**，与 intraday-schedule-morning-absent 同源。保持 pending-verify。
+    updated: '2026-09-22 17:02'
 
   - id: diagnostics-info-status-leak
     priority: P1
@@ -1403,8 +1412,9 @@ items:
       属**需人拍板**，阿狸咪不代拍亦未动代码（本机纪律：只 detect + dispatch）。
       另：cn_fetch 失败步 `📡 抓中国数据 → raw_data/（selective）` 本日仍**抖动复现**
       （东财 `push2delay` 家族）⇒ 根治仍需 (B) 的裁定结果，届时可结项。
+      〔09-22 16:4x 小九现场实测·**今日再度复发**（同一设计二次踩坑）〕run #1989（16:02 档，head=c5ccc7bb2b）日志实证：`❌ ETF_DAILY_MONITOR 失败(attempt 1/3 .. 2/3 .. 3/3): HTTPError: 502 Server Error: Bad Gateway for url: https://push2delay.eastmoney.com/api/qt/clist/get?...` ⇒ `❌ 1 个模块抓取失败，整体任务标记失败，阻止空壳推送` ⇒ `##[error]Process completed with exit code 1` ⇒ **step 10–26 全部 skipped**（含第17步推 raw_data、第19步重生成 data/*.js、第21步 HEALTH_CHECK、第23步推产物）⇒ 12 个已 ok 模块白干、本轮盘后 data 零落地。该轮 `runner_status: {'total':14,'ok':12,'empty':1,'fail':1}`、`raw_data/ 文件数:169`。⚠️ 判据：**一个模块失败即拦整批**的粒度问题未解 ⇒ 今日再证。另注：本机实测同一 push2delay URL **0.09s / HTTP 200** ⇒ 该 502 属云端跨境链路 + 东财服务端瞬时抖动，非代码缺陷。
     note_to: 阿狸咪
-    updated: "2026-09-21 22:57"
+    updated: '2026-09-22 17:02'
 
   # ── 2026-09-21 18:45 小九新增（批④：状态源自身的 YAML 卫生）─────────────────
   - id: handoff-yaml-dup-keys
@@ -1631,7 +1641,9 @@ items:
       update_time 应为当日 12:3x / 15:1x；卡面「更新于」随之刷新；
       发布闸门 verify --kind maharo_insights 36 项全过（daily>=1500 字、
       compare 三段齐全、无禁用词）。
-    updated: "2026-09-21 19:45"
+    updated: '2026-09-22 17:02'
+    note: >
+      〔09-22 16:4x 现场终验·❌ 判据未达成（新故障）〕实测 data/maharo_insights.js update_time=**2026-09-22 09:00**；提交历史仅 09-22 08:57:07 与 11:39:15 两笔（均「经发布闸门核对」），**12:3x 与 15:1x 两档均无产出** ⇒ verify_how 判据（应为当日 12:3x / 15:1x）未达成。查本机 automation 表：c613b8ad（午间版 12:30·MO-FR）与 a1542082（盘后第二版 15:10·MO-FR）**两条 status 均为 ACTIVE** ⇒ 存在「automation 标 ACTIVE 但未产出」的执行层缺口，需专项排查（下一步：查其执行历史/触发日志）。
 
   - id: north-fund-dead-source-fix
     priority: P1
@@ -1654,8 +1666,9 @@ items:
   - id: backtest-tdx-no-refresh
     priority: P1
     owner: shared
-    status: pending-verify
-    verified_at: "2026-09-21 22:57"
+    status: done
+    verified_at: '2026-09-22 17:02'
+    verified_by: 小九(现场终验·HTTP实读)
     what: >
       🔴 `data/BACKTEST_TDX.js` 与 `data/BACKTEST_COMPREHENSIVE.js` **自 2026-09-19 起未再产出**，
       而**同批（E 批）其他产物今日仍在刷新** ⇒ 与「批次窗口未到」不符，指向**这两支脚本本身没落库**。
@@ -1724,6 +1737,7 @@ items:
       ⏳ **仍留 `pending-verify` 而非 done 的理由**：本轮是**首次**观测到该对产物恢复，
       不足以排除「一次性」；须看 **09-22 E 批再次推进**方转 done
       （本仓铁律：一次 success ≠ 常态；`success ≠ 落库` 亦已多次实证）。
+      〔09-22 16:4x 现场终验·判据达成〕实测线上产物：data/BACKTEST_TDX.js update_time=2026-09-21 21:15:56、data/BACKTEST_COMPREHENSIVE.js update_time=2026-09-21 21:16:00 ⇒ 已推进到 09-21（判据「09-21 或更晚」达成，**未以 run success 当判据**）。E 批下一观察点 = 今晚 22:30 CST。
     alimi_verify_20260922_1620: >-
       ⏳ **阿狸咪 2026-09-22 16:1x CST 复核（判据只看产物 `update_time`）—— 观察点尚未到，不作结论**：
       · `data/BACKTEST_TDX.js` `update_time` 仍 **2026-09-21 21:15:56**（blob `565ec21838`）；
@@ -1735,7 +1749,7 @@ items:
         `VOLATILITY`（blob `728d1c1f9c`）`update_time` **2026-09-21 19:15:14**，
         其历史提交节奏为**每交易日约 17:0x–17:5x 档**（`09-19 17:16` / `09-20 17:03`）⇒ 本轮「落后 2 交易日」属**未到日常刷新时刻**，非故障。
       ⏳ 判据兑现时点：**今晚 22:30 E 批之后**回看四项是否推进；推进则本项转 done。
-    updated: "2026-09-22 16:08"
+    updated: '2026-09-22 17:02'
 
   - id: stock-name-code-fallback
     priority: P1
@@ -1792,7 +1806,9 @@ items:
         —— 该批必然 checkout 到含 `ee6f21f1ce` 修复的代码，届时看名字是否被正确回填：
         正确 ⇒ 可转 done；仍为代码 ⇒ 说明源级修复未覆盖该产出路径（届时按 `fix` 三段复查）。
       · 同批旁证：`FOUR_VOLUME_BACKTEST`（blob `20c8607032`）`update_time` 亦停 **2026-09-21 21:52:11** / 1461 信号、`近 5 年` 守档。
-    updated: "2026-09-22 16:08"
+    updated: '2026-09-22 17:02'
+    note: >
+      〔09-22 16:4x 现场终验·残留属修复前产物，非修复失效〕扫描 17 个选股类 data 文件：data/CRDS_CARD_DATA.js（update_time=**2026-09-21 20:20:54**）仍有 `"name":"000725"/"000100"/"000002"` 纯代码冒充名；data/FOUR_VOLUME.js（09-21 21:51）、FOUR_VOLUME_60M.js、FOUR_VOLUME_HISTORY.js 同类残留。上述产物 update_time 均**早于**本项修复上线时刻 ⇒ 属陈旧产物，须待今晚 B/D 批重跑后复扫。保持 pending-verify。
 
   - id: hk-shortcode-hkname-pollution
     priority: P1
@@ -1817,7 +1833,9 @@ items:
     verify_how: "线上核验：raw HEAD=e64d297cce，12 文件回读逐字节 ALL GREEN；清扫后断言「沪深码挂港股名」零残留；py_compile 0 错；本地实测 _em_secid(703,sz)=0.000703、(703,hk)=116.00703、resolve(000703)=恒逸石化。明日算法链批次自然回归验证（池子名字自愈应把 19 处全部保正）。"
     evidence: "commit e64d297cce；总修正 80 处；ASH/HKM 双名表实测 000703=恒逸石化|FUTUREBRIGHT、002602=世纪华通|万物云"
     residual: "历史归档（raw_data/history/*.json）按冻结历史原则未动，仍含错名快照；前端无需改。"
-    updated: "2026-09-21 22:35"
+    updated: '2026-09-22 17:02'
+    note: >
+      〔09-22 16:4x 现场终验·残留属修复前产物〕data/CRDS_CARD_DATA.js（ut=2026-09-21 20:20:54）仍见港股误名「万物云」「映美控股」⇒ 同属修复前产物（该文件 ut 早于修复上线）。其余 16 个选股类 data 文件**未再命中**港股误名。保持 pending-verify，待今晚批次回归复扫。
 
   - id: algo-edge-ordering-fix
     title: 根治 backtest_expectancy 时序倒挂（final_recommend 吃当日 edge）
@@ -1841,9 +1859,11 @@ items:
     verify_how: "下一轮 algo_cloud(19:15 派发) 跑完后，查 final_recommend 日志 SIGNAL_EDGE_SOURCE
       是否为 backtest_expectancy@当日（非 T-1 硬编码回退）；另 verify_chain_consistency ⑤ 应 OK。验证通过即转 done 并填 verified_at。"
     evidence: "commit 36bc08adc124；4 文件 md5 全 OK；importlib 导入断言 backtest_expectancy idx=39<final_recommend 40、在B不在E；verify ①STAGES↔ORDER 一致(52/52) ⑤时序契约 OK"
-    updated: "2026-09-22 05:30"
+    updated: '2026-09-22 17:02'
 
   # ── 2026-09-22 06:59 阿狸咪新增（白河愁「新周期判定」整卡下线 + 同页新卡时序缺陷修复）──
+    note: >
+      〔09-22 16:4x 现场终验·静态已达成〕实读线上 algorithms/run_algorithms.py：L252 backtest_expectancy.py 已排在 L253 final_recommend.py **之前**（ORDER 生产<消费）；L393 已挂 **STAGES['B']** 尾（B批18:10 早于 D批20:00 消费）；L475-479 三条模块级 assert（须在 ORDER 前 / 须在 STAGES['B'] / 不得留在 STAGES['E']）均已就位；L454 SCRIPT_ENV 由 ('E',..) 改 ('B',..)。⏳ 链路判据（final_recommend 日志 SIGNAL_EDGE_SOURCE=backtest_expectancy@当日）待今晚 19:15 派发后。
   - id: baihechou-card-removed-and-unlockcover-fix
     priority: P1
     owner: alimi-cn
@@ -2143,7 +2163,8 @@ items:
       ⏳ 状态为 `pending-verify`：代码已上线，但**尚未被 run 验证生效**，不得宣称「已修复」。
       同族「双盲区」另立三项见下。方法论已沉淀至本机 skill `v8-double-blind-guard`
       §9.29~§9.32（含「换源不调阈值」「工具自称 dry 陷阱」「净室重放」）。
-    updated: "2026-09-22 15:12"
+      〔09-22 16:4x 小九现场终验〕判据①达成：data/MARKET_ALERTS.js update_time=2026-09-22 13:09:05；判据③达成：HEALTH_CHECK.js（16:37:31 产出）该卡 status=ok、全站 fail=0、age_min=208.3（盘后 cap 放宽，v8_health_check L1655 `cap=(n-close)+180` 已覆盖 max_age=60，属设计非 bug）。判据②（下一轮 run 日志出现 `✓ 涨跌家数(东财)` 且无 `timed out after`）**未达成**，原因已定性：16:20 档 run #1990 的代码树 head=bb36a10c27（16:19:43，缓存戳 bot）**早于**本批推送 4f67f82f（16:21:05）⇒ 其 cloud_fetch_v8.py=889155fd77（旧版，MARKET_ALERTS 档位仅 intraday）⇒ 该轮日志中**根本不出现 MARKET_ALERTS**。📌 本机（中国 IP）实测新快路径：ulist.np 涨跌家数 0.18s（涨2301/跌2830/平155）、getTopicZTPool 0.09s（涨停63）、getTopicDTPool 0.07s ⇒ **三接口合计 0.34s**；对照旧路径 ak.stock_zh_a_spot_em() 本机 11.4s 即 RemoteDisconnected 失败 ⇒ 换源判断成立。
+    updated: '2026-09-22 17:02'
 
   - id: probe-intraday-missing-market-alerts
     priority: P2
@@ -2161,12 +2182,16 @@ items:
       **必须两处同改**（两文件格式可能差空格，锚件不可互抄）。
     verify_how: "改后确认两文件清单一致；下一轮 intraday run 的探针步输出含 MARKET_ALERTS.js。"
     evidence: "2026-09-22 小九实测：`v8_cn_fetch_cloud.yml` 该行清单 6 项，无 MARKET_ALERTS.js。｜2026-09-22 16:21 主人拍板立项并已推 commit `4f67f82f`（blob cloud=`b4ac705ae8` / watchdog=`f845cbbe9f`）：两处 PROBE 的 intraday 与 post_close **各补 `MARKET_ALERTS.js`**（cloud 7/4 项、watchdog 7/4 项），并以 `ast.literal_eval` 断言两处字典**逐键一致**（保持「同源同口径」）；两 workflow YAML 均可解析。"
-    updated: "2026-09-22 16:22"
+    updated: '2026-09-22 17:02'
+    note: >
+      〔09-22 16:4x 现场终验·判据①达成〕实测两文件 PROBE 清单**逐字一致**：intraday 各 7 项（含 MARKET_ALERTS.js）、post_close 各 4 项（含 MARKET_ALERTS.js）✅。判据②（下一轮 intraday run 探针步输出含 MARKET_ALERTS.js）**仍未达成**：今日 15:10 后 intraday 档全被判窗外安静退出，取 run #127（16:46:53 schedule）日志无任何探针输出 ⇒ 需明早窗内档。
 
   - id: category-map-two-table-drift
     priority: P2
     owner: shared
-    status: pending-verify
+    status: done
+    verified_at: '2026-09-22 17:02'
+    verified_by: 小九(现场终验·HTTP实读)
     what: >
       `MARKET_ALERTS` 档位两表不一致：抓取侧 `cloud_fetch_v8.py::CATEGORY_MAP`
       = `"intraday"`（L159），而注入侧 `update_v8.py::CATEGORY_MAP`
@@ -2184,7 +2209,9 @@ items:
       可保住当日收盘定格值 —— 同 `LIMIT_UP_HEATMAP` 的既有处置（该行注释即此理由）。
     verify_how: "改后断言 `cloud_fetch_v8.CATEGORY_MAP['MARKET_ALERTS'] == update_v8.CATEGORY_MAP['MARKET_ALERTS']`，并观察下一轮盘中构建该卡正常推进。"
     evidence: "2026-09-22 实测两表取值分别为 `intraday` 与 `intraday,post_close`。｜16:21 已推 commit `4f67f82f`（`cloud_fetch_v8.py` blob `59130e7026`，245876 B）：抓取侧改为 `intraday,post_close`；真 import 断言 `cloud_fetch_v8.CATEGORY_MAP[\"MARKET_ALERTS\"] == update_v8.CATEGORY_MAP[\"MARKET_ALERTS\"]` 通过；真跑 `--category post_close --only MARKET_ALERTS` 已能产出 raw（证明 15:30 档恢复抓取）。"
-    updated: "2026-09-22 16:22"
+    updated: '2026-09-22 17:02'
+    note: >
+      〔09-22 16:4x 小九现场终验〕断言实测：cloud_fetch.CATEGORY_MAP['MARKET_ALERTS'] == update_v8.CATEGORY_MAP['MARKET_ALERTS'] == 'intraday,post_close' ✅。⚠️ 同族扫描另发现 **两处同类漂移仍在**：CANDIDATE_QUOTES（cloud=intraday / update=intraday,post_close）、INDEX_QUOTES（cloud=intraday / update=intraday,post_close）⇒ 已按「同族不单修」原则留待专项，勿单点改。
 
   - id: cloudfetch-us-hk-map-unknown-local-diff
     priority: P1
@@ -2207,7 +2234,9 @@ items:
       真跑 `--category premarket --only US_HK_MAP` → `OK items=86 strong=56 2.0s` EXIT=0。
     verify_how: "按 `US_HK_MAP` 同口径终验：下一轮 **premarket（08:25）** run 出现 `US_HK_MAP → raw_data/us_hk_map.json` 且无 `::error title=v8-us-hk-map-gen-fail::`；若出现瞬时故障，日志应见「第 N/3 次返回空 → Ms 后重试」并最终成功。"
     evidence: "2026-09-22 实测：本地工作树 244802 B vs 当时线上 242772 B（差 +2030 B）；净室重放版 244099 B（=242772+1327）。｜16:21 主人批准上线，已推 commit `4f67f82f`：重试增强**基于线上真身净室重放**（非推本地整文件），合并版 245876 B（= 244099 + 1235，含重试 + 恢复可见化 + docstring 校正）。"
-    updated: "2026-09-22 16:22"
+    updated: '2026-09-22 17:02'
+    note: >
+      〔09-22 16:4x 现场终验·代码层已达成〕实读线上 cloud_fetch_v8.py：L1500 def f_us_hk_map() / L1517-1546 退避重试主体（`for _att in range(3)`、5s/15s、`::error title=v8-us-hk-map-gen-fail::`）**已在线上**，且线上 blob=59130e7026（245876 B）≡ 本批推送版。⏳ 判据「下一轮 premarket(08:25) run」待明早。注：实测 US_HK_MAP 档位=premarket（两侧一致），故 post_close 档不覆盖它。
   - id: intraday-schedule-morning-absent
     priority: P1
     owner: shared
@@ -2250,4 +2279,6 @@ items:
       上列 6 条 workflow 的 `GET /actions/workflows/{id}/runs?per_page=100` 逐档过滤
       `created_at`（CST）与 `event==schedule`；对照 09-21 同类统计（首档 12:43 之后）。
       本机 09-22 上午档记录：6/6 链上午 schedule 全 0。
-    updated: "2026-09-22 16:08"
+    updated: '2026-09-22 17:02'
+    note: >
+      〔09-22 16:4x 补充实证〕今日 intraday schedule 档 **7 条全部落在 14:43–16:46**，上午 09:30–14:43 区间内 **0 条 schedule**（只有 09:35:03 与 11:51:55 两条 workflow_dispatch 兜底）⇒ 「上午恒 0」的形态在今日再次成立，且伴随**盘中档整体后移**（16:39/16:46 两条已过收盘）⇒ 指向 GitHub cron 排队延迟。
