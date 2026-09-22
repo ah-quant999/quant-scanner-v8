@@ -918,10 +918,12 @@ jobs:
           # 与 v8_cn_fetch_watchdog.yml 的 PROBE 同源同口径（单一事实来源，不另立一套）
           PROBE = {
               "intraday":   ["LIMIT_UP_HEATMAP.js", "CONCEPT_RANKING.js", "CAPITAL_FLOW_DATA.js",
-                             "SECTOR_FUND_FLOW.js", "INDEX_QUOTES.js", "CANDIDATE_QUOTES.js"],
+                             "SECTOR_FUND_FLOW.js", "INDEX_QUOTES.js", "CANDIDATE_QUOTES.js",
+                             "MARKET_ALERTS.js"],
               "premarket":  ["JUDGMENT_DATA.js", "CRISIS_DATA.js", "LIMIT_UP_HEATMAP.js",
                              "US_HK_MAP.js", "V8_CALENDAR.js", "MARGIN_DATA.js"],
-              "post_close": ["LHB_DATA.js", "CANDIDATE_QUOTES.js", "CAPITAL_FLOW_DATA.js"],
+              "post_close": ["LHB_DATA.js", "CANDIDATE_QUOTES.js", "CAPITAL_FLOW_DATA.js",
+                         "MARKET_ALERTS.js"],
           }
           files = PROBE.get(cat)
           if not files:

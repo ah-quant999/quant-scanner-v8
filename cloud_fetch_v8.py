@@ -156,7 +156,13 @@ CATEGORY_MAP = {
     "LIMIT_UP_BROKEN": "intraday",
     "CANDIDATE_QUOTES": "intraday",  # 候选池实时行情：行业树图第二层（个股）数据源
     "SH_SZ_HISTORY": "intraday",  # 沪深成交额历史（滚动窗口，盘中最少5刷）
-    "MARKET_ALERTS": "intraday",  # 市场预警（孤儿模块 fetch_orphan_market_alerts.py 接入盘中刷新）
+    # 🔴 2026-09-22 补 post_close 兜底（与 update_v8.py 侧 "intraday,post_close" 对齐）：
+    #   权威调度口径见 logic.html —— 市场预警 slots 含 15:30，而本 workflow 的档位判定为
+    #   `540<=HM<=905 → intraday` / `905<HM<=1290 → post_close` ⇒ 15:30 档落 post_close，
+    #   原只标 intraday ⇒ **15:30 收盘定稿档实际不抓本卡**（口径漏洞）。
+    #   另：盘中 cron 偶发丢档（09-22 实测 13:00/13:30/14:00/14:30 四档全丢）时，
+    #   post_close 兜底可保住当日收盘定格值 —— 同 LIMIT_UP_HEATMAP 的既有处置。
+    "MARKET_ALERTS": "intraday,post_close",
     # 盘后（15:30 后）：大盘资金流时间轴，累积历史序列，避免盘中覆盖
     "MARKET_FUND_FLOW_DATA": "post_close",
     # 15:30 收盘数据：EXPERIMENT 等 akshare 可抓的 T+1 数据
@@ -1500,26 +1506,46 @@ def f_us_hk_map():
       隔夜交易日按 America/New_York 换算（用 CST 取日期会把 09-18 收盘误标成 09-19）。
     · 明细逻辑在 scripts/fetch_us_hk_map.py：交易所前缀运行时发现（禁硬编码）+ 映射对
       名称一致性闸门（US 东财名 × HK 腾讯独立源名，不符即整对剔除、计入 gate 统计）。
-    · 返回 None 时由 run() 走重试；本函数不抛异常，避免单个数据源打挂整轮 job。
+    · 本函数内部退避重试 3 次（间隔 5s/15s）；仍失败则返回 None，
+      由 run() 判 empty（不抛异常，避免单个数据源打挂整轮 job）。
     """
     import importlib.util as _ilu
     _p = ROOT / "scripts" / "fetch_us_hk_map.py"
     if not _p.exists():
         print("  ⚠️ US_HK_MAP: 生成器缺失 %s" % _p)
         return None
-    try:
-        _spec = _ilu.spec_from_file_location("_v8_us_hk_map", str(_p))
-        _mod = _ilu.module_from_spec(_spec)
-        _spec.loader.exec_module(_mod)
-        return _mod.build()
-    except Exception as _e:  # noqa: BLE001
-        # 🔴 静默吞异常 = 「双盲区」：run 全绿、卡片却冻结数日（2026-09-22 实事故）。
-        # 生成器异常必须打印完整栈 + GitHub ::error 注解，让云端失败可见、可追。
-        import traceback as _tb
-        print("  ⚠️ US_HK_MAP: 生成器执行异常 %s" % _e)
-        _tb.print_exc()
-        print("::error title=v8-us-hk-map-gen-fail::US_HK_MAP 生成器异常: %s" % _e)
-        return None
+    # 🔴 2026-09-22 一劳永逸加固（小九）：内部退避重试 + 完整可见化。
+    #   血证：云端 08:43 那轮东财对该 IP 整体 502，生成器只跑一次就 build()→None，
+    #   而 run() 对 None 判 empty（**不阻断、不重试**）⇒ 卡片冻结一整天、run 仍全绿。
+    #   这里独立重试 3 次（间隔 5s/15s），把瞬时数据源故障挡在函数内。
+    #   ⚠️ 重试**不得**以牺牲可观测性为代价：每次异常打完整栈，3 次全失败打一次 ::error。
+    _fail_detail = ''
+    for _att in range(3):
+        try:
+            _spec = _ilu.spec_from_file_location("_v8_us_hk_map", str(_p))
+            _mod = _ilu.module_from_spec(_spec)
+            _spec.loader.exec_module(_mod)
+            _res = _mod.build()
+            if _res is not None:
+                if _att:
+                    print("  ✅ US_HK_MAP: 第 %d 次尝试成功（前 %d 次为空）" % (_att + 1, _att))
+                return _res
+            if _att < 2:
+                _dly = (5, 15)[_att]
+                print("  ⚠️ US_HK_MAP: 第 %d/3 次返回空 → %ds 后重试" % (_att + 1, _dly))
+                time.sleep(_dly)
+        except Exception as _e:  # noqa: BLE001
+            import traceback as _tb
+            print("  ⚠️ US_HK_MAP: 生成器执行异常(第 %d/3 次) %s: %s"
+                  % (_att + 1, type(_e).__name__, _e))
+            _tb.print_exc()
+            _fail_detail = "%s: %s" % (type(_e).__name__, _e)
+            if _att < 2:
+                time.sleep((5, 15)[_att])
+    print("  🔴 US_HK_MAP: 3 次尝试全部失败（返回 empty，不覆盖既有产物）")
+    print("::error title=v8-us-hk-map-gen-fail::US_HK_MAP 生成器 3 次尝试全部失败%s"
+          % ("：" + _fail_detail if _fail_detail else "（均返回空）"))
+    return None
 
 
 def run(label, fn, retries=2):

@@ -116,9 +116,11 @@ jobs:
           BASE_URL = "https://ah-quant999.github.io/quant-scanner-v8/data/"
           PROBE = {
               "intraday": ["LIMIT_UP_HEATMAP.js", "CONCEPT_RANKING.js", "CAPITAL_FLOW_DATA.js",
-                           "SECTOR_FUND_FLOW.js", "INDEX_QUOTES.js", "CANDIDATE_QUOTES.js"],
+                           "SECTOR_FUND_FLOW.js", "INDEX_QUOTES.js", "CANDIDATE_QUOTES.js",
+                           "MARKET_ALERTS.js"],
               "premarket": ["JUDGMENT_DATA.js", "CRISIS_DATA.js", "LIMIT_UP_HEATMAP.js", "US_HK_MAP.js", "V8_CALENDAR.js", "MARGIN_DATA.js"],
-              "post_close": ["LHB_DATA.js", "CANDIDATE_QUOTES.js", "CAPITAL_FLOW_DATA.js"],
+              "post_close": ["LHB_DATA.js", "CANDIDATE_QUOTES.js", "CAPITAL_FLOW_DATA.js",
+                         "MARKET_ALERTS.js"],
           }
           files = PROBE.get(cat) or ["LIMIT_UP_HEATMAP.js"]
           # 🔴 2026-09-10 修正（主人令·13:00开盘数据停更事故）：
