@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 20:55"
+  updated: "2026-09-22 21:21"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 52
+  next_id_seq: 53
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -2002,7 +2002,7 @@ items:
   - id: unlockcover-factor-observation-card
     priority: P2
     owner: shared
-    status: blocked
+    status: doing
     what: >
       「暂未上架 › 解禁&机构关注」因子观测卡（commit 33499302c8，阿狸咪 09-22 05:31 上线）的
       **转正前口径对齐**。小九 09-22 09:57 完成四方实测取证，确认该链**已真跑通**
@@ -2044,12 +2044,20 @@ items:
       ⑥ 未登记 CARD_DEFS 但**当前不红灯**：走 check_all_data_files 通用 24h 红线，
          盘前每日刷新 ⇒ age<1440min ⇒ ok（链条一断即静默变红，属可接受但已知的盲区）。
     doc: "docs/ops/handover/2026-09-22_0957_小九_给阿狸咪_解禁机构关注因子观测卡三问.md"
+    reply: >
+      阿狸咪的工程师 2026-09-22 21:21 CST 已在 doc 档 §5 逐条答复（Q1 回测口径 / Q2 改名并暂不转正 / Q3 保留不外显）：
+      · 解禁 → 事件研究法（T-20…T+20，相对中证500 超额，按距 T0 交易日距离分四桶，方向自带符号）；
+      · 机构关注 → 横截面因子法（Rank IC/ICIR + 分组收益），但**当前触发率 ≈0.56%（28 条/5000+）已踩废线**，
+        加之 report_count_1m 硬编码恒 1 ⇒ **当前不具备转正条件**，建议改名 TOP_ANALYST_PICK 且仅作展示；
+      · annual_index / ret_12m = 分析师本人业绩 ⇒ 保留在 raw、UI 不外显，若展示须标注「(分析师业绩，非个股)」。
+      ⇒ 本项由 blocked 转 doing：解禁半边先做**离线**事件研究预筛（本机 kline_cache，不新增云端管线、不占跑批）；
+        机构关注半边待换真覆盖家数源（stock_research_report_em）后另开 item。
     verify_how: >
       阿狸咪在 doc 档末尾答复 Q1/Q2（Q3 可选）后，小九将本项 status 推进：
       定回测口径 → doing（进 algorithms/ 并按 v8 铁律过 verify_chain_consistency.py
       时序契约 + v8_stage_gate.py 分批判据）；或定「仅作展示不外测」→ done
       （并在 CARD_DEFS 登记 page=暂未上架·观测类、freq=每日盘前、max_age=1440）。
-    updated: "2026-09-22 09:57"
+    updated: "2026-09-22 21:21"
 
   # ── 2026-09-22 11:4x 阿狸咪新增（cn_fetch 单模块源级失败 ⇒ 两张卡面冻结；run 仍 success = 假绿）──
   - id: cnfetch-single-source-stale
@@ -2595,3 +2603,49 @@ items:
       任选方案落地后做一次**故意的坏写入**（临时提交里把 `index.html` 截断），
       断言：线上**始终**返回完整版（或自动回滚），且门禁红能真正阻断发布。
     updated: "2026-09-22 20:55"
+
+  # ── P1 · 卡面固话（2026-09-22 21:21 CST 阿狸咪现场登记：上游半成品覆盖完整档，主人直接看到「一直没变化」）──
+  - id: theme-value-concept-layer-zero
+    priority: P1
+    owner: shared
+    status: todo
+    what: >
+      「暂未上架 › 📡 观测类 › 🔭 主题空间 · 概念资金热度」卡在盘后**长期只显示零值**
+      （主题资金全 0 亿 / 动态热点 0 个 / 资金净流入 0 只）⇒ 主人 2026-09-22 21:21 CST 截图质问
+      「这卡的一直没变化，确认无误吗」。**确认有误，是真故障**：该卡「会动的那一层」= 概念板块层，
+      而线上 `data/SECTOR_FUND_FLOW.js`（tip blob `efcd1d3d1ce2` / `update_time=2026-09-22 19:54:03`）
+      的 `sectors_in` / `sectors_out` / `top_list` **全 200 条均为 type='行业'，概念类 0 条**；
+      前端只取 `type=='概念'`（index.html L7851-7856）⇒ `cList` 恒空 ⇒ 所有主题 `net=0 / nSec=0`、
+      `__TV_DYN_KEYS` 恒空、个股 `fund` 恒 0（= Σ 命中概念板块净额，L7937）。
+    note: >
+      **根因（已到代码行，机理已取证）**：`cloud_fetch_v8.py::f_sector_fund_flow()` L1871-1889
+      按 `[("行业","m:90 t:2"), ("概念","m:90 t:3")]` 两类分别抓取，**类内只对单条做 `net==0` 过滤**，
+      全函数仅在「两类加起来一条都没有」时才 `return None`（L1890）⇒
+      **任一类型整体抓空（接口抖动 / 被 WAF 重置）时静默产出「只有行业」的半成品并覆盖完整档**，
+      run 仍记 success ⇒ 与在册 `cnfetch-single-source-stale` / `cnfetch-empty-shell-block` 同族的「假绿」。
+      本轮实测（阿狸咪 2026-09-22 21:21 CST，全走 REST）：raw 侧近 10 档中 `17:34:59`、`19:54:03` 两档概念=0
+      （分别由 cn fetch 17:47 / 20:07 提交）；data 侧同一日**两个写入者互相覆盖** ——
+      `v8-cloud-bot`(build) 推 19:54 坏档（20:25 / 21:02），`github-actions[bot]`(cn fetch)
+      把 **18:11:10 的旧完整档**再推回去（20:10 / 20:57）⇒ 线上在「坏档」与「旧档」间来回翻，
+      **当前 tip 停在坏档**。更早逐档检查：09-18 28 档 / 09-19 7 档 / 09-20 5 档 **零坏档**（概念 81 条）
+      ⇒ **这是 09-21 20:43 之后新出现的退化**。
+    fix: >
+      治本（低风险、不动正常路径）：在 `f_sector_fund_flow()` 落库前加「**两类齐全**」断言 ——
+      行业与概念任一类条数为 0 即视为本轮失败（`return None` / 抛错 ⇒ run 记 empty），
+      **绝不落半成品**（与全站「禁 0 冒充」「禁空壳覆盖既有 raw」一致）。
+      ⚠️ 与在册 `fourvolume-backtest-3y-downgrade` 合并看：**护栏要放在落库/推送侧，不能只靠生成端自觉**。
+      ⚠️ **本轮不改**：当下正处盘后跑批高峰（cn fetch / build 每 5~30min 一档），
+      改云端抓取主文件会立即影响后续档 ⇒ 修复窗口 = 阿狸咪夜间时段（避开小九白天时段 + 做交接）。
+    evidence: >
+      ① 线上产物：`data/SECTOR_FUND_FLOW.js` tip blob `efcd1d3d1ce2` / 20,657 B /
+         `update_time=2026-09-22 19:54:03` / `republish_time=2026-09-22 21:01:35`；
+         `sectors_in` n=100（全行业）/ `sectors_out` n=100（全行业）/ `top_list` n=200（全行业）。
+      ② 前端判据：`index.html` L7851-7856（`x.type!=='概念'` 即跳过）/ L8061（徽章取 SFF.update_time）/
+         L8071-8073（主题全集 = 种子 + 当日概念榜自动追加）/ L7937（个股 fund 来自 cNet）。
+      ③ 逐档取证：09-21 末档 `20:43:52` 概念 0；09-22 `17:34:59`、`19:54:03` 概念 0；此前三日零坏档。
+    verify_how: >
+      修复后连看 ≥3 个盘后档，断言 `data/SECTOR_FUND_FLOW.js` 概念类条数 ≥ 50（不再为 0），
+      且该卡卡面出现非零「主题资金热度」与 ≥1 个 🔥 动态热点；
+      同时确认坏档再现时 run 结论为失败/empty 且 raw 保持上一完整档（不再被半成品覆盖）。
+    updated: "2026-09-22 21:21"
+
