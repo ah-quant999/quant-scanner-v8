@@ -95,6 +95,7 @@ def load_json(path, default=None):
 # ─────────────────────────────────────────────────────────────────────────────
 DATA_OUT = os.path.join(WORKSPACE, "..", "data")
 _QUOTE_SNAP_CACHE = None
+_STOP_SNAP_CACHE = None
 
 
 def _load_js_obj(name):
@@ -171,6 +172,59 @@ def quote_snapshot():
     else:
         print("  ⚠️ 无当日行情快照（STOCK_QUOTE / CANDIDATE_QUOTES 缺失或非当日）→ "
               "close/pct_chg 回退候选池历史值（不伪造）")
+    return snap
+
+
+def stop_snapshot():
+    """全站统一「精确止损」真源：data/STOCK_STOP_DATA.js（带当日校验）。
+
+    由 gen_stock_stop.py 用 gtimg 真实 250 根日K + compute_stop_target(精确版) 产出，
+    口径 = low20 / ATR / 前高 三口径取最严，与「今日可入手候选」卡**同一份数据**。
+
+    🔴 2026-09-22 主人令「我要最真实算出来的」：TOP10 此前用 GOLD_POOL 的 history 自算
+    止损，但那份 history 是「信号命中日」的**稀疏**序列（实测：恒逸石化只有 09-08 一根、
+    江波龙跳过 09-16、西部矿业只有 2 根），且「外资研投」通道的 close 恒为 null
+    （raw_data/gold_pool.json 356 只里 65 只，德业股份/国轩高科在列）
+    ⇒ ① 德业/国轩 close·止损·目标价全 0；② low20「近20日最低」语义根本不成立。
+    现改为直接引用全站单一真源，非当日则回退（**不伪造**）。
+
+    返回 {6位code: {"close","stop_loss","target_price","stop_loss_method",
+                     "target_price_method","risk_reward"}}；非当日 → 空 map。
+    """
+    global _STOP_SNAP_CACHE
+    if _STOP_SNAP_CACHE is not None:
+        return _STOP_SNAP_CACHE
+    today = datetime.now().strftime("%Y-%m-%d")
+    snap = {"date": None, "map": {}}
+    _sd = _load_js_obj("STOCK_STOP_DATA.js")
+    if str(_sd.get("update_time") or "")[:10] == today:
+        m = {}
+        for k, v in (_sd.get("stocks") or {}).items():
+            if not isinstance(v, dict):
+                continue
+            c = _code6(k)
+            if not c:
+                continue
+            cl = _num_or_none(v.get("close"))
+            sl = _num_or_none(v.get("stop_loss"))
+            tp = _num_or_none(v.get("target_price"))
+            if cl and sl and tp:
+                m[c] = {
+                    "close": cl,
+                    "stop_loss": sl,
+                    "target_price": tp,
+                    "stop_loss_method": v.get("stop_loss_method") or "",
+                    "target_price_method": v.get("target_price_method") or "",
+                    "risk_reward": _num_or_none(v.get("risk_reward")) or 0,
+                }
+        if m:
+            snap = {"date": today, "map": m}
+    _STOP_SNAP_CACHE = snap
+    if snap["map"]:
+        print(f"  🎯 精确止损闸门启用：STOCK_STOP_DATA @ {snap['date']}，覆盖 {len(snap['map'])} 只")
+    else:
+        print("  ⚠️ 无当日精确止损快照（STOCK_STOP_DATA 缺失或非当日）→ "
+              "回退候选池序列计算（不伪造）")
     return snap
 
 
@@ -1501,7 +1555,21 @@ def main():
         # 方案三统一口径（此处只有收盘价序列，用降级版：固定10%止损 + R:R=1.5止盈）
         stop_loss, target_price = 0, 0
         stop_loss_method, target_price_method, risk_reward = "", "", 0
-        if close_price and close_price > 0:
+        # 🔴 2026-09-22 主人令「我要最真实算出来的」：止损三件套优先取**全站单一真源**
+        #    data/STOCK_STOP_DATA.js（gtimg 真实 250 根日K 精确口径，与候选卡同源）。
+        #    命中时 close 一并采用，确保「展示价 / 止损基准 / 目标价基准」同源同口径。
+        #    未命中（非当日 / 不在 509 只覆盖内）才回退下面的序列降级口径 —— 不伪造。
+        _ss = stop_snapshot()["map"].get(str(raw_code))
+        _close_src = None
+        if _ss:
+            close_price = _ss["close"]
+            stop_loss = _ss["stop_loss"]
+            target_price = _ss["target_price"]
+            stop_loss_method = _ss["stop_loss_method"]
+            target_price_method = _ss["target_price_method"]
+            risk_reward = _ss["risk_reward"]
+            _close_src = "STOCK_STOP_DATA"
+        elif close_price and close_price > 0:
             _board = s.get("board_label", "") or board_from_code(raw_code)
             # 🔴 2026-09-22：止损/目标价基准须含当日收盘（历史序列最后一根滞后）
             _stop_seq = list(recent_closes)
@@ -1514,6 +1582,7 @@ def main():
                 stop_loss_method = _st["stop_loss_method"]
                 target_price_method = _st["target_price_method"]
                 risk_reward = _st["risk_reward"]
+            _close_src = quote_snapshot()["source"] if (_q and _q_price) else "history"
 
         # ── 基本面质量分（复用 fundamental_helper，与驾驶舱口径一致；
         #     含港股中性兜底：旧数据 hk 误标 D 自动修正为中性；含消息面加减分）──
@@ -1579,7 +1648,7 @@ def main():
             "close": close_price or latest.get("close") or s.get("close") or 0,
             "pct_chg": (_q["pct"] if (_q and _q.get("pct") is not None)
                         else (latest.get("pct_chg") or s.get("pct_chg") or 0)),
-            "close_source": (quote_snapshot()["source"] if (_q and _q_price) else "history"),
+            "close_source": (_close_src or "history"),
             "pct_chg_20d": pct20 or 0,
             "breakout_5d": breakout_5d,
             "total_score": total,
