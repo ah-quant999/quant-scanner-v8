@@ -1070,11 +1070,41 @@ def fetch_recent_listed_ths(days=5):
     today = datetime.now().date()
     start = today - timedelta(days=days)
 
+    # 🔴 2026-09-22 小九·一劳永逸：同花顺接口无超时 ⇒ 整轮静默卡死（血证 cn_fetch #1990）
+    #   现象：run 35704230770（16:20 post_close 档）step[9] 日志停在——
+    #       [1.5/5] 补充同花顺已上市新股...
+    #         0%|          | 0/78 [00:00<?, ?it/s]
+    #         1%|▏         | 1/78 [00:00<01:07,  1.14it/s]   ← 第 2 项后彻底静默
+    #     静默 **50 分钟**（16:21:03 → 17:11:43）才被手工取消；因 step[9] 无步级
+    #     timeout-minutes，只有 job 级 60min 才拦 ⇒ 占死唯一并发槽位，
+    #     排队中的 #1991 白等 51 分钟 ⇒ 16:20–17:11 数据链整段空转。
+    #   根因：ak.stock_xgsr_ths() 内部用 requests **不传 timeout**，上游不响应时
+    #     socket 无限等待；外层 try/except **抓不到**（不抛异常就进不了 except）。
+    #   修法：调用期间给 requests 全链路注入超时（含显式 timeout=None），
+    #     并以 socket 默认超时兜底 urllib 路径；超时即降级返回 []，
+    #     该源本身是可选项（东财 datacenter 为主源），不影响主链。
+    import socket as _sock
+    import requests as _rq
+    _THS_TO = 30
+    _orig_req = _rq.sessions.Session.request
+    _prev_sock_to = _sock.getdefaulttimeout()
+
+    def _ths_to_patched(self, method, url, **kw):
+        # 注意：akshare 可能显式传 timeout=None，setdefault 对它无效 ⇒ 必须判 None
+        if kw.get("timeout") is None:
+            kw["timeout"] = _THS_TO
+        return _orig_req(self, method, url, **kw)
+
     try:
+        _sock.setdefaulttimeout(_THS_TO)
+        _rq.sessions.Session.request = _ths_to_patched
         df = ak.stock_xgsr_ths()
     except Exception as e:
         print(f"  ⚠️ 同花顺上市数据获取失败: {e}")
         return []
+    finally:
+        _rq.sessions.Session.request = _orig_req
+        _sock.setdefaulttimeout(_prev_sock_to)
 
     candidates = []
     for _, row in df.iterrows():
