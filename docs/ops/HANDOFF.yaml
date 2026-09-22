@@ -246,7 +246,31 @@ items:
       正解方向 = ① 把「核心标记全命中」做成**推送侧硬前置**（任何写 index.html 的路径落盘前自检），
       或 ② 一律改为「取远端正文 + 就地改 ?v」（`api_push_raw._stamp_remote_index_v` 范式）并**删除所有本地入队口**。
 
-    updated: "2026-09-22 20:26"
+      🔴 **2026-09-22 20:29 CST 追加：真凶已取证（`v8_algo_cloud` #2045 step14 日志逐字，run 结束后拉到）**
+      写入者 = **算法链**（不是 cn fetch；提交信息 `v8 cn fetch: HH:MM` 只是 `api_push_raw.py` 的**默认消息**，会误导归因）：
+      ```
+      ⚠️ RAW GET /repos/.../contents/index.html?ref=6a985c3c21... -> 网络异常 FileNotFoundError: [Errno 2] No such ...
+      🔄 index.html ?v 已重写为单调令牌 1790078991（2 个文件）
+      ✅ index.html ?v 已随本批 extra 文件原子更新（基准=远端最新正文）
+      ⚠️ 单次提交 635 个文件（>300）——推送规模偏大，疑似全量重建或仓库膨胀，请核查来源驱动清单是否生效
+      ✅ raw_data 已推送（第 1 次）commit 0320100b
+      ```
+      ⇒ **机理 = 「远端取正文失败 ⇒ 回落本地副本」**：本步设计是「取远端最新 index.html 正文 + 就地重写 ?v」，
+      但远端 **RAW 通道取正文失败**（FileNotFoundError）后代码**回落读自托管 cn runner 工作区的本地 index.html**
+      —— 该工作区里那份是**数天前的旧版（366,154 B）** ⇒ 打上新鲜 ?v 令牌（`1790078991`）后随 635 文件一并提交，
+      **表面完全正常（无冲突、无告警、无 422、?v 还是新的）**，实际把正文换成旧版。
+      其后 `v8-cache-bot` 20:10:40 又在新 ?v 上做了一次「缓存戳对齐」，把截断版**再推一次**（放大影响面）。
+      🔴 **修复方向（建议小九，最小改动优先）**：
+      ① **取远端失败必须硬失败**：`_stamp_remote_index_v` 拿不到远端正文时**禁止回落本地**，
+         直接 `raise` + `::error::`（宁可本步软失败，也不许把 index.html 写坏）；
+      ② 兜底断言：提交前对 index.html 做**核心标记自检**（读 `docs/ops/index_protected_markers.txt`），
+         命中数低于基线即**拒绝入提交**并把命中数打进日志；
+      ③ 清理自托管 runner 工作区里的陈旧 `index.html`（或把它加入 `_SKIP_LOCAL_PUSH` 的**强制删除**清单）。
+      ✅ 另：同 run step15 日志逐字出现 **`NameError: name 't' is not defined`** ⇒ 印证在册 P0
+      `algo-step15-undefined-t` 的根因（该档跑的是修复前代码 head `fe9250e271`；我的修复 `c16e376ea6` 于 19:58 推送，
+      真验证样本 = 含该提交的后续档，如 `#2046` head `b93852366e`）。
+
+    updated: "2026-09-22 20:29"
 
   - id: alimi-same-family-check
     priority: P0
