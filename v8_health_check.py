@@ -112,7 +112,18 @@ CARD_DEFS = [
     #   现合并为单条，按数据本体（日频时间轴 daily + 盘中实时字段 market_net）取
     #   「实时数据 / 盘中每30分 + 收盘后定稿」，heal_cat=intraday（自愈应派发盘中抓取）。
     {"id": "MARKET_FUND_FLOW_DATA", "name": "市场资金流向", "page": "实时数据", "freq": "盘中每30分（收盘后追加当日定稿）", "max_age": 60, "key_fields": ["daily"], "heal_cat": "intraday"},
-    {"id": "MARKET_ALERTS", "name": "市场预警", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["indices"]},
+    # 🛡 2026-09-22 一劳永逸（小九）：补 heal_cat / producer / raw_file 三字段。
+    #   背景（run 35683849934 云端日志实证）：本卡 09-22 全天停更，根因是云端
+    #   f_market_alerts() 的 subprocess timeout=90s 被孤儿模块内 akshare 全市场抓取
+    #   （本机 79.8s / 云端跨境 >90s）打爆 ⇒ raw 不写 ⇒ data 不重建 ⇒ 卡冻结。
+    #   自愈侧此前**无显式 heal_cat**，靠 page→cat 隐式推导（日志实测能推出 intraday，
+    #   但属「隐式约定」，与 MARKET_FUND_FLOW_DATA 等同页卡的显式登记不一致）。
+    #   现按「一处 id 三处同口径」铁律显式登记，并补 producer 供卡名→脚本反查
+    #   （主人令 2026-09-18「别后续找不到更新任务对应不上」）。
+    #   ⚠️ 孤儿模块同时被 run_algorithms.py（盘后算法链）调用，故 raw_file 交叉校验有效。
+    {"id": "MARKET_ALERTS", "name": "市场预警", "page": "实时数据", "freq": "盘中实时（每30分）", "max_age": 60, "key_fields": ["indices"],
+     "heal_cat": "intraday", "raw_file": "market_alerts.json",
+     "producer": "algorithms/fetch_orphan_market_alerts.py"},
     # 盘后数据
     # ── 自愈类别说明（2026-08-11 第158轮全表核对）──────────────────────────────
     # cloud_fetch_v8.py 的 CATEGORY_MAP 中 post_close 只注册了 MARKET_FUND_FLOW_DATA / EXPERIMENT 两项。

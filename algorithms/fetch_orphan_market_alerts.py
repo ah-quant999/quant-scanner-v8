@@ -306,12 +306,94 @@ def fetch_sector_board():
     return [], []
 
 
+# ── 东财轻量接口（2026-09-22 一劳永逸，替代 akshare 全市场逐页抓取）──────────────
+# 🔴 真因（run 35683849934 云端日志实证）：
+#   本函数原先用 ak.stock_zh_a_spot_em() —— 全A 5918 只 / 59 页分页。
+#   本机（中国 IP）实测 79.8s；云端 ubuntu runner 跨境 ×2~3 ⇒ 必然 >90s。
+#   而 cloud_fetch_v8.py::f_market_alerts 的子进程 timeout=90s ⇒ RuntimeError ×3
+#   ⇒ save() 从不执行 ⇒ raw_data/market_alerts.json 不写
+#   ⇒ 推送步 `git status` 无此文件 ⇒ data/MARKET_ALERTS.js 不重建
+#   ⇒ 前端「市场预警」卡停更；且 MARKET_ALERTS 不在 _CRIT_INTRADAY ⇒ 整轮仍 success（假绿）。
+#   日志原文：`❌ MARKET_ALERTS 失败(attempt 1/3): ... timed out after 90 seconds`（三轮全灭）
+#
+# 修法：改用东财 push2 接口，实测 0.1~0.2s（快 ~800 倍），且云端同样可达：
+#   · 涨/跌/平家数 → ulist.np/get 的 f104/f105/f106（沪+深两市相加）
+#   · 涨停家数     → push2ex getTopicZTPool 的 data.tc（东财真实涨停池）
+# akshare 路径**保留为兜底**（东财失败时才走），保证极端情况下仍有数。
+_EM_HDRS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            'Referer': 'https://quote.eastmoney.com/'}
+_UT_ZT = '7eea3edcaed734bea9cbfc24409ed989'   # 东财涨停池公开 ut
+
+
+def _em_updown_counts():
+    """东财：全市场涨/跌/平家数（沪+深两市相加）。实测 0.1s。"""
+    r = requests.get(
+        'https://push2.eastmoney.com/api/qt/ulist.np/get',
+        params={'fltt': 2, 'invt': 2, 'fields': 'f2,f3,f12,f14,f104,f105,f106',
+                'secids': '1.000001,0.399001'},
+        headers=_EM_HDRS, timeout=10)
+    diff = (r.json().get('data') or {}).get('diff') or []
+    up = down = flat = 0
+    for it in diff:
+        up += int(it.get('f104') or 0)
+        down += int(it.get('f105') or 0)
+        flat += int(it.get('f106') or 0)
+    if up + down + flat <= 0:
+        return None
+    return {'up': up, 'down': down, 'flat': flat}
+
+
+def _em_limit_counts():
+    """东财：涨停/跌停家数。实测 0.2s。取不到返回 (None, None)。"""
+    d = datetime.datetime.now().strftime('%Y%m%d')
+    lu = ld = None
+    try:
+        r = requests.get('https://push2ex.eastmoney.com/getTopicZTPool',
+                         params={'ut': _UT_ZT, 'dpt': 'wz.ztzt', 'Pageindex': '0',
+                                 'pagesize': '1', 'sort': 'fbt:asc', 'date': d},
+                         headers=_EM_HDRS, timeout=10)
+        lu = (r.json().get('data') or {}).get('tc')
+    except Exception as e:
+        log(f"  ⚠️ 东财涨停池获取失败: {e}")
+    try:
+        r = requests.get('https://push2ex.eastmoney.com/getTopicDTPool',
+                         params={'ut': _UT_ZT, 'dpt': 'wz.dtzt', 'Pageindex': '0',
+                                 'pagesize': '1', 'sort': 'fund:asc', 'date': d},
+                         headers=_EM_HDRS, timeout=10)
+        ld = (r.json().get('data') or {}).get('tc')
+    except Exception as e:
+        log(f"  ⚠️ 东财跌停池获取失败: {e}")
+    return (lu, ld)
+
+
 def fetch_a_spot():
-    """获取A股全市场涨跌统计"""
+    """获取A股全市场涨跌统计（东财轻量接口优先，akshare 兜底）。
+
+    2026-09-22 一劳永逸：原实现单用 ak.stock_zh_a_spot_em()（79.8s 本机 / 云端 >90s 超时），
+    改为东财 push2 接口（0.3s 内完成），根治云端 90s 超时导致的整链静默停更。
+    """
+    # ── 快路径：东财轻量接口（实测 0.3s 内）──────────────────────────────
+    try:
+        counts = _em_updown_counts()
+        if counts:
+            lu, ld = _em_limit_counts()
+            mood = {
+                'up': counts['up'], 'down': counts['down'], 'flat': counts['flat'],
+                'limit_up': int(lu) if lu is not None else 0,
+                'limit_down': int(ld) if ld is not None else 0,
+            }
+            log(f"✓ 涨跌家数(东财): 涨{mood['up']} 跌{mood['down']} 平{mood['flat']} "
+                f"涨停{mood['limit_up']} 跌停{mood['limit_down']}")
+            return mood
+        log("  ⚠️ 东财涨跌家数返回全 0，降级 akshare 兜底")
+    except Exception as e:
+        log(f"  ⚠️ 东财涨跌家数失败({type(e).__name__}: {e})，降级 akshare 兜底")
+
+    # ── 兜底：原 akshare 路径（跨境慢，仅在东财失败时走）──────────────────
     for attempt in range(1, MAX_RETRY + 1):
         try:
             df = ak.stock_zh_a_spot_em()
-            log(f"✓ 获取到 {len(df)} 只A股行情")
+            log(f"✓ 获取到 {len(df)} 只A股行情(akshare 兜底)")
             pct_col = None
             for col in df.columns:
                 if '涨跌幅' in str(col):

@@ -3154,12 +3154,27 @@ def f_market_alerts():
         print(f"  ⚠️ 未找到 {script}")
         return None
     print(f"  🔄 调用市场预警孤儿模块: {script.name}")
+    # 🔴 2026-09-22 一劳永逸（小九）：timeout 90 → 240。
+    #   真因（run 35683849934 云端日志实证）：本函数原 timeout=90s，而孤儿模块内部
+    #   ak.stock_zh_a_spot_em()（全A 5918 只 / 59 页）本机实测 79.8s、云端跨境 ×2~3
+    #   ⇒ 三轮全灭 `timed out after 90 seconds` ⇒ save() 从不执行 ⇒ raw 不写
+    #   ⇒ 推送步 git status 无此文件 ⇒ data/MARKET_ALERTS.js 不重建 ⇒ 卡静默停更。
+    #   孤儿模块已改走东财轻量接口（实测 0.3s，整脚本 ~14s），本处宽松余量只是
+    #   为「东财抖动 → 降级 akshare 慢路径」留兜底，不再卡在临界值上。
+    _MA_TIMEOUT = 240
     try:
         r = _sp.run([sys.executable, str(script)], cwd=str(ROOT),
-                    capture_output=True, text=True, timeout=90)
+                    capture_output=True, text=True, timeout=_MA_TIMEOUT)
     except Exception as e:
-        raise RuntimeError(f"fetch_orphan_market_alerts 调用异常(90s超时): {e}")
+        # 🛡 可见性护栏：MARKET_ALERTS 不在 _CRIT_INTRADAY（单卡失败不阻断整轮，
+        #   属 09-09 既定设计），但不阻断 ≠ 不可见 —— 显式打 ::error:: 让 Actions
+        #   UI 标红，避免「卡停更、job 全绿、无人知晓」的假绿复发。
+        print(f"::error title=v8-market-alerts-fail::市场预警孤儿模块调用异常"
+              f"(timeout={_MA_TIMEOUT}s): {type(e).__name__}: {e}")
+        raise RuntimeError(f"fetch_orphan_market_alerts 调用异常({_MA_TIMEOUT}s超时): {e}")
     if r.returncode != 0:
+        print(f"::error title=v8-market-alerts-fail::市场预警孤儿模块 exit {r.returncode}"
+              f"：{(r.stderr or '')[:200]}")
         raise RuntimeError(f"fetch_orphan_market_alerts exit {r.returncode}: {r.stderr[:160]}")
     p = RAW_DIR / "market_alerts.json"
     if p.exists():
