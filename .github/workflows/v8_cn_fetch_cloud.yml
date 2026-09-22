@@ -1049,8 +1049,11 @@ jobs:
           now = datetime.datetime.now(CST)
           hm  = now.hour * 60 + now.minute
 
-          # 盘中窗口：上午 09:38-11:32 / 下午 12:58-15:05（收盘跑完最后一档即自然终止）
-          in_win = (9 * 60 + 38 <= hm <= 11 * 60 + 32) or (12 * 60 + 58 <= hm <= 15 * 60 + 5)
+          # 盘中窗口：上午 09:38-11:32 / 下午 12:58-15:10
+          #   2026-09-22 主人令「覆盖 13-15点10分」：下午上界 15:05 → 15:10。
+          #   原 15:05 截止会让 15:05-15:10 出现空档，而「v8发布闸门·盘后flush」正是
+          #   15:05 触发 ⇒ 恰在最需要一份新鲜数据兜底的时刻链已停。
+          in_win = (9 * 60 + 38 <= hm <= 11 * 60 + 32) or (12 * 60 + 58 <= hm <= 15 * 60 + 10)
           print(f"[relay] CST={now:%H:%M:%S} hm={hm} in_window={in_win}")
           if not in_win:
               print("[relay] 非盘中窗口（午休 / 已收盘）→ 链条在此自然终止，交由盘前/盘后档与看门狗")
@@ -1067,7 +1070,16 @@ jobs:
               with urllib.request.urlopen(req, timeout=30) as r:
                   return r.read()
 
-          # 节奏闸门：距本轮开跑不足 15 分钟则等到 15 分钟，避免与外部派发叠加
+          # 节奏闸门：距本轮开跑不足 10 分钟则等到 10 分钟，避免与外部派发叠加
+          #   2026-09-22 主人令「覆盖 13-15点10分」：档位 15 → 10 分钟。
+          #   实测依据（09-22 线上「v8 cn fetch」提交时间戳 13:00-15:11）：
+          #     13:10 / 13:25 / 13:34 / 13:58 / 14:08 / 14:19 / 14:43 / 14:54 / 15:09
+          #     ⇒ 多数 10~11 分钟，但出现 **两处 24 分钟空洞**
+          #       (13:36→13:58、14:21→14:43)。成因：run 被 cancelled 时
+          #       always() 的接力步来不及执行 ⇒ 链断，只能等外部 20/30 分钟兜底。
+          #   ⇒ 本档位下调 + 下方「在途查询」双管：既贴近 10 分钟，又不再叠队。
+          #   ⚠️ 下限纪律：**不得低于 10 分钟**。09-21 实测派发密到 7~8 分钟时
+          #     撞新浪/东财反爬 ⇒ 单轮 exit 1（详见本文件下方 STOCK_QUOTE 段记录）。
           gap = 999.0
           if rstart:
               try:
@@ -1076,17 +1088,40 @@ jobs:
               except Exception as e:
                   print(f"[relay] 解析 run_started_at 失败: {e}")
           print(f"[relay] 本轮已跑 {gap:.1f} 分钟（口径：距本轮开跑）")
-          if gap < 15:
-              wait = 15 - gap
-              print(f"[relay] 间隔不足 15 分钟 → 等待 {wait:.0f} 分钟后派发（保持 20 分钟档节奏，上限 8 分钟）")
-              time.sleep(min(wait * 60, 480))
+          if gap < 10:
+              wait = 10 - gap
+              print(f"[relay] 间隔不足 10 分钟 → 等待 {wait:.0f} 分钟后派发")
+              time.sleep(min(wait * 60, 600))
+
+          # 🔴 在途查询（2026-09-22 追加）：已有后继在排队/在跑 ⇒ 本轮不再派发。
+          #   理由：本仓并发组为 `queue: max`（可排队 100），派发源有三处
+          #     （原生 cron 每 20 分 / 外部兜底每 30 分 / 本接力）。
+          #     三处叠加时 run 会一路排队，把「排队时长」伪装成「run 很慢」，
+          #     并放大反爬命中。查询失败一律**保守照常派发**（宁可多派，不可断链）。
+          successor = False
+          try:
+              q = json.loads(api("GET",
+                  f"https://api.github.com/repos/{repo}/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=20"))
+              for r in q.get("workflow_runs", []):
+                  if str(r.get("id")) == me:
+                      continue
+                  if r.get("status") in ("queued", "in_progress", "pending", "waiting", "requested"):
+                      successor = True
+                      print(f"[relay] 已有在途 run #{r.get('run_number')} "
+                            f"(status={r.get('status')}) ⇒ 本轮不派发（链未断）")
+                      break
+          except Exception as e:
+              print(f"[relay] 在途查询失败({e}) ⇒ 保守照常派发")
 
           # ① 派发下一轮 intraday（自接力主环）
           try:
-              api("POST",
-                  f"https://api.github.com/repos/{repo}/actions/workflows/v8_cn_fetch_cloud.yml/dispatches",
-                  {"ref": "main", "inputs": {"category": "intraday"}})
-              print("[relay] ✅ 已派发下一轮 intraday（自接力）")
+              if successor:
+                  print("[relay] ⏭ 跳过本轮 intraday 派发")
+              else:
+                  api("POST",
+                      f"https://api.github.com/repos/{repo}/actions/workflows/v8_cn_fetch_cloud.yml/dispatches",
+                      {"ref": "main", "inputs": {"category": "intraday"}})
+                  print("[relay] ✅ 已派发下一轮 intraday（自接力）")
           except Exception as e:
               print(f"[relay] ❌ 派发失败: {e} —— 链条断于此，由 v8_cn_fetch_watchdog(>45min) 恢复")
               sys.exit(0)
