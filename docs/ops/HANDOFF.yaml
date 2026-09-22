@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 57
+  next_id_seq: 58
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -2756,13 +2756,19 @@ items:
   - id: index-tail-truncation-2220
     priority: P0
     owner: 阿狸咪的工程师
-    status: done
+    status: pending-verify
+    updated: 2026-09-22 23:38
+    updated_by: 阿狸咪的工程师
     what: >
       🔴 **事故**：`index.html` 于 **2026-09-22 22:20:41** 被 commit `7c78439fe8`（`v8 cn fetch: 22:20`）
       **删除尾部 183 行** —— A2 懒加载块全部内容（STOCK_LIST / STOCK_QUOTE / LHB_HISTORY 三张大表的
       按需注入与重放逻辑）＋ 文件结尾的 `</script></body></html>`，只在文件末留下一个**未闭合的 `<script>`**。
       1,347,523 → **1,338,018 B**（恰为应有内容的**前 99.3%** ⇒ 机制 = 非原子写「部分前缀写」中途被杀）。
       影响：三张懒加载大表**永不加载**；HTML 尾部不完整；且**下一轮 build 会读它继续写** ⇒ 会被固化。
+      ⚠️ **2026-09-22 23:03:34 二次复发（且更重）**：同一路径又把 index.html 写成 1,310,161 B / 18,582 行
+      （末尾仍未闭合、A2 块仍缺，比 22:20 那次还少 567 行）。23:5x 已第二次精确重建并推送
+      （commit **`b9df19eb7366`**，1,347,523 B / 19,149 行 / 28 个内联 script 0 语法错）。
+      ⇒ 真根因见新项 **`trunc-read-treated-as-success`**：不是「写坏了」，是**读坏了**。
     fix: >
       精确重建（非「回退父版本」）：= 截断前父版本 `e77a7f8b7e` ⊕ 截断后**全部合法改动**
       （2 处等长 `?v=` 令牌同步：FINAL_RECOMMEND_DATA.js 1790086153→1790086831、ALGO_TRACK.js →1790086845）
@@ -2789,7 +2795,9 @@ items:
   - id: cn-fetch-writer-version-drift
     priority: P0
     owner: 阿狸咪的工程师
-    status: todo
+    status: pending-verify
+    updated: 2026-09-22 23:38
+    updated_by: 阿狸咪的工程师
     what: >
       **未闭环的根因**：`index-tail-truncation-2220` 只修好了文件，**没有修掉那条会再次截断的路径**。
       判据级证据（谁写的）：全仓唯一写 `index.html` 的脚本是 `update_v8.py` 的
@@ -2799,6 +2807,13 @@ items:
       —— 与小九在 `top10-close-quote-gate` 上实证的「链用了早于 20:51 版脚本的旧树副本」**同族**
       （同一天、同一归因域：自托管 runner 工作区 / 冷启动源码同步未刷新）。
       ⚠️ 附带发现守卫自身的**残余盲区**：只要截断后仍补了 `</html>` 且缩水 <5%，即可穿门（负向对照用例 C）。
+      ⚠️ **2026-09-22 23:3x 订正（阿狸咪的工程师，证据级）**：上面的「旧副本」归因**不是**截断的成因。
+      真成因 = 同一 job 内的 `api_push_raw._api_get_raw` 把「断流后的部分字节」当**成功**返回，
+      而 `_blob_text` 正用它**取 index.html 全文**去重戳 ?v 再上传 ⇒ 网络一断就上传截断前缀。
+      同族但**不是同一件事**：「旧副本/旧树」问题（本项原始描述）确实存在且另有实锤——
+      23:03:34 同笔提交把 19 个 `data/*.js` 推回，其中 **11 个内嵌时间戳倒退**
+      （STOCK_MOMENTUM_STATE 22:55→22:23、MOMENTUM_FILTER 22:55→22:24、TRIPLE_TRACK 22:03→21:41、
+      HEALTH_CHECK 丢戳），已用「防倒退闸扩至 `data/*.js`」封堵（diff 见新项与交接件）。
     fix: >
       未实施（**不是我的车道**：`v8_cn_fetch_cloud.yml` 的 step「🛡️ 原子提交 index.html ?v」
       跑在自托管 runner 上，需小九侧处置）。建议两项：
@@ -2822,4 +2837,34 @@ items:
       ③ 该 job 日志能证明执行的是 main 上的 `update_v8.py`（blob 比对）。
     updated: "2026-09-22 22:50"
 
-
+  - id: trunc-read-treated-as-success
+    priority: P0
+    owner: 阿狸咪的工程师
+    status: pending-verify
+    updated: 2026-09-22 23:38
+    updated_by: 阿狸咪的工程师
+    what: |
+      `api_push_raw._api_get_raw` 在**只读表头**场景下刻意把「断流后已攒够
+      `_HEAD_MIN`(64KB) 的部分字节」当作**成功**返回（`err=""`）——这对读 `update_time` 是正确的（时间戳在文件头部）。
+      但 `_blob_text(commit_ref,"index.html",max_bytes=8MB)` **复用同一通道去取全文**，
+      供 `_stamp_remote_index_v` 就地重戳 ?v 后原样上传 ⇒ 网络一断即把**截断前缀**当正文，
+      main 上的 index.html 被写成截断件（22:20:41 → 1,338,018 B；23:03:34 → 1,310,161 B）。
+      与「用旧树」无关：两次的运行代码都是最新的，坏在**读的完整性未校验**。
+    fix: |
+      `_blob_text` 新增 `require_full`：正文须「字节数 == 远端 size」且「.html 尾部闭合」，
+      否则重试 4 次后**拒绝使用**（返回 None ⇒ 调用方跳过 ⇒ ?v 交 reconcile 自愈），
+      默认 False ⇒ 另一处「只读 256KB 表头」的调用方行为不变。
+      `_stamp_remote_index_v` 改走 require_full=True，并加双断言：取回正文末尾未闭合即拒绝改写、
+      改写后必须仍闭合且字节数不得缩水。commit af4b42b75435（78,413 B，回读逐字节一致）。
+    evidence: |
+      夹具 A/B 已证（`fixture_trunc.py`，截断读 err="" 场景）：
+        旧版 → **上传 54,093 B 未闭合件**（事故复现）；
+        新版 → **0 上传**，重试 4 次后拒绝（raw 读 4 次）；
+        完整读 → 新版照常改写上传 87,236 B 闭合件（**无过度拦截**）。
+      真数据判官（`mkpatch_push2.py`）：`_content_ts` 对 data/TRIPLE_TRACK.js 回退版得 21:41、
+      修复版得 22:03 ⇒ 闸判「倒退」拒绝；对无时间戳件得 None ⇒ 放行（无误拦）。
+    verify_how: |
+      待下一档算法链复验三件事：
+        ① 线上 index.html 仍以 `</html>` 结尾且字节数 ≥ 1,347,523（连续 3 次 cn fetch 后复查）；
+        ② cn fetch 日志出现 `📄 正文不完整` / `🚨 拒绝使用` 时，说明守卫真的在拦（属预期，不是故障）；
+        ③ 若仍出现截断，读 `_blob_text` 的 exp 与实际字节数，确认是否 size 元数据本身取失败。
