@@ -2798,11 +2798,46 @@ def f_w52_high():
     # 注：CN 网络无法访问真正的「52周新高」专用池(getTopicNewHighPool 返回非 JSON)，
     #     故以「历史新高」板块成分数作为市场新高广度信号（语义等价、真实可用）。
     # 东财板块接口单页硬上限 100 行，故总数取 data.total（真实值），TOP 展示取返回行。
+    #
+    # 🔴 2026-09-22 主人令「一劳永逸」根因修复（小九）：
+    #   本函数曾是 cloud_fetch_v8 里**唯一裸调** `_requests.get(...).json()` 的模块——
+    #     既无退避重试，又不吞异常。云端境外 runner 遇东财 WAF 瞬时重置（响应体非 JSON）
+    #     即抛 JSONDecodeError ⇒ run() 记 status=fail；而 premarket/post_close 语义是
+    #     「任一模块失败即致命」⇒ 打印「❌ 1 个模块抓取失败，整体任务标记失败，阻止空壳推送」
+    #     ⇒ 抓取步 exit 1 ⇒ 其后 push raw_data / update_v8 / push data/*.js **全部 skipped**。
+    #   实测（GitHub API + run 日志取证）：2026-09-21 15:54 ~ 09-22 05:07 连续 13 轮、13 小时，
+    #     **每轮唯独 W52_HIGH 失败**；而同一 host(push2delay) 且走 em_clist→_em_get_with_retry
+    #     的 SECTOR_FUND_FLOW / CONCEPT_RANKING / INDEX_QUOTES / CAPITAL_FLOW_DATA 全部成功
+    #     （raw_data/ 文件数 169）；raw_data/w52_high.json 自身在 09-18~09-21 持续正常产出
+    #     （最近一次 09-21 17:12，total=161）⇒ 接口可用，纯属**裸调缺重试**的单点拖死整链。
+    #   修法：与其余 push2delay 模块统一口径——带退避重试（0.5/1.5s），重试后仍失败则
+    #     **return None**（run() 记 empty，不阻断整链），并打印真因便于追因。语义与
+    #     f_index_quotes / f_sector_fund_flow 等一致：单源抖动绝不打挂整轮抓取。
     params = {"pn": "1", "pz": "500", "po": "1", "np": "1", "fltt": "2", "invt": "2",
               "ut": "b2884a393a59ad64002292a3e90d46a5", "fid": "f3",
               "fs": "b:BK0501", "fields": "f12,f14,f2,f3", "_": 1}
-    r = _requests.get(f"{_EM_DELAY}/api/qt/clist/get", params=params,
-                      headers=_EM_HEADERS, timeout=15).json()
+    r = None
+    _last_err = None
+    for _att in range(3):
+        try:
+            _resp = _requests.get(f"{_EM_DELAY}/api/qt/clist/get", params=params,
+                                  headers=_EM_HEADERS, timeout=15)
+            _txt = _resp.text or ""
+            if not _txt.lstrip().startswith(("{", "[")):
+                raise ValueError(f"非 JSON 响应（{len(_txt)}B，前 80 字：{_txt[:80]!r}）")
+            r = json.loads(_txt)
+            break
+        except Exception as _e:  # noqa: BLE001
+            _last_err = _e
+            r = None
+            if _att < 2:
+                _dly = (0.5, 1.5)[_att]
+                print(f"  ⚠️ W52_HIGH 抖动 尝试{_att + 1}/3: {type(_e).__name__}: {_e} → {_dly}s 后重试")
+                time.sleep(_dly)
+    if r is None:
+        print(f"  ⚠️ W52_HIGH 重试 3 次仍失败，本轮跳过（empty，不阻断整链）: "
+              f"{type(_last_err).__name__}: {_last_err}")
+        return None
     data = r.get("data") or {}
     rows = _em_clean_rows(data.get("diff") or [])
     if not rows:
@@ -2946,9 +2981,25 @@ def f_etf_pulse():
 
 def f_analyst_ratings():
     """分析师评级：akshare stock_analyst_rank_em（东财分析师排名 + 最新推荐个股）。
-    输出结构兼容 update_v8.py 的 ANALYST_RATINGS 转换：
-    {hot_stocks, latest_reports, upgrades, downgrades, new_coverage}"""
-    ak = get_ak()
+
+    输出结构（供 update_v8.py 的 INST_COVERAGE 转换消费，前端「暂未上架 › 解禁&机构关注」卡）：
+      {hot_stocks, latest_reports, upgrades, downgrades, new_coverage}
+
+    🔴 2026-09-22 主人令「一劳永逸」（小九）：本函数随 ANALYST_RATINGS 恢复注册而重新入链，
+      必须与其余模块同口径 —— **绝不抛异常**（否则重演 f_w52_high 的单点拖死整链），
+      且在**全部子项为空**时返回 None（run() 记 empty），而**不是** save 一个空壳
+      （空壳会覆盖掉 good 数据，把前端卡片由有数据洗成空白）。
+    """
+    # akshare 导入失败（未安装/环境异常）时必须优雅降级为 None，绝不让 ImportError
+    # 冒泡成 status=fail 拖死整条抓取链。
+    try:
+        ak = get_ak()
+    except Exception as e:  # noqa: BLE001
+        print(f"    ⚠️ 分析师评级: akshare 初始化失败，本轮跳过（empty，不阻断整链）: {e}")
+        return None
+    if ak is None:
+        print("    ⚠️ 分析师评级: akshare 不可用，本轮跳过（empty，不阻断整链）")
+        return None
     result = {"hot_stocks": [], "latest_reports": [], "upgrades": [], "downgrades": [], "new_coverage": []}
     year = now_cst().year
 
@@ -3014,6 +3065,13 @@ def f_analyst_ratings():
         print(f"    研报明细: 补充 {len(result['new_coverage'])} 条")
     except Exception as e:
         print(f"    ⚠️ 研报明细跳过: {e}")
+
+    # 🔴 2026-09-22 主人令「一劳永逸」（小九）：全部子项为空 → 返回 None（run() 记 empty），
+    #   绝不用空壳覆盖既有 raw_data/analyst_ratings.json —— 否则网络抖动期间会把前端
+    #   「解禁&机构关注」卡由有数据洗成空白（同 FOUR_VOLUME 被洗成 total:0 的事故家族）。
+    if not result.get("hot_stocks") and not result.get("latest_reports"):
+        print("    ⚠️ 分析师评级: 全部子项为空，本轮跳过（不覆盖既有数据）")
+        return None
 
     return result
 
@@ -4378,9 +4436,17 @@ def main(category=None, only=None):
         ("W52_HIGH", f_w52_high),
         ("ETF_PULSE", f_etf_pulse),
         ("ETF_DAILY_MONITOR", f_etf_daily_monitor),
-        # 🛡 2026-09-18 孤儿链清理：ANALYST_RATINGS 前端零引用、注入侧映射已移除
-    #    ⇒ 抓了无注入无消费，纯浪费抓取预算。此处注销（保留 f_analyst_ratings 定义备查）。
-    # ("ANALYST_RATINGS", f_analyst_ratings),
+        # 🔴 2026-09-22 主人令「一劳永逸」根因修复（小九）：**恢复** ANALYST_RATINGS 抓取链。
+        #   背景：2026-09-18 曾以「前端零引用、注入侧映射已移除 ⇒ 纯浪费抓取预算」注销本链，
+        #     当时判断成立；但 09-22 05:31 新上的「暂未上架 › 解禁&机构关注」因子观测卡
+        #     （index.html 读 window.INST_COVERAGE）**消费的正是本链产物** ——
+        #     data/INST_COVERAGE.js 的 coverage 条目与 f_analyst_ratings() 的 hot_stocks
+        #     逐字段同构（report_count_1m / date / org / analyst / annual_index / ret_12m），
+        #     但该卡只提交了产物、**从未接线生产者** ⇒ 数据冻结在
+        #     raw_data/analyst_ratings.json 最后更新时刻（2026-09-17 16:43:40）
+        #     ⇒ 健康巡检恒判 fail 红叉（典型「半截接线」故障）。
+        #   ⇒ 恢复抓取；注入侧同步改指 INST_COVERAGE（见 update_v8.py 的映射与转换分支）。
+        ("ANALYST_RATINGS", f_analyst_ratings),
         ("EXPERIMENT", f_experiment),
         ("V8_CAL", f_v8_cal),
         ("CANDIDATE_QUOTES", f_candidate_quotes),
