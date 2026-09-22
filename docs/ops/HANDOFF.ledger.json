@@ -56,7 +56,7 @@
     "pages-publish-bypasses-gate",
     "theme-value-concept-layer-zero"
   ],
-  "updated": "2026-09-22 21:21",
+  "updated": "2026-09-22 21:21 （2026-09-22 21:23 阿狸咪：更新 top10-close-quote-gate 的哈希（+本轮 stop_snapshot 单一真源））",
   "generated_by": "小九(lemoncat-cn) + 阿狸咪(alimi-cn) （2026-09-22 13:55 阿狸咪刷新：+2 新项 / 2 项回填） （2026-09-22 16:2x 阿狸咪刷新：+1 新项 / 1 项转 done / 3 项回填） （2026-09-22 17:0x 小九现场终验收口：4 项转 done（category-map-two-table-drift / candidate-quotes-category-drift / factorlab-commit-pathspec / backtest-tdx-no-refresh）+ 10 项实测注记；0 新增 id / next_id_seq 仍 47） （2026-09-22 19:58 阿狸咪补登记：+2 新 id（algo-step15-undefined-t / fourvolume-backtest-3y-downgrade） / next_id_seq 48→50 / max_next_id_seq 48→50；两项均为「现场已实测但从未进状态源」的红线） （2026-09-22 20:14 阿狸咪回填 cachebot-build-race 的 09-22 20:1x 实测实例） （2026-09-22 20:26 阿狸咪回填 stale-index-landmine 的 09-22 20:10 实锤实例+恢复） （2026-09-22 20:29 阿狸咪追加 stale-index-landmine 真凶取证） （2026-09-22 21:21 阿狸咪：+1 id（theme-value-concept-layer-zero，主题空间卡概念层被上游半成品归零）；unlockcover-factor-observation-card blocked→doing 并补 reply 字段（答复小九三问）；next_id_seq 52→53 / max_next_id_seq 52→53）",
   "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
   "id_content_hashes": {
@@ -111,7 +111,7 @@
     "ima-snapshot-72h-expiry-trap": "5c3e6287bf4e8133",
     "algo-step15-undefined-t": "b4336790ded669c8",
     "fourvolume-backtest-3y-downgrade": "f7a98cea517380df",
-    "top10-close-quote-gate": "bfe5a1f7111680f9",
+    "top10-close-quote-gate": "2438b0e383e47412",
     "pages-publish-bypasses-gate": "a8f4161a5a63af42",
     "theme-value-concept-layer-zero": "ed9f717475ff5378"
   },
