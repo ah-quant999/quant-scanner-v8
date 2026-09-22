@@ -1,8 +1,13 @@
 {
-  "update_time": "2026-09-22 23:46:34",
-  "run_start": "2026-09-22 23:17:57",
-  "ok": 11,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-09-23 00:32:55",
+  "run_start": "2026-09-23 00:22:29",
+  "ok": 13,
+  "fail": 1,
+  "failed_scripts": [
+    {
+      "script": "scripts/fetch_sector_leaders.py",
+      "reason": "退出码 1 | http.client.RemoteDisconnected: Remote end closed connection without response"
+    }
+  ],
   "skipped_by_time_gate": []
 }
