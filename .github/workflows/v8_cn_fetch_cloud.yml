@@ -53,7 +53,17 @@ on:
     #   本 workflow 的 08:25 盘前档每日准时 → 在此追加云端原生盘中种子（每 20 分），
     #   与 lemoncat（如恢复）同 concurrency group 排队不互杀、幂等闸门自动去重。
     #   注：本 job 的 schedule 触发为**每次新派发**（非高频轮询），不构成风暴。
-    - cron: '*/20 1-3,5-6 * * 1-5'  # 09:00-11:40 / 13:00-14:40 CST 盘中种子
+    # 🔴 2026-09-22 一劳永逸修复（主人令「隔夜美股卡没更新」· 小九）：
+    #   【病灶】盘前档 `25 0 * * 1-5`（08:25）被 GitHub **静默丢弃且从不触发**——
+    #     实测该 workflow 近 100 轮 run：schedule 仅 5 次，且全部落在盘中/盘后，
+    #     `25 0` 一次都没中过。⇒ 依赖 premarket 单档的 US_HK_MAP（隔夜美股映射）
+    #     整链漏跑，卡面冻结（09-21 08:20），HEALTH_CHECK 判 fail。
+    #   【修法】把每条种子的 UTC 起点由 `1` 提前到 `0`（CST 08:00 起）——
+    #     **不新增 cron 条目**（守住「≤5 条」的平台隐性约束，见文件顶部 08-06 记录），
+    #     却给盘前档 08:00/08:20/08:40 三个原生种子；配合下方类别判定的
+    #     「08:00–09:00 判 premarket」窗，盘前档从「单点 cron」变为「三种子冗余」。
+    #     幂等闸门会自动去重，不构成额外抓取负担。
+    - cron: '*/20 0-3,5-6 * * 1-5'  # 08:00-09:00 盘前种子 + 09:00-11:40/13:00-14:40 盘中种子
     - cron: '20 9-11 * * 1-5'  # 17:20/18:20/19:20 CST 盘后三档（不变）
     - cron: '0 1 * * 0,6'      # 周六/周日 09:00 CST 周度刷新（不变）
   workflow_dispatch:
@@ -142,10 +152,12 @@ jobs:
             #   「本文件还有盘中 cron」，与「盘前/盘中/盘后 权威划分表」口径冲突，故删除。
             #   判定仍是 github.event.schedule 原串精确匹配，未匹配即走 all 兜底（保底不变）。
             case "$CRON" in
-              "25 0 * * 1-5")           # 08:25 CST 盘前
+              "25 0 * * 1-5")           # 08:25 CST 盘前（保留；历史实测被 GitHub 静默丢弃）
                 CAT="premarket"; LB="盘前" ;;
-              "*/20 1-3,5-6 * * 1-5")   # 09:00-11:40 / 13:00-14:40 CST 盘中种子（云端原生）
+              "*/20 0-3,5-6 * * 1-5")   # 08:00-09:00 盘前种子 + 09:00-11:40/13:00-14:40 盘中种子
                 CAT="intraday";  LB="盘中(云端原生种子)" ;;
+              "*/20 1-3,5-6 * * 1-5")   # 旧串（兼容：历史 run 的 github.event.schedule 可能仍为此值）
+                CAT="intraday";  LB="盘中(云端原生种子·旧串兼容)" ;;
               "20 9-11 * * 1-5")        # 17:20 / 18:20 / 19:20 CST 盘后三档
                 CAT="post_close"; LB="盘后" ;;
               "0 1 * * 0,6")            # 周六 / 周日 09:00 CST 周度全量
@@ -177,6 +189,19 @@ jobs:
                 CAT="all";        LB="僵尸盘前档·按实际时刻重判(深夜 ${_HM}分→all)"
               fi
             fi
+            # 🔴 2026-09-22 一劳永逸修复（主人令「隔夜美股卡没更新」· 小九）：
+            #   【病灶】盘前种子 `*/20 0-3,5-6`（含 08:00/08:20/08:40 三档）在 UTC 00
+            #     时段执行时，上面 case 表判为 intraday。但 08:00–09:00（CST）**是盘前时段**：
+            #     此时段不能跑 intraday —— 盘前 A 股未开盘，intraday 类变量（INDEX_QUOTES/
+            #     ETF_PULSE/SECTOR_FUND_FLOW/…）取到的是上一交易日的收盘残值，
+            #     会把「盘前」的时间戳写进盘中卡 ⇒ 与 2026-09-13 那次「周日 all 洗出
+            #     15:3x 空窗时间戳」同族事故。
+            #   🛠 修法：把实际时刻 ∈ [480, 540)（08:00–09:00）的 intraday 判定**上修为
+            #     premarket**，使盘前种子真正落到盘前档；09:00 起仍按原样判 intraday。
+            #     安全性：premarket 档只含盘前类变量，不含任何 intraday 变量 ⇒ 不会污染盘中卡。
+            if [ "$CAT" = "intraday" ] && [ "$_HM" -ge 480 ] && [ "$_HM" -lt 540 ]; then
+              CAT="premarket"; LB="盘中种子·按实际时刻上修为盘前(${_HM}分)"
+            fi
             echo "category=$CAT" >> "$GITHUB_OUTPUT"
             echo "label=$LB"
           else
@@ -190,7 +215,30 @@ jobs:
             # 用 python 显式 +8h 计算 CST，不依赖 TZ 环境变量是否生效（跨 runner 更稳）
             HM=$(python3 -c "from datetime import datetime,timezone,timedelta;n=datetime.now(timezone.utc)+timedelta(hours=8);print(n.hour*60+n.minute)")
             HSTR=$(python3 -c "from datetime import datetime,timezone,timedelta;n=datetime.now(timezone.utc)+timedelta(hours=8);print('%d:%02d'%(n.hour,n.minute))")
-            if [ "$HM" -ge 505 ] && [ "$HM" -lt 540 ]; then
+            # 🔴 2026-09-22 一劳永逸修复（主人令「隔夜美股卡没更新」· 小九）：
+            #   【病灶】原窗口为 `HM>=505`（08:25）。而盘前档的**唯一**种子 cron
+            #     `25 0 * * 1-5` 被 GitHub 静默丢弃（实测该 workflow 近 100 轮 run 中
+            #     schedule 仅 5 次、且**全部落在盘中/盘后**，`25 0` 一次都没触发过）⇒
+            #     盘前档长期只能靠第三方「推送顺带触发」的裸 dispatch 兜底。
+            #   【实测事故·09-22】08:14:42 有一次裸 dispatch（HM=494）——
+            #     494 < 505 ⇒ 落到最末 else ⇒ **judged as `all`（最重档）**，两个恶果：
+            #       ① 全量档占满并发组（同组仅 1 running + 排队位），后续 run 被顶/积压
+            #          （实测 11:52/11:57/12:03 连续 3 轮 cancelled、12:04/12:06 卡 pending）；
+            #       ② 盘前语义丢失 ⇒ RUNNER_STATUS 记不上盘前档 ⇒ 依赖 premarket 单档的
+            #          US_HK_MAP（隔夜美股映射）整链漏跑，卡面冻结在 09-21 08:20，
+            #          HEALTH_CHECK 判 fail（age 1656min > 通用红线 1620min）。
+            #   🛠 修法：盘前窗**向前扩展到 08:00**（480）。08:00–09:00 之间的任何裸派发
+            #     一律判 premarket（轻档、语义正确、不堵塞并发组）—— 这正是「盘前兜底」
+            #     该有的行为：盘前时段本就该跑盘前档，而不是最重的 all。
+            #     安全性：premarket 档只抓盘前类变量（V8_CAL/IPO/MARGIN/MACRO/CRISIS/
+            #     NORTH_FUND/ANALYST_RATINGS/W52_HIGH/VOLATILITY/RESTRICTED_RELEASE/
+            #     PERFORMANCE_FORECAST/US_HK_MAP + MARKET_FUND_FLOW_DATA），
+            #     不含任何 intraday 变量 ⇒ 不会把盘中卡时间戳落进设计空窗。
+            # 🔴 2026-09-22 追加：盘前窗**下沿再前移到 06:00**（360）。
+            #   理由：06:00–08:00 之间若有裸派发（本机守护/看门狗补位，实测存在），
+            #   原逻辑落 `else` → all（最重档）⇒ 占满并发组、且「盘前语义」丢失。
+            #   该时段本就无盘中数据可抓（A 股未开盘），跑 premarket 是最轻且语义正确的选择。
+            if [ "$HM" -ge 360 ] && [ "$HM" -lt 540 ]; then
               echo "category=premarket" >> "$GITHUB_OUTPUT"
               echo "label=裸派发·按时刻自适应(盘前 $HSTR)"
             elif [ "$HM" -ge 540 ] && [ "$HM" -le 905 ]; then
