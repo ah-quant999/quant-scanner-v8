@@ -1572,8 +1572,16 @@ def run(label, fn, retries=2):
             print(f"  ❌ {label} 失败(attempt {attempt+1}/{retries+1}): {type(e).__name__}: {e}")
             _run_status[label] = {"status": "fail", "msg": f"{type(e).__name__}: {str(e)[:80]}"}
             time.sleep(2)
-    print(f"  🚫 {label} 重试耗尽仍失败（记 status=fail；单源不阻断整轮，≥%d 源才阻断）："
-          f"{type(last_err).__name__}: {last_err}" % _MIN_FATAL_SOURCES)
+    # 🔴 2026-09-22 小九·P0 修复：原先写成
+    #     print(f"...≥%d 源才阻断）：" f"{type(last_err).__name__}: {last_err}" % _MIN_FATAL_SOURCES)
+    #   —— 相邻 f-string 会先拼接再整体做 % 格式化，而最后一段把 last_err 展开进来了；
+    #   上游报错文本里普遍带 URL 百分号编码（如 fltt=2&in=%2C%3A），这些 % 被当成
+    #   格式符 ⇒ TypeError: not enough arguments for format string ⇒ 未捕获 → exit 1。
+    #   血证 cn_fetch #1992：ETF_DAILY_MONITOR 撞东财 502 走本分支，直接崩在打印上，
+    #   反而让「单源失败不阻断」退化成「单源失败即崩溃」，比修复前更糟。
+    #   修法：全部改用 f-string 内插，彻底不碰 % 运算符。
+    print(f"  🚫 {label} 重试耗尽仍失败（记 status=fail；单源不阻断整轮，≥{_MIN_FATAL_SOURCES} 源才阻断）："
+          f"{type(last_err).__name__}: {last_err}")
     time.sleep(0.5)
 
 
