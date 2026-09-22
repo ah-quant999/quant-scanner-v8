@@ -1,5 +1,5 @@
 window.FOUR_VOLUME_60M={
- "update_time": "2026-09-22 21:49:20",
+ "update_time": "2026-09-23 01:44:43",
  "total": 8,
  "period": "60m",
  "description": "四量终极 60分钟共振信号（加分因子，独立于日线版）",
@@ -92,13 +92,13 @@ window.FOUR_VOLUME_60M={
    "period": "60m"
   },
   {
-   "code": "300209",
-   "name": "行云科技",
-   "market": "sz",
-   "board_label": "创业板",
-   "close": 38.56,
-   "pct_chg": 6.4,
-   "turnover_rate": 9.94,
+   "code": "688234",
+   "name": "天岳先进",
+   "market": "sh",
+   "board_label": "科创板",
+   "close": 111.1,
+   "pct_chg": 3.91,
+   "turnover_rate": 2.31,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -108,26 +108,26 @@ window.FOUR_VOLUME_60M={
     "主力动量翻多": true,
     "机构金叉": false,
     "散户金叉": false,
-    "主力金叉": true
+    "主力金叉": false
    },
    "yzc": true,
    "jg": true,
    "xc": true,
    "four": true,
    "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 主力金叉",
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
    "signal_time": "2026-09-22",
    "enter_date": "2026-09-22",
    "period": "60m"
   },
   {
-   "code": "688234",
-   "name": "天岳先进",
-   "market": "sh",
-   "board_label": "科创板",
-   "close": 111.1,
-   "pct_chg": 3.91,
-   "turnover_rate": 2.31,
+   "code": "300613",
+   "name": "富瀚微",
+   "market": "sz",
+   "board_label": "创业板",
+   "close": 85.03,
+   "pct_chg": 3.75,
+   "turnover_rate": 7.71,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {

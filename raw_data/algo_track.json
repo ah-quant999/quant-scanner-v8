@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-22 18:48",
+  "update_time": "2026-09-23 01:47",
   "window_days": 90,
   "horizons": [
     5,
@@ -16,7 +16,7 @@
   "cost_pct_roundtrip": 0.3,
   "total_stats": {
     "four_volume": {
-      "tracking": 170,
+      "tracking": 171,
       "history_samples": 0,
       "win_rate": null,
       "avg_return": null,
@@ -26,17 +26,17 @@
       "today_signals": 14,
       "by_horizon": {
         "5": {
-          "samples": 114,
-          "win_rate": 36.8,
-          "avg_return": -2.34,
+          "samples": 115,
+          "win_rate": 36.5,
+          "avg_return": -2.41,
           "best_return": 22.7,
           "worst_return": -18.68,
-          "median_return": -2.19
+          "median_return": -2.35
         },
         "10": {
-          "samples": 87,
-          "win_rate": 43.7,
-          "avg_return": -0.9,
+          "samples": 88,
+          "win_rate": 43.2,
+          "avg_return": -1.04,
           "best_return": 43.88,
           "worst_return": -28.68,
           "median_return": -2.26
@@ -120,12 +120,12 @@
       ],
       "cost_pct_roundtrip": 0.3,
       "coverage": {
-        "items": 170,
-        "with_series": 168,
+        "items": 171,
+        "with_series": 169,
         "missing_cache": 2,
         "bar_asof": "2026-09-22",
-        "t5_ready": 114,
-        "t5_ready_pct": 67.1
+        "t5_ready": 115,
+        "t5_ready_pct": 67.3
       }
     }
   },
@@ -134,7 +134,7 @@
       "algo": "four_volume",
       "display_name": "四量终极",
       "stats": {
-        "tracking": 170,
+        "tracking": 171,
         "history_samples": 0,
         "win_rate": null,
         "avg_return": null,
@@ -144,17 +144,17 @@
         "today_signals": 14,
         "by_horizon": {
           "5": {
-            "samples": 114,
-            "win_rate": 36.8,
-            "avg_return": -2.34,
+            "samples": 115,
+            "win_rate": 36.5,
+            "avg_return": -2.41,
             "best_return": 22.7,
             "worst_return": -18.68,
-            "median_return": -2.19
+            "median_return": -2.35
           },
           "10": {
-            "samples": 87,
-            "win_rate": 43.7,
-            "avg_return": -0.9,
+            "samples": 88,
+            "win_rate": 43.2,
+            "avg_return": -1.04,
             "best_return": 43.88,
             "worst_return": -28.68,
             "median_return": -2.26
@@ -238,12 +238,12 @@
         ],
         "cost_pct_roundtrip": 0.3,
         "coverage": {
-          "items": 170,
-          "with_series": 168,
+          "items": 171,
+          "with_series": 169,
           "missing_cache": 2,
           "bar_asof": "2026-09-22",
-          "t5_ready": 114,
-          "t5_ready_pct": 67.1
+          "t5_ready": 115,
+          "t5_ready_pct": 67.3
         }
       },
       "tracking": [
@@ -257,7 +257,7 @@
           "last_close": 43.51,
           "last_pct": 6.38,
           "peak_pct": 7.95,
-          "days_in": 85,
+          "days_in": 86,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -276,7 +276,7 @@
           "last_close": 118.92,
           "last_pct": -21.24,
           "peak_pct": 10.0,
-          "days_in": 85,
+          "days_in": 86,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -295,7 +295,7 @@
           "last_close": 54.23,
           "last_pct": -16.72,
           "peak_pct": 3.81,
-          "days_in": 85,
+          "days_in": 86,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -314,7 +314,7 @@
           "last_close": 121.68,
           "last_pct": -0.3,
           "peak_pct": 2.52,
-          "days_in": 85,
+          "days_in": 86,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -333,7 +333,7 @@
           "last_close": 50.55,
           "last_pct": -10.47,
           "peak_pct": 1.31,
-          "days_in": 85,
+          "days_in": 86,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -352,7 +352,7 @@
           "last_close": 143.25,
           "last_pct": 0.01,
           "peak_pct": 10.18,
-          "days_in": 85,
+          "days_in": 86,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -371,7 +371,7 @@
           "last_close": 23.1,
           "last_pct": -7.04,
           "peak_pct": 0.0,
-          "days_in": 83,
+          "days_in": 84,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -390,7 +390,7 @@
           "last_close": 5.23,
           "last_pct": -1.13,
           "peak_pct": 18.53,
-          "days_in": 83,
+          "days_in": 84,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -409,7 +409,7 @@
           "last_close": 33.59,
           "last_pct": -22.17,
           "peak_pct": 0.0,
-          "days_in": 83,
+          "days_in": 84,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -428,9 +428,9 @@
           "last_close": 37.72,
           "last_pct": 14.41,
           "peak_pct": 22.41,
-          "days_in": 83,
+          "days_in": 84,
           "appear_count": 1,
-          "last_seen": "20260922",
+          "last_seen": "20260923",
           "signal_detail": {
             "period": "60m",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
@@ -447,7 +447,7 @@
           "last_close": 255.5,
           "last_pct": 8.35,
           "peak_pct": 8.35,
-          "days_in": 83,
+          "days_in": 84,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -466,7 +466,7 @@
           "last_close": 236.2,
           "last_pct": 7.85,
           "peak_pct": 11.41,
-          "days_in": 82,
+          "days_in": 83,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -485,7 +485,7 @@
           "last_close": 89.3,
           "last_pct": -10.5,
           "peak_pct": 3.64,
-          "days_in": 82,
+          "days_in": 83,
           "appear_count": 1,
           "last_seen": "20260817",
           "signal_detail": {
@@ -504,7 +504,7 @@
           "last_close": 20.05,
           "last_pct": -14.43,
           "peak_pct": 0.81,
-          "days_in": 82,
+          "days_in": 83,
           "appear_count": 1,
           "last_seen": "20260817",
           "signal_detail": {
@@ -523,7 +523,7 @@
           "last_close": 111.76,
           "last_pct": 15.22,
           "peak_pct": 15.22,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260819",
           "signal_detail": {
@@ -542,7 +542,7 @@
           "last_close": 93.18,
           "last_pct": -16.3,
           "peak_pct": 0.0,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -561,7 +561,7 @@
           "last_close": 226.5,
           "last_pct": 22.21,
           "peak_pct": 37.04,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260819",
           "signal_detail": {
@@ -580,7 +580,7 @@
           "last_close": 89.58,
           "last_pct": -5.32,
           "peak_pct": 2.29,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -599,7 +599,7 @@
           "last_close": 128.4,
           "last_pct": -29.89,
           "peak_pct": 0.0,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -618,7 +618,7 @@
           "last_close": 42.68,
           "last_pct": -2.51,
           "peak_pct": 7.47,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -637,7 +637,7 @@
           "last_close": 22.27,
           "last_pct": 34.56,
           "peak_pct": 35.71,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -656,7 +656,7 @@
           "last_close": 73.0,
           "last_pct": 14.78,
           "peak_pct": 14.78,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -675,9 +675,9 @@
           "last_close": 146.1,
           "last_pct": -2.83,
           "peak_pct": 3.35,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
-          "last_seen": "20260922",
+          "last_seen": "20260923",
           "signal_detail": {
             "period": "60m",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
@@ -694,7 +694,7 @@
           "last_close": 328.0,
           "last_pct": -21.35,
           "peak_pct": 1.12,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -713,7 +713,7 @@
           "last_close": 389.59,
           "last_pct": -7.69,
           "peak_pct": 3.57,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -732,7 +732,7 @@
           "last_close": 440.11,
           "last_pct": 8.15,
           "peak_pct": 9.84,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -751,7 +751,7 @@
           "last_close": 116.46,
           "last_pct": -13.09,
           "peak_pct": 4.34,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -770,7 +770,7 @@
           "last_close": 36.88,
           "last_pct": 4.83,
           "peak_pct": 5.03,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -789,7 +789,7 @@
           "last_close": 44.23,
           "last_pct": 22.32,
           "peak_pct": 22.59,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -808,7 +808,7 @@
           "last_close": 33.34,
           "last_pct": -16.08,
           "peak_pct": 4.46,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -827,7 +827,7 @@
           "last_close": 187.66,
           "last_pct": 0.01,
           "peak_pct": 1.78,
-          "days_in": 75,
+          "days_in": 76,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -846,7 +846,7 @@
           "last_close": 44.73,
           "last_pct": -3.14,
           "peak_pct": 0.91,
-          "days_in": 75,
+          "days_in": 76,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -865,7 +865,7 @@
           "last_close": 17.97,
           "last_pct": -21.73,
           "peak_pct": 0.0,
-          "days_in": 75,
+          "days_in": 76,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -884,7 +884,7 @@
           "last_close": 58.82,
           "last_pct": -12.68,
           "peak_pct": 0.0,
-          "days_in": 75,
+          "days_in": 76,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -903,7 +903,7 @@
           "last_close": 29.68,
           "last_pct": -17.92,
           "peak_pct": 0.0,
-          "days_in": 75,
+          "days_in": 76,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -922,7 +922,7 @@
           "last_close": 927.72,
           "last_pct": -1.62,
           "peak_pct": 0.0,
-          "days_in": 67,
+          "days_in": 68,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -941,7 +941,7 @@
           "last_close": 54.46,
           "last_pct": 2.08,
           "peak_pct": 9.41,
-          "days_in": 67,
+          "days_in": 68,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -960,7 +960,7 @@
           "last_close": 21.48,
           "last_pct": 8.32,
           "peak_pct": 15.53,
-          "days_in": 67,
+          "days_in": 68,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -979,7 +979,7 @@
           "last_close": 118.19,
           "last_pct": -13.59,
           "peak_pct": 0.0,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -998,7 +998,7 @@
           "last_close": 143.45,
           "last_pct": -4.84,
           "peak_pct": 2.48,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1017,7 +1017,7 @@
           "last_close": 181.2,
           "last_pct": 2.18,
           "peak_pct": 3.3,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -1036,7 +1036,7 @@
           "last_close": 292.0,
           "last_pct": -9.3,
           "peak_pct": 0.0,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1055,7 +1055,7 @@
           "last_close": 401.0,
           "last_pct": -21.39,
           "peak_pct": 0.0,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1074,7 +1074,7 @@
           "last_close": 52.19,
           "last_pct": 2.98,
           "peak_pct": 7.16,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -1093,7 +1093,7 @@
           "last_close": 123.0,
           "last_pct": -6.16,
           "peak_pct": 0.72,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -1112,7 +1112,7 @@
           "last_close": 43.12,
           "last_pct": -12.62,
           "peak_pct": 1.52,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1131,7 +1131,7 @@
           "last_close": 125.14,
           "last_pct": -0.28,
           "peak_pct": 2.2,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1150,7 +1150,7 @@
           "last_close": 25.0,
           "last_pct": -13.55,
           "peak_pct": 0.0,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260831",
           "signal_detail": {
@@ -1169,9 +1169,9 @@
           "last_close": 25.79,
           "last_pct": -5.46,
           "peak_pct": 3.78,
-          "days_in": 57,
+          "days_in": 58,
           "appear_count": 1,
-          "last_seen": "20260922",
+          "last_seen": "20260923",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
@@ -1188,7 +1188,7 @@
           "last_close": 4.66,
           "last_pct": -8.63,
           "peak_pct": 0.0,
-          "days_in": 52,
+          "days_in": 53,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1207,7 +1207,7 @@
           "last_close": 43.7,
           "last_pct": 3.04,
           "peak_pct": 5.85,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1226,7 +1226,7 @@
           "last_close": 7.3,
           "last_pct": -11.73,
           "peak_pct": 0.73,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1245,7 +1245,7 @@
           "last_close": 23.21,
           "last_pct": -6.34,
           "peak_pct": 0.0,
-          "days_in": 47,
+          "days_in": 48,
           "appear_count": 1,
           "last_seen": "20260903",
           "signal_detail": {
@@ -1264,7 +1264,7 @@
           "last_close": 14.62,
           "last_pct": 4.88,
           "peak_pct": 15.93,
-          "days_in": 47,
+          "days_in": 48,
           "appear_count": 1,
           "last_seen": "20260903",
           "signal_detail": {
@@ -1283,7 +1283,7 @@
           "last_close": 21.86,
           "last_pct": -0.14,
           "peak_pct": 7.49,
-          "days_in": 36,
+          "days_in": 37,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1302,7 +1302,7 @@
           "last_close": 40.12,
           "last_pct": 15.65,
           "peak_pct": 18.25,
-          "days_in": 36,
+          "days_in": 37,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1321,7 +1321,7 @@
           "last_close": 42.16,
           "last_pct": 16.75,
           "peak_pct": 25.56,
-          "days_in": 36,
+          "days_in": 37,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1340,7 +1340,7 @@
           "last_close": 273.35,
           "last_pct": 2.81,
           "peak_pct": 3.07,
-          "days_in": 34,
+          "days_in": 35,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1359,7 +1359,7 @@
           "last_close": 67.66,
           "last_pct": 9.31,
           "peak_pct": 18.58,
-          "days_in": 32,
+          "days_in": 33,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1378,7 +1378,7 @@
           "last_close": 9.45,
           "last_pct": 3.5,
           "peak_pct": 3.5,
-          "days_in": 32,
+          "days_in": 33,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1397,7 +1397,7 @@
           "last_close": 203.18,
           "last_pct": 19.53,
           "peak_pct": 19.53,
-          "days_in": 32,
+          "days_in": 33,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -1416,7 +1416,7 @@
           "last_close": 295.74,
           "last_pct": -1.26,
           "peak_pct": 5.58,
-          "days_in": 32,
+          "days_in": 33,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1435,7 +1435,7 @@
           "last_close": 36.24,
           "last_pct": -7.17,
           "peak_pct": 0.0,
-          "days_in": 32,
+          "days_in": 33,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1454,7 +1454,7 @@
           "last_close": 15.36,
           "last_pct": 15.32,
           "peak_pct": 15.32,
-          "days_in": 32,
+          "days_in": 33,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1473,7 +1473,7 @@
           "last_close": 156.3,
           "last_pct": 15.72,
           "peak_pct": 19.57,
-          "days_in": 32,
+          "days_in": 33,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1492,7 +1492,7 @@
           "last_close": 25.93,
           "last_pct": 6.31,
           "peak_pct": 9.55,
-          "days_in": 32,
+          "days_in": 33,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1511,7 +1511,7 @@
           "last_close": 73.36,
           "last_pct": 25.92,
           "peak_pct": 29.37,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1530,7 +1530,7 @@
           "last_close": 144.0,
           "last_pct": 17.29,
           "peak_pct": 19.39,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1549,7 +1549,7 @@
           "last_close": 111.1,
           "last_pct": 11.68,
           "peak_pct": 12.69,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1568,7 +1568,7 @@
           "last_close": 86.45,
           "last_pct": 2.31,
           "peak_pct": 2.31,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1587,7 +1587,7 @@
           "last_close": 1753.1,
           "last_pct": 3.0,
           "peak_pct": 8.02,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -1606,7 +1606,7 @@
           "last_close": 64.7,
           "last_pct": 4.61,
           "peak_pct": 8.76,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1625,7 +1625,7 @@
           "last_close": 306.23,
           "last_pct": 26.15,
           "peak_pct": 26.15,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -1644,7 +1644,7 @@
           "last_close": 82.83,
           "last_pct": -7.97,
           "peak_pct": 0.0,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1663,7 +1663,7 @@
           "last_close": 68.66,
           "last_pct": 8.13,
           "peak_pct": 10.03,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1682,7 +1682,7 @@
           "last_close": 68.12,
           "last_pct": -1.15,
           "peak_pct": 2.29,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1701,7 +1701,7 @@
           "last_close": 63.3,
           "last_pct": -4.91,
           "peak_pct": 0.0,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1720,7 +1720,7 @@
           "last_close": 186.8,
           "last_pct": 2.93,
           "peak_pct": 2.93,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -1739,7 +1739,7 @@
           "last_close": 106.12,
           "last_pct": 0.82,
           "peak_pct": 6.17,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1758,7 +1758,7 @@
           "last_close": 227.46,
           "last_pct": 13.5,
           "peak_pct": 14.44,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -1777,7 +1777,7 @@
           "last_close": 32.89,
           "last_pct": -11.44,
           "peak_pct": 3.69,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1796,7 +1796,7 @@
           "last_close": 40.5,
           "last_pct": 2.43,
           "peak_pct": 4.6,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1815,7 +1815,7 @@
           "last_close": 2316.0,
           "last_pct": -9.96,
           "peak_pct": 3.3,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1834,7 +1834,7 @@
           "last_close": 29.71,
           "last_pct": 2.84,
           "peak_pct": 6.78,
-          "days_in": 29,
+          "days_in": 30,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1853,7 +1853,7 @@
           "last_close": 33.42,
           "last_pct": -2.99,
           "peak_pct": 0.0,
-          "days_in": 29,
+          "days_in": 30,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1872,7 +1872,7 @@
           "last_close": 47.87,
           "last_pct": 15.63,
           "peak_pct": 15.63,
-          "days_in": 28,
+          "days_in": 29,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1891,7 +1891,7 @@
           "last_close": 45.1,
           "last_pct": -7.07,
           "peak_pct": 2.29,
-          "days_in": 28,
+          "days_in": 29,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1910,7 +1910,7 @@
           "last_close": 28.24,
           "last_pct": -11.5,
           "peak_pct": 0.0,
-          "days_in": 28,
+          "days_in": 29,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1929,7 +1929,7 @@
           "last_close": 105.2,
           "last_pct": -9.68,
           "peak_pct": 1.12,
-          "days_in": 28,
+          "days_in": 29,
           "appear_count": 1,
           "last_seen": "20260908",
           "signal_detail": {
@@ -1948,7 +1948,7 @@
           "last_close": 86.26,
           "last_pct": 15.65,
           "peak_pct": 17.98,
-          "days_in": 28,
+          "days_in": 29,
           "appear_count": 1,
           "last_seen": "20260916",
           "signal_detail": {
@@ -1967,7 +1967,7 @@
           "last_close": 25.39,
           "last_pct": 44.18,
           "peak_pct": 44.18,
-          "days_in": 28,
+          "days_in": 29,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -1986,7 +1986,7 @@
           "last_close": 507.1,
           "last_pct": 6.75,
           "peak_pct": 13.43,
-          "days_in": 28,
+          "days_in": 29,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -2005,7 +2005,7 @@
           "last_close": 400.0,
           "last_pct": 2.1,
           "peak_pct": 2.1,
-          "days_in": 28,
+          "days_in": 29,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -2024,7 +2024,7 @@
           "last_close": 97.08,
           "last_pct": 0.24,
           "peak_pct": 3.76,
-          "days_in": 28,
+          "days_in": 29,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -2043,7 +2043,7 @@
           "last_close": 18.2,
           "last_pct": -0.44,
           "peak_pct": 2.02,
-          "days_in": 28,
+          "days_in": 29,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -2062,7 +2062,7 @@
           "last_close": 25.82,
           "last_pct": 0.0,
           "peak_pct": 0.0,
-          "days_in": 26,
+          "days_in": 27,
           "appear_count": 1,
           "last_seen": "20260910",
           "signal_detail": {
@@ -2081,7 +2081,7 @@
           "last_close": 63.11,
           "last_pct": 11.72,
           "peak_pct": 11.72,
-          "days_in": 25,
+          "days_in": 26,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -2100,7 +2100,7 @@
           "last_close": 10.45,
           "last_pct": 4.92,
           "peak_pct": 8.33,
-          "days_in": 25,
+          "days_in": 26,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -2119,7 +2119,7 @@
           "last_close": 13.86,
           "last_pct": -10.64,
           "peak_pct": 0.0,
-          "days_in": 25,
+          "days_in": 26,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -2138,7 +2138,7 @@
           "last_close": 15.83,
           "last_pct": -3.12,
           "peak_pct": 0.0,
-          "days_in": 25,
+          "days_in": 26,
           "appear_count": 1,
           "last_seen": "20260911",
           "signal_detail": {
@@ -2157,7 +2157,7 @@
           "last_close": 117.0,
           "last_pct": 6.46,
           "peak_pct": 12.49,
-          "days_in": 23,
+          "days_in": 24,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -2176,7 +2176,7 @@
           "last_close": 129.48,
           "last_pct": 4.12,
           "peak_pct": 5.31,
-          "days_in": 23,
+          "days_in": 24,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -2195,7 +2195,7 @@
           "last_close": 19.28,
           "last_pct": 4.39,
           "peak_pct": 9.53,
-          "days_in": 23,
+          "days_in": 24,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -2214,7 +2214,7 @@
           "last_close": 19.87,
           "last_pct": 1.9,
           "peak_pct": 5.49,
-          "days_in": 23,
+          "days_in": 24,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -2233,7 +2233,7 @@
           "last_close": 28.02,
           "last_pct": -1.51,
           "peak_pct": 0.63,
-          "days_in": 23,
+          "days_in": 24,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -2252,7 +2252,7 @@
           "last_close": 6.54,
           "last_pct": -7.37,
           "peak_pct": 0.0,
-          "days_in": 23,
+          "days_in": 24,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -2271,7 +2271,7 @@
           "last_close": 6.88,
           "last_pct": -1.29,
           "peak_pct": 0.43,
-          "days_in": 23,
+          "days_in": 24,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -2290,7 +2290,7 @@
           "last_close": 8.12,
           "last_pct": 0.12,
           "peak_pct": 1.36,
-          "days_in": 23,
+          "days_in": 24,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -2309,7 +2309,7 @@
           "last_close": 12.93,
           "last_pct": -1.9,
           "peak_pct": 0.0,
-          "days_in": 16,
+          "days_in": 17,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -2328,7 +2328,7 @@
           "last_close": 15.96,
           "last_pct": 2.31,
           "peak_pct": 2.88,
-          "days_in": 16,
+          "days_in": 17,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -2347,7 +2347,7 @@
           "last_close": 151.13,
           "last_pct": 11.38,
           "peak_pct": 11.38,
-          "days_in": 16,
+          "days_in": 17,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -2366,7 +2366,7 @@
           "last_close": 37.96,
           "last_pct": 0.61,
           "peak_pct": 2.01,
-          "days_in": 15,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -2385,7 +2385,7 @@
           "last_close": 70.75,
           "last_pct": -3.11,
           "peak_pct": 0.66,
-          "days_in": 15,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -2404,7 +2404,7 @@
           "last_close": 16.48,
           "last_pct": 5.44,
           "peak_pct": 9.98,
-          "days_in": 15,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -2423,7 +2423,7 @@
           "last_close": 31.0,
           "last_pct": 0.49,
           "peak_pct": 4.25,
-          "days_in": 15,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -2442,7 +2442,7 @@
           "last_close": 39.09,
           "last_pct": -7.19,
           "peak_pct": 0.0,
-          "days_in": 13,
+          "days_in": 14,
           "appear_count": 1,
           "last_seen": "20260916",
           "signal_detail": {
@@ -2461,7 +2461,7 @@
           "last_close": 119.76,
           "last_pct": 1.54,
           "peak_pct": 8.53,
-          "days_in": 13,
+          "days_in": 14,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -2480,7 +2480,7 @@
           "last_close": 59.62,
           "last_pct": -6.81,
           "peak_pct": 0.0,
-          "days_in": 13,
+          "days_in": 14,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -2499,7 +2499,7 @@
           "last_close": 12.16,
           "last_pct": 0.25,
           "peak_pct": 3.3,
-          "days_in": 13,
+          "days_in": 14,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -2518,7 +2518,7 @@
           "last_close": 61.79,
           "last_pct": -1.89,
           "peak_pct": 1.98,
-          "days_in": 13,
+          "days_in": 14,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -2537,7 +2537,7 @@
           "last_close": 109.04,
           "last_pct": 1.62,
           "peak_pct": 4.66,
-          "days_in": 13,
+          "days_in": 14,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -2556,7 +2556,7 @@
           "last_close": 109.32,
           "last_pct": 0.55,
           "peak_pct": 3.8,
-          "days_in": 13,
+          "days_in": 14,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -2575,7 +2575,7 @@
           "last_close": 2.88,
           "last_pct": -4.64,
           "peak_pct": 0.0,
-          "days_in": 12,
+          "days_in": 13,
           "appear_count": 1,
           "last_seen": "20260916",
           "signal_detail": {
@@ -2594,7 +2594,7 @@
           "last_close": 49.95,
           "last_pct": -3.25,
           "peak_pct": 0.0,
-          "days_in": 11,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -2613,7 +2613,7 @@
           "last_close": 33.32,
           "last_pct": -3.03,
           "peak_pct": 0.49,
-          "days_in": 11,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -2632,7 +2632,7 @@
           "last_close": 24.76,
           "last_pct": 1.43,
           "peak_pct": 3.93,
-          "days_in": 11,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -2651,7 +2651,7 @@
           "last_close": 1121.0,
           "last_pct": -1.57,
           "peak_pct": 0.0,
-          "days_in": 11,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -2670,7 +2670,7 @@
           "last_close": 112.39,
           "last_pct": 22.56,
           "peak_pct": 22.56,
-          "days_in": 11,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -2689,7 +2689,7 @@
           "last_close": 40.58,
           "last_pct": -2.17,
           "peak_pct": 0.0,
-          "days_in": 10,
+          "days_in": 11,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -2708,7 +2708,7 @@
           "last_close": 722.46,
           "last_pct": 6.32,
           "peak_pct": 6.81,
-          "days_in": 10,
+          "days_in": 11,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -2727,7 +2727,7 @@
           "last_close": 26.61,
           "last_pct": -1.81,
           "peak_pct": 0.0,
-          "days_in": 10,
+          "days_in": 11,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -2746,7 +2746,7 @@
           "last_close": 378.84,
           "last_pct": 5.61,
           "peak_pct": 7.88,
-          "days_in": 9,
+          "days_in": 10,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -2765,7 +2765,7 @@
           "last_close": 208.03,
           "last_pct": 6.08,
           "peak_pct": 6.08,
-          "days_in": 9,
+          "days_in": 10,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -2784,7 +2784,7 @@
           "last_close": 44.4,
           "last_pct": 17.83,
           "peak_pct": 20.7,
-          "days_in": 9,
+          "days_in": 10,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -2803,7 +2803,7 @@
           "last_close": 37.92,
           "last_pct": 2.16,
           "peak_pct": 3.31,
-          "days_in": 9,
+          "days_in": 10,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -2822,7 +2822,7 @@
           "last_close": 53.5,
           "last_pct": 15.53,
           "peak_pct": 15.53,
-          "days_in": 9,
+          "days_in": 10,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -2841,7 +2841,7 @@
           "last_close": 60.16,
           "last_pct": 2.07,
           "peak_pct": 2.71,
-          "days_in": 9,
+          "days_in": 10,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -2860,7 +2860,7 @@
           "last_close": 78.74,
           "last_pct": -3.23,
           "peak_pct": 0.0,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -2879,7 +2879,7 @@
           "last_close": 66.5,
           "last_pct": 1.37,
           "peak_pct": 1.37,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -2898,7 +2898,7 @@
           "last_close": 18.28,
           "last_pct": 1.39,
           "peak_pct": 2.88,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -2917,7 +2917,7 @@
           "last_close": 74.0,
           "last_pct": 2.82,
           "peak_pct": 2.82,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -2936,7 +2936,7 @@
           "last_close": 327.5,
           "last_pct": 1.19,
           "peak_pct": 1.19,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -2955,7 +2955,7 @@
           "last_close": 134.86,
           "last_pct": -5.61,
           "peak_pct": 0.0,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -2974,9 +2974,9 @@
           "last_close": 60.13,
           "last_pct": 0.91,
           "peak_pct": 0.91,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
-          "last_seen": "20260922",
+          "last_seen": "20260923",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -2993,7 +2993,7 @@
           "last_close": 355.71,
           "last_pct": 0.71,
           "peak_pct": 0.81,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -3012,7 +3012,7 @@
           "last_close": 63.34,
           "last_pct": -1.45,
           "peak_pct": 0.39,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -3031,7 +3031,7 @@
           "last_close": 29.9,
           "last_pct": -3.17,
           "peak_pct": 0.0,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -3050,7 +3050,7 @@
           "last_close": 249.61,
           "last_pct": -4.16,
           "peak_pct": 0.0,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -3069,7 +3069,7 @@
           "last_close": 37.01,
           "last_pct": 0.16,
           "peak_pct": 0.73,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -3088,7 +3088,7 @@
           "last_close": 46.9,
           "last_pct": 0.86,
           "peak_pct": 0.86,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -3107,7 +3107,7 @@
           "last_close": 275.84,
           "last_pct": -3.1,
           "peak_pct": 0.0,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -3126,7 +3126,7 @@
           "last_close": 43.74,
           "last_pct": 17.27,
           "peak_pct": 17.27,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -3145,9 +3145,9 @@
           "last_close": 198.12,
           "last_pct": 1.0,
           "peak_pct": 1.0,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
-          "last_seen": "20260922",
+          "last_seen": "20260923",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
@@ -3164,7 +3164,7 @@
           "last_close": 55.21,
           "last_pct": -1.41,
           "peak_pct": 0.0,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -3183,7 +3183,7 @@
           "last_close": 254.95,
           "last_pct": -3.22,
           "peak_pct": 0.0,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -3202,7 +3202,7 @@
           "last_close": 351.89,
           "last_pct": 4.34,
           "peak_pct": 7.41,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -3221,7 +3221,7 @@
           "last_close": 124.02,
           "last_pct": 0.68,
           "peak_pct": 1.22,
-          "days_in": 7,
+          "days_in": 8,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -3240,9 +3240,9 @@
           "last_close": 171.2,
           "last_pct": 9.74,
           "peak_pct": 9.74,
-          "days_in": 1,
+          "days_in": 2,
           "appear_count": 1,
-          "last_seen": "20260922",
+          "last_seen": "20260923",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -3259,7 +3259,7 @@
           "last_close": 5.68,
           "last_pct": 0.0,
           "peak_pct": 0.0,
-          "days_in": 1,
+          "days_in": 2,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -3278,7 +3278,7 @@
           "last_close": 6.0,
           "last_pct": -1.15,
           "peak_pct": 0.0,
-          "days_in": 1,
+          "days_in": 2,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -3297,7 +3297,7 @@
           "last_close": 58.42,
           "last_pct": -1.93,
           "peak_pct": 0.0,
-          "days_in": 1,
+          "days_in": 2,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -3316,7 +3316,7 @@
           "last_close": 5.03,
           "last_pct": -0.98,
           "peak_pct": 0.0,
-          "days_in": 1,
+          "days_in": 2,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -3335,7 +3335,7 @@
           "last_close": 272.85,
           "last_pct": -3.43,
           "peak_pct": 0.0,
-          "days_in": 1,
+          "days_in": 2,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -3354,9 +3354,9 @@
           "last_close": 26.45,
           "last_pct": 0.0,
           "peak_pct": 0.0,
-          "days_in": 0,
+          "days_in": 1,
           "appear_count": 1,
-          "last_seen": "20260922",
+          "last_seen": "20260923",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -3373,9 +3373,9 @@
           "last_close": 112.97,
           "last_pct": 0.0,
           "peak_pct": 0.0,
-          "days_in": 0,
+          "days_in": 1,
           "appear_count": 1,
-          "last_seen": "20260922",
+          "last_seen": "20260923",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -3392,9 +3392,9 @@
           "last_close": 15.87,
           "last_pct": 0.0,
           "peak_pct": 0.0,
-          "days_in": 0,
+          "days_in": 1,
           "appear_count": 1,
-          "last_seen": "20260922",
+          "last_seen": "20260923",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 主力金叉",
@@ -3411,9 +3411,9 @@
           "last_close": 133.08,
           "last_pct": 0.0,
           "peak_pct": 0.0,
-          "days_in": 0,
+          "days_in": 1,
           "appear_count": 1,
-          "last_seen": "20260922",
+          "last_seen": "20260923",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -3427,12 +3427,12 @@
           "list_date": "20260922",
           "list_date_dashed": "2026-09-22",
           "entry_price": 122.29,
-          "last_close": 122.29,
-          "last_pct": 0.0,
-          "peak_pct": 0.0,
-          "days_in": 0,
+          "last_close": 123.6,
+          "last_pct": 1.07,
+          "peak_pct": 1.07,
+          "days_in": 1,
           "appear_count": 1,
-          "last_seen": "20260922",
+          "last_seen": "20260923",
           "signal_detail": {
             "period": "60m",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 主力金叉",
@@ -3446,10 +3446,10 @@
           "list_date": "20260922",
           "list_date_dashed": "2026-09-22",
           "entry_price": 38.56,
-          "last_close": 38.56,
-          "last_pct": 0.0,
+          "last_close": 38.15,
+          "last_pct": -1.06,
           "peak_pct": 0.0,
-          "days_in": 0,
+          "days_in": 1,
           "appear_count": 1,
           "last_seen": "20260922",
           "signal_detail": {
@@ -3465,16 +3465,35 @@
           "list_date": "20260922",
           "list_date_dashed": "2026-09-22",
           "entry_price": 111.1,
-          "last_close": 111.1,
-          "last_pct": 0.0,
+          "last_close": 109.4,
+          "last_pct": -1.53,
           "peak_pct": 0.0,
-          "days_in": 0,
+          "days_in": 1,
           "appear_count": 1,
-          "last_seen": "20260922",
+          "last_seen": "20260923",
           "signal_detail": {
             "period": "60m",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
             "pct_chg": 3.91
+          }
+        },
+        {
+          "code": "300613",
+          "name": "富瀚微",
+          "algo": "four_volume",
+          "list_date": "20260923",
+          "list_date_dashed": "2026-09-23",
+          "entry_price": 85.03,
+          "last_close": 85.03,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260923",
+          "signal_detail": {
+            "period": "60m",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+            "pct_chg": 3.75
           }
         }
       ],
@@ -3821,6 +3840,13 @@
           "name": "中文在线",
           "bars": 17,
           "pct": -5.76,
+          "last_bar": "2026-09-22"
+        },
+        {
+          "code": "002131",
+          "name": "利欧股份",
+          "bars": 15,
+          "pct": -8.93,
           "last_bar": "2026-09-22"
         },
         {
@@ -4661,7 +4687,7 @@
   ],
   "_meta": {
     "version": "v1",
-    "schema_date": "2026-09-22",
+    "schema_date": "2026-09-23",
     "note": "单算法（四量终极）独立追踪；entry=信号日收盘；by_horizon=从近到远的分档前向收益 T+5…T+90（有多少天算多少天，只取 kline_cache 日线，扣双边 0.3%，不含中途止损止盈）；unrealized=当日浮动（用实时价）；coverage=样本就绪度；win_rate/avg_return 无历史样本时为 null（不是 0）"
   }
 }
