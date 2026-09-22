@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 21:23"
+  updated: "2026-09-22 22:50"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 53
+  next_id_seq: 57
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -2673,4 +2673,153 @@ items:
       且该卡卡面出现非零「主题资金热度」与 ≥1 个 🔥 动态热点；
       同时确认坏档再现时 run 结论为失败/empty 且 raw 保持上一完整档（不再被半成品覆盖）。
     updated: "2026-09-22 21:21"
+
+  - id: triple-price-single-source
+    priority: P1
+    owner: 阿狸咪的工程师
+    status: pending-verify
+    what: >
+      三重共识「历史追踪」的现价与价格序列长期取自 `gold_pool.history[-1].close`，
+      但该 `history` 是**该股最后一次被信号命中的那天**的记录（scanner.py L2750 按命中日 append），
+      既非连续日K、也非当日价 ⇒ `_stock_price_history` 的「逐日真实收盘价序列」名不副实。
+      实测（真值源 = gtimg 不复权日K，独立于本仓任何产物）：69 只跟踪股 / 362 个可比格中
+      **252 格不符 = 69.6%**；今日列可比 4 只全错；恒逸石化 000703 冻在 09-08 的 18.89（真值 16.81，
+      −12.4%）、西部矿业 601168 冻在 09-17 的 35.45（真值 36.77）、德业股份 605117 整格 = 0、
+      另有票把 **0** 当价格写进序列。`gen_triple_track.py::_gp_latest_close` 同一反模式 ⇒ 跟踪盈亏、
+      回撤告警、催化剂兑现判定全部建立在滞后价上。
+    fix: >
+      对标本仓**已正确**的既有实现 `update_four_volume_history.py` 文件头 §C（不新造口径）：
+      价格源 = `raw_data/stock_quote.json`（A 批全市场快照），取不到价就**不写该格**，绝不用 0 冒充。
+      ① `update_triple_resonance_history.py`：新增 `load_quote_snapshot()` / `quote_price()`；
+      `_gp_latest()` 加当日校验（`date != today` ⇒ close/pct_chg 一律 None）；
+      写库改 `quote_price() or 入榜票自身记录价`，仍取不到 ⇒ 跳过不写（旧实现写 0）。
+      ② `gen_triple_track.py`：现价优先级 quote > ledger > gold_pool(须当日校验)，新增 `price_source` 字段；
+      回撤告警同口径。
+      ③ 数据侧同提交修复：`raw_data/triple_resonance_history.json` 与其镜像 `raw_data/triple_history.json`
+      按 gtimg 真实日K 逐格改正 313/516 格（原偏差均值 3.22%、最大 15.28%），另修每日记录 close 117 处、
+      `_tracking_latest` 收盘 109 处；非交易日键用最近前一交易日真值续接；结构与序列化格式零扰动。
+    evidence: >
+      commit `15dbf0415c08`（5 文件：2 个 .py + 3 个 raw_data JSON；回读逐字节一致）。
+      独立核验：修复前 362 可比格中 252 格与 gtimg 真值不符（69.6%）。
+      沙箱 A/B（物理隔离，输入均为远端当日真实产物）：修复后今日现价 **10/10 与真值一致**；
+      top10 非价格键 9/9 一致、tracked 非价格字段 138/140 一致（仅 2 处 `catalysts[].reaction` 由 pnl 派生，属预期）。
+      典型变化：德业股份 `0/None/—` → 82.38（pnl −3.65%，first_close 0→85.50）；
+      西部矿业 −16.49% → **−6.53%**；新易盛 +1.93% → **−2.50%（方向反转）**；联讯仪器 −5.11% → −12.83%。
+      🔴 **产物级线上终验**（实测 22:13:06 CST，用真实时刻）：
+      `data/TRIPLE_TRACK.js`（update_time 2026-09-22 22:03:45）：API 权威内容 sha16 `e496eba2c059c13c`
+      == CDN 内容 sha16（24265 B，逐字节一致）⇒ 德业股份 85.50/82.38/−3.65/`quote`、
+      西部矿业 39.34/36.77/−6.53/`quote`、新易盛 466.68/455.00/−2.50/`quote`；
+      `data/TRIPLE_HISTORY.js`：API sha16 `a0b276438d8d384b` == CDN sha16（73857 B，逐字节一致）⇒
+      德业 09-22 = 82.38（原 0）、恒逸石化 = 16.81（原 18.89）、西部矿业 = 36.77（原 35.45）。
+      （⚠️ 初查 CDN 疑似旧副本，实为 Pages 传播延迟 ~1–2min，二次抓取即与 API 逐字节一致——非未生效。）
+      🔵 **小九侧独立复核（其 22:23 回执 §五）**：用 `git grep 'gold_pool'` 得 20 候选、逐个判「价格级消费」命中 5 处，
+      认定本项两处（`gen_triple_track.py` / `update_triple_resonance_history.py`）**已闭合**，
+      结论「除 `generate_top10.py` 外，全仓无第二处把 `gold_pool.history` 当连续日K/当日价使用」——
+      与我侧「204 个 .py 全量下载 + 静态扫描」的结论**独立收敛**（两条方法、同一判定）。
+    verify_how: >
+      🔴 **前置判据（务必先跑，2026-09-22 22:23 小九实证教训）**：「代码在 main」≠「该轮真的执行了这份代码」。
+      小九查 `top10-close-quote-gate` 时发现 21:39 那轮算法链用的是 **20:51 之前的旧树副本**
+      （产物 20 条全无 `close_source` 键、零红灯零跳过 ⇒ 静默用旧码跑完照常上线）。
+      本质征：**产物缺新字段**。故本项先看 `data/TRIPLE_TRACK.js` 的 `tracked[]` 是否出现 `price_source` 键——
+      ① 出现 `price_source` 且值以 `quote` 为主 ⇒ 执行的**是新码**，再往下判数值；
+      ② 若整份**没有** `price_source` 键 ⇒ 判「同步用了旧树」，处置是等下一档/查冷启动源码同步步，
+      **不是**「fix 又没生效」（两者处置完全不同）。
+      然后才是数值断言：① `raw_data/triple_resonance_history.json` 的 `_stock_price_history[*][today]`
+      与 `raw_data/stock_quote.json` 当日价 **100% 相等**（0 值/滞后值清零）；
+      ② `tracked[].price_source` 为 `quote`（不再出现 `gold_pool`/`none` 冒充当日价）；
+      ③ `_stock_price_history` 不再出现 0 值格。
+    updated: "2026-09-22 22:50"
+
+  - id: triple-history-accumulator-caliber
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: todo
+    what: >
+      三重历史累加器仍有两处与四量（`update_four_volume_history.py`）口径不一致：
+      ① **按「跑批日」建顶层 key** 而非「信号日」（四量已改按 signal_date 建键、幂等天然成立）——
+      实测 `raw_data/triple_resonance_history.json` 28 个日期 key 中 4 个是**非交易日**
+      （2026-09-12 / 09-13 / 09-19 / 09-20），对应 154 个价格格在真实日K里无对应值。
+      ② `gen_triple_consensus.py` L216 / L252 的 `top.get("close", 0)` 在 TOP10 无 close 时会写 **0**，
+      与四量侧「取不到标 none、绝不用 0 冒充」的原则相悖。
+    fix: >
+      未实施（本轮只修价格真实性，不动键口径与结构，控制爆炸半径）。
+      建议：① 改按 `triple_consensus` 的信号日建 key，需同步核对 `backfill_top10_from_triple_history.py`
+      与前端 `TRIPLE_HISTORY` 的读取假设；② L216/L252 的 0 兜底改 None，并先确认前端对 null 的
+      `toFixed` 类用法安全（改前须 grep 全部消费点）。
+    evidence: >
+      本轮实测：顶层 28 个日期 key 中 4 个为周末键；本轮修复时该 154 格已用「最近前一交易日真值」续接，
+      数值正确但键口径仍待统一。
+    verify_how: >
+      改后：顶层日期 key 应全部落在交易日；连续 2 个批次的 key 增量 == 该期间交易日增量。
+    updated: "2026-09-22 22:50"
+
+  - id: index-tail-truncation-2220
+    priority: P0
+    owner: 阿狸咪的工程师
+    status: done
+    what: >
+      🔴 **事故**：`index.html` 于 **2026-09-22 22:20:41** 被 commit `7c78439fe8`（`v8 cn fetch: 22:20`）
+      **删除尾部 183 行** —— A2 懒加载块全部内容（STOCK_LIST / STOCK_QUOTE / LHB_HISTORY 三张大表的
+      按需注入与重放逻辑）＋ 文件结尾的 `</script></body></html>`，只在文件末留下一个**未闭合的 `<script>`**。
+      1,347,523 → **1,338,018 B**（恰为应有内容的**前 99.3%** ⇒ 机制 = 非原子写「部分前缀写」中途被杀）。
+      影响：三张懒加载大表**永不加载**；HTML 尾部不完整；且**下一轮 build 会读它继续写** ⇒ 会被固化。
+    fix: >
+      精确重建（非「回退父版本」）：= 截断前父版本 `e77a7f8b7e` ⊕ 截断后**全部合法改动**
+      （2 处等长 `?v=` 令牌同步：FINAL_RECOMMEND_DATA.js 1790086153→1790086831、ALGO_TRACK.js →1790086845）
+      ⊕ 逐字节恢复被删的 183 行尾部。commit **`0c4ad80766e2`**（单文件，回读逐字节一致）。
+      🔴 **同时封堵门禁盲区**：把 `</html>` 与 `{name:'LHB_HISTORY'` 登记进
+      `docs/ops/index_protected_markers.txt`（35 → 37 条）—— 这两个锚点位于被删区域内，
+      登记后本类截断会被 [10/10] **当场红掉**。
+    evidence: >
+      🔴 **盲区实证（本事故能穿门的直接原因）**：对事故态截断件跑真门禁函数 ——
+      `[10/10]` 旧清单 35 条 ⇒ **(True, 35/35 全在位)**（34 个锚点全在文件前段）；
+      `[2/14] check_new_function()` ⇒ **(True, 25 个 inline script 块 0 错误)**（正常为 28 块）。
+      ⇒ **现行 14 项门禁对本次截断完全无感**。
+      ✅ 登记 37 条后复跑：事故态 ⇒ **(False, 2/37 消失：</html>；{name:'LHB_HISTORY'})**（封堵生效）；
+      完好件 ⇒ 37/37（不误伤）。
+      ✅ **修复经流水线验证**：22:45 的 `v8 build`(`f8ae5fd39f`) 在其上只改 107 行 `?v=`＋`var BUILD`，
+      文件仍 **1,347,523 B / 19,149 行 / 末尾 `</script></body></html>`** ⇒ 修复件完整穿过流水线。
+      ✅ 线上终验：`raw/main` 与 CDN 均 1,347,523 B、CR=0；对当前 main 跑 [10/10] ⇒ **37/37 全在位**。
+      ⚠️ **复发风险单列**（见 `cn-fetch-writer-version-drift`）：修文件 ≠ 修路径。
+    verify_how: >
+      下一轮 cn fetch / build 后：① 断言 `index.html` 行数 ≥ 19,149 且末尾闭合 `</html>`；
+      ② 断言 [10/10] 为 37/37（含两个尾部锚点）；③ 断言 `</script>` 块数 ≥ 28。
+    updated: "2026-09-22 22:50"
+
+  - id: cn-fetch-writer-version-drift
+    priority: P0
+    owner: 阿狸咪的工程师
+    status: todo
+    what: >
+      **未闭环的根因**：`index-tail-truncation-2220` 只修好了文件，**没有修掉那条会再次截断的路径**。
+      判据级证据（谁写的）：全仓唯一写 `index.html` 的脚本是 `update_v8.py` 的
+      `_rewrite_index_html_cache_busters()` / `_ensure_momentum_loader()`，二者**都**走
+      `_atomic_write_index_html()`；该函数首条守卫是 `if "</html>" not in text[-200:]: raise`。
+      ⇒ **用这份代码不可能写出事故态**。故 22:20:41 那轮执行的必是 **20:27(`9037d76d22`) 之前的旧副本**
+      —— 与小九在 `top10-close-quote-gate` 上实证的「链用了早于 20:51 版脚本的旧树副本」**同族**
+      （同一天、同一归因域：自托管 runner 工作区 / 冷启动源码同步未刷新）。
+      ⚠️ 附带发现守卫自身的**残余盲区**：只要截断后仍补了 `</html>` 且缩水 <5%，即可穿门（负向对照用例 C）。
+    fix: >
+      未实施（**不是我的车道**：`v8_cn_fetch_cloud.yml` 的 step「🛡️ 原子提交 index.html ?v」
+      跑在自托管 runner 上，需小九侧处置）。建议两项：
+      ① **版本断言**：`python update_v8.py --only-cache-busters` 之后、`git add -f index.html` **之前**，
+      断言「`index.html` 行数 ≥ 上一版行数 × 0.95」且「末尾 200 字含 `</html>`」—— 不符即**硬失败**
+      （当前该 step 是 `soft_15` 软失败，不阻断 ⇒ 坏文件照样进 main）；
+      ② **确认 runner 工作区刷新**：22:20 那轮为何用的是 20:27 前的 `update_v8.py`（建议查该 job 日志里
+      `--only-cache-busters` 的输出与 `update_v8.py` 的 mtime/blob）。
+      ③ 备选纵深：把 `_atomic_write_index_html` 的 `</html>` 守卫**改成硬性**（现为文本末 200 字内匹配，
+      建议同时断言「`</body>`、`</html>` 各 ≥1 且 script 开闭配平」）。
+    evidence: >
+      证据①（守卫判别力，真跑远端 `update_v8.py` 的 `_atomic_write_index_html`）：
+      用例 A 事故态截断件 ⇒ **拦截** `RuntimeError: 末尾 200 字符内未见 </html>（疑似被截断），拒绝落盘`，
+      且正本保持原样、无 `.tmp` 残留；用例 B 完好件 ⇒ 放行（1,347,523 B）。
+      证据②（全仓写入方枚举）：204 个 `.py` 全量静态扫描，`index.html` 的活代码写入方**仅** `update_v8.py`；
+      `cloud_fetch_v8.py` 的 `write_text` 全为 json 产物，非 index.html。
+      证据③（机制）：事故态恰为应有内容的**前 1,338,018 / 1,347,523 字节 = 99.3%**，
+      末尾停在 `<!-- …懒加载… -->\n<script>` ⇒ 与 20:10 事故同族（`write_text` 先 truncate 再逐块写，中途被杀）。
+    verify_how: >
+      下一轮 cn fetch 后：① `index.html` 行数 ≥ 19,149 且末尾闭合；② workflow 中出现上述**硬失败**前置断言；
+      ③ 该 job 日志能证明执行的是 main 上的 `update_v8.py`（blob 比对）。
+    updated: "2026-09-22 22:50"
+
 
