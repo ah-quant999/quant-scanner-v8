@@ -75,7 +75,12 @@ VAR_TO_RAW = {
     "ETF_PULSE": "etf_pulse.json",
     "ETF_DAILY_MONITOR": "etf_daily_monitor.json",
     # 🛡 2026-09-18 孤儿链清理（同上）
-    # "ANALYST_RATINGS": "analyst_ratings.json",
+    # 🔴 2026-09-22 主人令「一劳永逸」· 接线①/③ **恢复登记**（小九）：
+    #   该链已被「暂未上架 › 解禁&机构关注」因子观测卡重新消费（index.html 读 window.INST_COVERAGE）。
+    #   ⚠️⚠️ 本表不登记 ⇒ save() 取不到 fname **直接 return** ⇒ raw 永不落盘。
+    #   血证（09-22 08:xx）：只恢复了 tasks 注册、漏恢复本表与 CATEGORY_MAP，
+    #   净室单测「函数能返回 27 条」全绿，线上却**零产出** —— 典型假修复。
+    "ANALYST_RATINGS": "analyst_ratings.json",
     "INDEX_QUOTES": "index_quotes.json",
     "EXPERIMENT": "experiment.json",
     "V8_CAL": "v8_cal.json",
@@ -115,7 +120,12 @@ CATEGORY_MAP = {
     "JUDGMENT_DATA": "premarket,intraday",
     "NORTH_FUND": "premarket,post_close",
     # 🛡 2026-09-18 孤儿链清理（同上）
-    # "ANALYST_RATINGS": "premarket",
+    # 🔴 2026-09-22 恢复登记（同 VAR_TO_RAW 注释）· 接线②（小九）：
+    #   ⚠️⚠️ 本表不登记 ⇒ 该 var 不进 target_vars（L3903 由本表派生）
+    #   ⇒ main() 的 `for var, fn in tasks` 首行就 continue ⇒ **永不执行**（假修复）。
+    #   档位 premarket：机构研报覆盖是日频 T+1 数据，盘前抓当日即可；
+    #   与 update_v8.py 侧 CATEGORY_MAP 的 "INST_COVERAGE": "premarket" 同档（两表必须同档）。
+    "ANALYST_RATINGS": "premarket",
     # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
     "W52_HIGH": "premarket,post_close",
     # 盘中（ETF 二合一·盘中异动/资金热度、板块资金流向等实时场景。
@@ -4505,6 +4515,35 @@ def main(category=None, only=None):
                 print(f"  ⚠️ 四量终极返回码 {r.returncode}")
         except Exception as e:
             print(f"  ⚠️ 四量终极子进程失败: {e}")
+
+    # 🔴 2026-09-22 主人令「一劳永逸」· 接线完整性硬自检（小九）
+    #   一条抓取链要真正出数，**三重接线缺一不可**：
+    #     ① tasks 注册          → 决定「能不能被调用」
+    #     ② CATEGORY_MAP 登记    → 决定「进不进 target_vars / 本档跑不跑」（L3903 由本表派生）
+    #     ③ VAR_TO_RAW 登记      → 决定「save() 能不能落盘」（L301 取不到 fname 直接 return）
+    #   血证：2026-09-22 恢复 ANALYST_RATINGS 时只做了①，②③漏做 ⇒ 单测全绿、线上零产出。
+    #   ⚠️ 之所以做成**硬阻断**而非警告：这类断线**不报错、不红灯**，「run 全绿 + 数据不动」
+    #     是最难发现的静默失能，必须在启动时立刻炸掉（成本≈0，抓取前即失败）。
+    _wf_vars = [v for v, _ in tasks]
+    _wf_set = set(_wf_vars)
+    _dup = sorted({v for v in _wf_vars if _wf_vars.count(v) > 1})
+    _no_cat = sorted(_wf_set - set(CATEGORY_MAP.keys()))
+    _no_raw = sorted(_wf_set - set(VAR_TO_RAW.keys()))
+    _probs = []
+    if _dup:
+        _probs.append(f"tasks 内变量重名（后者覆盖前者，静默丢弃）: {_dup}")
+    if _no_cat:
+        _probs.append(f"未登记 CATEGORY_MAP ⇒ 永不进 target_vars、永不执行: {_no_cat}")
+    if _no_raw:
+        _probs.append(f"未登记 VAR_TO_RAW ⇒ save() 直接 return、raw 永不落盘: {_no_raw}")
+    if _probs:
+        for _p in _probs:
+            print(f"  🔴 接线自检失败：{_p}")
+        raise SystemExit(
+            "接线不完整，中止本轮抓取（拒绝「run 全绿但零产出」的假成功）——"
+            "请补齐 CATEGORY_MAP / VAR_TO_RAW 后重跑")
+    print(f"  ✅ 接线自检通过：tasks={len(_wf_set)} 个变量，"
+          f"CATEGORY_MAP / VAR_TO_RAW 三重登记齐备（无重名、无漏登）")
 
     for var, fn in tasks:
         if target_vars is not None and var not in target_vars:
