@@ -943,6 +943,10 @@ jobs:
           #   也覆盖网络抖动；失败时打印响应正文，使下一次失败可诊断（不再是无信息抛栈）。
           #   3 次仍失败 -> exit 1（绝不静默放过）。
           meta_sha, html, _last_err = None, None, ""
+          # ★ 2026-09-22 阿狸咪的工程师：本步原凭空引用 t（全块无赋值）⇒ 确定性
+          #   NameError: name 't' is not defined，真跑档每次都在此步失败（#2044/#2026/#2025/#2023）。
+          #   口径同全站 ?v 约定（2026-09-10 令：单调 unix 秒令牌，实测线上 ?v=1790075211）。
+          t = str(int(time.time()))
           for _att in range(1, 4):
               meta_sha, html = _fetch_main_html()
               new = re.sub(r'(ALGO_TRACK\.js)\?v=\w+', r'\1?v=' + t, html)
