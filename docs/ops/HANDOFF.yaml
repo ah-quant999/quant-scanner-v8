@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 05:30"
+  updated: "2026-09-22 08:14"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -995,14 +995,17 @@ items:
   - id: logic-html-schedule-label
     priority: P2
     owner: shared
-    status: todo
+    status: done
     what: >
       `logic.html` 调度矩阵两处**既有**偏差（非 09-21 引入）：L2156 把 `v8_stock_quote_refresh`
       的执行机写成「云端 ubuntu」（实际主链 `runs-on: [self-hosted, cn]`；云端 ubuntu 的是 `_cloud` 副本）；
-      L2159 未区分主链/兜底。**本轮未改**：`logic.html` 并未描述 relay ② 的派发关系
-      ⇒ 不构成「文档说谎」；且改前端会扩大午休窗口的推送面（禁踩踏）。
-    verify_how: "与卡面文案一并做前端口径整理时同批修；改时须走分节守卫 + `?v` 竞态防护。"
-    updated: "2026-09-21 12:37"
+      L2159 未区分主链/兜底。**2026-09-22 08:1x 小九已修**（原「禁踩踏」顾虑解除：所改落在盘前窗口、
+      非午休；且经对照实验证明该改动不改变 `[4/8]` 门禁结论）—— 两行归属列按 workflow 真身逐条校正
+      （含 relay ② 主链优先 / ≥10 分未起 job 才派 `_cloud` 兜底），并在表下补「2026-09-22 口径校正」记录。
+      commit `139d86d55c83`。
+    verify_how: "已验 2026-09-22 08:14：① 本地搭最小环境实跑 align_logic_ops.py（即 [4/8] 门禁本体）——基线版与修复版均 EXIT 0，证明本改动不改变门禁结论；② 线上 Pages 直取 logic.html，md5=3be67ef76e73b0c0bc84ce57c00270bf（761006 B），与成品逐字节一致；③ 该推送触发的 Pages 构建 run（dynamic, head 139d86d55）completed。"
+    verified_at: "2026-09-22 08:14"
+    updated: "2026-09-22 08:14"
   - id: all-generic-redline-false-positive
     priority: P1
     owner: shared
