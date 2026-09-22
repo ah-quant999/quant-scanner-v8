@@ -1,6 +1,6 @@
 {
  "month": "2026年9月",
- "update_time": "2026-09-22 22:09",
+ "update_time": "2026-09-23 04:47",
  "legend": [
   {
    "title": "重要政策",
@@ -368,13 +368,13 @@
     {
      "num": 22,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": []
     },
     {
      "num": 23,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "上交所/深交所ETF期权最后交易日",
