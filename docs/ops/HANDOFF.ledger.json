@@ -53,8 +53,8 @@
     "algo-step15-undefined-t",
     "fourvolume-backtest-3y-downgrade"
   ],
-  "updated": "2026-09-22 19:58",
-  "generated_by": "小九(lemoncat-cn) + 阿狸咪(alimi-cn) （2026-09-22 13:55 阿狸咪刷新：+2 新项 / 2 项回填） （2026-09-22 16:2x 阿狸咪刷新：+1 新项 / 1 项转 done / 3 项回填） （2026-09-22 17:0x 小九现场终验收口：4 项转 done（category-map-two-table-drift / candidate-quotes-category-drift / factorlab-commit-pathspec / backtest-tdx-no-refresh）+ 10 项实测注记；0 新增 id / next_id_seq 仍 47） （2026-09-22 19:58 阿狸咪补登记：+2 新 id（algo-step15-undefined-t / fourvolume-backtest-3y-downgrade） / next_id_seq 48→50 / max_next_id_seq 48→50；两项均为「现场已实测但从未进状态源」的红线）",
+  "updated": "2026-09-22 20:14",
+  "generated_by": "小九(lemoncat-cn) + 阿狸咪(alimi-cn) （2026-09-22 13:55 阿狸咪刷新：+2 新项 / 2 项回填） （2026-09-22 16:2x 阿狸咪刷新：+1 新项 / 1 项转 done / 3 项回填） （2026-09-22 17:0x 小九现场终验收口：4 项转 done（category-map-two-table-drift / candidate-quotes-category-drift / factorlab-commit-pathspec / backtest-tdx-no-refresh）+ 10 项实测注记；0 新增 id / next_id_seq 仍 47） （2026-09-22 19:58 阿狸咪补登记：+2 新 id（algo-step15-undefined-t / fourvolume-backtest-3y-downgrade） / next_id_seq 48→50 / max_next_id_seq 48→50；两项均为「现场已实测但从未进状态源」的红线） （2026-09-22 20:14 阿狸咪回填 cachebot-build-race 的 09-22 20:1x 实测实例）",
   "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
   "id_content_hashes": {
     "algo-edge-ordering-fix": "17b731a53ed6f7e4",
@@ -66,7 +66,7 @@
     "baihechou-card-removed-and-unlockcover-fix": "c8250c317394a9cb",
     "build13-step-timeout-minutes": "2d72b3709a232b7a",
     "build13-timeout-guard": "b57166725a0e8493",
-    "cachebot-build-race": "f09fc6f05c9af96e",
+    "cachebot-build-race": "aeee45b3116cbdb1",
     "candidate-quotes-category-drift": "6e2e2dcb53f950c9",
     "category-map-two-table-drift": "ad99b1e8d87d84b9",
     "cloudfetch-us-hk-map-unknown-local-diff": "26e6caa2dbde45bf",

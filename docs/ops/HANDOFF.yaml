@@ -84,12 +84,33 @@ items:
       较 09-16 实测的 **105s 膨胀约 5 倍** ⇒ 佐证：**退避 / jitter 类方案只会把窗口撑得更长**，
       只有「消除 fast-forward 前提（部署步改走 api_push_raw.py / Contents API 逐文件 PUT）」
       或「把重建移出竞争窗口」才是根因解。
+      ── 阿狸咪 %s CST 补（本 P0 的又一次实例；REST + run 日志 zip 取证）──
+      实例：`v8_build_deploy` #7662（head `6c9b69de50`，evt=push，20:02:28 CST）：
+      `gate` job = success（含 [13/13] 交接状态源守卫），`build` job = **failure**，
+      失败步唯一 = `[13] 📤 部署到 main（GitHub Pages 源）`。日志逐字：
+      `! [rejected]  HEAD -> main (fetch first)` 连续三次全中（20:0x / 20:0x / 20:11:29），
+      随后 `❌ 3 次重试后仍失败` + `##[error]Process completed with exit code 1`。
+      🔴 **关键量化（本轮新增，比原记更锐）**：本档 step13 总耗时 8.9min（与
+      `build13-timeout-guard` 的 ≤9min 达标一致），单轮 = fetch(≤3min)+全量重建(≈5min)+push(≤3min)
+      ⇒ **实测三轮间隔 ≈4.5min**；而同期 main 推送间隔 **≈60~90s**
+      （20:03:22 / 20:04:34 / 20:04:41 / 20:05:30 / 20:06:10 / 20:07:19 / 20:07:30 / 20:10:58，
+      来源 = cache-bot / cn fetch / runner 上报）。
+      ⇒ **「重试窗口(≈4.5min) 恒大于推送间隔(≈1.5min)」⇒ 3 次重试在该时段数学上不可能赢**，
+      与「退避/jitter 只会把窗口撑得更长」同向，佐证本项 decided 的根因解方向
+      （消除 fast-forward 前提 / 把重建移出竞争窗口）。
+      ⏱ 同期对照（判「是否只此一档」）：近 16 档 build_deploy 中 `build` job 失败仅 **2 档** ——
+      #7662（step13，本条）；#7659（失败步 `[10] Pre-deploy audit`，根因 = 阿狸咪自己写的
+      HANDOFF 未来时戳，已由 commit `6c9b69de50` 修正，并经 #7662 的 `gate` job = success 确认）。
+      其余档为 push 触发后被新提交 `cancel`（设计内，非事故）。
+      🔍 **落地观察点（供复核，非结论）**：若后续多档 build 亦持续被拒，
+      `data/HEALTH_CHECK.js` 的 `update_time` 会停止前进（本档 20:10:56 那次重建成功但未落库）
+      ⇒ 该字段是否继续前进 = 「build 是否真的落地」的最省事探针。
     options:
       A: reconcile 遇 build running 时让开
       B: build 收口 ?v、reconcile 降频 30–60min 仅兜底
       C: 只维持超时护栏、接受「多数轮 push 需重试一次」
     decided: "按主人令『用最科学的方法』由小九自行决断 —— 倾向 B（职责单一化：build 是 ?v 的 owner）"
-    updated: "2026-09-21 08:40"
+    updated: "2026-09-22 20:14"
 
   - id: concurrency-block-bucket
     priority: P1
