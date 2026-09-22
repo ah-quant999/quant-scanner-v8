@@ -103,7 +103,10 @@ window.__domReadyFns=[];
        收盘后(交易日 15:00–23:00): 每 1 小时
        夜间(23:00–次日 07:00): 不刷新
        非交易日(周末/法定假期 07:00–23:00): 每 2 小时
-     实现见底部 __v8SmartRefreshStarted（含 2026 休市日）。旧「数据变化即刷」(__v8LiveDataProbe) 已移除。 -->
+     实现见底部 __v8SmartRefreshStarted（含 2026 休市日）。
+     数据变化即刷：见底部 __v8LiveDataProbe（2026-09-14 补回，HEAD 探测 HEALTH_CHECK.js）。
+     🔴 2026-09-22 小九更正：此处原写「旧「数据变化即刷」已移除」属**过时注释**——
+        实测该脚本确实存在于本文件后段（idx≈1061701），是刷新双保险的第二条腿。 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
@@ -18109,25 +18112,45 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
 
   var _last = Date.now();
+  /* 🔴 2026-09-22 一劳永逸修复（小九）：刷新链断裂自愈。
+     血证：原 _tick 写 `if(_maybeReload()) return;`，而 _maybeReload() 在触发时
+     先 _last=Date.now() 再 location.reload() 后 return true ⇒ _tick 直接 return、
+     **不再 setTimeout(_tick) 续排**，整套逻辑建立在「reload 必然销毁页面」之上。
+     但 Chrome 对后台标签页/省电模式会**抑制 reload**（页面 kept alive），
+     此时定时器链已断、页面却还活着 ⇒ 永久不再自动刷新。
+     jsdom 受控时钟实证：推进 45 分钟，reload 仅 1 次 @15.5min，之后零事件（链彻底断死）。
+     ⇒ 修复三点：① _tick 无条件续排；② reload 被抑制 90s 后自愈重试；③ 回前台补链。 */
+  var _reloadRequestedAt = 0;                            // 已请求 reload 的时刻（0=未请求）
   function _maybeReload(){
     var iv = _targetIntervalMs();
     if(iv === 0) return false;                           // 夜间不刷
     if((Date.now() - _last) >= iv){
       _last = Date.now();
+      _reloadRequestedAt = Date.now();                   // 登记：用于 90s 后自愈重试
       try{ location.reload(); }catch(e){}
-      return true;                                      // 本页即将销毁
+      return true;                                      // 已请求重载（但页可能未被销毁）
     }
     return false;
   }
   function _tick(){
-    if(_maybeReload()) return;
+    // ① 无条件续排：即便 _maybeReload() 触发了 reload，也不掐断定时器链（reload 可能被抑制）
+    _maybeReload();
     var iv = _targetIntervalMs();
+    // ② 自愈：已请求 reload 但 90 秒后页面仍存活 ⇒ 说明 reload 被抑制，重试一次
+    if(_reloadRequestedAt && (Date.now() - _reloadRequestedAt) >= 90*1000){
+      _reloadRequestedAt = 0;
+      try{ location.reload(); }catch(e){}
+    }
     setTimeout(_tick, iv === 0 ? 5*60*1000 : 60*1000);   // 夜间每5分回看天亮；其余每分钟检查距上次刷新耗时
   }
-  // 切回前台：超过本时段间隔才立即刷新（兜底，不超时不误刷）
+  // 切回前台：超过本时段间隔才立即刷新（兜底，不超时不误刷）；并补链防定时器已断
   try{
     document.addEventListener('visibilitychange', function(){
-      if(document.visibilityState === 'visible' && _maybeReload()) return;
+      if(document.visibilityState === 'visible'){
+        if(_maybeReload()) return;
+        // ③ 回前台补链：页面若曾经历被抑制的 reload，_tick 可能已断 ⇒ 这里补一次
+        try{ setTimeout(_tick, 0); }catch(e){}
+      }
     }, false);
   }catch(e){}
   // 兜底：陈旧硬上限（4 小时）—— 即便时段判定逻辑出错，也绝不「永不刷新」
