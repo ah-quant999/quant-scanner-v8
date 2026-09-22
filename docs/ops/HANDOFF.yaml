@@ -218,7 +218,35 @@ items:
       重写工作树 + index」的签名吻合。⚠️ 本项 fix 已治过 8 文件，但上述 2 处**未被 fix 覆盖**
       ⇒ 请小九按 §fix 同法给这两处 checkout 后补 `git reset -q HEAD -- <paths>`；
       在根因清理前，本项**不应**再判 pending-verify。
-    updated: "2026-09-22 09:24"
+      ── 🚨 阿狸咪 2026-09-22 20:26 CST 补：**上线以来最重的一次实锤**（已现场恢复，此段为事故档案）──
+      **事故**：根 `index.html` 被以「落后基线」覆盖 —— **1,347,523 B → 366,154 B（-73%）**，
+      `docs/ops/index_protected_markers.txt` 34 条核心标记中 **21 条消失**，含
+      `id="sec-op"` / `id="sec-dl"` / `id="sec-ul"` / `id="sec-bt"` / `window.__renderOps` /
+      `window.__renderFinalSec` / `window.FINAL_RECOMMEND_DATA` / `_SIG_EDGE_SRC` / `win_best_ok` /
+      `function _renderPostReady`（= DOMContentLoaded 初渲入口，缺它整页卡「加载中」）。
+      **写入提交**：`0320100b3f`（2026-09-22 20:10:13，message `v8 cn fetch: 2026-09-22 20:09`，
+      author `github-actions[bot]` ⇒ Contents API 家族）；其父 `ac8355e1c6`（20:09:52）仍是 1,347,523 B。
+      该提交**未同步修改标记清单** ⇒ 非有意删功能，是覆盖事故（守卫「有意删功能必同步删行」口径成立）。
+      **线上实证（HTTP 硬抓，非推断）**：`GET https://ah-quant999.github.io/quant-scanner-v8/index.html`
+      = **HTTP 200 / 366,154 B / sha256 5fdc70cc0840606c**，`id="sec-op"`、`_renderPostReady` 均 **False**。
+      **连锁红**：`v8_build_deploy` **#7666**（head `b93852366e`，20:10:58）`build` job failure，
+      Pre-deploy audit **三项红**：`[4/8] align_logic_ops`、`[10/10] index 核心标记守卫（21/34）`、
+      `[12/12] 调用点定义守卫（1 处无守卫的悬空调用 = _renderPostReady）` ⇒ **阻断 deploy**（守卫按设计生效）。
+      **恢复（已完成）**：阿狸咪 2026-09-22 20:26 CST（夜间本机时段）把 `ac8355e1c6` 的 index.html
+      **逐字节原样回推**（新 blob `2067d5d0baaa`，1,347,523 B / 0 缺失；重传 blob 与原 blob 相等已断言），
+      commit `319aeb7e1d`。复验：repo main **0/34 缺失**；线上 Pages **HTTP 200 / 1,347,523 B /
+      缺失 0/34**（sha256 `265dd32be82de725`）⇒ **用户面已恢复**。
+      **未取证的一环（交小九）**：真凶提交出自 `api_push_raw.py` 家族，但该脚本自 09-20 起已有
+      `_SKIP_LOCAL_PUSH = {"index.html"}`（注释自述「本地副本永不入队」，正为治本类覆盖）⇒ **存在绕过口**。
+      时间线上唯一在跑的是 `v8_cn_fetch_cloud.yml` **#2000**（19:32:45 创建，`updated_at` 冻结在
+      19:53:06 但仍 in_progress = 长跑推送步），其 step 日志在 run 结束前拉不到（HTTP 404）。
+      ⇒ **下一步 = #2000 结束后拉日志**，定位是哪一个 push 调用把本地 index.html 入了提交
+      （候选：PUSH_FILES 分支未过 `_SKIP_LOCAL_PUSH` 过滤 / 回退 walk_raw() 路径 / 另有脚本自建 tree）。
+      **结构性建议（待小九拍板）**：`[10/10]` 只在 build 里跑 ⇒ 只能挡住「部署」，**挡不住 cn 侧直推 index.html**；
+      正解方向 = ① 把「核心标记全命中」做成**推送侧硬前置**（任何写 index.html 的路径落盘前自检），
+      或 ② 一律改为「取远端正文 + 就地改 ?v」（`api_push_raw._stamp_remote_index_v` 范式）并**删除所有本地入队口**。
+
+    updated: "2026-09-22 20:26"
 
   - id: alimi-same-family-check
     priority: P0
