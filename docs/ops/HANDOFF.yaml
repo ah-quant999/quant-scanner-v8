@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 16:08"
+  updated: "2026-09-22 16:22"
   updated_by: 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -2148,7 +2148,7 @@ items:
   - id: probe-intraday-missing-market-alerts
     priority: P2
     owner: shared
-    status: todo
+    status: pending-verify
     what: >
       `v8_cn_fetch_cloud.yml` 落地探针 `PROBE["intraday"]` 白名单
       = `LIMIT_UP_HEATMAP.js / CONCEPT_RANKING.js / CAPITAL_FLOW_DATA.js /
@@ -2160,13 +2160,13 @@ items:
       ⚠️ 若该 PROBE 与 `v8_cn_fetch_watchdog.yml` 内同名清单自称「单一事实来源」，
       **必须两处同改**（两文件格式可能差空格，锚件不可互抄）。
     verify_how: "改后确认两文件清单一致；下一轮 intraday run 的探针步输出含 MARKET_ALERTS.js。"
-    evidence: "2026-09-22 小九实测：`v8_cn_fetch_cloud.yml` 该行清单 6 项，无 MARKET_ALERTS.js。"
-    updated: "2026-09-22 15:12"
+    evidence: "2026-09-22 小九实测：`v8_cn_fetch_cloud.yml` 该行清单 6 项，无 MARKET_ALERTS.js。｜2026-09-22 16:21 主人拍板立项并已推 commit `4f67f82f`（blob cloud=`b4ac705ae8` / watchdog=`f845cbbe9f`）：两处 PROBE 的 intraday 与 post_close **各补 `MARKET_ALERTS.js`**（cloud 7/4 项、watchdog 7/4 项），并以 `ast.literal_eval` 断言两处字典**逐键一致**（保持「同源同口径」）；两 workflow YAML 均可解析。"
+    updated: "2026-09-22 16:22"
 
   - id: category-map-two-table-drift
     priority: P2
     owner: shared
-    status: todo
+    status: pending-verify
     what: >
       `MARKET_ALERTS` 档位两表不一致：抓取侧 `cloud_fetch_v8.py::CATEGORY_MAP`
       = `"intraday"`（L159），而注入侧 `update_v8.py::CATEGORY_MAP`
@@ -2174,17 +2174,22 @@ items:
       潜在后果：盘中轮次构建时注入侧会把它当含 post_close 的产物，
       与 `_pure_pc` 防回滚护栏的判定口径产生偏差（本批实测未触发，属隐患）。
     fix: >
-      统一两表档位口径。改前先确认哪一侧权威：该卡实际仅盘中有产
-      ⇒ 以 `intraday` 为准，注入侧去掉 `,post_close`；
-      但**须先验证注入侧去掉后盘中构建仍会重建它**（避免反向造成不重建）。
+      🔴 2026-09-22 16:2x **原描述方向已被证伪，改为反向统一**（原写「以 intraday 为准、注入侧去掉
+      `,post_close`」是错的）：现以 **`intraday,post_close`** 为准，即**抓取侧补 post_close**。
+      依据（读 workflow 自身档位逻辑得出）：档位判定为
+      `540<=HM<=905 → intraday`（**止于 15:05**）/ `905<HM<=1290 → post_close`；
+      而权威调度表 `logic.html` 该卡 slots **含 `15:30`** ⇒ 15:30 收盘定稿档原落在 post_close，
+      抓取侧却只标 intraday ⇒ **该档实际不抓本卡**（口径漏洞，非仅「隐患」）。
+      另：盘中 cron 偶发丢档时（09-22 实测 13:00/13:30/14:00/14:30 四档全丢）post_close 兜底
+      可保住当日收盘定格值 —— 同 `LIMIT_UP_HEATMAP` 的既有处置（该行注释即此理由）。
     verify_how: "改后断言 `cloud_fetch_v8.CATEGORY_MAP['MARKET_ALERTS'] == update_v8.CATEGORY_MAP['MARKET_ALERTS']`，并观察下一轮盘中构建该卡正常推进。"
-    evidence: "2026-09-22 实测两表取值分别为 `intraday` 与 `intraday,post_close`。"
-    updated: "2026-09-22 15:12"
+    evidence: "2026-09-22 实测两表取值分别为 `intraday` 与 `intraday,post_close`。｜16:21 已推 commit `4f67f82f`（`cloud_fetch_v8.py` blob `59130e7026`，245876 B）：抓取侧改为 `intraday,post_close`；真 import 断言 `cloud_fetch_v8.CATEGORY_MAP[\"MARKET_ALERTS\"] == update_v8.CATEGORY_MAP[\"MARKET_ALERTS\"]` 通过；真跑 `--category post_close --only MARKET_ALERTS` 已能产出 raw（证明 15:30 档恢复抓取）。"
+    updated: "2026-09-22 16:22"
 
   - id: cloudfetch-us-hk-map-unknown-local-diff
     priority: P1
     owner: shared
-    status: todo
+    status: pending-verify
     what: >
       `cloud_fetch_v8.py` **本地工作树**曾比线上多 +2030 B，其中 **+703 B 是
       `f_us_hk_map()` 的「退避重试增强」**（含「3 次尝试全部失败」注释、署名「小九」），
@@ -2192,13 +2197,17 @@ items:
       与本机 09-22 上午完成的 `US_HK_MAP` 异常分支改造（线上仅「打 error 注解」版，
       commit `302752409981`）**不是同一批**。
     fix: >
-      **待主人拍板**：① 若认可该增强 ⇒ 由知情人补齐后作为独立一笔上线（须带验证证据）；
-      ② 若不认可 ⇒ 从本地工作树撤下，避免下次推送误夹带。
-      ⚠️ 小九本批已**刻意不带入**：`cloud_fetch_v8.py` 改用「以线上真身为基底的**净室重放**」
-      （增量恰为 +1327 B，只有 timeout 修复，零夹带）⇒ 线上该处逻辑未被替他人拍板。
-    verify_how: "主人给出处置结论；若上线则按 `US_HK_MAP` 同口径做三件终验。"
-    evidence: "2026-09-22 实测：本地工作树 244802 B vs 当时线上 242772 B（差 +2030 B）；净室重放版 244099 B（=242772+1327）。已推送版 blob `889155fd77` 即重放版。"
-    updated: "2026-09-22 15:12"
+      ✅ 2026-09-22 16:0x **主人拍板「上线」**，16:21 已推 commit `4f67f82f`（blob `59130e7026`）。
+      🔴 实施时发现源 WIP 有一处**可观测性退化**并已合并修正（未照单全收）：
+      源 WIP 在加 3 次退避重试的同时，**把当日已加上的 `::error` 注解与 `traceback.print_exc()` 删掉了**
+      —— 与本项目「静默吞异常＝双盲区」的既定修复方向相反。
+      现采取**两者兼得**：保留重试（5s/15s 退避），且每次异常仍打印完整栈、
+      `::error` 仅在 **3 次全失败**后打一次（happy path 零噪音）。
+      验证：mock 剧本（1 空→2 异常→3 成功）6/6 通过且不误打注解；反向剧本（3 次全空）恰好打一次注解；
+      真跑 `--category premarket --only US_HK_MAP` → `OK items=86 strong=56 2.0s` EXIT=0。
+    verify_how: "按 `US_HK_MAP` 同口径终验：下一轮 **premarket（08:25）** run 出现 `US_HK_MAP → raw_data/us_hk_map.json` 且无 `::error title=v8-us-hk-map-gen-fail::`；若出现瞬时故障，日志应见「第 N/3 次返回空 → Ms 后重试」并最终成功。"
+    evidence: "2026-09-22 实测：本地工作树 244802 B vs 当时线上 242772 B（差 +2030 B）；净室重放版 244099 B（=242772+1327）。｜16:21 主人批准上线，已推 commit `4f67f82f`：重试增强**基于线上真身净室重放**（非推本地整文件），合并版 245876 B（= 244099 + 1235，含重试 + 恢复可见化 + docstring 校正）。"
+    updated: "2026-09-22 16:22"
   - id: intraday-schedule-morning-absent
     priority: P1
     owner: shared
