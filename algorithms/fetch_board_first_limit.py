@@ -28,11 +28,26 @@ def _latest_trading_day():
 
 def build(date=None):
     import akshare as ak
+    explicit = date is not None
     if date is None:
         date = _latest_trading_day()
     df = ak.stock_zt_pool_em(date=date)
+    if (df is None or len(df) == 0) and not explicit:
+        # 2026-09-23 追加（阿狸咪·夜间窗口）：默认模式下当日无池（凌晨/周末/节假日/源未更新）
+        # 时，向前最多回溯 7 个自然日找最近一个有涨停池的交易日 —— 本卡语义是
+        # 「最近一个已收盘交易日的涨停池观察」，不是「今天必须有」；同日去重护栏保证
+        # 已采集过的交易日不会被回溯档覆盖。显式传日期（手动回补）时不回溯，所见即所得。
+        for _i in range(1, 8):
+            _d = (_now_cst() - datetime.timedelta(days=_i)).strftime('%Y%m%d')
+            _df = ak.stock_zt_pool_em(date=_d)
+            if _df is not None and len(_df) > 0:
+                date = _d
+                df = _df
+                print('BACKFILL: %s 无池 → 回溯到最近有池交易日 %s' % (
+                    _latest_trading_day(), _d))
+                break
     if df is None or len(df) == 0:
-        return None, date, "当日无涨停池数据（非交易日或源未更新）"
+        return None, date, "当日无涨停池数据（非交易日或源未更新，含回溯 7 日）"
     cols = list(df.columns)
     code_k = '代码'; name_k = '名称'; chg_k = '涨跌幅'; price_k = '最新价'
     cmcap_k = '流通市值'; tmcap_k = '总市值'; turn_k = '换手率'
