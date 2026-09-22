@@ -1856,10 +1856,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <!-- 2026-08-08 主人令：最终推荐 = 全站唯一买卖决策入口，置于选股策略左侧并默认激活 -->
   <div class="tab active" data-sec="final" onclick="switchSec('final',this)">🏆 最终推荐</div>
   <div class="tab" data-sec="query" onclick="switchSec('query',this)">🔍 个股查询</div>
-  <!-- 2026-09-15 主人令：选股策略取消加锁，全员可见（原「降级为辅助策略池，仅管理员可见」作废） -->
-  <div class="tab" data-sec="st" onclick="switchSec('st',this)">🎯 选股策略</div>
-  <!-- 2026-09-15 主人令：策略回测取消加锁，全员可见（原「仅管理员可见」作废） -->
-  <div class="tab" data-sec="bt" onclick="switchSec('bt',this)">🧪 策略回测</div>
+  <!-- 2026-09-22 主人令：选股策略恢复加锁，仅管理员可见（作废 2026-09-15「取消加锁·全员可见」） -->
+  <div class="tab locked admin-only" data-sec="st" data-lock="1" onclick="guardLock('st',this)">🔒 选股策略 <span class="lk">[锁]</span></div>
+  <!-- 2026-09-22 主人令：策略回测恢复加锁，仅管理员可见（作废 2026-09-15「取消加锁·全员可见」） -->
+  <div class="tab locked admin-only" data-sec="bt" data-lock="1" onclick="guardLock('bt',this)">🔒 策略回测 <span class="lk">[锁]</span></div>
   <!-- 2026-08-07 主人令：暂未上架 从运维子 Tab 提升为一级 nav（仅管理员可见，guardLock 锁定） -->
   <div class="tab locked admin-only" data-sec="ul" data-lock="1" onclick="guardLock('ul',this)">🔒 暂未上架 <span class="lk">[锁]</span></div>
   <!-- 2026-08-29 主人令：已下架 从运维子 Tab 提升为一级 nav -->
@@ -2969,7 +2969,7 @@ function fmtSigned(v){
 
   </section>
 
-  <!-- ============ 选股策略 ============ -->
+  <!-- ============ 选股策略（2026-09-22 主人令：恢复加锁，仅管理员可见） ============ -->
   <section id="sec-st">
     <div class="sec-head" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h2 style="margin:0;">🎯 选股策略</h2>
@@ -5460,13 +5460,13 @@ function fmtSigned(v){
 <!-- 2026-09-13 修复：此处原为畸形残骸（注释未闭合 + 混入 </script>），已删除。正确注释见下方 <section id="sec-bt"> 前。 -->
 
 
-<!-- ============ 策略回测（统一 · 2026-08-13 主人令；2026-09-15 取消加锁） ============
+<!-- ============ 策略回测（统一 · 2026-08-13 主人令；2026-09-22 恢复加锁） ============
      2026-09-16 主人令「统一口径、只留优质」重构：
        ① 口径只剩一套 —— 每个算法取自己「最佳持有期」的真实收益率与胜率（样本≥30）；
        ② 下方按「四量终极 / 三重共识 / 强势跟踪 / 逆势龙头」展示，其余全部删除；
           （2026-09-20 主人令：因子实验室亦退出本页 —— 不是选股策略，不回测不展示）
        ③ 「完整明细」折叠外壳删除，各策略逐档明细常驻展开。
-     2026-09-15 主人令：取消加锁，全员可见。 -->
+     2026-09-22 主人令：恢复加锁，仅管理员可见（作废 2026-09-15「取消加锁」）。 -->
   <section id="sec-bt">
     <div class="sec-head"><h2>📈 回测汇总</h2><span class="tag">四量 · 三重 · 强势跟踪 · 逆势龙头 · 一站看完</span><span class="fresh" id="btFresh">—</span></div>
     <!-- 2026-09-15 主人令：真实数据回测声明横幅 -->
@@ -8781,7 +8781,7 @@ window.__renderIndexObserve = function(){
   <div class="lockcard">
     <div class="lk">🔒</div>
     <h3>管理员验证</h3>
-    <p>运维与逻辑详解板块需要管理员权限</p>
+    <p>选股策略 / 策略回测 / 运维 / 逻辑详解 板块需要管理员权限</p>
     <input id="adminPwd" type="password" placeholder="输入管理员口令" onkeydown="if(event.key==='Enter')tryUnlock()" />
     <div class="err" id="lockErr"></div>
     <button class="btn" onclick="tryUnlock()">解锁</button>
@@ -8811,7 +8811,7 @@ async function tryUnlock(){
     document.getElementById('adminState').innerHTML='<b>管理员已登录</b>';
     document.getElementById('adminBtn').textContent='退出';
     document.getElementById('adminBtn').setAttribute('onclick','logout()');
-    /* 仅解锁带 data-lock 的真锁页；公开 tab（选股策略/策略回测）不受影响 */
+    /* 解锁全部带 data-lock 的真锁页（暂未上架/已下架/运维/选股策略/策略回测）；无锁公开 tab 不在此列 */
     document.querySelectorAll('.tab[data-lock="1"]').forEach(t=>{t.classList.remove('locked');const s=t.querySelector('.lk');if(s)s.remove();});
     document.querySelectorAll('.tab.admin-only').forEach(t=>t.style.display='flex');
     switchSec('op',document.querySelector('[data-sec="op"]'));
@@ -8872,6 +8872,13 @@ setInterval(_v8ForceUnlockAdminTabs, 1500);
 
 /* ===== 板块切换 ===== */
 function switchSec(sec,el){
+  /* 2026-09-22 主人令：真锁页「内容层」强制守卫（一劳永逸）。
+     原实现只在 nav 点击时经 guardLock 拦一次，switchSec 本身零校验 ⇒
+     控制台调用 / 刷新恢复 / URL 深链 / 其它模块内部调用 都能直接切进锁页看到内容。
+     此处统一收口：目标 tab 带 data-lock="1" 且非管理员 ⇒ 拒绝切换并弹锁。
+     对 暂未上架/已下架/运维/选股策略/策略回测 一体生效，不搞特例。 */
+  var _lkTab=document.querySelector('.tab[data-sec="'+sec+'"][data-lock="1"]');
+  if(_lkTab && !isAdmin()){ openLock(); return; }
   if(!el) el=document.querySelector('[data-sec="'+sec+'"]');
   document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
   var secEl=document.getElementById('sec-'+sec);
@@ -14931,7 +14938,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     if(h)safe(renderHistory,h);
   }
   initTriple();
-  // 2026-09-15 主人令：选股策略已取消加锁（全员可见），切 tab 时仍需刷新三重共识以防缓存
+  // 2026-09-22 主人令：选股策略已恢复加锁（仅管理员可见），切 tab 时仍需刷新三重共识以防缓存
   document.querySelectorAll('.tab[data-sec="st"]').forEach(t=>t.addEventListener('click', function(){
     if(typeof isAdmin==='function' && isAdmin()) setTimeout(initTriple, 60);
   }));
@@ -19055,7 +19062,16 @@ window.__renderV8CalToday();
 
     var sec;
     if(_isReload && _saved){
-      sec = _saved;                                          // 刷新：停在用户正在看的那一页
+      /* 2026-09-22 主人令：真锁页恢复校验（一劳永逸）。
+         漏洞：v8_boot_sec 是「点过就记」，管理员登录期间点过 st/bt ⇒ 同标签页登出后刷新，
+         恢复逻辑会把访客直接送进锁页看到内容。此处统一校验：恢复目标为真锁页且非管理员 ⇒ 丢弃记忆。
+         丢弃后落到静态默认（最终推荐），不再走时段判定，避免与 ② 段语义混淆。 */
+      var _sk=document.querySelector('.tab[data-sec="'+_saved+'"][data-lock="1"]');
+      if(_sk && typeof isAdmin==='function' && !isAdmin()){
+        try{ sessionStorage.removeItem('v8_boot_sec'); }catch(e){}
+        _saved = null;
+      }
+      sec = _saved || 'final';                               // 刷新：停在用户正在看的那一页
     }else{
       // ── ② 时段判定（北京时间；UTC 偏移换算，不依赖浏览器本地时区）──
       var d = new Date();
