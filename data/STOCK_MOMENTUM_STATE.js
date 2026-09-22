@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-22 18:57",
- "generated": "2026-09-22 18:57",
+ "update_time": "2026-09-22 19:04",
+ "generated": "2026-09-22 19:04",
  "meta": {
-  "generated": "2026-09-22 18:57",
+  "generated": "2026-09-22 19:04",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 13,
   "days_with_consensus": 0,
@@ -5245,15 +5245,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600540",
       "name": "新赛股份",
-      "change_pct": 6.726,
-      "price": 6.03,
+      "change_pct": 6.195,
+      "price": 6.0,
+      "category": "突破"
+     },
+     {
+      "code": "300464",
+      "name": "星徽股份",
+      "change_pct": 3.367,
+      "price": 12.28,
       "category": "突破"
      },
      {
       "code": "600792",
       "name": "云煤能源",
-      "change_pct": 5.311,
-      "price": 5.75,
+      "change_pct": 5.678,
+      "price": 5.77,
       "category": "突破"
      },
      {
@@ -5264,38 +5271,31 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "002328",
-      "name": "新朋股份",
-      "change_pct": 3.176,
-      "price": 8.77,
-      "category": "突破"
-     },
-     {
       "code": "300369",
       "name": "绿盟科技",
-      "change_pct": 4.541,
-      "price": 9.9,
+      "change_pct": 4.857,
+      "price": 9.93,
       "category": "突破"
      },
      {
       "code": "300290",
       "name": "ST荣科",
-      "change_pct": 8.263,
-      "price": 7.73,
+      "change_pct": 8.403,
+      "price": 7.74,
       "category": "突破"
      },
      {
       "code": "003006",
       "name": "百亚股份",
-      "change_pct": 3.725,
-      "price": 22.0,
+      "change_pct": 3.678,
+      "price": 21.99,
       "category": "突破"
      },
      {
       "code": "688112",
       "name": "鼎阳科技",
-      "change_pct": 14.402,
-      "price": 105.01,
+      "change_pct": 14.98,
+      "price": 105.54,
       "category": "突破"
      },
      {
@@ -5308,15 +5308,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "601999",
       "name": "出版传媒",
-      "change_pct": 3.156,
-      "price": 7.19,
+      "change_pct": 3.013,
+      "price": 7.18,
       "category": "突破"
      },
      {
       "code": "600857",
       "name": "宁波中百",
-      "change_pct": 3.545,
-      "price": 24.24,
+      "change_pct": 3.674,
+      "price": 24.27,
       "category": "突破"
      },
      {
@@ -5329,43 +5329,43 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605168",
       "name": "三人行",
-      "change_pct": 5.92,
-      "price": 56.18,
+      "change_pct": 5.901,
+      "price": 56.17,
       "category": "突破"
      },
      {
       "code": "001326",
       "name": "联域股份",
-      "change_pct": 4.054,
-      "price": 98.55,
+      "change_pct": 5.1,
+      "price": 99.54,
       "category": "突破"
      },
      {
       "code": "301122",
       "name": "采纳股份",
-      "change_pct": 11.318,
-      "price": 59.31,
+      "change_pct": 11.074,
+      "price": 59.18,
       "category": "突破"
      },
      {
       "code": "300691",
       "name": "联合光电",
-      "change_pct": 8.671,
-      "price": 19.3,
+      "change_pct": 8.953,
+      "price": 19.35,
       "category": "突破"
      },
      {
       "code": "301041",
       "name": "金百泽",
-      "change_pct": 3.453,
-      "price": 37.45,
+      "change_pct": 3.287,
+      "price": 37.39,
       "category": "突破"
      },
      {
       "code": "001389",
       "name": "广合科技",
-      "change_pct": 6.841,
-      "price": 198.65,
+      "change_pct": 6.599,
+      "price": 198.2,
       "category": "突破"
      },
      {
@@ -5387,15 +5387,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600540",
       "name": "新赛股份",
-      "change_pct": 6.726,
-      "price": 6.03,
+      "change_pct": 6.195,
+      "price": 6.0,
+      "category": "加速"
+     },
+     {
+      "code": "300464",
+      "name": "星徽股份",
+      "change_pct": 3.367,
+      "price": 12.28,
       "category": "加速"
      },
      {
       "code": "600792",
       "name": "云煤能源",
-      "change_pct": 5.311,
-      "price": 5.75,
+      "change_pct": 5.678,
+      "price": 5.77,
       "category": "加速"
      },
      {
@@ -5406,38 +5413,31 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "002328",
-      "name": "新朋股份",
-      "change_pct": 3.176,
-      "price": 8.77,
-      "category": "加速"
-     },
-     {
       "code": "300369",
       "name": "绿盟科技",
-      "change_pct": 4.541,
-      "price": 9.9,
+      "change_pct": 4.857,
+      "price": 9.93,
       "category": "加速"
      },
      {
       "code": "300290",
       "name": "ST荣科",
-      "change_pct": 8.263,
-      "price": 7.73,
+      "change_pct": 8.403,
+      "price": 7.74,
       "category": "加速"
      },
      {
       "code": "003006",
       "name": "百亚股份",
-      "change_pct": 3.725,
-      "price": 22.0,
+      "change_pct": 3.678,
+      "price": 21.99,
       "category": "加速"
      },
      {
       "code": "688112",
       "name": "鼎阳科技",
-      "change_pct": 14.402,
-      "price": 105.01,
+      "change_pct": 14.98,
+      "price": 105.54,
       "category": "加速"
      },
      {
@@ -5450,15 +5450,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "601999",
       "name": "出版传媒",
-      "change_pct": 3.156,
-      "price": 7.19,
+      "change_pct": 3.013,
+      "price": 7.18,
       "category": "加速"
      },
      {
       "code": "600857",
       "name": "宁波中百",
-      "change_pct": 3.545,
-      "price": 24.24,
+      "change_pct": 3.674,
+      "price": 24.27,
       "category": "加速"
      },
      {
@@ -5471,29 +5471,29 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605168",
       "name": "三人行",
-      "change_pct": 5.92,
-      "price": 56.18,
+      "change_pct": 5.901,
+      "price": 56.17,
       "category": "加速"
      },
      {
       "code": "001326",
       "name": "联域股份",
-      "change_pct": 4.054,
-      "price": 98.55,
+      "change_pct": 5.1,
+      "price": 99.54,
       "category": "加速"
      },
      {
       "code": "301122",
       "name": "采纳股份",
-      "change_pct": 11.318,
-      "price": 59.31,
+      "change_pct": 11.074,
+      "price": 59.18,
       "category": "加速"
      },
      {
       "code": "300691",
       "name": "联合光电",
-      "change_pct": 8.671,
-      "price": 19.3,
+      "change_pct": 8.953,
+      "price": 19.35,
       "category": "加速"
      }
     ],
@@ -5508,15 +5508,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600540",
       "name": "新赛股份",
-      "change_pct": 6.726,
-      "price": 6.03,
+      "change_pct": 6.195,
+      "price": 6.0,
+      "category": "短线选股"
+     },
+     {
+      "code": "300464",
+      "name": "星徽股份",
+      "change_pct": 3.367,
+      "price": 12.28,
       "category": "短线选股"
      },
      {
       "code": "600792",
       "name": "云煤能源",
-      "change_pct": 5.311,
-      "price": 5.75,
+      "change_pct": 5.678,
+      "price": 5.77,
       "category": "短线选股"
      },
      {
@@ -5527,38 +5534,31 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "002328",
-      "name": "新朋股份",
-      "change_pct": 3.176,
-      "price": 8.77,
-      "category": "短线选股"
-     },
-     {
       "code": "300369",
       "name": "绿盟科技",
-      "change_pct": 4.541,
-      "price": 9.9,
+      "change_pct": 4.857,
+      "price": 9.93,
       "category": "短线选股"
      },
      {
       "code": "300290",
       "name": "ST荣科",
-      "change_pct": 8.263,
-      "price": 7.73,
+      "change_pct": 8.403,
+      "price": 7.74,
       "category": "短线选股"
      },
      {
       "code": "003006",
       "name": "百亚股份",
-      "change_pct": 3.725,
-      "price": 22.0,
+      "change_pct": 3.678,
+      "price": 21.99,
       "category": "短线选股"
      },
      {
       "code": "688112",
       "name": "鼎阳科技",
-      "change_pct": 14.402,
-      "price": 105.01,
+      "change_pct": 14.98,
+      "price": 105.54,
       "category": "短线选股"
      },
      {
@@ -5571,15 +5571,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "601999",
       "name": "出版传媒",
-      "change_pct": 3.156,
-      "price": 7.19,
+      "change_pct": 3.013,
+      "price": 7.18,
       "category": "短线选股"
      },
      {
       "code": "600857",
       "name": "宁波中百",
-      "change_pct": 3.545,
-      "price": 24.24,
+      "change_pct": 3.674,
+      "price": 24.27,
       "category": "短线选股"
      },
      {
@@ -5592,43 +5592,43 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605168",
       "name": "三人行",
-      "change_pct": 5.92,
-      "price": 56.18,
+      "change_pct": 5.901,
+      "price": 56.17,
       "category": "短线选股"
      },
      {
       "code": "001326",
       "name": "联域股份",
-      "change_pct": 4.054,
-      "price": 98.55,
+      "change_pct": 5.1,
+      "price": 99.54,
       "category": "短线选股"
      },
      {
       "code": "301122",
       "name": "采纳股份",
-      "change_pct": 11.318,
-      "price": 59.31,
+      "change_pct": 11.074,
+      "price": 59.18,
       "category": "短线选股"
      },
      {
       "code": "300691",
       "name": "联合光电",
-      "change_pct": 8.671,
-      "price": 19.3,
+      "change_pct": 8.953,
+      "price": 19.35,
       "category": "短线选股"
      },
      {
       "code": "301041",
       "name": "金百泽",
-      "change_pct": 3.453,
-      "price": 37.45,
+      "change_pct": 3.287,
+      "price": 37.39,
       "category": "短线选股"
      },
      {
       "code": "001389",
       "name": "广合科技",
-      "change_pct": 6.841,
-      "price": 198.65,
+      "change_pct": 6.599,
+      "price": 198.2,
       "category": "短线选股"
      },
      {
@@ -5643,15 +5643,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301041",
       "name": "金百泽",
-      "change_pct": 3.453,
-      "price": 37.45,
+      "change_pct": 3.287,
+      "price": 37.39,
       "category": "强势股"
      },
      {
       "code": "001389",
       "name": "广合科技",
-      "change_pct": 6.841,
-      "price": 198.65,
+      "change_pct": 6.599,
+      "price": 198.2,
       "category": "强势股"
      },
      {
