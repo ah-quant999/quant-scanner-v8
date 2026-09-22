@@ -1,5 +1,5 @@
 {
-  "calc_time": "2026-09-22 22:46:40",
+  "calc_time": "2026-09-22 23:32:49",
   "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
   "hold_periods_tested": [
     1,
@@ -52840,5 +52840,5 @@
       ]
     }
   },
-  "update_stamp": 1790088400
+  "update_stamp": 1790091169
 }
