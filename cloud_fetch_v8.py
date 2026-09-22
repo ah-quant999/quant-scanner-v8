@@ -1513,7 +1513,12 @@ def f_us_hk_map():
         _spec.loader.exec_module(_mod)
         return _mod.build()
     except Exception as _e:  # noqa: BLE001
+        # 🔴 静默吞异常 = 「双盲区」：run 全绿、卡片却冻结数日（2026-09-22 实事故）。
+        # 生成器异常必须打印完整栈 + GitHub ::error 注解，让云端失败可见、可追。
+        import traceback as _tb
         print("  ⚠️ US_HK_MAP: 生成器执行异常 %s" % _e)
+        _tb.print_exc()
+        print("::error title=v8-us-hk-map-gen-fail::US_HK_MAP 生成器异常: %s" % _e)
         return None
 
 

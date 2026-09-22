@@ -919,7 +919,8 @@ jobs:
           PROBE = {
               "intraday":   ["LIMIT_UP_HEATMAP.js", "CONCEPT_RANKING.js", "CAPITAL_FLOW_DATA.js",
                              "SECTOR_FUND_FLOW.js", "INDEX_QUOTES.js", "CANDIDATE_QUOTES.js"],
-              "premarket":  ["JUDGMENT_DATA.js", "CRISIS_DATA.js", "LIMIT_UP_HEATMAP.js"],
+              "premarket":  ["JUDGMENT_DATA.js", "CRISIS_DATA.js", "LIMIT_UP_HEATMAP.js",
+                             "US_HK_MAP.js", "V8_CALENDAR.js", "MARGIN_DATA.js"],
               "post_close": ["LHB_DATA.js", "CANDIDATE_QUOTES.js", "CAPITAL_FLOW_DATA.js"],
           }
           files = PROBE.get(cat)
