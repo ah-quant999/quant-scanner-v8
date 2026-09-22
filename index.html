@@ -18250,12 +18250,21 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     setTimeout(function(){ fin(null); }, 5000);   // 跨境长尾保护：5 秒未回也算失败
   }
   function _reloadForData(remoteStamp){
-    try{
-      var b = location.href.split('#')[0];
-      var sep = b.indexOf('?') >= 0 ? '&' : '?';
-      var stamp = (remoteStamp || '').replace(/[^0-9A-Za-z:_\- ]/g, '');
-      location.replace(b + sep + 'fresh=' + encodeURIComponent(stamp));
-    }catch(e){ try{ location.reload(true); }catch(e2){} }
+    /* 🔴 2026-09-22 小九根治「一直刷新，连页面都看不了」
+       （主人令：说好 15 分钟自动刷新一次就不要乱变动）。
+       血证：?v= 缓存戳被 v8-cache-bot / v8-cloud-bot 每 1-3 分钟重写一次
+       （实测 16:09-16:38 共 12 次 index.html 提交）⇒ Pages 每次重新部署
+       ⇒ 本探测读的 data/HEALTH_CHECK.js Last-Modified 每 2-3 分钟就变
+       （实测 16:35:20 -> 16:38:47，三分钟内变两次）。老写法于是在这里
+       location.replace(url + '&fresh=' + stamp)：
+         ① 每 2 分钟就把整页重载一次（远密于承诺的 15 分钟）；
+         ② ?fresh= 每次都不同 ⇒ URL 恒变 ⇒ HTTP 缓存全部失效 ⇒ 每次全量
+            重下 1.3MB index.html + 43 个 data/*.js（含 4.4MB STOCK_QUOTE.js）
+            ⇒ 跨境加载长期转圈 ⇒ 主人看到「连页面都看不了」。
+       ⇒ 自动刷新唯一归口 = __v8SmartRefreshStarted 的时段刷新
+         （交易日盘中 09:30-11:30 / 13:00-15:00 每 15 分钟）。
+         本函数此后只记录数据戳，绝不自行导航。 */
+    try{ sessionStorage.setItem(PROBE_KEY, remoteStamp || ''); }catch(e){}
   }
   function _tick(){
     var iv = _probeIvMs();
