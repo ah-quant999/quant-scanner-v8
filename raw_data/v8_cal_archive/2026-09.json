@@ -1,6 +1,6 @@
 {
  "month": "2026年9月",
- "update_time": "2026-09-21 17:05",
+ "update_time": "2026-09-22 08:20",
  "legend": [
   {
    "title": "重要政策",
@@ -351,24 +351,24 @@
     {
      "num": 21,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "LPR利率报价（1年/5年以上）",
        "cls": "cb",
-       "released": false
+       "released": true
       },
       {
        "text": "🇺🇸 美国领先指标",
        "cls": "us",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 22,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": []
     },
     {
