@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 09:22"
+  updated: "2026-09-22 09:24"
   updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -186,7 +186,7 @@ items:
       重写工作树 + index」的签名吻合。⚠️ 本项 fix 已治过 8 文件，但上述 2 处**未被 fix 覆盖**
       ⇒ 请小九按 §fix 同法给这两处 checkout 后补 `git reset -q HEAD -- <paths>`；
       在根因清理前，本项**不应**再判 pending-verify。
-    updated: "2026-09-21 08:40"
+    updated: "2026-09-22 09:24"
 
   - id: alimi-same-family-check
     priority: P0
@@ -811,7 +811,7 @@ items:
       —— 该链正是被静默注销的那条。
       ⏳ 本项**仍维持 `pending-verify`（未转 done）**：按 `verify_how` 须再观察 1 个交易日，
         且**只看 `event=schedule`、不看总 run 数**。请你复核后决定是否转 done。
-    updated: "2026-09-21 18:45"
+    updated: "2026-09-22 09:24"
 
   - id: intraday-guard-window-gap
     priority: P1
@@ -1564,7 +1564,7 @@ items:
       ⚠️ 本地工作树两件虽仍未跟踪（HEAD 滞后所致），但**注入读的是本地文件**、与 git 跟踪无关
       ⇒ ③ 的判据（是否被注入上下文）**不受影响**，本项判 done。
       📎 旁证（不属本项、提请小九复核）：`HANDOFF.ledger.json` 另有 5 项哈希陈旧（handoff-meta-future-timestamp / cnfetch-empty-shell-block / maharo-plan-b-three-editions / north-fund-dead-source-fix / stock-name-code-fallback，22:02 刷新后仍 30/36 自洽；本项旧值已溯源至 3817f22c6=20:39 版，规则=整块rstrip+updated归一化+含尾注释）。本批只刷本项，其余不擅改。
-    updated: "2026-09-21 22:23"
+    updated: "2026-09-22 09:24"
   - id: maharo-plan-b-three-editions
     priority: P2
     owner: 小九
