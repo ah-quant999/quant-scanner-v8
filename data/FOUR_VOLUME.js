@@ -1,10 +1,10 @@
 window.FOUR_VOLUME={
- "update_time": "2026-09-22 18:17:27",
+ "update_time": "2026-09-22 18:52:17",
  "total": 6,
  "stocks": [
   {
    "code": "688105",
-   "name": "诺唯赞",
+   "name": "诺唯赞生物",
    "market": "sh",
    "board_label": "科创板",
    "close": 26.45,
