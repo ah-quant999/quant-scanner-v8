@@ -2153,17 +2153,17 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>08:25 <code>v8_cn_fetch_cloud</code> premarket</td><td>盘前数据抓取</td><td>云端 ubuntu</td></tr>
           <tr><td>08:30 / 09:30 周六 <code>v8_t1_guard</code></td><td>周六 T+1 兜底 + 巡检</td><td>云端 ubuntu</td></tr>
           <tr><td>08:07 起每 15 分 <code>v8_cn_fetch_watchdog</code></td><td>抓取看门狗（按陈旧度自动补派）</td><td>云端 ubuntu</td></tr>
-          <tr><td>09:00 <code>v8_algo_intraday_lite</code> / <code>v8_risk_gauge</code> / <code>v8_stock_quote_refresh</code></td><td>盘中类首档</td><td>云端 ubuntu</td></tr>
+          <tr><td>09:00 <code>v8_algo_intraday_lite</code> / <code>v8_risk_gauge</code> / <code>v8_stock_quote_refresh</code></td><td>盘中类首档</td><td><code>v8_algo_intraday_lite</code> / <code>v8_risk_gauge</code> 云端 ubuntu；<code>v8_stock_quote_refresh</code> 小九 cn（<code>[self-hosted, cn]</code>）</td></tr>
           <tr><td rowspan="5"><b>盘中</b><br>09:30-<br>15:00</td><td>09:40-15:00 每 20 分共 <b>14 档</b> <code>v8_cn_fetch_intraday_lemoncat</code></td><td>准点档调度器 → 派发 <code>v8_cn_fetch_cloud</code>(intraday) → 失败转 cn 兜底</td><td>调度器 GitHub ubuntu；被派发抓取跑云端 ubuntu，失败转小九 cn</td></tr>
           <tr><td>09:00-15:50 每 10 分 <code>v8_intraday_snapshot</code></td><td>板块资金日内快照</td><td>云端 ubuntu</td></tr>
-          <tr><td>每 30 分 <code>v8_stock_quote_refresh</code> + <code>v8_risk_gauge</code></td><td>行情 / 风险温度计</td><td>cn self-hosted / 云端 ubuntu</td></tr>
+          <tr><td>每 30 分 <code>v8_stock_quote_refresh</code> + <code>v8_risk_gauge</code></td><td>行情 / 风险温度计</td><td><code>v8_stock_quote_refresh</code> 主链跑小九 cn（relay ② 主链优先；主链排队 ≥10 分未起 job 才改派 <code>v8_stock_quote_refresh_cloud</code> 云端兜底）；<code>v8_risk_gauge</code> 跑云端 ubuntu</td></tr>
           <tr><td>11:00 / 13:00 / 15:00 <code>v8_algo_intraday_lite</code></td><td>盘中算法追踪（轻量）：跑 <code>gen_algo_track</code> 刷新三算法追踪（ALGO_TRACK）；<b>不重算盘后实验卡</b>（本环境不装 requirements.txt，实验卡归云端构建）；<b>体检红灯不阻断推送</b>（体检结论非 ok 时该步照常亮红可见，但本链产物仍照常推 main —— 2026-09-16 修：此前红灯会把整轮产物一起 skip）</td><td>云端 ubuntu</td></tr>
           <tr><td>每 30 分 <code>v8_health_patrol</code>；每 15 分 <code>v8_cache_buster_reconcile</code></td><td>巡检 / 缓存戳对齐（全天）</td><td>云端 ubuntu</td></tr>
           <tr><td rowspan="3"><b>盘后</b><br>15:05-<br>次日<br>09:00</td><td>16:30 <code>v8_cn_fetch_experiments</code></td><td>实验卡（暂未上架区）</td><td>云端 ubuntu</td></tr>
           <tr><td><b>16:40 / 18:10 / 20:00 / 21:00 / 22:30 / 00:30 / 06:00 / 08:00</b> 八个唤醒点 <code>v8_algo_cloud</code></td><td>跑哪批由闸门定：<b>A 采集 → B 选股 → D 汇总 → E 回测</b></td><td><code>[self-hosted, cn]</code> 双机谁空谁跑</td></tr>
           <tr><td>17:20 / 18:20 / 19:20 <code>v8_cn_fetch_cloud</code> post_close</td><td>盘后三档抓取</td><td>云端 ubuntu</td></tr>
         </table>
-        <div class="logic-h">补充：本表之外仍在跑的定时项（防漏）</div>
+        <div class="logic-p" style="border-left:3px solid #fbbf24;padding-left:10px;"><b>2026-09-22 口径校正</b>：本表「09:00 首档」与「盘中每 30 分」两行的归属列原把 <code>v8_stock_quote_refresh</code> 一并写成「云端 ubuntu」，<b>与真身不符</b>——实测其主链 <code>runs-on: [self-hosted, cn]</code>（小九机·中国 IP，2026-09-08 主人令回迁，根治新浪/东财盘中反爬），云端 <code>v8_stock_quote_refresh_cloud</code> 仅作兜底。本次按真身逐条校正（见上表两行）。</div><div class="logic-h">补充：本表之外仍在跑的定时项（防漏）</div>
         <table class="lg-table">
           <tr><th>时点</th><th>Workflow / 任务</th><th>干什么</th><th>归属</th></tr>
           <tr><td><b>16:00-08:59</b> 每小时 :10</td><td>「盘后算法链接力推进器」（本机自动化）</td><td><b>盘后链实际主力</b>：先查无在跑 → 跑闸门 → 只按 <code>proceed</code> 派发 <code>v8_algo_cloud</code>（不带 stage）</td><td>阿狸咪机</td></tr>
