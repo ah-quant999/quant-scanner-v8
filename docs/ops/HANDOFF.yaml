@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 13:55"
+  updated: "2026-09-22 15:12"
   updated_by: 阿狸咪(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 42
+  next_id_seq: 46
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -2041,3 +2041,107 @@ items:
       ② 若选择方案②，`index.html` 的 `data/STOCK_QUOTE.js?v=` 值应随内容变化**单调递增**，
         并与其余 108 处口径一致（同为 unix 秒量级令牌）。
     updated: "2026-09-22 13:55"
+
+  # ── P1/P2 · 假绿缺口（2026-09-22 小九实证并修复） ───────────────────────
+  - id: market-alerts-subprocess-timeout
+    priority: P1
+    owner: 小九(lemoncat-cn)
+    status: pending-verify
+    what: >
+      「市场预警」卡（实时数据页 / `MARKET_ALERTS`）恒冻在 `昨日 20:51`，
+      但盘中链当天 20+ 轮 run 全 success、闸门全绿、软失败清单里也没有它。
+      真因 = **子进程硬超时**（双盲区事故家族第四种死因）：云端跨境抓
+      `ak.stock_zh_a_spot_em()`（全A 5918 只 / 59 页）超 90s（本机实测 79.8s，云端 ×2~3）
+      ⇒ `f_market_alerts()` 抛 RuntimeError ⇒ `run()` 异常分支**不执行 `save()`**
+      ⇒ raw 字节不变 ⇒ 第17/23 步 `git status --porcelain` 看不见变更 ⇒ 静默跳过推送
+      ⇒ `data/*.js` 不重建。而 `MARKET_ALERTS` **不在** `_CRIT_INTRADAY`
+      （仅 `CANDIDATE_QUOTES`/`INDEX_QUOTES`）⇒ 整轮仍标 success = **假绿**。
+      根因与症状之间隔着三层解耦（超时→不写盘→git 无变更），故最难反推。
+    fix: >
+      三处（改动面严格限于「孤儿脚本内部 + 一个函数 timeout 常量 + health_check 登记字段」；
+      `v8_cn_fetch_cloud.yml` 与 `index.html` **未动** ⇒ 盘中链行为逐字节不变）：
+      ① `algorithms/fetch_orphan_market_alerts.py`：`fetch_a_spot()` 新增**东财轻量快路径**
+      （涨/跌/平 `push2.eastmoney.com/api/qt/ulist.np/get` 沪+深相加；
+      涨停 `push2ex.eastmoney.com/getTopicZTPool` / 跌停 `getTopicDTPool`），
+      实测 89s → **13.97s**；原 akshare 路径**原样保留为兜底**（新接口挂了不断源，只变慢）。
+      ② `cloud_fetch_v8.py::f_market_alerts()`：`_MA_TIMEOUT` 90 → **240s**；
+      异常/非零退出改打 `::error title=v8-market-alerts-fail::` 并 `raise`（不再静默）。
+      ③ `v8_health_check.py::CARD_DEFS`：`MARKET_ALERTS` 补 `heal_cat=intraday` /
+      `raw_file` / `producer`（**原缺 `heal_cat` ⇒ 自愈链断**）。
+    verify_how: >
+      推仓后判据（**禁以 run success 当判据**）：
+      ① 线上 `data/MARKET_ALERTS.js?nc=<epoch>` 的 `update_time` 推进到 **09-22 或更晚**；
+      ② 下一轮 `v8_cn_fetch_cloud` run 日志出现 `✓ 涨跌家数(东财)` 且**无** `timed out after`；
+      ③ `HEALTH_CHECK.js` 中该卡转 `ok`（age < 红线 120min）。
+    evidence: >
+      推送已完成：commit `27190861d838`（2026-09-22 15:09 CST），
+      三文件当场回读**逐字节一致**（blob `7a3e636a3b` 21068 B / `889155fd77` 244099 B /
+      `2d09171d7b` 219660 B）；推送前线上基线 16553/242772/218596 B，
+      md5 `03032da994e8`/`38dd387c8ce9`/`ede8752682a8`（三方对齐核对，无漂移）。
+      云端铁证（run 日志，经 `GET /actions/runs/{id}/logs` 取得；**实测本 token 可读日志**，
+      推翻旧记录「缺 actions:read」）：`>>> MARKET_ALERTS 2026-09-22T12:00:54+08:00`
+      → `失败(attempt 1~3/3): RuntimeError: ... timed out after 90 seconds`
+      → `🚫 MARKET_ALERTS 跳过` → `⏭️ 数据未变，跳过重写（幂等）`；
+      时间自洽：`03:59:58` ETF_PULSE ✅ → `04:05:32` 三轮全灭 ≈ 5.5min = 3×90s + 重试间隔。
+      端到端：`python cloud_fetch_v8.py --category intraday --only MARKET_ALERTS` → EXIT=0；
+      字段契约 7/7 键集+类型完全一致（零破坏性变更）；三文件纯 LF + AST 通过。
+    note: >
+      ⏳ 状态为 `pending-verify`：代码已上线，但**尚未被 run 验证生效**，不得宣称「已修复」。
+      同族「双盲区」另立三项见下。方法论已沉淀至本机 skill `v8-double-blind-guard`
+      §9.29~§9.32（含「换源不调阈值」「工具自称 dry 陷阱」「净室重放」）。
+    updated: "2026-09-22 15:12"
+
+  - id: probe-intraday-missing-market-alerts
+    priority: P2
+    owner: shared
+    status: todo
+    what: >
+      `v8_cn_fetch_cloud.yml` 落地探针 `PROBE["intraday"]` 白名单
+      = `LIMIT_UP_HEATMAP.js / CONCEPT_RANKING.js / CAPITAL_FLOW_DATA.js /
+      SECTOR_FUND_FLOW.js / INDEX_QUOTES.js / CANDIDATE_QUOTES.js`，
+      **不含 `MARKET_ALERTS.js`** ⇒ 该卡停更时探针**看不见**它
+      ⇒ 与 09-22 `US_HK_MAP`（premarket 档）同族的双盲区。
+    fix: >
+      把 `MARKET_ALERTS.js` 补进 `PROBE["intraday"]`。
+      ⚠️ 若该 PROBE 与 `v8_cn_fetch_watchdog.yml` 内同名清单自称「单一事实来源」，
+      **必须两处同改**（两文件格式可能差空格，锚件不可互抄）。
+    verify_how: "改后确认两文件清单一致；下一轮 intraday run 的探针步输出含 MARKET_ALERTS.js。"
+    evidence: "2026-09-22 小九实测：`v8_cn_fetch_cloud.yml` 该行清单 6 项，无 MARKET_ALERTS.js。"
+    updated: "2026-09-22 15:12"
+
+  - id: category-map-two-table-drift
+    priority: P2
+    owner: shared
+    status: todo
+    what: >
+      `MARKET_ALERTS` 档位两表不一致：抓取侧 `cloud_fetch_v8.py::CATEGORY_MAP`
+      = `"intraday"`（L159），而注入侧 `update_v8.py::CATEGORY_MAP`
+      = `"intraday,post_close"`（L236）。
+      潜在后果：盘中轮次构建时注入侧会把它当含 post_close 的产物，
+      与 `_pure_pc` 防回滚护栏的判定口径产生偏差（本批实测未触发，属隐患）。
+    fix: >
+      统一两表档位口径。改前先确认哪一侧权威：该卡实际仅盘中有产
+      ⇒ 以 `intraday` 为准，注入侧去掉 `,post_close`；
+      但**须先验证注入侧去掉后盘中构建仍会重建它**（避免反向造成不重建）。
+    verify_how: "改后断言 `cloud_fetch_v8.CATEGORY_MAP['MARKET_ALERTS'] == update_v8.CATEGORY_MAP['MARKET_ALERTS']`，并观察下一轮盘中构建该卡正常推进。"
+    evidence: "2026-09-22 实测两表取值分别为 `intraday` 与 `intraday,post_close`。"
+    updated: "2026-09-22 15:12"
+
+  - id: cloudfetch-us-hk-map-unknown-local-diff
+    priority: P1
+    owner: shared
+    status: todo
+    what: >
+      `cloud_fetch_v8.py` **本地工作树**曾比线上多 +2030 B，其中 **+703 B 是
+      `f_us_hk_map()` 的「退避重试增强」**（含「3 次尝试全部失败」注释、署名「小九」），
+      **线上没有、未提交、来源不明** —— 疑似同机另一会话/另一台机的在建工作。
+      与本机 09-22 上午完成的 `US_HK_MAP` 异常分支改造（线上仅「打 error 注解」版，
+      commit `302752409981`）**不是同一批**。
+    fix: >
+      **待主人拍板**：① 若认可该增强 ⇒ 由知情人补齐后作为独立一笔上线（须带验证证据）；
+      ② 若不认可 ⇒ 从本地工作树撤下，避免下次推送误夹带。
+      ⚠️ 小九本批已**刻意不带入**：`cloud_fetch_v8.py` 改用「以线上真身为基底的**净室重放**」
+      （增量恰为 +1327 B，只有 timeout 修复，零夹带）⇒ 线上该处逻辑未被替他人拍板。
+    verify_how: "主人给出处置结论；若上线则按 `US_HK_MAP` 同口径做三件终验。"
+    evidence: "2026-09-22 实测：本地工作树 244802 B vs 当时线上 242772 B（差 +2030 B）；净室重放版 244099 B（=242772+1327）。已推送版 blob `889155fd77` 即重放版。"
+    updated: "2026-09-22 15:12"

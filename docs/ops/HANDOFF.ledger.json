@@ -1,5 +1,5 @@
 {
-  "max_next_id_seq": 42,
+  "max_next_id_seq": 46,
   "ids": [
     "build13-timeout-guard",
     "cachebot-build-race",
@@ -43,7 +43,11 @@
     "unlockcover-factor-observation-card",
     "cnfetch-single-source-stale",
     "stockquote-noon-gap-relay-cancel",
-    "stockquote-cachebuster-noop"
+    "stockquote-cachebuster-noop",
+    "market-alerts-subprocess-timeout",
+    "probe-intraday-missing-market-alerts",
+    "category-map-two-table-drift",
+    "cloudfetch-us-hk-map-unknown-local-diff"
   ],
   "updated": "2026-09-22 13:55",
   "generated_by": "小九(lemoncat-cn) + 阿狸咪(alimi-cn) （2026-09-22 13:55 阿狸咪刷新：+2 新项 / 2 项回填）",
