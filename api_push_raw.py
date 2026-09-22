@@ -216,7 +216,8 @@ def _api_get_raw(path, timeout=120, max_bytes=None):
     return b"", last
 
 
-def _blob_text(commit_ref, path, blob_sha=None, max_bytes=None, local_size=None):
+def _blob_text(commit_ref, path, blob_sha=None, max_bytes=None, local_size=None,
+               require_full=False):
     """取远端某路径在指定 commit 上的**正文文本**（优先 raw 通道，退 base64 JSON）。
 
     🔴 通道选择依据（2026-09-17 本机 + 云端 E 批双实测）：
@@ -232,6 +233,43 @@ def _blob_text(commit_ref, path, blob_sha=None, max_bytes=None, local_size=None)
     """
     if path and commit_ref:
         cap = max_bytes if max_bytes else 3 * 1024 * 1024
+        # 🔴🔴🔴 2026-09-22 22:20 / 23:03 两次「index.html 尾部被截断」事故的真根因修复（阿狸咪的工程师）：
+        #   _api_get_raw 在**只读表头**场景下把「断流后已攒够 _HEAD_MIN(64KB) 的部分字节」
+        #   当作**成功**返回（err=""），这对「读 update_time」是正确的（时间戳在文件头部），
+        #   但本函数在 _stamp_remote_index_v 里是**取全文做改写再上传**：
+        #   网络一断 ⇒ 拿到「截断的前缀」且 err 为空 ⇒ 重戳 ?v ⇒ 原样上传 ⇒ **main 上的
+        #   index.html 被写成一个截断前缀**（实测两次：1,338,018 B / 1,310,161 B，
+        #   末尾未闭合、尾部 183~568 行丢失、站点尾部功能块消失，而全部 v8 门禁仍全绿）。
+        #   修法：require_full=True 时**必须**满足「字节数 == 远端 size」+「.html 末尾闭合」，
+        #   否则**重试；重试仍不完整就返回 None**（调用方跳过 → ?v 交 reconcile 自愈），
+        #   绝不把半截字节当正文交出去。默认 False ⇒ 既有调用者行为不变。
+        if require_full:
+            exp = None
+            try:
+                _m = api("GET",
+                         f"/repos/{REPO}/contents/{quote(path, safe='')}?ref={commit_ref}",
+                         timeout=45)
+                if "__error__" not in _m:
+                    exp = int(_m.get("size") or 0) or None
+            except Exception as _e:
+                print(f"  ⚠️ 取 {path} 期望字节数失败（{type(_e).__name__}）→ 仅用尾部闭合校验")
+            for _try in range(4):
+                _b, _err = _api_get_raw(
+                    f"/repos/{REPO}/contents/{quote(path, safe='')}?ref={commit_ref}",
+                    timeout=120, max_bytes=(exp + 1) if exp else cap)
+                _ok = bool(_b) and not _err
+                if _ok and exp and len(_b) != exp:
+                    _ok = False
+                    print(f"  ⚠️ {path} 正文不完整：{len(_b)} / {exp} 字节（第 {_try + 1} 次）")
+                if _ok and path.lower().endswith((".html", ".htm")) \
+                        and not _b.rstrip().endswith(b"</html>"):
+                    _ok = False
+                    print(f"  ⚠️ {path} 正文尾部未闭合（第 {_try + 1} 次），判为截断")
+                if _ok:
+                    return _b.decode("utf-8", "replace"), "contents-raw-full"
+                _time.sleep(1 + _try)
+            print(f"  🚨 {path} 连续 4 次均未取到完整正文 → **拒绝使用**（宁可不改，也不写坏线上）")
+            return None, "truncated"
         b, err = _api_get_raw(
             f"/repos/{REPO}/contents/{quote(path, safe='')}?ref={commit_ref}",
             timeout=120, max_bytes=cap)
@@ -721,9 +759,15 @@ def _stamp_remote_index_v(changed: dict, commit_ref: str):
        取不到正文。新实现改走 _blob_text（contents?ref= + raw，与守卫时间戳同一通道），
        取不到正文时**显式告警**，绝不谎报「已一致」。
     """
-    idx_text, _chan = _blob_text(commit_ref, "index.html", None, max_bytes=8 * 1024 * 1024)
+    # 🔴 2026-09-22：取全文必须走 require_full（字节数对齐 + 尾部闭合），
+    #   否则「截断读当成功」会把 main 上的 index.html 写成截断前缀（两次事故根因）。
+    idx_text, _chan = _blob_text(commit_ref, "index.html", None,
+                                 max_bytes=8 * 1024 * 1024, require_full=True)
     if not idx_text:
-        print("  ⚠️ 取远端 index.html 正文失败（raw + base64 双通道皆不可用）→ ?v 交由 reconcile 自愈")
+        print("  ⚠️ 取远端 index.html 完整正文失败（截断/双通道皆不可用）→ ?v 交由 reconcile 自愈")
+        return None
+    if not idx_text.rstrip().endswith("</html>"):
+        print("  🚨 取到的远端 index.html 末尾未闭合（截断件）→ **拒绝改写**，?v 交由 reconcile 自愈")
         return None
     tok = str(int(_time.time()))
     _pat = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?v=[0-9A-Za-z]+)?([\'"])')
@@ -736,6 +780,10 @@ def _stamp_remote_index_v(changed: dict, commit_ref: str):
     new_idx = _pat.sub(_repl, idx_text)
     if new_idx == idx_text:
         print("  ℹ️ index.html 无需改动（本次变更文件不在 ?v 重写集内）")
+        return None
+    # 🛡 纵深防御：上传前最后一道 —— 改写不得破坏尾部闭合，且字节数不得缩水
+    if not new_idx.rstrip().endswith("</html>") or len(new_idx) < len(idx_text):
+        print("  🚨 改写后 index.html 尾部未闭合或字节数缩水 → **拒绝上传**，?v 交由 reconcile 自愈")
         return None
     ib = api("POST", f"/repos/{REPO}/git/blobs",
              {"content": base64.b64encode(new_idx.encode("utf-8")).decode(),
@@ -1024,7 +1072,25 @@ def main():
             "raw_data/gold_pool.json",
             "raw_data/gold_pool_stocks.json",
         }
-        if (remote_sha and path.endswith(".json")
+        # 🛡🛡 2026-09-22 扩展：`.js` 同样纳入防倒退闸（阿狸咪的工程师，家机实证）
+        #   【铁证】23:03:34 `v8 cn fetch`（旧树 checkout）一笔提交改写 19 个 data/*.js，
+        #     逐一抽取内嵌时间戳比对 22:55 版 → 23:03 版：**倒退 11 / 前进 7 / 丢戳 1**：
+        #       STOCK_MOMENTUM_STATE.js     22:55 → 22:23
+        #       STOCK_MOMENTUM_STATE_V2.js  22:55 → 22:24
+        #       MOMENTUM_FILTER.js          22:55 → 22:24
+        #       FRESHNESS_STATUS.js         22:55 → 22:24
+        #       TRIPLE_TRACK.js             22:03 → 21:41（并丢掉 price_source×10）
+        #       IMA_STRONG_BACKTEST.js      22:54 → 22:02
+        #       HB_ALIMI / HB_XIAOJIU.js    22:52 → 22:02
+        #       RUNNER_STATUS.js            22:35 → 22:10
+        #       COMMODITY_ELASTICITY.js     22:55 → 22:23
+        #       HEALTH_CHECK.js             22:55 → （时间戳整段丢失，+10554B）
+        #     旧闸条件写死 `path.endswith(".json")` ⇒ `.js` **全被豁免** ⇒ 静默回退。
+        #     这正是「最终推荐永远是昨天的 / 动量卡在旧时刻」反复复发的机制来源。
+        #   【为什么安全】_content_ts 只认 update_time/gen_time/calc_time/run_time/
+        #     fetch_time/snapshot_time（**不含 republish_time**，故构建重戳不触发）；
+        #     取不到时间戳 ⇒ 直接放行（无戳文件不受影响）；本地更新则天然 lts>rts 放行。
+        if (remote_sha and path.endswith((".json", ".js"))
                 and path not in _NO_REGRESSION_GUARD):
             lts = _content_ts(content)
             if lts:
