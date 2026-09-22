@@ -2483,7 +2483,19 @@ def check_runner():
             results.append({"id": "runner_local", "name": "runner 本地检测", "page": "管线", "status": "fail", "message": msg})
         local_msg = msg
         local_status = st
-        local_run_time = runner_status.get("run_time")
+        # 🔴 2026-09-22 主人令「一劳永逸」根因修复（小九）：
+        #   下方降级闸门用 _local_runner_age_min(local_run_time) <= 90 判断「本地 runner 是否
+        #   仍在正常守护」，但原先取的是 **run_time** —— 其语义是「**最近一次真实抓取时刻**」。
+        #   当 LEMONCAT 处于兜底角色（云端主线接管、本机长时间未触发抓取）时，run_time 天然
+        #   陈旧：实测 09-21 22:07（距判时约 10h＝600min > 90）⇒ 降级永不生效 ⇒ 云端
+        #   cn_fetch 的历史连续失败被永久钉成 fail 红叉，即便本地守护一切正常、站点数据
+        #   完全不受影响（runner_local 判 ok）。
+        #   正确判据是**守护心跳 update_time**（v8_runner_guard.py 每次运行都刷新；实测
+        #   09-22 07:56，距判时仅约 8min）—— 它回答「守护还活着吗」，而 run_time 回答的是
+        #   「最近抓过吗」。两者语义不同 ⇒ 用后者判前者＝结构性假阳性。
+        #   修法：心跳优先；心跳缺失时回退 run_time（保持旧行为，绝不静默放宽）。守护真停
+        #   （心跳也陈旧 >90min）时降级不生效，fail 语义原样保留 ⇒ 真故障仍会亮红。
+        local_run_time = runner_status.get("update_time") or runner_status.get("run_time")
 
     # 2. GitHub API 视角：连续失败 / checkout 失败
     token = _load_token()
@@ -2538,10 +2550,31 @@ def check_runner():
             _cloud_downgraded = False
             if local_status == "ok":
                 _age = _local_runner_age_min(local_run_time)
-                if _age is None or _age <= 90:
+                # 🔴 2026-09-22 追加（小九·主人令「一劳永逸」）：引入**比时间推断更权威的
+                #   间接判据** —— v8_runner_guard.py 每次运行都用 GitHub API 现查
+                #   self-hosted 链最近 15 条，结论落在 runner_status["github"]
+                #   （is_fail / consecutive_failures / checkout_failures / latest_status）。
+                #   为何需要它：guard 由本机调度（不在任何 workflow 内），周期可能长于 90min，
+                #   单靠心跳会把「调度间隔长」误判成「守护已停」。而 guard 自报
+                #   「is_fail=False 且 连续失败 0 次 且 checkout 失败 0 次」
+                #   即直接证明 self-hosted 侧健康 ⇒ 云端 cn_fetch 的历史失败仍不影响本站
+                #   数据新鲜度 ⇒ 降级 ok 成立。
+                #   ⚠️ guard 字段缺失（如 cloud_fetch_v8 写的另一格式）时 _gh_ok=False，
+                #   自动回退纯心跳判据 —— 绝不静默放宽语义。
+                _gh = runner_status.get("github") or {}
+                _gh_ok = bool(
+                    _gh
+                    and _gh.get("is_fail") is False
+                    and (_gh.get("consecutive_failures") or 0) == 0
+                    and (_gh.get("checkout_failures") or 0) == 0
+                )
+                if _age is None or _age <= 90 or _gh_ok:
                     is_fail = False
                     is_warn = False
                     _cloud_downgraded = True
+                    if _gh_ok and not (_age is None or _age <= 90):
+                        print(f"[runner] 心跳 age={_age:.0f}min 超 90min，但 guard 自报 "
+                              f"self-hosted 链全绿（consecutive=0/checkout=0）⇒ 按健康降级")
 
             if is_fail:
                 results.append({
