@@ -281,7 +281,25 @@ items:
       · 门禁面复核：`#7666`（20:10:58，head `b93852366e`）/ `#7668`（20:17:32，head `7a49397e`）两档
         `gate` job = **success**、`build` job = **failure**，失败步**均为** `🛡️ Pre-deploy audit`
         ⇒ **门禁按设计拦住了 CI 自部署路径**（但拦不住 main 直写 —— 与对手方 20:29 的结构性建议同向）。
-    updated: "2026-09-22 20:40"
+
+    alimi_observe_20260922_2358: >-
+      🚨 **阿狸咪 2026-09-22 23:5x CST 补：产物修了、写入侧未修 ⇒ 23 分钟内第 2 次复发（已现场恢复）**
+      **复发事件**：`index.html` 再次被覆盖 —— **1,347,523 B → 604,042 B（-55%）**；
+      现行 `docs/ops/index_protected_markers.txt` **37 条中 16 条消失**（实测命中 **21/37**），
+      `</html>` 计数 = **0**，坏版末尾停在未写完的 JS 表达式 `... + '<div style="font-size:11px;color:' + arC`。
+      **引入点（逐提交 size 序列定位，唯一一笔）**：`756b6e896c43`（2026-09-22 **23:49:39 CST**，
+      message `v8 cn fetch: 2026-09-22 23:49`，author `github-actions[bot]` / committer `web-flow`
+      = Contents/Git Data API 家族，`files=32`、`index.html changes=10899`）；
+      其前一版 `90baedcdc3`（23:46:08，`v8 build`）仍为 1,347,523 B / **37/37 命中**。
+      ⚠️ 末 3 次覆盖时间线：22:20 `7c78439fe8`(1,338,018) → 23:03 `898ceba7c5`(1,310,161) → **23:49 `756b6e896c`(604,042)**
+      ⇒ 与在册 item `cn-fetch-writer-version-drift`（**todo**）指向同一根因。
+      **线上实证（HTTP 硬抓，非推断）**：`GET .../index.html?v=<rand>` = **HTTP 200 / 604,042 B**，
+      与仓内该版 blob **逐字节一致**（sha1 `4959aa8f34af09cf…`）⇒ 用户面确实在跑截断版。
+      **恢复（已完成）**：取最近 37/37 全命中的 `90baedcdc3:index.html`（blob `7120ff47c621`，1,347,523 B）
+      **逐字节原样回推**（新 blob sha 断言 == 原 blob sha），Git Data API **单文件提交 `0c5f830a45e5`**
+      （`base_tree` = 当时 tip 的 tree、`force:false`、PATCH **200 OK**）。
+      **本地侧复核**：`git diff --cached --name-only | wc -l` = **0**（与 20:4x 轮一致，无复埋）。
+    updated: "2026-09-23 00:01"
 
   - id: alimi-same-family-check
     priority: P0
