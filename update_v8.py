@@ -879,6 +879,59 @@ def _data_file_update_time(var_name):
     return _UPDATE_TOKEN
 
 
+def _atomic_write_index_html(idx_path, text, baseline_len, baseline_lines):
+    """🔴 2026-09-22 P0 根治（index.html 截断事故）：原子落盘 + 落盘后自证。
+
+    事故（2026-09-22 20:10 CST，cn fetch 轮）：原实现 `idx_path.write_text(...)` 会
+    **先 truncate 再逐块写**，进程在写入中途被杀（OOM / job 抢占）⇒ 文件停在
+    5,027/19,148 行、断在 `window.__STAR_ALT_SOURCES = {` 对象定义中间
+    （1,347,523 → 366,154 B，21/34 核心标记消失、`_renderPostReady` 全无）
+    ⇒ **线上整站白屏 9 分钟**（20:10:42 ~ 20:19:49 CST）。`force:false`、[10/10] 门禁
+    都拦不住它 —— 因为坏文件已经进了 main，而 GitHub 内置 pages 构建不等 v8 门禁。
+
+    本函数做三件事：
+      ① 同目录临时文件写入 + flush + fsync，再用 `Path.replace` **原子换入**
+         （同一文件系统内 rename 原子；中断只会留下一个 .tmp，**绝不伤正本**）；
+      ② 落盘后自证：末尾须含 `</html>`，且行数/长度不得较基线缩水 >5%；
+      ③ 自证不过 ⇒ 删临时文件 + 抛异常 ⇒ 调用方（各 workflow 的 bash -e step，
+         **均位于 `git add index.html` 之前**）直接失败 ⇒ **半个文件永远上不了 main**。
+
+    行尾纪律：读写一律 `newline=''` **原样透传**。main:index.html 实测为**纯 LF**
+    （2026-09-22 实测 1,347,523 B 中 CR=0）；而 `write_text` 的 newline=None 在
+    Windows 侧会写 CRLF、Linux 侧写 LF ⇒ **跨 OS 行尾翻转会造成全量假 diff**
+    （防覆盖铁律已明令禁止），故一律 newline='' 原样透传。
+    """
+    import os
+
+    if idx_path.suffix != ".html":
+        raise ValueError("_atomic_write_index_html 仅用于 .html 产物")
+    if "</html>" not in text[-200:]:
+        raise RuntimeError(
+            "index.html 自证失败：末尾 200 字符内未见 </html>（疑似被截断），拒绝落盘")
+    if baseline_lines and text.count("\n") < baseline_lines * 0.95:
+        raise RuntimeError(
+            "index.html 自证失败：行数 %d 较基线 %d 缩水 >5%%（疑似被截断），拒绝落盘"
+            % (text.count("\n"), baseline_lines))
+    if baseline_len and len(text) < baseline_len * 0.95:
+        raise RuntimeError(
+            "index.html 自证失败：长度 %d 较基线 %d 缩水 >5%%（疑似被截断），拒绝落盘"
+            % (len(text), baseline_len))
+    tmp_path = idx_path.with_name(idx_path.name + ".tmp")
+    try:
+        with open(tmp_path, "w", encoding="utf-8", newline="") as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+        tmp_path.replace(idx_path)
+    except BaseException:
+        try:
+            if tmp_path.exists():
+                tmp_path.unlink()
+        except Exception:
+            pass
+        raise
+
+
 def _rewrite_index_html_cache_busters():
     """为 index.html 中 data/*.js 引用追加基于文件更新时间的 cache-busting 参数。
 
@@ -889,7 +942,8 @@ def _rewrite_index_html_cache_busters():
     idx_path = ROOT / "index.html"
     if not idx_path.exists():
         return
-    html = idx_path.read_text(encoding='utf-8')
+    html = idx_path.read_text(encoding='utf-8', newline='')
+    _base_len, _base_lines = len(html), html.count('\n')
     # 🔴 2026-08-12 主人令修复：原 `[A-Z_]+` 不匹配含数字的变量名（V8_CAL/W52_HIGH/TOP10_DAILY）
     #   → 这些文件永远不加 ?v= 缓存戳 → 浏览器/CDN 永远缓存旧版 → 主站/本地都不更新！
     #   修复：加 0-9，匹配所有 data/*.js
@@ -914,7 +968,7 @@ def _rewrite_index_html_cache_busters():
 
     new_html = pat.sub(repl, html)
     if new_html != html:
-        idx_path.write_text(new_html, encoding='utf-8')
+        _atomic_write_index_html(idx_path, new_html, _base_len, _base_lines)
         print("✅ index.html cache-busting 参数已更新")
 
 
@@ -925,7 +979,8 @@ def _ensure_momentum_loader():
     idx_path = ROOT / "index.html"
     if not idx_path.exists():
         return
-    html = idx_path.read_text(encoding='utf-8')
+    html = idx_path.read_text(encoding='utf-8', newline='')
+    _base_len, _base_lines = len(html), html.count('\n')
     if "data/STOCK_MOMENTUM_STATE.js" in html:
         return  # 已存在（含 ?v 或刚注入），交给缓存戳逻辑处理
     tag = '<script src="data/STOCK_MOMENTUM_STATE.js" defer></script>'
@@ -936,7 +991,7 @@ def _ensure_momentum_loader():
         html = html.replace(marker, marker + "\n    " + tag, 1)
     else:
         html = html.replace("</head>", tag + "\n</head>", 1)
-    idx_path.write_text(html, encoding='utf-8')
+    _atomic_write_index_html(idx_path, html, _base_len, _base_lines)
     print("✅ 已补回 STOCK_MOMENTUM_STATE.js 加载标签（防构建冲掉）")
 
 
