@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 17:08"
+  updated: "2026-09-22 20:55"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 50
+  next_id_seq: 52
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -2534,3 +2534,64 @@ items:
       · 判据不变（本项 verify_how ②）：`signal_date_range` + `total_signals` + 内容**三者齐变**才算修复。
     updated: "2026-09-22 20:40"
 
+  # ── P1 · 数据真实性（2026-09-22 20:55 CST 阿狸咪登记：TOP10 卡价格滞后 / close=0 已修，待产物验证）──
+  - id: top10-close-quote-gate
+    priority: P1
+    owner: shared
+    status: pending-verify
+    what: >
+      TOP10 卡的 `close` / `pct_chg` 长期取自候选池 `history` 的**最后一根**
+      （= 上次算到这只票那天的快照），实测滞后 1~3 个交易日，且部分票为 0：
+      · 江波龙   卡上 347.79（实为 09-21 价），当日真实 348.27；
+      · 西部矿业 卡上 35.45（实为 09-17 价），当日真实 36.77（**滞后 3 个交易日**）；
+      · 德业股份 / 埃斯顿 / 国轩高科 `close=0` ⇒ 触发 `>0` 守卫 ⇒ **算不出止损位/目标价**。
+      影响面 = 卡片展示 + 止损位/目标价基准（**不影响选股打分**）；实证方法见 evidence。
+    fix: >
+      `algorithms/generate_top10.py` 新增 `quote_snapshot()` 当日行情闸门，口径与
+      `algorithms/final_recommend.py::_quote_snapshot()` **完全一致**（全站单一真源，禁某模块特立独行）：
+      只认 `update_time` 日期 == 今日 的快照，源优先级 `STOCK_QUOTE.js` → `CANDIDATE_QUOTES.js`；
+      非当日 / 缺失 ⇒ 整份作废回退历史值，**绝不伪造 0**；止损位/目标价序列补入当日收盘；
+      另加 `close_source` 字段（`history` / `STOCK_QUOTE` / `CANDIDATE_QUOTES`）便于事后核查。
+    evidence: >
+      阿狸咪 2026-09-22 20:51 CST 单文件 Git Data API 直推 commit `4ae153ca83`，
+      新 blob `13c7c2b9c83d110ed1d5511a1458837110877843`（87,520 B / 1,774 行，LF 与远端一致）；
+      推后回读**逐字节一致**；5 处锚点各唯一命中。
+      **沙箱三组对照**（仓库外 `E:\_alimi_tools\v8_close_fix\`；真实 gold_pool 抽 8 只、含 3 只 close=0；
+      行情取线上 2026-09-22 18:10 真身；夹具 + 回退版对照）：
+      ① base+当日 ⇒ 复现滞后与 3 只 0 值；② patched+当日 ⇒ 8/8 只 = 当日真价、`close=0` 清零；
+      ③ patched+非当日 ⇒ 与 ① 的 `close`/`pct_chg` **逐只完全一致**（回退等价、不伪造）。
+      断言：8/8 只 `total_score` 与 `rank` **逐只零变化** ⇒ 证明**未触碰评分口径**。
+    verify_how: >
+      看**下一档真正跑 D 批的盘后 algo 档**（本改动推于 09-22 20:51，当晚 20:13 那档已 checkout 完 ⇒ 不适用）：
+      断言 ① `data/TOP10_DAILY.js` 的 `close_source` == `STOCK_QUOTE`；
+      ② 与同刻 `STOCK_QUOTE.js` 的 `price` **逐只相等**；③ **无任何 `close=0`**。
+      🔴 判据纪律：`代码已推` ≠ `产物重跑` ≠ `被验证生效`，须以产物字段为准。
+    updated: "2026-09-22 20:55"
+
+  # ── P0 · 部署链结构性缺口（2026-09-22 20:55 CST 阿狸咪登记：v8 门禁拦不住 Pages 发布）──
+  - id: pages-publish-bypasses-gate
+    priority: P0
+    owner: shared
+    status: todo
+    what: >
+      2026-09-22 20:10 CST 的「`index.html` 被截断成 366,154 B（砍掉 14,220 行，断在
+      `window.__STAR_ALT_SOURCES = {` 对象定义正中间）⇒ 整站白屏 9 分钟」事故中，
+      v8 的 [10/10] 守卫**已经抓到**并让「构建部署」job 失败，
+      **但线上照样发布了残缺版** —— GitHub 内置的 `pages build and deployment` 是**独立流程**，
+      不消费 v8 的门禁结论，只要 `main` 变了就直接发布（20:10:42 发布残缺版 / 20:19:49 恢复）。
+      ⇒ **v8 门禁只能「喊」，不能「拦」线上**：任何写坏 `index.html` 的路径都会在数秒内上线。
+    note: >
+      这是「白屏 9 分钟」的**结构性**原因，也是与 09-20「引导函数被删 ⇒ 整页不渲染」同型事故
+      能一再打穿防线的根因。`update_v8.py` 的**非原子写**已由 commit `9037d76d22`
+      根治（临时文件 + fsync + 原子换入 + 落盘自证，全仓扫描确认它是唯一本地写 index.html 的地方）；
+      本项治的是「即便写坏了也没人拦」。
+    options:
+      A: 在 `pages build and deployment` 之前加**必需**的 status check / branch protection
+         （GitHub 侧配置，需主人或小九操作；我的 PAT 无 workflow scope ⇒ 改不了 workflow）
+      B: 发布改走 Actions 自建 `actions/deploy-pages`，使 v8 门禁成为**前置门**
+         （改动较大，需先评估与现有 `v8_build_deploy.yml` 的关系）
+      C: 保持现状 + 「发布后 60 秒内自动体检线上 `index.html` 完整性，异常即回滚」（缓解而非根治）
+    verify_how: >
+      任选方案落地后做一次**故意的坏写入**（临时提交里把 `index.html` 截断），
+      断言：线上**始终**返回完整版（或自动回滚），且门禁红能真正阻断发布。
+    updated: "2026-09-22 20:55"
