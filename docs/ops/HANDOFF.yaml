@@ -270,7 +270,18 @@ items:
       `algo-step15-undefined-t` 的根因（该档跑的是修复前代码 head `fe9250e271`；我的修复 `c16e376ea6` 于 19:58 推送，
       真验证样本 = 含该提交的后续档，如 `#2046` head `b93852366e`）。
 
-    updated: "2026-09-22 20:29"
+    alimi_observe_20260922_2042: >-
+      ✅ **阿狸咪 2026-09-22 20:40 CST 复查（本项 verify_how ①）**：本机 `git diff --cached --name-only | wc -l` = **0**
+      ⇒ 观察期内第 3 次复查通过（09-22 09:45 = **9** 项复埋 / 18:1x = **10** 项复埋 / 20:4x = **0**）。
+      · 补充取证（供对手方 20:29 真凶记录引用）：肇事版 **366,154 B 在 `index.html` 近 100 笔提交历史中不存在**
+        （逐版取 blob 与实际 size 比对，全表仅 `0320100b3f` / `b93852366e` 两笔为 366,154 B）
+        ⇒ 印证「**它不是仓内任何历史版本**，而来自自托管 runner 工作区的陈旧本地副本」这一判定。
+      · 独立复核（本机 HTTP 直抓，非 API 推断）：线上 Pages `HTTP 200` / **1,347,523 B**，
+        抽样 `id="sec-op"` / `id="sec-final"` / `id="sec-dl"` / `window.__renderOps` / `function _renderPostReady` **全在** ⇒ 用户面已恢复。
+      · 门禁面复核：`#7666`（20:10:58，head `b93852366e`）/ `#7668`（20:17:32，head `7a49397e`）两档
+        `gate` job = **success**、`build` job = **failure**，失败步**均为** `🛡️ Pre-deploy audit`
+        ⇒ **门禁按设计拦住了 CI 自部署路径**（但拦不住 main 直写 —— 与对手方 20:29 的结构性建议同向）。
+    updated: "2026-09-22 20:40"
 
   - id: alimi-same-family-check
     priority: P0
@@ -1879,7 +1890,23 @@ items:
         —— 该批必然 checkout 到含 `ee6f21f1ce` 修复的代码，届时看名字是否被正确回填：
         正确 ⇒ 可转 done；仍为代码 ⇒ 说明源级修复未覆盖该产出路径（届时按 `fix` 三段复查）。
       · 同批旁证：`FOUR_VOLUME_BACKTEST`（blob `20c8607032`）`update_time` 亦停 **2026-09-21 21:52:11** / 1461 信号、`近 5 年` 守档。
-    updated: '2026-09-22 17:02'
+    alimi_verify_20260922_2042: >-
+      🔴 **阿狸咪 2026-09-22 20:40 CST 实测（今日 18:3x–18:4x 新批产物）—— 源级修复「部分生效」：两个直接目标已达成，
+      但三个产出路径仍残留「代码冒充名」**。判据 = 逐文件拉 `main` 真身、按 code/name 同字段比对（只看产物，禁以 commit 存在当生效）：
+      · ✅ **已正确**：`data/FOUR_VOLUME.js`（ut **18:47:09**）**0 处**、`data/FOUR_VOLUME_60M.js`（ut **18:46:16**）**0 处**
+        ⇒ 本项 `fix` ④ 的两份回填**已生效**（000725/000100/000002 → 京东方A / TCL科技 / 万科A）。
+      · ❌ **同一批仍残留**：
+        · `data/FOUR_VOLUME_HISTORY.js`（ut **18:48:02**）`"000725":{…,"name":"000725","market":"sz","dropped_at":"2026-09-22"}` ⇒ **2 处**（000725 / 000100）
+        · `data/ALGO_TRACK.js`（ut **18:48**）`{"code":"000725","name":"000725","algo":"four_volume","list_date":"20260921"}` ⇒ **4 处**（000725 / 000100 各 2）
+        · `data/CRDS_CARD_DATA.js`（ut **18:39:05**）**6 处**，且**同一文件内自相矛盾**：
+          `{"code":"000725","name":"京东方A"}` ✅ 但 `{"code":"000735","name":"000735"}` ❌（000735 = 罗牛山），另有 `000100` / `300979`
+          ⇒ crds 路径的 `_looks_clean` 修复**对部分股生效、部分未生效**（既非整文件回退，也非源级完全无效）。
+      · 对照全 0 处：`TOP10_DAILY` / `TRIPLE_CONSENSUS` / `CANDIDATE_QUOTES` / `INST_TRADE` / `LHB_DATA` / `SECTOR_LEADERS` / `IMA_STRONG_STOCK`。
+      ⇒ **不得转 done**：`verify_how` 的「算法链批次自然回归验证」**部分通过（2/5 目标文件）**；
+        残留集中于 HISTORY / TRACK / CRDS ⇒ 疑因本项 `fix` ① 只改四处 `_looks_clean`、未覆盖这三个产出路径的取名回调。
+        建议：把 ① 的修复面**按产出路径补全**（落盘侧 + HISTORY/TRACK 快照侧）后再转 done。
+        附注：本项 `residual` 原记「HISTORY / TRACK 本批无缺名」**已被本轮实测推翻**。
+    updated: "2026-09-22 20:40"
     note: >
       〔09-22 16:4x 现场终验·残留属修复前产物，非修复失效〕扫描 17 个选股类 data 文件：data/CRDS_CARD_DATA.js（update_time=**2026-09-21 20:20:54**）仍有 `"name":"000725"/"000100"/"000002"` 纯代码冒充名；data/FOUR_VOLUME.js（09-21 21:51）、FOUR_VOLUME_60M.js、FOUR_VOLUME_HISTORY.js 同类残留。上述产物 update_time 均**早于**本项修复上线时刻 ⇒ 属陈旧产物，须待今晚 B/D 批重跑后复扫。保持 pending-verify。
 
@@ -2104,7 +2131,17 @@ items:
       · ③ `AVG_PRICE_880003` 同批复现：`⚠️ AVG_PRICE_880003: 空/无效数据，跳过写入（保留远端旧数据）`（14:58:03 / 15:02:23 两档）。
       ✅ 小结：`US_HK_MAP` 仍保持自愈（`update_time` **2026-09-22 12:46:53**），`MARKET_ALERTS` **不成立** ⇒ status 维持 `todo`。
       本机本轮**只 detect + 报告**：0 手工 dispatch / 0 代码改动 / 0 阈值改动。
-    updated: "2026-09-22 16:08"
+    alimi_verify_20260922_2042: >-
+      ✅ **阿狸咪 2026-09-22 20:40 CST 实测 —— `MARKET_ALERTS` 首次达成 verify_how ①**：
+      `data/MARKET_ALERTS.js` `update_time` = **2026-09-22 19:58:55**（741 B）⇒ 自 18:06:26 起**连续推进**，
+      已脱离「15:58:22 / 13:09:05 冻结」态，age 远小于 45min 红线 ⇒ **源级 90s 超时在本时段未复现**。
+      · `US_HK_MAP` 维持 **2026-09-22 12:46:53**（自愈保持，28,480 B）。
+      · ③ 口径修正：`AVG_PRICE_880003` 在本仓**无同名 data 文件**（`data/AVG_PRICE_880003.js` → **404**），
+        实际落盘名为 `data/AVG_PRICE_DATA.js` ⇒ 建议本项修正描述，避免后来者按错路径核对。
+      · 同刻 `HEALTH_CHECK.js`（`updated` **19:49:53**）summary `{ok:118, warn:1, fail:0, limited:2, total:122}`，
+        唯一 warn = `final_enter_stale`（最新 enter_date 2026-09-21 早于最近交易日 2026-09-22）⇒ 与本项**无关**。
+      ⇒ status `todo → pending-verify`：①② 单点通过，但未达 ③「连续 ≥2 档且确定性消失」⇒ 下轮续证。
+    updated: "2026-09-22 20:40"
   - id: stockquote-noon-gap-relay-cancel
     priority: P1
     owner: shared
@@ -2487,5 +2524,13 @@ items:
       ① 复现实验：离线构造「远端 5 年档 + 本地 3 年跑」，确认护栏是否被调用、判定为何放行；
       ② 修复后连看 ≥3 个盘后周期 ⇒ 断言 `signal_date_range` 恒为「近 5 年」，
       且 `total_signals` **随重跑变化**（证明是新跑，而非旧档原样回推 —— 三字段须齐变才叫修复）。
-    updated: "2026-09-22 19:58"
+    alimi_observe_20260922_2042: >-
+      ⏳ 阿狸咪 2026-09-22 20:40 CST 实测（按本项 what 预判「云端刷新路由必出 3 年档」复核）：
+      · `main` tip `data/FOUR_VOLUME_BACKTEST.js`（2,765 B）`update_time` = **2026-09-22 18:47:40**，
+        **`signal_date_range="近 3 年"` / `total_signals=1428`** ⇒ **3 年档在位**（与预判一致，非新形态、非新事故）。
+      · 逐版本翻转链（Contents API 取真身）：`0edaa61d7f`(09-21 11:42) **3 年/1443** → `86b5827b0e`(12:43) **5 年/1461**
+        → `b9809e667f`(14:00) **5 年/1461** → `bc1b0f4bce`(09-22 10:27) **3 年/1428** → `08d22d43cb`(11:03) / `6a985c3c21`(11:40) **3 年/1428**
+        ⇒ **09-22 全天为 3 年档**；观察点 = 今晚 22:30 `v8_algo_cloud` cron 的 E 批（`SCRIPT_ENV` 注入 5 年）是否把它翻回 5 年。
+      · 判据不变（本项 verify_how ②）：`signal_date_range` + `total_signals` + 内容**三者齐变**才算修复。
+    updated: "2026-09-22 20:40"
 
