@@ -2338,7 +2338,7 @@ items:
       ⇒ 本项记的是**结构性缺陷**，不是当天的红 run（后者已随快照刷新转绿）。
     updated: '2026-09-22 17:08'
 
-  # ── P0 · 算法链收尾步（2026-09-22 20:20 阿狸咪现场登记）──────────────────
+  # ── P0 · 算法链收尾步（2026-09-22 19:58 阿狸咪现场登记）──────────────────
   - id: algo-step15-undefined-t
     priority: P0
     owner: 阿狸咪
@@ -2350,7 +2350,7 @@ items:
       后果：**凡通过批次闸门的「真跑」档，收尾步必失败** ⇒ ① run 结论被拖成 `failure`
       （该 yml 自身注释即自述「会把 run 拖成 failure，连带 build 被跳过」）；
       ② ALGO_TRACK 的 ?v 永不由 algo 链对齐（目前仅靠 build/deploy 侧兜底对齐）。
-      实证（阿狸咪 2026-09-22 20:0x CST，全走 REST）：algo 近 40 档中 `conclusion=failure` 共 5 档，
+      实证（阿狸咪 2026-09-22 19:5x CST，全走 REST）：algo 近 40 档中 `conclusion=failure` 共 5 档，
       **其中 4 档失败步唯一 = step15**：#2044(09-22 18:00, runner=alimi-cn) / #2026(09-21 20:50) /
       #2025(09-21 20:15) / #2023(09-21 18:10)；另 1 档 #2024 失败步 = step14。
       真跑档的 step14「唯一推送」均为 `success` ⇒ **数据零损失**，仅收尾缓存戳步失败。
@@ -2359,7 +2359,7 @@ items:
       `ALGO_TRACK.js?v=1790075211`）在乐观锁重试循环前补一行 `t = str(int(time.time()))`
       （`time` 已在该 heredoc 的 import 列表内）。只加 1 行赋值 + 3 行注释，job/step 结构零改动。
     evidence: >
-      阿狸咪 2026-09-22 20:12 CST 单文件 Contents API 直推，commit `c16e376ea6`，新 blob
+      阿狸咪 2026-09-22 19:58 CST 单文件 Contents API 直推，commit `c16e376ea6`，新 blob
       `63cce8cb06f465ccf2c013b0721aae9776cf77d2`（80,941 B / 1,135 行）。
       推前门禁：YAML `safe_load` 通过、jobs/steps 形状 `[('algo',16)]` 前后一致、
       `run`+`with` 同存步 = 0；推前重取基线断言未漂移（`891afa0498`）；推后回读 blob 逐字节一致且含修复行。
@@ -2367,9 +2367,9 @@ items:
       等**下一个通过闸门的真跑 algo 档**跑完 ⇒ 断言 ① step15 结论 = `success`；② run 结论 = `success`；
       ③ step15 日志出现 `push index.html ALGO_TRACK ?v: 200 v= <10 位 epoch>`。
       🔴 判据纪律：`build=skipped` 的闸门空转档其 step15 亦为 `skipped`，**不得当验证样本**。
-    updated: "2026-09-22 20:20"
+    updated: "2026-09-22 19:58"
 
-  # ── P1 · 数据口径红线（2026-09-22 20:20 阿狸咪补登记：此前 3 日只在哨兵技能、从未进状态源）──
+  # ── P1 · 数据口径红线（2026-09-22 19:58 阿狸咪补登记：此前 3 日只在哨兵技能、从未进状态源）──
   - id: fourvolume-backtest-3y-downgrade
     priority: P1
     owner: shared
@@ -2379,7 +2379,7 @@ items:
       —— 即主人 2026-09-16 令「不是真实的我不要」所禁的**回测口径降级覆盖**。
       ⚠️ 本项此前**从未登记进本状态源**：阿狸咪哨兵 09-17 / 09-18 / 09-19 连续 3 日实测记录，
       但只留在哨兵技能内，未进 HANDOFF ⇒ 无人认领（典型的「已定性 ≠ 已登记」）。现补登记。
-      本轮实测（阿狸咪 2026-09-22 20:0x CST，取远端真身）：
+      本轮实测（阿狸咪 2026-09-22 19:5x CST，取远端真身）：
       · tip `data/FOUR_VOLUME_BACKTEST.js` blob `cba060abce` / `update_time=2026-09-22 18:47:40` /
         `total_signals=1428` / `signal_date_range="近 3 年"` ⇒ **当前在位的是错误档**。
       · 上游 `raw_data/four_volume_backtest.json` 的 `years` 字段同步为 3（历史上最省事的「一次跳变」铁证）。
@@ -2414,5 +2414,5 @@ items:
       ① 复现实验：离线构造「远端 5 年档 + 本地 3 年跑」，确认护栏是否被调用、判定为何放行；
       ② 修复后连看 ≥3 个盘后周期 ⇒ 断言 `signal_date_range` 恒为「近 5 年」，
       且 `total_signals` **随重跑变化**（证明是新跑，而非旧档原样回推 —— 三字段须齐变才叫修复）。
-    updated: "2026-09-22 20:20"
+    updated: "2026-09-22 19:58"
 
