@@ -26,15 +26,15 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 09:24"
-  updated_by: 小九(lemoncat-cn) + 阿狸咪(alimi-cn)
+  updated: "2026-09-22 09:57"
+  updated_by: 小九(lemoncat-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 39
+  next_id_seq: 40
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -1782,3 +1782,56 @@ items:
     residual: "raw_data/history/*.json 等冻结历史归档按原则未动；本机 06:30/08:30 自动化
       仅 PAUSED 未删（铁律：禁删阿狸咪任务）；若日后要恢复卡，git 历史可完整回溯。"
     updated: "2026-09-22 06:59"
+  # ── P2 · 候选因子观测（跨机口径对齐） ──────────────────────────────────
+  - id: unlockcover-factor-observation-card
+    priority: P2
+    owner: shared
+    status: blocked
+    what: >
+      「暂未上架 › 解禁&机构关注」因子观测卡（commit 33499302c8，阿狸咪 09-22 05:31 上线）的
+      **转正前口径对齐**。小九 09-22 09:57 完成四方实测取证，确认该链**已真跑通**
+      （线上 data/INST_COVERAGE.js HTTP 200 / 6101B / update_time=2026-09-22 08:43:37 / 28 条），
+      三重接线（tasks L4459 + CATEGORY_MAP L128 + VAR_TO_RAW L83）齐备，
+      硬自检护栏（cloud_fetch_v8.py L4519-4546）已上线防「假修复」复发；
+      前端三段闭合（定义 L15410 / window 挂载 L15469 / 派发 L15722 / 卡壳 L15674）。
+      ⚠️ 小九 09-21 曾据陈旧快照判该链「僵尸数据（停 09-17）」，**该结论已作废**，
+      详见下方 doc 档 §0（避免后续会话翻到旧结论被误导）。
+      仍有 3 个待阿狸咪答复的口径问题 —— 见 doc。
+    fix: >
+      待阿狸咪答复（本项为问答类，无代码改动）：
+      ⏸ status=blocked 语义：**等阿狸咪答复**（非等 run）。
+      Q1（🔴最关键）该卡的**转正判据 = 回测口径**是什么？
+        小九建议两因子**分开回测**（别混算，否则一有效一无效会互相稀释）：
+        解禁 → 事件研究法（T-5/T+1/T+5/T+20 相对中证500 超额，解禁是强事件，此为正统口径）；
+        机构关注 → 横截面因子法（IC/ICIR + 分组收益，可与 factor_walkforward 同口径）。
+      Q2 机构关注半边为何用「TOP分析师推荐」而非「覆盖家数」？
+        实测 f_analyst_ratings 取 stock_analyst_rank_em(year) 的 TOP30 分析师、每人 1 只，
+        report_count_1m **硬编码恒为 1**（非真数研报数）⇒ 字段名与实际语义不符。
+        当前 UI 未渲染该字段故不构成 bug；但若日后拿它做因子会咬人。
+        建议：保持现状则因子名改 TOP_ANALYST_PICK（INST_COVERAGE 字面是"机构覆盖"，语义不符）；
+        或换 stock_research_report_em 取真覆盖家数，则名实相符且成可回测因子。
+      Q3 条目内 annual_index / ret_12m 是**分析师本人**业绩（非个股收益）。
+        当前 UI 只渲染 org · rating，无歧义；若日后要展示须显式标注「(分析师业绩，非个股)」。
+        问：留着备展示，还是转发时顺手带上的？
+    evidence: >
+      小九 2026-09-22 09:57 CST 实测（只读，未动任何他人文件）：
+      ① 线上硬抓 https://ah-quant999.github.io/quant-scanner-v8/data/INST_COVERAGE.js
+         → HTTP 200 / 6101B / update_time=2026-09-22 08:43:37 / coverage 28 条 /
+         sample={"code":"688630","name":"芯碁微装","rating":"TOP分析师推荐(颜枫/上海证券)",
+         "org":"上海证券","analyst":"颜枫","annual_index":4619.65,"ret_12m":124.65}；
+      ② 接线三重：cloud_fetch_v8.py L4459(tasks) / L128(CATEGORY_MAP) / L83(VAR_TO_RAW)，
+         且 L4519-4546 硬自检「三重缺一即 SystemExit」已上线；
+      ③ 注入侧 update_v8.py L482-508 INST_COVERAGE 分支保 org/analyst/annual_index/ret_12m
+         不被压字段（刻意不复用 ANALYST_RATINGS 分支，避免二次口径漂移）；
+      ④ 前端 index.html L15410/15469/15722/15674 四段闭合；
+      ⑤ 空壳防洗：f_analyst_ratings 全空返回 None（run 记 empty），绝不用空壳覆盖既有 raw；
+      ⑥ 未登记 CARD_DEFS 但**当前不红灯**：走 check_all_data_files 通用 24h 红线，
+         盘前每日刷新 ⇒ age<1440min ⇒ ok（链条一断即静默变红，属可接受但已知的盲区）。
+    doc: "docs/ops/handover/2026-09-22_0957_小九_给阿狸咪_解禁机构关注因子观测卡三问.md"
+    verify_how: >
+      阿狸咪在 doc 档末尾答复 Q1/Q2（Q3 可选）后，小九将本项 status 推进：
+      定回测口径 → doing（进 algorithms/ 并按 v8 铁律过 verify_chain_consistency.py
+      时序契约 + v8_stage_gate.py 分批判据）；或定「仅作展示不外测」→ done
+      （并在 CARD_DEFS 登记 page=暂未上架·观测类、freq=每日盘前、max_age=1440）。
+    updated: "2026-09-22 09:57"
+
