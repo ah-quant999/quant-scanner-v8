@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-09-22 09:38:16
+// 最后更新：2026-09-22 10:15:18
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-09-22 09:38:16",
+  "update_time": "2026-09-22 10:15:18",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 32,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 3066,
+      "total": 3083,
       "ongoing": true
     },
     {
@@ -78,7 +78,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 32,
       "peak": 82,
       "peak_date": "08/20",
-      "total": 785,
+      "total": 792,
       "ongoing": true
     },
     {
@@ -143,7 +143,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 26,
       "peak": 20,
       "peak_date": "09/01",
-      "total": 206,
+      "total": 207,
       "ongoing": true
     },
     {
@@ -169,7 +169,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 24,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 219,
+      "total": 223,
       "ongoing": true
     },
     {
@@ -195,20 +195,20 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 20,
       "peak": 25,
       "peak_date": "09/01",
-      "total": 220,
+      "total": 223,
       "ongoing": true
     },
     {
       "sector": "军工",
       "start": "08/27",
-      "end": "09/21",
+      "end": "09/22",
       "start_idx": 13,
-      "end_idx": 30,
-      "days": 18,
-      "hot_days": 14,
+      "end_idx": 31,
+      "days": 19,
+      "hot_days": 15,
       "peak": 24,
       "peak_date": "09/09",
-      "total": 102,
+      "total": 105,
       "ongoing": true
     },
     {
@@ -221,7 +221,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 18,
       "peak": 12,
       "peak_date": "09/09",
-      "total": 128,
+      "total": 129,
       "ongoing": true
     },
     {
@@ -234,7 +234,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 17,
       "peak": 8,
       "peak_date": "09/02",
-      "total": 81,
+      "total": 82,
       "ongoing": true
     },
     {
@@ -258,9 +258,9 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "end_idx": 31,
       "days": 11,
       "hot_days": 11,
-      "peak": 19,
+      "peak": 21,
       "peak_date": "09/22",
-      "total": 120,
+      "total": 122,
       "ongoing": true
     },
     {
@@ -284,9 +284,9 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "end_idx": 31,
       "days": 5,
       "hot_days": 5,
-      "peak": 24,
-      "peak_date": "09/21",
-      "total": 64,
+      "peak": 26,
+      "peak_date": "09/22",
+      "total": 75,
       "ongoing": true
     },
     {
@@ -297,9 +297,9 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "end_idx": 31,
       "days": 3,
       "hot_days": 3,
-      "peak": 4,
-      "peak_date": "09/18",
-      "total": 11,
+      "peak": 5,
+      "peak_date": "09/22",
+      "total": 13,
       "ongoing": true
     }
   ]
