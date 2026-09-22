@@ -26,15 +26,15 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-22 17:02"
-  updated_by: 小九(lemoncat-cn)
+  updated: "2026-09-22 17:08"
+  updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 47
+  next_id_seq: 48
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -2282,3 +2282,58 @@ items:
     updated: '2026-09-22 17:02'
     note: >
       〔09-22 16:4x 补充实证〕今日 intraday schedule 档 **7 条全部落在 14:43–16:46**，上午 09:30–14:43 区间内 **0 条 schedule**（只有 09:35:03 与 11:51:55 两条 workflow_dispatch 兜底）⇒ 「上午恒 0」的形态在今日再次成立，且伴随**盘中档整体后移**（16:39/16:46 两条已过收盘）⇒ 指向 GitHub cron 排队延迟。
+
+  # ── 2026-09-22 17:1x 阿狸咪新增（ima 强势股全文快照 72h 龄门 × 访客路已失效 ⇒ 日频假红）──
+  - id: ima-snapshot-72h-expiry-trap
+    priority: P1
+    owner: shared
+    status: todo
+    what: >
+      `fetch_ima_strong_stock.py --source auto` 的正常路径是：优先读本机落下的全文快照
+      `raw_data/ima_strong_stock_full.{md,json}`（12 列、56/58 条），读不到/坏了才回退访客抓页。
+      但 `load_snapshot()` 有一道 **SNAPSHOT_MAX_AGE_H=72** 的龄门：`fetched_at` 超过 72h 即
+      **返回 None**（设计原意「宁可退回 1~2 条，也不拿三天前的名单冒充今天」）。
+      病灶在于回退目标已经死了 —— 云端 runner 的访客路（`_wiki_list_folder` 目录 API +
+      `_wiki_ssr_latest` SSR 深页）对 GitHub 出口 IP 已失效 ⇒ `fetch_via_wiki()` 抛
+      `RuntimeError: wiki 源两条路（目录 API / SSR 深页）均失败` ⇒ step6「🕸️ 抓取 ima 强势股日报」
+      红、step7/8（?v 重写 / 推送）**skip** ⇒ 产物不重产。
+      **触发条件是结构性的**：源方（知识库「九型人格」/文件夹「强势股跟踪」）一旦停发新日报
+      > 72h，快照龄必然越限 ⇒ **该 workflow 的日频派发必然逐日假红**，且遮住真故障。
+      本次实测：源方最新一篇停在 **2026-09-15**（连续 7 日无新篇）⇒ 09-22 15:52 CST 的
+      `workflow_dispatch` run #31 正是死于此，而非数据问题。
+    fix: >
+      三选一，**②③ 会动「数据诚实性」口径 ⇒ 必须主人拍板，禁自行改**：
+      ① 生产者侧（本机自动化，**2026-09-22 17:05 已临时补上**）：源方未发新篇时也由阿狸咪机
+         每日重取全文并刷新 `fetched_at`（正文逐字节不变、`data_date` 不前进）。缺点：依赖本机
+         自动化在线，它一停就又越限。
+      ② 消费侧治本（推荐）：快照过期时**不再回退已死的访客路**，而是带**显式降级标记**继续用
+         —— 产物加 `snapshot_expired=true` / `degraded_reason="snapshot_age>72h; guest-path-dead"`，
+         链保持绿、卡片如实标注停更。语义从「静默退回 1~2 条」改为「明示的全量但过期」。
+      ③ 最小改动：CI 把「快照过期 + 访客路失败」识别为**源方停更**，走
+         「保留上次产物 + run success（附 warning）」而非 exit 1。
+      另注：若走 ②，需同步核对前端对 `detail_complete` / `source_stale` 的降级文案
+      （`source_stale` 现由 `_eff_source=='wiki'` 恒置 False，快照通道亦被恒 False 覆盖，
+      与「快照可过期」的新语义打架 —— 这是**另一处潜在口径缺陷**，改口径时一并核）。
+    verify_how: >
+      在源方连续 ≥3 个自然日无新篇的窗口内，每日派发 `v8_ima_strong_stock.yml`：
+      ① 断言 run 结论恒 `success`（不再因快照龄越限而红）；
+      ② 断言产物 `data_date` **如实停留在源数据日**（不得前进、不得伪造）；
+      ③ 断言卡片/产物出现显式降级或停更提示（若采纳 ②）。
+      禁只跑一天就判治本 —— 本项病灶只在「>72h 无新篇」窗口才现形。
+    evidence: >
+      阿狸咪的工程师 2026-09-22 17:0x CST 实测（本机只读 + 一次快照刷新）：
+      · run #31（id 35701814107，2026-09-22T07:52:36Z = 15:52 CST，event=workflow_dispatch）
+        结论 failure；失败步 = step6；日志原文：
+        `⚠️ [snapshot] 快照过期：fetched_at=2026-09-19 13:01:52 · 已 74.9 h > 72 h ⇒ 回退访客抓页`
+        → `🌐 [wiki] 拉取目录 folder_id=…` → `RuntimeError: wiki 源两条路（目录 API / SSR 深页）均失败`。
+      · 源方核对（ima 连接器 `fetch_media_content`，KB `7500816604757970`）：最新一篇仍为
+        `强势股跟踪日报 2026-09-15`（media_id `note_…75055558956481737500816604757970`，
+        file_size 27032），与 09-19 落盘的快照**逐字节一致**（sha256 `b569b2af51c50a42`，5504 B，
+        60 条 12 列表格行）⇒ 源方确无新篇。
+      · 处置：17:05:17 CST 刷新快照 `fetched_at`（仅该字段，`data_date` 仍 2026-09-15），
+        commit `6b1a2ee6ae`；随后 dispatch ⇒ run #32 全绿，step6 日志
+        `✅ [snapshot] 强势股跟踪日报 2026-09-15 · 56/58 条（96.6%）· 对账 ✅通过（强势 头34 / 实34）`，
+        产物 `data/IMA_STRONG_STOCK.js` blob `9613fe9597a88ad7126cfae111fda835e5b3d153`
+        （detail_channel=full-snapshot / reconciled=true / len(stocks)=56）。
+      ⇒ 本项记的是**结构性缺陷**，不是当天的红 run（后者已随快照刷新转绿）。
+    updated: '2026-09-22 17:08'
