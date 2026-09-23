@@ -910,6 +910,10 @@ jobs:
       #   只改 ALGO_TRACK 一项，不碰 COMMODITY 等（避免用陈旧本地文件覆盖 build/deploy 已对齐的 ?v）。
       - name: "🔄 同步 ALGO_TRACK 缓存戳 ?v 并推送 index.html"
         if: steps.gate.outputs.proceed == 'true'
+        # 🛡 2026-09-23 阿狸咪的工程师：软失败。本步只同步 ALGO_TRACK 的 ?v（次要动作），
+        #   失败时 ?v 由 reconcile workflow 自愈；绝不能因它 exit 1 而 skip 链尾机器校验
+        #   （run #35862602672 实证：数据已推成功却整轮未校验）。与 cn fetch 同范式。
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -948,7 +952,33 @@ jobs:
           #   口径同全站 ?v 约定（2026-09-10 令：单调 unix 秒令牌，实测线上 ?v=1790075211）。
           t = str(int(time.time()))
           for _att in range(1, 4):
-              meta_sha, html = _fetch_main_html()
+              # 🛡 2026-09-23 阿狸咪的工程师（主人令「今晚算法链你盯」· run #35862602672 实证）：
+              #   原 `meta_sha, html = _fetch_main_html()` **写在本循环的 try 之外** ⇒ 该函数内
+              #   urlopen 抛的任何网络异常（实测 FileNotFoundError / 连接截断）都会**未捕获逃逸**
+              #   ⇒ Traceback ⇒ 本步 exit 1 ⇒ 连带 **step16 机器校验被 skip**
+              #   （数据其实已由 step14 推送成功，却整轮没被校验 —— 假绿的反面：真数据无校验）。
+              #   且原实现**不校验正文完整性**：read() 中途截断时（本机跨境网络常态，实测
+              #   1286885 / 1338126 / 1336976 / 1291766 字节 vs 期望 1352965）会拿**残缺 html
+              #   去 PUT**，可能把线上 index.html 写坏。
+              #   本步已是 bug 温床（2026-09-22 刚修过它凭空引用 t 的 NameError）。
+              #   修法三件：① 取正文纳入 try ⇒ 失败走重试而非崩溃；
+              #             ② 完整性断言（尾必须 </html>）⇒ 宁可不改，绝不写坏线上；
+              #             ③ workflow 侧挂 continue-on-error ⇒ ?v 同步属次要动作，
+              #                失败交 reconcile 自愈，**绝不阻断链尾机器校验**
+              #                （与 cn fetch「软失败 + 强制告警」同范式）。
+              try:
+                  meta_sha, html = _fetch_main_html()
+              except Exception as _e:
+                  _last_err = "取 main index.html 真身失败：%s: %s" % (type(_e).__name__, _e)
+                  print("  第 %d 次取真身失败 -> %s；将重试" % (_att, _last_err), flush=True)
+                  time.sleep(5 * _att)
+                  continue
+              if not html.rstrip().endswith("</html>"):
+                  _last_err = ("取到 index.html 正文不完整（%d 字节，尾非 </html>）"
+                               % len(html.encode("utf-8")))
+                  print("  第 %d 次取真身不完整 -> %s；将重试" % (_att, _last_err), flush=True)
+                  time.sleep(5 * _att)
+                  continue
               new = re.sub(r'(ALGO_TRACK\.js)\?v=\w+', r'\1?v=' + t, html)
               if new == html:
                   print("ALGO_TRACK ?v 已是最新，无需推送（第 %d 次取真身校验）" % _att)
