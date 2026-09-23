@@ -2769,7 +2769,12 @@ def update_gold_pool_from_scan(output):
         else:
             history.append(history_entry)
         # 更新名称(可能有变化)
-        pool["stocks"][key]["name"] = s["name"]
+        # 🛡 2026-09-24 一劳永逸（错名再犯根治）：写入前再过一次唯一校入口
+        #   resolve_clean_name_s（s["name"] 上游已清洗，此处为纵深防御——
+        #   防未来新增数据源绕过上游清洗，把港股研报名贴到 A 股码上）。
+        _auth_nm = resolve_clean_name_s(str(s.get("code", "")).zfill(6), s.get("market", ""), s.get("name", ""))
+        if _auth_nm:
+            pool["stocks"][key]["name"] = _auth_nm
 
     # 研报来源 → 金股（候选池中带研报标签的，天然在股池内）
     research_added = 0
@@ -2777,10 +2782,13 @@ def update_gold_pool_from_scan(output):
         for key, info in cand.items():
             if not any(src in RESEARCH_SRC for src in info.get("sources", [])):
                 continue
+            # 🛡 2026-09-24 一劳永逸（错名再犯根治）：研报金股入池/存量纠正均过唯一校入口，
+            #   与 self_heal_monitor._merge_guanlan_to_candidate 同规（传播口零直写）。
+            _auth_r = resolve_clean_name_s(str(info.get("code", "")).zfill(6), info.get("market", ""), info.get("name", ""))
             if key not in pool["stocks"]:
                 pool["stocks"][key] = {
                     "code": info.get("code", ""),
-                    "name": info.get("name", ""),
+                    "name": _auth_r or info.get("name", ""),
                     "market": info.get("market", ""),
                     "board_label": info.get("board_label", ""),
                     "fund_type": "",
@@ -2794,6 +2802,9 @@ def update_gold_pool_from_scan(output):
                 research_added += 1
             else:
                 _merge_sources(pool["stocks"][key], info.get("sources", []))
+                # 存量条目名字若是错的（历史遗留/被陈旧推送污染）→ 权威名就地纠正
+                if _auth_r and pool["stocks"][key].get("name") != _auth_r:
+                    pool["stocks"][key]["name"] = _auth_r
 
     # 候选股池全量快照（供前端"观测候选"展示）
     pool["candidates"] = cand if cand else {}

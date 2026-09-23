@@ -925,7 +925,22 @@ def derive_and_save_gold_pool(members):
         fd = _entry_first_date(old)
         if fd and fd < cutoff:
             continue  # 过期出池
-        stocks[key] = dict(old)
+        _o = dict(old)
+        # 🛡 2026-09-24 一劳永逸（阿狸咪的工程师·主人令「错名再犯根治」）：
+        #   继承分支原样保留旧条目（含 name）。09-23 实测：22:47 回填正确名后，
+        #   23:22 一笔落后基线的 cn fetch 把陈旧 worktree 产物推上 main，名字被打回
+        #   港股错名（000807 上海实业环境 / 000703 FUTURE BRIGHT / 000833 华讯）；
+        #   此后每轮 derive 走本继承分支 ⇒ 错名在金股池内自持循环、永不自愈。
+        #   现继承时就地过一次唯一校入口 resolve_clean_name（_SN_MAP 模块级缓存，
+        #   代价≈0）：权威名命中即正名，错名类故障从此无法跨轮存活。
+        _c6 = str(_o.get("code", "")).zfill(6)
+        _mk = _o.get("market", "")
+        if _o.get("name") and _mk in ("sh", "sz"):
+            _auth = resolve_clean_name(_c6, _mk, _o.get("name"))
+            if _auth and _auth != _o.get("name"):
+                print(f"    🛡 金股池继承正名: {_c6} {_o.get('name')} -> {_auth}")
+                _o["name"] = _auth
+        stocks[key] = _o
         inherited_keys.add(key)
 
     # 2) 今日符合口径：新增或刷新

@@ -495,7 +495,7 @@ window.CRDS_BACKTEST = {
    "signal_date": "2026-09-14",
    "entry_trade_date": "2026-09-15",
    "code": "000564",
-   "name": "中创智领",
+   "name": "供销大集",
    "entry_price": 1.54,
    "periods": {
     "1": {
@@ -4383,7 +4383,7 @@ window.CRDS_BACKTEST = {
    "signal_date": "2026-09-15",
    "entry_trade_date": "2026-09-16",
    "code": "002536",
-   "name": "百乐皇宫",
+   "name": "飞龙股份",
    "entry_price": 52.65,
    "periods": {
     "1": {
@@ -16047,7 +16047,7 @@ window.CRDS_BACKTEST = {
    "signal_date": "2026-09-21",
    "entry_trade_date": "2026-09-22",
    "code": "000560",
-   "name": "珠江船务",
+   "name": "我爱我家",
    "entry_price": 3.3,
    "periods": {
     "1": {
