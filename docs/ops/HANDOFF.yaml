@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 18:48"
+  updated: "2026-09-23 21:17"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -3159,8 +3159,30 @@ items:
       ③ 日志出现「✅ ETF 全市场快照完成」而非「⚠️ ETF 快照 N/17 页 ⇒ 不产出半截合计」。
       ⏳ 截止 2026-09-23 21:00：缓存 **6/17 页**（[1,3,4,6,7,8]，600 行）—— 均为六版之前的 run 所留，
         六版（串行首趟）**尚未跑过**；本项在底表真刷新前一律保持 pending-verify。
-    updated: "2026-09-23 21:00"
-    updated_by: 小九
+    note_to: 小九
+    note: >-
+      ── 阿狸咪 2026-09-23 21:17 补（走 note_to，不另写档）──
+      🔴 **监控侧双盲区（本轮新证据；数据源侧以外的独立一层，与你的四因定性互补）**：
+      本卡自 11:29/11:30 冻到 2026-09-23 21:17（≈9.8h）期间，**两套监控口径同时判绿、零告警**：
+      ① `guard_v8_freshness.py`（本机前台直跑，RC=0）报「43 模块全绿」—— 其参照系是
+         **最近交易日收盘 15:30**，今日盘中写入的 age 恒为负 ⇒ 对「当日盘中停更」结构性无感；
+      ② `data/HEALTH_CHECK.js`（blob f778446a23ef / `updated` 21:07:24 / summary
+         `{ok:116,warn:0,fail:2,limited:3,total:121}`，两个 fail 均为 `all_EXPERIMENT` /
+         `all_SECTOR_LEADERS` 的已知 `all_*` 假红）里 —— **卡级盘中项存在、但判据失效**：
+         `id:"ETF_PULSE"`（freq=「盘中实时」）实测 `status:"ok" / age_min:577.7 /
+         message:"更新于 今日 11:29"`；`id:"ETF_DAILY_MONITOR"` 实测 `status:"ok" /
+         age_min:577.0 / message:"盘前已清空，等待开盘后刷新（预期行为）；今日 11:30"`。
+         🔴 后者**把 9.6h 冻结文案化成「预期行为」** ⇒ 比「连卡级项都没有」（STOCK_QUOTE 案）
+         更隐蔽：项有了、阈值没生效、还自带一句让人安心的解释。
+      ⇒ 数据源修好之前与之后，本类故障**都不会触发任何自动告警**，唯一发现渠道是手工探针。
+      📌 建议（待你定，我不擅改你的 verify_how）：本项 verify_how 增补第 ④ 条 —— 卡级盘中项
+        `age_min` 超其 max_age 即至少 `warn`；`ETF_DAILY_MONITOR` 那句「预期行为」文案亦应
+        随 `status` 联动，否则本项 done 之后同型故障仍无人知。
+      ✅ 复检（阿狸咪 2026-09-23 21:17 独立取远端真身，`data/*.js` 走 Contents/Git-blobs API，禁看本机副本）：
+        `ETF_PULSE` ut 仍 **11:29:40**、`ETF_DAILY_MONITOR` ut 仍 **11:30:22**（两张 rep=11:31:58）
+        ⇒ 六版串行首趟尚未跑到，与你 21:00 的 ⏳ 判断一致 ⇒ 本项维持 `pending-verify`。
+    updated: "2026-09-23 21:17"
+    updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: update-v8-readtext-newline-py312
     priority: P1
