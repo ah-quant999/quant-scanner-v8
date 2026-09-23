@@ -1,20 +1,20 @@
-# 九宝量化 v8.0 — ETF clist 定罪探针（第4版·一次性诊断，验完即删）
+# 九宝量化 v8.0 — ETF clist 定罪探针（第5版·一次性诊断，验完即删）
 #
-# 2026-09-23：第3版已确证「生产函数能成功返数」（首调成功：total_net=+13.81亿/total_etf=264），
-#   但同一函数约 130 秒后再调即 None ⇒ 判定为**间歇性**而非参数错。
-#   第3版的矩阵对照组也全 0 行（含已知稳定的热力图参数）⇒ 那一刻端点整体不给数。
+# 2026-09-23 第4版的**设计缺陷**（必须记住，勿再犯）：
+#   第4版把「生产整函数 f_etf_daily_monitor（首调 66 秒、14 次分页请求）」放在**最前面**，
+#   其后所有矩阵/pz 梯度/稳定性测试**全部在「已被自己打限流」的状态下执行** ⇒
+#   全表 502（559B nginx 页），连「静置 30 秒」也没恢复 ⇒ 结论不可用（自证污染）。
 #
-# 本版要回答的**唯一问题**：能否用「更少的请求数」一次拿全 ETF 全市场？
-#   已知：em_clist 注释称 push2delay 对 pz 硬截 100 ⇒ 生产分页 14 次请求；
-#         而同轮的 ETF_INTRADAY_HEAT（1 次请求）每轮都 ok，生产的 ETF_DAILY_MONITOR
-#         （14 次请求）每轮 empty ⇒ 强烈指向「请求次数/配额」而非「参数」。
-#   故测：① 三个端点（delay / push2 主站 / push2his）对大 pz 的真实返回行数
-#         ② pz 梯度 100→5000 的真实行数（验证硬截 100 是否成立）
-#         ③ 同配置连打 6 次的成功率（限流特征）
-#         ④ 密集请求后**静置 30 秒**能否恢复（判断是「短时配额」还是「长时封禁」）
-#         ⑤ 生产整函数连续 3 次 + 单市场 fs 对照
+# 本版修正：**冷启动优先** —— 零前置请求，第一件事就是「一次请求能否拿全市场」的判定；
+#   把重活（生产整函数）挪到**最后**，只用来复现「重活之后是否 502」的对照。
+#
+# 要回答的三个问题：
+#   ① 一次请求（fid=f62 / pz=5000）能否拿全 ETF 全市场（≈1600 只）？—— 若可以，
+#      生产就应从「14 次分页」改成「1 次取全」，请求数降 93% ⇒ 从根上离开 502 窗口。
+#   ② fid=f62 与 fid=f3 的分页行为差异（f3 是否硬截 100）。
+#   ③ 502 窗口有多长 —— 用「10 次重试 × 5 秒」实测：多久能自愈（决定重试参数怎么配）。
 
-name: "🔬 v8 ETF clist 定罪探针v4(一次性·端点/pz上限+限流特征)"
+name: "🔬 v8 ETF clist 定罪探针v5(一次性·冷启动取全判定+502窗口实测)"
 
 on:
   workflow_dispatch: {}
@@ -29,23 +29,24 @@ concurrency:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - name: "📥 checkout（取生产代码真身）"
         uses: actions/checkout@v4
 
-      - name: "🐍 装依赖（cloud_fetch_v8 顶层仅 stdlib + pandas + requests）"
+      - name: "🐍 装依赖"
         run: |
           python3 -m pip install --quiet --disable-pip-version-check requests pandas
 
-      - name: "🔬 端点/pz 上限 + 限流特征实测"
+      - name: "🔬 冷启动取全判定 + 502 窗口实测"
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
           python3 - <<'PYEOF'
-          import json, os, sys, time, base64, traceback, importlib, inspect, urllib.request
+          import json, os, sys, time, base64, traceback, importlib, inspect
+          import urllib.request, urllib.parse
           import requests
           try:
               requests.packages.urllib3.disable_warnings()
@@ -53,9 +54,11 @@ jobs:
               pass
 
           t0 = time.time()
-          BUDGET = 700
-          out = {"probe_time": time.strftime("%Y-%m-%d %H:%M:%S"), "matrix": [], "stability": [],
-                 "prod_clist": [], "prod_fn": []}
+          BUDGET = 1000
+          CMB = "m:1+t:9,m:0+t:9"
+          F62 = "f12,f14,f62"
+          out = {"probe_time": time.strftime("%Y-%m-%d %H:%M:%S"), "cold": [], "pages": [],
+                 "coverage": {}, "robust": [], "heavy": []}
 
           def log(m):
               print(m, flush=True)
@@ -63,170 +66,154 @@ jobs:
           def left():
               return BUDGET - (time.time() - t0)
 
-          # ── 0. 生产模块 ─────────────────────────────────────────────
+          def stamp():
+              return time.strftime("%H:%M:%S")
+
+          # ── 0. 生产模块（只 import，不调用 ⇒ 零污染）────────────────
           sys.path.insert(0, os.getcwd())
-          cf = None
-          try:
-              cf = importlib.import_module("cloud_fetch_v8")
-              out["import_ok"] = True
-              out["em_clist_sig"] = str(inspect.signature(cf.em_clist))
-              log("✅ import OK | _EM_DELAY=%s" % cf._EM_DELAY)
-              log("   em_clist%s" % out["em_clist_sig"])
-          except Exception as e:
-              out["import_ok"] = False
-              out["import_err"] = "%s: %s" % (type(e).__name__, e)
-              log("❌ import 失败 %s" % e)
+          cf = importlib.import_module("cloud_fetch_v8")
+          out["import_ok"] = True
+          out["em_clist_sig"] = str(inspect.signature(cf.em_clist))
+          log("✅ import OK | _EM_DELAY=%s" % getattr(cf, "_EM_DELAY", "?"))
+          src = inspect.getsource(cf.em_clist)
+          out["em_clist_src"] = src
+          log("──────── em_clist 源码 ────────")
+          for ln in src.splitlines()[:60]:
+              log("   " + ln)
 
-          HDR = dict(cf._EM_HEADERS) if cf else {"User-Agent": "Mozilla/5.0", "Accept": "*/*"}
-
-          BASES = {"delay":    "https://push2delay.eastmoney.com",
-                   "push2":    "https://push2.eastmoney.com",
-                   "push2his": "https://push2his.eastmoney.com"}
-          CMB = "m:1+t:9,m:0+t:9"
-          F = "f12,f14,f62"
-
-          def call(key, pz, fs=CMB, fid="f3", po="1", pn=1, timeout=15):
-              base = BASES[key]
-              p = {"pn": str(pn), "pz": str(pz), "po": po, "np": "1", "fltt": "2", "invt": "2",
-                   "ut": "b2884a393a59ad64002292a3e90d46a5", "fid": fid, "fs": fs, "stat": "1",
-                   "fields": F, "_": int(time.time() * 1000)}
+          # ── 1/2. 冷启动：一次请求拿全市场（fid=f62，po=1 与 po=0）──
+          def prod(fs, fields, fid, pz, po, pn=1, timeout=20):
               t = time.time()
               try:
-                  r = requests.get(base + "/api/qt/clist/get", params=p, headers=HDR,
-                                   timeout=timeout, verify=False)
-                  el = round(time.time() - t, 1)
-                  try:
-                      d = r.json()
-                  except Exception:
-                      return {"base": key, "http": r.status_code, "json": False,
-                              "bytes": len(r.content), "head": r.text[:80].replace("\n", " "), "secs": el}
-                  data = d.get("data") or {}
-                  diff = data.get("diff") if isinstance(data.get("diff"), list) else []
-                  return {"base": key, "http": r.status_code, "json": True, "rc": d.get("rc"),
-                          "api_total": data.get("total"), "rows": len(diff), "secs": el,
-                          "k1": (sorted(diff[0].keys()) if diff and isinstance(diff[0], dict) else None),
-                          "sample": (str(diff[0])[:100] if diff else None)}
+                  rr = cf.em_clist(fs, fields, fid=fid, stat="1", pz=pz, po=po, pn=pn, timeout=timeout)
               except Exception as e:
-                  return {"base": key, "err": "%s: %s" % (type(e).__name__, str(e)[:70]),
-                          "secs": round(time.time() - t, 1)}
+                  return {"err": "%s: %s" % (type(e).__name__, str(e)[:80])}
+              el = round(time.time() - t, 1)
+              codes = [str(r.get("f12")) for r in rr if isinstance(r, dict) and r.get("f12")]
+              nets = []
+              for r in rr:
+                  try:
+                      nets.append(float(r.get("f62") or 0.0))
+                  except Exception:
+                      pass
+              return {"rows": len(rr), "uniq": len(set(codes)), "secs": el,
+                      "sum_net_yi": round(sum(nets) / 1e8, 3),
+                      "sh": sum(1 for c in set(codes) if c[:1] in ("5", "6")),
+                      "sz": sum(1 for c in set(codes) if c[:1] in ("1", "0", "3")),
+                      "sample": codes[:6], "at": stamp()}
 
           def add(bucket, tag, rec):
               rec["tag"] = tag
               bucket.append(rec)
-              log("   %-40s %s" % (tag, json.dumps(rec, ensure_ascii=False)[:165]))
+              log("   %-34s %s" % (tag, json.dumps(rec, ensure_ascii=False)[:200]))
 
-          # ── 1. 第一手：生产整函数（干净环境，无前置污染）────────────
-          def pfn(name):
-              if cf is None:
-                  return {"skip": "import failed"}
-              fn = getattr(cf, name, None)
-              if fn is None:
-                  return {"err": "无此函数"}
-              t = time.time()
-              try:
-                  r = fn()
-              except Exception as e:
-                  return {"err": "%s: %s" % (type(e).__name__, e), "tb": traceback.format_exc()[-600:],
-                          "secs": round(time.time() - t, 1)}
-              s = {"secs": round(time.time() - t, 1), "type": type(r).__name__}
-              if r is None:
-                  s["value"] = "None"
-              elif isinstance(r, dict):
-                  s["keys"] = list(r.keys())[:9]
-                  if "total_net" in r:
-                      s["total_net"] = r.get("total_net")
-                      s["total_etf"] = r.get("total_etf")
-                  if "etfs" in r:
-                      s["n_etfs"] = len(r.get("etfs") or [])
-                  if r.get("no_data"):
-                      s["no_data"] = True
-              else:
-                  s["value"] = str(r)[:120]
-              return s
+          log("════ 冷启动段（零前置请求） ════")
+          add(out["cold"], "f62_pz5000_CMB_po1", prod(CMB, F62, "f62", 5000, "1"))
+          time.sleep(0.5)
+          add(out["cold"], "f62_pz5000_CMB_po0", prod(CMB, F62, "f62", 5000, "0"))
+          time.sleep(0.5)
+          r_sh = prod("m:1+t:9", F62, "f62", 3000, "1")
+          add(out["cold"], "f62_pz3000_SH", r_sh)
+          time.sleep(0.5)
+          r_sz = prod("m:0+t:9", F62, "f62", 3000, "1")
+          add(out["cold"], "f62_pz3000_SZ", r_sz)
+          time.sleep(0.5)
+          # 生产现用形态（14 次分页的第一页）
+          add(out["cold"], "f3_pz100_CMB_pn1", prod(CMB, F62, "f3", 100, "1"))
+          time.sleep(0.5)
 
-          add(out["prod_fn"], "first(fn·干净)", {"fn": "f_etf_daily_monitor", **pfn("f_etf_daily_monitor")})
-          time.sleep(2)
-          add(out["prod_fn"], "first(fn·干净)", {"fn": "f_etf_pulse", **pfn("f_etf_pulse")})
-          time.sleep(2)
+          # ── 3. 分页行为对照：f3 vs f62（各连取 3 页）──────────────
+          log("════ 分页行为段 ════")
+          for fid in ("f3", "f62"):
+              for pn in (1, 2, 3):
+                  if left() < 500:
+                      break
+                  add(out["pages"], "%s_pz100_pn%d" % (fid, pn), prod(CMB, F62, fid, 100, "1", pn=pn))
+                  time.sleep(0.4)
 
-          # ── 2. 矩阵 A：端点 × pz=5000（能否一次拿全？）──────────────
-          for key in ["delay", "push2", "push2his"]:
+          out["coverage"] = {
+              "cmb_pz5000_uniq": out["cold"][0].get("uniq"),
+              "sh_uniq": r_sh.get("uniq"), "sz_uniq": r_sz.get("uniq"),
+              "sh_plus_sz": (r_sh.get("uniq") or 0) + (r_sz.get("uniq") or 0),
+          }
+          log("   coverage: %s" % json.dumps(out["coverage"], ensure_ascii=False))
+
+          # ── 4. 502 窗口实测：同一请求最多 12 次 × 5 秒 ─────────────
+          log("════ 502 窗口实测（12 次 × 5 秒）════")
+          URL = getattr(cf, "_EM_DELAY", "https://push2delay.eastmoney.com").rstrip("/") + "/api/qt/clist/get"
+          HDR = dict(getattr(cf, "_EM_HEADERS", {"User-Agent": "Mozilla/5.0"}))
+          out["probe_url"] = URL
+          for i in range(12):
               if left() < 200:
                   break
-              add(out["matrix"], "pz5000_%s" % key, call(key, 5000))
-              time.sleep(1.0)
-
-          # ── 3. 矩阵 B：pz 梯度（验证 push2delay 是否硬截 100）────────
-          for pz in [100, 500, 1000, 3000]:
-              if left() < 160:
-                  break
-              add(out["matrix"], "pz%d_delay" % pz, call("delay", pz))
-              time.sleep(1.0)
-
-          # ── 4. 矩阵 C：单市场 fs 对照（热力图同款形态）───────────────
-          if left() > 120:
-              add(out["matrix"], "single_sh_pz5000", call("delay", 5000, fs="m:1+t:9"))
-              time.sleep(1.0)
-              add(out["matrix"], "single_sz_pz5000", call("delay", 5000, fs="m:0+t:9"))
-              time.sleep(1.0)
-
-          # ── 5. 稳定性：同配置连打 6 次（限流特征）───────────────────
-          for i in range(6):
-              if left() < 90:
-                  break
-              r = call("delay", 5000)
-              add(out["stability"], "streak#%d" % (i + 1), r)
-              time.sleep(0.8)
-
-          # ── 6. 静置 30 秒，看是否恢复（短时配额 vs 长时封禁）─────────
-          time.sleep(30)
-          add(out["stability"], "after_30s_rest", call("delay", 5000))
-
-          # ── 7. 生产 em_clist 口径对照（同函数）──────────────────────
-          if cf is not None:
-              for tag, fs, pz in [("prod_clist_cmb_pz5000", CMB, 5000),
-                                  ("prod_clist_sh_pz5000", "m:1+t:9", 5000),
-                                  ("prod_clist_cmb_pz100", CMB, 100)]:
-                  if left() < 60:
-                      break
-                  t = time.time()
+              p = {"pn": "1", "pz": "5000", "po": "1", "np": "1", "fltt": "2", "invt": "2",
+                   "ut": "b2884a393a59ad64002292a3e90d46a5", "fid": "f62", "fs": CMB,
+                   "stat": "1", "fields": F62, "_": int(time.time() * 1000)}
+              t = time.time()
+              try:
+                  r = requests.get(URL, params=p, headers=HDR, timeout=20, verify=False)
+                  el = round(time.time() - t, 1)
                   try:
-                      rr = cf.em_clist(fs, F, fid="f3", stat="1", pz=pz, po="1", pn=1, timeout=12)
-                      rec = {"rows": len(rr), "secs": round(time.time() - t, 1),
-                             "sample": (str(rr[0])[:100] if rr else None)}
-                  except Exception as e:
-                      rec = {"err": "%s: %s" % (type(e).__name__, e)}
-                  add(out["prod_clist"], tag, rec)
-                  time.sleep(1.0)
-
-          # ── 8. 收尾：整函数再跑 2 次（污染后是否恢复）───────────────
-          for i in range(2):
-              if left() < 90:
+                      d = r.json()
+                      diff = (d.get("data") or {}).get("diff")
+                      rec = {"http": r.status_code, "json": True, "rows": len(diff) if isinstance(diff, list) else 0,
+                             "api_total": (d.get("data") or {}).get("total"), "secs": el, "at": stamp()}
+                  except Exception:
+                      rec = {"http": r.status_code, "json": False, "bytes": len(r.content),
+                             "head": r.text[:60].replace("\n", " "), "secs": el, "at": stamp()}
+              except Exception as e:
+                  rec = {"err": "%s: %s" % (type(e).__name__, str(e)[:60]), "secs": round(time.time() - t, 1), "at": stamp()}
+              rec["tag"] = "try#%d" % (i + 1)
+              out["robust"].append(rec)
+              log("   %-34s %s" % (rec["tag"], json.dumps(rec, ensure_ascii=False)[:190]))
+              if rec.get("rows"):
+                  # 成功即停：记录「从开始到第一次成功」的耗时 = 502 窗口长度
+                  out["recover_after_secs"] = round(time.time() - t0, 1)
+                  log("   ✅ 第 %d 次成功，窗口约 %.0f 秒" % (i + 1, time.time() - t0))
                   break
-              add(out["prod_fn"], "last#%d(矩阵后)" % (i + 1), {"fn": "f_etf_daily_monitor", **pfn("f_etf_daily_monitor")})
+              time.sleep(5)
+
+          # ── 5. 最后才跑重活：生产整函数（复现「重活后 502」对照）────
+          log("════ 重活对照段（放最后，不污染前面）════")
+          for i in range(2):
+              if left() < 150:
+                  break
+              t = time.time()
+              try:
+                  rr = cf.f_etf_daily_monitor()
+                  rec = ({"type": "NoneType"} if rr is None else
+                         {"type": "dict", "total_etf": rr.get("total_etf"),
+                          "total_net_yi": round((rr.get("total_net") or 0) / 1e8, 3)})
+              except Exception as e:
+                  rec = {"err": "%s: %s" % (type(e).__name__, str(e)[:80])}
+              rec["secs"] = round(time.time() - t, 1)
+              add(out["heavy"], "fn_after#%d" % (i + 1), rec)
               time.sleep(3)
 
           out["elapsed_secs"] = round(time.time() - t0, 1)
+          log("══ 完成，耗时 %.0f 秒 ══" % out["elapsed_secs"])
           body = json.dumps(out, ensure_ascii=False, indent=1).encode("utf-8")
 
           TOK = os.environ["GITHUB_TOKEN"]; REPO = os.environ["REPO"]
-          PATH_ = "raw_data/_etf_probe2.json"; BR = "main"
-
+          PATH_ = "raw_data/_etf_probe3.json"; BR = "main"
           def gh(url, method="GET", data=None):
               req = urllib.request.Request(url, data=data, method=method, headers={
                   "Authorization": "Bearer " + TOK, "Accept": "application/vnd.github+json"})
               return json.load(urllib.request.urlopen(req, timeout=30))
-
           try:
-              old = gh("https://api.github.com/repos/%s/contents/%s?ref=%s" % (REPO, PATH_, BR))
-              sha = old["sha"]
+              sha = gh("https://api.github.com/repos/%s/contents/%s?ref=%s" % (REPO, PATH_, BR))["sha"]
           except Exception:
               sha = None
-          payload = {"message": "chore(probe): ETF clist 探针v4(端点/pz上限+限流特征)",
+          payload = {"message": "chore(probe): ETF clist 探针v5(冷启动取全+502窗口)",
                      "content": base64.b64encode(body).decode(), "branch": BR}
           if sha:
               payload["sha"] = sha
-          gh("https://api.github.com/repos/%s/contents/%s" % (REPO, PATH_), "PUT",
-             json.dumps(payload).encode())
-          log("✅ 结果已提交 %s（%d B，耗时 %.0fs）" % (PATH_, len(body), out["elapsed_secs"]))
+          for _try in range(6):
+              try:
+                  gh("https://api.github.com/repos/%s/contents/%s" % (REPO, PATH_), "PUT",
+                     json.dumps(payload).encode())
+                  log("✅ 结果已提交 %s（%d B）" % (PATH_, len(body)))
+                  break
+              except Exception as e:
+                  log("PATCH 失败(%d/6): %s" % (_try + 1, e)); time.sleep(2)
           PYEOF
