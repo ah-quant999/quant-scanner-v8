@@ -369,19 +369,20 @@ jobs:
       - name: "📡 抓中国数据 → raw_data/（selective）"
         # 🛡 2026-08-22 幂等闸门：skip=true 时本 run 不重复抓取（另一新鲜 run 已在做）
         if: steps.gate.outputs.skip != 'true' && steps.td.outputs.proceed != 'false'
-        # 🛡️ 2026-08-12 移除 continue-on-error：抓取失败必须让 job 失败，
-        #    阻止 api_push_raw 把只刷了 update_time 的空壳数据推送到 main。
-        # 🔴 2026-09-22 小九·一劳永逸：补**步级**时间锁（血证 cn_fetch #1990）
-        #   现象：本步静默卡死 **50 分钟**（16:21:03 → 17:11:43 被手工取消）。
-        #     本步原先无 timeout-minutes，只有 job 级 60min 兜底 ⇒ 白占唯一并发
-        #     槽位 50 分钟，排队中的 #1991 白等 51 分钟 ⇒ 16:20–17:11 数据链空转。
-        #     卡点已定位：ak.stock_xgsr_ths() 内部 requests 不传 timeout。
-        #     （治本修复已在 fetch_ipo_data_v8.py 注入 30s 超时；本锁为第二道防线。）
-        #   取值依据：本步历史耗时 n=29 / p50=8.2min / max=20.2min
-        #     ⇒ 30min = 1.5×历史峰值，不误杀正常轮次，又能把「无限挂死」封顶。
-        #   语义：超时 → 本步 failure → 后续推送步 skipped → 本轮不落盘
-        #     （与既有「阻止空壳推送」一致），但槽位 30 分钟即释放，不再拖垮队列。
+        # 🛡️ 2026-09-24 主人令「按推荐方案全落地」：恢复 continue-on-error（选择性推送）。
+        #   根因：cloud_fetch_v8 仅对「成功模块」save()（失败模块不写 → 远端旧值天然保留），
+        #    但旧逻辑（2026-08-12 移除 continue-on-error）让抓取步 return 1 时整 job 失败 →
+        #    后续 api_push_raw 全 skipped → 整批不推（连已成功模块的新数据也卡住）。
+        #   恢复后：单/多源失败仅留痕，已成功模块照常推送，失败模块远端旧值保留；
+        #    HEALTH_CHECK 显式标注未刷新源。空壳防护改由 freshness 看门狗事后核对。
+        # 🔴 2026-09-22 小九·一劳永逸：步级时间锁（血证 cn_fetch #1990）保留——
+        #   现象：本步曾静默卡死 50 分钟占满唯一并发槽位；卡点 ak.stock_xgsr_ths() 内 requests 不传 timeout
+        #    （治本修复在 fetch_ipo_data_v8.py 注入 30s 超时；本锁为第二道防线）。
+        #   取值依据：本步历史耗时 n=29 / p50=8.2min / max=20.2min ⇒ 30min=1.5×峰值封顶「无限挂死」。
+        #   语义（2026-09-24 修正）：超时 → 本步 failure → continue-on-error 兜住不 kill job →
+        #    已成功源照常由后续 api_push_raw 推送，槽位 30 分钟即释放。
         timeout-minutes: 30
+        continue-on-error: true
         shell: bash
         run: |
           cat="${{ steps.cat.outputs.category }}"

@@ -139,8 +139,13 @@ jobs:
           python -c "import akshare, pandas; print('akshare', akshare.__version__, '/ pandas', pandas.__version__)"
 
       - name: "📡 抓中国数据 → raw_data/（selective）"
-        # 🛡️ 2026-08-12 移除 continue-on-error：抓取失败必须让 job 失败，
-        #    阻止 api_push_raw 把只刷了 update_time 的空壳数据推送到 main。
+        # 🛡️ 2026-09-24 主人令「按推荐方案全落地」：恢复 continue-on-error（选择性推送）。
+        #   根因：cloud_fetch_v8 仅对「成功模块」save()（失败模块不写 → 远端旧值天然保留），
+        #    但旧逻辑（2026-08-12 移除 continue-on-error）让抓取步 return 1 时整 job 失败 →
+        #    后续 api_push_raw 全 skipped → 整批不推（连已成功模块的新数据也卡住）。
+        #   恢复后：单/多源失败仅留痕，已成功模块照常推送，失败模块远端旧值保留；
+        #    HEALTH_CHECK 显式标注未刷新源。空壳防护改由 freshness 看门狗事后核对。
+        continue-on-error: true
         shell: bash
         run: |
           cat="${{ steps.cat.outputs.category }}"

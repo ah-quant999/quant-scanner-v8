@@ -253,6 +253,11 @@ items:
       **结构性建议（待小九拍板）**：`[10/10]` 只在 build 里跑 ⇒ 只能挡住「部署」，**挡不住 cn 侧直推 index.html**；
       正解方向 = ① 把「核心标记全命中」做成**推送侧硬前置**（任何写 index.html 的路径落盘前自检），
       或 ② 一律改为「取远端正文 + 就地改 ?v」（`api_push_raw._stamp_remote_index_v` 范式）并**删除所有本地入队口**。
+      🔵 **2026-09-24 阿狸咪的工程师 补（#37 pages-publish-bypasses-gate 同批 done）**：本项根因
+      （checkout 写主 index 不 unstage）仍由 v8_rollback_guard / v8_health_check 的 checkout+unstage 修复治理；
+      但「即便写坏也没人拦」的结构性缺口已由 #37 选项 C 补上——发布后 60s 硬抓线上 index.html 完整性 +
+      异常自动回滚守卫（.github/scripts/pages_post_publish_healthcheck.py），作为发布层兜底防线，与本书的
+      「staged 拆弹」治理正交互补。
 
       🔴 **2026-09-22 20:29 CST 追加：真凶已取证（`v8_algo_cloud` #2045 step14 日志逐字，run 结束后拉到）**
       写入者 = **算法链**（不是 cn fetch；提交信息 `v8 cn fetch: HH:MM` 只是 `api_push_raw.py` 的**默认消息**，会误导归因）：
@@ -1456,7 +1461,14 @@ items:
   - id: cnfetch-empty-shell-block
     priority: P0
     owner: shared
-    status: doing
+    status: done
+    resolved_at: "2026-09-24 03:15"
+    resolution: >
+      2026-09-24 主人令「按推荐方案全落地」#35：v8_cn_fetch_cloud.yml / v8_cn_fetch_cloud_hosted.yml
+      抓取步加 continue-on-error: true（selfhosted 版 09-09 已修，主力/托管版此前缺）。配合 cloud_fetch_v8
+      仅对「成功模块」save() 的既有机制（失败模块不写 ⇒ 远端旧值天然保留），恢复后：单/多源失败仅留痕、
+      已成功模块照常推送，实现「选择性推送」，根治「整批不推（连已算好的四量也卡住）」。空壳防护改由
+      freshness 看门狗事后核对（HEALTH_CHECK 显式标未刷新源）。
     what: >-
       2026-09-21 盘后 **cn_fetch 主批 3 个模块抓取失败 ⇒ 触发既有「阻止空壳推送」设计，
       整批（含已算好的 22 个 ok 模块）一并被拦** ⇒ raw_data 全批未落 main ⇒ 上游 B 批未就绪
@@ -2591,7 +2603,14 @@ items:
   - id: fourvolume-backtest-3y-downgrade
     priority: P1
     owner: shared
-    status: todo
+    status: done
+    verified_at: "2026-09-24 03:15"
+    resolution: >
+      2026-09-24 复核（阿狸咪的工程师）：写入入口 write_four_volume_backtest_js()（strategy_four_volume.py
+      L358-439）早已内建「只升不降」ratchet——读现存 signal_date_range，新 years 为 None 或小于旧值且旧值有数据
+      则跳过覆盖、保留高年限真值；main() L663 确走此函数。HANDOFF 实证 09-19 后持续「近 5 年守档」，
+      本次反复降级覆盖的根因（cloud_fetch_v8 未注入 V8_BACKTEST_YEARS ⇒ 子进程落默认 3 年）已被 ratchet 拦住。
+      本项实质已落地，仅补登记结案；后续若需永久固化「近 5 年」，可在 cloud_fetch_v8.f_four_volume 显式传 --years。
     what: >
       四量终极回测外壳 `data/FOUR_VOLUME_BACKTEST.js` 的 `signal_date_range` **反复由「近 5 年」降到「近 3 年」**
       —— 即主人 2026-09-16 令「不是真实的我不要」所禁的**回测口径降级覆盖**。
@@ -2695,7 +2714,16 @@ items:
   - id: pages-publish-bypasses-gate
     priority: P0
     owner: shared
-    status: todo
+    status: done
+    resolved_at: "2026-09-24 03:15"
+    resolution: >
+      采用选项 C（缓解而非根治，与 update_v8 非原子写已根治互补）：新增守卫脚本
+      .github/scripts/pages_post_publish_healthcheck.py，并在 v8_build_deploy.yml 部署步（git push 成功后、
+      if: success()）挂「🩺 发布后体检 index.html」步。机制：硬抓线上 index.html（github.io CDN 真实内容），
+      首等 60s 后轮询至 BUILD 命中或超时；校验 HTTP 200 / 字节阈值(600KB 截截断) / </html> 尾部闭合 /
+      index_protected_markers.txt 全 38 条核心标记命中（复用 pre_deploy_audit [10/10] 真源口径）；
+      若 BUILD 确已上线且损坏 → 自动回滚 index.html 到 build 前一版并推送（仅 revert index.html、不动
+      data/*.js、绝不 force-push）。「门禁只能喊、不能拦线上」的结构性缺口由发布层兜底补上。
     what: >
       2026-09-22 20:10 CST 的「`index.html` 被截断成 366,154 B（砍掉 14,220 行，断在
       `window.__STAR_ALT_SOURCES = {` 对象定义正中间）⇒ 整站白屏 9 分钟」事故中，

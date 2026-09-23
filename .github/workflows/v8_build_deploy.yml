@@ -551,6 +551,16 @@ jobs:
           done
           echo "❌ 3 次重试后仍失败"; exit 1
 
+      - name: "🩺 发布后体检 index.html（60s 硬抓线上 + 异常回滚）"
+        # 🛡 2026-09-24 主人令「按推荐方案全落地」#37：部署成功后，硬抓线上 index.html
+        #   校验完整性（HTTP 200 / 字节阈值 / </html> 闭合 / index_protected_markers 全命中）；
+        #   若新版本(BUILD 命中)确已上线且损坏 → 自动回滚 index.html 到最近通过版并推送。
+        #   仅部署成功(success)才跑；部署失败则不跑（无新版本可体检）。
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python .github/scripts/pages_post_publish_healthcheck.py
 
   # ══════════════════════════════════════════════════════════════════════
   # 🛡 盘中链首跑探活（P1 · 2026-09-18 主人令）
