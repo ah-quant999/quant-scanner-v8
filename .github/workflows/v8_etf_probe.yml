@@ -1,23 +1,28 @@
-# 九宝量化 v8.0 — ETF clist 探针（第9版·一次性诊断，验完即删）
+# 九宝量化 v8.0 — ETF clist 探针（第10版·一次性诊断，验完即删）
 #
-# v8 实测（19:24~19:29，同窗口 6 个独立 runner）：
-#   A 全新IP 顺序爬 17 页（页间 2s）: 仅第 1 页 200，第 2~17 页全败（187s）
-#   B 全新IP 分片域名 1..17.push2  : 前 3 页 200，第 4~17 页全败（37s）
-#   C 先烧 30 个请求再爬          : 0/17（271s）——「IP 被打死」可复现
-#   D 同域名隔 60s 打 4 次         : 0/4（204s）——**慢速节流也救不回来**
-#   E 同域名无间隔连打 6 次        : 4/6 成功（7s）= 200,200,200,502,502,200
-#   F 1..10.push2 各 1 次          : 0/10
-# ⇒ v7「首请求必成」在 v8 窗口不成立 ⇒ **不是干净的 per-IP 速率限制**，
-#   更像「随请求抽签 + 好/坏时段交替」。D 说明「放慢」无效，E 说明**快打有时能连成串**。
+# ── v9 实录（19:34~19:41，4 个独立 runner，各 6~8 分钟）已排除「并发 / 分片 / 快速重开」──
+#   G_concurrent_17 : 19 轮 → 9 页 / 900 行（362s）
+#   J_shard_concur  : 93 轮 → 13 页 / 1219 行（362s）← 历版最好，但**从未拼齐 17 页**
+#   H_rapid_restart : 70 次尝试 → 最好只有 100 行（481s）
+#   I_param_probe   : np=2 / invt=1 / pz=2000..6000 全部未突破 rows=100 硬截
+#   v8 的 C_burn30_then_crawl : 先烧 30 个请求 ⇒ 随后 17 页 0/17 全败（「该 IP 被打死」可复现）
+#   v8 的 D_pace60_4x        : 同域隔 60s 打 4 次 ⇒ 0/4（**放慢节流也救不回来**）
+#   v8 的 E_rapid_6x         : 同域无间隔连打 6 次 ⇒ 4/6（7s）——快打有时能连成串
+# ⇒ 定论：**clist 分页在生产环境凑不齐全市场**（1619 只 = 17 页），
+#   且「密集请求 ⇒ 一段时间内全 502」会自我加剧。生产 v3/v4 的「10 轮补页」
+#   在 20:00 那笔 run 里实测 **10 轮补到 0 页**（见 log），即撞上此机制。
 #
-# 本版要选出**唯一可行修法**（4 条路各占一个独立 runner）：
-#   G_concurrent_17  : 17 页**并发**发，失败页并发重试，最多 6 轮（好窗口只需几秒）
-#   H_rapid_restart  : 顺序爬（无间隔），一失败立即重开整爬，8 分钟内尽可能多次
-#   I_np2_pz2000     : 参数探路——np=2 / invt=1 等能否突破「rows=100」硬截（若能 ⇒ 1 请求拿全）
-#   J_shard_concur   : 17 页并发 + 每页打到不同分片域名 {i}.push2
-# 判据：leg 结束时**拿到多少页 / 多少只**（满 17 页 1700 只 = 可行修法）。
+# ── 本版转攻「一次请求拿到 ETF 板块级主力净额」（成立则彻底绕开分页）──
+#   A_board_ulist  : ulist.np/get secids=90.MK0021..24 → 能否回板块级 f62     ★最优先
+#                    （附带用 secids=1.510300,0.159915 验证 ulist 通路本身是否可用）
+#   B_board_fflow  : push2his fflow/daykline secid=90.MK0021 → 板块资金流历史？
+#   C_single_total : 四个单板块 clist 各自 total + 首页代码前缀（判各自覆盖沪深哪些）
+#   D_cold_base    : 冷启动连打 3 次 clist（同域无间隔）→ 基准成功率
+#   E_fields_ab    : fields 三变体（v9版无f2/f184 / 生产版含f2,f184 / 空）→ f184 是否毒药
+#   F_alt_fs       : 其他板块串（m:90+t:2 等）找有没有「ETF 汇总」板块
+# 判据：A 能回 f62 数值 ⇒ 直接以 A 重写（1 请求搞定）；否则按「降口径 + 慢补页」收尾。
 
-name: "🔬 v8 ETF clist 探针v9(并发vs快速重开·分片并发·参数破100截)"
+name: "🔬 v8 ETF clist 探针v10(板块级单请求·ulist/fflow 汇总路径)"
 
 on:
   workflow_dispatch: {}
@@ -34,22 +39,24 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "G_concurrent_17"
-            mode: "concurrent"
-            hostmode: "delay"
-            budget: "360"
-          - name: "H_rapid_restart"
-            mode: "rapid"
-            hostmode: "delay"
-            budget: "480"
-          - name: "I_param_probe"
-            mode: "params"
-            hostmode: "delay"
-            budget: "120"
-          - name: "J_shard_concur"
-            mode: "concurrent"
-            hostmode: "subdom"
-            budget: "360"
+          - name: "A_board_ulist"
+            mode: "board_ulist"
+            budget: "90"
+          - name: "B_board_fflow"
+            mode: "board_fflow"
+            budget: "90"
+          - name: "C_single_total"
+            mode: "single_total"
+            budget: "90"
+          - name: "D_cold_base"
+            mode: "cold_base"
+            budget: "90"
+          - name: "E_fields_ab"
+            mode: "fields_ab"
+            budget: "90"
+          - name: "F_alt_fs"
+            mode: "alt_fs"
+            budget: "90"
     steps:
       - name: "🐍 装依赖"
         run: python3 -m pip install --quiet --disable-pip-version-check requests
@@ -59,120 +66,187 @@ jobs:
         env:
           CFG_NAME: ${{ matrix.name }}
           CFG_MODE: ${{ matrix.mode }}
-          CFG_HOSTMODE: ${{ matrix.hostmode }}
           CFG_BUDGET: ${{ matrix.budget }}
         run: |
           python3 - <<'PYEOF'
-          import json, os, time, random, socket
-          from concurrent.futures import ThreadPoolExecutor
-
-          UT = "b2884a393a59ad64002292a3e90d46a5"
-          FS = "b:MK0021,b:MK0022,b:MK0023,b:MK0024"
-          FLDS = "f12,f14,f3,f6,f10,f62"
-          DELAY = "https://push2delay.eastmoney.com"
-          HDR = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-                 "Referer": "https://quote.eastmoney.com/"}
+          import json, os, time, random
           import requests
           try:
               requests.packages.urllib3.disable_warnings()
           except Exception:
               pass
 
-          def host_for(i, mode):
-              return ("https://%d.push2.eastmoney.com" % (i,)) if mode == "subdom" else DELAY
-
-          def fetch(host, pn, extra=None):
-              p = {"pn": str(pn), "pz": "100", "po": "1", "np": "1", "fltt": "2", "invt": "2",
-                   "ut": UT, "fid": "f62", "fs": FS, "stat": "1", "fields": FLDS,
-                   "_": int(time.time() * 1000)}
-              if extra:
-                  p.update(extra)
-              try:
-                  r = requests.get(host.rstrip("/") + "/api/qt/clist/get", params=p,
-                                   timeout=15, verify=False, headers=HDR)
-                  if r.status_code != 200:
-                      return None
-                  d = r.json()
-                  data = d.get("data") or {}
-                  diff = data.get("diff")
-                  if isinstance(diff, dict):
-                      diff = list(diff.values())
-                  return diff if isinstance(diff, list) else []
-              except Exception:
-                  return None
+          UT = "b2884a393a59ad64002292a3e90d46a5"
+          FS = "b:MK0021,b:MK0022,b:MK0023,b:MK0024"
+          FLDS = "f12,f14,f3,f6,f10,f62"
+          DELAY = "https://push2delay.eastmoney.com"
+          MAIN = "https://push2.eastmoney.com"
+          HIS = "https://push2his.eastmoney.com"
+          HDR = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                 "Referer": "https://quote.eastmoney.com/"}
 
           name = os.environ["CFG_NAME"]; mode = os.environ["CFG_MODE"]
-          hm = os.environ["CFG_HOSTMODE"]; budget = float(os.environ["CFG_BUDGET"])
+          budget = float(os.environ["CFG_BUDGET"])
           t0 = time.time()
           print("══════════════ %s ══════════════" % name, flush=True)
 
-          if mode == "params":
-              probes = [
-                  ("np2_pz2000", {"np": "2", "pz": "2000"}),
-                  ("np2_pz6000", {"np": "2", "pz": "6000"}),
-                  ("invt1_pz5000", {"invt": "1", "pz": "5000"}),
-                  ("fltt1_pz5000", {"fltt": "1", "pz": "5000"}),
-                  ("pz1000", {"pz": "1000"}),
-                  ("pz500_po1", {"pz": "500"}),
-              ]
-              for tag, extra in probes:
-                  rows = fetch(DELAY, 1, extra)
-                  print("PARAM %s %s -> %s" % (name, tag, "ERR/502" if rows is None else len(rows)),
-                        flush=True)
+          def get(url, params, timeout=15):
+              try:
+                  r = requests.get(url, params=params, timeout=timeout,
+                                   verify=False, headers=HDR)
+                  if r.status_code != 200:
+                      return None, "http%d" % r.status_code
+                  try:
+                      return r.json(), "ok"
+                  except Exception:
+                      return None, "notjson"
+              except Exception as e:
+                  return None, type(e).__name__
+
+          def norm(x):
+              if isinstance(x, dict):
+                  x = list(x.values())
+              return x if isinstance(x, list) else []
+
+          def tag(t, **kw):
+              print("TAG %s %s" % (t, json.dumps(kw, ensure_ascii=False)), flush=True)
+
+          def clist_params(pn=1, pz=100, fields=FLDS, fs=FS, fid="f62"):
+              return {"pn": str(pn), "pz": str(pz), "po": "1", "np": "1", "fltt": "2",
+                      "invt": "2", "ut": UT, "fid": fid, "fs": fs, "stat": "1",
+                      "fields": fields, "_": int(time.time() * 1000)}
+
+          # ── A：板块级 ulist（★核心假设）───────────────────────────────
+          if mode == "board_ulist":
+              # A1 四个 ETF 板块作为 secid（90.<板块代码>）
+              for secids in ["90.MK0021,90.MK0022,90.MK0023,90.MK0024",
+                             "90.MK0021",
+                             "90.BK0500"]:
+                  d, st = get(DELAY + "/api/qt/ulist.np/get",
+                              {"fltt": "2", "invt": "2", "ut": UT, "secids": secids,
+                               "fields": "f12,f14,f62,f3,f6,f184",
+                               "_": int(time.time() * 1000)})
+                  if d is None:
+                      tag("A1_ulist", secids=secids, status=st)
+                  else:
+                      dd = d.get("data") or {}
+                      rows = norm(dd.get("diff")) if dd else norm((d.get("data") or {}))
+                      tag("A1_ulist", secids=secids, rc=d.get("rc"), n=len(rows),
+                          sample=json.dumps(rows[:2], ensure_ascii=False)[:220])
                   time.sleep(2)
-              print("RESULT " + json.dumps({"cfg": name, "secs": round(time.time() - t0, 1)},
-                                           ensure_ascii=False), flush=True)
+              # A2 验证 ulist 通路本身：拿两只已知 ETF
+              d, st = get(DELAY + "/api/qt/ulist.np/get",
+                          {"fltt": "2", "invt": "2", "ut": UT,
+                           "secids": "1.510300,0.159915,1.000001",
+                           "fields": "f12,f14,f62,f3", "_": int(time.time() * 1000)})
+              if d is None:
+                  tag("A2_ulist_path", status=st)
+              else:
+                  dd = d.get("data") or {}
+                  rows = norm(dd.get("diff"))
+                  tag("A2_ulist_path", rc=d.get("rc"), n=len(rows),
+                      sample=json.dumps(rows[:3], ensure_ascii=False)[:260])
+              time.sleep(2)
+              # A3 单只 ETF 的 f62 与板块串首页首行对照（判板块级 f62 是否存在）
+              d, st = get(DELAY + "/api/qt/ulist.np/get",
+                          {"fltt": "2", "invt": "2", "ut": UT,
+                           "secids": "90.MK0021", "fields": "f12,f14,f62",
+                           "_": int(time.time() * 1000)})
+              tag("A3_single_board", status=st,
+                  raw=json.dumps(d, ensure_ascii=False)[:300] if d else None)
 
-          elif mode == "concurrent":
-              pages = {}; rounds = 0
-              while time.time() - t0 < budget and len(pages) < 17:
-                  rounds += 1
-                  todo = [pn for pn in range(1, 18) if pn not in pages]
-                  with ThreadPoolExecutor(max_workers=17) as ex:
-                      futs = {ex.submit(fetch, host_for(pn, hm), pn): pn for pn in todo}
-                      for f in futs:
-                          pn = futs[f]
-                          try:
-                              rows = f.result()
-                          except Exception:
-                              rows = None
-                          if rows is not None and len(rows) > 0:
-                              pages[pn] = rows
-                  print("ROUND %s #%d ok=%d/%d pages=%d rows=%d (%.0fs)" % (
-                      name, rounds, len(todo) - (len(todo) - (17 - len(pages))), 17,
-                      len(pages), sum(len(v) for v in pages.values()), time.time() - t0), flush=True)
-                  if len(pages) < 17:
-                      time.sleep(1.5)
-              print("RESULT " + json.dumps({"cfg": name, "rounds": rounds,
-                                            "pages_ok": sorted(pages.keys()),
-                                            "rows": sum(len(v) for v in pages.values()),
-                                            "secs": round(time.time() - t0, 1)}, ensure_ascii=False),
-                    flush=True)
+          # ── B：板块资金流历史（push2his fflow）────────────────────────
+          elif mode == "board_fflow":
+              for secid in ["90.MK0021", "90.BK0500", "1.000001"]:
+                  d, st = get(HIS + "/api/qt/stock/fflow/daykline/get",
+                              {"lmt": "0", "klt": "101", "secid": secid,
+                               "fields1": "f1,f2,f3,f7",
+                               "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65",
+                               "ut": UT, "_": int(time.time() * 1000)})
+                  if d is None:
+                      tag("B_fflow", secid=secid, status=st)
+                  else:
+                      dd = d.get("data") or {}
+                      kl = dd.get("klines") or []
+                      tag("B_fflow", secid=secid, rc=d.get("rc"), klines=len(kl),
+                          last=str(kl[-1])[:180] if kl else None,
+                          name=dd.get("name"))
+                  time.sleep(2)
 
-          else:  # rapid
-              best = 0; attempts = 0
-              while time.time() - t0 < budget:
-                  attempts += 1
-                  got = {}
-                  for pn in range(1, 18):
-                      rows = fetch(host_for(1, hm), pn)
-                      if rows is None or not rows:
-                          break
-                      got[pn] = rows
-                      if len(rows) < 100:
-                          break
-                  n = sum(len(v) for v in got.values())
-                  best = max(best, n)
-                  if n >= 1200:
-                      print("HIT %s attempt#%d rows=%d (%.0fs)" % (name, attempts, n, time.time() - t0),
-                            flush=True)
-                      break
-                  if attempts % 10 == 0:
-                      print("PROG %s attempt#%d best=%d (%.0fs)" % (name, attempts, best, time.time() - t0),
-                            flush=True)
-                  time.sleep(random.uniform(2.0, 5.0))
-              print("RESULT " + json.dumps({"cfg": name, "attempts": attempts, "best_rows": best,
-                                            "secs": round(time.time() - t0, 1)}, ensure_ascii=False),
-                    flush=True)
+          # ── C：四个单板块各自 total + 首页代码前缀 ────────────────────
+          elif mode == "single_total":
+              for b in ["MK0021", "MK0022", "MK0023", "MK0024"]:
+                  d, st = get(DELAY + "/api/qt/clist/get",
+                              clist_params(pn=1, pz=100, fs="b:" + b))
+                  if d is None:
+                      tag("C_board", board=b, status=st)
+                  else:
+                      dd = d.get("data") or {}
+                      rows = norm(dd.get("diff"))
+                      codes = [str(r.get("f12")) for r in rows]
+                      tag("C_board", board=b, rc=d.get("rc"), total=dd.get("total"),
+                          n=len(rows),
+                          pref={p: sum(1 for c in codes if c.startswith(p))
+                                for p in ("5", "1", "0", "3", "4", "8")},
+                          head=codes[:4])
+                  time.sleep(3)
+
+          # ── D：冷启动连打 3 次（基准成功率）───────────────────────────
+          elif mode == "cold_base":
+              for k in range(3):
+                  d, st = get(DELAY + "/api/qt/clist/get", clist_params(pn=1))
+                  if d is None:
+                      tag("D_cold", rep=k + 1, status=st, secs=round(time.time() - t0, 1))
+                  else:
+                      dd = d.get("data") or {}
+                      tag("D_cold", rep=k + 1, rc=d.get("rc"), rows=len(norm(dd.get("diff"))),
+                          total=dd.get("total"), secs=round(time.time() - t0, 1))
+
+          # ── E：fields 三变体（f184 是否毒药 + 每变体成功率）────────────
+          elif mode == "fields_ab":
+              variants = [
+                  ("v9_no_f2f184", "f12,f14,f3,f6,f10,f62"),
+                  ("prod_with_f2f184", "f12,f14,f2,f3,f6,f10,f62,f184"),
+                  ("no_fields", None),
+              ]
+              for vname, vf in variants:
+                  for rep in range(2):
+                      p = clist_params(pn=1)
+                      if vf is None:
+                          p.pop("fields", None)
+                      else:
+                          p["fields"] = vf
+                      d, st = get(DELAY + "/api/qt/clist/get", p)
+                      if d is None:
+                          tag("E_fields", variant=vname, rep=rep + 1, status=st)
+                      else:
+                          dd = d.get("data") or {}
+                          rows = norm(dd.get("diff"))
+                          tag("E_fields", variant=vname, rep=rep + 1, rc=d.get("rc"),
+                              rows=len(rows), total=dd.get("total"),
+                              keys=sorted(rows[0].keys())[:12] if rows else None)
+                      time.sleep(2)
+
+          # ── F：其他板块串（找 ETF 汇总板块）───────────────────────────
+          elif mode == "alt_fs":
+              for fsname, fs in [("old_m1t9", "m:1+t:9,m:0+t:9"),
+                                 ("mk0021_only", "b:MK0021"),
+                                 ("all_mk", FS),
+                                 ("industry", "m:90+t:2"),
+                                 ("concept", "m:90+t:3")]:
+                  d, st = get(DELAY + "/api/qt/clist/get",
+                              clist_params(pn=1, pz=100, fs=fs))
+                  if d is None:
+                      tag("F_fs", fs=fsname, status=st)
+                  else:
+                      dd = d.get("data") or {}
+                      rows = norm(dd.get("diff"))
+                      tag("F_fs", fs=fsname, rc=d.get("rc"), total=dd.get("total"),
+                          rows=len(rows),
+                          sample=json.dumps(rows[:1], ensure_ascii=False)[:200])
+                  time.sleep(3)
+
+          print("RESULT " + json.dumps({"cfg": name, "secs": round(time.time() - t0, 1)},
+                                       ensure_ascii=False), flush=True)
           print("══════════════ END %s ══════════════" % name, flush=True)
           PYEOF
