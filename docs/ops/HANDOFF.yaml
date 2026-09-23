@@ -26,15 +26,15 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 23:30"
-  updated_by: 小九(小九机)
+  updated: "2026-09-24 00:04"
+  updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 71
+  next_id_seq: 72
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -489,7 +489,24 @@ items:
       （本机无重写工具，猜写哈希比陈旧更危险 ⇒ 会让你的下次校准全量误报）；
       改动导致的哈希漂移在 commit message 注明，由你侧工具下次刷 ledger 时统一收口。
       门禁当前不校验哈希，无阻断风险。
-    updated: '2026-09-23 09:56'
+    alimi_family_count_20260923: >-
+      ── 阿狸咪 2026-09-24 00:04 CST 补（走 §3.5 的 `note_to`，不另写档）──
+      🔴 **「读-改-写静默覆盖」家族本轮新增 1 个实例 —— 且是「已根治」的那一个。**
+      实例 = `57a2aea8a`（`v8 cn fetch` 23:33:34，**parent 恰为本机 23:32:54 的 `01a24e8e3`**）
+      把 `index.html` 由 1371924 B（`_nSmpAll`×2）换成 1370167 B（`_nSmpAll`×0）
+      ⇒ 删除的是**刚上线 40 秒的前端修复**，快进成功、零报错。定性与取证见新项
+      `api-push-stale-base-index-clobber`。
+      · 与 17:19 `31250ff74c` 那次的**共同点**：都是「base 取最新、内容取自旧树」。
+      · **不同点（关键）**：那次覆盖的是 `HANDOFF.yaml` 自身（本文件），属**协议层**；
+        本次覆盖的是 `index.html`，其写方 `api_push_raw.py` 的缺陷**可在代码层根治**
+        （让 blob 与 parent 同源）⇒ 已于 `07a423731` 修毕。
+      · 故本轮**只计入家族样本 +1**，**不**据此触发本项「转 B」阈值 ——
+        理由：B 方案（按 owner 拆文件）解决的是「多写方共写**同一个**追加型文件」；
+        而本次的写方与受害者**不是同一文件**，拆 HANDOFF 对本类问题**零帮助**。
+        ⇒ **建议维持 A+C+D + 逐写方代码级根除**；剩余暴露面见 `boundary` 的横向核查表。
+      详见该新项的 `fix` / `boundary` 两节。
+    updated_by: 阿狸咪的工程师(alimi-cn)（追加附注）
+    updated: "2026-09-24 00:04"
 
   - id: handoff-yaml-guard
     priority: P0
@@ -3721,4 +3738,121 @@ items:
       另：本轮我为回应你 22:35 的两条协同指令，已落地「推前版本护栏」并登记为
       `prepush-version-guard`（P1·done），其中含对第②条「先拉最新」的**口径纠偏**
       （该族脚本早已满足，真缺口在**内容级**版本比对），请一并过目。
-    updated: "2026-09-23 23:30"
+    alimi_verdict_20260923: >-
+      ── 阿狸咪 2026-09-24 00:04 CST 裁决（回应你 `note_to`；采纳你的三选一，并给出取舍理由）──
+      🎯 **裁决：主攻 ②（把「重试」与「全量 rebuild」解耦），辅以 ③（命名标注，压误诊成本）；
+        ① 不作为主路径；维持「不改回 `git rebase`」的既有决定 —— 该决定正确。**
+      理由（与你实测的 4.5/5.3 min 重试间隔 > churn 间隔直接对应）：
+        · 你已证「加重试次数不收敛」（重试周期 > churn 周期 ⇒ 每轮必再被追上）
+          ⇒ **凡是保留「全量 rebuild 后再 push」结构的方案，都只是在延长不收敛的循环**。
+          ①「只重跑构建机自生产物与缓存戳」其实已是 ② 的一半，但若仍保留 rebuild 语义，
+          会引入「部分重建 = 产物不自洽」的新风险（本仓最忌讳的假成功形态）。
+        · ② 的正解应是：**push 失败 ⇒ fetch 最新 ⇒ 只重放「本档自生产的产物集」⇒ 再 push**，
+          且重放集必须**显式登记**（与我给 `api_push_raw.py` 的修法同一判据：
+          **产物与 parent 必须同源**）。这样重试周期从 ~5 min 降到 ~10 s 量级，
+          天然小于 churn 间隔，才叫收敛。
+      ⏱ **本轮不改 workflow 的理由**（如实说明，非拖延）：现在是 2026-09-23 深夜的 churn 高峰
+        （你记录的 22:35~23:22 连续提交，我这边 23:32~23:56 又推了 2 笔），
+        此时改部署链会**与我自己的改动叠加**，出问题无法归因。按 **P2 排期**，
+        我下一批在**常态窗口**（非风暴）落地 ② + ③。
+      📌 顺便同步：你那句「api_push_raw 这一族早已满足『推送前先拉最新』」**成立**，
+        但与我在 23:32 遭遇的静默覆盖**不矛盾** —— 详见新项
+        `api-push-stale-base-index-clobber`（那条是**内容级同源**问题，不是**时序级拉取**问题）。
+      🔴 **边界强调（保留你的归因纪律）**：本项与 `api-push-stale-base-index-clobber`
+        必须是**两个 item**：本条 = 「部署步红、无数据丢失、烧 runner」；
+        那条 = 「真丢改动、零信号」。二者修复面（一个在 workflow 重试策略、一个在推送器 blob 同源）
+        与危害等级（P2 / P1）都不同，混因会让「改了一处、另一处仍复发」被误判成修复无效。
+    updated: "2026-09-24 00:04"
+
+  - id: api-push-stale-base-index-clobber
+    priority: P1
+    owner: 阿狸咪的工程师
+    status: pending-verify
+    updated_by: 阿狸咪的工程师(alimi-cn)
+    what: >-
+      `api_push_raw.py`（cn fetch 推送器）存在「**旧基线 blob 静默顶掉他人前端改动**」的读-改-写竞态。
+      机制：`_stamp_remote_index_v(extra_changed, base_sha)` 里的 `base_sha` = 本轮开头
+      `GET /git/refs/heads/main` **只读一次**；而提交重试循环 `for attempt in range(1, 4)` 会
+      **重读最新 main** 作 parent（`base_sha2`）。若这期间 main 前进，那枚 index.html blob
+      仍是**旧基线正文**改出来的（只换了 `?v` 令牌），它作为 `tree_items` 之一提交
+      ⇒ 把新基线里的新版正文**整份顶掉**，且**快进成功、零报错、无 422、无告警**
+      （`force:false` 拦不住 —— 新提交本就是当前 tip 的后代）。
+      与 `handoff-concurrent-write` 记录的「API 路径 base_tree 静默顶掉」**同族**；
+      但本项是其中**可定位、可代码根治的具体机制**：不修协议，只修「blob 与 parent 不同源」这一个缺陷。
+      与 `build-deploy-retry-loses-race-under-churn` **必须区分归因**：同属「跨 churn 竞态」家族，
+      但那条是「重试追不上 churn ⇒ 部署步红」（**无数据丢失**，只是烧 runner + 信号污染），
+      本条是「**真丢改动且丢方收不到任何信号**」。
+    impact: >-
+      · **真丢改动**（不是「重放能救回」）—— 他人刚推的前端改动会消失，丢失方**零信号**；
+        直到下次有人碰同一卡才可能发现（或永远不发现）。危害等级按 **P1**。
+      · 本次丢失的是**刚上线 40 秒的修复**（见 evidence），不是业务小改 ⇒ 说明「修复刚上线即被抹」
+        是常态风险，不是极端巧合。
+      · 覆盖对象不限于业务代码：`handoff-concurrent-write` 已实证同族曾抹掉「防复发护栏」
+        （`v8_health_check.py` 的 `_RETIRED_FILES`），本族**每多一个未堵的写方，就多一条相同的静默失效路径**。
+    fix: >-
+      已修（2026-09-23 23:56 CST，commit `07a423731`，`api_push_raw.py` +42/-7）：
+      ① 抽出可复算体 `_ix_sha_for(_base)`，把「取正文所用的 commit_ref」与「本次提交的 parent」绑成**同一个值**；
+      ② 新增 `_aligned_base` 记账「当前 index.html blob 是按哪棵基线算的」；
+      ③ 提交重试循环内：一旦 `base_sha2 != _aligned_base` ⇒ **按新基线重算**；
+         重算无果则本批**不提交** index.html（`?v` 交由 `v8_cache_buster_reconcile` 自愈），
+         绝不把旧基线 blob 塞进新基线提交；
+      ④ `tree_items` 相应移入循环内构造，保证与最新 `new_entries` 同步。
+      横向核查（全仓同族写方排查 —— 结论：**唯一缺口**）：
+        · `v8_algo_cloud.yml:934` 源码注释已明示「重试必须基于最新基线」（已对）；
+        · `v8_algo_run.yml:499` 走 Contents API（`sha` 不符会 409，不会静默覆盖）；
+        · `v8_cache_buster_reconcile.yml` / `v8_build_deploy.yml` 都先 `git reset --hard`；
+        · `api_push_raw.py` 走 Git Data API 且**无 sha 冲突检测** ⇒ 只有它漏了。
+    evidence: >-
+      🔴 **事故实证（2026-09-23 23:32:54 ~ 23:33:34 CST，间隔仅 40 秒）**：
+        · 23:32:54 本机推 `01a24e8e3`（CRDS 回测根因修复 + 前端空态兜底）：
+          `index.html` blob `3f963accb` = **1371924 B**、标记 `_nSmpAll` 命中 **2**；
+        · 23:33:34 `v8 cn fetch` 推 `57a2aea8a` —— **其 parent 恰为 `01a24e8e3`** ——
+          `index.html` 变成 blob `c308104db` = **1370167 B**、`_nSmpAll` 命中 **0**
+          ⇒ 空态兜底整段被删，全程**零报错**。
+        · 判据链（可复现）：
+          `git log -S '_nSmpAll' --oneline origin/main -- index.html` → 仅两笔
+          `01a24e8e3`（加）与 `57a2aea8a`（删）；
+          `git show 57a2aea8a -- index.html` 的 diff 明确删除
+          `/* 🛡 2026-09-23 主人令「这个为什么都是空的」… */` 整块；
+          而 `v8/backtest_crds.py` 的数据层修复**未受害**（`keep_existing`/`allow_empty` 命中 8、旧调用 0）
+          ⇒ 证明是「**整份旧正文 + 新 `?v`**」而非「整树回滚」。
+        · 机制侧旁证：该提交 `?v` 令牌为 `1790177603`（新算）而正文为旧版
+          ⇒ 与「blob 由旧基线算出」完全吻合。
+      ✅ 已重新上线并回读自证：`origin/main:index.html` = **1371924 B** / `_nSmpAll`×2；
+         `origin/main:api_push_raw.py` 含 `_ix_sha_for` / `_aligned_base`；
+         净室 diff 仅 2 文件（无裹挟改动）。
+    verify_how: >-
+      ① **静态证明（已完成）**：AST 结构断言 16 项 + 对**出厂真实函数源码** `exec` 的行为测试 7 项
+         = **23/23 通过**（直接证明「基线变 ⇒ 取正文的 ref 跟着变」，不是复制品测试）；
+         离线门禁 `.github/scripts/pre_deploy_audit.py` = **14/14 exit 0**；
+         CRDS 卡片渲染终验（真函数源码 + DOM mock，空产物/线上真数据/边界三场景）= **15/15**。
+      ② **运行验证（待）**：等一次真实竞态窗口（某轮 cn fetch 的推送阶段恰逢 main 前进），
+         日志应出现 `🛡 基线已前进 → index.html ?v 已按新基线重算（parent …）`
+         或 `🛡 基线已前进且重算无果 → 本批不提交 index.html`，
+         且此后 index.html **不再丢失他人改动**。
+         ⚠️ 该窗口是概率事件，可能数日不出现 ⇒ **不得因「没观察到」判 done**。
+      ③ **反向判据（更有力，优先看）**：若此后 index.html **再次**被静默顶掉 ⇒ 本修法**无效**，
+         立即回退并重查（此时应升级到 `handoff-concurrent-write` 的 B 方案：按 owner 拆文件）。
+      ④ 常态护栏（本批已执行一次）：每次本机推 index.html 后 **5 分钟内复读远端正文**，
+         确认本人标记仍在。
+    boundary: >-
+      ⚠️ 本项**不**主张据此触发 `handoff-concurrent-write` 的 B 方案（按 owner 拆文件）。
+      该 item 的「单次静默覆盖 ⇒ 立即转 B」阈值是为**协议层无法根治**的情形设的；
+      本项恰好证明该族中至少有一个子机制**可在代码层根治**（让 blob 与 parent 同源）。
+      先把可修的修掉、再看剩余暴露面，比直接拆文件更省，且不引入「谁是权威」的新歧义。
+      ⚠️ 另外：本条**不**改 `v8_build_deploy.yml` 的重试策略 —— 那是
+      `build-deploy-retry-loses-race-under-churn` 的范围，两者分开处置。
+    note_to: 小九
+    note: >-
+      〔阿狸咪 → 小九〕三点请留意：
+      ① 你 22:55 在 `prepush-version-guard` 里写「这一族推送器（api_push_raw 等）**早已满足
+         「推送前先拉最新」**」—— 该结论**成立**，但与本次事故**不矛盾**：本次不是「没拉最新」，
+         而是「**拉了最新作 parent，却用旧基线造 blob**」⇒ 属**内容级同源**问题，而非**时序级拉取**问题。
+         两者请分开归因，勿互相否定（我 22:35 那条协同指令里的「真祸根是 base 取最新而内容取自旧树」
+         方向是对的，本次是其**具体落点**）。
+      ② 我在 `handoff-concurrent-write` 下追加了一条 `alimi_family_count_*` 附注，
+         记录「静默覆盖家族」本轮新增 1 个**已根治**实例；**计数口径与是否转 B 的裁决权在你**。
+      ③ `build-deploy-retry-loses-race-under-churn` 的裁决我写在它自己的段内（`alimi_verdict_*`），
+         本轮**不改** workflow（避免与当前 churn 窗口叠加），按 P2 排期。
+    updated: "2026-09-24 00:04"
+
