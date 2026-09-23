@@ -1,0 +1,141 @@
+# 九宝量化 v8.0 — 大基金增减持监控 fetcher 调度（cn runner）
+#
+# 2026-09-23 主人令：「做吧，放暂未上架」⇒「暂未上架 > 📡 观测类」新增
+#   「🚨 大基金 增减持监控」卡（置于「🔭 主题空间 · 概念资金热度」卡上方）。
+#   数据源 = 东方财富数据中心·股东增减持（RPT_SHARE_HOLDER_INCREASE），
+#   按**股东全名精确匹配**「国家集成电路产业投资基金（一期/二期/三期）」——
+#   该接口的模糊 like 不生效，必须全名等值，故脚本内写死三个主体名。
+#
+#   ⚠️ 与「国家大基金持股」**概念板块**（东财按季报十大股东打的 BK 标签）是两回事：
+#      本卡是大基金**自己的买卖动作**（法定披露）；板块资金流是**市场资金**对该板块的流入。
+#
+# 时点：工作日 20:30 CST（= UTC 12:30）。选此点三条理由：
+#   ① 减持公告披露高峰 16:00–19:00 ⇒ 20:30 当日基本发完；
+#   ② 避开盘中写仓窗口（09:15–11:30 / 12:45–15:00），不碰 index.html；
+#   ③ 与 17:30 的 LHB 链、18:30 的 algo_run 链错开，降低推仓竞争。
+#
+# 🔴 空提交保护（本链必需的取舍）：
+#   v8_build_deploy 的 push.paths 含 `data/**` ⇒ 每推一次 data 文件就触发一次
+#   **全量重建 + 部署**（~8min + Actions 配额）。若当日无新公告仍照推，就是每天白烧一次。
+#   故推送前先比对「线上 blob 内容」与「本地内容」，相同即 SKIP（见「内容比对」步骤）。
+#
+# 安全铁律（与 v8_lhb_fetch.yml 同步）：
+#   1. 严禁 actions/checkout / rm -rf / git clean -fdx（cn runner 系统级拦截，会挂 job）；
+#   2. 严禁 git clone/fetch（cn runner 到 github.com:443 被连接重置），源码同步走 Contents API；
+#   3. 单一职责：只产出并推送 data/DAJIJIN_REDUCTION.js，不动任何其他文件。
+name: "🚨 v8 大基金增减持 fetcher (cn runner)"
+
+on:
+  schedule:
+    # 工作日 20:30 CST（UTC 12:30）。周末不触发（公告极少且非交易口径）。
+    - cron: '30 12 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      skip_trading_day_gate:
+        description: "应急手动调用时绕过交易日闸（true 仅供非交易日补算）"
+        required: false
+        type: choice
+        options:
+          - "false"
+          - "true"
+        default: "false"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-dajijin-fetch
+  cancel-in-progress: false
+
+jobs:
+  dajijin-only:
+    runs-on: [self-hosted, cn]
+    # 🔴 safe-delete 批量删除守卫阈值必须显式设 2000（cn runner 为 Windows，不设则吃默认 50）。
+    env:
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
+      # 🔴 cn runner（Windows）默认 GBK —— 本脚本打印中文会 UnicodeEncodeError('gbk') 崩链。
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+    timeout-minutes: 20
+    steps:
+      - name: "📝 同步源码（Contents API · 同域，避开 raw 302）"
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $repo = 'ah-quant999/quant-scanner-v8'
+          $headers = @{
+            'User-Agent'    = 'v8-dajijin-fetcher'
+            'Accept'        = 'application/vnd.github+json'
+            'Authorization' = "Bearer $env:GH_PAT"
+          }
+          # ⚠️ 不用 `Accept: application/vnd.github.raw`：它会 302 跳到 raw.githubusercontent.com，
+          #    该域可能整域不可用 ⇒ 必失败。contents API 的 JSON+base64 全程同域 api.github.com。
+          $files = @('algorithms/fetch_dajijin_reduction.py', 'scripts/api_put_file.py', 'scripts/dajijin_need_push.py')
+          foreach ($f in $files) {
+            $url = "https://api.github.com/repos/$repo/contents/$f`?ref=main"
+            try {
+              $r = Invoke-RestMethod -Uri $url -Headers $headers -TimeoutSec 60 -Method Get
+              $b64 = ($r.content -replace "\s", "")
+              $bytes = [Convert]::FromBase64String($b64)
+              $dir = Split-Path $f -Parent
+              if ($dir) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+              [System.IO.File]::WriteAllBytes($f, $bytes)
+              Write-Host "[ok] fetched $f ($($bytes.Length) bytes)"
+            } catch {
+              Write-Host "[warn] API fetch failed for $f : $_" -ForegroundColor Yellow
+            }
+          }
+          if (-not (Test-Path 'algorithms/fetch_dajijin_reduction.py')) {
+            Write-Host "[fatal] 抓取器未就位，本链无法继续" -ForegroundColor Red
+            exit 1
+          }
+
+      - name: "📊 跑 fetch_dajijin_reduction.py（产出 data/DAJIJIN_REDUCTION.js）"
+        id: gen
+        shell: powershell
+        run: |
+          $skip = "${{ github.event.inputs.skip_trading_day_gate || 'false' }}"
+          if ($skip -eq 'true') {
+            Write-Host "skip_trading_day_gate=true: force run"
+          } else {
+            $dow = (Get-Date).DayOfWeek.value__
+            if ($dow -eq 0 -or $dow -ge 6) { Write-Host "[skip] weekend, exit ok"; exit 0 }
+          }
+          cd $env:GITHUB_WORKSPACE
+          python algorithms/fetch_dajijin_reduction.py --window 120
+          if ($LASTEXITCODE -ne 0) { Write-Host "[fatal] 抓取器返回非 0" -ForegroundColor Red; exit 1 }
+          if (-not (Test-Path 'data/DAJIJIN_REDUCTION.js')) {
+            Write-Host "[skip] 未产出文件（当日无记录 ⇒ 脚本刻意不写空壳，保留线上旧数据）"
+            exit 0
+          }
+          Write-Host "[ok] data/DAJIJIN_REDUCTION.js ready"
+
+      - name: "🔍 内容比对（相同则 SKIP，防空提交触发全量重建）"
+        id: diff
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          # 比对逻辑放仓内脚本 scripts/dajijin_need_push.py（可本机实测、避免 PowerShell
+          # here-string 的 `'@` 必须顶格 与 YAML 块缩进 的冲突，那会让整份 workflow 解析失败）。
+          $out = python scripts/dajijin_need_push.py 2>&1 | Out-String
+          Write-Host $out
+          if ($out -match 'NEED_PUSH=1') { "need=1" | Out-File -FilePath "_djj_need.txt" -Encoding ascii }
+          else { "need=0" | Out-File -FilePath "_djj_need.txt" -Encoding ascii }
+
+      - name: "📤 推送 data/DAJIJIN_REDUCTION.js（api_put_file.py）"
+        if: always()
+        shell: powershell
+        continue-on-error: true
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          $need = (Get-Content '_djj_need.txt' -ErrorAction SilentlyContinue) -join ''
+          if ($need -notmatch 'need=1') {
+            Write-Host "[skip] 内容与线上一致，不推送（避免空提交触发全量重建）"
+            exit 0
+          }
+          python scripts/api_put_file.py data/DAJIJIN_REDUCTION.js "data: 大基金增减持监控刷新（$(Get-Date -Format 'yyyy-MM-dd HH:mm') CST）"
+          if ($LASTEXITCODE -ne 0) { Write-Host "[warn] 推送失败，非阻塞（下轮补推）" -ForegroundColor Yellow }
