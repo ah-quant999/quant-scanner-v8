@@ -912,7 +912,11 @@ def _rewrite_index_html_cache_busters():
     idx_path = ROOT / "index.html"
     if not idx_path.exists():
         return
-    html = idx_path.read_text(encoding='utf-8', newline='')
+    # 🔴 2026-09-23 阿狸咪修：Path.read_text(newline=) 需 Python ≥3.13，
+    #   而 v8_ima_strong_stock.yml 固定 python-version "3.12" ⇒ TypeError 使该链 step7 恒红。
+    #   改用 open(..., newline='')（3.12/3.13 通吃），行尾纪律与语义不变。
+    with open(idx_path, 'r', encoding='utf-8', newline='') as _fh:
+        html = _fh.read()
     _base_len, _base_lines = len(html), html.count('\n')
     # 🔴 2026-08-12 主人令修复：原 `[A-Z_]+` 不匹配含数字的变量名（V8_CAL/W52_HIGH/TOP10_DAILY）
     #   → 这些文件永远不加 ?v= 缓存戳 → 浏览器/CDN 永远缓存旧版 → 主站/本地都不更新！
@@ -949,7 +953,11 @@ def _ensure_momentum_loader():
     idx_path = ROOT / "index.html"
     if not idx_path.exists():
         return
-    html = idx_path.read_text(encoding='utf-8', newline='')
+    # 🔴 2026-09-23 阿狸咪修：Path.read_text(newline=) 需 Python ≥3.13，
+    #   而 v8_ima_strong_stock.yml 固定 python-version "3.12" ⇒ TypeError 使该链 step7 恒红。
+    #   改用 open(..., newline='')（3.12/3.13 通吃），行尾纪律与语义不变。
+    with open(idx_path, 'r', encoding='utf-8', newline='') as _fh:
+        html = _fh.read()
     _base_len, _base_lines = len(html), html.count('\n')
     if "data/STOCK_MOMENTUM_STATE.js" in html:
         return  # 已存在（含 ?v 或刚注入），交给缓存戳逻辑处理
