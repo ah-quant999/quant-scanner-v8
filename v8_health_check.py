@@ -124,6 +124,18 @@ CARD_DEFS = [
     {"id": "MARKET_ALERTS", "name": "市场预警", "page": "实时数据", "freq": "盘中实时（每30分）", "max_age": 60, "key_fields": ["indices"],
      "heal_cat": "intraday", "raw_file": "market_alerts.json",
      "producer": "algorithms/fetch_orphan_market_alerts.py"},
+    # 🛡 2026-09-23 一劳永逸（小九 · HANDOFF item stockquote-noon-gap-relay-cancel fix(b)）：
+    #   补 STOCK_QUOTE 卡级盘中判据。背景（09-22 实测）：个股行情盘中停更 1h53m（11:15→13:51），
+    #   HEALTH_CHECK 122 项里**无 STOCK_QUOTE 卡级盘中项**，只有通用项 all_STOCK_QUOTE
+    #   （freq:"—"、通用 24h 红线、heal_cat 一律 "algo_run" 错配）⇒ 53 分钟冻结**结构性不会报红**。
+    #   · page="实时数据" + max_age=40 —— 该链设计节律 30min/轮，40min=1.3 轮即报，早于 45min 族。
+    #   · premarket_keep=True —— 09:00-09:30 开盘前沿用上一交易日收盘档不误报（与 ETF_DAILY_MONITOR 同型）。
+    #   · heal_cat="intraday" —— 自愈经 cn_fetch 盘中链 relay② 「主链优先」门控派发专用主链
+    #     v8_stock_quote_refresh（[self-hosted,cn]·双源），主链排队超时才由 relay 改派 _cloud 兜底；
+    #     自愈不再派错 algo_run（算法链根本没有本产物环节）。
+    #   · raw_file 交叉校验有效：raw_data/stock_quote.json 与 data/STOCK_QUOTE.js 同由专用链产出。
+    #   登记后 all_ 动态扫描自动跳过本 id（原错配通用项随之消失），一处 id 三处同口径。
+    {"id": "STOCK_QUOTE", "name": "个股行情", "page": "实时数据", "freq": "盘中每30分", "max_age": 40, "key_fields": ["update_time"], "premarket_keep": True, "heal_cat": "intraday", "raw_file": "stock_quote.json", "producer": "algorithms/fetch_stock_quote_v8.py"},
     # 盘后数据
     # ── 自愈类别说明（2026-08-11 第158轮全表核对）──────────────────────────────
     # cloud_fetch_v8.py 的 CATEGORY_MAP 中 post_close 只注册了 MARKET_FUND_FLOW_DATA / EXPERIMENT 两项。

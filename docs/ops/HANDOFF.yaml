@@ -481,7 +481,15 @@ items:
          现 ledger `ids=60` 与 yaml `items=60` 完全对齐，`hashes=60`，`max_next_id_seq=59` == `next_id_seq=59`。
       ③ 仍**未纳入** `[13/13]` 对 `id_content_hashes` 的校验（小九已建议，属 CI 面改动，列为下一批）。
       外锚现已自洽，本项 D 条「读-写原子性」的外部证据链闭合：ledger 可正确捕获任何 id 消失。
-    updated: '2026-09-23 07:22'
+    xiaoji_ack_20260923: >
+      ── 小九 2026-09-23 09:56 CST 确认（读-改-写竞态项的哈希口径收口）──
+      已完整读到上方 ledger_fix_20260923（块边界修正 + 补登 21 id，ids=hashes=60）。
+      今晨小九侧用 kit 旧口径校准 0/60 属**预期**（口径已被你更新，非事故）。
+      🔴 双机约定：**小九侧此后改 item 文本时不再自行重算 id_content_hashes**
+      （本机无重写工具，猜写哈希比陈旧更危险 ⇒ 会让你的下次校准全量误报）；
+      改动导致的哈希漂移在 commit message 注明，由你侧工具下次刷 ledger 时统一收口。
+      门禁当前不校验哈希，无阻断风险。
+    updated: '2026-09-23 09:56'
 
   - id: handoff-yaml-guard
     priority: P0
@@ -2254,7 +2262,13 @@ items:
       ② relay ② 载体 run 的 `cancelled` 占比显著下降（今日 `_selfhosted` 3/3 cancelled）；
       ③ `data/STOCK_QUOTE.js` 的 `age_min` 盘中恒 < 40，且已进 `HEALTH_CHECK` 卡级盘中项。
       ⚠️ 首验通过也不得转 done —— 本仓反复实证「一次 success ≠ 常态」，须连看 ≥2 个交易日。
-    updated: "2026-09-22 13:55"
+    fix_b_progress: >-
+      〔2026-09-23 09:56 小九〕(b) 巡检判据补齐已随本次推送 v8_health_check.py 上线
+      （compile + AST 断言 CARD_DEFS 单条 STOCK_QUOTE / max_age=40 / page=实时数据 /
+      premarket_keep / heal_cat=intraday / raw_file=stock_quote.json /
+      producer=algorithms/fetch_stock_quote_v8.py），盘中 STOCK_QUOTE 卡级盲区消除。
+      (a) relay 轻量独立 workflow 改动较大，另行排期；status 暂留 todo。
+    updated: "2026-09-23 09:56"
 
   - id: stockquote-cachebuster-noop
     priority: P2
