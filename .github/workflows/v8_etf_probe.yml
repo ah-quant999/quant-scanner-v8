@@ -1,28 +1,30 @@
-# 九宝量化 v8.0 — ETF clist 探针（第7版·一次性诊断，验完即删）
+# 九宝量化 v8.0 — ETF clist 探针（第8版·一次性诊断，验完即删）
 #
-# 前 6 版已确证（不再重复）：
-#   ① pz 被硬截 100（pn 必须翻页，全市场要 17 页）
-#   ② fs=m:1+t:9,m:0+t:9 漏深市；b:MK0021..MK0024 才与 akshare 口径一致（total 1619）
-#   ③ 502 以「窗口」形式出现（v5 连续 12 次 × 5s 全 502 = 60s 不可用）
-#   ④ 生产修复后 19:11 实测：第 1 页 4 轮 × 2 host = 8 个请求全失败 ⇒ 65s 预算不足
+# v7 已确证（19:19 实测，9 个独立 runner 同分钟）：
+#   ① **pz 截 100 与参数无关**：P1..P4（生产参数）全部 200/rows=100/total=1619；
+#      U1(akshare ut) U3(去fields) U4(fid=f3) 同样 rows=100 ⇒「一次请求拿全」不存在，必须 17 页。
+#   ② **全新 IP 的第一个请求 = 100% 成功**：P1..P4 = 4/4 × 200（sh/sz=58/42，sum=+26.893 亿）
+#      ⇒ 与查询形状无关（旧结论「形状非法」彻底推翻）。
+#   ③ 🔴 **同 IP 连发则立刻被打死**：B1（同 IP 连发 8 次 × 5s）= 第 1 次 200，其后 **7 连 502**
+#      （40 秒）。而同一秒的 4 个新 IP 全 200 ⇒ **限流主体是「客户端 IP」，不是「请求形状」**。
+#   ④ 这解释了全部历史现象：任务表**第 1 位** ETF_INTRADAY_HEAT（1 请求）档档新鲜；
+#      **第 19/20 位** ETF_DAILY_MONITOR / ETF_PULSE（各 17 页）从 11:31 起全冻
+#      —— 跑到第 19 个模块时该 runner 的 IP 早被前面的东财请求打死了。
 #
-# 本版要回答**唯一还没验的关键问题**：
-#   「pz 截 100」到底是东财的硬限制，还是**我们这组参数**（ut / stat / fields）导致的？
-#   若某个参数组合能一次拿全 1619 行 ⇒ 请求数 17 → 1，撞 502 的机会降一个数量级，
-#   这才是真正的「一劳永逸」；若所有组合都截 100，则只能靠「长退避 + 多轮」硬扛。
+# 本版要回答**决定修法**的三问：
+#   Q1 全新 IP 上，17 页连爬能不能跑完？跑完需要多慢？（决定：是否继续用主 job 抓）
+#   Q2 换 host（东财分片域名 1.push2 / 2.push2 …）能否绕过同 IP 限流？（若能 ⇒ 17 页分 17 个域名）
+#   Q3 「IP 被打死」是否可复现、能否自愈？（先打 30 个请求再爬 = 模拟生产第 19 位处境）
 #
-# 设计：矩阵 × 独立 runner（每 runner 只发 1 个请求，杜绝顺序污染）。
-#   P1..P4 生产现行参数（pz=100,pn=1,ut=旧,stat=1,fields=…) ×4 → 量测**每请求成功率**
-#   U1     ut 换 akshare 现行 token + pz=50000 + 去 stat
-#   U2     ut 不变 + pz=50000 + 去 fields（东财默认返回全字段）
-#   U3     ut 不变 + pz=50000 + 去 fields + 去 stat
-#   U4     ut 不变 + pz=50000 + fid=f3 + 去 fields + 去 stat（最贴近 akshare 原形）
-#   B1     同 IP 连发 8 次 × 5s（量测「同 IP 突发」是否自身触发 502）
-#
-# 记录：http / bytes / rc / data.total / len(diff) / 沪市深市分布 / 求和
-#   —— data.total 与 len(diff) 不等即为「被截」的硬证据。
+# 矩阵 × 独立 runner（每 leg 独占一个新 IP）：
+#   A_crawl17_delay_2s    全新 IP：17 页 × push2delay，页间 2s        → 能爬完 = 主 job 仍可抓
+#   B_crawl17_subdomains  全新 IP：17 页分别打 1..17.push2，无间隔      → 能爬完 = 换域名即解
+#   C_burn30_then_crawl   全新 IP：先打 30 个东财 clist（模拟第19位处境）再爬 17 页 → 复现「被打死」
+#   D_pace60_4x           全新 IP：同域名隔 60s 打 4 次               → 量测惩罚时长/自愈
+#   E_rapid_6x            全新 IP：同域名无间隔打 6 次                → 惩罚触发阈值
+#   F_subdomains_10x      全新 IP：1..10.push2 各 1 次，无间隔         → 域名是否真能分片
 
-name: "🔬 v8 ETF clist 探针v7(矩阵·pz截100归因+每请求成功率)"
+name: "🔬 v8 ETF clist 探针v8(同IP限流复现·17页连爬可行性·分片域名)"
 
 on:
   workflow_dispatch: {}
@@ -34,110 +36,41 @@ concurrency:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: "P1_prod_asis"
-            host: "https://push2delay.eastmoney.com"
-            mode: "single"
-            pz: "100"
-            pn: "1"
-            ut: "old"
-            stat: "1"
-            fields: "yes"
-            fid: "f62"
-            reps: "1"
-            gap: "0"
-          - name: "P2_prod_asis"
-            host: "https://push2delay.eastmoney.com"
-            mode: "single"
-            pz: "100"
-            pn: "1"
-            ut: "old"
-            stat: "1"
-            fields: "yes"
-            fid: "f62"
-            reps: "1"
-            gap: "0"
-          - name: "P3_prod_asis"
-            host: "https://push2delay.eastmoney.com"
-            mode: "single"
-            pz: "100"
-            pn: "1"
-            ut: "old"
-            stat: "1"
-            fields: "yes"
-            fid: "f62"
-            reps: "1"
-            gap: "0"
-          - name: "P4_prod_asis"
-            host: "https://push2delay.eastmoney.com"
-            mode: "single"
-            pz: "100"
-            pn: "1"
-            ut: "old"
-            stat: "1"
-            fields: "yes"
-            fid: "f62"
-            reps: "1"
-            gap: "0"
-          - name: "U1_akshare_ut_pz50000"
-            host: "https://push2.eastmoney.com"
-            mode: "single"
-            pz: "50000"
-            pn: "1"
-            ut: "akshare"
-            stat: "0"
-            fields: "yes"
-            fid: "f3"
-            reps: "1"
-            gap: "0"
-          - name: "U2_nofields_pz50000"
-            host: "https://push2.eastmoney.com"
-            mode: "single"
-            pz: "50000"
-            pn: "1"
-            ut: "old"
-            stat: "1"
-            fields: "no"
-            fid: "f62"
-            reps: "1"
-            gap: "0"
-          - name: "U3_nofields_nostat_pz50000"
-            host: "https://push2.eastmoney.com"
-            mode: "single"
-            pz: "50000"
-            pn: "1"
-            ut: "old"
-            stat: "0"
-            fields: "no"
-            fid: "f62"
-            reps: "1"
-            gap: "0"
-          - name: "U4_fidf3_noall_pz50000"
-            host: "https://push2delay.eastmoney.com"
-            mode: "single"
-            pz: "50000"
-            pn: "1"
-            ut: "old"
-            stat: "0"
-            fields: "no"
-            fid: "f3"
-            reps: "1"
-            gap: "0"
-          - name: "B1_burst_sameip_8x5s"
-            host: "https://push2delay.eastmoney.com"
-            mode: "burst"
-            pz: "100"
-            pn: "1"
-            ut: "old"
-            stat: "1"
-            fields: "yes"
-            fid: "f62"
-            reps: "8"
-            gap: "5"
+          - name: "A_crawl17_delay_2s"
+            mode: "crawl"
+            stride: "2"
+            hostmode: "delay"
+            burn: "0"
+          - name: "B_crawl17_subdomains"
+            mode: "crawl"
+            stride: "0"
+            hostmode: "subdom"
+            burn: "0"
+          - name: "C_burn30_then_crawl"
+            mode: "crawl"
+            stride: "2"
+            hostmode: "delay"
+            burn: "30"
+          - name: "D_pace60_4x"
+            mode: "pace"
+            stride: "60"
+            hostmode: "delay"
+            burn: "0"
+          - name: "E_rapid_6x"
+            mode: "pace"
+            stride: "0"
+            hostmode: "delay"
+            burn: "0"
+          - name: "F_subdomains_10x"
+            mode: "subdom"
+            stride: "0"
+            hostmode: "subdom"
+            burn: "0"
     steps:
       - name: "🐍 装依赖"
         run: python3 -m pip install --quiet --disable-pip-version-check requests
@@ -146,95 +79,113 @@ jobs:
         shell: bash
         env:
           CFG_NAME: ${{ matrix.name }}
-          CFG_HOST: ${{ matrix.host }}
           CFG_MODE: ${{ matrix.mode }}
-          CFG_PZ: ${{ matrix.pz }}
-          CFG_PN: ${{ matrix.pn }}
-          CFG_UT: ${{ matrix.ut }}
-          CFG_STAT: ${{ matrix.stat }}
-          CFG_FIELDS: ${{ matrix.fields }}
-          CFG_FID: ${{ matrix.fid }}
-          CFG_REPS: ${{ matrix.reps }}
-          CFG_GAP: ${{ matrix.gap }}
+          CFG_STRIDE: ${{ matrix.stride }}
+          CFG_HOSTMODE: ${{ matrix.hostmode }}
+          CFG_BURN: ${{ matrix.burn }}
         run: |
           python3 - <<'PYEOF'
-          import json, os, time, sys
+          import json, os, time, socket
 
-          UT_OLD = "b2884a393a59ad64002292a3e90d46a5"
-          UT_AK  = "bd1d9ddb04089700cf9c27f6f7426281"
-          FS_BMK = "b:MK0021,b:MK0022,b:MK0023,b:MK0024"
-          FIELDS = "f12,f14,f3,f6,f10,f62"
-
-          name = os.environ["CFG_NAME"]
-          url = os.environ["CFG_HOST"].rstrip("/") + "/api/qt/clist/get"
-          def build():
-              p = {"pn": os.environ["CFG_PN"], "pz": os.environ["CFG_PZ"], "po": "1", "np": "1",
-                   "fltt": "2", "invt": "2",
-                   "ut": UT_AK if os.environ["CFG_UT"] == "akshare" else UT_OLD,
-                   "fid": os.environ["CFG_FID"], "fs": FS_BMK,
-                   "_": int(time.time() * 1000)}
-              if os.environ["CFG_STAT"] == "1":
-                  p["stat"] = "1"
-              if os.environ["CFG_FIELDS"] == "yes":
-                  p["fields"] = FIELDS
-              return p
+          UT = "b2884a393a59ad64002292a3e90d46a5"
+          FS = "b:MK0021,b:MK0022,b:MK0023,b:MK0024"
+          FLDS = "f12,f14,f3,f6,f10,f62"
+          DELAY = "https://push2delay.eastmoney.com"
+          HDR = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                 "Referer": "https://quote.eastmoney.com/"}
 
           import requests
           try:
               requests.packages.urllib3.disable_warnings()
           except Exception:
               pass
-          HDR = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-                 "Referer": "https://quote.eastmoney.com/"}
 
-          def one():
-              r = {"t": time.strftime("%H:%M:%S")}
-              t0 = time.time()
+          def host_for(i, hostmode):
+              if hostmode == "subdom":
+                  return "https://%d.push2.eastmoney.com" % (i,)
+              return DELAY
+
+          def build(host, pn):
+              p = {"pn": str(pn), "pz": "100", "po": "1", "np": "1", "fltt": "2", "invt": "2",
+                   "ut": UT, "fid": "f62", "fs": FS, "stat": "1", "fields": FLDS,
+                   "_": int(time.time() * 1000)}
+              return host.rstrip("/") + "/api/qt/clist/get", p
+
+          def one(host, pn):
+              url, p = build(host, pn)
+              r = {"host": host.replace("https://", ""), "pn": pn, "t": time.strftime("%H:%M:%S")}
               try:
-                  resp = requests.get(url, params=build(), timeout=25, verify=False, headers=HDR)
+                  resp = requests.get(url, params=p, timeout=20, verify=False, headers=HDR)
                   r["http"] = resp.status_code
-                  r["bytes"] = len(resp.content)
-                  try:
-                      d = resp.json()
-                      data = d.get("data") or {}
-                      diff = data.get("diff")
-                      rows = diff if isinstance(diff, list) else []
-                      r["rc"] = d.get("rc")
-                      r["total"] = data.get("total")
-                      r["rows"] = len(rows)
-                      codes = [str(x.get("f12")) for x in rows if isinstance(x, dict)]
-                      r["sh"] = sum(1 for c in codes if c[:1] in ("5", "6"))
-                      r["sz"] = sum(1 for c in codes if c[:1] in ("1", "0", "3"))
-                      nets = []
-                      for x in rows:
-                          try:
-                              nets.append(float(x.get("f62") or 0.0))
-                          except Exception:
-                              pass
-                      r["sum_yi"] = round(sum(nets) / 1e8, 3)
-                  except Exception:
-                      r["json"] = False
-                      r["head"] = resp.text[:80].replace("\n", " ")
+                  if resp.status_code == 200:
+                      try:
+                          d = resp.json()
+                          data = d.get("data") or {}
+                          diff = data.get("diff")
+                          r["rows"] = len(diff) if isinstance(diff, list) else 0
+                          r["total"] = data.get("total")
+                          if isinstance(diff, list) and diff:
+                              r["c0"] = str(diff[0].get("f12"))
+                      except Exception as e:
+                          r["parse"] = str(e)[:50]
+                  else:
+                      r["bytes"] = len(resp.content)
               except Exception as e:
-                  r["err"] = "%s: %s" % (type(e).__name__, str(e)[:90])
-              r["secs"] = round(time.time() - t0, 1)
+                  r["err"] = "%s: %s" % (type(e).__name__, str(e)[:70])
               return r
 
-          reps = int(os.environ["CFG_REPS"]); gap = float(os.environ["CFG_GAP"])
+          name = os.environ["CFG_NAME"]
+          mode = os.environ["CFG_MODE"]
+          stride = float(os.environ["CFG_STRIDE"])
+          hostmode = os.environ["CFG_HOSTMODE"]
+          burn = int(os.environ["CFG_BURN"])
+          print("══════════════ %s ══════════════" % name, flush=True)
           out = []
-          for i in range(reps):
-              if i:
-                  time.sleep(gap)
-              out.append(one())
-              print("SAMPLE %s [%d/%d] %s" % (name, i + 1, reps, json.dumps(out[-1], ensure_ascii=False)), flush=True)
+          t0 = time.time()
 
-          ok = sum(1 for x in out if x.get("http") == 200)
-          summary = {"cfg": name, "reps": reps, "ok200": ok, "fail": reps - ok}
-          good = [x for x in out if x.get("http") == 200 and x.get("rc") == 0]
-          if good:
-              summary["max_rows"] = max(x.get("rows", 0) for x in good)
-              summary["max_total"] = max(x.get("total") or 0 for x in good)
-              summary["sample_sh_sz"] = "%s/%s" % (good[0].get("sh"), good[0].get("sz"))
-          print("RESULT " + json.dumps(summary, ensure_ascii=False), flush=True)
+          if mode == "crawl":
+              if burn:
+                  nb = 0
+                  for i in range(burn):
+                      r = one(host_for((i % 6) + 1, "subdom") if hostmode == "subdom" else DELAY, (i % 3) + 1)
+                      nb += 1 if r.get("http") == 200 else 0
+                  print("BURN %s 打完 %d 个请求，其中 200 = %d（%.1fs）" % (name, burn, nb, time.time() - t0), flush=True)
+              for pn in range(1, 18):
+                  if pn > 1 and stride:
+                      time.sleep(stride)
+                  r = one(host_for(pn, hostmode), pn)
+                  out.append(r)
+                  print("PAGE %s %s" % (name, json.dumps(r, ensure_ascii=False)), flush=True)
+              got = sum(x.get("rows") or 0 for x in out if x.get("http") == 200)
+              bad = [x["pn"] for x in out if x.get("http") != 200]
+              print("RESULT " + json.dumps({"cfg": name, "pages": len(out), "rows_sum": got,
+                                            "fail_pages": bad, "secs": round(time.time() - t0, 1)},
+                                           ensure_ascii=False), flush=True)
+          elif mode == "pace":
+              reps = 4 if stride >= 60 else 6
+              for i in range(reps):
+                  if i and stride:
+                      time.sleep(stride)
+                  r = one(host_for(1, hostmode), 1)
+                  out.append(r)
+                  print("SAMPLE %s %s" % (name, json.dumps(r, ensure_ascii=False)), flush=True)
+              print("RESULT " + json.dumps({"cfg": name, "reps": reps,
+                                            "ok200": sum(1 for x in out if x.get("http") == 200),
+                                            "secs": round(time.time() - t0, 1)}, ensure_ascii=False), flush=True)
+          else:  # subdom：1..10 各一次，测域名分片
+              for i in range(1, 11):
+                  h = "https://%d.push2.eastmoney.com" % (i,)
+                  try:
+                      socket.gethostbyname(h.replace("https://", ""))
+                      dns = "ok"
+                  except Exception as e:
+                      dns = "fail:" + str(e)[:34]
+                  r = one(h, 1)
+                  r["dns"] = dns
+                  out.append(r)
+                  print("SUB %s %s" % (name, json.dumps(r, ensure_ascii=False)), flush=True)
+              print("RESULT " + json.dumps({"cfg": name, "hosts": len(out),
+                                            "ok200": sum(1 for x in out if x.get("http") == 200),
+                                            "secs": round(time.time() - t0, 1)}, ensure_ascii=False), flush=True)
           print("══════════════ END %s ══════════════" % name, flush=True)
           PYEOF
