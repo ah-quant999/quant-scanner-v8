@@ -52,8 +52,6 @@ window.__renderCycleLadderCard|周期阶梯卡渲染器|2026-09-20
 window.__renderBoardFirstLimit|主板首板观察卡渲染器|2026-09-22
 window.__renderObsPlatform|观测类平台渲染器|2026-09-20
 window.__renderJudgmentBody|判断卡正文渲染器|2026-09-20
-window.__renderUnlockCover|因子观测卡渲染器|2026-09-22
-
 # ── C. 数据源全局名（7）─────────────────────────────────────────────
 window.FINAL_RECOMMEND_DATA|最终推荐数据源|2026-09-20
 window.IMA_STRONG_STOCK|强势股数据源|2026-09-20
@@ -76,7 +74,7 @@ win_best_ok|P5 判定口径实现锚点（窗口内最优达标年数·产物字
 switchFinalTab|最终推荐页子页切换（因子实验室迁入）|2026-09-20
 function _renderPostReady|引导函数定义：DOMContentLoaded 初渲入口（__renderBacktestSection 等 11 渲染器）。0d3482be4 删死代码时误删定义→整页卡「加载中」|2026-09-20
 DOMContentLoaded', _renderPostReady|同上引导函数的调用点；与定义必须同处一个 script 块且定义在前（否则 ReferenceError）|2026-09-20
-id="unlockCoverCard"|因子观测卡容器（pane 构建函数内，与已登记的 window.__renderUnlockCover 渲染器**分属两处**，非冗余）|2026-09-22
+# 〔2026-09-23〕window.__renderUnlockCover / id="unlockCoverCard" 两行已删：「解禁&机构关注」因子观测卡主人拍板整卡删除（commit 8991c96ad），按维护纪律同步清单。
 </html>|HTML 尾部完整性：末行必须闭合 —— 2026-09-22 22:20:41 截断事故（183 行尾部被删、含 </body></html>）**完整穿过现行 14 项门禁**（[10/10] 34 个锚点全在文件前段、[2/14] 语法 0 错），故补此锚点|2026-09-22
 {name:'LHB_HISTORY'|A2 懒加载大表清单（STOCK_LIST/STOCK_QUOTE/LHB_HISTORY 按需注入）；该块整体位于文件尾部，是最易被截断吞掉的功能块|2026-09-22
 # ---------------------------------------------------------------------------
