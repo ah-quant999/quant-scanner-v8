@@ -1,9 +1,9 @@
 {
-  "update_time": "2026-09-23 04:57:17",
+  "update_time": "2026-09-23 18:15:17",
   "data_date": "2026-09-23",
   "track_start": "2026-09-23",
   "history_days": 29,
-  "strict_count": 7,
+  "strict_count": 6,
   "near_count": 3,
   "tracked": [
     {
@@ -12,26 +12,26 @@
       "market": "sz",
       "board": "创业板",
       "status": "strict",
-      "total_score": 41.0,
+      "total_score": 30.4,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "计算机、通信和其他电子设备制造业",
-        "MSCI中国",
-        "AI手机",
         "深证100R",
-        "小米汽车",
-        "AI眼镜",
         "2026中报预增",
-        "信创"
+        "计算机、通信和其他电子设备制造业",
+        "信创",
+        "AI眼镜",
+        "AI手机",
+        "小米汽车",
+        "MSCI中国"
       ],
-      "signal_count": 1,
+      "signal_count": null,
       "enter_date": "2026-09-15",
       "hold_days": 8,
       "consecutive_days": 9,
       "first_close": 328.5,
-      "current_close": 348.27,
-      "pnl_pct": 6.02,
+      "current_close": 346.0,
+      "pnl_pct": 5.33,
       "price_source": "quote",
       "catalysts": [
         {
@@ -42,66 +42,31 @@
       ]
     },
     {
-      "code": "300390",
-      "name": "天华新能",
-      "market": "sz",
-      "board": "创业板",
-      "status": "near",
-      "total_score": 28.0,
-      "quality_grade": "B",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业",
-        "2026一季报预增",
-        "医疗器械概念",
-        "MSCI中国",
-        "深股通",
-        "锂矿概念",
-        "固态电池",
-        "独角兽"
-      ],
-      "signal_count": 2,
-      "enter_date": "2026-09-15",
-      "hold_days": 7,
-      "consecutive_days": 1,
-      "first_close": 52.3,
-      "current_close": 54.23,
-      "pnl_pct": 3.69,
-      "price_source": "quote",
-      "catalysts": [
-        {
-          "tag": "中报扭亏",
-          "score": 15,
-          "reaction": "已兑现(价涨)"
-        }
-      ]
-    },
-    {
-      "code": "300857",
-      "name": "协创数据",
+      "code": "300199",
+      "name": "翰宇药业",
       "market": "sz",
       "board": "创业板",
       "status": "strict",
-      "total_score": 34.8,
+      "total_score": 30.4,
       "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
+      "industry": "医药制造业",
       "sectors": [
-        "计算机、通信和其他电子设备制造业",
-        "2026一季报预增",
-        "MSCI中国",
-        "AI智能体",
-        "物联网",
-        "AI眼镜",
+        "肝炎概念",
+        "流感",
         "2026中报预增",
-        "小米概念"
+        "减肥药",
+        "深股通",
+        "创新药",
+        "医药制造业",
+        "互联医疗"
       ],
       "signal_count": 2,
-      "enter_date": "2026-08-17",
-      "hold_days": 5,
+      "enter_date": "2026-09-22",
+      "hold_days": 2,
       "consecutive_days": 2,
-      "first_close": 269.15,
-      "current_close": 273.35,
-      "pnl_pct": 1.56,
+      "first_close": 23.85,
+      "current_close": 24.29,
+      "pnl_pct": 1.84,
       "price_source": "quote",
       "catalysts": [
         {
@@ -112,30 +77,58 @@
       ]
     },
     {
-      "code": "300199",
-      "name": "翰宇药业",
+      "code": "300390",
+      "name": "天华新能",
       "market": "sz",
       "board": "创业板",
-      "status": "strict",
-      "total_score": 32.3,
-      "quality_grade": "A",
-      "industry": "医药制造业",
+      "status": "near",
+      "total_score": 26.1,
+      "quality_grade": "B",
+      "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "医药制造业",
-        "肝炎概念",
-        "2026中报预增",
+        "2026一季报预增",
+        "计算机、通信和其他电子设备制造业",
         "深股通",
-        "创新药",
-        "流感",
-        "互联医疗",
-        "减肥药"
+        "锂矿概念",
+        "医疗器械概念",
+        "固态电池",
+        "独角兽",
+        "MSCI中国"
       ],
-      "signal_count": 1,
-      "enter_date": "2026-09-22",
-      "hold_days": 2,
-      "consecutive_days": 2,
-      "first_close": 23.85,
-      "current_close": 23.85,
+      "signal_count": null,
+      "enter_date": "2026-09-15",
+      "hold_days": 7,
+      "consecutive_days": 1,
+      "first_close": 52.3,
+      "current_close": 52.76,
+      "pnl_pct": 0.88,
+      "price_source": "quote",
+      "catalysts": [
+        {
+          "tag": "中报扭亏",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "000737",
+      "name": "北方铜业",
+      "market": "sz",
+      "board": "主板",
+      "status": "near",
+      "total_score": 26.1,
+      "quality_grade": "B",
+      "industry": "有色金属冶炼和压延加工业",
+      "sectors": [
+        "有色金属冶炼和压延加工业"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-09-23",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 14.82,
+      "current_close": 14.82,
       "pnl_pct": 0.0,
       "price_source": "quote",
       "catalysts": [
@@ -152,26 +145,26 @@
       "market": "sh",
       "board": "主板",
       "status": "strict",
-      "total_score": 26.1,
+      "total_score": 28.0,
       "quality_grade": "A",
       "industry": "铁路、船舶、航空航天和其他运输设备制造业",
       "sectors": [
-        "并购重组概念",
-        "机构重仓",
-        "2026中报预增",
         "贬值受益",
-        "铁路、船舶、航空航天和其他运输设备制造业",
-        "QFII重仓",
+        "2026中报预增",
+        "机构重仓",
+        "大盘成长",
         "融资融券",
-        "大盘成长"
+        "并购重组概念",
+        "铁路、船舶、航空航天和其他运输设备制造业",
+        "QFII重仓"
       ],
-      "signal_count": 3,
+      "signal_count": null,
       "enter_date": "2026-09-22",
       "hold_days": 2,
       "consecutive_days": 2,
       "first_close": 219.0,
-      "current_close": 219.0,
-      "pnl_pct": 0.0,
+      "current_close": 215.32,
+      "pnl_pct": -1.68,
       "price_source": "quote",
       "catalysts": [
         {
@@ -182,59 +175,31 @@
       ]
     },
     {
-      "code": "000737",
-      "name": "北方铜业",
+      "code": "300502",
+      "name": "新易盛",
       "market": "sz",
-      "board": "主板",
-      "status": "near",
-      "total_score": 26.7,
-      "quality_grade": "B",
-      "industry": "有色金属冶炼和压延加工业",
-      "sectors": [
-        "有色金属冶炼和压延加工业"
-      ],
-      "signal_count": 2,
-      "enter_date": "2026-09-23",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 15.11,
-      "current_close": 15.11,
-      "pnl_pct": 0.0,
-      "price_source": "quote",
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "605117",
-      "name": "德业股份",
-      "market": "sh",
-      "board": "主板",
+      "board": "创业板",
       "status": "strict",
-      "total_score": 27.5,
+      "total_score": 26.7,
       "quality_grade": "A",
-      "industry": "电气机械和器材制造业",
+      "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "2026一季报预增",
-        "周期股",
-        "MSCI中国",
-        "沪股通",
-        "电气机械和器材制造业",
+        "深证100R",
         "2026中报预增",
-        "HS300",
-        "上证180"
+        "计算机、通信和其他电子设备制造业",
+        "机构重仓",
+        "深股通",
+        "基金重仓",
+        "百元股",
+        "MSCI中国"
       ],
       "signal_count": 1,
-      "enter_date": "2026-09-12",
-      "hold_days": 8,
-      "consecutive_days": 2,
-      "first_close": 85.5,
-      "current_close": 82.38,
-      "pnl_pct": -3.65,
+      "enter_date": "2026-08-17",
+      "hold_days": 5,
+      "consecutive_days": 1,
+      "first_close": 466.68,
+      "current_close": 451.2,
+      "pnl_pct": -3.32,
       "price_source": "quote",
       "catalysts": [
         {
@@ -250,26 +215,19 @@
       "market": "sh",
       "board": "主板",
       "status": "strict",
-      "total_score": 36.6,
+      "total_score": 33.5,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
-        "MSCI中国",
-        "稀缺资源",
-        "昨日炸板",
-        "有色金属矿采选业",
-        "2026中报预增",
-        "锂矿概念",
-        "新材料",
-        "钒电池"
+        "有色金属矿采选业"
       ],
-      "signal_count": 0,
+      "signal_count": 2,
       "enter_date": "2026-08-17",
       "hold_days": 8,
       "consecutive_days": 2,
       "first_close": 39.34,
-      "current_close": 36.77,
-      "pnl_pct": -6.53,
+      "current_close": 36.81,
+      "pnl_pct": -6.43,
       "price_source": "quote",
       "catalysts": [
         {
@@ -285,26 +243,26 @@
       "market": "sh",
       "board": "主板",
       "status": "near",
-      "total_score": 31.1,
+      "total_score": 29.2,
       "quality_grade": "B",
       "industry": "有色金属矿采选业",
       "sectors": [
-        "MSCI中国",
-        "稀缺资源",
-        "磷化工",
         "有色金属矿采选业",
-        "大盘股",
+        "HS300",
         "2026中报预增",
+        "磷化工",
+        "大盘股",
+        "稀缺资源",
         "昨日高振幅",
-        "HS300"
+        "MSCI中国"
       ],
-      "signal_count": 1,
+      "signal_count": null,
       "enter_date": "2026-08-17",
       "hold_days": 9,
       "consecutive_days": 1,
       "first_close": 19.13,
-      "current_close": 17.81,
-      "pnl_pct": -6.9,
+      "current_close": 17.66,
+      "pnl_pct": -7.68,
       "price_source": "quote",
       "catalysts": [
         {
@@ -315,24 +273,31 @@
       ]
     },
     {
-      "code": "688808",
-      "name": "联讯仪器",
+      "code": "605117",
+      "name": "德业股份",
       "market": "sh",
-      "board": "科创板",
+      "board": "主板",
       "status": "strict",
-      "total_score": 28.6,
+      "total_score": 29.4,
       "quality_grade": "A",
-      "industry": "仪器仪表制造业",
+      "industry": "电气机械和器材制造业",
       "sectors": [
-        "仪器仪表制造业"
+        "HS300",
+        "2026中报预增",
+        "2026一季报预增",
+        "周期股",
+        "沪股通",
+        "上证180",
+        "电气机械和器材制造业",
+        "MSCI中国"
       ],
-      "signal_count": 0,
-      "enter_date": "2026-09-07",
-      "hold_days": 3,
+      "signal_count": null,
+      "enter_date": "2026-09-12",
+      "hold_days": 8,
       "consecutive_days": 2,
-      "first_close": 2656.9,
-      "current_close": 2316.0,
-      "pnl_pct": -12.83,
+      "first_close": 85.5,
+      "current_close": 78.01,
+      "pnl_pct": -8.76,
       "price_source": "quote",
       "catalysts": [
         {
@@ -367,12 +332,6 @@
       "code": "688213",
       "name": "",
       "text": "(688213) 于 2026-08-17 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "300502",
-      "name": "新易盛",
-      "text": "新易盛(300502) 于 2026-09-22 跌出共识（曾连续 1 日）"
     },
     {
       "level": "warn",
@@ -546,7 +505,7 @@
       "level": "warn",
       "code": "688808",
       "name": "联讯仪器",
-      "text": "联讯仪器(688808) 入选以来回撤 -12.8%（2026-09-07 起）"
+      "text": "联讯仪器(688808) 入选以来回撤 -14.2%（2026-09-07 起）"
     },
     {
       "level": "warn",
@@ -589,6 +548,12 @@
       "code": "300759",
       "name": "康龙化成",
       "text": "康龙化成(300759) 于 2026-09-11 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "605117",
+      "name": "德业股份",
+      "text": "德业股份(605117) 入选以来回撤 -8.8%（2026-09-12 起）"
     },
     {
       "level": "warn",
@@ -725,7 +690,7 @@
         "names": [
           "江波龙",
           "天华新能",
-          "协创数据"
+          "新易盛"
         ]
       },
       {
@@ -744,17 +709,17 @@
         ]
       },
       {
-        "industry": "铁路、船舶、航空航天和其他运输设备制造业",
-        "count": 1,
-        "names": [
-          "松发股份"
-        ]
-      },
-      {
         "industry": "有色金属冶炼和压延加工业",
         "count": 1,
         "names": [
           "北方铜业"
+        ]
+      },
+      {
+        "industry": "铁路、船舶、航空航天和其他运输设备制造业",
+        "count": 1,
+        "names": [
+          "松发股份"
         ]
       },
       {
@@ -763,50 +728,35 @@
         "names": [
           "德业股份"
         ]
-      },
-      {
-        "industry": "仪器仪表制造业",
-        "count": 1,
-        "names": [
-          "联讯仪器"
-        ]
       }
     ],
     "by_sector": [
       {
         "sector": "2026中报预增",
-        "count": 7
+        "count": 6
       },
       {
         "sector": "MSCI中国",
-        "count": 6
+        "count": 5
       },
       {
         "sector": "计算机、通信和其他电子设备制造业",
         "count": 3
       },
       {
-        "sector": "2026一季报预增",
+        "sector": "深股通",
         "count": 3
       },
       {
-        "sector": "AI眼镜",
+        "sector": "深证100R",
         "count": 2
       },
       {
-        "sector": "深股通",
+        "sector": "2026一季报预增",
         "count": 2
       },
       {
-        "sector": "锂矿概念",
-        "count": 2
-      },
-      {
-        "sector": "HS300",
-        "count": 2
-      },
-      {
-        "sector": "稀缺资源",
+        "sector": "机构重仓",
         "count": 2
       },
       {
@@ -814,11 +764,19 @@
         "count": 2
       },
       {
-        "sector": "AI手机",
+        "sector": "HS300",
+        "count": 2
+      },
+      {
+        "sector": "信创",
         "count": 1
       },
       {
-        "sector": "深证100R",
+        "sector": "AI眼镜",
+        "count": 1
+      },
+      {
+        "sector": "AI手机",
         "count": 1
       },
       {
@@ -826,7 +784,31 @@
         "count": 1
       },
       {
-        "sector": "信创",
+        "sector": "肝炎概念",
+        "count": 1
+      },
+      {
+        "sector": "流感",
+        "count": 1
+      },
+      {
+        "sector": "减肥药",
+        "count": 1
+      },
+      {
+        "sector": "创新药",
+        "count": 1
+      },
+      {
+        "sector": "医药制造业",
+        "count": 1
+      },
+      {
+        "sector": "互联医疗",
+        "count": 1
+      },
+      {
+        "sector": "锂矿概念",
         "count": 1
       },
       {
@@ -842,51 +824,23 @@
         "count": 1
       },
       {
-        "sector": "AI智能体",
-        "count": 1
-      },
-      {
-        "sector": "物联网",
-        "count": 1
-      },
-      {
-        "sector": "小米概念",
-        "count": 1
-      },
-      {
-        "sector": "医药制造业",
-        "count": 1
-      },
-      {
-        "sector": "肝炎概念",
-        "count": 1
-      },
-      {
-        "sector": "创新药",
-        "count": 1
-      },
-      {
-        "sector": "流感",
-        "count": 1
-      },
-      {
-        "sector": "互联医疗",
-        "count": 1
-      },
-      {
-        "sector": "减肥药",
-        "count": 1
-      },
-      {
-        "sector": "并购重组概念",
-        "count": 1
-      },
-      {
-        "sector": "机构重仓",
+        "sector": "有色金属冶炼和压延加工业",
         "count": 1
       },
       {
         "sector": "贬值受益",
+        "count": 1
+      },
+      {
+        "sector": "大盘成长",
+        "count": 1
+      },
+      {
+        "sector": "融资融券",
+        "count": 1
+      },
+      {
+        "sector": "并购重组概念",
         "count": 1
       },
       {
@@ -898,43 +852,11 @@
         "count": 1
       },
       {
-        "sector": "融资融券",
+        "sector": "基金重仓",
         "count": 1
       },
       {
-        "sector": "大盘成长",
-        "count": 1
-      },
-      {
-        "sector": "有色金属冶炼和压延加工业",
-        "count": 1
-      },
-      {
-        "sector": "周期股",
-        "count": 1
-      },
-      {
-        "sector": "沪股通",
-        "count": 1
-      },
-      {
-        "sector": "电气机械和器材制造业",
-        "count": 1
-      },
-      {
-        "sector": "上证180",
-        "count": 1
-      },
-      {
-        "sector": "昨日炸板",
-        "count": 1
-      },
-      {
-        "sector": "新材料",
-        "count": 1
-      },
-      {
-        "sector": "钒电池",
+        "sector": "百元股",
         "count": 1
       },
       {
@@ -946,18 +868,34 @@
         "count": 1
       },
       {
+        "sector": "稀缺资源",
+        "count": 1
+      },
+      {
         "sector": "昨日高振幅",
         "count": 1
       },
       {
-        "sector": "仪器仪表制造业",
+        "sector": "周期股",
+        "count": 1
+      },
+      {
+        "sector": "沪股通",
+        "count": 1
+      },
+      {
+        "sector": "上证180",
+        "count": 1
+      },
+      {
+        "sector": "电气机械和器材制造业",
         "count": 1
       }
     ],
-    "concentration": 30.0
+    "concentration": 33.33
   },
   "overlap": {
-    "total_tracked": 10,
+    "total_tracked": 9,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -966,8 +904,8 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
-    "latest_date": "2026-09-22 23:32:49",
-    "total": 363,
+    "latest_date": "2026-09-23 06:08:52",
+    "total": 369,
     "best_hold_days": 10,
     "periods": {
       "1d": {
@@ -1015,7 +953,7 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 157,
+      "count": 160,
       "win_rate_5d": 52.4,
       "avg_ret_5d": 0.83,
       "best_win_rate": 56.9,
@@ -1023,7 +961,7 @@
     },
     {
       "band": "70~80",
-      "count": 206,
+      "count": 209,
       "win_rate_5d": 39.2,
       "avg_ret_5d": -1.36,
       "best_win_rate": 42.9,
@@ -1086,8 +1024,8 @@
     "summary": {
       "1d": {
         "count": 48,
-        "win_rate": 37.5,
-        "avg_return": 0.74
+        "win_rate": 41.67,
+        "avg_return": 0.83
       },
       "3d": {
         "count": 38,
@@ -1097,7 +1035,7 @@
       "5d": {
         "count": 29,
         "win_rate": 41.38,
-        "avg_return": 0.3
+        "avg_return": 0.17
       },
       "10d": {
         "count": 21,
@@ -1629,7 +1567,7 @@
         "offsets": {
           "1d": 0.0,
           "3d": -0.73,
-          "5d": -0.95
+          "5d": -2.12
         }
       },
       {
@@ -1639,7 +1577,7 @@
         "offsets": {
           "1d": 0.0,
           "3d": 0.74,
-          "5d": 3.05
+          "5d": 0.51
         }
       },
       {
@@ -1665,7 +1603,7 @@
         "name": "翰宇药业",
         "enter_date": "2026-09-22",
         "offsets": {
-          "1d": 0.0
+          "1d": 1.84
         }
       },
       {
@@ -1673,7 +1611,7 @@
         "name": "松发股份",
         "enter_date": "2026-09-22",
         "offsets": {
-          "1d": 0.0
+          "1d": -1.68
         }
       },
       {
@@ -1681,7 +1619,7 @@
         "name": "新锐股份",
         "enter_date": "2026-09-22",
         "offsets": {
-          "1d": 0.0
+          "1d": 4.26
         }
       }
     ]
