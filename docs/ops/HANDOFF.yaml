@@ -26,15 +26,15 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 16:37"
-  updated_by: 阿狸咪的工程师(alimi-cn)
+  updated: "2026-09-23 16:52"
+  updated_by: 小九
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 61
+  next_id_seq: 62
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -3073,3 +3073,27 @@ items:
     verified_at: "2026-09-23 16:37"
     updated: "2026-09-23 16:37"
     updated_by: 阿狸咪的工程师
+
+  # ── P0 · 数据链（小九 2026-09-23 盘后）─────────────────────────────────
+  - id: etf-monitor-clist-fid-invalid
+    priority: P0
+    owner: 小九
+    status: pending-verify
+    what: >-
+      AI速览「全市场ETF合计净流出」恒为 -4.95亿 不刷新；raw_data/etf_daily_monitor.json 冻在
+      2026-09-23 11:30:22（total_net=-4.9547e8）。根因：f_etf_daily_monitor / f_etf_pulse 弃
+      akshare 改 em_clist 直连时误用 fid="f12"（ETF 板块非法排序字段）⇒ clist 返回空 diff
+      ⇒ 两模块每轮 empty ⇒ 底表冻结（同端点 ETF_INTRADAY_HEAT 用 fid=f62 一直正常，可排除端点整体挂）。
+    fix: >-
+      cloud_fetch_v8.py 两函数 fid="f12" → "f3"（涨跌幅序，与 akshare fund_etf_spot_em 同款写法）。
+      commit bcaa2158370ddd09c4fe570cdcd1083af474dae6（md5 8d7b6a0e43d1，推送器逐字节自验通过）。
+    evidence: >-
+      云端确定性探针（一次性 v8_em_probe.yml，与 em_clist 同签名：_EM_HEADERS + rc==0 校验 + 退避重试）
+      实锤：fid=f3 + 组合 fs(m:1+t:9,m:0+t:9) → rc=0 / rows=100 / api_total=1362，第 2 页仍 100 行
+      （分页正常，全市场约 14 页）；fid=f12 → 空返。探针与结果文件已按计划删除（不复留诊断件）。
+    verify_how: >-
+      等一轮「含 bcaa2158 代码」的 v8_cn_fetch_cloud 跑完，核对 raw_data/etf_daily_monitor.json 的
+      update_time ≥ 2026-09-23 16:05 且 total_net 不再 ≈ -4.9547e8；并核 data/AI_MARKET_BRIEF.js 的
+      「全市场ETF合计净流出」数值随底表变化（brief 每档重生成、读该底表）。三证齐备才可置 done。
+    updated: "2026-09-23 16:52"
+    updated_by: 小九
