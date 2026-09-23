@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 17:28"
+  updated: "2026-09-23 19:00"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 67
+  next_id_seq: 68
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -3081,24 +3081,44 @@ items:
     status: pending-verify
     what: >-
       AI速览「全市场ETF合计净流出」恒为 -4.95亿 不刷新；raw_data/etf_daily_monitor.json 冻在
-      2026-09-23 11:30:22（total_net=-4.9547e8）。根因：f_etf_daily_monitor / f_etf_pulse 弃
-      akshare 改 em_clist 直连时误用 fid="f12"（ETF 板块非法排序字段）⇒ clist 返回空 diff
-      ⇒ 两模块每轮 empty ⇒ 底表冻结（同端点 ETF_INTRADAY_HEAT 用 fid=f62 一直正常，可排除端点整体挂）。
+      2026-09-23 11:30:22（total_etf=1602 / total_net=-4.9547e8）。
+      🔴 **原判「仅 fid=f12 非法」不完整，09-23 傍晚被探针 v5/v6 重新定性为四因叠加**：
+      ① **pz 硬截 100 属实**：pz=50000 时 push2delay 与 push2 主站都只回 100 行
+         （api_total=1619 而 rows=100）⇒ 无法「一次取全」，必须分页（14~17 页）；
+      ② **fs 口径漏深市**：`m:1+t:9,m:0+t:9` 的 api_total=1362，且同一页 100 行**全是沪市**
+         （SH=100 / SZ=0）；换 `b:MK0021,b:MK0022,b:MK0023,b:MK0024` 后 api_total=1619、同页 SH=58/SZ=42；
+      ③ **「请求失败」被误判成「已遍历到末尾」**：`if not page: break` ⇒ 17:31 日志实证第 1 页
+         连撞 2 次 502 后直接「返回空，跳过」；探针里更出现「只取到 264/1602 只却按全市场合计
+         写盘」的**静默截断**（假成功比不写更糟）；
+      ④ **不稳定是「窗口」不是「配额」**：v5 实测同一请求连打 12 次 × 5 秒**全程 502**（60 秒不可用）；
+         v6 改用 6 个**独立 runner**、每 runner 只发 1 个请求（消除顺序污染），同一分钟内 4 个 502 /
+         2 个 200 ⇒ 与请求次数无关 ⇒ 唯一修法是长退避，不是减请求。
+      ⑤ 对照组铁证：任务表**第 1 位**的 ETF_INTRADAY_HEAT（1 个请求）档档新鲜（16:59/17:22/18:05/18:24），
+         而**第 19/20 位**的 ETF_PULSE / ETF_DAILY_MONITOR（各 16 页）自 11:31 起全冻。
     fix: >-
-      cloud_fetch_v8.py 两函数 fid="f12" → "f3"（涨跌幅序，与 akshare fund_etf_spot_em 同款写法）。
-      commit bcaa2158370ddd09c4fe570cdcd1083af474dae6（md5 8d7b6a0e43d1，推送器逐字节自验通过）。
+      cloud_fetch_v8.py 重写为「ETF 全市场快照」_etf_snapshot()（commit 56ffc8e9dc…，md5 74ed877a73ff，
+      逐字节自验通过）：① fs 换东财 ETF 板块串 `b:MK0021,b:MK0022,b:MK0023,b:MK0024`（api_total=1619，
+      含沪深两市，与 akshare 口径 1602 一致）；② 分页失败**不推进页码**、原地退避 5/10/20/30s（每页 4 轮），
+      并在 push2delay / push2 两个 host 间轮换；③ 取不满 _ETF_MIN_ROWS=1200 ⇒ 整体返回 None
+      （上层不写盘、保留旧值）⇒ 消灭静默截断；④ ETF_PULSE 与 ETF_DAILY_MONITOR **共用同一份快照**
+      （原各 16 页＝32 次请求 → 17 次）；⑤ 单次预算 600s + 单轮累计 900s，避免拖爆 job。
+      离线桩网络五场景全过（正常 1619 / 第 2 页 502×2 原地重试 / 全程 502 必 None /
+      只回 3 页 300 只必 None / 未开盘给 no_data），旧写法残留用**代码级计数（跳注释行）**断言为 0。
     evidence: >-
-      云端确定性探针（一次性 v8_em_probe.yml，与 em_clist 同签名：_EM_HEADERS + rc==0 校验 + 退避重试）
-      实锤：fid=f3 + 组合 fs(m:1+t:9,m:0+t:9) → rc=0 / rows=100 / api_total=1362，第 2 页仍 100 行
-      （分页正常，全市场约 14 页）；fid=f12 → 空返。探针与结果文件已按计划删除（不复留诊断件）。
+      探针 v3→v6 逐版实测定性（v4 因「先跑重活再测」自污染已废；v5 改冷启动优先；
+      v6 改「矩阵 × 独立 runner，每 runner 只发 1 请求」彻底消除顺序污染）。
+      线上真身 API 回读：cloud_fetch_v8.py blob 254674 B / md5 74ed877a73ff 逐字节一致。
+      另：cn_fetch 陈旧 pending 队列已清 7 笔（head 全部早于本次修复，pending 不写文件、零数据风险，
+      但**队列单调增长本身是独立问题**，见 item cn-fetch-queue-growth），并派发 run 35849619293。
     verify_how: >-
-      等一轮「含 bcaa2158 代码」的 v8_cn_fetch_cloud 跑完，核对 raw_data/etf_daily_monitor.json 的
-      update_time ≥ 2026-09-23 16:05 且 total_net 不再 ≈ -4.9547e8；并核 data/AI_MARKET_BRIEF.js 的
-      「全市场ETF合计净流出」数值随底表变化（brief 每档重生成、读该底表）。三证齐备才可置 done。
-    updated: "2026-09-23 16:52"
+      等 run 35849619293（head 56ffc8e9dc）跑完，三证齐备才可置 done：
+      ① raw_data/etf_daily_monitor.json blob sha ≠ e87d6799e8、update_time ≥ 18:3x、
+         total_etf ≈1619（原 1602）、total_net 不再是 -4.9547e8；
+      ② 日志出现「ETF clist 第 N 页失败 → Ns 后重试」而非「返回空，跳过」；
+      ③ data/AI_MARKET_BRIEF.js 的「全市场ETF合计净流出」随底表变化。
+    updated: "2026-09-23 19:00"
     updated_by: 小九
 
-  # ── 2026-09-23 17:2x 阿狸咪新增（update_v8.py 用了 Py3.13 专有 API × ima 链固定 3.12 ⇒ step7 恒红）──
   - id: update-v8-readtext-newline-py312
     priority: P1
     owner: shared
@@ -3283,4 +3303,31 @@ items:
       另：这条是 `dups_of()` 全库扫描抓出来的，**现行门禁不查重复键**，
       建议同批加进 `[13/13]`（成本＝纯读文件，无网络依赖），否则同类陷阱还会再来一次。
     updated: "2026-09-23 18:00"
+    updated_by: 小九
+
+  # ── P1 · 编排（小九 2026-09-23 傍晚实测）───────────────────────────────
+  - id: cn-fetch-queue-growth
+    priority: P1
+    owner: shared
+    status: todo
+    what: >-
+      `v8_cn_fetch_cloud.yml` 的 pending 队列**单调增长**（实测 2026-09-23 18:34 积压 7 笔，
+      且每 ~15-20 分钟仍新增 1 笔，而单轮耗时 25~45 分钟 ⇒ 派发速率 > 服务速率）。
+      机制：`concurrency.group=v8-cn-fetch-cloud` + `cancel-in-progress: false` + `queue: max`
+      （2026-09-18 为治「旧 pending 被新 run 无条件顶掉」而特意放开的排队上限）。
+      后果有二：① 数据新鲜度被队列延迟拖后（18:03 起跑的那笔是 16:20 派发的，等了 1h43m）；
+      ② 🔴 **队列里的 run 用的是「派发时刻」的代码树**（head_sha 固定）⇒ 修复上线后，
+      积压的 7 笔仍在跑旧代码，**修复等于排队等 2~3 小时才可能生效**（本轮 ETF 修复即撞上此坑）。
+    fix: >-
+      待定（需拍板）。候选：a) 派发器加「同类别在跑则跳过」节流；b) 给队列加深度上限并让
+      超龄 pending 自动取消；c) 缩短单轮耗时（把最慢的抓取模块拆到独立 workflow）。
+      注意：**不要**回退 `cancel-in-progress: false`（会重新触发 08-24 的「杀正在写文件的 run」事故）。
+    evidence: >-
+      2026-09-23 18:34 实测：pending 7 笔（创建时刻 08:35/08:50/09:16/09:34/09:49/10:04/10:25 UTC），
+      in_progress 1 笔（08:20 派发于 10:03:51 才开始跑），head_sha 全部早于当日修复提交。
+      本轮据「pending 不写文件」判定可安全取消，已清 7 笔并派发带修复的新 run。
+    verify_how: >-
+      观察或改造后核对：连续 3 小时 pending 深度不增长（或稳定 ≤2），且「修复上线 → 被 run 执行」
+      的时延 ≤ 1 轮。
+    updated: "2026-09-23 19:00"
     updated_by: 小九
