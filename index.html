@@ -647,8 +647,8 @@ window.__domReadyFns=[];
 <script src="data/US_HK_MAP.js?v=1790166348" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
-    <script src="data/H_AUTO_BUY.js?v=1790167174" defer></script>
-    <script src="data/H_AUTO_BUY_TRACK.js?v=1790167174" defer></script>
+    <script src="data/H_AUTO_BUY.js?v=1790166348" defer></script>
+    <script src="data/H_AUTO_BUY_TRACK.js?v=1790166348" defer></script>
     <script src="data/UNLISTED_PANEL.js?v=1790166348" defer></script>
     <!-- 2026-09-07 主人令：机构研究·maharo 聚合卡（本机 cookie 拉取，云端无权限；数据由 .workbuddy/maharo_daily_pull.py 每日生成 data/maharo_macro.js） -->
     <!-- 2026-09-10 一劳永逸：AI 解析 insights 拆成独立文件 data/maharo_insights.js（window.MAHORO_INSIGHTS），
@@ -1765,8 +1765,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CAPITAL_FLOW_DATA.js?v=1790166348" defer></script>
 <script src="data/SH_SZ_HISTORY.js?v=1790166348" defer></script>
 <script src="data/CANDIDATE.js?v=1790166348" defer></script>
-    <script src="data/FOUR_VOLUME.js?v=1790167174" defer></script>
-    <script src="data/FOUR_VOLUME_60M.js?v=1790167174" defer></script>
+    <script src="data/FOUR_VOLUME.js?v=1790166348" defer></script>
+    <script src="data/FOUR_VOLUME_60M.js?v=1790166348" defer></script>
 
     <!-- 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」= 历史追踪 + 回测
          数据源：algorithms/update_four_volume_history.py（逐日账本+真实收盘价序列）
@@ -1775,7 +1775,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          ?v= 由 scripts/reconcile_cache_busters.py 自动对齐，此处写任意值即可。 -->
     <script src="data/FOUR_VOLUME_TRACK.js?v=1790166348" defer></script>
     <script src="data/FOUR_VOLUME_HISTORY.js?v=1790166348" defer></script>
-    <script src="data/STOCK_STOP_DATA.js?v=1790167174" defer></script>
+    <script src="data/STOCK_STOP_DATA.js?v=1790166348" defer></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=1790166348" defer></script>
 <script src="data/BACKTEST_TDX.js?v=1790166348" defer></script>
 
@@ -15696,7 +15696,10 @@ h += '<div class="card" id="macroKShapeBody" style="margin-bottom:16px;border-le
 //   定性：两级分层的观察名单 —— ①基础口径（市值/换手/封板）②K线严格过滤（「一进二」公式六项：
 //   涨停确认/大趋势/量差或控盘指数/量线粘合/三线粘合/角度60 + 量<6.18昨量 + 昨日非涨停；筹码穿刺因 SSRP 缺失按审计砍除）。
 //   数据由云端 cn fetch 步 algorithms/fetch_board_first_limit.py 产出（新浪日线算过滤）。
-//   ⚠️ 实测次日开盘买超额≈0（裸首板池 T+1 −0.48%/t=−2.55；严格分层增量 |t|<2）⇒ 是【降噪排序的观测卡】，非买点。
+//   ⚠️ 实测（2280 信号·2025-08~2026-09）：剔除不可成交（一字板 97 只 / 「收盘才确认封板」前视 352 只）后，
+//      真正可成交的 2183 个信号 T+1 开盘买 −0.386%（按日 t=−2.04，显著为负）；追高为铁律禁区
+//      （竞价高开>2% 整体 T+1 −1.148%、胜率仅 35.9%）⇒ 本卡是【候选池 + 次日避坑清单】，非买点；
+//      买点在次日 9:25 竞价：高开>2% 一律放弃，只有低开（≤0，尤其 ≤−2%）才具正期望（弱证据、仅可试仓）。
 //   竞态根治：渲染改由 __ulRenderPane 派发（用户进本页时 defer 数据必已就位），ulSelfHeal 每 1.5s 兜底。
 h += '<div id="boardFirstLimitCard" style="margin-bottom:16px;"></div>';  // 裸 div 宿主：与连板天梯同范式（v8CardHeader 自带卡头），防「双圆弧」复发
 h += '</div>'; // /ulPaneObserve
@@ -16408,7 +16411,7 @@ h += '</div>'; // /ulPaneObserve
     el.innerHTML = html;
   }
   window.__renderCycleLadderCard = __renderCycleLadderCard;
-  // 🔥 主板首板 · 一进二观察卡渲染器（2026-09-21 建；2026-09-23 阿狸咪的工程师：1行6列分层 + K线严格过滤接入 + 折叠不拉窗）
+  // 🔥 主板首板 · 一进二观察卡渲染器（2026-09-21 建；2026-09-23 阿狸咪的工程师：1行6列分层 + K线严格过滤接入 + 折叠不拉窗；2026-09-23 夜：量比入格 + 「三步买入法」实测口径 + 限制区补不可成交性证据）
   function __renderBoardFirstLimit(){
     var box=document.getElementById('boardFirstLimitCard');
     if(!box) return;
@@ -16417,11 +16420,12 @@ h += '</div>'; // /ulPaneObserve
     // 核心/用法/限制（全站统一范式）
     var _guide='<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:10px 12px;margin:0 0 10px;line-height:1.8;font-size:12px;color:var(--txt);">'
       +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">📌 核心：</b>在<b>最近一个已收盘交易日</b>的<b>主板首板</b>（60/00 开头 · 连板数=1）里做<b>两级分层</b>：①<b style="color:#26a69a;">基础口径</b>＝流通市值&lt;120亿<b>或</b>流通股&lt;4亿 ＋ 换手率&gt;2% ＋ 炸板 0 次（封板干净）；②<b style="color:#e0b34a;">K 线严格过滤</b>＝「一进二」公式六项（涨停确认／大趋势／量差<b>或</b>控盘指数／量线粘合／三线粘合／角度60°）＋ 量&lt;6.18×昨量 ＋ 昨日非涨停 ＋ 小盘 ＋ 换手&gt;2%。</div>'
-      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b><b style="color:#e0b34a;">★严格</b>＝六项 K 线过滤全过（金标·置顶）；<b style="color:#26a69a;">✓</b>＝仅基础口径达标；其余收进折叠区。排列「严格 → 基础 → 封板资金降序」。一进二看的是<b>次日承接</b>，须结合板块情绪（涨停天梯／炸板率）与个股位置；鼠标悬停可见该只未过哪些项与读数。</div>'
-      +'<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠ 限制：</b>本卡是<b>观察分层、非买点</b>。面板层实测（1909 只主板 · 约一年）：① <b>裸首板池</b>次日开盘买 T+1 <b style="color:#26a69a;">−0.48%</b>（按日 t=−2.55，显著为负）⇒ 盲追首板亏钱；② <b>严格分层</b>把 T+1 收到 −0.38%、T+5 由 −0.32% 转为 <b style="color:#ef5350;">+0.26%</b>，方向正确，<b>但增量 |t| 仅 1.0~1.6（未达显著）</b>；③「信号日收盘买」口径超额显著（T+5 +2.02%／t=5.98），但那是不可成交的价格。⇒ 严格过滤的价值是<b>降噪排序</b>，不是买点。筹码穿刺分支因外部指标 SSRP 缺失已按审计砍除。仅研究参考，不构成投资建议。</div>'
+      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b><b style="color:#e0b34a;">★严格</b>＝六项 K 线过滤全过（金标·置顶）；<b style="color:#26a69a;">✓</b>＝仅基础口径达标；其余收进折叠区。排列「严格 → 基础 → 封板资金降序」。每格直接标出<b>量比</b>（＝当日量÷昨日量）：<b style="color:#fbbf24;">量比≤0.5 的次日 80% 高开&gt;2%、43% 直接涨停开盘（多数买不到）</b>；量比≥2 者次日 69% 平价开盘，才是值得看的对象。鼠标悬停可见未过项与读数。</div>'
+      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#fb923c;">🎯 怎么买（唯一有实测支持的用法）：</b>本卡是<b>候选池</b>，买点在<b>次日 9:25 竞价</b>——① 高开 &gt;2% <b>一律放弃</b>（高开 6~9.8% 追进去当日 <b style="color:#26a69a;">−3.14%</b>，t=−7.03）；② 只有<b>低开</b>（≤0，尤其 ≤−2%）才有正期望（当日 <b style="color:#ef5350;">+1.05%</b>、胜率 50.4%，但 t=1.63 未达显著＝<b>弱证据、仅可试仓</b>）；③ 进场后持有 1~3 日，<b>3% 紧止损无效</b>（触发率 63.6%）。</div>'
+      +'<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠ 限制（这是候选池，不是买点清单）：</b>实测 2280 个严格达标信号（主板 · 2025-08~2026-09）：① <b>剔掉不可成交样本后，真正能买到的 2183 个信号，次日开盘买 T+1 <b style="color:#26a69a;">−0.386%</b>（按日 t=−2.04，显著为负）</b>；② 卡面「看着能赚」的两类散户都拿不到——<b>一字板 97 只</b>（T+3 <b style="color:#ef5350;">+9.7%</b>，但你买不进）与「T+1 收盘后才确认封板」352 只（fix1 +5.15%、t=22，属<b>未来函数</b>，不可作为买点）；③ <b>追高是铁律禁区</b>：竞价高开 &gt;2% 整体 T+1 <b style="color:#26a69a;">−1.148%</b>（胜率仅 35.9%），高开 6~9.8% 更差；④「信号日收盘买」口径 T+5 +2.02%（t=5.98）显著，但那是<b>不可成交的价格</b>。⇒ 严格过滤的价值是<b>降噪排序 + 次日避坑</b>。筹码穿刺分支因外部指标 SSRP 在 v8 无源、定义未知，已按审计砍除。仅研究参考，不构成投资建议。</div>'
       +'</div>';
     if(!d||!d.items||!d.items.length){
-      box.innerHTML=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径 + K线严格过滤（观察分层）','update_time',{update_time:(d&&d.update_time)||''},true)+_guide;
+      box.innerHTML=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径 + K线严格过滤（候选池·非买点）','update_time',{update_time:(d&&d.update_time)||''},true)+_guide;
       return;
     }
     var _grid='display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px 7px;';
@@ -16430,6 +16434,8 @@ h += '</div>'; // /ulPaneObserve
       var isS=!!x.strict;
       var kn=(x.kline==='na')?'<span style="color:#666;font-size:9px;"> K?</span>':((x.kline==='stale')?'<span style="color:#666;font-size:9px;"> K旧</span>':'');
       var rd=x.read||{};
+      var _vr=(rd.vol_ratio===undefined||rd.vol_ratio===null)?null:rd.vol_ratio;
+      var _vrc=(_vr!==null&&_vr<=0.5)?'color:#fbbf24;font-weight:700;':'';
       var tip=x.name+' '+x.code+' ｜ '+x.industry+' ｜ 流通'+x.circ_mcap+'亿／流通股'+x.circ_shares+'亿股 ｜ 换手'+x.turnover+'% ｜ 封'+x.seal+'亿 首封'+ft
         +' ｜ '+(isS?'K线六项全过':(x.kmiss&&x.kmiss.length?('未过：'+x.kmiss.join('／')):'K线未判定'))
         +(rd.vol_ratio?(' ｜ 量比'+rd.vol_ratio+' 角'+rd.ang_deg+'° 三线'+rd.glue3_ratio+' 量线'+rd.gluev_ratio):'');
@@ -16440,7 +16446,7 @@ h += '</div>'; // /ulPaneObserve
         +'<span style="color:#888;font-size:9px;">'+x.code+'</span>'
         +'<span style="margin-left:auto;white-space:nowrap;">'+(isS?'<span style="color:#e0b34a;font-size:9.5px;font-weight:700;">★</span>':(x.basic_pass?'<span style="color:#26a69a;font-size:9.5px;">✓</span>':''))+kn+'</span></div>'
         +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.industry+'</div>'
-        +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">流通'+x.circ_mcap+'亿·换'+x.turnover+'%</div>'
+        +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">流通'+x.circ_mcap+'亿·换'+x.turnover+'%·<span style="'+_vrc+'"'+((_vr!==null&&_vr<=0.5)?(' title="量比'+_vr+'≤0.5：次日大概率高开，慎追"'):'')+'>量'+(_vr===null?'—':_vr)+'</span></div>'
         +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">封'+x.seal+'亿·'+ft+'</div>'
         +l5
         +'</div>';
@@ -16456,8 +16462,11 @@ h += '</div>'; // /ulPaneObserve
     if(_B.length) _body+='<div style="margin-top:9px;">'+_sec('<b style="color:#26a69a;">✓ 基础达标</b> <span style="color:#8b98a8;">'+_B.length+' 只 · 未过严格过滤</span>',_B)+'</div>';
     if(_R.length) _body+='<details style="margin-top:9px;"><summary style="cursor:pointer;font-size:11px;color:#8b98a8;outline:none;">其余 '+_R.length+' 只（基础口径也未达标）· 点击展开</summary><div style="'+_grid+'margin-top:6px;">'+_R.map(_cell).join('')+'</div></details>';
     var _kna=(d.kline_na>0)?(' ｜ <span style="color:#8b98a8;">K线不可用 '+d.kline_na+' 只</span>'):'';
-    var html=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径 + K线严格过滤（一进二公式六项）· 观察分层','update_time',d)
-      +'<div style="padding:4px 0 8px;color:#bbb;font-size:12px;">数据日 <b style="color:#fbbf24;">'+_dd+'</b> 主板首板 <b style="color:#ef5350;">'+d.total+'</b> 只 ｜ 严格达标 <b style="color:#e0b34a;">'+(d.strict_pass||0)+'</b> 只 ｜ 基础达标 <b style="color:#26a69a;">'+d.basic_pass+'</b> 只'+_kna+'</div>'
+    var _slow=0;
+    d.items.forEach(function(x){ var v=(x.read||{}).vol_ratio; if(v!==undefined&&v!==null&&v<=0.5) _slow++; });
+    var html=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径 + K线严格过滤（一进二公式六项）· 候选池（非买点）','update_time',d)
+      +'<div style="padding:4px 0 8px;color:#bbb;font-size:12px;">数据日 <b style="color:#fbbf24;">'+_dd+'</b> 主板首板 <b style="color:#ef5350;">'+d.total+'</b> 只 ｜ 严格达标 <b style="color:#e0b34a;">'+(d.strict_pass||0)+'</b> 只 ｜ 基础达标 <b style="color:#26a69a;">'+d.basic_pass+'</b> 只'+_kna
+      +(_slow?(' ｜ <span style="color:#fbbf24;">次日易高开 '+_slow+' 只</span> <span style="color:#8b98a8;">(量比≤0.5，慎追)</span>'):'')+'</div>'
       +_guide
       +_body;
     box.innerHTML=html;
