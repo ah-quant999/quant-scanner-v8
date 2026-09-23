@@ -3010,18 +3010,26 @@ def f_performance_forecast():
 #        · 同域名无间隔连打 6 次：4/6（200,200,200,502,502,200）
 #        ⇒ 快慢都不是决定因素，成败按请求抽签、且好/坏时段交替。
 #
-#   ③ 🔴🔴 **并发扇出是唯一有效杠杆**（v9，6 分钟对战）：
-#        · 顺序爬 + 失败即重开：**70 次尝试，最好只 100 行**（第 1 页）
-#        · 17 页并发（同域名，失败页并发重试）：19 轮 → 9 页 / 900 只
-#        · 17 页并发 + **每页打不同分片域名 {pn}.push2**：**第 1 轮 18 秒就拿到 13 页 /
-#          1219 只**，6 分钟 93 轮稳定停在 13 页（缺的 2/7/9/13 页在该窗口恒失败，
-#          说明**特定页会长期 502**，换域名/换时段才能拿到）
+#   ③ 🔴🔴 **首趟串行 优于 首趟并发**（探针 v11，2026-09-23 20:48）：
+#        历版探针（v6~v10）都有同一个致命缺陷：把重活放在最前面，**后面所有对照都在
+#        「已被自己打限流」的状态下跑**，结论不可用 ⇒ v9 得出的「并发扇出是唯一有效
+#        杠杆」正是这么来的（那次 4 条腿在同一批 runner 里互相污染）。v11 是历版唯一
+#        无自污染的对照：**两条腿各占独立 runner（= 独立出口 IP），被测对象都放在该
+#        runner 的第一步**。结果：
+#          · 串行 pn=1..17（无间隔）      → **9/17 页 / 900 行 / 19.9s**
+#          · 并发 pn=1..17（workers=17）  → **0/17 页（全 502） / 30.2s**
+#        ⇒ 同一分钟、两个**新鲜 IP**：串行拿 9 页、并发拿 0 页。生产 20:00 那笔用的
+#          就是并发首轮，实测也只有 6/17 页。**故首趟一律串行** —— 最坏也与现状持平，
+#          实测则明显更好。同时**不要在同轮内硬捶**（见 ④）。
+#   ④ **一个 IP 只有「首趟」有收获**：v11 两条腿在首趟之后，无论串行补页（间隔 0.4s）
+#      还是并发补页，**全部 0 页**（S2 / S3 / C2 / C3 皆 0）⇒ 同一 run 内补页无意义，
+#      熔断即退出，把窗口留给**下一轮 run（新 runner = 新 IP）**。
 #        ⇒ 结论：**单次爬取永远拼不齐 17 页，必须把「拼页」做成可累积的**。
 #
 # 【三版实现】三条硬措施：
-#   1. **并发扇出**：17 页一次性并发（每页独立 thread），失败页下一轮再并发重试，
-#      单轮内做 _ETF_ROUNDS 轮；**每轮给每页轮换 host**（push2delay / push2 /
-#      1..12.push2 共 14 个入口）—— 实测「某页在某域名上恒 502」很常见，轮换才有出路。
+#   1. **串行遍历**：pn=1..17 逐页顺序请求（v11 实测优于并发，见 ③）；
+#      **每轮给每页轮换 host**（push2delay / push2 / 1..12.push2 共 14 个入口）——
+#      实测「某页在某域名上恒 502」很常见，轮换才有出路。
 #   2. **跨轮拼页缓存** raw_data/etf_snapshot_pages.json：已取到的页落盘留存，
 #      下一轮 run（下一个 runner / 新的 IP / 新的时段）只需补缺页。
 #      完整性判据 = **1..ceil(total/100) 页全到齐**（不是「够 1200 只」就写盘，
@@ -3041,8 +3049,7 @@ _ETF_HOSTS = ("https://push2delay.eastmoney.com", "https://push2.eastmoney.com")
 _ETF_PAGE = 100            # 硬约束：clist 对 pz 一律截断到 100（v7/v9 双证），无法调大
 _ETF_MAX_PAGES = 24        # 1619 只 ÷ 100 ≈ 17 页，留冗余
 _ETF_MIN_ROWS = 1400       # 拼齐后仍少于此数视为异常（1619 只全市场）
-_ETF_WORKERS = 17          # 并发扇出：一轮把 17 页全发出去
-_ETF_ROUNDS = 3            # 单次快照内最多 3 轮扇出（实测「密集请求即封」，多打只会延长封禁）
+_ETF_ROUNDS = 3            # 单次快照内最多 3 轮遍历（实测「首趟之后该 IP 全 0」，第 2 轮起基本即熔断）
 _ETF_BUDGET = 180          # 单次快照时间预算（秒）；实测一轮 ~2s，10 轮 ~30s
 _ETF_TOTAL_BUDGET = 420    # 单轮 run 内累计上限（两个模块共用一次快照，实际只跑一次）
 _ETF_FRESH_S = 1200        # 底表 20 分钟内更新过 ⇒ 整轮跳过
@@ -3154,8 +3161,7 @@ def _etf_snapshot():
 
 
 def _etf_snapshot_inner(today):
-    """并发扇出 17 页 + 逐轮补缺页 + 跨轮拼页（缓存见 _ETF_CACHE 注释）。"""
-    from concurrent.futures import ThreadPoolExecutor, as_completed
+    """串行遍历 17 页 + 逐轮补缺页 + 跨轮拼页（缓存见 _ETF_CACHE 注释）。"""
     after_close = _etf_after_close()
     max_age = 10 ** 9 if after_close else _ETF_CACHE_MAX_AGE_INTRADAY
     c = _etf_cache_load(today)
@@ -3185,22 +3191,17 @@ def _etf_snapshot_inner(today):
         if not miss:
             break
         got = 0
-        with ThreadPoolExecutor(max_workers=min(_ETF_WORKERS, len(miss))) as ex:
-            futs = {}
-            for pn in miss:
-                host = _ETF_HOSTS[(pn + rnd) % len(_ETF_HOSTS)]   # 逐轮轮换入口
-                futs[ex.submit(_etf_get_page, pn, host)] = pn
-            for f in as_completed(futs):
-                pn = futs[f]
-                try:
-                    ok, rows, _t = f.result()
-                except Exception:
-                    ok, rows, _t = False, [], 0
-                if ok and rows:
-                    pages[str(pn)] = [time.time(), rows]
-                    got += 1
-                    if _t:
-                        total = max(total, _t)
+        # 🔴 首趟**串行**（探针 v11 干净对照：串行 9/17 页 · 19.9s；并发 0/17 页 · 全 502）。
+        #    并发扇出会被东财立刻判为异常流量、把出口 IP 打进封禁 —— 这是「每轮只拿 6 页」
+        #    的真因。串行同时更省时间（19.9s vs 30.2s）。
+        for pn in miss:
+            host = _ETF_HOSTS[(pn + rnd) % len(_ETF_HOSTS)]   # 逐轮轮换入口
+            ok, rows, _t = _etf_get_page(pn, host)
+            if ok and rows:
+                pages[str(pn)] = [time.time(), rows]
+                got += 1
+                if _t:
+                    total = max(total, _t)
         c["pages"], c["total"] = pages, total
         _etf_cache_save(c)          # 每轮落盘：run 中途挂掉也不丢已取到的页
         print(f"  🔁 ETF 第 {rnd + 1} 轮：本轮补到 {got} 页 / 共 {len(pages)} 页"
