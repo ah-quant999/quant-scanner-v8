@@ -1,1 +1,133 @@
-{"update_time":"2026-09-23 13:03:00","status":"ok","process":{"ok":true,"listener":true,"worker":false,"details":["runner.listener"]},"service":{"ok":false,"status":"NOT_FOUND","exists":false},"worker_logs":{"ok":true,"errors":[],"scanned":1,"message":"最近日志无错误"},"github":{"ok":true,"consecutive_failures":0,"checkout_failures":0,"latest_run_id":35808464610,"latest_failed":false,"latest_status":"completed","stuck_min":0,"is_fail":false,"is_warn":false,"message":"self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) completed"},"runner_env":{"ok":true,"threshold":2000,"message":"阈值=2000（一劳永逸目标 2000）"},"actions_taken":[],"message":"runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) completed","run_time":"2026-09-23 13:03:00","category":"intraday","hostname":"","modules":{"ETF_INTRADAY_HEAT":{"status":"empty","msg":"返回空"},"SECTOR_FUND_FLOW":{"status":"empty","msg":"返回空"},"AVG_PRICE_DATA":{"status":"ok","msg":"成功"},"AVG_PRICE_880003":{"status":"ok","msg":"成功"},"INDEX_QUOTES":{"status":"empty","msg":"返回空"},"CONCEPT_RANKING":{"status":"empty","msg":"返回空"},"CFFEX_HOLDINGS":{"status":"ok","msg":"成功"},"CRISIS_DATA":{"status":"ok","msg":"成功"},"LIMIT_UP_HEATMAP":{"status":"ok","msg":"成功"},"LIMIT_UP_BROKEN":{"status":"ok","msg":"成功"},"CAPITAL_FLOW_DATA":{"status":"empty","msg":"返回空"},"MARKET_FUND_FLOW_DATA":{"status":"ok","msg":"成功"},"ETF_PULSE":{"status":"fail","msg":"HTTPError: 502 Server Error: Bad Gateway for url: https://push2delay.eastmoney.com/api/qt/c"},"ETF_DAILY_MONITOR":{"status":"fail","msg":"HTTPError: 502 Server Error: Bad Gateway for url: https://push2delay.eastmoney.com/api/qt/c"},"CANDIDATE_QUOTES":{"status":"ok","msg":"成功"},"SH_SZ_HISTORY":{"status":"ok","msg":"成功"},"JUDGMENT_DATA":{"status":"ok","msg":"成功"},"MACRO_BRIEF":{"status":"ok","msg":"成功"},"MARKET_ALERTS":{"status":"ok","msg":"成功"},"OVERSEAS_MARKETS":{"status":"ok","msg":"成功"}},"summary":{"total":20,"ok":13,"empty":5,"fail":2}}
+{
+  "update_time": "2026-09-23 13:05:25",
+  "status": "ok",
+  "process": {
+    "ok": true,
+    "listener": true,
+    "worker": false,
+    "details": [
+      "runner.listener"
+    ]
+  },
+  "service": {
+    "ok": false,
+    "status": "NOT_FOUND",
+    "exists": false
+  },
+  "worker_logs": {
+    "ok": true,
+    "errors": [],
+    "scanned": 1,
+    "message": "最近日志无错误"
+  },
+  "github": {
+    "ok": true,
+    "consecutive_failures": 0,
+    "checkout_failures": 0,
+    "latest_run_id": 35808464610,
+    "latest_failed": false,
+    "latest_status": "completed",
+    "stuck_min": 0,
+    "is_fail": false,
+    "is_warn": false,
+    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) completed"
+  },
+  "runner_env": {
+    "ok": true,
+    "threshold": 2000,
+    "message": "阈值=2000（一劳永逸目标 2000）"
+  },
+  "actions_taken": [],
+  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) completed",
+  "run_time": "2026-09-23 13:03:00",
+  "category": "intraday",
+  "hostname": "",
+  "modules": {
+    "ETF_INTRADAY_HEAT": {
+      "status": "empty",
+      "msg": "返回空"
+    },
+    "SECTOR_FUND_FLOW": {
+      "status": "empty",
+      "msg": "返回空"
+    },
+    "AVG_PRICE_DATA": {
+      "status": "ok",
+      "msg": "成功"
+    },
+    "AVG_PRICE_880003": {
+      "status": "ok",
+      "msg": "成功"
+    },
+    "INDEX_QUOTES": {
+      "status": "empty",
+      "msg": "返回空"
+    },
+    "CONCEPT_RANKING": {
+      "status": "empty",
+      "msg": "返回空"
+    },
+    "CFFEX_HOLDINGS": {
+      "status": "ok",
+      "msg": "成功"
+    },
+    "CRISIS_DATA": {
+      "status": "ok",
+      "msg": "成功"
+    },
+    "LIMIT_UP_HEATMAP": {
+      "status": "ok",
+      "msg": "成功"
+    },
+    "LIMIT_UP_BROKEN": {
+      "status": "ok",
+      "msg": "成功"
+    },
+    "CAPITAL_FLOW_DATA": {
+      "status": "empty",
+      "msg": "返回空"
+    },
+    "MARKET_FUND_FLOW_DATA": {
+      "status": "ok",
+      "msg": "成功"
+    },
+    "ETF_PULSE": {
+      "status": "fail",
+      "msg": "HTTPError: 502 Server Error: Bad Gateway for url: https://push2delay.eastmoney.com/api/qt/c"
+    },
+    "ETF_DAILY_MONITOR": {
+      "status": "fail",
+      "msg": "HTTPError: 502 Server Error: Bad Gateway for url: https://push2delay.eastmoney.com/api/qt/c"
+    },
+    "CANDIDATE_QUOTES": {
+      "status": "ok",
+      "msg": "成功"
+    },
+    "SH_SZ_HISTORY": {
+      "status": "ok",
+      "msg": "成功"
+    },
+    "JUDGMENT_DATA": {
+      "status": "ok",
+      "msg": "成功"
+    },
+    "MACRO_BRIEF": {
+      "status": "ok",
+      "msg": "成功"
+    },
+    "MARKET_ALERTS": {
+      "status": "ok",
+      "msg": "成功"
+    },
+    "OVERSEAS_MARKETS": {
+      "status": "ok",
+      "msg": "成功"
+    }
+  },
+  "summary": {
+    "total": 20,
+    "ok": 13,
+    "empty": 5,
+    "fail": 2
+  }
+}
