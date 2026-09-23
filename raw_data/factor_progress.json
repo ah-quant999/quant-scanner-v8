@@ -1,6 +1,6 @@
 {
- "update_time": "2026-09-23 02:51:52",
- "source_update_time": "2026-09-22 18:56:18",
+ "update_time": "2026-09-23 16:06:04",
+ "source_update_time": "2026-09-23 02:51:47",
  "policy": "主人 2026-09-09 22:31 决策：分批 walk-forward，禁止直接硬编码高分；OOS IR > 0.3 且 4/5 年胜率 > 55% 方可上线。主人 2026-09-15 07:33 令：本表即「待回测候选因子台账」——准备回测/准备追加的因子一律先登记在此（备忘），回测达标则接入、不达标则从台账删除该条（不留遗体）。",
  "summary": {
   "total": 4,
@@ -15,7 +15,7 @@
     "done": 4
    }
   },
-  "walkforward_run_at": "2026-09-22 23:46:26",
+  "walkforward_run_at": "2026-09-23 06:20:31",
   "walkforward_done": 4,
   "walkforward_retired": 4,
   "walkforward_integrated": [
@@ -78,7 +78,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺总股本/总市值",
     "why_unsolvable": "kline_cache 无股本字段；STOCK_QUOTE.stocks 无市值字段",
-    "retired_at": "2026-09-22 23:46:26",
+    "retired_at": "2026-09-23 06:20:31",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -88,7 +88,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺 PE/EPS",
     "why_unsolvable": "pe_ttm 被 fetch_stock_quote_v8.py 白名单丢弃；fundamental.eps 恒为 null",
-    "retired_at": "2026-09-22 23:46:26",
+    "retired_at": "2026-09-23 06:20:31",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -98,7 +98,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺毛利/总资产",
     "why_unsolvable": "fundamental_quality 无此二字段",
-    "retired_at": "2026-09-22 23:46:26",
+    "retired_at": "2026-09-23 06:20:31",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -108,7 +108,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺经营现金流/总资产",
     "why_unsolvable": "fundamental_quality 无此二字段",
-    "retired_at": "2026-09-22 23:46:26",
+    "retired_at": "2026-09-23 06:20:31",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -118,7 +118,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺总负债/总资产",
     "why_unsolvable": "fundamental_quality 无此二字段",
-    "retired_at": "2026-09-22 23:46:26",
+    "retired_at": "2026-09-23 06:20:31",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -128,7 +128,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺毛利/总资产/经营现金流/负债/营收",
     "why_unsolvable": "同上，且 9 项中 7 项依赖缺失字段",
-    "retired_at": "2026-09-22 23:46:26",
+    "retired_at": "2026-09-23 06:20:31",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -138,7 +138,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺净利润/经营现金流/总资产",
     "why_unsolvable": "fundamental_quality 无此三字段",
-    "retired_at": "2026-09-22 23:46:26",
+    "retired_at": "2026-09-23 06:20:31",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -148,7 +148,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺营业收入/总资产",
     "why_unsolvable": "fundamental_quality 无此二字段",
-    "retired_at": "2026-09-22 23:46:26",
+    "retired_at": "2026-09-23 06:20:31",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    }
   ],
@@ -169,7 +169,7 @@
    "oos_ir": 0.793,
    "sharpe_oos": 0.844,
    "max_drawdown_oos": -28.063,
-   "last_run_at": "2026-09-22 23:46:26",
+   "last_run_at": "2026-09-23 06:20:31",
    "owner": "小九(kline_cache)",
    "estimate_loops": "60d 滚动 std",
    "deploy_status": "✅ 已接入 generate_top10.py",
@@ -195,7 +195,7 @@
    "oos_ir": 0.59,
    "sharpe_oos": 1.003,
    "max_drawdown_oos": -44.684,
-   "last_run_at": "2026-09-22 23:46:26",
+   "last_run_at": "2026-09-23 06:20:31",
    "owner": "阿狸咪(kline_cache)",
    "estimate_loops": "20d 滚动 + 12m×5y walk-forward",
    "deploy_status": "已达标·待接入 generate_top10.py",
@@ -220,7 +220,7 @@
    "oos_ir": 0.528,
    "sharpe_oos": 0.735,
    "max_drawdown_oos": -25.675,
-   "last_run_at": "2026-09-22 23:46:26",
+   "last_run_at": "2026-09-23 06:20:31",
    "owner": "阿狸咪(kline_cache)",
    "estimate_loops": "60d 滚动 + 12m×5y walk-forward",
    "deploy_status": "已达标·待接入 generate_top10.py",
@@ -245,7 +245,7 @@
    "oos_ir": 1.154,
    "sharpe_oos": 0.725,
    "max_drawdown_oos": -28.681,
-   "last_run_at": "2026-09-22 23:46:26",
+   "last_run_at": "2026-09-23 06:20:31",
    "owner": "阿狸咪(kline_cache)",
    "estimate_loops": "20d/240d 比 + 12m×5y walk-forward",
    "deploy_status": "✅ 已接入 generate_top10.py",

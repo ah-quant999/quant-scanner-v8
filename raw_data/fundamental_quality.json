@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-23 15:24:27",
-  "total": 613,
+  "update_time": "2026-09-23 15:51:35",
+  "total": 619,
   "grade_summary": {
     "A": 27,
     "B": 30,
     "C": 169,
-    "D": 265,
-    "no_data": 122
+    "D": 266,
+    "no_data": 127
   },
   "stocks": {
     "hk_00001": {
@@ -6404,6 +6404,15 @@
       "cfo_to_asset": -4.37,
       "cf_queried": true
     },
+    "sz_301511": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.3301,
+      "revenue_growth": 43.439699999999995,
+      "reason": "ROE偏低(6.3%) | 营收高增(43.4%)",
+      "cfo_to_asset": -2.89,
+      "cf_queried": true
+    },
     "sz_301520": {
       "score": 15,
       "grade": "D",
@@ -6543,16 +6552,59 @@
         ]
       }
     },
-    "sz_301511": {
-      "score": 45,
-      "grade": "C",
-      "roe": 6.3301,
-      "revenue_growth": 43.439699999999995,
-      "reason": "ROE偏低(6.3%) | 营收高增(43.4%)",
+    "sh_601579": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sh_603067": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sh_688293": {
+      "score": 0,
+      "grade": "D",
+      "roe": 4.7325,
+      "revenue_growth": null,
+      "reason": "ROE差(4.7%) | 营收增速无数据",
       "statDate": "2026-06-30",
-      "cfo_to_asset": -2.89,
-      "cfo_to_or": -0.0666,
-      "asset_turn": 0.4344,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_688512": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sh_688700": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_300192": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
       "cf_queried": true
     }
   }

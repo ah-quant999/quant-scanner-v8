@@ -69,6 +69,10 @@ MUST_HAVE_CRON = {
     "v8_cn_fetch_intraday_lemoncat": "盘中准点档调度器(14 档·唯一主线)",
     # 2026-09-10 阿狸咪升格：实验卡抓取链有 16:30 CST cron 且已文档化 → ALLOW → MUST
     "v8_cn_fetch_experiments": "暂未上架·实验卡抓取(16:30)",
+    # 2026-09-23 补登记（本机·小九）：僵尸 run 收割机（服务器侧·每 5 分钟）。
+    #   病根：自托管 runner 掉线时 job 级 timeout 失效 ⇒ run 永生占槽 ⇒ 后续抓取全 pending。
+    #   本链跑 GitHub 官方 ubuntu（不依赖自托管），恒 exit 0。挂在 logic.html 补充表。
+    "v8_zombie_reaper": "僵尸 run 收割机(服务器侧·每5分钟)",
     # 注：v8_freshness_watch / v8_slot_scheduler 已于 2026-09-10 删除（派发源精简），
     #     从本名单彻底移除，勿再登记。
 }

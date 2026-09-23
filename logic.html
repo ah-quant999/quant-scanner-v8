@@ -2175,6 +2175,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>周六 21:00</td><td><code>cloud_weekly_cleanup</code></td><td>orphan 清理 + 新鲜度体检</td><td>云端 ubuntu</td></tr>
           <tr><td>周日 23:00</td><td><code>v8_cleanup</code></td><td>缓存 / 日志清理</td><td>云端 ubuntu</td></tr>
           <tr><td>非交易时段每 2h</td><td><code>runner_health_alert</code></td><td>runner 离线即时告警（开 Issue，恢复后自动关闭）</td><td>云端 ubuntu</td></tr>
+          <tr><td>每 5 分钟（全天）</td><td><code>v8_zombie_reaper</code></td><td>僵尸 run 收割机（服务器侧）：扫全仓 run，<code>in_progress</code> 冻结 &gt;15 分钟 / <code>queued</code> 冻结 &gt;120 分钟即判定「假活占位」并 cancel，释放并发槽（根治自托管 runner 掉线时 job 级 timeout 失效 ⇒ run 永生占槽 ⇒ 后续抓取全 pending）</td><td>云端 ubuntu（不依赖自托管 runner）</td></tr>
           <tr><td>周六 / 周日 19:30</td><td>「周末轻量维护」（本机自动化）</td><td>读交接 / 新股上市与退市股元数据巡检 / 更新 WEEKEND_RUN.js / dispatch 部署</td><td>阿狸咪机</td></tr>
         </table>
         <div class="logic-h">周 / 假期口径（与算法链闸门同源）</div>
