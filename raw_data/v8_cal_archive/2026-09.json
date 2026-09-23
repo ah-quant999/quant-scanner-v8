@@ -1,6 +1,6 @@
 {
  "month": "2026年9月",
- "update_time": "2026-09-23 23:45",
+ "update_time": "2026-09-24 00:25",
  "legend": [
   {
    "title": "重要政策",
@@ -374,24 +374,24 @@
     {
      "num": 23,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "上交所/深交所ETF期权最后交易日",
        "cls": "option",
-       "released": false
+       "released": true
       },
       {
        "text": "🇺🇸 消费者信心指数",
        "cls": "us",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 24,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": []
     },
     {
