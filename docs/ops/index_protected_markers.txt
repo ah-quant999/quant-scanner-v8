@@ -49,7 +49,6 @@ window.__renderDailyFactorCalc|每日因子计算卡渲染器|2026-09-20
 window.__renderImaStrongStock|ima 强势跟踪卡渲染器|2026-09-20
 window.__renderLimitUpHeatmap|涨停热力矩阵渲染器|2026-09-20
 window.__renderCycleLadderCard|周期阶梯卡渲染器|2026-09-20
-window.__renderBoardFirstLimit|主板首板观察卡渲染器|2026-09-22
 window.__renderObsPlatform|观测类平台渲染器|2026-09-20
 window.__renderJudgmentBody|判断卡正文渲染器|2026-09-20
 # ── C. 数据源全局名（7）─────────────────────────────────────────────
@@ -113,3 +112,4 @@ DOMContentLoaded', _renderPostReady|同上引导函数的调用点；与定义�
 #     即「只有 `?v=`/`BUILD` 变化却声称改了内容」= 告警；合法改版自然含实质差异 ⇒ 不误伤。
 #     可挂 v8_build_deploy.yml 部署前置步。**尚未实现，列为候选，勿当已上线。**
 # ---------------------------------------------------------------------------
+

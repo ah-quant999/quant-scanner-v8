@@ -669,8 +669,7 @@ window.__domReadyFns=[];
          scripts/{baihechou_daily,fetch_baihechou_v8,set_baihechou_analysis}.py 与本机 06:30/08:30
          自动化（98101962/622ad154，按铁律 PAUSED 不删）一并退役；window.CRISIS_DATA 宏观硬指标
          仍被每日洞察/情绪周期消费 ⇒ 只删卡壳不删源。 -->
-    <script src="data/BOARD_FIRST_LIMIT.js?v=1790185122" defer></script><!-- 🔥 主板首板 · 一进二观察（数据源：akshare.stock_zt_pool_em 完整涨停池 → 主板首板 + 基础口径过滤；取最近一个已收盘交易日 · cn fetch 每轮刷新 · window.BOARD_FIRST_LIMIT） -->
-    <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
+        <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=1790185122" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
     <script src="data/RISK_GAUGE.js?v=1790185122" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
@@ -2569,7 +2568,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
         <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
     <div id="cycleLadderCard" style="margin-bottom:12px;"></div>
-    <!-- 🚚 2026-09-23 主人令：「🔥 主板首板·一进二观察」卡已迁至「🔒 暂未上架 > 📡 观测类」（renderUnlisted ulPaneObserve 内 boardFirstLimitCard）。
          原因：仅基础口径观察名单、无买入信号，不占实时数据主位；且此处 tryRun 单发派发早于 defer 数据脚本 ⇒ 恒显「无数据」死卡。 -->
 
     <!-- 涨停热力矩阵（整行宽度）
@@ -15660,7 +15658,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       // 2026-09-15：__renderAiInsightsCompare 已随卡迁往「🌍 观测平台 > 🌍 宏观观测」，
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderThemeValue','__renderBoardFirstLimit'];
+      var names = ['__renderThemeValue'];
       var probe = document.getElementById('themeValueBody');
       if(probe) probe.setAttribute('data-ulpane', tab);
       var out = [];
@@ -15865,28 +15863,7 @@ h += '<div class="card" id="dajijinCard" style="display:none;margin-bottom:16px;
 //   ⚠ 同页同源只留一张壳，勿重复建；派发入口见 renderUnlisted 尾部 window.__renderMacroKShape 调用。
 h += '<div class="card" id="macroKShapeBody" style="margin-bottom:16px;border-left:4px solid #fbbf24;">'
    + '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F30D; 宏观景气背景 · K 型分层 加载中&#x2026;</div></div>';
-// ═══ 🔥 2026-09-23 主人令：「主板首板·一进二观察」由「📡 实时数据」迁入本页（观测类）═══
-//   定性：两级分层的观察名单 —— ①基础口径（市值/换手/封板）②K线严格过滤（「一进二」公式六项：
-//   涨停确认/大趋势/量差或控盘指数/量线粘合/三线粘合/角度60 + 量<6.18昨量 + 昨日非涨停；筹码穿刺因 SSRP 缺失按审计砍除）。
-//   数据由云端 cn fetch 步 algorithms/fetch_board_first_limit.py 产出（新浪日线算过滤）。
-//   ⚠️ 实测（2026-09-23 夜 · 全量重跑 4590 只 · 区间 2025-07~2026-09）：
-//   ⚠️ 实测（2026-09-23 夜④ · **全市场无偏口径** · kline_cache 2194 只主板 · 2025-05~2026-09）：
-//      🔴 重大更正：夜②曾报「当日开板买 → 次日卖 +0.920%」，那是**幸存者偏差** ——
-//         样本只含「收盘封住」的票（66.6%，+0.956%），**漏掉了 30.6% 的「炸板未回封」**（每笔 −5.611%）。
-//      全市场无偏（含炸板）· 当日触及涨停 14675 例：以涨停价打板 → 次日开盘卖 = −0.753%（t=−8.73）；
-//         【剔除买不到的一字板后 = 可成交 14070 例（95.9%）净 −1.052%（t=−11.25）】
-//         样本内 −0.999%／样本外 −1.108%，**17/17 个月全负**。
-//      「越赚的越买不到」：全天一字板 4.1% 收益最高 +6.205%（t=+28.96）却挂单排不到。
-//      「开盘即涨停」1208 例整体 +1.243%（t=+4.62），但其中 50.1% 是一字板把均值拉正；
-//         **可打板成交的 603 例 = −3.736%（t=−7.00，16/16 月负）**（回封 56.7% +1.683%／炸板 43.3% −10.836%）。
-//      折价买入（挂限价单在 −d 档）全线为负且越深越差：d=0.5% −3.493%｜d=2% −3.239%｜d=3% −3.632%｜d=9% −4.139%；
-//         根因：跌到 −3% 档的票炸板率 57.1%（全样本 30.6%）⇒ **折价不是折扣、是坏消息定价**。
-//      出场口径对照（无偏）：次日开盘 −1.052%／次日收盘 −1.002%／当日收盘 −1.815% ⇒ 换出场救不了。
-//      ⚠️ 结论：**打板 / 开板买入方向扣成本后为负期望**，本卡只作「盘后观察情绪强度」之用，不作买点。
-//         唯一仍成立（无偏，样本=收盘涨停股）：量比→次日 gap —— 量比≤0.5 → 80.4% 高开>2%、43.5% 涨停开、28.3% 全天一字。
-//      脚本（仓外）：E:/_alimi_tools/hicks/{daban,disc,disc2,t1430}.py
-//   竞态根治：渲染改由 __ulRenderPane 派发（用户进本页时 defer 数据必已就位），ulSelfHeal 每 1.5s 兜底。
-h += '<div id="boardFirstLimitCard" style="margin-bottom:16px;"></div>';  // 裸 div 宿主：与连板天梯同范式（v8CardHeader 自带卡头），防「双圆弧」复发
+  // 裸 div 宿主：与连板天梯同范式（v8CardHeader 自带卡头），防「双圆弧」复发
 h += '</div>'; // /ulPaneObserve
 
 // ===== 📊 大盘观察 pane —— 🚚 2026-09-15 主人令：整页迁出 =====
@@ -16596,69 +16573,7 @@ h += '</div>'; // /ulPaneObserve
     el.innerHTML = html;
   }
   window.__renderCycleLadderCard = __renderCycleLadderCard;
-  // 🔥 主板首板 · 一进二观察卡渲染器（2026-09-21 建；2026-09-23 阿狸咪的工程师：1行6列分层 + K线严格过滤接入 + 折叠不拉窗；夜①：量比入格 + 限制区补不可成交性证据；夜②：买卖方向纠偏（当日开板买→次日卖 +0.92%）—— **已被夜④推翻**；夜③：持有期定量纠偏（只做 1 日）；**夜④（2026-09-23）：无偏纠偏·正式推翻夜②** —— 全市场 14675 例「当日触及涨停」（含炸板·无幸存者偏差）实测：可打板成交 14070 例（95.9%）净 −1.052%（t=−11.25，内 −0.999%／外 −1.108%，17/17 月负）；夜②的 +0.92% 系样本只含「收盘封住」的 66.6%、漏掉 30.6% 炸板（每笔 −5.611%）所致；折价买入各档 −2.9%~−4.1% 且越深越差 ⇒ 定位由「交易口径」改为「候选池·非买点」）
-  function __renderBoardFirstLimit(){
-    var box=document.getElementById('boardFirstLimitCard');
-    if(!box) return;
-    var d=window.BOARD_FIRST_LIMIT;
-    var _dd=(d&&d.date&&String(d.date).length===8)?(String(d.date).slice(4,6)+'-'+String(d.date).slice(6,8)):'—';
-    // 核心/用法/限制（全站统一范式）
-    var _guide='<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:10px 12px;margin:0 0 10px;line-height:1.8;font-size:12px;color:var(--txt);">'
-      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">📌 核心：</b>在<b>最近一个已收盘交易日</b>的<b>主板首板</b>（60/00 开头 · 连板数=1）里做<b>两级分层</b>：①<b style="color:#26a69a;">基础口径</b>＝流通市值&lt;120亿<b>或</b>流通股&lt;4亿 ＋ 换手率&gt;2% ＋ 炸板 0 次（封板干净）；②<b style="color:#e0b34a;">K 线严格过滤</b>＝「一进二」公式六项（涨停确认／大趋势／量差<b>或</b>控盘指数／量线粘合／三线粘合／角度60°）＋ 量&lt;6.18×昨量 ＋ 昨日非涨停 ＋ 小盘 ＋ 换手&gt;2%。</div>'
-      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b><b style="color:#e0b34a;">★严格</b>＝六项 K 线过滤全过（金标·置顶）；<b style="color:#26a69a;">✓</b>＝仅基础口径达标；其余收进折叠区。排列「严格 → 基础 → 封板资金降序」。每格直接标出<b>量比</b>（＝当日量÷昨日量）：<b style="color:#fbbf24;">量比越小、隔夜溢价越高（≤1 档 +2.08%、3~6.18 档 +0.62%）</b>，但缩量封板更可能全天不开板 ⇒ 买不到。鼠标悬停可见未过项与读数。</div>'
-      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#fb923c;">🎯 能不能买（全市场无偏实测）：</b>本卡是<b>候选池</b>，<b style="color:#26a69a;">不是买点</b>。用全市场 <b>14,675</b> 个「当日触及涨停」样本（<b>含炸板 · 无幸存者偏差</b>）实测：以涨停价打板买入 → 次日开盘卖 = <b style="color:#26a69a;">−1.05%</b>（t=−11.25，<b>17/17 个月全负</b>）；剔掉买不到的一字板后仍为负 ⇒ <b>该方向扣掉成本后是负期望</b>，「当天买、次日卖」不成立。本卡的定位＝<b>盘后观察情绪强度</b>，不是下单依据。</div>'
-      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#93c5fd;">⏱ 换个出场口径能救吗：</b>不能。同一批无偏可成交样本：<b style="color:#26a69a;">次日开盘卖 −1.05%</b>／次日收盘卖 −1.00%／<b style="color:#26a69a;">当日收盘卖 −1.82%</b>，延后持有只会更差 ⇒ <b style="color:#fbbf24;">出场时点不是瓶颈，入场方向才是</b>。</div>'
-      +'<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠ 必读（本卡前一版把"偏差"当成了"收益"，已更正）：</b>① 前一版报的「当日开板买 +0.92%」是<b>幸存者偏差</b>——样本只含「收盘封住」的票（66.6%），<b>漏掉了 30.6% 的「炸板未回封」</b>（每笔 <b style="color:#26a69a;">−5.61%</b>）；补上炸板后 = <b style="color:#26a69a;">−1.05%</b>。② <b>越赚的越买不到</b>：全天一字板 +6.21%（t=+28.96）却挂单排不到；「开盘即涨停」里一半是一字板，把均值拉成正，<b>可成交那部分其实 −3.74%（16/16 月负）</b>。③ <b>折价买入更差</b>：跌到 −3% 档的票炸板率 57.1%（全样本 30.6%），各折价档 −2.9%~−4.1% ⇒ 折价不是折扣、是坏消息定价。④ 铁律：<b>先证「买得到」，再算收益</b>。仅研究参考，不构成投资建议。</div>'
-      +'</div>';
-    if(!d||!d.items||!d.items.length){
-      box.innerHTML=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径 + K线严格过滤（候选池 · 非买点）','update_time',{update_time:(d&&d.update_time)||''},true)+_guide;
-      return;
-    }
-    var _grid='display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px 7px;';
-    function _cell(x){
-      var ft=String(x.first_time||''); if(ft.length===6) ft=ft.slice(0,2)+':'+ft.slice(2,4);
-      var isS=!!x.strict;
-      var kn=(x.kline==='na')?'<span style="color:#666;font-size:9px;"> K?</span>':((x.kline==='stale')?'<span style="color:#666;font-size:9px;"> K旧</span>':'');
-      var rd=x.read||{};
-      var _vr=(rd.vol_ratio===undefined||rd.vol_ratio===null)?null:rd.vol_ratio;
-      var _vrc=(_vr!==null&&_vr<=0.5)?'color:#fbbf24;font-weight:700;':'';
-      var tip=x.name+' '+x.code+' ｜ '+x.industry+' ｜ 流通'+x.circ_mcap+'亿／流通股'+x.circ_shares+'亿股 ｜ 换手'+x.turnover+'% ｜ 封'+x.seal+'亿 首封'+ft
-        +' ｜ '+(isS?'K线六项全过':(x.kmiss&&x.kmiss.length?('未过：'+x.kmiss.join('／')):'K线未判定'))
-        +(rd.vol_ratio?(' ｜ 量比'+rd.vol_ratio+' 角'+rd.ang_deg+'° 三线'+rd.glue3_ratio+' 量线'+rd.gluev_ratio):'');
-      var l5=(x.kmiss&&x.kmiss.length)?'<div style="color:#78838f;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">✗ '+x.kmiss.join('·')+'</div>':'';
-      return '<div title="'+tip+'" style="font-size:10px;padding:3px 6px;border:1px solid var(--border2);border-left:2px solid '+(isS?'#e0b34a':'#26a69a')+';border-radius:5px;background:rgba(255,255,255,0.03);min-width:0;">'
-        +'<div style="display:flex;align-items:center;gap:4px;min-width:0;">'
-        +'<b style="color:#ef5350;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.name+'</b>'
-        +'<span style="color:#888;font-size:9px;">'+x.code+'</span>'
-        +'<span style="margin-left:auto;white-space:nowrap;">'+(isS?'<span style="color:#e0b34a;font-size:9.5px;font-weight:700;">★</span>':(x.basic_pass?'<span style="color:#26a69a;font-size:9.5px;">✓</span>':''))+kn+'</span></div>'
-        +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.industry+'</div>'
-        +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">流通'+x.circ_mcap+'亿·换'+x.turnover+'%·<span style="'+_vrc+'"'+((_vr!==null&&_vr<=0.5)?(' title="量比'+_vr+'≤0.5：次日大概率高开（约80%高开>2%、43%直接涨停开），但缩量封板常全天不开板、买不到，慎追"'):'')+'>量'+(_vr===null?'—':_vr)+'</span></div>'
-        +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">封'+x.seal+'亿·'+ft+'</div>'
-        +l5
-        +'</div>';
-    }
-    var _S=[],_B=[],_R=[];
-    d.items.forEach(function(x){ (x.strict?_S:(x.basic_pass?_B:_R)).push(x); });
-    function _sec(t,c){
-      return '<div style="font-size:11px;color:#bbb;margin:0 0 5px;">'+t+'</div>'
-        +'<div style="'+_grid+'">'+c.map(_cell).join('')+'</div>';
-    }
-    var _body='';
-    if(_S.length) _body+=_sec('<b style="color:#e0b34a;">★ 严格达标</b> <span style="color:#8b98a8;">'+_S.length+' 只 · 六项 K 线过滤全过</span>',_S);
-    if(_B.length) _body+='<div style="margin-top:9px;">'+_sec('<b style="color:#26a69a;">✓ 基础达标</b> <span style="color:#8b98a8;">'+_B.length+' 只 · 未过严格过滤</span>',_B)+'</div>';
-    if(_R.length) _body+='<details style="margin-top:9px;"><summary style="cursor:pointer;font-size:11px;color:#8b98a8;outline:none;">其余 '+_R.length+' 只（基础口径也未达标）· 点击展开</summary><div style="'+_grid+'margin-top:6px;">'+_R.map(_cell).join('')+'</div></details>';
-    var _kna=(d.kline_na>0)?(' ｜ <span style="color:#8b98a8;">K线不可用 '+d.kline_na+' 只</span>'):'';
-    var _slow=0;
-    d.items.forEach(function(x){ var v=(x.read||{}).vol_ratio; if(v!==undefined&&v!==null&&v<=0.5) _slow++; });
-    var html=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径 + K线严格过滤（一进二公式六项）· 候选池（非买点）','update_time',d)
-      +'<div style="padding:4px 0 8px;color:#bbb;font-size:12px;">数据日 <b style="color:#fbbf24;">'+_dd+'</b> 主板首板 <b style="color:#ef5350;">'+d.total+'</b> 只 ｜ 严格达标 <b style="color:#e0b34a;">'+(d.strict_pass||0)+'</b> 只 ｜ 基础达标 <b style="color:#26a69a;">'+d.basic_pass+'</b> 只'+_kna
-      +(_slow?(' ｜ <span style="color:#fbbf24;">次日易高开 '+_slow+' 只</span> <span style="color:#8b98a8;">(量比≤0.5 · 慎追)</span>'):'')+'</div>'
-      +_guide
-      +_body;
-    box.innerHTML=html;
-  }
-  window.__renderBoardFirstLimit = __renderBoardFirstLimit;
-
+  
   function drawV8MarginChart(){
     var data=window.MARGIN_DATA||{};
     var shData=data.sh||[];
@@ -18607,8 +18522,6 @@ window.__renderV8CalToday();
   }
   // 实时数据区：情绪周期·连板天梯（迁到涨停热力矩阵上方）
   tryRun('renderCycleLadderCard', window.__renderCycleLadderCard, 'cycle-ladder init');
-  // 🚚 2026-09-23 主人令：主板首板·一进二观察卡已迁「暂未上架>观测类」。
-  //   原 tryRun('renderBoardFirstLimit',…) 单发派发早于 defer 数据脚本执行 ⇒ window.BOARD_FIRST_LIMIT 未注入 ⇒ 恒「无数据」。
   //   现由 renderUnlisted.__ulRenderPane 派发（进页时 defer 已就位）+ ulSelfHeal 兜底，见观测类 pane。
   // 🔴 2026-09-16 主人令「还是看不了！一劳永逸修复」：补上 renderLimitUpHeatmap 的调用链。
   //   三保险：① 立即调用 ② 400/1200ms 延迟重试（覆盖 defer 数据脚本晚于本 IIFE 执行）
