@@ -1198,7 +1198,7 @@
     },
     {
       "code": "000807",
-      "name": "上海实业环境",
+      "name": "云铝股份",
       "market": "深市",
       "board": "主板",
       "horizon": "短线",
@@ -1400,7 +1400,7 @@
     },
     {
       "code": "000737",
-      "name": "湾区发展",
+      "name": "北方铜业",
       "market": "深市",
       "board": "主板",
       "horizon": "短线",
@@ -1438,7 +1438,7 @@
     },
     {
       "code": "000703",
-      "name": "FUTURE BRIGHT",
+      "name": "恒逸石化",
       "market": "深市",
       "board": "主板",
       "horizon": "短线",
@@ -1684,7 +1684,7 @@
     },
     {
       "code": "000807",
-      "name": "上海实业环境",
+      "name": "云铝股份",
       "final_score": 24.8,
       "resonance": 1,
       "sources": [

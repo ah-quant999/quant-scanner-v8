@@ -146,7 +146,7 @@ def heal_candidate_guanlan(dry_run=False):
 def _merge_guanlan_to_candidate():
     sys.path.insert(0, str(ALGO_DIR))
     try:
-        from build_candidate_pool import _norm
+        from build_candidate_pool import _norm, resolve_clean_name
     except ImportError as e:
         return {"success": False, "message": "无法导入 _norm: " + str(e)}
     try:
@@ -170,10 +170,16 @@ def _merge_guanlan_to_candidate():
         if result is None:
             continue
         padded_code, clean_name, mkt_key, board = result
+        # 🛡 2026-09-23 一劳永逸（本函数是错名的传播口）：原直接写 clean_name，而 _norm 只做
+        #   代码/市场格式化、不校名字 ⇒ 港股研报名被原样贴到 zfill(6) 后的 A 股码上
+        #   （00807 上海实业环境 → 000807 顶掉 云铝股份；同理 000591/000703… 共 880 组同号）。
+        #   改走全站唯一校入口 resolve_clean_name：
+        #   东财 f58(云端权威) > stock_names.json(A股权威) > 干净原名 > 代码兜底。
+        _auth = resolve_clean_name(padded_code, mkt_key, clean_name or name)
         key = mkt_key + "_" + padded_code
         if key not in stocks:
             stocks[key] = {
-                "name": clean_name or name,
+                "name": _auth or clean_name or name,
                 "code": padded_code,
                 "market": market_raw,
                 "sources": ["外资研投"],
@@ -183,6 +189,9 @@ def _merge_guanlan_to_candidate():
         else:
             if "外资研投" not in stocks[key].get("sources", []):
                 stocks[key]["sources"].append("外资研投")
+            # 存量条目名字若是错的（历史遗留）→ 用权威名就地纠正，不必等下一轮重建
+            if _auth and stocks[key].get("name") != _auth:
+                stocks[key]["name"] = _auth
 
     sd = Counter()
     for v in stocks.values():

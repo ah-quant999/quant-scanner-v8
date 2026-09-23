@@ -78,7 +78,7 @@
     },
     {
       "code": "000703",
-      "name": "FUTURE BRIGHT",
+      "name": "恒逸石化",
       "market": "sz",
       "board": "主板",
       "status": "strict",
@@ -217,7 +217,7 @@
     {
       "level": "warn",
       "code": "000703",
-      "name": "FUTURE BRIGHT",
+      "name": "恒逸石化",
       "text": "FUTURE BRIGHT(000703) 入选以来回撤 -13.5%（2026-08-20 起）"
     },
     {
@@ -886,7 +886,7 @@
       },
       {
         "code": "000703",
-        "name": "FUTURE BRIGHT",
+        "name": "恒逸石化",
         "enter_date": "2026-08-20",
         "offsets": {
           "3d": -3.03,

@@ -101,6 +101,30 @@ _NAME_INDEX = None  # [(name, code, full_code, exchange, market), ...] 按名字
 NAME_INDEX = None   # 全局索引（main 中构建后供 parse_stock_codes 使用）
 
 
+def _load_sn_rows():
+    """读 stock_names.json 条目列表（多级回退 + 顶层 dict 解包）。
+
+    🛡 2026-09-23 一劳永逸（根因）：该文件顶层是 {"data":[...], "update_time":...}，
+      原 `for s in json.load(f)` 迭代到的是 dict 的键(字符串) → s.get() 抛 AttributeError
+      被 except 吞掉 ⇒ A股名权威映射/索引恒为 0 条，港股名因此无人纠正（000807 上海实业环境）。
+      且 out/ 是中间产物目录（云端 fetch_stock_names 未跑即缺席，本机 worktree 恒缺席）
+      ⇒ 补 raw_data/ 与 algorithms/data/ 两级兜底（同 scanner._stock_names_map_s）。
+    """
+    for p in (STOCK_NAMES_FILE,
+              os.path.join(REPO_ROOT, "raw_data", "stock_names.json"),
+              os.path.join(BASE_DIR, "data", "stock_names.json")):
+        try:
+            with open(p, "r", encoding="utf-8") as f:
+                obj = json.load(f)
+            rows = obj.get("data") if isinstance(obj, dict) else obj
+            rows = [s for s in (rows or []) if isinstance(s, dict)]
+            if rows:
+                return rows
+        except Exception:
+            continue
+    return []
+
+
 def build_name_index():
     """加载 stock_names.json(A股) + gold_pool.json(港股)，构建 (名字, 代码) 索引，按名字长度降序排列。
 
@@ -115,14 +139,18 @@ def build_name_index():
 
     # ── 1) A 股索引（stock_names.json）──
     try:
-        with open(STOCK_NAMES_FILE, "r", encoding="utf-8") as f:
-            names = json.load(f)
-        for s in names:
+        for s in _load_sn_rows():
             nm = (s.get("name") or "").strip()
             code = (s.get("code") or "").strip()
             fc = (s.get("full_code") or "").strip()
             if not nm or not code:
                 continue
+            # 🛡 港股 5 位码同样存在于此表（00703/00001…），原默认 exch="SH" 会把港股名
+            #   当 A 股塞进名字索引 → 研报"只写名字不给代码"时会反查回港股代码。
+            if fc.lower().startswith("hk"):
+                continue
+            # 去交易所排版空格（"万 科Ａ"/"五 粮 液"），避免索引名与展示名不一致
+            nm = nm.replace(" ", "").replace("\u3000", "")
             exch, market = "SH", "沪市"
             if fc.startswith("sz"):
                 exch, market = "SZ", "深市"
@@ -176,20 +204,24 @@ _GARBAGE_KW = ['我们', '看好', '完成', '通过', '闪电', '带动', '新�
 
 
 def _build_code_name_map():
-    """A股 code→name (来自 stock_names.json, 干净)。"""
+    """A股 code→name（来自 stock_names.json，干净；多级回退见 _load_sn_rows）。"""
     global _CODE_NAME_MAP
     if _CODE_NAME_MAP is not None:
         return _CODE_NAME_MAP
     _CODE_NAME_MAP = {}
-    try:
-        with open(STOCK_NAMES_FILE, "r", encoding="utf-8") as f:
-            for s in json.load(f):
-                c = (s.get("code") or "").strip()
-                n = (s.get("name") or "").strip()
-                if c and n:
-                    _CODE_NAME_MAP[c.zfill(6)] = n
-    except Exception:
-        pass
+    for s in _load_sn_rows():
+        c = (s.get("code") or "").strip()
+        n = (s.get("name") or "").strip()
+        if not c or not n:
+            continue
+        # 🛡 港股 5 位码 zfill(6) 会顶掉深市 A 股名（00703 FUTURE BRIGHT vs 000703 恒逸石化）
+        #   → 本表只收沪深条目（同 scanner._stock_names_map_s / build_candidate_pool._stock_names_map）。
+        fc = (s.get("full_code") or "").strip().lower()
+        mkt = (s.get("market") or "").strip().lower()
+        if fc.startswith("hk") or mkt == "hk":
+            continue
+        # 去交易所排版空格（"万 科Ａ"/"五 粮 液"），避免权威名比原名更难读
+        _CODE_NAME_MAP[c.zfill(6)] = n.replace(" ", "").replace("\u3000", "")
     return _CODE_NAME_MAP
 
 

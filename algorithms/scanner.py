@@ -2414,7 +2414,17 @@ def _stock_names_map_s():
     for _sn_p in _sn_paths:
         try:
             with open(_sn_p, "r", encoding="utf-8") as f:
-                for s in json.load(f):
+                _sn_obj = json.load(f)
+                # 🛡 2026-09-23 一劳永逸（根因）：raw_data/stock_names.json 顶层是
+                #   {"data":[...], "update_time":...}，原 `for s in json.load(f)` 迭代到的是 dict 的
+                #   键(字符串) → s.get() 抛 AttributeError，被本函数 except 静默吞掉 ⇒ 映射恒为 0 条，
+                #   下面 09-21 的港股碰撞防御形同虚设；_em_name_s 一旦不可达就跌到
+                #   _looks_clean_s(原始名) ⇒ 港股名贴到 A 股码（000807 上海实业环境 / 000591 太阳能）。
+                if isinstance(_sn_obj, dict):
+                    _sn_obj = _sn_obj.get("data") or []
+                for s in (_sn_obj or []):
+                    if not isinstance(s, dict):
+                        continue
                     c = (s.get("code") or "").strip()
                     n = (s.get("name") or "").strip()
                     if not c or not n:
@@ -2426,11 +2436,17 @@ def _stock_names_map_s():
                     mkt = (s.get("market") or "").strip().lower()
                     if fc.startswith("hk") or mkt == "hk":
                         continue
-                    _SN_MAP_S[c.zfill(6)] = n
+                    # 去交易所排版空格（"万 科Ａ"/"五 粮 液"）：映射恢复生效后若照搬官方名，
+                    #   会把「万科A」显示成「万 科A」，修错名反引入展示噪音。
+                    _SN_MAP_S[c.zfill(6)] = n.replace(" ", "").replace("\u3000", "")
             if _SN_MAP_S:
                 break  # 首个可读且非空的来源即定
         except Exception:
             continue
+    if not _SN_MAP_S:
+        # 🛡 2026-09-23：不再静默 —— 本映射为空就意味着名称会退化为「原始名」，
+        #   而原始名可能正是港股名（000807 事故家族）。宁可吵一句，也不要再藏一个 bug。
+        print("  [WARN] A股名映射为空：三级来源均不可读/无条目 ⇒ 名称将退化为原始名（可能错名）")
     return _SN_MAP_S
 
 
