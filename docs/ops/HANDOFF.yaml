@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 22:55"
+  updated: "2026-09-23 23:02"
   updated_by: 小九(小九机)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -3654,3 +3654,19 @@ items:
       故该形态的处置是**三重**：① 关键文件挂 `strict`；② 段落区间无条件打印；
       ③ push log 留证供事后审计。**不宣称「已能自动拦截一切回退」。**
     updated: "2026-09-23 22:55"
+    note_20260923_2310: >-
+      〔推前护栏 · 双机推送器体检（2026-09-23 23:0x 小九）〕按「所有写着净室推送 / 隔离索引的脚本，
+      推送前必须先拉一次最新」逐个体检，结论 = **本仓这一族早已满足，无缺口**：
+      · `api_push_raw.py`（仓根 58 KB，cn runner 主推器）—— L994 取 `git/refs/heads/main` 作 base、
+        **L1278 推送前再次重读最新 main**（源码注释原文「与 build_deploy 并发安全」）、
+        L1312 `PATCH {"force": false}`、parent 恒为最新 main ⇒ **双次取最新**，比要求更严。
+      · `scripts/api_put_file.py` —— Contents API 以**当前 blob sha** 提交，天然冲突检测（409 重取 sha）。
+      · `sync_westock_portfolio.py` —— `git fetch origin main` + `read-tree origin/main` 派生树。
+      · `v8/fetch_wave_elliott.py` —— 临时隔离索引（`GIT_INDEX_FILE`）+ `read-tree <tree_sha>`。
+      · 本机 4 个净室推送脚本 —— 本轮全部核过并**已挂护栏**（`v8_push_files.py` 内建 /
+        `v8_prepush_guard.py` / `v8_push_multifile_base.py` / `v8_push_multifile_fast.py` /
+        `v8_fix_stockquery.py`，逃生门统一 `--skip-guard`）。
+      ⇒ **印证 what 段的纠偏**：「先拉最新」是这一族的**既有属性**、不是缺口；
+      真缺口在**内容级** —— 旧树内容挂在新父提交上，故本次落地的是**版本比对护栏**。
+      据此**未改动 `api_push_raw.py` 等仓内推送器**：其风险已由既有「防倒退闸（时间戳单调）」
+      + 本次本机护栏双重覆盖；若要为它移植护栏，属独立议题（需在 cn runner 环境落地，另立 item）。
