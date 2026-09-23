@@ -1,8 +1,8 @@
 {
-  "DATA": "out",
-  "V8_OUT_DIR": "out",
+  "DATA": "D:\\actions\\cn-runner\\_work\\quant-scanner-v8\\quant-scanner-v8\\algorithms\\..\\out",
+  "V8_OUT_DIR": "",
   "guanlan_watchlist": {
-    "exists": true,
+    "exists": false,
     "stocks": 0
   },
   "guanlan_reports": {

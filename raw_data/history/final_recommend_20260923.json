@@ -145,7 +145,7 @@
     {
       "rank": 2,
       "code": "000807",
-      "name": "云铝股份",
+      "name": "上海实业环境",
       "market": "sz",
       "board": "主板",
       "horizon": "短线/中线共振",
@@ -519,7 +519,7 @@
     {
       "rank": 2,
       "code": "000807",
-      "name": "云铝股份",
+      "name": "上海实业环境",
       "market": "深市",
       "board": "主板",
       "horizon": "短线/中线共振",
@@ -834,7 +834,7 @@
     },
     {
       "code": "000807",
-      "name": "云铝股份",
+      "name": "上海实业环境",
       "market": "深市",
       "board": "主板",
       "horizon": "中长线",
@@ -1046,7 +1046,7 @@
     },
     {
       "code": "000703",
-      "name": "恒逸石化",
+      "name": "FUTURE BRIGHT",
       "market": "深市",
       "board": "主板",
       "horizon": "中长线",
@@ -1228,7 +1228,7 @@
     },
     {
       "code": "000933",
-      "name": "神火股份",
+      "name": "非凡领越",
       "market": "深市",
       "board": "主板",
       "horizon": "短线",
@@ -1339,7 +1339,7 @@
     },
     {
       "code": "000737",
-      "name": "北方铜业",
+      "name": "湾区发展",
       "market": "深市",
       "board": "主板",
       "horizon": "短线",
@@ -1424,7 +1424,7 @@
     },
     {
       "code": "000833",
-      "name": "粤桂股份",
+      "name": "华讯",
       "market": "深市",
       "board": "主板",
       "horizon": "短线",
@@ -1625,7 +1625,7 @@
   "factor_trace": [
     {
       "code": "000807",
-      "name": "云铝股份",
+      "name": "上海实业环境",
       "final_score": 29.8,
       "resonance": 2,
       "sources": [

@@ -799,6 +799,9 @@
     },
     "000737": {
       "2026-09-23": 14.82
+    },
+    "688498": {
+      "2026-09-23": 1734.98
     }
   },
   "_tracking_latest": {
@@ -1115,9 +1118,9 @@
     "000807": {
       "enter_date": "2026-09-04",
       "enter_close": 26.95,
-      "last_date": "2026-09-04",
-      "last_close": 26.95,
-      "status": "dropped",
+      "last_date": "2026-09-23",
+      "last_close": 26.58,
+      "status": "strict",
       "streak": 1
     },
     "688808": {
@@ -1421,12 +1424,20 @@
       "status": "near",
       "streak": 1,
       "total_days": 1
+    },
+    "688498": {
+      "enter_date": "2026-09-23",
+      "enter_close": 1734.98,
+      "last_date": "2026-09-23",
+      "last_close": 1734.98,
+      "status": "strict",
+      "streak": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-09-23 20:03:05"
+    "last_update": "2026-09-23 22:48:53"
   },
   "2026-08-18": [
     {
@@ -2021,7 +2032,7 @@
       "status": "near"
     }
   ],
-  "update_time": "2026-09-23 20:03:05",
+  "update_time": "2026-09-23 22:48:53",
   "2026-08-30": [
     {
       "code": "300475",
@@ -4709,30 +4720,108 @@
       "board": "创业板",
       "close": 24.29,
       "pct_chg": 1.845,
-      "total_score": 34.2,
+      "total_score": 36.6,
       "quality_grade": "A",
       "industry": "医药制造业",
       "sectors": [
-        "减肥药",
-        "创新药",
+        "肝炎概念",
         "2026中报预增",
+        "减肥药",
         "深股通",
         "医药制造业",
         "互联医疗",
-        "肝炎概念",
-        "流感"
+        "流感",
+        "创新药"
       ],
       "signal_count": 2,
       "status": "strict"
     },
     {
+      "code": "000807",
+      "name": "上海实业环境",
+      "market": "sz",
+      "board": "主板",
+      "close": 26.58,
+      "pct_chg": -1.373,
+      "total_score": 29.8,
+      "quality_grade": "A",
+      "industry": "有色金属冶炼和压延加工业",
+      "sectors": [
+        "有色金属冶炼和压延加工业"
+      ],
+      "signal_count": 2,
+      "status": "strict"
+    },
+    {
+      "code": "601168",
+      "name": "西部矿业",
+      "market": "sh",
+      "board": "主板",
+      "close": 36.81,
+      "pct_chg": 0.109,
+      "total_score": 28.6,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 2,
+      "status": "strict"
+    },
+    {
+      "code": "300502",
+      "name": "新易盛",
+      "market": "sz",
+      "board": "创业板",
+      "close": 451.2,
+      "pct_chg": -0.835,
+      "total_score": 28.0,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "2026中报预增",
+        "基金重仓",
+        "深证100R",
+        "深股通",
+        "百元股",
+        "机构重仓",
+        "计算机、通信和其他电子设备制造业",
+        "MSCI中国"
+      ],
+      "signal_count": 1,
+      "status": "strict"
+    },
+    {
+      "code": "688498",
+      "name": "源杰科技",
+      "market": "sh",
+      "board": "科创板",
+      "close": 1734.98,
+      "pct_chg": -1.034,
+      "total_score": 26.7,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "2026中报预增",
+        "通信技术",
+        "基金重仓",
+        "沪股通",
+        "昨日高振幅",
+        "百元股",
+        "计算机、通信和其他电子设备制造业",
+        "MSCI中国"
+      ],
+      "signal_count": 1,
+      "status": "strict"
+    },
+    {
       "code": "000703",
-      "name": "恒逸石化",
+      "name": "FUTURE BRIGHT",
       "market": "sz",
       "board": "主板",
       "close": 17.39,
       "pct_chg": 3.45,
-      "total_score": 25.5,
+      "total_score": 26.1,
       "quality_grade": "A",
       "industry": "化学纤维制造业",
       "sectors": [
@@ -4748,18 +4837,18 @@
       "board": "主板",
       "close": 128.1,
       "pct_chg": 2.365,
-      "total_score": 26.1,
+      "total_score": 26.7,
       "quality_grade": "B",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
         "2026中报预增",
-        "计算机、通信和其他电子设备制造业",
         "深证100R",
         "深股通",
-        "PCB",
-        "MSCI中国",
+        "2026一季报预增",
         "百元股",
-        "2026一季报预增"
+        "PCB",
+        "计算机、通信和其他电子设备制造业",
+        "MSCI中国"
       ],
       "signal_count": 2,
       "status": "near"
