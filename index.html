@@ -2565,8 +2565,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
         <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
     <div id="cycleLadderCard" style="margin-bottom:12px;"></div>
-    <!-- 🔥 主板首板 · 一进二观察（2026-09-21 新建观察卡；数据 akshare.stock_zt_pool_em；K线严格过滤待云端K线步） -->
-    <div id="boardFirstLimitCard" style="margin-bottom:12px;"></div>
+    <!-- 🚚 2026-09-23 主人令：「🔥 主板首板·一进二观察」卡已迁至「🔒 暂未上架 > 📡 观测类」（renderUnlisted ulPaneObserve 内 boardFirstLimitCard）。
+         原因：仅基础口径观察名单、无买入信号，不占实时数据主位；且此处 tryRun 单发派发早于 defer 数据脚本 ⇒ 恒显「无数据」死卡。 -->
 
     <!-- 涨停热力矩阵（整行宽度）
          🌡 2026-09-15 主人令（六项）：卡名去掉旧「近15日」口径 → 主表固定展示最近 20 个交易日（≈一个月）；
@@ -15473,7 +15473,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       // 2026-09-15：__renderAiInsightsCompare 已随卡迁往「🌍 观测平台 > 🌍 宏观观测」，
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderThemeValue'];
+      var names = ['__renderThemeValue','__renderBoardFirstLimit'];
       var probe = document.getElementById('themeValueBody');
       if(probe) probe.setAttribute('data-ulpane', tab);
       var out = [];
@@ -15657,6 +15657,11 @@ h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-lef
 //   ⚠ 同页同源只留一张壳，勿重复建；派发入口见 renderUnlisted 尾部 window.__renderMacroKShape 调用。
 h += '<div class="card" id="macroKShapeBody" style="margin-bottom:16px;border-left:4px solid #fbbf24;">'
    + '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F30D; 宏观景气背景 · K 型分层 加载中&#x2026;</div></div>';
+// ═══ 🔥 2026-09-23 主人令：「主板首板·一进二观察」由「📡 实时数据」迁入本页（观测类）═══
+//   定性：仅「今日主板首板 + 基础口径（市值/换手/封板）」观察名单，K线严格过滤（控盘/三线粘合/角度60°/涨停确认/量差/筹码穿刺）
+//   待云端K线步接入 ⇒ 当前【无买入信号】，属观测卡非选股信号。
+//   竞态根治：渲染改由 __ulRenderPane 派发（用户进本页时 defer 数据必已就位），ulSelfHeal 每 1.5s 兜底。
+h += '<div id="boardFirstLimitCard" style="margin-bottom:16px;"></div>';  // 裸 div 宿主：与连板天梯同范式（v8CardHeader 自带卡头），防「双圆弧」复发
 h += '</div>'; // /ulPaneObserve
 
 // ===== 📊 大盘观察 pane —— 🚚 2026-09-15 主人令：整页迁出 =====
@@ -18320,8 +18325,9 @@ window.__renderV8CalToday();
   }
   // 实时数据区：情绪周期·连板天梯（迁到涨停热力矩阵上方）
   tryRun('renderCycleLadderCard', window.__renderCycleLadderCard, 'cycle-ladder init');
-  // 🔥 主板首板 · 一进二观察（迁到连板天梯下方）
-  tryRun('renderBoardFirstLimit', window.__renderBoardFirstLimit, 'board-first-limit init');
+  // 🚚 2026-09-23 主人令：主板首板·一进二观察卡已迁「暂未上架>观测类」。
+  //   原 tryRun('renderBoardFirstLimit',…) 单发派发早于 defer 数据脚本执行 ⇒ window.BOARD_FIRST_LIMIT 未注入 ⇒ 恒「无数据」。
+  //   现由 renderUnlisted.__ulRenderPane 派发（进页时 defer 已就位）+ ulSelfHeal 兜底，见观测类 pane。
   // 🔴 2026-09-16 主人令「还是看不了！一劳永逸修复」：补上 renderLimitUpHeatmap 的调用链。
   //   三保险：① 立即调用 ② 400/1200ms 延迟重试（覆盖 defer 数据脚本晚于本 IIFE 执行）
   //   ③ 1.5s 永久自愈轮询（见下方 selfHealLimitUpHeat，与 ceBody 同范式）。
