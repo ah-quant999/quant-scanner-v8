@@ -3301,8 +3301,10 @@ function fmtSigned(v){
         <table id="imaBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>中位数</th><th>最好</th><th>最差</th><th>最大回撤</th></tr></thead><tbody id="imaBackBody"></tbody></table>
       </div>
       <div style="margin-top:12px;padding:9px 12px;border-radius:8px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.2);font-size:11px;color:var(--dim);line-height:1.75;">
-        📎 <b style="color:var(--sub);">本页另两个算法已先后删除</b>：选股生命周期（T+5 胜率 32.2% / T+10 15.9%）、强势突破（T+1 44.7% / T+5 50.0%）—— 2026-09-16 主人令：回测明显弱于强势跟踪，先从展示中下架；2026-09-19 主人令：<b>强势突破连同数据层 / 渲染函数 / 回测源一并移除，已不再产出、不再回测</b>（选股生命周期卡亦已删除）。
-      </div>
+      <!-- 🗑 2026-09-23 主人令：「删除底部那句（本页另两个算法已先后删除…）」——
+           整块移除该灰底说明框（原内容 = 选股生命周期 / 强势突破 的撤除说明）。
+           撤除事实不变（数据层 / 渲染函数 / 回测源已于 2026-09-19 删除），
+           只是不再在本页底部展示这段历史说明。 -->
     </div><!--/st-life-->
 
 
@@ -6912,6 +6914,24 @@ function fmtSigned(v){
     if(D.note_url) html += '<a href="'+_e(D.note_url)+'" target="_blank" style="font-size:11px;color:#a78bfa;text-decoration:none;">原帖↗</a>';
     // 🛡 2026-09-04 一劳永逸：同上，不再 slice(0,16)，传完整时间戳给 _fmtAshareRel
     if(typeof _uBadge === 'function') html += _uBadge('auto','短线',(D.update_time||''));
+    /* 🔴 2026-09-23 主人令「确认这卡每日是否有更新」· 阿狸咪的工程师：
+       ── 实测：抓取链**每日都在跑**（v8_ima_strong_stock.yml cron + 云端 cn fetch），
+          但**数据内容**自 2026-09-15 起 8 天未前进（源笔记自述最新交易日 = 数据日），
+          而头部「已更新 于 今日 21:03」用的是**抓取时刻** ⇒ 只看它会误以为数据是今天的。
+       ── 修法：把**内容级**数据日（D.data_date / D.stale_days）**常显**为独立胶囊，
+          与「已更新（抓取时刻）」并列：抓取时刻在走、数据日不动 = 一眼看出源侧没更新。
+          判据全部来自产物字段，不臆测、不改数；颜色只做分档（>0 天=黄，≥5 天=红）。
+       ── 为何不依赖 source_stale：wiki 源的 source_stale 恒为 False
+          （见 fetch_ima_strong_stock.py 语义注释），故红胶囊分支对它永不触发；
+          此处改显「数据日」本身，不与该判定冲突、不改生产者口径。 */
+    if(D.data_date && !D.source_stale){
+      var _sdNum = (D.stale_days == null ? null : Number(D.stale_days));
+      var _sdCol = (_sdNum != null && _sdNum >= 5) ? '#ef5350' : ((_sdNum != null && _sdNum > 0) ? '#fbbf24' : '#94a3b8');
+      html += '<span title="数据日 = 源笔记「' + _e(D.source_title || 'ima 分享页') + '」的最新交易日；上方「已更新」是抓取时刻，不是数据新鲜度；距今 ' + ((_sdNum == null) ? '?' : _sdNum) + ' 天" '
+        + 'style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:' + _sdCol + '1a;color:' + _sdCol + ';border:1px solid ' + _sdCol + '55;white-space:nowrap">📅 数据日 ' + _e(D.data_date)
+        + ((_sdNum != null && _sdNum > 0) ? ('<span style="font-size:10px;opacity:.75;font-weight:500;margin-left:2px"> · ' + _sdNum + ' 天前</span>') : '')
+        + '</span>';
+    }
     /* 🔴 2026-09-17 主人令「杜绝一切假成功」· 阿狸咪的工程师
        ── 根因：本卡「更新于」用的是 D.update_time（**抓取时刻**），而源笔记实际停在
           2026-09-02（源页 document.title「强势股跟踪日报 2026-09-02」、页内自述
@@ -6959,12 +6979,10 @@ function fmtSigned(v){
     });
     html += '</div>';
 
-    /* 🎯 2026-09-19 主人令「这卡直接展示强势的，越强的排越强，正常和回落的折叠」 */
-    html += '<div style="font-weight:600;margin:2px 0 6px;color:#22c55e;">🟢 强势股 · 涨幅降序（越强越前） · '
-      + (_detailOK? '前 '+Math.min(10,_strongAll.length)+' / 共 <b style="margin-left:2px;">'+_strongAll.length+'</b> 只'
-                   : '本页可得的 <b style="margin-left:4px;">'+_strongAll.length+'</b> 只')
-      + (_detailOK && D.stocks.length>_strongAll.length?' <span style="font-size:11px;color:var(--dim);font-weight:500;">· 强势其余 + 正常/回落 见下方「全部标的」（正常/回落已折叠）</span>':'')
-      + '</div>';
+    /* 🎯 2026-09-23 主人令「只展示连涨强势，其他折叠不要拉窗」：
+       ── 取消本行「🟢 强势股 · 涨幅降序 · 前 10 / 共 N 只」——它与卡内 __imaRenderMain
+          产出的标题重复，且口径已改为「主表只放连涨强势」⇒ 标题统一由 __imaRenderMain
+          单一产出，避免两行绿标题并存 + 「前 10」与实际不符。 */
     /* 🎯 2026-09-19 主人令「这个每列都没对齐，对齐了要不看的很乱」：
        ── 根因：两处表格（主卡「强势前 10」/ 折叠里「全部标的」）都是 table-layout:auto，
           列宽随各自内容长短漂移 ⇒ 同一份表头在两张表里对不上位置，视觉很乱。
@@ -7056,34 +7074,59 @@ function fmtSigned(v){
   var _grpHtml = {};
   window.__imaGroupHtml = function(k){ return _grpHtml[k] || ''; };
 
-  /* 主卡就地渲染：强势全表（默认展开）+ 其余状态档折叠组 */
+  /* 🎯 2026-09-23 主人令「**只展示连涨强势，其他折叠不要拉窗**」：
+     ── 主表口径：只出「买点提示 = 连涨强势」的标的（连涨中且未破基准 = 源侧最强信号）；
+        其余全部收入折叠区（默认收起）：
+          · 强势组其余档 → 一条折叠（内部仍按 回调买点 → 观察期中 → 未标注 → 跌破基准 优先序）
+          · 非强势档（正常 / 回落 / 见顶 / 走弱）→ 各自一条折叠（沿用原口径）
+        ⇒ 首屏高度由「34 行长表」压到「连涨强势 N 行」，不再把页面拉长。
+     ──「不要拉窗」：折叠全部走 __imaFold（只切 display），**不引入任何
+        max-height / overflow 容器** ⇒ 结构上不可能出现纵向滚动条（详见上方 09-20 注释）。 */
   window.__imaRenderMain = function(){
     var host = document.getElementById('_imaStrongHost');
     if(!host) return;
     _grpHtml = {};   /* 每次渲染清空缓存，保证折叠区拿到的是本次数据 */
     var h = '';
+    /* 主表 = 连涨强势（_strongAll 已按档位升序 ⇒ 档 0 天然在最前） */
+    var _cont = _strongAll.filter(function(s){ return _tierOf(s) === 0; });
+    var _rest = _strongAll.filter(function(s){ return _tierOf(s) !== 0; });
     h += '<div style="font-weight:600;font-size:12px;margin:2px 0 6px;color:#22c55e;">'
-      + '🟢 强势 · 全部 <b>' + _strongAll.length + '</b> 只'
+      + '🟢 连涨强势 · <b>' + _cont.length + '</b> 只'
       + '<span style="font-size:10.5px;color:var(--dim);font-weight:500;margin-left:6px;">'
-      + '（优先序：连涨强势 → 回调买点 → 观察期中 → 未标注 → 跌破基准；同档内涨幅降序）</span></div>';
-    h += _tableHtml(_strongAll);
+      + '（连涨中且未破基准 · 越强越前；其余 ' + (_strongAll.length - _cont.length) + ' 只已折叠）</span></div>';
+    h += _tableHtml(_cont);
+    /* 折叠按钮统一样式：只挂 onclick + display 开关，无任何滚动容器 */
+    var _foldBtn = function(sid, label, col, cnt){
+      return '<div style="margin:6px 0;">'
+        + '<span id="' + sid + '_btn" onclick="window.__imaFold(\'' + sid + '\')" '
+        + 'style="cursor:pointer;display:inline-block;padding:3px 12px;border-radius:8px;font-size:11.5px;font-weight:600;'
+        + 'color:' + col + ';border:1px solid ' + col + '55;background:' + col + '1a;">▸ ' + label + ' ' + cnt + ' 只</span>'
+        + '<div id="' + sid + '" style="display:none;margin-top:6px;">' + _grpHtml[sid] + '</div>'
+        + '</div>';
+    };
     var _foldRows = '';
+    /* ① 强势组其余档（回调买点 / 观察期中 / 未标注 / 跌破基准）—— 一条折叠，档序不变 */
+    if(_rest.length){
+      var _sub = {};
+      _rest.forEach(function(s){ var tt = _tierOf(s); _sub[tt] = (_sub[tt] || 0) + 1; });
+      var _subTxt = [['回调买点',1],['观察期中',2],['未标注',3],['跌破基准',4]]
+        .filter(function(x){ return _sub[x[1]]; })
+        .map(function(x){ return x[0] + ' ' + _sub[x[1]]; }).join(' / ');
+      var _sidS = '_imaGrp_强势其余';
+      _grpHtml[_sidS] = _tableHtml(_rest);
+      _foldRows += _foldBtn(_sidS, '强势 · 其余（' + _subTxt + '）', '#22c55e', _rest.length);
+    }
+    /* ② 非强势档各自折叠 */
     ['正常','回落','见顶','走弱'].forEach(function(k){
       var arr = D.stocks.filter(function(x){ return (x.status||'')===k; }).sort(_sortByChg);
       if(!arr.length) return;
-      _grpHtml[k] = _tableHtml(arr);
-      var col = statusMap[k] || '#94a3b8';
       var sid = '_imaGrp_' + k;
-      _foldRows += '<div style="margin:6px 0;">'
-        + '<span id="' + sid + '_btn" onclick="window.__imaFold(\'' + sid + '\')" '
-        + 'style="cursor:pointer;display:inline-block;padding:3px 12px;border-radius:8px;font-size:11.5px;font-weight:600;'
-        + 'color:' + col + ';border:1px solid ' + col + '55;background:' + col + '1a;">▸ ' + k + ' ' + arr.length + ' 只</span>'
-        + '<div id="' + sid + '" style="display:none;margin-top:6px;">' + _grpHtml[k] + '</div>'
-        + '</div>';
+      _grpHtml[sid] = _tableHtml(arr);
+      _foldRows += _foldBtn(sid, k, statusMap[k] || '#94a3b8', arr.length);
     });
     if(_foldRows){
       h += '<div style="margin-top:12px;border-top:1px dashed var(--border);padding-top:10px;">'
-        + '<div style="font-size:11px;color:var(--dim);margin-bottom:4px;">📁 未达「强势」的状态档已折叠（点击展开）</div>'
+        + '<div style="font-size:11px;color:var(--dim);margin-bottom:4px;">📁 其余已折叠（点击展开；本卡折叠不拉窗 —— 只切显示，不出滚动条）</div>'
         + _foldRows + '</div>';
     }
     host.innerHTML = h;
