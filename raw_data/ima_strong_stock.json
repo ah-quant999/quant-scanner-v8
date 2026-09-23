@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-22 17:06:45",
+  "update_time": "2026-09-23 17:26:32",
   "source": "ima",
   "note_url": "https://ima.qq.com/wiki/?shareId=32c01f1da52044f743a01e4aa995d72e7940cc8e99cf413cc5f4c2eb39b4d389&folderId=folder_7500817011604393",
   "source_kind": "wiki",
@@ -7,7 +7,7 @@
   "source_title": "强势股跟踪日报 2026-09-15",
   "source_updated_at": "",
   "data_date": "2026-09-15",
-  "stale_days": 7,
+  "stale_days": 8,
   "source_stale": false,
   "summary": {
     "track": 58,
@@ -22,8 +22,8 @@
     "coverage_pct": 96.6,
     "source_chars": 4154,
     "source_channel": "full-snapshot",
-    "snapshot_fetched_at": "2026-09-22 17:05:17",
-    "snapshot_age_h": 0.02,
+    "snapshot_fetched_at": "2026-09-23 17:24:12",
+    "snapshot_age_h": 0.04,
     "strong_expected": 34,
     "strong_parsed": 34,
     "reconciled": true,
