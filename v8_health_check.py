@@ -2274,8 +2274,26 @@ def check_raw_data():
         # 🛡 2026-08-27 主人令：排除运行时缓存目录（_rps_cache 550 + kline_cache 401 + _tdx_cache 170）
         #   这些是算法运行产生的行情缓存，本不应入库/计入仓库规模；否则一直触发 raw_volume fail 红灯。
         _CACHE_SUBDIRS = {"_rps_cache", "kline_cache", "_tdx_cache", "backtest_kline_cache"}
-        n_files = sum(1 for _ in RAW_DIR.rglob("*")
-                      if _.is_file() and not any(part in _CACHE_SUBDIRS for part in _.parts))
+        # 🛡 2026-09-23 一劳永逸（阿狸咪的工程师·口径纠正）：本检查的语义（见上）是
+        #   「仓库规模临近 Git Trees 422 上限」⇒ 必须统计【已入库 tracked】文件。
+        #   原按本地工作区 rglob 统计，会把 runner 未入库的运行时残渣一并计入 ⇒ 假 FAIL。
+        #   实证（同仓同日两轮）：run#2072 `raw_data 共 4309` ⇒ fail；run#2073 同检查 ⇒ ok；
+        #   差值 3414 恰等于 checkout「Cleaning the repository」清掉的 raw_data/_wf_cache/*.json
+        #   （逐票行情缓存，不入库，单轮可累积 3400+ 个）。
+        n_files = None
+        try:
+            _ls = subprocess.run(["git", "ls-files", "raw_data"], capture_output=True,
+                                 text=True, encoding="utf-8", errors="replace", timeout=60)
+            if _ls.returncode == 0 and _ls.stdout.strip():
+                n_files = sum(1 for _ln in _ls.stdout.splitlines()
+                              if _ln.strip()
+                              and not any(_p in _CACHE_SUBDIRS for _p in _ln.split("/")))
+        except Exception:
+            n_files = None
+        if n_files is None:
+            # 回退（非 git 环境）：仍按本地工作区统计 —— 保持旧语义，绝不因取不到清单而漏检
+            n_files = sum(1 for _ in RAW_DIR.rglob("*")
+                          if _.is_file() and not any(part in _CACHE_SUBDIRS for part in _.parts))
         # 2026-08-29 一劳永逸：仓库膨胀属运维卫生指标，不应按「数据失鲜」触发 FAIL 邮件。
         #   原 >1100 直接 FAIL 导致日常规模持续喷看门狗邮件（误报噪音）；
         #   保留 Git Trees 422 防护语义：仅临近危险规模（>2500）才 FAIL，>1100 降为 WARN。
