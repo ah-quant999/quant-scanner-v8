@@ -1655,11 +1655,23 @@ def f_etf_intraday_heat():
     snap = _etf_snapshot()
     scope = "全市场"
     if not snap:
-        _ok, _page, _t = _etf_get_page(1, _ETF_HOSTS[0])
-        snap = {str(x.get("f12")): x for x in (_page or []) if x.get("f12")} if _ok else {}
-        scope = "净流入前100只"
+        # 降级：优先复用跨轮缓存里的第 1 页（fid=f62 降序 ⇒ 第 1 页 = 净流入前 100 名）。
+        # 复用可少打一次请求（该端点可用窗口稀缺）；缓存没有才现打。
+        _p1 = None
+        try:
+            _c0 = _etf_cache_load(now_cst().strftime("%Y%m%d"))
+            _p1 = (_c0.get("pages") or {}).get("1") or None
+        except Exception:
+            _p1 = None
+        if _p1 and len(_p1) > 1 and _p1[1]:
+            snap = {str(x.get("f12")): x for x in _p1[1] if x.get("f12")}
+            scope = "净流入前100只(缓存)"
+        else:
+            _ok, _page, _t = _etf_get_page(1, _ETF_HOSTS[0])
+            snap = {str(x.get("f12")): x for x in (_page or []) if x.get("f12")} if _ok else {}
+            scope = "净流入前100只"
         if snap:
-            print(f"  ⚠️ ETF_INTRADAY_HEAT: 全市场快照未拼齐 ⇒ 降级用第 1 页（{len(snap)} 只样本）")
+            print(f"  ⚠️ ETF_INTRADAY_HEAT: 全市场快照未拼齐 ⇒ 降级用 {scope}（{len(snap)} 只样本）")
     if not snap:
         return None
     recs = []
@@ -3030,7 +3042,7 @@ _ETF_PAGE = 100            # 硬约束：clist 对 pz 一律截断到 100（v7/v
 _ETF_MAX_PAGES = 24        # 1619 只 ÷ 100 ≈ 17 页，留冗余
 _ETF_MIN_ROWS = 1400       # 拼齐后仍少于此数视为异常（1619 只全市场）
 _ETF_WORKERS = 17          # 并发扇出：一轮把 17 页全发出去
-_ETF_ROUNDS = 10           # 单次快照内最多几轮（失败页逐轮补，host 逐轮轮换）
+_ETF_ROUNDS = 3            # 单次快照内最多 3 轮扇出（实测「密集请求即封」，多打只会延长封禁）
 _ETF_BUDGET = 180          # 单次快照时间预算（秒）；实测一轮 ~2s，10 轮 ~30s
 _ETF_TOTAL_BUDGET = 420    # 单轮 run 内累计上限（两个模块共用一次快照，实际只跑一次）
 _ETF_FRESH_S = 1200        # 底表 20 分钟内更新过 ⇒ 整轮跳过
@@ -3038,6 +3050,7 @@ _ETF_CACHE_MAX_AGE_INTRADAY = 2700   # 盘中允许的跨轮页龄（45 分钟�
 _ETF_CACHE = RAW_DIR / "etf_snapshot_pages.json"   # 跨轮拼页缓存（随 raw_data 一起入仓）
 _etf_cache = {"date": None, "rows": None}   # 同轮内两个模块共用，避免重复抓
 _etf_spent = {"secs": 0.0}
+_etf_failed = {"date": None}     # 本轮 run 内快照失败记忆（见 _etf_snapshot 注释）
 
 
 def _etf_after_close():
@@ -3109,10 +3122,18 @@ def _etf_cache_save(c):
 
 
 def _etf_snapshot():
-    """全市场 ETF 快照（code → 原始字段字典）；拼不齐返回 None（宁缺勿错）。"""
+    """全市场 ETF 快照（code → 原始字段字典）；拼不齐返回 None（宁缺勿错）。
+
+    2026-09-23 补：**本轮 run 内失败一次即记忆**。ETF_PULSE 与 ETF_DAILY_MONITOR
+    原先各自完整跑一遍补页，实测单轮 run 因此打了约 374 次请求（17 页 × 10 轮 × 2 模块 …），
+    第二遍纯粹打在「已被自己打死的窗口」上 —— 这是把封禁越拖越长的直接原因。
+    现在第二遍直接复用「本轮已失败」结论，不再发请求。"""
     today = now_cst().strftime("%Y%m%d")
     if _etf_cache["date"] == today and _etf_cache["rows"]:
         return _etf_cache["rows"]
+    if _etf_failed["date"] == today:
+        print("  ⏭️ ETF 快照本轮已尝试且未拼齐（失败记忆）⇒ 不再重复请求")
+        return None
     if _etf_fresh_skip():
         print(f"  ⏭️ ETF 底表 {_ETF_FRESH_S // 60} 分钟内刚更新 ⇒ 本轮跳过（省请求）")
         return None
@@ -3127,6 +3148,8 @@ def _etf_snapshot():
     if rows:
         _etf_cache["date"] = today
         _etf_cache["rows"] = rows
+    else:
+        _etf_failed["date"] = today          # 本轮不再对该端点做第二次尝试
     return rows
 
 
@@ -3183,6 +3206,13 @@ def _etf_snapshot_inner(today):
         print(f"  🔁 ETF 第 {rnd + 1} 轮：本轮补到 {got} 页 / 共 {len(pages)} 页"
               f"（total={total or '未知'}，{time.time() - t_start:.0f}s）")
         if total and all(str(p) in pages for p in range(1, min(_ETF_MAX_PAGES, (total + _ETF_PAGE - 1) // _ETF_PAGE) + 1)):
+            break
+        if got == 0:
+            # 实测（探针 v8/v9/v10 + 生产 20:00 逐行日志）：该出口 IP 的可用窗口只有最初几次
+            # 请求，之后进入 502 封禁；**继续硬捶会把封禁时间拉长**
+            # （v8 C_burn30_then_crawl：先烧 30 个请求 ⇒ 随后 17 页 0/17 全败）。
+            # 故一轮全败即熔断，把剩余窗口留给下一轮 run —— 跨轮拼页本就设计好了。
+            print("  🧊 ETF 本轮补页 0 ⇒ 立即熔断（不硬捶，窗口留给下一轮 run）")
             break
         if time.time() - t_start > _ETF_BUDGET:
             print(f"  ⏱️ ETF 快照达时间预算 {_ETF_BUDGET}s ⇒ 停止补页")
