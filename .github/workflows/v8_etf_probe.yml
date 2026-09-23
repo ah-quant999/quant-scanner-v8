@@ -1,26 +1,27 @@
-# 九宝量化 v8.0 — ETF clist 定罪探针（第5版·一次性诊断，验完即删）
+# 九宝量化 v8.0 — ETF clist 定罪探针（第6版·一次性诊断，验完即删）
 #
-# 2026-09-23 第4版的**设计缺陷**（必须记住，勿再犯）：
-#   第4版把「生产整函数 f_etf_daily_monitor（首调 66 秒、14 次分页请求）」放在**最前面**，
-#   其后所有矩阵/pz 梯度/稳定性测试**全部在「已被自己打限流」的状态下执行** ⇒
-#   全表 502（559B nginx 页），连「静置 30 秒」也没恢复 ⇒ 结论不可用（自证污染）。
+# 为什么必须用「矩阵 × 独立 runner」：v4/v5 已两次实证**第 1 个请求之后就连续 502**
+#   ⇒ 同一 runner 内做多组对照 = 后面全部被自己污染（v4 因此得出全表 502 的废结论）。
+#   本版让**每种配置各占一个全新 runner、只发 1 个请求**，从根上消除顺序污染。
 #
-# 本版修正：**冷启动优先** —— 零前置请求，第一件事就是「一次请求能否拿全市场」的判定；
-#   把重活（生产整函数）挪到**最后**，只用来复现「重活之后是否 502」的对照。
+# v5 已确证的两件事（不再重复测）：
+#   ① pz=5000 打在 push2delay 上**真被硬截 100 行**（docstring 说的"硬截"属实）⇒
+#      生产必须分页（现为 16 页）⇒ 每页都是一次撞 502 的机会。
+#   ② 502 窗口实测：连续 12 次 × 5 秒 **全部 502**（60 秒全程不可用），窗口以分钟计。
 #
-# 要回答的三个问题：
-#   ① 一次请求（fid=f62 / pz=5000）能否拿全 ETF 全市场（≈1600 只）？—— 若可以，
-#      生产就应从「14 次分页」改成「1 次取全」，请求数降 93% ⇒ 从根上离开 502 窗口。
-#   ② fid=f62 与 fid=f3 的分页行为差异（f3 是否硬截 100）。
-#   ③ 502 窗口有多长 —— 用「10 次重试 × 5 秒」实测：多久能自愈（决定重试参数怎么配）。
+# 本版要回答：**有没有「1 个请求拿全市场」的稳定组合？**
+#   A push2delay + m:1+t:9,m:0+t:9 + pz=5000   （复现基线：预期 100）
+#   B push2      + m:1+t:9,m:0+t:9 + pz=5000   （主站是否也截 100？）
+#   C push2      + b:MK0021..MK0024 + pz=50000 （akshare 口径：能否一次拿全 1600 只？）
+#   D push2delay + b:MK0021..MK0024 + pz=50000 （同上，但走镜像）
+#   E akshare fund_etf_spot_em()               （生产改造前的原方案，今日 11:31 曾成功出 1602 只）
+#   F push2      + m:1+t:9,m:0+t:9 + po=0      （升序方向是否可用）
+#   → 记录 data.total（东财自报总数）与 diff 行数：两者不等即为"被截"的硬证据。
 
-name: "🔬 v8 ETF clist 定罪探针v5(一次性·冷启动取全判定+502窗口实测)"
+name: "🔬 v8 ETF clist 探针v6(矩阵×独立runner·1请求取全判定)"
 
 on:
   workflow_dispatch: {}
-
-permissions:
-  contents: write
 
 concurrency:
   group: v8_etf_probe
@@ -29,191 +30,130 @@ concurrency:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: A_delay_cmb_f62_pz5000
+            base: "https://push2delay.eastmoney.com"
+            fs: "m:1+t:9,m:0+t:9"
+            fid: "f62"
+            pz: "5000"
+            po: "1"
+          - name: B_push2_cmb_f62_pz5000
+            base: "https://push2.eastmoney.com"
+            fs: "m:1+t:9,m:0+t:9"
+            fid: "f62"
+            pz: "5000"
+            po: "1"
+          - name: C_push2_bmk_f62_pz50000
+            base: "https://push2.eastmoney.com"
+            fs: "b:MK0021,b:MK0022,b:MK0023,b:MK0024"
+            fid: "f62"
+            pz: "50000"
+            po: "1"
+          - name: D_delay_bmk_f62_pz50000
+            base: "https://push2delay.eastmoney.com"
+            fs: "b:MK0021,b:MK0022,b:MK0023,b:MK0024"
+            fid: "f62"
+            pz: "50000"
+            po: "1"
+          - name: E_akshare_fund_etf_spot_em
+            base: "AKSHARE"
+            fs: ""
+            fid: ""
+            pz: ""
+            po: ""
+          - name: F_push2_cmb_f62_pz5000_po0
+            base: "https://push2.eastmoney.com"
+            fs: "m:1+t:9,m:0+t:9"
+            fid: "f62"
+            pz: "5000"
+            po: "0"
     steps:
-      - name: "📥 checkout（取生产代码真身）"
+      - name: "📥 checkout"
         uses: actions/checkout@v4
 
       - name: "🐍 装依赖"
-        run: |
-          python3 -m pip install --quiet --disable-pip-version-check requests pandas
+        run: python3 -m pip install --quiet --disable-pip-version-check requests pandas akshare
 
-      - name: "🔬 冷启动取全判定 + 502 窗口实测"
+      - name: "🔬 单请求实测（本 runner 只发这一个请求）"
         shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
+          CFG_NAME: ${{ matrix.name }}
+          CFG_BASE: ${{ matrix.base }}
+          CFG_FS: ${{ matrix.fs }}
+          CFG_FID: ${{ matrix.fid }}
+          CFG_PZ: ${{ matrix.pz }}
+          CFG_PO: ${{ matrix.po }}
         run: |
           python3 - <<'PYEOF'
-          import json, os, sys, time, base64, traceback, importlib, inspect
-          import urllib.request, urllib.parse
-          import requests
-          try:
-              requests.packages.urllib3.disable_warnings()
-          except Exception:
-              pass
+          import json, os, time, sys
 
+          name = os.environ["CFG_NAME"]
+          print("══════════════ %s ══════════════" % name, flush=True)
+          res = {"cfg": name}
           t0 = time.time()
-          BUDGET = 1000
-          CMB = "m:1+t:9,m:0+t:9"
-          F62 = "f12,f14,f62"
-          out = {"probe_time": time.strftime("%Y-%m-%d %H:%M:%S"), "cold": [], "pages": [],
-                 "coverage": {}, "robust": [], "heavy": []}
-
-          def log(m):
-              print(m, flush=True)
-
-          def left():
-              return BUDGET - (time.time() - t0)
-
-          def stamp():
-              return time.strftime("%H:%M:%S")
-
-          # ── 0. 生产模块（只 import，不调用 ⇒ 零污染）────────────────
-          sys.path.insert(0, os.getcwd())
-          cf = importlib.import_module("cloud_fetch_v8")
-          out["import_ok"] = True
-          out["em_clist_sig"] = str(inspect.signature(cf.em_clist))
-          log("✅ import OK | _EM_DELAY=%s" % getattr(cf, "_EM_DELAY", "?"))
-          src = inspect.getsource(cf.em_clist)
-          out["em_clist_src"] = src
-          log("──────── em_clist 源码 ────────")
-          for ln in src.splitlines()[:60]:
-              log("   " + ln)
-
-          # ── 1/2. 冷启动：一次请求拿全市场（fid=f62，po=1 与 po=0）──
-          def prod(fs, fields, fid, pz, po, pn=1, timeout=20):
-              t = time.time()
-              try:
-                  rr = cf.em_clist(fs, fields, fid=fid, stat="1", pz=pz, po=po, pn=pn, timeout=timeout)
-              except Exception as e:
-                  return {"err": "%s: %s" % (type(e).__name__, str(e)[:80])}
-              el = round(time.time() - t, 1)
-              codes = [str(r.get("f12")) for r in rr if isinstance(r, dict) and r.get("f12")]
-              nets = []
-              for r in rr:
+          try:
+              if os.environ["CFG_BASE"] == "AKSHARE":
+                  import akshare as ak
+                  df = ak.fund_etf_spot_em()
+                  res["type"] = "akshare"
+                  res["rows"] = int(len(df))
+                  res["cols"] = list(df.columns)[:14]
+                  netcol = next((c for c in df.columns if "主力净流入" in str(c) and "净额" in str(c)), None)
+                  if netcol is None:
+                      netcol = next((c for c in df.columns if "主力净流入" in str(c)), None)
+                  res["net_col"] = netcol
+                  if netcol:
+                      v = df[netcol].astype(float)
+                      res["sum_net_yi"] = round(float(v.sum()) / 1e8, 3)
+                  codes = df["代码"].astype(str).tolist() if "代码" in df.columns else []
+                  res["sh"] = sum(1 for c in codes if c[:1] in ("5", "6"))
+                  res["sz"] = sum(1 for c in codes if c[:1] in ("1", "0", "3"))
+                  res["sample"] = codes[:8]
+              else:
+                  import requests
                   try:
-                      nets.append(float(r.get("f62") or 0.0))
+                      requests.packages.urllib3.disable_warnings()
                   except Exception:
                       pass
-              return {"rows": len(rr), "uniq": len(set(codes)), "secs": el,
-                      "sum_net_yi": round(sum(nets) / 1e8, 3),
-                      "sh": sum(1 for c in set(codes) if c[:1] in ("5", "6")),
-                      "sz": sum(1 for c in set(codes) if c[:1] in ("1", "0", "3")),
-                      "sample": codes[:6], "at": stamp()}
-
-          def add(bucket, tag, rec):
-              rec["tag"] = tag
-              bucket.append(rec)
-              log("   %-34s %s" % (tag, json.dumps(rec, ensure_ascii=False)[:200]))
-
-          log("════ 冷启动段（零前置请求） ════")
-          add(out["cold"], "f62_pz5000_CMB_po1", prod(CMB, F62, "f62", 5000, "1"))
-          time.sleep(0.5)
-          add(out["cold"], "f62_pz5000_CMB_po0", prod(CMB, F62, "f62", 5000, "0"))
-          time.sleep(0.5)
-          r_sh = prod("m:1+t:9", F62, "f62", 3000, "1")
-          add(out["cold"], "f62_pz3000_SH", r_sh)
-          time.sleep(0.5)
-          r_sz = prod("m:0+t:9", F62, "f62", 3000, "1")
-          add(out["cold"], "f62_pz3000_SZ", r_sz)
-          time.sleep(0.5)
-          # 生产现用形态（14 次分页的第一页）
-          add(out["cold"], "f3_pz100_CMB_pn1", prod(CMB, F62, "f3", 100, "1"))
-          time.sleep(0.5)
-
-          # ── 3. 分页行为对照：f3 vs f62（各连取 3 页）──────────────
-          log("════ 分页行为段 ════")
-          for fid in ("f3", "f62"):
-              for pn in (1, 2, 3):
-                  if left() < 500:
-                      break
-                  add(out["pages"], "%s_pz100_pn%d" % (fid, pn), prod(CMB, F62, fid, 100, "1", pn=pn))
-                  time.sleep(0.4)
-
-          out["coverage"] = {
-              "cmb_pz5000_uniq": out["cold"][0].get("uniq"),
-              "sh_uniq": r_sh.get("uniq"), "sz_uniq": r_sz.get("uniq"),
-              "sh_plus_sz": (r_sh.get("uniq") or 0) + (r_sz.get("uniq") or 0),
-          }
-          log("   coverage: %s" % json.dumps(out["coverage"], ensure_ascii=False))
-
-          # ── 4. 502 窗口实测：同一请求最多 12 次 × 5 秒 ─────────────
-          log("════ 502 窗口实测（12 次 × 5 秒）════")
-          URL = getattr(cf, "_EM_DELAY", "https://push2delay.eastmoney.com").rstrip("/") + "/api/qt/clist/get"
-          HDR = dict(getattr(cf, "_EM_HEADERS", {"User-Agent": "Mozilla/5.0"}))
-          out["probe_url"] = URL
-          for i in range(12):
-              if left() < 200:
-                  break
-              p = {"pn": "1", "pz": "5000", "po": "1", "np": "1", "fltt": "2", "invt": "2",
-                   "ut": "b2884a393a59ad64002292a3e90d46a5", "fid": "f62", "fs": CMB,
-                   "stat": "1", "fields": F62, "_": int(time.time() * 1000)}
-              t = time.time()
-              try:
-                  r = requests.get(URL, params=p, headers=HDR, timeout=20, verify=False)
-                  el = round(time.time() - t, 1)
+                  p = {"pn": "1", "pz": os.environ["CFG_PZ"], "po": os.environ["CFG_PO"], "np": "1",
+                       "fltt": "2", "invt": "2", "ut": "b2884a393a59ad64002292a3e90d46a5",
+                       "fid": os.environ["CFG_FID"], "fs": os.environ["CFG_FS"], "stat": "1",
+                       "fields": "f12,f14,f62", "_": int(time.time() * 1000)}
+                  url = os.environ["CFG_BASE"].rstrip("/") + "/api/qt/clist/get"
+                  r = requests.get(url, params=p, timeout=25, verify=False,
+                                   headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                                            "Referer": "https://quote.eastmoney.com/"})
+                  res["http"] = r.status_code
+                  res["bytes"] = len(r.content)
                   try:
                       d = r.json()
-                      diff = (d.get("data") or {}).get("diff")
-                      rec = {"http": r.status_code, "json": True, "rows": len(diff) if isinstance(diff, list) else 0,
-                             "api_total": (d.get("data") or {}).get("total"), "secs": el, "at": stamp()}
+                      data = d.get("data") or {}
+                      diff = data.get("diff")
+                      rows = diff if isinstance(diff, list) else []
+                      res["rc"] = d.get("rc")
+                      res["api_total"] = data.get("total")
+                      res["rows"] = len(rows)
+                      codes = [str(x.get("f12")) for x in rows if isinstance(x, dict)]
+                      res["sh"] = sum(1 for c in codes if c[:1] in ("5", "6"))
+                      res["sz"] = sum(1 for c in codes if c[:1] in ("1", "0", "3"))
+                      res["sample"] = codes[:8]
+                      nets = []
+                      for x in rows:
+                          try:
+                              nets.append(float(x.get("f62") or 0.0))
+                          except Exception:
+                              pass
+                      res["sum_net_yi"] = round(sum(nets) / 1e8, 3)
                   except Exception:
-                      rec = {"http": r.status_code, "json": False, "bytes": len(r.content),
-                             "head": r.text[:60].replace("\n", " "), "secs": el, "at": stamp()}
-              except Exception as e:
-                  rec = {"err": "%s: %s" % (type(e).__name__, str(e)[:60]), "secs": round(time.time() - t, 1), "at": stamp()}
-              rec["tag"] = "try#%d" % (i + 1)
-              out["robust"].append(rec)
-              log("   %-34s %s" % (rec["tag"], json.dumps(rec, ensure_ascii=False)[:190]))
-              if rec.get("rows"):
-                  # 成功即停：记录「从开始到第一次成功」的耗时 = 502 窗口长度
-                  out["recover_after_secs"] = round(time.time() - t0, 1)
-                  log("   ✅ 第 %d 次成功，窗口约 %.0f 秒" % (i + 1, time.time() - t0))
-                  break
-              time.sleep(5)
-
-          # ── 5. 最后才跑重活：生产整函数（复现「重活后 502」对照）────
-          log("════ 重活对照段（放最后，不污染前面）════")
-          for i in range(2):
-              if left() < 150:
-                  break
-              t = time.time()
-              try:
-                  rr = cf.f_etf_daily_monitor()
-                  rec = ({"type": "NoneType"} if rr is None else
-                         {"type": "dict", "total_etf": rr.get("total_etf"),
-                          "total_net_yi": round((rr.get("total_net") or 0) / 1e8, 3)})
-              except Exception as e:
-                  rec = {"err": "%s: %s" % (type(e).__name__, str(e)[:80])}
-              rec["secs"] = round(time.time() - t, 1)
-              add(out["heavy"], "fn_after#%d" % (i + 1), rec)
-              time.sleep(3)
-
-          out["elapsed_secs"] = round(time.time() - t0, 1)
-          log("══ 完成，耗时 %.0f 秒 ══" % out["elapsed_secs"])
-          body = json.dumps(out, ensure_ascii=False, indent=1).encode("utf-8")
-
-          TOK = os.environ["GITHUB_TOKEN"]; REPO = os.environ["REPO"]
-          PATH_ = "raw_data/_etf_probe3.json"; BR = "main"
-          def gh(url, method="GET", data=None):
-              req = urllib.request.Request(url, data=data, method=method, headers={
-                  "Authorization": "Bearer " + TOK, "Accept": "application/vnd.github+json"})
-              return json.load(urllib.request.urlopen(req, timeout=30))
-          try:
-              sha = gh("https://api.github.com/repos/%s/contents/%s?ref=%s" % (REPO, PATH_, BR))["sha"]
-          except Exception:
-              sha = None
-          payload = {"message": "chore(probe): ETF clist 探针v5(冷启动取全+502窗口)",
-                     "content": base64.b64encode(body).decode(), "branch": BR}
-          if sha:
-              payload["sha"] = sha
-          for _try in range(6):
-              try:
-                  gh("https://api.github.com/repos/%s/contents/%s" % (REPO, PATH_), "PUT",
-                     json.dumps(payload).encode())
-                  log("✅ 结果已提交 %s（%d B）" % (PATH_, len(body)))
-                  break
-              except Exception as e:
-                  log("PATCH 失败(%d/6): %s" % (_try + 1, e)); time.sleep(2)
+                      res["json"] = False
+                      res["head"] = r.text[:90].replace("\n", " ")
+          except Exception as e:
+              res["err"] = "%s: %s" % (type(e).__name__, str(e)[:120])
+          res["secs"] = round(time.time() - t0, 1)
+          print("RESULT " + json.dumps(res, ensure_ascii=False), flush=True)
+          print("══════════════ END %s ══════════════" % name, flush=True)
           PYEOF
