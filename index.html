@@ -15696,10 +15696,14 @@ h += '<div class="card" id="macroKShapeBody" style="margin-bottom:16px;border-le
 //   定性：两级分层的观察名单 —— ①基础口径（市值/换手/封板）②K线严格过滤（「一进二」公式六项：
 //   涨停确认/大趋势/量差或控盘指数/量线粘合/三线粘合/角度60 + 量<6.18昨量 + 昨日非涨停；筹码穿刺因 SSRP 缺失按审计砍除）。
 //   数据由云端 cn fetch 步 algorithms/fetch_board_first_limit.py 产出（新浪日线算过滤）。
-//   ⚠️ 实测（2280 信号·2025-08~2026-09）：剔除不可成交（一字板 97 只 / 「收盘才确认封板」前视 352 只）后，
-//      真正可成交的 2183 个信号 T+1 开盘买 −0.386%（按日 t=−2.04，显著为负）；追高为铁律禁区
-//      （竞价高开>2% 整体 T+1 −1.148%、胜率仅 35.9%）⇒ 本卡是【候选池 + 次日避坑清单】，非买点；
-//      买点在次日 9:25 竞价：高开>2% 一律放弃，只有低开（≤0，尤其 ≤−2%）才具正期望（弱证据、仅可试仓）。
+//   ⚠️ 实测（2026-09-23 夜 · 全量重跑 4590 只 · 区间 2025-07~2026-09）：
+//      【反面用法＝亏】次日开盘买→次日收盘卖：−0.579%（t=−3.9，n=2238）；高开 6~9.8% 追进去当日 −3.14%。
+//      【正面用法＝隔夜模式】当日盘中开板买入 → 次日卖出（吃隔夜跳空）：+0.920%（已扣 0.6% 成本）、
+//      按日组合胜率 78.3%、t=+8.76；样本内 +0.922%／样本外 +0.916%（一致）、11/11 月为正；
+//      六项过滤有正增量（裸首板池同口径 +0.693%）；量比≤1 档最优 +2.078%（t=7.3）。
+//      可买性拆分：未开板（买不到）占 5.8% 但收益最高 +6.19%；开过板（可买）占 94.2% 仍 +0.92%。
+//      ⚠️ 存活边界：往返成本 <1.5%（1.2% → +0.32%；1.8% → −0.28% 转负）；单笔中位 +0.07%、
+//      净亏损笔 49.4%、最差单笔 −10.67%，收益集中在右尾 ⇒ 必须分散。执行时点在盘中（本卡盘后生成）。
 //   竞态根治：渲染改由 __ulRenderPane 派发（用户进本页时 defer 数据必已就位），ulSelfHeal 每 1.5s 兜底。
 h += '<div id="boardFirstLimitCard" style="margin-bottom:16px;"></div>';  // 裸 div 宿主：与连板天梯同范式（v8CardHeader 自带卡头），防「双圆弧」复发
 h += '</div>'; // /ulPaneObserve
@@ -16411,7 +16415,7 @@ h += '</div>'; // /ulPaneObserve
     el.innerHTML = html;
   }
   window.__renderCycleLadderCard = __renderCycleLadderCard;
-  // 🔥 主板首板 · 一进二观察卡渲染器（2026-09-21 建；2026-09-23 阿狸咪的工程师：1行6列分层 + K线严格过滤接入 + 折叠不拉窗；2026-09-23 夜：量比入格 + 「三步买入法」实测口径 + 限制区补不可成交性证据）
+  // 🔥 主板首板 · 一进二观察卡渲染器（2026-09-21 建；2026-09-23 阿狸咪的工程师：1行6列分层 + K线严格过滤接入 + 折叠不拉窗；2026-09-23 夜①：量比入格 + 限制区补不可成交性证据；2026-09-23 夜②：**买卖方向纠偏** —— 全量重跑证明正期望在「隔夜模式」（当日开板买→次日卖 +0.92%/组合胜率78.3%/t=8.76），原「次日9:25开盘买」口径为负（−0.58%）已作废）
   function __renderBoardFirstLimit(){
     var box=document.getElementById('boardFirstLimitCard');
     if(!box) return;
@@ -16420,12 +16424,12 @@ h += '</div>'; // /ulPaneObserve
     // 核心/用法/限制（全站统一范式）
     var _guide='<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:10px 12px;margin:0 0 10px;line-height:1.8;font-size:12px;color:var(--txt);">'
       +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">📌 核心：</b>在<b>最近一个已收盘交易日</b>的<b>主板首板</b>（60/00 开头 · 连板数=1）里做<b>两级分层</b>：①<b style="color:#26a69a;">基础口径</b>＝流通市值&lt;120亿<b>或</b>流通股&lt;4亿 ＋ 换手率&gt;2% ＋ 炸板 0 次（封板干净）；②<b style="color:#e0b34a;">K 线严格过滤</b>＝「一进二」公式六项（涨停确认／大趋势／量差<b>或</b>控盘指数／量线粘合／三线粘合／角度60°）＋ 量&lt;6.18×昨量 ＋ 昨日非涨停 ＋ 小盘 ＋ 换手&gt;2%。</div>'
-      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b><b style="color:#e0b34a;">★严格</b>＝六项 K 线过滤全过（金标·置顶）；<b style="color:#26a69a;">✓</b>＝仅基础口径达标；其余收进折叠区。排列「严格 → 基础 → 封板资金降序」。每格直接标出<b>量比</b>（＝当日量÷昨日量）：<b style="color:#fbbf24;">量比≤0.5 的次日 80% 高开&gt;2%、43% 直接涨停开盘（多数买不到）</b>；量比≥2 者次日 69% 平价开盘，才是值得看的对象。鼠标悬停可见未过项与读数。</div>'
-      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#fb923c;">🎯 怎么买（唯一有实测支持的用法）：</b>本卡是<b>候选池</b>，买点在<b>次日 9:25 竞价</b>——① 高开 &gt;2% <b>一律放弃</b>（高开 6~9.8% 追进去当日 <b style="color:#26a69a;">−3.14%</b>，t=−7.03）；② 只有<b>低开</b>（≤0，尤其 ≤−2%）才有正期望（当日 <b style="color:#ef5350;">+1.05%</b>、胜率 50.4%，但 t=1.63 未达显著＝<b>弱证据、仅可试仓</b>）；③ 进场后持有 1~3 日，<b>3% 紧止损无效</b>（触发率 63.6%）。</div>'
-      +'<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠ 限制（这是候选池，不是买点清单）：</b>实测 2280 个严格达标信号（主板 · 2025-08~2026-09）：① <b>剔掉不可成交样本后，真正能买到的 2183 个信号，次日开盘买 T+1 <b style="color:#26a69a;">−0.386%</b>（按日 t=−2.04，显著为负）</b>；② 卡面「看着能赚」的两类散户都拿不到——<b>一字板 97 只</b>（T+3 <b style="color:#ef5350;">+9.7%</b>，但你买不进）与「T+1 收盘后才确认封板」352 只（fix1 +5.15%、t=22，属<b>未来函数</b>，不可作为买点）；③ <b>追高是铁律禁区</b>：竞价高开 &gt;2% 整体 T+1 <b style="color:#26a69a;">−1.148%</b>（胜率仅 35.9%），高开 6~9.8% 更差；④「信号日收盘买」口径 T+5 +2.02%（t=5.98）显著，但那是<b>不可成交的价格</b>。⇒ 严格过滤的价值是<b>降噪排序 + 次日避坑</b>。筹码穿刺分支因外部指标 SSRP 在 v8 无源、定义未知，已按审计砍除。仅研究参考，不构成投资建议。</div>'
+      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b><b style="color:#e0b34a;">★严格</b>＝六项 K 线过滤全过（金标·置顶）；<b style="color:#26a69a;">✓</b>＝仅基础口径达标；其余收进折叠区。排列「严格 → 基础 → 封板资金降序」。每格直接标出<b>量比</b>（＝当日量÷昨日量）：<b style="color:#fbbf24;">量比越小、隔夜溢价越高（≤1 档 +2.08%、3~6.18 档 +0.62%）</b>，但缩量封板更可能全天不开板 ⇒ 买不到。鼠标悬停可见未过项与读数。</div>'
+      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#fb923c;">🎯 怎么买（实测：方向必须反过来）：</b>本卡是<b>候选池</b>。实测最有把握的用法＝<b style="color:#ef5350;">当日盘中开板时买入 → 次日卖出</b>（吃隔夜跳空）：<b style="color:#ef5350;">+0.92%/次</b>（已扣 0.6% 成本）、按日组合胜率 <b style="color:#ef5350;">78.3%</b>、t=8.76，样本内 +0.922%／样本外 +0.916%、<b>11 个月全正</b>；量比≤1 档更优（+2.08%，t=7.3）；次日卖在开盘 +0.92%、卖在收盘 +0.94%（不必抢开盘）。<b style="color:#26a69a;">❌ 反面用法（次日开盘买 → 次日收盘卖）＝ −0.58%（t=−3.9）</b>，高开 6~9.8% 追进去当日 −3.14% ⇒ 别这么干。⚠️ <b>执行时点在盘中</b>（须在开板期间买；按收盘价买＝涨停价排队，买不到），本卡盘后生成，仅供口径核对与盘前预备。</div>'
+      +'<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠ 限制（先看这三条再用）：</b>① 正期望来自「<b>开板才买得到</b>」：实测 <b style="color:#ef5350;">94.2%</b> 的样本当日开过板（可买，+0.92%）；未开板那 <b>5.8%</b> 收益虽然最高（<b style="color:#ef5350;">+6.19%</b>）却<b>根本买不进</b>。② <b>成本极敏感</b>：往返 1.2% 剩 +0.32%、1.5% 归零、<b style="color:#26a69a;">1.8% 转负</b> ⇒ 滑点与排队失败会吃掉全部利润。③ <b>必须分散</b>：单笔中位仅 +0.07%、净亏损笔占 49.4%、最差单笔 −10.67%，收益集中在右尾（p90 +6.25%），单押必翻车。仅研究参考，不构成投资建议。</div>'
       +'</div>';
     if(!d||!d.items||!d.items.length){
-      box.innerHTML=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径 + K线严格过滤（候选池·非买点）','update_time',{update_time:(d&&d.update_time)||''},true)+_guide;
+      box.innerHTML=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径 + K线严格过滤（隔夜打板池 · 盘中执行）','update_time',{update_time:(d&&d.update_time)||''},true)+_guide;
       return;
     }
     var _grid='display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px 7px;';
@@ -16446,7 +16450,7 @@ h += '</div>'; // /ulPaneObserve
         +'<span style="color:#888;font-size:9px;">'+x.code+'</span>'
         +'<span style="margin-left:auto;white-space:nowrap;">'+(isS?'<span style="color:#e0b34a;font-size:9.5px;font-weight:700;">★</span>':(x.basic_pass?'<span style="color:#26a69a;font-size:9.5px;">✓</span>':''))+kn+'</span></div>'
         +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.industry+'</div>'
-        +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">流通'+x.circ_mcap+'亿·换'+x.turnover+'%·<span style="'+_vrc+'"'+((_vr!==null&&_vr<=0.5)?(' title="量比'+_vr+'≤0.5：次日大概率高开，慎追"'):'')+'>量'+(_vr===null?'—':_vr)+'</span></div>'
+        +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">流通'+x.circ_mcap+'亿·换'+x.turnover+'%·<span style="'+_vrc+'"'+((_vr!==null&&_vr<=0.5)?(' title="量比'+_vr+'≤0.5：隔夜溢价最高（≤1档 +2.08%），但缩量封板常全天不开板、买不到"'):'')+'>量'+(_vr===null?'—':_vr)+'</span></div>'
         +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">封'+x.seal+'亿·'+ft+'</div>'
         +l5
         +'</div>';
@@ -16464,9 +16468,9 @@ h += '</div>'; // /ulPaneObserve
     var _kna=(d.kline_na>0)?(' ｜ <span style="color:#8b98a8;">K线不可用 '+d.kline_na+' 只</span>'):'';
     var _slow=0;
     d.items.forEach(function(x){ var v=(x.read||{}).vol_ratio; if(v!==undefined&&v!==null&&v<=0.5) _slow++; });
-    var html=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径 + K线严格过滤（一进二公式六项）· 候选池（非买点）','update_time',d)
+    var html=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径 + K线严格过滤（一进二公式六项）· 隔夜打板池 · 盘中执行','update_time',d)
       +'<div style="padding:4px 0 8px;color:#bbb;font-size:12px;">数据日 <b style="color:#fbbf24;">'+_dd+'</b> 主板首板 <b style="color:#ef5350;">'+d.total+'</b> 只 ｜ 严格达标 <b style="color:#e0b34a;">'+(d.strict_pass||0)+'</b> 只 ｜ 基础达标 <b style="color:#26a69a;">'+d.basic_pass+'</b> 只'+_kna
-      +(_slow?(' ｜ <span style="color:#fbbf24;">次日易高开 '+_slow+' 只</span> <span style="color:#8b98a8;">(量比≤0.5，慎追)</span>'):'')+'</div>'
+      +(_slow?(' ｜ <span style="color:#ef5350;">隔夜溢价最高 '+_slow+' 只</span> <span style="color:#8b98a8;">(量比≤0.5 · 须开板才买得到)</span>'):'')+'</div>'
       +_guide
       +_body;
     box.innerHTML=html;
