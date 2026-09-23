@@ -1,0 +1,96 @@
+# 九宝量化 v8.0 — 东财 clist fs 探针（一次性诊断，验完即删）
+#
+# 背景：2026-09-23 ETF_DAILY_MONITOR/ETF_PULSE 弃 akshare 改 em_clist 后云端返回空，
+#   而 ETF_INTRADAY_HEAT（fs=m:1+t:9）同端点正常 ⇒ 需实测定罪是哪个参数组合的问题。
+# 本探针从 GitHub 官方 ubuntu（与生产抓取同环境）测多组 fs/fid/pn 参数，
+#   结果 JSON 提交回仓 raw_data/_em_probe.json（Contents API，无敏感信息）。
+
+name: "🔬 v8 东财clist探针(一次性)"
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8_em_probe
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: "🔬 实测多组 fs 参数"
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, time, urllib.request, urllib.parse, base64
+
+          H = {
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+              "Referer": "https://data.eastmoney.com/zjlx/detail.html",
+              "Accept": "*/*",
+          }
+          UT = "b2884a393a59ad64002292a3e90d46a5"
+
+          def clist(host, fs, fields, fid, pz=100, po="1", pn=1):
+              params = {"pn": str(pn), "pz": str(pz), "po": po, "np": "1", "fltt": "2",
+                        "invt": "2", "ut": UT, "fid": fid, "fs": fs, "stat": "1",
+                        "fields": fields, "_": int(time.time() * 1000)}
+              url = f"https://{host}/api/qt/clist/get?" + urllib.parse.urlencode(params)
+              try:
+                  req = urllib.request.Request(url, headers=H)
+                  d = json.load(urllib.request.urlopen(req, timeout=20))
+                  rc = d.get("rc")
+                  data = d.get("data")
+                  diff = (data or {}).get("diff") or []
+                  total = (data or {}).get("total")
+                  sample = diff[0] if diff else None
+                  return {"rc": rc, "has_data": data is not None,
+                          "api_total": total, "rows": len(diff),
+                          "sample": {k: sample.get(k) for k in ("f12", "f14", "f62")} if sample else None}
+              except Exception as e:
+                  return {"error": f"{type(e).__name__}: {e}"}
+
+          cases = []
+          def case(tag, **kw):
+              r = clist(**kw)
+              cases.append({"tag": tag, **kw, **r})
+              print(f"  {tag}: {json.dumps(r, ensure_ascii=False)[:200]}")
+
+          case("A_沪ETF_f12_分页", host="push2delay.eastmoney.com", fs="m:1+t:9", fields="f12,f14,f62", fid="f12", pz=100, pn=1)
+          case("B_沪深ETF_f12_分页", host="push2delay.eastmoney.com", fs="m:1+t:9,m:0+t:9", fields="f12,f14,f62", fid="f12", pz=100, pn=1)
+          case("C_深ETF_f12", host="push2delay.eastmoney.com", fs="m:0+t:9", fields="f12,f14,f62", fid="f12", pz=100, pn=1)
+          case("D_沪深ETF_f62_pz5000", host="push2delay.eastmoney.com", fs="m:1+t:9,m:0+t:9", fields="f12,f14,f62", fid="f62", pz=5000, po="1", pn=1)
+          case("E_B的第2页", host="push2delay.eastmoney.com", fs="m:1+t:9,m:0+t:9", fields="f12,f14,f62", fid="f12", pz=100, pn=2)
+          case("F_主站push2_沪深ETF", host="push2.eastmoney.com", fs="m:1+t:9,m:0+t:9", fields="f12,f14,f62", fid="f12", pz=100, pn=1)
+          case("G_热力图原样_f62_pz3000", host="push2delay.eastmoney.com", fs="m:1+t:9", fields="f12,f14,f2,f3,f6,f62,f184", fid="f62", pz=3000, po="1", pn=1)
+
+          out = {"probe_time": time.strftime("%Y-%m-%d %H:%M:%S"), "cases": cases}
+          body = json.dumps(out, ensure_ascii=False, indent=1).encode("utf-8")
+
+          TOK = os.environ["GITHUB_TOKEN"]
+          REPO = os.environ["REPO"]
+          PATH_ = "raw_data/_em_probe.json"
+          BR = "main"
+          def gh(url, method="GET", data=None):
+              req = urllib.request.Request(url, data=data, method=method, headers={
+                  "Authorization": f"Bearer {TOK}", "Accept": "application/vnd.github+json"})
+              return json.load(urllib.request.urlopen(req, timeout=30))
+          try:
+              old = gh(f"https://api.github.com/repos/{REPO}/contents/{PATH_}?ref={BR}")
+              sha = old["sha"]
+          except Exception:
+              sha = None
+          payload = {"message": "chore(probe): 东财clist fs探针结果(一次性)", "content": base64.b64encode(body).decode(),
+                     "branch": BR}
+          if sha: payload["sha"] = sha
+          gh(f"https://api.github.com/repos/{REPO}/contents/{PATH_}", "PUT",
+             json.dumps(payload).encode())
+          print("✅ 探针结果已提交 raw_data/_em_probe.json")
+          PYEOF
