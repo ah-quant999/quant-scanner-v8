@@ -2058,13 +2058,16 @@ items:
       git ls-files 资产清单 6 条；自动化任务表两条已置 PAUSED（automation_update 回读）；
       首次补丁打在落后 176 commit 的旧基线上，检出后按防覆盖铁律在最新 origin/main 上重做。"
     residual: "raw_data/history/*.json 等冻结历史归档按原则未动；本机 06:30/08:30 自动化
-      仅 PAUSED 未删（铁律：禁删阿狸咪任务）；若日后要恢复卡，git 历史可完整回溯。"
+      仅 PAUSED 未删（铁律：禁删阿狸咪任务）；若日后要恢复卡，git 历史可完整回溯。
+      〔09-23 后记〕本项②修复所服务的「解禁&机构关注」因子观测卡当日已由主人拍板整卡删除
+      （commit 8991c96ad / ba85f9cde，见 unlockcover-factor-observation-card），
+      __renderUnlockCover 全链随之退役。"
     updated: "2026-09-22 06:59"
   # ── P2 · 候选因子观测（跨机口径对齐） ──────────────────────────────────
   - id: unlockcover-factor-observation-card
     priority: P2
     owner: shared
-    status: doing
+    status: done
     what: >
       「暂未上架 › 解禁&机构关注」因子观测卡（commit 33499302c8，阿狸咪 09-22 05:31 上线）的
       **转正前口径对齐**。小九 09-22 09:57 完成四方实测取证，确认该链**已真跑通**
@@ -2119,7 +2122,18 @@ items:
       定回测口径 → doing（进 algorithms/ 并按 v8 铁律过 verify_chain_consistency.py
       时序契约 + v8_stage_gate.py 分批判据）；或定「仅作展示不外测」→ done
       （并在 CARD_DEFS 登记 page=暂未上架·观测类、freq=每日盘前、max_age=1440）。
-    updated: "2026-09-22 21:21"
+    resolution: >
+      🔴 2026-09-23 12:05 主人拍板：**整卡删除**。解禁段与盘后页「解禁日历」同源纯重复（同一份
+      window.RESTRICTED_RELEASE，解禁日历为超集）；机构关注段无验证价值（与阿狸咪 §5 答复
+      「触发率≈0.56% 踩废线、report_count_1m 硬编码、不具备转正条件」互相印证）。
+      落地：commit 8991c96ad（index.html 删注入/渲染函数/挂载/卡壳/派发 5 处；
+      update_v8.py 删 CATEGORY_MAP 映射 + freq 项 + INST_COVERAGE 转换分支；
+      cloud_fetch_v8.py 四处注释收口）+ commit ba85f9cde（data/INST_COVERAGE.js 线上下架，
+      本地备份 E:/v8data/qs8-tmp/repo_trash_20260923/）。逐字节自验通过。
+      raw analyst_ratings.json 与 ANALYST_RATINGS 抓取链**保留**（algorithms/generate_top10.py 消费）。
+      Q1-Q3 口径问答随卡删除终结；若日后重启因子验证，§5 答复的两套回测口径仍有效
+      （离线做，有效再回前端）——本项「仅作展示→done+登记 CARD_DEFS」分支不再适用（卡已删）。
+    updated: "2026-09-23 12:05"
 
   # ── 2026-09-22 11:4x 阿狸咪新增（cn_fetch 单模块源级失败 ⇒ 两张卡面冻结；run 仍 success = 假绿）──
   - id: cnfetch-single-source-stale
