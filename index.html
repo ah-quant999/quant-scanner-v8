@@ -665,7 +665,7 @@ window.__domReadyFns=[];
          scripts/{baihechou_daily,fetch_baihechou_v8,set_baihechou_analysis}.py 与本机 06:30/08:30
          自动化（98101962/622ad154，按铁律 PAUSED 不删）一并退役；window.CRISIS_DATA 宏观硬指标
          仍被每日洞察/情绪周期消费 ⇒ 只删卡壳不删源。 -->
-    <script src="data/BOARD_FIRST_LIMIT.js?v=1790163353" defer></script><!-- 🔥 主板首板 · 一进二观察（数据源：akshare.stock_zt_pool_em 完整涨停池 → 主板首板 + 基础口径过滤；盘后日更 · window.BOARD_FIRST_LIMIT） -->
+    <script src="data/BOARD_FIRST_LIMIT.js?v=1790163965" defer></script><!-- 🔥 主板首板 · 一进二观察（数据源：akshare.stock_zt_pool_em 完整涨停池 → 主板首板 + 基础口径过滤；取最近一个已收盘交易日 · cn fetch 每轮刷新 · window.BOARD_FIRST_LIMIT） -->
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=1790163353" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
@@ -16372,35 +16372,41 @@ h += '</div>'; // /ulPaneObserve
     el.innerHTML = html;
   }
   window.__renderCycleLadderCard = __renderCycleLadderCard;
-  // 🔥 主板首板 · 一进二观察卡渲染器（2026-09-21）
+  // 🔥 主板首板 · 一进二观察卡渲染器（2026-09-21 建；2026-09-23 阿狸咪的工程师：1行2列 + 核心/用法/限制 + 数据日口径）
   function __renderBoardFirstLimit(){
     var box=document.getElementById('boardFirstLimitCard');
     if(!box) return;
     var d=window.BOARD_FIRST_LIMIT;
+    var _dd=(d&&d.date&&String(d.date).length===8)?(String(d.date).slice(4,6)+'-'+String(d.date).slice(6,8)):'—';
+    // 核心/用法/限制（全站统一范式）
+    var _guide='<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:10px 12px;margin:0 0 10px;line-height:1.8;font-size:12px;color:var(--txt);">'
+      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">📌 核心：</b>在<b>最近一个已收盘交易日</b>的<b>主板首板</b>（60/00 开头 · 连板数=1）里，找出符合<b style="color:#26a69a;">基础口径</b>的观察标的：流通市值&lt;120亿<b>或</b>流通股&lt;4亿 ＋ 换手率&gt;2% ＋ 炸板 0 次（封板干净）。</div>'
+      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b>「✓基础」= 三项基础口径全达标（绿标）；列表按「基础达标优先 → 封板资金降序」排列。一进二看的是<b>次日承接</b>，基础口径只是初筛，须结合板块情绪（涨停天梯／炸板率）与个股位置。</div>'
+      +'<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠ 限制：</b>当前<b>仅有基础口径</b>，K 线严格过滤（控盘指数／三线粘合／角度60°／涨停确认／量差／筹码穿刺）<b>尚未接入</b> ⇒ 本卡是<b>观察名单、非选股信号</b>。仅研究参考，不构成投资建议。</div>'
+      +'</div>';
     if(!d||!d.items||!d.items.length){
-      box.innerHTML=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径过滤（观察）','update_time',{update_time:(d&&d.update_time)||''},true);
+      box.innerHTML=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径过滤（观察）','update_time',{update_time:(d&&d.update_time)||''},true)+_guide;
       return;
     }
-    var rows='';
+    var cells='';
     d.items.forEach(function(x){
       var tag=x.basic_pass
-        ? '<span style="color:#26a69a;font-size:11px;margin-left:4px;">✓基础</span>'
-        : '<span style="color:#666;font-size:11px;margin-left:4px;">—</span>';
-      rows+='<div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;">'
-        +'<span style="color:#ef5350;min-width:64px;">'+x.name+'</span>'
-        +'<span style="color:#888;min-width:56px;">'+x.code+'</span>'
-        +'<span style="color:#bbb;min-width:72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.industry+'</span>'
-        +'<span style="color:#ccc;min-width:64px;">流通'+x.circ_mcap+'亿</span>'
-        +'<span style="color:#ccc;min-width:52px;">换'+x.turnover+'%</span>'
-        +'<span style="color:#ccc;min-width:52px;">封'+x.seal+'亿</span>'
-        +'<span style="color:#888;min-width:56px;">'+x.first_time+'</span>'
-        +tag
+        ? '<span style="color:#26a69a;font-size:10.5px;font-weight:700;">✓基础</span>'
+        : '<span style="color:#666;font-size:10.5px;">—</span>';
+      var ft=String(x.first_time||''); if(ft.length===6) ft=ft.slice(0,2)+':'+ft.slice(2,4);
+      cells+='<div style="font-size:11px;padding:4px 6px;border:1px solid var(--border2);border-radius:6px;background:rgba(255,255,255,0.03);min-width:0;">'
+        +'<div style="display:flex;align-items:center;gap:5px;">'
+        +'<b style="color:#ef5350;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.name+'</b>'
+        +'<span style="color:#888;">'+x.code+'</span>'
+        +'<span style="margin-left:auto;">'+tag+'</span></div>'
+        +'<div style="color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.industry+' · 流通'+x.circ_mcap+'亿 · 换'+x.turnover+'%</div>'
+        +'<div style="color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">封'+x.seal+'亿 · 首封'+ft+'</div>'
         +'</div>';
     });
-    var html=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径（流通市值<120亿/流通<4亿 + 换手>2% + 封板干净）','update_time',d)
-      +'<div style="padding:4px 0 8px;color:#bbb;font-size:12px;">今日主板首板 <b style="color:#ef5350;">'+d.total+'</b> 只 ｜ 基础口径达标 <b style="color:#26a69a;">'+d.basic_pass+'</b> 只'
-      +'<div style="color:#888;font-size:11px;margin-top:3px;line-height:1.5;">K线严格过滤（控盘指数/三线粘合/角度60°/涨停确认/量差/筹码穿刺）待云端K线步接入；当前仅基础口径，属<b>观察名单</b>非选股信号。</div></div>'
-      +'<div style="max-height:340px;overflow:auto;">'+rows+'</div>';
+    var html=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径（流通市值<120亿或流通<4亿 + 换手>2% + 封板干净）','update_time',d)
+      +'<div style="padding:4px 0 8px;color:#bbb;font-size:12px;">数据日 <b style="color:#fbbf24;">'+_dd+'</b> 主板首板 <b style="color:#ef5350;">'+d.total+'</b> 只 ｜ 基础口径达标 <b style="color:#26a69a;">'+d.basic_pass+'</b> 只</div>'
+      +_guide
+      +'<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px 10px;max-height:340px;overflow:auto;">'+cells+'</div>';
     box.innerHTML=html;
   }
   window.__renderBoardFirstLimit = __renderBoardFirstLimit;

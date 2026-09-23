@@ -26,25 +26,79 @@ def _latest_trading_day():
     """返回 YYYYMMDD；默认今天(CST)，调用方可覆盖。"""
     return _now_cst().strftime('%Y%m%d')
 
+# ── 交易日历 + 已收盘交易日（2026-09-23 阿狸咪的工程师：错日根因修复）────────────
+# 🔴 病灶：东财 getTopicZTPool 对「未收盘的今天 / 未来日」一律吐**最新存量池** ——
+#   实测 date=20260924（未来日）返回内容与 20260923 完全相同；周六/周日 → 真返回空池。
+#   ⇒ 原「空池才回溯」护栏对「未收盘的今天/未来日」**永不触发**：盘前 08:20 用 date=今天
+#     请求即拿到上一交易日的池，却按「请求日」打标 ⇒ 卡面写「今日」实为昨日（假新鲜）。
+# 🔴 正解：默认模式先用**交易日历**算出「最近一个已收盘定稿交易日」，只对该日查询；
+#   查询空时才沿交易日历（只试真交易日）往前回溯。绝不接受未收盘/非交易日。
+_CAL_CACHE = None
+
+def _trade_calendar():
+    """A股交易日历 set('YYYYMMDD')；akshare 不可用时返回 None（回退按周一~周五判定）。"""
+    global _CAL_CACHE
+    if _CAL_CACHE is not None:
+        return _CAL_CACHE
+    try:
+        import akshare as ak
+        df = ak.tool_trade_date_hist_sina()
+        if df is not None and not df.empty and 'trade_date' in df.columns:
+            _CAL_CACHE = set(str(x)[:10].replace('-', '') for x in df['trade_date'])
+            return _CAL_CACHE
+    except Exception as e:
+        print('WARN: 交易日历获取失败(%s) → 回退按周一~周五判定' % e)
+    _CAL_CACHE = None
+    return None
+
+def _is_trading_day(d):
+    cal = _trade_calendar()
+    if cal is not None:
+        return d.strftime('%Y%m%d') in cal
+    return d.weekday() < 5
+
+def _last_closed_trading_day():
+    """最近一个**已收盘定稿**的交易日（date 对象）。
+
+    · 今天是交易日且已过 16:00 CST ⇒ 取今天（给东财留定稿余量，避开 15:00 刚收盘未定稿）；
+    · 否则（盘前 / 盘中 / 周末 / 节假日）⇒ 取上一个交易日。
+    """
+    now = _now_cst()
+    d = now.date()
+    if not (_is_trading_day(d) and (now.hour * 100 + now.minute) >= 1600):
+        d = d - datetime.timedelta(days=1)
+    for _ in range(20):
+        if _is_trading_day(d):
+            return d
+        d = d - datetime.timedelta(days=1)
+    return d
+
 def build(date=None):
     import akshare as ak
     explicit = date is not None
     if date is None:
-        date = _latest_trading_day()
+        # 2026-09-23 修复：默认不再"以今天为起点试"，而是取最近一个**已收盘定稿交易日**
+        date = _last_closed_trading_day().strftime('%Y%m%d')
     df = ak.stock_zt_pool_em(date=date)
     if (df is None or len(df) == 0) and not explicit:
-        # 2026-09-23 追加（阿狸咪·夜间窗口）：默认模式下当日无池（凌晨/周末/节假日/源未更新）
-        # 时，向前最多回溯 7 个自然日找最近一个有涨停池的交易日 —— 本卡语义是
-        # 「最近一个已收盘交易日的涨停池观察」，不是「今天必须有」；同日去重护栏保证
-        # 已采集过的交易日不会被回溯档覆盖。显式传日期（手动回补）时不回溯，所见即所得。
-        for _i in range(1, 8):
-            _d = (_now_cst() - datetime.timedelta(days=_i)).strftime('%Y%m%d')
-            _df = ak.stock_zt_pool_em(date=_d)
+        # 2026-09-23 修复（错日根因）：原「自然日回溯」在拿到未收盘/未来日的**存量池**时
+        #   不触发（东财对这些日期返回最新存量而非空）⇒ 错标请求日。现改为**沿交易日历**
+        #   往前找最近一个有池的交易日（≤7 个交易日），只试真交易日，杜绝存量池错标。
+        _d0 = datetime.datetime.strptime(date, '%Y%m%d').date()
+        _tried = 0
+        for _i in range(1, 22):
+            _d = _d0 - datetime.timedelta(days=_i)
+            if not _is_trading_day(_d):
+                continue
+            _tried += 1
+            _df = ak.stock_zt_pool_em(date=_d.strftime('%Y%m%d'))
             if _df is not None and len(_df) > 0:
-                date = _d
+                date = _d.strftime('%Y%m%d')
                 df = _df
                 print('BACKFILL: %s 无池 → 回溯到最近有池交易日 %s' % (
-                    _latest_trading_day(), _d))
+                    _d0.strftime('%Y%m%d'), date))
+                break
+            if _tried >= 7:
                 break
     if df is None or len(df) == 0:
         return None, date, "当日无涨停池数据（非交易日或源未更新，含回溯 7 日）"
@@ -99,7 +153,7 @@ def build(date=None):
         'date': date,
         'total': len(items),
         'basic_pass': basic_n,
-        'note': '主板首板观察（东方财富涨停池派生）；基础口径=主板+首板+流通市值<120亿或流通股<4亿+换手率>2%+封板干净；K线严格过滤待云端K线步',
+        'note': '主板首板观察（东方财富涨停池派生·已收盘定稿交易日）；基础口径=主板+首板+流通市值<120亿或流通股<4亿+换手率>2%+封板干净；K线严格过滤待云端K线步',
         'items': items,
     }
     return out, date, None
