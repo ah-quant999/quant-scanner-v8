@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 04:55"
+  updated: "2026-09-23 12:04"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 59
+  next_id_seq: 60
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -2978,4 +2978,37 @@ items:
       直推 main，远端 update_time 由 2026-09-21 23:23 刷新至 2026-09-23 04:55。
     verified_at: "2026-09-23 04:55 CST（阿狸咪手动补数据 + 直推，红警解除；自动化每轮刷新待下一档 cn fetch 终验）"
     updated: "2026-09-23 04:55"
+    updated_by: 阿狸咪的工程师
+
+  - id: algo-step16-sanity-hardfail
+    priority: P1
+    owner: shared
+    status: pending-verify
+    what: >
+      algo 链（`v8_algo_cloud.yml`）step16「🛡 机器校验」在 2026-09-22 20:13 – 09-23 05:57 期间**连续 6 档硬失败**，
+      逐字判词 `❌ 硬失败 2 项: [CANDIDATE_BACKTEST] update_time 陈旧 8.3 天(2026-09-14 22:50)… [GOLD_POOL_BACKTEST] 同`。
+      这两项是**回测产物**（非每日刷新，跨周才更新），被 `algorithms/verify_data_sanity.py` 的通用新鲜度对账
+      误判为「陈旧」⇒ **产物本身正确、数据链路正常，属假红**。但该步位置在**唯一推送步（step14）之后**，
+      故产物已正常上线、run 却记 failure；更重的副作用是**红噪声掩盖后续真实硬失败**（无法从红灯里分辨真假）。
+      失败档：09-22 20:13、09-23 00:12 / 01:35 / 02:11 / 04:53 / 05:57；
+      另有 03:48 档为「runner 掉线族」（steps 全 None），同族但**不同因**，勿并入本项。
+    fix: >
+      已由对方于 2026-09-23 07:01:22 CST 落地：commit `fb2c48c987`（仅 `algorithms/verify_data_sanity.py`，+7/−0），
+      把 `CANDIDATE_BACKTEST` / `GOLD_POOL_BACKTEST` 加入该脚本豁免集，注释明写「回测非每日数据·品类误判」。
+      远端 blob `b9d7375d1713` / 16,967 B / CRLF=0。**代码层已到位，但尚未被任何真跑档验证**（见 evidence ②）。
+    evidence: >
+      ① **唯一调用点**：全仓仅 `v8_algo_cloud.yml` 调用（`python algorithms/verify_data_sanity.py --no-baseline`）；
+      `v8_health_patrol.yml` / `v8_daily_audit.yml` / `v8_cn_fetch_cloud.yml` 均 0 命中
+      ⇒ 终验**只能**由 algo 链的「真跑档」产生，不能靠巡检链代验。
+      ② 07:01 之后的 algo 档 = 08:03 / 09:02 / 10:15 / 11:37 / 11:52 **共 5 档，step9–step16 全部 skipped**
+      （step8「批次闸门」success ⇒ 本日批次已产出，链空转）⇒ **step16 一次都没真跑**，豁免是否生效**仍未知**。
+      ③ 修复前的真跑档 step16 全 = failure；两个模块远端 `update_time` 仍为 `2026-09-14 22:50:24`
+      （CANDIDATE_BACKTEST 3,138 B / GOLD_POOL_BACKTEST 3,112 B）⇒ 原触发条件**仍在**，可对照。
+      ④ 登记方 = 阿狸咪的工程师；以远端 `docs/ops/HANDOFF.yaml` 全文 grep `sanity` / `CANDIDATE_BACKTEST` / `step16`
+      **命中 0** 确认此前未挂账（不重复劳动）。
+    verify_how: >
+      下一档「真跑档」（step9「🧮 运行盘后算法链」conclusion = success 且**非 skipped**）中同时满足：
+      ① step16「🛡 机器校验」conclusion = **success**；② job 日志不再出现 `[CANDIDATE_BACKTEST] update_time 陈旧`；
+      ③ 该 run 的 `algo` job = success。三者齐备才可置 done 并填 `verified_at`（实测时刻）。
+    updated: "2026-09-23 12:04"
     updated_by: 阿狸咪的工程师
