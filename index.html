@@ -8781,8 +8781,8 @@ window.__renderIndexObserve = function(){
              当日每轮 v8_build_deploy 的 [4/8] align_logic_ops 恒红 ⇒ **deploy 全链被阻断**
              （算法数据推了不部署）。本项即该缺口的收口。
            ⚠️ 教训：新建带 cron 的 workflow 必须当轮完成双登记，否则当晚数据一律上不了线。
-         3 项 ALLOW_NO_CRON（仅 workflow_dispatch 应急 / 事件驱动）：
-           v8_algo_run | v8_cn_fetch_cloud_selfhosted | v8_build_deploy
+         4 项 ALLOW_NO_CRON（仅 workflow_dispatch 应急 / 事件驱动）：
+           v8_algo_run | v8_cn_fetch_cloud_selfhosted | v8_build_deploy | v8_align_gate
          2026-09-10 阿狸咪「派发源精简」清理（防止名单积灰再次误导）：
            · v8_freshness_watch / v8_slot_scheduler —— 文件已删除 → 从名单彻底移除
            · v8_cn_fetch / v8_algo / v8_sync_v6_data / v8_sync_legacy —— 文件早已不存在 → 删除死登记

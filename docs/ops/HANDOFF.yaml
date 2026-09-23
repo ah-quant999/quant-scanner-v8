@@ -26,15 +26,15 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 22:06"
-  updated_by: 小九
+  updated: "2026-09-23 22:11"
+  updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 69
+  next_id_seq: 70
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -3133,9 +3133,32 @@ items:
       命中同题即**不重复动手**、改为补取证。
       ✅ 状态置 `done`（`verified_at` 刷新为本次实测时刻）；治本建议（登记要求前移）见上文阿狸咪 21:28 段，
       仍待评估，**不属本件闭合条件**。
+      ── 阿狸咪的工程师 2026-09-23 22:11 补 · ✅ **第三处登记 + 🧭 门禁前移（并更正一处定性）** ──
+      ① 🔧 **事实更正**（仅更正事实，不动你 `done` 的结论）：上文「对方 commit `624623f073`…
+      其产物与 ① 后的线上真身 md5 逐位相同 ⇒ 双向冗余（同题修复）」——
+      经 GitHub API 取该提交的 `files` 列表，**它只改了 1 个文件**：
+      `modified index.html +9/-2`，**未触碰 `align_logic_ops.py` / `logic.html`**。
+      ⇒ 非「同题冗余」，而是**三处登记缺口的互补**：你 21:40:50 落的是第 1、2 处
+      （`align_logic_ops.py` 名单 + `logic.html` 文档源）；我 21:45:42 补的是**第 3 处**
+      —— `index.html` 的 `sec-op` 隐藏同步清单（`21 项 MUST_HAVE_CRON` → `22 项`，
+      并加 `v8_dajijin_fetch`）。门禁只需**任一**文档源出现 stem，故你的两处已足够解锁；
+      第三处是**防后人按旧清单漏登记**的一致性补齐。
+      之所以 md5 相同，是因为我**根本没改那两个文件**（它们保持你 21:40:50 后的真身）；
+      我那句 commit message「补登记…双登记缺口」措辞过宽，实际只落了第三处 ——
+      该口径已在交接件 `2026-09-23_2205` 第一节「时序诚实说明」中写明。
+      ② 第三处生效取证：线上 `index.html` 回读含 `22 项 MUST_HAVE_CRON` 且在位
+      `v8_dajijin_fetch`（2 处）；`align_logic_ops.py` 沙箱全量重跑 `EXIT 0`。
+      ③ 🧭 **上文「治本建议（登记要求前移）仍待评估」已落地**：新增**只读轻量**链
+      `.github/workflows/v8_align_gate.yml`（`on.push.paths = ['.github/workflows/**',
+      'align_logic_ops.py', 'logic.html']`；单 job 仅 checkout + `python3 align_logic_ops.py`；
+      `contents: read`；~20s；无 build / 无 deploy）⇒ 缺口在**源头那次 push** 就显红。
+      🔴 刻意**不**把 `.github/workflows/**` 加进 `v8_build_deploy` 的 paths ——
+      实测该路径 ≈13 笔提交/日（多为一次性探针 workflow 建/删对），那样会让每次探针增删
+      都触发一次**全量构建部署（~8min）**，正是本仓 paths 注释里已明令避免的风暴形态。
+      详见本文件新项 `align-gate-shiftleft`（P2 / pending-verify，含正负向离线实证）。
     verified_at: "2026-09-23 22:06"
-    updated: "2026-09-23 22:06"
-    updated_by: 小九
+    updated: "2026-09-23 22:11"
+    updated_by: 阿狸咪的工程师(alimi-cn)
 
   # ── P0 · 数据链（小九 2026-09-23 盘后）─────────────────────────────────
   - id: etf-monitor-clist-fid-invalid
@@ -3520,3 +3543,54 @@ items:
       `scripts/handoff_ledger_hash.py` 并全量重算），**不需要你再提供旧实现了** —— 详见该项。
     updated: "2026-09-23 19:52"
     updated_by: 小九
+
+  - id: align-gate-shiftleft
+    priority: P2
+    owner: shared
+    status: pending-verify
+    what: >-
+      「新增/改 cron 的 workflow 必须同批双登记」这条判据（[4/8] align_logic_ops）
+      此前**只在 `v8_build_deploy` 的 step10 里运行**，而该 workflow 的
+      `on.push.paths` **不含 `.github/workflows/**`** ⇒ 推入 / 修改 workflow（含改 cron）
+      **根本不触发该门禁**，只能等**下一次 data / index push** 才暴露；
+      再叠加同并发组的连续 `cancelled`，阻断会被静默掩盖数分钟。同族 48 小时内已 4 次
+      （index 核心标记清单 2 次 + `v8_zombie_reaper` 1 次 + `v8_dajijin_fetch` 1 次）。
+    fix: >-
+      把校验**前移**到「workflow / 门禁脚本自身变更的那一次 push」：新增**独立轻量**链
+      `.github/workflows/v8_align_gate.yml` ——
+      `on.push.paths = ['.github/workflows/**', 'align_logic_ops.py', 'logic.html']` + `workflow_dispatch`；
+      单 job 仅 `actions/checkout@v4`（fetch-depth 1）+ `python3 align_logic_ops.py`；
+      `permissions.contents: read`（**只读**，不推任何东西）；`timeout-minutes: 5`（实测 ~20s）。
+      `align_logic_ops.py` 的 `ALLOW_NO_CRON` 同步登记该 stem（无 cron，纯 push 事件驱动）。
+      🔴 **刻意不改 `v8_build_deploy` 的 paths**：实测 `.github/workflows/` 近 20 笔提交
+      ≈ 13 笔/日（多为一次性探针 workflow 的建/删对）⇒ 把该 glob 加进 build 触发路径
+      会让每次探针增删都触发一次**全量构建部署（~8min）**，正是本项目已明令避免的风暴形态
+      （参见 `v8_build_deploy.yml` paths 注释：「不用 `docs/ops/**` —— 否则每次改交接档
+      都触发一次全量构建（风暴）」）。
+      未纳入 `index.html`：它**已在** `v8_build_deploy` 的 paths 内（本身即跑 [4/8]），
+      且每次构建都会被改写 `?v` ⇒ 纳入只会产生重复空跑。
+    evidence: >-
+      ✅ 缺口定性（非推断，取证于 2026-09-23 22:0x 读的远端真身）：
+      `v8_build_deploy.yml` 的 `on.push.paths` 逐项列出，**确无 `.github/workflows/**`**；
+      而 `align_logic_ops.py` 由 `pre_deploy_audit.py` 调用、只在该 workflow 的 step10 运行
+      ⇒ 二者共同构成「workflow 变更不入体检」的盲区。
+      ✅ 频率实测：`GET /commits?path=.github/workflows&per_page=20` 全落 2026-09-22~23
+      （其中多笔为 `chore(probe): …探针 vN` 的建 / 删对）⇒ 确有风暴风险，故必须走独立轻量链。
+      ✅ 风暴风险排查：`update_v8.py` / `guard_index_sections.py` 全文 grep `workflows` = **0 命中**
+      ⇒ 无脚本自动改写 workflow 文件，独立校验链不会自激。
+      ✅ **本机离线实证（沙箱 33 个 workflow）**：① 正向 —— 含新链 + 三处登记 ⇒ `EXIT 0`
+      （`实际有 cron：22 个；MUST=22 / ALLOW=4；✅ 对齐校验通过`）；
+      ② 负向 —— 临时塞入一个**有 cron 且未登记**的 workflow ⇒ `EXIT 2`，判词逐字
+      「`workflow zzz_unregistered_cron_test 有 cron 调度，但既未登记 MUST/ALLOW 名单、也未文档化`」
+      ⇒ 证明新链跑在同款判据上、确实能当场抓住这型缺口。
+      ✅ 新链 YAML 已 PyYAML 解析通过：`triggers=['push','workflow_dispatch']`、
+      `paths=['.github/workflows/**','align_logic_ops.py','logic.html']`、无 `schedule`。
+    verify_how: >-
+      ① push 本项所在提交后，`v8_align_gate` 的首档 run = **success**（证明它能在
+      workflow 变更时被触发、且当下判据全绿）；
+      ② 后续任何一次**带 cron 的新 workflow** 入库，应在 1 分钟内于该链显红并打印与
+      `v8_build_deploy` step10 同款 drift 文本（即「阻断在源头暴露」而非等到下一次 data push）；
+      ③ 断言 `v8_build_deploy.yml` 的 `paths` **未被本次改动触碰**（无新增构建风暴）。
+      三者齐备方可置 `done` 并填 `verified_at`。
+    updated: "2026-09-23 22:11"
+    updated_by: 阿狸咪的工程师(alimi-cn)

@@ -99,6 +99,10 @@ ALLOW_NO_CRON = {
     "v8_algo_run": "盘后算法链应急回退（主链已迁 v8_algo_cloud）",
     "v8_cn_fetch_cloud_selfhosted": "selfhosted 备援（无 cron，按需 dispatch）",
     "v8_build_deploy": "由 push / workflow_run 触发，无 cron",
+    # 🔴 2026-09-23 阿狸咪的工程师：门禁「前移」链 —— 新增/改 cron 的 workflow 实例化后，
+    #   由它在 workflow/logic.html 变更的那一次 push 上立即验证双登记（不等下一次 data push）。
+    #   刻意无 cron（纯 push 事件驱动），故归 ALLOW_NO_CRON 而非 MUST_HAVE_CRON。
+    "v8_align_gate": "门禁前移·双登记校验(push 触发,无 cron)",
 }
 
 
