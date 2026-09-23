@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 16:26"
+  updated: "2026-09-23 16:37"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -3030,29 +3030,24 @@ items:
   - id: align-gate-unregistered-cron-workflow
     priority: P0
     owner: shared
-    status: todo
+    status: done
     what: >
-      🔴 **部署被结构性阻断**：`v8_build_deploy` 自 2026-09-23 15:41 CST 起**连续 5 档失败**
-      （#7841 15:41 / #7842 15:44 / #7843 15:50 / #7844 15:51 / #7845 16:07），全部倒在
-      `🛡️ Pre-deploy audit` 的 **[4/8] align_logic_ops**，其后 `📤 部署到 main（GitHub Pages 源）` = skipped
-      ⇒ Pages 侧不再更新。逐字判词（#7845 `build` job 日志）：
-      `❌ [4/8] align_logic_ops: align_logic_ops 失败:` /
+      🔴 **部署曾被结构性阻断**：`v8_build_deploy` 2026-09-23 15:41–16:07 CST **连续 5 档失败**
+      （#7841 / #7842 / #7843 / #7844 / #7845），全部倒在 `🛡️ Pre-deploy audit` 的
+      **[4/8] align_logic_ops**，其后 `📤 部署到 main（GitHub Pages 源）` = skipped ⇒ Pages 侧不再更新。
+      逐字判词（#7845 `build` job 日志）：`❌ [4/8] align_logic_ops: align_logic_ops 失败:` /
       `- workflow v8_zombie_reaper 有 cron 调度，但既未登记 MUST/ALLOW 名单、也未文档化`
       ⇒ 门禁按设计生效，**非误报**。
       **根因**：新增 workflow `.github/workflows/v8_zombie_reaper.yml`（commit `07ad8cf81c`，
       2026-09-23 15:35:57 CST，`cron: "*/5 * * * *"`）**未同批登记** `align_logic_ops.py` 的
       MUST/ALLOW 名单，也未文档化（脚本头部注释自述「新增带 cron 的 workflow 必须双登记」）。
-      ⚠️ **正在连带伤害**：对方 16:05:29 的 ETF 修复 `bcaa215837`（`data/ETF_PULSE.js` 与
-      `data/ETF_DAILY_MONITOR.js` 改 fid=f3 遍历全市场）**已落 main 但无法部署**（其触发的 #7845 即红档）。
-      属「新增/删除功能未同步登记清单」家族第 4 次（前 3 次：index 核心标记清单 2 次 + 本次）。
+      属「新增/删除功能未同步登记清单」家族**第 4 次**（前 3 次：index 核心标记清单 2 次 + 本次）。
     fix: >
       双登记（缺一即红）：① `align_logic_ops.py` → `MUST_HAVE_CRON` 增一行
       `"v8_zombie_reaper": "僵尸run收割机(服务器侧每5分钟·自托管掉线兜底)"`；
-      ② 文档源三选一（`align_logic_ops.py` 的 `DOC_SOURCES`：`index.html#sec-op` /
-      `index.html#sec-lg` / `logic.html#sec-lg`，脚本取 `id="sec-*"` 起至文件末的正文）
-      **出现字面量 `v8_zombie_reaper` 一次**即可（建议落运维页 sec-op 的调度矩阵）。
-      ⚠️ ② 落在 `index.html` / `logic.html` —— 属小九白天专属窗口的高危前端文件，
-      阿狸咪**不在对方窗口内代改**（防踩踏）；若 17:45 后仍红，则由阿狸咪夜间窗口接手。
+      ② 文档源（`align_logic_ops.py` 的 `DOC_SOURCES`：`index.html#sec-op` / `index.html#sec-lg` /
+      `logic.html#sec-lg`，脚本取 `id="sec-*"` 起至文件末的正文）**出现字面量 `v8_zombie_reaper` 一次**。
+      实修由对方完成（见 evidence ⑤）：`align_logic_ops.py +4/-0` + `logic.html +1/-0`。
     verify_how: >
       下一档 `v8_build_deploy` 的 `build` job 同时满足：① 日志出现 `✅ [4/8] align_logic_ops`；
       ② 整条 `Pre-deploy audit` = success；③ `📤 部署到 main（GitHub Pages 源）` = success。
@@ -3062,10 +3057,19 @@ items:
       `Pre-deploy audit`，step11/12/13 全 skipped；`gate` job = success
       ⇒ **既非「闸门 skip」族、也非「部署非快进」族**，是一族新阻断。
       ② 同档门禁其余 13 项全绿（`✅ [10/10] index 核心标记守卫: 35/35`、
-      `✅ [13/13] …items=61 next_id_seq=60`、`✅ [9/9] 回测口径守卫`）
-      ⇒ **唯一红项就是 [4/8]**，修它即解锁。
-      ③ 实证：远端 `.github/workflows/` 共 32 个（含 v8_zombie_reaper.yml）；`align_logic_ops.py`
-      blob `0490201c47af` / 6,858 B；其 `MUST_HAVE_CRON`（21 条）与 `ALLOW_NO_CRON`（3 条）**均无** zombie_reaper。
-      ④ 登记方 = 阿狸咪的工程师；以远端 YAML 全文 grep `zombie` / `reaper` **命中 0** 确认此前未挂账（不重复劳动）。
-    updated: "2026-09-23 16:26"
+      `✅ [9/9] 回测口径守卫`）⇒ **唯一红项就是 [4/8]**，修它即解锁。
+      ③ 实证：远端 `.github/workflows/` 共 32 个（含 v8_zombie_reaper.yml）；当时 `align_logic_ops.py`
+      blob `0490201c47af` / 6,858 B，其 `MUST_HAVE_CRON`（21 条）与 `ALLOW_NO_CRON`（3 条）**均无** zombie_reaper。
+      ④ 登记方 = 阿狸咪的工程师；以远端 YAML 全文 grep `zombie` / `reaper` **命中 0** 确认此前未挂账。
+      ⑤ **闭环取证**：对方 `44d3d212`（2026-09-23 **16:25:12** CST，message 明写「含修 align_logic_ops
+      漏登记 v8_zombie_reaper」）落 `align_logic_ops.py +4/-0` + `logic.html +1/-0`；
+      其后**第一档即绿**：`v8_build_deploy` **#7846**（16:25:22，head `44d3d212`）——
+      日志逐字 `✅ [4/8] align_logic_ops: align_logic_ops EXIT 0（逻辑详解页与真 workflow 对齐）`，
+      step10 `Pre-deploy audit` = **success**、step13 `📤 部署到 main（GitHub Pages 源）` = **success**、
+      `build` job = success；并 `✅ [13/13] …items=61（ledger 锚 61 个 id 全在）· next_id_seq=60≥60`。
+      ⏱️ **时序诚实说明**：我方 16:2x 据 #7845（16:07）判红并登记于 16:26，而对方修复提交为 **16:25:12**
+      （早约 1 分钟 ⇒ 双方并发，非重复劳动，也非我方误判：判红所用档 #7841–#7845 均真实存在）。
+      本项**保留作同族档案**，勿再当待修。
+    verified_at: "2026-09-23 16:37"
+    updated: "2026-09-23 16:37"
     updated_by: 阿狸咪的工程师

@@ -64,7 +64,7 @@
     "algo-step16-sanity-hardfail",
     "align-gate-unregistered-cron-workflow"
   ],
-  "updated": "2026-09-23 16:26",
+  "updated": "2026-09-23 16:37",
   "generated_by": "阿狸咪的工程师(alimi-cn)",
   "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
   "id_content_hashes": {
@@ -129,7 +129,7 @@
     "trunc-read-treated-as-success": "8c6caa12b4ddfde3",
     "board-first-limit-automation": "ba0e5665f59900e2",
     "algo-step16-sanity-hardfail": "ab76e95f86868264",
-    "align-gate-unregistered-cron-workflow": "eb2793c9da682f99"
+    "align-gate-unregistered-cron-workflow": "65aea4c99db21407"
   },
   "id_content_hash_note": "每 id 内容哈希（sha256 前 16 位；计算时把该 item 的 updated 时间戳归一化为 <ts>，并剔除块尾分隔注释，以排除纯时间漂移与插项造成的假阳性）。用途：现「ids 集合」锚只能抓 item 消失或整体回滚，抓不到「id 仍在、但内容被旧版顶掉」—— 那恰是防覆盖要防的主类。校验：按同一规则重算，逐 id 比对，不一致即视为内容被回退。（2026-09-23 阿狸咪的工程师 修正块边界：改为截到最后一个非空非注释行，解决插新项导致后续项哈希变化的误报）。"
 }
