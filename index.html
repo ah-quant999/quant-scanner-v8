@@ -1855,10 +1855,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <!-- 2026-08-08 主人令：最终推荐 = 全站唯一买卖决策入口，置于选股策略左侧并默认激活 -->
   <div class="tab active" data-sec="final" onclick="switchSec('final',this)">🏆 最终推荐</div>
   <div class="tab" data-sec="query" onclick="switchSec('query',this)">🔍 个股查询</div>
-  <!-- 2026-09-15 主人令：选股策略取消加锁，全员可见（原「降级为辅助策略池，仅管理员可见」作废） -->
-  <div class="tab" data-sec="st" onclick="switchSec('st',this)">🎯 选股策略</div>
-  <!-- 2026-09-15 主人令：策略回测取消加锁，全员可见（原「仅管理员可见」作废） -->
-  <div class="tab" data-sec="bt" onclick="switchSec('bt',this)">🧪 策略回测</div>
+  <!-- 2026-09-22 主人令：选股策略恢复加锁，仅管理员可见（作废 2026-09-15「取消加锁·全员可见」） -->
+  <div class="tab locked admin-only" data-sec="st" data-lock="1" onclick="guardLock('st',this)">🔒 选股策略 <span class="lk">[锁]</span></div>
+  <!-- 2026-09-22 主人令：策略回测恢复加锁，仅管理员可见（作废 2026-09-15「取消加锁·全员可见」） -->
+  <div class="tab locked admin-only" data-sec="bt" data-lock="1" onclick="guardLock('bt',this)">🔒 策略回测 <span class="lk">[锁]</span></div>
   <!-- 2026-08-07 主人令：暂未上架 从运维子 Tab 提升为一级 nav（仅管理员可见，guardLock 锁定） -->
   <div class="tab locked admin-only" data-sec="ul" data-lock="1" onclick="guardLock('ul',this)">🔒 暂未上架 <span class="lk">[锁]</span></div>
   <!-- 2026-08-29 主人令：已下架 从运维子 Tab 提升为一级 nav -->
@@ -1963,14 +1963,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <span style="font-size:15px;font-weight:700;color:var(--txt);">🏆 当日因子计分榜</span>
     <span id="dsbUpdSlot" style="display:inline-flex;align-items:center;gap:6px;"></span>
     <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">最新一轮榜单</span>
-    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">候选池 top20 · 按总分降序</span>
+    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">推荐置顶同序 · 余按因子总分降序</span>
     <span id="dsbBadge" style="font-size:10px;color:var(--dim);"></span>
     </div>
     <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px;">
     <b style="color:#f59e0b;">怎么读</b>：候选池每只票的<b>各因子加减分</b>逐项列出（<span style="color:#ef5350;">红=加分</span> / <span style="color:#26a69a;">绿=扣分</span> / 灰=0），按
     <code style="background:rgba(245,158,11,.1);padding:1px 4px;border-radius:3px;">total_score</code> 从高到低排列 ——
     <b style="color:#ef5350;">最顶部的就是最终推荐</b>；标 🏷「最终推荐」= 当日 FINAL_RECOMMEND 实际推荐名单。
-    <br><span style="color:var(--dim);">⚠️ 本榜为<b>最新一轮盘后产物</b>（非实时）—— 产物日期见卡头「更新于」胶囊，与「最终推荐」名单口径各自独立、按代码精确匹配，不混排。</span>
+    <br><span style="color:var(--dim);">⚠️ 本榜为<b>最新一轮盘后产物</b>（非实时）—— 产物日期见卡头「更新于」胶囊，与「最终推荐」TopN 完全一致（权威序）。</span>
     </div>
     <div id="dsbHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">&#x1F3C6; 当日因子计分榜加载中&#x2026;</div></div>
     </div>
@@ -2968,7 +2968,7 @@ function fmtSigned(v){
 
   </section>
 
-  <!-- ============ 选股策略 ============ -->
+  <!-- ============ 选股策略（2026-09-22 主人令：恢复加锁，仅管理员可见） ============ -->
   <section id="sec-st">
     <div class="sec-head" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h2 style="margin:0;">🎯 选股策略</h2>
@@ -5460,13 +5460,13 @@ function fmtSigned(v){
 <!-- 2026-09-13 修复：此处原为畸形残骸（注释未闭合 + 混入 </script>），已删除。正确注释见下方 <section id="sec-bt"> 前。 -->
 
 
-<!-- ============ 策略回测（统一 · 2026-08-13 主人令；2026-09-15 取消加锁） ============
+<!-- ============ 策略回测（统一 · 2026-08-13 主人令；2026-09-22 恢复加锁） ============
      2026-09-16 主人令「统一口径、只留优质」重构：
        ① 口径只剩一套 —— 每个算法取自己「最佳持有期」的真实收益率与胜率（样本≥30）；
        ② 下方按「四量终极 / 三重共识 / 强势跟踪 / 逆势龙头」展示，其余全部删除；
           （2026-09-20 主人令：因子实验室亦退出本页 —— 不是选股策略，不回测不展示）
        ③ 「完整明细」折叠外壳删除，各策略逐档明细常驻展开。
-     2026-09-15 主人令：取消加锁，全员可见。 -->
+     2026-09-22 主人令：恢复加锁，仅管理员可见（作废 2026-09-15「取消加锁」）。 -->
   <section id="sec-bt">
     <div class="sec-head"><h2>📈 回测汇总</h2><span class="tag">四量 · 三重 · 强势跟踪 · 逆势龙头 · 一站看完</span><span class="fresh" id="btFresh">—</span></div>
     <!-- 2026-09-15 主人令：真实数据回测声明横幅 -->
@@ -7523,6 +7523,33 @@ function fmtSigned(v){
     // 上述「↳」子项列（已含在「增强」列内，渲染时弱化，避免主人重复相加）
     var _SUBCOLS = { score_breakout:1, score_research:1, score_p4:1, score_p5:1 };
     var _detKeys = ['form_detail','fund_detail','sector_detail','inst_detail','quality_detail','research_detail','p4_detail','p5_detail'];
+    // 🔴 2026-09-23 一劳永逸修复：本榜排序以「最终推荐」为权威序，根除与最终推荐排名不一致
+    //   原逻辑直接按生成器序（total_score 降序）渲染，与 final_recommend.py 的 final_score 排序（且可纳入三重/四量等跨策略源）必然分叉。
+    //   现改为：① 最终推荐名单按 FR 同序置顶；② 其下按因子总分降序；③ FR 中含因子池外标的（跨策略源）也置顶并标注 ⊘。
+    var _codeOf = function(s){ return String(s.code==null?'':s.code).replace(/[^0-9]/g,''); };
+    var _frIdx = {};
+    (FR.stocks||[]).forEach(function(x, i){ if(x && x.code != null) _frIdx[String(x.code).replace(/[^0-9]/g,'')] = i; });
+    var _rest = rows.filter(function(s){ return !_frIdx.hasOwnProperty(_codeOf(s)); });
+    _rest.sort(function(a,b){ return (Number(b.total_score)||0) - (Number(a.total_score)||0); });
+    var _rowByCode = {}, _poolCodes = {};
+    rows.forEach(function(s){ var c=_codeOf(s); _rowByCode[c]=s; _poolCodes[c]=true; });
+    var _extraByCode = {};
+    (FR.stocks||[]).forEach(function(x){
+      if(!x || x.code == null) return;
+      var c = String(x.code).replace(/[^0-9]/g,'');
+      if(_poolCodes[c]) return;
+      var _r = { code:c, name:(x.name||c), total_score:(x.final_score!=null?x.final_score:'—'), _notInPool:true };
+      FACTS.forEach(function(f){ _r[f[1]] = 0; });
+      _extraByCode[c] = _r;
+    });
+    var _recRows = [];
+    (FR.stocks||[]).forEach(function(x){
+      if(!x || x.code == null) return;
+      var c = String(x.code).replace(/[^0-9]/g,'');
+      var _r = _rowByCode[c] || _extraByCode[c];
+      if(_r) _recRows.push(_r);
+    });
+    rows = _recRows.concat(_rest);
     // 🔴 2026-09-22：从产物取「真实公式三段」的真值，用于卡面如实披露（不写死、产物缺则降级）
     var _gi  = D.gate_info || {};
     var _gm  = (_gi.gate_multiplier != null) ? Number(_gi.gate_multiplier) : null;
@@ -8781,7 +8808,7 @@ window.__renderIndexObserve = function(){
   <div class="lockcard">
     <div class="lk">🔒</div>
     <h3>管理员验证</h3>
-    <p>运维与逻辑详解板块需要管理员权限</p>
+    <p>选股策略 / 策略回测 / 运维 / 逻辑详解 板块需要管理员权限</p>
     <input id="adminPwd" type="password" placeholder="输入管理员口令" onkeydown="if(event.key==='Enter')tryUnlock()" />
     <div class="err" id="lockErr"></div>
     <button class="btn" onclick="tryUnlock()">解锁</button>
@@ -8811,7 +8838,7 @@ async function tryUnlock(){
     document.getElementById('adminState').innerHTML='<b>管理员已登录</b>';
     document.getElementById('adminBtn').textContent='退出';
     document.getElementById('adminBtn').setAttribute('onclick','logout()');
-    /* 仅解锁带 data-lock 的真锁页；公开 tab（选股策略/策略回测）不受影响 */
+    /* 解锁全部带 data-lock 的真锁页（暂未上架/已下架/运维/选股策略/策略回测）；无锁公开 tab 不在此列 */
     document.querySelectorAll('.tab[data-lock="1"]').forEach(t=>{t.classList.remove('locked');const s=t.querySelector('.lk');if(s)s.remove();});
     document.querySelectorAll('.tab.admin-only').forEach(t=>t.style.display='flex');
     switchSec('op',document.querySelector('[data-sec="op"]'));
@@ -8872,6 +8899,13 @@ setInterval(_v8ForceUnlockAdminTabs, 1500);
 
 /* ===== 板块切换 ===== */
 function switchSec(sec,el){
+  /* 2026-09-22 主人令：真锁页「内容层」强制守卫（一劳永逸）。
+     原实现只在 nav 点击时经 guardLock 拦一次，switchSec 本身零校验 ⇒
+     控制台调用 / 刷新恢复 / URL 深链 / 其它模块内部调用 都能直接切进锁页看到内容。
+     此处统一收口：目标 tab 带 data-lock="1" 且非管理员 ⇒ 拒绝切换并弹锁。
+     对 暂未上架/已下架/运维/选股策略/策略回测 一体生效，不搞特例。 */
+  var _lkTab=document.querySelector('.tab[data-sec="'+sec+'"][data-lock="1"]');
+  if(_lkTab && !isAdmin()){ openLock(); return; }
   if(!el) el=document.querySelector('[data-sec="'+sec+'"]');
   document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
   var secEl=document.getElementById('sec-'+sec);
@@ -14931,7 +14965,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     if(h)safe(renderHistory,h);
   }
   initTriple();
-  // 2026-09-15 主人令：选股策略已取消加锁（全员可见），切 tab 时仍需刷新三重共识以防缓存
+  // 2026-09-22 主人令：选股策略已恢复加锁（仅管理员可见），切 tab 时仍需刷新三重共识以防缓存
   document.querySelectorAll('.tab[data-sec="st"]').forEach(t=>t.addEventListener('click', function(){
     if(typeof isAdmin==='function' && isAdmin()) setTimeout(initTriple, 60);
   }));
@@ -18198,12 +18232,21 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     setTimeout(function(){ fin(null); }, 5000);   // 跨境长尾保护：5 秒未回也算失败
   }
   function _reloadForData(remoteStamp){
-    try{
-      var b = location.href.split('#')[0];
-      var sep = b.indexOf('?') >= 0 ? '&' : '?';
-      var stamp = (remoteStamp || '').replace(/[^0-9A-Za-z:_\- ]/g, '');
-      location.replace(b + sep + 'fresh=' + encodeURIComponent(stamp));
-    }catch(e){ try{ location.reload(true); }catch(e2){} }
+    /* 🔴 2026-09-22 小九根治「一直刷新，连页面都看不了」
+       （主人令：说好 15 分钟自动刷新一次就不要乱变动）。
+       血证：?v= 缓存戳被 v8-cache-bot / v8-cloud-bot 每 1-3 分钟重写一次
+       （实测 16:09-16:38 共 12 次 index.html 提交）⇒ Pages 每次重新部署
+       ⇒ 本探测读的 data/HEALTH_CHECK.js Last-Modified 每 2-3 分钟就变
+       （实测 16:35:20 -> 16:38:47，三分钟内变两次）。老写法于是在这里
+       location.replace(url + '&fresh=' + stamp)：
+         ① 每 2 分钟就把整页重载一次（远密于承诺的 15 分钟）；
+         ② ?fresh= 每次都不同 ⇒ URL 恒变 ⇒ HTTP 缓存全部失效 ⇒ 每次全量
+            重下 1.3MB index.html + 43 个 data/*.js（含 4.4MB STOCK_QUOTE.js）
+            ⇒ 跨境加载长期转圈 ⇒ 主人看到「连页面都看不了」。
+       ⇒ 自动刷新唯一归口 = __v8SmartRefreshStarted 的时段刷新
+         （交易日盘中 09:30-11:30 / 13:00-15:00 每 15 分钟）。
+         本函数此后只记录数据戳，绝不自行导航。 */
+    try{ sessionStorage.setItem(PROBE_KEY, remoteStamp || ''); }catch(e){}
   }
   function _tick(){
     var iv = _probeIvMs();
@@ -18995,7 +19038,16 @@ window.__renderV8CalToday();
 
     var sec;
     if(_isReload && _saved){
-      sec = _saved;                                          // 刷新：停在用户正在看的那一页
+      /* 2026-09-22 主人令：真锁页恢复校验（一劳永逸）。
+         漏洞：v8_boot_sec 是「点过就记」，管理员登录期间点过 st/bt ⇒ 同标签页登出后刷新，
+         恢复逻辑会把访客直接送进锁页看到内容。此处统一校验：恢复目标为真锁页且非管理员 ⇒ 丢弃记忆。
+         丢弃后落到静态默认（最终推荐），不再走时段判定，避免与 ② 段语义混淆。 */
+      var _sk=document.querySelector('.tab[data-sec="'+_saved+'"][data-lock="1"]');
+      if(_sk && typeof isAdmin==='function' && !isAdmin()){
+        try{ sessionStorage.removeItem('v8_boot_sec'); }catch(e){}
+        _saved = null;
+      }
+      sec = _saved || 'final';                               // 刷新：停在用户正在看的那一页
     }else{
       // ── ② 时段判定（北京时间；UTC 偏移换算，不依赖浏览器本地时区）──
       var d = new Date();
