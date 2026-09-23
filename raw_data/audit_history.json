@@ -2928,5 +2928,33 @@
   },
   "warn_items": [],
   "fail_items": []
+ },
+ {
+  "date": "2026-09-24",
+  "time": "02:30:51",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 126,
+   "warn": 0,
+   "fail": 2,
+   "limited": 2,
+   "info": 0,
+   "other": 0,
+   "total": 130
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "all_EXPERIMENT",
+    "name": "EXPERIMENT",
+    "message": "EXPERIMENT.js 更新于 2天前 18:13；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_SECTOR_LEADERS",
+    "name": "SECTOR_LEADERS",
+    "message": "SECTOR_LEADERS.js 更新于 2天前 18:15；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
