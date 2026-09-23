@@ -3588,7 +3588,8 @@ function fmtSigned(v){
     var stocks = allStocks;            // 下方 byCat / 月度汇总用整月拼接
     var summary = (days.length ? days[days.length-1].summary : {}) || {};
     var lhbDate = days.length ? days[days.length-1].iso : '';
-    var updateTime = (window.LHB_DATA && window.LHB_DATA.update_time) || '';
+    /* 🛡 2026-09-23 删除死变量：自 2026-09-17「共振日历时间胶囊一劳永逸修复」起，
+       本卡时间胶囊只用「📅 数据日期」，该变量已无任何读取方（09-17 只删用法、漏删声明）。 */
     var _rcDaysAll = window._rcDays()||[];
     var dataDateIso = _rcDaysAll.length ? String(_rcDaysAll[_rcDaysAll.length-1].iso) : '';
 
@@ -3630,7 +3631,7 @@ function fmtSigned(v){
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">📅 机游共振日历 ' + window._rcDataDateBadge() + (window._uBadge ? window._uBadge('盘后','短线',updateTime) : '') + '</span>';
+    h += '<span class="cal-title">📅 机游共振日历 ' + window._rcDataDateBadge() + '</span>';
     h += '<span class="cal-meta">'
        + '<button class="cal-nav-btn" onclick="_jyCalPrev()" title="上个月">◀</button>'
        + ' <span id="jyCalYearMonth">' + year + '年' + (month+1) + '月</span> '
@@ -4067,7 +4068,7 @@ function fmtSigned(v){
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">🌊 北向席位日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + window._rcDataDateBadge() + (window._uBadge ? window._uBadge('盘后','短线',(window.LHB_DATA && window.LHB_DATA.update_time) || (window.LHB_HISTORY && window.LHB_HISTORY.update_time) || '') : '') + '</span>';
+    h += '<span class="cal-title">🌊 北向席位日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + window._rcDataDateBadge() + '</span>';
     h += '<span class="cal-meta">'
        + '<button class="cal-nav-btn" onclick="_northCalPrev()" title="上个月">◀</button>'
        + ' <span id="northCalYearMonth">' + year + '年' + (month+1) + '月</span> '
