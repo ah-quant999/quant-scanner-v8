@@ -1,0 +1,215 @@
+# 九宝量化 v8.0 — ETF clist 定罪探针（一次性诊断，验完即删）
+#
+# 2026-09-23 第3版（关键改进，勿退回裸请求写法）：
+#   第1/2版只「复刻参数」发裸请求 ⇒ 得出与生产**直接矛盾**的假阳性
+#   （探针 C1 返 100 行，而生产同轮同参数 empty）。本版改为**直接 import 生产模块
+#   cloud_fetch_v8**，用同一个 em_clist 函数、同一个 f_etf_daily_monitor() 整函数实测，
+#   并做三重对照：
+#     A 原始 HTTP —— 记录 rc / error / diff 类型 / f62 非零与占位计数
+#     B 生产 em_clist（函数级）
+#     C 生产整函数 f_etf_daily_monitor() / f_etf_pulse()（最终返回值）
+#   目的：定性 empty 到底是「参数非法导致空 diff」还是「3 次重试全失败被
+#   em_clist 的 `except RuntimeError: return []` 静默吞成空页」——这两种在
+#   runner_status.json 里都记作 empty，日志无法区分。
+
+name: "🔬 v8 ETF clist 定罪探针(一次性·同代码同环境)"
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8_etf_probe
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: "📥 checkout（取生产代码真身）"
+        uses: actions/checkout@v4
+
+      - name: "🐍 装依赖（cloud_fetch_v8 顶层仅 stdlib + pandas + requests）"
+        run: |
+          python3 -m pip install --quiet --disable-pip-version-check requests pandas
+
+      - name: "🔬 同代码同环境实测（A 原始HTTP / B 生产em_clist / C 生产整函数）"
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, sys, time, base64, random, traceback, importlib, inspect
+
+          t_start = time.time()
+          BUDGET = 780          # 秒：矩阵耗时上限，超了立即收尾落盘（避免整轮白跑）
+          out = {"probe_time": time.strftime("%Y-%m-%d %H:%M:%S"), "cases": []}
+
+          def log(m):
+              print(m, flush=True)
+
+          # ── 1. 加载生产模块 ─────────────────────────────────────────
+          sys.path.insert(0, os.getcwd())
+          cf = None
+          try:
+              cf = importlib.import_module("cloud_fetch_v8")
+              sig = str(inspect.signature(cf.em_clist))
+              src = open("cloud_fetch_v8.py", encoding="utf-8").read()
+              out["prod_import"] = {"ok": True, "em_delay": cf._EM_DELAY, "em_clist_sig": sig,
+                                    "fid_f3_cnt": src.count('fid="f3"'),
+                                    "fid_f12_cnt": src.count('fid="f12"')}
+              log("✅ import cloud_fetch_v8 OK | _EM_DELAY=%s" % cf._EM_DELAY)
+              log("   em_clist%s" % sig)
+              log("   线上 fid=\"f3\" ×%d / fid=\"f12\" ×%d" % (out["prod_import"]["fid_f3_cnt"],
+                                                              out["prod_import"]["fid_f12_cnt"]))
+          except Exception as e:
+              out["prod_import"] = {"ok": False, "err": "%s: %s" % (type(e).__name__, e),
+                                    "tb": traceback.format_exc()[-900:]}
+              log("❌ import 失败：%s" % e)
+
+          import requests
+
+          # ── A. 原始 HTTP 层 ─────────────────────────────────────────
+          def raw_call(fs, fields, fid, pz, po="1", pn=1, stat="1", tries=2):
+              url = "https://push2delay.eastmoney.com/api/qt/clist/get"
+              params = {"pn": str(pn), "pz": str(pz), "po": po, "np": "1", "fltt": "2", "invt": "2",
+                        "ut": "b2884a393a59ad64002292a3e90d46a5", "fid": fid, "fs": fs, "stat": stat,
+                        "fields": fields, "_": int(time.time() * 1000)}
+              hdr = cf._EM_HEADERS if cf else {"User-Agent": "Mozilla/5.0", "Accept": "*/*"}
+              last = None
+              for i in range(tries):
+                  try:
+                      r = requests.get(url, params=params, headers=hdr, timeout=12)
+                      d = r.json()
+                      rc = d.get("rc")
+                      if rc == 0:
+                          data = d.get("data") or {}
+                          diff = data.get("diff")
+                          rows = diff if isinstance(diff, list) else []
+                          nz = sum(1 for x in rows if isinstance(x, dict)
+                                   and x.get("f62") not in (None, "-", "--", "", 0, "0"))
+                          ph = sum(1 for x in rows if isinstance(x, dict)
+                                   and x.get("f62") in ("-", "--", ""))
+                          return {"ok": True, "http": r.status_code, "rc": rc, "rows": len(rows),
+                                  "api_total": data.get("total"), "diff_type": type(diff).__name__,
+                                  "f62_nonzero": nz, "f62_placeholder": ph, "sample": rows[:2]}
+                      last = "rc=%s(http %s)" % (rc, r.status_code)
+                  except Exception as e:
+                      last = "%s: %s" % (type(e).__name__, str(e)[:80])
+                  if i < tries - 1:
+                      time.sleep(0.6 + i * 1.2 + random.uniform(0, 0.3))
+              return {"ok": False, "err": last}
+
+          # ── B. 生产 em_clist（同一函数）────────────────────────────
+          def prod_clist(fs, fields, fid, pz, po="1", pn=1):
+              if cf is None:
+                  return {"skip": "import failed"}
+              t = time.time()
+              try:
+                  r = cf.em_clist(fs, fields, fid=fid, stat="1", pz=pz, po=po, pn=pn, timeout=12)
+                  return {"rows": len(r), "secs": round(time.time() - t, 1), "sample": r[:1]}
+              except Exception as e:
+                  return {"err": "%s: %s" % (type(e).__name__, e)}
+
+          # ── C. 生产整函数（最终返回值）──────────────────────────────
+          def prod_fn(name):
+              if cf is None:
+                  return {"skip": "import failed"}
+              fn = getattr(cf, name, None)
+              if fn is None:
+                  return {"err": "模块内无此函数"}
+              t = time.time()
+              try:
+                  r = fn()
+              except Exception as e:
+                  return {"err": "%s: %s" % (type(e).__name__, e),
+                          "tb": traceback.format_exc()[-700:], "secs": round(time.time() - t, 1)}
+              s = {"secs": round(time.time() - t, 1), "type": type(r).__name__}
+              if r is None:
+                  s["value"] = "None"                      # ← 记 empty 的那种返回
+              elif isinstance(r, dict):
+                  s["keys"] = list(r.keys())[:9]
+                  if "total_net" in r:
+                      s["total_net"] = r.get("total_net")
+                      s["total_etf"] = r.get("total_etf")
+                  if "etfs" in r:
+                      s["n_etfs"] = len(r.get("etfs") or [])
+                  if r.get("no_data"):
+                      s["no_data"] = True
+                  s["n_inflow"] = len(r.get("top_inflow") or [])
+              else:
+                  s["value"] = str(r)[:150]
+              return s
+
+          # ── 第一手：整函数（在矩阵之前，避免前置请求污染）──────────
+          out["fn_first"] = {"f_etf_daily_monitor": prod_fn("f_etf_daily_monitor")}
+          log("  [C-first] f_etf_daily_monitor -> %s" % json.dumps(out["fn_first"]["f_etf_daily_monitor"], ensure_ascii=False)[:200])
+          time.sleep(2)
+          out["fn_first"]["f_etf_pulse"] = prod_fn("f_etf_pulse")
+          log("  [C-first] f_etf_pulse         -> %s" % json.dumps(out["fn_first"]["f_etf_pulse"], ensure_ascii=False)[:200])
+          time.sleep(2)
+
+          # ── 案例矩阵 ───────────────────────────────────────────────
+          CMB = "m:1+t:9,m:0+t:9"                              # 生产现状：沪+深组合
+          MK = "b:MK0021,b:MK0022,b:MK0023,b:MK0024"           # ETF 基金专用板块串
+          F = "f12,f14,f62"
+          FP = "f12,f14,f3,f6,f10"                             # pulse 用的字段
+
+          def case(tag, fs, fields, fid, pz, po="1", pn=1):
+              if time.time() - t_start > BUDGET:
+                  out["cases"].append({"tag": tag, "skipped": "耗时预算用尽"})
+                  return
+              a = raw_call(fs, fields, fid, pz, po=po, pn=pn)
+              time.sleep(1.2)
+              b = prod_clist(fs, fields, fid, pz, po=po, pn=pn)
+              time.sleep(1.2)
+              rec = {"tag": tag,
+                     "args": {"fs": fs, "fields": fields, "fid": fid, "pz": pz, "po": po, "pn": pn},
+                     "A_raw": a, "B_prod_clist": b}
+              out["cases"].append(rec)
+              log("  %-34s A=%s | B=%s" % (tag,
+                  json.dumps(a, ensure_ascii=False)[:130], json.dumps(b, ensure_ascii=False)[:90]))
+
+          case("now_combined_f3_pz100",         CMB, F,  "f3",  100)      # 生产现状
+          case("now_combined_f3_pz100_p2",      CMB, F,  "f3",  100, pn=2)
+          case("ctrl_heat_single_f62_pz3000",   "m:1+t:9", "f12,f14,f2,f3,f6,f62,f184", "f62", 3000)  # 已知成功对照
+          case("single_sh_f3_pz100",            "m:1+t:9", F, "f3", 100)
+          case("single_sz_f3_pz100",            "m:0+t:9", F, "f3", 100)
+          case("etf_mk_f3_pz100",               MK, F, "f3", 100)
+          case("combined_f3_pz3000",            CMB, F, "f3", 3000)
+          case("combined_f62_pz100",            CMB, F, "f62", 100)
+          case("pulse_fields_combined_f3_p100", CMB, FP, "f3", 100)        # pulse 现状
+          case("combined_f12_pz100",            CMB, F, "f12", 100)        # 旧坏参数复现
+
+          # ── 收尾：再跑一次整函数，看是否稳定 ────────────────────────
+          time.sleep(2)
+          out["fn_last"] = {"f_etf_daily_monitor": prod_fn("f_etf_daily_monitor")}
+          log("  [C-last]  f_etf_daily_monitor -> %s" % json.dumps(out["fn_last"]["f_etf_daily_monitor"], ensure_ascii=False)[:200])
+
+          out["elapsed_secs"] = round(time.time() - t_start, 1)
+          body = json.dumps(out, ensure_ascii=False, indent=1).encode("utf-8")
+
+          # ── 落盘回仓 ───────────────────────────────────────────────
+          TOK = os.environ["GITHUB_TOKEN"]; REPO = os.environ["REPO"]
+          PATH_ = "raw_data/_etf_probe.json"; BR = "main"
+          def gh(url, method="GET", data=None):
+              req = urllib.request.Request(url, data=data, method=method, headers={
+                  "Authorization": f"Bearer {TOK}", "Accept": "application/vnd.github+json"})
+              return json.load(urllib.request.urlopen(req, timeout=30))
+          import urllib.request
+          try:
+              old = gh(f"https://api.github.com/repos/{REPO}/contents/{PATH_}?ref={BR}")
+              sha = old["sha"]
+          except Exception:
+              sha = None
+          payload = {"message": "chore(probe): ETF clist 定罪探针(第3版·同代码同环境)",
+                     "content": base64.b64encode(body).decode(), "branch": BR}
+          if sha:
+              payload["sha"] = sha
+          gh(f"https://api.github.com/repos/{REPO}/contents/{PATH_}", "PUT", json.dumps(payload).encode())
+          log("✅ 探针结果已提交 %s（%d B，耗时 %.0fs）" % (PATH_, len(body), out["elapsed_secs"]))
+          PYEOF

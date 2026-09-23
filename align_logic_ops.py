@@ -69,10 +69,20 @@ MUST_HAVE_CRON = {
     "v8_cn_fetch_intraday_lemoncat": "盘中准点档调度器(14 档·唯一主线)",
     # 2026-09-10 阿狸咪升格：实验卡抓取链有 16:30 CST cron 且已文档化 → ALLOW → MUST
     "v8_cn_fetch_experiments": "暂未上架·实验卡抓取(16:30)",
-    # 2026-09-23 补登记（本机·小九）：僵尸 run 收割机（服务器侧·每 5 分钟）。
-    #   病根：自托管 runner 掉线时 job 级 timeout 失效 ⇒ run 永生占槽 ⇒ 后续抓取全 pending。
-    #   本链跑 GitHub 官方 ubuntu（不依赖自托管），恒 exit 0。挂在 logic.html 补充表。
-    "v8_zombie_reaper": "僵尸 run 收割机(服务器侧·每5分钟)",
+    # 🔴 2026-09-23 当日撤销登记并删除文件（小九；主人拍板「删」）。
+    #   原意：自托管 runner 掉线时 job 级 timeout 失效 ⇒ run 永生占槽 ⇒ 后续抓取全 pending。
+    #   删因（两处设计级缺陷，均已实测）：
+    #     ① **判据不可靠**：以 run.updated_at 判「冻结」，但长跑 run 的该字段**长时间不刷新**
+    #        （实测：某 run 16:38:22 启动、已推进 19/32 步，updated_at 仍停 16:38:22，
+    #         冻结 23min > 15min 阈值）⇒ 一旦生效会把**正在正常抓取/部署**的 run 当僵尸
+    #         cancel（build_deploy 第13步常卡 30~38min、cn fetch 全链 ~50min，全是猎杀对象）。
+    #     ② **cron 零触发**：state=active、YAML 语法正确、全仓其他 cron 正常，唯它 82 分钟内
+    #        schedule 触发 0 次（应跑 ~16 次）⇒ 挂名摆设。
+    #   删除不留真空（兜底仍在）：本机哨兵 v8_night_postclose_watch.py「①.5 排队僵尸救援」
+    #     —— 判据「无 in_progress 且最老 pending 排队 ≥40min ⇒ cancel 后重派」，比本链更合理；
+    #     另有 v8_cn_fetch_watchdog（状态型兜底）。
+    #   ⚠️ 若将来重做，判据须改看 `jobs[].steps[]` 的最后推进时刻，并对长跑链白名单豁免；
+    #      **严禁**再用 run.updated_at 单指标判僵尸。
     # 注：v8_freshness_watch / v8_slot_scheduler 已于 2026-09-10 删除（派发源精简），
     #     从本名单彻底移除，勿再登记。
 }
