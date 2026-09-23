@@ -1210,14 +1210,37 @@ def main():
     # 🛡🛡 2026-09-20 防覆盖（阿狸咪的工程师）：index.html 的 ?v 以**远端最新正文**为基准就地重算，
     #   本地副本永不进提交（见 _SKIP_LOCAL_PUSH 取证）。同时换掉旧 contents 取正文的实现，
     #   根治「>1MB ⇒ 取到空串 ⇒ 谎报『已一致』」的假成功。失败绝不阻断本批数据推送。
-    if extra_changed:
+    def _ix_sha_for(_base):
+        """🛡🛡 2026-09-23 防覆盖根治（阿狸咪的工程师）：index.html 的 ?v 必须**基于与本次提交
+        相同的那棵基线树**重算 —— 取正文的 commit_ref 就是本次提交的 parent。
+
+        【为何必须】原实现只在提交循环**外**按 `base_sha`（本轮开头读到的那一次 main）算一枚 blob；
+          而提交重试循环会**重读最新 main** 作 parent（`base_sha2`）。若这期间 main 前进
+          （他人 / 其他 workflow 的推送落地），那枚 index.html blob 仍是**旧基线正文**改出来的，
+          它作为 `tree_items` 之一提交 ⇒ 把新基线里的新版正文整份顶掉：
+          **快进提交、无冲突、无 422、无告警**（`force: False` 拦不住，因为新提交是当前 tip 的后代）。
+        【铁证】2026-09-23 23:32:54 本机推 `01a24e8e3`（+前端空态块 `_nSmpAll`，1371924B）后 40 秒，
+          23:33:34 `v8 cn fetch` 提交 `57a2aea8a`（**父正是 `01a24e8e3`**）把 index.html
+          换成 1370167B、`_nSmpAll` 命中 2 → 0 ⇒ 卡片空态兜底被静默删除。
+        【修法】每次提交前只要基点与当前 main 不一致，就**按新基线重算**；重算无果则本批不提交
+          index.html（?v 交由 reconcile workflow 自愈）—— 绝不把旧基线 blob 塞进新基线提交。
+        """
+        if not extra_changed:
+            return None
         try:
-            _ix_sha = _stamp_remote_index_v(extra_changed, base_sha)
-            if _ix_sha:
-                new_entries["index.html"] = _ix_sha
-                print("✅ index.html ?v 已随本批 extra 文件原子更新（基准=远端最新正文）")
+            return _stamp_remote_index_v(extra_changed, _base)
         except Exception as _e:
             print(f"  ⚠️ index.html ?v 对齐异常（不影响本批数据推送）：{type(_e).__name__}: {_e}")
+            return None
+
+    _ix_sha = _ix_sha_for(base_sha)
+    if _ix_sha:
+        new_entries["index.html"] = _ix_sha
+        print("✅ index.html ?v 已随本批 extra 文件原子更新（基准=远端最新正文）")
+    else:
+        new_entries.pop("index.html", None)
+    # 记录「当前 index.html blob 是按哪棵基线算的」；提交循环里基线前进即重算（见 _ix_sha_for）
+    _aligned_base = base_sha
 
     print(f"📊 未变化 {unchanged} / 防倒退跳过 {len(regressed)} / 待更新 {len(new_entries)}")
     # 🛡 2026-08-22 规模巡检（主人令）：单次提交过大 = 全量重建/仓库膨胀信号，告警便于及时发现
@@ -1263,8 +1286,8 @@ def main():
     #   GitHub Git Trees API 请求体超限 → 超时失败 → 下午 15:35 等盘中快照抓到本地但推不上
     #   main → 前端「主力净额分时累计曲线」下午无数据（主人 8/21 22:51 报告）。
     #   修复①：tree_items 只含「本次变更文件」——base_tree 参数会保留远端其余路径，语义等价。
-    tree_items = [{"path": p, "mode": "100644", "type": "blob", "sha": s}
-                  for p, s in new_entries.items()]
+    #   🛡 2026-09-23：tree_items 改为**在提交循环内**构造 —— 基线前进时
+    #     `new_entries["index.html"]` 会被按新基线重算（见 _ix_sha_for），必须同步刷新。
 
     msg = "v8 cn fetch: " + now_cst().strftime("%Y-%m-%d %H:%M")
     # 2026-08-11 修复（159 轮看门狗）：提交环节的三类「单点致命」问题一并根治——
@@ -1285,6 +1308,18 @@ def main():
             last_err = f"读取 base commit 失败: {cmt2.get('__msg__')}"
             print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt); continue
         base_tree2 = cmt2["tree"]["sha"]
+        # 🛡🛡 2026-09-23 基线前进即重算 index.html（防「旧基线 blob 顶掉新正文」，见 _ix_sha_for）
+        if extra_changed and base_sha2 != _aligned_base:
+            _ix2 = _ix_sha_for(base_sha2)
+            _aligned_base = base_sha2
+            if _ix2:
+                new_entries["index.html"] = _ix2
+                print(f"  🛡 基线已前进 → index.html ?v 已按新基线重算（parent {base_sha2[:8]}）")
+            else:
+                new_entries.pop("index.html", None)
+                print("  🛡 基线已前进且重算无果 → 本批不提交 index.html（?v 交由 reconcile 自愈）")
+        tree_items = [{"path": p, "mode": "100644", "type": "blob", "sha": s}
+                      for p, s in new_entries.items()]
         # 修复②：变更文件 >100 时分批链式创建 tree（base_tree 逐批叠加），杜绝单请求超时。
         _BATCH = 100
         _cur_base = base_tree2
