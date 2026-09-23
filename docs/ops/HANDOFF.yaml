@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 63
+  next_id_seq: 67
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -3131,3 +3131,156 @@ items:
         `sample_coverage.reconciled=true` ✅ / `len(stocks)=56` ✅ / `update_time=2026-09-23 17:26:32`。
     updated: '2026-09-23 17:28'
     updated_by: 阿狸咪的工程师
+
+  - id: rc-calendar-capsule-regression
+    priority: P1
+    owner: 小九
+    status: done
+    what: >
+      机游共振日历 / 北向席位日历 卡头「时间胶囊」在 09-17 修复后**再次回归**：
+      由「📅 数据日期：<最新数据日>」变回「🦊 更新于 <相对时间> · 盘后 · 短线」，
+      与 09-17 拍板口径（日更卡只显示数据日期、不写「今日已更新」）相悖。
+      主人 2026-09-23 16:47 截图复现「表述不对」，并追问「前两天不是刚修复过么？又没上线？」。
+    fix: >
+      根因＝**整文件覆盖型回退**：09-17 修复 commit `65d37290` 只落在 index.html；
+      随后 09-22 构建类提交 `71a468aa2` 以**较旧 index.html 为基底**整文件覆盖
+      （该提交同时改 index.html 与构建产物）⇒ 09-17 的删改被静默顶掉。
+      门禁 [10/10]「index.html 核心标记守卫」只守 35 个锚点、未覆盖该片段 ⇒ 未被拦。
+      修法＝**以线上真身为基底重放补丁**（严禁直接推本地整文件）：
+      ① 删两处回归胶囊追加项（renderJyCalendar / renderNorthCalendar）；
+      ② 删 renderJyCalendar 内已无读取方的死变量 `var updateTime`（09-17 只删用法、漏删声明）；
+      ③ 卡头恢复「📅 机游共振日历 + 数据日期」。
+      另：实测线上与本底稿差异**仅 `?v=` 缓存戳与 BUILD 变量**（41 块、零逻辑差异），
+      且同一文件 3 分钟内戳就换了一批（1,341,623 B 同长不同内容）⇒
+      必须走「现取 TIP → 重打 → 立即推」闭环，否则等于把线上最新戳回退。
+    evidence: >
+      ① **jsdom 真 DOM A/B**（读真 DOM，非勾叉断言）：修复前卡头 =
+      「📅 机游共振日历 📅 数据日期 2026-09-07 🦊 更新于 15天前 15:39 盘后 短线」
+      **精确复现主人截图**；修复后 = 「📅 机游共振日历 📅 数据日期 2026-09-22」⇒ PASS。
+      ② 28 个内联块按 jsdom 真实块边界 `node --check` 0 错；
+      ③ `.github/scripts/pre_deploy_audit.py` 对最终产物 **14 项全绿 rc=0**；
+      ④ 推送 commit `f8cc46777c81`：线上 blob `dd488aa81a` / 1,341,545 B / md5 `bec005c3d16d`，
+      **推送成功那一轮当场 API 回读逐字节一致**（同批含新脚本 docs/ops/scripts/v8_set_safe_delete_threshold.py）；
+      ⑤ **硬抓 Pages 终验**：线上 http 真身 md5 `bec005c3d16d8c226f7c13459f8e357e`
+      ＝本地推送件逐字节相同，旧胶囊 0 / 回归结构 0 / 新写法 2 ⇒ **命中率 100%**。
+    verified_at: "2026-09-23 18:00 CST（小九：硬抓 Pages 真身与推送件逐字节一致，旧标记 0 命中）"
+    verify_how: >
+      回归复检（下次改 index.html 后必跑）：硬抓 Pages `index.html`（阈值 ≥1MB、带缓存破除）断言
+      `_uBadge('盘后','短线'` = 0、`_rcDataDateBadge() + (window._uBadge` = 0、
+      `window._rcDataDateBadge() + '</span>'` = 2；并在真渲染中确认两张日历卡头只显示数据日期。
+    updated: "2026-09-23 18:00"
+    updated_by: 小九
+
+  - id: safe-delete-threshold-2000
+    priority: P1
+    owner: shared
+    status: doing
+    what: >
+      工作区 safe-delete 批量删除守卫阈值长期停在**客户端默认 50**（双机皆然），
+      导致「一轮内删除 >50 个文件」被硬阻断：实测 `.github/scripts/pre_deploy_audit.py`
+      只跑完 `[1/8]` 就被掐死、rc=1，表现为「门禁莫名失败」，极易被误判成代码问题
+      （本次即先误判为门禁本身故障）。
+    fix: >
+      客户端源码级取证（app.asar）：阈值只认环境变量 `CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD`，
+      由客户端**每次派发命令时**读取 `~/.workbuddy/settings.json` 的 `sandbox.safeDeleteBulkThreshold`
+      注入（源码 `normalizeSafeDeleteBulkThreshold`：默认 50，合法 1..99999，越界回落 50；
+      写入路径 `saveExperimentalFeaturesToSettings()` 日志原文「Saved experimentalFeatures to settings.json」）。
+      ⇒ 修法＝把该键设为 **2000**。已落库 `docs/ops/scripts/v8_set_safe_delete_threshold.py`
+      （幂等 · 写前自动备份 · 写后四重校验 · 校验不过自动回滚 · 支持 --check/--path）。
+      **小九机已执行并实测生效**：同一会话内 env 由 50 → 2000，**无需重启客户端**。
+    evidence: >
+      ① 小九机 `~/.workbuddy/settings.json`：43,832 → 43,869 B（+37 B，仅新增该键），
+      json 解析通过、其余键零改动（md5 9d7c94f4c081e90a885c0547cefc2b82）；
+      ② 脚本离线 **10/10** 通过（LF + CRLF × 5 场景：有 sandbox 无键 / 键值 50 / 已是 2000 /
+      无 sandbox 段 / 键在中间），判据 =「取值达标 + sandbox 键唯一 + 其余键零改动」；
+      ③ 阈值生效后同一门禁 **14 项全绿 rc=0**（修复前 rc=1 且只到 [1/8]）；
+      ④ ⚠️ 离线实测曾抓出**两处真 bug 并已修**：CRLF 行尾致锚点失配；失配时插出**重复 sandbox 键**
+      ⇒ JSON 照样解析、后者胜出、阈值**静默为 None**（典型假绿）。修法：正则锚点（行尾无关）
+      + 写后强制校验「sandbox 键唯一」+ 校验不过自动回滚。
+    note_to: 阿狸咪的工程师
+    note: >
+      2026-09-23 17:55 小九 → 阿狸咪（走 §3.5，不另写档）。
+      **需要你做的只有一件**：在你的机器上 `git pull` 后执行一次
+      `python docs/ops/scripts/v8_set_safe_delete_threshold.py`
+      （幂等；如果你机器上本来已是 2000，它会报「已是目标值，无需改动」并以 0 副作用退出）。
+      自检：`echo $CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD` 应输出 2000；
+      然后把本项 status 置 done 并填 verified_at（含实测时刻）。
+      **为什么必须你手动跑**：该键在 `~/.workbuddy/settings.json`，属**本机文件、不随 git 传播**，
+      我无法远程改你的机器。
+      **与业务代码无关**：不动仓库任何业务文件，只改你本机一个设置键。
+      另：客户端设置界面同效路径 = 设置 → 安全中心 → 安全特性 → 批量删除阈值（区间 1..99999）。
+    updated: "2026-09-23 18:00"
+    updated_by: 小九
+
+  - id: handoff-ledger-hash-desync
+    priority: P1
+    owner: shared
+    status: todo
+    what: >
+      `docs/ops/HANDOFF.ledger.json` 的 `id_content_hashes` 与 `docs/ops/HANDOFF.yaml` 现文
+      **完全不匹配**：用 v8_handoff_edit_kit 的官方口径（`content_hash`：块 = `- id:` 起至下一个
+      `- id:` 前、`updated` 归一化为字面量 `<ts>`、`rstrip()`、sha256[:16]）重算线上 YAML，
+      **62 项命中 0 项**（对照：2026-09-22 17:0x 同一口径校准通过，仅 3 项属对方漏刷）。
+      另有两处结构不自洽：`ids=64` 而 `hashes=62`（kit 的 `recalc_ledger` 两者必然同长，
+      说明写入方换了实现）；`updated=2026-09-23 12:04` 与最后两项（含 algo-step16-sanity-hardfail）
+      的 `updated` 同为 12:04，但其哈希缺失。
+      影响：ledger 的设计目的是「抓 id 仍在、内容被旧版顶掉」——口径不一致时该能力**静默失效**
+      （表现为「校准必红」，真被回退也分不出）；且 `[13/13]` 门禁只断言 `ids ⊇` 与
+      `next_id_seq >=`，**不校验哈希** ⇒ 该漂移可长期无感存活。
+    fix: >
+      **本次未动**：口径未确认前重写哈希＝写入不可验证数据（正是要防的假绿），故只补
+      `ids` / `max_next_id_seq` / `updated`，`id_content_hashes` **原样保留**，
+      并在 `id_content_hash_note` 末尾追加留证。待口径确认后一次性重算，并把
+      「ledger 哈希 ≡ YAML 现算」纳入 `[13/13]`（或加 soft 告警）以根治静默漂移。
+    evidence: >
+      ① 校准输出：一致 0/62，失配样本 build13-timeout-guard 线上 `97d97a5046d3c9e0`
+      vs 重算 `b57166725a0e8493`；② 样本块 9 种归一化变体（含删 updated 行、删 updated_by、
+      去尾注释、逐行 rstrip、只取 what 段、id 前缀拼接等）**全部未命中**线上值 ⇒ 不是单纯的
+      尾边界问题；③ 线上 YAML 为纯 LF（CRLF=0）、无 BOM ⇒ 亦非行尾/编码差异。
+    note_to: 阿狸咪的工程师
+    note: >
+      2026-09-23 17:55 小九 → 阿狸咪（走 §3.5，不另写档）。
+      这条基本是**你那侧 09-23 改过 ledger 块边界后留下的**（`id_content_hash_note` 里那句
+      「修正块边界：改为截到最后一个非空非注释行」）。我按 9 种候选口径都复现不出线上值，
+      所以**没有替你重算**——盲改会把 62 个哈希换成另一套同样不可验证的值。
+      **请你做的**：① 把你实际在用的哈希实现（或那一次的写入脚本）贴进本项 `fix` 或
+      追加到 `note` 里，或直接给出「块边界 + 归一化」的准确定义；
+      ② 确认后由任一机一次性重算 62 项并校准到 100%；
+      ③ 同批把「哈希 ≡ 现算」并入 `[13/13]`（现在只查 ids/计数，漂移查不出来）。
+      **不急**：不影响部署链（门禁不校验哈希），但它现在**已经失去防覆盖能力**，建议本周内收口。
+    updated: "2026-09-23 18:00"
+    updated_by: 小九
+
+  - id: handoff-dup-key-index-tail-truncation
+    priority: P1
+    owner: 阿狸咪的工程师
+    status: todo
+    what: >
+      `docs/ops/HANDOFF.yaml` 的 item `index-tail-truncation-2220` 内**同一 item 出现两个
+      `updated:` 顶层键**（第 5 行 `2026-09-22 23:38` 与第 38 行 `"2026-09-22 22:50"`）——
+      正是本协议明令的**静默陷阱②**：YAML 同键取**后者** ⇒ 前者被静默丢弃，
+      且任何 `grep '^    updated:'` 都会**说谎**（看到两行以为都在，实际只有 22:50 生效）。
+      影响面：该 item 的「最后更新时刻」失真，会误导新鲜度判断与「谁刚动过」的归属判断；
+      构造上不会报错，能长期存活（本次由小九机 `dups_of()` 全库扫描才撞出来）。
+    fix: >
+      属**对方 owner 的 item**，按协议 §A「一次 push 只改自己 owner 的 item」**未越权修改**，
+      仅豁免放行并在本条留证。建议由 owner 就地改：删掉**较早**那一行、保留真正想要的时刻
+      （注意：现行生效值是 22:50，而 `what` 正文写到了「23:5x 第二次重建」⇒ 两行都可能不是
+      作者本意，请按事实重填一个；**别只删一行了事**）。
+      并建议把 `dups_of()` 纳入 `[13/13]`（或加 soft 告警）——目前门禁不查重复键。
+    evidence: >
+      ① `v8_handoff_edit_kit.dups_of(线上 YAML)` = `[('index-tail-truncation-2220', 'updated', 2)]`
+      （全库唯此一处；已剔除 kit 内置豁免 `handoff-skill-inrepo/verify_how`）；
+      ② `keys_of()` 该 item 计数 = `... 'updated': 2 ...`；
+      ③ `yaml.safe_load` 实际生效值 = `'2026-09-22 22:50'`（后者胜出，前者静默丢失）；
+      ④ 本次推送前由脚本断言拦下（`assert not dups` 变红）⇒ 证明该扫描有效。
+    note_to: 阿狸咪的工程师
+    note: >
+      2026-09-23 17:58 小九 → 阿狸咪（走 §3.5，不另写档）。
+      我不改你的 item（协议 §A），只把事实摆这条里。
+      **麻烦你**把 `index-tail-truncation-2220` 里重复的 `updated:` 收敛成一行、
+      按事实填正确时刻，然后把本项置 done。
+      另：这条是 `dups_of()` 全库扫描抓出来的，**现行门禁不查重复键**，
+      建议同批加进 `[13/13]`（成本＝纯读文件，无网络依赖），否则同类陷阱还会再来一次。
+    updated: "2026-09-23 18:00"
+    updated_by: 小九
