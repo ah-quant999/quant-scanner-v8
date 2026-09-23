@@ -1036,101 +1036,102 @@ def main():
     # 325KB 命中，导致整次推送 sys.exit(1)、全部数据不落地）。加 3 次指数退避重试；仍失败则跳过该文件
     # 而不是整体退出——保证其余数十个数据文件能正常上线。
     import time as _t
+    # ═══════════════════════════════════════════════════════════════════════
+    # 🛡🛡 2026-09-23 一劳永逸（阿狸咪的工程师 · 主人令「今晚算法链你盯」）
+    #   【症状】run #35847153922（09-23 18:09 CST）step14「唯一推送」卡满 20 分钟
+    #     被 job 级 timeout-minutes 硬杀 ⇒ tree/commit 从未创建 ⇒ **整拨
+    #     data/raw_data 零推送**（step15 推 index.html / step16 机器校验双双
+    #     skipped）。同段日志里候选池行情 6 个批次全 RemoteDisconnected
+    #     ⇒ 同一时刻 runner 跨境网络劣化。
+    #   【根因·源码实测】本步是**串行**推送：每个文件 2 次网络往返
+    #     （GET contents?ref= 取远端时间戳做防倒退比对 + POST /git/blobs），
+    #     变更面 = data/*.js + raw_data（本仓 173 个）里的数十个文件；
+    #     跨境慢网下单请求 30-60s ⇒ 总时长 O(n) 线性膨胀、无上限，
+    #     而 n 与网络延迟相乘必然撞穿 20 分钟。
+    #   【为何 480s 心跳看门狗没拦住】旧实现每个文件处理完都调 _beat()
+    #     ⇒ 「文件级有进展」永远成立 ⇒ 看门狗只在**单文件**卡 >480s 时才触发；
+    #     本次是「总量问题」而非「单点挂死」，故形同虚设。
+    #   【修法·两件】
+    #     ① **并发化**：per-file 处理（防倒退比对 + blob 上传）放进线程池
+    #        （PUSH_CONCURRENCY，默认 6），O(n) → O(n/并发)，把 60 分钟压到
+    #        个位数分钟；tree/commit/PATCH ref 仍严格串行（有前后依赖）。
+    #     ② **总时长软闸**：耗时超 PUSH_SOFT_DEADLINE_SEC（默认 720s）即停止
+    #        接收剩余文件、用**已完成部分**提交 —— 「部分落地 + 明确报失败」
+    #        远优于「被硬杀 ⇒ 零落地 + 假绿」。退出码 9 让 run 失败并释放并发组，
+    #        下轮派发自动续推（与既有设计一致，绝不静默 exit 0）。
+    #   【线程安全】_push_one() 只做网络 I/O 并**返回结果**，绝不写共享状态；
+    #     所有 new_entries / regressed / failed_paths / _guard_miss 累加都在主线程的
+    #     as_completed 循环里做 ⇒ 无需锁。_beat() 同样只在主线程调用，
+    #     使「全部线程都卡住」时主线程不再刷新心跳 ⇒ 看门狗恢复应有作用。
+    # ═══════════════════════════════════════════════════════════════════════
+    # 🛡 2026-09-13 一劳永逸：**累积继承型池类产物**豁免防倒退守卫。
+    #   金股池由两条链写同一份 out/gold_pool.json，其 scanner.py 侧落盘
+    #   从不设置顶层 update_time ⇒ 产出继承 prev 旧值 ⇒ 守卫判 lts < rts ⇒
+    #   永久拒推自锁（远端越新越推不动）。
+    #   ⚠️ 只豁免「成员单调累积、以磁盘 prev 为输入、覆盖不丢信号」的池类产物；
+    #      lhb_history.json 等 **append 型不在豁免内**（本地更短时覆盖会真丢数据）。
+    _NO_REGRESSION_GUARD = {
+        "raw_data/gold_pool.json",
+        "raw_data/gold_pool_stocks.json",
+    }
+    _PUSH_CONC = max(1, int(os.environ.get("PUSH_CONCURRENCY", "6")))
+    _SOFT_DEADLINE = float(os.environ.get("PUSH_SOFT_DEADLINE_SEC", "720"))
+    _BLOB_MAX_TRY = 8
+    _t0_push = _t.time()
     new_entries = {}
     failed_paths = []
     unchanged = 0
     regressed = []
     _guard_miss = []
-    for path, content in files.items():
-        # ---- 2026-08-09 防倒退守卫 ----------------------------------------
-        # 根因：walk_raw() 全量读本地 raw_data/，而云端 job 从 checkout 到 push
-        # 有数分钟窗口；期间别的 workflow（算法链 / weekend t1）推了新数据，
-        # 本次 push 会用 checkout 时刻的旧内容把它覆盖回去（读-改-写竞态）。
-        # 实测 candidate.json 被 cn fetch 反复打回 08-04，前端连续多日显示旧数据。
+
+    def _push_one(path, content):
+        """单文件：防倒退守卫 + blob 上传。只读全局、只返回结果（线程安全）。
+
+        返回 (status, path, extra)：
+          unchanged / guard_miss / uploaded     -> extra = None / None / new_sha
+          regressed -> extra = (local_ts, remote_ts)
+          failed    -> extra = 错误码
+        """
         local_sha = _blob_sha(content)
         remote_sha = existing.get(path)
         # (1) 内容完全一致：直接复用远端 sha，省一次 blob 上传
         if remote_sha and local_sha == remote_sha:
-            unchanged += 1
-            _beat()
-            continue
+            return ("unchanged", path, None)
         # (2) 内容不同：比对时间戳，本地更旧则保留远端版本，绝不覆盖
-        # 🛡 2026-09-13 一劳永逸：**累积继承型池类产物**豁免本守卫。
-        #   根因（远端真源实测）：金股池由两条链写同一份 out/gold_pool.json ——
-        #     · algorithms/scanner.py        （算法链 [0-pre]，run_algorithms.py:360）
-        #     · algorithms/build_candidate_pool.py（采集批，v8_cn_fetch_cloud.yml:414）
-        #   scanner.py 的两处落盘**从不设置顶层 update_time**（整文件 0 处命中），
-        #   产出完全继承 prev 旧值（实测 .bak: update_time=2026-09-11 15:00:00，
-        #   而远端已是 2026-09-12 00:53:46）⇒ stage_to_raw 搬进 raw_data 后，
-        #   本守卫判 lts < rts ⇒ **永久拒推自锁**（远端越新越推不动）。
-        #   旁证：commit ed0d5b659 / 485f1719b 里 raw_data/gold_pool.json.bak 被推送、
-        #   gold_pool.json 主文件没有 —— 正因为本守卫判据是 `path.endswith(".json")`，
-        #   .bak 天然豁免、主文件被拦。
-        #   ⚠️ 只豁免「成员单调累积、以磁盘 prev 为输入、覆盖不丢信号」的池类产物。
-        #      lhb_history.json 等 **append 型不在豁免内**（本地更短时覆盖会真丢数据）。
-        _NO_REGRESSION_GUARD = {
-            "raw_data/gold_pool.json",
-            "raw_data/gold_pool_stocks.json",
-        }
-        # 🛡🛡 2026-09-22 扩展：`.js` 同样纳入防倒退闸（阿狸咪的工程师，家机实证）
+        # 🛡🛡 2026-09-22 扩展（阿狸咪的工程师，家机实证）：`.js` 同样纳入防倒退闸。
         #   【铁证】23:03:34 `v8 cn fetch`（旧树 checkout）一笔提交改写 19 个 data/*.js，
-        #     逐一抽取内嵌时间戳比对 22:55 版 → 23:03 版：**倒退 11 / 前进 7 / 丢戳 1**：
-        #       STOCK_MOMENTUM_STATE.js     22:55 → 22:23
-        #       STOCK_MOMENTUM_STATE_V2.js  22:55 → 22:24
-        #       MOMENTUM_FILTER.js          22:55 → 22:24
-        #       FRESHNESS_STATUS.js         22:55 → 22:24
-        #       TRIPLE_TRACK.js             22:03 → 21:41（并丢掉 price_source×10）
-        #       IMA_STRONG_BACKTEST.js      22:54 → 22:02
-        #       HB_ALIMI / HB_XIAOJIU.js    22:52 → 22:02
-        #       RUNNER_STATUS.js            22:35 → 22:10
-        #       COMMODITY_ELASTICITY.js     22:55 → 22:23
-        #       HEALTH_CHECK.js             22:55 → （时间戳整段丢失，+10554B）
-        #     旧闸条件写死 `path.endswith(".json")` ⇒ `.js` **全被豁免** ⇒ 静默回退。
-        #     这正是「最终推荐永远是昨天的 / 动量卡在旧时刻」反复复发的机制来源。
-        #   【为什么安全】_content_ts 只认 update_time/gen_time/calc_time/run_time/
-        #     fetch_time/snapshot_time（**不含 republish_time**，故构建重戳不触发）；
-        #     取不到时间戳 ⇒ 直接放行（无戳文件不受影响）；本地更新则天然 lts>rts 放行。
+        #     内嵌时间戳比对 22:55 版 -> 23:03 版：倒退 11 / 前进 7 / 丢戳 1
+        #     （STOCK_MOMENTUM_STATE 22:55->22:23、HEALTH_CHECK 时间戳整段丢失…）。
+        #     旧闸条件写死 `path.endswith(".json")` ⇒ `.js` 全被豁免 ⇒ 静默回退。
+        #   【为何安全】_content_ts 只认 update_time/gen_time/calc_time/run_time/
+        #     fetch_time/snapshot_time（不含 republish_time，故构建重戳不触发）；
+        #     取不到时间戳 ⇒ 直接放行；本地更新则天然 lts>rts 放行。
         if (remote_sha and path.endswith((".json", ".js"))
                 and path not in _NO_REGRESSION_GUARD):
             lts = _content_ts(content)
             if lts:
-                # 🛡 2026-09-17 一劳永逸（阿狸咪的工程师）：**取远端时间戳改走
-                #   contents?ref= raw 通道**（只读头部 256KB，绕开 ~1.2MB 传输墙），
-                #   并传 commit_ref=base_sha（contents?ref= 只认 commit/branch，绝不认
-                #   blob sha；git/blobs 才认 blob sha）。旧实现 `GET /git/blobs/{sha}`
-                #   在 1.2MB 级必现 IncompleteRead（E 批铁证 fe205ffe9383 → 9.9M/104M），
-                #   三次重试又复用 req 零退避连败 ⇒ 488s 无进展 ⇒ 看门狗强退 ⇒ 整批 13 个产物零推送。
+                # 🛡 2026-09-17 一劳永逸：取远端时间戳走 contents?ref= raw 通道
+                #   （只读头部 256KB，绕开 ~1.2MB 传输墙）。旧实现 GET /git/blobs/{sha}
+                #   在 1.2MB 级必现 IncompleteRead ⇒ 488s 无进展 ⇒ 看门狗强退 ⇒ 整批零推送。
                 rtext, _chan = _blob_text(base_sha, path, remote_sha, max_bytes=256 * 1024)
                 rts = _content_ts(rtext.encode("utf-8")) if rtext else None
                 if rts and lts < rts:
-                    regressed.append((path, lts, rts))
-                    _beat()
-                    continue
+                    return ("regressed", path, (lts, rts))
                 if rtext and not rts:
                     # 通道通了、只是该 JSON 顶层没有可识别时间戳 ⇒ 正常放行
                     pass
                 elif not rtext:
                     # 🔴🔴 通道**本身**失败（raw + base64 双通道皆不可用）≠「本地更新」。
                     #   此时若静默放行，等于用 checkout 时刻的旧内容覆盖远端新版 ——
-                    #   正是 08-09 大范围数据回退故障的成因（守卫完全失效）。
-                    #   故累计计数，超阈值即**中止整轮**（宁可不推，绝不倒退）。
-                    _guard_miss.append(path)
-                _beat()
-        # -------------------------------------------------------------------
+                    #   正是 08-09 大范围数据回退故障的成因。故累计计数，超阈值中止整轮。
+                    return ("guard_miss", path, None)
+        # (3) blob 上传（幂等：内容相同则 sha 相同）
+        # 🔴 2026-09-02 根治令（涨停热力连续多轮静默丢数据事故）：重试 3 -> 8 次，
+        #   退避封顶 30s（1/2/4/8/16/30/30，总约 91s），足以跨过 GitHub 服务端 5xx
+        #   抖动窗口；仅对「可重试错误」重试（5xx/429/网络类），4xx 快速失败不拖慢整轮。
         payload = {"content": base64.b64encode(content).decode(), "encoding": "base64"}
         b = None
-        # 🔴 2026-09-02 根治令（涨停热力连续多轮静默丢数据事故）：
-        #    实测 09-02 盘中多轮 raw_data/limit_up_heatmap.json（仅 3.4KB，非大文件）
-        #    连续 3 次 HTTP 500 后「跳过 → 保留远程旧版本」，而 workflow 依旧报 success（假绿），
-        #    导致前端涨停热力卡在 08:45 盘前值、连续数小时无人知晓。三处加固：
-        #      1) 重试 3 → 8 次，退避封顶 30s（1/2/4/8/16/30/30，总约 91s），
-        #         足以跨过 GitHub 服务端 5xx 抖动窗口（实测抖动通常 <60s）；
-        #      2) 仅对「可重试错误」重试：5xx / 429 / 网络类异常。
-        #         4xx（400/403/404/422）属客户端错误，重试无意义 → 快速失败，不拖慢整轮；
-        #      3) 仍失败时打 ::error:: 注解（见下方 failed_paths 汇总），
-        #         Actions UI 直接标红，不再伪装成 success。
-        BLOB_MAX_TRY = 8
-        for attempt in range(BLOB_MAX_TRY):
+        for attempt in range(_BLOB_MAX_TRY):
             b = api("POST", f"/repos/{REPO}/git/blobs", payload)
             if "__error__" not in b:
                 break
@@ -1138,22 +1139,53 @@ def main():
             retryable = (code == "network"
                          or (isinstance(code, int) and (code >= 500 or code == 429)))
             if not retryable:
-                print(f"  ❌ 不可重试错误（HTTP {code}），放弃该文件: {path}")
-                break
-            if attempt < BLOB_MAX_TRY - 1:
+                return ("failed", path, code)
+            if attempt < _BLOB_MAX_TRY - 1:
                 wait = min(2 ** attempt, 30)
-                print(f"  ↻ blob 重试 {attempt + 1}/{BLOB_MAX_TRY - 1}"
+                print(f"  ↻ blob 重试 {attempt + 1}/{_BLOB_MAX_TRY - 1}"
                       f"（{path}，HTTP {code}，{wait}s 后）")
                 _t.sleep(wait)
         if b is None or "__error__" in b:
-            code = (b or {}).get("__error__")
-            print(f"  ⚠️ 跳过（{BLOB_MAX_TRY} 次均失败，HTTP {code}）: {path}")
-            failed_paths.append(path)
+            return ("failed", path, (b or {}).get("__error__"))
+        return ("uploaded", path, b["sha"])
+
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    print(f"🚀 并发推送启动：{len(files)} 个文件 / 并发 {_PUSH_CONC} / 软闸 {_SOFT_DEADLINE:.0f}s")
+    _ex = ThreadPoolExecutor(max_workers=_PUSH_CONC)
+    _futs = {_ex.submit(_push_one, _p, _c): _p for _p, _c in files.items()}
+    _deadline_hit = False
+    for _fut in as_completed(_futs):
+        if not _deadline_hit and (_t.time() - _t0_push) > _SOFT_DEADLINE:
+            _deadline_hit = True
+            print("⏱ 推送已耗时 %.0fs > 软闸 %.0fs ⇒ 停止接收剩余文件、"
+                  "用已完成部分提交（部分落地优于被硬杀致零落地）"
+                  % (_t.time() - _t0_push, _SOFT_DEADLINE))
+            _ex.shutdown(wait=False, cancel_futures=True)
+            break
+        try:
+            _st, _p, _extra = _fut.result()
+        except Exception as _e:
+            failed_paths.append(_futs[_fut])
+            print(f"  ⚠️ {_futs[_fut]} 处理异常：{type(_e).__name__}: {_e}")
             _beat()
             continue
-        new_entries[path] = b["sha"]
+        if _st == "unchanged":
+            unchanged += 1
+        elif _st == "regressed":
+            regressed.append((_p, _extra[0], _extra[1]))
+        elif _st == "guard_miss":
+            _guard_miss.append(_p)
+        elif _st == "failed":
+            failed_paths.append(_p)
+            print(f"  ⚠️ 跳过（{_BLOB_MAX_TRY} 次均失败，HTTP {_extra}）: {_p}")
+        elif _st == "uploaded":
+            new_entries[_p] = _extra
         _beat()
-        _beat()
+    if not _deadline_hit:
+        _ex.shutdown(wait=False)
+    print(f"📊 并发推送收工：耗时 %.0fs / 未变化 %d / 防倒退 %d / 待更新 %d / 失败 %d"
+          % (_t.time() - _t0_push, unchanged, len(regressed),
+             len(new_entries), len(failed_paths)))
 
     # ── 2026-08-15 根治「cn 单独推送 5 个 extra 文件后 ?v 失配」────────────
     # 仅当本次确实推送了 5 个 extra 文件中的一个，才原子更新 index.html 对应 ?v，
@@ -1287,6 +1319,17 @@ def main():
                 print("   若 3 次重试仍 422，请检查 Settings > Branches > main 保护规则。")
             continue
         print(f"✅ raw_data 已推送（第 {attempt} 次）commit {commit['sha'][:8]}")
+        # 🛡 2026-09-23 软闸收口：触发总时长软闸时本次只提交了**已完成部分**，
+        #   必须以退出码 9 上报（非假成功），让 run 失败并释放并发组、下轮续推。
+        #   os._exit 越过残留上传线程的 join（它们只是孤儿 blob，无害）。
+        if _deadline_hit:
+            print("⚠️ 本轮触发总时长软闸：仅提交已完成部分（%d 个文件），退出码 9 —— "
+                  "非假成功，下轮派发自动续推" % len(new_entries))
+            try:
+                sys.stdout.flush()
+            except Exception:
+                pass
+            os._exit(9)
         sys.exit(0)
     print(f"❌ 3 次重试后仍失败{('：' + last_err) if last_err else ''}"); sys.exit(1)
 
