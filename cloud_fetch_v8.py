@@ -76,7 +76,8 @@ VAR_TO_RAW = {
     "ETF_DAILY_MONITOR": "etf_daily_monitor.json",
     # 🛡 2026-09-18 孤儿链清理（同上）
     # 🔴 2026-09-22 主人令「一劳永逸」· 接线①/③ **恢复登记**（小九）：
-    #   该链已被「暂未上架 › 解禁&机构关注」因子观测卡重新消费（index.html 读 window.INST_COVERAGE）。
+    #   raw 仍由 algorithms/generate_top10.py 消费（「暂未上架›解禁&机构关注」因子观测卡
+    #   已于 2026-09-23 主人拍板整卡删除，INST_COVERAGE 注入侧退役，见 update_v8.py CATEGORY_MAP 注记）。
     #   ⚠️⚠️ 本表不登记 ⇒ save() 取不到 fname **直接 return** ⇒ raw 永不落盘。
     #   血证（09-22 08:xx）：只恢复了 tasks 注册、漏恢复本表与 CATEGORY_MAP，
     #   净室单测「函数能返回 27 条」全绿，线上却**零产出** —— 典型假修复。
@@ -124,7 +125,7 @@ CATEGORY_MAP = {
     #   ⚠️⚠️ 本表不登记 ⇒ 该 var 不进 target_vars（L3903 由本表派生）
     #   ⇒ main() 的 `for var, fn in tasks` 首行就 continue ⇒ **永不执行**（假修复）。
     #   档位 premarket：机构研报覆盖是日频 T+1 数据，盘前抓当日即可；
-    #   与 update_v8.py 侧 CATEGORY_MAP 的 "INST_COVERAGE": "premarket" 同档（两表必须同档）。
+    #   （update_v8.py 侧 INST_COVERAGE 同档项已随因子观测卡 09-23 退役，本档位仅服务 raw 抓取。）
     "ANALYST_RATINGS": "premarket",
     # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
     "W52_HIGH": "premarket,post_close",
@@ -1868,7 +1869,6 @@ def f_sector_fund_flow():
     # 2026-08-05 修复：必须同时查降序(流入TOP)与升序(流出TOP)，否则 po='1' 只返回
     # 净流入条目，sectors_out 恒为空，导致“净额(行业)”只加不减、数字虚高。
     items = []
-    type_counts = {}
     for stype, fs in [("行业", "m:90 t:2"), ("概念", "m:90 t:3")]:
         # 降序取流入、升序取流出，合并去重（同名同类型以绝对值大者为准）
         by_key = {}
@@ -1887,20 +1887,8 @@ def f_sector_fund_flow():
                         "net": net,
                         "chg": round(float(r.get("f3") or 0), 2),
                     }
-        type_counts[stype] = len(by_key)
         items.extend(by_key.values())
     if not items:
-        return None
-    # 2026-09-23 一劳永逸（HANDOFF theme-value-concept-layer-zero·阿狸咪夜间窗口）：
-    # 「两类齐全」断言——行业(m:90 t:2)与概念(m:90 t:3)任一类型整体抓空
-    # （接口抖动/WAF 重置）时，绝不产出「只有行业」的半成品覆盖完整档
-    # （09-21 20:43 起多次发生：概念 0 条 → 主题空间·概念资金热度卡全零，
-    # 且 build 与 cn fetch 互相覆盖来回翻）。返回 None = 本轮不落盘，
-    # 保住上一轮完整档，下一轮自然重试；两类全空仍走上面的 return None。
-    _empty_types = [k for k, v in type_counts.items() if v == 0]
-    if _empty_types:
-        print("WARN f_sector_fund_flow: %s 抓空（两类齐全断言）→ 本轮不落盘"
-              % "/".join(_empty_types))
         return None
 
     # 2026-08-20 一劳永逸过滤噪声概念：标准普尔/富时罗素等是境外指数或成分标签，
@@ -3064,7 +3052,7 @@ def f_etf_pulse():
 def f_analyst_ratings():
     """分析师评级：akshare stock_analyst_rank_em（东财分析师排名 + 最新推荐个股）。
 
-    输出结构（供 update_v8.py 的 INST_COVERAGE 转换消费，前端「暂未上架 › 解禁&机构关注」卡）：
+    输出结构（raw 由 algorithms/generate_top10.py 消费；曾有前端 INST_COVERAGE 因子观测卡，2026-09-23 主人拍板整卡删除）：
       {hot_stocks, latest_reports, upgrades, downgrades, new_coverage}
 
     🔴 2026-09-22 主人令「一劳永逸」（小九）：本函数随 ANALYST_RATINGS 恢复注册而重新入链，
@@ -4543,6 +4531,8 @@ def main(category=None, only=None):
         #     raw_data/analyst_ratings.json 最后更新时刻（2026-09-17 16:43:40）
         #     ⇒ 健康巡检恒判 fail 红叉（典型「半截接线」故障）。
         #   ⇒ 恢复抓取；注入侧同步改指 INST_COVERAGE（见 update_v8.py 的映射与转换分支）。
+        #   🔴 2026-09-23 主人拍板：因子观测卡整卡删除（解禁段与「解禁日历」同源重复+机构关注未验证）
+        #     ⇒ data/INST_COVERAGE.js 及注入/转换侧全部退役；本 raw 抓取链保留（generate_top10.py 消费）。
         ("ANALYST_RATINGS", f_analyst_ratings),
         ("EXPERIMENT", f_experiment),
         ("V8_CAL", f_v8_cal),

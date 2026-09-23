@@ -90,12 +90,10 @@ DATA_SOURCES = {
     #   ⚠️ 本文件在 PROTECTED_FILES.json 清单内，禁止误删（见 guard_protected_files.py）。
     "sector_cycle.json":           "SECTOR_CYCLE_ARCHIVE",
     "limit_up_broken.json":        "LIMIT_UP_BROKEN",
-    # 🔴 2026-09-22 主人令「一劳永逸」（小九）：analyst_ratings.json 重新接线，改指 INST_COVERAGE。
-    #   09-11 曾因「ANALYST_RATINGS 前端零引用」停发 js（当时判断成立）；
-    #   09-22 05:31 新上的「暂未上架 › 解禁&机构关注」因子观测卡读 window.INST_COVERAGE，
-    #   其数据正是本文件的 hot_stocks ⇒ 改指 INST_COVERAGE
-    #   （原 ANALYST_RATINGS 变量至今仍无任何前端消费者，故不恢复该名）。
-    "analyst_ratings.json":        "INST_COVERAGE",
+    # 🔴 2026-09-23 主人拍板：「解禁&机构关注」因子观测卡整卡删除（解禁段与盘后页「解禁日历」同源纯重复；
+    #   机构关注段从未离线回测验证）。INST_COVERAGE 注入/转换/频次同步退役，data/INST_COVERAGE.js 已下架。
+    #   analyst_ratings.json raw 本身仍由 algorithms/generate_top10.py 消费 ⇒ 抓取链保留，仅不再产出该 js。
+    #   （历史：09-11 曾因前端零引用停发；09-22 05:31 因子观测卡上线曾改指 INST_COVERAGE，随卡删除一并退役。）
     "suspension_alert.json":       "SUSPENSION_ALERT",
     "volatility.json":             "VOLATILITY",
     "index_quotes.json":           "INDEX_QUOTES",
@@ -229,9 +227,7 @@ CATEGORY_MAP = {
     "MACRO_DATA": "premarket,post_close",
     "CRISIS_DATA": "premarket,intraday",
     "NORTH_FUND": "premarket,post_close",
-    # 🔴 2026-09-22 同上：改指 INST_COVERAGE（研报覆盖数据，随 ANALYST_RATINGS 每日盘前刷新）。
-    #   原 ANALYST_RATINGS 已确认为零消费者，不恢复该变量名。
-    "INST_COVERAGE": "premarket",
+    # （INST_COVERAGE 频次项已于 2026-09-23 主人拍板随因子观测卡整卡删除，见 CATEGORY_MAP 处注记。）
     "SUSPENSION_ALERT": "premarket",
     "MARKET_ALERTS": "intraday,post_close",
     "OVERSEAS_MARKETS": "intraday,post_close",
@@ -479,33 +475,7 @@ def _make_lite(name, obj):
                     'date_range': r.get('date', ''),
                 }
         return {'update_time': obj.get('update_time'), 'ratings': list(merged.values())}
-    if name == 'INST_COVERAGE':
-        # 🔴 2026-09-22 主人令「一劳永逸」（小九）：前端「暂未上架 › 解禁&机构关注」因子观测卡
-        #   读 window.INST_COVERAGE（index.html），期望 {update_time, coverage:[...]}。
-        #   条目口径**逐字段保持与既有线上 data/INST_COVERAGE.js 同构**
-        #   （code/name/rating/report_count_1m/date/org/analyst/annual_index/ret_12m），
-        #   取值即 f_analyst_ratings() 的 hot_stocks 原始结构，避免二次口径漂移。
-        #   ⚠️ 不可复用上面的 ANALYST_RATINGS 分支：它输出 ratings，并把条目压成
-        #   {code,name,rating,count,date_range} —— 会丢掉 org/analyst/annual_index/ret_12m。
-        cov = []
-        _seen = set()
-        for r in (obj.get('hot_stocks') or []):
-            code = str(r.get('code', '') or '')
-            if not code or code in _seen:
-                continue
-            _seen.add(code)
-            cov.append({
-                'code': code,
-                'name': r.get('name', ''),
-                'rating': r.get('rating', '-'),
-                'report_count_1m': r.get('report_count_1m') or 1,
-                'date': r.get('date', ''),
-                'org': r.get('org', ''),
-                'analyst': r.get('analyst', ''),
-                'annual_index': r.get('annual_index'),
-                'ret_12m': r.get('ret_12m'),
-            })
-        return {'update_time': obj.get('update_time'), 'coverage': cov}
+    # （INST_COVERAGE 转换分支已于 2026-09-23 主人拍板随因子观测卡整卡删除，见 CATEGORY_MAP 处注记。）
     if name == 'SUSPENSION_ALERT':
         # v6 源结构(suspended/near_trigger) → v8 期望 {stocks:[...]}
         stocks = []
