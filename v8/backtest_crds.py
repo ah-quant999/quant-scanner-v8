@@ -19,11 +19,22 @@ backtest_crds.py — CRDS 逆势龙头（advanced 档位）历史回测
   - signals: 逐信号明细
 
 使用：
-  python v8/backtest_crds.py              # 全量回测
-  python v8/backtest_crds.py --dry        # 只统计信号数，不拉K线
+  python v8/backtest_crds.py                # 全量回测
+  python v8/backtest_crds.py --dry          # 只统计信号数，不拉K线
+  python v8/backtest_crds.py --allow-empty  # 人工强制写空骨架（默认绝不用空覆盖好数据）
+
+🔴 2026-09-23 主人令「一劳永逸」（阿狸咪的工程师）：
+  本产物是累积型（一次运行覆盖 8/1 以来全部历史信号）。原口径「baostock 登录失败 /
+  无历史信号 ⇒ 降级为空回测并写盘」会把积累多日的成果整份抹成 0 ⇒ 前端「逆势龙头·真实回测」
+  整卡变空（主人 2026-09-23 截图：12 档 samples 全 0，method 字段自证 "baostock 登录失败，自动降级"）。
+  该口径与 algorithms/calc_crds.py::_write_empty_crds_output 的 2026-09-06 主人令
+  （「数据源异常时空产物不再覆盖旧数据 —— 空卡比 stale 更伤」）直接冲突 ⇒ 本脚本对齐后者：
+    · 已有有效成果（total_signals>0 或任一档有样本）⇒ 保留旧产物、不写盘，仅打印 KEEP 告警；
+    · 从未有过有效成果 ⇒ 才写空骨架（诚实空）；
+    · 需人工清零时必须显式 --allow-empty（可审计）。
+  另：baostock 为免费源且全仓 20+ 脚本共用，同账号并发登录会互踢 ⇒ 登录改为多次重试。
 
 注意：
-  - baostock 登录失败时自动降级为空回测（避免 CI 挂死）。
   - 历史文件时间戳为文件名后 8 位 yyyymmdd，优先取文件内的 update_time/data_time。
 """
 import argparse
@@ -118,22 +129,41 @@ def load_signals():
     return signals
 
 
-def baostock_login():
+def baostock_login(retries=3, delay=5):
+    """登录 baostock（带重试）。
+
+    🔴 2026-09-23（阿狸咪的工程师）：baostock 是免费源，且本仓 20+ 脚本共用同一账号，
+    算法链并发跑批时**同账号互踢**高发 ⇒ 单次 login 失败即判死会误伤。
+    2026-09-18 01:22、2026-09-23 16:05 两次「登录失败 → 全 0 覆盖」事故，
+    其 method 字段均自证为 "baostock 登录失败，自动降级"。
+    ⇒ 改为重试 retries 次（每次先 logout 释放会话再重连，间隔 delay 秒），
+       显著降低「偶发抽风」被当成「数据源失效」的概率。
+    """
     if bs is None:
+        print("[baostock] 模块未安装（import 失败）")
         return False
-    try:
-        bs.logout()
-    except Exception:
-        pass
-    try:
-        r = bs.login()
-        if r.error_code != "0":
-            print(f"[baostock] login error {r.error_code}: {r.error_msg}")
-            return False
-        return True
-    except Exception as e:
-        print(f"[baostock] login exception: {e}")
-        return False
+    last = ""
+    tries = max(1, int(retries))
+    for i in range(1, tries + 1):
+        try:
+            bs.logout()
+        except Exception:
+            pass
+        try:
+            r = bs.login()
+            if getattr(r, "error_code", "?") == "0":
+                if i > 1:
+                    print(f"[baostock] 第 {i}/{tries} 次登录成功（前 {i-1} 次失败）")
+                return True
+            last = f"{getattr(r, 'error_code', '?')}: {getattr(r, 'error_msg', '')}"
+            print(f"[baostock] 第 {i}/{tries} 次登录失败 -> {last}")
+        except Exception as e:
+            last = str(e)
+            print(f"[baostock] 第 {i}/{tries} 次登录异常: {e}")
+        if i < tries:
+            time.sleep(delay)
+    print(f"[baostock] {tries} 次登录均失败，最后一次: {last}")
+    return False
 
 
 def bs_code(code):
@@ -262,18 +292,78 @@ def empty_backtest(reason):
     return payload
 
 
+def _existing_valid():
+    """旧产物是否含**有效历史成果**（「失败不覆盖」的判据）。
+
+    🛡 2026-09-23 主人令：回测产物是累积型（覆盖 8/1 以来的全部历史信号），
+    一次运行失败绝不代表历史成果失效 ⇒ 判据取「信号数 > 0 或任一档有样本」。
+    返回 dict（有效）或 None（无/不可读）。不可读时**按无效处理**（宁可写诚实空骨架，
+    也不把一份损坏文件当成有效成果继续顶着）。
+    """
+    try:
+        if not OUT_JSON.exists():
+            return None
+        d = json.loads(OUT_JSON.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"[CRDS backtest] 旧产物读取失败（{e}）")
+        return None
+    sm = d.get("summary") or {}
+    try:
+        nsig = int(sm.get("total_signals") or 0)
+    except Exception:
+        nsig = 0
+    nz = sum(1 for v in (sm.get("by_period") or {}).values()
+             if isinstance(v, dict) and (v.get("samples") or 0))
+    if nsig > 0 or nz > 0:
+        return {
+            "total_signals": nsig,
+            "periods_with_samples": nz,
+            "update_time": sm.get("update_time") or d.get("update_time") or "?",
+            "range": sm.get("signal_date_range") or "—",
+        }
+    return None
+
+
+def keep_existing(reason):
+    """失败路径：**保留旧产物、不写盘**，仅打印 KEEP 告警。
+
+    返回 True = 已保留（调用方应直接 return，不写空覆盖）；
+    返回 False = 从未有过有效成果 ⇒ 调用方写空骨架（诚实空）。
+    """
+    old = _existing_valid()
+    if not old:
+        return False
+    print("=" * 74)
+    print(f"[KEEP] {reason}")
+    print("[KEEP] 按主人令「空卡比 stale 更伤」→ **保留上次成功结果，不写空覆盖**")
+    print(f"[KEEP]   旧 update_time      = {old['update_time']}")
+    print(f"[KEEP]   旧 total_signals    = {old['total_signals']}")
+    print(f"[KEEP]   旧有样本档位数      = {old['periods_with_samples']}")
+    print(f"[KEEP]   旧 signal_date_range= {old['range']}")
+    print(f"[KEEP]   保留文件：{OUT_JSON.name} / {OUT_JS.name}")
+    print("[KEEP]   （如需人工清零，请显式加 --allow-empty）")
+    print("=" * 74)
+    return True
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry", action="store_true", help="只统计信号数，不拉K线")
+    parser.add_argument("--allow-empty", action="store_true", dest="allow_empty",
+                        help="人工强制写空骨架（默认：有旧成果时保留旧数据、不用 0 覆盖）")
     args = parser.parse_args()
 
     signals = load_signals()
     print(f"[CRDS backtest] loaded {len(signals)} advanced signals")
     if not signals:
-        payload = empty_backtest("无历史 advanced 信号")
+        # 🛡 2026-09-23 主人令：读不到历史信号 ≠ 历史成果失效 ⇒ 有旧成果就保留，不写 0 覆盖。
+        if not args.allow_empty and keep_existing("无历史 advanced 信号"):
+            return 0
+        payload = empty_backtest("无历史 advanced 信号"
+                                 + ("（--allow-empty 强制）" if args.allow_empty else "（首次运行，尚无成果）"))
         OUT_JSON.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
         OUT_JS.write_text("window.CRDS_BACKTEST = " + json.dumps(payload, ensure_ascii=False, indent=1) + ";", encoding="utf-8")
-        print("[CRDS backtest] written empty backtest")
+        print("[CRDS backtest] written empty backtest（确实无有效旧成果）")
         return 0
 
     if args.dry:
@@ -282,10 +372,16 @@ def main():
         return 0
 
     if not baostock_login():
-        payload = empty_backtest("baostock 登录失败，自动降级")
+        # 🛡 2026-09-23 主人令（本卡「整卡变空」的**唯一真凶**）：
+        #   原实现在此写 empty_backtest 覆盖 ⇒ 09-18 01:22 / 09-23 16:05 两次把
+        #   累积的 249 信号 × 12 档成果抹成 0。改为「有旧成果 ⇒ 保留不写」。
+        if not args.allow_empty and keep_existing("baostock 登录失败（已重试）"):
+            return 0
+        payload = empty_backtest("baostock 登录失败"
+                                 + ("（--allow-empty 强制）" if args.allow_empty else "（首次运行，尚无成果）"))
         OUT_JSON.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
         OUT_JS.write_text("window.CRDS_BACKTEST = " + json.dumps(payload, ensure_ascii=False, indent=1) + ";", encoding="utf-8")
-        print("[CRDS backtest] baostock login failed -> empty backtest")
+        print("[CRDS backtest] baostock login failed -> empty backtest（确实无有效旧成果）")
         return 0
 
     # 2026-09-06 主人令 P0-A：用连续 K 线段取真实入场/出场日（替代旧日历日 +1/3/5/10/20），

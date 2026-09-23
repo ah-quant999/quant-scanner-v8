@@ -17212,6 +17212,23 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
             + '｜ 信号 ' + _esc(_nSig) + ' 条，其中 <b style="color:#fbbf24;">' + _nBt + ' 条</b>有可用 K 线、进入回测'
             + '｜ <b style="color:#fbbf24;">' + nDay + ' 个独立信号日</b>'
             + '｜ ' + _esc(sm.signal_date_range||'—');
+          /* 🛡 2026-09-23 主人令「这个为什么都是空的」· 阿狸咪的工程师：
+             ── 全档无样本（历史遗留的空产物 / 从未成功产出）时，**不再排 12 行 0 表格**（主人截图那种「一片 0」
+                既没信息量、又像坏了）⇒ 改一行空态说明。
+             ── 数据层已同步根治：v8/backtest_crds.py 不再用空回测覆盖有效成果（对齐 calc_crds 的 09-06 主人令），
+                故此处为空 ⇒ 只可能是「确实还没有过一次成功回测」。
+             ── 诚实铁律：不插值、不用 0 冒充，把 method 里的真实原因原样透出。 */
+          var _nSmpAll = keys.reduce(function(a,k){ var rr = bp[String(k)] || bp[k] || {}; return a + (Number(rr.samples) || 0); }, 0);
+          if(_nSmpAll === 0){
+            var _rsn = String(sm.method || '');
+            _rsn = _rsn.indexOf('·') >= 0 ? _rsn.split('·').pop().trim() : (_rsn || '尚无历史 advanced 信号');
+            var bb0 = document.getElementById('stcrdsBtBody');
+            if(bb0) bb0.innerHTML = '<div class="note" style="line-height:1.9;">'
+              + '📭 <b>暂无可用回测结果</b>（' + _esc(_rsn) + '）'
+              + '<br><span style="font-size:11px;">信号 ' + _esc(_nSig) + ' 条 · 明细 ' + _nBt + ' 条 · 有样本档位 0</span>'
+              + '<br><span style="font-size:11px;color:var(--dim);">回测是<b>累积型</b>产物（覆盖 8/1 以来全部历史信号）：'
+              + '某次运行未成功时系统会<b>保留上一次成功结果、不以 0 覆盖</b>；此处为空 = 尚无成功产出，待下次回测成功后自动填充。</span></div>';
+          } else {
           var h = '<div style="overflow-x:auto;overflow-y:hidden;"><table style="width:100%;border-collapse:collapse;font-size:12px;">'
                 + '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
           ['持有期','样本 n','胜率','平均收益','最好','最差','盈亏比','夏普'].forEach(function(x){
@@ -17247,6 +17264,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
              + '数据源：' + _esc(sm.update_time || BT.update_time || '—') + '（v8/backtest_crds.py）</div>';
           var bb = document.getElementById('stcrdsBtBody');
           if(bb) bb.innerHTML = h;
+          }
           bbox.style.display = 'block';
         }
       } else if(bbox && tried > 12){
