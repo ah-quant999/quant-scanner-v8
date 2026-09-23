@@ -1,0 +1,240 @@
+{
+ "probe_time": "2026-09-23 09:48:28",
+ "cases": [
+  {
+   "tag": "now_combined_f3_pz100",
+   "args": {
+    "fs": "m:1+t:9,m:0+t:9",
+    "fields": "f12,f14,f62",
+    "fid": "f3",
+    "pz": 100,
+    "po": "1",
+    "pn": 1
+   },
+   "A_raw": {
+    "ok": false,
+    "err": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   },
+   "B_prod_clist": {
+    "rows": 0,
+    "secs": 5.4,
+    "sample": []
+   }
+  },
+  {
+   "tag": "now_combined_f3_pz100_p2",
+   "args": {
+    "fs": "m:1+t:9,m:0+t:9",
+    "fields": "f12,f14,f62",
+    "fid": "f3",
+    "pz": 100,
+    "po": "1",
+    "pn": 2
+   },
+   "A_raw": {
+    "ok": false,
+    "err": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   },
+   "B_prod_clist": {
+    "rows": 0,
+    "secs": 6.0,
+    "sample": []
+   }
+  },
+  {
+   "tag": "ctrl_heat_single_f62_pz3000",
+   "args": {
+    "fs": "m:1+t:9",
+    "fields": "f12,f14,f2,f3,f6,f62,f184",
+    "fid": "f62",
+    "pz": 3000,
+    "po": "1",
+    "pn": 1
+   },
+   "A_raw": {
+    "ok": false,
+    "err": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   },
+   "B_prod_clist": {
+    "rows": 0,
+    "secs": 6.1,
+    "sample": []
+   }
+  },
+  {
+   "tag": "single_sh_f3_pz100",
+   "args": {
+    "fs": "m:1+t:9",
+    "fields": "f12,f14,f62",
+    "fid": "f3",
+    "pz": 100,
+    "po": "1",
+    "pn": 1
+   },
+   "A_raw": {
+    "ok": false,
+    "err": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   },
+   "B_prod_clist": {
+    "rows": 0,
+    "secs": 5.2,
+    "sample": []
+   }
+  },
+  {
+   "tag": "single_sz_f3_pz100",
+   "args": {
+    "fs": "m:0+t:9",
+    "fields": "f12,f14,f62",
+    "fid": "f3",
+    "pz": 100,
+    "po": "1",
+    "pn": 1
+   },
+   "A_raw": {
+    "ok": false,
+    "err": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   },
+   "B_prod_clist": {
+    "rows": 0,
+    "secs": 5.4,
+    "sample": []
+   }
+  },
+  {
+   "tag": "etf_mk_f3_pz100",
+   "args": {
+    "fs": "b:MK0021,b:MK0022,b:MK0023,b:MK0024",
+    "fields": "f12,f14,f62",
+    "fid": "f3",
+    "pz": 100,
+    "po": "1",
+    "pn": 1
+   },
+   "A_raw": {
+    "ok": false,
+    "err": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   },
+   "B_prod_clist": {
+    "rows": 0,
+    "secs": 5.5,
+    "sample": []
+   }
+  },
+  {
+   "tag": "combined_f3_pz3000",
+   "args": {
+    "fs": "m:1+t:9,m:0+t:9",
+    "fields": "f12,f14,f62",
+    "fid": "f3",
+    "pz": 3000,
+    "po": "1",
+    "pn": 1
+   },
+   "A_raw": {
+    "ok": false,
+    "err": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   },
+   "B_prod_clist": {
+    "rows": 0,
+    "secs": 5.5,
+    "sample": []
+   }
+  },
+  {
+   "tag": "combined_f62_pz100",
+   "args": {
+    "fs": "m:1+t:9,m:0+t:9",
+    "fields": "f12,f14,f62",
+    "fid": "f62",
+    "pz": 100,
+    "po": "1",
+    "pn": 1
+   },
+   "A_raw": {
+    "ok": false,
+    "err": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   },
+   "B_prod_clist": {
+    "rows": 0,
+    "secs": 5.2,
+    "sample": []
+   }
+  },
+  {
+   "tag": "pulse_fields_combined_f3_p100",
+   "args": {
+    "fs": "m:1+t:9,m:0+t:9",
+    "fields": "f12,f14,f3,f6,f10",
+    "fid": "f3",
+    "pz": 100,
+    "po": "1",
+    "pn": 1
+   },
+   "A_raw": {
+    "ok": false,
+    "err": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   },
+   "B_prod_clist": {
+    "rows": 0,
+    "secs": 5.2,
+    "sample": []
+   }
+  },
+  {
+   "tag": "combined_f12_pz100",
+   "args": {
+    "fs": "m:1+t:9,m:0+t:9",
+    "fields": "f12,f14,f62",
+    "fid": "f12",
+    "pz": 100,
+    "po": "1",
+    "pn": 1
+   },
+   "A_raw": {
+    "ok": false,
+    "err": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   },
+   "B_prod_clist": {
+    "rows": 0,
+    "secs": 6.4,
+    "sample": []
+   }
+  }
+ ],
+ "prod_import": {
+  "ok": true,
+  "em_delay": "https://push2delay.eastmoney.com",
+  "em_clist_sig": "(fs, fields, fid='f62', stat='1', pz=5000, po='1', pn=1, timeout=15)",
+  "fid_f3_cnt": 2,
+  "fid_f12_cnt": 1
+ },
+ "fn_first": {
+  "f_etf_daily_monitor": {
+   "secs": 9.5,
+   "type": "dict",
+   "keys": [
+    "total_etf",
+    "total_net",
+    "top_inflow",
+    "top_outflow"
+   ],
+   "total_net": 1381199328.0,
+   "total_etf": 264,
+   "n_inflow": 10
+  },
+  "f_etf_pulse": {
+   "secs": 5.7,
+   "type": "NoneType",
+   "value": "None"
+  }
+ },
+ "fn_last": {
+  "f_etf_daily_monitor": {
+   "secs": 5.4,
+   "type": "NoneType",
+   "value": "None"
+  }
+ },
+ "elapsed_secs": 136.4
+}
