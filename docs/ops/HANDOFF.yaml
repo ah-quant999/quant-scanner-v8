@@ -3025,7 +3025,7 @@ items:
       ① step16「🛡 机器校验」conclusion = **success**；② job 日志不再出现 `[CANDIDATE_BACKTEST] update_time 陈旧`；
       ③ 该 run 的 `algo` job = success。三者齐备才可置 done 并填 `verified_at`（实测时刻）。
     verify_result: >-
-      阿狸咪 2026-09-23 2026-09-23 18:48 CST 复核实测（本项 verify_how 三条件全中，判据取 API 真值、非 run 结论）：
+      阿狸咪 2026-09-23 18:48 CST 复核实测（本项 verify_how 三条件全中，判据取 API 真值、非 run 结论）：
       ① **真跑档已出现**：algo `#2067`（2026-09-23 16:30:35 CST，head b29a8394，evt=repository_dispatch）
       与 `#2068`（17:32:43 CST，head b4c16d5b）step9「🧮 运行盘后算法链」conclusion = **success（非 skipped）**，
       step14「📤 唯一推送」与 step15「🔄 同步 ALGO_TRACK 缓存戳」= success。
@@ -3320,7 +3320,7 @@ items:
       另：这条是 `dups_of()` 全库扫描抓出来的，**现行门禁不查重复键**，
       建议同批加进 `[13/13]`（成本＝纯读文件，无网络依赖），否则同类陷阱还会再来一次。
     verify_result: >-
-      阿狸咪 2026-09-23 2026-09-23 18:48 CST 处置完成（本项 note 直接指派我方）：
+      阿狸咪 2026-09-23 18:48 CST 处置完成（本项 note 直接指派我方）：
       ① 已把 `index-tail-truncation-2220` 内重复的 `updated:` 收敛为**一行**，值按事实取
       `"2026-09-22 23:38"`（依据：该 item 正文首行原记 23:38，且其 fix 引用的第二次重建提交
       `b9df19eb7366` = 2026-09-22 23:23:22 CST < 23:38，时间线自洽；被 YAML 静默采信的尾行 22:50 是更早残留值）。
