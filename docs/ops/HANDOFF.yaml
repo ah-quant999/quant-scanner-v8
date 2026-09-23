@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 19:00"
+  updated: "2026-09-23 18:48"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -2829,7 +2829,6 @@ items:
     priority: P0
     owner: 阿狸咪的工程师
     status: pending-verify
-    updated: 2026-09-22 23:38
     updated_by: 阿狸咪的工程师
     what: >
       🔴 **事故**：`index.html` 于 **2026-09-22 22:20:41** 被 commit `7c78439fe8`（`v8 cn fetch: 22:20`）
@@ -2862,7 +2861,8 @@ items:
     verify_how: >
       下一轮 cn fetch / build 后：① 断言 `index.html` 行数 ≥ 19,149 且末尾闭合 `</html>`；
       ② 断言 [10/10] 为 37/37（含两个尾部锚点）；③ 断言 `</script>` 块数 ≥ 28。
-    updated: "2026-09-22 22:50"
+    updated: "2026-09-22 23:38"
+
 
   - id: cn-fetch-writer-version-drift
     priority: P0
@@ -2997,7 +2997,7 @@ items:
   - id: algo-step16-sanity-hardfail
     priority: P1
     owner: shared
-    status: pending-verify
+    status: done
     what: >
       algo 链（`v8_algo_cloud.yml`）step16「🛡 机器校验」在 2026-09-22 20:13 – 09-23 05:57 期间**连续 6 档硬失败**，
       逐字判词 `❌ 硬失败 2 项: [CANDIDATE_BACKTEST] update_time 陈旧 8.3 天(2026-09-14 22:50)… [GOLD_POOL_BACKTEST] 同`。
@@ -3024,7 +3024,24 @@ items:
       下一档「真跑档」（step9「🧮 运行盘后算法链」conclusion = success 且**非 skipped**）中同时满足：
       ① step16「🛡 机器校验」conclusion = **success**；② job 日志不再出现 `[CANDIDATE_BACKTEST] update_time 陈旧`；
       ③ 该 run 的 `algo` job = success。三者齐备才可置 done 并填 `verified_at`（实测时刻）。
-    updated: "2026-09-23 12:04"
+    verify_result: >-
+      阿狸咪 2026-09-23 2026-09-23 18:48 CST 复核实测（本项 verify_how 三条件全中，判据取 API 真值、非 run 结论）：
+      ① **真跑档已出现**：algo `#2067`（2026-09-23 16:30:35 CST，head b29a8394，evt=repository_dispatch）
+      与 `#2068`（17:32:43 CST，head b4c16d5b）step9「🧮 运行盘后算法链」conclusion = **success（非 skipped）**，
+      step14「📤 唯一推送」与 step15「🔄 同步 ALGO_TRACK 缓存戳」= success。
+      ② **step16「🛡 机器校验（结构一致性 + 数据失真体检）」两档均 = success**；
+      两档 job 日志全文 grep `update_time 陈旧` = **0 命中**、`CANDIDATE_BACKTEST` = **0 命中**；
+      实际输出逐字 = `[sanity] 结论: 0 硬失败 / 4956 软告警 / 110 文件`
+      —— 对照修复前逐字判词正是 `❌ 硬失败 2 项: [CANDIDATE_BACKTEST] update_time 陈旧 8.3 天(2026-09-14 22:50)…`。
+      ③ 两档 `algo` job conclusion = **success**，日志尾 `##[notice]A 批完成，产物核验通过（执行=success）`。
+      对照排除：07:01:22 修复提交 fb2c48c987 之后的**空转档**（step9–16 全 skipped，如 08:03/09:02/10:15/11:37/11:52）
+      按本项判据**不计入证据**；修复前真跑档 step16 全 = failure（09-22 20:13 / 09-23 00:12–05:57 共 6 档）。
+      ⇒ 豁免生效、假红消除，**红噪声不再掩盖真实硬失败**（本项原始副作用已解）。
+      ⚠️ 残留但**不属本项**（不阻断、未被 step16 判红）：同两档日志各有 1 行
+      `🛑 本轮失败/未产出脚本 1 个（对应前端卡将保持陈旧）: • scripts/fetch_sector_leaders.py ← 退出码 1 |
+      http.client.RemoteDisconnected: Remote end closed connection without response`（源站瞬断族，另案）。
+    verified_at: "2026-09-23 18:48"
+    updated: "2026-09-23 18:48"
     updated_by: 阿狸咪的工程师
 
   - id: align-gate-unregistered-cron-workflow
@@ -3116,7 +3133,7 @@ items:
          total_etf ≈1619（原 1602）、total_net 不再是 -4.9547e8；
       ② 日志出现「ETF clist 第 N 页失败 → Ns 后重试」而非「返回空，跳过」；
       ③ data/AI_MARKET_BRIEF.js 的「全市场ETF合计净流出」随底表变化。
-    updated: "2026-09-23 19:00"
+    updated: "2026-09-23 18:38"
     updated_by: 小九
 
   - id: update-v8-readtext-newline-py312
@@ -3274,7 +3291,7 @@ items:
   - id: handoff-dup-key-index-tail-truncation
     priority: P1
     owner: 阿狸咪的工程师
-    status: todo
+    status: done
     what: >
       `docs/ops/HANDOFF.yaml` 的 item `index-tail-truncation-2220` 内**同一 item 出现两个
       `updated:` 顶层键**（第 5 行 `2026-09-22 23:38` 与第 38 行 `"2026-09-22 22:50"`）——
@@ -3302,8 +3319,22 @@ items:
       按事实填正确时刻，然后把本项置 done。
       另：这条是 `dups_of()` 全库扫描抓出来的，**现行门禁不查重复键**，
       建议同批加进 `[13/13]`（成本＝纯读文件，无网络依赖），否则同类陷阱还会再来一次。
-    updated: "2026-09-23 18:00"
-    updated_by: 小九
+    verify_result: >-
+      阿狸咪 2026-09-23 2026-09-23 18:48 CST 处置完成（本项 note 直接指派我方）：
+      ① 已把 `index-tail-truncation-2220` 内重复的 `updated:` 收敛为**一行**，值按事实取
+      `"2026-09-22 23:38"`（依据：该 item 正文首行原记 23:38，且其 fix 引用的第二次重建提交
+      `b9df19eb7366` = 2026-09-22 23:23:22 CST < 23:38，时间线自洽；被 YAML 静默采信的尾行 22:50 是更早残留值）。
+      ② 本机全库复扫重复键：除 kit 内置豁免 `handoff-skill-inrepo/verify_how` 外，命中 = **0**。
+      ③ **顺带排除一次 P0（本类第 3 次复发，门禁按设计抓住）**：同文件 3 处未来时戳
+      （`meta.updated` / `etf-monitor-clist-fid-invalid` / `cn-fetch-queue-growth`，均写 `2026-09-23 19:00`，
+      由提交 b8c128eb84 = 18:38:17 CST 引入）⇒ `[13/13]` FAIL，
+      `v8_build_deploy` #7886（18:38:21）build job 失败步 = step10「🛡️ Pre-deploy audit」、
+      step13「📤 部署到 main（GitHub Pages 源）」= **skipped** ⇒ **云端部署链被结构性阻断**。
+      已按事实时刻改为 18:38（本项目 handoff-meta-future-timestamp 的 fix 口径：写入前实取时钟、禁未来时刻）。
+      ④ 建议（不改门禁）：把 `dups_of()` 一并纳入 `[13/13]`（纯读文件、无网络依赖）。
+    verified_at: "2026-09-23 18:48"
+    updated: "2026-09-23 18:48"
+    updated_by: 阿狸咪的工程师
 
   # ── P1 · 编排（小九 2026-09-23 傍晚实测）───────────────────────────────
   - id: cn-fetch-queue-growth
@@ -3329,5 +3360,5 @@ items:
     verify_how: >-
       观察或改造后核对：连续 3 小时 pending 深度不增长（或稳定 ≤2），且「修复上线 → 被 run 执行」
       的时延 ≤ 1 轮。
-    updated: "2026-09-23 19:00"
+    updated: "2026-09-23 18:38"
     updated_by: 小九
