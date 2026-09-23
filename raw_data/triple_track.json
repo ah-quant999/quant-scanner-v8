@@ -1,9 +1,9 @@
 {
-  "update_time": "2026-09-23 22:49:13",
-  "data_date": "2026-09-23",
-  "track_start": "2026-09-23",
-  "history_days": 29,
-  "strict_count": 6,
+  "update_time": "2026-09-24 00:35:19",
+  "data_date": "2026-09-24",
+  "track_start": "2026-09-24",
+  "history_days": 30,
+  "strict_count": 5,
   "near_count": 1,
   "tracked": [
     {
@@ -17,18 +17,18 @@
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
         "2026中报预增",
-        "深证100R",
+        "计算机、通信和其他电子设备制造业",
+        "PCB",
+        "百元股",
         "深股通",
         "2026一季报预增",
-        "百元股",
-        "PCB",
-        "计算机、通信和其他电子设备制造业",
+        "深证100R",
         "MSCI中国"
       ],
       "signal_count": 2,
       "enter_date": "2026-08-30",
-      "hold_days": 5,
-      "consecutive_days": 1,
+      "hold_days": 6,
+      "consecutive_days": 2,
       "first_close": 121.7,
       "current_close": 128.1,
       "pnl_pct": 5.26,
@@ -47,61 +47,26 @@
       "market": "sz",
       "board": "创业板",
       "status": "strict",
-      "total_score": 36.6,
+      "total_score": 34.8,
       "quality_grade": "A",
       "industry": "医药制造业",
       "sectors": [
-        "肝炎概念",
         "2026中报预增",
-        "减肥药",
         "深股通",
         "医药制造业",
+        "减肥药",
         "互联医疗",
+        "肝炎概念",
         "流感",
         "创新药"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-22",
-      "hold_days": 2,
-      "consecutive_days": 2,
+      "hold_days": 3,
+      "consecutive_days": 3,
       "first_close": 23.85,
       "current_close": 24.29,
       "pnl_pct": 1.84,
-      "price_source": "quote",
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "688498",
-      "name": "源杰科技",
-      "market": "sh",
-      "board": "科创板",
-      "status": "strict",
-      "total_score": 26.7,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "2026中报预增",
-        "通信技术",
-        "基金重仓",
-        "沪股通",
-        "昨日高振幅",
-        "百元股",
-        "计算机、通信和其他电子设备制造业",
-        "MSCI中国"
-      ],
-      "signal_count": 1,
-      "enter_date": "2026-09-23",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 1734.98,
-      "current_close": 1734.98,
-      "pnl_pct": 0.0,
       "price_source": "quote",
       "catalysts": [
         {
@@ -126,7 +91,7 @@
       "signal_count": 2,
       "enter_date": "2026-09-04",
       "hold_days": 1,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "first_close": 26.95,
       "current_close": 26.58,
       "pnl_pct": -1.37,
@@ -145,23 +110,23 @@
       "market": "sz",
       "board": "创业板",
       "status": "strict",
-      "total_score": 28.0,
+      "total_score": 26.1,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
         "2026中报预增",
-        "基金重仓",
-        "深证100R",
-        "深股通",
-        "百元股",
-        "机构重仓",
         "计算机、通信和其他电子设备制造业",
+        "基金重仓",
+        "百元股",
+        "深股通",
+        "机构重仓",
+        "深证100R",
         "MSCI中国"
       ],
       "signal_count": 1,
       "enter_date": "2026-08-17",
-      "hold_days": 5,
-      "consecutive_days": 1,
+      "hold_days": 6,
+      "consecutive_days": 2,
       "first_close": 466.68,
       "current_close": 451.2,
       "pnl_pct": -3.32,
@@ -188,8 +153,8 @@
       ],
       "signal_count": 2,
       "enter_date": "2026-08-17",
-      "hold_days": 8,
-      "consecutive_days": 2,
+      "hold_days": 9,
+      "consecutive_days": 3,
       "first_close": 39.34,
       "current_close": 36.81,
       "pnl_pct": -6.43,
@@ -216,8 +181,8 @@
       ],
       "signal_count": 2,
       "enter_date": "2026-08-20",
-      "hold_days": 2,
-      "consecutive_days": 2,
+      "hold_days": 3,
+      "consecutive_days": 3,
       "first_close": 20.1,
       "current_close": 17.39,
       "pnl_pct": -13.48,
@@ -240,9 +205,21 @@
     },
     {
       "level": "warn",
+      "code": "603993",
+      "name": "洛阳钼业",
+      "text": "洛阳钼业(603993) 于 2026-09-23 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
       "code": "000975",
       "name": "",
       "text": "(000975) 于 2026-08-17 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "good",
+      "code": "601168",
+      "name": "西部矿业",
+      "text": "西部矿业(601168) 连续 3 日稳居严格共识（高质量）"
     },
     {
       "level": "warn",
@@ -255,6 +232,12 @@
       "code": "688213",
       "name": "",
       "text": "(688213) 于 2026-08-17 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300857",
+      "name": "协创数据",
+      "text": "协创数据(300857) 于 2026-09-23 跌出共识（曾连续 2 日）"
     },
     {
       "level": "warn",
@@ -341,6 +324,12 @@
       "text": "赤峰黄金(600988) 于 2026-08-22 跌出共识（曾连续 2 日）"
     },
     {
+      "level": "good",
+      "code": "000703",
+      "name": "FUTURE BRIGHT",
+      "text": "FUTURE BRIGHT(000703) 连续 3 日稳居严格共识（高质量）"
+    },
+    {
       "level": "warn",
       "code": "000703",
       "name": "FUTURE BRIGHT",
@@ -416,7 +405,7 @@
       "level": "warn",
       "code": "688808",
       "name": "联讯仪器",
-      "text": "联讯仪器(688808) 入选以来回撤 -14.2%（2026-09-07 起）"
+      "text": "联讯仪器(688808) 于 2026-09-23 跌出共识（曾连续 2 日）"
     },
     {
       "level": "warn",
@@ -464,7 +453,7 @@
       "level": "warn",
       "code": "605117",
       "name": "德业股份",
-      "text": "德业股份(605117) 入选以来回撤 -8.8%（2026-09-12 起）"
+      "text": "德业股份(605117) 于 2026-09-23 跌出共识（曾连续 2 日）"
     },
     {
       "level": "warn",
@@ -528,6 +517,12 @@
     },
     {
       "level": "warn",
+      "code": "300390",
+      "name": "天华新能",
+      "text": "天华新能(300390) 于 2026-09-23 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
       "code": "000977",
       "name": "浪潮信息",
       "text": "浪潮信息(000977) 于 2026-09-17 跌出共识（曾连续 3 日）"
@@ -539,10 +534,10 @@
       "text": "华润置地(01109) 于 2026-09-18 跌出共识（曾连续 4 日）"
     },
     {
-      "level": "good",
+      "level": "warn",
       "code": "301308",
       "name": "江波龙",
-      "text": "江波龙(301308) 连续 9 日稳居严格共识（高质量）"
+      "text": "江波龙(301308) 于 2026-09-23 跌出共识（曾连续 9 日）"
     },
     {
       "level": "warn",
@@ -587,20 +582,43 @@
       "text": "中信证券(600030) 于 2026-09-21 跌出共识（曾连续 3 日）"
     },
     {
+      "level": "good",
+      "code": "300199",
+      "name": "翰宇药业",
+      "text": "翰宇药业(300199) 连续 3 日稳居严格共识（高质量）"
+    },
+    {
+      "level": "warn",
+      "code": "603268",
+      "name": "松发股份",
+      "text": "松发股份(603268) 于 2026-09-23 跌出共识（曾连续 2 日）"
+    },
+    {
       "level": "warn",
       "code": "688257",
       "name": "新锐股份",
       "text": "新锐股份(688257) 于 2026-09-22 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "000737",
+      "name": "",
+      "text": "(000737) 于 2026-09-23 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "688498",
+      "name": "源杰科技",
+      "text": "源杰科技(688498) 于 2026-09-23 跌出共识（曾连续 1 日）"
     }
   ],
   "sector_cluster": {
     "by_industry": [
       {
         "industry": "计算机、通信和其他电子设备制造业",
-        "count": 3,
+        "count": 2,
         "names": [
           "沪电股份",
-          "源杰科技",
           "新易盛"
         ]
       },
@@ -636,46 +654,34 @@
     "by_sector": [
       {
         "sector": "2026中报预增",
-        "count": 4
+        "count": 3
       },
       {
         "sector": "深股通",
         "count": 3
       },
       {
-        "sector": "百元股",
-        "count": 3
-      },
-      {
         "sector": "计算机、通信和其他电子设备制造业",
-        "count": 3
+        "count": 2
       },
       {
-        "sector": "MSCI中国",
-        "count": 3
+        "sector": "百元股",
+        "count": 2
       },
       {
         "sector": "深证100R",
         "count": 2
       },
       {
-        "sector": "基金重仓",
+        "sector": "MSCI中国",
         "count": 2
-      },
-      {
-        "sector": "2026一季报预增",
-        "count": 1
       },
       {
         "sector": "PCB",
         "count": 1
       },
       {
-        "sector": "肝炎概念",
-        "count": 1
-      },
-      {
-        "sector": "减肥药",
+        "sector": "2026一季报预增",
         "count": 1
       },
       {
@@ -683,7 +689,15 @@
         "count": 1
       },
       {
+        "sector": "减肥药",
+        "count": 1
+      },
+      {
         "sector": "互联医疗",
+        "count": 1
+      },
+      {
+        "sector": "肝炎概念",
         "count": 1
       },
       {
@@ -695,19 +709,11 @@
         "count": 1
       },
       {
-        "sector": "通信技术",
-        "count": 1
-      },
-      {
-        "sector": "沪股通",
-        "count": 1
-      },
-      {
-        "sector": "昨日高振幅",
-        "count": 1
-      },
-      {
         "sector": "有色金属冶炼和压延加工业",
+        "count": 1
+      },
+      {
+        "sector": "基金重仓",
         "count": 1
       },
       {
@@ -723,10 +729,10 @@
         "count": 1
       }
     ],
-    "concentration": 42.86
+    "concentration": 33.33
   },
   "overlap": {
-    "total_tracked": 7,
+    "total_tracked": 6,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -850,13 +856,13 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-09-23",
-    "history_days": 29,
+    "track_start": "2026-09-24",
+    "history_days": 30,
     "summary": {
       "1d": {
-        "count": 48,
-        "win_rate": 41.67,
-        "avg_return": 0.83
+        "count": 50,
+        "win_rate": 40.0,
+        "avg_return": 0.79
       },
       "3d": {
         "count": 38,
@@ -864,14 +870,14 @@
         "avg_return": 0.08
       },
       "5d": {
-        "count": 29,
-        "win_rate": 41.38,
-        "avg_return": 0.17
+        "count": 31,
+        "win_rate": 45.16,
+        "avg_return": 0.23
       },
       "10d": {
-        "count": 21,
-        "win_rate": 28.57,
-        "avg_return": -0.84
+        "count": 24,
+        "win_rate": 37.5,
+        "avg_return": -0.13
       },
       "20d": {
         "count": 10,
@@ -1302,7 +1308,8 @@
         "name": "紫光股份",
         "enter_date": "2026-09-14",
         "offsets": {
-          "1d": 0.43
+          "1d": 0.43,
+          "10d": 2.84
         }
       },
       {
@@ -1310,7 +1317,8 @@
         "name": "同花顺",
         "enter_date": "2026-09-14",
         "offsets": {
-          "1d": -0.75
+          "1d": -0.75,
+          "10d": 1.5
         }
       },
       {
@@ -1318,7 +1326,8 @@
         "name": "富创精密",
         "enter_date": "2026-09-14",
         "offsets": {
-          "1d": 4.82
+          "1d": 4.82,
+          "10d": 10.14
         }
       },
       {
@@ -1417,7 +1426,8 @@
         "enter_date": "2026-09-19",
         "offsets": {
           "1d": 0.0,
-          "3d": 3.45
+          "3d": 3.45,
+          "5d": 1.34
         }
       },
       {
@@ -1426,7 +1436,8 @@
         "enter_date": "2026-09-19",
         "offsets": {
           "1d": 0.0,
-          "3d": 1.32
+          "3d": 1.32,
+          "5d": 0.94
         }
       },
       {
@@ -1451,6 +1462,22 @@
         "enter_date": "2026-09-22",
         "offsets": {
           "1d": 4.26
+        }
+      },
+      {
+        "code": "000737",
+        "name": "",
+        "enter_date": "2026-09-23",
+        "offsets": {
+          "1d": 0.0
+        }
+      },
+      {
+        "code": "688498",
+        "name": "源杰科技",
+        "enter_date": "2026-09-23",
+        "offsets": {
+          "1d": 0.0
         }
       }
     ]
