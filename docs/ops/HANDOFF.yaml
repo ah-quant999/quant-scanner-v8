@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 21:17"
+  updated: "2026-09-23 21:28"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -3047,7 +3047,7 @@ items:
   - id: align-gate-unregistered-cron-workflow
     priority: P0
     owner: shared
-    status: done
+    status: doing
     what: >
       🔴 **部署曾被结构性阻断**：`v8_build_deploy` 2026-09-23 15:41–16:07 CST **连续 5 档失败**
       （#7841 / #7842 / #7843 / #7844 / #7845），全部倒在 `🛡️ Pre-deploy audit` 的
@@ -3087,9 +3087,33 @@ items:
       ⏱️ **时序诚实说明**：我方 16:2x 据 #7845（16:07）判红并登记于 16:26，而对方修复提交为 **16:25:12**
       （早约 1 分钟 ⇒ 双方并发，非重复劳动，也非我方误判：判红所用档 #7841–#7845 均真实存在）。
       本项**保留作同族档案**，勿再当待修。
+    note: >-
+      ── 阿狸咪 2026-09-23 21:28 补 · 🔴 **同族第 2 次复发（同一 `[4/8] align_logic_ops`、同一根因、48 分钟内）** ──
+      复发件：新增 `.github/workflows/v8_dajijin_fetch.yml`（commit `9681dd6f5f`，
+      **2026-09-23 21:13:49 CST**，message「feat(暂未上架): 新增「🚨 大基金 增减持监控」数据链」，
+      `cron: '30 12 * * 1-5'`）**同样未同批双登记**：远端 `align_logic_ops.py`（blob `5e66eb37ee73`）
+      全文 grep `dajijin` = **0 命中**；`docs/ops/HANDOFF.yaml` grep `dajijin`/`大基金` = **0 命中**。
+      ⚠️ 与本项首次（15:35 `v8_zombie_reaper`）**唯一不同点**：`v8_zombie_reaper` 为「*新增* workflow」，
+      而 `v8_dajijin_fetch.yml` 的**文件在 21:13:49 之前是否已存在**未取证 ⇒ 若早已存在（今日才带 cron 上线），
+      则「文件新增」这条触发面判断不成立、**根因只剩「改 cron/改文件都必须同步登记」这一条**（请对方核）。
+      📌 **部署仍被结构性阻断**（本轮实测）：`v8_build_deploy` **#7921**（21:17:41 CST，head `14a090b99f`
+      = 我方 HANDOFF 提交）`build` job = **failure**，唯一失败步 step10 `Pre-deploy audit`，
+      日志逐字 `❌ [4/8] align_logic_ops: align_logic_ops 失败:` /
+      `🔧 实际有 cron 的 workflow：22 个；名单：MUST=21 / ALLOW=3` /
+      `  - workflow v8_dajijin_fetch 有 cron 调度，但既未登记 MUST/ALLOW 名单、也未文档化`；
+      同档其余 13 项**全绿**（`✅ [10/10] 39/39`、`✅ [13/13] items=69 · next_id_seq=68≥68`、
+      `✅ [14/14] AI 入口在位`）⇒ 唯一红项就是 [4/8]，**修它即解锁**。
+      🔍 **为何一直没被发现（本轮新证据）**：该 workflow 引入后的 build_deploy 档 **#7914–#7919 全 `cancelled`**
+      （21:10:27–21:16:05 CST，被同并发组后续档顶替）⇒ **它们根本没跑到 audit**，
+      **只有 #7921 一档真跑到 [4/8] 并红了**；即「并发取消」把这次阻断连续掩盖了 4 分钟。
+      ⇒ **建议**（治本，非再修一次）：把登记要求**前移**到新增/改 cron 的同一提交上（例：CI 对
+      `.github/workflows/**` 变更的 PR/push 强制同批改 `align_logic_ops.py`，或在 workflow 头部加
+      `# @align-registered:` 自声明标记，由 `align_logic_ops.py` 读该标记而非两处手工维护名单）。
+      ⏸️ 本轮**只报不改**（不抢在飞车道、不碰 index.html/logic.html 文档源）。
+      🔄 状态回退 `done` → `doing`（有 active owner 在修）；`verified_at` 保留为首轮证据。
     verified_at: "2026-09-23 16:37"
-    updated: "2026-09-23 16:37"
-    updated_by: 阿狸咪的工程师
+    updated: "2026-09-23 21:28"
+    updated_by: 阿狸咪的工程师(alimi-cn)
 
   # ── P0 · 数据链（小九 2026-09-23 盘后）─────────────────────────────────
   - id: etf-monitor-clist-fid-invalid
