@@ -26,8 +26,8 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 22:11"
-  updated_by: 阿狸咪的工程师(alimi-cn)
+  updated: "2026-09-23 22:55"
+  updated_by: 小九(小九机)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
@@ -3594,3 +3594,63 @@ items:
       三者齐备方可置 `done` 并填 `verified_at`。
     updated: "2026-09-23 22:11"
     updated_by: 阿狸咪的工程师(alimi-cn)
+
+  # ── P1 · 推送安全 ──────────────────────────────────────────────────────
+
+  - id: prepush-version-guard
+    priority: P1
+    owner: 小九
+    status: done
+    updated_by: 小九(小九机)
+    what: >-
+      回应阿狸咪 2026-09-23 22:35 给小九的两条协同指令：
+      ① 「锚点守卫有天生短板：拦不住『同一个文件里悄悄换回旧版』（锚点还在，只是某段被换成旧实现）」
+         ⇒ 正解是加一道「文件前后版本比对」；
+      ② 「所有写着『净室推送 / 隔离索引』的脚本，推送前必须先拉一次最新 —— 这次的祸根就是拿旧树直接推」。
+      🔴 **对第②条的口径纠偏（实测，非推断）**：这一族脚本**早已**满足「先拉最新」——
+      `v8_push_files.py` 每轮 `T = tip()` 且基线取自**该 TIP 的线上真身**；
+      `v8_fix_stockquery.py` 用 `tip_now()`、`v8_push_multifile_base.py` 用 `fetch_raw(path, ref=main)`。
+      它们从来不是「用本地树当 base」。**真祸根是：base 取最新、但内容取自旧树**
+      ⇒ 结果是「**挂着新父提交的旧内容**」，比整树回退**更隐蔽**
+      （`git show` 看着像一次正常改动，只有逐字节比对才现形）。
+      ⇒ 故「先拉最新」是**必要但不充分**条件，必须补**内容级**比对（即①的通解）。
+    fix: >-
+      **新增推前版本护栏**，两件指令统一落在同一点上（①＝内容级比对，②＝比对前置）。
+      (A) 新工具 `~/.workbuddy/scripts/v8_prepush_guard.py`（独立入口，CLI + 可 import 的
+          `guard_pairs()`）：取线上真身 → 与待推内容做版本比对 → 出裁决
+          （rc=0 放行 / rc=6 疑似回退 / rc=2 取基线失败则**拒绝推送**，宁停不猜）。
+      (B) `v8_push_files.py::push()` 内建护栏：`guard=True` 默认开，命中即 `return 6`，
+          **阻断在建 blob 之前**（零副作用）；新增 `--strict-guard` / `--allow-revert` / `--no-guard`。
+      (C) 判据四档：A1 删行率（`removed>30` 且 `>2%`）/ A2 **删字节率**（`>5%`）/
+          B 整档缩水（`>10%`）/ C `strict`（任何删行即拦）。
+      (D) 段落级区间**无条件打印**（`difflib.SequenceMatcher`，见 `section_blocks`）——
+          这才是把「锚点仍在、某段被换掉」摆到人眼前的抓手。
+      (E) 明细写入 `~/.workbuddy/v8_push_log/<ts>_PUSHED.json` 的 `guard` 字段，供**事后审计**。
+    evidence: >-
+      ✅ **A2（删字节率）为何必需 —— 血训实测**：`docs/ops/HANDOFF.yaml` 线上 326,831 B/3,596 行，
+      本机落后版 320,217 B/3,522 行 ⇒ **只删 79 行却丢 6.6 KB**（该文件有大量超长块标量行）
+      ⇒ 行数比例失真，**只看行数会漏判**。首版只做 A1 时该用例判 `ok`，加 A2 后判 `suspect`。
+      ✅ **实验室对照 7 用例全 PASS**（`_guard_test.py`，真身字节、不造假）：
+      旧树覆盖 ⇒ suspect（**精准点名**会删掉对方刚补的整条 `align-gate-shiftleft`）；
+      等量替换 60 行（strict）⇒ suspect；等量替换 60 行（非 strict）⇒ ok（**符合能力边界声明**）；
+      线上真身 +1 行无害追加 ⇒ ok；**真实加卡改动 `+276/-253` 行（删行率 1.32%）⇒ ok（不误伤）**；
+      新文件 ⇒ new；逐字节相同 ⇒ noop。
+      ✅ **端到端双向实测（经 `v8_push_files.py --dry`，零推送）**：
+      负向 = 推本机落后版 HANDOFF ⇒ `RC=6`，输出逐字点名
+      「段落 L3546 起：删 51 行 / 补 0 行 ⟵ - id: align-gate-shiftleft」；
+      正向 = 线上真身 +1 行 ⇒ `RC=0` 放行。
+      ✅ **接线清单 5/5**（全部 py_compile 通过）：`v8_push_files.py`（内建）/
+      `v8_prepush_guard.py`（本体）/ `v8_push_multifile_base.py` / `v8_push_multifile_fast.py`
+      （仅校验本轮重建项）/ `v8_fix_stockquery.py`；逃生门统一为 `--skip-guard`。
+      ℹ️ 该族脚本均在 `~/.workbuddy/scripts/`，**不在本仓内** ⇒ 本次落地无需推仓、无覆盖风险。
+    verify_how: >-
+      ① 任一推送脚本在「底稿落后线上」时**必须被拦**（rc=6 且打印被删段落），不得静默推送；
+      ② 正常情况下（线上真身 + 正常增量改动）**必须放行**，不得产生「逢推必拦」的狼来了效应；
+      ③ 每次成功推送的 `~/.workbuddy/v8_push_log/*_PUSHED.json` 含 `guard` 明细。
+    boundary: >-
+      ⚠️ **能力边界（诚实声明，勿夸大）**：A1/A2/B 是**统计判据**，只能抓「量级异常」的回退。
+      「**等量替换一小段**」（`removed≈added`、占比 0.3%）在统计上与正常迭代**不可区分**
+      —— 这**不是实现缺陷**，而是**无先验即不可判**（不知道「什么是对的」，就判不出「什么是旧的」）。
+      故该形态的处置是**三重**：① 关键文件挂 `strict`；② 段落区间无条件打印；
+      ③ push log 留证供事后审计。**不宣称「已能自动拦截一切回退」。**
+    updated: "2026-09-23 22:55"
