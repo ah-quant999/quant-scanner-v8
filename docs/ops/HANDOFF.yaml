@@ -26,15 +26,15 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 16:52"
-  updated_by: 小九
+  updated: "2026-09-23 17:28"
+  updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 62
+  next_id_seq: 63
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -3097,3 +3097,37 @@ items:
       「全市场ETF合计净流出」数值随底表变化（brief 每档重生成、读该底表）。三证齐备才可置 done。
     updated: "2026-09-23 16:52"
     updated_by: 小九
+
+  # ── 2026-09-23 17:2x 阿狸咪新增（update_v8.py 用了 Py3.13 专有 API × ima 链固定 3.12 ⇒ step7 恒红）──
+  - id: update-v8-readtext-newline-py312
+    priority: P1
+    owner: shared
+    status: done
+    what: >
+      `update_v8.py` 的 `_rewrite_index_html_cache_busters()`（:915）与 `_ensure_momentum_loader()`（:952）
+      读 index.html 时用了 `idx_path.read_text(encoding='utf-8', newline='')`。
+      `Path.read_text()` 的 `newline=` 形参是 **Python 3.13 才新增**的；而全仓消费 `update_v8.py` 的
+      9 个 workflow 里 **只有 `v8_ima_strong_stock.yml` 固定 `python-version: "3.12"`**（其余均 3.13）
+      ⇒ 该链 step7「重写 index.html 的 ?v 缓存戳」必抛
+      `TypeError: Path.read_text() got an unexpected keyword argument 'newline'` ⇒ step7 红、
+      step8（推送）skip ⇒ **产物不重产**（外部表现为「卡片停在旧日期」，极易误判成 ima 数据事故）。
+      引入时点：2026-09-22 12:27Z `9037d76d22`（index.html 截断根治 · 原子写 + 落盘自证）。
+      实证红 run：#33（09-22 20:50 CST · schedule）/ #34（09-23 15:52 CST · dispatch），失败步均为 step7。
+      ⚠️ 同一行代码在 3.13 的 workflow 上**不报错** ⇒ 该缺陷**只打 ima 一条链**，别按数据问题排查。
+    fix: >
+      已治本：两处改为 `with open(idx_path, 'r', encoding='utf-8', newline='') as _fh: html = _fh.read()`
+      （3.12/3.13 通吃），`newline=''` 行尾纪律与读入语义完全不变。commit `03e8db79da`。
+    verify_how: >
+      派发 `v8_ima_strong_stock.yml`（ref=main）：断言 step7/step8 均由 skip 转 success、run 结论 success，
+      且产物 `data/IMA_STRONG_STOCK.js` 的 `update_time` 相对上一版前进。
+    evidence: >
+      阿狸咪的工程师 2026-09-23 CST（全部实测，非推断）：
+      · 本机 **Python 3.12.8** scratch 目录真实执行 `update_v8.py --only-cache-busters` → rc=0，
+        日志 `✅ index.html cache-busting 参数已更新` + `✅ 已补回 STOCK_MOMENTUM_STATE.js 加载标签`。
+      · 推送 commit `03e8db79da`（远端 update_v8.py blob `47c44702545561353387d5d61e3babfe665e7c13`，
+        92,912 B，CRLF=0，`read_text(encoding='utf-8', newline='')` 残留 **0** 处）。
+      · dispatch **run #35**（id 35842789168，head `c0fad680e4`）**8 步全 success**，step7/step8 转绿。
+      · 产物 blob `024920cc0d0ed68f719f8c8b2d66151c923638b3`：`detail_channel=full-snapshot` ✅ /
+        `sample_coverage.reconciled=true` ✅ / `len(stocks)=56` ✅ / `update_time=2026-09-23 17:26:32`。
+    updated: '2026-09-23 17:28'
+    updated_by: 阿狸咪的工程师
