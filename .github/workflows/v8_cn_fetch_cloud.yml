@@ -342,6 +342,7 @@ jobs:
           if [ -z "$TD" ]; then TD="true"; fi   # 解析失败→保守视为交易日，不跳过
           if [ "$TD" != "true" ]; then TD="false"; fi
           echo "is_trading_day=$TD"
+          echo "is_trading_day=$TD" >> "$GITHUB_OUTPUT"   # 🛡 2026-09-23 供「一进二观察」等日频卡步做周末闸门
           # 交易日 / 周末周度刷新(category=all) / 手动全量 → 继续抓取；
           # 仅「工作日 + 非交易日(节假日)」→ 跳过冗余抓取（V8_DATA_DATE 已保证不串日，无数据风险）
           if [ "$TD" = "true" ] || [ "$CAT" = "all" ]; then
@@ -560,15 +561,33 @@ jobs:
         #   从未接入任何自动化（全仓 workflow 0 引用）⇒ 数据停在 2026-09-21 23:23，
         #   健康面板报「超过通用红线 1620 分钟」。本步把它挂进 cn fetch 链。
         #   ⚠️ 09-23 首版只挂 post_close ⇒ 09-23 盘前 run 直接 skip，要等 17:20 才刷新，
-        #      与「一劳永逸」相悖；故改为【每轮刷新】（不再挑时段）：
-        #      非交易时段 run 触发时，fetcher 默认模式会自动「向前回溯最近有池交易日(≤7日)」
-        #      补抓最近一个交易日数据，配合「同日去重」天然幂等，不会重复推送也不会空壳。
+        #      与「一劳永逸」相悖；故改为【每轮刷新】（不再挑时段）。
+        #   🛡 2026-09-23 二次修订（主人令「周末跑了浪费吧」·阿狸咪的工程师）：
+        #      涨停池是**收盘才定稿**的日频数据 ⇒ 盘前/盘中/周末每一轮 run 都不可能产出
+        #      比上一交易日更新的内容：周末（category=all，td.proceed 仍为 true）必然只是
+        #      重取同一份数据。故本步加 `td.is_trading_day != 'false'` 闸门 —— 周末零请求跳过；
+        #      td 步骤解析失败时其输出为空（'' != 'false'）⇒ 保守放行，不会漏跑。
+        #      盘前/盘中的冗余轮次由**生成器内置增量闸门 need_refresh()** 收敛：
+        #      只花 1 次交易日历请求，即判断「已采集档的 date 已跟上最近已收盘交易日
+        #      且 K 线口径版本一致且覆盖充足」⇒ 早退，不发涨停池/K 线请求（零空转）。
+        #      即：每交易日只真抓 1 次（收盘后首轮），其余轮次零请求。
         #   产物 raw_data/board_first_limit.json + data/BOARD_FIRST_LIMIT.js 由下方
         #   soft_10/soft_14 推送步按 git status 增量自动上线，无需新增推送口。
-        #   脚本自身带三道护栏：① 抓空不覆盖（防空壳，同 cnfetch-empty-shell-block 族）
+        #   脚本自身带五道护栏：① 抓空不覆盖（防空壳，同 cnfetch-empty-shell-block 族）
         #   ② 同日去重（同一交易日只落首轮，不产生重复推送）
-        #   ③ 向前回溯（非交易/源未更新时回退到最近有池交易日，杜绝空壳）；
+        #   ③ 向前回溯（非交易/源未更新时沿交易日历回退到最近有池交易日，杜绝空壳）；
         #      显式传日期 = 手动回补强制覆盖。
+        #   ④ 增量闸门 need_refresh()：已采集且口径/kline 覆盖达标 ⇒ 早退（见上）。
+        #   ⑤ K 线重试封顶（kline_try≤3）：K 线源不可用时最多重试 3 轮即停，防「每轮重试」风暴。
+        #   🔴 2026-09-23 三次修订（主人令「K线严格过滤马上加，明早我要看到」）：
+        #      本步产物新增 K 线严格过滤结果（strict_pass / k_flags / 读数）：
+        #      · K 线源 = **新浪日线**（实测：东财 push2his 含 52. 编号子域、以及
+        #        akshare.stock_zh_a_hist 在本机与云端均被 WAF 拒；腾讯 gtimg web.ifzq 返回 501；
+        #        新浪 getKLineData 返回当日真值）—— 一次 HTTP 取 320 根，候选仅 20~40 只。
+        #      · 回退 = 仓内 raw_data/kline_cache（已入仓·零网络），其尾根日期 < 信号日则判
+        #        'stale' —— **不给过滤结论**，绝不拿旧 K 线冒充当日（诚实降级）。
+        #      · 过滤口径 = 交付区《选股公式解读与审计_2026-09-21》+ 回测实现 bt_yijiner.py
+        #        的 components()，六项忠实复刻；筹码穿刺分支因外部 SSRP 缺失按审计砍除。
         #   🔴 2026-09-23 追加（错日根因一劳永逸·阿狸咪的工程师）：默认模式由「以今天为起点试」
         #      改为**先用交易日历取「最近一个已收盘交易日」**（今天未过 16:00 CST 则取上一交易日）。
         #      病灶：东财 getTopicZTPool 对「未收盘的今天 / 未来日」一律吐**最新存量池**
@@ -578,7 +597,9 @@ jobs:
         #      显式传日期（手动回补）行为不变。
         #   软失败 + 强制 annotation（本文件 09-08 主人令范式）：一进二观察卡失败不拖垮
         #   全链盘后数据，但必须在软失败汇总里可见。
-        if: steps.gate.outputs.skip != 'true' && steps.td.outputs.proceed != 'false'
+        # 🛡 2026-09-23 主人令「周末跑了浪费吧」：本卡是**收盘定稿**的日频数据，周末
+        #   （category=all，td.proceed 仍为 true）跑本步只会重取同一份上一交易日数据。
+        if: steps.gate.outputs.skip != 'true' && steps.td.outputs.proceed != 'false' && steps.td.outputs.is_trading_day != 'false'
         timeout-minutes: 10
         continue-on-error: true
         shell: bash

@@ -665,7 +665,7 @@ window.__domReadyFns=[];
          scripts/{baihechou_daily,fetch_baihechou_v8,set_baihechou_analysis}.py 与本机 06:30/08:30
          自动化（98101962/622ad154，按铁律 PAUSED 不删）一并退役；window.CRISIS_DATA 宏观硬指标
          仍被每日洞察/情绪周期消费 ⇒ 只删卡壳不删源。 -->
-    <script src="data/BOARD_FIRST_LIMIT.js?v=1790165430" defer></script><!-- 🔥 主板首板 · 一进二观察（数据源：akshare.stock_zt_pool_em 完整涨停池 → 主板首板 + 基础口径过滤；取最近一个已收盘交易日 · cn fetch 每轮刷新 · window.BOARD_FIRST_LIMIT） -->
+    <script src="data/BOARD_FIRST_LIMIT.js?v=1790165749" defer></script><!-- 🔥 主板首板 · 一进二观察（数据源：akshare.stock_zt_pool_em 完整涨停池 → 主板首板 + 基础口径过滤；取最近一个已收盘交易日 · cn fetch 每轮刷新 · window.BOARD_FIRST_LIMIT） -->
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=1790165430" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
@@ -15693,8 +15693,10 @@ h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-lef
 h += '<div class="card" id="macroKShapeBody" style="margin-bottom:16px;border-left:4px solid #fbbf24;">'
    + '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F30D; 宏观景气背景 · K 型分层 加载中&#x2026;</div></div>';
 // ═══ 🔥 2026-09-23 主人令：「主板首板·一进二观察」由「📡 实时数据」迁入本页（观测类）═══
-//   定性：仅「今日主板首板 + 基础口径（市值/换手/封板）」观察名单，K线严格过滤（控盘/三线粘合/角度60°/涨停确认/量差/筹码穿刺）
-//   待云端K线步接入 ⇒ 当前【无买入信号】，属观测卡非选股信号。
+//   定性：两级分层的观察名单 —— ①基础口径（市值/换手/封板）②K线严格过滤（「一进二」公式六项：
+//   涨停确认/大趋势/量差或控盘指数/量线粘合/三线粘合/角度60 + 量<6.18昨量 + 昨日非涨停；筹码穿刺因 SSRP 缺失按审计砍除）。
+//   数据由云端 cn fetch 步 algorithms/fetch_board_first_limit.py 产出（新浪日线算过滤）。
+//   ⚠️ 实测次日开盘买超额≈0（裸首板池 T+1 −0.48%/t=−2.55；严格分层增量 |t|<2）⇒ 是【降噪排序的观测卡】，非买点。
 //   竞态根治：渲染改由 __ulRenderPane 派发（用户进本页时 defer 数据必已就位），ulSelfHeal 每 1.5s 兜底。
 h += '<div id="boardFirstLimitCard" style="margin-bottom:16px;"></div>';  // 裸 div 宿主：与连板天梯同范式（v8CardHeader 自带卡头），防「双圆弧」复发
 h += '</div>'; // /ulPaneObserve
@@ -16406,7 +16408,7 @@ h += '</div>'; // /ulPaneObserve
     el.innerHTML = html;
   }
   window.__renderCycleLadderCard = __renderCycleLadderCard;
-  // 🔥 主板首板 · 一进二观察卡渲染器（2026-09-21 建；2026-09-23 阿狸咪的工程师：1行2列 + 核心/用法/限制 + 数据日口径）
+  // 🔥 主板首板 · 一进二观察卡渲染器（2026-09-21 建；2026-09-23 阿狸咪的工程师：1行6列分层 + K线严格过滤接入 + 折叠不拉窗）
   function __renderBoardFirstLimit(){
     var box=document.getElementById('boardFirstLimitCard');
     if(!box) return;
@@ -16414,33 +16416,50 @@ h += '</div>'; // /ulPaneObserve
     var _dd=(d&&d.date&&String(d.date).length===8)?(String(d.date).slice(4,6)+'-'+String(d.date).slice(6,8)):'—';
     // 核心/用法/限制（全站统一范式）
     var _guide='<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:10px 12px;margin:0 0 10px;line-height:1.8;font-size:12px;color:var(--txt);">'
-      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">📌 核心：</b>在<b>最近一个已收盘交易日</b>的<b>主板首板</b>（60/00 开头 · 连板数=1）里，找出符合<b style="color:#26a69a;">基础口径</b>的观察标的：流通市值&lt;120亿<b>或</b>流通股&lt;4亿 ＋ 换手率&gt;2% ＋ 炸板 0 次（封板干净）。</div>'
-      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b>「✓基础」= 三项基础口径全达标（绿标）；列表按「基础达标优先 → 封板资金降序」排列。一进二看的是<b>次日承接</b>，基础口径只是初筛，须结合板块情绪（涨停天梯／炸板率）与个股位置。</div>'
-      +'<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠ 限制：</b>当前<b>仅有基础口径</b>，K 线严格过滤（控盘指数／三线粘合／角度60°／涨停确认／量差／筹码穿刺）<b>尚未接入</b> ⇒ 本卡是<b>观察名单、非选股信号</b>。仅研究参考，不构成投资建议。</div>'
+      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">📌 核心：</b>在<b>最近一个已收盘交易日</b>的<b>主板首板</b>（60/00 开头 · 连板数=1）里做<b>两级分层</b>：①<b style="color:#26a69a;">基础口径</b>＝流通市值&lt;120亿<b>或</b>流通股&lt;4亿 ＋ 换手率&gt;2% ＋ 炸板 0 次（封板干净）；②<b style="color:#e0b34a;">K 线严格过滤</b>＝「一进二」公式六项（涨停确认／大趋势／量差<b>或</b>控盘指数／量线粘合／三线粘合／角度60°）＋ 量&lt;6.18×昨量 ＋ 昨日非涨停 ＋ 小盘 ＋ 换手&gt;2%。</div>'
+      +'<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b><b style="color:#e0b34a;">★严格</b>＝六项 K 线过滤全过（金标·置顶）；<b style="color:#26a69a;">✓</b>＝仅基础口径达标；其余收进折叠区。排列「严格 → 基础 → 封板资金降序」。一进二看的是<b>次日承接</b>，须结合板块情绪（涨停天梯／炸板率）与个股位置；鼠标悬停可见该只未过哪些项与读数。</div>'
+      +'<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">⚠ 限制：</b>本卡是<b>观察分层、非买点</b>。面板层实测（1909 只主板 · 约一年）：① <b>裸首板池</b>次日开盘买 T+1 <b style="color:#26a69a;">−0.48%</b>（按日 t=−2.55，显著为负）⇒ 盲追首板亏钱；② <b>严格分层</b>把 T+1 收到 −0.38%、T+5 由 −0.32% 转为 <b style="color:#ef5350;">+0.26%</b>，方向正确，<b>但增量 |t| 仅 1.0~1.6（未达显著）</b>；③「信号日收盘买」口径超额显著（T+5 +2.02%／t=5.98），但那是不可成交的价格。⇒ 严格过滤的价值是<b>降噪排序</b>，不是买点。筹码穿刺分支因外部指标 SSRP 缺失已按审计砍除。仅研究参考，不构成投资建议。</div>'
       +'</div>';
     if(!d||!d.items||!d.items.length){
-      box.innerHTML=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径过滤（观察）','update_time',{update_time:(d&&d.update_time)||''},true)+_guide;
+      box.innerHTML=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径 + K线严格过滤（观察分层）','update_time',{update_time:(d&&d.update_time)||''},true)+_guide;
       return;
     }
-    var cells='';
-    d.items.forEach(function(x){
-      var tag=x.basic_pass
-        ? '<span style="color:#26a69a;font-size:10.5px;font-weight:700;">✓基础</span>'
-        : '<span style="color:#666;font-size:10.5px;">—</span>';
+    var _grid='display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px 7px;';
+    function _cell(x){
       var ft=String(x.first_time||''); if(ft.length===6) ft=ft.slice(0,2)+':'+ft.slice(2,4);
-      cells+='<div style="font-size:11px;padding:4px 6px;border:1px solid var(--border2);border-radius:6px;background:rgba(255,255,255,0.03);min-width:0;">'
-        +'<div style="display:flex;align-items:center;gap:5px;">'
-        +'<b style="color:#ef5350;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.name+'</b>'
-        +'<span style="color:#888;">'+x.code+'</span>'
-        +'<span style="margin-left:auto;">'+tag+'</span></div>'
-        +'<div style="color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.industry+' · 流通'+x.circ_mcap+'亿 · 换'+x.turnover+'%</div>'
-        +'<div style="color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">封'+x.seal+'亿 · 首封'+ft+'</div>'
+      var isS=!!x.strict;
+      var kn=(x.kline==='na')?'<span style="color:#666;font-size:9px;"> K?</span>':((x.kline==='stale')?'<span style="color:#666;font-size:9px;"> K旧</span>':'');
+      var rd=x.read||{};
+      var tip=x.name+' '+x.code+' ｜ '+x.industry+' ｜ 流通'+x.circ_mcap+'亿／流通股'+x.circ_shares+'亿股 ｜ 换手'+x.turnover+'% ｜ 封'+x.seal+'亿 首封'+ft
+        +' ｜ '+(isS?'K线六项全过':(x.kmiss&&x.kmiss.length?('未过：'+x.kmiss.join('／')):'K线未判定'))
+        +(rd.vol_ratio?(' ｜ 量比'+rd.vol_ratio+' 角'+rd.ang_deg+'° 三线'+rd.glue3_ratio+' 量线'+rd.gluev_ratio):'');
+      var l5=(x.kmiss&&x.kmiss.length)?'<div style="color:#78838f;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">✗ '+x.kmiss.join('·')+'</div>':'';
+      return '<div title="'+tip+'" style="font-size:10px;padding:3px 6px;border:1px solid var(--border2);border-left:2px solid '+(isS?'#e0b34a':'#26a69a')+';border-radius:5px;background:rgba(255,255,255,0.03);min-width:0;">'
+        +'<div style="display:flex;align-items:center;gap:4px;min-width:0;">'
+        +'<b style="color:#ef5350;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.name+'</b>'
+        +'<span style="color:#888;font-size:9px;">'+x.code+'</span>'
+        +'<span style="margin-left:auto;white-space:nowrap;">'+(isS?'<span style="color:#e0b34a;font-size:9.5px;font-weight:700;">★</span>':(x.basic_pass?'<span style="color:#26a69a;font-size:9.5px;">✓</span>':''))+kn+'</span></div>'
+        +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.industry+'</div>'
+        +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">流通'+x.circ_mcap+'亿·换'+x.turnover+'%</div>'
+        +'<div style="color:var(--dim);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">封'+x.seal+'亿·'+ft+'</div>'
+        +l5
         +'</div>';
-    });
-    var html=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径（流通市值<120亿或流通<4亿 + 换手>2% + 封板干净）','update_time',d)
-      +'<div style="padding:4px 0 8px;color:#bbb;font-size:12px;">数据日 <b style="color:#fbbf24;">'+_dd+'</b> 主板首板 <b style="color:#ef5350;">'+d.total+'</b> 只 ｜ 基础口径达标 <b style="color:#26a69a;">'+d.basic_pass+'</b> 只</div>'
+    }
+    var _S=[],_B=[],_R=[];
+    d.items.forEach(function(x){ (x.strict?_S:(x.basic_pass?_B:_R)).push(x); });
+    function _sec(t,c){
+      return '<div style="font-size:11px;color:#bbb;margin:0 0 5px;">'+t+'</div>'
+        +'<div style="'+_grid+'">'+c.map(_cell).join('')+'</div>';
+    }
+    var _body='';
+    if(_S.length) _body+=_sec('<b style="color:#e0b34a;">★ 严格达标</b> <span style="color:#8b98a8;">'+_S.length+' 只 · 六项 K 线过滤全过</span>',_S);
+    if(_B.length) _body+='<div style="margin-top:9px;">'+_sec('<b style="color:#26a69a;">✓ 基础达标</b> <span style="color:#8b98a8;">'+_B.length+' 只 · 未过严格过滤</span>',_B)+'</div>';
+    if(_R.length) _body+='<details style="margin-top:9px;"><summary style="cursor:pointer;font-size:11px;color:#8b98a8;outline:none;">其余 '+_R.length+' 只（基础口径也未达标）· 点击展开</summary><div style="'+_grid+'margin-top:6px;">'+_R.map(_cell).join('')+'</div></details>';
+    var _kna=(d.kline_na>0)?(' ｜ <span style="color:#8b98a8;">K线不可用 '+d.kline_na+' 只</span>'):'';
+    var html=v8CardHeader('🔥','主板首板 · 一进二观察','主板首板 + 基础口径 + K线严格过滤（一进二公式六项）· 观察分层','update_time',d)
+      +'<div style="padding:4px 0 8px;color:#bbb;font-size:12px;">数据日 <b style="color:#fbbf24;">'+_dd+'</b> 主板首板 <b style="color:#ef5350;">'+d.total+'</b> 只 ｜ 严格达标 <b style="color:#e0b34a;">'+(d.strict_pass||0)+'</b> 只 ｜ 基础达标 <b style="color:#26a69a;">'+d.basic_pass+'</b> 只'+_kna+'</div>'
       +_guide
-      +'<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px 10px;max-height:340px;overflow:auto;">'+cells+'</div>';
+      +_body;
     box.innerHTML=html;
   }
   window.__renderBoardFirstLimit = __renderBoardFirstLimit;
