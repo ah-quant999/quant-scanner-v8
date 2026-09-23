@@ -2979,7 +2979,7 @@ def f_etf_daily_monitor():
     MAX_PAGES = 30  # 安全阀：全市场 ETF 约 1000+ 只，30 页足矣
     pn = 1
     while pn <= MAX_PAGES:
-        page = em_clist("m:1+t:9,m:0+t:9", fields, fid="f12", stat="1", pz=PAGE_SIZE, po="1", pn=pn)
+        page = em_clist("m:1+t:9,m:0+t:9", fields, fid="f3", stat="1", pz=PAGE_SIZE, po="1", pn=pn)
         if not page:
             break  # 空页：已遍历至末尾
         for r in page:
@@ -3012,14 +3012,14 @@ def f_etf_daily_monitor():
 def f_etf_pulse():
     # ETF 盘中异动：筛「量比>1.2 的活跃 ETF」按量比排序（降级为成交额/涨跌幅 TOP）
     # 🔴 2026-09-23 同 f_etf_daily_monitor：akshare fund_etf_spot_em → push2delay 云端持续 502，
-    #   改 em_clist 直连（f10=量比 / f3=涨跌幅 / f6=成交额），fid=f12 分页遍历全市场。
+    #   改 em_clist 直连（f10=量比 / f3=涨跌幅 / f6=成交额），fid=f3 涨跌幅序遍历全市场（f12 非法排序字段→空返）。
     fields = "f12,f14,f3,f6,f10"
     by_code = {}
     PAGE_SIZE = 100
     MAX_PAGES = 30
     pn = 1
     while pn <= MAX_PAGES:
-        page = em_clist("m:1+t:9,m:0+t:9", fields, fid="f12", stat="1", pz=PAGE_SIZE, po="1", pn=pn)
+        page = em_clist("m:1+t:9,m:0+t:9", fields, fid="f3", stat="1", pz=PAGE_SIZE, po="1", pn=pn)
         if not page:
             break
         for r in page:
