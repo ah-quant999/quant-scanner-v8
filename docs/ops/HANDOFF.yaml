@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-24 01:52"
+  updated: "2026-09-24 02:46"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 72
+  next_id_seq: 73
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -3939,3 +3939,31 @@ items:
          本轮**不改** workflow（避免与当前 churn 窗口叠加），按 P2 排期。
     updated: "2026-09-24 00:04"
 
+  - id: postclose-reliability-trio
+    priority: P1
+    owner: shared
+    status: todo
+    updated: "2026-09-24 02:46"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+    what: >-
+      〔2026-09-24 02:46 阿狸咪的工程师〕主人令「和小九商量定」——昨夜三项挂账已定案，登记施工口径：
+      ① post_close HEAL 守卫放宽：硬窗口 16:00-21:30 收窄为 16:00-20:30；对 post_close 独有产物
+      （主力净额分时 / 涨停热力矩阵 / EXPERIMENT / SECTOR_LEADERS）开缺口自愈白名单——
+      21:30 后若当日 post_close 仍未成功，允许单次补跑（HEAL_DEBOUNCE_MIN=25 去抖保留）。
+      ② 6 连发派发源收敛单发：同 concurrency 组 cancel-in-progress:false 只容 1 running+1 pending，
+      多余 run 直接 jobs:[]=cancelled、派发方收 204=假成功 ⇒ 多源定时触发合并为单发。
+      ③ build_deploy step13 按修法A施工（推送与重建解耦）：每轮全量重建约 4min，大于 churn 间隔
+      1-3min，重试三连全部 rejected；推送改走增量文件集 Contents API（参照 cn fetch soft_14 自闭环）。
+    fix: |-
+      ① 改 v8_health_check.py:898 硬窗口 + 自愈守卫白名单逻辑；
+      ② 改派发 workflow / 定时源（保留唯一触发，删除冗余 schedule/dispatch）；
+      ③ 改 v8_build_deploy.yml step13：推送步与重建步解耦，推送基于 git status 增量集。
+      改 .github/workflows/ 须 classic token + 推前 schema 自检（run 步禁 with，防 0 job 假 failure）。
+    evidence: |-
+      09-23 夜实测：post_close 被派发风暴拖到 21:11 → 东财 push2 瞬时故障 → 不落盘 → 幂等跳过 →
+      自愈被去抖 25min + 16:00-21:30 窗口各拦一次 ⇒ EXPERIMENT（卡在 09-22 18:13）/
+      SECTOR_LEADERS（09-22 18:15）红卡；build_deploy 近 12 档 step13 1 success/8 cancelled/2 failure。
+      另：09-24 凌晨错名二犯根治已落（回填 173 处 + 派生/研报入口过唯一校入口，见 commit f4f46bf1eff8）。
+    verify_how: |-
+      下一交易日 post_close 后四卡产物 update_time 全部前进，且 HEALTH_CHECK 无该四卡红；
+      build_deploy 近 12 档 step13 无 rejected/cancelled；观察 ≥2 个交易日再转 done。
