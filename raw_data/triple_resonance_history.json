@@ -998,9 +998,9 @@
     "000703": {
       "enter_date": "2026-08-20",
       "enter_close": 20.1,
-      "last_date": "2026-08-29",
-      "last_close": 19.49,
-      "status": "dropped",
+      "last_date": "2026-09-23",
+      "last_close": 17.39,
+      "status": "strict",
       "streak": 2,
       "total_days": 2
     },
@@ -1088,9 +1088,9 @@
     "002463": {
       "enter_date": "2026-08-30",
       "enter_close": 121.7,
-      "last_date": "2026-09-10",
-      "last_close": 127.92,
-      "status": "dropped",
+      "last_date": "2026-09-23",
+      "last_close": 128.1,
+      "status": "near",
       "streak": 1,
       "total_days": 5
     },
@@ -1426,7 +1426,7 @@
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-09-23 18:14:57"
+    "last_update": "2026-09-23 20:03:05"
   },
   "2026-08-18": [
     {
@@ -2021,7 +2021,7 @@
       "status": "near"
     }
   ],
-  "update_time": "2026-09-23 18:14:57",
+  "update_time": "2026-09-23 20:03:05",
   "2026-08-30": [
     {
       "code": "300475",
@@ -4703,196 +4703,65 @@
   ],
   "2026-09-23": [
     {
-      "code": "601168",
-      "name": "西部矿业",
-      "market": "sh",
-      "board": "主板",
-      "close": 36.81,
-      "pct_chg": 1.49,
-      "total_score": 33.5,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 2,
-      "status": "strict"
-    },
-    {
-      "code": "301308",
-      "name": "江波龙",
-      "market": "sz",
-      "board": "创业板",
-      "close": 346.0,
-      "pct_chg": 0.138,
-      "total_score": 30.4,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "深证100R",
-        "2026中报预增",
-        "计算机、通信和其他电子设备制造业",
-        "信创",
-        "AI眼镜",
-        "AI手机",
-        "小米汽车",
-        "MSCI中国"
-      ],
-      "signal_count": null,
-      "status": "strict"
-    },
-    {
       "code": "300199",
       "name": "翰宇药业",
       "market": "sz",
       "board": "创业板",
       "close": 24.29,
-      "pct_chg": 1.102,
-      "total_score": 30.4,
+      "pct_chg": 1.845,
+      "total_score": 34.2,
       "quality_grade": "A",
       "industry": "医药制造业",
       "sectors": [
-        "肝炎概念",
-        "流感",
-        "2026中报预增",
         "减肥药",
-        "深股通",
         "创新药",
+        "2026中报预增",
+        "深股通",
         "医药制造业",
-        "互联医疗"
+        "互联医疗",
+        "肝炎概念",
+        "流感"
       ],
       "signal_count": 2,
       "status": "strict"
     },
     {
-      "code": "605117",
-      "name": "德业股份",
-      "market": "sh",
-      "board": "主板",
-      "close": 78.01,
-      "pct_chg": 0.5,
-      "total_score": 29.4,
-      "quality_grade": "A",
-      "industry": "电气机械和器材制造业",
-      "sectors": [
-        "HS300",
-        "2026中报预增",
-        "2026一季报预增",
-        "周期股",
-        "沪股通",
-        "上证180",
-        "电气机械和器材制造业",
-        "MSCI中国"
-      ],
-      "signal_count": null,
-      "status": "strict"
-    },
-    {
-      "code": "603268",
-      "name": "松发股份",
-      "market": "sh",
-      "board": "主板",
-      "close": 215.32,
-      "pct_chg": -1.151,
-      "total_score": 28.0,
-      "quality_grade": "A",
-      "industry": "铁路、船舶、航空航天和其他运输设备制造业",
-      "sectors": [
-        "贬值受益",
-        "2026中报预增",
-        "机构重仓",
-        "大盘成长",
-        "融资融券",
-        "并购重组概念",
-        "铁路、船舶、航空航天和其他运输设备制造业",
-        "QFII重仓"
-      ],
-      "signal_count": null,
-      "status": "strict"
-    },
-    {
-      "code": "300502",
-      "name": "新易盛",
+      "code": "000703",
+      "name": "FUTURE BRIGHT",
       "market": "sz",
-      "board": "创业板",
-      "close": 451.2,
-      "pct_chg": -0.379,
-      "total_score": 26.7,
+      "board": "主板",
+      "close": 17.39,
+      "pct_chg": 3.45,
+      "total_score": 25.5,
       "quality_grade": "A",
+      "industry": "化学纤维制造业",
+      "sectors": [
+        "化学纤维制造业"
+      ],
+      "signal_count": 2,
+      "status": "strict"
+    },
+    {
+      "code": "002463",
+      "name": "沪电股份",
+      "market": "sz",
+      "board": "主板",
+      "close": 128.1,
+      "pct_chg": 2.365,
+      "total_score": 26.1,
+      "quality_grade": "B",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
+        "2026中报预增",
+        "计算机、通信和其他电子设备制造业",
         "深证100R",
-        "2026中报预增",
-        "计算机、通信和其他电子设备制造业",
-        "机构重仓",
         "深股通",
-        "基金重仓",
+        "PCB",
+        "MSCI中国",
         "百元股",
-        "MSCI中国"
-      ],
-      "signal_count": 1,
-      "status": "strict"
-    },
-    {
-      "code": "603993",
-      "name": "洛阳钼业",
-      "market": "sh",
-      "board": "主板",
-      "close": 17.66,
-      "pct_chg": 1.251,
-      "total_score": 29.2,
-      "quality_grade": "B",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业",
-        "HS300",
-        "2026中报预增",
-        "磷化工",
-        "大盘股",
-        "稀缺资源",
-        "昨日高振幅",
-        "MSCI中国"
-      ],
-      "signal_count": null,
-      "status": "near"
-    },
-    {
-      "code": "000737",
-      "name": "北方铜业",
-      "market": "sz",
-      "board": "主板",
-      "close": 14.82,
-      "pct_chg": 4.712,
-      "total_score": 26.1,
-      "quality_grade": "B",
-      "industry": "有色金属冶炼和压延加工业",
-      "sectors": [
-        "有色金属冶炼和压延加工业"
+        "2026一季报预增"
       ],
       "signal_count": 2,
-      "status": "near"
-    },
-    {
-      "code": "300390",
-      "name": "天华新能",
-      "market": "sz",
-      "board": "创业板",
-      "close": 52.76,
-      "pct_chg": 0.074,
-      "total_score": 26.1,
-      "quality_grade": "B",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "2026一季报预增",
-        "计算机、通信和其他电子设备制造业",
-        "深股通",
-        "锂矿概念",
-        "医疗器械概念",
-        "固态电池",
-        "独角兽",
-        "MSCI中国"
-      ],
-      "signal_count": null,
       "status": "near"
     }
   ]
