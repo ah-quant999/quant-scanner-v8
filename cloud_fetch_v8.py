@@ -2966,81 +2966,106 @@ def f_performance_forecast():
 
 
 def f_etf_daily_monitor():
-    # ETF 日监控：全市场 ETF 当日主力净流入排名（T+1 盘后更新）
-    # 数据源：akshare fund_etf_spot_em 含「主力净流入-净额」字段
-    df = get_ak().fund_etf_spot_em()
-    if df is None or df.empty:
+    # ETF 日监控：全市场 ETF 当日主力净流入排名
+    # 🔴 2026-09-23 一劳永逸（小九）：原用 akshare fund_etf_spot_em（底层 push2delay，
+    #   云端持续 502，09-22 #1989 / 09-23 两日血证：本模块+ETF_PULSE 每轮 fail，
+    #   raw_data/etf_daily_monitor.json 冻结在 11:30 → AI速览「ETF合计净流出」恒 -4.95亿）。
+    #   改走与 f_etf_intraday_heat / AVG_PRICE_DATA 同源的 em_clist 直连（云端实证稳定）：
+    #   fid=f12 代码序保证分页稳定 + pn 循环遍历全市场（沪 m:1+t:9 + 深 m:0+t:9）。
+    #   输出 schema 不变：{total_etf,total_net,top_inflow,top_outflow}（AI速览/ETF卡直读）。
+    fields = "f12,f14,f62"
+    by_code = {}
+    PAGE_SIZE = 100
+    MAX_PAGES = 30  # 安全阀：全市场 ETF 约 1000+ 只，30 页足矣
+    pn = 1
+    while pn <= MAX_PAGES:
+        page = em_clist("m:1+t:9,m:0+t:9", fields, fid="f12", stat="1", pz=PAGE_SIZE, po="1", pn=pn)
+        if not page:
+            break  # 空页：已遍历至末尾
+        for r in page:
+            code = str(r.get("f12") or "")
+            if not code:
+                continue
+            try:
+                net = float(r.get("f62") or 0.0)
+            except (TypeError, ValueError):
+                net = 0.0  # '-'（无数据）占位归一
+            if net != 0.0:  # 与原口径一致：去掉无净流入数据的行，避免污染合计
+                by_code[code] = {"code": code, "name": r.get("f14"), "net": net}
+        if len(page) < PAGE_SIZE:
+            break  # 末页不足 100 条：到底了
+        pn += 1
+    if not by_code:
         return None
-    net_col = "主力净流入-净额" if "主力净流入-净额" in df.columns else None
-    if net_col is None:
-        # 字段缺失时退化为成交额排序，保证有数据而非空
-        df2 = df.sort_values("成交额", ascending=False).head(20) if "成交额" in df.columns else df.head(20)
-        return {"items": df2.to_dict(orient="records"), "note": "主力净流入字段缺失，退化为成交额排序"}
-    df = df.copy()
-    df[net_col] = pd.to_numeric(df[net_col], errors="coerce").fillna(0.0)
-    df = df[df[net_col] != 0.0]  # 去掉无净流入数据的行（避免 nan 污染）
-    if df.empty:
-        return {"no_data": True, "note": "盘前无主力净流入数据，盘后 T+1 自动更新"}
-    inflow = df.sort_values(net_col, ascending=False).head(10)
-    outflow = df.sort_values(net_col, ascending=True).head(10)
-    total_net = float(df[net_col].sum())
+    rows = list(by_code.values())
+    total_net = float(sum(r["net"] for r in rows))
+    inflow = sorted(rows, key=lambda x: x["net"], reverse=True)[:10]
+    outflow = sorted(rows, key=lambda x: x["net"])[:10]
     return {
-        "total_etf": int(len(df)),
+        "total_etf": int(len(rows)),
         "total_net": total_net,
-        "top_inflow": [{"name": r["名称"], "code": r["代码"], "net": float(r[net_col])} for _, r in inflow.iterrows()],
-        "top_outflow": [{"name": r["名称"], "code": r["代码"], "net": float(r[net_col])} for _, r in outflow.iterrows()],
+        "top_inflow": [{"name": r["name"], "code": r["code"], "net": r["net"]} for r in inflow],
+        "top_outflow": [{"name": r["name"], "code": r["code"], "net": r["net"]} for r in outflow],
     }
 
 
 def f_etf_pulse():
-    # ETF 盘中异动：用 fund_etf_spot_em 实时行情筛「量比>1.2 的活跃 ETF」按量比排序
-    # 注：本版 akshare 已移除 fund_etf_hist_em 等分钟线接口，故用实时快照的量比/涨跌幅表征异动
-    df = get_ak().fund_etf_spot_em()
-    if df is None or df.empty:
+    # ETF 盘中异动：筛「量比>1.2 的活跃 ETF」按量比排序（降级为成交额/涨跌幅 TOP）
+    # 🔴 2026-09-23 同 f_etf_daily_monitor：akshare fund_etf_spot_em → push2delay 云端持续 502，
+    #   改 em_clist 直连（f10=量比 / f3=涨跌幅 / f6=成交额），fid=f12 分页遍历全市场。
+    fields = "f12,f14,f3,f6,f10"
+    by_code = {}
+    PAGE_SIZE = 100
+    MAX_PAGES = 30
+    pn = 1
+    while pn <= MAX_PAGES:
+        page = em_clist("m:1+t:9,m:0+t:9", fields, fid="f12", stat="1", pz=PAGE_SIZE, po="1", pn=pn)
+        if not page:
+            break
+        for r in page:
+            code = str(r.get("f12") or "")
+            if not code:
+                continue
+
+            def _num(v):
+                try:
+                    return float(v) if v not in (None, "-", "") else 0.0
+                except (TypeError, ValueError):
+                    return 0.0
+            by_code[code] = {
+                "name": r.get("f14"), "code": code,
+                "chg": _num(r.get("f3")),
+                "amount": _num(r.get("f6")),
+                "vol": _num(r.get("f10")),
+            }
+        if len(page) < PAGE_SIZE:
+            break
+        pn += 1
+    if not by_code:
         return None
-    vol_col = "量比" if "量比" in df.columns else None
-    chg_col = "涨跌幅" if "涨跌幅" in df.columns else None
-    amt_col = "成交额" if "成交额" in df.columns else None
-    if vol_col is None and chg_col is None:
-        return {"note": "异动字段（量比/涨跌幅）缺失", "etfs": []}
-    df = df.copy()
-    if vol_col:
-        df[vol_col] = pd.to_numeric(df[vol_col], errors="coerce").fillna(0.0)
-    if chg_col:
-        df[chg_col] = pd.to_numeric(df[chg_col], errors="coerce").fillna(0.0)
-    if amt_col:
-        df[amt_col] = pd.to_numeric(df[amt_col], errors="coerce").fillna(0.0)
-    # 未开盘检测：集合竞价前(<09:30)全市场量比/成交额均为 0，此时输出榜单毫无意义，
+    rows = list(by_code.values())
+    # 未开盘检测：集合竞价前全市场量比/成交额均为 0，输出榜单毫无意义，
     # 直接回 no_data 让前端显示「未开盘」，避免展示一整屏 0.00 的假异动。
-    has_vol = bool(vol_col) and float(df[vol_col].max()) > 0
-    has_amt = bool(amt_col) and float(df[amt_col].max()) > 0
+    has_vol = any(r["vol"] > 0 for r in rows)
+    has_amt = any(r["amount"] > 0 for r in rows)
     if not has_vol and not has_amt:
         return {"no_data": True, "etfs": [],
                 "note": "未开盘/集合竞价中，量比与成交额尚未产生，开盘后自动刷新"}
 
-    # 优先筛量比>1.2 的异动；若无显著放量，退化为成交额 TOP（活跃度真实可比，
-    # 不用量比排序——量比为 0 时排序结果等同于代码倒序，是无意义的噪声）
+    # 优先筛量比>1.2 的异动；若无显著放量，退化为成交额 TOP（活跃度真实可比）
     if has_vol:
-        hot = df[df[vol_col] > 1.2]
-        if not hot.empty:
-            base, sort_col, mode = hot, vol_col, "hot"
+        hot = [r for r in rows if r["vol"] > 1.2]
+        if hot:
+            base, mode = sorted(hot, key=lambda x: x["vol"], reverse=True), "hot"
         else:
-            base, sort_col, mode = df, (amt_col or vol_col), "amt"
+            base, mode = sorted(rows, key=lambda x: x["amount"], reverse=True), "amt"
     else:
-        hot = df[df[chg_col].abs() > 2] if chg_col else df.iloc[0:0]
-        if not hot.empty:
-            base, sort_col, mode = hot, chg_col, "chg"
+        hot = [r for r in rows if abs(r["chg"]) > 2]
+        if hot:
+            base, mode = sorted(hot, key=lambda x: abs(x["chg"]), reverse=True), "chg"
         else:
-            base, sort_col, mode = df, (amt_col or chg_col), "amt"
-    base = base.sort_values(sort_col, ascending=False).head(12)
-    etfs = []
-    for _, r in base.iterrows():
-        etfs.append({
-            "name": r["名称"], "code": r["代码"],
-            "chg": float(r[chg_col]) if chg_col else 0.0,
-            "vol": float(r[vol_col]) if vol_col else 0.0,
-            "amount": float(r[amt_col]) if amt_col else 0.0,
-        })
+            base, mode = sorted(rows, key=lambda x: x["amount"], reverse=True), "amt"
+    etfs = base[:12]
     note = {
         "hot": "盘中异动：量比>1.2 的放量 ETF（按量比排序）",
         "chg": "盘中异动：涨跌幅>2% 的 ETF",
