@@ -72,14 +72,14 @@
   "cn-fetch-queue-growth",
   "dajijin-reduction-monitor"
  ],
- "updated": "2026-09-23 21:48",
- "generated_by": "小九；2026-09-23 19:00 追加 cn-fetch-queue-growth 并抬高上限至 68（哈希未重算，同 handoff-ledger-hash-desync 口径） ｜2026-09-23 2026-09-23 18:48 阿狸咪的工程师：回填 algo-step16-sanity-hardfail->done（真跑档 step16 success）+ handoff-dup-key-index-tail-truncation->done（index-tail-truncation-2220 重复 updated 键已收敛）+ 修正 3 处未来时戳（19:00->18:38，解 [13/13] 阻断）；id_content_hashes 仍按待口径确认原样保留 ｜2026-09-23 21:17 阿狸咪的工程师：给 etf-monitor-clist-fid-invalid 追加 note（监控侧双盲区新证据：guard 43 模块全绿 + HEALTH_CHECK 两卡 age_min 577.7/577.0 仍判 ok；ETF_DAILY_MONITOR message 把 9.6h 冻结文案化为「预期行为」）—— 仅 note，未改 status/未改 ids/未动 id_content_hashes（沿用 handoff-ledger-hash-desync 的「口径确认前不盲改哈希」策略） ｜2026-09-23 21:28 阿狸咪的工程师：align-gate-unregistered-cron-workflow 回退 done→doing（同族第 2 次复发：v8_dajijin_fetch 21:13:49 未双登记；#7921 build failure 唯一红项 [4/8]，其余 13 项全绿）。ids/next_id_seq/id_content_hashes 未变。 ｜ 小九；2026-09-23 21:48 以远端真身为基底做 item 级合并（仅追加本机 owner 的 dajijin-reduction-monitor，远端既有 item 全部保留、断言 0 丢失 0 重复）；id_content_hashes 全量重算（口径＝仓内唯一实现 scripts/handoff_ledger_hash.py，含幂等自证）。",
+ "updated": "2026-09-23 22:06",
+ "generated_by": "小九；2026-09-23 19:00 追加 cn-fetch-queue-growth 并抬高上限至 68（哈希未重算，同 handoff-ledger-hash-desync 口径） ｜2026-09-23 2026-09-23 18:48 阿狸咪的工程师：回填 algo-step16-sanity-hardfail->done（真跑档 step16 success）+ handoff-dup-key-index-tail-truncation->done（index-tail-truncation-2220 重复 updated 键已收敛）+ 修正 3 处未来时戳（19:00->18:38，解 [13/13] 阻断）；id_content_hashes 仍按待口径确认原样保留 ｜2026-09-23 21:17 阿狸咪的工程师：给 etf-monitor-clist-fid-invalid 追加 note（监控侧双盲区新证据：guard 43 模块全绿 + HEALTH_CHECK 两卡 age_min 577.7/577.0 仍判 ok；ETF_DAILY_MONITOR message 把 9.6h 冻结文案化为「预期行为」）—— 仅 note，未改 status/未改 ids/未动 id_content_hashes（沿用 handoff-ledger-hash-desync 的「口径确认前不盲改哈希」策略） ｜2026-09-23 21:28 阿狸咪的工程师：align-gate-unregistered-cron-workflow 回退 done→doing（同族第 2 次复发：v8_dajijin_fetch 21:13:49 未双登记；#7921 build failure 唯一红项 [4/8]，其余 13 项全绿）。ids/next_id_seq/id_content_hashes 未变。 ｜ 小九；2026-09-23 21:48 以远端真身为基底做 item 级合并（仅追加本机 owner 的 dajijin-reduction-monitor，远端既有 item 全部保留、断言 0 丢失 0 重复）；id_content_hashes 全量重算（口径＝仓内唯一实现 scripts/handoff_ledger_hash.py，含幂等自证）。 ｜ 小九；2026-09-23 22:06 闭合 align-gate-unregistered-cron-workflow（doing→done + 取证 notes），id_content_hashes 同批重算（仓内唯一口径 scripts/handoff_ledger_hash.py）。",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
   "algo-edge-ordering-fix": "c23c7f0ae4d8ada3",
   "algo-step15-undefined-t": "f9b5a3470393bc9e",
   "algo-step16-sanity-hardfail": "fbbd75a0831eb090",
-  "align-gate-unregistered-cron-workflow": "7a800f57130d375b",
+  "align-gate-unregistered-cron-workflow": "ec9c84c9f3a96bff",
   "alimi-same-family-check": "e985164c73b845ff",
   "all-generic-redline-cap-cliff": "21d4a47d6b94a270",
   "all-generic-redline-false-positive": "d67955b87a700b6c",

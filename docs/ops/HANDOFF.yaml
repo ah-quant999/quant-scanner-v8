@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 21:48"
+  updated: "2026-09-23 22:06"
   updated_by: 小九
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -3047,7 +3047,7 @@ items:
   - id: align-gate-unregistered-cron-workflow
     priority: P0
     owner: shared
-    status: doing
+    status: done
     what: >
       🔴 **部署曾被结构性阻断**：`v8_build_deploy` 2026-09-23 15:41–16:07 CST **连续 5 档失败**
       （#7841 / #7842 / #7843 / #7844 / #7845），全部倒在 `🛡️ Pre-deploy audit` 的
@@ -3111,9 +3111,31 @@ items:
       `# @align-registered:` 自声明标记，由 `align_logic_ops.py` 读该标记而非两处手工维护名单）。
       ⏸️ 本轮**只报不改**（不抢在飞车道、不碰 index.html/logic.html 文档源）。
       🔄 状态回退 `done` → `doing`（有 active owner 在修）；`verified_at` 保留为首轮证据。
-    verified_at: "2026-09-23 16:37"
-    updated: "2026-09-23 21:28"
-    updated_by: 阿狸咪的工程师(alimi-cn)
+      ── 小九 2026-09-23 2026-09-23 22:06 补 · ✅ **已解锁并双向取证**（双机并发，双方产物逐字节相同）──
+      **① 我方修复**：commit `58d37b5dd6`（**2026-09-23 21:40:50 CST**，message
+      「fix(ops-gate): 双登记 v8_dajijin_fetch —— 解锁被阻断的 [4/8] 门禁」）落两文件：
+      `align_logic_ops.py` 10,473 B（md5 `3c3f907d467c`）→ **11,026 B（md5 `509d5a20218a`）**；
+      `logic.html` 761,006 B（md5 `3be67ef76e73`）→ **761,620 B（md5 `9441ebb28e1d`，CRLF 保持 8,614）**。
+      **② 效果即刻可见**：其**后第一档** `v8_build_deploy` **#35869145926**（21:44:10 CST，head `5965a8735c`）
+      `build` job = **success**，其中 `🛡️ Pre-deploy audit` = **success**、
+      `📤 部署到 main（GitHub Pages 源）` = **success**（经 API `/actions/runs/{id}/jobs` 逐步结论取证）
+      ⇒ 满足本件 `verify_how` 的 ②③；①「日志出现 ✅ [4/8] align_logic_ops」以
+      **本机离线复现等同判词**补足：`✅ [4/8] align_logic_ops: align_logic_ops EXIT 0（逻辑详解页与真 workflow 对齐）`，
+      且同一次 `pre_deploy_audit.py` **14/14 全绿 rc=0**（含 `✅ [10/10] index 核心标记 39/39`、
+      `✅ [13/13] items=70 · next_id_seq=69≥69`）。
+      **③ 双机并发（非重复劳动定性）**：对方 commit `624623f073`（**21:45:42 CST**，晚 4 分 52 秒）
+      为**同题修复**；其产物与 ① 后的线上真身 **md5 逐位相同**（`509d5a20218a` / `9441ebb28e1d`）
+      ⇒ 双向冗余但**零副作用**，仅多触发一档 build（#35869340229 已 cancelled，未浪费部署）。
+      📌 **可复用的时序结论**：本次「判红 → 修复 → 复绿」全程 **27 分钟**（21:17:41 首红 → 21:44:10 复绿），
+      其中 **3 分钟**用于本机取证、**4 分 52 秒**为双机并发重叠窗口。
+      若双方在动手前各看一眼 HANDOFF（本件当时已是 `doing` 且有 owner），重叠窗口可完全消除。
+      ⇒ **建议流程**：接手 `doing` 件前先 `git fetch` 比对最近 5 分钟提交与 `align_logic_ops.py` 线上 blob，
+      命中同题即**不重复动手**、改为补取证。
+      ✅ 状态置 `done`（`verified_at` 刷新为本次实测时刻）；治本建议（登记要求前移）见上文阿狸咪 21:28 段，
+      仍待评估，**不属本件闭合条件**。
+    verified_at: "2026-09-23 22:06"
+    updated: "2026-09-23 22:06"
+    updated_by: 小九
 
   # ── P0 · 数据链（小九 2026-09-23 盘后）─────────────────────────────────
   - id: etf-monitor-clist-fid-invalid
