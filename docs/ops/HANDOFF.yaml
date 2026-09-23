@@ -2840,8 +2840,7 @@ items:
     priority: P0
     owner: 阿狸咪的工程师
     status: pending-verify
-    updated: 2026-09-22 23:38
-    updated_by: 阿狸咪的工程师
+    updated_by: 阿狸咪的工程师（原记录）/ 小九（2026-09-23 实施 fix 建议①）
     what: >
       **未闭环的根因**：`index-tail-truncation-2220` 只修好了文件，**没有修掉那条会再次截断的路径**。
       判据级证据（谁写的）：全仓唯一写 `index.html` 的脚本是 `update_v8.py` 的
@@ -2879,7 +2878,39 @@ items:
     verify_how: >
       下一轮 cn fetch 后：① `index.html` 行数 ≥ 19,149 且末尾闭合；② workflow 中出现上述**硬失败**前置断言；
       ③ 该 job 日志能证明执行的是 main 上的 `update_v8.py`（blob 比对）。
-    updated: "2026-09-22 22:50"
+    fix_applied_20260923: >
+      ✅ 小九 2026-09-23 08:5x CST 已实施 fix 建议①（本项车道归小九侧 —— 阿狸咪已在本文原文注明
+      「不是我的车道：`v8_cn_fetch_cloud.yml` 跑在自托管 runner 上，需小九侧处置」）。
+      落点 = `.github/workflows/v8_cn_fetch_cloud.yml` 的 step `soft_15`「🛡️ 原子提交 index.html ?v」，
+      在 `python update_v8.py --only-cache-busters` 之后、`git add -f index.html` **之前**插入四项硬断言：
+        ① 行数 ≥ 18,800（线上正常态 19,176 行；22:20 事故态为删 183 行后的 18,993 行 ⇒ 该阈值按事故态定，具捕获力）
+        ② 文本末 200 字含 `</html>`（无则判 HTML 未闭合）
+        ③ A2 懒加载大表三锚齐备：`{name:'STOCK_LIST'` / `{name:'STOCK_QUOTE'` / `{name:'LHB_HISTORY'`
+           —— 该块整体位于文件尾部，正是 22:20 事故丢掉的那 183 行，故为最强判据
+        ④ 字节数 ≥ 1,250,000（事故态 1,338,018 B 仍高于此值 ⇒ ④ 仅作兜底）
+      任一不过 ⇒ `exit 1`（**不 add / 不 commit / 不 push**），并打 `::error title=v8-index-guard::`
+      annotation 显式告警。**刻意保留 `continue-on-error: true`**（job 不阻断语义不变，与既有
+      「软失败但强制告警」主人令一致）；本改动只作用于「坏文件能否进 main」这一环。
+      净室 A/B 实测（把 heredoc 体抠出独立执行；基底 = 线上真身 1,349,692 B / 19,176 行）：
+        c1 正常          ⇒ exit 0 ✅ 放行
+        c2 删尾 183 行   ⇒ exit 1 ✅ 拦截（报：无 </html> + 缺 A2 三锚）
+        c3 A2 锚被挖     ⇒ exit 1 ✅ 拦截（报：缺 {name:'LHB_HISTORY'）
+        c4 无 </html>    ⇒ exit 1 ✅ 拦截（报：末 200 字未闭合）
+        c5 缩水 20 万 B  ⇒ exit 1 ✅ 拦截（报：行数 15,814 < 18,800 等 6 项）
+      结构化自检：YAML `safe_load` 通过 · `soft_15` 的 `continue-on-error` 仍为 True ·
+      断言块位置(752 字偏移) < `git add` 位置(1732) ⇒ 顺序正确 · 行尾仍为纯 LF。
+      推送与自验：commit `631123e0bd8a`；blob `4c42862e9c` / 85,036 B / md5 `3a1d7c388f2a`
+      —— **当场 API 回读逐字节一致**（净室推送器自验，非本地产物推断）。
+      ⚠️ **尚未取得 run 终验**：`v8_cn_fetch_cloud.yml` 由定时档/派发触发，补丁不会立刻产生 run。
+      终验时机 = 下一个 cn fetch 档真跑后核对：① job 日志出现「index.html 完整性断言通过」
+      ② 该步不再报 `v8-index-guard` ③ `index.html` 行数 ≥19,000 且末尾闭合。
+      **故本项状态保持 pending-verify，未擅自置 done。**
+      📌 附带修复：本 item 原有**重复顶层键 `updated`**（原 L2843 与 L2882 各一处），
+      YAML 对重复键取后者 ⇒ 前一处为**僵尸键**（对 `grep` 说谎）；本次一并删除。
+      另：本次不动 `docs/ops/HANDOFF.ledger.json` —— 经核对 `[13/13]` 门禁（`pre_deploy_audit.py:1117`）
+      只断言「ids 超集」与「next_id_seq 单调不减」两项，**不校验 `id_content_hashes`**；
+      本次未增删任何 id、未动 `meta.next_id_seq` ⇒ 门禁不受影响、无需刷新 ledger。
+    updated: "2026-09-23 08:57"
 
   - id: trunc-read-treated-as-success
     priority: P0
