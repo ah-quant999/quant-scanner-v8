@@ -2965,39 +2965,138 @@ def f_performance_forecast():
         return None
 
 
-def f_etf_daily_monitor():
-    # ETF 日监控：全市场 ETF 当日主力净流入排名
-    # 🔴 2026-09-23 一劳永逸（小九）：原用 akshare fund_etf_spot_em（底层 push2delay，
-    #   云端持续 502，09-22 #1989 / 09-23 两日血证：本模块+ETF_PULSE 每轮 fail，
-    #   raw_data/etf_daily_monitor.json 冻结在 11:30 → AI速览「ETF合计净流出」恒 -4.95亿）。
-    #   改走与 f_etf_intraday_heat / AVG_PRICE_DATA 同源的 em_clist 直连（云端实证稳定）：
-    #   fid=f12 代码序保证分页稳定 + pn 循环遍历全市场（沪 m:1+t:9 + 深 m:0+t:9）。
-    #   输出 schema 不变：{total_etf,total_net,top_inflow,top_outflow}（AI速览/ETF卡直读）。
-    fields = "f12,f14,f62"
-    by_code = {}
-    PAGE_SIZE = 100
-    MAX_PAGES = 30  # 安全阀：全市场 ETF 约 1000+ 只，30 页足矣
-    pn = 1
-    while pn <= MAX_PAGES:
-        page = em_clist("m:1+t:9,m:0+t:9", fields, fid="f3", stat="1", pz=PAGE_SIZE, po="1", pn=pn)
-        if not page:
-            break  # 空页：已遍历至末尾
-        for r in page:
-            code = str(r.get("f12") or "")
-            if not code:
+# ─────────────────────────────────────────────────────────────────────────────
+# ETF 全市场快照（2026-09-23 二版·一劳永逸）
+#
+# 【为什么要改】原实现（akshare fund_etf_spot_em → 后改 em_clist 直连）在盘后持续 502，
+#   raw_data/etf_daily_monitor.json 冻结在 11:31 ⇒ AI速览「ETF 合计」恒 -4.95亿。
+#   探针 v6（6 配置 × 6 个**独立 runner**，每 runner 只发 1 个请求，从根上杜绝顺序污染）
+#   实测出三条硬结论：
+#     ① **pz 硬截 100 属实**：pz=50000 时 push2delay 与 push2 主站都只回 100 行
+#        （api_total=1619 而 rows=100）⇒ 「一次请求拿全」不存在，必须分页。
+#     ② **原 fs 口径不完整**：`m:1+t:9,m:0+t:9` 的 api_total=1362，且同一页 100 行
+#        **全部是沪市**（SH=100 / SZ=0）—— 深市被静默丢弃；改用东财 ETF 板块串
+#        `b:MK0021,b:MK0022,b:MK0023,b:MK0024` 后 api_total=1619、同页 SH=58/SZ=42，
+#        与 akshare 口径（冻结文件里 total_etf=1602）一致。
+#     ③ **不稳定是「窗口」而非「配额」**：同一分钟内 6 个独立 runner 各发 1 个请求，
+#        A/C/E/F 得 502、B/D 得 200 ⇒ 与请求次数无关（推翻了「请求太密触发限流」的旧假设，
+#        也给 v4 探针「首调成功、其后全 502」的假象定性：那只是撞上窗口）。
+#        ⇒ 唯一的修法就是 **更长退避 + 失败不推进页码**，而不是减少请求。
+#
+# 【旧实现两个致命点】
+#   ① `if not page: break` 把「请求失败」误判成「已遍历到末尾」：09-23 17:31 日志实测第 1 页
+#      连撞 2 次 502 后直接「返回空，跳过」；探针里更出现「只取到 264/1602 只却按全市场
+#      合计写盘」的静默截断 —— 假成功比不写更糟。
+#   ② 底层 `_em_get_with_retry` 只重试 3 次、退避 0.5/1.5/3.0s（合计约 5 秒）⇒
+#      撞上以分钟计的 502 窗口必然放弃。
+#
+# 【本实现】失败**不推进页码**、原地长退避重试，并逐页在两个可达 host 间轮换；
+#   取不满下限即整体返回 None（上层不写盘、保留旧值）—— 宁缺勿错。
+# ─────────────────────────────────────────────────────────────────────────────
+_ETF_FS = "b:MK0021,b:MK0022,b:MK0023,b:MK0024"   # 东财 ETF 板块串（含沪深两市，api_total≈1619）
+_ETF_FIELDS = "f12,f14,f3,f6,f10,f62"             # 一次取全所需字段，两个 ETF 模块共用
+_ETF_HOSTS = ("https://push2delay.eastmoney.com", # 延迟镜像（历史实证可达）
+              "https://push2.eastmoney.com")      # 主站（探针 v6 实测同分钟亦有 200，作第二源）
+_ETF_PAGE = 100        # 硬约束：clist 对 pz 一律截断到 100，无法调大
+_ETF_MAX_PAGES = 24    # 1619 只 ÷ 100 ≈ 17 页，留 7 页冗余
+_ETF_MIN_ROWS = 1200   # 全市场 ETF ≈1619 只；取不满即视为残缺，整体放弃
+_ETF_PAGE_TRIES = 4    # 每页最多 4 轮，退避 5/10/20/30s（合计 65s）⇒ 可扛分钟级窗口
+_ETF_BUDGET = 600      # 单次快照预算（秒）；超时即放弃，避免拖爆 job（job 上限 60 分钟）
+_ETF_TOTAL_BUDGET = 900  # 单轮内**所有** ETF 快照尝试的累计上限（秒）。
+                         #   ETF_PULSE / ETF_DAILY_MONITOR 两个模块 + 上游模块级重试会各调一次，
+                         #   若不设累计闸，最坏情况 = 3 次 × 600s = 30 分钟，会把 job 拖爆。
+_etf_cache = {"date": None, "rows": None}   # 同轮内 ETF_PULSE / ETF_DAILY_MONITOR 共用，省一半请求
+_etf_spent = {"secs": 0.0}
+
+
+def _etf_clist_page(fs, fields, fid, pz, pn):
+    """取一页 ETF clist。返回 (ok, rows)：ok=False 明确表示**请求失败**（区别于「到底了」）。"""
+    params = {
+        "pn": str(pn), "pz": str(pz), "po": "1", "np": "1", "fltt": "2", "invt": "2",
+        "ut": "b2884a393a59ad64002292a3e90d46a5",
+        "fid": fid, "fs": fs, "stat": "1", "fields": fields, "_": int(time.time() * 1000),
+    }
+    for host in _ETF_HOSTS:
+        try:
+            r = _requests.get(f"{host}/api/qt/clist/get", params=params,
+                              headers=_EM_HEADERS, timeout=20)
+            d = r.json()
+            if d.get("rc") != 0:
                 continue
-            try:
-                net = float(r.get("f62") or 0.0)
-            except (TypeError, ValueError):
-                net = 0.0  # '-'（无数据）占位归一
-            if net != 0.0:  # 与原口径一致：去掉无净流入数据的行，避免污染合计
-                by_code[code] = {"code": code, "name": r.get("f14"), "net": net}
-        if len(page) < PAGE_SIZE:
-            break  # 末页不足 100 条：到底了
-        pn += 1
-    if not by_code:
+            dd = d.get("data")
+            if not dd:
+                return True, []        # rc=0 但无 data ⇒ 真·没有更多页
+            return True, _em_clean_rows(dd.get("diff", []) or [])
+        except Exception:
+            continue                   # 换下一个 host
+    return False, []                   # 两个 host 都失败 ⇒ 明确「失败」
+
+
+def _etf_snapshot():
+    """全市场 ETF 快照（code → 原始字段字典）；失败或残缺返回 None。"""
+    today = now_cst().strftime("%Y%m%d")
+    if _etf_cache["date"] == today and _etf_cache["rows"]:
+        return _etf_cache["rows"]
+    if _etf_spent["secs"] >= _ETF_TOTAL_BUDGET:
+        print(f"  🚫 ETF 快照累计已耗 {_etf_spent['secs']:.0f}s ≥ 预算 {_ETF_TOTAL_BUDGET}s ⇒ 本轮不再尝试")
         return None
-    rows = list(by_code.values())
+    t_start = time.time()
+    try:
+        return _etf_snapshot_inner(today)
+    finally:
+        _etf_spent["secs"] += time.time() - t_start
+
+
+def _etf_snapshot_inner(today):
+    t_start = time.time()
+    by_code, pn = {}, 1
+    while pn <= _ETF_MAX_PAGES:
+        ok, page = False, []
+        for a in range(_ETF_PAGE_TRIES):
+            ok, page = _etf_clist_page(_ETF_FS, _ETF_FIELDS, "f62", _ETF_PAGE, pn)
+            if ok:
+                break
+            wait = min(5.0 * (2 ** a), 30.0)          # 5/10/20/30s
+            print(f"  ⚠️ ETF clist 第 {pn} 页失败，{wait:.0f}s 后重试（{a + 1}/{_ETF_PAGE_TRIES}）")
+            time.sleep(wait)
+            if time.time() - t_start > _ETF_BUDGET:
+                break
+        if not ok:
+            print(f"  🚫 ETF clist 第 {pn} 页重试 {_ETF_PAGE_TRIES} 次仍失败 ⇒ 放弃（不写半截数据）")
+            return None
+        if not page:
+            break
+        for r in page:
+            c = str(r.get("f12") or "")
+            if c:
+                by_code[c] = r
+        if len(page) < _ETF_PAGE:
+            break
+        if time.time() - t_start > _ETF_BUDGET:
+            print(f"  🚫 ETF 快照超预算 {_ETF_BUDGET}s（已取 {len(by_code)} 只）⇒ 放弃")
+            return None
+        pn += 1
+    if len(by_code) < _ETF_MIN_ROWS:
+        print(f"  ⚠️ ETF 快照仅 {len(by_code)} 只（< {_ETF_MIN_ROWS}）⇒ 视为残缺，本轮不产出")
+        return None
+    _etf_cache["date"] = today
+    _etf_cache["rows"] = by_code
+    return by_code
+
+
+def f_etf_daily_monitor():
+    # ETF 日监控：全市场 ETF 当日主力净流入排名（口径见上方 _ETF_FS 注释）。
+    # 输出 schema 不变：{total_etf,total_net,top_inflow,top_outflow}（AI速览/ETF卡直读）。
+    snap = _etf_snapshot()
+    if not snap:
+        return None
+    rows = []
+    for code, r in snap.items():
+        try:
+            net = float(r.get("f62") or 0.0)
+        except (TypeError, ValueError):
+            net = 0.0                  # '-'（无数据）占位归一
+        rows.append({"code": code, "name": r.get("f14"), "net": net})
     total_net = float(sum(r["net"] for r in rows))
     inflow = sorted(rows, key=lambda x: x["net"], reverse=True)[:10]
     outflow = sorted(rows, key=lambda x: x["net"])[:10]
@@ -3011,39 +3110,24 @@ def f_etf_daily_monitor():
 
 def f_etf_pulse():
     # ETF 盘中异动：筛「量比>1.2 的活跃 ETF」按量比排序（降级为成交额/涨跌幅 TOP）
-    # 🔴 2026-09-23 同 f_etf_daily_monitor：akshare fund_etf_spot_em → push2delay 云端持续 502，
-    #   改 em_clist 直连（f10=量比 / f3=涨跌幅 / f6=成交额），fid=f3 涨跌幅序遍历全市场（f12 非法排序字段→空返）。
-    fields = "f12,f14,f3,f6,f10"
-    by_code = {}
-    PAGE_SIZE = 100
-    MAX_PAGES = 30
-    pn = 1
-    while pn <= MAX_PAGES:
-        page = em_clist("m:1+t:9,m:0+t:9", fields, fid="f3", stat="1", pz=PAGE_SIZE, po="1", pn=pn)
-        if not page:
-            break
-        for r in page:
-            code = str(r.get("f12") or "")
-            if not code:
-                continue
-
-            def _num(v):
-                try:
-                    return float(v) if v not in (None, "-", "") else 0.0
-                except (TypeError, ValueError):
-                    return 0.0
-            by_code[code] = {
-                "name": r.get("f14"), "code": code,
-                "chg": _num(r.get("f3")),
-                "amount": _num(r.get("f6")),
-                "vol": _num(r.get("f10")),
-            }
-        if len(page) < PAGE_SIZE:
-            break
-        pn += 1
-    if not by_code:
+    # 与 f_etf_daily_monitor 共用同一份全市场快照（_etf_snapshot），**不额外发请求** ——
+    # 原实现两个模块各自分页 16 次（共 32 次），是本轮 502 暴露面最大的地方。
+    snap = _etf_snapshot()
+    if not snap:
         return None
-    rows = list(by_code.values())
+
+    def _num(v):
+        try:
+            return float(v) if v not in (None, "-", "") else 0.0
+        except (TypeError, ValueError):
+            return 0.0
+
+    rows = [{
+        "name": r.get("f14"), "code": code,
+        "chg": _num(r.get("f3")),
+        "amount": _num(r.get("f6")),
+        "vol": _num(r.get("f10")),
+    } for code, r in snap.items()]
     # 未开盘检测：集合竞价前全市场量比/成交额均为 0，输出榜单毫无意义，
     # 直接回 no_data 让前端显示「未开盘」，避免展示一整屏 0.00 的假异动。
     has_vol = any(r["vol"] > 0 for r in rows)
@@ -3072,7 +3156,6 @@ def f_etf_pulse():
         "amt": "盘中暂无显著放量，展示成交额最活跃 TOP12",
     }[mode]
     return {"etfs": etfs, "note": note}
-
 
 def f_analyst_ratings():
     """分析师评级：akshare stock_analyst_rank_em（东财分析师排名 + 最新推荐个股）。
