@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-09-23 12:59:10
+// 最后更新：2026-09-23 13:21:31
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-09-23 12:59:10",
+  "update_time": "2026-09-23 13:21:31",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 3033,
+      "total": 3035,
       "ongoing": true
     },
     {
@@ -91,7 +91,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 25,
       "peak": 20,
       "peak_date": "09/01",
-      "total": 205,
+      "total": 206,
       "ongoing": true
     },
     {
@@ -182,7 +182,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 21,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 247,
+      "total": 248,
       "ongoing": true
     },
     {
@@ -214,14 +214,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "通信设备",
       "start": "08/31",
-      "end": "09/22",
+      "end": "09/23",
       "start_idx": 12,
-      "end_idx": 28,
-      "days": 17,
-      "hot_days": 17,
+      "end_idx": 29,
+      "days": 18,
+      "hot_days": 18,
       "peak": 8,
       "peak_date": "09/02",
-      "total": 83,
+      "total": 86,
       "ongoing": true
     },
     {
@@ -247,7 +247,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 12,
       "peak": 21,
       "peak_date": "09/22",
-      "total": 136,
+      "total": 138,
       "ongoing": true
     },
     {
@@ -273,7 +273,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 6,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 104,
+      "total": 107,
       "ongoing": true
     },
     {
