@@ -1,9 +1,9 @@
 {
-  "update_time": "2026-09-24 00:35:19",
+  "update_time": "2026-09-24 02:00:11",
   "data_date": "2026-09-24",
   "track_start": "2026-09-24",
   "history_days": 30,
-  "strict_count": 5,
+  "strict_count": 1,
   "near_count": 1,
   "tracked": [
     {
@@ -12,18 +12,18 @@
       "market": "sz",
       "board": "主板",
       "status": "near",
-      "total_score": 26.7,
+      "total_score": 25.5,
       "quality_grade": "B",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "2026中报预增",
-        "计算机、通信和其他电子设备制造业",
-        "PCB",
         "百元股",
-        "深股通",
         "2026一季报预增",
+        "计算机、通信和其他电子设备制造业",
         "深证100R",
-        "MSCI中国"
+        "PCB",
+        "MSCI中国",
+        "2026中报预增",
+        "深股通"
       ],
       "signal_count": 2,
       "enter_date": "2026-08-30",
@@ -47,18 +47,18 @@
       "market": "sz",
       "board": "创业板",
       "status": "strict",
-      "total_score": 34.8,
+      "total_score": 33.5,
       "quality_grade": "A",
       "industry": "医药制造业",
       "sectors": [
-        "2026中报预增",
-        "深股通",
-        "医药制造业",
+        "创新药",
         "减肥药",
         "互联医疗",
-        "肝炎概念",
         "流感",
-        "创新药"
+        "肝炎概念",
+        "2026中报预增",
+        "深股通",
+        "医药制造业"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-22",
@@ -73,125 +73,6 @@
           "tag": "中报预增",
           "score": 15,
           "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "000807",
-      "name": "上海实业环境",
-      "market": "sz",
-      "board": "主板",
-      "status": "strict",
-      "total_score": 29.8,
-      "quality_grade": "A",
-      "industry": "有色金属冶炼和压延加工业",
-      "sectors": [
-        "有色金属冶炼和压延加工业"
-      ],
-      "signal_count": 2,
-      "enter_date": "2026-09-04",
-      "hold_days": 1,
-      "consecutive_days": 2,
-      "first_close": 26.95,
-      "current_close": 26.58,
-      "pnl_pct": -1.37,
-      "price_source": "quote",
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "300502",
-      "name": "新易盛",
-      "market": "sz",
-      "board": "创业板",
-      "status": "strict",
-      "total_score": 26.1,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "2026中报预增",
-        "计算机、通信和其他电子设备制造业",
-        "基金重仓",
-        "百元股",
-        "深股通",
-        "机构重仓",
-        "深证100R",
-        "MSCI中国"
-      ],
-      "signal_count": 1,
-      "enter_date": "2026-08-17",
-      "hold_days": 6,
-      "consecutive_days": 2,
-      "first_close": 466.68,
-      "current_close": 451.2,
-      "pnl_pct": -3.32,
-      "price_source": "quote",
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "走弱"
-        }
-      ]
-    },
-    {
-      "code": "601168",
-      "name": "西部矿业",
-      "market": "sh",
-      "board": "主板",
-      "status": "strict",
-      "total_score": 28.6,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 2,
-      "enter_date": "2026-08-17",
-      "hold_days": 9,
-      "consecutive_days": 3,
-      "first_close": 39.34,
-      "current_close": 36.81,
-      "pnl_pct": -6.43,
-      "price_source": "quote",
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "走弱"
-        }
-      ]
-    },
-    {
-      "code": "000703",
-      "name": "FUTURE BRIGHT",
-      "market": "sz",
-      "board": "主板",
-      "status": "strict",
-      "total_score": 26.1,
-      "quality_grade": "A",
-      "industry": "化学纤维制造业",
-      "sectors": [
-        "化学纤维制造业"
-      ],
-      "signal_count": 2,
-      "enter_date": "2026-08-20",
-      "hold_days": 3,
-      "consecutive_days": 3,
-      "first_close": 20.1,
-      "current_close": 17.39,
-      "pnl_pct": -13.48,
-      "price_source": "quote",
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "走弱"
         }
       ]
     }
@@ -326,14 +207,14 @@
     {
       "level": "good",
       "code": "000703",
-      "name": "FUTURE BRIGHT",
-      "text": "FUTURE BRIGHT(000703) 连续 3 日稳居严格共识（高质量）"
+      "name": "恒逸石化",
+      "text": "恒逸石化(000703) 连续 3 日稳居严格共识（高质量）"
     },
     {
       "level": "warn",
       "code": "000703",
-      "name": "FUTURE BRIGHT",
-      "text": "FUTURE BRIGHT(000703) 入选以来回撤 -13.5%（2026-08-20 起）"
+      "name": "恒逸石化",
+      "text": "恒逸石化(000703) 入选以来回撤 -13.5%（2026-08-20 起）"
     },
     {
       "level": "warn",
@@ -616,10 +497,9 @@
     "by_industry": [
       {
         "industry": "计算机、通信和其他电子设备制造业",
-        "count": 2,
+        "count": 1,
         "names": [
-          "沪电股份",
-          "新易盛"
+          "沪电股份"
         ]
       },
       {
@@ -628,56 +508,19 @@
         "names": [
           "翰宇药业"
         ]
-      },
-      {
-        "industry": "有色金属冶炼和压延加工业",
-        "count": 1,
-        "names": [
-          "上海实业环境"
-        ]
-      },
-      {
-        "industry": "有色金属矿采选业",
-        "count": 1,
-        "names": [
-          "西部矿业"
-        ]
-      },
-      {
-        "industry": "化学纤维制造业",
-        "count": 1,
-        "names": [
-          "FUTURE BRIGHT"
-        ]
       }
     ],
     "by_sector": [
       {
         "sector": "2026中报预增",
-        "count": 3
+        "count": 2
       },
       {
         "sector": "深股通",
-        "count": 3
-      },
-      {
-        "sector": "计算机、通信和其他电子设备制造业",
         "count": 2
       },
       {
         "sector": "百元股",
-        "count": 2
-      },
-      {
-        "sector": "深证100R",
-        "count": 2
-      },
-      {
-        "sector": "MSCI中国",
-        "count": 2
-      },
-      {
-        "sector": "PCB",
         "count": 1
       },
       {
@@ -685,7 +528,23 @@
         "count": 1
       },
       {
-        "sector": "医药制造业",
+        "sector": "计算机、通信和其他电子设备制造业",
+        "count": 1
+      },
+      {
+        "sector": "深证100R",
+        "count": 1
+      },
+      {
+        "sector": "PCB",
+        "count": 1
+      },
+      {
+        "sector": "MSCI中国",
+        "count": 1
+      },
+      {
+        "sector": "创新药",
         "count": 1
       },
       {
@@ -697,42 +556,22 @@
         "count": 1
       },
       {
-        "sector": "肝炎概念",
-        "count": 1
-      },
-      {
         "sector": "流感",
         "count": 1
       },
       {
-        "sector": "创新药",
+        "sector": "肝炎概念",
         "count": 1
       },
       {
-        "sector": "有色金属冶炼和压延加工业",
-        "count": 1
-      },
-      {
-        "sector": "基金重仓",
-        "count": 1
-      },
-      {
-        "sector": "机构重仓",
-        "count": 1
-      },
-      {
-        "sector": "有色金属矿采选业",
-        "count": 1
-      },
-      {
-        "sector": "化学纤维制造业",
+        "sector": "医药制造业",
         "count": 1
       }
     ],
-    "concentration": 33.33
+    "concentration": 50.0
   },
   "overlap": {
-    "total_tracked": 6,
+    "total_tracked": 2,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -1056,7 +895,7 @@
       },
       {
         "code": "000703",
-        "name": "FUTURE BRIGHT",
+        "name": "恒逸石化",
         "enter_date": "2026-08-20",
         "offsets": {
           "3d": -3.03,
@@ -1161,7 +1000,7 @@
       },
       {
         "code": "000807",
-        "name": "上海实业环境",
+        "name": "云铝股份",
         "enter_date": "2026-09-04",
         "offsets": {
           "1d": -0.59,

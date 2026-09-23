@@ -1,13 +1,8 @@
 {
-  "update_time": "2026-09-24 00:54:10",
-  "run_start": "2026-09-24 00:25:43",
-  "ok": 26,
-  "fail": 1,
-  "failed_scripts": [
-    {
-      "script": "calc_sentiment_cycle.py",
-      "reason": "退出码 1 | TypeError: '<' not supported between instances of 'list' and 'int'"
-    }
-  ],
+  "update_time": "2026-09-24 02:20:22",
+  "run_start": "2026-09-24 01:47:55",
+  "ok": 27,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }
