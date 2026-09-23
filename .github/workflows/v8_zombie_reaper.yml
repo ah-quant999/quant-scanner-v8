@@ -1,0 +1,106 @@
+# 九宝量化 v8.0 — 僵尸 run 收割机（服务器侧自清理·根治自托管掉线永生占位）
+#
+# 🔴 2026-09-23 主人令「为什么总是这些错，不是都说一劳永逸修好了吗」——病根定案：
+#   自托管 runner（小九单位机 cn / Lemoncat）掉线时，GitHub 的 job 级 timeout-minutes
+#   是【由 runner 自己执行】的 ⇒ runner 一死超时即失效 ⇒ run 变「永生僵尸」，
+#   占死并发槽 ⇒ 后续盘中抓取全部 pending ⇒ 数据断档（09-23 实证 3 次：
+#   #46 / #35822788723 / #35828465131，同族事故，每次都靠人工 cancel 救活）。
+#
+#   本 workflow 是【服务器侧】的根治：跑在 GitHub 官方 ubuntu 上（永远在线，
+#   不依赖任何自托管 runner / 本机哨兵），每 5 分钟扫一次全仓 run，
+#   发现「假活占位」直接 cancel 释放并发槽。
+#
+# 判据（保守·防误杀）：
+#   · in_progress 且 updated_at 冻结 > 15 分钟 ⇒ 占位（15 分钟没有任何 step 推进的
+#     run 视为挂死；本仓各步实测均 < 10 分钟，宁可取消重跑、不可僵死占槽——主人口径）。
+#   · queued 且 updated_at 冻结 > 120 分钟 ⇒ 队列死尸（并发饿死/脏排队，实测
+#     pages build 曾排队冻结 10 天）。
+#   · 正常长跑 run 的 updated_at 会随 step 推进而刷新 ⇒ 不会被误杀。
+#
+# 安全性：
+#   · 本 job 自身秒级完成，永远不会命中自己的判据。
+#   · 恒 exit 0：收割失败只打日志，绝不 red 掉管线。
+#   · GITHUB_TOKEN 仅申请 actions:write（取消 run 所需），无 contents 写权限。
+
+name: "☠️ v8 僵尸run收割机"
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # 每 5 分钟：盘中 20 分档下，僵尸最多占 15~20 分钟即被清
+  workflow_dispatch: {}      # 手动触发（测试/应急）
+
+permissions:
+  actions: write            # POST /runs/{id}/cancel 需要
+  contents: read
+
+concurrency:
+  group: v8_zombie_reaper
+  cancel-in-progress: true
+
+jobs:
+  reap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: "☠️ 扫描并收割僵尸 run"
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          INPROGRESS_FREEZE_MIN: "15"
+          QUEUED_FREEZE_MIN: "120"
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, time, urllib.request, datetime
+
+          TOK = os.environ["GITHUB_TOKEN"]
+          REPO = os.environ["REPO"]
+          IP_FREEZE = int(os.environ["INPROGRESS_FREEZE_MIN"])
+          Q_FREEZE = int(os.environ["QUEUED_FREEZE_MIN"])
+          API = f"https://api.github.com/repos/{REPO}/actions/runs"
+
+          def api(url, method="GET"):
+              req = urllib.request.Request(url, method=method, headers={
+                  "Authorization": f"Bearer {TOK}",
+                  "Accept": "application/vnd.github+json",
+              })
+              try:
+                  resp = urllib.request.urlopen(req, timeout=30)
+                  if method == "GET":
+                      return json.load(resp)
+                  return resp.status
+              except urllib.error.HTTPError as e:
+                  print(f"    HTTP {e.code} {url.split('/')[-1]}")
+                  return e.code
+
+          now = datetime.datetime.now(datetime.timezone.utc)
+          reaped, checked = [], 0
+
+          for status, freeze_min in (("in_progress", IP_FREEZE), ("queued", Q_FREEZE)):
+              page = 1
+              while page <= 3:  # 每状态最多翻 3 页（per_page=100，防失控）
+                  d = api(f"{API}?status={status}&per_page=100&page={page}")
+                  runs = (d or {}).get("workflow_runs") or []
+                  if not runs:
+                      break
+                  for r in runs:
+                      checked += 1
+                      upd = datetime.datetime.fromisoformat(
+                          r["updated_at"].replace("Z", "+00:00"))
+                      frozen = (now - upd).total_seconds() / 60
+                      if frozen > freeze_min:
+                          bj = (upd + datetime.timedelta(hours=8)).strftime("%H:%M")
+                          print(f"  ☠️ 收割 #{r['id']} [{r['name'][:40]}] "
+                                f"status={status} 冻结 {frozen:.0f}min "
+                                f"(最后活动北京 {bj}) sha={r['head_sha'][:10]}")
+                          code = api(f"{API}/{r['id']}/cancel", method="POST")
+                          reaped.append((r["id"], r["name"][:40], status, round(frozen), code))
+                  if len(runs) < 100:
+                      break
+                  page += 1
+
+          print(f"✅ 扫描 {checked} 条 run，收割 {len(reaped)} 条僵尸")
+          for rid, name, st, fz, code in reaped:
+              print(f"    #{rid} {name} [{st}] 冻结{fz}min cancel→HTTP {code}")
+          # 恒 exit 0：收割是维护动作，失败不 red 管线
+          PYEOF
