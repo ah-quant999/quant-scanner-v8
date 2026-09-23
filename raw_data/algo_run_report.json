@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-23 06:20:37",
-  "run_start": "2026-09-23 06:01:31",
-  "ok": 10,
+  "update_time": "2026-09-23 15:33:49",
+  "run_start": "2026-09-23 15:23:59",
+  "ok": 13,
   "fail": 1,
   "failed_scripts": [
     {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
+      "script": "scripts/fetch_sector_leaders.py",
+      "reason": "退出码 1 | http.client.RemoteDisconnected: Remote end closed connection without response"
     }
   ],
   "skipped_by_time_gate": []
