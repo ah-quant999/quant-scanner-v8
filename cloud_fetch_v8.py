@@ -3049,6 +3049,7 @@ _ETF_HOSTS = ("https://push2delay.eastmoney.com", "https://push2.eastmoney.com")
 _ETF_PAGE = 100            # 硬约束：clist 对 pz 一律截断到 100（v7/v9 双证），无法调大
 _ETF_MAX_PAGES = 24        # 1619 只 ÷ 100 ≈ 17 页，留冗余
 _ETF_MIN_ROWS = 1400       # 拼齐后仍少于此数视为异常（1619 只全市场）
+_ETF_DEFAULT_PAGES = 17    # total 未知（当日首轮 run）时的页数缺省值：1619 只 ÷ 100 = 17（v7/v9 实测恒 1619）
 _ETF_ROUNDS = 3            # 单次快照内最多 3 轮遍历（实测「首趟之后该 IP 全 0」，第 2 轮起基本即熔断）
 _ETF_BUDGET = 180          # 单次快照时间预算（秒）；实测一轮 ~2s，10 轮 ~30s
 _ETF_TOTAL_BUDGET = 420    # 单轮 run 内累计上限（两个模块共用一次快照，实际只跑一次）
@@ -3183,10 +3184,11 @@ def _etf_snapshot_inner(today):
             npages = min(_ETF_MAX_PAGES, (total + _ETF_PAGE - 1) // _ETF_PAGE)
             cand = list(range(1, npages + 1))
         else:
-            # total 未知（一页都没成）时先撒「探针窗」：每轮只打 8 页、逐轮平移，
-            # 避免在坏窗口里空转 24 页 × 10 轮 = 240 个请求去打东财（礼貌 + 省时）。
-            _s = (rnd * 8) % _ETF_MAX_PAGES + 1
-            cand = [((_s - 1 + x) % _ETF_MAX_PAGES) + 1 for x in range(8)]
+            # total 未知（当日首轮 run，缓存为空）时按缺省页数取 1..17。原实现只探 8 页
+            # ⇒ 当日首轮最多只能拼到 8 页（且次轮该 IP 已封、补不到），白白少拿 ~3 页。
+            # v11 实测「串行 17 个请求」本身无害（19.9s 拿到 9 页），故不必再自我设限。
+            n_p = min(_ETF_MAX_PAGES, _ETF_DEFAULT_PAGES)
+            cand = list(range(1, n_p + 1))
         miss = [p for p in cand if str(p) not in pages]
         if not miss:
             break
