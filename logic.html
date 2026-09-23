@@ -2168,6 +2168,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><th>时点</th><th>Workflow / 任务</th><th>干什么</th><th>归属</th></tr>
           <tr><td><b>16:00-08:59</b> 每小时 :10</td><td>「盘后算法链接力推进器」（本机自动化）</td><td><b>盘后链实际主力</b>：先查无在跑 → 跑闸门 → 只按 <code>proceed</code> 派发 <code>v8_algo_cloud</code>（不带 stage）</td><td>阿狸咪机</td></tr>
           <tr><td>17:30</td><td><code>v8_lhb_fetch</code></td><td>当日龙虎榜（交易所 17:00 后发布）</td><td><code>[self-hosted, cn]</code></td></tr>
+          <tr><td>工作日 20:30</td><td><code>v8_dajijin_fetch</code></td><td>大基金（国家集成电路产业投资基金 一期/二期/三期）<b>增减持监控</b>：读东财数据中心<b>法定披露</b>的股东增减持记录（近 120 日窗口），汇总「近 N 日合计减持 X 笔 · Y 只 · Z 万股」。<b>只减不增＝常态</b>（一期已进入回收 / 延展期），此表作<b>利空前瞻信号</b>用（回避参考），<b>不是买入信号</b>；产物归「🔒 暂未上架」页展示</td><td><code>[self-hosted, cn]</code>（东财行情域境外不可达）</td></tr>
           <tr><td>22:30</td><td><code>v8_daily_audit</code></td><td>每日审计</td><td>云端 ubuntu</td></tr>
           <tr><td>23:00</td><td><code>v8_backup</code></td><td>备份 <code>raw_data/*.json</code></td><td>云端 ubuntu</td></tr>
           <tr><td>raw_data / data push 后</td><td><code>v8_build_deploy</code></td><td>selective build + GitHub Pages 部署</td><td>云端 ubuntu</td></tr>

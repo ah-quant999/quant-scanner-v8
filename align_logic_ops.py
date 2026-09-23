@@ -69,6 +69,11 @@ MUST_HAVE_CRON = {
     "v8_cn_fetch_intraday_lemoncat": "盘中准点档调度器(14 档·唯一主线)",
     # 2026-09-10 阿狸咪升格：实验卡抓取链有 16:30 CST cron 且已文档化 → ALLOW → MUST
     "v8_cn_fetch_experiments": "暂未上架·实验卡抓取(16:30)",
+    # 2026-09-23 补登记（本机·小九）：大基金（国家集成电路产业投资基金一/二/三期）增减持监控。
+    #   数据源＝东财数据中心 RPT_SHARE_HOLDER_INCREASE（法定披露·按季报股东名单，准实时）；
+    #   产物 data/DAJIJIN_REDUCTION.js，供「🔒 暂未上架」页卡片读取（只减不增＝利空前瞻信号）。
+    #   跑小九 cn（[self-hosted, cn]，东财域境外不可达）；已挂 logic.html 补充表。
+    "v8_dajijin_fetch": "大基金增减持监控(工作日20:30)",
     # 🔴 2026-09-23 当日撤销登记并删除文件（小九；主人拍板「删」）。
     #   原意：自托管 runner 掉线时 job 级 timeout 失效 ⇒ run 永生占槽 ⇒ 后续抓取全 pending。
     #   删因（两处设计级缺陷，均已实测）：
