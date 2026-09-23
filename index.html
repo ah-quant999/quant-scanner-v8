@@ -645,6 +645,10 @@ window.__domReadyFns=[];
      数据由 cloud_fetch_v8.py::f_us_hk_map() 盘前 08:25 单档生成 → raw_data/us_hk_map.json
      → update_v8.py → data/US_HK_MAP.js（window.US_HK_MAP）。此处漏注入 = 死块（恒 undefined）。 -->
 <script src="data/US_HK_MAP.js?v=1790171717" defer></script>
+<!-- 🚨 2026-09-23 主人令：大基金 增减持监控（暂未上架 > 观测类）。
+     数据由 algorithms/fetch_dajijin_reduction.py 产出（东财数据中心·股东增减持，按股东全名精确匹配
+     国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
+<script src="data/DAJIJIN_REDUCTION.js?v=1790171717" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
     <script src="data/H_AUTO_BUY.js?v=1790171717" defer></script>
@@ -15192,6 +15196,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
             if(r2 && r2.items && r2.items.length){
               clearInterval(window.__uhkRetryTimer); window.__uhkRetryTimer = null; window.__uhkRetryN = 0;
               try{ window._fillUsHkMap(); }catch(e){}
+    /* 🚨 2026-09-23 主人令：大基金 增减持监控卡派发（与 _fillUsHkMap 同处 renderUnlisted 尾部，
+       覆盖首渲即触发；defer 数据未到时由 _fillDajijin 内部 600ms×30 自愈轮询补渲）。 */
+    window._fillDajijin();
             } else if(window.__uhkRetryN > 30){
               clearInterval(window.__uhkRetryTimer); window.__uhkRetryTimer = null; window.__uhkRetryN = 0;
             }
@@ -15344,6 +15351,101 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
     }catch(e){ console.warn('隔夜美股映射卡渲染失败', e); }
   };
+  /* ═══ 🚨 2026-09-23 主人令：大基金 增减持监控卡渲染（观测类）═══
+     数据：window.DAJIJIN_REDUCTION（algorithms/fetch_dajijin_reduction.py 直出 data/*.js）。
+     范式与 _fillUsHkMap 逐条对齐（不许特立独行）：
+       ① 无数据 ⇒ 整卡 display:none（不产空壳卡）；
+       ② 600ms×30 自愈轮询补渲（覆盖 defer 脚本加载窗口，否则表现为「卡面永久加载中」）；
+       ③ 卡尾必带「口径 + 来源 + 免责」，可一眼验真；
+       ④ 全部字段 _esc 转义（防 XSS；股票名来自外部源）。
+     配色遵循全站红涨绿跌：减持 = var(--down) 绿、增持 = var(--up) 红。 */
+  window._fillDajijin = function(){
+    try{
+      var card = document.getElementById('dajijinCard');
+      var body = document.getElementById('dajijinBody');
+      if(!card || !body) return;
+      var d = window.DAJIJIN_REDUCTION || null;
+      if(!d || !(d.records && d.records.length)){
+        if(!window.__djjRetryTimer){
+          window.__djjRetryN = 0;
+          window.__djjRetryTimer = setInterval(function(){
+            window.__djjRetryN++;
+            var r2 = window.DAJIJIN_REDUCTION;
+            if(r2 && r2.records && r2.records.length){
+              clearInterval(window.__djjRetryTimer); window.__djjRetryTimer = null; window.__djjRetryN = 0;
+              try{ window._fillDajijin(); }catch(e){}
+            } else if(window.__djjRetryN > 30){
+              clearInterval(window.__djjRetryTimer); window.__djjRetryTimer = null; window.__djjRetryN = 0;
+            }
+          }, 600);
+        }
+        return;
+      }
+      if(window.__djjRetryTimer){ clearInterval(window.__djjRetryTimer); window.__djjRetryTimer = null; window.__djjRetryN = 0; }
+
+      var _esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+      var _num = function(v, dg){
+        if(v == null || v === '' || isNaN(v)) return '&#8212;';
+        var p = Number(v).toFixed(dg == null ? 2 : dg).split('.');
+        p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return p.join('.');
+      };
+      var s = d.summary || {}, recs = d.records || [], BY = s.by_holder || {}, h = '';
+
+      /* ── ① 汇总条：主体拆分（一期/二期/三期）+ 合计 ── */
+      h += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 11px;margin-bottom:10px;background:rgba(244,63,94,.05);border:1px solid rgba(244,63,94,.2);border-radius:7px;font-size:12.5px;">';
+      h += '<span style="color:#f43f5e;font-weight:700;">&#x1F3DB; 近 ' + (d.window_days || 120) + ' 日</span>';
+      ['一期', '二期', '三期'].forEach(function(k){
+        if(!BY[k]) return;
+        h += '<span style="color:var(--sub);">' + k + ' <b style="color:var(--txt);">' + BY[k].n + '</b> 笔 / <b style="color:var(--txt);">' + BY[k].codes + '</b> 只 / <b style="color:var(--txt);">' + _num(BY[k].shares) + '</b> 万股</span>';
+      });
+      if(!Object.keys(BY).length) h += '<span style="color:var(--sub);">无记录</span>';
+      h += '<span style="margin-left:auto;color:var(--sub);">减持合计 <b style="color:var(--down);">' + _num(s.reduce_shares) + '</b> 万股 &#183; 涉及 <b style="color:var(--txt);">' + (s.stock_cnt || 0) + '</b> 只</span>';
+      h += '</div>';
+
+      /* ── ② 明细表：公告日倒序（数据端已排好）── */
+      h += '<div style="font-size:11.5px;color:var(--dim);margin-bottom:4px;">按公告日倒序 &#183; 共 ' + recs.length + ' 条 &#183; 「变动」为该次披露的区间累计股数</div>';
+      recs.forEach(function(r){
+        var isCut = String(r.dir || '').indexOf('减') >= 0;
+        var col = isCut ? 'var(--down)' : 'var(--up)';
+        var bgc = isCut ? 'rgba(38,166,154,.15)' : 'rgba(239,83,80,.15)';
+        h += '<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px dashed var(--border);font-size:12.5px;flex-wrap:wrap;">'
+           + '<span style="color:var(--dim);min-width:74px;">' + _esc(r.date) + '</span>'
+           + '<span style="font-weight:700;color:var(--txt);min-width:62px;">' + _esc(r.code) + '</span>'
+           + '<span style="color:var(--txt);min-width:76px;">' + _esc(r.name) + '</span>'
+           + '<span style="font-size:10px;background:rgba(255,255,255,.06);color:var(--sub);padding:1px 6px;border-radius:4px;">' + _esc(r.holder) + '</span>'
+           + '<span style="font-size:10px;background:' + bgc + ';color:' + col + ';padding:1px 6px;border-radius:4px;">' + _esc(r.dir) + '</span>'
+           + '<span style="min-width:96px;text-align:right;color:' + col + ';font-weight:700;">' + _num(r.shares) + ' 万股</span>'
+           + '<span style="min-width:100px;color:var(--sub);">变动后 ' + _num(r.hold_ratio) + '%</span>'
+           + '<span style="color:var(--dim);font-size:11px;">区间 ' + _esc(r.start) + ' ~ ' + _esc(r.end) + '</span>'
+           + '</div>';
+      });
+      if((s.errors || []).length){
+        h += '<div style="font-size:11px;color:#fbbf24;margin-top:6px;">&#x26A0; 部分主体本条抓取失败：'
+           + _esc((s.errors || []).map(function(x){ return x.holder; }).join('、')) + '（已跳过，未静默降级为 0）</div>';
+      }
+
+      /* ── ③ 口径 / 来源 / 免责（每卡必带）── */
+      h += '<div style="font-size:10.5px;color:var(--dim);line-height:1.75;margin-top:12px;border-top:1px dashed var(--border);padding-top:8px;">'
+         + '&#x1F517; <b>口径</b>：' + _esc(d.caliber || '') + '。<br>'
+         + '&#x1F4E1; <b>来源</b>：' + _esc(d.source || '') + '（结构化法定披露，非行情快照）。<br>'
+         + '&#x26A0;&#xFE0F; 金额列未展示（原口径为估算）；<b style="color:#fbbf24;">减持属「公告先于执行」的利空前瞻信号，本卡不构成投资建议，也不代表大基金完整持仓动作（5% 以下减持不公告）。</b></div>';
+
+      body.innerHTML = h;
+      card.style.display = 'block';
+
+      var ot = document.getElementById('djjOneText');
+      if(ot) ot.innerHTML = _esc(s.one_liner || '');
+
+      var fb = document.getElementById('djjFresh');
+      if(fb){
+        var ts = d.update_time || '';
+        if(typeof _uBadge === 'function'){ try{ fb.innerHTML = _uBadge('auto', '盘后', ts); }catch(e2){ fb.textContent = ts; } }
+        else { fb.textContent = ts; }
+      }
+    }catch(e){ console.warn('大基金增减持卡渲染失败', e); }
+  };
+
 
   window._fillSectorLeaders = function(){
     /* ═══ 🎯 2026-09-19 主人令·单一真源重写（旧版见 git 历史）═══
@@ -15689,7 +15791,28 @@ h += '<div class="card" id="usHkMapCard" style="display:none;margin-bottom:16px;
    + '<span class="fresh" id="usHkFresh">&#x2014;</span>'
    + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 隔夜口径（美东收盘，非实时）</span></div>'
    + '<div id="usHkMapBody"><div class="note">加载中&#x2026;</div></div></div>';
-h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-left:4px solid var(--cyan);"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52D; 主题空间 · 概念资金热度 加载中&#x2026;</div></div>';
+
+// ═══ 🚨 2026-09-23 主人令：大基金 增减持监控（观测类 · 置于「🔭 主题空间 · 概念资金热度」卡上方）═══
+//   需求原话：「做吧，放暂未上架」＋「这卡上方」＋「核心/用法/限制 这套和一句话结论的解析都要跟上」。
+//   数据 window.DAJIJIN_REDUCTION（data/DAJIJIN_REDUCTION.js ← algorithms/fetch_dajijin_reduction.py）。
+//   口径：东方财富数据中心·股东增减持（RPT_SHARE_HOLDER_INCREASE），按**股东全名精确匹配**
+//         国家集成电路产业投资基金（一期/二期/三期）三个主体 —— 模糊 like 在该接口不生效，必须全名等值。
+//   ⚠ 与「国家大基金持股」概念板块（东财按季报十大股东打的 BK 板块标签）是**两回事**：
+//       本卡 = 大基金**自己的买卖动作**（法定披露）；板块资金流 = **市场资金**对该板块的流入。
+//       两者方向可以完全相反（实测：盛科通信 6/8–9/7 被大基金减持 707 万股，同期板块连续大涨）。
+//   无数据 ⇒ 整卡保持 display:none（不产空壳卡）；填充见 window._fillDajijin（600ms×30 自愈轮询）。
+h += '<div class="card" id="dajijinCard" style="display:none;margin-bottom:16px;border-left:4px solid #f43f5e;">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+   + '<span style="font-size:15px;font-weight:700;color:#f43f5e;">&#x1F6A8; 大基金 增减持监控</span>'
+   + '<span class="fresh" id="djjFresh">&#x2014;</span>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 法定披露口径（公告先于执行，非实时行情）</span></div>'
+   + '<div style="background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.3);border-radius:7px;padding:9px 11px;margin-bottom:10px;font-size:12.5px;line-height:1.7;color:var(--txt);">'
+   + '&#x1F4E3; <b style="color:#f43f5e;">一句话结论：</b><span id="djjOneText">加载中&#x2026;</span></div>'
+   + '<div style="background:rgba(244,63,94,.05);border:1px solid rgba(244,63,94,.2);border-radius:7px;padding:9px 11px;margin-bottom:10px;font-size:12px;line-height:1.7;color:var(--txt);">'
+   + '<b style="color:#f43f5e;">&#x1F4CC; 核心：</b>把「大基金减持」这类<b>法定披露</b>信号摆到眼前 &#8212;&#8212; 持股 5% 以上股东减持须提前 15 个交易日预披露，属<b>公告先于执行</b>的确定性信息。<br>'
+   + '<b style="color:#f43f5e;">&#x1F4A1; 用法：</b>当<b>风险排查表</b>用 &#8212;&#8212; 持仓若出现在清单里，说明大基金正在退出，需重新评估；<b style="color:#fbbf24;">不是买入信号</b>。<br>'
+   + '<b style="color:#f43f5e;">&#x26A0; 限制：</b>① 只覆盖持股 &#8805;5% 主体的披露义务，<b>5% 以下减持不公告</b>，故本表 &#8800; 大基金全部动作；② 仅按全名匹配三个基金主体，不含华芯投资等 GP；③ 变动股数为<b>区间累计</b>、非单日；④ 金额为估算（变动股数 &#215; 公告日收盘价）。</div>'
+   + '<div id="dajijinBody"><div class="note">加载中&#x2026;</div></div></div>';h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-left:4px solid var(--cyan);"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52D; 主题空间 · 概念资金热度 加载中&#x2026;</div></div>';
 
 // 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡壳已删（原 baihechouBody，
 //   见 git 历史；同批删渲染函数与派发，生产者/自动化一并退役）。
