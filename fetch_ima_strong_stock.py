@@ -22,6 +22,13 @@ import re
 import sys
 from datetime import datetime, timedelta, timezone
 
+# 🔴 2026-09-24：源停更邮件告警（统一走 v8_send_alert 闸门；云端无配置时静默跳过）
+try:
+    import v8_send_alert
+except Exception as _e:
+    v8_send_alert = None
+    print("[WARN] v8_send_alert 导入失败，源停更告警将只在日志体现：%s" % _e)
+
 ROOT = os.path.dirname(os.path.abspath(__file__))
 RAW_DIR = os.path.join(ROOT, "raw_data")
 DATA_DIR = os.path.join(ROOT, "data")
@@ -55,6 +62,9 @@ WIKI_API = "https://ima.qq.com/cgi-bin/knowledge_share_get/get_share_info"
 WIKI_FOLDER_STRONG_TRACK = "folder_7500817011604393"
 # SSR 深页（实测：比 API 目录新一天，见 _wiki_ssr_latest 说明）
 WIKI_PAGE = "https://ima.qq.com/wiki/"
+
+# 🔴 2026-09-24：源停更邮件告警阈值（自然日）。日报性质 ⇒ 默认 2 天（容一个非交易日）。
+WIKI_STALE_DAYS_ALERT = int(os.environ.get("WIKI_STALE_DAYS_ALERT", "2"))
 
 STATUS_SET = {"强势", "正常", "回落", "见顶", "走弱", "连涨强势"}
 # 🔴 2026-09-17 阿狸咪的工程师（主人令「算法不得出错」专项）：补 "连涨强势"。
@@ -105,6 +115,12 @@ SNAPSHOT_MAX_AGE_H = 72
 
 def is_date(s):
     return bool(s) and DATE_RE.match(s or "")
+
+
+def _extract_date(s):
+    """从字符串中抽取首个 YYYY-MM-DD 日期，无则返回空串。"""
+    m = re.search(r"(\d{4}-\d{2}-\d{2})", str(s or ""))
+    return m.group(1) if m else ""
 
 
 def to_float(s):
@@ -638,8 +654,12 @@ def load_snapshot():
         return None
 
     # ── 新鲜度：快照必须「够新」才敢用（判据 84 同类：拿旧名单冒充今天 = 最坏的一种谎）──
+    # 🔴 2026-09-24（选项②）：访客路已死，快照过期时**不再回退**去撞 wiki，而是带降级标记继续用。
+    #   因此 load_snapshot() 不再因龄大而返回 None；调用方根据返回的 snapshot_expired 决定是否再试 wiki。
     _fa = str(snap.get("fetched_at") or "")
     age_h = None
+    snapshot_expired = False
+    degraded_reason = ""
     try:
         _dt = datetime.strptime(_fa, "%Y-%m-%d %H:%M:%S").replace(
             tzinfo=timezone(timedelta(hours=8)))
@@ -650,9 +670,10 @@ def load_snapshot():
         print("⚠️ [snapshot] fetched_at 缺失或格式非法（%r）⇒ 回退（不猜龄）" % _fa[:40])
         return None
     if age_h > SNAPSHOT_MAX_AGE_H:
-        print("⚠️ [snapshot] 快照过期：fetched_at=%s · 已 %.1f h > %d h ⇒ 回退访客抓页"
-              % (_fa, age_h, SNAPSHOT_MAX_AGE_H))
-        return None
+        snapshot_expired = True
+        degraded_reason = "snapshot_age>%.0fh;guest-path-dead" % age_h
+        print("⚠️ [snapshot] 快照过期：fetched_at=%s · 已 %.1f h > %d h ⇒ 不再回退已死访客路，"
+              "将带降级标记继续使用旧快照" % (_fa, age_h, SNAPSHOT_MAX_AGE_H))
     if age_h < -1:
         print("⚠️ [snapshot] fetched_at 在未来（%.1f h）⇒ 时区口径可疑，回退" % age_h)
         return None
@@ -692,6 +713,8 @@ def load_snapshot():
         "source_channel": "full-snapshot",
         "snapshot_fetched_at": _fa,
         "snapshot_age_h": round(age_h, 2),
+        "snapshot_expired": snapshot_expired,
+        "degraded_reason": degraded_reason,
         "strong_expected": _strong_expected,
         "strong_parsed": _strong_parsed,
         "reconciled": _reconciled,
@@ -703,15 +726,17 @@ def load_snapshot():
                  "实际强势条数）做内容级对账，相等即视为完整，不等才判 truncated。"
                  "⚠️ 与访客通道的『服务端 300 字硬墙』是两回事，勿混。"),
     }
-    print("✅ [snapshot] %s · %d/%s 条（%.1f%%）· 数据日 %s · 快照龄 %.1f h · 对账 %s"
-          "（强势 头%s / 实%s）"
-          % (title or "?", len(stocks), expected, coverage["coverage_pct"] or 0,
-             data_date or "?", age_h,
+    print("%s [snapshot] %s · %d/%s 条（%.1f%%）· 数据日 %s · 快照龄 %.1f h · 对账 %s"
+          "（强势 头%s / 实%s）%s"
+          % ("⚠️" if snapshot_expired else "✅", title or "?", len(stocks), expected,
+             coverage["coverage_pct"] or 0, data_date or "?", age_h,
              "✅通过" if _reconciled else "🔴不一致",
-             _strong_expected, _strong_parsed))
+             _strong_expected, _strong_parsed,
+             "[已过期/降级]" if snapshot_expired else ""))
     return {"summary": summary, "stocks": stocks,
             "meta": {"source_title": title, "source_updated_at": ""},
-            "coverage": coverage, "wiki_latest": title}
+            "coverage": coverage, "wiki_latest": title,
+            "snapshot_expired": snapshot_expired, "degraded_reason": degraded_reason}
 
 
 def fetch_via_wiki(share_id=None, folder_id=None):
@@ -825,6 +850,7 @@ def main():
     #   否则前端/审计无法判断「这 56 条是全量还是降级」（判据：不许假成功）。
     _eff_source = args.source
     _detail_channel = "introduction"
+    degraded_reason = ""
     if args.source in ("auto", "wiki"):
         data = None
         # auto ⇒ 先试**全文快照**（见 SNAPSHOT_MD 段：访客通道永远只有 1~2 条）
@@ -832,9 +858,28 @@ def main():
             data = load_snapshot()
             if data:
                 _detail_channel = "full-snapshot"
-        if data is None:
-            data = fetch_via_wiki(folder_id=args.folder)
-            _detail_channel = "introduction"
+                degraded_reason = data.get("degraded_reason", "")
+        # 🔴 2026-09-24（选项②）：快照过期时不再回退已死访客路；但**仍尝试** wiki 看源是否有新篇。
+        #   wiki 成功 ⇒ 用新数据；wiki 失败 ⇒ 带降级标记继续用过期快照（不 exit 1）。
+        if data is None or data.get("snapshot_expired"):
+            try:
+                wiki_data = fetch_via_wiki(folder_id=args.folder)
+                if wiki_data:
+                    # 仅当 wiki 拿到不旧于快照的数据才替换；若 wiki 也返回同一旧篇，保留过期快照标记更诚实
+                    snap_title_date = _extract_date(data.get("meta", {}).get("source_title") or "") if data else ""
+                    wiki_title_date = _extract_date(wiki_data.get("meta", {}).get("source_title") or "")
+                    if data is None or (wiki_title_date and wiki_title_date >= snap_title_date):
+                        data = wiki_data
+                        _detail_channel = "introduction"
+                        degraded_reason = ""
+                    else:
+                        print("   ⚠️ wiki 返回的标题日期 %s 不新于快照 %s，保留过期快照降级标记"
+                              % (wiki_title_date, snap_title_date))
+            except Exception as e:
+                if data is None:
+                    raise
+                print("   ⚠️ wiki 取新篇失败（%s %s），带降级标记继续使用过期快照"
+                      % (type(e).__name__, str(e)[:120]))
         _eff_source = "wiki"
         _src_url = "https://ima.qq.com/wiki/?shareId=%s&folderId=%s" % (WIKI_SHARE_ID, args.folder)
     else:
@@ -920,11 +965,11 @@ def main():
         "source_updated_at": meta.get("source_updated_at") or "",
         "data_date": _data_date,
         "stale_days": _stale_days,
-        # 🔴 2026-09-19：wiki 源的「最新一篇」就是源侧最新状态 ⇒ 标题日期即数据日，
-        #   此时**不因「距今 N 天」报停更**（源可能本就隔几日更新，报停更=诬告主人）。
-        #   仅当「最新一篇的日期 < 今天且它已经落后于知识库的最新内容」才判停更——
-        #   而 wiki 源取到的**就是最新一篇**，故恒为 False（新鲜度由 data_date 显示）。
-        "source_stale": False if _eff_source == "wiki" else bool(_stale_days is not None and _stale_days > 0),
+        # 🔴 2026-09-24（选项②）：源停更按**自然日阈值**判定，不再为 wiki 源恒置 False。
+        #   阈值 WIKI_STALE_DAYS_ALERT 默认 2 天；日报停更超过该天数即 source_stale=true。
+        "source_stale": bool(_stale_days is not None and _stale_days > WIKI_STALE_DAYS_ALERT),
+        "snapshot_expired": bool((data.get("coverage") or {}).get("snapshot_expired")),
+        "degraded_reason": degraded_reason or (data.get("coverage") or {}).get("degraded_reason", ""),
         "summary": data["summary"],
         # 🔴 wiki 源必带：如实标注「拿到几条 / 应有多少条 / 是否被服务端截断」
         "sample_coverage": data.get("coverage"),
@@ -1016,6 +1061,22 @@ def main():
               f"{out['source_updated_at'] or '?'}，最新交易日 {out['data_date']} ⇒ "
               f"**已 {out['stale_days']} 天无新数据**。本次抓取成功但内容与上一期相同"
               f"（源侧停更，不是抓取失败）。")
+        # 🔴 2026-09-24：发邮件告警（stale 级；非交易日静默；本机有配置才真发）。
+        try:
+            if v8_send_alert:
+                _subj = f"ima 强势股日报源停更 {out['stale_days']} 天"
+                _body = (
+                    f"源笔记：{out['source_title'] or '?'}\n"
+                    f"最新交易日：{out['data_date']}\n"
+                    f"已停更天数：{out['stale_days']} 天（阈值 {WIKI_STALE_DAYS_ALERT} 天）\n"
+                    f"降级原因：{out.get('degraded_reason') or '源无新篇'}\n"
+                    f"快照过期：{'是' if out.get('snapshot_expired') else '否'}\n"
+                    f"源 URL：{out['note_url']}\n\n"
+                    f"请检查 ima 知识库「强势股跟踪」文件夹是否已迁移或更名。"
+                )
+                v8_send_alert.send_alert(_subj, _body, level="stale")
+        except Exception as _ae:
+            print(f"[WARN] 源停更邮件告警发送失败（非致命）: {_ae}")
     else:
         print(f"📅 源数据日 {out['data_date']}（新鲜）· 源自述更新时间 {out['source_updated_at'] or '?'}")
 

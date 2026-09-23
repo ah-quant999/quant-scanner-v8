@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-24 00:04"
+  updated: "2026-09-24 01:52"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -2504,7 +2504,7 @@ items:
   - id: ima-snapshot-72h-expiry-trap
     priority: P1
     owner: shared
-    status: todo
+    status: pending-verify
     what: >
       `fetch_ima_strong_stock.py --source auto` 的正常路径是：优先读本机落下的全文快照
       `raw_data/ima_strong_stock_full.{md,json}`（12 列、56/58 条），读不到/坏了才回退访客抓页。
@@ -2518,42 +2518,43 @@ items:
       > 72h，快照龄必然越限 ⇒ **该 workflow 的日频派发必然逐日假红**，且遮住真故障。
       本次实测：源方最新一篇停在 **2026-09-15**（连续 7 日无新篇）⇒ 09-22 15:52 CST 的
       `workflow_dispatch` run #31 正是死于此，而非数据问题。
+      ⚠️ 2026-09-24 01:3x CST 阿狸咪再核：用户提示「高手换过文件夹」。已递归扫描当前 share 全部
+      folder（含嵌套）：旧 folder `folder_7500817011604393` 仍在，但已从根目录被移入「选股」下；
+      **未发现**任何标题含「强势股跟踪日报」且日期 > 2026-09-15 的条目。其他 folder（短线情绪选股、
+      情绪温度计、强势股筛选等）内容/格式均不同。若源确实继续更新，则可能已迁移到**新 share**或
+      未共享的 private folder；需用户补充新分享链接才能根治跟踪错。
     fix: >
-      三选一，**②③ 会动「数据诚实性」口径 ⇒ 必须主人拍板，禁自行改**：
-      ① 生产者侧（本机自动化，**2026-09-22 17:05 已临时补上**）：源方未发新篇时也由阿狸咪机
-         每日重取全文并刷新 `fetched_at`（正文逐字节不变、`data_date` 不前进）。缺点：依赖本机
-         自动化在线，它一停就又越限。
-      ② 消费侧治本（推荐）：快照过期时**不再回退已死的访客路**，而是带**显式降级标记**继续用
-         —— 产物加 `snapshot_expired=true` / `degraded_reason="snapshot_age>72h; guest-path-dead"`，
-         链保持绿、卡片如实标注停更。语义从「静默退回 1~2 条」改为「明示的全量但过期」。
-      ③ 最小改动：CI 把「快照过期 + 访客路失败」识别为**源方停更**，走
-         「保留上次产物 + run success（附 warning）」而非 exit 1。
-      另注：若走 ②，需同步核对前端对 `detail_complete` / `source_stale` 的降级文案
-      （`source_stale` 现由 `_eff_source=='wiki'` 恒置 False，快照通道亦被恒 False 覆盖，
-      与「快照可过期」的新语义打架 —— 这是**另一处潜在口径缺陷**，改口径时一并核）。
+      主人 2026-09-24 授权「2 可以」⇒ 按选项② + 邮件告警落地：
+      ① `load_snapshot()` 不再因龄大返回 None；快照过期时标记 `snapshot_expired=true` /
+         `degraded_reason` 并继续返回旧快照。
+      ② `main()` 中：若快照过期，仍尝试 `fetch_via_wiki()` 取新篇；wiki 成功且日期更新则替换；
+         wiki 失败/无新篇则**带降级标记继续使用过期快照**，脚本 exit 0（链保持绿）。
+      ③ `source_stale` 不再为 wiki 源恒置 False；改为 `stale_days > WIKI_STALE_DAYS_ALERT`
+         （默认 2 天，可用环境变量覆盖）。
+      ④ 当 `source_stale=true` 时，调用 `v8_send_alert.send_alert(..., level="stale")` 发邮件告警；
+         云端 runner 无 SMTP 配置时静默跳过，本机有配置时真发。
+      ⑤ 前端已有 `source_stale` 红胶囊降级文案，本次后端口径改真后自动生效；`data_date` 胶囊
+         保持常显。
     verify_how: >
       在源方连续 ≥3 个自然日无新篇的窗口内，每日派发 `v8_ima_strong_stock.yml`：
       ① 断言 run 结论恒 `success`（不再因快照龄越限而红）；
       ② 断言产物 `data_date` **如实停留在源数据日**（不得前进、不得伪造）；
-      ③ 断言卡片/产物出现显式降级或停更提示（若采纳 ②）。
+      ③ 断言产物含 `snapshot_expired` / `degraded_reason` / `source_stale` / `stale_days`；
+      ④ 断言卡片出现红胶囊停更提示（source_stale 为真时）；
+      ⑤ 断言邮件告警进入 trace.log（本机）或收到邮件（本机配置存在时）。
       禁只跑一天就判治本 —— 本项病灶只在「>72h 无新篇」窗口才现形。
+      反向判据：若源方恢复更新（新 share/新 folder），产物 `data_date` 必须前进且
+      `source_stale` 自动转 False；否则说明 folder 仍未改对。
     evidence: >
-      阿狸咪的工程师 2026-09-22 17:0x CST 实测（本机只读 + 一次快照刷新）：
-      · run #31（id 35701814107，2026-09-22T07:52:36Z = 15:52 CST，event=workflow_dispatch）
-        结论 failure；失败步 = step6；日志原文：
-        `⚠️ [snapshot] 快照过期：fetched_at=2026-09-19 13:01:52 · 已 74.9 h > 72 h ⇒ 回退访客抓页`
-        → `🌐 [wiki] 拉取目录 folder_id=…` → `RuntimeError: wiki 源两条路（目录 API / SSR 深页）均失败`。
-      · 源方核对（ima 连接器 `fetch_media_content`，KB `7500816604757970`）：最新一篇仍为
-        `强势股跟踪日报 2026-09-15`（media_id `note_…75055558956481737500816604757970`，
-        file_size 27032），与 09-19 落盘的快照**逐字节一致**（sha256 `b569b2af51c50a42`，5504 B，
-        60 条 12 列表格行）⇒ 源方确无新篇。
-      · 处置：17:05:17 CST 刷新快照 `fetched_at`（仅该字段，`data_date` 仍 2026-09-15），
-        commit `6b1a2ee6ae`；随后 dispatch ⇒ run #32 全绿，step6 日志
-        `✅ [snapshot] 强势股跟踪日报 2026-09-15 · 56/58 条（96.6%）· 对账 ✅通过（强势 头34 / 实34）`，
-        产物 `data/IMA_STRONG_STOCK.js` blob `9613fe9597a88ad7126cfae111fda835e5b3d153`
-        （detail_channel=full-snapshot / reconciled=true / len(stocks)=56）。
-      ⇒ 本项记的是**结构性缺陷**，不是当天的红 run（后者已随快照刷新转绿）。
-    updated: '2026-09-22 17:08'
+      阿狸咪的工程师 2026-09-24 01:4x CST 实测：
+      · 修改后 `python fetch_ima_strong_stock.py` 本地运行：snapshot_age=32.8h，直接命中源停更
+        （data_date=2026-09-15，stale_days=9）⇒ source_stale=true，邮件告警 `[v8·阿狸咪] ima 强势股日报源停更 9 天`
+        已发送（level=stale，本机 SMTP 配置存在）。
+      · `verify_ima_sync.py` exit 0 并输出 `::warning::源侧停更`（不失败）。
+      · 强令 SNAPSHOT_MAX_AGE_H=1 复现过期路径：`load_snapshot()` 返回 `snapshot_expired=true` /
+        `degraded_reason=snapshot_age>33h;guest-path-dead`，不再回退访客路。
+      · 递归扫描当前 share 全部 folder：含「强势股跟踪日报」条目最新仍为 2026-09-15。
+    updated: "2026-09-24 01:52"
 
   # ── P0 · 算法链收尾步（2026-09-22 19:58 阿狸咪现场登记）──────────────────
   - id: algo-step15-undefined-t
