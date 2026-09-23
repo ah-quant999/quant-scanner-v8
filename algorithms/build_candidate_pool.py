@@ -113,6 +113,7 @@ _EM_HEADERS = {
 }
 _EM_NAME_CACHE = {}
 _SN_MAP = None
+_HK_COLLISION_NAMES = set()  # A股码碰撞的港股名集合（仅用于「是否该纠」判据）
 # 注: 不在此硬编码个别校正——股票名以 东财 f58(云端/本机均可达) 为权威,
 #      stock_names.json 作为本地兜底。任何"疑似错名"须联网核实后再动, 严禁凭记忆改。
 
@@ -161,6 +162,7 @@ def _stock_names_map():
                     fc = (s.get("full_code") or "").strip().lower()
                     mkt = (s.get("market") or "").strip().lower()
                     if fc.startswith("hk") or mkt == "hk":
+                        _HK_COLLISION_NAMES.add(n)  # 收集港股名，供碰撞判据
                         continue
                     # 去交易所排版空格（"万 科Ａ"/"五 粮 液"）：映射一旦恢复生效，若照搬官方名
                     #   会把「万科A」显示成「万 科A」，修错名反引入展示噪音。
@@ -255,7 +257,14 @@ def resolve_clean_name(code, market, raw_name):
     c = str(code).zfill(6)
     snm = _stock_names_map().get(c)
     if market != "hk" and snm:           # A股本地权威
-        return _norm_name(snm)
+        # 🛡 2026-09-24 一劳永逸（阿狸咪的工程师）：原 `if snm: return snm` 会强制把站点简称
+        #   改成 stock_names.json 全称（博瑞医药→博瑞生物医药），造成全站名称膨胀回归；
+        #   现仅当「现名是港股碰撞名 或 垃圾」时才用权威名覆盖，保留系统一直用的简称，
+        #   同时根治 880 组 A股码+港股名 碰撞（000807 上海实业环境→云铝股份）。
+        rn = (raw_name or "").strip()
+        if rn and (rn in _HK_COLLISION_NAMES or not _looks_clean(rn)):
+            return _norm_name(snm)
+        return _norm_name(rn) if _looks_clean(rn) else str(code).strip()
     if _looks_clean(raw_name):           # 原始名若干净则采用
         return _norm_name(raw_name)
     return str(code).strip()             # 兜底代码(不出垃圾)
