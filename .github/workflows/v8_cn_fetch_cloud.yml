@@ -804,6 +804,42 @@ jobs:
             git fetch "$REPO" main
             git reset --hard FETCH_HEAD
             python update_v8.py --only-cache-busters
+
+            # 🔴 2026-09-23 小九补 · 缺口② cn-fetch-writer-version-drift
+            #   背景：2026-09-22 22:20:41 index.html 被 commit 7c78439fe8 删掉尾部 183 行
+            #   （A2 懒加载块 STOCK_LIST/STOCK_QUOTE/LHB_HISTORY 全没），而 update_v8.py 的
+            #   _atomic_write_index_html 是软守卫（只匹配文本末 200 字含 </html>），
+            #   对「截断点在中间 / 守卫被跳过 / 守卫后的二次损坏」无感。
+            #   ⇒ 本步在 git add 之前做四项硬断言，任一不过即 exit 1（不 add / 不 commit / 不 push）。
+            #   ⚠️ 保持 continue-on-error: true（不阻断 job），但会打 ::error:: 显式告警。
+            python - <<'PYEOF_IDXGUARD'
+            import io, sys, os
+            p = "index.html"
+            if not os.path.isfile(p):
+                print("::error title=v8-index-guard::index.html 不存在，已阻止推送"); sys.exit(1)
+            raw = io.open(p, "rb").read()
+            txt = raw.decode("utf-8", "replace")
+            nlines = txt.count(chr(10)) + 1
+            errs = []
+            MIN_LINES = 18800
+            if nlines < MIN_LINES:
+                errs.append("行数 %d < %d（疑尾部截断）" % (nlines, MIN_LINES))
+            if "</html>" not in txt[-200:]:
+                errs.append("末 200 字内无 </html>（HTML 未闭合）")
+            for k in ["{name:'STOCK_LIST'", "{name:'STOCK_QUOTE'", "{name:'LHB_HISTORY'"]:
+                if k not in txt:
+                    errs.append("缺 A2 锚点 %s（尾部块被删）" % k)
+            MIN_BYTES = 1250000
+            if len(raw) < MIN_BYTES:
+                errs.append("字节数 %d < %d" % (len(raw), MIN_BYTES))
+            if errs:
+                print("::error title=v8-index-guard::index.html 完整性断言失败，已阻止推送")
+                for e in errs:
+                    print("  - " + e)
+                sys.exit(1)
+            print("\u2705 index.html 完整性断言通过：行数=%d 字节=%d 尾部闭合=OK A2三锚=OK" % (nlines, len(raw)))
+            PYEOF_IDXGUARD
+
             git add -f index.html
             if git diff --cached --quiet; then
               echo "ℹ️ ?v 已最新，无需推送"; _v8_ok=1; break
