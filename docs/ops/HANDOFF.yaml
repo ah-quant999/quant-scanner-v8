@@ -26,15 +26,15 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-23 21:28"
-  updated_by: 阿狸咪的工程师(alimi-cn)
+  updated: "2026-09-23 21:48"
+  updated_by: 小九
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 68
+  next_id_seq: 69
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -3443,4 +3443,58 @@ items:
       观察或改造后核对：连续 3 小时 pending 深度不增长（或稳定 ≤2），且「修复上线 → 被 run 执行」
       的时延 ≤ 1 轮。
     updated: "2026-09-23 21:00"
+    updated_by: 小九
+
+  - id: dajijin-reduction-monitor
+    priority: P1
+    owner: 小九
+    status: pending-verify
+    what: >
+      「暂未上架 > 📡 观测类」新增「🚨 大基金 增减持监控」卡（置于「🔭 主题空间 · 概念资金热度」卡上方，
+      2026-09-23 主人令三联：「做吧，放暂未上架」＋「这卡上方」＋「核心/用法/限制 这套和一句话结论的解析都要跟上」）。
+      起因：主人问「国家大基金持股是什么、能拿到实时数据跟着买吗」—— 结论是**两个东西**：
+      「国家大基金持股」是东财按季报十大股东打的**概念板块标签**（其 `net/net_5d` 是**全市场资金**流入，
+      与大基金自身买卖无因果）；大基金本身是**私募股权基金**，散户买不到、且一期已进入回收/延展期。
+      故本卡只做一件能落地的：**监控大基金自身的增减持法定披露**。
+    fix: >
+      ① 抓取器 `algorithms/fetch_dajijin_reduction.py`（纯标准库，无第三方依赖）：
+      源 = 东财数据中心 `RPT_SHARE_HOLDER_INCREASE`，按 `HOLDER_NAME` **全名等值**匹配三个主体
+      （一期/二期/三期；⚠️ 该接口的模糊 `like` **不生效**，实测 `count=None`）。
+      ② 前端卡 `index.html` 内 `dajijinCard` + `window._fillDajijin()`（范式与 `_fillUsHkMap` 逐条对齐：
+      无数据整卡 `display:none`、600ms×30 自愈轮询、卡尾必带口径/来源/免责）。
+      ③ 自动化 `.github/workflows/v8_dajijin_fetch.yml`（cn runner，工作日 20:30 CST = UTC 12:30）。
+      **空提交保护**：`v8_build_deploy` 的 `paths` 含 `data/**` ⇒ 每推一次 data 都会触发全量重建；
+      故推送前用 `scripts/dajijin_need_push.py` 比对线上/blob，相同即 SKIP（否则每天白烧一次 build）。
+    evidence: >
+      ✅ **本机实测通过（真实数据）**：一期 `count=222` 全部为「减持」（零增持 ⇒ 独立印证「一期处于回收期」）、
+      二期 8 条、三期 0 条；窗口 120 天得 **14 条记录 / 9 只 / 8,552.39 万股**。
+      ✅ **字段语义单位实测**：`CHANGE_NUM`=万股、`HOLD_RATIO`=变动后持股比例%；
+      交叉验证 —— 盛科通信三笔（2026-07-01 / 08-07 / 09-08）持股比例 **11.0% / 10.0% / 9.87%**
+      与公开披露逐位一致；`TRADE_AVERAGE_PRICE` 实测**恒为 None** ⇒ 金额只能用 `CLOSE_PRICE` 估算，
+      故卡片**不展示金额列**（避免估算值被当硬数据）。
+      ✅ **jsdom 真 DOM 渲染验证 PASS**：`display=block`、含真实股票名、含「核心/用法/限制」三行、
+      含一句话结论、**顺序断言 `orderBefore=true`**（确认位于主题空间卡上方）。
+      ✅ 28 个 inline script 块 `node --check` **0 语法错**。
+      ⚠️ 调试留证：jsdom 下 `renderUnlisted()` 一度只产出空壳 —— 根因是缺 `STOCK_MOMENTUM_STATE` 时
+      函数会动态加载脚本并**提前 return**（index.html 约 15640 行），补桩后即 PASS；**非本次改动缺陷**。
+      ⚠️ 本机东财 `push2.eastmoney.com` **RemoteDisconnected**（3 次重试全败），但 `datacenter-web` 可达；
+      两者不同域，故本卡数据源不受影响。
+    verify_how: >
+      等 `.github/workflows/v8_dajijin_fetch.yml` 首跑（或手动 `workflow_dispatch`）后核对：
+      ① run 结论 success 且「内容比对」步按预期输出 NEED_PUSH；
+      ② 线上 `data/DAJIJIN_REDUCTION.js` 的 `update_time` 前进到当日；
+      ③ 硬抓 Pages 上 `index.html`，进「暂未上架」页应见该卡且位于「主题空间」卡**上方**；
+      ④ 若 cn runner 访问 `datacenter-web` 失败 ⇒ 脚本会把这些主体记入 `summary.errors`（**不写空壳**），
+      卡面会显式提示「部分主体抓取失败」，届时把源换成 `cninfo` 按 orgId 逐股查（路径已探通）。
+    note_to: 阿狸咪的工程师
+    note: >
+      2026-09-23 20:13 小九 → 阿狸咪（走 §3.5，不另写档）。
+      这条**是新增数据链**，与你夜班时段（18:00–次日 07:30）有交叠，请注意：
+      ① 新链 cron 是**工作日 20:30 CST**，只产出/推送 `data/DAJIJIN_REDUCTION.js` **单文件**，
+      不动 `raw_data/`、不动 `index.html`、不碰 `v8_algo_run` 主链；
+      ② 它有**空提交保护**（内容一致即 SKIP），所以正常情况下**不会**每天触发一次全量 build；
+      ③ 若你看到它在 20:30 前后有 commit，那是**预期行为**，不是覆盖；
+      ④ 另：`handoff-ledger-hash-desync` 我已换个方向收口（新增仓内唯一口径脚本
+      `scripts/handoff_ledger_hash.py` 并全量重算），**不需要你再提供旧实现了** —— 详见该项。
+    updated: "2026-09-23 19:52"
     updated_by: 小九
