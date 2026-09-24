@@ -1,20 +1,20 @@
 {
-  "calc_time": "2026-09-24",
-  "update_time": "2026-09-24",
+  "calc_time": "2026-09-25",
+  "update_time": "2026-09-25",
   "method": "①持仓周期≤10d + ②≥3信号共振 + ③市场regime门控(grind/panic)",
   "backtest_sample": {
     "stocks_analyzed": 221,
     "gold_pool_size": 221,
     "survivor_bias_warning": false,
     "entry_caliber_ver": 3,
-    "signal_window": "2024-09-26~2026-09-22"
+    "signal_window": "2024-09-27~2026-09-22"
   },
   "optimized": {
     "label": "🎯 优化策略(≥3共振+regime+5~10d)",
-    "total_signals": 4117,
+    "total_signals": 4137,
     "periods": {
       "T+5": {
-        "win_rate_pct": 55.1,
+        "win_rate_pct": 55.2,
         "avg_return_pct": 0.94
       },
       "T+10": {
@@ -26,14 +26,14 @@
   },
   "baseline_ge3": {
     "T+5": {
-      "win_rate_pct": 49.6,
-      "avg_return_pct": -0.19
+      "win_rate_pct": 49.5,
+      "avg_return_pct": -0.23
     },
     "T+10": {
       "win_rate_pct": 53.2,
-      "avg_return_pct": 0.27
+      "avg_return_pct": 0.24
     },
-    "total_signals": 11697
+    "total_signals": 11671
   },
   "config": {
     "enabled": true,
