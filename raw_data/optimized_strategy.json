@@ -7,15 +7,15 @@
     "gold_pool_size": 221,
     "survivor_bias_warning": false,
     "entry_caliber_ver": 3,
-    "signal_window": "2024-09-26~2026-09-21"
+    "signal_window": "2024-09-26~2026-09-22"
   },
   "optimized": {
     "label": "🎯 优化策略(≥3共振+regime+5~10d)",
-    "total_signals": 4097,
+    "total_signals": 4117,
     "periods": {
       "T+5": {
-        "win_rate_pct": 55.0,
-        "avg_return_pct": 0.92
+        "win_rate_pct": 55.1,
+        "avg_return_pct": 0.94
       },
       "T+10": {
         "win_rate_pct": 58.1,
@@ -27,13 +27,13 @@
   "baseline_ge3": {
     "T+5": {
       "win_rate_pct": 49.6,
-      "avg_return_pct": -0.2
+      "avg_return_pct": -0.19
     },
     "T+10": {
-      "win_rate_pct": 53.1,
+      "win_rate_pct": 53.2,
       "avg_return_pct": 0.27
     },
-    "total_signals": 11683
+    "total_signals": 11697
   },
   "config": {
     "enabled": true,
@@ -68,8 +68,8 @@
     "note": "数据驱动：仅在市场状态为 grind/panic 时开仓"
   },
   "current_regime": {
-    "date": "2026-09-23",
-    "regime": "grind",
+    "date": "2026-09-24",
+    "regime": "panic",
     "open_position": true,
     "ok": true,
     "reason": "ok"
