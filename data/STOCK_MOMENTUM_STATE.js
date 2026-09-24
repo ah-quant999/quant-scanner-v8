@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-24 16:07",
- "generated": "2026-09-24 16:07",
+ "update_time": "2026-09-24 16:21",
+ "generated": "2026-09-24 16:21",
  "meta": {
-  "generated": "2026-09-24 16:07",
+  "generated": "2026-09-24 16:21",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 15,
   "days_with_consensus": 0,
@@ -6190,8 +6190,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605577",
       "name": "龙版传媒",
-      "change_pct": 3.204,
-      "price": 16.43,
+      "change_pct": 3.769,
+      "price": 16.52,
       "category": "突破"
      },
      {
@@ -6204,8 +6204,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600641",
       "name": "先导基电",
-      "change_pct": 7.803,
-      "price": 51.53,
+      "change_pct": 7.866,
+      "price": 51.56,
       "category": "突破"
      },
      {
@@ -6218,29 +6218,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300192",
       "name": "科德教育",
-      "change_pct": 9.499,
-      "price": 25.13,
-      "category": "突破"
-     },
-     {
-      "code": "000993",
-      "name": "闽东电力",
-      "change_pct": 3.294,
-      "price": 19.44,
+      "change_pct": 10.283,
+      "price": 25.31,
       "category": "突破"
      },
      {
       "code": "003006",
       "name": "百亚股份",
-      "change_pct": 3.844,
-      "price": 22.42,
+      "change_pct": 4.863,
+      "price": 22.64,
       "category": "突破"
      },
      {
       "code": "301122",
       "name": "采纳股份",
-      "change_pct": 3.915,
-      "price": 63.7,
+      "change_pct": 3.654,
+      "price": 63.54,
       "category": "突破"
      },
      {
@@ -6251,17 +6244,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "002285",
-      "name": "世联行",
-      "change_pct": 3.47,
-      "price": 3.28,
-      "category": "突破"
-     },
-     {
-      "code": "000829",
-      "name": "天音控股",
-      "change_pct": 3.091,
-      "price": 9.34,
+      "code": "605008",
+      "name": "长鸿高科",
+      "change_pct": 3.158,
+      "price": 14.7,
       "category": "突破"
      },
      {
@@ -6277,14 +6263,21 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 5.983,
       "price": 8.68,
       "category": "突破"
+     },
+     {
+      "code": "002264",
+      "name": "新 华 都",
+      "change_pct": 10.014,
+      "price": 8.13,
+      "category": "突破"
      }
     ],
     "加速": [
      {
       "code": "605577",
       "name": "龙版传媒",
-      "change_pct": 3.204,
-      "price": 16.43,
+      "change_pct": 3.769,
+      "price": 16.52,
       "category": "加速"
      },
      {
@@ -6297,8 +6290,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600641",
       "name": "先导基电",
-      "change_pct": 7.803,
-      "price": 51.53,
+      "change_pct": 7.866,
+      "price": 51.56,
       "category": "加速"
      },
      {
@@ -6311,29 +6304,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300192",
       "name": "科德教育",
-      "change_pct": 9.499,
-      "price": 25.13,
-      "category": "加速"
-     },
-     {
-      "code": "000993",
-      "name": "闽东电力",
-      "change_pct": 3.294,
-      "price": 19.44,
+      "change_pct": 10.283,
+      "price": 25.31,
       "category": "加速"
      },
      {
       "code": "003006",
       "name": "百亚股份",
-      "change_pct": 3.844,
-      "price": 22.42,
+      "change_pct": 4.863,
+      "price": 22.64,
       "category": "加速"
      },
      {
       "code": "301122",
       "name": "采纳股份",
-      "change_pct": 3.915,
-      "price": 63.7,
+      "change_pct": 3.654,
+      "price": 63.54,
       "category": "加速"
      },
      {
@@ -6348,8 +6334,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605577",
       "name": "龙版传媒",
-      "change_pct": 3.204,
-      "price": 16.43,
+      "change_pct": 3.769,
+      "price": 16.52,
       "category": "短线选股"
      },
      {
@@ -6362,8 +6348,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600641",
       "name": "先导基电",
-      "change_pct": 7.803,
-      "price": 51.53,
+      "change_pct": 7.866,
+      "price": 51.56,
       "category": "短线选股"
      },
      {
@@ -6376,29 +6362,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300192",
       "name": "科德教育",
-      "change_pct": 9.499,
-      "price": 25.13,
-      "category": "短线选股"
-     },
-     {
-      "code": "000993",
-      "name": "闽东电力",
-      "change_pct": 3.294,
-      "price": 19.44,
+      "change_pct": 10.283,
+      "price": 25.31,
       "category": "短线选股"
      },
      {
       "code": "003006",
       "name": "百亚股份",
-      "change_pct": 3.844,
-      "price": 22.42,
+      "change_pct": 4.863,
+      "price": 22.64,
       "category": "短线选股"
      },
      {
       "code": "301122",
       "name": "采纳股份",
-      "change_pct": 3.915,
-      "price": 63.7,
+      "change_pct": 3.654,
+      "price": 63.54,
       "category": "短线选股"
      },
      {
@@ -6409,17 +6388,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "002285",
-      "name": "世联行",
-      "change_pct": 3.47,
-      "price": 3.28,
-      "category": "短线选股"
-     },
-     {
-      "code": "000829",
-      "name": "天音控股",
-      "change_pct": 3.091,
-      "price": 9.34,
+      "code": "605008",
+      "name": "长鸿高科",
+      "change_pct": 3.158,
+      "price": 14.7,
       "category": "短线选股"
      },
      {
@@ -6434,22 +6406,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "芯能科技",
       "change_pct": 5.983,
       "price": 8.68,
+      "category": "短线选股"
+     },
+     {
+      "code": "002264",
+      "name": "新 华 都",
+      "change_pct": 10.014,
+      "price": 8.13,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "002285",
-      "name": "世联行",
-      "change_pct": 3.47,
-      "price": 3.28,
-      "category": "强势股"
-     },
-     {
-      "code": "000829",
-      "name": "天音控股",
-      "change_pct": 3.091,
-      "price": 9.34,
+      "code": "605008",
+      "name": "长鸿高科",
+      "change_pct": 3.158,
+      "price": 14.7,
       "category": "强势股"
      },
      {
@@ -6464,6 +6436,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "芯能科技",
       "change_pct": 5.983,
       "price": 8.68,
+      "category": "强势股"
+     },
+     {
+      "code": "002264",
+      "name": "新 华 都",
+      "change_pct": 10.014,
+      "price": 8.13,
       "category": "强势股"
      }
     ]
