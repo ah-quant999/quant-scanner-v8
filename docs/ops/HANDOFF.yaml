@@ -4574,7 +4574,7 @@ items:
   - id: ci-gate-dual-block-meta-block-lost-0925
     priority: P0
     owner: shared
-    status: pending-verify
+    status: done
     what: |-
       🔴 **云端部署链被硬阻断 8+ 轮（2026-09-24 20:56 ~ 09-25 06:47 CST）**，失败步唯一 = `build` job step10
       `🛡️ Pre-deploy audit`，其后「双盲区静态校验 / 部署前校验 / 部署到 main / 发布后体检」**全 skipped**。
@@ -4612,12 +4612,27 @@ items:
       ② 同时 `pre_deploy_audit` 逐字应见 `🎉 14 项全部通过 → deploy 可继续`；
       ③ 反测：把 `HANDOFF.yaml` 的 `meta:` 块再删一次 ⇒ `[13/13]` 应 FAIL 并阻断 deploy（回归防护有效性）。
       ✅ **线上终验已取得（阿狸咪 2026-09-25 07:2x CST）**：run #8210 `build` job success + 14/14 全绿 + 已部署 main
-      ⇒ **本项已满足转 `done` 的判据**（待小九侧复核后置 `done`）。
+      ⇒ **本项已满足转 `done` 的判据**。
+      ✅ **闭环终验（阿狸咪 2026-09-25 07:41 CST · run #8213 head `79e16f575540`）**：
+         因修复 commit `ebfbdab936cc` 追加 item 抬高 `ledger.max_next_id_seq` 至 78，
+         而 `meta.next_id_seq` 仍 77 ⇒ `[13/13]` 改判「meta.next_id_seq 回退」，部署链**二次阻断**（#8212）。
+         已由 commit `79e16f575540` 同步抬至 78。**run #8213 = 全链 completed success**，逐字：
+           `✅ [5/8]  workflow YAML: 34 个 workflow 全部有效`
+           `✅ [10/10] index 核心标记守卫: 38/38 全部在位`
+           `✅ [11/11] defer 数据缓存守卫: 0 处空结果固化风险`
+           `✅ [12/12] 调用点定义守卫: 162 个全部有定义（0 处悬空）`
+           `✅ [13/13] 交接状态源守卫: items=83 · next_id_seq=78≥78`
+           `🎉 14 项全部通过 → deploy 可继续`／`✅ 已部署 main（第 1 次尝试）`
+           `🩺 发布后体检：✅ 线上 index.html 完整（1361458 字节，BUILD=79e16f5755，标记 38 全命中）`
+         run 内 `HEAD is now at 79e16f5755 fix(handoff): meta.next_id_seq 77→78` ⇒ **修复版本已被真跑**。
+      🔴 **新增铁律**：`meta.next_id_seq`（YAML）与 `ledger.max_next_id_seq`（JSON）
+         **必须同批同步抬升**（`handoff_ledger_hash.py --fix` 会自动取 `meta.next_id_seq` 作锚）；
+         只抬一侧 ⇒ `[13/13]` 立即以「回退」硬阻断部署（本项即此坑）。
     reflection: |-
       🔴 **纪律自省（双机共守）**：
       1. 改「被门禁依赖的文件」（`HANDOFF.yaml` / 锚点清单 / workflow）后，收尾**必须跑一次完整 `pre_deploy_audit.py`**
          （或至少该项单测），**只重算 ledger 哈希不足** —— 本项即因漏此步，把部署链静默阻断 8 轮。
       2. 推 `workflow` 文件后，**必到 GitHub `actions/workflows` 接口核「是否被注册」**：
          本地 `yaml.safe_load` 通过 ≠ GitHub 接受（GitHub 侧校验更严，本次 heredoc 缩进本地 PyYAML 也不报错）。
-    updated: "2026-09-25 07:30"
+    updated: "2026-09-25 07:45"
     updated_by: 阿狸咪的工程师(alimi-cn)
