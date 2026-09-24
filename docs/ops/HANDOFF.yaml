@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-24 08:14"
+  updated: "2026-09-24 17:20"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 75
+  next_id_seq: 76
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -4164,4 +4164,66 @@ items:
       ⚠️ 归属澄清：本条与 14:10 小九档的**下午**断档（并发组/队列）**不是同一根因**
         —— 小九 14:10 档 §四.1 已明确排除「上传 403」（13:00 后 25 文件提交成功）。
     updated: "2026-09-24 15:25"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: rawdata-md-crlf-flip
+    priority: P2
+    owner: shared
+    status: todo
+    what: >-
+      `raw_data/` 下两个**多行 markdown** 被某条链静默改写行尾 LF→CRLF（正文零变化）：
+      `raw_data/ima_strong_stock_full.md` 5504 B → 5632 B（+128 CRLF）、
+      `raw_data/chan_buy_point_full.md` +115/−115。
+      首现提交 `fabb6e6434`（2026-09-24 04:04:59Z = **12:04:59 CST**，github-actions[bot]，
+      message 形如 `v8 cn fetch: 2026-09-24 12:00`）。
+      ⚠️ 该 message 由 `api_push_raw.py:668` 硬编码、**多条链共用** ⇒ 本条**不归因**到具体 workflow。
+      🔎 推定机制（置信 ~85%，未定责）：本仓 `core.autocrlf=true` + `.gitattributes`
+      **对 `raw_data/*.md` 无任何规则** ⇒ 该族属性 unspecified，Windows checkout 后
+      工作树为 CRLF；而走 GitHub API 逐文件上传的推送器读的是**工作树字节**（绕过 git
+      clean filter）⇒ CRLF 落库。旁证：同批 16 个 `raw_data/*.json` 均只 `+1/−1`
+      （它们有 `raw_data/*.json text eol=lf` 规则，且多为单行），**唯有两个 .md 全行 diff**。
+      已排除：`fetch_ima_strong_stock.py` **只读**快照（L641/L647 读模式），
+      其写盘仅 `raw_data/ima_strong_stock.json` + `data/IMA_STRONG_STOCK.js` ⇒ 非本文件元凶。
+    impact: >-
+      · 功能性**暂无影响**：线上 `data/IMA_STRONG_STOCK.js` 仍 `detail_channel=full-snapshot` /
+        `sample_coverage.reconciled=true` / `len(stocks)=56`（解析器对 CRLF 容错）。
+      · 🔴 破坏快照的**字节保真契约**：`raw_data/ima_strong_stock_full.md` 是自动化 149ad8ff
+        经 ima 连接器取回的**全文原文**，其全部价值前提是「逐字节 == 源方原文」；
+        行尾翻转后该文件字节已不等于源方原文。
+      · ⚠️ 会打死该自动化的**推送守卫**：`push_snapshot.py` 断言
+        `remote_md == fetched_md` 才推；远端现为 CRLF、连接器取回为 LF ⇒
+        一旦 ima 通道恢复，任何快照刷新（含**新篇**）都会 abort。
+      · 附带：每次翻转产生 128 行幻影 diff（噪声），掩盖真实改动、干扰 `fix(eol)` 类排查。
+    fix: >-
+      建议（**本轮未执行**，因 .gitattributes 属跨机共享策略、且推定机制未 100% 定责，
+      留 owner=shared 由双机拍板）：在 `.gitattributes` 「数据文件锁 LF」段追加一行窄规则
+      `raw_data/*.md  text eol=lf`。理由：与既有 `data/*.json` / `raw_data/*.json` /
+      `docs/ops/*.txt` 同族同法（该段注释明写「逐族列窄规则，把影响面精确锁定在已知的几个文件」），
+      影响面仅 **2 个文件**；且 `eol=lf` 同时约束工作树 ⇒ 无论翻转来自 checkout 还是
+      API 上传工作树字节，均被消除。补规则后由既有 `scripts/normalize_eol.py → git check-attr`
+      机制自动收口，无需手改工作树。
+      ⚠️ 备选（仅治标，且会掩盖同类回归，不推荐单独用）：`push_snapshot.py` 侧比较前统一归一化行尾。
+      ⚠️ 也**禁**只做一次 `fix(eol)` 手工归一化就收工 —— 源侧会再翻。
+    verify_how: >-
+      ① `raw_data/ima_strong_stock_full.md` 的 CRLF 计数恒 **0**、字节数恒 **5504**、
+      git blob sha 恒 **`4f005ed49425`**，连续 ≥3 个交易日不被再翻；
+      ② 反测 `raw_data/chan_buy_point_full.md` 的 CRLF 同样恒 0；
+      ③ 真跑终验：下一个 ima 快照刷新档 `push_snapshot.py` 不再 abort（或新篇正常落盘）。
+    evidence: >-
+      阿狸咪 2026-09-24 17:2x CST 走 GitHub API 独立取证（非状态延续推断）：
+      · **纯行尾翻转的证明**：远端现版（blob `9784a49dd820` / 5632 B / CRLF=128 / 裸 LF=0）
+        做 `CRLF→LF` 后的 **git blob sha1 = `4f005ed49425`**（5504 B / CRLF=0），
+        与父提交 `fabb6e6434^` = `7d0fe5df72` 该路径 blob **逐字节相同** ⇒ 正文零变化；
+        且 `4f005ed49425` 正是 09-22 轮次记录在案的线上 md sha（两处独立互相印证）。
+      · 该路径提交史仅 3 条：`5108cbc475`(09-19 建立) → `c0fad680e4`(09-23，**仅**刷 json 的
+        `fetched_at`，md 未动) → `fabb6e6434`(09-24 12:04:59 CST，md 翻 CRLF)。
+        `chan_buy_point_full.md` 亦为「09-19 后首翻」⇒ **非每日既有行为**。
+      · 提交 `fabb6e6434` 文件面：仅这两个 `.md` 呈**全行 diff**（+128/−128、+115/−115），
+        其余 16 个 `raw_data/*.json` 均 `+1/−1`（单行时间戳）。
+      · `.gitattributes`（blob `addd2f76468a` / 6606 B / 纯 LF）实测**确无** `raw_data/*.md` 规则；
+        其 2026-09-21 段自述「刻意不写 `*.md` 宽泛式…逐族列窄规则」⇒ 本族属已知缺口。
+      · 同轮线上产物/链况只读核对：`data/IMA_STRONG_STOCK.js` blob `383a556295eb` / 16455 B /
+        `update_time=2026-09-24 15:57:48` / `snapshot_age_h=22.56` / `source_stale=true`；
+        `v8_ima_strong_stock` 最近 run **#37 success**（2026-09-24 07:56:12Z = 15:56:12 CST）。
+    updated: "2026-09-24 17:20"
     updated_by: 阿狸咪的工程师(alimi-cn)
