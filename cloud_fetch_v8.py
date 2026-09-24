@@ -562,14 +562,20 @@ def _all_individual_recs(fields="f12,f14,f2,f3,f62,f184"):
       现：任一榜为空 ⇒ 立刻补一次（em_clist 内部已遍历 host 池换 host 重试，这里补的
       是「时刻」这一维 —— 换节点后常能过）；仍缺则由调用方按降级处置（不发布合计）。
     """
-    desc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="1")
-    asc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="0")
-    if not desc:
-        print("  ⚠️ 个股资金榜：净流入降序榜首次为空 ⇒ 补抓一次")
-        desc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="1")
-    if not asc:
-        print("  ⚠️ 个股资金榜：净流出升序榜首次为空 ⇒ 补抓一次")
-        asc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="0")
+    desc = []
+    asc = []
+    _max_retry = 3
+    for _attempt in range(_max_retry):
+        if not desc:
+            desc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="1")
+        if not asc:
+            asc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="0")
+        if desc and asc:
+            break
+        if _attempt < _max_retry - 1:
+            _backoff = 1.5 * (_attempt + 1)
+            print(f"  ⚠️ 个股资金榜第{_attempt+1}次补抓后仍有空榜(desc={bool(desc)},asc={bool(asc)}) ⇒ {_backoff:.1f}s 后换 host 再补")
+            time.sleep(_backoff)
     by_code = {}
     for r in desc + asc:
         c = str(r.get("f12"))
@@ -584,6 +590,27 @@ def _all_individual_recs(fields="f12,f14,f2,f3,f62,f184"):
             "net_pct": round(float(r.get("f184") or 0), 2),
         }
     return list(by_code.values()), bool(desc), bool(asc)
+
+
+def _persist_last_good_capital(payload):
+    """缓存今日最近一次成功抓到 top_inflow 的个股资金批次（raw_data/_last_good_capital_flow.json），
+    供 gen_market_brief 在新鲜抓取失败时兜底（仅限当日 cached_at，绝不跨日沿用）。
+
+    🛡 2026-09-24 一劳永逸（小九）：根因是 em_clist 取东财个股资金榜连接抖动/限流会静默返回空表，
+    致 top_inflow 为空、AI速览「🎯 推荐关注」整条消失（主人实拍「推荐股票呢？」）。
+    修法：成功抓到流入榜即落盘本批次；gen_market_brief 仅在本轮新鲜流入榜为空且
+    该缓存 cached_at 为当日时才启用，确保卡片不空白、也绝不把旧版当新版。"""
+    try:
+        if not (payload or {}).get("top_inflow"):
+            return
+        _snap = dict(payload)
+        _snap["cached_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        (RAW_DIR / "_last_good_capital_flow.json").write_text(
+            json.dumps(_snap, ensure_ascii=False), encoding="utf-8")
+        print(f"  💾 已缓存今日最近成功个股资金批次（top_inflow={len(_snap['top_inflow'])}）")
+    except Exception as _e:
+        print(f"  ⚠️ 缓存最近成功批次失败: {_e}")
+
 
 # 单次运行状态跟踪（用于前端定时任务跟踪看板）
 _run_status = {}
@@ -2860,14 +2887,15 @@ def f_capital_flow_data():
     inflow = [x for x in recs if x["net"] > 0][:20]
     outflow = sorted([x for x in recs if x["net"] < 0], key=lambda x: x["net"])[:20]
     _note = "全市场个股主力净流入(亿)，来源东方财富push2delay；非席位四路口径"
-    if not (_desc_ok and _asc_ok):
+    _degraded = not (_desc_ok and _asc_ok)
+    if _degraded:
         # 🛡 2026-09-24 一劳永逸（小九）：半边缺失 ⇒ **绝不发布 market_net**。
         #   半边加和实测 -296.77亿 vs 完整 -162.13亿（失真 83%），且会连带把
         #   AI速览资金灯压到「资金大幅流出」。宁缺勿错：合计置 None（下游走
         #   「资金待更新」灰灯），榜单只出真实拿到的那一侧。
         print(f"  🔴 个股资金榜降级：desc_ok={_desc_ok} asc_ok={_asc_ok} ⇒ 合计口径不可用"
               f"（market_net=null，避免半边失真）")
-        return {
+        payload = {
             "top_inflow": inflow,
             "top_outflow": outflow,
             "market_net": None,
@@ -2876,13 +2904,18 @@ def f_capital_flow_data():
                             "全市场主力净额不可用（不发布 market_net，避免半边加和失真）",
             "note": _note,
         }
-    market_net = round(sum(x["net"] for x in recs), 2)
-    return {
-        "top_inflow": inflow,
-        "top_outflow": outflow,
-        "market_net": market_net,
-        "note": _note,
-    }
+    else:
+        payload = {
+            "top_inflow": inflow,
+            "top_outflow": outflow,
+            "market_net": round(sum(x["net"] for x in recs), 2),
+            "note": _note,
+        }
+    # 🛡 2026-09-24 一劳永逸（小九）：成功抓到流入榜 ⇒ 缓存「今日最近成功批次」，
+    #   供 gen_market_brief 在新鲜抓取失败时兜底（仅限当日，绝不跨日沿用）。
+    if inflow:
+        _persist_last_good_capital(payload)
+    return payload
 
 def f_north_fund():
     # 北向资金：港交所 2024-05 后停止披露 top_buy，系统标「停止」

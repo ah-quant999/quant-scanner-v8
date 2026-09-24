@@ -97,6 +97,31 @@ def load_raw_fresh(name, max_age_min=None, what=""):
     return data, True
 
 
+def load_last_good_capital():
+    """今日最近一次成功抓到 top_inflow 的兜底批次（仅在当日新鲜抓取失败时启用）。
+
+    🛡 2026-09-24 一劳永逸（小九）：根因是 em_clist 取东财个股资金榜连接抖动/限流会静默返回空表，
+    致 top_inflow 为空、AI速览「🎯 推荐关注」整条消失（主人实拍「推荐股票呢？」）。
+    cloud_fetch_v8.f_capital_flow_data 在成功抓到 top_inflow 时把批次缓存到
+    raw_data/_last_good_capital_flow.json（含 cached_at 时间戳）。此处仅在
+    「① top_inflow 非空 ② cached_at 为当日」时返回，绝不跨日沿用旧批次
+    （避免把旧版当新版）。返回 dict 或 None。
+    """
+    try:
+        p = os.path.join(RAW, "_last_good_capital_flow.json")
+        if not os.path.exists(p):
+            return None
+        d = json.load(open(p, "r", encoding="utf-8"))
+        if not d.get("top_inflow"):
+            return None
+        _cached = d.get("cached_at") or d.get("update_time") or ""
+        if _cached[:10] != datetime.now().strftime("%Y-%m-%d"):
+            return None
+        return d
+    except Exception:
+        return None
+
+
 def fmt_pct(v):
     if v is None:
         return "--"
@@ -777,6 +802,18 @@ def main():
         "etf_daily_monitor.json", max_age_min=120, what="ETF资金条(etf_daily_monitor)")
     capital, _capital_fresh = load_raw_fresh(
         "capital_flow_data.json", max_age_min=120, what="个股异动/推荐关注(capital_flow_data)")
+    # 🛡 2026-09-24 一劳永逸（小九）：新鲜流入榜为空（东财连接抖动/限流静默返空，或源过期）⇒
+    #   启用「今日最近成功批次」兜底，确保「🎯 推荐关注」不空白，且显式打标「待刷新」
+    #   （绝不把旧版当新版：load_last_good_capital 仅返回 cached_at 为当日的批次）。
+    _capital_stale = False
+    if not (capital.get("top_inflow") if capital else False):
+        _lg = load_last_good_capital()
+        if _lg:
+            capital = _lg
+            _capital_stale = True
+            print("  ⏳ 新鲜流入榜为空 ⇒ 沿用今日最近成功批次（标记「待刷新」，非实时）")
+        else:
+            print("  ⚠️ 个股资金榜今日无成功批次 ⇒ 推荐关注本段不出（宁缺勿错）")
     limitup = load_raw("limit_up_heatmap.json", {})
 
     indices = idx.get("items", [])
@@ -842,6 +879,9 @@ def main():
     # 主线板块 & 推荐个股（结构化落地，供前端展示）
     mainline_sectors = _top_real_concepts(concepts, 5)
     mainline_picks = _top_picks(capital, 3)
+    if _capital_stale:
+        # 兜底批次非实时：给每张票打「⏳ 待刷新」标（前端若有渲染位即可见；数据层始终诚实标注）
+        mainline_picks = [{**pk, "tag": "⏳ 待刷新"} for pk in mainline_picks]
 
     # ETF 资金解读（类似截图风格）
     etf_insight = []
@@ -898,6 +938,9 @@ def main():
         "strategies": strategies,
         "mainline_sectors": mainline_sectors,
         "mainline_picks": mainline_picks,
+        "mainline_picks_stale": _capital_stale,
+        "mainline_picks_note": ("推荐关注沿用今日最近成功批次（最新净流入榜抓取暂不可用，将在下一轮自动刷新）；非实时，仅供参照"
+                                 if _capital_stale else ""),
         "etf_insight": etf_insight,
         "closing_summary": closing_summary,
         "note": f"由{market_status}数据规则生成，非投资建议",
