@@ -637,7 +637,7 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=5424719840" defer></script>
 <script src="data/MARGIN_DATA.js?v=034d8dbccd" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=6ce2650325" defer></script>
-<script src="data/IPO_DATA.js?v=51f2f4bcfe" defer></script>
+<script src="data/IPO_DATA.js?v=fe37957794" defer></script>
     <script src="data/CRISIS_DATA.js?v=c99ca4dee5" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=b8c79b61ae" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=316bb21765" defer></script>
@@ -679,7 +679,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=81cc438ef0" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=fb39bc3071" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=b6d721a002" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1811,9 +1811,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=546c95a764" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=6c4501711e" defer></script>
-<script src="data/HB_XIAOJIU.js?v=085321d9b9" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=c68ff27043" defer></script>
-<script src="data/HEALTH_CHECK.js?v=603af6857f" defer></script>
+<script src="data/HB_XIAOJIU.js?v=eb43096ce8" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=fdeb953b2e" defer></script>
+<script src="data/HEALTH_CHECK.js?v=6390a468fe" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=ceaa04fa86" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=cd49784d65" defer></script>
@@ -10856,11 +10856,11 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=51f2f4bcfe"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=fe37957794"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=51f2f4bcfe';
+        return 'data/IPO_DATA.js?v=fe37957794';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
