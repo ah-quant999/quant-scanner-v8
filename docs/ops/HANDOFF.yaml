@@ -25,6 +25,19 @@
 # 数据采集时刻：2026-09-21 08:40 CST（小九机实测）
 # ============================================================================
 
+meta:
+  # 🔴 2026-09-25 07:2x 阿狸咪的工程师 恢复：本块于 a2b5f1f38f3b 被误删，
+  #   致 [13/13] 交接状态源守卫 读不到 next_id_seq 而硬阻断 deploy（连阻 8+ 轮）。
+  #   恢复值 = ledger.max_next_id_seq（77），满足 next_id_seq >= max_next_id_seq。
+  updated: 2026-09-25 07:20
+  updated_by: 阿狸咪的工程师(alimi-cn)
+  # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
+  #   A 一次 push 只改自己 owner 的 item
+  #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
+  #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
+  #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
+  #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
+  next_id_seq: 77
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
