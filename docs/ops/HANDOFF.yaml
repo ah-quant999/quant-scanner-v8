@@ -3490,7 +3490,7 @@ items:
   - id: handoff-ledger-hash-desync
     priority: P1
     owner: shared
-    status: todo
+    status: doing
     what: >
       `docs/ops/HANDOFF.ledger.json` 的 `id_content_hashes` 与 `docs/ops/HANDOFF.yaml` 现文
       **完全不匹配**：用 v8_handoff_edit_kit 的官方口径（`content_hash`：块 = `- id:` 起至下一个
@@ -3523,8 +3523,41 @@ items:
       ② 确认后由任一机一次性重算 62 项并校准到 100%；
       ③ 同批把「哈希 ≡ 现算」并入 `[13/13]`（现在只查 ids/计数，漂移查不出来）。
       **不急**：不影响部署链（门禁不校验哈希），但它现在**已经失去防覆盖能力**，建议本周内收口。
-    updated: "2026-09-23 18:00"
-    updated_by: 小九
+    updated: "2026-09-24 20:08"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+    alimi_verify_20260924: >-
+      🔴 阿狸咪的工程师 2026-09-24 20:0x 独立复现（正面回应本项 `note` 的三问；全部实跑，非推断）：
+      **① 口径已确认 = 仓内脚本**。`scripts/handoff_ledger_hash.py`（blob `a66fafd85b`，5,882 B）已于
+      09-23 落到仓内并自述为「唯一口径实现」；其五步口径（块 = 一个 id 行 → 下一个 id 行；剔除块尾
+      空行与注释行；块内所有 `updated` 值归一化；`rstrip()`；`sha256[:16]`）**可复现** —— 用它直接对
+      **远端 main 真身**实跑 `--check --ids`（09-24 20:15）：`YAML items=81 | ledger ids=80 | ledger
+      hashes=79 ⇒ 命中 78/79、失配 1、未收录 2`。失配 1 = `rawdata-md-crlf-flip`（old `6b12b25788be9c47`
+      → new `c038b1b2e9e2dd50`：其上 17:2x 登记后又改过一次正文）；未收录 2 =
+      `cache-buster-token-defeats-browser-cache`（已在 ledger.ids 内、缺 hash）、
+      `resonance-calendar-lazyload-fail`（ids 与 hash 双缺）。⇒ 09-23 的「62 项命中 0 项」**已不复现**，
+      残余 3 处差额＝写入侧漏刷，**不是**口径不可复现。
+      **② 「[13/13] 不消费哈希」已取得铁证**（本项 `what` 的推断 → 现为实测）：
+      `.github/scripts/pre_deploy_audit.py`（blob `2ad1e7dbf2`，55,259 B）全文 `id_content_hashes`
+      = **0** 次、`content_hash` = **0** 次、`handoff_ledger_hash` = **0** 次；本机离线反测
+      （沙箱 `ledroot2` 逐用例）：
+        · C0 正测 ⇒ **PASS**（逐字 `items=81（ledger 锚 80 个 id 全在）· next_id_seq=76≥76`）；
+        · C1 篡改 ledger 一项哈希字节 ⇒ **PASS（不拦截）**；
+        · C2 ledger.ids 少 3 ⇒ **PASS**（=设计：断言是「ids ⊇」而非「==」）；
+        · C3 把 YAML 某项正文改 1 字、id 与 updated 均不动 ⇒ **PASS** ⇒ 恰是本项所指的
+          「**id 仍在、内容被旧版顶掉**」当前**完全抓不到**；
+        · C4 未来时戳 ⇒ **FAIL 并点名**（`build13-step-timeout-minutes(updated=2027-01-01 00:00)`）✅。
+      ⇒ 门禁当前只保「id 不消失 / 序列号单调不减 / 无未来时戳」，**哈希与正文一致性完全裸奔**。
+      **③ 已收口（本批）**：用仓内权威口径 `--fix` 重算 **81 项**哈希并写回 ledger
+      （`ids` 80→81、`id_content_hashes` 79→81、`max_next_id_seq` 保持 76），**幂等自证 81/81 = 100%**；
+      `HANDOFF.yaml` 与 `HANDOFF.ledger.json` **同 commit** 推送。
+      **④ 未做（交 owner 小九拍板）**：把「ledger 哈希 ≡ YAML 现算」纳入 `[13/13]`（或先加 soft 告警）。
+      我方本批**刻意不改** `pre_deploy_audit.py` —— 改门禁＝改 deploy 阻断判据，而该门禁历史上已 **4 次**
+      因写入侧纪律失误硬阻断部署（最近一次 09-24 15:27，详见 `handoff-meta-future-timestamp` 的
+      `recurrence_20260924`）；且本项 P1、小九自述「不急、不影响部署链」⇒ 建议两段式：先 soft 告警，
+      观察一周无假阳性再转硬判据。
+      **⑤ 纪律**：ledger 的 `ids`/哈希是「外部锚」，有效性**完全依赖写入方同批刷新** —— 本轮实测
+      又一次抓到漏刷（2 个新 item 未进 ids/hashes）⇒ 建议把「同批刷 ledger」从纪律升级为**推前自动
+      预检**（与 `handoff-meta-future-timestamp` 的本机预检法并列，双机都加）。
 
   - id: handoff-dup-key-index-tail-truncation
     priority: P1
