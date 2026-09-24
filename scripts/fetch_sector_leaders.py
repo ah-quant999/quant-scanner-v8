@@ -272,14 +272,16 @@ def build():
 
 if __name__ == "__main__":
     # 🛡 2026-09-24 阿狸咪的工程师（主人令「一劳永逸」· 红卡停更根治）：
-    #   原实现直接 `build()`，而 build() 在「SECTOR_RS 无 sectors」时 `return None` 且
-    #   **进程仍以 0 退出** ⇒ 上层 run_algorithms 视为成功、failed_scripts 不记
-    #   ⇒ 表现为「SECTOR_LEADERS 永久停在旧日期、链路全绿」的静默停更
-    #   （实证：自 2026-09-22 18:15 起停更 2 天，HEALTH_CHECK 判 fail 而算法链 fail=0）。
-    #   修法：产物为空即显式非零退出（可见失败），让失败账本与 Actions UI 都能看见。
+    #   原为裸 `build()`：build() 内部在「SECTOR_RS 无 sectors」时 return None，
+    #   而进程**仍以 0 退出** ⇒ 上层 run_algorithms 视为成功、failed_scripts 不记
+    #   ⇒ 与产卡侧 save() 的静默跳过叠加，表现为「SECTOR_LEADERS 卡永久停在旧日期
+    #   而整条算法链全绿」。实测铁证：raw_data/sector_leaders.json 停在
+    #   2026-09-22 18:15（data_date 09-21），同轮 algo_run_report.json 却是 ok=1/fail=0。
+    #   修法：空返回时显式打 ::error:: 并**非零退出**，让失败计入账本、Actions 标红。
+    #   仅在「不写盘」路径上新增可见性，不改口径、不动任何好数据。
     _res = build()
     if not _res:
         print("::error title=v8-sector-leaders-no-data::SECTOR_LEADERS 构建返回空"
-              "（SECTOR_RS 无 sectors 或全部板块均未产出）——本轮不写盘，卡片保持上一次成功日期。")
+              "（SECTOR_RS 无 sectors 或全部板块均未产出）——本轮不写盘，"
+              "卡片保持上一次成功日期；请检查上游 fetch_sector_rs 是否正常产出。")
         raise SystemExit(1)
-
