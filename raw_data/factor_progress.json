@@ -1,6 +1,6 @@
 {
- "update_time": "2026-09-24 16:09:42",
- "source_update_time": "2026-09-24 02:11:17",
+ "update_time": "2026-09-24 18:38:47",
+ "source_update_time": "2026-09-24 16:09:37",
  "policy": "主人 2026-09-09 22:31 决策：分批 walk-forward，禁止直接硬编码高分；OOS IR > 0.3 且 4/5 年胜率 > 55% 方可上线。主人 2026-09-15 07:33 令：本表即「待回测候选因子台账」——准备回测/准备追加的因子一律先登记在此（备忘），回测达标则接入、不达标则从台账删除该条（不留遗体）。",
  "summary": {
   "total": 4,
@@ -15,7 +15,7 @@
     "done": 4
    }
   },
-  "walkforward_run_at": "2026-09-24 04:08:37",
+  "walkforward_run_at": "2026-09-24 16:13:55",
   "walkforward_done": 4,
   "walkforward_retired": 4,
   "walkforward_integrated": [
@@ -31,7 +31,7 @@
     "ir_oos": 0.05,
     "beat_base_rate": 52.6,
     "top_win_avg": 50.5,
-    "base_win_avg": 48.5,
+    "base_win_avg": 48.4,
     "spread_oos_pct": 0.0587,
     "was_p5_integrated": false,
     "p5_gate_note": null
@@ -40,9 +40,9 @@
     "name": "12-1 跨周期动量",
     "pool": "candidate",
     "ir_oos": 0.027,
-    "beat_base_rate": 49.7,
-    "top_win_avg": 46.9,
-    "base_win_avg": 48.5,
+    "beat_base_rate": 50.3,
+    "top_win_avg": 46.8,
+    "base_win_avg": 48.4,
     "spread_oos_pct": 0.0237,
     "was_p5_integrated": false,
     "p5_gate_note": null
@@ -53,7 +53,7 @@
     "ir_oos": 0.033,
     "beat_base_rate": 48.5,
     "top_win_avg": 46.5,
-    "base_win_avg": 48.5,
+    "base_win_avg": 48.4,
     "spread_oos_pct": 0.0296,
     "was_p5_integrated": false,
     "p5_gate_note": null
@@ -62,9 +62,9 @@
     "name": "隔夜跳空累积",
     "pool": "candidate",
     "ir_oos": 0.387,
-    "beat_base_rate": 54.4,
+    "beat_base_rate": 53.8,
     "top_win_avg": 47.9,
-    "base_win_avg": 48.5,
+    "base_win_avg": 48.4,
     "spread_oos_pct": 0.1602,
     "was_p5_integrated": false,
     "p5_gate_note": null
@@ -78,7 +78,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺总股本/总市值",
     "why_unsolvable": "kline_cache 无股本字段；STOCK_QUOTE.stocks 无市值字段",
-    "retired_at": "2026-09-24 04:08:37",
+    "retired_at": "2026-09-24 16:13:55",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -88,7 +88,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺 PE/EPS",
     "why_unsolvable": "pe_ttm 被 fetch_stock_quote_v8.py 白名单丢弃；fundamental.eps 恒为 null",
-    "retired_at": "2026-09-24 04:08:37",
+    "retired_at": "2026-09-24 16:13:55",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -98,7 +98,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺毛利/总资产",
     "why_unsolvable": "fundamental_quality 无此二字段",
-    "retired_at": "2026-09-24 04:08:37",
+    "retired_at": "2026-09-24 16:13:55",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -108,7 +108,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺经营现金流/总资产",
     "why_unsolvable": "fundamental_quality 无此二字段",
-    "retired_at": "2026-09-24 04:08:37",
+    "retired_at": "2026-09-24 16:13:55",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -118,7 +118,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺总负债/总资产",
     "why_unsolvable": "fundamental_quality 无此二字段",
-    "retired_at": "2026-09-24 04:08:37",
+    "retired_at": "2026-09-24 16:13:55",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -128,7 +128,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺毛利/总资产/经营现金流/负债/营收",
     "why_unsolvable": "同上，且 9 项中 7 项依赖缺失字段",
-    "retired_at": "2026-09-24 04:08:37",
+    "retired_at": "2026-09-24 16:13:55",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -138,7 +138,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺净利润/经营现金流/总资产",
     "why_unsolvable": "fundamental_quality 无此三字段",
-    "retired_at": "2026-09-24 04:08:37",
+    "retired_at": "2026-09-24 16:13:55",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    },
    {
@@ -148,7 +148,7 @@
     "category": "NO_DATA",
     "missing_fields": "缺营业收入/总资产",
     "why_unsolvable": "fundamental_quality 无此二字段",
-    "retired_at": "2026-09-24 04:08:37",
+    "retired_at": "2026-09-24 16:13:55",
     "revive_rule": "fetch_stock_quote_v8.py 白名单补 pe_ttm/pb_mrq，且 fundamental_quality 扩到含所需字段后，从 RETIRED_NO_DATA 移回 CANDIDATE_POOL 即可重跑"
    }
   ],
@@ -169,15 +169,15 @@
    "oos_ir": 0.787,
    "sharpe_oos": 0.838,
    "max_drawdown_oos": -28.456,
-   "last_run_at": "2026-09-24 04:08:37",
+   "last_run_at": "2026-09-24 16:13:55",
    "owner": "小九(kline_cache)",
    "estimate_loops": "60d 滚动 std",
    "deploy_status": "✅ 已接入 generate_top10.py",
    "pool": "audit",
-   "notes": "✅ walk-forward 达标（2019-08-30~2026-09-04，171 个调仓点，hold=10d）：IR_OOS=0.787 · Top跑赢基准率=62.6% · Top绝对胜率=52.6%（基准48.5%）· Top回撤=-28.456%。 🔌 已接入：P5 分档 +6/+3（hold=10d，60日成交额中位数·低流动性溢价）；口径=候选池内分位分档（非硬编码），未来复跑 verdict≠PASS 会自动失效。",
-   "beat_base_rate": 62.6,
-   "top_win_avg": 52.6,
-   "base_win_avg": 48.5,
+   "notes": "✅ walk-forward 达标（2019-08-30~2026-09-04，171 个调仓点，hold=10d）：IR_OOS=0.787 · Top跑赢基准率=62.0% · Top绝对胜率=52.5%（基准48.4%）· Top回撤=-28.456%。 🔌 已接入：P5 分档 +6/+3（hold=10d，60日成交额中位数·低流动性溢价）；口径=候选池内分位分档（非硬编码），未来复跑 verdict≠PASS 会自动失效。",
+   "beat_base_rate": 62.0,
+   "top_win_avg": 52.5,
+   "base_win_avg": 48.4,
    "spread_oos_pct": 0.638,
    "integrated_detail": "P5 分档 +6/+3（hold=10d，60日成交额中位数·低流动性溢价）"
   },
@@ -195,16 +195,16 @@
    "oos_ir": 0.597,
    "sharpe_oos": 0.998,
    "max_drawdown_oos": -44.583,
-   "last_run_at": "2026-09-24 04:08:37",
+   "last_run_at": "2026-09-24 16:13:55",
    "owner": "阿狸咪(kline_cache)",
    "estimate_loops": "20d 滚动 + 12m×5y walk-forward",
    "deploy_status": "已达标·待接入 generate_top10.py",
    "pool": "candidate",
-   "notes": "✅ walk-forward 达标（2019-08-30~2026-08-21，170 个调仓点，hold=20d）：IR_OOS=0.597 · Top跑赢基准率=51.2% · Top绝对胜率=51.0%（基准48.2%）· Top回撤=-44.583%。",
+   "notes": "✅ walk-forward 达标（2019-08-30~2026-08-21，170 个调仓点，hold=20d）：IR_OOS=0.597 · Top跑赢基准率=51.2% · Top绝对胜率=51.1%（基准48.2%）· Top回撤=-44.583%。",
    "beat_base_rate": 51.2,
-   "top_win_avg": 51.0,
+   "top_win_avg": 51.1,
    "base_win_avg": 48.2,
-   "spread_oos_pct": 0.7037
+   "spread_oos_pct": 0.7044
   },
   {
    "name": "特质波动率 IVOL",
@@ -220,13 +220,13 @@
    "oos_ir": 1.106,
    "sharpe_oos": -0.041,
    "max_drawdown_oos": -41.29,
-   "last_run_at": "2026-09-24 04:08:37",
+   "last_run_at": "2026-09-24 16:13:55",
    "owner": "阿狸咪(kline_cache)",
    "estimate_loops": "60d 滚动 + 12m×5y walk-forward",
    "deploy_status": "已达标·待接入 generate_top10.py",
    "pool": "candidate",
-   "notes": "✅ walk-forward 达标（2019-08-30~2026-09-04，171 个调仓点，hold=5d）：IR_OOS=1.106 · Top跑赢基准率=55.0% · Top绝对胜率=50.6%（基准47.9%）· Top回撤=-41.29%。",
-   "beat_base_rate": 55.0,
+   "notes": "✅ walk-forward 达标（2019-08-30~2026-09-04，171 个调仓点，hold=5d）：IR_OOS=1.106 · Top跑赢基准率=55.6% · Top绝对胜率=50.6%（基准47.9%）· Top回撤=-41.29%。",
+   "beat_base_rate": 55.6,
    "top_win_avg": 50.6,
    "base_win_avg": 47.9,
    "spread_oos_pct": 0.7355
@@ -245,15 +245,15 @@
    "oos_ir": 1.165,
    "sharpe_oos": 0.721,
    "max_drawdown_oos": -28.665,
-   "last_run_at": "2026-09-24 04:08:37",
+   "last_run_at": "2026-09-24 16:13:55",
    "owner": "阿狸咪(kline_cache)",
    "estimate_loops": "20d/240d 比 + 12m×5y walk-forward",
    "deploy_status": "✅ 已接入 generate_top10.py",
    "pool": "candidate",
-   "notes": "✅ walk-forward 达标（2019-08-30~2026-09-04，171 个调仓点，hold=10d）：IR_OOS=1.165 · Top跑赢基准率=59.6% · Top绝对胜率=51.3%（基准48.5%）· Top回撤=-28.665%。 🔌 已接入：P5 分档 +6/+3（hold=5d，换手率趋势·缩量=强势）；口径=候选池内分位分档（非硬编码），未来复跑 verdict≠PASS 会自动失效。",
+   "notes": "✅ walk-forward 达标（2019-08-30~2026-09-04，171 个调仓点，hold=10d）：IR_OOS=1.165 · Top跑赢基准率=59.6% · Top绝对胜率=51.3%（基准48.4%）· Top回撤=-28.665%。 🔌 已接入：P5 分档 +6/+3（hold=5d，换手率趋势·缩量=强势）；口径=候选池内分位分档（非硬编码），未来复跑 verdict≠PASS 会自动失效。",
    "beat_base_rate": 59.6,
    "top_win_avg": 51.3,
-   "base_win_avg": 48.5,
+   "base_win_avg": 48.4,
    "spread_oos_pct": 0.7504,
    "integrated_detail": "P5 分档 +6/+3（hold=5d，换手率趋势·缩量=强势）"
   }

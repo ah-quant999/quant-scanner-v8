@@ -1,21 +1,21 @@
 {
-  "update_time": "2026-09-24 02:35:41",
+  "update_time": "2026-09-24 18:19:59",
   "data_time": "2026-09-24 15:30:00",
-  "total_scanned": 500,
+  "total_scanned": 525,
   "scan_stats": {
-    "candidates": 504,
-    "succeeded": 500,
-    "failed": 4,
-    "kline_source_used": "本地缓存(主源 495/500 只)",
-    "elapsed_sec": 89.8,
-    "throughput_per_sec": 5.6,
-    "cache_fresh": 495,
-    "cache_miss": 9,
-    "cache_stale": 0,
-    "net_tx": 9,
+    "candidates": 528,
+    "succeeded": 525,
+    "failed": 3,
+    "kline_source_used": "腾讯gtimg(主源 529/525 只)",
+    "elapsed_sec": 184.2,
+    "throughput_per_sec": 2.9,
+    "cache_fresh": 0,
+    "cache_miss": 10,
+    "cache_stale": 518,
+    "net_tx": 529,
     "net_mootdx": 0,
     "net_em": 0,
-    "kline_fail": 4,
+    "kline_fail": 3,
     "workers": 12,
     "budget_sec": 1500,
     "budget_skipped": 0,
@@ -23,35 +23,40 @@
   },
   "market_context": {
     "valid": true,
-    "validity": "有效",
-    "summary": "市场综合强度 -0.47%（上证-0.39%，涨跌 2363:4261），震荡市，CRDS 可正常参考",
-    "today_pct": -0.47,
-    "prev_pct": 0.12,
-    "trend5_pct": 1.84,
-    "color": "#1D9E75",
+    "validity": "高有效",
+    "summary": "市场综合强度 -2.15%（上证-1.22%，涨跌 1352:5224），恐慌市 CRDS 信号最强，但需防系统性风险",
+    "today_pct": -2.15,
+    "prev_pct": -0.47,
+    "trend5_pct": 0.13,
+    "color": "#185FA5",
     "data_source": "index_quotes",
-    "sh_pct": -0.39,
+    "sh_pct": -1.22,
     "composite_weights": {
       "000001": 0.25,
       "399001": 0.25,
       "399006": 0.25,
       "000688": 0.25
     },
-    "series_last_pct": -0.47,
-    "breadth_score": -0.57,
-    "breadth": 0.3567,
-    "up_total": 2363,
-    "down_total": 4261
+    "series_last_pct": -2.15,
+    "breadth_score": -1.18,
+    "breadth": 0.2056,
+    "up_total": 1352,
+    "down_total": 5224
   },
   "cond1_list": [
     {
       "code": "000002",
-      "name": "000002",
+      "name": "万科A",
       "board_label": "主板"
     },
     {
       "code": "000560",
-      "name": "珠江船务",
+      "name": "我爱我家",
+      "board_label": "主板"
+    },
+    {
+      "code": "000592",
+      "name": "平潭发展",
       "board_label": "主板"
     },
     {
@@ -62,6 +67,11 @@
     {
       "code": "000981",
       "name": "山子高科",
+      "board_label": "主板"
+    },
+    {
+      "code": "002119",
+      "name": "康强电子",
       "board_label": "主板"
     },
     {
@@ -85,8 +95,18 @@
       "board_label": "创业板"
     },
     {
+      "code": "301689",
+      "name": "电科思仪",
+      "board_label": "创业板"
+    },
+    {
       "code": "600127",
       "name": "金健米业",
+      "board_label": "主板"
+    },
+    {
+      "code": "600371",
+      "name": "万向德农",
       "board_label": "主板"
     },
     {
@@ -127,6 +147,11 @@
   ],
   "cond2_list": [
     {
+      "code": "000592",
+      "name": "平潭发展",
+      "board_label": "主板"
+    },
+    {
       "code": "000636",
       "name": "风华高科",
       "board_label": "主板"
@@ -139,6 +164,11 @@
     {
       "code": "000981",
       "name": "山子高科",
+      "board_label": "主板"
+    },
+    {
+      "code": "002119",
+      "name": "康强电子",
       "board_label": "主板"
     },
     {
@@ -157,6 +187,11 @@
       "board_label": "主板"
     },
     {
+      "code": "300300",
+      "name": "海峡创新",
+      "board_label": "创业板"
+    },
+    {
       "code": "300903",
       "name": "科翔股份",
       "board_label": "创业板"
@@ -169,6 +204,16 @@
     {
       "code": "301520",
       "name": "万邦医药",
+      "board_label": "创业板"
+    },
+    {
+      "code": "301689",
+      "name": "电科思仪",
+      "board_label": "创业板"
+    },
+    {
+      "code": "301699",
+      "name": "洛轴股份",
       "board_label": "创业板"
     },
     {
@@ -244,6 +289,11 @@
       "board_label": "主板"
     },
     {
+      "code": "002472",
+      "name": "双环传动",
+      "board_label": "主板"
+    },
+    {
       "code": "300979",
       "name": "300979",
       "board_label": "创业板"
@@ -254,13 +304,18 @@
       "board_label": "主板"
     },
     {
+      "code": "601099",
+      "name": "太平洋",
+      "board_label": "主板"
+    },
+    {
       "code": "601231",
       "name": "环旭电子",
       "board_label": "主板"
     },
     {
       "code": "000002",
-      "name": "000002",
+      "name": "万科A",
       "board_label": "主板"
     },
     {
@@ -294,13 +349,18 @@
       "board_label": "主板"
     },
     {
+      "code": "000560",
+      "name": "我爱我家",
+      "board_label": "主板"
+    },
+    {
       "code": "000620",
-      "name": "大唐西市",
+      "name": "盈新发展",
       "board_label": "主板"
     },
     {
       "code": "000630",
-      "name": "隽泰控股",
+      "name": "铜陵有色",
       "board_label": "主板"
     },
     {
@@ -319,11 +379,6 @@
       "board_label": "主板"
     },
     {
-      "code": "000735",
-      "name": "000735",
-      "board_label": "主板"
-    },
-    {
       "code": "000811",
       "name": "冰轮环境",
       "board_label": "主板"
@@ -335,12 +390,12 @@
     },
     {
       "code": "000833",
-      "name": "华讯",
+      "name": "粤桂股份",
       "board_label": "主板"
     },
     {
       "code": "000878",
-      "name": "金朝阳集团",
+      "name": "云南铜业",
       "board_label": "主板"
     },
     {
@@ -349,8 +404,8 @@
       "board_label": "主板"
     },
     {
-      "code": "000988",
-      "name": "华工科技",
+      "code": "001267",
+      "name": "汇绿生态",
       "board_label": "主板"
     },
     {
@@ -366,6 +421,11 @@
     {
       "code": "002080",
       "name": "中材科技",
+      "board_label": "主板"
+    },
+    {
+      "code": "002119",
+      "name": "康强电子",
       "board_label": "主板"
     },
     {
@@ -391,6 +451,11 @@
     {
       "code": "002281",
       "name": "光迅科技",
+      "board_label": "主板"
+    },
+    {
+      "code": "002297",
+      "name": "博云新材",
       "board_label": "主板"
     },
     {
@@ -441,11 +506,6 @@
     {
       "code": "002827",
       "name": "高争民爆",
-      "board_label": "主板"
-    },
-    {
-      "code": "002938",
-      "name": "鹏鼎控股",
       "board_label": "主板"
     },
     {
@@ -519,8 +579,8 @@
       "board_label": "创业板"
     },
     {
-      "code": "300131",
-      "name": "英唐智控",
+      "code": "300142",
+      "name": "沃森生物",
       "board_label": "创业板"
     },
     {
@@ -541,11 +601,6 @@
     {
       "code": "300192",
       "name": "科德教育",
-      "board_label": "创业板"
-    },
-    {
-      "code": "300199",
-      "name": "翰宇药业",
       "board_label": "创业板"
     },
     {
@@ -571,6 +626,11 @@
     {
       "code": "300260",
       "name": "新莱应材",
+      "board_label": "创业板"
+    },
+    {
+      "code": "300285",
+      "name": "国瓷材料",
       "board_label": "创业板"
     },
     {
@@ -619,6 +679,11 @@
       "board_label": "创业板"
     },
     {
+      "code": "300433",
+      "name": "蓝思科技",
+      "board_label": "创业板"
+    },
+    {
       "code": "300442",
       "name": "润泽科技",
       "board_label": "创业板"
@@ -629,8 +694,18 @@
       "board_label": "创业板"
     },
     {
+      "code": "300454",
+      "name": "深信服",
+      "board_label": "创业板"
+    },
+    {
       "code": "300458",
       "name": "全志科技",
+      "board_label": "创业板"
+    },
+    {
+      "code": "300475",
+      "name": "香农芯创",
       "board_label": "创业板"
     },
     {
@@ -669,13 +744,18 @@
       "board_label": "创业板"
     },
     {
-      "code": "300589",
-      "name": "江龙船艇",
+      "code": "300620",
+      "name": "光库科技",
       "board_label": "创业板"
     },
     {
       "code": "300623",
       "name": "捷捷微电",
+      "board_label": "创业板"
+    },
+    {
+      "code": "300647",
+      "name": "超频三",
       "board_label": "创业板"
     },
     {
@@ -701,6 +781,11 @@
     {
       "code": "300672",
       "name": "国科微",
+      "board_label": "创业板"
+    },
+    {
+      "code": "300676",
+      "name": "华大基因",
       "board_label": "创业板"
     },
     {
@@ -739,8 +824,8 @@
       "board_label": "创业板"
     },
     {
-      "code": "300766",
-      "name": "每日互动",
+      "code": "300765",
+      "name": "石药创新",
       "board_label": "创业板"
     },
     {
@@ -751,11 +836,6 @@
     {
       "code": "300782",
       "name": "卓胜微",
-      "board_label": "创业板"
-    },
-    {
-      "code": "300790",
-      "name": "宇瞳光学",
       "board_label": "创业板"
     },
     {
@@ -869,6 +949,11 @@
       "board_label": "创业板"
     },
     {
+      "code": "301189",
+      "name": "奥尼电子",
+      "board_label": "创业板"
+    },
+    {
       "code": "301200",
       "name": "大族数控",
       "board_label": "创业板"
@@ -899,8 +984,18 @@
       "board_label": "创业板"
     },
     {
+      "code": "301316",
+      "name": "慧博云通",
+      "board_label": "创业板"
+    },
+    {
       "code": "301366",
       "name": "一博科技",
+      "board_label": "创业板"
+    },
+    {
+      "code": "301369",
+      "name": "联动科技",
       "board_label": "创业板"
     },
     {
@@ -964,13 +1059,18 @@
       "board_label": "主板"
     },
     {
-      "code": "600108",
-      "name": "亚盛集团",
+      "code": "600110",
+      "name": "诺德股份",
       "board_label": "主板"
     },
     {
-      "code": "600110",
-      "name": "诺德股份",
+      "code": "600111",
+      "name": "北方稀土",
+      "board_label": "主板"
+    },
+    {
+      "code": "600118",
+      "name": "中国卫星",
       "board_label": "主板"
     },
     {
@@ -1029,6 +1129,16 @@
       "board_label": "主板"
     },
     {
+      "code": "600489",
+      "name": "中金黄金",
+      "board_label": "主板"
+    },
+    {
+      "code": "600498",
+      "name": "烽火通信",
+      "board_label": "主板"
+    },
+    {
       "code": "600522",
       "name": "中天科技",
       "board_label": "主板"
@@ -1066,6 +1176,11 @@
     {
       "code": "600690",
       "name": "海尔智家",
+      "board_label": "主板"
+    },
+    {
+      "code": "600699",
+      "name": "均胜电子",
       "board_label": "主板"
     },
     {
@@ -1124,6 +1239,21 @@
       "board_label": "主板"
     },
     {
+      "code": "601689",
+      "name": "拓普集团",
+      "board_label": "主板"
+    },
+    {
+      "code": "601857",
+      "name": "中国石油",
+      "board_label": "主板"
+    },
+    {
+      "code": "601869",
+      "name": "长飞光纤",
+      "board_label": "主板"
+    },
+    {
       "code": "601872",
       "name": "招商轮船",
       "board_label": "主板"
@@ -1144,8 +1274,23 @@
       "board_label": "主板"
     },
     {
+      "code": "603019",
+      "name": "中科曙光",
+      "board_label": "主板"
+    },
+    {
       "code": "603067",
       "name": "振华股份",
+      "board_label": "主板"
+    },
+    {
+      "code": "603083",
+      "name": "剑桥科技",
+      "board_label": "主板"
+    },
+    {
+      "code": "603118",
+      "name": "共进股份",
       "board_label": "主板"
     },
     {
@@ -1179,8 +1324,18 @@
       "board_label": "主板"
     },
     {
+      "code": "603601",
+      "name": "再升科技",
+      "board_label": "主板"
+    },
+    {
       "code": "603650",
       "name": "彤程新材",
+      "board_label": "主板"
+    },
+    {
+      "code": "603663",
+      "name": "三祥新材",
       "board_label": "主板"
     },
     {
@@ -1261,11 +1416,6 @@
     {
       "code": "688027",
       "name": "国盾量子",
-      "board_label": "科创板"
-    },
-    {
-      "code": "688028",
-      "name": "沃尔德",
       "board_label": "科创板"
     },
     {
@@ -1409,6 +1559,11 @@
       "board_label": "科创板"
     },
     {
+      "code": "688203",
+      "name": "海正生材",
+      "board_label": "科创板"
+    },
+    {
       "code": "688213",
       "name": "思特威",
       "board_label": "科创板"
@@ -1436,6 +1591,11 @@
     {
       "code": "688235",
       "name": "百济神州",
+      "board_label": "科创板"
+    },
+    {
+      "code": "688249",
+      "name": "晶合集成",
       "board_label": "科创板"
     },
     {
@@ -1534,6 +1694,11 @@
       "board_label": "科创板"
     },
     {
+      "code": "688372",
+      "name": "伟测科技",
+      "board_label": "科创板"
+    },
+    {
       "code": "688381",
       "name": "帝奥微",
       "board_label": "科创板"
@@ -1554,8 +1719,18 @@
       "board_label": "科创板"
     },
     {
+      "code": "688396",
+      "name": "华润微",
+      "board_label": "科创板"
+    },
+    {
       "code": "688409",
       "name": "富创精密",
+      "board_label": "科创板"
+    },
+    {
+      "code": "688428",
+      "name": "诺诚健华",
       "board_label": "科创板"
     },
     {
@@ -1619,6 +1794,11 @@
       "board_label": "科创板"
     },
     {
+      "code": "688596",
+      "name": "正帆科技",
+      "board_label": "科创板"
+    },
+    {
       "code": "688608",
       "name": "恒玄科技",
       "board_label": "科创板"
@@ -1629,8 +1809,18 @@
       "board_label": "科创板"
     },
     {
+      "code": "688625",
+      "name": "呈和科技",
+      "board_label": "科创板"
+    },
+    {
       "code": "688628",
       "name": "优利德",
+      "board_label": "科创板"
+    },
+    {
+      "code": "688629",
+      "name": "华丰科技",
       "board_label": "科创板"
     },
     {
@@ -1684,6 +1874,11 @@
       "board_label": "科创板"
     },
     {
+      "code": "688801",
+      "name": "燧原科技",
+      "board_label": "科创板"
+    },
+    {
       "code": "688802",
       "name": "沐曦股份",
       "board_label": "科创板"
@@ -1706,6 +1901,11 @@
     {
       "code": "688826",
       "name": "频准激光",
+      "board_label": "科创板"
+    },
+    {
+      "code": "688836",
+      "name": "宇树科技",
       "board_label": "科创板"
     }
   ],
@@ -1737,7 +1937,19 @@
     {
       "code": "601086",
       "name": "国芳集团",
-      "score": 97,
+      "score": 93,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "301689",
+      "name": "电科思仪",
+      "score": 74,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "002119",
+      "name": "康强电子",
+      "score": 70,
       "enter_date": "2026-09-24"
     }
   ],
@@ -1757,6 +1969,12 @@
     {
       "code": "002815",
       "name": "崇达技术",
+      "score": 100,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "300300",
+      "name": "海峡创新",
       "score": 100,
       "enter_date": "2026-09-24"
     },
@@ -1815,8 +2033,20 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "000592",
+      "name": "平潭发展",
+      "score": 30,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "000002",
-      "name": "000002",
+      "name": "万科A",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "000560",
+      "name": "我爱我家",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -1889,6 +2119,12 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "301699",
+      "name": "洛轴股份",
+      "score": 83,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "002074",
       "name": "国轩高科",
       "score": 0,
@@ -1907,6 +2143,12 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "002472",
+      "name": "双环传动",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "300979",
       "name": "300979",
       "score": 0,
@@ -1915,6 +2157,12 @@
     {
       "code": "600761",
       "name": "安徽合力",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "601099",
+      "name": "太平洋",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -1961,20 +2209,14 @@
       "enter_date": "2026-09-24"
     },
     {
-      "code": "000560",
-      "name": "珠江船务",
-      "score": 0,
-      "enter_date": "2026-09-24"
-    },
-    {
       "code": "000620",
-      "name": "大唐西市",
+      "name": "盈新发展",
       "score": 0,
       "enter_date": "2026-09-24"
     },
     {
       "code": "000630",
-      "name": "隽泰控股",
+      "name": "铜陵有色",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -1991,12 +2233,6 @@
       "enter_date": "2026-09-24"
     },
     {
-      "code": "000735",
-      "name": "000735",
-      "score": 0,
-      "enter_date": "2026-09-24"
-    },
-    {
       "code": "000811",
       "name": "冰轮环境",
       "score": 0,
@@ -2004,19 +2240,19 @@
     },
     {
       "code": "000833",
-      "name": "华讯",
+      "name": "粤桂股份",
       "score": 0,
       "enter_date": "2026-09-24"
     },
     {
       "code": "000878",
-      "name": "金朝阳集团",
+      "name": "云南铜业",
       "score": 0,
       "enter_date": "2026-09-24"
     },
     {
-      "code": "000988",
-      "name": "华工科技",
+      "code": "001267",
+      "name": "汇绿生态",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2069,6 +2305,12 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "002297",
+      "name": "博云新材",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "002335",
       "name": "科华数据",
       "score": 0,
@@ -2101,12 +2343,6 @@
     {
       "code": "002827",
       "name": "高争民爆",
-      "score": 0,
-      "enter_date": "2026-09-24"
-    },
-    {
-      "code": "002938",
-      "name": "鹏鼎控股",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2183,8 +2419,8 @@
       "enter_date": "2026-09-24"
     },
     {
-      "code": "300131",
-      "name": "英唐智控",
+      "code": "300142",
+      "name": "沃森生物",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2209,12 +2445,6 @@
     {
       "code": "300192",
       "name": "科德教育",
-      "score": 0,
-      "enter_date": "2026-09-24"
-    },
-    {
-      "code": "300199",
-      "name": "翰宇药业",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2249,8 +2479,8 @@
       "enter_date": "2026-09-24"
     },
     {
-      "code": "300300",
-      "name": "海峡创新",
+      "code": "300285",
+      "name": "国瓷材料",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2303,6 +2533,12 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "300433",
+      "name": "蓝思科技",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "300442",
       "name": "润泽科技",
       "score": 0,
@@ -2315,8 +2551,20 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "300454",
+      "name": "深信服",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "300458",
       "name": "全志科技",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "300475",
+      "name": "香农芯创",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2363,14 +2611,20 @@
       "enter_date": "2026-09-24"
     },
     {
-      "code": "300589",
-      "name": "江龙船艇",
+      "code": "300620",
+      "name": "光库科技",
       "score": 0,
       "enter_date": "2026-09-24"
     },
     {
       "code": "300623",
       "name": "捷捷微电",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "300647",
+      "name": "超频三",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2401,6 +2655,12 @@
     {
       "code": "300672",
       "name": "国科微",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "300676",
+      "name": "华大基因",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2447,8 +2707,8 @@
       "enter_date": "2026-09-24"
     },
     {
-      "code": "300766",
-      "name": "每日互动",
+      "code": "300765",
+      "name": "石药创新",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2461,12 +2721,6 @@
     {
       "code": "300782",
       "name": "卓胜微",
-      "score": 0,
-      "enter_date": "2026-09-24"
-    },
-    {
-      "code": "300790",
-      "name": "宇瞳光学",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2591,6 +2845,12 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "301189",
+      "name": "奥尼电子",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "301200",
       "name": "大族数控",
       "score": 0,
@@ -2627,8 +2887,20 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "301316",
+      "name": "慧博云通",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "301366",
       "name": "一博科技",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "301369",
+      "name": "联动科技",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2681,12 +2953,6 @@
       "enter_date": "2026-09-24"
     },
     {
-      "code": "301689",
-      "name": "电科思仪",
-      "score": 0,
-      "enter_date": "2026-09-24"
-    },
-    {
       "code": "600048",
       "name": "保利发展",
       "score": 0,
@@ -2699,14 +2965,20 @@
       "enter_date": "2026-09-24"
     },
     {
-      "code": "600108",
-      "name": "亚盛集团",
+      "code": "600110",
+      "name": "诺德股份",
       "score": 0,
       "enter_date": "2026-09-24"
     },
     {
-      "code": "600110",
-      "name": "诺德股份",
+      "code": "600111",
+      "name": "北方稀土",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "600118",
+      "name": "中国卫星",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2753,6 +3025,12 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "600371",
+      "name": "万向德农",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "600396",
       "name": "华电辽能",
       "score": 0,
@@ -2761,6 +3039,18 @@
     {
       "code": "600415",
       "name": "小商品城",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "600489",
+      "name": "中金黄金",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "600498",
+      "name": "烽火通信",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2797,6 +3087,12 @@
     {
       "code": "600690",
       "name": "海尔智家",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "600699",
+      "name": "均胜电子",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2843,6 +3139,24 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "601689",
+      "name": "拓普集团",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "601857",
+      "name": "中国石油",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "601869",
+      "name": "长飞光纤",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "601872",
       "name": "招商轮船",
       "score": 0,
@@ -2867,8 +3181,26 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "603019",
+      "name": "中科曙光",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "603067",
       "name": "振华股份",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "603083",
+      "name": "剑桥科技",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "603118",
+      "name": "共进股份",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2909,8 +3241,20 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "603601",
+      "name": "再升科技",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "603650",
       "name": "彤程新材",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "603663",
+      "name": "三祥新材",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -2995,12 +3339,6 @@
     {
       "code": "688027",
       "name": "国盾量子",
-      "score": 0,
-      "enter_date": "2026-09-24"
-    },
-    {
-      "code": "688028",
-      "name": "沃尔德",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -3167,6 +3505,12 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "688203",
+      "name": "海正生材",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "688213",
       "name": "思特威",
       "score": 0,
@@ -3199,6 +3543,12 @@
     {
       "code": "688235",
       "name": "百济神州",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "688249",
+      "name": "晶合集成",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -3311,6 +3661,12 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "688372",
+      "name": "伟测科技",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "688381",
       "name": "帝奥微",
       "score": 0,
@@ -3335,8 +3691,20 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "688396",
+      "name": "华润微",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "688409",
       "name": "富创精密",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "688428",
+      "name": "诺诚健华",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -3413,6 +3781,12 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "688596",
+      "name": "正帆科技",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "688608",
       "name": "恒玄科技",
       "score": 0,
@@ -3425,8 +3799,20 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "688625",
+      "name": "呈和科技",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "688628",
       "name": "优利德",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
+      "code": "688629",
+      "name": "华丰科技",
       "score": 0,
       "enter_date": "2026-09-24"
     },
@@ -3491,6 +3877,12 @@
       "enter_date": "2026-09-24"
     },
     {
+      "code": "688801",
+      "name": "燧原科技",
+      "score": 0,
+      "enter_date": "2026-09-24"
+    },
+    {
       "code": "688802",
       "name": "沐曦股份",
       "score": 0,
@@ -3519,6 +3911,12 @@
       "name": "频准激光",
       "score": 0,
       "enter_date": "2026-09-24"
+    },
+    {
+      "code": "688836",
+      "name": "宇树科技",
+      "score": 0,
+      "enter_date": "2026-09-24"
     }
   ],
   "detail": {
@@ -3532,7 +3930,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.06,
+      "vr_peak": 1.07,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3577,7 +3975,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.31,
+      "vr_peak": 3.46,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3592,7 +3990,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.26,
+      "vr_peak": 3.28,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3607,7 +4005,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.89,
+      "vr_peak": 0.88,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3622,7 +4020,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.01,
+      "vr_peak": 1.03,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3637,7 +4035,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.1,
+      "vr_peak": 2.18,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3652,7 +4050,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.07,
+      "vr_peak": 1.08,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3660,14 +4058,14 @@
     "002472": {
       "name": "双环传动",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.35,
+      "vr_peak": 1.77,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3682,7 +4080,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.37,
+      "vr_peak": 1.41,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3697,7 +4095,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.2,
+      "vr_peak": 1.35,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3712,7 +4110,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.28,
+      "vr_peak": 1.3,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3727,7 +4125,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.56,
+      "vr_peak": 2.33,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -3742,7 +4140,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.02,
+      "vr_peak": 1.11,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -3757,7 +4155,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.14,
+      "vr_peak": 1.21,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -3772,7 +4170,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.32,
+      "vr_peak": 1.39,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -3787,7 +4185,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.34,
+      "vr_peak": 2.42,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -3802,7 +4200,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.25,
+      "vr_peak": 1.26,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -3810,14 +4208,14 @@
     "601099": {
       "name": "太平洋",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.45,
+      "vr_peak": 1.54,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -3829,10 +4227,10 @@
       "cond1": false,
       "cond2": false,
       "cond3": true,
-      "zt_count": 1,
+      "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.94,
+      "vr_peak": 1.95,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -3847,7 +4245,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.39,
+      "vr_peak": 1.41,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -3862,13 +4260,13 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.84,
+      "vr_peak": 0.79,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
     },
     "000002": {
-      "name": "000002",
+      "name": "万科A",
       "score": 0,
       "conds": 2,
       "cond1": true,
@@ -3877,7 +4275,7 @@
       "zt_count": 2,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 4.37,
+      "vr_peak": 3.9,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3892,7 +4290,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.67,
+      "vr_peak": 1.71,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3907,7 +4305,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.5,
+      "vr_peak": 1.52,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3922,7 +4320,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 4.52,
+      "vr_peak": 4.32,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3937,7 +4335,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.1,
+      "vr_peak": 2.14,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3952,7 +4350,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.88,
+      "vr_peak": 1.9,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3967,7 +4365,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.53,
+      "vr_peak": 2.58,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -3982,28 +4380,28 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.39,
+      "vr_peak": 1.44,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "000560": {
-      "name": "珠江船务",
+      "name": "我爱我家",
       "score": 0,
-      "conds": 1,
+      "conds": 2,
       "cond1": true,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 3,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.02,
+      "vr_peak": 1.85,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "000564": {
-      "name": "中创智领",
+      "name": "供销大集",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4012,28 +4410,28 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.08,
+      "vr_peak": 0.93,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "000592": {
       "name": "平潭发展",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
+      "score": 30,
+      "conds": 2,
+      "cond1": true,
+      "cond2": true,
       "cond3": false,
-      "zt_count": 1,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.31,
+      "zt_count": 2,
+      "zt_down_count": 1,
+      "af_peak": 4.67,
+      "vr_peak": 1.28,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "000620": {
-      "name": "大唐西市",
+      "name": "盈新发展",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4042,13 +4440,13 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.59,
+      "vr_peak": 1.63,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "000630": {
-      "name": "隽泰控股",
+      "name": "铜陵有色",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4057,7 +4455,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.56,
+      "vr_peak": 1.61,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4072,7 +4470,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 10.64,
-      "vr_peak": 1.89,
+      "vr_peak": 1.92,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4087,13 +4485,13 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.64,
+      "vr_peak": 1.73,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "000703": {
-      "name": "000703",
+      "name": "恒逸石化",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4102,7 +4500,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.97,
+      "vr_peak": 1.02,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4117,28 +4515,28 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.98,
+      "vr_peak": 2.01,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "000735": {
-      "name": "000735",
+      "name": "罗牛山",
       "score": 0,
-      "conds": 1,
+      "conds": 0,
       "cond1": false,
       "cond2": false,
-      "cond3": true,
+      "cond3": false,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.79,
+      "vr_peak": 1.27,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "000737": {
-      "name": "湾区发展",
+      "name": "北方铜业",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4147,13 +4545,13 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.32,
+      "vr_peak": 1.34,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "000807": {
-      "name": "上海实业环境",
+      "name": "云铝股份",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4162,7 +4560,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.22,
+      "vr_peak": 1.23,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4177,7 +4575,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.74,
+      "vr_peak": 1.79,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4189,16 +4587,16 @@
       "cond1": true,
       "cond2": true,
       "cond3": true,
-      "zt_count": 3,
+      "zt_count": 2,
       "zt_down_count": 2,
       "af_peak": 11.64,
-      "vr_peak": 2.31,
+      "vr_peak": 2.22,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "000833": {
-      "name": "华讯",
+      "name": "粤桂股份",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4207,13 +4605,13 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.25,
+      "vr_peak": 1.54,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "000878": {
-      "name": "金朝阳集团",
+      "name": "云南铜业",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -4222,7 +4620,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.83,
+      "vr_peak": 1.85,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4237,7 +4635,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.07,
+      "vr_peak": 1.05,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4252,7 +4650,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.39,
+      "vr_peak": 1.41,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4267,7 +4665,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.01,
+      "vr_peak": 1.03,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4282,7 +4680,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.83,
+      "vr_peak": 0.85,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4297,28 +4695,13 @@
       "zt_count": 2,
       "zt_down_count": 1,
       "af_peak": 11.67,
-      "vr_peak": 3.55,
+      "vr_peak": 3.49,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "000988": {
       "name": "华工科技",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.74,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "主板"
-    },
-    "001267": {
-      "name": "汇绿生态",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4327,7 +4710,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.48,
+      "vr_peak": 1.36,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "主板"
+    },
+    "001267": {
+      "name": "汇绿生态",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.56,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4342,7 +4740,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.15,
+      "vr_peak": 1.23,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4357,7 +4755,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.69,
+      "vr_peak": 3.54,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4387,7 +4785,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.34,
+      "vr_peak": 1.23,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4402,7 +4800,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.65,
+      "vr_peak": 1.63,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4417,7 +4815,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.66,
+      "vr_peak": 2.61,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4432,7 +4830,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.03,
+      "vr_peak": 1.06,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "主板"
+    },
+    "002119": {
+      "name": "康强电子",
+      "score": 70,
+      "conds": 3,
+      "cond1": true,
+      "cond2": true,
+      "cond3": true,
+      "zt_count": 2,
+      "zt_down_count": 1,
+      "af_peak": 4.65,
+      "vr_peak": 3.69,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4447,7 +4860,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.45,
+      "vr_peak": 1.43,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4462,7 +4875,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.12,
+      "vr_peak": 2.19,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4477,7 +4890,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.76,
+      "vr_peak": 2.75,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4492,7 +4905,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.06,
+      "vr_peak": 3.08,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4522,7 +4935,22 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.98,
+      "vr_peak": 2.01,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "主板"
+    },
+    "002297": {
+      "name": "博云新材",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.87,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4537,7 +4965,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 4.42,
+      "vr_peak": 4.12,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4552,7 +4980,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.45,
+      "vr_peak": 1.5,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4567,7 +4995,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.09,
+      "vr_peak": 1.1,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4582,7 +5010,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.61,
+      "vr_peak": 1.65,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4597,7 +5025,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.4,
+      "vr_peak": 1.42,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4612,7 +5040,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.4,
+      "vr_peak": 1.42,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4627,7 +5055,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.87,
+      "vr_peak": 0.91,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4642,7 +5070,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.38,
+      "vr_peak": 1.43,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4657,7 +5085,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.35,
+      "vr_peak": 1.43,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4672,7 +5100,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.44,
+      "vr_peak": 1.42,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4687,7 +5115,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.31,
+      "vr_peak": 1.35,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4702,7 +5130,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.4,
+      "vr_peak": 1.44,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4717,7 +5145,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.01,
+      "vr_peak": 1.03,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4732,7 +5160,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.91,
+      "vr_peak": 2.7,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4747,7 +5175,7 @@
       "zt_count": 2,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.67,
+      "vr_peak": 1.73,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4762,13 +5190,13 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.24,
+      "vr_peak": 1.28,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "002536": {
-      "name": "百乐皇宫",
+      "name": "飞龙股份",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4777,7 +5205,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.04,
+      "vr_peak": 0.97,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4792,7 +5220,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 11.64,
-      "vr_peak": 1.89,
+      "vr_peak": 1.79,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4807,7 +5235,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.75,
+      "vr_peak": 0.81,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4822,7 +5250,7 @@
       "zt_count": 4,
       "zt_down_count": 2,
       "af_peak": 11.67,
-      "vr_peak": 3.35,
+      "vr_peak": 3.27,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4837,13 +5265,13 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.27,
+      "vr_peak": 1.28,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "002602": {
-      "name": "万物云",
+      "name": "世纪华通",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4864,10 +5292,10 @@
       "cond1": false,
       "cond2": false,
       "cond3": true,
-      "zt_count": 1,
+      "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.81,
+      "vr_peak": 1.8,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4882,7 +5310,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.2,
+      "vr_peak": 1.23,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4897,7 +5325,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.54,
+      "vr_peak": 2.53,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4912,7 +5340,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 10.67,
-      "vr_peak": 1.9,
+      "vr_peak": 1.85,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4927,7 +5355,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.93,
+      "vr_peak": 1.92,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4942,7 +5370,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.79,
+      "vr_peak": 0.93,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4957,13 +5385,13 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.17,
+      "vr_peak": 1.42,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
     },
     "002881": {
-      "name": "武汉有机",
+      "name": "美格智能",
       "score": 0,
       "conds": 0,
       "cond1": false,
@@ -4972,7 +5400,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.32,
+      "vr_peak": 1.08,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4987,7 +5415,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.45,
+      "vr_peak": 1.47,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4995,14 +5423,14 @@
     "002938": {
       "name": "鹏鼎控股",
       "score": 0,
-      "conds": 1,
+      "conds": 0,
       "cond1": false,
       "cond2": false,
-      "cond3": true,
+      "cond3": false,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.75,
+      "vr_peak": 1.16,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -5017,7 +5445,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.0,
+      "vr_peak": 1.34,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -5032,7 +5460,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.52,
+      "vr_peak": 1.53,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -5047,7 +5475,7 @@
       "zt_count": 3,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 4.25,
+      "vr_peak": 3.88,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -5062,7 +5490,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.23,
+      "vr_peak": 2.28,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -5077,7 +5505,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.23,
+      "vr_peak": 1.26,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -5092,7 +5520,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.36,
+      "vr_peak": 2.47,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5107,7 +5535,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.69,
+      "vr_peak": 1.74,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5122,7 +5550,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.5,
+      "vr_peak": 2.58,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5137,7 +5565,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.56,
+      "vr_peak": 1.64,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5152,7 +5580,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.04,
+      "vr_peak": 1.14,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5167,7 +5595,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.68,
+      "vr_peak": 1.72,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5182,7 +5610,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.53,
+      "vr_peak": 1.6,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5197,7 +5625,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.87,
+      "vr_peak": 1.89,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5212,7 +5640,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.35,
+      "vr_peak": 1.44,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5227,7 +5655,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.83,
+      "vr_peak": 2.88,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5242,7 +5670,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.2,
+      "vr_peak": 1.29,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5257,7 +5685,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.51,
+      "vr_peak": 1.52,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5272,7 +5700,7 @@
       "zt_count": 2,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 6.57,
+      "vr_peak": 5.62,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5287,7 +5715,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.71,
+      "vr_peak": 1.7,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5295,14 +5723,14 @@
     "300131": {
       "name": "英唐智控",
       "score": 0,
-      "conds": 1,
+      "conds": 0,
       "cond1": false,
       "cond2": false,
-      "cond3": true,
+      "cond3": false,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.51,
+      "vr_peak": 1.48,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5317,7 +5745,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.48,
+      "vr_peak": 1.47,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5332,7 +5760,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.99,
+      "vr_peak": 1.06,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5340,14 +5768,14 @@
     "300142": {
       "name": "沃森生物",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.36,
+      "vr_peak": 1.54,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5362,7 +5790,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.08,
+      "vr_peak": 2.07,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5377,7 +5805,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.4,
+      "vr_peak": 1.42,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5392,7 +5820,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.33,
+      "vr_peak": 2.32,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5422,7 +5850,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.31,
+      "vr_peak": 1.29,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5437,7 +5865,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.03,
+      "vr_peak": 1.07,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5452,7 +5880,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.97,
+      "vr_peak": 3.16,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5460,14 +5888,14 @@
     "300199": {
       "name": "翰宇药业",
       "score": 0,
-      "conds": 1,
+      "conds": 0,
       "cond1": false,
       "cond2": false,
-      "cond3": true,
+      "cond3": false,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.51,
+      "vr_peak": 1.49,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5482,7 +5910,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.74,
+      "vr_peak": 2.57,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5497,7 +5925,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.57,
+      "vr_peak": 1.61,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5512,7 +5940,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.77,
+      "vr_peak": 1.81,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5527,7 +5955,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.08,
+      "vr_peak": 3.05,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5542,7 +5970,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.91,
+      "vr_peak": 1.93,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5557,28 +5985,13 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.06,
+      "vr_peak": 1.2,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
     },
     "300285": {
       "name": "国瓷材料",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.44,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
-    "300300": {
-      "name": "海峡创新",
       "score": 0,
       "conds": 1,
       "cond1": false,
@@ -5587,7 +6000,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.64,
+      "vr_peak": 1.84,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
+    "300300": {
+      "name": "海峡创新",
+      "score": 100,
+      "conds": 2,
+      "cond1": false,
+      "cond2": true,
+      "cond3": true,
+      "zt_count": 1,
+      "zt_down_count": 1,
+      "af_peak": 9.29,
+      "vr_peak": 1.87,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5602,7 +6030,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.37,
+      "vr_peak": 1.39,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5617,7 +6045,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.83,
+      "vr_peak": 0.82,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5632,7 +6060,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.41,
+      "vr_peak": 1.44,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5647,7 +6075,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 6.37,
+      "vr_peak": 5.9,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5662,7 +6090,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.11,
+      "vr_peak": 2.15,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5692,7 +6120,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.08,
+      "vr_peak": 1.06,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5707,7 +6135,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.98,
+      "vr_peak": 1.95,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5722,7 +6150,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.63,
+      "vr_peak": 1.7,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5737,7 +6165,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.41,
+      "vr_peak": 1.4,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5752,7 +6180,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.12,
+      "vr_peak": 1.17,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5767,7 +6195,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.37,
+      "vr_peak": 1.35,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5782,7 +6210,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.42,
+      "vr_peak": 1.36,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5797,7 +6225,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.86,
+      "vr_peak": 1.91,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5812,7 +6240,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.97,
+      "vr_peak": 1.95,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5827,7 +6255,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.66,
+      "vr_peak": 1.65,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5842,7 +6270,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.06,
+      "vr_peak": 1.04,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5857,7 +6285,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.2,
+      "vr_peak": 1.21,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5865,14 +6293,14 @@
     "300433": {
       "name": "蓝思科技",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.45,
+      "vr_peak": 1.52,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5887,7 +6315,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.54,
+      "vr_peak": 2.44,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5902,7 +6330,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.26,
+      "vr_peak": 2.27,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5910,14 +6338,14 @@
     "300454": {
       "name": "深信服",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.49,
+      "vr_peak": 1.51,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5932,7 +6360,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.27,
+      "vr_peak": 1.35,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5947,7 +6375,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.14,
+      "vr_peak": 2.15,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5962,7 +6390,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.0,
+      "vr_peak": 1.04,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5970,14 +6398,14 @@
     "300475": {
       "name": "香农芯创",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.48,
+      "vr_peak": 1.52,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -5992,7 +6420,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.15,
+      "vr_peak": 2.22,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6007,7 +6435,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.48,
+      "vr_peak": 1.49,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6022,7 +6450,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.8,
+      "vr_peak": 1.74,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6037,7 +6465,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.05,
+      "vr_peak": 1.1,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6052,7 +6480,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.44,
+      "vr_peak": 1.18,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6067,7 +6495,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.31,
+      "vr_peak": 1.33,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6082,7 +6510,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.3,
+      "vr_peak": 1.17,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6097,7 +6525,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.58,
+      "vr_peak": 1.64,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6112,7 +6540,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.64,
+      "vr_peak": 1.73,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6127,7 +6555,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.79,
+      "vr_peak": 1.82,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6142,7 +6570,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.66,
+      "vr_peak": 1.79,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6157,7 +6585,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.78,
+      "vr_peak": 1.84,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6165,14 +6593,14 @@
     "300589": {
       "name": "江龙船艇",
       "score": 0,
-      "conds": 1,
+      "conds": 0,
       "cond1": false,
       "cond2": false,
-      "cond3": true,
+      "cond3": false,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.96,
+      "vr_peak": 1.33,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6187,7 +6615,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.05,
+      "vr_peak": 1.09,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6202,7 +6630,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.46,
+      "vr_peak": 1.48,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6217,7 +6645,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.41,
+      "vr_peak": 1.4,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6225,14 +6653,14 @@
     "300620": {
       "name": "光库科技",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.49,
+      "vr_peak": 1.51,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6247,7 +6675,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.42,
+      "vr_peak": 2.49,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6267,6 +6695,21 @@
       "market_label": "sz",
       "board_label": "创业板"
     },
+    "300647": {
+      "name": "超频三",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.96,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
     "300657": {
       "name": "弘信电子",
       "score": 0,
@@ -6277,7 +6720,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.22,
+      "vr_peak": 2.26,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6292,7 +6735,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.32,
+      "vr_peak": 2.3,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6307,7 +6750,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.58,
+      "vr_peak": 1.65,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6322,7 +6765,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.26,
+      "vr_peak": 2.28,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6337,7 +6780,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.02,
+      "vr_peak": 2.04,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
+    "300676": {
+      "name": "华大基因",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 2.96,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6367,7 +6825,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.58,
+      "vr_peak": 1.67,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6382,7 +6840,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.97,
+      "vr_peak": 1.91,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6397,7 +6855,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.55,
+      "vr_peak": 1.57,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6412,7 +6870,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.88,
+      "vr_peak": 1.79,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6427,7 +6885,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.12,
+      "vr_peak": 2.13,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6442,7 +6900,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.24,
+      "vr_peak": 1.29,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6457,7 +6915,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.05,
+      "vr_peak": 1.06,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6472,7 +6930,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.55,
+      "vr_peak": 1.6,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6495,21 +6953,6 @@
     "300765": {
       "name": "石药创新",
       "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.41,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
-    "300766": {
-      "name": "每日互动",
-      "score": 0,
       "conds": 1,
       "cond1": false,
       "cond2": false,
@@ -6517,7 +6960,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.59,
+      "vr_peak": 1.51,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
+    "300766": {
+      "name": "每日互动",
+      "score": 0,
+      "conds": 0,
+      "cond1": false,
+      "cond2": false,
+      "cond3": false,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.12,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6532,7 +6990,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.49,
+      "vr_peak": 2.35,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6547,7 +7005,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.7,
+      "vr_peak": 1.69,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6555,14 +7013,14 @@
     "300790": {
       "name": "宇瞳光学",
       "score": 0,
-      "conds": 1,
+      "conds": 0,
       "cond1": false,
       "cond2": false,
-      "cond3": true,
+      "cond3": false,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.59,
+      "vr_peak": 1.41,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6577,7 +7035,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.29,
+      "vr_peak": 1.38,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6607,7 +7065,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.56,
+      "vr_peak": 1.59,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6622,7 +7080,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.03,
+      "vr_peak": 2.07,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6637,7 +7095,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.62,
+      "vr_peak": 3.37,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6652,7 +7110,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.59,
+      "vr_peak": 1.6,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
+    "300843": {
+      "name": "胜蓝股份",
+      "score": 0,
+      "conds": 0,
+      "cond1": false,
+      "cond2": false,
+      "cond3": false,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.42,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6667,7 +7140,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.69,
+      "vr_peak": 1.62,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6682,7 +7155,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.06,
+      "vr_peak": 1.08,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6697,7 +7170,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.63,
+      "vr_peak": 1.64,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6712,7 +7185,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.05,
+      "vr_peak": 1.06,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6727,7 +7200,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.25,
+      "vr_peak": 1.27,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6742,7 +7215,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 23.26,
-      "vr_peak": 1.54,
+      "vr_peak": 1.57,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6757,7 +7230,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.28,
+      "vr_peak": 1.25,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6772,7 +7245,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.45,
+      "vr_peak": 2.43,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6787,7 +7260,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.73,
+      "vr_peak": 2.64,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6802,7 +7275,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.23,
+      "vr_peak": 2.19,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6817,7 +7290,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.47,
+      "vr_peak": 1.49,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6832,7 +7305,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.29,
+      "vr_peak": 1.34,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6847,7 +7320,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.2,
+      "vr_peak": 2.11,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6862,7 +7335,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.32,
+      "vr_peak": 1.39,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6892,7 +7365,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.83,
+      "vr_peak": 2.67,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6907,7 +7380,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.57,
+      "vr_peak": 1.56,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6922,7 +7395,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.01,
+      "vr_peak": 1.94,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6937,7 +7410,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.09,
+      "vr_peak": 3.01,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6952,7 +7425,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 23.26,
-      "vr_peak": 2.57,
+      "vr_peak": 2.42,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6967,7 +7440,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.87,
+      "vr_peak": 2.62,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6982,7 +7455,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.38,
+      "vr_peak": 1.44,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6997,7 +7470,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.32,
+      "vr_peak": 1.33,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7012,7 +7485,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.33,
+      "vr_peak": 2.21,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7027,7 +7500,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.98,
+      "vr_peak": 2.0,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7047,6 +7520,21 @@
       "market_label": "sz",
       "board_label": "创业板"
     },
+    "301189": {
+      "name": "奥尼电子",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 2.03,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
     "301200": {
       "name": "大族数控",
       "score": 0,
@@ -7057,7 +7545,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.62,
+      "vr_peak": 1.63,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7072,7 +7560,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.51,
+      "vr_peak": 1.59,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7087,7 +7575,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.41,
+      "vr_peak": 1.43,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7102,7 +7590,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.65,
+      "vr_peak": 2.56,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7117,7 +7605,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.4,
+      "vr_peak": 2.25,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7132,7 +7620,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.69,
+      "vr_peak": 1.79,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7147,7 +7635,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.41,
+      "vr_peak": 1.49,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7162,7 +7650,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.75,
+      "vr_peak": 1.84,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
+    "301316": {
+      "name": "慧博云通",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 2.46,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7177,7 +7680,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.03,
+      "vr_peak": 1.98,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
+    "301369": {
+      "name": "联动科技",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 2.99,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7192,7 +7710,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.0,
+      "vr_peak": 2.01,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7207,7 +7725,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.31,
+      "vr_peak": 1.33,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7222,7 +7740,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.34,
+      "vr_peak": 2.39,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7237,7 +7755,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.89,
+      "vr_peak": 1.9,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7252,7 +7770,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.14,
+      "vr_peak": 1.13,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7267,7 +7785,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 23.26,
-      "vr_peak": 1.67,
+      "vr_peak": 1.69,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7282,7 +7800,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.54,
+      "vr_peak": 1.58,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7297,7 +7815,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.55,
+      "vr_peak": 1.58,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7312,7 +7830,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.45,
+      "vr_peak": 1.43,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7327,7 +7845,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.05,
+      "vr_peak": 2.02,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7357,7 +7875,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.6,
+      "vr_peak": 1.57,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7379,30 +7897,30 @@
     },
     "301689": {
       "name": "电科思仪",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
+      "score": 74,
+      "conds": 3,
+      "cond1": true,
+      "cond2": true,
       "cond3": true,
-      "zt_count": 1,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.55,
+      "zt_count": 2,
+      "zt_down_count": 1,
+      "af_peak": 9.3,
+      "vr_peak": 1.59,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
     },
     "301699": {
       "name": "洛轴股份",
-      "score": 0,
-      "conds": 0,
+      "score": 83,
+      "conds": 1,
       "cond1": false,
-      "cond2": false,
+      "cond2": true,
       "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.33,
+      "zt_count": 1,
+      "zt_down_count": 1,
+      "af_peak": 9.3,
+      "vr_peak": 1.34,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7417,7 +7935,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.12,
+      "vr_peak": 1.15,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7432,7 +7950,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.4,
+      "vr_peak": 1.39,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7462,7 +7980,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.38,
+      "vr_peak": 1.43,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7492,7 +8010,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.33,
+      "vr_peak": 2.29,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7507,7 +8025,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.27,
+      "vr_peak": 1.34,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7537,7 +8055,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.9,
+      "vr_peak": 1.95,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7545,14 +8063,14 @@
     "600108": {
       "name": "亚盛集团",
       "score": 0,
-      "conds": 1,
+      "conds": 0,
       "cond1": false,
       "cond2": false,
-      "cond3": true,
+      "cond3": false,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.42,
+      "vr_peak": 1.47,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7567,7 +8085,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.65,
+      "vr_peak": 1.7,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7575,14 +8093,29 @@
     "600111": {
       "name": "北方稀土",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.47,
+      "vr_peak": 1.55,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
+    "600118": {
+      "name": "中国卫星",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.64,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7597,7 +8130,7 @@
       "zt_count": 3,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.39,
+      "vr_peak": 1.34,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7642,7 +8175,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.63,
+      "vr_peak": 1.65,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7657,7 +8190,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.17,
+      "vr_peak": 1.22,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7672,7 +8205,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 11.65,
-      "vr_peak": 1.66,
+      "vr_peak": 1.64,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7687,7 +8220,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.79,
+      "vr_peak": 1.88,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7702,7 +8235,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.01,
+      "vr_peak": 2.0,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7717,7 +8250,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.9,
+      "vr_peak": 1.96,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7732,7 +8265,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.47,
+      "vr_peak": 1.49,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7747,7 +8280,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 11.64,
-      "vr_peak": 1.4,
+      "vr_peak": 1.44,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7762,7 +8295,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.17,
+      "vr_peak": 1.32,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7777,7 +8310,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.93,
+      "vr_peak": 1.67,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7792,7 +8325,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.71,
+      "vr_peak": 1.84,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7807,7 +8340,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.2,
+      "vr_peak": 1.27,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
+    "600371": {
+      "name": "万向德农",
+      "score": 0,
+      "conds": 1,
+      "cond1": true,
+      "cond2": false,
+      "cond3": false,
+      "zt_count": 3,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.37,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7822,7 +8370,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.99,
+      "vr_peak": 0.97,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7837,7 +8385,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.1,
+      "vr_peak": 1.85,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
+    "600397": {
+      "name": "江钨装备",
+      "score": 0,
+      "conds": 0,
+      "cond1": false,
+      "cond2": false,
+      "cond3": false,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.13,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7852,7 +8415,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 10.63,
-      "vr_peak": 1.99,
+      "vr_peak": 1.97,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7867,7 +8430,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.65,
+      "vr_peak": 2.62,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7882,7 +8445,7 @@
       "zt_count": 2,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.47,
+      "vr_peak": 3.16,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7897,7 +8460,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.37,
+      "vr_peak": 1.47,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7912,7 +8475,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.24,
+      "vr_peak": 1.26,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7927,7 +8490,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.34,
+      "vr_peak": 1.41,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
+    "600489": {
+      "name": "中金黄金",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.57,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7935,14 +8513,14 @@
     "600498": {
       "name": "烽火通信",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.48,
+      "vr_peak": 1.59,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7957,7 +8535,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.41,
+      "vr_peak": 1.4,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7972,7 +8550,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.52,
+      "vr_peak": 1.6,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -7987,7 +8565,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.23,
+      "vr_peak": 1.25,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8002,7 +8580,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.64,
+      "vr_peak": 1.72,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8017,7 +8595,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.23,
+      "vr_peak": 2.14,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8032,7 +8610,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.12,
+      "vr_peak": 2.19,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8062,7 +8640,7 @@
       "zt_count": 3,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.39,
+      "vr_peak": 3.01,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8077,7 +8655,7 @@
       "zt_count": 2,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.02,
+      "vr_peak": 2.0,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8089,10 +8667,10 @@
       "cond1": false,
       "cond2": false,
       "cond3": true,
-      "zt_count": 1,
+      "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.68,
+      "vr_peak": 1.71,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8107,7 +8685,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.66,
+      "vr_peak": 2.7,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8122,7 +8700,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.15,
+      "vr_peak": 1.1,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
+    "600699": {
+      "name": "均胜电子",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 1,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 3.59,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8137,7 +8730,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.72,
+      "vr_peak": 2.69,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8152,7 +8745,7 @@
       "zt_count": 3,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.83,
+      "vr_peak": 1.88,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8167,7 +8760,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.17,
+      "vr_peak": 1.12,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8182,7 +8775,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.82,
+      "vr_peak": 1.65,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8197,7 +8790,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.61,
+      "vr_peak": 1.55,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8212,7 +8805,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.97,
+      "vr_peak": 1.07,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8227,7 +8820,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.13,
+      "vr_peak": 1.12,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8247,6 +8840,21 @@
       "market_label": "sh",
       "board_label": "主板"
     },
+    "600919": {
+      "name": "江苏银行",
+      "score": 0,
+      "conds": 0,
+      "cond1": false,
+      "cond2": false,
+      "cond3": false,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.4,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
     "600967": {
       "name": "内蒙一机",
       "score": 100,
@@ -8257,7 +8865,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 10.63,
-      "vr_peak": 1.99,
+      "vr_peak": 1.96,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8272,7 +8880,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.31,
+      "vr_peak": 1.36,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8287,14 +8895,14 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.37,
+      "vr_peak": 1.41,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
     },
     "601086": {
       "name": "国芳集团",
-      "score": 97,
+      "score": 93,
       "conds": 3,
       "cond1": true,
       "cond2": true,
@@ -8302,7 +8910,7 @@
       "zt_count": 3,
       "zt_down_count": 1,
       "af_peak": 11.66,
-      "vr_peak": 1.88,
+      "vr_peak": 1.79,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8317,7 +8925,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.21,
+      "vr_peak": 1.23,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8332,7 +8940,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.45,
+      "vr_peak": 1.1,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8347,7 +8955,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.18,
+      "vr_peak": 1.24,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8362,7 +8970,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.25,
+      "vr_peak": 2.31,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8377,7 +8985,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.63,
+      "vr_peak": 1.59,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8392,7 +9000,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.38,
+      "vr_peak": 1.4,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8407,7 +9015,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.94,
+      "vr_peak": 0.95,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8422,7 +9030,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.29,
+      "vr_peak": 1.31,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8437,7 +9045,7 @@
       "zt_count": 4,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.14,
+      "vr_peak": 2.84,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8452,7 +9060,37 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.59,
+      "vr_peak": 1.6,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
+    "601689": {
+      "name": "拓普集团",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.76,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
+    "601857": {
+      "name": "中国石油",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.63,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8460,14 +9098,14 @@
     "601869": {
       "name": "长飞光纤",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.48,
+      "vr_peak": 1.52,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8482,7 +9120,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.7,
+      "vr_peak": 1.68,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8497,7 +9135,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.93,
+      "vr_peak": 1.96,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8512,7 +9150,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.35,
+      "vr_peak": 1.37,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
+    "601988": {
+      "name": "中国银行",
+      "score": 0,
+      "conds": 0,
+      "cond1": false,
+      "cond2": false,
+      "cond3": false,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.26,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8527,7 +9180,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.36,
+      "vr_peak": 1.63,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8542,7 +9195,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.71,
+      "vr_peak": 1.69,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8550,14 +9203,14 @@
     "603019": {
       "name": "中科曙光",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.46,
+      "vr_peak": 1.55,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8572,7 +9225,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.51,
+      "vr_peak": 1.89,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8580,14 +9233,14 @@
     "603083": {
       "name": "剑桥科技",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.46,
+      "vr_peak": 1.52,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8595,14 +9248,14 @@
     "603118": {
       "name": "共进股份",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.45,
+      "vr_peak": 1.53,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8617,7 +9270,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.74,
+      "vr_peak": 1.7,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8632,7 +9285,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.57,
+      "vr_peak": 1.61,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8647,7 +9300,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.16,
+      "vr_peak": 1.19,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8662,7 +9315,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.34,
+      "vr_peak": 2.27,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8692,7 +9345,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.0,
+      "vr_peak": 1.96,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8707,7 +9360,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.91,
+      "vr_peak": 1.96,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
+    "603601": {
+      "name": "再升科技",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 2.96,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8722,7 +9390,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.07,
+      "vr_peak": 1.08,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8737,7 +9405,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.41,
+      "vr_peak": 1.48,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8757,6 +9425,21 @@
       "market_label": "sh",
       "board_label": "主板"
     },
+    "603663": {
+      "name": "三祥新材",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 1,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.54,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
     "603773": {
       "name": "沃格光电",
       "score": 0,
@@ -8767,7 +9450,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.47,
+      "vr_peak": 2.36,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8782,7 +9465,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.7,
+      "vr_peak": 2.62,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8797,7 +9480,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.88,
+      "vr_peak": 1.81,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8812,7 +9495,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 10.65,
-      "vr_peak": 2.47,
+      "vr_peak": 2.49,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8827,7 +9510,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 10.65,
-      "vr_peak": 1.96,
+      "vr_peak": 1.92,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8842,7 +9525,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.73,
+      "vr_peak": 1.79,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8857,7 +9540,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.8,
+      "vr_peak": 1.88,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8872,7 +9555,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.75,
+      "vr_peak": 1.78,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8887,7 +9570,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.97,
+      "vr_peak": 2.42,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8902,7 +9585,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.87,
+      "vr_peak": 1.86,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8917,7 +9600,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.34,
+      "vr_peak": 1.32,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -8947,7 +9630,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.37,
+      "vr_peak": 2.54,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -8962,7 +9645,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.6,
+      "vr_peak": 1.64,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -8977,7 +9660,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.2,
+      "vr_peak": 1.23,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -8992,7 +9675,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.98,
+      "vr_peak": 2.97,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9007,7 +9690,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.27,
+      "vr_peak": 1.34,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9022,7 +9705,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.84,
+      "vr_peak": 1.86,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9037,7 +9720,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.74,
+      "vr_peak": 3.57,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9045,14 +9728,14 @@
     "688028": {
       "name": "沃尔德",
       "score": 0,
-      "conds": 1,
+      "conds": 0,
       "cond1": false,
       "cond2": false,
-      "cond3": true,
+      "cond3": false,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.54,
+      "vr_peak": 1.32,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9067,7 +9750,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.7,
+      "vr_peak": 1.65,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9082,7 +9765,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.9,
+      "vr_peak": 1.94,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9097,7 +9780,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.4,
+      "vr_peak": 1.46,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9112,7 +9795,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.31,
+      "vr_peak": 2.4,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9127,7 +9810,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.6,
+      "vr_peak": 2.61,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9157,7 +9840,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.62,
+      "vr_peak": 1.64,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9172,7 +9855,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.68,
+      "vr_peak": 1.7,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9187,7 +9870,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.54,
+      "vr_peak": 2.03,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9202,7 +9885,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.84,
+      "vr_peak": 1.87,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9232,7 +9915,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.61,
+      "vr_peak": 3.56,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9247,7 +9930,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.38,
+      "vr_peak": 1.43,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9262,7 +9945,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.39,
+      "vr_peak": 1.43,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9277,7 +9960,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.98,
+      "vr_peak": 3.53,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9292,7 +9975,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.18,
+      "vr_peak": 2.22,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9307,7 +9990,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 5.25,
+      "vr_peak": 5.09,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9322,7 +10005,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.18,
+      "vr_peak": 2.24,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9337,7 +10020,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.37,
+      "vr_peak": 2.39,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9352,7 +10035,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.97,
+      "vr_peak": 2.98,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9367,7 +10050,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.93,
+      "vr_peak": 1.92,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9397,7 +10080,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.9,
+      "vr_peak": 2.81,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9412,7 +10095,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.04,
+      "vr_peak": 2.02,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9427,7 +10110,7 @@
       "zt_count": 3,
       "zt_down_count": 1,
       "af_peak": 23.26,
-      "vr_peak": 2.29,
+      "vr_peak": 2.22,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9442,7 +10125,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.58,
+      "vr_peak": 1.63,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9457,7 +10140,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.54,
+      "vr_peak": 1.59,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9472,7 +10155,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.78,
+      "vr_peak": 1.86,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9487,7 +10170,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.53,
+      "vr_peak": 1.58,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9517,7 +10200,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.36,
+      "vr_peak": 1.41,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9532,7 +10215,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.99,
+      "vr_peak": 1.05,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9547,7 +10230,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.32,
+      "vr_peak": 1.34,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9562,7 +10245,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.46,
+      "vr_peak": 3.7,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9577,7 +10260,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.02,
+      "vr_peak": 1.07,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9592,7 +10275,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.67,
+      "vr_peak": 1.81,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9607,7 +10290,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.08,
+      "vr_peak": 1.1,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9622,7 +10305,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.15,
+      "vr_peak": 2.11,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9637,7 +10320,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.41,
+      "vr_peak": 1.42,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "科创板"
+    },
+    "688203": {
+      "name": "海正生材",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 4.4,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9652,7 +10350,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.34,
+      "vr_peak": 1.32,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9682,7 +10380,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.3,
+      "vr_peak": 2.36,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9697,7 +10395,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.13,
+      "vr_peak": 2.26,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9712,7 +10410,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.59,
+      "vr_peak": 2.52,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9727,7 +10425,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.54,
+      "vr_peak": 1.65,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9742,7 +10440,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.76,
+      "vr_peak": 1.75,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9757,7 +10455,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.69,
+      "vr_peak": 1.75,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9765,14 +10463,14 @@
     "688249": {
       "name": "晶合集成",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.42,
+      "vr_peak": 1.52,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9787,7 +10485,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.54,
+      "vr_peak": 1.56,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9802,7 +10500,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.59,
+      "vr_peak": 1.64,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9817,7 +10515,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 19.87,
-      "vr_peak": 1.88,
+      "vr_peak": 1.91,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9832,7 +10530,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.8,
+      "vr_peak": 3.88,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9847,7 +10545,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.26,
+      "vr_peak": 1.33,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9862,7 +10560,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.88,
+      "vr_peak": 1.79,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9877,7 +10575,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.12,
+      "vr_peak": 1.05,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9892,7 +10590,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.62,
+      "vr_peak": 2.52,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9907,7 +10605,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.45,
+      "vr_peak": 2.39,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9922,7 +10620,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.53,
+      "vr_peak": 1.57,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9937,7 +10635,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 5.47,
+      "vr_peak": 4.74,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9952,7 +10650,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.95,
+      "vr_peak": 1.94,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9967,7 +10665,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.73,
+      "vr_peak": 1.75,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9982,7 +10680,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 4.4,
+      "vr_peak": 5.54,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -9997,7 +10695,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.72,
+      "vr_peak": 2.75,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10012,7 +10710,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.66,
+      "vr_peak": 1.74,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10027,7 +10725,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.57,
+      "vr_peak": 1.6,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10042,7 +10740,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.41,
+      "vr_peak": 1.49,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10057,7 +10755,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.8,
+      "vr_peak": 1.84,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10072,7 +10770,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.86,
+      "vr_peak": 1.93,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10087,7 +10785,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.69,
+      "vr_peak": 3.54,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10102,7 +10800,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.56,
+      "vr_peak": 1.59,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10110,14 +10808,14 @@
     "688372": {
       "name": "伟测科技",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.47,
+      "vr_peak": 1.51,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10147,7 +10845,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.15,
+      "vr_peak": 2.14,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10162,7 +10860,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.03,
+      "vr_peak": 2.02,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10177,7 +10875,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.68,
+      "vr_peak": 1.7,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10185,14 +10883,14 @@
     "688396": {
       "name": "华润微",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.39,
+      "vr_peak": 1.5,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10207,7 +10905,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 0.93,
+      "vr_peak": 0.94,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10237,7 +10935,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.66,
+      "vr_peak": 1.71,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "科创板"
+    },
+    "688428": {
+      "name": "诺诚健华",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 2.31,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10252,7 +10965,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.66,
+      "vr_peak": 1.63,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10267,7 +10980,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.36,
+      "vr_peak": 1.39,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10282,7 +10995,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.41,
+      "vr_peak": 1.37,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10297,7 +11010,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.22,
+      "vr_peak": 1.24,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "科创板"
+    },
+    "688502": {
+      "name": "茂莱光学",
+      "score": 0,
+      "conds": 0,
+      "cond1": false,
+      "cond2": false,
+      "cond3": false,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.44,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10312,7 +11040,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.25,
+      "vr_peak": 1.28,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10327,7 +11055,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 5.27,
+      "vr_peak": 4.99,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10342,7 +11070,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.39,
+      "vr_peak": 1.41,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10357,7 +11085,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.61,
+      "vr_peak": 1.63,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10372,7 +11100,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.69,
+      "vr_peak": 1.74,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10387,7 +11115,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.65,
+      "vr_peak": 1.63,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10402,7 +11130,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.88,
+      "vr_peak": 1.9,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10417,7 +11145,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.01,
+      "vr_peak": 1.96,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10432,7 +11160,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.88,
+      "vr_peak": 1.94,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10447,7 +11175,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.37,
+      "vr_peak": 2.38,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10462,7 +11190,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.62,
+      "vr_peak": 1.68,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10477,7 +11205,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.36,
+      "vr_peak": 1.39,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10492,7 +11220,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.73,
+      "vr_peak": 2.62,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10507,7 +11235,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.54,
+      "vr_peak": 1.66,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10515,14 +11243,14 @@
     "688596": {
       "name": "正帆科技",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.43,
+      "vr_peak": 1.52,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10537,7 +11265,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.41,
+      "vr_peak": 1.4,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10552,7 +11280,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.74,
+      "vr_peak": 3.62,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10567,7 +11295,22 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.48,
+      "vr_peak": 2.49,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "科创板"
+    },
+    "688625": {
+      "name": "呈和科技",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.96,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10582,7 +11325,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.24,
+      "vr_peak": 1.29,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10597,7 +11340,7 @@
       "zt_count": 1,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 3.4,
+      "vr_peak": 3.14,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10605,14 +11348,14 @@
     "688629": {
       "name": "华丰科技",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.48,
+      "vr_peak": 1.5,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10627,7 +11370,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.27,
+      "vr_peak": 1.36,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10642,7 +11385,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.11,
+      "vr_peak": 2.15,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10657,7 +11400,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.54,
+      "vr_peak": 1.52,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10672,7 +11415,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.67,
+      "vr_peak": 2.51,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10687,7 +11430,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.1,
+      "vr_peak": 1.13,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10702,7 +11445,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.14,
+      "vr_peak": 1.18,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10717,7 +11460,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.69,
+      "vr_peak": 2.47,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10732,7 +11475,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.59,
+      "vr_peak": 1.56,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10747,7 +11490,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.38,
+      "vr_peak": 1.39,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10762,7 +11505,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.46,
+      "vr_peak": 1.48,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10777,7 +11520,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.65,
+      "vr_peak": 1.68,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10792,7 +11535,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.84,
+      "vr_peak": 1.89,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10807,7 +11550,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.37,
+      "vr_peak": 1.39,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10822,7 +11565,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.78,
+      "vr_peak": 2.05,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10837,7 +11580,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.12,
+      "vr_peak": 2.05,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10852,7 +11595,37 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.13,
+      "vr_peak": 2.23,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "科创板"
+    },
+    "688800": {
+      "name": "瑞可达",
+      "score": 0,
+      "conds": 0,
+      "cond1": false,
+      "cond2": false,
+      "cond3": false,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.29,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "科创板"
+    },
+    "688801": {
+      "name": "燧原科技",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 2.43,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10867,7 +11640,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 4.63,
+      "vr_peak": 4.53,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10882,7 +11655,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.41,
+      "vr_peak": 1.49,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10897,7 +11670,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.25,
+      "vr_peak": 1.29,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10912,7 +11685,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.66,
+      "vr_peak": 1.69,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10927,7 +11700,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.86,
+      "vr_peak": 1.83,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10942,7 +11715,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 2.16,
+      "vr_peak": 2.21,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10957,7 +11730,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.25,
+      "vr_peak": 1.3,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10972,7 +11745,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.74,
+      "vr_peak": 1.83,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10987,7 +11760,7 @@
       "zt_count": 1,
       "zt_down_count": 1,
       "af_peak": 23.26,
-      "vr_peak": 1.37,
+      "vr_peak": 1.46,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -10995,14 +11768,14 @@
     "688836": {
       "name": "宇树科技",
       "score": 0,
-      "conds": 0,
+      "conds": 1,
       "cond1": false,
       "cond2": false,
-      "cond3": false,
+      "cond3": true,
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.47,
+      "vr_peak": 1.58,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
@@ -11017,7 +11790,7 @@
       "zt_count": 0,
       "zt_down_count": 0,
       "af_peak": 0,
-      "vr_peak": 1.36,
+      "vr_peak": 1.4,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"

@@ -1,15 +1,15 @@
 window.FOUR_VOLUME={
- "update_time": "2026-09-24 04:03:48",
- "total": 4,
+ "update_time": "2026-09-24 18:26:23",
+ "total": 3,
  "stocks": [
   {
-   "code": "600418",
-   "name": "江淮汽车",
-   "market": "sh",
+   "code": "002297",
+   "name": "博云新材",
+   "market": "sz",
    "board_label": "主板",
-   "close": 23.45,
-   "pct_chg": 9.99,
-   "turnover_rate": 9.63,
+   "close": 22.47,
+   "pct_chg": 5.49,
+   "turnover_rate": 24.18,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -18,7 +18,7 @@ window.FOUR_VOLUME={
     "广度翻多": true,
     "主力动量翻多": true,
     "机构金叉": true,
-    "散户金叉": false,
+    "散户金叉": true,
     "主力金叉": true
    },
    "yzc": true,
@@ -26,18 +26,18 @@ window.FOUR_VOLUME={
    "xc": true,
    "four": true,
    "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-   "signal_date": "2026-09-23",
-   "enter_date": "2026-09-23"
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 散户金叉 + 主力金叉",
+   "signal_date": "2026-09-24",
+   "enter_date": "2026-09-24"
   },
   {
-   "code": "688131",
-   "name": "皓元医药",
+   "code": "688082",
+   "name": "盛美上海半导体",
    "market": "sh",
    "board_label": "科创板",
-   "close": 110.37,
-   "pct_chg": 9.84,
-   "turnover_rate": 4.96,
+   "close": 304.11,
+   "pct_chg": 4.39,
+   "turnover_rate": 1.56,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -55,17 +55,17 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-   "signal_date": "2026-09-23",
-   "enter_date": "2026-09-23"
+   "signal_date": "2026-09-24",
+   "enter_date": "2026-09-24"
   },
   {
-   "code": "300568",
-   "name": "星源材质",
+   "code": "300442",
+   "name": "润泽科技",
    "market": "sz",
    "board_label": "创业板",
-   "close": 17.0,
-   "pct_chg": 6.52,
-   "turnover_rate": 7.3,
+   "close": 68.01,
+   "pct_chg": 1.9,
+   "turnover_rate": 1.99,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -83,36 +83,8 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-   "signal_date": "2026-09-23",
-   "enter_date": "2026-09-23"
-  },
-  {
-   "code": "300814",
-   "name": "中富电路",
-   "market": "sz",
-   "board_label": "创业板",
-   "close": 145.22,
-   "pct_chg": 1.38,
-   "turnover_rate": 6.75,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": true,
-    "散户金叉": false,
-    "主力金叉": false
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉",
-   "signal_date": "2026-09-23",
-   "enter_date": "2026-09-23"
+   "signal_date": "2026-09-24",
+   "enter_date": "2026-09-24"
   }
  ]
 };

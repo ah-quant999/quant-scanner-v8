@@ -1,15 +1,13 @@
 {
-"update_time": "2026-09-24 16:04:44",
+"update_time": "2026-09-24 18:38:18",
 "total": 8029,
-"new_listings_count": 1,
+"new_listings_count": 0,
 "delisted_count": 0,
-"new_listings": [
-"00730 首惠产业金融－新"
-],
+"new_listings": [],
 "delisted": [],
-"meta_enriched": 1,
+"meta_enriched": 0,
 "guard_tripped": false,
 "guard_reasons": [],
-"old_universe": 8028,
+"old_universe": 8029,
 "fresh_universe": 8029
 }

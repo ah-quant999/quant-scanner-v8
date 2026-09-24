@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-24 02:39:14",
+  "update_time": "2026-09-24 18:27:52",
   "data_date": "2026-09-24",
   "track_start": "2026-09-24",
   "history_days": 30,
@@ -16,28 +16,28 @@
       "quality_grade": "B",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "百元股",
-        "2026一季报预增",
-        "计算机、通信和其他电子设备制造业",
-        "深证100R",
-        "PCB",
         "MSCI中国",
         "2026中报预增",
-        "深股通"
+        "PCB",
+        "百元股",
+        "深证100R",
+        "2026一季报预增",
+        "深股通",
+        "计算机、通信和其他电子设备制造业"
       ],
-      "signal_count": 2,
+      "signal_count": null,
       "enter_date": "2026-08-30",
       "hold_days": 6,
       "consecutive_days": 2,
       "first_close": 121.7,
-      "current_close": 128.1,
-      "pnl_pct": 5.26,
+      "current_close": 124.05,
+      "pnl_pct": 1.93,
       "price_source": "quote",
       "catalysts": [
         {
           "tag": "中报预增",
           "score": 15,
-          "reaction": "已兑现(价涨)"
+          "reaction": "观察中"
         }
       ]
     },
@@ -51,22 +51,22 @@
       "quality_grade": "A",
       "industry": "医药制造业",
       "sectors": [
-        "创新药",
-        "减肥药",
-        "互联医疗",
         "流感",
-        "肝炎概念",
         "2026中报预增",
+        "医药制造业",
+        "互联医疗",
+        "肝炎概念",
         "深股通",
-        "医药制造业"
+        "创新药",
+        "减肥药"
       ],
-      "signal_count": 2,
+      "signal_count": 1,
       "enter_date": "2026-09-22",
       "hold_days": 3,
       "consecutive_days": 3,
       "first_close": 23.85,
-      "current_close": 24.29,
-      "pnl_pct": 1.84,
+      "current_close": 23.3,
+      "pnl_pct": -2.31,
       "price_source": "quote",
       "catalysts": [
         {
@@ -101,6 +101,12 @@
       "code": "601168",
       "name": "西部矿业",
       "text": "西部矿业(601168) 连续 3 日稳居严格共识（高质量）"
+    },
+    {
+      "level": "warn",
+      "code": "601168",
+      "name": "西部矿业",
+      "text": "西部矿业(601168) 入选以来回撤 -10.5%（2026-08-17 起）"
     },
     {
       "level": "warn",
@@ -214,7 +220,7 @@
       "level": "warn",
       "code": "000703",
       "name": "恒逸石化",
-      "text": "恒逸石化(000703) 入选以来回撤 -13.5%（2026-08-20 起）"
+      "text": "恒逸石化(000703) 入选以来回撤 -14.2%（2026-08-20 起）"
     },
     {
       "level": "warn",
@@ -520,7 +526,19 @@
         "count": 2
       },
       {
+        "sector": "MSCI中国",
+        "count": 1
+      },
+      {
+        "sector": "PCB",
+        "count": 1
+      },
+      {
         "sector": "百元股",
+        "count": 1
+      },
+      {
+        "sector": "深证100R",
         "count": 1
       },
       {
@@ -532,15 +550,19 @@
         "count": 1
       },
       {
-        "sector": "深证100R",
+        "sector": "流感",
         "count": 1
       },
       {
-        "sector": "PCB",
+        "sector": "医药制造业",
         "count": 1
       },
       {
-        "sector": "MSCI中国",
+        "sector": "互联医疗",
+        "count": 1
+      },
+      {
+        "sector": "肝炎概念",
         "count": 1
       },
       {
@@ -549,22 +571,6 @@
       },
       {
         "sector": "减肥药",
-        "count": 1
-      },
-      {
-        "sector": "互联医疗",
-        "count": 1
-      },
-      {
-        "sector": "流感",
-        "count": 1
-      },
-      {
-        "sector": "肝炎概念",
-        "count": 1
-      },
-      {
-        "sector": "医药制造业",
         "count": 1
       }
     ],
@@ -580,8 +586,8 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
-    "latest_date": "2026-09-23 21:38:33",
-    "total": 369,
+    "latest_date": "2026-09-24 03:56:48",
+    "total": 375,
     "best_hold_days": 10,
     "periods": {
       "1d": {
@@ -629,7 +635,7 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 160,
+      "count": 163,
       "win_rate_5d": 53.2,
       "avg_ret_5d": 0.85,
       "best_win_rate": 56.9,
@@ -637,7 +643,7 @@
     },
     {
       "band": "70~80",
-      "count": 209,
+      "count": 212,
       "win_rate_5d": 39.2,
       "avg_ret_5d": -1.36,
       "best_win_rate": 43.3,
@@ -701,7 +707,7 @@
       "1d": {
         "count": 50,
         "win_rate": 40.0,
-        "avg_return": 0.79
+        "avg_return": 0.64
       },
       "3d": {
         "count": 38,
@@ -710,13 +716,13 @@
       },
       "5d": {
         "count": 31,
-        "win_rate": 45.16,
-        "avg_return": 0.23
+        "win_rate": 38.71,
+        "avg_return": 0.11
       },
       "10d": {
         "count": 24,
-        "win_rate": 37.5,
-        "avg_return": -0.13
+        "win_rate": 33.33,
+        "avg_return": -0.42
       },
       "20d": {
         "count": 10,
@@ -1148,7 +1154,7 @@
         "enter_date": "2026-09-14",
         "offsets": {
           "1d": 0.43,
-          "10d": 2.84
+          "10d": 2.05
         }
       },
       {
@@ -1157,7 +1163,7 @@
         "enter_date": "2026-09-14",
         "offsets": {
           "1d": -0.75,
-          "10d": 1.5
+          "10d": -0.71
         }
       },
       {
@@ -1166,7 +1172,7 @@
         "enter_date": "2026-09-14",
         "offsets": {
           "1d": 4.82,
-          "10d": 10.14
+          "10d": 6.38
         }
       },
       {
@@ -1266,7 +1272,7 @@
         "offsets": {
           "1d": 0.0,
           "3d": 3.45,
-          "5d": 1.34
+          "5d": -0.71
         }
       },
       {
@@ -1276,7 +1282,7 @@
         "offsets": {
           "1d": 0.0,
           "3d": 1.32,
-          "5d": 0.94
+          "5d": -0.94
         }
       },
       {
@@ -1308,7 +1314,7 @@
         "name": "",
         "enter_date": "2026-09-23",
         "offsets": {
-          "1d": 0.0
+          "1d": -5.8
         }
       },
       {
@@ -1316,7 +1322,7 @@
         "name": "源杰科技",
         "enter_date": "2026-09-23",
         "offsets": {
-          "1d": 0.0
+          "1d": -2.01
         }
       }
     ]
