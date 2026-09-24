@@ -702,14 +702,15 @@ _EXTRA_FILES = (
 _RE_V = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
 
 
-# ⚠️⚠️ 已废除口径（2026-09-10 主人令）——下面这个 sha1 内容哈希**不得再用于 index.html 的 ?v**：
-#   · 理由：内容哈希在「数据被回滚到旧内容」时哈希恰好等于旧版 ⇒ 浏览器缓存旧 ?v 永远吐旧数据
-#     （表现为「最终推荐回退到 2 天前」「盘中主线卡在旧时刻」）；
-#   · 现行口径 = 单调 unix 秒令牌（update_v8._data_file_update_time 与 _stamp_remote_index_v）；
-#   · 本仓已有核验会对十六进制形态报警并重写：
-#     v8_build_deploy.yml「?v 出现非 unix 秒令牌(旧内容哈希口径回潮)」。
-#   ⇒ 2026-09-20 起 index.html 的 ?v 一律走 _stamp_remote_index_v；两者仅作历史留痕。
-#     （已证本仓 workflows 内无其他调用点；如需彻底删除请先确认无外部 importer。）
+# ✅✅ 2026-09-24 17:4x 小九**恢复为权威口径**（原 2026-09-10「已废除」标记作废）
+#   —— 主人报「主站转半天打不开」（可用性 P0），根因即「?v 用 unix 秒令牌 ⇒ 每次构建全站 URL 翻新
+#      ⇒ 浏览器缓存命中率恒为 0 ⇒ 每次访问跨境全量重下 10MB+」（实测首页 TTFB 16s / 总计 33s，
+#      带 --compressed 仅 2.8s）。详细论证见 update_v8._data_file_update_time 顶部注释。
+#   现口径 = **中性化内容哈希**（剔除 republish_time 后 sha1[:10]），内容不变则 URL 不变。
+#   🔴 同族矩阵（改本口径必须三处同改，禁只改一处）：
+#     ① update_v8._data_file_update_time / _neutral_content_sha1  —— 构建期生成
+#     ② 本文件的 _stamp_remote_index_v（下方）                      —— 推送期生成
+#     ③ v8_build_deploy.yml「提交前核验」步                          —— 门禁判据
 def _neutral_sha(content: bytes) -> str:
     """与 update_v8._rewrite / reconcile_cache_busters 完全一致的中性化哈希：
     先剔除 republish_time 的构建时间戳（非数据本体），再取 sha1 前 10 位。"""
@@ -745,12 +746,13 @@ def _stamp_remote_index_v(changed: dict, commit_ref: str):
     🔴 基准必须是**远端正文**（commit_ref），绝不允许使用本地副本：本地是 checkout 快照，
        直接上传会以「最新 main」为 base_tree 静默覆盖他人的前端改动（见 _SKIP_LOCAL_PUSH）。
 
-    🔴 ?v 口径 = **单调 unix 秒令牌**，与 update_v8._data_file_update_time 的 _UPDATE_TOKEN 同源。
-       为何不能用内容哈希：2026-09-10 主人令已改口径 —— 内容哈希在「数据被回滚到旧内容」时
-       哈希恰好等于旧版 ⇒ 浏览器缓存旧 ?v 永远吐旧数据（表现为「最终推荐回退到 2 天前」
-       「盘中主线卡在旧时刻」）。且本仓已有核验会对十六进制形态报警：
-       v8_build_deploy.yml「?v 出现非 unix 秒令牌(旧内容哈希口径回潮)」。
-       ⇒ 在此处写 sha1 形态 = 被判口径回潮并触发一次重写，禁止使用 _neutral_sha。
+    🔴 ?v 口径 = **中性化内容哈希**（`_neutral_sha`，sha1 前 10 位），与
+       update_v8._neutral_content_sha1 逐字节同源。口径于 2026-09-24 17:4x 恢复
+       （原 2026-09-10 的「unix 秒令牌」口径因造成「全站 URL 每轮翻新 ⇒ 浏览器缓存全失效
+       ⇒ 主站转半天打不开」而被推翻，论证见 update_v8._data_file_update_time 顶部注释）。
+       ⇒ 只有**本次真正变更**的文件其 ?v 才变；未变更文件保持原 ?v，浏览器缓存命中。
+       ⚠️ 不要再按「十六进制形态 = 回潮」判断 —— build_deploy 的门禁已同步改为**真比对**，
+          因为 unix 秒令牌本身也全由 [0-9] 组成、与 hex 形态不可区分。
 
     🔴 旧实现为何必须换掉（2026-09-20 实测）：旧代码走 `GET /contents/index.html` 取正文，
        而 index.html 现为 1.36MB > Contents API 的 1MB 上限 ⇒ 返回 encoding="none" +
@@ -769,12 +771,18 @@ def _stamp_remote_index_v(changed: dict, commit_ref: str):
     if not idx_text.rstrip().endswith("</html>"):
         print("  🚨 取到的远端 index.html 末尾未闭合（截断件）→ **拒绝改写**，?v 交由 reconcile 自愈")
         return None
-    tok = str(int(_time.time()))
+    # 🔴 2026-09-24：按**每个文件自己的新内容**算 ?v（不再是一枚全站共享的 unix 令牌）。
+    #   仅当该文件在 changed 内才改写 ⇒ 未变更文件的 URL 保持不变 ⇒ 缓存命中。
+    # 🛡 纵深防御：空内容（未就绪）不写空 ?v，保留原值等下一步对齐（原 _stamp_index_v 同纪律）。
     _pat = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?v=[0-9A-Za-z]+)?([\'"])')
 
     def _repl(m):
-        if m.group(2) in changed:
-            return f"{m.group(1)}{m.group(2)}?v={tok}{m.group(3)}"
+        src = m.group(2)
+        if src in changed:
+            data = changed[src]
+            if not data or not data.strip():
+                return m.group(0)
+            return f"{m.group(1)}{src}?v={_neutral_sha(data)}{m.group(3)}"
         return m.group(0)
 
     new_idx = _pat.sub(_repl, idx_text)
@@ -791,7 +799,7 @@ def _stamp_remote_index_v(changed: dict, commit_ref: str):
     if "__error__" in ib or "sha" not in ib:
         print("  ⚠️ index.html blob 上传失败，?v 将交由 reconcile 自愈")
         return None
-    print(f"  🔄 index.html ?v 已重写为单调令牌 {tok}（{len(changed)} 个文件）")
+    print(f"  🔄 index.html ?v 已按内容哈希重写（{len(changed)} 个文件，未变更文件 URL 保持不变）")
     return ib["sha"]
 def _local_tree_paths(base_sha, want_prefixes):
     """用本地 git ls-tree 直接取「受管路径 → blob sha」，**零网络请求**。

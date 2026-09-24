@@ -39,8 +39,20 @@ permissions:
 concurrency:
   # 🔧 2026-09-09 一劳永逸「双机兜底配合」：原独立 group v8-cn-fetch-cloud-hosted 与
   #   云端主力 v8-cn-fetch-cloud 互不互斥 → 夜间补抓档可能与主链并发 push main 互踢。
-  #   统一为 v8-cn-fetch-cloud（cancel-in-progress:false → 队列而非互杀）。
-  group: v8-cn-fetch-cloud
+  #   统一并发组（cancel-in-progress:false → 队列而非互杀），
+  #   从根上保证「同一 category 任一时刻只有一条 fetch 在写 main」。
+  #
+  # 🔴 2026-09-24 17:3x 小九「同族漏改」根治（HANDOFF: cnfetch-fallback-concurrency-orphan · P0）：
+  #   15:03 主链为解「僵尸 run 独占单一静态组 62 分钟堵死队列」改为按 category 动态命名，
+  #   但本文件与 selfhosted **漏改**，仍留在**旧裸组** `v8-cn-fetch-cloud`
+  #   ⇒ 与新命名三组（-intraday / -post_close / -scheduled）全不互斥
+  #   ⇒ 主链与兜底链可**同时写 main**（防倒退守卫互踢 / 半截 JSON 回潮）。
+  #   现与主链**完全同构**：本文件 20:30 CST cron 档**无 inputs** ⇒ 落 `-scheduled`（与主链 cron 档互斥）；
+  #   若被看门狗带 category 派发（如 post_close）则落对应组，语义与主链一致。
+  #   ✅ 同 category 互斥、跨 category 并发。
+  #   ⚠️ 同族三份（cloud / hosted / selfhosted）改动必须矩阵化枚举，禁只改一处：
+  #     grep -rn "v8-cn-fetch-cloud" --include=*.yml .github/workflows/
+  group: v8-cn-fetch-cloud-${{ github.event.inputs.category || 'scheduled' }}
   cancel-in-progress: false
 
 jobs:

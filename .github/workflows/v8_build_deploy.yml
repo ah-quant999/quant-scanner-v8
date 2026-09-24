@@ -460,7 +460,35 @@ jobs:
             #   也会在 15 分钟内兜底纠正，双保险。
             # 🛡 2026-09-21 小九：加硬超时（原无护栏，是本步 30min+ 的主要时间汇）
             timeout 180 python update_v8.py --only-cache-busters
-            python -c "import re,pathlib,collections,subprocess; idx=pathlib.Path('index.html').read_text(encoding='utf-8'); m=re.findall(r'data/[A-Z0-9_]+\.js\?v=([0-9a-zA-Z]{1,40})',idx); bad=sorted(set(v for v in m if not v.isdigit())); c=collections.Counter(m); print('::warning::?v 出现非 unix 秒令牌(旧内容哈希口径回潮): '+str(bad[:8])) if bad else print('OK 提交前核验: '+str(len(m))+' 个 ?v 均为 unix 秒令牌, token='+c.most_common(1)[0][0]+' x'+str(c.most_common(1)[0][1])); subprocess.run(['python','update_v8.py','--only-cache-busters'],check=True) if bad else None"
+            # 🛡 2026-09-24 判据同步（?v 口径三处同改之③ —— 阿狸咪令「同族改动必须矩阵化枚举」）
+            #   ?v 口径已于 09-24 17:4x 由「unix 秒单调令牌」恢复为「**中性化内容哈希**」
+            #   （论证见 update_v8._data_file_update_time 顶部：时间戳口径使全站 URL 每轮翻新
+            #     ⇒ 浏览器缓存命中率恒 0 ⇒ 主站转半天打不开，实测 TTFB 16s / 总计 33s）。
+            #   ⚠️ 故**不能再用「是否纯数字」判形态** —— unix 秒令牌本就全由 [0-9] 组成，
+            #      与 hex 形态**不可区分**（旧判据在新口径下会 100% 误报「口径回潮」并白跑兜底）。
+            #   ⇒ 改为**真比对**：用本地 data/<var>.js 内容算中性化 sha1[:10]，与 index.html 的 ?v 逐一对照。
+            #   （血训：09-13 那次即因判据未随口径同步 ⇒ 恒报「?v 仍失配」= 假 failure，不阻断却误导审计。）
+          python - <<'PYEOF'
+          import re, pathlib, hashlib, subprocess
+          idx = pathlib.Path('index.html').read_text(encoding='utf-8')
+          def nsha(p):
+              t = p.read_text(encoding='utf-8', errors='replace')
+              t = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', t)
+              return hashlib.sha1(t.encode('utf-8')).hexdigest()[:10]
+          pairs = re.findall(r'data/([A-Z0-9_]+)\.js\?v=([0-9A-Za-z]{1,40})', idx)
+          bad = []
+          for var, v in pairs:
+              p = pathlib.Path('data') / (var + '.js')
+              if p.exists():
+                  h = nsha(p)
+                  if h != v:
+                      bad.append((var, v, h))
+          if bad:
+              print('::warning::?v 与本地文件内容哈希不符（%d 项，重跑对齐）: %s' % (len(bad), [b[0] for b in bad[:8]]))
+              subprocess.run(['python', 'update_v8.py', '--only-cache-busters'], check=True)
+          else:
+              print('OK 提交前核验: %d 个 ?v 与 data/*.js 内容哈希一致' % len(pairs))
+          PYEOF
             # 🛡 安全：先把任何落入 data/ 的密钥/令牌文件从索引移除，避免一并由 git add 提交到
             #   公开仓库（git add 不会自动 unstage 已跟踪的敏感文件；此前 -f 曾把 .mahoro_cookies.txt 等强制入库）。
             git rm --cached --ignore-unmatch \

@@ -8,7 +8,7 @@
 - 删除死数据文件 RECOMMEND / SCAN_DATA 的映射。
 """
 
-import json, os, re, subprocess, sys, time
+import json, os, re, subprocess, sys, time, hashlib
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -805,6 +805,9 @@ def _write_js(var_name, obj):
 
 
 # 单调部署令牌缓存：同一进程内所有 data/*.js 共用，保证一次构建 ?v 统一失效。
+# ⚠️ 2026-09-24 起**已废弃**：`?v=` 口径回归「中性化内容哈希」，权威实现在
+#   `_neutral_content_sha1()`。本全局（unix 秒单调令牌）不再被任何函数读取，
+#   保留定义仅为兼容历史引用（全仓已确认无其他调用点）。**禁止**再把它接回 ?v。
 _UPDATE_TOKEN = None
 
 
@@ -837,16 +840,47 @@ def _data_file_update_time(var_name):
     path = DATA_DIR / f"{var_name}.js"
     if not path.exists():
         return ""
-    # 🔴 2026-09-10 一劳永逸修复（主人令：根治「数据回滚/更新后浏览器陈旧缓存」）：
-    #   原内容哈希 ?v 在「数据被回滚到旧内容」时，哈希恰好等于旧版 → 浏览器缓存旧 ?v
-    #   永远吐旧数据（表现为「最终推荐回退到2天前」「盘中主线卡在旧时刻」）。
-    #   改为单调部署令牌（unix 秒），每次构建必变 → 浏览器永远重载最新数据；
-    #   代价是全量重载（数据可靠性优先于带宽，符合主人「最及时准确数据」铁律）。
-    #   同一进程内复用同一令牌，保证一次构建所有 data/*.js 的 ?v 一致（单次统一失效）。
-    global _UPDATE_TOKEN
-    if _UPDATE_TOKEN is None:
-        _UPDATE_TOKEN = str(int(time.time()))
-    return _UPDATE_TOKEN
+    # 🔴🔴 2026-09-24 17:4x 小九 紧急根治「主站转半天打不开」（可用性 P0 事故）
+    #   【事故现象】主人报主站转半天打不开。实测首页 code=200 但 **TTFB 16s / 总计 33s**
+    #     （跨境明文 1.36MB），带 --compressed 仅 2.8s ⇒ 瓶颈=全站资源被判定为「全新 URL」而重下。
+    #   【根因】本函数自 2026-09-10 起返回 **unix 秒单调令牌**（下方旧注释自承「代价是全量重载」）。
+    #     该代价在线上已演变为事故，因为 09-10 之后新增了两条放大器：
+    #       ① `v8_cache_buster_reconcile` 每 15 分钟 + **每次 data/** push** 都跑（今日实测 23+ 档）；
+    #       ② 云端 churn 使 index.html 每 2–10 分钟重建一次 ⇒ CDN 恒 `X-Cache: MISS` / `Age: 0`；
+    #     叠加后 ⇒ index.html 中 ~100 个 `data/*.js` 的 ?v **几乎永远在变**
+    #     ⇒ 浏览器对 10MB+ 数据资源**缓存命中率恒为 0**，每次访问全量跨境重下 ⇒「转半天」。
+    #   【为何 09-10 的理由不成立】其注释称「数据回滚到旧内容 ⇒ 哈希=旧版 ⇒ 浏览器永远吐旧数据」：
+    #     回滚发生时**线上文件内容也回滚了**，浏览器命中旧 ?v 取回的正是线上当前内容 ⇒ **一致**。
+    #     真正会造成「显示与线上不符」的是 CDN 边缘缓存异常，与 ?v 取内容哈希还是时间戳无关。
+    #   【现口径】中性化内容哈希（剔除 `republish_time` 这类构建时间戳，只对**数据本体**取 sha1[:10]）
+    #     —— 正是 2026-08-14 主人令的原意：
+    #       · 内容未变 ⇒ ?v 不变 ⇒ 浏览器/CDN 命中（恢复速度）；
+    #       · 内容真变 ⇒ ?v 变（且**只有**变化的文件变）⇒ 精准刷新，无需全量重下。
+    #     口径与 `api_push_raw._neutral_sha` **逐字节同源**；三处同源点见下方「同族矩阵」。
+    #   ⚠️ 同族矩阵（改本口径必须三处同改，禁只改一处 —— 本仓已有两次「判据未同步」血训）：
+    #       ① 本函数（update_v8.py）                    —— 构建期生成
+    #       ② api_push_raw._stamp_remote_index_v        —— 推送期生成
+    #       ③ v8_build_deploy.yml「提交前核验」步       —— 门禁判据
+    return _neutral_content_sha1(path)
+
+
+def _neutral_content_sha1(path):
+    """index.html `?v=` 的唯一权威口径 = 中性化内容哈希（sha1 前 10 位）。
+
+    「中性化」= 先剔除 `republish_time` 字段值（纯构建时刻、非数据本体），再对全文取 sha1。
+    与 `api_push_raw._neutral_sha(content: bytes)` 完全同源（同正则、同截断长度）。
+    🔴 必须走 `read_bytes().decode()` —— **不可用 `path.read_text()`**：
+       read_text 默认启用 universal newlines，会把 CRLF 静默转成 LF，而推送端 `_stamp_remote_index_v`
+       拿到的是**原始字节**。两者对含 CRLF 的 data/*.js 会算出不同哈希（实测 10 抽样中 3 例失配：
+       VALUATION_PERCENTILE / SECTOR_RECOMMENDATION / STOCK_LIST）⇒ ?v 永远对不上 ⇒ 缓存恒失效。
+    """
+    raw = path.read_bytes()
+    try:
+        text = raw.decode("utf-8")
+    except Exception:
+        text = raw.decode("utf-8", "replace")
+    neutral = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', text)
+    return hashlib.sha1(neutral.encode("utf-8")).hexdigest()[:10]
 
 
 def _atomic_write_index_html(idx_path, text, baseline_len, baseline_lines):

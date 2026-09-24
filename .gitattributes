@@ -52,6 +52,19 @@ raw_data/*.json     text eol=lf
 #     scripts/normalize_eol.py → git check-attr，故**补此规则即自动扩展收口范围**。
 data/*.json         text eol=lf
 raw_data/history/*.json  text eol=lf
+# 2026-09-24 小九补漏（同源根因第三处 · 交接件 `rawdata-md-crlf-flip`）
+#   实测（阿狸咪 17:2x 只读取证，证据链完整）：`raw_data/*.md` 全族**无任何规则**
+#   ⇒ 属性 unspecified ⇒ Windows checkout 后工作树为 CRLF；
+#   而走 GitHub API 逐文件上传的推送器读的是**工作树字节**（绕过 git clean filter）
+#   ⇒ 2026-09-24 12:04:59 CST（commit fabb6e6434）把这两个 .md 整篇翻成 CRLF 落库：
+#     `raw_data/ima_strong_stock_full.md`  5504 → 5632 B（+128 行 CRLF）
+#     `raw_data/chan_buy_point_full.md`    +115/−115
+#   （同批 16 个 raw_data/*.json 只 +1/−1 —— 它们**已有** `raw_data/*.json text eol=lf`。）
+#   后果：① 快照「逐字节 == ima 源方原文」契约被破坏（该文件全部价值前提）；
+#         ② `push_snapshot.py` 断言 `remote_md == fetched_md` ⇒ 通道一恢复，任何刷新（含新篇）必 abort。
+#   本族 .md 全量枚举 = **仅这 2 个文件** ⇒ 影响面精确锁定，与 09-21 段「逐族列窄规则」同法。
+#   ⚠️ 收口必须用 `git add --renormalize <显式路径>`（普通 add 对 stat 未变者跳过 clean filter，静默无效）。
+raw_data/*.md       text eol=lf
 # 2026-09-21 阿狸咪再补漏（同源根因第二处）
 #   ⚠️ 更正 09-21 早先写入本段的错误表述：原文称该文件「永久脏」——**不成立**。
 #      实测：属性 unspecified 时 blob 与工作树**同为 CRLF** ⇒ git 判为一致，`git status` 全空。
