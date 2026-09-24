@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "3bda8280f0";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "4e072a29b2";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -679,7 +679,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=48cc0756fe" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=320d8463f1" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=b6d721a002" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1811,10 +1811,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=acc85915b6" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=ba23ff67a2" defer></script>
-<script src="data/HB_XIAOJIU.js?v=880872ae0b" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=e61349381c" defer></script>
-<script src="data/HEALTH_CHECK.js?v=0a2886b391" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=299e581971" defer></script>
+<script src="data/HB_XIAOJIU.js?v=6f9471f75f" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=f521723371" defer></script>
+<script src="data/HEALTH_CHECK.js?v=4afb0039bc" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=b6bafe80b8" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=63db8889ee" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=00fcbeeb09" defer></script>
@@ -1825,14 +1825,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=76312df7f0" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=9219b6a10a" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=17f63140d3" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=4454436480" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=19948a2665" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=5bbb0beecb" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=7de32c71bd" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=557c3ed5d2" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=2d14af08d6" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=3dcd0da0a1" defer></script>
-    <script src="data/IMA_STRONG_BACKTEST.js?v=21fb93fff3" defer></script>
+    <script src="data/IMA_STRONG_BACKTEST.js?v=78845eff90" defer></script>
     <script src="data/CRDS_BACKTEST.js?v=d348b3be89" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -15727,7 +15727,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=4454436480';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=7de32c71bd';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -15736,7 +15736,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=19948a2665';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=557c3ed5d2';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
