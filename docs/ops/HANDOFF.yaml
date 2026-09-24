@@ -3357,7 +3357,7 @@ items:
         ⇒ 建议观察 ≥1 个交易日，判据 = 连续 3 档 update_time 均前进、且 HEALTH_CHECK 不再出现该二卡 fail。
       ⚠️ 口径不一致待 owner 收口：item 头部 `status: done` 与块内 08:14 文本「结论维持 pending-verify」并存，
         且该次状态变更**未同步刷新 `updated`**（仍为 08:14 / 阿狸咪）。
-    updated: "2026-09-24 15:47"
+    updated: "2026-09-24 15:25"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: update-v8-readtext-newline-py312
@@ -3651,7 +3651,7 @@ items:
          建议下一步：对一次取消事件取 `run_started_at` / `updated_at` 做秒级对齐，并审计仓外脚本的 cancel 调用。
       ⚠️ 与本轮新增的 `cnfetch-fallback-concurrency-orphan` **联动看**：若队列确被外部清空 + 并发组又不再互斥，
          两者叠加正是 09-24 盘中 2.8h 空窗的完整因果链。
-    updated: "2026-09-24 15:47"
+    updated: "2026-09-24 15:25"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: dajijin-reduction-monitor
@@ -4124,7 +4124,7 @@ items:
         唯一「跨文件共用」项 = `v8-cn-fetch-cloud`（`hosted` + `selfhosted`）；
       · `v8_cn_fetch_cloud.yml` blob `d6e28e87` / L106 已含 `${{ ... }}` 表达式；
       · `hosted` #25 与 `selfhosted` #55 的 run 时刻见 impact（`GET /actions/workflows/{id}/runs`）。
-    updated: "2026-09-24 15:47"
+    updated: "2026-09-24 15:25"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: cnfetch-api-quota-403-exhausted
@@ -4163,5 +4163,5 @@ items:
       · 本机同刻 `GET /rate_limit`（阿狸咪 PAT 口径，非安装级）`remaining=5000` ⇒ **不能**用本机 PAT 配额反证安装级配额。
       ⚠️ 归属澄清：本条与 14:10 小九档的**下午**断档（并发组/队列）**不是同一根因**
         —— 小九 14:10 档 §四.1 已明确排除「上传 403」（13:00 后 25 文件提交成功）。
-    updated: "2026-09-24 15:47"
+    updated: "2026-09-24 15:25"
     updated_by: 阿狸咪的工程师(alimi-cn)
