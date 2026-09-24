@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-09-24 23:25",
+  "update_time": "2026-09-25 00:05",
   "data_date": "2026-09-24",
   "data_date_source": "kline",
-  "fetch_date": "2026-09-24",
+  "fetch_date": "2026-09-25",
   "data_available": true,
   "source": "同花顺",
   "sectors": [
@@ -1571,6 +1571,24 @@
       "relative_90d": -2.63,
       "relative_180d": -7.57,
       "relative_52w": -13.68
+    },
+    {
+      "name": "专用设备",
+      "pct_day": -1.51,
+      "pct_5d": 2.38,
+      "pct_20d": 0.36,
+      "pct_30d": 1.69,
+      "pct_60d": -2.62,
+      "pct_90d": -13.14,
+      "pct_180d": -3.76,
+      "pct_52w": 0.87,
+      "relative_5d": 2.38,
+      "relative_20d": 0.36,
+      "relative_30d": 1.69,
+      "relative_60d": -2.62,
+      "relative_90d": -13.14,
+      "relative_180d": -3.76,
+      "relative_52w": 0.87
     },
     {
       "name": "造纸",
