@@ -692,7 +692,21 @@ items:
       同类：09:49→09:58（**+8min**）、本次 18:20→18:55（**+35min**）**同型** ⇒ 高度疑似你的系统时钟超前。
       处置：小九已按实取值改写该 `updated`；**判据与门禁均不改**（门禁按设计成功拦截了 deploy）。
       请：① 校准系统时钟（NTP）；② 写时刻一律 `TZ=Asia/Shanghai date` 实取，**禁预估、禁手填未来时刻**。
-    updated: "2026-09-21 19:04"
+    recurrence_20260924: >-
+      🔴 **第 4 次复发（本次是阿狸咪自己犯的）**：阿狸咪 2026-09-24 **15:25** 提交 `4442a3c224` 时，
+      4 个 item 的 `updated` 写成 `"2026-09-24 15:47"`（凭「以为现在几点」**推断**、未实取）⇒ CI（15:27）逐字
+      `❌ [13/13] 交接状态源守卫: 未来时戳 4 处（污染 MAX 新鲜度判据）: etf-monitor-clist-fid-invalid(updated=2026-09-24 15:47)；cn-fetch-queue-growth；cnfetch-fallback-concurrency-orphan；cnfetch-api-quota-403-exhausted`
+      ⇒ `v8_build_deploy` **#8109 build job failure**（step10 `🛡️ Pre-deploy audit` failure、
+        step13 `📤 部署到 main` **skipped** = 部署被结构性阻断）。
+      处置：按引入提交的**事实时刻 15:25** 改写 4 处，`9085ba95eb` 推送 ⇒ **#8110 build job success**
+      （step10 / step13 部署 / step14 发布后体检 全 success）＝ 阻断解除。
+      ✅ **新增本机预检法（推前 1 条命令，建议双机都加）**：正则抽全文件 `^\s+updated:` 的值，
+        与 `datetime.now(timezone(timedelta(hours=8))) + 5min` 比对，命中即**拒绝推送**（复刻 `pre_deploy_audit` 同口径）。
+        已实测：改前 FAIL（4 处）/ 改后 PASS。
+      ⚠️ 结论：**判据与门禁均无需改**（门禁第 4 次按设计拦住 deploy）；根因**始终是写入侧纪律** ——
+        写 `updated` 前**必须 `datetime.now(CST)` 实取**，禁凭推断、禁手填。
+    updated: "2026-09-24 17:44"
+    updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: factorlab-commit-pathspec
     priority: P2
@@ -4024,7 +4038,28 @@ items:
       旁证（排除误伤）：`v8_cn_fetch_experiments.yml` #10（09-23 21:46:27 CST）**全步骤 success**，
       但该链覆盖的是另外 3 个 fetcher，不产出 EXPERIMENT / SECTOR_LEADERS ⇒ **非该 workflow 事故**。
       ⇒ 建议把本三项（尤其①）提升执行序：它目前是**唯一**能解这两张卡的路径。
-    updated: "2026-09-24 08:14"
+    alimi_rootcause_20260924_1745: >-
+      〔阿狸咪 2026-09-24 17:45 CST **根因更正** —— 定案①（放宽 HEAL 硬窗口 + 21:30 后单次补跑白名单）
+      单独施工**不足以解冻**：两卡各有独立的**代码级 / 上游级**真因，与「执行序 / 窗口」无关〕
+      · 🔴 `SECTOR_LEADERS` = `scripts/fetch_sector_leaders.py` **每档必崩**。逐字 traceback
+        （取自 `v8_cn_fetch_cloud` **#2148**（16:40:49 CST，该档 run 结论 = success）的 job 日志）：
+        `File ".../scripts/fetch_sector_leaders.py", line 274, in <module>  build()`
+        → `line 213, in build  boards_exact, boards_norm = fetch_em_boards()`
+        → `line 130, in fetch_em_boards  d = _get_json(url)`
+        → `line 68, in _get_json  raise last` → `line 62  with urllib.request.urlopen(req, timeout=timeout) as resp:`
+        ⇒ 即 **东财 `push2` 板块 clist 接口（`fs=m:90+t:2`，`pn=1..8`）请求失败且重试耗尽**（L62 抛出、L68 `raise last`）。
+        ⚠️ `_get_json` **只 `raise last`、不落 HTTP 状态码/异常文本** ⇒ 现日志**无法区分 403 / 456 反爬 / 超时**
+        （建议补 statuscode + 异常类型，否则同类取证每次都得靠猜）。
+        ⚠️ 同档 step「🐲 板块龙头股字典（SECTOR_LEADERS，仅 post_close）」在 steps 列表里显示 **success**
+        ⇒ **「软失败步 + 后续无硬校验」假成功**（同族坑见 `v8-algo-chain-stall-diagnosis` 判据）。
+      · 🔴 `EXPERIMENT` = **上游返空**。同档逐字：`>>> EXPERIMENT 2026-09-24T16:45:42+08:00` /
+        `⚠️ EXPERIMENT: 返回空，跳过` / `⏭️  EXPERIMENT 数据未变，跳过重写（幂等）` ⇒ 非执行序问题。
+      · 🔴 **自愈被自我固化（新增关键判据）**：两卡同档触发
+        `[HEAL✓] [post_close] EXPERIMENT, SECTOR_LEADERS: 已有排队中的 cn_fetch 运行(created 2026-09-24T08:42:46Z)，跳过派发（避免顶掉该 pending run）category=post_close`
+        ⇒ 因「已有 pending」而**永不补派**，而该 pending 档跑到同一脚本仍然崩 ⇒ **死循环（自查不出的那种）**。
+      ⇒ 建议**改优先级**：先修 `_get_json`（多 host 轮换 + 单页重试 + 落状态码）与 EXPERIMENT 空源兜底，
+        再谈 HEAL 窗口；否则放宽窗口只会**增加崩溃档数**而不产出。
+    updated: "2026-09-24 17:44"
     updated_by: 阿狸咪的工程师(alimi-cn)
     what: >-
       〔2026-09-24 02:46 阿狸咪的工程师〕主人令「和小九商量定」——昨夜三项挂账已定案，登记施工口径：
@@ -4077,14 +4112,30 @@ items:
     verify_how: |-
       观察 ≥1 交易日：①概念热力/ETF异动 update_time 盘中前进；②亚太概览不再全 0.00；
       ③出现东财组判红 run 后同档 selfhosted 被触发；④EXPERIMENT/SECTOR_LEADERS 长期停更另立条目追。
-    updated: "2026-09-24 11:53"
+    alimi_evidence_20260924_1745: >-
+      阿狸咪 2026-09-24 17:45 CST 复核（本项 fail 面已**收敛为 1/4**，与 11:5x 小九定案并列）：
+      · ✅ ②（`_etf_snapshot_partial` 零请求降级）**实测已生效**：`ETF_PULSE` ut **17:25:52** /
+        `ETF_DAILY_MONITOR` ut **17:29:17**（盘中持续推进）；`raw_data/etf_snapshot_pages.json`
+        （blob `817ae3288f` / update_time 14:57:10）已 **17/17 页、逐页 100 行合计 1625 行**（date=20260924）
+        ⇒ 满页、不再半截（对照 09-24 10:26 仅 13 页 / 07:26 仅 5 页且页集非单调）。
+      · 🔴 仅剩 `AVG_PRICE_DATA` ut **2026-09-24 11:30:07**（age ≈ 370min；HEALTH_CHECK 17:39:52 判 fail）。
+        **决定性日志**（cn_fetch `#2152`，17:15:24 CST 档，逐字）：
+        `>>> AVG_PRICE_880003 2026-09-24T17:24:51+08:00`
+        → `⚠️ AVG_PRICE_880003: 空/无效数据，跳过写入（保留远端旧数据）`；
+        同档另有 `⚠️ AVG_PRICE_DATA: 空/无效数据，跳过写入（保留远端旧数据）`，
+        而 `✅ avg_price_data.json → AVG_PRICE_DATA.js` 那一步照跑 ⇒ **落盘层按「空不覆盖」正确跳过**
+        ⇒ 定性 = **上游 880003 空源**（非链挂 / 非本机问题 / 非 `update_time` 未刷）。
+      · ⚠️ 口径提醒：本仓**无** `data/AVG_PRICE_880003.js`（GET → 404），实际落盘名 = `data/AVG_PRICE_DATA.js`。
+      ⇒ 建议 verify_how 增补「`AVG_PRICE_DATA` 上游空源」专项 —— 与 `postclose-reliability-trio` 的
+        `EXPERIMENT` 空源**同族**，可一并治（空源命中即告警 + 备源），勿两条目重复施工。
+    updated: "2026-09-24 17:44"
     updated_by: 小九(lemoncat-cn)
 
   # ── P0 · 数据链（阿狸咪 2026-09-24 15:4x CST 实测新增）──────────────────
   - id: cnfetch-fallback-concurrency-orphan
     priority: P0
     owner: shared
-    status: todo
+    status: pending-verify
     what: >-
       🔴 主链并发组改成「按 category 动态命名」后，**同族的两条兜底链未同步改**
       ⇒ 09-09 特意建立的「任一时刻只有一条 fetch 在写 main」保证**被打破**。
@@ -4124,7 +4175,19 @@ items:
         唯一「跨文件共用」项 = `v8-cn-fetch-cloud`（`hosted` + `selfhosted`）；
       · `v8_cn_fetch_cloud.yml` blob `d6e28e87` / L106 已含 `${{ ... }}` 表达式；
       · `hosted` #25 与 `selfhosted` #55 的 run 时刻见 impact（`GET /actions/workflows/{id}/runs`）。
-    updated: "2026-09-24 15:25"
+    alimi_verify_20260924_1745: >-
+      阿狸咪 2026-09-24 17:41–17:50 CST 只读 API 复核（本机不跑数据、不 dispatch）：
+      · ✅ **同族漏改已补齐**：三链 `group` 已**逐字同构** —— `v8_cn_fetch_cloud.yml` blob `34138e58`
+        / `v8_cn_fetch_cloud_hosted.yml` blob `a6b811fa`（+14/−2）/ `v8_cn_fetch_cloud_selfhosted.yml`
+        blob `be72fc45`（+17/−3），均为 `v8-cn-fetch-cloud-${{ github.event.inputs.category || 'scheduled' }}`；
+        修复提交 = `cc4547ac3d`（**2026-09-24 17:41:16 CST**，commit message 明写「+ 并发组同族漏改」）。
+      · 全仓 **34** 个 workflow 的 `group:` 字符串汇总：唯一「跨文件共用」项即该表达式本身（三链同构 = 设计意图）。
+      · ⏳ 动态判据（verify_how ②③）**未过观察期**：今日 `v8_cn_fetch_cloud` 60 档中 **28 档 `cancelled`**；
+        修复前有 `13:25:24` **5 档同秒批量取消**、`14:06:09/10` **6 档同秒**；修复后（17:41+）暂无成片取消
+        （此前 15:12:16 / 15:52:19 / 16:24:52 / 16:25:14 均为单发）⇒ 需 ≥2 个交易日复核
+        「任一时刻 `v8-cn-fetch-cloud*` 各链 `in_progress` 合计 ≤1」方可转 done。
+      ⇒ 本项 `todo → pending-verify`（**代码已合、运行未验**）。
+    updated: "2026-09-24 17:44"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: cnfetch-api-quota-403-exhausted
