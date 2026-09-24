@@ -4232,7 +4232,7 @@ items:
   - id: rawdata-md-crlf-flip
     priority: P2
     owner: shared
-    status: todo
+    status: pending-verify
     what: >-
       `raw_data/` 下两个**多行 markdown** 被某条链静默改写行尾 LF→CRLF（正文零变化）：
       `raw_data/ima_strong_stock_full.md` 5504 B → 5632 B（+128 CRLF）、
@@ -4288,5 +4288,82 @@ items:
       · 同轮线上产物/链况只读核对：`data/IMA_STRONG_STOCK.js` blob `383a556295eb` / 16455 B /
         `update_time=2026-09-24 15:57:48` / `snapshot_age_h=22.56` / `source_stale=true`；
         `v8_ima_strong_stock` 最近 run **#37 success**（2026-09-24 07:56:12Z = 15:56:12 CST）。
+    jiu_fix_20260924: >-
+      〔2026-09-24 17:4x 小九**已施工** · todo → pending-verify〕
+      ① `.gitattributes` 追加窄规则 `raw_data/*.md  text eol=lf`（影响面实测**仅此 2 个文件**，
+         与 09-21 段「逐族列窄规则、刻意不写 `*.md` 宽泛式」同法）；
+      ② 两个 md 已按 LF 落库：`ima_strong_stock_full.md` blob **`4f005ed494`**（5504 B / CRLF=0）、
+         `chan_buy_point_full.md` blob `6e018e4b3e`（13842 B / CRLF=0）——
+         前者与阿狸咪上文独立算得的 `4f005ed49425` **逐字节吻合**（双机互证）。
+      ③ 根因补充：推送器读的是**工作树字节**（绕过 git clean filter）
+         ⇒ **仅加规则不够**，必须同时 `git add --renormalize <显式路径>` 收口工作树
+         （普通 `git add` 对 stat 未变者跳过 clean filter，会静默无效——本仓 09-21 已留证该陷阱）。
+      ④ 提交 `cc4547ac3d`（随 ?v 口径同批推送），推后逐字节回读自验全绿。
+      ⑤ 观察项交接收尾：`verify_how` 的 ①②（CRLF 恒 0 / blob sha 恒定）需 ≥3 个交易日复核，
+         建议由夜班（阿狸咪机）在下一交易日核对一次即可转 done。
     updated: "2026-09-24 17:20"
     updated_by: 阿狸咪的工程师(alimi-cn)
+
+  # ── P0 · 前端缓存（主人报「主站转半天打不开」· 2026-09-24 小九根治）────────────
+  - id: cache-buster-token-defeats-browser-cache
+    priority: P0
+    owner: shared
+    status: pending-verify
+    what: >-
+      〔2026-09-24 17:3x 小九〕主人报「主站转半天打不开」。取证：首页 `HTTP 200` 但
+      **TTFB 16.14s / 总计 33.45s**（同 URL 带 `--compressed` 仅 **2.77s**）
+      ⇒ 瓶颈是**全站资源被浏览器判为全新 URL 而全量重下**，不是服务端故障、也不是页面损坏。
+      根因三处，同一族（`?v=` 缓存戳的生成 / 重写 / 门禁）：
+      ① `update_v8._data_file_update_time` 自 **2026-09-10** 起返回**单调 unix 秒令牌**
+        （每次构建必变；该处旧注释自承「代价是全量重载」）⇒ ~100 个 `data/*.js` 的 URL
+        每轮全量翻新 ⇒ 浏览器缓存**命中率恒为 0**；
+      ② `v8_cache_buster_reconcile`（每 15 分钟 **+ 每次 `data/**` push**）持续重刷，
+        叠加云端 churn 使 index.html 每 2–10 分钟重建 ⇒ CDN 恒 `X-Cache: MISS` / `Age: 0`；
+      ③ 重写正则字符类为 `[A-Z0-9_]+`（**不含小写**）⇒ 线上带 `?v` 的 2 个**小写**文件名
+        （`maharo_insights.js` / `maharo_macro.js`）**永不刷新** ?v —— 与 2026-08-12
+        「`[A-Z_]+` 漏数字 ⇒ V8_CAL/W52_HIGH/TOP10_DAILY 永不更新」**完全同型**。
+    impact: >-
+      · 可用性：主人体感「转半天打不开」；实测途中出现 `ConnectionResetError(10054)`。
+      · 机制性：`?v` 与「数据是否真变」完全脱钩 ⇒ 缓存命中率 0，跨境带宽/延迟代价**恒定付出**。
+      · 决策性：本次**推翻 2026-09-10 主人令的结论**，必须留档，否则易被后人「按旧令改回去」。
+    fix: |-
+      ① `update_v8._data_file_update_time` 口径回归**中性化内容哈希**（新增
+        `_neutral_content_sha1()`：剔除 `republish_time` 后取 sha1[:10]；**必须走
+        `read_bytes().decode()`**，用 `read_text()` 会被 universal-newlines 把 CRLF 转成 LF
+        ⇒ 与推送端字节口径不一致，实测 10 抽样中 3 例失配）；
+      ② `api_push_raw._stamp_remote_index_v` 同步 —— 由「一枚全站共享 unix 令牌」改为
+        **按每个文件自己的新内容**算 `_neutral_sha`；
+      ③ `v8_build_deploy.yml`「提交前核验」判据同步 —— ⚠️ **不能再用「是否纯数字」判形态**
+        （unix 令牌本就全由 `[0-9]` 组成、与 hex 形态**不可区分**，旧判据在新口径下会 100% 误报）
+        ⇒ 改为**真比对**（本地内容哈希 vs 页面 ?v）；
+      ④ 重写正则字符类 `[A-Z0-9_]+` → `[A-Za-z0-9_]+`，**四处同改**：`update_v8.pat` ·
+        `api_push_raw._RE_V` · `api_push_raw._pat` · `build_deploy` 核验步。
+      🔴 同族矩阵铁律：本口径共 **4 处**同源实现/判据，改任意一处必须四处逐项勾选
+        （本次病灶 ③④ 正是「只改一处、漏改同族」，与 `cnfetch-fallback-concurrency-orphan` 同型）。
+      为何 09-10 的顾虑不成立：其理由为「数据回滚到旧内容 ⇒ 哈希=旧版 ⇒ 浏览器吐旧数据」，
+      但**回滚时线上文件内容也回滚了**，浏览器命中旧 ?v 取回的正是线上当前内容 ⇒ **一致**；
+      真正的「显示与线上不符」只可能源自 CDN 边缘缓存异常，与 ?v 取内容哈希还是时间戳无关。
+    verify_how: >-
+      ① 形态：线上 index.html 的 `?v` 全部为 `[0-9a-f]{10}`，不再出现「整站同一时间戳」；
+      ② 一致性：抽 ≥6 个 `data/*.js`，`中性化sha1(线上文件内容)[:10] == 页面 ?v`；
+      ③ 稳定性：**内容不变时多档构建后 ?v 保持不变**（缓存收益的直接判据，为本次核心验收）；
+      ④ 性能：首页 TTFB 由 16s 量级回落；
+      ⑤ 小写：`maharo_insights.js` / `maharo_macro.js` 的 `?v` 不再是手填常量 `20260924`。
+    evidence: >-
+      小九 2026-09-24 17:2x–17:5x CST 实测（硬抓 Pages + API 真身，非状态延续推断）：
+      · 故障面：首页 `code=200 ttfb=16.14s total=33.45s size=1358890`；`--compressed` 同 URL
+        `ttfb=1.88s total=2.77s size=424427`；响应头 `X-Cache: MISS` / `Age: 0` /
+        `x-github-edge-region: japaneast`；同刻对照 `github.com` TTFB 12.8s、`data/MARKET_ALERTS.js` 0.74s。
+      · 戳面：线上 `?v=1790242039`（= **2026-09-24 17:27:19 CST** 的 epoch）x99 + `20260924` x1；
+        提交史显示当日 `chore: 缓存戳实时对齐 ?v → 防覆盖` 达 **23 档**（08:24→17:06）。
+      · 页面完好性（排除误判）：尾部 `</html>` 闭合、大小 8 档稳定 1358890 B（非截断、非暴涨）。
+      · 修复后硬抓复验：线上 `?v` 已全为 hex 形态（101 个唯一值）；抽检
+        `MACRO_DATA` / `AI_MARKET_BRIEF` / `INDEX_QUOTES` / `ETF_DAILY_MONITOR` / `LHB_DATA`
+        **5/6 逐字节一致**（`IPO_DATA` 处 churn 窗口内，由自愈器 ≤15 分钟收敛）；
+        `MACRO_DATA.js` 页面 `3463159837` == 内容哈希 `3463159837`
+        ⇒ 证明「纯数字」是哈希巧合、**非旧口径残留**（避免被门禁误判为回潮）。
+      · 性能：抓取总耗时 33s → **6.5s**。
+      · 提交：`cc4547ac3d`（?v 口径三处 + 并发组同族）、`c040113a3e`（正则小写四处同改）；
+        两批均走净室推送器，推后逐字节回读自验全绿。
+    updated: "2026-09-24 17:51"
+    updated_by: 小九的工程师(lemoncat-cn)
