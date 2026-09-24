@@ -1241,6 +1241,10 @@ def main():
         new_entries.pop("index.html", None)
     # 记录「当前 index.html blob 是按哪棵基线算的」；提交循环里基线前进即重算（见 _ix_sha_for）
     _aligned_base = base_sha
+    # 🔴 2026-09-24 一劳永逸（小九的工程师）：记录「new_entries 是通过哪棵基线的防倒退守卫的」。
+    #   提交循环里一旦发现基线前进，必须按**新基线**对全部变更文件复验（见下方同名修复块）——
+    #   此前只重算 index.html，data/raw_data 沿用旧基线结论，正是 09-24 旧版回灌的成因。
+    _guarded_base = base_sha
 
     print(f"📊 未变化 {unchanged} / 防倒退跳过 {len(regressed)} / 待更新 {len(new_entries)}")
     # 🛡 2026-08-22 规模巡检（主人令）：单次提交过大 = 全量重建/仓库膨胀信号，告警便于及时发现
@@ -1318,6 +1322,54 @@ def main():
             else:
                 new_entries.pop("index.html", None)
                 print("  🛡 基线已前进且重算无果 → 本批不提交 index.html（?v 交由 reconcile 自愈）")
+        # 🔴🔴 2026-09-24 一劳永逸（小九的工程师 · 主人令「主站还是13点多的数据」根因修复之三）
+        #   【病灶·本仓实证】`base_sha`（L997 读到的 main）与**本处创建 commit** 之间要跑完
+        #     「20~30 个文件 × 2 次网络往返」；基线若在此期间前进，new_entries 里
+        #     data/raw_data 的 blob 仍是**按旧基线**通过防倒退守卫的 ⇒ 旧内容随新基线提交落地，
+        #     且因 parent 就是当前 tip、**快进提交、无冲突、无 422、无告警**。
+        #   【铁证·09-24】某轮 15:08 读到 base，15:13:04 才提交（commit `78883d7a`）；
+        #     期间 15:09:23 的 `f166a3e8` 已把 main 推进（brief 15:09:14 / stale=True / picks=3）。
+        #     结果 78883d7a 用 **14:59:18 / stale=False / picks=0** 的旧 brief 把它整份顶掉
+        #     ⇒ 主人拍到的「🎯 推荐关注」依旧空白（修了又被回灌，表象与「没修」无异）。
+        #   【与 09-23 index.html 修复同构】那一处已按新基线重算 index.html；
+        #     但 data/raw_data **仍沿用旧基线守卫结论** ⇒ 本块把复验扩展到全部变更文件。
+        #   【修法】基线前进时，用**新基线**逐个复验：
+        #     · 本地更新（lts ≥ rts）／新基线无此文件（新文件）→ 放行；
+        #     · 本地更旧（lts < rts）            → **剔除**，绝不提交旧版；
+        #     · 远端时间戳通道失败               → **剔除**（宁缺勿错，绝不用旧内容覆盖新版）。
+        if base_sha2 != _guarded_base:
+            print(f"  🛡 基线已前进（{_guarded_base[:8]} → {base_sha2[:8]}）"
+                  f"→ 对本批 {len(new_entries)} 个文件按**新基线**复验防倒退")
+            _existing2, _ok4 = _remote_tree_paths(base_tree2, _GUARD_PREFIXES)
+            if not _ok4 or not _existing2:
+                last_err = "基线前进后新守卫基线不可得"
+                print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt); continue
+            _kept, _dropped = {}, 0
+            for _p, _sha in new_entries.items():
+                if _p not in files:
+                    # index.html 等「非本地字节」项：已在上面按新基线重算，直接保留
+                    _kept[_p] = _sha; continue
+                _rsha = _existing2.get(_p)
+                if not _rsha:
+                    _kept[_p] = _sha; continue          # 新基线里没有 ⇒ 新文件，放行
+                _lt = _content_ts(files[_p])
+                if not _lt:
+                    _kept[_p] = _sha; continue          # 本地无时间戳 ⇒ 不拦（与原守卫同口径）
+                _rtxt, _chan = _blob_text(base_sha2, _p, _rsha, max_bytes=256 * 1024)
+                if not _rtxt:
+                    _dropped += 1
+                    print(f"  🛡️ 新基线复验通道失败 → 保守剔除 {_p}（宁缺勿错）")
+                    continue
+                _rt = _content_ts(_rtxt.encode("utf-8"))
+                if _rt and _lt < _rt:
+                    _dropped += 1
+                    regressed.append((_p, _lt, _rt))
+                    print(f"  🛡️ 防倒退跳过（新基线复验） {_p}: 本地({_lt}) < 远端({_rt})")
+                    continue
+                _kept[_p] = _sha
+            new_entries = _kept
+            _guarded_base = base_sha2
+            print(f"  🛡 新基线复验完成：保留 {len(new_entries)} / 剔除 {_dropped}")
         tree_items = [{"path": p, "mode": "100644", "type": "blob", "sha": s}
                       for p, s in new_entries.items()]
         # 修复②：变更文件 >100 时分批链式创建 tree（base_tree 逐批叠加），杜绝单请求超时。
