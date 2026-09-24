@@ -271,4 +271,15 @@ def build():
 
 
 if __name__ == "__main__":
-    build()
+    # 🛡 2026-09-24 阿狸咪的工程师（主人令「一劳永逸」· 红卡停更根治）：
+    #   原实现直接 `build()`，而 build() 在「SECTOR_RS 无 sectors」时 `return None` 且
+    #   **进程仍以 0 退出** ⇒ 上层 run_algorithms 视为成功、failed_scripts 不记
+    #   ⇒ 表现为「SECTOR_LEADERS 永久停在旧日期、链路全绿」的静默停更
+    #   （实证：自 2026-09-22 18:15 起停更 2 天，HEALTH_CHECK 判 fail 而算法链 fail=0）。
+    #   修法：产物为空即显式非零退出（可见失败），让失败账本与 Actions UI 都能看见。
+    _res = build()
+    if not _res:
+        print("::error title=v8-sector-leaders-no-data::SECTOR_LEADERS 构建返回空"
+              "（SECTOR_RS 无 sectors 或全部板块均未产出）——本轮不写盘，卡片保持上一次成功日期。")
+        raise SystemExit(1)
+

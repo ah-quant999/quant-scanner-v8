@@ -397,28 +397,6 @@ _EM_HEADERS = {
     "Accept": "*/*",
 }
 
-# 🔴🔴 2026-09-24 一劳永逸根因修复（小九 · 主人令「审计整个实时数据页，有问题马上解决」）
-# ─────────────────────────────────────────────────────────────────────────────
-# 【实测根因】东财 clist **单 host 单次请求成功率仅 ~6-10%**，失败几乎全是
-#   RemoteDisconnected（对端主动断连；与 host 无关、随机分布，非超时、非 WAF 黑名单）。
-#   而原 `_em_get_with_retry` 的 3 次重试**始终打同一个 host**（只做时间退避）
-#   ⇒ 实测「3 次全败」仍常见，**等效于没有重试**；`_etf_get_page` 更是零重试。
-# 【对照实验（各 17 页，2026-09-24 11:09 本机实测，同一网络环境）】
-#     A 现状(连接池复用·零重试)        成功  1/17
-#     B 每次新建 Session + Connection:close  成功  1/17
-#     C **失败换 host 重试（最多 3 个）**    成功 15/17   ← 唯一有效解
-#     D 共享 Session + Connection:close      成功  0/17
-#   ⇒ 结论：**换 host 才是解药，退避空等不是**。故所有东财 clist 请求统一改为换 host 重试。
-# 【一条修复同时根治四个长期停摆产物】
-#     · etf_snapshot_pages 单轮拼不齐 17 页 ⇒ ETF_DAILY_MONITOR / ETF_PULSE 停摆 23.6h
-#     · f_avg_price 60 页遍历有效样本 <3000 ⇒ AVG_PRICE_DATA 停摆 20.3h
-#     · f_concept_ranking 单次调用失败即返回 None ⇒ CONCEPT_RANKING 停摆 19.4h
-#   （2026-09-24 11:05 线上实测：上述四产物 update_time 分别为 09-23 11:30/11:30/14:49/15:42）
-# ⚠️ 与 _ETF_HOSTS（L3078）同源同语义：后者是 ETF 模块早期就摸索出的同一结论，本次把它
-#    上提到**公共请求层**，让全部东财调用方共享，不再各模块各自为战。
-_EM_HOSTS = ("https://push2delay.eastmoney.com", "https://push2.eastmoney.com") + tuple(
-    "https://%d.push2.eastmoney.com" % _i for _i in range(1, 13))
-
 # ── 美联储议息官方源（2026-09-17 主人令·根治：新增议息数据链路）─────────────
 # 背景：原 f_macro_brief() 是纯规则引擎，只读 global_macro/monetary/commodities，
 #   完全没有「议息」这一输入 ⇒ 无论重发多少次都写不出加息，且原油条目硬编码
@@ -437,33 +415,16 @@ _FED_HEADERS = {
     "Accept": "*/*",
 }
 
-def _em_get_with_retry(url, *, params, headers, timeout, max_attempts=3, label="", hosts=None):
-    """东财 push2 请求（含重试）。
-
-    2026-08-19 主人令一劳永逸式根治云端 push2 抓取抖动（B 方案）：指数退避重试。
-    🔴 2026-09-24 一劳永逸（小九）：**改为「换 host 重试」**（对照实验见 _EM_HOSTS 注释）。
-       · hosts 给出时，第 k 次尝试改用 hosts[k]（**保留原 path/query**，只换域名）；
-       · 退避同步调短为 0.4/0.8/1.2s（原 0.5/1.5/3.0s 共 5s 且同 host 重试≈无效）——
-         实测「换 host」比「空等」有效得多，且总耗时从 5s 降到 ~2s，给同轮其它任务让出预算。
-       · 未给 hosts 时行为与旧版完全一致（向后兼容，不破坏任何现有 caller 语义）。
-    三次都失败抛 RuntimeError 给上层 fn_xxx 决定是否降级返回（保留空列表语义）。"""
+def _em_get_with_retry(url, *, params, headers, timeout, max_attempts=3, label=""):
+    """2026-08-19 主人令一劳永逸式根治云端 push2 抓取抖动（B 方案）：
+       指数退避重试，遇 ConnectionError/Timeout/JSON 异常/rc!=0 时按 0.5s/1.5s/3.0s 退避。
+       三次都失败抛 RuntimeError 给上层 fn_xxx 决定是否降级返回（保留空列表语义，不破坏现有 caller）。"""
     import random as _rnd
-    delays = [0.4, 0.8, 1.2]
+    delays = [0.5, 1.5, 3.0]
     last_err = None
-    _path = ""
-    if hosts:
-        try:
-            from urllib.parse import urlsplit, urlunsplit
-            _sp = urlsplit(url)
-            _path = urlunsplit(("", "", _sp.path, _sp.query, ""))
-        except Exception:
-            hosts = None          # 解析失败 ⇒ 退回旧行为，绝不因此抛错
     for attempt in range(max_attempts):
-        _u = url
-        if hosts:
-            _u = hosts[attempt % len(hosts)].rstrip("/") + _path
         try:
-            r = _requests.get(_u, params=params, headers=headers, timeout=timeout)
+            r = _requests.get(url, params=params, headers=headers, timeout=timeout)
             d = r.json()
             if d.get("rc") == 0:
                 return d
@@ -471,9 +432,8 @@ def _em_get_with_retry(url, *, params, headers, timeout, max_attempts=3, label="
         except Exception as e:
             last_err = e
         if attempt < max_attempts - 1:
-            dly = delays[attempt] + _rnd.uniform(0, 0.3)
-            print(f"  ⚠️ push2 抖动({label or url}) 尝试{attempt+1}/{max_attempts}: "
-                  f"{last_err} → {dly:.1f}s 后换 host 重试")
+            dly = delays[attempt] + _rnd.uniform(0, 0.4)
+            print(f"  ⚠️ push2 抖动({label or url}) 尝试{attempt+1}/{max_attempts}: {last_err} → {dly:.1f}s 后重试")
             import time as _t; _t.sleep(dly)
     raise RuntimeError(f"push2 重试{max_attempts}次仍失败: {last_err}")
 
@@ -516,7 +476,6 @@ def em_clist(fs, fields, fid="f62", stat="1", pz=5000, po="1", pn=1, timeout=15)
     po="1" 降序(取净流入最高)，po="0" 升序(取净流出最高)。
     pn 页码（默认 1），pz 单页大小（默认 5000，但 push2delay 实际硬截 100，分页需自循环）。
     2026-08-19 主人令：em_clist/em_ulist_np 加 _em_get_with_retry 指数退避，根治云端 WAF 抖动。
-    🔴 2026-09-24（小九）：改走 `hosts=_EM_HOSTS` ⇒ 重试时**换 host**（实测唯一有效解）。
     """
     params = {
         "pn": str(pn), "pz": str(pz), "po": po, "np": "1", "fltt": "2", "invt": "2",
@@ -529,7 +488,6 @@ def em_clist(fs, fields, fid="f62", stat="1", pz=5000, po="1", pn=1, timeout=15)
             f"{_EM_DELAY}/api/qt/clist/get", params=params,
             headers=_EM_HEADERS, timeout=timeout,
             label=f"clist {fs.split(' ')[0]} pz={pz} po={po}",
-            hosts=_EM_HOSTS,
         )
     except RuntimeError:
         return []
@@ -549,33 +507,9 @@ def _to_yi(v):
 _IND_FS = "m:0+t:6+f:!2,m:0+t:13+f:!2,m:0+t:80+f:!2,m:1+t:2+f:!2,m:1+t:23+f:!2,m:0+t:7+f:!2,m:1+t:3+f:!2"
 
 def _all_individual_recs(fields="f12,f14,f2,f3,f62,f184"):
-    """取全市场个股主力净流入并集（降序 TOP + 升序 TOP 合并去重），用于准确求和与净流入/流出 TOP。
-
-    返回 (recs, desc_ok, asc_ok)。
-
-    🔴 2026-09-24 一劳永逸（小九）：**两榜必须都拿到**，缺榜要显式上报，不得静默降级。
-      血证：09-24 11:35 那轮 desc（净流入降序）静默返回 []（em_clist 失败一律返回空表，
-      与「真的没有正净流入」无法区分）⇒
-        · capital_flow_data.top_inflow 变空数组 ⇒ AI速览「主力大单流入」整条消失、
-          mainline_picks（前端「🎯 推荐关注」）为 0 ⇒ 主人实拍「推荐股票呢？」；
-        · market_net 只剩净流出半边 ⇒ -296.77亿，而完整口径实测仅 -162.13亿（失真 83%）。
-      现：任一榜为空 ⇒ 立刻补一次（em_clist 内部已遍历 host 池换 host 重试，这里补的
-      是「时刻」这一维 —— 换节点后常能过）；仍缺则由调用方按降级处置（不发布合计）。
-    """
-    desc = []
-    asc = []
-    _max_retry = 3
-    for _attempt in range(_max_retry):
-        if not desc:
-            desc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="1")
-        if not asc:
-            asc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="0")
-        if desc and asc:
-            break
-        if _attempt < _max_retry - 1:
-            _backoff = 1.5 * (_attempt + 1)
-            print(f"  ⚠️ 个股资金榜第{_attempt+1}次补抓后仍有空榜(desc={bool(desc)},asc={bool(asc)}) ⇒ {_backoff:.1f}s 后换 host 再补")
-            time.sleep(_backoff)
+    """取全市场个股主力净流入并集（降序 TOP + 升序 TOP 合并去重），用于准确求和与净流入/流出 TOP。"""
+    desc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="1")
+    asc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="0")
     by_code = {}
     for r in desc + asc:
         c = str(r.get("f12"))
@@ -589,28 +523,7 @@ def _all_individual_recs(fields="f12,f14,f2,f3,f62,f184"):
             "net": _to_yi(r.get("f62")),
             "net_pct": round(float(r.get("f184") or 0), 2),
         }
-    return list(by_code.values()), bool(desc), bool(asc)
-
-
-def _persist_last_good_capital(payload):
-    """缓存今日最近一次成功抓到 top_inflow 的个股资金批次（raw_data/_last_good_capital_flow.json），
-    供 gen_market_brief 在新鲜抓取失败时兜底（仅限当日 cached_at，绝不跨日沿用）。
-
-    🛡 2026-09-24 一劳永逸（小九）：根因是 em_clist 取东财个股资金榜连接抖动/限流会静默返回空表，
-    致 top_inflow 为空、AI速览「🎯 推荐关注」整条消失（主人实拍「推荐股票呢？」）。
-    修法：成功抓到流入榜即落盘本批次；gen_market_brief 仅在本轮新鲜流入榜为空且
-    该缓存 cached_at 为当日时才启用，确保卡片不空白、也绝不把旧版当新版。"""
-    try:
-        if not (payload or {}).get("top_inflow"):
-            return
-        _snap = dict(payload)
-        _snap["cached_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        (RAW_DIR / "_last_good_capital_flow.json").write_text(
-            json.dumps(_snap, ensure_ascii=False), encoding="utf-8")
-        print(f"  💾 已缓存今日最近成功个股资金批次（top_inflow={len(_snap['top_inflow'])}）")
-    except Exception as _e:
-        print(f"  ⚠️ 缓存最近成功批次失败: {_e}")
-
+    return list(by_code.values())
 
 # 单次运行状态跟踪（用于前端定时任务跟踪看板）
 _run_status = {}
@@ -1564,31 +1477,8 @@ def _fetch_overseas_indices():
 def f_overseas_markets():
     """海外/亚太股市观测（注册于 OVERSEAS_MARKETS→intraday，盘中每30分刷新）。
     恒生指数/日经225/韩国KOSPI/台湾加权：反映亚太风险偏好，对 A 股开盘与外资流向有传导。
-    数据真实抓取，绝不编造点位。
-    🔴 2026-09-24 一劳永逸（小九）：原实现抓取失败仍返回全 null 对象 ⇒ 每轮把昨日
-    有效点位覆盖成 null（前端把 null 渲染成 0.00，主人实测「恒生 0.00」），且 run
-    依旧全绿、不触发小九 cn 兜底 ⇒ 空盘循环。
-    修法（对齐 2026-09-22 US_HK_MAP 加固模式）：
-      ① 函数内退避重试 3 次（间隔 5s/15s），把瞬时限流挡在函数内；
-      ② 3 次仍全 null ⇒ return None —— run() 判 empty，**不覆盖既有产物**，
-        宁可沿用昨日/上一轮有效点位，绝不写空盘；
-      ③ note 按抓取时段动态生成（原硬编码「08:25 抓取时亚太尚未开盘」与
-        intraday 盘中每轮刷新语义自相矛盾）。"""
-    idx = []
-    for _att in range(3):
-        idx = _fetch_overseas_indices()
-        if any(x.get("chg_pct") is not None for x in idx):
-            if _att:
-                print(f"  ✅ OVERSEAS_MARKETS: 第 {_att + 1} 次尝试成功（前 {_att} 次为空）")
-            break
-        if _att < 2:
-            _dly = (5, 15)[_att]
-            print(f"  ⚠️ OVERSEAS_MARKETS: 第 {_att + 1}/3 次全空 → {_dly}s 后重试")
-            time.sleep(_dly)
-    if not any(x.get("chg_pct") is not None for x in idx):
-        print("  🔴 OVERSEAS_MARKETS: 3 次尝试全部无数据 ⇒ 返回 empty（不覆盖既有产物）")
-        print("::error title=v8-overseas-markets-empty::海外指数 3 次尝试全无数据（源限流/网络异常），保留上一轮产物")
-        return None
+    数据真实抓取，失败时 value=None（前端标注「数据未接入」），绝不编造点位。"""
+    idx = _fetch_overseas_indices()
     now = now_cst()
     ups = sum(1 for x in idx if x.get("chg_pct") is not None and x["chg_pct"] > 0)
     downs = sum(1 for x in idx if x.get("chg_pct") is not None and x["chg_pct"] < 0)
@@ -1598,19 +1488,11 @@ def f_overseas_markets():
         bias = "亚太偏弱"
     else:
         bias = "亚太分化"
-    # note 动态生成：09:30 前亚太未全部开盘（日经/KOSPI 08:00 已开、恒生/台湾 09:00/09:30），
-    # 09:30 后为盘中实时口径。原文案硬编码「08:25 抓取时亚太尚未开盘」在盘中轮次属误导。
-    if (now.hour, now.minute) < (9, 30):
-        _note = ("亚太主要指数为最新可得点位（北京时间 09:30 前日经/KOSPI 已开盘、恒生/台湾加权尚未开盘或为昨收），"
-                 "反映隔夜与早盘亚太风险偏好，对 A 股开盘有传导。")
-    else:
-        _note = ("亚太主要指数盘中点位（恒生 09:30 / 台湾加权 09:00 / 日经·KOSPI 08:00 开盘），"
-                 "反映亚太风险偏好，对 A 股午后走势与外资流向有传导。")
     return {
         "date": now.strftime("%Y-%m-%d"),
         "indices": idx,
         "bias": bias,
-        "note": _note,
+        "note": "恒生指数/日经225/韩国KOSPI/台湾加权为前一交易日收盘（北京时间08:25抓取时亚太尚未开盘），反映隔夜亚太风险偏好，对A股开盘有传导。",
         "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
         "auto": True,
     }
@@ -2880,42 +2762,19 @@ def f_limit_up_broken():
 def f_capital_flow_data():
     # 个股主力净流入排行：全市场降序+升序并集（push2delay 镜像），
     # 规避实时 push2 host 的 WAF 重置，且避免 pz 截断只取头部导致净流出缺失。
-    recs, _desc_ok, _asc_ok = _all_individual_recs()
+    recs = _all_individual_recs()
     if not recs:
         return None
     recs.sort(key=lambda x: x["net"], reverse=True)
     inflow = [x for x in recs if x["net"] > 0][:20]
     outflow = sorted([x for x in recs if x["net"] < 0], key=lambda x: x["net"])[:20]
-    _note = "全市场个股主力净流入(亿)，来源东方财富push2delay；非席位四路口径"
-    _degraded = not (_desc_ok and _asc_ok)
-    if _degraded:
-        # 🛡 2026-09-24 一劳永逸（小九）：半边缺失 ⇒ **绝不发布 market_net**。
-        #   半边加和实测 -296.77亿 vs 完整 -162.13亿（失真 83%），且会连带把
-        #   AI速览资金灯压到「资金大幅流出」。宁缺勿错：合计置 None（下游走
-        #   「资金待更新」灰灯），榜单只出真实拿到的那一侧。
-        print(f"  🔴 个股资金榜降级：desc_ok={_desc_ok} asc_ok={_asc_ok} ⇒ 合计口径不可用"
-              f"（market_net=null，避免半边失真）")
-        payload = {
-            "top_inflow": inflow,
-            "top_outflow": outflow,
-            "market_net": None,
-            "degraded": True,
-            "degrade_note": "个股资金榜降级：净流入/净流出榜单有一侧抓取失败，"
-                            "全市场主力净额不可用（不发布 market_net，避免半边加和失真）",
-            "note": _note,
-        }
-    else:
-        payload = {
-            "top_inflow": inflow,
-            "top_outflow": outflow,
-            "market_net": round(sum(x["net"] for x in recs), 2),
-            "note": _note,
-        }
-    # 🛡 2026-09-24 一劳永逸（小九）：成功抓到流入榜 ⇒ 缓存「今日最近成功批次」，
-    #   供 gen_market_brief 在新鲜抓取失败时兜底（仅限当日，绝不跨日沿用）。
-    if inflow:
-        _persist_last_good_capital(payload)
-    return payload
+    market_net = round(sum(x["net"] for x in recs), 2)
+    return {
+        "top_inflow": inflow,
+        "top_outflow": outflow,
+        "market_net": market_net,
+        "note": "全市场个股主力净流入(亿)，来源东方财富push2delay；非席位四路口径",
+    }
 
 def f_north_fund():
     # 北向资金：港交所 2024-05 后停止披露 top_buy，系统标「停止」
@@ -3224,45 +3083,30 @@ def _etf_fresh_skip():
         return False
 
 
-_ETF_PAGE_ATTEMPTS = 4     # 单页最多试 4 个不同 host（换 host 是唯一有效解，见 _EM_HOSTS 注释）
-
-
 def _etf_get_page(pn, host):
     """取 clist 一页。返回 (ok, rows, total)：
        ok=False 明确表示**请求失败**（区别于「已经到底了」——二版之前的实现
-       就是把失败当成了「遍历到末尾」，才写出 264/1602 只的半截合计）。
-
-    🔴 2026-09-24 一劳永逸（小九）：**单页失败改为「换 host 重试」**（本次四产物停摆的直接根因）。
-       · 实测单 host 单次成功率仅 ~6-10%（RemoteDisconnected）；原实现一页**只给一次机会、零重试**
-         ⇒ 单轮 17 页只拿到 1~8 页 ⇒ 只能靠跨轮累积 ⇒ 盘中 45 分钟窗口一到全部失效
-         ⇒ **永远拼不齐** ⇒ ETF_DAILY_MONITOR / ETF_PULSE 双双停摆（线上实测停 23.6h）。
-       · 现每页最多换 _ETF_PAGE_ATTEMPTS 个 host 尝试（首个为调用方指定 host），成功率 ~88%。
-       · ⚠️ 每次尝试**必须刷新 params["_"]**：原实现时间戳在请求外只算一次，
-         重试会带同一 `_` 值，服务端可能按该参数命中同一缓存/同一故障节点 ⇒ 重试等于白打。
-    """
+       就是把失败当成了「遍历到末尾」，才写出 264/1602 只的半截合计）。"""
     params = {
         "pn": str(pn), "pz": str(_ETF_PAGE), "po": "1", "np": "1", "fltt": "2", "invt": "2",
         "ut": "b2884a393a59ad64002292a3e90d46a5",
         "fid": "f62", "fs": _ETF_FS, "stat": "1", "fields": _ETF_FIELDS,
+        "_": int(time.time() * 1000),
     }
-    _hosts = list(dict.fromkeys([host] + list(_ETF_HOSTS)))[:max(1, _ETF_PAGE_ATTEMPTS)]
-    for _i, _h in enumerate(_hosts):
-        params["_"] = int(time.time() * 1000) + _i
-        try:
-            r = _requests.get(f"{_h}/api/qt/clist/get", params=params,
-                              headers=_EM_HEADERS, timeout=15)
-            if r.status_code != 200:
-                continue
-            d = r.json()
-            if d.get("rc") != 0:
-                continue
-            dd = d.get("data")
-            if not dd:
-                return True, [], 0        # rc=0 但无 data ⇒ 真·没有更多页
-            return True, _em_clean_rows(dd.get("diff", []) or []), int(dd.get("total") or 0)
-        except Exception:
-            continue
-    return False, [], 0
+    try:
+        r = _requests.get(f"{host}/api/qt/clist/get", params=params,
+                          headers=_EM_HEADERS, timeout=15)
+        if r.status_code != 200:
+            return False, [], 0
+        d = r.json()
+        if d.get("rc") != 0:
+            return False, [], 0
+        dd = d.get("data")
+        if not dd:
+            return True, [], 0            # rc=0 但无 data ⇒ 真·没有更多页
+        return True, _em_clean_rows(dd.get("diff", []) or []), int(dd.get("total") or 0)
+    except Exception:
+        return False, [], 0
 
 
 def _etf_cache_load(today):
@@ -3285,37 +3129,6 @@ def _etf_cache_save(c):
         print(f"  ⚠️ ETF 拼页缓存写入失败（不影响本轮）：{e}")
 
 
-def _etf_snapshot_cached_full(today):
-    """🔴 零请求：从跨轮拼页缓存读取**完整**底表（当日、17 页全齐且 ≥_ETF_MIN_ROWS）。
-
-    专供 `_etf_snapshot()` 的「新鲜度短路」分支使用：底表刚更新过就不该再打东财，
-    但**必须把缓存重算成本轮产物落盘** —— 否则 f_etf_daily_monitor 返回 None、
-    save() 不写盘，raw_data 会长时间停在上一次成功写入的时刻。
-    血证（主人 09-24 实拍）：raw_data/etf_daily_monitor.json 卡在 09-23 11:30:22 的
-    半截合计 -4.95亿，AI速览连挂 4 轮 3 轮重发同一数字。
-    不完整一律返回 None（半截合计禁止放行，判据与 _etf_snapshot_inner 尾部完全一致）。"""
-    try:
-        c = _etf_cache_load(today)
-    except Exception:
-        return None
-    pages = c.get("pages") or {}
-    if not pages:
-        return None
-    total = int(c.get("total") or 0)
-    npages = min(_ETF_MAX_PAGES, (total + _ETF_PAGE - 1) // _ETF_PAGE) if total else _ETF_DEFAULT_PAGES
-    if any(str(pn) not in pages for pn in range(1, npages + 1)):
-        return None
-    by_code = {}
-    for pn in range(1, npages + 1):
-        for r in (pages.get(str(pn)) or [0, []])[1]:
-            code = str(r.get("f12") or "")
-            if code:
-                by_code[code] = r
-    if len(by_code) < _ETF_MIN_ROWS:
-        return None
-    return by_code
-
-
 def _etf_snapshot():
     """全市场 ETF 快照（code → 原始字段字典）；拼不齐返回 None（宁缺勿错）。
 
@@ -3330,19 +3143,7 @@ def _etf_snapshot():
         print("  ⏭️ ETF 快照本轮已尝试且未拼齐（失败记忆）⇒ 不再重复请求")
         return None
     if _etf_fresh_skip():
-        # 🛡 2026-09-24 一劳永逸（小九）：底表 20 分钟内刚更新 ⇒ 不重复发请求，
-        #   但**必须用缓存底表把本轮产物重算落盘**。
-        #   原实现此处直接 `return None` ⇒ f_etf_daily_monitor() 返回 None ⇒ save() 不写，
-        #   ⇒ raw_data/etf_daily_monitor.json 长时间停在上一次成功写入的时刻，
-        #   而下游 gen_market_brief 照读不误 ⇒ 把昨日半截合计 -4.95亿 当今日发布
-        #   （实测：10:23→11:35 共 4 轮速览里 3 轮重发同一数字，主人原话「这数字一直没变过！」）。
-        #   现改为：缓存底表**完整**（当日 · 17 页全齐 · ≥_ETF_MIN_ROWS）才复用重算；
-        #   不完整仍返回 None（半截合计 = -4.95亿 假值的同类错误，禁止放行）。
-        _cached_full = _etf_snapshot_cached_full(today)
-        if _cached_full:
-            print("  ♻️ ETF 底表 20 分钟内已更新 ⇒ 复用缓存底表重算产物（零请求，保持产物新鲜）")
-            return _cached_full
-        print(f"  ⏭️ ETF 底表 {_ETF_FRESH_S // 60} 分钟内刚更新且缓存不完整 ⇒ 本轮跳过")
+        print(f"  ⏭️ ETF 底表 {_ETF_FRESH_S // 60} 分钟内刚更新 ⇒ 本轮跳过（省请求）")
         return None
     if _etf_spent["secs"] >= _ETF_TOTAL_BUDGET:
         print(f"  🚫 ETF 快照累计已耗 {_etf_spent['secs']:.0f}s ≥ 预算 {_ETF_TOTAL_BUDGET}s ⇒ 本轮不再尝试")
@@ -3443,40 +3244,6 @@ def _etf_snapshot_inner(today):
     return by_code
 
 
-def _etf_snapshot_partial():
-    """部分快照（🔴 零请求）：只读当日跨轮拼页缓存，把已拿到的页拼成部分快照。
-
-    2026-09-24 小九·一劳永逸：七版「17 页全齐才产出」治好了 -4.95 亿半截合计，
-    但 ETF_PULSE 与底表共用 _etf_snapshot() ⇒ 底表整天拼不齐时，盘中异动卡
-    被连带锁死一整天（实测 09-24 全天停 09-23 11:29）。量比 TOP12 异动榜
-    **不做全市场合计**，部分页样本偏差可接受（note 标注页数），故允许降级。
-    约束：
-      · 绝不发请求（补页/失败记忆/预算全由 _etf_snapshot 管，本函数只读缓存）；
-      · 仅限 ETF_PULSE 使用，ETF_DAILY_MONITOR 的合计口径必须保持 17 页全齐
-        （放半截页拼合计 = -4.95 亿恒定 bug 复辟，绝对禁止）；
-      · 已攒页少于 1 页的量 ⇒ 无意义，返回 None。"""
-    today = now_cst().strftime("%Y%m%d")
-    try:
-        c = _etf_cache_load(today)
-    except Exception:
-        return None, 0, 0
-    pages = c.get("pages") or {}
-    total = int(c.get("total") or 0)
-    if not pages:
-        return None, 0, 0
-    npages = min(_ETF_MAX_PAGES, (total + _ETF_PAGE - 1) // _ETF_PAGE) if total else _ETF_DEFAULT_PAGES
-    by_code = {}
-    for _k, _v in pages.items():
-        for r in (_v or [0, []])[1]:
-            code = str(r.get("f12") or "")
-            if code:
-                by_code[code] = r
-    if len(by_code) < 200:
-        # <2 页（<200 只）样本异动榜纯噪声，宁可停摆等下一轮（拼页跨轮累积很快）
-        return None, 0, 0
-    return by_code, len(pages), npages
-
-
 def f_etf_daily_monitor():
     # ETF 日监控：全市场 ETF 当日主力净流入排名（口径见上方 _ETF_FS 注释）。
     # 输出 schema 不变：{total_etf,total_net,top_inflow,top_outflow}（AI速览/ETF卡直读）。
@@ -3505,18 +3272,7 @@ def f_etf_pulse():
     # ETF 盘中异动：筛「量比>1.2 的活跃 ETF」按量比排序（降级为成交额/涨跌幅 TOP）
     # 与 f_etf_daily_monitor 共用同一份全市场快照（_etf_snapshot），**不额外发请求** ——
     # 原实现两个模块各自分页 16 次（共 32 次），是本轮 502 暴露面最大的地方。
-    # 🔴 2026-09-24 降级路径（小九）：底表 17 页未拼齐（跨轮累积中）⇒ _etf_snapshot()
-    #    返回 None，原实现直接 return None ⇒ 异动卡停摆一整天。现改用
-    #    _etf_snapshot_partial()（零请求、只读缓存）出部分快照榜，note 标注页数；
-    #    全量底表拼齐后自动恢复全市场口径。合计口径（ETF_DAILY_MONITOR）不放降级。
     snap = _etf_snapshot()
-    _snap_note = ""
-    if not snap:
-        snap, _got, _need = _etf_snapshot_partial()
-        if not snap:
-            return None
-        _snap_note = f"（部分快照 {_got}/{_need} 页；全量底表拼齐后自动恢复全市场口径）"
-        print(f"  ⚠️ ETF_PULSE: 底表未拼齐 → 降级部分快照 {_got}/{_need} 页（零请求）")
     if not snap:
         return None
 
@@ -3559,7 +3315,7 @@ def f_etf_pulse():
         "chg": "盘中异动：涨跌幅>2% 的 ETF",
         "amt": "盘中暂无显著放量，展示成交额最活跃 TOP12",
     }[mode]
-    return {"etfs": etfs, "note": note + _snap_note}
+    return {"etfs": etfs, "note": note}
 
 
 def f_analyst_ratings():
@@ -3681,6 +3437,17 @@ def f_experiment():
             continue
     stocks = list(by_code.values())
     if not stocks:
+        # 🛡 2026-09-24 阿狸咪的工程师（主人令「一劳永逸」· 红卡停更根治）：
+        #   本函数是 EXPERIMENT 卡的**唯一产出方**，数据全依赖东财 push2delay 实时快照。
+        #   原实现仅 `return None` ⇒ 上游 save() 因 _is_empty_payload 静默跳过写盘（该保护
+        #   本身正确，防空数据洗掉好数据），但**空返回零可见性** ⇒ 表现为
+        #   「卡永久停在旧日期、job 全绿、无人知晓」——实证 EXPERIMENT 自 2026-09-22 18:13
+        #   起停更 2 天，HEALTH_CHECK 判 fail 而算法链 failed_scripts=0（静默停更）。
+        #   修法：空返回时显式打 ::error:: 让 Actions UI 标红（与 f_market_alerts 既有范式一致），
+        #   使「东财抖动 ⇒ 本卡抓不到」变成可见故障而非静默陈旧。
+        print("::error title=v8-experiment-no-data::EXPERIMENT 抓取返回空"
+              "(东财 push2delay em_clist 未返回任何记录)——本次不写盘，"
+              "卡片将保持上一次成功日期；请检查东财接口可用性/反爬窗口。")
         return None
 
     def pick(pred, key, n=15):
@@ -5135,34 +4902,10 @@ def main(category=None, only=None):
     print(f"  ✅ 接线自检通过：tasks={len(_wf_set)} 个变量，"
           f"CATEGORY_MAP / VAR_TO_RAW 三重登记齐备（无重名、无漏登）")
 
-    # 🔴 2026-09-24 一劳永逸（小九的工程师 · 主人令「主站还是13点多的数据」根因修复之四）
-    #   【病灶·本仓实证】本循环**没有任何总时长上限**：任一源在网络层 hung（东财/新浪对
-    #     海外 IP 反爬时单请求可长时间无响应），整轮就长期停在这一步。
-    #     09-24 实测：15:23 派发的 run `#35969326733` **卡在「📡 抓中国数据」32 分钟**
-    #     （只有 job 级 timeout 60min 才会被杀）⇒ 该档位长时间被占、后续 run 全部 pending
-    #     （15:32/15:40/15:41 三个 run 干等），且**永远走不到后面的 gen_market_brief
-    #     与推送步骤** ⇒ 数据与 AI速览双双冻结 —— 与「13 点多数据」是同一类病灶。
-    #   【修法】给抓取循环设**总时长预算**（默认 720s，可用 FETCH_BUDGET_SEC 调）：
-    #     预算内正常抓；超预算的剩余源**本轮跳过**、留给下一轮（幂等闸门自动去重）。
-    #     ⚠️ 关键语义：**跳过剩余源 ≠ 丢弃已抓到的数据** —— 循环结束后照常落盘、
-    #     照常跑 gen_market_brief、照常进入推送 ⇒ 站点表现为「部分更新」而非空窗，
-    #     且整轮时长可预期。这正是「宁缺勿错 + 不空窗」的取舍。
-    _budget_sec = float(os.environ.get("FETCH_BUDGET_SEC", "720"))
-    _t_budget_end = time.time() + _budget_sec
-    _skipped_budget = []
     for var, fn in tasks:
         if target_vars is not None and var not in target_vars:
             continue
-        if time.time() > _t_budget_end:
-            _skipped_budget.append(var)
-            print(f"  ⏳ {var} 跳过：本轮抓取已用满 {int(_budget_sec)}s 预算"
-                  f"（防单源 hung 拖死整轮、堵住并发组）")
-            continue
         run(var, fn)
-    if _skipped_budget:
-        print(f"  ⏳ 本轮因超时预算跳过 {len(_skipped_budget)} 个源（下一轮补抓）："
-              f"{', '.join(_skipped_budget[:8])}"
-              f"{' ...' if len(_skipped_budget) > 8 else ''}")
 
     # 盘前必须把盘中/实时模块的当日数据清空，避免昨日收盘数据挂到开盘前（仅在 premarket 阶段执行）
     _clear_intraday_for_premarket(category, only=only)
