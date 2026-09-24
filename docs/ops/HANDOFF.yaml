@@ -3037,8 +3037,19 @@ items:
       c21e4975f8（fetcher 回溯版）；09-23 阿狸咪手动补 09-22 数据（date=20260922, total=35, basic_pass=9）
       直推 main，远端 update_time 由 2026-09-21 23:23 刷新至 2026-09-23 04:55。
     verified_at: "2026-09-23 04:55 CST（阿狸咪手动补数据 + 直推，红警解除；自动化每轮刷新待下一档 cn fetch 终验）"
-    updated: "2026-09-23 04:55"
-    updated_by: 阿狸咪的工程师
+    retirement: >-
+      2026-09-24 小九白天档（主人令「卡已连根拔掉，后台生成器一并停」）：本卡**原子退役**。
+      · 前端 0 引用：index.html / logic.html 对 `BOARD_FIRST_LIMIT` 与「一进二」均 **0 命中**（卡早已拔除）
+        ⇒ 产物 `data/BOARD_FIRST_LIMIT.js` 与 `raw_data/board_first_limit.json` 已成**孤儿**，
+        而 `algorithms/fetch_board_first_limit.py` 仍被 cn fetch 每轮调用 ⇒ 每日重建该孤儿（唯一尾巴）。
+      · 已移除 `.github/workflows/v8_cn_fetch_cloud.yml` 的 `board_first` 步
+        （含 `V8_SF_board_first` 输出声明与软失败汇总循环项 `soft_1 board_first soft_3` → `soft_1 soft_3`）；
+      · 已删脚本本体 `algorithms/fetch_board_first_limit.py` + 产物双份（data / raw_data）；
+      · 健康面板 `all_BOARD_FIRST_LIMIT` 属 `v8_health_check.py` 的 `check_all_data_files()` **动态扫描**项
+        （全文件 0 处显式 CARD_DEF）⇒ 产物删除后下一轮巡检**自动收敛**，无需改 health_check。
+      · 主站部署需 workflow-scope token（阿狸咪本机 PAT 无；小九机 token scopes = gist,repo,workflow）⇒ 由小九收口。
+    updated: "2026-09-24 08:22"
+    updated_by: 小九的工程师
 
   - id: algo-step16-sanity-hardfail
     priority: P1

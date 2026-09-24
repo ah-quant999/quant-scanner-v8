@@ -555,63 +555,6 @@ jobs:
             exit 1
           fi
 
-      - name: "🏀 主板首板·一进二观察（fetch_board_first_limit，每轮刷新）"
-        id: board_first
-        # 2026-09-23 一劳永逸（主人令「一进二观察卡停更 2 天，修」·阿狸咪夜间窗口）：
-        #   该卡 09-22 05:19 上线时只落了手动快照，fetcher（algorithms/fetch_board_first_limit.py）
-        #   从未接入任何自动化（全仓 workflow 0 引用）⇒ 数据停在 2026-09-21 23:23，
-        #   健康面板报「超过通用红线 1620 分钟」。本步把它挂进 cn fetch 链。
-        #   ⚠️ 09-23 首版只挂 post_close ⇒ 09-23 盘前 run 直接 skip，要等 17:20 才刷新，
-        #      与「一劳永逸」相悖；故改为【每轮刷新】（不再挑时段）。
-        #   🛡 2026-09-23 二次修订（主人令「周末跑了浪费吧」·阿狸咪的工程师）：
-        #      涨停池是**收盘才定稿**的日频数据 ⇒ 盘前/盘中/周末每一轮 run 都不可能产出
-        #      比上一交易日更新的内容：周末（category=all，td.proceed 仍为 true）必然只是
-        #      重取同一份数据。故本步加 `td.is_trading_day != 'false'` 闸门 —— 周末零请求跳过；
-        #      td 步骤解析失败时其输出为空（'' != 'false'）⇒ 保守放行，不会漏跑。
-        #      盘前/盘中的冗余轮次由**生成器内置增量闸门 need_refresh()** 收敛：
-        #      只花 1 次交易日历请求，即判断「已采集档的 date 已跟上最近已收盘交易日
-        #      且 K 线口径版本一致且覆盖充足」⇒ 早退，不发涨停池/K 线请求（零空转）。
-        #      即：每交易日只真抓 1 次（收盘后首轮），其余轮次零请求。
-        #   产物 raw_data/board_first_limit.json + data/BOARD_FIRST_LIMIT.js 由下方
-        #   soft_10/soft_14 推送步按 git status 增量自动上线，无需新增推送口。
-        #   脚本自身带五道护栏：① 抓空不覆盖（防空壳，同 cnfetch-empty-shell-block 族）
-        #   ② 同日去重（同一交易日只落首轮，不产生重复推送）
-        #   ③ 向前回溯（非交易/源未更新时沿交易日历回退到最近有池交易日，杜绝空壳）；
-        #      显式传日期 = 手动回补强制覆盖。
-        #   ④ 增量闸门 need_refresh()：已采集且口径/kline 覆盖达标 ⇒ 早退（见上）。
-        #   ⑤ K 线重试封顶（kline_try≤3）：K 线源不可用时最多重试 3 轮即停，防「每轮重试」风暴。
-        #   🔴 2026-09-23 三次修订（主人令「K线严格过滤马上加，明早我要看到」）：
-        #      本步产物新增 K 线严格过滤结果（strict_pass / k_flags / 读数）：
-        #      · K 线源 = **新浪日线**（实测：东财 push2his 含 52. 编号子域、以及
-        #        akshare.stock_zh_a_hist 在本机与云端均被 WAF 拒；腾讯 gtimg web.ifzq 返回 501；
-        #        新浪 getKLineData 返回当日真值）—— 一次 HTTP 取 320 根，候选仅 20~40 只。
-        #      · 回退 = 仓内 raw_data/kline_cache（已入仓·零网络），其尾根日期 < 信号日则判
-        #        'stale' —— **不给过滤结论**，绝不拿旧 K 线冒充当日（诚实降级）。
-        #      · 过滤口径 = 交付区《选股公式解读与审计_2026-09-21》+ 回测实现 bt_yijiner.py
-        #        的 components()，六项忠实复刻；筹码穿刺分支因外部 SSRP 缺失按审计砍除。
-        #   🔴 2026-09-23 追加（错日根因一劳永逸·阿狸咪的工程师）：默认模式由「以今天为起点试」
-        #      改为**先用交易日历取「最近一个已收盘交易日」**（今天未过 16:00 CST 则取上一交易日）。
-        #      病灶：东财 getTopicZTPool 对「未收盘的今天 / 未来日」一律吐**最新存量池**
-        #      （实测 date=未来日 返回内容与当日完全相同；周六/周日 才是真空池）⇒ 原「空池才回溯」
-        #      护栏对此**永不触发** ⇒ 盘前 08:20 拿到上一交易日池却按「请求日」打标
-        #      （卡面写「今日」实为昨日，假新鲜）。回溯亦改为**沿交易日历**只试真交易日。
-        #      显式传日期（手动回补）行为不变。
-        #   软失败 + 强制 annotation（本文件 09-08 主人令范式）：一进二观察卡失败不拖垮
-        #   全链盘后数据，但必须在软失败汇总里可见。
-        # 🛡 2026-09-23 主人令「周末跑了浪费吧」：本卡是**收盘定稿**的日频数据，周末
-        #   （category=all，td.proceed 仍为 true）跑本步只会重取同一份上一交易日数据。
-        if: steps.gate.outputs.skip != 'true' && steps.td.outputs.proceed != 'false' && steps.td.outputs.is_trading_day != 'false'
-        timeout-minutes: 10
-        continue-on-error: true
-        shell: bash
-        run: |
-          python algorithms/fetch_board_first_limit.py
-          _v8_rc=$?
-          if [ "$_v8_rc" != "0" ]; then
-            echo "::error title=v8-softfail:board_first(exit=$_v8_rc)::🏀 主板首板·一进二观察抓取软失败，退出码 $_v8_rc。本步不阻断 job，请核对健康面板 BOARD_FIRST_LIMIT 卡新鲜度。"
-            exit 1
-          fi
-
       - name: "📤 推送 raw_data/ 到 main（来源驱动增量，Contents API）"
         id: soft_10
         # 🔴 2026-08-30 22:3x 同类 bug 一次清干净（实测 run 33312102792 / 33309687912
@@ -956,7 +899,6 @@ jobs:
         shell: bash
         env:
           V8_SF_soft_1: ${{ steps.soft_1.outcome }}
-          V8_SF_board_first: ${{ steps.board_first.outcome }}
           V8_SF_soft_3: ${{ steps.soft_3.outcome }}
           V8_SF_soft_4: ${{ steps.soft_4.outcome }}
           V8_SF_soft_5: ${{ steps.soft_5.outcome }}
@@ -974,7 +916,7 @@ jobs:
         run: |
           FAILED=""
           # 显式列出本 job 全部软失败步 id（生成期确定，不依赖 env 扫描，永不漏）
-          for sid in soft_1 board_first soft_3 soft_4 soft_5 soft_6 soft_7 soft_8 soft_9 soft_10 soft_11 soft_12 soft_13 soft_14 soft_15 soft_16; do
+          for sid in soft_1 soft_3 soft_4 soft_5 soft_6 soft_7 soft_8 soft_9 soft_10 soft_11 soft_12 soft_13 soft_14 soft_15 soft_16; do
             eval "v=\"\${V8_SF_$sid:-}\""
             if [ "$v" = "failure" ] || [ "$v" = "cancelled" ]; then
               FAILED="$FAILED $sid"
