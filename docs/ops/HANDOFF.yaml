@@ -34,10 +34,55 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 76
+  next_id_seq: 77
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
+  - id: redcard-hostfail-rootfix-0924
+    priority: P1
+    owner: shared
+    status: pending-verify
+    what: >
+      红卡停更（EXPERIMENT / SECTOR_LEADERS / DAJIJIN_REDUCTION）三类真因已逐一定位到铁证层级，
+      其中前两类为**东财 push2 大面积 502 / 非 JSON 响应**所致，非管线死亡：
+      (1) SECTOR_LEADERS —— v8_cn_fetch_cloud run 35997809909 · step22「板块龙头股字典」实测
+          `urllib.error.HTTPError: HTTP Error 502: Bad Gateway`（fetch_sector_leaders.py L62/L68），
+          脚本 exit 1；该卡自 2026-09-22 18:15 停更，HEALTH_CHECK 09-24 连判 3 次 [FAIL]、
+          自愈派发 2 次 post_close 皆无效（下一轮仍打同一个已 502 的 host）。
+      (2) EXPERIMENT —— 同 run 日志 L641-646 实测：
+          `⚠️ push2 抖动(clist …) 尝试1/3 … 尝试2/3 …`（**换 host 重试确实生效**但仍全败）
+          → `⚠️ EXPERIMENT: 返回空，跳过` ⇒ 上游 save() 按设计跳过写盘（保护本身正确），
+          卡保持 2026-09-22 18:13。
+      (3) DAJIJIN_REDUCTION —— 停在 2026-09-23 19:43；v8_health_check 自愈被**时间窗口闸门**跳过：
+          `当前 21:15 非盘后产出窗口(16:00-20:30)，跳过 algo_run 派发` ⇒ 结构性自愈盲区。
+      已施工两笔（阿狸咪 2026-09-24 夜，均线性历史零 force、推后逐字节回读通过）：
+        · da2639dada50：EXPERIMENT 空返回打 `::error title=v8-experiment-no-data::`；
+          fetch_sector_leaders.py 空返回打 `::error::` + `raise SystemExit(1)`。
+          ⚠️ 该提交前有一笔同内容事故提交 df4efa41ee52 —— 因用**落后本机 clone** 造 blob
+          误删小九 2026-09-24 的 310 行修复（_EM_HOSTS/_all_individual_recs/
+          _persist_last_good_capital/_etf_snapshot_cached_full/FETCH_BUDGET_SEC），
+          已在 da2639dada50 以「远端 parent 真身 + 仅加护栏」回滚重放（相对 parent 零删除、
+          小九修复指纹 11/11 复验在位）。事故与根治已固化进技能 v8-stale-base-blob-silent-clobber §7.2。
+        · 1052d4334162：按特征扫全仓收口 —— 给 scripts/fetch_sector_leaders.py 补
+          `EM_HOSTS` 换 host 池（14 host）+ `_get_json(hosts=)` 换 host 重试（未传 hosts 时
+          行为与旧版完全一致），两处 em_clist 调用点接入。此即小九 2026-09-24 在
+          cloud_fetch_v8.py 已验证结论（同 host 重试 3 次成功 1/17 vs 换 host 15/17）的补口。
+    fix: >
+      (a) 已落地：见上三笔提交。(b) 待办：DAJIJIN_REDUCTION 自愈窗口盲区 ——
+      需裁决「非盘后窗口是否允许对该卡强制补跑」（当前 16:00-20:30 硬闸把它锁在窗外，
+      而其 cron 为工作日 20:30 CST，一旦当轮失败就必然等到次日，无当日第二机会）。
+    verify_how: >
+      1) 等下一轮 v8_cn_fetch_cloud（workflow_dispatch category=post_close）跑到
+         step22「板块龙头股字典」，确认日志出现换 host 重试且**不再 502 退出**；
+      2) 远端 raw_data/sector_leaders.json 的 update_time 前进到 2026-09-24 之后；
+         raw_data/experiment.json 同理（若东财仍全败，则应看到
+         `::error title=v8-experiment-no-data::` 显式标红，而非静默）；
+      3) DAJIJIN_REDUCTION：确认 run 36006148888 结论，并推动窗口闸门裁决。
+    not_done_note: >
+      本项 status 保持 pending-verify：护栏与换 host 均为「让失败可见/提高成功率」，
+      尚未跑出一轮成功产物 ⇒ 禁宣称「已修复」。另：补跑 run 36005590505（算法链）
+      与 36006148888（DAJIJIN）派发后长时间停留 in_progress/queued，
+      疑与 run 日志中所述「僵尸 pending run 排队 31min」的 runner 队列拥塞有关，一并观察。
   - id: build13-timeout-guard
     priority: P0
     owner: shared
