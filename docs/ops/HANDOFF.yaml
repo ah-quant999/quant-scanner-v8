@@ -25,40 +25,6 @@
 # 数据采集时刻：2026-09-21 08:40 CST（小九机实测）
 # ============================================================================
 
-meta:
-  alimi_verify_20260925_0003: >
-    🔴 阿狸咪的工程师 2026-09-25 00:03 CST **铁证级终验（本项验证面 100% 闭合）**：
-    · ① **换 host 修复已确实部署且在运行**（排除「跑的是旧代码」）：cn_fetch #2177/#2178/#2179 的
-      `compare 1052d4334162...head` 全 = ahead/behind=0；远端 scripts/fetch_sector_leaders.py
-      实测 L57 `EM_HOSTS`（push2delay + push2 + 1..12.push2 = **14 host**）、L72 `_get_json(hosts=)`、
-      L166/L187 两处 em_clist 接入位齐全。
-    · ② **换 host 重试确实执行了，但 14 host 全 502**（决定性逐字，run #2178 job 107697441096）：
-      `⚠️ 东财 push2 抖动(push2delay…) 尝试1/3: HTTP Error 502: Bad Gateway → 0.6s 后换 host 重试`
-      `⚠️ 东财 push2 抖动(push2…)         尝试2/3: HTTP Error 502: Bad Gateway → 1.1s 后换 host 重试`
-      旁证（东财整体抖而非单接口）：`301718/301660/113710 行情获取失败: 502`、
-      `W52_HIGH 抖动…非 JSON 响应（559B，'<html>…<title>502 Bad Gateway'`、
-      `❌ eastmoney push2 失败: HTTP Error 502: Bad Gateway — 不写盘`。
-    · ③ EXPERIMENT 侧：`##[error]EXPERIMENT 抓取返回空(东财 push2delay em_clist 未返回任何记录)`
-      ⇒ **09-22 的可见性护栏按设计生效**（失败已显式标红，不再静默）。
-    · ④ 自愈已触发但无产出：`[HEAL✓] 已自动派发刷新 (HTTP 204)` → 重派 run 仍打同一 502 host。
-    · ⑤ 产物实测：raw_data/experiment.json blob `ce3a07ffee6c` ut 2026-09-22 18:13:35（age 53.3h）；
-      raw_data/sector_leaders.json blob `efd9983a732f` ut 2026-09-22 18:15:13（age 53.3h）。内容非空
-      （EXPERIMENT 五名单 15/15/15/15/7；SECTOR_LEADERS sector_count=65 / leaders_fail_count=0）
-      ⇒ 属「停更」非「洗空」，**禁伪造补漏**。
-    ⇒ **定性：上游东财 push2 全域 502 真故障，非我方管线/执行序/自愈窗口** ⇒ 按任务书第 3 条
-      「已用新代码仍失败 ⇒ 属东财端真故障，出交接件记 HANDOFF，**不反复派发**」处置。
-      交接件：docs/ops/handover/2026-09-25_0003_阿狸咪的工程师给小九的工程师_红卡东财502真故障终验_换host修复已生效仍全败_勿再派发.md
-      建议：① verify_how#1 标注「换 host 已出现」为已验证（502 仍在属外部）；
-      ② 增设「东财 502 期间对本两卡自动重派降频/暂停」处置口径，恢复判据 = 东财恢复后首轮自然产出。
-  updated: 2026-09-25 00:08
-  updated_by: 阿狸咪的工程师(alimi-cn)
-  # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
-  #   A 一次 push 只改自己 owner 的 item
-  #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
-  #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
-  #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
-  #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 77
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -124,6 +90,38 @@ items:
       (3) 因此本轮**不追加派发**（主人令「不要造成踩踏和暴风」）：已有 2 个 pending 在队，
           再派只会加剧互踢。改为等待自然推进 + 按 head_sha 判定。
 
+    alimi_verify_20260925_0003: >
+      🔴 阿狸咪的工程师 2026-09-25 00:03 CST **铁证级终验（本项验证面 100% 闭合）**：
+      · ① **换 host 修复已确实部署且在运行**（排除「跑的是旧代码」）：cn_fetch
+        #2177/#2178/#2179 的 `compare 1052d4334162...head` 全 = ahead / behind=0；
+        远端 `scripts/fetch_sector_leaders.py` 实测 L57 `EM_HOSTS`（push2delay + push2 +
+        1..12.push2 = **14 host**）、L72 `_get_json(hosts=)` 换 host 重试、L166/L187
+        两处 em_clist 调用点均已接入。
+      · ② **换 host 重试确实执行了，但 14 host 全 502**（决定性逐字，run #2178
+        job id 107697441096）：
+        `⚠️ 东财 push2 抖动(push2delay…) 尝试1/3: HTTP Error 502: Bad Gateway → 0.6s 后换 host 重试`
+        `⚠️ 东财 push2 抖动(push2…)         尝试2/3: HTTP Error 502: Bad Gateway → 1.1s 后换 host 重试`
+        旁证（东财整体抖，非单接口）：`301718/301660/113710 行情获取失败: 502` /
+        `W52_HIGH 抖动…非 JSON 响应（559B，前 80 字：'<html>…<title>502 Bad Gateway'` /
+        `❌ eastmoney push2 失败: HTTP Error 502: Bad Gateway — 不写盘`。
+      · ③ EXPERIMENT 侧：`##[error]EXPERIMENT 抓取返回空(东财 push2delay em_clist 未返回任何记录)`
+        ⇒ **09-22 的可见性护栏按设计生效**（失败已显式标红，不再静默）。
+      · ④ 自愈已触发但无产出：`[HEAL✓] 已自动派发刷新 (HTTP 204)` → 重派 run 仍打同一 502 host。
+      · ⑤ 产物实测：`raw_data/experiment.json` blob `ce3a07ffee6c` ut 2026-09-22 18:13:35
+        （age 53.3h）；`raw_data/sector_leaders.json` blob `efd9983a732f` ut 2026-09-22 18:15:13
+        （age 53.3h）。内容**非空**（EXPERIMENT 五名单 15/15/15/15/7；SECTOR_LEADERS
+        sector_count=65 / leaders_fail_count=0）⇒ 属「停更」非「洗空」，**禁伪造补漏**。
+      · ⑥ 本轮另实证：**SECTOR_LEADERS 的 Actions step 结论仍显示 success**（soft_13b 为
+        `continue-on-error: true` + 内部 exit 1 被吞）⇒ **「step 绿 ≠ 产物新」**，判健康一律读
+        产物 `update_time`。
+      ⇒ **定性：上游东财 push2 全域 502 真故障，非我方管线 / 非执行序 / 非自愈窗口** ⇒ 按任务书
+        第 3 条「已用新代码仍失败 ⇒ 属东财端真故障，出交接件记 HANDOFF，**不反复派发**」处置。
+        交接件：`docs/ops/handover/2026-09-25_0003_阿狸咪的工程师给小九的工程师_红卡东财502真故障终验_换host修复已生效仍全败_勿再派发.md`
+        建议：① `verify_how` 第 1 条标注「换 host 已出现」为已验证（502 仍在属外部）；
+        ② 增设「东财 502 期间对本两卡自动重派**降频/暂停**」处置口径，恢复判据 = 东财恢复后
+           首轮自然产出（可用仓内 `probe_em.yml` 主动探测，该探测不产数据、不占 post_close 名额）。
+    updated: "2026-09-25 00:15"
+    updated_by: 阿狸咪的工程师(alimi-cn)
   - id: build13-timeout-guard
     priority: P0
     owner: shared
