@@ -4367,3 +4367,27 @@ items:
         两批均走净室推送器，推后逐字节回读自验全绿。
     updated: "2026-09-24 17:51"
     updated_by: 小九的工程师(lemoncat-cn)
+
+  # ── P0 · 前端大表加载（两张共振日历永久空白根治） ─────────────────
+  - id: resonance-calendar-lazyload-fail
+    priority: P0
+    owner: 小九(lemoncat-cn)
+    status: pending-verify
+    what: >-
+      〔2026-09-24 18:1x 小九〕主人报「今天2个共振又没有」= 共振日历两张 tab（机游共振日历 +
+      北向席位日历）。只读实证：**数据层完全正常**（LHB_DATA 当日 17:32、LHB_HISTORY 当日
+      17:33，63 只中含 25 只北向席位；Pages 分发亦已是 17:32 版）。病根在**前端大表加载**：
+      两 tab 全靠 data/LHB_HISTORY.js（1.8MB / 79 天全量），GitHub Pages 跨境实测三次全失败
+      （302KB 截断 / 超时 / status=000 ≈3KB/s）；原 onerror 只 console.warn 就 done() ⇒
+      无重试、无降级 ⇒ 两日历永久空白；叠加 __rcPollHistory 仅轮询 9s 即放弃 ⇒ 主人只能每天手动来问。
+    fix: |-
+      ① BIG 三张大表各配多源兜底（fastly.jsdelivr.net 实测 1.84MB/6.5s ≈284KB/s，比 Pages 快 90 倍）；
+      ② loadOne 重写：单源 25s 超时 + 源间自动轮换 + 3 轮退避重试 + 幂等 onOk（防迟到成功重复执行）；
+      ③ 全源全轮皆败 ⇒ 用 LHB_DATA（当日 25KB）降级渲染 + 页内明确提示（绝不静默空白）；
+      ④ __rcPollHistory 轮询窗口 9s → 120s（覆盖最坏 3 轮×2 源×25s）。
+    verify_how: |-
+      主人下次打开共振日历：①两 tab 均有数据（不再空白）；②控制台若出现「源失败(...)」仍能渲染成功；
+      ③极端断网/全源失败时显示明示文案而非空白页。长期项：LHB_HISTORY 体积瘦身
+      （裁 reason/price 等冗余字段实测可省 ~40%，1003KB/全量）另立条目。
+    updated: "2026-09-24 17:59"
+    updated_by: 小九(lemoncat-cn)

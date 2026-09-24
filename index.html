@@ -3458,7 +3458,7 @@ function fmtSigned(v){
         clearInterval(iv);
         try{ window.__jyCalRendered = false; if(typeof renderJyCalendar==='function') renderJyCalendar(); }catch(e){}
         try{ window.__northCalRendered = false; if(typeof renderNorthCalendar==='function') renderNorthCalendar(); }catch(e){}
-      } else if(n > 30){ clearInterval(iv); }   // 最多轮询 ~9s，避免空转
+      } else if(n > 400){ clearInterval(iv); }   // 2026-09-24：9s→~120s（大表跨境加载慢，9s 窗口内未到位即永久空白）
     }, 300);
   };
   /* 懒加载/轮询共用的双 tab 重绘（不依赖当前激活 tab，避免切过去仍空） */
@@ -19088,18 +19088,25 @@ window.__renderV8CalToday();
 <!-- 2026-08-15 A2 懒加载：首屏不下载 4 个大参考表，首屏渲染完成后按需注入，到位后重放渲染回调 -->
 <script>
 (function(){
+  /* 🛡 2026-09-24 一劳永逸：两张共振日历（机游共振＋北向席位）永久空白的根治。
+     病灶（实证）：两 tab 全靠 data/LHB_HISTORY.js（**1.8 MB / 79 天全量**），
+     GitHub Pages 跨境下载实测三次全失败（302KB 截断／超时／status=000 ≈3 KB/s），
+     而原 onerror 只 console.warn 就 done() ⇒ 无重试、无降级 ⇒ 永久空白，主人只能每天手动来问。
+     修法：① 每个大表配**多源兜底**（fastly.jsdelivr 实测 1.84MB/6.5s ≈284 KB/s，快 90 倍）；
+           ② 单源超时 25s、源间自动轮换、最多 3 轮（退避 0.5/1/1.5s）；
+           ③ 全源全轮皆败 ⇒ 用 LHB_DATA（当日 25KB）降级渲染 + 明确提示（绝不静默空白）。 */
+  var A2_CDN='https://fastly.jsdelivr.net/gh/ah-quant999/quant-scanner-v8@main/data/';
   var BIG=[
-    {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=1e785a53fd'},
-    // 🛡 2026-08-31 一劳永逸：STOCK_PROFILE.js(1.4MB) 与 STOCK_LIST 的 industry/concepts
-    //   实测 9602 条【零差异】、且 45.9% 为空值 → 停止单独下载，改由 STOCK_LIST 到位后就地
-    //   合成 window.STOCK_PROFILE，前端引用点(819/5979 行)零改动。省 1.4 MB 下载。
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=20543802e2'},
-    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=d19fa5f817'}
+    {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=1e785a53fd', fallbacks:[A2_CDN+'STOCK_LIST.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=20543802e2', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=d19fa5f817', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
-    var s=document.createElement('script');
-    s.src=item.url; s.defer=true;
-    s.onload=function(){
+    var srcs=[item.url].concat(item.fallbacks||[]);
+    var si=0, round=0, MAXR=3, TMO=25000, _fin=false, _okdone=false;
+    function finish(){ if(_fin) return; _fin=true; done(); }
+    function onOk(){
+      if(_okdone) return; _okdone=true;
       // 🛡 2026-08-20 主人令「共振日历前面又空了」一劳永逸：LHB_HISTORY 到位后，
       //   若用户当前正在共振日历 tab，立即重置渲染锁并重绘，补上之前因懒加载未到而缺失的历史日期。
       if(item.name==='LHB_HISTORY'){
@@ -19128,10 +19135,46 @@ window.__renderV8CalToday();
           }
         }catch(e){ console.warn('[A2 lazy] STOCK_PROFILE 合成失败', e); }
       }
-      done();
-    };
-    s.onerror=function(){ console.warn('[A2 lazy] 加载失败', item.url); done(); };
-    document.head.appendChild(s);
+      finish();
+    }
+    /* 全源全轮皆败：降级渲染 + 明示（绝不静默空白） */
+    function onFail(){
+      try{ console.error('[A2 lazy] 所有源与重试均失败：', item.name); }catch(e){}
+      if(item.name==='LHB_HISTORY'){
+        try{ if(typeof window.__rcRedrawBoth==='function') window.__rcRedrawBoth(); }catch(e){}
+        try{
+          var _el=document.getElementById('jyCalContainer');
+          if(_el && !String(_el.innerHTML||'').trim()){
+            _el.innerHTML='<div style="text-align:center;padding:28px 14px;color:var(--dim);font-size:13px;line-height:1.9">'
+              +'历史大表（1.8MB）加载失败，暂只显示当日数据。<br>'
+              +'<span style="font-size:11.5px">已自动重试 3 轮；请 <b style="color:#38bdf8;cursor:pointer" onclick="location.reload()">刷新页面</b> 重试。</span></div>';
+          }
+        }catch(e){}
+      }
+      finish();
+    }
+    function next(why){
+      try{ console.warn('[A2 lazy] 源失败('+why+')：'+srcs[si % srcs.length]); }catch(e){}
+      si++;
+      if(si % srcs.length === 0) round++;
+      if(round < MAXR){ setTimeout(attempt, 500*(round+1)); }
+      else { onFail(); }
+    }
+    function attempt(){
+      var base=srcs[si % srcs.length];
+      var url=base + (round>0 ? (base.indexOf('?')>-1?'&':'?')+'__a2r='+round : '');
+      var s=document.createElement('script'), settled=false;
+      s.defer=true; s.src=url;
+      var to=setTimeout(function(){
+        if(settled) return; settled=true;
+        try{ s.onload=s.onerror=null; }catch(e){}
+        next('timeout');
+      }, TMO);
+      s.onload=function(){ if(settled) return; settled=true; clearTimeout(to); onOk(); };
+      s.onerror=function(){ if(settled) return; settled=true; clearTimeout(to); next('error'); };
+      document.head.appendChild(s);
+    }
+    attempt();
   }
   function replay(){
     (window.__domReadyFns||[]).forEach(function(fn){
