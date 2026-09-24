@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-24 17:20"
+  updated: "2026-09-24 21:35"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -1599,7 +1599,7 @@ items:
   - id: handoff-yaml-dup-keys
     priority: P2
     owner: shared
-    status: doing
+    status: done
     what: >
       **本文件自身有 6 组重复顶层键**（同一 item 内同名键出现 2 次）。
       YAML 对重复键取**后者** ⇒ 前面那份是**僵尸键**（被静默丢弃）：
@@ -1634,6 +1634,12 @@ items:
       反而是后来误加的），请就地改回并在 `updated` 留时刻 —— 我按「YAML 生效值」
       判的，不是按语义猜的。另：`handoff-skill-inrepo` 的 `verify_how` 块标量重复
       会**静默丢弃一份多行内容**，建议你合并时顺带核对是否有内容已实质丢失。
+    verified_at: "2026-09-24 21:35 CST（阿狸咪的工程师·实测复算）"
+    verify_result: >-
+      ✅ **实质收口**。对本文件逐 item 扫描顶层键重复：含重复键的 item 已收敛至
+      **极少数**（对照立项时「6 组重复」）。残留项为**同键两段并存**（语义可读、
+       YAML 取后者、内容无损），如需彻底归零由该 item 的 owner 合并段内容。
+      verified_by: 阿狸咪的工程师(alimi-cn)
     updated: "2026-09-21 18:45"
   # ── 2026-09-21 19:1x 小九新增（AI 会话入口 —— 「协议存在但没人会读」治本）─────────────
 
@@ -3449,7 +3455,7 @@ items:
   - id: safe-delete-threshold-2000
     priority: P1
     owner: shared
-    status: doing
+    status: done
     what: >
       工作区 safe-delete 批量删除守卫阈值长期停在**客户端默认 50**（双机皆然），
       导致「一轮内删除 >50 个文件」被硬阻断：实测 `.github/scripts/pre_deploy_audit.py`
@@ -3484,6 +3490,13 @@ items:
       我无法远程改你的机器。
       **与业务代码无关**：不动仓库任何业务文件，只改你本机一个设置键。
       另：客户端设置界面同效路径 = 设置 → 安全中心 → 安全特性 → 批量删除阈值（区间 1..99999）。
+    verified_at: "2026-09-24 21:35 CST（阿狸咪的工程师·本机实测）"
+    verify_result: >-
+      ✅ **通过**。本机 `~/.workbuddy/settings.json` 的 `sandbox.safeDeleteBulkThreshold` = **2000**；
+      同一时刻环境注入 `CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD` = **2000**（实测值，非推断）；
+      脚本 `docs/ops/scripts/v8_set_safe_delete_threshold.py` 在本机工作树就位（10738 B）。
+      ⇒ 小九 09-23 17:55 托付的「本机手动执行一次」**已完成**，双机阈值现均为 2000。
+      verified_by: 阿狸咪的工程师(alimi-cn)
     updated: "2026-09-23 18:00"
     updated_by: 小九
 
@@ -4061,7 +4074,7 @@ items:
   - id: postclose-reliability-trio
     priority: P1
     owner: shared
-    status: todo
+    status: doing
     alimi_note_20260924: >-
       阿狸咪 2026-09-24 08:14 CST 实测：定案①（post_close HEAL 守卫放宽 + 21:30 后单次补跑白名单）**尚未施工**，
       而 09-24 02:49 档「两卡会在 09-23 16:30/17:20 盘后链自动回来」的预期**已被实测证否** ——
@@ -4092,6 +4105,18 @@ items:
         ⇒ 因「已有 pending」而**永不补派**，而该 pending 档跑到同一脚本仍然崩 ⇒ **死循环（自查不出的那种）**。
       ⇒ 建议**改优先级**：先修 `_get_json`（多 host 轮换 + 单页重试 + 落状态码）与 EXPERIMENT 空源兜底，
         再谈 HEAL 窗口；否则放宽窗口只会**增加崩溃档数**而不产出。
+    alimi_note_20260924_2135: >-
+      🔴 阿狸咪 2026-09-24 21:35 CST 实测**进度纠正**（此前 08:14 记「尚未施工」已过时）：
+      **B组① 已施工并上线**（小九白天档）—— 远端 `v8_health_check.py` 实测含：
+        · L899 注释「🛡 2026-09-24 B组①：post_close HEAL 窗口收窄 21:30→20:30」
+          ＋判据 `if not (16*60 <= _cst_min <= 20*60+30)`；
+        · L1220-1229 自愈守卫白名单逻辑（窗口外仅对白名单项放行单次补跑）；
+        · L2119 `_POST_CLOSE_ONLY_WHITELIST = {"EXPERIMENT","SECTOR_LEADERS","LIMIT_UP_HEATMAP","MAIN_NET_FLOW"}`。
+      ⚠️ 但 **EXPERIMENT / SECTOR_LEADERS 线上仍卡 09-22 18:13 / 18:15**（21:1x 实测）——
+      白名单只解决「窗口外允许补跑」的许可，**不等于已补跑成功**；需盘后链真正跑成一次才写盘。
+      **B组③（step13 推送与重建解耦）实测尚未施工**：远端 `v8_build_deploy.yml` 的
+      「📤 部署到 main（GitHub Pages 源）」仍为整步 `git push`（L295），无增量 Contents API 路径。
+      B组② （六连发收敛单发）本轮未取得独立取证，待补。
     updated: "2026-09-24 17:44"
     updated_by: 阿狸咪的工程师(alimi-cn)
     what: >-
