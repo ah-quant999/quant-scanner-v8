@@ -699,7 +699,7 @@ _EXTRA_FILES = (
     "data/CITIC_PE_BACKTEST.js",
     # 🛡 2026-08-19 阿狸咪根治孤儿：data/MACRO.js 删除（前端 render 0 处引用 window.MACRO）—节省空间+Actions分钟
 )
-_RE_V = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
+_RE_V = re.compile(r'([\'"])(data/[A-Za-z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
 
 
 # ✅✅ 2026-09-24 17:4x 小九**恢复为权威口径**（原 2026-09-10「已废除」标记作废）
@@ -774,7 +774,11 @@ def _stamp_remote_index_v(changed: dict, commit_ref: str):
     # 🔴 2026-09-24：按**每个文件自己的新内容**算 ?v（不再是一枚全站共享的 unix 令牌）。
     #   仅当该文件在 changed 内才改写 ⇒ 未变更文件的 URL 保持不变 ⇒ 缓存命中。
     # 🛡 纵深防御：空内容（未就绪）不写空 ?v，保留原值等下一步对齐（原 _stamp_index_v 同纪律）。
-    _pat = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?v=[0-9A-Za-z]+)?([\'"])')
+    # 🔴 2026-09-24：正则含小写 —— 线上实测 index.html 有 2 个真实引用的**小写**文件名
+    #   （data/maharo_insights.js / data/maharo_macro.js），旧 `[A-Z0-9_]+` 漏掉它们
+    #   ⇒ 其 ?v 永不重写 ⇒ 内容更新而 URL 恒定 ⇒ 前端永久吐旧副本。
+    #   （详见 update_v8 同族注释；四处同改：本处 · _RE_V · update_v8.pat · build_deploy 核验步。）
+    _pat = re.compile(r'([\'"])(data/[A-Za-z0-9_]+\.js)(?:\?v=[0-9A-Za-z]+)?([\'"])')
 
     def _repl(m):
         src = m.group(2)

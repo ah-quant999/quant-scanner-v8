@@ -963,7 +963,21 @@ def _rewrite_index_html_cache_busters():
     #   正则漏掉 → 这些 ?v 永远是 A2 手填的旧值，CDN 长期吐旧副本（缓存戳失配，正是防覆盖铁律最忌）。
     #   改为全量匹配 index.html 中所有「带引号」的 data/X.js(?:\?v=...)? 出现
     #   （script 标签 / fetch / BIG 数组均引号包裹），统一按内容 sha1 重写 ?v。
-    pat = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
+    # 🔴 2026-09-24 17:4x 小九补漏（第三类根因）：原 `[A-Z0-9_]` **不含小写字母**
+    #   ⇒ 真实被 index.html 引用的 2 个**小写**文件名（`data/maharo_insights.js` /
+    #     `data/maharo_macro.js`）**从不被重写 ?v** ⇒ 内容更新而 URL 恒定 ⇒ 浏览器/CDN
+    #     永久吐旧副本 = 前端「数据不刷新」的**结构性根因**之一。
+    #   （与 2026-08-12 那次「`[A-Z_]+` 漏数字 ⇒ V8_CAL/W52_HIGH/TOP10_DAILY 永不更新」**完全同型**，
+    #     本次是漏小写。⇒ 教训：该正则的字符类必须与「实际文件名集合」对齐，而非只对大写下划线。）
+    #   【实测口径（勿凭想象扩大）】线上 index.html 带 ?v 的引用共 110 处/101 文件，其中含小写的
+    #     仅上述 2 个；其余小写名（algo_track / limit_up_heatmap / ima_strong_stock / us_hk_map /
+    #     factor_progress / four_volume_track / hb_xiaojiu / ima_strong_backtest）**只出现在注释文案里**、
+    #     并非真实 `<script src>` 引用（它们由别的大写同名文件或后端直接读 raw_data 承载）。
+    #   改为 `[A-Za-z0-9_]+` 后覆盖面与「真实引用集合」一致。
+    #   ⚠️ 仍**不含 `/`**：`data/archive/V8_CAL_INDEX.js` 等子目录引用有意不处理（非主站卡）。
+    #   🔴 同族矩阵（改本正则必须四处同改）：本行 · api_push_raw._RE_V · api_push_raw 的 _pat ·
+    #      v8_build_deploy.yml「提交前核验」步。
+    pat = re.compile(r'([\'"])(data/[A-Za-z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
 
     def repl(m):
         q1, src, q2 = m.group(1), m.group(2), m.group(3)

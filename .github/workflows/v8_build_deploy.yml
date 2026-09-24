@@ -475,7 +475,7 @@ jobs:
               t = p.read_text(encoding='utf-8', errors='replace')
               t = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', t)
               return hashlib.sha1(t.encode('utf-8')).hexdigest()[:10]
-          pairs = re.findall(r'data/([A-Z0-9_]+)\.js\?v=([0-9A-Za-z]{1,40})', idx)
+          pairs = re.findall(r'data/([A-Za-z0-9_]+)\.js\?v=([0-9A-Za-z]{1,40})', idx)
           bad = []
           for var, v in pairs:
               p = pathlib.Path('data') / (var + '.js')
