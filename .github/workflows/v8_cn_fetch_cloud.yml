@@ -79,7 +79,19 @@ permissions:
   actions: write
 
 concurrency:
-  group: v8-cn-fetch-cloud
+  # 🔴 2026-09-24 一劳永逸（主人令「主站还是13点多的数据」根因修复之一 · 小九的工程师）
+  #   【病灶】并发组是**单一静态名** `v8-cn-fetch-cloud`：所有 category（intraday /
+  #     post_close / premarket / 周末全量）**抢同一个槽位**。而 post_close 是合法长跑
+  #     （job timeout 60 min），实测 09-24 #35956823600 从 12:43 占槽到 13:45
+  #     **共 62 分钟**；同期到达的 6 个 intraday run 全部被取消
+  #     （13:25:24 一次 canc 5 个、14:06:09 一次 canc 7 个）⇒ 盘中数据空窗 2.8 小时
+  #     （CAPITAL_FLOW 卡 11:35 / ETF 卡 11:30 / INDEX_QUOTES 卡 12:09）。
+  #   【修法】并发组**按 category 动态命名** ⇒ intraday 与 post_close 各占一组、
+  #     互不阻塞：盘后长跑再久也顶不掉盘中档，盘中档再密也拖不慢盘后。
+  #   【为何不用 `docs/ops/**` 那种前缀匹配】并发组名必须**精确**，
+  #     表达式在 workflow 解析期求值，`inputs.category` 为空（schedule/cron 触发）时
+  #     回落到 `scheduled` —— 三条 cron（盘前/盘后/周末）时间窗本就错开，共享一组无碍。
+  group: v8-cn-fetch-cloud-${{ github.event.inputs.category || 'scheduled' }}
   # 2026-08-24 修复(#1 取消风暴根治)：改为 false，新派发不再杀掉正在写
   # 共振/快照文件的 run，从根上杜绝「自伤顶掉」——此前 cancel-in-progress:true
   # 频繁把正在写 triple_consensus.json / lhb_history.json / sector_fund_flow 的 run 杀掉，

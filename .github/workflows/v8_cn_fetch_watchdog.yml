@@ -136,62 +136,109 @@ jobs:
           # 🔴 2026-09-09 盘中更新审计·一劳永逸：不仅看「有没有在跑」，还要看「最近一次是否失败/拥堵」。
           #    云端 ubuntu-latest 队列拥堵时（>=2 run 在排队 或 最近一次 failure），改派 self-hosted cn runner
           #    兜底，避免 13:00 数据停滞 70min 同类事故。
-          def cloud_state():
-              """查询云端 cn_fetch 队列状态 + 最近一次完成结论。"""
+          def queue_detail():
+              """查询云端 cn_fetch 队列细节：返回 (执行中数, 排队中数, 最近一次完成结论)。
+
+              🔴 2026-09-24 新增：per_page 5 → 20。并发组已按 category 拆分
+                 （intraday / post_close / scheduled 各自成组），5 条窗口覆盖不到两组，
+                 会把「另一组在跑」误判成「队列已空」。
+              """
               try:
                   import os as _os
                   rq = urllib.request.Request(
                       "https://api.github.com/repos/ah-quant999/quant-scanner-v8"
-                      "/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=5",
+                      "/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=20",
                       headers={"User-Agent": "Mozilla/5.0",
                                "Authorization": "Bearer " + _os.environ.get("GH_TOKEN", "")})
                   j = json.loads(urllib.request.urlopen(rq, timeout=20).read())
                   runs = j.get("workflow_runs", [])
-                  running = sum(1 for x in runs if x.get("status") != "completed")
+                  inprog = sum(1 for x in runs if x.get("status") == "in_progress")
+                  queued = sum(1 for x in runs if x.get("status") in (
+                      "queued", "pending", "waiting", "requested"))
                   latest = None
                   for x in runs:
                       if x.get("status") == "completed":
                           latest = x.get("conclusion")
                           break
-                  return running, latest
+                  return inprog, queued, latest
               except Exception as e:
                   print(f"[watchdog] 查云端状态失败: {e}")
-                  return 0, None
+                  return 0, 0, None
+
+          def cloud_state():
+              """兼容包装：返回 (未完成总数, 最近一次完成结论)。"""
+              _a, _b, _latest = queue_detail()
+              return _a + _b, _latest
 
           def cancel_stuck_cloud_runs():
-              """🔴 2026-09-10 一劳永逸破锁：取消 cloud.yml 中创建>12分且无新数据的 running run，
-              释放 v8-cn-fetch-cloud concurrency 锁。否则一个卡死 run 占锁会把主派发档挡掉 → 数据空窗
-              （09-10 09:32 watchdog 派发的 cloud run 卡15分占锁、挡掉 09:40 主派，同 09-09 13点事故）。"""
+              """🔴 2026-09-24 一劳永逸重写（主人令「主站还是13点多的数据」根因修复之二 · 小九的工程师）
+
+              【病灶·本仓实证】旧判据 `age(x["created_at"]) > 12` 有两处致命缺陷：
+                ① **不看 status** —— pending/queued（正常排队）也被当成"卡死 run"。
+                   本仓盘中每 20 分派发、单轮执行 20+ 分 ⇒ 排队是**预期行为**；
+                   旧口径会把排队中的 run 批量砍掉 ⇒ 队列被清空
+                   （实测 09-24 13:25:24 一次 canc 6 个、14:06:09 一次 canc 7 个），
+                   且砍完**不补派** ⇒ 数据空窗 2.8 小时（CAPITAL_FLOW 卡 11:35）。
+                ② `created_at` **包含排队时间** —— post_close 是合法长跑
+                   （job timeout 60 min；实测 #35956823600 占槽 12:43→13:45 共 62 分），
+                   会在第 12 分钟就被判死，连"长跑自己"也被砍。
+              【修法】只对「**in_progress 且【真正开始执行】超过阈值**」的 run 出手：
+                · pending/queued/waiting/requested → **绝不 cancel**（排队是正常语义）；
+                · 执行时长改用 `run_started_at` 计（**不含排队时间**）；
+                · 阈值按窗区分：盘后长跑窗（CST 15:30–20:30）70 分（job timeout 60 + 余量），
+                  其余时段 25 分（intraday 正常 7–17 分，超 25 分即真卡）。
+              【职责已变】并发组 2026-09-24 起按 category 拆分（见 v8_cn_fetch_cloud.yml
+                `group: v8-cn-fetch-cloud-<category>`）⇒ post_close 与 intraday 互不占槽，
+                本函数不再承担"释放槽位"职责，只需兜住**真僵尸** ⇒ 故判据从宽、宁可少杀。
+              """
               try:
-                  import os as _os, time as _t
+                  import os as _os
                   hdr = {"User-Agent": "Mozilla/5.0",
                          "Authorization": "Bearer " + _os.environ.get("GH_TOKEN", ""),
                          "Accept": "application/vnd.github+json",
                          "X-GitHub-Api-Version": "2022-11-28"}
                   rq = urllib.request.Request(
                       "https://api.github.com/repos/ah-quant999/quant-scanner-v8"
-                      "/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=5", headers=hdr)
+                      "/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=20", headers=hdr)
                   j = json.loads(urllib.request.urlopen(rq, timeout=20).read())
+                  in_postclose = (15 * 60 + 30) <= hhmm <= (20 * 60 + 30)
+                  exec_limit = 70 if in_postclose else 25
+                  now_utc = datetime.datetime.utcnow()
                   for x in j.get("workflow_runs", []):
-                      if x.get("status") == "completed":
+                      stt = x.get("status")
+                      if stt == "completed":
                           continue
-                      created = datetime.datetime.strptime(x["created_at"][:19], "%Y-%m-%dT%H:%M:%S")
-                      age_min = (datetime.datetime.utcnow() - created).total_seconds() / 60
-                      if age_min > 12:
+                      if stt != "in_progress":
+                          # 🛡 排队中的 run 一律不动 —— 这是本次断档事故的直接教训。
+                          created = datetime.datetime.strptime(
+                              x["created_at"][:19], "%Y-%m-%dT%H:%M:%S")
+                          wait_min = (now_utc - created).total_seconds() / 60
+                          print(f"[watchdog] ⏳ run#{x['id']} 处于「{stt}」排队中"
+                                f"（已等 {wait_min:.0f} 分）→ **不取消**（排队是正常语义）")
+                          continue
+                      started = x.get("run_started_at") or x.get("created_at")
+                      st = datetime.datetime.strptime(started[:19], "%Y-%m-%dT%H:%M:%S")
+                      exec_min = (now_utc - st).total_seconds() / 60
+                      if exec_min > exec_limit:
                           req2 = urllib.request.Request(
                               f"https://api.github.com/repos/ah-quant999/quant-scanner-v8"
                               f"/actions/runs/{x['id']}/cancel",
                               data=b"", method="POST", headers=hdr)
                           try:
                               urllib.request.urlopen(req2, timeout=20)
-                              print(f"[watchdog] 🔓 破锁：取消卡死 cloud run#{x['id']}（龄{age_min:.0f}分，释放 concurrency）")
+                              print(f"[watchdog] 🔓 破锁：取消真僵尸 cloud run#{x['id']}"
+                                    f"（**已执行** {exec_min:.0f} 分 > {exec_limit} 分）")
                               audit("cancel", target="cloud_stuck_lock", run=x['id'],
-                                    age_min=round(age_min, 1), ok=True, why="lock_release")
+                                    exec_min=round(exec_min, 1), limit=exec_limit,
+                                    ok=True, why="zombie_in_progress")
                           except Exception as e:
                               audit("cancel", target="cloud_stuck_lock", run=x['id'],
-                                    age_min=round(age_min, 1), ok=False, why="lock_release",
-                                    err=str(e)[:120])
+                                    exec_min=round(exec_min, 1), limit=exec_limit,
+                                    ok=False, why="zombie_in_progress", err=str(e)[:120])
                               print(f"[watchdog] 取消 run#{x['id']} 失败: {e}")
+                      else:
+                          print(f"[watchdog] 🏃 run#{x['id']} 执行中（{exec_min:.0f} 分，"
+                                f"阈值 {exec_limit} 分）→ 正常，不动")
               except Exception as e:
                   print(f"[watchdog] 破锁查询失败: {e}")
 
@@ -215,6 +262,15 @@ jobs:
               print(f"[watchdog] ☁️ 已派云端 {category}")
               audit("dispatch", path="cloud_main", cat=category, ok=(r.returncode == 0),
                     trigger="stale_probe")
+
+          # 🔴 2026-09-24 一劳永逸**接线**（小九的工程师）：
+          #   实本函数此前**只有定义、从无调用** —— 全仓 grep `cancel_stuck_cloud_runs`
+          #   仅 1 处命中（就是定义本身）⇒ 死代码 ⇒ 所谓"看门狗破锁"从未生效过。
+          #   而 09-24 13:25:24 / 14:06:09 的批量 cancel（一次 6~7 个）另有来源，
+          #   清空队列后**无人补派** ⇒ 空窗 2.8 小时。现正式接线：先清真僵尸
+          #   （只砍 in_progress 且执行超阈值者，绝不动 pending，见函数 docstring），
+          #   再继续往下走陈旧度探测与兜底派发。
+          cancel_stuck_cloud_runs()
 
           stale, newest = [], None
           for fn in files:
@@ -262,9 +318,29 @@ jobs:
               print("::error title=数据极陈旧·已派兜底::" +
                     ", ".join(f"{fn}({a:.0f}min)" for fn, a in hard_stale))
           elif stale:
-              print(f"[watchdog] ⚠️ {len(stale)}/{len(files)} 个文件偏旧（监控阈值 {thr}min，派发阈值 {dispatch_thr}min），仅告警不派发（主派发应运行中）")
-              print("::warning title=数据偏旧::" +
-                    ", ".join(f"{fn}({a:.0f}min)" for fn, a in stale))
+              # 🔴 2026-09-24 一劳永逸（小九的工程师）：数据偏旧时**先查队列是否真空**。
+              #   病灶（09-24 实证）：队列被批量 cancel 清空后，旧判据是
+              #   「age ≤ dispatch_thr(45min) ⇒ 仅告警不派发」⇒ 空窗被硬拖到 45 分钟以上，
+              #   而空窗期数据以分钟计在腐烂（CAPITAL_FLOW 卡 11:35，13:22 时 age 已 107min；
+              #   实际是主人先发现，不是看门狗自愈）。
+              #   修法：**队列真空**（既无执行中、也无排队中 run）= 没有任何一轮在跑，
+              #   此时"不派"就是纯空转 ⇒ **立即补派**，不再等 dispatch_thr。
+              _ip, _q, _latest = queue_detail()
+              if _ip == 0 and _q == 0:
+                  print(f"[watchdog] 🚑 队列真空（执行中 0 / 排队中 0）且 {len(stale)} 个文件偏旧"
+                        f" ⇒ 无任何一轮在跑，立即补派 {cat}（不等 {dispatch_thr}min 兜底阈值）")
+                  if _latest == "failure":
+                      dispatch_cat(cat, use_selfhosted=True)
+                  else:
+                      dispatch_cat(cat, use_selfhosted=False)
+                  print("::error title=队列真空·已补派::" +
+                        ", ".join(f"{fn}({a:.0f}min)" for fn, a in stale))
+              else:
+                  print(f"[watchdog] ⚠️ {len(stale)}/{len(files)} 个文件偏旧（监控阈值 {thr}min，"
+                        f"派发阈值 {dispatch_thr}min；队列 执行中{_ip}/排队{_q}）"
+                        f"→ 仅告警不派发（已有 run 在跑，不抢档）")
+                  print("::warning title=数据偏旧::" +
+                        ", ".join(f"{fn}({a:.0f}min)" for fn, a in stale))
           else:
               print(f"[watchdog] ✅ {len(files)} 个文件全部新鲜（最新 {newest}，监控阈值 {thr}min），无需派发")
           PY
