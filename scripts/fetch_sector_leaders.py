@@ -45,6 +45,18 @@ UA = {
 }
 EM = "https://push2delay.eastmoney.com"
 
+# 🔴 2026-09-24 阿狸咪的工程师（主人令「一劳永逸」· 按特征扫全仓收口）：
+#   小九今日已在 cloud_fetch_v8.py 用对照实验证伪「同 host 重试」，本脚本却仍是单 host。
+#   铁证（v8_cn_fetch_cloud run 35997809909 step22）：
+#     `_get_json` line 62 urlopen → `urllib.error.HTTPError: HTTP Error 502: Bad Gateway`
+#     ⇒ 脚本 exit 1 ⇒ SECTOR_LEADERS 卡自 2026-09-22 18:15 停更（HEALTH_CHECK 连判 3 次 fail、
+#       自愈派发 2 次皆无效，因为下一次仍打同一个 502 的 host）。
+#   对照结论（cloud_fetch_v8.py _EM_HOSTS 注释，小九 2026-09-24 实测）：
+#     同 host 重试 3 次 成功 1/17；**失败换 host 重试 成功 15/17** ⇒ 换 host 才是解药。
+#   故此处与 cloud_fetch_v8.py 同源同语义地加 host 池；只改建连策略，不动任何取数口径。
+EM_HOSTS = ("https://push2delay.eastmoney.com", "https://push2.eastmoney.com") + tuple(
+    "https://%d.push2.eastmoney.com" % _i for _i in range(1, 13))
+
 
 def log(msg):
     try:
@@ -54,17 +66,41 @@ def log(msg):
     print("[%s] %s" % (time.strftime("%H:%M:%S"), msg), flush=True)
 
 
-def _get_json(url, timeout=20, retry=3):
+def _get_json(url, timeout=20, retry=3, hosts=None):
+    """东财 push2 请求（含重试）。
+
+    🔴 2026-09-24 阿狸咪的工程师：**改为「换 host 重试」**（对照实验见 EM_HOSTS 注释）。
+       · 未给 hosts 时行为**与旧版完全一致**（单 host + 退避 1.2s），向后兼容；
+       · 给了 hosts 时，第 k 次尝试改用 hosts[k]，**保留原 path/query 只换域名**；
+       · 退避同步调短为 0.6/1.1s（实测换 host 远胜空等，也给同轮其它任务让出预算）；
+       · 解析失败 ⇒ 退回旧行为，绝不因此抛错。
+    """
     last = None
-    for i in range(retry):
+    _path = ""
+    if hosts:
         try:
-            req = urllib.request.Request(url, headers=UA)
+            from urllib.parse import urlsplit, urlunsplit
+            _sp = urlsplit(url)
+            _path = urlunsplit(("", "", _sp.path, _sp.query, ""))
+        except Exception:
+            hosts = None
+    delays = [0.6, 1.1]
+    for i in range(retry):
+        _u = url
+        if hosts:
+            _u = hosts[i % len(hosts)].rstrip("/") + _path
+        try:
+            req = urllib.request.Request(_u, headers=UA)
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 return json.loads(resp.read().decode("utf-8", "replace"))
         except Exception as e:
             last = e
             if i < retry - 1:
-                time.sleep(1.2)
+                _d = delays[i] if i < len(delays) else delays[-1]
+                if hosts:
+                    print("  ⚠️ 东财 push2 抖动(%s) 尝试%d/%d: %s → %.1fs 后换 host 重试"
+                          % (_u.split("/")[2], i + 1, retry, str(e)[:60], _d), flush=True)
+                time.sleep(_d)
     raise last
 
 
@@ -127,7 +163,7 @@ def fetch_em_boards():
     for pn in range(1, 9):
         url = ("%s/api/qt/clist/get?pn=%d&pz=100&po=1&np=1&fltt=2&invt=2"
                "&fid=f3&fs=m:90+t:2&fields=f12,f14,f3" % (EM, pn))
-        d = _get_json(url)
+        d = _get_json(url, hosts=EM_HOSTS)
         diff = ((d.get("data") or {}).get("diff")) or []
         if not diff:
             break
@@ -148,7 +184,7 @@ def fetch_em_boards():
 def fetch_cons(bk):
     url = ("%s/api/qt/clist/get?pn=1&pz=400&po=1&np=1&fltt=2&invt=2"
            "&fid=f3&fs=b:%s&fields=f12,f14,f2,f3,f62" % (EM, bk))
-    d = _get_json(url)
+    d = _get_json(url, hosts=EM_HOSTS)
     diff = ((d.get("data") or {}).get("diff")) or []
     rows = []
     for x in diff:
