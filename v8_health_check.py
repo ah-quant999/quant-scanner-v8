@@ -894,8 +894,8 @@ def _dispatch_algo_run(picking_only=False):
     #   允许 heal 派发 algo_cloud(盘后产出窗口)。
     _cst_now = now_cst()
     _cst_min = _cst_now.hour * 60 + _cst_now.minute
-    if not (16 * 60 <= _cst_min <= 21 * 60 + 30):
-        return True, (f"当前 {_cst_now.strftime('%H:%M')} 非盘后产出窗口(16:00-21:30)，"
+    if not (16 * 60 <= _cst_min <= 20 * 60 + 30):  # 🛡 2026-09-24 B组①：post_close HEAL 窗口收窄 21:30→20:30（风暴根治·刀2 收紧）
+        return True, (f"当前 {_cst_now.strftime('%H:%M')} 非盘后产出窗口(16:00-20:30)，"
                       "跳过 algo_run 派发（防风暴·2026-09-04 主人令）"), False
     # 🔴 2026-08-22 根因⑨（主人令）：选股类卡片在 18:00 前派发 = 空转——
     #   run_algorithms 的 18:00 时间闸会把 20+ 选股脚本全跳过（实证 15:34/15:46/15:50
@@ -1217,6 +1217,18 @@ def self_heal(report):
 
     for cat, items in cat_items.items():
         names = [it.get("name", "") for it in items]
+        # 🛡 2026-09-24 B组①（小九·开盘前收口）：post_close HEAL 窗口收窄 + 白名单
+        #   常态仅 16:00-20:30 允许 post_close 自愈派发；窗口外仅对「post_close 独有产物白名单」
+        #   放行单次补跑（HEAL_DEBOUNCE_MIN=25 去抖保留，避免凌晨风暴）。口径源 HANDOFF postclose-reliability-trio。
+        if cat == "post_close":
+            _pc_min = now_cst().hour * 60 + now_cst().minute
+            _pc_in_win = 16 * 60 <= _pc_min <= 20 * 60 + 30
+            _pc_wl = [it for it in items if it.get("id", "").replace("all_", "") in _POST_CLOSE_ONLY_WHITELIST]
+            if not _pc_in_win and not _pc_wl:
+                for it in items:
+                    it["heal"] = "已自愈(跳过): post_close 窗口外(16:00-20:30)且非白名单项"
+                healed.append("[post_close] " + ", ".join(names) + ": post_close 窗口外，跳过（白名单项才允许单次补跑）")
+                continue
         last = lock.get(cat)
         if last:
             last_dt = parse_time(last)
@@ -2094,6 +2106,18 @@ _LOW_FREQ_MAX_AGE = {
 }
 
 
+# 🛡 2026-09-24 B组根因修复（小九·开盘前收口）：check_all_data_files() 动态 all_* 项
+#   原硬编码 heal_cat="algo_run"，但这些文件实际由 cn_fetch post_close 产出（见 cloud_fetch_v8.py
+#   CATEGORY_MAP 及 workflow「板块龙头股字典(SECTOR_LEADERS)」等 post_close 步），自愈派发到
+#   算法链(run_algorithms)永远刷不到它们 ⇒ 陈旧红卡永不复原（09-23 夜 EXPERIMENT/SECTOR_LEADERS
+#   卡在 09-22 18:13/18:15 实测证否）。改为按真实产出链判定。
+_POST_CLOSE_DATA_FILES = {
+    "EXPERIMENT", "SECTOR_LEADERS", "MAIN_NET_FLOW", "NET_FLOW",
+}
+# 🛡 2026-09-24 B组①（小九·开盘前收口）：post_close 独有产物白名单——窗口外(16:00-20:30)
+#   仅对这些项放行单次补跑自愈（HEAL_DEBOUNCE_MIN=25 去抖保留）。口径源 HANDOFF postclose-reliability-trio。
+_POST_CLOSE_ONLY_WHITELIST = {"EXPERIMENT", "SECTOR_LEADERS", "LIMIT_UP_HEATMAP", "MAIN_NET_FLOW"}
+
 def check_all_data_files():
     """全量审计 data/*.js：已登记 CARD_DEFS 的跳过（check_data_cards 管），其余全部按通用规则查。
 
@@ -2110,6 +2134,7 @@ def check_all_data_files():
     derived = {"BIG_BULL_HUNTER", "SIX_DIM_RADAR"}
     for p in sorted(DATA_DIR.glob("*.js")):
         vid = p.name[:-3]
+        vid_heal = "post_close" if vid in _POST_CLOSE_DATA_FILES else "algo_run"
         if vid in known_ids or vid in derived:
             continue
         # 🛡 2026-08-19 一劳永逸：OCR 依赖文件彻底跳过（不输出 items[] → 不渲染告警卡）
@@ -2131,14 +2156,14 @@ def check_all_data_files():
                 results.append({
                     "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
                     "status": "ok", "last_update": "静态映射", "age_min": None,
-                    "heal_cat": "algo_run",
+                    "heal_cat": vid_heal,
                     "message": f"{p.name} 静态映射文件（非严格 JSON，按体积检查 OK，{p.stat().st_size//1024}KB）",
                 })
                 continue
             results.append({
                 "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
                 "status": "fail", "last_update": "--", "age_min": None,
-                "heal_cat": "algo_run",  # 文件缺失 → 算法链重跑可重建
+                "heal_cat": vid_heal,  # 文件缺失 → post_close 重跑可重建
                 "message": f"{p.name} 缺失或解析失败（未被 CARD_DEFS 登记）",
             })
             continue
@@ -2171,7 +2196,7 @@ def check_all_data_files():
                     results.append({
                         "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
                         "status": "fail", "last_update": rel, "age_min": round(_age_lf, 1),
-                        "heal_cat": "algo_run",
+                        "heal_cat": vid_heal,
                         "message": (f"{p.name} 更新于 {rel}；超过低频红线 {int(_lfa)} 分钟"
                                     f"（{_lfa // 1440} 天，按生产者节拍：算法链周度批次）"
                                     f" —— 请检查周末批是否执行"
@@ -2181,7 +2206,7 @@ def check_all_data_files():
                 results.append({
                     "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
                     "status": "ok", "last_update": rel, "age_min": round(_age_lf, 1),
-                    "heal_cat": "algo_run",
+                    "heal_cat": vid_heal,
                     "message": (f"{p.name} 低频产物，更新于 {rel}"
                                 f"（按生产者节拍红线 {_lfa // 1440} 天；未套用 24h 通用红线）"),
                 })
@@ -2191,7 +2216,7 @@ def check_all_data_files():
             results.append({
                 "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
                 "status": "ok", "last_update": rel, "age_min": None,
-                "heal_cat": "algo_run",
+                "heal_cat": vid_heal,
                 "message": _msg,
             })
             continue
@@ -2200,7 +2225,7 @@ def check_all_data_files():
             results.append({
                 "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
                 "status": "warn", "last_update": str(ts)[:16], "age_min": None,
-                "heal_cat": "algo_run",
+                "heal_cat": vid_heal,
                 "message": f"{p.name} 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）",
             })
             continue
@@ -2241,7 +2266,7 @@ def check_all_data_files():
         results.append({
             "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
             "status": status, "last_update": str(ts)[:19], "age_min": round(age_min, 1),
-            "heal_cat": "algo_run",
+            "heal_cat": vid_heal,
             "message": msg,
         })
     return results
