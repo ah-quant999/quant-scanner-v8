@@ -5135,10 +5135,34 @@ def main(category=None, only=None):
     print(f"  ✅ 接线自检通过：tasks={len(_wf_set)} 个变量，"
           f"CATEGORY_MAP / VAR_TO_RAW 三重登记齐备（无重名、无漏登）")
 
+    # 🔴 2026-09-24 一劳永逸（小九的工程师 · 主人令「主站还是13点多的数据」根因修复之四）
+    #   【病灶·本仓实证】本循环**没有任何总时长上限**：任一源在网络层 hung（东财/新浪对
+    #     海外 IP 反爬时单请求可长时间无响应），整轮就长期停在这一步。
+    #     09-24 实测：15:23 派发的 run `#35969326733` **卡在「📡 抓中国数据」32 分钟**
+    #     （只有 job 级 timeout 60min 才会被杀）⇒ 该档位长时间被占、后续 run 全部 pending
+    #     （15:32/15:40/15:41 三个 run 干等），且**永远走不到后面的 gen_market_brief
+    #     与推送步骤** ⇒ 数据与 AI速览双双冻结 —— 与「13 点多数据」是同一类病灶。
+    #   【修法】给抓取循环设**总时长预算**（默认 720s，可用 FETCH_BUDGET_SEC 调）：
+    #     预算内正常抓；超预算的剩余源**本轮跳过**、留给下一轮（幂等闸门自动去重）。
+    #     ⚠️ 关键语义：**跳过剩余源 ≠ 丢弃已抓到的数据** —— 循环结束后照常落盘、
+    #     照常跑 gen_market_brief、照常进入推送 ⇒ 站点表现为「部分更新」而非空窗，
+    #     且整轮时长可预期。这正是「宁缺勿错 + 不空窗」的取舍。
+    _budget_sec = float(os.environ.get("FETCH_BUDGET_SEC", "720"))
+    _t_budget_end = time.time() + _budget_sec
+    _skipped_budget = []
     for var, fn in tasks:
         if target_vars is not None and var not in target_vars:
             continue
+        if time.time() > _t_budget_end:
+            _skipped_budget.append(var)
+            print(f"  ⏳ {var} 跳过：本轮抓取已用满 {int(_budget_sec)}s 预算"
+                  f"（防单源 hung 拖死整轮、堵住并发组）")
+            continue
         run(var, fn)
+    if _skipped_budget:
+        print(f"  ⏳ 本轮因超时预算跳过 {len(_skipped_budget)} 个源（下一轮补抓）："
+              f"{', '.join(_skipped_budget[:8])}"
+              f"{' ...' if len(_skipped_budget) > 8 else ''}")
 
     # 盘前必须把盘中/实时模块的当日数据清空，避免昨日收盘数据挂到开盘前（仅在 premarket 阶段执行）
     _clear_intraday_for_premarket(category, only=only)
