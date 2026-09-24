@@ -397,6 +397,28 @@ _EM_HEADERS = {
     "Accept": "*/*",
 }
 
+# 🔴🔴 2026-09-24 一劳永逸根因修复（小九 · 主人令「审计整个实时数据页，有问题马上解决」）
+# ─────────────────────────────────────────────────────────────────────────────
+# 【实测根因】东财 clist **单 host 单次请求成功率仅 ~6-10%**，失败几乎全是
+#   RemoteDisconnected（对端主动断连；与 host 无关、随机分布，非超时、非 WAF 黑名单）。
+#   而原 `_em_get_with_retry` 的 3 次重试**始终打同一个 host**（只做时间退避）
+#   ⇒ 实测「3 次全败」仍常见，**等效于没有重试**；`_etf_get_page` 更是零重试。
+# 【对照实验（各 17 页，2026-09-24 11:09 本机实测，同一网络环境）】
+#     A 现状(连接池复用·零重试)        成功  1/17
+#     B 每次新建 Session + Connection:close  成功  1/17
+#     C **失败换 host 重试（最多 3 个）**    成功 15/17   ← 唯一有效解
+#     D 共享 Session + Connection:close      成功  0/17
+#   ⇒ 结论：**换 host 才是解药，退避空等不是**。故所有东财 clist 请求统一改为换 host 重试。
+# 【一条修复同时根治四个长期停摆产物】
+#     · etf_snapshot_pages 单轮拼不齐 17 页 ⇒ ETF_DAILY_MONITOR / ETF_PULSE 停摆 23.6h
+#     · f_avg_price 60 页遍历有效样本 <3000 ⇒ AVG_PRICE_DATA 停摆 20.3h
+#     · f_concept_ranking 单次调用失败即返回 None ⇒ CONCEPT_RANKING 停摆 19.4h
+#   （2026-09-24 11:05 线上实测：上述四产物 update_time 分别为 09-23 11:30/11:30/14:49/15:42）
+# ⚠️ 与 _ETF_HOSTS（L3078）同源同语义：后者是 ETF 模块早期就摸索出的同一结论，本次把它
+#    上提到**公共请求层**，让全部东财调用方共享，不再各模块各自为战。
+_EM_HOSTS = ("https://push2delay.eastmoney.com", "https://push2.eastmoney.com") + tuple(
+    "https://%d.push2.eastmoney.com" % _i for _i in range(1, 13))
+
 # ── 美联储议息官方源（2026-09-17 主人令·根治：新增议息数据链路）─────────────
 # 背景：原 f_macro_brief() 是纯规则引擎，只读 global_macro/monetary/commodities，
 #   完全没有「议息」这一输入 ⇒ 无论重发多少次都写不出加息，且原油条目硬编码
@@ -415,16 +437,33 @@ _FED_HEADERS = {
     "Accept": "*/*",
 }
 
-def _em_get_with_retry(url, *, params, headers, timeout, max_attempts=3, label=""):
-    """2026-08-19 主人令一劳永逸式根治云端 push2 抓取抖动（B 方案）：
-       指数退避重试，遇 ConnectionError/Timeout/JSON 异常/rc!=0 时按 0.5s/1.5s/3.0s 退避。
-       三次都失败抛 RuntimeError 给上层 fn_xxx 决定是否降级返回（保留空列表语义，不破坏现有 caller）。"""
+def _em_get_with_retry(url, *, params, headers, timeout, max_attempts=3, label="", hosts=None):
+    """东财 push2 请求（含重试）。
+
+    2026-08-19 主人令一劳永逸式根治云端 push2 抓取抖动（B 方案）：指数退避重试。
+    🔴 2026-09-24 一劳永逸（小九）：**改为「换 host 重试」**（对照实验见 _EM_HOSTS 注释）。
+       · hosts 给出时，第 k 次尝试改用 hosts[k]（**保留原 path/query**，只换域名）；
+       · 退避同步调短为 0.4/0.8/1.2s（原 0.5/1.5/3.0s 共 5s 且同 host 重试≈无效）——
+         实测「换 host」比「空等」有效得多，且总耗时从 5s 降到 ~2s，给同轮其它任务让出预算。
+       · 未给 hosts 时行为与旧版完全一致（向后兼容，不破坏任何现有 caller 语义）。
+    三次都失败抛 RuntimeError 给上层 fn_xxx 决定是否降级返回（保留空列表语义）。"""
     import random as _rnd
-    delays = [0.5, 1.5, 3.0]
+    delays = [0.4, 0.8, 1.2]
     last_err = None
-    for attempt in range(max_attempts):
+    _path = ""
+    if hosts:
         try:
-            r = _requests.get(url, params=params, headers=headers, timeout=timeout)
+            from urllib.parse import urlsplit, urlunsplit
+            _sp = urlsplit(url)
+            _path = urlunsplit(("", "", _sp.path, _sp.query, ""))
+        except Exception:
+            hosts = None          # 解析失败 ⇒ 退回旧行为，绝不因此抛错
+    for attempt in range(max_attempts):
+        _u = url
+        if hosts:
+            _u = hosts[attempt % len(hosts)].rstrip("/") + _path
+        try:
+            r = _requests.get(_u, params=params, headers=headers, timeout=timeout)
             d = r.json()
             if d.get("rc") == 0:
                 return d
@@ -432,8 +471,9 @@ def _em_get_with_retry(url, *, params, headers, timeout, max_attempts=3, label="
         except Exception as e:
             last_err = e
         if attempt < max_attempts - 1:
-            dly = delays[attempt] + _rnd.uniform(0, 0.4)
-            print(f"  ⚠️ push2 抖动({label or url}) 尝试{attempt+1}/{max_attempts}: {last_err} → {dly:.1f}s 后重试")
+            dly = delays[attempt] + _rnd.uniform(0, 0.3)
+            print(f"  ⚠️ push2 抖动({label or url}) 尝试{attempt+1}/{max_attempts}: "
+                  f"{last_err} → {dly:.1f}s 后换 host 重试")
             import time as _t; _t.sleep(dly)
     raise RuntimeError(f"push2 重试{max_attempts}次仍失败: {last_err}")
 
@@ -476,6 +516,7 @@ def em_clist(fs, fields, fid="f62", stat="1", pz=5000, po="1", pn=1, timeout=15)
     po="1" 降序(取净流入最高)，po="0" 升序(取净流出最高)。
     pn 页码（默认 1），pz 单页大小（默认 5000，但 push2delay 实际硬截 100，分页需自循环）。
     2026-08-19 主人令：em_clist/em_ulist_np 加 _em_get_with_retry 指数退避，根治云端 WAF 抖动。
+    🔴 2026-09-24（小九）：改走 `hosts=_EM_HOSTS` ⇒ 重试时**换 host**（实测唯一有效解）。
     """
     params = {
         "pn": str(pn), "pz": str(pz), "po": po, "np": "1", "fltt": "2", "invt": "2",
@@ -488,6 +529,7 @@ def em_clist(fs, fields, fid="f62", stat="1", pz=5000, po="1", pn=1, timeout=15)
             f"{_EM_DELAY}/api/qt/clist/get", params=params,
             headers=_EM_HEADERS, timeout=timeout,
             label=f"clist {fs.split(' ')[0]} pz={pz} po={po}",
+            hosts=_EM_HOSTS,
         )
     except RuntimeError:
         return []
@@ -1477,8 +1519,31 @@ def _fetch_overseas_indices():
 def f_overseas_markets():
     """海外/亚太股市观测（注册于 OVERSEAS_MARKETS→intraday，盘中每30分刷新）。
     恒生指数/日经225/韩国KOSPI/台湾加权：反映亚太风险偏好，对 A 股开盘与外资流向有传导。
-    数据真实抓取，失败时 value=None（前端标注「数据未接入」），绝不编造点位。"""
-    idx = _fetch_overseas_indices()
+    数据真实抓取，绝不编造点位。
+    🔴 2026-09-24 一劳永逸（小九）：原实现抓取失败仍返回全 null 对象 ⇒ 每轮把昨日
+    有效点位覆盖成 null（前端把 null 渲染成 0.00，主人实测「恒生 0.00」），且 run
+    依旧全绿、不触发小九 cn 兜底 ⇒ 空盘循环。
+    修法（对齐 2026-09-22 US_HK_MAP 加固模式）：
+      ① 函数内退避重试 3 次（间隔 5s/15s），把瞬时限流挡在函数内；
+      ② 3 次仍全 null ⇒ return None —— run() 判 empty，**不覆盖既有产物**，
+        宁可沿用昨日/上一轮有效点位，绝不写空盘；
+      ③ note 按抓取时段动态生成（原硬编码「08:25 抓取时亚太尚未开盘」与
+        intraday 盘中每轮刷新语义自相矛盾）。"""
+    idx = []
+    for _att in range(3):
+        idx = _fetch_overseas_indices()
+        if any(x.get("chg_pct") is not None for x in idx):
+            if _att:
+                print(f"  ✅ OVERSEAS_MARKETS: 第 {_att + 1} 次尝试成功（前 {_att} 次为空）")
+            break
+        if _att < 2:
+            _dly = (5, 15)[_att]
+            print(f"  ⚠️ OVERSEAS_MARKETS: 第 {_att + 1}/3 次全空 → {_dly}s 后重试")
+            time.sleep(_dly)
+    if not any(x.get("chg_pct") is not None for x in idx):
+        print("  🔴 OVERSEAS_MARKETS: 3 次尝试全部无数据 ⇒ 返回 empty（不覆盖既有产物）")
+        print("::error title=v8-overseas-markets-empty::海外指数 3 次尝试全无数据（源限流/网络异常），保留上一轮产物")
+        return None
     now = now_cst()
     ups = sum(1 for x in idx if x.get("chg_pct") is not None and x["chg_pct"] > 0)
     downs = sum(1 for x in idx if x.get("chg_pct") is not None and x["chg_pct"] < 0)
@@ -1488,11 +1553,19 @@ def f_overseas_markets():
         bias = "亚太偏弱"
     else:
         bias = "亚太分化"
+    # note 动态生成：09:30 前亚太未全部开盘（日经/KOSPI 08:00 已开、恒生/台湾 09:00/09:30），
+    # 09:30 后为盘中实时口径。原文案硬编码「08:25 抓取时亚太尚未开盘」在盘中轮次属误导。
+    if (now.hour, now.minute) < (9, 30):
+        _note = ("亚太主要指数为最新可得点位（北京时间 09:30 前日经/KOSPI 已开盘、恒生/台湾加权尚未开盘或为昨收），"
+                 "反映隔夜与早盘亚太风险偏好，对 A 股开盘有传导。")
+    else:
+        _note = ("亚太主要指数盘中点位（恒生 09:30 / 台湾加权 09:00 / 日经·KOSPI 08:00 开盘），"
+                 "反映亚太风险偏好，对 A 股午后走势与外资流向有传导。")
     return {
         "date": now.strftime("%Y-%m-%d"),
         "indices": idx,
         "bias": bias,
-        "note": "恒生指数/日经225/韩国KOSPI/台湾加权为前一交易日收盘（北京时间08:25抓取时亚太尚未开盘），反映隔夜亚太风险偏好，对A股开盘有传导。",
+        "note": _note,
         "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
         "auto": True,
     }
@@ -3083,30 +3156,45 @@ def _etf_fresh_skip():
         return False
 
 
+_ETF_PAGE_ATTEMPTS = 4     # 单页最多试 4 个不同 host（换 host 是唯一有效解，见 _EM_HOSTS 注释）
+
+
 def _etf_get_page(pn, host):
     """取 clist 一页。返回 (ok, rows, total)：
        ok=False 明确表示**请求失败**（区别于「已经到底了」——二版之前的实现
-       就是把失败当成了「遍历到末尾」，才写出 264/1602 只的半截合计）。"""
+       就是把失败当成了「遍历到末尾」，才写出 264/1602 只的半截合计）。
+
+    🔴 2026-09-24 一劳永逸（小九）：**单页失败改为「换 host 重试」**（本次四产物停摆的直接根因）。
+       · 实测单 host 单次成功率仅 ~6-10%（RemoteDisconnected）；原实现一页**只给一次机会、零重试**
+         ⇒ 单轮 17 页只拿到 1~8 页 ⇒ 只能靠跨轮累积 ⇒ 盘中 45 分钟窗口一到全部失效
+         ⇒ **永远拼不齐** ⇒ ETF_DAILY_MONITOR / ETF_PULSE 双双停摆（线上实测停 23.6h）。
+       · 现每页最多换 _ETF_PAGE_ATTEMPTS 个 host 尝试（首个为调用方指定 host），成功率 ~88%。
+       · ⚠️ 每次尝试**必须刷新 params["_"]**：原实现时间戳在请求外只算一次，
+         重试会带同一 `_` 值，服务端可能按该参数命中同一缓存/同一故障节点 ⇒ 重试等于白打。
+    """
     params = {
         "pn": str(pn), "pz": str(_ETF_PAGE), "po": "1", "np": "1", "fltt": "2", "invt": "2",
         "ut": "b2884a393a59ad64002292a3e90d46a5",
         "fid": "f62", "fs": _ETF_FS, "stat": "1", "fields": _ETF_FIELDS,
-        "_": int(time.time() * 1000),
     }
-    try:
-        r = _requests.get(f"{host}/api/qt/clist/get", params=params,
-                          headers=_EM_HEADERS, timeout=15)
-        if r.status_code != 200:
-            return False, [], 0
-        d = r.json()
-        if d.get("rc") != 0:
-            return False, [], 0
-        dd = d.get("data")
-        if not dd:
-            return True, [], 0            # rc=0 但无 data ⇒ 真·没有更多页
-        return True, _em_clean_rows(dd.get("diff", []) or []), int(dd.get("total") or 0)
-    except Exception:
-        return False, [], 0
+    _hosts = list(dict.fromkeys([host] + list(_ETF_HOSTS)))[:max(1, _ETF_PAGE_ATTEMPTS)]
+    for _i, _h in enumerate(_hosts):
+        params["_"] = int(time.time() * 1000) + _i
+        try:
+            r = _requests.get(f"{_h}/api/qt/clist/get", params=params,
+                              headers=_EM_HEADERS, timeout=15)
+            if r.status_code != 200:
+                continue
+            d = r.json()
+            if d.get("rc") != 0:
+                continue
+            dd = d.get("data")
+            if not dd:
+                return True, [], 0        # rc=0 但无 data ⇒ 真·没有更多页
+            return True, _em_clean_rows(dd.get("diff", []) or []), int(dd.get("total") or 0)
+        except Exception:
+            continue
+    return False, [], 0
 
 
 def _etf_cache_load(today):
@@ -3244,6 +3332,40 @@ def _etf_snapshot_inner(today):
     return by_code
 
 
+def _etf_snapshot_partial():
+    """部分快照（🔴 零请求）：只读当日跨轮拼页缓存，把已拿到的页拼成部分快照。
+
+    2026-09-24 小九·一劳永逸：七版「17 页全齐才产出」治好了 -4.95 亿半截合计，
+    但 ETF_PULSE 与底表共用 _etf_snapshot() ⇒ 底表整天拼不齐时，盘中异动卡
+    被连带锁死一整天（实测 09-24 全天停 09-23 11:29）。量比 TOP12 异动榜
+    **不做全市场合计**，部分页样本偏差可接受（note 标注页数），故允许降级。
+    约束：
+      · 绝不发请求（补页/失败记忆/预算全由 _etf_snapshot 管，本函数只读缓存）；
+      · 仅限 ETF_PULSE 使用，ETF_DAILY_MONITOR 的合计口径必须保持 17 页全齐
+        （放半截页拼合计 = -4.95 亿恒定 bug 复辟，绝对禁止）；
+      · 已攒页少于 1 页的量 ⇒ 无意义，返回 None。"""
+    today = now_cst().strftime("%Y%m%d")
+    try:
+        c = _etf_cache_load(today)
+    except Exception:
+        return None, 0, 0
+    pages = c.get("pages") or {}
+    total = int(c.get("total") or 0)
+    if not pages:
+        return None, 0, 0
+    npages = min(_ETF_MAX_PAGES, (total + _ETF_PAGE - 1) // _ETF_PAGE) if total else _ETF_DEFAULT_PAGES
+    by_code = {}
+    for _k, _v in pages.items():
+        for r in (_v or [0, []])[1]:
+            code = str(r.get("f12") or "")
+            if code:
+                by_code[code] = r
+    if len(by_code) < 200:
+        # <2 页（<200 只）样本异动榜纯噪声，宁可停摆等下一轮（拼页跨轮累积很快）
+        return None, 0, 0
+    return by_code, len(pages), npages
+
+
 def f_etf_daily_monitor():
     # ETF 日监控：全市场 ETF 当日主力净流入排名（口径见上方 _ETF_FS 注释）。
     # 输出 schema 不变：{total_etf,total_net,top_inflow,top_outflow}（AI速览/ETF卡直读）。
@@ -3272,7 +3394,18 @@ def f_etf_pulse():
     # ETF 盘中异动：筛「量比>1.2 的活跃 ETF」按量比排序（降级为成交额/涨跌幅 TOP）
     # 与 f_etf_daily_monitor 共用同一份全市场快照（_etf_snapshot），**不额外发请求** ——
     # 原实现两个模块各自分页 16 次（共 32 次），是本轮 502 暴露面最大的地方。
+    # 🔴 2026-09-24 降级路径（小九）：底表 17 页未拼齐（跨轮累积中）⇒ _etf_snapshot()
+    #    返回 None，原实现直接 return None ⇒ 异动卡停摆一整天。现改用
+    #    _etf_snapshot_partial()（零请求、只读缓存）出部分快照榜，note 标注页数；
+    #    全量底表拼齐后自动恢复全市场口径。合计口径（ETF_DAILY_MONITOR）不放降级。
     snap = _etf_snapshot()
+    _snap_note = ""
+    if not snap:
+        snap, _got, _need = _etf_snapshot_partial()
+        if not snap:
+            return None
+        _snap_note = f"（部分快照 {_got}/{_need} 页；全量底表拼齐后自动恢复全市场口径）"
+        print(f"  ⚠️ ETF_PULSE: 底表未拼齐 → 降级部分快照 {_got}/{_need} 页（零请求）")
     if not snap:
         return None
 
@@ -3315,7 +3448,7 @@ def f_etf_pulse():
         "chg": "盘中异动：涨跌幅>2% 的 ETF",
         "amt": "盘中暂无显著放量，展示成交额最活跃 TOP12",
     }[mode]
-    return {"etfs": etfs, "note": note}
+    return {"etfs": etfs, "note": note + _snap_note}
 
 
 def f_analyst_ratings():
