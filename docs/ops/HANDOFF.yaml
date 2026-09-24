@@ -82,7 +82,24 @@ items:
       本项 status 保持 pending-verify：护栏与换 host 均为「让失败可见/提高成功率」，
       尚未跑出一轮成功产物 ⇒ 禁宣称「已修复」。另：补跑 run 36005590505（算法链）
       与 36006148888（DAJIJIN）派发后长时间停留 in_progress/queued，
-      疑与 run 日志中所述「僵尸 pending run 排队 31min」的 runner 队列拥塞有关，一并观察。
+      疑与 run 日志中所述「僵尸 pending run 排队 31min」的 runner 队列拥塞有关，一并观察。    evidence_note: >
+      【2026-09-24 深夜追加铁证】
+      (1) 「success 恒为假绿」已实证：run 36001001846 的 step22「板块龙头股字典（SECTOR_LEADERS，
+          仅 post_close）」started 13:51:06Z → **success**，同 run「📤 推送重建的 data/*.js」亦 success；
+          但复查远端 raw_data/sector_leaders.json 仍为 `update_time=2026-09-22 18:15:13 /
+          data_date=2026-09-21 / n=65`、raw_data/experiment.json 仍 09-22 18:13:35
+          ⇒ **step 绿 ≠ 产物新**。原因：build() 在 L213 fetch_em_boards() 抛 502 时，
+          外层 workflow 以 `|| true` 风格的软失败吞掉（该 step 有 soft_13b 告警但 exit 1 未阻断
+          job），且该轮 checkout 的是旧脚本（head 0533f52004，早于我 1052d4334162 的 host 修复）。
+      (2) concurrency 排队坐实：同一时刻 v8_cn_fetch_cloud（group v8-cn-fetch-cloud，
+          cancel-in-progress: false）有 **2 个 pending** 在排
+          （36007346709 head=da2639dada / 36004459310 head=0a962427e7），
+          加上 in_progress 的 36001001846 ⇒ 我推的 host 修复要等**第 3 个 run** 才可能被取用。
+          ⇒ 判「修复是否生效」**必须比对 run 的 head_sha 是否 ≥ 1052d4334162**，
+          只看「有 run 在跑」会把旧代码的 run 误当验证。
+      (3) 因此本轮**不追加派发**（主人令「不要造成踩踏和暴风」）：已有 2 个 pending 在队，
+          再派只会加剧互踢。改为等待自然推进 + 按 head_sha 判定。
+
   - id: build13-timeout-guard
     priority: P0
     owner: shared
