@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-24 19:04",
- "generated": "2026-09-24 19:04",
+ "update_time": "2026-09-24 19:07",
+ "generated": "2026-09-24 19:07",
  "meta": {
-  "generated": "2026-09-24 19:04",
+  "generated": "2026-09-24 19:07",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 15,
   "days_with_consensus": 0,
@@ -6216,10 +6216,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "300192",
-      "name": "科德教育",
-      "change_pct": 10.283,
-      "price": 25.31,
+      "code": "300300",
+      "name": "海峡创新",
+      "change_pct": 19.978,
+      "price": 10.81,
       "category": "突破"
      },
      {
@@ -6234,6 +6234,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "采纳股份",
       "change_pct": 3.654,
       "price": 63.54,
+      "category": "突破"
+     },
+     {
+      "code": "002119",
+      "name": "康强电子",
+      "change_pct": 9.993,
+      "price": 29.61,
       "category": "突破"
      },
      {
@@ -6302,10 +6309,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "300192",
-      "name": "科德教育",
-      "change_pct": 10.283,
-      "price": 25.31,
+      "code": "300300",
+      "name": "海峡创新",
+      "change_pct": 19.978,
+      "price": 10.81,
       "category": "加速"
      },
      {
@@ -6320,6 +6327,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "采纳股份",
       "change_pct": 3.654,
       "price": 63.54,
+      "category": "加速"
+     },
+     {
+      "code": "002119",
+      "name": "康强电子",
+      "change_pct": 9.993,
+      "price": 29.61,
       "category": "加速"
      },
      {
@@ -6360,10 +6374,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "300192",
-      "name": "科德教育",
-      "change_pct": 10.283,
-      "price": 25.31,
+      "code": "300300",
+      "name": "海峡创新",
+      "change_pct": 19.978,
+      "price": 10.81,
       "category": "短线选股"
      },
      {
@@ -6378,6 +6392,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "采纳股份",
       "change_pct": 3.654,
       "price": 63.54,
+      "category": "短线选股"
+     },
+     {
+      "code": "002119",
+      "name": "康强电子",
+      "change_pct": 9.993,
+      "price": 29.61,
       "category": "短线选股"
      },
      {
