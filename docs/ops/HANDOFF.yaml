@@ -4570,3 +4570,54 @@ items:
       （裁 reason/price 等冗余字段实测可省 ~40%，1003KB/全量）另立条目。
     updated: "2026-09-24 17:59"
     updated_by: 小九(lemoncat-cn)
+
+  - id: ci-gate-dual-block-meta-block-lost-0925
+    priority: P0
+    owner: shared
+    status: pending-verify
+    what: |-
+      🔴 **云端部署链被硬阻断 8+ 轮（2026-09-24 20:56 ~ 09-25 06:47 CST）**，失败步唯一 = `build` job step10
+      `🛡️ Pre-deploy audit`，其后「双盲区静态校验 / 部署前校验 / 部署到 main / 发布后体检」**全 skipped**。
+      两项门禁同时 FAIL：
+        ① `❌ [13/13] 交接状态源守卫: next_id_seq / max_next_id_seq 非整数（当前=None ledger=77）`
+        ② `❌ [5/8] workflow YAML: 1/34 个 workflow 对 GitHub 无效: probe_em_hosts.yml:17 顶层非法行`
+      真因（铁证，非推断）：
+        ① `docs/ops/HANDOFF.yaml` 的**整个 `meta:` 块被误删**。守卫 `pre_deploy_audit.py:1218` 读
+           `d["meta"]["next_id_seq"]` ⇒ `None` ⇒ `int(None)` 抛错 ⇒ FAIL。
+           该块在 `136d8f8cdbbe` 仍完好（`meta:`@L28、`next_id_seq: 77`@L61），
+           被**下一笔 `a2b5f1f38f3b`（阿狸咪 09-24 16:15 UTC「修正上一笔追加位置」）整块删除**，
+           连带删掉并发写协议注释。当时只重算 ledger 哈希、未跑完整 pre_deploy_audit ⇒ 漏检。
+        ② `probe_em_hosts.yml` heredoc 正文（`run: |` → `python - <<'PYEOF'` 之后）**丢 10 空格基准缩进**，
+           第 17 行起被顶到第 0 列 ⇒ YAML 顶层非法行 ⇒ GitHub 判无效。
+    fix: |-
+      ✅ **阿狸咪的工程师 2026-09-25 07:2x CST 已修并推送（commit `89ae1b937d09`，Git Data API 六步）**：
+        ① `HANDOFF.yaml` 在 `items:` 前**恢复 `meta:` 块**（`next_id_seq: 77` == `ledger.max_next_id_seq`，
+           复原 `updated` / `updated_by` + 并发写协议 A/C/D/E 注释）；
+        ② `probe_em_hosts.yml` heredoc 正文**统一补 10 空格基准缩进**（保留相对缩进）。
+      ledger **无需重算哈希**：`[13/13]` 只断言「ids 超集 + seq 单调不减」，不校验 `id_content_hashes`。
+      推前断言：插入前后除 meta 块外逐行一致；`yaml.safe_load` 回读 `meta.next_id_seq==77`、`items` 仍 82；
+      守卫逻辑离线模拟 PASS；workflow 文件 GitHub 端实测已注册（34/34 有效）。
+    evidence: |-
+      ① run **#8210**（head `0eef8c8864b9`）经 `compare 89ae1b937d09...0eef8c8864b9` = **ahead 1 / behind 0**
+         ⇒ 确为修复后代码。逐字：
+           `✅ [5/8] workflow YAML: 34 个 workflow 全部有效（PyYAML 全量）`
+           `✅ [13/13] 交接状态源守卫: 交接状态源完好：items=82（ledger 锚 82 个 id 全在）· next_id_seq=77≥77`
+           `🎉 14 项全部通过 → deploy 可继续`
+           `✅ 已部署 main（第 1 次尝试，GitHub Pages 自动重建）`
+         `build` job = **completed success**（此前 8/8 failure）；唯一非 success 步 = step3「抢跑短路」= skipped（设计）。
+      ② 部署后主站复测：**HTTP 200 / 1,361,458 B** ✅。
+      ③ 失败基线逐字（run #8208 / job 107866549869）：见本项 `what`。
+    verify_how: |-
+      ① 判据 = 之后任一 `v8_build_deploy` run 的 **`build` job 真跑 = success**（**禁看 run 结论**；盘中 build=skipped 属设计）；
+      ② 同时 `pre_deploy_audit` 逐字应见 `🎉 14 项全部通过 → deploy 可继续`；
+      ③ 反测：把 `HANDOFF.yaml` 的 `meta:` 块再删一次 ⇒ `[13/13]` 应 FAIL 并阻断 deploy（回归防护有效性）。
+      ✅ **线上终验已取得（阿狸咪 2026-09-25 07:2x CST）**：run #8210 `build` job success + 14/14 全绿 + 已部署 main
+      ⇒ **本项已满足转 `done` 的判据**（待小九侧复核后置 `done`）。
+    reflection: |-
+      🔴 **纪律自省（双机共守）**：
+      1. 改「被门禁依赖的文件」（`HANDOFF.yaml` / 锚点清单 / workflow）后，收尾**必须跑一次完整 `pre_deploy_audit.py`**
+         （或至少该项单测），**只重算 ledger 哈希不足** —— 本项即因漏此步，把部署链静默阻断 8 轮。
+      2. 推 `workflow` 文件后，**必到 GitHub `actions/workflows` 接口核「是否被注册」**：
+         本地 `yaml.safe_load` 通过 ≠ GitHub 接受（GitHub 侧校验更严，本次 heredoc 缩进本地 PyYAML 也不报错）。
+    updated: "2026-09-25 07:30"
+    updated_by: 阿狸咪的工程师(alimi-cn)
