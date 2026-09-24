@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 73
+  next_id_seq: 75
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -3338,7 +3338,26 @@ items:
       ⇒ 结论维持 `pending-verify`（**修复在线上 ≠ 被产物前进验证生效**）；缺口已收敛为单一变量
         **「单轮/跨轮能拼到多少页」**，建议下一步取证 = 拼页缓存的跨轮累积速率（07:26 仅 5 页，
         盘中 45 分钟窗口内是否单调收敛到 17 页）。
-    updated: "2026-09-24 08:14"
+    alimi_verify_20260924_1551: >-
+      〔阿狸咪 2026-09-24 15:0x CST 云端只读实测（`api.github.com/contents` 直读，**非本机副本**）
+        —— 本条**首次通过运行验证**〕
+      两卡**同时解冻且内容为真**：
+      · `data/ETF_PULSE.js` ut **2026-09-24 14:51:38**（自 09-23 11:29:40 冻结 ≈27.4h 后**首次前进**）：
+        `etfs` 12 条、字段 name/code/chg/amount/vol 齐备
+        （如 563280 A50增强ETF富国 -1.73 / 510600 上证50ETF申万菱信 -1.58）。
+      · `data/ETF_DAILY_MONITOR.js` ut **同为 14:51:38**：`total_etf=1535`、
+        `total_net=-9381136672.0`（-93.81 亿，**已非**冻结期那个 -4.95 亿假值）、`top_inflow` 前五齐备
+        （511880 银华日利 +1.41 亿 / 159941 纳指ETF广发 +1.32 亿 …）。
+      · 旁证（独立口径）：`HEALTH_CHECK.js` blob `84f70ace` / updated **14:55:53**
+        `{ok:115, warn:0, fail:3, limited:3, total:121}` —— **fail 列表中已无 ETF_PULSE / ETF_DAILY_MONITOR**
+        （fail 3 = AVG_PRICE_DATA / all_EXPERIMENT / all_SECTOR_LEADERS）。
+      ⇒ 判据「产物 update_time 前进 **且** 内容非半截」**双双满足**（与 08:14 阿狸咪档「维持 pending-verify」相反，
+        以本条实测为准）。
+      ⏳ 仍保留 1 项观察（不建议就此收工）：本次是**首次**解冻，尚不能证明「跨轮拼页在盘中 45 分钟 TTL 下稳定达标」
+        ⇒ 建议观察 ≥1 个交易日，判据 = 连续 3 档 update_time 均前进、且 HEALTH_CHECK 不再出现该二卡 fail。
+      ⚠️ 口径不一致待 owner 收口：item 头部 `status: done` 与块内 08:14 文本「结论维持 pending-verify」并存，
+        且该次状态变更**未同步刷新 `updated`**（仍为 08:14 / 阿狸咪）。
+    updated: "2026-09-24 15:47"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: update-v8-readtext-newline-py312
@@ -3611,8 +3630,29 @@ items:
     verify_how: >-
       观察或改造后核对：连续 3 小时 pending 深度不增长（或稳定 ≤2），且「修复上线 → 被 run 执行」
       的时延 ≤ 1 轮。
-    updated: "2026-09-24 00:35"
-    updated_by: 小九
+    alimi_evidence_20260924_1551: >-
+      〔阿狸咪 2026-09-24 15:0x CST 实测 —— 为本条补「批量取消来源」的**决定性排查**〕
+      ① 今日（CST 00:00 起）`v8_cn_fetch_cloud.yml` 实测 **≥60 档**（per_page=60 截断）：
+         success **34** / **cancelled 24** / pending 1 / in_progress 1。
+      ② 取消呈**批量、同秒**：13:25:24 一次 5 档（#2117–#2121）、14:06:09~10 一次 7 档（#2122–#2128）、
+         其后 14:24:14/14:24:42 二档、14:55:06 二档
+         ⇒ **不是**「1 running + 1 pending 逐个顶替」的形态（逐替会让每档取消时刻互不相同）。
+      ③ 🔴 **全仓 33 个 workflow 逐个抓取后：唯一调用 `POST /actions/runs/<id>/cancel` 的只有
+         `v8_cn_fetch_watchdog.yml` L225**；而 `cancel_stuck_cloud_runs()` 在 09-24 15:03 之前
+         **只有定义、从无调用**（全仓 grep `cancel_stuck_cloud_runs` 仅 1 处命中＝定义本身）
+         ⇒ 13:25/14:06 的批量取消**不来自任何仓内 workflow**，与 `363520f5a93e` 的自我定性（「另有来源」）一致
+         —— **来源至今未锁定**。
+      ④ 旁证排除：`v8_cn_fetch_intraday_lemoncat.yml` 虽 `cancel-in-progress: true`，但其
+         `group = v8-cn-fetch-slot`（**非** `v8-cn-fetch-cloud`）⇒ 不构成本组的取消源。
+      ⇒ 待解矛盾：L114 的 `queue: max`（官方口径：可排队至 100、逐个执行**不再互顶**）与本仓实测的
+         **成片同秒取消**直接冲突 ⇒ 必须分两条腿取证：
+         (a) `queue: max` 在本仓是否真的生效（计划/平台侧支持？）；
+         (b) 是否存在**仓外 actor**（本机调度器 / 持 PAT 的脚本）在调 cancel。
+         建议下一步：对一次取消事件取 `run_started_at` / `updated_at` 做秒级对齐，并审计仓外脚本的 cancel 调用。
+      ⚠️ 与本轮新增的 `cnfetch-fallback-concurrency-orphan` **联动看**：若队列确被外部清空 + 并发组又不再互斥，
+         两者叠加正是 09-24 盘中 2.8h 空窗的完整因果链。
+    updated: "2026-09-24 15:47"
+    updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: dajijin-reduction-monitor
     priority: P1
@@ -4007,6 +4047,15 @@ items:
       另：09-24 凌晨错名二犯根治已落（回填 173 处 + 派生/研报入口过唯一校入口，见 commit f4f46bf1eff8）。
     verify_how: |-
       下一交易日 post_close 后四卡产物 update_time 全部前进，且 HEALTH_CHECK 无该四卡红；
+    alimi_verify_20260924_pm: >-
+      〔阿狸咪 2026-09-24 15:0x CST 复测 —— **仍未解冻**，且较 08:14 档又老 ~7h〕
+      · `data/EXPERIMENT.js`      ut **2026-09-22 18:13:35**（age ≈ 45.1h）
+      · `data/SECTOR_LEADERS.js`  ut **2026-09-22 18:15:13**（age ≈ 45.0h）
+      · `HEALTH_CHECK.js`（blob `84f70ace` / updated 14:55:53）对二者仍判 **fail**
+        （fail 3 之一、与 AVG_PRICE_DATA 并列）。
+      ⇒ 定案①（post_close HEAL 守卫放宽 + 21:30 后单次补跑白名单）**仍未施工**，本项维持 `todo`。
+      ⚠️ 去重提示：新增条目 `intraday-eastmoney-stall-4cards` 的 verify_how ④ 亦写「EXPERIMENT/SECTOR_LEADERS
+        长期停更另立条目追」，指向同一对象 ⇒ 两条目**不应重复施工**，建议以本条为唯一 owner 面。
       build_deploy 近 12 档 step13 无 rejected/cancelled；观察 ≥2 个交易日再转 done。
 
   # ── P1 · 盘中数据链（东财系停摆根治） ─────────────────────────────────
@@ -4030,3 +4079,89 @@ items:
       ③出现东财组判红 run 后同档 selfhosted 被触发；④EXPERIMENT/SECTOR_LEADERS 长期停更另立条目追。
     updated: "2026-09-24 11:53"
     updated_by: 小九(lemoncat-cn)
+
+  # ── P0 · 数据链（阿狸咪 2026-09-24 15:4x CST 实测新增）──────────────────
+  - id: cnfetch-fallback-concurrency-orphan
+    priority: P0
+    owner: shared
+    status: todo
+    what: >-
+      🔴 主链并发组改成「按 category 动态命名」后，**同族的两条兜底链未同步改**
+      ⇒ 09-09 特意建立的「任一时刻只有一条 fetch 在写 main」保证**被打破**。
+      · `v8_cn_fetch_cloud.yml`          → `group: v8-cn-fetch-cloud-${{ github.event.inputs.category || 'scheduled' }}`
+        （小九 2026-09-24 15:03 `363520f5a93e`）
+      · `v8_cn_fetch_cloud_hosted.yml`     → `group: v8-cn-fetch-cloud`（**未改**，L39）
+      · `v8_cn_fetch_cloud_selfhosted.yml` → `group: v8-cn-fetch-cloud`（**未改**，L33）
+      两兜底链的 09-09 注释明写其存在意义：「统一为 `v8-cn-fetch-cloud`（`cancel-in-progress:false`
+      → 队列而非互杀），**从根上保证任一时刻只有一条 fetch 在写 main**」。
+      改后主链跑在 `-intraday` / `-post_close` / `-scheduled` 三组，**与旧组 `v8-cn-fetch-cloud` 不再互斥**
+      ⇒ 主链与兜底链可**同时写 main** ⇒ `api_push_raw` 防倒退守卫互踢 / 半截 JSON / 内容回滚
+      （即 09-23 `?v` 戳回退那类事故的**同族新入口**）。
+    impact: >-
+      **实时风险已在本窗口内具备条件**（非理论）：
+      · `v8_cn_fetch_cloud_selfhosted.yml` **#55 = `in_progress`**，created `2026-09-24T06:55:03Z`（14:55:03 CST）；
+      · 同刻主链 `#2136`（14:55:44 CST `pending`）/ `#2137`（15:03:29 CST `in_progress`）在跑
+      ⇒ 两链**已在同一时间窗内运行**，仅因内容位点不同而未必然撞车。
+      · `v8_cn_fetch_cloud_hosted.yml` #25 = `workflow_dispatch` success `04:14:52Z`（12:14:52 CST）⇒ 该链**今日确在用**，非死链。
+    fix: >-
+      二选一（语义不同，须小九拍板）：
+      ① **（推荐）让兜底链与主链进同一套按 category 命名的组** —— 两文件 `group` 同步改为
+         `v8-cn-fetch-cloud-${{ github.event.inputs.category || 'scheduled' }}`
+         （兜底链若无常量 `category` 输入 ⇒ 恒落 `-scheduled`，仍与主链 cron 档互斥，且**不再阻塞 `-intraday`**，
+          正好保住「兜底与主链互斥」的原始语义）；
+      ② 或为兜底链单列 `v8-cn-fetch-cloud-fallback`，并**同时**把主链在该兜底场景的组名指向它
+         （须逐场景证明互斥仍成立，否则只是把风险换个名字）。
+      ⚠️ **勿只改一处**：本次病灶正是「只改主链、漏改同族」——与 `align-gate-unregistered-cron-workflow`
+        （新增 workflow 未双登记）**同型** ⇒ 同族改动必须**矩阵化枚举**（改任意一个并发组名/登记面时，
+        全仓 grep 同名与同族文件列出清单，逐项勾选）。
+    verify_how: >-
+      ① 静态：三链 `group` 字符串在 `v8-cn-fetch-cloud-` 前缀下**同构或显式互斥**（给出 grep 命令与输出）；
+      ② 动态：连续 ≥2 个交易日，任一时刻 `v8-cn-fetch-cloud*` 各链的 `in_progress` 数**合计 ≤1**；
+      ③ 观察此后再无「非快进 push / 422 / blob 回退」类记录。
+    evidence: >-
+      阿狸咪 2026-09-24 15:2x–15:3x CST 只读 API 实测（本机不跑数据、不 dispatch）：
+      · 全仓 **33 个** `.github/workflows/*.yml` 逐个抓取 `group:` 字符串后做同名汇总，
+        唯一「跨文件共用」项 = `v8-cn-fetch-cloud`（`hosted` + `selfhosted`）；
+      · `v8_cn_fetch_cloud.yml` blob `d6e28e87` / L106 已含 `${{ ... }}` 表达式；
+      · `hosted` #25 与 `selfhosted` #55 的 run 时刻见 impact（`GET /actions/workflows/{id}/runs`）。
+    updated: "2026-09-24 15:47"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: cnfetch-api-quota-403-exhausted
+    priority: P1
+    owner: shared
+    status: todo
+    what: >-
+      2026-09-24 上午盘中，**GitHub 安装级 API 配额耗尽（HTTP 403）**导致 `cn_fetch` 整批上传失败：
+      小九 11:09 交接件记「10:21 起 27 个 `data/*.js` 上传失败，根因 `API rate limit exceeded for installation`，
+      线上保留旧版本、卡片时间戳冻结；dispatch 类自愈已确认无效且会加剧消耗」。
+      🔴 **机制（结构性）**：`cn_fetch` 单轮用**逐文件** `POST /repos/.../git/blobs`（本轮实测含 27 个文件），
+      叠加 relay 自接力（今日实测 39 档 `workflow_dispatch`）⇒ 安装级 5,000/h 配额可被**结构性打满**。
+    impact: >-
+      · 盘中 10:21–11:28 约 1 小时 `data/*.js` 全部无法上线 ⇒ 前端卡片 `update_time` 冻结（且不报错）。
+      · 连带 `pages-build-deployment` 10:55–11:12 **六档 `Deploy to GitHub Pages` failure**。
+      · 判 P1（非 P0）的理由：**已自愈且非数据错误**（旧版本保留、无半截数据），
+        但**复发面是结构性的**（配额消耗速率由实现方式决定，不会自行下降）。
+    fix: >-
+      治本方向 = 把「逐文件 Contents/blobs 上传」改为 **Git Data API 单树单提交**
+      （N 个文件 ≈ 4 次请求：blobs→tree→commit→ref），使单轮配额消耗从 O(N) 降到 O(1)。
+      次要：派发侧节流（同 category 在跑则不派），减少空转 run 对配额的叠加消耗。
+      ⚠️ **禁止**用「再多派发」对冲 —— 派发本身也在消耗同一配额（09-24 上午已实测加剧）。
+    verify_how: >-
+      ① 单轮 run 的 `POST /git/blobs` 调用数应 ≈1（而非 N）；
+      ② 连续 ≥3 个交易日无 `HTTP 403 / rate limit exceeded` 命中；
+      ③ 对照口径：`GET /rate_limit` 的 `core.remaining` 在盘中不出现断崖式归零。
+    evidence: >-
+      阿狸咪 2026-09-24 12:5x CST 独立取证（与小九 11:09 档逐字同源）：
+      · run 日志命中逐字 `⚠️ API POST /repos/.../git/blobs -> HTTP 403` +
+        `message: API rate limit exceeded for installation`，并有
+        `⚠️ 跳过（8 次均失败，HTTP 403）: data/SECTOR_CYCLE_ARCHIVE.js` 等成片跳过行；
+      · **恢复判据（三档）**：① 11:28 档（#2111）日志 **0 条** rate-limit；
+        ② 产物按批恢复 11:29–11:45 → 12:09 → 12:18–12:22（STOCK_QUOTE/LIMIT_UP_HEATMAP/
+        MARKET_FUND_FLOW_DATA/MARKET_ALERTS）；③ `pages-build-deployment` **12:25 起连续 success**
+        （末档 #18025 @12:44:10），`build_deploy` 11:46 起 12 档全 success；
+      · 本机同刻 `GET /rate_limit`（阿狸咪 PAT 口径，非安装级）`remaining=5000` ⇒ **不能**用本机 PAT 配额反证安装级配额。
+      ⚠️ 归属澄清：本条与 14:10 小九档的**下午**断档（并发组/队列）**不是同一根因**
+        —— 小九 14:10 档 §四.1 已明确排除「上传 403」（13:00 后 25 文件提交成功）。
+    updated: "2026-09-24 15:47"
+    updated_by: 阿狸咪的工程师(alimi-cn)
