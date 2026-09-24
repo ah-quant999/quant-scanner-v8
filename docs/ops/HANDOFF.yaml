@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-24 02:46"
+  updated: "2026-09-24 08:14"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -3314,7 +3314,20 @@ items:
       ✅ 复检（阿狸咪 2026-09-23 21:17 独立取远端真身，`data/*.js` 走 Contents/Git-blobs API，禁看本机副本）：
         `ETF_PULSE` ut 仍 **11:29:40**、`ETF_DAILY_MONITOR` ut 仍 **11:30:22**（两张 rep=11:31:58）
         ⇒ 六版串行首趟尚未跑到，与你 21:00 的 ⏳ 判断一致 ⇒ 本项维持 `pending-verify`。
-    updated: "2026-09-24 00:35"
+    alimi_progress_20260924: >-
+      阿狸咪 2026-09-24 08:14 CST 实测（远端 API 真身，非本机副本）：
+      ① **七版已在线上且逐字节确认** —— `cloud_fetch_v8.py` 264139 B / md5 `a657dd92e17f`，与 fix 段所述完全一致
+         （引入提交 `f83a4b68f459`，09-24 00:28:31 CST）。
+      ② 但**产物仍未前进**：`data/ETF_PULSE.js` ut 仍 `2026-09-23 11:29:40`、`data/ETF_DAILY_MONITOR.js`
+         ut 仍 `2026-09-23 11:30:22`（冻结 ≈20.6h）；`HEALTH_CHECK`（08:02:04）对 ETF_PULSE 给 fail，
+         `age_min=1232.4 :: 更新于 昨日 11:29；超过阈值 1172 分钟`。
+      ③ 跨轮拼页缓存在**推进但远未达标**：`raw_data/etf_snapshot_pages.json` date=20260924 / total=1625 /
+         **仅 5 页**（pn=1,2,3,7,15）＝ **500/1625 行**，update_time `2026-09-24 07:26:15`
+         ⇒ 未达 `_ETF_MIN_ROWS` ⇒ 按「禁半截写盘」设计**整体不写**（设计按预期生效，但源站 502 面仍占优）。
+      ⇒ 结论维持 `pending-verify`（**修复在线上 ≠ 被产物前进验证生效**）；缺口已收敛为单一变量
+        **「单轮/跨轮能拼到多少页」**，建议下一步取证 = 拼页缓存的跨轮累积速率（07:26 仅 5 页，
+        盘中 45 分钟窗口内是否单调收敛到 17 页）。
+    updated: "2026-09-24 08:14"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: update-v8-readtext-newline-py312
@@ -3845,7 +3858,15 @@ items:
         必须是**两个 item**：本条 = 「部署步红、无数据丢失、烧 runner」；
         那条 = 「真丢改动、零信号」。二者修复面（一个在 workflow 重试策略、一个在推送器 blob 同源）
         与危害等级（P2 / P1）都不同，混因会让「改了一处、另一处仍复发」被误判成修复无效。
-    updated: "2026-09-24 00:04"
+    alimi_evidence_20260924: >-
+      阿狸咪 2026-09-24 08:14 CST 实测（同日 5 档复核，与立项例同族）：
+      `v8_build_deploy` #8023(07:26:26) / #8022(07:24:52) / #8017(06:22:43) / #8016(06:18:34) / #8014(05:23:06)
+      五档 `build` job = failure，**唯一失败步 = step13「📤 部署到 main（GitHub Pages 源）」**；
+      `gate` job 与 step10 `🛡️ Pre-deploy audit` 均 success ⇒ 排除门禁/数据成因，确认该族 = 推送竞态。
+      #8023 日志逐字三次 `! [rejected] HEAD -> main (fetch first)`（23:31:44 / 23:35:21 / 23:38:50 UTC）
+      ＋ `##[error]Process completed with exit code 1.` ⇒ 与立项例形态逐字一致。
+      ⚠️ 同窗并存两族**非**本项：并发组顶替产生的 `cancelled`、以及 step3「⚡ 抢跑短路」skipped。
+    updated: "2026-09-24 08:14"
 
   - id: api-push-stale-base-index-clobber
     priority: P1
@@ -3943,7 +3964,16 @@ items:
     priority: P1
     owner: shared
     status: todo
-    updated: "2026-09-24 02:46"
+    alimi_note_20260924: >-
+      阿狸咪 2026-09-24 08:14 CST 实测：定案①（post_close HEAL 守卫放宽 + 21:30 后单次补跑白名单）**尚未施工**，
+      而 09-24 02:49 档「两卡会在 09-23 16:30/17:20 盘后链自动回来」的预期**已被实测证否** ——
+      · `data/EXPERIMENT.js` ut 仍 `2026-09-22 18:13:35`（age 2268.5 min）
+      · `data/SECTOR_LEADERS.js` ut 仍 `2026-09-22 18:15:13`（age 2266.8 min）
+      · `HEALTH_CHECK`（08:02:04）对二者均给 `fail`：`超过通用红线 1620 分钟（交易日 24h / 非交易日 T+1 18:30）`
+      旁证（排除误伤）：`v8_cn_fetch_experiments.yml` #10（09-23 21:46:27 CST）**全步骤 success**，
+      但该链覆盖的是另外 3 个 fetcher，不产出 EXPERIMENT / SECTOR_LEADERS ⇒ **非该 workflow 事故**。
+      ⇒ 建议把本三项（尤其①）提升执行序：它目前是**唯一**能解这两张卡的路径。
+    updated: "2026-09-24 08:14"
     updated_by: 阿狸咪的工程师(alimi-cn)
     what: >-
       〔2026-09-24 02:46 阿狸咪的工程师〕主人令「和小九商量定」——昨夜三项挂账已定案，登记施工口径：
