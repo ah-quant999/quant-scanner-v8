@@ -1038,6 +1038,23 @@ jobs:
           else:
               print("[landcheck] 全部文件无法读取/解析，证据不足 → 不误报红")
 
+          # 🆕 2026-09-24 东财源组判红（治「东财系盘中停摆但 run 全绿」）：
+          #   病灶：盘中主力跑 GitHub hosted（海外 IP），东财 push2delay 拒答 ⇒ 东财系任务
+          #   每轮 empty（不覆盖旧产物）；而 landcheck 只要非东财源（INDEX_QUOTES 等）推进
+          #   1 个就判 ok ⇒ 调度器「小九 cn 兜底」几乎永不触发 ⇒ 东财卡整日停摆。
+          #   修法：intraday 档东财源组**全部**未推进（哪怕其余源全绿）→ run 判红 exit 1
+          #   ⇒ 调度器 check_cloud 探到 failure 触发小九 selfhosted 兜底轮（中国 IP 可抓东财）。
+          #   红 run 在此语义下 = 自愈链路信号，非事故。
+          EAST_FILES = ["CONCEPT_RANKING.js", "CAPITAL_FLOW_DATA.js", "SECTOR_FUND_FLOW.js",
+                        "LIMIT_UP_HEATMAP.js", "CANDIDATE_QUOTES.js"]
+          east_stale = [f for f in stale if f in EAST_FILES]
+          east_adv = [f for f in advanced if f in EAST_FILES]
+          east_all_stale = (cat == "intraday" and bool(east_stale) and not east_adv)
+          if east_all_stale:
+              verdict = "east_group_stale"
+              print(f"[landcheck] 东财源组 {len(east_stale)} 个全部未推进"
+                    f"（其余源推进 {len(advanced)} 个）→ 判红触发小九 cn 兜底")
+
           gh_out = os.environ.get("GITHUB_OUTPUT")
           if gh_out:
               with open(gh_out, "a") as f:
@@ -1045,16 +1062,21 @@ jobs:
                   f.write(f"advanced={len(advanced)}\n")
                   f.write(f"stale={len(stale)}\n")
 
-          if verdict == "empty_round":
-              msg = (f"本轮 category={cat} 应刷新 {len(files)} 个代表文件，"
-                     f"实际【0 个】推进 → 整轮空转（假成功）")
+          if verdict in ("empty_round", "east_group_stale"):
+              if verdict == "empty_round":
+                  msg = (f"本轮 category={cat} 应刷新 {len(files)} 个代表文件，"
+                         f"实际【0 个】推进 → 整轮空转（假成功）")
+                  detail = ", ".join(f"`{x}`" for x in stale)
+              else:
+                  msg = (f"本轮 category={cat} 东财源组 {len(east_stale)} 个代表文件全部未推进"
+                         f"（其余源推进 {len(advanced)} 个）→ 东财数据假成功")
+                  detail = ", ".join(f"`{x}`" for x in east_stale)
               print("::error title=v8-fake-success::" + msg +
                     "。远端 main 数据未更新，本轮此前的 success 不可信，请查本轮软失败 annotation。")
               gh_sum = os.environ.get("GITHUB_STEP_SUMMARY")
               if gh_sum:
                   with open(gh_sum, "a") as f:
-                      f.write(f"## ❌ 假成功：{msg}\n\n未推进文件："
-                              + ", ".join(f"`{x}`" for x in stale) + "\n")
+                      f.write(f"## ❌ 假成功：{msg}\n\n未推进文件：" + detail + "\n")
               sys.exit(1)
           PY
 

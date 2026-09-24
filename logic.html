@@ -1005,7 +1005,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
           <tr><td><b>期指主力合约 · 情绪方向</b></td><td><b>CFFEX_HOLDINGS</b></td><td><b>云端 v8_cn_fetch_cloud</b></td><td><b>实时数据 / 盘中 · 短线（2026-08-31 迁回，防回滚）</b></td></tr>
           <tr><td>情绪周期 · 连板天梯</td><td>LIMIT_UP_HEATMAP</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
           <tr><td>涨停热力矩阵</td><td>LIMIT_UP_HEATMAP</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
-          <tr><td>ETF 盘中异动 · 主力净额分时</td><td>ETF_PULSE / ETF_NET_SUBSCRIPTION</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分（2026-09-11 轻量化：原「ETF 三合一」Block3「日监控·主力净流入」已独立成卡并迁至「盘后数据」页；2026-09-15 主人令：Block2「资金热度·净申赎」T-1 非实时，亦迁至「盘后数据」页「日监控」卡下方）</td></tr>
+          <tr><td>ETF 盘中异动 · 主力净额分时</td><td>ETF_PULSE / ETF_NET_SUBSCRIPTION</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分（2026-09-11 轻量化：原「ETF 三合一」Block3「日监控·主力净流入」已独立成卡并迁至「盘后数据」页；2026-09-15 主人令：Block2「资金热度·净申赎」T-1 非实时，亦迁至「盘后数据」页「日监控」卡下方。降级口径 2026-09-24：全市场 17 页快照跨轮拼页未齐时，本卡自动降级用已拼齐的部分快照（≥2 页）出榜并标注「部分快照 N/17 页」；「ETF 日监控」合计口径不降级，拼齐前保留昨日完整合计，严防半截合计误导）</td></tr>
           <tr><td><b>（2026-09-11 迁出）日监控 · 主力净流入</b></td><td><b>ETF_DAILY_MONITOR</b></td><td><b>云端 v8_cn_fetch_cloud</b></td><td><b>已迁至「盘后数据」页（市场宽度卡上方）· 盘中每 30 分 + 收盘后定稿（防回滚）</b></td></tr>
           <tr><td>板块资金趋势</td><td>SECTOR_FUND_FLOW / SECTOR_FUND_FLOW_TREND</td><td>云端 v8_cn_fetch_cloud</td><td>盘后数据页 / 盘中每 30 分（2026-09-11：原 Block1「盘中追热」整块删除，行业/概念净额榜改由「AI 市场速览」承载）</td></tr>
           <tr><td>概念资金热力图</td><td>CONCEPT_RANKING</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
@@ -1019,7 +1019,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-h">指数快览</div>
         <div class="logic-p">上证 / 深证 / 创业 / 科创等主要指数现价、涨跌幅、涨跌家数、成交额。数据来自东方财富 push2delay（INDEX_QUOTES），盘中每 30 分刷新，属 T+0 实时/准实时数据。2026-08-31 起每个指数胶囊改小，名称/价格/涨跌幅/成交压缩为紧凑两行。</div>
         <div class="logic-h">亚太市场概览</div>
-        <div class="logic-p">日经 225 / 恒生 / 韩国 KOSPI / 台湾加权等亚太主要指数。数据来自 akshare（OVERSEAS_MARKETS），<b>注册为 intraday</b>，随各市场交易时段每 30 分刷新，徽章统一显示「实时」。2026-08-31 起每个指数胶囊改小，名称/点位/涨跌幅压缩为紧凑两行。</div>
+        <div class="logic-p">日经 225 / 恒生 / 韩国 KOSPI / 台湾加权等亚太主要指数。数据来自东方财富全球指数接口（push2delay，OVERSEAS_MARKETS），<b>注册为 intraday</b>，随各市场交易时段每 30 分刷新，徽章统一显示「实时」。防呆口径（2026-09-24）：抓取失败时函数内重试 3 次，仍全空则<b>不落盘、保留上一轮有效点位</b>；前端点位缺失显示「--」而非 0.00。2026-08-31 起每个指数胶囊改小，名称/点位/涨跌幅压缩为紧凑两行。</div>
         <div class="logic-h">行业树图 · 细分赛道</div>
         <div class="logic-p">以 treemap 方块展示行业板块涨跌。优先用盘中实时资金流 SECTOR_FUND_FLOW（每 30 分刷新），盘中缺失不回退到盘后 SECTOR_RS；方块颜色=涨跌，面积≈日内波动幅度。<b>2026-08-31 主人令</b>：胶囊尺寸加大，撑满卡片高度，避免下方半截空荡。<br>🔁 <b>2026-09-15 主人令（尺寸统一）</b>：本卡与「概念资金热力图」此前各写一套尺寸公式，导致同页两卡一大一小（概念卡 30 个方块里 21 个塌到 44px，名字被截成「光…」，主人原话「上面那个根本太小气看不了」）。现将尺寸计算抽为全站唯一入口 <code>window._v8TreeTilePx</code>，<b>两卡共用同一把尺子</b>：权重＝0.75×数值 + 0.25×排名（排名权重用于压掉「主力净流入」这类长尾量纲），方块尺寸恒在 <b>62–132px</b>；字号由 <code>window._v8TreeTileFont</code> 按尺寸分四档（12 / 13 / 14 / 15px）；圆角 10px、间距 6px、内边距 8px 两卡一致。⚠️ 两卡必须走同一函数，禁止再各写一套（主人铁律：不允许某模块特立独行）。</div>
       </div>

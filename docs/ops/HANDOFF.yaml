@@ -4008,3 +4008,25 @@ items:
     verify_how: |-
       下一交易日 post_close 后四卡产物 update_time 全部前进，且 HEALTH_CHECK 无该四卡红；
       build_deploy 近 12 档 step13 无 rejected/cancelled；观察 ≥2 个交易日再转 done。
+
+  # ── P1 · 盘中数据链（东财系停摆根治） ─────────────────────────────────
+  - id: intraday-eastmoney-stall-4cards
+    priority: P1
+    owner: 小九(lemoncat-cn)
+    status: pending-verify
+    what: >-
+      〔2026-09-24 11:5x 小九〕主人报多卡「昨日数据」。全量审计 110 个 data/*.js：盘中东财系四卡
+      （亚太概览全0.00/ETF横幅/ETF盘中异动/概念热力）停昨日=hosted 海外 IP 被东财拒答且 landcheck
+      非东财源动 1 个即全绿 ⇒ 小九兜底永不触发；OVERSEAS_MARKETS 抓失败写全 null 覆盖旧值，前端
+      Number(null)=0.00；ETF_PULSE 与底表共用 17 页快照被连带锁死；实验卡 workflow 09-23 success
+      但 EXPERIMENT.js 未落地（假成功又一例）。
+    fix: |-
+      ① f_overseas_markets 重试3次+全空不覆盖+note动态；② _etf_snapshot_partial 零请求降级，
+      ETF_PULSE 部分快照出榜（≥2页/200只），ETF_DAILY_MONITOR 合计口径不降级；
+      ③ landcheck 新增东财源组判红（intraday 东财5文件全未推进→exit 1→调度器触发小九 cn 兜底）；
+      ④ 前端 value null 显示「--」；⑤ logic.html 数据源勘误+降级口径披露。
+    verify_how: |-
+      观察 ≥1 交易日：①概念热力/ETF异动 update_time 盘中前进；②亚太概览不再全 0.00；
+      ③出现东财组判红 run 后同档 selfhosted 被触发；④EXPERIMENT/SECTOR_LEADERS 长期停更另立条目追。
+    updated: "2026-09-24 11:53"
+    updated_by: 小九(lemoncat-cn)
