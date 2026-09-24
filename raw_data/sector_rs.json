@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-24 22:17",
+  "update_time": "2026-09-24 22:24",
   "data_date": "2026-09-24",
   "data_date_source": "kline",
   "fetch_date": "2026-09-24",
@@ -709,24 +709,6 @@
       "relative_52w": -3.59
     },
     {
-      "name": "计算机设备",
-      "pct_day": -1.44,
-      "pct_5d": 2.75,
-      "pct_20d": -0.49,
-      "pct_30d": -0.53,
-      "pct_60d": 0.26,
-      "pct_90d": -14.64,
-      "pct_180d": -7.94,
-      "pct_52w": -2.74,
-      "relative_5d": 2.75,
-      "relative_20d": -0.49,
-      "relative_30d": -0.53,
-      "relative_60d": 0.26,
-      "relative_90d": -14.64,
-      "relative_180d": -7.94,
-      "relative_52w": -2.74
-    },
-    {
       "name": "金属新材料",
       "pct_day": -1.75,
       "pct_5d": 2.53,
@@ -1319,24 +1301,6 @@
       "relative_90d": -12.29,
       "relative_180d": -11.72,
       "relative_52w": -11.63
-    },
-    {
-      "name": "元件",
-      "pct_day": -4.5,
-      "pct_5d": 1.95,
-      "pct_20d": 16.93,
-      "pct_30d": 20.77,
-      "pct_60d": 1.13,
-      "pct_90d": 22.15,
-      "pct_180d": 85.41,
-      "pct_52w": 102.21,
-      "relative_5d": 1.95,
-      "relative_20d": 16.93,
-      "relative_30d": 20.77,
-      "relative_60d": 1.13,
-      "relative_90d": 22.15,
-      "relative_180d": 85.41,
-      "relative_52w": 102.21
     },
     {
       "name": "医疗服务",
@@ -1993,24 +1957,6 @@
   ],
   "strong_20d": [
     {
-      "name": "元件",
-      "pct_day": -4.5,
-      "pct_5d": 1.95,
-      "pct_20d": 16.93,
-      "pct_30d": 20.77,
-      "pct_60d": 1.13,
-      "pct_90d": 22.15,
-      "pct_180d": 85.41,
-      "pct_52w": 102.21,
-      "relative_5d": 1.95,
-      "relative_20d": 16.93,
-      "relative_30d": 20.77,
-      "relative_60d": 1.13,
-      "relative_90d": 22.15,
-      "relative_180d": 85.41,
-      "relative_52w": 102.21
-    },
-    {
       "name": "影视院线",
       "pct_day": -1.18,
       "pct_5d": 0.13,
@@ -2171,28 +2117,28 @@
       "relative_90d": -9.68,
       "relative_180d": -8.34,
       "relative_52w": -3.59
+    },
+    {
+      "name": "白色家电",
+      "pct_day": -0.74,
+      "pct_5d": 2.69,
+      "pct_20d": 3.87,
+      "pct_30d": 4.46,
+      "pct_60d": 1.11,
+      "pct_90d": -8.55,
+      "pct_180d": -0.65,
+      "pct_52w": 0.79,
+      "relative_5d": 2.69,
+      "relative_20d": 3.87,
+      "relative_30d": 4.46,
+      "relative_60d": 1.11,
+      "relative_90d": -8.55,
+      "relative_180d": -0.65,
+      "relative_52w": 0.79
     }
   ],
   "strong_relative_20d": [
     {
-      "name": "元件",
-      "pct_day": -4.5,
-      "pct_5d": 1.95,
-      "pct_20d": 16.93,
-      "pct_30d": 20.77,
-      "pct_60d": 1.13,
-      "pct_90d": 22.15,
-      "pct_180d": 85.41,
-      "pct_52w": 102.21,
-      "relative_5d": 1.95,
-      "relative_20d": 16.93,
-      "relative_30d": 20.77,
-      "relative_60d": 1.13,
-      "relative_90d": 22.15,
-      "relative_180d": 85.41,
-      "relative_52w": 102.21
-    },
-    {
       "name": "影视院线",
       "pct_day": -1.18,
       "pct_5d": 0.13,
@@ -2353,28 +2299,28 @@
       "relative_90d": -9.68,
       "relative_180d": -8.34,
       "relative_52w": -3.59
+    },
+    {
+      "name": "白色家电",
+      "pct_day": -0.74,
+      "pct_5d": 2.69,
+      "pct_20d": 3.87,
+      "pct_30d": 4.46,
+      "pct_60d": 1.11,
+      "pct_90d": -8.55,
+      "pct_180d": -0.65,
+      "pct_52w": 0.79,
+      "relative_5d": 2.69,
+      "relative_20d": 3.87,
+      "relative_30d": 4.46,
+      "relative_60d": 1.11,
+      "relative_90d": -8.55,
+      "relative_180d": -0.65,
+      "relative_52w": 0.79
     }
   ],
   "strong_30d": [
     {
-      "name": "元件",
-      "pct_day": -4.5,
-      "pct_5d": 1.95,
-      "pct_20d": 16.93,
-      "pct_30d": 20.77,
-      "pct_60d": 1.13,
-      "pct_90d": 22.15,
-      "pct_180d": 85.41,
-      "pct_52w": 102.21,
-      "relative_5d": 1.95,
-      "relative_20d": 16.93,
-      "relative_30d": 20.77,
-      "relative_60d": 1.13,
-      "relative_90d": 22.15,
-      "relative_180d": 85.41,
-      "relative_52w": 102.21
-    },
-    {
       "name": "种植业与林业",
       "pct_day": -1.82,
       "pct_5d": -1.18,
@@ -2535,28 +2481,28 @@
       "relative_90d": -3.48,
       "relative_180d": -14.96,
       "relative_52w": -16.77
+    },
+    {
+      "name": "港口航运",
+      "pct_day": 0.69,
+      "pct_5d": -1.24,
+      "pct_20d": 1.3,
+      "pct_30d": 5.26,
+      "pct_60d": 12.04,
+      "pct_90d": 0.55,
+      "pct_180d": 5.39,
+      "pct_52w": 11.28,
+      "relative_5d": -1.24,
+      "relative_20d": 1.3,
+      "relative_30d": 5.26,
+      "relative_60d": 12.04,
+      "relative_90d": 0.55,
+      "relative_180d": 5.39,
+      "relative_52w": 11.28
     }
   ],
   "strong_relative_30d": [
     {
-      "name": "元件",
-      "pct_day": -4.5,
-      "pct_5d": 1.95,
-      "pct_20d": 16.93,
-      "pct_30d": 20.77,
-      "pct_60d": 1.13,
-      "pct_90d": 22.15,
-      "pct_180d": 85.41,
-      "pct_52w": 102.21,
-      "relative_5d": 1.95,
-      "relative_20d": 16.93,
-      "relative_30d": 20.77,
-      "relative_60d": 1.13,
-      "relative_90d": 22.15,
-      "relative_180d": 85.41,
-      "relative_52w": 102.21
-    },
-    {
       "name": "种植业与林业",
       "pct_day": -1.82,
       "pct_5d": -1.18,
@@ -2717,6 +2663,24 @@
       "relative_90d": -3.48,
       "relative_180d": -14.96,
       "relative_52w": -16.77
+    },
+    {
+      "name": "港口航运",
+      "pct_day": 0.69,
+      "pct_5d": -1.24,
+      "pct_20d": 1.3,
+      "pct_30d": 5.26,
+      "pct_60d": 12.04,
+      "pct_90d": 0.55,
+      "pct_180d": 5.39,
+      "pct_52w": 11.28,
+      "relative_5d": -1.24,
+      "relative_20d": 1.3,
+      "relative_30d": 5.26,
+      "relative_60d": 12.04,
+      "relative_90d": 0.55,
+      "relative_180d": 5.39,
+      "relative_52w": 11.28
     }
   ],
   "strong_60d": [
@@ -3085,24 +3049,6 @@
   ],
   "strong_90d": [
     {
-      "name": "元件",
-      "pct_day": -4.5,
-      "pct_5d": 1.95,
-      "pct_20d": 16.93,
-      "pct_30d": 20.77,
-      "pct_60d": 1.13,
-      "pct_90d": 22.15,
-      "pct_180d": 85.41,
-      "pct_52w": 102.21,
-      "relative_5d": 1.95,
-      "relative_20d": 16.93,
-      "relative_30d": 20.77,
-      "relative_60d": 1.13,
-      "relative_90d": 22.15,
-      "relative_180d": 85.41,
-      "relative_52w": 102.21
-    },
-    {
       "name": "医疗服务",
       "pct_day": -2.13,
       "pct_5d": 7.27,
@@ -3263,28 +3209,28 @@
       "relative_90d": -1.09,
       "relative_180d": -12.76,
       "relative_52w": -15.37
+    },
+    {
+      "name": "汽车服务及其他",
+      "pct_day": -0.81,
+      "pct_5d": 0.75,
+      "pct_20d": 1.05,
+      "pct_30d": 3.43,
+      "pct_60d": 9.94,
+      "pct_90d": -2.37,
+      "pct_180d": -9.29,
+      "pct_52w": -12.3,
+      "relative_5d": 0.75,
+      "relative_20d": 1.05,
+      "relative_30d": 3.43,
+      "relative_60d": 9.94,
+      "relative_90d": -2.37,
+      "relative_180d": -9.29,
+      "relative_52w": -12.3
     }
   ],
   "strong_relative_90d": [
     {
-      "name": "元件",
-      "pct_day": -4.5,
-      "pct_5d": 1.95,
-      "pct_20d": 16.93,
-      "pct_30d": 20.77,
-      "pct_60d": 1.13,
-      "pct_90d": 22.15,
-      "pct_180d": 85.41,
-      "pct_52w": 102.21,
-      "relative_5d": 1.95,
-      "relative_20d": 16.93,
-      "relative_30d": 20.77,
-      "relative_60d": 1.13,
-      "relative_90d": 22.15,
-      "relative_180d": 85.41,
-      "relative_52w": 102.21
-    },
-    {
       "name": "医疗服务",
       "pct_day": -2.13,
       "pct_5d": 7.27,
@@ -3445,28 +3391,28 @@
       "relative_90d": -1.09,
       "relative_180d": -12.76,
       "relative_52w": -15.37
+    },
+    {
+      "name": "汽车服务及其他",
+      "pct_day": -0.81,
+      "pct_5d": 0.75,
+      "pct_20d": 1.05,
+      "pct_30d": 3.43,
+      "pct_60d": 9.94,
+      "pct_90d": -2.37,
+      "pct_180d": -9.29,
+      "pct_52w": -12.3,
+      "relative_5d": 0.75,
+      "relative_20d": 1.05,
+      "relative_30d": 3.43,
+      "relative_60d": 9.94,
+      "relative_90d": -2.37,
+      "relative_180d": -9.29,
+      "relative_52w": -12.3
     }
   ],
   "strong_180d": [
     {
-      "name": "元件",
-      "pct_day": -4.5,
-      "pct_5d": 1.95,
-      "pct_20d": 16.93,
-      "pct_30d": 20.77,
-      "pct_60d": 1.13,
-      "pct_90d": 22.15,
-      "pct_180d": 85.41,
-      "pct_52w": 102.21,
-      "relative_5d": 1.95,
-      "relative_20d": 16.93,
-      "relative_30d": 20.77,
-      "relative_60d": 1.13,
-      "relative_90d": 22.15,
-      "relative_180d": 85.41,
-      "relative_52w": 102.21
-    },
-    {
       "name": "电子化学品",
       "pct_day": -2.33,
       "pct_5d": 1.1,
@@ -3627,28 +3573,28 @@
       "relative_90d": -13.98,
       "relative_180d": 15.86,
       "relative_52w": 17.15
+    },
+    {
+      "name": "互联网电商",
+      "pct_day": -1.25,
+      "pct_5d": 2.05,
+      "pct_20d": 6.46,
+      "pct_30d": 5.47,
+      "pct_60d": 6.43,
+      "pct_90d": -4.76,
+      "pct_180d": 14.54,
+      "pct_52w": 10.61,
+      "relative_5d": 2.05,
+      "relative_20d": 6.46,
+      "relative_30d": 5.47,
+      "relative_60d": 6.43,
+      "relative_90d": -4.76,
+      "relative_180d": 14.54,
+      "relative_52w": 10.61
     }
   ],
   "strong_relative_180d": [
     {
-      "name": "元件",
-      "pct_day": -4.5,
-      "pct_5d": 1.95,
-      "pct_20d": 16.93,
-      "pct_30d": 20.77,
-      "pct_60d": 1.13,
-      "pct_90d": 22.15,
-      "pct_180d": 85.41,
-      "pct_52w": 102.21,
-      "relative_5d": 1.95,
-      "relative_20d": 16.93,
-      "relative_30d": 20.77,
-      "relative_60d": 1.13,
-      "relative_90d": 22.15,
-      "relative_180d": 85.41,
-      "relative_52w": 102.21
-    },
-    {
       "name": "电子化学品",
       "pct_day": -2.33,
       "pct_5d": 1.1,
@@ -3809,28 +3755,28 @@
       "relative_90d": -13.98,
       "relative_180d": 15.86,
       "relative_52w": 17.15
+    },
+    {
+      "name": "互联网电商",
+      "pct_day": -1.25,
+      "pct_5d": 2.05,
+      "pct_20d": 6.46,
+      "pct_30d": 5.47,
+      "pct_60d": 6.43,
+      "pct_90d": -4.76,
+      "pct_180d": 14.54,
+      "pct_52w": 10.61,
+      "relative_5d": 2.05,
+      "relative_20d": 6.46,
+      "relative_30d": 5.47,
+      "relative_60d": 6.43,
+      "relative_90d": -4.76,
+      "relative_180d": 14.54,
+      "relative_52w": 10.61
     }
   ],
   "strong_52w": [
     {
-      "name": "元件",
-      "pct_day": -4.5,
-      "pct_5d": 1.95,
-      "pct_20d": 16.93,
-      "pct_30d": 20.77,
-      "pct_60d": 1.13,
-      "pct_90d": 22.15,
-      "pct_180d": 85.41,
-      "pct_52w": 102.21,
-      "relative_5d": 1.95,
-      "relative_20d": 16.93,
-      "relative_30d": 20.77,
-      "relative_60d": 1.13,
-      "relative_90d": 22.15,
-      "relative_180d": 85.41,
-      "relative_52w": 102.21
-    },
-    {
       "name": "电子化学品",
       "pct_day": -2.33,
       "pct_5d": 1.1,
@@ -3991,28 +3937,28 @@
       "relative_90d": -10.15,
       "relative_180d": -1.95,
       "relative_52w": 19.48
+    },
+    {
+      "name": "环保设备",
+      "pct_day": -1.25,
+      "pct_5d": 1.38,
+      "pct_20d": -2.09,
+      "pct_30d": -0.23,
+      "pct_60d": -3.4,
+      "pct_90d": -13.35,
+      "pct_180d": 10.73,
+      "pct_52w": 17.71,
+      "relative_5d": 1.38,
+      "relative_20d": -2.09,
+      "relative_30d": -0.23,
+      "relative_60d": -3.4,
+      "relative_90d": -13.35,
+      "relative_180d": 10.73,
+      "relative_52w": 17.71
     }
   ],
   "strong_relative_52w": [
     {
-      "name": "元件",
-      "pct_day": -4.5,
-      "pct_5d": 1.95,
-      "pct_20d": 16.93,
-      "pct_30d": 20.77,
-      "pct_60d": 1.13,
-      "pct_90d": 22.15,
-      "pct_180d": 85.41,
-      "pct_52w": 102.21,
-      "relative_5d": 1.95,
-      "relative_20d": 16.93,
-      "relative_30d": 20.77,
-      "relative_60d": 1.13,
-      "relative_90d": 22.15,
-      "relative_180d": 85.41,
-      "relative_52w": 102.21
-    },
-    {
       "name": "电子化学品",
       "pct_day": -2.33,
       "pct_5d": 1.1,
@@ -4173,6 +4119,24 @@
       "relative_90d": -10.15,
       "relative_180d": -1.95,
       "relative_52w": 19.48
+    },
+    {
+      "name": "环保设备",
+      "pct_day": -1.25,
+      "pct_5d": 1.38,
+      "pct_20d": -2.09,
+      "pct_30d": -0.23,
+      "pct_60d": -3.4,
+      "pct_90d": -13.35,
+      "pct_180d": 10.73,
+      "pct_52w": 17.71,
+      "relative_5d": 1.38,
+      "relative_20d": -2.09,
+      "relative_30d": -0.23,
+      "relative_60d": -3.4,
+      "relative_90d": -13.35,
+      "relative_180d": 10.73,
+      "relative_52w": 17.71
     }
   ],
   "weak_5d": [
@@ -4413,24 +4377,6 @@
       "relative_52w": -4.53
     },
     {
-      "name": "计算机设备",
-      "pct_day": -1.44,
-      "pct_5d": 2.75,
-      "pct_20d": -0.49,
-      "pct_30d": -0.53,
-      "pct_60d": 0.26,
-      "pct_90d": -14.64,
-      "pct_180d": -7.94,
-      "pct_52w": -2.74,
-      "relative_5d": 2.75,
-      "relative_20d": -0.49,
-      "relative_30d": -0.53,
-      "relative_60d": 0.26,
-      "relative_90d": -14.64,
-      "relative_180d": -7.94,
-      "relative_52w": -2.74
-    },
-    {
       "name": "保险",
       "pct_day": -1.4,
       "pct_5d": 0.51,
@@ -4537,6 +4483,24 @@
       "relative_90d": -14.08,
       "relative_180d": 6.59,
       "relative_52w": 7.41
+    },
+    {
+      "name": "环境治理",
+      "pct_day": -0.9,
+      "pct_5d": 1.15,
+      "pct_20d": -1.46,
+      "pct_30d": 0.55,
+      "pct_60d": 1.73,
+      "pct_90d": -11.69,
+      "pct_180d": -0.92,
+      "pct_52w": 1.58,
+      "relative_5d": 1.15,
+      "relative_20d": -1.46,
+      "relative_30d": 0.55,
+      "relative_60d": 1.73,
+      "relative_90d": -11.69,
+      "relative_180d": -0.92,
+      "relative_52w": 1.58
     }
   ],
   "index": {
