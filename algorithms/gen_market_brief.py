@@ -41,6 +41,62 @@ def load_raw(name, default=None):
         return default if default is not None else {}
 
 
+def load_raw_fresh(name, max_age_min=None, what=""):
+    """读 raw_data/X.json 并做**源新鲜度校验**（🔴 2026-09-24 一劳永逸 · 小九）。
+
+    为什么必须加：上游 `save()` 在抓取返回 None（拼页不齐 / 限流 / 降级）时按设计
+    **保留旧文件、不刷新 update_time**（这是「宁缺勿错」的正确处置），但**下游若照读
+    不误，就会把昨天的数字当成今天发布**。
+    血证（主人 09-24 实拍）：AI速览「ETF资金」条从 10:23 一路挂 09-23 的
+    「全市场ETF合计净流出 -4.95亿」，同一数字在 4 轮速览里 3 轮原样重发
+    （主人原话「这数字一直没变过！」），而同期 data/ETF_DAILY_MONITOR.js 已是当日
+    -77.68亿 —— 上游没问题，是**速览读了陈旧源却毫无察觉**。
+
+    判据（任一不满足即判「不可用」，宁缺勿错，绝不贴旧数）：
+      ① 源文件缺失 / 解析失败；
+      ② 无 update_time 字段（无法判定新鲜度 ⇒ 一律不信）；
+      ③ update_time 的日期不是今天；
+      ④ 给了 max_age_min 且距今超过阈值。
+
+    返回 (data, ok)；ok=False 时 data 为 {}，调用方应按「该源不存在」处理
+    （不产出对应条目，而不是退化成半边口径或昨日数字）。
+    """
+    path = os.path.join(RAW, name)
+    _label = what or name
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        print(f"  ⚠️ {_label}: 读取失败（{e}）⇒ 按不可用处理，本段不出")
+        return {}, False
+    ts = (data or {}).get("update_time")
+    if not ts:
+        print(f"  ⚠️ {_label}: 缺 update_time ⇒ 无法判定新鲜度，按不可用处理，本段不出")
+        return {}, False
+    _dt = None
+    for _fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M"):
+        try:
+            _dt = datetime.strptime(str(ts)[:19 if len(_fmt) > 16 else 16], _fmt)
+            break
+        except Exception:
+            continue
+    if _dt is None:
+        print(f"  ⚠️ {_label}: update_time 格式异常（{ts}）⇒ 按不可用处理，本段不出")
+        return {}, False
+    _now = datetime.now()
+    if _dt.date() != _now.date():
+        print(f"  🔴 {_label}: 源陈旧 —— update_time={ts} 非当日 ⇒ 本段不发布"
+              f"（宁缺勿错，绝不把昨日数字当今日发布）")
+        return {}, False
+    if max_age_min is not None:
+        _age_min = (_now - _dt).total_seconds() / 60.0
+        if _age_min > max_age_min:
+            print(f"  🔴 {_label}: 源过期 —— update_time={ts} 距今 {_age_min:.0f} 分钟"
+                  f" > 阈值 {max_age_min} 分钟 ⇒ 本段不发布")
+            return {}, False
+    return data, True
+
+
 def fmt_pct(v):
     if v is None:
         return "--"
@@ -712,8 +768,15 @@ def main():
     concepts = load_raw("concept_ranking.json", {})
     sectors = load_raw("sector_fund_flow.json", {})
     etf_heat = load_raw("etf_intraday_heat.json", {})
-    etf_daily = load_raw("etf_daily_monitor.json", {})
-    capital = load_raw("capital_flow_data.json", {})
+    # 🛡 2026-09-24 一劳永逸（小九）：这两个源是「陈旧即误导」的高危源，改走新鲜度守卫。
+    #   · etf_daily_monitor.json —— ETF资金条的总额（贴昨日值 = 主人实拍的「-4.95亿不变」）；
+    #     阈值 120 分钟：覆盖「连续两档抓取失败」的窗口，主防线是「非当日一律不发布」。
+    #   · capital_flow_data.json —— 个股异动（流入/流出）+ mainline_picks（推荐关注）两处共用；
+    #     上半年无数据时会只出流出半边 ⇒ 曾致「推荐关注」整条消失（主人实拍「推荐股票呢？」）。
+    etf_daily, _etf_daily_fresh = load_raw_fresh(
+        "etf_daily_monitor.json", max_age_min=120, what="ETF资金条(etf_daily_monitor)")
+    capital, _capital_fresh = load_raw_fresh(
+        "capital_flow_data.json", max_age_min=120, what="个股异动/推荐关注(capital_flow_data)")
     limitup = load_raw("limit_up_heatmap.json", {})
 
     indices = idx.get("items", [])
@@ -743,9 +806,20 @@ def main():
     if market_net is not None:
         main_net = market_net
     else:
-        cap_in = sum(x.get("net", 0) for x in capital.get("top_inflow", [])[:20])
-        cap_out = sum(x.get("net", 0) for x in capital.get("top_outflow", [])[:20])
-        main_net = cap_in + cap_out
+        # 🔴 2026-09-24 一劳永逸（小九）：加和口径**只允许在两侧榜单都拿到时使用**。
+        #   血证：09-24 11:35 那轮净流入降序榜静默返回空 ⇒ 只剩净流出半边 ⇒
+        #   半边加和 = -296.77亿，而完整口径实测只有 -162.13亿（失真 83%），
+        #   资金灯因此被压到「资金大幅流出」。现改为：任一侧缺失 / 源被守卫判不可用
+        #   ⇒ main_net 置 None，走「资金待更新」灰灯（不猜、不用半边冒充全市场）。
+        cap_in = (capital or {}).get("top_inflow") or []
+        cap_out = (capital or {}).get("top_outflow") or []
+        if cap_in and cap_out:
+            main_net = (sum(x.get("net", 0) for x in cap_in[:20])
+                        + sum(x.get("net", 0) for x in cap_out[:20]))
+        else:
+            main_net = None
+            print(f"  ⚠️ 资金灯：个股资金榜不完整（in={len(cap_in)} out={len(cap_out)}）"
+                  f" ⇒ 合计口径不可用，置「资金待更新」（不用半边加和冒充全市场）")
 
     # 健康度
     health = health_lights(indices, up_down_ratio, main_net)

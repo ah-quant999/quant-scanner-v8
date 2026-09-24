@@ -549,9 +549,27 @@ def _to_yi(v):
 _IND_FS = "m:0+t:6+f:!2,m:0+t:13+f:!2,m:0+t:80+f:!2,m:1+t:2+f:!2,m:1+t:23+f:!2,m:0+t:7+f:!2,m:1+t:3+f:!2"
 
 def _all_individual_recs(fields="f12,f14,f2,f3,f62,f184"):
-    """取全市场个股主力净流入并集（降序 TOP + 升序 TOP 合并去重），用于准确求和与净流入/流出 TOP。"""
+    """取全市场个股主力净流入并集（降序 TOP + 升序 TOP 合并去重），用于准确求和与净流入/流出 TOP。
+
+    返回 (recs, desc_ok, asc_ok)。
+
+    🔴 2026-09-24 一劳永逸（小九）：**两榜必须都拿到**，缺榜要显式上报，不得静默降级。
+      血证：09-24 11:35 那轮 desc（净流入降序）静默返回 []（em_clist 失败一律返回空表，
+      与「真的没有正净流入」无法区分）⇒
+        · capital_flow_data.top_inflow 变空数组 ⇒ AI速览「主力大单流入」整条消失、
+          mainline_picks（前端「🎯 推荐关注」）为 0 ⇒ 主人实拍「推荐股票呢？」；
+        · market_net 只剩净流出半边 ⇒ -296.77亿，而完整口径实测仅 -162.13亿（失真 83%）。
+      现：任一榜为空 ⇒ 立刻补一次（em_clist 内部已遍历 host 池换 host 重试，这里补的
+      是「时刻」这一维 —— 换节点后常能过）；仍缺则由调用方按降级处置（不发布合计）。
+    """
     desc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="1")
     asc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="0")
+    if not desc:
+        print("  ⚠️ 个股资金榜：净流入降序榜首次为空 ⇒ 补抓一次")
+        desc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="1")
+    if not asc:
+        print("  ⚠️ 个股资金榜：净流出升序榜首次为空 ⇒ 补抓一次")
+        asc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="0")
     by_code = {}
     for r in desc + asc:
         c = str(r.get("f12"))
@@ -565,7 +583,7 @@ def _all_individual_recs(fields="f12,f14,f2,f3,f62,f184"):
             "net": _to_yi(r.get("f62")),
             "net_pct": round(float(r.get("f184") or 0), 2),
         }
-    return list(by_code.values())
+    return list(by_code.values()), bool(desc), bool(asc)
 
 # 单次运行状态跟踪（用于前端定时任务跟踪看板）
 _run_status = {}
@@ -2835,18 +2853,35 @@ def f_limit_up_broken():
 def f_capital_flow_data():
     # 个股主力净流入排行：全市场降序+升序并集（push2delay 镜像），
     # 规避实时 push2 host 的 WAF 重置，且避免 pz 截断只取头部导致净流出缺失。
-    recs = _all_individual_recs()
+    recs, _desc_ok, _asc_ok = _all_individual_recs()
     if not recs:
         return None
     recs.sort(key=lambda x: x["net"], reverse=True)
     inflow = [x for x in recs if x["net"] > 0][:20]
     outflow = sorted([x for x in recs if x["net"] < 0], key=lambda x: x["net"])[:20]
+    _note = "全市场个股主力净流入(亿)，来源东方财富push2delay；非席位四路口径"
+    if not (_desc_ok and _asc_ok):
+        # 🛡 2026-09-24 一劳永逸（小九）：半边缺失 ⇒ **绝不发布 market_net**。
+        #   半边加和实测 -296.77亿 vs 完整 -162.13亿（失真 83%），且会连带把
+        #   AI速览资金灯压到「资金大幅流出」。宁缺勿错：合计置 None（下游走
+        #   「资金待更新」灰灯），榜单只出真实拿到的那一侧。
+        print(f"  🔴 个股资金榜降级：desc_ok={_desc_ok} asc_ok={_asc_ok} ⇒ 合计口径不可用"
+              f"（market_net=null，避免半边失真）")
+        return {
+            "top_inflow": inflow,
+            "top_outflow": outflow,
+            "market_net": None,
+            "degraded": True,
+            "degrade_note": "个股资金榜降级：净流入/净流出榜单有一侧抓取失败，"
+                            "全市场主力净额不可用（不发布 market_net，避免半边加和失真）",
+            "note": _note,
+        }
     market_net = round(sum(x["net"] for x in recs), 2)
     return {
         "top_inflow": inflow,
         "top_outflow": outflow,
         "market_net": market_net,
-        "note": "全市场个股主力净流入(亿)，来源东方财富push2delay；非席位四路口径",
+        "note": _note,
     }
 
 def f_north_fund():
@@ -3217,6 +3252,37 @@ def _etf_cache_save(c):
         print(f"  ⚠️ ETF 拼页缓存写入失败（不影响本轮）：{e}")
 
 
+def _etf_snapshot_cached_full(today):
+    """🔴 零请求：从跨轮拼页缓存读取**完整**底表（当日、17 页全齐且 ≥_ETF_MIN_ROWS）。
+
+    专供 `_etf_snapshot()` 的「新鲜度短路」分支使用：底表刚更新过就不该再打东财，
+    但**必须把缓存重算成本轮产物落盘** —— 否则 f_etf_daily_monitor 返回 None、
+    save() 不写盘，raw_data 会长时间停在上一次成功写入的时刻。
+    血证（主人 09-24 实拍）：raw_data/etf_daily_monitor.json 卡在 09-23 11:30:22 的
+    半截合计 -4.95亿，AI速览连挂 4 轮 3 轮重发同一数字。
+    不完整一律返回 None（半截合计禁止放行，判据与 _etf_snapshot_inner 尾部完全一致）。"""
+    try:
+        c = _etf_cache_load(today)
+    except Exception:
+        return None
+    pages = c.get("pages") or {}
+    if not pages:
+        return None
+    total = int(c.get("total") or 0)
+    npages = min(_ETF_MAX_PAGES, (total + _ETF_PAGE - 1) // _ETF_PAGE) if total else _ETF_DEFAULT_PAGES
+    if any(str(pn) not in pages for pn in range(1, npages + 1)):
+        return None
+    by_code = {}
+    for pn in range(1, npages + 1):
+        for r in (pages.get(str(pn)) or [0, []])[1]:
+            code = str(r.get("f12") or "")
+            if code:
+                by_code[code] = r
+    if len(by_code) < _ETF_MIN_ROWS:
+        return None
+    return by_code
+
+
 def _etf_snapshot():
     """全市场 ETF 快照（code → 原始字段字典）；拼不齐返回 None（宁缺勿错）。
 
@@ -3231,7 +3297,19 @@ def _etf_snapshot():
         print("  ⏭️ ETF 快照本轮已尝试且未拼齐（失败记忆）⇒ 不再重复请求")
         return None
     if _etf_fresh_skip():
-        print(f"  ⏭️ ETF 底表 {_ETF_FRESH_S // 60} 分钟内刚更新 ⇒ 本轮跳过（省请求）")
+        # 🛡 2026-09-24 一劳永逸（小九）：底表 20 分钟内刚更新 ⇒ 不重复发请求，
+        #   但**必须用缓存底表把本轮产物重算落盘**。
+        #   原实现此处直接 `return None` ⇒ f_etf_daily_monitor() 返回 None ⇒ save() 不写，
+        #   ⇒ raw_data/etf_daily_monitor.json 长时间停在上一次成功写入的时刻，
+        #   而下游 gen_market_brief 照读不误 ⇒ 把昨日半截合计 -4.95亿 当今日发布
+        #   （实测：10:23→11:35 共 4 轮速览里 3 轮重发同一数字，主人原话「这数字一直没变过！」）。
+        #   现改为：缓存底表**完整**（当日 · 17 页全齐 · ≥_ETF_MIN_ROWS）才复用重算；
+        #   不完整仍返回 None（半截合计 = -4.95亿 假值的同类错误，禁止放行）。
+        _cached_full = _etf_snapshot_cached_full(today)
+        if _cached_full:
+            print("  ♻️ ETF 底表 20 分钟内已更新 ⇒ 复用缓存底表重算产物（零请求，保持产物新鲜）")
+            return _cached_full
+        print(f"  ⏭️ ETF 底表 {_ETF_FRESH_S // 60} 分钟内刚更新且缓存不完整 ⇒ 本轮跳过")
         return None
     if _etf_spent["secs"] >= _ETF_TOTAL_BUDGET:
         print(f"  🚫 ETF 快照累计已耗 {_etf_spent['secs']:.0f}s ≥ 预算 {_ETF_TOTAL_BUDGET}s ⇒ 本轮不再尝试")
