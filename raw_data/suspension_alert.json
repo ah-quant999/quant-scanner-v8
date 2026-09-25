@@ -1,52 +1,52 @@
 {
-  "update_time": "2026-09-24 16:56:14",
+  "update_time": "2026-09-25 19:06:50",
   "suspended": [
     {
       "code": "200706",
       "name": "瓦轴B",
-      "days": 206,
+      "days": 207,
       "reason": "刊登重要公告"
     },
     {
       "code": "301139",
       "name": "*ST元道",
-      "days": 24,
+      "days": 25,
       "reason": "刊登重要公告"
     },
     {
       "code": "002731",
       "name": "*ST萃华",
-      "days": 23,
+      "days": 24,
       "reason": "未如期刊登定期报告"
     },
     {
       "code": "200016",
       "name": "*ST康佳B",
-      "days": 20,
+      "days": 21,
       "reason": "刊登重要公告"
     },
     {
       "code": "000016",
       "name": "*ST康佳A",
-      "days": 20,
+      "days": 21,
       "reason": "刊登重要公告"
     },
     {
       "code": "688496",
       "name": "*ST清越",
-      "days": 13,
+      "days": 14,
       "reason": "刊登重要公告"
     },
     {
       "code": "605303",
       "name": "园林股份",
-      "days": 10,
+      "days": 11,
       "reason": "拟筹划重大资产重组"
     },
     {
       "code": "601238",
       "name": "广汽集团",
-      "days": 10,
+      "days": 11,
       "reason": "拟筹划重大资产重组"
     }
   ],

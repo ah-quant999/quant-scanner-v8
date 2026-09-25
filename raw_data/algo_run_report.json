@@ -1,12 +1,16 @@
 {
-  "update_time": "2026-09-25 04:42:59",
-  "run_start": "2026-09-25 04:21:34",
-  "ok": 10,
-  "fail": 1,
+  "update_time": "2026-09-25 19:09:13",
+  "run_start": "2026-09-25 18:58:37",
+  "ok": 12,
+  "fail": 2,
   "failed_scripts": [
     {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
+      "script": "fetch_inst_trade.py",
+      "reason": "退出码 1 | [19:04:41] 全部接口重试仍失败，保留旧数据（如有）"
+    },
+    {
+      "script": "scripts/fetch_sector_leaders.py",
+      "reason": "退出码 1 | http.client.RemoteDisconnected: Remote end closed connection without response"
     }
   ],
   "skipped_by_time_gate": []
