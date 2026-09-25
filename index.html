@@ -679,7 +679,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=a937c2a27b" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=61059c608f" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=b6d721a002" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1811,10 +1811,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=acc85915b6" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=ba23ff67a2" defer></script>
-<script src="data/HB_XIAOJIU.js?v=d3c9f3d068" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=9506d17d7a" defer></script>
-<script src="data/HEALTH_CHECK.js?v=b4f1add5e2" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=1d4200f2bf" defer></script>
+<script src="data/HB_XIAOJIU.js?v=f5615a6805" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=9c24c83642" defer></script>
+<script src="data/HEALTH_CHECK.js?v=a53beb2101" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=994bf2802c" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=63db8889ee" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=00fcbeeb09" defer></script>
@@ -1825,7 +1825,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=76312df7f0" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=08a4499a23" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=7ebd93d897" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=c70ed40b63" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=4a78e0bd03" defer></script>
