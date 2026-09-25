@@ -159,6 +159,29 @@ items:
       · ⑦ 本轮**未派发任何 workflow、未改代码/数据**；唯一写操作 = 新增交接件
         `docs/ops/handover/2026-09-25_0454_阿狸咪的工程师给小九_红卡东财502上游断供复验_换host已执行仍全败_判上游故障勿再派发.md`
         （commit `14caa669`）+ 本字段。主站 200/1,361,458B 与 blob `eab52b8516a8` 逐字节一致 ✅
+    alimi_verify_20260925_0958: |
+      🔴 阿狸咪的工程师 2026-09-25 09:58 CST **第 3 次复验（证据强度再升级：拿到 step22 完整 traceback + 揭示「step=success 但产物不动」的机制）**：
+      · ① **换 host 修复在运行路径中真被执行**（比此前更强的证据）：post_close run `36015908298`（#2182，09-24 22:52 CST 派发，head=`44d6d665`，
+        `compare 1052d4334162...44d6d665` = ahead/behind=0）step22「🐲 板块龙头股字典」逐字打印：
+        `⚠️ 东财 push2 抖动(push2delay.eastmoney.com) 尝试1/3: HTTP Error 502: Bad Gateway → 0.6s 后换 host 重试`
+        `⚠️ 东财 push2 抖动(push2.eastmoney.com) 尝试2/3: HTTP Error 502: Bad Gateway → 1.1s 后换 host 重试`
+        ⇒ 两枚 host 都被 502 拒；第 3 次（1.push2）直接 `RemoteDisconnected: Remote end closed connection without response`
+        （traceback：`fetch_sector_leaders.py:166 d = _get_json(url, hosts=EM_HOSTS)` → `:104 raise last` → `:94 urlopen`）。**换 host 逻辑确实执行了，只是所有 host 都不可用** ⇒ 失效点在东财侧。
+      · ② 🔴 **本轮揭示「step conclusion=success 但产物不动」的机制（新增判据）**：该步脚本 `exit 1`，但 step 仍报 **success**
+        —— 因 workflow 用 `_v8_rc=$?` 捕获后 `echo ::error title=v8-softfail:soft_13b(exit=$_v8_rc)::…` 再 **吞掉退出码不向上传**
+        ⇒ jobs API 里该 step 的 conclusion = `success`。**故「SECTOR_LEADERS step=success」完全不能证明数据已刷新**；
+        09-24 七个 post_close run（#2176-#2182）step22 全报 success，而 `sector_leaders.json` 的 `update_time` 仍停在 09-22 18:15 = 铁证。
+      · ③ **红卡第二态（experiment.json）的独立真因（本轮新查明，与 sector 不同）**：其生产脚本 `algorithms/gen_triple_consensus.py:128`
+        有 `from utils.time_gate import check_stock_picking_ready`（**盘后 18:00 时间门**），故只在 post_close 档（21:40）能产数。
+        而 09-24 21:41 的 experiments 链 run `36007389821`（#11，head=`da2639dada`）在 `🔄 重新生成 data/*.js` 段逐字：
+        `⏭️ EXPERIMENT 数据未变，跳过重写（幂等）` ⇒ 该轮 fetcher 只产 valuation_percentile / factor_audit / index_value_framework 三件，
+        **未触发三重共识重算** ⇒ 产物零推进。**结论同 sector：上游不可用 + 未达重算条件，非我方代码缺陷。**
+      · ④ **跨网对照（续用）**：本机 push2*/push2his/82.push2/push2delay **API 路径全 RemoteDisconnected**，
+        而 `www.eastmoney.com`=**200** / `quote.eastmoney.com`=**200** ⇒ 主站活、行情 API 拒连。双网络双形态 ⇒ 判上游故障。
+      · ⑤ **休市叠加（本轮定性）**：上交所公告〔2026〕22号 —— **09-25(五)~09-27(日) 休市，09-28(一) 起开市**（已查证 sse.com.cn 原文）。
+        本机/CI 均确认 09-25 非交易日（cn_fetch 日志逐字 `⏸️ 今日 2026-09-25 非A股交易日，intraday 跳过`；
+        step22 在所有今日 run 中均 `skipped` = 设计内闸门）。**红卡下一自然恢复判据 = 09-28(周一) post_close。**
+      · ⑥ **终态：继续 pending-verify、不派发**（任务书第 3 条）。任何重派仍会打同一批挂掉的 host ⇒ 自愈空转。
   - id: build13-timeout-guard
     priority: P0
     owner: shared
