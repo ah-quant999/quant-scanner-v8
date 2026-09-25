@@ -37,7 +37,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 79
+  next_id_seq: 80
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -4798,3 +4798,63 @@ items:
       ⇒ **fix(A) 需搭配**：把 `_get_trade_cal()` 失败路径由「默认 True」改为「**回落守卫同源的静态权威日历**」（复用本仓既有 `guard_v8_freshness._HOLIDAY_RANGES_2026` / `_MAKEUP_DAYS_2026`，**不得再造第 6 份硬编码表**），或至少改为**抛错/显式告警**而非静默 True。可判据：修复后断网情形下 `v8_date.is_trading_day('2026-10-01')` 必须为 False。
       📉 **C. 空转规模实测（比登记值更大）**：`GET /repos/…/actions/workflows/327687211/runs?created=2026-09-24T16:00Z..2026-09-25T15:59Z` ⇒ `v8_cn_fetch_cloud` 今日（CST 09-25 00:00–14:5x）**82 档**；另 `v8_cn_fetch_intraday_lemoncat` 今日 **13 档** ⇒ 休市日合计 **≥95 档**全量空转（每档逐文件 `POST /git/blobs` ⇒ 叠加配额消耗）。与登记值「50 档（至 13:11）」不矛盾，属同一趋势的后续实测。
       🏷 处置：`owner` 维持 shared，**fix(A) 属 workflow 车道**（本机 fine-grained PAT 对 `.github/workflows/**` 必 403）；本轮 14:4x 处**小九白天独家时段（7:45–17:45）** ⇒ 阿狸咪**不动代码、不派发**，仅补证 + 补正方案，交小九落码（时限：09-30 前，否则 10-01~10-07 连休复现）。
+
+  # ── P1 · 双机心跳（阿狸咪 2026-09-25 15:4x CST 实测新增）────────────────────
+  - id: heartbeat-files-clobbered-by-cnfetch
+    priority: P1
+    owner: shared
+    status: todo
+    what: >-
+      🔴 双机心跳的**唯一载体** `raw_data/hb_alimi.json` / `raw_data/hb_xiaojiu.json` 会被 cn 侧 raw 回推
+      用**陈旧副本**顶掉 ⇒ 其 `last_time` **非单调回退** ⇒ 云端 build 据它重生成的 `data/HB_ALIMI.js` /
+      `data/HB_XIAOJIU.js` 同步回退 ⇒ `v8_peer_monitor` 的 `check_alimi_alive()` / `check_xiaoju_alive()`
+      读到超阈 ⇒ **误判「机器掉线」**（阈值 `PEER_FAILOVER_THRESHOLD_MIN=180`，日历分钟，**无节假日/回退豁免**）。
+      现象是「心跳倒退」，不是「心跳停跳」——发送侧一切正常，是**发布层被顶掉**。
+    impact: >-
+      · **信任通道被污染**：心跳是双机「对方是否活着」的唯一判据；回退即把「活着」显示成「死了」
+        ⇒ down 判定 / 派发 / 交接决策失真，并可能外发「机器掉线」告警邮件（纯噪音）。
+      · **不是理论风险（已实测发生）**：`v8_peer_monitor` 2026-09-25 15:07:13 档判 `al=down`
+        （`alimi.silent_min=200.2 / last_time=2026-09-25 11:47:03`），而阿狸咪发送侧**实际正常** ——
+        `~/.workbuddy/v8_alimi_heartbeat.state.json` = `last_time 2026-09-25 13:53:20 / status ok`，
+        且远端存在对应提交 `2e4dc62488`「data: 阿狸咪心跳上报 20260925-1353」。
+      · **同族悬案的最优解释**：2026-09-24 观测到的「`HB_XIAOJIU.last_time` 非单调倒退 ~10.5h」
+        与本项同一机制（见 evidence 小九侧逐笔），可直接并入本项结案。
+    fix: >-
+      待 owner 拍板（本轮**未改任何代码**：15:4x 处小九白天独家时段，且推送器属 cn runner 车道）：
+      ① **最小**：把 `last_time` 纳入 `api_push_raw.py` 的防倒退时间戳白名单 ——
+         `_TS_KEYS`（L568）与抽取正则（L584）**两处必须同改**；
+         并核 `_NO_REGRESSION_GUARD`（累积继承型豁免表）**不得**豁免这两份心跳文件。
+      ② 或按 `api-push-stale-base-index-clobber` 的 `_SKIP_LOCAL_PUSH` 范式：心跳文件**本地副本永不入队**，
+         改由发送侧「取远端正文 + 只改 `last_time`」后随本提交原子落地。
+      ③ **结构性（与①②正交）**：cn 侧推送前对 `raw_data/hb_*.json` 做**单调性硬前置** ——
+         新值 < 远端旧值即**拒推 + 显式告警**（宁可不推，绝不倒退）。
+      ⚠️ 治本还须定位「陈旧副本从哪来」，候选：① `walk_raw()` 回退路径 os.walk 本地 `raw_data/` 全量入队；
+        ② cn runner 工作区对 `raw_data/hb_*.json` 无 fetch/reset ⇒ 停留在上一次同步值。
+    verify_how: >-
+      ① 静态：`grep -n "last_time" api_push_raw.py` 在 `_TS_KEYS` 与抽取正则**两处**均有命中（给出逐字）；
+      ② 动态：连续 ≥2 个交易日，`GET /repos/…/commits?path=raw_data/hb_alimi.json`（及 `hb_xiaojiu`）
+         的 `last_time` **单调不减**（给出两机各自的逐笔序列）；
+      ③ 副作用：不再出现「回退后 `silent_min` 突跳超阈」型 down 判定 / 告警。
+    evidence: >-
+      · **阿狸咪侧逐笔**（`GET contents/raw_data/hb_alimi.json?ref=<sha>`，全部取远端 API，非本机副本）：
+        `ab5f25634f` 08:44:43 → 08:44:43 ｜ `8b0d4dc7e3`（cn fetch 10:53:07）→ **06:43:25（回退 2h1m）**
+        ｜ `b65d8549b2` 11:47:03 ｜ `2e4dc62488`（心跳上报 13:53:20）→ 13:53:20
+        ｜ `a153059f08`（cn fetch 14:32:03）→ **11:47:03（回退 2h6m）**。
+        该提交 check-runs = `fetch`(success) + `intraday_slot`(cancelled) + build/deploy
+        ⇒ **写入方 = cn fetch 链的 raw 回推**（提交信息 `v8 cn fetch: HH:MM` 是 `api_push_raw.py` 的
+        **共用默认消息**，不可据此细分到具体链）。
+      · **落地放大（同一链路上的二次伤害）**：`data/HB_ALIMI.js` 在 `a153059f08` 时 = `last_time 13:53:20`
+        （`update_time` 14:16:58），但在 `6ecc836f91`（build 15:16）时 = **`last_time 11:47:03`**
+        ⇒ 云端据被顶掉的 raw **重新生成并回退落地**，前端与监控面看到的即倒退值。
+      · **小九侧同族**：`276adf7725`（心跳上报 14:48:04）→ `78883d7a16`（cn fetch 15:11）**02:04:32（回退 12h44m）**
+        → `b57d144439` 16:41:35 → `c5dbe07aac`（cn fetch 16:58）**16:41:35（回退 11min）** → `20cf35cc1e` 17:53:49。
+      · **守卫盲区（代码级硬证）**：`api_push_raw.py` L568
+        `_TS_KEYS = ("update_time", "gen_time", "calc_time", "run_time", "fetch_time", "snapshot_time")`、
+        L584 `rb'"(?:update_time|gen_time|calc_time|run_time|fetch_time|snapshot_time)"'`
+        ⇒ **两份心跳文件只含 `last_time`，守卫取不到基线时间戳** ⇒ 「防倒退闸」静默放行
+        （L1079–L1122 按 `_content_ts` 是否存在决定是否比对）。
+      · **旁证**：`raw_data/_peer_monitor_state.json` 15:07:13 档
+        `runner=v8_peer_monitor / host=CAT / threshold_min=180 / interval_min=63`，
+        `xiaoju.silent_min=1273.4`（休市日设计，已知误报类）与 `alimi.silent_min=200.2`（本项）。
+    updated: 2026-09-25 15:35
+    updated_by: 阿狸咪的工程师(alimi-cn)
