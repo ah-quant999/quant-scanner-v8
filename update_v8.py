@@ -746,7 +746,7 @@ def _write_js(var_name, obj):
         except Exception:
             pass
 
-    def _pick_ts(existing, obj=None):
+    def _pick_ts(existing, obj=None, _existing_file_ts=""):
         """真实优先：源数据自带时间戳 > _meta.last_update（子级更新） > 源文件 mtime > 当前时间。
 
         2026-08-07 修（主人铁律「不得造假」）：原实现取 max(existing, mtime, now)，
@@ -765,16 +765,38 @@ def _write_js(var_name, obj):
                 if meta_last and meta_last > existing:
                     return meta_last
             return existing
+        # 🛡 2026-09-25 阿狸咪的工程师（主人令「改好直接上线」· 卡面假刷新根治）：
+        #   existing 为空时的旧回退顺序是 「mtime_ts → now_ts」。而云端 runner 每次 checkout
+        #   都会刷新 raw_data 文件的 mtime ⇒ **每个构建周期都把该卡的「更新于」重写成本次
+        #   checkout 时刻**，业务数据却一个字节没变。实测证据：09-25 19:44 那轮提交
+        #   (0802df64e81c) 的 17 个 data/*.js 全部是 ±1 行改动 = 只刷时间戳、内容未变，
+        #   而 raw 层同一轮根本没产出 ⇒ 主人看到「更新于今天」，实际数据仍是 T-1。
+        #   修法：在 mtime 之前插入一层「现有 data/*.js 已带的 update_time」——它才是真实语义
+        #   时间；仅在 data 层首次构建（无历史值）时才回退 mtime / now_ts，保持幂等。
+        if not existing and not obj_had_ts and _existing_file_ts:
+            return _existing_file_ts
         if mtime_ts:
             return mtime_ts
         return now_ts
 
+    # ① 现有 data/<var>.js 已有的 update_time（真实语义时间的兜底源，防云端 checkout 刷 mtime）
+    _existing_file_ts = ""
+    try:
+        if out_path.exists():
+            _m = re.search(r'"update_time"\s*:\s*"([^"]+)"', out_path.read_text(encoding='utf-8'))
+            if _m:
+                _existing_file_ts = _m.group(1)
+    except Exception:
+        _existing_file_ts = ""
+
     if isinstance(lite_obj, list):
         # 顶层数组：包装成 dict（同步 sync_v6_to_v8 规则）
-        lite_obj = {"data": lite_obj, "update_time": _pick_ts(None), "republish_time": now_ts}
+        lite_obj = {"data": lite_obj, "update_time": _pick_ts(None, _existing_file_ts=_existing_file_ts),
+                    "republish_time": now_ts}
     elif isinstance(lite_obj, dict):
         existing = lite_obj.get("update_time") or lite_obj.get("calc_time") or ""
-        lite_obj["update_time"] = _pick_ts(existing, lite_obj)
+        lite_obj["update_time"] = _pick_ts(existing, lite_obj,
+                                           _existing_file_ts=_existing_file_ts)
         # republish_time = 本次构建/重部署时间，仅用于排障与缓存戳，前端不得当作「数据时间」展示
         lite_obj["republish_time"] = now_ts
 

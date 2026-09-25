@@ -279,8 +279,24 @@ def build():
                 "cons_count": len(cons), "leaders": cons[:TOP_N], "match": how,
             })
             time.sleep(0.3)
+    # 🛡 2026-09-25 阿狸咪的工程师（主人令「改好直接上线」· 卡面假刷新根治）：
+    #   原口径 `"update_time": time.strftime(...)` = **本脚本落盘时刻**，与数据日期无关。
+    #   实测后果：卡面「更新于」永远显示成今晚上次构建时间，而内容可能仍是 T-1
+    #   （09-25 19:44 那轮SECTOR_LEADERS.js 的 update_time=09-25 19:44 但 data_date=09-24），
+    #   主人据此判定「数据已刷新」⇒ 正是「今天有 t+1 数据、怎么全部没更新」的直接成因。
+    #   修法（不造假原则）：update_time 一律取**源数据时间**（SECTOR_RS 的 update_time，
+    #   与「板块资金趋势」卡同源同规则）；源缺失时才退回构建时刻，并显式写入
+    #   `republish_time` 供排障。数据日期仍取 src_date，两者语义分离、不再混淆。
+    _src_ut = ""
+    try:
+        if isinstance(rs, dict):
+            _src_ut = rs.get("update_time") or ""
+    except Exception:
+        _src_ut = ""
+    _built_ut = time.strftime("%Y-%m-%d %H:%M:%S")
     payload = {
-        "update_time": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "update_time": _src_ut or _built_ut,
+        "republish_time": _built_ut,
         "data_date": src_date, "rule_ver": PHASE_RULE_VER, "top_n": TOP_N,
         "source": "东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期",
         "phase": "主升+启动", "sector_count": len(sectors_out), "sectors": sectors_out,
