@@ -4699,7 +4699,7 @@ items:
   - id: trading-day-gate-predeps-fallback
     priority: P0
     owner: shared
-    status: todo
+    status: pending-verify
     what: >-
       2026-09-25（中秋休市，上交所〔2026〕22号：09-25~09-27 休市）实测：cn_fetch 主链的**交易日闸门失效**，
       休市日仍判「交易日」并全量抓取，且 **V8_DATA_DATE 被错标为休市日当天**。两处证据同源于**同一步序缺陷**：
@@ -4799,8 +4799,6 @@ items:
            `is_trading=True` 使 <24h 豁免失效，而 `close` 仍回退到周五 ⇒ 阈值口径错位；
         ② 本项 fix 建议「回落守卫同源的静态权威日历（`_HOLIDAY_RANGES_2026`/`_MAKEUP_DAYS_2026`）」——
            须**同时改 `last_trade_day_close()` 改用 `_is_trading_day()`**，否则新源救不了这处，且会把两套口径一并复刻。
-    updated: "2026-09-25 18:08"
-    updated_by: 阿狸咪的工程师(alimi-cn)
     alimi_verify_20260925_1450: |
       ── 阿狸咪的工程师 2026-09-25 14:4x CST 独立复核（13:2x 登记之后的**第二条独立证据链**；全部取远端 API，非本机副本）──
       ✅ **A. 根因三条独立命中**（与登记内容一致，可作终验依据）：
@@ -4813,6 +4811,26 @@ items:
       ⇒ **fix(A) 需搭配**：把 `_get_trade_cal()` 失败路径由「默认 True」改为「**回落守卫同源的静态权威日历**」（复用本仓既有 `guard_v8_freshness._HOLIDAY_RANGES_2026` / `_MAKEUP_DAYS_2026`，**不得再造第 6 份硬编码表**），或至少改为**抛错/显式告警**而非静默 True。可判据：修复后断网情形下 `v8_date.is_trading_day('2026-10-01')` 必须为 False。
       📉 **C. 空转规模实测（比登记值更大）**：`GET /repos/…/actions/workflows/327687211/runs?created=2026-09-24T16:00Z..2026-09-25T15:59Z` ⇒ `v8_cn_fetch_cloud` 今日（CST 09-25 00:00–14:5x）**82 档**；另 `v8_cn_fetch_intraday_lemoncat` 今日 **13 档** ⇒ 休市日合计 **≥95 档**全量空转（每档逐文件 `POST /git/blobs` ⇒ 叠加配额消耗）。与登记值「50 档（至 13:11）」不矛盾，属同一趋势的后续实测。
       🏷 处置：`owner` 维持 shared，**fix(A) 属 workflow 车道**（本机 fine-grained PAT 对 `.github/workflows/**` 必 403）；本轮 14:4x 处**小九白天独家时段（7:45–17:45）** ⇒ 阿狸咪**不动代码、不派发**，仅补证 + 补正方案，交小九落码（时限：09-30 前，否则 10-01~10-07 连休复现）。
+    alimi_fix_20260925_1959: >-
+      ── 阿狸咪的工程师 2026-09-25 19:4x~20:0x CST **已根治并线上验证**（阿狸咪夜间窗口；5 笔提交）──
+      🔴 **双因**：①登记中的步骤序缺陷 ②**本轮新查明**「静态日历兜底源不可达」——
+        该表当时只存在于 `guard_v8_freshness.py`，而其顶部 `from update_v8 import ...` ⇒ 在
+        不装第三方库的轻量 job（`build_deploy` gate）与依赖未装的早期步骤里 **import 不进来** ⇒ 兜底形同虚设。
+      🛠 **5 笔**：①`52b01b8b7b6a` cn_fetch 步骤序（setup-python + 安装依赖 上移；步骤数 28 不变）
+        ②`1f496c492974` 新增零依赖 `v8_calendar.py` ③`24eac5f82ac1` `v8_date` 兜底改回落 v8_calendar
+        ④`85f109d50ef4` `fetch_lhb` 二阶兜底 `return True` → 回落 v8_calendar
+        ⑤`341d6c055f96` `v8_build_deploy` gate 的 sparse-checkout 补 `v8_calendar.py`（否则 gate 仍读不到）。
+      ✅ **线上逐字**（run `#2288` / id `36129677046` / head `52b01b8b7b6a`，job `fetch`=success）：
+        `📅 数据日期=2026-09-24`（**已回退**）/ `V8_DATA_DATE: 2026-09-24` / `is_trading_day=false` /
+        `proceed=false (工作日遇节假日，跳过冗余抓取)` / 「📡 抓中国数据」= **skipped** ⇒ verify_how ①②③ 达成。
+      ✅ **本机对照**（零第三方库最小树）：09-25 / 10-01 / 10-07 → False（修复前 True）；
+        09-28 / 10-08 / 2027-03-01 → True；12/12 断言通过；`fetch_lhb` mock（`_get_trade_cal→None`）亦 False + 显式告警。
+      ⏳ **待验（未宣称已完成）**：①`data/*.js` 61 处「假今日 2026-09-25」**未手工回改**，待 09-28 post_close 自然覆盖
+        ②`build_deploy` gate 线上（sparse 补丁后）待下一次 push 自然触发验证
+        ③`guard_v8_freshness` 内同名常量待合流（值已逐字同源；⚠️ `_MAKEUP_DAYS_2026` 不得用于交易日判定）。
+      📄 交接件：`docs/ops/handover/2026-09-25_1958_阿狸咪的工程师给小九_P0交易日历闸门失效已根治_线上逐字验证通过.md`
+    updated: "2026-09-25 19:57"
+    updated_by: 阿狸咪的工程师(alimi-cn)
 
   # ── P1 · 双机心跳（阿狸咪 2026-09-25 15:4x CST 实测新增）────────────────────
   - id: heartbeat-files-clobbered-by-cnfetch
