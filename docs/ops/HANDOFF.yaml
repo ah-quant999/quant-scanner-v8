@@ -29,7 +29,7 @@ meta:
   # 🔴 2026-09-25 07:2x 阿狸咪的工程师 恢复：本块于 a2b5f1f38f3b 被误删，
   #   致 [13/13] 交接状态源守卫 读不到 next_id_seq 而硬阻断 deploy（连阻 8+ 轮）。
   #   恢复值 = ledger.max_next_id_seq（77）；后因新增 item 抬高 ledger 至 78 ⇒ 同步抬至 78（2026-09-25 07:3x），保持 next_id_seq >= max_next_id_seq 不变式。
-  updated: 2026-09-25 18:08
+  updated: 2026-09-25 20:54
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -4829,7 +4829,33 @@ items:
         ②`build_deploy` gate 线上（sparse 补丁后）待下一次 push 自然触发验证
         ③`guard_v8_freshness` 内同名常量待合流（值已逐字同源；⚠️ `_MAKEUP_DAYS_2026` 不得用于交易日判定）。
       📄 交接件：`docs/ops/handover/2026-09-25_1958_阿狸咪的工程师给小九_P0交易日历闸门失效已根治_线上逐字验证通过.md`
-    updated: "2026-09-25 19:57"
+    alimi_verify_20260925_2054: >-
+      ── 阿狸咪的工程师 2026-09-25 20:3x~20:5x CST 独立复核（本项第 3 条独立证据链；全程远端 API，未用本机副本）──
+      ✅ **A. 修复线上逐字复验通过**（独立于 1959 档的自证）：5 笔提交远端可达
+      （`52b01b8b7b6a` / `1f496c492974` / `24eac5f82ac1` / `85f109d50ef4` / `341d6c055f96`）；
+      `v8_calendar.py` 远端在位（blob `5d72b8ecd005` / 2816 B）。run `#2288`（id `36129677046`）job `fetch`
+      **真实步骤序**（`/jobs` API）：`4 setup-python` → `5 📦 安装依赖` → `6 🗓 解析数据日期` →
+      `8 🛡 交易日历闸门` → **`9 📡 抓中国数据` = skipped**；日志逐字 `📅 数据日期=2026-09-24`、
+      `is_trading_day=false`、`proceed=false (工作日遇节假日，跳过冗余抓取)` ⇒ 登记 verify_how ①② 由本轮**独立**达成。
+      🔴 **B. verify_how ③ 判据必须细分（本轮新增，防下一位验证者误判「修复未生效」）**：
+      ③ 现文「扫描 `data/*.js` 的 `date`/`enter_date`/`close_date`，不得出现休市日」**不可机械执行**。实测远端
+      残留 `2026-09-25` 分三类：① **观察/成员表日（非行情日，非缺陷）** —— `data/CANDIDATE.js` 581 处
+      `metrics.date` 源自 `algorithms/build_candidate_pool.py:1192` 的 `today_date = time.strftime("%Y-%m-%d")`
+      （自然日），经 `_merge_membership()` → L1251 `v["metrics"]["date"] = today_date` 写入，`last_seen` 363 /
+      `first_seen` 3 同源 ⇒ 语义是「成员表观察日」，**不是** `v8_date` 打戳；② **纯构建戳（非数据日）** ——
+      `update_time`/`republish_time` = 09-25 属当日真实构建时刻，应排除；③ 🔴 **真·残留假今日（algo 侧）** ——
+      `data/CRDS_CARD_DATA.js` `enter_date` **334 处** = 09-25 且 `data_time:"2026-09-25 15:30:00"`
+      （update_time `2026-09-25 02:33:07`）；`data/FINAL_RECOMMEND_DATA.js` `close_date` 30 / `enter_date` 24 /
+      `entry_date` 6（`2026-09-25 03:01:12`）；`data/TRIPLE_CONSENSUS.js` `data_time:"2026-09-25 01:56:44"`
+      （`2026-09-25 02:31:28`）。三份 update_time 均在 **02:31~03:01 CST（早于修复落码 19:29）**。
+      ⇒ 建议把 ③ 改为「扫描面限定**行情数据日字段**（`data_time`/`close_date`/行情类 `date`），并显式排除
+      成员表观察日（`metrics.date`/`last_seen`/`first_seen`）与构建戳（`update_time`/`republish_time`）」。
+      ⏳ **C. 09-28（周一）唯一硬判据**：algo 链 post_close 重跑后，上表 ③ 三份产物的 `data_time`/`close_date`/
+      `enter_date` 应**自然归零为 09-28**（或保留 09-24）；若仍出现非交易日日期 ⇒ 说明 **algo 侧日期源另有出处
+      （非 `v8_date`）**，本项 5 笔修复未覆盖，须另开项。
+      ⚠️ 本轮为监听巡检轮：只读 + 本条追加；未改任何代码/阈值，未动 `index.html`/`logic.html`/`data/`/
+      `raw_data/`/`.github/**`。
+    updated: "2026-09-25 20:54"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   # ── P1 · 双机心跳（阿狸咪 2026-09-25 15:4x CST 实测新增）────────────────────
