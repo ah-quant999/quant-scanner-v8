@@ -278,6 +278,23 @@ jobs:
         with:
           fetch-depth: 1
 
+      # 🔴 2026-09-25 阿狸咪·P0 一劳永逸：本块（setup-python + 安装依赖）由原「交易日历闸门之后」上移至此。
+      #    根因：解析数据日期/交易日历闸门先于依赖安装运行 ⇒ fetch_lhb 顶层 import akshare 失败 ⇒
+      #    v8_date 静默兜底 weekday()<5 ⇒ 休市日（如 2026-09-25 中秋）误判为交易日：V8_DATA_DATE 被标成
+      #    休市日当天（61 个 data/*.js 假今日）、闸门 proceed=true 致全量空转（单日 ≥95 档）。
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: "📦 安装依赖"
+        # 🔴 2026-08-14 主人令永久修复：裸 `pip` 在 Windows runner 默认 PowerShell 下找不到
+        #   （pip: ObjectNotFound，导致今天下午 13:40-14:04 云端链路 5 连败）。
+        #   改用 `python -m pip`（不依赖 PATH），并显式 shell: bash 与其余 step 一致。
+        shell: bash
+        run: |
+          python -m pip install akshare pandas requests --quiet
+          python -c "import akshare, pandas; print('akshare', akshare.__version__, '/ pandas', pandas.__version__)"
+
       # 🛡 2026-08-29 统一交易日历中枢：所有下游脚本通过 V8_DATA_DATE 取「数据应属日期」，
       #   根治非交易日跑批把日期错标成「今天」的冒充今日问题。
       - name: "🗓 解析数据日期"
@@ -410,19 +427,6 @@ jobs:
             echo "proceed=false (工作日遇节假日，跳过冗余抓取)"
             echo "proceed=false" >> "$GITHUB_OUTPUT"
           fi
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: "📦 安装依赖"
-        # 🔴 2026-08-14 主人令永久修复：裸 `pip` 在 Windows runner 默认 PowerShell 下找不到
-        #   （pip: ObjectNotFound，导致今天下午 13:40-14:04 云端链路 5 连败）。
-        #   改用 `python -m pip`（不依赖 PATH），并显式 shell: bash 与其余 step 一致。
-        shell: bash
-        run: |
-          python -m pip install akshare pandas requests --quiet
-          python -c "import akshare, pandas; print('akshare', akshare.__version__, '/ pandas', pandas.__version__)"
 
       - name: "📡 抓中国数据 → raw_data/（selective）"
         # 🛡 2026-08-22 幂等闸门：skip=true 时本 run 不重复抓取（另一新鲜 run 已在做）
