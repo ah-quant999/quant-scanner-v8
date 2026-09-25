@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 05:08"
+  updated: "2026-09-26 07:23"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -4534,7 +4534,43 @@ items:
         **未生效**）与各 fetcher 的落盘口径；**归属未定**（该提交无关联 run，且 message 不可作归因
         —— 见铁律「`v8 cn fetch: HH:MM` 系硬编码」）⇒ 下一窗口逐脚本读源码定因，**禁凭推断改码**。
       · status 维持 pending-verify（主卡 SECTOR_LEADERS 已根治；同族 5 项未清）。
-    updated: "2026-09-26 05:08"
+    alimi_verify_20260926_0725: >-
+      〔阿狸咪的工程师 2026-09-26 07:2x CST 第 3 次复验 —— 已到**源码行级**定因（第 13 轮遗留的
+      「逐脚本读源码定因」，本轮完成；仍然**未改码**）〕
+      判据（key 级，比第 13 轮的「行内 ±1」精确）：取相邻两笔构建提交 9a81d56ae540(06:39 CST) 与
+      f98f0006450a(05:40 CST)，经 git/blobs 取回 5 个产物**全文**、解析 JSON 后**逐键**比对。逐字：
+      · data/COMMODITY_ELASTICITY.js  diff_keys=1  仅 .update_time 05:40:24→06:39:42
+      · data/SENTIMENT_CYCLE.js  diff_keys=1  仅 .update_time 21:40:24→22:39:42
+      · data/MOMENTUM_FILTER.js  diff_keys=2  仅 .republish_time + .update_time
+      · data/AUDIT_TRAIL.js  diff_keys=1  仅 .generated_at 21:40:26→22:39:44
+      · data/IMA_STRONG_BACKTEST.js  diff_keys=2  仅 .generated + .republish_time
+      ⇒ 5 个产物**零数据键变化** = 100% 假刷新。数据侧时间键（COMMODITY_ELASTICITY.data_date=2026-09-24、
+        MOMENTUM_FILTER.generated=2026-09-24 19:02:16）**全部冻结**，只有「构建时刻」在前进。
+      【真因·写到调用点】**不是** _write_js：unconditionally 盖 now() 的是 update_v8.py::main() 里的
+        run_experiment_cards()（L1474-1560）—— 它**每次 build 都把 fetcher 当子进程重跑**，而这些脚本
+        **直接写 data/*.js（绕过 _write_js）**：
+        · algorithms/calc_commodity_elasticity.py L873/903-905 → update_time = datetime.now(CST)
+        · algorithms/calc_sentiment_cycle.py L135/156-158      → update_time = datetime.now()（裸 now = runner 的 UTC，比 CST 慢 8h）
+        · scripts/momentum_common_filter.py L203-236          → republish_time = now（**有**幂等守卫，但中性化只剥 republish_time+generated，**漏剥 update_time** ⇒ 守卫形同虚设）
+        · update_v8.py::_build_audit_trail() L1330-1338       → generated_at = datetime.now()，且 _write_audit_trail_js() **完全无幂等守卫**
+        ⇒ _write_js 的 _existing_file_ts 兜底对这 5 项**结构性失效**（它们根本没走 _write_js），
+          故 09-25 的修复不可能覆盖到它们。
+      【修法设计（本轮**未施工**，理由见 ②）】
+        ① 单一收口点：update_v8.py::main() 中「全部写入之后、_rewrite_index_html_cache_busters() 之前」
+           加一次构建期幂等清扫 —— 进程开始时快照这 5 个文件，结束时若「按各自构建时间键中性化后
+           逐字节相等」则还原快照 ⇒ 数据不变则 update_time 不变。
+           ⚠️ 中性化键**必须逐文件白名单**：COMMODITY_ELASTICITY/SENTIMENT_CYCLE=update_time；
+           MOMENTUM_FILTER=republish_time+update_time；IMA_STRONG_BACKTEST=generated+republish_time；
+           AUDIT_TRAIL=**仅 generated_at** —— 其 latest.date/time 是**真实审计条目时间**，严禁一起中性化
+           （否则会吞掉 22:30 日审的新条目）。
+        ② 🔴 **门禁口径必须同批裁定，未裁定前不得上线**：冻结 update_time 后，
+           v8_health_check.py::check_all_data_files()（L2170 优先读 update_time，再 date/generated/generated_at）
+           会把这 5 项读成「陈旧」，超 24h 通用红线即判 fail（MOMENTUM* 已由 L2253 降级为 warn）。
+           即「修掉假刷新」会**换来最多 5 个诚实的陈旧红**，与 HANDOFF `all-generic-redline-false-positive`(doing)
+           及 guard_v8_freshness:236=30 天 / v8_health_check=24h 的**口径打架**是同一个未决面；
+           且 fail 项带 heal_cat 会触发自愈派发 ⇒ 有踩踏风险。故本项由 owner 就 ② 拍板后一次性施工。
+      ⇒ status 维持 pending-verify（主卡 SECTOR_LEADERS 已根治；同族 5 项真因已到源码行、修法已定）。
+    updated: "2026-09-26 07:23"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: experiment-card-stalled-3d-0925

@@ -88,7 +88,7 @@
   "build-blocker-pick-ts-nameerror-0925",
   "algo-t1-segment-d-gate-false-red-0926"
  ],
- "updated": "2026-09-26 05:10",
+ "updated": "2026-09-26 07:26",
  "generated_by": "小九；2026-09-23 19:00 追加 cn-fetch-queue-growth 并抬高上限至 68（哈希未重算，同 handoff-ledger-hash-desync 口径） ｜2026-09-23 18:48 阿狸咪的工程师：回填 algo-step16-sanity-hardfail->done（真跑档 step16 success）+ handoff-dup-key-index-tail-truncation->done（index-tail-truncation-2220 重复 updated 键已收敛）+ 修正 3 处未来时戳（19:00->18:38，解 [13/13] 阻断）；id_content_hashes 仍按待口径确认原样保留 ｜2026-09-23 21:17 阿狸咪的工程师：给 etf-monitor-clist-fid-invalid 追加 note（监控侧双盲区新证据：guard 43 模块全绿 + HEALTH_CHECK 两卡 age_min 577.7/577.0 仍判 ok；ETF_DAILY_MONITOR message 把 9.6h 冻结文案化为「预期行为」）—— 仅 note，未改 status/未改 ids/未动 id_content_hashes（沿用 handoff-ledger-hash-desync 的「口径确认前不盲改哈希」策略） ｜2026-09-23 21:28 阿狸咪的工程师：align-gate-unregistered-cron-workflow 回退 done→doing（同族第 2 次复发：v8_dajijin_fetch 21:13:49 未双登记；#7921 build failure 唯一红项 [4/8]，其余 13 项全绿）。ids/next_id_seq/id_content_hashes 未变。 ｜ 小九；2026-09-23 21:48 以远端真身为基底做 item 级合并（仅追加本机 owner 的 dajijin-reduction-monitor，远端既有 item 全部保留、断言 0 丢失 0 重复）；id_content_hashes 全量重算（口径＝仓内唯一实现 scripts/handoff_ledger_hash.py，含幂等自证）。 ｜ 小九；2026-09-23 22:06 闭合 align-gate-unregistered-cron-workflow（doing→done + 取证 notes），id_content_hashes 同批重算（仓内唯一口径 scripts/handoff_ledger_hash.py）。 ｜ 小九；2026-09-23 22:55 追加 prepush-version-guard（推前版本护栏，P1·done）：回应阿狸咪 22:35 给小九的两条协同指令，含口径纠偏（「先拉最新」早已满足，真祸根是 base 取最新而内容取自旧树）+ 7 用例实验室对照 + 端到端双向实测 + 5 脚本接线。**既有 71 项 id_content_hashes 刻意未动**（沿用 handoff-ledger-hash-desync 的「口径确认前不盲改哈希」策略）；仅追加新 id 的 hash。 ｜ 小九；2026-09-23 23:02 给 prepush-version-guard 追加「双机推送器体检」附注：核实仓内这一族（api_push_raw / api_put_file / sync_westock_portfolio / fetch_wave_elliott）**早已满足「推送前先拉最新」**⇒ 未改仓内推送器；仅刷新本 item 自身 hash（其余 71 项不动）。 | 2026-09-23 23:30 小九(小九机) append build-deploy-retry-loses-race-under-churn ｜2026-09-24 00:04 阿狸咪的工程师：追加 api-push-stale-base-index-clobber（P1·pending-verify，api_push_raw 旧基线 blob 静默顶掉 index.html 的读-改-写竞态，已于 07a423731 根治）；同批给 handoff-concurrent-write 追加 alimi_family_count_20260923（家族样本 +1，建议维持 A+C+D、不据此转 B）、给 build-deploy-retry-loses-race-under-churn 填 alimi_verdict_20260923（裁决：主攻 ② 解耦重试与全量 rebuild，辅以 ③；本轮不改 workflow，按 P2 排期）。ids 74 / max_next_id_seq 72 / id_content_hashes 全量重算（仓内唯一口径 scripts/handoff_ledger_hash.py，差异集恰为本轮改动项：失配 2 = 上述两既有项、未收录 1 = 新增项 ⇒ 口径自证通过）。另修正本人 18:48 段内的重复日期串（2026-09-23 2026-09-23 → 2026-09-23），属笔误、无语义变更。",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -113,7 +113,7 @@
   "cache-buster-token-defeats-browser-cache": "65afd56a3d5cfd97",
   "cachebot-build-race": "aeee45b3116cbdb1",
   "candidate-quotes-category-drift": "6e2e2dcb53f950c9",
-  "card-fake-freshness-timestamp-rootfix-0925": "770a767f966361ae",
+  "card-fake-freshness-timestamp-rootfix-0925": "ddb8ef74fc0318e0",
   "category-map-two-table-drift": "ad99b1e8d87d84b9",
   "cloudfetch-us-hk-map-unknown-local-diff": "26e6caa2dbde45bf",
   "cn-fetch-queue-growth": "9febc159b39835bb",
