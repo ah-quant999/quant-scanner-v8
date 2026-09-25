@@ -122,7 +122,24 @@ def is_trading_day(date_str):
     cal = _get_trade_cal()
     if cal is not None:
         return d.strftime("%Y-%m-%d") in cal
-    return True  # 查不到日历时保守：视为交易日（不写占位）
+    # 🔴 2026-09-25 阿狸咪·P0（trading-day-gate-predeps-fallback）：日历拉取失败时
+    #   原为 `return True`（默认「是交易日」）⇒ 休市日（2026-09-25 中秋）被判为交易日，
+    #   触发全量抓取且把 V8_DATA_DATE 标成休市日当天。改为回落零依赖静态权威日历：
+    #   命中法定休市区间 ⇒ False；未覆盖年份退回工作日判定。
+    _iso = d.strftime("%Y-%m-%d")
+    try:
+        _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        if _root not in sys.path:
+            sys.path.insert(0, _root)
+        import v8_calendar as _cal
+        if _cal.covers(_iso) and _cal.in_holiday_range(_iso):
+            log(f"⚠️ 交易日历不可用 ⇒ 静态权威日历判定 {_iso} 为法定休市（非交易日）")
+            return False
+        log(f"⚠️ 交易日历不可用 ⇒ 静态权威日历未命中休市区间，按工作日视为交易日 {_iso}")
+        return True
+    except Exception as _e2:
+        log(f"⚠️ 交易日历与静态日历均不可用({type(_e2).__name__}) ⇒ 保守视为交易日 {_iso}")
+        return True
 
 def _parse_lhb_list_em(df):
     """东财龙虎榜列表 → 统一 stocks 结构"""
