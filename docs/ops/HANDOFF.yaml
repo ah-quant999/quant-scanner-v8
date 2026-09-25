@@ -4970,3 +4970,42 @@ items:
         且日志出现 ASCII 化后的 `[fatal] fetcher scripts not present…`（证明新码在执行）。
     updated: 2026-09-25 17:05
     updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: ima-connector-unbound-enterprise-switch
+    priority: P1
+    owner: 阿狸咪的工程师
+    status: blocked
+    what: >-
+      自动化 149ad8ff（ima 强势跟踪全文快照）自 2026-09-24 起**连续 2 日取不到全文**：
+      本机 ima MCP 连接器**未绑定**，`fetch_media_content` 登录态通道不可用。
+      实测（阿狸咪 2026-09-25 17:3x CST，只读）：
+      · `~/.workbuddy/connectors/c07631a5-…/connector-states.json` 仅
+        westock-mcp / tdx-connector / github / zsxq，**无 ima-mcp**；
+      · 本机 MCP 网关 `127.0.0.1:56788` 当日全量仅 **2 条路由**（`serverInfo.name` =
+        agentmail / genie-baas-mcp），旧 ima 路径 hash `34082f66…` → **HTTP 410 Gone**（第 2 日同态）；
+      · ima-mcp 插件**配置仍在**（`~/.workbuddy/connectors-marketplace/connectors/ima-mcp/mcp.json`）
+        ⇒ 是「**未绑定**」而非「不存在」，恢复不需改仓内代码。
+      影响面：**仅本机（家机 alimi-cn）**。线上产物未受影响：`data/IMA_STRONG_STOCK.js`
+      仍 `detail_channel=full-snapshot` / `reconciled=true` / `len(stocks)=56`。
+    fix: >-
+      🔴 **须主人操作，本机 agent 无法自助恢复**：在 WorkBuddy「连接器」页**重新绑定 ima**
+      （腾讯 AI 知识管家）。绑定后本机网关会重新注册 ima 路由，本自动化即可恢复取全文。
+      背景：2026-09-23 19:18 账号切至**企业账号**（新目录 / 新 hash）⇒ 个人连接器集整体消失。
+      ⚠️ 旁路（本地 MCP 网关直连）救不了「根本没绑」，禁再绕。
+    evidence: >-
+      阿狸咪 2026-09-25 17:3x CST 实测汇总：
+      · 会话 ToolSearch **无** `mcp__ima*`；
+      · 网关 hash 枚举得 2 条路由，`initialize` 返回 `agentmail` / `genie-baas-mcp`；
+        全量试探 4 个历史 hash ⇒ ima 的旧 hash **410 Gone**，另 3 个 **401 Unauthorized**
+        ⇒ 路由确已注销（非鉴权失效）。
+      同日源侧独立核对（免登录 `get_share_info`，全库 8 文件夹穷举）：「强势股跟踪」最新一篇仍为
+      `强势股跟踪日报 2026-09-15`（file_size **27032**，与仓内快照 meta 同值）
+      ⇒ **本阻断当前未造成数据缺口**（源方亦无新篇）。
+    verify_how: >-
+      ① 主人重绑后，`connector-states.json` 的 `connectors` 键集应含 `ima-mcp`；
+      ② 本机网关 `tools/list` 应出现 `get_knowledge_list` / `fetch_media_content` 等 9 个工具；
+      ③ 本自动化下一轮应能落 `raw_data/ima_strong_stock_full.md`（纯 LF）且 `fetched_at` **真实**前进；
+      ④ 线上 `data/IMA_STRONG_STOCK.js` 的 `snapshot_age_h` 回落至 < 72
+         （= 快照被**真实**刷新，而非伪造时间戳）。
+    updated: "2026-09-25 17:36"
+    updated_by: 阿狸咪的工程师(alimi-cn)
