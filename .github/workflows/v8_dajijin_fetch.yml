@@ -70,8 +70,8 @@ jobs:
             'Accept'        = 'application/vnd.github+json'
             'Authorization' = "Bearer $env:GH_PAT"
           }
-          # ⚠️ 不用 `Accept: application/vnd.github.raw`：它会 302 跳到 raw.githubusercontent.com，
-          #    该域可能整域不可用 ⇒ 必失败。contents API 的 JSON+base64 全程同域 api.github.com。
+          # [ascii] Do NOT use `Accept: application/vnd.github.raw`: it 302-redirects to
+          #   raw.githubusercontent.com, which may be wholly unreachable => guaranteed failure.
           $files = @('algorithms/fetch_dajijin_reduction.py', 'scripts/api_put_file.py', 'scripts/dajijin_need_push.py')
           foreach ($f in $files) {
             $url = "https://api.github.com/repos/$repo/contents/$f`?ref=main"
@@ -88,7 +88,7 @@ jobs:
             }
           }
           if (-not (Test-Path 'algorithms/fetch_dajijin_reduction.py')) {
-            Write-Host "[fatal] 抓取器未就位，本链无法继续" -ForegroundColor Red
+            Write-Host "[fatal] fetcher scripts not present; chain cannot continue" -ForegroundColor Red
             exit 1
           }
 
@@ -105,9 +105,9 @@ jobs:
           }
           cd $env:GITHUB_WORKSPACE
           python algorithms/fetch_dajijin_reduction.py --window 120
-          if ($LASTEXITCODE -ne 0) { Write-Host "[fatal] 抓取器返回非 0" -ForegroundColor Red; exit 1 }
+          if ($LASTEXITCODE -ne 0) { Write-Host "[fatal] fetcher returned non-zero" -ForegroundColor Red; exit 1 }
           if (-not (Test-Path 'data/DAJIJIN_REDUCTION.js')) {
-            Write-Host "[skip] 未产出文件（当日无记录 ⇒ 脚本刻意不写空壳，保留线上旧数据）"
+            Write-Host "[skip] no output file (no records today; script deliberately writes no empty shell, keeps existing online data)"
             exit 0
           }
           Write-Host "[ok] data/DAJIJIN_REDUCTION.js ready"
@@ -119,8 +119,8 @@ jobs:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           cd $env:GITHUB_WORKSPACE
-          # 比对逻辑放仓内脚本 scripts/dajijin_need_push.py（可本机实测、避免 PowerShell
-          # here-string 的 `'@` 必须顶格 与 YAML 块缩进 的冲突，那会让整份 workflow 解析失败）。
+          # [ascii] comparison logic lives in repo script scripts/dajijin_need_push.py (locally testable;
+          #   avoids the PowerShell here-string `'@`-at-column-0 vs YAML block indentation conflict).
           $out = python scripts/dajijin_need_push.py 2>&1 | Out-String
           Write-Host $out
           if ($out -match 'NEED_PUSH=1') { "need=1" | Out-File -FilePath "_djj_need.txt" -Encoding ascii }
@@ -134,8 +134,31 @@ jobs:
           cd $env:GITHUB_WORKSPACE
           $need = (Get-Content '_djj_need.txt' -ErrorAction SilentlyContinue) -join ''
           if ($need -notmatch 'need=1') {
-            Write-Host "[skip] 内容与线上一致，不推送（避免空提交触发全量重建）"
+            Write-Host "[skip] content identical to remote; no push (avoid an empty commit triggering a full rebuild)"
             exit 0
           }
-          python scripts/api_put_file.py data/DAJIJIN_REDUCTION.js "data: 大基金增减持监控刷新（$(Get-Date -Format 'yyyy-MM-dd HH:mm') CST）"
-          if ($LASTEXITCODE -ne 0) { Write-Host "[warn] 推送失败，非阻塞（下轮补推）" -ForegroundColor Yellow }
+          python scripts/api_put_file.py data/DAJIJIN_REDUCTION.js "data: dajijin reduction monitor refresh ($(Get-Date -Format 'yyyy-MM-dd HH:mm') CST)"
+          if ($LASTEXITCODE -ne 0) { Write-Host "[warn] push failed (non-blocking; retried next round)" -ForegroundColor Yellow }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 中文原文备份（run 块 ASCII 化前逐字保留）  2026-09-25 阿狸咪的工程师(alimi-cn)
+#
+# 成因：cn runner 为 Windows 且系统码页 GBK；GitHub 写出的 .ps1 为 UTF-8 无 BOM，
+#   Windows PowerShell 5.1 按 ANSI(GBK) 解码 ⇒ 多字节字符的尾字节会「吃掉」紧随的
+#   开引号或换行 ⇒ ParserError（字符串缺少终止符 / 数组索引表达式丢失或无效）。
+#   实测本链 2/2 run 均在第 2 步「同步源码」解析期即失败，data/DAJIJIN_REDUCTION.js
+#   自 2026-09-23 19:43 起从未更新。
+#   YAML 注释与 name/description 由 GitHub 按 UTF-8 读取、不经 PowerShell，故无风险。
+#   本文件 YAML 层的全部中文注释保持原样，此块仅收录原先位于 run 块内的中文。
+# ─────────────────────────────────────────────────────────────────────────────
+# [step0 同步源码 L73]          # ⚠️ 不用 `Accept: application/vnd.github.raw`：它会 302 跳到 raw.githubusercontent.com，
+# [step0 同步源码 L74]          #    该域可能整域不可用 ⇒ 必失败。contents API 的 JSON+base64 全程同域 api.github.com。
+# [step0 同步源码 L91]            Write-Host "[fatal] 抓取器未就位，本链无法继续" -ForegroundColor Red
+# [step1 跑脚本   L108]          if ($LASTEXITCODE -ne 0) { Write-Host "[fatal] 抓取器返回非 0" -ForegroundColor Red; exit 1 }
+# [step1 跑脚本   L110]            Write-Host "[skip] 未产出文件（当日无记录 ⇒ 脚本刻意不写空壳，保留线上旧数据）"
+# [step2 内容比对 L122]          # 比对逻辑放仓内脚本 scripts/dajijin_need_push.py（可本机实测、避免 PowerShell
+# [step2 内容比对 L123]          # here-string 的 `'@` 必须顶格 与 YAML 块缩进 的冲突，那会让整份 workflow 解析失败）。
+# [step3 推送     L137]            Write-Host "[skip] 内容与线上一致，不推送（避免空提交触发全量重建）"
+# [step3 推送     L140]          python scripts/api_put_file.py data/DAJIJIN_REDUCTION.js "data: 大基金增减持监控刷新（$(Get-Date -Format 'yyyy-MM-dd HH:mm') CST）"
+# [step3 推送     L141]          if ($LASTEXITCODE -ne 0) { Write-Host "[warn] 推送失败，非阻塞（下轮补推）" -ForegroundColor Yellow }
+# ─────────────────────────────────────────────────────────────────────────────
