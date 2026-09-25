@@ -27,6 +27,29 @@ def now_cst() -> datetime.datetime:
     return datetime.datetime.now(TZ_CN)
 
 
+def _fallback_is_trading_day(d: datetime.date) -> bool:
+    """在线日历不可用时的兜底：**零依赖**静态权威节假日区间 + 周末判定。
+
+    🔴 2026-09-25 阿狸咪·P0：本函数替代原「静默 weekday()<5」兜底。
+      - 静态表来源 = v8_calendar.HOLIDAY_RANGES（零 import / 零副作用，任何环境可加载）；
+        此前该表只存在于 guard_v8_freshness.py，而其顶部 `from update_v8 import ...`
+        ⇒ 在未装第三方库的轻量 job（build_deploy gate / 依赖未装的 cn_fetch 早期步骤）
+        根本 import 不进来 —— 这正是本 P0 的隐藏第二因。
+      - 未覆盖年份（表外）退回周末判定，且不据此断言「是交易日」以外的结论。
+    """
+    iso = d.strftime("%Y-%m-%d")
+    root = os.path.dirname(os.path.abspath(__file__))
+    if root not in sys.path:
+        sys.path.insert(0, root)
+    try:
+        import v8_calendar as _cal
+        if _cal.covers(iso) and _cal.in_holiday_range(iso):
+            return False
+    except Exception:
+        pass
+    return d.weekday() < 5
+
+
 def _is_trading_day_impl(date_str: str) -> bool:
     """底层交易日判断：优先复用 fetch_lhb 的交易日历（与既有链路保持一致）。"""
     # 把 fetch_lhb 加入路径后复用其缓存的交易日历
@@ -36,13 +59,19 @@ def _is_trading_day_impl(date_str: str) -> bool:
     try:
         from fetch_lhb import is_trading_day as _lhb_is_trading_day
         return _lhb_is_trading_day(date_str)
-    except Exception:
-        # 交易日历不可用时的保守兜底：周末视为非交易，其他视为交易
+    except Exception as e:
+        # 🔴 2026-09-25 阿狸咪·P0（trading-day-gate-predeps-fallback）：
+        #   原兜底 = `weekday() < 5` ⇒ **法定假日被判为交易日**（2026-09-25 中秋实证：
+        #   V8_DATA_DATE 被标成休市日当天「假今日」+ 交易日闸门 proceed=true 全量空转）。
+        #   改为回落零依赖静态权威日历 v8_calendar.HOLIDAY_RANGES（与 guard_v8_freshness 同源）。
         try:
             d = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
         except Exception:
             return True
-        return d.weekday() < 5
+        fb = _fallback_is_trading_day(d)
+        print(f"⚠️ v8_date: 在线交易日历不可用({type(e).__name__}) ⇒ 回落静态权威日历: "
+              f"{date_str} is_trading_day={fb}", file=sys.stderr)
+        return fb
     finally:
         if algo_dir in sys.path and sys.path[0] == algo_dir:
             sys.path.pop(0)
