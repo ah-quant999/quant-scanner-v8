@@ -29,7 +29,7 @@ meta:
   # 🔴 2026-09-25 07:2x 阿狸咪的工程师 恢复：本块于 a2b5f1f38f3b 被误删，
   #   致 [13/13] 交接状态源守卫 读不到 next_id_seq 而硬阻断 deploy（连阻 8+ 轮）。
   #   恢复值 = ledger.max_next_id_seq（77）；后因新增 item 抬高 ledger 至 78 ⇒ 同步抬至 78（2026-09-25 07:3x），保持 next_id_seq >= max_next_id_seq 不变式。
-  updated: 2026-09-25 13:20
+  updated: 2026-09-25 13:23
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -4747,5 +4747,27 @@ items:
       ⚠️ 诚实标注残余不确定：`v8_date` 的兜底 except **不打日志** ⇒ 未取到 ImportError 的逐字；
       但「步骤序 + 顶层 akshare 依赖 + 42ms 步耗时 + 本机复现」四条旁证同向，且唯一替代解释
       （sina 日历把 09-25 列为交易日）与 step25 的「非交易日」结论及 `_HOLIDAY_RANGES_2026` 均矛盾。
-    updated: "2026-09-25 13:20"
+    alimi_verify_20260925_1345: >-
+      ── 阿狸咪的工程师 2026-09-25 13:3x CST 追加（同批只读取证 · 第 2 次提交）──
+      🔴 **影响面第 2 处（已验证）：`v8_build_deploy` 的 gate 走同一套判定 ⇒ 休市日成「门禁盲区」。**
+      · `v8_build_deploy.yml`（blob `ab8738551fd8`）gate job：step3 `python algorithms/check_trading_day.py || true`
+        为**同源误判**；step4 时钟判据在 13:21 ⇒ `TR=1`；`IF_TD="${{ steps.td_run.outputs.is_trading_day }}"`
+        展开后 = `true` ⇒ 短路二（`IF_TD=false ⇒ TR=0`）**不触发** ⇒ `trading=true`。
+      · 逐字（run #8239 = 阿狸咪本轮 push 档、13:21:xx CST）：gate step3 `📅 2026-09-25 is_trading_day=true`；
+        step4 `🕒 当前北京时间 13:21 → 交易时段=YES`；`build` job = **skipped**
+        （其 `if: needs.gate.outputs.trading != 'true' && …`）。
+      · 后果：休市日 09:25–11:30 / 13:00–14:59 的**所有** push 档，`build` 一律 skip ⇒
+        `🛡️ Pre-deploy audit`（含 `[10/10]` index 核心标记守卫、`[13/13]` 交接状态源守卫）与
+        `📤 部署到 main` **同时不执行** ⇒ 该时段门禁与部署双缺位（而 GitHub 自带
+        `pages build and deployment` 仍随 push 发布）—— 属需 owner 拍板的完整性缺口。
+      · 反向副作用：同一判定使 `intraday_patrol`（`if: needs.gate.outputs.trading == 'true'`）在休市日**照常启动**
+        并去补派盘中链，本轮逐字：`✅ v8_cn_fetch_intraday_lemoncat.yml → HTTP 204`、
+        `✅ v8_intraday_snapshot.yml → HTTP 204`、`[FAIL] v8_algo_intraday_lite.yml run=0
+        产物 ALGO_TRACK.js STALE(679.5min)` ⇒ 休市日空转再叠加。
+      · 修法提示：本项 fix(A)（setup-python / 安装依赖 上移）**同时**修好本处（gate 亦调 `check_trading_day.py`）。
+      🛠 **自查纠错（防误报留痕）**：我初见 CI 日志的 `IF_TD="true"` 一度疑为**硬编码死代码**；
+        经核 `v8_build_deploy.yml:295` 源码 = `IF_TD="${{ steps.td_run.outputs.is_trading_day }}"`（**非硬编码**，
+        日志是表达式**展开后**的行）⇒ 结论改判为「值取自 step 输出，因同一兜底缺陷而为 true」。
+        留此条以免后来者据错判施工。
+    updated: "2026-09-25 13:23"
     updated_by: 阿狸咪的工程师(alimi-cn)
