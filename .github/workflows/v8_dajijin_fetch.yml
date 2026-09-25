@@ -61,7 +61,8 @@ jobs:
       - name: "📝 同步源码（Contents API · 同域，避开 raw 302）"
         shell: powershell
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           $ErrorActionPreference = 'Stop'
           $repo = 'ah-quant999/quant-scanner-v8'
@@ -116,7 +117,8 @@ jobs:
         id: diff
         shell: powershell
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           cd $env:GITHUB_WORKSPACE
           # [ascii] comparison logic lives in repo script scripts/dajijin_need_push.py (locally testable;
@@ -130,6 +132,9 @@ jobs:
         if: always()
         shell: powershell
         continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           cd $env:GITHUB_WORKSPACE
           $need = (Get-Content '_djj_need.txt' -ErrorAction SilentlyContinue) -join ''

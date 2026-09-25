@@ -64,11 +64,12 @@ jobs:
     steps:
       # 仅调 GitHub Contents API 拉取 algorithms/fetch_lhb.py（本 workflow 唯一需要的脚本），
       # 避开 git clone（cn runner 上 github.com 被 connection reset）也避开 checkout action。
-      # 需要的环境变量：GH_PAT
+      # 需要的环境变量：V8_GH_TOKEN（仓内 Secrets 只登记 V8_GH_TOKEN；
+      #   原 secrets.GH_PAT 不存在 ⇒ 解析为空 ⇒ Bearer 空 ⇒ 401，2026-09-25 阿狸咪实证）
       - name: "📝 同步源码（安全）"
         shell: powershell
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
         run: |
           $ErrorActionPreference = 'Stop'
           $TARGET = 'algorithms/fetch_lhb.py'
@@ -136,6 +137,9 @@ jobs:
         if: always() && steps.fetch_lhb.outcome == 'success'
         shell: powershell
         continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           cd $env:GITHUB_WORKSPACE
           python api_push_raw.py --only lhb || python api_push_raw.py || Write-Host "api_push_raw failed, non-blocking"
