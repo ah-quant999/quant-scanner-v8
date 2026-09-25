@@ -4664,7 +4664,10 @@ items:
       已由 316d4c878b 治本）。部署影响：**无**（失败在链尾，推送已完成；build_deploy #8283~#8288 全 success）。
     fix: >-
       择一施工（改 .github/workflows/** 须 classic token；涉「告警分流」语义 ⇒ 建议 owner 拍板）：
-      (A) 问责侧分流（推荐）：v8_algo_run.yml step17 在 `kind=t1` ∧ D 未产出 ∧ D 现存产物数据日 ==
+      ⚠️ 2026-09-26 02:5x 阿狸咪的工程师·更正目标文件（第 12 轮复核）：**是 `.github/workflows/v8_algo_cloud.yml`（本项 fix 原写 `v8_algo_run.yml` 有误）**。
+        举证：失败 workflow id 324119592 的 path = `.github/workflows/v8_algo_cloud.yml`（blob 9377eaa9681f，83,489 B，step17「🛡 结果问责」位于 L1070-1165）；
+        而 `.github/workflows/v8_algo_run.yml`（33,441 B）全文 grep `结果问责`/`stage_gate` = **0 命中**，本步不在其中（按错文件名施工会改到无此步的自托管变体，等于没修）。
+      (A) 问责侧分流（推荐）：v8_algo_cloud.yml step17 在 `kind=t1` ∧ D 未产出 ∧ D 现存产物数据日 ==
           `_last_trading_day(day)` 时输出 `::notice`（同 v8-stage-gate-reject「合规拒绝、不告警」族），
           不再打 `::error v8-algo-stale`；
       (B) 闸门侧：`chain_day()` 在 t1 段首**不下发 D 批**（D 纯盘后产物），只下发 A/B，D 待下一交易日。
@@ -4679,5 +4682,24 @@ items:
       · .github/scripts/v8_stage_gate.py L591 chain_day / L504 check_ready / L415 _cand
       · raw_data/algo_run_report.json（2026-09-26 00:18:15）
       · docs/ops/handover/2026-09-26_0042_阿狸咪的工程师给小九_休市段首t1算法链D批问责假红已定位到源码行_产物正确禁补数_待裁决修法.md
-    updated: "2026-09-26 00:40"
+    alimi_verify_20260926_0255: >-
+      第 12 轮夜间复验（2026-09-26 02:50~03:0x CST · 阿狸咪的工程师/alimi-cn · 只读核对，未派发任何 workflow）：
+      · 连档扩面：algo 链 **#2106~#2114 共 9 档** run 全 failure，失败步**恒为** step17
+        「🛡 结果问责（按目标批次 + 产物完整性 · 杜绝假成功）」，问责输入逐字同构：
+        `目标批=D 闸门放行=true 执行标志=true 算法步骤=success 数据日=2026-09-25(t1) CST=02:26
+         B就绪=10/12(true) D最终推荐=0/1(false)` ⇒ 与 #2110 **同因**，非新故障。
+        run #2115（id 36175601327，head 4240fbafaa）02:46 起 in_progress，预计同因再红。
+      · 🔴 **空转放大（本轮新增判据）**：闸门 §3「缺什么跑什么」每轮都判出 `target=D` +
+        `proceed=true`（B 已就绪、D 未就绪），而 D 在休市段首**结构上不可能就绪**
+        （无新行情 ⇒ final_recommend 就绪门控必然拒绝）⇒ 每 ~30 分钟派发一档、每档占用 cn runner
+        约 15-20 分钟 = **自愈空转循环**；**由 09-28(周一) 交易日自然终止**，无须人工干预，
+        禁手工补数、禁伪造 D（见 not_verify_how）。
+      · 上游侧复核（产物为准）：`raw_data/algo_run_report.json`（ut 2026-09-26 02:21:17）逐字
+        `failed_scripts=[{"script":"final_recommend.py","reason":"就绪门控未通过（上游选股输入陈旧/缺失）"}]`
+        ⇒ D 未产出属**正确保护**；同 run 内 `verify_chain_outputs.py` 判
+        `新鲜 13 / 必需项失败 0 / 时间戳盲区 0 / 共 14` + `闸门通过` ⇒ 产物零缺陷。
+      · ⚠️ **与另一红卡族不混同**：`experiment.json`/`sector_leaders.json` 停 09-22 的根因**不同**
+        （东财 push2 上游断供 + 休市期 SECTOR_LEADERS 步按设计 skipped，恢复判据 = 09-28 post_close）
+        ⇒ 两项分开归责、分开验收。
+    updated: "2026-09-26 02:53"
     updated_by: 阿狸咪的工程师(alimi-cn)
