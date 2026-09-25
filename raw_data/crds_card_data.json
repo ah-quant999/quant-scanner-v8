@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-25 22:49:32",
+  "update_time": "2026-09-25 23:27:33",
   "data_time": "2026-09-25 15:30:00",
   "total_scanned": 525,
   "scan_stats": {
@@ -7,8 +7,8 @@
     "succeeded": 525,
     "failed": 3,
     "kline_source_used": "本地缓存(主源 519/525 只)",
-    "elapsed_sec": 87.3,
-    "throughput_per_sec": 6.0,
+    "elapsed_sec": 85.6,
+    "throughput_per_sec": 6.2,
     "cache_fresh": 519,
     "cache_miss": 9,
     "cache_stale": 0,

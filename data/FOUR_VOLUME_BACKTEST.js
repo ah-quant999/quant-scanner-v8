@@ -1,8 +1,8 @@
 window.FOUR_VOLUME_BACKTEST = {
- "update_time": "2026-09-25 22:56:48",
+ "update_time": "2026-09-25 23:35:28",
  "summary": {
-  "update_time": "2026-09-25 22:56:48",
-  "calc_time": "2026-09-25 22:56:48",
+  "update_time": "2026-09-25 23:35:28",
+  "calc_time": "2026-09-25 23:35:28",
   "total_signals": 1426,
   "method": "四量终极历史回测：信号日次一交易日开盘买入，持有N个交易日收盘价卖出（前复权；已扣双边交易成本 0.30%）",
   "signal_date_range": "近 5 年",
