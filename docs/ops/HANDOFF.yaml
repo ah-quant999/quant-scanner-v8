@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-24 21:35"
+  updated: "2026-09-25 22:20"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 79
+  next_id_seq: 80
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -4491,10 +4491,17 @@ items:
       · 铁证：09-25 19:44 提交 0802df64e81c 的 17 个 data/*.js 全部为 ±1 行（仅刷新时间戳、内容未变），而同轮 raw 层零产出 ⇒ 主人据「更新于今天」判定已刷新，实际数据仍是 T-1。
       · 推送 commit 69166eab4dc0（parent=048d6ae46806 快进，未用 force）；回读逐字节相等。
       · 推送前自证：py_compile 双绿 / 相对远端真身白名单外零删除 / 小九 EM_HOSTS 等修复指纹全在位。
+      · ⚠️ 2026-09-25 21:34–22:18 本项被**连带阻断**：该修复引入的 `obj_had_ts` 未定义变量
+        使 update_v8.py 在第 776 行抛 NameError ⇒ build job step9 连续 5 轮失败（#8275~#8279），
+        构建根本不跑 ⇒ 本项「假刷新是否根治」无法验证。已由 316d4c878b 补齐定义并线上验证通过。
+      · 复验证据（run #8280，head=316d4c878b）：`FRESHNESS_STATUS 数据未变，跳过重写（幂等）`
+        （无 traceback）+ step9/13/14 全 success + 线上 1361458 B 体检 38 标记全命中。
     refs: |
       · commit 0802df64e81c（假刷新铁证提交）
       · scripts/fetch_sector_leaders.py L283（原 update_time 口径）
       · update_v8.py _pick_ts / _write_js
+    updated: "2026-09-25 22:20"
+    updated_by: 阿狸咪的工程师
 
   - id: experiment-card-stalled-3d-0925
     title: EXPERIMENT 卡停更 3 天（东财端连不上，代码护栏已上线待观测）
@@ -4536,3 +4543,50 @@ items:
       （裁 reason/price 等冗余字段实测可省 ~40%，1003KB/全量）另立条目。
     updated: "2026-09-24 17:59"
     updated_by: 小九(lemoncat-cn)
+
+
+  - id: build-blocker-pick-ts-nameerror-0925
+    title: 部署链硬阻——build step9 补 _pick_ts 未定义变量 obj_had_ts
+    owner: 阿狸咪的工程师
+    created: 2026-09-25 22:0x
+    status: done
+    priority: P0
+    scope: shared
+    what: >-
+      2026-09-25 21:34 CST 起 build_deploy 连续 5 轮（#8275~#8279）失败，main 停止部署约 44 分钟。
+      失败步固定为 build job 的 step9「🏗️ 构建 data/*.js（selective）」，而 gate 门禁 job 始终
+      success ⇒ 非 [13/13] 阻断。分界提交 = 69166eab4d（卡面假刷新根治），其引入
+      `if not existing and not obj_had_ts and _existing_file_ts:`（update_v8.py L776）却未定义
+      obj_had_ts ⇒ `NameError: name 'obj_had_ts' is not defined`，update_v8.py 以 exit 1 终止。
+      该提交当时的推送自证只跑了 py_compile —— 它不解析名字，故对运行期 NameError 静默漏检。
+    fix: |-
+      已闭环。按原注释语义就地补齐 5 行定义（+240 字节，相对远端真身 diff 仅 +5 行、白名单外零删除）：
+      obj_had_ts = bool(isinstance(obj, dict) and (obj.get("update_time") or obj.get("calc_time")))。
+      优先级链 existing > _meta.last_update > 文件历史 update_time > mtime > now 完全不变；
+      到达 L776 时 existing 恒为假，且两个调用点的 existing 均由 obj 的 update_time/calc_time 推导
+      ⇒ 本补法与原作者语义等价、不改任何既有分支。
+      推送走 Git Data API 六步（远端 contents API 取基底 10fdc3d1cba7 → 新建 blob → base_tree
+      只替换该 1 路径 → commit(parent=真 tip) → force:false → 回读逐字节），漂移断言不通过即 sys.exit。
+    verify_how: |-
+      1) 离线四项（推前已跑）：逐行 diff 仅 +5 行 / py_compile 通过 / 零依赖 AST 未定义名扫描 0 命中
+         （仅 __file__ 属模块级 dunder 的扫描器误报）/ _pick_ts 新旧对照单测「旧 5/7 抛 NameError、
+         新 7/7 通过」。
+      2) 线上（已完成）：run #8280 的 head_sha == 修复提交 316d4c878b；build job=success 且
+         step9/13/14 全 success；逐字 `✅ 已部署 main（第 1 次尝试）` +
+         `🩺 体检通过：线上 index.html 完整（1361458 字节，BUILD=316d4c878b，标记 38 全命中）`。
+      3) 主站复核：HTTP 200 / 1,361,458 B，线上 index.html 与远端 blob 逐字节一致（sha256 3535d0041c8d418a）。
+    not_verify_how: |-
+      禁只看 run conclusion 判红绿；也禁用「py_compile 绿」代替名字解析——NameError 属运行期错误，
+      只有 AST/类型检查或真跑才可见（本次即被该盲区坑掉 5 轮）。
+    evidence: |-
+      · run #8279 build job 108104741908 栈帧（逐字）：_pick_ts → L776 → NameError: name 'obj_had_ts' is not defined
+        → `##[error]Process completed with error: exit code 1`
+      · run #8280 gate=success / build=success / intraday_patrol=skipped（休市正确）
+      · 主站 sha256 live == repo == 3535d0041c8d418a（逐字节）
+    refs: |-
+      · commit 316d4c878b（修复，blob e3eff9d0de3b / 99239 B）
+      · 分界提交 69166eab4d（引入缺陷）
+      · update_v8.py L776 / L798（_pick_ts / _write_js）
+      · docs/ops/handover/2026-09-25_2220_阿狸咪的工程师给小九的工程师_部署链硬阻根治_构建步补未定义变量_CI8280全绿.md
+    updated: "2026-09-25 22:20"
+    updated_by: 阿狸咪的工程师
