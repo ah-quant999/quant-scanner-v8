@@ -29,7 +29,7 @@ meta:
   # 🔴 2026-09-25 07:2x 阿狸咪的工程师 恢复：本块于 a2b5f1f38f3b 被误删，
   #   致 [13/13] 交接状态源守卫 读不到 next_id_seq 而硬阻断 deploy（连阻 8+ 轮）。
   #   恢复值 = ledger.max_next_id_seq（77）；后因新增 item 抬高 ledger 至 78 ⇒ 同步抬至 78（2026-09-25 07:3x），保持 next_id_seq >= max_next_id_seq 不变式。
-  updated: 2026-09-25 07:20
+  updated: 2026-09-25 13:20
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -37,7 +37,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 78
+  next_id_seq: 79
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -4679,4 +4679,73 @@ items:
       2. 推 `workflow` 文件后，**必到 GitHub `actions/workflows` 接口核「是否被注册」**：
          本地 `yaml.safe_load` 通过 ≠ GitHub 接受（GitHub 侧校验更严，本次 heredoc 缩进本地 PyYAML 也不报错）。
     updated: "2026-09-25 07:45"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: trading-day-gate-predeps-fallback
+    priority: P0
+    owner: shared
+    status: todo
+    what: >-
+      2026-09-25（中秋休市，上交所〔2026〕22号：09-25~09-27 休市）实测：cn_fetch 主链的**交易日闸门失效**，
+      休市日仍判「交易日」并全量抓取，且 **V8_DATA_DATE 被错标为休市日当天**。两处证据同源于**同一步序缺陷**：
+      `v8_cn_fetch_cloud.yml` 的 step4「🗓 解析数据日期」(`python -c "import v8_date; print(v8_date.today_data_date())"`)
+      与 step6「🛡 交易日历闸门」(`python algorithms/check_trading_day.py`)，**均排在
+      step7 `actions/setup-python@v5` / step8「📦 安装依赖」(`python -m pip install akshare pandas requests`) 之前**。
+      而 `algorithms/fetch_lhb.py:9` 是**顶层** `import akshare as ak`（`v8_date._is_trading_day_impl` 恰是
+      `from fetch_lhb import is_trading_day`）⇒ 两步运行时 akshare 尚未安装 ⇒ 导入必失败 ⇒ `v8_date` 的
+      `except Exception` **静默**兜底 `d.weekday() < 5` ⇒ **周五（09-25）恒判交易日**、`today_data_date()`
+      不回退 ⇒ 返回 2026-09-25。逐字（run #2236 / id 36097381571、job `fetch`、CST）：
+      step4 输出 `📅 数据日期=2026-09-25` → `V8_DATA_DATE: 2026-09-25`（其后 30 个 step 全继承）；
+      step6 输出 `is_trading_day=true` / `proceed=true  (交易日 或 周末周度/手动全量)`。
+      反证（同一 run 里另一套日历判对）：step25「云端兜底调度」逐字
+      `算法链: 非交易日（2026-09-25 13:09），跳过算法链派发`；`guard_v8_freshness._HOLIDAY_RANGES_2026`
+      亦含 `("2026-09-25","2026-09-27")`，本机守卫实测报「交易日: 否」⇒ **同一时刻两套日历结论相反**。
+      同族既有记录：`cnfetch-empty-shell-block` 的 note 已记「`_MAKEUP_DAYS_2026` vs `v8_date→fetch_lhb`
+      对 09-20 结论相反」（补班日方向）；**本项是其镜像方向（工作日休市日）且根因不同（前置依赖缺失）**。
+    impact: >-
+      · **数据日期真实性（宗旨①）**：休市日当天所有经 V8_DATA_DATE 打戳的产物被标成 2026-09-25。
+        实测扫描 `data/*.js`（113 个）：**61 个**含 `2026-09-25`；日期字段口径命中
+        `date=2026-09-25` **581 处** / `enter_date` **358 处** / `close_date` **30 处** / `entry_date` 6 处 /
+        `last_date` 3 处（例：`data/CANDIDATE.js` 的 `"metrics":{...,"date":"2026-09-25"}`、`"last_seen":"2026-09-25"`）
+        ⇒ 与设计（休市日沿用上一交易日 09-24）相反，是 `v8_date` 自身兜底造成的「冒充今日」。
+      · **纯浪费的配额与算力**：休市日 cn_fetch 今日仍 **50 档**（48 档 `workflow_dispatch`），04:43→13:11 CST 近乎不停；
+        单档时长中位 ≈2.5min、合计 ≈145 min；每档用逐文件 `POST /git/blobs` ⇒ 直接叠加
+        `cnfetch-api-quota-403-exhausted`(P1) 的配额消耗（休市日属**纯浪费**）。
+      · **时间敏感**：若不在 **09-30** 前修复，10-01~10-07 连续休市日将重复同样的错标与空转。
+    fix: >-
+      （A）**根因修（推荐；属 workflow 车道 ⇒ 建议小九落码）**：把 `actions/setup-python@v5` 与「📦 安装依赖」
+      **上移到 step4「🗓 解析数据日期」之前** —— 依赖就位后 `fetch_lhb` 可导入、akshare 日历可用，
+      step4/step6 自动恢复正确口径，**无需新增任何日历表**。注意 step id（`gate`/`cat`/`td`）不变、仅调顺序；
+      并同步核查 `v8_cn_fetch_cloud_hosted.yml` / `v8_cn_fetch_cloud_selfhosted.yml` 及其它
+      「在安装依赖之前解析数据日期」的 workflow 是否同型。
+      （B）**兜底加固（可与 A 并行）**：`v8_date._is_trading_day_impl` 的兜底当前是裸 `weekday()<5`，
+      建议改为「日历不可用时**不再断言『是交易日』**」（如判「未知 ⇒ 沿用上一交易日」并打印显式告警），
+      避免再静默产出假今日。⚠️ **不建议**再新增第 6 份硬编码节假日表（本仓 `_MAKEUP_DAYS_2026` 已复刻 4~5 文件，
+      与去碎片化方向相反）；若确需静态兜底，必须复用**同一权威源**。
+      ⚠️ 本轮为监听巡检轮（detect+dispatch），**阿狸咪未改任何代码**，仅登记并交出。
+    verify_how: >-
+      ① 修复后取任一**工作日盘中** run：step4 应输出当日 `📅 数据日期=`、step6 `is_trading_day=true`（本就应 true），
+      并以 **step4 耗时**做旁证（应出现网络日历拉取量级 >300ms，而非当前的 ~40ms）；
+      ② **休市日判据（下次中秋/国庆）**：step4 `📅 数据日期=` 必须**回退为上一交易日**、step6 `proceed=false`、
+      step9「📡 抓中国数据」= **skipped**；cn_fetch 当日档数应降至个位；
+      ③ 「假今日」归零：扫描 `data/*.js` 的 `date`/`enter_date`/`close_date`，不得出现休市日；
+      ④ 禁以「run success」当判据 —— 休市日空转的 run 同样是 success。
+    evidence: >-
+      阿狸咪的工程师 2026-09-25 13:0x~13:2x CST 独立取证（一律远端 API，非本机副本）：
+      · run `36097381571`（#2236、13:09:32 CST、success）job `fetch` 的**真实步骤序**（`/jobs` API 取 started_at）：
+      `4 🗓 解析数据日期` → `6 🛡 交易日历闸门` → `7 setup-python` → `8 📦 安装依赖`（同秒 05:09:48/49 UTC）。
+      · 同 run 日志逐字：`📅 数据日期=2026-09-25`、`is_trading_day=true`、`proceed=true`、
+      `算法链: 非交易日（2026-09-25 13:09），跳过算法链派发`。
+      · 步耗时旁证：step4 命令行 `.0658Z` → 输出行 `.1080Z` = **42 ms**（真拉 akshare/sina 日历不可能完成）。
+      · 代码：`algorithms/fetch_lhb.py`（blob `017a36eaf8`）L9 `import akshare as ak`；
+      `v8_date.py`（blob `35bfbe8d2f`）`_is_trading_day_impl` 静默 except + `d.weekday() < 5`；
+      `algorithms/check_trading_day.py`（blob `703c906dcb`）同样经 `v8_date`；
+      `v8_cn_fetch_cloud.yml`（blob `34138e58`）L418 `python -m pip install akshare pandas requests`。
+      · 本机复现（移走 fetch_lhb 依赖后）：`v8_date.is_trading_day('2026-09-25')` → **True**；
+      `v8_date.today_data_date()` → **2026-09-25**。
+      · 产物扫描：113 个 `data/*.js` 中 61 个含 `2026-09-25`（`date=` 581 处，实例见 impact）。
+      ⚠️ 诚实标注残余不确定：`v8_date` 的兜底 except **不打日志** ⇒ 未取到 ImportError 的逐字；
+      但「步骤序 + 顶层 akshare 依赖 + 42ms 步耗时 + 本机复现」四条旁证同向，且唯一替代解释
+      （sina 日历把 09-25 列为交易日）与 step25 的「非交易日」结论及 `_HOLIDAY_RANGES_2026` 均矛盾。
+    updated: "2026-09-25 13:20"
     updated_by: 阿狸咪的工程师(alimi-cn)
