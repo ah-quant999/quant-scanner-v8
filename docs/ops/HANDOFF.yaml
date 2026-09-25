@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-25 22:20"
+  updated: "2026-09-26 00:40"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 80
+  next_id_seq: 81
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -4500,7 +4500,24 @@ items:
       · commit 0802df64e81c（假刷新铁证提交）
       · scripts/fetch_sector_leaders.py L283（原 update_time 口径）
       · update_v8.py _pick_ts / _write_js
-    updated: "2026-09-25 22:20"
+    alimi_verify_20260926_0042: >-
+      〔阿狸咪的工程师 2026-09-26 00:4x CST 部分复验 —— 主卡已根治，同族仍有 5 个产物假刷新〕
+      判据 = 以铁证提交 0802df64e81c 的**同一批 17 个 data/*.js** 为样本，用 commits API 逐笔取 patch，
+      统计修复提交 316d4c878b（09-25 22:2x CST）之后近 30 笔 main 提交的变更形态
+      （纯时间戳 = 唯一变化行命中 update_time/republish_time/updated/BUILD；否则记为内容变更）。
+      结果：
+      · ✅ `data/SECTOR_LEADERS.js` 修复后 **0 次变更**（修复前每轮 +1/-1）⇒ 根因①已根治：
+        源不新鲜则不再重写，卡面「更新于」不再被构建时刻顶掉。
+      · ✅ `EXPERIMENT.js` / `FINAL_RECOMMEND_DATA.js` 逐字 `⏭️ … 数据未变，跳过重写（幂等）`。
+      · 🔴 **仍有 5 个同族产物「内容零变化、update_time 每轮照刷」**（近 30 笔次数）：
+        `COMMODITY_ELASTICITY.js`×12、`IMA_STRONG_BACKTEST.js`×12、`MOMENTUM_FILTER.js`×11、
+        `AUDIT_TRAIL.js`×9、`SENTIMENT_CYCLE.js`×8（另 `HB_ALIMI.js`×2）；
+        全部形态 = `+1/-1`，唯一变化行是 update_time ⇒ 主人仍会被「更新于今天」误导（数据实为 T-1）。
+      ⇒ **本项不得转 done**：根因①目前只在 fetch_sector_leaders.py 收口，同族产物仍有假刷新。
+      ⚠️ 写戳位置本轮**未逐一读源码**（禁凭推断）⇒ 需逐脚本定位后按 fetch_sector_leaders.py ① 的
+      同一口径（update_time 取源数据时刻；源缺失才回落并写 republish_time）收口，
+      验证判据沿用「内容零变化 ⇒ update_time 也不变」。status 维持 pending-verify。
+    updated: "2026-09-26 00:40"
     updated_by: 阿狸咪的工程师
 
   - id: experiment-card-stalled-3d-0925
@@ -4521,6 +4538,19 @@ items:
     refs: |
       · raw_data/experiment.json update_time=2026-09-22 18:13:35
       · data/EXPERIMENT.js commit 0320100b3f33
+    alimi_verify_20260926_0042: >-
+      〔阿狸咪的工程师 2026-09-26 00:4x CST 按 verify_how 复验 —— 条件未到，结论顺延〕
+      09-26 档 cn_fetch（run #2289 / id 36148625311 / head f781f00b4203）job 日志**不含**
+      `::error title=v8-experiment-no-data::`。原因不是护栏失效，而是**抓取步本轮被跳过**：
+      step8「🛡 交易日历闸门（连续休市段跳过冗余抓取）」= success，step9「📡 抓中国数据」= **skipped**
+      （09-25 中秋休市，非交易日）⇒ EXPERIMENT fetcher 未执行 ⇒ 自然不会打空返回告警。
+      旁证（同档逐字）：`⏭️ EXPERIMENT 数据未变，跳过重写（幂等）` + `✅ experiment.json → EXPERIMENT.js`
+      ⇒ 幂等跳过路径生效、未产生假刷新。
+      ⇒ 本项 verify_how 顺延至**下一交易日（09-28 周一）post_close 档**：届时若东财仍全败，应看到
+      `::error title=v8-experiment-no-data::`（护栏生效）；若东财恢复则产物 update_time 前进。
+      status 维持 doing。
+    updated: "2026-09-26 00:40"
+    updated_by: 阿狸咪的工程师(alimi-cn)
   - id: resonance-calendar-lazyload-fail
     priority: P0
     owner: 小九(lemoncat-cn)
@@ -4590,3 +4620,64 @@ items:
       · docs/ops/handover/2026-09-25_2220_阿狸咪的工程师给小九的工程师_部署链硬阻根治_构建步补未定义变量_CI8280全绿.md
     updated: "2026-09-25 22:20"
     updated_by: 阿狸咪的工程师
+
+  # ── P1 · 算法链（假红线族 · 休市段首必现） ─────────────────────────────
+  - id: algo-t1-segment-d-gate-false-red-0926
+    title: 休市段首(t1) algo 链 D 批问责必假红——产物正确但 run 转 failure
+    priority: P1
+    owner: shared
+    status: todo
+    created: 2026-09-26 00:3x
+    scope: shared
+    what: >-
+      2026-09-26 00:04~00:22 CST（中秋休市段首 09-25 的夜间档）algo 链 run #2110
+      （id 36158426548，head b9c15be31cf2）job=algo conclusion=failure，失败步固定 = step17
+      「🛡 结果问责（按目标批次 + 产物完整性 · 杜绝假成功）」。**产物内容零缺陷**：同一步内
+      `algorithms/verify_chain_outputs.py` 逐字判 `✅ 新鲜 13 / ❌ 必需项失败 0 / ⚠️ 时间戳盲区 0 / 共 14`
+      + `✅ 闸门通过：全部核心产物均为本交易日产出` ⇒ 属**假红灯**（红线族假阳性），
+      禁当数据事故、禁补数、禁手工造 final_recommend。
+    evidence: >-
+      逐字（run #2110 · step17）：
+      `问责输入: 目标批=D 闸门放行=true 执行标志=true 算法步骤=success 数据日=2026-09-25(t1)
+       CST=00:22 B就绪=10/12(true) D最终推荐=0/1(false)`
+      `##[error]D 批跑完但 FINAL_RECOMMEND 仍非本数据日盘后产出（闸门裁决=未就绪 0/1，执行=success）
+       —— 假成功，必须排查`
+      同 job env 内 `V8_DATA_DATE: 2026-09-24`（cn_fetch 侧数据日**正确**），而问责用
+      `数据日=2026-09-25` ⇒ **同仓两处日期口径不一致**。
+      根因链（已逐行读源码）：
+      · `.github/scripts/v8_stage_gate.py` `chain_day()`（L591-619）：09-25 非交易日、09-24 是交易日
+        ⇒ 命中 t1 分支 `return d,"t1","T+1 数据日 d"` ⇒ **数据日 = 段首 09-25**（符合主人 2026-09-11
+        规则「假期第一日跑」，非 bug）。
+      · 同文件 `check_ready()`（L504-545）只对 `run_day != day` 放宽「戳落运行日」；`_cand()`（L415-427）
+        把 hour<9 的戳归**前一自然日** ⇒ B 产物戳 09-26 00:08 归 09-25 == day ⇒ `ready_B=true`；
+        D 产物 `FINAL_RECOMMEND_DATA.js` 戳 09-25 03:01 归 **09-24** ⇒ 既不等于 day 也不等于 run_day
+        ⇒ `ready_D=0/1`。
+      · D 本轮**根本没跑**（正确保护）：`raw_data/algo_run_report.json` 逐字
+        `"failed_scripts":[{"script":"final_recommend.py","reason":"就绪门控未通过（上游选股输入陈旧/缺失）"}]`
+        + 日志 `⏭️ 跳过 final_recommend（就绪门控未通过，本轮不产出最终推荐）`。
+        A 批输入明细逐字 `inst_trade.json=STALE(2026-09-24 16:52)` / `lhb_data.json=STALE(2026-09-25 02:34)`
+        / `AVG_PRICE_DATA.js=STALE(2026-09-24 11:30)` / `ETF_NET_SUBSCRIPTION.js=STALE(2026-09-24 23:51)`
+        —— 全是上一交易日口径，与「链数据日 09-25」天然不匹配 ⇒ **休市段首必挂**。
+      ⇒ 拒绝产出 D 是对的（不得用 T-1 输入造 D）；**错的是把「合规拒绝」判成 run failure**。
+      复发面：**每个周六 + 每个假期首日**（t1 段首）必现，年均 ≥50 档 ⇒ 真 P0 易被此红淹没。
+      连档 #2106~#2110 五档同因（#2106/#2107 另叠加 step11 update_v8 `NameError: obj_had_ts`，
+      已由 316d4c878b 治本）。部署影响：**无**（失败在链尾，推送已完成；build_deploy #8283~#8288 全 success）。
+    fix: >-
+      择一施工（改 .github/workflows/** 须 classic token；涉「告警分流」语义 ⇒ 建议 owner 拍板）：
+      (A) 问责侧分流（推荐）：v8_algo_run.yml step17 在 `kind=t1` ∧ D 未产出 ∧ D 现存产物数据日 ==
+          `_last_trading_day(day)` 时输出 `::notice`（同 v8-stage-gate-reject「合规拒绝、不告警」族），
+          不再打 `::error v8-algo-stale`；
+      (B) 闸门侧：`chain_day()` 在 t1 段首**不下发 D 批**（D 纯盘后产物），只下发 A/B，D 待下一交易日。
+      两案均**不得**放宽 check_ready 的 floor/戳判据（否则会把真陈旧放过 = 制造假绿）。
+    verify_how: >-
+      下一周六或假期首日档：algo run step17 conclusion == success（或至少不再出现 `v8-algo-stale`），
+      且 `raw_data/final_recommend.json` 的 update_time **未被伪造推进**（须仍等于上一交易日盘后产出时刻）。
+    not_verify_how: >-
+      禁用手工重生成 final_recommend 让它变新来消红（伪造数据）；也禁止只把 run 结论改绿而不改判据（假绿）。
+    refs: |-
+      · run 36158426548（#2110）step17 逐字
+      · .github/scripts/v8_stage_gate.py L591 chain_day / L504 check_ready / L415 _cand
+      · raw_data/algo_run_report.json（2026-09-26 00:18:15）
+      · docs/ops/handover/2026-09-26_0042_阿狸咪的工程师给小九_休市段首t1算法链D批问责假红已定位到源码行_产物正确禁补数_待裁决修法.md
+    updated: "2026-09-26 00:40"
+    updated_by: 阿狸咪的工程师(alimi-cn)
