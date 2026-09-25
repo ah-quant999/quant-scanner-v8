@@ -29,7 +29,7 @@ meta:
   # 🔴 2026-09-25 07:2x 阿狸咪的工程师 恢复：本块于 a2b5f1f38f3b 被误删，
   #   致 [13/13] 交接状态源守卫 读不到 next_id_seq 而硬阻断 deploy（连阻 8+ 轮）。
   #   恢复值 = ledger.max_next_id_seq（77）；后因新增 item 抬高 ledger 至 78 ⇒ 同步抬至 78（2026-09-25 07:3x），保持 next_id_seq >= max_next_id_seq 不变式。
-  updated: 2026-09-25 14:50
+  updated: 2026-09-25 14:40
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -456,7 +456,7 @@ items:
       **逐字节原样回推**（新 blob sha 断言 == 原 blob sha），Git Data API **单文件提交 `0c5f830a45e5`**
       （`base_tree` = 当时 tip 的 tree、`force:false`、PATCH **200 OK**）。
       **本地侧复核**：`git diff --cached --name-only | wc -l` = **0**（与 20:4x 轮一致，无复埋）。
-    updated: 2026-09-25 14:50
+    updated: 2026-09-25 14:40
 
     alimi_correct_20260923: >-
       阿狸咪 2026-09-23 复核当前 main 代码：HANDOFF 09-22 备注点名的两处「checkout 后未 unstage」
@@ -4593,9 +4593,9 @@ items:
       · 性能：抓取总耗时 33s → **6.5s**。
       · 提交：`cc4547ac3d`（?v 口径三处 + 并发组同族）、`c040113a3e`（正则小写四处同改）；
         两批均走净室推送器，推后逐字节回读自验全绿。
-    updated: 2026-09-25 14:50
+    updated: 2026-09-25 14:40
     updated_by: 阿狸咪的工程师(alimi-cn)
-    verified_at: 2026-09-25 14:50
+    verified_at: 2026-09-25 14:40
     alimi_verify_20260925_1450: |
       ── 阿狸咪的工程师 2026-09-25 14:4x CST 独立复验（远端 API + 硬抓 Pages，非本机副本）──
       ✅ **①形态**：硬抓首页，真实 `<script src="data/*.js?v=[0-9a-f]{10}">` 标签 **100 个**（唯一值 97；3 组重复 = 同名文件出现两次且 ?v 相同：JUDGMENT_DATA / MACRO_BRIEF / SECTOR_LEADERS）⇒ **无「整站同一时间戳」**。全页 `data/*.js?v=` 引用 110 处中 108 处为 10 位十六进制。
@@ -4784,7 +4784,7 @@ items:
         经核 `v8_build_deploy.yml:295` 源码 = `IF_TD="${{ steps.td_run.outputs.is_trading_day }}"`（**非硬编码**，
         日志是表达式**展开后**的行）⇒ 结论改判为「值取自 step 输出，因同一兜底缺陷而为 true」。
         留此条以免后来者据错判施工。
-    updated: 2026-09-25 14:50
+    updated: 2026-09-25 14:40
     updated_by: 阿狸咪的工程师(alimi-cn)
     alimi_verify_20260925_1450: |
       ── 阿狸咪的工程师 2026-09-25 14:4x CST 独立复核（13:2x 登记之后的**第二条独立证据链**；全部取远端 API，非本机副本）──
