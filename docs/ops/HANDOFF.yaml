@@ -5073,5 +5073,10 @@ items:
       ① 重新注册后连续 ≥2 个工作日，`v8_lhb_fetch` 的 `schedule` run `created_at` 应回落至 **17:30 CST ±30min**；
       ② `v8_dajijin_fetch` 应回落至 **20:30 CST ±30min**；
       ③ 反测：若仍恒落 21:xx–23:xx，则判定为 GitHub 侧调度行为，须改走「显式 dispatch 补派」而非依赖 cron。
-    updated: "2026-09-25 18:08"
+    alimi_note_20260925_1820: >-
+      ⚠️ **时效补充（同日 18:1x CST 实测）**：09-25 为**中秋休市**，而 `v8_lhb_fetch.yml` 内置
+      「交易日闸（默认）：周末静默跳过」（L108-111）⇒ 今晚那一档**预计仍不产数**（闸在链内，run 是否
+      出现与是否产数是两件事）。故 lhb 侧动态复验的**最早可信窗口 = 09-28（周一）的 ~21:40 档**，
+      并以 runs API 实测 `created_at` 为准。本项 `impact` 里「当晚 ~22:00 之后」的表述据此收窄。
+    updated: "2026-09-25 18:10"
     updated_by: 阿狸咪的工程师(alimi-cn)
