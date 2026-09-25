@@ -29,7 +29,7 @@ meta:
   # 🔴 2026-09-25 07:2x 阿狸咪的工程师 恢复：本块于 a2b5f1f38f3b 被误删，
   #   致 [13/13] 交接状态源守卫 读不到 next_id_seq 而硬阻断 deploy（连阻 8+ 轮）。
   #   恢复值 = ledger.max_next_id_seq（77）；后因新增 item 抬高 ledger 至 78 ⇒ 同步抬至 78（2026-09-25 07:3x），保持 next_id_seq >= max_next_id_seq 不变式。
-  updated: 2026-09-25 13:23
+  updated: 2026-09-25 14:50
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -456,7 +456,7 @@ items:
       **逐字节原样回推**（新 blob sha 断言 == 原 blob sha），Git Data API **单文件提交 `0c5f830a45e5`**
       （`base_tree` = 当时 tip 的 tree、`force:false`、PATCH **200 OK**）。
       **本地侧复核**：`git diff --cached --name-only | wc -l` = **0**（与 20:4x 轮一致，无复埋）。
-    updated: "2026-09-23 00:01"
+    updated: 2026-09-25 14:50
 
     alimi_correct_20260923: >-
       阿狸咪 2026-09-23 复核当前 main 代码：HANDOFF 09-22 备注点名的两处「checkout 后未 unstage」
@@ -466,6 +466,11 @@ items:
       09-22 20:26 那次 1.3MB→366KB「落后基线型 Contents API 覆盖」（commit 0320100b3f；
       force:false 拦不住「基线落后型覆盖」，见 §30.1/§43），该机制已由 `require_full` 截断读守卫
       （af4b42b75435）根治，待下一档 cn fetch 复验后转 pending-verify。
+    alimi_verify_20260925_1450: |
+      ── 阿狸咪的工程师 2026-09-25 14:4x CST 本机复测（家机 alimi-cn）──
+      ✅ ① `git diff --cached --name-only | wc -l` = **0**（恒无暂存内容 ⇒ 即便被 cron 触发也无 staged 可吞）。
+      ✅ ② `git reflog`（带 --date=iso）最近一次 `reset: moving to origin/main` = **2026-09-24 03:02:35**；**09-25 全天 0 次**（最新条目为 09-24 10:52 的 `pull --rebase --autostash`）⇒ 未再出现新的 reset 行为。
+      ⚠️ 残存风险面（本轮未触发，但仍在）：本机工作树 **9 处未暂存漂移** —— `index.html` / `logic.html` / `api_push_raw.py` / `update_v8.py` / `algorithms/gen_market_brief.py` / `.gitattributes` / `data/_ops_alert_pending.json` / `data/_peer_alert_state.json` / `raw_data/_peer_monitor_state.json`。其中 `index.html`（1,361,458 B、CRLF=0、LF=19,314）与远端 blob `8d6480368569`（线上 CDN 逐字节同源）**sha256 不同** ⇒ 本机是**异版本快照**，一旦被 `git add -A` 类脚本提交即反向覆盖线上前端 ⇒ 「禁本机 clone 直推」铁律继续有效。本项维持 doing（判据③「观察一个完整交易日」尚未满足；09-25~09-27 休市，顺延至 09-28 起算）。
 
   - id: alimi-same-family-check
     priority: P0
@@ -4531,7 +4536,7 @@ items:
   - id: cache-buster-token-defeats-browser-cache
     priority: P0
     owner: shared
-    status: pending-verify
+    status: done
     what: >-
       〔2026-09-24 17:3x 小九〕主人报「主站转半天打不开」。取证：首页 `HTTP 200` 但
       **TTFB 16.14s / 总计 33.45s**（同 URL 带 `--compressed` 仅 **2.77s**）
@@ -4588,8 +4593,18 @@ items:
       · 性能：抓取总耗时 33s → **6.5s**。
       · 提交：`cc4547ac3d`（?v 口径三处 + 并发组同族）、`c040113a3e`（正则小写四处同改）；
         两批均走净室推送器，推后逐字节回读自验全绿。
-    updated: "2026-09-24 17:51"
-    updated_by: 小九的工程师(lemoncat-cn)
+    updated: 2026-09-25 14:50
+    updated_by: 阿狸咪的工程师(alimi-cn)
+    verified_at: 2026-09-25 14:50
+    alimi_verify_20260925_1450: |
+      ── 阿狸咪的工程师 2026-09-25 14:4x CST 独立复验（远端 API + 硬抓 Pages，非本机副本）──
+      ✅ **①形态**：硬抓首页，真实 `<script src="data/*.js?v=[0-9a-f]{10}">` 标签 **100 个**（唯一值 97；3 组重复 = 同名文件出现两次且 ?v 相同：JUDGMENT_DATA / MACRO_BRIEF / SECTOR_LEADERS）⇒ **无「整站同一时间戳」**。全页 `data/*.js?v=` 引用 110 处中 108 处为 10 位十六进制。
+      ✅ **②一致性**：抽 **14 个**逐一核 `sha1(剔除 republish_time 后内容)[:10] == 页面 ?v` ⇒ **14/14 命中**（ETF_INTRADAY_HEAT 9eeac91fa9 / SECTOR_FUND_FLOW 5ea918e345 / ETF_NET_SUBSCRIPTION 7cb8dea404 / SECTOR_FUND_FLOW_TREND ab266a2b49 / SECTOR_FUND_FLOW_INTRADAY d29bf3e0d0 / DO_NOT_DELETE d2b8b5eb61 / SUSPENSION_ALERT cdbf52cf32 / GOLD_POOL 1ffad02664 / maharo_insights 890383ef2e / MACRO_DATA 17dcc924fe / AI_MARKET_BRIEF b2137caba4 / INDEX_QUOTES 4e772dec48 / ETF_DAILY_MONITOR 512474d78c / LHB_DATA 5159e454ac）。
+      ✅ **③稳定性（核心判据）**：`IPO_DATA.js` 的 `republish_time` 已前进到 **2026-09-25 00:11:12**，而其页面 `?v=444ef3ee9c` **恰等于其内容哈希** ⇒ ?v 只随数据本体变、**不随构建时刻变**（中性化生效）。另：跨 4 次硬抓（约 10 分钟内，期间 cache-bot 每 1–2 分钟推一档）97 个唯一值**零漂移** ⇒ 内容不变 ⇒ ?v 不变。
+      ✅ **④性能**：本机硬抓首页 `code=200 ttfb=0.363s total=0.781s size=1361458`（对照 09-24 基线 16.14s/33.45s）⇒ 回落达标。
+      ✅ **⑤小写文件名**：`maharo_insights.js?v=890383ef2e` **= 其内容哈希**（原「永不刷新」的小写文件现已正常重戳）⇒ 正则字符类修复确凿生效。
+      ⚠️ **口径澄清（防后人假 FAIL，务必照此判）**：`maharo_macro.js?v=20260924` 在全页**只出现在 HTML 注释里**——逐字 `<!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20260924） -->`（该注入行按主人令 09-13 已删，文件当前 **0 个活跃引用**）。⇒ ⑤ 判据**必须排除注释**（正解 = 只扫 `<script src="data/...">` 真实标签 + A2 loader 的 `url:'data/...'` 字面量），否则裸 grep 会得「⑤ 仍挂 20260924」的**假 FAIL**。同族坑：`IPO_DATA.js?v=1790031455` 亦**仅存在于 2026-08-28 的注释**中（活跃 ?v 已正确）。补充：A2 懒加载三张大表不在 `<script src>` 里（运行时注入），其 `url:'data/STOCK_LIST.js?v=1d77eaf1ac'` 亦与其内容哈希**相等**。
+      ⇒ ①②③④⑤ **五项判据全部达成**，转 done。
 
   # ── P0 · 前端大表加载（两张共振日历永久空白根治） ─────────────────
   - id: resonance-calendar-lazyload-fail
@@ -4769,5 +4784,17 @@ items:
         经核 `v8_build_deploy.yml:295` 源码 = `IF_TD="${{ steps.td_run.outputs.is_trading_day }}"`（**非硬编码**，
         日志是表达式**展开后**的行）⇒ 结论改判为「值取自 step 输出，因同一兜底缺陷而为 true」。
         留此条以免后来者据错判施工。
-    updated: "2026-09-25 13:23"
+    updated: 2026-09-25 14:50
     updated_by: 阿狸咪的工程师(alimi-cn)
+    alimi_verify_20260925_1450: |
+      ── 阿狸咪的工程师 2026-09-25 14:4x CST 独立复核（13:2x 登记之后的**第二条独立证据链**；全部取远端 API，非本机副本）──
+      ✅ **A. 根因三条独立命中**（与登记内容一致，可作终验依据）：
+      ① 远端 `algorithms/fetch_lhb.py` L9 逐字 `import akshare as ak`（**顶层**、无 try 包裹）⇒ setup-python/安装依赖之前 import 该模块必 ImportError；
+      ② 远端 `v8_date.py` `_is_trading_day_impl`（L37–L45）逐字：`try: from fetch_lhb import is_trading_day … except Exception:` → **静默** `return d.weekday() < 5` ⇒ 2026-09-25（周五）恒 True；
+      ③ **步骤序实测**（run #2265 / id 36102141929、job `fetch`、success）：`4 🗓 解析数据日期` 14:16:59 → `6 🛡 交易日历闸门` 14:16:59 → `7 actions/setup-python@v5` 14:16:59 → `8 📦 安装依赖` 14:17:00 ⇒ **解析/闸门确实先于依赖安装**；同 run `9 📡 抓中国数据 → raw_data/` 结论 = **success（未 skipped）** ⇒ 休市日空转抓取确凿。
+      🔴 **B. 修复方案补正（新增，登记内容未覆盖）——fix(A) 单靠「依赖上移」不足以防复发**：
+      远端 `fetch_lhb.py::is_trading_day()` 末端是**二阶兜底**：`cal = _get_trade_cal()`（`ak.tool_trade_date_hist_sina()`，24h 缓存）；若 `cal is not None` 则 `return d.strftime("%Y-%m-%d") in cal`；**否则 `return True  # 查不到日历时保守：视为交易日（不写占位）`**。
+      ⇒ 即便依赖就位，只要新浪日历拉取失败/超时（跨境网络，本仓高频），**仍回落为「交易日」** ⇒ 同样产出「假今日」。
+      ⇒ **fix(A) 需搭配**：把 `_get_trade_cal()` 失败路径由「默认 True」改为「**回落守卫同源的静态权威日历**」（复用本仓既有 `guard_v8_freshness._HOLIDAY_RANGES_2026` / `_MAKEUP_DAYS_2026`，**不得再造第 6 份硬编码表**），或至少改为**抛错/显式告警**而非静默 True。可判据：修复后断网情形下 `v8_date.is_trading_day('2026-10-01')` 必须为 False。
+      📉 **C. 空转规模实测（比登记值更大）**：`GET /repos/…/actions/workflows/327687211/runs?created=2026-09-24T16:00Z..2026-09-25T15:59Z` ⇒ `v8_cn_fetch_cloud` 今日（CST 09-25 00:00–14:5x）**82 档**；另 `v8_cn_fetch_intraday_lemoncat` 今日 **13 档** ⇒ 休市日合计 **≥95 档**全量空转（每档逐文件 `POST /git/blobs` ⇒ 叠加配额消耗）。与登记值「50 档（至 13:11）」不矛盾，属同一趋势的后续实测。
+      🏷 处置：`owner` 维持 shared，**fix(A) 属 workflow 车道**（本机 fine-grained PAT 对 `.github/workflows/**` 必 403）；本轮 14:4x 处**小九白天独家时段（7:45–17:45）** ⇒ 阿狸咪**不动代码、不派发**，仅补证 + 补正方案，交小九落码（时限：09-30 前，否则 10-01~10-07 连休复现）。
