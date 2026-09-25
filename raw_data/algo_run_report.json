@@ -1,17 +1,8 @@
 {
-  "update_time": "2026-09-25 19:09:13",
-  "run_start": "2026-09-25 18:58:37",
-  "ok": 12,
-  "fail": 2,
-  "failed_scripts": [
-    {
-      "script": "fetch_inst_trade.py",
-      "reason": "退出码 1 | [19:04:41] 全部接口重试仍失败，保留旧数据（如有）"
-    },
-    {
-      "script": "scripts/fetch_sector_leaders.py",
-      "reason": "退出码 1 | http.client.RemoteDisconnected: Remote end closed connection without response"
-    }
-  ],
+  "update_time": "2026-09-25 21:27:41",
+  "run_start": "2026-09-25 20:29:29",
+  "ok": 27,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }

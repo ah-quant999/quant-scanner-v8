@@ -1,9 +1,9 @@
 {
-  "update_time": "2026-09-25 02:36:25",
+  "update_time": "2026-09-25 20:45:40",
   "data_date": "2026-09-25",
   "track_start": "2026-09-25",
   "history_days": 31,
-  "strict_count": 3,
+  "strict_count": 2,
   "near_count": 0,
   "tracked": [
     {
@@ -12,18 +12,18 @@
       "market": "sh",
       "board": "科创板",
       "status": "strict",
-      "total_score": 28.6,
+      "total_score": 26.7,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "昨日高振幅",
-        "通信技术",
-        "计算机、通信和其他电子设备制造业",
         "沪股通",
+        "计算机、通信和其他电子设备制造业",
+        "通信技术",
         "基金重仓",
         "2026中报预增",
-        "百元股",
-        "MSCI中国"
+        "昨日高振幅",
+        "MSCI中国",
+        "百元股"
       ],
       "signal_count": 0,
       "enter_date": "2026-09-23",
@@ -47,18 +47,18 @@
       "market": "sz",
       "board": "创业板",
       "status": "strict",
-      "total_score": 32.3,
+      "total_score": 31.1,
       "quality_grade": "A",
       "industry": "医药制造业",
       "sectors": [
-        "创新药",
+        "互联医疗",
         "减肥药",
+        "深股通",
         "流感",
         "肝炎概念",
         "2026中报预增",
-        "深股通",
         "医药制造业",
-        "互联医疗"
+        "创新药"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-22",
@@ -73,41 +73,6 @@
           "tag": "中报预增",
           "score": 15,
           "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "300502",
-      "name": "新易盛",
-      "market": "sz",
-      "board": "创业板",
-      "status": "strict",
-      "total_score": 26.1,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业",
-        "深证100R",
-        "基金重仓",
-        "2026中报预增",
-        "机构重仓",
-        "深股通",
-        "百元股",
-        "MSCI中国"
-      ],
-      "signal_count": 1,
-      "enter_date": "2026-08-17",
-      "hold_days": 7,
-      "consecutive_days": 1,
-      "first_close": 466.68,
-      "current_close": 435.0,
-      "pnl_pct": -6.79,
-      "price_source": "quote",
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "走弱"
         }
       ]
     }
@@ -532,10 +497,9 @@
     "by_industry": [
       {
         "industry": "计算机、通信和其他电子设备制造业",
-        "count": 2,
+        "count": 1,
         "names": [
-          "源杰科技",
-          "新易盛"
+          "源杰科技"
         ]
       },
       {
@@ -549,30 +513,14 @@
     "by_sector": [
       {
         "sector": "2026中报预增",
-        "count": 3
+        "count": 2
+      },
+      {
+        "sector": "沪股通",
+        "count": 1
       },
       {
         "sector": "计算机、通信和其他电子设备制造业",
-        "count": 2
-      },
-      {
-        "sector": "基金重仓",
-        "count": 2
-      },
-      {
-        "sector": "百元股",
-        "count": 2
-      },
-      {
-        "sector": "MSCI中国",
-        "count": 2
-      },
-      {
-        "sector": "深股通",
-        "count": 2
-      },
-      {
-        "sector": "昨日高振幅",
         "count": 1
       },
       {
@@ -580,15 +528,31 @@
         "count": 1
       },
       {
-        "sector": "沪股通",
+        "sector": "基金重仓",
         "count": 1
       },
       {
-        "sector": "创新药",
+        "sector": "昨日高振幅",
+        "count": 1
+      },
+      {
+        "sector": "MSCI中国",
+        "count": 1
+      },
+      {
+        "sector": "百元股",
+        "count": 1
+      },
+      {
+        "sector": "互联医疗",
         "count": 1
       },
       {
         "sector": "减肥药",
+        "count": 1
+      },
+      {
+        "sector": "深股通",
         "count": 1
       },
       {
@@ -604,22 +568,14 @@
         "count": 1
       },
       {
-        "sector": "互联医疗",
-        "count": 1
-      },
-      {
-        "sector": "深证100R",
-        "count": 1
-      },
-      {
-        "sector": "机构重仓",
+        "sector": "创新药",
         "count": 1
       }
     ],
-    "concentration": 66.67
+    "concentration": 50.0
   },
   "overlap": {
-    "total_tracked": 3,
+    "total_tracked": 2,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -628,8 +584,8 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
-    "latest_date": "2026-09-24 21:44:30",
-    "total": 375,
+    "latest_date": "2026-09-25 04:29:34",
+    "total": 381,
     "best_hold_days": 5,
     "periods": {
       "1d": {
@@ -677,7 +633,7 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 163,
+      "count": 166,
       "win_rate_5d": 53.5,
       "avg_ret_5d": 0.96,
       "best_win_rate": 56.9,
@@ -685,7 +641,7 @@
     },
     {
       "band": "70~80",
-      "count": 212,
+      "count": 215,
       "win_rate_5d": 39.2,
       "avg_ret_5d": -1.36,
       "best_win_rate": 43.1,

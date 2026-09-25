@@ -1,9 +1,9 @@
 {
-  "update_time": "2026-09-25 02:02:20",
+  "update_time": "2026-09-25 20:45:30",
   "data_date": "2026-09-24",
   "track_start": "2026-09-14",
   "history_days": 9,
-  "price_days": 8,
+  "price_days": 9,
   "signal_count": 3,
   "tracked_total": 73,
   "active_count": 3,
@@ -36,10 +36,11 @@
       "price_source": "quote",
       "offsets": {
         "1d": 6.6,
-        "3d": 28.15
+        "3d": 28.15,
+        "5d": 38.23
       },
-      "best_n": 3,
-      "best_pct": 28.15,
+      "best_n": 5,
+      "best_pct": 38.23,
       "qd": null,
       "yzc": null,
       "jg": null,
@@ -347,7 +348,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": 1.58,
-        "3d": 4.68
+        "3d": 4.68,
+        "5d": 4.13
       },
       "best_n": 3,
       "best_pct": 4.68,
@@ -386,10 +388,11 @@
       "price_source": "quote",
       "offsets": {
         "1d": -0.41,
-        "3d": 3.29
+        "3d": 3.29,
+        "5d": 3.96
       },
-      "best_n": 3,
-      "best_pct": 3.29,
+      "best_n": 5,
+      "best_pct": 3.96,
       "qd": null,
       "yzc": null,
       "jg": null,
@@ -664,7 +667,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": 1.0,
-        "3d": 1.95
+        "3d": 1.95,
+        "5d": 1.28
       },
       "best_n": 3,
       "best_pct": 1.95,
@@ -702,7 +706,8 @@
       "pnl_pct": 0.45,
       "price_source": "quote",
       "offsets": {
-        "1d": 4.31
+        "1d": 4.31,
+        "3d": 0.45
       },
       "best_n": 1,
       "best_pct": 4.31,
@@ -741,7 +746,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -0.49,
-        "3d": 2.15
+        "3d": 2.15,
+        "5d": 0.32
       },
       "best_n": 3,
       "best_pct": 2.15,
@@ -818,9 +824,11 @@
       "current_close": 22.47,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -862,9 +870,11 @@
       "current_close": 304.11,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -906,9 +916,11 @@
       "current_close": 68.01,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -991,7 +1003,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": 5.09,
-        "3d": 2.7
+        "3d": 2.7,
+        "5d": -0.83
       },
       "best_n": 1,
       "best_pct": 5.09,
@@ -1150,7 +1163,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": 0.81,
-        "3d": 1.35
+        "3d": 1.35,
+        "5d": -1.81
       },
       "best_n": 3,
       "best_pct": 1.35,
@@ -1188,7 +1202,8 @@
       "pnl_pct": -1.86,
       "price_source": "quote",
       "offsets": {
-        "1d": 0.55
+        "1d": 0.55,
+        "3d": -1.86
       },
       "best_n": 1,
       "best_pct": 0.55,
@@ -1343,7 +1358,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -2.34,
-        "3d": -2.6
+        "3d": -2.6,
+        "5d": -2.41
       },
       "best_n": 1,
       "best_pct": -2.34,
@@ -1422,7 +1438,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": 2.88,
-        "3d": 1.89
+        "3d": 1.89,
+        "5d": -2.5
       },
       "best_n": 1,
       "best_pct": 2.88,
@@ -1461,7 +1478,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -0.59,
-        "3d": -0.18
+        "3d": -0.18,
+        "5d": -2.67
       },
       "best_n": 3,
       "best_pct": -0.18,
@@ -1540,7 +1558,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -4.47,
-        "3d": 1.23
+        "3d": 1.23,
+        "5d": -2.85
       },
       "best_n": 3,
       "best_pct": 1.23,
@@ -1579,7 +1598,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -0.68,
-        "3d": -0.57
+        "3d": -0.57,
+        "5d": -2.86
       },
       "best_n": 3,
       "best_pct": -0.57,
@@ -1698,7 +1718,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": 1.57,
-        "3d": -0.42
+        "3d": -0.42,
+        "5d": -3.3
       },
       "best_n": 1,
       "best_pct": 1.57,
@@ -1777,7 +1798,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": 0.39,
-        "3d": -0.34
+        "3d": -0.34,
+        "5d": -3.53
       },
       "best_n": 1,
       "best_pct": 0.39,
@@ -1808,7 +1830,8 @@
       "pnl_pct": -3.62,
       "price_source": "quote",
       "offsets": {
-        "1d": 0.47
+        "1d": 0.47,
+        "3d": -3.62
       },
       "best_n": 1,
       "best_pct": 0.47,
@@ -1886,7 +1909,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -2.01,
-        "3d": -2.14
+        "3d": -2.14,
+        "5d": -3.66
       },
       "best_n": 1,
       "best_pct": -2.01,
@@ -1964,7 +1988,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": 0.73,
-        "3d": -0.11
+        "3d": -0.11,
+        "5d": -3.84
       },
       "best_n": 1,
       "best_pct": 0.73,
@@ -2003,7 +2028,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": 1.89,
-        "3d": -1.0
+        "3d": -1.0,
+        "5d": -3.94
       },
       "best_n": 1,
       "best_pct": 1.89,
@@ -2081,7 +2107,8 @@
       "pnl_pct": -3.96,
       "price_source": "quote",
       "offsets": {
-        "1d": 0.6
+        "1d": 0.6,
+        "3d": -3.96
       },
       "best_n": 1,
       "best_pct": 0.6,
@@ -2159,7 +2186,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -2.46,
-        "3d": -1.38
+        "3d": -1.38,
+        "5d": -4.46
       },
       "best_n": 3,
       "best_pct": -1.38,
@@ -2275,7 +2303,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -0.82,
-        "3d": 0.38
+        "3d": 0.38,
+        "5d": -4.83
       },
       "best_n": 3,
       "best_pct": 0.38,
@@ -2307,7 +2336,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -2.52,
-        "3d": -1.9
+        "3d": -1.9,
+        "5d": -5.0
       },
       "best_n": 3,
       "best_pct": -1.9,
@@ -2345,10 +2375,11 @@
       "pnl_pct": -5.08,
       "price_source": "quote",
       "offsets": {
-        "1d": -5.16
+        "1d": -5.16,
+        "3d": -5.08
       },
-      "best_n": 1,
-      "best_pct": -5.16,
+      "best_n": 3,
+      "best_pct": -5.08,
       "qd": null,
       "yzc": null,
       "jg": null,
@@ -2384,7 +2415,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -0.58,
-        "3d": -1.61
+        "3d": -1.61,
+        "5d": -5.18
       },
       "best_n": 1,
       "best_pct": -0.58,
@@ -2463,7 +2495,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -1.9,
-        "3d": -3.25
+        "3d": -3.25,
+        "5d": -5.88
       },
       "best_n": 1,
       "best_pct": -1.9,
@@ -2502,7 +2535,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -2.21,
-        "3d": -3.58
+        "3d": -3.58,
+        "5d": -6.17
       },
       "best_n": 1,
       "best_pct": -2.21,
@@ -2579,7 +2613,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -1.3,
-        "3d": -3.24
+        "3d": -3.24,
+        "5d": -6.46
       },
       "best_n": 1,
       "best_pct": -1.3,
@@ -2617,7 +2652,8 @@
       "pnl_pct": -6.74,
       "price_source": "quote",
       "offsets": {
-        "1d": -4.6
+        "1d": -4.6,
+        "3d": -6.74
       },
       "best_n": 1,
       "best_pct": -4.6,
@@ -2846,7 +2882,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -2.57,
-        "3d": -6.51
+        "3d": -6.51,
+        "5d": -10.39
       },
       "best_n": 1,
       "best_pct": -2.57,
@@ -3410,7 +3447,7 @@
     "note": "四量信号自上线起逐日累积真实收盘价前向样本（基准=入选日收盘，T+N 按真实交易日推进，不含未来函数）。样本随持有天数成熟而增加；长档（75/90/180/250）见上方「回测 N 日胜率」的信号层回测。",
     "track_start": "2026-09-14",
     "history_days": 9,
-    "price_days": 8,
+    "price_days": 9,
     "horizons": [
       "1d",
       "3d",
@@ -3428,19 +3465,19 @@
     ],
     "summary": {
       "1d": {
-        "count": 70,
-        "win_rate": 44.29,
-        "avg_return": -0.08
+        "count": 73,
+        "win_rate": 42.47,
+        "avg_return": -0.07
       },
       "3d": {
-        "count": 61,
-        "win_rate": 47.54,
-        "avg_return": 1.37
+        "count": 67,
+        "win_rate": 44.78,
+        "avg_return": 0.94
       },
       "5d": {
-        "count": 25,
-        "win_rate": 60.0,
-        "avg_return": 2.61
+        "count": 50,
+        "win_rate": 40.0,
+        "avg_return": 0.61
       },
       "10d": {
         "count": 0,
@@ -3469,6 +3506,36 @@
       }
     },
     "per_stock": [
+      {
+        "code": "002297",
+        "name": "博云新材",
+        "enter_date": "2026-09-24",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
+      {
+        "code": "688082",
+        "name": "盛美上海半导体",
+        "enter_date": "2026-09-24",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
+      {
+        "code": "300442",
+        "name": "润泽科技",
+        "enter_date": "2026-09-24",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
       {
         "code": "300568",
         "name": "星源材质",
@@ -3516,7 +3583,8 @@
         "name": "诺唯赞生物",
         "enter_date": "2026-09-22",
         "offsets": {
-          "1d": 4.31
+          "1d": 4.31,
+          "3d": 0.45
         },
         "best_n": 1,
         "best_pct": 4.31
@@ -3526,7 +3594,8 @@
         "name": "恒玄科技",
         "enter_date": "2026-09-22",
         "offsets": {
-          "1d": 0.47
+          "1d": 0.47,
+          "3d": -3.62
         },
         "best_n": 1,
         "best_pct": 0.47
@@ -3536,7 +3605,8 @@
         "name": "中国长城",
         "enter_date": "2026-09-22",
         "offsets": {
-          "1d": -4.6
+          "1d": -4.6,
+          "3d": -6.74
         },
         "best_n": 1,
         "best_pct": -4.6
@@ -3546,7 +3616,8 @@
         "name": "星宸科技",
         "enter_date": "2026-09-22",
         "offsets": {
-          "1d": 0.55
+          "1d": 0.55,
+          "3d": -1.86
         },
         "best_n": 1,
         "best_pct": 0.55
@@ -3556,17 +3627,19 @@
         "name": "中文在线",
         "enter_date": "2026-09-22",
         "offsets": {
-          "1d": -5.16
+          "1d": -5.16,
+          "3d": -5.08
         },
-        "best_n": 1,
-        "best_pct": -5.16
+        "best_n": 3,
+        "best_pct": -5.08
       },
       {
         "code": "300223",
         "name": "君正股份",
         "enter_date": "2026-09-22",
         "offsets": {
-          "1d": 0.6
+          "1d": 0.6,
+          "3d": -3.96
         },
         "best_n": 1,
         "best_pct": 0.6
@@ -3710,7 +3783,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -2.52,
-          "3d": -1.9
+          "3d": -1.9,
+          "5d": -5.0
         },
         "best_n": 3,
         "best_pct": -1.9
@@ -3721,7 +3795,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -0.59,
-          "3d": -0.18
+          "3d": -0.18,
+          "5d": -2.67
         },
         "best_n": 3,
         "best_pct": -0.18
@@ -3732,7 +3807,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -2.34,
-          "3d": -2.6
+          "3d": -2.6,
+          "5d": -2.41
         },
         "best_n": 1,
         "best_pct": -2.34
@@ -3743,7 +3819,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": 2.88,
-          "3d": 1.89
+          "3d": 1.89,
+          "5d": -2.5
         },
         "best_n": 1,
         "best_pct": 2.88
@@ -3754,7 +3831,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": 1.58,
-          "3d": 4.68
+          "3d": 4.68,
+          "5d": 4.13
         },
         "best_n": 3,
         "best_pct": 4.68
@@ -3765,7 +3843,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": 1.0,
-          "3d": 1.95
+          "3d": 1.95,
+          "5d": 1.28
         },
         "best_n": 3,
         "best_pct": 1.95
@@ -3776,7 +3855,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -0.82,
-          "3d": 0.38
+          "3d": 0.38,
+          "5d": -4.83
         },
         "best_n": 3,
         "best_pct": 0.38
@@ -3787,7 +3867,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -2.01,
-          "3d": -2.14
+          "3d": -2.14,
+          "5d": -3.66
         },
         "best_n": 1,
         "best_pct": -2.01
@@ -3798,7 +3879,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -2.57,
-          "3d": -6.51
+          "3d": -6.51,
+          "5d": -10.39
         },
         "best_n": 1,
         "best_pct": -2.57
@@ -3809,7 +3891,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -0.49,
-          "3d": 2.15
+          "3d": 2.15,
+          "5d": 0.32
         },
         "best_n": 3,
         "best_pct": 2.15
@@ -3820,7 +3903,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": 0.81,
-          "3d": 1.35
+          "3d": 1.35,
+          "5d": -1.81
         },
         "best_n": 3,
         "best_pct": 1.35
@@ -3831,7 +3915,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": 0.39,
-          "3d": -0.34
+          "3d": -0.34,
+          "5d": -3.53
         },
         "best_n": 1,
         "best_pct": 0.39
@@ -3842,7 +3927,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -4.47,
-          "3d": 1.23
+          "3d": 1.23,
+          "5d": -2.85
         },
         "best_n": 3,
         "best_pct": 1.23
@@ -3853,7 +3939,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": 5.09,
-          "3d": 2.7
+          "3d": 2.7,
+          "5d": -0.83
         },
         "best_n": 1,
         "best_pct": 5.09
@@ -3864,7 +3951,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -2.46,
-          "3d": -1.38
+          "3d": -1.38,
+          "5d": -4.46
         },
         "best_n": 3,
         "best_pct": -1.38
@@ -3875,7 +3963,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -1.3,
-          "3d": -3.24
+          "3d": -3.24,
+          "5d": -6.46
         },
         "best_n": 1,
         "best_pct": -1.3
@@ -3886,7 +3975,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": 0.73,
-          "3d": -0.11
+          "3d": -0.11,
+          "5d": -3.84
         },
         "best_n": 1,
         "best_pct": 0.73
@@ -3897,7 +3987,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": 1.57,
-          "3d": -0.42
+          "3d": -0.42,
+          "5d": -3.3
         },
         "best_n": 1,
         "best_pct": 1.57
@@ -3908,7 +3999,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": 1.89,
-          "3d": -1.0
+          "3d": -1.0,
+          "5d": -3.94
         },
         "best_n": 1,
         "best_pct": 1.89
@@ -3919,10 +4011,11 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -0.41,
-          "3d": 3.29
+          "3d": 3.29,
+          "5d": 3.96
         },
-        "best_n": 3,
-        "best_pct": 3.29
+        "best_n": 5,
+        "best_pct": 3.96
       },
       {
         "code": "300394",
@@ -3930,7 +4023,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -1.9,
-          "3d": -3.25
+          "3d": -3.25,
+          "5d": -5.88
         },
         "best_n": 1,
         "best_pct": -1.9
@@ -3941,10 +4035,11 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": 6.6,
-          "3d": 28.15
+          "3d": 28.15,
+          "5d": 38.23
         },
-        "best_n": 3,
-        "best_pct": 28.15
+        "best_n": 5,
+        "best_pct": 38.23
       },
       {
         "code": "002384",
@@ -3952,7 +4047,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -0.58,
-          "3d": -1.61
+          "3d": -1.61,
+          "5d": -5.18
         },
         "best_n": 1,
         "best_pct": -0.58
@@ -3963,7 +4059,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -0.68,
-          "3d": -0.57
+          "3d": -0.57,
+          "5d": -2.86
         },
         "best_n": 3,
         "best_pct": -0.57
@@ -3974,7 +4071,8 @@
         "enter_date": "2026-09-18",
         "offsets": {
           "1d": -2.21,
-          "3d": -3.58
+          "3d": -3.58,
+          "5d": -6.17
         },
         "best_n": 1,
         "best_pct": -2.21

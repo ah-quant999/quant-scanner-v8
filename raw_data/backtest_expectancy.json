@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-25 02:23:49",
+    "generated": "2026-09-25 21:27:41",
     "method": "walk-forward / out-of-sample, shrinkage_k=10",
     "horizons": [
       3,
@@ -14,14 +14,14 @@
     ],
     "coverage": {
       "stocks_total": 1244,
-      "with_kline": 1244,
+      "with_kline": 1242,
       "occ_total": 2020,
       "p4_evaluated": 799,
       "p4_skipped_no_mkt": 0,
       "excluded_garbage": 0
     },
-    "partial": false,
-    "needs_refresh": false,
+    "partial": true,
+    "needs_refresh": true,
     "code_gate": "valid_a_share_reference(5222)",
     "entry_mode": "next_open",
     "entry_note": "次日开盘成交（T+1 open）：信号由 T 日收盘数据算出，最早只能 T+1 开盘买入；旧版用 T 日收盘价成交属前视偏差，已废弃",
