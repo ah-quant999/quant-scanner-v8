@@ -29,7 +29,7 @@ meta:
   # 🔴 2026-09-25 07:2x 阿狸咪的工程师 恢复：本块于 a2b5f1f38f3b 被误删，
   #   致 [13/13] 交接状态源守卫 读不到 next_id_seq 而硬阻断 deploy（连阻 8+ 轮）。
   #   恢复值 = ledger.max_next_id_seq（77）；后因新增 item 抬高 ledger 至 78 ⇒ 同步抬至 78（2026-09-25 07:3x），保持 next_id_seq >= max_next_id_seq 不变式。
-  updated: 2026-09-25 20:54
+  updated: 2026-09-25 21:00
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -4855,7 +4855,20 @@ items:
       （非 `v8_date`）**，本项 5 笔修复未覆盖，须另开项。
       ⚠️ 本轮为监听巡检轮：只读 + 本条追加；未改任何代码/阈值，未动 `index.html`/`logic.html`/`data/`/
       `raw_data/`/`.github/**`。
-    updated: "2026-09-25 20:54"
+    alimi_gate_online_20260925_2101: >-
+      ── 阿狸咪的工程师 21:01 CST **追加（第 4 条证据链）：影响面第 2 处「休市日门禁盲区」已在线闭环** ──
+      本项 `alimi_verify_20260925_1345` 登记的「休市日 gate 误判 ⇒ `build` job skipped ⇒ `Pre-deploy audit` 与
+      `部署到 main` 双缺位」+「`intraday_patrol` 反而照常启动补派」——属本项 ⏳ 待验第 ② 条。**本轮由阿狸咪的
+      一次正常 push 自然触发并实测闭环**（run `#8271` / id `36137814345` / head `3041fe970dee`，push 事件）：
+      · `gate` job = **success**；`build` job **不再被跳过**（`in_progress`→后续 step9~13 全 success）；
+      · `build` step10 **🛡️ Pre-deploy audit = success**（含 `[10/10]` index 核心标记守卫、`[13/13]` 交接状态源守卫）；
+      · `build` step13 **📤 部署到 main = success**（本档无推送竞态）；
+      · `intraday_patrol` job = **skipped**（休市日不再空转补派盘中链）。
+      ⇒ 与修复前逐字对照（`alimi_verify_20260925_1345`：休市日 `build`=skipped + `intraday_patrol` 跑并 `HTTP 204`）
+      **结论完全反转** ⇒ 影响面第 2 处判为**已闭环**（由 fix(A)+fix(B) 与 `341d6c055f96` 的 gate sparse-checkout 补丁共同达成）。
+      ⚠️ 剩余未闭环项仍是本项 ⏳①（`data/*.js` 残留假今日，见 `alimi_verify_20260925_2054` 的三类细分与 09-28 判据）
+      与 ⏳③（`guard_v8_freshness` 同名常量合流）。
+    updated: "2026-09-25 21:00"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   # ── P1 · 双机心跳（阿狸咪 2026-09-25 15:4x CST 实测新增）────────────────────
