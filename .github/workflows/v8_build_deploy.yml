@@ -124,6 +124,7 @@ jobs:
           sparse-checkout: |
             algorithms/check_trading_day.py
             v8_date.py
+            v8_calendar.py
           sparse-checkout-cone-mode: false
       - id: td_run
         continue-on-error: true
