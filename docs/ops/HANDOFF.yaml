@@ -849,8 +849,17 @@ items:
         已实测：改前 FAIL（4 处）/ 改后 PASS。
       ⚠️ 结论：**判据与门禁均无需改**（门禁第 4 次按设计拦住 deploy）；根因**始终是写入侧纪律** ——
         写 `updated` 前**必须 `datetime.now(CST)` 实取**，禁凭推断、禁手填。
-    updated: "2026-09-24 17:44"
+    updated: "2026-09-25 12:15"
     updated_by: 阿狸咪的工程师(alimi-cn)
+    alimi_verify_20260925_1215: >-
+      ✅ 阿狸咪的工程师 2026-09-25 12:15 CST **verify_how ①② 双双实测通过**（09-21 的 `evidence` 只记了反测②，本轮补齐正测①；
+      复现方式＝仓外最小树 importlib 载入 `check_handoff_ledger()` 直调，**未动本机工作树、未改任何文件**）：
+      · ① 正测（对远端 main 现树）逐字：`OK=True` / `交接状态源完好：items=83（ledger 锚 83 个 id 全在）· next_id_seq=78≥78` ⇒ PASS。
+      · ② 反测（把一项 `updated` 改成 now+30min = `2026-09-25 12:15`）逐字：`OK=False` /
+        `未来时戳 1 处（污染 MAX 新鲜度判据）: redcard-hostfail-rootfix-0924(updated=2026-09-25 12:44)`
+        ⇒ **FAIL 并精确点名该项**，与 `verify_how` 预期逐字一致。
+      · ⇒ 门禁判据**按设计工作**；本项剩余风险纯属**写入侧纪律**（09-21 起 4 次复发均为人手写错时刻，
+        最近一次 09-24 15:27 系阿狸咪自身所犯，见 `recurrence_20260924`）⇒ 是否由 doing 转 done 交 owner 小九判定。
 
   - id: factorlab-commit-pathspec
     priority: P2
@@ -3680,7 +3689,7 @@ items:
       ② 确认后由任一机一次性重算 62 项并校准到 100%；
       ③ 同批把「哈希 ≡ 现算」并入 `[13/13]`（现在只查 ids/计数，漂移查不出来）。
       **不急**：不影响部署链（门禁不校验哈希），但它现在**已经失去防覆盖能力**，建议本周内收口。
-    updated: "2026-09-24 20:08"
+    updated: "2026-09-25 12:15"
     updated_by: 阿狸咪的工程师(alimi-cn)
     alimi_verify_20260924: >-
       🔴 阿狸咪的工程师 2026-09-24 20:0x 独立复现（正面回应本项 `note` 的三问；全部实跑，非推断）：
@@ -3715,6 +3724,18 @@ items:
       **⑤ 纪律**：ledger 的 `ids`/哈希是「外部锚」，有效性**完全依赖写入方同批刷新** —— 本轮实测
       又一次抓到漏刷（2 个新 item 未进 ids/hashes）⇒ 建议把「同批刷 ledger」从纪律升级为**推前自动
       预检**（与 `handoff-meta-future-timestamp` 的本机预检法并列，双机都加）。
+    alimi_verify_20260925_1215: >-
+      🔁 阿狸咪的工程师 2026-09-25 12:15 CST 增量复验（仓外最小树复现，未动本机工作树、未改任何代码）：
+      **① 漂移未回潮**：对远端 main 现树（本文件 blob `ac06514e2733670918365bc1ed1ffa877f75b078` / `HANDOFF.ledger.json` blob
+      `2125732ff603a621aff60765dd2a993790d9a73b`）用仓内唯一口径 `scripts/handoff_ledger_hash.py --check`
+      逐字：`YAML items = 83 | ledger ids = 83 | ledger hashes = 83` → `命中 = 83/83 | 失配 = 0 | 未收录 = 0`（RC=0）。
+      对照 09-24 的 81/81 ⇒ 新增 2 项**同批已刷**，连续两轮 100%。
+      **② 「④ 门禁不消费哈希」已精确定位到行**（供 owner 一步施工）：`.github/scripts/pre_deploy_audit.py`
+      的 `check_handoff_ledger()`（L1117–1228）断言**仅 3 条** —— ①`ledger.ids ⊆ 当前 ids`（L1213-1216）
+      ②`meta.next_id_seq ≥ ledger.max_next_id_seq`（L1218-1225）③无未来时戳（L1194-1202，TOL=5min）；
+      **全函数 `id_content_hashes` 引用数 = 0** ⇒ 「id 仍在、正文被旧版顶掉」仍**完全抓不到**（本项 `what` 的原始风险至今未闭合）。
+      **③ 仍待 owner 拍板（我未改门禁）**：判据同 09-24 批次（P1「不急」+ 改门禁＝改 deploy 阻断判据，
+      该门禁已 4 次因写入侧纪律失误硬阻断部署）⇒ 建议先 soft 告警、观察一周无假阳性再转硬判据。
 
   - id: handoff-dup-key-index-tail-truncation
     priority: P1
