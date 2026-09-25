@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 00:40"
+  updated: "2026-09-26 05:08"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -4517,8 +4517,25 @@ items:
       ⚠️ 写戳位置本轮**未逐一读源码**（禁凭推断）⇒ 需逐脚本定位后按 fetch_sector_leaders.py ① 的
       同一口径（update_time 取源数据时刻；源缺失才回落并写 republish_time）收口，
       验证判据沿用「内容零变化 ⇒ update_time 也不变」。status 维持 pending-verify。
-    updated: "2026-09-26 00:40"
-    updated_by: 阿狸咪的工程师
+    alimi_verify_20260926_0510: >-
+      〔阿狸咪的工程师 2026-09-26 05:08 CST 第 2 次复验（距 00:42 档 ~4.5h）—— 5 个同族产物假刷新
+      **仍在**，并**修正 00:42 档的推断方向**：写戳路径不止 fetcher，**构建批也在重写**〕
+      · 判据 = 取 main 近 25 笔提交，逐笔用 commits API 抽这 5 个文件的 patch，看唯一变化行。
+      · 铁证提交 c2c7c9254f（09-26 04:25，message `v8 build: 2026-09-26 04:25`；同批含 index.html
+        + 9 个 data/*.js = 典型构建批）逐字：
+        - data/COMMODITY_ELASTICITY.js：`"update_time": "2026-09-26 04:20:00"` →
+          `"2026-09-26 04:25:49"`，而同行 `"data_date": "2026-09-24"` **未变** ⇒ 数据日冻结、
+          「更新于」前进 = 假刷新（主人仍会被误导成「今天刷过」）。
+        - data/SENTIMENT_CYCLE.js：`"update_time": "2026-09-25 19:35:21"` → `"2026-09-25 20:25:49"`，
+          `"data_date": "2026-09-25"` 未变。
+        - data/MOMENTUM_FILTER.js：`"generated":"2026-09-24 19:02:16"` 跨多笔构建**恒不变**。
+        - data/AUDIT_TRAIL.js：`latest.time` 恒 `02:47:49`（差异在行内更深键，须整行比对）。
+      · ⇒ 修法须**同时**覆盖 `update_v8.py::_write_js/_pick_ts`（其 `_existing_file_ts` 兜底对这 5 项
+        **未生效**）与各 fetcher 的落盘口径；**归属未定**（该提交无关联 run，且 message 不可作归因
+        —— 见铁律「`v8 cn fetch: HH:MM` 系硬编码」）⇒ 下一窗口逐脚本读源码定因，**禁凭推断改码**。
+      · status 维持 pending-verify（主卡 SECTOR_LEADERS 已根治；同族 5 项未清）。
+    updated: "2026-09-26 05:08"
+    updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: experiment-card-stalled-3d-0925
     title: EXPERIMENT 卡停更 3 天（东财端连不上，代码护栏已上线待观测）
