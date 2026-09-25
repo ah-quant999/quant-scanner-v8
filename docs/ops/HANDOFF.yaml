@@ -37,7 +37,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 80
+  next_id_seq: 82
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -4857,4 +4857,116 @@ items:
         `runner=v8_peer_monitor / host=CAT / threshold_min=180 / interval_min=63`，
         `xiaoju.silent_min=1273.4`（休市日设计，已知误报类）与 `alimi.silent_min=200.2`（本项）。
     updated: 2026-09-25 15:35
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: cn-singleflight-ghpat-missing-401
+    priority: P0
+    owner: shared
+    status: pending-verify
+    what: >-
+      `v8_dajijin_fetch.yml` 与 `v8_lhb_fetch.yml` 都引用 `secrets.GH_PAT`，但**该 secret 根本不存在**
+      （实测 `GET /repos/ah-quant999/quant-scanner-v8/actions/secrets` 只登记
+      `MAHORO_COOKIE` / `V8_GH_TOKEN` / `ZSXQ_TOKEN`）⇒ 模板解析为空 ⇒ 脚本内
+      `'Authorization' = "Bearer $env:GH_PAT"` 变成 `Bearer `（空）⇒ Contents API **一律 401**。
+      两条链都把失败写成非阻塞告警 ⇒ **run 恒 success = 假绿**，数据链实际全死。
+    impact: >-
+      · **dajijin 链**（`data/DAJIJIN_REDUCTION.js`）：step0 三步全部 401（run #3 日志逐字
+        `[warn] API fetch failed for …: 远程服务器返回错误: (401) 未经授权。`）⇒ 退化为使用
+        runner 工作区里的**陈旧本地副本**；step2 因取不到 token 打印
+        `[warn] 无 GH_PAT ⇒ 保守判定为需要推送`；step3 `scripts/api_put_file.py` 读
+        `GITHUB_TOKEN`/`GH_TOKEN` 亦为空 ⇒ `exit 1` ⇒ 但该步 `continue-on-error: true`
+        且内部只 `Write-Host` 告警 ⇒ **run 仍报 success**。产物自 2026-09-23 19:43 **冻结 2 天**。
+      · **lhb 单飞链**：step0 同步 401 后退回本地副本（脚本自述 `using local copy (LHB may be stale)`）；
+        step3 跑 `python api_push_raw.py --only lhb` 但**整个 step 无 `env:`** ⇒ `api_push_raw.py`
+        L33-35 取不到 `GITHUB_TOKEN`/`GH_TOKEN` ⇒ `❌ 缺少 GITHUB_TOKEN; sys.exit(1)` ⇒
+        被 `|| Write-Host "api_push_raw failed, non-blocking"` 吞掉 ⇒ run 恒 success。
+        （注：龙虎榜线上数据由主链 `v8_cn_fetch_cloud` step10 供给，故本链长期假绿未被察觉。）
+      · **同族面**：本仓 4 处「失败被写成非阻塞 ⇒ 假绿」的写法已在本项与
+        `vn-softfail-swallow` 家族登记；**判健康只读产物 update_time，禁读 run/step 结论**。
+    fix: >-
+      **已修（阿狸咪 2026-09-25 17:0x CST，提交 `87fe569b43d7`）**：
+      ① `secrets.GH_PAT` → `secrets.V8_GH_TOKEN`（仓内既有、另 6 条链在用）；
+      ② 给两个 python 推送助手补 `GITHUB_TOKEN` / `GH_TOKEN` 环境映射
+         （dajijin step0/step2/step3 三处、lhb step3 一处）。
+      ⏳ **未做（留 owner 裁决）**：是否把「推送失败」从非阻塞改为阻断
+      （现写法是设计选择：失败留给下轮补推；代价是假绿）。
+    verify_how: >-
+      ① **dajijin 侧已达成**：run **#4**（head `87fe569b43d7`）step2 日志逐字
+      `[ok] fetched algorithms/fetch_dajijin_reduction.py (11313 bytes)` ×3、
+      `env: GH_PAT: *** / GITHUB_TOKEN: ***`（非空）⇒ 同步恢复；产物远端
+      `data/DAJIJIN_REDUCTION.js` `update_time` **2026-09-23 19:43 → 2026-09-25 17:05**，
+      提交 `7dcfcd53d6ab`「data: dajijin reduction monitor refresh (2026-09-25 17:05 CST)」；
+      独立解析产物 = `records` 14 条 / `summary.total=14` / `errors=[]`（与 run 日志一致）。
+      ② **lhb 侧待验**：等 17:30 CST 的 `schedule` 档（或单发 `workflow_dispatch`）⇒ 断言
+      step0 日志出现 `fetched algorithms/fetch_lhb.py from origin/main`（不再有 401 warn），
+      且 step3 无 `❌ 缺少 GITHUB_TOKEN`。
+      ③ **静态判据**：`grep -c 'secrets\.GH_PAT' .github/workflows/*.yml` 恒为 **0**（注释除外）。
+      ④ 反测：把 `V8_GH_TOKEN` 临时清空应重新出现 401 ⇒ 证明因果链（**勿在生产仓库做**）。
+    evidence: >-
+      · 远端 secret 名单（09-25 17:0x 实测）：`MAHORO_COOKIE`(08-08) / `V8_GH_TOKEN`(08-05) /
+        `ZSXQ_TOKEN`(08-17)，**无 GH_PAT**。
+      · run #3（head `86a7f056a1e9`）job `108010272712` 日志：step0 三条 401 +
+        step1 `[ok] data/DAJIJIN_REDUCTION.js ready` + step2 `[warn] 无 GH_PAT ⇒ 保守判定为需要推送`
+        + step3 `[warn] push failed (non-blocking; retried next round)`，而 **run 结论 = success**。
+      · 修复后 run #4（head `87fe569b43d7`）job `108011527944`：三步全 401 消失、产物落地并推送成功。
+      · **假绿判据（本项核心）**：`v8_lhb_fetch` 最近 12 档 run 结论全 `success`、无任何失败步，
+        而其 step3 的 `api_push_raw.py` 因缺 token 必然 `exit 1` ⇒ **step 结论不可作为健康判据**。
+    updated: 2026-09-25 17:05
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: cn-runner-ps1-utf8-noBOM-gbk-parse-fail
+    priority: P1
+    owner: shared
+    status: pending-verify
+    what: >-
+      **cn runner 上的 Windows PowerShell `run:` 块严禁出现非 ASCII 字符。** 机制（已到字节级）：
+      cn runner 是 Windows 且系统码页为 **GBK(936)**，而 GitHub Actions 把 `run:` 写成的临时 `.ps1`
+      是 **UTF-8 无 BOM**；Windows PowerShell 5.1 对无 BOM 脚本**按 ANSI(GBK) 解码** ⇒
+      多字节字符的**尾字节会「吃掉」紧随的那个字节**（引号 0x22 或换行 0x0A 都在 GBK 尾字节合法区间
+      0x40–0xFE 之外 ⇒ 解码器把该 2 字节对整体替换掉）⇒ 后果分两级：
+      · **解析期硬失败**：被吃掉的是 `"` ⇒ `ParserError: 字符串缺少终止符`；
+      · **静默吞行（更危险）**：被吃掉的是换行 ⇒ 下一行代码并入上一行的注释
+        ⇒ **整条语句凭空消失、零报错、零红灯**。
+    impact: >-
+      · **已致真事故**：`v8_dajijin_fetch.yml` 4 个 run 块中 3 个解析失败 ——
+        step0 `Write-Host "[fatal] 抓取器未就位，本链无法继续"` 的收尾引号被吞 ⇒ 该链
+        **2/2 run 全部死在第 2 步「同步源码」**（run #1/#2）。
+      · **静默丢码实证**：step2 原文 8 行，cp936 解码后**只剩 7 行** ——
+        `$out = python scripts/dajijin_need_push.py 2>&1 | Out-String`
+        **整行并入上一行注释** ⇒ `$out` 恒 `$null` ⇒ `need=0` ⇒ **即使解析通过也永远不推送**。
+      · **同族潜伏面（本项主体风险）**：全仓扫描（`shell` 为 powershell/pwsh/cmd 且 `run` 含非 ASCII）
+        另有 **4 个块 / 3 个 workflow**：`v8_algo_run.yml` ×2（step0 20 行中文注释、step4 2 行）、
+        `v8_cn_fetch_cloud_selfhosted.yml` ×1（7 行）、`v8_lhb_fetch.yml` ×1（1 行）。
+        **实测这 4 个块今日解析 0 错**（被吞的都是同行注释、未命中引号/换行），
+        但**同一条字节规则随时会命中** ⇒ 属**结构性隐患**，任何一次改字都可能引爆。
+    fix: >-
+      **已修**：`v8_dajijin_fetch.yml` 三个 run 块内 10 行中文（注释 / `Write-Host` 日志 /
+      提交信息文案）**ASCII 化**，**代码逻辑零改动**（AST 命令序列比对为证）；中文原文无损保留为
+      文件尾部 YAML 注释块（YAML 由 GitHub 按 UTF-8 读、**不经 PowerShell**，故无风险）。
+      提交 `86a7f056a1e9`（parent `51ad156adb13`），blob `02299413152a`。
+      ⏳ **未做（留 owner 裁决）**：另 3 个 workflow 的 4 个同族块是否同批 ASCII 化。
+      **阿狸咪判断**：`v8_algo_run.yml` 是主算法链，为「潜伏项」动它有回归风险，
+      建议**等一次专门窗口**同批处理，而不是在巡检轮里顺手改。
+    verify_how: >-
+      **可复现命令（本机即 alimi-cn runner，故结论可复现）**：
+      ① 取远端 `run:` 块 → 替换 `${{ … }}` 表达式 → 以 **UTF-8 无 BOM** 写 `.ps1`
+         （`run.encode('utf-8')`，**勿加 BOM**）→ 用 PowerShell 5.1 解析：
+         `[System.Management.Automation.Language.Parser]::ParseFile($f,[ref]$null,[ref]$errs)`
+         ⇒ 修复前 `errs = 2/3/0/2`，修复后 `0/0/0/0`。
+      ② **静默吞行判据**：`[System.Text.Encoding]::GetEncoding(936).GetString(bytes)`
+         的**行数** < UTF-8 解码的行数（实测 step0 29→27、step2 8→7）即已吞行。
+      ③ **等价性判据**：对修复前后块提取 `CommandAst.GetCommandName()` 有序序列
+         ⇒ 现存语句必须一一对应；修复前 step2 缺 `python`/`Out-String` 即被吞证据。
+      ④ 反向判据（防回归）：仓库内任何 `.ps1`（含 `run:` 块落盘体）**非 ASCII 字符数应为 0**。
+    evidence: >-
+      · 本机实测（PowerShell 5.1.19041.2364，即 runner 同机同版本）：
+        修复前 step0 `2 err @L24 字符串缺少终止符: "`、step1 `3 err`、step2 `0 err 但丢语句`、step3 `2 err`。
+      · cp936 逐字节还原（`GetEncoding(936)`）：step0 行 24 变为
+        `Write-Host "[fatal] 鎶撳彇鍣ㄦ湭灏变綅锛屾湰閾炬棤娉曠户缁? -ForegroundColor Red`
+        —— 收尾 `"` 消失 ⇒ 字符串吞到行尾。
+      · CI 侧原始证据：run #1（`36006148888`）/ #2（`36034611514`）均
+        `FAILED STEP #2 📝 同步源码`，报 `ParserError … TerminatorExpectedAtEndOfString`。
+      · 修复后：run #3（`86a7f056a1e9`）/ #4（`87fe569b43d7`）6 步全 success，
+        且日志出现 ASCII 化后的 `[fatal] fetcher scripts not present…`（证明新码在执行）。
+    updated: 2026-09-25 17:05
     updated_by: 阿狸咪的工程师(alimi-cn)
