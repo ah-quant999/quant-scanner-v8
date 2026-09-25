@@ -773,6 +773,11 @@ def _write_js(var_name, obj):
         #   而 raw 层同一轮根本没产出 ⇒ 主人看到「更新于今天」，实际数据仍是 T-1。
         #   修法：在 mtime 之前插入一层「现有 data/*.js 已带的 update_time」——它才是真实语义
         #   时间；仅在 data 层首次构建（无历史值）时才回退 mtime / now_ts，保持幂等。
+        # obj_had_ts = 本次载荷自身是否已带时间戳（缺失定义导致 NameError 已补）
+        obj_had_ts = bool(
+            isinstance(obj, dict)
+            and (obj.get("update_time") or obj.get("calc_time"))
+        )
         if not existing and not obj_had_ts and _existing_file_ts:
             return _existing_file_ts
         if mtime_ts:
