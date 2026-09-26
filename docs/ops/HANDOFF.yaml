@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 09:46"
+  updated: "2026-09-26 09:57"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 81
+  next_id_seq: 82
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -4767,4 +4767,64 @@ items:
         （东财 push2 上游断供 + 休市期 SECTOR_LEADERS 步按设计 skipped，恢复判据 = 09-28 post_close）
         ⇒ 两项分开归责、分开验收。
     updated: "2026-09-26 02:53"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: peer-monitor-holiday-silence-false-down
+    title: peer_monitor 缺交易日豁免——休市/长假期间把对方机器误判为 down（阈值型假红）
+    priority: P1
+    owner: shared
+    status: todo
+    scope: shared
+    created: "2026-09-26 09:57"
+    what: >-
+      `v8_peer_monitor.py` 判「对方机器掉线」的阈值 `PEER_FAILOVER_THRESHOLD_MIN = 180`（L103）
+      是**日历分钟**，全文件**无任何交易日/节假日豁免**（`is_trading_day` / `holiday` / `_HOLIDAY`
+      三者命中数均为 0；唯一 `weekday()` 在 L664，只服务旧的 workday 窗口模式）。
+      而对方心跳产物 `HB_XIAOJIU` 按设计**只在盘中/盘后档重建**（`update_v8.py:310`
+      `"HB_XIAOJIU": "intraday,post_close"`）⇒ 休市日（cn_fetch 交易日闸门跳过、algo 链非交易日跳过）
+      **本就不重建** ⇒ `last_time` 冻结、沉默分钟数随假期线性增长 ⇒ 阈值必被击穿 ⇒
+      每轮 `verdict` 稳定写 `xj=down`。**属阈值型误报：非机器真掉线、非数据事故、禁补数。**
+      连带面：`CONSEC_DOWN_BEFORE_ALERT = 2`（L110）⇒ 连续 2 次 down 即调 `v8_send_alert.send_alert`
+      发信（机侧冷却 `ALERT_COOLDOWN_HOURS = 6`）⇒ 长假期间会周期性产生**假「机器离线」告警**。
+    evidence: >-
+      线上真身逐字（阿狸咪的工程师 2026-09-26 09:57 CST 实读，非推断）：
+      · `raw_data/_peer_monitor_state.json`（`run_time: 2026-09-25 21:47:42`）：
+        `threshold_min: 180` / `"xiaoju": {"alive": false, "silent_min": 1673.9,
+        "last_time": "2026-09-24 17:53:49"}` / `"alimi": {"alive": true, "silent_min": 36.4}` /
+        `verdict: "xj=down/al=alive"`。
+      · `raw_data/hb_xiaojiu.json`：`last_time = "2026-09-24 17:53:49"`（截至 2026-09-26 09:57 已沉默 ≈16h）
+        —— 与上面 `silent_min` 互相印证 ⇒ **沉默的真因是「产物未重建」，不是心跳腿挂了**。
+      · 复读 09-26 09:54 CST：`raw_data/hb_alimi.json` `last_time = 2026-09-26 07:38:47`（我方正常跳）
+        vs `hb_xiaojiu.json` 仍冻 09-24 17:53:49 ⇒ 差异**只由「哪一侧有盘中/盘后档」解释**。
+      · 源码侧证据（远端真身）：`v8_peer_monitor.py` 35,135 B / CRLF=0 / sha256 前 12 = 83572b345d7b；
+        阈值三因子逐字 `HEARTBEAT_INTERVAL_MIN = 63` / `HEARTBEAT_THRESHOLD_FACTOR = 2` /
+        `HEARTBEAT_GRACE_MIN = 54`；判存活处 = L311（小九侧）/ L335（阿狸咪侧）。
+      · 时间窗：2026-09-25（中秋）至 2026-09-27（周末）**连续三个非交易日**
+        （`v8_calendar.HOLIDAY_RANGES` 含 09-25~09-27；`guard_v8_freshness` 报「交易日: 否」）
+        ⇒ 本项在整个窗口内**每轮稳定复现**，且国庆连休（10-01 起）将再次放大。
+      · 同族既有铁律（本仓已记）：**判某机 DOWN 前必须先跑 `_is_trading_day(今天)`**；
+        非交易日一切「今日 0 档 / 停更」按设计豁免 ⇒ 「心跳停更」≠「机器离线」，两者须分开取证。
+    fix: >-
+      给 `v8_peer_monitor.py` 的判活逻辑加**交易日豁免**（复用仓内权威源，**禁**再增第 6 份硬编码节假日表）：
+      （A）`is_trading_day(今天) == False`（含周末/法定假日；补班日由 `v8_date` 裁决）⇒
+        **跳过判 down**，且 `verdict` 显式写 `holiday-skip` —— 必须能与「判 alive」区分，
+        否则「没判」会再次被读成「机器好的」。
+      （B）沉默时长按**交易日**计（`v8_date` 口径）而非日历分钟，避免跨假期累积击穿 180min。
+      （C）假期后首个交易日：不得因假期期间累积的沉默立刻判 down；
+        该日盘中档重建 `HB_*` 后回归原判据。
+      ⚠️ 本项与 `all-generic-redline-false-positive`（P1·doing）同属「假红灯」族
+        ⇒ 建议**同批裁定口径**，避免「健康检查 24h 红线」与「peer 180min 阈值」两套假红判据继续打架。
+      ⚠️ 涉及告警面 ⇒ 修完须观察 ≥1 个完整休市窗口（含国庆连休）确认无用例回归。
+    verify_how: >-
+      修好后在一个**非交易日**跑 `python v8_peer_monitor.py`（或等一个休市档）：
+      ① `raw_data/_peer_monitor_state.json` 的 `verdict` 不再出现 `down`（应为 `holiday-skip` 或 `alive`）；
+      ② 假期结束后首个交易日盘中档：`HB_XIAOJIU.last_time` 回到当日 ⇒ `verdict` 回 `alive`；
+      ③ 须能在输出里看到 `is_trading_day=false` 的**显式判据行**（禁止用「把阈值无限放大」来消除假红）。
+    not_verify_how: 只看 `verdict` 是否含 down —— 不联读 `run_time` / `last_time` / `is_trading_day` 就无法区分「真掉线」与「休市设计」。
+    refs: |
+      · v8_peer_monitor.py L100-110（阈值与告警常量）/ L311 / L335（判存活）/ L664（唯一 weekday 用法）
+      · update_v8.py:310 「HB_XIAOJIU: intraday,post_close」⇒ 心跳产物重建时机
+      · data/V8_CAL.js + v8_calendar.py（假期区间权威源）
+      · raw_data/_peer_monitor_state.json、raw_data/hb_alimi.json、raw_data/hb_xiaojiu.json
+    updated: "2026-09-26 09:57"
     updated_by: 阿狸咪的工程师(alimi-cn)
