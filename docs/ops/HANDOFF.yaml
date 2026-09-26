@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 12:15"
+  updated: "2026-09-26 14:23"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -1459,7 +1459,32 @@ items:
          「按生产者节拍红线 30 天」。
       （本批已落地 A/B 两条；status=doing，线上四条判据确认后转 done。）
     note_to: 阿狸咪
-    updated: "2026-09-21 18:55"
+    alimi_verify_20260926_1425: >-
+       〔阿狸咪的工程师 2026-09-26 14:25 CST · 第 17 轮 · 本族新实例：盘中产物被通用红线在休市期判 fail〕
+
+       线上 `data/HEALTH_CHECK.js`（blob `95efc0de08` / update_time 2026-09-26 14:11:29）实测：
+       summary = ok 118 / warn 0 / fail 1 / limited 2 / info 0 / other 0 / total 121，overall = warn。
+       唯一 fail 项逐字：
+       id=AVG_PRICE_DATA，name=平均股价（全A算术平均·880003口径），page=实时数据，freq=盘中每30分，
+       status=fail，last_update=2026-09-24 11:30:07，age_min=3041.3，
+       message=更新于 2天前 11:30；超过阈值 2981 分钟，heal_cat=intraday。
+
+       ⇒ 「通用/盘中红线打到结构性低频产物」在本族第 3 个实例（前两例 = all_ALGO_BACKTEST_COMPARE、
+         all_STOCK_LIST，均已 ok）。判龄阈值 2981 分钟 ≈ 49.7h ⇒ 休市第 2 日起必判 fail（本次 09-26 13:11 起）。
+
+       🔴 须与「阈值口径打架」分开验收的第二个问题：`data/AVG_PRICE_DATA.js` 提交史实测
+          09-24 全天仅 11:33 一次更新（`e4a01ac7c8`），而 09-23 有 4 次（10:44/11:33/14:57/15:29）、
+          09-22 有 8 次 ⇒ 09-24 下午盘中采样疑似缺失。该产物 source = 全A等权自算(东财em_clist)，
+          与 `redcard-hostfail-rootfix-0924` 的东财断供同期 ⇒ 两者需分开归责：
+          观 `AVG_PRICE_DATA.js` 内 date=2026-09-24（= 最后交易日）⇒ 卡面数据本身正确，非数据事故；
+          待 09-28 交易日盘中复看是否恢复「每 30 分钟前进」——恢复则纯属阈值口径问题，
+          不恢复则另立东财断供实例。
+
+       · heal_cat=intraday ⇒ 该 fail 参与自愈派发，休市期无法修复 ⇒ 与 cn_fetch step7「陈旧强制放行」
+         叠加成空转（今日 12:00–14:09 实测 15 档）⇒ 与 `card-fake-freshness-timestamp-rootfix-0925` 同一未决面。
+
+       ⇒ status 维持 doing：本族虽前两例转 ok，但新增实例 + 两守卫口径（30 天 vs 24h/49.7h）未统一 ⇒ 治本未闭环。
+    updated: "2026-09-26 14:23"
 
   # ── 2026-09-21 17:0x 小九新增（批②：通用红线 cap 断崖修复）─────────────────
   - id: all-generic-redline-cap-cliff
@@ -4604,7 +4629,31 @@ items:
            及 guard_v8_freshness:236=30 天 / v8_health_check=24h 的**口径打架**是同一个未决面；
            且 fail 项带 heal_cat 会触发自愈派发 ⇒ 有踩踏风险。故本项由 owner 就 ② 拍板后一次性施工。
       ⇒ status 维持 pending-verify（主卡 SECTOR_LEADERS 已根治；同族 5 项真因已到源码行、修法已定）。
-    updated: "2026-09-26 07:23"
+    alimi_verify_20260926_1425: >-
+       〔阿狸咪的工程师 2026-09-26 14:25 CST · 第 17 轮 · 按 verify_how 原文口径做云端真跑档比对 ⇒ 未根治，并发现第 6 个同族文件〕
+
+       样本 = `data/SECTOR_FUND_FLOW_INTRADAY.js`（休市日 09-26 被 cn_fetch 每 1~2 分钟重写一次）。
+       取相邻 4 笔提交全文（`git/blobs`，正则取 window.X 字面量后逐键 flat diff），逐字：
+
+       · `e7b6611ba3`：diff_keys=1，仅 `republish_time` None → 2026-09-26 14:06:00
+       · `2f9508e515`：diff_keys=1，仅 `republish_time` 14:06:00 → 14:05:18
+       · `b7e46340c1`：diff_keys=2，仅 `republish_time` → None、`update_time` 14:05:13 → 14:07:38
+       · `a785109563`：diff_keys=1，仅 `republish_time` None → 14:07:43
+
+       ⇒ 数据键零变化、时间键每 1~2 分钟前进 = 教科书式假刷新。此前已定因的 5 项
+       （COMMODITY_ELASTICITY / SENTIMENT_CYCLE / MOMENTUM_FILTER / AUDIT_TRAIL / IMA_STRONG_BACKTEST）之外，
+       新增第 6 项 `SECTOR_FUND_FLOW_INTRADAY.js`；其写路径 = cn_fetch step16「追加板块资金日内快照」
+       + step19 update_v8，且它同时驱动 index.html 的 ?v 缓存戳 ⇒ 连锁把 index.html 也每 1~2 分钟重写。
+
+       ⇒ verify_how「内容零变化而 update_time 也不变」未达成 ⇒ status 维持 pending-verify
+         （不得据单点绿判根治）。
+
+       🔴 同时定性其自激循环（本项与 `all-generic-redline-false-positive` 同面）：
+          cn_fetch step7「幂等闸门」对「数据陈旧」强制放行 ⇒ 休市期每档全跑 ⇒ 每档重写时间戳（假刷新）
+          而真数据不动 ⇒ 判龄仍陈旧 ⇒ 再派发。今日实测 12:00–14:09 共 15 档（actor 全自动，
+          1~2 分钟一档；未堆积：同 group in_progress 峰值 = 1）。
+          该循环由 09-28 交易日自然终止；治本须让闸门区分「结构性不可修（休市 / 外部源断供）」与「可修陈旧」。
+    updated: "2026-09-26 14:23"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: experiment-card-stalled-3d-0925
@@ -4801,7 +4850,29 @@ items:
       · ⚠️ **与另一红卡族不混同**：`experiment.json`/`sector_leaders.json` 停 09-22 的根因**不同**
         （东财 push2 上游断供 + 休市期 SECTOR_LEADERS 步按设计 skipped，恢复判据 = 09-28 post_close）
         ⇒ 两项分开归责、分开验收。
-    updated: "2026-09-26 02:53"
+    alimi_verify_20260926_1425: >-
+       〔阿狸咪的工程师 2026-09-26 14:25 CST · 第 17 轮 · 连档范围与自然收束点实测（run 表 + job/step 表 + 日志逐字）〕
+
+       · 连档范围：2106 至 2122 号共 17 档 failure（09-25 21:41 → 09-26 08:39 CST），失败步恒为
+         step17「🛡 结果问责（按目标批次 + 产物完整性 · 杜绝假成功）」；其中 2106/2107 两档另叠加 step11
+         （update_v8.py 抛 NameError，`obj_had_ts` 未定义，已由 `316d4c878b` 治本），2108 起失败步唯一 = step17。
+
+       · 自然收束点 = algo 2123 号（id 36216810679 / head `0037ba90b8d6` / 09-26 12:05 CST / ev=schedule）
+         与 2124 号（id 36220360706 / head `b36b993f445a` / 13:17 CST / ev=workflow_dispatch）：
+         run 结论 = success，job algo = success，step17 = success。
+         逐字（2124 号 · job 108344340693 · step17）：
+         问责输入：目标批=NONE 闸门放行=true 执行标志=false 算法步骤=skipped 数据日=none(none) CST=13:18
+         B就绪=10/12(true) D最终推荐=0/1(false)
+         闸门行逐字：🚦 目标批=NONE 放行=（⏸ 非交易日（休市，无 T+1 需求） → 不跑任何批（合规空转））
+         ⇒ 休市段第 2 天起闸门不再下发 D ⇒ 问责不再触发 `::error v8-algo-stale` 红灯
+         （= 提交 `70d9a5e8f93b`（09-20）「休市段第2天云端问责必红根治」的生效路径；对照 2122 号段首日
+         目标批=D 数据日=2026-09-25(t1) … D最终推荐=0/1(false) ⇒ 转红）。
+
+       · ⚠️ 本项指向的缺口未消除：段首日（t1）仍会下发 D 并必假红 ⇒ 复发面（每个假期首日）不变
+         ⇒ status 维持 todo，修法仍待 owner 在 (A) 问责侧分流 / (B) 闸门侧 t1 不下发 D 中拍板。
+
+       · 下一个自然复发点 = 10-01（国庆首日）；最近可复验交易日 = 09-28（周一）（届时 step17 应为绿）。
+    updated: "2026-09-26 14:23"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: peer-monitor-holiday-silence-false-down
@@ -5375,7 +5446,7 @@ items:
     title: HANDOFF.yaml 被「旧基线 blob + 新 parent」推送静默删除 7 个登记项（唯一状态源丢挂账）
     priority: P0
     owner: shared
-    status: todo
+    status: pending-verify
     scope: shared
     created: "2026-09-26 12:15"
     what: >-
@@ -5442,5 +5513,34 @@ items:
       · scripts/handoff_ledger_hash.py、.github/scripts/pre_deploy_audit.py::check_handoff_ledger
       · skill v8-handoff-yaml-item-update §13-1（漂移守卫）/ §17-1（内容级漂移守卫）
       · 同族：api-push-stale-base-index-clobber、handoff-concurrent-write
-    updated: "2026-09-26 12:15"
+    alimi_verify_20260926_1425: >-
+       〔阿狸咪的工程师 2026-09-26 14:25 CST · 第 17 轮巡检 · 只读实读远端 API 复验（第 17 轮）〕
+
+       verify_how 逐条（数据源全部为远端真身，非本机副本、非推断）：
+
+       ① ✅ main 的 `docs/ops/HANDOFF.yaml`（blob `e74879a23b04` / 500,286 B）解析得 items=95，
+          7 项逐 id 全部在位：`ci-gate-dual-block-meta-block-lost-0925`（已 done）、
+          `trading-day-gate-predeps-fallback`、`heartbeat-files-clobbered-by-cnfetch`、
+          `cn-singleflight-ghpat-missing-401`、`cn-runner-ps1-utf8-noBOM-gbk-parse-fail`、
+          `ima-connector-unbound-enterprise-switch`、`cn-singleflight-schedule-trigger-offset` 各命中 1 次；
+          `meta.next_id_seq=83` ≥ 83 ⇒ 满足。恢复动作 = 提交 `2dacb961395c`（09-26 12:16 CST，非本机所为）。
+
+       ② ✅ 仓外最小树离线跑真门禁 `.github/scripts/pre_deploy_audit.py::check_handoff_ledger()`
+          （`m.ROOT` 显式覆盖为 pathlib.Path）⇒ 返回 (True, '交接状态源完好：items=95（ledger 锚 95 个 id 全在）· next_id_seq=83≥83')。
+
+       ③ ✅ 仓内唯一口径 `scripts/handoff_ledger_hash.py --check` ⇒ items=95 | ids=95 | hashes=95，
+          命中 95/95 · 失配 0 · 未收录 0。
+
+       ④ ✅ 由本笔推送自证：`GET /commits/<sha>.files` 只含登记 2 路径（docs/ops/HANDOFF.yaml +
+          docs/ops/HANDOFF.ledger.json），item id 集合 95→95 只增不减（零删除）；推后逐字节回读一致。
+
+       ⇒ ①②③④ 全达成，status todo → pending-verify。
+       ⚠️ 但 (B)「写入侧强制预检」目前只写进 skill、未落成硬门禁（09-25 21:45 那轮即因未落实而翻车）
+          ⇒ 治本项未闭环，故不转 done；待 (B) 落码（或门禁加「id 集合只增不减」断言）后再收口。
+
+       附：本机复核口径 = items 数 + id 集合逐项比对 + 离线真门禁 + `--check` 三件同看，
+       禁只看 [13/13] 门禁绿（YAML 与 ledger 同批回退时门禁恒绿，查不出整段丢失）。
+       🔴 本轮新踩坑（写入侧，已同步进 skill）：HANDOFF.yaml 的长字段必须用 `>-` 折叠块标量 ——
+          裸标量续行里出现「空格+#」会被 YAML 当注释（静默截断该行余下内容）、出现「: 」会直接解析失败。
+    updated: "2026-09-26 14:23"
     updated_by: 阿狸咪的工程师(alimi-cn)
