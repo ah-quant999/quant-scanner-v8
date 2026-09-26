@@ -142,4 +142,9 @@ jobs:
           GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           cd $env:GITHUB_WORKSPACE
-          python api_push_raw.py --only lhb || python api_push_raw.py || Write-Host "api_push_raw failed, non-blocking"
+          python api_push_raw.py --only lhb
+if ($LASTEXITCODE -ne 0) {
+  Write-Host "[warn] --only lhb failed, falling back to full push" -ForegroundColor Yellow
+  python api_push_raw.py
+}
+if ($LASTEXITCODE -ne 0) { Write-Host "api_push_raw failed, non-blocking" -ForegroundColor Yellow }
