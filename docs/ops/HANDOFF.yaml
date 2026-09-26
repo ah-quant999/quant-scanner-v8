@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: 2026-09-27 00:59
+  updated: 2026-09-27 05:29
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -5264,7 +5264,41 @@ items:
       口径重述（当日 `event=schedule` 仅 #2301 一档）。
       ⚠️ verify_how ① 仍缺：需**工作日盘中**真跑档（下一交易日 **09-28 周一**）验证 step4 耗时量级与
       `is_trading_day=true` 路径 ⇒ status 维持 pending-verify。
-    updated: "2026-09-26 16:40"
+    alimi_verify_20260927_0530: >-
+      〔阿狸咪的工程师 2026-09-27 05:29 CST · 第 23 轮巡检 · 只读远端 API（非本机副本）〕
+      ✅ **A. verify_how ② 第 2 次独立复现**（本仓「一次 success ≠ 常态」纪律要求的隔日样本）：
+      样本 = cn_fetch run **#2391**（id `36271978000` / 09-27 05:09 CST / `event=workflow_dispatch` /
+      job `fetch` = success）。`GET /actions/runs/<id>/jobs` 的真实 step 表逐字：
+      `4 Run actions/setup-python@v5` → `5 📦 安装依赖` → `6 🗓 解析数据日期` → `7 🔒 幂等闸门（按并发组判重…）`
+      → `8 🛡 交易日历闸门（连续休市段跳过冗余抓取）` → **`9 📡 抓中国数据 → raw_data/（selective）` = skipped**。
+      ⇒ **依赖安装（step4/5）已确认前置于「解析数据日期」（step6）**，fix(A) 步序在线上稳定；
+      日志逐字 `📅 数据日期=2026-09-24`（回退上一交易日）/ `is_trading_day=false` /
+      `proceed=false (工作日遇节假日，跳过冗余抓取)` ⇒ ② 的三项子判据**再次全部达成**。
+      ⚠️ 第 4 项子判据（`SECTOR_LEADERS` 步 skipped）在本档**不适用**：本档 `CAT=post_close`，
+      该步按设计应真跑，实测 step22 = success（09-26 样本 #2310 是另一 category ⇒ 两者不可混比）。
+      🔴 **B. verify_how ③ 仍未达成，且本轮把残留根因收窄到「algo / 衍生侧不走 v8_date」——关键新证据 =
+      三份产物是在修复落码之后重跑的，仍带休市日数据日**（故不能用「旧档待自然重跑」解释）：
+      · `data/CRDS_CARD_DATA.js` —— `enter_date` **09-26 共 334 处** + `data_time:"2026-09-26 15:30:00"`，
+        该文件 `update_time = 2026-09-26 08:41:48`（**晚于修复落码 09-25 19:29**）；
+      · `data/H_AUTO_BUY.js` —— `date:"2026-09-25"`，`update_time = 2026-09-25 20:59:39`（**晚于修复落码**）；
+      · `data/TRIPLE_TRACK.js` —— `data_date:"2026-09-25"`，`update_time = 2026-09-26 08:43:47`。
+      ⇒ 与本仓在册项 **`algo-artifact-date-naked-now-bypass-calendar`**（`calc_crds.py` 同文件两套日期口径）
+      **同源**，本项 5 笔修复（`v8_date` / gate / workflow 步序）**覆盖不到**，应在那条项里收口。
+      对照：`FINAL_RECOMMEND_DATA.js`（09-25 ×60，ut `2026-09-25 03:01:12`）/ `SH_FIB.js` / `SZ_FIB.js`
+      （09-25，ut `2026-09-25 19:03`）三份 ut **均早于** 19:29 修复 ⇒ 属**旧档**，待自然重跑即可。
+      🔴 **C. verify_how ③ 的扫描判据必须显式排除三类合法值，否则会永久假红/假绿**（本轮新增，可直接复用）：
+      ① 成员表**观察自然日** —— `data/CANDIDATE.js` 实测 `date` 09-27 ×**537**（`time.strftime("%Y-%m-%d")`
+      自然日，非行情数据日）；② **构建戳** —— `update_time` / `republish_time`；
+      ③ **前瞻类日历字段** —— 实测 `data/RESTRICTED_RELEASE.js` 含 `date:"2026-12-17"`（解禁日历，合法未来日）。
+      ⇒ 建议把 ③ 收窄为「**行情数据日字段**（`data_time` / `close_date` / 行情类 `date`）不得出现休市日，
+      且须排除 ①②③」，再叠加 `alimi_verify_20260925_2054` 的 09-28 判据复核 algo 侧产物。
+      🔴 **D. 本轮工具判据（防「假阴性 0 命中」）**：机读扫描 `data/*.js` 必须用
+      `Accept: application/vnd.github.raw` **取原文**，并逐文件断言首 token 像 JS 产物
+      （`window.` / `{` / `//` 等）。首版误用 json Accept ⇒ 拿到的是 **base64 包装 JSON**，
+      正则命中**恒为 0**（本轮实测 110 个文件全 0 命中，险些据此误判「③ 已达成」）。
+      ⚠️ 本轮为监听巡检轮：只读 + 本条追加；未改任何代码 / 阈值，未动 `index.html` / `logic.html` /
+      `data/` / `raw_data/` / `.github/**`。
+    updated: "2026-09-27 05:29"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: heartbeat-files-clobbered-by-cnfetch
