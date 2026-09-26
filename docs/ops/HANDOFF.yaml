@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 22:41"
+  updated: 2026-09-27 00:59
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -3863,7 +3863,29 @@ items:
          建议下一步：对一次取消事件取 `run_started_at` / `updated_at` 做秒级对齐，并审计仓外脚本的 cancel 调用。
       ⚠️ 与本轮新增的 `cnfetch-fallback-concurrency-orphan` **联动看**：若队列确被外部清空 + 并发组又不再互斥，
          两者叠加正是 09-24 盘中 2.8h 空窗的完整因果链。
-    updated: "2026-09-24 15:25"
+    alimi_verify_20260927_0059: >-
+      〔阿狸咪的工程师 2026-09-27 00:59 CST · 第 21 轮巡检 · 派发源彻底锁定，收口本项 2026-09-24「来源至今未锁定」〕
+      铁证甲（去抖锁 vs run 创建时刻逐秒吻合）：远端 data/.heal_dispatch.json @main 逐字 =
+      {{"premarket":"2026-09-18 09:50:38","algo_run":"2026-09-22 18:00:28","intraday":"2026-09-27 00:40:37","post_close":"2026-09-27 00:23:50"}}。
+      而该 lock 仅在 _dispatch_cn_fetch 真发出 POST（dispatched=True）时才刷新（v8_health_check.py L1259-1263）
+      ⇒ intraday 锁 00:40:37 对上 run #2354 created 00:40:39、post_close 锁 00:23:50 对上 run #2350 created 00:23:51
+      ⇒ 这两档确证由 v8_health_check 的 _dispatch_cn_fetch() 派发（不是外部来源）。
+      铁证乙（双派发源 = actor 分型即 token 分型）：
+      · 源A = v8_cn_fetch_cloud.yml step21「🩺 刷新 HEALTH_CHECK.js」内嵌 python v8_health_check.py，
+        env 只有 GITHUB_TOKEN ⇒ 派发 actor=github-actions[bot]（实测 09-27 00:00-00:41 共 6 档）。
+      · 源B = v8_health_patrol.yml job env L110 V8_GITHUB_TOKEN = secrets.V8_GH_TOKEN（PAT，属 ah-quant999）
+        + L134-140 python v8_health_check.py --heal ⇒ 派发 actor=ah-quant999（同窗口实测 4 档）；
+        源B 由 workflow_run（cn_fetch / algo_cloud / build_deploy 一完成即触发）加自身 schedule 8,38 驱动。
+      · 派发点唯一 = v8_health_check.py _dispatch_cn_fetch() L840-875 → POST /repos/{REPO}/actions/workflows/327687211/dispatches
+        body={{ref:main, inputs:{{category:cat}}}}（CN_WORKFLOW_ID=327687211 见 L702）。
+      铁证丙（去抖为何在双源下失效）：lock[cat] 存仓内 data/.heal_dispatch.json，**靠 checkout 快照读取**
+      ⇒ 源A 与源B 在各自 job 里读的都是自己 checkout 时刻的旧版（源A 新值要等 step23/24 推回 main 才可见）
+      ⇒ 同一 25 分钟窗口内两源可各派一次；且 _has_pending_run（L775-790）**只拦 queued/pending、in_progress 照常派发**
+      ⇒ 并发档被结构性允许（实测最小间隔 17s：#2351→#2352）。
+      实测节律：09-27 00:00:00-00:41 CST 共 10 档（源A 6 / 源B 4；间隔 17s~16m40s），10/10 全 success、0 堆积。
+      本轮 0 派发、未改码。修法仍待 owner 拍板（候选：①两源共用外部去抖状态 ②源B 收敛为 repository_dispatch
+      ③_has_pending_run 增加 in_progress 拦截或把 HEAL_DEBOUNCE_MIN(25min) 抬到 > 单轮耗时）。
+    updated: 2026-09-27 00:59
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: dajijin-reduction-monitor
@@ -6026,7 +6048,22 @@ items:
         本轮独立复现其聚合层回执：同档 step27 逐字 `##[error]软失败步（不阻断 job，但对应数据可能未刷新）： soft_13`
         ⇒ **可观测性未全失**，与承接项定级 P2 的依据一致；
       · ③ 本档 `index.html` 有变更（数据重建后 ?v 前进）⇒ `ℹ️ ?v 已最新，无需推送` 分支不适用，未评。
-    updated: "2026-09-26 22:41"
+    alimi_verify_20260927_0059: >-
+      〔阿狸咪的工程师 2026-09-27 00:59 CST · 第 21 轮巡检 · 第 3 档线上复验（换档第 3 次）〕
+      样本 = run #2354（id 36256305403，head 09346d39fcba，2026-09-27 00:40 CST，ev=workflow_dispatch）。
+      ① ✅ 逐字：`✅ index.html 完整性断言通过：行数=19315 字节=1361458 尾部闭合=OK A2三锚=OK`（step24 表内 success）；
+         全日志（88,068 B）`syntax error` / `unexpected end of file` / `here-document` 命中 **0**；
+         该步之前的 soft_13 块尾 `exit 1` + `fi` 结构已就位（第 19 轮修复①在线上可见）。
+      ② 按 alimi_verify_20260926_2045 的更正口径（承接 cn-softfail-annotation-dead-under-bash-e）复核：
+         本档 step21 尾部仍有 `##[error]Process completed with exit code 2.`，已逐字核其上游上下文 ——
+         该 2 来自 v8_health_check.py 在 fail 项 > 0 时的**设计语义**（L3562），紧邻逐字
+         `[INFO] 总体: warn | 统计: {{'ok': 117, 'warn': 0, 'fail': 2, 'limited': 2, ...}}`
+         ⇒ 与 bash 语法错误无关，非本项残留缺陷。同档 step27 独立回执「软失败步（不阻断 job，但对应数据可能未刷新）： soft_13」。
+      ③ 本档 index.html 有变更（?v 前进）⇒ `ℹ️ ?v 已最新，无需推送` 分支不适用，未评。
+      ⇒ verify_how ① 三档齐备（#2321 / #2336 / #2354）；② 已按更正口径移交承接项（其「归错」本轮已逐字排除）；
+        ③ 仍缺「index.html 无变化档」的自然样本。**故 status 维持 pending-verify**（不因 ①② 达成而宣称 done）。
+        下一自然样本 = 首个 ?v 无变化的真跑档。
+    updated: 2026-09-27 00:59
     updated_by: 阿狸咪的工程师(alimi-cn)
     what: >-
       `.github/workflows/v8_cn_fetch_cloud.yml` 有 3 个 `run:` 块存在 bash 语法错误（阿狸咪 2026-09-26 20:1x CST
@@ -6145,7 +6182,16 @@ items:
     priority: P1
     owner: 小九（裁决/落码）/ 阿狸咪的工程师（已定性 · 可代落码）
     status: todo
-    updated: "2026-09-26 22:41"
+    alimi_verify_20260927_0059: >-
+      〔阿狸咪的工程师 2026-09-27 00:59 CST · 第 21 轮巡检 · 第 3 档复现（未修）〕
+      样本 = run #2354（head 09346d39fcba，2026-09-27 00:40 CST）。
+      ① 仍逐字 `V8_RUN_START: `（runner step env dump 为空）+ `[landcheck] 无法解析 run_started_at=''，保守跳过（宁可不报，不误报）`
+         ⇒ 与基线档 #2336 同一分支，连续 3 档结构性复现（#2332-#2337 六档 + 换档 #2354），非偶发。
+      ② relay 步本档 = skipped（非盘中窗口）⇒ gap=999.0 分支不可观测，未评。
+      ③ 回归项（休市/非盘中不得判红或派发）在**未修**状态下自然满足，**不构成修复证据**。
+      ⇒ 仍 status=todo，待小九裁决落码（阿狸咪可代落码；但落码前必须先加交易日/窗口门控，理由见 what 段——否则
+        激活即周末假红加派发风暴）。
+    updated: 2026-09-27 00:59
     updated_by: 阿狸咪的工程师(alimi-cn)
     what: >-
       `.github/workflows/v8_cn_fetch_cloud.yml` 两处把 `V8_RUN_START` 取成 `${{ github.run_started_at }}`：
