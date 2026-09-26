@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-27 00:16",
+  "update_time": "2026-09-27 00:25",
   "data_date": "2026-09-24",
   "data_date_source": "kline",
   "fetch_date": "2026-09-27",
@@ -59,24 +59,6 @@
       "relative_90d": -8.55,
       "relative_180d": -0.65,
       "relative_52w": 0.79
-    },
-    {
-      "name": "保险",
-      "pct_day": -1.4,
-      "pct_5d": 0.51,
-      "pct_20d": -0.56,
-      "pct_30d": 3.38,
-      "pct_60d": 5.02,
-      "pct_90d": 5.31,
-      "pct_180d": -17.24,
-      "pct_52w": -4.03,
-      "relative_5d": 0.51,
-      "relative_20d": -0.56,
-      "relative_30d": 3.38,
-      "relative_60d": 5.02,
-      "relative_90d": 5.31,
-      "relative_180d": -17.24,
-      "relative_52w": -4.03
     },
     {
       "name": "包装印刷",
@@ -3157,24 +3139,6 @@
       "relative_52w": 29.16
     },
     {
-      "name": "保险",
-      "pct_day": -1.4,
-      "pct_5d": 0.51,
-      "pct_20d": -0.56,
-      "pct_30d": 3.38,
-      "pct_60d": 5.02,
-      "pct_90d": 5.31,
-      "pct_180d": -17.24,
-      "pct_52w": -4.03,
-      "relative_5d": 0.51,
-      "relative_20d": -0.56,
-      "relative_30d": 3.38,
-      "relative_60d": 5.02,
-      "relative_90d": 5.31,
-      "relative_180d": -17.24,
-      "relative_52w": -4.03
-    },
-    {
       "name": "生物制品",
       "pct_day": -2.83,
       "pct_5d": 7.72,
@@ -3263,6 +3227,24 @@
       "relative_90d": -1.09,
       "relative_180d": -12.76,
       "relative_52w": -15.37
+    },
+    {
+      "name": "汽车服务及其他",
+      "pct_day": -0.81,
+      "pct_5d": 0.75,
+      "pct_20d": 1.05,
+      "pct_30d": 3.43,
+      "pct_60d": 9.94,
+      "pct_90d": -2.37,
+      "pct_180d": -9.29,
+      "pct_52w": -12.3,
+      "relative_5d": 0.75,
+      "relative_20d": 1.05,
+      "relative_30d": 3.43,
+      "relative_60d": 9.94,
+      "relative_90d": -2.37,
+      "relative_180d": -9.29,
+      "relative_52w": -12.3
     }
   ],
   "strong_relative_90d": [
@@ -3339,24 +3321,6 @@
       "relative_52w": 29.16
     },
     {
-      "name": "保险",
-      "pct_day": -1.4,
-      "pct_5d": 0.51,
-      "pct_20d": -0.56,
-      "pct_30d": 3.38,
-      "pct_60d": 5.02,
-      "pct_90d": 5.31,
-      "pct_180d": -17.24,
-      "pct_52w": -4.03,
-      "relative_5d": 0.51,
-      "relative_20d": -0.56,
-      "relative_30d": 3.38,
-      "relative_60d": 5.02,
-      "relative_90d": 5.31,
-      "relative_180d": -17.24,
-      "relative_52w": -4.03
-    },
-    {
       "name": "生物制品",
       "pct_day": -2.83,
       "pct_5d": 7.72,
@@ -3445,6 +3409,24 @@
       "relative_90d": -1.09,
       "relative_180d": -12.76,
       "relative_52w": -15.37
+    },
+    {
+      "name": "汽车服务及其他",
+      "pct_day": -0.81,
+      "pct_5d": 0.75,
+      "pct_20d": 1.05,
+      "pct_30d": 3.43,
+      "pct_60d": 9.94,
+      "pct_90d": -2.37,
+      "pct_180d": -9.29,
+      "pct_52w": -12.3,
+      "relative_5d": 0.75,
+      "relative_20d": 1.05,
+      "relative_30d": 3.43,
+      "relative_60d": 9.94,
+      "relative_90d": -2.37,
+      "relative_180d": -9.29,
+      "relative_52w": -12.3
     }
   ],
   "strong_180d": [
@@ -4431,24 +4413,6 @@
       "relative_52w": -2.74
     },
     {
-      "name": "保险",
-      "pct_day": -1.4,
-      "pct_5d": 0.51,
-      "pct_20d": -0.56,
-      "pct_30d": 3.38,
-      "pct_60d": 5.02,
-      "pct_90d": 5.31,
-      "pct_180d": -17.24,
-      "pct_52w": -4.03,
-      "relative_5d": 0.51,
-      "relative_20d": -0.56,
-      "relative_30d": 3.38,
-      "relative_60d": 5.02,
-      "relative_90d": 5.31,
-      "relative_180d": -17.24,
-      "relative_52w": -4.03
-    },
-    {
       "name": "公路铁路运输",
       "pct_day": 0.01,
       "pct_5d": -0.56,
@@ -4537,6 +4501,24 @@
       "relative_90d": -14.08,
       "relative_180d": 6.59,
       "relative_52w": 7.41
+    },
+    {
+      "name": "环境治理",
+      "pct_day": -0.9,
+      "pct_5d": 1.15,
+      "pct_20d": -1.46,
+      "pct_30d": 0.55,
+      "pct_60d": 1.73,
+      "pct_90d": -11.69,
+      "pct_180d": -0.92,
+      "pct_52w": 1.58,
+      "relative_5d": 1.15,
+      "relative_20d": -1.46,
+      "relative_30d": 0.55,
+      "relative_60d": 1.73,
+      "relative_90d": -11.69,
+      "relative_180d": -0.92,
+      "relative_52w": 1.58
     }
   ],
   "index": {
