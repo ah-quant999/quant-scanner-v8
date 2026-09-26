@@ -2990,5 +2990,33 @@
   },
   "warn_items": [],
   "fail_items": []
+ },
+ {
+  "date": "2026-09-27",
+  "time": "01:53:00",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 126,
+   "warn": 0,
+   "fail": 2,
+   "limited": 2,
+   "info": 0,
+   "other": 0,
+   "total": 130
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "AVG_PRICE_DATA",
+    "name": "平均股价（全A算术平均·880003口径）",
+    "message": "更新于 3天前 11:30；超过阈值 3682 分钟"
+   },
+   {
+    "id": "all_EXPERIMENT",
+    "name": "EXPERIMENT",
+    "message": "EXPERIMENT.js 更新于 5天前 18:13；超过通用红线 5940 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
