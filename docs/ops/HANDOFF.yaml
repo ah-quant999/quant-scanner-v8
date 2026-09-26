@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 17:37"
+  updated: "2026-09-26 19:53"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 86
+  next_id_seq: 87
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -5889,3 +5889,68 @@ items:
       `cn-fetch-api-quota-403-exhausted`（同源配额）、`cn-singleflight-schedule-trigger-offset`（调度偏移）。
     updated: "2026-09-26 17:37"
     updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: stock-universe-etf-silent-drop-0926
+    priority: P1
+    owner: shared
+    status: todo
+    updated: "2026-09-26 19:53"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+    what: >-
+      全市场股票基础名单链路（`data/STOCK_LIST.js` ← `raw_data/stock_names.json` ←
+      `algorithms/fetch_stock_names.py`）中的 **ETF 全量（约 1620 只）自 2026-09-21 19:22 CST 起静默消失**，
+      且已固化进基线、持续 5 天未自愈（不是抓取抖动，是被覆盖后的稳态）。
+      实测（2026-09-26 19:46-19:55 CST，阿狸咪机 alimi-cn，全部走远端 API / 线上硬抓）：
+      · 远端 `raw_data/stock_names.json`（`update_time 2026-09-25 21:27:42`，blob 1,929,751 B）
+        = **8027 条 = A股 5221 + 港股 2806 + ETF 0**；文件内 `market` 字段取值集合仅 `hk` 一种。
+      · 线上硬抓 `https://ah-quant999.github.io/quant-scanner-v8/data/STOCK_LIST.js`
+        （HTTP 200 / 1,929,812 B / `update_time 2026-09-25 21:27:42`）= 同样 8027 条；
+        探针 `510300` / `159915` / `512880` / `510050` / `588000` / `159919` **全部不在名单内**。
+      · 时序定位（`raw_data/weekend_meta_report.json` 逐档 `total`，GitHub API 逐提交实读）：
+        2026-09-21 16:06 CST = **9647**（含 ETF）→ 2026-09-21 19:22 CST = **8026**（ETF 已失）
+        ⇒ 缺口形成于 2026-09-21 16:06-19:22 之间，与 ETF 量级（≈1621）吻合。
+      影响面：站点「个股搜索 / 个股画像」的 ETF 覆盖归零（前端 ETF 专用卡另有独立数据源，不受影响）；
+      名单类守卫（`all_STOCK_LIST` 等）因基线已被改写而不再报警。
+      排除项：非改名 / 非合并 —— 全文件关键词命中 `fund_etf`=0、`market: "etf"`=0，为**真删除态**。
+    fix: >-
+      根因 = 抓取侧**失败即静默降级 + 覆盖式 promote**：
+      `algorithms/fetch_stock_names.py::_fetch_etf_stocks()` 走 `ak.fund_etf_spot_em()`（东财口径），
+      异常分支只 `print("⚠️ ETF 获取失败: ...")` 后返回空列表（实证 L222-223），
+      主流程随后照常把「本次成功市场」写 `out/stock_names.json` 并 promote 到 `raw_data/stock_names.json`
+      ⇒ 一次失败就把上一版含 ETF 的文件**整体覆盖**。
+      🔴 本机 2026-09-26 19:46 CST 跑 `v8_weekend_light.py` 复现同一错误，逐字：
+      `⚠️ ETF 获取失败: ConnectionError ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))`
+      ⇒ 家机与云端同源故障，不是单机网络问题。
+      建议修法（交 owner 拍板，按性价比排序）：
+      ① 抓取失败**不得降级覆盖**：`_fetch_etf_stocks()` 返回空时，应写「本次成功市场 ∪ 旧文件同市场子集」，
+         或直接**硬失败**（不 promote、不覆盖），宁可保留旧名单；
+      ② `algorithms/refresh_stock_metadata.py` 的三条护栏（`<1000` / `fresh < old×0.9` / 单轮退市）
+         改为**按市场拆分**（A / 港股 / ETF 各自比），使「单市场整体缺失」可被精准拦下 ——
+         现口径下基线一旦被污染即**恒不触发**（2026-09-25 档 `guard_tripped=false, old_universe=8027`；
+         反例：2026-09-22 18:55 档 `old_universe=9652` 时曾正确 `guard_tripped=true`，
+         说明护栏**会拦但不会修**，且拦下一次后基线仍被改写成无 ETF 版）。
+      ③ 上游恢复后**无需补数**（ETF 名单非时序数据），重跑一次抓取即可回补。
+      关联 item：`all-generic-redline-false-positive`（同一条 STOCK_LIST 链的红线口径）、
+      `stock-name-code-fallback` / `hk-shortcode-hkname-pollution`（同名单文件的名称侧缺陷）。
+    evidence: >-
+      取证 ①：`GET /repos/ah-quant999/quant-scanner-v8/contents/raw_data/stock_names.json?ref=main`
+      ⇒ `update_time=2026-09-25 21:27:42`、`len(data)=8027`、`market=='hk'` 计数 2806、ETF 探针 0 命中。
+      取证 ②：线上硬抓 `data/STOCK_LIST.js`（不走本地副本）⇒ HTTP 200 / 1,929,812 B /
+      md5 `e7f792f56414...` / 8027 条 / ETF 探针 0 命中。
+      取证 ③：`GET /commits?path=raw_data/weekend_meta_report.json` 逐提交取文件读 `total`，
+      得 09-21T08:36Z(=16:06 CST) 9647 → 09-21T11:42Z(=19:22 CST) 8026 的台阶。
+      取证 ④：本机 2026-09-26 19:46 CST `v8_weekend_light.py` 全文输出（本轮留档
+      `C:/Users/HH20210606/WorkBuddy/_v8wk_0926/`）含 ETF ConnectionError 逐字报错。
+      取证 ⑤：本轮本机巡检 total 亦为 8027（A 5221 + 港股 2806 + ETF 0），与远端一致 ⇒ 排除「本机独有」。
+    verify_how: >-
+      ① `GET contents/raw_data/stock_names.json?ref=main`：`len(data) > 9500`
+         且 ETF 探针 `510300` / `159915` / `512880` / `588000` **全部在**（回归判据）；
+      ② 线上硬抓 `data/STOCK_LIST.js`：条目数 > 9500 且 `market=='etf'` 计数 ≈ 1600±50；
+      ③ `algorithms/fetch_stock_names.py` 在 ETF 抓取失败时**不产出** `out/stock_names.json`
+         （或产出仍含旧 ETF 子集）—— 对「内联异常分支」做源码级复核；
+      ④ `refresh_stock_metadata.py` 护栏可对「单市场整体缺失」报警：构造 ETF 缺失的假 out 文件，
+         期望 `guard_tripped=true` 且 `guard_reasons` 点名 ETF；
+      ⑤ 次周 `raw_data/weekend_meta_report.json` 的 `total` 回到 >9500 且 `guard_tripped` 不再为 false 掩盖缺口；
+      ⑥ 回归自证（缺口是否仍在）：线上硬抓 `data/STOCK_LIST.js`，用 ETF 探针集合
+         `510300` / `159915` / `512880` / `510050` / `588000` / `159919` 计数，期望 **6/6 命中**；
+         期望 `raw_data/stock_names.json` 内 `market=='etf'` 计数 ≈ 1600±50。
