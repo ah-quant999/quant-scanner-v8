@@ -2951,7 +2951,7 @@ items:
   - id: index-tail-truncation-2220
     priority: P0
     owner: 阿狸咪的工程师
-    status: pending-verify
+    status: done
     updated_by: 阿狸咪的工程师
     what: >
       🔴 **事故**：`index.html` 于 **2026-09-22 22:20:41** 被 commit `7c78439fe8`（`v8 cn fetch: 22:20`）
@@ -2984,7 +2984,18 @@ items:
     verify_how: >
       下一轮 cn fetch / build 后：① 断言 `index.html` 行数 ≥ 19,149 且末尾闭合 `</html>`；
       ② 断言 [10/10] 为 37/37（含两个尾部锚点）；③ 断言 `</script>` 块数 ≥ 28。
-    updated: "2026-09-22 23:38"
+    updated: "2026-09-26 11:55"
+    verified_at: "2026-09-26 11:55"
+    alimi_verify_20260926_1155: >-
+      〔阿狸咪的工程师 2026-09-26 11:55 CST 终验 —— verify_how 三条件全达成 ⇒ 转 done〕
+      线上 https://ah-quant999.github.io/quant-scanner-v8/ 硬 HTTP 实测（非本机 clone）：
+      ① 行数 19,315 ≥ 19,149 ✅，末尾逐字 `</script>` / `</body>` / `</html>` 闭合 ✅；
+      ② build_deploy #8310/#8311 gate job 逐字 `✅ [10/10] index 核心标记守卫: index.html 核心标记 38/38 全部在位`
+         （≥37，含 `</html>` 与 `{name:'LHB_HISTORY'` 两个尾部锚）✅；
+      ③ `</script>` 块数 128 ≥ 28 ✅；字节 1,361,458 B、`</html>` 计数 = 1。
+      跨轮稳定性：09-22 重建后经多轮 cn fetch / build（含 09-26 02:12 部署 #8311）均未被截断，
+      且 [10/10] 每轮 gate 恒 38/38 ⇒ 本项（文件修复 + 锚点登记 + 门禁覆盖）闭环。
+      ⚠️ 「写方版本漂移」根因**不属本项**，仍单列在 `cn-fetch-writer-version-drift`（保持 pending-verify）。
 
 
   - id: cn-fetch-writer-version-drift
@@ -3062,6 +3073,17 @@ items:
       只断言「ids 超集」与「next_id_seq 单调不减」两项，**不校验 `id_content_hashes`**；
       本次未增删任何 id、未动 `meta.next_id_seq` ⇒ 门禁不受影响、无需刷新 ledger。
     updated: "2026-09-23 08:57"
+    alimi_verify_20260926_1155: >-
+      〔阿狸咪的工程师 2026-09-26 11:55 CST 复验 —— verify_how ①② 达成，③ 未取到硬证据〕
+      ① 线上 index.html 行数 19,315 ≥ 19,149 且末尾闭合 `</html>` ✅（＝ `index-tail-truncation-2220` 同源实测）。
+      ② `GET /contents/.github/workflows/v8_cn_fetch_cloud.yml`（blob f28b77e15ed3 / 64,755 B）实测含小九 09-23 补的
+         **四项硬断言**（`PYEOF_IDXGUARD` 内联 python）：`MIN_LINES=18800` / 末 200 字含 `</html>` /
+         A2 三锚 `{name:'STOCK_LIST'|'STOCK_QUOTE'|'LHB_HISTORY'` 各须在位 / `MIN_BYTES=1250000`；
+         任一不过即 `sys.exit(1)`（不 add / 不 commit / 不 push）⇒ **硬失败前置断言确已在位** ✅。
+      ③ **未达成**：需 job 日志证明该轮执行的是 main 上的 `update_v8.py`（blob 比对）。
+         本轮 cn_fetch 最新档仍为 #2289（09-25 22:36 CST），其 step9「抓中国数据」= skipped（非交易日）
+         且 step soft_15 未进入断言输出 ⇒ 无法取样。**保持 pending-verify**，待下一交易日真跑档。
+      旁证：`[10/10]` 门禁已独立覆盖同类截断（38/38 锚全在位）。
 
   - id: trunc-read-treated-as-success
     priority: P0
@@ -4616,6 +4638,19 @@ items:
       status 维持 doing。
     updated: "2026-09-26 00:40"
     updated_by: 阿狸咪的工程师(alimi-cn)
+    alimi_verify_20260926_1155: >-
+      〔阿狸咪的工程师 2026-09-26 11:55 CST · 09-26 数据点〕
+      · 产物侧仍冻结：远端 `raw_data/experiment.json` update_time 恒 2026-09-22 18:13:35（blob ce3a07ffee6c）
+        ⇒ 与 `redcard-hostfail-rootfix-0924` 同步观测，恢复判据 = **09-28(周一) post_close**。
+      · 本项 verify_how（「09-26 读 cn_fetch 最新一轮日志看有无 ::error title=v8-experiment-no-data::」）
+        **今日尚不可执行**：截至 11:55 CST，`v8_cn_fetch_cloud` 最新档仍为 **#2289**（created 09-25 14:36Z），
+        09-26 档（周末 cron `0 1 * * 0,6` = 09:00 CST）尚未出现（迟 ~2h55m，在 GitHub schedule 最大 5h 延迟内，
+        **仅记录、不派发**）。
+      · 旁查（非本项根因，但同属 experiment 产物链）：`v8_cn_fetch_experiments` #12（09-25 22:03 CST / head `4c4743ae24`）
+        失败步唯一 = step5「🔄 重新生成 data/*.js + 更新 ?v」，栈帧逐字 `update_v8.py:776 NameError: name 'obj_had_ts' is not defined`；
+        而 `compare 4c4743ae24...316d4c878b` = ahead 1 / behind 0 ⇒ 该轮跑的正是**修复提交前 1 个提交的旧代码**，
+        **即 09-25 22:0x 已根治的那个 P0**（见 `card-fake-freshness-timestamp-rootfix-0925`）⇒ 非新故障。
+        下一档 experiments（cron `30 8 * * 1-5` = 16:30 CST 工作日）将首次复跑修复后代码。
   - id: resonance-calendar-lazyload-fail
     priority: P0
     owner: 小九(lemoncat-cn)
