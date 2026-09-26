@@ -142,9 +142,26 @@ jobs:
           GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           cd $env:GITHUB_WORKSPACE
+          # 2026-09-26 alimi: fix exit-code semantics (stop double full push / API quota burn).
+          #   api_push_raw.py rc: 0=ok | 9=soft-deadline, only finished part committed
+          #   (by design, NOT a failure; next dispatch continues) | 1=hard fail.
+          #   Old "-ne 0" treated 9 as failure -> ran a SECOND full push -> 403 secondary
+          #   rate limit. Evidence run#31: 1st wave committed 4426 files (rc=9), fallback
+          #   wave then had 4332 upload failures + main-ref 403 -> whole step exit 1.
+          # NOTE (tracked in HANDOFF, NOT changed here - needs owner decision):
+          #   api_push_raw.py has NO "--only" arg (no argv parsing at all) -> this very line
+          #   is the full-push fallback (5572 files); and "out/" is in no push set ->
+          #   out/lhb_result.json can never land.
           python api_push_raw.py --only lhb
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "[warn] --only lhb failed, falling back to full push" -ForegroundColor Yellow
+          $rc = $LASTEXITCODE
+          if ($rc -ne 0 -and $rc -ne 9) {
+            Write-Host "[warn] api_push_raw rc=$rc, falling back to full push" -ForegroundColor Yellow
             python api_push_raw.py
+            $rc = $LASTEXITCODE
           }
-          if ($LASTEXITCODE -ne 0) { Write-Host "api_push_raw failed, non-blocking" -ForegroundColor Yellow }
+          if ($rc -eq 9) {
+            Write-Host "[info] api_push_raw rc=9 = soft-deadline partial commit (by design, not a failure)"
+            exit 0
+          }
+          if ($rc -ne 0) { Write-Host "api_push_raw failed (rc=$rc), non-blocking" -ForegroundColor Yellow }
+          exit $rc

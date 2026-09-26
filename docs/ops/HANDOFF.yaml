@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 16:42"
+  updated: "2026-09-26 17:37"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 85
+  next_id_seq: 86
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -5750,6 +5750,25 @@ items:
       （C）**可选加固（本轮未做，避免超推送预算）**：把末行告警改为
         `Write-Host "::error title=v8-lhb-push-softfail::…"`，在保留「非阻塞」语义的同时让失败在
         annotations 可见（对齐主人 2026-09-08「禁止假 success」令）。
+      （D）🔴 **二次自纠（2026-09-26 17:4x CST，本批）**：A-corr 的**语义**仍保留了原设计的一个隐患 ——
+        原 `||` 链与 A 的 `if ($LASTEXITCODE -ne 0)` 都把**退出码 9 当作失败**，而 `api_push_raw.py` 的
+        9 = 「触发总时长软闸、仅提交已完成部分」，脚本自己的原话是「**非假成功，下轮派发自动续推**」
+        ⇒ 被误判为失败 ⇒ **再跑一次全量推送**。实测 run#31 推送步时间轴（逐字）：
+          `08:54:23 🚀 并发推送启动：5572 个文件 / 并发 6 / 软闸 720s`
+          `09:01:37 ⏱ 推送已耗时 720s > 软闸 720s ⇒ 停止接收剩余文件…`
+          `09:01:37 📊 并发推送收工：耗时 720s / 未变化 272 / 防倒退 18 / 待更新 4426 / 失败 15`
+          `09:01:37 ⚠️ 本轮触发总时长软闸：仅提交已完成部分（4426 个文件），退出码 9 —— 非假成功，下轮派发自动续推`
+          `09:01:37 [warn] --only lhb failed, falling back to full push`   ← 回退分支被 rc=9 触发
+          `09:02:45 🚀 并发推送启动：5572 个文件 / 并发 6 / 软闸 720s`      ← 第二轮全量（重复劳动）
+          `09:08:47 ⚠️ 共 4332 个文件上传失败，将保留远程旧版本`            ← 撞 403 二级限速
+          `09:09:02 ❌ 3 次重试后仍失败：读取 main ref 失败` → `exit 1`
+        ⇒ 后果 = ①**双倍烧 API 配额**（`user ID 293579813`）②把「设计内的部分成功」劣化成**硬失败**。
+        修正：新 `run:` 块改为 `$rc = $LASTEXITCODE`，**`9` 视为可接受**（打印
+        `[info] api_push_raw rc=9 = soft-deadline partial commit (by design, not a failure)` 后 `exit 0`），
+        仅当 `rc ∉ {0,9}` 才回退全量；末行告警也只对 `rc ∉ {0,9}` 打印。
+        ⚠️ 可复用判据：**「软闸/部分提交」类退出码必须与「真失败」分开判** —— 凡
+        `if ($LASTEXITCODE -ne 0)` 式的回退写法，都要先确认被调脚本的**全部退出码语义**
+        （本例 0 / 9 / 1 三义），否则回退会从保护变成**放大器**。
     verify_how: >-
       ① 下一档 `v8_lhb_fetch` 真跑（`schedule: '30 9 * * 1-5'` = 17:30 CST；实际调度有 +4~5h 偏移，
         见 `cn-singleflight-schedule-trigger-offset`）的推送步日志**不再出现**
@@ -5764,6 +5783,14 @@ items:
         (b) `GET /actions/workflows` 该条 `name` 回到 `🐉 v8 龙虎榜单飞 fetcher (cn runner)`；
         (c) `POST /actions/workflows/<id>/dispatches` 返回 **204**（可手动补算）。
         ⚠️ 本轮实测：三项全是「文件整份 YAML 非法」的**症状**，与 `workflow_dispatch:` 写没写无关。
+      ⑥ ✅ **「修复确已生效（代码路径）」已取得动态证据（2026-09-26 17:0x CST）**：手动 dispatch 产生的
+        run `#31`（id `36230767013`）`head_sha = c77df9027e39`（2026-09-26T08:45:34Z）
+        **晚于修复提交** `0fc71d707737`（08:44:50Z）⇒ 该轮跑的确是修好的代码；其推送步日志出现
+        `[warn] --only lhb failed, falling back to full push` 与 `api_push_raw failed, non-blocking`
+        —— 这两句**只可能由本项新增的 `$LASTEXITCODE` 分支打印** ⇒ ParserError 已消除、PS 逻辑确被执行。
+        ⚠️ 但同档也暴露**下一条独立缺陷**（`--only` 不存在 ⇒ 实为全量推送 + rc=9 被误判 ⇒ 二次全量 ⇒ 403）：
+        见新增 item `lhb-push-only-arg-noop-out-dir-unpushed` 与本项 (D)。⇒ 本项**维持 `pending-verify`**：
+        判「真修好」仍须 ②（`out/lhb_result.json` 提交数由 0 变 ≥1），而 ② 已被证实**结构性不可达**。
     not_verify_how: >-
       · ❌ 禁以 run 结论（`success`）判本项已修 —— 该步 `continue-on-error: true` ⇒ **恒绿**，本项本身就是
         假绿事故。
@@ -5778,5 +5805,87 @@ items:
       `cn-runner-ps1-utf8-noBOM-gbk-parse-fail`（同族：run 块与解释器不匹配）、
       `cn-singleflight-schedule-trigger-offset`（同链调度偏移）。
       交接件：`docs/ops/handover/2026-09-26_1639_阿狸咪的工程师给小九_v8_lhb_fetch推送步PS5.1管道符解析失败根治_龙虎榜链推送长期死代码.md`。
-    updated: "2026-09-26 16:42"
+      本轮追加（17:4x）：修复提交 `0fc71d707737`（parent `9c41ec3e0e6f`，files=4）；run `#31`（id `36230767013`，
+      `event=workflow_dispatch`，runner `alimi-cn`，head_sha `c77df9027e39`）；`api_push_raw.py`
+      （blob `2dd6645caaa2`，退出码语义 0/9/1）；新增 item `lhb-push-only-arg-noop-out-dir-unpushed`。
+    updated: "2026-09-26 17:37"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  # ── P1 · 同一龙虎榜链的第二层缺陷（本轮 run#31 定性新增）─────────────
+  - id: lhb-push-only-arg-noop-out-dir-unpushed
+    title: "v8_lhb_fetch 的 `--only lhb` 是**不存在的参数**（实为无 PUSH_FILES 的全量回退推送）；且 `out/` 不在任何推送面 ⇒ 该链产物结构性永远落不了地"
+    priority: P1
+    owner: shared
+    status: todo
+    scope: workflow
+    created: "2026-09-26 17:37"
+    what: >-
+      `v8_lhb_fetch.yml` 推送步的**自述意图**（文件第 127-128 行注释）是「以 `api_push_raw.py --only lhb` 限定
+      只推送 `lhb_result.json` + `lhb_seats.json`」。实测该意图的**两个前提全部不成立**：
+      ① **`api_push_raw.py` 根本没有 `--only` 参数**：全文 1,437 行内 `--only` 命中 **0 次**，
+        `argparse` / `add_argument` / `sys.argv` / `parse_args` 命中**全 0**，脚本侧无任何 argv 解析
+        ⇒ `--only lhb` 被**静默忽略**，该句实为「不带 `PUSH_FILES` 时的**全量回退推送**」
+        （`walk_raw()` 遍历整个 `raw_data/` + `walk_extra()` 的固定 `data/*.js` 白名单）。
+      ② **`out/` 不在任何推送面**：`walk_raw()` 只 `os.walk("raw_data")`；`walk_extra()` 是**固定白名单**
+        （13 个 `data/*.js`）；`out` 只出现在 `_remote_tree_paths` 的 **SKIP 剪枝**里
+        ⇒ `out/lhb_result.json` / `out/lhb_history.json` **无论推送成功与否都不可能入仓**。
+    impact: >-
+      · 该链的**产物契约是空头**：`algorithms/fetch_lhb.py` 写 `out/lhb_result.json`（L454）与
+        `out/lhb_history.json`（L493），而这两条路径永远推不出去 ⇒「抓到也入不了仓」是**结构性**的，非偶发。
+      · 每次 `v8_lhb_fetch` 真跑都会发起**一次全量推送**（实测 run#31：`🚀 并发推送启动：5572 个文件 /
+        并发 6 / 软闸 720s`）⇒ 单次约 4400+ 次 Contents/Blobs 写请求，与 `cn-fetch-api-quota-403-exhausted`
+        同源：本链是**新增的配额大户**，会加剧 `user ID 293579813` 的 5000/h 主限与二级限速。
+      · 全量推送在 720s 软闸内**必然跑不完**（实测第一波 4426/5572）⇒ 每次真跑**必然** `rc=9`；
+        与 `cn-singleflight-ps51-pipe-pipe-parse-fail-lhb-push` 的 (D) 项（rc=9 被误判为失败而二次全量）
+        叠加后 = 「每次真跑 → 两轮全量 → 一次 403 硬失败」。
+    evidence: >-
+      ① `GET /contents/api_push_raw.py?ref=main`（blob `2dd6645caaa2`，88,529 B，1,437 行）正则实测：
+        `--only` = **0 次**；`argparse` / `add_argument` / `sys.argv` / `parse_args` = **全 0 次**；
+        `lhb` = 1 次且位于**注释**内（L655 / L689 / L1084 的退役说明）。
+      ② 推送面实测（同文件）：`def walk_raw()` L514（`os.walk("raw_data")` L551）；
+        `def walk_extra()` L622（固定 `extra = [...]` 白名单，13 个 `data/*.js`）；
+        `out` 仅在 L882 `SKIP = ("backup","docs","raw_data/kline_cache","legacy_v6","out", …)` 出现
+        ⇒ 属**被剪枝**而非被推送。
+      ③ 入仓实测：`GET /commits?path=out/lhb_result.json` = **0 笔**、`path=out/lhb_history.json` = **0 笔**；
+        反证 `out/lhb_seats.json` 有 5 笔，但**全部落在 2026-09-12 / 2026-09-15**（人工补录口径），此后未再更新。
+      ④ run#31（id `36230767013`，`workflow_dispatch`，runner `alimi-cn`）推送步日志逐字：
+        `🚀 并发推送启动：5572 个文件 / 并发 6 / 软闸 720s`
+        `📊 并发推送收工：耗时 720s / 未变化 272 / 防倒退 18 / 待更新 4426 / 失败 15`
+        `⚠️ 本轮触发总时长软闸：仅提交已完成部分（4426 个文件），退出码 9 —— 非假成功，下轮派发自动续推`
+        ⇒ 证明「第一句 `--only lhb`」就是全量推送，且**必然**触发软闸。
+      ⑤ 需求侧反证（是否为孤儿链）：`algorithms/run_algorithms.py` 的 A 批**已含** `fetch_lhb.py`
+        （`"fetch_lhb.py": 2400` 与 `"fetch_sector_rs.py","fetch_lhb.py"`）；线上真身 `data/LHB_DATA.js`
+        与 `raw_data/lhb_history.json` 的提交**全部来自 `v8 cn fetch` 链**（09-24 19:06Z / 09-26 16:58）
+        ⇒ 独立 `v8_lhb_fetch` 链与其 `out/` 产物疑似**重复且无消费方**（待 owner 确认后判生死）。
+    fix: >-
+      本轮**未改**（属设计变更、跨链影响，须 owner 裁定），仅登记。可选方向（按代价递增）：
+      （a）**最小**：把推送步的 `python api_push_raw.py --only lhb` 短路为
+        `Write-Host "[skip] lhb push step disabled until scoped-push lands"` —— 立即止住
+        「每跑一次烧 4400+ 写请求」；代价是产物仍不入仓（与现状等价，因为本来也入不了）。
+      （b）在 `api_push_raw.py` 里**真正实现** `--only <group>`（需定义 group→路径集映射，并把 `out/` 纳入该 group），
+        影响所有调用方，须回归验证。
+      （c）若确认该链与其产物**无消费方**（见 evidence ⑤），按「无生产者/无消费者」退役该链（对齐 `LHB_7D` 退役先例）。
+      ⚠️ 三条路都**不要**用 `git add -f out/…` 之类旁路：本仓 `out/` 属 SKIP 面，人为加白会与
+        `_remote_tree_paths` 的剪枝口径打架。
+    verify_how: >-
+      ① 判「本条已生效」的硬判据 = **推送步不再发起全量推送**：下一档 `v8_lhb_fetch` 真跑日志中不再出现
+        `🚀 并发推送启动：5xxx 个文件`（出现即仍是全量），且不再出现 `raw_data/kline_cache/*.json 本轮上传失败`。
+      ② 若走方向（b）：`GET /commits?path=out/lhb_result.json` 由 **0 笔**变 **≥1 笔**。
+      ③ 若走方向（c）：`GET /actions/workflows` 内该 workflow 消失（或被显式标注退役），且 HANDOFF 本项转 done。
+      ④ 一切判据只取远端 API 真身（`GET /contents/<path>?ref=<sha>`、`GET /commits?path=`），禁读本机 clone。
+    not_verify_how: >-
+      · ❌ 禁以「run 结论 success」判生效 —— 该步 `continue-on-error: true` ⇒ 恒绿（同族假绿）。
+      · ❌ 禁以「提交里出现 lhb 相关文件」判生效 —— 全量推送本就会带上 `raw_data/` 下所有 lhb 文件，
+        那是**全量推送的副产品**，不是本项被修复。
+      · ❌ 禁把 `raw_data/lhb_seats.json` 当本链产物 —— 推送面里没有它的**生产者**；
+        `fetch_lhb.py` 是它的**读者**（`SEATS_PATH = ../out/lhb_seats.json`）。
+      · ❌ 禁据「`out/lhb_seats.json` 在远端存在」推断「`out/` 能被推」—— 那 5 笔全在 09-12/09-15，属人工补录。
+    refs: >-
+      `.github/workflows/v8_lhb_fetch.yml`（第 127-128 行意图注释 + 推送步）；`api_push_raw.py`
+      （`walk_raw` L514 / `walk_extra` L622 / `SKIP` L882 / 无 argv 解析）；
+      `algorithms/fetch_lhb.py`（L21 `OUT`、L23 `SEATS_PATH`、L454 与 L493 写入）；
+      `algorithms/run_algorithms.py`（A 批含 `fetch_lhb.py`）；run `#31`（id `36230767013`）。
+      关联 item：`cn-singleflight-ps51-pipe-pipe-parse-fail-lhb-push`（同链 L1 缺陷与本轮 (D) 项）、
+      `cn-fetch-api-quota-403-exhausted`（同源配额）、`cn-singleflight-schedule-trigger-offset`（调度偏移）。
+    updated: "2026-09-26 17:37"
     updated_by: 阿狸咪的工程师(alimi-cn)
