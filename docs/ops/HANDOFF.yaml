@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 19:53"
+  updated: "2026-09-26 20:21"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 87
+  next_id_seq: 88
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -2355,6 +2355,24 @@ items:
         唯一 warn = `final_enter_stale`（最新 enter_date 2026-09-21 早于最近交易日 2026-09-22）⇒ 与本项**无关**。
       ⇒ status `todo → pending-verify`：①② 单点通过，但未达 ③「连续 ≥2 档且确定性消失」⇒ 下轮续证。
     updated: "2026-09-22 20:40"
+    alimi_verify_20260926_2021: >-
+      🔴 **第 19 轮（阿狸咪 2026-09-26 20:21 CST）实测 —— `AVG_PRICE_880003` 实例升级：从「逐档空源跳过」恶化为「整段下午缺档」**：
+      · 产物现状（远端真身）：`raw_data/avg_price_data.json` `update_time = 2026-09-24 11:30:07`；
+        `data/AVG_PRICE_DATA.js` 同 `update_time`（`republish_time 2026-09-24 11:31:41`）⇒ age **56.6h**。
+      · **关键新证据（`GET /commits?path=raw_data/avg_price_data.json`）**：该文件提交史
+        09-24 **仅 11:31:39 一笔**，而其前 09-23 有 10:43 / 11:31 / **14:55** 三笔、09-22 有 13:34→15:09 共 6 笔
+        ⇒ **09-24（周四·交易日）下午 13:00–15:00 盘中采样整段缺失**，非休市所致（09-25~09-27 才休市）。
+      · 线上 `data/HEALTH_CHECK.js`（`updated` 2026-09-26 20:00:53，blob `341feac134d3`）
+        summary = `{ok:118, warn:0, fail:1, limited:2, total:121}`，**唯一 fail 项 = `AVG_PRICE_DATA`**
+        （`age_min 3390.7 > 生效阈值 3330`，`heal_cat=intraday`）；同档日志逐字
+        `[FAIL] 实时数据/平均股价（全A算术平均·880003口径）: 更新于 2天前 11:30；超过阈值 3325 分钟`
+        + `[HEAL✓] [intraday] 平均股价…: 近 25 分钟内已派发，跳过重复`。
+      · **MARKET_ALERTS / US_HK_MAP 两项已不再出现在 fail 列表**（本项 verify_how ② 该侧成立），
+        但 verify_how ① 因休市当日无法判「推进到当日」⇒ **status 维持 todo**。
+      · 🔴 **自愈空转仍在**：休市日 `HEAL✓` 仍按 `intraday` 类派发（`v8_health_check.py::check_all_data_files`
+        对所有 `all_*`/同类项硬编码 `heal_cat`），而休市/上游断供期重派**结构性无效**。
+      · 下一自然复验点 = **09-28（周一）盘中**：看 `avg_price_data.json` 是否恢复每 30 分钟推进。
+
   - id: stockquote-noon-gap-relay-cancel
     priority: P1
     owner: shared
@@ -3119,6 +3137,26 @@ items:
          本轮 cn_fetch 最新档仍为 #2289（09-25 22:36 CST），其 step9「抓中国数据」= skipped（非交易日）
          且 step soft_15 未进入断言输出 ⇒ 无法取样。**保持 pending-verify**，待下一交易日真跑档。
       旁证：`[10/10]` 门禁已独立覆盖同类截断（38/38 锚全在位）。
+    alimi_verify_20260926_2021: >-
+      🔴 **第 19 轮（阿狸咪 2026-09-26 20:21 CST）重大更正 —— 本轮实测 verify_how ② 的运行时口径**：
+      该 item 的 fix（2026-09-23 小九补丁 `631123e0bd8a`）在 `.github/workflows/v8_cn_fetch_cloud.yml`
+      step `soft_15`「🛡️ 原子提交 index.html ?v」里插入的四项 index 完整性硬断言，**源码在位但运行时从未执行**：
+      · `run:` 块里 heredoc 起始行/内容/闭合标签**整块用了 12 空格缩进**，而 YAML 块标量基准 = 该块首行 10 空格
+        ⇒ 剥离后闭合标签剩 **2 空格**，bash 的 heredoc 闭合符必须**顶格**⇒ 不认 ⇒ 未闭合 heredoc 吞掉后续全部行
+        ⇒ `for i in 1 2 3; do … done` 无法构造 ⇒ **bash 解析阶段即失败，整段一行不执行**。
+      · **CI 逐字铁证**：run `#2320`（id `36240203983`，head `e267b89b33bb`，09-26 19:53 CST）step24 表内 conclusion
+        = `success`，但日志尾部逐字 `line 64: syntax error: unexpected end of file` +
+        `##[error]Process completed with exit code 2.`（`continue-on-error: true` 把 exit 2 吞成 success）。
+      · **本机净室复现**：还原 run 块后 `bash -n` 同一处报同构错误；修复后该文件 26 个 run 块错误 **3 → 0**。
+      · **自引入起一直坏**：用 `git/blobs` 逐版取该文件 12 个历史版本核对，自 `631123e0bd8a` 起其后 8 版全部带此缺陷。
+      ⇒ 故 **verify_how ② 在修复前不成立**（前轮仅据源码 grep 判「已就位」属误判，本轮更正）；
+      修复见新 item `cnfetch-bash-syntax-dead-steps-0926`（commit `99fef522c817`）。
+      ✅ **verify_how ① 本轮成立**：`index.html` 19,315 行（≥19,149）、末 200 字含 `</html>`、
+      A2 三锚齐备、`</script>` 128 块；线上硬抓与 main blob `149ad390c99a`（1,361,458 B）**逐字节一致**。
+      ✅ **verify_how ③ 本轮达成（首次取到真跑档）**：cn_fetch run `#2320`/`#2317` 的 `step19`（重生成 data/*.js）
+      **真执行**（日志逐字 `python update_v8.py` + `✅ index.html cache-busting 参数已更新` + 逐文件 `✅ …json → ….js`）；
+      且 `update_v8.py` @head `e267b89b33bb` / @`55f2e720df50` 的 blob = **`e3eff9d0de3b`（99,239 B）
+      = main 当前 blob**（sha256 前 16 位 `dac81a1bc204fc93` 两者相同）⇒ 跑的确是 main 版，**无 writer 版本漂移**。
 
   - id: trunc-read-treated-as-success
     priority: P0
@@ -5954,3 +5992,60 @@ items:
       ⑥ 回归自证（缺口是否仍在）：线上硬抓 `data/STOCK_LIST.js`，用 ETF 探针集合
          `510300` / `159915` / `512880` / `510050` / `588000` / `159919` 计数，期望 **6/6 命中**；
          期望 `raw_data/stock_names.json` 内 `market=='etf'` 计数 ≈ 1600±50。
+
+  - id: cnfetch-bash-syntax-dead-steps-0926
+    title: cn_fetch 三处 run 块 bash 语法缺陷 —— step24 index 完整性硬断言实为死码
+    priority: P1
+    owner: 阿狸咪的工程师（已修）/ 小九（复核 + 线上终验）
+    status: pending-verify
+    updated: "2026-09-26 20:21"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+    what: >-
+      `.github/workflows/v8_cn_fetch_cloud.yml` 有 3 个 `run:` 块存在 bash 语法错误（阿狸咪 2026-09-26 20:1x CST
+      实测定位，本机净室 + CI 双向铁证）：
+      · ① `soft_13`「🩺 刷新 HEALTH_CHECK.js」块尾**缺 `exit 1` + `fi`**；
+      · ② `soft_13b`「🐲 板块龙头股字典」块尾**多**一段 `exit 1` + `fi`（即 ① 缺的那两行被误划进来）；
+        ⇒ ①② 同一事故：2026-09-19 阿狸咪新增板块龙头股 step 时**插入点未按 step 边界**（选在 `echo` 之后、
+        `exit 1` 之前），把 `soft_13` 的收尾两行划进了新 step。**影响轻**：bash 流式执行，
+        `python v8_health_check.py` / `python scripts/fetch_sector_leaders.py` 仍照常跑
+        （step21 日志有 `[INFO] 已生成 data/HEALTH_CHECK.js`；第 2 轮取到 `fetch_sector_leaders.py:166` traceback），
+        仅**尾部软失败告警/退出码**失效。
+      · ③ `soft_15`「🛡️ 原子提交 index.html ?v」的 heredoc（`PYEOF_IDXGUARD`）**起始行/内容/闭合标签整块 12 空格缩进**，
+        YAML 按 10 空格基准剥离后闭合标签剩 **2 空格** ⇒ bash 不认 ⇒ heredoc 未闭合吞掉后续全部行
+        ⇒ `for i in 1 2 3; do … done` 无法构造 ⇒ **bash 解析阶段即失败，整段一行不执行**。
+        **影响重**：被吞掉的包括小九 2026-09-23 补的四项 index 完整性硬断言
+        （`MIN_LINES=18800` / 末 200 字含 `</html>` / A2 三锚 / `MIN_BYTES=1250000`）**以及该步设计目的本身**
+        （`git add -f index.html` + `commit` + `push`）。由 `631123e0bd8a`（09-23 08:52）引入，
+        经 `git/blobs` 逐版核对，**其后 8 个版本全部带此缺陷**。
+      · 三处 step 均为 `continue-on-error: true` ⇒ 真实 `exit code 2` 被吞成 conclusion `success`（**假绿**）。
+    fix: >-
+      ✅ 已由阿狸咪「代为修复」（**属小九车道，本轮因「防护实为死码 + 休市窗口 + 改动仅缩进/行位移」而直接落码**），
+      commit **`99fef522c8178bebceb4ca9043200e2e7a0c75ad`**（`parent 865b68e226de`，+29/−30）：
+      ① `soft_13` 块尾补 `exit 1` + `fi`；② `soft_13b` 块尾删残留 `exit 1` + `fi`；
+      ③ `soft_15` heredoc 整块缩进 12 → 10 空格（27 行）⇒ 闭合标签顶格。
+      🔴 **定级 P1 而非 P0 的依据（纵深三层）**：`index.html` 完整性仍有 ① `update_v8.py::_atomic_write_index_html()`
+      软守卫（末 200 字含 `</html>`）② `v8_build_deploy` 的 `[10/10] index 核心标记守卫`（38 标记，每档 gate 实跑）
+      两层**有效**防线；本轮失效的只是第 ③ 层（`soft_15` 硬断言）。`?v` 原子提交失效则由 `v8_cache_buster_reconcile` 兜底，
+      线上 `?v` 已是内容哈希且跨多轮零漂移（第 7 轮已验）。
+    evidence: >-
+      · CI 逐字：run `#2320`（id `36240203983`，head `e267b89b33bb`）step24 表内 `success`，日志尾
+        `line 64: syntax error: unexpected end of file` + `##[error]Process completed with exit code 2.`；
+        同档 step21（`soft_13`）尾部亦 `exit code 2`。
+      · 本机净室：按 YAML 块标量规则还原 run 块 → 替换 `${{ }}` → `bash -n`：**BEFORE 3 个错误 / AFTER 0 个**。
+      · 语义零改动自证：`yaml.safe_load` 通过；**28 个 step 的 (name,id,if,run[:40]) 签名修复前后一一相同**。
+      · 拦截力复测（抠出守卫 python 独立跑）：正常态（main `149ad390c99a`，19,315 行 / 1,361,458 B）rc=0 放行；
+        删尾 183 行 / 挖 A2 锚 / 去 `</html>` / **真事故态 `7c78439fe8`**（1,338,018 B / 18,966 行）全部 rc=1 拦截。
+      · 推送自证：`GET /commits/99fef522c817.files` = 恰 1 个登记路径；`GET /contents` 回读 89,519 B 逐字节一致
+        （blob `f4bf6f6d73ac`）；`GET /actions/workflows?per_page=100`（total_count=35）仍含该文件 ⇒ GitHub 接受。
+      · 全仓扫描：34 个 workflow / 180 个 run 块逐一 `bash -n` ⇒ **除本文件 3 处外，其余命中全为
+        `shell: powershell` 块的假阳性**（`$LASTEXITCODE` / `Get-Content` 等 PS 语法，须按 shell 过滤）。
+    verify_how: >-
+      下一档 `v8_cn_fetch_cloud` 真跑后（只看该档 job 日志，**禁以 step conclusion 当判据**）：
+      ① `step24` 出现 **`✅ index.html 完整性断言通过：行数=… 字节=… 尾部闭合=OK A2三锚=OK`**，
+        且**不再有** `syntax error: unexpected end of file`；
+      ② `step21`/`step22` 尾部**不再有** `##[error]Process completed with exit code 2.`
+        （若因真实失败走 `exit 1`，应能看到 `::error title=v8-softfail:soft_13…` 显式告警 —— 那属**预期**）；
+      ③ 若 `index.html` 无变化，`step24` 应打印 `ℹ️ ?v 已最新，无需推送`（证明 `git add/commit` 路径已恢复）。
+      ⚠️ 参照物：修复提交 sha = `99fef522c817`；验证档 head_sha 必须**包含**该提交（`compare` behind=0）。
+    refs: >-
+      `.github/workflows/v8_cn_fetch_cloud.yml` · `docs/ops/handover/2026-09-26_2019_阿狸咪的工程师给小九_cn_fetch三处_bash_语法缺陷根治_—_step24_index_完整性硬断言实为死码.md`
