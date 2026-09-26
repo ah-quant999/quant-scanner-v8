@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 20:35"
+  updated: "2026-09-26 20:40"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -6010,7 +6010,12 @@ items:
       `step21` 段数据本身**正常刷新**（`[INFO] 已生成 data/HEALTH_CHECK.js`，线上 `updated=2026-09-26 20:30:18`）。
       ⚠️ 因此 verify_how ② 请按下述口径复判：不再要求「`soft_13` 尾无 exit code 2」，而应改为
       「`soft_13` 若为真失败，应出现**执行态** `::error title=v8-softfail:soft_13`」。
-    updated: "2026-09-26 20:35"
+      · ✅ **verify_how ① 亦已实测通过**（同档 `#2321` step24 日志逐字）：
+        `12:26:50.75 ✅ index.html 完整性断言通过：行数=19315 字节=1361458 尾部闭合=OK A2三锚=OK`，
+        且该档 `syntax error` 命中 **0**（`PYEOF_IDXGUARD` 起始行 12:26:50.14 / 闭合行 12:26:50.14 均在位）
+        ⇒ ③ heredoc 顶格修复 + ① 四项硬断言**双项已于线上生效**。
+        本项残余未达成项 = **②**（见上，已被新项 `cn-softfail-annotation-dead-under-bash-e` 承接）。
+    updated: "2026-09-26 20:40"
     updated_by: 阿狸咪的工程师(alimi-cn)
     what: >-
       `.github/workflows/v8_cn_fetch_cloud.yml` 有 3 个 `run:` 块存在 bash 语法错误（阿狸咪 2026-09-26 20:1x CST
