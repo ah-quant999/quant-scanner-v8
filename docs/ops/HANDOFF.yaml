@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 14:37"
+  updated: "2026-09-26 16:40"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 84
+  next_id_seq: 85
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -5183,7 +5183,28 @@ items:
       **结论完全反转** ⇒ 影响面第 2 处判为**已闭环**（由 fix(A)+fix(B) 与 `341d6c055f96` 的 gate sparse-checkout 补丁共同达成）。
       ⚠️ 剩余未闭环项仍是本项 ⏳①（`data/*.js` 残留假今日，见 `alimi_verify_20260925_2054` 的三类细分与 09-28 判据）
       与 ⏳③（`guard_v8_freshness` 同名常量合流）。
-    updated: "2026-09-25 21:00"
+    alimi_verify_20260926_1640: >-
+      〔阿狸咪的工程师 2026-09-26 16:3x CST · 第 18 轮巡检 · **verify_how ②「休市日判据」取得硬证据**（只读远端 API）〕
+      样本 = cn_fetch run **#2310**（id `36224602960` / 2026-09-26 14:43 CST / `event=workflow_dispatch` /
+      job `fetch` = success）。该 job 的 step 表与日志逐字（`curl -sSL GET /actions/jobs/<id>/logs`）：
+        · step6「🗓 解析数据日期」= success ⇒ 日志 `📅 数据日期=2026-09-24`（**回退为上一交易日**，非当日 09-26）
+          且同 run env `V8_DATA_DATE: 2026-09-24`；
+        · step8「🛡 交易日历闸门（连续休市段跳过冗余抓取）」= success ⇒ `is_trading_day=false` +
+          `proceed=false (工作日遇节假日，跳过冗余抓取)`；
+        · step9「📡 抓中国数据 → raw_data/（selective）」= **skipped**；step10~15（LHB/商品弹性/板块 RS/
+          ETF/研报）= skipped；step22「🐲 板块龙头股字典（SECTOR_LEADERS，仅 post_close）」= **skipped**。
+      ⇒ verify_how ② 的**四项子判据全部达成**（数据日期回退 ✅ / proceed=false ✅ / step9 skipped ✅ /
+      SECTOR_LEADERS 跳过 ✅）。09-25~09-27 为中秋休市窗口（上交所〔2026〕22 号），本档是修复后
+      **首个落在休市窗口内的真跑档** ⇒ 修复在真跑路径生效，非静态推断。
+      ⚠️ 唯一未达成的子判据 = 「cn_fetch 当日档数应降至个位」：当日（09-26）实际 **21 档**。经逐档追溯，
+      增量**全部来自 health_patrol 自愈派发**（`AVG_PRICE_DATA`/平均股价 880003 判 fail 且 `heal_cat=intraday`
+      ⇒ 每轮派发 cn_fetch），且每档在 step8/9 即早退（不产生抓取）⇒ **不是本项回归**，而是
+      `all-generic-redline-false-positive` + `card-fake-freshness-timestamp-rootfix-0925` 记录的自激空转面的
+      表现；「档数」这项判据本身混淆了「cron 档数」与「自愈派发档数」，建议本项收口时按**cron（schedule）档数**
+      口径重述（当日 `event=schedule` 仅 #2301 一档）。
+      ⚠️ verify_how ① 仍缺：需**工作日盘中**真跑档（下一交易日 **09-28 周一**）验证 step4 耗时量级与
+      `is_trading_day=true` 路径 ⇒ status 维持 pending-verify。
+    updated: "2026-09-26 16:40"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: heartbeat-files-clobbered-by-cnfetch
@@ -5647,4 +5668,96 @@ items:
       `algo-t1-segment-d-gate-false-red-0926`（同处休市段，但属问责/目标批次侧，根因不同，勿混为一谈）。
       〔阿狸咪的工程师 2026-09-26 14:37 CST · 第 18 轮巡检 · 只读实读远端 API（非本机副本、非推断）〕
     updated: "2026-09-26 14:37"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  # ── 2026-09-26 16:4x 阿狸咪新增（第 18 轮巡检 · cn 单飞链推送步语法级死代码）─────────────
+  - id: cn-singleflight-ps51-pipe-pipe-parse-fail-lhb-push
+    title: "v8_lhb_fetch 推送步用 PS 5.1 不支持的 `||` ⇒ 整段解析失败被 continue-on-error 吞掉：龙虎榜链推送长期是死代码（假绿）"
+    priority: P0
+    owner: shared
+    status: pending-verify
+    scope: workflow
+    created: "2026-09-26 16:40"
+    what: >-
+      `v8_lhb_fetch.yml` 推送步「📤 推送到仓库（api_push_raw.py 中 LHB 分支）」的 `run:` 块第 3 行写作
+      `python api_push_raw.py --only lhb || python api_push_raw.py || Write-Host "api_push_raw failed, non-blocking"`。
+      该步 shell 实测 = `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.EXE -command ". '{0}'"`
+      ⇒ **Windows PowerShell 5.1**；而 `||` 是 **PS 7+ 才支持**的语句分隔符 ⇒ 整个 `.ps1` 解析失败
+      （`The token '||' is not a valid statement separator in this version.` ×2、CategoryInfo=ParserError、
+      FullyQualifiedErrorId=InvalidEndOfLine、`##[error]Process completed with exit code 1.`）
+      ⇒ **`python api_push_raw.py --only lhb` 从未被执行**（日志内搜不到该脚本的任何输出）；
+      而该步 `continue-on-error: true`（08-30 为「推送超时别拖死 job」而设）把 exit 1 吞掉
+      ⇒ **run 结论恒 success = 假绿**。
+    impact: >-
+      · 龙虎榜单飞链的**推送能力长期是死代码**：即便 `fetch_lhb.py` 抓到数据也永不入仓。
+      · 与 `cn-singleflight-ghpat-missing-401`（token 修复，09-25 已完成）是**同一条链的两个独立缺陷**：
+        token 修好后推送步**仍**必死 ⇒ 两项都修完、且真跑档出现 `api_push_raw.py` 输出，该链才算恢复。
+      · 与 `cn-runner-ps1-utf8-noBOM-gbk-parse-fail` 同族（「cn runner 上 `run:` 块与解释器不匹配」），
+        但成因不同：彼为非 ASCII/GBK 解码，本项为 **PowerShell 版本特性** ⇒ 两条铁律须并列记。
+      · 假绿已持续 ≥ 4 周（逐档实证见 evidence ①）⇒ 属「run 绿但能力为 0」的隐性停摆。
+    evidence: >-
+      ① 逐档取 job 日志（`GET /actions/jobs/<id>/logs`，**curl -sSL** 避 302 丢 Authorization）实测：
+        run `#25`(09-22 22:07) / `#26`(09-23 22:19) / `#27`(09-24 22:20) / `#28`(09-25 22:42)
+        **四档全含**同一 ParserError，且**四档都搜不到 `api_push_raw.py` 的任何输出**；四档 run 结论均为
+        `success`（= 假绿实证）。
+        run #28 逐字：`At D:\actions\cn-runner\_work\_temp\a7856ea0-….ps1:3 char:35` /
+        `+ python api_push_raw.py --only lhb || python api_push_raw.py || Write- …` /
+        `The token '||' is not a valid statement separator in this version.` ×2 /
+        `+ CategoryInfo : ParserError: (:) [], ParseException` /
+        `+ FullyQualifiedErrorId : InvalidEndOfLine` / `##[error]Process completed with exit code 1.`
+      ② 旁证（该链唯一两个推送目标从未入仓）：`GET /commits?path=out/lhb_result.json` = **0 笔**、
+        `path=raw_data/lhb_seats.json` = **0 笔**；`raw_data/lhb_data.json` 的提交全部来自
+        `v8 cn fetch`（算法/云端链），与本链无关。
+      ③ 同族排查（结论 = 全仓仅此一处）：`v8_dajijin_fetch.yml` 的 `||` 只在 `${{ … }}` 表达式内（GitHub
+        表达式引擎解析，不经 PS）；`v8_cn_fetch_cloud_hosted.yml` / `v8_cn_fetch_cloud_selfhosted.yml` /
+        `v8_stock_quote_refresh.yml` 的 `[ … ] || …` 均在 `shell: bash` 步内 ⇒ 均无此问题。
+      ④ 本机同机复现（`alimi-cn` = 该链实际 runner，同为 PS 5.1.19041.2364）：抽 `run:` 块 →
+        UTF-8 无 BOM 写 `.ps1` → `[Parser]::ParseFile`：**修复前 `errs=2`**（`L2 标记"||"不是此版本中的有效
+        语句分隔符` ×2，与 CI 逐字同型）→ **修复后 `errs=0`**。
+      ⑤ ⚠️ **附带缺陷（同文件、本轮未修）**：该 workflow 注册名 = 文件路径（`GET /actions/workflows` 里
+        其余 34 个均为正常人类可读名），且 `POST /actions/workflows/{id 或文件名}/dispatches` 恒
+        `422 {"message":"Workflow does not have 'workflow_dispatch' trigger"}` —— 尽管文件第 30 行**确有**
+        `workflow_dispatch:`（含 `skip_trading_day_gate`）。与 2026-08-30 已诊断的「go-yaml 不接受
+        surrogate 转义 ⇒ 整份解析失败 ⇒ 判无 dispatch」同型**且未治愈** ⇒ 该链**无法手动补算/手动验证**，
+        只能等 cron（这也是本项死代码潜伏 4 周无人察觉的结构性原因）。
+    fix: >-
+      （A）**已落地（阿狸咪 2026-09-26 16:3x CST）**：把 `||` 改为 PS 5.1 兼容的 `$LASTEXITCODE` 判定，
+        保持原语义（先 `--only lhb`，失败回落整轮推送，最后仅打印非阻塞告警）：
+          `python api_push_raw.py --only lhb`
+          `if ($LASTEXITCODE -ne 0) { Write-Host "[warn] --only lhb failed, falling back to full push"; python api_push_raw.py }`
+          `if ($LASTEXITCODE -ne 0) { Write-Host "api_push_raw failed, non-blocking" }`
+        新 `run:` 块**纯 ASCII**（cn runner GBK(936)，非 ASCII run 块会重蹈
+        `cn-runner-ps1-utf8-noBOM-gbk-parse-fail`）—— 已断言 `all(ord(c) < 128)`。
+        推送：commit `6f7f66456c35`（parent = 真 tip `42cd0596f59d`，`base_tree` 只替换登记路径、`force:false`）；
+        `GET /commits/<sha>.files` = 恰 1 个文件（+6/−1）；推后回读 blob `b18a0dfb1b18` / 7,598 B 逐字节一致，
+        文件内 `||` 由 3 → 1（仅剩 `${{ … || 'false' }}` 表达式）。
+      （B）**附带缺陷待修（建议下一窗口单独处理，勿与 A 混）**：使该 workflow 能被 `workflow_dispatch`
+        （否则永远只能等 cron，无法即时复验）；判据 = 同一 `dispatches` POST 返回 204。
+      （C）**可选加固（本轮未做，避免超推送预算）**：把末行告警改为
+        `Write-Host "::error title=v8-lhb-push-softfail::…"`，在保留「非阻塞」语义的同时让失败在
+        annotations 可见（对齐主人 2026-09-08「禁止假 success」令）。
+    verify_how: >-
+      ① 下一档 `v8_lhb_fetch` 真跑（`schedule: '30 9 * * 1-5'` = 17:30 CST；实际调度有 +4~5h 偏移，
+        见 `cn-singleflight-schedule-trigger-offset`）的推送步日志**不再出现**
+        `not a valid statement separator`，且**出现 `api_push_raw.py` 的输出**（逐字给出）。
+      ② 源侧恢复（东财/新浪 LHB 列表可用）后：`out/lhb_result.json` 或 `raw_data/lhb_seats.json`
+        提交数由 0 变 ≥1（`GET /commits?path=…`）。
+      ③ 静态：`GET /contents/.github/workflows/v8_lhb_fetch.yml` 全文**可执行行** `||` 命中 = 0
+        （仅 `${{ … }}` 表达式内 1 处属正常）。
+      ④ 判据一律取远端 API 真身（日志用 `curl -sSL`；文件用 contents API），禁读本机副本。
+    not_verify_how: >-
+      · ❌ 禁以 run 结论（`success`）判本项已修 —— 该步 `continue-on-error: true` ⇒ **恒绿**，本项本身就是
+        假绿事故。
+      · ❌ 禁因日志出现 `[skip] weekend, exit ok`（fetch 步周末静默）就判「推送步也跳过了」——
+        推送步条件是 `if: always() && steps.fetch_lhb.outcome == 'success'` ⇒ **周末同样会执行**。
+      · ❌ 禁凭「提交 6f7f66456c35 存在于 main」判修复生效：必须看**真跑档日志**里该步是否真的调起了脚本。
+    refs: >-
+      `.github/workflows/v8_lhb_fetch.yml`（推送步 run 块；`on:` 第 30 行 `workflow_dispatch` 与注册态不符）；
+      commit `6f7f66456c35`（修复）/ `42cd0596f59d`（parent 真 tip）；run `#25`~`#28`
+      （36149238266 / 36012022001 / 35873365922 / 35738128020）；`out/lhb_result.json`、`raw_data/lhb_seats.json`。
+      关联 item：`cn-singleflight-ghpat-missing-401`（同链另一缺陷，token）、
+      `cn-runner-ps1-utf8-noBOM-gbk-parse-fail`（同族：run 块与解释器不匹配）、
+      `cn-singleflight-schedule-trigger-offset`（同链调度偏移）。
+      交接件：`docs/ops/handover/2026-09-26_1639_阿狸咪的工程师给小九_v8_lhb_fetch推送步PS5.1管道符解析失败根治_龙虎榜链推送长期死代码.md`。
+    updated: "2026-09-26 16:40"
     updated_by: 阿狸咪的工程师(alimi-cn)
