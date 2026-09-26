@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 20:40"
+  updated: "2026-09-26 22:41"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 89
+  next_id_seq: 90
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -6015,7 +6015,18 @@ items:
         且该档 `syntax error` 命中 **0**（`PYEOF_IDXGUARD` 起始行 12:26:50.14 / 闭合行 12:26:50.14 均在位）
         ⇒ ③ heredoc 顶格修复 + ① 四项硬断言**双项已于线上生效**。
         本项残余未达成项 = **②**（见上，已被新项 `cn-softfail-annotation-dead-under-bash-e` 承接）。
-    updated: "2026-09-26 20:40"
+    alimi_verify_20260926_2245: >-
+      〔阿狸咪的工程师 2026-09-26 22:45 CST 第 2 次线上复验 —— verify_how ① 再次达成（更新的一档）〕
+      样本 = run `#2336`（id `36248589475`，head `b9f7e956e935`，2026-09-26 22:27 CST，ev=workflow_dispatch），
+      该档 head **已含**修复提交（`compare 99fef522c817...b9f7e956e935` = **ahead 48 / behind 0**）。
+      · ✅ ① 逐字：`✅ index.html 完整性断言通过：行数=19315 字节=1361458 尾部闭合=OK A2三锚=OK`
+        （同一档全日志 `syntax error` / `unexpected end of file` / `here-document` 命中 **0**）；
+      · 参照：上一轮基线档为 `#2321`（head `265b00bf863e`）⇒ 本次换档复现，排除单档偶发；
+      · ② 仍按 `alimi_verify_20260926_2045` 的更正口径判（承接项 `cn-softfail-annotation-dead-under-bash-e`），
+        本轮独立复现其聚合层回执：同档 step27 逐字 `##[error]软失败步（不阻断 job，但对应数据可能未刷新）： soft_13`
+        ⇒ **可观测性未全失**，与承接项定级 P2 的依据一致；
+      · ③ 本档 `index.html` 有变更（数据重建后 ?v 前进）⇒ `ℹ️ ?v 已最新，无需推送` 分支不适用，未评。
+    updated: "2026-09-26 22:41"
     updated_by: 阿狸咪的工程师(alimi-cn)
     what: >-
       `.github/workflows/v8_cn_fetch_cloud.yml` 有 3 个 `run:` 块存在 bash 语法错误（阿狸咪 2026-09-26 20:1x CST
@@ -6129,3 +6140,55 @@ items:
       `.github/workflows/v8_cn_fetch_cloud.yml` · `.github/workflows/v8_cn_fetch_cloud_hosted.yml` ·
       `.github/workflows/v8_cn_fetch_cloud_selfhosted.yml` · `.github/workflows/v8_stock_quote_refresh.yml:261` ·
       `v8_health_check.py:3562`
+  - id: cn-run-start-env-dead-guards-0926
+    title: cn_fetch 两处 V8_RUN_START 恒空 ⇒ landcheck 反假成功终检从未生效 + 自接力 10 分钟节奏闸门失效
+    priority: P1
+    owner: 小九（裁决/落码）/ 阿狸咪的工程师（已定性 · 可代落码）
+    status: todo
+    updated: "2026-09-26 22:41"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+    what: >-
+      `.github/workflows/v8_cn_fetch_cloud.yml` 两处把 `V8_RUN_START` 取成 `${{ github.run_started_at }}`：
+      `landcheck`（step28「🔍 数据落地实证终检（杜绝『run 全绿但数据没动』的假成功）」L1018）与
+      `relay`（step29「🔁 盘中自接力」L1169）。而 `github.run_started_at` **不在 GitHub `github` 上下文属性表内**
+      （`run_id` / `run_number` / `run_attempt` 在列，`run_started_at` 不在列）⇒ 服务端求值为 `null`
+      ⇒ 环境变量**恒为空字符串**（实测 6/6 档）。后果两条：
+      · ① **landcheck 从未生效**：`started` 空 ⇒ `datetime.strptime('', …)` 抛 ValueError ⇒ 命中
+        `except` ⇒ 打印「保守跳过」⇒ `sys.exit(0)`，**在取 PROBE 文件新鲜度之前就退出**。
+        该步正是 2026-09-22 为东财停更事故新增的防线（item `intraday-eastmoney-stall-4cards` 的 verify ③：
+        intraday 东财 5 文件全未推进 ⇒ `exit 1` ⇒ 调度器触发小九 cn 兜底）⇒ **该防线自上线起形同虚设**。
+        🔴 注意 `if: always() && steps.gate.outputs.skip != 'true'` ⇒ 休市/非交易日同样进入 ⇒
+        **直接修好 `started` 而不加交易日门控，会在周末/假期立刻制造假红 + cn 兜底派发风暴**。
+      · ② **relay 的「派发不得密于 10 分钟」节奏闸门失效**：`gap = 999.0` 为默认值，仅在 `if rstart:` 为真时才计算
+        ⇒ rstart 恒空 ⇒ `gap < 10` 恒 False ⇒ **永不 sleep**。而该闸门的设立理由在同文件注释 L1213-1214 逐字写明：
+        「下限纪律：不得低于 10 分钟。09-21 实测派发密到 7~8 分钟时撞新浪/东财反爬 ⇒ 单轮 exit 1。」
+        缓解项：同档「在途查询」（L1233-1246）仍在工作 ⇒ 链不会同刻并发；故实际暴露面 = 前一档跑得很快
+        （休市跳步 / 快速失败）时下一档被**立即**派发。观测：09-26（周六）24h 内 cn_fetch 共 **50 档**，
+        `#2337`(14:29:38Z)→`#2338`(14:31:10Z)→`#2339`(14:31:44Z) 相邻仅 92s / 34s。
+    evidence: >-
+      · 源码面：远端 main blob `f4bf6f6d73ac`（89,519 B）L1018 / L1169 逐字 `V8_RUN_START: ${{ github.run_started_at }}`；
+        同一 blob 与 run `#2336` head `b9f7e956e935` 逐字节相同 ⇒ 跑的就是这份代码。
+      · 运行面：run `#2336`（id `36248589475`）step28 runner env dump 逐字 `V8_RUN_START: `（空），
+        该步输出逐字 `[landcheck] 无法解析 run_started_at=''，保守跳过（宁可不报，不误报）`。
+      · 历史面：连续 6 档 completed run（`#2332`~`#2337`）job 日志逐一核对，landcheck 段**全部**落在同一
+        「保守跳过」分支 ⇒ 结构性，非偶发。
+      · 文档面：GitHub Contexts 参考页 `github` 属性表（官方页 + 3 处镜像）未收录 `run_started_at`。
+      · 反向对照：`relay` 步 L1170 的 `V8_RUN_ID: ${{ github.run_id }}` 是**合法**属性，可作兜底的数据源。
+    fix: >-
+      ⛔ 本轮**未落码**（见下「为何不落码」）。建议 A（最小语义漂移，两处同改）：
+      ① `landcheck` step 的 `env:` 补 `V8_RUN_ID: ${{ github.run_id }}`（`relay` 步已有）；
+      ② 两处脚本内在 `rstart` 为空时经 API 兜底：`GET /repos/{repo}/actions/runs/{V8_RUN_ID}` → 取 `run_started_at`
+         （该字段在 REST API 的 run 对象里**真实存在**，与本项「上下文属性表」不是一回事；
+         本仓 item `cn-singleflight-schedule-trigger-offset` 即引用过它）。注意 `relay` 步的 `api()` / `H` 定义在
+         gap 计算**之后**（L1194-1203）⇒ 需把 gap 计算下移，或直接用 `tok` + urllib 取。
+      ③ `landcheck` **同批**加门控：非交易日 / 非盘中窗口 ⇒ 打印原因后 `sys.exit(0)`，避免激活即风暴。
+      备选 B（不推荐）：换 `github.event.repository.updated_at` —— 语义不符（是仓库推送时间，非本轮开跑时间）。
+    verify_how: >-
+      下一档 `v8_cn_fetch_cloud` 真跑后（**只看该档 job 日志**，禁以 step conclusion 当判据）：
+      ① `landcheck` 段出现 `[landcheck] 本轮基准时间 …`（**不再**出现 `无法解析 run_started_at=''`）；
+      ② `relay` 段出现 `[relay] 本轮已跑 N 分钟（口径：距本轮开跑）` 且 **N 为真实分钟数（非 999.0）**；
+      ③ **回归项**：休市日 / 非盘中窗口下 `landcheck` 与 `relay` 均**不得**判红或派发（防「一修就风暴」）。
+      ⚠️ 参照物：本轮定性的基线档 = `#2336`（head `b9f7e956e935`）。
+    refs: >-
+      `.github/workflows/v8_cn_fetch_cloud.yml` · `docs/ops/handover/2026-09-26_2240_阿狸咪的工程师给小九_cn_fetch自接力节奏闸门与landcheck反假成功终检双双失效_根因V8_RUN_START恒空.md`
+
