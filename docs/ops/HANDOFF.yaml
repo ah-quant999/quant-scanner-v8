@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 07:23"
+  updated: "2026-09-26 09:46"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -2662,7 +2662,19 @@ items:
       等**下一个通过闸门的真跑 algo 档**跑完 ⇒ 断言 ① step15 结论 = `success`；② run 结论 = `success`；
       ③ step15 日志出现 `push index.html ALGO_TRACK ?v: 200 v= <10 位 epoch>`。
       🔴 判据纪律：`build=skipped` 的闸门空转档其 step15 亦为 `skipped`，**不得当验证样本**。
-    updated: "2026-09-22 19:58"
+    alimi_verify_20260926_0945: >-
+      〔阿狸咪的工程师 2026-09-26 09:46 CST · 第 15 轮巡检 · 真跑档复验〕
+      样本 = algo 链 run #2122（id 36205640791 / head 73d6e8f90bdf / 2026-09-26 08:39 CST / ev=workflow_dispatch）。
+      ① 修复提交在位：compare c16e376ea6...73d6e8f90bdf = ahead 1644 / behind 0 ⇒ 该轮跑的确实是含修复的代码。
+      ② step15「🔄 同步 ALGO_TRACK 缓存戳 ?v 并推送 index.html」结论 = success（取自 run step 表，非 run 结论）。
+      ③ step15 日志逐字：`push index.html ALGO_TRACK ?v: 200 v= 1790383951`（10 位 epoch，换算 = 2026-09-26 08:52:31 CST，
+         与该步日志时刻 00:52:37Z 同刻）⇒ 补的 `t = str(int(time.time()))` 确被执行，NameError 不复现。
+      ⇒ **本项自身缺陷（step15 NameError 必拖垮真跑档 run）已消除**。
+      ⚠️ verify_how 的 ②「run 结论 = success」本轮**不成立**，但该 run 失败步**唯一 = step17「结果问责」**，
+         属**另一条已在册缺陷** `algo-t1-segment-d-gate-false-red-0926`（P1·休市段首 t1 问责假红·产物零缺陷），
+         与本项无因果 ⇒ 故 **status 维持 pending-verify**，不越权宣称 done。
+      下一自然验证点 = 09-28(周一) 首个真跑档：若 step17 假红随交易日消失，则 ①②③ 三判据全达成 ⇒ 即可转 done。
+    updated: "2026-09-26 09:46"
 
   # ── P1 · 数据口径红线（2026-09-22 19:58 阿狸咪补登记：此前 3 日只在哨兵技能、从未进状态源）──
   - id: fourvolume-backtest-3y-downgrade
