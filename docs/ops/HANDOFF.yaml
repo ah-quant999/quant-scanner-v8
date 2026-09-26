@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 20:21"
+  updated: "2026-09-26 20:35"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 88
+  next_id_seq: 89
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -5998,7 +5998,19 @@ items:
     priority: P1
     owner: 阿狸咪的工程师（已修）/ 小九（复核 + 线上终验）
     status: pending-verify
-    updated: "2026-09-26 20:21"
+    alimi_verify_20260926_2045: >-
+      🔴 **verify_how ② 于修复上线后实测「不通过」，且真因与 ①②③ 的预期不同**（阿狸咪 2026-09-26 20:35 CST 补）：
+      run `#2321`（head `265b00bf863e`，**已含** `99fef522c817`）step21（`soft_13`）尾部**仍有**
+      `##[error]Process completed with exit code 2.` —— 说明该现象**不是**「块尾缺 `exit 1` + `fi`」
+      （那处确已修好），而是：这些 step 的 `shell: bash` 展开含 **`-e`**（逐字
+      `/usr/bin/bash --noprofile --norc -e -o pipefail {0}`）⇒ 被捕获命令非零即终止整段脚本，
+      模板的 `_v8_rc=$?` / annotation / `exit 1` **三行恒不可达**；叠加 `v8_health_check.py:3562`
+      在有 fail 项时**按设计**返回 2 ⇒ 每档必被标 failure。**承接项 = `cn-softfail-annotation-dead-under-bash-e`（本轮新建）。**
+      另附**正向证据**：同档 `V8_SF_soft_15: success`（step24）⇒ ③ 的 heredoc 缩进修复**已在线上生效**；
+      `step21` 段数据本身**正常刷新**（`[INFO] 已生成 data/HEALTH_CHECK.js`，线上 `updated=2026-09-26 20:30:18`）。
+      ⚠️ 因此 verify_how ② 请按下述口径复判：不再要求「`soft_13` 尾无 exit code 2」，而应改为
+      「`soft_13` 若为真失败，应出现**执行态** `::error title=v8-softfail:soft_13`」。
+    updated: "2026-09-26 20:35"
     updated_by: 阿狸咪的工程师(alimi-cn)
     what: >-
       `.github/workflows/v8_cn_fetch_cloud.yml` 有 3 个 `run:` 块存在 bash 语法错误（阿狸咪 2026-09-26 20:1x CST
@@ -6049,3 +6061,66 @@ items:
       ⚠️ 参照物：修复提交 sha = `99fef522c817`；验证档 head_sha 必须**包含**该提交（`compare` behind=0）。
     refs: >-
       `.github/workflows/v8_cn_fetch_cloud.yml` · `docs/ops/handover/2026-09-26_2019_阿狸咪的工程师给小九_cn_fetch三处_bash_语法缺陷根治_—_step24_index_完整性硬断言实为死码.md`
+
+  - id: cn-softfail-annotation-dead-under-bash-e
+    title: cn 三链 29 处「软失败细粒度告警」在 bash -e 下恒为死码（含软失败退出码语义）
+    priority: P2
+    owner: 小九（workflow 车道落码）/ 阿狸咪的工程师（已定性 · 可代落码）
+    status: todo
+    updated: "2026-09-26 20:35"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+    what: >-
+      cn 侧三个 workflow 的 run 块普遍采用「命令 → `_v8_rc=$?` → `if [ "$_v8_rc" != "0" ]; then
+      echo "::error title=v8-softfail:<id>::…"; exit 1; fi`」的软失败告警模板。
+      实测该模板的**后三行从未执行**：这些 step 用 `shell: bash`，GitHub 展开为
+      `/usr/bin/bash --noprofile --norc -e -o pipefail`（逐字取自 run #2321 日志 12:26:40.1539337Z）
+      ⇒ `-e` 使被捕获命令一旦非零就**立即终止整段脚本**，`$?` 捕获 / annotation / `exit 1` 全部不可达。
+      · 分布（远端真身行号，共 **29 处**）：`v8_cn_fetch_cloud.yml` 14 处
+        （482/499/517/536/554/583/649/721/740/758/781/813/908/952）；
+        `v8_cn_fetch_cloud_hosted.yml` 6 处（180/257/275/300/361/419）；
+        `v8_cn_fetch_cloud_selfhosted.yml` 9 处（311/330/350/371/391/414/445/465/523）。
+      · 反证「正解就在同仓」：`v8_stock_quote_refresh.yml:261` 与 `v8_stock_quote_refresh_cloud.yml:272`
+        都有 `set +e`（前者注释即「假 success 根治」）⇒ 两条 stock_quote 链对了，三条 cn 链漏了。
+      · 影响 ①：09-08 主人令「软失败但强制告警」的**细粒度** `::error title=v8-softfail:<id>`
+        一路**零产出**（实测 run #2321 全档**执行态** annotation = 0 行，脚本正文回声不算）。
+      · 影响 ②：该步退出码 = 被捕获命令的**原始 rc**（如 2），而非模板设计意图的 `1`。
+      · 影响 ③：聚合层「📢 软失败汇总告警」（读 `steps.<id>.outcome`）**仍然有效**
+        ⇒ 可观测性未全失（仅降级），故定 **P2** 而非 P1。
+      · 叠加真因（本轮新判据，纠正上一项 verify_how ② 的期待）：`soft_13` 每档必被报「软失败」
+        **不等于**它没刷数据 —— `v8_health_check.py:3562`
+        `sys.exit(0 if report["overall"] == "ok" else 2)` 是**按设计**在报告含 fail/warn 项时返回 2。
+        实测 run #2321 紧接 12:26:45.72 `[INFO] 已生成 data/HEALTH_CHECK.js`（数据已刷），
+        线上 `data/HEALTH_CHECK.js` `updated=2026-09-26 20:30:18` ⇒ **产物确已刷新**，属「假失败标注」。
+    fix: >-
+      ⛔ 本轮**未落码**（巡监窗口 + 属 workflow 车道）。三种修法与权衡如下，推荐 A：
+      · A（最小语义改动·推荐）：对**单命令块**在 `run:` 块首行插 `set +e`（与 `v8_stock_quote_refresh.yml:261`
+        既有范式一致）；对**多命令块**（soft_8 / soft_10 / soft_11 / soft_14 / soft_16 等）
+        改为只把被捕获的命令包成 `cmd || _v8_rc=$?`（`||` 列表豁免 `-e`，且不改早段命令的 `-e` 保护）。
+      · B：把命令改写成 `if ! cmd; then …; fi`（结构最清晰，改动面最大）。
+      · C（须与 A/B 同做）：给 `v8_health_check.py` 加 `--exit-zero`，让「报告里有 fail 项」不再冒充
+        「本步执行失败」—— 否则 `soft_13` 仍会每档被标 failure，细粒度 annotation 依旧死。
+      🔴 为何不在本轮直接改：29 处中含**推送步**（soft_10 / soft_14）与 6 处多命令块
+      ⇒ 机械化插入会改变早段命令的失败语义（本仓铁律「不要造成踩踏」）；且本项为巡监轮发现。
+    evidence: >-
+      · run #2321（id `36241885520`，head `265b00bf863e`，2026-09-26 20:25 CST，**已含**修复提交
+        `99fef522c817`）：步表 `step21 = success`，但「📢 软失败汇总告警」逐字
+        `V8_SF_soft_13: failure` + `##[error]软失败步（不阻断 job，但对应数据可能未刷新）： soft_13`。
+      · 同档日志 12:26:40.44 打印 soft_13 脚本体 → 12:26:45.72 `[INFO] 已生成 data/HEALTH_CHECK.js`
+        → 12:26:45.82 `##[error]Process completed with exit code 2.`（模板的 `exit 1` 从未生效）。
+      · 同档**执行态** `::error title=v8-softfail:` 命中 **0 行**（用 `'echo "::error' not in line` 过滤脚本回声）。
+      · shell 展开逐字：`shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}`。
+      · 全仓分布面复核：34 个 workflow 中仅上述 3 个文件存在该 rc 捕获模板且**无** `set +e`；
+        两条 stock_quote 链各 1 处**均有** `set +e`。
+      · 上游产物真值：线上 `data/HEALTH_CHECK.js` `updated=2026-09-26 20:30:18` / `overall=warn` /
+        `{ok:118, warn:0, fail:1(AVG_PRICE_DATA), limited:2, total:121}`。
+    verify_how: >-
+      下一档 `v8_cn_fetch_cloud` 真跑后（**只看该档 job 日志**，禁以 step conclusion 当判据）：
+      ① 该档**执行态** `::error title=v8-softfail:` 行数 ≥ 1（当前恒 0；过滤法 = 去掉以 `echo "::error` 开头的脚本回声）；
+      ② 回执「📢 软失败汇总告警」仍能逐 id 点名失败的软失败步（回归：聚合层不得被改坏）；
+      ③ 若某软失败步确因命令失败而红，其 step 退出码应为 `1`（而非该命令的原始 rc，如 2）。
+      ⚠️ 参照物：本轮定性的基线 run = `#2321`；若 `soft_13` 不再出现，须同时确认 `HEALTH_CHECK.js`
+      仍按时刷新（防「用 exit 0 掩盖真失败」的过度修复）。
+    refs: >-
+      `.github/workflows/v8_cn_fetch_cloud.yml` · `.github/workflows/v8_cn_fetch_cloud_hosted.yml` ·
+      `.github/workflows/v8_cn_fetch_cloud_selfhosted.yml` · `.github/workflows/v8_stock_quote_refresh.yml:261` ·
+      `v8_health_check.py:3562`
