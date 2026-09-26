@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 14:25"
+  updated: "2026-09-26 14:37"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 83
+  next_id_seq: 84
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -5553,4 +5553,98 @@ items:
        🔴 本轮新踩坑（写入侧，已同步进 skill）：HANDOFF.yaml 的长字段必须用 `>-` 折叠块标量 ——
           裸标量续行里出现「空格+#」会被 YAML 当注释（静默截断该行余下内容）、出现「: 」会直接解析失败。
     updated: "2026-09-26 14:23"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+  # ── P1 · 数据真实性（algo 产物日期源） ─────────────────────────────────
+  - id: algo-artifact-date-naked-now-bypass-calendar
+    title: "algo 产物日期源绕过交易日历：calc_crds 用裸 datetime.now() 拼「15:30 收盘」⇒ 休市日仍落当日假快照"
+    priority: P1
+    owner: shared
+    status: todo
+    scope: shared
+    created: "2026-09-26 14:37"
+    what: >-
+      承接 item `trading-day-gate-predeps-fallback` 的 verify_how ③/C（原文：「若仍出现非交易日日期 ⇒ 说明
+      algo 侧日期源另有出处（非 `v8_date`），本项 5 笔修复未覆盖，须另开项」）—— **该判据在 09-26（周六）
+      提前触发，根因已定位到源码行**。2026-09-26 为周六（非交易日；`data/V8_CAL.js` +
+      `guard_v8_freshness._HOLIDAY_RANGES_2026` 双源一致），远端 main 实测：
+      `data/CRDS_CARD_DATA.js`（145,695 B）`update_time:"2026-09-26 08:41:48"`、
+      `data_time:"2026-09-26 15:30:00"`（**一个不存在的周六收盘时刻**）、`"enter_date":"2026-09-26"` **337 处**；
+      同批 `raw_data/crds_card_data.json`（232,986 B）`data_time` 同为 `2026-09-26 15:30:00`。
+      根因（`algorithms/calc_crds.py`：**同一文件内两套日期口径自打架**）：
+        · 该文件 **L380 已 `import v8_date`**、L383 `_now = v8_date.now_cst()`、L390
+          `_EXPECTED_END = str(v8_date.last_trading_day(ref, max_lookback=15))[:10]`
+          ⇒ 「预期结束日」是**认交易日历**的；
+        · 但**落盘**三处用的是**裸 `datetime.now()`**：
+          L1281 `data_date = datetime.now().strftime("%Y-%m-%d")`；
+          L1318 `"data_time": data_date + " 15:30:00"`（**无条件拼 15:30 收盘**）；
+          L1360-1361 `today_str = datetime.now().strftime("%Y-%m-%d")` →
+          `daily_file = os.path.join(hist_dir, f"crds_{today_str.replace('-','')}.json")`；L1375 `hist[today_str] = {...}`。
+        ⇒ 休市日**不因交易日历回退**，反而**新建当日快照文件**并对外宣称「当日 15:30 收盘」。
+      ⚠️ 已排除同族误报（本轮**同时筛查、结论相反**，防下一位验证者扩大打击面）：
+        `data/TRIPLE_CONSENSUS.js` 的 `enter_date` 走 tracking 表（实测 2026-09-22 / 2026-09-23，真实交易日，
+        **正常**），其 `data_time` 继承上游 `TOP10_DAILY.update_time`（08:24:27，语义是「快照时刻」非「收盘时刻」）
+        ⇒ **不属本族**；`data/FINAL_RECOMMEND_DATA.js` 本日 **0 处** 09-26 且未重生成（ut 冻 09-25 03:01:12）
+        ⇒ D 批非交易日不产出，**行为正确**。
+    impact: >-
+      · **数据真实性（宗旨①）**：非交易日（周末 + 节假日，含即将到来的 10-01~10-07 国庆连休）把
+        「当日 15:30 收盘」这一**不存在**的时刻写进产物并直接上卡 ⇒ 使用者会误判「今天有盘后数据」。
+      · **历史库污染**：每个休市日新增一份 `crds_YYYYMMDD.json`（≈247 KB）且内容为前一份副本
+        ⇒ 下游「按历史序列做对比/回测」会吃到假样本，且仓库体积无谓增长（09-25 / 09-26 已各 +247 KB）。
+      · **时间敏感**：国庆连休 7 天将再产 7 份假快照 ⇒ 建议在 **09-30 前**或与
+        `trading-day-gate-predeps-fallback` 的 fix(A) 同批处理。
+      · 影响面**限于 CRDS**：数值本身取自最近交易日行情（非凭空造数）⇒ 属「**标错日期 + 多落历史**」而非
+        「数据造假」，据此定 **P1** 而非 P0。
+    evidence: >-
+      ① `raw_data/history/` 实测存在**两个非交易日的完整快照**（远端 API 逐字节）：`crds_20260925.json`
+         （247,174 B）`data_time = "2026-09-25 15:30:00"`（中秋休市日）、`crds_20260926.json`（247,174 B）
+         `data_time = "2026-09-26 15:30:00"`（周六）；二者 **size 完全相同** ⇒ 证明是「按自然日新建」
+         而非「有数据才写」（休市日无新行情，内容同源复制）。
+      ② `raw_data/history/crds_history.json` 顶层键实测含 `2026-09-25` / `2026-09-26`
+         （近 8 键 09-19…09-26）⇒ **历史序列已被非交易日快照污染**。
+      ③ 前端可见性：`data/CRDS_CARD_DATA.js` 的 `data_time` 直接上卡 ⇒ 周末/节假日打开主站会看到
+         「数据时间 2026-09-26 15:30:00」这一**不存在的收盘时刻**（假新鲜 display）。
+      ④ 落盘来源为**云端 run（非本机）**：当日 algo 链档 `#2121 08:23 CST / #2122 08:39 CST`；
+         两份产物 `update_time` 08:40:08 / 08:41:48 与之吻合；本轮阿狸咪全程只读（0 写入产物）。
+      ⑤ **去重检查**：远端 `docs/ops/HANDOFF.yaml` 内 `calc_crds` / `crds_2026` 命中均不涉本根因
+         （既有 14 处 `CRDS` 命中全属「港股误名 / 纯代码冒充名 / 红卡停更」等其它项）⇒ 本项为**新登记**，非重复。
+    fix: >-
+      （A）**根因修（推荐；纯算法侧、不涉 workflow 写权 ⇒ 双机任一方可落码）**：把 `algorithms/calc_crds.py`
+        落盘三处改用**该文件已 import 的 `v8_date`**，与 L383/L390 统一：
+          · L1281 → `data_date = str(v8_date.last_trading_day(v8_date.now_cst().date(), max_lookback=15))[:10]`
+            （或 `v8_date.today_data_date()`，与本仓 cn/algo 侧同一权威实现）；
+          · L1318 → 保持 `data_date + " 15:30:00"`（`data_date` 已是交易日时 15:30 才成立）；
+          · L1360-1361 + L1375 → 历史文件名与 `hist` 键同样改用 `data_date`
+            ⇒ 休市日**覆盖写最近交易日那一份**（幂等），不再新增当日文件。
+      （B）**存量清理（可选，需拍板）**：两份假快照 `raw_data/history/crds_20260925.json` /
+        `crds_20260926.json` + `crds_history.json` 内对应两个键。⚠️ 删历史文件属数据类改动，
+        **本轮未动**，仅登记。
+      （C）**口径统一（建议同批）**：本仓已多现「裸 `datetime.now()` vs `v8_date`」两套日期源
+        （本项 + `build_candidate_pool.py:1192` 的成员表观察日）。建议约定：**行情类日期字段一律走 `v8_date`**，
+        自然日字段（观察日/构建戳）在代码内显式注释区分，避免下一位验证者按字面扫 `2026-09-26` 误判。
+      ⚠️ 本轮为监听巡检轮（detect + dispatch），**阿狸咪未改任何代码/产物**，仅登记并交出。
+    verify_how: >-
+      ① **下一个休市日**（最近 = 2026-10-01 国庆）跑后取远端真身：`data/CRDS_CARD_DATA.js` 的 `data_time`
+         **不得**为休市日（应为最近交易日）；`"enter_date":"<休市日>"` 命中数应为 **0**；
+         `raw_data/history/` 不得新增 `crds_<休市日>.json`；`crds_history.json` 顶层键不得新增休市日键。
+      ② **下一个交易日**（2026-09-28 周一 post_close）反证未误伤：`data_time` 应正常为 `2026-09-28 15:30:00`、
+         `enter_date` 为 09-28 ⇒ 说明改动只作用在休市日分支。
+      ③ 判据**必须读远端 API blob**（`git/blobs/<sha>` + `Accept: application/vnd.github.raw`）；
+         ⚠️ `GET /contents` 对 >1 MB 文件 `content` 为空会**假绿**；本机 `data/*.js` 是陈旧副本、**不可**作判据。
+      ④ 禁以「run success」当判据 —— 见 `not_verify_how`。
+    not_verify_how: >-
+      · ❌ 不得用「run success / run failure」判本项：09-26 的 algo 档 `#2123/#2124/#2125` 全 success
+        且**链内步骤整片 skipped**（非交易日按设计跳过），而产物仍在 08:4x 由 `#2121/#2122` 写出。
+      · ❌ 不得用 `update_time` 判「有没有假今日」：`update_time` 是**构建时刻**（休市日也应推进），
+        要判的是 `data_time` / `enter_date` / 历史文件名。
+      · ❌ 不得只扫本机 `data/*.js`：本机为陈旧副本 ⇒ 恒查不到或查到过期值，必须读远端 blob。
+      · ❌ 不得据本项去改 `build_candidate_pool.py` 的成员表观察日（`metrics.date`）—— 那属「观察日」语义，
+        非行情日字段，已在 `trading-day-gate-predeps-fallback` 内定性为**非缺陷**。
+    refs: >-
+      `algorithms/calc_crds.py`（L380/L383/L390 vs L1281/L1318/L1360-1361/L1375）；`data/CRDS_CARD_DATA.js`；
+      `raw_data/crds_card_data.json`；`raw_data/history/crds_20260925.json`；`raw_data/history/crds_20260926.json`；
+      `raw_data/history/crds_history.json`；`data/V8_CAL.js`；`guard_v8_freshness._HOLIDAY_RANGES_2026`。
+      关联 item：`trading-day-gate-predeps-fallback`（本项兑现其 verify_how ③/C 判据）、
+      `algo-t1-segment-d-gate-false-red-0926`（同处休市段，但属问责/目标批次侧，根因不同，勿混为一谈）。
+      〔阿狸咪的工程师 2026-09-26 14:37 CST · 第 18 轮巡检 · 只读实读远端 API（非本机副本、非推断）〕
+    updated: "2026-09-26 14:37"
     updated_by: 阿狸咪的工程师(alimi-cn)
