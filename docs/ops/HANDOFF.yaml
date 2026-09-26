@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 09:57"
+  updated: "2026-09-26 12:15"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 82
+  next_id_seq: 83
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -4862,4 +4862,585 @@ items:
       · data/V8_CAL.js + v8_calendar.py（假期区间权威源）
       · raw_data/_peer_monitor_state.json、raw_data/hb_alimi.json、raw_data/hb_xiaojiu.json
     updated: "2026-09-26 09:57"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: ci-gate-dual-block-meta-block-lost-0925
+    priority: P0
+    owner: shared
+    status: done
+    what: |-
+      🔴 **云端部署链被硬阻断 8+ 轮（2026-09-24 20:56 ~ 09-25 06:47 CST）**，失败步唯一 = `build` job step10
+      `🛡️ Pre-deploy audit`，其后「双盲区静态校验 / 部署前校验 / 部署到 main / 发布后体检」**全 skipped**。
+      两项门禁同时 FAIL：
+        ① `❌ [13/13] 交接状态源守卫: next_id_seq / max_next_id_seq 非整数（当前=None ledger=77）`
+        ② `❌ [5/8] workflow YAML: 1/34 个 workflow 对 GitHub 无效: probe_em_hosts.yml:17 顶层非法行`
+      真因（铁证，非推断）：
+        ① `docs/ops/HANDOFF.yaml` 的**整个 `meta:` 块被误删**。守卫 `pre_deploy_audit.py:1218` 读
+           `d["meta"]["next_id_seq"]` ⇒ `None` ⇒ `int(None)` 抛错 ⇒ FAIL。
+           该块在 `136d8f8cdbbe` 仍完好（`meta:`@L28、`next_id_seq: 77`@L61），
+           被**下一笔 `a2b5f1f38f3b`（阿狸咪 09-24 16:15 UTC「修正上一笔追加位置」）整块删除**，
+           连带删掉并发写协议注释。当时只重算 ledger 哈希、未跑完整 pre_deploy_audit ⇒ 漏检。
+        ② `probe_em_hosts.yml` heredoc 正文（`run: |` → `python - <<'PYEOF'` 之后）**丢 10 空格基准缩进**，
+           第 17 行起被顶到第 0 列 ⇒ YAML 顶层非法行 ⇒ GitHub 判无效。
+    fix: |-
+      ✅ **阿狸咪的工程师 2026-09-25 07:2x CST 已修并推送（commit `89ae1b937d09`，Git Data API 六步）**：
+        ① `HANDOFF.yaml` 在 `items:` 前**恢复 `meta:` 块**（`next_id_seq: 77` == `ledger.max_next_id_seq`，
+           复原 `updated` / `updated_by` + 并发写协议 A/C/D/E 注释）；
+        ② `probe_em_hosts.yml` heredoc 正文**统一补 10 空格基准缩进**（保留相对缩进）。
+      ledger **无需重算哈希**：`[13/13]` 只断言「ids 超集 + seq 单调不减」，不校验 `id_content_hashes`。
+      推前断言：插入前后除 meta 块外逐行一致；`yaml.safe_load` 回读 `meta.next_id_seq==77`、`items` 仍 82；
+      守卫逻辑离线模拟 PASS；workflow 文件 GitHub 端实测已注册（34/34 有效）。
+    evidence: |-
+      ① run **#8210**（head `0eef8c8864b9`）经 `compare 89ae1b937d09...0eef8c8864b9` = **ahead 1 / behind 0**
+         ⇒ 确为修复后代码。逐字：
+           `✅ [5/8] workflow YAML: 34 个 workflow 全部有效（PyYAML 全量）`
+           `✅ [13/13] 交接状态源守卫: 交接状态源完好：items=82（ledger 锚 82 个 id 全在）· next_id_seq=77≥77`
+           `🎉 14 项全部通过 → deploy 可继续`
+           `✅ 已部署 main（第 1 次尝试，GitHub Pages 自动重建）`
+         `build` job = **completed success**（此前 8/8 failure）；唯一非 success 步 = step3「抢跑短路」= skipped（设计）。
+      ② 部署后主站复测：**HTTP 200 / 1,361,458 B** ✅。
+      ③ 失败基线逐字（run #8208 / job 107866549869）：见本项 `what`。
+    verify_how: |-
+      ① 判据 = 之后任一 `v8_build_deploy` run 的 **`build` job 真跑 = success**（**禁看 run 结论**；盘中 build=skipped 属设计）；
+      ② 同时 `pre_deploy_audit` 逐字应见 `🎉 14 项全部通过 → deploy 可继续`；
+      ③ 反测：把 `HANDOFF.yaml` 的 `meta:` 块再删一次 ⇒ `[13/13]` 应 FAIL 并阻断 deploy（回归防护有效性）。
+      ✅ **线上终验已取得（阿狸咪 2026-09-25 07:2x CST）**：run #8210 `build` job success + 14/14 全绿 + 已部署 main
+      ⇒ **本项已满足转 `done` 的判据**。
+      ✅ **闭环终验（阿狸咪 2026-09-25 07:41 CST · run #8213 head `79e16f575540`）**：
+         因修复 commit `ebfbdab936cc` 追加 item 抬高 `ledger.max_next_id_seq` 至 78，
+         而 `meta.next_id_seq` 仍 77 ⇒ `[13/13]` 改判「meta.next_id_seq 回退」，部署链**二次阻断**（#8212）。
+         已由 commit `79e16f575540` 同步抬至 78。**run #8213 = 全链 completed success**，逐字：
+           `✅ [5/8]  workflow YAML: 34 个 workflow 全部有效`
+           `✅ [10/10] index 核心标记守卫: 38/38 全部在位`
+           `✅ [11/11] defer 数据缓存守卫: 0 处空结果固化风险`
+           `✅ [12/12] 调用点定义守卫: 162 个全部有定义（0 处悬空）`
+           `✅ [13/13] 交接状态源守卫: items=83 · next_id_seq=78≥78`
+           `🎉 14 项全部通过 → deploy 可继续`／`✅ 已部署 main（第 1 次尝试）`
+           `🩺 发布后体检：✅ 线上 index.html 完整（1361458 字节，BUILD=79e16f5755，标记 38 全命中）`
+         run 内 `HEAD is now at 79e16f5755 fix(handoff): meta.next_id_seq 77→78` ⇒ **修复版本已被真跑**。
+      🔴 **新增铁律**：`meta.next_id_seq`（YAML）与 `ledger.max_next_id_seq`（JSON）
+         **必须同批同步抬升**（`handoff_ledger_hash.py --fix` 会自动取 `meta.next_id_seq` 作锚）；
+         只抬一侧 ⇒ `[13/13]` 立即以「回退」硬阻断部署（本项即此坑）。
+    reflection: |-
+      🔴 **纪律自省（双机共守）**：
+      1. 改「被门禁依赖的文件」（`HANDOFF.yaml` / 锚点清单 / workflow）后，收尾**必须跑一次完整 `pre_deploy_audit.py`**
+         （或至少该项单测），**只重算 ledger 哈希不足** —— 本项即因漏此步，把部署链静默阻断 8 轮。
+      2. 推 `workflow` 文件后，**必到 GitHub `actions/workflows` 接口核「是否被注册」**：
+         本地 `yaml.safe_load` 通过 ≠ GitHub 接受（GitHub 侧校验更严，本次 heredoc 缩进本地 PyYAML 也不报错）。
+    updated: "2026-09-25 07:45"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: trading-day-gate-predeps-fallback
+    priority: P0
+    owner: shared
+    status: pending-verify
+    what: >-
+      2026-09-25（中秋休市，上交所〔2026〕22号：09-25~09-27 休市）实测：cn_fetch 主链的**交易日闸门失效**，
+      休市日仍判「交易日」并全量抓取，且 **V8_DATA_DATE 被错标为休市日当天**。两处证据同源于**同一步序缺陷**：
+      `v8_cn_fetch_cloud.yml` 的 step4「🗓 解析数据日期」(`python -c "import v8_date; print(v8_date.today_data_date())"`)
+      与 step6「🛡 交易日历闸门」(`python algorithms/check_trading_day.py`)，**均排在
+      step7 `actions/setup-python@v5` / step8「📦 安装依赖」(`python -m pip install akshare pandas requests`) 之前**。
+      而 `algorithms/fetch_lhb.py:9` 是**顶层** `import akshare as ak`（`v8_date._is_trading_day_impl` 恰是
+      `from fetch_lhb import is_trading_day`）⇒ 两步运行时 akshare 尚未安装 ⇒ 导入必失败 ⇒ `v8_date` 的
+      `except Exception` **静默**兜底 `d.weekday() < 5` ⇒ **周五（09-25）恒判交易日**、`today_data_date()`
+      不回退 ⇒ 返回 2026-09-25。逐字（run #2236 / id 36097381571、job `fetch`、CST）：
+      step4 输出 `📅 数据日期=2026-09-25` → `V8_DATA_DATE: 2026-09-25`（其后 30 个 step 全继承）；
+      step6 输出 `is_trading_day=true` / `proceed=true  (交易日 或 周末周度/手动全量)`。
+      反证（同一 run 里另一套日历判对）：step25「云端兜底调度」逐字
+      `算法链: 非交易日（2026-09-25 13:09），跳过算法链派发`；`guard_v8_freshness._HOLIDAY_RANGES_2026`
+      亦含 `("2026-09-25","2026-09-27")`，本机守卫实测报「交易日: 否」⇒ **同一时刻两套日历结论相反**。
+      同族既有记录：`cnfetch-empty-shell-block` 的 note 已记「`_MAKEUP_DAYS_2026` vs `v8_date→fetch_lhb`
+      对 09-20 结论相反」（补班日方向）；**本项是其镜像方向（工作日休市日）且根因不同（前置依赖缺失）**。
+    impact: >-
+      · **数据日期真实性（宗旨①）**：休市日当天所有经 V8_DATA_DATE 打戳的产物被标成 2026-09-25。
+        实测扫描 `data/*.js`（113 个）：**61 个**含 `2026-09-25`；日期字段口径命中
+        `date=2026-09-25` **581 处** / `enter_date` **358 处** / `close_date` **30 处** / `entry_date` 6 处 /
+        `last_date` 3 处（例：`data/CANDIDATE.js` 的 `"metrics":{...,"date":"2026-09-25"}`、`"last_seen":"2026-09-25"`）
+        ⇒ 与设计（休市日沿用上一交易日 09-24）相反，是 `v8_date` 自身兜底造成的「冒充今日」。
+      · **纯浪费的配额与算力**：休市日 cn_fetch 今日仍 **50 档**（48 档 `workflow_dispatch`），04:43→13:11 CST 近乎不停；
+        单档时长中位 ≈2.5min、合计 ≈145 min；每档用逐文件 `POST /git/blobs` ⇒ 直接叠加
+        `cnfetch-api-quota-403-exhausted`(P1) 的配额消耗（休市日属**纯浪费**）。
+      · **时间敏感**：若不在 **09-30** 前修复，10-01~10-07 连续休市日将重复同样的错标与空转。
+    fix: >-
+      （A）**根因修（推荐；属 workflow 车道 ⇒ 建议小九落码）**：把 `actions/setup-python@v5` 与「📦 安装依赖」
+      **上移到 step4「🗓 解析数据日期」之前** —— 依赖就位后 `fetch_lhb` 可导入、akshare 日历可用，
+      step4/step6 自动恢复正确口径，**无需新增任何日历表**。注意 step id（`gate`/`cat`/`td`）不变、仅调顺序；
+      并同步核查 `v8_cn_fetch_cloud_hosted.yml` / `v8_cn_fetch_cloud_selfhosted.yml` 及其它
+      「在安装依赖之前解析数据日期」的 workflow 是否同型。
+      （B）**兜底加固（可与 A 并行）**：`v8_date._is_trading_day_impl` 的兜底当前是裸 `weekday()<5`，
+      建议改为「日历不可用时**不再断言『是交易日』**」（如判「未知 ⇒ 沿用上一交易日」并打印显式告警），
+      避免再静默产出假今日。⚠️ **不建议**再新增第 6 份硬编码节假日表（本仓 `_MAKEUP_DAYS_2026` 已复刻 4~5 文件，
+      与去碎片化方向相反）；若确需静态兜底，必须复用**同一权威源**。
+      ⚠️ 本轮为监听巡检轮（detect+dispatch），**阿狸咪未改任何代码**，仅登记并交出。
+    verify_how: >-
+      ① 修复后取任一**工作日盘中** run：step4 应输出当日 `📅 数据日期=`、step6 `is_trading_day=true`（本就应 true），
+      并以 **step4 耗时**做旁证（应出现网络日历拉取量级 >300ms，而非当前的 ~40ms）；
+      ② **休市日判据（下次中秋/国庆）**：step4 `📅 数据日期=` 必须**回退为上一交易日**、step6 `proceed=false`、
+      step9「📡 抓中国数据」= **skipped**；cn_fetch 当日档数应降至个位；
+      ③ 「假今日」归零：扫描 `data/*.js` 的 `date`/`enter_date`/`close_date`，不得出现休市日；
+      ④ 禁以「run success」当判据 —— 休市日空转的 run 同样是 success。
+    evidence: >-
+      阿狸咪的工程师 2026-09-25 13:0x~13:2x CST 独立取证（一律远端 API，非本机副本）：
+      · run `36097381571`（#2236、13:09:32 CST、success）job `fetch` 的**真实步骤序**（`/jobs` API 取 started_at）：
+      `4 🗓 解析数据日期` → `6 🛡 交易日历闸门` → `7 setup-python` → `8 📦 安装依赖`（同秒 05:09:48/49 UTC）。
+      · 同 run 日志逐字：`📅 数据日期=2026-09-25`、`is_trading_day=true`、`proceed=true`、
+      `算法链: 非交易日（2026-09-25 13:09），跳过算法链派发`。
+      · 步耗时旁证：step4 命令行 `.0658Z` → 输出行 `.1080Z` = **42 ms**（真拉 akshare/sina 日历不可能完成）。
+      · 代码：`algorithms/fetch_lhb.py`（blob `017a36eaf8`）L9 `import akshare as ak`；
+      `v8_date.py`（blob `35bfbe8d2f`）`_is_trading_day_impl` 静默 except + `d.weekday() < 5`；
+      `algorithms/check_trading_day.py`（blob `703c906dcb`）同样经 `v8_date`；
+      `v8_cn_fetch_cloud.yml`（blob `34138e58`）L418 `python -m pip install akshare pandas requests`。
+      · 本机复现（移走 fetch_lhb 依赖后）：`v8_date.is_trading_day('2026-09-25')` → **True**；
+      `v8_date.today_data_date()` → **2026-09-25**。
+      · 产物扫描：113 个 `data/*.js` 中 61 个含 `2026-09-25`（`date=` 581 处，实例见 impact）。
+      ⚠️ 诚实标注残余不确定：`v8_date` 的兜底 except **不打日志** ⇒ 未取到 ImportError 的逐字；
+      但「步骤序 + 顶层 akshare 依赖 + 42ms 步耗时 + 本机复现」四条旁证同向，且唯一替代解释
+      （sina 日历把 09-25 列为交易日）与 step25 的「非交易日」结论及 `_HOLIDAY_RANGES_2026` 均矛盾。
+    alimi_verify_20260925_1345: >-
+      ── 阿狸咪的工程师 2026-09-25 13:3x CST 追加（同批只读取证 · 第 2 次提交）──
+      🔴 **影响面第 2 处（已验证）：`v8_build_deploy` 的 gate 走同一套判定 ⇒ 休市日成「门禁盲区」。**
+      · `v8_build_deploy.yml`（blob `ab8738551fd8`）gate job：step3 `python algorithms/check_trading_day.py || true`
+        为**同源误判**；step4 时钟判据在 13:21 ⇒ `TR=1`；`IF_TD="${{ steps.td_run.outputs.is_trading_day }}"`
+        展开后 = `true` ⇒ 短路二（`IF_TD=false ⇒ TR=0`）**不触发** ⇒ `trading=true`。
+      · 逐字（run #8239 = 阿狸咪本轮 push 档、13:21:xx CST）：gate step3 `📅 2026-09-25 is_trading_day=true`；
+        step4 `🕒 当前北京时间 13:21 → 交易时段=YES`；`build` job = **skipped**
+        （其 `if: needs.gate.outputs.trading != 'true' && …`）。
+      · 后果：休市日 09:25–11:30 / 13:00–14:59 的**所有** push 档，`build` 一律 skip ⇒
+        `🛡️ Pre-deploy audit`（含 `[10/10]` index 核心标记守卫、`[13/13]` 交接状态源守卫）与
+        `📤 部署到 main` **同时不执行** ⇒ 该时段门禁与部署双缺位（而 GitHub 自带
+        `pages build and deployment` 仍随 push 发布）—— 属需 owner 拍板的完整性缺口。
+      · 反向副作用：同一判定使 `intraday_patrol`（`if: needs.gate.outputs.trading == 'true'`）在休市日**照常启动**
+        并去补派盘中链，本轮逐字：`✅ v8_cn_fetch_intraday_lemoncat.yml → HTTP 204`、
+        `✅ v8_intraday_snapshot.yml → HTTP 204`、`[FAIL] v8_algo_intraday_lite.yml run=0
+        产物 ALGO_TRACK.js STALE(679.5min)` ⇒ 休市日空转再叠加。
+      · 修法提示：本项 fix(A)（setup-python / 安装依赖 上移）**同时**修好本处（gate 亦调 `check_trading_day.py`）。
+      🛠 **自查纠错（防误报留痕）**：我初见 CI 日志的 `IF_TD="true"` 一度疑为**硬编码死代码**；
+        经核 `v8_build_deploy.yml:295` 源码 = `IF_TD="${{ steps.td_run.outputs.is_trading_day }}"`（**非硬编码**，
+        日志是表达式**展开后**的行）⇒ 结论改判为「值取自 step 输出，因同一兜底缺陷而为 true」。
+        留此条以免后来者据错判施工。
+    alimi_evidence_20260925_1910: >-
+      **阿狸咪 2026-09-25 18:0x CST 追加同族证据（只读巡检，未改代码）——同一文件内两套日历口径自打架**：
+      - 🔴 `guard_v8_freshness.py`（blob `2ad246ef49`）内并存两套不一致实现：
+        · `_is_trading_day()`（L113-121）用 `_HOLIDAY_RANGES_2026` + `_MAKEUP_DAYS_2026`，**认节假日**；
+        · `last_trade_day_close()`（L569-580）**只回退周末** `while d.weekday() >= 5`，**完全不看节假日**。
+        ⇒ 2026-09-25（中秋休市）实测二者结论打架：线上 `data/FRESHNESS_STATUS.js` 同时输出
+        `is_trading_day:false` 与 `last_trade_close:"2026-09-25 15:30:00"`（一个**不存在的收盘**）。
+      - ✅ **今日实测无影响 ⇒ 属 latent，禁当事故**：`check_group` L676「非交易日 + 阈值<24h ⇒ 跳过」使 <24h 模块豁免；
+        ≥24h 模块走 `trading_days_between(ts.date(), close.date())`，而 09-25 本身非交易日不计数 ⇒ 复核 43 模块
+        `core_stale/warn_stale/frozen_stale` 全 0，结论正确。
+      - ⚠️ 两个潜在雷（供 fix(A) 落地时一并考虑）：
+        ① `_MAKEUP_DAYS_2026`（本文件 L107，**在册「4 文件」之一，本轮确认在列**）把 **10-10（周六）** 判为交易日 ⇒
+           `is_trading=True` 使 <24h 豁免失效，而 `close` 仍回退到周五 ⇒ 阈值口径错位；
+        ② 本项 fix 建议「回落守卫同源的静态权威日历（`_HOLIDAY_RANGES_2026`/`_MAKEUP_DAYS_2026`）」——
+           须**同时改 `last_trade_day_close()` 改用 `_is_trading_day()`**，否则新源救不了这处，且会把两套口径一并复刻。
+    alimi_verify_20260925_1450: |
+      ── 阿狸咪的工程师 2026-09-25 14:4x CST 独立复核（13:2x 登记之后的**第二条独立证据链**；全部取远端 API，非本机副本）──
+      ✅ **A. 根因三条独立命中**（与登记内容一致，可作终验依据）：
+      ① 远端 `algorithms/fetch_lhb.py` L9 逐字 `import akshare as ak`（**顶层**、无 try 包裹）⇒ setup-python/安装依赖之前 import 该模块必 ImportError；
+      ② 远端 `v8_date.py` `_is_trading_day_impl`（L37–L45）逐字：`try: from fetch_lhb import is_trading_day … except Exception:` → **静默** `return d.weekday() < 5` ⇒ 2026-09-25（周五）恒 True；
+      ③ **步骤序实测**（run #2265 / id 36102141929、job `fetch`、success）：`4 🗓 解析数据日期` 14:16:59 → `6 🛡 交易日历闸门` 14:16:59 → `7 actions/setup-python@v5` 14:16:59 → `8 📦 安装依赖` 14:17:00 ⇒ **解析/闸门确实先于依赖安装**；同 run `9 📡 抓中国数据 → raw_data/` 结论 = **success（未 skipped）** ⇒ 休市日空转抓取确凿。
+      🔴 **B. 修复方案补正（新增，登记内容未覆盖）——fix(A) 单靠「依赖上移」不足以防复发**：
+      远端 `fetch_lhb.py::is_trading_day()` 末端是**二阶兜底**：`cal = _get_trade_cal()`（`ak.tool_trade_date_hist_sina()`，24h 缓存）；若 `cal is not None` 则 `return d.strftime("%Y-%m-%d") in cal`；**否则 `return True  # 查不到日历时保守：视为交易日（不写占位）`**。
+      ⇒ 即便依赖就位，只要新浪日历拉取失败/超时（跨境网络，本仓高频），**仍回落为「交易日」** ⇒ 同样产出「假今日」。
+      ⇒ **fix(A) 需搭配**：把 `_get_trade_cal()` 失败路径由「默认 True」改为「**回落守卫同源的静态权威日历**」（复用本仓既有 `guard_v8_freshness._HOLIDAY_RANGES_2026` / `_MAKEUP_DAYS_2026`，**不得再造第 6 份硬编码表**），或至少改为**抛错/显式告警**而非静默 True。可判据：修复后断网情形下 `v8_date.is_trading_day('2026-10-01')` 必须为 False。
+      📉 **C. 空转规模实测（比登记值更大）**：`GET /repos/…/actions/workflows/327687211/runs?created=2026-09-24T16:00Z..2026-09-25T15:59Z` ⇒ `v8_cn_fetch_cloud` 今日（CST 09-25 00:00–14:5x）**82 档**；另 `v8_cn_fetch_intraday_lemoncat` 今日 **13 档** ⇒ 休市日合计 **≥95 档**全量空转（每档逐文件 `POST /git/blobs` ⇒ 叠加配额消耗）。与登记值「50 档（至 13:11）」不矛盾，属同一趋势的后续实测。
+      🏷 处置：`owner` 维持 shared，**fix(A) 属 workflow 车道**（本机 fine-grained PAT 对 `.github/workflows/**` 必 403）；本轮 14:4x 处**小九白天独家时段（7:45–17:45）** ⇒ 阿狸咪**不动代码、不派发**，仅补证 + 补正方案，交小九落码（时限：09-30 前，否则 10-01~10-07 连休复现）。
+    alimi_fix_20260925_1959: >-
+      ── 阿狸咪的工程师 2026-09-25 19:4x~20:0x CST **已根治并线上验证**（阿狸咪夜间窗口；5 笔提交）──
+      🔴 **双因**：①登记中的步骤序缺陷 ②**本轮新查明**「静态日历兜底源不可达」——
+        该表当时只存在于 `guard_v8_freshness.py`，而其顶部 `from update_v8 import ...` ⇒ 在
+        不装第三方库的轻量 job（`build_deploy` gate）与依赖未装的早期步骤里 **import 不进来** ⇒ 兜底形同虚设。
+      🛠 **5 笔**：①`52b01b8b7b6a` cn_fetch 步骤序（setup-python + 安装依赖 上移；步骤数 28 不变）
+        ②`1f496c492974` 新增零依赖 `v8_calendar.py` ③`24eac5f82ac1` `v8_date` 兜底改回落 v8_calendar
+        ④`85f109d50ef4` `fetch_lhb` 二阶兜底 `return True` → 回落 v8_calendar
+        ⑤`341d6c055f96` `v8_build_deploy` gate 的 sparse-checkout 补 `v8_calendar.py`（否则 gate 仍读不到）。
+      ✅ **线上逐字**（run `#2288` / id `36129677046` / head `52b01b8b7b6a`，job `fetch`=success）：
+        `📅 数据日期=2026-09-24`（**已回退**）/ `V8_DATA_DATE: 2026-09-24` / `is_trading_day=false` /
+        `proceed=false (工作日遇节假日，跳过冗余抓取)` / 「📡 抓中国数据」= **skipped** ⇒ verify_how ①②③ 达成。
+      ✅ **本机对照**（零第三方库最小树）：09-25 / 10-01 / 10-07 → False（修复前 True）；
+        09-28 / 10-08 / 2027-03-01 → True；12/12 断言通过；`fetch_lhb` mock（`_get_trade_cal→None`）亦 False + 显式告警。
+      ⏳ **待验（未宣称已完成）**：①`data/*.js` 61 处「假今日 2026-09-25」**未手工回改**，待 09-28 post_close 自然覆盖
+        ②`build_deploy` gate 线上（sparse 补丁后）待下一次 push 自然触发验证
+        ③`guard_v8_freshness` 内同名常量待合流（值已逐字同源；⚠️ `_MAKEUP_DAYS_2026` 不得用于交易日判定）。
+      📄 交接件：`docs/ops/handover/2026-09-25_1958_阿狸咪的工程师给小九_P0交易日历闸门失效已根治_线上逐字验证通过.md`
+    alimi_verify_20260925_2054: >-
+      ── 阿狸咪的工程师 2026-09-25 20:3x~20:5x CST 独立复核（本项第 3 条独立证据链；全程远端 API，未用本机副本）──
+      ✅ **A. 修复线上逐字复验通过**（独立于 1959 档的自证）：5 笔提交远端可达
+      （`52b01b8b7b6a` / `1f496c492974` / `24eac5f82ac1` / `85f109d50ef4` / `341d6c055f96`）；
+      `v8_calendar.py` 远端在位（blob `5d72b8ecd005` / 2816 B）。run `#2288`（id `36129677046`）job `fetch`
+      **真实步骤序**（`/jobs` API）：`4 setup-python` → `5 📦 安装依赖` → `6 🗓 解析数据日期` →
+      `8 🛡 交易日历闸门` → **`9 📡 抓中国数据` = skipped**；日志逐字 `📅 数据日期=2026-09-24`、
+      `is_trading_day=false`、`proceed=false (工作日遇节假日，跳过冗余抓取)` ⇒ 登记 verify_how ①② 由本轮**独立**达成。
+      🔴 **B. verify_how ③ 判据必须细分（本轮新增，防下一位验证者误判「修复未生效」）**：
+      ③ 现文「扫描 `data/*.js` 的 `date`/`enter_date`/`close_date`，不得出现休市日」**不可机械执行**。实测远端
+      残留 `2026-09-25` 分三类：① **观察/成员表日（非行情日，非缺陷）** —— `data/CANDIDATE.js` 581 处
+      `metrics.date` 源自 `algorithms/build_candidate_pool.py:1192` 的 `today_date = time.strftime("%Y-%m-%d")`
+      （自然日），经 `_merge_membership()` → L1251 `v["metrics"]["date"] = today_date` 写入，`last_seen` 363 /
+      `first_seen` 3 同源 ⇒ 语义是「成员表观察日」，**不是** `v8_date` 打戳；② **纯构建戳（非数据日）** ——
+      `update_time`/`republish_time` = 09-25 属当日真实构建时刻，应排除；③ 🔴 **真·残留假今日（algo 侧）** ——
+      `data/CRDS_CARD_DATA.js` `enter_date` **334 处** = 09-25 且 `data_time:"2026-09-25 15:30:00"`
+      （update_time `2026-09-25 02:33:07`）；`data/FINAL_RECOMMEND_DATA.js` `close_date` 30 / `enter_date` 24 /
+      `entry_date` 6（`2026-09-25 03:01:12`）；`data/TRIPLE_CONSENSUS.js` `data_time:"2026-09-25 01:56:44"`
+      （`2026-09-25 02:31:28`）。三份 update_time 均在 **02:31~03:01 CST（早于修复落码 19:29）**。
+      ⇒ 建议把 ③ 改为「扫描面限定**行情数据日字段**（`data_time`/`close_date`/行情类 `date`），并显式排除
+      成员表观察日（`metrics.date`/`last_seen`/`first_seen`）与构建戳（`update_time`/`republish_time`）」。
+      ⏳ **C. 09-28（周一）唯一硬判据**：algo 链 post_close 重跑后，上表 ③ 三份产物的 `data_time`/`close_date`/
+      `enter_date` 应**自然归零为 09-28**（或保留 09-24）；若仍出现非交易日日期 ⇒ 说明 **algo 侧日期源另有出处
+      （非 `v8_date`）**，本项 5 笔修复未覆盖，须另开项。
+      ⚠️ 本轮为监听巡检轮：只读 + 本条追加；未改任何代码/阈值，未动 `index.html`/`logic.html`/`data/`/
+      `raw_data/`/`.github/**`。
+    alimi_gate_online_20260925_2101: >-
+      ── 阿狸咪的工程师 21:01 CST **追加（第 4 条证据链）：影响面第 2 处「休市日门禁盲区」已在线闭环** ──
+      本项 `alimi_verify_20260925_1345` 登记的「休市日 gate 误判 ⇒ `build` job skipped ⇒ `Pre-deploy audit` 与
+      `部署到 main` 双缺位」+「`intraday_patrol` 反而照常启动补派」——属本项 ⏳ 待验第 ② 条。**本轮由阿狸咪的
+      一次正常 push 自然触发并实测闭环**（run `#8271` / id `36137814345` / head `3041fe970dee`，push 事件）：
+      · `gate` job = **success**；`build` job **不再被跳过**（`in_progress`→后续 step9~13 全 success）；
+      · `build` step10 **🛡️ Pre-deploy audit = success**（含 `[10/10]` index 核心标记守卫、`[13/13]` 交接状态源守卫）；
+      · `build` step13 **📤 部署到 main = success**（本档无推送竞态）；
+      · `intraday_patrol` job = **skipped**（休市日不再空转补派盘中链）。
+      ⇒ 与修复前逐字对照（`alimi_verify_20260925_1345`：休市日 `build`=skipped + `intraday_patrol` 跑并 `HTTP 204`）
+      **结论完全反转** ⇒ 影响面第 2 处判为**已闭环**（由 fix(A)+fix(B) 与 `341d6c055f96` 的 gate sparse-checkout 补丁共同达成）。
+      ⚠️ 剩余未闭环项仍是本项 ⏳①（`data/*.js` 残留假今日，见 `alimi_verify_20260925_2054` 的三类细分与 09-28 判据）
+      与 ⏳③（`guard_v8_freshness` 同名常量合流）。
+    updated: "2026-09-25 21:00"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: heartbeat-files-clobbered-by-cnfetch
+    priority: P1
+    owner: shared
+    status: todo
+    what: >-
+      🔴 双机心跳的**唯一载体** `raw_data/hb_alimi.json` / `raw_data/hb_xiaojiu.json` 会被 cn 侧 raw 回推
+      用**陈旧副本**顶掉 ⇒ 其 `last_time` **非单调回退** ⇒ 云端 build 据它重生成的 `data/HB_ALIMI.js` /
+      `data/HB_XIAOJIU.js` 同步回退 ⇒ `v8_peer_monitor` 的 `check_alimi_alive()` / `check_xiaoju_alive()`
+      读到超阈 ⇒ **误判「机器掉线」**（阈值 `PEER_FAILOVER_THRESHOLD_MIN=180`，日历分钟，**无节假日/回退豁免**）。
+      现象是「心跳倒退」，不是「心跳停跳」——发送侧一切正常，是**发布层被顶掉**。
+    impact: >-
+      · **信任通道被污染**：心跳是双机「对方是否活着」的唯一判据；回退即把「活着」显示成「死了」
+        ⇒ down 判定 / 派发 / 交接决策失真，并可能外发「机器掉线」告警邮件（纯噪音）。
+      · **不是理论风险（已实测发生）**：`v8_peer_monitor` 2026-09-25 15:07:13 档判 `al=down`
+        （`alimi.silent_min=200.2 / last_time=2026-09-25 11:47:03`），而阿狸咪发送侧**实际正常** ——
+        `~/.workbuddy/v8_alimi_heartbeat.state.json` = `last_time 2026-09-25 13:53:20 / status ok`，
+        且远端存在对应提交 `2e4dc62488`「data: 阿狸咪心跳上报 20260925-1353」。
+      · **同族悬案的最优解释**：2026-09-24 观测到的「`HB_XIAOJIU.last_time` 非单调倒退 ~10.5h」
+        与本项同一机制（见 evidence 小九侧逐笔），可直接并入本项结案。
+    fix: >-
+      待 owner 拍板（本轮**未改任何代码**：15:4x 处小九白天独家时段，且推送器属 cn runner 车道）：
+      ① **最小**：把 `last_time` 纳入 `api_push_raw.py` 的防倒退时间戳白名单 ——
+         `_TS_KEYS`（L568）与抽取正则（L584）**两处必须同改**；
+         并核 `_NO_REGRESSION_GUARD`（累积继承型豁免表）**不得**豁免这两份心跳文件。
+      ② 或按 `api-push-stale-base-index-clobber` 的 `_SKIP_LOCAL_PUSH` 范式：心跳文件**本地副本永不入队**，
+         改由发送侧「取远端正文 + 只改 `last_time`」后随本提交原子落地。
+      ③ **结构性（与①②正交）**：cn 侧推送前对 `raw_data/hb_*.json` 做**单调性硬前置** ——
+         新值 < 远端旧值即**拒推 + 显式告警**（宁可不推，绝不倒退）。
+      ⚠️ 治本还须定位「陈旧副本从哪来」，候选：① `walk_raw()` 回退路径 os.walk 本地 `raw_data/` 全量入队；
+        ② cn runner 工作区对 `raw_data/hb_*.json` 无 fetch/reset ⇒ 停留在上一次同步值。
+    verify_how: >-
+      ① 静态：`grep -n "last_time" api_push_raw.py` 在 `_TS_KEYS` 与抽取正则**两处**均有命中（给出逐字）；
+      ② 动态：连续 ≥2 个交易日，`GET /repos/…/commits?path=raw_data/hb_alimi.json`（及 `hb_xiaojiu`）
+         的 `last_time` **单调不减**（给出两机各自的逐笔序列）；
+      ③ 副作用：不再出现「回退后 `silent_min` 突跳超阈」型 down 判定 / 告警。
+    evidence: >-
+      · **阿狸咪侧逐笔**（`GET contents/raw_data/hb_alimi.json?ref=<sha>`，全部取远端 API，非本机副本）：
+        `ab5f25634f` 08:44:43 → 08:44:43 ｜ `8b0d4dc7e3`（cn fetch 10:53:07）→ **06:43:25（回退 2h1m）**
+        ｜ `b65d8549b2` 11:47:03 ｜ `2e4dc62488`（心跳上报 13:53:20）→ 13:53:20
+        ｜ `a153059f08`（cn fetch 14:32:03）→ **11:47:03（回退 2h6m）**。
+        该提交 check-runs = `fetch`(success) + `intraday_slot`(cancelled) + build/deploy
+        ⇒ **写入方 = cn fetch 链的 raw 回推**（提交信息 `v8 cn fetch: HH:MM` 是 `api_push_raw.py` 的
+        **共用默认消息**，不可据此细分到具体链）。
+      · **落地放大（同一链路上的二次伤害）**：`data/HB_ALIMI.js` 在 `a153059f08` 时 = `last_time 13:53:20`
+        （`update_time` 14:16:58），但在 `6ecc836f91`（build 15:16）时 = **`last_time 11:47:03`**
+        ⇒ 云端据被顶掉的 raw **重新生成并回退落地**，前端与监控面看到的即倒退值。
+      · **小九侧同族**：`276adf7725`（心跳上报 14:48:04）→ `78883d7a16`（cn fetch 15:11）**02:04:32（回退 12h44m）**
+        → `b57d144439` 16:41:35 → `c5dbe07aac`（cn fetch 16:58）**16:41:35（回退 11min）** → `20cf35cc1e` 17:53:49。
+      · **守卫盲区（代码级硬证）**：`api_push_raw.py` L568
+        `_TS_KEYS = ("update_time", "gen_time", "calc_time", "run_time", "fetch_time", "snapshot_time")`、
+        L584 `rb'"(?:update_time|gen_time|calc_time|run_time|fetch_time|snapshot_time)"'`
+        ⇒ **两份心跳文件只含 `last_time`，守卫取不到基线时间戳** ⇒ 「防倒退闸」静默放行
+        （L1079–L1122 按 `_content_ts` 是否存在决定是否比对）。
+      · **旁证**：`raw_data/_peer_monitor_state.json` 15:07:13 档
+        `runner=v8_peer_monitor / host=CAT / threshold_min=180 / interval_min=63`，
+        `xiaoju.silent_min=1273.4`（休市日设计，已知误报类）与 `alimi.silent_min=200.2`（本项）。
+    updated: 2026-09-25 15:35
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: cn-singleflight-ghpat-missing-401
+    priority: P0
+    owner: shared
+    status: pending-verify
+    what: >-
+      `v8_dajijin_fetch.yml` 与 `v8_lhb_fetch.yml` 都引用 `secrets.GH_PAT`，但**该 secret 根本不存在**
+      （实测 `GET /repos/ah-quant999/quant-scanner-v8/actions/secrets` 只登记
+      `MAHORO_COOKIE` / `V8_GH_TOKEN` / `ZSXQ_TOKEN`）⇒ 模板解析为空 ⇒ 脚本内
+      `'Authorization' = "Bearer $env:GH_PAT"` 变成 `Bearer `（空）⇒ Contents API **一律 401**。
+      两条链都把失败写成非阻塞告警 ⇒ **run 恒 success = 假绿**，数据链实际全死。
+    impact: >-
+      · **dajijin 链**（`data/DAJIJIN_REDUCTION.js`）：step0 三步全部 401（run #3 日志逐字
+        `[warn] API fetch failed for …: 远程服务器返回错误: (401) 未经授权。`）⇒ 退化为使用
+        runner 工作区里的**陈旧本地副本**；step2 因取不到 token 打印
+        `[warn] 无 GH_PAT ⇒ 保守判定为需要推送`；step3 `scripts/api_put_file.py` 读
+        `GITHUB_TOKEN`/`GH_TOKEN` 亦为空 ⇒ `exit 1` ⇒ 但该步 `continue-on-error: true`
+        且内部只 `Write-Host` 告警 ⇒ **run 仍报 success**。产物自 2026-09-23 19:43 **冻结 2 天**。
+      · **lhb 单飞链**：step0 同步 401 后退回本地副本（脚本自述 `using local copy (LHB may be stale)`）；
+        step3 跑 `python api_push_raw.py --only lhb` 但**整个 step 无 `env:`** ⇒ `api_push_raw.py`
+        L33-35 取不到 `GITHUB_TOKEN`/`GH_TOKEN` ⇒ `❌ 缺少 GITHUB_TOKEN; sys.exit(1)` ⇒
+        被 `|| Write-Host "api_push_raw failed, non-blocking"` 吞掉 ⇒ run 恒 success。
+        （注：龙虎榜线上数据由主链 `v8_cn_fetch_cloud` step10 供给，故本链长期假绿未被察觉。）
+      · **同族面**：本仓 4 处「失败被写成非阻塞 ⇒ 假绿」的写法已在本项与
+        `vn-softfail-swallow` 家族登记；**判健康只读产物 update_time，禁读 run/step 结论**。
+    fix: >-
+      **已修（阿狸咪 2026-09-25 17:0x CST，提交 `87fe569b43d7`）**：
+      ① `secrets.GH_PAT` → `secrets.V8_GH_TOKEN`（仓内既有、另 6 条链在用）；
+      ② 给两个 python 推送助手补 `GITHUB_TOKEN` / `GH_TOKEN` 环境映射
+         （dajijin step0/step2/step3 三处、lhb step3 一处）。
+      ⏳ **未做（留 owner 裁决）**：是否把「推送失败」从非阻塞改为阻断
+      （现写法是设计选择：失败留给下轮补推；代价是假绿）。
+    verify_how: >-
+      ① **dajijin 侧已达成**：run **#4**（head `87fe569b43d7`）step2 日志逐字
+      `[ok] fetched algorithms/fetch_dajijin_reduction.py (11313 bytes)` ×3、
+      `env: GH_PAT: *** / GITHUB_TOKEN: ***`（非空）⇒ 同步恢复；产物远端
+      `data/DAJIJIN_REDUCTION.js` `update_time` **2026-09-23 19:43 → 2026-09-25 17:05**，
+      提交 `7dcfcd53d6ab`「data: dajijin reduction monitor refresh (2026-09-25 17:05 CST)」；
+      独立解析产物 = `records` 14 条 / `summary.total=14` / `errors=[]`（与 run 日志一致）。
+      ② **lhb 侧待验**：等 17:30 CST 的 `schedule` 档（或单发 `workflow_dispatch`）⇒ 断言
+      step0 日志出现 `fetched algorithms/fetch_lhb.py from origin/main`（不再有 401 warn），
+      且 step3 无 `❌ 缺少 GITHUB_TOKEN`。
+      ③ **静态判据**：`grep -c 'secrets\.GH_PAT' .github/workflows/*.yml` 恒为 **0**（注释除外）。
+      ④ 反测：把 `V8_GH_TOKEN` 临时清空应重新出现 401 ⇒ 证明因果链（**勿在生产仓库做**）。
+    evidence: >-
+      · 远端 secret 名单（09-25 17:0x 实测）：`MAHORO_COOKIE`(08-08) / `V8_GH_TOKEN`(08-05) /
+        `ZSXQ_TOKEN`(08-17)，**无 GH_PAT**。
+      · run #3（head `86a7f056a1e9`）job `108010272712` 日志：step0 三条 401 +
+        step1 `[ok] data/DAJIJIN_REDUCTION.js ready` + step2 `[warn] 无 GH_PAT ⇒ 保守判定为需要推送`
+        + step3 `[warn] push failed (non-blocking; retried next round)`，而 **run 结论 = success**。
+      · 修复后 run #4（head `87fe569b43d7`）job `108011527944`：三步全 401 消失、产物落地并推送成功。
+      · **假绿判据（本项核心）**：`v8_lhb_fetch` 最近 12 档 run 结论全 `success`、无任何失败步，
+        而其 step3 的 `api_push_raw.py` 因缺 token 必然 `exit 1` ⇒ **step 结论不可作为健康判据**。
+    alimi_verify_20260925_1910: >-
+      **阿狸咪 2026-09-25 18:0x CST 独立复核（只读）——静态判据达标，动态复验的「17:30 档」前提被证否**：
+      - ✅ **verify_how ③ 静态判据已达成**：全仓 34 个 workflow 逐个抓 `secrets.GH_PAT`，**活引用 0 处**；唯一命中是
+        `v8_lhb_fetch.yml` L68 的**说明性注释**（"原 secrets.GH_PAT 不存在 ⇒ 401"），L72 已改 `GH_PAT: ${{ secrets.V8_GH_TOKEN }}`
+        （L141-142 亦为 V8_GH_TOKEN）；`v8_dajijin_fetch.yml` 的 `secrets.GH_PAT` 计数为 **0**、`V8_GH_TOKEN` 6 处。
+      - 🔴 **verify_how ② 的前提纠错**：写「等 17:30 CST 的 `schedule` 档」不成立 —— 实测该链 `schedule` 只在
+        **CST 21:36–23:58** 触发（近 18 档无一例外），详见新增 item `cn-singleflight-schedule-trigger-offset`。
+        故本项**维持 `pending-verify` 不动**，lhb 侧动态复验顺延至**今晚 ~22:00 之后**。
+      - ✅ dajijin 侧维持已达成（本机独立复读线上 `data/DAJIJIN_REDUCTION.js` `update_time` = **2026-09-25 17:05**，
+        与 verify_how ① 记录一致，非伪造时间戳）。
+    updated: "2026-09-25 18:08"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: cn-runner-ps1-utf8-noBOM-gbk-parse-fail
+    priority: P1
+    owner: shared
+    status: pending-verify
+    what: >-
+      **cn runner 上的 Windows PowerShell `run:` 块严禁出现非 ASCII 字符。** 机制（已到字节级）：
+      cn runner 是 Windows 且系统码页为 **GBK(936)**，而 GitHub Actions 把 `run:` 写成的临时 `.ps1`
+      是 **UTF-8 无 BOM**；Windows PowerShell 5.1 对无 BOM 脚本**按 ANSI(GBK) 解码** ⇒
+      多字节字符的**尾字节会「吃掉」紧随的那个字节**（引号 0x22 或换行 0x0A 都在 GBK 尾字节合法区间
+      0x40–0xFE 之外 ⇒ 解码器把该 2 字节对整体替换掉）⇒ 后果分两级：
+      · **解析期硬失败**：被吃掉的是 `"` ⇒ `ParserError: 字符串缺少终止符`；
+      · **静默吞行（更危险）**：被吃掉的是换行 ⇒ 下一行代码并入上一行的注释
+        ⇒ **整条语句凭空消失、零报错、零红灯**。
+    impact: >-
+      · **已致真事故**：`v8_dajijin_fetch.yml` 4 个 run 块中 3 个解析失败 ——
+        step0 `Write-Host "[fatal] 抓取器未就位，本链无法继续"` 的收尾引号被吞 ⇒ 该链
+        **2/2 run 全部死在第 2 步「同步源码」**（run #1/#2）。
+      · **静默丢码实证**：step2 原文 8 行，cp936 解码后**只剩 7 行** ——
+        `$out = python scripts/dajijin_need_push.py 2>&1 | Out-String`
+        **整行并入上一行注释** ⇒ `$out` 恒 `$null` ⇒ `need=0` ⇒ **即使解析通过也永远不推送**。
+      · **同族潜伏面（本项主体风险）**：全仓扫描（`shell` 为 powershell/pwsh/cmd 且 `run` 含非 ASCII）
+        另有 **4 个块 / 3 个 workflow**：`v8_algo_run.yml` ×2（step0 20 行中文注释、step4 2 行）、
+        `v8_cn_fetch_cloud_selfhosted.yml` ×1（7 行）、`v8_lhb_fetch.yml` ×1（1 行）。
+        **实测这 4 个块今日解析 0 错**（被吞的都是同行注释、未命中引号/换行），
+        但**同一条字节规则随时会命中** ⇒ 属**结构性隐患**，任何一次改字都可能引爆。
+    fix: >-
+      **已修**：`v8_dajijin_fetch.yml` 三个 run 块内 10 行中文（注释 / `Write-Host` 日志 /
+      提交信息文案）**ASCII 化**，**代码逻辑零改动**（AST 命令序列比对为证）；中文原文无损保留为
+      文件尾部 YAML 注释块（YAML 由 GitHub 按 UTF-8 读、**不经 PowerShell**，故无风险）。
+      提交 `86a7f056a1e9`（parent `51ad156adb13`），blob `02299413152a`。
+      ⏳ **未做（留 owner 裁决）**：另 3 个 workflow 的 4 个同族块是否同批 ASCII 化。
+      **阿狸咪判断**：`v8_algo_run.yml` 是主算法链，为「潜伏项」动它有回归风险，
+      建议**等一次专门窗口**同批处理，而不是在巡检轮里顺手改。
+    verify_how: >-
+      **可复现命令（本机即 alimi-cn runner，故结论可复现）**：
+      ① 取远端 `run:` 块 → 替换 `${{ … }}` 表达式 → 以 **UTF-8 无 BOM** 写 `.ps1`
+         （`run.encode('utf-8')`，**勿加 BOM**）→ 用 PowerShell 5.1 解析：
+         `[System.Management.Automation.Language.Parser]::ParseFile($f,[ref]$null,[ref]$errs)`
+         ⇒ 修复前 `errs = 2/3/0/2`，修复后 `0/0/0/0`。
+      ② **静默吞行判据**：`[System.Text.Encoding]::GetEncoding(936).GetString(bytes)`
+         的**行数** < UTF-8 解码的行数（实测 step0 29→27、step2 8→7）即已吞行。
+      ③ **等价性判据**：对修复前后块提取 `CommandAst.GetCommandName()` 有序序列
+         ⇒ 现存语句必须一一对应；修复前 step2 缺 `python`/`Out-String` 即被吞证据。
+      ④ 反向判据（防回归）：仓库内任何 `.ps1`（含 `run:` 块落盘体）**非 ASCII 字符数应为 0**。
+    evidence: >-
+      · 本机实测（PowerShell 5.1.19041.2364，即 runner 同机同版本）：
+        修复前 step0 `2 err @L24 字符串缺少终止符: "`、step1 `3 err`、step2 `0 err 但丢语句`、step3 `2 err`。
+      · cp936 逐字节还原（`GetEncoding(936)`）：step0 行 24 变为
+        `Write-Host "[fatal] 鎶撳彇鍣ㄦ湭灏变綅锛屾湰閾炬棤娉曠户缁? -ForegroundColor Red`
+        —— 收尾 `"` 消失 ⇒ 字符串吞到行尾。
+      · CI 侧原始证据：run #1（`36006148888`）/ #2（`36034611514`）均
+        `FAILED STEP #2 📝 同步源码`，报 `ParserError … TerminatorExpectedAtEndOfString`。
+      · 修复后：run #3（`86a7f056a1e9`）/ #4（`87fe569b43d7`）6 步全 success，
+        且日志出现 ASCII 化后的 `[fatal] fetcher scripts not present…`（证明新码在执行）。
+    updated: 2026-09-25 17:05
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: ima-connector-unbound-enterprise-switch
+    priority: P1
+    owner: 阿狸咪的工程师
+    status: blocked
+    what: >-
+      自动化 149ad8ff（ima 强势跟踪全文快照）自 2026-09-24 起**连续 2 日取不到全文**：
+      本机 ima MCP 连接器**未绑定**，`fetch_media_content` 登录态通道不可用。
+      实测（阿狸咪 2026-09-25 17:3x CST，只读）：
+      · `~/.workbuddy/connectors/c07631a5-…/connector-states.json` 仅
+        westock-mcp / tdx-connector / github / zsxq，**无 ima-mcp**；
+      · 本机 MCP 网关 `127.0.0.1:56788` 当日全量仅 **2 条路由**（`serverInfo.name` =
+        agentmail / genie-baas-mcp），旧 ima 路径 hash `34082f66…` → **HTTP 410 Gone**（第 2 日同态）；
+      · ima-mcp 插件**配置仍在**（`~/.workbuddy/connectors-marketplace/connectors/ima-mcp/mcp.json`）
+        ⇒ 是「**未绑定**」而非「不存在」，恢复不需改仓内代码。
+      影响面：**仅本机（家机 alimi-cn）**。线上产物未受影响：`data/IMA_STRONG_STOCK.js`
+      仍 `detail_channel=full-snapshot` / `reconciled=true` / `len(stocks)=56`。
+    fix: >-
+      🔴 **须主人操作，本机 agent 无法自助恢复**：在 WorkBuddy「连接器」页**重新绑定 ima**
+      （腾讯 AI 知识管家）。绑定后本机网关会重新注册 ima 路由，本自动化即可恢复取全文。
+      背景：2026-09-23 19:18 账号切至**企业账号**（新目录 / 新 hash）⇒ 个人连接器集整体消失。
+      ⚠️ 旁路（本地 MCP 网关直连）救不了「根本没绑」，禁再绕。
+    evidence: >-
+      阿狸咪 2026-09-25 17:3x CST 实测汇总：
+      · 会话 ToolSearch **无** `mcp__ima*`；
+      · 网关 hash 枚举得 2 条路由，`initialize` 返回 `agentmail` / `genie-baas-mcp`；
+        全量试探 4 个历史 hash ⇒ ima 的旧 hash **410 Gone**，另 3 个 **401 Unauthorized**
+        ⇒ 路由确已注销（非鉴权失效）。
+      同日源侧独立核对（免登录 `get_share_info`，全库 8 文件夹穷举）：「强势股跟踪」最新一篇仍为
+      `强势股跟踪日报 2026-09-15`（file_size **27032**，与仓内快照 meta 同值）
+      ⇒ **本阻断当前未造成数据缺口**（源方亦无新篇）。
+    verify_how: >-
+      ① 主人重绑后，`connector-states.json` 的 `connectors` 键集应含 `ima-mcp`；
+      ② 本机网关 `tools/list` 应出现 `get_knowledge_list` / `fetch_media_content` 等 9 个工具；
+      ③ 本自动化下一轮应能落 `raw_data/ima_strong_stock_full.md`（纯 LF）且 `fetched_at` **真实**前进；
+      ④ 线上 `data/IMA_STRONG_STOCK.js` 的 `snapshot_age_h` 回落至 < 72
+         （= 快照被**真实**刷新，而非伪造时间戳）。
+    updated: "2026-09-25 17:36"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: cn-singleflight-schedule-trigger-offset
+    priority: P1
+    owner: shared
+    status: todo
+    what: >-
+      **声明 cron 与实际调度时刻系统性不符（约 +4~5 小时）**，两条 cn 单飞链均复现：
+      · `v8_lhb_fetch.yml` 声明 `cron: '30 9 * * 1-5'`（= 17:30 CST），近 18 档 `schedule` run 的 `created_at`
+        **全部**落在 **CST 21:36–23:58**（UTC 13:36–14:24，个别 15:07 / 15:56–15:58），**无一档在 17:30 附近**；
+      · `v8_dajijin_fetch.yml` 声明 `'30 12'`（= 20:30 CST），其**唯一**一档 `schedule` run 落在
+        **09-25 01:29 CST**（UTC 17:29，偏差 +4h59m）。
+      注：`v8_cn_fetch_cloud` / `v8_build_deploy` 近 25 档**无 `schedule` 事件**（全靠 dispatch/推送），不受本项影响。
+    impact: >-
+      · **所有「等某档复验」的判据失真**：例 item `cn-singleflight-ghpat-missing-401` 的 verify_how ② 原写
+        「等 17:30 CST 的 `schedule` 档」—— 该档实际不存在；lhb 侧修复的端到端复验只能在**当晚 ~22:00 之后**看到。
+      · 判「某链今天跑没跑 / 何时跑」**只能以 runs API 的 `created_at` 为准，禁以 workflow 文案/cron 声明为准**。
+      · 与 `intraday-schedule-morning-absent` 同族（「声明档位 ≠ 实际档位」），但本项是**无差别整体后移**，
+        与「上午档系统性缺席」根因不同，勿混为一谈。
+    evidence: >-
+      · 采样（`GET /actions/workflows/345816848/runs`，仅 `event=schedule`，CST）：#27 09-24 22:20:01 /
+        #26 09-23 22:19:47 / #25 09-22 22:07:35 / #24 09-21 23:58:57 / #23 09-18 21:44:41 / #22 09-17 22:24:19 /
+        #21 09-16 22:17:39 / #20 09-14 23:56:04；逐档 `run_started_at == created_at`（#27 均为 14:20:01Z）⇒
+        **不是**「已创建但排队等 cn runner」。
+      · 每档 `head_sha` = 该时刻 main tip（#27 head `701732440f`，其提交时间 14:15:12Z ≈ run 前 4m49s）
+        ⇒ run 确在那一刻创建，非展示层延迟。
+      · **反证非仓内改错**：`v8_lhb_fetch.yml` 自 2026-08-30 起 11 笔提交，**cron 逐版都是 `30 9 * * 1-5`**
+        （09-01 / 09-10 / 09-12 / 09-15 / 09-17 / 09-25 各版实测同一值），从未出现 `30 13`/`30 14`
+        ⇒ 排除「改过 cron 而 GitHub 沿用旧注册」。
+      · 对照（同仓其他链）：`v8_health_patrol`（`8,38 * * * 1-5`）延迟 14–19min；`温度计`（`*/30 0-8`）延迟 5–29min
+        ⇒ 本仓确有小幅调度抖动，但**小时级偏移只在两条 cn 单飞链上稳定复现**。
+    fix: >-
+      ⏳ **未修**（需 workflow 写权 = 小九；阿狸咪的 fine-grained PAT 对 `.github/workflows/**` 恒 403）：
+      ① 在 Actions UI 对 `v8_lhb_fetch` / `v8_dajijin_fetch` 做一次 **disable → enable**（强制重新注册 schedule）后观察；
+      ② 若仍偏移，再考虑 cron 前移补偿 —— **先定根因，禁瞎调 cron**（避免掩盖真实问题）；
+      ③ 判据侧就地修正：凡「档位」类断言（含交接件 `verify_how`）一律写成「以 runs API `created_at` 实测为准」。
+    verify_how: >-
+      ① 重新注册后连续 ≥2 个工作日，`v8_lhb_fetch` 的 `schedule` run `created_at` 应回落至 **17:30 CST ±30min**；
+      ② `v8_dajijin_fetch` 应回落至 **20:30 CST ±30min**；
+      ③ 反测：若仍恒落 21:xx–23:xx，则判定为 GitHub 侧调度行为，须改走「显式 dispatch 补派」而非依赖 cron。
+    alimi_note_20260925_1820: >-
+      ⚠️ **时效补充（同日 18:1x CST 实测）**：09-25 为**中秋休市**，而 `v8_lhb_fetch.yml` 内置
+      「交易日闸（默认）：周末静默跳过」（L108-111）⇒ 今晚那一档**预计仍不产数**（闸在链内，run 是否
+      出现与是否产数是两件事）。故 lhb 侧动态复验的**最早可信窗口 = 09-28（周一）的 ~21:40 档**，
+      并以 runs API 实测 `created_at` 为准。本项 `impact` 里「当晚 ~22:00 之后」的表述据此收窄。
+    updated: "2026-09-25 18:10"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: handoff-yaml-stale-base-item-drop
+    title: HANDOFF.yaml 被「旧基线 blob + 新 parent」推送静默删除 7 个登记项（唯一状态源丢挂账）
+    priority: P0
+    owner: shared
+    status: todo
+    scope: shared
+    created: "2026-09-26 12:15"
+    what: >-
+      🔴 2026-09-25 21:45 CST 的提交 `cd56033bde`（署名「阿狸咪的工程师」，`docs/ops/HANDOFF.yaml`
+      **-652 / +51 行**）在「原提交非快进（PATCH 422）」后改走「**同内容 blob + 新 parent 重建**」，
+      但实际落盘的是**旧基线内容**：`meta.next_id_seq` 由 83 **回退到 79**、`meta.updated` 回退到
+      「2026-09-24 21:35」⇒ **静默删除 7 个已登记 item**，且**无冲突信号、无 422 残留、无任何告警**。
+      被删 7 项（均于 2026-09-25 13:21–18:11 登记，其中 **3 项 P0**）：
+      `ci-gate-dual-block-meta-block-lost-0925`、`trading-day-gate-predeps-fallback`(P0)、
+      `heartbeat-files-clobbered-by-cnfetch`、`cn-singleflight-ghpat-missing-401`(P0)、
+      `cn-runner-ps1-utf8-noBOM-gbk-parse-fail`、`ima-connector-unbound-enterprise-switch`、
+      `cn-singleflight-schedule-trigger-offset`。
+      危害面：本文件是**双机唯一状态源**（「什么还没做 / 谁在做」的权威记录）⇒ 丢失的不是某段内容，
+      而是**整个挂账条目**：从 21:45 起至本项恢复之前，这 7 件事对双机**同时不可见**
+      （对方不会重复劳动，但也**不会接手**）⇒ 静默烂尾。
+      同族已记：`api-push-stale-base-index-clobber`（index.html 整文件覆盖，09-24 血训）、
+      `handoff-concurrent-write`（并发写协议）。**本项是该族在「状态源 YAML」上的首次实证记录**，
+      且破坏性更强（丢的是条目本身）。
+    evidence: >-
+      阿狸咪的工程师 2026-09-26 12:0x–12:2x CST 实读**远端 API**（非本机副本、非推断）：
+      · 逐提交取 `docs/ops/HANDOFF.yaml` 的 id 集合（`GET /contents/docs/ops/HANDOFF.yaml?ref=<sha>`）：
+        `bf818065a0`(09-25 20:00) = **89 项，含全部 7 项**；
+        `87d619de45`(09-25 21:01) = **89 项，含全部 7 项**；
+        `cd56033bde`(09-25 21:45) = **84 项，7 项全失**；
+        `main`(09-26 12:0x) = **87 项，7 项仍全缺**。
+      · 该提交 `GET /commits/cd56033bde` 逐字：`parent=455794d129`；
+        `files=[docs/ops/HANDOFF.ledger.json(+13/-23), docs/ops/HANDOFF.yaml(+51/-652)]`；
+        message=「原提交 f2ce1271c3f2（parent=69166eab4dc0）因同期出现 7cd66a4ab4ac / 455794d12977
+        两个新提交而无法快进（PATCH 422）；目标文件内容经断言确认**未被他人改动**，
+        故以同内容 blob + 新 parent 重建，保持线性历史、不使用 force」。
+      · **反证该断言为假**：所谓「同期未被他人改动」的 7 项，恰是 13:21–18:11 由**阿狸咪的工程师本人**
+        登记的新 item（另含小九族项）⇒ 断言比对的参照物取错（拿旧基线而非当前远端 tip 比）。
+      · **排除「改名/合并」**：`main` 全文命中数 —— `GH_PAT`=0 / `GBK`=0 / `noBOM`=0 / `enterprise`=0 /
+        `ima-connector`=0 / `singleflight`=0 / `predeps`=0 / `trading-day-gate`=0；
+        （`心跳`=5 / `last_time`=6 的命中均属**其它**既有项）⇒ 判定为**真删除**，非改名。
+      · 🔴 **门禁盲区铁证（本机复现）**：把当前远端真身（已丢 7 项）放进假树跑真门禁
+        `check_handoff_ledger()` ⇒ 逐字
+        `(True, '交接状态源完好：items=87（ledger 锚 87 个 id 全在）· next_id_seq=82≥82')`
+        ⇒ **门禁判「完好」**。根因：判据只有 `ledger.ids ⊆ yaml.ids` + `next_id_seq ≥ ledger.max_next_id_seq`，
+        而 `ledger` 与 YAML **被同一提交一起回退** ⇒ 两侧同时回到旧态 ⇒ **文件内自洽性永远查不出
+        跨提交的整段丢失**。同理 `scripts/handoff_ledger_hash.py --check` 当时也是 87/87 全命中。
+    fix: >-
+      （A）**立即恢复（本项同批已完成）**：以 `87d619de45` 的 7 个 item 原文块，EOF 追加回 `main`，
+        同批 `scripts/handoff_ledger_hash.py --fix` 重算 ledger，单提交推
+        `docs/ops/HANDOFF.yaml` + `docs/ops/HANDOFF.ledger.json`。
+      （B）🔴 **写入侧强制预检（一劳永逸，正解）**：任何对 `HANDOFF.yaml` 的推送，**造 blob 之前**
+        必须断言「本地基底字节 == 当前远端 tip 的该文件字节」（或 blob sha 相等），不等即**整轮重来**；
+        **严禁**「同内容 blob + 新 parent 重建」这一自证式动作 —— 它把「非快进」偷偷变成「覆盖」。
+        该断言已写进 skill `v8-handoff-yaml-item-update` §13-1 / §17-1，但 09-25 21:45 那一轮**未落实**。
+      （C）**门禁侧新增一条不依赖 ledger 的判据**（⚠️ 交 owner 小九拍板，非本机单方面改
+        `pre_deploy_audit.py` —— 该门禁史上 4 次硬阻 deploy）：在 `[13/13]` 里记录
+        `items` 数与 `id 集合` 的**历史最大值**，下一档若出现**减少**即告警（单文件回滚才查得出）。
+      （D）巡检纪律：每轮读状态源时，顺手比对「上一档 id 集合 ⊆ 本档」。
+    verify_how: >-
+      ① 恢复后 `main` 的 `docs/ops/HANDOFF.yaml` 逐 id 含全部 7 项（`GET /contents?ref=main`），
+        且 `items` 数 = 95、`next_id_seq` ≥ 83；
+      ② 本机真门禁离线 `check_handoff_ledger()` 得 `(True, 'items=95（ledger 锚 95 个 id 全在）')`；
+      ③ `scripts/handoff_ledger_hash.py --check` = `命中 95/95 · 失配 0 · 未收录 0`；
+      ④ 此后任一对 HANDOFF.yaml 的推送：`GET /commits/<sha>.files` 只含登记 2 路径，
+        且新旧 id 集合**只增不减**。
+    not_verify_how: 只看 `[13/13]` 门禁绿 —— YAML 与 ledger 同批回退时门禁**恒绿**，看不出 item 消失。
+    refs: |
+      · 删除提交 cd56033bde；含 7 项的末档 87d619de45 / bf818065a0；当前 main（87 项）
+      · scripts/handoff_ledger_hash.py、.github/scripts/pre_deploy_audit.py::check_handoff_ledger
+      · skill v8-handoff-yaml-item-update §13-1（漂移守卫）/ §17-1（内容级漂移守卫）
+      · 同族：api-push-stale-base-index-clobber、handoff-concurrent-write
+    updated: "2026-09-26 12:15"
     updated_by: 阿狸咪的工程师(alimi-cn)
