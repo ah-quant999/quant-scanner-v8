@@ -758,6 +758,8 @@ jobs:
           _v8_rc=$?
           if [ "$_v8_rc" != "0" ]; then
             echo "::error title=v8-softfail:soft_13(exit=$_v8_rc)::🩺 刷新 HEALTH_CHECK.js (v8_health_check) 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
       # 🐲 2026-09-19 阿狸咪的工程师：板块龙头股字典随「板块相对强度」同轮生成
       #   （主人令「主升/启动 板块·龙头股 要跟着 板块资金趋势 变动而变动，对应清楚」）
       #   ① 品类门与 soft_6（🔄 板块相对强度重算，跑 algorithms/fetch_sector_rs.py）
@@ -779,9 +781,6 @@ jobs:
           _v8_rc=$?
           if [ "$_v8_rc" != "0" ]; then
             echo "::error title=v8-softfail:soft_13b(exit=$_v8_rc)::🐲 板块龙头股字典生成软失败（退出码 $_v8_rc）。前端「主升/启动 板块·龙头股」卡将沿用上轮龙头股列表 —— 板块清单与涨跌幅不受影响（与「板块资金趋势」卡同源 SECTOR_RS）。"
-            exit 1
-          fi
-
             exit 1
           fi
 
@@ -846,33 +845,33 @@ jobs:
             #   对「截断点在中间 / 守卫被跳过 / 守卫后的二次损坏」无感。
             #   ⇒ 本步在 git add 之前做四项硬断言，任一不过即 exit 1（不 add / 不 commit / 不 push）。
             #   ⚠️ 保持 continue-on-error: true（不阻断 job），但会打 ::error:: 显式告警。
-            python - <<'PYEOF_IDXGUARD'
-            import io, sys, os
-            p = "index.html"
-            if not os.path.isfile(p):
-                print("::error title=v8-index-guard::index.html 不存在，已阻止推送"); sys.exit(1)
-            raw = io.open(p, "rb").read()
-            txt = raw.decode("utf-8", "replace")
-            nlines = txt.count(chr(10)) + 1
-            errs = []
-            MIN_LINES = 18800
-            if nlines < MIN_LINES:
-                errs.append("行数 %d < %d（疑尾部截断）" % (nlines, MIN_LINES))
-            if "</html>" not in txt[-200:]:
-                errs.append("末 200 字内无 </html>（HTML 未闭合）")
-            for k in ["{name:'STOCK_LIST'", "{name:'STOCK_QUOTE'", "{name:'LHB_HISTORY'"]:
-                if k not in txt:
-                    errs.append("缺 A2 锚点 %s（尾部块被删）" % k)
-            MIN_BYTES = 1250000
-            if len(raw) < MIN_BYTES:
-                errs.append("字节数 %d < %d" % (len(raw), MIN_BYTES))
-            if errs:
-                print("::error title=v8-index-guard::index.html 完整性断言失败，已阻止推送")
-                for e in errs:
-                    print("  - " + e)
-                sys.exit(1)
-            print("\u2705 index.html 完整性断言通过：行数=%d 字节=%d 尾部闭合=OK A2三锚=OK" % (nlines, len(raw)))
-            PYEOF_IDXGUARD
+          python - <<'PYEOF_IDXGUARD'
+          import io, sys, os
+          p = "index.html"
+          if not os.path.isfile(p):
+              print("::error title=v8-index-guard::index.html 不存在，已阻止推送"); sys.exit(1)
+          raw = io.open(p, "rb").read()
+          txt = raw.decode("utf-8", "replace")
+          nlines = txt.count(chr(10)) + 1
+          errs = []
+          MIN_LINES = 18800
+          if nlines < MIN_LINES:
+              errs.append("行数 %d < %d（疑尾部截断）" % (nlines, MIN_LINES))
+          if "</html>" not in txt[-200:]:
+              errs.append("末 200 字内无 </html>（HTML 未闭合）")
+          for k in ["{name:'STOCK_LIST'", "{name:'STOCK_QUOTE'", "{name:'LHB_HISTORY'"]:
+              if k not in txt:
+                  errs.append("缺 A2 锚点 %s（尾部块被删）" % k)
+          MIN_BYTES = 1250000
+          if len(raw) < MIN_BYTES:
+              errs.append("字节数 %d < %d" % (len(raw), MIN_BYTES))
+          if errs:
+              print("::error title=v8-index-guard::index.html 完整性断言失败，已阻止推送")
+              for e in errs:
+                  print("  - " + e)
+              sys.exit(1)
+          print("\u2705 index.html 完整性断言通过：行数=%d 字节=%d 尾部闭合=OK A2三锚=OK" % (nlines, len(raw)))
+          PYEOF_IDXGUARD
 
             git add -f index.html
             if git diff --cached --quiet; then
