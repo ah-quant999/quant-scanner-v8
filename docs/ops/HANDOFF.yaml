@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-26 16:40"
+  updated: "2026-09-26 16:42"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -5714,14 +5714,18 @@ items:
       ④ 本机同机复现（`alimi-cn` = 该链实际 runner，同为 PS 5.1.19041.2364）：抽 `run:` 块 →
         UTF-8 无 BOM 写 `.ps1` → `[Parser]::ParseFile`：**修复前 `errs=2`**（`L2 标记"||"不是此版本中的有效
         语句分隔符` ×2，与 CI 逐字同型）→ **修复后 `errs=0`**。
-      ⑤ ⚠️ **附带缺陷（同文件、本轮未修）**：该 workflow 注册名 = 文件路径（`GET /actions/workflows` 里
-        其余 34 个均为正常人类可读名），且 `POST /actions/workflows/{id 或文件名}/dispatches` 恒
-        `422 {"message":"Workflow does not have 'workflow_dispatch' trigger"}` —— 尽管文件第 30 行**确有**
-        `workflow_dispatch:`（含 `skip_trading_day_gate`）。与 2026-08-30 已诊断的「go-yaml 不接受
-        surrogate 转义 ⇒ 整份解析失败 ⇒ 判无 dispatch」同型**且未治愈** ⇒ 该链**无法手动补算/手动验证**，
-        只能等 cron（这也是本项死代码潜伏 4 周无人察觉的结构性原因）。
+      ⑤ ✅ **「注册名=路径 / dispatch 422」的真因已查明 = 本项首笔补丁自身的 YAML 缩进破坏**
+        （**不是**既有缺陷、也**不是** 08-30 那个 surrogate 转义问题）：`6f7f66456c35` 之后实测
+        `GET /actions/workflows` 该条 `name` = 文件路径，`dispatches` POST = `422 无 workflow_dispatch`；
+        16:41 的 `9c41ec3e0e6f` 同样触发 `event=push`、`jobs=0`、`failure` 的校验 run（#29 / #30）。
+        同型历史锚点：08-30 的 `#1`~`#8` 正是当年那批非法版本产生的同类校验 run，而 **`#9`
+        （08-30 19:43、`event=workflow_dispatch`、`conclusion=success`、`name=🐉 …`）** 证明该文件修好之后
+        **本来是可以手动派发的** ⇒ 本项 ⑤ 属**本轮自伤、已修**，此前 4 周的死代码与它无关。
+        ⚠️ 由此得一条**可复用判据**：`验证 workflow 是否被 GitHub 接受` 最快的三信号 = ① push 后是否新增
+        `event=push / jobs=0` 的失败 run；② 注册 `name` 是否等于文件路径；③ `dispatches` 是否 422。
+        三者任一异常 ⇒ **先查 YAML 整份合法性**（而非查触发器写法）。
     fix: >-
-      （A）**已落地（阿狸咪 2026-09-26 16:3x CST）**：把 `||` 改为 PS 5.1 兼容的 `$LASTEXITCODE` 判定，
+      （A）**已落地（阿狸咪 2026-09-26 16:3x~17:0x CST，含一次自纠）**：把 `||` 改为 PS 5.1 兼容的 `$LASTEXITCODE` 判定，
         保持原语义（先 `--only lhb`，失败回落整轮推送，最后仅打印非阻塞告警）：
           `python api_push_raw.py --only lhb`
           `if ($LASTEXITCODE -ne 0) { Write-Host "[warn] --only lhb failed, falling back to full push"; python api_push_raw.py }`
@@ -5731,8 +5735,18 @@ items:
         推送：commit `6f7f66456c35`（parent = 真 tip `42cd0596f59d`，`base_tree` 只替换登记路径、`force:false`）；
         `GET /commits/<sha>.files` = 恰 1 个文件（+6/−1）；推后回读 blob `b18a0dfb1b18` / 7,598 B 逐字节一致，
         文件内 `||` 由 3 → 1（仅剩 `${{ … || 'false' }}` 表达式）。
-      （B）**附带缺陷待修（建议下一窗口单独处理，勿与 A 混）**：使该 workflow 能被 `workflow_dispatch`
-        （否则永远只能等 cron，无法即时复验）；判据 = 同一 `dispatches` POST 返回 204。
+      （A-corr）🔴 **自纠（必读）**：A 的**首笔补丁 `6f7f66456c35` 自身有缺陷**——替换 `||` 那一行时，
+        新块的**续行没有跟着 `run:` 块的 10 空格缩进**（`if ($LASTEXITCODE…` 等 5 行落在**列 0**），
+        而列 0 的内容在 YAML 里已跑出块标量 ⇒ **整份 workflow 语法非法**。GitHub 的即时反馈三连（本轮实测）：
+          ① 该文件 push 后自动产生 `event=push` 的**校验 run**：`jobs=0`、`conclusion=failure`、`name=` 文件路径；
+          ② 注册信息退化：`GET /actions/workflows` 的 `name` 由「🐉 v8 龙虎榜单飞 fetcher (cn runner)」**回退为文件路径**；
+          ③ `POST /actions/workflows/{id}/dispatches` ⇒ `422 Workflow does not have 'workflow_dispatch' trigger`
+            （**尽管文件里确有** `workflow_dispatch:` ⇒ 该 422 是「整份被判无效」的症状，不是「触发器没写」）。
+        修正版已随本批重推（缩进 10 / 12 空格；`yaml.safe_load` OK 且
+        `d['jobs']['lhb-only']['steps'][-1]['run']` 逐字正确；末步 run 块 PS 5.1 `ParseFile errs=0`）。
+        ⚠️ 教训（已记入 skill）：**对 `run:` 块做「按脱缩进锚串替换」时，新块的续行必须显式补回缩进**，
+        且推前必须 `yaml.safe_load` + 「无列 0 裸内容行」双断言 —— 本轮首笔只做了 PS 解析（对**块内**文本）與
+        Python 侧替换断言，**未做整文件 YAML 断言**，故漏检。
       （C）**可选加固（本轮未做，避免超推送预算）**：把末行告警改为
         `Write-Host "::error title=v8-lhb-push-softfail::…"`，在保留「非阻塞」语义的同时让失败在
         annotations 可见（对齐主人 2026-09-08「禁止假 success」令）。
@@ -5745,6 +5759,11 @@ items:
       ③ 静态：`GET /contents/.github/workflows/v8_lhb_fetch.yml` 全文**可执行行** `||` 命中 = 0
         （仅 `${{ … }}` 表达式内 1 处属正常）。
       ④ 判据一律取远端 API 真身（日志用 `curl -sSL`；文件用 contents API），禁读本机副本。
+      ⑤ **GitHub 接受该 workflow（= 文件整份合法）**：修正版推后
+        (a) **不再**新增 `event=push / jobs=0 / failure` 的校验 run；
+        (b) `GET /actions/workflows` 该条 `name` 回到 `🐉 v8 龙虎榜单飞 fetcher (cn runner)`；
+        (c) `POST /actions/workflows/<id>/dispatches` 返回 **204**（可手动补算）。
+        ⚠️ 本轮实测：三项全是「文件整份 YAML 非法」的**症状**，与 `workflow_dispatch:` 写没写无关。
     not_verify_how: >-
       · ❌ 禁以 run 结论（`success`）判本项已修 —— 该步 `continue-on-error: true` ⇒ **恒绿**，本项本身就是
         假绿事故。
@@ -5759,5 +5778,5 @@ items:
       `cn-runner-ps1-utf8-noBOM-gbk-parse-fail`（同族：run 块与解释器不匹配）、
       `cn-singleflight-schedule-trigger-offset`（同链调度偏移）。
       交接件：`docs/ops/handover/2026-09-26_1639_阿狸咪的工程师给小九_v8_lhb_fetch推送步PS5.1管道符解析失败根治_龙虎榜链推送长期死代码.md`。
-    updated: "2026-09-26 16:40"
+    updated: "2026-09-26 16:42"
     updated_by: 阿狸咪的工程师(alimi-cn)

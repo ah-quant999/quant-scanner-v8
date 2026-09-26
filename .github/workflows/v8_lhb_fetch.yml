@@ -143,8 +143,8 @@ jobs:
         run: |
           cd $env:GITHUB_WORKSPACE
           python api_push_raw.py --only lhb
-if ($LASTEXITCODE -ne 0) {
-  Write-Host "[warn] --only lhb failed, falling back to full push" -ForegroundColor Yellow
-  python api_push_raw.py
-}
-if ($LASTEXITCODE -ne 0) { Write-Host "api_push_raw failed, non-blocking" -ForegroundColor Yellow }
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "[warn] --only lhb failed, falling back to full push" -ForegroundColor Yellow
+            python api_push_raw.py
+          }
+          if ($LASTEXITCODE -ne 0) { Write-Host "api_push_raw failed, non-blocking" -ForegroundColor Yellow }
