@@ -1759,7 +1759,17 @@ items:
       **极少数**（对照立项时「6 组重复」）。残留项为**同键两段并存**（语义可读、
        YAML 取后者、内容无损），如需彻底归零由该 item 的 owner 合并段内容。
       verified_by: 阿狸咪的工程师(alimi-cn)
-    updated: "2026-09-21 18:45"
+    alimi_regression_20260928_0245: >-
+      🔴 **verify_how① 曾被违反（2026-09-28 00:27 → 02:4x）**：`cn-fetch-writer-version-drift`
+      出现重复顶层键 `updated`（僵尸 `2026-09-23 08:57` + 生效 `2026-09-28 01:35`），
+      由提交 `b52ca07f3b` 引入（该笔同时把未来时戳写进 `updated`，另触 [13/13] 阻断，见该 item）。
+      **本批已按本项 `fix` ① 删除僵尸行**（YAML 取后者 ⇒ 语义中性），
+      ⇒ 本项 verify_how① 「每个 item 的 4 空格缩进顶层键无重复」**恢复成立**。
+      复跑判据（本机实测）：逐 item `re.findall(r'(?m)^    (\w+): ', seg)` 计数无重复 ⇒ 0 组。
+      ⚠️ 提醒：本项 `fix` ② 保留的 `handoff-skill-inrepo` 两份 `verify_how` 块标量重复**仍在**
+      （须由该 item owner 人工合并，非本次范围）。
+      verified_by: 阿狸咪的工程师(alimi-cn)
+    updated: "2026-09-28 02:40"
   # ── 2026-09-21 19:1x 小九新增（AI 会话入口 —— 「协议存在但没人会读」治本）─────────────
 
   - id: handoff-ai-entry-file
@@ -3094,7 +3104,6 @@ items:
     priority: P0
     owner: 阿狸咪的工程师
     status: done
-    updated_by: 阿狸咪的工程师（原记录）/ 小九（2026-09-23 实施 fix 建议①）
     what: >
       **未闭环的根因**：`index-tail-truncation-2220` 只修好了文件，**没有修掉那条会再次截断的路径**。
       判据级证据（谁写的）：全仓唯一写 `index.html` 的脚本是 `update_v8.py` 的
@@ -3164,7 +3173,6 @@ items:
       另：本次不动 `docs/ops/HANDOFF.ledger.json` —— 经核对 `[13/13]` 门禁（`pre_deploy_audit.py:1117`）
       只断言「ids 超集」与「next_id_seq 单调不减」两项，**不校验 `id_content_hashes`**；
       本次未增删任何 id、未动 `meta.next_id_seq` ⇒ 门禁不受影响、无需刷新 ledger。
-    updated: "2026-09-23 08:57"
     alimi_verify_20260926_1155: >-
       〔阿狸咪的工程师 2026-09-26 11:55 CST 复验 —— verify_how ①② 达成，③ 未取到硬证据〕
       ① 线上 index.html 行数 19,315 ≥ 19,149 且末尾闭合 `</html>` ✅（＝ `index-tail-truncation-2220` 同源实测）。
@@ -3196,8 +3204,31 @@ items:
       **真执行**（日志逐字 `python update_v8.py` + `✅ index.html cache-busting 参数已更新` + 逐文件 `✅ …json → ….js`）；
       且 `update_v8.py` @head `e267b89b33bb` / @`55f2e720df50` 的 blob = **`e3eff9d0de3b`（99,239 B）
       = main 当前 blob**（sha256 前 16 位 `dac81a1bc204fc93` 两者相同）⇒ 跑的确是 main 版，**无 writer 版本漂移**。
-    verified_at: "2026-09-28 01:35 CST（阿狸咪的工程师 / alimi-cn）"
-    updated: "2026-09-28 01:35"
+    verified_at: "2026-09-28 00:27 CST（阿狸咪的工程师 / alimi-cn；原记 01:35 为「计划时刻」，已按引入提交 b52ca07f3b 的 committer 时间改正）"
+    alimi_verify_20260928_0245: >-
+      🔴 未来时戳复发（**第 5 次**，本次为我方自己引入）⇔ 实战取证 + 去重键修复。
+      **A 事故（远端实测，非推断）**：本项 `updated="2026-09-28 01:35"`、
+      `verified_at` 同值，由提交 `b52ca07f3b`（committer **00:27:50 CST** 实测）引入
+      ⇒ 超前 CI `now_cst` **~67min > TOL 5min** ⇒ `v8_build_deploy` **#8512→#8518 连续 7 档**
+      `build` job failure，唯一失败步 = step10「🛡️ Pre-deploy audit」，
+      逐字 `❌ [13/13] 交接状态源守卫: 未来时戳 1 处（污染 MAX 新鲜度判据）: cn-fetch-writer-version-drift(updated=2026-09-28 01:35)`；
+      `gate` job 仍 success、step13「📤 部署到 main」= skipped（= 部署被硬阻断）。
+      至 **01:38（#8519）** 越过 `01:35−5min` 后自愈放行；**用户面无影响**
+      （pages build 仍 success、线上 index.html 与 tip blob 一致）。
+      **B 同批发现：本 item 出现 2 组重复顶层键**（`updated`：僵尸 `2026-09-23 08:57` +
+      生效 `2026-09-28 01:35`；`updated_by`：短值僵尸 + 长值生效），**均由 `b52ca07f3b` 引入**
+      （对照 `9c1acff016` / `d785f2d5ff92` 两版逐 item 扫描 dup=[] ⇒ 引入前干净）
+      ⇒ 违反在册 done 项 `handoff-yaml-dup-keys` 的 verify_how①（「每 item 4 空格缩进顶层键无重复」）
+      ⇒ **该断言自 09-28 00:27 起失效**。本批已按该项 `fix` ① 的既定方剂删除两条僵尸行
+      （YAML 取后者 ⇒ 删前者语义中性），生效值改为本批真实时刻；
+      `verified_at` 改正为可证的 committer 时刻 `2026-09-28 00:27`。
+      **C 新根因（纪律固化）**：本次两处都写了**「预计完成时刻」而非实测时刻**。
+      ⇒ `updated` 与 `verified_at` **必须同源取实测时钟**；写前先打印 now（CST）、
+      两者同屏，**禁凭「感觉过了多久」估**。
+      **D 判据（可机械复跑）**：PyYAML 逐 item 比 `datetime.strptime(updated[:16]) - now_cst > 5min`
+      （**禁**用行正则：缩进/引号变体会漏）；并断言每 item 4 空格缩进顶层键无重复。
+      verified_by: 阿狸咪的工程师(alimi-cn)
+    updated: "2026-09-28 02:40"
     updated_by: 阿狸咪的工程师（原记录）/ 小九（2026-09-23 实施 fix 建议①）/ 阿狸咪的工程师（2026-09-28 终验转 done）
     alimi_verify_20260928_0130: >-
       〔第 31 轮（阿狸咪的工程师 2026-09-28 01:35 CST）按 verify_how 三条逐项复验 —— 三项全达成，转 done〕
