@@ -103,11 +103,14 @@ _HOLIDAY_RANGES_2026 = [
     ("2026-06-19", "2026-06-21"), ("2026-09-25", "2026-09-27"),
     ("2026-10-01", "2026-10-07"),
 ]
-# 补班日（周末但实际交易日）
-_MAKEUP_DAYS_2026 = {
-    "2026-01-04", "2026-02-14", "2026-02-28",
-    "2026-05-09", "2026-09-20", "2026-10-10",
-}
+# 补班日：🔴 2026-09-28 阿狸咪·P0（与 v8_calendar.MAKEUP_DAYS 口径合流）
+#   A 股**周末一律休市**，「调休上班日」不是交易日。原值把 2026-09-20(周日)/
+#   2026-10-10(周六) 当交易日 ⇒ 与 v8_calendar 双日历结论相反 ⇒ 休市日假红 +
+#   无意义自愈派发（同族既有挂账见 HANDOFF `cnfetch-empty-shell-block` 的 note）。
+#   同批已把 v8_health_check.py 清零，本处为其残留副本。
+_MAKEUP_DAYS_2026 = set()
+# 原值（保留供追溯，勿直接启用）：
+#   {"2026-01-04","2026-02-14","2026-02-28","2026-05-09","2026-09-20","2026-10-10"}
 
 
 def _is_trading_day(d) -> bool:
@@ -569,12 +572,17 @@ def pipeline_selfheal(token, now, is_trading, sh):
 def last_trade_day_close(now: datetime) -> datetime:
     """返回最近交易日收盘时间（15:30）。非交易日回退。"""
     d = now.date()
-    while d.weekday() >= 5:
+    # 🔴 2026-09-28 阿狸咪：原为 `while d.weekday() >= 5` —— **只跳周末、不查节假日**，
+    #   与本文件自带的 _is_trading_day()/`_HOLIDAY_RANGES_2026` 直接打架。
+    #   实测 2026-09-28 00:51 产出 last_trade_close=「2026-09-25 15:30」（周五），
+    #   而权威日历 v8_calendar.HOLIDAY_RANGES 列明 09-25~09-27 中秋休市 ⇒
+    #   真实最近交易日 = 2026-09-24(周四) ⇒ last_trade_close 应 = 2026-09-24 15:30。
+    while not _is_trading_day(d):
         d -= timedelta(days=1)
     close = datetime.combine(d, datetime.strptime("15:30", "%H:%M").time())
     if now < close:
         d -= timedelta(days=1)
-        while d.weekday() >= 5:
+        while not _is_trading_day(d):
             d -= timedelta(days=1)
         close = datetime.combine(d, datetime.strptime("15:30", "%H:%M").time())
     return close
