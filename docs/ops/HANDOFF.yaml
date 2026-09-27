@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: 2026-09-27 19:35
+  updated: 2026-09-27 22:00
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -4803,7 +4803,7 @@ items:
     title: EXPERIMENT 卡停更 3 天（东财端连不上，代码护栏已上线待观测）
     owner: 阿狸咪的工程师
     created: 2026-09-25 21:2x
-    status: doing
+    status: pending-verify
     priority: P1
     scope: shared
     verify_how: 明日（09-26）读 v8_cn_fetch_cloud 最新一轮日志，确认是否存在 ::error title=v8-experiment-no-data::；若出现即护栏生效（失败显式标红而非静默）。产物侧须等东财 clist 恢复后方能推进，不以人工补跑充数。
@@ -4828,7 +4828,7 @@ items:
       ⇒ 本项 verify_how 顺延至**下一交易日（09-28 周一）post_close 档**：届时若东财仍全败，应看到
       `::error title=v8-experiment-no-data::`（护栏生效）；若东财恢复则产物 update_time 前进。
       status 维持 doing。
-    updated: "2026-09-26 00:40"
+    updated: "2026-09-27 22:00"
     updated_by: 阿狸咪的工程师(alimi-cn)
     alimi_verify_20260926_1155: >-
       〔阿狸咪的工程师 2026-09-26 11:55 CST · 09-26 数据点〕
@@ -4843,6 +4843,35 @@ items:
         而 `compare 4c4743ae24...316d4c878b` = ahead 1 / behind 0 ⇒ 该轮跑的正是**修复提交前 1 个提交的旧代码**，
         **即 09-25 22:0x 已根治的那个 P0**（见 `card-fake-freshness-timestamp-rootfix-0925`）⇒ 非新故障。
         下一档 experiments（cron `30 8 * * 1-5` = 16:30 CST 工作日）将首次复跑修复后代码。
+    alimi_verify_20260927_2200: >-
+      〔阿狸咪的工程师 2026-09-27 22:0x CST · 红卡已恢复 + 本轮自查出并修掉一个同源缺陷〕
+      · **恢复实测（远端真身）**：`raw_data/experiment.json` update_time 已由 2026-09-22 18:13:35 前进到
+        **2026-09-27 21:07:08**（blob 7cefdf7c71，size 2781）；`data/EXPERIMENT.js` 同步 ut=21:07:08
+        （republish_time 21:14:32）⇒ 卡片不再停旧日期，内容为真实抓取快照（非人工补数）。
+      · **恢复路径（他机先修，非本项 owner 本轮所推）**：① 提交 `6fbc80374f`（09-27 20:19 CST）
+        新增 datacenter 兜底源 `_experiment_from_datacenter()`；② 提交 `1dd01f4112`（09-27 21:05 CST）
+        把 EXPERIMENT 前移到 tasks 第 2 位，根治「720s 总预算内被 ⏳ 跳过 ⇒ f_experiment 从不执行」。
+      · **主路径仍坏（属上游）**：run #2527（head=1dd01f4112）job 日志逐字
+        `⚠️ em_clist 为空（东财 push2 不可达），尝试 datacenter 兜底源...` ⇒ 东财 push2 自 09-22 起的故障
+        **尚未恢复**，卡片目前靠兜底源维持（与在册 `redcard-hostfail-rootfix-0924` 同步观测，不在本项重复挂账）。
+      · 🔴 **本轮自查出的同源缺陷（已修已推）**：兜底源分页参数名写错 ——
+        `cloud_fetch_v8.py::_experiment_from_datacenter()` 用 `_params["pageNum"]`，而东财 datacenter API
+        实际只认 **`pageNumber`** ⇒ 参数被静默忽略 ⇒ 15 页循环每页都返回第 1 页 ⇒ `_recs` 7500 条实为
+        **同一批 500 只重复 15 次** ⇒ 去重后仅 500 只（000001~001339 深市主板）⇒ EXPERIMENT 名单
+        **系统性只覆盖深市，不含沪市(6xx)/创业板(300)/科创(688)**。
+        铁证（本机 curl，中国 IP）：`pageNum=1/2/3/11/12` 返回字节数恒为 85475 且首尾代码恒 000001~001339；
+        换 `pageNumber=2` 则返回 001356~002500 ✅ ⇒ 参数名即唯一变量。
+        修复提交 `be247848b0`（parent fef3cb9de1，**仅 1 登记路径**，Git Data API `force:false`，基底取远端 contents）：
+        `pageNum`→`pageNumber`（+1 行语义 +2 行注释）；推前 py_compile rc=0、漂移断言通过；推后回读**逐字节一致**
+        （blob 3b3e90792e → 4174f2b754，size 288450 → 288696）。
+        本地模拟修复后：`pageNumber=1..11` 去重 **5199 只**，前缀覆盖 000/001/002/003/300/301/302/600/601/603/605/688/689。
+      · **下一档判据（本项 verify_how）**：`v8_cn_fetch_cloud` 任一新档 job 日志中
+        `✅ datacenter 兜底取到 N 只个股快照` 的 **N 应由 7500 收敛为 5199**（=不再有重复页），
+        且该批 `raw_data/experiment.json` 名单出现沪市(6xx)或创业板(300)代码 ⇒ 判修复生效；
+        若 N 仍为 7500 ⇒ 参数名未生效，须回查。
+      · ⚠️ 兜底源 `TRADE_DATE=2026-09-24`（较最新交易日滞后 1 天，属该报告固有节奏）—— 仅记录，不处置。
+      ⇒ status doing → **pending-verify**（等下一档日志的 5199 / 含沪市 判据）。
+
   - id: resonance-calendar-lazyload-fail
     priority: P0
     owner: 小九(lemoncat-cn)
@@ -6413,7 +6442,7 @@ items:
   - id: tz-naive-now-utc-stamp-flip-0927
     priority: P1
     owner: 阿狸咪的工程师
-    status: pending-verify
+    status: done
     what: >-
       产物展示时间戳的**时区口径**在「云 runner / 自托管 runner」之间不一致：同一文件相邻批次会在
       CST+8 与 UTC 之间来回跳 8 小时（非单调，先 -8h 再 +8h）。
@@ -6467,5 +6496,20 @@ items:
       `.github/workflows/v8_build_deploy.yml` · `.github/workflows/v8_cn_fetch_cloud.yml` ·
       `update_v8.py` · `algorithms/calc_sentiment_cycle.py` · `v8_health_check.py`（L403 口径）·
       `docs/ops/HANDOFF.yaml#card-fake-freshness-timestamp-rootfix-0925`（同族、不同缺陷）
-    updated: "2026-09-27 19:35"
+    updated: "2026-09-27 21:55"
     updated_by: 阿狸咪的工程师(alimi-cn)
+    alimi_verify_20260927_2155: >-
+      〔阿狸咪的工程师 2026-09-27 21:55 CST · 按 verify_how 四条逐项复验 ⇒ 全部满足，转 done〕
+      ① 单批形态：远端 `data/AUDIT_TRAIL.js` generated_at=2026-09-27 21:37:05、
+         `data/SENTIMENT_CYCLE.js` update_time=2026-09-27 21:37:02，对应 `v8 build:` 提交
+         fef3cb9de1（committer.date=2026-09-27T13:37:06Z）⇒ 差值恒 +8h（CST），误差 ≤1s，远优于 ≤3min 门槛 ✅。
+      ② 连续 6 批无振荡（本项要求 ≥3）：逐提交取 blob 实测（提交时刻 UTC → 产物值）——
+         fef3cb9de1 13:37:06Z→21:37:05 / 559a091555 13:32:34Z→21:32:33 / c60d88ec91 13:01:21Z→21:01:20 /
+         d8fe40a25d 12:36:42Z→20:36:41 / 440c21a32c 12:29:39Z→20:29:38 / d44e62efd9 12:26:16Z→20:26:15
+         ⇒ 六批全部恒 +8h，无任何 ~8h 跳变 ✅。
+      ③ 下游一致性：同批 `data/HEALTH_CHECK.js` update_time=2026-09-27 21:36:55（既知 CST 对照物）
+         与上述两项落同一 +8h 日的同一时刻量级 ✅。
+      ④ 不回归：线上 HEALTH_CHECK summary = ok 118 / warn 0 / **fail 1** / limited 2 / total 121，
+         唯一 fail = AVG_PRICE_DATA（既有挂账，非本改动引入）；`all_EXPERIMENT` 已随红卡恢复移出 fail ⇒ 未新增 ✅。
+      修复合入硬判据：`GET /repos/ah-quant999/quant-scanner-v8/compare/4b32ddd3d40b...main` = ahead 84 / behind 0。
+      ⇒ status pending-verify → **done**（本项闭环；另有 70 个脚本的裸 datetime.now 需按 runs-on 归属另立评估，不在本项范围）。
