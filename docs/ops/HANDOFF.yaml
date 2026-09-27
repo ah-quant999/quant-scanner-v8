@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: 2026-09-27 05:29
+  updated: 2026-09-27 09:55
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -5298,7 +5298,49 @@ items:
       正则命中**恒为 0**（本轮实测 110 个文件全 0 命中，险些据此误判「③ 已达成」）。
       ⚠️ 本轮为监听巡检轮：只读 + 本条追加；未改任何代码 / 阈值，未动 `index.html` / `logic.html` /
       `data/` / `raw_data/` / `.github/**`。
-    updated: "2026-09-27 05:29"
+    alimi_verify_20260927_0955: >-
+      〔阿狸咪的工程师 2026-09-27 09:5x CST · 第 25 轮巡检 · verify_how ②「休市日判据」取得第 3 次独立复现，
+      并**首次把第四子项「档数降至个位」实测出来：未达成**〕 全程远端 API，未用本机副本。
+
+      🔴 A. 前三子项已达成（第 3 次独立复现；样本 = run **#2416** / id `36283875441` / head `3d14c447f6` /
+      `event=workflow_dispatch` / job `fetch` = success）。`/jobs` API 取**真实步骤序**：
+      `4 setup-python` → `5 📦 安装依赖` → `6 🗓 解析数据日期` → `7 🔒 幂等闸门` → `8 🛡 交易日历闸门` →
+      **`9 📡 抓中国数据` = skipped**。日志逐字：`📅 数据日期=2026-09-24`（**已回退为上一交易日**）、
+      `is_trading_day=false`、`proceed=false (工作日遇节假日，跳过冗余抓取)`；同 run env 逐字
+      `V8_DATA_DATE: 2026-09-24`。⇒ 步序与 `52b01b8b7b6a` 一致（依赖先于解析），
+      前三子项（数据日期回退 / `proceed=false` / step9 skipped）**达成**。
+
+      🔴 B. 第四子项「cn_fetch 当日档数应降至个位」**未达成** —— 逐日实测（远端
+      `actions/workflows/327687211/runs?per_page=100 × 4 页` 全量，按 CST 归日，含 category 分型）：
+      · 09-24（交易日）= **108** 档；· 09-25（中秋休市）= **105** 档（`intraday 100` / `scheduled 4` / `post_close 1`）；
+      · 09-26（周六）= **55** 档；· 09-27（周日，截至 09:55 仍在跑）= **72** 档（`post_close 34` / `intraday 38`）。
+      ⇒ **休市日档数与交易日同量级**，与「降至个位」差一个数量级。
+      ⚠️ 本项 `impact` 段原记 09-25「50 档」经全量重算实为 **105 档**（旧记数受 `per_page` 截断低估）
+      ⇒ 该数字宜以本次为准。
+
+      🔴 C. 根因收窄（**第四子项不可能由本项 5 笔修复达成 ⇒ 建议拆出、另立 owner 面**）：
+      派发量由 `v8_health_check._dispatch_cn_fetch()` 驱动，触发条件 = 数据陈旧。逐字（run #2416 step7 幂等闸门）：
+      `⚠️ 线上数据已 3655 分钟未更新（>25） ⇒ 无视并发强制抓取`。
+      ⇒ 闭环：**休市 ⇒ 无新数据 ⇒ 陈旧判据恒真 ⇒ 每 ~15-20 分钟重派一档 ⇒ 该档再被 step8 日历闸门 skip** = 纯空转。
+      两套口径在此**互相打架**：step7「陈旧 ⇒ 强制抓取」放行、step8「休市 ⇒ 跳过」拦下；
+      放行者不改变结果，只让闸门每轮白跑。
+      旁证（空转不写盘 ⇒ 属设计内、**非故障**）：`raw_data/algo_heartbeat.json` 与
+      `raw_data/algo_run_report.json` 自 **2026-09-26 08:49:08** 未再推进（≈25h），
+      而 `HEALTH_CHECK` **未**判其 fail ⇒ 与「step9 一跳过就不写 raw_data」自洽，**勿报成故障**。
+      ⇒ 处置建议：本项以「前三子项达成」结项；第四子项**并入** `cn-fetch-queue-growth`
+      （其 `fix` 候选 a「派发器加『同类别在跑则跳过』节流」正对此症），
+      勿让本项永久卡在不可由本次修复达成的判据上。
+
+      ⚠️ D. 本轮旁证（判「非数据事故」）：主站 200 / **1,361,458 B** / 19,315 行 / 尾部闭合
+      （CI 同档自证逐字 `✅ index.html 完整性断言通过：行数=19315 字节=1361458 尾部闭合=OK A2三锚=OK`）；
+      `HEALTH_CHECK` = `ok 117 / warn 0 / fail 2 / limited 2 / total 121`，
+      2 个 fail = `AVG_PRICE_DATA`（09-24 11:30）+ `EXPERIMENT`（09-22 18:13）**均既有挂账**；
+      `data/SECTOR_LEADERS.js` ut **2026-09-26 21:57**（已恢复；`raw_data/sector_leaders.json` 停 09-22 属**孤儿死写**）；
+      `build_deploy` 近 14 档正常档 `gate=success / build=success / intraday_patrol=skipped`，
+      2 档 `cancelled` 且无 job（并发顶替，非数据事故）。
+      ⚠️ 本轮为监听巡检轮：只读 + 本条追加；未改任何代码 / 阈值，未动 `index.html` / `logic.html` /
+      `data/` / `raw_data/` / `.github/**`。
+    updated: "2026-09-27 09:55"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: heartbeat-files-clobbered-by-cnfetch
