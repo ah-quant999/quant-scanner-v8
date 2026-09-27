@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: 2026-09-27 16:50
+  updated: 2026-09-27 19:35
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 90
+  next_id_seq: 91
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -6410,3 +6410,62 @@ items:
     refs: >-
       `.github/workflows/v8_cn_fetch_cloud.yml` · `docs/ops/handover/2026-09-26_2240_阿狸咪的工程师给小九_cn_fetch自接力节奏闸门与landcheck反假成功终检双双失效_根因V8_RUN_START恒空.md`
 
+  - id: tz-naive-now-utc-stamp-flip-0927
+    priority: P1
+    owner: 阿狸咪的工程师
+    status: pending-verify
+    what: >-
+      产物展示时间戳的**时区口径**在「云 runner / 自托管 runner」之间不一致：同一文件相邻批次会在
+      CST+8 与 UTC 之间来回跳 8 小时（非单调，先 -8h 再 +8h）。
+      实测（2026-09-27 19:0x CST，远端真身逐提交取 blob 解析）：
+      `data/AUDIT_TRAIL.js` 的 `generated_at` 与 `data/SENTIMENT_CYCLE.js` 的 `update_time`
+      在 `v8 build:` 批次（= `v8_build_deploy.yml`，runs-on `ubuntu-latest`，UTC）写成 UTC；
+      在 `v8 cn fetch:` / `v8 risk gauge:` 批次（自托管机，CST）写成 CST。
+      逐批横向样本（commit 时刻用 UTC，产物值原样）：
+      `0faf5094afd3` 10:57:11Z build ⇒ AUDIT_TRAIL=10:57:10 / SENTIMENT_CYCLE=10:57:09
+      `1d8ec0d27bf9` 10:54:48Z risk ⇒ AUDIT_TRAIL=18:54:07 / SENTIMENT_CYCLE=18:54:04
+      `7733f7946c55` 11:09:56Z cnfetch ⇒ AUDIT_TRAIL=19:02:21 / SENTIMENT_CYCLE=19:02:19
+      同一 build 提交内对照：`COMMODITY_ELASTICITY`=18:57:09、`IMA_STRONG_BACKTEST`=18:56:56、
+      `HEALTH_CHECK`=18:57:05 均为 CST（正确），只有上述两项是 UTC ⇒ 属「某模块特立独行」。
+      后果：① 卡面「更新于」出现向后跳 8 小时再向前跳回，主人一眼可见；
+      ② `v8_health_check.py` L403 把产物时间戳**按 CST 解析**（`replace(tzinfo=timezone(timedelta(hours=8)))`），
+      故 UTC 值会被少算 8 小时龄 ⇒ 龄判据被系统性低估。
+    evidence: >-
+      根因（已读源码，非推断）：全仓 209 个 .py（剔除 backup/_fix/legacy 等）扫描后，
+      「用裸 `datetime.now()` 写展示时间戳」的仅两处，且恰为上述两个 offender：
+      ① `update_v8.py` L1331（`_gen_ops_extras()` → `_write_audit_trail_js()` 的 `generated_at`）——
+      同文件 L19 定义 `CST = ZoneInfo("Asia/Shanghai")`、L21-23 定义 `now_cst()`，
+      L741/L1206/L1239 一律用 `now_cst()` / `tz=CST` ⇒ 只有 L1331 漏了 tz；
+      ② `algorithms/calc_sentiment_cycle.py` L135（`update_time`）——该文件仅 `from datetime import datetime`，
+      无任何 CST 约定。
+      下游一致性铁证：`v8_health_check.py` L403 与 L297-298（`now_cst()`）证明全仓把产物时间戳**约定为 CST**。
+      另：本项与在册 `card-fake-freshness-timestamp-rootfix-0925` 是**不同缺陷** ——
+      那项讲「内容零变化而 update_time 每轮照刷」，本项讲「时间戳写错时区 ⇒ 8 小时抖动」；
+      但 AUDIT_TRAIL / SENTIMENT_CYCLE 同属那 5 项同族产物，两项须一并验收。
+    fix: >-
+      提交 `4b32ddd3d40bc0ac47caa035e768f29f02662f55`（parent `0200b77e1be29aff1b87c708b13f8f0b84c9d6fc`，
+      恰 2 登记路径，Git Data API `force:false`，取自远端 contents 基底）：
+      ① `update_v8.py` L1331：`datetime.now()` → `now_cst()`（+1/-1，零行为变更）；
+      ② `algorithms/calc_sentiment_cycle.py`：`from datetime import datetime, timezone, timedelta`
+      + 新增 `CST = timezone(timedelta(hours=8))` / `def now_cst()`，L135 改用 `now_cst()`（+10/-2）。
+      推前自证：两文件 `py_compile` rc=0；逐行 diff 恰为目标行；推后回读**逐字节一致**
+      （`update_v8.py` blob `ea420b505cc3` / `calc_sentiment_cycle.py` blob `ba1b909f5956`）。
+      ⚠️ **本轮未修**其余仍含裸 `datetime.now().strftime` 的脚本 —— 扫描命中 70 个，
+      但**只有在云 runner（UTC）上执行的才会真错**，自托管机裸 `now()` 恰为 CST 属正确；
+      须按 workflow 的 runs-on 归属逐一评估后再决定收敛范围（避免一次性大改引入回归）。
+    verify_how: >-
+      ① **单批形态**：下一次 `v8 build:` 批次（`v8_build_deploy.yml`，ubuntu-latest）
+      产出的 `data/AUDIT_TRAIL.js` 的 `generated_at` 与 `data/SENTIMENT_CYCLE.js` 的 `update_time`
+      应为**该提交时刻的 CST**（与 `commit.committer.date` +8h 相差 ≤3 分钟），不再出现 UTC 形态；
+      ② **连续 3 批无振荡**：取最近 3 个 `v8 build:` 提交，同文件相邻两批的时间戳**不得出现 ~8h 跳变**
+      （判据：|Δ| < 30 分钟，或单调前进）；
+      ③ **下游一致性**：同上 3 批中，这两个文件的 `generated_at` / `update_time` 与同批
+      `COMMODITY_ELASTICITY` / `HEALTH_CHECK`（已为 CST 的对照物）落在同一 +8h 日内同一时刻量级；
+      ④ **不回归**：`v8_health_check.py` 的 `AVG_PRICE_DATA` / `all_EXPERIMENT` 等龄判据不得因本次改动
+      新增多余 fail（这两项本来就 fail，属既有挂账）。
+    refs: >-
+      `.github/workflows/v8_build_deploy.yml` · `.github/workflows/v8_cn_fetch_cloud.yml` ·
+      `update_v8.py` · `algorithms/calc_sentiment_cycle.py` · `v8_health_check.py`（L403 口径）·
+      `docs/ops/HANDOFF.yaml#card-fake-freshness-timestamp-rootfix-0925`（同族、不同缺陷）
+    updated: "2026-09-27 19:35"
+    updated_by: 阿狸咪的工程师(alimi-cn)
