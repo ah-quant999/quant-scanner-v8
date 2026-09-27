@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: 2026-09-27 09:55
+  updated: 2026-09-27 12:23
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -83,6 +83,45 @@ items:
       尚未跑出一轮成功产物 ⇒ 禁宣称「已修复」。另：补跑 run 36005590505（算法链）
       与 36006148888（DAJIJIN）派发后长时间停留 in_progress/queued，
       疑与 run 日志中所述「僵尸 pending run 排队 31min」的 runner 队列拥塞有关，一并观察。
+    alimi_verify_20260927_1215: >-
+      〔阿狸咪的工程师 2026-09-27 2026-09-27 12:23 CST · 第 2 次复验：verify_how ① 达成 / ② 判据须修正〕
+      A. 一次复现（判据 = run.head_sha ≥ 修复 sha + 本次 run 的 step 表，禁只看 run 结论）：
+         cn_fetch（327687211）近期全部轮 head_sha 均远超 1052d4334162（最新 #2423 head=71c1242fe224）
+         ⇒ 新代码确在用。其中 #2288（created 2026-09-25T11:29:36Z = 19:29 CST，
+         event=workflow_dispatch，category=post_close，head=52b01b8b7b6a）step22
+         「🐲 板块龙头股字典（SECTOR_LEADERS，仅 post_close）」= **success**
+         ⇒ 本项 verify_how ①「换 host 重试且不再 502 退出」**达成**。
+      B. 真故障定性 = 东财端（非本仓代码缺陷），已到铁证层级：
+         · #2172 / #2173（09-24 19:58 / 20:28 CST，category=post_close）逐字
+           `⚠️ push2 抖动(clist m:90 pz=200 po=1) 尝试1/3: HTTPSConnectionPool(host=
+           'push2delay.eastmoney.com', port=443): Read timed out.` → `⚠️ EXPERIMENT: 返回空，跳过`。
+         · #2288 / #2422（09-25 19:29 / 09-27 10:24 CST）逐字
+           `⚠️ 东财 push2 抖动(push2delay.eastmoney.com) 尝试1/3: HTTP Error 502: Bad Gateway`（≥10 次连打）。
+         ⇒ 属东财端真故障，**0 派发**（防踩踏），不反复补跑。
+      C. verify_how ② 现状与判据修正（本项当前**无法由原判据判**，非护栏失效）：
+         · EXPERIMENT 侧 —— 护栏 `::error title=v8-experiment-no-data::`（落于 da2639dada50 /
+           09-24 21:39 CST）**至今未被触发过一次**。原因：修复落地后所有 post_close 轮的
+           step9「📡 抓中国数据 → raw_data/（selective）」均 = **skipped**（09-25 中秋休市、
+           09-26/09-27 周末；#2288 step 表逐字 step9=skipped）⇒ cloud_fetch_v8.py **从未被执行**
+           ⇒ 「EXPERIMENT 抓取返回空」这条路径根本没走到 ⇒ 自然不会打标红。
+           **护栏验证窗口 = 09-28（周一）post_close 档**（故 #2288 的 `⏭️ EXPERIMENT 数据未变，
+           跳过重写（幂等）` 是 update_v8 侧幂等输出，不能当护栏证据）。
+         · SECTOR_LEADERS 侧 —— raw_data/sector_leaders.json 仍停在 2026-09-22 18:15:13
+           （末次提交 324a142bf114 / 09-22 18:17 CST），**原判据「raw 侧 ut 前进到 09-24 之后」无执行窗口**：
+           `scripts/fetch_sector_leaders.py`（blob 3ccc58ae76a5）L23 `OUT_RAW` + L24 `OUT_JS` 同写两路，
+           而 workflow 步序 **step17「📤 推送 raw_data/」先于 step22「SECTOR_LEADERS」**
+           ⇒ step22 本轮写下的 raw 最早只能在**下一轮** step17 被推；休市段 step9/step22 全 skip
+           ⇒ raw 侧自 09-22 后不可能前进。
+           ✅ 而**真源已前进**：data/SECTOR_LEADERS.js ut=2026-09-26 21:57 / data_date=2026-09-24 /
+           republish_time=2026-09-26 22:13:27（末次提交 85cd6c05dedd / 09-26 22:13 CST）。
+           ⇒ **建议 owner 把本项 verify_how ② 的第一判据由 raw_data 侧改判 data/SECTOR_LEADERS.js 侧**
+           （后者已达成），勿把本项永久卡在「无执行窗口」的判据上。
+      D. 工具判据（防再犯）：
+         ① 判「修复是否生效」= run.head_sha ≥ 修复 sha **且**读本次 run 的 step 表（step9/step22 是否 skipped）；
+         ② 东财故障判据 = 日志逐字含 `push2delay.eastmoney.com` 且含 `502 Bad Gateway` 或 `Read timed out`；
+         ③ 判「护栏是否失效」前先问「该路径本轮是否被执行」，skipped ≠ 护栏失效。
+      本轮写操作：0 dispatch / 0 数据补跑 / 0 邮件；仅本文件定点回填。
+
   - id: build13-timeout-guard
     priority: P0
     owner: shared
