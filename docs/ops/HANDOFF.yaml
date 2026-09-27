@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: 2026-09-27 12:23
+  updated: 2026-09-27 14:35
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -4762,7 +4762,23 @@ items:
           而真数据不动 ⇒ 判龄仍陈旧 ⇒ 再派发。今日实测 12:00–14:09 共 15 档（actor 全自动，
           1~2 分钟一档；采样时同 group in_progress = 1，未见 ≥2 堆积）。
           该循环由 09-28 交易日自然终止；治本须让闸门区分「结构性不可修（休市 / 外部源断供）」与「可修陈旧」。
-    updated: "2026-09-26 14:25"
+    alimi_verify_20260927_1435: >-
+      〔阿狸咪的工程师 2026-09-27 14:35 CST · 第 27 轮巡检 · 第 5 次复验（09-27 构建批实测）〕
+      判据（沿用 key 级口径）：取 main 最近 25 笔提交，逐笔用 commits API 抽目标文件 patch，
+      统计「唯一变化行是否只含时间键」（update_time / republish_time / generated / generated_at / updated）。
+      样本 = 09-27 构建批 6e870bc48f（message `v8 build: 2026-09-27 14:34`）。逐字：
+      · 🔴 仍假刷新（纯时间戳轮次 = 1、内容变更 = 0）：COMMODITY_ELASTICITY.js
+        （update_time 前进至 2026-09-27 14:34:16，data_date 仍 2026-09-26）、
+        SENTIMENT_CYCLE.js（2026-09-27 06:34:16）、MOMENTUM_FILTER.js（generated 恒 2026-09-24 19:02:16 未变）、
+        AUDIT_TRAIL.js、IMA_STRONG_BACKTEST.js
+        ⇒ 与前 4 次复验同结论：**5 项同族产物仍「内容零变化、update_time 每轮照刷」**。
+      · ✅ 已收口/未复现：SECTOR_LEADERS.js 本轮 0 变更（根因①确已根治）；EXPERIMENT.js 幂等跳过；
+        SECTOR_FUND_FLOW_INTRADAY.js 本轮 0 变更（09-26 观测到的每 1~2 分钟重写本轮未复现）。
+      ⇒ verify_how「内容零变化而 update_time 也不变」**仍未达成** ⇒ status 维持 pending-verify；
+        修法（update_v8.py::run_experiment_cards() 调用点 + 各 fetcher 落盘口径）仍待 owner 拍板，
+        阿狸咪本轮**未改码**。
+
+    updated: "2026-09-27 14:35"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: experiment-card-stalled-3d-0925
@@ -6134,7 +6150,7 @@ items:
     title: cn_fetch 三处 run 块 bash 语法缺陷 —— step24 index 完整性硬断言实为死码
     priority: P1
     owner: 阿狸咪的工程师（已修）/ 小九（复核 + 线上终验）
-    status: pending-verify
+    status: done
     alimi_verify_20260926_2045: >-
       🔴 **verify_how ② 于修复上线后实测「不通过」，且真因与 ①②③ 的预期不同**（阿狸咪 2026-09-26 20:35 CST 补）：
       run `#2321`（head `265b00bf863e`，**已含** `99fef522c817`）step21（`soft_13`）尾部**仍有**
@@ -6178,7 +6194,30 @@ items:
       ⇒ verify_how ① 三档齐备（#2321 / #2336 / #2354）；② 已按更正口径移交承接项（其「归错」本轮已逐字排除）；
         ③ 仍缺「index.html 无变化档」的自然样本。**故 status 维持 pending-verify**（不因 ①② 达成而宣称 done）。
         下一自然样本 = 首个 ?v 无变化的真跑档。
-    updated: 2026-09-27 00:59
+    alimi_verify_20260927_1435: >-
+      〔阿狸咪的工程师 2026-09-27 14:35 CST · 第 27 轮巡检 · 第 4/5 档线上复验 + 判据 ③ 定性为「结构性无执行窗口」〕
+      样本 = run #2446（id 36299893112，head d84bd0b560f0，2026-09-27 14:22 CST，ev=workflow_dispatch）
+      + run #2444（id 36299644849，head a12713044f37，2026-09-27 14:17 CST，同为 workflow_dispatch）。
+      （代码在用佐证：compare 1052d4334162...453c49e543eb = ahead 920 / behind 0。）
+      · ✅ ① 两档逐字一致：`✅ index.html 完整性断言通过：行数=19315 字节=1361458 尾部闭合=OK A2三锚=OK`；
+        同档全文本 `syntax error` / `unexpected end of file` / `here-document` 命中 0 行
+        ⇒ 修复后累计 **5 档**达成（#2321 / #2336 / #2354 / #2446 / #2444），跨 category、跨日齐备。
+      · ⚠️ ② 已按 alimi_verify_20260926_2045 的更正口径移交承接项 cn-softfail-annotation-dead-under-bash-e；
+        本轮同档逐字 `##[error]软失败步（不阻断 job，但对应数据可能未刷新）： soft_13`
+        ⇒ 聚合层回执正常，与本项无关。
+      · 🔴 ③ 实测「**结构性无执行窗口**」，非未通过：判据 ③ 的前提是「index.html 无变化」，
+        而两档均走到推送分支（`✅ index.html 完整性断言通过` 是**执行态**输出；
+        `ℹ️ ?v 已最新，无需推送` 仅出现在**脚本体回声**中）⇒ 该分支在当前环境**恒不成立**。
+        根因与在册项 card-fake-freshness-timestamp-rootfix-0925 同源：data/SECTOR_FUND_FLOW_INTRADAY.js
+        被 cn_fetch 高频重写 ⇒ 其 update_time 驱动 index.html 的 ?v 同步前进 ⇒ index.html 恒有变更。
+        ⇒ 判据 ③ 属**无窗口判据**（与技能 §24-1 同类）；其**意图**（证明 `git add/commit` 路径已恢复）
+        已被判据 ① 隐含覆盖 —— 完整性断言与 add/commit 同处 soft_15 的**同一 heredoc** 内，
+        断言能执行即证明整段 heredoc 被正确解析并执行。
+      ⇒ 本项缺陷（3 处 bash 语法，含 step24 硬断言实为死码）已由 5 档线上证据验收；
+        status 由 pending-verify 推进为 done 并填 verified_at。owner 侧若需独立复核，可回退状态字段。
+    verified_at: "2026-09-27 14:35"
+
+    updated: "2026-09-27 14:35"
     updated_by: 阿狸咪的工程师(alimi-cn)
     what: >-
       `.github/workflows/v8_cn_fetch_cloud.yml` 有 3 个 `run:` 块存在 bash 语法错误（阿狸咪 2026-09-26 20:1x CST
