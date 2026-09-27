@@ -3093,7 +3093,7 @@ items:
   - id: cn-fetch-writer-version-drift
     priority: P0
     owner: 阿狸咪的工程师
-    status: pending-verify
+    status: done
     updated_by: 阿狸咪的工程师（原记录）/ 小九（2026-09-23 实施 fix 建议①）
     what: >
       **未闭环的根因**：`index-tail-truncation-2220` 只修好了文件，**没有修掉那条会再次截断的路径**。
@@ -3196,6 +3196,36 @@ items:
       **真执行**（日志逐字 `python update_v8.py` + `✅ index.html cache-busting 参数已更新` + 逐文件 `✅ …json → ….js`）；
       且 `update_v8.py` @head `e267b89b33bb` / @`55f2e720df50` 的 blob = **`e3eff9d0de3b`（99,239 B）
       = main 当前 blob**（sha256 前 16 位 `dac81a1bc204fc93` 两者相同）⇒ 跑的确是 main 版，**无 writer 版本漂移**。
+    verified_at: "2026-09-28 01:35 CST（阿狸咪的工程师 / alimi-cn）"
+    updated: "2026-09-28 01:35"
+    updated_by: 阿狸咪的工程师（原记录）/ 小九（2026-09-23 实施 fix 建议①）/ 阿狸咪的工程师（2026-09-28 终验转 done）
+    alimi_verify_20260928_0130: >-
+      〔第 31 轮（阿狸咪的工程师 2026-09-28 01:35 CST）按 verify_how 三条逐项复验 —— 三项全达成，转 done〕
+      🔴 判据纪律：本轮不采信任何 run 的 conclusion，只采信「产物侧原文 / 真跑日志逐字 / blob sha 命名式比对」。
+      · ✅ verify_how ①（index.html 行数 ≥ 19,149 且末尾闭合）：线上硬抓 3 次复测，
+        http=200 / Content-Length=1,361,458 B / 19,315 行 / 末 200 字含 `</html>` / `</script>` 128 块
+        / `?v=` 115 处；远端 blob 1,361,458 B 逐字节一致。
+      · ✅ verify_how ②（workflow 中出现「硬失败」前置断言）：**且本轮首次取得「运行时真执行」证据**。
+        ① 静态：远端 `.github/workflows/v8_cn_fetch_cloud.yml` blob `f4bf6f6d73ac`（89,519 B / CR=0）。
+           把该文件 26 个 `run:` 块逐个抽出做净室 `bash -n` ⇒ **语法错误 3 → 0**（同项承接缺陷
+           `cnfetch-bash-syntax-dead-steps-0926` 的 heredoc 缩进修复确已在线上）。
+        ② 运行态逐字（cn_fetch run **#2536** / id 36330899847 / 23:48:25 CST / head `c12b3d17fa4d`）：
+           `✅ index.html 完整性断言通过：行数=19315 字节=1361458 尾部闭合=OK A2三锚=OK`
+           （同字样在 #2533 亦现）⇒ 四项硬断言（行数 ≥18,800 / 末 200 字含 `</html>` /
+           A2 三锚 STOCK_LIST·STOCK_QUOTE·LHB_HISTORY / 字节 ≥1.25MB）**在线上真跑且通过**。
+           硬失败语义核对：断言块以 `sys.exit(1)` + `::error title=v8-index-guard::` 落点在
+           `git add -f index.html` **之前** ⇒ 不过则不 add/不 commit/不 push（步级 continue-on-error
+           只放开 job 结论，不放开推送）⇒ 属真「硬」前置断言。
+      · ✅ verify_how ③（证明执行的是 main 版 writer，无版本漂移）：按 `contents?ref=<run head_sha>` 取
+        `update_v8.py` blob —— main / `c12b3d17fa4d`(#2536) / `730c9e182f12`(#2534/#2535) /
+        `392c6b7cb5bf`(#2531/#2532) 四者 blob **同为 `ea420b505cc3`（99,234 B）** ⇒ 真跑档执行的
+        就是 main 的 writer，writer 版本漂移不再存在。
+      · 闭合判据（代价面）：本项根因是「某轮会用早于修复的旧树副本写 index.html / 截断件可进 main」。
+        自 `af4b42b75435`（截断上传根因）与 `da2639dada50`/`631123e0bd8a`+`99fef522c817`（硬断言链）落地起，
+        连续 5 个自然日、含 09-27 单日 192 档 cn_fetch，index.html 恒为 19,315 行 / 1,361,458 B / 尾部闭合，
+        零截断件落 main。
+      ⚠️ 未主张：不断言「网络断流时守卫必然触发」（判据 ② 的负向窗口属 `trunc-read-treated-as-success`，
+        仍需一次真实断流事件方能取证；本项只主张「写出坏文件的路已被硬断言堵住」）。
 
   - id: trunc-read-treated-as-success
     priority: P0
