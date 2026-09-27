@@ -5115,6 +5115,18 @@ def main(category=None, only=None):
 
     tasks = [
         ("ETF_INTRADAY_HEAT", f_etf_intraday_heat),
+        # 🔴 2026-09-27 一劳永逸修复（阿狸咪·主人令「今晚全部修复好」）：
+        #   【病灶】EXPERIMENT 原排在 tasks 第 21 位（约 30 个源之中）。抓取循环有 720s 总预算
+        #     （FETCH_BUDGET_SEC，防单源 hung 拖死整轮），预算耗尽后剩余源整轮跳过（L5256）。
+        #     实测 09-27 category=all 跑批：前 20 个源吃满 720s ⇒ EXPERIMENT 被「⏳ 跳过」
+        #     ⇒ f_experiment 根本没执行 ⇒ datacenter 兜底（云端非中国 IP 触达不到 push2 的
+        #     唯一救命源）永远没机会跑 ⇒ 红卡永久停更、且 run 全绿（假成功）。
+        #   【修法】把 EXPERIMENT 前移到第 2 位（紧跟 ETF_INTRADAY_HEAT）。它依赖的
+        #     em_clist/datacenter 与其余源无依赖关系，提前跑零副作用；而一旦前移，
+        #     任何批次（含最重的 all）都会在预算耗尽前先完成 EXPERIMENT，从根上消除
+        #     「被预算跳过」这一静默失能。f_experiment 内部空数据仍 return None 不写盘，
+        #     不影响「不洗空」铁律。
+        ("EXPERIMENT", f_experiment),
         ("ETF_NET_SUBSCRIPTION", f_etf_net_subscription),  # 2026-09-11 主人 P1：真实份额申赎（上交所日环比）
         ("SECTOR_FUND_FLOW", f_sector_fund_flow),
         ("AVG_PRICE_DATA", f_avg_price),
@@ -5147,7 +5159,6 @@ def main(category=None, only=None):
         #   🔴 2026-09-23 主人拍板：因子观测卡整卡删除（解禁段与「解禁日历」同源重复+机构关注未验证）
         #     ⇒ data/INST_COVERAGE.js 及注入/转换侧全部退役；本 raw 抓取链保留（generate_top10.py 消费）。
         ("ANALYST_RATINGS", f_analyst_ratings),
-        ("EXPERIMENT", f_experiment),
         ("V8_CAL", f_v8_cal),
         ("CANDIDATE_QUOTES", f_candidate_quotes),
         ("SH_SZ_HISTORY", f_sh_sz_history),
