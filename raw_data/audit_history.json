@@ -3018,5 +3018,33 @@
     "message": "EXPERIMENT.js 更新于 5天前 18:13；超过通用红线 5940 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
+ },
+ {
+  "date": "2026-09-28",
+  "time": "02:34:52",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 125,
+   "warn": 0,
+   "fail": 2,
+   "limited": 3,
+   "info": 0,
+   "other": 0,
+   "total": 130
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "DO_NOT_DELETE",
+    "name": "防误删清单",
+    "message": "更新于 09-21 01:57；超过阈值 10080 分钟"
+   },
+   {
+    "id": "AVG_PRICE_DATA",
+    "name": "平均股价（全A算术平均·880003口径）",
+    "message": "更新于 4天前 11:30；超过阈值 5164 分钟"
+   }
+  ]
  }
 ]
