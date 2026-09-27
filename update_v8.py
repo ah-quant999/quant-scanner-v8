@@ -1328,7 +1328,7 @@ def _generate_audit_trail():
         "latest": latest,
         "history": history[-20:],
         "nightly": nightly,
-        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "generated_at": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
     }
 
 

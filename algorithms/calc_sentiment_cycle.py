@@ -15,11 +15,19 @@
 """
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "data")
 RAW = os.path.join(ROOT, "raw_data")
+
+
+CST = timezone(timedelta(hours=8))
+
+
+def now_cst():
+    """北京时间 CST+8。禁止无 tz 的本地时钟：云 runner (UTC) 会写出 -8h 的假时间戳。"""
+    return datetime.now(CST)
 
 
 def load_limit_up():
@@ -132,7 +140,7 @@ def main():
     high_ladder_count = sum(ladder_dist.get(n, 0) for n in range(3, 11))
 
     result = {
-        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
         "data_date": lm.get("update_time", "")[:10],
         "source": "LIMIT_UP_HEATMAP",
         "phase": phase,
