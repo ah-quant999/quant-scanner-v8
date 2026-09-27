@@ -3687,7 +3687,9 @@ def _experiment_from_datacenter():
         # 该报告单页硬截 500，循环翻页覆盖全市场（上限 15 页≈7500 只，远超 A 股总量）
         for _pg in range(1, 16):
             _params = dict(_base)
-            _params["pageNum"] = str(_pg)
+            # 🔴 2026-09-27 修：东财 datacenter 正确分页参数名是 pageNumber；写 pageNum 会被静默忽略
+            #   ⇒ 15 页全返回第 1 页（实测去重仅 500 只 000/001 深主板）⇒ 名单系统性偏深市
+            _params["pageNumber"] = str(_pg)
             try:
                 _r = _requests.get(_url, params=_params, headers=_headers, timeout=25)
                 _d = _r.json()
