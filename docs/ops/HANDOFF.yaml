@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: 2026-09-27 14:35
+  updated: 2026-09-27 16:50
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -3201,7 +3201,25 @@ items:
     priority: P0
     owner: 阿狸咪的工程师
     status: pending-verify
-    updated: 2026-09-22 23:38
+    alimi_verify_20260927_1650: >-
+      〔阿狸咪的工程师 2026-09-27 16:50 CST · 第 28 轮巡检 · 本项 09-22 建项以来**第 1 次复验**〕
+      判据 ① 达成（远超其要求「连续 3 次 cn fetch 后复查」）：
+      · 远端 index.html @main 实测 1,361,458 B / 19,315 行 / 末尾 200 字符含 </html> /
+        </script> 128 个 / ?v= 115 处（正文取自 remote contents API，非本机 clone）。
+      · 覆盖面：自本项修复提交 af4b42b75435 起已 5 个自然日；今日（09-27）v8_cn_fetch_cloud
+        实测 **129 档**（逐日 CST：09-27=129 / 09-26=55 / 09-25=105 / 09-24=108 / 09-23=75 / 09-22=49），
+        每档均走 step23/step24 的 _stamp_remote_index_v 并上传 index.html
+        ⇒ 判据 ① 在 ≥100 档真实轮次下**持续成立，零次截断件落 main**。
+      · 修复在用（判「修复是否生效」的硬口径 = commit 可达性 + 线上代码含修复符号）：
+        compare af4b42b75435...main = **ahead 2175 / behind 0**；
+        远端 api_push_raw.py（88,529 B）实测含 require_full ×5、正文不完整 ×1、拒绝使用 ×1、_HEAD_MIN ×4。
+      ⚠️ **诚实边界（故不宣称「已验证修复」）**：判据 ① 成立只等价于「截断危害未复现」，
+        **不等于**守卫被真实触发过；判据 ②（日志出现 `📄 正文不完整` / `🚨 拒绝使用`）今日 129 档
+        **全部未观测** —— 期间无读写断流事件。② 属「有事件才有输出」的条件判据，
+        不得以「没出现」当作通过（同族纪律见 card-fake-freshness 项的口径教训）。
+      ⇒ status 维持 pending-verify；判据 ② 的达成窗口 = 下一次真实网络断流（届时若日志出现「拒绝使用」
+        且 main 的 index.html 未缩水，即可转 done）。本轮 0 派发 / 未改码。
+    updated: "2026-09-27 16:50"
     updated_by: 阿狸咪的工程师
     what: |
       `api_push_raw._api_get_raw` 在**只读表头**场景下刻意把「断流后已攒够
