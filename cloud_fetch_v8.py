@@ -3659,74 +3659,80 @@ def f_analyst_ratings():
     return result
 
 
-def _experiment_from_akshare():
-    """EXPERIMENT 兜底源：东财 push2 clist 不可达时，用 akshare 取全市场个股快照。
+def _experiment_from_datacenter():
+    """EXPERIMENT 兜底源（云端 non-China runner 专用）：东财 datacenter RPT_DMSK_TS_STOCKNEW。
 
     🔴 2026-09-27 一劳永逸（阿狸咪的工程师·主人令「今晚全部修复」）：
-       em_clist 自 09-22 起因东财 push2 持续不可达恒返回空表 ⇒ EXPERIMENT 卡永久停在旧日期。
-       akshare 的 stock_individual_fund_flow_rank / stock_zh_a_spot_em 走与 push2 不同的
-       东财接口/域名（datacenter 实测可达），作为兜底源恢复该卡。
+       em_clist 走 push2.eastmoney.com，在 GitHub 云端 runner（非中国 IP）被墙、恒返回空表
+       ⇒ EXPERIMENT 卡自 09-22 起永久停更。akshare 的 stock_individual_fund_flow_rank /
+       stock_zh_a_spot_em 内部**同样走 push2** ⇒ 亦失效（已实测 ProxyError/空表）。
+       datacenter.eastmoney.com 是与 push2 不同的域名、非中国 IP 亦可直连（已实测 HTTP 200），
+       其 RPT_DMSK_TS_STOCKNEW 报告直接给出全市场个股的 涨跌幅(CHANGE_RATE) + 主力净流入
+       (PRIME_INFLOW)，字段语义与 em_clist 的 f3/f62 一致，故作为云端兜底源恢复该卡。
        任何异常都吞掉返回 [] —— 绝不因此让 f_experiment 崩溃，下游仍走「空则 ::error:: 不写盘」路径。
-       注：akshare 列名随版本浮动，按子串容错匹配；净额单位按 em_clist 约定换算成「亿」。"""
+       净额单位按 em_clist 约定换算成「亿」。"""
     try:
-        ak = get_ak()
-        recs = []
-        # 首选：个股资金流榜（含主力净流入 f62 等价字段）
-        try:
-            df = ak.stock_individual_fund_flow_rank(indicator="今日", stock="全部")
-            if df is not None and len(df):
-                cols = list(df.columns)
-                code_c = next((c for c in cols if "代码" in c), None)
-                name_c = next((c for c in cols if "名称" in c), None)
-                chg_c = next((c for c in cols if "涨跌幅" in c), None)
-                net_c = next((c for c in cols if "主力净额" in c or "净额" in c), None)
-                if code_c and name_c:
-                    for _, _row in df.iterrows():
-                        try:
-                            _net = _row[net_c] if net_c else 0.0
-                            try:
-                                _net = float(_net) / 1e8
-                            except Exception:
-                                _net = 0.0
-                            recs.append({
-                                "code": str(_row[code_c]).zfill(6),
-                                "name": str(_row[name_c]),
-                                "chg": float(_row[chg_c]) if chg_c else 0.0,
-                                "net": round(_net, 2),
-                                "netpct": 0.0,
-                            })
-                        except Exception:
-                            continue
-        except Exception as _e:
-            print(f"  ⚠️ akshare fund_flow_rank 兜底失败: {_e}")
-        # 次选：实时快照（保底拿涨幅，净额置 0）
-        if not recs:
+        _url = "https://datacenter.eastmoney.com/securities/api/data/v1/get"
+        _base = {
+            "reportName": "RPT_DMSK_TS_STOCKNEW",
+            "columns": "SECURITY_CODE,SECUCODE,SECURITY_NAME_ABBR,TRADE_DATE,"
+                       "CHANGE_RATE,PRIME_INFLOW,ORG_PARTICIPATE",
+            "pageSize": "500",
+            "source": "WEB",
+            "client": "WEB",
+        }
+        _headers = {"User-Agent": "Mozilla/5.0", "Referer": "https://data.eastmoney.com/"}
+        _recs = []
+        _td = None
+        # 该报告单页硬截 500，循环翻页覆盖全市场（上限 15 页≈7500 只，远超 A 股总量）
+        for _pg in range(1, 16):
+            _params = dict(_base)
+            _params["pageNum"] = str(_pg)
             try:
-                df = ak.stock_zh_a_spot_em()
-                if df is not None and len(df):
-                    cols = list(df.columns)
-                    code_c = next((c for c in cols if c == "代码"), None) or next((c for c in cols if "代码" in c), None)
-                    name_c = next((c for c in cols if "名称" in c), None)
-                    chg_c = next((c for c in cols if "涨跌幅" in c), None)
-                    if code_c and name_c:
-                        for _, _row in df.iterrows():
-                            try:
-                                recs.append({
-                                    "code": str(_row[code_c]).zfill(6),
-                                    "name": str(_row[name_c]),
-                                    "chg": float(_row[chg_c]) if chg_c else 0.0,
-                                    "net": 0.0,
-                                    "netpct": 0.0,
-                                })
-                            except Exception:
-                                continue
+                _r = _requests.get(_url, params=_params, headers=_headers, timeout=25)
+                _d = _r.json()
             except Exception as _e:
-                print(f"  ⚠️ akshare spot_em 兜底失败: {_e}")
-        if recs:
-            print(f"  ✅ akshare 兜底取到 {len(recs)} 只个股快照")
-        return recs
+                print(f"  ⚠️ datacenter 兜底第{_pg}页请求失败: {_e}")
+                break
+            if not _d.get("success"):
+                print(f"  ⚠️ datacenter 兜底第{_pg}页返回失败: {_d.get('message')}")
+                break
+            _rows = (_d.get("result") or {}).get("data") or []
+            if not _rows:
+                break
+            if _td is None:
+                _td = _rows[0].get("TRADE_DATE")
+            for _row in _rows:
+                try:
+                    _code = str(_row.get("SECURITY_CODE") or "").strip().zfill(6)
+                    if not _code or _code == "000000":
+                        continue
+                    _net = _row.get("PRIME_INFLOW") or 0
+                    try:
+                        _net = float(_net) / 1e8
+                    except Exception:
+                        _net = 0.0
+                    _org = _row.get("ORG_PARTICIPATE") or 0
+                    try:
+                        _org = float(_org) * 100
+                    except Exception:
+                        _org = 0.0
+                    _recs.append({
+                        "code": _code,
+                        "name": str(_row.get("SECURITY_NAME_ABBR") or "").strip(),
+                        "chg": round(float(_row.get("CHANGE_RATE") or 0), 2),
+                        "net": round(_net, 2),
+                        "netpct": round(_org, 2),
+                    })
+                except Exception:
+                    continue
+            if len(_rows) < 500:
+                break
+        if _recs:
+            print(f"  ✅ datacenter 兜底取到 {len(_recs)} 只个股快照（TRADE_DATE={_td}）")
+        return _recs
     except Exception as _e:
-        print(f"  ⚠️ akshare 兜底整体失败: {_e}")
+        print(f"  ⚠️ datacenter 兜底整体失败: {_e}")
         return []
 
 
@@ -3751,12 +3757,13 @@ def f_experiment():
         except Exception:
             continue
     # 🔴 2026-09-27 一劳永逸（阿狸咪的工程师·主人令「今晚全部修复」）：东财 push2 clist 自 09-22 起
-    #   持续不可达 ⇒ em_clist 恒返回空表 ⇒ EXPERIMENT 卡永久停旧日期。加 akshare 兜底源
-    #   （走与 push2 不同的东财接口/域名），取不到则 by_code 仍空，下方走「::error:: 不写盘」路径。
-    #   仅作兜底、不改变主路径语义；任何异常已在 _experiment_from_akshare 内吞掉。
+    #   持续不可达（云端 runner 非中国 IP 被墙）⇒ em_clist 恒返回空表 ⇒ EXPERIMENT 卡永久停旧日期。
+    #   加 datacenter 兜底源（RPT_DMSK_TS_STOCKNEW，push2 之外的东财域名、非中国 IP 可直连），
+    #   取不到则 by_code 仍空，下方走「::error:: 不写盘」路径。
+    #   仅作兜底、不改变主路径语义；任何异常已在 _experiment_from_datacenter 内吞掉。
     if not by_code:
-        print("  ⚠️ em_clist 为空（东财 push2 不可达），尝试 akshare 兜底源...")
-        for _ak_rec in _experiment_from_akshare():
+        print("  ⚠️ em_clist 为空（东财 push2 不可达），尝试 datacenter 兜底源...")
+        for _ak_rec in _experiment_from_datacenter():
             c = _ak_rec.get("code")
             if c and c not in by_code:
                 by_code[c] = _ak_rec
