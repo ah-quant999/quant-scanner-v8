@@ -1,15 +1,31 @@
 {
-  "update_time": "2026-09-28 17:01",
+  "update_time": "2026-09-28 18:24",
   "data_type": "real",
   "summary": {
-    "in_count": 8,
-    "out_count": 19,
-    "in_text": "电力(8.6亿)、石油加工贸易(6.0亿)、养殖业(5.5亿)、煤炭开采加工(3.5亿)、汽车整车(3.4亿)",
-    "out_text": "种植业与林业(-1.1亿)、综合(-1.1亿)、港口航运(-1.2亿)、汽车服务及其他(-1.2亿)、家居用品(-1.2亿)",
-    "alert": "🔥 8个板块大幅流入；⚠️ 19个板块大幅流出"
+    "in_count": 16,
+    "out_count": 0,
+    "in_text": "换电概念(12.4亿)、电力(8.6亿)、猪肉(6.8亿)、石油加工贸易(6.0亿)、养殖业(5.5亿)",
+    "out_text": "无",
+    "alert": "🔥 16个板块大幅流入；🚀 换电概念+12.4亿(连7天)"
   },
   "sectors_in": [
     {
+      "name": "换电概念",
+      "net": 12.39,
+      "net_5d": 19.02,
+      "net_20d": 48.64,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 16,
+      "net_60d": 48.64,
+      "net_60d_days": 16,
+      "consecutive_days": 7,
+      "trend": "in",
+      "net_10d": 43.88,
+      "net_10d_days": 10
+    },
+    {
       "name": "电力",
       "net": 8.6,
       "net_5d": -5.58,
@@ -24,6 +40,19 @@
       "consecutive_days": 1,
       "trend": "in",
       "net_20d_days": 40
+    },
+    {
+      "name": "猪肉",
+      "net": 6.81,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 4,
+      "trend": "in",
+      "net_5d_days": 4,
+      "net_10d_days": 4,
+      "net_20d_days": 4,
+      "net_60d_days": 4
     },
     {
       "name": "石油加工贸易",
@@ -88,6 +117,52 @@
       "net_10d_days": 10
     },
     {
+      "name": "中船系",
+      "net": 2.4,
+      "net_5d": 41.02,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 4,
+      "trend": "in",
+      "net_60d": 41.02,
+      "net_5d_days": 5,
+      "net_10d_days": 5,
+      "net_20d_days": 5,
+      "net_60d_days": 5
+    },
+    {
+      "name": "乳业",
+      "net": 2.28,
+      "net_5d": 9.63,
+      "net_20d": 38.27,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 15,
+      "net_60d": 38.27,
+      "net_60d_days": 15,
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_10d": 26.37,
+      "net_10d_days": 10
+    },
+    {
+      "name": "可燃冰",
+      "net": 2.19,
+      "net_5d": -0.18,
+      "net_20d": 8.05,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 18,
+      "net_60d": 8.05,
+      "net_60d_days": 18,
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_10d": 1.19,
+      "net_10d_days": 10
+    },
+    {
       "name": "轨交设备",
       "net": 1.79,
       "net_5d": 1.92,
@@ -132,297 +207,72 @@
       "trend": "in",
       "net_10d_days": 6,
       "net_20d_days": 6
-    }
-  ],
-  "sectors_out": [
+    },
     {
-      "name": "种植业与林业",
-      "net": -1.05,
+      "name": "养鸡",
+      "net": 1.53,
       "net_5d": 0,
       "net_20d": 0,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 3,
-      "net_10d_days": 3,
-      "net_20d_days": 3,
-      "net_60d_days": 3
-    },
-    {
-      "name": "综合",
-      "net": -1.1,
-      "net_5d": 3.35,
-      "net_20d": 9.34,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 20,
-      "net_60d": 9.34,
-      "net_60d_days": 20,
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_10d": -8.33,
-      "net_10d_days": 10
-    },
-    {
-      "name": "港口航运",
-      "net": -1.22,
-      "net_5d": 13.75,
-      "net_20d": 27.52,
-      "type": "行业",
-      "net_10d": -52.76,
-      "net_10d_days": 10,
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_60d": 20.86,
-      "net_60d_days": 6,
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_20d_days": 7
-    },
-    {
-      "name": "汽车服务及其他",
-      "net": -1.22,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "行业",
-      "consecutive_days": 4,
-      "trend": "out",
-      "net_5d_days": 4,
-      "net_10d_days": 4,
-      "net_20d_days": 4,
-      "net_60d_days": 4
-    },
-    {
-      "name": "家居用品",
-      "net": -1.25,
-      "net_5d": -0.06,
-      "net_20d": 7.11,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 16,
-      "net_60d": 7.11,
-      "net_60d_days": 16,
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_10d": -0.18,
-      "net_10d_days": 10
-    },
-    {
-      "name": "风电设备",
-      "net": -1.34,
-      "net_5d": 10.91,
-      "net_20d": 118.96,
-      "type": "行业",
-      "net_10d": 94.54,
-      "net_10d_days": 10,
-      "net_60d": 493.82,
-      "net_60d_days": 49,
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_20d_days": 44
-    },
-    {
-      "name": "其他社会服务",
-      "net": -1.36,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
+      "type": "概念",
+      "consecutive_days": 2,
+      "trend": "in",
       "net_5d_days": 2,
       "net_10d_days": 2,
       "net_20d_days": 2,
       "net_60d_days": 2
     },
     {
-      "name": "中药",
-      "net": -1.43,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 2,
-      "net_10d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
-    },
-    {
-      "name": "生物制品",
-      "net": -1.59,
-      "net_5d": -18.9,
-      "net_20d": -36.78,
-      "type": "行业",
+      "name": "宠物经济",
+      "net": 1.48,
+      "net_5d": 11.45,
+      "net_20d": 18.15,
+      "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_20d_days": 20,
-      "net_60d": -103.33,
-      "net_60d_days": 41,
-      "consecutive_days": 3,
-      "trend": "out",
-      "net_10d": -10.71,
+      "net_20d_days": 13,
+      "net_60d": 18.15,
+      "net_60d_days": 13,
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_10d": 6.43,
       "net_10d_days": 10
     },
     {
-      "name": "农产品加工",
-      "net": -1.71,
-      "net_5d": -9.06,
-      "net_20d": -17.07,
-      "type": "行业",
+      "name": "租售同权",
+      "net": 1.1,
+      "net_5d": 2.68,
+      "net_20d": 23.11,
+      "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_20d_days": 20,
-      "net_60d": 0.11,
-      "net_60d_days": 35,
-      "consecutive_days": 3,
-      "trend": "out",
-      "net_10d": -2.77,
+      "net_20d_days": 18,
+      "net_60d": 23.11,
+      "net_60d_days": 18,
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_10d": 17.11,
       "net_10d_days": 10
-    },
-    {
-      "name": "橡胶制品",
-      "net": -1.84,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 4,
-      "net_10d_days": 4,
-      "net_20d_days": 4,
-      "net_60d_days": 4
-    },
-    {
-      "name": "美容护理",
-      "net": -2.13,
-      "net_5d": 2.86,
-      "net_20d": 10.08,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 20,
-      "net_60d": -6.33,
-      "net_60d_days": 28,
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_10d": 6.38,
-      "net_10d_days": 10
-    },
-    {
-      "name": "造纸",
-      "net": -2.13,
-      "net_5d": 1.78,
-      "net_20d": 13.13,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 19,
-      "net_60d": 13.13,
-      "net_60d_days": 19,
-      "consecutive_days": 3,
-      "trend": "out",
-      "net_10d": 4.83,
-      "net_10d_days": 10
-    },
-    {
-      "name": "工程机械",
-      "net": -2.29,
-      "net_5d": -1.26,
-      "net_20d": -24.09,
-      "type": "行业",
-      "net_10d": -4.06,
-      "net_10d_days": 10,
-      "net_60d": 153.12,
-      "net_60d_days": 49,
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_20d_days": 28
-    },
-    {
-      "name": "旅游及酒店",
-      "net": -2.34,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 4,
-      "net_10d_days": 4,
-      "net_20d_days": 4,
-      "net_60d_days": 4
-    },
-    {
-      "name": "纺织制造",
-      "net": -2.54,
-      "net_5d": 0.12,
-      "net_20d": 11.29,
-      "type": "行业",
-      "net_10d": 10.04,
-      "net_10d_days": 10,
-      "net_60d": 175.03,
-      "net_60d_days": 49,
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_20d_days": 17
-    },
-    {
-      "name": "黑色家电",
-      "net": -2.64,
-      "net_5d": -0.07,
-      "net_20d": -0.16,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 16,
-      "net_60d": -0.16,
-      "net_60d_days": 16,
-      "consecutive_days": 3,
-      "trend": "out",
-      "net_10d": -6.56,
-      "net_10d_days": 10
-    },
-    {
-      "name": "环保设备",
-      "net": -2.69,
-      "net_5d": -1.6,
-      "net_20d": 0,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_60d": -4.08,
-      "net_60d_days": 6,
-      "consecutive_days": 4,
-      "trend": "out",
-      "net_10d_days": 7,
-      "net_20d_days": 7
-    },
-    {
-      "name": "包装印刷",
-      "net": -2.73,
-      "net_5d": 0.97,
-      "net_20d": 15.47,
-      "type": "行业",
-      "net_10d": 1.0,
-      "net_10d_days": 10,
-      "net_60d": 291.38,
-      "net_60d_days": 49,
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_20d_days": 24
     }
   ],
+  "sectors_out": [],
   "top_list": [
     {
+      "name": "换电概念",
+      "net": 12.39,
+      "net_5d": 19.02,
+      "net_20d": 48.64,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 16,
+      "net_60d": 48.64,
+      "net_60d_days": 16,
+      "consecutive_days": 7,
+      "trend": "in",
+      "net_10d": 43.88,
+      "net_10d_days": 10
+    },
+    {
       "name": "电力",
       "net": 8.6,
       "net_5d": -5.58,
@@ -437,6 +287,19 @@
       "consecutive_days": 1,
       "trend": "in",
       "net_20d_days": 40
+    },
+    {
+      "name": "猪肉",
+      "net": 6.81,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 4,
+      "trend": "in",
+      "net_5d_days": 4,
+      "net_10d_days": 4,
+      "net_20d_days": 4,
+      "net_60d_days": 4
     },
     {
       "name": "石油加工贸易",
@@ -501,6 +364,52 @@
       "net_10d_days": 10
     },
     {
+      "name": "中船系",
+      "net": 2.4,
+      "net_5d": 41.02,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 4,
+      "trend": "in",
+      "net_60d": 41.02,
+      "net_5d_days": 5,
+      "net_10d_days": 5,
+      "net_20d_days": 5,
+      "net_60d_days": 5
+    },
+    {
+      "name": "乳业",
+      "net": 2.28,
+      "net_5d": 9.63,
+      "net_20d": 38.27,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 15,
+      "net_60d": 38.27,
+      "net_60d_days": 15,
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_10d": 26.37,
+      "net_10d_days": 10
+    },
+    {
+      "name": "可燃冰",
+      "net": 2.19,
+      "net_5d": -0.18,
+      "net_20d": 8.05,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 18,
+      "net_60d": 8.05,
+      "net_60d_days": 18,
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_10d": 1.19,
+      "net_10d_days": 10
+    },
+    {
       "name": "轨交设备",
       "net": 1.79,
       "net_5d": 1.92,
@@ -545,6 +454,123 @@
       "trend": "in",
       "net_10d_days": 6,
       "net_20d_days": 6
+    },
+    {
+      "name": "养鸡",
+      "net": 1.53,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_5d_days": 2,
+      "net_10d_days": 2,
+      "net_20d_days": 2,
+      "net_60d_days": 2
+    },
+    {
+      "name": "宠物经济",
+      "net": 1.48,
+      "net_5d": 11.45,
+      "net_20d": 18.15,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 13,
+      "net_60d": 18.15,
+      "net_60d_days": 13,
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_10d": 6.43,
+      "net_10d_days": 10
+    },
+    {
+      "name": "租售同权",
+      "net": 1.1,
+      "net_5d": 2.68,
+      "net_20d": 23.11,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 18,
+      "net_60d": 23.11,
+      "net_60d_days": 18,
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_10d": 17.11,
+      "net_10d_days": 10
+    },
+    {
+      "name": "足球概念",
+      "net": 0.91,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 2,
+      "trend": "in"
+    },
+    {
+      "name": "禽流感",
+      "net": 0.73,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "页岩气",
+      "net": 0.67,
+      "net_5d": 28.63,
+      "net_20d": 56.81,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 20,
+      "net_60d": 51.43,
+      "net_60d_days": 21,
+      "consecutive_days": 3,
+      "trend": "in"
+    },
+    {
+      "name": "牙科医疗",
+      "net": 0.31,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 3,
+      "trend": "in"
+    },
+    {
+      "name": "中韩自贸区",
+      "net": 0.12,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 2,
+      "trend": "in"
+    },
+    {
+      "name": "网约车",
+      "net": 0.12,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 2,
+      "trend": "in"
+    },
+    {
+      "name": "兵装重组概念",
+      "net": 0.08,
+      "net_5d": 1.24,
+      "net_20d": 0,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_60d": -1.43,
+      "net_60d_days": 6,
+      "consecutive_days": 1,
+      "trend": "in"
     },
     {
       "name": "小家电",
@@ -576,6 +602,19 @@
       "trend": "out"
     },
     {
+      "name": "芬太尼",
+      "net": -0.05,
+      "net_5d": -4.48,
+      "net_20d": 0,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_60d": -4.3,
+      "net_60d_days": 6,
+      "consecutive_days": 6,
+      "trend": "out"
+    },
+    {
       "name": "燃气",
       "net": -0.12,
       "net_5d": 0,
@@ -597,6 +636,20 @@
       "net_5d_days": 5,
       "source": "本地累加",
       "consecutive_days": 1,
+      "trend": "out"
+    },
+    {
+      "name": "电子身份证",
+      "net": -0.26,
+      "net_5d": 4.2,
+      "net_20d": 16.61,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 11,
+      "net_60d": 16.61,
+      "net_60d_days": 11,
+      "consecutive_days": 2,
       "trend": "out"
     },
     {
@@ -642,6 +695,15 @@
       "trend": "out"
     },
     {
+      "name": "高压氧舱",
+      "net": -0.39,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 2,
+      "trend": "out"
+    },
+    {
       "name": "贸易",
       "net": -0.4,
       "net_5d": -3.06,
@@ -652,6 +714,63 @@
       "net_60d": -3.06,
       "net_60d_days": 5,
       "consecutive_days": 4,
+      "trend": "out"
+    },
+    {
+      "name": "白酒概念",
+      "net": -0.44,
+      "net_5d": 8.84,
+      "net_20d": -0.99,
+      "type": "概念",
+      "net_10d": -15.71,
+      "net_10d_days": 10,
+      "consecutive_days": 1,
+      "trend": "out"
+    },
+    {
+      "name": "举牌",
+      "net": -0.46,
+      "net_5d": 0.21,
+      "net_20d": -2.93,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 18,
+      "net_60d": -2.93,
+      "net_60d_days": 18,
+      "consecutive_days": 3,
+      "trend": "out"
+    },
+    {
+      "name": "露营经济",
+      "net": -0.49,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 3,
+      "trend": "out"
+    },
+    {
+      "name": "青蒿素",
+      "net": -0.55,
+      "net_5d": -2.25,
+      "net_20d": -22.33,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 12,
+      "net_60d": -22.33,
+      "net_60d_days": 12,
+      "consecutive_days": 1,
+      "trend": "out"
+    },
+    {
+      "name": "特色小镇",
+      "net": -0.62,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
       "trend": "out"
     },
     {
@@ -667,348 +786,19 @@
       "net_60d_days": 29,
       "consecutive_days": 4,
       "trend": "out"
-    },
-    {
-      "name": "房地产",
-      "net": -0.68,
-      "net_5d": 3.57,
-      "net_20d": 74.64,
-      "type": "行业",
-      "net_10d": 35.15,
-      "net_10d_days": 10,
-      "net_60d": 968.09,
-      "net_60d_days": 49,
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "consecutive_days": 3,
-      "trend": "out"
-    },
-    {
-      "name": "化学纤维",
-      "net": -0.74,
-      "net_5d": -1.25,
-      "net_20d": 7.42,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 14,
-      "net_60d": 7.42,
-      "net_60d_days": 14,
-      "consecutive_days": 1,
-      "trend": "out"
-    },
-    {
-      "name": "饮料制造",
-      "net": -0.79,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out"
-    },
-    {
-      "name": "医疗器械",
-      "net": -0.98,
-      "net_5d": -19.73,
-      "net_20d": -69.28,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 20,
-      "net_60d": -56.3,
-      "net_60d_days": 36,
-      "consecutive_days": 5,
-      "trend": "out"
-    },
-    {
-      "name": "种植业与林业",
-      "net": -1.05,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 3,
-      "net_10d_days": 3,
-      "net_20d_days": 3,
-      "net_60d_days": 3
-    },
-    {
-      "name": "综合",
-      "net": -1.1,
-      "net_5d": 3.35,
-      "net_20d": 9.34,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 20,
-      "net_60d": 9.34,
-      "net_60d_days": 20,
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_10d": -8.33,
-      "net_10d_days": 10
-    },
-    {
-      "name": "港口航运",
-      "net": -1.22,
-      "net_5d": 13.75,
-      "net_20d": 27.52,
-      "type": "行业",
-      "net_10d": -52.76,
-      "net_10d_days": 10,
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_60d": 20.86,
-      "net_60d_days": 6,
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_20d_days": 7
-    },
-    {
-      "name": "汽车服务及其他",
-      "net": -1.22,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "行业",
-      "consecutive_days": 4,
-      "trend": "out",
-      "net_5d_days": 4,
-      "net_10d_days": 4,
-      "net_20d_days": 4,
-      "net_60d_days": 4
-    },
-    {
-      "name": "家居用品",
-      "net": -1.25,
-      "net_5d": -0.06,
-      "net_20d": 7.11,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 16,
-      "net_60d": 7.11,
-      "net_60d_days": 16,
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_10d": -0.18,
-      "net_10d_days": 10
-    },
-    {
-      "name": "风电设备",
-      "net": -1.34,
-      "net_5d": 10.91,
-      "net_20d": 118.96,
-      "type": "行业",
-      "net_10d": 94.54,
-      "net_10d_days": 10,
-      "net_60d": 493.82,
-      "net_60d_days": 49,
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_20d_days": 44
-    },
-    {
-      "name": "其他社会服务",
-      "net": -1.36,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 2,
-      "net_10d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
-    },
-    {
-      "name": "中药",
-      "net": -1.43,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 2,
-      "net_10d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
-    },
-    {
-      "name": "生物制品",
-      "net": -1.59,
-      "net_5d": -18.9,
-      "net_20d": -36.78,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 20,
-      "net_60d": -103.33,
-      "net_60d_days": 41,
-      "consecutive_days": 3,
-      "trend": "out",
-      "net_10d": -10.71,
-      "net_10d_days": 10
-    },
-    {
-      "name": "农产品加工",
-      "net": -1.71,
-      "net_5d": -9.06,
-      "net_20d": -17.07,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 20,
-      "net_60d": 0.11,
-      "net_60d_days": 35,
-      "consecutive_days": 3,
-      "trend": "out",
-      "net_10d": -2.77,
-      "net_10d_days": 10
-    },
-    {
-      "name": "橡胶制品",
-      "net": -1.84,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 4,
-      "net_10d_days": 4,
-      "net_20d_days": 4,
-      "net_60d_days": 4
-    },
-    {
-      "name": "美容护理",
-      "net": -2.13,
-      "net_5d": 2.86,
-      "net_20d": 10.08,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 20,
-      "net_60d": -6.33,
-      "net_60d_days": 28,
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_10d": 6.38,
-      "net_10d_days": 10
-    },
-    {
-      "name": "造纸",
-      "net": -2.13,
-      "net_5d": 1.78,
-      "net_20d": 13.13,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 19,
-      "net_60d": 13.13,
-      "net_60d_days": 19,
-      "consecutive_days": 3,
-      "trend": "out",
-      "net_10d": 4.83,
-      "net_10d_days": 10
-    },
-    {
-      "name": "工程机械",
-      "net": -2.29,
-      "net_5d": -1.26,
-      "net_20d": -24.09,
-      "type": "行业",
-      "net_10d": -4.06,
-      "net_10d_days": 10,
-      "net_60d": 153.12,
-      "net_60d_days": 49,
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_20d_days": 28
-    },
-    {
-      "name": "旅游及酒店",
-      "net": -2.34,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 4,
-      "net_10d_days": 4,
-      "net_20d_days": 4,
-      "net_60d_days": 4
-    },
-    {
-      "name": "纺织制造",
-      "net": -2.54,
-      "net_5d": 0.12,
-      "net_20d": 11.29,
-      "type": "行业",
-      "net_10d": 10.04,
-      "net_10d_days": 10,
-      "net_60d": 175.03,
-      "net_60d_days": 49,
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_20d_days": 17
-    },
-    {
-      "name": "黑色家电",
-      "net": -2.64,
-      "net_5d": -0.07,
-      "net_20d": -0.16,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_20d_days": 16,
-      "net_60d": -0.16,
-      "net_60d_days": 16,
-      "consecutive_days": 3,
-      "trend": "out",
-      "net_10d": -6.56,
-      "net_10d_days": 10
-    },
-    {
-      "name": "环保设备",
-      "net": -2.69,
-      "net_5d": -1.6,
-      "net_20d": 0,
-      "type": "行业",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "net_60d": -4.08,
-      "net_60d_days": 6,
-      "consecutive_days": 4,
-      "trend": "out",
-      "net_10d_days": 7,
-      "net_20d_days": 7
-    },
-    {
-      "name": "包装印刷",
-      "net": -2.73,
-      "net_5d": 0.97,
-      "net_20d": 15.47,
-      "type": "行业",
-      "net_10d": 1.0,
-      "net_10d_days": 10,
-      "net_60d": 291.38,
-      "net_60d_days": 49,
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_20d_days": 24
     }
   ],
   "consecutive": {
+    "换电概念": {
+      "days": 7,
+      "trend": "in"
+    },
     "电力": {
       "days": 1,
+      "trend": "in"
+    },
+    "猪肉": {
+      "days": 4,
       "trend": "in"
     },
     "石油加工贸易": {
@@ -1027,6 +817,18 @@
       "days": 3,
       "trend": "in"
     },
+    "中船系": {
+      "days": 4,
+      "trend": "in"
+    },
+    "乳业": {
+      "days": 3,
+      "trend": "in"
+    },
+    "可燃冰": {
+      "days": 2,
+      "trend": "in"
+    },
     "轨交设备": {
       "days": 1,
       "trend": "in"
@@ -1039,6 +841,46 @@
       "days": 1,
       "trend": "in"
     },
+    "养鸡": {
+      "days": 2,
+      "trend": "in"
+    },
+    "宠物经济": {
+      "days": 2,
+      "trend": "in"
+    },
+    "租售同权": {
+      "days": 2,
+      "trend": "in"
+    },
+    "足球概念": {
+      "days": 2,
+      "trend": "in"
+    },
+    "禽流感": {
+      "days": 1,
+      "trend": "in"
+    },
+    "页岩气": {
+      "days": 3,
+      "trend": "in"
+    },
+    "牙科医疗": {
+      "days": 3,
+      "trend": "in"
+    },
+    "中韩自贸区": {
+      "days": 2,
+      "trend": "in"
+    },
+    "网约车": {
+      "days": 2,
+      "trend": "in"
+    },
+    "兵装重组概念": {
+      "days": 1,
+      "trend": "in"
+    },
     "小家电": {
       "days": 4,
       "trend": "out"
@@ -1047,12 +889,20 @@
       "days": 1,
       "trend": "out"
     },
+    "芬太尼": {
+      "days": 6,
+      "trend": "out"
+    },
     "燃气": {
       "days": 1,
       "trend": "out"
     },
     "白酒": {
       "days": 1,
+      "trend": "out"
+    },
+    "电子身份证": {
+      "days": 2,
       "trend": "out"
     },
     "物流": {
@@ -1067,104 +917,36 @@
       "days": 1,
       "trend": "out"
     },
+    "高压氧舱": {
+      "days": 2,
+      "trend": "out"
+    },
     "贸易": {
       "days": 4,
       "trend": "out"
     },
+    "白酒概念": {
+      "days": 1,
+      "trend": "out"
+    },
+    "举牌": {
+      "days": 3,
+      "trend": "out"
+    },
+    "露营经济": {
+      "days": 3,
+      "trend": "out"
+    },
+    "青蒿素": {
+      "days": 1,
+      "trend": "out"
+    },
+    "特色小镇": {
+      "days": 1,
+      "trend": "out"
+    },
     "医药商业": {
       "days": 4,
-      "trend": "out"
-    },
-    "房地产": {
-      "days": 3,
-      "trend": "out"
-    },
-    "化学纤维": {
-      "days": 1,
-      "trend": "out"
-    },
-    "饮料制造": {
-      "days": 1,
-      "trend": "out"
-    },
-    "医疗器械": {
-      "days": 5,
-      "trend": "out"
-    },
-    "种植业与林业": {
-      "days": 1,
-      "trend": "out"
-    },
-    "综合": {
-      "days": 1,
-      "trend": "out"
-    },
-    "港口航运": {
-      "days": 1,
-      "trend": "out"
-    },
-    "汽车服务及其他": {
-      "days": 4,
-      "trend": "out"
-    },
-    "家居用品": {
-      "days": 1,
-      "trend": "out"
-    },
-    "风电设备": {
-      "days": 1,
-      "trend": "out"
-    },
-    "其他社会服务": {
-      "days": 1,
-      "trend": "out"
-    },
-    "中药": {
-      "days": 1,
-      "trend": "out"
-    },
-    "生物制品": {
-      "days": 3,
-      "trend": "out"
-    },
-    "农产品加工": {
-      "days": 3,
-      "trend": "out"
-    },
-    "橡胶制品": {
-      "days": 1,
-      "trend": "out"
-    },
-    "美容护理": {
-      "days": 1,
-      "trend": "out"
-    },
-    "造纸": {
-      "days": 3,
-      "trend": "out"
-    },
-    "工程机械": {
-      "days": 1,
-      "trend": "out"
-    },
-    "旅游及酒店": {
-      "days": 1,
-      "trend": "out"
-    },
-    "纺织制造": {
-      "days": 1,
-      "trend": "out"
-    },
-    "黑色家电": {
-      "days": 3,
-      "trend": "out"
-    },
-    "环保设备": {
-      "days": 4,
-      "trend": "out"
-    },
-    "包装印刷": {
-      "days": 1,
       "trend": "out"
     }
   },
@@ -1880,20 +1662,19 @@
       "net_60d_days": 10
     },
     {
-      "name": "房地产",
-      "net": -0.68,
-      "net_5d": 3.57,
-      "net_20d": 74.64,
+      "name": "专精特新",
+      "net": -52.11,
+      "net_5d": -160.39,
+      "net_20d": 728.95,
+      "net_60d": 957.52,
       "type": "行业",
-      "net_10d": 35.15,
-      "net_10d_days": 10,
-      "net_60d": 968.09,
-      "net_60d_days": 49,
-      "net_5d_days": 5,
-      "source": "本地累加",
       "consecutive_days": 3,
       "trend": "out",
-      "net_20d_days": 40
+      "net_5d_days": 5,
+      "net_10d": 274.2,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 42
     }
   ]
 }
