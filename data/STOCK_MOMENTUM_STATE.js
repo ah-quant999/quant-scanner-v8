@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-28 23:59",
- "generated": "2026-09-28 23:59",
+ "update_time": "2026-09-29 00:17",
+ "generated": "2026-09-29 00:17",
  "meta": {
-  "generated": "2026-09-28 23:59",
+  "generated": "2026-09-29 00:17",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 17,
+  "total_days": 18,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -6759,6 +6759,230 @@ window.STOCK_MOMENTUM_STATE = (function() {
   },
   {
    "date": "2026-09-28",
+   "categories": {
+    "突破": [
+     {
+      "code": "600540",
+      "name": "新赛股份",
+      "change_pct": 3.867,
+      "price": 5.64,
+      "category": "突破"
+     },
+     {
+      "code": "601218",
+      "name": "吉鑫科技",
+      "change_pct": 10.0,
+      "price": 6.05,
+      "category": "突破"
+     },
+     {
+      "code": "688656",
+      "name": "浩欧博",
+      "change_pct": 4.17,
+      "price": 137.66,
+      "category": "突破"
+     },
+     {
+      "code": "600699",
+      "name": "均胜电子",
+      "change_pct": 6.189,
+      "price": 24.02,
+      "category": "突破"
+     },
+     {
+      "code": "000020",
+      "name": "深华发Ａ",
+      "change_pct": 9.992,
+      "price": 14.64,
+      "category": "突破"
+     },
+     {
+      "code": "600059",
+      "name": "古越龙山",
+      "change_pct": 6.636,
+      "price": 11.73,
+      "category": "突破"
+     },
+     {
+      "code": "600418",
+      "name": "江淮汽车",
+      "change_pct": 9.987,
+      "price": 25.22,
+      "category": "突破"
+     },
+     {
+      "code": "300207",
+      "name": "欣旺达",
+      "change_pct": 6.421,
+      "price": 21.38,
+      "category": "突破"
+     },
+     {
+      "code": "002100",
+      "name": "天康生物",
+      "change_pct": 3.694,
+      "price": 7.86,
+      "category": "突破"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 4.413,
+      "price": 128.01,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "600540",
+      "name": "新赛股份",
+      "change_pct": 3.867,
+      "price": 5.64,
+      "category": "加速"
+     },
+     {
+      "code": "601218",
+      "name": "吉鑫科技",
+      "change_pct": 10.0,
+      "price": 6.05,
+      "category": "加速"
+     },
+     {
+      "code": "688656",
+      "name": "浩欧博",
+      "change_pct": 4.17,
+      "price": 137.66,
+      "category": "加速"
+     },
+     {
+      "code": "600699",
+      "name": "均胜电子",
+      "change_pct": 6.189,
+      "price": 24.02,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "600540",
+      "name": "新赛股份",
+      "change_pct": 3.867,
+      "price": 5.64,
+      "category": "短线选股"
+     },
+     {
+      "code": "601218",
+      "name": "吉鑫科技",
+      "change_pct": 10.0,
+      "price": 6.05,
+      "category": "短线选股"
+     },
+     {
+      "code": "688656",
+      "name": "浩欧博",
+      "change_pct": 4.17,
+      "price": 137.66,
+      "category": "短线选股"
+     },
+     {
+      "code": "600699",
+      "name": "均胜电子",
+      "change_pct": 6.189,
+      "price": 24.02,
+      "category": "短线选股"
+     },
+     {
+      "code": "000020",
+      "name": "深华发Ａ",
+      "change_pct": 9.992,
+      "price": 14.64,
+      "category": "短线选股"
+     },
+     {
+      "code": "600059",
+      "name": "古越龙山",
+      "change_pct": 6.636,
+      "price": 11.73,
+      "category": "短线选股"
+     },
+     {
+      "code": "600418",
+      "name": "江淮汽车",
+      "change_pct": 9.987,
+      "price": 25.22,
+      "category": "短线选股"
+     },
+     {
+      "code": "300207",
+      "name": "欣旺达",
+      "change_pct": 6.421,
+      "price": 21.38,
+      "category": "短线选股"
+     },
+     {
+      "code": "002100",
+      "name": "天康生物",
+      "change_pct": 3.694,
+      "price": 7.86,
+      "category": "短线选股"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 4.413,
+      "price": 128.01,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "000020",
+      "name": "深华发Ａ",
+      "change_pct": 9.992,
+      "price": 14.64,
+      "category": "强势股"
+     },
+     {
+      "code": "600059",
+      "name": "古越龙山",
+      "change_pct": 6.636,
+      "price": 11.73,
+      "category": "强势股"
+     },
+     {
+      "code": "600418",
+      "name": "江淮汽车",
+      "change_pct": 9.987,
+      "price": 25.22,
+      "category": "强势股"
+     },
+     {
+      "code": "300207",
+      "name": "欣旺达",
+      "change_pct": 6.421,
+      "price": 21.38,
+      "category": "强势股"
+     },
+     {
+      "code": "002100",
+      "name": "天康生物",
+      "change_pct": 3.694,
+      "price": 7.86,
+      "category": "强势股"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 4.413,
+      "price": 128.01,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-09-29",
    "categories": {
     "突破": [
      {
