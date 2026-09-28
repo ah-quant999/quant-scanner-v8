@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-28 22:13"
+  updated: "2026-09-29 00:40"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 94
+  next_id_seq: 95
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -165,6 +165,108 @@ items:
             `[HEAL✓] [algo] 最终推荐入选日期: 未到 18:00 盘后选股窗口，跳过 algo_run 派发` ⇒
             HEALTH_CHECK 的 `final_enter_stale` warn 与 `FINAL_RECOMMEND_DATA.js`/`TOP10_DAILY.js` 陈旧
             **属 18:00 前的设计态**，非故障、禁补跑。
+    alimi_verify_20260929_0040: >-
+      〔阿狸咪的工程师 2026-09-29 00:40 CST · 第 4 次复验 · 隔夜档实测〕
+      A. 判据① EXPERIMENT —— 保持达成：远端 `raw_data/experiment.json` update_time = 2026-09-28 23:56:25。
+      B. 判据② SECTOR_LEADERS —— 仍未达成；本档补两处**机制级**新证据，并更正一条既往判词：
+         · 复发两档同签名（远端 API 实测）：#2609（created 22:18 / job 23:21:45→23:55:43）与
+           #2610（created 22:39 / job 23:55:48→00:31:57），step22 均先打
+           `✅ source SECTOR_RS: update_time=… data_date=2026-09-28 sectors=89/90`
+           ⇒ **上游 SECTOR_RS 已进 09-28**（卡堵点确在下游「抓东财板块成分股」这一步），随后
+           `⚠️ 东财 push2 抖动(push2delay.eastmoney.com) 尝试1/3: HTTP Error 502: Bad Gateway` →
+           `(push2.eastmoney.com) 尝试2/3: 502` →
+           `http.client.RemoteDisconnected: Remote end closed connection without response`，
+           栈帧 `fetch_sector_leaders.py:334 <module> → :249 build → :166 fetch_em_boards → :94 _get_json`；
+           两档 job 均以 `##[error]Process completed with exit code 1.` 收尾。
+         · 🔴 **更正本项 2026-09-28 16:50 判词**（上方 B 段「步内已打 ::error title=v8-softfail:soft_13b
+           ⇒ 护栏本身已生效」与实测不符）：两档日志中 `soft_13b` **仅出现 1 次**，即 run 块脚本文本自身，
+           **执行期并无该 annotation**。真因 = step22 的 `shell: bash` 展开含 `-e`
+           （逐字 `/usr/bin/bash --noprofile --norc -e -o pipefail {0}`），
+           `python scripts/fetch_sector_leaders.py` 一经非零，bash **立即退出**，
+           其后的 `_v8_rc=$?` 与 `echo "::error title=v8-softfail:soft_13b…"` **永不执行**
+           ⇒ 该软失败告警为**死码**（与在册 done 项 `cnfetch-bash-syntax-dead-steps-0926`
+           「仅尾部软失败告警/退出码失效」逐条吻合；该 done 项的复验结论应视为仍成立）。
+           净后果：本卡失败**只**在日志里以 GitHub 自打的 `##[error]Process completed with exit code 1.`
+           现形，而 API `steps[22].conclusion` 因 `continue-on-error: true` 仍报 **success**
+           ⇒ **job 绿 + step 绿 + 无告警 = 三重静默**，只看面板必漏。
+         · 🔴 **新增结构缺口**（本轮首次定位；与在册 `lhb-push-only-arg-noop-out-dir-unpushed`
+           同族「产物落在推送面之外」）：step22 在 **L308 先写 `raw_data/sector_leaders.json`、
+           L311 再写 `data/SECTOR_LEADERS.js`**；而其后**唯一**推送步 step23（`soft_14`）只
+           `DATA_MANIFEST=$(git status --porcelain data/ | …)`；含 `raw_data/` 的推送步 step17（`soft_10`，
+           glob = `raw_data/ data/`）**排在 step22 之前**；step24 只 `git add -f index.html`、
+           step25 仅派发算法链 ⇒ **step22 写入的 raw 侧产物在本 workflow 内无任何推送通道**。
+           实测吻合：`data/SECTOR_LEADERS.js` 有 09-25 / 09-26 两笔落仓提交，而
+           `raw_data/sector_leaders.json` 自 09-22 起 **0 笔** ⇒ 该滞留**不是**东财端造成，属**结构性落不了地**。
+      C. 处置：仍**不派发**（cn_fetch 同组排队 4 个：1 running + 3 pending，队列在推进
+         #2609→#2610→#2611，按纪律只报告不 dispatch）；两项修法均属 **workflow 车道（小九）**：
+         ① step23 的 glob 扩为 `raw_data/ data/`（或把 step22 上移至 step17 之前）；
+         ② `soft_13`/`soft_13b` 改用 `python … || _v8_rc=$?` 以兼容 `-e`，恢复告警可用。
+         **本轮未擅改 workflow**，已另立 item `cnfetch-step22-raw-unpushed-alert-dead-0929` 挂账。
+      D. 旁证（本轮其余面全绿）：主站 200 / 1,364,111 B；`raw_data/algo_run_report.json` 与
+         `algo_heartbeat.json` update_time 均 = 2026-09-28 21:47:53；`data/HEALTH_CHECK.js` 更新于 00:20:28；
+         build_deploy #8676 / health_patrol #4018 于 00:32 起跑（head `e1973bbe30`）。
+
+
+
+  - id: cnfetch-step22-raw-unpushed-alert-dead-0929
+    title: "cn_fetch step22（板块龙头股字典）两处结构性缺陷：raw 侧产物无推送通道 + 软失败告警为死码（-e 吞掉）"
+    priority: P1
+    owner: 小九(lemoncat-cn)
+    status: todo
+    scope: workflow
+    created: "2026-09-29 00:40"
+    what: >-
+      `.github/workflows/v8_cn_fetch_cloud.yml` 的 step22「🐲 板块龙头股字典（SECTOR_LEADERS，仅 post_close）」
+      （id `soft_13b`）存在两处结构性缺陷，均由阿狸咪 2026-09-29 00:30–00:40 CST 远端 API + job 原始日志
+      实测定位（禁读本机 clone）：
+      ① **raw 侧产物结构性落不了地**：`scripts/fetch_sector_leaders.py` 在 L308 写
+         `raw_data/sector_leaders.json`、L311 写 `data/SECTOR_LEADERS.js`。而本 workflow 内
+         **最后一个 glob 含 `raw_data/` 的推送步是 step17**（`soft_10`，
+         `MANIFEST=$(git status --porcelain raw_data/ data/ …)`，L638），它**排在 step22 之前**；
+         step22 之后唯一的推送步 step23（`soft_14`）只 glob `data/`（L802）；step24 只
+         `git add -f index.html`、step25 仅派发算法链 ⇒ step22 写入的 raw 产物**无任何推送通道**。
+      ② **软失败告警为死码**：step22 的 `shell: bash` 展开为
+         `/usr/bin/bash --noprofile --norc -e -o pipefail {0}`，`-e` 使
+         `python scripts/fetch_sector_leaders.py` 一经非零即**立即退出**，其后赖以捕获退出码的
+         `_v8_rc=$?` 与 `echo "::error title=v8-softfail:soft_13b…"`（L781-785）**永不执行**
+         ⇒ 设计中的显式告警从未生效（与在册 done 项 `cnfetch-bash-syntax-dead-steps-0926`
+         「仅尾部软失败告警/退出码失效」同源）。
+    impact: >-
+      · ①使 `raw_data/sector_leaders.json` 长期滞留（远端实测：该文件最新提交 `324a142bf1`
+        @2026-09-22 18:17:33，其后 **0 笔**），而 `data/SECTOR_LEADERS.js` 却能在脚本成功的轮次落仓
+        （09-25 `0802df64e8` / 09-26 `85cd6c05de`）⇒ raw 与 js 双产物**长期不同批、不同日期**，
+        使「卡面 vs 源」审计、HEALTH_CHECK 新鲜度判定与 `card-fake-freshness-timestamp-rootfix-0925`
+        的 verify 都失去可靠中间产物。
+      · ②使本卡失败**完全静默**：job 结论 success（`continue-on-error: true`）、
+        API `steps[22].conclusion` = success、且无 `::error` 告警 ⇒ 只看面板必漏；唯一痕迹是
+        日志里 GitHub 自打的 `##[error]Process completed with exit code 1.`。
+      · 与在册 `lhb-push-only-arg-noop-out-dir-unpushed`（产物落在推送面之外）属**同族**，
+        说明「写入点晚于/超出推送面」这一模式在本仓已至少两处独立复现 ⇒ 建议纳入同族矩阵化排查：
+        **凡产物写入点，须逐一同列「谁负责推它、该推送步在写入点之前还是之后」**。
+    fix: >-
+      建议（属 workflow 车道，待小九落码；阿狸咪本轮**未擅改 workflow**）：
+      ① 将 step23（`soft_14`）的 `DATA_MANIFEST` glob 由 `data/` 扩为 `raw_data/ data/`
+         （最小改动、保留「自闭环」语义）；或将 step22 整体上移至 step17 之前，
+         使其 raw 产物落入 step17 的推送面。二选一须同时评估与 step19 `update_v8` 的先后依赖。
+      ② 将 `soft_13`/`soft_13b`（以及其余同型 `soft_*`）的告警改为
+         `python … || _v8_rc=$?` 或显式 `set +e`，使 `-e` 下退出码仍可捕获、告警可打印；
+         否则「软失败强制告警」在本文件内多处为**纸面约定**。
+    verify_how: >-
+      ① 静态：`python api_push_raw.py` 的调用点中，glob 含 `raw_data/` 的**最后一个** step 的
+         行号 > `scripts/fetch_sector_leaders.py` 两个写盘点的所属 step 行号（给出 grep 输出）；
+      ② 动态：下一轮 `[… post_close]` 且 step22 **真跑成功**的 run，去
+         `GET /commits?path=raw_data/sector_leaders.json` 取最新一笔，其 committer date 须 **≥ 该 run 的
+         job 结束时刻**，且与同轮 `data/SECTOR_LEADERS.js` 同 commit 或同一批；
+      ③ 告警可执行性反测：本地 `bash -e` 跑同型块，确认 `_v8_rc` 能取到非零且 `::error` 被打印
+         （当前版本必为「取不到」= FAIL）。
+    not_verify_how: >-
+      · ❌ 禁以「run conclusion = success」判 ② 已修（`continue-on-error` 恒绿）；
+      · ❌ 禁以「API steps[22].conclusion = success」判无故障（本轮已证其为假绿）；
+      · ❌ 禁读本机 clone 的 `raw_data/` 或 `data/*.js` 判断产物新鲜度（本机副本恒陈旧）。
+    refs: >-
+      `.github/workflows/v8_cn_fetch_cloud.yml`（step17 L637-643 / step22 L772-785 /
+      step23 L790-807 / step24 L876-881）；`scripts/fetch_sector_leaders.py`（L308 / L311 / L334）；
+      job 原始日志 run #2609（job 108997948527）/ #2610（job 109012740483）。
 
   - id: build13-timeout-guard
     priority: P0
