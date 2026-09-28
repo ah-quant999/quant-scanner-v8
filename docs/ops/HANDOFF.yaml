@@ -6574,3 +6574,56 @@ items:
          唯一 fail = AVG_PRICE_DATA（既有挂账，非本改动引入）；`all_EXPERIMENT` 已随红卡恢复移出 fail ⇒ 未新增 ✅。
       修复合入硬判据：`GET /repos/ah-quant999/quant-scanner-v8/compare/4b32ddd3d40b...main` = ahead 84 / behind 0。
       ⇒ status pending-verify → **done**（本项闭环；另有 70 个脚本的裸 datetime.now 需按 runs-on 归属另立评估，不在本项范围）。
+  - id: avgprice-source-switch-caliber-gap-0928
+    priority: P1
+    owner: shared
+    status: todo
+    what: >-
+      平均股价（AVG_PRICE）**换源口径断层**：09-28 09:32 `35bce73af331` 把 `f_avg_price`
+      主源由东财 em_clist 换成新浪 Market_Center（因东财 clist 云端整体不可用，属必要换源），
+      但**未做口径接续** —— 新浪口径的今日值被直接追加到东财口径的 19 天 `history` 之后，
+      且 `ma20/ma60/position_vs_ma*` 直接用该混合序列计算。
+      线上实测：`data/AVG_PRICE_DATA.js` 09:39:19 `avg_price=26.9019` / 09:46:36 `26.6497`，
+      `prev_avg_price=28.9545` ⇒ 隐含 **−7.09% / −7.96%**；而**同文件** `avg_change_pct`
+      仅 **−1.15% / −1.32%**，同批 `data/MARKET_ALERTS.js` 实测沪指 −0.86% / 深成 −1.69% /
+      创业板 −2.30% ⇒ 价格字段隐含跌幅不可能为真。定量离群：近 20 日
+      `|均价日变化−avg_change_pct|` 最大 1.80pp（09-01），今日 **5.94pp**。
+      真值裁判（本机独立复算同接口 + 第三方交叉）：新浪 5294 只 = **26.7932**、
+      腾讯 5294 只 = **26.7803**，逐股最大偏差 1.4%、`|比值−1|>3%` 只数 = 0
+      ⇒ **新值可信，8% 台阶来自换源本身**（东财端云端/家机均不可达，成因标待定，不影响处置）。
+      用户可见影响：`index.html` L2397-2470 该卡按 `position_vs_ma_eff`（今日 −5.9155·MA20）
+      与阈值 ±3/±5 渲染出 **「偏低·超卖·MA20」假信号**；而 `HEALTH_CHECK` 因「数据变新」
+      已 fail=0（ok 118 / warn 0 / fail 0 / limited 3 / total 121）⇒ **守卫绿 ≠ 数据对**。
+      另：`source` 字段为硬编码字面量 `全A等权自算(东财em_clist)`，实取新浪 ⇒ 溯源失真。
+    fix: >-
+      【未实施·建议】① 口径接续（主）：`history` 条目加 `src` 标识，跨源以切换日为界 ——
+      或存旧序列到 `history_legacy_eastmoney` 并从切换日重建新口径序列（MA 走 `_MA_LADDER`
+      MA5→MA15→MA20 自动升档，「积累中」优于假破位），或按切换日**同一时刻**实测比值一次性折算；
+      ② L5262 `source` 字符串随实际源写入（如 `全A等权自算(新浪 Market_Center)`）；
+      ③ 卡名/`index_name`/`source` 三处口径统一；④ 加护栏：跨源追加时若
+      `|今日值/前一交易日值−1|` 与 `avg_change_pct` 相差 > 3pp ⇒ 打
+      `::warning title=v8-avgprice-caliber-gap::` 并拒绝接续（宁缺勿错）。
+      ⚠️ **不得**回退成「再等东财」：东财 clist 云端已整体不可用，回退＝回到 4 天停更。
+      参照同文件 L5152-5169 既有「880003 口径保护」纪律 —— 该纪律只挡 `880003` 字样，
+      挡不住「同为『全A等权』但换源」，本项即补该缺口。
+    verify_how: >-
+      ① `data/AVG_PRICE_DATA.js` 的 `|(avg_price/prev_avg_price−1)*100 − avg_change_pct|`
+      **< 1.5pp**；② `source` 字段与实际取源一致；③ 连续 3 批 `MA20` 无跨源单日台阶
+      （相邻两批 MA20 变化 < 1%）；④ `index.html` 该卡档位不再由跨口径 MA 触发。
+      🔴 判据纪律：**不得**以 `HEALTH_CHECK` 的 `AVG_PRICE_DATA` 由 fail 转 ok 作为「已修」证据
+      —— 该项只因「数据变新」而清，与口径正确性无关（本轮已实测 fail=0 而值仍错）。
+    evidence: >-
+      换源提交 `35bce73af331`（09-28 09:32:31 CST）＝ cn_fetch run **#2566** 的 `head_sha`
+      （`contents?ref=35bce73af331` 与写盘轮同源，已断言）；云端 run #2566 日志逐字
+      `[平均股价] 新浪源成功：5293 只` / `有效窗口 MA20=28.3379 偏离=-5.0674%`；
+      09:44:35 提交 `338dd171e451` 的 `data/AVG_PRICE_DATA.js` diff 可见
+      `28.9545(东财,09-24) → 26.9019(新浪,09-28)` 单日台阶；
+      离群判据由 `history[]` 20 项全量复算得出；三方对照由本机独立复算
+      （新浪 53 页 / 15.2s / 5194 只 = 27.0117；腾讯逐股 5294 只 = 26.7803）得出。
+    refs: >-
+      `cloud_fetch_v8.py#f_avg_price`（L4916-5287，尤 L5205-5213 / L5220-5225 / L5262）·
+      `data/AVG_PRICE_DATA.js` · `raw_data/avg_price_data.json` · `data/MARKET_ALERTS.js` ·
+      `index.html` L2397-2470 · `data/HEALTH_CHECK.js` · 接管档
+      `docs/ops/handover/2026-09-28_0955_阿狸咪的工程师给小九_平均股价换源口径断层.md`
+    updated: "2026-09-28 09:55"
+    updated_by: 阿狸咪的工程师(alimi-cn)
