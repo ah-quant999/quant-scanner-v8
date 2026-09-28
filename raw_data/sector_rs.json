@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-29 03:35",
+  "update_time": "2026-09-29 03:57",
   "data_date": "2026-09-28",
   "data_date_source": "kline",
   "fetch_date": "2026-09-29",
@@ -1472,15 +1472,15 @@
       "pct_30d": -6.89,
       "pct_60d": 7.76,
       "pct_90d": -2.1,
-      "pct_180d": null,
-      "pct_52w": null,
+      "pct_180d": -14.83,
+      "pct_52w": -5.96,
       "relative_5d": -0.04,
       "relative_20d": -3.01,
       "relative_30d": -6.89,
       "relative_60d": 7.76,
       "relative_90d": -2.1,
-      "relative_180d": null,
-      "relative_52w": null
+      "relative_180d": -14.83,
+      "relative_52w": -5.96
     },
     {
       "name": "养殖业",
