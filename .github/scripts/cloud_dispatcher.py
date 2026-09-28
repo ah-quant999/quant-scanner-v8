@@ -340,11 +340,74 @@ def _momentum_filter_needs_recompute():
     except Exception as e:
         return True, "解析异常: " + str(e)
 
+def _algo_track_needs_recompute():
+    """ALGO_TRACK（四量终极/RPS/CRDS 追踪）由本链盘中每 2h 重生；若其 update_time 日期 < 今日
+    （盘中漏派发）则仍需补算。2026-09-28 一劳永逸根因修复：原 _momentum_filter_needs_recompute
+    只判 MOMENTUM_FILTER.js（该文件已由 19:15 盘后链每日保新鲜）→ 恒判「无需重算」→
+    dispatch_momentum_intraday 永不派发 v8_algo_intraday_lite → ALGO_TRACK 停更（实测至 09-25）。
+    本判据使本链真正服务于其真实产物 ALGO_TRACK。"""
+    p = os.path.join(REPO_ROOT, "data", "ALGO_TRACK.js")
+    if not os.path.exists(p):
+        return True, "ALGO_TRACK.js 缺失"
+    try:
+        s = open(p, encoding="utf-8").read()
+        mg = re.search(r'["\'](?:update_time|generated)["\']\s*[:=]\s*["\']([\d-]+\s*[\d:]+)', s)
+        today = datetime.datetime.now(CST).strftime("%Y-%m-%d")
+        if not mg:
+            return True, "ALGO_TRACK 无法解析日期"
+        if mg.group(1)[:10] < today:
+            return True, "ALGO_TRACK 陈旧(%s < 今日 %s)，需补算" % (mg.group(1)[:10], today)
+        return False, "ALGO_TRACK 已为今日(%s)" % mg.group(1)[:10]
+    except Exception as e:
+        return True, "ALGO_TRACK 解析异常: " + str(e)
+
+def _intraday_snapshot_needs_recompute():
+    """板块资金日内快照由 v8_intraday_snapshot 独立高频 job 写；该 workflow 仅依赖被 GitHub 静默
+    注销的 schedule cron（09-21 已挂账 intraday-chain-cron-deregistered），无 dispatch 兜底 → 整日哑火。
+    本判据在其产物陈旧时兜底派发（SECTOR_FUND_FLOW_INTRADAY 目前由 cn_fetch 内联调用保新鲜，
+    故多数情况判定新鲜跳过；仅当 cn_fetch 也失联时才真正兜底，避免双重写入冲突）。"""
+    p = os.path.join(REPO_ROOT, "data", "SECTOR_FUND_FLOW_INTRADAY.js")
+    if not os.path.exists(p):
+        return True, "SECTOR_FUND_FLOW_INTRADAY.js 缺失"
+    try:
+        s = open(p, encoding="utf-8").read()
+        mg = re.search(r'["\'](?:update_time|generated)["\']\s*[:=]\s*["\']([\d-]+\s*[\d:]+)', s)
+        if not mg:
+            return True, "SECTOR_FUND_FLOW_INTRADAY 无法解析日期"
+        dt = datetime.datetime.strptime(mg.group(1)[:16].replace("T", " "), "%Y-%m-%d %H:%M").replace(tzinfo=CST)
+        ago = (datetime.datetime.now(CST) - dt).total_seconds() / 60.0
+        if ago > 25:
+            return True, "SECTOR_FUND_FLOW_INTRADAY 陈旧(%.0f分钟前)" % ago
+        return False, "SECTOR_FUND_FLOW_INTRADAY 新鲜(%.0f分钟前)" % ago
+    except Exception as e:
+        return True, "SECTOR_FUND_FLOW_INTRADAY 解析异常: " + str(e)
+
+def dispatch_intraday_snapshot(now):
+    need, why = _intraday_snapshot_needs_recompute()
+    if not need:
+        print("  板块资金日内快照: " + why + "，跳过")
+        return
+    lr = latest_run("v8_intraday_snapshot.yml")
+    if lr:
+        created, concl = lr
+        ct = datetime.datetime.fromisoformat(created.replace("Z", "+00:00")).astimezone(CST)
+        ago = (now - ct).total_seconds() / 60.0
+        if concl == "success" and ago <= 15:
+            print("  板块资金日内快照: 成功于 %s(%.0f分钟前)，冷却跳过" % (ct.strftime("%H:%M"), ago))
+            return
+    print("  板块资金日内快照: " + why + "，派发 v8_intraday_snapshot.yml")
+    dispatch("v8_intraday_snapshot.yml")
+
 def dispatch_momentum_intraday(now):
     need, why = _momentum_filter_needs_recompute()
     if not need:
-        print("  动量轻量: " + why + "，跳过")
-        return
+        # 2026-09-28 一劳永逸：补判 ALGO_TRACK 新鲜度（本链真实产物），避免 ALGO_TRACK 永不再生
+        a_need, a_why = _algo_track_needs_recompute()
+        if a_need:
+            need, why = True, a_why
+        else:
+            print("  动量轻量: " + why + "，跳过")
+            return
     # 冷却：最近冷却窗口内已成功跑过则跳过（防 30 分轮询频派发）
     lr = latest_run(MOMENTUM_LITE_WF)
     if lr:
@@ -431,6 +494,9 @@ def main():
 
     # 3) 动量共识筛选重算（新 OCR 输入触发 + 冷却）
     dispatch_momentum_intraday(now)
+
+    # 3.5) 2026-09-28 一劳永逸：板块资金日内快照兜底派发（覆盖被注销的 schedule）
+    dispatch_intraday_snapshot(now)
 
     print("🛰️ 兜底调度完成")
 
