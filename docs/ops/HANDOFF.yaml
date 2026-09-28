@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: 2026-09-28 16:43
+  updated: 2026-09-27 22:00
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 91
+  next_id_seq: 92
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -121,50 +121,6 @@ items:
          ② 东财故障判据 = 日志逐字含 `push2delay.eastmoney.com` 且含 `502 Bad Gateway` 或 `Read timed out`；
          ③ 判「护栏是否失效」前先问「该路径本轮是否被执行」，skipped ≠ 护栏失效。
       本轮写操作：0 dispatch / 0 数据补跑 / 0 邮件；仅本文件定点回填。
-    alimi_verify_20260928_1650: >-
-      〔阿狸咪的工程师 2026-09-28 16:45 CST · 第 3 次复验 · 今日 post_close 档实测〕
-      A. 判据① EXPERIMENT —— 已达成（真源已推进）：
-         · `raw_data/experiment.json` update_time = **2026-09-28 16:13:46**；`data/EXPERIMENT.js` 同刻。
-           提交历史逐档在推：`0b33d8c1ce`（09-28 16:25:54）/ `be5a392fd8`（16:17:44）/ `13e7d981b1`（15:55:43）。
-         · 同档日志（run #2599 `[premarket,post_close]`）逐字 `>>> EXPERIMENT 2026-09-28T16:03:53+08:00` +
-           `✅ EXPERIMENT → raw_data/experiment.json` ⇒ 常规成功路径（非 datacenter 兜底路径）。
-         · 名单由「全深市」变为**跨市场**（`000/002/300/301/600/601/603/605/688` 齐现，此前仅 `000/001`）
-           ⇒ 分页修复 `be247848b0` 亦已生效。
-      B. 判据② SECTOR_LEADERS —— 仍未达成（本轮**铁证级**新增）：
-         · run #2597（`[post_close]`，created 15:34:25 / job 16:13:08→16:43:07，**run 结论 success**）
-           step22「🐲 板块龙头股字典（SECTOR_LEADERS，仅 post_close）」日志逐字：
-           `⚠️ 东财 push2 抖动(push2delay.eastmoney.com) 尝试1/3: HTTP Error 502: Bad Gateway → 0.6s 后换 host 重试`
-           `⚠️ 东财 push2 抖动(push2.eastmoney.com) 尝试2/3: HTTP Error 502: Bad Gateway → 1.1s 后换 host 重试`
-           栈帧 `scripts/fetch_sector_leaders.py:334 <module> → :249 build → :166 fetch_em_boards → :104/:94 _get_json`
-           ⇒ **换 host 重试两次仍 502**。
-         · 步内已打 `::error title=v8-softfail:soft_13b(exit=...)::🐲 板块龙头股字典生成软失败`
-           ⇒ **护栏本身已生效**（失败有显式 annotation）；step 结论仍 success 属「软失败步」语义，
-           **不是**护栏失效（判据见 D-③）。
-         · 换 host 修复**确实在用**：run head `9eaba0c48b` ≫ `1052d4334162`，且日志里 host 已在
-           `push2delay` / `push2` 之间轮换 ⇒ **已用上新代码仍失败**。
-         · 同档旁证（东财 push2 面整体不可用）：`⚠️ W52_HIGH 重试 3 次仍失败 → 返回空，跳过`
-           （响应为 559B 的 `502 Bad Gateway` HTML 页）、`❌ eastmoney push2 失败: HTTP Error 502: Bad Gateway
-           — 不写盘，保留现有 raw_data/etf_*.json（避免覆盖小九真版本）`、
-           `⚠️ push2 抖动(clist m:90 pz=200 po=0/1) 尝试1/5…` 全败。
-         · 产物侧：`raw_data/sector_leaders.json` 最新提交仍 `324a142bf1` @2026-09-22 18:17:33；
-           `data/SECTOR_LEADERS.js` 最新提交 `85cd6c05de` @2026-09-26 22:13:31（age ≈ 42.5h）。
-      C. 处置结论：**属东财 push2 端真故障（`fs=m:90+t:2` 板块 clist 分支），非本仓代码缺陷**。
-         按「不反复派发」纪律 —— 本轮 **0 dispatch / 0 数据补跑 / 0 邮件**，仅本文件留证。
-      D. 判据纪律与同轮旁证：
-         ① 判「修复是否生效」= `run.head_sha ≥ 修复 sha` **且**读本次 run 的 step 表；本轮两项均满足。
-         ② 东财故障判据 = 日志逐字含 `push2` 且含 `502 Bad Gateway`（本轮命中 3 处）。
-         ③ 判「护栏是否失效」前先问「该路径本轮是否被执行」；本轮**已执行**（step22 真跑）
-            ⇒ 属「执行了仍失败」，方向正确、待上游恢复；**换 host 提高的是成功率，不是保证**。
-         ④ 同轮另一宗**未登记但已定性**的观察（供下轮判断，暂不单独立项）：
-            algo 链 run #2146（09-28 15:27，`trigger_algo`，runner=self-hosted/cn）**job 在 step9 中途被终止** ——
-            step1-8 全 success、step9 起**全部无结论**、**日志 zip 仅 22B（空）**、关联产物零写入；
-            19 分钟后（job 15:27:22→15:52:31）以 failure 收尾。与在册 t1 假红（失败步固定 = step17）**签名不同**。
-            其后 **#2147（16:40:53）已自动接力**（同走 checkout 回退路径）⇒ 未阻断链路。
-         ⑤ 同轮口径澄清（**防下轮误报**）：本机实测兜底调度器逐字
-            `算法链: 当前 16:xx 未到 18:00，跳过（等盘后 LHB 发布）` +
-            `[HEAL✓] [algo] 最终推荐入选日期: 未到 18:00 盘后选股窗口，跳过 algo_run 派发` ⇒
-            HEALTH_CHECK 的 `final_enter_stale` warn 与 `FINAL_RECOMMEND_DATA.js`/`TOP10_DAILY.js` 陈旧
-            **属 18:00 前的设计态**，非故障、禁补跑。
 
   - id: build13-timeout-guard
     priority: P0
@@ -4933,7 +4889,7 @@ items:
       ⇒ 本项 verify_how 顺延至**下一交易日（09-28 周一）post_close 档**：届时若东财仍全败，应看到
       `::error title=v8-experiment-no-data::`（护栏生效）；若东财恢复则产物 update_time 前进。
       status 维持 doing。
-    updated: "2026-09-28 16:43"
+    updated: "2026-09-27 22:00"
     updated_by: 阿狸咪的工程师(alimi-cn)
     alimi_verify_20260926_1155: >-
       〔阿狸咪的工程师 2026-09-26 11:55 CST · 09-26 数据点〕
@@ -4976,27 +4932,11 @@ items:
         若 N 仍为 7500 ⇒ 参数名未生效，须回查。
       · ⚠️ 兜底源 `TRADE_DATE=2026-09-24`（较最新交易日滞后 1 天，属该报告固有节奏）—— 仅记录，不处置。
       ⇒ status doing → **pending-verify**（等下一档日志的 5199 / 含沪市 判据）。
-    alimi_verify_20260928_1650: >-
-      〔阿狸咪的工程师 2026-09-28 16:45 CST · 第 4 次复验 · 今日 post_close 档实测〕
-      ① 产物侧**已推进**（达成）：`raw_data/experiment.json` update_time = **2026-09-28 16:13:46**、
-      `data/EXPERIMENT.js` 同刻（提交 `0b33d8c1ce` 09-28 16:25:54 / `be5a392fd8` 16:17:44）。
-      对照本项 09-27 22:00 记录（当时走 datacenter 兜底 + `TRADE_DATE=2026-09-24`），
-      今日名单已含 **沪市 6xx（600/601/603/605）+ 深市 000/002 + 创业 300/301 + 科创 688**
-      ⇒ verify_how 中「出现沪市代码」这一半判据**达成**。
-      ② **未达成／未验证部分（诚实边界，故 status 维持 pending-verify）**：
-      本项另一半判据是「`✅ datacenter 兜底取到 N 只个股快照` 的 N 由 7500 收敛为 **5199**」；
-      本轮**未取到该行** —— 今日日志显示走的是常规成功路径（`>>> EXPERIMENT … ✅ EXPERIMENT → raw_data/experiment.json`），
-      **datacenter 兜底路径本轮无执行窗口** ⇒ 该子判据**不适用**，不得据此宣称达成。
-      ③ 旁证：同档 run #2599 的 step17（推送 raw_data）/ step19（update_v8）/ step23（推送 data）均 success；
-      `data/EXPERIMENT.js` 在线可读且非空（2,459 B）。
-      ④ 工具判据：判「产物是否真推进」只看 `update_time` + `GET /commits?path=…` 提交历史，
-      **禁以 run success 当判据**（同族纪律见 `card-fake-freshness-timestamp-rootfix-0925`）。
-      本轮写操作：0 dispatch / 0 补跑 / 0 邮件；仅本文件定点回填。
 
   - id: resonance-calendar-lazyload-fail
     priority: P0
     owner: 小九(lemoncat-cn)
-    status: pending-verify
+    status: done
     what: >-
       〔2026-09-24 18:1x 小九〕主人报「今天2个共振又没有」= 共振日历两张 tab（机游共振日历 +
       北向席位日历）。只读实证：**数据层完全正常**（LHB_DATA 当日 17:32、LHB_HISTORY 当日
@@ -5013,8 +4953,52 @@ items:
       主人下次打开共振日历：①两 tab 均有数据（不再空白）；②控制台若出现「源失败(...)」仍能渲染成功；
       ③极端断网/全源失败时显示明示文案而非空白页。长期项：LHB_HISTORY 体积瘦身
       （裁 reason/price 等冗余字段实测可省 ~40%，1003KB/全量）另立条目。
-    updated: "2026-09-24 17:59"
-    updated_by: 小九(lemoncat-cn)
+    alimi_verify_20260928_1810: >-
+      ✅ **阿狸咪的工程师 2026-09-28 18:1x CST 真浏览器终验（Edge headless · 直打 Pages 线上真身）——
+      verify_how ①②③ 全部达标，本项由 pending-verify 转 done。**
+      · **① 两 tab 均有数据（不再空白）**：真浏览器打开线上 index.html（1,364,111 B / sha 前16 `69aae18017f4f9ca`），
+        兜底源 fastly.jsdelivr.net 成功把 `LHB_HISTORY.js`（**1,602,143 B**）拉入 ⇒
+        `jyCalContainer` 渲染 **97,228 B**、`northCalContainer` 渲染 **22,112 B**，
+        控制台 `[A2 lazy] LHB_HISTORY 到位，重绘两个共振日历` ⇒ 病灶（Pages 跨境 1.8MB 三次全失败）已消除。
+      · **② 源失败仍可渲染成功**：本轮 jsdelivr 直接命中，未触发失败路径（属正常，非缺陷）。
+      · **③ 全源全轮皆败 ⇒ 明示文案**：request interception 断掉全部 `LHB_HISTORY.js`（Pages 源 + CDN 源，
+        共 **6 次**尝试 = 2 源 × 3 轮，日志逐条 `[A2 lazy] 源失败(error)：data/LHB_HISTORY.js?v=…` /
+        `…fastly.jsdelivr.net/…LHB_HISTORY.js` 后 `[A2 lazy] 所有源与重试均失败： LHB_HISTORY`）。
+      🔴 **本轮发现并修复一处真 bug（原 fix ③ 未完整兑现）**：`onFail()` 里 `__rcRedrawBoth()`
+      会先用 `LHB_DATA` 把容器**填满**，紧随其后的 `if(!_el.innerHTML.trim())` 判据因此**恒为假**
+      ⇒ 明示提示整条被跳过 ⇒ 主人看到一张「看似完全正常」的日历，实为降级态且**页面零提示**
+      ＝**静默降级**，与 fix ③「绝不静默空白」直接相悖。修法（已在 index.html 落盘并上线）：
+      容器为空仍走整块占位提示；容器已有内容则**追加**醒目提示条且**绝不覆盖日历**；
+      幂等（同 id 至多一条），两个共振容器（机游 / 北向）**同步处理**，禁止某一路特立独行。
+      修复后断源复验：纯文本首行 = `⚠️历史大表（1.8MB）多轮加载失败，当前仅显示当日龙虎榜数据
+      （历史日期可能缺失）。请刷新页面重试。` ⇒ 提示可见 ✅ 且日历仍在下方渲染 ✅（非空白）。
+    fix_ext_20260928: >-
+      index.html `onFail()` 分支追加降级提示（机游 jyCalContainer + 北向 northCalContainer 对称）。
+    updated: "2026-09-28 18:10"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: lhb-history-size-slim
+    title: 长期项·共振日历大表 LHB_HISTORY 体积瘦身（懒加载依赖的单点风险源）
+    owner: shared
+    status: todo
+    priority: P2
+    scope: shared
+    what: >-
+      〔2026-09-28 阿狸咪立账〕共振日历两 tab 全量依赖 `data/LHB_HISTORY.js`（**1.6-1.8MB / 79 天**），
+      试了多源兜底 + 3 轮重试后**仍存在单点**：任一源被跨境网络掐断即触发降级（只显示当日），
+      历史日期缺失 ⇒ 日历「看着在但内容少」。根治方向 = **缩表**而非继续加源。
+      实测裁 `reason` / `price` 等冗余字段可省 ~40%（1003KB / 全量口径）。
+    fix: >-
+      ① 生成侧（生成器/抓取脚本）裁剪 LHB_HISTORY 冗余字段（reason/price…），目标 ≤1.0MB；
+      ② 前端懒加载保持多源兜底不变（缩表后 Pages 源亦能直接扛住，可缩短 25s 超时）；
+      ③ 缩表须同步确认「北向席位」等消费方字段依赖，禁静默删字段致卡片缺列。
+    verify_how: >-
+      缩表后真浏览器打开共振日历两 tab：①两 tab 历史日期齐全（非仅当日）；②`LHB_HISTORY` 注入字节 ≤1.0MB；
+      ③北向席位卡片列数与缩表前一致（无缺列）；④pre_deploy_audit 14 项全绿。
+    refs: >-
+      `index.html` L19106-19190（A2 懒加载 `BIG` / `loadOne` / `onFail`）· `data/LHB_HISTORY.js`（1.8MB/79天）
+    updated: "2026-09-28 18:10"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
 
 
   - id: build-blocker-pick-ts-nameerror-0925
