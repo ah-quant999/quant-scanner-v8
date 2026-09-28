@@ -93,6 +93,69 @@ def _atomic_write(path: str, body: str) -> None:
         raise RuntimeError("回读不一致，写入被拒")
 
 
+def _git(*args, timeout=60):
+    """返回 (rc, bytes)。git 不可用/超时 ⇒ (None, b'')。"""
+    import subprocess
+    try:
+        p = subprocess.run(["git", "-C", ROOT] + list(args),
+                           capture_output=True, timeout=timeout)
+        return p.returncode, p.stdout
+    except Exception:
+        return None, b""
+
+
+def _remote_baseline_check():
+    """🔴 fix(B) 写侧硬预检（2026-09-28 22:1x 阿狸咪的工程师 落码）。
+
+    背景（当日第 5 次复发，写入方脚本已定位）：
+      `E:\\_alimi_tools\\_patch_finalrec_ledger_1933.py`（20:43:12）直接读**本机工作树**
+      `docs/ops/HANDOFF.yaml`（当时停在 09-27 22:00 快照 / next_id_seq=91）当基底，
+      追加 1 项后覆写并推送 ⇒ 相对远端 107 项 **静默删掉 3 个 item + 6 个判据键**，
+      其自身 `assert 'next_id_seq: 91' in s` 因「基底本就是 91」而**照常通过**。
+
+    本函数把 skill §铁律 1「基底必须取远端 API，禁本机副本」变成**可执行硬拒**：
+      本地 HANDOFF.yaml 原始字节 != `origin/main:docs/ops/HANDOFF.yaml` 原始字节
+      ⇒ 判「本地基陈旧」，`--fix` **拒绝执行**（exit 2），既不改 YAML 也不改 ledger。
+
+    fail-open：无 git / fetch 失败 / 浅克隆读不到 ⇒ 返回 (True, '跳过…')，只告警放行，
+    以免误伤离线 CI 与只读巡检。
+    """
+    rc, _ = _git("fetch", "origin", "main", "-q", timeout=60)
+    if rc is None:
+        return True, "跳过（git 不可用或超时）"
+    rc, remote = _git("show", "origin/main:docs/ops/HANDOFF.yaml", timeout=30)
+    if rc != 0 or not remote:
+        return True, "跳过（读不到 origin/main:docs/ops/HANDOFF.yaml，rc=%s）" % rc
+    with open(YAML_PATH, "rb") as f:
+        local = f.read()
+    h = lambda b: hashlib.sha256(b).hexdigest()[:12]
+    if local != remote:
+        return False, ("🔴 本地 HANDOFF.yaml 基陈旧：本地 %d B / sha256=%s  !=  "
+                       "origin/main %d B / sha256=%s" % (len(local), h(local), len(remote), h(remote)))
+    return True, "✅ 本地基底 == origin/main（%d B / sha256=%s）" % (len(local), h(local))
+
+
+def _history_shrink_report():
+    """非阻断「历史收缩」报告：把 origin/main 上 HANDOFF.yaml **最近两版** 的 id 集合相比，
+    列出「上一版有、这一版无」的 id。用于在**不冻结部署**的前提下把「陈旧副本整文件覆盖」喊出来。"""
+    rc, out = _git("log", "origin/main", "-n", "2", "--format=%H", "--", "docs/ops/HANDOFF.yaml", timeout=30)
+    if rc != 0 or not out:
+        return None
+    shas = [x for x in out.decode("utf-8", "ignore").split() if x]
+    if len(shas) < 2:
+        return None
+    rc, prev = _git("show", "%s:docs/ops/HANDOFF.yaml" % shas[1], timeout=30)
+    if rc != 0 or not prev:
+        return None
+    prev_ids = [m.group(1) for m in ID_RE.finditer(prev.decode("utf-8", "ignore"))]
+    rc, cur = _git("show", "%s:docs/ops/HANDOFF.yaml" % shas[0], timeout=30)
+    if rc != 0 or not cur:
+        return None
+    cur_ids = [m.group(1) for m in ID_RE.finditer(cur.decode("utf-8", "ignore"))]
+    gone = [i for i in prev_ids if i not in set(cur_ids)]
+    return (shas[0][:12], shas[1][:12], len(prev_ids), len(cur_ids), gone)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
@@ -101,6 +164,26 @@ def main() -> int:
     a = ap.parse_args()
     if not (a.check or a.fix):
         a.check = True
+
+    base_ok, base_msg = _remote_baseline_check()
+    print("[基线预检] " + base_msg)
+    if not base_ok:
+        if a.fix:
+            print("\n🔴 [--fix 已拒] 本地基陈旧：若在此基上重算 ledger，会把「远端已有、本地没有」的条目"
+                  "\n   连锚一起回退（[13/13] 门禁将全程无感）⇒ 本工具按 skill §铁律 1 硬拒写入。"
+                  "\n   正解：先 `git show origin/main:docs/ops/HANDOFF.yaml > docs/ops/HANDOFF.yaml`"
+                  "（或按 API 路径重取远端内容）再重放你自己的改动，然后重跑本脚本。")
+            return 2
+        print("🔴 [--check] 继续只读比对，但**结论不可信**（基线落后远端）⇒ 先同步基底再判读。")
+
+    rep = _history_shrink_report()
+    if rep:
+        s0, s1, n0, n1, gone = rep
+        print("[历史收缩] origin/main 最近两版 HANDOFF.yaml：%s(%d 项) <- %s(%d 项)  消失 id=%s"
+              % (s0, n1, s1, n0, gone if gone else "无"))
+        if gone:
+            print("   🔴 有 item 从状态源消失 ⇒ 疑似「陈旧副本整文件覆盖」（当日已复发 5 次）。"
+                  "\n      判据/处置见 docs/ops/HANDOFF.yaml 的 handoff-yaml-stale-base-item-drop。")
 
     y = _read(YAML_PATH)
     led_text = _read(LEDGER_PATH)
