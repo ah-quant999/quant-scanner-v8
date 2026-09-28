@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-29 00:40"
+  updated: "2026-09-29 00:47"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 95
+  next_id_seq: 96
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -267,6 +267,77 @@ items:
       `.github/workflows/v8_cn_fetch_cloud.yml`（step17 L637-643 / step22 L772-785 /
       step23 L790-807 / step24 L876-881）；`scripts/fetch_sector_leaders.py`（L308 / L311 / L334）；
       job 原始日志 run #2609（job 108997948527）/ #2610（job 109012740483）。
+
+  - id: build-deploy-blocked-by-crosslayer-stale-guard-0929
+    title: "build_deploy 部署链被自家跨层闸门恒阻断（4/12 档同因失败）：HB_ALIMI / HB_XIAOJIU 内层 update_time 被钉旧 + IMA_STRONG_BACKTEST 停更 ⇒ v8_verify_layer_parity STALE_DAYS=3 恒判失败"
+    priority: P0
+    owner: shared
+    status: todo
+    scope: shared
+    created: "2026-09-29 00:47"
+    what: >-
+      `v8_build_deploy` 的**部署步** step13「📤 部署到 main（GitHub Pages 源）」在末尾内嵌跨层一致性硬闸门
+      （`v8_build_deploy.yml` L394：`python v8_verify_layer_parity.py || { echo "::error::跨层一致性校验失败…"; exit 1; }`），
+      一旦 `v8_verify_layer_parity.py` 判出「陈旧静默上线」即 `exit 1` ⇒ 整个部署步失败、
+      step14「🩺 发布后体检 index.html」连带走 `skipped` ⇒ **本轮构建的产物一律不落地**。
+      触发条件是 `STALE_DAYS = 3`（`v8_verify_layer_parity.py` L35）且**与时段无关**
+      （L234 注明「data 层陈旧静默上线（stale_data）→ 恒失败（>STALE_DAYS 天，与时段无关）」——
+      即盘前/盘中的时段白名单**救不了**这一类）。
+      远端实测（2026-09-29 00:40–00:55 CST，全部取 GitHub API + job 原始日志，禁读本机 clone）：
+      `v8_build_deploy` 近 12 档 = #8668…#8679，其中 **4 档失败且失败步完全相同（step13）**：
+      #8670（head `f56daf1eda`，09-28 15:39:32Z）/ #8674（`25f425528a`，15:52:32Z）/
+      #8676（`e1973bbe30`，16:32:00Z）/ #8677（`19509351a9`，16:41:38Z）。
+      四档日志判词逐字一致：
+      `❌ data 层超过 3 天未更新（raw 无日期字段，属陈旧静默上线）：`
+      `- HB_XIAOJIU: data=2026-09-25 21:21:45 已陈旧 4 天`
+      `- HB_ALIMI: data=2026-09-25 21:21:45 已陈旧 4 天`
+      `- IMA_STRONG_BACKTEST: data=2026-09-25 21:31:06 已陈旧 4 天` + `🛑 陈旧静默上线 3 项，阻断部署/推送。`
+      （#8670 另多 `INDEX_HISTORY: data=2026-09-25T19:03:20 已陈旧 4 天` ⇒ 4 项）。
+      三源定性：
+      ① HB_XIAOJIU / HB_ALIMI —— **内层 `update_time` 被** cn 侧 raw 回推用陈旧副本顶回 `2026-09-25 21:21:45`
+         （在册项 `heartbeat-files-clobbered-by-cnfetch`，status **todo / 未修**）；
+      ② IMA_STRONG_BACKTEST —— data 停在 `2026-09-25 21:31:06`，与 09-25 之后该链是否真跑产有关，
+         建议与 `ima-snapshot-72h-expiry-trap` 一并核（本轮**未**展开，不做超范围断言）；
+      ③ INDEX_HISTORY（仅 #8670 命中）—— 时区口径类（`2026-09-25T19:03:20` 形如裸 UTC 戳），
+         与在册 `tz-naive-now-utc-stamp-flip-0927` 可能同源，建议一并对表。
+    impact: >-
+      · **部署链被自家守卫锁死**：只要这 3 项不前进，step13 每档必红、step14 永远 skipped
+        ⇒ build 侧「重生成 data/*.js + 原子提交 index.html ?v + 部署」这条链路**整体不落地**，
+        只能靠 cn_fetch 链自己的 step23/24 自闭环兜底 ⇒ **前端产物更新面收窄**，
+        且 `logic.html` / `v6_memo.html` 等只在 build 侧产出的资源无法上线。
+      · **红噪声常态化**：4/12 档同一红，长期与真故障混在一起（出勤率约 1/3），
+        训练出的「看着红也不管」正是主人反复禁止的失效模式。
+      · **CI 分钟浪费 + 部署延迟**：每档都要跑完整个生成链后才在最后一步被拦下。
+      · ⚠️ 与「假红」不同：**这不是误报**——data 层那 3 项**确实**陈旧；病根在①（数据侧被顶旧）与②（产物停更），
+        闸门行为本身是正确的。因此**正解是修数据侧根因，不是放宽闸门**（放宽会真的把陈旧数据推上线）。
+    fix: >-
+      建议（属 shared 车道；阿狸咪本轮**未擅改 workflow / 未改闸门阈值**）：
+      ① **优先修 `heartbeat-files-clobbered-by-cnfetch`**（它已被本项证明会连带锁死部署链）
+         —— 按该项 (fix) 的 ① / ② / ③ 任一落地；
+      ② IMA_STRONG_BACKTEST 需定「该链是否应在每日 21:31 前产出」；若其正常节奏本就 >3 天
+         （如周更），则**不应**用 `STALE_DAYS=3` 的通用阈值卡它，应纳入按类别标注的**时间粒度白名单**
+         （区别于现有的「时段白名单」，两者语义不同，勿混）；
+      ③ 若短期内无法修 ①，可考虑给 `v8_verify_layer_parity.py` 的 `stale_data` 增加
+         **显式豁免清单 + 到期日**（例如 `HB_*: 豁免至 2026-10-05`），确保豁免是「带时限的显式决定」
+         而不是静默放行；⚠️ 直接删 `HB_*` 检查或抬高 `STALE_DAYS` 属**掩盖**，禁。
+    verify_how: >-
+      ① 静态：`v8_build_deploy.yml` step13 内 L394 的闸门调用与 `v8_verify_layer_parity.py` L35 / L176 / L234
+         三处判据给出逐字（grep 输出）；
+      ② 动态：连续 ≥3 档 `v8_build_deploy` 的 `build` job，step13 结论 = `success`，
+         且日志中**不再**出现 `🛑 陈旧静默上线 N 项，阻断部署/推送。`；
+      ③ 反测（防掩盖）：`GET /commits?path=data/HB_ALIMI.js` 最新一笔的 `update_time` 须 **> 2026-09-25 21:21:45**
+         （即证明是数据侧真推进，而不是把闸门关掉）；
+      ④ 副作用：step14「🩺 发布后体检 index.html」由 `skipped` 恢复为真跑。
+    not_verify_how: >-
+      · ❌ 禁以「run conclusion」判——要看 `build` job 的 step13 结论（`build=skipped` 工作日盘中属设计，勿混淆）；
+      · ❌ 禁以「把 `STALE_DAYS` 调大 / 删掉 HB_* 检查后 step13 变绿」当修复（那是掩盖陈旧数据上线）；
+      · ❌ 禁读本机 clone 的 `data/*.js` 判断这三项是否陈旧。
+    refs: >-
+      `.github/workflows/v8_build_deploy.yml`（step13 L296-397，闸门调用 L394）；`v8_verify_layer_parity.py`
+      （`STALE_DAYS` L35 / 判据 L176 / 恒失败说明 L234 / 判词 L220 / 汇总 L242）；
+      job 原始日志：#8677（build job）/ #8676 / #8674 / #8670；
+      关联在册项：`heartbeat-files-clobbered-by-cnfetch`、`ima-snapshot-72h-expiry-trap`、
+      `tz-naive-now-utc-stamp-flip-0927`。
 
   - id: build13-timeout-guard
     priority: P0
@@ -5858,6 +5929,27 @@ items:
         `xiaoju.silent_min=1273.4`（休市日设计，已知误报类）与 `alimi.silent_min=200.2`（本项）。
     updated: 2026-09-25 15:35
     updated_by: 阿狸咪的工程师(alimi-cn)
+    alimi_verify_20260929_0055_deploy_block: >-
+      🔴 **〔阿狸咪的工程师 2026-09-29 00:47 CST · 后果升级：本项已不再是「误判掉线」级别，
+      而是「build_deploy 部署链被恒阻断」级别〕**
+      · 实测（远端 API + build job 原始日志）：`v8_build_deploy` 近 12 档中有 **4 档**
+        （#8670 / #8674 / #8676 / #8677）在 step13「📤 部署到 main（GitHub Pages 源）」失败，
+        失败步完全相同、判词逐字相同：
+        `❌ data 层超过 3 天未更新（raw 无日期字段，属陈旧静默上线）：`
+        `- HB_XIAOJIU: data=2026-09-25 21:21:45 已陈旧 4 天`
+        `- HB_ALIMI: data=2026-09-25 21:21:45 已陈旧 4 天`
+        `- IMA_STRONG_BACKTEST: data=2026-09-25 21:31:06 已陈旧 4 天`
+        `🛑 陈旧静默上线 3 项，阻断部署/推送。` +
+        `##[error]跨层一致性校验失败：data/*.js 与 raw_data/*.json 不一致或有陈旧，禁止部署`
+        （#8670 另多一项 `INDEX_HISTORY: data=2026-09-25T19:03:20 已陈旧 4 天`）。
+      · 链路：`v8_build_deploy.yml` step13 L394 `python v8_verify_layer_parity.py || { echo "::error::跨层…"; exit 1; }`；
+        该脚本 `STALE_DAYS = 3`（L35），L176「raw 无日期字段且 data 超 3 天」**恒失败、与时段无关**（L234），
+        故 step13 必红、step14「发布后体检」连带走 skipped。
+      · **本项的 `update_time` 回退正是这 3 项里 2 项（HB_ALIMI / HB_XIAOJIU 均 2026-09-25 21:21:45）的直接成因**
+        ⇒ 本项若不修，部署链将持续被自己的守卫拦死。已另立
+        `build-deploy-blocked-by-crosslayer-stale-guard-0929`（P0）专项挂账。
+
+
 
   - id: cn-singleflight-ghpat-missing-401
     priority: P0
