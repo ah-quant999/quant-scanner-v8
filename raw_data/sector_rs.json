@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-09-28 23:33",
+  "update_time": "2026-09-29 00:10",
   "data_date": "2026-09-28",
   "data_date_source": "kline",
-  "fetch_date": "2026-09-28",
+  "fetch_date": "2026-09-29",
   "data_available": true,
   "source": "同花顺",
   "sectors": [
@@ -869,24 +869,6 @@
       "relative_90d": 8.38,
       "relative_180d": 20.97,
       "relative_52w": 27.95
-    },
-    {
-      "name": "贸易",
-      "pct_day": -1.43,
-      "pct_5d": -1.41,
-      "pct_20d": -5.75,
-      "pct_30d": -0.63,
-      "pct_60d": 0.85,
-      "pct_90d": -14.61,
-      "pct_180d": -18.62,
-      "pct_52w": -13.45,
-      "relative_5d": -1.41,
-      "relative_20d": -5.75,
-      "relative_30d": -0.63,
-      "relative_60d": 0.85,
-      "relative_90d": -14.61,
-      "relative_180d": -18.62,
-      "relative_52w": -13.45
     },
     {
       "name": "农产品加工",

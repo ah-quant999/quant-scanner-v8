@@ -1,6 +1,6 @@
 {
  "month": "2026年9月",
- "update_time": "2026-09-28 23:28",
+ "update_time": "2026-09-29 00:06",
  "legend": [
   {
    "title": "重要政策",
@@ -437,19 +437,19 @@
     {
      "num": 28,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇺🇸 耐用品订单",
        "cls": "us",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 29,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "富时A50交割日",
