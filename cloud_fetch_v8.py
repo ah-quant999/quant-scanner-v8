@@ -442,7 +442,7 @@ _FED_HEADERS = {
     "Accept": "*/*",
 }
 
-def _em_get_with_retry(url, *, params, headers, timeout, max_attempts=3, label="", hosts=None):
+def _em_get_with_retry(url, *, params, headers, timeout, max_attempts=5, label="", hosts=None):
     """东财 push2 请求（含重试）。
 
     2026-08-19 主人令一劳永逸式根治云端 push2 抓取抖动（B 方案）：指数退避重试。
@@ -453,7 +453,9 @@ def _em_get_with_retry(url, *, params, headers, timeout, max_attempts=3, label="
        · 未给 hosts 时行为与旧版完全一致（向后兼容，不破坏任何现有 caller 语义）。
     三次都失败抛 RuntimeError 给上层 fn_xxx 决定是否降级返回（保留空列表语义）。"""
     import random as _rnd
-    delays = [0.4, 0.8, 1.2]
+    # 🔴 2026-09-28：扩表到与 max_attempts=5 对齐 —— 旧表仅 3 项，
+    #   attempt>=3 时 delays[attempt] 会 IndexError。
+    delays = [0.4, 0.8, 1.2, 1.8, 2.4]
     last_err = None
     _path = ""
     if hosts:
