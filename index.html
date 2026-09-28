@@ -19155,13 +19155,27 @@ window.__renderV8CalToday();
       try{ console.error('[A2 lazy] 所有源与重试均失败：', item.name); }catch(e){}
       if(item.name==='LHB_HISTORY'){
         try{ if(typeof window.__rcRedrawBoth==='function') window.__rcRedrawBoth(); }catch(e){}
+        // 🛡 2026-09-28 阿狸咪的工程师（一劳永逸「明示提示被自己的重绘吞掉」）：
+        //   实证（真浏览器断源 E2E）：__rcRedrawBoth() 会先用 LHB_DATA 降级把容器**填满**，
+        //   于是紧随其后的 `!_el.innerHTML.trim()` 恒为假 ⇒ 提示分支**整条被跳过** ⇒
+        //   主人看到一张「看似完全正常」的日历，实为降级态且页面**零提示** = 静默降级，
+        //   与本块 fix ③「全源全轮皆败 ⇒ 明示提示，绝不静默空白」直接相悖。
+        //   修法：容器为空 → 仍走整块占位提示（原路径保留）；容器已有内容 → **追加**醒目提示条，
+        //     **绝不覆盖日历**（覆盖只会让降级态更不可见）。
+        //   幂等：同 id 提示至多一条，重绘清空容器后可再插。
+        //   两个共振容器（机游 / 北向）同步处理 —— 禁止某一路特立独行。
         try{
-          var _el=document.getElementById('jyCalContainer');
-          if(_el && !String(_el.innerHTML||'').trim()){
-            _el.innerHTML='<div style="text-align:center;padding:28px 14px;color:var(--dim);font-size:13px;line-height:1.9">'
-              +'历史大表（1.8MB）加载失败，暂只显示当日数据。<br>'
-              +'<span style="font-size:11.5px">已自动重试 3 轮；请 <b style="color:#38bdf8;cursor:pointer" onclick="location.reload()">刷新页面</b> 重试。</span></div>';
-          }
+          var _TIP='<div id="a2LhbHistDegraded" style="margin:0 0 10px;padding:9px 12px;border-radius:8px;'
+            +'background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.45);color:#ef9a9a;font-size:12px;line-height:1.7">'
+            +'⚠️ 历史大表（1.8MB）多轮加载失败，当前<b>仅显示当日</b>龙虎榜数据（历史日期可能缺失）。'
+            +'请 <b style="color:#38bdf8;cursor:pointer" onclick="location.reload()">刷新页面</b> 重试。</div>';
+          ['jyCalContainer','northCalContainer'].forEach(function(_id){
+            var _el=document.getElementById(_id);
+            if(!_el) return;
+            if(!String(_el.innerHTML||'').trim()){ _el.innerHTML=_TIP; return; }
+            if(!document.getElementById('a2LhbHistDegraded'))
+              _el.insertAdjacentHTML('afterbegin', _TIP);
+          });
         }catch(e){}
       }
       finish();
