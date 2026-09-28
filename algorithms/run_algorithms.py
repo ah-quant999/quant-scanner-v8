@@ -104,6 +104,14 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   与三重同族给出 900s 显式预算（避免走默认 1800s 拖长 B 批，B 批在 D 批 20:00 关键路径上）。
     "update_four_volume_history.py": 900,
     "gen_four_volume_track.py": 900,
+    # 🛡 2026-09-28 阿狸咪的工程师（🔴 最终推荐连续 3 天不出 · 真根因根治）：
+    #   final_recommend.py 是 D 批末步、跨策略共振的**最终产物**；其 main() 内含
+    #   「等 FACTOR_LAB.js 当日新鲜」轮询，最长 _fl_max_wait=20 分钟（每次 sleep 60s）。
+    #   实证 2026-09-28 run#2149：B 批 19:01 跑完后本步启动 → 因子 data_date 停在 09-24
+    #   （要求 == 今天 09-28）→ 白等 20min → 剩余预算不足 → 撞默认 1800s 被杀
+    #   ⇒ 产物 **根本没落盘**（data/FINAL_RECOMMEND_DATA.js 仍停在 09-25 03:01），
+    #   而链尾照常 success（假成功！）。给足 55min，覆盖「20min 等待 + 计算 + 写盘」。
+    "final_recommend.py": 3300,
 }
 
 
