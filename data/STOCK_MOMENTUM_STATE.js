@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-28 19:23",
- "generated": "2026-09-28 19:23",
+ "update_time": "2026-09-28 19:31",
+ "generated": "2026-09-28 19:31",
  "meta": {
-  "generated": "2026-09-28 19:23",
+  "generated": "2026-09-28 19:31",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 17,
   "days_with_consensus": 0,
@@ -6769,10 +6769,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "601218",
+      "name": "吉鑫科技",
+      "change_pct": 10.0,
+      "price": 6.05,
+      "category": "突破"
+     },
+     {
       "code": "688656",
       "name": "浩欧博",
       "change_pct": 4.17,
       "price": 137.66,
+      "category": "突破"
+     },
+     {
+      "code": "600699",
+      "name": "均胜电子",
+      "change_pct": 6.189,
+      "price": 24.02,
       "category": "突破"
      },
      {
@@ -6790,6 +6804,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "600418",
+      "name": "江淮汽车",
+      "change_pct": 9.987,
+      "price": 25.22,
+      "category": "突破"
+     },
+     {
+      "code": "300207",
+      "name": "欣旺达",
+      "change_pct": 6.421,
+      "price": 21.38,
+      "category": "突破"
+     },
+     {
       "code": "002100",
       "name": "天康生物",
       "change_pct": 3.694,
@@ -6801,27 +6829,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "五洲医疗",
       "change_pct": 4.413,
       "price": 128.01,
-      "category": "突破"
-     },
-     {
-      "code": "002553",
-      "name": "南方精工",
-      "change_pct": 6.577,
-      "price": 17.34,
-      "category": "突破"
-     },
-     {
-      "code": "002962",
-      "name": "五方光电",
-      "change_pct": 9.985,
-      "price": 14.76,
-      "category": "突破"
-     },
-     {
-      "code": "600886",
-      "name": "国投电力",
-      "change_pct": 3.163,
-      "price": 15.33,
       "category": "突破"
      }
     ],
@@ -6834,10 +6841,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
+      "code": "601218",
+      "name": "吉鑫科技",
+      "change_pct": 10.0,
+      "price": 6.05,
+      "category": "加速"
+     },
+     {
       "code": "688656",
       "name": "浩欧博",
       "change_pct": 4.17,
       "price": 137.66,
+      "category": "加速"
+     },
+     {
+      "code": "600699",
+      "name": "均胜电子",
+      "change_pct": 6.189,
+      "price": 24.02,
       "category": "加速"
      }
     ],
@@ -6850,10 +6871,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "601218",
+      "name": "吉鑫科技",
+      "change_pct": 10.0,
+      "price": 6.05,
+      "category": "短线选股"
+     },
+     {
       "code": "688656",
       "name": "浩欧博",
       "change_pct": 4.17,
       "price": 137.66,
+      "category": "短线选股"
+     },
+     {
+      "code": "600699",
+      "name": "均胜电子",
+      "change_pct": 6.189,
+      "price": 24.02,
       "category": "短线选股"
      },
      {
@@ -6871,6 +6906,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "600418",
+      "name": "江淮汽车",
+      "change_pct": 9.987,
+      "price": 25.22,
+      "category": "短线选股"
+     },
+     {
+      "code": "300207",
+      "name": "欣旺达",
+      "change_pct": 6.421,
+      "price": 21.38,
+      "category": "短线选股"
+     },
+     {
       "code": "002100",
       "name": "天康生物",
       "change_pct": 3.694,
@@ -6882,27 +6931,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "五洲医疗",
       "change_pct": 4.413,
       "price": 128.01,
-      "category": "短线选股"
-     },
-     {
-      "code": "002553",
-      "name": "南方精工",
-      "change_pct": 6.577,
-      "price": 17.34,
-      "category": "短线选股"
-     },
-     {
-      "code": "002962",
-      "name": "五方光电",
-      "change_pct": 9.985,
-      "price": 14.76,
-      "category": "短线选股"
-     },
-     {
-      "code": "600886",
-      "name": "国投电力",
-      "change_pct": 3.163,
-      "price": 15.33,
       "category": "短线选股"
      }
     ],
@@ -6922,6 +6950,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "600418",
+      "name": "江淮汽车",
+      "change_pct": 9.987,
+      "price": 25.22,
+      "category": "强势股"
+     },
+     {
+      "code": "300207",
+      "name": "欣旺达",
+      "change_pct": 6.421,
+      "price": 21.38,
+      "category": "强势股"
+     },
+     {
       "code": "002100",
       "name": "天康生物",
       "change_pct": 3.694,
@@ -6933,27 +6975,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "五洲医疗",
       "change_pct": 4.413,
       "price": 128.01,
-      "category": "强势股"
-     },
-     {
-      "code": "002553",
-      "name": "南方精工",
-      "change_pct": 6.577,
-      "price": 17.34,
-      "category": "强势股"
-     },
-     {
-      "code": "002962",
-      "name": "五方光电",
-      "change_pct": 9.985,
-      "price": 14.76,
-      "category": "强势股"
-     },
-     {
-      "code": "600886",
-      "name": "国投电力",
-      "change_pct": 3.163,
-      "price": 15.33,
       "category": "强势股"
      }
     ]
