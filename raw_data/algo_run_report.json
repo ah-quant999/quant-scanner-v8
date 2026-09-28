@@ -1,12 +1,16 @@
 {
-  "update_time": "2026-09-26 08:48:52",
-  "run_start": "2026-09-26 08:40:08",
-  "ok": 0,
-  "fail": 0,
+  "update_time": "2026-09-28 17:02:28",
+  "run_start": "2026-09-28 16:51:53",
+  "ok": 12,
+  "fail": 2,
   "failed_scripts": [
     {
-      "script": "final_recommend.py",
-      "reason": "就绪门控未通过（上游选股输入陈旧/缺失）"
+      "script": "fetch_inst_trade.py",
+      "reason": "退出码 1 | [16:58:58] 全部接口重试仍失败，保留旧数据（如有）"
+    },
+    {
+      "script": "scripts/fetch_sector_leaders.py",
+      "reason": "退出码 1 | http.client.RemoteDisconnected: Remote end closed connection without response"
     }
   ],
   "skipped_by_time_gate": []
