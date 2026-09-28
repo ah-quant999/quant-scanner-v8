@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-29 00:42",
+  "update_time": "2026-09-29 01:15",
   "data_date": "2026-09-28",
   "data_date_source": "kline",
   "fetch_date": "2026-09-29",
@@ -383,6 +383,24 @@
       "relative_90d": -9.85,
       "relative_180d": -11.68,
       "relative_52w": -12.75
+    },
+    {
+      "name": "港口航运",
+      "pct_day": -0.63,
+      "pct_5d": -1.67,
+      "pct_20d": -0.5,
+      "pct_30d": 5.56,
+      "pct_60d": 10.15,
+      "pct_90d": 0.23,
+      "pct_180d": 6.3,
+      "pct_52w": 9.99,
+      "relative_5d": -1.67,
+      "relative_20d": -0.5,
+      "relative_30d": 5.56,
+      "relative_60d": 10.15,
+      "relative_90d": 0.23,
+      "relative_180d": 6.3,
+      "relative_52w": 9.99
     },
     {
       "name": "公路铁路运输",
@@ -887,6 +905,24 @@
       "relative_90d": -1.54,
       "relative_180d": -14.96,
       "relative_52w": -18.31
+    },
+    {
+      "name": "农化制品",
+      "pct_day": -1.7,
+      "pct_5d": -2.35,
+      "pct_20d": -8.12,
+      "pct_30d": 0.24,
+      "pct_60d": 1.64,
+      "pct_90d": -8.47,
+      "pct_180d": -7.96,
+      "pct_52w": -4.7,
+      "relative_5d": -2.35,
+      "relative_20d": -8.12,
+      "relative_30d": 0.24,
+      "relative_60d": 1.64,
+      "relative_90d": -8.47,
+      "relative_180d": -7.96,
+      "relative_52w": -4.7
     },
     {
       "name": "能源金属",
@@ -2393,6 +2429,24 @@
       "relative_52w": -18.31
     },
     {
+      "name": "港口航运",
+      "pct_day": -0.63,
+      "pct_5d": -1.67,
+      "pct_20d": -0.5,
+      "pct_30d": 5.56,
+      "pct_60d": 10.15,
+      "pct_90d": 0.23,
+      "pct_180d": 6.3,
+      "pct_52w": 9.99,
+      "relative_5d": -1.67,
+      "relative_20d": -0.5,
+      "relative_30d": 5.56,
+      "relative_60d": 10.15,
+      "relative_90d": 0.23,
+      "relative_180d": 6.3,
+      "relative_52w": 9.99
+    },
+    {
       "name": "教育",
       "pct_day": -3.71,
       "pct_5d": -0.24,
@@ -2481,24 +2535,6 @@
       "relative_90d": 6.1,
       "relative_180d": 3.74,
       "relative_52w": 1.65
-    },
-    {
-      "name": "小家电",
-      "pct_day": 1.2,
-      "pct_5d": 4.48,
-      "pct_20d": 3.02,
-      "pct_30d": 3.73,
-      "pct_60d": 3.93,
-      "pct_90d": -12.5,
-      "pct_180d": -13.03,
-      "pct_52w": -17.72,
-      "relative_5d": 4.48,
-      "relative_20d": 3.02,
-      "relative_30d": 3.73,
-      "relative_60d": 3.93,
-      "relative_90d": -12.5,
-      "relative_180d": -13.03,
-      "relative_52w": -17.72
     }
   ],
   "strong_relative_30d": [
@@ -2575,6 +2611,24 @@
       "relative_52w": -18.31
     },
     {
+      "name": "港口航运",
+      "pct_day": -0.63,
+      "pct_5d": -1.67,
+      "pct_20d": -0.5,
+      "pct_30d": 5.56,
+      "pct_60d": 10.15,
+      "pct_90d": 0.23,
+      "pct_180d": 6.3,
+      "pct_52w": 9.99,
+      "relative_5d": -1.67,
+      "relative_20d": -0.5,
+      "relative_30d": 5.56,
+      "relative_60d": 10.15,
+      "relative_90d": 0.23,
+      "relative_180d": 6.3,
+      "relative_52w": 9.99
+    },
+    {
       "name": "教育",
       "pct_day": -3.71,
       "pct_5d": -0.24,
@@ -2663,24 +2717,6 @@
       "relative_90d": 6.1,
       "relative_180d": 3.74,
       "relative_52w": 1.65
-    },
-    {
-      "name": "小家电",
-      "pct_day": 1.2,
-      "pct_5d": 4.48,
-      "pct_20d": 3.02,
-      "pct_30d": 3.73,
-      "pct_60d": 3.93,
-      "pct_90d": -12.5,
-      "pct_180d": -13.03,
-      "pct_52w": -17.72,
-      "relative_5d": 4.48,
-      "relative_20d": 3.02,
-      "relative_30d": 3.73,
-      "relative_60d": 3.93,
-      "relative_90d": -12.5,
-      "relative_180d": -13.03,
-      "relative_52w": -17.72
     }
   ],
   "strong_60d": [
@@ -2793,6 +2829,24 @@
       "relative_52w": 1.65
     },
     {
+      "name": "港口航运",
+      "pct_day": -0.63,
+      "pct_5d": -1.67,
+      "pct_20d": -0.5,
+      "pct_30d": 5.56,
+      "pct_60d": 10.15,
+      "pct_90d": 0.23,
+      "pct_180d": 6.3,
+      "pct_52w": 9.99,
+      "relative_5d": -1.67,
+      "relative_20d": -0.5,
+      "relative_30d": 5.56,
+      "relative_60d": 10.15,
+      "relative_90d": 0.23,
+      "relative_180d": 6.3,
+      "relative_52w": 9.99
+    },
+    {
       "name": "农产品加工",
       "pct_day": -0.82,
       "pct_5d": -0.71,
@@ -2845,24 +2899,6 @@
       "relative_90d": -8.38,
       "relative_180d": -15.83,
       "relative_52w": -21.58
-    },
-    {
-      "name": "文化传媒",
-      "pct_day": -2.77,
-      "pct_5d": -1.21,
-      "pct_20d": 4.93,
-      "pct_30d": 1.85,
-      "pct_60d": 8.93,
-      "pct_90d": -6.48,
-      "pct_180d": -3.47,
-      "pct_52w": -9.58,
-      "relative_5d": -1.21,
-      "relative_20d": 4.93,
-      "relative_30d": 1.85,
-      "relative_60d": 8.93,
-      "relative_90d": -6.48,
-      "relative_180d": -3.47,
-      "relative_52w": -9.58
     }
   ],
   "strong_relative_60d": [
@@ -2975,6 +3011,24 @@
       "relative_52w": 1.65
     },
     {
+      "name": "港口航运",
+      "pct_day": -0.63,
+      "pct_5d": -1.67,
+      "pct_20d": -0.5,
+      "pct_30d": 5.56,
+      "pct_60d": 10.15,
+      "pct_90d": 0.23,
+      "pct_180d": 6.3,
+      "pct_52w": 9.99,
+      "relative_5d": -1.67,
+      "relative_20d": -0.5,
+      "relative_30d": 5.56,
+      "relative_60d": 10.15,
+      "relative_90d": 0.23,
+      "relative_180d": 6.3,
+      "relative_52w": 9.99
+    },
+    {
       "name": "农产品加工",
       "pct_day": -0.82,
       "pct_5d": -0.71,
@@ -3027,24 +3081,6 @@
       "relative_90d": -8.38,
       "relative_180d": -15.83,
       "relative_52w": -21.58
-    },
-    {
-      "name": "文化传媒",
-      "pct_day": -2.77,
-      "pct_5d": -1.21,
-      "pct_20d": 4.93,
-      "pct_30d": 1.85,
-      "pct_60d": 8.93,
-      "pct_90d": -6.48,
-      "pct_180d": -3.47,
-      "pct_52w": -9.58,
-      "relative_5d": -1.21,
-      "relative_20d": 4.93,
-      "relative_30d": 1.85,
-      "relative_60d": 8.93,
-      "relative_90d": -6.48,
-      "relative_180d": -3.47,
-      "relative_52w": -9.58
     }
   ],
   "strong_90d": [
@@ -3193,6 +3229,24 @@
       "relative_52w": -15.18
     },
     {
+      "name": "港口航运",
+      "pct_day": -0.63,
+      "pct_5d": -1.67,
+      "pct_20d": -0.5,
+      "pct_30d": 5.56,
+      "pct_60d": 10.15,
+      "pct_90d": 0.23,
+      "pct_180d": 6.3,
+      "pct_52w": 9.99,
+      "relative_5d": -1.67,
+      "relative_20d": -0.5,
+      "relative_30d": 5.56,
+      "relative_60d": 10.15,
+      "relative_90d": 0.23,
+      "relative_180d": 6.3,
+      "relative_52w": 9.99
+    },
+    {
       "name": "养殖业",
       "pct_day": 0.2,
       "pct_5d": -1.22,
@@ -3209,24 +3263,6 @@
       "relative_90d": -0.68,
       "relative_180d": -7.69,
       "relative_52w": -10.92
-    },
-    {
-      "name": "中药",
-      "pct_day": -0.22,
-      "pct_5d": 0.48,
-      "pct_20d": -4.17,
-      "pct_30d": -4.28,
-      "pct_60d": 3.61,
-      "pct_90d": -1.01,
-      "pct_180d": -7.03,
-      "pct_52w": -14.23,
-      "relative_5d": 0.48,
-      "relative_20d": -4.17,
-      "relative_30d": -4.28,
-      "relative_60d": 3.61,
-      "relative_90d": -1.01,
-      "relative_180d": -7.03,
-      "relative_52w": -14.23
     }
   ],
   "strong_relative_90d": [
@@ -3375,6 +3411,24 @@
       "relative_52w": -15.18
     },
     {
+      "name": "港口航运",
+      "pct_day": -0.63,
+      "pct_5d": -1.67,
+      "pct_20d": -0.5,
+      "pct_30d": 5.56,
+      "pct_60d": 10.15,
+      "pct_90d": 0.23,
+      "pct_180d": 6.3,
+      "pct_52w": 9.99,
+      "relative_5d": -1.67,
+      "relative_20d": -0.5,
+      "relative_30d": 5.56,
+      "relative_60d": 10.15,
+      "relative_90d": 0.23,
+      "relative_180d": 6.3,
+      "relative_52w": 9.99
+    },
+    {
       "name": "养殖业",
       "pct_day": 0.2,
       "pct_5d": -1.22,
@@ -3391,24 +3445,6 @@
       "relative_90d": -0.68,
       "relative_180d": -7.69,
       "relative_52w": -10.92
-    },
-    {
-      "name": "中药",
-      "pct_day": -0.22,
-      "pct_5d": 0.48,
-      "pct_20d": -4.17,
-      "pct_30d": -4.28,
-      "pct_60d": 3.61,
-      "pct_90d": -1.01,
-      "pct_180d": -7.03,
-      "pct_52w": -14.23,
-      "relative_5d": 0.48,
-      "relative_20d": -4.17,
-      "relative_30d": -4.28,
-      "relative_60d": 3.61,
-      "relative_90d": -1.01,
-      "relative_180d": -7.03,
-      "relative_52w": -14.23
     }
   ],
   "strong_180d": [
@@ -4395,6 +4431,24 @@
       "relative_52w": -13.64
     },
     {
+      "name": "港口航运",
+      "pct_day": -0.63,
+      "pct_5d": -1.67,
+      "pct_20d": -0.5,
+      "pct_30d": 5.56,
+      "pct_60d": 10.15,
+      "pct_90d": 0.23,
+      "pct_180d": 6.3,
+      "pct_52w": 9.99,
+      "relative_5d": -1.67,
+      "relative_20d": -0.5,
+      "relative_30d": 5.56,
+      "relative_60d": 10.15,
+      "relative_90d": 0.23,
+      "relative_180d": 6.3,
+      "relative_52w": 9.99
+    },
+    {
       "name": "物流",
       "pct_day": -1.18,
       "pct_5d": 0.26,
@@ -4483,24 +4537,6 @@
       "relative_90d": -15.63,
       "relative_180d": -25.42,
       "relative_52w": -26.03
-    },
-    {
-      "name": "半导体",
-      "pct_day": -4.69,
-      "pct_5d": -4.65,
-      "pct_20d": -1.05,
-      "pct_30d": -2.23,
-      "pct_60d": -21.19,
-      "pct_90d": -5.25,
-      "pct_180d": 36.82,
-      "pct_52w": 51.62,
-      "relative_5d": -4.65,
-      "relative_20d": -1.05,
-      "relative_30d": -2.23,
-      "relative_60d": -21.19,
-      "relative_90d": -5.25,
-      "relative_180d": 36.82,
-      "relative_52w": 51.62
     }
   ],
   "index": {
