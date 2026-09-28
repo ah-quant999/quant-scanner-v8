@@ -764,6 +764,25 @@ jobs:
           fi
           echo "🚦 目标批=${TGT} 放行=${{ steps.gate.outputs.proceed }}（${REASON}）"
 
+          # 🛡 2026-09-28 阿狸咪的工程师（一劳永逸：空转轮杜绝白烧 20+ 分钟）
+          #   实证：run#36391711008（15:27 CST，trigger_algo）闸门判 target_stage=NONE
+          #     ⇒ proceed=false ⇒ 下游 8 步（算法/桥接/update_v8/healthcheck/推送/校验…）
+          #     全部 `if: steps.gate.outputs.proceed == 'true'` ⇒ **一步都不会跑**，
+          #     但本轮仍耗时 25 分 09 秒后 **failure**。由 workflow 源码可反推：
+          #     闸门之后的步被 `if:` 全部 skip、链尾「结果问责」(if: always()) 对 NONE 走
+          #     `::notice` exit 0 ⇒ 失败**只能**发生在闸门之前的 setup 段
+          #     （checkout / API 同步回退 / setup-python / 「📦 安装 A股依赖」双镜像兜底重试）。
+          #     该轮日志不可取证：API 取 `/actions/jobs/<id>/logs` 得到 302→Azure blob，
+          #     签名窗口内直取恒 `BlobNotFound`（已两次复现）——属平台侧限制，非本仓缺陷。
+          #   修法：闸门不让行 ⇒ 立即静默收尾（exit 0）。
+          #     · **零行为变更**：exit 0 与「8 步全 skipped ⇒ job success」完全等价；
+          #     · 唯一收益 = 不再为「注定空转」的轮次支付 checkout/deps 的墙钟成本；
+          #     · 链尾「结果问责」仍会跑（if: always()），红灯语义一滴不减。
+          if [ "${{ steps.gate.outputs.proceed }}" != "true" ]; then
+            echo "::notice title=v8-algo-noop-exit::闸门未放行（目标批 ${TGT:-NONE}）→ 下游 8 步本就全部 skipped，本轮静默收尾（不空烧依赖安装等墙钟成本）"
+            exit 0
+          fi
+
       - name: "🧮 运行盘后算法链（写入 raw_data/，推送由链尾统一执行）"
         id: algo
         if: steps.gate.outputs.proceed == 'true'
