@@ -4941,18 +4941,47 @@ def main(category=None, only=None):
         #   v8_health_check 的 key_fields 已同步去掉这两个字段，只校验 avg_price/ma20/ma60。
         try:
             fields = "f12,f14,f2,f3"
-            by_code = {}
-            # 2026-08-11 修复：push2delay 即便 pz=5000 实际只返 100 条；按代码(f12)分页遍历拿全量
-            PAGE_SIZE = 100
-            MAX_PAGES = 60  # 安全阀：A 股理论 5293 只，60 页足矣
-            pn = 1
-            while pn <= MAX_PAGES:
-                page = em_clist(_IND_FS, fields, fid="f12", stat="1", pz=PAGE_SIZE, po="1", pn=pn)
-                if not page:
-                    break  # 空页：已遍历至末尾
-                for r in page:
+
+            # ────────────────────────────────────────────────────────────────
+            # 🔴🔴 2026-09-28 一劳永逸治本（主人令「盘前准备，以后到时间自动启动」+ 实拍
+            #   「平均股价（全A算术平均·880003口径）失败：最后更新 2026-09-24 11:30:07，
+            #    超过阈值 5535 分钟」）
+            # ────────────────────────────────────────────────────────────────
+            # 【病灶·云端日志实证】09-28 每一轮 cn fetch 都稳定复现：
+            #     >>> AVG_PRICE_DATA 2026-09-28T09:14:11+08:00
+            #       ⚠️ 全A spot 有效样本仅 0 只，放弃计算
+            #   ⇒ 自 09-24 11:33（该文件线上最后一次提交）后连续 4 天零更新，
+            #     且该卡注册了 heal_cat=intraday ⇒ 每轮 FAIL 都派发一次刷新 ⇒
+            #     **自愈死循环**（09-28 云端 run 密集到每隔几分钟一个，全是它触发的）。
+            #
+            # 【根因·两层，缺一不可】
+            #   ① 请求数连乘：原实现按 pn=1..60 逐页遍历，每页都是一次独立 clist 请求。
+            #      本仓 L402-411 自己用对照实验写得明明白白：东财 clist **单 host 单次
+            #      成功率仅 ~6-10%**（失败几乎全是 RemoteDisconnected，对端主动断连）。
+            #      60 次连乘 ⇒ 全链路成功率 ≈ 0.06^60 ⇒ **必然失败**，不是偶发。
+            #      （同一份血证已写在 L414：「f_avg_price 60 页遍历有效样本 <3000」）
+            #   ② 失败与「到底」不可分：em_clist 请求失败时**返回 []**（L534-537），
+            #      而原循环写 `if not page: break  # 空页：已遍历至末尾`
+            #      ⇒ 第 1 页一失败就 break，by_code 恒为空，日志吐出「有效样本仅 0 只」，
+            #      看起来像「源没数据」，实则是「第 1 页请求就挂了」。
+            #      ⚠️ 这与 L556-563 记录的 09-24 资金流血证是**同一个 bug 模式**：
+            #         `_all_individual_recs` 当时已修（补抓 3 次 + 显式上报缺榜），
+            #         **唯独 f_avg_price 漏修** —— 本次补齐，消除同类代码行为不一致。
+            #
+            # 【修法】与 `_all_individual_recs` 同款同源（它支撑的资金流卡一直正常）：
+            #   · 主路径：**单次大批量** pz=5000（1 次请求拿全市场）⇒ 请求数 60→1~3
+            #   · 失败补抓：同一页最多 3 次、间隔递增（em_clist 内部已做换 host 重试）
+            #   · 兜底分页：仅当单次条数明显不足（说明接口硬截 100）才逐页补齐，
+            #     且**连续 2 页空**才判定到底 —— 单页空不再当作终点
+            #   · 样本仍不足 3000 ⇒ 照旧不写盘（宁缺勿错，保持既有保护）
+            # ────────────────────────────────────────────────────────────────
+
+            def _absorb(rows, bucket):
+                """吸收一页行到 bucket（按代码去重）。返回 (新增条数, 本页有效条数)。"""
+                added = 0
+                for r in rows:
                     code = str(r.get("f12") or "")
-                    if not code:
+                    if not code or code in bucket:
                         continue
                     # 处理 "-"（停牌/无成交）+ None
                     price_raw = r.get("f2")
@@ -4966,14 +4995,151 @@ def main(category=None, only=None):
                     except (ValueError, TypeError):
                         chg = None
                     if price > 0:
-                        by_code[code] = {"price": price, "chg": chg}
-                if len(page) < PAGE_SIZE:
-                    break  # 末页不足 100 条：到底了
-                pn += 1
+                        bucket[code] = {"price": price, "chg": chg}
+                        added += 1
+                return added, len(rows)
+
+            def _pull_page(pz, pn, tries=3):
+                """单页拉取，最多 tries 次补抓。返回 (rows, hit) —— hit=False 表示
+                【3 次都没拿到任何行】，调用方据此区分「请求失败」而非「到底了」。"""
+                for _att in range(tries):
+                    rows = em_clist(_IND_FS, fields, fid="f12", stat="1", pz=pz, po="1", pn=pn)
+                    if rows:
+                        return rows, True
+                    if _att < tries - 1:
+                        time.sleep(1.2 * (_att + 1))
+                return [], False
+
+            def _sina_spot_all():
+                """🆕 2026-09-28 新增·本卡首选主源：**新浪**全市场快照
+                （Market_Center.getHQNodeData，node=hs_a，100 条/页 × ~53 页）。
+
+                【为什么换源】东财 clist 在云端 runner 已**整体不可用**（见上方病灶注释），
+                同期线上 CAPITAL_FLOW_DATA.js 实测只剩 255 字节 / market_net=0.0 /
+                top_inflow=[] —— 同源调用方一起空，证明不是本卡独有。
+                【实测对照（2026-09-28 09:5x，同一网络）】
+                  东财 clist：多 host 池仍 RemoteDisconnected，单页成功率 6-10%（仓库
+                              L406-411 亲测数据），60 页连乘 ⇒ 0；pz=5000 亦无效
+                  新浪 Market_Center：**53 页遍历 5300 只、失败页 0、耗时 25.3s**
+                ⇒ 新浪在本场景是压倒性更稳的一方，故升为主源、东财降为兜底。
+                【字段】code / name / trade(现价,str) / changepercent(涨跌幅)
+                返回 (recs, ok)：ok=False 表示「整轮不可用」，调用方据此回退东财；
+                绝不把「失败」伪装成「没有数据」。
+                """
+                import requests as _rq
+                _base = ("https://vip.stock.finance.sina.com.cn/quotes_service/"
+                         "api/json_v2.php/Market_Center.getHQNodeData")
+                _hdr = {"User-Agent": _EM_HEADERS.get("User-Agent", "Mozilla/5.0"),
+                        "Referer": "https://finance.sina.com.cn",
+                        "Accept": "*/*"}
+                _out = {}
+                _fail = 0
+                for _pg in range(1, 54):          # A 股 ~5300 只，100/页 ⇒ 53 页足矣
+                    if time.time() > _t0 + 300:   # 本函数内部 300s 自我保护
+                        print(f"  ⚠️ [平均股价·新浪] 超 300s，提前收束（已 {len(_out)} 只）")
+                        break
+                    _arr = None
+                    for _try in range(2):         # 单页最多 2 次（新浪本身很稳）
+                        try:
+                            _resp = _rq.get(_base, params={
+                                "page": _pg, "num": 100, "sort": "symbol",
+                                "asc": 1, "node": "hs_a", "symbol": "", "_s_r_a": "page",
+                            }, headers=_hdr, timeout=20)
+                            _resp.raise_for_status()
+                            _arr = _resp.json()
+                            break
+                        except Exception:
+                            if _try == 0:
+                                time.sleep(0.8)
+                    if not isinstance(_arr, list) or not _arr:
+                        _fail += 1
+                        if _fail >= 2:            # 连续 2 页不可用 ⇒ 判定源不可用，回退东财
+                            print(f"  ⚠️ [平均股价·新浪] 连续 {_fail} 页失败 → 判定源不可用")
+                            return [], False
+                        continue
+                    _fail = 0
+                    _n_ok = 0
+                    for _r in _arr:
+                        _c = str(_r.get("code") or "")
+                        if not _c or _c in _out:
+                            continue
+                        try:
+                            _p = float(_r.get("trade") or 0)
+                        except (ValueError, TypeError):
+                            _p = 0
+                        if _p <= 0:
+                            continue
+                        try:
+                            _ch = float(_r.get("changepercent"))
+                        except (ValueError, TypeError):
+                            _ch = None
+                        _out[_c] = {"price": _p, "chg": _ch}
+                        _n_ok += 1
+                    if len(_arr) < 100:           # 末页不足 100 ⇒ 真到底
+                        break
+                if len(_out) < 3000:
+                    print(f"  ⚠️ [平均股价·新浪] 仅 {len(_out)} 只（<3000）→ 判定不可用")
+                    return [], False
+                print(f"  [平均股价] 新浪源成功：{len(_out)} 只")
+                return [{"code": c, "price": v["price"], "chg": v["chg"]}
+                        for c, v in _out.items()], True
+
+            by_code = {}
+            # ── 主源①：新浪（2026-09-28 起升为首选）──
+            _t0 = time.time()
+            try:
+                sina_recs, sina_ok = _sina_spot_all()
+            except Exception as _e:
+                print(f"  ⚠️ [平均股价·新浪] 异常: {_e}")
+                sina_recs, sina_ok = [], False
+            if sina_ok:
+                for _r in sina_recs:
+                    by_code[_r["code"]] = {"price": _r["price"], "chg": _r["chg"]}
+
+            # ── 兜底②：东财 clist（新浪不可用/不足时才走）──
+            if len(by_code) < 3000:
+                if sina_ok:
+                    print(f"  ⚠️ [平均股价] 新浪仅 {len(by_code)} 只，东财兜底补齐")
+                BIG = 5000
+                big_rows, big_ok = _pull_page(pz=BIG, pn=1)
+                if big_ok:
+                    _absorb(big_rows, by_code)
+                    print(f"  [平均股价] 东财兜底 pz={BIG} → {len(big_rows)} 行，"
+                          f"累计 {len(by_code)} 只")
+
+                # 单次不足 3000（接口硬截 100）才逐页补齐
+                if len(by_code) < 3000:
+                    PAGE_SIZE = 100
+                    MAX_PAGES = 60      # 安全阀：A 股理论 5293 只，60 页足矣
+                    pn = 1
+                    _empty_streak = 0   # 连续「失败/空」页数，达 2 才判到底
+                    _fail_pages = 0
+                    while pn <= MAX_PAGES:
+                        page, hit = _pull_page(pz=PAGE_SIZE, pn=pn)
+                        if not hit or not page:
+                            _empty_streak += 1
+                            _fail_pages += 1
+                            # 🔴 关键：单页空**不再**直接 break（那是旧 bug 的入口）
+                            if _empty_streak >= 2:
+                                print(f"  [平均股价] 连续 {_empty_streak} 页空/失败 → 判定已到底"
+                                      f"（pn={pn}，累计 {len(by_code)} 只）")
+                                break
+                            pn += 1
+                            continue
+                        _empty_streak = 0
+                        _absorb(page, by_code)
+                        if len(page) < PAGE_SIZE:
+                            break       # 末页不足 100 条：真的到底了
+                        pn += 1
+                    if _fail_pages:
+                        print(f"  ⚠️ [平均股价] 分页期间 {_fail_pages} 页请求失败（已重试）")
+
             recs = list(by_code.values())
             # A 股理论 5293 只，停牌/无成交会少一些，≥3000 视为有效全市场样本
             if len(recs) < 3000:
-                print(f"  ⚠️ 全A spot 有效样本仅 {len(recs)} 只，放弃计算")
+                print(f"  ⚠️ 全A spot 有效样本仅 {len(recs)} 只，放弃计算"
+                      f"（新浪源 {'可用' if sina_ok else '不可用'}）"
+                      f" ⇒ 不写盘、保留远端旧数据，等下一轮")
                 return {}
             prices = [r["price"] for r in recs]
             avg_price = sum(prices) / len(prices)
