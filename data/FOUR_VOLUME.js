@@ -1,43 +1,15 @@
 window.FOUR_VOLUME={
- "update_time": "2026-09-27 20:34:12",
- "total": 3,
+ "update_time": "2026-09-28 18:38:17",
+ "total": 1,
  "stocks": [
   {
-   "code": "002297",
-   "name": "博云新材",
-   "market": "sz",
-   "board_label": "主板",
-   "close": 22.47,
-   "pct_chg": 5.49,
-   "turnover_rate": 24.18,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": true,
-    "散户金叉": true,
-    "主力金叉": true
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 散户金叉 + 主力金叉",
-   "signal_date": "2026-09-24",
-   "enter_date": "2026-09-24"
-  },
-  {
-   "code": "688082",
-   "name": "盛美上海半导体",
+   "code": "600206",
+   "name": "有研新材",
    "market": "sh",
-   "board_label": "科创板",
-   "close": 304.11,
-   "pct_chg": 4.39,
-   "turnover_rate": 1.56,
+   "board_label": "主板",
+   "close": 51.63,
+   "pct_chg": 3.65,
+   "turnover_rate": 12.91,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -45,46 +17,18 @@ window.FOUR_VOLUME={
     "机构托底": true,
     "广度翻多": true,
     "主力动量翻多": true,
-    "机构金叉": true,
+    "机构金叉": false,
     "散户金叉": false,
-    "主力金叉": true
+    "主力金叉": false
    },
    "yzc": true,
    "jg": true,
    "xc": true,
    "four": true,
    "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-   "signal_date": "2026-09-24",
-   "enter_date": "2026-09-24"
-  },
-  {
-   "code": "300442",
-   "name": "润泽科技",
-   "market": "sz",
-   "board_label": "创业板",
-   "close": 68.01,
-   "pct_chg": 1.9,
-   "turnover_rate": 1.99,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": true,
-    "散户金叉": false,
-    "主力金叉": true
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-   "signal_date": "2026-09-24",
-   "enter_date": "2026-09-24"
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+   "signal_date": "2026-09-28",
+   "enter_date": "2026-09-28"
   }
  ]
 };

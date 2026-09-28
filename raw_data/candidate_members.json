@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-28 17:39:06",
+  "update_time": "2026-09-28 18:48:24",
   "total": 561,
   "hysteresis_days": 5,
   "source_dist": {
@@ -7886,7 +7886,7 @@
     },
     "sh_688347": {
       "code": "688347",
-      "name": "华虹宏力半导体",
+      "name": "华虹宏力",
       "market": "sh",
       "board_label": "科创板",
       "sources": [
@@ -9619,7 +9619,7 @@
     },
     "sh_688052": {
       "code": "688052",
-      "name": "纳芯微电子",
+      "name": "纳芯微",
       "market": "sh",
       "board_label": "科创板",
       "sources": [
