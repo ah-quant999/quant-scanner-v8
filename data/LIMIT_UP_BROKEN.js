@@ -1,1 +1,1 @@
-window.LIMIT_UP_BROKEN = {"update_time":"2026-09-28 08:47:01","date":"2026-09-28","total":0,"note":"东方财富炸板股池（真实）：盘中触及涨停但收盘未封住","stocks":[],"republish_time":"2026-09-28 08:51:01"};
+window.LIMIT_UP_BROKEN = {"update_time":"2026-09-28 08:47:01","date":"2026-09-28","total":0,"note":"东方财富炸板股池（真实）：盘中触及涨停但收盘未封住","stocks":[],"republish_time":"2026-09-28 08:50:55"};
