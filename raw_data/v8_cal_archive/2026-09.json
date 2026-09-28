@@ -1,6 +1,6 @@
 {
  "month": "2026年9月",
- "update_time": "2026-09-27 21:12",
+ "update_time": "2026-09-28 08:30",
  "legend": [
   {
    "title": "重要政策",
@@ -425,7 +425,7 @@
     {
      "num": 27,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": []
     }
    ]
@@ -437,7 +437,7 @@
     {
      "num": 28,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇺🇸 耐用品订单",
