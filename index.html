@@ -615,7 +615,7 @@ window.__domReadyFns=[];
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=af1a8c206a" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=7ca3eed7c5" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=aa3e51a09d" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=2b6369a278" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=1749b574ca" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=698dd39ba7" defer></script>
@@ -623,7 +623,7 @@ window.__domReadyFns=[];
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_PROFILE 不再单独下载（1.4MB 与 STOCK_LIST 100% 重复），由 STOCK_LIST 合成 -->
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
-    <script src="data/MACRO_DATA.js?v=c957718d34" defer></script>
+    <script src="data/MACRO_DATA.js?v=0300161691" defer></script>
     <script src="data/MACRO_BRIEF.js?v=09b1390baa" defer></script>
     <script src="data/MACRO_KSHAPE.js?v=627ddea309" defer></script><!-- 宏观景气K型分层（数据驱动·每日巡检） -->
 <script src="data/NT_DATA.js?v=060c96b95e" defer></script>
@@ -637,7 +637,7 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=e8af50e99a" defer></script>
 <script src="data/MARGIN_DATA.js?v=cac4d6ae9a" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=59b44e41ec" defer></script>
-<script src="data/IPO_DATA.js?v=8a7e1d1b6d" defer></script>
+<script src="data/IPO_DATA.js?v=bdc27de336" defer></script>
     <script src="data/CRISIS_DATA.js?v=940a4f3d9c" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=d5e214ad1c" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=1d1fdc9f4c" defer></script>
@@ -1762,8 +1762,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      故不再注入 AI_INSIGHTS_COMPARE 数据文件（文件本身连同 fetcher 一并从仓库删除）。 -->
 <script src="data/WAVE_ELLIOTT.js?v=76f562029a" defer></script>
 <script src="data/SZ_FIB.js?v=1e975907f7" defer></script>
-<script src="data/SECTOR_RS.js?v=fade0a8670" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=e7a1d8ce2d" defer></script>
+<script src="data/SECTOR_RS.js?v=a9a86fab04" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=fa8e75ba2c" defer></script>
 <script src="data/INST_TRADE.js?v=536b5bcbbc" defer></script>
 <script src="data/NORTH_FUND.js?v=fde0472966" defer></script>
 <script src="data/MARKET_ALERTS.js?v=ceb12c9428" defer></script>
@@ -1792,7 +1792,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/BACKTEST_TDX.js?v=c696ae0870" defer></script>
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=d2c640591f" defer></script>
-<script src="data/EXPERIMENT.js?v=2dd3dd6a3f" defer></script>
+<script src="data/EXPERIMENT.js?v=4957165ca7" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=1bac1e7ce0" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=b21d61ca26" defer></script>
@@ -1821,9 +1821,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=f827a972d9" defer></script>
 <script src="data/HB_XIAOJIU.js?v=532127e77f" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=00af848dc6" defer></script>
-<script src="data/HEALTH_CHECK.js?v=a629c49aa4" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=cd06dec879" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=c187cb3a0f" defer></script>
+<script src="data/HEALTH_CHECK.js?v=9064627a77" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=66d259433e" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=63db8889ee" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=00fcbeeb09" defer></script>
@@ -1836,12 +1836,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/FACTOR_WALKFORWARD.js?v=76312df7f0" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=b908819788" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=a7bd3ea089" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=a6b0d45b4f" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=ce2196136a" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=4a2fc69f09" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=88f87d84d1" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=1cb7408ead" defer></script>
-    <script src="data/IMA_STRONG_BACKTEST.js?v=12fcf431eb" defer></script>
+    <script src="data/IMA_STRONG_BACKTEST.js?v=3f13ab3a8f" defer></script>
     <script src="data/CRDS_BACKTEST.js?v=d348b3be89" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -10865,11 +10865,11 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=8a7e1d1b6d"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=bdc27de336"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=8a7e1d1b6d';
+        return 'data/IPO_DATA.js?v=bdc27de336';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
@@ -15740,7 +15740,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=a7bd3ea089';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=ce2196136a';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -15749,7 +15749,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=a6b0d45b4f';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=4a2fc69f09';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -19112,7 +19112,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=f2cd72c2fa', fallbacks:[A2_CDN+'STOCK_LIST.js']},
     {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=1031fe23a3', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
-    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=14354d6aa2', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
+    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=d011f02ab8', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
     var srcs=[item.url].concat(item.fallbacks||[]);
