@@ -637,7 +637,7 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=e593f0df9a" defer></script>
 <script src="data/MARGIN_DATA.js?v=cac4d6ae9a" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=6ccb3ce56e" defer></script>
-<script src="data/IPO_DATA.js?v=e33a518e08" defer></script>
+<script src="data/IPO_DATA.js?v=efa22d442a" defer></script>
     <script src="data/CRISIS_DATA.js?v=4f65a6e5a4" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=07f6ffb8e3" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=c495c232c4" defer></script>
@@ -1812,8 +1812,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=10552384b9" defer></script>
 <script src="data/HB_XIAOJIU.js?v=9a4db18d40" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=b273adc068" defer></script>
-<script src="data/HEALTH_CHECK.js?v=82e5425432" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=bff46f95bd" defer></script>
+<script src="data/HEALTH_CHECK.js?v=c232221e72" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=273bbcb448" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=63db8889ee" defer></script>
@@ -10856,11 +10856,11 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=e33a518e08"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=efa22d442a"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=e33a518e08';
+        return 'data/IPO_DATA.js?v=efa22d442a';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
