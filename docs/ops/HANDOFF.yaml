@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-29 03:03"
+  updated: "2026-09-29 05:30"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 97
+  next_id_seq: 98
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -7293,4 +7293,54 @@ items:
       `data/HEALTH_CHECK.js`（`all_WAVE_ELLIOTT`）·
       `docs/ops/handover/2026-09-29_0302_阿狸咪的工程师给小九的工程师_WAVE_ELLIOTT日频漏刷09-28(小九机automation)+阿狸咪应急补跑.md`
     updated: "2026-09-29 03:03"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: healthcheck-all-ts-source-mismatch-0929
+    title: >-
+      HEALTH_CHECK `all_*` 通用红线出现结构性假红：同一提交内 `data/WAVE_ELLIOTT.js` / `data/DAJIJIN_REDUCTION.js`
+      的 `update_time` 是新鲜的（09-29 03:48:30 / 09-29 03:48），而同提交的 `data/HEALTH_CHECK.js` 报的是它们
+      **上一版**的时间戳（09-24 17:14:59 / 09-25 17:05，超通用红线 1620min）⇒ 面板 fail=6 里至少 2 项为假红（真实应为 4）
+    owner: shared
+    status: todo
+    created: "2026-09-29 05:30"
+    priority: P2
+    block_deploy: false
+    context: >-
+      【现象】线上站点与远端 main 上 `data/WAVE_ELLIOTT.js` 顶层 `update_time` = 2026-09-29 03:48:30、
+      `data/DAJIJIN_REDUCTION.js` = 2026-09-29 03:48（均新鲜）；而 `data/HEALTH_CHECK.js`（每档重建，
+      ages 每档递增 ⇒ 确在重算）把二者分别报成 2026-09-24 17:14:59（age 6467.3min）与
+      2026-09-25 17:05（age 5037.2min）。
+      【铁证·同一提交内自相矛盾】提交 `9d19b05ae7`（09-29 05:02:28 · 33 文件）内同时含上述三者，
+      即「产物新 / 面板报旧」发生在**同一棵树**里 ⇒ 排除「远端就是旧数据」「站点 CDN 陈旧」。
+      【归属】这两个字面量在 main 树内除 `data/HEALTH_CHECK.js` 自身外 **0 命中**；
+      且 09-25 17:05 恰为 `data/DAJIJIN_REDUCTION.js` 的**上一笔**提交（7dcfcd53d6，09-25 17:05:04）
+      ⇒ 健康读到的不是当前树产物，而是**旧版本**。
+      【代码路径】`v8_health_check.py` L52 `DATA_DIR = Path("data")`（相对 cwd）；
+      `check_all_data_files()` L2121+ 取 `ts = update_time|date|generated|…`（L2170-2177）后按通用红线判龄；
+      CI 分支 `load_window_var_newest()` L540：`GITHUB_ACTIONS=true` 时**本地可用即直接返回**，取不到才回落线上站点。
+      ⇒ 同一 checkout 内「产物 → 健康」必须一致；实测不一致 = 判据缺陷。
+    evidence: >-
+      `GET /commits/9d19b05ae7` + `raw …/<sha>/data/WAVE_ELLIOTT.js|DAJIJIN_REDUCTION.js|HEALTH_CHECK.js`；
+      `GET /commits?path=data/DAJIJIN_REDUCTION.js`（098b8349e7 09-29 03:48:31 ← 7dcfcd53d6 09-25 17:05:04）；
+      硬抓 `https://ah-quant999.github.io/quant-scanner-v8/data/WAVE_ELLIOTT.js?nc=<epoch>`（尾部时间戳 03:48:30）。
+    fix: >-
+      ① 机制未定位到行，**需小九侧拉该档 `fetch` job 日志**（阿狸咪无 logs 通道）定案。三个候选入口：
+      (a) 本档内 `data/*.js` 被前序步回退（`bridge_raw_data.py` L662 / `update_v8.py` L711 用陈旧源重生成），
+      而推送被 `api_push_raw` 防倒退守卫拦下 ⇒ 远端新、面板旧；(b) 健康步 cwd ≠ workspace（`DATA_DIR` 为相对路径）；
+      (c) `actions/checkout`（L276，`fetch-depth: 1` 无显式 ref）拿到旧 sha。
+      验证法：health 步前后各插一次 `md5sum data/WAVE_ELLIOTT.js data/DAJIJIN_REDUCTION.js`；日志加 `pwd`。
+      ② 建议护栏（未落码）：判 fail 前自证「上报的 last_update 必须能在当前 checkout 的原文件里逐字命中」，
+      命中不了 ⇒ `::warning title=v8-health-ts-source-mismatch::` 并降为 warn。
+    verify_how: >-
+      ① 静态：`grep -n "DATA_DIR" v8_health_check.py` 与 `load_window_var_newest` 的 CI 分支逐字给出；
+      ② 动态：取**下一档** `v8_cn_fetch_cloud` 真跑，断言同提交内
+      `data/HEALTH_CHECK.js` 的 `all_WAVE_ELLIOTT.last_update` **逐字等于** 同提交 `data/WAVE_ELLIOTT.js` 的
+      `update_time`（同理 DAJIJIN），且该两项不再出现在 `summary.fail` 中；
+      ③ 反测：人为把某 `data/*.js` 的 update_time 改成远早于当前，断言健康仍能如实报红（不得把真停更一并降级）。
+    files: >-
+      `data/HEALTH_CHECK.js` · `v8_health_check.py`（L52/L540/L2121/L2170） ·
+      `.github/workflows/v8_cn_fetch_cloud.yml`（L276/L643/L662/L711/L746/L778/L807） ·
+      `data/WAVE_ELLIOTT.js` · `data/DAJIJIN_REDUCTION.js` · `api_push_raw.py`（L568/L583） ·
+      docs/ops/handover/2026-09-29_0526_阿狸咪的工程师给小九的工程师_HEALTH_CHECK通用红线两项结构性假红(波浪大基金)时间戳来源与同树产物不符.md
+    updated: "2026-09-29 05:30"
     updated_by: 阿狸咪的工程师(alimi-cn)
