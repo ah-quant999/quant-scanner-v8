@@ -39,6 +39,19 @@ from name_utils import strip_entitlement_prefix  # noqa: E402
 import requests as _requests
 from datetime import datetime, timedelta
 
+# 🔴 2026-09-28 修复（观澜台素材冻结 09-24~09-28 的根因）：
+#   本脚本被 Windows 计划任务以无控制台方式拉起时，stdout 编码回落到 ANSI 代码页(GBK)；
+#   而下面的进度输出含 U+25B8「▸」等 GBK 不可编码字符 ⇒ 在 `print(f"  ▸ 股票名索引…")`
+#   处抛 `UnicodeEncodeError: 'gbk' codec can't encode character '\u25b8'`，
+#   子进程 **0.6 秒即退出、从未产出新素材**；终端手跑因环境带 UTF-8 而全程正常，
+#   故该故障长期不可见（唯一征兆是包装器记录的 elapsed≈0.6s）。
+#   此处统一把 stdout/stderr 切到 UTF-8，使调用方环境无关。
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(BASE_DIR)
 # v8 原生化钩子（2026-08-02）：v8 仓通过 V8_OUT_DIR 环境变量重定向 DATA_DIR 到仓库根 out/
