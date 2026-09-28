@@ -1137,11 +1137,20 @@ function _uBadge(slot, horizon, ts, sub, pageSlot){
   //      下次有人调 SLA 就会把误报放回来。删干净才是真一劳永逸。
   //   ── 胶囊仍照常显示真实更新时间 t（含今日/昨日/N天前相对语义）。
   // 统一轻量 pill 风格（与最终推荐 finalStatusBadges 一致）
+  // 🛡 2026-09-28 主人令（「实时数据里很多卡都没及时更新」排查）：
+  //   根因之一：盘中 intraday 抓取链只跑 40 个「盘中档」变量，盘前/盘后档
+  //   （北向 / 两融 / 打新 / 宏观 / 52周新高 / 解禁 / 业绩预告 / ETF 份额 …）盘中链根本不抓，
+  //   update_time 停在今早盘前批次 —— 数据本身是新鲜的，但按「实时」标准看像卡住了。
+  //   此处按胶囊已有的 slot 如实标注（slot 由 pageSlot / _slotByTs 归一，与标签同源），
+  //   让「本就不该盘中刷新」与「真的刷新失败」一眼可分。零数据语义改动。
+  var _cadNote = (slot && slot !== '实时' && slot !== '盘中' && slot !== 'auto')
+    ? ' <span style="font-size:10px;color:var(--dim);font-weight:400;opacity:.9">\u00b7 ' + slot + '档数据，盘中不刷新</span>'
+    : '';
   var _okTitle = '数据更新于 ' + t;
   if(_pageSlot && _realSlot && _realSlot !== _pageSlot){
     _okTitle += '｜数据实际产出时段：' + _realSlot + '（本卡位于「' + _pageSlot + '」页）';
   }
-  return '<span title="'+_okTitle+'" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+t+sHTML+hHTML+'</span>'
+  return '<span title="'+_okTitle+'" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+t+sHTML+hHTML+_cadNote+'</span>'
     + (sub ? ' <span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">' + sub + '</span>' : '');
 }
 function setBadge(id, slot, horizon, ts, sub, pageSlot){
