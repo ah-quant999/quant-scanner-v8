@@ -121,7 +121,21 @@ def is_trading_day(date_str):
         return False
     cal = _get_trade_cal()
     if cal is not None:
-        return d.strftime("%Y-%m-%d") in cal
+        _iso = d.strftime("%Y-%m-%d")
+        # 🔴🔴 2026-09-28 阿狸咪根治（共振日历「今天没数据」真凶）：
+        #   新浪/东财交易日历**只在当日收盘之后才收录当天**。因此「日历里查不到今天」
+        #   唯一合理的解释是**当天尚未完结**，而不是「今天休市」。
+        #   旧实现直接 `return _iso in cal` ⇒ 交易日盘中/刚收盘那几小时恒为 False
+        #   ⇒ main() 走 `if not is_trading_day` 分支 ⇒
+        #     `_update_lhb_history({}, today, trading=False)` 把**当天写成空占位**
+        #   ⇒ 共振日历两卡(jyCal / northCal)当日整格空白。
+        #   实证：2026-09-28 16:2x 的 cn_fetch 那轮写下了空占位，
+        #   而 17:00 另一条链从龙虎榜接口抓到 33 只 —— 同一天两套口径互相打架。
+        #   正解：当天未完结 ⇒ 保守视为交易日 ⇒ main() 走「不写占位、只打日志」分支。
+        if _iso not in cal and _iso == datetime.date.today().strftime("%Y-%m-%d"):
+            log(f"⚠️ 交易日历尚未收录今天 {_iso}（收盘前常态）⇒ 保守视为交易日，禁止写非交易日占位")
+            return True
+        return _iso in cal
     # 🔴 2026-09-25 阿狸咪·P0（trading-day-gate-predeps-fallback）：日历拉取失败时
     #   原为 `return True`（默认「是交易日」）⇒ 休市日（2026-09-25 中秋）被判为交易日，
     #   触发全量抓取且把 V8_DATA_DATE 标成休市日当天。改为回落零依赖静态权威日历：
