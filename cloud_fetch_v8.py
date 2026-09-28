@@ -2143,8 +2143,68 @@ def f_index_quotes():
         return None
     return {"items": items, "note": "东财实时指数行情(push2delay)"}
 
+CONCEPT_NOTE_MAIN = "概念板块列表(涨跌幅/主力净流入亿)，来源东方财富push2delay"
+CONCEPT_NOTE_FALLBACK = "概念板块列表(涨跌幅/主力净流入亿)，来源：复用本轮板块资金流(sector_fund_flow)概念条目"
+
+
+def _concept_items_from_sector_flow():
+    """🧩 2026-09-28 新增：从「本轮已成功」的 sector_fund_flow.json 复用概念条目。
+
+    【为什么需要它】f_concept_ranking 与 f_sector_fund_flow 是**同一个 em_clist 通道**，
+      但前者多了 `f:!50` 过滤 ⇒ 在云端 runner 上失败率显著更高（日志常现
+      `⚠️ CONCEPT_RANKING: 返回空，跳过`），而后者本轮**成功抓到概念 176 条**。
+      ⇒ 病灶不是「没数据」，而是**同一批数据没被复用**。原实现失败即 `return None`
+        ⇒ CONCEPT_RANKING 连续停摆数天（09-24 19:27 → 09-28 10:00，用户亲眼看到
+        「概念资金热力图 · 更新于 4天前 19:22」）。
+    【字段契约】前端 index.html:2670-2715（treemap）只消费 `it.name / it.chg / it.net`
+      与 `d.update_time`；此处恰好同构（name/chg/net 语义完全一致，均来自东财 f14/f3/f62），
+      **前端零改动**。
+    """
+    try:
+        with open(RAW_DIR / "sector_fund_flow.json", encoding="utf-8") as f:
+            sff = json.load(f)
+    except Exception as e:
+        print(f"  ⚠️ CONCEPT_RANKING 兜底读取 sector_fund_flow.json 失败: {e}")
+        return []
+    # 🛡️ 假刷新闸门：sector 的 update_time 由 f_sector_fund_flow 真实抓取时写入
+    #   （盘前重戳 _restamp_fib_for_premarket 只碰 sh_fib/sz_fib，不碰它 ⇒ 戳 != 数据的老路走不通）。
+    #   若 sector 本身已是隔日数据，**绝不能**把它套上今天的时间戳写进 CONCEPT_RANKING，
+    #   否则就是「热力图显示今日 09:30、方块却是 4 天前的数据」这种最坏假绿。
+    #   宁可返回空 ⇒ 不写盘 ⇒ 卡片继续诚实显示陈旧 + 看守报超龄。
+    _sut = str(sff.get("update_time") or "")
+    _today = now_cst().strftime("%Y-%m-%d")
+    if not _sut.startswith(_today):
+        print(f"  ⚠️ CONCEPT_RANKING 兜底放弃：sector_fund_flow update_time={_sut or '?'} 非今日"
+              f"（{_today}）⇒  refusing 假刷新（不写盘）")
+        return []
+    pool = sff.get("top_list")
+    if not pool:
+        pool = (sff.get("sectors_in") or []) + (sff.get("sectors_out") or [])
+    if not pool:
+        print("  ⚠️ CONCEPT_RANKING 兜底：sector_fund_flow 内无条目，跳过")
+        return []
+    out = []
+    for x in pool:
+        if str(x.get("type") or "") != "概念":
+            continue
+        name = x.get("name")
+        if not name or name in _NOISE_CONCEPTS:
+            continue
+        out.append({
+            "name": name,
+            "chg": round(float(x.get("chg") or 0), 2),
+            "net": round(float(x.get("net") or 0), 2),
+        })
+    print(f"  ♻️ CONCEPT_RANKING 复用 sector_fund_flow「概念」{len(out)} 条"
+          f"（sector update_time={sff.get('update_time', '?')}）")
+    return out
+
+
 def f_concept_ranking():
     # 概念板块列表（涨跌幅 + 主力净流入），push2delay 镜像。
+    # 🩹 2026-09-28 根治（小九）：东财 clist 本就高失败率，失败**不再直接 return None**
+    #   ⇒ 改为回退复用本轮已成功的 sector_fund_flow.json「概念」条目。
+    #   【反例警戒】若沿用旧写法，热力图会连续数天顶着陈旧 update_time 而不自知。
     rows = em_clist("m:90 t:3 f:!50", "f12,f14,f3,f62,f184,f20", fid="f62", stat="1", pz=300)
     items = []
     for r in rows:
@@ -2155,9 +2215,15 @@ def f_concept_ranking():
             "net": _to_yi(r.get("f62")),
             "amount": round(float(r.get("f20") or 0) / 1e8, 2),
         })
+    note = CONCEPT_NOTE_MAIN
+    if not items:
+        items = _concept_items_from_sector_flow()
+        note = CONCEPT_NOTE_FALLBACK
     if not items:
         return None
-    return {"items": items, "note": "概念板块列表(涨跌幅/主力净流入亿)，来源东方财富push2delay"}
+    # note 如实标注来源，杜绝「回退数据被标成主源」的误导（字段与 f_sector_fund_flow
+    # 同源同义，均为东财 f14 名称 / f3 涨跌幅 / f62 主力净流入 ⇒ 前端语义零差别）。
+    return {"items": items, "note": note}
 
 def f_candidate_quotes():
     """候选池实时行情（行业树图第二层·个股数据源）。
@@ -3482,10 +3548,31 @@ def _etf_snapshot_partial():
     return by_code, len(pages), npages
 
 
+# 🩹 2026-09-28 ETF_DAILY_MONITOR 降级闸门：全市场 ETF 约 1619 只 ÷ 100/页 ≈ 17 页，
+#   而东财 clist 单页面失败率极高（本文件 L402-411 亲测 6-10%）⇒ 「17 页全齐」几乎不可达，
+#   实测每轮总有 1 页拿不到 ⇒ `_etf_snapshot()` 恒 None ⇒ 本卡自 09-24 23:32 起整天不写盘。
+#   但同一时刻 `_etf_snapshot_partial()` 报告「部分快照 17/17 页」——**通路一直是通的**，
+#   是「合计口径必须 17 页全齐」这条硬规矩把它锁死了。
+#   折中（可解释、可审计）：覆盖率 ≥ 16/17 且样本 ≥ _ETF_MIN_ROWS 才放行，
+#   并在产物里标 `partial/covered_pages/total_pages` ⇒ 前端据实标注「部分页口径」，
+#   绝不让它顶着「全市场」三个字误导（宁可降级后如实标偏，也不装作全量）。
+_ETF_DAILY_MIN_PAGES = 16
+
+
 def f_etf_daily_monitor():
     # ETF 日监控：全市场 ETF 当日主力净流入排名（口径见上方 _ETF_FS 注释）。
     # 输出 schema 不变：{total_etf,total_net,top_inflow,top_outflow}（AI速览/ETF卡直读）。
     snap = _etf_snapshot()
+    _partial_pages, _total_pages = 0, 0
+    if not snap:
+        _snap, _got, _need = _etf_snapshot_partial()
+        if _snap and _got >= _ETF_DAILY_MIN_PAGES and len(_snap) >= _ETF_MIN_ROWS:
+            print(f"  ♻️ ETF_DAILY_MONITOR 降级：复用部分拼页 {_got}/{_need} 页（{len(_snap)} 只）"
+                  f"⇒ 合计为**已覆盖部分**，前端将标注 partial")
+            snap, _partial_pages, _total_pages = _snap, _got, _need
+        else:
+            print(f"  ⚠️ ETF_DAILY_MONITOR: 底表未拼齐（{_got if _snap else 0} 页）"
+                  f"且未达 {_ETF_DAILY_MIN_PAGES}/17 降级线 ⇒ 不写盘，保留远端旧数据")
     if not snap:
         return None
     rows = []
@@ -3498,12 +3585,18 @@ def f_etf_daily_monitor():
     total_net = float(sum(r["net"] for r in rows))
     inflow = sorted(rows, key=lambda x: x["net"], reverse=True)[:10]
     outflow = sorted(rows, key=lambda x: x["net"])[:10]
-    return {
+    _out = {
         "total_etf": int(len(rows)),
         "total_net": total_net,
         "top_inflow": [{"name": r["name"], "code": r["code"], "net": r["net"]} for r in inflow],
         "top_outflow": [{"name": r["name"], "code": r["code"], "net": r["net"]} for r in outflow],
     }
+    if _partial_pages:
+        # 🏷 诚实标记：合计与榜只覆盖已拼到的页 ⇒ 前端据此标注「部分页口径」，不许伪装全市场
+        _out["partial"] = True
+        _out["covered_pages"] = _partial_pages
+        _out["total_pages"] = _total_pages
+    return _out
 
 
 def f_etf_pulse():

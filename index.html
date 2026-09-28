@@ -11680,6 +11680,10 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
       ? '盘前 · 数据为上一交易日('+_dataDate+')收盘值；09:40 起每 30 分盘中累积'
       : (_hr<15.5?'盘中 · 每 30 分累积中（基线 15:10/15:30）':'盘后 · 当日('+_dataDate+')定基');
     var h='<div style="padding:8px 4px;">';
+    // 🏷 2026-09-28：ETF_DAILY_MONITOR 降级口径标注（后端 f_etf_daily_monitor 降级即置 partial，此处据实提示）
+    if(daily.partial===true){
+      h+='<div style="font-size:10.5px;color:#ffb74d;margin:-2px 0 8px;">⚠️ 部分页口径 '+((daily.covered_pages||'?')+'/'+(daily.total_pages||'?'))+'（东财底表本轮未取全）· 上方合计与排名仅覆盖已取回部分，非全市场</div>';
+    }
     h+='<div style="font-size:11px;color:var(--sub);margin-bottom:8px;">全市场净流入：<span style="color:'+(daily.total_net>=0?'var(--up)':'var(--down)')+';font-weight:700;">'+(daily.total_net>=0?'+':'')+(daily.total_net/1e8).toFixed(2)+'亿</span> · 覆盖 '+(daily.total_etf||0)+' 只 <span style="color:var(--dim);font-size:10.5px;margin-left:6px;">'+_dataHint+'</span></div>';
     h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">';
     /* Card 1: TOP10 主力净流入 */
