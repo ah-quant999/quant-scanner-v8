@@ -358,8 +358,20 @@
   },
   "2026-09-24": {
     "count_80plus": 0,
-    "total_scored": 271,
-    "max_score": 33.5,
-    "update_time": "2026-09-24 02:34:06"
+    "total_scored": 262,
+    "max_score": 32.9,
+    "update_time": "2026-09-24 19:17:28"
+  },
+  "2026-09-25": {
+    "count_80plus": 0,
+    "total_scored": 262,
+    "max_score": 32.3,
+    "update_time": "2026-09-25 23:26:01"
+  },
+  "2026-09-26": {
+    "count_80plus": 0,
+    "total_scored": 262,
+    "max_score": 32.3,
+    "update_time": "2026-09-26 08:40:13"
   }
 }
