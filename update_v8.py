@@ -230,7 +230,10 @@ CATEGORY_MAP = {
     # （INST_COVERAGE 频次项已于 2026-09-23 主人拍板随因子观测卡整卡删除，见 CATEGORY_MAP 处注记。）
     "SUSPENSION_ALERT": "premarket",
     "MARKET_ALERTS": "intraday,post_close",
-    "OVERSEAS_MARKETS": "intraday,post_close",
+    # 🛡 2026-09-28 主人令「亚太比A股早开盘，和盘前一起8点多更新」：与 cloud_fetch_v8.py 侧同步升三档。
+    #   血证：09-28 09:17 selfhosted premarket 轮 raw 已新(09:35落main)但本表缺 premarket ⇒
+    #   build(premarket) 跳过重建 data/OVERSEAS_MARKETS.js，卡面冻结 09-24。第三处同口径对齐。
+    "OVERSEAS_MARKETS": "premarket,intraday,post_close",
     # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
     "W52_HIGH": "premarket,post_close",
     # 🛡 2026-09-11 小九的工程师（三档归档对齐）：同上漏同步。抓取侧 cloud_fetch_v8.py 两者均为
