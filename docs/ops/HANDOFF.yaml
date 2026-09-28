@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-29 00:47"
+  updated: "2026-09-29 03:03"
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 96
+  next_id_seq: 97
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -7248,4 +7248,49 @@ items:
       `raw_data/lhb_history.json` · `.github/workflows/v8_lhb_fetch.yml`（cron `30 9 * * 1-5`
       ＝ CST 17:30）· `index.html` L3433-3453（两卡容器）/ L2742-2780（LHB_HISTORY＋LHB_DATA 合并）
     updated: "2026-09-28 17:55"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: wave-elliott-daily-miss-0928
+    title: >-
+      WAVE_ELLIOTT 日频产物 2026-09-28（交易日）漏刷：脚本自述由小九机 16:00 automation 跑，但仓内 35 个 workflow 全文 grep 该脚本名 0 命中 ⇒ 调用方不在仓内（阿狸咪已应急补跑数据）
+    owner: 小九的工程师(lemoncat-cn)
+    status: todo
+    created: "2026-09-29 03:03"
+    priority: P1
+    block_deploy: false
+    context: >-
+      【现象】远端 `data/WAVE_ELLIOTT.js` blob `6b498fd74346c150d2aeef42f525604536702ecf` / 16,223 B，
+      meta.date = series 末交易日 = **2026-09-24 17:14:59**，此后无提交。
+      提交史铁证：`data(wave): 日频刷新波浪客观序列(截至…)` 在 09-21 / 09-22 / 09-23 / 09-24 **每个交易日**各一笔
+      （作者 `v8-cloud-bot`，时刻 16:15–17:21 CST）；09-25 中秋休市 / 09-26-27 周末不刷 = **正确**；
+      **09-28（周一，`v8_date.is_trading_day('2026-09-28')=True`）当日无该提交** ⇒ 真漏刷，非通用红线误杀。
+      【调用方】`v8/fetch_wave_elliott.py` 自述「谁跑：小九机 WorkBuddy automation 日频 16:00」、
+      「阿狸咪机无此 automation（也无 westock）」；而**仓内 35 个 workflow 全文 grep 该脚本名 = 0 命中**
+      （`.github/**` 内 wave/波浪 仅命中 lhb 注释），`algorithms/run_algorithms.py` / `.github/scripts/` 亦 0 命中
+      ⇒ 调用方**不在仓内**，属小九机本地 automation，阿狸咪无法自查其存亡。
+      【旁证】小九机本体**在线**：`data/HB_XIAOJIU.js` `last_time` = 2026-09-29 00:48:07（status ok）；
+      其专属链 `v8_ima_strong_stock` / `v8_cn_fetch_intraday_lemoncat` 09-28 各档均 success
+      ⇒ 不是「小九机 down」，更像**该 automation 被暂停/未触发**（待小九自查）。
+      【健康面】HEALTH_CHECK（updated 2026-09-29 02:45:25）overall=fail 6 项，本项 `all_WAVE_ELLIOTT`
+      age 6330.4min（≈4.4 天，通用红线 1620min）。与在册族 `all-generic-redline-false-positive` 的区别：
+      本项**有「每交易日必落提交」的真停更反证**，不属误杀。
+    fix: >-
+      ① 【数据·阿狸咪已应急补跑 2026-09-29 03:0x CST】以**原脚本逻辑**（腾讯 ifzq 三级降级，家机实测
+      6 个指数全部取数成功、末交易日 2026-09-28）在仓外重算并走 Git Data API 单文件推送：
+      commit `404c673040bdd5b52b91dbdb7ec747b3545921cc`（parent `0358ec2dab60`）/ blob `058a08ab13dc8583ec7840458f6ef5e99f774ff4` / 16,234 B；
+      series 末交易日 09-24→**09-28**（700 交易日窗口）、idx 5 指数全部至 09-28、
+      **marks 人工浪型拐点 6 条逐字节保留（未重判）**、LF 单行压缩态；基 blob 漂移断言通过，非破坏性。
+      ⚠️ `index.html` 的 `?v=` 是本文件内容哈希 ⇒ 该卡对**已缓存浏览器**须等下一轮 cn_fetch step24
+      原子刷 `?v` 后才可见新内容（新访客即时可见）。
+      ② 【根因·待小九】请确认小九机 WorkBuddy automation（应日频 CST 16:00 跑 `v8/fetch_wave_elliott.py`）
+      是否 PAUSED / 未触发；若是则恢复，并观察 09-29 档是否落 `data(wave): …(截至2026-09-29)` 提交。
+      ③ 【防复发·建议】该脚本无仓内调用点 ⇒ 建议把小九机 automation「上次成功时刻」纳入
+      `v8_peer_monitor` 或 HB 心跳可视面，避免「静默漏跑 4 天才被通用红线发现」。
+    refs: >-
+      `v8/fetch_wave_elliott.py`（blob `2ee17e1d0c`，自述由小九机 16:00 automation 跑）· `v8/gen_wave_report.py` ·
+      `data/WAVE_ELLIOTT.js`（远端 blob `6b498fd743` → 新 blob `058a08ab13dc`）·
+      `index.html` L1763（`data/WAVE_ELLIOTT.js?v=76f562029a`）· `.github/workflows/*`（35 个全文 grep 脚本名 0 命中）·
+      `data/HEALTH_CHECK.js`（`all_WAVE_ELLIOTT`）·
+      `docs/ops/handover/2026-09-29_0302_阿狸咪的工程师给小九的工程师_WAVE_ELLIOTT日频漏刷09-28(小九机automation)+阿狸咪应急补跑.md`
+    updated: "2026-09-29 03:03"
     updated_by: 阿狸咪的工程师(alimi-cn)
