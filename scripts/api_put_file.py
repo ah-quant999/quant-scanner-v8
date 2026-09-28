@@ -175,9 +175,22 @@ def _request(method, path, data=None, retry=3):
     return {"__error__": "net", "__msg__": last}, 0
 
 
+def _quote_rel(local_rel: str) -> str:
+    """把仓库相对路径逐段百分号编码（🔴 API 路径含中文/空格/括号必须 quote）。
+
+    2026-09-28 阿狸咪的工程师：本函数此前缺失 ⇒ 中文文件名（如
+    `docs/ops/handover/2026-09-28_1656_阿狸咪的工程师…（含一处静默降级_bug_根治）.md`）
+    被直接拼进 URL ⇒ `urllib` 内部 `ascii codec can't encode characters in
+    position 83-89` ⇒ 三次重试全空转、推送假失败。
+    逐段 quote（而非整体 quote）以保持 `/` 分隔符不被转义。
+    """
+    from urllib.parse import quote
+    return "/".join(quote(seg, safe="") for seg in local_rel.split("/"))
+
+
 def put_file(local_rel, msg=None):
     local_rel = local_rel.replace("\\", "/")
-    path = f"/repos/{REPO}/contents/{local_rel}"
+    path = f"/repos/{REPO}/contents/{_quote_rel(local_rel)}"
     with open(local_rel, "rb") as f:
         content = f.read()
     # 🛡 2026-09-20 推边界行尾收口（见上方 fold_eol 注释）
