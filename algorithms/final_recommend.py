@@ -910,7 +910,15 @@ def main():
     _n_roe_hit = 0         # ROE_TTM：命中池内票数
     _n_weak_hit = 0        # 放量弱势：扣分票数
     _today = datetime.now().strftime("%Y-%m-%d")
-    _fl_max_wait = 0 if V8_OFFLINE else 20  # 离线模式本机无 baostock 注定取不到 FACTOR_LAB，直接跳过等待
+    # 🛡 2026-09-28 阿狸咪的工程师（最终推荐连续 3 天不出 · 配套根治）：
+    #   原「固定等满 20 分钟」是个**无效空等**——FACTOR_LAB 的 data_date 是脚本生成时刻
+    #   从 baostock 实测到的最近交易日（非「今天」）；而本判据要求 data_date == 今天。
+    #   实证 09-28：FACTOR_LAB update_time=09-28 18:45 但 data_date=2026-09-24 ⇒ 判据永不满足
+    #   ⇒ 白等 20min ⇒ 撞 run_algorithms 默认 1800s 被杀 ⇒ 产物**完全没落盘**（回不到降级路径）。
+    #   现改为「可配上限 + 内容无变化即提前降级」（见下方 _fl_prev_fp 指纹判据），
+    #   等待收益最大化、无效等待最小化，超时预算另由 run_algorithms 抬到 3300s 兜底。
+    _fl_max_wait = 0 if V8_OFFLINE else max(1, int(os.environ.get("V8_FR_MAX_WAIT_MIN", "12")))
+    _fl_prev_fp = None   # 指纹：FACTOR_LAB.js 前 4KB ⇒ 内容无变化即说明源没在更新，继续等无意义
     # 🔴 2026-09-17 阿狸咪的工程师：非交易周（周六/周日）豁免 —— 周末 baostock 无新数据，
     #   因子的 data_date 合理地停在本周最后交易日（周五）。不豁免会把「周末正常产物」误判成陈旧。
     #   ⚠️ 残留边界（已登记交接件）：法定节假日不在豁免内（本仓无节假日历），节假日当天可能多
@@ -918,7 +926,7 @@ def main():
     _fl_wd = datetime.now().weekday()   # 0=周一 … 6=周日
     _fl_floor = ((datetime.now() - timedelta(days=_fl_wd - 4)).strftime("%Y-%m-%d")
                  if _fl_wd >= 5 else _today)
-    for _wi in range(_fl_max_wait):  # 最多等 ~20min（正常 19:40 前 B 批已产完，此处通常 0 等待）
+    for _wi in range(_fl_max_wait):  # 最多等 _fl_max_wait 分钟（默认 12；正常 19:40 前 B 批已产完，此处通常 0 等待）
         _cand = load_js("FACTOR_LAB.js", "FACTOR_LAB")
         # 🔴 2026-09-17 阿狸咪的工程师（小九 20:25 回执第⑤项授权落地）：**内容级新鲜校验**。
         #   原实现只看 update_time 的**日期**是否=今天 ⇒ 2026-09-17 04:49 那版
@@ -942,6 +950,21 @@ def main():
         _fl_hint = ("；周末豁免 data_date≥%s" % _fl_floor) if _fl_wd >= 5 else ""
         if _fl_last_dd:
             _fl_hint += "；当前 data_date=%s" % _fl_last_dd
+        # 🔴 内容指纹判据（2026-09-28 根治配套）：若本轮读到的 FACTOR_LAB.js 与前一轮
+        #   字节完全一致 ⇒ 说明 B 批生成器并未在产出新因子，继续 sleep 只是白烧预算
+        #   （原实现固定等满 20min，正是把 D 批末步拖过 1800s 被杀的元凶）。
+        #   连续 2 轮指纹相同即提前降级（fl 保持 None ⇒ 走「降级跳过因子融合」，不伪造数据）。
+        _fl_fp = ""
+        try:
+            with open(os.path.join(DATA, "FACTOR_LAB.js"), "rb") as _fh:
+                _fl_fp = _fh.read(4096)
+        except Exception:
+            _fl_fp = str((_cand or {}).get("update_time", "")) + _fl_dd
+        if _fl_prev_fp is not None and _fl_fp == _fl_prev_fp:
+            print(f"  ⏭ FACTOR_LAB.js 连续两轮内容无变化（data_date={_fl_dd or '?'}）⇒ 停止空等，"
+                  f"降级跳过因子融合（不用旧因子冒充今日，产物置 data_degraded=True）", flush=True)
+            break
+        _fl_prev_fp = _fl_fp
         print(f"  💓 等待 FACTOR_LAB.js 当日新鲜数据（因子实验室，要求 data_date={_today}{_fl_hint}）"
               f"… 已等 {_wi+1}/{_fl_max_wait} 分钟", flush=True)
         time.sleep(60)
