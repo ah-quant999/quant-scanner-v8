@@ -332,6 +332,13 @@ jobs:
                   continue
               with open(local, "rb") as f:
                   content = f.read()
+              if len(content) == 0:
+                  # 2026-09-28 一劳永逸根因修复（主人令「严禁 0 字节覆盖」）：
+                  # 实测 09-28 09:46 本步把 0 字节 raw_data/stock_quote.json 推上 main，
+                  # 导致后续 build 被 v8_deploy_guard 拦截变红、STOCK_QUOTE 整链卡死。
+                  # 抓取产物为空（A股双源不可用）时，宁可保留远端旧文件，绝不推送 0 字节覆盖。
+                  print(f"  ❌ {local} 为空字节，拒绝推送（防 0 字节覆盖线上 / 触发 deploy 守卫红），保留远端旧文件")
+                  continue
               print(f"  push {remote}  ({len(content)} bytes)")
               # get existing sha
               get_url = f"https://api.github.com/repos/{REPO}/contents/{remote}"
