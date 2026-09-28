@@ -575,6 +575,26 @@ def reset_consec_counter(side="xiaoju"):
         _save_alert_state(extra=extra)
 
 
+def _xiaoju_on_duty(now=None):
+    """🔴 2026-09-29 一劳永逸根治（主人令「解决不了的才发、不需要事事汇报」）：
+
+    小九（单位机）按**双机分时铁律**只在 **工作日 07:45–17:45** 独家值班；
+    其余时段（夜间 17:45–次日07:45 + 周末全天）由阿狸咪接管 —— 小九离线是
+    **设计预期的休息**，不是故障。
+
+    此前 2026-09-21 为修「监控可观测性」把监控窗口改成全周24h常开，却没同步把
+    「小九该休息时段」排除出告警 ⇒ 把「小九在睡觉」当「小九失联」发 infra 邮件，
+    每夜轰炸主人邮箱，严重违反主人纪律。
+
+    本函数用于区分：非在岗时段的「down」= 预期离线（静默）；在岗时段的「down」= 真故障（发信）。
+    监控仍全周常开、自证仍每轮写 ⇒ 可观测性不受影响（"没告警"与"监控没跑"仍可区分）。"""
+    now = now or datetime.now()
+    if now.weekday() >= 5:                 # 周末：小九本就休息
+        return False
+    h, m_ = now.hour, now.minute
+    return (7 * 60 + 45) <= (h * 60 + m_) <= (17 * 60 + 45)
+
+
 def handle_side(side, status, silent_min, hb_last, detail, peer_name, kind):
     """🔴 2026-09-21 新增（B2）：把「某机侧判定结果的处置」统一为**一条链路**，
     使两侧完全对称。原 main() 只处置小九——`check_alimi_alive()` 算出的 down
@@ -596,6 +616,17 @@ def handle_side(side, status, silent_min, hb_last, detail, peer_name, kind):
         return 0
 
     # —— status == "down"：真·静默超阈值 ——
+    # 🔴 2026-09-29 班次感知：小九非在岗时段（夜间/周末）离线是设计预期（阿狸咪已接管），
+    # 不是故障 ⇒ 静默（不邮件、不 dispatch rescue），仅自证留痕，避免每夜轰炸主人邮箱。
+    if side == "xiaoju" and not _xiaoju_on_duty():
+        _now = datetime.now()
+        log(f"😴 小九当前非在岗时段（{_now.strftime('%Y-%m-%d %H:%M')}），离线属预期"
+            f"（阿狸咪已接管）→ 静默不告警")
+        try:
+            _save_alert_state(extra={f"expected_off_{side}": _now.strftime("%Y-%m-%d %H:%M:%S")})
+        except Exception:
+            pass
+        return 0
     key = f"consec_down_{side}"
     st = _load_alert_state()
     consec = int(st.get(key, 0) or 0) + 1
