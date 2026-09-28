@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-28 19:39"
+  updated: 2026-09-27 22:00
   updated_by: 阿狸咪的工程师(alimi-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 93
+  next_id_seq: 92
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -121,50 +121,6 @@ items:
          ② 东财故障判据 = 日志逐字含 `push2delay.eastmoney.com` 且含 `502 Bad Gateway` 或 `Read timed out`；
          ③ 判「护栏是否失效」前先问「该路径本轮是否被执行」，skipped ≠ 护栏失效。
       本轮写操作：0 dispatch / 0 数据补跑 / 0 邮件；仅本文件定点回填。
-    alimi_verify_20260928_1650: >-
-      〔阿狸咪的工程师 2026-09-28 16:45 CST · 第 3 次复验 · 今日 post_close 档实测〕
-      A. 判据① EXPERIMENT —— 已达成（真源已推进）：
-         · `raw_data/experiment.json` update_time = **2026-09-28 16:13:46**；`data/EXPERIMENT.js` 同刻。
-           提交历史逐档在推：`0b33d8c1ce`（09-28 16:25:54）/ `be5a392fd8`（16:17:44）/ `13e7d981b1`（15:55:43）。
-         · 同档日志（run #2599 `[premarket,post_close]`）逐字 `>>> EXPERIMENT 2026-09-28T16:03:53+08:00` +
-           `✅ EXPERIMENT → raw_data/experiment.json` ⇒ 常规成功路径（非 datacenter 兜底路径）。
-         · 名单由「全深市」变为**跨市场**（`000/002/300/301/600/601/603/605/688` 齐现，此前仅 `000/001`）
-           ⇒ 分页修复 `be247848b0` 亦已生效。
-      B. 判据② SECTOR_LEADERS —— 仍未达成（本轮**铁证级**新增）：
-         · run #2597（`[post_close]`，created 15:34:25 / job 16:13:08→16:43:07，**run 结论 success**）
-           step22「🐲 板块龙头股字典（SECTOR_LEADERS，仅 post_close）」日志逐字：
-           `⚠️ 东财 push2 抖动(push2delay.eastmoney.com) 尝试1/3: HTTP Error 502: Bad Gateway → 0.6s 后换 host 重试`
-           `⚠️ 东财 push2 抖动(push2.eastmoney.com) 尝试2/3: HTTP Error 502: Bad Gateway → 1.1s 后换 host 重试`
-           栈帧 `scripts/fetch_sector_leaders.py:334 <module> → :249 build → :166 fetch_em_boards → :104/:94 _get_json`
-           ⇒ **换 host 重试两次仍 502**。
-         · 步内已打 `::error title=v8-softfail:soft_13b(exit=...)::🐲 板块龙头股字典生成软失败`
-           ⇒ **护栏本身已生效**（失败有显式 annotation）；step 结论仍 success 属「软失败步」语义，
-           **不是**护栏失效（判据见 D-③）。
-         · 换 host 修复**确实在用**：run head `9eaba0c48b` ≫ `1052d4334162`，且日志里 host 已在
-           `push2delay` / `push2` 之间轮换 ⇒ **已用上新代码仍失败**。
-         · 同档旁证（东财 push2 面整体不可用）：`⚠️ W52_HIGH 重试 3 次仍失败 → 返回空，跳过`
-           （响应为 559B 的 `502 Bad Gateway` HTML 页）、`❌ eastmoney push2 失败: HTTP Error 502: Bad Gateway
-           — 不写盘，保留现有 raw_data/etf_*.json（避免覆盖小九真版本）`、
-           `⚠️ push2 抖动(clist m:90 pz=200 po=0/1) 尝试1/5…` 全败。
-         · 产物侧：`raw_data/sector_leaders.json` 最新提交仍 `324a142bf1` @2026-09-22 18:17:33；
-           `data/SECTOR_LEADERS.js` 最新提交 `85cd6c05de` @2026-09-26 22:13:31（age ≈ 42.5h）。
-      C. 处置结论：**属东财 push2 端真故障（`fs=m:90+t:2` 板块 clist 分支），非本仓代码缺陷**。
-         按「不反复派发」纪律 —— 本轮 **0 dispatch / 0 数据补跑 / 0 邮件**，仅本文件留证。
-      D. 判据纪律与同轮旁证：
-         ① 判「修复是否生效」= `run.head_sha ≥ 修复 sha` **且**读本次 run 的 step 表；本轮两项均满足。
-         ② 东财故障判据 = 日志逐字含 `push2` 且含 `502 Bad Gateway`（本轮命中 3 处）。
-         ③ 判「护栏是否失效」前先问「该路径本轮是否被执行」；本轮**已执行**（step22 真跑）
-            ⇒ 属「执行了仍失败」，方向正确、待上游恢复；**换 host 提高的是成功率，不是保证**。
-         ④ 同轮另一宗**未登记但已定性**的观察（供下轮判断，暂不单独立项）：
-            algo 链 run #2146（09-28 15:27，`trigger_algo`，runner=self-hosted/cn）**job 在 step9 中途被终止** ——
-            step1-8 全 success、step9 起**全部无结论**、**日志 zip 仅 22B（空）**、关联产物零写入；
-            19 分钟后（job 15:27:22→15:52:31）以 failure 收尾。与在册 t1 假红（失败步固定 = step17）**签名不同**。
-            其后 **#2147（16:40:53）已自动接力**（同走 checkout 回退路径）⇒ 未阻断链路。
-         ⑤ 同轮口径澄清（**防下轮误报**）：本机实测兜底调度器逐字
-            `算法链: 当前 16:xx 未到 18:00，跳过（等盘后 LHB 发布）` +
-            `[HEAL✓] [algo] 最终推荐入选日期: 未到 18:00 盘后选股窗口，跳过 algo_run 派发` ⇒
-            HEALTH_CHECK 的 `final_enter_stale` warn 与 `FINAL_RECOMMEND_DATA.js`/`TOP10_DAILY.js` 陈旧
-            **属 18:00 前的设计态**，非故障、禁补跑。
 
   - id: build13-timeout-guard
     priority: P0
@@ -833,31 +789,6 @@ items:
         已实测：改前 FAIL（4 处）/ 改后 PASS。
       ⚠️ 结论：**判据与门禁均无需改**（门禁第 4 次按设计拦住 deploy）；根因**始终是写入侧纪律** ——
         写 `updated` 前**必须 `datetime.now(CST)` 实取**，禁凭推断、禁手填。
-    alimi_verify_20260928_1715: >-
-      〔阿狸咪的工程师 2026-09-28 17:15 CST · 第 19 轮巡检 · **第 5 次复发** · 门禁按设计再次拦住 deploy〕
-      🔴 与 09-21 / 09-24 完全同型：写入侧凭「以为现在几点」填未来时戳。
-      事实链（全部远端真身）：
-        · 提交 `827af8a766`（2026-09-28T08:56:33Z = **16:56 CST**；署名 ah-quant999，双机共用账号；
-          同批交接件 `docs/ops/handover/2026-09-28_1656_阿狸咪的工程师(alimi-cn)…` ⇒ 写入方为 alimi-cn 侧）
-          把 `resonance-calendar-lazyload-fail` 与 `lhb-history-size-slim` 的 `updated` 写成
-          **`"2026-09-28 18:10"`**（比提交时刻超前 **74 分钟**，远超本门禁 5min 容差）。
-        · CI 逐字（`v8_build_deploy` **#8612**，build job，2026-09-28T09:01:47Z = 17:01:47 CST）：
-          `❌ [13/13] 交接状态源守卫: 未来时戳 2 处（污染 MAX 新鲜度判据）:
-           resonance-calendar-lazyload-fail(updated=2026-09-28 18:10)；lhb-history-size-slim(updated=2026-09-28 18:10)`
-          随后 `🚫 1 项校验失败 → 阻断 deploy！` + `##[error]Process completed with exit code 1.`
-          ⇒ step10 failure、step11/12/13/14 **全 skipped**（含 `📤 部署到 main`）
-          ⇒ **部署链自 16:56 起硬阻断**（[1/8]~[12/12] 与 [14/14] 全绿 ⇒ 唯一阻断源即本行）。
-        · 旁证：同批 `#8611`（HANDOFF 1/2）cancelled；`#8610`（16:49，引入前）step10/13/14 全 success。
-        · 另一条旁证（判「是否被门禁抓住」的最强形态）：本机离线跑同一函数
-          `pre_deploy_audit.py::check_handoff_ledger()` 对**当前 main 真身** ⇒
-          `(False, '未来时戳 2 处（污染 MAX 新鲜度判据）: …')`，与 CI 逐字一致。
-      处置（本轮，单提交）：① 两处 `18:10` 按**事实时刻**改写为 `"2026-09-28 16:56"`（= 引入提交的真实时刻）；
-        ② 恢复同批被旧基线覆盖的 2 条判据键（见 `handoff-yaml-stale-base-item-drop` 同批记录）；
-        ③ 同批刷 ledger。推后**已验**：`v8_build_deploy` **#8613**（head=`4df3bf4b8a`）`completed/success` ⇒ `[13/13]` 转 ✅、阻断解除。
-      ⚠️ 判据与门禁**均不改** —— 门禁**第 5 次按设计成功拦住 deploy**；根因仍是写入侧纪律：
-        写 `updated` 前必须 `datetime.now(timezone(timedelta(hours=8)))` **实取**，禁推断、禁手填计划时刻。
-      📌 推前预检法（09-24 已记、本轮再次证明有效）：正则抽全文件 `^\s+updated:` 值，与 CST now+5min 比对，
-        命中即**拒绝推送**。本轮修前实测 FAIL 2 处 / 修后 PASS。
     updated: "2026-09-24 17:44"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
@@ -3910,32 +3841,6 @@ items:
       **⑤ 纪律**：ledger 的 `ids`/哈希是「外部锚」，有效性**完全依赖写入方同批刷新** —— 本轮实测
       又一次抓到漏刷（2 个新 item 未进 ids/hashes）⇒ 建议把「同批刷 ledger」从纪律升级为**推前自动
       预检**（与 `handoff-meta-future-timestamp` 的本机预检法并列，双机都加）。
-    alimi_verify_20260928_1720: >-
-      〔阿狸咪的工程师 2026-09-28 17:20 CST · 第 19 轮巡检 · **根因首次坐实：行尾口径泄漏**〕
-      🔴 本项 09-23 记「口径不可复现 / 62 项 0 命中」、09-24 又记「口径已确认 = 仓内脚本、81/81 = 100%」
-      —— 本轮实测证明**两条都对**，只是漏了第三段：**写入方在 CRLF 工作树上跑 `--fix`**。
-      一、决定性实验（对**当前 main 真身**逐 id 回放多种口径，样本 = 全部 105 项）：
-        · 官方口径（仓内 `scripts/handoff_ledger_hash.py`：剔块尾空行/注释 + `updated` 归一 `<ts>` + `rstrip`）
-          读 **LF 现文** ⇒ 命中 **0/105**。
-        · 同一实现，仅把待哈希的块文本 `\n` 换成 `\r\n`（即假定该文件是 CRLF）⇒ 命中 **47/105**。
-        · 另测：原始块（不剔尾不归一）LF=0/105、CRLF=1/105；`sha256[:8]`、去首行等变体全 0/105。
-        ⇒ **CRLF 变换使命中率从 0 跳到 47，是唯一显著命中的变体**。
-      二、三段历史即自洽：
-        · 09-24 20:15 阿狸咪实测 81/81 = 100% ⇒ 当时 ledger 与 **LF 现文**一致（口径正确）。
-        · 09-24 之后某轮 `--fix` 是在 **CRLF 工作树**上跑的（本仓 `docs/**` blob 惯例 LF，而本机
-          `Edit` 默认写 CRLF —— MEMORY 已记为已知坑）⇒ 该轮写入的哈希**全部按 CRLF 计算**。
-        · 遂得「LF 口径 0/105、CRLF 口径 47/105」；47 = 自那轮起**内容未变**的项，其余 58 =
-          内容其后被正当地改过 ⇒ **不是**被回退、**不是**口径不可复现，而是
-          **行尾口径泄漏进哈希**（`content_hash()` 直接对原始文本 sha256，未归一化 `\r\n`）。
-      三、危害：ledger 的「抓内容被旧版顶掉」能力**静默归零**（校准永远必红 ⇒ 真回退也分不出）；
-        且 `[13/13]` 只查 `ids ⊇` 与 `next_id_seq` ⇒ 该失效**长期无感**（与本项 09-23 记录一致）。
-      四、🔴 建议正解（一行、对 LF 输入**零行为变化** ⇒ 非破坏性）：`content_hash()` 内先
-        `blk = blk.replace("\r\n", "\n")`（或 `_read()` 解码后统一换行）⇒ 口径变为**行尾无关**，
-        双机无论本地文件是 LF 还是 CRLF 都得到同一哈希；随后一次性 `--fix` 重算 105 项即收口。
-        ⚠️ 该脚本属**双机共享口径**，按本仓惯例（口径/门禁变更交 小九 拍板）**本轮未改**；
-          证据（本段）与补丁方案已备，待裁决后即可落码 + 全量重算。
-      五、本轮处置：**不改** `id_content_hashes`（避免把 105 项盲改成某一种口径下的不可验证值），
-        仅留证；同批另一路已恢复被旧基线覆盖的 2 条判据键（见 `handoff-yaml-stale-base-item-drop`）。
 
   - id: handoff-dup-key-index-tail-truncation
     priority: P1
@@ -5027,27 +4932,11 @@ items:
         若 N 仍为 7500 ⇒ 参数名未生效，须回查。
       · ⚠️ 兜底源 `TRADE_DATE=2026-09-24`（较最新交易日滞后 1 天，属该报告固有节奏）—— 仅记录，不处置。
       ⇒ status doing → **pending-verify**（等下一档日志的 5199 / 含沪市 判据）。
-    alimi_verify_20260928_1650: >-
-      〔阿狸咪的工程师 2026-09-28 16:45 CST · 第 4 次复验 · 今日 post_close 档实测〕
-      ① 产物侧**已推进**（达成）：`raw_data/experiment.json` update_time = **2026-09-28 16:13:46**、
-      `data/EXPERIMENT.js` 同刻（提交 `0b33d8c1ce` 09-28 16:25:54 / `be5a392fd8` 16:17:44）。
-      对照本项 09-27 22:00 记录（当时走 datacenter 兜底 + `TRADE_DATE=2026-09-24`），
-      今日名单已含 **沪市 6xx（600/601/603/605）+ 深市 000/002 + 创业 300/301 + 科创 688**
-      ⇒ verify_how 中「出现沪市代码」这一半判据**达成**。
-      ② **未达成／未验证部分（诚实边界，故 status 维持 pending-verify）**：
-      本项另一半判据是「`✅ datacenter 兜底取到 N 只个股快照` 的 N 由 7500 收敛为 **5199**」；
-      本轮**未取到该行** —— 今日日志显示走的是常规成功路径（`>>> EXPERIMENT … ✅ EXPERIMENT → raw_data/experiment.json`），
-      **datacenter 兜底路径本轮无执行窗口** ⇒ 该子判据**不适用**，不得据此宣称达成。
-      ③ 旁证：同档 run #2599 的 step17（推送 raw_data）/ step19（update_v8）/ step23（推送 data）均 success；
-      `data/EXPERIMENT.js` 在线可读且非空（2,459 B）。
-      ④ 工具判据：判「产物是否真推进」只看 `update_time` + `GET /commits?path=…` 提交历史，
-      **禁以 run success 当判据**（同族纪律见 `card-fake-freshness-timestamp-rootfix-0925`）。
-      本轮写操作：0 dispatch / 0 补跑 / 0 邮件；仅本文件定点回填。
 
   - id: resonance-calendar-lazyload-fail
     priority: P0
     owner: 小九(lemoncat-cn)
-    status: done
+    status: pending-verify
     what: >-
       〔2026-09-24 18:1x 小九〕主人报「今天2个共振又没有」= 共振日历两张 tab（机游共振日历 +
       北向席位日历）。只读实证：**数据层完全正常**（LHB_DATA 当日 17:32、LHB_HISTORY 当日
@@ -5064,89 +4953,8 @@ items:
       主人下次打开共振日历：①两 tab 均有数据（不再空白）；②控制台若出现「源失败(...)」仍能渲染成功；
       ③极端断网/全源失败时显示明示文案而非空白页。长期项：LHB_HISTORY 体积瘦身
       （裁 reason/price 等冗余字段实测可省 ~40%，1003KB/全量）另立条目。
-    alimi_verify_20260928_1810: >-
-      ✅ **阿狸咪的工程师 2026-09-28 18:1x CST 真浏览器终验（Edge headless · 直打 Pages 线上真身）——
-      verify_how ①②③ 全部达标，本项由 pending-verify 转 done。**
-      · **① 两 tab 均有数据（不再空白）**：真浏览器打开线上 index.html（1,364,111 B / sha 前16 `69aae18017f4f9ca`），
-        兜底源 fastly.jsdelivr.net 成功把 `LHB_HISTORY.js`（**1,602,143 B**）拉入 ⇒
-        `jyCalContainer` 渲染 **97,228 B**、`northCalContainer` 渲染 **22,112 B**，
-        控制台 `[A2 lazy] LHB_HISTORY 到位，重绘两个共振日历` ⇒ 病灶（Pages 跨境 1.8MB 三次全失败）已消除。
-      · **② 源失败仍可渲染成功**：本轮 jsdelivr 直接命中，未触发失败路径（属正常，非缺陷）。
-      · **③ 全源全轮皆败 ⇒ 明示文案**：request interception 断掉全部 `LHB_HISTORY.js`（Pages 源 + CDN 源，
-        共 **6 次**尝试 = 2 源 × 3 轮，日志逐条 `[A2 lazy] 源失败(error)：data/LHB_HISTORY.js?v=…` /
-        `…fastly.jsdelivr.net/…LHB_HISTORY.js` 后 `[A2 lazy] 所有源与重试均失败： LHB_HISTORY`）。
-      🔴 **本轮发现并修复一处真 bug（原 fix ③ 未完整兑现）**：`onFail()` 里 `__rcRedrawBoth()`
-      会先用 `LHB_DATA` 把容器**填满**，紧随其后的 `if(!_el.innerHTML.trim())` 判据因此**恒为假**
-      ⇒ 明示提示整条被跳过 ⇒ 主人看到一张「看似完全正常」的日历，实为降级态且**页面零提示**
-      ＝**静默降级**，与 fix ③「绝不静默空白」直接相悖。修法（已在 index.html 落盘并上线）：
-      容器为空仍走整块占位提示；容器已有内容则**追加**醒目提示条且**绝不覆盖日历**；
-      幂等（同 id 至多一条），两个共振容器（机游 / 北向）**同步处理**，禁止某一路特立独行。
-      修复后断源复验：纯文本首行 = `⚠️历史大表（1.8MB）多轮加载失败，当前仅显示当日龙虎榜数据
-      （历史日期可能缺失）。请刷新页面重试。` ⇒ 提示可见 ✅ 且日历仍在下方渲染 ✅（非空白）。
-    fix_ext_20260928: >-
-      index.html `onFail()` 分支追加降级提示（机游 jyCalContainer + 北向 northCalContainer 对称）。
-    updated: "2026-09-28 17:08"
-    updated_by: 阿狸咪的工程师(alimi-cn)
-  - id: algo-cloud-noop-wallclock-waste
-    title: 算法链空转轮白烧 20+ 分钟——闸门未放行时立即静默收尾
-    owner: 阿狸咪的工程师(alimi-cn)
-    status: done
-    priority: P1
-    scope: shared
-    what: >-
-      〔2026-09-28 接管算法链调查立账〕run#36391711008（15:27 CST，trigger_algo，head 3f805b74d16
-      ≠ 本人 16:xx 之后的改动）耗时 **25 分 09 秒后 failure**，而它本是一轮注定空转的轮次：
-      闸门当时判 `target_stage=NONE / chain_day=2026-09-25（中秋非交易日，回填不可能）`
-      ⇒ `proceed=false` ⇒ **下游 8 步全部 `if: steps.gate.outputs.proceed == 'true'` 被 skip**
-      （算法 / 桥接 / update_v8 / healthcheck / CANDIDATE_QUOTES / 唯一推送 / ALGO_TRACK?v / 机器校验），
-      链尾「结果问责」`if: always()` 对 NONE 走 `::notice` exit 0。
-      但 workflow **没有在闸门不让行时早退**，于是仍照跑 checkout + API 同步回退判定 +
-      setup-python + 「📦 安装 A股依赖（官方 PyPI + 双镜像兜底 + 重试）」——25 分钟全烧在这段
-      「注定不产出任何东西」的 setup 上，最后以 failure 收场（真凶无法确认：该轮 job 日志
-      `/actions/jobs/108828796904/logs` → 302 到 Azure blob，签名窗口内直取恒
-      `BlobNotFound`，已两次复现 ⇒ 平台侧不可取证，非本仓缺陷）。
-    fix: >-
-      `.github/workflows/v8_algo_cloud.yml`「🔒 批次闸门」步末尾新增早退：
-      `if [ "${{ steps.gate.outputs.proceed }}" != "true" ]; then
-       echo "::notice title=v8-algo-noop-exit::…"; exit 0; fi`
-      ① **零行为变更**：exit 0 与「8 步全 skipped ⇒ job success」完全等价；
-      ② 链尾「结果问责」仍会执行（`if: always()`），红灯/绿灯语义一滴不减；
-      ③ 唯一差别 = 不再为空转轮支付 checkout / deps 的墙钟成本。
-    fix_ext_20260928: >-
-      同批修 `docs/ops/HANDOFF.yaml` 两处**未来时戳**（`updated: 2026-09-28 18:10`
-      ⇒ `17:08`）——未来时戳会污染 [13/13] 的 MAX 新鲜度判据并阻断 deploy。
-    verify_how: >-
-      ① `python -c "import yaml…"` 全量解析 34 个 workflow 通过；② 闸门步 `run` 取块跑
-      `bash -n` ⇒ rc=0（push 前实跑）；③ `pre_deploy_audit.py` 14 项全绿（实跑，[5/8] 与 [13/13] 均绿）；
-      ④ `handoff_ledger_hash.py --check` 105/105 命中 0 失配（--fix 后回验）。
-    refs: >-
-      `.github/workflows/v8_algo_cloud.yml` L765「🚦 目标批」之后（原 L765 末尾）·
-      run#36391711008 · `.github/scripts/v8_stage_gate.py` decide() §3（回填不可能→NONE）
-    updated: "2026-09-28 17:12"
-    updated_by: 阿狸咪的工程师(alimi-cn)
-  - id: lhb-history-size-slim
-    title: 长期项·共振日历大表 LHB_HISTORY 体积瘦身（懒加载依赖的单点风险源）
-    owner: shared
-    status: todo
-    priority: P2
-    scope: shared
-    what: >-
-      〔2026-09-28 阿狸咪立账〕共振日历两 tab 全量依赖 `data/LHB_HISTORY.js`（**1.6-1.8MB / 79 天**），
-      试了多源兜底 + 3 轮重试后**仍存在单点**：任一源被跨境网络掐断即触发降级（只显示当日），
-      历史日期缺失 ⇒ 日历「看着在但内容少」。根治方向 = **缩表**而非继续加源。
-      实测裁 `reason` / `price` 等冗余字段可省 ~40%（1003KB / 全量口径）。
-    fix: >-
-      ① 生成侧（生成器/抓取脚本）裁剪 LHB_HISTORY 冗余字段（reason/price…），目标 ≤1.0MB；
-      ② 前端懒加载保持多源兜底不变（缩表后 Pages 源亦能直接扛住，可缩短 25s 超时）；
-      ③ 缩表须同步确认「北向席位」等消费方字段依赖，禁静默删字段致卡片缺列。
-    verify_how: >-
-      缩表后真浏览器打开共振日历两 tab：①两 tab 历史日期齐全（非仅当日）；②`LHB_HISTORY` 注入字节 ≤1.0MB；
-      ③北向席位卡片列数与缩表前一致（无缺列）；④pre_deploy_audit 14 项全绿。
-    refs: >-
-      `index.html` L19106-19190（A2 懒加载 `BIG` / `loadOne` / `onFail`）· `data/LHB_HISTORY.js`（1.8MB/79天）
-    updated: "2026-09-28 17:08"
-    updated_by: 阿狸咪的工程师(alimi-cn)
-
+    updated: "2026-09-24 17:59"
+    updated_by: 小九(lemoncat-cn)
 
 
   - id: build-blocker-pick-ts-nameerror-0925
@@ -6030,46 +5838,6 @@ items:
       ④ 此后任一对 HANDOFF.yaml 的推送：`GET /commits/<sha>.files` 只含登记 2 路径，
         且新旧 id 集合**只增不减**。
     not_verify_how: 只看 `[13/13]` 门禁绿 —— YAML 与 ledger 同批回退时门禁**恒绿**，看不出 item 消失。
-    alimi_verify_20260928_1950: >-
-      〔阿狸咪的工程师 2026-09-28 19:4x CST · 第 38 轮巡检 · **本日第 4 次复发** · 只读实读远端 API 取证〕
-      🔴 与 09-25 21:45 / 本日 17:09 / 17:20 完全同型，但本次**指纹更硬**（写入侧把陈旧本地副本当内容源）：
-      一、事实链（全部远端真身）：
-        · 提交 `12f0c6f3cbf8`（2026-09-28T09:48:28Z = **17:48 CST**，署名 ah-quant999，双机共用账号；
-          同批交接件 `docs/ops/handover/2026-09-28_1749_阿狸咪的工程师(alimi-cn)给小九的工程师(lemoncat-cn)…`
-          ⇒ 写入方为 alimi-cn 侧），`docs/ops/HANDOFF.yaml` **+60 / -236 行**、parent `fd5d97d56e9c`。
-        · 其 parent `fd5d97d56e9c` 的该文件 blob = `31fcd17862d0`（640,509 B / items=106 / next_id_seq=93 /
-          meta.updated=2026-09-28 17:15）⇒ **基线是最新的**，不是「旧基线 + 新 parent」。
-          但落盘内容 = blob `b1f834ed7c79`（621,605 B / items=105 / **next_id_seq 93→92** /
-          **meta.updated 17:15→2026-09-27 22:00**）⇒ **内容源取自 09-27 22:00 的陈旧快照**
-          （本机工作树该文件恰为同态：621,605 B / seq 92 / updated 09-27 22:00）
-          ⇒ 违反「造 blob 前必须断言基底 == 远端 tip」与本仓「内容源取远端 contents API」纪律。
-        · 净效果：**静默删除 2 个 item + 5 个判据键**，同时新增 1 项（`lhb-history-today-empty-placeholder`）：
-          被删 item = `algo-cloud-noop-wallclock-waste`（08:47 立账，done/P1，owner 阿狸咪）·
-          `lhb-history-size-slim`（todo/P2，owner shared）；
-          被删判据键 = `alimi_verify_20260928_1650`（owner `experiment-card-stalled-3d-0925`）·
-          `_1715`（`handoff-meta-future-timestamp`）· `_1720`（`handoff-ledger-hash-desync`）·
-          `_1730`（**本项**）· `_1810`（`resonance-calendar-lazyload-fail`）⇒ 5 项各自的
-          「最后一次实测判据」整段蒸发。
-        · 🔴 **ledger 被同源一起回退**：`docs/ops/HANDOFF.ledger.json` 由 ids=106 / max_next_id_seq=93 /
-          updated=17:10 变为 ids=105 / max_next_id_seq=92 / updated=17:48，且
-          `algo-cloud-noop-wallclock-waste` 与 `lhb-history-size-slim` 的哈希锚**同时消失**
-          ⇒ [13/13] `check_handoff_ledger()` 仍判「完好」（判据只有 `ledger.ids ⊆ yaml.ids` +
-          `next_id_seq ≥ ledger.max_next_id_seq`）⇒ **门禁第 4 次全程无感**（与本项 09-26 记录逐条一致）。
-      二、本轮处置（阿狸咪的工程师，单提交）：
-        ① 以**远端 main 现文**（blob `b1f834ed7c79`）为基底做并集重建：逐 item 块与 `fd5d97d56e9c`
-           比对，同 id 取 `updated` 较晚者、ref 独有项按原后继位置插回 ⇒ 恢复 2 个 item + 5 个判据键；
-        ② meta 归位：`next_id_seq` 92→93、`updated` 取实刻；
-        ③ 同批 `scripts/handoff_ledger_hash.py --fix` 重算 ledger（仓外最小树、官方口径）；
-        ④ 推后逐字节回读自证 + 6 分钟覆盖哨兵（判据：blob sha 与 4 键集合不变）。
-      三、⚠️ 仍未闭环（故本项 status 由 `pending-verify` 退回 **`doing`**）：本项 fix(B)「写入侧强制预检」
-        至今只写进 skill、**未落成硬门禁**，今日 17:48 即因未落实而再度翻车 ⇒ 建议落两条硬判据：
-        （i）推送器造 blob 前断言「本地基底 blob sha == 远端 tip 该文件 blob sha」，不等即整轮放弃；
-        （ii）`pre_deploy_audit.py` 的 `[13/13]` 增「item id 集合与 items 数**只增不减**」历史最大值断言
-        （需 owner 小九拍板 —— 该门禁史上多次硬阻 deploy）。
-    refs: >-
-      · 复发提交 `12f0c6f3cbf8`（parent `fd5d97d56e9c`）· 含 2 项 + 7 键的末档 `fd5d97d56e9c`
-      · `docs/ops/HANDOFF.ledger.json`（106→105 同源回退）· `scripts/handoff_ledger_hash.py`
-      · skill `v8-handoff-yaml-item-update` §13-1 / §17-1
     refs: |
       · 删除提交 cd56033bde；含 7 项的末档 87d619de45 / bf818065a0；当前 main（87 项）
       · scripts/handoff_ledger_hash.py、.github/scripts/pre_deploy_audit.py::check_handoff_ledger
@@ -6106,45 +5874,6 @@ items:
           裸标量续行里出现「空格+#」会被 YAML 当注释（静默截断该行余下内容）、出现「: 」会直接解析失败。
     updated: "2026-09-26 14:23"
     updated_by: 阿狸咪的工程师(alimi-cn)
-    alimi_verify_20260928_1730: >-
-      〔阿狸咪的工程师 2026-09-28 17:30 CST · 第 19 轮巡检 · **同一根因 25 分钟内复发第 2、3 次**〕
-      🔴 本项 (B)「写入侧强制预检」至今未落码 ⇒ 旧基线覆盖**连续重演**；两次丢的都是
-      「item 内的 key」而非「整个 item」——门禁**双重恒绿**，是本族更隐蔽的新形态。
-      一、三次覆盖的完整链条（全部取自远端 API 真身；A/B/C 为三方键级比对）：
-        · ① `b630cea15e`（09-28 08:47:08Z = 16:47 CST）：向本文件两处各追加
-          `alimi_verify_20260928_1650` 1 条（617,653 → 623,926 B）。
-          被 `827af8a766`（08:56:33Z，parent=f3dcc8d166，基底=047375f4aa5f）抹掉
-          （`files=[docs/ops/HANDOFF.yaml +50/-66]`）。
-        · ② `4df3bf4b8a`（09:09:10Z = 17:09 CST）：以 main 现 blob `9d9f656f18` 为基底**逐字重放**上述 2 键
-          ＋新增 3 条留证键（`handoff-yaml-stale-base-item-drop` / `handoff-meta-future-timestamp` /
-          `handoff-ledger-hash-desync`），621,556 → **637,371 B**（`+155 -6`），CI `#8613` **success**。
-        · ③ `98249fe52d`（09:11:35Z = **17:11 CST**，即 ② 之后 **145 秒**）message
-          「docs: 立账 algo-cloud-noop-wallclock-waste + 两处未来时戳修正」，parent=`42bfc69ee2`
-          （= ② 的子提交，仅改 `.github/workflows/v8_algo_cloud.yml`），
-          `files=[docs/ops/HANDOFF.yaml +44/-156]`，624,347 B。
-      二、🔴 **本次是「删自己 parent 里的内容」的硬证据（比 ① 更硬）**——逐 ref 取该文件并点数我的 4 个键：
-        `aa68810917`(②的parent) 621,556 B ⇒ 4 键全 0；`4df3bf4b8a`(②) 637,371 B ⇒ 全在；
-        **`42bfc69ee2`(③的parent) 637,371 B ⇒ 4 键全在**；`98249fe52d`(③) 624,347 B ⇒ **4 键全 0**；
-        `main` 624,347 B ⇒ 4 键全 0。
-        ⇒ ③ 声称的父提交**确实包含**我的内容，却提交了不含它的版本 ⇒ 不是「基线落后」而是
-          **「读」与「写」用了不同快照（读的是 09:05 前的旧副本）**；且 `force:false` / 快进校验**均无法拦截**。
-      三、归因边界（**禁凭署名硬指某台机**）：①②③ 的 `author.name` 均为 `ah-quant999`（双机共用账号）。
-        但 ① 有同批交接件 `docs/ops/handover/2026-09-28_1656_阿狸咪的工程师(alimi-cn)给小九的工程师…`
-        ⇒ 指向 **alimi-cn 侧（本机）的另一路并发写**；②③ 与我本轮手动推送同机同时段，同为 alimi-cn 侧。
-        结论只可表述为「alimi-cn 侧存在一路**未做推前同源预检**的 HANDOFF 写入器」，不指认到「小九」。
-      四、🔴 新形态盲区（判据加强）：丢「item 内 key」时两道闸门**同时失效**：
-        (1) `[13/13]` 只断言 `ledger.ids ⊆ yaml.ids` 与 `next_id_seq` 单调 —— id 集合 105→106 只增不减 ⇒ 绿；
-        (2) `scripts/handoff_ledger_hash.py --check` 的哈希对**该 YAML 现内容**计算，而覆盖方同批刷了 ledger
-            （提交 message「ledger 同步 106 项哈希」）⇒ 现读必然满命中 ⇒ 也绿。
-        ⇒ 唯一可见手段 = **推后 N 分钟内回读远端、逐 id 比对 key 集合**（或本机留存推送前后快照）。
-      五、处置（本轮）：(A) 已是**第 3 次恢复**（以 main 现 blob 为基底重放 5 键 ＋同批刷 ledger）；
-        🔴 **并改为「双轨留证」**——同批落一份**交接件新文件**（`docs/ops/handover/…md`，新路径不受本覆盖类
-        影响，因为覆盖方的树只替换其登记路径）⇒ 即使本文件又被抹，证据仍在。
-        (B) **强烈建议立即落码**：写侧造 blob 之前断言
-        「本地基底字节 == `GET /contents/docs/ops/HANDOFF.yaml`（默认分支）返回字节」，不等即**整轮重来**；
-        并**禁止用本机落后 clone 的 HANDOFF.yaml 作基底**（①②③ 均此因）。
-      六、本轮写操作：`docs/ops/HANDOFF.yaml` + 交接件 1 份（+ 同批 `HANDOFF.ledger.json` 视门禁需要）；
-        0 dispatch / 0 数据补跑 / 0 邮件。
   # ── P1 · 数据真实性（algo 产物日期源） ─────────────────────────────────
   - id: algo-artifact-date-naked-now-bypass-calendar
     title: "algo 产物日期源绕过交易日历：calc_crds 用裸 datetime.now() 拼「15:30 收盘」⇒ 休市日仍落当日假快照"
@@ -6898,58 +6627,57 @@ items:
       `docs/ops/handover/2026-09-28_0955_阿狸咪的工程师给小九_平均股价换源口径断层.md`
     updated: "2026-09-28 09:55"
     updated_by: 阿狸咪的工程师(alimi-cn)
-
-  - id: lhb-history-today-empty-placeholder
-    title: >-
-      共振日历两卡当日空白根治：fetch_lhb 把「交易日历尚未收录当天」误判为休市写空占位
-      ＋产物 data/LHB_HISTORY.js 停在 16:21 未随源重算（2026-09-28 实证）
-    owner: 阿狸咪的工程师(alimi-cn)
-    status: done
-    created: "2026-09-28 17:55"
+  - id: final-recommend-killed-by-1800s-0928
     priority: P0
-    block_deploy: false
-    context: >-
-      主人 17:0x 反馈「两个共振日历今天还没出数据」。真浏览器终验复现：
-      🎧 机游共振日历 / 🌊 北向席位日历 卡头已显示「数据日期 2026-09-28」，
-      但日历当天那格只有 `trading:false`、无 `stocks` ⇒ 当日空白。
-      数据链路排查结论（三处问题，非一处）：
-      ① 源层面：`raw_data/lhb_history.json` 的 `2026-09-28` 本身是好的
-      （`trading:true` / 55 只，16:2x 由 cn_fetch 那轮追加）。
-      ② 判据层面（真 bug）：`algorithms/fetch_lhb.py::is_trading_day` 用新浪交易日历判定，
-      而**交易日历只在收盘后才收录当天**，导致「日历里查不到今天」被当成休市 ⇒
-      `main()` 走 `not is_trading_day` 分支 ⇒ `_update_lhb_history({}, today, trading=False)`
-      把当天写成空占位。16:2x 那轮即在收盘初期跑过，据此写下空坑。
-      ③ 产物层面：源 16:2x 就已含当天，但 `data/LHB_HISTORY.js` 直到 17:34:48 才重算，
-      中间约 1 小时主人看到的是空坑产物。
-    fix: >-
-      ① 【根因·已根治】`fetch_lhb.py::is_trading_day` 增加「当天未收录」特判：
-      若日历不含该日**且该日为今天** ⇒ 保守返回 True（收盘前常态，不等于休市），
-      于是 `main()` 走「不写占位、只打日志」分支。桩件单测 5/5 PASS
-      （今天未收录→True；明天已收录→True；昨天/国庆→False；更早周日→False）。
-      ② 【产物·已上线】远端 `data/LHB_HISTORY.js` 补回 `2026-09-28`（trading:true / 55 只），
-      本机拉回后跑 `update_v8.py --only-cache-busters` 同步缓存戳
-      `?v=5d8c292d55 → 2c15e83e42`（未重建任何数据）。
-      ③ 【根因·防复发】已推远端，17:30 的 `v8_lhb_fetch` 定时轮与后续跑批用新判据。
-    verify_how: >-
-      ① Edge headless 真浏览器打开线上 🎧共振日历，读 `window.LHB_HISTORY['2026-09-28']`
-      ⇒ `trading:true` 且有 `stocks`（实测 82 天键、最新 2026-09-28、update_time
-      `2026-09-28 17:34:48`）；
-      ② 渲染前后对照（同法同页）：TAB2 🌊北向席位 9/28 由「北向 17 / +5.63亿」
-      →「**北向 30 / +6.22亿**」，TAB1 机游共振 9/28 净流入由空坑兜底值
-      →「**-6.60亿**」（真实 55 只汇总）；
-      ③ Pages 硬抓：`data/LHB_HISTORY.js` = 1,861,887 B（= 远端新版），
-      `index.html` 内 `LHB_HISTORY.js?v=2c15e83e42`；
-      ④ `pre_deploy_audit.py` 14 项全绿。
+    owner: 阿狸咪的工程师
+    status: done
+    what: >-
+      「最终推荐」（D 批末步 `algorithms/final_recommend.py` → `data/FINAL_RECOMMEND_DATA.js`）
+      在 2026-09-26/27/28 **连续三个交易日不产出**，产物停在 `2026-09-25 03:01:12`，
+      而算法链 run **照常 success（假成功）**。真因是「等待预算 + 默认超时」叠加：
+      `final_recommend.main()` 内有一段「等 `data/FACTOR_LAB.js` 当日新鲜」轮询，
+      `_fl_max_wait` 原固定 20 分钟、每次 `time.sleep(60)`。而因子侧 `data/FACTOR_LAB.js`
+      `update_time` 已是当日、其 `data_date` 却停在 `2026-09-24`（`resolve_data_date()`
+      取 baostock 实测到的最近交易日）——「要求 data_date == 今天」的判据**永远不满足**
+      ⇒ 空等 20 分钟 ⇒ 撞 `run_algorithms.py` 的默认 `DEFAULT_SCRIPT_TIMEOUT=1800`
+      ⇒ 进程被杀 ⇒ **产物根本没落盘**（连「因子降级继续算」这条路径都没走到）。
+      时间线实证（run#2149，18:39 派发）：B 批产物 18:48-19:01 落盘 → 本步启动 →
+      白等 20min → 19:31 超 1800s → 19:39 链结束仍 success，线上仍为 09-25 旧值。
     evidence: >-
-      判据单测输出 5/5 PASS（桩掉 akshare，monkeypatch 交易日历不含 2026-09-28）；
-      线上 blob `data/LHB_HISTORY.js` sha `f4e0047c8a75` 1,861,887 B；
-      源 `raw_data/lhb_history.json` blob `025e5d0549bf` 2,651,177 B（09-28 = trading:true/55 只）；
-      curl Pages 实抓 `http=200 size=1861887`。
+      ① 产物侧：远端 `data/FINAL_RECOMMEND_DATA.js` 的 `update_time` = `2026-09-25 03:01:12`，
+      `raw_data/history/` 最新 dated 快照 = `final_recommend_20260925.json`（26/27/28 三个缺日）。
+      ② 因子侧：`data/FACTOR_LAB.js` = `{"update_time":"2026-09-28 18:45:12","data_date":"2026-09-24",...}`
+      ⇒ `data_date != 今天(09-28)`，且当日为非周末（周一）⇒ 等待判据不可能成立。
+      ③ 代码侧：`algorithms/final_recommend.py` L~921 `for _wi in range(_fl_max_wait)`（注释「最多等 ~20min」）
+      与 L~913 `_fl_max_wait = 0 if V8_OFFLINE else 20`；`algorithms/run_algorithms.py` L44
+      `DEFAULT_SCRIPT_TIMEOUT = 1800`，`SCRIPT_TIMEOUT_OVERRIDE` 表中**未登记** final_recommend.py
+      ⇒ 走默认 1800s。
+      ④ 复现验证：改后用 `stage=D / force_run=true / chain_day=2026-09-28` 派发 run#2151（id 36417483609），
+      20:31:01 落盘 `update_time=2026-09-28 20:31:01` + `raw_data/history/final_recommend_20260928.json`，
+      run 20:37 completed/success ⇒ 与「被 1800s 杀」的旧形态形成前后对照。
+    fix: >-
+      走 Git Data API（`force:false`，推前重取 tip，推后回读逐字节一致）改两处：
+      ① `algorithms/run_algorithms.py` 的 `SCRIPT_TIMEOUT_OVERRIDE` 新增
+      `"final_recommend.py": 3300`（+55min，覆盖「20min 等待 + 计算 + 写盘」，根因级）；
+      ② `algorithms/final_recommend.py`：等待上限改为可配 `V8_FR_MAX_WAIT_MIN`（默认 12），
+      并在轮询内加**内容指纹判据**——连续两轮 `data/FACTOR_LAB.js` 前 4KB 字节相同即
+      「源没在更新」⇒ 立即 break 降级（打印 `⏭ ... 停止空等`），不再烧预算等一个不会来的新鲜度。
+      两文件 `compile()` 通过；推后回读：`run_algorithms.py` md5 `d4da1ed677`、
+      `final_recommend.py` md5 `4c1e65a22a` **逐字节一致**。
+    verify_how: >-
+      ① **本晚已验收**：线上硬抓 `data/FINAL_RECOMMEND_DATA.js` 的 `update_time` =
+      `2026-09-28 20:31:01`（远端与 Pages 两侧同值）；`index.html` 内 `?v=ed482c04d7`
+      与线上文件内容的 `sha1(neutralize)[:10]` **逐项一致**；
+      ② **真浏览器**：Edge headless 打开主站，卡头显示「更新于 今日 20:31 盘后 · ✅ 0928 已跑 ·
+      📦 0928 已入库 20」，Top5 首项 翰宇药业(300199) 综合 34.2 共振 2 源，`window.TRIPLE_CONSENSUS`
+      `update_time=2026-09-28 20:14:39 / count=4`（三重共识同步已出）；
+      ③ **门禁**：`pre_deploy_audit.py` **14/14 全绿**；
+      ④ **不回归**：D 批就绪判据（`READY_SPEC["D"]`）未动；下次 FACTOR_LAB `data_date` 追平当日时，
+      应走「等 1 轮即 break」带因子融合的正常路径（`data_degraded` 应为 false）。
     refs: >-
-      `algorithms/fetch_lhb.py#is_trading_day`（L113-152，本次新增「当天未收录」特判）·
-      `algorithms/fetch_lhb.py#main`（L349-354 占位分支）· `update_v8.py`（DATA_SOURCES
-      `lhb_history.json → LHB_HISTORY`，category `post_close`）· `data/LHB_HISTORY.js` ·
-      `raw_data/lhb_history.json` · `.github/workflows/v8_lhb_fetch.yml`（cron `30 9 * * 1-5`
-      ＝ CST 17:30）· `index.html` L3433-3453（两卡容器）/ L2742-2780（LHB_HISTORY＋LHB_DATA 合并）
-    updated: "2026-09-28 17:55"
-    updated_by: 阿狸咪的工程师(alimi-cn)
+      `algorithms/final_recommend.py`（等待轮询 / `V8_FR_MAX_WAIT_MIN` / 指纹判据）·
+      `algorithms/run_algorithms.py`（`SCRIPT_TIMEOUT_OVERRIDE` / `DEFAULT_SCRIPT_TIMEOUT=1800`）·
+      `v8/factor_lab_gen.py`（`resolve_data_date()`：data_date = baostock 最近有数据交易日）·
+      `.github/scripts/v8_stage_gate.py`（`READY_SPEC["D"]`）·
+      `docs/ops/handover/2026-09-28_2042_阿狸咪的工程师给小九的工程师_最终推荐连续3天不出·真因根治+今晚D批补跑上线.md`
+    updated: "2026-09-28 20:42"
