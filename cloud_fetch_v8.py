@@ -177,7 +177,7 @@ CATEGORY_MAP = {
     "AVG_PRICE_DATA": "intraday",
     # 2026-09-18：880003 主口径随等权同档（intraday），保证每轮都刷新 MA 与历史
     "AVG_PRICE_880003": "intraday",
-    "OVERSEAS_MARKETS": "intraday",  # 亚太市场(日经/恒生/KOSPI/台湾)：交易时段实时更新，盘中每轮刷新
+    "OVERSEAS_MARKETS": "premarket,intraday",  # 亚太市场(日经/恒生/KOSPI/台湾)：盘前档随08:25盘前cron刷新（日经/KOSPI 08:00先于A股开盘，2026-09-28 主人令「亚太比A股早开盘，和盘前一起8点多更新」）+ 盘中每轮刷新
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告，日频更新即可
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：注释写「盘后数据页」却只在盘前抓 —— 语义错配。
     #   页面把这两张卡标成「收盘后/盘后」，但盘后档不抓 → 卡片永远显示早上那一档的时间。
@@ -1567,7 +1567,7 @@ def _fetch_overseas_indices():
 
 
 def f_overseas_markets():
-    """海外/亚太股市观测（注册于 OVERSEAS_MARKETS→intraday，盘中每30分刷新）。
+    """海外/亚太股市观测（注册于 OVERSEAS_MARKETS→premarket,intraday，盘前08:25+盘中每30分刷新）。
     恒生指数/日经225/韩国KOSPI/台湾加权：反映亚太风险偏好，对 A 股开盘与外资流向有传导。
     数据真实抓取，绝不编造点位。
     🔴 2026-09-24 一劳永逸（小九）：原实现抓取失败仍返回全 null 对象 ⇒ 每轮把昨日
