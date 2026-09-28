@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "ab5dec8172";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "b440d59fe3";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -1819,11 +1819,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=06feea07f4" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=efd8129788" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=1dcf881ff5" defer></script>
-<script src="data/HB_XIAOJIU.js?v=a0d1969e70" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=2bd16885e0" defer></script>
-<script src="data/HEALTH_CHECK.js?v=abc13c5981" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=3bb6ceadc5" defer></script>
+<script src="data/RUNNER_STATUS.js?v=9020f73ce7" defer></script>
+<script src="data/HB_XIAOJIU.js?v=a2cda6554d" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=278af662e2" defer></script>
+<script src="data/HEALTH_CHECK.js?v=d2a40613d8" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=8fc8fa3a42" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=63db8889ee" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=00fcbeeb09" defer></script>
@@ -1834,14 +1834,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=76312df7f0" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=acc8d09450" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=d4de4f5b62" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=0f84aaacc6" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=49a69fe643" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=5d6608caf3" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=2f906fbb79" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=a64d149a4b" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=c75401ef92" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=c077e57033" defer></script>
-    <script src="data/IMA_STRONG_BACKTEST.js?v=8cb5e3a29b" defer></script>
+    <script src="data/IMA_STRONG_BACKTEST.js?v=f59dee507c" defer></script>
     <script src="data/CRDS_BACKTEST.js?v=d348b3be89" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -15740,7 +15740,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=0f84aaacc6';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=2f906fbb79';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -15749,7 +15749,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=49a69fe643';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=a64d149a4b';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
