@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-29 07:06:11",
-  "total": 600,
+  "update_time": "2026-09-29 13:38:59",
+  "total": 595,
   "grade_summary": {
     "A": 25,
     "B": 30,
     "C": 153,
     "D": 267,
-    "no_data": 125
+    "no_data": 120
   },
   "stocks": {
     "hk_00001": {
@@ -142,13 +142,6 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "hk_00728": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
     "hk_00817": {
       "score": 0,
       "grade": "",
@@ -184,13 +177,6 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "hk_00902": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
     "hk_00939": {
       "score": 0,
       "grade": "",
@@ -220,13 +206,6 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_00992": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
-    "hk_00998": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -311,20 +290,6 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_01299": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
-    "hk_01336": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
-    "hk_01339": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -6026,6 +5991,15 @@
         ]
       }
     },
+    "sz_301218": {
+      "score": 25,
+      "grade": "D",
+      "roe": -1.6070000000000002,
+      "revenue_growth": 13.0665,
+      "reason": "ROE差(-1.6%) | 营收增长(13.1%)",
+      "cfo_to_asset": -5.36,
+      "cf_queried": true
+    },
     "sz_301230": {
       "score": 0,
       "grade": "D",
@@ -6314,18 +6288,6 @@
           "中报预增"
         ]
       }
-    },
-    "sz_301218": {
-      "score": 25,
-      "grade": "D",
-      "roe": -1.6070000000000002,
-      "revenue_growth": 13.0665,
-      "reason": "ROE差(-1.6%) | 营收增长(13.1%)",
-      "statDate": "2026-06-30",
-      "cfo_to_asset": -5.36,
-      "cfo_to_or": -0.4103,
-      "asset_turn": 0.1307,
-      "cf_queried": true
     }
   }
 }
