@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-09-29 13:46:05",
-  "data_date": "2026-09-28",
+  "update_time": "2026-09-29 18:38:02",
+  "data_date": "2026-09-29",
   "meta": {
-    "data_date": "2026-09-28",
+    "data_date": "2026-09-29",
     "close_semantics": "⚠️ 记录里的 close 是「上次算到这只票那天」的快照（roe 按季 asof_q / abn 按月 asof_ym 缓存），**不是当日报价**；需要当日价请查 STOCK_QUOTE.js 或 CANDIDATE_QUOTES.js。同时看 close_date 字段。",
     "liquid_def": "liquid=false 表示最新K线日 != 数据日 或 当月换手率为 0（停牌/零成交），已从榜单剔除",
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
-    "n_universe": 475,
-    "n_at_valid": 934,
+    "n_universe": 504,
+    "n_at_valid": 949,
     "n_roe_large": 663,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
@@ -414,6 +414,30 @@
         "asof_ym": "2026-09"
       },
       {
+        "code": "sh.601811",
+        "name": "新华文轩",
+        "close": 18.52,
+        "close_date": "2026-09-28",
+        "liquid": true,
+        "abn": 3.086,
+        "factor_at": -3.0859,
+        "roe_ttm": null,
+        "size_proxy": 1267549517.5,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sh.605058",
+        "name": "澳弘电子",
+        "close": 54.18,
+        "close_date": "2026-09-28",
+        "liquid": true,
+        "abn": 3.049,
+        "factor_at": -3.0487,
+        "roe_ttm": null,
+        "size_proxy": 3096690419.5,
+        "asof_ym": "2026-09"
+      },
+      {
         "code": "sz.003040",
         "name": "楚天龙",
         "close": 17.46,
@@ -459,28 +483,6 @@
         "factor_at": -2.3165,
         "roe_ttm": null,
         "size_proxy": 6479859256.2,
-        "asof_ym": "2026-09"
-      },
-      {
-        "code": "sh.600613",
-        "name": "神奇制药",
-        "close": 9.41,
-        "abn": 2.308,
-        "factor_at": -2.3082,
-        "roe_ttm": null,
-        "size_proxy": 2285563792.6,
-        "asof_ym": "2026-09"
-      },
-      {
-        "code": "sz.000560",
-        "name": "我爱我家",
-        "close": 2.74,
-        "close_date": "2026-09-11",
-        "liquid": true,
-        "abn": 2.206,
-        "factor_at": -2.2056,
-        "roe_ttm": null,
-        "size_proxy": 8416348631.7,
         "asof_ym": "2026-09"
       }
     ]
