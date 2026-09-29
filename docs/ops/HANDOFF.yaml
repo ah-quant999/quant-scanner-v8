@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-29 18:55"
+  updated: "2026-09-29 23:12"
   updated_by: 小九(lemoncat-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 100
+  next_id_seq: 115
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -7472,3 +7472,19 @@ items:
       - "docs/ops/HANDOFF.yaml#intraday-chain-cron-deregistered"
     updated: "2026-09-29 12:55"
     updated_by: 小九(lemoncat-cn)
+
+  - id: watchdog-heartbeat-falsekill-rootfix-0929
+    priority: P0
+    owner: 阿狸咪(alimi-cn)
+    status: done
+    what: >
+      看门狗(v8_cloud_watchdog.py)与盘后算法链不同机：看门狗跑在云端 ubuntu-latest，算法链跑在 [self-hosted, cn] 独立 worktree。原 check_algo_chain() 内「心跳静默取消」分支调用 _read_local_heartbeat() 在云端巡检机读到的总是过期 checkout 副本，hb_age 恒成立，误杀一切健康在跑的算法 run，触发取消风暴，进而造成 BACKTEST 三卡与「最终推荐入选日期陈旧」等红卡（09-29 #2179/#2180 实证；09-17 回执已判据同源缺陷）。
+    fix: >
+      永久移除心跳静默取消分支 + 死函数 _read_local_heartbeat() + 死常量 ALGO_SILENCE_KILL_MIN；整条 run 卡死改由 r_age>ALGO_STUCK_MIN(165min) 兜底（不依赖心跳文件，跨机可靠）。仅推 v8_cloud_watchdog.py，已上 main 6cfdda8（parent d84bdaceae，同批重建 data/INDEX_HISTORY.js）。US_HK_MAP 陈旧系美东交易时段 build() 闸门拒绝产出的设计态，非代码 bug，待 09-30 04:00 CST 美收盘后 cn-fetch 自愈。
+    verify_how: >
+      ① v8_cloud_watchdog.py on main 已无 _read_local_heartbeat 与 ALGO_SILENCE_KILL_MIN（grep 零命中）；② 下一轮 v8_health_patrol 不再取消健康在跑的算法 run；③ BACKTEST_COMPREHENSIVE/TDX/FINAL_RECOMMEND_DATA 红卡清零；④ INDEX_HISTORY.js update_time 与 raw_data/index_history.json 对齐（已重建为 2026-09-29T19:35:09）。
+    refs:
+      - "v8_cloud_watchdog.py"
+      - "docs/ops/HANDOFF.yaml#healthcheck-falsealarm-0929"
+    updated: "2026-09-29 23:12"
+    updated_by: 阿狸咪的工程师(alimi-cn)
