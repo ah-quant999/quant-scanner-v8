@@ -7347,7 +7347,7 @@ items:
   - id: sector-fund-flow-trend-em-realsource-0929
     priority: P0
     owner: shared
-    status: pending-verify
+    status: done
     what: >-
       「💰 资金净额趋势」卡（板块资金流·趋势）数值错误、且与东财真值方向相反。用户截图实测：
       猪肉概念 5日=+52.1亿、汽车整车 20日=+65.2亿、中船系 5日=+41.0亿 等大幅正值；
@@ -7379,6 +7379,15 @@ items:
       石油行业=BK0464、煤炭=BK0437、证券Ⅱ=BK0473）；本机全量跑 `fetch_em_fflow_windows` 实测
       覆盖 11/12 截图板块（仅中船系派生板块无东财对应→回退闸门）；commit=f13f6b0cf2047017688b8e975b175877a1c7e89e
       （blob 回读 md5=ff8d77cf14ef 逐字节一致）。
+    verified_at: "2026-09-29 15:05"
+    evidence: >
+      algo run 36526788652（13:34 dispatch，10/10 success，head dee5d1ef0d）以修复后代码产出
+      raw_data/sector_fund_flow_trend.json 13:47 版：40 板块中 9 个 src=东财日K（抖音/鸿蒙/百度/区块链/
+      虚拟数字人/ChatGPT/房地产/物业管理/特斯拉），窗口天数 5d=5、20d=20 全满；其余走连续性闸门累加
+      （元件 5d=-163.29 满窗、方向与东财真值一致）。卡面 JS 曾滞留 07:15（api_push_raw._EXTRA_FILES
+      不含 SECTOR_FUND_FLOW_TREND.js、fetch 链盘中 intraday 档不重建 post_close 卡）→ 已用 13:47 raw
+      等构重建并直推 f924d618（blob 回读逐字节一致），main 真身 update_time=13:47 已验。
+      今晚 17:20 post_close 构建将自然接续刷新。
     refs: >-
       `algorithms/fetch_orphan_sector_fund_flow.py`（L554-666 EM_FFLOW_HOSTS/EM_SEARCH_HOSTS/_em_bk_code/
       fetch_em_fflow_windows；L1174-1184 EM真源覆盖；L1232-1257 candidate 同步）·
