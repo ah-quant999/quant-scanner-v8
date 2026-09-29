@@ -1117,6 +1117,9 @@
       "2026-09-28": 1591.43,
       "2026-09-29": 1638.5,
       "2026-09-30": 1638.5
+    },
+    "002640": {
+      "2026-09-30": 3.94
     }
   },
   "_tracking_latest": {
@@ -1150,9 +1153,9 @@
     "601168": {
       "enter_date": "2026-08-17",
       "enter_close": 39.34,
-      "last_date": "2026-09-24",
-      "last_close": 36.81,
-      "status": "dropped",
+      "last_date": "2026-09-30",
+      "last_close": 35.17,
+      "status": "strict",
       "streak": 3,
       "total_days": 9
     },
@@ -1213,9 +1216,9 @@
     "002916": {
       "enter_date": "2026-08-17",
       "enter_close": 392.9,
-      "last_date": "2026-08-17",
-      "last_close": 392.9,
-      "status": "dropped",
+      "last_date": "2026-09-30",
+      "last_close": 375.6,
+      "status": "near",
       "streak": 1,
       "total_days": 1
     },
@@ -1433,9 +1436,9 @@
     "000807": {
       "enter_date": "2026-09-04",
       "enter_close": 26.95,
-      "last_date": "2026-09-24",
-      "last_close": 26.58,
-      "status": "dropped",
+      "last_date": "2026-09-30",
+      "last_close": 26.47,
+      "status": "strict",
       "streak": 2,
       "total_days": 1
     },
@@ -1591,9 +1594,9 @@
     "300033": {
       "enter_date": "2026-09-14",
       "enter_close": 205.55,
-      "last_date": "2026-09-15",
-      "last_close": 204.0,
-      "status": "dropped",
+      "last_date": "2026-09-30",
+      "last_close": 199.71,
+      "status": "near",
       "streak": 2,
       "total_days": 1
     },
@@ -1609,9 +1612,9 @@
     "300390": {
       "enter_date": "2026-09-15",
       "enter_close": 52.3,
-      "last_date": "2026-09-23",
-      "last_close": 52.76,
-      "status": "dropped",
+      "last_date": "2026-09-30",
+      "last_close": 49.05,
+      "status": "near",
       "streak": 1,
       "total_days": 7
     },
@@ -1749,12 +1752,20 @@
       "status": "strict",
       "streak": 4,
       "total_days": 4
+    },
+    "002640": {
+      "enter_date": "2026-09-30",
+      "enter_close": 3.94,
+      "last_date": "2026-09-30",
+      "last_close": 3.94,
+      "status": "strict",
+      "streak": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-09-30 02:00:54"
+    "last_update": "2026-09-30 03:40:28"
   },
   "2026-08-18": [
     {
@@ -2349,7 +2360,7 @@
       "status": "near"
     }
   ],
-  "update_time": "2026-09-30 02:00:54",
+  "update_time": "2026-09-30 03:40:28",
   "2026-08-30": [
     {
       "code": "300475",
@@ -5417,20 +5428,43 @@
       "board": "创业板",
       "close": 22.79,
       "pct_chg": 1.741,
-      "total_score": 34.2,
+      "total_score": 36.0,
       "quality_grade": "A",
       "industry": "医药制造业",
       "sectors": [
         "2026中报预增",
-        "互联医疗",
-        "医药制造业",
         "深股通",
-        "减肥药",
         "流感",
+        "创新药",
+        "减肥药",
         "肝炎概念",
-        "创新药"
+        "互联医疗",
+        "医药制造业"
       ],
       "signal_count": 1,
+      "status": "strict"
+    },
+    {
+      "code": "002640",
+      "name": "跨境通",
+      "market": "sz",
+      "board": "主板",
+      "close": 3.94,
+      "pct_chg": -0.505,
+      "total_score": 34.2,
+      "quality_grade": "A",
+      "industry": "零售业",
+      "sectors": [
+        "消费电子概念",
+        "2026中报扭亏",
+        "电商概念",
+        "内贸流通",
+        "跨境电商",
+        "拼多多概念",
+        "无线耳机",
+        "零售业"
+      ],
+      "signal_count": 2,
       "status": "strict"
     },
     {
@@ -5440,15 +5474,15 @@
       "board": "科创板",
       "close": 1638.5,
       "pct_chg": 2.958,
-      "total_score": 30.4,
+      "total_score": 33.5,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
+        "基金重仓",
         "MSCI中国",
         "2026中报预增",
-        "通信技术",
         "沪股通",
-        "基金重仓",
+        "通信技术",
         "昨日高振幅",
         "百元股",
         "计算机、通信和其他电子设备制造业"
@@ -5463,18 +5497,18 @@
       "board": "创业板",
       "close": 392.91,
       "pct_chg": -1.699,
-      "total_score": 28.6,
+      "total_score": 31.1,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
+        "基金重仓",
         "MSCI中国",
         "2026中报预增",
-        "基金重仓",
         "深股通",
         "机构重仓",
         "百元股",
-        "计算机、通信和其他电子设备制造业",
-        "深证100R"
+        "深证100R",
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 0,
       "status": "strict"
@@ -5486,21 +5520,122 @@
       "board": "创业板",
       "close": 246.39,
       "pct_chg": 0.163,
-      "total_score": 25.5,
+      "total_score": 29.8,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
         "MSCI中国",
         "2026中报预增",
-        "AI眼镜",
-        "2026一季报预增",
         "小米概念",
-        "计算机、通信和其他电子设备制造业",
         "AI智能体",
-        "物联网"
+        "物联网",
+        "计算机、通信和其他电子设备制造业",
+        "2026一季报预增",
+        "AI眼镜"
       ],
       "signal_count": 0,
       "status": "strict"
+    },
+    {
+      "code": "601168",
+      "name": "西部矿业",
+      "market": "sh",
+      "board": "主板",
+      "close": 35.17,
+      "pct_chg": 4.146,
+      "total_score": 28.6,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 2,
+      "status": "strict"
+    },
+    {
+      "code": "000807",
+      "name": "云铝股份",
+      "market": "sz",
+      "board": "主板",
+      "close": 26.47,
+      "pct_chg": 4.336,
+      "total_score": 28.6,
+      "quality_grade": "A",
+      "industry": "有色金属冶炼和压延加工业",
+      "sectors": [
+        "有色金属冶炼和压延加工业"
+      ],
+      "signal_count": 2,
+      "status": "strict"
+    },
+    {
+      "code": "300390",
+      "name": "天华新能",
+      "market": "sz",
+      "board": "创业板",
+      "close": 49.05,
+      "pct_chg": 2.187,
+      "total_score": 26.3,
+      "quality_grade": "B",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "固态电池",
+        "独角兽",
+        "MSCI中国",
+        "锂矿概念",
+        "深股通",
+        "医疗器械概念",
+        "计算机、通信和其他电子设备制造业",
+        "2026一季报预增"
+      ],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "002916",
+      "name": "深南电路",
+      "market": "sz",
+      "board": "主板",
+      "close": 375.6,
+      "pct_chg": 1.245,
+      "total_score": 26.1,
+      "quality_grade": "C",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "MSCI中国",
+        "2026中报预增",
+        "5G概念",
+        "深股通",
+        "PCB",
+        "百元股",
+        "深证100R",
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "300033",
+      "name": "同花顺",
+      "market": "sz",
+      "board": "创业板",
+      "close": 199.71,
+      "pct_chg": 0.838,
+      "total_score": 25.6,
+      "quality_grade": "C",
+      "industry": "其他金融业",
+      "sectors": [
+        "MSCI中国",
+        "2026中报预增",
+        "国产软件",
+        "机构重仓",
+        "百元股",
+        "其他金融业",
+        "鸿蒙概念",
+        "深证100R"
+      ],
+      "signal_count": 2,
+      "status": "near"
     }
   ]
 }

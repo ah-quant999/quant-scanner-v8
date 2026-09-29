@@ -1,29 +1,162 @@
 {
-  "update_time": "2026-09-30 02:01:14",
+  "update_time": "2026-09-30 03:40:48",
   "data_date": "2026-09-30",
   "track_start": "2026-09-30",
   "history_days": 34,
-  "strict_count": 4,
-  "near_count": 0,
+  "strict_count": 7,
+  "near_count": 3,
   "tracked": [
+    {
+      "code": "002640",
+      "name": "跨境通",
+      "market": "sz",
+      "board": "主板",
+      "status": "strict",
+      "total_score": 34.2,
+      "quality_grade": "A",
+      "industry": "零售业",
+      "sectors": [
+        "消费电子概念",
+        "2026中报扭亏",
+        "电商概念",
+        "内贸流通",
+        "跨境电商",
+        "拼多多概念",
+        "无线耳机",
+        "零售业"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-09-30",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 3.94,
+      "current_close": 3.94,
+      "pnl_pct": 0.0,
+      "price_source": "quote",
+      "catalysts": [
+        {
+          "tag": "中报扭亏",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "000807",
+      "name": "云铝股份",
+      "market": "sz",
+      "board": "主板",
+      "status": "strict",
+      "total_score": 28.6,
+      "quality_grade": "A",
+      "industry": "有色金属冶炼和压延加工业",
+      "sectors": [
+        "有色金属冶炼和压延加工业"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-09-04",
+      "hold_days": 1,
+      "consecutive_days": 2,
+      "first_close": 26.95,
+      "current_close": 26.47,
+      "pnl_pct": -1.78,
+      "price_source": "quote",
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "300033",
+      "name": "同花顺",
+      "market": "sz",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 25.6,
+      "quality_grade": "C",
+      "industry": "其他金融业",
+      "sectors": [
+        "MSCI中国",
+        "2026中报预增",
+        "国产软件",
+        "机构重仓",
+        "百元股",
+        "其他金融业",
+        "鸿蒙概念",
+        "深证100R"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-09-14",
+      "hold_days": 1,
+      "consecutive_days": 2,
+      "first_close": 205.55,
+      "current_close": 199.71,
+      "pnl_pct": -2.84,
+      "price_source": "quote",
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "002916",
+      "name": "深南电路",
+      "market": "sz",
+      "board": "主板",
+      "status": "near",
+      "total_score": 26.1,
+      "quality_grade": "C",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "MSCI中国",
+        "2026中报预增",
+        "5G概念",
+        "深股通",
+        "PCB",
+        "百元股",
+        "深证100R",
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 392.9,
+      "current_close": 375.6,
+      "pnl_pct": -4.4,
+      "price_source": "quote",
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "走弱"
+        }
+      ]
+    },
     {
       "code": "300199",
       "name": "翰宇药业",
       "market": "sz",
       "board": "创业板",
       "status": "strict",
-      "total_score": 34.2,
+      "total_score": 36.0,
       "quality_grade": "A",
       "industry": "医药制造业",
       "sectors": [
         "2026中报预增",
-        "互联医疗",
-        "医药制造业",
         "深股通",
-        "减肥药",
         "流感",
+        "创新药",
+        "减肥药",
         "肝炎概念",
-        "创新药"
+        "互联医疗",
+        "医药制造业"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-22",
@@ -47,15 +180,15 @@
       "market": "sh",
       "board": "科创板",
       "status": "strict",
-      "total_score": 30.4,
+      "total_score": 33.5,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
+        "基金重仓",
         "MSCI中国",
         "2026中报预增",
-        "通信技术",
         "沪股通",
-        "基金重仓",
+        "通信技术",
         "昨日高振幅",
         "百元股",
         "计算机、通信和其他电子设备制造业"
@@ -77,23 +210,58 @@
       ]
     },
     {
+      "code": "300390",
+      "name": "天华新能",
+      "market": "sz",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 26.3,
+      "quality_grade": "B",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "固态电池",
+        "独角兽",
+        "MSCI中国",
+        "锂矿概念",
+        "深股通",
+        "医疗器械概念",
+        "计算机、通信和其他电子设备制造业",
+        "2026一季报预增"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-09-15",
+      "hold_days": 7,
+      "consecutive_days": 1,
+      "first_close": 52.3,
+      "current_close": 49.05,
+      "pnl_pct": -6.21,
+      "price_source": "quote",
+      "catalysts": [
+        {
+          "tag": "中报扭亏",
+          "score": 15,
+          "reaction": "走弱"
+        }
+      ]
+    },
+    {
       "code": "300857",
       "name": "协创数据",
       "market": "sz",
       "board": "创业板",
       "status": "strict",
-      "total_score": 25.5,
+      "total_score": 29.8,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
         "MSCI中国",
         "2026中报预增",
-        "AI眼镜",
-        "2026一季报预增",
         "小米概念",
-        "计算机、通信和其他电子设备制造业",
         "AI智能体",
-        "物联网"
+        "物联网",
+        "计算机、通信和其他电子设备制造业",
+        "2026一季报预增",
+        "AI眼镜"
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
@@ -112,23 +280,51 @@
       ]
     },
     {
+      "code": "601168",
+      "name": "西部矿业",
+      "market": "sh",
+      "board": "主板",
+      "status": "strict",
+      "total_score": 28.6,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-08-17",
+      "hold_days": 9,
+      "consecutive_days": 3,
+      "first_close": 39.34,
+      "current_close": 35.17,
+      "pnl_pct": -10.6,
+      "price_source": "quote",
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "走弱"
+        }
+      ]
+    },
+    {
       "code": "300502",
       "name": "新易盛",
       "market": "sz",
       "board": "创业板",
       "status": "strict",
-      "total_score": 28.6,
+      "total_score": 31.1,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
+        "基金重仓",
         "MSCI中国",
         "2026中报预增",
-        "基金重仓",
         "深股通",
         "机构重仓",
         "百元股",
-        "计算机、通信和其他电子设备制造业",
-        "深证100R"
+        "深证100R",
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
@@ -167,10 +363,16 @@
       "text": "(000975) 于 2026-08-17 跌出共识（曾连续 1 日）"
     },
     {
+      "level": "good",
+      "code": "601168",
+      "name": "西部矿业",
+      "text": "西部矿业(601168) 连续 3 日稳居严格共识（高质量）"
+    },
+    {
       "level": "warn",
       "code": "601168",
       "name": "西部矿业",
-      "text": "西部矿业(601168) 于 2026-09-24 跌出共识（曾连续 3 日）"
+      "text": "西部矿业(601168) 入选以来回撤 -10.6%（2026-08-17 起）"
     },
     {
       "level": "warn",
@@ -207,12 +409,6 @@
       "code": "688331",
       "name": "荣昌生物",
       "text": "荣昌生物(688331) 于 2026-09-04 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "warn",
-      "code": "002916",
-      "name": "",
-      "text": "(002916) 于 2026-08-17 跌出共识（曾连续 1 日）"
     },
     {
       "level": "warn",
@@ -360,12 +556,6 @@
     },
     {
       "level": "warn",
-      "code": "000807",
-      "name": "云铝股份",
-      "text": "云铝股份(000807) 于 2026-09-24 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "warn",
       "code": "688808",
       "name": "联讯仪器",
       "text": "联讯仪器(688808) 于 2026-09-23 跌出共识（曾连续 2 日）"
@@ -468,21 +658,9 @@
     },
     {
       "level": "warn",
-      "code": "300033",
-      "name": "同花顺",
-      "text": "同花顺(300033) 于 2026-09-15 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "warn",
       "code": "688409",
       "name": "富创精密",
       "text": "富创精密(688409) 于 2026-09-15 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "warn",
-      "code": "300390",
-      "name": "天华新能",
-      "text": "天华新能(300390) 于 2026-09-23 跌出共识（曾连续 1 日）"
     },
     {
       "level": "warn",
@@ -579,11 +757,34 @@
     "by_industry": [
       {
         "industry": "计算机、通信和其他电子设备制造业",
-        "count": 3,
+        "count": 5,
         "names": [
+          "深南电路",
           "源杰科技",
+          "天华新能",
           "协创数据",
           "新易盛"
+        ]
+      },
+      {
+        "industry": "零售业",
+        "count": 1,
+        "names": [
+          "跨境通"
+        ]
+      },
+      {
+        "industry": "有色金属冶炼和压延加工业",
+        "count": 1,
+        "names": [
+          "云铝股份"
+        ]
+      },
+      {
+        "industry": "其他金融业",
+        "count": 1,
+        "names": [
+          "同花顺"
         ]
       },
       {
@@ -592,23 +793,42 @@
         "names": [
           "翰宇药业"
         ]
+      },
+      {
+        "industry": "有色金属矿采选业",
+        "count": 1,
+        "names": [
+          "西部矿业"
+        ]
       }
     ],
     "by_sector": [
       {
-        "sector": "2026中报预增",
-        "count": 4
+        "sector": "MSCI中国",
+        "count": 6
       },
       {
-        "sector": "MSCI中国",
-        "count": 3
+        "sector": "2026中报预增",
+        "count": 6
       },
       {
         "sector": "计算机、通信和其他电子设备制造业",
-        "count": 3
+        "count": 5
+      },
+      {
+        "sector": "百元股",
+        "count": 4
       },
       {
         "sector": "深股通",
+        "count": 4
+      },
+      {
+        "sector": "深证100R",
+        "count": 3
+      },
+      {
+        "sector": "机构重仓",
         "count": 2
       },
       {
@@ -616,8 +836,80 @@
         "count": 2
       },
       {
-        "sector": "百元股",
+        "sector": "2026一季报预增",
         "count": 2
+      },
+      {
+        "sector": "消费电子概念",
+        "count": 1
+      },
+      {
+        "sector": "2026中报扭亏",
+        "count": 1
+      },
+      {
+        "sector": "电商概念",
+        "count": 1
+      },
+      {
+        "sector": "内贸流通",
+        "count": 1
+      },
+      {
+        "sector": "跨境电商",
+        "count": 1
+      },
+      {
+        "sector": "拼多多概念",
+        "count": 1
+      },
+      {
+        "sector": "无线耳机",
+        "count": 1
+      },
+      {
+        "sector": "零售业",
+        "count": 1
+      },
+      {
+        "sector": "有色金属冶炼和压延加工业",
+        "count": 1
+      },
+      {
+        "sector": "国产软件",
+        "count": 1
+      },
+      {
+        "sector": "其他金融业",
+        "count": 1
+      },
+      {
+        "sector": "鸿蒙概念",
+        "count": 1
+      },
+      {
+        "sector": "5G概念",
+        "count": 1
+      },
+      {
+        "sector": "PCB",
+        "count": 1
+      },
+      {
+        "sector": "流感",
+        "count": 1
+      },
+      {
+        "sector": "创新药",
+        "count": 1
+      },
+      {
+        "sector": "减肥药",
+        "count": 1
+      },
+      {
+        "sector": "肝炎概念",
+        "count": 1
       },
       {
         "sector": "互联医疗",
@@ -628,19 +920,7 @@
         "count": 1
       },
       {
-        "sector": "减肥药",
-        "count": 1
-      },
-      {
-        "sector": "流感",
-        "count": 1
-      },
-      {
-        "sector": "肝炎概念",
-        "count": 1
-      },
-      {
-        "sector": "创新药",
+        "sector": "沪股通",
         "count": 1
       },
       {
@@ -648,19 +928,23 @@
         "count": 1
       },
       {
-        "sector": "沪股通",
-        "count": 1
-      },
-      {
         "sector": "昨日高振幅",
         "count": 1
       },
       {
-        "sector": "AI眼镜",
+        "sector": "固态电池",
         "count": 1
       },
       {
-        "sector": "2026一季报预增",
+        "sector": "独角兽",
+        "count": 1
+      },
+      {
+        "sector": "锂矿概念",
+        "count": 1
+      },
+      {
+        "sector": "医疗器械概念",
         "count": 1
       },
       {
@@ -676,18 +960,18 @@
         "count": 1
       },
       {
-        "sector": "机构重仓",
+        "sector": "AI眼镜",
         "count": 1
       },
       {
-        "sector": "深证100R",
+        "sector": "有色金属矿采选业",
         "count": 1
       }
     ],
-    "concentration": 75.0
+    "concentration": 50.0
   },
   "overlap": {
-    "total_tracked": 4,
+    "total_tracked": 10,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -914,7 +1198,7 @@
       },
       {
         "code": "002916",
-        "name": "",
+        "name": "深南电路",
         "enter_date": "2026-08-17",
         "offsets": {
           "20d": -0.81
