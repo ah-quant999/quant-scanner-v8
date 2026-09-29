@@ -7344,3 +7344,46 @@ items:
       docs/ops/handover/2026-09-29_0526_阿狸咪的工程师给小九的工程师_HEALTH_CHECK通用红线两项结构性假红(波浪大基金)时间戳来源与同树产物不符.md
     updated: "2026-09-29 05:30"
     updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: sector-fund-flow-trend-em-realsource-0929
+    priority: P0
+    owner: shared
+    status: pending-verify
+    what: >-
+      「💰 资金净额趋势」卡（板块资金流·趋势）数值错误、且与东财真值方向相反。用户截图实测：
+      猪肉概念 5日=+52.1亿、汽车整车 20日=+65.2亿、中船系 5日=+41.0亿 等大幅正值；
+      直连东财官方真值对账——猪肉概念 5日=**−3.07亿**、汽车整车 20日=**−13.74亿**
+      （方向相反，量级差 10~20 倍）。根因：P0 本地累加把「history 里最近 N 条稀疏记录」
+      硬标成「N日」——history 只记「板块上榜日」（main 仅 top_list 板块 append），
+      猪肉仅 3 条记录横跨 40 天被标「5日」、汽车整车 24 条稀疏记录求和硬标「20日」，
+      中船系 5 条横跨 40 天硬标「5日」。前端 `_dayOK` 已强制「满窗才出数」，
+      但后端给了「满窗天数标签 + 稀疏值」→ 卡片显示虚假满窗大值。
+    fix: >-
+      【已实施·小九 2026-09-29】以东财官方 per-board 资金流日K（push2his fflow/daykline，
+      `secid=90.{BK代码}`，严格按最后 N 交易日求和）为唯一真源，覆写 top_list 的
+      net_5d/10d/20d/60d 并写真实窗口天数（满窗才出数）；稀疏记录从此无权出数（P0 连续性闸门拒出）。
+      三处配套修正：① 板块名→BK 代码映射由被阻断的 clist(push2/push2delay，本机 RemoteDisconnected)
+      改用 searchapi suggest（实测可达，token 用公开 D43BF722...），结果缓存 raw_data/sector_bk_codes.json；
+      ② 本仓内部名↔东财标准名别名（石油加工贸易→石油石化、煤炭开采加工→煤炭、证券→证券Ⅱ；
+      中船系等派生板块东财无对应→显式 None 回退闸门）；③ `_em_get_json` 加 trust_env=False 绕过系统代理劫持。
+      真源失败→回退本地连续性闸门（宁空勿假）。commit=f13f6b0cf2047017688b8e975b175877a1c7e89e。
+    verify_how: >-
+      ① 线上 `data/SECTOR_FUND_FLOW_TREND.js` 的 `net_5d`/`net_20d` 方向与东财日K真值一致
+      （如猪肉 5日≈−3.07、汽车整车 20日≈−13.74、电力 5日≈−24.9、元件 5日≈−190.6）；
+      ② 任意板块 `net_Nd_days >= N`（满窗才出数），无「稀疏记录硬标 N日」；
+      ③ 前端「资金净额趋势」卡 5日/20日 双子卡显示值与真值同号同量级、且「满N日」角标仅出现在真满窗板块；
+      ④ 卡片不再出现「猪肉+52、汽车整车+65」这类与真值反向的大值（即用户原截图现象消失）。
+      🔴 判据纪律：不得仅以 `HEALTH_CHECK` 该卡由 fail 转 ok 作「已修」证据——守卫绿≠数据对。
+    evidence: >-
+      东财真值由 push2his fflow/daykline 逐板块实拉（猪肉 BK0882 120 行：5日=−3.07、20日=−9.97；
+      汽车整车 BK1029：5日=+23.16、20日=−13.74）；searchapi 实测取码（猪肉=BK0882、汽车整车=BK1029、
+      石油行业=BK0464、煤炭=BK0437、证券Ⅱ=BK0473）；本机全量跑 `fetch_em_fflow_windows` 实测
+      覆盖 11/12 截图板块（仅中船系派生板块无东财对应→回退闸门）；commit=f13f6b0cf2047017688b8e975b175877a1c7e89e
+      （blob 回读 md5=ff8d77cf14ef 逐字节一致）。
+    refs: >-
+      `algorithms/fetch_orphan_sector_fund_flow.py`（L554-666 EM_FFLOW_HOSTS/EM_SEARCH_HOSTS/_em_bk_code/
+      fetch_em_fflow_windows；L1174-1184 EM真源覆盖；L1232-1257 candidate 同步）·
+      `raw_data/sector_bk_codes.json` · `raw_data/sector_fund_flow_trend.json` ·
+      `data/SECTOR_FUND_FLOW_TREND.js` · `index.html` L11132-11178（`sfMiniTrend`+`_dayOK` 满窗过滤）·
+      `docs/ops/HANDOFF.yaml#card-fake-freshness-timestamp-rootfix-0925`（同族满窗纪律）
+    updated: "2026-09-29 12:27"
+    updated_by: 小九
