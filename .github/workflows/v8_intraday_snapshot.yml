@@ -41,6 +41,16 @@ on:
     - cron: '*/10 1-3 * * 1-5'   # UTC 01:00-03:50 = CST 09:00-11:50（上午盘中，每 10 分钟）
     - cron: '*/10 4-7 * * 1-5'   # UTC 04:00-07:50 = CST 12:00-15:50（下午盘中，每 10 分钟）
   workflow_dispatch:
+  # 🛡 2026-09-29 小九 · 三修（根治「schedule 再次静默注销」）：
+  #   实测 09-26~09-28 三天 36 个 run 中 schedule 仅 2 次（09-21 同款注销复发），
+  #   09-29 上午 9:00-11:13 零快照、卡面空白（主人实锤）。cron 何时被 GitHub 注销不可控，
+  #   唯一可控的稳定触发源 = fetch 链（watchdog 每 15min + 本机调度器每 20min 双保险派发，
+  #   09-29 实测即使 schedule 全灭，fetch 链仍每 ~40min 完成一轮并已靠 soft_9 步骤写出 11:13 起的点）。
+  #   故挂 workflow_run 保底：fetch 链每完成一轮 → 本 job 追加一个当前时刻点。
+  #   无环：本 job 推的 2 个快照文件不会反向触发 fetch 链（它无 push 触发器）。
+  workflow_run:
+    workflows: ["🇨🇳 v8 中国数据抓取(云端)"]
+    types: [completed]
 
 permissions:
   contents: write
