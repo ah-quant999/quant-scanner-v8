@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-29 18:24:50",
+ "generated": "2026-09-29 21:38:29",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -149,16 +149,16 @@
    "bench_days": 44
   },
   "30d": {
-   "samples": 85,
+   "samples": 86,
    "immature": false,
-   "win": 70,
+   "win": 71,
    "loss": 15,
-   "win_rate": 82.4,
-   "avg_return": 16.27,
-   "median_return": 7.55,
+   "win_rate": 82.6,
+   "avg_return": 17.18,
+   "median_return": 7.71,
    "best_return": 137.41,
    "worst_return": -29.2,
-   "max_drawdown": -14.45,
+   "max_drawdown": -14.51,
    "bench_avg_return": 0.161,
    "bench_win_rate": 50.44,
    "bench_days": 34
@@ -179,16 +179,16 @@
    "bench_days": 24
   },
   "60d": {
-   "samples": 17,
+   "samples": 19,
    "immature": false,
-   "win": 13,
+   "win": 15,
    "loss": 4,
-   "win_rate": 76.5,
-   "avg_return": 23.72,
+   "win_rate": 78.9,
+   "avg_return": 27.24,
    "median_return": 16.77,
-   "best_return": 87.37,
+   "best_return": 99.46,
    "worst_return": -10.57,
-   "max_drawdown": -24.99,
+   "max_drawdown": -24.63,
    "bench_avg_return": -4.092,
    "bench_win_rate": 37.54,
    "bench_days": 13
