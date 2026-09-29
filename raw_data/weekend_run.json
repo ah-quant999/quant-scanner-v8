@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-09-29 13:56:15",
-  "generated": "2026-09-29 13:56:15",
+  "update_time": "2026-09-29 16:02:56",
+  "generated": "2026-09-29 16:02:56",
   "period_start": "2026-09-21",
   "period_end": "2026-09-27",
   "stats": {
@@ -9,15 +9,21 @@
     "tracked_files": 9,
     "ok_files": 8,
     "missing_files": 1,
-    "latest_health": null
+    "latest_health": {
+      "ok": 113,
+      "warn": 0,
+      "fail": 2,
+      "total": 116,
+      "updated": "2026-09-16 11:31:54"
+    }
   },
   "freshness": [
     {
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-09-29 12:38:35",
-      "size_kb": 21.9
+      "update_time": "2026-09-29 15:24:09",
+      "size_kb": 21.8
     },
     {
       "file": "triple_history.json",
@@ -37,7 +43,7 @@
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-09-29 13:41",
+      "update_time": "2026-09-29 15:50",
       "size_kb": 106.5
     },
     {
@@ -51,8 +57,8 @@
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-09-29 08:44:47",
-      "size_kb": 624.5
+      "update_time": "2026-09-29 13:38:45",
+      "size_kb": 976.6
     },
     {
       "file": "candidate.json",
