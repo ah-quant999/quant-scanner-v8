@@ -1527,9 +1527,60 @@ def _fetch_us_overnight():
     return _fetch_us_overnight_yahoo()
 
 
+# 新浪国际指数备源代码 → 与 _fetch_overseas_indices 的东财 code 一一对应
+_SINA_OVERSEAS = (("int_hangseng", "HSI"), ("int_nikkei", "N225"),
+                  ("int_kospi", "KS11"), ("int_taiwan", "TWII"))
+
+
+def _fetch_overseas_sina():
+    """新浪国际指数备源（东财 push2delay 全灭时兜底）。
+    返回 {东财code: {"f12": code, "f2": 点位, "f3": 涨跌幅%}}，与东财 diff 行同构。
+    接口：https://hq.sinajs.cn/list=int_hangseng,int_nikkei,int_kospi,int_taiwan
+    返回形如 `var hq_str_int_hangseng="恒生指数,24560.33,-81.23,-0.33,...";`
+    （字段序：名称, 现价, 涨跌额, 涨跌幅%…）。需 Referer，编码 gb2312。"""
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Referer": "https://finance.sina.com.cn/",
+        "Accept": "*/*",
+    }
+    out = {}
+    try:
+        codes = ",".join(c for c, _ in _SINA_OVERSEAS)
+        r = _requests.get(f"https://hq.sinajs.cn/list={codes}", headers=headers, timeout=15)
+        r.encoding = "gb2312"
+        for c, em_code in _SINA_OVERSEAS:
+            m = re.search(r'hq_str_%s="([^"]*)"' % c, r.text or "")
+            if not m:
+                continue
+            f = (m.group(1) or "").split(",")
+            if len(f) < 4:
+                continue
+            try:
+                price, pct = float(f[1]), float(f[3])
+            except Exception:
+                continue
+            out[em_code] = {"f12": em_code, "f2": price, "f3": pct}
+    except Exception as e:
+        print(f"    ⚠️ 海外指数新浪备源失败: {e}")
+    return out
+
+
 def _fetch_overseas_indices():
-    """海外/亚太股市观测：恒生指数、日经225、韩国KOSPI、台湾加权（东方财富延迟镜像，中国网络稳定）。
-    返回 [{name, code, value, chg_pct, currency}]；失败时该条 value=None，绝不编造。"""
+    """海外/亚太股市观测：恒生指数、日经225、韩国KOSPI、台湾加权。
+    返回 [{name, code, value, chg_pct, currency}]；失败时该条 value=None，绝不编造。
+
+    🔴 2026-09-29 一劳永逸（小九）：原实现是**裸 `_requests.get` 单次请求** push2delay，
+      既无重试也不换 host ⇒ 东财一抖动即全空（与 09-24「实时卡不更新」同源根因，
+      本 caller 当时被漏掉）⇒ 外层 f_overseas_markets 的 3 次退避也全败 ⇒ `return None`
+      「不覆盖既有产物」⇒ 卡面永久停在最后一轮成功时刻。
+      血证（09-29）：update_time 卡在 14:11:40，此后 fetch 链 14:19/14:46/15:29/16:21
+      各轮均未再更新本卡，而同轮 AVG_PRICE/AI_MARKET 正常刷新 ⇒ 坐实是本 caller 专属失败。
+    修法（对齐 em_clist 的 09-24 范式）：
+      ① 主源改走 `_em_get_with_retry(hosts=_EM_HOSTS)` —— push2delay + push2 + 12 个数字
+         镜像共 14 host 轮换重试，把瞬时限流挡在函数内；
+      ② 主源全灭 ⇒ 回退新浪国际指数备源（hq.sinajs.cn，中国网络最稳）；
+      ③ 两者皆空才返回全 null（上层仍有 3 次退避 + 「不覆盖既有产物」保护）。"""
     sec_map = [
         ("100.HSI", "恒生指数", "HKD"),
         ("100.N225", "日经225", "JPY"),
@@ -1537,18 +1588,24 @@ def _fetch_overseas_indices():
         ("100.TWII", "台湾加权", "TWD"),
     ]
     by_code = {}
+    # ① 主源：东财（含换 host 重试）
     try:
-        r = _requests.get(
+        d = _em_get_with_retry(
             f"{_EM_DELAY}/api/qt/ulist.np/get",
             params={"fltt": "2", "invt": "2", "ut": "b2884a393a59ad64002292a3e90d46a5",
                     "fields": "f12,f14,f2,f3",
                     "secids": ",".join(s for s, _, _ in sec_map)},
-            headers=_EM_HEADERS, timeout=15)
-        j = r.json()
-        rows = _em_clean_rows((j.get("data", {}) or {}).get("diff") or [])
+            headers=_EM_HEADERS, timeout=15,
+            label="overseas ulist", hosts=_EM_HOSTS)
+        rows = _em_clean_rows((d.get("data", {}) or {}).get("diff") or [])
         by_code = {x.get("f12"): x for x in rows if x.get("f12")}
     except Exception as e:
-        print(f"    ⚠️ 海外指数抓取失败: {e}")
+        print(f"    ⚠️ 海外指数东财源失败（已换 host 重试 5 次）: {e}")
+    # ② 备源：新浪（东财全灭时才用）
+    if not by_code:
+        by_code = _fetch_overseas_sina()
+        if by_code:
+            print(f"    ↩️ 海外指数改用新浪备源（命中 {len(by_code)}/4）")
     results = []
     for secid, name, cur in sec_map:
         code = secid.split(".", 1)[1]

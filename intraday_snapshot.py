@@ -54,13 +54,81 @@ def get_index_chg():
         return 0.0
 
 
+def _load_today_intraday(today):
+    """读当日 intraday 原始档（主文件 → .bak 回退）。非当日/损坏一律返回 None。"""
+    for p in (INTRADAY_PATH, INTRADAY_PATH + ".bak"):
+        if not os.path.exists(p):
+            continue
+        try:
+            ex = json.loads(open(p, encoding="utf-8").read())
+        except Exception:
+            continue
+        if ex.get("date") == today and isinstance(ex.get("snapshots"), list):
+            return ex
+    return None
+
+
+def _write_outputs(data):
+    """原子写 raw_data/sector_fund_flow_intraday.json（+ .bak）与 data/SECTOR_FUND_FLOW_INTRADAY.js。
+    先写临时文件再 rename，避免被取消中途杀掉留下半截 JSON。"""
+    blob = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    tmp = INTRADAY_PATH + ".tmp"
+    open(tmp, "w", encoding="utf-8").write(blob)
+    os.replace(tmp, INTRADAY_PATH)
+    try:
+        open(INTRADAY_PATH + ".bak", "w", encoding="utf-8").write(blob)
+    except Exception:
+        pass
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(DATA_PATH, "w", encoding="utf-8", newline="\n") as f:
+        f.write("window.SECTOR_FUND_FLOW_INTRADAY = " + blob + ";\n")
+
+
+def _purge_after_close(today):
+    """🛡 2026-09-29 一劳永逸（小九）：幂等「盘后离群点」归并。
+
+    根因：原时段守卫上界 16:05 过宽（A股 15:00 收盘）⇒ 15:00 之后的运行（fetch 链
+      workflow_run 触发）把 15:29/15:59/16:03 这些**盘后点**也写进曲线，x 轴出现
+      「非交易时段刻度」（主人 09-29 实拍「快照 15:29 → 16:03 不对」）。
+    修法：把当日 snapshots 中所有 time > "15:00" 的点**归并为一个 "15:00" 收盘点**
+      （取其最后一个盘后点的数值 —— A股 15:00 收盘后 sector_fund_flow 的累计净额本就
+      是收盘口径，语义正确），而非直接删除（直接删会让当日曲线整体变空）。
+    ⚠️ 必须在**时段守卫之前**调用：否则 15:05 后脚本直接 return，永远清不到脏点。
+    幂等：无越界点时不写盘（返回 False）。"""
+    ex = _load_today_intraday(today)
+    if not ex:
+        return False
+    snaps = ex.get("snapshots") or []
+    late = [s for s in snaps if str(s.get("time") or "") > "15:00"]
+    if not late:
+        return False
+    merged = dict(late[-1])
+    merged["time"] = "15:00"
+    snaps = [s for s in snaps if str(s.get("time") or "") <= "15:00"]
+    if any(str(s.get("time") or "") == "15:00" for s in snaps):
+        snaps = [(merged if str(s.get("time") or "") == "15:00" else s) for s in snaps]
+    else:
+        snaps.append(merged)
+    ex["snapshots"] = snaps
+    ex["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")
+    _write_outputs(ex)
+    print("🧹 已归并 %d 个盘后离群点（%s）→ 15:00 收盘点"
+          % (len(late), "/".join(str(s.get("time")) for s in late)))
+    return True
+
+
 def main():
     t = now_cst()
     hhmm = t.strftime("%H:%M")
     today = t.strftime("%Y-%m-%d")
 
-    # 🛡 交易时段守卫：仅 09:25–16:05 写快照，杜绝盘前/盘后离群点污染曲线
-    if not ("09:25" <= hhmm <= "16:05"):
+    # 🛡 自愈①（2026-09-29）：归并盘后离群点 —— 必须放在时段守卫**之前**，
+    #   否则 15:05 后脚本直接 return，已污染的盘后点永远清不掉。
+    _purge_after_close(today)
+
+    # 🛡 交易时段守卫：仅 09:25–15:05 写快照（A股 09:30 开盘 / 15:00 收盘，两端各留 5 分钟余量）。
+    #   2026-09-29 修：上界原为 16:05（过宽）⇒ 15:00 后的运行点（15:29/15:59/16:03）污染曲线。
+    if not ("09:25" <= hhmm <= "15:05"):
         print(f"⏭️ 非交易时段 {hhmm}，跳过板块资金日内快照")
         return 0
 
@@ -108,29 +176,13 @@ def main():
     top_out = [{"name": s["name"], "net": round(float(s.get("net", 0)), 2)}
                for s in so[:5] if s.get("name") not in _NOISE]
 
-    snap = {"time": hhmm, "sectors_in": top_in, "sectors_out": top_out, "index_chg": idx_chg}
+    # 🛡 2026-09-29：收盘归位 —— 15:00 后的运行点统一记作 "15:00"（A股收盘），
+    #   避免 x 轴出现 15:01–15:05 这类非交易刻度；同刻幂等覆盖。
+    _snap_hhmm = "15:00" if hhmm > "15:00" else hhmm
+    snap = {"time": _snap_hhmm, "sectors_in": top_in, "sectors_out": top_out, "index_chg": idx_chg}
 
-    # 读取 / 合并（盘日切换则清空旧数据）
-    data = {"date": today, "snapshots": []}
-    if os.path.exists(INTRADAY_PATH):
-        try:
-            ex = json.loads(open(INTRADAY_PATH, encoding="utf-8").read())
-            if ex.get("date") == today and isinstance(ex.get("snapshots"), list):
-                data = ex
-        except Exception:
-            # 主文件损坏 → 尝试 .bak 恢复，而非静默重置清空（曾致午后丢失）
-            bak = INTRADAY_PATH + ".bak"
-            if os.path.exists(bak):
-                try:
-                    ex = json.loads(open(bak, encoding="utf-8").read())
-                    if ex.get("date") == today and isinstance(ex.get("snapshots"), list):
-                        data = ex
-                        print("↩️ 从 .bak 恢复 intraday（主文件读取损坏）")
-                except Exception:
-                    pass
-    if not isinstance(data.get("snapshots"), list):
-        data["snapshots"] = []
-    data["date"] = today
+    # 读取 / 合并（盘日切换则清空旧数据；主文件损坏自动回退 .bak —— 复用 _load_today_intraday）
+    data = _load_today_intraday(today) or {"date": today, "snapshots": []}
 
     # 🧹 2026-09-02 主人令一劳永逸：自愈清理 —— 剔除当日「口径断裂」的历史快照（幂等，每次运行都收敛）。
     #   判据：某快照的 sectors_in 板块名单与「当日最新一档」零交集 → 两者不是同一口径
@@ -150,11 +202,12 @@ def main():
             if len(_keep) != len(data["snapshots"]):
                 data["snapshots"] = _keep
 
-    # 幂等：同时间快照覆盖而非重复追加（杜绝双机/重试导致的重复快照）
+    # 幂等：按「归位后时刻」覆盖而非重复追加（杜绝双机/重试/盘后归位导致的重复快照，
+    # 尤其 15:01–15:05 多次运行若不按 _snap_hhmm 比对会追加第二个 "15:00" 重影点）
     times = {s.get("time") for s in data["snapshots"]}
-    if hhmm in times:
+    if _snap_hhmm in times:
         for i, s in enumerate(data["snapshots"]):
-            if s.get("time") == hhmm:
+            if s.get("time") == _snap_hhmm:
                 data["snapshots"][i] = snap
                 break
     else:
@@ -168,20 +221,8 @@ def main():
 
     data["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")  # 🛡 每次快照刷新，根治盘中超 4h 假陈旧
 
-    blob = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
-    # 先写临时文件再原子 rename，避免被取消中途杀掉留下半截 JSON
-    tmp = INTRADAY_PATH + ".tmp"
-    open(tmp, "w", encoding="utf-8").write(blob)
-    os.replace(tmp, INTRADAY_PATH)
-    try:
-        open(INTRADAY_PATH + ".bak", "w", encoding="utf-8").write(blob)
-    except Exception:
-        pass
-
-    # 直接生成 data/SECTOR_FUND_FLOW_INTRADAY.js（与 update_v8 同构：window.X = raw）
-    os.makedirs(DATA_DIR, exist_ok=True)
-    with open(DATA_PATH, "w", encoding="utf-8", newline="\n") as f:
-        f.write("window.SECTOR_FUND_FLOW_INTRADAY = " + blob + ";\n")
+    # 原子写 raw_data + data js（复用 _write_outputs：主文件→.bak 回退→.js 一致）
+    _write_outputs(data)
 
     print(f"📈 板块资金日内快照 {hhmm}（{len(top_in)}进{len(top_out)}出, 指数{idx_chg:+.2f}%）→ 已写 raw + data")
     return 0
