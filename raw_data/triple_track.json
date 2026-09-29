@@ -1,9 +1,9 @@
 {
-  "update_time": "2026-09-29 20:22:43",
-  "data_date": "2026-09-29",
-  "track_start": "2026-09-29",
-  "history_days": 33,
-  "strict_count": 4,
+  "update_time": "2026-09-29 21:17:28",
+  "data_date": "2026-09-28",
+  "track_start": "2026-09-28",
+  "history_days": 32,
+  "strict_count": 2,
   "near_count": 0,
   "tracked": [
     {
@@ -12,23 +12,23 @@
       "market": "sz",
       "board": "创业板",
       "status": "strict",
-      "total_score": 34.2,
+      "total_score": 32.3,
       "quality_grade": "A",
       "industry": "医药制造业",
       "sectors": [
         "医药制造业",
         "肝炎概念",
-        "深股通",
         "2026中报预增",
         "减肥药",
-        "创新药",
         "互联医疗",
-        "流感"
+        "创新药",
+        "流感",
+        "深股通"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-22",
-      "hold_days": 6,
-      "consecutive_days": 6,
+      "hold_days": 5,
+      "consecutive_days": 5,
       "first_close": 23.85,
       "current_close": 22.79,
       "pnl_pct": -4.44,
@@ -47,96 +47,26 @@
       "market": "sh",
       "board": "科创板",
       "status": "strict",
-      "total_score": 30.4,
+      "total_score": 26.7,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "沪股通",
-        "基金重仓",
-        "昨日高振幅",
-        "2026中报预增",
         "计算机、通信和其他电子设备制造业",
         "MSCI中国",
+        "2026中报预增",
+        "沪股通",
+        "基金重仓",
+        "百元股",
         "通信技术",
-        "百元股"
+        "昨日高振幅"
       ],
-      "signal_count": 1,
+      "signal_count": 0,
       "enter_date": "2026-09-23",
-      "hold_days": 3,
-      "consecutive_days": 3,
+      "hold_days": 2,
+      "consecutive_days": 2,
       "first_close": 1734.98,
       "current_close": 1638.5,
       "pnl_pct": -5.56,
-      "price_source": "quote",
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "走弱"
-        }
-      ]
-    },
-    {
-      "code": "300857",
-      "name": "协创数据",
-      "market": "sz",
-      "board": "创业板",
-      "status": "strict",
-      "total_score": 27.3,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "AI智能体",
-        "2026一季报预增",
-        "小米概念",
-        "2026中报预增",
-        "计算机、通信和其他电子设备制造业",
-        "MSCI中国",
-        "AI眼镜",
-        "物联网"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 6,
-      "consecutive_days": 1,
-      "first_close": 269.15,
-      "current_close": 246.39,
-      "pnl_pct": -8.46,
-      "price_source": "quote",
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "走弱"
-        }
-      ]
-    },
-    {
-      "code": "300502",
-      "name": "新易盛",
-      "market": "sz",
-      "board": "创业板",
-      "status": "strict",
-      "total_score": 28.6,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "基金重仓",
-        "深股通",
-        "深证100R",
-        "机构重仓",
-        "2026中报预增",
-        "计算机、通信和其他电子设备制造业",
-        "MSCI中国",
-        "百元股"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 8,
-      "consecutive_days": 1,
-      "first_close": 466.68,
-      "current_close": 392.91,
-      "pnl_pct": -15.81,
       "price_source": "quote",
       "catalysts": [
         {
@@ -188,13 +118,13 @@
       "level": "warn",
       "code": "300502",
       "name": "新易盛",
-      "text": "新易盛(300502) 入选以来回撤 -15.8%（2026-08-17 起）"
+      "text": "新易盛(300502) 于 2026-09-25 跌出共识（曾连续 1 日）"
     },
     {
       "level": "warn",
       "code": "300857",
       "name": "协创数据",
-      "text": "协创数据(300857) 入选以来回撤 -8.5%（2026-08-17 起）"
+      "text": "协创数据(300857) 于 2026-09-23 跌出共识（曾连续 2 日）"
     },
     {
       "level": "warn",
@@ -548,7 +478,7 @@
       "level": "good",
       "code": "300199",
       "name": "翰宇药业",
-      "text": "翰宇药业(300199) 连续 6 日稳居严格共识（高质量）"
+      "text": "翰宇药业(300199) 连续 5 日稳居严格共识（高质量）"
     },
     {
       "level": "warn",
@@ -567,56 +497,28 @@
       "code": "000737",
       "name": "",
       "text": "(000737) 于 2026-09-23 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "good",
-      "code": "688498",
-      "name": "源杰科技",
-      "text": "源杰科技(688498) 连续 3 日稳居严格共识（高质量）"
     }
   ],
   "sector_cluster": {
     "by_industry": [
-      {
-        "industry": "计算机、通信和其他电子设备制造业",
-        "count": 3,
-        "names": [
-          "源杰科技",
-          "协创数据",
-          "新易盛"
-        ]
-      },
       {
         "industry": "医药制造业",
         "count": 1,
         "names": [
           "翰宇药业"
         ]
+      },
+      {
+        "industry": "计算机、通信和其他电子设备制造业",
+        "count": 1,
+        "names": [
+          "源杰科技"
+        ]
       }
     ],
     "by_sector": [
       {
         "sector": "2026中报预增",
-        "count": 4
-      },
-      {
-        "sector": "计算机、通信和其他电子设备制造业",
-        "count": 3
-      },
-      {
-        "sector": "MSCI中国",
-        "count": 3
-      },
-      {
-        "sector": "深股通",
-        "count": 2
-      },
-      {
-        "sector": "基金重仓",
-        "count": 2
-      },
-      {
-        "sector": "百元股",
         "count": 2
       },
       {
@@ -632,11 +534,11 @@
         "count": 1
       },
       {
-        "sector": "创新药",
+        "sector": "互联医疗",
         "count": 1
       },
       {
-        "sector": "互联医疗",
+        "sector": "创新药",
         "count": 1
       },
       {
@@ -644,11 +546,27 @@
         "count": 1
       },
       {
+        "sector": "深股通",
+        "count": 1
+      },
+      {
+        "sector": "计算机、通信和其他电子设备制造业",
+        "count": 1
+      },
+      {
+        "sector": "MSCI中国",
+        "count": 1
+      },
+      {
         "sector": "沪股通",
         "count": 1
       },
       {
-        "sector": "昨日高振幅",
+        "sector": "基金重仓",
+        "count": 1
+      },
+      {
+        "sector": "百元股",
         "count": 1
       },
       {
@@ -656,38 +574,14 @@
         "count": 1
       },
       {
-        "sector": "AI智能体",
-        "count": 1
-      },
-      {
-        "sector": "2026一季报预增",
-        "count": 1
-      },
-      {
-        "sector": "小米概念",
-        "count": 1
-      },
-      {
-        "sector": "AI眼镜",
-        "count": 1
-      },
-      {
-        "sector": "物联网",
-        "count": 1
-      },
-      {
-        "sector": "深证100R",
-        "count": 1
-      },
-      {
-        "sector": "机构重仓",
+        "sector": "昨日高振幅",
         "count": 1
       }
     ],
-    "concentration": 75.0
+    "concentration": 50.0
   },
   "overlap": {
-    "total_tracked": 4,
+    "total_tracked": 2,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -696,47 +590,47 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
-    "latest_date": "2026-09-29 19:58:48",
-    "total": 399,
-    "best_hold_days": 10,
+    "latest_date": "2026-09-28 21:27:13",
+    "total": 393,
+    "best_hold_days": 5,
     "periods": {
       "1d": {
-        "win_rate": 37.1,
-        "avg_return": -1.44,
-        "sharpe": -0.29,
-        "count": 375,
+        "win_rate": 37.3,
+        "avg_return": -1.39,
+        "sharpe": -0.27,
+        "count": 357,
         "best": 15.09,
         "worst": -12.95
       },
       "3d": {
-        "win_rate": 39.0,
-        "avg_return": -1.52,
-        "sharpe": -0.23,
-        "count": 351,
+        "win_rate": 39.6,
+        "avg_return": -1.43,
+        "sharpe": -0.22,
+        "count": 346,
         "best": 15.21,
         "worst": -13.43
       },
       "5d": {
-        "win_rate": 42.5,
-        "avg_return": -0.78,
-        "sharpe": -0.1,
-        "count": 341,
+        "win_rate": 44.4,
+        "avg_return": -0.51,
+        "sharpe": -0.06,
+        "count": 324,
         "best": 19.25,
         "worst": -15.32
       },
       "10d": {
         "win_rate": 44.1,
-        "avg_return": -0.6,
+        "avg_return": -0.63,
         "sharpe": -0.07,
-        "count": 313,
+        "count": 306,
         "best": 19.25,
         "worst": -15.32
       },
       "20d": {
-        "win_rate": 36.1,
-        "avg_return": -1.43,
-        "sharpe": -0.15,
-        "count": 263,
+        "win_rate": 38.0,
+        "avg_return": -1.15,
+        "sharpe": -0.11,
+        "count": 250,
         "best": 19.25,
         "worst": -16.53
       }
@@ -745,18 +639,18 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 175,
-      "win_rate_5d": 49.6,
-      "avg_ret_5d": 0.17,
-      "best_win_rate": 52.4,
+      "count": 172,
+      "win_rate_5d": 52.3,
+      "avg_ret_5d": 0.75,
+      "best_win_rate": 55.6,
       "best_hold_days": 30
     },
     {
       "band": "70~80",
-      "count": 224,
-      "win_rate_5d": 37.6,
-      "avg_ret_5d": -1.44,
-      "best_win_rate": 42.7,
+      "count": 221,
+      "win_rate_5d": 39.2,
+      "avg_ret_5d": -1.36,
+      "best_win_rate": 42.9,
       "best_hold_days": 10
     }
   ],
@@ -764,27 +658,27 @@
     "periods": [
       {
         "period": "1d",
-        "strict_win": 37.1,
-        "strict_ret": -1.44,
-        "strict_count": 375,
+        "strict_win": 37.3,
+        "strict_ret": -1.39,
+        "strict_count": 357,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "3d",
-        "strict_win": 39.0,
-        "strict_ret": -1.52,
-        "strict_count": 351,
+        "strict_win": 39.6,
+        "strict_ret": -1.43,
+        "strict_count": 346,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "5d",
-        "strict_win": 42.5,
-        "strict_ret": -0.78,
-        "strict_count": 341,
+        "strict_win": 44.4,
+        "strict_ret": -0.51,
+        "strict_count": 324,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -792,17 +686,17 @@
       {
         "period": "10d",
         "strict_win": 44.1,
-        "strict_ret": -0.6,
-        "strict_count": 313,
+        "strict_ret": -0.63,
+        "strict_count": 306,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "20d",
-        "strict_win": 36.1,
-        "strict_ret": -1.43,
-        "strict_count": 263,
+        "strict_win": 38.0,
+        "strict_ret": -1.15,
+        "strict_count": 250,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -811,8 +705,8 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-09-29",
-    "history_days": 33,
+    "track_start": "2026-09-28",
+    "history_days": 32,
     "summary": {
       "1d": {
         "count": 50,
@@ -825,19 +719,19 @@
         "avg_return": -0.49
       },
       "5d": {
-        "count": 34,
-        "win_rate": 35.29,
-        "avg_return": -0.25
+        "count": 31,
+        "win_rate": 38.71,
+        "avg_return": 0.11
       },
       "10d": {
-        "count": 29,
-        "win_rate": 37.93,
-        "avg_return": -0.55
+        "count": 28,
+        "win_rate": 35.71,
+        "avg_return": -0.69
       },
       "20d": {
-        "count": 13,
-        "win_rate": 15.38,
-        "avg_return": -6.16
+        "count": 12,
+        "win_rate": 16.67,
+        "avg_return": -6.52
       }
     },
     "per_stock": [
@@ -1123,8 +1017,7 @@
         "offsets": {
           "1d": -0.59,
           "5d": 1.26,
-          "10d": -0.15,
-          "20d": -1.78
+          "10d": -0.15
         }
       },
       {
@@ -1349,8 +1242,7 @@
         "offsets": {
           "1d": 3.65,
           "3d": 3.65,
-          "5d": 11.99,
-          "10d": 3.51
+          "5d": 11.99
         }
       },
       {
@@ -1409,8 +1301,7 @@
         "enter_date": "2026-09-22",
         "offsets": {
           "1d": 1.84,
-          "3d": -2.31,
-          "5d": -4.44
+          "3d": -2.31
         }
       },
       {
@@ -1419,8 +1310,7 @@
         "enter_date": "2026-09-22",
         "offsets": {
           "1d": -1.68,
-          "3d": -1.42,
-          "5d": -2.27
+          "3d": -1.42
         }
       },
       {
@@ -1429,8 +1319,7 @@
         "enter_date": "2026-09-22",
         "offsets": {
           "1d": 4.26,
-          "3d": -0.36,
-          "5d": -4.96
+          "3d": -0.36
         }
       },
       {
