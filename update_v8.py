@@ -760,7 +760,28 @@ def _write_js(var_name, obj):
         2026-08-27 一劳永逸修复：TRIPLE_HISTORY 等带 _meta 的数据，
         算法跟踪只更新 _meta.last_update 而忘同步顶层 update_time → HEALTH_CHECK 读到陈旧值报 fail。
         此处增加 _meta.last_update 作为第二优先源，取较新者。
+
+        🛡 2026-09-29 小九（v8_build_deploy 连环红根治）：心跳/回测类 raw 顶层只有
+        last_time（hb_xiaojiu/hb_alimi 心跳时间）/ generated（ima_strong_backtest 生成时间）
+        ——原判据只认 update_time/calc_time ⇒ 这类文件 existing 与 obj_had_ts 恒空
+        ⇒ 恒走 _existing_file_ts 兜底 ⇒ data 的 update_time **永冻在首次构建时刻**
+        （实测三文件停在 2026-09-25 21:21~21:31，而 raw 语义时间每轮新鲜且被 cn fetch
+        正常重建/提交——republish_time 活的、update_time 死的）。冻结值被
+        v8_verify_layer_parity 判「data 层陈旧>3 天」→ 09-29 01:49 CST 起 build_deploy
+        连续 failure 50+ 条、盘后部署全灭，且每轮重建无法自愈（冻结值自我复制=死锁）。
+        修法：语义时间源扩展 +last_time +generated（影响面仅此 3 个 raw，其余文件
+        有 update_time/calc_time 先短路，行为不变）；源语义时间优先于旧值兜底。
         """
+        # 源数据自带语义时间戳（含心跳/回测类专字段），优先级最高
+        _src_ts = ""
+        if isinstance(obj, dict):
+            for _k in ("update_time", "calc_time", "last_time", "generated"):
+                _v = obj.get(_k)
+                if _v:
+                    _src_ts = str(_v)
+                    break
+        if _src_ts and (not existing or _src_ts > existing):
+            return _src_ts
         if existing:
             # 有 _meta.last_update 且比 existing 更新？→ 用它（消除顶层/子级时间不同步）
             if obj and isinstance(obj, dict):

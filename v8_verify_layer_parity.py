@@ -29,7 +29,11 @@ RAW_DIR = ROOT / "raw_data"
 DATA_DIR = ROOT / "data"
 
 # 按优先级取最可靠的日期字段
-DATE_KEYS = ("update_time", "calc_time", "gen_time", "run_time", "date", "data_date")
+# 🛡 2026-09-29 小九：补 last_time（hb_xiaojiu/hb_alimi 心跳 raw）/ generated（ima_strong_backtest
+#   回测 raw）——原清单不含它们 → 这三个 raw 被判「无日期字段无法核验」→ data 层被
+#   _write_js 旧值兜底冻住的 update_time（09-25）判「陈旧>3 天」→ 部署被误阻断。
+#   h_auto_buy_history/weekend_run 虽也有 generated，但其顶层 update_time 优先命中，零影响。
+DATE_KEYS = ("update_time", "calc_time", "gen_time", "run_time", "date", "data_date", "last_time", "generated")
 
 # 🛡 2026-08-29：raw 无日期字段时，data 层超过此天数即判为陈旧静默上线
 STALE_DAYS = 3
