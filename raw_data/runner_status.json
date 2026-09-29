@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-29 14:12:39",
+  "update_time": "2026-09-29 14:15:57",
   "status": "warn",
   "process": {
     "ok": true,
@@ -28,10 +28,10 @@
     "latest_run_id": 36526788652,
     "latest_failed": false,
     "latest_status": "in_progress",
-    "stuck_min": 38,
+    "stuck_min": 41,
     "is_fail": false,
     "is_warn": true,
-    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 盘后算法链(cn) in_progress (已卡住 38 分)"
+    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 盘后算法链(cn) in_progress (已卡住 41 分)"
   },
   "runner_env": {
     "ok": true,
@@ -39,7 +39,7 @@
     "message": "阈值=2000（一劳永逸目标 2000）"
   },
   "actions_taken": [],
-  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 盘后算法链(cn) in_progress (已卡住 38 分)",
+  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 盘后算法链(cn) in_progress (已卡住 41 分)",
   "run_time": "2026-09-29 14:11:40",
   "category": "intraday",
   "hostname": "",
