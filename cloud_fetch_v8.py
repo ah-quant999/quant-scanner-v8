@@ -2086,11 +2086,25 @@ def f_sector_fund_flow():
     # 2026-08-05 修复：必须同时查降序(流入TOP)与升序(流出TOP)，否则 po='1' 只返回
     # 净流入条目，sectors_out 恒为空，导致“净额(行业)”只加不减、数字虚高。
     items = []
+    # 🔴 2026-09-29 一劳永逸（小九）：单腿空结果 ≠ 真没有 —— 板块列表恒非空（概念约500个/行业100+），
+    #   东财过载时 clist 返回 rc=0 + data:null ⇒ em_clist 判「成功」返回 [] ⇒ 该腿静默归零。
+    #   当日实证（data/SECTOR_FUND_FLOW.js 提交史）：14:03 概念0·行业200 / 14:08 概念182·行业0 /
+    #   15:00 起 post_close 四连败概念0 ⇒ 收盘后最后快照概念恒空 ⇒ 主题空间卡全 0.0亿（观感死卡）。
+    #   修法：每腿空结果时换请求重试（最多3次，间隔0.8s）；若概念腿最终仍空而行业腿成功，
+    #   且当日早前 raw 里已有概念数据（同一交易日、口径同源），则沿用之并打 concept_fallback 标记
+    #   （宁用当日早前真值，不留全 0 假象）。
+    _LEG_ATTEMPTS = 3
     for stype, fs in [("行业", "m:90 t:2"), ("概念", "m:90 t:3")]:
         # 降序取流入、升序取流出，合并去重（同名同类型以绝对值大者为准）
         by_key = {}
         for po in ("1", "0"):
-            rows = em_clist(fs, "f12,f14,f3,f62,f184", fid="f62", stat="1", pz=200, po=po)
+            rows = []
+            for _att in range(_LEG_ATTEMPTS):
+                rows = em_clist(fs, "f12,f14,f3,f62,f184", fid="f62", stat="1", pz=200, po=po)
+                if rows:
+                    break
+                if _att < _LEG_ATTEMPTS - 1:
+                    time.sleep(0.8)  # 换请求重试（em_clist 内部已换 host，这里解决 data:null 直通）
             for r in rows:
                 name = r.get("f14")
                 net = _to_yi(r.get("f62"))
@@ -2105,6 +2119,24 @@ def f_sector_fund_flow():
                         "chg": round(float(r.get("f3") or 0), 2),
                     }
         items.extend(by_key.values())
+    # ── 概念腿兜底（2026-09-29）：概念腿全败时沿用当日早前 raw 档的概念数据 ──
+    _concept_fallback = False
+    if items and not any(x.get("type") == "概念" for x in items):
+        try:
+            _old_p = RAW_DIR / "sector_fund_flow.json"
+            if _old_p.exists():
+                _old = json.loads(_old_p.read_text(encoding="utf-8"))
+                _old_day = (_old.get("update_time") or "")[:10]
+                if _old_day == now_cst().strftime("%Y-%m-%d"):
+                    _old_cpts = [x for x in (_old.get("top_list") or [])
+                                 if x.get("type") == "概念" and x.get("name")]
+                    if _old_cpts:
+                        items.extend(_old_cpts)
+                        _concept_fallback = True
+                        print(f"  🛟 概念腿换请求重试{_LEG_ATTEMPTS}次仍空，沿用当日 {_old_day} 早前档 "
+                              f"{len(_old_cpts)} 个概念板块（真值兜底，非编造）")
+        except Exception as _se:
+            print(f"  ⚠️ 概念兜底读取失败（不影响主数据）: {_se}")
     if not items:
         return None
 
@@ -2155,6 +2187,7 @@ def f_sector_fund_flow():
         "sectors_out": sectors_out,
         "top_list": items,
         "note": "行业+概念主力净流入(亿)，来源东方财富push2delay（升序+降序合并）",
+        "concept_fallback": _concept_fallback,  # 2026-09-29：true=概念为当日早前档兜底（概念腿全败）
         "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
     }
 
@@ -3189,30 +3222,20 @@ def f_w52_high():
     #   修法：与其余 push2delay 模块统一口径——带退避重试（0.5/1.5s），重试后仍失败则
     #     **return None**（run() 记 empty，不阻断整链），并打印真因便于追因。语义与
     #     f_index_quotes / f_sector_fund_flow 等一致：单源抖动绝不打挂整轮抓取。
+    # 🔴 2026-09-29 一劳永逸（小九）：上面这版自带「同 host 3 连重试」—— 09-24 对照实验已实证
+    #   「换 host 才是解药，同 host 空等≈无效」，本函数是全仓最后一处漏网的裸调单 host 重试。
+    #   当日实证：15:00/15:13/15:33/15:49 四轮 post_close 后 raw_data/w52_high.json 停在 14:46，
+    #   data/SECTOR_FUND_FLOW 同轮正常 ⇒ 纯单 host 重试缺陷，非接口下线。
+    #   统一改走 _em_get_with_retry(hosts=_EM_HOSTS)，失败 return None（run() 记 empty，不阻断整链）。
     params = {"pn": "1", "pz": "500", "po": "1", "np": "1", "fltt": "2", "invt": "2",
               "ut": "b2884a393a59ad64002292a3e90d46a5", "fid": "f3",
-              "fs": "b:BK0501", "fields": "f12,f14,f2,f3", "_": 1}
-    r = None
-    _last_err = None
-    for _att in range(3):
-        try:
-            _resp = _requests.get(f"{_EM_DELAY}/api/qt/clist/get", params=params,
-                                  headers=_EM_HEADERS, timeout=15)
-            _txt = _resp.text or ""
-            if not _txt.lstrip().startswith(("{", "[")):
-                raise ValueError(f"非 JSON 响应（{len(_txt)}B，前 80 字：{_txt[:80]!r}）")
-            r = json.loads(_txt)
-            break
-        except Exception as _e:  # noqa: BLE001
-            _last_err = _e
-            r = None
-            if _att < 2:
-                _dly = (0.5, 1.5)[_att]
-                print(f"  ⚠️ W52_HIGH 抖动 尝试{_att + 1}/3: {type(_e).__name__}: {_e} → {_dly}s 后重试")
-                time.sleep(_dly)
-    if r is None:
-        print(f"  ⚠️ W52_HIGH 重试 3 次仍失败，本轮跳过（empty，不阻断整链）: "
-              f"{type(_last_err).__name__}: {_last_err}")
+              "fs": "b:BK0501", "fields": "f12,f14,f2,f3", "_": int(time.time() * 1000)}
+    try:
+        r = _em_get_with_retry(f"{_EM_DELAY}/api/qt/clist/get", params=params,
+                               headers=_EM_HEADERS, timeout=15,
+                               label="w52_high BK0501", hosts=_EM_HOSTS)
+    except RuntimeError as _e:
+        print(f"  ⚠️ W52_HIGH 换host重试5次仍失败，本轮跳过（empty，不阻断整链）: {_e}")
         return None
     data = r.get("data") or {}
     rows = _em_clean_rows(data.get("diff") or [])

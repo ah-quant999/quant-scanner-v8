@@ -42,6 +42,12 @@ CST = timezone(timedelta(hours=8))
 ET = ZoneInfo("America/New_York")  # 隔夜交易日必须按美东判，勿用 CST（会多算一天）
 
 EM_DELAY = "https://push2delay.eastmoney.com"
+# 🔴 2026-09-29 一劳永逸（小九）：换 host 重试 —— 09-24 对照实验已实证「东财 clist 单 host 单次
+#   成功率仅 ~6-10%、换 host 才是解药，同 host 空等≈无效」（见 cloud_fetch_v8._EM_HOSTS 注释）。
+#   当日实证：09-24 07:07 / 09-28 09:33 两轮 premarket 大盘锚(100.SPX/NDX/DJIA)全空、
+#   而**同函数同轮** ADR/ETF 报价可得 ⇒ 单 host 3 连重试缺陷；本表与 cloud_fetch_v8 同源同语义。
+EM_HOSTS = (EM_DELAY, "https://push2.eastmoney.com") + tuple(
+    "https://%d.push2.eastmoney.com" % _i for _i in range(1, 13))
 EM_UT = "b2884a393a59ad64002292a3e90d46a5"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0 Safari/537.36")
@@ -172,10 +178,16 @@ def _f(v):
 
 
 def _em(batch, fields=EM_FIELDS, timeout=20, retries=3):
-    """东财 push2delay ulist.np 批量点名。返回行列表（失败返回 []）。"""
+    """东财 ulist.np 批量点名（🔴 2026-09-29 改换 host 重试，见 EM_HOSTS 注释）。返回行列表（失败返回 []）。
+
+    ⚠️ 只对「请求异常/非 JSON」换 host 重试；**空 diff 不重试** —— resolve() 的多前缀探测
+       大量批次合法地为空，按空重试会把探测耗时放大 3 倍。空 diff 场景由调用方自判
+       （锚点等「必非空」调用各自带重试+兜底）。"""
+    last_err = None
     for i in range(retries):
+        host = EM_HOSTS[i % len(EM_HOSTS)]
         try:
-            r = requests.get(EM_DELAY + "/api/qt/ulist.np/get",
+            r = requests.get(host + "/api/qt/ulist.np/get",
                              params={"fltt": "2", "invt": "2", "ut": EM_UT,
                                      "fields": fields, "secids": ",".join(batch)},
                              headers=EM_HEADERS, timeout=timeout)
@@ -183,9 +195,11 @@ def _em(batch, fields=EM_FIELDS, timeout=20, retries=3):
             if isinstance(d, dict):
                 d = list(d.values())
             return d or []
-        except Exception:  # noqa: BLE001
+        except Exception as e:  # noqa: BLE001
+            last_err = e
             if i < retries - 1:
                 time.sleep(0.8)
+    print(f"   [us_hk_map] ⚠️ ulist 点名失败（换host {retries} 次）: {type(last_err).__name__}: {last_err}")
     return []
 
 
@@ -400,18 +414,49 @@ def build():
         })
 
     # ── 4) 隔夜大盘锚（显式 secid，见 US_ANCHORS 注释）─────────────────────
+    # 🔴 2026-09-29 一劳永逸（小九）：锚点 secid（100.SPX/NDX/DJIA）**必非空**，空=瞬时故障。
+    #   东财 3 次换 host 仍空 ⇒ 腾讯行情源兜底（qt.gtimg.cn 实测 CN 直连可用：
+    #   usINX=标普500/.INX、usNDX=纳斯达克100/.NDX、usDJI=道琼斯/.DJI，字段[3]=价 [32]=涨跌%）。
+    #   兜底值带 note 标注来源，绝不编造；两源都空才记「该指数点位未取到」。
+    def _tx_anchor(tx_code):
+        try:
+            t = requests.get("https://qt.gtimg.cn/q=" + tx_code,
+                             headers=TX_HEADERS, timeout=10).text
+            seg = t.split('"')[1] if '"' in t else ""
+            p = seg.split("~") if seg else []
+            if len(p) > 32 and p[3] not in ("", "0.000"):
+                return {"price": float(p[3]), "pct": float(p[32]), "em_name": p[1],
+                        "note": "东财锚缺失，腾讯行情源兜底（" + (p[30] or "") + "）"}
+        except Exception as _te:
+            print(f"   [us_hk_map] ⚠️ 腾讯锚兜底失败 {tx_code}: {type(_te).__name__}: {_te}")
+        return None
+
     anchors = []
     for secid, code, label in US_ANCHORS:
-        rows = _em([secid])
-        row = rows[0] if rows else None
-        if row and str(row.get("f14") or "").strip() not in ("", "-"):
+        row = None
+        for _att in range(3):  # 锚点必非空 ⇒ 空结果也重试（换 host 由 _em 内部轮转）
+            rows = _em([secid])
+            row = rows[0] if rows else None
+            if row and str(row.get("f14") or "").strip() not in ("", "-"):
+                break
+            row = None
+            if _att < 2:
+                time.sleep(0.5)
+        if row:
             anchors.append({"code": code, "name": label,
                             "em_name": str(row.get("f14") or ""),
                             "price": _f(row.get("f2")), "pct": _f(row.get("f3"))})
         else:
-            anchors.append({"code": code, "name": label, "em_name": None,
-                            "price": None, "pct": None,
-                            "note": "该指数点位未取到，不编造"})
+            _tx = _tx_anchor({"SPX": "usINX", "NDX": "usNDX", "DJIA": "usDJI"}.get(code, ""))
+            if _tx:
+                anchors.append({"code": code, "name": label,
+                                "em_name": _tx["em_name"],
+                                "price": _tx["price"], "pct": _tx["pct"],
+                                "note": _tx["note"]})
+            else:
+                anchors.append({"code": code, "name": label, "em_name": None,
+                                "price": None, "pct": None,
+                                "note": "该指数点位未取到，不编造"})
     ups = sum(1 for a in anchors if (a.get("pct") or 0) > 0)
     downs = sum(1 for a in anchors if (a.get("pct") or 0) < 0)
     if all(a.get("pct") is None for a in anchors):
