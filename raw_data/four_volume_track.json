@@ -1,9 +1,9 @@
 {
-  "update_time": "2026-09-29 20:22:53",
+  "update_time": "2026-09-30 02:01:04",
   "data_date": "2026-09-29",
   "track_start": "2026-09-14",
   "history_days": 11,
-  "price_days": 11,
+  "price_days": 12,
   "signal_count": 3,
   "tracked_total": 76,
   "active_count": 3,
@@ -149,10 +149,11 @@
       "price_source": "quote",
       "offsets": {
         "1d": -2.22,
-        "3d": 7.55
+        "3d": 7.55,
+        "5d": 11.04
       },
-      "best_n": 3,
-      "best_pct": 7.55,
+      "best_n": 5,
+      "best_pct": 11.04,
       "qd": null,
       "yzc": null,
       "jg": null,
@@ -469,9 +470,11 @@
       "current_close": 33.76,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -513,9 +516,11 @@
       "current_close": 9.0,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -557,9 +562,11 @@
       "current_close": 93.99,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -1002,7 +1009,8 @@
       "offsets": {
         "1d": 2.13,
         "3d": 6.81,
-        "5d": 7.47
+        "5d": 7.47,
+        "10d": -3.36
       },
       "best_n": 5,
       "best_pct": 7.47,
@@ -1555,7 +1563,8 @@
       "offsets": {
         "1d": 1.93,
         "3d": 5.0,
-        "5d": -0.91
+        "5d": -0.91,
+        "10d": -6.42
       },
       "best_n": 3,
       "best_pct": 5.0,
@@ -1635,7 +1644,8 @@
       "offsets": {
         "1d": -2.1,
         "3d": 0.6,
-        "5d": 1.22
+        "5d": 1.22,
+        "10d": -6.83
       },
       "best_n": 5,
       "best_pct": 1.22,
@@ -1990,7 +2000,8 @@
       "offsets": {
         "1d": -2.63,
         "3d": 2.79,
-        "5d": 2.21
+        "5d": 2.21,
+        "10d": -8.29
       },
       "best_n": 3,
       "best_pct": 2.79,
@@ -2431,7 +2442,8 @@
       "offsets": {
         "1d": -3.14,
         "3d": -0.22,
-        "5d": 0.0
+        "5d": 0.0,
+        "10d": -11.03
       },
       "best_n": 5,
       "best_pct": 0.0,
@@ -2550,7 +2562,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -6.19,
-        "3d": -8.96
+        "3d": -8.96,
+        "5d": -11.57
       },
       "best_n": 1,
       "best_pct": -6.19,
@@ -2669,7 +2682,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -4.68,
-        "3d": -12.67
+        "3d": -12.67,
+        "5d": -12.33
       },
       "best_n": 1,
       "best_pct": -4.68,
@@ -2830,7 +2844,8 @@
       "offsets": {
         "1d": -2.65,
         "3d": -1.16,
-        "5d": -0.6
+        "5d": -0.6,
+        "10d": -13.02
       },
       "best_n": 5,
       "best_pct": -0.6,
@@ -2903,7 +2918,8 @@
       "offsets": {
         "1d": -1.62,
         "3d": -2.81,
-        "5d": -5.95
+        "5d": -5.95,
+        "10d": -15.37
       },
       "best_n": 1,
       "best_pct": -1.62,
@@ -3601,7 +3617,7 @@
     "note": "四量信号自上线起逐日累积真实收盘价前向样本（基准=入选日收盘，T+N 按真实交易日推进，不含未来函数）。样本随持有天数成熟而增加；长档（75/90/180/250）见上方「回测 N 日胜率」的信号层回测。",
     "track_start": "2026-09-14",
     "history_days": 11,
-    "price_days": 11,
+    "price_days": 12,
     "horizons": [
       "1d",
       "3d",
@@ -3620,8 +3636,8 @@
     ],
     "summary": {
       "1d": {
-        "count": 73,
-        "win_rate": 42.47,
+        "count": 76,
+        "win_rate": 40.79,
         "avg_return": -0.07
       },
       "3d": {
@@ -3630,14 +3646,14 @@
         "avg_return": 0.48
       },
       "5d": {
-        "count": 67,
-        "win_rate": 31.34,
-        "avg_return": -1.17
+        "count": 70,
+        "win_rate": 31.43,
+        "avg_return": -1.31
       },
       "10d": {
-        "count": 9,
-        "win_rate": 33.33,
-        "avg_return": -4.89
+        "count": 16,
+        "win_rate": 18.75,
+        "avg_return": -6.77
       },
       "20d": {
         "count": 0,
@@ -3661,6 +3677,36 @@
       }
     },
     "per_stock": [
+      {
+        "code": "300450",
+        "name": "先导智能",
+        "enter_date": "2026-09-29",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
+      {
+        "code": "688469",
+        "name": "芯联集成",
+        "enter_date": "2026-09-29",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
+      {
+        "code": "301550",
+        "name": "斯菱智驱",
+        "enter_date": "2026-09-29",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
       {
         "code": "600206",
         "name": "有研新材",
@@ -3725,10 +3771,11 @@
         "enter_date": "2026-09-23",
         "offsets": {
           "1d": -2.22,
-          "3d": 7.55
+          "3d": 7.55,
+          "5d": 11.04
         },
-        "best_n": 3,
-        "best_pct": 7.55
+        "best_n": 5,
+        "best_pct": 11.04
       },
       {
         "code": "688131",
@@ -3736,7 +3783,8 @@
         "enter_date": "2026-09-23",
         "offsets": {
           "1d": -6.19,
-          "3d": -8.96
+          "3d": -8.96,
+          "5d": -11.57
         },
         "best_n": 1,
         "best_pct": -6.19
@@ -3747,7 +3795,8 @@
         "enter_date": "2026-09-23",
         "offsets": {
           "1d": -4.68,
-          "3d": -12.67
+          "3d": -12.67,
+          "5d": -12.33
         },
         "best_n": 1,
         "best_pct": -4.68
@@ -4372,7 +4421,8 @@
         "offsets": {
           "1d": -2.1,
           "3d": 0.6,
-          "5d": 1.22
+          "5d": 1.22,
+          "10d": -6.83
         },
         "best_n": 5,
         "best_pct": 1.22
@@ -4384,7 +4434,8 @@
         "offsets": {
           "1d": -1.62,
           "3d": -2.81,
-          "5d": -5.95
+          "5d": -5.95,
+          "10d": -15.37
         },
         "best_n": 1,
         "best_pct": -1.62
@@ -4396,7 +4447,8 @@
         "offsets": {
           "1d": -2.65,
           "3d": -1.16,
-          "5d": -0.6
+          "5d": -0.6,
+          "10d": -13.02
         },
         "best_n": 5,
         "best_pct": -0.6
@@ -4408,7 +4460,8 @@
         "offsets": {
           "1d": 2.13,
           "3d": 6.81,
-          "5d": 7.47
+          "5d": 7.47,
+          "10d": -3.36
         },
         "best_n": 5,
         "best_pct": 7.47
@@ -4420,7 +4473,8 @@
         "offsets": {
           "1d": 1.93,
           "3d": 5.0,
-          "5d": -0.91
+          "5d": -0.91,
+          "10d": -6.42
         },
         "best_n": 3,
         "best_pct": 5.0
@@ -4432,7 +4486,8 @@
         "offsets": {
           "1d": -3.14,
           "3d": -0.22,
-          "5d": 0.0
+          "5d": 0.0,
+          "10d": -11.03
         },
         "best_n": 5,
         "best_pct": 0.0
@@ -4444,7 +4499,8 @@
         "offsets": {
           "1d": -2.63,
           "3d": 2.79,
-          "5d": 2.21
+          "5d": 2.21,
+          "10d": -8.29
         },
         "best_n": 3,
         "best_pct": 2.79
