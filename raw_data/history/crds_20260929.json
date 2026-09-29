@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-29 18:41:00",
+  "update_time": "2026-09-29 19:42:32",
   "data_time": "2026-09-29 15:30:00",
   "total_scanned": 501,
   "scan_stats": {
@@ -7,8 +7,8 @@
     "succeeded": 501,
     "failed": 3,
     "kline_source_used": "腾讯gtimg(主源 505/501 只)",
-    "elapsed_sec": 171.6,
-    "throughput_per_sec": 2.9,
+    "elapsed_sec": 219.3,
+    "throughput_per_sec": 2.3,
     "cache_fresh": 0,
     "cache_miss": 9,
     "cache_stale": 495,
@@ -3895,21 +3895,6 @@
       "market_label": "sz",
       "board_label": "主板"
     },
-    "300438": {
-      "name": "鹏辉能源",
-      "score": 0,
-      "conds": 0,
-      "cond1": false,
-      "cond2": false,
-      "cond3": false,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.11,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
     "300979": {
       "name": "300979",
       "score": 0,
@@ -5901,6 +5886,21 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.69,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
+    "300438": {
+      "name": "鹏辉能源",
+      "score": 0,
+      "conds": 0,
+      "cond1": false,
+      "cond2": false,
+      "cond3": false,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.11,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"

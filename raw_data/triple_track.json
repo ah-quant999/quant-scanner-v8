@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-29 18:48:58",
+  "update_time": "2026-09-29 20:22:43",
   "data_date": "2026-09-29",
   "track_start": "2026-09-29",
   "history_days": 33,
@@ -16,14 +16,14 @@
       "quality_grade": "A",
       "industry": "医药制造业",
       "sectors": [
-        "互联医疗",
-        "减肥药",
-        "流感",
         "医药制造业",
+        "肝炎概念",
         "深股通",
         "2026中报预增",
-        "肝炎概念",
-        "创新药"
+        "减肥药",
+        "创新药",
+        "互联医疗",
+        "流感"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-22",
@@ -47,18 +47,18 @@
       "market": "sh",
       "board": "科创板",
       "status": "strict",
-      "total_score": 28.6,
+      "total_score": 30.4,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "昨日高振幅",
-        "通信技术",
+        "沪股通",
         "基金重仓",
-        "百元股",
-        "MSCI中国",
-        "计算机、通信和其他电子设备制造业",
+        "昨日高振幅",
         "2026中报预增",
-        "沪股通"
+        "计算机、通信和其他电子设备制造业",
+        "MSCI中国",
+        "通信技术",
+        "百元股"
       ],
       "signal_count": 1,
       "enter_date": "2026-09-23",
@@ -82,18 +82,18 @@
       "market": "sz",
       "board": "创业板",
       "status": "strict",
-      "total_score": 25.5,
+      "total_score": 27.3,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "小米概念",
-        "2026一季报预增",
         "AI智能体",
-        "MSCI中国",
-        "物联网",
-        "AI眼镜",
+        "2026一季报预增",
+        "小米概念",
+        "2026中报预增",
         "计算机、通信和其他电子设备制造业",
-        "2026中报预增"
+        "MSCI中国",
+        "AI眼镜",
+        "物联网"
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
@@ -117,18 +117,18 @@
       "market": "sz",
       "board": "创业板",
       "status": "strict",
-      "total_score": 29.8,
+      "total_score": 28.6,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
         "基金重仓",
-        "百元股",
-        "MSCI中国",
-        "深证100R",
-        "计算机、通信和其他电子设备制造业",
-        "2026中报预增",
         "深股通",
-        "机构重仓"
+        "深证100R",
+        "机构重仓",
+        "2026中报预增",
+        "计算机、通信和其他电子设备制造业",
+        "MSCI中国",
+        "百元股"
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
@@ -600,11 +600,11 @@
         "count": 4
       },
       {
-        "sector": "MSCI中国",
+        "sector": "计算机、通信和其他电子设备制造业",
         "count": 3
       },
       {
-        "sector": "计算机、通信和其他电子设备制造业",
+        "sector": "MSCI中国",
         "count": 3
       },
       {
@@ -620,18 +620,6 @@
         "count": 2
       },
       {
-        "sector": "互联医疗",
-        "count": 1
-      },
-      {
-        "sector": "减肥药",
-        "count": 1
-      },
-      {
-        "sector": "流感",
-        "count": 1
-      },
-      {
         "sector": "医药制造业",
         "count": 1
       },
@@ -640,7 +628,23 @@
         "count": 1
       },
       {
+        "sector": "减肥药",
+        "count": 1
+      },
+      {
         "sector": "创新药",
+        "count": 1
+      },
+      {
+        "sector": "互联医疗",
+        "count": 1
+      },
+      {
+        "sector": "流感",
+        "count": 1
+      },
+      {
+        "sector": "沪股通",
         "count": 1
       },
       {
@@ -652,11 +656,7 @@
         "count": 1
       },
       {
-        "sector": "沪股通",
-        "count": 1
-      },
-      {
-        "sector": "小米概念",
+        "sector": "AI智能体",
         "count": 1
       },
       {
@@ -664,15 +664,15 @@
         "count": 1
       },
       {
-        "sector": "AI智能体",
-        "count": 1
-      },
-      {
-        "sector": "物联网",
+        "sector": "小米概念",
         "count": 1
       },
       {
         "sector": "AI眼镜",
+        "count": 1
+      },
+      {
+        "sector": "物联网",
         "count": 1
       },
       {
@@ -696,47 +696,47 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
-    "latest_date": "2026-09-28 21:27:13",
-    "total": 393,
-    "best_hold_days": 5,
+    "latest_date": "2026-09-29 19:58:48",
+    "total": 399,
+    "best_hold_days": 10,
     "periods": {
       "1d": {
-        "win_rate": 37.3,
-        "avg_return": -1.39,
-        "sharpe": -0.27,
-        "count": 357,
+        "win_rate": 37.1,
+        "avg_return": -1.44,
+        "sharpe": -0.29,
+        "count": 375,
         "best": 15.09,
         "worst": -12.95
       },
       "3d": {
-        "win_rate": 39.6,
-        "avg_return": -1.43,
-        "sharpe": -0.22,
-        "count": 346,
+        "win_rate": 39.0,
+        "avg_return": -1.52,
+        "sharpe": -0.23,
+        "count": 351,
         "best": 15.21,
         "worst": -13.43
       },
       "5d": {
-        "win_rate": 44.4,
-        "avg_return": -0.51,
-        "sharpe": -0.06,
-        "count": 324,
+        "win_rate": 42.5,
+        "avg_return": -0.78,
+        "sharpe": -0.1,
+        "count": 341,
         "best": 19.25,
         "worst": -15.32
       },
       "10d": {
         "win_rate": 44.1,
-        "avg_return": -0.63,
+        "avg_return": -0.6,
         "sharpe": -0.07,
-        "count": 306,
+        "count": 313,
         "best": 19.25,
         "worst": -15.32
       },
       "20d": {
-        "win_rate": 38.0,
-        "avg_return": -1.15,
-        "sharpe": -0.11,
-        "count": 250,
+        "win_rate": 36.1,
+        "avg_return": -1.43,
+        "sharpe": -0.15,
+        "count": 263,
         "best": 19.25,
         "worst": -16.53
       }
@@ -745,18 +745,18 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 172,
-      "win_rate_5d": 52.3,
-      "avg_ret_5d": 0.75,
-      "best_win_rate": 55.6,
+      "count": 175,
+      "win_rate_5d": 49.6,
+      "avg_ret_5d": 0.17,
+      "best_win_rate": 52.4,
       "best_hold_days": 30
     },
     {
       "band": "70~80",
-      "count": 221,
-      "win_rate_5d": 39.2,
-      "avg_ret_5d": -1.36,
-      "best_win_rate": 42.9,
+      "count": 224,
+      "win_rate_5d": 37.6,
+      "avg_ret_5d": -1.44,
+      "best_win_rate": 42.7,
       "best_hold_days": 10
     }
   ],
@@ -764,27 +764,27 @@
     "periods": [
       {
         "period": "1d",
-        "strict_win": 37.3,
-        "strict_ret": -1.39,
-        "strict_count": 357,
+        "strict_win": 37.1,
+        "strict_ret": -1.44,
+        "strict_count": 375,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "3d",
-        "strict_win": 39.6,
-        "strict_ret": -1.43,
-        "strict_count": 346,
+        "strict_win": 39.0,
+        "strict_ret": -1.52,
+        "strict_count": 351,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "5d",
-        "strict_win": 44.4,
-        "strict_ret": -0.51,
-        "strict_count": 324,
+        "strict_win": 42.5,
+        "strict_ret": -0.78,
+        "strict_count": 341,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -792,17 +792,17 @@
       {
         "period": "10d",
         "strict_win": 44.1,
-        "strict_ret": -0.63,
-        "strict_count": 306,
+        "strict_ret": -0.6,
+        "strict_count": 313,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "20d",
-        "strict_win": 38.0,
-        "strict_ret": -1.15,
-        "strict_count": 250,
+        "strict_win": 36.1,
+        "strict_ret": -1.43,
+        "strict_count": 263,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
