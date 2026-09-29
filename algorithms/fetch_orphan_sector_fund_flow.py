@@ -230,6 +230,53 @@ def calc_consecutive_days(records):
     return days, trend
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+# 🔴 2026-09-29 二修（主人令：「这4个的金额确定没错？修很多次了，能靠谱一点吗」）
+#
+# 为什么还要二修：当天 13:59 的「一修」只给 P0 块的 net_5d / net_20d 加了 _span_ok，
+#   但**卡片实际取数的候选池块用的是另一套 _real_n（零校验）**，60 日分支也没加 ⇒ 守卫形同虚设。
+# 实测实锤（真实 history 复现，分毫吻合卡面数字）：
+#   数据中心(AIDC) 5d = 459.69+459.69+347.97+208.33+57.05 = +1532.73 亿，
+#   而这 5 条记录横跨 09-07 → 09-29 共 **22 个自然日**（且 459.69 被重复计两次）。
+#   同型：5G +1393.50 / CPO +1061.30 / 人民币贬值受益 +1051.96 / 汽车电子 +915.62 / 新能源汽车 +660.15。
+#
+# 根治口径：**「N 日累计」只允许有唯一实现**，所有稀疏求和点一律走 _hist_window()；
+#   跨度超限即拒绝出数（宁空勿假 —— 前端自然隐藏该板块，而不是显示一个假的天文数字）。
+#   跨度上限按**实际条数 k** 计算（≈1.6k，含周末/节假日余量），而非按窗口名字，
+#   这样「有几天出几天」的旧设计（如 60 日实 45 天）仍被保留、但稀疏冒充被彻底封死。
+# ═══════════════════════════════════════════════════════════════════════════
+_DAYS_MIN = {5: 5, 10: 8, 20: 8, 60: 5}   # 各窗口出数所需最少真实条数（沿用原阈值，不缩覆盖）
+
+
+def _cal_cap(k):
+    """k 条记录允许的最大自然日跨度（≈1.6k，含周末/节假日余量；下限 10 天）。"""
+    if k <= 0:
+        return 0
+    return max(10, int(k * 1.6) + 4)
+
+
+def _hist_window(hist, n):
+    """从本地 history 取「最近 n 条真实记录」累加，并**强制校验自然日跨度**。
+
+    返回 (累计值, 实际天数)；条数不足 / 跨度超限 / 日期异常 ⇒ (None, None)。
+    为什么必须卡跨度：history 只记「板块上榜日」，稀疏记录求和 ≠ N 日累计
+    （曾致数据中心(AIDC)「5日」被算成 +1532.73 亿，真值是另一个数量级）。
+    """
+    real = [x for x in (hist or []) if not x.get("carried")]
+    k = min(n, len(real))
+    if k < _DAYS_MIN.get(n, n):
+        return None, None
+    seg = real[-k:]
+    try:
+        d0 = datetime.strptime(str(seg[0].get("date", "")), "%Y-%m-%d")
+        d1 = datetime.strptime(str(seg[-1].get("date", "")), "%Y-%m-%d")
+    except Exception:
+        return None, None
+    if (d1 - d0).days > _cal_cap(k):
+        return None, None
+    return round(sum(x.get("net", 0) for x in seg), 2), k
+
+
 def _try_stock_fund_flow(flow_type):
     """兼容 akshare 新旧版 API（行业/概念资金流）"""
     if flow_type == "industry":
@@ -563,6 +610,15 @@ EM_BK_NAME_ALIAS = {
     "煤炭开采加工": "煤炭",
     "证券": "证券Ⅱ",
     "中船系": None,
+    # 🟢 2026-09-29 二修：让「资金净额趋势卡」被诟病的 6 个板块取到东财官方日K真源
+    #   （内部名与东财标准名不一致 → searchapi 精确匹配失败 → 全走本地稀疏累加 → 假天文数）。
+    #   下方 BK 码经 searchapi 实测确认。
+    "数据中心(AIDC)": "数据中心",          # BK0922
+    "5G": "5G概念",                        # BK0714
+    "共封装光学(CPO)": "CPO概念",           # BK1128
+    "人民币贬值受益": "贬值受益",           # BK0812
+    "汽车电子": "汽车电子电气系统",         # BK1529
+    "新能源汽车": "新能源车",               # BK0900
 }
 _BK_CODE_CACHE_FILE = os.path.join(ROOT, "raw_data", "sector_bk_codes.json")
 
@@ -1024,46 +1080,28 @@ def fetch_sector_flow():
                 hist_data = json.load(hf)
             for item in top_list:
                 name = item["name"]
-                if name in hist_data and len(hist_data[name]) >= 2:
-                    real_entries = [x for x in hist_data[name] if not x.get("carried")]
-                    nets = [x.get("net", 0) for x in real_entries]
-                    # 🟢 2026-09-29 连续性闸门（「5日/20日与真值方向相反」根因根治）：
-                    #   本地 history 只记「上榜日」，稀疏记录求和冒充 N 日 = 假数据。
-                    #   仅当尾部 N 条记录的历日跨度 ≤ 该窗口自然上限时才允许出数：
-                    #   5日≤10历日 / 10日≤16 / 20日≤32 / 60日≤95（含节假日余量）。
-                    _dates = [str(x.get("date", "")) for x in real_entries]
-
-                    def _span_ok(n, cal_cap):
-                        if len(_dates) < n:
-                            return False
-                        try:
-                            _d0 = datetime.strptime(_dates[-n], "%Y-%m-%d")
-                            _d1 = datetime.strptime(_dates[-1], "%Y-%m-%d")
-                            return (_d1 - _d0).days <= cal_cap
-                        except Exception:
-                            return False
-
-                    if len(nets) >= 5 and _span_ok(5, 10):
-                        item["net_5d"] = round(sum(nets[-5:]), 2)
-                        item["net_5d_days"] = 5
-                        if item.get("source") not in ("东财历史", "同花顺估算", "neodata", "东财日K"):
-                            item["source"] = "本地累加"
-                        hist_5d_count += 1
-                    # 20日: 真实历史 >=8 天 + 尾部跨度≤32历日 才出数（稀疏记录一律拒绝）
-                    if len(nets) >= 8 and _span_ok(min(len(nets), 20), 32):
-                        n20 = round(sum(nets[-20:]) if len(nets) >= 20 else sum(nets), 2)
-                        if item.get("net_20d") in (None, 0) and n20 != 0:
-                            item["net_20d"] = n20
-                            item["net_20d_days"] = min(len(nets), 20)
+                _h = hist_data.get(name)
+                if _h and len(_h) >= 2:
+                    # 🟢 2026-09-29 二修：4 个窗口统一走 _hist_window（含跨度闸门），
+                    #   杜绝「守卫只加一半」——原实现 60 日分支与候选池块均裸奔。
+                    for _n in (5, 10, 20, 60):
+                        _k = "net_%dd" % _n
+                        if item.get(_k) not in (None, 0):
+                            continue
+                        _v, _d = _hist_window(_h, _n)
+                        if _v is None or _v == 0:
+                            continue
+                        item[_k] = _v
+                        item[_k + "_days"] = _d
+                        if _n == 5:
+                            hist_5d_count += 1
+                        elif _n == 20:
                             hist_20d_count += 1
-                    # 60日: 真实历史 >=5 天即可出数（2026-08-27 修复：原阈值20天导致
-                    #   history最多19天→零个板块达标→60日恒空。改为与5d一致，有几天出几天）
-                    if len(nets) >= 5:
-                        n60 = round(sum(nets[-60:]) if len(nets) >= 60 else sum(nets), 2)
-                        if item.get("net_60d") in (None, 0) and n60 != 0:
-                            item["net_60d"] = n60
-                            item["net_60d_days"] = min(len(nets), 60)
+                        elif _n == 60:
                             hist_60d_count += 1
+                    if item.get("net_5d") not in (None, 0) and \
+                            item.get("source") not in ("东财历史", "同花顺估算", "neodata", "东财日K"):
+                        item["source"] = "本地累加"
             print(f"  📊 [P0本地累加] 5日={hist_5d_count} 20日={hist_20d_count} 60日={hist_60d_count} (来自{len(hist_data)}个板块history)")
         except Exception as e:
             print(f"  📊 [P0本地累加] 失败: {e}")
@@ -1212,6 +1250,29 @@ def fetch_sector_flow():
         candidate_map[name]["trend"] = trend
     candidate_list = list(candidate_map.values())
 
+    # 🟢 2026-09-29 二修：候选板块补取东财日K真源（仅「有有效 BK 码」且活跃者）。
+    #   被诟病的 6 个板块（数据中心(AIDC)/5G/CPO/人民币贬值受益/汽车电子/新能源汽车）此前
+    #   因内部名≠东财标准名导致 BK 解析失败、拿不到权威日K，全走本地稀疏累加 → 假天文数。
+    #   这里与 top_list 共用 fetch_em_fflow_windows 真源；按最近活跃度封顶 120，避免 1161 板块全量请求。
+    #   真源成功 ⇒ 下方 _em_wins.get(nm) 覆盖本地闸门值（真值）；失败 ⇒ 回退 _hist_window（宁空勿假）。
+    try:
+        _cand_em = []
+        for _c in candidate_list:
+            _cn = _c.get("name")
+            if not _cn or not is_valid_sector_name(_cn):
+                continue
+            _ch = history.get(_cn, [])
+            if len(_ch) < 3:          # 非活跃候选不值得拉取
+                continue
+            if not _em_bk_code(_cn):  # 别名命中 → 东财 BK 码；否则跳过（宁空勿假）
+                continue
+            _cand_em.append({"name": _cn, "net": _ch[-1].get("net", 0)})
+        if _cand_em:
+            _cand_em.sort(key=lambda x: abs(x.get("net", 0)), reverse=True)
+            _em_wins.update(fetch_em_fflow_windows(_cand_em, max_n=min(120, len(_cand_em))))
+    except Exception as _e:
+        print(f"  ⚠️ [候选EM日K真源] 异常（回退本地闸门累加）: {_e}")
+
     # 🛡 2026-08-20 主人令「一劳永逸」: candidate_list 同样放宽 20日/60日 阈值，
     # 用真实可用天数出数并标注，避免大片板块因历史不足而显示「暂无」。
     seen_names = set()
@@ -1222,30 +1283,28 @@ def fetch_sector_flow():
         seen_names.add(nm)
         hist = history.get(nm, [])
 
-        def _real_n(hist, n):
-            arr = [h for h in hist[-n:] if not h.get("carried")]
-            return arr, round(sum(h["net"] for h in arr), 2)
-        real_5, net_5d_val = _real_n(hist, 5)
-        real_10, net_10d_val = _real_n(hist, 10)
-        real_20, net_20d_val = _real_n(hist, 20)
-        real_60, net_60d_val = _real_n(hist, 60)
-        if item.get("net_5d") in (None, 0) and net_5d_val != 0 and len(real_5) >= 5:
+        # 🟢 2026-09-29 二修：候选板块的 N 日累计**唯一**走 _hist_window（与 P0 块统一），
+        #   强制自然日跨度闸门 —— 稀疏记录冒充 N 日累计、重复值双计，一律拒绝（宁空勿假）。
+        net_5d_val, real_5 = _hist_window(hist, 5)
+        net_10d_val, real_10 = _hist_window(hist, 10)
+        net_20d_val, real_20 = _hist_window(hist, 20)
+        net_60d_val, real_60 = _hist_window(hist, 60)
+        if item.get("net_5d") in (None, 0) and net_5d_val not in (None, 0):
             item["net_5d"] = net_5d_val
-            item["net_5d_days"] = len(real_5)
-        # 10日: >=8 天出数（与主流程一致）
-        if item.get("net_10d") in (None, 0) and net_10d_val != 0 and len(real_10) >= 8:
+            item["net_5d_days"] = real_5
+        # 10日: 走 _hist_window（内部已校验 >=_DAYS_MIN[10]=8 且跨度达标）
+        if item.get("net_10d") in (None, 0) and net_10d_val not in (None, 0):
             item["net_10d"] = net_10d_val
-            item["net_10d_days"] = len(real_10)
-        # 20日: >=8 天出数，避免空窗（本地约 9 天可用）
-        if item.get("net_20d") in (None, 0) and net_20d_val != 0 and len(real_20) >= 8:
+            item["net_10d_days"] = real_10
+        # 20日: 同上
+        if item.get("net_20d") in (None, 0) and net_20d_val not in (None, 0):
             item["net_20d"] = net_20d_val
-            item["net_20d_days"] = len(real_20)
-        # 60日: >=5 天出数（2026-08-27 修复：原20天导致history不足时恒空）
-        if item.get("net_60d") in (None, 0) and net_60d_val != 0 and len(real_60) >= 5:
+            item["net_20d_days"] = real_20
+        # 60日: 同上
+        if item.get("net_60d") in (None, 0) and net_60d_val not in (None, 0):
             item["net_60d"] = net_60d_val
-            item["net_60d_days"] = len(real_60)
-        # 兜底：写实 *_days 字段，sectors_in/out 同步时不再乱 fallback
-        # （🟢 2026-09-29：仅当对应净额值真实存在才标天数，杜绝「值空却标满天数」）
+            item["net_60d_days"] = real_60
+        # 兜底：写实 *_days 字段（仅当净额真实存在），供 sectors_in/out 同步，不再乱 fallback
         real_all = [h for h in hist if not h.get("carried")]
         for k in ("net_5d", "net_10d", "net_20d", "net_60d"):
             days_field = k + "_days"
