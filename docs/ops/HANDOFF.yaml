@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-29 18:40"
+  updated: "2026-09-29 18:55"
   updated_by: 小九(lemoncat-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,10 +34,35 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 99
+  next_id_seq: 100
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
+  - id: threecard-fundflow-anchor-0929
+    priority: P1
+    owner: lemoncat-cn
+    status: pending-verify
+    what: >
+      三卡观感异常一根因（均为东财请求层缺陷，非接口下线）：
+      (1) 市场宽度卡 post_close 不刷新 —— f_w52_high 是全仓最后一处「单 host 3 连重试」裸调
+          （09-24 对照实验已实证换 host 才是解药），15:00 起 post_close 四连败 raw 停 14:46；
+      (2) 主题空间·概念资金热度全 0.0亿 —— 概念腿请求返回 rc=0+data:null 时 em_clist 判「成功」
+          返回 []，该腿静默归零（提交史实证 14:03 概念0·行业200 / 14:08 概念182·行业0 /
+          15:00 起收盘后四连败概念0 ⇒ 收盘后最后快照概念恒空）；
+      (3) 隔夜美股卡「大盘锚缺失」—— _em 单 host 重试，09-24 07:07 / 09-28 09:33 两轮锚点全空
+          而同函数同轮 ADR 报价可得。
+    fix: >
+      f_w52_high 改走 _em_get_with_retry(hosts=_EM_HOSTS)；f_sector_fund_flow 每腿空结果换请求
+      重试3次 + 概念腿全败时沿用当日早前 raw 概念档（concept_fallback 标记，真值非编造）；
+      fetch_us_hk_map _em 改 EM_HOSTS 换 host 重试 + 锚点腾讯行情源兜底（usINX/usNDX/usDJI，
+      本机实测 CN 直连可用），note 标注来源。同时补 build_deploy paths 盲区
+      （+cloud_fetch_v8.py +scripts/**，f5216989 实证抓取层推送零 run）。提交 f5216989。
+    verify_how: >
+      ① 下轮 post_close 后 data/W52_HIGH.js update_time 应为收盘后时刻；
+      ② 收盘后最后一轮 SECTOR_FUND_FLOW top_list 应含概念板块（concept_fallback=true 亦算过）；
+      ③ 明早 premarket 后 raw_data/us_hk_map.json 的 us_indices 三指数 price 非 null（或 note 标腾讯兜底）。
+    updated: "2026-09-29 18:55"
+
   - id: freshness-falsealarm-rootfix-0929
     priority: P1
     owner: lemoncat-cn

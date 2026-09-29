@@ -58,6 +58,12 @@ on:
       - 'docs/ops/HANDOFF.yaml'
       - 'docs/ops/HANDOFF.ledger.json'
       - '.github/scripts/pre_deploy_audit.py'
+      # 🛡 2026-09-29 小九（可达性盲区补口·实证）：paths 漏 cloud_fetch_v8.py 与 scripts/**
+      #   ⇒ 当日 f5216989（三卡根治：W52_HIGH/概念腿/美股锚 全在抓取层）推送后 build_deploy
+      #   **一条 run 都没建**（head_sha 过滤 total_count=1，仅 pages build）——
+      #   抓取层改动永远绕过 [13/13] 审计守卫与构建部署。补两行，精确点名、不用宽 glob。
+      - 'cloud_fetch_v8.py'
+      - 'scripts/**'
   workflow_run:
     workflows:
       - "🇨🇳 v8 中国数据抓取(cn·应急)"
