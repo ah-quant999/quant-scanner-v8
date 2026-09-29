@@ -31,6 +31,7 @@
 """
 
 import json
+import os
 import time
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
@@ -284,6 +285,39 @@ def _tag(m):
 def build():
     """返回 payload dict；无有效数据时返回 None（由调用方重试）。"""
     t0 = time.time()
+
+    # ── 0) 语义/预算双闸门（🛡 2026-09-29 断更根治·小九）─────────────────────
+    #   背景：本模块原挂 premarket 单档（08:25），实测三连坑 → 结构性断更：
+    #     ① 盘前 cron「25 0 * * 1-5」历史实测被 GitHub 静默丢弃/延迟 4h46m（run #1630 铁证）；
+    #     ② 早间 dispatch 被并发组挤兑排队 4.5h → 13:00 才执行 → workflow「僵尸盘前档」
+    #        重判改跑 intraday/post_close → 本模块全天漏跑（09-29 卡面冻结在 09-28 09:20）；
+    #     ③ 自愈侧 all_US_HK_MAP 落入 check_all_data_files 默认 algo_run 通道 → 被
+    #        盘后产出窗口闸拦死 → 白天永不自愈。
+    #   配套：cloud_fetch_v8 / update_v8 两张 CATEGORY_MAP 已同改挂
+    #   "premarket,intraday,post_close" 三档 —— 档位只负责触发，数据语义由本函数闸门保证：
+    #     闸1 美东时钟：ET 周一~五 09:30–16:00 常规交易时段内拒绝产出 —— 该时段 push2delay
+    #         返回「当日盘中」数据，写卡会把「隔夜」语义漂移成盘中（违反卡片口径铁律）；
+    #         其余时段数据恒为「美东最近已收盘交易日」＝隔夜语义安全。
+    #     闸2 当日已产出：raw_data/us_hk_map.json 的 update_time 日期 == 今日 → 跳过重抓
+    #         （每日仅首轮真实抓取；盘前轮失败/丢失时，盘中/盘后轮自动补位自愈，预算最小化）。
+    et_now = datetime.now(ET)
+    et_min = et_now.hour * 60 + et_now.minute
+    if et_now.weekday() < 5 and 9 * 60 + 30 <= et_min < 16 * 60:
+        print("   [us_hk_map] 美东常规交易时段(ET %s) → 拒绝产出（防隔夜语义漂移成盘中）"
+              % et_now.strftime("%H:%M"))
+        return None
+    try:
+        _raw_p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                              "raw_data", "us_hk_map.json")
+        with open(_raw_p, "r", encoding="utf-8") as _f:
+            _prev = json.load(_f)
+        if str(_prev.get("update_time", ""))[:10] == datetime.now(CST).strftime("%Y-%m-%d"):
+            print("   [us_hk_map] 今日已产出（%s）→ 跳过重抓（预算闸门）" % _prev.get("update_time"))
+            return None
+    except FileNotFoundError:
+        pass  # 首次产出，无既有产物 → 继续
+    except Exception as _e:
+        print("   [us_hk_map] 既有产物读取失败（忽略继续）: %s" % _e)
 
     # ── 1) 美股候选（ADR + ETF 去重）────────────────────────────────────────
     us_codes = sorted({c for c, _ in ADR_PAIRS} | {c for c, _ in ETF_MAP})

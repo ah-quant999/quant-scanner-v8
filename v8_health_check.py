@@ -2890,7 +2890,15 @@ def check_signal_date_freshness():
             })
         else:
             newest = max(dates)
-            if newest < last_trade_str:
+            # 🛡 2026-09-29 小九（一劳永逸）：final_recommend 盘后 18:00 才产出
+            #   （run_algorithms 18:00 时间闸防半日数据假回测），白天(18:00 前)最新一批来自昨夜，
+            #   enter_date 天然落后最近交易日 1 天 = 预期内，非数据失效。
+            #   仅在「落后 > 1 个交易日」或「已过 18:00 产出窗口仍落后」时才报陈旧，
+            #   避免每天 18:00 前固定假黄灯；真实断更（落后 ≥2 交易日 / 18:00 后仍旧）照报不误。
+            _cst = now_cst()
+            _prev_trade = _last_trade_date(_cst.date() - timedelta(days=1))
+            _prev_trade_str = _prev_trade.strftime("%Y-%m-%d") if _prev_trade else ""
+            if newest < last_trade_str and (_cst.hour >= 18 or (not _prev_trade_str or newest < _prev_trade_str)):
                 results.append({
                     "id": "final_enter_stale",
                     "name": "最终推荐入选日期",
@@ -2904,7 +2912,7 @@ def check_signal_date_freshness():
                     "name": "最终推荐入选日期",
                     "page": "内容审计",
                     "status": "ok",
-                    "message": f"最新 enter_date {newest} ≥ 最近交易日 {last_trade_str}"
+                    "message": f"最新 enter_date {newest} ≥ 上一交易日 {_prev_trade_str}（18:00 前未刷新为预期）"
                 })
 
         # 2026-08-15 主人令：Top3 市场分布只展示、不误报。

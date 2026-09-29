@@ -382,10 +382,13 @@ CATEGORY_MAP = {
     "RESTRICTED_RELEASE": "premarket,post_close",
     "PERFORMANCE_FORECAST": "premarket,post_close",
     # 🆕 2026-09-19 主人令：「隔夜美股强势 → A股/港股 映射」。
-    #   ⚠️ 必须与 cloud_fetch_v8.py 侧同档（两处均为 premarket 单档）：
-    #   抓取侧挂 A 档、注入侧挂 B 档 = 「raw 已新、data/*.js 不重建」的半截更新。
-    #   只挂 premarket 的理由见 cloud_fetch_v8.py 同条注释（隔夜语义 + 不耗盘中预算）。
-    "US_HK_MAP": "premarket",
+    #   ⚠️ 必须与 cloud_fetch_v8.py 侧同档（两表同档铁律）：
+    #   抓取侧挂 premarket,intraday,post_close、注入侧必须同档，否则「raw 已新、data/*.js 不重建」半截更新。
+    #   🔴 2026-09-29 小九（一劳永逸）：原只挂 premarket 单档 → 盘前轮被并发组挤兑排队 4.5h 后
+    #     变「僵尸盘前档」重判 → 本模块全天漏跑（卡面冻结 09-28 09:20 实测）。改三档，
+    #     语义与预算由生成器内双闸门保证（scripts/fetch_us_hk_map.py build() 开头）：
+    #     美东交易时段拒绝产出（防隔夜语义漂移）+ 当日已产出跳过重抓；盘前失败时盘中/盘后轮自动补位自愈。
+    "US_HK_MAP": "premarket,intraday,post_close",
 }
 
 CATEGORY_LABEL = {
@@ -1381,6 +1384,12 @@ def _emit_freshness_status_js():
     if obj is None:
         print("  ⏭️  data/freshness_status.json 读取失败，跳过 FRESHNESS_STATUS.js")
         return
+    # 🛡 2026-09-29 小九（一劳永逸）：freshness_status.json 顶层无语义时间字段
+    #   ⇒ _write_js → _pick_ts 恒走 existing 兜底 ⇒ FRESHNESS_STATUS.js 的 update_time
+    #   永冻在首次构建时刻（实测停在 2026-09-25 21:34），运维面板「新鲜度」卡误报陈旧/冻结。
+    #   本状态是每次 build 重新生成的报告，其 update_time 应 = 本次构建时刻；
+    #   注入后 _pick_ts 走「源数据自带时间戳」最高优先级 ⇒ 死锁破除（与 09-29 心跳三文件同款根治）。
+    obj["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")
     _write_js("FRESHNESS_STATUS", obj)
     print("  ✅ data/freshness_status.json → data/FRESHNESS_STATUS.js")
 

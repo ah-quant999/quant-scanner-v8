@@ -184,13 +184,21 @@ CATEGORY_MAP = {
     #   加 post_close，使盘后档(17:20/18:20/19:20)必定重抓，与页面语义对齐。
     "RESTRICTED_RELEASE": "premarket,post_close",
     "PERFORMANCE_FORECAST": "premarket,post_close",
-    # 🆕 2026-09-19 主人令：「隔夜美股强势 → A股/港股 映射」——只挂 premarket 单档。
-    #   ① 语义天然对齐：08:25 抓取时美东上一交易日已收盘 ⇒ 拿到的就是「隔夜」收盘，
-    #      update_v8.py 侧 CATEGORY_MAP 同步登记 premarket（两表必须同档）。
-    #   ② 必要且充分：主人令「每日盘前必须更新完成」；盘中/盘后美股休市或数据未更新，
-    #      重抓无新信息，只会白耗 20 分钟一轮的抓取预算。
-    #   🔴 禁止挂 intraday —— 会把「隔夜」卡刷成盘中语义，违反卡片时区口径铁律。
-    "US_HK_MAP": "premarket",
+    # 🆕 2026-09-19 主人令：「隔夜美股强势 → A股/港股 映射」。
+    #   🛡 2026-09-29 断更根治（小九）：原 premarket 单档存在结构性死锁三连——
+    #     ① 盘前 cron 被GitHub 静默丢弃/延迟（run #1630 实证延迟 4h46m）；
+    #     ② 早间 dispatch 被并发组「1 running+1 pending」挤兑，排队 4.5h 后 13:00 执行
+    #        → 「僵尸盘前档」重判改跑 intraday/post_close → 本模块全天漏跑
+    #        （09-29 卡面冻结在 09-28 09:20 实测）；
+    #     ③ 自愈侧 all_US_HK_MAP 落入 check_all_data_files 默认 algo_run 通道 → 被盘后
+    #        窗口闸拦死 → 白天永不自愈。
+    #   改挂三档，语义与预算由生成器内双闸门保证（scripts/fetch_us_hk_map.py build() 开头）：
+    #     · 美东 ET 09:30–16:00 交易时段拒绝产出（防「隔夜」语义漂移成盘中）；
+    #     · 当日已产出（raw update_time 日期==今日）则跳过重抓 —— 每日仅首轮真实抓取，
+    #       盘前失败时盘中/盘后轮自动补位自愈。
+    #   🔴 原「禁止挂 intraday」禁令的语义保护不变 —— 由闸门①承担，档位仅触发。
+    #   ⚠️ 两表同档铁律：update_v8.py CATEGORY_MAP 已同步三档。
+    "US_HK_MAP": "premarket,intraday,post_close",
 }
 
 _ak = None
