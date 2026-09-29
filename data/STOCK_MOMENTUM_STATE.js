@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-29 21:03",
- "generated": "2026-09-29 21:03",
+ "update_time": "2026-09-29 21:06",
+ "generated": "2026-09-29 21:06",
  "meta": {
-  "generated": "2026-09-29 21:03",
+  "generated": "2026-09-29 21:06",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 18,
   "days_with_consensus": 0,
@@ -7000,6 +7000,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "301190",
+      "name": "善水科技",
+      "change_pct": 20.0,
+      "price": 29.94,
+      "category": "突破"
+     },
+     {
       "code": "603757",
       "name": "大元泵业",
       "change_pct": 4.967,
@@ -7021,10 +7028,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "603626",
-      "name": "科森科技",
-      "change_pct": 6.267,
-      "price": 23.91,
+      "code": "600488",
+      "name": "津药药业",
+      "change_pct": 10.048,
+      "price": 6.9,
       "category": "突破"
      },
      {
@@ -7035,31 +7042,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "301122",
-      "name": "采纳股份",
-      "change_pct": 4.945,
-      "price": 67.91,
-      "category": "突破"
-     },
-     {
-      "code": "301041",
-      "name": "金百泽",
-      "change_pct": 12.124,
-      "price": 39.49,
-      "category": "突破"
-     },
-     {
       "code": "300237",
       "name": "ST美晨",
       "change_pct": 3.478,
       "price": 2.38,
-      "category": "突破"
-     },
-     {
-      "code": "605058",
-      "name": "澳弘电子",
-      "change_pct": 10.004,
-      "price": 59.6,
       "category": "突破"
      },
      {
@@ -7091,17 +7077,31 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "600418",
-      "name": "江淮汽车",
-      "change_pct": 3.251,
-      "price": 26.04,
-      "category": "突破"
-     },
-     {
       "code": "301234",
       "name": "五洲医疗",
       "change_pct": 4.836,
       "price": 134.2,
+      "category": "突破"
+     },
+     {
+      "code": "000829",
+      "name": "天音控股",
+      "change_pct": 5.658,
+      "price": 9.15,
+      "category": "突破"
+     },
+     {
+      "code": "002913",
+      "name": "奥士康",
+      "change_pct": 10.0,
+      "price": 91.08,
+      "category": "突破"
+     },
+     {
+      "code": "600048",
+      "name": "保利发展",
+      "change_pct": 4.1,
+      "price": 5.84,
       "category": "突破"
      }
     ],
@@ -7121,6 +7121,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
+      "code": "301190",
+      "name": "善水科技",
+      "change_pct": 20.0,
+      "price": 29.94,
+      "category": "加速"
+     },
+     {
       "code": "603757",
       "name": "大元泵业",
       "change_pct": 4.967,
@@ -7142,10 +7149,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "603626",
-      "name": "科森科技",
-      "change_pct": 6.267,
-      "price": 23.91,
+      "code": "600488",
+      "name": "津药药业",
+      "change_pct": 10.048,
+      "price": 6.9,
       "category": "加速"
      },
      {
@@ -7153,13 +7160,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "协和电子",
       "change_pct": 9.998,
       "price": 44.01,
-      "category": "加速"
-     },
-     {
-      "code": "301122",
-      "name": "采纳股份",
-      "change_pct": 4.945,
-      "price": 67.91,
       "category": "加速"
      }
     ],
@@ -7179,6 +7179,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "301190",
+      "name": "善水科技",
+      "change_pct": 20.0,
+      "price": 29.94,
+      "category": "短线选股"
+     },
+     {
       "code": "603757",
       "name": "大元泵业",
       "change_pct": 4.967,
@@ -7200,10 +7207,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "603626",
-      "name": "科森科技",
-      "change_pct": 6.267,
-      "price": 23.91,
+      "code": "600488",
+      "name": "津药药业",
+      "change_pct": 10.048,
+      "price": 6.9,
       "category": "短线选股"
      },
      {
@@ -7214,31 +7221,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "301122",
-      "name": "采纳股份",
-      "change_pct": 4.945,
-      "price": 67.91,
-      "category": "短线选股"
-     },
-     {
-      "code": "301041",
-      "name": "金百泽",
-      "change_pct": 12.124,
-      "price": 39.49,
-      "category": "短线选股"
-     },
-     {
       "code": "300237",
       "name": "ST美晨",
       "change_pct": 3.478,
       "price": 2.38,
-      "category": "短线选股"
-     },
-     {
-      "code": "605058",
-      "name": "澳弘电子",
-      "change_pct": 10.004,
-      "price": 59.6,
       "category": "短线选股"
      },
      {
@@ -7270,40 +7256,40 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "600418",
-      "name": "江淮汽车",
-      "change_pct": 3.251,
-      "price": 26.04,
-      "category": "短线选股"
-     },
-     {
       "code": "301234",
       "name": "五洲医疗",
       "change_pct": 4.836,
       "price": 134.2,
+      "category": "短线选股"
+     },
+     {
+      "code": "000829",
+      "name": "天音控股",
+      "change_pct": 5.658,
+      "price": 9.15,
+      "category": "短线选股"
+     },
+     {
+      "code": "002913",
+      "name": "奥士康",
+      "change_pct": 10.0,
+      "price": 91.08,
+      "category": "短线选股"
+     },
+     {
+      "code": "600048",
+      "name": "保利发展",
+      "change_pct": 4.1,
+      "price": 5.84,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "301041",
-      "name": "金百泽",
-      "change_pct": 12.124,
-      "price": 39.49,
-      "category": "强势股"
-     },
-     {
       "code": "300237",
       "name": "ST美晨",
       "change_pct": 3.478,
       "price": 2.38,
-      "category": "强势股"
-     },
-     {
-      "code": "605058",
-      "name": "澳弘电子",
-      "change_pct": 10.004,
-      "price": 59.6,
       "category": "强势股"
      },
      {
@@ -7335,17 +7321,31 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "600418",
-      "name": "江淮汽车",
-      "change_pct": 3.251,
-      "price": 26.04,
-      "category": "强势股"
-     },
-     {
       "code": "301234",
       "name": "五洲医疗",
       "change_pct": 4.836,
       "price": 134.2,
+      "category": "强势股"
+     },
+     {
+      "code": "000829",
+      "name": "天音控股",
+      "change_pct": 5.658,
+      "price": 9.15,
+      "category": "强势股"
+     },
+     {
+      "code": "002913",
+      "name": "奥士康",
+      "change_pct": 10.0,
+      "price": 91.08,
+      "category": "强势股"
+     },
+     {
+      "code": "600048",
+      "name": "保利发展",
+      "change_pct": 4.1,
+      "price": 5.84,
       "category": "强势股"
      }
     ]
