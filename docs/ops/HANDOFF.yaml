@@ -259,6 +259,20 @@ items:
 
 
 
+    alimi_verify_20260930_0639: >-
+       〔阿狸咪的工程师 2026-09-30 06:42 CST · 第 5 次复验 · 纠正 09-29 22:15 假恢复〕
+       A. 纠正：09-29 22:15 巡检报「SECTOR_LEADERS 已恢复(09-29 14:53)」系读取**本机本地副本**
+          （未提交改动被静默回退），远端权威态 2026-09-30 06:37 CST 复核
+          raw_data/sector_leaders.json update_time 仍 = 2026-09-22 18:15:13，从未前进 ⇒ 该判据作废。
+       B. 现状：EXPERIMENT 已恢复（raw_data/experiment.json = 2026-09-30 05:49:21，今日新鲜）；
+          raw_data/sector_leaders.json 仍卡 09-22 ⇒ 与 09-29 00:40 已定位的**结构性推送缺口**
+          （step22 写 raw 但推送步 step17 排在其前、step23 只推 data/）一致，非东财端新故障；
+          真因与修复挂账见 cnfetch-step22-raw-unpushed-alert-dead-0929（小九 workflow 车道）。
+       C. 同源核验：最新 cn_fetch run #36635479093（09-29 21:46, head 957b2302）
+          compare 1052d4334162...957b2302 = ahead / behind_by=0 ⇒ 换 host 修复确在运行路径；
+          run 结论 success 但 raw 未动 = 三重静默（continue-on-error 吞 exit1），与 09-29 00:40 判据一致。
+       D. 处置：pending run=0（queued/in_progress 均 0）⇒ 不派发、不踩踏；本项维持 pending-verify。
+          本轮写操作：0 dispatch / 0 补跑 / 0 邮件；仅本文件定点回填。
   - id: cnfetch-step22-raw-unpushed-alert-dead-0929
     title: "cn_fetch step22（板块龙头股字典）两处结构性缺陷：raw 侧产物无推送通道 + 软失败告警为死码（-e 吞掉）"
     priority: P1
