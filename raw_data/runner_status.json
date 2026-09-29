@@ -1,13 +1,12 @@
 {
-  "update_time": "2026-09-29 23:11:20",
-  "status": "warn",
+  "update_time": "2026-09-29 23:41:31",
+  "status": "ok",
   "process": {
     "ok": true,
     "listener": true,
-    "worker": true,
+    "worker": false,
     "details": [
-      "runner.listener",
-      "runner.worker"
+      "runner.listener"
     ]
   },
   "service": {
@@ -22,16 +21,16 @@
     "message": "最近日志无错误"
   },
   "github": {
-    "ok": false,
+    "ok": true,
     "consecutive_failures": 0,
     "checkout_failures": 0,
     "latest_run_id": 36584859060,
     "latest_failed": false,
-    "latest_status": "in_progress",
-    "stuck_min": 27,
+    "latest_status": "completed",
+    "stuck_min": 0,
     "is_fail": false,
-    "is_warn": true,
-    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 盘后算法链(cn) in_progress (已卡住 27 分)"
+    "is_warn": false,
+    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 盘后算法链(cn) completed"
   },
   "runner_env": {
     "ok": true,
@@ -39,7 +38,7 @@
     "message": "阈值=2000（一劳永逸目标 2000）"
   },
   "actions_taken": [],
-  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 盘后算法链(cn) in_progress (已卡住 27 分)",
+  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 盘后算法链(cn) completed",
   "run_time": "2026-09-29 22:40:54",
   "category": "all",
   "hostname": "",
