@@ -293,6 +293,24 @@ jobs:
       - name: "🛡️ 部署前校验：关键 data/*.js 非空（防空 raw_data 覆盖成 shell 致整站空）"
         run: python v8_deploy_guard.py
 
+      # 🛡️ 2026-09-29 主人令「加」：层B标注(_cadNote)防回退守卫
+      #   根因：2026-09-28 排查「实时数据里很多卡都没及时更新」时，确认盘中不刷新的
+      #   档位卡（盘前/盘后/收盘后：北向/两融/打新/宏观/52周新高/解禁/业绩预告/ETF份额…）
+      #   本就不该盘中刷新，需在胶囊上如实标注「· {slot}档数据，盘中不刷新」，
+      #   让「本就不该刷新」与「真的刷新失败」一眼可分。该标注此前曾被「发布闸门核对」
+      #   整块回退覆盖（commit 63e35a2091），被迫手动恢复。
+      #   守卫：index.html 是部署流 `git reset --hard FETCH_HEAD` + update_v8.py(?v 戳) 的
+      #   产物，_cadNote 不被生成器改写；但任何「发布闸门/手改」若提交一份无此标注的
+      #   index.html，部署即静默丢失标注。此处部署前硬断言其存在，缺失即阻断（build 红），
+      #   从根上封死层B回退。判据用可见标注文案「盘中不刷新」（与 _cadNote 变量同源）。
+      - name: "🛡️ 护栏：层B标注(盘中不刷新)防回退"
+        run: |
+          if ! grep -q "盘中不刷新" index.html; then
+            echo "::error::index.html 丢失层B标注（_cadNote / 盘中不刷新），疑似发布闸门核对或手改回退，阻断部署"
+            exit 1
+          fi
+          echo "✅ 层B标注存在：盘中不刷新档位卡已如实标注，未回退"
+
       - name: "📤 部署到 main（GitHub Pages 源）"
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
