@@ -342,7 +342,6 @@ ALGO_WORKFLOW_FILE = "v8_algo_cloud.yml"
 ALGO_WORKFLOW_NAME = "☁️ v8 盘后算法链(云端)"   # 2026-09-04 修复：2bb75e57 引用但漏定义 → NameError 致看门狗整轮崩溃
 ALGO_STUCK_MIN = 165        # 算法链 step 150min/job 200min：>165min 仍 in_progress 必为整条卡死
 ALGO_STALE_MIN = 1500       # 距上次成功 >25h 且处于盘后窗口 → 疑似漏跑（交易日每天 19:15/20:00 两档）
-ALGO_SILENCE_KILL_MIN = 15  # 与 run_algorithms.SILENCE_KILL_SEC 对齐：本地心跳静默超 15min+余量 → 卡死
 
 
 
@@ -408,17 +407,6 @@ def find_workflow_id_by_filename(filename):
         if w.get("path") == f".github/workflows/{filename}":
             return w["id"]
     return None
-
-
-def _read_local_heartbeat():
-    """读本地 raw_data/algo_heartbeat.json（cn-runner 同机场景可见最近一轮进度）。"""
-    p = Path("raw_data/algo_heartbeat.json")
-    if not p.exists():
-        return None
-    try:
-        return json.loads(p.read_text(encoding="utf-8"))
-    except Exception:
-        return None
 
 
 def _algo_recover(run_id, run_number):
@@ -585,19 +573,14 @@ def check_algo_chain():
                       f"已 {fmt_age(r_age)} 未结束（step 超时150min/job 200min），疑似整条卡死")
             _algo_recover(running["id"], r_num)
             return False, detail, False
-        # 同机心跳兜底：status=running 但最后心跳已超静默阈值 → 进程冻结
-        hb = _read_local_heartbeat()
-        if hb and hb.get("status") == "running":
-            try:
-                hb_ts = datetime.strptime(hb["update_time"], "%Y-%m-%d %H:%M:%S")
-                hb_age = (now_cst - hb_ts).total_seconds() / 60
-                if hb_age > (ALGO_SILENCE_KILL_MIN + 5):
-                    detail = (f"algo 链 run #{r_num} 心跳静默 {fmt_age(hb_age)}"
-                              f"（最后脚本 {hb.get('script')}），疑似进程冻结，已触发 cancel+重派")
-                    _algo_recover(running["id"], r_num)
-                    return False, detail, False
-            except Exception:
-                pass
+        # 🔴 2026-09-29 一劳永逸根因修复（误杀健康在跑 run）
+        # 原「同机心跳兜底」分支读 raw_data/algo_heartbeat.json 判进程冻结，但本看门狗固定跑在
+        # 云端 ubuntu-latest（v8_health_patrol.yml），算法链跑在 [self-hosted, cn]（不同机、独立
+        # worktree），读到的永远是过期 checkout 副本 ⇒ hb_age 恒成立 ⇒ 误杀一切健康在跑 run
+        # （09-29 #2179/#2180 实证，与 09-17 回执「看门狗读的是自己机的相对路径」判据一致）。
+        # 该分支在「跨机巡检」架构下永远失真且必然误杀，故彻底移除；整条 run 卡死改由下方
+        # r_age>ALGO_STUCK_MIN(165min) 兜底（不依赖心跳文件，跨机可靠）。单脚本冻结已由
+        # run_algorithms._supervised_run 进程内实时杀进程续跑，无需此处重复兜底。
         return True, (f"algo 链 run #{r_num} {running['status']} @ {r_created.strftime('%m-%d %H:%M')} "
                       f"(已 {fmt_age(r_age)})"), False
 
