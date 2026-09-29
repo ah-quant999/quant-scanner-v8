@@ -3084,5 +3084,28 @@
     "message": "SECTOR_LEADERS.js 更新于 3天前 21:57；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
+ },
+ {
+  "date": "2026-09-30",
+  "time": "03:32:47",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 126,
+   "warn": 0,
+   "fail": 1,
+   "limited": 3,
+   "info": 0,
+   "other": 0,
+   "total": 130
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "all_US_HK_MAP",
+    "name": "US_HK_MAP",
+    "message": "US_HK_MAP.js 更新于 2天前 09:20；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
