@@ -758,7 +758,11 @@ def fetch_via_wiki(share_id=None, folder_id=None):
     except Exception as e:
         print("   ⚠️ SSR 深页失败: %s %s" % (type(e).__name__, str(e)[:120]))
     if not ssr:
-        raise RuntimeError("wiki 源两条路（目录 API / SSR 深页）均失败")
+        raise RuntimeError(
+            "wiki 源两条路（目录 API / SSR 深页）均失败。"
+            "若目录 API 返回 0 篇且无异常，通常是**源目录已从分享中移除/迁库**"
+            "（实测 2026-09-29：高手 09-15 后停发日报且「强势股跟踪」目录已从分享消失）"
+            "——需主人确认高手新分享位置，抓取端无法自愈。")
 
     intro = ssr.get("introduction") or ""
     title = ssr.get("title") or ""
@@ -1056,28 +1060,50 @@ def main():
               f"{_cov2.get('strong_parsed')}）—— 不是源表格少行，**是解析或源结构变了**，"
               f"请查 raw_data/ima_strong_stock_full.md 的表格列数。")
     # 🔴 2026-09-17：抓取成功 ≠ 数据新鲜。源侧停更必须吼出来（这是「杜绝假成功」的落点）
+    # 🔴🔴 2026-09-29 阿狸咪的工程师（主人令「谁一直半夜给我发邮件·一劳永逸」）：
+    #   源停更邮件改为**状态迁移触发**——只在「非停更 → 停更」当次发 1 封；
+    #   此后同一停更态的每日重复告警一律**静默**（打印留证 + raw json 落盘）。
+    #   实证：源（高手 ima 日报）自 09-15 停更 ⇒ stale 级邮件工作日每次跑都发，
+    #   09-29 00:02 半夜那封「源停更 14 天」正是本链发的 ⇒ 每日重复 = 骚扰。
+    #   上期状态读 raw_data/ima_strong_stock.json（本函数此时还没覆写它，读到的就是上期）。
+    _prev_stale = None
+    try:
+        with open(os.path.join(RAW_DIR, "ima_strong_stock.json"), "r", encoding="utf-8") as _pf:
+            _prev_stale = bool((json.load(_pf) or {}).get("source_stale"))
+    except Exception:
+        _prev_stale = None   # 首次运行/文件缺失 ⇒ 按「首次告警」处理
     if out["source_stale"]:
         print(f"⛔ 源停更告警：源笔记「{out['source_title'] or '?'}」自述更新时间 "
               f"{out['source_updated_at'] or '?'}，最新交易日 {out['data_date']} ⇒ "
               f"**已 {out['stale_days']} 天无新数据**。本次抓取成功但内容与上一期相同"
               f"（源侧停更，不是抓取失败）。")
-        # 🔴 2026-09-24：发邮件告警（stale 级；非交易日静默；本机有配置才真发）。
-        try:
-            if v8_send_alert:
-                _subj = f"ima 强势股日报源停更 {out['stale_days']} 天"
-                _body = (
-                    f"源笔记：{out['source_title'] or '?'}\n"
-                    f"最新交易日：{out['data_date']}\n"
-                    f"已停更天数：{out['stale_days']} 天（阈值 {WIKI_STALE_DAYS_ALERT} 天）\n"
-                    f"降级原因：{out.get('degraded_reason') or '源无新篇'}\n"
-                    f"快照过期：{'是' if out.get('snapshot_expired') else '否'}\n"
-                    f"源 URL：{out['note_url']}\n\n"
-                    f"请检查 ima 知识库「强势股跟踪」文件夹是否已迁移或更名。"
-                )
-                v8_send_alert.send_alert(_subj, _body, level="stale")
-        except Exception as _ae:
-            print(f"[WARN] 源停更邮件告警发送失败（非致命）: {_ae}")
+        if _prev_stale is not True:
+            # 🔴 2026-09-24：发邮件告警（stale 级；非交易日静默；本机有配置才真发）。
+            #    2026-09-29 起：仅停更态**进入时**发一次，之后静默。
+            try:
+                if v8_send_alert:
+                    _subj = f"ima 强势股日报源停更 {out['stale_days']} 天"
+                    _body = (
+                        f"源笔记：{out['source_title'] or '?'}\n"
+                        f"最新交易日：{out['data_date']}\n"
+                        f"已停更天数：{out['stale_days']} 天（阈值 {WIKI_STALE_DAYS_ALERT} 天）\n"
+                        f"降级原因：{out.get('degraded_reason') or '源无新篇'}\n"
+                        f"快照过期：{'是' if out.get('snapshot_expired') else '否'}\n"
+                        f"源 URL：{out['note_url']}\n\n"
+                        f"请检查 ima 知识库「强势股跟踪」文件夹是否已迁移或更名。\n"
+                        f"（本邮件仅在停更状态进入时发送一次；此后每日静默留证，"
+                        f"源恢复更新时也不会再发「停更」邮件。）"
+                    )
+                    v8_send_alert.send_alert(_subj, _body, level="stale")
+            except Exception as _ae:
+                print(f"[WARN] 源停更邮件告警发送失败（非致命）: {_ae}")
+        else:
+            print(f"🔕 源停更邮件已于上期发出（连续停更第 {out['stale_days']} 天）——"
+                  f"按 2026-09-29 邮件纪律静默留证，不再每日重复发送。")
     else:
+        if _prev_stale is True:
+            print(f"🎉 源已恢复更新（上期停更，本期数据日 {out['data_date']}）——"
+                  f"按纪律静默（好消息不打扰），前端卡片红胶囊将自动消失。")
         print(f"📅 源数据日 {out['data_date']}（新鲜）· 源自述更新时间 {out['source_updated_at'] or '?'}")
 
     os.makedirs(RAW_DIR, exist_ok=True)
