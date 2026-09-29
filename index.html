@@ -679,7 +679,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=d89403ea6c" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=1eee7c35ab" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=383275f899" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1819,10 +1819,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=ed8bb53bce" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=9d30215fed" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=12b102632e" defer></script>
+<script src="data/RUNNER_STATUS.js?v=171255368e" defer></script>
 <script src="data/HB_XIAOJIU.js?v=39ab4498fa" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=b005477c20" defer></script>
-<script src="data/HEALTH_CHECK.js?v=638ee8efdf" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=a9d8a1549d" defer></script>
+<script src="data/HEALTH_CHECK.js?v=6cbe231ef0" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=075f3af6e9" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=fbdf6de74f" defer></script>
