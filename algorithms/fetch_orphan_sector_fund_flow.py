@@ -545,6 +545,150 @@ def _fetch_akshare_real_5d20d(top_list):
     return result
 
 
+# ═══ 2026-09-29 一劳永逸（主人令·「资金净额趋势卡 之前几千亿/现在几十亿，还与真值方向相反」）═══
+# 根因（实测实锤）：P0 本地累加把「最近 N 条稀疏记录」硬标成「N日」——
+#   history 只记「板块上榜日」（main 里仅 top_list 板块 append），猪肉 5 条记录横跨 40 天被标「5日」；
+#   汽车整车 20 条稀疏记录求和 +65.21 硬标「20日」，而东财官方真值 20日 = -13.74（方向相反）。
+# 根治：以东财官方 per-board 资金流日K（push2his fflow/daykline）为唯一真源，
+#   严格按「最后 N 个交易日」求和，*_days 写真实窗口天数；稀疏记录从此无权出数（见 P0 连续性闸门）。
+EM_FFLOW_HOSTS = ["http://push2his.eastmoney.com", "https://push2his.eastmoney.com"]
+# 🟢 2026-09-29：板块名→BK 代码映射改用 searchapi suggest（clist 的 push2/push2delay 在本机/代理环境
+#   被 RemoteDisconnected 彻底阻断；searchapi 经实测可达，返回 Classify=BK 的板块 Code）。
+EM_SEARCH_HOSTS = ["https://searchapi.eastmoney.com", "http://searchapi.eastmoney.com"]
+EM_SEARCH_TOKEN = "D43BF722C8E5ADC0ACEED19C09C0610F"
+# 🟢 2026-09-29：本仓内部板块名 ↔ 东财标准板块名 别名（东财无完全同名，需映射才能取真源日K）。
+#   中船系等为派生板块，东财无对应 → 显式 None，直接回退本地闸门（宁空勿假）。
+EM_BK_NAME_ALIAS = {
+    "石油加工贸易": "石油石化",
+    "煤炭开采加工": "煤炭",
+    "证券": "证券Ⅱ",
+    "中船系": None,
+}
+_BK_CODE_CACHE_FILE = os.path.join(ROOT, "raw_data", "sector_bk_codes.json")
+
+
+def _em_get_json(url, timeout=15, tries=2):
+    last = None
+    # 🟢 2026-09-29：trust_env=False 强制直连——本机/部分环境系统代理(127.0.0.1:xxxx)会把
+    #   push2/push2his 劫持成 ProxyError 或返回假 200 空 data，urllib 直连则正常（实测）。
+    _s = requests.Session()
+    _s.trust_env = False
+    for _i in range(tries):
+        try:
+            rq = _s.get(url, timeout=timeout, headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                "Referer": "https://data.eastmoney.com/",
+            })
+            return rq.json()
+        except Exception as _e:
+            last = _e
+            time.sleep(1)
+    raise last
+
+
+def _load_bk_code_map():
+    try:
+        with open(_BK_CODE_CACHE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def _save_bk_code_map(m):
+    try:
+        with open(_BK_CODE_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(m, f, ensure_ascii=False)
+    except Exception:
+        pass
+
+
+def _em_bk_code(name):
+    """板块名 → 东财 BK 代码。clist(push2) 在代理环境被 RemoteDisconnected 阻断，
+    改用 searchapi suggest（已实测可达）取 Classify=BK 的板块 Code；结果缓存到
+    raw_data/sector_bk_codes.json（跨运行零重复拉取）。失败返回 None → 该板块回退本地闸门累加。"""
+    m = _load_bk_code_map()
+    if name in m:
+        return m[name]
+    # 别名：本仓内部名 → 东财标准名（None 表示东财无对应，直接回退）
+    alias = EM_BK_NAME_ALIAS.get(name, name)
+    if alias is None:
+        return None
+    got = False
+    for host in EM_SEARCH_HOSTS:
+        try:
+            u = (f"{host}/api/suggest/get?input={requests.utils.quote(alias)}"
+                 f"&type=14&token={EM_SEARCH_TOKEN}&count=10&refer=web")
+            j = _em_get_json(u, timeout=15, tries=2)
+            arr = ((j.get("QuotationCodeTable") or {}).get("Data") or [])
+            for it in arr:
+                if (str(it.get("Classify")) == "BK" or str(it.get("SecurityType")) == "9") \
+                        and str(it.get("Name", "")).strip() == alias:
+                    code = str(it.get("Code", "")).strip()
+                    if code:
+                        m[name] = code
+                        got = True
+                        break
+            if got:
+                break
+        except Exception:
+            continue
+    if got:
+        _save_bk_code_map(m)
+        return m.get(name)
+    print(f"  ⚠️ [BK映射] 未找到东财代码: {name}（回退本地闸门累加）")
+    return None
+
+
+def fetch_em_fflow_windows(top_list, max_n=60):
+    """东财官方日K真源：严格按「最后 N 个交易日」求和 5/10/20/60 日窗口。
+    返回 {name: {net_5d, net_5d_days, net_10d, ..., net_60d_days, source}}；失败的板块不进结果。
+    截止口径：CST 15:00 前视为未收盘 → 排除当日盘中行；15:00 后含当日收盘行。"""
+    result = {}
+    now_cst = datetime.utcnow() + timedelta(hours=8)  # runner 是 UTC，显式 +8（铁律5）
+    today_str = now_cst.strftime("%Y-%m-%d")
+    include_today = now_cst.hour >= 15
+    items = sorted(top_list, key=lambda x: abs(x.get("net", 0)), reverse=True)[:max_n]
+    ok_cnt = 0
+    for item in items:
+        name = item.get("name")
+        if not is_valid_sector_name(name):
+            continue
+        bk = _em_bk_code(name)
+        if not bk:
+            continue
+        rows = None
+        for host in EM_FFLOW_HOSTS:
+            try:
+                u = (f"{host}/api/qt/stock/fflow/daykline/get?lmt=0&klt=101"
+                     f"&fields1=f1,f2,f3,f7"
+                     f"&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65"
+                     f"&secid=90.{bk}")
+                kl = (_em_get_json(u).get("data") or {}).get("klines") or []
+                rows = [(k.split(",")[0], float(k.split(",")[1]) / 1e8) for k in kl]
+                break
+            except Exception:
+                continue
+        if not rows:
+            continue
+        while rows and rows[-1][0] == today_str and not include_today:
+            rows = rows[:-1]  # 盘中/盘前运行：当日行未收盘，剔除，窗口止于上一收盘日
+        if len(rows) < 5:
+            continue
+        ent = {}
+        for n in (5, 10, 20, 60):
+            if len(rows) >= n:
+                ent[f"net_{n}d"] = round(sum(v for _, v in rows[-n:]), 2)
+                ent[f"net_{n}d_days"] = n
+        if not ent:
+            continue
+        ent["source"] = "东财日K"
+        result[name] = ent
+        ok_cnt += 1
+        time.sleep(0.15)
+    print(f"  🟢 [EM日K真源] 严格窗口累计: 成功 {ok_cnt}/{len(items)} 板块")
+    return result
+
+
 def fetch_from_neodata():
     """使用 NeoData 接口获取板块资金流向（备选数据源）"""
     import requests as req
@@ -883,14 +1027,30 @@ def fetch_sector_flow():
                 if name in hist_data and len(hist_data[name]) >= 2:
                     real_entries = [x for x in hist_data[name] if not x.get("carried")]
                     nets = [x.get("net", 0) for x in real_entries]
-                    if len(nets) >= 5:
+                    # 🟢 2026-09-29 连续性闸门（「5日/20日与真值方向相反」根因根治）：
+                    #   本地 history 只记「上榜日」，稀疏记录求和冒充 N 日 = 假数据。
+                    #   仅当尾部 N 条记录的历日跨度 ≤ 该窗口自然上限时才允许出数：
+                    #   5日≤10历日 / 10日≤16 / 20日≤32 / 60日≤95（含节假日余量）。
+                    _dates = [str(x.get("date", "")) for x in real_entries]
+
+                    def _span_ok(n, cal_cap):
+                        if len(_dates) < n:
+                            return False
+                        try:
+                            _d0 = datetime.strptime(_dates[-n], "%Y-%m-%d")
+                            _d1 = datetime.strptime(_dates[-1], "%Y-%m-%d")
+                            return (_d1 - _d0).days <= cal_cap
+                        except Exception:
+                            return False
+
+                    if len(nets) >= 5 and _span_ok(5, 10):
                         item["net_5d"] = round(sum(nets[-5:]), 2)
                         item["net_5d_days"] = 5
-                        if item.get("source") not in ("东财历史", "同花顺估算", "neodata"):
+                        if item.get("source") not in ("东财历史", "同花顺估算", "neodata", "东财日K"):
                             item["source"] = "本地累加"
                         hist_5d_count += 1
-                    # 20日: 真实历史 >=8 天即可出数（本地约 9 天，避免空窗）
-                    if len(nets) >= 8:
+                    # 20日: 真实历史 >=8 天 + 尾部跨度≤32历日 才出数（稀疏记录一律拒绝）
+                    if len(nets) >= 8 and _span_ok(min(len(nets), 20), 32):
                         n20 = round(sum(nets[-20:]) if len(nets) >= 20 else sum(nets), 2)
                         if item.get("net_20d") in (None, 0) and n20 != 0:
                             item["net_20d"] = n20
@@ -918,6 +1078,15 @@ def fetch_sector_flow():
                 h = ak_hist[name]
                 item["net_5d"] = h["net_5d"]
                 item["net_20d"] = h["net_20d"]
+                # 🟢 2026-09-29：真实日序列的窗口天数如实标注（此前缺标 ⇒ 兜底乱写 len(real_all)）
+                if h.get("net_5d") is not None:
+                    item["net_5d_days"] = 5
+                if h.get("net_10d") is not None:
+                    item["net_10d_days"] = 10
+                if h.get("net_20d") is not None:
+                    item["net_20d_days"] = 20
+                if h.get("net_60d") is not None:
+                    item["net_60d_days"] = 60
                 item["source"] = "东财历史"
                 ak_matched += 1
         if ak_matched > 0:
@@ -1002,6 +1171,18 @@ def fetch_sector_flow():
             history[name].append({"date": today, "net": net})
         history[name] = history[name][-60:]
 
+    # 🟢 2026-09-29 一劳永逸：东财日K真源严格窗口累计，权威覆盖 top_list 的 5/10/20/60 日
+    #   （真源成功 ⇒ 稀疏历史/估算值全部被覆盖；真源失败 ⇒ 回退下方 P0 连续性闸门，宁空勿假）
+    _em_wins = {}
+    try:
+        _em_wins = fetch_em_fflow_windows(result["top_list"])
+        for item in result["top_list"]:
+            _w = _em_wins.get(item.get("name"))
+            if _w:
+                item.update(_w)
+    except Exception as _e:
+        print(f"  ⚠️ [EM日K真源] 异常（回退本地连续性闸门累加）: {_e}")
+
     # 计算连续天数
     for item in result["top_list"]:
         name = item["name"]
@@ -1064,11 +1245,16 @@ def fetch_sector_flow():
             item["net_60d"] = net_60d_val
             item["net_60d_days"] = len(real_60)
         # 兜底：写实 *_days 字段，sectors_in/out 同步时不再乱 fallback
+        # （🟢 2026-09-29：仅当对应净额值真实存在才标天数，杜绝「值空却标满天数」）
         real_all = [h for h in hist if not h.get("carried")]
         for k in ("net_5d", "net_10d", "net_20d", "net_60d"):
             days_field = k + "_days"
-            if item.get(days_field) is None:
+            if item.get(days_field) is None and item.get(k) not in (None, 0):
                 item[days_field] = len(real_all)
+        # 🟢 2026-09-29 EM日K真源权威覆盖（history-only 候选板块同样享受真值）
+        _w = _em_wins.get(nm)
+        if _w:
+            item.update(_w)
 
 
     trend_5d = sorted([x for x in candidate_list if x.get("net_5d") is not None and x["net_5d"] != 0],
