@@ -1120,6 +1120,9 @@
     },
     "002640": {
       "2026-09-30": 3.94
+    },
+    "300394": {
+      "2026-09-30": 255.99
     }
   },
   "_tracking_latest": {
@@ -1760,12 +1763,20 @@
       "last_close": 3.94,
       "status": "strict",
       "streak": 1
+    },
+    "300394": {
+      "enter_date": "2026-09-30",
+      "enter_close": 255.99,
+      "last_date": "2026-09-30",
+      "last_close": 255.99,
+      "status": "strict",
+      "streak": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-09-30 03:40:28"
+    "last_update": "2026-09-30 04:50:12"
   },
   "2026-08-18": [
     {
@@ -2360,7 +2371,7 @@
       "status": "near"
     }
   ],
-  "update_time": "2026-09-30 03:40:28",
+  "update_time": "2026-09-30 04:50:12",
   "2026-08-30": [
     {
       "code": "300475",
@@ -5422,70 +5433,47 @@
   ],
   "2026-09-30": [
     {
-      "code": "300199",
-      "name": "翰宇药业",
-      "market": "sz",
-      "board": "创业板",
-      "close": 22.79,
-      "pct_chg": 1.741,
-      "total_score": 36.0,
-      "quality_grade": "A",
-      "industry": "医药制造业",
-      "sectors": [
-        "2026中报预增",
-        "深股通",
-        "流感",
-        "创新药",
-        "减肥药",
-        "肝炎概念",
-        "互联医疗",
-        "医药制造业"
-      ],
-      "signal_count": 1,
-      "status": "strict"
-    },
-    {
-      "code": "002640",
-      "name": "跨境通",
-      "market": "sz",
-      "board": "主板",
-      "close": 3.94,
-      "pct_chg": -0.505,
-      "total_score": 34.2,
-      "quality_grade": "A",
-      "industry": "零售业",
-      "sectors": [
-        "消费电子概念",
-        "2026中报扭亏",
-        "电商概念",
-        "内贸流通",
-        "跨境电商",
-        "拼多多概念",
-        "无线耳机",
-        "零售业"
-      ],
-      "signal_count": 2,
-      "status": "strict"
-    },
-    {
       "code": "688498",
       "name": "源杰科技",
       "market": "sh",
       "board": "科创板",
       "close": 1638.5,
       "pct_chg": 2.958,
-      "total_score": 33.5,
+      "total_score": 35.4,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
+        "计算机、通信和其他电子设备制造业",
         "基金重仓",
-        "MSCI中国",
+        "百元股",
         "2026中报预增",
-        "沪股通",
         "通信技术",
         "昨日高振幅",
-        "百元股",
-        "计算机、通信和其他电子设备制造业"
+        "沪股通",
+        "MSCI中国"
+      ],
+      "signal_count": 1,
+      "status": "strict"
+    },
+    {
+      "code": "300199",
+      "name": "翰宇药业",
+      "market": "sz",
+      "board": "创业板",
+      "close": 22.79,
+      "pct_chg": 1.741,
+      "total_score": 34.2,
+      "quality_grade": "A",
+      "industry": "医药制造业",
+      "sectors": [
+        "深股通",
+        "互联医疗",
+        "2026中报预增",
+        "创新药",
+        "流感",
+        "肝炎概念",
+        "医药制造业",
+        "减肥药"
       ],
       "signal_count": 1,
       "status": "strict"
@@ -5497,18 +5485,18 @@
       "board": "创业板",
       "close": 392.91,
       "pct_chg": -1.699,
-      "total_score": 31.1,
+      "total_score": 31.7,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "基金重仓",
-        "MSCI中国",
-        "2026中报预增",
+        "计算机、通信和其他电子设备制造业",
         "深股通",
-        "机构重仓",
-        "百元股",
         "深证100R",
-        "计算机、通信和其他电子设备制造业"
+        "百元股",
+        "2026中报预增",
+        "基金重仓",
+        "机构重仓",
+        "MSCI中国"
       ],
       "signal_count": 0,
       "status": "strict"
@@ -5520,76 +5508,67 @@
       "board": "创业板",
       "close": 246.39,
       "pct_chg": 0.163,
-      "total_score": 29.8,
+      "total_score": 30.4,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "MSCI中国",
-        "2026中报预增",
+        "计算机、通信和其他电子设备制造业",
+        "AI眼镜",
         "小米概念",
+        "2026中报预增",
+        "2026一季报预增",
         "AI智能体",
         "物联网",
-        "计算机、通信和其他电子设备制造业",
-        "2026一季报预增",
-        "AI眼镜"
+        "MSCI中国"
       ],
       "signal_count": 0,
       "status": "strict"
     },
     {
-      "code": "601168",
-      "name": "西部矿业",
-      "market": "sh",
-      "board": "主板",
-      "close": 35.17,
-      "pct_chg": 4.146,
-      "total_score": 28.6,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 2,
-      "status": "strict"
-    },
-    {
-      "code": "000807",
-      "name": "云铝股份",
+      "code": "002640",
+      "name": "跨境通",
       "market": "sz",
       "board": "主板",
-      "close": 26.47,
-      "pct_chg": 4.336,
-      "total_score": 28.6,
+      "close": 3.94,
+      "pct_chg": -0.505,
+      "total_score": 27.3,
       "quality_grade": "A",
-      "industry": "有色金属冶炼和压延加工业",
+      "industry": "零售业",
       "sectors": [
-        "有色金属冶炼和压延加工业"
+        "无线耳机",
+        "电商概念",
+        "消费电子概念",
+        "零售业",
+        "2026中报扭亏",
+        "内贸流通",
+        "拼多多概念",
+        "跨境电商"
       ],
       "signal_count": 2,
       "status": "strict"
     },
     {
-      "code": "300390",
-      "name": "天华新能",
+      "code": "300394",
+      "name": "天孚通信",
       "market": "sz",
       "board": "创业板",
-      "close": 49.05,
-      "pct_chg": 2.187,
-      "total_score": 26.3,
-      "quality_grade": "B",
+      "close": 255.99,
+      "pct_chg": 4.571,
+      "total_score": 25.5,
+      "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "固态电池",
-        "独角兽",
-        "MSCI中国",
-        "锂矿概念",
-        "深股通",
-        "医疗器械概念",
         "计算机、通信和其他电子设备制造业",
-        "2026一季报预增"
+        "算力概念",
+        "深股通",
+        "5G概念",
+        "深证100R",
+        "百元股",
+        "HS300",
+        "MSCI中国"
       ],
-      "signal_count": 2,
-      "status": "near"
+      "signal_count": 0,
+      "status": "strict"
     },
     {
       "code": "002916",
@@ -5598,41 +5577,41 @@
       "board": "主板",
       "close": 375.6,
       "pct_chg": 1.245,
-      "total_score": 26.1,
+      "total_score": 26.7,
       "quality_grade": "C",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "MSCI中国",
-        "2026中报预增",
-        "5G概念",
-        "深股通",
+        "计算机、通信和其他电子设备制造业",
         "PCB",
-        "百元股",
+        "深股通",
+        "5G概念",
         "深证100R",
-        "计算机、通信和其他电子设备制造业"
+        "百元股",
+        "2026中报预增",
+        "MSCI中国"
       ],
       "signal_count": 0,
       "status": "near"
     },
     {
-      "code": "300033",
-      "name": "同花顺",
+      "code": "300390",
+      "name": "天华新能",
       "market": "sz",
       "board": "创业板",
-      "close": 199.71,
-      "pct_chg": 0.838,
-      "total_score": 25.6,
-      "quality_grade": "C",
-      "industry": "其他金融业",
+      "close": 49.05,
+      "pct_chg": 2.187,
+      "total_score": 25.1,
+      "quality_grade": "B",
+      "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "MSCI中国",
-        "2026中报预增",
-        "国产软件",
-        "机构重仓",
-        "百元股",
-        "其他金融业",
-        "鸿蒙概念",
-        "深证100R"
+        "计算机、通信和其他电子设备制造业",
+        "深股通",
+        "独角兽",
+        "医疗器械概念",
+        "2026一季报预增",
+        "固态电池",
+        "锂矿概念",
+        "MSCI中国"
       ],
       "signal_count": 2,
       "status": "near"
