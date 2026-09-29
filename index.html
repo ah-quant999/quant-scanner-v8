@@ -5880,8 +5880,8 @@ function fmtSigned(v){
         try{ consensusItems = _sortBucket(consensusItems, 'consensus_count', false); }catch(e){ console.warn('[life] consensus sort', e); }
         html += '<div style="margin:10px 0;padding:12px;border:1.5px solid rgba(56,189,248,.45);border-radius:14px;background:rgba(56,189,248,.04);">';
         html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">';
-        html += '<span style="font-size:13px;font-weight:700;color:#38bdf8;">🤝 多 algo 共识 · '+consensusItems.length+' 只</span>';
-        html += '<span style="font-size:10.5px;color:var(--dim);">v8 三大 algo ≥2 命中 · 按共识数↓</span>';
+        html += '<span style="font-size:13px;font-weight:700;color:#38bdf8;">🔥 四量强势信号 · '+consensusItems.length+' 只</span>';
+        html += '<span style="font-size:10.5px;color:var(--dim);">单算法强势度 ≥2 · 按强度↓</span>';
         html += '</div>';
         html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
         consensusItems.forEach(function(it){
@@ -5898,7 +5898,7 @@ function fmtSigned(v){
           html +=   '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
           html +=     '<span style="font-weight:700;font-size:12.5px;color:var(--txt);font-family:ui-monospace,monospace;">'+_esc(_code)+'</span>';
           html +=     '<span style="font-size:11.5px;color:var(--txt);">'+_esc(_name)+'</span>';
-          html +=     '<span style="margin-left:auto;font-weight:700;font-size:11px;color:#38bdf8;padding:2px 8px;border-radius:6px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);white-space:nowrap;">🤝 '+_cons+' / 3</span>';
+          html +=     '<span style="margin-left:auto;font-weight:700;font-size:11px;color:#38bdf8;padding:2px 8px;border-radius:6px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);white-space:nowrap;">🔥 强 '+_cons+'</span>';
           html +=     _resoBadge(_code);
           html +=   '</div>';
           html +=   '<div style="margin-bottom:6px;line-height:1.6;font-size:10.5px;">';
@@ -6009,7 +6009,7 @@ function fmtSigned(v){
             g +=   '</div>';
             g +=   '<div style="display:flex;align-items:center;gap:4px;margin-top:auto;min-width:0;">';
             if(_isSel){ g += '<span style="font-size:9px;font-weight:700;color:var(--gold);">🌟</span>'; }
-            if(_cons>=2){ g += '<span style="font-size:9px;font-weight:700;color:#38bdf8;padding:1px 4px;border-radius:4px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);">🤝'+_cons+'</span>'; }
+            if(_cons>=2){ g += '<span style="font-size:9px;font-weight:700;color:#38bdf8;padding:1px 4px;border-radius:4px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);">🔥'+_cons+'</span>'; }
             g += _resoBadge(_code);
             g +=     '<span style="margin-left:auto;font-weight:700;font-size:11.5px;color:'+periodColor+';white-space:nowrap;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
             g +=   '</div>';
@@ -14599,7 +14599,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       var consShowLimit = 60;
       html += '<div style="margin:8px 0;padding:8px;border:1px solid rgba(56,189,248,.35);border-radius:8px;background:rgba(56,189,248,.04);">';
       html +=   '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">';
-      html +=     '<span style="font-size:12.5px;font-weight:700;color:#38bdf8;">🤝 全共识池 '+consensusItems.length+' 只</span>';
+      html +=     '<span style="font-size:12.5px;font-weight:700;color:#38bdf8;">🔥 四量强势信号 '+consensusItems.length+' 只</span>';
       html +=     '<span style="font-size:10.5px;color:var(--dim);">每胶囊一行 · 内部左右双列 · 按共识数↓ · 前 '+consShowLimit+' 只</span>';
       html +=   '</div>';
 
@@ -14621,7 +14621,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         html +=   '<div style="display:flex;align-items:center;gap:6px;min-width:170px;">';
         html +=     '<span style="font-weight:700;font-size:12.5px;color:var(--txt);font-family:ui-monospace,monospace;">'+window._escapeHtml(_code)+'</span>';
         html +=     '<span style="font-size:11.5px;color:var(--txt);">'+window._escapeHtml(_name)+'</span>';
-        html +=     '<span style="font-weight:700;font-size:11px;color:#38bdf8;padding:2px 8px;border-radius:6px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);white-space:nowrap;">🤝 '+_cons+' / 3</span>';
+        html +=     '<span style="font-weight:700;font-size:11px;color:#38bdf8;padding:2px 8px;border-radius:6px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);white-space:nowrap;">🔥 强 '+_cons+'</span>';
         html +=   '</div>';
         // 右列：algo chips + 入场以来%
         html +=   '<div style="flex:1;min-width:240px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
@@ -18980,7 +18980,7 @@ window.__renderV8CalToday();
       try{
         var _ai = _algoIndex[String(s.code)||''];
         if(_ai && _ai.cons>=2){
-          tags += '<span class="no-shrink" style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;background:rgba(56,189,248,.18);color:#38bdf8;border:1px solid rgba(56,189,248,.4);white-space:nowrap;" title="多 algo 共识：'+_fe((_ai.algos||[]).join(' / '))+' （方案B加权 +3 分）">🤝 '+_ai.cons+' / 3</span>';
+          tags += '<span class="no-shrink" style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;background:rgba(56,189,248,.18);color:#38bdf8;border:1px solid rgba(56,189,248,.4);white-space:nowrap;" title="四量强势信号：强度 '+_ai.cons+' / 2（单算法时代按信号强度计）">🔥 强 '+_ai.cons+'</span>';
         }
       }catch(_){}
       var srcColor={'三重共识':'var(--purple)','四量终极':'#ff7043','逆势龙头·精锐':'#06b6d4'};

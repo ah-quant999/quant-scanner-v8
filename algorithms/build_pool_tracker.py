@@ -158,6 +158,19 @@ def _signal_type(it, reason, algos_hit):
     return "其他"
 
 
+def _signal_strength(status, signal_type):
+    """单算法时代：用信号强度代替「多算法共识」。强势/加速=2；回调买点/反弹=1；其他=0。"""
+    if signal_type in ("强势", "加速", "强势突破", "多算法共识"):
+        return 2
+    if status == "strong":
+        return 2
+    if signal_type in ("短线买点", "回调", "反弹"):
+        return 1
+    if status == "buy_dip":
+        return 1
+    return 0
+
+
 def _sector_match_item(item, sector_top_in, sector_top_out):
     item_concepts = set(item.get("_concepts", []) or [])
     item_industry = item.get("_industry", "") or ""
@@ -206,7 +219,10 @@ def _selection_score(item, phase, sector_top_in, sector_top_out):
         elif status == "strong" and sector_match == "top_inflow":
             sentiment_bonus, sentiment_match = 3, "caution"
         elif status == "buy_dip":
-            sentiment_bonus, sentiment_match = 2, "neutral"
+            if item.get("drawdown", 0) >= 8.0:
+                sentiment_bonus, sentiment_match = 4, "ok"
+            else:
+                sentiment_bonus, sentiment_match = 2, "neutral"
         elif status == "topped":
             sentiment_bonus, sentiment_match = -2, "caution"
         elif status == "weak" and sector_match == "outflow":
@@ -252,15 +268,17 @@ def build_items(merged, sentiment, sector_flow, profile_map):
         status, buy_hint, sell_hint = _status_decide(peak, last, days)
         code = it["code"]
         prof = (profile_map or {}).get(code, {}) or {}
-        # 阶段 2：多算法共识 + 信号类型
+        # 阶段 2：强势信号（单算法时代：用信号强度代替「多算法共识」）
         algos_hit = it.get("_algos_hit", [it.get("_algo", "")])
-        consensus_count = len(set(algos_hit))
         _reason = (it.get("signal_detail") or {}).get("reason", "")
         signal_type = _signal_type(it, _reason, algos_hit)
+        signal_strength = _signal_strength(status, signal_type)
+        consensus_count = signal_strength  # 复用字段：单算法下=强势度(0-2)，前端≥2即「强势信号」
         # 🔧 K 批修复：必须把 status 也注入 it_for_select（否则 _selection_score 走 normal 分支）
         it_for_select = dict(it, _industry=prof.get("industry", ""),
                               _concepts=prof.get("concepts", []),
-                              status=status)
+                              status=status,
+                              drawdown=round(peak - last, 2))
 
         (sector_bonus, sentiment_bonus, sector_match, concept_top, sector_net,
          sentiment_match, selected_score, selected) = _selection_score(
@@ -287,6 +305,7 @@ def build_items(merged, sentiment, sector_flow, profile_map):
             "algos_hit": algos_hit,
             "consensus_count": consensus_count,
             "signal_type": signal_type,
+            "signal_strength": signal_strength,
             # K 批精选维度
             "industry": prof.get("industry", ""),
             "concept_top": concept_top,
@@ -351,7 +370,7 @@ def main():
         merged = dedupe_by_code(retained_algos)
         items = build_items(merged, sentiment, sector_flow, profile_map)
         status_counts, by_algo, selected_count = aggregate(items)
-        consensus_count = sum(1 for it in items if it.get("consensus_count", 0) >= 2)
+        consensus_count = sum(1 for it in items if it.get("signal_strength", 0) >= 2)
         def _sort_key(it):
             if it["status"] == "strong":
                 return (0, -it["peak_pct"], -it["days_in"])
@@ -393,7 +412,7 @@ def main():
                 "2026-09-03 已下线「板块龙头 / 大牛股猎手」已过滤"
             ),
         }
-        log(f"✅ 入池 {len(items)} 只（去重前 {raw_pool_size}）；精选 {selected_count} 只；多算法共识 {consensus_count} 只；状态分布 {dict(status_counts)}")
+        log(f"✅ 入池 {len(items)} 只（去重前 {raw_pool_size}）；精选 {selected_count} 只；强势信号 {consensus_count} 只；状态分布 {dict(status_counts)}")
 
     os.makedirs(RAW_DIR, exist_ok=True)
     with open(OUT_JSON_PATH, "w", encoding="utf-8") as f:

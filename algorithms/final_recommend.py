@@ -1379,6 +1379,25 @@ def main():
             _e["buy_score"] = _e["final_score"]
             _e["_aligned_topfactor"] = True
             _al_hit += 1
+    # 🆕 2026-09-29 去僵化：读取上一日最终推荐 Top5，对连续霸榜票施加温和时间衰减
+    try:
+        _yest = load_json("final_recommend.json")
+        _yest_top = {norm_code(s.get("code", "")).lstrip('.')
+                     for s in (_yest.get("stocks") or [])[:5]}
+    except Exception:
+        _yest_top = set()
+    V8_FINAL_DECAY = float(os.environ.get("V8_FINAL_DECAY", "0.95"))
+    _n_decayed = 0
+    for _e in scored:
+        _k = _e.get("key") or norm_code(_e.get("code", "")).lstrip(".")
+        if _e.get("_aligned_topfactor") and _k in _yest_top:
+            _e["final_score"] = round(_e["final_score"] * V8_FINAL_DECAY, 2)
+            _e["buy_score"] = _e["final_score"]
+            _e["_decayed"] = True
+            _n_decayed += 1
+    if _n_decayed:
+        print(f"  [去僵化] {_n_decayed} 只连续霸榜票 final_score ×{V8_FINAL_DECAY}")
+
     # 名次 = 因子榜原序；不在榜上的压到最后（理论上无：四量终极即因子榜来源）
     scored.sort(key=lambda x: (
         _ord_by_key.get(x.get("key") or norm_code(x.get("code", "")).lstrip("."), 10 ** 6),
