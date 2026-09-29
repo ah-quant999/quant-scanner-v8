@@ -26,18 +26,44 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-29 05:30"
-  updated_by: 阿狸咪的工程师(alimi-cn)
+  updated: "2026-09-29 18:40"
+  updated_by: 小九(lemoncat-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 98
+  next_id_seq: 99
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
+  - id: freshness-falsealarm-rootfix-0929
+    priority: P1
+    owner: lemoncat-cn
+    status: pending-verify
+    what: >
+      运维面板「新鲜度/红卡」三处「陈旧/假红」真因已定位并根治：
+      (1) FRESHNESS_STATUS.js 的 update_time 被 _pick_ts 死锁恒冻结 —— freshness_status.json
+          顶层无时间字段 ⇒ _write_js 恒走 existing 兜底 ⇒ 面板永远显示旧日期假红；
+      (2) US_HK_MAP 卡面冻结 —— 两表 CATEGORY_MAP 漏挂档（仅 premarket 单档），
+          且生成器缺「美东交易时段/今日已产出」双闸门，盘后窗口被闸拦死；
+      (3) final_recommend 入选日期每天固定假黄灯 —— health_check 的 final_enter_stale
+          在 18:00 前把「落后最近交易日 1 天」误报为陈旧（run_algorithms 18:00 闸门
+          致白天 enter_date 天然落后属预期）。
+    fix: >
+      update_v8.py _emit_freshness_status_js 在 _write_js 前注入 obj["update_time"]=now_cst()；
+      cloud_fetch_v8 / update_v8 两表 CATEGORY_MAP 同改 US_HK_MAP="premarket,intraday,post_close"；
+      fetch_us_hk_map.py build() 加双闸门（ET 09:30-16:00 拒产出 + 今日已产出跳过重抓）；
+      v8_health_check.py check_signal_date_freshness 改为窗口感知（18:00 前落后 1 日属预期，
+      仅 newest<last_trade 或 newest<prev_trade 才 warn）。提交 97abca39（2026-09-29T10:09Z 已落地）。
+    verify_how: >
+      ① 线上 data/FRESHNESS_STATUS.js update_time 已现 2026-09-29 18:13:49（修复前冻结旧日期）✓已证；
+      ② 下轮 pipeline（盘前/盘中/盘后）应触达 US_HK_MAP 生成器，raw_data/us_hk_map.json update_time
+         由 2026-09-28 翻到当日即证（源非空时）；
+      ③ health_check 18:00 前 final_enter_stale 应报 ok 而非 warn。
+    updated: "2026-09-29 18:40"
+
   - id: redcard-hostfail-rootfix-0924
     priority: P1
     owner: shared
