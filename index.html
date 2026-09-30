@@ -673,9 +673,9 @@ window.__domReadyFns=[];
          仍被每日洞察/情绪周期消费 ⇒ 只删卡壳不删源。 -->
         <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
-    <script src="data/MARKET_REGIME.js?v=386c6b3dd5" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
+    <script src="data/MARKET_REGIME.js?v=c41e0e9e53" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
     <script src="data/RISK_GAUGE.js?v=ac0c1e0ff9" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
-    <script src="data/SECTOR_RECOMMENDATION.js?v=af67f17941" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
+    <script src="data/SECTOR_RECOMMENDATION.js?v=bc5e6b41a3" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=ecd78fd84a" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
     <!-- 2026-09-13 阿狸咪的工程师：补注入 FRESHNESS_STATUS（2.7 KB）。
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
@@ -1811,7 +1811,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      ALGO_TRACK.js 再度注入 —— 它是「选股生命周期（实盘持仓池）」回测的唯一真源，
      内含 by_horizon（真实持仓池分档前向收益）+ unrealized（当日浮动）。
      2026-08-31 曾因「前端零引用」停止注入（省 42.4 KB）——现回测页需要它，故恢复。 -->
-    <script src="data/ALGO_TRACK.js?v=1790773189" defer></script>
+    <script src="data/ALGO_TRACK.js?v=2c927a6bff" defer></script>
 <script src="data/ETF_PULSE.js?v=5b8784c64c" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=b37a2e8ef2" defer></script>
 <script src="data/TOP10_DAILY.js?v=4275b7b743" defer></script>
@@ -8857,6 +8857,7 @@ window.__renderIndexObserve = function(){
     <div id="firstBoardAlertCard" class="card" style="margin-top:14px;background:#1a1d24;border:1px solid #2a2f3a;border-radius:10px;">
       <div style="padding:10px 12px;font-weight:700;color:#e6e9ef;border-bottom:1px solid #2a2f3a;">🔭 连板梯队前哨 <span style="font-size:11px;color:#8a93a6;font-weight:400;">一进二前哨 · 二进三观察 · 量比≥3</span> <span id="fbaUpd" style="font-size:11px;color:#8a93a6;font-weight:400;">更新于 --</span></div>
       <div id="fbaBody" style="padding:10px 12px;font-size:13px;color:#8a93a6;">加载中…</div>
+      <div style="padding:0 12px 10px;font-size:12px;line-height:1.7;color:#8a93a6;"><b style="color:#fbbf24;">&#x1F4CC; 核心：</b>首板放量&#8805;3倍=资金启动信号（回测晋级率&#8776;16%）；二连板=高位接力临界点（晋级率&#8776;24%，但隔夜高开吃掉溢价）。<br><b style="color:#fbbf24;">&#x1F4A1; 用法：</b>盘后出名单，次日盘中确认非一字开盘、分时弱转强再介入；量比3~5倍是健康区，<b>不是越大越好</b>（&gt;8倍多为巨分歧）。<br><b style="color:#fbbf24;">&#x26A0; 限制：</b>盘后更新、非盘中实时；观察名单&#8800;买点；一字板买不进，ST已剔除。</div>
     </div>
     <script>
     (function(){

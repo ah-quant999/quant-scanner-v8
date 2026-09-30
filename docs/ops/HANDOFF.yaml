@@ -7526,3 +7526,16 @@ items:
       - "docs/ops/HANDOFF.yaml#first-board-alert-0930"
     updated: "2026-09-30 20:57"
     updated_by: 阿狸咪的工程师
+
+  - id: ladder-legend-0930
+    priority: P2
+    owner: 阿狸咪(alimi-cn)
+    status: done
+    what: 连板梯队前哨卡补「核心/用法/限制」三行注脚（全站卡片规范样式，主题色 #fbbf24，HTML实体图标与其它卡一致）：核心=首板≥3倍量启动信号+二连板临界点（晋级率16%/24%）；用法=盘后出名单次日盘中确认介入、量比3~5健康区非越大越好；限制=盘后更新非实时、观察名单≠买点、一字板买不进ST已剔除。注脚为静态HTML置于fbaBody后，加载中/渲染失败也恒可见。
+    fix: tip_index_legend.html 锚点补丁（「加载中…</div></div><script>」唯一锚，卡尾注脚div）；29内联script new Function 0错、38保护标记全中、firstBoardAlertCard唯一、纯LF。
+    verify_how: 推后回读tip确认注脚3行在firstBoardAlertCard内部且在</div>（卡尾）之前；grep '&#x1F4CC;' 计数含本卡新增。
+    refs:
+      - "index.html"
+      - "docs/ops/HANDOFF.yaml#ladder-sentinel-fix-0930"
+    updated: "2026-09-30 21:05"
+    updated_by: 阿狸咪的工程师
