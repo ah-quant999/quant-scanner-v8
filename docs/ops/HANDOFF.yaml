@@ -7539,3 +7539,16 @@ items:
       - "docs/ops/HANDOFF.yaml#ladder-sentinel-fix-0930"
     updated: "2026-09-30 21:05"
     updated_by: 阿狸咪的工程师
+
+  - id: ladder-ui-0930
+    priority: P2
+    owner: 阿狸咪(alimi-cn)
+    status: done
+    what: 连板梯队前哨卡 UI 三改（主人 21:0x 令）：①「更新于」从手搓灰字换全站统一 🦊 胶囊（setBadge('fbaUpd','盘后','短线',ts)，带陈旧度/时段语义）；②换手率统一两位小数（(+r.turnover).toFixed(2)）；③首板/二进三两张表改一行两列网格 mini 卡（grid 1fr 1fr，每格名称/代码/价/量比/换手/行业）。
+    fix: push_ladder_ui.py 基于 API 实时 tip 现取现改现推（blob 取全文校验 size 防截断），29 内联 script new Function 0 错。commit a349104a10。
+    verify_how: tip 回读 setBadge('fbaUpd / function cell(r, priceLabel) / toFixed(2) 均在线且位于卡 script 内。
+    refs:
+      - "index.html"
+      - "docs/ops/HANDOFF.yaml#ladder-sentinel-fix-0930"
+    updated: "2026-09-30 21:16"
+    updated_by: 阿狸咪的工程师
