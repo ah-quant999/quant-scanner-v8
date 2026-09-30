@@ -1,13 +1,8 @@
 {
-  "update_time": "2026-09-30 18:48:13",
-  "run_start": "2026-09-30 18:22:57",
-  "ok": 13,
-  "fail": 1,
-  "failed_scripts": [
-    {
-      "script": "fetch_orphan_sector_fund_flow.py",
-      "reason": "监督器静默杀(>15min 无输出)"
-    }
-  ],
+  "update_time": "2026-09-30 20:50:36",
+  "run_start": "2026-09-30 20:03:09",
+  "ok": 27,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }

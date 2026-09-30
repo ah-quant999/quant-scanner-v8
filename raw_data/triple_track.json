@@ -1,11 +1,46 @@
 {
-  "update_time": "2026-09-30 07:02:46",
+  "update_time": "2026-09-30 20:18:55",
   "data_date": "2026-09-30",
   "track_start": "2026-09-30",
   "history_days": 34,
   "strict_count": 6,
   "near_count": 2,
   "tracked": [
+    {
+      "code": "300199",
+      "name": "翰宇药业",
+      "market": "sz",
+      "board": "创业板",
+      "status": "strict",
+      "total_score": 34.2,
+      "quality_grade": "A",
+      "industry": "医药制造业",
+      "sectors": [
+        "2026中报预增",
+        "创新药",
+        "医药制造业",
+        "肝炎概念",
+        "流感",
+        "深股通",
+        "减肥药",
+        "互联医疗"
+      ],
+      "signal_count": 1,
+      "enter_date": "2026-09-22",
+      "hold_days": 7,
+      "consecutive_days": 7,
+      "first_close": 23.85,
+      "current_close": 23.92,
+      "pnl_pct": 0.29,
+      "price_source": "quote",
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
     {
       "code": "002640",
       "name": "跨境通",
@@ -16,21 +51,21 @@
       "quality_grade": "A",
       "industry": "零售业",
       "sectors": [
-        "跨境电商",
         "零售业",
-        "内贸流通",
         "消费电子概念",
-        "无线耳机",
         "拼多多概念",
-        "电商概念",
-        "2026中报扭亏"
+        "跨境电商",
+        "无线耳机",
+        "内贸流通",
+        "2026中报扭亏",
+        "电商概念"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-30",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 3.94,
-      "current_close": 3.94,
+      "first_close": 3.91,
+      "current_close": 3.91,
       "pnl_pct": 0.0,
       "price_source": "quote",
       "catalysts": [
@@ -51,21 +86,21 @@
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
+        "百元股",
         "算力概念",
-        "深证100R",
-        "5G概念",
-        "MSCI中国",
-        "深股通",
         "计算机、通信和其他电子设备制造业",
+        "深股通",
+        "MSCI中国",
+        "5G概念",
         "HS300",
-        "百元股"
+        "深证100R"
       ],
       "signal_count": 0,
       "enter_date": "2026-09-30",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 255.99,
-      "current_close": 255.99,
+      "first_close": 260.77,
+      "current_close": 260.77,
       "pnl_pct": 0.0,
       "price_source": "quote",
       "catalysts": [
@@ -86,92 +121,22 @@
       "quality_grade": "C",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "深证100R",
+        "PCB",
         "2026中报预增",
-        "5G概念",
-        "MSCI中国",
-        "深股通",
-        "计算机、通信和其他电子设备制造业",
         "百元股",
-        "PCB"
+        "计算机、通信和其他电子设备制造业",
+        "深股通",
+        "MSCI中国",
+        "5G概念",
+        "深证100R"
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
       "hold_days": 1,
       "consecutive_days": 1,
       "first_close": 392.9,
-      "current_close": 375.6,
-      "pnl_pct": -4.4,
-      "price_source": "quote",
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "走弱"
-        }
-      ]
-    },
-    {
-      "code": "300199",
-      "name": "翰宇药业",
-      "market": "sz",
-      "board": "创业板",
-      "status": "strict",
-      "total_score": 34.2,
-      "quality_grade": "A",
-      "industry": "医药制造业",
-      "sectors": [
-        "医药制造业",
-        "互联医疗",
-        "2026中报预增",
-        "肝炎概念",
-        "创新药",
-        "深股通",
-        "流感",
-        "减肥药"
-      ],
-      "signal_count": 1,
-      "enter_date": "2026-09-22",
-      "hold_days": 7,
-      "consecutive_days": 7,
-      "first_close": 23.85,
-      "current_close": 22.79,
-      "pnl_pct": -4.44,
-      "price_source": "quote",
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "走弱"
-        }
-      ]
-    },
-    {
-      "code": "688498",
-      "name": "源杰科技",
-      "market": "sh",
-      "board": "科创板",
-      "status": "strict",
-      "total_score": 35.4,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "通信技术",
-        "基金重仓",
-        "沪股通",
-        "2026中报预增",
-        "昨日高振幅",
-        "MSCI中国",
-        "计算机、通信和其他电子设备制造业",
-        "百元股"
-      ],
-      "signal_count": 1,
-      "enter_date": "2026-09-23",
-      "hold_days": 4,
-      "consecutive_days": 4,
-      "first_close": 1734.98,
-      "current_close": 1638.5,
-      "pnl_pct": -5.56,
+      "current_close": 373.01,
+      "pnl_pct": -5.06,
       "price_source": "quote",
       "catalysts": [
         {
@@ -191,22 +156,22 @@
       "quality_grade": "B",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "固态电池",
         "2026一季报预增",
-        "锂矿概念",
-        "MSCI中国",
-        "深股通",
         "计算机、通信和其他电子设备制造业",
+        "医疗器械概念",
         "独角兽",
-        "医疗器械概念"
+        "深股通",
+        "固态电池",
+        "MSCI中国",
+        "锂矿概念"
       ],
       "signal_count": 2,
       "enter_date": "2026-09-15",
       "hold_days": 7,
       "consecutive_days": 1,
       "first_close": 52.3,
-      "current_close": 49.05,
-      "pnl_pct": -6.21,
+      "current_close": 49.09,
+      "pnl_pct": -6.14,
       "price_source": "quote",
       "catalysts": [
         {
@@ -226,22 +191,57 @@
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
+        "AI眼镜",
         "2026一季报预增",
-        "小米概念",
-        "AI智能体",
         "2026中报预增",
-        "MSCI中国",
-        "计算机、通信和其他电子设备制造业",
         "物联网",
-        "AI眼镜"
+        "计算机、通信和其他电子设备制造业",
+        "MSCI中国",
+        "小米概念",
+        "AI智能体"
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
       "hold_days": 7,
       "consecutive_days": 2,
       "first_close": 269.15,
-      "current_close": 246.39,
-      "pnl_pct": -8.46,
+      "current_close": 251.16,
+      "pnl_pct": -6.68,
+      "price_source": "quote",
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "走弱"
+        }
+      ]
+    },
+    {
+      "code": "688498",
+      "name": "源杰科技",
+      "market": "sh",
+      "board": "科创板",
+      "status": "strict",
+      "total_score": 35.4,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "昨日高振幅",
+        "通信技术",
+        "百元股",
+        "2026中报预增",
+        "基金重仓",
+        "计算机、通信和其他电子设备制造业",
+        "MSCI中国",
+        "沪股通"
+      ],
+      "signal_count": 1,
+      "enter_date": "2026-09-23",
+      "hold_days": 4,
+      "consecutive_days": 4,
+      "first_close": 1734.98,
+      "current_close": 1613.0,
+      "pnl_pct": -7.03,
       "price_source": "quote",
       "catalysts": [
         {
@@ -261,22 +261,22 @@
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "机构重仓",
-        "深证100R",
-        "基金重仓",
         "2026中报预增",
-        "MSCI中国",
-        "深股通",
+        "百元股",
+        "基金重仓",
         "计算机、通信和其他电子设备制造业",
-        "百元股"
+        "机构重仓",
+        "深股通",
+        "MSCI中国",
+        "深证100R"
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
       "hold_days": 9,
       "consecutive_days": 2,
       "first_close": 466.68,
-      "current_close": 392.91,
-      "pnl_pct": -15.81,
+      "current_close": 389.0,
+      "pnl_pct": -16.65,
       "price_source": "quote",
       "catalysts": [
         {
@@ -316,7 +316,7 @@
       "level": "warn",
       "code": "601168",
       "name": "西部矿业",
-      "text": "西部矿业(601168) 入选以来回撤 -10.6%（2026-08-17 起）"
+      "text": "西部矿业(601168) 入选以来回撤 -10.1%（2026-08-17 起）"
     },
     {
       "level": "warn",
@@ -334,13 +334,7 @@
       "level": "warn",
       "code": "300502",
       "name": "新易盛",
-      "text": "新易盛(300502) 入选以来回撤 -15.8%（2026-08-17 起）"
-    },
-    {
-      "level": "warn",
-      "code": "300857",
-      "name": "协创数据",
-      "text": "协创数据(300857) 入选以来回撤 -8.5%（2026-08-17 起）"
+      "text": "新易盛(300502) 入选以来回撤 -16.6%（2026-08-17 起）"
     },
     {
       "level": "warn",
@@ -705,17 +699,10 @@
         "names": [
           "天孚通信",
           "深南电路",
-          "源杰科技",
           "天华新能",
           "协创数据",
+          "源杰科技",
           "新易盛"
-        ]
-      },
-      {
-        "industry": "零售业",
-        "count": 1,
-        "names": [
-          "跨境通"
         ]
       },
       {
@@ -724,23 +711,30 @@
         "names": [
           "翰宇药业"
         ]
+      },
+      {
+        "industry": "零售业",
+        "count": 1,
+        "names": [
+          "跨境通"
+        ]
       }
     ],
     "by_sector": [
-      {
-        "sector": "MSCI中国",
-        "count": 6
-      },
       {
         "sector": "计算机、通信和其他电子设备制造业",
         "count": 6
       },
       {
-        "sector": "深股通",
-        "count": 5
+        "sector": "MSCI中国",
+        "count": 6
       },
       {
         "sector": "2026中报预增",
+        "count": 5
+      },
+      {
+        "sector": "深股通",
         "count": 5
       },
       {
@@ -756,15 +750,35 @@
         "count": 2
       },
       {
-        "sector": "基金重仓",
-        "count": 2
-      },
-      {
         "sector": "2026一季报预增",
         "count": 2
       },
       {
-        "sector": "跨境电商",
+        "sector": "基金重仓",
+        "count": 2
+      },
+      {
+        "sector": "创新药",
+        "count": 1
+      },
+      {
+        "sector": "医药制造业",
+        "count": 1
+      },
+      {
+        "sector": "肝炎概念",
+        "count": 1
+      },
+      {
+        "sector": "流感",
+        "count": 1
+      },
+      {
+        "sector": "减肥药",
+        "count": 1
+      },
+      {
+        "sector": "互联医疗",
         "count": 1
       },
       {
@@ -772,15 +786,7 @@
         "count": 1
       },
       {
-        "sector": "内贸流通",
-        "count": 1
-      },
-      {
         "sector": "消费电子概念",
-        "count": 1
-      },
-      {
-        "sector": "无线耳机",
         "count": 1
       },
       {
@@ -788,11 +794,23 @@
         "count": 1
       },
       {
-        "sector": "电商概念",
+        "sector": "跨境电商",
+        "count": 1
+      },
+      {
+        "sector": "无线耳机",
+        "count": 1
+      },
+      {
+        "sector": "内贸流通",
         "count": 1
       },
       {
         "sector": "2026中报扭亏",
+        "count": 1
+      },
+      {
+        "sector": "电商概念",
         "count": 1
       },
       {
@@ -808,39 +826,11 @@
         "count": 1
       },
       {
-        "sector": "医药制造业",
+        "sector": "医疗器械概念",
         "count": 1
       },
       {
-        "sector": "互联医疗",
-        "count": 1
-      },
-      {
-        "sector": "肝炎概念",
-        "count": 1
-      },
-      {
-        "sector": "创新药",
-        "count": 1
-      },
-      {
-        "sector": "流感",
-        "count": 1
-      },
-      {
-        "sector": "减肥药",
-        "count": 1
-      },
-      {
-        "sector": "通信技术",
-        "count": 1
-      },
-      {
-        "sector": "沪股通",
-        "count": 1
-      },
-      {
-        "sector": "昨日高振幅",
+        "sector": "独角兽",
         "count": 1
       },
       {
@@ -852,11 +842,11 @@
         "count": 1
       },
       {
-        "sector": "独角兽",
+        "sector": "AI眼镜",
         "count": 1
       },
       {
-        "sector": "医疗器械概念",
+        "sector": "物联网",
         "count": 1
       },
       {
@@ -868,11 +858,15 @@
         "count": 1
       },
       {
-        "sector": "物联网",
+        "sector": "昨日高振幅",
         "count": 1
       },
       {
-        "sector": "AI眼镜",
+        "sector": "通信技术",
+        "count": 1
+      },
+      {
+        "sector": "沪股通",
         "count": 1
       },
       {
@@ -1023,17 +1017,17 @@
       "5d": {
         "count": 36,
         "win_rate": 33.33,
-        "avg_return": -0.65
+        "avg_return": -0.69
       },
       "10d": {
         "count": 31,
-        "win_rate": 38.71,
-        "avg_return": -0.66
+        "win_rate": 35.48,
+        "avg_return": -0.62
       },
       "20d": {
         "count": 15,
         "win_rate": 13.33,
-        "avg_return": -8.65
+        "avg_return": -8.43
       }
     },
     "per_stock": [
@@ -1332,7 +1326,7 @@
           "3d": -7.42,
           "5d": -7.42,
           "10d": -7.11,
-          "20d": -43.69
+          "20d": -41.79
         }
       },
       {
@@ -1344,7 +1338,7 @@
           "3d": -3.82,
           "5d": -3.82,
           "10d": -7.29,
-          "20d": -6.02
+          "20d": -4.66
         }
       },
       {
@@ -1569,7 +1563,7 @@
           "1d": 0.0,
           "3d": -0.73,
           "5d": -2.12,
-          "10d": -4.64
+          "10d": -2.24
         }
       },
       {
@@ -1580,7 +1574,7 @@
           "1d": 0.0,
           "3d": 0.74,
           "5d": 0.51,
-          "10d": 0.08
+          "10d": -1.05
         }
       },
       {
@@ -1640,7 +1634,7 @@
         "offsets": {
           "1d": -5.8,
           "3d": -11.94,
-          "5d": -9.38
+          "5d": -9.31
         }
       },
       {
@@ -1650,7 +1644,7 @@
         "offsets": {
           "1d": -2.01,
           "3d": -8.27,
-          "5d": -5.56
+          "5d": -7.03
         }
       }
     ]
