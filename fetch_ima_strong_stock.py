@@ -65,6 +65,12 @@ KB_NAME = "九型人格"
 KB_CREATOR = "梧谷枫灯"
 NOTE_URL = "https://ima.qq.com/wiki/?shareId=%s&folderId=%s" % (WIKI_SHARE_ID, FOLDER_MAIN)
 
+# 🔴🔴 死夹黑名单（源方重组/改名后已下架或弃用，绝不可再读，防「读错/回退旧版」）
+#   · folder_7500817011604393 = 旧「强势股跟踪」日报夹（2026-09-15 绝笔、已删除）
+#   · folder_7506360161825717 = 旧「缠论买点每日推荐」夹（高手改名短线情绪选股后弃用）
+# 当前唯一有效水源 = FOLDER_MAIN（folder_7507701210837524「短线情绪选股」）。
+DEAD_FOLDERS = {"folder_7500817011604393", "folder_7506360161825717"}
+
 SNAPSHOT_MAX_AGE_H = 72          # 快照 >72h 视为过期（降级，不伪造）
 WIKI_STALE_DAYS_ALERT = 2        # 日报性质：停更 >2 自然日 = source_stale
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -269,6 +275,12 @@ def main():
                     help="auto = 快照优先、无效时走访客兜底（默认）；snapshot-only = 只读快照")
     args = ap.parse_args()
 
+    # 🔴 死夹拒绝：FOLDER_MAIN 一旦指向已下架/弃用水源 ⇒ 直接拒绝（绝不允许读旧源/覆盖旧版）
+    if FOLDER_MAIN in DEAD_FOLDERS:
+        raise SystemExit(
+            "❌ FOLDER_MAIN=%s 属于已弃用/下架水源（DEAD_FOLDERS），"
+            "拒绝读取旧源，以防「读错 / 覆盖回旧版」。请确认水源已切到 folder_7507701210837524。" % FOLDER_MAIN)
+
     data = load_snapshot()
     channel = "full-snapshot" if data else "none"
     degraded_reason = ""
@@ -387,6 +399,46 @@ def main():
         "kb": {"kb_id": KB_ID, "kb_name": KB_NAME, "kb_creator": KB_CREATOR,
                "folder_id": FOLDER_MAIN, "folder_name": FOLDER_MAIN_NAME},
     }
+
+    # 🔴🔴 防回归：数据源日期倒退 ⇒ 绝不覆盖已发布的好版本（堵死「又回到旧版」）
+    #   触发场景：快照/源意外给了比线上更旧的 data_date（如陈旧快照、源临时回滚）。
+    _prev_path = os.path.join(RAW_DIR, "ima_strong_stock.json")
+    _regress = False
+    try:
+        if os.path.exists(_prev_path):
+            with open(_prev_path, encoding="utf-8") as _pf:
+                _prev = json.load(_pf) or {}
+            _pd = _prev.get("data_date")
+            if _pd and re.fullmatch(r"\d{4}-\d{2}-\d{2}", _pd) and data_date \
+                    and re.fullmatch(r"\d{4}-\d{2}-\d{2}", data_date):
+                _new_d = datetime.strptime(data_date, "%Y-%m-%d").date()
+                _prev_d = datetime.strptime(_pd, "%Y-%m-%d").date()
+                if _new_d < _prev_d:
+                    _regress = True
+    except Exception as _e:
+        print("[WARN] 回归检查读上一版失败（不阻断，按正常写）：%s" % _e)
+    if _regress:
+        # 保留上一版（已是 newer 的好版本），标注 degraded，绝不回写旧数据
+        try:
+            with open(_prev_path, encoding="utf-8") as _pf:
+                _prev = json.load(_pf) or {}
+            _prev["detail_channel"] = "retained-last"
+            _prev["degraded_reason"] = "data_date-regressed(%s<%s);retained-last-good" % (
+                data_date, _prev.get("data_date"))
+            _prev["update_time"] = datetime.now(timezone(timedelta(hours=8))).strftime(
+                "%Y-%m-%d %H:%M:%S")
+            with open(_prev_path, "w", encoding="utf-8", newline="\n") as f:
+                json.dump(_prev, f, ensure_ascii=False, indent=2)
+            with open(os.path.join(DATA_DIR, "IMA_STRONG_STOCK.js"), "w", encoding="utf-8", newline="\n") as f:
+                f.write("window.IMA_STRONG_STOCK = ")
+                json.dump(_prev, f, ensure_ascii=False, separators=(",", ":"))
+                f.write(";\n")
+            print("⛔ 数据日倒退（%s < 上一版 %s）—— 已保留上一版产物，拒绝回退到旧版。"
+                  % (data_date, _prev.get("data_date")))
+            return
+        except Exception as _e:
+            print("❌ 回归保留上一版也失败：%s" % _e)
+            raise SystemExit(1)
 
     # 🔴 生产者自检（沿用 v1「谁产出谁负责」）：形状不对拒绝写出
     _viol = []
