@@ -1798,7 +1798,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/FINAL_RECOMMEND_DATA.js?v=787494fe6f" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=d06a6fd1d4" defer></script>
-    <script src="data/IMA_STRONG_STOCK.js?v=f728ae586f" defer></script>
+    <script src="data/IMA_STRONG_STOCK.js?v=d268a5cb1f" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=41f0ba2e21" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
 <script src="data/BACKTEST_ALL_ALGOS.js?v=e9097c1eed" defer></script>
@@ -6852,313 +6852,106 @@ function fmtSigned(v){
     function _e(s){ return String(s==null?'':s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
     var D = window.IMA_STRONG_STOCK;
     if(!D || !D.stocks || !D.stocks.length){
-      // 数据未就绪 → 自愈重试（覆盖 defer 加载窗口）
+      /* 数据未就绪 → 自愈重试（覆盖 defer 加载窗口） */
       if(!(window.__imaRetry && window.__imaRetry >= 15)){
         window.__imaRetry = (window.__imaRetry || 0) + 1;
         setTimeout(window.__renderImaStrongStock, 700);
       } else {
-        dst.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">📡 强势跟踪（ima 自动同步）<br><span style="font-size:11px">数据加载中…若长时间为空请硬刷新 (Ctrl/Cmd+F5)</span></div>';
+        dst.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">📡 短线情绪选股（ima 自动同步）<br><span style="font-size:11px">数据加载中…若长时间为空请硬刷新 (Ctrl/Cmd+F5)</span></div>';
       }
       return;
     }
     window.__imaRetry = 0;
-    var sum = D.summary || {};
-    /* 🔴🔴 2026-09-19 阿狸咪的工程师（主人令「不要你以为，实打实」）：
-       ── 背景：ima 新源（wiki）已接通（实测取到 2026-09-15，从「停更 16 天」恢复），
-          但服务端把分享正文 `introduction` 截断在约 300 字（全站 70+ 条实测无一超过）
-          ⇒ 本期源自述跟踪 58 只，正文却只能解析出 2 条。**若照常渲染，页面会显示
-          「已跟踪 2」而汇总胶囊显示「跟踪 58」= 自相矛盾 + 假数据**。
-       ── 修法：源产物带 detail_complete，前端据此**降级标注**（**不写长提示条** —— 2026-09-19 主人令）：
-          头部胶囊改用「源跟踪 N · 明细节流 M 条」，既不拿残缺 stocks 冒充全量，
-          也不静默隐藏 —— 让「能拿到多少」在标题行内一眼可见。
-       ── 判据来源：raw_data/ima_strong_stock.json 的 detail_complete（生产者如实落盘）。 */
-    var _detailOK = (D.detail_complete !== false);
-    var _srcTrack = (sum.track != null) ? sum.track : (D.stocks ? D.stocks.length : 0);
-    var _sortByChg = function(a,b){ return (parseFloat(b.change_pct)||0) - (parseFloat(a.change_pct)||0); };
-    /* 🎯 2026-09-20 主人令「强势要按照 [连涨强势 / 观察期中 / 跌破基准] 这种方式排序，
-       最强最推荐的放最上面」：
-       ── 判据来源：主人给的三张截图 = 本表「买点提示」列的取值；本期实测分布
-          连涨强势 3 只（连涨 3~6 天，趋势正在加速）/ 观察期中 19 只 /
-          空提示 9 只 / 跌破基准 3 只（强势组内）。**回调买点 10 只本期全在「正常」组**，
-          仍保留该档位以防后续强势组出现。
-       ── 语义优先级（数字越小 = 越强越推荐）：
-          0 连涨强势　连涨中且未破基准 ⇒ 趋势正在走强，最可关注
-          1 回调买点　强势股回撤到买点区（源已标注具体回撤%）⇒ 次优介入位
-          2 观察期中　源已入选但尚无明确动作 ⇒ 中性
-          3 (空)　　　源未给提示 ⇒ 中性偏弱
-          4 跌破基准　已跌破入选基准价 ⇒ 最弱，风险最高
-       ── 🔴 诚实铁律：**只按语义分档排序，不改动任何数值、不改任何文案**；
-          档内仍按涨跌幅降序（原口径不变）。绝不把「跌破基准」的跌幅美化成正值。 */
-    var _tierOf = function(s){
-      var bp = String(s.buy_point || '');
-      if(bp.indexOf('连涨强势') >= 0) return 0;
-      if(bp.indexOf('回调买点') >= 0) return 1;
-      if(bp.indexOf('观察期中') >= 0) return 2;
-      if(bp.replace(/\s/g,'') === '') return 3;
-      if(bp.indexOf('跌破基准') >= 0) return 4;
-      return 3;   /* 未知文案 ⇒ 归入中性档，不臆测 */
-    };
-    /* 强势组排序：先按档位升序，档内按涨跌幅降序（越强越前） */
-    var _sortStrong = function(a,b){
-      var ta = _tierOf(a), tb = _tierOf(b);
-      if(ta !== tb) return ta - tb;
-      return _sortByChg(a,b);
-    };
-    var _strongAll = D.stocks.filter(function(s){ return (s.status||'')==='强势'; }).sort(_sortStrong);
-    var statusMap = {'强势':'#22c55e','正常':'#38bdf8','回落':'#fbbf24','见顶':'#fb923c','走弱':'#ef5350'};
-    function _c(v){ var n=parseFloat(v); return isNaN(n)?'var(--sub)':(n>0?'#ef5350':(n<0?'#26a69a':'var(--sub)')); }
-    function _p(v){ var n=parseFloat(v); return isNaN(n)?'--':((n>0?'+':'')+n.toFixed(2)+'%'); }
-    function _pr(v){ var n=parseFloat(v); return isNaN(n)?'--':n.toFixed(2); }
+    /* 高手共振 set：候选池股票若命中 v8 选股生命周期池 → 外部共振源（口径沿用 v1） */
+    var _v8Map = {}; ((window.V8_POOL_TRACKER && window.V8_POOL_TRACKER.items) || []).forEach(function(x){ if(x && x.code) _v8Map[x.code] = x; });
+    var _reso = (typeof window.__gaoshouResoCount==='function') ? window.__gaoshouResoCount() : 0;
     var html = '';
-    // 高手共振 set：IMA 股票若命中 v8 选股生命周期池 → 视为外部共振源
-    var _imaSet = {}; (D.stocks||[]).forEach(function(s){ if(s && s.code) _imaSet[s.code] = s; });
-    var _v8Items = (window.V8_POOL_TRACKER && window.V8_POOL_TRACKER.items) || [];
-    var _v8Map = {}; _v8Items.forEach(function(x){ if(x && x.code) _v8Map[x.code] = x; });
-    var _reso = (typeof window.__gaoshouResoCount==='function') ? window.__gaoshouResoCount() : 0; /* 2026-09-03 主人令：口径统一=IMA池∩v8选股体系（生命周期池+最终推荐候选），与 Top5「高手共振」同一判定 */
-    // 头部胶囊：更新于 + 已跟踪 N + 高手共振 N
+    /* ── 头部：标题 + 角色 + 徽章行 ── */
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
-    html += '📡 <span style="font-weight:700;font-size:14px;color:var(--txt);">强势跟踪</span>';
-    html += '<span style="font-size:10.5px;color:var(--dim);font-weight:600;letter-spacing:.5px;">· ②共振确认</span>'; /* 2026-09-04 主人令·方案乙：角色标签 */
+    html += '📡 <span style="font-weight:700;font-size:14px;color:var(--txt);">短线情绪选股</span>';
+    html += '<span style="font-size:10.5px;color:var(--dim);font-weight:600;letter-spacing:.5px;">· ②共振确认</span>';
     html += '<span style="font-size:10px;color:#a78bfa;font-weight:600;background:rgba(167,139,250,.14);padding:1px 7px;border-radius:4px;">ima 自动同步</span>';
     if(D.note_url) html += '<a href="'+_e(D.note_url)+'" target="_blank" style="font-size:11px;color:#a78bfa;text-decoration:none;">原帖↗</a>';
-    // 🛡 2026-09-04 一劳永逸：同上，不再 slice(0,16)，传完整时间戳给 _fmtAshareRel
     if(typeof _uBadge === 'function') html += _uBadge('auto','短线',(D.update_time||''));
-    /* 🔴 2026-09-23 主人令「确认这卡每日是否有更新」· 阿狸咪的工程师：
-       ── 实测：抓取链**每日都在跑**（v8_ima_strong_stock.yml cron + 云端 cn fetch），
-          但**数据内容**自 2026-09-15 起 8 天未前进（源笔记自述最新交易日 = 数据日），
-          而头部「已更新 于 今日 21:03」用的是**抓取时刻** ⇒ 只看它会误以为数据是今天的。
-       ── 修法：把**内容级**数据日（D.data_date / D.stale_days）**常显**为独立胶囊，
-          与「已更新（抓取时刻）」并列：抓取时刻在走、数据日不动 = 一眼看出源侧没更新。
-          判据全部来自产物字段，不臆测、不改数；颜色只做分档（>0 天=黄，≥5 天=红）。
-       ── 为何不依赖 source_stale：wiki 源的 source_stale 恒为 False
-          （见 fetch_ima_strong_stock.py 语义注释），故红胶囊分支对它永不触发；
-          此处改显「数据日」本身，不与该判定冲突、不改生产者口径。 */
-    if(D.data_date && !D.source_stale){
+    /* 数据日常显胶囊（内容级新鲜度；与「已更新」抓取时刻并列 —— 沿用 09-23 主人令防假新鲜） */
+    if(D.data_date){
       var _sdNum = (D.stale_days == null ? null : Number(D.stale_days));
       var _sdCol = (_sdNum != null && _sdNum >= 5) ? '#ef5350' : ((_sdNum != null && _sdNum > 0) ? '#fbbf24' : '#94a3b8');
-      html += '<span title="数据日 = 源笔记「' + _e(D.source_title || 'ima 分享页') + '」的最新交易日；上方「已更新」是抓取时刻，不是数据新鲜度；距今 ' + ((_sdNum == null) ? '?' : _sdNum) + ' 天" '
+      html += '<span title="数据日 = 源报告「'+_e(D.source_title||'')+'」的报告日；上方「已更新」是抓取时刻，不是数据新鲜度" '
         + 'style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:' + _sdCol + '1a;color:' + _sdCol + ';border:1px solid ' + _sdCol + '55;white-space:nowrap">📅 数据日 ' + _e(D.data_date)
         + ((_sdNum != null && _sdNum > 0) ? ('<span style="font-size:10px;opacity:.75;font-weight:500;margin-left:2px"> · ' + _sdNum + ' 天前</span>') : '')
         + '</span>';
     }
-    /* 🔴 2026-09-17 主人令「杜绝一切假成功」· 阿狸咪的工程师
-       ── 根因：本卡「更新于」用的是 D.update_time（**抓取时刻**），而源笔记实际停在
-          2026-09-02（源页 document.title「强势股跟踪日报 2026-09-02」、页内自述
-          「更新时间：2026.09.02 15:41」、每行「最新交易日」= 2026-09-02）；产物价格
-          字段指纹自 09-03 起连续 20 次抓取一字未改。而 09-14 主人令已把全站
-          「陈旧红胶囊」分支**整段删除**（日频误报）⇒ 源停更 15 天，页面零提示，
-          胶囊照旧显示「今日 15:53 盘后」= 假新鲜。
-       ── 修法：只加不改 —— 源侧自带 data_date/source_stale 时追加一枚**内容级**红胶囊。
-          判据来自源自身标注（不是 SLA 猜测），故「今日批次尚未产出」不会误报，
-          也不会把 09-14 删掉的那个误报机制放回来。 */
+    /* 源停更红胶囊（判据 = 生产者 source_stale，沿用 09-17 杜绝假成功语义） */
     if(D.source_stale && D.data_date){
-      html += '<span title="源笔记「'+_e(D.source_title||'ima 分享页')+'」自述更新时间 '+_e(D.source_updated_at||'?')+'｜最新交易日 '+_e(D.data_date)+'｜距今 '+(D.stale_days)+' 天｜源侧停更，非抓取失败" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:700;background:rgba(239,83,80,.14);color:#ef5350;border:1px solid rgba(239,83,80,.45);white-space:nowrap">⚠️ 源停更 '+(D.stale_days)+' 天 · 数据日 '+_e(D.data_date)+'</span>';
+      html += '<span title="源报告「'+_e(D.source_title||'')+'」最新数据日 '+_e(D.data_date)+'｜距今 '+(D.stale_days)+' 天｜源侧停更，非抓取失败" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:700;background:rgba(239,83,80,.14);color:#ef5350;border:1px solid rgba(239,83,80,.45);white-space:nowrap">⚠️ 源停更 '+(D.stale_days)+' 天 · 数据日 '+_e(D.data_date)+'</span>';
     }
-    // 已跟踪 N（语义真实，非已入仓）
-    /* 📋「已跟踪」：明细完整 ⇒ 显示真实条数；被服务端截断 ⇒ 显示**源侧汇总数**，
-       并在 title 里写明「本页仅能展示 M 条」——而不是显示 2（那会让主人以为源只有 2 只）。 */
-    if(_detailOK){
-      html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);white-space:nowrap">📋 已跟踪 <b style="margin-left:2px">'+(D.stocks?D.stocks.length:0)+'</b></span>';
-    } else {
-      html += '<span title="源侧本期跟踪 '+_srcTrack+' 只，本页仅能解析出 '+((D.stocks||[]).length)+' 只（服务端对分享正文做约 300 字截断）" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);white-space:nowrap">📋 源跟踪 <b style="margin-left:2px">'+_srcTrack+'</b><span style="font-size:10px;opacity:.72;font-weight:500;"> · 明细节流 '+((D.stocks||[]).length)+' 条</span></span>';
-    }
-    if(_reso>0) html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);white-space:nowrap">🏆 高手共振 <b style="margin-left:2px">'+_reso+'</b></span>';
     html += '</div>';
+    /* ── 情绪周期 + 汇总胶囊行 ── */
     html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:11px;">';
-    /* 方案 D 2026-09-05：胶囊后挂 (实 N) 仅当 sum.实.摘要不一致时显示，避免视觉噪音 */
-    var _allN = D.stocks?D.stocks.length:0;
-    var _realByStatus = {'强势':0,'正常':0,'回落':0,'见顶':0,'走弱':0};
-    (D.stocks||[]).forEach(function(s){ var k=s.status||''; if(_realByStatus[k]!=null) _realByStatus[k]++; });
-    var _topCaps = [
-      ['跟踪', sum.track, '#a78bfa', _allN],
-      ['强势', sum.strong, '#22c55e', _realByStatus['强势']],
-      ['买点候选', sum.buy_point, '#fbbf24', null],
-      ['见顶', sum.top, '#fb923c', _realByStatus['见顶']],
-      ['走弱', sum.weak, '#ef5350', _realByStatus['走弱']],
-      ['已剔除', sum.removed, '#94a3b8', null]
-    ];
-    _topCaps.forEach(function(b){
-      var label=b[0], sumV=b[1], col=b[2], realV=b[3];
-      if(sumV==null) return;
-      var suffix = '';
-      if(realV!=null && realV!==sumV){
-        suffix = ' <span style="font-size:9.5px;font-weight:500;opacity:.7;color:'+col+';" title="表中实际可筛/可见数="(实 '+realV+')"> (实 '+realV+')</span>';
-      }
-      html += '<span style="padding:2px 8px;border-radius:10px;font-weight:600;color:'+col+';background:'+col+'22;border:1px solid '+col+'55;">'+label+' <b>'+sumV+'</b>'+suffix+'</span>';
-    });
+    if(D.cycle_stage){
+      html += '<span title="源报告头部自述：情绪周期阶段与建议总仓位" style="padding:2px 8px;border-radius:10px;font-weight:600;color:#38bdf8;background:#38bdf822;border:1px solid #38bdf855;">🌡 ' + _e(D.cycle_stage) + (D.position_advice ? ' · 建议仓位 <b>' + _e(D.position_advice) + '</b>' : '') + '</span>';
+    }
+    html += '<span style="padding:2px 8px;border-radius:10px;font-weight:600;color:#a78bfa;background:#a78bfa22;border:1px solid #a78bfa55;">候选 <b>' + (D.stocks ? D.stocks.length : 0) + '</b></span>';
+    if(_reso>0) html += '<span style="padding:2px 8px;border-radius:10px;font-weight:600;color:#fbbf24;background:#fbbf2422;border:1px solid #fbbf2455;">🏆 高手共振 <b>' + _reso + '</b></span>';
     html += '</div>';
-
-    /* 🎯 2026-09-23 主人令「只展示连涨强势，其他折叠不要拉窗」：
-       ── 取消本行「🟢 强势股 · 涨幅降序 · 前 10 / 共 N 只」——它与卡内 __imaRenderMain
-          产出的标题重复，且口径已改为「主表只放连涨强势」⇒ 标题统一由 __imaRenderMain
-          单一产出，避免两行绿标题并存 + 「前 10」与实际不符。 */
-    /* 🎯 2026-09-19 主人令「这个每列都没对齐，对齐了要不看的很乱」：
-       ── 根因：两处表格（主卡「强势前 10」/ 折叠里「全部标的」）都是 table-layout:auto，
-          列宽随各自内容长短漂移 ⇒ 同一份表头在两张表里对不上位置，视觉很乱。
-       ── 修法：抽出**唯一一份列定义 _COLS**（宽度 + 对齐），两处表格共用
-          <colgroup> + table-layout:fixed 锁死列位置；长文本（行业/买点提示/v8 命中）
-          统一 nowrap+ellipsis+title，既不撑列也不丢信息。 */
+    /* ── 候选池主表（按排名升序；单日 N≤10 一屏放下，不设折叠 —— 防膨胀）──
+       列定义唯一一份 + table-layout:fixed 锁列（沿用 09-19 对齐铁律）；
+       长文本统一 nowrap+ellipsis+title。红涨绿跌铁律只作用于涨跌值，强度分非涨跌 ⇒ 琥珀分档。 */
     var _COLS = [
-      {t:'代码',     w:62,  a:'left'},
-      {t:'名称',     w:84,  a:'left'},
-      {t:'行业',     w:152, a:'left'},
-      {t:'首入选',   w:84,  a:'left'},
-      {t:'基准价',   w:66,  a:'right'},
-      {t:'最新价',   w:66,  a:'right'},
-      {t:'涨跌幅',   w:76,  a:'right'},
-      {t:'回撤',     w:62,  a:'right'},
-      {t:'连涨',     w:46,  a:'right'},
-      {t:'状态',     w:66,  a:'left'},
-      {t:'买点提示', w:0,   a:'left'},   /* w=0 ⇒ 弹性列，吃掉剩余宽度 */
-      {t:'v8 命中',  w:78,  a:'left'}
+      {t:'排名',    w:44,  a:'right'},
+      {t:'代码',    w:62,  a:'left'},
+      {t:'名称',    w:84,  a:'left'},
+      {t:'强度分',  w:58,  a:'right'},
+      {t:'换手',    w:56,  a:'right'},
+      {t:'量比',    w:56,  a:'right'},
+      {t:'流通亿',  w:62,  a:'right'},
+      {t:'封单亿',  w:62,  a:'right'},
+      {t:'题材',    w:150, a:'left'},
+      {t:'判定说明', w:0,   a:'left'},
+      {t:'v8 命中', w:78,  a:'left'}
     ];
     function _td(a, extra){ return 'padding:5px 6px;text-align:'+a+';'+(extra||''); }
     function _clip(){ return 'padding:5px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'; }
-    function _tableHtml(list){
-      if(!list.length) return '<div class="note" style="text-align:center;color:var(--dim);padding:12px;">当前无标的</div>';
-      var h = '<div style="overflow-x:auto;overflow-y:hidden;"><table style="width:100%;min-width:880px;border-collapse:collapse;font-size:11px;color:var(--sub);table-layout:fixed;">';
-      h += '<colgroup>';
-      _COLS.forEach(function(c){ h += '<col'+(c.w?' style="width:'+c.w+'px;"':'')+'>'; });
-      h += '</colgroup>';
-      h += '<thead><tr style="color:var(--dim);font-weight:600;">';
-      _COLS.forEach(function(c){ h += '<th style="'+_td(c.a)+'">'+c.t+'</th>'; });
-      h += '</tr></thead><tbody>';
-      list.forEach(function(s){
-        var dp=parseFloat(s.drawdown_pct);
-        var dcol=isNaN(dp)?'var(--sub)':(dp>0?'#ef5350':(dp<0?'#26a69a':'var(--sub)'));
-        var sc=statusMap[s.status]||'#94a3b8';
-        // v8 命中：该 IMA 股票是否同时在 v8 选股生命周期池
-        var _v8 = _v8Map[s.code] || null;
-        var _v8Html = '<span style="font-size:10px;color:var(--dim);">—</span>';
-        if(_v8){
-          var _vs = _v8.status||'';
-          var _vc = {'strong':'#22c55e','buy_dip':'#fbbf24','topped':'#fb923c','weak':'#ef5350','normal':'#38bdf8'}[_vs]||'#94a3b8';
-          _v8Html = '<span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;color:'+_vc+';background:'+_vc+'22;">🏆 '+(window.__v8StatusLabel ? window.__v8StatusLabel[_vs]||_vs : _vs)+'</span>';
-        }
-        h += '<tr style="border-top:1px solid var(--border);">'
-          + '<td style="'+_td('left','color:var(--txt);font-weight:600;')+'">'+(s.code||'')+'</td>'
-          + '<td style="'+_clip()+'color:var(--txt);" title="'+_e(s.name||'')+'">'+_e(s.name||'')+'</td>'
-          + '<td style="'+_clip()+'color:var(--dim);" title="'+_e(s.industry||'')+'">'+_e(s.industry||'')+'</td>'
-          + '<td style="'+_td('left','color:var(--dim);')+'">'+_e(s.first_selected||'')+'</td>'
-          + '<td style="'+_td('right')+'">'+_pr(s.base_price)+'</td>'
-          + '<td style="'+_td('right','color:var(--txt);')+'">'+_pr(s.latest_price)+'</td>'
-          + '<td style="'+_td('right','color:'+_c(s.change_pct)+';font-weight:600;')+'">'+_p(s.change_pct)+'</td>'
-          + '<td style="'+_td('right','color:'+dcol+';')+'">'+_p(s.drawdown_pct)+'</td>'
-          + '<td style="'+_td('right')+'">'+(s.consecutive_up||0)+'</td>'
-          + '<td style="'+_td('left')+'"><span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;color:'+sc+';background:'+sc+'22;">'+_e(s.status||'')+'</span></td>'
-          + '<td style="'+_clip()+'color:var(--dim);" title="'+_e(s.buy_point||'')+'">'+_e(s.buy_point||'')+'</td>'
-          + '<td style="'+_clip()+'">'+_v8Html+'</td>'
-          + '</tr>';
-      });
-      h += '</tbody></table></div>';
-      return h;
-    }
-    /* 🎯 2026-09-20 主人令「这里重复了，上面那个显示前10删除，只要下方的，
-       一样只显示强势的，其他折叠」：
-       ── 旧版结构：主卡渲染「强势前 10 表」+ 一个「📄 全部标的」触发按钮；
-          点开后又**渲染一遍强势全表**（其前 10 行与主卡表逐行重复）⇒ 正是主人指的「重复」。
-       ── 新版：**取消主卡那张前 10 表、也取消那个触发按钮**，改为在卡内**就地渲染**
-          一张「强势全表」（默认展开），下接其余状态档的折叠组。
-          全卡只有一张强势表 ⇒ 零重复、零多余入口。
-       ── 🔴「不要拉条」：本卡的折叠组**自管 display 切换**，不引入任何
-          max-height / overflow 容器（详见 window.__imaRenderMain 注释）。 */
-    html += '<div id="_imaStrongHost"></div>';
-    dst.innerHTML = html;
-  /* 🔴 2026-09-19 主人令「强势的排前面、越强的排越前，正常和回落的折叠」：
-     ── 旧版把全部 status 混成一表按涨幅降序 ⇒ 回落股（自选以来区间涨幅 +97%）压在
-        榜首，视觉上像「回落的最强」，与「强势跟踪」的主题正好相反。
-     ── 新版：① 强势组**全部展开**且按涨幅降序（越强越前）；
-             ② 其余分档（正常 / 回落 / 见顶 / 走弱）**收进二级折叠**，默认不占版面；
-             ③ 下线原「全部/强势/正常…」筛选胶囊（分组已替代其作用，避免重复入口）。
-     分组明细表由 __imaGroupHtml 供给（同一渲染闭包内的 _grpHtml 缓存），
-     保证二级折叠展开时拿到的是**本次渲染**的数据，不会取到上一次的旧值。 */
-  /* 🎯 2026-09-20 主人令「只直接折叠展开，不要这种拉条」：
-     ── 旧版走全站 __foldOpen：容器带 `max-height:72vh; overflow-y:auto` ⇒ 内容一多就出
-        **纵向拉条**，正是主人截图里点名不要的那个。
-     ── 新版本卡**自管折叠**：只切 `display`（none <-> ''），DOM 尺寸由浏览器自然撑开，
-        **全程不设 max-height、不设 overflow** ⇒ 结构上不可能出现拉条。
-     ── 表格本身的横向滚动另论：_tableHtml 容器 `overflow-x:auto;overflow-y:hidden;`
-        （CSS Overflow Module L3 §3：一个轴设成非 visible 的滚动值，另一轴的 visible 会被
-         计算成 auto ⇒ 只写 overflow-x:auto 会**连带**产生纵向拉条，必须显式压掉 y）。 */
-  var _grpHtml = {};
-  window.__imaGroupHtml = function(k){ return _grpHtml[k] || ''; };
-
-  /* 🎯 2026-09-23 主人令「**只展示连涨强势，其他折叠不要拉窗**」：
-     ── 主表口径：只出「买点提示 = 连涨强势」的标的（连涨中且未破基准 = 源侧最强信号）；
-        其余全部收入折叠区（默认收起）：
-          · 强势组其余档 → 一条折叠（内部仍按 回调买点 → 观察期中 → 未标注 → 跌破基准 优先序）
-          · 非强势档（正常 / 回落 / 见顶 / 走弱）→ 各自一条折叠（沿用原口径）
-        ⇒ 首屏高度由「34 行长表」压到「连涨强势 N 行」，不再把页面拉长。
-     ──「不要拉窗」：折叠全部走 __imaFold（只切 display），**不引入任何
-        max-height / overflow 容器** ⇒ 结构上不可能出现纵向滚动条（详见上方 09-20 注释）。 */
-  window.__imaRenderMain = function(){
-    var host = document.getElementById('_imaStrongHost');
-    if(!host) return;
-    _grpHtml = {};   /* 每次渲染清空缓存，保证折叠区拿到的是本次数据 */
-    var h = '';
-    /* 主表 = 连涨强势（_strongAll 已按档位升序 ⇒ 档 0 天然在最前） */
-    var _cont = _strongAll.filter(function(s){ return _tierOf(s) === 0; });
-    var _rest = _strongAll.filter(function(s){ return _tierOf(s) !== 0; });
-    h += '<div style="font-weight:600;font-size:12px;margin:2px 0 6px;color:#22c55e;">'
-      + '🟢 连涨强势 · <b>' + _cont.length + '</b> 只'
-      + '<span style="font-size:10.5px;color:var(--dim);font-weight:500;margin-left:6px;">'
-      + '（连涨中且未破基准 · 越强越前；其余 ' + (_strongAll.length - _cont.length) + ' 只已折叠）</span></div>';
-    h += _tableHtml(_cont);
-    /* 折叠按钮统一样式：只挂 onclick + display 开关，无任何滚动容器 */
-    var _foldBtn = function(sid, label, col, cnt){
-      return '<div style="margin:6px 0;">'
-        + '<span id="' + sid + '_btn" onclick="window.__imaFold(\'' + sid + '\')" '
-        + 'style="cursor:pointer;display:inline-block;padding:3px 12px;border-radius:8px;font-size:11.5px;font-weight:600;'
-        + 'color:' + col + ';border:1px solid ' + col + '55;background:' + col + '1a;">▸ ' + label + ' ' + cnt + ' 只</span>'
-        + '<div id="' + sid + '" style="display:none;margin-top:6px;">' + _grpHtml[sid] + '</div>'
-        + '</div>';
-    };
-    var _foldRows = '';
-    /* ① 强势组其余档（回调买点 / 观察期中 / 未标注 / 跌破基准）—— 一条折叠，档序不变 */
-    if(_rest.length){
-      var _sub = {};
-      _rest.forEach(function(s){ var tt = _tierOf(s); _sub[tt] = (_sub[tt] || 0) + 1; });
-      var _subTxt = [['回调买点',1],['观察期中',2],['未标注',3],['跌破基准',4]]
-        .filter(function(x){ return _sub[x[1]]; })
-        .map(function(x){ return x[0] + ' ' + _sub[x[1]]; }).join(' / ');
-      var _sidS = '_imaGrp_强势其余';
-      _grpHtml[_sidS] = _tableHtml(_rest);
-      _foldRows += _foldBtn(_sidS, '强势 · 其余（' + _subTxt + '）', '#22c55e', _rest.length);
-    }
-    /* ② 非强势档各自折叠 */
-    ['正常','回落','见顶','走弱'].forEach(function(k){
-      var arr = D.stocks.filter(function(x){ return (x.status||'')===k; }).sort(_sortByChg);
-      if(!arr.length) return;
-      var sid = '_imaGrp_' + k;
-      _grpHtml[sid] = _tableHtml(arr);
-      _foldRows += _foldBtn(sid, k, statusMap[k] || '#94a3b8', arr.length);
+    function _num(v,d){ var n=parseFloat(v); return isNaN(n)?'--':n.toFixed(d==null?2:d); }
+    function _scoreCol(v){ var n=parseFloat(v); return isNaN(n)?'var(--sub)':(n>=70?'#fbbf24':'var(--txt)'); }
+    var rows = (D.stocks||[]).slice().sort(function(a,b){ return (a.rank||99)-(b.rank||99); });
+    html += '<div style="overflow-x:auto;overflow-y:hidden;"><table style="width:100%;min-width:880px;border-collapse:collapse;font-size:11px;color:var(--sub);table-layout:fixed;">';
+    html += '<colgroup>';
+    _COLS.forEach(function(c){ html += '<col'+(c.w?' style="width:'+c.w+'px;"':'')+'>'; });
+    html += '</colgroup>';
+    html += '<thead><tr style="color:var(--dim);font-weight:600;">';
+    _COLS.forEach(function(c){ html += '<th style="'+_td(c.a)+'">'+c.t+'</th>'; });
+    html += '</tr></thead><tbody>';
+    rows.forEach(function(s){
+      var _v8 = _v8Map[s.code] || null;
+      var _v8Html = '<span style="font-size:10px;color:var(--dim);">—</span>';
+      if(_v8){
+        var _vs = _v8.status||'';
+        var _vc = {'strong':'#22c55e','buy_dip':'#fbbf24','topped':'#fb923c','weak':'#ef5350','normal':'#38bdf8'}[_vs]||'#94a3b8';
+        _v8Html = '<span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;color:'+_vc+';background:'+_vc+'22;">🏆 '+(window.__v8StatusLabel ? window.__v8StatusLabel[_vs]||_vs : _vs)+'</span>';
+      }
+      html += '<tr style="border-top:1px solid var(--border);">'
+        + '<td style="'+_td('right')+'">'+(s.rank||'')+'</td>'
+        + '<td style="'+_td('left','color:var(--txt);font-weight:600;')+'">'+_e(s.code||'')+'</td>'
+        + '<td style="'+_clip()+'color:var(--txt);" title="'+_e(s.name||'')+'">'+_e(s.name||'')+'</td>'
+        + '<td style="'+_td('right','color:'+_scoreCol(s.score)+';font-weight:700;')+'">'+(s.score==null?'--':s.score)+'</td>'
+        + '<td style="'+_td('right')+'">'+_num(s.turnover_pct,1)+'%</td>'
+        + '<td style="'+_td('right')+'">'+_num(s.vol_ratio)+'</td>'
+        + '<td style="'+_td('right')+'">'+_num(s.mktcap_yi,1)+'</td>'
+        + '<td style="'+_td('right')+'">'+_num(s.seal_yi)+'</td>'
+        + '<td style="'+_clip()+'color:var(--dim);" title="'+_e(s.theme||'')+'">'+_e(s.theme||'')+'</td>'
+        + '<td style="'+_clip()+'color:var(--dim);" title="'+_e(s.note||'')+'">'+_e(s.note||'')+'</td>'
+        + '<td style="'+_clip()+'">'+_v8Html+'</td>'
+        + '</tr>';
     });
-    if(_foldRows){
-      h += '<div style="margin-top:12px;border-top:1px dashed var(--border);padding-top:10px;">'
-        + '<div style="font-size:11px;color:var(--dim);margin-bottom:4px;">📁 其余已折叠（点击展开；本卡折叠不拉窗 —— 只切显示，不出滚动条）</div>'
-        + _foldRows + '</div>';
+    html += '</tbody></table></div>';
+    /* 明细节流如实降级（访客兜底 ~300 字硬墙时 detail_complete=false） */
+    if(D.detail_complete === false){
+      html += '<div class="note" style="font-size:11px;color:#fbbf24;padding:6px 2px 0;">⚠️ 明细节流：本期仅拿到部分候选（访客兜底通道硬截断），非全量 —— 判据 sample_coverage.detail_channel。</div>';
     }
-    host.innerHTML = h;
-  };
-
-  /* 就地折叠开关：只切 display，不碰 max-height / overflow */
-  window.__imaFold = function(id){
-    var box = document.getElementById(id);
-    if(!box) return;
-    var btn = document.getElementById(id + '_btn');
-    var open = (box.style.display !== 'none');
-    box.style.display = open ? 'none' : '';
-    if(btn && btn.__g0 === undefined){ btn.__g0 = btn.innerHTML; }
-    if(btn){ btn.innerHTML = open ? btn.__g0 : ('▾ 收起 · ' + btn.__g0.replace(/^▸\s*/, '')); }
-  };
-
-  /* 🔴 执行顺序铁律：① 声明(_grpHtml) → ② 定义(__imaRenderMain/__imaFold) → ③ 调用。
-     `var` 有提升但**赋值按序执行**；`window.X = fn` 是普通赋值、**无提升**。
-     调用若排在定义之前 ⇒ TypeError: window.__imaRenderMain is not a function；
-     调用若排在 `var _grpHtml = {}` 之前 ⇒ 声明语句会把刚渲染好的缓存**清空**。 */
-  window.__imaRenderMain();
-  }; /* ← 闭合 __renderImaStrongStock（__imaFullPopup/__imaSetFilter 已移入其体内） */
-
+    dst.innerHTML = html;
+  }; /* ← 闭合 __renderImaStrongStock（v2 换代：候选池单表，无分组折叠） */
 
   // ===== 因子实验室（异常换手率 + ROE_TTM 大市值档）=====
   window.__flRetry = 0;
