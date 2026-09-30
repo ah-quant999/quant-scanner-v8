@@ -7591,3 +7591,16 @@ items:
       - "index.html#firstBoardAlertCard"
     updated: "2026-09-30 23:25"
     updated_by: 阿狸咪的工程师
+
+  - id: holiday-trading-day-fix-1001
+    priority: P1
+    owner: 小九(lemoncat-cn)
+    status: done
+    what: 国庆休市日（2026-10-01）被整条链误判为交易日 + workflow step5 崩溃根治。接力自动化本班 00:38 派发 A 批（run #36745715520，alimi-cn 承接）实测 failure：step5「解析数据日期」报 GITHUB_ENV/GITHUB_OUTPUT Invalid format，step9 起全 skipped，闸门回退判 chain_day=09-30，问责 failure——空烧一轮、补批未成、看板红灯噪音。
+    fix: v8_date.py 双层修复（fetch_lhb 零改动）：① _is_trading_day_impl 静态权威日历（v8_calendar.HOLIDAY_RANGES=国务院安排+交易所休市公告）前置校验，命中法定休市区间（国庆 10-01~10-07）直接判非交易日——根因是 fetch_lhb.is_trading_day 对「今天未被在线日历收录」一律保守判 True（该设计只防交易日盘中写空占位），但法定休市日全天不可能被收录；② 调用 fetch_lhb 期间 stdout 重定向到 stderr——放大器是 fetch_lhb log() print 到 stdout，step5 $(python -c ...) 命令替换捕获两行（警告+日期）⇒ GITHUB_ENV Invalid format。commit eeca0d7ee4（expect-base 69ff7c467819 快进，回读 blob c79822592a 逐字节一致）。
+    verify_how: 本机净室验证：today_data_date() 输出单行 2026-09-30；10-01/04/07=False 零 stdout 泄漏；10-08 开市/10-12 周一=True；10-10 调休周六=False；py_compile OK。修复推送后重跑接力探测：[DONE] 跨日伪缺批空转、零派发（对比修复前误派 A）。云端下轮 checkout main 自动生效。
+    refs:
+      - "v8_date.py"
+      - "algorithms/fetch_lhb.py#is_trading_day"
+    updated: "2026-10-01 00:58"
+    updated_by: 小九
