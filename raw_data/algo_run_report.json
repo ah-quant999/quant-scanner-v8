@@ -1,17 +1,8 @@
 {
-  "update_time": "2026-09-30 23:33:37",
-  "run_start": "2026-09-30 22:16:13",
-  "ok": 50,
-  "fail": 2,
-  "failed_scripts": [
-    {
-      "script": "v8/factor_lab_gen.py",
-      "reason": "退出码 1 | 接收数据异常，请稍后再试。"
-    },
-    {
-      "script": "fetch_orphan_sector_fund_flow.py",
-      "reason": "监督器静默杀(>15min 无输出)"
-    }
-  ],
+  "update_time": "2026-09-30 23:44:23",
+  "run_start": "2026-09-30 23:37:57",
+  "ok": 1,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }
