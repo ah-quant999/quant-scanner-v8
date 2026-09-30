@@ -7558,7 +7558,7 @@ items:
     owner: 阿狸咪(alimi-cn)
     status: done
     what: 主人令「连板梯队前哨每天15:30推送」：v8_cn_fetch_cloud.yml 加 15:30 CST 收盘定稿档 cron（'30 7 * * 1-5'）+ case 表分支判 post_close（'盘后(收盘定稿·前哨档)'）。涨停池/连板数 15:00 定型 ⇒ 比原盘后最早档(17:20)提前 110 分钟出当日前哨。cron 总数 4→5 恰守平台「≤5 条」上限；15:30 落 post_close 判定窗(905<HM<=1290)；非交易日 _is_trading_day 自动 skip；LHB 17:00 后才有 ⇒ 本档 LHB 可能 fail 由 17:20 档补齐（单任务 fail 不致命）。跑完管线自动 commit raw_data→update_v8 重生成 data/*.js→push main→自动触发 Pages 部署（提交+部署全自动）。
-    fix: PAT 现有 workflow scope（X-OAuth-Scopes: repo,workflow，旧铁律「无 workflow scope」已过时）⇒ 云端原生 cron 直改。commit da5099f95e（base 198f7d98aa 快进，与 21:26 小九短线情绪v2 无冲突）。
+    fix: 'PAT 现有 workflow scope（X-OAuth-Scopes: repo,workflow，旧铁律「无 workflow scope」已过时）⇒ 云端原生 cron 直改。commit da5099f95e（base 198f7d98aa 快进，与 21:26 小九短线情绪v2 无冲突）。'
     verify_how: tip 回读 schedule 恰 5 条且 30 7 种子唯一、case 分支唯一；另 dispatch 一轮 category=post_close 实测 FIRST_BOARD_ALERT 云端管线首跑（此前数据均本机手工生成，云端从未跑过——首跑验证明天 15:30 不翻车）。
     refs:
       - ".github/workflows/v8_cn_fetch_cloud.yml"
