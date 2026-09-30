@@ -15574,10 +15574,22 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       /* 启动板块默认折叠 —— 与图2 的「启动·N 点击查看」交互对齐（状态存 DOM，重渲不丢） */
       var launchOpen = (body.dataset.ulOpen === '1');
-      /* 三种「没龙头股」的原因分别明示，绝不静默丢板块（旧版曾因此只显示 9 个） */
+      /* 四种「没龙头股」的原因分别明示，绝不静默丢板块（旧版曾因此只显示 9 个）。
+         🛡 2026-09-30 小九（主人令「一劳永逸」）：后端 fetch_sector_leaders.py 现携
+         em_boards_source（live/cache/unavailable）审计字段——东财全 host 断连日
+         （实测 09-30：RemoteDisconnected 云端+本机全断）板块被降级保留为 no_match，
+         此处须与「真·无对应行业板块」区分开，避免误导；dict 旧档时今日新晋板块
+         in_dict=false 也不再误报「不在抓取名单」。 */
+      var _dsrc = (window.SECTOR_LEADERS || {}).em_boards_source || '';
       var MSG_NOMATCH = '&#x26A0;&#xFE0F; 该板块在东财无对应行业板块，无法抓成分股（需人工别名表补）';
+      var MSG_EMLIMIT = '&#x26A0;&#xFE0F; 东财接口本轮受限（全 host 断连），龙头股名单暂缺，下轮自动补抓（板块阶段判定不受影响）';
       var MSG_FAIL    = '&#x26A0;&#xFE0F; 龙头股行情本轮抓取失败，待下轮盘后自动补抓（板块阶段判定不受影响）';
-      var MSG_NOCOV   = '&#x26A0;&#xFE0F; 龙头股本轮未抓取（该板块不在抓取名单内，待补）';
+      var MSG_NOCOV   = '&#x26A0;&#xFE0F; 该板块为本轮新晋，龙头股名单下轮自动生成（上游字典尚未收录）';
+      var _msgOf = function(s){
+        if(s.no_match) return (_dsrc === 'unavailable') ? MSG_EMLIMIT : MSG_NOMATCH;
+        if(s.leaders_error) return MSG_FAIL;
+        return MSG_NOCOV;
+      };
       var h = '', cur = null;
       rows.forEach(function(s){
         var ph = s.phase;
@@ -15607,7 +15619,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         var _hasL = s.leaders && s.leaders.length;
         if(_hasL) h += '  <div style="display:flex;flex-wrap:wrap;gap:6px 10px;">';
         else h += '  <div style="font-size:11px;color:#fbbf24;background:rgba(251,191,36,.07);border:1px dashed rgba(251,191,36,.35);border-radius:6px;padding:6px 9px;">'
-                + (s.no_match ? MSG_NOMATCH : (s.leaders_error ? MSG_FAIL : MSG_NOCOV)) + '</div>';
+                + _msgOf(s) + '</div>';
         (s.leaders || []).forEach(function(p, idx){
           var col = (p.chg >= 0) ? 'var(--up)' : 'var(--down)';
           h += '<span style="display:inline-flex;align-items:baseline;gap:5px;padding:3px 8px;border-radius:5px;background:rgba(255,255,255,.04);border-left:3px solid ' + col + ';font-size:12px;white-space:nowrap;">';

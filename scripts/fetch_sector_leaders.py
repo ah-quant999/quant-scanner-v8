@@ -23,6 +23,22 @@ SRC_RS = os.path.join(ROOT, "data", "SECTOR_RS.js")
 OUT_RAW = os.path.join(ROOT, "raw_data", "sector_leaders.json")
 OUT_JS = os.path.join(ROOT, "data", "SECTOR_LEADERS.js")
 
+# 🛡 2026-09-30 小九（主人令「暂未上架这卡这里为什么没有？一劳永逸修复」）：
+#   东财 push2 对云端 runner 全 host RemoteDisconnected（run#36691760288 实测，
+#   algo_run_report fail=2 记账在案）⇒ 本脚本 09-29 19:28 后断供 2 天 ⇒
+#   「主升/启动·龙头股」卡今日 2 个启动板块（小金属/风电设备）龙头股位全空。
+#   修法 = 三层兜底（只加降级路径，不动任何取数口径）：
+#     ① 板块名→BK 映射缓存  raw_data/em_boards_cache.json  （成功轮全量回写，随 git 跨 run/跨日累积）
+#     ② 板块成员名单缓存    raw_data/em_members_cache.json  （fetch_cons 成功轮回写）
+#     ③ 行情腾讯兜底        qt.gtimg.cn 批量报价（fetch_us_hk_map 同源，云端已验证可达）
+#   ⇒ 东财全断日：板块清单走缓存、行情走腾讯；缓存也缺时板块结构仍照写照推（明示
+#     no_match/leaders_error），dict **每日刷新绝不中断**，不再整脚本崩退出 1。
+CACHE_BOARDS = os.path.join(ROOT, "raw_data", "em_boards_cache.json")
+CACHE_MEMBERS = os.path.join(ROOT, "raw_data", "em_members_cache.json")
+
+# 本轮板块名→BK 映射的来源审计（live=东财在线 / cache=本地缓存兜底 / unavailable=缓存也缺）
+EM_BOARDS_SOURCE = "live"
+
 TOP_N = 5
 PHASE_RULE_VER = 2
 PHASES = ("主升", "启动")
@@ -118,6 +134,26 @@ def _read_window_js(path):
         return None
 
 
+def _cache_load(path):
+    """读 JSON 缓存；任何异常返回 None（兜底路径绝不抛错）。"""
+    try:
+        with open(path, "rb") as f:
+            return json.loads(f.read().decode("utf-8"))
+    except Exception:
+        return None
+
+
+def _cache_save(path, obj):
+    """原子写 JSON 缓存；失败仅记日志，不阻塞主流程。"""
+    try:
+        tmp = path + ".tmp"
+        with open(tmp, "wb") as f:
+            f.write(json.dumps(obj, ensure_ascii=False).encode("utf-8"))
+        os.replace(tmp, path)
+    except Exception as e:
+        log("cache save fail %s: %s" % (os.path.basename(path), str(e)[:60]))
+
+
 def _phase_of(s):
     d5 = s.get("pct_5d") or 0
     d20 = s.get("pct_20d") or 0
@@ -158,26 +194,56 @@ def _resolve_bk(nm, exact, norm):
 
 
 def fetch_em_boards():
-    """返回 (精确名映射, 归一名映射)。归一碰撞时优先 Ⅱ 级，其次先到先得。"""
+    """返回 (精确名映射, 归一名映射)。归一碰撞时优先 Ⅱ 级，其次先到先得。
+    🛡 2026-09-30 小九：**本函数永不 raise**——东财全 host 断连（RemoteDisconnected）
+    时回退 raw_data/em_boards_cache.json（成功轮全量回写、随 git 跨日累积）；
+    缓存也没有则返回空映射（build 层按 no_match=1 明示保留板块），dict 断供根除。"""
     exact, norm = {}, {}
-    for pn in range(1, 9):
-        url = ("%s/api/qt/clist/get?pn=%d&pz=100&po=1&np=1&fltt=2&invt=2"
-               "&fid=f3&fs=m:90+t:2&fields=f12,f14,f3" % (EM, pn))
-        d = _get_json(url, hosts=EM_HOSTS)
-        diff = ((d.get("data") or {}).get("diff")) or []
-        if not diff:
-            break
-        for x in diff:
-            nm, bk = x.get("f14"), x.get("f12")
-            if nm and bk:
-                exact[nm] = bk
-                k = _norm(nm)
-                if k not in norm or nm.endswith("Ⅱ"):
-                    norm[k] = bk
-        total = (d.get("data") or {}).get("total") or 0
-        if len(exact) >= total:
-            break
-        time.sleep(0.25)
+    global EM_BOARDS_SOURCE
+    try:
+        for pn in range(1, 9):
+            url = ("%s/api/qt/clist/get?pn=%d&pz=100&po=1&np=1&fltt=2&invt=2"
+                   "&fid=f3&fs=m:90+t:2&fields=f12,f14,f3" % (EM, pn))
+            d = _get_json(url, hosts=EM_HOSTS)
+            diff = ((d.get("data") or {}).get("diff")) or []
+            if not diff:
+                break
+            for x in diff:
+                nm, bk = x.get("f14"), x.get("f12")
+                if nm and bk:
+                    exact[nm] = bk
+                    k = _norm(nm)
+                    if k not in norm or nm.endswith("Ⅱ"):
+                        norm[k] = bk
+            total = (d.get("data") or {}).get("total") or 0
+            if len(exact) >= total:
+                break
+            time.sleep(0.25)
+    except Exception as e:
+        log("⚠️ em boards 东财全 host 失败(%s) → 回退本地缓存" % str(e)[:70])
+        cached = _cache_load(CACHE_BOARDS)
+        if cached and cached.get("boards"):
+            _boards = cached["boards"]
+            exact.update(_boards)
+            # 归一重建：Ⅱ 级优先（与在线逻辑同规则），其余先到先得
+            for _pass in ("Ⅱ", None):
+                for nm2, bk2 in _boards.items():
+                    if _pass == "Ⅱ" and not nm2.endswith("Ⅱ"):
+                        continue
+                    if _pass != "Ⅱ" and nm2.endswith("Ⅱ"):
+                        continue
+                    k2 = _norm(nm2)
+                    if k2 not in norm:
+                        norm[k2] = bk2
+            log("em boards cache: %d 条（updated=%s）" % (len(exact), cached.get("_updated", "?")))
+            EM_BOARDS_SOURCE = "cache"
+            return exact, norm
+        log("em boards cache 无 ⇒ 本轮全部板块按 no_match 明示（结构不断供）")
+        EM_BOARDS_SOURCE = "unavailable"
+        return {}, {}
+    if exact:
+        _cache_save(CACHE_BOARDS, {"_updated": time.strftime("%Y-%m-%d %H:%M:%S"), "boards": exact})
+        EM_BOARDS_SOURCE = "live"
     return exact, norm
 
 
@@ -186,6 +252,18 @@ def fetch_cons(bk):
            "&fid=f3&fs=b:%s&fields=f12,f14,f2,f3,f62" % (EM, bk))
     d = _get_json(url, hosts=EM_HOSTS)
     diff = ((d.get("data") or {}).get("diff")) or []
+    # 🛡 2026-09-30 小九：成功轮全量回写成员名单缓存（code+name），供东财断连日
+    #   腾讯行情兜底使用；随 git 跨 run/跨日累积。失败仅记日志不阻塞。
+    _members = []
+    for x in diff:
+        _c, _n = x.get("f12"), x.get("f14")
+        if _c and _n:
+            _members.append({"code": str(_c), "name": str(_n)})
+    if _members:
+        _mc = _cache_load(CACHE_MEMBERS) or {}
+        _mem_all = _mc.get("members") or {}
+        _mem_all[bk] = _members
+        _cache_save(CACHE_MEMBERS, {"_updated": time.strftime("%Y-%m-%d %H:%M:%S"), "members": _mem_all})
     rows = []
     for x in diff:
         code = x.get("f12")
@@ -207,8 +285,50 @@ def fetch_cons(bk):
     return rows
 
 
+def _tx_cons(members):
+    """腾讯 qt.gtimg.cn 批量行情兜底（2026-09-30 小九；源与 fetch_us_hk_map 同，
+    云端已验证可达）。members=[{code,name}]（东财 6 位代码）→ 与 fetch_cons 同结构 rows。
+    腾讯行情无主力净额 ⇒ main_net=None（前端龙头股位只展示涨幅，不受影响）。"""
+    def _txkey(c):
+        c = str(c)
+        if c.startswith(("sh", "sz")):
+            return c
+        return ("sh" if c[:1] in ("6", "9") else "sz") + c
+
+    out = []
+    keys = [_txkey(m["code"]) for m in members]
+    tx_headers = {"User-Agent": UA["User-Agent"], "Referer": "https://gu.qq.com/"}
+    for i in range(0, len(keys), 30):
+        url = "https://qt.gtimg.cn/q=" + ",".join(keys[i:i + 30])
+        req = urllib.request.Request(url, headers=tx_headers)
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            txt = resp.read().decode("gbk", "replace")
+        for line in txt.split(";"):
+            line = line.strip()
+            if '="' not in line:
+                continue
+            f = line.split('="', 1)[1].rstrip('";').split("~")
+            if len(f) <= 3 or not f[3]:
+                continue
+            try:
+                price = float(f[3])
+                pct = float(f[32]) if len(f) > 32 and f[32] not in ("", "-") else 0.0
+            except (ValueError, IndexError):
+                continue
+            if price <= 0:
+                continue
+            out.append({"code": f[2], "name": f[1], "price": round(price, 2),
+                        "chg": round(pct, 2), "main_net": None})
+        time.sleep(0.2)
+    out.sort(key=lambda r: r["chg"], reverse=True)
+    return out
+
+
 def fetch_cons_safe(bk):
-    """双轮重试：每轮内部 _get_json 已带 3 重试；轮间 2.5s 缓冲防东财限流。"""
+    """双轮重试（东财）：每轮内部 _get_json 已带 3 重试；轮间 2.5s 缓冲防东财限流。
+    🛡 2026-09-30 小九：东财两轮全断（RemoteDisconnected/502）时改走**腾讯成员缓存兜底**
+    （名单来自 fetch_cons 成功轮回写的 raw_data/em_members_cache.json）；腾讯也失败才
+    raise（走 leaders_error 明示保留路径）。绝不因东财单源断连而丢龙头股。"""
     last = None
     for rnd in range(2):
         try:
@@ -217,6 +337,16 @@ def fetch_cons_safe(bk):
             last = e
             if rnd == 0:
                 time.sleep(2.5)
+    cached = _cache_load(CACHE_MEMBERS)
+    ml = ((cached or {}).get("members") or {}).get(bk) or []
+    if ml:
+        try:
+            rows = _tx_cons(ml)
+            log("cons fallback(tencent) %s: %d rows（东财断连，名单缓存 updated=%s）"
+                % (bk, len(rows), (cached or {}).get("_updated", "?")))
+            return rows
+        except Exception as e2:
+            log("cons tencent fallback fail %s: %s" % (bk, str(e2)[:60]))
     raise last
 
 
@@ -301,6 +431,7 @@ def build():
         "source": "东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期",
         "phase": "主升+启动", "sector_count": len(sectors_out), "sectors": sectors_out,
         "nomatch_count": n_nomatch, "leaders_fail_count": n_fail,
+        "em_boards_source": EM_BOARDS_SOURCE,
         "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；"
                 "个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；"
                 "no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*)",
