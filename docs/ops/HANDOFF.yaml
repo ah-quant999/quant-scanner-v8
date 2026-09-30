@@ -7566,3 +7566,16 @@ items:
       - "docs/ops/HANDOFF.yaml#ladder-sentinel-fix-0930"
     updated: "2026-09-30 21:38"
     updated_by: 阿狸咪的工程师
+
+  - id: ladder-ui-legend-5col-0930
+    priority: P2
+    owner: 阿狸咪(alimi-cn)
+    status: done
+    what: 主人令连板梯队前哨卡 UI 三改：①注脚(核心/用法/限制)从卡底上移至卡名正下方(padding 6px 12px 0)；②股票格 1行5列(grid repeat(5,1fr)，首板10只=2行×5、二进三3只=1行)；③JS 客户端强制按量比降序(不依赖数据文件顺序)；④五列下格内边距 6px 9px→5px 7px。
+    fix: 基于实时 tip 锚点补丁，仅动卡片区域、不碰任何 ?v 缓存戳（无 reconcile 竞态）；大文件取本地 git 对象（origin/main==tip 校验后），规避 API blob 断流。
+    verify_how: tip 回读注脚位于 fbaBody 之前、repeat(5,1fr) 唯一、firstBoardAlertCard 唯一；内联 script node new Function 0 错；38 条保护标记全命中。
+    refs:
+      - "index.html#firstBoardAlertCard"
+      - "docs/ops/HANDOFF.yaml#ladder-sentinel-fix-0930"
+    updated: "2026-09-30 23:00"
+    updated_by: 阿狸咪的工程师
