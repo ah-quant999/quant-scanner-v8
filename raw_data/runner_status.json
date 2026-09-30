@@ -1,13 +1,12 @@
 {
-  "update_time": "2026-10-01 00:17:39",
+  "update_time": "2026-10-01 01:07:47",
   "status": "ok",
   "process": {
     "ok": true,
     "listener": true,
-    "worker": true,
+    "worker": false,
     "details": [
-      "runner.listener",
-      "runner.worker"
+      "runner.listener"
     ]
   },
   "service": {
@@ -18,7 +17,7 @@
   "worker_logs": {
     "ok": true,
     "errors": [],
-    "scanned": 1,
+    "scanned": 0,
     "message": "最近日志无错误"
   },
   "github": {
