@@ -1,8 +1,8 @@
 {
- "update_time": "2026-09-30 23:32:05",
+ "update_time": "2026-10-01 02:14:03",
  "engine": "algorithms/factor_walkforward.py",
  "methodology": "时点无前视：t 只用 ≤t 的 K 线；入场 = 次日开盘，出场 = (t+1+h) 开盘；调仓间隔 10 交易日；分层=五分位(L1 最强)；成本=往返 0.20%；IS/OOS = 调仓点前 60%/后 40% 切分。判据：IR_OOS>0.3 且 连续 5 年窗口内 ≥4 年 Top 层胜率>55%。",
- "universe_n": 4159,
+ "universe_n": 4163,
  "universe_src": "raw_data/kline_cache（A 股 6 位码）",
  "data_src": "新浪 datalen=2200（主）→ gtimg（兜底）",
  "bars_min": 515,
@@ -19,76 +19,76 @@
    "n_points": 171,
    "date_from": "2019-08-30",
    "date_to": "2026-09-04",
-   "spread_avg_pct": -0.0431,
-   "spread_is_pct": -0.0774,
-   "spread_oos_pct": 0.0076,
+   "spread_avg_pct": -0.041,
+   "spread_is_pct": -0.0761,
+   "spread_oos_pct": 0.0108,
    "top_win_avg": 46.9,
-   "top_avg_pct": 0.2287,
-   "bottom_avg_pct": 0.2718,
-   "ir_is": -0.113,
-   "ir_oos": 0.009,
+   "top_avg_pct": 0.2286,
+   "bottom_avg_pct": 0.2697,
+   "ir_is": -0.111,
+   "ir_oos": 0.012,
    "sharpe_oos": 0.302,
    "base_win_avg": 48.4,
-   "beat_base_rate": 48.0,
-   "spread_pos_rate": 52.6,
+   "beat_base_rate": 49.7,
+   "spread_pos_rate": 53.2,
    "years_beat_gt55": 1,
-   "max_drawdown_top_pct": -52.927,
+   "max_drawdown_top_pct": -52.928,
    "years": {
     "2019": {
      "n": 9,
      "top_win": 54.2,
      "base_win": 54.5,
      "beat_base": 55.6,
-     "spread_avg": -0.2032
+     "spread_avg": -0.2008
     },
     "2020": {
      "n": 24,
      "top_win": 49.5,
      "base_win": 48.2,
      "beat_base": 54.2,
-     "spread_avg": 0.5839
+     "spread_avg": 0.5874
     },
     "2021": {
      "n": 24,
      "top_win": 47.6,
      "base_win": 50.6,
-     "beat_base": 45.8,
-     "spread_avg": -0.6496
+     "beat_base": 50.0,
+     "spread_avg": -0.6462
     },
     "2022": {
      "n": 24,
      "top_win": 44.4,
      "base_win": 44.9,
-     "beat_base": 50.0,
-     "spread_avg": 0.0632
+     "beat_base": 54.2,
+     "spread_avg": 0.0601
     },
     "2023": {
      "n": 25,
      "top_win": 40.7,
      "base_win": 43.8,
      "beat_base": 40.0,
-     "spread_avg": -0.273
+     "spread_avg": -0.2704
     },
     "2024": {
      "n": 24,
      "top_win": 45.2,
      "base_win": 47.2,
      "beat_base": 45.8,
-     "spread_avg": -0.3141
+     "spread_avg": -0.3006
     },
     "2025": {
      "n": 24,
-     "top_win": 52.2,
+     "top_win": 52.1,
      "base_win": 55.8,
      "beat_base": 50.0,
-     "spread_avg": -0.0217
+     "spread_avg": -0.0359
     },
     "2026": {
      "n": 17,
      "top_win": 45.8,
      "base_win": 45.1,
-     "beat_base": 47.1,
-     "spread_avg": 0.5532
+     "beat_base": 52.9,
+     "spread_avg": 0.5646
     }
    },
    "years_win_gt55": 0,
@@ -103,26 +103,26 @@
    "by_hold": {
     "hold_5": {
      "ir_oos": -0.601,
-     "ir_is": -0.309,
-     "spread_oos_pct": -0.4368,
+     "ir_is": -0.306,
+     "spread_oos_pct": -0.4373,
      "beat_base_rate": 50.6,
      "years_beat_gt55": 3,
      "years_total": 8,
      "verdict": "FAIL"
     },
     "hold_10": {
-     "ir_oos": 0.009,
-     "ir_is": -0.113,
-     "spread_oos_pct": 0.0076,
-     "beat_base_rate": 48.0,
+     "ir_oos": 0.012,
+     "ir_is": -0.111,
+     "spread_oos_pct": 0.0108,
+     "beat_base_rate": 49.7,
      "years_beat_gt55": 1,
      "years_total": 8,
      "verdict": "FAIL"
     },
     "hold_20": {
-     "ir_oos": -0.193,
+     "ir_oos": -0.187,
      "ir_is": -0.087,
-     "spread_oos_pct": -0.2354,
+     "spread_oos_pct": -0.2287,
      "beat_base_rate": 41.2,
      "years_beat_gt55": 1,
      "years_total": 8,
@@ -137,110 +137,110 @@
    "n_points": 171,
    "date_from": "2019-08-30",
    "date_to": "2026-09-04",
-   "spread_avg_pct": -0.0879,
-   "spread_is_pct": -0.162,
-   "spread_oos_pct": 0.0215,
+   "spread_avg_pct": -0.0865,
+   "spread_is_pct": -0.1631,
+   "spread_oos_pct": 0.0267,
    "top_win_avg": 46.5,
-   "top_avg_pct": 0.1833,
-   "bottom_avg_pct": 0.2713,
-   "ir_is": -0.232,
-   "ir_oos": 0.024,
-   "sharpe_oos": 0.284,
+   "top_avg_pct": 0.1838,
+   "bottom_avg_pct": 0.2703,
+   "ir_is": -0.234,
+   "ir_oos": 0.029,
+   "sharpe_oos": 0.285,
    "base_win_avg": 48.4,
-   "beat_base_rate": 48.0,
+   "beat_base_rate": 47.4,
    "spread_pos_rate": 51.5,
-   "years_beat_gt55": 1,
-   "max_drawdown_top_pct": -53.389,
+   "years_beat_gt55": 0,
+   "max_drawdown_top_pct": -53.44,
    "years": {
     "2019": {
      "n": 9,
      "top_win": 51.4,
      "base_win": 54.5,
      "beat_base": 44.4,
-     "spread_avg": -0.5607
+     "spread_avg": -0.5631
     },
     "2020": {
      "n": 24,
      "top_win": 48.6,
      "base_win": 48.2,
      "beat_base": 50.0,
-     "spread_avg": 0.4433
+     "spread_avg": 0.452
     },
     "2021": {
      "n": 24,
-     "top_win": 47.6,
+     "top_win": 47.5,
      "base_win": 50.6,
      "beat_base": 45.8,
-     "spread_avg": -0.6515
+     "spread_avg": -0.657
     },
     "2022": {
      "n": 24,
-     "top_win": 44.5,
+     "top_win": 44.4,
      "base_win": 44.9,
      "beat_base": 54.2,
-     "spread_avg": 0.028
+     "spread_avg": 0.0229
     },
     "2023": {
      "n": 25,
-     "top_win": 40.5,
+     "top_win": 40.6,
      "base_win": 43.8,
      "beat_base": 36.0,
-     "spread_avg": -0.3442
+     "spread_avg": -0.3458
     },
     "2024": {
      "n": 24,
      "top_win": 45.0,
      "base_win": 47.2,
      "beat_base": 41.7,
-     "spread_avg": -0.3522
+     "spread_avg": -0.3406
     },
     "2025": {
      "n": 24,
      "top_win": 52.3,
      "base_win": 55.8,
-     "beat_base": 58.3,
-     "spread_avg": 0.1442
+     "beat_base": 54.2,
+     "spread_avg": 0.1401
     },
     "2026": {
      "n": 17,
-     "top_win": 45.4,
+     "top_win": 45.5,
      "base_win": 45.1,
      "beat_base": 52.9,
-     "spread_avg": 0.4665
+     "spread_avg": 0.4765
     }
    },
    "years_win_gt55": 0,
    "years_total": 8,
    "win_years": 5,
    "win_pass_n": 4,
-   "win_best_ok": 1,
+   "win_best_ok": 0,
    "pass_ir": false,
    "pass_years": false,
    "verdict": "FAIL",
    "pass_holds": [],
    "by_hold": {
     "hold_5": {
-     "ir_oos": -0.62,
-     "ir_is": -0.286,
-     "spread_oos_pct": -0.4699,
+     "ir_oos": -0.621,
+     "ir_is": -0.289,
+     "spread_oos_pct": -0.4713,
      "beat_base_rate": 49.4,
      "years_beat_gt55": 2,
      "years_total": 8,
      "verdict": "FAIL"
     },
     "hold_10": {
-     "ir_oos": 0.024,
-     "ir_is": -0.232,
-     "spread_oos_pct": 0.0215,
-     "beat_base_rate": 48.0,
-     "years_beat_gt55": 1,
+     "ir_oos": 0.029,
+     "ir_is": -0.234,
+     "spread_oos_pct": 0.0267,
+     "beat_base_rate": 47.4,
+     "years_beat_gt55": 0,
      "years_total": 8,
      "verdict": "FAIL"
     },
     "hold_20": {
-     "ir_oos": -0.107,
-     "ir_is": -0.228,
-     "spread_oos_pct": -0.1317,
+     "ir_oos": -0.105,
+     "ir_is": -0.23,
+     "spread_oos_pct": -0.129,
      "beat_base_rate": 42.9,
      "years_beat_gt55": 1,
      "years_total": 8,
@@ -255,24 +255,24 @@
    "n_points": 171,
    "date_from": "2019-08-30",
    "date_to": "2026-09-04",
-   "spread_avg_pct": 0.4674,
-   "spread_is_pct": 0.4323,
-   "spread_oos_pct": 0.5192,
+   "spread_avg_pct": 0.4709,
+   "spread_is_pct": 0.4362,
+   "spread_oos_pct": 0.5222,
    "top_win_avg": 51.1,
-   "top_avg_pct": 0.465,
-   "bottom_avg_pct": -0.0024,
-   "ir_is": 0.704,
-   "ir_oos": 0.612,
-   "sharpe_oos": 0.733,
+   "top_avg_pct": 0.4669,
+   "bottom_avg_pct": -0.004,
+   "ir_is": 0.71,
+   "ir_oos": 0.615,
+   "sharpe_oos": 0.734,
    "base_win_avg": 48.4,
    "beat_base_rate": 50.9,
-   "spread_pos_rate": 56.7,
+   "spread_pos_rate": 57.3,
    "years_beat_gt55": 2,
-   "max_drawdown_top_pct": -24.717,
+   "max_drawdown_top_pct": -24.723,
    "years": {
     "2019": {
      "n": 9,
-     "top_win": 56.5,
+     "top_win": 56.4,
      "base_win": 54.5,
      "beat_base": 44.4,
      "spread_avg": -1.1056
@@ -282,49 +282,49 @@
      "top_win": 51.0,
      "base_win": 48.2,
      "beat_base": 45.8,
-     "spread_avg": 0.241
+     "spread_avg": 0.2463
     },
     "2021": {
      "n": 24,
-     "top_win": 54.4,
+     "top_win": 54.5,
      "base_win": 50.6,
      "beat_base": 41.7,
-     "spread_avg": 0.5842
+     "spread_avg": 0.5868
     },
     "2022": {
      "n": 24,
      "top_win": 47.6,
      "base_win": 44.9,
      "beat_base": 54.2,
-     "spread_avg": 1.0278
+     "spread_avg": 1.0362
     },
     "2023": {
      "n": 25,
-     "top_win": 46.8,
+     "top_win": 46.7,
      "base_win": 43.8,
      "beat_base": 60.0,
-     "spread_avg": 0.7455
+     "spread_avg": 0.746
     },
     "2024": {
      "n": 24,
      "top_win": 48.9,
      "base_win": 47.2,
      "beat_base": 62.5,
-     "spread_avg": 0.8823
+     "spread_avg": 0.8826
     },
     "2025": {
      "n": 24,
-     "top_win": 59.4,
+     "top_win": 59.5,
      "base_win": 55.8,
      "beat_base": 45.8,
-     "spread_avg": 0.0789
+     "spread_avg": 0.0943
     },
     "2026": {
      "n": 17,
      "top_win": 45.9,
      "base_win": 45.1,
      "beat_base": 47.1,
-     "spread_avg": 0.2175
+     "spread_avg": 0.2071
     }
    },
    "years_win_gt55": 2,
@@ -338,27 +338,27 @@
    "pass_holds": [],
    "by_hold": {
     "hold_5": {
-     "ir_oos": 0.974,
-     "ir_is": 0.183,
-     "spread_oos_pct": 0.6175,
+     "ir_oos": 0.975,
+     "ir_is": 0.19,
+     "spread_oos_pct": 0.6184,
      "beat_base_rate": 49.4,
      "years_beat_gt55": 3,
      "years_total": 8,
      "verdict": "FAIL"
     },
     "hold_10": {
-     "ir_oos": 0.612,
-     "ir_is": 0.704,
-     "spread_oos_pct": 0.5192,
+     "ir_oos": 0.615,
+     "ir_is": 0.71,
+     "spread_oos_pct": 0.5222,
      "beat_base_rate": 50.9,
      "years_beat_gt55": 2,
      "years_total": 8,
      "verdict": "FAIL"
     },
     "hold_20": {
-     "ir_oos": 0.593,
-     "ir_is": 1.078,
-     "spread_oos_pct": 0.696,
+     "ir_oos": 0.595,
+     "ir_is": 1.084,
+     "spread_oos_pct": 0.6993,
      "beat_base_rate": 50.6,
      "years_beat_gt55": 3,
      "years_total": 8,
@@ -373,76 +373,76 @@
    "n_points": 172,
    "date_from": "2019-08-30",
    "date_to": "2026-09-18",
-   "spread_avg_pct": 0.4863,
-   "spread_is_pct": 0.2662,
-   "spread_oos_pct": 0.8149,
+   "spread_avg_pct": 0.49,
+   "spread_is_pct": 0.2685,
+   "spread_oos_pct": 0.8206,
    "top_win_avg": 50.5,
-   "top_avg_pct": 0.3966,
-   "bottom_avg_pct": -0.0897,
-   "ir_is": 0.601,
-   "ir_oos": 1.196,
-   "sharpe_oos": -0.067,
+   "top_avg_pct": 0.3989,
+   "bottom_avg_pct": -0.0911,
+   "ir_is": 0.606,
+   "ir_oos": 1.204,
+   "sharpe_oos": -0.064,
    "base_win_avg": 47.8,
    "beat_base_rate": 56.4,
    "spread_pos_rate": 57.6,
    "years_beat_gt55": 5,
-   "max_drawdown_top_pct": -41.31,
+   "max_drawdown_top_pct": -41.281,
    "years": {
     "2019": {
      "n": 9,
      "top_win": 65.4,
-     "base_win": 61.0,
+     "base_win": 60.9,
      "beat_base": 33.3,
-     "spread_avg": -0.2363
+     "spread_avg": -0.2405
     },
     "2020": {
      "n": 24,
      "top_win": 59.8,
      "base_win": 57.9,
      "beat_base": 33.3,
-     "spread_avg": -0.3179
+     "spread_avg": -0.3144
     },
     "2021": {
      "n": 24,
      "top_win": 53.7,
      "base_win": 50.7,
      "beat_base": 58.3,
-     "spread_avg": 0.28
+     "spread_avg": 0.2775
     },
     "2022": {
      "n": 24,
      "top_win": 46.9,
      "base_win": 44.5,
      "beat_base": 58.3,
-     "spread_avg": 0.702
+     "spread_avg": 0.7096
     },
     "2023": {
      "n": 25,
      "top_win": 44.4,
      "base_win": 41.9,
      "beat_base": 64.0,
-     "spread_avg": 0.682
+     "spread_avg": 0.6854
     },
     "2024": {
      "n": 24,
      "top_win": 42.2,
      "base_win": 40.6,
      "beat_base": 66.7,
-     "spread_avg": 0.4262
+     "spread_avg": 0.4295
     },
     "2025": {
      "n": 24,
      "top_win": 53.0,
      "base_win": 50.3,
      "beat_base": 54.2,
-     "spread_avg": 0.2931
+     "spread_avg": 0.3012
     },
     "2026": {
      "n": 18,
      "top_win": 47.5,
      "base_win": 42.9,
      "beat_base": 72.2,
-     "spread_avg": 1.9737
+     "spread_avg": 1.979
     }
    },
    "years_win_gt55": 2,
@@ -458,27 +458,27 @@
    ],
    "by_hold": {
     "hold_5": {
-     "ir_oos": 1.196,
-     "ir_is": 0.601,
-     "spread_oos_pct": 0.8149,
+     "ir_oos": 1.204,
+     "ir_is": 0.606,
+     "spread_oos_pct": 0.8206,
      "beat_base_rate": 56.4,
      "years_beat_gt55": 5,
      "years_total": 8,
      "verdict": "PASS"
     },
     "hold_10": {
-     "ir_oos": 0.531,
-     "ir_is": 1.105,
-     "spread_oos_pct": 0.4663,
+     "ir_oos": 0.54,
+     "ir_is": 1.099,
+     "spread_oos_pct": 0.4737,
      "beat_base_rate": 60.2,
      "years_beat_gt55": 4,
      "years_total": 8,
      "verdict": "FAIL"
     },
     "hold_20": {
-     "ir_oos": 0.733,
-     "ir_is": 1.641,
-     "spread_oos_pct": 0.871,
+     "ir_oos": 0.748,
+     "ir_is": 1.645,
+     "spread_oos_pct": 0.8878,
      "beat_base_rate": 57.6,
      "years_beat_gt55": 3,
      "years_total": 8,
@@ -493,76 +493,76 @@
    "n_points": 171,
    "date_from": "2019-08-30",
    "date_to": "2026-09-04",
-   "spread_avg_pct": 0.7275,
-   "spread_is_pct": 0.7055,
-   "spread_oos_pct": 0.7599,
+   "spread_avg_pct": 0.7278,
+   "spread_is_pct": 0.709,
+   "spread_oos_pct": 0.7556,
    "top_win_avg": 51.2,
-   "top_avg_pct": 0.655,
-   "bottom_avg_pct": -0.0724,
-   "ir_is": 1.126,
-   "ir_oos": 1.194,
-   "sharpe_oos": 0.712,
+   "top_avg_pct": 0.6562,
+   "bottom_avg_pct": -0.0716,
+   "ir_is": 1.132,
+   "ir_oos": 1.186,
+   "sharpe_oos": 0.711,
    "base_win_avg": 48.4,
    "beat_base_rate": 58.5,
    "spread_pos_rate": 65.5,
    "years_beat_gt55": 5,
-   "max_drawdown_top_pct": -28.642,
+   "max_drawdown_top_pct": -28.605,
    "years": {
     "2019": {
      "n": 9,
      "top_win": 57.6,
      "base_win": 54.5,
      "beat_base": 44.4,
-     "spread_avg": 0.459
+     "spread_avg": 0.4577
     },
     "2020": {
      "n": 24,
-     "top_win": 49.4,
+     "top_win": 49.5,
      "base_win": 48.2,
      "beat_base": 33.3,
-     "spread_avg": 0.2059
+     "spread_avg": 0.207
     },
     "2021": {
      "n": 24,
      "top_win": 53.9,
      "base_win": 50.6,
      "beat_base": 58.3,
-     "spread_avg": 0.8211
+     "spread_avg": 0.8193
     },
     "2022": {
      "n": 24,
      "top_win": 50.1,
      "base_win": 44.9,
      "beat_base": 70.8,
-     "spread_avg": 1.3742
+     "spread_avg": 1.3797
     },
     "2023": {
      "n": 25,
      "top_win": 46.2,
      "base_win": 43.8,
      "beat_base": 68.0,
-     "spread_avg": 0.5964
+     "spread_avg": 0.6066
     },
     "2024": {
      "n": 24,
      "top_win": 49.2,
      "base_win": 47.2,
      "beat_base": 66.7,
-     "spread_avg": 1.1926
+     "spread_avg": 1.1902
     },
     "2025": {
      "n": 24,
      "top_win": 60.1,
      "base_win": 55.8,
      "beat_base": 66.7,
-     "spread_avg": 0.5888
+     "spread_avg": 0.5903
     },
     "2026": {
      "n": 17,
-     "top_win": 45.1,
+     "top_win": 45.2,
      "base_win": 45.1,
      "beat_base": 47.1,
-     "spread_avg": 0.2925
+     "spread_avg": 0.2761
     }
    },
    "years_win_gt55": 2,
@@ -574,33 +574,32 @@
    "pass_years": true,
    "verdict": "PASS",
    "pass_holds": [
-    5,
     10,
     20
    ],
    "by_hold": {
     "hold_5": {
-     "ir_oos": 1.315,
-     "ir_is": 1.048,
-     "spread_oos_pct": 0.6285,
-     "beat_base_rate": 55.8,
-     "years_beat_gt55": 5,
+     "ir_oos": 1.313,
+     "ir_is": 1.055,
+     "spread_oos_pct": 0.6284,
+     "beat_base_rate": 55.2,
+     "years_beat_gt55": 4,
      "years_total": 8,
-     "verdict": "PASS"
+     "verdict": "FAIL"
     },
     "hold_10": {
-     "ir_oos": 1.194,
-     "ir_is": 1.126,
-     "spread_oos_pct": 0.7599,
+     "ir_oos": 1.186,
+     "ir_is": 1.132,
+     "spread_oos_pct": 0.7556,
      "beat_base_rate": 58.5,
      "years_beat_gt55": 5,
      "years_total": 8,
      "verdict": "PASS"
     },
     "hold_20": {
-     "ir_oos": 1.543,
-     "ir_is": 1.451,
-     "spread_oos_pct": 1.3395,
+     "ir_oos": 1.541,
+     "ir_is": 1.457,
+     "spread_oos_pct": 1.3367,
      "beat_base_rate": 62.9,
      "years_beat_gt55": 5,
      "years_total": 8,
@@ -615,76 +614,76 @@
    "n_points": 171,
    "date_from": "2019-08-30",
    "date_to": "2026-09-04",
-   "spread_avg_pct": 0.2341,
-   "spread_is_pct": 0.2775,
-   "spread_oos_pct": 0.1701,
+   "spread_avg_pct": 0.2304,
+   "spread_is_pct": 0.2715,
+   "spread_oos_pct": 0.1696,
    "top_win_avg": 47.9,
-   "top_avg_pct": 0.3972,
-   "bottom_avg_pct": 0.163,
-   "ir_is": 0.662,
-   "ir_oos": 0.412,
-   "sharpe_oos": 0.406,
+   "top_avg_pct": 0.3952,
+   "bottom_avg_pct": 0.1648,
+   "ir_is": 0.649,
+   "ir_oos": 0.411,
+   "sharpe_oos": 0.404,
    "base_win_avg": 48.4,
-   "beat_base_rate": 53.8,
+   "beat_base_rate": 53.2,
    "spread_pos_rate": 59.1,
    "years_beat_gt55": 4,
-   "max_drawdown_top_pct": -45.792,
+   "max_drawdown_top_pct": -45.848,
    "years": {
     "2019": {
      "n": 9,
      "top_win": 56.8,
      "base_win": 54.5,
      "beat_base": 66.7,
-     "spread_avg": 1.2141
+     "spread_avg": 1.2112
     },
     "2020": {
      "n": 24,
      "top_win": 46.9,
      "base_win": 48.2,
      "beat_base": 45.8,
-     "spread_avg": -0.1581
+     "spread_avg": -0.171
     },
     "2021": {
      "n": 24,
      "top_win": 50.0,
      "base_win": 50.6,
      "beat_base": 50.0,
-     "spread_avg": 0.632
+     "spread_avg": 0.6313
     },
     "2022": {
      "n": 24,
      "top_win": 44.7,
      "base_win": 44.9,
      "beat_base": 58.3,
-     "spread_avg": 0.2967
+     "spread_avg": 0.2951
     },
     "2023": {
      "n": 25,
      "top_win": 43.6,
      "base_win": 43.8,
      "beat_base": 44.0,
-     "spread_avg": 0.0698
+     "spread_avg": 0.0633
     },
     "2024": {
      "n": 24,
      "top_win": 46.0,
      "base_win": 47.2,
-     "beat_base": 45.8,
-     "spread_avg": -0.5647
+     "beat_base": 41.7,
+     "spread_avg": -0.5614
     },
     "2025": {
      "n": 24,
      "top_win": 55.0,
      "base_win": 55.8,
      "beat_base": 62.5,
-     "spread_avg": 0.5416
+     "spread_avg": 0.5421
     },
     "2026": {
      "n": 17,
      "top_win": 45.5,
      "base_win": 45.1,
      "beat_base": 70.6,
-     "spread_avg": 0.5545
+     "spread_avg": 0.544
     }
    },
    "years_win_gt55": 1,
@@ -698,27 +697,27 @@
    "pass_holds": [],
    "by_hold": {
     "hold_5": {
-     "ir_oos": 0.068,
-     "ir_is": 0.405,
-     "spread_oos_pct": 0.0198,
+     "ir_oos": 0.074,
+     "ir_is": 0.404,
+     "spread_oos_pct": 0.0215,
      "beat_base_rate": 48.8,
-     "years_beat_gt55": 2,
+     "years_beat_gt55": 1,
      "years_total": 8,
      "verdict": "FAIL"
     },
     "hold_10": {
-     "ir_oos": 0.412,
-     "ir_is": 0.662,
-     "spread_oos_pct": 0.1701,
-     "beat_base_rate": 53.8,
+     "ir_oos": 0.411,
+     "ir_is": 0.649,
+     "spread_oos_pct": 0.1696,
+     "beat_base_rate": 53.2,
      "years_beat_gt55": 4,
      "years_total": 8,
      "verdict": "FAIL"
     },
     "hold_20": {
-     "ir_oos": 1.158,
-     "ir_is": 0.887,
-     "spread_oos_pct": 0.7155,
+     "ir_oos": 1.163,
+     "ir_is": 0.882,
+     "spread_oos_pct": 0.717,
      "beat_base_rate": 53.5,
      "years_beat_gt55": 5,
      "years_total": 8,
@@ -733,76 +732,76 @@
    "n_points": 171,
    "date_from": "2019-08-30",
    "date_to": "2026-09-04",
-   "spread_avg_pct": 0.3139,
-   "spread_is_pct": 0.4846,
-   "spread_oos_pct": 0.0617,
+   "spread_avg_pct": 0.3183,
+   "spread_is_pct": 0.4859,
+   "spread_oos_pct": 0.0706,
    "top_win_avg": 50.5,
-   "top_avg_pct": 0.4112,
-   "bottom_avg_pct": 0.0973,
-   "ir_is": 0.605,
-   "ir_oos": 0.052,
-   "sharpe_oos": 0.622,
+   "top_avg_pct": 0.4107,
+   "bottom_avg_pct": 0.0924,
+   "ir_is": 0.607,
+   "ir_oos": 0.06,
+   "sharpe_oos": 0.621,
    "base_win_avg": 48.4,
    "beat_base_rate": 52.6,
    "spread_pos_rate": 53.2,
    "years_beat_gt55": 4,
-   "max_drawdown_top_pct": -24.107,
+   "max_drawdown_top_pct": -24.129,
    "years": {
     "2019": {
      "n": 9,
      "top_win": 58.2,
      "base_win": 54.5,
      "beat_base": 55.6,
-     "spread_avg": -0.9762
+     "spread_avg": -0.982
     },
     "2020": {
      "n": 24,
      "top_win": 50.8,
      "base_win": 48.2,
      "beat_base": 58.3,
-     "spread_avg": 0.5747
+     "spread_avg": 0.5786
     },
     "2021": {
      "n": 24,
      "top_win": 53.7,
      "base_win": 50.6,
      "beat_base": 50.0,
-     "spread_avg": 0.4858
+     "spread_avg": 0.4862
     },
     "2022": {
      "n": 24,
-     "top_win": 46.4,
+     "top_win": 46.5,
      "base_win": 44.9,
      "beat_base": 54.2,
-     "spread_avg": 1.0335
+     "spread_avg": 1.0366
     },
     "2023": {
      "n": 25,
      "top_win": 46.4,
      "base_win": 43.8,
      "beat_base": 60.0,
-     "spread_avg": 0.7065
+     "spread_avg": 0.7079
     },
     "2024": {
      "n": 24,
      "top_win": 48.4,
      "base_win": 47.2,
      "beat_base": 58.3,
-     "spread_avg": 0.159
+     "spread_avg": 0.1698
     },
     "2025": {
      "n": 24,
      "top_win": 57.1,
      "base_win": 55.8,
      "beat_base": 37.5,
-     "spread_avg": -0.4458
+     "spread_avg": -0.4354
     },
     "2026": {
      "n": 17,
      "top_win": 46.4,
      "base_win": 45.1,
      "beat_base": 47.1,
-     "spread_avg": 0.0843
+     "spread_avg": 0.0889
     }
    },
    "years_win_gt55": 2,
@@ -816,27 +815,27 @@
    "pass_holds": [],
    "by_hold": {
     "hold_5": {
-     "ir_oos": 0.738,
-     "ir_is": -0.071,
-     "spread_oos_pct": 0.6854,
+     "ir_oos": 0.743,
+     "ir_is": -0.065,
+     "spread_oos_pct": 0.6904,
      "beat_base_rate": 47.7,
      "years_beat_gt55": 3,
      "years_total": 8,
      "verdict": "FAIL"
     },
     "hold_10": {
-     "ir_oos": 0.052,
-     "ir_is": 0.605,
-     "spread_oos_pct": 0.0617,
+     "ir_oos": 0.06,
+     "ir_is": 0.607,
+     "spread_oos_pct": 0.0706,
      "beat_base_rate": 52.6,
      "years_beat_gt55": 4,
      "years_total": 8,
      "verdict": "FAIL"
     },
     "hold_20": {
-     "ir_oos": 0.071,
-     "ir_is": 1.036,
-     "spread_oos_pct": 0.1139,
+     "ir_oos": 0.077,
+     "ir_is": 1.038,
+     "spread_oos_pct": 0.1231,
      "beat_base_rate": 48.2,
      "years_beat_gt55": 1,
      "years_total": 8,
@@ -851,55 +850,55 @@
    "n_points": 171,
    "date_from": "2019-08-30",
    "date_to": "2026-09-04",
-   "spread_avg_pct": 0.8873,
-   "spread_is_pct": 1.0454,
-   "spread_oos_pct": 0.6536,
+   "spread_avg_pct": 0.8886,
+   "spread_is_pct": 1.045,
+   "spread_oos_pct": 0.6573,
    "top_win_avg": 52.4,
-   "top_avg_pct": 0.8697,
-   "bottom_avg_pct": -0.0176,
-   "ir_is": 1.476,
-   "ir_oos": 0.816,
-   "sharpe_oos": 0.835,
+   "top_avg_pct": 0.8702,
+   "bottom_avg_pct": -0.0184,
+   "ir_is": 1.473,
+   "ir_oos": 0.82,
+   "sharpe_oos": 0.836,
    "base_win_avg": 48.4,
    "beat_base_rate": 63.2,
-   "spread_pos_rate": 62.6,
+   "spread_pos_rate": 63.2,
    "years_beat_gt55": 6,
-   "max_drawdown_top_pct": -27.861,
+   "max_drawdown_top_pct": -27.948,
    "years": {
     "2019": {
      "n": 9,
      "top_win": 56.9,
      "base_win": 54.5,
      "beat_base": 44.4,
-     "spread_avg": -0.2115
+     "spread_avg": -0.2051
     },
     "2020": {
      "n": 24,
      "top_win": 50.7,
      "base_win": 48.2,
      "beat_base": 54.2,
-     "spread_avg": 0.0161
+     "spread_avg": 0.0159
     },
     "2021": {
      "n": 24,
      "top_win": 55.3,
      "base_win": 50.6,
      "beat_base": 66.7,
-     "spread_avg": 1.5587
+     "spread_avg": 1.555
     },
     "2022": {
      "n": 24,
      "top_win": 49.5,
      "base_win": 44.9,
      "beat_base": 70.8,
-     "spread_avg": 1.7644
+     "spread_avg": 1.7641
     },
     "2023": {
      "n": 25,
      "top_win": 49.7,
      "base_win": 43.8,
      "beat_base": 72.0,
-     "spread_avg": 1.6239
+     "spread_avg": 1.624
     },
     "2024": {
      "n": 24,
@@ -913,14 +912,14 @@
      "top_win": 61.3,
      "base_win": 55.8,
      "beat_base": 66.7,
-     "spread_avg": 0.8556
+     "spread_avg": 0.8633
     },
     "2026": {
      "n": 17,
      "top_win": 47.8,
      "base_win": 45.1,
      "beat_base": 58.8,
-     "spread_avg": 0.4312
+     "spread_avg": 0.4349
     }
    },
    "years_win_gt55": 3,
@@ -939,17 +938,17 @@
    "by_hold": {
     "hold_5": {
      "ir_oos": 1.188,
-     "ir_is": 1.184,
-     "spread_oos_pct": 0.7296,
+     "ir_is": 1.19,
+     "spread_oos_pct": 0.7313,
      "beat_base_rate": 62.2,
      "years_beat_gt55": 5,
      "years_total": 8,
      "verdict": "PASS"
     },
     "hold_10": {
-     "ir_oos": 0.816,
-     "ir_is": 1.476,
-     "spread_oos_pct": 0.6536,
+     "ir_oos": 0.82,
+     "ir_is": 1.473,
+     "spread_oos_pct": 0.6573,
      "beat_base_rate": 63.2,
      "years_beat_gt55": 6,
      "years_total": 8,
@@ -957,8 +956,8 @@
     },
     "hold_20": {
      "ir_oos": 1.114,
-     "ir_is": 2.05,
-     "spread_oos_pct": 1.2872,
+     "ir_is": 2.052,
+     "spread_oos_pct": 1.2884,
      "beat_base_rate": 68.8,
      "years_beat_gt55": 6,
      "years_total": 8,
