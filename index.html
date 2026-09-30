@@ -653,8 +653,8 @@ window.__domReadyFns=[];
 <script src="data/DAJIJIN_REDUCTION.js?v=c02ae2cdf5" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
-    <script src="data/H_AUTO_BUY.js?v=ef023690b5" defer></script>
-    <script src="data/H_AUTO_BUY_TRACK.js?v=460f4cdea8" defer></script>
+    <script src="data/H_AUTO_BUY.js?v=5db1557b1e" defer></script>
+    <script src="data/H_AUTO_BUY_TRACK.js?v=f4e95aa9d7" defer></script>
     <script src="data/UNLISTED_PANEL.js?v=e4a2df05e9" defer></script>
     <!-- 2026-09-07 主人令：机构研究·maharo 聚合卡（本机 cookie 拉取，云端无权限；数据由 .workbuddy/maharo_daily_pull.py 每日生成 data/maharo_macro.js） -->
     <!-- 2026-09-10 一劳永逸：AI 解析 insights 拆成独立文件 data/maharo_insights.js（window.MAHORO_INSIGHTS），
@@ -1779,8 +1779,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CAPITAL_FLOW_DATA.js?v=7c3b335545" defer></script>
 <script src="data/SH_SZ_HISTORY.js?v=069736cada" defer></script>
 <script src="data/CANDIDATE.js?v=6b03924c4e" defer></script>
-    <script src="data/FOUR_VOLUME.js?v=5dc38ce17a" defer></script>
-    <script src="data/FOUR_VOLUME_60M.js?v=77d1e0bc6c" defer></script>
+    <script src="data/FOUR_VOLUME.js?v=0fdd6c3635" defer></script>
+    <script src="data/FOUR_VOLUME_60M.js?v=bccb28d4f7" defer></script>
 
     <!-- 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」= 历史追踪 + 回测
          数据源：algorithms/update_four_volume_history.py（逐日账本+真实收盘价序列）
@@ -1789,7 +1789,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          ?v= 由 scripts/reconcile_cache_busters.py 自动对齐，此处写任意值即可。 -->
     <script src="data/FOUR_VOLUME_TRACK.js?v=bd57d73d0c" defer></script>
     <script src="data/FOUR_VOLUME_HISTORY.js?v=4168490f02" defer></script>
-    <script src="data/STOCK_STOP_DATA.js?v=816a6a4fe1" defer></script>
+    <script src="data/STOCK_STOP_DATA.js?v=2626d16a4a" defer></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=4d1ec1a768" defer></script>
 <script src="data/BACKTEST_TDX.js?v=ea9397f509" defer></script>
 
@@ -1797,7 +1797,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/EXPERIMENT.js?v=7ec124c8fc" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=787494fe6f" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=eba91df035" defer></script>
+<script src="data/V8_POOL_TRACKER.js?v=d06a6fd1d4" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=f728ae586f" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=41f0ba2e21" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
@@ -1806,7 +1806,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
-    <script src="data/FACTOR_LAB.js?v=1da6df9481" defer></script>
+    <script src="data/FACTOR_LAB.js?v=65ff7d7a57" defer></script>
 <!-- 🟢 2026-09-16 主人令（「你缺的是生命周期的回测」）：
      ALGO_TRACK.js 再度注入 —— 它是「选股生命周期（实盘持仓池）」回测的唯一真源，
      内含 by_horizon（真实持仓池分档前向收益）+ unrealized（当日浮动）。
@@ -1836,13 +1836,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=035d71a2f1" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=25bc5b4d1c" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=95ac60f098" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=dc595358fb" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=f8fa761a33" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=daceea904a" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/FOUR_VOLUME_BACKTEST.js?v=ca529ae8ba" defer></script>
+    <script src="data/FOUR_VOLUME_BACKTEST.js?v=077d2ef288" defer></script>
     <script src="data/IMA_STRONG_BACKTEST.js?v=c6bcb10b33" defer></script>
     <script src="data/CRDS_BACKTEST.js?v=1725a2f982" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
@@ -8853,7 +8853,7 @@ window.__renderIndexObserve = function(){
 
     <div id="unlistedPanel"></div>
     <!-- 2026-09-30 阿狸咪：连板梯队前哨卡（一进二前哨 + 二进三观察 · 仅暂未上架实验区可见） -->
-    <script src="data/FIRST_BOARD_ALERT.js?v=6a56961b40" defer></script>
+    <script src="data/FIRST_BOARD_ALERT.js?v=8b84d83808" defer></script>
     <div id="firstBoardAlertCard" class="card" style="margin-top:14px;background:#1a1d24;border:1px solid #2a2f3a;border-radius:10px;">
       <div style="padding:10px 12px;font-weight:700;color:#e6e9ef;border-bottom:1px solid #2a2f3a;">🔭 连板梯队前哨 <span style="font-size:11px;color:#8a93a6;font-weight:400;">一进二前哨 · 二进三观察 · 量比≥3</span> <span id="fbaUpd" style="font-size:11px;color:#8a93a6;font-weight:400;">更新于 --</span></div>
       <div id="fbaBody" style="padding:10px 12px;font-size:13px;color:#8a93a6;">加载中…</div>
@@ -19115,7 +19115,7 @@ window.__renderV8CalToday();
   var A2_CDN='https://fastly.jsdelivr.net/gh/ah-quant999/quant-scanner-v8@main/data/';
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=29ae2018d8', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=95624902d7', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=5ebb37e2af', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=e5324246ab', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
