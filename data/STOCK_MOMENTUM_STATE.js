@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-30 19:58",
- "generated": "2026-09-30 19:58",
+ "update_time": "2026-09-30 20:55",
+ "generated": "2026-09-30 20:55",
  "meta": {
-  "generated": "2026-09-30 19:58",
+  "generated": "2026-09-30 20:55",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 19,
   "days_with_consensus": 0,
@@ -7364,17 +7364,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "301080",
+      "name": "百普赛斯",
+      "change_pct": 14.691,
+      "price": 141.07,
+      "category": "突破"
+     },
+     {
       "code": "002811",
       "name": "郑中设计",
       "change_pct": 3.35,
       "price": 16.97,
-      "category": "突破"
-     },
-     {
-      "code": "301190",
-      "name": "善水科技",
-      "change_pct": 20.007,
-      "price": 35.93,
       "category": "突破"
      },
      {
@@ -7413,6 +7413,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "300162",
+      "name": "雷曼光电",
+      "change_pct": 7.92,
+      "price": 9.13,
+      "category": "突破"
+     },
+     {
       "code": "000498",
       "name": "山东路桥",
       "change_pct": 4.635,
@@ -7432,6 +7439,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 10.0,
       "price": 16.17,
       "category": "突破"
+     },
+     {
+      "code": "603008",
+      "name": "ST喜临门",
+      "change_pct": 6.212,
+      "price": 10.6,
+      "category": "突破"
      }
     ],
     "加速": [
@@ -7443,17 +7457,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
+      "code": "301080",
+      "name": "百普赛斯",
+      "change_pct": 14.691,
+      "price": 141.07,
+      "category": "加速"
+     },
+     {
       "code": "002811",
       "name": "郑中设计",
       "change_pct": 3.35,
       "price": 16.97,
-      "category": "加速"
-     },
-     {
-      "code": "301190",
-      "name": "善水科技",
-      "change_pct": 20.007,
-      "price": 35.93,
       "category": "加速"
      },
      {
@@ -7494,17 +7508,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "301080",
+      "name": "百普赛斯",
+      "change_pct": 14.691,
+      "price": 141.07,
+      "category": "短线选股"
+     },
+     {
       "code": "002811",
       "name": "郑中设计",
       "change_pct": 3.35,
       "price": 16.97,
-      "category": "短线选股"
-     },
-     {
-      "code": "301190",
-      "name": "善水科技",
-      "change_pct": 20.007,
-      "price": 35.93,
       "category": "短线选股"
      },
      {
@@ -7543,6 +7557,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "300162",
+      "name": "雷曼光电",
+      "change_pct": 7.92,
+      "price": 9.13,
+      "category": "短线选股"
+     },
+     {
       "code": "000498",
       "name": "山东路桥",
       "change_pct": 4.635,
@@ -7562,6 +7583,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 10.0,
       "price": 16.17,
       "category": "短线选股"
+     },
+     {
+      "code": "603008",
+      "name": "ST喜临门",
+      "change_pct": 6.212,
+      "price": 10.6,
+      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -7570,6 +7598,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "极米科技",
       "change_pct": 4.679,
       "price": 84.79,
+      "category": "强势股"
+     },
+     {
+      "code": "300162",
+      "name": "雷曼光电",
+      "change_pct": 7.92,
+      "price": 9.13,
       "category": "强势股"
      },
      {
