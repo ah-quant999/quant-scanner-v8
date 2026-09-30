@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-30 16:31",
+  "update_time": "2026-09-30 16:56",
   "data_date": "2026-09-29",
   "data_date_source": "kline",
   "fetch_date": "2026-09-30",
@@ -1031,6 +1031,24 @@
       "relative_90d": -13.68,
       "relative_180d": 16.05,
       "relative_52w": 30.35
+    },
+    {
+      "name": "其他社会服务",
+      "pct_day": 0.36,
+      "pct_5d": -1.78,
+      "pct_20d": -2.41,
+      "pct_30d": -3.09,
+      "pct_60d": -4.22,
+      "pct_90d": -11.23,
+      "pct_180d": -6.23,
+      "pct_52w": -7.25,
+      "relative_5d": -1.78,
+      "relative_20d": -2.41,
+      "relative_30d": -3.09,
+      "relative_60d": -4.22,
+      "relative_90d": -11.23,
+      "relative_180d": -6.23,
+      "relative_52w": -7.25
     },
     {
       "name": "软件开发",
