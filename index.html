@@ -627,8 +627,8 @@ window.__domReadyFns=[];
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
     <script src="data/MACRO_DATA.js?v=502e596826" defer></script>
     <script src="data/MACRO_BRIEF.js?v=2feb4d28fa" defer></script>
-    <script src="data/MACRO_KSHAPE.js?v=627ddea309" defer></script><!-- 宏观景气K型分层（数据驱动·每日巡检） -->
-<script src="data/NT_DATA.js?v=756bedfde9" defer></script>
+    <!-- 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役（巡检自动化已消亡、09-23 后死数据；生产者/渲染/派发/时窗一并清理，见 git 历史） -->
+    <script src="data/NT_DATA.js?v=756bedfde9" defer></script>
 <script src="data/LHB_DATA.js?v=c8f27221c2" defer></script>
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
@@ -12850,9 +12850,9 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'暂未上架模块索引', source:'UNLISTED_PANEL', freq:'手动策划', slots:['周','日'], note:'静态索引'},
+          {name:'暂未上架模块索引', source:'UNLISTED_PANEL', freq:'手动策划', slots:['周','日'], note:'静态索引'}
 
-          {name:'宏观K型分层', source:'MACRO_KSHAPE', freq:'事件驱动每日巡检', slots:['2','1',':','0','0'], note:'K型分层'},
+          // 🗑 2026-09-30 主人令：宏观K型分层 条目随整卡退役删除
 
         ]
 
@@ -13403,7 +13403,7 @@ function drawUpDownChart(){
     '观测平台': ['SH_FIB'],
     '共振日历': ['LHB_DATA'],
     '策略回测': ['BACKTEST_ALL_ALGOS'],
-    '暂未上架': ['MACRO_KSHAPE','UNLISTED_PANEL'],
+    '暂未上架': ['UNLISTED_PANEL'],
     '运维': ['DO_NOT_DELETE','UNLISTED_PANEL'],
   };
     _PAGE_ORDER.filter(function(p){return byPage[p];}).concat(Object.keys(byPage).filter(function(p){return _PAGE_ORDER.indexOf(p) < 0;})).forEach(function(page){
@@ -15874,13 +15874,12 @@ h += '<div class="card" id="dajijinCard" style="display:none;margin-bottom:16px;
 
 // 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡壳已删（原 baihechouBody，
 //   见 git 历史；同批删渲染函数与派发，生产者/自动化一并退役）。
-// ═══ 🚚 2026-09-18 主人令：宏观景气背景 · K 型分层 由「🌍 观测平台 > 🌍 宏观观测」整卡迁入本页（白河愁卡下方）═══
-//   依据：该卡数据源（data/MACRO_KSHAPE.js）仅沧海一土狗单源 ⇒ 与白河愁卡（单源 @白河愁博士）同属「单一观点源」类。
-//   容器 id = macroKShapeBody（原为 obsPaneMacro 内联匿名块，无 id）；渲染函数 __renderMacroKShape（文件内同名定义）。
-//   ⚠ 同页同源只留一张壳，勿重复建；派发入口见 renderUnlisted 尾部 window.__renderMacroKShape 调用。
-h += '<div class="card" id="macroKShapeBody" style="margin-bottom:16px;border-left:4px solid #fbbf24;">'
-   + '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F30D; 宏观景气背景 · K 型分层 加载中&#x2026;</div></div>';
-  // 裸 div 宿主：与连板天梯同范式（v8CardHeader 自带卡头），防「双圆弧」复发
+// ═══ 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役 ═══
+//   原壳卡 #macroKShapeBody 注入处（本行上方原 h += 两行已删）。判废依据：巡检自动化
+//   「沧海一土狗文章巡检（每日 21:00）」已不存在（本机 automations 无此任务、workflow 无、
+//   全仓无生成脚本）⇒ 09-23 21:15 后永为死数据，卡上「每日巡检」标签失实。
+//   渲染函数 __renderMacroKShape / 派发块 / V8_PAGE_SCHEDULE / _PAGE_CARD_ORDER / script 注入
+//   / v8_health_check.py 条目 / data/MACRO_KSHAPE.js 同批清理（见 git 历史）。
 h += '</div>'; // /ulPaneObserve
 
 // ===== 📊 大盘观察 pane —— 🚚 2026-09-15 主人令：整页迁出 =====
@@ -15905,12 +15904,7 @@ h += '</div>'; // /ulPaneObserve
     el.innerHTML=h;
     // 2026-09-12：暂未上架仅剩「观测类」一个在册子页，直接激活之
     setTimeout(function(){ window.__ulSwitch(null, 'observe'); }, 0);
-    // 🛡 2026-09-18：K 型分层卡迁入本页后必须同步派发（defer 数据晚于首渲到达，退避 3 次：0/600/1800ms）。
-    //   原宿主在「🌍 宏观观测」由 __obsRenderPane 的 macro 分支派发；迁页后改由本处接管 ⇒ 派发职责一并搬迁。
-    try{
-      var _mk = function(){ try{ if(typeof window.__renderMacroKShape==='function') window.__renderMacroKShape(); }catch(e){ console.warn('K型分层卡渲染失败',e); } };
-      _mk(); setTimeout(_mk, 600); setTimeout(_mk, 1800);
-    }catch(e){}
+    // 🗑 2026-09-30：K 型分层卡已退役，原派发块（退避 0/600/1800ms 调 __renderMacroKShape）随卡删除。
     // 2026-08-30 主人令:渲染兜底
     if(!h || h.length<200){ el.innerHTML='<div style=\"text-align:center;padding:40px;color:var(--dim);\"><div style=\"font-size:32px;margin-bottom:12px;\">📭</div><div style=\"font-size:14px;\">已下架卡片暂无可用数据</div><div style=\"font-size:12px;margin-top:8px;\">稍后再试或检查数据源</div></div>'; }
     // 2026-09-12：此处原有第二份 __ulSwitch 定义（与函数开头那份完全重复，
@@ -17974,64 +17968,8 @@ h+=`</div>`;
     }
     if(typeof window.__obsRenderPane === 'function'){ try{ window.__obsRenderPane(tab); }catch(e){} }
   };
-  // ═══ 🚚 2026-09-18 主人令：宏观景气背景 · K 型分层 由「🌍 观测平台 > 🌍 宏观观测」整卡迁至「暂未上架 > 观测类」（白河愁卡下方）═══
-  //   主人原话：「这卡如果只是根据土狗的观点分析的，就放到暂未上架白河愁卡的下方」。
-  //   取证：data/MACRO_KSHAPE.js 的 source 仅沧海一土狗单源（name/title/url 各 1 条）⇒ 判定成立，
-  //        属「单一观点源」类，与白河愁卡（单源 @白河愁博士）同类同页。
-  //   🛡 改造要点：原为 __renderObsPlatform 内联硬编码（无独立函数 / 不在派发名单）⇒
-  //      搬迁时同步抽为独立函数并补派发，否则「只搬壳子不搬函数」→ 容器永久「加载中」。
-  //   数据源：window.MACRO_KSHAPE（data/MACRO_KSHAPE.js）· 每日 21:00 沧海一土狗文章巡检刷新。
-  //   红涨绿跌铁律适用：增速为正=红(扩张)，为负=绿(收缩)；中性区灰。
-  window.__renderMacroKShape = function(){
-     var _host = document.getElementById('macroKShapeBody');
-     if(!_host) return 'nohost';
-     var _h = '';
-     var _kShape = window.MACRO_KSHAPE || {};
-     var _kSrc = _kShape.source || {};
-     var _kUpd = _kShape.updated || '2026-09-04';
-     var _kSrcLine = _kSrc.title
-       ? ('来源：<a href="' + (_kSrc.url || '#') + '" target="_blank" style="color:var(--link);">沧海一土狗 · ' + _kSrc.title + '</a> · ' + (_kSrc.date || ''))
-       : '来源：沧海一土狗';
-     function _kShapeRow(o, c){ return '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">' + o.name + '</span><b style="color:' + c + ';">' + o.val + '</b></div>'; }
-     /* 🛡 2026-09-18 晚 二修（主人令「这个卡左侧不要两个圆弧括号」）：原此处又自建一张 .card 同名卡，
-        与 renderUnlisted 里的壳卡 #macroKShapeBody 卡中嵌卡 ⇒ 两道金色圆角左边条并排（视觉=左侧两个圆弧括号），
-        且产生重复 id。本函数只负责往壳卡里填内容；卡壳样式（含唯一一道金色左边条）归壳卡所有。 */
-     _h += '<div>'
-        // ── ① 标题行（置顶）：卡名 + 频率 badge + 数据源 ──
-        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-        + '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🌍 宏观景气背景 · K 型分层</span>'
-        + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#fbbf24;background:rgba(251,191,36,.16);border:1px solid rgba(251,191,36,.4);letter-spacing:.5px;">⚡ 事件驱动 · 每日巡检</span>'
-        + '<span style="font-size:12px;color:var(--dim);">' + (_kShape.data_point || '7月数据') + ' · ' + _kSrcLine + ' · <b style="color:var(--dim);">更新于 ' + _kUpd + '</b></span></div>'
-        // ── ② 分析块（卡名下方）：核心 / 用法 / 限制 ──
-        + '<div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.7;font-size:12px;color:var(--txt);">'
-        + '<b style="color:#fbbf24;">&#x1F4CC; 核心：</b>用 K 型框架把行业分为扩张/中性/收缩三区。<br>'
-        + '<b style="color:#fbbf24;">&#x1F4A1; 用法：</b>理解为什么某些板块资金持续流入/流出，辅助背景判断。<br>'
-        + '<b style="color:#fbbf24;">&#x26A0; 限制：</b>结构化行业三区为人工策展（日级巡检触发，随沧海一土狗新 K 型图更新），背景认知适合查阅不适合盯盘。</div>'
-        + '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;">帮你理解<b style="color:var(--txt);">为什么某些板块资金持续流入</b>（外需+AI+技改 vs 地产链+财政收缩）——背景认知，适合查阅不适合盯盘。</div>'
-        + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;">'
-        + '<div style="background:rgba(239,83,80,.06);border:1px solid rgba(239,83,80,.25);border-radius:7px;padding:9px 11px;">'
-        + '<div style="font-size:12.5px;font-weight:700;color:#ef5350;margin-bottom:5px;">▲ 扩张区 · K 型上端</div>'
-        + (_kShape.expansion || []).map(function(o){ return _kShapeRow(o, '#ef5350'); }).join('')
-        + '</div>'
-        + '<div style="background:rgba(154,164,178,.06);border:1px solid rgba(154,164,178,.25);border-radius:7px;padding:9px 11px;">'
-        + '<div style="font-size:12.5px;font-weight:700;color:#9aa4b2;margin-bottom:5px;">◆ 中性区 · 总量平稳</div>'
-        + (_kShape.neutral || []).map(function(o){ return _kShapeRow(o, '#9aa4b2'); }).join('')
-        + (_kShape.neutral_note ? '<div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(154,164,178,.3);font-size:11px;line-height:1.7;color:var(--dim);">' + _kShape.neutral_note + '</div>' : '')
-        + '</div>'
-        + '<div style="background:rgba(38,166,154,.06);border:1px solid rgba(38,166,154,.25);border-radius:7px;padding:9px 11px;">'
-        + '<div style="font-size:12.5px;font-weight:700;color:#26a69a;margin-bottom:5px;">▼ 收缩区 · K 型下端</div>'
-        + (_kShape.contraction || []).map(function(o){ return _kShapeRow(o, '#26a69a'); }).join('')
-        + '</div>'
-        + '</div>'
-        + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:9px 12px;margin-top:10px;font-size:12px;line-height:1.8;color:var(--sub);">'
-        + '<b style="color:#fbbf24;">📖 框架要点（沧海一土狗 · 金融抑制模型）：</b>' + (_kShape.framework || '')
-        + (_kShape.latest_note ? '<div style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.25);border-radius:7px;padding:8px 12px;margin-top:10px;font-size:11.5px;line-height:1.7;color:var(--sub);">🔔 ' + _kShape.latest_note + '</div>' : '')
-        + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">🔭 仅供研究参考，不构成个人投资建议 · 数据时点以原文为准</div>'
-        + '</div>'; // 🛡 2026-09-18 搬迁同步：原此处 '</div></div>' 的第二个 </div> 用于闭合 /obsPaneMacro；本卡改为独立函数后无 pane 闭合层，收敛为 1 个
-
-     _host.innerHTML = _h;
-     return 'ok';
-  };
+  // ═══ 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役 ═══
+  //   原 window.__renderMacroKShape 渲染函数（09-18 迁入版）整块删除；判废依据见壳卡注入处的退役注释。
 
   window.__renderObsPlatform = function(){
     var _act = window.__obsActivePane || 'macro';

@@ -365,6 +365,12 @@ _RETIRED_ARTIFACTS = {
     "data/BAIHECHOU_MACRO.js",
     "data/BAIHECHOU_ANALYSIS.js",
     "raw_data/baihechou_posts.json",
+    # 🗑 2026-09-30 主人令（阿狸咪的工程师）：「宏观景气背景 · K 型分层」整卡退役 ——
+    #   生产者「沧海一土狗文章巡检自动化（每日 21:00）」已不存在（本机 automations 无此任务 /
+    #   workflow 无 / 全仓无生成脚本）⇒ data/MACRO_KSHAPE.js 停在 2026-09-23 21:15 永为死数据。
+    #   前端引用/渲染/派发/V8_PAGE_SCHEDULE/_PAGE_CARD_ORDER/v8_health_check 登记同批清理；
+    #   远端产物由本次退役提交一次性删除；本行只拦「本地残留副本回推复活」。
+    "data/MACRO_KSHAPE.js",
 }
 # 按前缀兜底：raw_data/strong_breakout_YYYYMMDD.json（逐日留档）
 _RETIRED_PREFIXES = (

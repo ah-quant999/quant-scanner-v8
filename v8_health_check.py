@@ -70,21 +70,11 @@ CARD_DEFS = [
     # 🛡 2026-09-08 一劳永逸：NT_DATA 由盘后算法链(fetch_orphan_nt_data.py)产出，原挂"今日事件"页
     #   在 08:00-10:00 盘前被 adjust_max_age 收紧到 180min 误杀（盘后产物不可能 <180min 新鲜）→ 改挂"全量数据"页豁免。
     {"id": "NT_DATA", "name": "市场提示", "page": "全量数据", "freq": "每日盘后(算法链)", "max_age": 720, "key_fields": ["alerts"], "weekend_update": False, "heal_cat": "algo_run"},
-    # 🛡 2026-09-16 阿狸咪的工程师 · 修「事件驱动数据被 24h 通用红线误判 fail」：
-    #   🚚 2026-09-18 主人令：宏观景气背景 · K 型分层 由「🌍 观测平台 > 🌍 宏观观测」整卡迁至「🔒 暂未上架 > 📊 观测类」
-#      （位置：白河愁卡「🌐 新周期判定」下方）。依据：data/MACRO_KSHAPE.js 的 source 仅沧海一土狗单源 ⇒ 与白河愁卡同为「单一观点源」类。
-#      前端：容器 #macroKShapeBody / 渲染函数 window.__renderMacroKShape()（原为 __renderObsPlatform 内联块，迁页时同步抽出）；本行 page 字段已同步。
-#   根因（实测）：MACRO_KSHAPE 既不在 CARD_DEFS 也不在 _KNOWN_EXTRA_PAGES 白名单
-    #   ⇒ 落入 check_all_data_files 动态扫描，按通用 24h 红线判 fail
-    #   （09-16 21:57 体检实测：[FAIL] 全量数据/MACRO_KSHAPE 更新于 昨日 20:11，超过 1440 分钟）。
-    #   但该卡 2026-09-15 19:27（ae30ea7a1）已按主人令改为**事件驱动**：
-    #   提交原文「convert to event-driven daily poll ... stop monthly automation」；
-    #   index.html 同位注释：每日「沧海一土狗文章巡检」自动化(21:00)发现新文才刷新 source/updated。
-    #   ⇒「无新文 ⇒ updated 不变」是设计内行为，不是陈旧故障。
-    #   按既有 manual_dep 范式登记（同 UNLISTED_PANEL）：超阈值降级为 limited（🔒 受限可用），
-    #   面板显示「等外部策展」而非「陈旧」，自愈链也不会做永远无效的派发。
-    #   ⚠️ 只登记这一个事件驱动卡，不放松任何算法产物的红线。
-    {"id": "MACRO_KSHAPE", "name": "宏观K型分层", "page": "暂未上架·观测类", "freq": "事件驱动(每日巡检)", "max_age": 10080, "key_fields": ["data_point"], "manual_dep": True, "producer": "沧海一土狗文章巡检自动化（每日 21:00）", "manual_note": "事件驱动 · 无自动刷新（非故障）：2026-09-15 19:27 ae30ea7a1 起由「沧海一土狗文章巡检」自动化按日巡视，发现新文才刷新，无新文保持上次策展值；非算法产物。"},
+    # 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役 ⇒ MACRO_KSHAPE 巡检登记项随卡删除
+    #   （原 09-16/09-18 事件驱动登记条目见 git 历史）。判废依据：生产者「沧海一土狗文章巡检自动化
+    #   （每日 21:00）」已不存在（本机 automations 无此任务 / workflow 无 / 全仓无生成脚本）
+    #   ⇒ data/MACRO_KSHAPE.js 停在 2026-09-23 21:15 永为死数据。产物与前端同批退役，
+    #   见下方 _RETIRED_FILES 护栏 + api_push_raw.py::_RETIRED_ARTIFACTS。
     # 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡整卡下线
     #   ⇒ BAIHECHOU_ANALYSIS 巡检登记项随卡删除（原 09-18 补监控盲区、09-21 补 producer
     #   的完整条目见 git 历史）；产物与生产者脚本同批退役，见下方 _RETIRED_FILES 护栏。
@@ -2083,6 +2073,7 @@ _RETIRED_FILES = {
     "ALGO_BACKTEST_COMPARE",     # 两套算法回测对比（2026-09-20 全链退役，本批删除产物）
     "BAIHECHOU_MACRO",           # 新周期判定·海外宏观（2026-09-22 主人令整卡下线）
     "BAIHECHOU_ANALYSIS",        # 新周期判定·AI解析（同上，同批退役）
+    "MACRO_KSHAPE",              # 宏观景气背景·K型分层（2026-09-30 主人令整卡退役：巡检自动化已消亡，09-23 后死数据）
 }
 
 # ⏱ 2026-09-21（本批）小九：低频产物「按生产者节拍判龄」表 ——
