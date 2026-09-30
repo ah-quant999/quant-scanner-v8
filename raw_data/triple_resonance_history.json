@@ -1776,7 +1776,7 @@
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-09-30 20:18:35"
+    "last_update": "2026-09-30 22:48:59"
   },
   "2026-08-18": [
     {
@@ -2371,7 +2371,7 @@
       "status": "near"
     }
   ],
-  "update_time": "2026-09-30 20:18:35",
+  "update_time": "2026-09-30 22:48:59",
   "2026-08-30": [
     {
       "code": "300475",
@@ -5433,47 +5433,47 @@
   ],
   "2026-09-30": [
     {
-      "code": "688498",
-      "name": "源杰科技",
-      "market": "sh",
-      "board": "科创板",
-      "close": 1613.0,
-      "pct_chg": 2.958,
-      "total_score": 35.4,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "昨日高振幅",
-        "通信技术",
-        "百元股",
-        "2026中报预增",
-        "基金重仓",
-        "计算机、通信和其他电子设备制造业",
-        "MSCI中国",
-        "沪股通"
-      ],
-      "signal_count": 1,
-      "status": "strict"
-    },
-    {
       "code": "300199",
       "name": "翰宇药业",
       "market": "sz",
       "board": "创业板",
       "close": 23.92,
-      "pct_chg": 1.741,
-      "total_score": 34.2,
+      "pct_chg": 4.958,
+      "total_score": 37.9,
       "quality_grade": "A",
       "industry": "医药制造业",
       "sectors": [
-        "2026中报预增",
         "创新药",
-        "医药制造业",
-        "肝炎概念",
-        "流感",
-        "深股通",
+        "2026中报预增",
         "减肥药",
-        "互联医疗"
+        "流感",
+        "医药制造业",
+        "互联医疗",
+        "深股通",
+        "肝炎概念"
+      ],
+      "signal_count": 1,
+      "status": "strict"
+    },
+    {
+      "code": "688498",
+      "name": "源杰科技",
+      "market": "sh",
+      "board": "科创板",
+      "close": 1613.0,
+      "pct_chg": -1.556,
+      "total_score": 33.5,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "百元股",
+        "2026中报预增",
+        "昨日高振幅",
+        "MSCI中国",
+        "沪股通",
+        "通信技术",
+        "基金重仓",
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 1,
       "status": "strict"
@@ -5484,42 +5484,19 @@
       "market": "sz",
       "board": "创业板",
       "close": 389.0,
-      "pct_chg": -1.699,
-      "total_score": 31.7,
+      "pct_chg": -0.995,
+      "total_score": 31.1,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "2026中报预增",
         "百元股",
-        "基金重仓",
-        "计算机、通信和其他电子设备制造业",
+        "深证100R",
+        "2026中报预增",
+        "MSCI中国",
         "机构重仓",
         "深股通",
-        "MSCI中国",
-        "深证100R"
-      ],
-      "signal_count": 0,
-      "status": "strict"
-    },
-    {
-      "code": "300857",
-      "name": "协创数据",
-      "market": "sz",
-      "board": "创业板",
-      "close": 251.16,
-      "pct_chg": 0.163,
-      "total_score": 30.4,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "AI眼镜",
-        "2026一季报预增",
-        "2026中报预增",
-        "物联网",
-        "计算机、通信和其他电子设备制造业",
-        "MSCI中国",
-        "小米概念",
-        "AI智能体"
+        "基金重仓",
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 0,
       "status": "strict"
@@ -5530,91 +5507,45 @@
       "market": "sz",
       "board": "主板",
       "close": 3.91,
-      "pct_chg": -0.505,
-      "total_score": 27.3,
+      "pct_chg": -0.761,
+      "total_score": 28.6,
       "quality_grade": "A",
       "industry": "零售业",
       "sectors": [
-        "零售业",
-        "消费电子概念",
-        "拼多多概念",
-        "跨境电商",
         "无线耳机",
+        "电商概念",
         "内贸流通",
-        "2026中报扭亏",
-        "电商概念"
+        "拼多多概念",
+        "消费电子概念",
+        "跨境电商",
+        "零售业",
+        "2026中报扭亏"
       ],
       "signal_count": 2,
       "status": "strict"
     },
     {
-      "code": "300394",
-      "name": "天孚通信",
+      "code": "300857",
+      "name": "协创数据",
       "market": "sz",
       "board": "创业板",
-      "close": 260.77,
-      "pct_chg": 4.571,
-      "total_score": 25.5,
+      "close": 251.16,
+      "pct_chg": 1.936,
+      "total_score": 28.6,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "百元股",
-        "算力概念",
-        "计算机、通信和其他电子设备制造业",
-        "深股通",
+        "AI眼镜",
+        "AI智能体",
+        "2026中报预增",
+        "物联网",
         "MSCI中国",
-        "5G概念",
-        "HS300",
-        "深证100R"
+        "小米概念",
+        "2026一季报预增",
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 0,
       "status": "strict"
-    },
-    {
-      "code": "002916",
-      "name": "深南电路",
-      "market": "sz",
-      "board": "主板",
-      "close": 373.01,
-      "pct_chg": 1.245,
-      "total_score": 26.7,
-      "quality_grade": "C",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "PCB",
-        "2026中报预增",
-        "百元股",
-        "计算机、通信和其他电子设备制造业",
-        "深股通",
-        "MSCI中国",
-        "5G概念",
-        "深证100R"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "300390",
-      "name": "天华新能",
-      "market": "sz",
-      "board": "创业板",
-      "close": 49.09,
-      "pct_chg": 2.187,
-      "total_score": 25.1,
-      "quality_grade": "B",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "2026一季报预增",
-        "计算机、通信和其他电子设备制造业",
-        "医疗器械概念",
-        "独角兽",
-        "深股通",
-        "固态电池",
-        "MSCI中国",
-        "锂矿概念"
-      ],
-      "signal_count": 2,
-      "status": "near"
     }
   ]
 }

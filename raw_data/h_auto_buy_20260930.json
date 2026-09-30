@@ -1,7 +1,7 @@
 {
   "date": "2026-09-30",
   "snapshot_date": "2026-09-30",
-  "snapshot_time": "2026-09-30 18:27:09",
+  "snapshot_time": "2026-09-30 22:20:01",
   "method": "涨幅≥3.0% + 量比≥1.2（4日均量，H 反推最小可行版）",
   "total_scanned": 8382,
   "skipped_no_quote": 0,
@@ -4615,8 +4615,8 @@
       "board": "主板"
     }
   ],
-  "generated_at": "2026-09-30 20:31:20",
-  "update_time": "2026-09-30 20:31:20",
+  "generated_at": "2026-09-30 23:18:09",
+  "update_time": "2026-09-30 23:18:09",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖",
   "kline_stat": {
     "cache_fresh": 116,

@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-09-30 07:28:03",
-  "base_trade_date": "2026-09-29",
+  "update_time": "2026-09-30 21:00:18",
+  "base_trade_date": "2026-09-30",
   "stage_window": "B",
   "skipped_out_of_window": [
     {
@@ -21,34 +21,34 @@
     {
       "name": "候选池",
       "path": "raw_data/candidate.json",
-      "status": "✅ 本次产出",
-      "ts": "2026-09-30 06:58:31",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-30 20:10:55",
       "required": true,
-      "note": "基准日 2026-09-29，产物 2026-09-30（本次运行当日产出）"
+      "note": ""
     },
     {
       "name": "候选池(前端)",
       "path": "data/CANDIDATE.js",
-      "status": "✅ 本次产出",
-      "ts": "2026-09-30 06:58:31",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-30 20:10:55",
       "required": false,
-      "note": "基准日 2026-09-29，产物 2026-09-30（本次运行当日产出）"
+      "note": ""
     },
     {
       "name": "逆势龙头CRDS",
       "path": "raw_data/crds_card_data.json",
-      "status": "✅ 本次产出",
-      "ts": "2026-09-30 06:57:53",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-30 20:10:04",
       "required": true,
-      "note": "基准日 2026-09-29，产物 2026-09-30（本次运行当日产出）"
+      "note": ""
     },
     {
       "name": "逆势龙头(前端)",
       "path": "data/CRDS_CARD_DATA.js",
-      "status": "✅ 本次产出",
-      "ts": "2026-09-30 06:57:53",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-30 20:10:04",
       "required": false,
-      "note": "基准日 2026-09-29，产物 2026-09-30（本次运行当日产出）"
+      "note": ""
     },
     {
       "name": "相对强度RPS",
@@ -61,58 +61,58 @@
     {
       "name": "TOP10推荐池",
       "path": "raw_data/top10_daily.json",
-      "status": "✅ 本次产出",
-      "ts": "2026-09-30 06:59:40",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-30 20:11:10",
       "required": true,
-      "note": "基准日 2026-09-29，产物 2026-09-30（本次运行当日产出）"
+      "note": ""
     },
     {
       "name": "TOP10推荐池(前端)",
       "path": "data/TOP10_DAILY.js",
-      "status": "✅ 本次产出",
-      "ts": "2026-09-30 06:59:40",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-30 20:11:10",
       "required": false,
-      "note": "基准日 2026-09-29，产物 2026-09-30（本次运行当日产出）"
+      "note": ""
     },
     {
       "name": "三重共识",
       "path": "raw_data/triple_consensus.json",
-      "status": "✅ 本次产出",
-      "ts": "2026-09-30 07:02:41",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-30 20:18:50",
       "required": true,
-      "note": "基准日 2026-09-29，产物 2026-09-30（本次运行当日产出）"
+      "note": ""
     },
     {
       "name": "三重共识(前端)",
       "path": "data/TRIPLE_CONSENSUS.js",
-      "status": "✅ 本次产出",
-      "ts": "2026-09-30 07:02:41",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-30 20:18:50",
       "required": false,
-      "note": "基准日 2026-09-29，产物 2026-09-30（本次运行当日产出）"
+      "note": ""
     },
     {
       "name": "四量终极",
       "path": "data/FOUR_VOLUME.js",
-      "status": "✅ 本次产出",
-      "ts": "2026-09-30 07:01:39",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-30 20:17:30",
       "required": false,
-      "note": "基准日 2026-09-29，产物 2026-09-30（本次运行当日产出）"
+      "note": ""
     },
     {
       "name": "四量终极60m",
       "path": "data/FOUR_VOLUME_60M.js",
-      "status": "✅ 本次产出",
-      "ts": "2026-09-30 07:00:48",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-30 20:16:36",
       "required": false,
-      "note": "基准日 2026-09-29，产物 2026-09-30（本次运行当日产出）"
+      "note": ""
     },
     {
       "name": "金股池",
       "path": "raw_data/gold_pool.json",
-      "status": "✅ 本次产出",
-      "ts": "2026-09-30 06:58:31",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-09-30 20:10:55",
       "required": false,
-      "note": "基准日 2026-09-29，产物 2026-09-30（本次运行当日产出）"
+      "note": ""
     }
   ]
 }
