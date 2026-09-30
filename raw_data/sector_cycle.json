@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-30 04:53:12",
+  "update_time": "2026-09-30 10:01:33",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 3065,
+      "total": 3060,
       "ongoing": true
     },
     {
@@ -50,7 +50,7 @@
       "hot_days": 30,
       "peak": 82,
       "peak_date": "08/20",
-      "total": 580,
+      "total": 587,
       "ongoing": true
     },
     {
@@ -102,7 +102,7 @@
       "hot_days": 26,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 242,
+      "total": 248,
       "ongoing": true
     },
     {
@@ -154,7 +154,7 @@
       "hot_days": 24,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 287,
+      "total": 281,
       "ongoing": true
     },
     {
@@ -180,7 +180,7 @@
       "hot_days": 22,
       "peak": 12,
       "peak_date": "09/09",
-      "total": 150,
+      "total": 154,
       "ongoing": true
     },
     {
@@ -219,7 +219,7 @@
       "hot_days": 16,
       "peak": 21,
       "peak_date": "09/22",
-      "total": 158,
+      "total": 157,
       "ongoing": true
     },
     {
@@ -232,7 +232,7 @@
       "hot_days": 11,
       "peak": 7,
       "peak_date": "09/29",
-      "total": 52,
+      "total": 51,
       "ongoing": true
     },
     {
@@ -245,7 +245,7 @@
       "hot_days": 10,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 173,
+      "total": 172,
       "ongoing": true
     },
     {
@@ -258,7 +258,7 @@
       "hot_days": 7,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 41,
+      "total": 40,
       "ongoing": true
     }
   ]
