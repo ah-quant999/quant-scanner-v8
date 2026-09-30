@@ -7579,3 +7579,15 @@ items:
       - "docs/ops/HANDOFF.yaml#ladder-sentinel-fix-0930"
     updated: "2026-09-30 23:00"
     updated_by: 阿狸咪的工程师
+
+  - id: ladder-card-top-dedupe-0930
+    priority: P2
+    owner: 阿狸咪(alimi-cn)
+    status: done
+    what: 主人令两改：①连板梯队前哨卡移到「暂未上架」页最顶部（sec-head 之后、unlistedPanel 之前）；②删除卡内 JS 底部重复行「量比≥3｜剔除一字板/ST｜回测晋级率16%/24%｜临界观察·非买点」——与卡名下 核心/用法/限制 注脚完全重复。
+    fix: 基于实时 tip 锚点补丁仅动卡片区域，不碰任何 ?v 缓存戳；Git Data API 快进（force:false，422 重取 tip 重试）。注：本机 git main 与远端历史孤儿化（无共同祖先），API 推送路径不受影响，禁从本机 git push。
+    verify_how: tip 回读 firstBoardAlertCard 唯一且位于 unlistedPanel 之前；重复行锚点 0 命中；repeat(5,1fr)=8 不变；38 条保护标记全命中；内联 script node new Function 0 错。
+    refs:
+      - "index.html#firstBoardAlertCard"
+    updated: "2026-09-30 23:25"
+    updated_by: 阿狸咪的工程师
