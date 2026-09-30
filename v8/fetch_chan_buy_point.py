@@ -46,6 +46,11 @@ KB_NAME = "强势股跟踪"
 KB_CREATOR = "梧谷枫灯"
 FOLDER_ID = "folder_7506360161825717"
 FOLDER_NAME = "缠论买点每日推荐"
+# 🔴 主人令（2026-09-30）：分享链接勿再丢失 —— 分享 share_id 固化于此（库级分享）。
+# 访客接口（get_share_info）实测该分享公开范围不含本文件夹（登录态订阅视角为准），
+# share_id 仅作"源定位与恢复"备份，日常取全文仍走 ima-mcp 连接器（get_knowledge_list → fetch_media_content）。
+SHARE_ID = "32c01f1da52044f743a01e4aa995d72e7940cc8e99cf413cc5f4c2eb39b4d389"
+SHARE_URL = "https://ima.qq.com/wiki/share/index?share_id=" + SHARE_ID
 
 
 def _now():
