@@ -1,13 +1,23 @@
 {
-"update_time": "2026-09-30 07:09:27",
-"total": 8032,
-"new_listings_count": 0,
-"delisted_count": 0,
-"new_listings": [],
-"delisted": [],
-"meta_enriched": 0,
+"update_time": "2026-09-30 16:27:37",
+"total": 8034,
+"new_listings_count": 5,
+"delisted_count": 3,
+"new_listings": [
+"001246 N力勤",
+"00653 卓悦控股（新）",
+"02938 帝王国际投资",
+"06802 欢创科技",
+"08582 清大东方（四千）"
+],
+"delisted": [
+"00928 帝王国际投资",
+"02919 粤港湾智算－二千",
+"02932 正味集团股权"
+],
+"meta_enriched": 5,
 "guard_tripped": false,
 "guard_reasons": [],
 "old_universe": 8032,
-"fresh_universe": 8032
+"fresh_universe": 8034
 }
