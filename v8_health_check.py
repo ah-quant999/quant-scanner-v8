@@ -147,7 +147,12 @@ CARD_DEFS = [
     #   原 CARD_DEFS 登记让它绑死 SH_FIB 检查 → SH_FIB 老化超时同步误报 red。
     #   移除该项登记;下面"全量数据审计"循环的 derived = {..., "SIX_DIM_RADAR"}
     #   已保护它不报"缺失或解析失败"。前端 renderSixDim 直接读 SH_FIB,无副作用。
-    {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["sh"], "heal_cat": "post_close"},  # 2026-08-18 主人令一劳永逸：交易所每日16:15发布1次，360min 阈值导致 22:15 必误报 → 1440（24h，符合主人 24h 铁律）
+    # 🛡 2026-09-30 主人令（盘后页映射对齐·两卡跟随大盘观测卡走）：
+    #   MARGIN_DATA 的唯一 UI =「🌍 观测平台 > 📊 大盘观测」卡内「两融余额走势」（v8MarginChart），
+    #   原登记 page="盘后数据" 与实际页失配。改 page 即看板自动归位；
+    #   阈值口径不变：post_close 节拍由下方 adjust_max_age / _hard_cap 的盘后元组显式覆盖
+    #   （"观测平台" 已加入该元组），max_age=1440 与 heal_cat 均不动 → 有效阈值与迁移前逐字节同值。
+    {"id": "MARGIN_DATA", "name": "融资融券", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["sh"], "heal_cat": "post_close"},  # 2026-08-18 主人令一劳永逸：交易所每日16:15发布1次，360min 阈值导致 22:15 必误报 → 1440（24h，符合主人 24h 铁律）
     # 🛡 2026-09-11 主人令（轻量化·卡迁移）：原「实时数据」段条目迁来——「日监控·主力净流入」
     #   已自 ETF 二合一（原三合一）Block3 拆出，独立成卡挂在「盘后数据」页、市场宽度卡上方。
     #   · page="盘后数据"     —— 与 index.html / logic.html「任务运行看板」的分组一致（不再置实时数据组）
@@ -160,8 +165,13 @@ CARD_DEFS = [
     # 🛡 2026-09-04 主人令一劳永逸：孤儿文件转正——此前无生成调度（all_ 动态扫描按通用 1440 红线误报 fail）。
     #   FACTOR_LAB 由 v8/factor_lab_gen.py 挂 STAGES[B] 产出；FOUR_VOLUME_BACKTEST 由 strategy_four_volume.py
     #   在回测批（STAGES[E]，注入 V8_BACKTEST_YEARS）产出。登记后走运维卡区正式判定，all_ 扫描跳过。
-    {"id": "FACTOR_LAB", "name": "因子实验室", "page": "盘后数据", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "net_dep": True, "net_dep_note": "本机baostock被风控黑名单(err=10001011匿名用户)，无替代数据源，需小九中国IP+浏览器UA在线刷全市场3200只财务+ROE+异常换手。本机无法产出，保留旧数据待小九。"},
-    {"id": "FOUR_VOLUME_BACKTEST", "name": "四量终极回测", "page": "盘后数据", "freq": "每日回测批", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🛡 2026-09-07 22:2x：原 key_fields=["periods"] 但 periods 在 summary.by_period 嵌套、回测未跑时顶层缺失 → 永久 warn。改为 summary（永远非空 dict，by_period/calc_time 都在内）。
+    # 🛡 2026-09-30 主人令（盘后页映射对齐）：FACTOR_LAB 唯一 UI =「🏆 最终推荐」页 🧪因子实验室 tab
+    #   （因子定位卡/每日因子计算/当日计分榜，2026-09-20 主人令已从策略回测页整体移除回测卡）。
+    #   page 迁"最终推荐"，阈值走盘后元组（该页已显式加入），有效阈值仍 = def_max(1440)，逐字节同值。
+    {"id": "FACTOR_LAB", "name": "因子实验室", "page": "最终推荐", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "net_dep": True, "net_dep_note": "本机baostock被风控黑名单(err=10001011匿名用户)，无替代数据源，需小九中国IP+浏览器UA在线刷全市场3200只财务+ROE+异常换手。本机无法产出，保留旧数据待小九。"},
+    # 🛡 2026-09-30 主人令（盘后页映射对齐）：FOUR_VOLUME_BACKTEST 唯一 UI = 选股策略页四量终极子页
+    #   回测表（fvBackBody）。page 迁"选股策略"（与该页既有项同一阈值分支，逐字节同值）。
+    {"id": "FOUR_VOLUME_BACKTEST", "name": "四量终极回测", "page": "选股策略", "freq": "每日回测批", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🛡 2026-09-07 22:2x：原 key_fields=["periods"] 但 periods 在 summary.by_period 嵌套、回测未跑时顶层缺失 → 永久 warn。改为 summary（永远非空 dict，by_period/calc_time 都在内）。
 
     # 🔴 2026-09-12 主人令（拍板第 2 项·一劳永逸）：BACKTEST_ALL_ALGOS 正式登记。
     #   根因（实测）：algorithms/gen_backtest_all_algos.py 已挂 STAGES["E"]（ORDER 47/48），
@@ -183,23 +193,35 @@ CARD_DEFS = [
     #   （连同 algorithms/backtest_pools.py 与两条产物）。池子本身产出的新鲜度，仍由下面
     #   「候选池 / 金股池」（page=盘后数据，heal_cat=algo_run）两条负责 —— 那才是它们该被考核的。
     {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "实时数据", "freq": "盘中每30分（日行情取最近交易日）", "max_age": 120, "key_fields": ["items"], "heal_cat": "intraday"},  # 2026-08-31 修复：cloud_fetch_v8.py 的 tasks 列表含 CFFEX_HOLDINGS，盘中每 30 分执行并刷新 update_time，但数据为日行情取最近交易日；HC 分类应与调度一致，避免盘后/盘中口径冲突
-    {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"], "heal_cat": "premarket"},  # 危机雷达每日 08:25 跑一次
+    # 🛡 2026-09-30 主人令（盘后页映射对齐）：危机雷达卡壳已删（只删卡壳不删源），现役 UI =
+    #   共振日历页综合信号灯（sec-rc 读 CRISIS_DATA）+ CRDS 有效性判据 + 每日洞察。
+    #   page 迁"共振日历"（该页已加入盘后阈值元组，有效阈值仍 = def_max(360)，逐字节同值）。
+    {"id": "CRISIS_DATA", "name": "危机雷达", "page": "共振日历", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"], "heal_cat": "premarket"},  # 危机雷达每日 08:25 跑一次
     # 🛡 2026-09-11 小九的股票专家：此处原有 MARKET_FUND_FLOW_DATA 的**重复登记**
     #   （「盘后资金流向 / 盘后数据 / max_age=360 / heal_cat=premarket」），与上面
     #   「实时数据」那条 id 完全同名 → 消费处无去重 → 同卡被计两次且口径打架。
     #   已合并为唯一一条（见"实时数据"段），此处删除。
     #   原注：资金流日频时间轴——08:25 必跑一次（防漏跑）｜语义已并入合并后的 freq/口径。
-    {"id": "CANDIDATE", "name": "候选池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
-    {"id": "GOLD_POOL", "name": "黄金池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
-    {"id": "LHB_DATA", "name": "龙虎榜", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
-    {"id": "INST_TRADE", "name": "机构买卖", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top_buy", "top_sell"], "heal_cat": "algo_run", "raw_file": "inst_trade.json"},  # 🛡 2026-09-10 一劳永逸：raw_file 交叉校验，根治「raw已新/js待D批重建」误报 fail
-    {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
+    # 🛡 2026-09-30 主人令（盘后页映射对齐·五项归位）：候选池/黄金池/三重共识/龙虎榜/机构买卖的
+    #   现役 UI 分别在 选股策略子页（选股池/三重共识）、共振日历页（龙虎榜 8 卡）、运维子页
+    #   （renderOps 的 DATA.inst_trade 供 AI速览/洞察消费）。原 page="盘后数据" 全部失配。
+    #   阈值逐字节同值：CANDIDATE/GOLD_POOL/TRIPLE_CONSENSUS 与"选股策略"既有项同一分支；
+    #   LHB_DATA/CRISIS_DATA 所在"共振日历"已加入盘后阈值元组；INST_TRADE 迁"运维"后
+    #   有效阈值 = min(def_max=360, 运维 7 天帽) = 360 不变，heal_algo 降级白名单同步扩展。
+    {"id": "CANDIDATE", "name": "候选池", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
+    {"id": "GOLD_POOL", "name": "黄金池", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
+    {"id": "LHB_DATA", "name": "龙虎榜", "page": "共振日历", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
+    {"id": "INST_TRADE", "name": "机构买卖", "page": "运维", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top_buy", "top_sell"], "heal_cat": "algo_run", "raw_file": "inst_trade.json"},  # 🛡 2026-09-10 一劳永逸：raw_file 交叉校验，根治「raw已新/js待D批重建」误报 fail
+    {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
     # 2026-08-29 一劳永逸：MARKET_REGIME / SECTOR_RECOMMENDATION 由 market_regime.py / sector_recommendation.py
     #   每日盘后产出，原属通用全量审计分支（被 parse_time T 格式误伤判黄灯）。正式纳入 CARD_DEFS：
     #   · 健康检查按 24h 红线（交易所/宏观日频数据，1440min）
     #   · 看板与运维面板正确归类到"盘后数据"
     #   · 与 MARGIN_DATA / CFFEX_HOLDINGS 同口径
-    {"id": "MARKET_REGIME", "name": "市场利率环境", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current_rates", "trends", "meta"], "heal_cat": "algo_run"},
+    # 🛡 2026-09-30 主人令（盘后页映射对齐）：MARKET_REGIME 唯一 UI =「暂未上架·调试专区」
+    #   ulMacroPanel（🌍宏观环境卡）。page 迁"暂未上架"（该页已加入盘后阈值元组，
+    #   有效阈值仍 = def_max(1440)，逐字节同值）。
+    {"id": "MARKET_REGIME", "name": "市场利率环境", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current_rates", "trends", "meta"], "heal_cat": "algo_run"},
     {"id": "SECTOR_RECOMMENDATION", "name": "板块推荐", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["regime", "current_rates", "trends", "meta"], "heal_cat": "algo_run"},
     # 选股策略
     {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
@@ -1592,7 +1614,11 @@ def _adjust_max_age_legacy(def_max, page=None, n=None):
         # 周末：覆盖到周一早盘
         return 2880
 
-    if page in ("盘后数据", "选股策略"):
+    # 🛡 2026-09-30 主人令（盘后页映射对齐）：元组扩展 —— LHB_DATA/CRISIS_DATA(共振日历)、
+    #   MARGIN_DATA(观测平台)、MARKET_REGIME(暂未上架)、FACTOR_LAB(最终推荐) 虽随真实 UI 迁页，
+    #   但数据节拍仍是「盘后算法链每日一次」，必须继续走本分支的自适应窗口；
+    #   迁入页既有项（SH_FIB 等）同受益：由盘中 45min 硬夹回归盘后自适应（生成时点均为收市后，行为不变）。
+    if page in ("盘后数据", "选股策略", "共振日历", "观测平台", "暂未上架", "最终推荐"):
         # 盘后数据由 v8_algo_run 18:30 算法链产出，每个交易日仅一次。
         # 关键：18:30 之外的所有时段，数据合理地来自「上一交易日收盘后」，
         # 年龄可达 24h+，绝不能再用 360min 判 stale（否则夜间/白天/周末必然满屏红灯）。
@@ -1664,7 +1690,7 @@ def _hard_cap_for_owner_rule_legacy(n=None, page=None):
         #   仅交易日更新一次。周一早盘距最近交易日收盘可达 60h+，但那是「最新可用」数据，
         #   不应按 24h 红线判 fail（与 adjust_max_age 盘后/选股分支同口径）。
         #   阈值 = 距最近收盘分钟数 + 3h 缓冲；仍不低于 24h 底线；真实多日不更新仍会超阈值告警。
-        if page in ("盘后数据", "选股策略", "全量数据"):
+        if page in ("盘后数据", "选股策略", "全量数据", "共振日历", "观测平台", "暂未上架", "最终推荐"):
             close = last_trade_day_close(n)
             cap = int((n - close).total_seconds() / 60) + 180
             return max(24 * 60, cap)
