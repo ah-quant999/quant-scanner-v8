@@ -1574,6 +1574,40 @@ def _fetch_overseas_sina():
     return out
 
 
+
+def _fetch_overseas_yahoo(missing_em_codes):
+    """国际指数 Yahoo chart 第三备源（东财/新浪均缺时逐条补；海外 runner 可达，
+    对齐 _fetch_us_overnight_yahoo 先例的调用参数与 UA）。
+    返回 {东财code: {"f12": code, "f2": 点位, "f3": 涨跌幅%}}，与东财 diff 行同构。
+    🔴 2026-09-30（阿狸咪）：云端实证东财 ulist 对 100.KS11/100.TWII 不返回行、
+    新浪 int_kospi/int_taiwan 已停供空串 ⇒ 两卡长期 null。Yahoo 取
+    meta.regularMarketPrice vs chartPreviousClose（盘中实时口径）。"""
+    sym_map = {"KS11": "^KS11", "TWII": "^TWII", "HSI": "^HSI", "N225": "^N225"}
+    out = {}
+    for em_code in missing_em_codes:
+        sym = sym_map.get(em_code)
+        if not sym:
+            continue
+        try:
+            r = _requests.get(
+                f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}",
+                params={"interval": "1d", "range": "5d"},
+                headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
+            j = r.json()
+            result = (j.get("chart", {}).get("result") or [None])[0]
+            if not result:
+                continue
+            meta = result.get("meta", {})
+            price = meta.get("regularMarketPrice")
+            prev = meta.get("chartPreviousClose") or meta.get("previousClose")
+            if price in (None, "") or prev in (None, ""):
+                continue
+            pct = (float(price) - float(prev)) / float(prev) * 100
+            out[em_code] = {"f12": em_code, "f2": round(float(price), 2),
+                            "f3": round(pct, 2)}
+        except Exception as e:
+            print(f"    ⚠️ Yahoo 备源 {em_code} 失败: {e}")
+    return out
 def _fetch_overseas_indices():
     """海外/亚太股市观测：恒生指数、日经225、韩国KOSPI、台湾加权。
     返回 [{name, code, value, chg_pct, currency}]；失败时该条 value=None，绝不编造。
@@ -1609,11 +1643,28 @@ def _fetch_overseas_indices():
         by_code = {x.get("f12"): x for x in rows if x.get("f12")}
     except Exception as e:
         print(f"    ⚠️ 海外指数东财源失败（已换 host 重试 5 次）: {e}")
-    # ② 备源：新浪（东财全灭时才用）
-    if not by_code:
-        by_code = _fetch_overseas_sina()
-        if by_code:
-            print(f"    ↩️ 海外指数改用新浪备源（命中 {len(by_code)}/4）")
+    # ② 备源1：新浪——逐条补缺（🔴 2026-09-30 阿狸咪：旧逻辑「全灭才用」，但东财对
+    #    KS11/TWII 不返回行而 HSI/N225 正常 ⇒ by_code 恒非空 ⇒ 缺的两条永远补不上）
+    if len(by_code) < len(sec_map):
+        sina_all = _fetch_overseas_sina()
+        _added = 0
+        for _c, _em in _SINA_OVERSEAS:
+            if _em not in by_code and _em in sina_all:
+                by_code[_em] = sina_all[_em]
+                _added += 1
+        if _added:
+            print(f"    ↩️ 新浪备源补缺 {_added} 条（现 {len(by_code)}/4）")
+    # ③ 备源2：Yahoo chart（东财/新浪仍缺的条目逐条补；云端海外 runner 可达）
+    if len(by_code) < len(sec_map):
+        _miss = [c.split(".", 1)[1] for c, _, _ in sec_map if c.split(".", 1)[1] not in by_code]
+        yahoo = _fetch_overseas_yahoo(_miss)
+        _added = 0
+        for _em, _row in yahoo.items():
+            if _em not in by_code:
+                by_code[_em] = _row
+                _added += 1
+        if _added:
+            print(f"    ↩️ Yahoo 备源补缺 {_added} 条（现 {len(by_code)}/4）")
     results = []
     for secid, name, cur in sec_map:
         code = secid.split(".", 1)[1]
