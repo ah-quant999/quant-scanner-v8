@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-30 16:48:10",
+ "generated": "2026-09-30 17:21:09",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -33,7 +33,7 @@
  "skipped_no_signal_date": 0,
  "signal_days": 48,
  "signal_date_range": "2026-06-09 ~ 2026-09-15",
- "ima_update_time": "2026-09-29 22:23:52",
+ "ima_update_time": "2026-09-30 15:54:30",
  "source_coverage": {
   "rows_parsed": 56,
   "expected": 58,
@@ -41,9 +41,9 @@
   "source_chars": 4154,
   "source_channel": "full-snapshot",
   "snapshot_fetched_at": "2026-09-23 17:24:12",
-  "snapshot_age_h": 148.99,
+  "snapshot_age_h": 166.5,
   "snapshot_expired": true,
-  "degraded_reason": "snapshot_age>149h;guest-path-dead",
+  "degraded_reason": "snapshot_age>167h;guest-path-dead",
   "strong_expected": 34,
   "strong_parsed": 34,
   "reconciled": true,
