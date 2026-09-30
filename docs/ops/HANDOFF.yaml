@@ -7512,3 +7512,17 @@ items:
     refs: cloud_fetch_v8.py / update_v8.py / index.html / v8/first_board_alert.py
     updated: "2026-09-30 20:06:18"
     updated_by: 阿狸咪的工程师
+  - id: ladder-sentinel-fix-0930
+    priority: P1
+    owner: 阿狸咪(alimi-cn)
+    status: done
+    what: 首板倍量前哨卡被插在 </section> 之外（main 游离子节点），翻页切换只隐藏 section，卡片在每页底部恒显（主人截图实证）。同时按主人令落地方案A：卡改名「连板梯队前哨」、更新于进卡名、新增二进三临界观察栏；两条回测先行（2025-08~2026-09 主板 kline_cache：裸首板 T+1 均值-0.49%/晋级率15.5%，倍量3-5 组-0.24%、5-8 组+0.18%、>8 组样本17不可靠 ⇒ 量比非越大越好（隔夜溢价随量比递减）；裸二板晋级率24.3%但T+1均值-0.28% ⇒ 「三板最难」难在买入价而非晋级，二进三=临界观察·非推荐）。
+    fix: 卡片块移入 <section id="sec-ul">（unlistedPanel 之后 </section> 之前）；first_board_alert.py 加 ladder2（连板数==2 非一字全量·量比/换手展示·cap15）；cloud_fetch f_first_board_alert 取连板数∈{1,2} 宇宙（meta 带 lbc）；数据含3只二进三（传艺科技6.94x/上海洗霸3.07x/亚邦股份2.04x）。commit 85a7c684e5（4文件，force:false）。
+    verify_how: ①推后复读 tip：firstBoardAlertCard 恰1处且位于 sec-ul 内、ladder2 命中；②29 内联script new Function 0错；③[10/10] 38保护标记全命中；④被顶掉的5个 ?v 戳（H_AUTO_BUY/FOUR_VOLUME 等，基线落后所致）由 v8_cache_buster_reconcile run#2572(head=85a7c684) 自动对齐，无需手工；⑤中间3笔(20:49-20:53)仅动 raw_data，无内容覆盖。
+    refs:
+      - "v8/first_board_alert.py"
+      - "cloud_fetch_v8.py"
+      - "index.html"
+      - "docs/ops/HANDOFF.yaml#first-board-alert-0930"
+    updated: "2026-09-30 20:57"
+    updated_by: 阿狸咪的工程师
