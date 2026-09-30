@@ -35,6 +35,7 @@ DATA_SOURCES = {
     #   根因：与 8/18 OVERSEAS_MARKETS 同类疏漏（fetch 注册了 raw 写，build 没映射）。
     "sector_fund_flow_intraday.json": "SECTOR_FUND_FLOW_INTRADAY",
     "gold_pool.json":              "GOLD_POOL",
+    "first_board_alert.json":       "FIRST_BOARD_ALERT",  # 2026-09-30 主人令：首板倍量前哨
     "stock_names.json":            "STOCK_LIST",
     # 🔴 2026-09-13 主人令「前后端都无人读，删干净」：stock_profile.json → STOCK_PROFILE
     #   data/STOCK_PROFILE.js 转换已停产（省 1.33 MB/次入库）。

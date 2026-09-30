@@ -85,6 +85,7 @@ VAR_TO_RAW = {
     "INDEX_QUOTES": "index_quotes.json",
     "EXPERIMENT": "experiment.json",
     "V8_CAL": "v8_cal.json",
+    "FIRST_BOARD_ALERT": "first_board_alert.json",  # 2026-09-30 主人令：首板倍量前哨（一进二候选）
     "CANDIDATE_QUOTES": "candidate_quotes.json",
     "SH_SZ_HISTORY": "sh_sz_history.json",
     "MARKET_ALERTS": "market_alerts.json",
@@ -105,6 +106,7 @@ VAR_TO_RAW = {
 CATEGORY_MAP = {
     # 盘前
     "V8_CAL": "premarket,post_close",
+    "FIRST_BOARD_ALERT": "post_close",  # 2026-09-30 首板倍量前哨：盘后涨停池定型后抓
     "IPO_DATA": "premarket,post_close",
     "MARGIN_DATA": "premarket,post_close",
     # 2026-08-31：期指主力合约为盘中实时，放回实时数据页，改为 intraday 抓取
@@ -5520,8 +5522,51 @@ def main(category=None, only=None):
             print(f"  ⚠️ 平均股价获取失败: {e}")
             return {}
 
+    def f_first_board_alert():
+        """首板倍量前哨（一进二前哨卡）：首板(连板数==1)当天用倍量筛出可能走多板的候选。
+        复用 _get_zt_pool() 取首板宇宙；量比由 v8/first_board_alert.py 用新浪日K计算（单源）。"""
+        import importlib.util
+        try:
+            df = _get_zt_pool()
+        except Exception as e:
+            print(f"  ⚠️ FIRST_BOARD_ALERT: 涨停池获取失败 {e}")
+            return None
+        if df is None or len(df) == 0:
+            return {"alerts": [], "params": {"vol_ratio_min": 3.0},
+                    "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S")}
+        try:
+            first = df[df["连板数"] == 1]
+        except Exception:
+            return None
+        if first is None or len(first) == 0:
+            return {"alerts": [], "params": {"vol_ratio_min": 3.0},
+                    "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S")}
+        codes = [str(x) for x in first["代码"].tolist()]
+        meta = {}
+        for _, r in first.iterrows():
+            turnover = r.get("换手率")
+            try:
+                turnover = float(turnover) if turnover not in (None, "") else None
+            except Exception:
+                turnover = None
+            meta[str(r["代码"])] = {
+                "name": r.get("名称"),
+                "industry": r.get("所属行业"),
+                "turnover": turnover,
+            }
+        try:
+            spec = importlib.util.spec_from_file_location(
+                "first_board_alert", str(ROOT / "v8" / "first_board_alert.py"))
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            return mod.build_alerts(codes, meta=meta)
+        except Exception as e:
+            print(f"  ⚠️ FIRST_BOARD_ALERT: 模块调用失败 {e}")
+            return None
+
     tasks = [
         ("ETF_INTRADAY_HEAT", f_etf_intraday_heat),
+        ("FIRST_BOARD_ALERT", f_first_board_alert),  # 2026-09-30 主人令：首板倍量前哨
         # 🔴 2026-09-27 一劳永逸修复（阿狸咪·主人令「今晚全部修复好」）：
         #   【病灶】EXPERIMENT 原排在 tasks 第 21 位（约 30 个源之中）。抓取循环有 720s 总预算
         #     （FETCH_BUDGET_SEC，防单源 hung 拖死整轮），预算耗尽后剩余源整轮跳过（L5256）。

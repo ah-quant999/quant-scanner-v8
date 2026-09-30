@@ -8853,6 +8853,37 @@ window.__renderIndexObserve = function(){
 
     <div id="unlistedPanel"></div>
   </section>
+    <!-- 2026-09-30 阿狸咪：首板倍量前哨卡（一进二候选 · 暂未上架实验区） -->
+    <script src="data/FIRST_BOARD_ALERT.js?v=1" defer></script>
+    <div id="firstBoardAlertCard" class="card" style="margin-top:14px;background:#1a1d24;border:1px solid #2a2f3a;border-radius:10px;">
+      <div style="padding:10px 12px;font-weight:700;color:#e6e9ef;border-bottom:1px solid #2a2f3a;">🔭 首板倍量前哨 <span style="font-size:11px;color:#8a93a6;font-weight:400;">一进二候选 · 量比≥3</span></div>
+      <div id="fbaBody" style="padding:10px 12px;font-size:13px;color:#8a93a6;">加载中…</div>
+    </div>
+    <script>
+    (function(){
+      function fbaFill(){
+        var d=window.FIRST_BOARD_ALERT; var el=document.getElementById('fbaBody');
+        if(!el) return;
+        if(!d){ setTimeout(fbaFill,800); return; }
+        var a=(d.alerts||[]);
+        if(!a.length){ el.innerHTML='<span style="color:#8a93a6">暂无首板倍量信号（非交易日或无符合倍量条件的首板）</span>'; return; }
+        var h='<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+        h+='<tr style="color:#8a93a6"><th style="text-align:left;padding:2px 4px">名称/代码</th><th style="text-align:right;padding:2px 4px">首板价</th><th style="text-align:right;padding:2px 4px">量比</th><th style="text-align:left;padding:2px 4px">行业</th></tr>';
+        a.forEach(function(r){
+          h+='<tr><td style="padding:2px 4px"><b style="color:#e6e9ef">'+r.name+'</b> <span style="color:#8a93a6">'+r.code+'</span></td>'+
+             '<td style="text-align:right;padding:2px 4px;color:#ef5350">'+r.board_close+'</td>'+
+             '<td style="text-align:right;padding:2px 4px;color:#ef5350">'+r.vol_ratio+'×</td>'+
+             '<td style="padding:2px 4px;color:#8a93a6">'+(r.industry||'-')+'</td></tr>';
+        });
+        h+='</table>';
+        h+='<div style="margin-top:6px;color:#8a93a6;font-size:11px;">量比≥'+(d.params&&d.params.vol_ratio_min||3)+'｜剔除一字板/ST｜更新 '+d.update_time+'</div>';
+        el.innerHTML=h;
+      }
+      fbaFill();
+      var t=0; var iv=setInterval(function(){ if(window.FIRST_BOARD_ALERT){ clearInterval(iv); fbaFill(); } else if(++t>30){ clearInterval(iv); } },800);
+    })();
+    </script>
+
 
   <!-- ============ 已下架（2026-08-29 主人令：从运维子 Tab 提升为一级 nav） ============ -->
   <section id="sec-dl">
