@@ -7502,3 +7502,13 @@ items:
       - "docs/ops/HANDOFF.yaml#healthcheck-falsealarm-0929"
     updated: "2026-09-29 23:12"
     updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: first-board-alert-0930
+    priority: P1
+    owner: 阿狸咪(alimi-cn)
+    status: done
+    what: 新增「首板倍量前哨」卡（一进二候选），首板当天用倍量(量比≥3)筛可能走多板的候选，提前于连板梯队；暂挂暂未上架实验区。
+    fix: 新增 v8/first_board_alert.py（新浪日K算量比·剔一字板/ST）+ cloud_fetch f_first_board_alert(post_close) + update_v8 DATA_SOURCES + index.html 自包含卡片(兄弟节点自愈)；commit 971ccbfb900c。数据10-01盘后首出。
+    verify_how: main 回读4文件锚点全命中；本地样本 000504(9/30首板倍量3.41)命中、600825(一字板)跳过。
+    refs: cloud_fetch_v8.py / update_v8.py / index.html / v8/first_board_alert.py
+    updated: "2026-09-30 20:06:18"
+    updated_by: 阿狸咪的工程师
