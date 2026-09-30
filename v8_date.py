@@ -52,13 +52,44 @@ def _fallback_is_trading_day(d: datetime.date) -> bool:
 
 def _is_trading_day_impl(date_str: str) -> bool:
     """底层交易日判断：优先复用 fetch_lhb 的交易日历（与既有链路保持一致）。"""
+    # 🔴🔴 2026-10-01 国庆实证（workflow step5 'Invalid format' 事故根治）：
+    #   fetch_lhb.is_trading_day 对「今天未被在线日历收录」一律保守判 True
+    #   （该设计只防「交易日盘中日历滞后 ⇒ 误写空占位」），但**法定休市日全天
+    #   都不可能被收录** ⇒ 2026-10-01 国庆被误判为交易日。
+    #   放大器：fetch_lhb 的 log() print 到 stdout ⇒ workflow step5
+    #   `$(python -c "import v8_date; print(v8_date.today_data_date())")`
+    #   捕获两行（警告行+日期行）⇒ GITHUB_ENV/GITHUB_OUTPUT 'Invalid format'
+    #   ⇒ step5 failure ⇒ 闸门输出断裂 ⇒ step9 起全 skipped + 问责 failure
+    #   （run #36745715520 实证，接力派发整轮空烧）。
+    #   修法（双层，fetch_lhb 自身行为零改动）：
+    #   ① 静态权威日历（v8_calendar.HOLIDAY_RANGES = 国务院安排+交易所休市公告）
+    #      前置校验：命中法定休市区间 ⇒ 直接判非交易日
+    #      （与在线日历最终口径一致——休市日本就不在 trade_date 集合内，无冲突风险）；
+    #   ② 调用 fetch_lhb 期间把其 stdout 警告重定向到 stderr
+    #      （警告不丢，但不再污染 `$(...)` 命令替换 / GITHUB_ENV）。
+    try:
+        _root = os.path.dirname(os.path.abspath(__file__))
+        if _root not in sys.path:
+            sys.path.insert(0, _root)
+        import v8_calendar as _cal
+        if _cal.covers(date_str) and _cal.in_holiday_range(date_str):
+            return False
+    except Exception:
+        pass  # 静态日历不可用时回落原链路（fetch_lhb → 原兜底），不放大故障
     # 把 fetch_lhb 加入路径后复用其缓存的交易日历
     algo_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "algorithms")
     if algo_dir not in sys.path:
         sys.path.insert(0, algo_dir)
     try:
         from fetch_lhb import is_trading_day as _lhb_is_trading_day
-        return _lhb_is_trading_day(date_str)
+        import contextlib
+        import io
+        _cap = io.StringIO()
+        with contextlib.redirect_stdout(_cap):
+            _r = _lhb_is_trading_day(date_str)
+        if _cap.getvalue():
+            sys.stderr.write(_cap.getvalue())
+        return _r
     except Exception as e:
         # 🔴 2026-09-25 阿狸咪·P0（trading-day-gate-predeps-fallback）：
         #   原兜底 = `weekday() < 5` ⇒ **法定假日被判为交易日**（2026-09-25 中秋实证：
