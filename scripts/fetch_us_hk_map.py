@@ -228,6 +228,17 @@ def resolve(codes, prefixes, chunk=50):
             got[code] = row
     if clash:
         print("   [us_hk_map] ⚠️ 跨市场同代码告警（已保留先命中者，请人工复核）: " + "; ".join(clash))
+    # 🛡 2026-09-30 一劳永逸（阿狸咪的工程师）：东财未命中的 code → 腾讯+新浪兜底。
+    #   东财美股接口 09-28 起对本机与云端同时拒绝（RemoteDisconnected 双侧实证）；
+    #   部分命中场景同样只对缺失部分补，成本最小化。市场按前缀组合推断，
+    #   无法识别的组合（不该出现）保持原行为（空就是空，由上层 None-重试兜底）。
+    _miss = sorted(want - set(got))
+    if _miss:
+        _mk = _market_of(prefixes)
+        if _mk:
+            print("   [us_hk_map] 🛡 东财未命中 %d/%d（%s）→ 腾讯+新浪兜底"
+                  % (len(_miss), len(want), _mk))
+            got.update(_resolve_tx(_miss, _mk))
     return got
 
 
@@ -250,6 +261,156 @@ def tx_names(keys):
             if len(parts) > 1:
                 out[k.replace("v_", "").strip()] = parts[1].strip()
     return out
+
+
+# ── 🛡 2026-09-30 腾讯+新浪兜底（阿狸咪的工程师·一劳永逸）─────────────────────
+# 背景：东财美股 ulist（push2delay/push2 系）自 2026-09-28 09:20 后对本机（中国家宽）
+#   与云端（GHA 美国机房）**同时** RemoteDisconnected（两侧实测铁证），主路径已死；
+#   原兜底只覆盖三大指数锚，86 只明细标的全空 ⇒ 整卡 return None ⇒ 断更。
+# 方案：resolve() 对东财未命中的 code 自动降级 ——
+#   · 报价/名称/涨跌幅/时间戳 = 腾讯 qt.gtimg.cn（指数锚兜底同源，云端已验证可达）；
+#   · 多周期动量 = 新浪美股日K（US_MinKService.getDailyK，num=3000 一次拉全 3024 根、
+#     末根=最近已收盘交易日；09-30 实测以 09-25 为端点复算 BABA 六周期，与东财
+#     09-28 产物 mom 逐位一致：-0.8/-5.65/-3.09/0.4/-5.65/11.99 ⇒ 口径完全复刻）。
+# 兜底行造与东财行同构的伪行（f12/f14/f2/f3/f124 + 动量字段位），下游 build() 零改动；
+# 行内带 _src="tx" 标记，build() 汇总进 gate 透明透出。前端零消费 secid（09-30 grep 实证），
+# f13 置空串不影响任何消费方。
+
+TX_IDX_MAP = {"HSI": "hkHSI", "HSTECH": "hkHSTECH", "DJIA": "usDJI"}
+
+
+def _tx_txkey(code, market):
+    """裸代码 → 腾讯行情键；无映射返回 None。"""
+    if market == "US":
+        return "us" + code
+    if market == "HK":
+        return "hk" + code
+    if market == "A":
+        # A 股 ETF：5 开头=沪 sh，其余（1/0 开头）=深 sz（本表目标全部为 ETF/指数）
+        return ("sh" if code.startswith("5") else "sz") + code
+    if market == "IDX":
+        return TX_IDX_MAP.get(code)
+    return None
+
+
+def _tx_quotes(tx_keys):
+    """腾讯 gtimg 批量实时报价。返回 {tx_key: {name, price, pct, ts_str}}。
+
+    字段位（实测 09-30）：p[1]=中文名 p[3]=最新价 p[32]=当日涨跌% p[30]=时间戳
+    （美股「2026-09-29 16:00:01」美东；港/A「2026/09/30 11:59:59」北京）。
+    无效代码返回 v_pv_none_match=1 之类短行 ⇒ 按 len<=32 跳过（诚实缺失）。"""
+    out = {}
+    for i in range(0, len(tx_keys), 30):
+        try:
+            r = requests.get("https://qt.gtimg.cn/q=" + ",".join(tx_keys[i:i + 30]),
+                             headers=TX_HEADERS, timeout=15)
+            txt = r.content.decode("gbk", errors="replace")
+        except Exception as e:  # noqa: BLE001
+            print(f"   [us_hk_map] ⚠️ 腾讯报价批量失败: {type(e).__name__}: {e}")
+            continue
+        for line in txt.split(";"):
+            line = line.strip()
+            if "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            k = k.replace("v_", "").strip()
+            p = v.strip().strip('"').split("~")
+            if len(p) <= 32 or not p[3] or p[3] in ("0.000", ""):
+                continue
+            try:
+                out[k] = {"name": p[1].strip(), "price": float(p[3]),
+                          "pct": float(p[32]), "ts_str": (p[30] or "").strip()}
+            except ValueError:
+                continue
+    return out
+
+
+def _sina_closes(symbol):
+    """新浪美股全历史日K收盘。返回 [(date_str, close)]；失败 []。"""
+    try:
+        r = requests.get(
+            "https://stock.finance.sina.com.cn/usstock/api/json_v2.php/"
+            "US_MinKService.getDailyK?symbol=%s&page=1&num=3000" % symbol,
+            headers={"User-Agent": UA}, timeout=20)
+        arr = json.loads(r.text)
+        return [(str(x.get("d") or ""), float(x.get("c"))) for x in arr
+                if x.get("d") and x.get("c")]
+    except Exception as e:  # noqa: BLE001
+        print(f"   [us_hk_map] ⚠️ 新浪日K失败 {symbol}: {type(e).__name__}: {e}")
+        return []
+
+
+def _mom_from_closes(closes, end_date):
+    """东财多周期动量的新浪复刻。dN = 末根收盘 / N 个交易日前收盘 - 1。
+
+    护栏（诚实铁律）：新浪末根日期必须 == 腾讯报价的美东日期，否则整体 {} ——
+    端点错位硬算出来的动量是假数据，宁缺毋滥。"""
+    if not closes or len(closes) < 61 or closes[-1][0] != end_date:
+        return {}
+    last = closes[-1][1]
+    return {"d%d" % n: round((last / closes[-1 - n][1] - 1) * 100, 2)
+            for n in (1, 3, 5, 10, 20, 60)}
+
+
+def _parse_tx_ts(ts_str, us=False):
+    """腾讯 p[30] → epoch。美股按美东、港/A 按北京解释；失败 None。"""
+    try:
+        s = (ts_str or "").replace("/", "-").strip()
+        dt = datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
+        return dt.replace(tzinfo=(ET if us else CST)).timestamp()
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _resolve_tx(codes, market):
+    """腾讯+新浪兜底版 resolve。返回 {code: 伪东财行}（结构同构，下游零改动）。"""
+    keys = {}
+    for c in codes:
+        tk = _tx_txkey(c, market)
+        if tk:
+            keys[c] = tk
+    if not keys:
+        return {}
+    qs = _tx_quotes(list(keys.values()))
+    got = {}
+    for c, tk in keys.items():
+        q = qs.get(tk)
+        if not q:
+            print(f"   [us_hk_map] ⚠️ 腾讯亦无 {market} {c}（诚实缺失，计入 gate）")
+            continue
+        row = {"f12": c, "f13": "", "f14": q["name"],
+               "f2": q["price"], "f3": q["pct"],
+               "f124": _parse_tx_ts(q["ts_str"], us=(market == "US")),
+               "_src": "tx"}
+        if market == "US":
+            # f3 本身就是 d1（与东财同位）；d3/d5/d10/d20/d60 填东财字段位
+            m = _mom_from_closes(_sina_closes(c), (q["ts_str"] or "")[:10])
+            time.sleep(0.15)  # 新浪礼貌间隔
+            row["f127"] = m.get("d3")
+            row["f109"] = m.get("d5")
+            row["f160"] = m.get("d10")
+            row["f110"] = m.get("d20")
+            row["f24"] = m.get("d60")
+        got[c] = row
+        print(f"   [us_hk_map] 🛡 腾讯兜底 {market} {c}: {q['name']} "
+              f"{q['price']} ({q['pct']}%)")
+    return got
+
+
+_MARKET_BY_PREFIXES = {}
+
+
+def _market_of(prefixes):
+    """按前缀组合推断市场（供兜底路由）。"""
+    key = tuple(prefixes)
+    if key not in _MARKET_BY_PREFIXES:
+        for mk, pl in (("US", P_US), ("HK", P_HK), ("A", P_A), ("IDX", P_IDX)):
+            if key == tuple(pl):
+                _MARKET_BY_PREFIXES[key] = mk
+                break
+        else:
+            _MARKET_BY_PREFIXES[key] = None
+    return _MARKET_BY_PREFIXES[key]
 
 
 def _norm_name(n):
@@ -323,8 +484,14 @@ def build():
     try:
         _raw_p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                               "raw_data", "us_hk_map.json")
-        with open(_raw_p, "r", encoding="utf-8") as _f:
-            _prev = json.load(_f)
+        # 🔴🔴 2026-09-30 一劳永逸（阿狸咪的工程师）：原 `as _f` 把模块级 float 转换函数
+        #   `_f()`（L170）遮蔽成文件对象 —— with 块结束后该绑定不恢复，从此 build() 内
+        #   所有 `_f(...)` 调用全部 TypeError: '_io.TextIOWrapper' object is not callable
+        #   （09-30 08:47 云端 run 日志 L448 栈帧铁证）。这就是 09-29「断更根治」上线后
+        #   本模块 09-29/09-30 两天全机器（云端+小九+本机）零成功、卡面冻结 09-28 09:20
+        #   的**唯一真凶** —— 档位/闸门/兜底都白修，代码先炸。改名 _prev_fh 根治。
+        with open(_raw_p, "r", encoding="utf-8") as _prev_fh:
+            _prev = json.load(_prev_fh)
         if str(_prev.get("update_time", ""))[:10] == datetime.now(CST).strftime("%Y-%m-%d"):
             print("   [us_hk_map] 今日已产出（%s）→ 跳过重抓（预算闸门）" % _prev.get("update_time"))
             return None
@@ -337,6 +504,8 @@ def build():
     us_codes = sorted({c for c, _ in ADR_PAIRS} | {c for c, _ in ETF_MAP})
     us_rows = resolve(us_codes, P_US)
     print("   [us_hk_map] 美股候选解析 %d/%d" % (len(us_rows), len(us_codes)))
+    # 🛡 2026-09-30 兜底透明化：统计经腾讯+新浪降级的行数，汇总进 gate/note
+    n_tx_rows = sum(1 for r in us_rows.values() if r.get("_src") == "tx")
 
     # ── 2) ADR ↔ 港股 名称闸门 ─────────────────────────────────────────────
     hk_codes = sorted({h for _, h in ADR_PAIRS})
@@ -521,6 +690,10 @@ def build():
             "etf_ok": len(etf_items),
             "target_missing": tgt_missing,
             "target_missing_n": len(tgt_missing),
+            # 🛡 2026-09-30：东财美股接口不可达时经腾讯+新浪兜底的美股行数（透明审计）
+            "us_tx_fallback": n_tx_rows,
+            "us_source": ("tencent+sina(东财美股接口不可达兜底)" if n_tx_rows
+                          else "eastmoney"),
         },
         "mom_fields": {"d1": "当日", "d3": "3日", "d5": "5日",
                        "d10": "10日", "d20": "20日", "d60": "60日"},
@@ -528,7 +701,9 @@ def build():
         "note": ("隔夜口径：美东最近一个交易日收盘价与近期涨跌幅，由东财延迟镜像（push2delay）提供，"
                  "与报价同日同源；映射对已经「美股中文名 × 港股中文名（腾讯独立源）」一致性闸门校验，"
                  "名称不符者整对剔除（剔除数见 gate）。ETF 对位标的为『同类主题』映射，非完全同标的，"
-                 "仅供盘前风险偏好参考。"),
+                 "仅供盘前风险偏好参考。")
+                + ("🔴 本次美股报价/动量经腾讯行情源+新浪日K兜底产出（东财美股接口不可达，"
+                   "09-30 实测口径与东财逐位一致，来源见 gate.us_source）。" if n_tx_rows else ""),
         "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
         "auto": True,
     }
