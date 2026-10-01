@@ -18259,7 +18259,16 @@ if(tht) tht.textContent = '交易日历 + 打新速览';
 
 /* 今日事件卡兜底：V8_CAL 日历事件（确保执行） */
 window.__renderV8CalToday = function(){
+  /* 🛡 2026-10-01 根治「月历有事件、今日详情卡空」不同源：
+     页面拿到旧版月数据（旧 index.html/旧 buster 缓存）时 live V8_CAL 停在上月，
+     其尾周的下月格子无事件 ⇒ 跨月头几天详情卡显示「无标注事件」而月历（归档导航）有事件。
+     修复：live 月份 ≠ 今天所在月 ⇒ 自动动态加载今天所在月归档重匹配（同 __v8calGoto 通道）；
+     归档缺失/仍无事件 ⇒ 如实显示并明示「当前日历为 X 月版，请刷新页面」。 */
+  var _p0 = window._cstParts ? window._cstParts(new Date()) : null;
+  var _tk = _p0 ? (_p0.y + '-' + String(_p0.m).padStart(2,'0')) : '';
+  var _lk = window.__v8calLiveKey ? window.__v8calLiveKey() : '';
   var D = window.V8_CAL || {weeks:[]};
+  if(_tk && _lk && _tk !== _lk && window.__v8calTodayArc && window.__v8calTodayArc.weeks){ D = window.__v8calTodayArc; }
   var todayKeys = window._v8CalTodayKeys ? window._v8CalTodayKeys(D) : {};
   var todayEvents = [];
   D.weeks.forEach(function(w){
@@ -18267,6 +18276,18 @@ window.__renderV8CalToday = function(){
       if(todayKeys[String(w.no)+'-'+String(d.num)]){ todayEvents = d.events || []; }
     });
   });
+  if(!todayEvents.length && _tk && _lk && _tk !== _lk && !window.__v8calTodayArc && !window.__v8calTodayArcLoading){
+    window.__v8calTodayArcLoading = true;
+    var _s = document.createElement('script');
+    _s.src = 'data/archive/V8_CAL_' + _tk + '.js';
+    _s.onload = function(){
+      try{ window.__v8calTodayArc = (window.V8_CAL_ARC && window.V8_CAL_ARC.weeks) ? window.V8_CAL_ARC : null; }catch(e){ window.__v8calTodayArc = null; }
+      window.__v8calTodayArcLoading = false;
+      try{ window.__renderV8CalToday(); }catch(e){}
+    };
+    _s.onerror = function(){ window.__v8calTodayArcLoading = false; };
+    document.head.appendChild(_s);
+  }
   var dateEl = document.getElementById('v8DayDate');
   if(dateEl){
     var parts = window._cstParts ? window._cstParts(new Date()) : null;
@@ -18292,7 +18313,12 @@ window.__renderV8CalToday = function(){
     });
     html += '</div>';
   } else {
-    html += '<div style="color:#888;padding:8px 0">📅 今日日历无标注事件</div>';
+    var _staleHint = '';
+    if(_tk && _lk && _tk !== _lk){
+      var _la = _lk.split('-');
+      _staleHint = '<span style="color:#ffb74d">（当前日历为 ' + _la[0] + '年' + parseInt(_la[1],10) + '月版 · 请刷新页面获取本月日历）</span>';
+    }
+    html += '<div style="color:#888;padding:8px 0">📅 今日日历无标注事件' + _staleHint + '</div>';
   }
   box.innerHTML = html || '<div style="color:#888;padding:12px">加载中…</div>';
 };
