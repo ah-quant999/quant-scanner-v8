@@ -621,7 +621,7 @@ window.__domReadyFns=[];
     <script src="data/DO_NOT_DELETE.js?v=1749b574ca" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=8d6d4065cf" defer></script>
-    <script src="data/GOLD_POOL.js?v=b6557990c8" defer></script>
+    <script src="data/GOLD_POOL.js?v=a4e1631126" defer></script>
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_PROFILE 不再单独下载（1.4MB 与 STOCK_LIST 100% 重复），由 STOCK_LIST 合成 -->
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
@@ -1751,10 +1751,10 @@ function _buildJudgmentEnvHTML(d){
 }
 window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 </script>
-<script src="data/CRDS_CARD_DATA.js?v=7cea9006c9" defer></script>
+<script src="data/CRDS_CARD_DATA.js?v=f349dc48e3" defer></script>
 <script src="data/TRIPLE_CONSENSUS.js?v=55023b7222" defer></script>
 <script src="data/TRIPLE_TRACK.js?v=b791798c7b" defer></script>
-<script src="data/TRIPLE_HISTORY.js?v=bc3ad03fab" defer></script>
+<script src="data/TRIPLE_HISTORY.js?v=94723ad7eb" defer></script>
 <!-- 🔴 2026-09-14 一劳永逸：V8_CAL.js 原为全页 head 内【唯一】无 defer 的脚本
      → 同步阻塞 HTML 解析（浏览器须停下等它下载+执行，才继续解析其后 93 个 defer 脚本与整个 body）。
      消费方全是 DOMContentLoaded 后的渲染回调 → 加 defer 语义不变。 -->
@@ -1778,7 +1778,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/VOLATILITY.js?v=be8deb3e83" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=7c3b335545" defer></script>
 <script src="data/SH_SZ_HISTORY.js?v=069736cada" defer></script>
-<script src="data/CANDIDATE.js?v=3d1d8a890c" defer></script>
+<script src="data/CANDIDATE.js?v=978a5a9633" defer></script>
     <script src="data/FOUR_VOLUME.js?v=4ab9e98c77" defer></script>
     <script src="data/FOUR_VOLUME_60M.js?v=eefea5cb02" defer></script>
 
@@ -1787,17 +1787,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
                 algorithms/gen_four_volume_track.py（持仓跟踪/告警/前向累积/聚类/重叠）
          经 update_v8.py 的 CATEGORY_MAP 生成 data/*.js 注入 window 变量。
          ?v= 由 scripts/reconcile_cache_busters.py 自动对齐，此处写任意值即可。 -->
-    <script src="data/FOUR_VOLUME_TRACK.js?v=e881e784cf" defer></script>
-    <script src="data/FOUR_VOLUME_HISTORY.js?v=0b5855e9ca" defer></script>
+    <script src="data/FOUR_VOLUME_TRACK.js?v=3a07b5e5de" defer></script>
+    <script src="data/FOUR_VOLUME_HISTORY.js?v=b33f731a35" defer></script>
     <script src="data/STOCK_STOP_DATA.js?v=6bc86c4db5" defer></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=d0c42361be" defer></script>
 <script src="data/BACKTEST_TDX.js?v=e87976a15c" defer></script>
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=d9e930a5dd" defer></script>
 <script src="data/EXPERIMENT.js?v=4f9fc884d2" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=9fae19e255" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=c90039f69d" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=b851a8ed88" defer></script>
+<script src="data/V8_POOL_TRACKER.js?v=cef6d7dc1d" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=a44d91547d" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=3fafe67ec2" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
@@ -1811,10 +1811,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      ALGO_TRACK.js 再度注入 —— 它是「选股生命周期（实盘持仓池）」回测的唯一真源，
      内含 by_horizon（真实持仓池分档前向收益）+ unrealized（当日浮动）。
      2026-08-31 曾因「前端零引用」停止注入（省 42.4 KB）——现回测页需要它，故恢复。 -->
-    <script src="data/ALGO_TRACK.js?v=c6f99b2b49" defer></script>
+    <script src="data/ALGO_TRACK.js?v=ea53071a87" defer></script>
 <script src="data/ETF_PULSE.js?v=5b8784c64c" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=b359cf490f" defer></script>
-<script src="data/TOP10_DAILY.js?v=b8aa56c365" defer></script>
+<script src="data/TOP10_DAILY.js?v=66cae56456" defer></script>
 <script src="data/WEEKEND_RUN.js?v=a9ab23cb8d" defer></script>
 <script src="data/W52_HIGH.js?v=24e0b78cf9" defer></script>
 <!-- 2026-08-30：盘后数据页新增解禁日历 + 业绩预告 -->
