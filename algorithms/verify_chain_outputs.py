@@ -297,6 +297,35 @@ def main():
         return 1
 
     print("\n✅ 闸门通过：全部核心产物均为本交易日产出")
+
+    # 🔴 2026-10-01 一劳永逸（阿狸咪的工程师）：跨产物一致性硬断言。
+    #   新鲜度闸只判「当天产没产」，判不了「最终推荐 vs 因子榜是否同序同分」。
+    #   今天早上那类「会话手动推旧 FR（读的是旧因子榜快照）」因此绕过新鲜度闸
+    #   却与线上因子榜对不上、无人报警 ⇒ 此处补一道：FR 前 N 名必须 == 因子榜
+    #   按 total_score 降序的前 N 名，且 final_score == total_score。
+    #   仅当两文件都在时生效；缺失返回 2 交上方新鲜度闸兜底，不影响现有判据方向。
+    try:
+        import subprocess
+        _ver = os.path.join(ALGO, "verify_fr_factor_consistency.py")
+        if os.path.exists(_ver):
+            _rc = subprocess.run(
+                [sys.executable, _ver], cwd=ROOT,
+                capture_output=True, text=True, timeout=120,
+            )
+            for _l in (_rc.stdout or "").strip().splitlines():
+                print("   [FR↔因子榜] " + _l)
+            if _rc.returncode == 1:
+                print("\n🛑 跨产物一致性未通过——最终推荐疑似被旧/错数据覆盖，"
+                      "与因子榜对不上。交由告警链路处理；请勿绕过本闸门。")
+                if args.warn_only:
+                    print("   ⚠️ warn-only 模式：不返回非零退出码")
+                else:
+                    return 1
+            elif _rc.returncode not in (0, 2):
+                print(f"   ⚠️ 一致性校验器异常退出码 {_rc.returncode}，不阻断（交由新鲜度闸兜底）")
+    except Exception as _e:  # noqa: BLE001
+        print(f"   ⚠️ 一致性断言执行异常: {_e}（不阻断）")
+
     return 0
 
 
