@@ -7412,6 +7412,7 @@ function fmtSigned(v){
     var _icwTxt = (_icw != null) ? _icw.toFixed(2) : '—';
     var _rgwTxt = (_rgw != null) ? _rgw.toFixed(2) : '—';
     var _divTxt = (_div != null) ? String(_div)    : '<span style="color:#94a3b8;">产物未含</span>';
+    var _regTxt = _gi.current_regime ? _e(_gi.current_regime) : '—';
     var h = '<div style="overflow-x:auto;overflow-y:hidden;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
           + '<thead><tr style="background:rgba(148,163,184,.07);color:var(--sub);text-align:left;">'
           + '<th style="padding:5px 6px;">#</th>'
@@ -7459,11 +7460,12 @@ function fmtSigned(v){
        + '口径：本榜 = <code>algorithms/generate_top10.py</code> 的 total_score 评分体系（决定排序的主力分，产物原序=已降序）；'
        + '因子链 factor_chain（如放量弱势 weak_penalty）是推荐层的二次微调，两层各自如实、不混排。'
        + '因子列缺失记 0。<b style="color:var(--sub);">⚠️ 带 ↳ 的 4 列是「增强」的子项，已计入增强，<u>勿再相加</u></b>。'
-       + '<br><b style="color:var(--sub);">总分算法（三段，缺一不可复现）：</b>'
-       + '① <code>raw</code> = 信号基础 + 增强 + 形态 + 资金 + 板块 + 机构 + 质量 + 回测反哺（8 项各计一次）；'
-       + '② <code>raw × 门禁乘子 ' + _gmTxt + '</code>（IC 权重 ' + _icwTxt + ' × regime 权重 ' + _rgwTxt + '，下限 0.3 / 上限 1.05）；'
-       + '③ <code>÷ 归一化分母 ' + _divTxt + ' × 100</code>，clamp 0~100。'
-       + '　⇒ 所以「各列直接相加」<b>不等于</b>总分，须走上式。'
+       + '<br><b style="color:var(--sub);">总分算法（2026-10-01 版 · 四步，可逐股复现）：</b>'
+       + '<br>① <b>表内 8 个加数列均为有效值</b>——质量列 = 原始质量分 ×0.5 ×池内0.5 ×报告时效(0.5~1，财报越旧越衰减) ×活跃度(0.35~1，当前无信号下沉)；机构列 = 原始机构分 ×2（IC 全维最强因子加权）；形态列 = <b>全池横截面中性化值</b>（按当日全部候选的形态分名次映射到 -4~+4，只保留相对强弱、消除趋势日全员齐高分，全员并列时≈0）；'
+       + '<br>② <code>raw = 信号基础 + 增强 + 形态 + 资金 + 板块 + 机构 + 质量 + 回测反哺</code>（8 列相加，各计一次；↳4 子项已含在增强内）；'
+       + '<br>③ <code>总分 = clamp( raw × 门禁乘子 ' + _gmTxt + ' ÷ 归一化分母 ' + _divTxt + ' × 100 , 0 , 100 ) × 个股regime系数</code>；门禁乘子 = clamp( 开仓系数 × IC权重 ' + _icwTxt + ' × regime权重 ' + _rgwTxt + ' , 0.3 , 1.05 )，全池统一；当日 regime = ' + _regTxt + '。'
+       + '<br>④ 按总分降序排名；「🏷 最终推荐」名单置顶（推荐层可纳入三重共识/四量终极等跨策略源）。'
+       + '<br>⇒ 所以「各列直接相加」<b>不等于</b>总分，须走②③；表内列为两位小数展示值、中间计算为全精度，<b>逐列复现总分允许 ±0.1 舍入差</b>。'
        + '数据源 data/TOP10_DAILY.js'
        + (D.update_time ? (' · 更新于 <b>'+_e(D.update_time)+'</b>') : '')
        + '。仅研究参考，非买卖建议。</div>';
