@@ -8030,8 +8030,13 @@ function fmtSigned(v){
     dst.innerHTML = ''
       + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
       + '<b style="font-size:15px;">&#x1F52E; AI 洞察·多源观点对比</b>'
-      + _uBadge('auto', '中长线', M.update_time, 'MAHORO_INSIGHTS 聚合 ' + srcN + ' 源 · AI 阅读后撰写')
+      // 🛡 2026-10-01 主人令：「日更」频率徽章紧贴「更新于」胶囊。
+      //   原实现把 sub 说明（MAHORO_INSIGHTS 聚合 … 源）作为 _uBadge 的第 4 参，
+      //   sub 会插在胶囊之后 ⇒ 频率徽章被顶到下一行（主人截图：胶囊在标题行、徽章掉到第三行）。
+      //   修法：_uBadge 不再传 sub，频率徽章紧随胶囊，sub 说明后置到行尾（同 flex 行，wrap 兜底）。
+      + _uBadge('auto', '中长线', M.update_time)
       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#8b5cf6;background:rgba(139,92,246,.16);border:1px solid rgba(139,92,246,.4);letter-spacing:.5px;">&#x1F4C6; 日更 · 盘前 08:50 / 午间 12:30 / 盘后 15:10</span>'
+      + '<span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">MAHORO_INSIGHTS 聚合 ' + srcN + ' 源 · AI 阅读后撰写</span>'
       + '</div>'
       // 核心 / 解析（2026-09-15 主人令：口径由「统计」改为「实情解析」）
       + '<div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.22);border-radius:7px;padding:8px 12px;margin-bottom:10px;line-height:1.7;">'
