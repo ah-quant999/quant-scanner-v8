@@ -7655,3 +7655,16 @@ items:
       - "data/FINAL_RECOMMEND_DATA.js"
     updated: "2026-10-01 13:15"
     updated_by: 阿狸咪的工程师
+  - id: final-raw-sync-1001
+    priority: P0
+    owner: 阿狸咪的工程师
+    status: done
+    what: P0覆盖事故——13:08 C类最终推荐被 13:49 与 14:19 两次 v8 post_close build 用仓库旧 raw_data/final_recommend.json（9/30 版）重建 js 洗回旧版。根因是当日全链重跑只直推了 data js、raw json 未同步，而 update_v8 现有「非 post_close 构建不重写纯盘后产物」闸防不了「post_close 构建 + 旧 raw」组合。
+    fix: commit 35c9d19b9e 一次提交同步恢复 data/FINAL_RECOMMEND_DATA.js（blob 88c49293b6fa）与 raw_data/final_recommend.json（从该 blob 无损反解并去除 republish_time 搬运字段）双 ut=13:08:27。实验证实 js 的 JSON 与 raw json 完全同构（仅多 republish_time 单字段，_make_lite 无 FINAL 分支全量透传）。
+    verify_how: 14:25 build run 36824691375 完成后终验 FINAL ut 仍=13:08:27 且 Top5=湖南裕能/中科创达/金安国纪/特锐德/工业富联——json 已在 tip 后 build 重建幂等，洗版循环终结。🔴新铁律——直推 data js 必须同批反解/同步推 raw json，否则下轮 post_close build 必洗回；本机 raw_data 整链被同步层回退至 9/30 版。后续建议——update_v8 可加「raw ut 旧于 data ut 时不重写」防倒退闸（挂账待议）。
+    refs:
+      - "data/FINAL_RECOMMEND_DATA.js"
+      - "raw_data/final_recommend.json"
+      - "update_v8.py"
+    updated: "2026-10-01 14:40"
+    updated_by: 阿狸咪的工程师
