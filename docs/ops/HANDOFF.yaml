@@ -7616,3 +7616,16 @@ items:
       - "algorithms/generate_top10.py"
     updated: "2026-10-01 08:42"
     updated_by: 阿狸咪的工程师
+  - id: quality-form-ab-rootfix-1001
+    priority: P0
+    owner: 阿狸咪的工程师
+    status: done
+    what: A+B 进一步根治评分维度偏重/双重计数——A: 形态权重×0.7 压动能集中日 form 间歇性独大；B: 池内质量×0.5 去双重计数(金股池进池已筛 ROE/营收/中报，评分再算=重复计价)。最终质量排序分=原始×0.25。
+    fix: algorithms/generate_top10.py 加 FORM_WEIGHT=0.7/POOL_QUALITY_WEIGHT=0.5 常量；raw_total 的 form_score 乘 FORM_WEIGHT；quality_effective 再乘 POOL_QUALITY_WEIGHT。重跑生成器+转 TOP10_DAILY.js(commit 2cb6041b6d)。
+    verify_how: 回测 replay_ab.py(41交易日)：A+B最优(0.7,0.5) TOP5前向-0.32%/胜46.8%/t=-0.63 vs 基线-0.85%/44.4%/-1.73；TOP10 -0.29%/44.1%/-0.75 vs -0.81%/43.2%/-2.22；form%6.3/qual%10.4 无独大。远端榜单 update_time=2026-10-01 12:30，#1 湖南裕能质量分0.0，旧霸榜股全跌出 TOP10；代码含常量2处。
+    refs:
+      - "algorithms/generate_top10.py"
+      - "data/TOP10_DAILY.js"
+    updated: "2026-10-01 12:45"
+    updated_by: 阿狸咪的工程师
+
