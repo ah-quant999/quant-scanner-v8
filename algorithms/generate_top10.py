@@ -62,6 +62,19 @@ QUALITY_REPORT_DECAY_DAYS = 120      # RC2：其后 120 天内线性衰减到 FL
 QUALITY_REPORT_FLOOR = 0.5           # RC2：衰减下限（旧报告仍保留 50% 权重）
 QUALITY_ACTIVITY_ZERO = 0.35         # RC3：sig_count==0 时质量分折扣系数
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 🔴 2026-10-01 进一步根治「维度偏重 / 双重计数」（A+B；回测见 replay_ab.py，41 交易日）
+# 审计发现：RC1 后质量分占比降到 ~30%，但形态(form)接棒成 44% 新最大项（动能集中日间歇性强）；
+#   且金股池进池时已用 ROE/营收/中报筛过质量，评分阶段再给质量分 = 双重计数。
+# A: 形态权重 FORM_WEIGHT=0.7（压制 form 在动能集中日的间歇性独大，释放权重给动态因子）
+# B: 池内质量再降权 POOL_QUALITY_WEIGHT=0.5（金股池已筛质量 → 排序去双重计数，保留半数区分力）
+#   最终质量排序分 = 原始质量 ×QUALITY_WEIGHT(0.5) ×POOL_QUALITY_WEIGHT(0.5) = ×0.25。
+#   回测最优 (FW=0.7,PQW=0.5)：TOP5 前向 -0.32%/胜46.8%/t=-0.63  vs 基线 -0.85%/44.4%/-1.73；
+#   TOP10 -0.29%/44.1%/-0.75 vs 基线 -0.81%/43.2%/-2.22；form%6.3/qual%10.4 无维度独大。
+#   ⚠️ PQW 不可=0（回测 TOP10 反退化 t=-2.37 显著负），保留半数最优。
+FORM_WEIGHT = 0.7
+POOL_QUALITY_WEIGHT = 0.5
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 🔴 2026-10-01 质量分时效/活跃度衰减辅助函数（根治「总这几只」）
@@ -1651,6 +1664,7 @@ def main():
         _q_period = (fq or {}).get("statDate")
         quality_effective = (quality_score
                              * QUALITY_WEIGHT
+                             * POOL_QUALITY_WEIGHT
                              * report_age_factor(_q_period)
                              * activity_factor(sig_count))
 
@@ -1665,7 +1679,8 @@ def main():
             continue
 
         # ── 原始总分（各维度绝对加分之和）──
-        raw_total = base + enhance + form_score + fund + sector_score + inst + quality_effective
+        raw_total = (base + enhance + form_score * FORM_WEIGHT + fund
+                     + sector_score + inst + quality_effective)
 
         # ── 回测反哺（P2；🔴 2026-09-20 改动15）：walk-forward 信号组合 **T+5** 修正 ──
         # T+5 收益每 1% ≈ ±1 分，clamp ±10；组合缺失回退 0（中性）。
