@@ -7668,3 +7668,16 @@ items:
       - "update_v8.py"
     updated: "2026-10-01 14:40"
     updated_by: 阿狸咪的工程师
+  - id: top10-restore-formula-1001
+    priority: P1
+    owner: 阿狸咪的工程师
+    status: done
+    what: 主人指出当日因子计分榜「不权威」——审计发现双重根因。①TOP10_DAILY.js 也被 13:49 同一轮 post_close build 用旧 raw_data/top10_daily.json 洗回 9/30 旧评分版（翰宇药业 37.3 霸榜），是 final-raw-sync-1001 事故的漏网卡（当时终验只查了 FINAL 未查 TOP10）；②卡面「总分算法」说明停留在旧三段口径，完全未反映 C 类中性化/质量有效值/机构×2/门禁/归一化的现行公式。
+    fix: ①data/TOP10_DAILY.js 与 raw_data/top10_daily.json 同批恢复 13:07 C 类版（commit a579d6c6e6，blob 3c28bd80 反解 json 去 republish_time，同 final-raw-sync 方法）；②index.html 卡面说明升级为四步完整可复现口径（commit 32d1913a8b，基线=实时 tip 幂等重放，含 ±0.1 舍入差如实标注）。
+    verify_how: 公式用远端产物 20 行逐股反算验证（17/20 精确一致、3 只差 ±0.1=全精度中间值 vs 两位小数展示列，已在卡面如实标注）；推送前 node 校验 42/42 保护标记+29 inline script new Function 0 错；线上抓站终验——新说明已上线、旧说明 0 残留、榜 ut=13:07:04 Top1=湖南裕能 7.9、?v 已刷 b8aa56c365。
+    refs:
+      - "data/TOP10_DAILY.js"
+      - "raw_data/top10_daily.json"
+      - "index.html"
+    updated: "2026-10-01 15:45"
+    updated_by: 阿狸咪的工程师
