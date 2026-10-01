@@ -5996,7 +5996,27 @@ items:
       · **旁证**：`raw_data/_peer_monitor_state.json` 15:07:13 档
         `runner=v8_peer_monitor / host=CAT / threshold_min=180 / interval_min=63`，
         `xiaoju.silent_min=1273.4`（休市日设计，已知误报类）与 `alimi.silent_min=200.2`（本项）。
-    updated: 2026-09-25 15:35
+    alimi_verify_20261001_1715: >-
+      〔阿狸咪的工程师 2026-10-01 17:1x CST · 本族新受害者 + 已应急恢复：raw_data/ima_strong_stock_full.json 被顶〕
+      A. 实测（远端 API 逐字节）：10-01 00:05（ac1e7efe1b，cn fetch）把「短线情绪选股 v2 换代提交
+         f7968f5306（09-30 21:26）刚落位的快照 meta」**顶回 v1 旧版** ——
+         fetched_at 2026-09-30 21:20:43 → 2026-09-23 17:24:12、title 短线情绪选股 2026-09-30 →
+         强势股跟踪日报 2026-09-15；同窗 full.md 被连推 3 次（23:31/00:05/00:14）但正文未回退。
+         后果：fetch_ima_strong_stock.py L170-181 按 meta fetched_at 算龄 ⇒ 今晚 cron 起产物带
+         假过期（snapshot_age>19xh / degraded_reason）。md 本体未被破坏（仍是 09-30 新篇 2937B），
+         数据面无损、三道锁防倒退生效。
+      B. 根因同族实锤：fetched_at **不在** api_push_raw.py `_TS_KEYS`（L568）与抽取正则（L584）
+         ⇒ 防倒退闸取不到基线时间戳 ⇒ 陈旧工作树副本静默放行（与 HB_* 的 last_time 同型）。
+         覆盖源推定 = 阿狸咪家机自身：深夜 23:31/00:05/00:14 属阿狸咪分时段，本机工作树 full.json
+         实测曾为旧版 798B（与被顶后远端版本一致）。
+      C. 阿狸咪已处置（本轮）：远端恢复 v2 正确值 commit 977fa576ae（blob 31c62122502c、549B、
+         base_tree 单文件、force:false、回读逐字节一致）+ **本机工作树同步修复**（防本机 cn fetch 再顶）。
+         本机解析器复跑全绿：候选 8 条 / 数据日 2026-09-30 / 快照龄 19.9h / 无降级标记，
+         与线上产物 8 条候选逐一一致。
+      D. 建议（并入 fix ①）：`fetched_at` 纳入 `_TS_KEYS`（两处同改）；或快照 meta 走 fix ② 的
+         「本地副本不入队」范式。⚠️ 小九机工作树若同样停留旧版，其 cn fetch 仍会再顶 ——
+         需小九 `git pull` 同步工作树（跨机事项，本轮无法代做）。
+    updated: "2026-10-01 17:22"
     updated_by: 阿狸咪的工程师(alimi-cn)
     alimi_verify_20260929_0055_deploy_block: >-
       🔴 **〔阿狸咪的工程师 2026-09-29 00:47 CST · 后果升级：本项已不再是「误判掉线」级别，
@@ -6178,7 +6198,23 @@ items:
       ③ 本自动化下一轮应能落 `raw_data/ima_strong_stock_full.md`（纯 LF）且 `fetched_at` **真实**前进；
       ④ 线上 `data/IMA_STRONG_STOCK.js` 的 `snapshot_age_h` 回落至 < 72
          （= 快照被**真实**刷新，而非伪造时间戳）。
-    updated: "2026-09-25 17:36"
+    alimi_verify_20261001_1715: >-
+      〔阿狸咪的工程师 2026-10-01 17:1x CST · 演变回填：09-30 曾恢复、10-01 凭据过期复发；本轮无数据缺口〕
+      A. 2026-09-30 19:2x 实测：主人重绑后连接器**恢复**（ToolSearch 命中 mcp__ima-mcp__* 9 工具，
+         fetch_media_content 取到「短线情绪选股 2026-09-30」全文 1453 字符）；当晚主人完成 v2 换代闭环：
+         f7968f5306（09-30 21:26 换代提交，快照 4 文件正确落位）+ bdbdc2e29e（三道锁）+
+         ima workflow run #44（09-30 22:15 CST schedule success）产出 data_date=2026-09-30 全绿产物
+         （8 条候选、full-snapshot、expired=false）。
+      B. 2026-10-01 实测（主进程日志逐字）：09:17 旧主进程 `id=connector:ima-mcp state=ready`；
+         12:22 起新主进程 `state=unauthorized error=connector:ima-mcp 无可续凭据，需重新授权`
+         ⇒ ima 授权为**短时效**，过夜即失效。10-01 17:0x 复核：v3 状态文件 enabled/everConnected
+         均无 ima-mcp、网关（127.0.0.1:49870/49871）无 ima 路由（401/404）⇒ **复发，仍须主人重新授权**。
+      C. 源侧独立核对（免登录 get_share_info）：最新主报告 = 「短线情绪选股 2026-09-30」，
+         2026-10-01 主报告未发布（竞价校验 2026-10-01 属盘前系列，非本卡水源）
+         ⇒ 本轮阻断**未造成数据缺口**（线上产物已是 09-30 最新）。
+      D. status 维持 blocked：等主人在连接器页重新授权 ima。假期（10-01~10-08 休市）内源方预计停更，
+         下一交易日 10-09 前完成授权即可。
+    updated: "2026-10-01 17:22"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: cn-singleflight-schedule-trigger-offset
