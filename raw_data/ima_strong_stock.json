@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-30 22:16:53",
+  "update_time": "2026-10-01 22:49:29",
   "source": "ima",
   "note_url": "https://ima.qq.com/wiki/?shareId=32c01f1da52044f743a01e4aa995d72e7940cc8e99cf413cc5f4c2eb39b4d389&folderId=folder_7507701210837524",
   "source_kind": "wiki",
@@ -7,7 +7,7 @@
   "source_title": "短线情绪选股 2026-09-30",
   "source_updated_at": "",
   "data_date": "2026-09-30",
-  "stale_days": 0,
+  "stale_days": 1,
   "source_stale": false,
   "snapshot_expired": false,
   "degraded_reason": "",
@@ -63,7 +63,7 @@
     "expected": null,
     "source_channel": "full-snapshot",
     "snapshot_fetched_at": "2026-09-30 21:20:43",
-    "snapshot_age_h": 0.94,
+    "snapshot_age_h": 25.48,
     "truncated": false,
     "note": "v2 换代水源「短线情绪选股」主报告全文快照（成员连接器）；introduction 兜底通道受 ~300 字硬墙（如实降级 detail_complete=false）。"
   },
