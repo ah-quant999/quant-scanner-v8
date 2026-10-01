@@ -1722,6 +1722,10 @@ def main():
         bt_ex5 = bt_excess5_for(*sig_tuple)
         score_backtest = max(-10, min(10, round(bt_ex5)))
         raw_total = raw_total + score_backtest
+        # 🔴 2026-10-01 修复（C 类补丁）：_raw_noform 必须含 backtest 分！
+        #   中性化循环后用 _raw_noform 重建 total；若漏掉 backtest(±10) 等于无意中
+        #   执行「B0 去 backtest」——回测已证 B0 显著变差(t=-2.06)，实现必须与回测一致。
+        _raw_noform += score_backtest
         # T+5 胜率（用于前端展示；改动15 从 win10 改 win5 —— T+10 胜率同样被 β 撑高：
         #   by_signal "1,1,0,0" win10=72.5% 但 win5 仅 48.1%，展示 T+10 会误导主人）
         _wr_rec = BT_BY_SIGNAL.get(f"{int(has_chan)},{int(sig_jinzuan)},{int(has_jigou)},{int(has_trend)}")
