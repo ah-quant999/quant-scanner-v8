@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-01 02:08",
+  "update_time": "2026-10-01 09:11",
   "data_date": "2026-09-30",
   "data_date_source": "kline",
   "fetch_date": "2026-10-01",
@@ -285,14 +285,14 @@
       "pct_60d": 1.27,
       "pct_90d": -10.3,
       "pct_180d": -7.79,
-      "pct_52w": null,
+      "pct_52w": -2.55,
       "relative_5d": -2.73,
       "relative_20d": -4.08,
       "relative_30d": -2.28,
       "relative_60d": 1.27,
       "relative_90d": -10.3,
       "relative_180d": -7.79,
-      "relative_52w": null
+      "relative_52w": -2.55
     },
     {
       "name": "纺织制造",
@@ -537,14 +537,14 @@
       "pct_60d": -0.68,
       "pct_90d": -14.82,
       "pct_180d": -6.19,
-      "pct_52w": null,
+      "pct_52w": -5.58,
       "relative_5d": -4.61,
       "relative_20d": -4.22,
       "relative_30d": 0.31,
       "relative_60d": -0.68,
       "relative_90d": -14.82,
       "relative_180d": -6.19,
-      "relative_52w": null
+      "relative_52w": -5.58
     },
     {
       "name": "化学纤维",
@@ -1095,14 +1095,14 @@
       "pct_60d": -6.81,
       "pct_90d": -11.79,
       "pct_180d": 1.72,
-      "pct_52w": null,
+      "pct_52w": 8.45,
       "relative_5d": -5.77,
       "relative_20d": -4.13,
       "relative_30d": -4.08,
       "relative_60d": -6.81,
       "relative_90d": -11.79,
       "relative_180d": 1.72,
-      "relative_52w": null
+      "relative_52w": 8.45
     },
     {
       "name": "食品加工制造",

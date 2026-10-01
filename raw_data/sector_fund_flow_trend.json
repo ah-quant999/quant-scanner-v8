@@ -1,22 +1,23 @@
 {
-  "update_time": "2026-09-30 16:09",
+  "update_time": "2026-10-01 09:14",
   "data_type": "real",
   "summary": {
     "in_count": 40,
     "out_count": 0,
     "in_text": "高股息精选(81.1亿)、同花顺漂亮100(73.8亿)、创新药(69.4亿)、银行(41.1亿)、同花顺中特估100(37.8亿)",
     "out_text": "无",
-    "alert": "🔥 40个板块大幅流入；🚀 高股息精选+81.1亿(连13天)、同花顺漂亮100+73.8亿(连7天)、创新药+69.4亿(连2天)"
+    "alert": "🔥 40个板块大幅流入；🚀 高股息精选+81.1亿(连14天)、同花顺漂亮100+73.8亿(连8天)、创新药+69.4亿(连3天)"
   },
   "sectors_in": [
     {
       "name": "高股息精选",
       "net": 81.13,
-      "net_5d": 0,
+      "net_5d": 220.59,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 13,
-      "trend": "in"
+      "consecutive_days": 14,
+      "trend": "in",
+      "net_5d_days": 5
     },
     {
       "name": "同花顺漂亮100",
@@ -24,39 +25,39 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 7,
+      "consecutive_days": 8,
       "trend": "in"
     },
     {
       "name": "创新药",
       "net": 69.36,
-      "net_5d": -35.68,
-      "net_20d": -84.77,
+      "net_5d": -43.1,
+      "net_20d": 21.52,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": 3.82,
+      "net_10d": 65.1,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -435.9,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 2,
+      "net_60d": -190.92,
+      "net_60d_days": 34,
+      "source": "本地累加",
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
       "name": "银行",
       "net": 41.13,
-      "net_5d": 32.17,
-      "net_20d": 13.03,
+      "net_5d": 73.79,
+      "net_20d": 54.65,
       "type": "行业",
       "net_5d_days": 5,
-      "net_10d": 28.15,
+      "net_10d": 69.77,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": 285.62,
+      "net_60d": 327.24,
       "net_60d_days": 44,
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -65,39 +66,39 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 9,
+      "consecutive_days": 10,
       "trend": "in"
     },
     {
       "name": "证金持股",
       "net": 35.65,
-      "net_5d": -10.04,
-      "net_20d": -92.36,
+      "net_5d": 39.02,
+      "net_20d": 33.14,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": -14.07,
+      "net_10d": 42.34,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -1058.63,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 1,
+      "net_60d": -67.81,
+      "net_60d_days": 39,
+      "source": "本地累加",
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
       "name": "化学制药",
       "net": 30.67,
-      "net_5d": -19.75,
-      "net_20d": -76.47,
+      "net_5d": -14.1,
+      "net_20d": -27.57,
       "type": "行业",
       "net_5d_days": 5,
-      "net_10d": -1.1,
+      "net_10d": 17.01,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -320.7,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 3,
+      "net_60d": -196.61,
+      "net_60d_days": 45,
+      "source": "本地累加",
+      "consecutive_days": 4,
       "trend": "in"
     },
     {
@@ -106,23 +107,20 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
       "name": "减肥药",
       "net": 28.22,
-      "net_5d": 4.17,
-      "net_20d": -26.9,
+      "net_5d": 27.6,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": 11.26,
+      "net_10d": 73.52,
       "net_10d_days": 10,
-      "source": "东财日K",
-      "net_20d_days": 20,
-      "net_60d": -183.6,
-      "net_60d_days": 60,
-      "consecutive_days": 4,
+      "source": "本地累加",
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
@@ -131,72 +129,63 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in"
     },
     {
       "name": "肝炎概念",
       "net": 25.77,
-      "net_5d": -22.2,
-      "net_20d": -28.8,
+      "net_5d": 59.47,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": -4.26,
+      "net_10d": 79.42,
       "net_10d_days": 10,
-      "source": "东财日K",
-      "net_20d_days": 20,
-      "net_60d": -112.29,
-      "net_60d_days": 60,
-      "consecutive_days": 5,
+      "source": "本地累加",
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
       "name": "医疗服务",
       "net": 25.54,
-      "net_5d": -11.77,
-      "net_20d": 29.07,
+      "net_5d": 3.26,
+      "net_20d": 41.54,
       "type": "行业",
       "net_5d_days": 5,
-      "net_10d": 16.31,
+      "net_10d": 10.51,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -57.47,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 2,
+      "net_60d": -62.2,
+      "net_60d_days": 45,
+      "source": "本地累加",
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
       "name": "物业管理",
       "net": 25.23,
-      "net_5d": 1.13,
-      "net_20d": -1.98,
+      "net_5d": 105.38,
+      "net_20d": 0,
       "type": "概念",
-      "net_5d_days": 5,
-      "net_10d": -0.12,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d": -3.74,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 10,
-      "trend": "in"
+      "consecutive_days": 11,
+      "trend": "in",
+      "net_5d_days": 5
     },
     {
       "name": "房地产",
       "net": 25.11,
-      "net_5d": 7.07,
-      "net_20d": 20.63,
+      "net_5d": 25.86,
+      "net_20d": 205.22,
       "type": "行业",
-      "net_10d": 27.64,
+      "net_10d": 242.32,
       "net_10d_days": 10,
-      "net_60d": -43.98,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "net_5d_days": 5,
-      "net_20d_days": 20,
-      "consecutive_days": 2,
-      "trend": "in"
+      "net_60d": 1611.16,
+      "net_60d_days": 49,
+      "source": "本地累加",
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_5d_days": 42,
+      "net_20d_days": 42
     },
     {
       "name": "仿制药一致性评价",
@@ -204,23 +193,20 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
       "name": "流感",
       "net": 23.64,
-      "net_5d": -34.47,
-      "net_20d": -45.39,
+      "net_5d": 29.7,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": -2.35,
+      "net_10d": 90.67,
       "net_10d_days": 10,
-      "source": "东财日K",
-      "net_20d_days": 20,
-      "net_60d": -191.54,
-      "net_60d_days": 60,
-      "consecutive_days": 10,
+      "source": "本地累加",
+      "consecutive_days": 11,
       "trend": "in"
     },
     {
@@ -229,7 +215,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
@@ -238,55 +224,47 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 10,
+      "consecutive_days": 11,
       "trend": "in"
     },
     {
       "name": "租售同权",
       "net": 22.53,
-      "net_5d": 7.02,
-      "net_20d": 21.02,
+      "net_5d": 28.59,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "source": "东财日K",
-      "net_10d": 22.36,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d": -2.49,
-      "net_60d_days": 60,
-      "consecutive_days": 4,
+      "source": "本地累加",
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
       "name": "超级品牌",
       "net": 20.99,
-      "net_5d": 10.03,
-      "net_20d": -46.54,
+      "net_5d": -10.92,
+      "net_20d": -44.38,
       "type": "概念",
-      "net_10d": 9.27,
+      "net_10d": 39.88,
       "net_10d_days": 10,
-      "net_60d": -206.16,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "net_5d_days": 5,
-      "net_20d_days": 20,
-      "consecutive_days": 1,
-      "trend": "in"
+      "net_60d": 295.49,
+      "net_60d_days": 49,
+      "source": "本地累加",
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_5d_days": 27,
+      "net_20d_days": 27
     },
     {
       "name": "辅助生殖",
       "net": 20.91,
-      "net_5d": 2.36,
-      "net_20d": -6.11,
+      "net_5d": 42.64,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": 0.42,
+      "net_10d": 56.5,
       "net_10d_days": 10,
-      "source": "东财日K",
-      "net_20d_days": 20,
-      "net_60d": -66.75,
-      "net_60d_days": 60,
-      "consecutive_days": 3,
+      "source": "本地累加",
+      "consecutive_days": 4,
       "trend": "in"
     },
     {
@@ -295,23 +273,20 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
       "name": "重组蛋白",
       "net": 19.94,
-      "net_5d": -2.97,
-      "net_20d": 1.79,
+      "net_5d": 27.33,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": 7.05,
+      "net_10d": 40.22,
       "net_10d_days": 10,
-      "source": "东财日K",
-      "net_20d_days": 20,
-      "net_60d": -31.43,
-      "net_60d_days": 60,
-      "consecutive_days": 1,
+      "source": "本地累加",
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -320,55 +295,52 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 7,
+      "consecutive_days": 8,
       "trend": "in"
     },
     {
       "name": "合成生物",
       "net": 17.79,
-      "net_5d": -24.75,
-      "net_20d": -48.63,
+      "net_5d": 26.7,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": -35.54,
+      "net_10d": 41.79,
       "net_10d_days": 10,
-      "source": "东财日K",
-      "net_20d_days": 20,
-      "net_60d": -187.4,
-      "net_60d_days": 60,
-      "consecutive_days": 2,
+      "source": "本地累加",
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
       "name": "动力电池回收",
       "net": 17.47,
-      "net_5d": -24.35,
-      "net_20d": -152.96,
+      "net_5d": 32.03,
+      "net_20d": -48.98,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": -59.92,
+      "net_10d": -15.04,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -398.51,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 5,
+      "net_60d": -18.14,
+      "net_60d_days": 26,
+      "source": "本地累加",
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
       "name": "能源金属",
       "net": 16.82,
-      "net_5d": -6.8,
-      "net_20d": -62.78,
+      "net_5d": 1.2,
+      "net_20d": -55.23,
       "type": "行业",
       "net_5d_days": 5,
-      "net_10d": -7.93,
+      "net_10d": -0.12,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -212.94,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 1,
+      "net_60d": -66.81,
+      "net_60d_days": 44,
+      "source": "本地累加",
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -377,55 +349,55 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
       "name": "养老概念",
       "net": 16.11,
-      "net_5d": -9.61,
-      "net_20d": -0.79,
+      "net_5d": 44.72,
+      "net_20d": 157.84,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": 33.97,
+      "net_10d": 120.87,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -134.6,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 13,
+      "net_60d": 144.89,
+      "net_60d_days": 24,
+      "source": "本地累加",
+      "consecutive_days": 14,
       "trend": "in"
     },
     {
       "name": "白酒",
       "net": 15.28,
-      "net_5d": 11.36,
-      "net_20d": -21.84,
+      "net_5d": -3.44,
+      "net_20d": -66.67,
       "type": "行业",
-      "net_10d": 5.82,
+      "net_10d": 11.99,
       "net_10d_days": 10,
-      "net_60d": -90.23,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "net_5d_days": 5,
-      "net_20d_days": 20,
-      "consecutive_days": 2,
-      "trend": "in"
+      "net_60d": -12.82,
+      "net_60d_days": 49,
+      "source": "本地累加",
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_5d_days": 22,
+      "net_20d_days": 22
     },
     {
       "name": "生物制品",
       "net": 14.97,
-      "net_5d": -5.41,
-      "net_20d": -13.06,
+      "net_5d": -8.15,
+      "net_20d": -21.99,
       "type": "行业",
       "net_5d_days": 5,
-      "net_10d": 7.13,
+      "net_10d": 0.24,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -93.68,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 1,
+      "net_60d": -89.22,
+      "net_60d_days": 43,
+      "source": "本地累加",
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -434,7 +406,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
@@ -443,7 +415,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
@@ -452,24 +424,21 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
       "name": "生物疫苗",
       "net": 13.93,
-      "net_5d": -2.73,
-      "net_20d": -25.26,
+      "net_5d": 21.45,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "source": "东财日K",
-      "net_10d": 4.96,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d": -108.65,
-      "net_60d_days": 60,
-      "consecutive_days": 1,
-      "trend": "in"
+      "source": "本地累加",
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_10d": 42.33,
+      "net_10d_days": 10
     },
     {
       "name": "共同富裕示范区",
@@ -477,24 +446,20 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
       "name": "换电概念",
       "net": 13.02,
-      "net_5d": -5.09,
-      "net_20d": -9.5,
+      "net_5d": 47.88,
+      "net_20d": 0,
       "type": "概念",
-      "net_5d_days": 5,
-      "net_10d": -4.99,
+      "net_10d": 49.7,
       "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d": -53.49,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 9,
-      "trend": "in"
+      "consecutive_days": 10,
+      "trend": "in",
+      "net_5d_days": 5
     },
     {
       "name": "眼科医疗",
@@ -502,38 +467,38 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
       "name": "电池",
       "net": 12.51,
-      "net_5d": -2.64,
-      "net_20d": -160.7,
+      "net_5d": -13.97,
+      "net_20d": -169.45,
       "type": "行业",
-      "net_10d": -74.74,
+      "net_10d": 96.41,
       "net_10d_days": 10,
-      "net_60d": -562.36,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "net_5d_days": 5,
-      "net_20d_days": 20,
-      "consecutive_days": 2,
-      "trend": "in"
+      "net_60d": 2338.27,
+      "net_60d_days": 49,
+      "source": "本地累加",
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_5d_days": 44,
+      "net_20d_days": 44
     },
     {
       "name": "白酒概念",
       "net": 10.75,
-      "net_5d": -15.67,
-      "net_20d": 5.18,
+      "net_5d": 1.08,
+      "net_20d": 7.52,
       "type": "概念",
-      "net_10d": 9.04,
+      "net_10d": 58.38,
       "net_10d_days": 10,
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 5,
-      "net_20d_days": 5
+      "net_5d_days": 6,
+      "net_20d_days": 6
     }
   ],
   "sectors_out": [],
@@ -541,11 +506,12 @@
     {
       "name": "高股息精选",
       "net": 81.13,
-      "net_5d": 0,
+      "net_5d": 220.59,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 13,
-      "trend": "in"
+      "consecutive_days": 14,
+      "trend": "in",
+      "net_5d_days": 5
     },
     {
       "name": "同花顺漂亮100",
@@ -553,39 +519,39 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 7,
+      "consecutive_days": 8,
       "trend": "in"
     },
     {
       "name": "创新药",
       "net": 69.36,
-      "net_5d": -35.68,
-      "net_20d": -84.77,
+      "net_5d": -43.1,
+      "net_20d": 21.52,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": 3.82,
+      "net_10d": 65.1,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -435.9,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 2,
+      "net_60d": -190.92,
+      "net_60d_days": 34,
+      "source": "本地累加",
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
       "name": "银行",
       "net": 41.13,
-      "net_5d": 32.17,
-      "net_20d": 13.03,
+      "net_5d": 73.79,
+      "net_20d": 54.65,
       "type": "行业",
       "net_5d_days": 5,
-      "net_10d": 28.15,
+      "net_10d": 69.77,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": 285.62,
+      "net_60d": 327.24,
       "net_60d_days": 44,
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -594,39 +560,39 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 9,
+      "consecutive_days": 10,
       "trend": "in"
     },
     {
       "name": "证金持股",
       "net": 35.65,
-      "net_5d": -10.04,
-      "net_20d": -92.36,
+      "net_5d": 39.02,
+      "net_20d": 33.14,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": -14.07,
+      "net_10d": 42.34,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -1058.63,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 1,
+      "net_60d": -67.81,
+      "net_60d_days": 39,
+      "source": "本地累加",
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
       "name": "化学制药",
       "net": 30.67,
-      "net_5d": -19.75,
-      "net_20d": -76.47,
+      "net_5d": -14.1,
+      "net_20d": -27.57,
       "type": "行业",
       "net_5d_days": 5,
-      "net_10d": -1.1,
+      "net_10d": 17.01,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -320.7,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 3,
+      "net_60d": -196.61,
+      "net_60d_days": 45,
+      "source": "本地累加",
+      "consecutive_days": 4,
       "trend": "in"
     },
     {
@@ -635,23 +601,20 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
       "name": "减肥药",
       "net": 28.22,
-      "net_5d": 4.17,
-      "net_20d": -26.9,
+      "net_5d": 27.6,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": 11.26,
+      "net_10d": 73.52,
       "net_10d_days": 10,
-      "source": "东财日K",
-      "net_20d_days": 20,
-      "net_60d": -183.6,
-      "net_60d_days": 60,
-      "consecutive_days": 4,
+      "source": "本地累加",
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
@@ -660,72 +623,63 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in"
     },
     {
       "name": "肝炎概念",
       "net": 25.77,
-      "net_5d": -22.2,
-      "net_20d": -28.8,
+      "net_5d": 59.47,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": -4.26,
+      "net_10d": 79.42,
       "net_10d_days": 10,
-      "source": "东财日K",
-      "net_20d_days": 20,
-      "net_60d": -112.29,
-      "net_60d_days": 60,
-      "consecutive_days": 5,
+      "source": "本地累加",
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
       "name": "医疗服务",
       "net": 25.54,
-      "net_5d": -11.77,
-      "net_20d": 29.07,
+      "net_5d": 3.26,
+      "net_20d": 41.54,
       "type": "行业",
       "net_5d_days": 5,
-      "net_10d": 16.31,
+      "net_10d": 10.51,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -57.47,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 2,
+      "net_60d": -62.2,
+      "net_60d_days": 45,
+      "source": "本地累加",
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
       "name": "物业管理",
       "net": 25.23,
-      "net_5d": 1.13,
-      "net_20d": -1.98,
+      "net_5d": 105.38,
+      "net_20d": 0,
       "type": "概念",
-      "net_5d_days": 5,
-      "net_10d": -0.12,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d": -3.74,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 10,
-      "trend": "in"
+      "consecutive_days": 11,
+      "trend": "in",
+      "net_5d_days": 5
     },
     {
       "name": "房地产",
       "net": 25.11,
-      "net_5d": 7.07,
-      "net_20d": 20.63,
+      "net_5d": 25.86,
+      "net_20d": 205.22,
       "type": "行业",
-      "net_10d": 27.64,
+      "net_10d": 242.32,
       "net_10d_days": 10,
-      "net_60d": -43.98,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "net_5d_days": 5,
-      "net_20d_days": 20,
-      "consecutive_days": 2,
-      "trend": "in"
+      "net_60d": 1611.16,
+      "net_60d_days": 49,
+      "source": "本地累加",
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_5d_days": 42,
+      "net_20d_days": 42
     },
     {
       "name": "仿制药一致性评价",
@@ -733,23 +687,20 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
       "name": "流感",
       "net": 23.64,
-      "net_5d": -34.47,
-      "net_20d": -45.39,
+      "net_5d": 29.7,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": -2.35,
+      "net_10d": 90.67,
       "net_10d_days": 10,
-      "source": "东财日K",
-      "net_20d_days": 20,
-      "net_60d": -191.54,
-      "net_60d_days": 60,
-      "consecutive_days": 10,
+      "source": "本地累加",
+      "consecutive_days": 11,
       "trend": "in"
     },
     {
@@ -758,7 +709,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
@@ -767,55 +718,47 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 10,
+      "consecutive_days": 11,
       "trend": "in"
     },
     {
       "name": "租售同权",
       "net": 22.53,
-      "net_5d": 7.02,
-      "net_20d": 21.02,
+      "net_5d": 28.59,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "source": "东财日K",
-      "net_10d": 22.36,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d": -2.49,
-      "net_60d_days": 60,
-      "consecutive_days": 4,
+      "source": "本地累加",
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
       "name": "超级品牌",
       "net": 20.99,
-      "net_5d": 10.03,
-      "net_20d": -46.54,
+      "net_5d": -10.92,
+      "net_20d": -44.38,
       "type": "概念",
-      "net_10d": 9.27,
+      "net_10d": 39.88,
       "net_10d_days": 10,
-      "net_60d": -206.16,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "net_5d_days": 5,
-      "net_20d_days": 20,
-      "consecutive_days": 1,
-      "trend": "in"
+      "net_60d": 295.49,
+      "net_60d_days": 49,
+      "source": "本地累加",
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_5d_days": 27,
+      "net_20d_days": 27
     },
     {
       "name": "辅助生殖",
       "net": 20.91,
-      "net_5d": 2.36,
-      "net_20d": -6.11,
+      "net_5d": 42.64,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": 0.42,
+      "net_10d": 56.5,
       "net_10d_days": 10,
-      "source": "东财日K",
-      "net_20d_days": 20,
-      "net_60d": -66.75,
-      "net_60d_days": 60,
-      "consecutive_days": 3,
+      "source": "本地累加",
+      "consecutive_days": 4,
       "trend": "in"
     },
     {
@@ -824,23 +767,20 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
       "name": "重组蛋白",
       "net": 19.94,
-      "net_5d": -2.97,
-      "net_20d": 1.79,
+      "net_5d": 27.33,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": 7.05,
+      "net_10d": 40.22,
       "net_10d_days": 10,
-      "source": "东财日K",
-      "net_20d_days": 20,
-      "net_60d": -31.43,
-      "net_60d_days": 60,
-      "consecutive_days": 1,
+      "source": "本地累加",
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -849,55 +789,52 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 7,
+      "consecutive_days": 8,
       "trend": "in"
     },
     {
       "name": "合成生物",
       "net": 17.79,
-      "net_5d": -24.75,
-      "net_20d": -48.63,
+      "net_5d": 26.7,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": -35.54,
+      "net_10d": 41.79,
       "net_10d_days": 10,
-      "source": "东财日K",
-      "net_20d_days": 20,
-      "net_60d": -187.4,
-      "net_60d_days": 60,
-      "consecutive_days": 2,
+      "source": "本地累加",
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
       "name": "动力电池回收",
       "net": 17.47,
-      "net_5d": -24.35,
-      "net_20d": -152.96,
+      "net_5d": 32.03,
+      "net_20d": -48.98,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": -59.92,
+      "net_10d": -15.04,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -398.51,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 5,
+      "net_60d": -18.14,
+      "net_60d_days": 26,
+      "source": "本地累加",
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
       "name": "能源金属",
       "net": 16.82,
-      "net_5d": -6.8,
-      "net_20d": -62.78,
+      "net_5d": 1.2,
+      "net_20d": -55.23,
       "type": "行业",
       "net_5d_days": 5,
-      "net_10d": -7.93,
+      "net_10d": -0.12,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -212.94,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 1,
+      "net_60d": -66.81,
+      "net_60d_days": 44,
+      "source": "本地累加",
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -906,55 +843,55 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
       "name": "养老概念",
       "net": 16.11,
-      "net_5d": -9.61,
-      "net_20d": -0.79,
+      "net_5d": 44.72,
+      "net_20d": 157.84,
       "type": "概念",
       "net_5d_days": 5,
-      "net_10d": 33.97,
+      "net_10d": 120.87,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -134.6,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 13,
+      "net_60d": 144.89,
+      "net_60d_days": 24,
+      "source": "本地累加",
+      "consecutive_days": 14,
       "trend": "in"
     },
     {
       "name": "白酒",
       "net": 15.28,
-      "net_5d": 11.36,
-      "net_20d": -21.84,
+      "net_5d": -3.44,
+      "net_20d": -66.67,
       "type": "行业",
-      "net_10d": 5.82,
+      "net_10d": 11.99,
       "net_10d_days": 10,
-      "net_60d": -90.23,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "net_5d_days": 5,
-      "net_20d_days": 20,
-      "consecutive_days": 2,
-      "trend": "in"
+      "net_60d": -12.82,
+      "net_60d_days": 49,
+      "source": "本地累加",
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_5d_days": 22,
+      "net_20d_days": 22
     },
     {
       "name": "生物制品",
       "net": 14.97,
-      "net_5d": -5.41,
-      "net_20d": -13.06,
+      "net_5d": -8.15,
+      "net_20d": -21.99,
       "type": "行业",
       "net_5d_days": 5,
-      "net_10d": 7.13,
+      "net_10d": 0.24,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d": -93.68,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 1,
+      "net_60d": -89.22,
+      "net_60d_days": 43,
+      "source": "本地累加",
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -963,7 +900,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
@@ -972,7 +909,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
@@ -981,24 +918,21 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
       "name": "生物疫苗",
       "net": 13.93,
-      "net_5d": -2.73,
-      "net_20d": -25.26,
+      "net_5d": 21.45,
+      "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
-      "source": "东财日K",
-      "net_10d": 4.96,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d": -108.65,
-      "net_60d_days": 60,
-      "consecutive_days": 1,
-      "trend": "in"
+      "source": "本地累加",
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_10d": 42.33,
+      "net_10d_days": 10
     },
     {
       "name": "共同富裕示范区",
@@ -1006,24 +940,20 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
       "name": "换电概念",
       "net": 13.02,
-      "net_5d": -5.09,
-      "net_20d": -9.5,
+      "net_5d": 47.88,
+      "net_20d": 0,
       "type": "概念",
-      "net_5d_days": 5,
-      "net_10d": -4.99,
+      "net_10d": 49.7,
       "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d": -53.49,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "consecutive_days": 9,
-      "trend": "in"
+      "consecutive_days": 10,
+      "trend": "in",
+      "net_5d_days": 5
     },
     {
       "name": "眼科医疗",
@@ -1031,199 +961,199 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
       "name": "电池",
       "net": 12.51,
-      "net_5d": -2.64,
-      "net_20d": -160.7,
+      "net_5d": -13.97,
+      "net_20d": -169.45,
       "type": "行业",
-      "net_10d": -74.74,
+      "net_10d": 96.41,
       "net_10d_days": 10,
-      "net_60d": -562.36,
-      "net_60d_days": 60,
-      "source": "东财日K",
-      "net_5d_days": 5,
-      "net_20d_days": 20,
-      "consecutive_days": 2,
-      "trend": "in"
+      "net_60d": 2338.27,
+      "net_60d_days": 49,
+      "source": "本地累加",
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_5d_days": 44,
+      "net_20d_days": 44
     },
     {
       "name": "白酒概念",
       "net": 10.75,
-      "net_5d": -15.67,
-      "net_20d": 5.18,
+      "net_5d": 1.08,
+      "net_20d": 7.52,
       "type": "概念",
-      "net_10d": 9.04,
+      "net_10d": 58.38,
       "net_10d_days": 10,
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 5,
-      "net_20d_days": 5
+      "net_5d_days": 6,
+      "net_20d_days": 6
     }
   ],
   "consecutive": {
     "高股息精选": {
-      "days": 13,
+      "days": 14,
       "trend": "in"
     },
     "同花顺漂亮100": {
-      "days": 7,
-      "trend": "in"
-    },
-    "创新药": {
-      "days": 2,
-      "trend": "in"
-    },
-    "银行": {
-      "days": 1,
-      "trend": "in"
-    },
-    "同花顺中特估100": {
-      "days": 9,
-      "trend": "in"
-    },
-    "证金持股": {
-      "days": 1,
-      "trend": "in"
-    },
-    "化学制药": {
-      "days": 3,
-      "trend": "in"
-    },
-    "细胞免疫治疗": {
-      "days": 4,
-      "trend": "in"
-    },
-    "减肥药": {
-      "days": 4,
-      "trend": "in"
-    },
-    "CRO概念": {
       "days": 8,
       "trend": "in"
     },
-    "肝炎概念": {
-      "days": 5,
-      "trend": "in"
-    },
-    "医疗服务": {
-      "days": 2,
-      "trend": "in"
-    },
-    "物业管理": {
-      "days": 10,
-      "trend": "in"
-    },
-    "房地产": {
-      "days": 2,
-      "trend": "in"
-    },
-    "仿制药一致性评价": {
-      "days": 5,
-      "trend": "in"
-    },
-    "流感": {
-      "days": 10,
-      "trend": "in"
-    },
-    "医药电商": {
-      "days": 5,
-      "trend": "in"
-    },
-    "跨境支付(CIPS)": {
-      "days": 10,
-      "trend": "in"
-    },
-    "租售同权": {
-      "days": 4,
-      "trend": "in"
-    },
-    "超级品牌": {
-      "days": 1,
-      "trend": "in"
-    },
-    "辅助生殖": {
+    "创新药": {
       "days": 3,
       "trend": "in"
     },
-    "智能医疗": {
-      "days": 4,
-      "trend": "in"
-    },
-    "重组蛋白": {
-      "days": 1,
-      "trend": "in"
-    },
-    "金属钴": {
-      "days": 7,
-      "trend": "in"
-    },
-    "合成生物": {
+    "银行": {
       "days": 2,
       "trend": "in"
     },
-    "动力电池回收": {
+    "同花顺中特估100": {
+      "days": 10,
+      "trend": "in"
+    },
+    "证金持股": {
+      "days": 2,
+      "trend": "in"
+    },
+    "化学制药": {
+      "days": 4,
+      "trend": "in"
+    },
+    "细胞免疫治疗": {
       "days": 5,
       "trend": "in"
     },
-    "能源金属": {
-      "days": 1,
-      "trend": "in"
-    },
-    "金属镍": {
+    "减肥药": {
       "days": 5,
       "trend": "in"
     },
-    "养老概念": {
-      "days": 13,
-      "trend": "in"
-    },
-    "白酒": {
-      "days": 2,
-      "trend": "in"
-    },
-    "生物制品": {
-      "days": 1,
-      "trend": "in"
-    },
-    "猴痘概念": {
-      "days": 2,
-      "trend": "in"
-    },
-    "央企国企改革": {
-      "days": 4,
-      "trend": "in"
-    },
-    "装配式建筑": {
-      "days": 4,
-      "trend": "in"
-    },
-    "生物疫苗": {
-      "days": 1,
-      "trend": "in"
-    },
-    "共同富裕示范区": {
-      "days": 1,
-      "trend": "in"
-    },
-    "换电概念": {
+    "CRO概念": {
       "days": 9,
       "trend": "in"
     },
-    "眼科医疗": {
+    "肝炎概念": {
+      "days": 6,
+      "trend": "in"
+    },
+    "医疗服务": {
+      "days": 3,
+      "trend": "in"
+    },
+    "物业管理": {
+      "days": 11,
+      "trend": "in"
+    },
+    "房地产": {
+      "days": 3,
+      "trend": "in"
+    },
+    "仿制药一致性评价": {
+      "days": 6,
+      "trend": "in"
+    },
+    "流感": {
+      "days": 11,
+      "trend": "in"
+    },
+    "医药电商": {
+      "days": 6,
+      "trend": "in"
+    },
+    "跨境支付(CIPS)": {
+      "days": 11,
+      "trend": "in"
+    },
+    "租售同权": {
+      "days": 5,
+      "trend": "in"
+    },
+    "超级品牌": {
       "days": 2,
+      "trend": "in"
+    },
+    "辅助生殖": {
+      "days": 4,
+      "trend": "in"
+    },
+    "智能医疗": {
+      "days": 5,
+      "trend": "in"
+    },
+    "重组蛋白": {
+      "days": 2,
+      "trend": "in"
+    },
+    "金属钴": {
+      "days": 8,
+      "trend": "in"
+    },
+    "合成生物": {
+      "days": 3,
+      "trend": "in"
+    },
+    "动力电池回收": {
+      "days": 6,
+      "trend": "in"
+    },
+    "能源金属": {
+      "days": 2,
+      "trend": "in"
+    },
+    "金属镍": {
+      "days": 6,
+      "trend": "in"
+    },
+    "养老概念": {
+      "days": 14,
+      "trend": "in"
+    },
+    "白酒": {
+      "days": 3,
+      "trend": "in"
+    },
+    "生物制品": {
+      "days": 2,
+      "trend": "in"
+    },
+    "猴痘概念": {
+      "days": 3,
+      "trend": "in"
+    },
+    "央企国企改革": {
+      "days": 5,
+      "trend": "in"
+    },
+    "装配式建筑": {
+      "days": 5,
+      "trend": "in"
+    },
+    "生物疫苗": {
+      "days": 2,
+      "trend": "in"
+    },
+    "共同富裕示范区": {
+      "days": 2,
+      "trend": "in"
+    },
+    "换电概念": {
+      "days": 10,
+      "trend": "in"
+    },
+    "眼科医疗": {
+      "days": 3,
       "trend": "in"
     },
     "电池": {
-      "days": 2,
+      "days": 3,
       "trend": "in"
     },
     "白酒概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     }
   },
@@ -1264,6 +1194,16 @@
       "net_60d_days": 6
     },
     {
+      "name": "高股息精选",
+      "net": 81.13,
+      "net_5d": 220.59,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 14,
+      "trend": "in",
+      "net_5d_days": 5
+    },
+    {
       "name": "AI应用",
       "net": -8.65,
       "net_5d": 110.43,
@@ -1277,6 +1217,16 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 38
+    },
+    {
+      "name": "物业管理",
+      "net": 25.23,
+      "net_5d": 105.38,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 11,
+      "trend": "in",
+      "net_5d_days": 5
     },
     {
       "name": "AI智能体",
@@ -1356,32 +1306,6 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 38
-    },
-    {
-      "name": "AI芯片",
-      "net": 15.9,
-      "net_5d": 73.74,
-      "net_20d": 0,
-      "net_60d": null,
-      "type": "行业",
-      "consecutive_days": 2,
-      "trend": "in",
-      "net_5d_days": 5
-    },
-    {
-      "name": "传感器",
-      "net": -6.5,
-      "net_5d": 72.6,
-      "net_20d": 313.32,
-      "net_60d": 311.14,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 5,
-      "net_10d": 233.65,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 36
     }
   ],
   "trend_10d": [
@@ -1401,6 +1325,21 @@
       "net_60d_days": 34
     },
     {
+      "name": "第三代半导体",
+      "net": -12.47,
+      "net_5d": 24.44,
+      "net_20d": 610.1,
+      "net_60d": 656.01,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 387.56,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 37
+    },
+    {
       "name": "先进封装",
       "net": -20.08,
       "net_5d": -100.79,
@@ -1414,6 +1353,22 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 43
+    },
+    {
+      "name": "房地产",
+      "net": 25.11,
+      "net_5d": 25.86,
+      "net_20d": 205.22,
+      "type": "行业",
+      "net_10d": 242.32,
+      "net_10d_days": 10,
+      "net_60d": 1611.16,
+      "net_60d_days": 49,
+      "source": "本地累加",
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_5d_days": 42,
+      "net_20d_days": 42
     },
     {
       "name": "传感器",
@@ -1476,6 +1431,22 @@
       "net_60d_days": 36
     },
     {
+      "name": "养老概念",
+      "net": 16.11,
+      "net_5d": 44.72,
+      "net_20d": 157.84,
+      "type": "概念",
+      "net_5d_days": 5,
+      "net_10d": 120.87,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d": 144.89,
+      "net_60d_days": 24,
+      "source": "本地累加",
+      "consecutive_days": 14,
+      "trend": "in"
+    },
+    {
       "name": "华为海思",
       "net": -8.29,
       "net_5d": 47.8,
@@ -1516,51 +1487,6 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 37
-    },
-    {
-      "name": "AI智能体",
-      "net": -6.75,
-      "net_5d": 99.76,
-      "net_20d": 254.48,
-      "net_60d": 202.04,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 5,
-      "net_10d": 105.86,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 31
-    },
-    {
-      "name": "次新股",
-      "net": -6.44,
-      "net_5d": 47.16,
-      "net_20d": -21.05,
-      "net_60d": 57.6,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 5,
-      "net_10d": 102.27,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 32
-    },
-    {
-      "name": "DeepSeek概念",
-      "net": -7.13,
-      "net_5d": 31.35,
-      "net_20d": -16.32,
-      "net_60d": 57.49,
-      "type": "概念",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 5,
-      "net_10d": 98.79,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 38
     }
   ],
   "trend_20d": [
@@ -1578,6 +1504,21 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 43
+    },
+    {
+      "name": "第三代半导体",
+      "net": -12.47,
+      "net_5d": 24.44,
+      "net_20d": 610.1,
+      "net_60d": 656.01,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 387.56,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 37
     },
     {
       "name": "光纤概念",
@@ -1728,24 +1669,41 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 46
-    },
-    {
-      "name": "AI智能体",
-      "net": -6.75,
-      "net_5d": 99.76,
-      "net_20d": 254.48,
-      "net_60d": 202.04,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 5,
-      "net_10d": 105.86,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 31
     }
   ],
   "trend_60d": [
+    {
+      "name": "电池",
+      "net": 12.51,
+      "net_5d": -13.97,
+      "net_20d": -169.45,
+      "type": "行业",
+      "net_10d": 96.41,
+      "net_10d_days": 10,
+      "net_60d": 2338.27,
+      "net_60d_days": 49,
+      "source": "本地累加",
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_5d_days": 44,
+      "net_20d_days": 44
+    },
+    {
+      "name": "房地产",
+      "net": 25.11,
+      "net_5d": 25.86,
+      "net_20d": 205.22,
+      "type": "行业",
+      "net_10d": 242.32,
+      "net_10d_days": 10,
+      "net_60d": 1611.16,
+      "net_60d_days": 49,
+      "source": "本地累加",
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_5d_days": 42,
+      "net_20d_days": 42
+    },
     {
       "name": "通信设备",
       "net": 7.4,
@@ -1852,6 +1810,21 @@
       "net_60d_days": 42
     },
     {
+      "name": "第三代半导体",
+      "net": -12.47,
+      "net_5d": 24.44,
+      "net_20d": 610.1,
+      "net_60d": 656.01,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": 387.56,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 37
+    },
+    {
       "name": "先进封装",
       "net": -20.08,
       "net_5d": -100.79,
@@ -1880,51 +1853,6 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 45
-    },
-    {
-      "name": "汽车芯片",
-      "net": -6.5,
-      "net_5d": 29.34,
-      "net_20d": 260.09,
-      "net_60d": 562.19,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
-      "net_5d_days": 5,
-      "net_10d": 410.98,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 34
-    },
-    {
-      "name": "通信网络设备及器件",
-      "net": 11.46,
-      "net_5d": -117.28,
-      "net_20d": 62.51,
-      "net_60d": 558.74,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": -47.09,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 43
-    },
-    {
-      "name": "光纤概念",
-      "net": 6.48,
-      "net_5d": -220.81,
-      "net_20d": 377.31,
-      "net_60d": 558.37,
-      "type": "概念",
-      "consecutive_days": 2,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": -211.99,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 44
     }
   ]
 }

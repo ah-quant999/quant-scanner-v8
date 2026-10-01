@@ -1,52 +1,52 @@
 {
-  "update_time": "2026-09-30 22:49:47",
+  "update_time": "2026-10-01 09:13:35",
   "suspended": [
     {
       "code": "200706",
       "name": "瓦轴B",
-      "days": 212,
+      "days": 213,
       "reason": "刊登重要公告"
     },
     {
       "code": "002731",
       "name": "*ST萃华",
-      "days": 29,
+      "days": 30,
       "reason": "未如期刊登定期报告"
     },
     {
       "code": "200016",
       "name": "*ST康佳B",
-      "days": 26,
+      "days": 27,
       "reason": "刊登重要公告"
     },
     {
       "code": "000016",
       "name": "*ST康佳A",
-      "days": 26,
+      "days": 27,
       "reason": "刊登重要公告"
     },
     {
       "code": "688496",
       "name": "*ST清越",
-      "days": 19,
+      "days": 20,
       "reason": "刊登重要公告"
     },
     {
       "code": "601198",
       "name": "东兴证券",
-      "days": 15,
+      "days": 16,
       "reason": "刊登重要公告"
-    },
-    {
-      "code": "603400",
-      "name": "华之杰",
-      "days": 15,
-      "reason": "拟筹划重大资产重组"
     },
     {
       "code": "601059",
       "name": "信达证券",
-      "days": 15,
+      "days": 16,
+      "reason": "刊登重要公告"
+    },
+    {
+      "code": "300082",
+      "name": "奥克股份",
+      "days": 10,
       "reason": "刊登重要公告"
     }
   ],
