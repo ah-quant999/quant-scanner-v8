@@ -572,7 +572,7 @@ def walk_raw():
 
 
 _TS_KEYS = ("update_time", "gen_time", "calc_time", "run_time",
-            "fetch_time", "snapshot_time")
+            "fetch_time", "snapshot_time", "last_time")
 
 
 def _blob_sha(content: bytes) -> str:
@@ -587,7 +587,7 @@ def _blob_sha(content: bytes) -> str:
 #   故用正则扫描头部字节兜底，仍能命中顶层时间戳（v8 所有 raw_data JSON 的
 #   update_time 均在文件头部，截断不影响）。
 _TS_RE = re.compile(
-    rb'"(?:update_time|gen_time|calc_time|run_time|fetch_time|snapshot_time)"'
+    rb'"(?:update_time|gen_time|calc_time|run_time|fetch_time|snapshot_time|last_time)"'
     rb'\s*:\s*"(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2})')
 
 def _content_ts(content: bytes):

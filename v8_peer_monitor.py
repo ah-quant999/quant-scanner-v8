@@ -606,6 +606,12 @@ def handle_side(side, status, silent_min, hb_last, detail, peer_name, kind):
                  （她本身不是兜底对象，dispatch 主链也救不了她的心跳）
 
     返回 exit code（0=正常/静默自愈，1=已确认异常）。"""
+    if status == "holiday-skip":
+        # 🔴 2026-10-01（item peer-monitor-holiday-silence-false-down）：休市日心跳
+        # 本就不重建 ⇒ 沉默分钟数随假期增长必击穿阈值。显式跳过，与 alive/down 可区分。
+        log(f"📅 {peer_name}今日休市（v8_date 口径）→ 心跳判活豁免，不告警不派发")
+        return 0
+
     if status == "alive":
         log(f"✅ {peer_name}正常（最近心跳 {silent_min:.0f} 分钟前） | {detail}")
         reset_consec_counter(side)
@@ -723,6 +729,21 @@ def main():
 
     status, silent_min, hb_last, detail = check_peer_alive(fetched=fetched)
     al_status, al_silent, al_last, al_detail = check_alimi_alive(fetched=fetched)
+
+    # 🔴 2026-10-01 交易日豁免（item peer-monitor-holiday-silence-false-down）：
+    # HB_XIAOJIU/HB_ALIMI 仅盘中/盘后档重建（update_v8: "intraday,post_close"），
+    # 休市日恒不重建 ⇒ 日历分钟沉默数随假期线性增长 ⇒ 阈值必被击穿 ⇒ 假期每天误判 down。
+    # 今天非交易日（v8_date 权威口径，禁再增硬编码节假日表）时两侧改判 holiday-skip。
+    try:
+        import v8_date as _v8d
+        _is_holiday = not _v8d.is_trading_day(_v8d.now_cst().date())
+    except Exception as _e:
+        log(f"  ⚠️ 交易日判定不可用（保守按交易日处理）: {type(_e).__name__} {_e}")
+        _is_holiday = False
+    if _is_holiday:
+        log("📅 今日非交易日 → 心跳判活豁免（holiday-skip）")
+        status = "holiday-skip"
+        al_status = "holiday-skip"
 
     # [4] 无论结论如何，先落自证（含两侧判定）
     run_ctx = {

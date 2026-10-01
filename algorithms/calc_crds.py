@@ -1278,7 +1278,7 @@ def calc_crds():
     print(f"  关注级(一项满足):  {len(watch_l)} 只")
 
     # 数据日期：用于给每只股票打 enter_date，前端「M-D已入仓」胶囊依据。
-    data_date = datetime.now().strftime("%Y-%m-%d")
+    data_date = str(v8_date.today_data_date())[:10]  # 🔴 2026-10-01 休市日回退上一交易日（v8_date 权威口径），禁裸 now()（item algo-artifact-date-naked-now）
 
     # 5. 输出
     _elapsed = time.monotonic() - _t0

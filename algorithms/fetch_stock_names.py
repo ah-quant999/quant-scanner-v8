@@ -203,12 +203,12 @@ def _fetch_etf_stocks():
         import akshare as ak
     except Exception as e:
         print(f"  ⚠️ akshare 未安装，跳过 ETF: {e}")
-        return []
+        return None
     try:
         df = ak.fund_etf_spot_em()
         if df is None or df.empty:
             print("  ⚠️ ETF 无数据")
-            return []
+            return None
         result = []
         for _, row in df.iterrows():
             code = str(row.get("代码", "")).strip()
@@ -221,7 +221,7 @@ def _fetch_etf_stocks():
         return result
     except Exception as e:
         print(f"  ⚠️ ETF 获取失败: {type(e).__name__} {str(e)[:60]}")
-        return []
+        return None
 
 
 def main():
@@ -269,6 +269,25 @@ def main():
     # ── ETF ──
     time.sleep(1)
     etf_stocks = _fetch_etf_stocks()
+    if not etf_stocks:
+        # 🔴 2026-10-01 失败不覆盖护栏（item stock-universe-etf-silent-drop-0926）：
+        # 旧逻辑 ETF 抓取失败返回空列表时主流程照常写盘 ⇒ 一次源故障即把上一版
+        # ETF 全量(约1620只)静默清零（09-21 起固化 5 天未自愈的根因；
+        # 且 8027 只 > 4000 兜底阈值，<4000 补全分支永远救不了）。
+        # 现改为：失败(None/空)时沿用旧文件中的 ETF 条目（真值非编造）并打显式告警。
+        try:
+            with open(OUTPUT, "r", encoding="utf-8") as _f:
+                _old_all = json.load(_f)
+            if isinstance(_old_all, dict):
+                _old_all = _old_all.get("data", _old_all)
+            _old_etf = [s for s in (_old_all or []) if isinstance(s, dict) and s.get("market") == "etf"]
+        except Exception:
+            _old_etf = []
+        if _old_etf:
+            print(f"  ::error title=v8-etf-fetch-fail::ETF 抓取失败/为空，沿用旧文件 {len(_old_etf)} 只（失败不覆盖）")
+            etf_stocks = _old_etf
+        else:
+            print("  ::error title=v8-etf-fetch-fail::ETF 抓取失败且旧文件无 ETF 段，本轮 ETF 将为空")
     if etf_stocks:
         seen = {s["code"] for s in all_stocks}
         for s in etf_stocks:
