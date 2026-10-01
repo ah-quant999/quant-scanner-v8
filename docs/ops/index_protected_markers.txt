@@ -119,3 +119,4 @@ const _slotJoined =|时窗胶囊根因修复（slots 字符数组归一化）变
 OVERSEAS_MARKETS|健康+16 / obs 组代表卡 id（亚太市场概览）|2026-10-01
 v8_algo_intraday_lite|运维自动化表+14 代表 workflow 名|2026-10-01
 TOP10_DAILY|最终推荐组胶囊填充代表卡 id|2026-10-01
+firstBoardAlertCard" class="card" style="margin-top:14px;margin-bottom:16px;background:#1a1d24;border:1px solid #2a2f3a;border-left:4px solid #fbbf24;border-radius:10px;">|连板梯队前哨卡浅黄左条+间距（2026-10-01 主人令 9363b7f808/9775c6681e，曾被 aaefd05ada 落后基线洗掉·须防再犯）|2026-10-01
