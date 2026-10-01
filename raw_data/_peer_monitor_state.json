@@ -1,7 +1,7 @@
 {
   "runner": "v8_peer_monitor",
   "host": "CAT",
-  "run_time": "2026-10-01 17:57:36",
+  "run_time": "2026-10-01 17:58:58",
   "threshold_min": 180,
   "interval_min": 63,
   "xiaoju": {
@@ -16,6 +16,6 @@
     "last_time": "",
     "detail": "fetch 失败"
   },
-  "verdict": "xj=False/al=unknown",
+  "verdict": "xj=holiday-skip/al=holiday-skip",
   "note": "本文件由 v8_peer_monitor 每轮运行覆盖写 ⇒ 「没告警」与「监控没在跑」可区分"
 }
