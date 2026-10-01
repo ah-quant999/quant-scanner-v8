@@ -14699,7 +14699,27 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
               + ' · 星档：score≥4.0⇒5★ / ≥3.2⇒4★ / ≥2.4⇒3★'
               + (rt.cov != null ? (' · 持有期覆盖 ' + Math.round(rt.cov * 100) + '%') : '')
               + (rt.maxN != null ? (' · 最大样本 ' + rt.maxN) : '');
-    var _badge = (typeof window.__betaDepHTML === 'function') ? window.__betaDepHTML(card) : '';
+    /* 🔴 2026-10-01 主人令「4.34四颗星、4.02五颗星，这逻辑就有问题！」：
+       实为 09-17 已批准的两道**封顶**在起作用（node 真实复算 data/BACKTEST_ALL_ALGOS.js：
+       四量终极 score 4.34 自然档 5★，但 T+1 胜率 49.3%<50% ⇒ 短周期惩罚封顶 4★；
+       强势跟踪 score 4.02，T+1 胜率 58.6% 不触发、样本 111≥100 不封顶 ⇒ 5★）。
+       算法不动（「一个事实只扣一次」设计不变），但 tooltip 原先只写「星档」不写
+       「封顶」，字面上自相矛盾、像 bug ⇒ 现把封顶原因显式写进 tooltip 并加
+       「封顶」小角标，星级一眼可解释。 */
+    var _capWhy = (rt.penal && rt.penalWhy)
+      ? ('短周期惩罚：' + rt.penalWhy + ' ⇒ 封顶 ' + rt.stars + '★（短期胜率不过半，输给随机不配满分）')
+      : (rt.nCapped
+          ? ('样本量封顶：最大样本 ' + rt.maxN + ' < 100 ⇒ 封顶 ' + rt.stars + '★（证据强度不足以支撑满分）')
+          : '');
+    if(_capWhy) _tips += ' · ' + _capWhy;
+    var _capBadge = _capWhy
+      ? '<span title="' + String(_capWhy).replace(/"/g, '&quot;')
+        + '" style="margin-left:5px;padding:0 5px;border-radius:7px;font-size:9.5px;font-weight:600;'
+        + 'color:#94a3b8;background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.3);'
+        + 'white-space:nowrap;cursor:help;vertical-align:1px;">封顶</span>'
+      : '';
+    var _badge = _capBadge
+               + ((typeof window.__betaDepHTML === 'function') ? window.__betaDepHTML(card) : '');
     return '<span style="color:#fbbf24;font-size:12px;letter-spacing:1px;" title="'
          + String(_tips).replace(/"/g, '&quot;') + '">'+s+'</span>' + _badge;
   };
