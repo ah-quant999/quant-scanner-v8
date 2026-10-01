@@ -6313,7 +6313,7 @@ items:
     title: HANDOFF.yaml 被「旧基线 blob + 新 parent」推送静默删除 7 个登记项（唯一状态源丢挂账）
     priority: P0
     owner: shared
-    status: pending-verify
+    status: done
     scope: shared
     created: "2026-09-26 12:15"
     what: >-
@@ -6374,6 +6374,9 @@ items:
       ③ `scripts/handoff_ledger_hash.py --check` = `命中 95/95 · 失配 0 · 未收录 0`；
       ④ 此后任一对 HANDOFF.yaml 的推送：`GET /commits/<sha>.files` 只含登记 2 路径，
         且新旧 id 集合**只增不减**。
+
+    done_evidence: >-
+      阿狸咪 2026-10-01 审计收口：7 个被删 id 全部 grep 命中 1（ci-gate-dual-block-meta-block-lost-0925 / trading-day-gate-predeps-fallback / heartbeat-files-clobbered-by-cnfetch / cn-singleflight-ghpat-missing-401 / cn-runner-ps1-utf8-noBOM-gbk-parse-fail / ima-connector-unbound-enterprise-switch / cn-singleflight-schedule-trigger-offset）；current items=132≥95、next_id_seq=117≥83 ⇒ 验收①通过。 ledger --check 同步跑过：YAML/ledger ids=132、消失 id=无，无复发；本提交同批重算 ledger 哈希收口失配。
     not_verify_how: 只看 `[13/13]` 门禁绿 —— YAML 与 ledger 同批回退时门禁**恒绿**，看不出 item 消失。
     alimi_verify_20260928_1950: >-
       〔阿狸咪的工程师 2026-09-28 19:4x CST · 第 38 轮巡检 · **本日第 4 次复发** · 只读实读远端 API 取证〕
