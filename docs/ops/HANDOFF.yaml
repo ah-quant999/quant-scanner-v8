@@ -7620,7 +7620,7 @@ items:
     priority: P0
     owner: 阿狸咪的工程师
     status: done
-    what: A+B 进一步根治评分维度偏重/双重计数——A: 形态权重×0.7 压动能集中日 form 间歇性独大；B: 池内质量×0.5 去双重计数(金股池进池已筛 ROE/营收/中报，评分再算=重复计价)。最终质量排序分=原始×0.25。
+    what: A+B 进一步根治评分维度偏重/双重计数——A·形态权重×0.7 压动能集中日 form 间歇性独大；B·池内质量×0.5 去双重计数(金股池进池已筛 ROE/营收/中报，评分再算=重复计价)。最终质量排序分=原始×0.25。
     fix: algorithms/generate_top10.py 加 FORM_WEIGHT=0.7/POOL_QUALITY_WEIGHT=0.5 常量；raw_total 的 form_score 乘 FORM_WEIGHT；quality_effective 再乘 POOL_QUALITY_WEIGHT。重跑生成器+转 TOP10_DAILY.js(commit 2cb6041b6d)。
     verify_how: 回测 replay_ab.py(41交易日)：A+B最优(0.7,0.5) TOP5前向-0.32%/胜46.8%/t=-0.63 vs 基线-0.85%/44.4%/-1.73；TOP10 -0.29%/44.1%/-0.75 vs -0.81%/43.2%/-2.22；form%6.3/qual%10.4 无独大。远端榜单 update_time=2026-10-01 12:30，#1 湖南裕能质量分0.0，旧霸榜股全跌出 TOP10；代码含常量2处。
     refs:
@@ -7635,7 +7635,8 @@ items:
     what: C 类评分升级——form 横截面中性化(rank 零中心±4, 治趋势日全员齐 6 分量纲膨胀) + 机构分 IC 加权×2(rank IC +0.116/ICIR0.435/IC>0 76.5% 为全维最强而原权重仅 2.3%)。IC 诊断同时证实 quality 头部内 IC≈0(去双重计数正确)、backtest 头部内 IC 负但去除反显著变差(t-2.06)故不动。
     fix: generate_top10.py 加 INST_WEIGHT=2.0/FORM_NEUT_SCALE=4.0 + rank_neutralize()；raw_total 拆 _raw_noform+form，循环后全候选 rank 中性化重算 total(与 gate/regime 口径一致)，breakdown.form/inst 展示有效值。commits ec49076a1c(代码+FINAL)+ed6097cbf5(TOP10_DAILY 补转)。
     verify_how: 回测 replay_v2.py(42日)：N4+I2 TOP5 前向 +0.23%/胜48.1%/t+0.43 唯一转正 vs 基线 -0.47%/46.7%/-0.92；TOP10 -0.37% vs -0.31%(差 0.06pp 不显著)。远端 TOP10 ut=12:55 form=0.05(并列中性化生效)、FINAL ut=12:57 top5=湖南裕能/金安国纪/工业富联/中国巨石/000725(中国巨石 inst=6 加权受益升至#4)。
-    refs:/n      - "algorithms/generate_top10.py"
+    refs:
+      - "algorithms/generate_top10.py"
       - "data/TOP10_DAILY.js"
       - "data/FINAL_RECOMMEND_DATA.js"
     updated: "2026-10-01 13:00"
