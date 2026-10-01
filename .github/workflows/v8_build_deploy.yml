@@ -318,6 +318,7 @@ jobs:
           echo "✅ 层B标注存在：盘中不刷新档位卡已如实标注，未回退"
 
       - name: "📤 部署到 main（GitHub Pages 源）"
+        timeout-minutes: 30
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # ★ 2026-08-15 根治 build clobber：update_v8.py 的 ?v 计算需 GITHUB_TOKEN 才能
