@@ -7681,3 +7681,16 @@ items:
       - "index.html"
     updated: "2026-10-01 15:45"
     updated_by: 阿狸咪的工程师
+  - id: namefix-10cards-restore-1001
+    priority: P0
+    owner: 阿狸咪的工程师
+    status: done
+    what: 主人反馈第 12/13 名股票名仍错（000039 中国北大荒 / 000725 名码退化）——审计发现 13:41 错名修复(308d6a3288) 涉及的 10 张 data js 全部被 13:49/14:01/14:19 三轮 post_close build 用仓库旧 raw json 洗回错名旧版；且 15:2x 恢复 TOP10 时误用了 13:09 blob（错名修复前基线），属恢复选基线失误。
+    fix: commit 32ebc034df 一次提交全量恢复 10 卡 js(13:41 修复 blob) + 对应 raw json(从 blob 无损反解去 republish_time)——ALGO_TRACK/CANDIDATE/CRDS_CARD_DATA/FINAL_RECOMMEND_DATA/FOUR_VOLUME_HISTORY/FOUR_VOLUME_TRACK/GOLD_POOL/TOP10_DAILY/TRIPLE_HISTORY/V8_POOL_TRACKER 共 20 文件。GOLD_POOL 反解 json 缺 stocks.history 日明细（lite 裁剪有损，latest 保留，开市后盘后批自动重建完整）。
+    verify_how: 推前断言 TOP10 第12名=000039 中集集团/第13名=000725 京东方A；两次 422 竞争重试后快进成功；3 分钟后复查 9/9 blob 对齐未被再洗；线上抓站终验榜 ut=13:07:04 第12/13名=中集集团/京东方A、Top5=湖南裕能池、GOLD_POOL ut=09:09:13。教训——错名/评分类修复若涉及多卡，必须当轮 js+raw json 同批推，漏一张 raw 下轮 build 必洗回。
+    refs:
+      - "data/TOP10_DAILY.js"
+      - "algorithms/name_utils.py"
+      - "update_v8.py"
+    updated: "2026-10-01 16:00"
+    updated_by: 阿狸咪的工程师
