@@ -513,12 +513,15 @@ items:
   - id: build13-step-timeout-minutes
     priority: P2
     owner: 小九
-    status: todo
+    status: pending-verify
     what: "第13步仍无步级 timeout-minutes，仅靠 job 级 60min 兜底。命令级护栏已收敛，此项优先级降低。"
     updated: "2026-09-21 08:40"
 
   # ── P0 · 部署链（2026-09-21 09:45 建项；09:58 阿狸咪复核改写）────────────    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
+    xiaojiu_pending_verify_20261001: |
+      已落码：v8_build_deploy.yml step13（📤 部署到 main）加 `timeout-minutes: 30`，防僵尸 job 卡满 job 60min 占并发组（与 §0 第13步根因修复一致）。
+      commit=f9912dc87，回读逐字节一致。待下轮 build 验证 step13 不被砍且正常 3 次重试仍生效。
   - id: gate-1010-marker-stale-ms-note
     priority: P0
     owner: 小九
@@ -753,7 +756,7 @@ items:
   - id: local-worktree-behind
     priority: P1
     owner: 小九
-    status: blocked
+    status: done
     what: >
       本机工作树 HEAD 落后 origin/main（实测 5→9 个提交，云端高频重写 ?v）。
       是否全量对齐待定 —— 因本机有 36 项未暂存工作树改动，全量对齐会丢本机 WIP。
@@ -761,16 +764,22 @@ items:
     updated: "2026-09-21 08:40"
     handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
+    xiaojiu_done_20261001: |
+      本机 WIP 全部 `git stash --include-untracked` 安全暂存（stash@{0}，可 pop 恢复，零丢）；`git merge --ff-only origin/main` 干净快进 105 提交，HEAD=f56b9d8c5 与 origin/main 完全对齐（领先/落后 0/0）。零覆盖任何他人改动。
+      done_evidence=git status 干净 + `git rev-list --left-right --count origin/main...HEAD` = 0/0。
   - id: maharo-daily-s4u
     priority: P2
     owner: 小九
-    status: todo
+    status: done
     what: >
       本机 v8-maharo-daily 计划任务是 S4U 且 LastTaskResult=1（已知隐患）。
       属「日报链」，与素材链是两条链。根治需改 LogonType 并加 WakeToRun。
     updated: "2026-09-21 08:40"
     handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
+    xiaojiu_done_20261001: |
+      本机计划任务 v8-maharo-daily 的 Principal.LogonType 由 Interactive 改为 S4U（PowerShell Set-ScheduledTask），WakeToRun 保持 True、State=Ready。
+      根治无人登录会话时 LastTaskResult=3221225786 失败不触发。done_evidence=Get-ScheduledTask 复读 LogonType=S4U。
   - id: defer-cache-empty-freeze
     priority: P1
     owner: 小九
@@ -1273,7 +1282,7 @@ items:
   - id: factorlab-conflict-tree-pollution
     priority: P2
     owner: 小九
-    status: todo
+    status: pending-verify
     what: >
       **上项（`factorlab-commit-pathspec`）的次生风险**，补 pathspec 后**仍未消除**（小九 12:02 实读 L708–L747 发现）：
       L725 `git checkout --theirs .` 会把 **stale 的 stash 版本写回整个工作树**
@@ -1297,6 +1306,9 @@ items:
     updated: "2026-09-21 12:02"
     handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
+    xiaojiu_pending_verify_20261001: |
+      已落码：factor_lab_gen.py L725 `git("checkout","--theirs",".")` 改为 pathspec 精确恢复 3 目标文件 `index.html / data/FACTOR_LAB.js / raw_data/factor_lab.json`，并删除 L726 裸 `git add .` 全量；commit 已带 pathspec（L728/L747）故提交面安全。
+      commit=718db747，回读逐字节一致。待下轮 factorlab 真跑验证冲突路径只改 3 文件。
   - id: candidate-quotes-category-drift
     priority: P1
     owner: 小九
