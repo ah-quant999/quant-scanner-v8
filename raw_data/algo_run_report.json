@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-10-01 16:02:29",
-  "run_start": "2026-10-01 15:32:02",
-  "ok": 26,
+  "update_time": "2026-10-02 00:08:07",
+  "run_start": "2026-10-01 23:42:46",
+  "ok": 10,
   "fail": 1,
   "failed_scripts": [
     {
-      "script": "gen_algo_track.py",
-      "reason": "退出码 1 | NameError: name '_extract_four_volume' is not defined. Did you mean: '_extract_from_four_volume'?"
+      "script": "v8/fetch_citic_pe.py",
+      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
     }
   ],
   "skipped_by_time_gate": []
