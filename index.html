@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "30a9c695c9";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "a0a519621e";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -629,7 +629,7 @@ window.__domReadyFns=[];
     <script src="data/MACRO_BRIEF.js?v=ee48faedcd" defer></script>
     <!-- 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役（巡检自动化已消亡、09-23 后死数据；生产者/渲染/派发/时窗一并清理，见 git 历史） -->
     <script src="data/NT_DATA.js?v=30fa05cf46" defer></script>
-<script src="data/LHB_DATA.js?v=a0c0034dac" defer></script>
+<script src="data/LHB_DATA.js?v=d06092c20d" defer></script>
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
@@ -639,7 +639,7 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=c147167462" defer></script>
 <script src="data/MARGIN_DATA.js?v=fd6c7a3432" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=ab0f4dedcd" defer></script>
-<script src="data/IPO_DATA.js?v=f42feeaed1" defer></script>
+<script src="data/IPO_DATA.js?v=40ffdd73f8" defer></script>
     <script src="data/CRISIS_DATA.js?v=b00ed2bf27" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=964bb34288" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=aca7beeb2e" defer></script>
@@ -674,14 +674,14 @@ window.__domReadyFns=[];
         <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=e3a7ece37a" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
-    <script src="data/RISK_GAUGE.js?v=7ed859bfce" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
+    <script src="data/RISK_GAUGE.js?v=1be246bf2f" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=672f268af1" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=3869309c83" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
     <!-- 2026-09-13 阿狸咪的工程师：补注入 FRESHNESS_STATUS（2.7 KB）。
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=22d734e624" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=32a7d22286" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=2983aeb095" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1764,7 +1764,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      故不再注入 AI_INSIGHTS_COMPARE 数据文件（文件本身连同 fetcher 一并从仓库删除）。 -->
 <script src="data/WAVE_ELLIOTT.js?v=85af8a8bca" defer></script>
 <script src="data/SZ_FIB.js?v=45f116001c" defer></script>
-<script src="data/SECTOR_RS.js?v=71c571f529" defer></script>
+<script src="data/SECTOR_RS.js?v=a384ed4b51" defer></script>
 <script src="data/SECTOR_PHASE_HISTORY.js?v=d6964b1002" defer></script>
 <script src="data/INST_TRADE.js?v=7086e2b9a0" defer></script>
 <script src="data/NORTH_FUND.js?v=ce5c54445f" defer></script>
@@ -1790,18 +1790,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/FOUR_VOLUME_TRACK.js?v=e881e784cf" defer></script>
     <script src="data/FOUR_VOLUME_HISTORY.js?v=0b5855e9ca" defer></script>
     <script src="data/STOCK_STOP_DATA.js?v=6bc86c4db5" defer></script>
-<script src="data/BACKTEST_COMPREHENSIVE.js?v=d0c42361be" defer></script>
-<script src="data/BACKTEST_TDX.js?v=e87976a15c" defer></script>
+<script src="data/BACKTEST_COMPREHENSIVE.js?v=0b429ce444" defer></script>
+<script src="data/BACKTEST_TDX.js?v=b17231b4cc" defer></script>
 
-<script src="data/OPTIMIZED_STRATEGY.js?v=d9e930a5dd" defer></script>
+<script src="data/OPTIMIZED_STRATEGY.js?v=4a2d6a7b99" defer></script>
 <script src="data/EXPERIMENT.js?v=4f9fc884d2" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=bf189c9922" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=b851a8ed88" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=a44d91547d" defer></script>
-    <script src="data/FACTOR_LAB_BACKTEST.js?v=3fafe67ec2" defer></script>
+    <script src="data/FACTOR_LAB_BACKTEST.js?v=493152a29a" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
-<script src="data/BACKTEST_ALL_ALGOS.js?v=3b229464d7" defer></script>
+<script src="data/BACKTEST_ALL_ALGOS.js?v=a856816692" defer></script>
 <!-- 🔴 2026-09-14 主人令：「金股池和候选股池是算法的上游水源，不是策略，不需要回测！」
      原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
@@ -1814,18 +1814,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/ALGO_TRACK.js?v=c6f99b2b49" defer></script>
 <script src="data/ETF_PULSE.js?v=5b8784c64c" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=b359cf490f" defer></script>
-<script src="data/TOP10_DAILY.js?v=d84e827536" defer></script>
+<script src="data/TOP10_DAILY.js?v=a506440ece" defer></script>
 <script src="data/WEEKEND_RUN.js?v=a9ab23cb8d" defer></script>
 <script src="data/W52_HIGH.js?v=24e0b78cf9" defer></script>
 <!-- 2026-08-30：盘后数据页新增解禁日历 + 业绩预告 -->
 <script src="data/RESTRICTED_RELEASE.js?v=3568886414" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=9100031740" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=07052300c4" defer></script>
-<script src="data/HB_XIAOJIU.js?v=5cf72a74c3" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=daf0dd8da2" defer></script>
-<script src="data/HEALTH_CHECK.js?v=de0b3196af" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=f18a38ef26" defer></script>
+<script src="data/RUNNER_STATUS.js?v=61be5bdb8e" defer></script>
+<script src="data/HB_XIAOJIU.js?v=5fd3af44c2" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=bb297acf38" defer></script>
+<script src="data/HEALTH_CHECK.js?v=e53d07ad6b" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=b3e6a6aa17" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=d951dc57ee" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=af39386104" defer></script>
@@ -1838,16 +1838,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 🆕 2026-09-19 主人令（阿狸咪的工程师）：walk-forward 真值（verdict / IR_OOS / 跑赢基准率），
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
-    <script src="data/FACTOR_WALKFORWARD.js?v=dfd3778f61" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=c08df93fce" defer></script>
+    <script src="data/FACTOR_WALKFORWARD.js?v=4c3fdcc229" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=4a140e0580" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=d4a24f514a" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=f4b0add5cb" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=6f3c7b42e2" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=a04aaceea5" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=82bf835011" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=286ce2bbc1" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/FOUR_VOLUME_BACKTEST.js?v=1cdd4ac36d" defer></script>
-    <script src="data/IMA_STRONG_BACKTEST.js?v=518fc18119" defer></script>
-    <script src="data/CRDS_BACKTEST.js?v=e115e2c925" defer></script>
+    <script src="data/FOUR_VOLUME_BACKTEST.js?v=d3453afafe" defer></script>
+    <script src="data/IMA_STRONG_BACKTEST.js?v=98e5a2274d" defer></script>
+    <script src="data/CRDS_BACKTEST.js?v=6967c81458" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -8030,13 +8030,8 @@ function fmtSigned(v){
     dst.innerHTML = ''
       + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
       + '<b style="font-size:15px;">&#x1F52E; AI 洞察·多源观点对比</b>'
-      // 🛡 2026-10-01 主人令：「日更」频率徽章紧贴「更新于」胶囊。
-      //   原实现把 sub 说明（MAHORO_INSIGHTS 聚合 … 源）作为 _uBadge 的第 4 参，
-      //   sub 会插在胶囊之后 ⇒ 频率徽章被顶到下一行（主人截图：胶囊在标题行、徽章掉到第三行）。
-      //   修法：_uBadge 不再传 sub，频率徽章紧随胶囊，sub 说明后置到行尾（同 flex 行，wrap 兜底）。
-      + _uBadge('auto', '中长线', M.update_time)
+      + _uBadge('auto', '中长线', M.update_time, 'MAHORO_INSIGHTS 聚合 ' + srcN + ' 源 · AI 阅读后撰写')
       + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#8b5cf6;background:rgba(139,92,246,.16);border:1px solid rgba(139,92,246,.4);letter-spacing:.5px;">&#x1F4C6; 日更 · 盘前 08:50 / 午间 12:30 / 盘后 15:10</span>'
-      + '<span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">MAHORO_INSIGHTS 聚合 ' + srcN + ' 源 · AI 阅读后撰写</span>'
       + '</div>'
       // 核心 / 解析（2026-09-15 主人令：口径由「统计」改为「实情解析」）
       + '<div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.22);border-radius:7px;padding:8px 12px;margin-bottom:10px;line-height:1.7;">'
@@ -8587,6 +8582,21 @@ window.__renderIndexObserve = function(){
         <tr><td>v8_health_patrol</td><td>每小时 :08/:38</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>数据健康巡检 + 自愈（v8_health_check.py --heal）；陈旧阈值 2026-09-10 由 6 分调为 30 分</td></tr>
         <tr><td>v8_algo_cloud</td><td>16:40/18:10/20:00/21:00(+22:30/00:30/06:00/08:00)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产（选股四模块+回测）</td></tr>
         <tr><td>v8_backup</td><td>每日23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data / 交接文档（含 v6 备份保留策略：v8 稳定一周前不删）</td></tr>
+        <!-- ✅ 2026-10-01 主人令「全面审计」：14 条有 cron 但此前漏登记的 workflow 补齐（周期均按 yml cron 实测换算 CST） -->
+        <tr><td>v8_algo_intraday_lite</td><td>工作日 09:00/11:00/13:00/15:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>盘中/隔夜 Lite 算法链：算法追踪(ALGO_TRACK)+健康面板刷新</td></tr>
+        <tr><td>v8_ima_strong_stock</td><td>工作日 15:45</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>ima 强势股自动同步（强势跟踪卡水源 · 三道防回归锁）</td></tr>
+        <tr><td>v8_lhb_fetch</td><td>工作日 17:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>龙虎榜 fetcher（cn runner · 共振日历水源）</td></tr>
+        <tr><td>v8_dajijin_fetch</td><td>工作日 20:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>大基金增减持 fetcher（cn runner · 暂未上架·观测类）</td></tr>
+        <tr><td>v8_cn_fetch_cloud_hosted</td><td>工作日 20:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>中国数据抓取（云端 hosted 兜底）</td></tr>
+        <tr><td>v8_cn_fetch_experiments</td><td>工作日 16:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>实验卡数据抓取（暂未上架区）</td></tr>
+        <tr><td>v8_stock_quote_refresh</td><td>工作日 09:00-16:00 每30分</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>个股行情轻量刷新（STOCK_QUOTE）</td></tr>
+        <tr><td>v8_risk_gauge</td><td>工作日 盘中每30分+盘后每小时</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>实时风险温度计（RISK_GAUGE）</td></tr>
+        <tr><td>v8_daily_audit</td><td>每日 22:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>每日全站审核（22:30 备份前）</td></tr>
+        <tr><td>v8_t1_guard</td><td>周六 08:30/09:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>T+1 守门（8:30 兜底 + 9:30 巡检）</td></tr>
+        <tr><td>v8_weekend_light</td><td>周六/日 19:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>周末轻量维护（元数据巡检+重部署）</td></tr>
+        <tr><td>v8_cache_buster_reconcile</td><td>每 15 分</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>缓存戳实时对齐（防覆盖对账）</td></tr>
+        <tr><td>v8_cleanup</td><td>周日 23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>云端周日清理</td></tr>
+        <tr><td>cloud_weekly_cleanup</td><td>周六 21:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>云端每周清理</td></tr>
         <tr><td>runner_health_alert</td><td>工作日 13/15/17/19/21 点 · 周末 08-20 点每 2h</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>lemoncat-cn runner 离线告警 + 自动恢复关闭 Issue</td></tr>
         <tr><td>小九-v8云端管线看门狗</td><td>08-22每小时</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>只监督、不部署、不抢跑</td></tr>
         
@@ -8654,7 +8664,7 @@ window.__renderIndexObserve = function(){
 
     <!-- 2026-09-30 阿狸咪：连板梯队前哨卡（一进二前哨 + 二进三观察 · 仅暂未上架实验区可见） -->
     <script src="data/FIRST_BOARD_ALERT.js?v=a7a625d30e" defer></script>
-    <div id="firstBoardAlertCard" class="card" style="margin-top:14px;margin-bottom:16px;background:#1a1d24;border:1px solid #2a2f3a;border-left:4px solid #fbbf24;border-radius:10px;">
+    <div id="firstBoardAlertCard" class="card" style="margin-top:14px;background:#1a1d24;border:1px solid #2a2f3a;border-radius:10px;">
       <div style="padding:10px 12px;font-weight:700;color:#e6e9ef;border-bottom:1px solid #2a2f3a;">🔭 连板梯队前哨 <span style="font-size:11px;color:#8a93a6;font-weight:400;">一进二前哨 · 二进三观察 · 量比≥3</span> <span id="fbaUpd"></span></div>
       <div style="padding:6px 12px 0;font-size:12px;line-height:1.7;color:#8a93a6;"><b style="color:#fbbf24;">&#x1F4CC; 核心：</b>首板放量&#8805;3倍=资金启动信号（回测晋级率&#8776;16%）；二连板=高位接力临界点（晋级率&#8776;24%，但隔夜高开吃掉溢价）。<br><b style="color:#fbbf24;">&#x1F4A1; 用法：</b>盘后出名单，次日盘中确认非一字开盘、分时弱转强再介入；量比3~5倍是健康区，<b>不是越大越好</b>（&gt;8倍多为巨分歧）。<br><b style="color:#fbbf24;">&#x26A0; 限制：</b>盘后更新、非盘中实时；观察名单&#8800;买点；一字板买不进，ST已剔除。</div>
       <div id="fbaBody" style="padding:10px 12px;font-size:13px;color:#8a93a6;">加载中…</div>
@@ -10723,11 +10733,11 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=f42feeaed1"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=40ffdd73f8"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=f42feeaed1';
+        return 'data/IPO_DATA.js?v=40ffdd73f8';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
@@ -12504,7 +12514,7 @@ function drawUpDownChart(){
 
   const V8_PAGE_SCHEDULE = {
 
-    updated: '2026-09-22 05:30',
+    updated: '2026-10-01 09:10',
 
     source: 'GitHub Actions API + data/*.js 时间戳',
 
@@ -12515,6 +12525,19 @@ function drawUpDownChart(){
         id:'obs', icon:'🌍', name:'观测平台',
 
         cards:[
+
+          {name:'机构研究·AI解析', source:'maharo_insights', freq:'盘中+每日3档', slots:['08:50','12:30','15:10'], note:'AI 洞察对比同源'},
+
+          {name:'指数观测·四框架', source:'INDEX_VALUE_FRAMEWORK', freq:'每日盘前', slots:['07:10'], note:'宏观观测'},
+
+          {name:'艾略特波浪·深度分析', source:'WAVE_ELLIOTT', freq:'收盘后1次', slots:['19:15'], note:'大盘观测'},
+
+          {name:'中信PE热力', source:'CITIC_PE_THERMO', freq:'收盘后1次', slots:['19:15'], note:'大盘观测'},
+
+          {name:'斐波那契观测窗', source:'SH_FIB', freq:'收盘后1次', slots:['19:15'], note:'大盘观测'},
+
+          {name:'两融余额', source:'MARGIN_DATA', freq:'收盘后1次', slots:['16:15'], note:'交易所16:15发布'},
+
         ]
 
       },
@@ -12544,6 +12567,8 @@ function drawUpDownChart(){
         id:'rt', icon:'📡', name:'实时数据',
 
         cards:[
+
+          {name:'AI 市场速览', source:'AI_MARKET_BRIEF', freq:'盘中+每日3档', slots:['08:50','12:30','15:10'], note:'盘前/午间/盘后'},
 
           {name:'指数快览', source:'INDEX_QUOTES', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'核心指数'},
 
@@ -12623,9 +12648,11 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'最终推荐·Top5', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'聚合推荐'},
+          {name:'最终推荐·Top5', source:'TOP10_DAILY/FOUR_VOLUME', freq:'收盘后1次', slots:['19:15','20:15'], note:'聚合推荐+因子评分'},
 
           {name:'今日推荐候选池聚合', source:'CANDIDATE', freq:'收盘后1次', slots:['2','0',':','0','0'], note:'候选池聚合'},
+
+          {name:'因子实验室', source:'FACTOR_LAB', freq:'收盘后1次', slots:['19:15'], note:'非策略·加分项'},
 
         ]
 
@@ -12706,7 +12733,13 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'暂未上架模块索引', source:'UNLISTED_PANEL', freq:'手动策划', slots:['周','日'], note:'静态索引'}
+          {name:'暂未上架模块索引', source:'UNLISTED_PANEL', freq:'手动策划', slots:['周','日'], note:'静态索引'},
+
+          {name:'主升/启动板块·龙头股', source:'SECTOR_LEADERS', freq:'收盘后1次', slots:['21:45'], note:'观测类·板块龙头'},
+
+          {name:'连板梯队前哨', source:'FIRST_BOARD_ALERT', freq:'收盘后1次', slots:['23:30'], note:'一进二/二进三观察'},
+
+          {name:'大基金增减持监控', source:'DAJIJIN_REDUCTION', freq:'工作日20:30', slots:['20:30'], note:'观测类'}
 
           // 🗑 2026-09-30 主人令：宏观K型分层 条目随整卡退役删除
 
@@ -12729,13 +12762,21 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'中国数据抓取(v8_cn_fetch_cloud)', source:'RUNNER_STATUS', freq:'工作日cron·云端', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'核心数据管线'},
+          {name:'中国数据抓取(v8_cn_fetch_cloud)', source:'RUNNER_STATUS', freq:'工作日cron·云端', slots:['08:25','09:00','09:20','09:40','10:00','10:20','10:40','11:00','11:20','11:40','13:00','13:20','13:40','14:00','14:20','14:40','17:20','18:20','19:20'], note:'核心数据管线·真实cron节律'},
 
           {name:'盘后算法链(v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'8唤醒点', slots:['1','9',':','1','5'], note:'候选池/金股池/三重共识'},
 
           {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['0','9',':','0','0','|','1','7',':','0','0'], note:'完整性检查'},
 
-          {name:'运维常态巡检(v8_health_patrol)', source:'HEALTH_CHECK', freq:'每30分云端cron', slots:['00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'], note:'全站巡检+自愈'},
+          {name:'运维常态巡检(v8_health_patrol)', source:'HEALTH_CHECK', freq:'每30分云端cron', slots:['00:08','00:38','01:08','01:38','02:08','02:38','03:08','03:38','04:08','04:38','05:08','05:38','06:08','06:38','07:08','07:38','08:08','08:38','09:08','09:38','10:08','10:38','11:08','11:38','12:08','12:38','13:08','13:38','14:08','14:38','15:08','15:38','16:08','16:38','17:08','17:38','18:08','18:38','19:08','19:38','20:08','20:38','21:08','21:38','22:08','22:38','23:08','23:38'], note:'全站巡检+自愈'},
+
+          {name:'盘中/隔夜Lite算法链(v8_algo_intraday_lite)', source:'ALGO_TRACK', freq:'工作日·4唤醒点', slots:['09:00','11:00','13:00','15:00'], note:'算法追踪+健康面板'},
+
+          {name:'强势跟踪水源(v8_ima_strong_stock)', source:'IMA_STRONG_STOCK', freq:'工作日15:45', slots:['15:45'], note:'ima 短线情绪选股'},
+
+          {name:'龙虎榜抓取(v8_lhb_fetch)', source:'LHB_DATA', freq:'工作日17:30', slots:['17:30'], note:'共振日历水源'},
+
+          {name:'大基金增减持(v8_dajijin_fetch)', source:'DAJIJIN_REDUCTION', freq:'工作日20:30', slots:['20:30'], note:'暂未上架·观测类'},
 
           {name:'☁️持仓云端同步(westock)', source:'PORTFOLIO_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'实时持仓', sourceMissing:true},
 
@@ -12960,14 +13001,21 @@ function drawUpDownChart(){
         let cOk=0, cMiss=0, cPending=0;
 
         const isTradeDay = window._isAshareTradingDay && window._isAshareTradingDay(now);
-        const isMarketCard = /(盘中|工作日|cron|每日2次|收盘后)/i.test(c.freq || '');
+        const isMarketCard = /(盘中|工作日|cron|每日|收盘后|盘后|盘前|小时)/i.test(c.freq || '');
         const isWeekendSkipped = c.weekendUpdate === false;
 
         // 多 slot 卡（盘中+盘后 等）一劳永逸：只要 lastTs 落在任一槽位 ±60min 区间，整卡全部槽位都标 ✓
         //   否则盘中槽位无数据时被错误判 ✗（如候选池 lastTs=17:36 落在 19:15 区间但 15:30 槽 ✗ → 红边）
+        // 🛡 2026-10-01 主人令「全面审计·亮灯」一劳永逸根因修复（阿狸咪的工程师）：
+        //   矩阵大量行 slots 是**字符数组**（['0','8',':','2','5']）而 slotDate 按 '08:25' 整串解析、
+        //   全函数无 join 归一化 ⇒ 今日事件/盘后/共振/最终/选股/回测/暂未上架/运维算法链 等组的
+        //   时窗胶囊自上线起从未真正亮灯（只渲染灰字符碎片，✓/✗ 判定整体失灵）。
+        //   统一归一化：数组→join 成整串 → 再按 '|' 拆多槽；字符串行（rt/op patrol）原样兼容。
+        const _slotJoined = (c.slots || []).map(function(x){ return Array.isArray(x) ? x.join('') : String(x); }).join('');
+        const _slots = _slotJoined ? _slotJoined.split('|').filter(function(p){ return p !== ''; }) : [];
         let multiSlotAnyOk = false;
-        if(hasDataToday && c.slots.length > 1){
-          for(const s2 of c.slots){
+        if(hasDataToday && _slots.length > 1){
+          for(const s2 of _slots){
             const sd2 = slotDate(s2);
             if(!sd2) continue;
             const gs2 = new Date(sd2.getTime() - 60*60000);
@@ -12976,7 +13024,7 @@ function drawUpDownChart(){
           }
         }
 
-        c.slots.forEach(function(s){
+        _slots.forEach(function(s){
 
           const sd = slotDate(s);
 
@@ -13252,18 +13300,18 @@ function drawUpDownChart(){
   //   ⚠️ 维护判据：本表顺序须与 index.html 各 <section> 内 <h3> 从上到下一致。
   //      未列入的 id 自动按 it.order 排到本组末尾（防页面新卡在看板掉队）。
   const _PAGE_CARD_ORDER = {
-    '实时数据': ['INDEX_QUOTES','OVERSEAS_MARKETS','CFFEX_HOLDINGS','LIMIT_UP_HEATMAP','ETF_PULSE','MARKET_FUND_FLOW_DATA','COMMODITY_ELASTICITY','CONCEPT_RANKING','SECTOR_FUND_FLOW','ETF_INTRADAY_HEAT','AVG_PRICE_DATA'],
+    '实时数据': ['AI_MARKET_BRIEF','INDEX_QUOTES','OVERSEAS_MARKETS','CFFEX_HOLDINGS','LIMIT_UP_HEATMAP','ETF_PULSE','MARKET_FUND_FLOW_DATA','COMMODITY_ELASTICITY','CONCEPT_RANKING','SECTOR_FUND_FLOW','ETF_INTRADAY_HEAT','AVG_PRICE_DATA'],
     // 🛡 2026-09-30 主人令（映射对齐·与后端 v8_health_check.py page 字段同步）：
     //   盘后组缩到真实 7 卡（与 V8_PAGE_SCHEDULE 12716 逐项一致）；迁走的 10 项归到真实页组
     //   （候选/金池/三重共识/四量回测→选股策略，龙虎榜/危机雷达→共振日历，两融→观测平台，
     //    利率环境→暂未上架，因子实验室→最终推荐，机构买卖→运维）。
     '盘后数据': ['SECTOR_RECOMMENDATION','ETF_DAILY_MONITOR','ETF_NET_SUBSCRIPTION','W52_HIGH','MACRO_DATA','RESTRICTED_RELEASE','PERFORMANCE_FORECAST'],
-    '选股策略': ['GOLD_POOL','CANDIDATE','TRIPLE_CONSENSUS','FOUR_VOLUME','CRDS_CARD_DATA','FOUR_VOLUME_60M','FOUR_VOLUME_BACKTEST','ALGO_TRACK','TRIPLE_HISTORY','FOUR_VOLUME_HISTORY','FOUR_VOLUME_TRACK','VOLATILITY','STOCK_STOP_DATA','H_AUTO_BUY','H_AUTO_BUY_TRACK','IMA_STRONG_BACKTEST'],
+    '选股策略': ['GOLD_POOL','CANDIDATE','TRIPLE_CONSENSUS','FOUR_VOLUME','CRDS_CARD_DATA','FOUR_VOLUME_60M','FOUR_VOLUME_BACKTEST','ALGO_TRACK','TRIPLE_HISTORY','FOUR_VOLUME_HISTORY','FOUR_VOLUME_TRACK','VOLATILITY','STOCK_STOP_DATA','H_AUTO_BUY','H_AUTO_BUY_TRACK','IMA_STRONG_BACKTEST','IMA_STRONG_STOCK'],
     '今日事件': ['JUDGMENT_DATA','RESTRICTED_RELEASE','PERFORMANCE_FORECAST','IPO_DATA','V8_CAL'],
-    '观测平台': ['SH_FIB','MARGIN_DATA'],
+    '观测平台': ['maharo_insights','INDEX_VALUE_FRAMEWORK','WAVE_ELLIOTT','CITIC_PE_THERMO','SH_FIB','MARGIN_DATA'],
     '共振日历': ['LHB_DATA','CRISIS_DATA'],
-    '最终推荐': ['FACTOR_LAB'],
-    '暂未上架': ['UNLISTED_PANEL','MARKET_REGIME'],
+    '最终推荐': ['TOP10_DAILY','FACTOR_LAB'],
+    '暂未上架': ['UNLISTED_PANEL','SECTOR_LEADERS','FIRST_BOARD_ALERT','DAJIJIN_REDUCTION','MARKET_REGIME'],
     '策略回测': ['BACKTEST_ALL_ALGOS'],
     '运维': ['DO_NOT_DELETE','UNLISTED_PANEL','INST_TRADE'],
   };
@@ -15618,7 +15666,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=d4a24f514a';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=a04aaceea5';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -15627,7 +15675,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=f4b0add5cb';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=82bf835011';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -18264,16 +18312,7 @@ if(tht) tht.textContent = '交易日历 + 打新速览';
 
 /* 今日事件卡兜底：V8_CAL 日历事件（确保执行） */
 window.__renderV8CalToday = function(){
-  /* 🛡 2026-10-01 根治「月历有事件、今日详情卡空」不同源：
-     页面拿到旧版月数据（旧 index.html/旧 buster 缓存）时 live V8_CAL 停在上月，
-     其尾周的下月格子无事件 ⇒ 跨月头几天详情卡显示「无标注事件」而月历（归档导航）有事件。
-     修复：live 月份 ≠ 今天所在月 ⇒ 自动动态加载今天所在月归档重匹配（同 __v8calGoto 通道）；
-     归档缺失/仍无事件 ⇒ 如实显示并明示「当前日历为 X 月版，请刷新页面」。 */
-  var _p0 = window._cstParts ? window._cstParts(new Date()) : null;
-  var _tk = _p0 ? (_p0.y + '-' + String(_p0.m).padStart(2,'0')) : '';
-  var _lk = window.__v8calLiveKey ? window.__v8calLiveKey() : '';
   var D = window.V8_CAL || {weeks:[]};
-  if(_tk && _lk && _tk !== _lk && window.__v8calTodayArc && window.__v8calTodayArc.weeks){ D = window.__v8calTodayArc; }
   var todayKeys = window._v8CalTodayKeys ? window._v8CalTodayKeys(D) : {};
   var todayEvents = [];
   D.weeks.forEach(function(w){
@@ -18281,18 +18320,6 @@ window.__renderV8CalToday = function(){
       if(todayKeys[String(w.no)+'-'+String(d.num)]){ todayEvents = d.events || []; }
     });
   });
-  if(!todayEvents.length && _tk && _lk && _tk !== _lk && !window.__v8calTodayArc && !window.__v8calTodayArcLoading){
-    window.__v8calTodayArcLoading = true;
-    var _s = document.createElement('script');
-    _s.src = 'data/archive/V8_CAL_' + _tk + '.js';
-    _s.onload = function(){
-      try{ window.__v8calTodayArc = (window.V8_CAL_ARC && window.V8_CAL_ARC.weeks) ? window.V8_CAL_ARC : null; }catch(e){ window.__v8calTodayArc = null; }
-      window.__v8calTodayArcLoading = false;
-      try{ window.__renderV8CalToday(); }catch(e){}
-    };
-    _s.onerror = function(){ window.__v8calTodayArcLoading = false; };
-    document.head.appendChild(_s);
-  }
   var dateEl = document.getElementById('v8DayDate');
   if(dateEl){
     var parts = window._cstParts ? window._cstParts(new Date()) : null;
@@ -18318,12 +18345,7 @@ window.__renderV8CalToday = function(){
     });
     html += '</div>';
   } else {
-    var _staleHint = '';
-    if(_tk && _lk && _tk !== _lk){
-      var _la = _lk.split('-');
-      _staleHint = '<span style="color:#ffb74d">（当前日历为 ' + _la[0] + '年' + parseInt(_la[1],10) + '月版 · 请刷新页面获取本月日历）</span>';
-    }
-    html += '<div style="color:#888;padding:8px 0">📅 今日日历无标注事件' + _staleHint + '</div>';
+    html += '<div style="color:#888;padding:8px 0">📅 今日日历无标注事件</div>';
   }
   box.innerHTML = html || '<div style="color:#888;padding:12px">加载中…</div>';
 };
