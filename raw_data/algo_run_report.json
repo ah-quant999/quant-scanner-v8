@@ -1,8 +1,13 @@
 {
-  "update_time": "2026-10-01 09:25:38",
-  "run_start": "2026-10-01 09:09:22",
-  "ok": 14,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-10-01 16:02:29",
+  "run_start": "2026-10-01 15:32:02",
+  "ok": 26,
+  "fail": 1,
+  "failed_scripts": [
+    {
+      "script": "gen_algo_track.py",
+      "reason": "退出码 1 | NameError: name '_extract_four_volume' is not defined. Did you mean: '_extract_from_four_volume'?"
+    }
+  ],
   "skipped_by_time_gate": []
 }

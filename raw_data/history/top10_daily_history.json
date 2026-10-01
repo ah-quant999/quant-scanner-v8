@@ -391,5 +391,11 @@
     "total_scored": 292,
     "max_score": 37.3,
     "update_time": "2026-09-30 23:38:07"
+  },
+  "2026-10-01": {
+    "count_80plus": 0,
+    "total_scored": 307,
+    "max_score": 14.0,
+    "update_time": "2026-10-01 15:35:29"
   }
 }
