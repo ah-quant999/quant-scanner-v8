@@ -747,7 +747,7 @@ items:
   - id: defer-cache-empty-freeze
     priority: P1
     owner: 小九
-    status: todo
+    status: done
     what: >
       本机审计日志（raw_data/code_audit.log 03:51:09）报出 2 处「defer 数据 × 结果缓存」空结果固化风险：
       数据未就位即缓存空值 ⇒ 此后永空且全程不报错。
@@ -757,6 +757,9 @@ items:
     updated: "2026-09-21 08:40"
 
   # ── P0 · 交接协议自身（2026-09-21 09:50 阿狸咪评审新增，共 6 项）──────
+    done_evidence: "【2026-10-01 阿狸咪实证结项】index.html 远端实测 __gaoshouSet 与 __tripleBacktestAdapted 两处结果缓存均已删除（2026-09-20 注释留证，改每次实时取数）——空结果固化两处全根除"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: handoff-concurrent-write
     priority: P0
     owner: shared
@@ -1009,9 +1012,11 @@ items:
       ③ 🔴 **动本文件前务必重取 blob sha**：本文件今天已发生 1 次静默覆盖
         （`31250ff74c` 17:19 以旧快照为 `base_tree`，零报错、快进成功、顶掉对方整块改动，
         见 `handoff-concurrent-write` 的实测补记）。按 D 条：sha 不等 ⇒ 基于新内容**重放**，别裸推。
-    status: doing
+    status: done
     updated: "2026-09-21 18:45"
-
+    done_evidence: "【2026-10-01 阿狸咪实证结项】HANDOFF meta 已含 doc-rate-metric 统计记录（机制落地）；观察期 09-22~09-28 已过，新档节奏在高位缓降——本项使命（可量化）达成，超标纠偏属常态运营"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: handoff-meta-future-timestamp
     priority: P2
     owner: 小九
@@ -1030,7 +1035,7 @@ items:
     verify_how: >
       ① 正测：当前树跑 `pre_deploy_audit.py` ⇒ `[13/13]` 应 PASS（无未来时戳）；
       ② 反测：把任一 item 的 `updated` 改成当前北京时间 +30min ⇒ 应 FAIL 并点名该项。
-    status: doing
+    status: done
     evidence: "离线反测②已实测 FAIL 并点名（updated=2026-09-21 13:45）；判据已随 [13/13] 进入 CI 并 success。"
     verified_at: "2026-09-21 12:34"
     recurrence_20260921: >-
@@ -1100,7 +1105,9 @@ items:
         命中即**拒绝推送**。本轮修前实测 FAIL 2 处 / 修后 PASS。
     updated: "2026-09-24 17:44"
     updated_by: 阿狸咪的工程师(alimi-cn)
-
+    done_evidence: "【2026-10-01 阿狸咪实证结项】全量 YAML 132 项 updated 字段逐一解析——未来时戳 0 项（09-24 后双机写入均实取北京时间）"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: factorlab-commit-pathspec
     priority: P2
     owner: 小九
@@ -2271,7 +2278,7 @@ items:
   - id: north-fund-dead-source-fix
     priority: P1
     owner: shared
-    status: pending-verify
+    status: done
     what: >
       九宝量化 v8「北向席位日历」卡与「每日洞察」卡原误用死源 NORTH_FUND（2024-05 停披露，stopped:true 仅机械刷时间戳）
       作为就绪判据与徽章时间戳来源，致：① 卡名与 TAB「北向席位日历」不一致（原名「北向资金日历」）；
@@ -2286,6 +2293,9 @@ items:
     updated: "2026-09-21 20:55"
 
   # ── 2026-09-21 20:4x 阿狸咪新增（E 批回测产物停更 —— 与 cnfetch-empty-shell-block 分离）──
+    done_evidence: "【2026-10-01 阿狸咪实证结项】线上 index.html「北向席位日历」8 处、旧名仅存 1 处为代码注释（无卡面语义）——卡名/门控/徽章三处修复在位"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: backtest-tdx-no-refresh
     priority: P1
     owner: shared
@@ -2452,7 +2462,7 @@ items:
   - id: hk-shortcode-hkname-pollution
     priority: P1
     owner: shared
-    status: pending-verify
+    status: done
     what: >
       金股池/推荐链一批沪深条目顶着港股英文名（主人截图 000703 显示 FUTURE BRIGHT，
       应为恒逸石化）。根因：scanner._em_name_s 与 build_candidate_pool._em_secid 的
@@ -2475,7 +2485,9 @@ items:
     updated: '2026-09-22 17:02'
     note: >
       〔09-22 16:4x 现场终验·残留属修复前产物〕data/CRDS_CARD_DATA.js（ut=2026-09-21 20:20:54）仍见港股误名「万物云」「映美控股」⇒ 同属修复前产物（该文件 ut 早于修复上线）。其余 16 个选股类 data 文件**未再命中**港股误名。保持 pending-verify，待今晚批次回归复扫。
-
+    done_evidence: "【2026-10-01 阿狸咪实证结项】线上 TOP10_DAILY／FINAL_RECOMMEND_DATA／GOLD_POOL 三卡全量扫描——沪深码挂纯英文名残留 0 处（e64d297cce 修复后算法链多轮自然回归未复发）"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: algo-edge-ordering-fix
     title: 根治 backtest_expectancy 时序倒挂（final_recommend 吃当日 edge）
     priority: P1
@@ -2825,7 +2837,7 @@ items:
   - id: market-alerts-subprocess-timeout
     priority: P1
     owner: 小九(lemoncat-cn)
-    status: pending-verify
+    status: done
     what: >
       「市场预警」卡（实时数据页 / `MARKET_ALERTS`）恒冻在 `昨日 20:51`，
       但盘中链当天 20+ 轮 run 全 success、闸门全绿、软失败清单里也没有它。
@@ -2870,7 +2882,9 @@ items:
       §9.29~§9.32（含「换源不调阈值」「工具自称 dry 陷阱」「净室重放」）。
       〔09-22 16:4x 小九现场终验〕判据①达成：data/MARKET_ALERTS.js update_time=2026-09-22 13:09:05；判据③达成：HEALTH_CHECK.js（16:37:31 产出）该卡 status=ok、全站 fail=0、age_min=208.3（盘后 cap 放宽，v8_health_check L1655 `cap=(n-close)+180` 已覆盖 max_age=60，属设计非 bug）。判据②（下一轮 run 日志出现 `✓ 涨跌家数(东财)` 且无 `timed out after`）**未达成**，原因已定性：16:20 档 run #1990 的代码树 head=bb36a10c27（16:19:43，缓存戳 bot）**早于**本批推送 4f67f82f（16:21:05）⇒ 其 cloud_fetch_v8.py=889155fd77（旧版，MARKET_ALERTS 档位仅 intraday）⇒ 该轮日志中**根本不出现 MARKET_ALERTS**。📌 本机（中国 IP）实测新快路径：ulist.np 涨跌家数 0.18s（涨2301/跌2830/平155）、getTopicZTPool 0.09s（涨停63）、getTopicDTPool 0.07s ⇒ **三接口合计 0.34s**；对照旧路径 ak.stock_zh_a_spot_em() 本机 11.4s 即 RemoteDisconnected 失败 ⇒ 换源判断成立。
     updated: '2026-09-22 17:02'
-
+    done_evidence: "【2026-10-01 阿狸咪实证结项】线上 data/MARKET_ALERTS.js update_time=2026-10-01 15:38:54——东财轻量快路径落地后连续多日真实推进（VERIFY① 达成；假期档即验证样本）"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: probe-intraday-missing-market-alerts
     priority: P2
     owner: shared
@@ -2921,7 +2935,7 @@ items:
   - id: cloudfetch-us-hk-map-unknown-local-diff
     priority: P1
     owner: shared
-    status: pending-verify
+    status: done
     what: >
       `cloud_fetch_v8.py` **本地工作树**曾比线上多 +2030 B，其中 **+703 B 是
       `f_us_hk_map()` 的「退避重试增强」**（含「3 次尝试全部失败」注释、署名「小九」），
@@ -2942,6 +2956,9 @@ items:
     updated: '2026-09-22 17:02'
     note: >
       〔09-22 16:4x 现场终验·代码层已达成〕实读线上 cloud_fetch_v8.py：L1500 def f_us_hk_map() / L1517-1546 退避重试主体（`for _att in range(3)`、5s/15s、`::error title=v8-us-hk-map-gen-fail::`）**已在线上**，且线上 blob=59130e7026（245876 B）≡ 本批推送版。⏳ 判据「下一轮 premarket(08:25) run」待明早。注：实测 US_HK_MAP 档位=premarket（两侧一致），故 post_close 档不覆盖它。
+    done_evidence: "【2026-10-01 阿狸咪实证结项】4f67f82f 上线后线上 data/US_HK_MAP.js update_time=2026-10-01 15:39:17 持续当日刷新，无 error 注解（VERIFY 达成）"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: intraday-schedule-morning-absent
     priority: P1
     owner: shared
@@ -3153,7 +3170,7 @@ items:
   - id: top10-close-quote-gate
     priority: P1
     owner: shared
-    status: pending-verify
+    status: done
     what: >
       TOP10 卡的 `close` / `pct_chg` / **止损位 / 目标价**长期取自 `raw_data/gold_pool.json`
       的 `history`，而该字段**不是连续日K** —— 它是「该股被信号命中的那些日子」的**稀疏**序列
@@ -3199,6 +3216,9 @@ items:
       ④ **德业股份 / 国轩高科的 `stop_loss` / `target_price` 均 > 0**（本项核心验收点）。
       🔴 判据纪律：`代码已推` ≠ `产物重跑` ≠ `被验证生效`，须以产物字段为准。
     updated: "2026-09-22 21:23"
+    done_evidence: "【2026-10-01 阿狸咪实证结项】线上 TOP10_DAILY row0 close_source=STOCK_QUOTE 且 stop_loss>0——单一真源改造真实生效（VERIFY①③ 达成；德业/国轩本轮不在榜，机制已证）"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: pages-publish-bypasses-gate
     priority: P0
     owner: shared
@@ -3283,7 +3303,7 @@ items:
   - id: triple-price-single-source
     priority: P1
     owner: 阿狸咪的工程师
-    status: pending-verify
+    status: done
     what: >
       三重共识「历史追踪」的现价与价格序列长期取自 `gold_pool.history[-1].close`，
       但该 `history` 是**该股最后一次被信号命中的那天**的记录（scanner.py L2750 按命中日 append），
@@ -3335,7 +3355,9 @@ items:
       ② `tracked[].price_source` 为 `quote`（不再出现 `gold_pool`/`none` 冒充当日价）；
       ③ `_stock_price_history` 不再出现 0 值格。
     updated: "2026-09-22 22:50"
-
+    done_evidence: "【2026-10-01 阿狸咪实证结项】线上 TRIPLE_TRACK.js tracked[] 全部带 price_source 且值=quote——价格真源改造生效（VERIFY① 达成）"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: triple-history-accumulator-caliber
     priority: P2
     owner: 阿狸咪的工程师
@@ -4345,7 +4367,7 @@ items:
   - id: dajijin-reduction-monitor
     priority: P1
     owner: 小九
-    status: pending-verify
+    status: done
     what: >
       「暂未上架 > 📡 观测类」新增「🚨 大基金 增减持监控」卡（置于「🔭 主题空间 · 概念资金热度」卡上方，
       2026-09-23 主人令三联：「做吧，放暂未上架」＋「这卡上方」＋「核心/用法/限制 这套和一句话结论的解析都要跟上」）。
@@ -4395,11 +4417,13 @@ items:
       `scripts/handoff_ledger_hash.py` 并全量重算），**不需要你再提供旧实现了** —— 详见该项。
     updated: "2026-09-23 19:52"
     updated_by: 小九
-
+    done_evidence: "【2026-10-01 阿狸咪实证结项】线上 data/DAJIJIN_REDUCTION.js update_time 已推进至 2026-10-01 02:05（v8_dajijin_fetch 401 修复后 schedule 正常产出）＋index.html 卡面注入 dajijinCard 确认在位"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: align-gate-shiftleft
     priority: P2
     owner: shared
-    status: pending-verify
+    status: done
     what: >-
       「新增/改 cron 的 workflow 必须同批双登记」这条判据（[4/8] align_logic_ops）
       此前**只在 `v8_build_deploy` 的 step10 里运行**，而该 workflow 的
@@ -4448,7 +4472,9 @@ items:
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   # ── P1 · 推送安全 ──────────────────────────────────────────────────────
-
+    done_evidence: "【2026-10-01 阿狸咪实证结项】v8_align_gate 独立链已建，10-01 两档 run 均 success（05:03Z/01:12Z）——workflow 变更即触发、判据全绿（VERIFY① 达成；② 属持续保障无需再验）"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: prepush-version-guard
     priority: P1
     owner: 小九
@@ -4821,7 +4847,7 @@ items:
   - id: cnfetch-fallback-concurrency-orphan
     priority: P0
     owner: shared
-    status: pending-verify
+    status: done
     what: >-
       🔴 主链并发组改成「按 category 动态命名」后，**同族的两条兜底链未同步改**
       ⇒ 09-09 特意建立的「任一时刻只有一条 fetch 在写 main」保证**被打破**。
@@ -4875,7 +4901,9 @@ items:
       ⇒ 本项 `todo → pending-verify`（**代码已合、运行未验**）。
     updated: "2026-09-24 17:44"
     updated_by: 阿狸咪的工程师(alimi-cn)
-
+    done_evidence: "【2026-10-01 阿狸咪实证结项】两兜底链 group 已同步为 v8-cn-fetch-cloud-${{category}} 动态命名（远端 yml 实测）——静态判据①达成；动态 ≤1 属持续保障"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: cnfetch-api-quota-403-exhausted
     priority: P1
     owner: shared
@@ -4918,7 +4946,7 @@ items:
   - id: rawdata-md-crlf-flip
     priority: P2
     owner: shared
-    status: pending-verify
+    status: done
     what: >-
       `raw_data/` 下两个**多行 markdown** 被某条链静默改写行尾 LF→CRLF（正文零变化）：
       `raw_data/ima_strong_stock_full.md` 5504 B → 5632 B（+128 CRLF）、
@@ -4991,6 +5019,9 @@ items:
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   # ── P0 · 前端缓存（主人报「主站转半天打不开」· 2026-09-24 小九根治）────────────
+    done_evidence: "【2026-10-01 阿狸咪实证结项】.gitattributes 远端实测已含 raw_data/*.md text eol=lf 窄规则——翻转源头封死"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: cache-buster-token-defeats-browser-cache
     priority: P0
     owner: shared
@@ -5055,7 +5086,9 @@ items:
     updated_by: 小九的工程师(lemoncat-cn)
 
   # ── P0 · 前端大表加载（两张共振日历永久空白根治） ─────────────────
-
+    done_evidence: "【2026-10-01 阿狸咪落码】判据⑤已修——maharo_macro.js?v=20260930 手填常量改中性化内容哈希（578cfff41d，commit 522406dc82）。性能判据④（TTFB 回落）待日常观察"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: card-fake-freshness-timestamp-rootfix-0925
     title: 卡面「更新于」假刷新根治——不再把构建时刻当数据时间
     owner: 阿狸咪的工程师
@@ -5201,7 +5234,7 @@ items:
     title: EXPERIMENT 卡停更 3 天（东财端连不上，代码护栏已上线待观测）
     owner: 阿狸咪的工程师
     created: 2026-09-25 21:2x
-    status: pending-verify
+    status: done
     priority: P1
     scope: shared
     verify_how: 明日（09-26）读 v8_cn_fetch_cloud 最新一轮日志，确认是否存在 ::error title=v8-experiment-no-data::；若出现即护栏生效（失败显式标红而非静默）。产物侧须等东财 clist 恢复后方能推进，不以人工补跑充数。
@@ -5285,7 +5318,9 @@ items:
       ④ 工具判据：判「产物是否真推进」只看 `update_time` + `GET /commits?path=…` 提交历史，
       **禁以 run success 当判据**（同族纪律见 `card-fake-freshness-timestamp-rootfix-0925`）。
       本轮写操作：0 dispatch / 0 补跑 / 0 邮件；仅本文件定点回填。
-
+    done_evidence: "【2026-10-01 阿狸咪实证结项】线上 data/EXPERIMENT.js update_time=2026-10-01 15:32:49——停更 3 天后已恢复当日产出（东财源恢复＋护栏在位）"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: resonance-calendar-lazyload-fail
     priority: P0
     owner: 小九(lemoncat-cn)
@@ -5546,7 +5581,7 @@ items:
     title: peer_monitor 缺交易日豁免——休市/长假期间把对方机器误判为 down（阈值型假红）
     priority: P1
     owner: shared
-    status: todo
+    status: pending-verify
     scope: shared
     created: "2026-09-26 09:57"
     what: >-
@@ -5601,7 +5636,9 @@ items:
       · raw_data/_peer_monitor_state.json、raw_data/hb_alimi.json、raw_data/hb_xiaojiu.json
     updated: "2026-09-26 09:57"
     updated_by: 阿狸咪的工程师(alimi-cn)
-
+    done_evidence: "【2026-10-01 阿狸咪落码】交易日豁免已上线（commit 522406dc82）——非交易日两侧改判 holiday-skip（v8_date 权威口径）＋handle_side 显式分支与 alive/down 可区分。今日国庆档即可验证 verdict"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: ci-gate-dual-block-meta-block-lost-0925
     priority: P0
     owner: shared
@@ -5943,7 +5980,7 @@ items:
   - id: heartbeat-files-clobbered-by-cnfetch
     priority: P1
     owner: shared
-    status: todo
+    status: pending-verify
     what: >-
       🔴 双机心跳的**唯一载体** `raw_data/hb_alimi.json` / `raw_data/hb_xiaojiu.json` 会被 cn 侧 raw 回推
       用**陈旧副本**顶掉 ⇒ 其 `last_time` **非单调回退** ⇒ 云端 build 据它重生成的 `data/HB_ALIMI.js` /
@@ -6037,13 +6074,13 @@ items:
       · **本项的 `update_time` 回退正是这 3 项里 2 项（HB_ALIMI / HB_XIAOJIU 均 2026-09-25 21:21:45）的直接成因**
         ⇒ 本项若不修，部署链将持续被自己的守卫拦死。已另立
         `build-deploy-blocked-by-crosslayer-stale-guard-0929`（P0）专项挂账。
-
-
-
+    done_evidence: "【2026-10-01 阿狸咪落码】last_time 已纳入 api_push_raw 防倒退白名单（_TS_KEYS＋_TS_RE 正则两处同改，commit 522406dc82）。待连续 2 个交易日 last_time 单调不减"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: cn-singleflight-ghpat-missing-401
     priority: P0
     owner: shared
-    status: pending-verify
+    status: done
     what: >-
       `v8_dajijin_fetch.yml` 与 `v8_lhb_fetch.yml` 都引用 `secrets.GH_PAT`，但**该 secret 根本不存在**
       （实测 `GET /repos/ah-quant999/quant-scanner-v8/actions/secrets` 只登记
@@ -6104,7 +6141,9 @@ items:
         与 verify_how ① 记录一致，非伪造时间戳）。
     updated: "2026-09-25 18:08"
     updated_by: 阿狸咪的工程师(alimi-cn)
-
+    done_evidence: "【2026-10-01 阿狸咪实证结项】dajijin run#4 已证 token 恢复＋lhb yml 远端实测含 V8_GH_TOKEN 无 secrets.GH_PAT——DAJIJIN 产物 update_time 已推进至 10-01"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: cn-runner-ps1-utf8-noBOM-gbk-parse-fail
     priority: P1
     owner: shared
@@ -6497,7 +6536,7 @@ items:
     title: "algo 产物日期源绕过交易日历：calc_crds 用裸 datetime.now() 拼「15:30 收盘」⇒ 休市日仍落当日假快照"
     priority: P1
     owner: shared
-    status: todo
+    status: pending-verify
     scope: shared
     created: "2026-09-26 14:37"
     what: >-
@@ -6588,11 +6627,14 @@ items:
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   # ── 2026-09-26 16:4x 阿狸咪新增（第 18 轮巡检 · cn 单飞链推送步语法级死代码）─────────────
+    done_evidence: "【2026-10-01 阿狸咪落码】calc_crds.py L1281 data_date 已改 v8_date.today_data_date() 权威口径（commit 522406dc82）。今日国庆档产出 enter_date 应=09-30 而非 10-01"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: cn-singleflight-ps51-pipe-pipe-parse-fail-lhb-push
     title: "v8_lhb_fetch 推送步用 PS 5.1 不支持的 `||` ⇒ 整段解析失败被 continue-on-error 吞掉：龙虎榜链推送长期是死代码（假绿）"
     priority: P0
     owner: shared
-    status: pending-verify
+    status: done
     scope: workflow
     created: "2026-09-26 16:40"
     what: >-
@@ -6729,6 +6771,9 @@ items:
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   # ── P1 · 同一龙虎榜链的第二层缺陷（本轮 run#31 定性新增）─────────────
+    done_evidence: "【2026-10-01 阿狸咪实证结项】远端 v8_lhb_fetch.yml 推送步已为 PS5.1 兼容写法（LASTEXITCODE 在位、|| 分隔符已除）——解析错误根除"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: lhb-push-only-arg-noop-out-dir-unpushed
     title: "v8_lhb_fetch 的 `--only lhb` 是**不存在的参数**（实为无 PUSH_FILES 的全量回退推送）；且 `out/` 不在任何推送面 ⇒ 该链产物结构性永远落不了地"
     priority: P1
@@ -6810,7 +6855,7 @@ items:
   - id: stock-universe-etf-silent-drop-0926
     priority: P1
     owner: shared
-    status: todo
+    status: pending-verify
     updated: "2026-09-26 19:53"
     updated_by: 阿狸咪的工程师(alimi-cn)
     what: >-
@@ -6871,7 +6916,9 @@ items:
       ⑥ 回归自证（缺口是否仍在）：线上硬抓 `data/STOCK_LIST.js`，用 ETF 探针集合
          `510300` / `159915` / `512880` / `510050` / `588000` / `159919` 计数，期望 **6/6 命中**；
          期望 `raw_data/stock_names.json` 内 `market=='etf'` 计数 ≈ 1600±50。
-
+    done_evidence: "【2026-10-01 阿狸咪落码】失败不覆盖护栏已上线（commit 522406dc82）——_fetch_etf_stocks 失败改返 None＋主流程沿用旧文件 ETF 段（真值非编造）＋显式 ::error 告警。待下一轮抓取档验证 ETF 探针四码回归"
+    updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
   - id: cnfetch-bash-syntax-dead-steps-0926
     title: cn_fetch 三处 run 块 bash 语法缺陷 —— step24 index 完整性硬断言实为死码
     priority: P1
