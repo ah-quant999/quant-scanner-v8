@@ -6207,7 +6207,7 @@ items:
   - id: ima-connector-unbound-enterprise-switch
     priority: P1
     owner: 阿狸咪的工程师
-    status: blocked
+    status: pending-verify
     what: >-
       自动化 149ad8ff（ima 强势跟踪全文快照）自 2026-09-24 起**连续 2 日取不到全文**：
       本机 ima MCP 连接器**未绑定**，`fetch_media_content` 登录态通道不可用。
@@ -6258,7 +6258,9 @@ items:
          下一交易日 10-09 前完成授权即可。
     updated: "2026-10-01 17:22"
     updated_by: 阿狸咪的工程师(alimi-cn)
-
+    done_evidence: "【2026-10-01 19:2x 阿狸咪实测纠正】昨夜已恢复，非『须主人重绑』：① 本机快照 raw_data/ima_strong_stock_full.json fetched_at=2026-09-30 21:20:43（channel=member-full-text-snapshot，标题「短线情绪选股 2026-09-30」，md 全文 2937B 含候选池表）；② 线上 data/IMA_STRONG_STOCK.js update_time=2026-09-30 22:16:53、data_date=09-30、8 只、snapshot_expired=False、source_stale=False、stale_days=0 ⇒ VERIFY③④ 已达成。中断期精确口径：09-24 至 09-30 夜约 6 天（原 WHAT 记录时点 09-25 为『连续 2 日』），非 7 天。残留待验：判据①② 未过——connector-states.json 键集仍无 ima-mcp、当前会话 ToolSearch 搜不到 ima 工具 ⇒ 昨夜取文通道的持久绑定态未证实，待下一轮自动跑批 fetched_at 真实前进后全项结项。"
+    updated: "2026-10-01 19:25"
+    updated_by: 阿狸咪的工程师
   - id: cn-singleflight-schedule-trigger-offset
     priority: P1
     owner: shared
