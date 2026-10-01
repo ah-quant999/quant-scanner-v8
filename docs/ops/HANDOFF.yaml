@@ -5581,7 +5581,7 @@ items:
     title: peer_monitor 缺交易日豁免——休市/长假期间把对方机器误判为 down（阈值型假红）
     priority: P1
     owner: shared
-    status: pending-verify
+    status: done
     scope: shared
     created: "2026-09-26 09:57"
     what: >-
@@ -5638,6 +5638,9 @@ items:
     updated_by: 阿狸咪的工程师(alimi-cn)
     done_evidence: "【2026-10-01 阿狸咪落码】交易日豁免已上线（commit 522406dc82）——非交易日两侧改判 holiday-skip（v8_date 权威口径）＋handle_side 显式分支与 alive/down 可区分。今日国庆档即可验证 verdict"
     updated: "2026-10-01 18:20"
+    updated_by: 阿狸咪的工程师
+    done_evidence: "【2026-10-01 阿狸咪实测结项】国庆档真跑（17:58）——日志逐字「今日非交易日 → 心跳判活豁免（holiday-skip）」＋两侧「休市 → 不告警不派发」＋自证推送 HTTP 200（raw_data/_peer_monitor_state.json 留痕）⇒ VERIFY① 达成；is_trading_day(10-01)=False 实测（远端 522406dc82 新码）"
+    updated: "2026-10-01 18:05"
     updated_by: 阿狸咪的工程师
   - id: ci-gate-dual-block-meta-block-lost-0925
     priority: P0
