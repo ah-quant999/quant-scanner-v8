@@ -1,9 +1,13 @@
 {
-  "update_time": "2026-10-02 04:30:25",
-  "run_start": "2026-10-02 03:41:33",
-  "ok": 10,
-  "fail": 1,
+  "update_time": "2026-10-02 06:09:18",
+  "run_start": "2026-10-02 05:11:41",
+  "ok": 9,
+  "fail": 2,
   "failed_scripts": [
+    {
+      "script": "backtest_comprehensive.py",
+      "reason": "监督器静默杀(>15min 无输出)"
+    },
     {
       "script": "v8/fetch_citic_pe.py",
       "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
