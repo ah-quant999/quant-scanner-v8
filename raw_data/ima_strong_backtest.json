@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-01 02:17:17",
+ "generated": "2026-10-01 09:28:21",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -172,16 +172,16 @@
    "bench_days": 25
   },
   "60d": {
-   "samples": 19,
+   "samples": 20,
    "immature": false,
-   "win": 15,
+   "win": 16,
    "loss": 4,
-   "win_rate": 78.9,
-   "avg_return": 27.24,
-   "median_return": 16.77,
+   "win_rate": 80.0,
+   "avg_return": 28.5,
+   "median_return": 19.47,
    "best_return": 99.46,
    "worst_return": -10.57,
-   "max_drawdown": -24.63,
+   "max_drawdown": -24.28,
    "bench_avg_return": -3.8993,
    "bench_win_rate": 37.68,
    "bench_days": 14
