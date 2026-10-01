@@ -1,1 +1,1381 @@
-window.FINAL_RECOMMEND_DATA = {"update_time":"2026-09-30 23:44:18","crisis_score":32.9,"crisis_high":false,"crisis_note":"危机雷达未达高位，逆势龙头暂不并入","total_candidates":20,"top_n":5,"data_degraded":false,"signal_edge":{"source":"backtest_expectancy@2026-09-30 20:50:33","degraded":false,"effective":{"jinzuan":1.156,"chan":0.83,"trend":-1.816,"jigou":-1.087},"hardcoded_default":{"jinzuan":0.532,"chan":0.759,"trend":-1.532,"jigou":-0.66},"n_on10":{"jinzuan":168,"chan":344,"trend":251,"jigou":424},"consistent":{"jinzuan":true,"chan":true,"trend":true,"jigou":true},"loaded":{"generated":"2026-09-30 20:50:33","hit":4,"n_snapshots":75,"date_range":["2026-06-06","2026-09-30"]},"alpha_select":{"enabled":true,"skipped_no_positive_edge":0}},"degrade_note":null,"market_regime":{"date":"2026-09-30","regime":"panic","open":true,"ok":true,"reason":"ok","note":"grind/panic=可开仓(正常推)；stabilize/rebound=历史回测≥3共振负期望，应观察/少推；ok=false 表示 regime 取数失败已按保守处置（regime=null、不推满仓）"},"price_source":{"date":"2026-09-30","source":"STOCK_QUOTE","covered":20,"total":20,"note":"价格唯一权威来源（当日有效快照）；未覆盖的票 close/pct_chg 为 null，不伪造 0.00%"},"strong_sectors":["公路铁路运输","医疗服务","厨卫电器","小家电","小金属","房地产","汽车整车","生物制品","贵金属","银行","风电设备","饮料制造"],"stocks":[{"rank":1,"code":"300199","name":"翰宇药业","market":"sz","board":"创业板","horizon":"短线/中线共振","close":23.92,"close_date":"2026-09-30","close_source":"STOCK_QUOTE","close_verified":true,"pct_chg":4.96,"stop_loss":21.53,"target_price":27.7,"risk_reward":1.58,"support":22.06,"resistance":24.93,"atr":1.03,"sources":["三重共识","四量终极"],"source_scores":{"三重共识":1.52,"四量终极":1.65},"resonance":2,"strength":3.17,"sector_score":0.0,"sector_hits":[],"sector_fund":[],"final_score":37.3,"buy_score":37.3,"enter_date":"2026-09-22","signals":["缠论买点","跨策略共振"],"_60m_resonance":false,"reason":"三重共识 评分38；四量终极 信号1项","industry":"医药制造业","concepts":["深股通","幽门螺杆菌概念","医药制造业","肝炎概念","流感","AI制药（医疗）","合成生物","工业大麻"],"tracking":{"entry_date":"2026-09-22","entry_price":23.92,"latest_price":23.92,"return_pct":0.0,"hold_days":1,"exit_type":"hold","note":"今日新入选，自动开始跟踪","alerts":[{"level":"good","code":"300199","name":"翰宇药业","text":"翰宇药业(300199) 连续 7 日稳居严格共识（高质量）"}]},"action":"买入","market_regime":"panic"},{"rank":2,"code":"688498","name":"源杰科技","market":"sh","board":"科创板","horizon":"短线/中线共振","close":1613.0,"close_date":"2026-09-30","close_source":"STOCK_QUOTE","close_verified":true,"pct_chg":-1.56,"stop_loss":1451.7,"target_price":1918.0,"risk_reward":1.89,"support":1439.03,"resistance":1887.0,"atr":83.83,"sources":["三重共识","四量终极"],"source_scores":{"三重共识":1.34,"四量终极":1.65},"resonance":2,"strength":2.99,"sector_score":0.0,"sector_hits":[],"sector_fund":[],"final_score":32.9,"buy_score":32.9,"enter_date":"2026-09-23","signals":["缠论买点","跨策略共振"],"_60m_resonance":false,"reason":"三重共识 评分34；四量终极 信号1项","industry":"计算机、通信和其他电子设备制造业","concepts":["大盘股","国产芯片","光纤概念","中证500","QFII重仓","计算机、通信和其他电子设备制造业","科技风格","MSCI中国"],"tracking":{"entry_date":"2026-09-23","entry_price":1613.0,"latest_price":1613.0,"return_pct":0.0,"hold_days":1,"exit_type":"hold","note":"今日新入选，自动开始跟踪","alerts":[{"level":"good","code":"688498","name":"源杰科技","text":"源杰科技(688498) 连续 4 日稳居严格共识（高质量）"}]},"action":"买入","market_regime":"panic"},{"rank":3,"code":"300502","name":"新易盛","market":"sz","board":"创业板","horizon":"短线/中线共振","close":389.0,"close_date":"2026-09-30","close_source":"STOCK_QUOTE","close_verified":true,"pct_chg":-0.99,"stop_loss":350.1,"target_price":579.42,"risk_reward":4.9,"support":378.56,"resistance":475.0,"atr":21.23,"sources":["三重共识","四量终极"],"source_scores":{"三重共识":1.24,"四量终极":1.5},"resonance":2,"strength":2.74,"sector_score":0.0,"sector_hits":[],"sector_fund":[],"final_score":31.1,"buy_score":31.1,"enter_date":"2026-08-17","signals":["跨策略共振"],"_60m_resonance":false,"reason":"三重共识 评分31；四量终极 信号0项","industry":"计算机、通信和其他电子设备制造业","concepts":["大盘股","深股通","深证100R","东方财富热股","计算机、通信和其他电子设备制造业","科技风格","MSCI中国","5G概念"],"tracking":{"entry_date":"2026-08-17","entry_price":389.0,"latest_price":389.0,"return_pct":0.0,"hold_days":1,"exit_type":"hold","note":"今日新入选，自动开始跟踪","alerts":[{"level":"warn","code":"300502","name":"新易盛","text":"新易盛(300502) 入选以来回撤 -16.6%（2026-08-17 起）"}]},"action":"买入","market_regime":"panic"},{"rank":4,"code":"300857","name":"协创数据","market":"sz","board":"创业板","horizon":"短线/中线共振","close":251.16,"close_date":"2026-09-30","close_source":"STOCK_QUOTE","close_verified":true,"pct_chg":1.94,"stop_loss":226.04,"target_price":309.65,"risk_reward":2.33,"support":242.35,"resistance":278.6,"atr":11.56,"sources":["三重共识","四量终极"],"source_scores":{"三重共识":1.14,"四量终极":1.5},"resonance":2,"strength":2.64,"sector_score":0.0,"sector_hits":[],"sector_fund":[],"final_score":28.6,"buy_score":28.6,"enter_date":"2026-08-17","signals":["跨策略共振"],"_60m_resonance":false,"reason":"三重共识 评分29；四量终极 信号0项","industry":"计算机、通信和其他电子设备制造业","concepts":["人工智能","大盘股","国产芯片","中证500","大数据","深股通","阿里概念","计算机、通信和其他电子设备制造业"],"tracking":{"entry_date":"2026-08-17","entry_price":251.16,"latest_price":251.16,"return_pct":0.0,"hold_days":1,"exit_type":"hold","note":"今日新入选，自动开始跟踪"},"action":"买入","market_regime":"panic"},{"rank":5,"code":"002640","name":"跨境通","market":"sz","board":"主板","horizon":"短线/中线共振","close":3.91,"close_date":"2026-09-30","close_source":"STOCK_QUOTE","close_verified":true,"pct_chg":-0.76,"stop_loss":3.52,"target_price":4.22,"risk_reward":0.79,"support":3.2,"resistance":4.22,"atr":0.25,"sources":["三重共识","四量终极"],"source_scores":{"三重共识":1.14,"四量终极":0.98},"resonance":2,"strength":2.12,"sector_score":0.0,"sector_hits":[],"sector_fund":[],"final_score":28.6,"buy_score":28.6,"enter_date":"2026-09-30","signals":["上涨趋势","机构变红","跨策略共振"],"_60m_resonance":false,"reason":"三重共识 评分29；四量终极 信号2项","industry":"零售业","concepts":["破增发价股","婴童概念","电商概念","无线耳机","零售业","标准普尔","深股通","网红经济"],"tracking":{"entry_date":"2026-09-30","entry_price":3.91,"latest_price":3.91,"return_pct":0.0,"hold_days":1,"exit_type":"hold","note":"今日新入选，自动开始跟踪"},"action":"买入","market_regime":"panic"}],"consensus_stocks":[{"rank":1,"code":"300199","name":"翰宇药业","market":"深市","board":"创业板","horizon":"短线/中线共振","close":23.92,"close_date":"2026-09-30","close_source":"STOCK_QUOTE","close_verified":true,"pct_chg":4.96,"stop_loss":21.53,"target_price":27.7,"risk_reward":1.58,"support":22.06,"resistance":24.93,"atr":1.03,"sources":["三重共识","四量终极"],"source_scores":{"三重共识":1.52,"四量终极":1.65},"resonance":2,"strength":3.17,"final_score":37.3,"sector_score":0.0,"sector_hits":[],"enter_date":"2026-09-22","signals":["跨策略共振","缠论买点"],"_60m_resonance":false,"reason":"三重共识 评分38；四量终极 信号1项","industry":"医药制造业","concepts":["深股通","幽门螺杆菌概念","医药制造业","肝炎概念","流感","AI制药（医疗）","合成生物","工业大麻"],"tracking":{"entry_date":"2026-09-22","entry_price":23.92,"latest_price":23.92,"return_pct":0.0,"hold_days":1,"exit_type":"hold","note":"今日新入选，自动开始跟踪"},"action":"买入","market_regime":"panic"},{"rank":2,"code":"688498","name":"源杰科技","market":"沪市","board":"科创板","horizon":"短线/中线共振","close":1613.0,"close_date":"2026-09-30","close_source":"STOCK_QUOTE","close_verified":true,"pct_chg":-1.56,"stop_loss":1451.7,"target_price":1918.0,"risk_reward":1.89,"support":1439.03,"resistance":1887.0,"atr":83.83,"sources":["三重共识","四量终极"],"source_scores":{"三重共识":1.34,"四量终极":1.65},"resonance":2,"strength":2.99,"final_score":32.9,"sector_score":0.0,"sector_hits":[],"enter_date":"2026-09-23","signals":["跨策略共振","缠论买点"],"_60m_resonance":false,"reason":"三重共识 评分34；四量终极 信号1项","industry":"计算机、通信和其他电子设备制造业","concepts":["大盘股","国产芯片","光纤概念","中证500","QFII重仓","计算机、通信和其他电子设备制造业","科技风格","MSCI中国"],"tracking":{"entry_date":"2026-09-23","entry_price":1613.0,"latest_price":1613.0,"return_pct":0.0,"hold_days":1,"exit_type":"hold","note":"今日新入选，自动开始跟踪"},"action":"买入","market_regime":"panic"},{"rank":3,"code":"300502","name":"新易盛","market":"深市","board":"创业板","horizon":"短线/中线共振","close":389.0,"close_date":"2026-09-30","close_source":"STOCK_QUOTE","close_verified":true,"pct_chg":-0.99,"stop_loss":350.1,"target_price":579.42,"risk_reward":4.9,"support":378.56,"resistance":475.0,"atr":21.23,"sources":["三重共识","四量终极"],"source_scores":{"三重共识":1.24,"四量终极":1.5},"resonance":2,"strength":2.74,"final_score":31.1,"sector_score":0.0,"sector_hits":[],"enter_date":"2026-08-17","signals":["跨策略共振"],"_60m_resonance":false,"reason":"三重共识 评分31；四量终极 信号0项","industry":"计算机、通信和其他电子设备制造业","concepts":["大盘股","深股通","深证100R","东方财富热股","计算机、通信和其他电子设备制造业","科技风格","MSCI中国","5G概念"],"tracking":{"entry_date":"2026-08-17","entry_price":389.0,"latest_price":389.0,"return_pct":0.0,"hold_days":1,"exit_type":"hold","note":"今日新入选，自动开始跟踪"},"action":"买入","market_regime":"panic"},{"rank":4,"code":"300857","name":"协创数据","market":"深市","board":"创业板","horizon":"短线/中线共振","close":251.16,"close_date":"2026-09-30","close_source":"STOCK_QUOTE","close_verified":true,"pct_chg":1.94,"stop_loss":226.04,"target_price":309.65,"risk_reward":2.33,"support":242.35,"resistance":278.6,"atr":11.56,"sources":["三重共识","四量终极"],"source_scores":{"三重共识":1.14,"四量终极":1.5},"resonance":2,"strength":2.64,"final_score":28.6,"sector_score":0.0,"sector_hits":[],"enter_date":"2026-08-17","signals":["跨策略共振"],"_60m_resonance":false,"reason":"三重共识 评分29；四量终极 信号0项","industry":"计算机、通信和其他电子设备制造业","concepts":["人工智能","大盘股","国产芯片","中证500","大数据","深股通","阿里概念","计算机、通信和其他电子设备制造业"],"tracking":{"entry_date":"2026-08-17","entry_price":251.16,"latest_price":251.16,"return_pct":0.0,"hold_days":1,"exit_type":"hold","note":"今日新入选，自动开始跟踪"},"action":"买入","market_regime":"panic"},{"rank":5,"code":"002640","name":"跨境通","market":"深市","board":"主板","horizon":"短线/中线共振","close":3.91,"close_date":"2026-09-30","close_source":"STOCK_QUOTE","close_verified":true,"pct_chg":-0.76,"stop_loss":3.52,"target_price":4.22,"risk_reward":0.79,"support":3.2,"resistance":4.22,"atr":0.25,"sources":["三重共识","四量终极"],"source_scores":{"三重共识":1.14,"四量终极":0.98},"resonance":2,"strength":2.12,"final_score":28.6,"sector_score":0.0,"sector_hits":[],"enter_date":"2026-09-30","signals":["跨策略共振","机构变红","上涨趋势"],"_60m_resonance":false,"reason":"三重共识 评分29；四量终极 信号2项","industry":"零售业","concepts":["破增发价股","婴童概念","电商概念","无线耳机","零售业","标准普尔","深股通","网红经济"],"tracking":{"entry_date":"2026-09-30","entry_price":3.91,"latest_price":3.91,"return_pct":0.0,"hold_days":1,"exit_type":"hold","note":"今日新入选，自动开始跟踪"},"action":"买入","market_regime":"panic"}],"all_candidates":[{"code":"300199","name":"翰宇药业","market":"深市","board":"创业板","horizon":"中长线","close":23.92,"close_date":"2026-09-30","close_verified":true,"pct_chg":4.96,"final_score":37.3,"resonance":2,"sources":["三重共识","四量终极"],"signals":["缠论买点","跨策略共振"],"industry":"医药制造业","concepts":["深股通","幽门螺杆菌概念","医药制造业","肝炎概念","流感","AI制药（医疗）","合成生物","工业大麻"],"enter_date":"2026-09-22","stop_loss":21.53,"target_price":27.7,"risk_reward":1.58,"support":22.06,"resistance":24.93,"factor_actions":[]},{"code":"688498","name":"源杰科技","market":"沪市","board":"科创板","horizon":"中长线","close":1613.0,"close_date":"2026-09-30","close_verified":true,"pct_chg":-1.56,"final_score":32.9,"resonance":2,"sources":["三重共识","四量终极"],"signals":["缠论买点","跨策略共振"],"industry":"计算机、通信和其他电子设备制造业","concepts":["大盘股","国产芯片","光纤概念","中证500","QFII重仓","计算机、通信和其他电子设备制造业","科技风格","MSCI中国"],"enter_date":"2026-09-23","stop_loss":1451.7,"target_price":1918.0,"risk_reward":1.89,"support":1439.03,"resistance":1887.0,"factor_actions":[]},{"code":"300502","name":"新易盛","market":"深市","board":"创业板","horizon":"中长线","close":389.0,"close_date":"2026-09-30","close_verified":true,"pct_chg":-0.99,"final_score":31.1,"resonance":2,"sources":["三重共识","四量终极"],"signals":["跨策略共振"],"industry":"计算机、通信和其他电子设备制造业","concepts":["大盘股","深股通","深证100R","东方财富热股","计算机、通信和其他电子设备制造业","科技风格","MSCI中国","5G概念"],"enter_date":"2026-08-17","stop_loss":350.1,"target_price":579.42,"risk_reward":4.9,"support":378.56,"resistance":475.0,"factor_actions":[]},{"code":"300857","name":"协创数据","market":"深市","board":"创业板","horizon":"中长线","close":251.16,"close_date":"2026-09-30","close_verified":true,"pct_chg":1.94,"final_score":28.6,"resonance":2,"sources":["三重共识","四量终极"],"signals":["跨策略共振"],"industry":"计算机、通信和其他电子设备制造业","concepts":["人工智能","大盘股","国产芯片","中证500","大数据","深股通","阿里概念","计算机、通信和其他电子设备制造业"],"enter_date":"2026-08-17","stop_loss":226.04,"target_price":309.65,"risk_reward":2.33,"support":242.35,"resistance":278.6,"factor_actions":[]},{"code":"002640","name":"跨境通","market":"深市","board":"主板","horizon":"中长线","close":3.91,"close_date":"2026-09-30","close_verified":true,"pct_chg":-0.76,"final_score":28.6,"resonance":2,"sources":["三重共识","四量终极"],"signals":["上涨趋势","机构变红","跨策略共振"],"industry":"零售业","concepts":["破增发价股","婴童概念","电商概念","无线耳机","零售业","标准普尔","深股通","网红经济"],"enter_date":"2026-09-30","stop_loss":3.52,"target_price":4.22,"risk_reward":0.79,"support":3.2,"resistance":4.22,"factor_actions":[]},{"code":"300390","name":"天华新能","market":"深市","board":"创业板","horizon":"短线","close":49.09,"close_date":"2026-09-30","close_verified":true,"pct_chg":0.08,"final_score":24.8,"resonance":1,"sources":["四量终极"],"signals":["缠论买点","金钻信号"],"industry":"计算机、通信和其他电子设备制造业","concepts":["中证500","医疗器械概念","先进制造风格","中芯概念","深股通","计算机、通信和其他电子设备制造业","中盘股","MSCI中国"],"enter_date":"2026-09-30","stop_loss":44.18,"target_price":96.0,"risk_reward":9.56,"support":47.86,"resistance":61.28,"factor_actions":[]},{"code":"688808","name":"联讯仪","market":"沪市","board":"科创板","horizon":"短线","close":1546.63,"close_date":"2026-09-30","close_verified":true,"pct_chg":3.38,"final_score":24.2,"resonance":1,"sources":["四量终极"],"signals":[],"industry":"仪器仪表制造业","concepts":["仪器仪表制造业"],"enter_date":"2026-09-30","stop_loss":1391.97,"target_price":1846.62,"risk_reward":1.94,"support":1435.81,"resistance":1846.62,"factor_actions":[]},{"code":"300033","name":"同花顺","market":"深市","board":"创业板","horizon":"短线","close":197.06,"close_date":"2026-09-30","close_verified":true,"pct_chg":-1.33,"final_score":23.0,"resonance":1,"sources":["四量终极"],"signals":["缠论买点","金钻信号"],"industry":"其他金融业","concepts":["人工智能","大盘股","创业成份","鸿蒙概念","大数据","深股通","其他金融业","深证100R"],"enter_date":"2026-09-30","stop_loss":177.35,"target_price":245.48,"risk_reward":2.46,"support":196.37,"resistance":228.6,"factor_actions":[]},{"code":"300037","name":"新宙邦","market":"深市","board":"创业板","horizon":"短线","close":66.52,"close_date":"2026-09-30","close_verified":true,"pct_chg":0.9,"final_score":21.7,"resonance":1,"sources":["四量终极"],"signals":[],"industry":"计算机、通信和其他电子设备制造业","concepts":["中证500","先进制造风格","特斯拉概念","深股通","液冷概念","计算机、通信和其他电子设备制造业","中盘股","MSCI中国"],"enter_date":"2026-09-30","stop_loss":59.87,"target_price":84.99,"risk_reward":2.78,"support":61.88,"resistance":76.45,"factor_actions":[]},{"code":"300394","name":"天孚通信","market":"深市","board":"创业板","horizon":"短线","close":260.77,"close_date":"2026-09-30","close_verified":true,"pct_chg":1.87,"final_score":21.7,"resonance":1,"sources":["四量终极"],"signals":[],"industry":"计算机、通信和其他电子设备制造业","concepts":["大盘股","光纤概念","QFII重仓","深股通","深证100R","计算机、通信和其他电子设备制造业","科技风格","MSCI中国"],"enter_date":"2026-09-30","stop_loss":234.69,"target_price":294.5,"risk_reward":1.29,"support":237.3,"resistance":292.07,"factor_actions":[]},{"code":"601872","name":"招商轮船","market":"沪市","board":"主板","horizon":"短线","close":20.15,"close_date":"2026-09-30","close_verified":true,"pct_chg":1.31,"final_score":21.7,"resonance":1,"sources":["四量终极"],"signals":[],"industry":"水上运输业","concepts":["水上运输业","一带一路","大盘价值","大盘股","油气资源","HS300","上证180","MSCI中国"],"enter_date":"2026-09-30","stop_loss":18.13,"target_price":22.98,"risk_reward":1.4,"support":17.79,"resistance":22.98,"factor_actions":[]},{"code":"000737","name":"北方铜业","market":"深市","board":"主板","horizon":"短线","close":13.44,"close_date":"2026-09-30","close_verified":true,"pct_chg":0.07,"final_score":21.3,"resonance":1,"sources":["四量终极"],"signals":["机构变红","缠论买点"],"industry":"有色金属冶炼和压延加工业","concepts":["新材料","中盘成长","中盘股","中证500","参股券商","稀缺资源","PCB","2026中报预增"],"enter_date":"2026-09-30","stop_loss":12.1,"target_price":17.2,"risk_reward":2.8,"support":13.05,"resistance":17.2,"factor_actions":[]},{"code":"000703","name":"恒逸石化","market":"深市","board":"主板","horizon":"短线","close":15.63,"close_date":"2026-09-30","close_verified":true,"pct_chg":-0.38,"final_score":20.5,"resonance":1,"sources":["四量终极"],"signals":[],"industry":"化学纤维制造业","concepts":["新材料","转债标的","中盘股","中证500","化学纤维制造业","2026中报预增","深成500","机构重仓"],"enter_date":"2026-09-30","stop_loss":14.07,"target_price":20.13,"risk_reward":2.88,"support":15.42,"resistance":18.61,"factor_actions":[]},{"code":"601168","name":"西部矿业","market":"沪市","board":"主板","horizon":"短线","close":35.35,"close_date":"2026-09-30","close_verified":true,"pct_chg":0.51,"final_score":20.0,"resonance":1,"sources":["四量终极"],"signals":["上涨趋势","机构变红"],"industry":"有色金属矿采选业","concepts":["新材料","黄金概念","近期新高","东方财富热股","昨日炸板","中盘股","上证180","MSCI中国"],"enter_date":"2026-09-30","stop_loss":31.82,"target_price":43.29,"risk_reward":2.25,"support":33.5,"resistance":41.97,"factor_actions":[]},{"code":"300620","name":"光库科技","market":"深市","board":"创业板","horizon":"短线","close":270.48,"close_date":"2026-09-30","close_verified":true,"pct_chg":3.62,"final_score":19.9,"resonance":1,"sources":["四量终极"],"signals":["缠论买点","金钻信号"],"industry":"计算机、通信和其他电子设备制造业","concepts":["无人驾驶","中盘成长","光纤概念","国产芯片","中证500","卫星互联网","QFII重仓","海洋经济"],"enter_date":"2026-09-30","stop_loss":243.43,"target_price":333.54,"risk_reward":2.33,"support":251.2,"resistance":309.75,"factor_actions":[]},{"code":"002916","name":"深南电路","market":"深市","board":"主板","horizon":"短线","close":373.01,"close_date":"2026-09-30","close_verified":true,"pct_chg":-0.69,"final_score":18.6,"resonance":1,"sources":["四量终极"],"signals":[],"industry":"计算机、通信和其他电子设备制造业","concepts":["大盘股","国产芯片","央国企改革","深股通","深证100R","计算机、通信和其他电子设备制造业","科技风格","MSCI中国"],"enter_date":"2026-09-30","stop_loss":335.71,"target_price":459.8,"risk_reward":2.33,"support":328.21,"resistance":424.04,"factor_actions":[]},{"code":"300548","name":"长芯博创","market":"深市","board":"创业板","horizon":"短线","close":219.83,"close_date":"2026-09-30","close_verified":true,"pct_chg":0.83,"final_score":18.0,"resonance":1,"sources":["四量终极"],"signals":[],"industry":"计算机、通信和其他电子设备制造业","concepts":["中盘成长","国产芯片","铜缆高速连接","光纤概念","中证500","深股通","计算机、通信和其他电子设备制造业","中盘股"],"enter_date":"2026-09-30","stop_loss":197.85,"target_price":247.8,"risk_reward":1.27,"support":191.87,"resistance":247.8,"factor_actions":[]},{"code":"000807","name":"云铝股份","market":"深市","board":"主板","horizon":"短线","close":26.2,"close_date":"2026-09-30","close_verified":true,"pct_chg":-1.02,"final_score":18.0,"resonance":1,"sources":["四量终极"],"signals":["上涨趋势","机构变红","高ROE"],"industry":"有色金属冶炼和压延加工业","concepts":["大盘股","深股通","深证100R","MSCI中国","深成500","融资融券","大盘价值","新能源车"],"enter_date":"2026-09-30","stop_loss":23.58,"target_price":29.13,"risk_reward":1.12,"support":25.05,"resistance":29.13,"factor_actions":[{"factor":"ROE_TTM","adj":0.0,"scored":false,"note":"高ROE 排名第23／signals+reasons 展示，不计分（边际 +0.68pp 弱正，不足与强源同权）"}]},{"code":"002074","name":"国轩高科","market":"深市","board":"主板","horizon":"短线","close":29.5,"close_date":"2026-09-30","close_verified":true,"pct_chg":2.86,"final_score":17.4,"resonance":1,"sources":["四量终极"],"signals":["缩量强势"],"industry":"电气机械和器材制造业","concepts":["低空经济","大盘股","动力电池回收","电气机械和器材制造业","先进制造风格","深股通","数据中心","智能电网"],"enter_date":"2026-09-30","stop_loss":26.55,"target_price":30.49,"risk_reward":0.34,"support":24.67,"resistance":30.49,"factor_actions":[{"factor":"异常换手率","adj":0.0,"scored":false,"note":"缩量强势 排名第6／tags 展示，不计分（边际 −2.21pp 负 alpha ⇒ 整源剔除）"}]},{"code":"600105","name":"永鼎股份","market":"沪市","board":"主板","horizon":"短线","close":36.26,"close_date":"2026-09-30","close_verified":true,"pct_chg":-2.0,"final_score":16.8,"resonance":1,"sources":["四量终极"],"signals":["金钻信号"],"industry":"电气机械和器材制造业","concepts":["中盘成长","国产芯片","光纤概念","中证500","电气机械和器材制造业","QFII重仓","大数据","数据中心"],"enter_date":"2026-09-30","stop_loss":32.63,"target_price":53.33,"risk_reward":4.71,"support":36.12,"resistance":47.62,"factor_actions":[]}],"factor_chain":{"update_time":"2026-09-30 23:44:18","score_formula":"final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）","where":"algorithms/final_recommend.py :: 方案B 因子融合 + scored 计分","gate":{"V8_FUSION_NOISE_FILTER":1,"regime_open":true,"regime_coef_note":"非开仓期(_open_regime=False) 因子权重 ×0.3（仅对真计分的因子生效）"},"integrated":[{"key":"weak","name":"放量弱势","role":"仅标注","scored":false,"adj":0.0,"where":"2026-09-20 已随第二套 final_score 公式清除；仅写 signals 展示","n_hit":0,"evidence":"未回测","why":"FACTOR_LAB 异常换手率 **bottom 档**（放量=弱势）命中池内票即扣分　⚠️ 三重问题（2026-09-18 实测取证）：① **无依据** —— 本档从未纳入 walk-forward 回测（−2.21pp 是 **top 档**的实测值，bottom 档无同类证据），属「凭空的惩罚」，与 P5 明文原则「反向档位无显著负 edge 不给惩罚」冲突；② **设计上不相交** —— bottom 榜 = 极端放量股（abn 最大，弱势特征），而候选池由选股策略产出、天然偏缩量强势，两集合语义相反；实测 bottom ∩ pool = **0** ⇒ 本条几乎恒为 0 分；③ **代码失配（已修）** —— _weak 集合原缺 .lstrip('.') 导致恒不匹配，29 轮 / 1333 条候选命中 0 次"},{"key":"abn","name":"异常换手率","role":"仅展示","scored":false,"adj":0.0,"where":"写 tags（V8_FUSION_NOISE_FILTER=1），不写 sources/source_scores","n_hit":1,"evidence":"薄样本(9 信号日 / 85 命中)","why":"实测边际 −2.21pp（负 alpha，命中 85 条）⇒ 整源剔除，不计共振/strength"},{"key":"roe","name":"ROE_TTM","role":"仅展示","scored":false,"adj":0.0,"where":"写 signals「高ROE」+ reasons，不写 sources/source_scores","n_hit":1,"evidence":"薄样本(9 信号日 / 89 命中)","why":"实测边际 +0.68pp（弱正，命中 89 条 ≈ 43.9% 覆盖率，无选择性）⇒ 不足与强源同权"}],"evidence_note":"计分依据分级：①「未回测」= 无任何样本外证据（放量弱势）；②「薄样本」= 9 信号日实测边际，样本不足以定权重，故不计分（异常换手率/ROE_TTM/高手跟踪）；③「walk-forward」= ≥4/5 年 OOS 检验通过才给分（候选池层 P5 的 amt60/turntrend，+6/+3）。本层当前**没有任何因子持有第③级证据** ⇒ 除放量弱势外全部为 0 分，属**有意的保守**。　🔴 结论（2026-09-18 主人问「扣分标准科学吗？别一开始就犯错」）：本层唯一记分的「放量弱势 −0.5」有**三重问题** —— ①无回测依据（bottom 榜从未回测）；②设计上不相交（bottom=极端放量股 vs 候选池=缩量强势，实测交集 0 ⇒ 几乎恒不触发）；③上游 _weak 集合曾因 norm_code 未剥点而恒失配（29 轮命中 0 次，本补丁已修）。⇒ **因子在本层的实际计分影响 = 0**，现状等于「全部只做标注」；要让它真正成为加减分项，须先补 walk-forward 回测（流程见下方 ③ 待接入队列 / 明细见本页 🧪 因子审计卡）。","dedup_note":"因子只对**池内已有票**动作（_factor_in_pool 只查不建）⇒ 不产池、不决定谁能进榜"},"factor_trace":[{"code":"000807","name":"云铝股份","final_score":18.0,"resonance":1,"sources":["四量终极"],"actions":[{"factor":"ROE_TTM","adj":0.0,"scored":false,"note":"高ROE 排名第23／signals+reasons 展示，不计分（边际 +0.68pp 弱正，不足与强源同权）"}],"adj_total":0.0},{"code":"002074","name":"国轩高科","final_score":17.4,"resonance":1,"sources":["四量终极"],"actions":[{"factor":"异常换手率","adj":0.0,"scored":false,"note":"缩量强势 排名第6／tags 展示，不计分（边际 −2.21pp 负 alpha ⇒ 整源剔除）"}],"adj_total":0.0}],"republish_time":"2026-09-30 23:58:52"};
+window.FINAL_RECOMMEND_DATA = {
+  "update_time": "2026-10-01 12:48:03",
+  "crisis_score": 32.9,
+  "crisis_high": false,
+  "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
+  "total_candidates": 20,
+  "top_n": 5,
+  "data_degraded": true,
+  "signal_edge": {
+    "source": "backtest_expectancy@2026-09-30 07:19:18",
+    "degraded": false,
+    "effective": {
+      "jinzuan": 0.99,
+      "chan": 0.857,
+      "trend": -1.939,
+      "jigou": -1.052
+    },
+    "hardcoded_default": {
+      "jinzuan": 0.532,
+      "chan": 0.759,
+      "trend": -1.532,
+      "jigou": -0.66
+    },
+    "n_on10": {
+      "jinzuan": 168,
+      "chan": 334,
+      "trend": 248,
+      "jigou": 409
+    },
+    "consistent": {
+      "jinzuan": true,
+      "chan": true,
+      "trend": true,
+      "jigou": true
+    },
+    "loaded": {
+      "generated": "2026-09-30 07:19:18",
+      "hit": 4,
+      "n_snapshots": 75,
+      "date_range": [
+        "2026-06-06",
+        "2026-09-30"
+      ]
+    },
+    "alpha_select": {
+      "enabled": true,
+      "skipped_no_positive_edge": 0
+    }
+  },
+  "degrade_note": "⚠️ 数据降级：因子实验室（FACTOR_LAB.js）未达数据日（实际 data_date=2026-09-29） ⇒ 方案B 因子融合整体跳过。本结果为「降级放行」产物 —— 排序与信号有效，但上述环节未达最新口径。请对照产物内 factor_chain / signal_edge 元数据判断适用范围。",
+  "market_regime": {
+    "date": "2026-09-30",
+    "regime": "panic",
+    "open": true,
+    "ok": true,
+    "reason": "ok",
+    "note": "grind/panic=可开仓(正常推)；stabilize/rebound=历史回测≥3共振负期望，应观察/少推；ok=false 表示 regime 取数失败已按保守处置（regime=null、不推满仓）"
+  },
+  "price_source": {
+    "date": null,
+    "source": null,
+    "covered": 0,
+    "total": 20,
+    "note": "价格唯一权威来源（当日有效快照）；未覆盖的票 close/pct_chg 为 null，不伪造 0.00%"
+  },
+  "strong_sectors": [
+    "公路铁路运输",
+    "厨卫电器",
+    "小家电",
+    "小金属",
+    "房地产",
+    "文化传媒",
+    "汽车整车",
+    "生物制品",
+    "贵金属",
+    "轨交设备",
+    "银行",
+    "风电设备"
+  ],
+  "stocks": [
+    {
+      "rank": 1,
+      "code": "301358",
+      "name": "湖南裕能",
+      "market": "sz",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_source": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "stop_loss": 45.51,
+      "target_price": 74.88,
+      "risk_reward": 4.81,
+      "support": 49.44,
+      "resistance": 62.1,
+      "atr": 1.46,
+      "sources": [
+        "四量终极"
+      ],
+      "source_scores": {
+        "四量终极": 1.5
+      },
+      "resonance": 1,
+      "strength": 1.5,
+      "sector_score": 0.0,
+      "sector_hits": [],
+      "sector_fund": [],
+      "final_score": 10.4,
+      "buy_score": 10.4,
+      "enter_date": "2026-10-01",
+      "signals": [
+        "四量终极共振"
+      ],
+      "_60m_resonance": false,
+      "reason": "四量终极 信号0项",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "创业成份",
+        "中证500",
+        "中盘价值",
+        "先进制造风格",
+        "中盘股",
+        "储能概念",
+        "MSCI中国",
+        "锂电池概念"
+      ],
+      "tracking": {
+        "entry_date": "2026-10-01",
+        "entry_price": null,
+        "latest_price": null,
+        "return_pct": null,
+        "hold_days": 1,
+        "exit_type": "hold",
+        "note": "等待行情数据开始跟踪"
+      },
+      "action": "买入",
+      "market_regime": "panic"
+    },
+    {
+      "rank": 2,
+      "code": "002636",
+      "name": "金安国纪",
+      "market": "sz",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 73.18,
+      "close_date": "2026-10-01",
+      "close_source": "四量终极",
+      "close_verified": true,
+      "pct_chg": 5.43,
+      "stop_loss": 68.06,
+      "target_price": 83.43,
+      "risk_reward": 2.0,
+      "support": 63.8,
+      "resistance": 92.0,
+      "atr": 5.97,
+      "sources": [
+        "四量终极"
+      ],
+      "source_scores": {
+        "四量终极": 1.46
+      },
+      "resonance": 1,
+      "strength": 1.46,
+      "sector_score": 0.0,
+      "sector_hits": [],
+      "sector_fund": [],
+      "final_score": 8.8,
+      "buy_score": 8.8,
+      "enter_date": "2026-10-01",
+      "signals": [
+        "机构变红",
+        "缠论买点"
+      ],
+      "_60m_resonance": false,
+      "reason": "四量终极 信号2项",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "标准普尔",
+        "富时罗素",
+        "昨日高振幅",
+        "PCB",
+        "小盘股",
+        "2026中报预增",
+        "小盘成长",
+        "医疗器械概念"
+      ],
+      "tracking": {
+        "entry_date": "2026-10-01",
+        "entry_price": 73.18,
+        "latest_price": 73.18,
+        "return_pct": 0.0,
+        "hold_days": 1,
+        "exit_type": "hold",
+        "note": "今日新入选，自动开始跟踪"
+      },
+      "action": "买入",
+      "market_regime": "panic"
+    },
+    {
+      "rank": 3,
+      "code": "300496",
+      "name": "中科创达",
+      "market": "sz",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_source": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null,
+      "atr": null,
+      "sources": [
+        "四量终极"
+      ],
+      "source_scores": {
+        "四量终极": 1.5
+      },
+      "resonance": 1,
+      "strength": 1.5,
+      "sector_score": 0.0,
+      "sector_hits": [],
+      "sector_fund": [],
+      "final_score": 8.2,
+      "buy_score": 8.2,
+      "enter_date": "2026-10-01",
+      "signals": [
+        "四量终极共振"
+      ],
+      "_60m_resonance": false,
+      "reason": "四量终极 信号0项",
+      "industry": "软件和信息技术服务业",
+      "concepts": [
+        "中证500",
+        "富时罗素",
+        "AIPC",
+        "边缘计算",
+        "车联网(车路云)",
+        "破增发价股",
+        "英伟达概念",
+        "AI眼镜"
+      ],
+      "tracking": {
+        "entry_date": "2026-10-01",
+        "entry_price": null,
+        "latest_price": null,
+        "return_pct": null,
+        "hold_days": 1,
+        "exit_type": "hold",
+        "note": "等待行情数据开始跟踪"
+      },
+      "action": "买入",
+      "market_regime": "panic"
+    },
+    {
+      "rank": 4,
+      "code": "300001",
+      "name": "特锐德",
+      "market": "sz",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_source": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null,
+      "atr": null,
+      "sources": [
+        "四量终极"
+      ],
+      "source_scores": {
+        "四量终极": 1.5
+      },
+      "resonance": 1,
+      "strength": 1.5,
+      "sector_score": 0.0,
+      "sector_hits": [],
+      "sector_fund": [],
+      "final_score": 8.2,
+      "buy_score": 8.2,
+      "enter_date": "2026-10-01",
+      "signals": [
+        "四量终极共振"
+      ],
+      "_60m_resonance": false,
+      "reason": "四量终极 信号0项",
+      "industry": "电气机械和器材制造业",
+      "concepts": [
+        "数据中心",
+        "高压快充",
+        "中证500",
+        "富时罗素",
+        "新能源车",
+        "一带一路",
+        "储能概念",
+        "雅下水电概念"
+      ],
+      "tracking": {
+        "entry_date": "2026-10-01",
+        "entry_price": null,
+        "latest_price": null,
+        "return_pct": null,
+        "hold_days": 1,
+        "exit_type": "hold",
+        "note": "等待行情数据开始跟踪"
+      },
+      "action": "买入",
+      "market_regime": "panic"
+    },
+    {
+      "rank": 5,
+      "code": "300750",
+      "name": "宁德时代",
+      "market": "sz",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": 358.1,
+      "close_date": "2026-10-01",
+      "close_source": "四量终极",
+      "close_verified": true,
+      "pct_chg": -1.5,
+      "stop_loss": 322.29,
+      "target_price": 429.72,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null,
+      "atr": null,
+      "sources": [
+        "四量终极"
+      ],
+      "source_scores": {
+        "四量终极": 1.68
+      },
+      "resonance": 1,
+      "strength": 1.68,
+      "sector_score": 0.0,
+      "sector_hits": [],
+      "sector_fund": [],
+      "final_score": 8.0,
+      "buy_score": 8.0,
+      "enter_date": "2026-10-01",
+      "signals": [
+        "金钻信号"
+      ],
+      "_60m_resonance": false,
+      "reason": "四量终极 信号1项",
+      "industry": "电气机械和器材制造业",
+      "concepts": [
+        "钠离子电池",
+        "富时罗素",
+        "百元股",
+        "蚂蚁概念",
+        "新能源车",
+        "行业龙头",
+        "锂矿概念",
+        "储能概念"
+      ],
+      "tracking": {
+        "entry_date": "2026-10-01",
+        "entry_price": 358.1,
+        "latest_price": 358.1,
+        "return_pct": 0.0,
+        "hold_days": 1,
+        "exit_type": "hold",
+        "note": "今日新入选，自动开始跟踪"
+      },
+      "action": "买入",
+      "market_regime": "panic"
+    }
+  ],
+  "consensus_stocks": [
+    {
+      "rank": 1,
+      "code": "301358",
+      "name": "湖南裕能",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_source": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "stop_loss": 45.51,
+      "target_price": 74.88,
+      "risk_reward": 4.81,
+      "support": 49.44,
+      "resistance": 62.1,
+      "atr": 1.46,
+      "sources": [
+        "四量终极"
+      ],
+      "source_scores": {
+        "四量终极": 1.5
+      },
+      "resonance": 1,
+      "strength": 1.5,
+      "final_score": 10.4,
+      "sector_score": 0.0,
+      "sector_hits": [],
+      "enter_date": "2026-10-01",
+      "signals": [],
+      "_60m_resonance": false,
+      "reason": "四量终极 信号0项",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "创业成份",
+        "中证500",
+        "中盘价值",
+        "先进制造风格",
+        "中盘股",
+        "储能概念",
+        "MSCI中国",
+        "锂电池概念"
+      ],
+      "tracking": {
+        "entry_date": "2026-10-01",
+        "entry_price": null,
+        "latest_price": null,
+        "return_pct": null,
+        "hold_days": 1,
+        "exit_type": "hold",
+        "note": "等待行情数据开始跟踪"
+      },
+      "action": "买入",
+      "market_regime": "panic"
+    },
+    {
+      "rank": 2,
+      "code": "002636",
+      "name": "金安国纪",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 73.18,
+      "close_date": "2026-10-01",
+      "close_source": "四量终极",
+      "close_verified": true,
+      "pct_chg": 5.43,
+      "stop_loss": 68.06,
+      "target_price": 83.43,
+      "risk_reward": 2.0,
+      "support": 63.8,
+      "resistance": 92.0,
+      "atr": 5.97,
+      "sources": [
+        "四量终极"
+      ],
+      "source_scores": {
+        "四量终极": 1.46
+      },
+      "resonance": 1,
+      "strength": 1.46,
+      "final_score": 8.8,
+      "sector_score": 0.0,
+      "sector_hits": [],
+      "enter_date": "2026-10-01",
+      "signals": [
+        "缠论买点",
+        "机构变红"
+      ],
+      "_60m_resonance": false,
+      "reason": "四量终极 信号2项",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "标准普尔",
+        "富时罗素",
+        "昨日高振幅",
+        "PCB",
+        "小盘股",
+        "2026中报预增",
+        "小盘成长",
+        "医疗器械概念"
+      ],
+      "tracking": {
+        "entry_date": "2026-10-01",
+        "entry_price": 73.18,
+        "latest_price": 73.18,
+        "return_pct": 0.0,
+        "hold_days": 1,
+        "exit_type": "hold",
+        "note": "今日新入选，自动开始跟踪"
+      },
+      "action": "买入",
+      "market_regime": "panic"
+    },
+    {
+      "rank": 3,
+      "code": "300496",
+      "name": "中科创达",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_source": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null,
+      "atr": null,
+      "sources": [
+        "四量终极"
+      ],
+      "source_scores": {
+        "四量终极": 1.5
+      },
+      "resonance": 1,
+      "strength": 1.5,
+      "final_score": 8.2,
+      "sector_score": 0.0,
+      "sector_hits": [],
+      "enter_date": "2026-10-01",
+      "signals": [],
+      "_60m_resonance": false,
+      "reason": "四量终极 信号0项",
+      "industry": "软件和信息技术服务业",
+      "concepts": [
+        "中证500",
+        "富时罗素",
+        "AIPC",
+        "边缘计算",
+        "车联网(车路云)",
+        "破增发价股",
+        "英伟达概念",
+        "AI眼镜"
+      ],
+      "tracking": {
+        "entry_date": "2026-10-01",
+        "entry_price": null,
+        "latest_price": null,
+        "return_pct": null,
+        "hold_days": 1,
+        "exit_type": "hold",
+        "note": "等待行情数据开始跟踪"
+      },
+      "action": "买入",
+      "market_regime": "panic"
+    },
+    {
+      "rank": 4,
+      "code": "300001",
+      "name": "特锐德",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_source": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null,
+      "atr": null,
+      "sources": [
+        "四量终极"
+      ],
+      "source_scores": {
+        "四量终极": 1.5
+      },
+      "resonance": 1,
+      "strength": 1.5,
+      "final_score": 8.2,
+      "sector_score": 0.0,
+      "sector_hits": [],
+      "enter_date": "2026-10-01",
+      "signals": [],
+      "_60m_resonance": false,
+      "reason": "四量终极 信号0项",
+      "industry": "电气机械和器材制造业",
+      "concepts": [
+        "数据中心",
+        "高压快充",
+        "中证500",
+        "富时罗素",
+        "新能源车",
+        "一带一路",
+        "储能概念",
+        "雅下水电概念"
+      ],
+      "tracking": {
+        "entry_date": "2026-10-01",
+        "entry_price": null,
+        "latest_price": null,
+        "return_pct": null,
+        "hold_days": 1,
+        "exit_type": "hold",
+        "note": "等待行情数据开始跟踪"
+      },
+      "action": "买入",
+      "market_regime": "panic"
+    },
+    {
+      "rank": 5,
+      "code": "300750",
+      "name": "宁德时代",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": 358.1,
+      "close_date": "2026-10-01",
+      "close_source": "四量终极",
+      "close_verified": true,
+      "pct_chg": -1.5,
+      "stop_loss": 322.29,
+      "target_price": 429.72,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null,
+      "atr": null,
+      "sources": [
+        "四量终极"
+      ],
+      "source_scores": {
+        "四量终极": 1.68
+      },
+      "resonance": 1,
+      "strength": 1.68,
+      "final_score": 8.0,
+      "sector_score": 0.0,
+      "sector_hits": [],
+      "enter_date": "2026-10-01",
+      "signals": [
+        "金钻信号"
+      ],
+      "_60m_resonance": false,
+      "reason": "四量终极 信号1项",
+      "industry": "电气机械和器材制造业",
+      "concepts": [
+        "钠离子电池",
+        "富时罗素",
+        "百元股",
+        "蚂蚁概念",
+        "新能源车",
+        "行业龙头",
+        "锂矿概念",
+        "储能概念"
+      ],
+      "tracking": {
+        "entry_date": "2026-10-01",
+        "entry_price": 358.1,
+        "latest_price": 358.1,
+        "return_pct": 0.0,
+        "hold_days": 1,
+        "exit_type": "hold",
+        "note": "今日新入选，自动开始跟踪"
+      },
+      "action": "买入",
+      "market_regime": "panic"
+    }
+  ],
+  "all_candidates": [
+    {
+      "code": "301358",
+      "name": "湖南裕能",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "final_score": 10.4,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [],
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "创业成份",
+        "中证500",
+        "中盘价值",
+        "先进制造风格",
+        "中盘股",
+        "储能概念",
+        "MSCI中国",
+        "锂电池概念"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": 45.51,
+      "target_price": 74.88,
+      "risk_reward": 4.81,
+      "support": 49.44,
+      "resistance": 62.1,
+      "factor_actions": []
+    },
+    {
+      "code": "002636",
+      "name": "金安国纪",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 73.18,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": 5.43,
+      "final_score": 8.8,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "机构变红",
+        "缠论买点"
+      ],
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "标准普尔",
+        "富时罗素",
+        "昨日高振幅",
+        "PCB",
+        "小盘股",
+        "2026中报预增",
+        "小盘成长",
+        "医疗器械概念"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": 68.06,
+      "target_price": 83.43,
+      "risk_reward": 2.0,
+      "support": 63.8,
+      "resistance": 92.0,
+      "factor_actions": []
+    },
+    {
+      "code": "300496",
+      "name": "中科创达",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "final_score": 8.2,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [],
+      "industry": "软件和信息技术服务业",
+      "concepts": [
+        "中证500",
+        "富时罗素",
+        "AIPC",
+        "边缘计算",
+        "车联网(车路云)",
+        "破增发价股",
+        "英伟达概念",
+        "AI眼镜"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "300001",
+      "name": "特锐德",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "final_score": 8.2,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [],
+      "industry": "电气机械和器材制造业",
+      "concepts": [
+        "数据中心",
+        "高压快充",
+        "中证500",
+        "富时罗素",
+        "新能源车",
+        "一带一路",
+        "储能概念",
+        "雅下水电概念"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "300750",
+      "name": "宁德时代",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": 358.1,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": -1.5,
+      "final_score": 8.0,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "金钻信号"
+      ],
+      "industry": "电气机械和器材制造业",
+      "concepts": [
+        "钠离子电池",
+        "富时罗素",
+        "百元股",
+        "蚂蚁概念",
+        "新能源车",
+        "行业龙头",
+        "锂矿概念",
+        "储能概念"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": 322.29,
+      "target_price": 429.72,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "000725",
+      "name": "京东方Ａ",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 5.92,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": -0.34,
+      "final_score": 7.0,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "机构变红",
+        "缠论买点"
+      ],
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "富时罗素",
+        "OLED",
+        "UWB概念",
+        "钙钛矿电池",
+        "荣耀概念",
+        "裸眼3D",
+        "央国企改革",
+        "电子竞技"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": 5.51,
+      "target_price": 6.75,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "601138",
+      "name": "工业富联",
+      "market": "沪市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 64.04,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": 0.28,
+      "final_score": 6.8,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "机构变红",
+        "缠论买点"
+      ],
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "富时罗素",
+        "车联网(车路云)",
+        "深圳特区",
+        "英伟达概念",
+        "独角兽",
+        "计算机、通信和其他电子设备制造业",
+        "区块链",
+        "东方财富热股"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": 59.56,
+      "target_price": 73.01,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "600105",
+      "name": "永鼎股份",
+      "market": "沪市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 39.8,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": -2.93,
+      "final_score": 6.8,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "机构变红",
+        "缠论买点"
+      ],
+      "industry": "电气机械和器材制造业",
+      "concepts": [
+        "数据中心",
+        "中证500",
+        "富时罗素",
+        "QFII重仓",
+        "网络安全",
+        "新能源车",
+        "科技风格",
+        "一带一路"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": 37.01,
+      "target_price": 45.37,
+      "risk_reward": 2.0,
+      "support": 36.18,
+      "resistance": 47.62,
+      "factor_actions": []
+    },
+    {
+      "code": "00762",
+      "name": "中国联通",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 5.63,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": 0.72,
+      "final_score": 6.3,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "缠论买点",
+        "金钻信号"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-10-01",
+      "stop_loss": 5.24,
+      "target_price": 6.42,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "00941",
+      "name": "中国移动",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 79.5,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": 0.32,
+      "final_score": 6.3,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "缠论买点",
+        "金钻信号"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-10-01",
+      "stop_loss": 73.94,
+      "target_price": 90.63,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "09987",
+      "name": "百胜中国",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 349.8,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": -0.74,
+      "final_score": 6.3,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "缠论买点",
+        "金钻信号"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-10-01",
+      "stop_loss": 325.31,
+      "target_price": 398.77,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "03690",
+      "name": "美团-W",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 76.65,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": -2.85,
+      "final_score": 6.3,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "缠论买点",
+        "金钻信号"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-10-01",
+      "stop_loss": 71.28,
+      "target_price": 87.38,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "601208",
+      "name": "东材科技",
+      "market": "沪市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 51.28,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": 4.44,
+      "final_score": 5.9,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "机构变红",
+        "缠论买点"
+      ],
+      "industry": "化学原料和化学制品制造业",
+      "concepts": [
+        "OLED",
+        "燃料电池概念",
+        "新能源车",
+        "化学原料和化学制品制造业",
+        "PCB",
+        "电网概念",
+        "MLCC",
+        "苹果概念"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": 47.69,
+      "target_price": 58.46,
+      "risk_reward": 2.0,
+      "support": 44.76,
+      "resistance": 56.78,
+      "factor_actions": []
+    },
+    {
+      "code": "000039",
+      "name": "中国北大荒",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "final_score": 5.9,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [],
+      "industry": "金属制品业",
+      "concepts": [
+        "中证500",
+        "富时罗素",
+        "破净股",
+        "天然气",
+        "商业航天",
+        "深圳特区",
+        "可燃冰",
+        "2026一季报预减"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": 7.7,
+      "target_price": 9.78,
+      "risk_reward": 1.44,
+      "support": 8.48,
+      "resistance": 9.66,
+      "factor_actions": []
+    },
+    {
+      "code": "01211",
+      "name": "比亚迪股份",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 88.25,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": 1.2,
+      "final_score": 5.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "缠论买点"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-10-01",
+      "stop_loss": 82.07,
+      "target_price": 100.6,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "002850",
+      "name": "科达利",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "final_score": 5.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [],
+      "industry": "金属制品业",
+      "concepts": [
+        "PEEK材料概念",
+        "中证500",
+        "富时罗素",
+        "百元股",
+        "深圳特区",
+        "新能源车",
+        "人形机器人",
+        "特斯拉概念"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "600176",
+      "name": "中国巨石",
+      "market": "沪市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 43.2,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": 1.31,
+      "final_score": 5.6,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "机构变红",
+        "缠论买点"
+      ],
+      "industry": "非金属矿物制品业",
+      "concepts": [
+        "PEEK材料概念",
+        "中字头",
+        "富时罗素",
+        "央国企改革",
+        "非金属矿物制品业",
+        "东方财富热股",
+        "行业龙头",
+        "一带一路"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": 40.18,
+      "target_price": 49.25,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "002437",
+      "name": "誉衡药业",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 4.86,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": 9.95,
+      "final_score": 4.9,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "机构变红",
+        "缠论买点"
+      ],
+      "industry": "医药制造业",
+      "concepts": [
+        "创新药",
+        "病原体防治",
+        "标准普尔",
+        "低价股",
+        "肝炎概念",
+        "2026一季报预增",
+        "破发股",
+        "深股通"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": 4.52,
+      "target_price": 5.54,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    },
+    {
+      "code": "600362",
+      "name": "江西铜业",
+      "market": "沪市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 49.01,
+      "close_date": "2026-10-01",
+      "close_verified": true,
+      "pct_chg": -0.39,
+      "final_score": 4.5,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红",
+        "缠论买点"
+      ],
+      "industry": "有色金属冶炼和压延加工业",
+      "concepts": [
+        "富时罗素",
+        "央国企改革",
+        "稀缺资源",
+        "一带一路",
+        "大盘价值",
+        "大盘股",
+        "融资融券",
+        "沪股通"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": 45.58,
+      "target_price": 55.87,
+      "risk_reward": 2.0,
+      "support": 40.73,
+      "resistance": 50.84,
+      "factor_actions": []
+    },
+    {
+      "code": "002371",
+      "name": "创联控股",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": null,
+      "close_date": null,
+      "close_verified": false,
+      "pct_chg": null,
+      "final_score": 4.5,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [],
+      "industry": "专用设备制造业",
+      "concepts": [
+        "高带宽内存",
+        "OLED",
+        "百元股",
+        "富时罗素",
+        "第三代半导体",
+        "央国企改革",
+        "专用设备制造业",
+        "东方财富热股"
+      ],
+      "enter_date": "2026-10-01",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null,
+      "factor_actions": []
+    }
+  ],
+  "factor_chain": {
+    "update_time": "2026-10-01 12:48:03",
+    "score_formula": "final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）",
+    "where": "algorithms/final_recommend.py :: 方案B 因子融合",
+    "gate": {
+      "V8_FUSION_NOISE_FILTER": 1,
+      "regime_open": true
+    },
+    "integrated": [],
+    "skipped": true,
+    "skip_reason": "本轮 FACTOR_LAB.js 缺失/内容陈旧 ⇒ 方案B 因子融合整体跳过（数据降级）"
+  },
+  "factor_trace": []
+};
