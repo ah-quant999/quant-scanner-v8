@@ -7628,4 +7628,16 @@ items:
       - "data/TOP10_DAILY.js"
     updated: "2026-10-01 12:45"
     updated_by: 阿狸咪的工程师
+  - id: form-neutralize-inst-ic-1001
+    priority: P0
+    owner: 阿狸咪的工程师
+    status: done
+    what: C 类评分升级——form 横截面中性化(rank 零中心±4, 治趋势日全员齐 6 分量纲膨胀) + 机构分 IC 加权×2(rank IC +0.116/ICIR0.435/IC>0 76.5% 为全维最强而原权重仅 2.3%)。IC 诊断同时证实 quality 头部内 IC≈0(去双重计数正确)、backtest 头部内 IC 负但去除反显著变差(t-2.06)故不动。
+    fix: generate_top10.py 加 INST_WEIGHT=2.0/FORM_NEUT_SCALE=4.0 + rank_neutralize()；raw_total 拆 _raw_noform+form，循环后全候选 rank 中性化重算 total(与 gate/regime 口径一致)，breakdown.form/inst 展示有效值。commits ec49076a1c(代码+FINAL)+ed6097cbf5(TOP10_DAILY 补转)。
+    verify_how: 回测 replay_v2.py(42日)：N4+I2 TOP5 前向 +0.23%/胜48.1%/t+0.43 唯一转正 vs 基线 -0.47%/46.7%/-0.92；TOP10 -0.37% vs -0.31%(差 0.06pp 不显著)。远端 TOP10 ut=12:55 form=0.05(并列中性化生效)、FINAL ut=12:57 top5=湖南裕能/金安国纪/工业富联/中国巨石/000725(中国巨石 inst=6 加权受益升至#4)。
+    refs:/n      - "algorithms/generate_top10.py"
+      - "data/TOP10_DAILY.js"
+      - "data/FINAL_RECOMMEND_DATA.js"
+    updated: "2026-10-01 13:00"
+    updated_by: 阿狸咪的工程师
 
