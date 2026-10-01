@@ -7642,3 +7642,16 @@ items:
     updated: "2026-10-01 13:00"
     updated_by: 阿狸咪的工程师
 
+  - id: c-patch-restore-backtest-1001
+    priority: P0
+    owner: 阿狸咪的工程师
+    status: done
+    what: 对抗式自审发现 C 类改造引入的实现 bug——中性化重建 total 用的 _raw_noform 漏了 P2 回测反哺分 score_backtest(±10)，等于无意执行回测已证显著变差的 B0 去 backtest 方案(t=-2.06)，线上实现与已验证回测方案(N4+I2 含 bt)不一致。
+    fix: generate_top10.py 在 score_backtest 计算后补 _raw_noform += score_backtest(带注释标记)。commit b6c255d12c 单提交三文件(代码+TOP10_DAILY+FINAL_RECOMMEND)。
+    verify_how: py_compile 过；重跑全链(TIME_GATE_BYPASS=1) backtest 列回归(bt=1.0/-1.0 可见)，排名微调(金安国纪#3/中科创达#2 互换)；远端回读 TOP10 ut=13:07:04、FINAL ut=13:08:27、代码含修复标记。对抗式自审另发现 3 项非紧急问题已报主人待定——分数尺度崩塌(NORM_DIVISOR=130 按旧权重校准,新榜顶部仅 7~13 分,≥80 阈值永久死亡,历史不可比,需重校准+renormalize)、回测横截面 top20 vs 实现全候选 78 只口径差、回测 stat 混装 5 日/10 日前向收益(t 偏乐观)+9 变体选优赢家诅咒,均记 OOS 跟踪。
+    refs:
+      - "algorithms/generate_top10.py"
+      - "data/TOP10_DAILY.js"
+      - "data/FINAL_RECOMMEND_DATA.js"
+    updated: "2026-10-01 13:15"
+    updated_by: 阿狸咪的工程师
