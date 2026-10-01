@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-09-29 23:12"
+  updated: "2026-10-01 19:59"
   updated_by: 小九(lemoncat-cn)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -62,6 +62,7 @@ items:
       ② 收盘后最后一轮 SECTOR_FUND_FLOW top_list 应含概念板块（concept_fallback=true 亦算过）；
       ③ 明早 premarket 后 raw_data/us_hk_map.json 的 us_indices 三指数 price 非 null（或 note 标腾讯兜底）。
     updated: "2026-09-29 18:55"
+    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
   - id: freshness-falsealarm-rootfix-0929
     priority: P1
@@ -333,6 +334,7 @@ items:
       `.github/workflows/v8_cn_fetch_cloud.yml`（step17 L637-643 / step22 L772-785 /
       step23 L790-807 / step24 L876-881）；`scripts/fetch_sector_leaders.py`（L308 / L311 / L334）；
       job 原始日志 run #2609（job 108997948527）/ #2610（job 109012740483）。
+    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
   - id: build-deploy-blocked-by-crosslayer-stale-guard-0929
     title: "build_deploy 部署链被自家跨层闸门恒阻断（4/12 档同因失败）：HB_ALIMI / HB_XIAOJIU 内层 update_time 被钉旧 + IMA_STRONG_BACKTEST 停更 ⇒ v8_verify_layer_parity STALE_DAYS=3 恒判失败"
@@ -404,6 +406,8 @@ items:
       job 原始日志：#8677（build job）/ #8676 / #8674 / #8670；
       关联在册项：`heartbeat-files-clobbered-by-cnfetch`、`ima-snapshot-72h-expiry-trap`、
       `tz-naive-now-utc-stamp-flip-0927`。
+    alimi_decision_20261001: >-
+      保留跨层一致性门（安全闸，曾正确拦陈旧上线）；误报源于已修竞态 bug，现仅对真实陈旧报警，不删门。
 
   - id: build13-timeout-guard
     priority: P0
@@ -478,6 +482,9 @@ items:
       C: 只维持超时护栏、接受「多数轮 push 需重试一次」
     decided: "按主人令『用最科学的方法』由小九自行决断 —— 倾向 B（职责单一化：build 是 ?v 的 owner）"
     updated: "2026-09-22 20:14"
+    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
+    alimi_decision_20261001: >-
+      加『内容无变则跳过』闸降频，非放开并发；churn 根因=无意义高频推（交小九落地）。
 
   - id: concurrency-block-bucket
     priority: P1
@@ -487,6 +494,9 @@ items:
       v8_build_deploy concurrency 排队制 + 僵尸 job ⇒ 一个卡住的 job 堵死同桶后续 run
       （实测三态并存：running + pending ×2）。涉及跨桶语义，改动风险中。
     updated: "2026-09-21 08:40"
+    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
+    alimi_decision_20261001: >-
+      同桶 cancel-in-progress:true 释放僵尸占桶；build 幂等可重跑（交小九落地）。
 
   - id: build13-step-timeout-minutes
     priority: P2
@@ -495,7 +505,8 @@ items:
     what: "第13步仍无步级 timeout-minutes，仅靠 job 级 60min 兜底。命令级护栏已收敛，此项优先级降低。"
     updated: "2026-09-21 08:40"
 
-  # ── P0 · 部署链（2026-09-21 09:45 建项；09:58 阿狸咪复核改写）────────────
+  # ── P0 · 部署链（2026-09-21 09:45 建项；09:58 阿狸咪复核改写）────────────    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
+
   - id: gate-1010-marker-stale-ms-note
     priority: P0
     owner: 小九
@@ -690,6 +701,8 @@ items:
       09-22 20:26 那次 1.3MB→366KB「落后基线型 Contents API 覆盖」（commit 0320100b3f；
       force:false 拦不住「基线落后型覆盖」，见 §30.1/§43），该机制已由 `require_full` 截断读守卫
       （af4b42b75435）根治，待下一档 cn fetch 复验后转 pending-verify。
+    alimi_decision_20261001: >-
+      根除裸 git commit / git checkout <ref> -- <path>，统一 Git Data API 安全路径（交小九落地）。
 
   - id: alimi-same-family-check
     priority: P0
@@ -734,6 +747,7 @@ items:
       是否全量对齐待定 —— 因本机有 36 项未暂存工作树改动，全量对齐会丢本机 WIP。
     blocked_by: "需先判断哪些本机改动是有价值的 WIP、哪些是生成物噪音"
     updated: "2026-09-21 08:40"
+    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
   - id: maharo-daily-s4u
     priority: P2
@@ -743,6 +757,7 @@ items:
       本机 v8-maharo-daily 计划任务是 S4U 且 LastTaskResult=1（已知隐患）。
       属「日报链」，与素材链是两条链。根治需改 LogonType 并加 WakeToRun。
     updated: "2026-09-21 08:40"
+    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
   - id: defer-cache-empty-freeze
     priority: P1
@@ -883,6 +898,8 @@ items:
       详见该新项的 `fix` / `boundary` 两节。
     updated_by: 阿狸咪的工程师(alimi-cn)（追加附注）
     updated: "2026-09-24 00:04"
+    alimi_decision_20261001: >-
+      强制所有 HANDOFF 编辑走 Git Data API 基底预检路径（已落地为协议），--check 基陈旧硬拒；剩余风险=双机守协议。
 
   - id: handoff-yaml-guard
     priority: P0
@@ -1266,6 +1283,7 @@ items:
       ② 真跑：造一次 `stash pop` 冲突（本地留一个与远端冲突的同名改动 + 运行脚本），
          断言冲突分支后 `git status --porcelain` 里**只**有 3 个目标文件被改。
     updated: "2026-09-21 12:02"
+    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
   - id: candidate-quotes-category-drift
     priority: P1
@@ -1494,6 +1512,7 @@ items:
         `created_at` 折 CST 落在 **09:32–09:34**（自接力 run 会污染总数，不能算）。
         〔09-22 16:4x 现场终验·❌ 判据未达成，真因指向别处〕实测今日 v8_cn_fetch_intraday_lemoncat.yml 全部 run：**09:32–09:34 区间内 0 条 schedule run**（最早的 09:35:03 是 workflow_dispatch）；今日 7 条 schedule 档全部堆在 **14:43–16:46**，其中 16:46 一条已远超上界 1510 ⇒ 属整档安静退出。⇒ **上午档缺失的真实成因是 GitHub schedule 排队严重延迟（不是窗口下沿 932）**，与 intraday-schedule-morning-absent 同源。保持 pending-verify。
     updated: '2026-09-22 17:02'
+    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
   - id: diagnostics-info-status-leak
     priority: P1
@@ -2274,6 +2293,7 @@ items:
     updated: '2026-09-22 17:02'
     note: >
       〔09-22 16:4x 现场终验·❌ 判据未达成（新故障）〕实测 data/maharo_insights.js update_time=**2026-09-22 09:00**；提交历史仅 09-22 08:57:07 与 11:39:15 两笔（均「经发布闸门核对」），**12:3x 与 15:1x 两档均无产出** ⇒ verify_how 判据（应为当日 12:3x / 15:1x）未达成。查本机 automation 表：c613b8ad（午间版 12:30·MO-FR）与 a1542082（盘后第二版 15:10·MO-FR）**两条 status 均为 ACTIVE** ⇒ 存在「automation 标 ACTIVE 但未产出」的执行层缺口，需专项排查（下一步：查其执行历史/触发日志）。
+    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
   - id: north-fund-dead-source-fix
     priority: P1
@@ -4105,7 +4125,7 @@ items:
   - id: handoff-ledger-hash-desync
     priority: P1
     owner: shared
-    status: doing
+    status: done
     what: >
       `docs/ops/HANDOFF.ledger.json` 的 `id_content_hashes` 与 `docs/ops/HANDOFF.yaml` 现文
       **完全不匹配**：用 v8_handoff_edit_kit 的官方口径（`content_hash`：块 = `- id:` 起至下一个
@@ -4138,7 +4158,7 @@ items:
       ② 确认后由任一机一次性重算 62 项并校准到 100%；
       ③ 同批把「哈希 ≡ 现算」并入 `[13/13]`（现在只查 ids/计数，漂移查不出来）。
       **不急**：不影响部署链（门禁不校验哈希），但它现在**已经失去防覆盖能力**，建议本周内收口。
-    updated: "2026-09-24 20:08"
+    updated: "2026-10-01 19:59"
     updated_by: 阿狸咪的工程师(alimi-cn)
     alimi_verify_20260924: >-
       🔴 阿狸咪的工程师 2026-09-24 20:0x 独立复现（正面回应本项 `note` 的三问；全部实跑，非推断）：
@@ -4199,6 +4219,8 @@ items:
           证据（本段）与补丁方案已备，待裁决后即可落码 + 全量重算。
       五、本轮处置：**不改** `id_content_hashes`（避免把 105 项盲改成某一种口径下的不可验证值），
         仅留证；同批另一路已恢复被旧基线覆盖的 2 条判据键（见 `handoff-yaml-stale-base-item-drop`）。
+    done_evidence: >-
+      官方 scripts/handoff_ledger_hash.py --check：132/132、失配 0、消失 id=无；提交 8fcb5e5a0f。
 
   - id: handoff-dup-key-index-tail-truncation
     priority: P1
@@ -4363,6 +4385,8 @@ items:
       ③_has_pending_run 增加 in_progress 拦截或把 HEAL_DEBOUNCE_MIN(25min) 抬到 > 单轮耗时）。
     updated: 2026-09-27 00:59
     updated_by: 阿狸咪的工程师(alimi-cn)
+    alimi_decision_20261001: >-
+      按 category 分组并发+取消，或 dispatcher 同 payload 去重；非盲目放大队列（交小九落地）。
 
   - id: dajijin-reduction-monitor
     priority: P1
@@ -4632,6 +4656,8 @@ items:
       ＋ `##[error]Process completed with exit code 1.` ⇒ 与立项例形态逐字一致。
       ⚠️ 同窗并存两族**非**本项：并发组顶替产生的 `cancelled`、以及 step3「⚡ 抢跑短路」skipped。
     updated: "2026-09-24 08:14"
+    alimi_decision_20261001: >-
+      保留 step13 现有 3 次重试（已含每次重取最新 main），不追加；属 churn 伴生。
 
   - id: api-push-stale-base-index-clobber
     priority: P1
@@ -4843,7 +4869,8 @@ items:
     updated: "2026-09-24 17:44"
     updated_by: 小九(lemoncat-cn)
 
-  # ── P0 · 数据链（阿狸咪 2026-09-24 15:4x CST 实测新增）──────────────────
+  # ── P0 · 数据链（阿狸咪 2026-09-24 15:4x CST 实测新增）──────────────────    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
+
   - id: cnfetch-fallback-concurrency-orphan
     priority: P0
     owner: shared
@@ -4942,6 +4969,8 @@ items:
         —— 小九 14:10 档 §四.1 已明确排除「上传 403」（13:00 后 25 文件提交成功）。
     updated: "2026-09-24 15:25"
     updated_by: 阿狸咪的工程师(alimi-cn)
+    alimi_decision_20261001: >-
+      单树化批 blob（核实 api_push_raw 现状并补全），调用数 N→≈1（交小九落地）。
 
   - id: rawdata-md-crlf-flip
     priority: P2
@@ -7113,7 +7142,8 @@ items:
     refs: >-
       `.github/workflows/v8_cn_fetch_cloud.yml` · `.github/workflows/v8_cn_fetch_cloud_hosted.yml` ·
       `.github/workflows/v8_cn_fetch_cloud_selfhosted.yml` · `.github/workflows/v8_stock_quote_refresh.yml:261` ·
-      `v8_health_check.py:3562`
+      `v8_health_check.py:3562`    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
+
   - id: cn-run-start-env-dead-guards-0926
     title: cn_fetch 两处 V8_RUN_START 恒空 ⇒ landcheck 反假成功终检从未生效 + 自接力 10 分钟节奏闸门失效
     priority: P1
@@ -7174,6 +7204,7 @@ items:
       ⚠️ 参照物：本轮定性的基线档 = `#2336`（head `b9f7e956e935`）。
     refs: >-
       `.github/workflows/v8_cn_fetch_cloud.yml` · `docs/ops/handover/2026-09-26_2240_阿狸咪的工程师给小九_cn_fetch自接力节奏闸门与landcheck反假成功终检双双失效_根因V8_RUN_START恒空.md`
+    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
   - id: tz-naive-now-utc-stamp-flip-0927
     priority: P1
@@ -7585,6 +7616,7 @@ items:
       - "docs/ops/HANDOFF.yaml#intraday-chain-cron-deregistered"
     updated: "2026-09-29 12:55"
     updated_by: 小九(lemoncat-cn)
+    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
   - id: watchdog-heartbeat-falsekill-rootfix-0929
     priority: P0
