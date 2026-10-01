@@ -75,6 +75,16 @@ QUALITY_ACTIVITY_ZERO = 0.35         # RC3：sig_count==0 时质量分折扣系�
 FORM_WEIGHT = 0.7
 POOL_QUALITY_WEIGHT = 0.5
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 🔴 2026-10-01 C 类：横截面中性化 + IC 加权（回测见 replay_neutral.py / replay_v2.py）
+# IC 诊断(42日, top20 内 rank IC)：inst +0.116(ICIR 0.435, IC>0 76.5%) 最强但权重仅 2.3%；
+#   form 齐分膨胀(趋势日全员 6 分) → rank 中性化零中心 ±4；quality IC≈0 证实去双重计数正确；
+#   backtest 头部内 IC 负但去除反而显著变差(t-2.06) → 不动(防过拟合)。
+# 回测：N4+I2 TOP5 前向 +0.23%/胜48.1%/t+0.43(唯一转正) vs 基线 -0.47%/46.7%/-0.92；
+#   TOP10 -0.37% vs 基线 -0.31%(差 0.06pp 不显著)。
+INST_WEIGHT = 2.0                     # IC 最强因子加权
+FORM_NEUT_SCALE = 4.0                 # form rank 中性化零中心幅度
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 🔴 2026-10-01 质量分时效/活跃度衰减辅助函数（根治「总这几只」）
@@ -108,6 +118,26 @@ def activity_factor(sig_count):
     except Exception:
         sc = 0
     return 1.0 if sc >= 1 else QUALITY_ACTIVITY_ZERO
+
+
+def rank_neutralize(vals, scale):
+    """C 类：横截面 rank 中性化——并列取平均秩，线性映射到零中心 [-scale, +scale]。
+    消除「趋势日全员齐高分」的量纲膨胀，只保留相对区分力（回测 N4+I2 TOP5 唯一转正）。"""
+    n = len(vals)
+    if n < 2:
+        return [0.0] * n
+    order = sorted(range(n), key=lambda i: vals[i])
+    rk = [0.0] * n
+    i = 0
+    while i < n:
+        j = i
+        while j + 1 < n and vals[order[j + 1]] == vals[order[i]]:
+            j += 1
+        avg = (i + j) / 2.0
+        for t in range(i, j + 1):
+            rk[order[t]] = avg
+        i = j + 1
+    return [(rk[i] / (n - 1) - 0.5) * 2 * scale for i in range(n)]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1679,8 +1709,11 @@ def main():
             continue
 
         # ── 原始总分（各维度绝对加分之和）──
-        raw_total = (base + enhance + form_score * FORM_WEIGHT + fund
-                     + sector_score + inst + quality_effective)
+        # 🔴 2026-10-01 C 类：inst 为 IC 最强因子(+0.116/ICIR0.435) → 加权 ×2；
+        #   form 改走横截面中性化（循环后统一 rank 零中心 ±4），raw_total 拆出 noform 便于重算。
+        inst_effective = inst * INST_WEIGHT
+        _raw_noform = base + enhance + fund + sector_score + inst_effective + quality_effective
+        raw_total = _raw_noform + form_score * FORM_WEIGHT
 
         # ── 回测反哺（P2；🔴 2026-09-20 改动15）：walk-forward 信号组合 **T+5** 修正 ──
         # T+5 收益每 1% ≈ ±1 分，clamp ±10；组合缺失回退 0（中性）。
@@ -1742,13 +1775,17 @@ def main():
             "target_price_method": target_price_method,
             "risk_reward": risk_reward,
             "stop_precise": False,
+            # C 类中性化暂存：循环后统一 rank 中性化重算 total（键名下划线=不进 JSON 产物）
+            "_form_raw": form_score,
+            "_raw_noform": _raw_noform,
+            "_gate": gate_multiplier,
             "breakdown": {
                 "base": base,
                 "enhance": enhance,
                 "form": form_score,
                 "fund": fund,
                 "sector": sector_score,
-                "inst": inst,
+                "inst": round(inst_effective, 1),
                 "quality": round(quality_effective, 1),
                 "backtest": score_backtest,
                 "breakout": 5 if breakout_5d else 0,
@@ -1778,6 +1815,14 @@ def main():
         })
 
     # ── 5. 排序取TOP20 ──
+    # 🔴 2026-10-01 C 类：form 横截面中性化（全候选 rank 零中心 ±FORM_NEUT_SCALE，
+    #    消除「趋势日全员齐 6 分」的量纲膨胀；与 gate/regime 口径一致地重算 total）
+    if scored:
+        _neut = rank_neutralize([s["_form_raw"] for s in scored], FORM_NEUT_SCALE)
+        for s, fn in zip(scored, _neut):
+            raw_eff = (s["_raw_noform"] + fn) * s["_gate"]
+            s["total_score"] = round(min(100, max(0, raw_eff / NORM_DIVISOR * 100)) * s.get("regime_adjust", 1.0), 1)
+            s["breakdown"]["form"] = round(fn, 2)   # 展示与排序口径一致（有效 form）
     scored.sort(key=lambda x: -x["total_score"])
     if VETO_COUNT:
         print(f"  ⛔ 质差一票否决合计: {VETO_COUNT} 只（ST/当期亏损/营收崩塌，未进评分）")
