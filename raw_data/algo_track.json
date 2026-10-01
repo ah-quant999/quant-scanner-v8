@@ -2358,7 +2358,7 @@
         },
         {
           "code": "000725",
-          "name": "000725",
+          "name": "京东方A",
           "algo": "four_volume",
           "list_date": "20260921",
           "list_date_dashed": "2026-09-21",
@@ -2396,7 +2396,7 @@
         },
         {
           "code": "000100",
-          "name": "000100",
+          "name": "TCL科技",
           "algo": "four_volume",
           "list_date": "20260921",
           "list_date_dashed": "2026-09-21",
@@ -4383,7 +4383,7 @@
         },
         {
           "code": "000725",
-          "name": "000725",
+          "name": "京东方A",
           "bars": 7,
           "pct": -6.07,
           "last_bar": "2026-09-30"
@@ -4397,7 +4397,7 @@
         },
         {
           "code": "000100",
-          "name": "000100",
+          "name": "TCL科技",
           "bars": 4,
           "pct": -6.01,
           "last_bar": "2026-09-24"
