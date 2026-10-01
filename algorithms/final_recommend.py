@@ -148,7 +148,9 @@ def _stock_name_map():
                 d = json.load(open(sp, encoding="utf-8"))
                 for it in (d.get("data") or []):
                     if isinstance(it, dict) and it.get("code") and it.get("name"):
-                        _m[str(it["code"])] = str(it["name"])
+                        # 🛡 2026-10-01：去交易所排版空格+全角归一（万 科Ａ→万科A，展示噪音根治）
+                        _m[str(it["code"])] = (str(it["name"]).replace(" ", "").replace("\u3000", "")
+                                               .replace("Ａ", "A").replace("Ｂ", "B"))
         except Exception as e:
             print(f"[warn] stock_names 加载失败: {e}")
         _STOCK_NAME_MAP = _m
@@ -156,13 +158,23 @@ def _stock_name_map():
 
 
 def _resolve_name(code, name):
-    """fix_name 兜底后仍为纯代码（name==code/缺失）时，用 stock_names 映射补全真实股票名。"""
+    """fix_name 兜底后仍为纯代码（name==code/缺失）或港股碰撞名时，权威映射补全真实股票名。
+    🛡 2026-10-01 扩（港股碰撞名拦截）：「中国北大荒(hk00039)→000039 中集集团」家族——
+      上游携带的名字干净但错误，name==code 判别不到 ⇒ 统一走
+      name_utils.resolve_authoritative_name（只拦确定性错误，合法简称零触碰）。"""
     n = fix_name(code, name)
     c = norm_code(code)
     if not n or n == c:
         m = _stock_name_map().get(code) or _stock_name_map().get(c)
         if m:
             return m
+    try:
+        from name_utils import resolve_authoritative_name
+        n2 = resolve_authoritative_name(code, n)
+        if n2:
+            return n2
+    except Exception:
+        pass
     return n
 
 
@@ -739,7 +751,7 @@ def main():
         r = pool[_nc]
         if not r["code"]:
             r["code"] = _nc
-            r["name"] = fix_name(_nc, name)
+            r["name"] = _resolve_name(_nc, name)
             r["market"] = market or market_prefix(_nc)
             r["board"] = board or board_from_code(_nc)
             # 从 STOCK_STOP_DATA 预填支撑/压力/ATR/止损/目标（如存在）
@@ -751,7 +763,7 @@ def main():
         else:
             # 已有记录时，若旧 name 为空/等于 code，尝试用新 name/映射表更新
             if not r["name"] or r["name"] == r["code"]:
-                r["name"] = fix_name(code, name)
+                r["name"] = _resolve_name(code, name)
         return r
 
     def _factor_in_pool(code):
@@ -1250,7 +1262,7 @@ def main():
         prof = profiles.get(key) or profiles.get(norm_code(key))
         if prof:
             if not r["name"] or r["name"] == r["code"]:
-                r["name"] = fix_name(r["code"], prof.get("name"))
+                r["name"] = _resolve_name(r["code"], prof.get("name"))
             if not r["industry"]:
                 r["industry"] = prof.get("industry") or ""
             if prof.get("concepts"):

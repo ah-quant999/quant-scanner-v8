@@ -171,6 +171,15 @@ def _signal_strength(status, signal_type):
     return 0
 
 
+def _auth_name(code, name, market=""):
+    """🛡 2026-10-01 消费点收口：名=码/港股碰撞名 → 权威名（name_utils）。"""
+    try:
+        from name_utils import resolve_authoritative_name
+        return resolve_authoritative_name(code, name, market)
+    except Exception:
+        return name
+
+
 def _sector_match_item(item, sector_top_in, sector_top_out):
     item_concepts = set(item.get("_concepts", []) or [])
     item_industry = item.get("_industry", "") or ""
@@ -287,7 +296,7 @@ def build_items(merged, sentiment, sector_flow, profile_map):
 
         items.append({
             "code": code,
-            "name": it.get("name", ""),
+            "name": _auth_name(code, it.get("name", "")),
             "algo": it.get("_algo", ""),
             "list_date": it.get("list_date_dashed") or it.get("list_date", ""),
             "entry_price": float(it.get("entry_price") or 0),

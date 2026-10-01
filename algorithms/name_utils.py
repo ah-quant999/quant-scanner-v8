@@ -97,6 +97,76 @@ def strip_entitlement_prefix(name):
     return re.sub(r'^(XD|XR|DR|N)', '', str(name).strip())
 
 
+# ── 🛡 2026-10-01 一劳永逸（港股碰撞名 + 名码退化 消费点收口）─────────────
+# 背景（10-01 主人截图实锤）：TOP10 第12名 000039 显示「中国北大荒」= hk00039 港股名
+#   经「陈旧 out/gold_pool.json 遮蔽新鲜 raw_data」通路上位；第13名 000725 名=码退化。
+# scanner/build_candidate_pool 各有带 EM 兜底的 resolve_*，但 generate_top10 /
+#   final_recommend / gen_algo_track / build_pool_tracker 等【消费点】直接
+#   s.get("name") 继承，绕过唯一校入口 ⇒ 本模块提供轻量纯本地收口（不再写第 5 份映射）。
+_AUTH_CACHE = None
+
+
+def _auth_maps():
+    """延迟加载 raw_data/stock_names.json → (A股名映射{6位码:名}, 港股碰撞名集合)。
+    与 scanner._stock_names_map_s 同规：顶层 dict 取 data；港股条目不进 6 位映射；
+    去交易所排版空格。raw_data 版已入仓、任何环境恒可达。"""
+    global _AUTH_CACHE
+    if _AUTH_CACHE is not None:
+        return _AUTH_CACHE
+    amap, hk = {}, set()
+    import os as _os, json as _json
+    p = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))),
+                      "raw_data", "stock_names.json")
+    try:
+        with open(p, "r", encoding="utf-8") as f:
+            obj = _json.load(f)
+        if isinstance(obj, dict):
+            obj = obj.get("data") or []
+        for it in (obj or []):
+            if not isinstance(it, dict):
+                continue
+            c = (it.get("code") or "").strip()
+            n = (it.get("name") or "").strip()
+            if not c or not n:
+                continue
+            fc = (it.get("full_code") or "").strip().lower()
+            mkt = (it.get("market") or "").strip().lower()
+            if fc.startswith("hk") or mkt == "hk":
+                hk.add(n)   # 收集港股名，供碰撞判据（中国北大荒/上海实业环境/FUTURE BRIGHT 家族）
+                continue
+            amap[c.zfill(6)] = (n.replace(" ", "").replace("\u3000", "")
+                                .replace("Ａ", "A").replace("Ｂ", "B"))
+    except Exception as e:
+        print("  [WARN] name_utils 权威名映射加载失败: %s" % e)
+    if not amap:
+        print("  [WARN] name_utils A股名映射为空：raw_data/stock_names.json 不可读 ⇒ 名称将退化")
+    _AUTH_CACHE = (amap, hk)
+    return _AUTH_CACHE
+
+
+def resolve_authoritative_name(code, name, market=""):
+    """消费点统一收口：只拦两类【确定性错误】，不碰合法简称（防名称膨胀回归）。
+      ① 名缺失 / 名==纯代码（000725 事故家族）
+      ② 名 ∈ 港股碰撞名集合（hk00039 中国北大荒 顶 000039 中集集团 家族）
+    合法冠名（N力勤/XD*/DR*）与正常简称原样放行；港股(market=="hk")不套用 A 股映射。"""
+    n = (name or "").strip()
+    c = norm_code(code)
+    c6 = c.zfill(6)[-6:] if c else ""
+    raw_code_s = str(code or "").strip()
+    suspect = (not n) or n == raw_code_s or (c6 and n == c6) \
+              or bool(re.fullmatch(r"[0-9A-Za-z]+", n))
+    amap, hk = _auth_maps()
+    if not suspect:
+        if n in hk and (market or "").strip().lower() != "hk":
+            m = amap.get(c6)
+            if m:
+                return m
+        return n
+    if (market or "").strip().lower() == "hk":
+        return n or c6
+    return amap.get(c6, n or c6)
+
+
 def fix_name(code, name):
     """如果 name 为空或与 code 相同，用兜底映射表/画像修复。
 

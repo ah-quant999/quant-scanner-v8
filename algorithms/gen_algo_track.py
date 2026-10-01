@@ -126,7 +126,16 @@ def _quote_map(stock_quote):
     return mp
 
 
-def _extract_four_volume():
+def _auth_name(code, name, market=""):
+    """🛡 2026-10-01 消费点收口：名=码/港股碰撞名 → 权威名（name_utils，合法简称零触碰）。"""
+    try:
+        from name_utils import resolve_authoritative_name
+        return resolve_authoritative_name(code, name, market)
+    except Exception:
+        return name
+
+
+def _extract_from_four_volume():
     """从 FOUR_VOLUME.js + FOUR_VOLUME_60M.js 提取今日信号。"""
     signals = []
     for js_name in ["FOUR_VOLUME", "FOUR_VOLUME_60M"]:
@@ -140,7 +149,7 @@ def _extract_four_volume():
                 continue
             signals.append({
                 "code": str(code),
-                "name": s.get("name", ""),
+                "name": _auth_name(code, s.get("name", ""), s.get("market", "")),
                 "market": s.get("market", ""),
                 "algo": "four_volume",
                 "period": period,
@@ -170,7 +179,7 @@ def _extract_from_final_rec(source_name):
         # 2026-09-03 主人令：板块龙头/大牛股猎手已下线，algo_map 留作 audit 痕迹，禁止实际引用
         results.append({
             "code": str(code),
-            "name": s.get("name", ""),
+            "name": _auth_name(code, s.get("name", "")),
             "market": s.get("board", ""),
             "algo": source_name,   # 2026-09-11 修：algo_map 从未定义（原注释已写明"禁止实际引用"，直接落 source_name）
             "signal_date": _today_dashed(),

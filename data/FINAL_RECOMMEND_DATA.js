@@ -1050,7 +1050,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "000039",
-      "name": "中国北大荒",
+      "name": "中集集团",
       "market": "深市",
       "board": "主板",
       "horizon": "短线",

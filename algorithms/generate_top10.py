@@ -1180,10 +1180,36 @@ def main():
     #    本脚本在 step1 运行，直接读 raw_data 会拿到上一轮的旧/空文件 → "金股池为空"跳过。
     #    故优先读 out/gold_pool.json（本轮），回退 raw_data。
     _out_gp = os.path.join(WORKSPACE, "..", "out", "gold_pool.json")
+    _raw_gp = os.path.join(DATA_DIR, "gold_pool.json")
     gold_pool = load_json(_out_gp, {})
+    # 🛡 2026-10-01 一劳永逸（陈旧 out/ 遮蔽新鲜 raw_data）：out/ 是工作区持久文件，
+    #   假期/补跑跳过 scanner 重产时会读到 09-23 名字修复之前的陈旧污染池
+    #   （10-01 实锤：000039 中国北大荒 / 000725、000100 名=码 直上 TOP10 前排）。
+    #   update_time 对比，陈旧 out/ 一律弃用改读 raw_data（tracked、恒新鲜入库）。
+    try:
+        _out_ut = str((gold_pool or {}).get("update_time") or "")
+        _raw_ut = ""
+        if os.path.exists(_raw_gp):
+            with open(_raw_gp, encoding="utf-8") as _f:
+                _raw_ut = str((json.load(_f) or {}).get("update_time") or "")
+        if _out_ut and _raw_ut and _out_ut < _raw_ut:
+            print(f"  🛡 out/gold_pool.json 陈旧({_out_ut}) < raw_data({_raw_ut}) → 弃用 out/ 改读 raw_data")
+            gold_pool = {}
+    except Exception:
+        pass
     if not (isinstance(gold_pool, dict) and gold_pool.get("stocks")):
-        gold_pool = load_json(os.path.join(DATA_DIR, "gold_pool.json"), {"stocks": {}})
+        gold_pool = load_json(_raw_gp, {"stocks": {}})
     gp_stocks = gold_pool.get("stocks", {})
+    # 🛡 2026-10-01 一劳永逸（消费点唯一校入口）：无论池来自 out/ 还是 raw_data，
+    #   名字统一过 name_utils.resolve_authoritative_name（只拦 名=码/港股碰撞名
+    #   两类确定性错误），存量错名就地纠正，正常简称零触碰（防名称膨胀回归）。
+    try:
+        from name_utils import resolve_authoritative_name as _ran
+        for _k, _s in gp_stocks.items():
+            if isinstance(_s, dict) and _s.get("name"):
+                _s["name"] = _ran(_s.get("code") or _k, _s.get("name"), _s.get("market", ""))
+    except Exception as _e:
+        print(f"  ⚠️ 名字收口跳过: {_e}")
     if not gp_stocks:
         print("  ⚠️  金股池为空，跳过")
         print(f"\n  结果: 跳过 (金股池为空)")
