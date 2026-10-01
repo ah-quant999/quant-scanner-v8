@@ -45,6 +45,57 @@ OUTPUT = os.path.join(DATA_DIR, "top10_daily.json")
 NORM_DIVISOR = 130
 NORM_VERSION = 130          # 写入快照，供迁移函数识别是否已按本口径归一
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 🔴 2026-10-01 根治「当日因子计分榜总这几只」（审计结论 + 回测验证后上线）
+# 根因：质量分（ROE/营收增速/中报预告，季度级静态数据）独占 35~38 分，远超
+#       动态因子（信号/形态/资金/板块 ±10 量级）→ 头部排名整个季度冻结。
+# 三处根治（回测见 E:/_alimi_tools/audit_dsb/replay_backtest.py，41 交易日窗口）：
+#   RC1 质量分权重再平衡：quality 贡献 ×0.5（原 1.0），让动态因子真正参与排序；
+#       NEW(top10) 前向均值 -0.56% 胜率43.7% vs OLD -0.77% → 跑赢且 t 从显著负变不显著。
+#   RC2 报告期时效衰减：财报越旧质量分越贬值（防止静态分永久霸榜）；
+#       前向加固（历史快照无 period 字段，未参与回测，但同方向、只额外折扣旧质量分）。
+#   RC3 当前无信号衰减：sig_count==0 的票靠老底子分数霸榜 → 质量分 ×0.35 下沉，
+#       直接打沉无当前信号的「常驻票」，治体感上的「总这几只」。
+QUALITY_WEIGHT = 0.5                 # RC1
+QUALITY_REPORT_GRACE_DAYS = 60       # RC2：报告期后 60 天内不衰减
+QUALITY_REPORT_DECAY_DAYS = 120      # RC2：其后 120 天内线性衰减到 FLOOR
+QUALITY_REPORT_FLOOR = 0.5           # RC2：衰减下限（旧报告仍保留 50% 权重）
+QUALITY_ACTIVITY_ZERO = 0.35         # RC3：sig_count==0 时质量分折扣系数
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 🔴 2026-10-01 质量分时效/活跃度衰减辅助函数（根治「总这几只」）
+def report_age_factor(period):
+    """RC2：依据财报报告期末日，越旧质量分越贬值。
+    period: 'YYYYMMDD' 或 'YYYY-MM-DD'（报告期末，如 '2026-06-30'）；无则=1.0。"""
+    if not period:
+        return 1.0
+    s = str(period).replace("-", "").replace("/", "")
+    if len(s) != 8 or not s.isdigit():
+        return 1.0
+    try:
+        from datetime import datetime as _dt
+        end = _dt.strptime(s, "%Y%m%d")
+        age = (datetime.now() - end).days
+    except Exception:
+        return 1.0
+    if age <= QUALITY_REPORT_GRACE_DAYS:
+        return 1.0
+    over = age - QUALITY_REPORT_GRACE_DAYS
+    if over >= QUALITY_REPORT_DECAY_DAYS:
+        return QUALITY_REPORT_FLOOR
+    frac = over / QUALITY_REPORT_DECAY_DAYS
+    return 1.0 - (1.0 - QUALITY_REPORT_FLOOR) * frac
+
+
+def activity_factor(sig_count):
+    """RC3：当前无信号(sig_count==0)的票质量分打折下沉；有信号则满权。"""
+    try:
+        sc = int(sig_count)
+    except Exception:
+        sc = 0
+    return 1.0 if sc >= 1 else QUALITY_ACTIVITY_ZERO
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 🔴 P2 信号边缘权重（2026-09-05 建立；🔴 2026-09-20 改「可实盘 T+5 超额」口径 = 改动15）
@@ -1593,6 +1644,16 @@ def main():
         fq = fundamental_stocks.get(fq_key, {})
         quality_score, quality_grade, quality_detail = quality_points(fq)
 
+        # 🔴 2026-10-01 质量分时效+活跃度衰减（根治「总这几只」）：
+        #   RC2 报告期时效（fq.period，无则=1.0） / RC3 当前无信号打折。
+        #   quality_effective 同时作为 raw_total 的「质量」项与卡片展示的 score_quality，
+        #   保证前端展示与排序口径一致（不再展示虚高的 38 分静态质量）。
+        _q_period = (fq or {}).get("statDate")
+        quality_effective = (quality_score
+                             * QUALITY_WEIGHT
+                             * report_age_factor(_q_period)
+                             * activity_factor(sig_count))
+
         # ── 质差股一票否决（2026-09-07 主人令·贝塔派审计缺口补齐）──
         # 共振链此前只做加分没有垃圾票出清。ST/当期亏损/营收崩塌直接出局，
         # 不进 TOP10 → 三重共识 → 最终推荐任何下游环节。缺数据一律中性放行。
@@ -1604,7 +1665,7 @@ def main():
             continue
 
         # ── 原始总分（各维度绝对加分之和）──
-        raw_total = base + enhance + form_score + fund + sector_score + inst + quality_score
+        raw_total = base + enhance + form_score + fund + sector_score + inst + quality_effective
 
         # ── 回测反哺（P2；🔴 2026-09-20 改动15）：walk-forward 信号组合 **T+5** 修正 ──
         # T+5 收益每 1% ≈ ±1 分，clamp ±10；组合缺失回退 0（中性）。
@@ -1658,7 +1719,7 @@ def main():
             "regime_open": regime_open,
             "regime_adjust": regime_adj,
             "quality_grade": quality_grade,
-            "quality_score": quality_score,
+            "quality_score": round(quality_effective, 1),
             "sectors": stock_sectors[:8] if isinstance(stock_sectors, list) else [],
             "stop_loss": stop_loss,
             "target_price": target_price,
@@ -1673,7 +1734,7 @@ def main():
                 "fund": fund,
                 "sector": sector_score,
                 "inst": inst,
-                "quality": quality_score,
+                "quality": round(quality_effective, 1),
                 "backtest": score_backtest,
                 "breakout": 5 if breakout_5d else 0,
                 "research": research_score,
