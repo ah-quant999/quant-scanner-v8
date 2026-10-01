@@ -722,8 +722,10 @@ def main():
                 rc, o = git("stash", "pop")
                 if rc != 0:
                     log("stash pop 冲突 -> 强制恢复 stash 版本", o[-300:] if o else "")
-                    git("checkout", "--theirs", ".")
-                    git("add", ".")
+                    git("checkout", "--theirs", "--", "index.html", "data/FACTOR_LAB.js", "raw_data/factor_lab.json")
+                    # 🔧 C3 根治：冲突时只精确恢复 3 个目标文件到 stash 版本（与 L728 pathspec add / L747 commit 一致），
+                    # 不再 `git add .` 全量 → 消除工作树污染与「旧树静默覆盖」家族（旧 checkout --theirs . 会污染全部文件，
+                    # 经 v8_build_deploy 的 --detect-changes 二次致害）。正常无冲突路径不受影响。
             # 4) 提交目标文件
             rc, o = git("add", "index.html", "data/FACTOR_LAB.js", "raw_data/factor_lab.json")
             log("git add rc=", rc)
@@ -741,9 +743,8 @@ def main():
             #   **stale 工作树版本**一并推上远端 —— 属本仓最致命的「旧树静默覆盖」家族
             #   （与 09-20 index.html 覆盖事故、stale-index-landmine 同族），只是换了个入口。
             #   补 pathspec 后：即使 index 被填满，commit 也只带走这 3 个路径 ⇒ 引爆链断。
-            #   ⚠️ 残留：L725 `checkout --theirs .` 仍会污染**工作树**（非提交面），
-            #   会经 v8_build_deploy 的 --detect-changes 二次致害；已另立挂账
-            #   factorlab-conflict-tree-pollution（P2）跟踪，不在本处一并改（最小改动原则）。
+            #   ✅ C3 根治(2026-10-01 小九)：L725 已改为 pathspec 精确恢复 3 个目标文件，
+            #      工作树不再被 `checkout --theirs .` 污染；factorlab-conflict-tree-pollution 挂账结项。
             rc, o = git("commit", "-m",
                 "chore(v8): 因子实验室定时刷新(异常换手率重点池 + ROE全市场主板)",
                 "--", "index.html", "data/FACTOR_LAB.js", "raw_data/factor_lab.json")
