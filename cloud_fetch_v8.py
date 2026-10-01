@@ -3302,9 +3302,30 @@ def f_w52_high():
         except Exception:
             chg = 0.0
         top_gainers.append({"name": rr.get("f14"), "code": rr.get("f12"), "chg": chg})
+    # 📈 2026-10-01 主人令「要解析不要裸数字」：累积家数观察序列（前端趋势行/档位判定用）。
+    #   读现有 raw_data/w52_high.json 的 history（不存在/坏档则空启动），按 date upsert
+    #   当日 {date,total}（同日多轮跑批取最新值，收盘档定稿），保留最近 60 条。
+    #   透传链路已核验：update_v8.py W52_HIGH 分支只剔除 stocks，history 原样下发 data/W52_HIGH.js；
+    #   v8_health_check.py key_fields=["total","top_gainers"]，新增字段不触发问责假红。
+    history = []
+    try:
+        _raw_p = ROOT / "raw_data" / "w52_high.json"
+        if _raw_p.exists():
+            _prev = json.loads(_raw_p.read_text(encoding="utf-8"))
+            _h = _prev.get("history") or []
+            if isinstance(_h, list):
+                history = [x for x in _h if isinstance(x, dict) and x.get("date")]
+    except Exception as _e:
+        print(f"  ⚠️ W52_HIGH history 读取失败（空启动，不阻断）: {_e}")
+        history = []
+    _today = now_cst().strftime("%Y-%m-%d")
+    history = [x for x in history if x.get("date") != _today]
+    history.append({"date": _today, "total": int(total)})
+    history = history[-60:]
     return {
         "total": total,
         "top_gainers": top_gainers,
+        "history": history,
         "note": "东方财富「历史新高」板块成分数（真实新高广度信号）",
     }
 

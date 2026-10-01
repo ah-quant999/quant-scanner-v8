@@ -13391,20 +13391,58 @@ function drawUpDownChart(){
       $t.textContent='—';
       return;
     }
-    let score=50;
-    if(total>=300) score=90;
-    else if(total>=200) score=75;
-    else if(total>=150) score=60;
-    else if(total>=100) score=45;
-    else if(total>=50) score=30;
-    else score=20;
-    // 🛡 2026-09-30 主人令（审计·去假精确）：5 档「宽度评分」数字已删（无信息量的硬编码映射），
-    //   score 仅保留用于红涨/金/绿跌着色，不再展示数值。
-    let color=score>=70?'var(--up)':(score>=50?'var(--gold)':'var(--down)');
-    // 2026-08-31：胶囊改小，内部改成一行；徽章统一用 _uBadge
-    let h='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:10px;">';
-    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">今日历史新高</span><span style="font-size:20px;font-weight:800;color:'+color+';">'+total+'</span></div>';
+    // 📈 2026-10-01 主人令「要解析不要裸数字」：四档位色带+指针落位+趋势行+行动解读。
+    //   量纲 0~300+（东财「历史新高」板块成分数），切点 30/100/200 与旧评分映射（50/100/150/200/300）同源。
+    //   四档口径与行动建议详见逻辑详解页「市场宽度 · 新高家数（广度温度计）」。
+    const _wz=[{min:200,label:'亢奋普涨',col:'var(--up)',tip:'普涨扩散、赚钱效应广，进攻可积极；家数骤降＝情绪见顶信号，先降仓'},
+               {min:100,label:'温和扩散',col:'var(--gold)',tip:'上涨有宽度、非单一抱团，正常做多区，跟随主线板块'},
+               {min:30,label:'分化抱团',col:'var(--sub)',tip:'行情集中少数板块，指数易假红；进攻票优选「已在新高榜＋四模块共振」双确认'},
+               {min:0,label:'退潮控仓',col:'var(--down)',tip:'新高家数萎缩、赚钱效应差，以防守为主，等家数连续回升再转进攻'}];
+    const _z=_wz.find(function(z){return total>=z.min;});
+    const _pct=function(v){return Math.min(v,300)/300*100;};
+    let h='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;margin-bottom:10px;">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">';
+    h+='<span style="font-size:11px;color:var(--sub);">今日历史新高 <span style="font-size:20px;font-weight:800;color:'+_z.col+';">'+total+'</span> 家</span>';
+    h+='<span style="font-size:12px;font-weight:700;color:'+_z.col+';">'+_z.label+'</span></div>';
+    h+='<div style="position:relative;height:22px;display:flex;border-radius:6px;margin:6px 0 3px;">';
+    h+='<div style="width:'+_pct(30)+'%;background:var(--down);opacity:.72;border-radius:6px 0 0 6px;"></div>';
+    h+='<div style="width:'+(_pct(100)-_pct(30))+'%;background:var(--sub);opacity:.72;"></div>';
+    h+='<div style="width:'+(_pct(200)-_pct(100))+'%;background:var(--gold);opacity:.72;"></div>';
+    h+='<div style="flex:1;background:var(--up);opacity:.72;border-radius:0 6px 6px 0;"></div>';
+    const _px=Math.max(0,Math.min(100,_pct(total)));
+    h+='<div style="position:absolute;left:calc('+_px+'% - 5px);top:2px;width:4px;height:18px;border-radius:2px;background:var(--txt);box-shadow:0 0 4px rgba(0,0,0,.7);"></div>';
+    h+='<div style="position:absolute;left:calc('+_px+'% - 6px);top:-10px;font-size:10px;color:var(--txt);text-shadow:0 1px 3px #000;">'+total+'</div>';
     h+='</div>';
+    h+='<div style="position:relative;height:11px;font-size:9px;color:var(--dim);">';
+    h+='<span style="position:absolute;left:'+_pct(30)+'%;transform:translateX(-50%);">30</span>';
+    h+='<span style="position:absolute;left:'+_pct(100)+'%;transform:translateX(-50%);">100</span>';
+    h+='<span style="position:absolute;left:'+_pct(200)+'%;transform:translateX(-50%);">200</span>';
+    h+='<span style="position:absolute;right:0;">300+</span></div></div>';
+    // 趋势行（history 近 60 观察日，同日取最新值，收盘档定稿）
+    const _hist=(data.history||[]).filter(function(x){return x&&x.date;});
+    let _tr='';
+    if(_hist.length>=2){
+      const _prev=Number(_hist[_hist.length-2].total)||0;
+      const _d=total-_prev;
+      let _run=0,_dir=0;
+      for(let i=_hist.length-1;i>0;i--){
+        const _diff=(Number(_hist[i].total)||0)-(Number(_hist[i-1].total)||0);
+        if(_diff===0) break;
+        const _s=_diff>0?1:-1;
+        if(_dir===0) _dir=_s;
+        if(_s!==_dir) break;
+        _run++;
+      }
+      const _dcol=_d>0?'var(--up)':(_d<0?'var(--down)':'var(--sub)');
+      _tr='<span style="color:'+_dcol+';font-weight:700;">'+(_d>0?'+':'')+_d+'</span>'
+         +(_run>=2?(' · <span style="color:'+_z.col+';font-weight:700;">'+(_dir>0?'连升':'连降')+_run+'日</span>'):'');
+    }else{
+      _tr='<span style="color:var(--dim);">趋势序列建档中'+(_hist.length?('（已积累 '+_hist.length+' 日）'):'')+'</span>';
+    }
+    h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">较上一观察日 '+_tr+'</div>';
+    // 行动解读（档位判定 → 仓位建议，口径与逻辑详解页一致）
+    h+='<div style="font-size:12px;line-height:1.7;color:var(--txt);background:rgba(251,191,36,.06);border:1px dashed rgba(251,191,36,.32);border-radius:8px;padding:8px 10px;margin-bottom:10px;">';
+    h+='<b style="color:'+_z.col+';">解读：</b>'+total+' 家 → '+_z.label+'。'+_z.tip+'。</div>';
     if(top.length){
       h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">领涨新高股 TOP8</div>';
       h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;">';
