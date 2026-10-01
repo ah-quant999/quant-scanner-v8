@@ -7604,3 +7604,15 @@ items:
       - "algorithms/fetch_lhb.py#is_trading_day"
     updated: "2026-10-01 00:58"
     updated_by: 小九
+
+  - id: quality-score-freeze-rootfix-1001
+    priority: P0
+    owner: 小九(lemoncat-cn)
+    status: done
+    what: 根治「当日因子计分榜总这几只」——审计确认根因=质量分(ROE/营收/中报预告，季度级静态)独占35~38分远超动态因子(±10)，头部排名整季冻结；叠加金股池45交易日出池(09-13令)与无当前信号(sig_count=0)仍上榜。
+    fix: algorithms/generate_top10.py 三处根治(commit d854ff0c1f)：①RC1 质量分权重×0.5(原1.0)让动态因子真正参与；②RC2 报告期时效衰减(report_age_factor读statDate，旧报告×0.5触底，随缓存刷新激活)；③RC3 当前无信号质量分×0.35下沉。score_quality/breakdown.quality 改为展示有效分(与原排序口径一致)。
+    verify_how: 回放回测(76快照/4749只kline/41交易日)：NEW top10 前向均值-0.56%胜率43.7% vs OLD -0.77%/44.4% vs 基准-1.00%/42.6%，t从显著负(-1.79)变不显著(-0.52)，跑赢OLD与基准。单测衰减函数正确(中报0.863/年报0.5/无信号0.35)。py_compile通过。
+    refs:
+      - "algorithms/generate_top10.py"
+    updated: "2026-10-01 08:42"
+    updated_by: 阿狸咪的工程师
