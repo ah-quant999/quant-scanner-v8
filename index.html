@@ -1980,14 +1980,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <span style="font-size:15px;font-weight:700;color:var(--txt);">🏆 当日因子计分榜</span>
     <span id="dsbUpdSlot" style="display:inline-flex;align-items:center;gap:6px;"></span>
     <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">最新一轮榜单</span>
-    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">推荐置顶同序 · 余按因子总分降序</span>
+    <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b4d;">全榜按因子总分降序 · 🏷=当日最终推荐</span>
     <span id="dsbBadge" style="font-size:10px;color:var(--dim);"></span>
     </div>
     <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px;">
-    <b style="color:#f59e0b;">怎么读</b>：候选池每只票的<b>各因子加减分</b>逐项列出（<span style="color:#ef5350;">红=加分</span> / <span style="color:#26a69a;">绿=扣分</span> / 灰=0），按
-    <code style="background:rgba(245,158,11,.1);padding:1px 4px;border-radius:3px;">total_score</code> 从高到低排列 ——
-    <b style="color:#ef5350;">最顶部的就是最终推荐</b>；标 🏷「最终推荐」= 当日 FINAL_RECOMMEND 实际推荐名单。
-    <br><span style="color:var(--dim);">⚠️ 本榜为<b>最新一轮盘后产物</b>（非实时）—— 产物日期见卡头「更新于」胶囊，与「最终推荐」TopN 完全一致（权威序）。</span>
+    <b style="color:#f59e0b;">怎么读</b>：候选池每只票的<b>各因子加减分</b>逐项列出（<span style="color:#ef5350;">红=加分</span> / <span style="color:#26a69a;">绿=扣分</span> / 灰=0），<b>全榜按</b>
+    <code style="background:rgba(245,158,11,.1);padding:1px 4px;border-radius:3px;">total_score</code> <b>从高到低排列</b>；
+    标 🏷「最终推荐」= 当日 FINAL_RECOMMEND 实际推荐名单（该名单用 final_score 口径、可含跨策略源，与本榜因子总分各自如实 —— <b>仅作标记，不改变本榜排序</b>）。
+    <br><span style="color:var(--dim);">⚠️ 本榜为<b>最新一轮盘后产物</b>（非实时）—— 产物日期见卡头「更新于」胶囊；「最终推荐」为独立管线，更新时刻可能早于/晚于本榜（错批时两者名单可不同，各自如实）。</span>
     </div>
     <div id="dsbHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">&#x1F3C6; 当日因子计分榜加载中&#x2026;</div></div>
     </div>
@@ -7324,9 +7324,9 @@ function fmtSigned(v){
   // 🏆 当日因子计分榜（2026-09-19 主人令新建）
   //   原话：「这张专门成立一张，把当天进候选池股票的各种因子加减分全列出来，
   //          按分数从高到低排列，最顶部的就是最终推荐的几只了，一目了然为什么选这几只」
-  //   数据源：data/TOP10_DAILY.js 的 top20（generate_top10.py 落盘，每票 11 维因子分 + 文字明细，
-  //           已按 total_score 降序 —— 本卡**照产物原序渲染，不重排**，顶部即最高分）。
-  //   🏷「最终推荐」标记 ← FINAL_RECOMMEND_DATA.stocks 当日实际推荐名单（代码数字位精确匹配）。
+  //   数据源：data/TOP10_DAILY.js 的 top20（generate_top10.py 落盘，每票 11 维因子分 + 文字明细）。
+  //   🔴 2026-10-01 主人令：前端统一按 total_score 降序重排（不再「照产物原序」裸信），
+  //      🏷「最终推荐」仅作行标记 ← FINAL_RECOMMEND_DATA.stocks（代码数字位精确匹配），不置顶。
   //   口径注：本榜 = generate_top10.py 的 total_score 评分体系（决定排序的主力分）；
   //           推荐层的 factor_chain（放量弱势 weak_penalty 等）是二次微调，
   //           两层口径各自如实、不混排。
@@ -7375,33 +7375,12 @@ function fmtSigned(v){
     // 上述「↳」子项列（已含在「增强」列内，渲染时弱化，避免主人重复相加）
     var _SUBCOLS = { score_breakout:1, score_research:1, score_p4:1, score_p5:1 };
     var _detKeys = ['form_detail','fund_detail','sector_detail','inst_detail','quality_detail','research_detail','p4_detail','p5_detail'];
-    // 🔴 2026-09-23 一劳永逸修复：本榜排序以「最终推荐」为权威序，根除与最终推荐排名不一致
-    //   原逻辑直接按生成器序（total_score 降序）渲染，与 final_recommend.py 的 final_score 排序（且可纳入三重/四量等跨策略源）必然分叉。
-    //   现改为：① 最终推荐名单按 FR 同序置顶；② 其下按因子总分降序；③ FR 中含因子池外标的（跨策略源）也置顶并标注 ⊘。
-    var _codeOf = function(s){ return String(s.code==null?'':s.code).replace(/[^0-9]/g,''); };
-    var _frIdx = {};
-    (FR.stocks||[]).forEach(function(x, i){ if(x && x.code != null) _frIdx[String(x.code).replace(/[^0-9]/g,'')] = i; });
-    var _rest = rows.filter(function(s){ return !_frIdx.hasOwnProperty(_codeOf(s)); });
-    _rest.sort(function(a,b){ return (Number(b.total_score)||0) - (Number(a.total_score)||0); });
-    var _rowByCode = {}, _poolCodes = {};
-    rows.forEach(function(s){ var c=_codeOf(s); _rowByCode[c]=s; _poolCodes[c]=true; });
-    var _extraByCode = {};
-    (FR.stocks||[]).forEach(function(x){
-      if(!x || x.code == null) return;
-      var c = String(x.code).replace(/[^0-9]/g,'');
-      if(_poolCodes[c]) return;
-      var _r = { code:c, name:(x.name||c), total_score:(x.final_score!=null?x.final_score:'—'), _notInPool:true };
-      FACTS.forEach(function(f){ _r[f[1]] = 0; });
-      _extraByCode[c] = _r;
-    });
-    var _recRows = [];
-    (FR.stocks||[]).forEach(function(x){
-      if(!x || x.code == null) return;
-      var c = String(x.code).replace(/[^0-9]/g,'');
-      var _r = _rowByCode[c] || _extraByCode[c];
-      if(_r) _recRows.push(_r);
-    });
-    rows = _recRows.concat(_rest);
+    // 🔴 2026-10-01 主人令（反转 09-23 置顶序）：本榜=因子计分榜，全榜统一按 total_score 降序；
+    //   🏷「最终推荐」仅作行标记（见上方 _rec），不再置顶、不再向榜内注入因子池外标的。
+    //   缘由（实测 2026-10-01）：FR 与 TOP10 是两条管线、update_time 可错批（FR 13:08 vs TOP10 15:35），
+    //   置顶混排会把 FR 旧批的 final_score 冒充「总分」列、池外标的因子列全 0 —— 榜面即假。
+    //   （09-23 置顶令的背景是两榜同批同源；盘中 lite 重算 TOP10 不联动 FR 后，置顶=混批，故按新令反转。）
+    rows = rows.slice().sort(function(a,b){ return (Number(b.total_score)||0) - (Number(a.total_score)||0); });
     // 🔴 2026-09-22：从产物取「真实公式三段」的真值，用于卡面如实披露（不写死、产物缺则降级）
     var _gi  = D.gate_info || {};
     var _gm  = (_gi.gate_multiplier != null) ? Number(_gi.gate_multiplier) : null;
@@ -7464,7 +7443,7 @@ function fmtSigned(v){
        + '<br>① <b>表内 8 个加数列均为有效值</b>——质量列 = 原始质量分 ×0.5 ×池内0.5 ×报告时效(0.5~1，财报越旧越衰减) ×活跃度(0.35~1，当前无信号下沉)；机构列 = 原始机构分 ×2（IC 全维最强因子加权）；形态列 = <b>全池横截面中性化值</b>（按当日全部候选的形态分名次映射到 -4~+4，只保留相对强弱、消除趋势日全员齐高分，全员并列时≈0）；'
        + '<br>② <code>raw = 信号基础 + 增强 + 形态 + 资金 + 板块 + 机构 + 质量 + 回测反哺</code>（8 列相加，各计一次；↳4 子项已含在增强内）；'
        + '<br>③ <code>总分 = clamp( raw × 门禁乘子 ' + _gmTxt + ' ÷ 归一化分母 ' + _divTxt + ' × 100 , 0 , 100 ) × 个股regime系数</code>；门禁乘子 = clamp( 开仓系数 × IC权重 ' + _icwTxt + ' × regime权重 ' + _rgwTxt + ' , 0.3 , 1.05 )，全池统一；当日 regime = ' + _regTxt + '。'
-       + '<br>④ 按总分降序排名；「🏷 最终推荐」名单置顶（推荐层可纳入三重共识/四量终极等跨策略源）。'
+       + '<br>④ 全榜按总分降序排名（2026-10-01 主人令：🏷「最终推荐」仅作行标记，不再置顶、不注入因子池外标的——两管线错批时各自如实）。'
        + '<br>⇒ 所以「各列直接相加」<b>不等于</b>总分，须走②③；表内列为两位小数展示值、中间计算为全精度，<b>逐列复现总分允许 ±0.1 舍入差</b>。'
        + '数据源 data/TOP10_DAILY.js'
        + (D.update_time ? (' · 更新于 <b>'+_e(D.update_time)+'</b>') : '')
