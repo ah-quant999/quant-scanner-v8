@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-09-30 21:00:18",
-  "base_trade_date": "2026-09-30",
+  "update_time": "2026-10-01 16:06:44",
+  "base_trade_date": "2026-10-01",
   "stage_window": "B",
   "skipped_out_of_window": [
     {
@@ -22,7 +22,7 @@
       "name": "候选池",
       "path": "raw_data/candidate.json",
       "status": "✅ 本日新鲜",
-      "ts": "2026-09-30 20:10:55",
+      "ts": "2026-10-01 15:35:18",
       "required": true,
       "note": ""
     },
@@ -30,7 +30,7 @@
       "name": "候选池(前端)",
       "path": "data/CANDIDATE.js",
       "status": "✅ 本日新鲜",
-      "ts": "2026-09-30 20:10:55",
+      "ts": "2026-10-01 15:35:18",
       "required": false,
       "note": ""
     },
@@ -38,7 +38,7 @@
       "name": "逆势龙头CRDS",
       "path": "raw_data/crds_card_data.json",
       "status": "✅ 本日新鲜",
-      "ts": "2026-09-30 20:10:04",
+      "ts": "2026-10-01 15:34:41",
       "required": true,
       "note": ""
     },
@@ -46,7 +46,7 @@
       "name": "逆势龙头(前端)",
       "path": "data/CRDS_CARD_DATA.js",
       "status": "✅ 本日新鲜",
-      "ts": "2026-09-30 20:10:04",
+      "ts": "2026-10-01 15:34:41",
       "required": false,
       "note": ""
     },
@@ -62,7 +62,7 @@
       "name": "TOP10推荐池",
       "path": "raw_data/top10_daily.json",
       "status": "✅ 本日新鲜",
-      "ts": "2026-09-30 20:11:10",
+      "ts": "2026-10-01 15:35:29",
       "required": true,
       "note": ""
     },
@@ -70,7 +70,7 @@
       "name": "TOP10推荐池(前端)",
       "path": "data/TOP10_DAILY.js",
       "status": "✅ 本日新鲜",
-      "ts": "2026-09-30 20:11:10",
+      "ts": "2026-10-01 15:35:29",
       "required": false,
       "note": ""
     },
@@ -78,7 +78,7 @@
       "name": "三重共识",
       "path": "raw_data/triple_consensus.json",
       "status": "✅ 本日新鲜",
-      "ts": "2026-09-30 20:18:50",
+      "ts": "2026-10-01 15:40:58",
       "required": true,
       "note": ""
     },
@@ -86,7 +86,7 @@
       "name": "三重共识(前端)",
       "path": "data/TRIPLE_CONSENSUS.js",
       "status": "✅ 本日新鲜",
-      "ts": "2026-09-30 20:18:50",
+      "ts": "2026-10-01 15:40:58",
       "required": false,
       "note": ""
     },
@@ -94,7 +94,7 @@
       "name": "四量终极",
       "path": "data/FOUR_VOLUME.js",
       "status": "✅ 本日新鲜",
-      "ts": "2026-09-30 20:17:30",
+      "ts": "2026-10-01 15:39:27",
       "required": false,
       "note": ""
     },
@@ -102,7 +102,7 @@
       "name": "四量终极60m",
       "path": "data/FOUR_VOLUME_60M.js",
       "status": "✅ 本日新鲜",
-      "ts": "2026-09-30 20:16:36",
+      "ts": "2026-10-01 15:38:24",
       "required": false,
       "note": ""
     },
@@ -110,7 +110,7 @@
       "name": "金股池",
       "path": "raw_data/gold_pool.json",
       "status": "✅ 本日新鲜",
-      "ts": "2026-09-30 20:10:55",
+      "ts": "2026-10-01 15:35:18",
       "required": false,
       "note": ""
     }
