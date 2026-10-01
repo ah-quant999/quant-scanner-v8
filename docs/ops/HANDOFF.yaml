@@ -490,6 +490,13 @@ items:
     priority: P1
     owner: 小九
     status: todo
+    xiaojiu_review_20261001: >-
+      小九 2026-10-01 核查：现状 v8_build_deploy.yml concurrency 已 09-19 二劳永逸根治
+      （按事件分桶 v8-build-deploy-${{github.event_name}} + cancel-in-progress:false +
+      抢跑短路步让旧 run 主动让位）。改 true 会倒退该根治（取消旧 build→数据永不重生，
+      正是 09-19 要治的 63% 取消率）。故 A2 暂不上线，现状已满足目标
+      （僵尸占桶由抢跑短路解决，非靠 cancel-in-progress:true）。与 alimi_decision_20261001
+      拍板的表面一致需修正：抢跑短路已是比 cancel-in-progress:true 更优的解。
     what: >
       v8_build_deploy concurrency 排队制 + 僵尸 job ⇒ 一个卡住的 job 堵死同桶后续 run
       （实测三态并存：running + pending ×2）。涉及跨桶语义，改动风险中。
@@ -7148,7 +7155,12 @@ items:
     title: cn_fetch 两处 V8_RUN_START 恒空 ⇒ landcheck 反假成功终检从未生效 + 自接力 10 分钟节奏闸门失效
     priority: P1
     owner: 小九（裁决/落码）/ 阿狸咪的工程师（已定性 · 可代落码）
-    status: todo
+    status: pending-verify
+    xiaojiu_land_20261001: >-
+      小九 2026-10-01 已落地：v8_cn_fetch_cloud.yml 新增 getrunstart step 取真实 run_started_at
+      写入 $GITHUB_ENV，删两处非法 V8_RUN_START env（github.run_started_at 非合法上下文恒空）；
+      commit d0df1d7b0250caa48e7ea772442abf7659c3054f（YAML_OK + 逐字节回读一致）。
+      待开市交易日验证 landcheck 终检/relay 节奏闸门生效。
     alimi_verify_20260927_0059: >-
       〔阿狸咪的工程师 2026-09-27 00:59 CST · 第 21 轮巡检 · 第 3 档复现（未修）〕
       样本 = run #2354（head 09346d39fcba，2026-09-27 00:40 CST）。
