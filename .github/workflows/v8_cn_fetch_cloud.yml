@@ -1017,6 +1017,19 @@ jobs:
       #     - 本轮【0 个代表文件推进】= 整轮空转的假成功 → ::error + exit 1，让 run 如实变红；
       #     - 部分推进 = 局部软失败 → 已由上方 softfail-summary 覆盖，本步不重复报红。
       #   读远端走 Contents API（Accept: raw 直取 git blob），**不走 Pages CDN** —— CDN 有缓存会误判。
+      - name: "🕐 取真实 run_started_at（根治 github.run_started_at 非法上下文恒空 → landcheck/relay 失效）"
+        id: getrunstart
+        if: always() && steps.gate.outputs.skip != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          started=$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${{ github.run_id }}" \
+            | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('run_started_at',''))")
+          echo "V8_RUN_START=${started}" >> "$GITHUB_ENV"
+          echo "✅ run_started_at=${started}"
       - name: "🔍 数据落地实证终检（杜绝『run 全绿但数据没动』的假成功）"
         id: landcheck
         if: always() && steps.gate.outputs.skip != 'true'
@@ -1024,7 +1037,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           V8_CAT: ${{ steps.cat.outputs.category }}
-          V8_RUN_START: ${{ github.run_started_at }}
         run: |
           python3 - <<'PY'
           import os, re, sys, datetime, urllib.request
@@ -1175,7 +1187,6 @@ jobs:
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          V8_RUN_START: ${{ github.run_started_at }}
           V8_RUN_ID: ${{ github.run_id }}
         run: |
           python3 - <<'PY'
