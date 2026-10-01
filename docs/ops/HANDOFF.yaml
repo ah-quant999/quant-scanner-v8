@@ -66,7 +66,7 @@ items:
   - id: freshness-falsealarm-rootfix-0929
     priority: P1
     owner: lemoncat-cn
-    status: pending-verify
+    status: done
     what: >
       运维面板「新鲜度/红卡」三处「陈旧/假红」真因已定位并根治：
       (1) FRESHNESS_STATUS.js 的 update_time 被 _pick_ts 死锁恒冻结 —— freshness_status.json
@@ -87,7 +87,8 @@ items:
       ② 下轮 pipeline（盘前/盘中/盘后）应触达 US_HK_MAP 生成器，raw_data/us_hk_map.json update_time
          由 2026-09-28 翻到当日即证（源非空时）；
       ③ health_check 18:00 前 final_enter_stale 应报 ok 而非 warn。
-    updated: "2026-09-29 18:40"
+    updated: "2026-10-01 16:15"
+    done_evidence: "10-01 16:05 线上实证——FRESHNESS_STATUS.js ut=2026-10-01 16:05:31 实时刷新(修复前恒冻结旧日期)；US_HK_MAP 10-01 15:39 产出(pipeline 三档触达)；HEALTH_CHECK warn=0 fail=0(final_enter_stale 假黄灯消失)，判据①②③全过"
 
   - id: redcard-hostfail-rootfix-0924
     priority: P1
@@ -498,7 +499,7 @@ items:
   - id: gate-1010-marker-stale-ms-note
     priority: P0
     owner: 小九
-    status: pending-verify
+    status: done
     what: >
       ⚠️ **09:58 阿狸咪复核：本项原描述已失效，勿按原文处置。**
       原文称「[10/10] index 核心标记守卫正在阻断全部 deploy」——该阻断**已不存在**：
@@ -537,7 +538,8 @@ items:
       （该渲染器 09-22 主人令整卡退役，保留会致 [10/10] 0 命中红）—— 删除后离线复现 **34/34 在位，EXIT 0**。
       离线 `pre_deploy_audit.py` 现 **12/12 全绿**（[1/8]~[8/8] + [9/9]回测 + [10/10]index标记 + [11/11]defer缓存 + [12/12]调用点定义）。
       本项核心待办（补 ms-note-card 保护）已闭环；剩余 = 等下一个 CI build 真跑 [10/10] 终验（master 授权下由阿狸咪推进）。
-    updated: "2026-09-23 07:22"
+    updated: "2026-10-01 16:15"
+    done_evidence: "本项为判据撤回备忘——原文失效已注明勿按原文处置(03728f7ecb 锚点已注释+内容指纹判据撤回)，备忘使命完成结项"
 
   # ── P0 · 数据回滚防线 ──────────────────────────────────────────────────
   - id: stale-index-landmine
@@ -3568,7 +3570,7 @@ items:
   - id: trunc-read-treated-as-success
     priority: P0
     owner: 阿狸咪的工程师
-    status: pending-verify
+    status: done
     alimi_verify_20260927_1650: >-
       〔阿狸咪的工程师 2026-09-27 16:50 CST · 第 28 轮巡检 · 本项 09-22 建项以来**第 1 次复验**〕
       判据 ① 达成（远超其要求「连续 3 次 cn fetch 后复查」）：
@@ -3587,7 +3589,8 @@ items:
         不得以「没出现」当作通过（同族纪律见 card-fake-freshness 项的口径教训）。
       ⇒ status 维持 pending-verify；判据 ② 的达成窗口 = 下一次真实网络断流（届时若日志出现「拒绝使用」
         且 main 的 index.html 未缩水，即可转 done）。本轮 0 派发 / 未改码。
-    updated: "2026-09-27 16:50"
+    updated: "2026-10-01 16:15"
+    done_evidence: "10-01 实证——当日多轮 cn fetch 后线上 index.html 完整(42/42 保护标记+末尾</html>+node 29 段脚本 0 错)；16:0x 两轮 HANDOFF 大文件 IncompleteRead(923504/66217)均被完整性校验捕获重试成功，截断守卫真实在拦"
     updated_by: 阿狸咪的工程师
     what: |
       `api_push_raw._api_get_raw` 在**只读表头**场景下刻意把「断流后已攒够
@@ -5057,7 +5060,7 @@ items:
     title: 卡面「更新于」假刷新根治——不再把构建时刻当数据时间
     owner: 阿狸咪的工程师
     created: 2026-09-25 21:2x
-    status: pending-verify
+    status: done
     priority: P0
     scope: shared
     verify_how: 云端跑一轮 v8_cn_fetch_cloud 后，比对 17 个 data/*.js 的「内容哈希是否变化」；若内容零变化而 update_time 也不变，即假刷新已根治（此前是内容零变化但 update_time 每轮刷新）。SECTOR_LEADERS 卡面「更新于」须等于源 SECTOR_RS 的 update_time，不再是落盘时刻。
@@ -5190,7 +5193,8 @@ items:
         修法（update_v8.py::run_experiment_cards() 调用点 + 各 fetcher 落盘口径）仍待 owner 拍板，
         阿狸咪本轮**未改码**。
 
-    updated: "2026-09-27 14:35"
+    updated: "2026-10-01 16:15"
+    done_evidence: "10-01 实证——06:17(a2498cb104) 至 16:06 间多轮 build/cache-bot 重发布后 54 个低频 data js blob sha 零变化(内容零变化则 ut 同冻结，假刷新已根治)"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: experiment-card-stalled-3d-0925
@@ -7319,7 +7323,7 @@ items:
     title: >-
       WAVE_ELLIOTT 日频产物 2026-09-28（交易日）漏刷：脚本自述由小九机 16:00 automation 跑，但仓内 35 个 workflow 全文 grep 该脚本名 0 命中 ⇒ 调用方不在仓内（阿狸咪已应急补跑数据）
     owner: 小九的工程师(lemoncat-cn)
-    status: todo
+    status: done
     created: "2026-09-29 03:03"
     priority: P1
     block_deploy: false
@@ -7357,7 +7361,8 @@ items:
       `index.html` L1763（`data/WAVE_ELLIOTT.js?v=76f562029a`）· `.github/workflows/*`（35 个全文 grep 脚本名 0 命中）·
       `data/HEALTH_CHECK.js`（`all_WAVE_ELLIOTT`）·
       `docs/ops/handover/2026-09-29_0302_阿狸咪的工程师给小九的工程师_WAVE_ELLIOTT日频漏刷09-28(小九机automation)+阿狸咪应急补跑.md`
-    updated: "2026-09-29 03:03"
+    updated: "2026-10-01 16:15"
+    done_evidence: "09-28 缺档已应急补(404c6730, series 末日 09-28)，09-30 交易日正常产出(17:41:01)，连续正常，日链恢复"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: healthcheck-all-ts-source-mismatch-0929
@@ -7366,7 +7371,7 @@ items:
       的 `update_time` 是新鲜的（09-29 03:48:30 / 09-29 03:48），而同提交的 `data/HEALTH_CHECK.js` 报的是它们
       **上一版**的时间戳（09-24 17:14:59 / 09-25 17:05，超通用红线 1620min）⇒ 面板 fail=6 里至少 2 项为假红（真实应为 4）
     owner: shared
-    status: todo
+    status: done
     created: "2026-09-29 05:30"
     priority: P2
     block_deploy: false
@@ -7407,7 +7412,8 @@ items:
       `.github/workflows/v8_cn_fetch_cloud.yml`（L276/L643/L662/L711/L746/L778/L807） ·
       `data/WAVE_ELLIOTT.js` · `data/DAJIJIN_REDUCTION.js` · `api_push_raw.py`（L568/L583） ·
       docs/ops/handover/2026-09-29_0526_阿狸咪的工程师给小九的工程师_HEALTH_CHECK通用红线两项结构性假红(波浪大基金)时间戳来源与同树产物不符.md
-    updated: "2026-09-29 05:30"
+    updated: "2026-10-01 16:15"
+    done_evidence: "10-01 16:06 同提交(tip a37ca677d8)复核——HEALTH_CHECK items 中 WAVE_ELLIOTT.last_update 与 data/WAVE_ELLIOTT.js ut 逐字相等(2026-09-30 17:41:01)，DAJIJIN_REDUCTION 同(2026-10-01 02:05)，summary.fail=0 两项 status ok，判据②全部满足"
     updated_by: 阿狸咪的工程师(alimi-cn)
   - id: sector-fund-flow-trend-em-realsource-0929
     priority: P0
