@@ -486,6 +486,11 @@ items:
     alimi_decision_20261001: >-
       加『内容无变则跳过』闸降频，非放开并发；churn 根因=无意义高频推（交小九落地）。
 
+    xiaojiu_verify_20261001: >-
+      小九 2026-10-01 核查：build_deploy 已 09-19 二劳永逸根治（按事件分桶 + 抢跑短路），
+      cache-bot 抢 main 导致的 build 取消竞态已治；缓存戳链另有 `git diff --cached --quiet` 跳过闸 +
+      push/schedule 双触发。进一步「更前置降频」有破坏 ?v 新鲜度的风险，净收益为负 => 不落地（核心竞态已治）。
+
   - id: concurrency-block-bucket
     priority: P1
     owner: 小九
@@ -4395,6 +4400,11 @@ items:
     alimi_decision_20261001: >-
       按 category 分组并发+取消，或 dispatcher 同 payload 去重；非盲目放大队列（交小九落地）。
 
+    xiaojiu_verify_20261001: >-
+      小九 2026-10-01 核查：cloud_dispatcher.py L100-102 已有「已有 run 在跑/排队 -> 跳过」节流
+      （再派发只会加剧限流）。根因「多派发源x单席位」需各源都过该守卫；当前无实时证据队列仍增长，
+      不盲目加代码 => 不落地（守卫已就位，待开市观察验证）。
+
   - id: dajijin-reduction-monitor
     priority: P1
     owner: 小九
@@ -4978,6 +4988,11 @@ items:
     updated_by: 阿狸咪的工程师(alimi-cn)
     alimi_decision_20261001: >-
       单树化批 blob（核实 api_push_raw 现状并补全），调用数 N→≈1（交小九落地）。
+
+    xiaojiu_verify_20261001: >-
+      小九 2026-10-01 核查：api_push_raw.py 已增量 PUSH_FILES + 单树批（POST /git/trees 按 _BATCH 切块）
+      + 并发 blob（ThreadPoolExecutor）；cn_fetch soft_10 走 `PUSH_FILES=$MANIFEST` 只推变更文件（非 5572 全量）。
+      403 配额耗尽根因（全量推送打爆配额）已实质缓解 => 不落地（单树化批已就位）。
 
   - id: rawdata-md-crlf-flip
     priority: P2
@@ -6898,6 +6913,12 @@ items:
     updated: "2026-09-26 17:37"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
+    xiaojiu_verify_20261001: >-
+      小九 2026-10-01 核查：v8_lhb_fetch.yml 产出 out/lhb_result.json，git log 显示从未落仓且前端不消费
+      （前端吃 data/LHB_DATA.js，由 raw_data/lhb_data.json 经 update_v8 转换，今日 10-01 15:44 仍鲜活）。
+      该链为冗余孤儿链，`--only lhb` 非实参 + out/ 不在推送面 -> 产物永不落地；修之=让无人消费的孤儿文件落地=无用 => 不落地。
+      若确需清理，建议另立「v8_lhb_fetch.yml 退役」专项决策，勿在此项做无用推送面修补。
+
   - id: stock-universe-etf-silent-drop-0926
     priority: P1
     owner: shared
@@ -7150,6 +7171,11 @@ items:
       `.github/workflows/v8_cn_fetch_cloud.yml` · `.github/workflows/v8_cn_fetch_cloud_hosted.yml` ·
       `.github/workflows/v8_cn_fetch_cloud_selfhosted.yml` · `.github/workflows/v8_stock_quote_refresh.yml:261` ·
       `v8_health_check.py:3562`    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
+
+    xiaojiu_verify_20261001: >-
+      小九 2026-10-01 核查：四条链（cn 三链 + v8_lhb_fetch）grep `set -e` 全零命中，
+      软失败模板 `cmd; _v8_rc=$?` 恰恰依赖「无 set -e」才能捕获；父项验证 `##[error]软失败步...soft_13`
+      在日志真实出现 => 告警未死。标题「dead under bash -e」为伪前提，改之=把正常代码改成「更兼容」写法=无用 => 不落地。
 
   - id: cn-run-start-env-dead-guards-0926
     title: cn_fetch 两处 V8_RUN_START 恒空 ⇒ landcheck 反假成功终检从未生效 + 自接力 10 分钟节奏闸门失效
