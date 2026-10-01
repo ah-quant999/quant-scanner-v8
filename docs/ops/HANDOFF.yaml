@@ -5477,7 +5477,7 @@ items:
     title: 休市段首(t1) algo 链 D 批问责必假红——产物正确但 run 转 failure
     priority: P1
     owner: shared
-    status: todo
+    status: done
     created: 2026-09-26 00:3x
     scope: shared
     what: >-
@@ -5576,7 +5576,9 @@ items:
        · 下一个自然复发点 = 10-01（国庆首日）；最近可复验交易日 = 09-28（周一）（届时 step17 应为绿）。
     updated: "2026-09-26 14:23"
     updated_by: 阿狸咪的工程师(alimi-cn)
-
+    done_evidence: "【2026-10-01 19:4x 阿狸咪实测结项】国庆假期首日档正是本项判据窗口：今日 3 档 algo run（09:06 schedule/12:49 schedule/15:31 dispatch）step17「结果问责」conclusion 全部 success、各档 failure 步=0，不再出现 v8-algo-stale 假红；且 raw_data/final_recommend.json 今日提交链仅两笔（阿狸咪 14:25 恢复 + 主人 19:27 主动重跑对齐口径），15:31 algo 档未伪造推进 final raw ⇒ VERIFY①② 双达成。副产品实证：15:31 档 CRDS enter_date=10-01 命中 315 处（旧代码产物，修复 17:5x 才落码）⇒ 修复必要性反证，相关项见 algo-artifact-date-naked-now-bypass-calendar。"
+    updated: "2026-10-01 19:45"
+    updated_by: 阿狸咪的工程师
   - id: peer-monitor-holiday-silence-false-down
     title: peer_monitor 缺交易日豁免——休市/长假期间把对方机器误判为 down（阈值型假红）
     priority: P1
