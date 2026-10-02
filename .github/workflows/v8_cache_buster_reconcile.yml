@@ -87,7 +87,7 @@ jobs:
           git config user.name "v8-cache-bot"
           git config user.email "v8-bot@users.noreply.github.com"
           REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
-          git add -f index.html
+          git add -f index.html logic.html
           if git diff --cached --quiet; then
             echo "ℹ️ ?v 已一致，无需推送"; exit 0
           fi
@@ -100,7 +100,7 @@ jobs:
             git fetch "$REPO" main
             git reset --hard FETCH_HEAD
             python update_v8.py --only-cache-busters
-            git add -f index.html
+            git add -f index.html logic.html
             if git diff --cached --quiet; then echo "ℹ️ 重试时已一致"; exit 0; fi
             git commit -m "chore: 缓存戳实时对齐 ?v → 防覆盖 (retry $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M'))"
           done

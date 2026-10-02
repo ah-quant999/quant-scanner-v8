@@ -3,10 +3,10 @@
 """
 v8 Pre-deploy audit（CI 自动门禁，2026-09-05 主人令一劳永逸落地）
 ================================================================
-目的：每次云端 build/deploy 前自动跑 **12** 项校验，任何一项失败 → 阻断 deploy。
+目的：每次云端 build/deploy 前自动跑 **15** 项校验，任何一项失败 → 阻断 deploy。
 等同「改后三件套」固化为 CI step，不再依赖人工记忆流程。
 
-十二项校验：
+十五项校验（1-12 见下；13=交接状态源守卫 / 14=AI 入口在位守卫 / 15=logic.html 缓存戳守卫）：
   1. py_compile        —— 所有 *.py 文件 0 语法错误
   2. new Function      —— index.html 所有 inline <script> 0 语法错误（Node）
   3. 完整性核对        —— data/*.js 数量在下界 90 与**动态上界**之间
@@ -1314,6 +1314,64 @@ def check_ai_entry_files():
                   "必读 %d 条 · 死链 0" % (len(at.encode("utf-8")), len(POINTERS)))
 
 
+def _guard_neutral_sha1(fpath):
+    """logic.html 缓存戳守卫用的中性化内容哈希：与 update_v8._neutral_content_sha1 逐字节同源。
+
+    读字节 → utf-8 解码 → 剔除 republish_time 字段值 → sha1 前 10 位。
+    （改本口径必须同步 update_v8._neutral_content_sha1 / api_push_raw._neutral_sha /
+     v8_build_deploy.yml「提交前核验」步三处，禁只改一处。）
+    """
+    import hashlib
+    raw = fpath.read_bytes()
+    try:
+        text = raw.decode("utf-8")
+    except Exception:
+        text = raw.decode("utf-8", "replace")
+    neutral = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', text)
+    return hashlib.sha1(neutral.encode("utf-8")).hexdigest()[:10]
+
+
+def check_logic_html_cache_busters():
+    """logic.html 的 data/*.js ?v 必须与线上数据文件内容哈希逐文件一致（防覆盖 / 防回归）。
+
+    ★ 2026-10-02 阿狸咪的工程师 新增（配套 update_v8 已扩展处理 logic.html +
+       v8_cache_buster_reconcile.yml 纳入 logic.html 自愈兜底）：
+       此前 logic.html 的 ?v 停在同一旧时间戳字面量 1789284978（09-24 内容哈希口径前的
+       旧格式），且从未被任何 reconcile 刷新 → logic.html 真 <script src="data/X.js?v=...">
+       加载的 data 戳永不变化 ⇒ 数据更新后逻辑详解页长期吐旧副本（防覆盖铁律最忌的
+       缓存戳失配复发）。本项作为部署门禁，硬断言 logic.html 每个「带 ?v」的 data/X.js
+       的 ?v == 中性化内容哈希（与 update_v8._data_file_update_time 逐字节同源），任何
+       漂移 / 旧格式回潮立即阻断部署。
+    判定（避免误杀）：仅校验「带 ?v」的 data/*.js；仅当该 data 文件本地真实存在才比对；
+       本地无 data/*.js（极端环境）则放行并告警，避免守卫自身变成单点阻断。
+    """
+    html_path = ROOT / "logic.html"
+    if not html_path.exists():
+        return True, "logic.html 不存在（放行）"
+    try:
+        html = html_path.read_text(encoding="utf-8")
+    except Exception as e:
+        return False, "logic.html 读取失败: %s" % e
+    data_dir = ROOT / "data"
+    pat = re.compile(r'data/([A-Za-z0-9_]+\.js)\?v=([0-9a-fA-F]{1,})')
+    checked, drift = 0, []
+    for m in pat.finditer(html):
+        fname = m.group(1)
+        actual = m.group(2)
+        fpath = data_dir / fname
+        if not fpath.exists():
+            continue
+        expected = _guard_neutral_sha1(fpath)
+        checked += 1
+        if actual != expected:
+            drift.append("%s(?v=%s≠%s)" % (fname, actual, expected))
+    if checked == 0:
+        return True, "logic.html 无可校验的带?v data 引用（放行，避免守卫自身成为单点）"
+    if drift:
+        return False, "%d/%d 个带?v data 引用戳失配(疑似停旧/旧格式回潮): " % (len(drift), checked) + "; ".join(drift[:8])
+    return True, "logic.html %d 个带?v data 引用戳均与数据内容哈希一致" % checked
+
+
 def main():
     checks = [
         ("[1/8] py_compile", check_py_compile),
@@ -1330,6 +1388,7 @@ def main():
         ("[12/12] 调用点定义守卫", check_callee_defined),
         ("[13/13] 交接状态源守卫", check_handoff_ledger),
         ("[14/14] AI 入口在位守卫", check_ai_entry_files),
+        ("[15/15] logic.html 缓存戳守卫", check_logic_html_cache_busters),
     ]
     print("=" * 60)
     print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用；2026-09-11 扩至 5 项；"
@@ -1338,7 +1397,8 @@ def main():
           "同日扩至 11 项（[11/11] defer 数据缓存守卫·防空结果固化）；"
           "2026-09-21 扩至 12 项（[12/12] 调用点定义守卫·防删函数连带删邻函数致 ReferenceError）；"
           "同日扩至 13 项（[13/13] 交接状态源守卫·外部锚 ledger 防旧版本静默回滚）；"
-          "同日扩至 14 项（[14/14] AI 入口在位守卫·防「协议存在但没人会读」））")
+          "同日扩至 14 项（[14/14] AI 入口在位守卫·防「协议存在但没人会读」）；"
+          "2026-10-02 扩至 15 项（[15/15] logic.html 缓存戳守卫·防两页戳漂移/旧格式回潮））")
     print("=" * 60)
     fails = 0
     results = []

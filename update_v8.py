@@ -995,16 +995,19 @@ def _atomic_write_index_html(idx_path, text, baseline_len, baseline_lines):
         raise
 
 
-def _rewrite_index_html_cache_busters():
-    """为 index.html 中 data/*.js 引用追加基于文件更新时间的 cache-busting 参数。
+def _rewrite_cache_busters_for(html_path):
+    """通用：为任意 html 文件（index.html / logic.html）中 data/*.js 引用重写 ?v 缓存戳。
+    抽出自 _rewrite_index_html_cache_busters，使 logic.html 与 index.html 共用同一套权威 ?v
+    逻辑，根治「reconcile 只处理 index.html 漏掉 logic.html」导致的戳失配（logic.html
+    707-711 行是真 <script src="data/X.js?v=..." defer> 加载，旧戳会读陈旧数据）。
 
     核心用途：防止浏览器/CDN 在数据更新后继续返回旧 data/*.js（典型问题：
     AI市场速览已生成新数据，但页面仍显示旧时间戳）。
     只有文件本身的时间戳发生变化时，对应的 URL 才会变化，未变更文件保持原 URL。
     """
-    idx_path = ROOT / "index.html"
-    if not idx_path.exists():
+    if not html_path.exists():
         return
+    idx_path = html_path
     # 🔴 2026-09-23 阿狸咪修：Path.read_text(newline=) 需 Python ≥3.13，
     #   而 v8_ima_strong_stock.yml 固定 python-version "3.12" ⇒ TypeError 使该链 step7 恒红。
     #   改用 open(..., newline='')（3.12/3.13 通吃），行尾纪律与语义不变。
@@ -1050,7 +1053,12 @@ def _rewrite_index_html_cache_busters():
     new_html = pat.sub(repl, html)
     if new_html != html:
         _atomic_write_index_html(idx_path, new_html, _base_len, _base_lines)
-        print("✅ index.html cache-busting 参数已更新")
+        print(f"✅ {idx_path.name} cache-busting 参数已更新")
+
+def _rewrite_index_html_cache_busters():
+    """为 index.html 中 data/*.js 引用追加基于文件更新时间的 cache-busting 参数（委托通用函数）。"""
+    _rewrite_cache_busters_for(ROOT / "index.html")
+
 
 
 def _ensure_momentum_loader():
@@ -1724,6 +1732,7 @@ def main():
     #   各算各的"导致的失配。
     if args.only_cache_busters:
         _ensure_momentum_loader()
+        _rewrite_cache_busters_for(ROOT / "logic.html")
         _rewrite_index_html_cache_busters()
         print("✅ 仅重写 ?v 完成（未重建数据）")
         return 0
@@ -1739,6 +1748,7 @@ def main():
         # 重写的 COMMODITY_ELASTICITY.js 等）之后才算 ?v，否则 ?v 与最终文件内容
         # 不符 → CDN 吐旧副本。
         _ensure_momentum_loader()
+        _rewrite_cache_busters_for(ROOT / "logic.html")
         _rewrite_index_html_cache_busters()
     return rc
 
