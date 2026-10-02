@@ -7897,12 +7897,11 @@ function fmtSigned(v){
         + '</div>';
     }
     // 2026-10-02 主人令：单层直出（三项齐），无分档无折叠
+    // 2026-10-02 晚 二次修：红色口径标题行删除（与上方统计行三重重复）；grid 不再嵌套（嵌套曾被压成一行 1 卡）
     var cards = '';
     if(hits.length){
       var inner = hits.map(_tvCard).join('');
-      cards += '<div style="font-size:12px;font-weight:700;color:#ef5350;margin-bottom:6px;">'
-        + '（三项齐 · ' + hits.length + ' 只 · 概念 + 业绩正向 + ROE≥10%）</div>'
-        + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">' + inner + '</div>';
+      cards += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;">' + inner + '</div>';
     }
 
     // ---- chip：主题名 + 当日主力净额（每天在动）----
@@ -7948,15 +7947,16 @@ function fmtSigned(v){
       +   '<b style="color:var(--sub);">主题资金热度</b>（主力净额，亿元 · 红流入/绿流出）：' + (hasFund ? rankStr : '<span style="color:#fbbf24;">资金源 SECTOR_FUND_FLOW 未加载</span>')
       + '</div>'
       + '<div style="font-size:11.5px;color:var(--sub);margin-bottom:8px;line-height:1.6;">'
-      +   '本主题 <b style="color:var(--txt);">' + _ev(window.__TV_THEMES[window.__tvTheme].label) + '</b> 三项齐 <b style="color:var(--txt);">' + hits.length + '</b> 只 · '
+      // 2026-10-02 晚 主人令「重复的整合到一行」：原三行里「三项齐 N 只」重复 2 遍 → 并入首行一行直出
+      +   '本主题 <b style="color:var(--txt);">' + _ev(window.__TV_THEMES[window.__tvTheme].label) + '</b> · '
+      +   '<span style="color:#ef5350;font-weight:600;">✅三项齐 ' + hits.length + '</span> 只 · '
+      +   '<span style="color:#ef5350;font-weight:600;">💰资金净流入 ' + nFundPos + '</span> 只 · '
       +   '概念板块 <b>' + curSt.nSec + '</b> 个 · 板块资金合计 <b style="color:' + _numColor(curSt.net) + ';">' + _sign(curSt.net) + '亿</b>'
       +   (curSt.nSec ? ' · 均涨跌 <b style="color:' + _numColor(curSt.avg) + ';">' + _sign(curSt.avg, 2) + '%</b>' : '')
       +   (curSt.lead ? ' · 资金最强 <span style="color:var(--sub);">' + _ev(curSt.lead) + '</span>' : '')
-      +   '<br><span style="color:#ef5350;font-weight:600;">✅ 三项齐 ' + hits.length + '</span> 只 · '
-      +   '<span style="color:#ef5350;font-weight:600;">💰资金净流入 ' + nFundPos + '</span> 只'
       +   '<br>证据覆盖：基本面质量库 A股 ' + Object.keys(fqMap).length + ' 只（ROE≥10 共 ' + nFqRoe + ' 只）· 业绩预告正向 ' + nPerf + ' 只 / 画像全市场 ' + nScanned + ' 只 —— 质量库外概念票不参与列示；资金维度每日刷新，为本卡主要变化来源。'
       + '</div>'
-      + (cards ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">' + cards + '</div>'
+      + (cards ? cards
                : '<div class="note" style="color:var(--dim);">本主题暂无「三项齐」股票（概念命中但缺业绩/ROE 证据），换个主题试试</div>')
       // 2026-09-13 主人令：A/B/C 分档后不再截断，删除「仅展示前 N 只」提示行。
       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.6;">口径：板块资金取 SECTOR_FUND_FLOW「概念」类板块当日主力净额（亿元），个股资金 = Σ(其命中概念板块净额)；'
