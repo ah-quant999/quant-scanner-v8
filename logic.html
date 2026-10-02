@@ -729,7 +729,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/H_AUTO_BUY_TRACK.js?v=b818e67917" defer></script>
   <script src="data/UNLISTED_PANEL.js?v=e4a2df05e9" defer></script>
   <script src="data/MARKET_REGIME.js?v=8e8a5a26d0" defer></script>
-  <script src="data/RISK_GAUGE.js?v=a58542560e" defer></script>
+  <script src="data/RISK_GAUGE.js?v=8d2eceec04" defer></script>
   <script src="data/SECTOR_RECOMMENDATION.js?v=60cad1663d" defer></script>
   <script src="data/WEEKEND_META_REPORT.js?v=c458331225" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=2983aeb095" defer></script>
@@ -775,12 +775,12 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/RESTRICTED_RELEASE.js?v=456a24d5a5" defer></script>
   <script src="data/PERFORMANCE_FORECAST.js?v=1596aa9534" defer></script>
   <script src="data/RUNNER_STATUS.js?v=958d01a37e" defer></script>
-  <script src="data/HEALTH_CHECK.js?v=cefa970dde" defer></script>
-  <script src="data/COMMODITY_ELASTICITY.js?v=e5c023216b" defer></script>
-  <script src="data/SENTIMENT_CYCLE.js?v=7a95618fed" defer></script>
-  <script src="data/STOCK_MOMENTUM_STATE.js?v=d0d4ba4b08" defer></script>
-  <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=10af5e755a" defer></script>
-  <script src="data/MOMENTUM_FILTER.js?v=42b10b6de2" defer></script>
+  <script src="data/HEALTH_CHECK.js?v=9667c7b4ac" defer></script>
+  <script src="data/COMMODITY_ELASTICITY.js?v=727839c60d" defer></script>
+  <script src="data/SENTIMENT_CYCLE.js?v=ab4e71f9d1" defer></script>
+  <script src="data/STOCK_MOMENTUM_STATE.js?v=5c42d76cc4" defer></script>
+  <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=655cca2e08" defer></script>
+  <script src="data/MOMENTUM_FILTER.js?v=d5e0e8c7f8" defer></script>
   <!-- 🗑 2026-09-19 主人令：「强势突破」全站删除 ⇒ 本引用移除。
        🔵 2026-09-20 补正（阿狸咪的工程师）：上方原注记「已于 2026-09-19 移除（Pages 实测 404）」
           **当时正确、现已过时** —— 该轮实为短暂移除，随后恢复；真正的终局是 2026-09-20
@@ -6816,7 +6816,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=d0d4ba4b08';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=5c42d76cc4';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -6825,7 +6825,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=10af5e755a';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=655cca2e08';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
