@@ -517,8 +517,12 @@ items:
     what: "第13步仍无步级 timeout-minutes，仅靠 job 级 60min 兜底。命令级护栏已收敛，此项优先级降低。"
     updated: "2026-09-21 08:40"
 
-  # ── P0 · 部署链（2026-09-21 09:45 建项；09:58 阿狸咪复核改写）────────────    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
+  # ── P0 · 部署链（2026-09-21 09:45 建项；09:58 阿狸咪复核改写）────────────
+    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
+    verify_how: >-
+      下轮 v8_build_deploy 的 build job step13「部署到 main」正常执行（不被 timeout-minutes:30 砍），
+      且僵尸场景 3 次重试逻辑仍生效；连续 2 档 build job step13 正常即转 done。
     xiaojiu_pending_verify_20261001: |
       已落码：v8_build_deploy.yml step13（📤 部署到 main）加 `timeout-minutes: 30`，防僵尸 job 卡满 job 60min 占并发组（与 §0 第13步根因修复一致）。
       commit=f9912dc87，回读逐字节一致。待下轮 build 验证 step13 不被砍且正常 3 次重试仍生效。
@@ -6121,8 +6125,6 @@ items:
       D. 建议（并入 fix ①）：`fetched_at` 纳入 `_TS_KEYS`（两处同改）；或快照 meta 走 fix ② 的
          「本地副本不入队」范式。⚠️ 小九机工作树若同样停留旧版，其 cn fetch 仍会再顶 ——
          需小九 `git pull` 同步工作树（跨机事项，本轮无法代做）。
-    updated: "2026-10-01 17:22"
-    updated_by: 阿狸咪的工程师(alimi-cn)
     alimi_verify_20260929_0055_deploy_block: >-
       🔴 **〔阿狸咪的工程师 2026-09-29 00:47 CST · 后果升级：本项已不再是「误判掉线」级别，
       而是「build_deploy 部署链被恒阻断」级别〕**
@@ -6143,7 +6145,22 @@ items:
         ⇒ 本项若不修，部署链将持续被自己的守卫拦死。已另立
         `build-deploy-blocked-by-crosslayer-stale-guard-0929`（P0）专项挂账。
     done_evidence: "【2026-10-01 阿狸咪落码】last_time 已纳入 api_push_raw 防倒退白名单（_TS_KEYS＋_TS_RE 正则两处同改，commit 522406dc82）。待连续 2 个交易日 last_time 单调不减"
-    updated: "2026-10-01 18:20"
+    alimi_verify_20261002_1712: >-
+      🔴 **〔阿狸咪的工程师 2026-10-02 17:1x CST · 覆盖复发第 2 次 + 治本（D 建议）已落码〕**
+      · 复发：10-02 00:54 CST `a17f0e5235`（cn fetch 午夜批）再次把 full.json 顶回 v1 旧版
+        （fetched_at 2026-09-30 21:20:43 → 2026-09-23 17:24:12、title 短线情绪选股 2026-09-30 →
+        强势股跟踪日报 2026-09-15，blob 复为 4034191efe 798B）——上轮 C 段「本机工作树同步修复」
+        只护了家机，覆盖源实为另一工作树（推定小九机），D 段预判应验。
+      · 恢复：commit d059d4e52f（blob 31c62122502c 549B 复推，回读逐字节一致 + 60s 复读稳定）。
+      · 🎉 治本落地（= 本 item D 建议「fetched_at 纳入 _TS_KEYS」）：commit d6a2fa6e8b ——
+        `_TS_KEYS`（L574-575）与 `_TS_RE`（L589-591）两处同改加 fetched_at，并同步修正 L1124 注释。
+        闸行为 = lts 小于 rts 时跳过该文件（保留远端版、不报错）；full.json 不在
+        _NO_REGRESSION_GUARD 排除清单（仅 gold_pool 两文件），受闸保护；仓内 4 个快照 meta
+        （ima_strong_stock_full / ima_strong_backtest / ima_strong_stock / chan_buy_point_full）全部受益。
+        自证：远端版 py_compile 通过 + 回读逐字节一致（保持原行尾）。
+      · 待验证：小九机旧工作树下次 cn fetch 推 full.json 应被闸跳过（远端 fetched_at 不再回退）；
+        连续 2 个 cn fetch 窗口 fetched_at 单调不减即可转 done。
+    updated: "2026-10-02 17:12"
     updated_by: 阿狸咪的工程师
   - id: cn-singleflight-ghpat-missing-401
     priority: P0
