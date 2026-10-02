@@ -7905,7 +7905,8 @@ function fmtSigned(v){
     }
 
     // ---- chip：主题名 + 当日主力净额（每天在动）----
-    var chips = '';
+    // 2026-10-02 晚 主人令：第一行固定 7 个长期主题（种子），🔥金色热点另起第二行 —— 拆两个 flex 容器
+    var chipsSeed = '', chipsDyn = '';
     for(tk in window.__TV_THEMES){
       var tt = window.__TV_THEMES[tk], st = themeStat[tk];
       var act = tk === window.__tvTheme;
@@ -7916,7 +7917,8 @@ function fmtSigned(v){
       var _acc   = _dyn ? '#fbbf24' : '#a78bfa';
       var _accBg = _dyn ? 'rgba(251,191,36,.15)' : 'rgba(167,139,250,.15)';
       var _accFg = _dyn ? '#fcd34d' : '#c4b5fd';
-      chips += '<button onclick="window.__tvSetTheme(\'' + tk + '\')" style="padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid ' + (act ? _acc : 'var(--border)') + ';background:' + (act ? _accBg : 'var(--card)') + ';color:' + (act ? _accFg : 'var(--sub)') + ';font-weight:600;transition:.15s;">' + tt.label + fundTxt + '</button>';
+      var _chip = '<button onclick="window.__tvSetTheme(\'' + tk + '\')" style="padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid ' + (act ? _acc : 'var(--border)') + ';background:' + (act ? _accBg : 'var(--card)') + ';color:' + (act ? _accFg : 'var(--sub)') + ';font-weight:600;transition:.15s;">' + tt.label + fundTxt + '</button>';
+      if(_dyn) chipsDyn += _chip; else chipsSeed += _chip;
     }
     // 主题资金热度排行（主题全集 = 种子 + 自动追加，按当日主力净额降序 → 每天/每档刷新即变）
     var rankArr = [];
@@ -7942,7 +7944,9 @@ function fmtSigned(v){
       +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b>只列「三项齐」= 概念命中 + 业绩正向（营收正增或业绩预告预增）+ ROE≥10%。证据取自基本面质量库（候选/金股池 A 股 · Baostock 日更），库外概念票无法验证、一律不列；按板块资金净额降序，资金为辅助验证。</div>'
       +   '<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">🔥 主题会动：</b>7 个长期主题为固定种子，另按当日概念资金榜自动追加最多 ' + (window.TV_DYN_MAX || 5) + ' 个新热点（金色描边 + 🔥 前缀）—— 主题集合每天随行情变化，不写死。仅研究参考，不构成投资建议。</div>'
       + '</div>'
-      + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">' + chips + '</div>'
+      // 2026-10-02 晚 主人令：第一行固定 7 个长期主题种子，🔥金色热点独占第二行
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">' + chipsSeed + '</div>'
+      + (chipsDyn ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">' + chipsDyn + '</div>' : '')
       + '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;padding:6px 8px;background:rgba(148,163,184,.06);border-radius:6px;line-height:1.7;">'
       +   '<b style="color:var(--sub);">主题资金热度</b>（主力净额，亿元 · 红流入/绿流出）：' + (hasFund ? rankStr : '<span style="color:#fbbf24;">资金源 SECTOR_FUND_FLOW 未加载</span>')
       + '</div>'
