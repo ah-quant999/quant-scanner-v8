@@ -572,7 +572,7 @@ def walk_raw():
 
 
 _TS_KEYS = ("update_time", "gen_time", "calc_time", "run_time",
-            "fetch_time", "snapshot_time", "last_time")
+            "fetch_time", "snapshot_time", "last_time", "fetched_at")
 
 
 def _blob_sha(content: bytes) -> str:
@@ -587,7 +587,7 @@ def _blob_sha(content: bytes) -> str:
 #   故用正则扫描头部字节兜底，仍能命中顶层时间戳（v8 所有 raw_data JSON 的
 #   update_time 均在文件头部，截断不影响）。
 _TS_RE = re.compile(
-    rb'"(?:update_time|gen_time|calc_time|run_time|fetch_time|snapshot_time|last_time)"'
+    rb'"(?:update_time|gen_time|calc_time|run_time|fetch_time|snapshot_time|last_time|fetched_at)"'
     rb'\s*:\s*"(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2})')
 
 def _content_ts(content: bytes):
@@ -1122,7 +1122,7 @@ def main():
         #     （STOCK_MOMENTUM_STATE 22:55->22:23、HEALTH_CHECK 时间戳整段丢失…）。
         #     旧闸条件写死 `path.endswith(".json")` ⇒ `.js` 全被豁免 ⇒ 静默回退。
         #   【为何安全】_content_ts 只认 update_time/gen_time/calc_time/run_time/
-        #     fetch_time/snapshot_time（不含 republish_time，故构建重戳不触发）；
+        #     fetch_time/snapshot_time/last_time/fetched_at（不含 republish_time，故构建重戳不触发）；
         #     取不到时间戳 ⇒ 直接放行；本地更新则天然 lts>rts 放行。
         if (remote_sha and path.endswith((".json", ".js"))
                 and path not in _NO_REGRESSION_GUARD):
