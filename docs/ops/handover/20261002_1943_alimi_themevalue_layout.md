@@ -33,3 +33,12 @@
 
 ## 工作树
 `E:/_alimi_tools/v8_themevalue`（detach @2ba6167ea）排版验证完成后将 `git worktree remove --force` 清理。
+
+
+---
+
+## 追记 · 2026-10-02 20:0x · chip 拆双行（主人第二道截图令）
+- **指令**：「第一行就7个固定，第二行金色描边的」→ 第一行固定 7 个长期主题种子，🔥金色热点独占第二行。
+- **改动**：仅 __renderThemeValue chip 渲染：chips 单容器拆为 chipsSeed/chipsDyn 两个 flex 行（种子行 margin-bottom:8px，热点行 10px）；样式/交互/排行未动。
+- **验证**：渲染桩 14/14 PASS（种子行恰 7 chip 不含热点、热点行不含长期主题；「医疗服务」含「医疗」被种子正确覆盖=关键词逻辑有效）+ 29 script 0 错 + 门禁 14/14 + 纯 LF。
+- **推送**：9bb99979ed（parent=实时 tip 4a97d674b，force:false，回读一致）。
