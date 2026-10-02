@@ -15819,11 +15819,15 @@ h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;
 // ═══ 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测类第 3 卡）═══
 //   需求原话：「没错就是隔夜的，我只要近期涨幅好的个股或者ETF映射到A港股的就够了。
 //             每日盘前必须更新完成，任务设置好。」
-//   位置：暂未上架 > 📡 观测类，位于「🔭 主题空间 · 概念资金热度」卡上方
-//         （2026-09-19 21:35 主人令：由观测类第 2 卡下移至本位置）。
+//   位置：暂未上架 > 📡 观测类
+//         （2026-09-19 21:35 主人令：由观测类第 2 卡下移；2026-10-02 主人令：主题空间卡上移至此卡上方，本卡顺延下移一位）。
 //   数据 window.US_HK_MAP（data/US_HK_MAP.js ← cloud_fetch_v8.py::f_us_hk_map()，
 //         盘前 08:25 单档生成；生成器 scripts/fetch_us_hk_map.py）。
 //   无数据 ⇒ 整卡保持 display:none（不产出空壳卡）；填充见 window._fillUsHkMap（600ms×30 自愈）。
+// ═══ 🔭 2026-10-02 主人令：主题空间 · 概念资金热度 上移至「🌙 隔夜美股强势」卡上方 ═══
+//   （原位于大基金卡下方，见下方隔夜美股/大基金卡壳注释；容器 id 与渲染派发未动，仅调卡序。）
+h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-left:4px solid var(--cyan);"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52D; 主题空间 · 概念资金热度 加载中&#x2026;</div></div>';
+
 h += '<div class="card" id="usHkMapCard" style="display:none;margin-bottom:16px;border-left:4px solid #a78bfa;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#a78bfa;">&#x1F319; 隔夜美股强势 &#183; 映射 A/港股</span>'
@@ -15851,7 +15855,7 @@ h += '<div class="card" id="dajijinCard" style="display:none;margin-bottom:16px;
    + '<b style="color:#f43f5e;">&#x1F4CC; 核心：</b>把「大基金减持」这类<b>法定披露</b>信号摆到眼前 &#8212;&#8212; 持股 5% 以上股东减持须提前 15 个交易日预披露，属<b>公告先于执行</b>的确定性信息。<br>'
    + '<b style="color:#f43f5e;">&#x1F4A1; 用法：</b>当<b>风险排查表</b>用 &#8212;&#8212; 持仓若出现在清单里，说明大基金正在退出，需重新评估；<b style="color:#fbbf24;">不是买入信号</b>。<br>'
    + '<b style="color:#f43f5e;">&#x26A0; 限制：</b>① 只覆盖持股 &#8805;5% 主体的披露义务，<b>5% 以下减持不公告</b>，故本表 &#8800; 大基金全部动作；② 仅按全名匹配三个基金主体，不含华芯投资等 GP；③ 变动股数为<b>区间累计</b>、非单日；④ 金额为估算（变动股数 &#215; 公告日收盘价）。</div>'
-   + '<div id="dajijinBody"><div class="note">加载中&#x2026;</div></div></div>';h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-left:4px solid var(--cyan);"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52D; 主题空间 · 概念资金热度 加载中&#x2026;</div></div>';
+   + '<div id="dajijinBody"><div class="note">加载中&#x2026;</div></div></div>';
 
 // 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡壳已删（原 baihechouBody，
 //   见 git 历史；同批删渲染函数与派发，生产者/自动化一并退役）。
