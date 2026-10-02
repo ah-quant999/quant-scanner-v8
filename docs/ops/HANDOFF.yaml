@@ -6341,8 +6341,18 @@ items:
     updated: "2026-10-01 17:22"
     updated_by: 阿狸咪的工程师(alimi-cn)
     done_evidence: "【2026-10-01 19:2x 阿狸咪实测纠正】昨夜已恢复，非『须主人重绑』：① 本机快照 raw_data/ima_strong_stock_full.json fetched_at=2026-09-30 21:20:43（channel=member-full-text-snapshot，标题「短线情绪选股 2026-09-30」，md 全文 2937B 含候选池表）；② 线上 data/IMA_STRONG_STOCK.js update_time=2026-09-30 22:16:53、data_date=09-30、8 只、snapshot_expired=False、source_stale=False、stale_days=0 ⇒ VERIFY③④ 已达成。中断期精确口径：09-24 至 09-30 夜约 6 天（原 WHAT 记录时点 09-25 为『连续 2 日』），非 7 天。残留待验：判据①② 未过——connector-states.json 键集仍无 ima-mcp、当前会话 ToolSearch 搜不到 ima 工具 ⇒ 昨夜取文通道的持久绑定态未证实，待下一轮自动跑批 fetched_at 真实前进后全项结项。"
-    updated: "2026-10-01 19:25"
-    updated_by: 阿狸咪的工程师
+    alimi_verify_20261002_1909: >-
+      〔阿狸咪的工程师 2026-10-02 19:09 CST · 主人重绑后实测：连接已恢复，判据①②达成〕
+      A. connector-status 当前 = ima-mcp connected；会话 ToolSearch 命中 mcp__ima-mcp__get_knowledge_base_list /
+         search_knowledge / fetch_media_content 等工具 ⇒ 判据①达成（连接器已真实绑定，非仅配置残留）。
+      B. 实测 get_knowledge_base_list 返回个人知识库「懒猫的知识库」；search_knowledge("短线情绪选股")
+         命中 v8 水源「强势股跟踪」篇（media_id=weburl_d3a8e660…，can_fetch_content=true）
+         ⇒ 判据②达成（网关路由 + 取文通道通）。
+      C. 残留判据③④ 待印证：假期（10-01~10-08 休市）源方停更，自动化 fetched_at 暂未真实前进；
+         待 10-09 前下一轮 ima 快照自动化(149ad8ff)真实落库后，VERIFY③④ 补全即结项。
+      D. status 维持 pending-verify：连接层已复原，仅余自动跑批端到端印证。
+    updated: "2026-10-02 19:09"
+    updated_by: 阿狸咪的工程师(alimi-cn)
   - id: cn-singleflight-schedule-trigger-offset
     priority: P1
     owner: shared
