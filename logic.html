@@ -710,7 +710,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=a4e21c7170" defer></script>
   <script src="data/DO_NOT_DELETE.js?v=1749b574ca" defer></script>
   <script src="data/SUSPENSION_ALERT.js?v=8d6d4065cf" defer></script>
-  <script src="data/GOLD_POOL.js?v=57e169cb0a" defer></script>
+  <script src="data/GOLD_POOL.js?v=619a14907f" defer></script>
   <script src="data/MACRO_DATA.js?v=5c694124fc" defer></script>
   <script src="data/MACRO_BRIEF.js?v=ee48faedcd" defer></script>
   <script src="data/NT_DATA.js?v=43eedf0f21" defer></script>
@@ -729,7 +729,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/H_AUTO_BUY_TRACK.js?v=b818e67917" defer></script>
   <script src="data/UNLISTED_PANEL.js?v=e4a2df05e9" defer></script>
   <script src="data/MARKET_REGIME.js?v=8e8a5a26d0" defer></script>
-  <script src="data/RISK_GAUGE.js?v=bd435d030d" defer></script>
+  <script src="data/RISK_GAUGE.js?v=45d548d661" defer></script>
   <script src="data/SECTOR_RECOMMENDATION.js?v=60cad1663d" defer></script>
   <script src="data/WEEKEND_META_REPORT.js?v=c458331225" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=2983aeb095" defer></script>
@@ -742,8 +742,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/V8_CAL.js?v=d363407b7e"></script>
   <script src="data/SH_FIB.js?v=a3712b8f27" defer></script>
   <script src="data/SZ_FIB.js?v=99bdac808c" defer></script>
-  <script src="data/SECTOR_RS.js?v=07153a08b3" defer></script>
-  <script src="data/SECTOR_PHASE_HISTORY.js?v=e6803cb957" defer></script>
+  <script src="data/SECTOR_RS.js?v=a64f401332" defer></script>
+  <script src="data/SECTOR_PHASE_HISTORY.js?v=0a56c93a0d" defer></script>
   <script src="data/INST_TRADE.js?v=a520e4f107" defer></script>
   <script src="data/NORTH_FUND.js?v=1539b92c68" defer></script>
   <script src="data/MARKET_ALERTS.js?v=af4acab911" defer></script>
@@ -753,7 +753,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     <script src="data/VOLATILITY.js?v=98f97c85f0" defer></script>
   <script src="data/CAPITAL_FLOW_DATA.js?v=7c3b335545" defer></script>
   <script src="data/SH_SZ_HISTORY.js?v=069736cada" defer></script>
-  <script src="data/CANDIDATE.js?v=9ef7f33273" defer></script>
+  <script src="data/CANDIDATE.js?v=c7bb874f5f" defer></script>
   <script src="data/FOUR_VOLUME.js?v=f55fb1b2d9" defer></script>
   <script src="data/FOUR_VOLUME_60M.js?v=556a3e802a" defer></script>
   <script src="data/STOCK_STOP_DATA.js?v=f60a74f86b" defer></script>
@@ -775,12 +775,12 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/RESTRICTED_RELEASE.js?v=d2a57d1676" defer></script>
   <script src="data/PERFORMANCE_FORECAST.js?v=6333deb9a1" defer></script>
   <script src="data/RUNNER_STATUS.js?v=be3704c3dc" defer></script>
-  <script src="data/HEALTH_CHECK.js?v=a2e26522fe" defer></script>
-  <script src="data/COMMODITY_ELASTICITY.js?v=6d337b9f18" defer></script>
-  <script src="data/SENTIMENT_CYCLE.js?v=4a248a86f4" defer></script>
-  <script src="data/STOCK_MOMENTUM_STATE.js?v=39055b77ad" defer></script>
-  <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=ea9ba0b86c" defer></script>
-  <script src="data/MOMENTUM_FILTER.js?v=24fe656ae8" defer></script>
+  <script src="data/HEALTH_CHECK.js?v=58c6b08484" defer></script>
+  <script src="data/COMMODITY_ELASTICITY.js?v=c2b98a2371" defer></script>
+  <script src="data/SENTIMENT_CYCLE.js?v=ac67370c8e" defer></script>
+  <script src="data/STOCK_MOMENTUM_STATE.js?v=6870efed80" defer></script>
+  <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=c3d396036d" defer></script>
+  <script src="data/MOMENTUM_FILTER.js?v=686d7834e2" defer></script>
   <!-- 🗑 2026-09-19 主人令：「强势突破」全站删除 ⇒ 本引用移除。
        🔵 2026-09-20 补正（阿狸咪的工程师）：上方原注记「已于 2026-09-19 移除（Pages 实测 404）」
           **当时正确、现已过时** —— 该轮实为短暂移除，随后恢复；真正的终局是 2026-09-20
@@ -6816,7 +6816,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=39055b77ad';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=6870efed80';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -6825,7 +6825,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=ea9ba0b86c';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=c3d396036d';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
