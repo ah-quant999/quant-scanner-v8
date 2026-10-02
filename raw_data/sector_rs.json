@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-02 22:04",
+  "update_time": "2026-10-02 23:51",
   "data_date": "2026-09-30",
   "data_date_source": "kline",
   "fetch_date": "2026-10-02",
@@ -887,24 +887,6 @@
       "relative_90d": -16.04,
       "relative_180d": -19.56,
       "relative_52w": -13.97
-    },
-    {
-      "name": "农产品加工",
-      "pct_day": 1.0,
-      "pct_5d": -2.83,
-      "pct_20d": -4.03,
-      "pct_30d": 0.68,
-      "pct_60d": 12.02,
-      "pct_90d": -0.9,
-      "pct_180d": -14.92,
-      "pct_52w": -18.24,
-      "relative_5d": -2.83,
-      "relative_20d": -4.03,
-      "relative_30d": 0.68,
-      "relative_60d": 12.02,
-      "relative_90d": -0.9,
-      "relative_180d": -14.92,
-      "relative_52w": -18.24
     },
     {
       "name": "农化制品",
