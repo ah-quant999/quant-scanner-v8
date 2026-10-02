@@ -42,3 +42,12 @@
 - **改动**：仅 __renderThemeValue chip 渲染：chips 单容器拆为 chipsSeed/chipsDyn 两个 flex 行（种子行 margin-bottom:8px，热点行 10px）；样式/交互/排行未动。
 - **验证**：渲染桩 14/14 PASS（种子行恰 7 chip 不含热点、热点行不含长期主题；「医疗服务」含「医疗」被种子正确覆盖=关键词逻辑有效）+ 29 script 0 错 + 门禁 14/14 + 纯 LF。
 - **推送**：9bb99979ed（parent=实时 tip 4a97d674b，force:false，回读一致）。
+
+
+---
+
+## 追记 · 2026-10-02 20:1x · 观测类卡序调整（主人第三道截图令）
+- **指令**：「这卡移到它上方」→「🔭 主题空间·概念资金热度」移到「🌙 隔夜美股强势·映射 A/港股」卡上方。
+- **改动**：仅 renderUnlisted 观测类 pane 卡壳顺序：themeValueBody 卡壳从大基金卡之后整体上移至 usHkMapCard 之前；新卡序 = …概念/行业→ETF·龙头参考 → 🔭主题空间 → 🌙隔夜美股 → 🚨大基金。容器 id/渲染函数/派发/数据均未动；同步修正隔夜美股卡过时位置注释。
+- **验证**：29 script 0 错 + 卡序断言（tv<us<dj）PASS + 门禁 14/14 + 纯 LF。
+- **推送**：99a8593de7（parent=实时 tip b27eff7f5，force:false，回读一致）。小九侧零动作。
