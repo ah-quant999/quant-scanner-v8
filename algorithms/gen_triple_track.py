@@ -9,7 +9,7 @@ gen_triple_track.py — 三重共识「历史追踪」跟踪 + 回测分析器
   - raw_data/gold_pool.json             （信号数/涨跌幅兜底；**其 history[-1].close 不是当日价**，仅当日校验通过才可用）
   - data/fundamental_quality.json       （催化剂 news.tags / 评分加减）
   - data/backtest_comprehensive.json    （baostock 真实收盘价滚动回测，信号层）
-  - data/top10_daily.json               （TOP10≥70，用于全站精选重叠度）
+  - data/top10_daily.json               （TOP10≥70，用于TOP10≥70 重叠度）
   （2026-09-06 审计修复：cockpit_backtest.json / cockpit_tier_recommend.json 随驾驶舱 09-03 下线，
    相关读取与重叠度输出已移除——文件不存在时此前输出「与驾驶舱重叠 0」属伪数据）
 
@@ -18,7 +18,7 @@ gen_triple_track.py — 三重共识「历史追踪」跟踪 + 回测分析器
 覆盖 8 项能力：
   1) 持仓盈亏跟踪   2) 状态迁移告警   3) 催化剂兑现追踪
   4) 回测 N 日胜率（真实信号层 + 前向累积）  5) 严格 vs 宽松对比
-  6) 阈值敏感性   7) 板块聚类   8) 全站精选重叠度
+  6) 阈值敏感性   7) 板块聚类   8) TOP10≥70 重叠度
 
 原则：不编造数据；样本不足处明确标注"积累中"。
 """
@@ -410,7 +410,7 @@ def main():
         top_ind = sector_cluster["by_industry"][0]["count"]
         sector_cluster["concentration"] = r2(top_ind / len(tracked) * 100)
 
-    # ---------- 8) 全站精选重叠度 ----------
+    # ---------- 8) TOP10≥70 重叠度 ----------
     today_codes = set(ncode(t["code"]) for t in tracked)
     top10_ge70 = set()
     for s in top10.get("top10", []):

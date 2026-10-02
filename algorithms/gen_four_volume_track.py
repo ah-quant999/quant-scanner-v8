@@ -10,7 +10,7 @@ gen_four_volume_track.py — 四量终极「历史追踪 + 前向回测」分析
   - raw_data/four_volume_history.json      （update_four_volume_history.py 的累积账本，
                                             含每日快照 + _tracking_latest + _stock_price_history）
   - algorithms/stock_industry_concepts.json（行业/概念映射，与三重共识同源）
-  - raw_data/top10_daily.json              （TOP10≥70，用于全站精选重叠度）
+  - raw_data/top10_daily.json              （TOP10≥70，用于TOP10≥70 重叠度）
 
 写出：raw_data/four_volume_track.json（前端「四量终极」tab 的跟踪/回测子卡消费）
 
@@ -19,7 +19,7 @@ gen_four_volume_track.py — 四量终极「历史追踪 + 前向回测」分析
   2) 状态迁移告警（新入选 / 掉出 / 连续入选 / 大幅回撤 / 信号兑现）
   3) 前向累积回测（自建逐日真实收盘价序列 T+1/3/5/10/20/30/45/60）
   4) 板块聚类（行业集中度 → 相关性风险）
-  5) 全站精选重叠度
+  5) TOP10≥70 重叠度
   6) 四量四灯状态（QD / 游资点火 / 机构托底 / 当天金叉 / 四路翻多）
   7) 价格来源透明化（quote / ledger / none 逐只标注，取不到就留空）
 
@@ -316,7 +316,7 @@ def main():
         "concentration": r2(by_industry[0]["count"] / len(cl) * 100) if (cl and by_industry) else 0,
     }
 
-    # ---- 全站精选重叠度 ----
+    # ---- TOP10≥70 重叠度 ----
     top10_ge70 = set()
     for s in (top10.get("top10", []) if isinstance(top10, dict) else []):
         if (s.get("total_score") or 0) >= 70:
