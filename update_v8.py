@@ -204,6 +204,10 @@ DATA_SOURCES = {
     #   ⚠️ 本表必须登记：否则 update_v8 永不生成 data/US_HK_MAP.js —— 与 2026-08-18 的
     #   overseas_markets.json 漏挂属同一类「raw 已新、js 永旧」半截更新事故。
     "us_hk_map.json":             "US_HK_MAP",
+    # 🆕 2026-10-02 主人令「三项齐」：主题空间卡基本面证据源（候选/金股池 A股 ROE/营收增速，Baostock 日更）。
+    #   ⚠️ 本表必须登记：否则 update_v8 永不生成 data/FUNDAMENTAL_QUALITY.js ——
+    #   与 2026-08-18 overseas_markets / 2026-08-26 final_recommend 同类「raw 已新、js 永旧」半截更新事故预防。
+    "fundamental_quality.json":   "FUNDAMENTAL_QUALITY",
 }
 
 # 🆕 2026-09-05 主人令一劳永逸：运维看板全量覆盖 + 审计轨迹
@@ -852,7 +856,7 @@ def _write_js(var_name, obj):
     except Exception:
         pass
 
-    with open(out_path, "w", encoding='utf-8') as f:
+    with open(out_path, "w", encoding='utf-8', newline='') as f:   # 🔴 2026-10-02 阿狸咪修：缺 newline='' ⇒ Windows 本地跑批把尾行写成 CRLF（云端 LF/本地 CRLF 漂移）；与写盘铁律对齐
         f.write(f"window.{var_name} = ")
         json.dump(lite_obj, f, ensure_ascii=False, separators=(',', ':'))
         f.write(";\n")

@@ -1820,6 +1820,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-30：盘后数据页新增解禁日历 + 业绩预告 -->
 <script src="data/RESTRICTED_RELEASE.js?v=d2a57d1676" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=6333deb9a1" defer></script>
+<script src="data/FUNDAMENTAL_QUALITY.js?v=e87ea43011" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=ec77535a70" defer></script>
 <script src="data/HB_XIAOJIU.js?v=5cf72a74c3" defer></script>
@@ -7712,7 +7713,7 @@ function fmtSigned(v){
     if(!dst) return;
     var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
     var L = window.STOCK_LIST, arr = (L && L.data) || null;
-    var PF = window.PERFORMANCE_FORECAST, FL = window.FACTOR_LAB, SFF = window.SECTOR_FUND_FLOW;
+    var PF = window.PERFORMANCE_FORECAST, SFF = window.SECTOR_FUND_FLOW;
     var sects = (SFF && SFF.top_list) || null;
     var hasFund = !!(sects && sects.length);
     if((!arr || !arr.length) && !(window.STOCK_PROFILE && window.STOCK_PROFILE.profiles)){
@@ -7721,6 +7722,8 @@ function fmtSigned(v){
       return;
     }
     if(!hasFund && window.__tvRetry < 20){ window.__tvRetry++; setTimeout(window.__renderThemeValue, 900); return; }
+    // 2026-10-02：三项齐证据源 FUNDAMENTAL_QUALITY 未就绪时同样等待
+    if(!window.FUNDAMENTAL_QUALITY && window.__tvRetry < 20){ window.__tvRetry++; setTimeout(window.__renderThemeValue, 900); return; }
 
     // ---- 概念板块字典（只取 type=='概念'）----
     var cNet = {}, cChg = {}, cList = [];
@@ -7792,9 +7795,15 @@ function fmtSigned(v){
       if(['预增','扭亏','略增','续盈','续增'].indexOf(it.type) < 0) return;
       if(perfMap[it.code] == null) perfMap[it.code] = it;
     });
-    var roeMap = {};
-    ((FL && FL.roe_largecap && FL.roe_largecap.top) || []).forEach(function(r){
-      if(r && r.code) roeMap[String(r.code).replace(/^[^.]+\./, '')] = r;
+    // 2026-10-02 主人令「三项齐」：证据源升级 FUNDAMENTAL_QUALITY（候选/金股池 A股 ROE+营收增速，Baostock 日更）
+    //   替换原 roe_largecap Top30 大市值窄门（30 只与科技/医药主题交集天然过小）。
+    var FQ = window.FUNDAMENTAL_QUALITY, fqMap = {}, nFqRoe = 0;
+    Object.keys((FQ && FQ.stocks) || {}).forEach(function(k){
+      if(k.indexOf('hk_') === 0) return;
+      var v = FQ.stocks[k], num = k.split('_')[1];
+      if(!v || !num) return;
+      if(v.roe != null && v.roe >= 10) nFqRoe++;
+      fqMap[num] = v;
     });
 
     // ---- 个股层：主题关键词命中 + 资金净额（Σ 命中概念板块的当日主力净额）----
@@ -7815,7 +7824,7 @@ function fmtSigned(v){
         }
       }
       if(matched.length) hits.push({code:code, name:name, industry:industry, tags:matched,
-                                    perf:perfMap[code]||null, roe:roeMap[code]||null,
+                                    perf:perfMap[code]||null, fq:fqMap[code]||null,
                                     fund:fund, nFundSec:nFundSec});
     }
     if(arr && arr.length){
@@ -7837,9 +7846,13 @@ function fmtSigned(v){
       var v = (it.change_pct == null) ? '' : (it.change_pct > 0 ? '+' : '') + it.change_pct.toFixed(1) + '%';
       return '<span style="font-size:10px;color:#ef5350;font-weight:600;">📈' + _ev(it.type) + (v ? ' ' + v : '') + '(' + (isProfit?'净利':'营收') + ')</span>';
     }
-    function roeBadge(r){
-      if(!r || r.roe_ttm == null) return '';
-      return '<span style="font-size:10px;color:#38bdf8;font-weight:600;">💎 ROE_TTM ' + r.roe_ttm.toFixed(1) + '%</span>';
+    function roeBadge(q){
+      if(!q || q.roe == null) return '';
+      return '<span style="font-size:10px;color:#38bdf8;font-weight:600;">💎 ROE ' + q.roe.toFixed(1) + '%</span>';
+    }
+    function revBadge(q){
+      if(!q || q.revenue_growth == null) return '';
+      return '<span style="font-size:10px;color:#fbbf24;font-weight:600;">📑 营收+' + q.revenue_growth.toFixed(1) + '%</span>';
     }
     function fundBadge(x){
       if(!x.nFundSec) return '';
@@ -7848,30 +7861,30 @@ function fmtSigned(v){
     }
     // 交叉象限符号：🔥 资金正+基本面 / 💰 仅资金正 / 📈 仅基本面 / 空
     function quadMark(x){
-      var f = x.nFundSec > 0 && x.fund > 0, b = !!(x.perf || x.roe);
+      var f = x.nFundSec > 0 && x.fund > 0, b = !!(x.perf || x.fq);
       if(f && b) return '<span title="资金流入 + 基本面证据" style="font-size:11px;">🔥</span>';
       if(f) return '<span title="仅资金流入，无基本面证据" style="font-size:11px;">💰</span>';
       if(b) return '<span title="有基本面证据，资金未流入" style="font-size:11px;">📈</span>';
       return '';
     }
-    // 分档：A=概念+业绩正向  B=概念+ROE榜  C=仅概念命中；同档按【资金净额】降序（这就是每天变的地方）
-    hits.forEach(function(x){ x.tier = x.perf ? 0 : (x.roe ? 1 : 2); });
-    hits.sort(function(a,b){
-      return a.tier - b.tier || (b.fund - a.fund) || b.tags.length - a.tags.length
-        || ((b.perf && b.perf.change_pct) || 0) - ((a.perf && a.perf.change_pct) || 0);
+    // 2026-10-02 主人令「三项齐」：B/C 档全删，只留 概念命中 + 业绩正向 + ROE≥10 的交集层。
+    //   业绩正向 = 营收增速>0（基本面质量库）或 业绩预告正向；ROE 达标 = 质量库 roe≥10。
+    hits.forEach(function(x){
+      x.revPos = !!(x.perf || (x.fq && x.fq.revenue_growth != null && x.fq.revenue_growth > 0));
+      x.roeOk  = !!(x.fq && x.fq.roe != null && x.fq.roe >= 10);
+      x.ok = x.revPos && x.roeOk;
     });
-    // 2026-09-13 主人令：不再三档混排统一截断 60 只，改为 A/B/C 分桶。
-    //   A 档（概念+业绩+ROE 三项齐）= 全量直出；B/C 档默认折叠，点标题展开。
-    var nA = 0, nB = 0, nFundPos = 0;
-    hits.forEach(function(x){ if(x.tier===0) nA++; else if(x.tier===1) nB++; if(x.nFundSec>0 && x.fund>0) nFundPos++; });
-    var tierHits = [[], [], []];
-    hits.forEach(function(x){ tierHits[x.tier].push(x); });
+    hits = hits.filter(function(x){ return x.ok; });
+    hits.sort(function(a,b){ return (b.fund - a.fund) || b.tags.length - a.tags.length; });
+    if(hits.length > 40) hits = hits.slice(0, 40);   // 每主题封顶 40 只，防爆屏
+    var nFundPos = 0;
+    hits.forEach(function(x){ if(x.nFundSec>0 && x.fund>0) nFundPos++; });
     // 卡片渲染器（原 shown.map 回调体，提为可复用函数）
     function _tvCard(x){
-      var border = x.tier===0 ? '#ef5350' : (x.tier===1 ? '#38bdf8' : '#94a3b8');
+      var border = '#ef5350';   // 三项齐统一红（证据最全档）
       var tagStr = x.tags.slice(0,2).map(_ev).join(' / ') + (x.tags.length > 2 ? ' +' + (x.tags.length-2) : '');
-      var badge = perfBadge(x.perf);
-      var b2 = roeBadge(x.roe);
+      var badge = perfBadge(x.perf) || revBadge(x.fq);
+      var b2 = roeBadge(x.fq);
       if(badge && b2) badge += ' ' + b2; else if(b2) badge = b2;
       var badge3 = fundBadge(x);
       if(badge3) badge = badge ? badge + '<br>' + badge3 : badge3;
@@ -7883,31 +7896,14 @@ function fmtSigned(v){
         + '<div style="margin-top:3px;line-height:1.5;">' + badge + '</div>'
         + '</div>';
     }
-    var TIER_META = [
-      { key:'A', name:'A档', color:'#ef5350', desc:'概念 + 业绩正向 + ROE 三项齐（证据最全）' },
-      { key:'B', name:'B档', color:'#38bdf8', desc:'概念 + 业绩或 ROE 其一（部分证据）' },
-      { key:'C', name:'C档', color:'#94a3b8', desc:'仅概念命中（暂无基本面证据）' }
-    ];
+    // 2026-10-02 主人令：单层直出（三项齐），无分档无折叠
     var cards = '';
-    TIER_META.forEach(function(tm, ti){
-      var bucket = tierHits[ti];
-      if(!bucket.length) return;
-      var inner = bucket.map(_tvCard).join('');
-      var grid = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">' + inner + '</div>';
-      if(tm.key === 'A'){
-        // A 档：直接全部展开显示
-        cards += '<div style="margin-bottom:12px;">'
-          + '<div style="font-size:12px;font-weight:700;color:' + tm.color + ';margin-bottom:6px;">'
-          + '（' + tm.name + ' · ' + bucket.length + ' 只 · ' + tm.desc + '）</div>'
-          + grid + '</div>';
-      } else {
-        // B/C 档：折叠，点标题展开
-        cards += '<details style="margin-bottom:12px;">'
-          + '<summary style="cursor:pointer;font-size:12px;font-weight:700;color:' + tm.color + ';padding:4px 0;user-select:none;">'
-          + '（' + tm.name + ' · ' + bucket.length + ' 只 · ' + tm.desc + '）点击展开 ▾</summary>'
-          + '<div style="margin-top:8px;">' + grid + '</div></details>';
-      }
-    });
+    if(hits.length){
+      var inner = hits.map(_tvCard).join('');
+      cards += '<div style="font-size:12px;font-weight:700;color:#ef5350;margin-bottom:6px;">'
+        + '（三项齐 · ' + hits.length + ' 只 · 概念 + 业绩正向 + ROE≥10%）</div>'
+        + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">' + inner + '</div>';
+    }
 
     // ---- chip：主题名 + 当日主力净额（每天在动）----
     var chips = '';
@@ -7934,17 +7930,17 @@ function fmtSigned(v){
 
     var curSt = themeStat[window.__tvTheme] || { net:0, nSec:0, avg:0, lead:'', leadNet:0 };
     var stamp = (SFF && SFF.update_time) || (L && L.update_time) || (window.STOCK_PROFILE && window.STOCK_PROFILE.update_time) || '—';
-    var nPerf = Object.keys(perfMap).length, nRoe = Object.keys(roeMap).length;
+    var nPerf = Object.keys(perfMap).length;
     // 2026-09-13：主题构成随当日资金榜变化 → 卡内文案不再写死主题名单，改为动态计数
     var nSeed = Object.keys(window.__TV_SEED_THEMES).length;
     var nDyn = (window.__TV_DYN_KEYS || []).length;
     var nThemeAll = nSeed + nDyn;
     dst.innerHTML = ''
-      + window.v8CardHeader('🔭','主题空间 · 概念资金热度','概念 × 资金热度 × 业绩/ROE 交叉（实验版）','update_time',{update_time:stamp, slot:'盘后', horizon:'中长线'})
+      + window.v8CardHeader('🔭','主题空间 · 概念资金热度','概念 × 资金热度 × 三项齐交叉（实验版）','update_time',{update_time:stamp, slot:'盘后', horizon:'中长线'})
       + '<div style="padding:12px 14px;">'
       + '<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.8;font-size:12px;color:var(--txt);">'
-      +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">📌 核心：</b>在 <b style="color:var(--txt);">' + nThemeAll + '</b> 个主题（<b>' + nSeed + '</b> 个长期主题 + <b style="color:#fcd34d;">' + nDyn + '</b> 个由当日概念资金榜自动追加的新热点）中，找出「有概念想象空间 + 业绩或ROE质量证据」的股票。</div>'
-      +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b>A 档=概念+业绩正向+ROE 三项齐；B 档=概念+业绩或ROE 其一；C 档=仅概念命中（A 档直接展开，B/C 档点标题展开 ▾）。按 A→B→C、板块资金净额排序，资金为辅助验证。</div>'
+      +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">📌 核心：</b>在 <b style="color:var(--txt);">' + nThemeAll + '</b> 个主题（<b>' + nSeed + '</b> 个长期主题 + <b style="color:#fcd34d;">' + nDyn + '</b> 个由当日概念资金榜自动追加的新热点）中，找出「概念想象空间 + 业绩正向 + ROE≥10%」三项齐的股票。</div>'
+      +   '<div style="font-size:12.5px;margin-bottom:5px;"><b style="color:#c4b5fd;">💡 用法：</b>只列「三项齐」= 概念命中 + 业绩正向（营收正增或业绩预告预增）+ ROE≥10%。证据取自基本面质量库（候选/金股池 A 股 · Baostock 日更），库外概念票无法验证、一律不列；按板块资金净额降序，资金为辅助验证。</div>'
       +   '<div style="font-size:12.5px;padding:6px 9px;border-radius:6px;background:rgba(251,191,36,.1);border-left:3px solid #fbbf24;"><b style="color:#fbbf24;">🔥 主题会动：</b>7 个长期主题为固定种子，另按当日概念资金榜自动追加最多 ' + (window.TV_DYN_MAX || 5) + ' 个新热点（金色描边 + 🔥 前缀）—— 主题集合每天随行情变化，不写死。仅研究参考，不构成投资建议。</div>'
       + '</div>'
       + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">' + chips + '</div>'
@@ -7952,21 +7948,19 @@ function fmtSigned(v){
       +   '<b style="color:var(--sub);">主题资金热度</b>（主力净额，亿元 · 红流入/绿流出）：' + (hasFund ? rankStr : '<span style="color:#fbbf24;">资金源 SECTOR_FUND_FLOW 未加载</span>')
       + '</div>'
       + '<div style="font-size:11.5px;color:var(--sub);margin-bottom:8px;line-height:1.6;">'
-      +   '本主题 <b style="color:var(--txt);">' + _ev(window.__TV_THEMES[window.__tvTheme].label) + '</b> 命中 <b style="color:var(--txt);">' + hits.length + '</b> 只 · '
+      +   '本主题 <b style="color:var(--txt);">' + _ev(window.__TV_THEMES[window.__tvTheme].label) + '</b> 三项齐 <b style="color:var(--txt);">' + hits.length + '</b> 只 · '
       +   '概念板块 <b>' + curSt.nSec + '</b> 个 · 板块资金合计 <b style="color:' + _numColor(curSt.net) + ';">' + _sign(curSt.net) + '亿</b>'
       +   (curSt.nSec ? ' · 均涨跌 <b style="color:' + _numColor(curSt.avg) + ';">' + _sign(curSt.avg, 2) + '%</b>' : '')
       +   (curSt.lead ? ' · 资金最强 <span style="color:var(--sub);">' + _ev(curSt.lead) + '</span>' : '')
-      +   '<br><span style="color:#ef5350;font-weight:600;">A档 概念+业绩正向 ' + nA + '</span> · '
-      +   '<span style="color:#38bdf8;font-weight:600;">B档 概念+ROE榜 ' + nB + '</span> · '
-      +   '<span style="color:var(--dim);">C档 仅概念 ' + (hits.length - nA - nB) + '</span> · '
+      +   '<br><span style="color:#ef5350;font-weight:600;">✅ 三项齐 ' + hits.length + '</span> 只 · '
       +   '<span style="color:#ef5350;font-weight:600;">💰资金净流入 ' + nFundPos + '</span> 只'
-      +   '<br>证据覆盖：业绩预告正向 ' + nPerf + ' 只 · ROE大市值榜 ' + nRoe + ' 只 / 画像全市场 ' + nScanned + ' 只 —— 基本面证据仍窄；资金维度每日刷新，为本卡主要变化来源。'
+      +   '<br>证据覆盖：基本面质量库 A股 ' + Object.keys(fqMap).length + ' 只（ROE≥10 共 ' + nFqRoe + ' 只）· 业绩预告正向 ' + nPerf + ' 只 / 画像全市场 ' + nScanned + ' 只 —— 质量库外概念票不参与列示；资金维度每日刷新，为本卡主要变化来源。'
       + '</div>'
       + (cards ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">' + cards + '</div>'
-               : '<div class="note" style="color:var(--dim);">本主题无概念命中，换个主题试试</div>')
+               : '<div class="note" style="color:var(--dim);">本主题暂无「三项齐」股票（概念命中但缺业绩/ROE 证据），换个主题试试</div>')
       // 2026-09-13 主人令：A/B/C 分档后不再截断，删除「仅展示前 N 只」提示行。
       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.6;">口径：板块资金取 SECTOR_FUND_FLOW「概念」类板块当日主力净额（亿元），个股资金 = Σ(其命中概念板块净额)；'
-      + '卡内符号：🔥=资金流入+基本面证据 / 💰=仅资金流入 / 📈=有基本面证据但资金未流入，仅作交叉提示、非买卖信号。仅研究参考，不构成投资建议。</div>'
+      + '卡内符号：🔥=资金流入+基本面证据 / 📈=有基本面证据但资金未流入，仅作交叉提示、非买卖信号。仅研究参考，不构成投资建议。</div>'
       + '</div>';   // /padding 12 14
   };
 
