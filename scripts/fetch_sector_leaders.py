@@ -154,6 +154,88 @@ def _cache_save(path, obj):
         log("cache save fail %s: %s" % (os.path.basename(path), str(e)[:60]))
 
 
+# 🛡 2026-10-01 阿狸咪的工程师（第四层兜底·NeoData）：东财 push2 全家族 09-30 起对本机+云端
+#   runner 全 HTTP 层 RemoteDisconnected（TCP/TLS 可建连、HTTP 请求即被掐），而 ①②③ 三层
+#   兜底缓存需一次成功抓取才建立 ⇒ 东财断日缓存也缺 ⇒ 全板块 no_match/leaders 空（10-01
+#   实测 4 板块 leaders 全 0、卡面龙头股位整段空白，主人令根治）。
+#   NeoData「板块成分明细」（copilot.tencent.com/agenttool/v1/neodata）与 fetch_sector_rs.py
+#   同源同 token 通道、实测可达；**仅在前三层全失效时启用**，任何失败 return None 不抛错。
+#   节假日「今日」= 最近交易日（2026-10-01 与腾讯 qt.gtimg.cn 逐股核验 8/8 一致）。
+NEODATA_URL = "https://copilot.tencent.com/agenttool/v1/neodata"
+NEO_TOKEN_PATHS = (
+    os.path.join(ROOT, "algorithms", ".neodata_token"),
+    "E:/.workbuddy/skills/.neodata_token",
+    os.path.expanduser("~/.workbuddy/.neodata_token"),
+    os.path.expanduser("~/.workbuddy/skills/.neodata_token"),
+)
+
+
+def _neo_token():
+    """NeoData token：algorithms/.neodata_token 优先（视为权威不查时效），其余 JSON 缓存
+    路径要求 saved_at 12h 内。全缺返回 None（调用方按无兜底降级，行为与旧版一致）。"""
+    for i, p in enumerate(NEO_TOKEN_PATHS):
+        try:
+            if not os.path.exists(p):
+                continue
+            with open(p) as f:
+                cache = json.load(f)
+            tok = cache.get("token") if isinstance(cache, dict) else None
+            saved = cache.get("saved_at", 0) if isinstance(cache, dict) else 0
+            if tok and (i == 0 or (time.time() - saved < 43200)):
+                return tok
+        except Exception:
+            continue
+    return None
+
+
+def _neo_cons(name):
+    """NeoData 板块成分兜底：返回与 fetch_cons 同构 rows（涨幅降序；调用方截 TOP_N）。
+    仅前三层（东财在线/名单缓存/腾讯行情）全失效时调用；任何失败 return None 不抛错。
+    表格行首带 '|' ⇒ split 空首元素：[1]=代码 [2]=名称 [4]=最新价 [6]=涨跌幅 [15]=主力净流入。"""
+    import re as _re
+    tok = _neo_token()
+    if not tok:
+        return None
+    try:
+        body = json.dumps({"query": "%s板块成分股今日涨幅前5" % name,
+                           "channel": "neodata", "sub_channel": "workbuddy"}).encode("utf-8")
+        req = urllib.request.Request(NEODATA_URL, data=body, method="POST", headers={
+            "Authorization": "Bearer " + tok, "Content-Type": "application/json",
+            "User-Agent": UA["User-Agent"]})
+        with urllib.request.urlopen(req, timeout=40) as resp:
+            d = json.loads(resp.read().decode("utf-8"))
+        if not d.get("suc"):
+            log("neo fail %s: %s" % (name, str(d)[:80]))
+            return None
+        rows = []
+        for item in (d.get("data", {}).get("apiData", {}).get("apiRecall") or []):
+            if item.get("type") != "板块成分明细":
+                continue
+            for line in (item.get("content") or "").split("\n"):
+                cols = [x.strip() for x in line.split("|")]
+                if len(cols) < 8 or ":" in cols[0]:
+                    continue
+                m = _re.match(r"^(\d{6})\.(SZ|SH|BJ)$", cols[1])
+                if not m:
+                    continue
+
+                def _f(idx):
+                    try:
+                        return float(cols[idx].replace(",", ""))
+                    except Exception:
+                        return None
+                chg = _f(6)
+                if chg is None:
+                    continue
+                rows.append({"code": m.group(1), "name": cols[2], "price": _f(4),
+                             "chg": chg, "main_net": _f(15)})
+        rows.sort(key=lambda r: r["chg"], reverse=True)
+        return rows or None
+    except Exception as e:
+        log("neo cons fail %s: %s" % (name, str(e)[:60]))
+        return None
+
+
 def _phase_of(s):
     d5 = s.get("pct_5d") or 0
     d20 = s.get("pct_20d") or 0
@@ -375,6 +457,7 @@ def build():
     sectors_out = []
     n_fail = 0
     n_nomatch = 0
+    n_neo = 0
     if leaders_all:
         boards_exact, boards_norm = fetch_em_boards()
         log("em boards: exact=%d norm=%d" % (len(boards_exact), len(boards_norm)))
@@ -382,6 +465,16 @@ def build():
             nm = x["name"]
             bk, how = _resolve_bk(nm, boards_exact, boards_norm)
             if not bk:
+                _neo = _neo_cons(nm)
+                if _neo:
+                    n_neo += 1
+                    log("neo fallback %s: %d rows（东财板块映射缺失，NeoData 兜底）" % (nm, len(_neo)))
+                    sectors_out.append({
+                        "name": nm, "bk": None, "phase": x.get("phase", "主升"),
+                        "pct_5d": x.get("pct_5d"), "pct_20d": x.get("pct_20d"),
+                        "cons_count": len(_neo), "leaders": _neo[:TOP_N], "match": "neodata",
+                    })
+                    continue
                 # 🎯 2026-09-19 主人令·两卡对应：不再静默丢板块！保留 + no_match=1，
                 #   前端明示「该板块在东财无对应行业板块，需人工别名表补」⇒ 两卡计数因此对齐。
                 n_nomatch += 1
@@ -395,6 +488,16 @@ def build():
             try:
                 cons = fetch_cons_safe(bk)
             except Exception as e:
+                _neo = _neo_cons(nm)
+                if _neo:
+                    n_neo += 1
+                    log("neo fallback %s(%s): %d rows（东财个股断连，NeoData 兜底）" % (nm, bk, len(_neo)))
+                    sectors_out.append({
+                        "name": nm, "bk": bk, "phase": x.get("phase", "主升"),
+                        "pct_5d": x.get("pct_5d"), "pct_20d": x.get("pct_20d"),
+                        "cons_count": len(_neo), "leaders": _neo[:TOP_N], "match": "neodata",
+                    })
+                    continue
                 n_fail += 1
                 log("cons fail2 %s(%s): %s —— 保留板块，个股留空待下轮补抓" % (nm, bk, str(e)[:60]))
                 sectors_out.append({
@@ -428,9 +531,11 @@ def build():
         "update_time": _src_ut or _built_ut,
         "republish_time": _built_ut,
         "data_date": src_date, "rule_ver": PHASE_RULE_VER, "top_n": TOP_N,
-        "source": "东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期",
+        "source": ("东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期"
+                   + (" + 腾讯NeoData 板块成分明细（东财 push2 封禁兜底 %d 板块）" % n_neo if n_neo else "")),
         "phase": "主升+启动", "sector_count": len(sectors_out), "sectors": sectors_out,
         "nomatch_count": n_nomatch, "leaders_fail_count": n_fail,
+        "neo_fallback_count": n_neo,
         "em_boards_source": EM_BOARDS_SOURCE,
         "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；"
                 "个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；"
@@ -447,9 +552,9 @@ def build():
         _cnt.setdefault(p, [0, 0])
         _cnt[p][0] += 1 if x.get("leaders") else 0
         _cnt[p][1] += 1
-    log("OK %s js_bytes=%d leaders_fail=%d no_match=%d" % (
+    log("OK %s js_bytes=%d leaders_fail=%d no_match=%d neo_fallback=%d" % (
         " ".join("%s(%d/%d)" % (p, v[0], v[1]) for p, v in sorted(_cnt.items(), key=lambda kv: _po.get(kv[0], 9))),
-        len(body), n_fail, n_nomatch))
+        len(body), n_fail, n_nomatch, n_neo))
     return payload
 
 
