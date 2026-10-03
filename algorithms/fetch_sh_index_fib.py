@@ -382,9 +382,32 @@ def build_fib_json(windows, index_data, history):
     
     # 下跌统计
     down = calc_down_stats(history)
-    if index_data.get('index', 0) > 0 and abs(index_data['index'] - down['current_close']) > 1:
-        down['total_pct'] = round((index_data['index'] - down['peak_close']) / down['peak_close'] * 100, 2)
-        down['current_close'] = index_data['index']
+
+    # 🔴 2026-10-03 一劳永逸修复 SH_FIB「current 取数差一日」根因：
+    #   akshare stock_zh_index_spot_em 在非交易时段（盘前/盘后/休市）返回的
+    #   「最新价」= 昨收、「涨跌幅」= 0；fetch_realtime 失败亦返回空 → 旧逻辑
+    #   current.index 退回昨收且 change_pct=0，造成卡面比真实价差一日。
+    #   现以 history（120日真实收盘序列）最新收盘为基准；仅当实时价带真实涨跌
+    #   （|change_pct|>0，即交易时段有成交）才采用实时价，否则用 history 末根收盘
+    #   + 由 history 相邻收盘计算的真实当日涨跌幅。
+    _hist_last = history[-1] if history else {}
+    _hist_close = _hist_last.get('close', 0) or 0
+    _real_idx = index_data.get('index', 0) or 0
+    _real_pct = index_data.get('change_pct', 0) or 0
+    if _hist_close > 0 and abs(_real_pct) < 1e-9:
+        _use_index = _hist_close
+        if len(history) >= 2:
+            _prev = history[-2].get('close', 0) or 0
+            _use_pct = round((_hist_close - _prev) / _prev * 100, 2) if _prev else 0
+        else:
+            _use_pct = 0
+    else:
+        _use_index = _real_idx
+        _use_pct = _real_pct
+
+    if _use_index > 0 and abs(_use_index - down['current_close']) > 1:
+        down['total_pct'] = round((_use_index - down['peak_close']) / down['peak_close'] * 100, 2)
+        down['current_close'] = _use_index
     
     # 如果实时数据显示已涨回峰值以上，重置连跌天数
     if down['total_pct'] >= 0:
@@ -402,8 +425,8 @@ def build_fib_json(windows, index_data, history):
         mode = "温和下跌"
     
     current = {
-        "index": index_data.get('index', down.get('current_close', 0)),
-        "change_pct": round(index_data.get('change_pct', 0), 2),
+        "index": _use_index,
+        "change_pct": round(_use_pct, 2),
         "change_points": round(index_data.get('change_points', 0), 2),
         "days_down": down['days_down'], "total_pct": down['total_pct'],
         "total_points": down['total_points'], "avg_pct": down['avg_pct'],
