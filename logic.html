@@ -718,7 +718,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/archive/V8_CAL_INDEX.js" defer></script>
   <script src="data/CONCEPT_RANKING.js?v=25c03d710b" defer></script>
   <script src="data/INDEX_QUOTES.js?v=17f4eac361" defer></script>
-  <script src="data/AI_MARKET_BRIEF.js?v=6085b3a611" defer></script>
+  <script src="data/AI_MARKET_BRIEF.js?v=4fe713aa9b" defer></script>
   <script src="data/MARGIN_DATA.js?v=a18bf88338" defer></script>
   <script src="data/CFFEX_HOLDINGS.js?v=ab0f4dedcd" defer></script>
   <script src="data/IPO_DATA.js?v=112ba11666" defer></script>
@@ -754,7 +754,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/CAPITAL_FLOW_DATA.js?v=7c3b335545" defer></script>
   <script src="data/SH_SZ_HISTORY.js?v=069736cada" defer></script>
   <script src="data/CANDIDATE.js?v=179d62798e" defer></script>
-  <script src="data/FOUR_VOLUME.js?v=f55fb1b2d9" defer></script>
+  <script src="data/FOUR_VOLUME.js?v=5ba9e22584" defer></script>
   <script src="data/FOUR_VOLUME_60M.js?v=556a3e802a" defer></script>
   <script src="data/STOCK_STOP_DATA.js?v=f60a74f86b" defer></script>
   <script src="data/BACKTEST_COMPREHENSIVE.js?v=94491299a2" defer></script>
@@ -764,7 +764,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <!-- 选股策略模块回测源（供「各选股策略回测汇总」读取） -->
   <script src="data/FOUR_VOLUME_BACKTEST.js?v=b6e977950a" defer></script>
   <script src="data/CRDS_BACKTEST.js?v=2e1d092b81" defer></script>
-  <script src="data/EXPERIMENT.js?v=3ad2f47547" defer></script>
+  <script src="data/EXPERIMENT.js?v=6756416a71" defer></script>
   <script src="data/FINAL_RECOMMEND_DATA.js?v=716116d232" defer></script>
   <script src="data/V8_POOL_TRACKER.js?v=cef6d7dc1d" defer></script>
   <script src="data/ETF_PULSE.js?v=5b8784c64c" defer></script>
@@ -775,12 +775,12 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/RESTRICTED_RELEASE.js?v=37a4779870" defer></script>
   <script src="data/PERFORMANCE_FORECAST.js?v=cccd2738f4" defer></script>
   <script src="data/RUNNER_STATUS.js?v=504f3a69ca" defer></script>
-  <script src="data/HEALTH_CHECK.js?v=2d4d2a6e6f" defer></script>
-  <script src="data/COMMODITY_ELASTICITY.js?v=4589c19d2e" defer></script>
-  <script src="data/SENTIMENT_CYCLE.js?v=cc80167993" defer></script>
-  <script src="data/STOCK_MOMENTUM_STATE.js?v=994807ebbd" defer></script>
-  <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=b63b5bdd42" defer></script>
-  <script src="data/MOMENTUM_FILTER.js?v=42df75bf32" defer></script>
+  <script src="data/HEALTH_CHECK.js?v=a82d0f4a82" defer></script>
+  <script src="data/COMMODITY_ELASTICITY.js?v=89cb847dbd" defer></script>
+  <script src="data/SENTIMENT_CYCLE.js?v=4988f9970f" defer></script>
+  <script src="data/STOCK_MOMENTUM_STATE.js?v=f4970cde7f" defer></script>
+  <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=694d05fa42" defer></script>
+  <script src="data/MOMENTUM_FILTER.js?v=ac0b285fd9" defer></script>
   <!-- 🗑 2026-09-19 主人令：「强势突破」全站删除 ⇒ 本引用移除。
        🔵 2026-09-20 补正（阿狸咪的工程师）：上方原注记「已于 2026-09-19 移除（Pages 实测 404）」
           **当时正确、现已过时** —— 该轮实为短暂移除，随后恢复；真正的终局是 2026-09-20
@@ -6816,7 +6816,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=994807ebbd';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=f4970cde7f';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -6825,7 +6825,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=b63b5bdd42';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=694d05fa42';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
