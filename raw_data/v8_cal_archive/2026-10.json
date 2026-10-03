@@ -1,6 +1,6 @@
 {
  "month": "2026年10月",
- "update_time": "2026-10-02 22:22",
+ "update_time": "2026-10-03 13:46",
  "legend": [
   {
    "title": "重要政策",
@@ -164,24 +164,24 @@
     {
      "num": 2,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇺🇸 美国非农",
        "cls": "us",
-       "released": false
+       "released": true
       },
       {
        "text": "🇨🇳 A股休市（国庆节）",
        "cls": "hk",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 3,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇨🇳 A股休市（国庆节）",
