@@ -371,6 +371,12 @@ _RETIRED_ARTIFACTS = {
     #   前端引用/渲染/派发/V8_PAGE_SCHEDULE/_PAGE_CARD_ORDER/v8_health_check 登记同批清理；
     #   远端产物由本次退役提交一次性删除；本行只拦「本地残留副本回推复活」。
     "data/MACRO_KSHAPE.js",
+    # 🗑 2026-10-03 阿狸咪（同族第四例）：机构研究·maharo 聚合旧文件 data/maharo_macro.js ——
+    #   前端 2026-09-13 起零引用（renderMahoroCard 改读 MAHORO_INSIGHTS），window.MAHORO_MACRO 恒{}；
+    #   唯生产者是家机 WorkBuddy 自动化（LLM 型，直写 data/*.js，每日 08:20 提交）仍产出 → 孤儿死数据。
+    #   远端产物由本次退役提交一次性删除；本行只拦「本地残留副本/自动化回推复活」（与 v8_health_check._RETIRED_FILES 同源维护）。
+    #   ⚠️ 注意：data/maharo_insights.js（window.MAHORO_INSIGHTS）是活链，勿误伤。
+    "data/maharo_macro.js",
 }
 # 按前缀兜底：raw_data/strong_breakout_YYYYMMDD.json（逐日留档）
 _RETIRED_PREFIXES = (
