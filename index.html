@@ -9048,10 +9048,26 @@ function switchSec(sec,el){
      对 暂未上架/已下架/运维/选股策略/策略回测 一体生效，不搞特例。 */
   var _lkTab=document.querySelector('.tab[data-sec="'+sec+'"][data-lock="1"]');
   if(_lkTab && !isAdmin()){ openLock(); return; }
+  /* 🔴🔴 2026-10-04 主人令：目标板块容器不存在 ⇒ 禁止切换（一劳永逸根治「刷新即白屏」）。
+     事故（已真浏览器复现）：v8_boot_sec 记忆了已迁出的 'lg'（逻辑详解已拆为独立页 logic.html，
+     主站不再有 sec-lg 容器），F5 刷新触发恢复调用 switchSec('lg') ⇒ 下方 forEach 把全部
+     section 的 active 清掉后，sec-lg 不存在 ⇒ 无人被重新激活 ⇒ 内容区整片空白（导航栏仍在，
+     故不像错误页，极易被误判成「主站坏了」）。
+     处理：清掉脏记忆 → 兜底激活静态默认页（最终推荐）→ return 保持现有内容，绝不留下「零 active」。 */
+  var secEl=document.getElementById('sec-'+sec);
+  if(!secEl){
+    try{ sessionStorage.removeItem('v8_boot_sec'); }catch(e){}
+    if(!document.querySelector('section.active')){
+      var _fbSec=document.getElementById('sec-final');
+      if(_fbSec) _fbSec.classList.add('active');
+      var _fbTab=document.querySelector('.tab[data-sec="final"]');
+      if(_fbTab) _fbTab.classList.add('active');
+    }
+    return;
+  }
   if(!el) el=document.querySelector('[data-sec="'+sec+'"]');
   document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
-  var secEl=document.getElementById('sec-'+sec);
-  if(secEl) secEl.classList.add('active');
+  secEl.classList.add('active');
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   if(el) el.classList.add('active');
   // 进入运维板块时默认显示"运维"子页，防止 opTab1 active 被意外移除后空白
@@ -19398,6 +19414,14 @@ window.__renderV8CalToday();
         try{ sessionStorage.removeItem('v8_boot_sec'); }catch(e){}
         _saved = null;
       }
+      /* 🔴 2026-10-04 主人令：恢复目标必须有真实容器（一劳永逸，与上面锁校验同思路）。
+         漏洞：v8_boot_sec 记得 'lg'（「逻辑详解」已拆为独立页，主站无 sec-lg 容器），
+         刷新后 switchSec('lg') 会把全部 section 的 active 清掉却无人补上 ⇒ 内容区整片空白。
+         目标不可达即丢弃记忆，落回静态默认（最终推荐）。 */
+      if(_saved && !document.getElementById('sec-'+_saved)){
+        try{ sessionStorage.removeItem('v8_boot_sec'); }catch(e){}
+        _saved = null;
+      }
       sec = _saved || 'final';                               // 刷新：停在用户正在看的那一页
     }else{
       // ── ② 时段判定（北京时间；UTC 偏移换算，不依赖浏览器本地时区）──
@@ -19418,7 +19442,13 @@ window.__renderV8CalToday();
         var el = ev.target;
         while(el && el !== _navEl && !(el.getAttribute && el.getAttribute('data-sec'))) el = el.parentNode;
         if(el && el.getAttribute){
-          try{ sessionStorage.setItem('v8_boot_sec', el.getAttribute('data-sec')); }catch(e){}
+          /* 🔴 2026-10-04 主人令：只记「有真实容器」的板块（断掉脏值来源）。
+             历史坑：顶部「逻辑详解」tab 带 data-sec="lg" 但点它是 window.open 独立页，
+             记下 'lg' 后一旦刷新就会切进不存在的容器 ⇒ 整页空白（详见 switchSec 内注释）。 */
+          var _ds = el.getAttribute('data-sec');
+          if(_ds && document.getElementById('sec-'+_ds)){
+            try{ sessionStorage.setItem('v8_boot_sec', _ds); }catch(e){}
+          }
         }
       }, true);
     }
