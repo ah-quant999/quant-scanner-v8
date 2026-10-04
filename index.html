@@ -4856,9 +4856,9 @@ function fmtSigned(v){
         var _now = new Date();
         var _curYM = _now.getFullYear()*100 + (_now.getMonth()+1);
         var _firstYM = parseInt(_mKeys[0].replace('-',''),10);
-        var _lastYM = parseInt(_mKeys[_mKeys.length-1].replace('-',''),10);
         if(!window.__rcRecState){
-          window.__rcRecState = { y: parseInt(_mKeys[_mKeys.length-1].slice(0,4),10), m: parseInt(_mKeys[_mKeys.length-1].slice(5,7),10)-1 };
+          /* 默认=当前真实日期所在月（2026-10-04 主人令「跟着日期走，打开就在本月」） */
+          window.__rcRecState = { y: _now.getFullYear(), m: _now.getMonth() };
         }
         var _st = window.__rcRecState;
         var _ym = _st.y*100 + (_st.m+1);
@@ -4990,6 +4990,10 @@ function fmtSigned(v){
           st.m += delta;
           if(st.m < 0){ st.m = 11; st.y--; }
           else if(st.m > 11){ st.m = 0; st.y++; }
+          /* 夹取到 [首数据月, 当前月]（对齐 TAB1，防翻到无意义未来月） */
+          var _ym = st.y*100 + (st.m+1);
+          if(_ym < _firstYM){ st.y = parseInt(_mKeys[0].slice(0,4),10); st.m = parseInt(_mKeys[0].slice(5,7),10)-1; }
+          else if(_ym > _curYM){ st.y = _now.getFullYear(); st.m = _now.getMonth(); }
           var el = document.getElementById('rcRecContainer');
           if(el){ try{ el.innerHTML = _rcRecBuild(); }catch(e){ console.warn('记录翻月渲染失败', e); } }
         };
