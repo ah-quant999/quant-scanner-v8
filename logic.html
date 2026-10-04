@@ -2041,13 +2041,13 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 
       
     <!-- === 观测平台（2026-09-15 主人令：新建一级页 · 原「🌍 宏观观测」一级页升级为父级）
-         其下两个同级子页：①🌍 宏观观测（左，2 卡）②📊 大盘观测（右，5 张内容卡 + 顶部汇总 = 6 卡 · 2026-10-03 补迁入两融余额走势） === -->
+         其下两个同级子页：①🌍 宏观观测（左，2 卡）②📊 大盘观测（右，4 卡） === -->
     <div class="lg-pane" id="lg-obs">
 <h2 class="lg-section-title">🌍 观测平台</h2>
       <div class="card">
         <h3><span class="ic">🌍</span>观测平台 - 说明</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p"><b style="color:var(--gold)">2026-09-15 主人令</b>：由原一级页「🌍 宏观观测」<b>升级为一级页「🌍 观测平台」</b>，仍挂主站最左侧（今日事件之前），<b>不锁</b>（访客可见）。平台下挂<b>两个同级子页</b>，子页顺序按主人令：<b>①🌍 宏观观测</b>——宏观/周期坐标，回答「周期处在哪里」；<b>②📊 大盘观测</b>——由原「暂未上架 → 📊 大盘观察」整页迁入并改名，回答「大盘走到哪一步」，5 张内容卡（含 2026-10-03 迁入的两融余额走势）。</div><div class="logic-h">两个子页总览</div><table class="lg-table"><tr><th>子页</th><th>卡数</th><th>卡片</th></tr><tr><td>🌍 宏观观测</td><td>1</td><td>📚 机构研究 · AI 解析建议（🗑 宏观景气背景 · K 型分层 已于 2026-09-30 按主人令整卡退役）</td></tr><tr><td>📊 大盘观测</td><td>5</td><td>📊 艾略特波浪 · 深度分析<br>🧪 斐波那契F观测窗<br>🌡️ 中信 PE 观测<br>📈 A股指数观测<br>📊 两融余额走势（2026-10-03 迁入）</td></tr></table><div class="logic-h">📊 大盘观测 · 5 张卡</div><div class="logic-p">· <b>📊 艾略特波浪 · 深度分析</b>（<code>elliottWaveBody</code>）：一行 6 列紧凑格 + <b>真实图形</b> = <code>window.WAVE_ELLIOTT</code> 700 个交易日真实收盘序列 + 6 个人工浪型拐点（①起/①顶/②底/③顶/④底/⑤高） + 三条真实关键位（本轮高点 / 最新拐点 / ④浪生命线）。<br>· <b>🧪 斐波那契F观测窗</b>（<code>fibWindowBody</code>）：<b style="color:var(--gold)">2026-09-15 主人令由「🔒 已下架」盘前区迁入</b>，紧贴波浪卡下方。按斐波那契日数（F(3)/F(5)/F(8)/F(13)/F(21)/F(34)/F(55)）定位变盘窗口，回答「<b>何时</b>变盘」；上一张卡回答「<b>跌到哪</b>」，两者维度互补——主人明确令<b>不合卡</b>（理由：两卡都是盘后更新，差别不大）。数据源 <code>data/SH_FIB.js</code>，盘后 18:00 链刷新；不含未来数据，历史窗口触发/失效状态可逐条回查。</div><div class="logic-p"><b style="color:#ef5350">⚠️ 两卡口径必须分清（2026-09-15 阿狸咪的工程师「先修」项，已在前端显式标注）：</b>艾略特波浪卡用<b>最高价</b>口径（③顶 4258.86 @05-14），斐波那契F卡用<b>收盘价</b>口径（06-22 收盘 4163.10）——<b>两卡跌幅读数不同属正常，勿混比</b>。两端现已各自印出口径声明行，杜绝相邻矛盾读感。</div><div class="logic-p"><b style="color:#ef5350">⚠️ 数据层问题（2026-10-03 阿狸咪已一劳永逸修复 fetch_sh_index_fib.py；前端仍保守兜底不采价格）：</b>🔴 修复后：fetch_sh_index_fib.py 改以 history 真实收盘序列末根为基准，仅交易时段带真实涨跌（|change_pct|&gt;0）才采用实时价，SH_FIB.current 的 index/total_points/total_pct 不再差一日，与第三方收盘一致。<code>SH_FIB.current</code> 的 <code>index / total_points / total_pct</code> 三字段写的是<b>前一交易日</b>收盘（2026-09-14 实测 3888.11，而当日真实收盘 = 3885.33；反推 <code>peak_close + total_points = 4163.10 − 274.99 = 3888.11</code>）；而 <code>days_down=60 / peak_date=2026-06-22 / peak_close=4163.10</code> 三项实测<b>正确</b>（06-22 → 09-14 在真实序列中恰好相隔 60 个交易日）。<br><b>前端兜底</b>：F卡一律以 <code>WAVE_ELLIOTT.series</code> 最新真实收盘重算这三项（现得 3885.33 / −277.77 / −6.67%），<code>WAVE_ELLIOTT</code> 缺失时退回 SH_FIB 原值并标注「前一交易日」。<b>未改任何数据源、未补造数值</b>；根因在取数脚本（差一日），须由小九修。</div>
+        <div class="logic-p"><b style="color:var(--gold)">2026-09-15 主人令</b>：由原一级页「🌍 宏观观测」<b>升级为一级页「🌍 观测平台」</b>，仍挂主站最左侧（今日事件之前），<b>不锁</b>（访客可见）。平台下挂<b>两个同级子页</b>，子页顺序按主人令：<b>①🌍 宏观观测</b>——宏观/周期坐标，回答「周期处在哪里」；<b>②📊 大盘观测</b>——由原「暂未上架 → 📊 大盘观察」整页迁入并改名，回答「大盘走到哪一步」，4 张卡。</div><div class="logic-h">两个子页总览</div><table class="lg-table"><tr><th>子页</th><th>卡数</th><th>卡片</th></tr><tr><td>🌍 宏观观测</td><td>1</td><td>📚 机构研究 · AI 解析建议（🗑 宏观景气背景 · K 型分层 已于 2026-09-30 按主人令整卡退役）</td></tr><tr><td>📊 大盘观测</td><td>4</td><td>📊 艾略特波浪 · 深度分析<br>🧪 斐波那契F观测窗<br>🌡️ 中信 PE 观测<br>📈 A股指数观测</td></tr></table><div class="logic-h">📊 大盘观测 · 4 张卡</div><div class="logic-p">· <b>📊 艾略特波浪 · 深度分析</b>（<code>elliottWaveBody</code>）：一行 6 列紧凑格 + <b>真实图形</b> = <code>window.WAVE_ELLIOTT</code> 700 个交易日真实收盘序列 + 6 个人工浪型拐点（①起/①顶/②底/③顶/④底/⑤高） + 三条真实关键位（本轮高点 / 最新拐点 / ④浪生命线）。<br>· <b>🧪 斐波那契F观测窗</b>（<code>fibWindowBody</code>）：<b style="color:var(--gold)">2026-09-15 主人令由「🔒 已下架」盘前区迁入</b>，紧贴波浪卡下方。按斐波那契日数（F(3)/F(5)/F(8)/F(13)/F(21)/F(34)/F(55)）定位变盘窗口，回答「<b>何时</b>变盘」；上一张卡回答「<b>跌到哪</b>」，两者维度互补——主人明确令<b>不合卡</b>（理由：两卡都是盘后更新，差别不大）。数据源 <code>data/SH_FIB.js</code>，盘后 18:00 链刷新；不含未来数据，历史窗口触发/失效状态可逐条回查。</div><div class="logic-p"><b style="color:#ef5350">⚠️ 两卡口径必须分清（2026-09-15 阿狸咪的工程师「先修」项，已在前端显式标注）：</b>艾略特波浪卡用<b>最高价</b>口径（③顶 4258.86 @05-14），斐波那契F卡用<b>收盘价</b>口径（06-22 收盘 4163.10）——<b>两卡跌幅读数不同属正常，勿混比</b>。两端现已各自印出口径声明行，杜绝相邻矛盾读感。</div><div class="logic-p"><b style="color:#ef5350">⚠️ 数据层问题（2026-10-03 阿狸咪已一劳永逸修复 fetch_sh_index_fib.py；前端仍保守兜底不采价格）：</b>🔴 修复后：fetch_sh_index_fib.py 改以 history 真实收盘序列末根为基准，仅交易时段带真实涨跌（|change_pct|&gt;0）才采用实时价，SH_FIB.current 的 index/total_points/total_pct 不再差一日，与第三方收盘一致。<code>SH_FIB.current</code> 的 <code>index / total_points / total_pct</code> 三字段写的是<b>前一交易日</b>收盘（2026-09-14 实测 3888.11，而当日真实收盘 = 3885.33；反推 <code>peak_close + total_points = 4163.10 − 274.99 = 3888.11</code>）；而 <code>days_down=60 / peak_date=2026-06-22 / peak_close=4163.10</code> 三项实测<b>正确</b>（06-22 → 09-14 在真实序列中恰好相隔 60 个交易日）。<br><b>前端兜底</b>：F卡一律以 <code>WAVE_ELLIOTT.series</code> 最新真实收盘重算这三项（现得 3885.33 / −277.77 / −6.67%），<code>WAVE_ELLIOTT</code> 缺失时退回 SH_FIB 原值并标注「前一交易日」。<b>未改任何数据源、未补造数值</b>；根因在取数脚本（差一日），须由小九修。</div>
         <div class="logic-h">现存卡（2026-09-30 起 1 张）</div>
         <table class="lg-table">
           <tr><th>卡片</th><th>内容</th><th>数据 / 刷新</th></tr>
@@ -2059,7 +2059,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">与「今日事件」的区别</div>
         <div class="logic-p">「今日事件」看的是<b>当天有什么</b>（解禁 / 业绩预告 / 宏观数据速览 / 择时裁决）；「宏观观测」看的是<b>周期处在哪里</b>（月 / 季尺度）。前者是日历，后者是坐标，不重复。</div>
         <div class="logic-h">前端位置</div>
-        <div class="logic-p">宿主容器 <code>#obsHost</code>（<code>&lt;section id="sec-obs"&gt;</code>），渲染入口 <code>window.__renderObsPlatform()</code>（旧名 <code>__renderMacroPane</code> <b style="color:#ef5350">已彻底删除，全站 0 处调用点，无兼容别名</b>）；<code>switchSec('obs')</code> 与 <code>_renderPostReady()</code> 双入口触发。<br>子页切换走 <code>window.__obsSwitch(btn, tab)</code>，卡片渲染统一走派发器 <code>window.__obsRenderPane(tab)</code>——<b>派发器是唯一真源</b>：子页切换、骨架就绪、自愈重试三条路径都只调它，杜绝「骨架建好了却没人叫渲染函数」导致的卡面永久「加载中…」（该缺陷 2026-09-12 与 2026-09-14 已各出现一次，见下方防复发检查项）。<br>5 张大盘观测卡的容器 id 与渲染函数<b>全部保留未改</b>，仅换宿主：<code>elliottWaveBody → __renderElliottWave</code> / <code>fibWindowBody → __renderFibWindow</code> / <code>citicPeObserveBody → __renderCiticPeObserve</code> / <code>indexObserveBody → __renderIndexObserve</code>；两融余额走势卡容器 <code>marginBody</code>（图 <code>#v8MarginChart</code>，由 <code>drawV8MarginChart()</code> 直接绘制，2026-10-03 迁入）。</div><div class="logic-h">🗑️ 顺带清除的死代码</div><div class="logic-p">2026-09-15 随卡迁出一并删除 <code>renderFib()</code>（原约 63 行，含内联 weekday 工具）：其入口守卫为 <code>if(!$('phFibDays')) return;</code>，而 <code>phFibDays / phFibPct / phFibPoints / phFibNext / phFibNextLbl / phFibBadge / phFibTime</code> 这 7 个容器 id 在全 HTML 中<b>只有引用、没有任何定义点</b>（实测全文件 16 处 <code>phFib*</code> 引用、0 处 <code>id=</code> 定义）⇒ 函数<b>恒早退</b>，被调 2 次（<code>_renderPostReady</code> 链与 <code>renderDelisted</code>）均为空转。<b>清障不损功能</b>。</div>
+        <div class="logic-p">宿主容器 <code>#obsHost</code>（<code>&lt;section id="sec-obs"&gt;</code>），渲染入口 <code>window.__renderObsPlatform()</code>（旧名 <code>__renderMacroPane</code> <b style="color:#ef5350">已彻底删除，全站 0 处调用点，无兼容别名</b>）；<code>switchSec('obs')</code> 与 <code>_renderPostReady()</code> 双入口触发。<br>子页切换走 <code>window.__obsSwitch(btn, tab)</code>，卡片渲染统一走派发器 <code>window.__obsRenderPane(tab)</code>——<b>派发器是唯一真源</b>：子页切换、骨架就绪、自愈重试三条路径都只调它，杜绝「骨架建好了却没人叫渲染函数」导致的卡面永久「加载中…」（该缺陷 2026-09-12 与 2026-09-14 已各出现一次，见下方防复发检查项）。<br>4 张大盘观测卡的容器 id 与渲染函数<b>全部保留未改</b>，仅换宿主：<code>elliottWaveBody → __renderElliottWave</code> / <code>fibWindowBody → __renderFibWindow</code> / <code>citicPeObserveBody → __renderCiticPeObserve</code> / <code>indexObserveBody → __renderIndexObserve</code>。</div><div class="logic-h">🗑️ 顺带清除的死代码</div><div class="logic-p">2026-09-15 随卡迁出一并删除 <code>renderFib()</code>（原约 63 行，含内联 weekday 工具）：其入口守卫为 <code>if(!$('phFibDays')) return;</code>，而 <code>phFibDays / phFibPct / phFibPoints / phFibNext / phFibNextLbl / phFibBadge / phFibTime</code> 这 7 个容器 id 在全 HTML 中<b>只有引用、没有任何定义点</b>（实测全文件 16 处 <code>phFib*</code> 引用、0 处 <code>id=</code> 定义）⇒ 函数<b>恒早退</b>，被调 2 次（<code>_renderPostReady</code> 链与 <code>renderDelisted</code>）均为空转。<b>清障不损功能</b>。</div>
       </div>
     </div>
 
@@ -7863,8 +7863,17 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     }
     h+='</div></div>';
 
-    /* 2026-10-03 一劳永逸修复：两融余额走势卡已迁往「🌍 观测平台 > 📊 大盘观测」（见 index.html __renderObsPlatform），
-       此处（已下架页）不再重复渲染（避免 #v8MarginChart 重复 id + 已下架页仅管理员可见的死展示）。 */
+    /* 5. 两融余额走势 */
+    var margin=window.MARGIN_DATA||{}, marginT=margin.update_time||'';
+    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #1976d2;">';
+    h+=v8CardHeader('📊','两融余额走势（亿元）','','update_time',{update_time:marginT},!margin||!margin.sh||!margin.sh.length);
+    h+='<div style="padding:12px 14px;">';
+    if(margin&&margin.sh&&margin.sh.length){
+      h+='<div id="v8MarginChart" style="width:100%;height:240px;"></div>';
+    } else {
+      h+='<div class="note" style="text-align:center;">两融数据暂不可用</div>';
+    }
+    h+='</div></div>';
 
     /* 6. 宽基ETF净申赎：2026-09-06 轻量化移除旧口径（宽基+亿份）卡——东财口径展示见主站「已下架」区 window.ETF_SUBSCRIPTION_EM */
 
@@ -7872,8 +7881,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     /* 2026-08-30 主人令：斐波那契双卡 + 商品涨价弹性榜三卡已上移至「已下架」顶部盘前条幅下方 */
 
     el.innerHTML=h;
-    /* 2026-10-03 一劳永逸修复：两融余额走势卡已从本页（已下架页）移除，迁往「🌍 观测平台 > 📊 大盘观测」，
-       此处不再调用 drawV8MarginChart()（#v8MarginChart 已不存在，虽函数有早退守卫仍属死调用，与 index.html 对齐）。 */
+    drawV8MarginChart();
     // 2026-08-29 一劳永逸：删 renderMacro 调用——opTab4 无 phMacroBody 抛 null 已被主人之前在 initPostMarket 9680 注释；
     // 🗑 2026-09-16 主人令：原温度计 / 六维 / 危机雷达三卡渲染调用已随卡处置移除（index.html 同步）。
     try{ if(window.renderMarketFundFlow) window.renderMarketFundFlow(window.MARKET_FUND_FLOW_DATA||{}); }catch(e){console.warn("已下架·资金流时间轴渲染失败",e);}

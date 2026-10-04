@@ -13305,12 +13305,12 @@ function drawUpDownChart(){
     '实时数据': ['AI_MARKET_BRIEF','INDEX_QUOTES','OVERSEAS_MARKETS','CFFEX_HOLDINGS','LIMIT_UP_HEATMAP','ETF_PULSE','MARKET_FUND_FLOW_DATA','COMMODITY_ELASTICITY','CONCEPT_RANKING','SECTOR_FUND_FLOW','ETF_INTRADAY_HEAT','AVG_PRICE_DATA'],
     // 🛡 2026-09-30 主人令（映射对齐·与后端 v8_health_check.py page 字段同步）：
     //   盘后组缩到真实 7 卡（与 V8_PAGE_SCHEDULE 12716 逐项一致）；迁走的 10 项归到真实页组
-    //   （候选/金池/三重共识/四量回测→选股策略，龙虎榜/危机雷达→共振日历，两融→观测平台，
+    //   （候选/金池/三重共识/四量回测→选股策略，龙虎榜/危机雷达→共振日历，两融→盘后数据，
     //    利率环境→暂未上架，因子实验室→最终推荐，机构买卖→运维）。
-    '盘后数据': ['SECTOR_RECOMMENDATION','ETF_DAILY_MONITOR','ETF_NET_SUBSCRIPTION','W52_HIGH','MACRO_DATA','RESTRICTED_RELEASE','PERFORMANCE_FORECAST'],
+    '盘后数据': ['SECTOR_RECOMMENDATION','ETF_DAILY_MONITOR','ETF_NET_SUBSCRIPTION','W52_HIGH','MACRO_DATA','RESTRICTED_RELEASE','PERFORMANCE_FORECAST','MARGIN_DATA'],
     '选股策略': ['GOLD_POOL','CANDIDATE','TRIPLE_CONSENSUS','FOUR_VOLUME','CRDS_CARD_DATA','FOUR_VOLUME_60M','FOUR_VOLUME_BACKTEST','ALGO_TRACK','TRIPLE_HISTORY','FOUR_VOLUME_HISTORY','FOUR_VOLUME_TRACK','VOLATILITY','STOCK_STOP_DATA','H_AUTO_BUY','H_AUTO_BUY_TRACK','IMA_STRONG_BACKTEST','IMA_STRONG_STOCK'],
     '今日事件': ['JUDGMENT_DATA','RESTRICTED_RELEASE','PERFORMANCE_FORECAST','IPO_DATA','V8_CAL'],
-    '观测平台': ['maharo_insights','INDEX_VALUE_FRAMEWORK','WAVE_ELLIOTT','CITIC_PE_THERMO','SH_FIB','MARGIN_DATA'],
+    '观测平台': ['maharo_insights','INDEX_VALUE_FRAMEWORK','WAVE_ELLIOTT','CITIC_PE_THERMO','SH_FIB'],
     '共振日历': ['LHB_DATA','CRISIS_DATA'],
     '最终推荐': ['TOP10_DAILY','FACTOR_LAB'],
     '暂未上架': ['UNLISTED_PANEL','SECTOR_LEADERS','FIRST_BOARD_ALERT','DAJIJIN_REDUCTION','MARKET_REGIME'],
@@ -16702,8 +16702,17 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       +'<div style="margin-top:6px;font-size:11px;color:var(--dim);line-height:1.5;">📌 口径说明：累计净流入 = 上证指数（000001）单日主力资金净流入的滚动累加；数据覆盖沪市全市场成分股，非仅宽基ETF。</div>'
       +'</div></div>';
 
-    /* 2026-10-03 一劳永逸修复：两融余额走势卡已迁往「🌍 观测平台 > 📊 大盘观测」（见 __renderObsPlatform），
-       此处不再重复渲染（避免 #v8MarginChart 重复 id + 已下架页仅管理员可见的死展示）。 */
+    /* 5. 两融余额走势（2026-10-04 主人令：由「🌍 观测平台 > 📊 大盘观测」迁回「🔒 已下架」——两融归属已下架，大盘观测不再渲染，避免 #v8MarginChart 重复 id） */
+    var margin=window.MARGIN_DATA||{}, marginT=margin.update_time||'';
+    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #1976d2;">';
+    h+=v8CardHeader('📊','两融余额走势（亿元）','','update_time',{update_time:marginT,slot:'盘后',horizon:'中长线'},!margin||!margin.sh||!margin.sh.length);
+    h+='<div style="padding:12px 14px;">';
+    if(margin&&margin.sh&&margin.sh.length){
+      h+='<div id="v8MarginChart" style="width:100%;height:240px;"></div>';
+    } else {
+      h+='<div class="note" style="text-align:center;">两融数据暂不可用</div>';
+    }
+    h+='</div></div>';
 
     /* 2026-09-02 主人令：已下架选股模块整体删除（大牛股猎手/全站精选与选股策略高度重复；
        四量终极迁回「选股策略」子页面）。星级表 __MODULE_STARS 已提前到全局作用域。 */
@@ -16711,7 +16720,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     /* 2026-08-30 主人令：斐波那契双卡 + 商品涨价弹性榜三卡已上移至「已下架」顶部盘前条幅下方 */
 
     el.innerHTML=h;
-    // 2026-10-03：drawV8MarginChart() 已迁往观测平台大盘观测卡（__renderObsPlatform 调度），本页无 #v8MarginChart 容器 ⇒ 不再调用
+    drawV8MarginChart();
     // 2026-09-07 主人令：宽基ETF卡恢复柱状图形态（数据仍东财五分类，不回退旧口径图表函数——旧口径 fetch 链保持下线）。
     // 2026-08-29 一劳永逸：删 renderMacro 调用——opTab4 无 phMacroBody 抛 null 已被主人之前在 initPostMarket 9680 注释；
     //   下面 3 个 safe 调用使用与 initPostMarket 同样的窗口数据来源（line 9658-9660 已对齐）：
@@ -17977,7 +17986,7 @@ h+=`</div>`;
     //   派发入口见 window.__obsRenderPane 的 macro 分支（唯一真源，与 _fillMahoroCard 同处）。
     hm += '<div class="card" id="aiInsightsCompareBody" style="margin-bottom:16px;border-left:4px solid #8b5cf6;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52E; AI 洞察·多源观点对比 加载中&#x2026;</div></div>';
     hm += '</div>'; // /obsPaneMacro
-    // ══ 子页②：📊 大盘观测（5 张内容卡 + 顶部汇总 = 6 卡 · 2026-10-03 补迁入两融余额走势，与数据矩阵/健康巡检归属一致）══
+    // ══ 子页②：📊 大盘观测（4 张内容卡 · 两融余额走势 2026-10-04 主人令迁回「🔒 已下架」）══
     hm += '<div id="obsPaneMarket" style="display:' + (_act==='market' ? 'block' : 'none') + ';">';
     // ── 卡０：大盘 4 卡汇总解析（2026-09-17 主人令：放在大盘观测最顶部）──
     //   读数口径：WAVE_ELLIOTT / CITIC_PE_THERMO / CITIC_PE_BACKTEST / VALUATION_PERCENTILE / SH_FIB；缺则如实空态
@@ -17998,12 +18007,6 @@ h+=`</div>`;
     hm += '<div class="card" id="citicPeObserveBody" style="margin-bottom:16px;border-left:4px solid #fbbf24;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F321; 中信 PE 观测 加载中&#x2026;</div></div>';
     // ── 卡4：A股指数观测（从「暂未上架 · 观测类」迁入，容器 id 未变）──
     hm += '<div class="card" id="indexObserveBody" style="margin-bottom:16px;border-left:4px solid #60a5fa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F4C8; A股指数观测 加载中&#x2026;</div></div>';
-    // ── 卡5：两融余额走势（2026-10-03 一劳永逸修复：由「🔒 已下架」迁往大盘观测，与数据矩阵/健康巡检归属一致）──
-    hm += '<div class="card" id="marginBody" style="margin-bottom:16px;border-left:4px solid #1976d2;">'
-       + v8CardHeader('📊','两融余额走势（亿元）','','update_time',{update_time:(window.MARGIN_DATA||{}).update_time||'',slot:'盘后',horizon:'中长线'},!window.MARGIN_DATA||!window.MARGIN_DATA.sh||!window.MARGIN_DATA.sh.length)
-       + '<div style="padding:12px 14px;">'
-       + (window.MARGIN_DATA&&window.MARGIN_DATA.sh&&window.MARGIN_DATA.sh.length ? '<div id="v8MarginChart" style="width:100%;height:240px;"></div>' : '<div class="note" style="text-align:center;">两融数据暂不可用</div>')
-       + '</div></div>';
     hm += '</div>'; // /obsPaneMarket
     var _host = document.getElementById('obsHost');
 
@@ -18032,9 +18035,6 @@ h+=`</div>`;
       setTimeout(_aic, 600);
       setTimeout(_mh, 1800);
       setTimeout(_aic, 1800);
-      // 2026-10-03：两融余额走势图（大盘观测卡5）由 defer 数据晚到，退避重试渲染到 #v8MarginChart
-      var _mg = function(){ try{ if(typeof drawV8MarginChart === 'function') drawV8MarginChart(); }catch(e){ console.warn('两融图渲染失败',e); } };
-      _mg(); setTimeout(_mg, 600); setTimeout(_mg, 1800);
     }catch(e){ console.warn('maharo 卡调度失败', e); }
     // 🛡 骨架就绪后派发「当前子页」渲染（defer 数据可能晚于首渲到达）
     setTimeout(function(){ try{ window.__obsRenderPane(window.__obsActivePane || 'macro'); }catch(e){} }, 0);
