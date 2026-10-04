@@ -8964,7 +8964,7 @@ window.__renderIndexObserve = function(){
    - 纯前端哈希只能挡普通访客；真正防护 = 运维/逻辑详解的敏感数据(数据源/算法)不进公开仓库，
      部署时改由私有后端或 GitHub Secrets 提供，前端只渲染结果。
 */
-const ADMIN_HASH = "c6d4fb79e8b66e7bcb829cdafed22a81042558b7e2dcb1090be5d9a14a52ecd4";
+const ADMIN_HASH = "a3e5b452437afea1da548831c60cede51f4ef8747e41378c01d952ff336fa521";
 function isAdmin(){ try{ if(location.protocol==='file:') return true; if(sessionStorage.getItem('v8_admin')==='1') return true; return false; }catch(e){ return false; } }
 function openLock(){ if(isAdmin())return; document.getElementById('lockMask').classList.add('show'); document.getElementById('adminPwd').focus(); }
 async function sha256(s){
