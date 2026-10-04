@@ -151,6 +151,21 @@ def load_doc():
 
 
 def main():
+    # 2026-10-04 主人令：三件套对齐优先用本地完整版逻辑详解（参数层），公开 logic.html 已下架。
+    # 本地完整版路径多候选探测（坚果云同步盘双机共享 / 环境变量 / 兼容旧路径）；
+    # 不存在（云端 CI 无此文件）则跳过，退化为对齐 index.html 源。
+    _lf = os.environ.get("V8_LOGIC_FULL")
+    if not _lf:
+        for _c in (os.path.join(ROOT, "..", "v8_logic_private", "logic.full.html"),
+                   "E:/v8_logic_private/logic.full.html",
+                   "E:/Nutstore/v8_logic_private/logic.full.html",
+                   "C:/Users/HH20210606/Nutstore/v8_logic_private/logic.full.html",
+                   "D:/Nutstore/v8_logic_private/logic.full.html"):
+            if os.path.isfile(_c):
+                _lf = _c
+                break
+    if _lf and os.path.isfile(_lf):
+        DOC_SOURCES.insert(0, (_lf, "lg", "logic.full.html#sec-lg"))
     if not os.path.exists(INDEX):
         print("❌ index.html 不存在，无法校验")
         sys.exit(1)

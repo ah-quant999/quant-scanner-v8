@@ -74,3 +74,7 @@ data/FOUR_VOLUME_BACKTEST.json
 node_modules/
 package-lock.json
 package.json
+
+# 🛡 2026-10-04 主人令：逻辑详解完整版（参数层）永不在公开仓出现，仅存本机私有副本 E:\v8_logic_private\
+#   防任何人误将完整版放进公开仓根导致泄露；公开 logic.html 仅是「已下架」说明页。
+logic.full.html

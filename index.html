@@ -1883,7 +1883,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <!-- 2026-08-29 主人令：已下架 从运维子 Tab 提升为一级 nav -->
   <div class="tab locked admin-only" data-sec="dl" data-lock="1" onclick="guardLock('dl',this)">🔒 已下架 <span class="lk">[锁]</span></div>
   <div class="tab locked admin-only" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
-  <div class="tab locked admin-only" data-lock="1" onclick="window.open('./logic.html','_blank')" title="2026-08-31 轻量化：逻辑详解已拆为独立页 logic.html（本体 153.6 KB 不再进首屏）">🔒 逻辑详解 <span class="lk">[锁]</span></div>
 </nav>
 
 <main>
@@ -8590,8 +8589,8 @@ window.__renderIndexObserve = function(){
 
     <div id="opTab1" class="op-tab-pane active">
 
-    <!-- 2026-08-31 轻量化：逻辑详解已拆为独立页 logic.html，主站运维页同步说明 -->
-    <div style="font-size:12px;color:var(--dim);margin:0 0 14px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">ℹ️ <b style="color:var(--gold)">逻辑详解（指标/策略/安全口径）</b> 已于 2026-08-31 轻量化拆为独立页 <code>logic.html</code>。点顶部 🔒 <b>逻辑详解</b> Tab 可打开（本体 153.6 KB 不再进首屏，首屏省 166 KB）。</div>
+    <!-- 2026-10-04 主人令：逻辑详解已下架，运维页说明同步收敛 -->
+    <div style="font-size:12px;color:var(--dim);margin:0 0 14px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">ℹ️ <b style="color:var(--gold)">逻辑详解（指标/策略/安全口径）</b> 已于 2026-10-04 下架，公开站点不再承载其全部交易参数内容；管理员本地查看见本机同步盘私有副本 <code>v8_logic_private/logic.full.html</code>。</div>
 
     
 
@@ -8961,11 +8960,11 @@ window.__renderIndexObserve = function(){
 <script>
 /* ===== 管理员锁 =====
    安全约束（部署铁律）：免费公开仓库绝不存明文密码/数据源 token/核心算法。
-   - 此处仅用 SHA-256 哈希校验（明文 cat999 不入库，仓库里只有哈希）。
+   - 此处仅用 SHA-256 哈希校验（明文口令不入库，仓库里只有哈希；2026-10-04 主人令：旧 cat999 已作废，注释不再写明文）。
    - 纯前端哈希只能挡普通访客；真正防护 = 运维/逻辑详解的敏感数据(数据源/算法)不进公开仓库，
      部署时改由私有后端或 GitHub Secrets 提供，前端只渲染结果。
 */
-const ADMIN_HASH = "24f6683a479d5b95461b4549b26d2f685b109a3e8c960219c075c9da3825f529"; // sha256("cat999")
+const ADMIN_HASH = "c6d4fb79e8b66e7bcb829cdafed22a81042558b7e2dcb1090be5d9a14a52ecd4";
 function isAdmin(){ try{ if(location.protocol==='file:') return true; if(sessionStorage.getItem('v8_admin')==='1') return true; return false; }catch(e){ return false; } }
 function openLock(){ if(isAdmin())return; document.getElementById('lockMask').classList.add('show'); document.getElementById('adminPwd').focus(); }
 async function sha256(s){
