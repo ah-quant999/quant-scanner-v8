@@ -15,8 +15,9 @@ gen_do_not_delete_js.py — 把仓库根的 DO_NOT_DELETE.md（禁止删除清�
   - 轻量 Markdown → HTML 转换器，仅覆盖本清单实际用到的语法
     （#/##/### 标题、> 引用块、| 表格、无序/有序列表、**加粗**、`代码`、--- 分隔线）。
   - 全部 HTML 经 json 转义后写入 JS 字符串，杜绝引号/换行破坏脚本。
-  - 计算内容 sha256 前 10 位作为 ?v 缓存戳，并回写 index.html 中
-    data/DO_NOT_DELETE.js?v= 的戳值（与 update_v8.py 对其它 data/*.js 的口径一致）。
+  - 计算数据文件「中性化内容 sha1 前 10 位」作为 ?v 缓存戳（2026-09-24 起全站权威口径，
+    与 update_v8._neutral_content_sha1 / pre_deploy_audit [15/15] 同源），并回写
+    index.html 与 logic.html 两页中 data/DO_NOT_DELETE.js?v= 的戳值。
 
 铁律：数据必须走 window.X 注入，禁止 fetch('../data/...')。本脚本产物即 window.X。
 """
@@ -31,6 +32,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "DO_NOT_DELETE.md")
 OUT = os.path.join(ROOT, "data", "DO_NOT_DELETE.js")
 INDEX = os.path.join(ROOT, "index.html")
+LOGIC = os.path.join(ROOT, "logic.html")
 
 
 def esc_html(s: str) -> str:
@@ -169,11 +171,27 @@ def md_to_html(md: str) -> str:
     return "\n".join(out)
 
 
-def patch_index_v(hash10: str) -> bool:
-    """回写 index.html 中 data/DO_NOT_DELETE.js?v= 的缓存戳；若无此标签则插入。"""
-    if not os.path.exists(INDEX):
+def _neutral_sha10(path: str) -> str:
+    """🔴 2026-10-04 口径根治：?v 权威口径 = 数据文件「中性化内容 sha1 前 10 位」。
+    与 update_v8._neutral_content_sha1 / pre_deploy_audit._guard_neutral_sha1 逐字节同源：
+    读字节 → utf-8 解码 → 剔除 republish_time 字段值 → sha1 前 10 位。
+    （旧 sha256(裸字节) 口径已废除——它与 [15/15] 守卫的期望值永不相等，必阻断部署。）
+    """
+    raw = open(path, "rb").read()
+    try:
+        text = raw.decode("utf-8")
+    except Exception:
+        text = raw.decode("utf-8", "replace")
+    neutral = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', text)
+    return hashlib.sha1(neutral.encode("utf-8")).hexdigest()[:10]
+
+
+def patch_page_v(page_path: str, hash10: str) -> bool:
+    """回写指定页面（index.html / logic.html）中 data/DO_NOT_DELETE.js?v= 的缓存戳；
+    若无此标签则在最后一个 data/*.js defer 脚本后插入。"""
+    if not os.path.exists(page_path):
         return False
-    with open(INDEX, "r", encoding="utf-8") as f:
+    with open(page_path, "r", encoding="utf-8") as f:
         html = f.read()
     tag_re = re.compile(r'<script src="data/DO_NOT_DELETE\.js\?v=[0-9a-f]+" defer></script>')
     if tag_re.search(html):
@@ -190,7 +208,7 @@ def patch_index_v(hash10: str) -> bool:
             html2 = html[:last.end()] + "\n    " + ins + html[last.end():]
         else:
             html2 = html
-    with open(INDEX, "w", encoding="utf-8") as f:
+    with open(page_path, "w", encoding="utf-8") as f:
         f.write(html2)
     return True
 
@@ -213,18 +231,21 @@ def main():
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(payload)
-    # 🔧 一致性：写完后再算磁盘文件 sha10（含 timestamp + window.X 包装），
-    #    用最终 disk_sha 作为 ?v 缓存戳回写 index.html，杜绝 CDN 缓存失配
-    hash10 = hashlib.sha256(open(OUT, "rb").read()).hexdigest()[:10]
-    # 把 payload 头部注释里的 hash10 修正成 disk_sha（让注释和 ?v 一致）
+    # 🔧 一致性：写完后再按权威口径（中性化内容 sha1 前 10 位）算 ?v 缓存戳，
+    #    回写 index.html 与 logic.html 两页，杜绝 CDN 缓存失配与 [15/15] 戳漂移阻断
+    #    （2026-10-04 根治：旧实现用 sha256(裸字节) 且只回写 index.html）。
+    hash10 = _neutral_sha10(OUT)
+    # 把 payload 头部注释里的 hash10 修正成 ?v 同源戳（让注释和 ?v 一致）
     payload2 = re.sub(r"内容sha10：[a-f0-9]{10}", f"内容sha10：{hash10}", payload, count=1)
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(payload2)
     # 二次确认稳定（不会有 modify 链）
-    hash10 = hashlib.sha256(open(OUT, "rb").read()).hexdigest()[:10]
-    patched = patch_index_v(hash10)
+    hash10 = _neutral_sha10(OUT)
+    patched_i = patch_page_v(INDEX, hash10)
+    patched_l = patch_page_v(LOGIC, hash10)
     print(f"✅ 生成 {os.path.relpath(OUT, ROOT)}  (HTML {len(html)} 字节, ?v={hash10})")
-    print(f"✅ index.html ?v 回写: {'已更新' if patched else '未改动（标签缺失）'}")
+    print(f"✅ index.html ?v 回写: {'已更新' if patched_i else '未改动（标签缺失）'}")
+    print(f"✅ logic.html ?v 回写: {'已更新' if patched_l else '未改动（标签缺失）'}")
 
 
 if __name__ == "__main__":
