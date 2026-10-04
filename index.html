@@ -3159,15 +3159,17 @@ function fmtSigned(v){
            「四量是现查收益率最好的选股方式，必须有自己的一整套系统，特别是历史追踪。」
            以下 6 张子卡与「严格三重共识」页同版式、同数据口径族：
              持仓盈亏跟踪 / 状态迁移告警 / 回测 N 日胜率（信号层）
-             / 前向累积跟踪 / 板块聚类 / 每日入选历史
-           （原第 7 张「选股池重叠度」已于 2026-09-16 主人令整卡删除 —— 数据源从未产出）
+             / 板块聚类 / 每日入选历史
+           （原第 7 张「选股池重叠度」已于 2026-09-16 主人令整卡删除 —— 数据源从未产出；
+             原「前向累积跟踪」已于 2026-10-04 主人令整卡删除 —— 与回测N日胜率重复）
            数据源：data/FOUR_VOLUME_TRACK.js + data/FOUR_VOLUME_HISTORY.js
                   （update_v8 由 raw_data/four_volume_track.json /
                     four_volume_history.json 生成） -->
       <div class="card">
         <h3><span class="ic">📈</span>持仓盈亏跟踪 <span style="font-size:11px;color:var(--sub);font-weight:400">- 盘后 ·</span> <span class="fresh" id="fvTrackTime">—</span></h3>
         <div class="note">入选以来涨跌 = 入选信号日收盘价 → 最新收盘价（真实收盘价逐日累积）；持有/连续按「信号日批次」计。价格源标注 quote=全市场行情快照 / ledger=账本自记 / none=取不到（留空不用 0 冒充）。</div>
-        <table id="fvTrack"><thead><tr><th style="width:18%">名称</th><th>状态</th><th>入选日</th><th>持有</th><th>连续</th><th>入选以来</th><th>四灯</th><th>价格源</th></tr></thead><tbody id="fvTrackBody"></tbody></table>
+        <!-- 2026-10-04 主人令：改由 JS 按入选月分组渲染（本月展开、历史月折叠），表头随月内表格生成 -->
+        <div id="fvTrackBody"><div style="color:var(--sub);text-align:center;padding:14px">加载中…</div></div>
       </div>
       <div class="card">
         <h3><span class="ic">🔔</span>状态迁移 &amp; 告警 · <span class="fresh" id="fvAlertCount">0</span></h3>
@@ -3178,11 +3180,9 @@ function fmtSigned(v){
         <div class="note" id="fvBackNote">加载中…</div>
         <table id="fvBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>最好</th><th>最差</th><th>最大回撤</th><th>夏普</th></tr></thead><tbody id="fvBackBody"></tbody></table>
       </div>
-      <div class="card">
-        <h3><span class="ic">🔁</span>前向累积跟踪（上线以来 · 真实收盘价） - 历史<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:6px;">✅ 真实数据（前向累积）</span></h3>
-        <div class="note" id="fvSelfNote">加载中…</div>
-        <table id="fvSelf"><thead><tr><th>持有期</th><th>成熟样本</th><th>胜率</th><th>平均收益</th></tr></thead><tbody id="fvSelfBody"></tbody></table>
-      </div>
+      <!-- 🔴 2026-10-04 主人令：前向累积跟踪整卡删除（与回测N日胜率高度重复：
+           回测卡=近5年1518信号大样本回溯全期限谱；本卡=上线以来仅12信号日小样本，
+           为回测卡实时子集，统计意义弱 ⇒ 删重留回测卡。fvRenderSelf 同步删除。 -->
       <div class="card">
         <h3><span class="ic">🏭</span>板块聚类（相关性风险） - 盘后</h3>
         <div class="note">当前在池（active）票的行业分布；单一行业占比过高提示同涨同跌相关性风险。</div>
@@ -12919,8 +12919,6 @@ function drawUpDownChart(){
 
           {name:'回测N日胜率(近5年)', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'近5年回测'},
 
-          {name:'前向累积跟踪', source:'FOUR_VOLUME_TRACK', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'前向累积'},
-
           {name:'四量入选历史', source:'FOUR_VOLUME_HISTORY', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'四量历史'},
 
           {name:'逆势龙头', source:'CRDS_CARD_DATA', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'CRDS 精英池'},
@@ -14462,28 +14460,51 @@ window.showRestrictedItems = showRestrictedItems;
     var tb=$('fvTrackBody');
     if(!tb) return;
     var arr = track.tracked || [];
-    if(arr.length){
-      tb.innerHTML = arr.map(function(t){
-        var st = t.status==='active'
-          ? '<span class="tp-badge cons">在池</span>'
-          : '<span class="tp-badge near" style="background:rgba(244,73,93,.16);color:var(--up)">已掉出</span>';
-        var hold = (t.hold_days==null?'—':t.hold_days+'日');
-        var cons = (t.consecutive_days==null?'—':t.consecutive_days+'日');
-        return '<tr>'
-          + '<td style="text-align:left"><b>'+(t.name||'')+'</b> <span class="tp-code">'+(t.code||'')+'</span>'
-          +   (t.is_new?' <span style="font-size:10px;color:#fbbf24">新</span>':'')+'</td>'
-          + '<td>'+st+'</td>'
-          + '<td>'+(t.enter_date||'—')+'</td>'
-          + '<td>'+hold+'</td>'
-          + '<td>'+cons+'</td>'
-          + '<td '+pnlClass(t.pnl_pct)+'>'+fvPct(t.pnl_pct)+'</td>'
-          + '<td style="text-align:left">'+fvLamps(t)+'</td>'
-          + '<td>'+fvSrcLabel(t.price_source)+'</td>'
-          + '</tr>';
-      }).join('');
-    } else {
-      tb.innerHTML='<tr><td colspan="8" style="color:var(--sub);text-align:center">暂无跟踪样本（首次运行后逐日累积）</td></tr>';
+    if(!arr.length){
+      tb.innerHTML='<div style="color:var(--sub);text-align:center;padding:14px">暂无跟踪样本（首次运行后逐日累积）</div>';
+      return;
     }
+    /* 2026-10-04 主人令：样本太多不必全铺 —— 按入选自然月分组，本月展开、历史月 <details> 折叠（与入选历史卡同口径） */
+    var _thead='<table style="width:100%"><thead><tr><th style="width:18%">名称</th><th>状态</th><th>入选日</th><th>持有</th><th>连续</th><th>入选以来</th><th>四灯</th><th>价格源</th></tr></thead><tbody>';
+    var rowHtml=function(t){
+      var st = t.status==='active'
+        ? '<span class="tp-badge cons">在池</span>'
+        : '<span class="tp-badge near" style="background:rgba(244,73,93,.16);color:var(--up)">已掉出</span>';
+      var hold = (t.hold_days==null?'—':t.hold_days+'日');
+      var cons = (t.consecutive_days==null?'—':t.consecutive_days+'日');
+      return '<tr>'
+        + '<td style="text-align:left"><b>'+(t.name||'')+'</b> <span class="tp-code">'+(t.code||'')+'</span>'
+        +   (t.is_new?' <span style="font-size:10px;color:#fbbf24">新</span>':'')+'</td>'
+        + '<td>'+st+'</td>'
+        + '<td>'+(t.enter_date||'—')+'</td>'
+        + '<td>'+hold+'</td>'
+        + '<td>'+cons+'</td>'
+        + '<td '+pnlClass(t.pnl_pct)+'>'+fvPct(t.pnl_pct)+'</td>'
+        + '<td style="text-align:left">'+fvLamps(t)+'</td>'
+        + '<td>'+fvSrcLabel(t.price_source)+'</td>'
+        + '</tr>';
+    };
+    var _nowM=(function(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');})();
+    var groups={}; var order=[];
+    arr.forEach(function(t){
+      var m=(t.enter_date&&/^\d{4}-\d{2}/.test(t.enter_date)) ? t.enter_date.slice(0,7) : '未知';
+      if(!groups[m]){ groups[m]=[]; order.push(m); }
+      groups[m].push(t);
+    });
+    order.sort(function(a,b){ if(a==='未知')return 1; if(b==='未知')return -1; return a<b?1:-1; });
+    var h='';
+    order.forEach(function(m){
+      var rows=groups[m];
+      var tableHtml=_thead+rows.map(rowHtml).join('')+'</tbody></table>';
+      if(m===_nowM){
+        h+='<div class="tp-hist-date" style="color:var(--up);font-weight:700;">📅 本月 '+m+' · '+rows.length+' 只</div>'+tableHtml;
+      }else{
+        h+='<details style="margin:8px 0;border:1px solid var(--border);border-radius:8px;overflow:hidden;">'
+          +'<summary style="cursor:pointer;padding:8px 12px;background:rgba(148,163,184,.07);font-size:12px;font-weight:600;color:var(--sub);list-style:none;user-select:none;">📅 '+(m==='未知'?'未标注入选日':m)+' · '+rows.length+' 只 <span style="color:var(--dim);font-weight:400;font-size:11px;">（点击展开查阅）</span></summary>'
+          +'<div style="padding:4px 12px 10px;">'+tableHtml+'</div></details>';
+      }
+    });
+    tb.innerHTML=h;
 
     // ---- 告警 ----
     var alerts = track.alerts || [];
@@ -14613,33 +14634,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     }catch(e){ console.warn('IMA 回测渲染失败',e); }
   };
 
-                    function fvRenderSelf(track){
-    var note=$('fvSelfNote'), body=$('fvSelfBody');
-    if(!body) return;
-    var sb = (track && track.self_backtest) || null;
-    if(!sb){
-      if(note) note.textContent='前向累积数据未加载';
-      body.innerHTML='<tr><td colspan="4" style="color:var(--sub);text-align:center">前向样本积累中</td></tr>';
-      return;
-    }
-    if(note){
-      note.textContent = (sb.note||'')
-        + ' 跟踪起始 '+(sb.track_start||'—')
-        + ' · 信号日 '+(sb.history_days||0)+' 个 · 交易日轴 '+(sb.price_days||0)+' 天。';
-    }
-    var hs = sb.horizons || [], sum = sb.summary || {};
-    if(!hs.length){ body.innerHTML='<tr><td colspan="4" style="color:var(--sub);text-align:center">前向样本积累中</td></tr>'; return; }
-    body.innerHTML = hs.map(function(k){
-      var v = sum[k] || {};
-      var mature = (v.count||0) > 0;
-      return '<tr>'
-        + '<td>T+'+String(k).replace('d','')+'</td>'
-        + '<td>'+(mature ? v.count : '<span style="color:var(--dim)">0（未成熟）</span>')+'</td>'
-        + '<td '+(mature ? pnlClass(v.win_rate!=null?v.win_rate-50:null) : 'style="color:var(--dim)"')+'>'+(mature?fvNum(v.win_rate,1)+'%':'—')+'</td>'
-        + '<td '+(mature ? pnlClass(v.avg_return) : 'style="color:var(--dim)"')+'>'+(mature?fvPct(v.avg_return):'—')+'</td>'
-        + '</tr>';
-    }).join('');
-  }
+  /* 🔴 2026-10-04 主人令：fvRenderSelf（前向累积跟踪渲染）整函数删除——卡已删重 */
 
   function fvRenderHistory(hist, track){
     var box=$('fvHistory');
@@ -14707,7 +14702,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     var safe = function(fn, a1, a2){ try{ fn(a1, a2); }catch(e){ console.warn('四量跟踪渲染失败', e); } };
     safe(fvRenderTrack, TRACK);
     safe(fvRenderBacktest, BT);
-    safe(fvRenderSelf, TRACK);
     safe(fvRenderHistory, HIST, TRACK);
     return {track:!!TRACK, hist:!!HIST, bt:!!BT};
   };
