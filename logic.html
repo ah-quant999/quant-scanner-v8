@@ -775,12 +775,12 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/RESTRICTED_RELEASE.js?v=081db59e70" defer></script>
   <script src="data/PERFORMANCE_FORECAST.js?v=19c3b514b0" defer></script>
   <script src="data/RUNNER_STATUS.js?v=f35ad7ee7f" defer></script>
-  <script src="data/HEALTH_CHECK.js?v=f504e543ab" defer></script>
-  <script src="data/COMMODITY_ELASTICITY.js?v=95af078fbd" defer></script>
-  <script src="data/SENTIMENT_CYCLE.js?v=8626d8a176" defer></script>
-  <script src="data/STOCK_MOMENTUM_STATE.js?v=c5d0d2d004" defer></script>
-  <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=4c87308b80" defer></script>
-  <script src="data/MOMENTUM_FILTER.js?v=1deb33949b" defer></script>
+  <script src="data/HEALTH_CHECK.js?v=ceddeb2d10" defer></script>
+  <script src="data/COMMODITY_ELASTICITY.js?v=02dd5f96fe" defer></script>
+  <script src="data/SENTIMENT_CYCLE.js?v=2462541857" defer></script>
+  <script src="data/STOCK_MOMENTUM_STATE.js?v=2218519dd4" defer></script>
+  <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=27b5cfb607" defer></script>
+  <script src="data/MOMENTUM_FILTER.js?v=b007229328" defer></script>
   <!-- 🗑 2026-09-19 主人令：「强势突破」全站删除 ⇒ 本引用移除。
        🔵 2026-09-20 补正（阿狸咪的工程师）：上方原注记「已于 2026-09-19 移除（Pages 实测 404）」
           **当时正确、现已过时** —— 该轮实为短暂移除，随后恢复；真正的终局是 2026-09-20
@@ -6844,7 +6844,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=c5d0d2d004';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=2218519dd4';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -6853,7 +6853,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=4c87308b80';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=27b5cfb607';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
