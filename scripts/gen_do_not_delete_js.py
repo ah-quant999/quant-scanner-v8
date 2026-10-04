@@ -31,6 +31,7 @@ import datetime
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "DO_NOT_DELETE.md")
 OUT = os.path.join(ROOT, "data", "DO_NOT_DELETE.js")
+LF = chr(10)  # 强制 LF 写出，与仓库存储口径一致（防 CRLF 幻影戳漂移）
 INDEX = os.path.join(ROOT, "index.html")
 LOGIC = os.path.join(ROOT, "logic.html")
 
@@ -229,7 +230,7 @@ def main():
         f"window.DO_NOT_DELETE = {{\"update_time\": {json.dumps(now)}, \"html_sha10\": {json.dumps(hash10)}, \"html_len\": {len(html)}}};\n"
     )
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "w", encoding="utf-8") as f:
+    with open(OUT, "w", encoding="utf-8", newline=LF) as f:
         f.write(payload)
     # 🔧 一致性：写完后再按权威口径（中性化内容 sha1 前 10 位）算 ?v 缓存戳，
     #    回写 index.html 与 logic.html 两页，杜绝 CDN 缓存失配与 [15/15] 戳漂移阻断
@@ -237,7 +238,7 @@ def main():
     hash10 = _neutral_sha10(OUT)
     # 把 payload 头部注释里的 hash10 修正成 ?v 同源戳（让注释和 ?v 一致）
     payload2 = re.sub(r"内容sha10：[a-f0-9]{10}", f"内容sha10：{hash10}", payload, count=1)
-    with open(OUT, "w", encoding="utf-8") as f:
+    with open(OUT, "w", encoding="utf-8", newline=LF) as f:
         f.write(payload2)
     # 二次确认稳定（不会有 modify 链）
     hash10 = _neutral_sha10(OUT)
