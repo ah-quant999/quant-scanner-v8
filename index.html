@@ -4798,7 +4798,148 @@ function fmtSigned(v){
       h += '</div>';
     })();
 
-    c.innerHTML = h;
+        /* ===== 📜 每日记录 + 📊 每周汇总（2026-10-04 主人令：仿两个共振日历下方样式，
+       洞察口径=机构+游资+北向三通道；从有数据开始逐月回溯，随 LHB_HISTORY 每交易日 17:30 自动延伸） ===== */
+    (function(){
+      var _days = (window._rcDays ? window._rcDays() : []) || [];
+      if(!_days.length) return;
+      var _safe = window._safeArr || function(x){ return Array.isArray(x)?x:[]; };
+      function _nbNet(s){ var nb=(s.seats||{})['北向']; return nb?((+nb.buy||0)-(+nb.sell||0)):0; }
+      function _net3(s){ return (s.inst_net_万||0)+(s.yz_net_万||0)+_nbNet(s); }
+      function _strength(s){ var i=+(s.inst_net_万||0), y=+(s.yz_net_万||0), n=_nbNet(s); return (i>0?i:0)+(y>0?y:0)+(n>0?n:0); }
+      var TH = 8000; /* 与机游共振日历同门槛：8000万 ≈ 0.8亿 */
+      /* 洞察口径五类列表（与卡内「明日关注/明日风险/最强共振/机构独买/游资独买」同口径） */
+      function _insLists(stocks){
+        var all = _safe(stocks);
+        function blk(title,color,arr){
+          if(!arr.length) return '';
+          var inner = arr.map(function(s){
+            return '<div class="jy-li"><span class="jy-name">'+_rcEsc(s.name||'')+'</span><span class="'+color+'" style="font-weight:600">'+_rcFmtYi(s._net)+'</span></div>';
+          }).join('');
+          return '<div class="jy-block"><div class="jy-block-hd" style="color:'+color+'">'+title+'</div>'+inner+'</div>';
+        }
+        var focus = all.filter(function(s){ return _net3(s) > 0; })
+          .map(function(s){ s._net=_net3(s); s._st=_strength(s); return s; })
+          .sort(function(a,b){ return b._st - a._st; }).slice(0,5);
+        var risk = all.filter(function(s){ return _net3(s) < 0; })
+          .map(function(s){ s._net=_net3(s); return s; })
+          .sort(function(a,b){ return a._net - b._net; }).slice(0,5);
+        var strong = all.filter(function(s){ return (s.inst_net_万||0)>0 && (s.yz_net_万||0)>0 && ((s.inst_net_万||0)+(s.yz_net_万||0))>=TH; })
+          .sort(function(a,b){ return ((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0)); }).slice(0,4)
+          .map(function(s){ s._net=(s.inst_net_万||0)+(s.yz_net_万||0); return s; });
+        var instOnly = all.filter(function(s){ return (s.inst_net_万||0)>0 && (s.yz_net_万||0)<=0; })
+          .sort(function(a,b){ return (b.inst_net_万||0)-(a.inst_net_万||0); }).slice(0,5)
+          .map(function(s){ s._net=s.inst_net_万||0; return s; });
+        var yzOnly = all.filter(function(s){ return (s.yz_net_万||0)>0 && (s.inst_net_万||0)<=0; })
+          .sort(function(a,b){ return (b.yz_net_万||0)-(a.yz_net_万||0); }).slice(0,4)
+          .map(function(s){ s._net=s.yz_net_万||0; return s; });
+        var h2 = '';
+        h2 += blk('▲ 净买关注 TOP5（机游+游资+北向）','c-up',focus);
+        h2 += blk('▼ 净卖风险 TOP5（机游+游资+北向）','c-down',risk);
+        h2 += blk('★ 最强共振（机构+游资 ≥0.8亿）','#a78bfa',strong);
+        h2 += blk('🏛 机构独买（游资未参与）','#38bdf8',instOnly);
+        h2 += blk('⚡ 游资独买（机构未参与）','#f59e0b',yzOnly);
+        return h2;
+      }
+      function _esc(s){ return _rcEsc(String(s||'')); }
+      /* 按月分组（最新月在前） */
+      var _months = {};
+      _days.forEach(function(d){
+        var k = String(d.iso||'').slice(0,7);
+        if(k.length!==7) return;
+        (_months[k] = _months[k] || []).push(d);
+      });
+      var _mKeys = Object.keys(_months).sort().reverse();
+      h += '<h3 style="margin-top:28px;font-size:15px;color:var(--txt)">📜 每日记录 · 洞察口径 <span style="font-size:11px;color:var(--dim);font-weight:400">· 机游+游资+北向三通道 · 从有数据开始（'+_esc(_days[0].iso)+' 首日 · 每交易日 17:30 自动延伸）</span></h3>';
+      _mKeys.forEach(function(mk){
+        var mDays = _months[mk].slice().sort(function(a,b){ return a.iso<b.iso?-1:1; });
+        var mY = parseInt(mk.slice(0,4),10), mM = parseInt(mk.slice(5,7),10)-1;
+        var mStocks = []; mDays.forEach(function(d){ mStocks = mStocks.concat(_safe(d.stocks)); });
+        var mJy = mStocks.filter(function(s){ return (s.category||'')==='机游共振'; }).length;
+        var mNet = 0; mStocks.forEach(function(s){ mNet += _net3(s); });
+        h += '<div style="margin-top:20px;font-size:14px;font-weight:700;color:var(--txt);border-left:3px solid var(--purple);padding-left:8px">📅 '+mY+'年'+(mM+1)+'月 <span style="font-size:11px;font-weight:400;color:var(--dim);margin-left:6px">'+mDays.length+' 个交易日</span> <span style="font-size:11px;color:#a78bfa;margin-left:6px">★共振 '+mJy+'</span> <span class="'+(mNet>=0?'c-up':'c-down')+'" style="font-size:12px;margin-left:6px">三通道净流入 '+_rcFmtYi(mNet)+'</span></div>';
+        /* 按周分组（周一次序，与机游共振日历同法） */
+        var wkMap = {}, wkOrder = [];
+        mDays.forEach(function(d){
+          var dyY=parseInt(d.iso.slice(0,4),10), dyM=parseInt(d.iso.slice(5,7),10)-1, dyD=parseInt(d.iso.slice(8,10),10);
+          var wr = _rcWeekRangeOf(dyY, dyM, dyD);
+          var k = wr.mon.getTime();
+          if(!wkMap[k]){ wkMap[k]={wr:wr, days:[]}; wkOrder.push(k); }
+          wkMap[k].days.push(d);
+        });
+        function _range(wr){ return (wr.mon.getMonth()+1)+'/'+wr.mon.getDate()+'-'+(wr.sun.getMonth()+1)+'/'+wr.sun.getDate(); }
+        function _trunc(wr){ return (wr.mon.getMonth()!==mM || wr.sun.getMonth()!==mM) ? ' <span style="color:var(--dim);font-size:10px">(跨月)</span>' : ''; }
+        wkOrder.forEach(function(k, wi){
+          var w = wkMap[k], wr = w.wr;
+          h += '<div class="jy-week"><div class="jy-week-hd">第'+(wi+1)+'周 '+_range(wr)+_trunc(wr)+'</div>';
+          w.days.forEach(function(d){
+            var stocks = _safe(d.stocks);
+            var dJy = stocks.filter(function(s){ return (s.category||'')==='机游共振'; }).length;
+            var dNet = 0; stocks.forEach(function(s){ dNet += _net3(s); });
+            var dow = new Date(parseInt(d.iso.slice(0,4),10), parseInt(d.iso.slice(5,7),10)-1, parseInt(d.iso.slice(8,10),10)).getDay();
+            h += '<div class="jy-day-card">';
+            h += '<div class="jy-day-hd"><span class="jy-day-date">📅 '+_esc(d.iso.replace(/-/g,'/'))+' 周'+['日','一','二','三','四','五','六'][dow]+'</span>';
+            h += '<span class="jy-badge" style="color:#a78bfa">★共振 '+dJy+'</span>';
+            h += '<span class="'+(dNet>=0?'c-up':'c-down')+'" style="font-weight:700">净流入'+_rcFmtYi(dNet)+'</span></div>';
+            var lists = _insLists(stocks);
+            h += lists ? ('<div class="jy-day-body">'+lists+'</div>') : '<div style="color:var(--dim);font-size:12px;padding:6px 0">本日无洞察口径信号</div>';
+            h += '</div>';
+          });
+          h += '</div>';
+        });
+        /* 📊 每周汇总（本月 · 同股跨日三通道净额累加，流入/流出各 TOP10） */
+        h += '<h3 style="margin-top:18px;font-size:14px;color:var(--txt)">📊 每周汇总 · '+mY+'年'+(mM+1)+'月 <span style="font-size:11px;color:var(--dim);font-weight:400">· 同股跨日三通道净额累加</span></h3>';
+        h += '<div class="week-cards">';
+        wkOrder.forEach(function(k, wi){
+          var w = wkMap[k], wr = w.wr;
+          var wStocks = []; w.days.forEach(function(d){ wStocks = wStocks.concat(_safe(d.stocks)); });
+          h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">第'+(wi+1)+'周 '+_range(wr)+_trunc(wr)+'</span></div>';
+          if(!wStocks.length){
+            h += '<div style="text-align:center;color:var(--dim);padding:20px;font-size:12px">该周无数据</div></div>';
+            return;
+          }
+          var agg = {};
+          wStocks.forEach(function(s){
+            var code = s.code||s.name||''; if(!code) return;
+            if(!agg[code]) agg[code] = {code:s.code||'', name:s.name||'', net:0, days:0, jy:false};
+            agg[code].net += _net3(s); agg[code].days += 1;
+            if((s.category||'')==='机游共振') agg[code].jy = true;
+          });
+          var list = Object.keys(agg).map(function(c){ return agg[c]; });
+          var wJy = list.filter(function(s){ return s.jy; }).length;
+          var wNet = 0; list.forEach(function(s){ wNet += s.net; });
+          var wBuy = list.filter(function(s){ return s.net > 0; }).sort(function(a,b){ return b.net - a.net; }).slice(0,10);
+          var wSell = list.filter(function(s){ return s.net < 0; }).sort(function(a,b){ return a.net - b.net; }).slice(0,10);
+          h += '<div style="display:flex;gap:10px;align-items:center;font-size:11px;margin-bottom:8px;padding:0 4px">';
+          h += '<span style="color:#a78bfa;font-weight:600">★共振 '+wJy+'</span>';
+          h += '<span class="'+(wNet>=0?'c-up':'c-down')+'" style="font-weight:700">净买卖 '+_rcFmtYi(wNet)+'</span>';
+          h += '</div>';
+          h += '<div class="wk-badge buy">✅ 买入TOP10</div><div class="wk-list">';
+          if(!wBuy.length){ h += '<div class="wk-item" style="color:var(--dim);justify-content:center">无</div>'; }
+          else wBuy.forEach(function(s){ h += '<div class="wk-item"><span>'+_esc(s.name)+'<span class="ms-code">'+_esc(s.code)+'</span></span><span class="c-up">'+_rcFmtYi(s.net)+'</span></div>'; });
+          h += '</div><div class="wk-badge sell">❌ 卖出TOP10</div><div class="wk-list">';
+          if(!wSell.length){ h += '<div class="wk-item" style="color:var(--dim);justify-content:center">无</div>'; }
+          else wSell.forEach(function(s){ h += '<div class="wk-item"><span>'+_esc(s.name)+'<span class="ms-code">'+_esc(s.code)+'</span></span><span class="c-down">'+_rcFmtYi(s.net)+'</span></div>'; });
+          h += '</div></div>';
+        });
+        h += '</div>';
+      });
+      /* 口径说明（通栏） */
+      h += '<div class="ms-note-card" style="margin-top:16px">';
+      h += '<div class="ms-note-head"><span style="color:#38bdf8">≡</span> 口径说明 <span class="ms-note-tag">共 '+_days.length+' 个交易日 · '+_mKeys.length+' 个月</span></div>';
+      h += '<div class="ms-note-body">';
+      h += '<span class="ms-note-item">数据源：龙虎榜历史+当日（从有数据开始），每交易日 17:30 自动延伸</span>';
+      h += '<span class="ms-note-item">净买/净卖=「机构+游资+北向」三通道整体净额；排序强度=正通道之和（与「明日关注/明日风险」同口径）</span>';
+      h += '<span class="ms-note-item">最强共振=机构+游资双正且合计≥8000万；机构独买/游资独买=单通道为正、另一通道非正</span>';
+      h += '<span class="ms-note-item">每周汇总：同股跨日三通道净额累加，流入/流出各取 TOP10</span>';
+      h += '<span class="ms-note-item">危机雷达风险度分无逐日历史快照，本记录不含该分值（不虚构历史）</span>';
+      h += '</div>';
+      h += '<div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--border);font-size:10px;color:var(--dim);opacity:.85">仅供参考，不构成投资建议</div>';
+      h += '</div>';
+    })();
+
+
+c.innerHTML = h;
     window.__insightRendered = true;
     }catch(e){
       console.error('每日洞察渲染失败', e);

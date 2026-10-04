@@ -1388,7 +1388,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       <div class="card">
         <h3><span class="ic">🧲</span>共振日历 - 说明</h3>
         <div class="logic-h">三段结构</div>
-        <div class="logic-p">· <b>📅 机游共振日历</b>（jyCalContainer）：逐日展示龙虎榜「机游共振 / 机构独买 / 游资独买」上榜标的与净买额。<br>· <b>🌊 北向席位日历</b>（northCalContainer）：逐日北向席位净买卖明细与连续净买信号。<br>· <b>🔍 每日洞察</b>：涨跌概况 / 资金流向 / 热点板块 / 异动信号聚合。</div>
+        <div class="logic-p">· <b>📅 机游共振日历</b>（jyCalContainer）：逐日展示龙虎榜「机游共振 / 机构独买 / 游资独买」上榜标的与净买额。<br>· <b>🌊 北向席位日历</b>（northCalContainer）：逐日北向席位净买卖明细与连续净买信号。<br>· <b>🔍 每日洞察</b>：涨跌概况 / 资金流向 / 热点板块 / 异动信号聚合。<br>· <b style="color:var(--gold)">2026-10-04 主人令：每日洞察内容下方新增「📜 每日记录 + 📊 每周汇总」两区</b>（仿两个共振日历下方样式：每日卡按周分组、每周卡买入/卖出 TOP10；口径=机构+游资+北向三通道，从有数据开始逐月回溯；数据源 LHB_HISTORY+LHB_DATA，每交易日 17:30 自动延伸；危机雷达分无逐日历史快照，记录不含该分值）。</div>
         <div class="logic-h">数据口径</div>
         <div class="logic-p">统一由 <code>window._rcDays()</code> 聚合 <b>LHB_HISTORY</b>（多日历史，保证 7 日连续数据）+ <b>LHB_DATA</b>（当日降级兜底）产出。2026-08-08 清理了与 sec-rc 新实现同名冲突的旧 <code>renderJyCalendar</code> / <code>renderNorthCalendar</code>（曾渲染进不存在容器，导致日历覆盖、7 日数据时有时无），现仅保留单一聚合实现。</div>
         <div class="logic-h">已下架：大牛股猎手（2026-09-03 主人令）</div>
