@@ -4851,115 +4851,150 @@ function fmtSigned(v){
       });
       var _mKeys = Object.keys(_months).sort();
       h += '<h3 style="margin-top:28px;font-size:15px;color:var(--txt)">📜 每日记录 · 洞察口径 <span style="font-size:11px;color:var(--dim);font-weight:400">· 机游+游资+北向三通道 · 从有数据开始（'+_esc(_days[0].iso)+' 首日 · 每交易日 17:30 自动延伸）</span></h3>';
-      _mKeys.forEach(function(mk){
-        var mDays = _months[mk].slice().sort(function(a,b){ return a.iso<b.iso?-1:1; });
-        var mY = parseInt(mk.slice(0,4),10), mM = parseInt(mk.slice(5,7),10)-1;
-        var mStocks = []; mDays.forEach(function(d){ mStocks = mStocks.concat(_safe(d.stocks)); });
-        var mJy = mStocks.filter(function(s){ return (s.category||'')==='机游共振'; }).length;
-        var mNet = 0; mStocks.forEach(function(s){ mNet += _net3(s); });
-        /* 月历卡片（仿 TAB1 机游共振日历 · 静态历史月，无翻月/无点击） */
-        h += '<div class="cal-header-row" style="margin-top:22px">'
-          + '<span class="cal-title">📅 '+mY+'年'+(mM+1)+'月 <span style="font-size:11px;font-weight:400;color:var(--dim);margin-left:6px">'+mDays.length+' 个交易日</span> <span style="font-size:11px;color:#a78bfa;margin-left:6px">★共振 '+mJy+'</span> <span class="'+(mNet>=0?'c-up':'c-down')+'" style="font-size:12px;margin-left:6px">三通道净流入 '+_rcFmtYi(mNet)+'</span></span>'
-          + '</div>';
-        h += '<div class="cal-head">'
-          + ['一','二','三','四','五','六','日'].map(function(dw,i){ return '<span'+(i>=5?' class="weekend"':'')+'>'+dw+'</span>'; }).join('')
-          + '</div>';
-        h += '<div class="cal-grid">'
-        var _dayMap = {}; mDays.forEach(function(d){ _dayMap[String(d.iso).replace(/-/g,'')] = d; });
-        var _fd = new Date(mY, mM, 1).getDay(); var _off = _fd === 0 ? 6 : _fd - 1;
-        var _dim = new Date(mY, mM+1, 0).getDate();
-        for(var _e=0; _e<_off; _e++) h += '<div class="cal-cell empty"></div>';
-        for(var _d=1; _d<=_dim; _d++){
-          var _iso = String(mY)+String(mM+1).padStart(2,'0')+String(_d).padStart(2,'0');
-          var _has = !!_dayMap[_iso];
-          var _cc = 'cal-cell' + (_has ? ' has-data' : '');
-          h += '<div class="'+_cc+'">';
-          h += '<span class="cal-date-num"><span>'+_d+'</span><span class="dow">周'+['日','一','二','三','四','五','六'][new Date(mY,mM,_d).getDay()]+'</span></span>';
-          if(_has){
-            var _ds = _dayMap[_iso].stocks||[];
-            var _jy = _ds.filter(function(s){ return (s.category||'')==='机游共振'; }).length;
-            var _n = 0; _ds.forEach(function(s){ _n += _net3(s); });
-            var _nc = _n>=0 ? 'c-up' : 'c-down';
-            h += '<div class="cal-net '+_nc+'">净流入 <b style="font-size:14px">'+( _n>=0?'+':'')+(_n/10000).toFixed(2)+'</b><span style="font-size:10px;opacity:.7">亿</span></div>';
-            h += (_jy>0)
-              ? '<div class="cal-sub"><span style="color:#a78bfa;font-weight:700">★</span> 共振 <b style="color:#a78bfa">'+_jy+'</b></div>'
-              : '<div class="cal-sub"><span style="color:#a78bfa;font-weight:700">★</span> 共振 <b style="color:var(--dim)">0</b></div>';
-          } else {
-            var _dw = new Date(mY,mM,_d).getDay();
-            if(_dw===0 || _dw===6) h += '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);opacity:.4;font-size:11px">休市</div>';
-            else h += '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);opacity:.25;font-size:11px">--</div>';
-          }
-          h += '</div>';
+      /* 翻月式：一次只显示选中月（2026-10-04 主人令「跟着每个月变动」+「补齐月度汇总」） */
+      (function(){
+        var _now = new Date();
+        var _curYM = _now.getFullYear()*100 + (_now.getMonth()+1);
+        var _firstYM = parseInt(_mKeys[0].replace('-',''),10);
+        var _lastYM = parseInt(_mKeys[_mKeys.length-1].replace('-',''),10);
+        if(!window.__rcRecState){
+          window.__rcRecState = { y: parseInt(_mKeys[_mKeys.length-1].slice(0,4),10), m: parseInt(_mKeys[_mKeys.length-1].slice(5,7),10)-1 };
         }
-        var _tot = _off + _dim; var _r = _tot % 7;
-        if(_r>0) for(var _e2=0; _e2<7-_r; _e2++) h += '<div class="cal-cell empty"></div>';
-        h += '</div>';
-        /* 按周分组（周一次序，与机游共振日历同法） */
-        var wkMap = {}, wkOrder = [];
-        mDays.forEach(function(d){
-          var dyY=parseInt(d.iso.slice(0,4),10), dyM=parseInt(d.iso.slice(5,7),10)-1, dyD=parseInt(d.iso.slice(8,10),10);
-          var wr = _rcWeekRangeOf(dyY, dyM, dyD);
-          var k = wr.mon.getTime();
-          if(!wkMap[k]){ wkMap[k]={wr:wr, days:[]}; wkOrder.push(k); }
-          wkMap[k].days.push(d);
-        });
-        function _range(wr){ return (wr.mon.getMonth()+1)+'/'+wr.mon.getDate()+'-'+(wr.sun.getMonth()+1)+'/'+wr.sun.getDate(); }
-        function _trunc(wr){ return (wr.mon.getMonth()!==mM || wr.sun.getMonth()!==mM) ? ' <span style="color:var(--dim);font-size:10px">(跨月)</span>' : ''; }
-        wkOrder.forEach(function(k, wi){
-          var w = wkMap[k], wr = w.wr;
-          h += '<div class="jy-week"><div class="jy-week-hd">第'+(wi+1)+'周 '+_range(wr)+_trunc(wr)+'</div>';
-          w.days.forEach(function(d){
-            var stocks = _safe(d.stocks);
-            var dJy = stocks.filter(function(s){ return (s.category||'')==='机游共振'; }).length;
-            var dNet = 0; stocks.forEach(function(s){ dNet += _net3(s); });
-            var dow = new Date(parseInt(d.iso.slice(0,4),10), parseInt(d.iso.slice(5,7),10)-1, parseInt(d.iso.slice(8,10),10)).getDay();
-            h += '<div class="jy-day-card">';
-            h += '<div class="jy-day-hd"><span class="jy-day-date">📅 '+_esc(d.iso.replace(/-/g,'/'))+' 周'+['日','一','二','三','四','五','六'][dow]+'</span>';
-            h += '<span class="jy-badge" style="color:#a78bfa">★共振 '+dJy+'</span>';
-            h += '<span class="'+(dNet>=0?'c-up':'c-down')+'" style="font-weight:700">净流入'+_rcFmtYi(dNet)+'</span></div>';
-            var lists = _insLists(stocks);
-            h += lists ? ('<div class="jy-day-body">'+lists+'</div>') : '<div style="color:var(--dim);font-size:12px;padding:6px 0">本日无洞察口径信号</div>';
+        var _st = window.__rcRecState;
+        var _ym = _st.y*100 + (_st.m+1);
+        if(_ym < _firstYM){ _st.y = parseInt(_mKeys[0].slice(0,4),10); _st.m = parseInt(_mKeys[0].slice(5,7),10)-1; }
+        else if(_ym > _curYM){ _st.y = _now.getFullYear(); _st.m = _now.getMonth(); }
+
+        function _rcRecBuild(){
+          var mY = window.__rcRecState.y, mM = window.__rcRecState.m;
+          var mk = mY + '-' + String(mM+1).padStart(2,'0');
+          var mDays = (_months[mk] || []).slice().sort(function(a,b){ return a.iso<b.iso?-1:1; });
+          var mStocks = []; mDays.forEach(function(d){ mStocks = mStocks.concat(_safe(d.stocks)); });
+          var mJy = mStocks.filter(function(s){ return (s.category||'')==='机游共振'; }).length;
+          var mNet = 0; mStocks.forEach(function(s){ mNet += _net3(s); });
+          var h = '<div class="cal-header-row" style="margin-top:22px">'
+            + '<span class="cal-title">📅 '+mY+'年'+(mM+1)+'月'
+            + (mDays.length ? (' <span style="font-size:11px;font-weight:400;color:var(--dim);margin-left:6px">'+mDays.length+' 个交易日</span> <span style="font-size:11px;color:#a78bfa;margin-left:6px">★共振 '+mJy+'</span> <span class="'+(mNet>=0?'c-up':'c-down')+'" style="font-size:12px;margin-left:6px">三通道净流入 '+_rcFmtYi(mNet)+'</span>') : '')
+            + '</span>'
+            + '<span class="cal-meta">'
+            + '<button class="cal-nav-btn" onclick="_rcRecNav(-1)" title="上个月">◀</button>'
+            + ' <span id="rcRecYM">'+mY+'年'+(mM+1)+'月</span> '
+            + '<button class="cal-nav-btn" onclick="_rcRecNav(1)" title="下个月">▶</button>'
+            + '</span></div>';
+          if(!mDays.length){
+            h += '<div class="cal-head">'+['一','二','三','四','五','六','日'].map(function(dw,ii){ return '<span'+(ii>=5?' class="weekend"':'')+'>'+dw+'</span>'; }).join('')+'</div>';
+            h += '<div class="cal-grid">';
+            var _fd0 = new Date(mY, mM, 1).getDay(); var _off0 = _fd0===0?6:_fd0-1; var _dim0 = new Date(mY, mM+1, 0).getDate();
+            for(var _e=0;_e<_off0;_e++) h += '<div class="cal-cell empty"></div>';
+            for(var _d=1;_d<=_dim0;_d++){ var _dw0=new Date(mY,mM,_d).getDay(); h += '<div class="cal-cell">'+( (_dw0===0||_dw0===6)?'<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);opacity:.4;font-size:11px">休市</div>':'<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);opacity:.25;font-size:11px">--</div>')+'</div>'; }
+            var _tot0=_off0+_dim0,_r0=_tot0%7; if(_r0>0) for(var _e2=0;_e2<7-_r0;_e2++) h += '<div class="cal-cell empty"></div>';
+            h += '</div>';
+            h += '<div style="text-align:center;color:var(--dim);padding:18px;font-size:12px">本月暂无交易日数据（休市或数据未产出）</div>';
+            return h;
+          }
+          h += '<div class="cal-head">'+['一','二','三','四','五','六','日'].map(function(dw,ii){ return '<span'+(ii>=5?' class="weekend"':'')+'>'+dw+'</span>'; }).join('')+'</div>';
+          h += '<div class="cal-grid">';
+          var _dayMap = {}; mDays.forEach(function(d){ _dayMap[String(d.iso).replace(/-/g,'')] = d; });
+          var _fd = new Date(mY, mM, 1).getDay(); var _off = _fd===0?6:_fd-1; var _dim = new Date(mY, mM+1, 0).getDate();
+          for(var _e=0;_e<_off;_e++) h += '<div class="cal-cell empty"></div>';
+          for(var _d=1;_d<=_dim;_d++){
+            var _iso = String(mY)+String(mM+1).padStart(2,'0')+String(_d).padStart(2,'0');
+            var _has = !!_dayMap[_iso]; var _cc = 'cal-cell' + (_has ? ' has-data' : '');
+            h += '<div class="'+_cc+'">';
+            h += '<span class="cal-date-num"><span>'+_d+'</span><span class="dow">周'+['日','一','二','三','四','五','六'][new Date(mY,mM,_d).getDay()]+'</span></span>';
+            if(_has){
+              var _ds = _dayMap[_iso].stocks||[]; var _jy = _ds.filter(function(s){ return (s.category||'')==='机游共振'; }).length; var _n = 0; _ds.forEach(function(s){ _n += _net3(s); });
+              var _nc = _n>=0 ? 'c-up' : 'c-down';
+              h += '<div class="cal-net '+_nc+'">净流入 <b style="font-size:14px">'+( _n>=0?'+':'')+(_n/10000).toFixed(2)+'</b><span style="font-size:10px;opacity:.7">亿</span></div>';
+              h += (_jy>0) ? '<div class="cal-sub"><span style="color:#a78bfa;font-weight:700">★</span> 共振 <b style="color:#a78bfa">'+_jy+'</b></div>' : '<div class="cal-sub"><span style="color:#a78bfa;font-weight:700">★</span> 共振 <b style="color:var(--dim)">0</b></div>';
+            } else {
+              var _dw = new Date(mY,mM,_d).getDay();
+              if(_dw===0 || _dw===6) h += '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);opacity:.4;font-size:11px">休市</div>';
+              else h += '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);opacity:.25;font-size:11px">--</div>';
+            }
+            h += '</div>';
+          }
+          var _tot = _off + _dim; var _r = _tot % 7; if(_r>0) for(var _e2=0;_e2<7-_r;_e2++) h += '<div class="cal-cell empty"></div>';
+          h += '</div>';
+          var wkMap = {}, wkOrder = [];
+          mDays.forEach(function(d){
+            var dyY=parseInt(d.iso.slice(0,4),10), dyM=parseInt(d.iso.slice(5,7),10)-1, dyD=parseInt(d.iso.slice(8,10),10);
+            var wr = _rcWeekRangeOf(dyY, dyM, dyD); var k = wr.mon.getTime();
+            if(!wkMap[k]){ wkMap[k]={wr:wr, days:[]}; wkOrder.push(k); }
+            wkMap[k].days.push(d);
+          });
+          function _range(wr){ return (wr.mon.getMonth()+1)+'/'+wr.mon.getDate()+'-'+(wr.sun.getMonth()+1)+'/'+wr.sun.getDate(); }
+          function _trunc(wr){ return (wr.mon.getMonth()!==mM || wr.sun.getMonth()!==mM) ? ' <span style="color:var(--dim);font-size:10px">(跨月)</span>' : ''; }
+          wkOrder.forEach(function(k, wi){
+            var w = wkMap[k], wr = w.wr;
+            h += '<div class="jy-week"><div class="jy-week-hd">第'+(wi+1)+'周 '+_range(wr)+_trunc(wr)+'</div>';
+            w.days.forEach(function(d){
+              var stocks = _safe(d.stocks);
+              var dJy = stocks.filter(function(s){ return (s.category||'')==='机游共振'; }).length;
+              var dNet = 0; stocks.forEach(function(s){ dNet += _net3(s); });
+              var dow = new Date(parseInt(d.iso.slice(0,4),10), parseInt(d.iso.slice(5,7),10)-1, parseInt(d.iso.slice(8,10),10)).getDay();
+              h += '<div class="jy-day-card">';
+              h += '<div class="jy-day-hd"><span class="jy-day-date">📅 '+_esc(d.iso.replace(/-/g,'/'))+' 周'+['日','一','二','三','四','五','六'][dow]+'</span>';
+              h += '<span class="jy-badge" style="color:#a78bfa">★共振 '+dJy+'</span>';
+              h += '<span class="'+(dNet>=0?'c-up':'c-down')+'" style="font-weight:700">净流入'+_rcFmtYi(dNet)+'</span></div>';
+              var lists = _insLists(stocks);
+              h += lists ? ('<div class="jy-day-body">'+lists+'</div>') : '<div style="color:var(--dim);font-size:12px;padding:6px 0">本日无洞察口径信号</div>';
+              h += '</div>';
+            });
             h += '</div>';
           });
-          h += '</div>';
-        });
-        /* 📊 每周汇总（本月 · 同股跨日三通道净额累加，流入/流出各 TOP10） */
-        h += '<h3 style="margin-top:18px;font-size:14px;color:var(--txt)">📊 每周汇总 · '+mY+'年'+(mM+1)+'月 <span style="font-size:11px;color:var(--dim);font-weight:400">· 同股跨日三通道净额累加</span></h3>';
-        h += '<div class="week-cards">';
-        wkOrder.forEach(function(k, wi){
-          var w = wkMap[k], wr = w.wr;
-          var wStocks = []; w.days.forEach(function(d){ wStocks = wStocks.concat(_safe(d.stocks)); });
-          h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">第'+(wi+1)+'周 '+_range(wr)+_trunc(wr)+'</span></div>';
-          if(!wStocks.length){
-            h += '<div style="text-align:center;color:var(--dim);padding:20px;font-size:12px">该周无数据</div></div>';
-            return;
-          }
-          var agg = {};
-          wStocks.forEach(function(s){
-            var code = s.code||s.name||''; if(!code) return;
-            if(!agg[code]) agg[code] = {code:s.code||'', name:s.name||'', net:0, days:0, jy:false};
-            agg[code].net += _net3(s); agg[code].days += 1;
-            if((s.category||'')==='机游共振') agg[code].jy = true;
+          h += '<h3 style="margin-top:18px;font-size:14px;color:var(--txt)">📊 每周汇总 · '+mY+'年'+(mM+1)+'月 <span style="font-size:11px;color:var(--dim);font-weight:400">· 同股跨日三通道净额累加</span></h3>';
+          h += '<div class="week-cards">';
+          wkOrder.forEach(function(k, wi){
+            var w = wkMap[k], wr = w.wr;
+            var wStocks = []; w.days.forEach(function(d){ wStocks = wStocks.concat(_safe(d.stocks)); });
+            h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">第'+(wi+1)+'周 '+_range(wr)+_trunc(wr)+'</span></div>';
+            if(!wStocks.length){ h += '<div style="text-align:center;color:var(--dim);padding:20px;font-size:12px">该周无数据</div></div>'; return; }
+            var agg = {};
+            wStocks.forEach(function(s){ var code=s.code||s.name||''; if(!code) return; if(!agg[code]) agg[code]={code:s.code||'',name:s.name||'',net:0,days:0,jy:false}; agg[code].net+=_net3(s); agg[code].days+=1; if((s.category||'')==='机游共振') agg[code].jy=true; });
+            var list = Object.keys(agg).map(function(c){ return agg[c]; });
+            var wJy = list.filter(function(s){ return s.jy; }).length;
+            var wNet = 0; list.forEach(function(s){ wNet += s.net; });
+            var wBuy = list.filter(function(s){ return s.net>0; }).sort(function(a,b){ return b.net-a.net; }).slice(0,10);
+            var wSell = list.filter(function(s){ return s.net<0; }).sort(function(a,b){ return a.net-b.net; }).slice(0,10);
+            h += '<div style="display:flex;gap:10px;align-items:center;font-size:11px;margin-bottom:8px;padding:0 4px"><span style="color:#a78bfa;font-weight:600">★共振 '+wJy+'</span><span class="'+(wNet>=0?'c-up':'c-down')+'" style="font-weight:700">净买卖 '+_rcFmtYi(wNet)+'</span></div>';
+            h += '<div class="wk-badge buy">✅ 买入TOP10</div><div class="wk-list">';
+            if(!wBuy.length){ h += '<div class="wk-item" style="color:var(--dim);justify-content:center">无</div>'; } else wBuy.forEach(function(s){ h += '<div class="wk-item"><span>'+_esc(s.name)+'<span class="ms-code">'+_esc(s.code)+'</span></span><span class="c-up">'+_rcFmtYi(s.net)+'</span></div>'; });
+            h += '</div><div class="wk-badge sell">❌ 卖出TOP10</div><div class="wk-list">';
+            if(!wSell.length){ h += '<div class="wk-item" style="color:var(--dim);justify-content:center">无</div>'; } else wSell.forEach(function(s){ h += '<div class="wk-item"><span>'+_esc(s.name)+'<span class="ms-code">'+_esc(s.code)+'</span></span><span class="c-down">'+_rcFmtYi(s.net)+'</span></div>'; });
+            h += '</div></div>';
           });
-          var list = Object.keys(agg).map(function(c){ return agg[c]; });
-          var wJy = list.filter(function(s){ return s.jy; }).length;
-          var wNet = 0; list.forEach(function(s){ wNet += s.net; });
-          var wBuy = list.filter(function(s){ return s.net > 0; }).sort(function(a,b){ return b.net - a.net; }).slice(0,10);
-          var wSell = list.filter(function(s){ return s.net < 0; }).sort(function(a,b){ return a.net - b.net; }).slice(0,10);
-          h += '<div style="display:flex;gap:10px;align-items:center;font-size:11px;margin-bottom:8px;padding:0 4px">';
-          h += '<span style="color:#a78bfa;font-weight:600">★共振 '+wJy+'</span>';
-          h += '<span class="'+(wNet>=0?'c-up':'c-down')+'" style="font-weight:700">净买卖 '+_rcFmtYi(wNet)+'</span>';
           h += '</div>';
-          h += '<div class="wk-badge buy">✅ 买入TOP10</div><div class="wk-list">';
-          if(!wBuy.length){ h += '<div class="wk-item" style="color:var(--dim);justify-content:center">无</div>'; }
-          else wBuy.forEach(function(s){ h += '<div class="wk-item"><span>'+_esc(s.name)+'<span class="ms-code">'+_esc(s.code)+'</span></span><span class="c-up">'+_rcFmtYi(s.net)+'</span></div>'; });
-          h += '</div><div class="wk-badge sell">❌ 卖出TOP10</div><div class="wk-list">';
-          if(!wSell.length){ h += '<div class="wk-item" style="color:var(--dim);justify-content:center">无</div>'; }
-          else wSell.forEach(function(s){ h += '<div class="wk-item"><span>'+_esc(s.name)+'<span class="ms-code">'+_esc(s.code)+'</span></span><span class="c-down">'+_rcFmtYi(s.net)+'</span></div>'; });
-          h += '</div></div>';
-        });
-        h += '</div>';
-      });
+          /* 📊 月度汇总（本月全量 · 同股跨日三通道净额累加，流入/流出各 TOP10，2026-10-04 主人令补齐） */
+          h += '<h3 style="margin-top:18px;font-size:14px;color:var(--txt)">📊 月度汇总 · '+mY+'年'+(mM+1)+'月 <span style="font-size:11px;color:var(--dim);font-weight:400">· ★共振 '+mJy+' · 三通道净买卖 '+_rcFmtYi(mNet)+'</span></h3>';
+          (function(){
+            var agg = {}; mStocks.forEach(function(s){ var code=s.code||s.name||''; if(!code) return; if(!agg[code]) agg[code]={code:s.code||'',name:s.name||'',net:0,days:0,jy:false}; agg[code].net+=_net3(s); agg[code].days+=1; if((s.category||'')==='机游共振') agg[code].jy=true; });
+            var list = Object.keys(agg).map(function(c){ return agg[c]; });
+            var _in = list.filter(function(s){ return s.net>0; }).sort(function(a,b){ return b.net-a.net; }).slice(0,10);
+            var _out = list.filter(function(s){ return s.net<0; }).sort(function(a,b){ return a.net-b.net; }).slice(0,10);
+            h += '<div class="month-summary" style="grid-template-columns:repeat(2,1fr);gap:12px">';
+            h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--up)">▲</span> 净流入TOP10</div>';
+            if(_in.length){ _in.forEach(function(s,idx){ h += '<div class="ms-item"><span>'+(idx+1)+_rcEsc(s.name)+'<span class="ms-code">'+_rcEsc(s.code)+'</span></span><span class="ms-val c-up">'+_rcFmtYi(s.net)+'</span></div>'; }); }
+            else { h += '<div style="color:var(--dim);font-size:12px;padding:6px 0">本期无净流入标的</div>'; }
+            h += '</div>';
+            h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--down)">▼</span> 净流出TOP10</div>';
+            if(_out.length){ _out.forEach(function(s,idx){ h += '<div class="ms-item"><span>'+(idx+1)+_rcEsc(s.name)+'<span class="ms-code">'+_rcEsc(s.code)+'</span></span><span class="ms-val c-down">'+_rcFmtYi(s.net)+'</span></div>'; }); }
+            else { h += '<div style="color:var(--dim);font-size:12px;padding:6px 0">本期无净流出标的</div>'; }
+            h += '</div>';
+            h += '</div>';
+          })();
+          return h;
+        }
+        window._rcRecNav = function(delta){
+          var st = window.__rcRecState;
+          st.m += delta;
+          if(st.m < 0){ st.m = 11; st.y--; }
+          else if(st.m > 11){ st.m = 0; st.y++; }
+          var el = document.getElementById('rcRecContainer');
+          if(el){ try{ el.innerHTML = _rcRecBuild(); }catch(e){ console.warn('记录翻月渲染失败', e); } }
+        };
+        h += '<div id="rcRecContainer">' + _rcRecBuild() + '</div>';
+      })();
       /* 口径说明（通栏） */
       h += '<div class="ms-note-card" style="margin-top:16px">';
       h += '<div class="ms-note-head"><span style="color:#38bdf8">≡</span> 口径说明 <span class="ms-note-tag">共 '+_days.length+' 个交易日 · '+_mKeys.length+' 个月</span></div>';
