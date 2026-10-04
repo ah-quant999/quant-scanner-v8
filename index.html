@@ -4842,14 +4842,14 @@ function fmtSigned(v){
         return h2;
       }
       function _esc(s){ return _rcEsc(String(s||'')); }
-      /* 按月分组（最新月在前） */
+      /* 按月分组（时间正序：从首个有数据月（2026-06）起逐月排列，2026-10-04 主人令） */
       var _months = {};
       _days.forEach(function(d){
         var k = String(d.iso||'').slice(0,7);
         if(k.length!==7) return;
         (_months[k] = _months[k] || []).push(d);
       });
-      var _mKeys = Object.keys(_months).sort().reverse();
+      var _mKeys = Object.keys(_months).sort();
       h += '<h3 style="margin-top:28px;font-size:15px;color:var(--txt)">📜 每日记录 · 洞察口径 <span style="font-size:11px;color:var(--dim);font-weight:400">· 机游+游资+北向三通道 · 从有数据开始（'+_esc(_days[0].iso)+' 首日 · 每交易日 17:30 自动延伸）</span></h3>';
       _mKeys.forEach(function(mk){
         var mDays = _months[mk].slice().sort(function(a,b){ return a.iso<b.iso?-1:1; });
