@@ -16059,7 +16059,13 @@ h += '</div>'; // /ulPaneObserve
     window.__v8RichLines = renderLines;
     var h = '';
     // 2026-09-10 一劳永逸：优先读独立 insights 文件（window.MAHORO_INSIGHTS），云端重生成 maharo_macro.js 不会覆盖它；fallback 到内嵌
-    var ins = window.MAHORO_INSIGHTS || d.insights || {};
+    // 2026-09-10 一劳永逸：数据源仅 window.MAHORO_INSIGHTS（ins0 已在函数头兜底）。
+    // 🔴 2026-10-04 一劳永逸修复 ReferenceError: d is not defined —— maharo_macro 退役
+    //   （commit 92628b37b5）删了 var d 声明却漏删本函数体后半部分 7 处 d.xxx 死引用；
+    //   此前靠 `||` 短路侥幸不炸，MAHORO_INSIGHTS 一加载成功走到 d.sources 即 ReferenceError，
+    //   整卡降级（主人 10-04 08:39 截图实锤）。d.sources 徽章块与原始条目录 details 块
+    //   均为 maharo_macro 孤儿 UI，随数据源一并退役删除。
+    var ins = ins0;
     var blocks = [
       {k:'daily',   icon:'\ud83d\udccc', name:'\u4eca\u65e5\u89e3\u6790', col:'#34d399', bg:'rgba(52,211,153,.06)', bd:'rgba(52,211,153,.35)'},
       {k:'weekly',  icon:'\ud83d\udcc5', name:'\u672c\u5468\u89e3\u6790', col:'#60a5fa', bg:'rgba(96,165,250,.06)', bd:'rgba(96,165,250,.35)'},
@@ -16079,25 +16085,8 @@ h += '</div>'; // /ulPaneObserve
     if(!anyIns){
       h += '<div class="note" style="padding:12px;text-align:center;">\u89e3\u6790\u5f85\u751f\u6210\uff08\u6bcf\u65e5 08:30 \u81ea\u52a8\u5316\u9605\u8bfb\u540e\u64b0\u5199\uff09</div>';
     }
-    if(d.sources && d.sources.length){
-      h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px;">';
-      d.sources.forEach(function(s){
-        var col = s.stale ? '#ef5350' : '#26a69a';
-        h += '<span style="font-size:11px;padding:2px 7px;border-radius:10px;border:1px solid '+col+';color:'+col+';">'+s.label+' \u00b7 '+(s.latest||'-')+(s.stale?' \u26a0':'')+'</span>';
-      });
-      h += '</div>';
-    }
-    h += '<details open style="font-size:11px;color:var(--dim);"><summary style="cursor:pointer;color:var(--sub);">\ud83d\udcf0 \u539f\u59cb\u6761\u76ee\u9644\u5f55\uff08\u547d\u4e2d '+((d.watched||[]).length)+' \u00b7 \u6838\u5fc3 '+((d.core||[]).length)+' \u00b7 \u5168\u90e8 '+((d.all_lite||[]).length)+'\uff0c\u5df2\u9ed8\u8ba4\u5c55\u5f00\uff09</summary>';
-    (d.watched||[]).forEach(function(r){
-      h += '<div style="padding:3px 0;border-top:1px dashed rgba(255,255,255,.06);">\u2605\u3010'+r.source_label+'\u3011'+esc(r.title)+' \uff5c '+esc(r.ts)+'</div>';
-    });
-    (d.core||[]).forEach(function(r){
-      h += '<div style="padding:3px 0;border-top:1px dashed rgba(255,255,255,.06);">\u25c6\u3010'+r.source_label+'\u3011'+esc(r.title)+' \uff5c '+esc(r.ts)+'</div>';
-    });
-    (d.all_lite||[]).forEach(function(r){
-      h += '<div style="padding:2px 0;border-top:1px dashed rgba(255,255,255,.04);">\u3010'+r.source_label+'\u3011'+esc(r.title)+' \uff5c '+esc(r.ts)+'</div>';
-    });
-    h += '</details>';
+    /* 2026-10-04 maharo_macro 孤儿 UI 退役：原 d.sources 来源徽章块与 d.watched/core/all_lite
+       原始条目录 details 块已随 maharo_macro 数据源一并删除（d 未定义曾致整卡降级）。 */
     h += '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">\ud83d\udd2d \u89e3\u6790\u4e3a AI \u9605\u8bfb\u673a\u6784\u6e90\u540e\u751f\u6210\uff0c\u4ec5\u4f9b\u7814\u7a76\u53c2\u8003\uff0c\u4e0d\u6784\u6210\u4e2a\u4eba\u6295\u8d44\u5efa\u8bae</div>';
     host.innerHTML = h;
   }
