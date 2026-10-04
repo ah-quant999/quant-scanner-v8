@@ -5413,6 +5413,30 @@ function drawUpDownChart(){
   }
   window.renderLgDnd = renderLgDnd;
   (window.__domReadyFns = window.__domReadyFns || []).push(renderLgDnd);
+  /* 🔴 2026-10-04 一劳永逸修复「防删清单加载中…」永久卡死：本页平行复制了 index.html 的
+     __domReadyFns 收集器（本行 push renderLgDnd）却漏复制消费端（index.html 44~77 的
+     DCL 派发/懒加载重放）⇒ 回调只收集、从不执行，防删 pane 自上线起永卡「加载中…」。
+     本页 defer 数据脚本少，直接补 DCL 派发：DCL 必然在全部 defer 脚本（含
+     data/DO_NOT_DELETE.js）执行完之后触发 ⇒ window.DO_NOT_DELETE_HTML 已就绪；
+     若该 js 404 则 defer 失败不阻塞 DCL ⇒ renderLgDnd 走「尚未加载」兜底，不会卡死。
+     FIRED 幂等守卫 + readyState 兜底，双保险。 */
+  (function(){
+    var FIRED = false;
+    function __lgFireDomReady(){
+      if(FIRED) return; FIRED = true;
+      var fns = window.__domReadyFns || [];
+      var ok = 0, bad = 0;
+      for(var i = 0; i < fns.length; i++){
+        try{ if(typeof fns[i] === 'function'){ fns[i](); ok++; } }catch(e){ bad++; }
+      }
+      try{ console.log('[逻辑详解页 domReady] 派发渲染回调 ' + ok + ' 个' + (bad ? ('，失败 ' + bad + ' 个') : '')); }catch(e){}
+    }
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', __lgFireDomReady);
+    } else {
+      __lgFireDomReady();
+    }
+  })();
 
 
 
