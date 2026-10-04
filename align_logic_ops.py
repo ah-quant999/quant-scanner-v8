@@ -152,8 +152,10 @@ def load_doc():
 
 def main():
     # 2026-10-04 主人令：三件套对齐优先用本地完整版逻辑详解（参数层），公开 logic.html 已下架。
-    # 本地完整版路径多候选探测（坚果云同步盘双机共享 / 环境变量 / 兼容旧路径）；
-    # 不存在（云端 CI 无此文件）则跳过，退化为对齐 index.html 源。
+    # 🔴 2026-10-04 策略（主人选定）：双机各存本机真源，坚果云(同步盘)只做「临时搬运」——
+    #    搬运完成后即删云端副本 ⇒ 候选顺序坚持「本机真源优先」，坚果云候选仅在中转窗口
+    #    内存在时才会命中，非常驻兜底。环境变量 V8_LOGIC_FULL 可显式指定路径；
+    #    都不存在（如云端 CI）则跳过，退化为对齐 index.html 源。
     _lf = os.environ.get("V8_LOGIC_FULL")
     if not _lf:
         for _c in (os.path.join(ROOT, "..", "v8_logic_private", "logic.full.html"),

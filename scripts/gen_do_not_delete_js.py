@@ -209,6 +209,11 @@ def patch_page_v(page_path: str, hash10: str) -> bool:
             html2 = html[:last.end()] + "\n    " + ins + html[last.end():]
         else:
             html2 = html
+    # 🔧 2026-10-04 修复「假更新」误报：原先无论是否真改动都返回 True，
+    #    导致已解耦的 logic.html（无标签、无 data/*.js 锚点）也打印「已更新」。
+    #    现按内容是否变化如实回报，且无变化时不再回写（避免无谓 mtime 变动）。
+    if html2 == html:
+        return False
     with open(page_path, "w", encoding="utf-8") as f:
         f.write(html2)
     return True

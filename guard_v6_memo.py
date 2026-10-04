@@ -1,30 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""⛔【永久禁止删除 PERMANENT DO-NOT-DELETE】v8 部署护栏（二道防线）：确保「逻辑详解页 / v6备忘录」永不丢失 / 被覆盖（2026-08-15 主人二次令：本脚本及 v6_memo.html / v6_memo.golden.html 永久不可删，任何清理/重构/瘦身/AI 操作均不得删除或覆盖）。
+"""⛔【永久禁止删除 PERMANENT DO-NOT-DELETE】v8 部署护栏：确保「v6备忘录 v6_memo.html」永不丢失 / 被覆盖（2026-08-15 主人二次令：本脚本及 v6_memo.html / v6_memo.golden.html 永久不可删，任何清理/重构/瘦身/AI 操作均不得删除或覆盖）。
 
 背景（2026-08-15 主人令）：
   此前多次发生"v6 覆盖 v8"——远端历史被 V6 归档页覆盖、CDN 按完整 URL 缓存了
-  旧/截断副本，导致逻辑详解页的 v6备忘录 看似"没了"。本脚本作为 CI 部署前的硬性
-  闸门 + 自愈器，三重防护：
+  旧/截断副本，导致 v6备忘录 看似"没了"。本脚本作为 CI 部署前的硬性闸门 + 自愈器。
 
-  1) v6_memo.html 必须存在且完整（≥ MIN_BYTES）。若缺失/被截断/被覆盖，
-     依次尝试从 git HEAD、再到提交的黄金备份 v6_memo.golden.html 还原。
-  2) index.html 必须保留 v6备忘录 入口（子tab `data-lg="v6"` + 面板 `id="lg-v6"`
-     + 内联内容标记）。任一缺失即 FAIL 部署，阻断"丢失态"上线。
-  3) 内联内容一致性：lg-v6 面板内必须包含 v6_memo.html 的 body 内容
-     （2026-08-17 最终方案：废除 iframe/fetch，直接内嵌 HTML，零动态依赖）。
+🔴 2026-10-04 主人令（方案B）：
+  v6备忘录 已从 logic.html 彻底迁出 —— 本护栏**不再要求 logic.html 承载任何 v6 入口**
+  （旧版曾校验 logic.html 的 data-lg="v6" 子 tab + id="lg-v6" 面板 + v6 渲染入口，现全部废除）。
+  保护锚点改为 v6_memo.html 本体：
+    1) 存在 + 完整（≥ MIN_BYTES）；缺失/截断 → git HEAD → 黄金备份逐级自愈。
+    2) 内容标识：必须含 v6 正文标记「九宝量化 V6.0」且以 </html> 收尾，
+       防止被替换成占位空页 / 半截文件而"看着还在"。
+  v6_memo.html / v6_memo.golden.html / 本脚本 三者仍为【永久禁止删除】核心资产。
 
 用法：python guard_v6_memo.py
 退出码 0 = 通过（含已自愈），1 = 存在不可自愈的缺失，阻断部署。
-
-⚠️ 2026-08-31 变更：v6备忘录 入口已从 index.html 迁至独立页 logic.html
-   （逻辑详解页拆为独立页，本体 153.6KB 不再进首屏）。本护栏的入口校验
-   相应改为检查 logic.html（data-lg="v6" 子tab + id="lg-v6" 面板 + 真实引用
-   v6_memo.html），并软校验 index.html 仍保留「逻辑详解」tab 指向 logic.html。
-   v6_memo.html 完整性自愈逻辑不变。
 """
 import os
-import re
 import sys
 import hashlib
 import subprocess
@@ -32,8 +26,9 @@ import subprocess
 MEMO = "v6_memo.html"
 GOLDEN = "v6_memo.golden.html"
 INDEX = "index.html"
-LOGIC = "logic.html"  # 2026-08-31 逻辑详解拆为独立页，v6备忘录 入口迁至 logic.html
-MIN_BYTES = 60000  # 当前 ~157KB；阈值取 ~43%，足以捕捉"被删/被清空/被截断"
+LOGIC = "logic.html"  # 2026-10-04 方案B 起已与 v6 解耦，此处仅作信息输出
+MIN_BYTES = 60000     # 当前 ~161KB；阈值取 ~37%，足以捕捉"被删/被清空/被截断"
+MEMO_BODY_MARKER = "九宝量化 V6.0"
 
 
 def git_show(path):
@@ -63,6 +58,7 @@ def restore_memo():
 
 
 def sha10_of(path):
+    """v6_memo.html 的 ?v 口径：原始字节 sha1 前 10 位（与 reconcile_cache_busters 严格一致）。"""
     with open(path, "rb") as f:
         return hashlib.sha1(f.read()).hexdigest()[:10]
 
@@ -83,75 +79,44 @@ def main():
     else:
         print("✅ v6_memo.html 完整（%d 字节）" % os.path.getsize(MEMO))
 
-    # ── 2) v6备忘录 入口现位于 logic.html（2026-08-31 逻辑详解拆为独立页） ──
-    if not os.path.exists(LOGIC):
-        print("❌ logic.html 不存在（v6备忘录 入口页），阻断部署")
-        sys.exit(1)
-
-    h = open(LOGIC, encoding="utf-8").read()
-    # v6备忘录 在 logic.html 中以 iframe 模式渲染（JS 动态赋 src + 直链兜底按钮），
-    # 仍兼容旧 fetch()/内联模式检测，避免未来回退时漏检。
-    has_iframe = 'src="v6_memo.html' in h
-    has_fetch = ('__v6MemoLoad' in h) and ('v6MemoBody' in h)
-    has_inline = ('id="lg-v6"' in h) and ('九宝量化 V6.0' in h)
-    has_jssrc = ('v6MemoFrame' in h) and (re.search(r"""\.src\s*=\s*['"]v6_memo\.html""", h) is not None)
-    has_directlink = re.search(r"""href=['"]v6_memo\.html""", h) is not None
-
-    checks = {
-        "子tab data-lg=\"v6\"": 'data-lg="v6"',
-        "面板 id=\"lg-v6\"": 'id="lg-v6"',
-    }
-    missing = []
-    for k, v in checks.items():
-        if v not in h:
-            missing.append(k)
-    if not (has_iframe or has_fetch or has_inline or has_jssrc or has_directlink):
-        missing.append("v6 渲染入口(iframe / fetch / 内联 / JS动态src / 直链)")
-    if missing:
-        print("❌ logic.html 缺失 v6备忘录 入口：%s —— 阻断部署" % "、".join(missing))
+    # ── 2) v6_memo.html 内容标识（方案B 新锚点：锚定本体，不再看 logic.html） ──
+    with open(MEMO, encoding="utf-8", errors="replace") as f:
+        memo_txt = f.read()
+    if MEMO_BODY_MARKER not in memo_txt:
+        print("❌ v6_memo.html 缺少 v6 正文标记「%s」——疑似被换成占位页，阻断部署"
+              % MEMO_BODY_MARKER)
+        ok = False
+    elif "</html>" not in memo_txt[-512:]:
+        print("❌ v6_memo.html 未以 </html> 收尾——疑似被截断，阻断部署")
         ok = False
     else:
-        if has_inline:
-            mode = "内联(最终方案)"
-        elif has_fetch:
-            mode = "fetch()注入"
-        elif has_iframe:
-            mode = "iframe"
-        elif has_jssrc:
-            mode = "iframe(JS动态src·缓存击穿)"
-        else:
-            mode = "直链兜底(a href)"
-        print("✅ logic.html 保留 v6备忘录 子tab/面板/%s" % mode)
+        print("✅ v6_memo.html 含 v6 正文标记且完整收尾")
 
-    # 软校验：主站 index.html 仍保留「逻辑详解」tab 指向 logic.html（确保 v6备忘录 从主站可达）
-    if os.path.exists(INDEX):
-        hi = open(INDEX, encoding="utf-8").read()
-        if 'logic.html' in hi:
-            print("✅ index.html 保留「逻辑详解」入口 → logic.html（v6备忘录 可达）")
+    # ── 3) 与 logic.html 的解耦状态（信息输出，不阻断部署） ──────────
+    if os.path.exists(LOGIC):
+        h = open(LOGIC, encoding="utf-8", errors="replace").read()
+        if ('data-lg="v6"' in h) or ('id="lg-v6"' in h) or ("v6_memo.html" in h):
+            print("ℹ️ logic.html 仍引用 v6 资产（方案B 已迁出；彻底解耦更佳，不阻断）")
         else:
-            print("⚠️ index.html 未引用 logic.html（软告警，不阻断）：v6备忘录 可能从主站不可达")
+            print("✅ logic.html 已与 v6 备忘录解耦（方案B 生效）")
     else:
-        print("⚠️ index.html 不存在（软告警，不阻断）")
+        print("ℹ️ logic.html 不存在（本护栏不再要求它，跳过）")
 
-    # ── 3) 内联一致性校验（仅内联模式需要） ────────────────────────
-    if has_inline:
-        lg_match = re.search(r'<div class="lg-pane" id="lg-v6">(.*?)</div>\s*</div>\s*<section', h, re.DOTALL)
-        if lg_match:
-            inner = lg_match.group(1)
-            inner_len = len(inner)
-            if inner_len < 1000:
-                print("⚠️ lg-v6 面板内容过短（%d 字节），可能被意外清空" % inner_len)
-                ok = False
-            else:
-                print("✅ v6备忘录内联内容完整（%d 字节）" % inner_len)
+    if os.path.exists(INDEX):
+        with open(INDEX, encoding="utf-8", errors="replace") as f:
+            hi = f.read()
+        if "logic.html" in hi:
+            print("✅ index.html 仍引用 logic.html（逻辑详解入口，页面本体已下架）")
         else:
-            print("⚠️ 无法解析 lg-v6 面板范围，跳过内容长度校验")
+            print("ℹ️ index.html 未引用 logic.html")
+    else:
+        print("ℹ️ index.html 不存在（软提示，不阻断）")
 
     if not ok:
-        print("🚫 护栏失败：v6备忘录 入口缺失，已阻断部署。请先修复 logic.html 再推送。")
+        print("🚫 护栏失败：v6备忘录 本体缺失/损坏，已阻断部署。")
         sys.exit(1)
 
-    print("✅ 防覆盖护栏通过：v6备忘录 完整且入口就位，允许部署。")
+    print("✅ 防覆盖护栏通过：v6备忘录 本体完整（永久禁删资产在位），允许部署。")
     sys.exit(0)
 
 
