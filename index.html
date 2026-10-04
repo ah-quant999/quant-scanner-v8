@@ -14410,10 +14410,12 @@ window.showRestrictedItems = showRestrictedItems;
       });
       return s+'</div>';
     };
+    /* 「本月」=当前真实日期所在月（2026-10-04 主人令：与四量统一，数据滞后时不得把上月当本月全展开） */
+    const _nowM=(()=>{const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');})();
     mkeys.forEach((m,mi)=>{
       const ds=months[m];
       const total=ds.reduce((a,d)=>a+((hist[d]||[]).length||0),0);
-      if(mi===0){
+      if(m===_nowM){
         h+='<div class="tp-hist-date" style="color:var(--up);font-weight:700;">📅 本月 '+m+' · '+ds.length+' 个信号日 · '+total+' 只</div>';
         ds.forEach(d=>{h+=renderDay(d);});
       }else{
@@ -14679,10 +14681,12 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       });
       return s + '</div>';
     };
+    /* 「本月」=当前真实日期所在月（2026-10-04 主人令：数据滞后时不得把上月当本月全展开） */
+    var _nowM=(function(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');})();
     mkeys.forEach(function(m,mi){
       var ds = months[m];
       var total = ds.reduce(function(a,d){ return a + (((hist[d]||[]).length)||0); }, 0);
-      if(mi===0){
+      if(m===_nowM){
         h += '<div class="tp-hist-date" style="color:var(--up);font-weight:700;">📅 本月 '+m+' · '+ds.length+' 个信号日 · '+total+' 只</div>';
         ds.forEach(function(d){ h += renderDay(d); });
       }else{
