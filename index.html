@@ -4857,7 +4857,43 @@ function fmtSigned(v){
         var mStocks = []; mDays.forEach(function(d){ mStocks = mStocks.concat(_safe(d.stocks)); });
         var mJy = mStocks.filter(function(s){ return (s.category||'')==='机游共振'; }).length;
         var mNet = 0; mStocks.forEach(function(s){ mNet += _net3(s); });
-        h += '<div style="margin-top:20px;font-size:14px;font-weight:700;color:var(--txt);border-left:3px solid var(--purple);padding-left:8px">📅 '+mY+'年'+(mM+1)+'月 <span style="font-size:11px;font-weight:400;color:var(--dim);margin-left:6px">'+mDays.length+' 个交易日</span> <span style="font-size:11px;color:#a78bfa;margin-left:6px">★共振 '+mJy+'</span> <span class="'+(mNet>=0?'c-up':'c-down')+'" style="font-size:12px;margin-left:6px">三通道净流入 '+_rcFmtYi(mNet)+'</span></div>';
+        /* 月历卡片（仿 TAB1 机游共振日历 · 静态历史月，无翻月/无点击） */
+        h += '<div class="cal-header-row" style="margin-top:22px">'
+          + '<span class="cal-title">📅 '+mY+'年'+(mM+1)+'月 <span style="font-size:11px;font-weight:400;color:var(--dim);margin-left:6px">'+mDays.length+' 个交易日</span> <span style="font-size:11px;color:#a78bfa;margin-left:6px">★共振 '+mJy+'</span> <span class="'+(mNet>=0?'c-up':'c-down')+'" style="font-size:12px;margin-left:6px">三通道净流入 '+_rcFmtYi(mNet)+'</span></span>'
+          + '</div>';
+        h += '<div class="cal-head">'
+          + ['一','二','三','四','五','六','日'].map(function(dw,i){ return '<span'+(i>=5?' class="weekend"':'')+'>'+dw+'</span>'; }).join('')
+          + '</div>';
+        h += '<div class="cal-grid">'
+        var _dayMap = {}; mDays.forEach(function(d){ _dayMap[String(d.iso).replace(/-/g,'')] = d; });
+        var _fd = new Date(mY, mM, 1).getDay(); var _off = _fd === 0 ? 6 : _fd - 1;
+        var _dim = new Date(mY, mM+1, 0).getDate();
+        for(var _e=0; _e<_off; _e++) h += '<div class="cal-cell empty"></div>';
+        for(var _d=1; _d<=_dim; _d++){
+          var _iso = String(mY)+String(mM+1).padStart(2,'0')+String(_d).padStart(2,'0');
+          var _has = !!_dayMap[_iso];
+          var _cc = 'cal-cell' + (_has ? ' has-data' : '');
+          h += '<div class="'+_cc+'">';
+          h += '<span class="cal-date-num"><span>'+_d+'</span><span class="dow">周'+['日','一','二','三','四','五','六'][new Date(mY,mM,_d).getDay()]+'</span></span>';
+          if(_has){
+            var _ds = _dayMap[_iso].stocks||[];
+            var _jy = _ds.filter(function(s){ return (s.category||'')==='机游共振'; }).length;
+            var _n = 0; _ds.forEach(function(s){ _n += _net3(s); });
+            var _nc = _n>=0 ? 'c-up' : 'c-down';
+            h += '<div class="cal-net '+_nc+'">净流入 <b style="font-size:14px">'+( _n>=0?'+':'')+(_n/10000).toFixed(2)+'</b><span style="font-size:10px;opacity:.7">亿</span></div>';
+            h += (_jy>0)
+              ? '<div class="cal-sub"><span style="color:#a78bfa;font-weight:700">★</span> 共振 <b style="color:#a78bfa">'+_jy+'</b></div>'
+              : '<div class="cal-sub"><span style="color:#a78bfa;font-weight:700">★</span> 共振 <b style="color:var(--dim)">0</b></div>';
+          } else {
+            var _dw = new Date(mY,mM,_d).getDay();
+            if(_dw===0 || _dw===6) h += '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);opacity:.4;font-size:11px">休市</div>';
+            else h += '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);opacity:.25;font-size:11px">--</div>';
+          }
+          h += '</div>';
+        }
+        var _tot = _off + _dim; var _r = _tot % 7;
+        if(_r>0) for(var _e2=0; _e2<7-_r; _e2++) h += '<div class="cal-cell empty"></div>';
+        h += '</div>';
         /* 按周分组（周一次序，与机游共振日历同法） */
         var wkMap = {}, wkOrder = [];
         mDays.forEach(function(d){
