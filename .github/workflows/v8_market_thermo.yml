@@ -3,8 +3,8 @@
 # 2026-10-05 阿狸咪的工程师 建（主人令：未来预测子TAB · 牛转熊指标观测台 · 每日更新）。
 # 2026-10-05 补（主人令："每日自动审计不能只是说说，要落实到位"）：
 #   推送前强制跑 v8/audit_market_thermo.py 审计门禁（结构层+akshare真值交叉核验），
-#   审计 exit!=0 → 推送步骤不执行 → Actions 红灯可见。硬闸，非日志说说。
-# 单一职责：跑 v8/gen_market_thermo.py → data/MARKET_THERMO.js → 审计门禁 → api_push_raw 入仓。
+#   审计 exit!=0 -> 推送步骤不执行 -> Actions 红灯可见。硬闸，非日志说说。
+# 单一职责：跑 v8/gen_market_thermo.py -> data/MARKET_THERMO.js -> 审计门禁 -> api_push_raw 入仓。
 # 数据链路：sw_index_daily_cache(等权/PE分位) + gtimg(上证月K/成交量/实时点位)
 #           + akshare(社融脉冲/PMI) + raw_data 缓存(融资/国债/沪深300PE)。
 # 健壮性：单源失败自动回退上一版同字段；D 骨架重建失败则不写盘退出（宁旧勿错）。
@@ -65,14 +65,14 @@ jobs:
             }
           }
 
-      - name: "🐍 Python / akshare 环境检查"
+      - name: "🐍 Python / deps 环境检查"
         shell: powershell
         run: |
           python --version
-          python -c "import akshare, pandas, requests" 2>$null
+          python -c "import pandas, requests" 2>$null
           if ($LASTEXITCODE -ne 0) {
             Write-Host "deps missing, installing from tsinghua mirror..."
-            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas requests
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pandas requests
           } else { Write-Host "deps ready" }
 
       - name: "📦 同步 raw_data 缓存依赖（gen 输入·仅5文件·Git Data API·sha校验·tries=6）"
@@ -93,7 +93,7 @@ jobs:
           if (Test-Path 'data/MARKET_THERMO.js') {
             Write-Host "[ok] data/MARKET_THERMO.js refreshed"
           } else {
-            Write-Host "[warn] MARKET_THERMO.js missing（D 重建失败，宁旧勿错）"
+            Write-Host "[warn] MARKET_THERMO.js missing (D rebuild failed; keep old to avoid error)"
           }
 
       - name: "🔍 审计门禁（结构层+akshare真值交叉核验 · 硬闸）"
@@ -103,15 +103,17 @@ jobs:
         run: |
           cd $env:GITHUB_WORKSPACE
           if (-not (Test-Path 'data/MARKET_THERMO.js')) {
-            Write-Host "[GATE-FAIL] gen 成功但产物缺失 -> 异常，红灯阻断" -ForegroundColor Red
+            Write-Host "[GATE-FAIL] gen ok but product missing -> abnormal, red block" -ForegroundColor Red
             exit 2
           }
-          python v8/audit_market_thermo.py
+          $venvPy = "$env:USERPROFILE\.workbuddy\binaries\python\envs\default\Scripts\python.exe"
+          $audPy = if (Test-Path $venvPy) { $venvPy } else { 'python' }
+          & $audPy v8/audit_market_thermo.py
           if ($LASTEXITCODE -ne 0) {
-            Write-Host "[GATE-FAIL] 审计门禁未通过(exit=$LASTEXITCODE) -> 阻断推送" -ForegroundColor Red
+            Write-Host "[GATE-FAIL] audit gate failed(exit=$LASTEXITCODE) -> block push" -ForegroundColor Red
             exit $LASTEXITCODE
           }
-          Write-Host "[GATE-PASS] 审计全绿 -> 放行推送"
+          Write-Host "[GATE-PASS] audit all green -> allow push"
 
       - name: "📤 推送到仓库（api_push_raw · PUSH_FILES）"
         id: push
@@ -125,10 +127,10 @@ jobs:
           if ((Test-Path 'data/MARKET_THERMO.js') -and ((Get-Item 'data/MARKET_THERMO.js').Length -gt 3000)) {
             python api_push_raw.py
           } else {
-            Write-Host "[skip] 产物缺失或过小，不推送（防线：防空白覆盖）"
+            Write-Host "[skip] product missing or too small, not pushing (guard: prevent blank overwrite)"
           }
 
-      - name: "🚨 结果闸门（gen失败/审计skip/推送skip → 红灯，禁绿灯假象）"
+      - name: "🚨 结果闸门（gen失败/审计skip/推送skip -> 红灯，禁绿灯假象）"
         if: always()
         shell: powershell
         run: |
@@ -137,15 +139,15 @@ jobs:
           $push = '${{ steps.push.outcome }}'
           Write-Host "gen=$gen audit=$aud push=$push"
           if ($gen -ne 'success') {
-            Write-Host "[GATE] gen 未成功($gen) -> 红灯（宁可报警可见，不可静默旧数据）" -ForegroundColor Red
+            Write-Host "[GATE] gen not success($gen) -> RED (prefer visible alarm over silent stale data)" -ForegroundColor Red
             exit 1
           }
           if ($aud -ne 'success') {
-            Write-Host "[GATE] 审计未通过或未执行($aud) -> 红灯" -ForegroundColor Red
+            Write-Host "[GATE] audit failed or skipped($aud) -> RED" -ForegroundColor Red
             exit 1
           }
           if ($push -ne 'success') {
-            Write-Host "[GATE] 推送未执行($push) -> 红灯" -ForegroundColor Red
+            Write-Host "[GATE] push not executed($push) -> RED" -ForegroundColor Red
             exit 1
           }
-          Write-Host "[GATE] gen+审计+推送 全链正常 [OK]" -ForegroundColor Green
+          Write-Host "[GATE] gen+audit+push full chain OK [OK]" -ForegroundColor Green
