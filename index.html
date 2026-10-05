@@ -9202,7 +9202,7 @@ function switchSec(sec,el){
         _slSelfInjected = true;
         try{
           var _sc = document.createElement('script');
-          _sc.src = 'data/STOCK_LIST.js?v=7dfe36c2f0'; _sc.async = true;
+          _sc.src = (_v8ResUrl('STOCK_LIST') || 'data/STOCK_LIST.js?v=7dfe36c2f0'); _sc.async = true;
           document.head.appendChild(_sc);
         }catch(e){}
       }
@@ -15892,7 +15892,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=72f35c91ff';
+      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=72f35c91ff');
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -15901,7 +15901,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=0b372669ce';
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=0b372669ce');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -19365,6 +19365,23 @@ window.__renderV8CalToday();
            ② 单源超时 25s、源间自动轮换、最多 3 轮（退避 0.5/1/1.5s）；
            ③ 全源全轮皆败 ⇒ 用 LHB_DATA（当日 25KB）降级渲染 + 明确提示（绝不静默空白）。 */
   var A2_CDN='https://fastly.jsdelivr.net/gh/ah-quant999/quant-scanner-v8@main/data/';
+  /* 🔴 一劳永逸：数据模块资源 URL 解析器（单一真源）
+     兜底自注入（个股查询 STOCK_LIST / 强势突破 动量）曾硬编码 ?v 版本，
+     每次 deploy 刷新哈希须两处手动同步，失步即加载错版本。
+     现统一从此解析：① 优先 BIG 懒加载清单 ② 否则扫文档已有 <script src> 标签。
+     调用方各自保留最后已知版本常量作兜底，仅当规范出处意外缺失时使用。 */
+  function _v8ResUrl(name){
+    try{
+      var i, arr = window.BIG || [];
+      for(i=0;i<arr.length;i++){ if(arr[i] && arr[i].name===name && arr[i].url) return arr[i].url; }
+      var tags = document.getElementsByTagName('script');
+      for(i=0;i<tags.length;i++){
+        var _s = tags[i].getAttribute('src')||'';
+        if(_s.indexOf('data/'+name+'.js')>-1 && _s.indexOf('?v=')>-1) return _s;
+      }
+    }catch(e){}
+    return null;
+  }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=7dfe36c2f0', fallbacks:[A2_CDN+'STOCK_LIST.js']},
     {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=90ef481b70', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
