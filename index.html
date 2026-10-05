@@ -2022,7 +2022,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <ul style="margin:0;padding:0;font-size:12.5px;line-height:1.9;color:var(--txt);list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;">
           <li>⚡ <b>操作信号（置顶）</b>：6 维综合买卖判断 → 🟢偏多机会 / 🔴建议减仓 / ⏸中性观望</li>
           <li>📊 <b>实时行情</b>：现价、涨跌幅、成交量/额、今开/昨收/最高/最低</li>
-          <li>📐 <b>环境摘要（仅持仓时显示）</b>：持仓成本（实时行情卡内）</li>
+          <li>🧮 <b>算法现场评分</b>：策略命中(三重共识/金股池/候选池/逆势龙头/四量终极) + 0-100 综合分</li>
           <li>🎯 <b>止盈止损</b>：止损位、目标位、盈亏比、操作建议</li>
           <li>🏷 <b>概念行业概览</b>：板块、行业、题材概念标签（含 💧 关联板块资金流向，按净额排序取前 8）</li>
           <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、逆势龙头、四量终极</li>
@@ -9481,7 +9481,9 @@ function switchSec(sec,el){
         (!divCheck.ok?'<div style="font-size:10px;color:var(--down);margin-top:4px;">⚠️ '+divCheck.reason+'，请交叉核对东财/交易所公告</div>':'')+
       '</div>';
     }
-    h+='<div style="margin-top:8px;font-size:10px;color:var(--dim);">快照 '+q.snapshot_time+' · 行情源 akshare 新浪 · 分红源 东财 stock_fhps_em · 财务画像源 算法链 baostock</div>';
+    var _qDate = (SQ.update_time||'').split(' ')[0] || '';
+    var _snap = q.snapshot_time ? (_qDate ? (_qDate+' '+q.snapshot_time) : q.snapshot_time) : '—';
+    h+='<div style="margin-top:8px;font-size:10px;color:var(--dim);">快照 '+_snap+' · 行情源 akshare 新浪 · 分红源 东财 stock_fhps_em · 财务画像源 算法链 baostock</div>';
     // 🔴 2026-08-12 主人紧急修复：删除「平均股价/持仓/弱MA摘要行」
     //   主人：「平均股价放个股查询里干嘛？！」
     //   根因：这是 AVG_PRICE_DATA 全市场等权均价，与具体股票无关
@@ -9635,81 +9637,6 @@ function switchSec(sec,el){
     //   之前误放在 renderTradeSignals（单只）里，导致查询 002739 时显示全市场 16 只候选
     //   修复：单只查询只显示该股的操作信号；全市场主线板块改放「最终推荐」候选池底部
     return h;
-  }
-
-  /* ===== 主线板块 & 推荐个股：把「加仓主线」落地为具体板块名+代码 ===== */
-  function _renderMainlinePicks(score){
-    try {
-      var fr = window.FINAL_RECOMMEND_DATA || {};
-      var sff = (window.SECTOR_FUND_FLOW || {});
-
-      // --- 收集主线板块 ---
-      var sectors = [];
-      var ss = (fr.strong_sectors || []);
-      for(var si=0;si<Math.min(ss.length,8);si++) sectors.push(ss[si]);
-
-      // 资金流入 TOP 补充（去重）
-      var sfi = (sff.sectors_in || []).slice(0,10);
-      if(sfi.length>0 && sfi[0] && typeof sfi[0]==='object' && sfi[0].name){
-        for(var i=0;i<sfi.length;i++){
-          if(sectors.indexOf(sfi[i].name)===-1) sectors.push(sfi[i].name);
-        }
-      } else if(typeof sfi[0]==='string'){
-        for(var i=0;i<sfi.length;i++){
-          if(sectors.indexOf(sfi[i])===-1) sectors.push(sfi[i]);
-        }
-      }
-
-      // --- 收集推荐个股 ---
-      var stocks = [];
-      var fs = window._safeArr(fr.stocks);
-      for(var i=0;i<fs.length;i++){
-        var st=fs[i]; if(!st) continue;
-        stocks.push({code:st.code||'?',name:st.name||'?',score:st.final_score||0,
-          src:(st.sources||[]).join('+'),stop:st.stop_loss,target:st.target_price});
-      }
-      // COCKPIT_ADVICE 已下线（2026-09-03）：watch 补充整段删除
-
-      if(sectors.length===0 && stocks.length===0) return '';
-
-      var h='<div style="margin-top:10px;border-top:1px solid rgba(251,191,36,.15);padding-top:10px;">';
-
-      if(sectors.length>0){
-        h+='<div style="margin-bottom:8px;"><span style="font-size:11px;font-weight:600;color:var(--cyan);">📊 主线板块</span>';
-        h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">';
-        for(var i=0;i<Math.min(sectors.length,10);i++){
-          h+='<span style="font-size:11px;padding:2px 7px;background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.20);border-radius:10px;color:var(--sub);white-space:nowrap;">'+sectors[i]+'</span>';
-        }
-        if(sectors.length>10) h+='<span style="font-size:10px;color:var(--dim);">+'+(sectors.length-10)+'</span>';
-        h+='</div></div>';
-      }
-
-      if(stocks.length>0){
-        h+='<div><span style="font-size:11px;font-weight:600;color:var(--gold);">🎯 推荐关注</span>';
-        h+='<div style="display:flex;flex-direction:column;gap:3px;margin-top:4px;">';
-        var showN=Math.min(stocks.length,8);
-        for(var i=0;i<showN;i++){
-          var stk=stocks[i];
-          var tc='rgba(251,191,36,.12)',bc='rgba(251,191,36,.22)';
-          if(stk.score>=6){tc='rgba(94,224,160,.12)';bc='rgba(94,224,160,.25)';}
-          else if(stk.src&&stk.src.indexOf('A档')>=0){tc='rgba(56,189,248,.12)';bc='rgba(56,189,248,.25)';}
-          h+='<div style="display:flex;align-items:center;gap:6px;font-size:11px;padding:3px 7px;background:'+tc+';border:1px solid '+bc+';border-radius:5px;">';
-          h+='<b style="color:var(--txt);min-width:48px;">'+stk.code+'</b>';
-          h+='<span style="color:var(--sub);flex:1;">'+stk.name+'</span>';
-          if(stk.stop!=null) h+='<span style="color:var(--down);font-size:10px;white-space:nowrap;">损¥'+stk.stop.toFixed(2)+'</span>';
-          if(stk.target!=null) h+='<span style="color:var(--up);font-size:10px;white-space:nowrap;">目¥'+stk.target.toFixed(2)+'</span>';
-          if(stk.ret3d!=null) h+='<span style="color:'+(stk.ret3d>=0?'var(--up)':'var(--down)')+';font-size:10px;white-space:nowrap;">3日'+(stk.ret3d>=0?'+':'')+stk.ret3d.toFixed(1)+'%</span>';
-          h+='<span style="color:var(--dim);font-size:9px;white-space:nowrap;margin-left:auto;">'+(stk.src||'')+'</span>';
-          h+='</div>';
-        }
-        if(stocks.length>showN) h+='<div style="font-size:10px;color:var(--dim);text-align:center;">...共 '+stocks.length+' 只候选</div>';
-        h+='</div></div>';
-      }
-      h+='</div>';
-      return h;
-    } catch(e){
-      return '';
-    }
   }
 
   /* ===== 止盈止损/目标位（方案二：止损三口径取最严，止盈三口径 cascade R:R>=1.5） ===== */
