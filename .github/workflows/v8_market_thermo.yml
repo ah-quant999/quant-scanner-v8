@@ -1,7 +1,10 @@
 # 九宝量化 v8.0 — 🔮「未来预测」子TAB数据 fetcher 调度（cn runner）
 #
 # 2026-10-05 阿狸咪的工程师 建（主人令：未来预测子TAB · 牛转熊指标观测台 · 每日更新）。
-# 单一职责：跑 v8/gen_market_thermo.py → data/MARKET_THERMO.js → api_push_raw 入仓。
+# 2026-10-05 补（主人令："每日自动审计不能只是说说，要落实到位"）：
+#   推送前强制跑 v8/audit_market_thermo.py 审计门禁（结构层+akshare真值交叉核验），
+#   审计 exit!=0 → 推送步骤不执行 → Actions 红灯可见。硬闸，非日志说说。
+# 单一职责：跑 v8/gen_market_thermo.py → data/MARKET_THERMO.js → 审计门禁 → api_push_raw 入仓。
 # 数据链路：sw_index_daily_cache(等权/PE分位) + gtimg(上证月K/成交量/实时点位)
 #           + akshare(社融脉冲/PMI) + raw_data 缓存(融资/国债/沪深300PE)。
 # 健壮性：单源失败自动回退上一版同字段；D 骨架重建失败则不写盘退出（宁旧勿错）。
@@ -40,21 +43,26 @@ jobs:
           GH_PAT: ${{ secrets.V8_GH_TOKEN }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $TARGET = 'v8/gen_market_thermo.py'
-          $URL = "https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/$($TARGET -replace '/','%2F')?ref=main"
+          $TARGETS = @('v8/gen_market_thermo.py', 'v8/audit_market_thermo.py')
           $headers = @{
             'User-Agent' = 'v8-market-thermo'
             'Accept'     = 'application/vnd.github.raw'
             'Authorization' = "Bearer $env:GH_PAT"
           }
           New-Item -ItemType Directory -Force -Path v8 | Out-Null
-          try {
-            $r = Invoke-RestMethod -Uri $URL -Headers $headers -TimeoutSec 60 -Method Get
-            [System.IO.File]::WriteAllText("v8/_gen_thermo.py.tmp", $r, [System.Text.Encoding]::UTF8)
-            Move-Item -Force "v8/_gen_thermo.py.tmp" "v8/gen_market_thermo.py"
-            Write-Host "fetched $TARGET from origin/main"
-          } catch {
-            Write-Host "[warn] API fetch failed: $_ ; using local copy" -ForegroundColor Yellow
+          foreach ($TARGET in $TARGETS) {
+            $URL = "https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/$($TARGET -replace '/','%2F')?ref=main"
+            $local = $TARGET -replace '^v8/', 'v8/_'
+            $local = $local -replace '\.py$', '.py.tmp'
+            try {
+              $r = Invoke-RestMethod -Uri $URL -Headers $headers -TimeoutSec 60 -Method Get
+              [System.IO.File]::WriteAllText($local, $r, [System.Text.Encoding]::UTF8)
+              $dest = if ($TARGET -eq 'v8/gen_market_thermo.py') { 'v8/gen_market_thermo.py' } else { 'v8/audit_market_thermo.py' }
+              Move-Item -Force $local $dest
+              Write-Host "fetched $TARGET from origin/main"
+            } catch {
+              Write-Host "[warn] API fetch failed for ${TARGET}: $_ ; using local copy" -ForegroundColor Yellow
+            }
           }
 
       - name: "🐍 Python / akshare 环境检查"
@@ -82,8 +90,25 @@ jobs:
             Write-Host "[warn] MARKET_THERMO.js missing（D 重建失败，宁旧勿错）"
           }
 
+      - name: "🔍 审计门禁（结构层+akshare真值交叉核验 · 硬闸）"
+        id: audit
+        if: steps.gen.outcome == 'success' && (hashFiles('data/MARKET_THERMO.js') != '')
+        shell: powershell
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          if (-not (Test-Path 'data/MARKET_THERMO.js')) {
+            Write-Host "[skip] 产物缺失，审计不适用"
+            exit 0
+          }
+          python v8/audit_market_thermo.py
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "[GATE-FAIL] 审计门禁未通过(exit=$LASTEXITCODE) → 阻断推送" -ForegroundColor Red
+            exit $LASTEXITCODE
+          }
+          Write-Host "[GATE-PASS] 审计全绿 → 放行推送"
+
       - name: "📤 推送到仓库（api_push_raw · PUSH_FILES）"
-        if: steps.gen.outcome == 'success'
+        if: steps.gen.outcome == 'success' && steps.audit.outcome == 'success'
         shell: powershell
         env:
           PUSH_FILES: "data/MARKET_THERMO.js"

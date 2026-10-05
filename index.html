@@ -18240,14 +18240,7 @@ h+=`</div>`;
     // ── 统一卡头（2026-10-05 主人令：新卡顶部加卡片名+更新于，全站统一 v8CardHeader）──
     var html=window.v8CardHeader('&#x1F52E;','未来预测','val10温度 + EDHEC牛熊状态机 + 9项牛转熊先行指标 + 2027情景推演','update_time',Object.assign({},T,{update_time:T.generated,slot:'盘后',horizon:'中长线'}));
     html+='<div style="padding:14px;">';
-    // ── KPI 行（2026-10-05 主人令：去掉「上证/沪深300」胶囊 → 5格宽度平分；该数据移至一句话结论下方）──
-    html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">'
-      +kpi('10年PE分位',(c.val10!=null?c.val10:'—'),'>80 贵 / <50 便宜')
-      +kpi('距牛市峰值回撤',edhecDD.toFixed(1)+'%','EDHEC·'+(bst==='bear'?'熊市段':'牛市上行'))
-      +kpi('沪深300 PE',(EXT.hs300pe&&EXT.hs300pe.pe!=null?EXT.hs300pe.pe:'—'),(EXT.hs300pe?('5年分位 '+EXT.hs300pe.pct5y+'%'):''))
-      +kpi('社融脉冲',(EXT.tsf?EXT.tsf.yoy+'%':'—'),(EXT.tsf?('12M新增同比·'+EXT.tsf.month):''))
-      +kpi('PMI',(EXT.pmi?EXT.pmi.v:'—'),(EXT.pmi?EXT.pmi.date.slice(0,7):''));
-    html+='</div>';
+    // ── KPI 行已移至「上证/沪深300 点位条」之后（2026-10-05 二次令）──
     // ── 分析方法（核心/用法/限制）──
     html+='<div style="background:rgba(192,132,252,.07);border:1px solid rgba(192,132,252,.28);border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.75;font-size:12px;color:var(--txt);">'
       +'<b style="color:'+C_PUR+';">&#x1F4CC; 核心：</b>本页用「市场温度(val10) + EDHEC牛熊状态机 + 9项牛转熊先行指标」三维研判A股所处周期位置，并给出2027年度多情景推演；全部数据来自 v8 日更管线(window.MARKET_THERMO)，零未来函数。<br>'
@@ -18256,12 +18249,19 @@ h+=`</div>`;
       +'</div>';
     // ── 一句话结论（2026-10-05 主人令：从情景表下方移至「核心/用法/限制」下方）──
     html+='<div style="background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.42);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.85;color:'+C_TXT+';"><b style="color:'+C_AMB+';">&#x1F4A1; 一句话结论：</b>当前处于「牛市中段、估值中性偏低、信用收缩初现」的脆弱平衡——估值与情绪不贵（地量+低估值分位+股债性价比高），但社融脉冲已转负、杠杆温和退潮是历史上每轮转熊的宏观先兆；宜保持中性仓位、重结构、控回撤，重点盯两个红灯触发条件：val10 冲上 80 或 脉冲 ≤ −10%。</div>';
-    // ── 上证/沪深300 实时点位（2026-10-05 主人令：从KPI行胶囊移至一句话结论下方）──
+    // ── 上证/沪深300 实时点位（2026-10-05 主人令：从KPI行胶囊移至一句话结论下方；更新时间已由统一卡头承载，此处删除）──
     html+='<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--dim);">'
       +'<span>&#x1F4CD; 上证 / 沪深300：</span>'
       +'<b style="font-size:15px;color:'+C_TXT+';">'+(SPOT.sh||'—')+' / '+(SPOT.hs300||'—')+'</b>'
-      +(T.generated?('<span>更新于 '+T.generated.slice(0,10)+'</span>'):'')
       +'</div>';
+    // ── KPI 行（2026-10-05 二次令：整体移到「一句话结论+上证/沪深300」块下方，5格宽度平分）──
+    html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;margin-bottom:14px;">'
+      +kpi('10年PE分位',(c.val10!=null?c.val10:'—'),'>80 贵 / <50 便宜')
+      +kpi('距牛市峰值回撤',edhecDD.toFixed(1)+'%','EDHEC·'+(bst==='bear'?'熊市段':'牛市上行'))
+      +kpi('沪深300 PE',(EXT.hs300pe&&EXT.hs300pe.pe!=null?EXT.hs300pe.pe:'—'),(EXT.hs300pe?('5年分位 '+EXT.hs300pe.pct5y+'%'):''))
+      +kpi('社融脉冲',(EXT.tsf?EXT.tsf.yoy+'%':'—'),(EXT.tsf?('12M新增同比·'+EXT.tsf.month):''))
+      +kpi('PMI',(EXT.pmi?EXT.pmi.v:'—'),(EXT.pmi?EXT.pmi.date.slice(0,7):''));
+    html+='</div>';
     // ── 观测台表格 ──
     var lvlTag={green:'&#x1F7E2; 正常',yellow:'&#x1F7E1; 警惕',red:'&#x1F534; 警示',muted:'&#x26AA; 待接入'};
     var lvlCol={green:C_GRN,yellow:C_AMB,red:C_RED,muted:C_DIM};
