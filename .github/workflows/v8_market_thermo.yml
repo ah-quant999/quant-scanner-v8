@@ -41,6 +41,7 @@ jobs:
         shell: powershell
         env:
           GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           $ErrorActionPreference = 'Stop'
           $TARGETS = @('v8/gen_market_thermo.py', 'v8/audit_market_thermo.py', 'v8/fetch_raw_data_thermo.py')
@@ -79,6 +80,7 @@ jobs:
         shell: powershell
         env:
           GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           python v8/fetch_raw_data_thermo.py
 
@@ -122,6 +124,7 @@ jobs:
         env:
           PUSH_FILES: "data/MARKET_THERMO.js"
           GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           cd $env:GITHUB_WORKSPACE
           if ((Test-Path 'data/MARKET_THERMO.js') -and ((Get-Item 'data/MARKET_THERMO.js').Length -gt 3000)) {
