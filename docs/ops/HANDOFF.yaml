@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-06 07:15"
+  updated: "2026-10-06 07:36"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -7915,4 +7915,18 @@ items:
     refs:
       - "index.html"
     updated: "2026-10-06 07:15"
+    updated_by: 阿狸咪的工程师
+  - id: strategy-page-deadcode-cleanup-1006
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: done
+    what: >
+      选股策略页审计发现 3 项疑点，已一劳永逸修复并上线 main：①[中危]全站死功能 __renderLifecycleSection 函数体（目标 #lifeBody 全站无 DOM 定义，仅余 L7052 一处活触发且 if(!dst) return 静默空转，switchSt 调度已于 2026-09-19 删）→ 整段删除（原 L6006-L6301）+ 删 L7052 活调用 + 孤儿头部注释；②[低]不可达 fa 分支（switchSt if(n==='fa') 与 __stRetryTab 中 fa 映射项，DOM 无 data-st=fa 按钮、switchSt('fa') 早删）→ 删除；③保留 __v8NormCode/__gaoshouSet 等活函数（高手共振在用）。
+    fix: >
+      经 Git Data API（contents PUT，force:false）推 main：commit 829401e285b8e4a0074e4201edaea9ddff300830。质量门：29 内联/102 外链 new Function 0 错；产物 0 CR 纯 LF；blob sha e1a627dfb55f5c8d47d90f8e4bf8fdaa4e0baa96 本地与 GitHub 回算一致（字节级自证）；同步更新 L14901 待办注释标注已删净、L5533 注释去生命周期引用。
+    verify_how: >
+      远端 main tip=829401e285b8e4a0074e4201edaea9ddff300830 已含修复；GitHub Pages 自动部署；语法门 0 错；字节级 sha 自证通过；断言 __renderLifecycleSection 函数定义/L7052 调用/fa 分支/fa 映射项全部消失、活函数 __v8NormCode/__renderImaStrongStock 仍在。
+    refs:
+      - "index.html"
+    updated: "2026-10-06 07:36"
     updated_by: 阿狸咪的工程师
