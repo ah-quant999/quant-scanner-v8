@@ -74,6 +74,11 @@ MUST_HAVE_CRON = {
     #   产物 data/DAJIJIN_REDUCTION.js，供「🔒 暂未上架」页卡片读取（只减不增＝利空前瞻信号）。
     #   跑小九 cn（[self-hosted, cn]，东财域境外不可达）；已挂 logic.html 补充表。
     "v8_dajijin_fetch": "大基金增减持监控(工作日20:30)",
+    # 2026-10-05 阿狸咪的工程师补登记（门禁 [4/8] 拦截补漏）：未来预测子TAB数据链
+    #   （v8/gen_market_thermo.py，交易日 16:10 CST 盘后，[self-hosted, cn]）——
+    #   10-05 建链时漏双登记，Pre-deploy audit [4/8] 连续红灯阻断 deploy；
+    #   已同步在运维页卡片调度表（index.html#sec-op）挂文档行。
+    "v8_market_thermo": "未来预测数据fetcher(交易日16:10)",
     # 🔴 2026-09-23 当日撤销登记并删除文件（小九；主人拍板「删」）。
     #   原意：自托管 runner 掉线时 job 级 timeout 失效 ⇒ run 永生占槽 ⇒ 后续抓取全 pending。
     #   删因（两处设计级缺陷，均已实测）：
