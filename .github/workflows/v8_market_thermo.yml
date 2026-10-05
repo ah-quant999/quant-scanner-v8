@@ -103,15 +103,15 @@ jobs:
         run: |
           cd $env:GITHUB_WORKSPACE
           if (-not (Test-Path 'data/MARKET_THERMO.js')) {
-            Write-Host "[GATE-FAIL] gen 成功但产物缺失 → 异常，红灯阻断" -ForegroundColor Red
+            Write-Host "[GATE-FAIL] gen 成功但产物缺失 -> 异常，红灯阻断" -ForegroundColor Red
             exit 2
           }
           python v8/audit_market_thermo.py
           if ($LASTEXITCODE -ne 0) {
-            Write-Host "[GATE-FAIL] 审计门禁未通过(exit=$LASTEXITCODE) → 阻断推送" -ForegroundColor Red
+            Write-Host "[GATE-FAIL] 审计门禁未通过(exit=$LASTEXITCODE) -> 阻断推送" -ForegroundColor Red
             exit $LASTEXITCODE
           }
-          Write-Host "[GATE-PASS] 审计全绿 → 放行推送"
+          Write-Host "[GATE-PASS] 审计全绿 -> 放行推送"
 
       - name: "📤 推送到仓库（api_push_raw · PUSH_FILES）"
         id: push
@@ -137,15 +137,15 @@ jobs:
           $push = '${{ steps.push.outcome }}'
           Write-Host "gen=$gen audit=$aud push=$push"
           if ($gen -ne 'success') {
-            Write-Host "[GATE] gen 未成功($gen) → 红灯（宁可报警可见，不可静默旧数据）" -ForegroundColor Red
+            Write-Host "[GATE] gen 未成功($gen) -> 红灯（宁可报警可见，不可静默旧数据）" -ForegroundColor Red
             exit 1
           }
           if ($aud -ne 'success') {
-            Write-Host "[GATE] 审计未通过或未执行($aud) → 红灯" -ForegroundColor Red
+            Write-Host "[GATE] 审计未通过或未执行($aud) -> 红灯" -ForegroundColor Red
             exit 1
           }
           if ($push -ne 'success') {
-            Write-Host "[GATE] 推送未执行($push) → 红灯" -ForegroundColor Red
+            Write-Host "[GATE] 推送未执行($push) -> 红灯" -ForegroundColor Red
             exit 1
           }
-          Write-Host "[GATE] gen+审计+推送 全链正常 ✓" -ForegroundColor Green
+          Write-Host "[GATE] gen+审计+推送 全链正常 [OK]" -ForegroundColor Green
