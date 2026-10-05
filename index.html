@@ -18237,19 +18237,30 @@ h+=`</div>`;
       +'<div style="font-size:11px;color:var(--dim);">'+lab+'</div>'
       +'<div style="font-size:20px;font-weight:800;color:'+C_TXT+';margin-top:3px;">'+val+'</div>'
       +'<div style="font-size:10.5px;color:var(--dim);margin-top:2px;">'+hint+'</div></div>'; }
-    var html='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">'
+    // ── 统一卡头（2026-10-05 主人令：新卡顶部加卡片名+更新于，全站统一 v8CardHeader）──
+    var html=window.v8CardHeader('&#x1F52E;','未来预测','val10温度 + EDHEC牛熊状态机 + 9项牛转熊先行指标 + 2027情景推演','update_time',Object.assign({},T,{update_time:T.generated,slot:'盘后',horizon:'中长线'}));
+    html+='<div style="padding:14px;">';
+    // ── KPI 行（2026-10-05 主人令：去掉「上证/沪深300」胶囊 → 5格宽度平分；该数据移至一句话结论下方）──
+    html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">'
       +kpi('10年PE分位',(c.val10!=null?c.val10:'—'),'>80 贵 / <50 便宜')
       +kpi('距牛市峰值回撤',edhecDD.toFixed(1)+'%','EDHEC·'+(bst==='bear'?'熊市段':'牛市上行'))
       +kpi('沪深300 PE',(EXT.hs300pe&&EXT.hs300pe.pe!=null?EXT.hs300pe.pe:'—'),(EXT.hs300pe?('5年分位 '+EXT.hs300pe.pct5y+'%'):''))
       +kpi('社融脉冲',(EXT.tsf?EXT.tsf.yoy+'%':'—'),(EXT.tsf?('12M新增同比·'+EXT.tsf.month):''))
-      +kpi('PMI',(EXT.pmi?EXT.pmi.v:'—'),(EXT.pmi?EXT.pmi.date.slice(0,7):''))
-      +kpi('上证/沪深300',(SPOT.sh||'—')+' / '+(SPOT.hs300||'—'),(T.generated?('更新于 '+T.generated.slice(0,10)):''));
+      +kpi('PMI',(EXT.pmi?EXT.pmi.v:'—'),(EXT.pmi?EXT.pmi.date.slice(0,7):''));
     html+='</div>';
     // ── 分析方法（核心/用法/限制）──
     html+='<div style="background:rgba(192,132,252,.07);border:1px solid rgba(192,132,252,.28);border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.75;font-size:12px;color:var(--txt);">'
       +'<b style="color:'+C_PUR+';">&#x1F4CC; 核心：</b>本页用「市场温度(val10) + EDHEC牛熊状态机 + 9项牛转熊先行指标」三维研判A股所处周期位置，并给出2027年度多情景推演；全部数据来自 v8 日更管线(window.MARKET_THERMO)，零未来函数。<br>'
       +'<b style="color:'+C_PUR+';">&#x1F4A1; 用法：</b>①看顶部6个KPI定「贵不贵/险不险」；②看观测台9项指示灯(&#x1F7E2;正常/&#x1F7E1;警惕/&#x1F534;警示)定「牛熊哪一程」；③看2027情景表定「预期与仓位倾向」；④图①看长周期位置、图②看估值分位。<br>'
       +'<b style="color:'+C_PUR+';">&#x26A0; 限制：</b>情景表为研究性推演(非买卖建议)，概率随数据滚动更新；社融/PMI等宏观源滞后1–5个月属正常并已如实标注；本页只判「周期位置与风险水位」，不给具体买卖点。'
+      +'</div>';
+    // ── 一句话结论（2026-10-05 主人令：从情景表下方移至「核心/用法/限制」下方）──
+    html+='<div style="background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.42);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.85;color:'+C_TXT+';"><b style="color:'+C_AMB+';">&#x1F4A1; 一句话结论：</b>当前处于「牛市中段、估值中性偏低、信用收缩初现」的脆弱平衡——估值与情绪不贵（地量+低估值分位+股债性价比高），但社融脉冲已转负、杠杆温和退潮是历史上每轮转熊的宏观先兆；宜保持中性仓位、重结构、控回撤，重点盯两个红灯触发条件：val10 冲上 80 或 脉冲 ≤ −10%。</div>';
+    // ── 上证/沪深300 实时点位（2026-10-05 主人令：从KPI行胶囊移至一句话结论下方）──
+    html+='<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--dim);">'
+      +'<span>&#x1F4CD; 上证 / 沪深300：</span>'
+      +'<b style="font-size:15px;color:'+C_TXT+';">'+(SPOT.sh||'—')+' / '+(SPOT.hs300||'—')+'</b>'
+      +(T.generated?('<span>更新于 '+T.generated.slice(0,10)+'</span>'):'')
       +'</div>';
     // ── 观测台表格 ──
     var lvlTag={green:'&#x1F7E2; 正常',yellow:'&#x1F7E1; 警惕',red:'&#x1F534; 警示',muted:'&#x26AA; 待接入'};
@@ -18296,9 +18307,9 @@ h+=`</div>`;
         +'<td style="border:1px solid var(--border);padding:6px;text-align:left;color:var(--dim);font-size:11px;">'+x.drv+'</td></tr>';
     });
     html+='</tbody></table>';
-    html+='<div style="background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.42);border-radius:10px;padding:12px 14px;margin-top:10px;font-size:13px;line-height:1.85;color:'+C_TXT+';"><b style="color:'+C_AMB+';">&#x1F4A1; 一句话结论：</b>当前处于「牛市中段、估值中性偏低、信用收缩初现」的脆弱平衡——估值与情绪不贵（地量+低估值分位+股债性价比高），但社融脉冲已转负、杠杆温和退潮是历史上每轮转熊的宏观先兆；宜保持中性仓位、重结构、控回撤，重点盯两个红灯触发条件：val10 冲上 80 或 脉冲 ≤ −10%。</div>';
     html+='<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.7;">&#x1F4CC; 数据锚：val10&#x2208;[50,60] 时，历史之后12个月等权指数均值 <b style="color:'+C_TXT+'">+'+(base12==null?'—':base12)+'%</b>（27年数据实算）。'
       +'⚠️ 活跃黄旗：社融脉冲已转负（'+EXT.tsf.yoy+'%），信用扩张失速是历史上每轮熊市的宏观先兆；红灯条件 = val10 冲上 80 或 脉冲 ≤ −10%。数据更新：'+T.generated+'。</div>';
+    html+='</div>'; // /卡头下方内容包裹层（2026-10-05）
     host.innerHTML=html;
     // ── ECharts 渲染（暗色）──
     var AXS={axisLine:{lineStyle:{color:'#3a4149'}},axisLabel:{color:'#9aa4b2',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.06)'}}};
