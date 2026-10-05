@@ -5530,7 +5530,7 @@ c.innerHTML = h;
   };
 
   // ══ 2026-09-02 主人令：策略回测单一来源（一劳永逸）══
-  //   主策略区(__renderBacktestSection) / 选股生命周期(__renderLifecycleSection) / 星级表模块行(_buildStrategyRating)
+  //   主策略区(__renderBacktestSection) / 星级表模块行(_buildStrategyRating)
   //   全部读此配置；删一个策略只改这里，三处自动同步消失，绝不再漏删/错删。
   //   active = 仍在选股策略子页的活跃回测；delisted = 已移出 UI，9/3 起全部不再进回测区。
   //   删一个策略只改一处（active or delisted），三处（主策略区/已下架区/星级表）自动同步消失，绝不再漏删/错删。
@@ -5970,13 +5970,6 @@ c.innerHTML = h;
     for(var i=0;i<folds.length;i++){ folds[i].remove(); }
   };
 
-  /* ════════════════════════════════════════════════════════════════════
-     v8 选股生命周期（2026-09-01 主人令：作为「选股策略」子页面，置于三重共识之后）
-     渲染进 #lifeBody（#st-life 子页面容器）。
-     布局：① 多 algo 共识（全部展示） → ② 精选池（全部展示，跟在共识下方）
-          → ③ 4 桶（前3桶直接展示，走弱桶弹窗） → ④ 待确认剔除（弹窗）
-     删除：置顶两卡、情绪/板块横排、4 桶明细表、已剔除本机记录、冗余 footer。
-     ════════════════════════════════════════════════════════════════════ */
   /* ═══ 2026-09-03 主人令：高手共振口径统一（一劳永逸）═══
      根因：源数据存在 .601899 点前缀家族，池徽章按原始码精确匹配（IMA∩生命周期池=1）、
      最终推荐信号按数据侧 IMA 成员判定（Top5=3），两处口径不同。统一：全局规范化码 + 单一判定，两处共用。 */
@@ -6002,302 +5995,6 @@ c.innerHTML = h;
     }catch(e){}
     for(var k in g){ if(uni[k]) n++; }
     return n;
-  };
-  window.__renderLifecycleSection = function(){
-    var dst = document.getElementById('lifeBody');
-    if(!dst) return;
-    var html = '';
-    try{
-      var pt = (typeof window!=='undefined' && window.V8_POOL_TRACKER) || null;
-      if(!(pt && pt.items && Array.isArray(pt.items) && pt.items.length)){
-        dst.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">⏳ v8 选股生命周期数据刷新中…（window.V8_POOL_TRACKER 未就绪）</div>';
-        return;
-      }
-      var sc = pt.status_counts || {};
-      // 高手共振：IMA 跟踪池作为外部共振源之一（2026-09-03 主人令：高手的也是共振源之一）
-      var _imaMap = {};
-      try{ ((window.IMA_STRONG_STOCK && window.IMA_STRONG_STOCK.stocks) || []).forEach(function(s){ if(s && s.code) _imaMap[s.code] = s; }); }catch(_){}
-      function _resoBadge(code){
-        if((window.__inGaoshouReso ? window.__inGaoshouReso(code) : _imaMap[code])) return '<span style="font-size:9px;font-weight:700;color:#fbbf24;background:rgba(251,191,36,.16);border:1px solid rgba(251,191,36,.4);padding:1px 4px;border-radius:4px;white-space:nowrap;" title="高手强势股跟踪也命中（外部共振源）">🏆</span>';
-        return '';
-      }
-      var removedMap = _loadRemovedMap();
-
-      /* ─── 状态枚举（提前定义，供 4 桶状态标签与待确认剔除 共用，避免 hoist 后 undefined 访问） ─── */
-      var STATUS_ORDER = ['strong','buy_dip','topped','weak'];
-      var statusLabel = {strong:'🟢强势', buy_dip:'🟡回调买点', topped:'🟠见顶', weak:'🔴走弱'};
-      var statusColor = {strong:'#22c55e', buy_dip:'#fbbf24', topped:'#fb923c', weak:'#ef5350'};
-
-      /* ─── 列头点击排序（一劳永逸：支持点击切换） ─── */
-      var POOL_SORT_DEFAULT = {field:'last_pct', asc:false};
-      if(!pt._sort) pt._sort = {field:POOL_SORT_DEFAULT.field, asc:POOL_SORT_DEFAULT.asc};
-      var sortField = pt._sort.field;
-      var sortAsc   = !!pt._sort.asc;
-      var sortArrow = sortAsc ? '↑' : '↓';
-      window.__sortPoolTracker = function(field){
-        if(!window.V8_POOL_TRACKER || !field) return;
-        var cur = window.V8_POOL_TRACKER._sort || POOL_SORT_DEFAULT;
-        if(cur.field === field){ cur.asc = !cur.asc; }
-        else { cur.field = field; cur.asc = (field === 'code' || field === 'name'); }
-        window.V8_POOL_TRACKER._sort = cur;
-        window.__renderLifecycleSection();
-        if(typeof window.__renderBacktestSection === 'function') window.__renderBacktestSection();
-      };
-      function _sortBucket(arr, field, asc){
-        return arr.slice().sort(function(a,b){
-          var va = a[field], vb = b[field];
-          if(va==null && vb==null) return 0;
-          if(va==null) return 1;
-          if(vb==null) return -1;
-          if(typeof va === 'string') return asc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
-          return asc ? va - vb : vb - va;
-        });
-      }
-      function _thSortable(label, field, align){
-        var isCur = (sortField === field);
-        var arrow = isCur ? ' '+sortArrow : '';
-        var activeStyle = isCur ? 'color:#22c55e;font-weight:700;' : 'color:var(--sub);cursor:pointer;user-select:none;';
-        var a = align || 'right';
-        return '<th onclick="window.__sortPoolTracker(\''+field+'\')" style="padding:6px;text-align:'+a+';'+activeStyle+'" title="点击切换排序">'+label+arrow+'</th>';
-      }
-      function _loadRemovedMap(){
-        try { return JSON.parse(localStorage.getItem('v8_pool_removed') || '{}') || {}; } catch(e){ return {}; }
-      }
-      // 2026-09-12 主人令：一键全部剔除（原来要一只一只点）
-      window.__removeAllStocks = function(codes){
-        try {
-          if(!codes || !codes.length) return;
-          var m = _loadRemovedMap();
-          var items = (window.V8_POOL_TRACKER && window.V8_POOL_TRACKER.items) || [];
-          codes.forEach(function(code){
-            var it = items.find(function(x){ return x.code === code; }) || {};
-            m[code] = { name: it.name, status: it.status, last_pct: it.last_pct, drawdown: it.drawdown, removed_at: (function(){var p=window._cstParts?window._cstParts(new Date()):null;return p?p.y+'-'+String(p.m).padStart(2,'0')+'-'+String(p.d).padStart(2,'0')+'T'+String(p.hh).padStart(2,'0')+':'+String(p.mm).padStart(2,'0'):new Date().toISOString().slice(0,16);})() };
-          });
-          localStorage.setItem('v8_pool_removed', JSON.stringify(m));
-          if(typeof window.__renderLifecycleSection === 'function') window.__renderLifecycleSection();
-          if(typeof window.__renderBacktestSection === 'function') window.__renderBacktestSection();
-        } catch(e){ console.warn('[removeAllStocks]', e); }
-      };
-      window.__removeStock = function(code){
-        try {
-          var m = _loadRemovedMap();
-          var it = (window.V8_POOL_TRACKER.items || []).find(function(x){ return x.code === code; }) || {};
-          m[code] = { name: it.name, status: it.status, last_pct: it.last_pct, drawdown: it.drawdown, removed_at: (function(){var p=window._cstParts?window._cstParts(new Date()):null;return p?p.y+'-'+String(p.m).padStart(2,'0')+'-'+String(p.d).padStart(2,'0')+'T'+String(p.hh).padStart(2,'0')+':'+String(p.mm).padStart(2,'0'):new Date().toISOString().slice(0,16);})() };
-          localStorage.setItem('v8_pool_removed', JSON.stringify(m));
-          window.__renderLifecycleSection();
-          if(typeof window.__renderBacktestSection === 'function') window.__renderBacktestSection();
-        } catch(e) { console.warn('removeStock fail', e); }
-      };
-      /* ─── 头部 ─── */
-      var _upd = (pt && pt.update_time) || '';
-      var _sc = pt.status_counts || {};
-      var _isPre = false;
-      try{
-        var _nowParts2 = window._cstParts ? window._cstParts(new Date()) : null;
-        _isPre = _nowParts2 && (_nowParts2.hh < 9 || (_nowParts2.hh === 9 && _nowParts2.mm < 30));
-      }catch(e){}
-      html += '<div style="margin:14px 0;" class="card">';
-      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-      html += '<span style="font-size:15px;font-weight:700;color:var(--txt);">v8 选股生命周期</span>';
-      html += '<span style="font-size:10.5px;color:var(--dim);font-weight:600;letter-spacing:.5px;">· ③持有管理</span>'; /* 2026-09-04 主人令·方案乙：角色标签 */
-      html += '<span style="font-size:11px;color:var(--dim);">三 algo 跟踪池去重 → 专家阈值判状态（强势/买点/见顶/走弱）· 二维精选（板块流入×情绪周期）</span>';
-      // 2026-09-03 主人令：「已跑」「已推仓」分开执行，胶囊也分开，紧跟卡片名不另起一行（与严格三重共识 / 四量终极 / 逆势龙头保持同一行 3 胶囊样式）
-      html += _uBadge(_isPre?'盘前':'盘后','短线',_upd);
-      var _v8RunInfo = window._runBadgeInfo ? window._runBadgeInfo(_upd) : null;
-      if(_v8RunInfo && _v8RunInfo.show){
-        html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);white-space:nowrap">'+_v8RunInfo.label+'</span>';
-      }
-      html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#60a5fa;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.3);white-space:nowrap">📦 '+(pt.selected_size||0)+' 已推仓</span>';
-      html += '</div>';
-
-      /* ─── ① 多 algo 共识（全部展示） ─── */
-      var consensusItems = [];
-      try{ consensusItems = (pt.items||[]).filter(function(x){ return x && (typeof x.consensus_count==='number') && x.consensus_count>=2 && (x.algos_hit||[]).length; }); }catch(e){ console.warn('[life] consensus filter', e); }
-      if(consensusItems && consensusItems.length){
-        try{ consensusItems = _sortBucket(consensusItems, 'consensus_count', false); }catch(e){ console.warn('[life] consensus sort', e); }
-        html += '<div style="margin:10px 0;padding:12px;border:1.5px solid rgba(56,189,248,.45);border-radius:14px;background:rgba(56,189,248,.04);">';
-        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">';
-        html += '<span style="font-size:13px;font-weight:700;color:#38bdf8;">🔥 四量强势信号 · '+consensusItems.length+' 只</span>';
-        html += '<span style="font-size:10.5px;color:var(--dim);">单算法强势度 ≥2 · 按强度↓</span>';
-        html += '</div>';
-        html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
-        consensusItems.forEach(function(it){
-          if(!it) return;
-          var _code = it.code || '';
-          var _name = it.name || '';
-          var _cons = (typeof it.consensus_count==='number') ? it.consensus_count : 0;
-          var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
-          var _algos = Array.isArray(it.algos_hit) ? it.algos_hit : [];
-          var _daysIn = (typeof it.days_in==='number') ? it.days_in : null;
-          var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
-          var algoChips = _algos.map(function(a){ return '<span style="display:inline-block;padding:1px 6px;margin:1px 2px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(56,189,248,.18);color:#38bdf8;border:1px solid rgba(56,189,248,.4);">'+_esc(a)+'</span>'; }).join('');
-          html += '<div style="padding:9px 10px;border:1px solid rgba(56,189,248,.28);border-radius:8px;background:rgba(56,189,248,.06);">';
-          html +=   '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
-          html +=     '<span style="font-weight:700;font-size:12.5px;color:var(--txt);font-family:ui-monospace,monospace;">'+_esc(_code)+'</span>';
-          html +=     '<span style="font-size:11.5px;color:var(--txt);">'+_esc(_name)+'</span>';
-          html +=     '<span style="margin-left:auto;font-weight:700;font-size:11px;color:#38bdf8;padding:2px 8px;border-radius:6px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);white-space:nowrap;">🔥 强 '+_cons+'</span>';
-          html +=     _resoBadge(_code);
-          html +=   '</div>';
-          html +=   '<div style="margin-bottom:6px;line-height:1.6;font-size:10.5px;">';
-          html +=     '<span style="color:var(--dim);font-size:10px;margin-right:4px;">命中的算法：</span>'+(algoChips||'<span style="font-size:10px;color:var(--dim);">—</span>');
-          html +=   '</div>';
-          html +=   '<div style="display:flex;align-items:center;">';
-          html +=     '<span style="font-size:10px;color:var(--dim);white-space:nowrap;">入场以来'+( _daysIn!=null ? ' · '+_daysIn+' 天' : '')+'</span>';
-          html +=     '<span style="margin-left:auto;font-weight:700;font-size:14px;color:'+periodColor+';min-width:62px;text-align:right;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
-          html +=   '</div>';
-          html += '</div>';
-        });
-        html += '</div>';
-        html += '</div>'; // /共识
-      }
-
-      /* ─── ② 精选池（全部展示，跟在共识下方） ─── */
-      var selectedItems = [];
-      try{ selectedItems = (pt.items||[]).filter(function(x){ return x && x.selected; }); }catch(e){ console.warn('[life] selected filter', e); }
-      if(selectedItems && selectedItems.length){
-        try{ selectedItems = _sortBucket(selectedItems, 'selected_score', false); }catch(e){ console.warn('[life] selected sort', e); }
-        html += '<div style="margin:10px 0;padding:0;border:1px solid rgba(251,191,36,.35);border-radius:10px;background:rgba(251,191,36,.04);">';
-        html += '<div style="padding:10px 12px;font-size:13px;font-weight:700;color:var(--gold);">🌟 精选池 '+selectedItems.length+' 只 · 板块流入×情绪周期双优 · 按精选分↓</div>';
-        html += '<div style="padding:8px 10px;">';
-        html += '<div style="overflow-x:auto;overflow-y:hidden;"><table style="width:100%;border-collapse:collapse;font-size:12.5px;">';
-        html += '<thead><tr style="background:rgba(251,191,36,.08);border-bottom:1.5px solid rgba(251,191,36,.3);">';
-        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">代码</th>';
-        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">名称</th>';
-        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">信号</th>';
-        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);" title="行业·板块最优概念置顶·其余概念前1；悬停显示全部概念（STOCK_PROFILE 全量档案）">行业·概念</th>';
-        html += '<th style="padding:7px 8px;text-align:right;color:var(--gold);">精选分</th>';
-        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);" title="algo 入选日期 = 入场时间">入场时间</th>';
-        html += '<th style="padding:7px 8px;text-align:right;color:var(--gold);" title="从 algo 入选那天起到当前的累计涨幅（基准 entry_price）">入场以来</th>';
-        html += '</tr></thead><tbody>';
-        selectedItems.forEach(function(it){
-          if(!it) return;
-          var _code = it.code || '';
-          var _name = it.name || '';
-          var _selScore = (typeof it.selected_score==='number') ? it.selected_score : 0;
-          var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
-          var _secNet = (typeof it.sector_net==='number') ? it.sector_net : 0;
-          var _daysIn = (typeof it.days_in==='number') ? it.days_in : null;
-          var _entryDate = it.list_date || '';
-          var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
-          var conceptColor = it.sector_match==='top_inflow' ? '#22c55e' : (it.sector_match==='outflow' ? '#ef5350' : 'var(--dim)');
-          var sigColor = it.signal_type==='多算法共识' ? '#38bdf8' : (it.signal_type==='板块联动' ? '#22c55e' : 'var(--sub)');
-          var _entryLabel = _entryDate ? _entryDate + (_daysIn!=null ? '（'+_daysIn+'天）' : '') : '—';
-          /* 2026-09-04 主人令（A+B 混合方案）：行业独立列 + 概念列=板块最优置顶·前2全展示·悬停 tooltip 全量概念
-             数据源：window.STOCK_PROFILE.profiles[code] = {industry, concepts[]}（由 STOCK_LIST 就地合成，9613 只全量） */
-          var _profAll = (window.STOCK_PROFILE && window.STOCK_PROFILE.profiles) || {};
-          var _norm = window.__v8NormCode ? window.__v8NormCode(_code) : _code;
-          var _prof = _profAll[_code] || _profAll[_norm] || {};
-          var _industry = _prof.industry || it.industry || '—';
-          var _conceptsAll = (Array.isArray(_prof.concepts) && _prof.concepts.length) ? _prof.concepts.slice() : (it.concept_top ? [it.concept_top] : []);
-          var _topConcept = it.concept_top || '';
-          if(_topConcept){ _conceptsAll = [_topConcept].concat(_conceptsAll.filter(function(c){ return c && c !== _topConcept; })); }
-          var _conceptTip = '共 ' + _conceptsAll.length + ' 个概念（行业：' + _industry + '）';
-          if(_topConcept && (typeof _secNet==='number')) _conceptTip += '\n板块净流入 ' + (_secNet>0?'+':'') + _secNet.toFixed(1) + ' 亿';
-          if(_conceptsAll.length) _conceptTip += '\n' + _conceptsAll.join(' · ');
-          var _showConcepts = _conceptsAll.slice(0, 2);
-          var _extraCnt = _conceptsAll.length - _showConcepts.length;
-          var _conceptHtml = '<span style="color:var(--sub);font-weight:700;">'+_esc(_industry)+'</span>';
-          if(_conceptHtml) _conceptHtml += '<span style="color:var(--dim);"> · </span>';
-          _conceptHtml += _showConcepts.map(function(c, i){
-            var _col = (i === 0 && _topConcept) ? conceptColor : 'var(--txt)';
-            var _bold = (i === 0 && _topConcept) ? '800' : '500';
-            return '<span style="color:'+_col+';font-weight:'+_bold+';">'+_esc(c)+'</span>';
-          }).join('<span style="color:var(--dim);"> · </span>');
-          if(_extraCnt > 0) _conceptHtml += '<span style="color:var(--dim);"> +'+_extraCnt+'</span>';
-          if(!_conceptHtml) _conceptHtml = '<span style="color:var(--dim);">—</span>';
-          html += '<tr style="border-bottom:1px solid rgba(148,163,184,.08);background:rgba(251,191,36,.03);">';
-          html += '<td style="padding:6px 8px;color:var(--txt);font-weight:700;font-size:12.5px;font-family:ui-monospace,monospace;white-space:nowrap;">'+_esc(_code)+'</td>';
-          html += '<td style="padding:6px 8px;color:var(--txt);font-weight:600;white-space:nowrap;">'+_esc(_name)+' '+_resoBadge(_code)+'</td>';
-          html += '<td style="padding:6px 8px;color:'+sigColor+';font-weight:600;">'+_esc(it.signal_type||'')+'</td>';
-          html += '<td style="padding:6px 8px;font-size:12px;min-width:200px;" title="'+_esc(_conceptTip).replace(/"/g,'&quot;').replace(/'/g,'&#39;')+'">'+_conceptHtml+'</td>';
-          html += '<td style="padding:6px 8px;text-align:right;color:var(--gold);font-weight:800;font-size:13px;">'+(_selScore>0?'+':'')+_selScore.toFixed(1)+'</td>';
-          html += '<td style="padding:6px 8px;color:var(--txt);font-weight:600;white-space:nowrap;" title="入选价 '+((typeof it.entry_price==='number')?it.entry_price.toFixed(2):'—')+'">'+_esc(_entryLabel)+'</td>';
-          html += '<td style="padding:6px 8px;text-align:right;font-weight:800;font-size:13.5px;color:'+periodColor+';">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</td>';
-          html += '</tr>';
-        });
-        html += '</tbody></table></div>';
-        html += '</div></div>';
-      }
-
-      /* ─── ③ 4 桶（强势/买点/见顶 直接展示，走弱 弹窗） ─── */
-      var buckets = [
-        {key:'strong',  label:'🟢强势',   color:'#22c55e', bg:'rgba(34,197,94,.10)',   border:'rgba(34,197,94,.35)'},
-        {key:'buy_dip', label:'🟡回调买点', color:'#fbbf24', bg:'rgba(251,191,36,.10)',  border:'rgba(251,191,36,.35)'},
-        {key:'topped',  label:'🟠见顶',   color:'#fb923c', bg:'rgba(251,146,60,.10)',  border:'rgba(251,146,60,.35)'},
-        {key:'weak',    label:'🔴走弱',   color:'#ef5350', bg:'rgba(239,83,80,.10)',   border:'rgba(239,83,80,.35)'},
-      ];
-      var statusFilter = {strong:'strong', buy_dip:'buy_dip', topped:'topped', weak:'weak'};
-      function _buildBucketGrid(items, border){
-        var g = '';
-        if(items && items.length){
-          g += '<div style="padding:6px 10px 8px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;">';
-          items.forEach(function(it){
-            if(!it) return;
-            var _code = it.code || '';
-            var _name = it.name || '';
-            var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
-            var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
-            var _cons = (typeof it.consensus_count==='number') ? it.consensus_count : 0;
-            var _isSel = !!it.selected;
-            g += '<div style="padding:6px 8px;border:1px solid '+border+';border-radius:6px;background:rgba(15,23,42,.45);display:flex;flex-direction:column;gap:4px;min-width:0;">';
-            g +=   '<div style="display:flex;align-items:center;gap:6px;min-width:0;">';
-            g +=     '<span style="color:var(--txt);font-weight:700;font-size:11px;font-family:ui-monospace,monospace;white-space:nowrap;">'+_esc(_code)+'</span>';
-            g +=     '<span style="color:var(--txt);font-size:10.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(_name)+'</span>';
-            g +=   '</div>';
-            g +=   '<div style="display:flex;align-items:center;gap:4px;margin-top:auto;min-width:0;">';
-            if(_isSel){ g += '<span style="font-size:9px;font-weight:700;color:var(--gold);">🌟</span>'; }
-            if(_cons>=2){ g += '<span style="font-size:9px;font-weight:700;color:#38bdf8;padding:1px 4px;border-radius:4px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);">🔥'+_cons+'</span>'; }
-            g += _resoBadge(_code);
-            g +=     '<span style="margin-left:auto;font-weight:700;font-size:11.5px;color:'+periodColor+';white-space:nowrap;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
-            g +=   '</div>';
-            g += '</div>';
-          });
-          g += '</div>';
-        } else {
-          g += '<div style="padding:6px 12px 10px;font-size:11px;color:var(--dim);">该桶 0 只</div>';
-        }
-        return g;
-      }
-      html += '<div style="margin:10px 0;">';
-      buckets.forEach(function(b){
-        var n = sc[b.key]||0;
-        var bucketItems = [];
-        try{
-          bucketItems = (pt.items||[]).filter(function(x){ return x && x.status === statusFilter[b.key]; });
-          bucketItems = _sortBucket(bucketItems, 'last_pct', false);
-        }catch(e){ console.warn('[life] bucket filter', e); }
-        if(b.key === 'weak'){
-          window.__lifeModalCache.weak = _buildBucketGrid(bucketItems, b.border);
-          html += '<div style="border:1px solid '+b.border+';border-radius:8px;background:'+b.bg+';margin-bottom:8px;cursor:pointer;user-select:none;" onclick="openLifeModal(this, \''+b.label+' '+n+' 只\', window.__lifeModalCache.weak)">';
-          html +=   '<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;">';
-          html +=     '<span style="font-size:12px;font-weight:700;color:'+b.color+';">'+b.label+' '+n+'</span>';
-          html +=     '<span style="font-size:10.5px;color:var(--dim);font-weight:500;">点击查看明细</span>';
-          html +=   '</div>';
-          html += '</div>';
-          return;
-        }
-        html += '<details open style="border:1px solid '+b.border+';border-radius:8px;background:'+b.bg+';margin-bottom:8px;">';
-        html +=   '<summary style="cursor:pointer;user-select:none;padding:6px 12px;font-size:12px;font-weight:700;color:'+b.color+';list-style:none;display:flex;align-items:center;gap:8px;">';
-        html +=     '<span style="display:inline-block;padding:2px 10px;border-radius:6px;">'+b.label+' '+n+'</span>';
-        html +=     '<span style="font-size:10.5px;color:var(--dim);font-weight:500;">共 '+(bucketItems?bucketItems.length:0)+' 只</span>';
-        html +=   '</summary>';
-        html += _buildBucketGrid(bucketItems, b.border);
-        html += '</details>';
-      });
-      html += '</div>';
-
-      /* ─── ⑤ 选股策略回测（按用户反问 2026-09-02 22:50：回测都归到回测汇总 tab 了，不在选股 tab 里重复写一份）
-           本页不再渲染战绩回测小条 / 模块回测卡，避免与回测汇总 tab 重复维护 ─── */
-
-      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">数据 '+_upd.substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池</div>';
-      html += '</div>'; // /card
-    }catch(e){
-      console.error('[life v8 选股生命周期]', e && (e.message||e), e && e.stack);
-      try{ if(typeof Sentry!=='undefined' && Sentry && Sentry.captureException) Sentry.captureException(e); }catch(_){}
-    }
-    try{
-      dst.innerHTML = html || '<div class="note" style="padding:24px;text-align:center;color:var(--dim);">⏳ v8 选股生命周期数据刷新中…</div>';
-    }catch(e){ console.error('[life dst.innerHTML fail]', e); }
   };
 
   /* ══ 2026-09-12 主人令：策略回测页重写（方案一+三）══
@@ -7049,7 +6746,6 @@ c.innerHTML = h;
 
     /* ── v8 选股生命周期 已迁至「选股策略」子页面（2026-09-01 主人令：
           置于三重共识之后，由 window.__renderLifecycleSection() 渲染进 #lifeBody）── */
-    try{ if(typeof window.__renderLifecycleSection === 'function') window.__renderLifecycleSection(); }catch(e){ console.warn('[bt→lifecycle]', e); }
 
     /* ── v8 选股生命周期（渲染函数定义见下方 window.__renderLifecycleSection，2026-09-01 迁出）── */
     /* v8 选股生命周期 旧体已迁至 window.__renderLifecycleSection()（2026-09-01），本段为死代码，已整体删除 */
@@ -14893,7 +14589,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
 
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
-    ['tc','fv','crds','pool','life','fa'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['tc','fv','crds','pool','life'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
     // 2026-08-29 主人令：选股池子页渲染（2026-09-11：并入金股池卡片，统一走 renderStPoolAll）
     if(n==='pool' && typeof window.renderStPoolAll==='function') setTimeout(window.renderStPoolAll, 30);
@@ -14904,15 +14600,11 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
        两函数体首行都是 `if(!dst) return;` ⇒ 每次切到本页都**静默空转**
        （不报错、不渲染、纯浪费）。主人 2026-09-16 令：生命周期子页与
        强势突破 pane 因回测太差已**永久下架**，调度随之下线。
-       ⚠️ 仅删调度、未删函数定义（其余路径可能仍在调用，待确认后再删净）。 */
+       ✅ 2026-10-06 阿狸咪的工程师：经审计确认 __renderLifecycleSection 仅余 L7052 一处活触发（switchSt 调度已于 2026-09-19 删），目标 #lifeBody 全站无 DOM 定义 ⇒ 函数体（原 L6006–L6301）与 L7052 调用已**彻底删净**，死代码从根消除。__renderStrongBreakout 此前已删净。 */
     /* 保留：__renderImaStrongStock（#imaStrongBody ✅ 活）+ renderLifeBacktests（回测真实产出） */
     if(n==='life' && typeof window.renderLifeBacktests==='function') setTimeout(window.renderLifeBacktests, 60);
     // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
-    if(n==='fa'){
-      if(typeof window.__renderFactorPane==='function') setTimeout(window.__renderFactorPane, 30);
-      if(typeof window.__renderDailyFactorCalc==='function') setTimeout(window.__renderDailyFactorCalc, 30);
-    }
-    // 2026-09-12 更新：因子实验室已迁入本页 🧪 因子实验室 子页，其渲染由上方 if(n==='fa') 分支负责，故此处仍不挂 life。
+    // 2026-10-06 阿狸咪的工程师：fa（因子实验室）分支经审计为不可达死代码（DOM 无 data-st="fa" 按钮、switchSt('fa') 早删），已删净；因子实验室现仅于「最终推荐」页渲染。
   // 2026-09-18 主人令：子页名统一「因子实验室」（原「🧪 因子」），且不评星级（因子=加分项，非选股策略）。
     // 🛡 2026-09-02 主人令根治：切换后立即启动「子 tab 数据就绪重试」（见 __stRetryTab），消除 defer 未注入导致的首渲空卡
     try{ window.__stRetryTab(n); }catch(e){}
@@ -14929,7 +14621,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       crds:function(){return !!window.CRDS_CARD_DATA;},
       life:function(){return !!(window.V8_POOL_TRACKER&&window.V8_POOL_TRACKER.items&&window.V8_POOL_TRACKER.items.length);},
       // 2026-09-12 主人令：因子实验室子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
-      fa:function(){return !!(window.FACTOR_LAB||window.FACTOR_LAB_BACKTEST);}
     };
     var _chk=_map[n]||function(){return true;};
     if(_chk()) return; // 数据已就绪，无需重试
