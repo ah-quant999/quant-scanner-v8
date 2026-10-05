@@ -18233,11 +18233,7 @@ h+=`</div>`;
     // ── 估值锚：val10∈[50,60] 后12M等权均值 ──
     function fwd12(lo,hi){ var cnt=0,sum=0,i; for(i=0;i+12<D.eq.length;i++){ var vv=D.val10[i]; if(vv==null)continue; if(vv>=lo&&vv<=hi){ var r=(D.eq[i+12]-D.eq[i])/D.eq[i]*100; if(isFinite(r)){cnt++;sum+=r;} } } return cnt?+(sum/cnt).toFixed(1):null; }
     var base12=fwd12(50,60);
-    // ── KPI 行 ──
-    function kpi(lab,val,hint){ return '<div style="flex:1;min-width:130px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">'
-      +'<div style="font-size:11px;color:var(--dim);">'+lab+'</div>'
-      +'<div style="font-size:20px;font-weight:800;color:'+C_TXT+';margin-top:3px;">'+val+'</div>'
-      +'<div style="font-size:10.5px;color:var(--dim);margin-top:2px;">'+hint+'</div></div>'; }
+
     // ── 统一卡头（2026-10-05 主人令：新卡顶部加卡片名+更新于，全站统一 v8CardHeader）──
     var html=window.v8CardHeader('&#x1F52E;','未来预测','val10温度 + EDHEC牛熊状态机 + 9项牛转熊先行指标 + 2027情景推演','update_time',Object.assign({},T,{update_time:T.generated,slot:'盘后',horizon:'中长线'}));
     html+='<div style="padding:14px;">';
@@ -18245,7 +18241,7 @@ h+=`</div>`;
     // ── 分析方法（核心/用法/限制）──
     html+='<div style="background:rgba(192,132,252,.07);border:1px solid rgba(192,132,252,.28);border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.75;font-size:12px;color:var(--txt);">'
       +'<b style="color:'+C_PUR+';">&#x1F4CC; 核心：</b>本页用「市场温度(val10) + EDHEC牛熊状态机 + 9项牛转熊先行指标」三维研判A股所处周期位置，并给出2027年度多情景推演；全部数据来自 v8 日更管线(window.MARKET_THERMO)，零未来函数。<br>'
-      +'<b style="color:'+C_PUR+';">&#x1F4A1; 用法：</b>①看顶部6个KPI定「贵不贵/险不险」；②看观测台9项指示灯(&#x1F7E2;正常/&#x1F7E1;警惕/&#x1F534;警示)定「牛熊哪一程」；③看2027情景表定「预期与仓位倾向」；④图①看长周期位置、图②看估值分位。<br>'
+      +'<b style="color:'+C_PUR+';">&#x1F4A1; 用法：</b>①看观测台9项指示灯(&#x1F7E2;正常/&#x1F7E1;警惕/&#x1F534;警示)定「贵不贵/险不险/牛熊哪一程」；②看2027情景表定「预期与仓位倾向」；③图①看长周期位置、图②看估值分位。<br>'
       +'<b style="color:'+C_PUR+';">&#x26A0; 限制：</b>情景表为研究性推演(非买卖建议)，概率随数据滚动更新；社融/PMI等宏观源滞后1–5个月属正常并已如实标注；本页只判「周期位置与风险水位」，不给具体买卖点。'
       +'</div>';
     // ── 一句话结论（2026-10-05 主人令：从情景表下方移至「核心/用法/限制」下方）──
@@ -18255,14 +18251,7 @@ h+=`</div>`;
       +'<span>&#x1F4CD; 上证 / 沪深300：</span>'
       +'<b style="font-size:15px;color:'+C_TXT+';">'+(SPOT.sh||'—')+' / '+(SPOT.hs300||'—')+'</b>'
       +'</div>';
-    // ── KPI 行（2026-10-05 二次令：整体移到「一句话结论+上证/沪深300」块下方，5格宽度平分）──
-    html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;margin-bottom:14px;">'
-      +kpi('10年PE分位',(c.val10!=null?c.val10:'—'),'>80 贵 / <50 便宜')
-      +kpi('距牛市峰值回撤',edhecDD.toFixed(1)+'%','EDHEC·'+(bst==='bear'?'熊市段':'牛市上行'))
-      +kpi('沪深300 PE',(EXT.hs300pe&&EXT.hs300pe.pe!=null?EXT.hs300pe.pe:'—'),(EXT.hs300pe?('5年分位 '+EXT.hs300pe.pct5y+'%'):''))
-      +kpi('社融脉冲',(EXT.tsf?EXT.tsf.yoy+'%':'—'),(EXT.tsf?('12M新增同比·'+EXT.tsf.month):''))
-      +kpi('PMI',(EXT.pmi?EXT.pmi.v:'—'),(EXT.pmi?EXT.pmi.date.slice(0,7):''));
-    html+='</div>';
+    // ── 顶部KPI胶囊行已删（2026-10-05 21:00 主人令：与下方观测台9项逐项重复，属重复展示）──
     // ── 观测台表格 ──
     var lvlTag={green:'&#x1F7E2; 正常',yellow:'&#x1F7E1; 警惕',red:'&#x1F534; 警示',muted:'&#x26AA; 待接入'};
     var lvlCol={green:C_GRN,yellow:C_AMB,red:C_RED,muted:C_DIM};
