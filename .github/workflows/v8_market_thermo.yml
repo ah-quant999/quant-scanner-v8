@@ -75,6 +75,42 @@ jobs:
             python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas requests
           } else { Write-Host "deps ready" }
 
+      - name: "📦 同步 raw_data 缓存依赖（gen 输入，缺则必败）"
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $headers = @{
+            'User-Agent' = 'v8-market-thermo'
+            'Accept'     = 'application/vnd.github.raw'
+            'Authorization' = "Bearer $env:GH_PAT"
+          }
+          $API = 'https://api.github.com/repos/ah-quant999/quant-scanner-v8'
+          $tip = (Invoke-RestMethod -Uri "$API/git/ref/heads/main" -Headers $headers).object.sha
+          $top = Invoke-RestMethod -Uri "$API/git/trees/$tip" -Headers $headers
+          # 1) sw_index_daily_cache 全部 CSV（31个）
+          $swTree = $top.tree | Where-Object { $_.path -eq 'raw_data' }
+          if (-not $swTree) { Write-Host "[fail] 远端无 raw_data" -ForegroundColor Red; exit 1 }
+          $sub = Invoke-RestMethod -Uri "$API/git/trees/$($swTree.sha)" -Headers $headers
+          $sw = $sub.tree | Where-Object { $_.path -eq 'sw_index_daily_cache' }
+          if (-not $sw) { Write-Host "[fail] 远端无 sw_index_daily_cache" -ForegroundColor Red; exit 1 }
+          $swt = Invoke-RestMethod -Uri "$API/git/trees/$($sw.sha)" -Headers $headers
+          New-Item -ItemType Directory -Force -Path raw_data/sw_index_daily_cache | Out-Null
+          $n = 0
+          foreach ($f in $swt.tree) {
+            $url = "$API/contents/raw_data/sw_index_daily_cache/$($f.path)?ref=main"
+            Invoke-WebRequest -Uri $url -Headers $headers -TimeoutSec 60 -OutFile "raw_data/sw_index_daily_cache/$($f.path)"
+            $n++
+          }
+          Write-Host "sw_index_daily_cache 同步 $n 个 CSV"
+          # 2) 三个 json 依赖
+          foreach ($j in @('margin_data.json','macro_data.json','valuation_percentile.json')) {
+            $url = "$API/contents/raw_data/$j" + '?ref=main'
+            Invoke-WebRequest -Uri $url -Headers $headers -TimeoutSec 60 -OutFile "raw_data/$j"
+            Write-Host "synced raw_data/$j"
+          }
+
       - name: "📊 跑 gen_market_thermo.py（交易日闸）"
         id: gen
         shell: powershell
@@ -92,13 +128,13 @@ jobs:
 
       - name: "🔍 审计门禁（结构层+akshare真值交叉核验 · 硬闸）"
         id: audit
-        if: steps.gen.outcome == 'success' && (hashFiles('data/MARKET_THERMO.js') != '')
+        if: steps.gen.outcome == 'success'
         shell: powershell
         run: |
           cd $env:GITHUB_WORKSPACE
           if (-not (Test-Path 'data/MARKET_THERMO.js')) {
-            Write-Host "[skip] 产物缺失，审计不适用"
-            exit 0
+            Write-Host "[GATE-FAIL] gen 成功但产物缺失 → 异常，红灯阻断" -ForegroundColor Red
+            exit 2
           }
           python v8/audit_market_thermo.py
           if ($LASTEXITCODE -ne 0) {
@@ -108,6 +144,7 @@ jobs:
           Write-Host "[GATE-PASS] 审计全绿 → 放行推送"
 
       - name: "📤 推送到仓库（api_push_raw · PUSH_FILES）"
+        id: push
         if: steps.gen.outcome == 'success' && steps.audit.outcome == 'success'
         shell: powershell
         env:
@@ -120,3 +157,25 @@ jobs:
           } else {
             Write-Host "[skip] 产物缺失或过小，不推送（防线：防空白覆盖）"
           }
+
+      - name: "🚨 结果闸门（gen失败/审计skip/推送skip → 红灯，禁绿灯假象）"
+        if: always()
+        shell: powershell
+        run: |
+          $gen = '${{ steps.gen.outcome }}'
+          $aud = '${{ steps.audit.outcome }}'
+          $push = '${{ steps.push.outcome }}'
+          Write-Host "gen=$gen audit=$aud push=$push"
+          if ($gen -ne 'success') {
+            Write-Host "[GATE] gen 未成功($gen) → 红灯（宁可报警可见，不可静默旧数据）" -ForegroundColor Red
+            exit 1
+          }
+          if ($aud -ne 'success') {
+            Write-Host "[GATE] 审计未通过或未执行($aud) → 红灯" -ForegroundColor Red
+            exit 1
+          }
+          if ($push -ne 'success') {
+            Write-Host "[GATE] 推送未执行($push) → 红灯" -ForegroundColor Red
+            exit 1
+          }
+          Write-Host "[GATE] gen+审计+推送 全链正常 ✓" -ForegroundColor Green
