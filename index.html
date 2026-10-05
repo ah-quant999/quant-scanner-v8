@@ -617,7 +617,7 @@ window.__domReadyFns=[];
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=6719569574" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=4750f4b20a" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=c4f125da68" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=ab266fe2b2" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=90ecbe1124" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=8d6d4065cf" defer></script>
@@ -682,7 +682,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=7b957ed35b" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=93d7ab39a9" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=2983aeb095" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1825,9 +1825,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=0baac310f0" defer></script>
 <script src="data/HB_XIAOJIU.js?v=5cf72a74c3" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=8101218e3e" defer></script>
-<script src="data/HEALTH_CHECK.js?v=703aa24576" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=9266e96ebb" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=6a27a59136" defer></script>
+<script src="data/HEALTH_CHECK.js?v=0ff226d212" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=27e84331de" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=a9778690cb" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=93f583df55" defer></script>
@@ -1841,7 +1841,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=bae759de3e" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=eb4b3abc3d" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=645bca50fc" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=9f0083057b" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2bf162518b" defer></script>
