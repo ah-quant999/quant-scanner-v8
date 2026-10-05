@@ -81,10 +81,23 @@ jobs:
           GH_PAT: ${{ secrets.V8_GH_TOKEN }}
         run: |
           $ErrorActionPreference = 'Stop'
+          $ProgressPreference = 'SilentlyContinue'
           $headers = @{
             'User-Agent' = 'v8-market-thermo'
             'Accept'     = 'application/vnd.github.raw'
             'Authorization' = "Bearer $env:GH_PAT"
+          }
+          function Get-FileHard($url, $out, $tries = 4) {
+            for ($k = 1; $k -le $tries; $k++) {
+              try {
+                Invoke-WebRequest -Uri $url -Headers $headers -TimeoutSec 90 -OutFile $out
+                return
+              } catch {
+                Write-Host "[retry $k/$tries] $out : $_" -ForegroundColor Yellow
+                Start-Sleep -Seconds (4 * $k)
+              }
+            }
+            throw "同步失败(重试$tries次): $out"
           }
           $API = 'https://api.github.com/repos/ah-quant999/quant-scanner-v8'
           $tip = (Invoke-RestMethod -Uri "$API/git/ref/heads/main" -Headers $headers).object.sha
@@ -100,14 +113,14 @@ jobs:
           $n = 0
           foreach ($f in $swt.tree) {
             $url = "$API/contents/raw_data/sw_index_daily_cache/$($f.path)?ref=main"
-            Invoke-WebRequest -Uri $url -Headers $headers -TimeoutSec 60 -OutFile "raw_data/sw_index_daily_cache/$($f.path)"
+            Get-FileHard $url "raw_data/sw_index_daily_cache/$($f.path)"
             $n++
           }
           Write-Host "sw_index_daily_cache 同步 $n 个 CSV"
           # 2) 三个 json 依赖
           foreach ($j in @('margin_data.json','macro_data.json','valuation_percentile.json')) {
             $url = "$API/contents/raw_data/$j" + '?ref=main'
-            Invoke-WebRequest -Uri $url -Headers $headers -TimeoutSec 60 -OutFile "raw_data/$j"
+            Get-FileHard $url "raw_data/$j"
             Write-Host "synced raw_data/$j"
           }
 
