@@ -171,8 +171,12 @@ NEO_TOKEN_PATHS = (
 
 
 def _neo_token():
-    """NeoData token：algorithms/.neodata_token 优先（视为权威不查时效），其余 JSON 缓存
+    """NeoData token：环境变量 NEODATA_TOKEN 最优先（云端 secret 接线口，2026-10-05）；
+    其次 algorithms/.neodata_token（视为权威不查时效），其余 JSON 缓存
     路径要求 saved_at 12h 内。全缺返回 None（调用方按无兜底降级，行为与旧版一致）。"""
+    _env = os.environ.get("NEODATA_TOKEN")
+    if _env:
+        return _env
     for i, p in enumerate(NEO_TOKEN_PATHS):
         try:
             if not os.path.exists(p):
@@ -512,6 +516,41 @@ def build():
                 "cons_count": len(cons), "leaders": cons[:TOP_N], "match": how,
             })
             time.sleep(0.3)
+    # 🛡 2026-10-05 阿狸咪的工程师（主人令「不是都修好了吗？是被覆盖回去了吗？」· 跑批洗回第三次根治）：
+    #   实证链：10-02 18:39 NeoData 兜底 4 板块×5 龙头全复活（f875d7dff2）→ 当晚 22:11/23:58
+    #   云端 cn fetch（github-actions[bot]）用同款脚本重跑：云端无 NeoData token
+    #   （E:/.workbuddy/skills/.neodata_token 仅本机；凭证禁入库）⇒ _neo_token()=None ⇒
+    #   兜底静默跳过 ⇒ 空名单照常落仓把好数据洗回（neo_fallback_count 4→0、龙头 20→0）。
+    #   修法（同日保底锁）：data_date 与上一版相同 ⇒ 该交易日龙头快照仍有效 ⇒ 本轮名单为空、
+    #   上一版同名板块有名单的板块**过继** leaders（bk/cons_count 同步、match 前缀 retained:），
+    #   记 retained_count 审计字段；**跨日不过继**（昨日涨幅榜不得冒充今日，防造假）。
+    #   ⇒ 云端无 token 的跑批从此只能「保住已有的」，再也洗不回空的。
+    n_retained = 0
+    if src_date:
+        _prev = _cache_load(OUT_RAW)
+        _prev_secs = {}
+        if isinstance(_prev, dict) and str(_prev.get("data_date") or "")[:10] == src_date:
+            for _p in (_prev.get("sectors") or []):
+                if isinstance(_p, dict) and _p.get("name"):
+                    _prev_secs[_p["name"]] = _p
+        for x in sectors_out:
+            if x.get("leaders"):
+                continue
+            _pl = (_prev_secs.get(x["name"]) or {}).get("leaders") or []
+            if not _pl:
+                continue
+            _pv = _prev_secs[x["name"]]
+            x["leaders"] = _pl
+            x["bk"] = _pv.get("bk")
+            x["cons_count"] = _pv.get("cons_count") or len(_pl)
+            x["match"] = "retained:" + (x.get("match") or _pv.get("match") or "")
+            if x.pop("no_match", None):
+                n_nomatch = max(0, n_nomatch - 1)
+            if x.pop("leaders_error", None):
+                n_fail = max(0, n_fail - 1)
+            n_retained += 1
+            log("retained %s: %d leaders（同 data_date=%s 自上一版过继，防洗回）"
+                % (x["name"], len(_pl), src_date))
     # 🛡 2026-09-25 阿狸咪的工程师（主人令「改好直接上线」· 卡面假刷新根治）：
     #   原口径 `"update_time": time.strftime(...)` = **本脚本落盘时刻**，与数据日期无关。
     #   实测后果：卡面「更新于」永远显示成今晚上次构建时间，而内容可能仍是 T-1
@@ -536,6 +575,7 @@ def build():
         "phase": "主升+启动", "sector_count": len(sectors_out), "sectors": sectors_out,
         "nomatch_count": n_nomatch, "leaders_fail_count": n_fail,
         "neo_fallback_count": n_neo,
+        "retained_count": n_retained,
         "em_boards_source": EM_BOARDS_SOURCE,
         "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；"
                 "个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；"
@@ -552,9 +592,9 @@ def build():
         _cnt.setdefault(p, [0, 0])
         _cnt[p][0] += 1 if x.get("leaders") else 0
         _cnt[p][1] += 1
-    log("OK %s js_bytes=%d leaders_fail=%d no_match=%d neo_fallback=%d" % (
+    log("OK %s js_bytes=%d leaders_fail=%d no_match=%d neo_fallback=%d retained=%d" % (
         " ".join("%s(%d/%d)" % (p, v[0], v[1]) for p, v in sorted(_cnt.items(), key=lambda kv: _po.get(kv[0], 9))),
-        len(body), n_fail, n_nomatch, n_neo))
+        len(body), n_fail, n_nomatch, n_neo, n_retained))
     return payload
 
 
