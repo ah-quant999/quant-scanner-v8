@@ -7968,3 +7968,18 @@ items:
       - "index.html"
     updated: "2026-10-06 22:28"
     updated_by: 阿狸咪的工程师
+  - id: audit-strategy-backtest-page-1006
+    priority: P3
+    owner: 阿狸咪的工程师
+    status: done
+    verified_at: "2026-10-06 23:18"
+    what: >-
+      策略回测页审计（程序化静态分析全文件 + 逐函数追定义 + node 解析线上真实产物交叉核验）结论：展示逻辑科学、诚实铁律到位——样本门槛 n<30 整行灰显(CRDS卡 opacity:.45+⚠／共用卡 opacity:.55／总表 _bestHoldOf 跳过)、挑选偏差标注(非单调>15pp)、源时点只摊不下结论(防假failure)、CRDS minActiveN=4<30 落观测组不评级、样本独立性诚实披露(n是信号条数非独立样本)、全档无样本时空态说明(不排0表)。真实产物 CRDS_BACKTEST(2026-10-02) 与 BACKTEST_ALL_ALGOS(2026-10-01) 经 node 解析：by_period 真实(T+20=4样本/100%、T+30=4样本/75%→前端灰显生效)、ranking_all 全样本≥30(无小样本混入)、无小样本高胜率隐藏异常。
+    fix: >-
+      审计中发现「全算法回测汇总」块口径说明调用过时 A.primary_rule 字段(描述旧主口径「四量=持有T+5／逆势=持有T+5」)，而同页「算法回测总表」实际展示「最佳持有期」(四量T+250／三重T+30／逆势T+1)→ 同页口径打架。经 Git Data API（contents PUT，force:false）推 main：commit 72bc5173f3，将口径说明统一为与总表一致的「最佳持有期」口径。质量门：29 内联 script new Function 0 错；产物 0 CR 纯 LF；blob sha fdbd89d2ec 本地与 GitHub 回算一致（字节级自证）。
+    verify_how: >-
+      远端 main tip=72bc5173f3 已含修复；GitHub Pages 自动部署；语法门 0 错；字节级 sha 自证通过；断言「口径说明」行不再含过时 primary_rule 旧主口径、与总表「最佳持有期」同口径；node 解析确认真实数据与前端逻辑一致。
+    refs:
+      - "index.html"
+    updated: "2026-10-06 23:18"
+    updated_by: 阿狸咪的工程师
