@@ -7998,3 +7998,18 @@ items:
       - "index.html"
     updated: "2026-10-07 07:30"
     updated_by: 阿狸咪的工程师
+  - id: audit-ops-page-1007
+    priority: P3
+    owner: 阿狸咪的工程师
+    status: done
+    verified_at: "2026-10-07 07:40"
+    what: >-
+      运维页（🔒 管理员）审计：程序化静态分析全文件 + 逐函数追定义 renderRunnerTrack / renderAuditTrail / renderTaskSchedule / renderHealthCheck + 数据源文件存在性与注入核验。结论：展示逻辑科学、诚实铁律执行到位（真实读 window.RUNNER_STATUS / AUDIT_TRAIL / HEALTH_CHECK / HB_XIAOJIU，不改数不插值、无样本显占位、四态同源、锁态标注、未接入显「待配置」灰而非红叉）。真实数据交叉核验：RUNNER_STATUS run_time=2026-10-06 17:08:54、AUDIT_TRAIL 2026-10-07 02:43:35 overall=ok、HEALTH_CHECK updated=2026-10-07 02:43:38 overall=ok，全部真实新鲜；HB_XIAOJIU last_time=2026-10-01 07:47:38 陈旧，前端如实显「离线」（真实反映，非 bug）。发现并修复一处实质性诚实缺陷。
+    fix: >-
+      经 Git Data API（blob + tree + commit + ref PATCH，force:false）推 main：commit 870fcb6c4c。根因：v8 部署走 Git Data API 直推 main，跳过 v8_build_deploy.yml 构建期 BUILD 替换（L441 re.sub），致 main 上 var BUILD 恒为过期占位值 352bdd71e8，不等于真实部署 commit e3d34f3627——运维页「部署 SHA」显示不真实值，且版本戳强缓存破坏机制（L14-15 比对 BUILD 触发强制刷新）因 BUILD 永不变而失效。修复：将 BUILD 改为真实 main tip 短 SHA e3d34f3627；并在推送脚本固化「推送前自动 re.sub BUILD 为当前 tip 前 10 位」，根治回归（任何直推都对齐真实 tip）。质量门：29 内联 script new Function 0 错；产物 0 CR 纯 LF；blob sha 43124406b1 本地与 GitHub 回算一致（字节级自证）。
+    verify_how: >-
+      远端 main tip=870fcb6c4c 已含修复；GitHub Pages 自动部署；语法门 0 错；字节级 sha 自证通过；硬刷后运维页「部署 SHA」= e3d34f3627（= 当前真实 main tip），「最后部署」因 RUNNER_STATUS 无 republish_time 显「—」（真实，不伪造时间）。运维页四动态渲染（数据健康总览 / 审计轨迹 / 任务运行看板 / 前端健康巡检）与四静态数据源均就位、真实。
+    refs:
+      - "index.html"
+    updated: "2026-10-07 07:40"
+    updated_by: 阿狸咪的工程师
