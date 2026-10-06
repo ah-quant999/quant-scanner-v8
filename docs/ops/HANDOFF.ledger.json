@@ -114,6 +114,7 @@
     "final-recommend-killed-by-1800s-0928",
     "lhb-history-today-empty-placeholder",
     "wave-elliott-daily-miss-0928",
+    "strategy-page-dead-injection-cleanup-1006": "8d7e5e4e7e6b2ca1"
     "healthcheck-all-ts-source-mismatch-0929",
     "sector-fund-flow-trend-em-realsource-0929",
     "intraday-snapshot-schedule-deregistered-again-0929",
@@ -274,5 +275,5 @@
     "wave-elliott-daily-miss-0928": "8e36cb3c0434f18b"
   },
   "id_content_hash_note": "每 id 内容哈希（sha256 前 16 位；计算时把该 item 的 updated 时间戳归一化为 <ts>，并剔除块尾分隔注释，以排除纯时间漂移与插项造成的假阳性）。用途：现「ids 集合」锚只能抓 item 消失或整体回滚，抓不到「id 仍在、但内容被旧版顶掉」—— 那恰是防覆盖要防的主类。校验：按同一规则重算，逐 id 比对，不一致即视为内容被回退。（2026-09-23 阿狸咪的工程师 修正块边界：改为截到最后一个非空非注释行，解决插新项导致后续项哈希变化的误报）。 ｜2026-09-23 17:5x 小九实测留证：按本口径用**未编辑的线上 YAML** 重算，**62 项命中 0 项**（2026-09-22 17:0x 同口径尚能对齐），且 ids=64 而 hashes=62 与本口径的 recalc_ledger 代码路径不自洽 ⇒ 判定为**口径变更或既存漂移**。在口径确认前**刻意不重写哈希**（盲改＝写入不可验证数据），只补 ids / 计数；详见 docs/ops/HANDOFF.yaml 的 item handoff-ledger-hash-desync。",
-  "next_id_seq": 117
+  "next_id_seq": 118
 }
