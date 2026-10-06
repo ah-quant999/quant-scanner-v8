@@ -15720,6 +15720,9 @@ h += '<div class="card" id="dajijinCard" style="display:none;margin-bottom:16px;
 //   渲染函数 __renderMacroKShape / 派发块 / V8_PAGE_SCHEDULE / _PAGE_CARD_ORDER / script 注入
 //   / v8_health_check.py 条目 / data/MACRO_KSHAPE.js 同批清理（见 git 历史）。
 h += '</div>'; // /ulPaneObserve
+    // 2026-10-07 阿狸咪：模块去向索引专用子容器（renderUnlisted 在 unlistedPanel 内预留），
+    //   避免与下方 _renderV8StockLists 旧实现「整容器 ulEl.innerHTML=modulesHtml()」互相覆盖 ⇒ 索引卡永远不可见。
+    h += '<div id="unlistedIdxPanel"></div>';
 
 // ===== 📊 大盘观察 pane —— 🚚 2026-09-15 主人令：整页迁出 =====
 //   去向：新建一级页「🌍 观测平台」> 子页「📊 大盘观测」（改名），卡片由 3 张增至 4 张
@@ -15741,11 +15744,14 @@ h += '</div>'; // /ulPaneObserve
 //   原 4 按钮子页签导航行与 __ulSwitch 的多组分支已随迁一并删除，避免指向不存在的容器。
 // 2026-09-02 主人令：强势突破 pane、模块去向索引、动量共识/H反推/两套算法回测对比 全部删除（卡片清单以 renderUnlisted 为准）。
     el.innerHTML=h;
+    // 2026-10-07 阿狸咪：renderUnlisted 是 unlistedPanel 唯一真源；「模块去向索引」卡走专用子容器 unlistedIdxPanel，
+    //   在此同步填充（覆盖 UNLISTED_PANEL 已加载情形），不再依赖被 renderUnlisted 回写吞掉的整容器覆盖逻辑。
+    try{ if(typeof window._renderV8StockLists==='function') window._renderV8StockLists(); }catch(e){}
     // 2026-09-12：暂未上架仅剩「观测类」一个在册子页，直接激活之
     setTimeout(function(){ window.__ulSwitch(null, 'observe'); }, 0);
     // 🗑 2026-09-30：K 型分层卡已退役，原派发块（退避 0/600/1800ms 调 __renderMacroKShape）随卡删除。
     // 2026-08-30 主人令:渲染兜底
-    if(!h || h.length<200){ el.innerHTML='<div style=\"text-align:center;padding:40px;color:var(--dim);\"><div style=\"font-size:32px;margin-bottom:12px;\">📭</div><div style=\"font-size:14px;\">已下架卡片暂无可用数据</div><div style=\"font-size:12px;margin-top:8px;\">稍后再试或检查数据源</div></div>'; }
+    if(!h || h.length<200){ el.innerHTML='<div style=\"text-align:center;padding:40px;color:var(--dim);\"><div style=\"font-size:32px;margin-bottom:12px;\">📭</div><div style=\"font-size:14px;\">暂未上架卡片暂无可用数据</div><div style=\"font-size:12px;margin-top:8px;\">稍后再试或检查数据源</div></div>'; }
     // 2026-09-12：此处原有第二份 __ulSwitch 定义（与函数开头那份完全重复，
     //   且含指向已迁走容器的死分支）已删除，只保留函数开头提前暴露的那一份。
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
@@ -16584,7 +16590,19 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
 
   /* 2026-08-30 主人令：暂未上架 + 已下架股票目录填充（统一 unlistedPanel + dl 两个 tab 共用） */
   function _renderV8StockLists(){
-    var ulEl = document.getElementById('unlistedPanel');
+    // 2026-10-07 阿狸咪：写入专用子容器 unlistedIdxPanel（renderUnlisted 在 unlistedPanel 内预留），
+    //   绝不再整容器覆盖 unlistedPanel（旧 ulEl.innerHTML=modulesHtml() 会抹掉 5 张观测卡，且索引卡因被
+    //   renderUnlisted 60ms 后回写而永远不可见）。容器缺失（renderUnlisted 尚未跑）则随 UNLISTED_PANEL 一起轮询。
+    var host = document.getElementById('unlistedIdxPanel');
+    if(!host){
+      if(!window.__ulIdxRetryTimer){
+        window.__ulIdxRetryTimer = setInterval(function(){
+          var _h = document.getElementById('unlistedIdxPanel');
+          if(_h && window.UNLISTED_PANEL){ clearInterval(window.__ulIdxRetryTimer); window.__ulIdxRetryTimer=null; try{ window._renderV8StockLists(); }catch(e){} }
+        }, 800);
+      }
+      return;
+    }
     // 🛡 2026-09-02 主人令根治：UNLISTED_PANEL 为 defer 脚本，未注入即「模块去向索引」卡永久空 → 轮询补填
     if(!window.UNLISTED_PANEL){
       if(!window.__ulIdxRetryTimer){
@@ -16627,7 +16645,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       h+='</div>';
       return h;
     }
-    if(ulEl) ulEl.innerHTML = modulesHtml();
+    if(host) host.innerHTML = modulesHtml();
   }
   window._renderV8StockLists = _renderV8StockLists;
 
