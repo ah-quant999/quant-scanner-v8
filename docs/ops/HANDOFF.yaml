@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-06 07:36"
+  updated: "2026-10-06 22:28"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 121
+  next_id_seq: 122
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -7943,4 +7943,28 @@ items:
     refs:
       - "index.html"
     updated: "2026-10-06 07:44"
+    updated_by: 阿狸咪的工程师
+
+  - id: crds-backtest-thin-sample-guard-1006
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: done
+    verified_at: "2026-10-06 22:28"
+    what: >-
+      逆势龙头(CRDS)回测卡展示缺陷：T+20/T+30 仅 4 样本却显示 100%/75% 高胜率与高收益(最高
+      +26.41%)，误导性强。根因=卡片渲染 L16993 的 (thin?'':'') 是 no-op（本应加灰显却没加），且
+      L16997/L16999 只判 win_rate==null 而忽略 thin，导致 n<30 的小样本行整行高亮。已按全站诚实
+      铁律(主对比表 L5864 对 n<30 严格灰显)一脉修复。
+    fix: >-
+      经 Git Data API（contents PUT，force:false）推 main：commit 7bcb1bdcf4。三处修改：① L16993
+      (thin?'':'') → (thin?'opacity:.45;':'') 整行降透明；② L16997 胜率判据加 ||thin 转灰；③ L16999
+      收益判据加 thin 转灰。质量门：29 内联 script new Function 0 错；产物 0 CR 纯 LF；blob sha
+      0f0e5903 本地与 GitHub 回算一致（字节级自证）。
+    verify_how: >-
+      远端 main tip=7bcb1bdcf4 已含修复；GitHub Pages 自动部署；语法门 0 错；字节级 sha 自证通过；
+      断言 T+20(4样本)/T+30(4样本) 整行 opacity:.45 且胜率/收益转 var(--dim) 灰显；n<30 不再给高亮
+      高分误导。样本成熟时间见 owner 说明。
+    refs:
+      - "index.html"
+    updated: "2026-10-06 22:28"
     updated_by: 阿狸咪的工程师
