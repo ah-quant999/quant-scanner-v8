@@ -7983,3 +7983,18 @@ items:
       - "index.html"
     updated: "2026-10-06 23:18"
     updated_by: 阿狸咪的工程师
+  - id: audit-unlisted-delisted-page-1007
+    priority: P3
+    owner: 阿狸咪的工程师
+    status: done
+    verified_at: "2026-10-07 07:30"
+    what: >-
+      暂未上架页 / 已下架页 审计（程序化静态分析全文件 + 逐函数追定义 + 数据源文件存在性与注入核验）结论：两页数据源真实完备、诚实口径到位（观测卡标注「研究信号·不构成投资建议」、无样本显示「—」、display:none 直到有数据，不下 0 冒充）。发现并修复一处实质性正确性问题——暂未上架页「实验区·模块去向索引」卡（调度表明确列为暂未上架卡片）因 renderUnlisted 与 _renderV8StockLists 争用同一 unlistedPanel 容器被互相覆盖而永远不可见：旧 _renderV8StockLists 用 ulEl.innerHTML=modulesHtml() 整容器覆盖，而 renderUnlisted 60ms 后回写 5 张观测卡将其吞掉。
+    fix: >-
+      经 Git Data API（contents PUT，force:false）推 main：commit 5bd10363a58a7bf9072b799fac74326c31c92562。改为专用子容器 unlistedIdxPanel（renderUnlisted 内预留并同步填充），不再整容器互覆盖；容器/数据缺失时随 UNLISTED_PANEL 一起轮询补填。顺带修正 renderUnlisted 兜底文案错写「已下架卡片暂无可用数据」→「暂未上架卡片暂无可用数据」。质量门：29 内联 script new Function 0 错；产物 0 CR 纯 LF；blob sha aed18f85 本地与 GitHub 回算一致（字节级自证）。
+    verify_how: >-
+      远端 main tip=5bd10363a58a7bf9072b799fac74326c31c92562 已含修复；GitHub Pages 自动部署；语法门 0 错；字节级 sha 自证通过；断言 unlistedPanel 内新增 #unlistedIdxPanel 子容器、_renderV8StockLists 改写该子容器（不再 ulEl 整容器覆盖）、暂未上架页进入后 5 张观测卡与「模块去向索引」卡同屏可见。已下架页（renderDelisted：成交额/涨跌家数/资金流时间轴/两融）数据源 MARGIN_DATA / MARKET_FUND_FLOW_DATA 均存在且已注入，结构无缺失。
+    refs:
+      - "index.html"
+    updated: "2026-10-07 07:30"
+    updated_by: 阿狸咪的工程师
