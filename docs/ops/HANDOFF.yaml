@@ -7930,3 +7930,17 @@ items:
       - "index.html"
     updated: "2026-10-06 07:36"
     updated_by: 阿狸咪的工程师
+  - id: strategy-page-dead-injection-cleanup-1006
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: done
+    what: >
+      选股策略页深度审计（程序化静态分析全文件 + 逐函数追定义 + 数据源读取计数）发现 3 个全局零读取死注入 + 1 个悬挂调用：①ALGO_TRACK.js 被 <script> 注入但 window.ALGO_TRACK 全文零读取（renderLifeBacktests 实际读 IMA_STRONG_BACKTEST，旧注释「回测页需要它」与实证不符，属 2026-09-16 误恢复）；②H_AUTO_BUY.js / H_AUTO_BUY_TRACK.js 注入但零读取（H 反推短线买点策略早已下线）；③_renderPostReady 每页加载仍 try 调已删除的 __renderLifecycleSection()（被 catch 静默吞掉，纯死代码残留）。
+    fix: >
+      经 Git Data API（contents PUT，force:false）推 main：commit 8bdb2a69e2c8de70c191a3d794532181fcebe1c3。移除 3 个死 script 标签 + _renderPostReady 悬挂调用 + 更正 L14270 错误注释（「数据层 ALGO_TRACK 保持不动，照常回测」→ 实证为全局零读取死注入）+ 前端注册表 _PAGE_CARD_ORDER['选股策略'] 同步清三死源。质量门：29 内联 script new Function 0 错；产物 0 CR 纯 LF；blob sha a171e9e8 本地与 GitHub 回算一致（字节级自证）。
+    verify_how: >
+      远端 tip=8bdb2a69e2c8de70c191a3d794532181fcebe1c3；字节级回读 blob=a171e9e8fb0957f35c0b1213004a766c98ab75a8 一致；语法门 0 错；断言 data/ALGO_TRACK.js / data/H_AUTO_BUY.js / data/H_AUTO_BUY_TRACK.js 三 script 标签 0 命中、try{ window.__renderLifecycleSection(); }catch(e){} 0 命中、注册表三死源清除。运维页调度任务表对 ALGO_TRACK 算法任务的正当描述（source:'ALGO_TRACK'）保留——护栏：非孤立死注入前不擅删生成管线，三文件仍每日产出故后端健康巡检新鲜度绿灯不误报。后端 v8_health_check.py 监控清单同步清理列为受护栏约束的后续项（需主人令）。
+    refs:
+      - "index.html"
+    updated: "2026-10-06 07:44"
+    updated_by: 阿狸咪的工程师
