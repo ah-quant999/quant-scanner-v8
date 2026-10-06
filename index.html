@@ -16990,13 +16990,13 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
           keys.forEach(function(k){
             var r = bp[String(k)] || bp[k] || {};
             var nS = r.samples || 0, thin = nS < 30;
-            h += '<tr style="border-bottom:1px solid var(--border2);' + (thin?'':'') + '">'
+            h += '<tr style="border-bottom:1px solid var(--border2);' + (thin?'opacity:.45;':'') + '">'
                + '<td style="padding:6px;font-weight:700;color:var(--txt);white-space:nowrap;">T+' + k + '</td>'
                + '<td style="padding:6px;color:' + (thin?'var(--dim)':'var(--sub)') + ';font-weight:' + (thin?'700':'400') + ';">'
                +   nS + (thin?' ⚠':'') + '</td>'
-               + '<td style="padding:6px;font-weight:700;color:' + (r.win_rate==null?'var(--dim)':'#fbbf24') + ';">'
+               + '<td style="padding:6px;font-weight:700;color:' + (r.win_rate==null||thin?'var(--dim)':'#fbbf24') + ';">'
                +   (r.win_rate==null?'\u2014':_n(r.win_rate)+'%') + '</td>'
-               + '<td style="padding:6px;font-weight:700;color:' + _pl(r.avg_return) + ';">'
+               + '<td style="padding:6px;font-weight:700;color:' + (thin?'var(--dim)':_pl(r.avg_return)) + ';">'
                +   (r.avg_return==null?'\u2014':_sgn(r.avg_return)+_n(r.avg_return,2)+'%') + '</td>'
                + '<td style="padding:6px;color:' + _pl(r.best_return) + ';">'
                +   (r.best_return==null?'\u2014':_sgn(r.best_return)+_n(r.best_return,2)+'%') + '</td>'
