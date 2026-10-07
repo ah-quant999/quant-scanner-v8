@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-06 22:28"
+  updated: "2026-10-07 08:25"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 122
+  next_id_seq: 127
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -8013,3 +8013,35 @@ items:
       - "index.html"
     updated: "2026-10-07 07:40"
     updated_by: 阿狸咪的工程师
+  - id: healthboard-pagecardorder-align-1007
+    priority: P3
+    owner: 阿狸咪的工程师
+    status: done
+    verified_at: "2026-10-07 08:25"
+    what: >-
+      前端健康巡检看板注册表 _PAGE_CARD_ORDER 与导航页 / HEALTH_CHECK.js 真源对齐审计，发现并修复 6 处漂移：补实时数据 MARKET_ALERTS/STOCK_QUOTE、选股策略 ALGO_TRACK/H_AUTO_BUY/H_AUTO_BUY_TRACK、今日事件 MACRO_DATA；删盘后数据 MACRO_DATA/RESTRICTED_RELEASE/PERFORMANCE_FORECAST（实属今日事件）、暂未上架 UNLISTED_PANEL（实则运维）；补全量数据(48项)/管线(10项)/内容审计(4项)三个原本缺失页组（_PAGE_ORDER 已列但 _PAGE_CARD_ORDER 无条目）。_PAGE_ORDER 已与 nav 前 12 项一致，无需改。
+    fix: >-
+      经 Git Data API（blob+tree+commit+ref PATCH，force:false）推 main：commit 37ba3db041419b4824dae05a42466978d8ee61a2。派生自 HEALTH_CHECK.js（updated=2026-10-07 02:43:38，122 项）page+order 真源整表重建 _PAGE_CARD_ORDER；同步 BUILD 对齐当前 tip（1791332466）。质量门：29 内联 script new Function 0 错；产物 0 CR 纯 LF；blob sha cd691133979946c2f0b8e305d3a6e34eb60f0057 本地与 GitHub 回算一致（字节级自证）。
+    verify_how: >-
+      远端 main tip=37ba3db0 已含修复；GitHub Pages 自动部署；语法门 0 错；字节级 sha 自证通过；断言 _PAGE_CARD_ORDER 覆盖 13 页（含全量数据/管线/内容审计）、实时数据含 MARKET_ALERTS/STOCK_QUOTE、选股策略含 ALGO_TRACK/H_AUTO_BUY/H_AUTO_BUY_TRACK、今日事件含 MACRO_DATA、盘后数据仅 5 项、暂未上架 4 项不含 UNLISTED_PANEL。
+    refs:
+      - "index.html"
+    updated: "2026-10-07 08:25"
+    updated_by: 阿狸咪的工程师
+
+  - id: audit-logic-page-1007
+    priority: P3
+    owner: 阿狸咪的工程师
+    status: done
+    verified_at: "2026-10-07 08:25"
+    what: >-
+      逻辑详解页（logic.html）新/删对齐审计。结论：logic.html 为 2026-10-04 主人令下的「📖 逻辑详解已下架」存根（1620B，CRLF），公开站不再承载任何逻辑详解内容（阈值/权重/公式/胜率/评分/止损/仓位），完整版仅存本机私有副本、不进 GitHub Pages、不对访客可见；本页已与 v6 备忘录完全解耦（v6 入口骨架已移除）、不写存放路径。故逻辑详解页含 0 个模块引用——无陈旧项可删、无新增项可补；补模块文档将直接违反 2026-10-04 令。本次审计确认其处于该令下的正确终态，无需代码改动。
+    fix: >-
+      审计结论为「无需改动」；未对 logic.html 写入任何逻辑内容（遵守 2026-10-04 主人令）。如需恢复公开逻辑详解，须主人明确撤销该令。
+    verify_how: >-
+      读回 logic.html（blob b398418ebf）确认仅含「逻辑详解已下架」单一标题与两段说明，正文 0 个模块/公式/v6 引用；全文件 grep 无 v6/memo/阈值/权重字串。审计判定：与站点真实结构（逻辑全下架）一致，补/删口径无偏差。
+    refs:
+      - "logic.html"
+    updated: "2026-10-07 08:25"
+    updated_by: 阿狸咪的工程师
+
