@@ -3723,6 +3723,63 @@ def _etf_snapshot_partial():
 _ETF_DAILY_MIN_PAGES = 16
 
 
+def _etf_daily_monitor_reuse():
+    """🩹 2026-10-07 一劳永逸（阿狸咪）：休市日/低频日拼页永远凑不齐 ⇒ 每天必 empty。
+
+    根因（血证 2026-10-01~10-06 国庆假期，观测平台连续红灯「Runner 模块
+    ETF_DAILY_MONITOR 返回空数据集」）：
+      · 跨轮拼页缓存按「当天日期」清零（_etf_cache_load），已入仓的上轮累积成果
+        raw_data/etf_snapshot_pages.json 假期每天被当空盘丢弃；
+      · 东财 clist 单页成功率 ~88%（换 host 4 次）⇒ 17 页单轮全齐概率仅 ~11%，
+        交易日靠盘中几十轮跨轮累积才拼得齐；假期每天仅 1 轮盘后 run ⇒ 结构性
+        拼不齐 ⇒ _etf_snapshot() None → 降级门(≥16/17)也过不了 → 本函数
+        （原实现）返回 None → run() 记 "empty" → 观测平台红灯，data 文件
+        时间戳整个假期冻结（观感=停更）。
+
+    诚实复用（非造数）：f62（当日主力净流入）自最近交易日 15:05 收盘起冻结，
+    此后（休市日全天 / 收盘后）raw_data/etf_daily_monitor.json 的上一版
+    **就是当前最新可得真值**——复用它重新落盘（save() 会刷新 update_time=
+    本轮确认时刻，与 10-01 假期成功产出同口径），并打 `reused: true` 供审计。
+    安全闸：
+      · 交易日盘中（09:30–15:05）**绝不复用**（f62 实时变化，会拿昨日定稿榜
+        冒充盘中实时榜 = 假数据）；
+      · 上一版 update_time 必须晚于「最近交易日 15:05 定稿时刻」，否则视为
+        陈旧禁复用（宁可继续 empty 也不假刷新停更多日的旧值）。
+    复用闭环：落盘后下一轮 _etf_fresh_skip() 命中（20 分钟内）⇒ 拼页缓存
+    不完整 ⇒ 本函数再次兜底 ⇒ 稳定 ok，不再空打东财（省请求、少撞限流）。"""
+    try:
+        _p = RAW_DIR / "etf_daily_monitor.json"
+        if not _p.exists():
+            return None
+        prev = json.loads(_p.read_text(encoding="utf-8"))
+        if not isinstance(prev, dict) or not prev.get("top_inflow"):
+            return None
+        now = now_cst()
+        _hm = (now.hour, now.minute)
+        if _is_trading_day(now.date()) and (9, 30) <= _hm < (15, 5):
+            return None                     # 交易日盘中：f62 实时变化，禁止复用
+        try:
+            _dt = datetime.strptime(str(prev.get("update_time"))[:19],
+                                    "%Y-%m-%d %H:%M:%S").replace(tzinfo=CST)
+        except Exception:
+            return None
+        _ltd = _last_trading_day(now.date())   # 最近交易日（date）
+        _freeze = datetime(_ltd.year, _ltd.month, _ltd.day, 15, 5, tzinfo=CST)
+        if _dt < _freeze:
+            # 上一版早于最近收盘定稿（停更多日的陈旧值）⇒ 禁复用，保持诚实 empty
+            print(f"  ⏭️ ETF_DAILY_MONITOR 复用闸：上一版 {_dt} 早于最近定稿时刻 "
+                  f"{_freeze} ⇒ 不复用（防假刷新）")
+            return None
+        out = dict(prev)
+        out["reused"] = True
+        print(f"  ♻️ ETF_DAILY_MONITOR 诚实复用：休市/收盘后拼页未齐，沿用上一版定稿"
+              f"（其 update_time={prev.get('update_time')}，f62 自 {_ltd} 收盘冻结未变化）")
+        return out
+    except Exception as e:
+        print(f"  ⚠️ ETF_DAILY_MONITOR 复用兜底异常：{type(e).__name__}: {e}")
+        return None
+
+
 def f_etf_daily_monitor():
     # ETF 日监控：全市场 ETF 当日主力净流入排名（口径见上方 _ETF_FS 注释）。
     # 输出 schema 不变：{total_etf,total_net,top_inflow,top_outflow}（AI速览/ETF卡直读）。
@@ -3738,6 +3795,11 @@ def f_etf_daily_monitor():
             print(f"  ⚠️ ETF_DAILY_MONITOR: 底表未拼齐（{_got if _snap else 0} 页）"
                   f"且未达 {_ETF_DAILY_MIN_PAGES}/17 降级线 ⇒ 不写盘，保留远端旧数据")
     if not snap:
+        # 🩹 2026-10-07 一劳永逸：休市日/收盘后拼页结构性凑不齐 ⇒ 诚实复用上一版定稿，
+        #   不再让观测平台假期天天红灯「返回空数据集」（详见 _etf_daily_monitor_reuse）。
+        _fb = _etf_daily_monitor_reuse()
+        if _fb is not None:
+            return _fb
         return None
     rows = []
     for code, r in snap.items():
