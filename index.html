@@ -629,7 +629,7 @@ window.__domReadyFns=[];
     <script src="data/MACRO_DATA.js?v=64710cf7a1" defer></script>
     <!-- 🔮 2026-10-05 主人令：未来预测子TAB（牛转熊指标观测台）数据，gen_market_thermo.py 日更 -->
     <script src="data/MARKET_THERMO.js?v=0a732d0e7a" defer></script>
-    <script src="data/MACRO_BRIEF.js?v=2d5b95e70f" defer></script>
+    <script src="data/MACRO_BRIEF.js?v=b2011fd841" defer></script>
     <!-- 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役（巡检自动化已消亡、09-23 后死数据；生产者/渲染/派发/时窗一并清理，见 git 历史） -->
     <script src="data/NT_DATA.js?v=43eedf0f21" defer></script>
 <script src="data/LHB_DATA.js?v=7ff5933834" defer></script>
@@ -2107,7 +2107,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       //   原 ok 仅校验 head 含卡名，但：defer 时序下需排序：
       //     1) HTML 分析到 line 1630+ 注册 ◐◦selfHealJudgmentHeader；
       //     2) HTML 继续分析到 line 10673 注册 v8CardHeader；
-      //     3) <script src="data/JUDGMENT_DATA.js?v=964bb34288" defer> 和 <script src="data/MACRO_BRIEF.js?v=2d5b95e70f" defer> 在 HTML 分析完成后才异步执行；
+      //     3) <script src="data/JUDGMENT_DATA.js?v=964bb34288" defer> 和 <script src="data/MACRO_BRIEF.js?v=b2011fd841" defer> 在 HTML 分析完成后才异步执行；
       //     4) 首次 initCardBadges / switchSec 触发 ◐◦renderJudgmentHeader 时，JUDGMENT_DATA.js 可能还没加载完；
       //     5) ts='' → v8CardHeader 返回的 HTML 中：卡名、副标题，但缺少「更新于」膠勢；
       //     6) 自愈校验 ok 通过（head.innerHTML.indexOf('今日判定')>=0）→ 永不重昆明；
