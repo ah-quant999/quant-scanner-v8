@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 127
+  next_id_seq: 128
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -8043,5 +8043,22 @@ items:
     refs:
       - "logic.html"
     updated: "2026-10-07 08:25"
+    updated_by: 阿狸咪的工程师
+  - id: logic-private-align-protect-1007
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: done
+    verified_at: "2026-10-07 08:55"
+    what: >-
+      纠正 2026-10-07 早间审计的范围偏差：主人令澄清 logic.html 并非「下架/废弃」，而是「太重要→藏起来（私有化）」，完整版仅存本机私有副本（坚果云 E:/Nutstore/v8_logic_private/logic.full.html，不进公网），且每次改后三件套仍须执行。据此对私有完整版逻辑详解做两件事：(1) 对齐补遗——新增 ALGO_TRACK/H_AUTO_BUY/H_AUTO_BUY_TRACK 三个选股策略模块的登记索引，并将 MACRO_DATA/RESTRICTED_RELEASE/PERFORMANCE_FORECAST 的页归属由「盘后数据」更正为「今日事件」、UNLISTED_PANEL 由「暂未上架」更正为「运维」（与看板注册表 _PAGE_CARD_ORDER 2026-10-07 修复一致）；(2) 重要文件保护——v8 logic.full.html 与 v6 v6_memo.html 头部均加「永久禁止删除」横幅，新建 DO_NOT_DELETE.md 清单与 v8 镜像护栏 guard_logic_full.py（对齐 v6 既有 guard_v6_memo.py）。
+    fix: >-
+      私有目录 E:/Nutstore/v8_logic_private/ 下：logic.full.html、v6_memo.html 头部加结构化 PERMANENT DO-NOT-DELETE 横幅；新建 DO_NOT_DELETE.md（重要文件·永久禁删清单）与 guard_logic_full.py（缺失/截断时从冷备份 E:/v8_logic_private/logic.full.html 自愈）；logic.full.html 选股策略章插入「2026-10-07 新增/迁移模块对齐补遗」表。护栏 guard_logic_full.py 实跑通过（exit 0）；logic.full.html 结构完整（DOCTYPE/</html> 齐全，767178B）。上述改动均在本机/双机坚果云私享目录，不进公开仓库，遵守 2026-10-04 令（公开 logic.html 仍维持「已下架」占位）。
+    verify_how: >-
+      本地核验：guard_logic_full.py 输出 完整 + 含禁删标记 + exit 0；logic.full.html grep 补遗块=1、DOCTYPE=1、</html>=1、字节 767178；v6_memo.html 头部含 PERMANENT DO-NOT-DELETE；DO_NOT_DELETE.md 与 guard_logic_full.py 均存在。双机交接：坚果云同步使小九侧同得上述文件（含护栏），冷备份 E:/v8_logic_private/logic.full.html 仍 773163B 完好作自愈源。
+    refs:
+      - "E:/Nutstore/v8_logic_private/logic.full.html"
+      - "E:/Nutstore/v8_logic_private/v6_memo.html"
+      - "E:/Nutstore/v8_logic_private/guard_logic_full.py"
+    updated: "2026-10-07 08:55"
     updated_by: 阿狸咪的工程师
 
