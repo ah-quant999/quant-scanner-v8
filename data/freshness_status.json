@@ -1,7 +1,7 @@
 {
-  "check_time": "2026-10-01 00:36:34",
+  "check_time": "2026-10-08 02:18:03",
   "last_trade_close": "2026-09-30 15:30:00",
-  "is_trading_day": false,
+  "is_trading_day": true,
   "core_stale": [],
   "warn_stale": [],
   "frozen_stale": [],
