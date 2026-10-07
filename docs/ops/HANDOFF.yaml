@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 129
+  next_id_seq: 130
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -8078,3 +8078,18 @@ items:
     updated: "2026-10-07 09:07"
     updated_by: 阿狸咪的工程师
 
+  - id: audit-main-site-1007
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: done
+    verified_at: "2026-10-07 10:10"
+    what: >-
+      主站全面审计（走 GitHub API 远端真源 main=5c06f3506c，非本机落后树）。结论全绿：(1) 前端卡片结构 §1：解析块17个、不合规0；(2) 核心标记守卫[10/10]：44锚点0缺失；(3) 数据真实性：LHB_DATA 已更新至09-30（旧患卡08-04已修复）、FOUR_VOLUME 现有2只信号（旧患命中0已修复）、MARKET_FUND_FLOW_DATA 真实update_time=2026-10-06（初查误把序列起始日20260202当戳，已排除）、图14四路资金读FOUR_VOLUME_BACKTEST非LHB（旧患已自愈）；(4) 僵尸§8三层：15个前端零注入data文件全部有Python后端消费，非真僵尸（避开了"只看前端注入误报"陷阱）；(5) 时区§11：6处toISOString全在window._fmtDateCST守卫后，无跨天误判；(6) 双机健康：RUNNER_STATUS/HEALTH_CHECK已接入，HEALTH_CHECK 10-07仍更新。(7) 轻量化：115个data文件/19.3k行index.html，4个日历归档(V8_CAL_2026-08/09/10+INDEX)可评估精简但须先核消费方。
+    fix: >-
+      本轮为只读审计，未改任何线上文件。仅将审计基线记入本 HANDOFF + ledger 供双机对齐。
+    verify_how: >-
+      审计脚本基于远端main=5c06f3506c落盘index.html(1.37MB/LF/19331行)、logic.html、关键data/*.js、index_protected_markers.txt，逐项跑§1结构/§8僵尸/§11时区/守卫命中/导航对齐/freshness校验；结论均经原始输出佐证。
+    refs:
+      - "E:/WorkBuddy交付/主站全面审计/report_2026-10-07.html"
+    updated: "2026-10-07 10:10"
+    updated_by: 阿狸咪的工程师
