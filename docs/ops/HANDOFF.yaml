@@ -48,7 +48,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 132
+  next_id_seq: 133
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -8122,3 +8122,17 @@ items:
     【有出】v6历史备份段「禁止删除」降级为「可清理」(2026-08-07限制令早已过期、v8稳定数月、标注路径已无文件)；
     修正 data/*.js 数量漂移(48→111)；删除私有清单中全仓不存在的 check_logic_deps.py 失效引用。
     核心资产(index/logic.full/v6_memo/golden/data/raw_data/PROTECTED_FILES三项)经核验全部存在且保留。
+  - id: fix-etf-daily-monitor-empty-1007
+    date: 2026-10-07
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: done
+    note: |
+      主人实拍观测平台红灯「Runner 模块 ETF_DAILY_MONITOR 返回空数据集」，一劳永逸修复+立即上线。
+      根因：跨轮拼页缓存按当天日期清零 + 东财 clist 单页成功率~88% ⇒ 17页单轮全齐仅~11%，交易日靠盘中几十轮跨轮累积拼齐；
+      假期每天仅 1 轮盘后 run ⇒ 结构性拼不齐 ⇒ f_etf_daily_monitor 返回 None ⇒ run() 记 empty ⇒ 观测平台假期天天红灯、data 时间戳冻结。
+      修复(cloud_fetch_v8.py)：新增 _etf_daily_monitor_reuse() 诚实复用——f62 自最近交易日 15:05 收盘冻结，休市日全天/收盘后
+      复用上一版定稿重新落盘(reused:true 审计标注, save() 刷新 update_time)；交易日盘中 09:30-15:05 绝不复用；
+      上一版早于最近定稿时刻则禁复用(防假刷新陈旧值)。本机实测：真抓首轮 0 页熔断 → 复用生效，
+      data/ETF_DAILY_MONITOR.js 时间戳刷新至 2026-10-07 15:04(值=09-30 收盘定稿, 假期无新交易即最新可得真值)。
+      明日 10-08 开市后盘中恢复跨轮累积、盘后链自动产出真抓全量。commit afeecbe0bfc6(数据+代码同批)，回读自证通过。
