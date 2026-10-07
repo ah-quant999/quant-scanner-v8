@@ -8136,3 +8136,18 @@ items:
       上一版早于最近定稿时刻则禁复用(防假刷新陈旧值)。本机实测：真抓首轮 0 页熔断 → 复用生效，
       data/ETF_DAILY_MONITOR.js 时间戳刷新至 2026-10-07 15:04(值=09-30 收盘定稿, 假期无新交易即最新可得真值)。
       明日 10-08 开市后盘中恢复跨轮累积、盘后链自动产出真抓全量。commit afeecbe0bfc6(数据+代码同批)，回读自证通过。
+  - id: fix-macro-brief-holiday-backfill-1007
+    date: 2026-10-07
+    owner: 阿狸咪的工程师
+    priority: P2
+    status: done
+    title: 宏观观测 MACRO_BRIEF 假期停更补齐（主人澄清：红灯=ETF已修，宏观观测另需每日解析）
+    note: |
+      主人澄清：截图红灯=ETF_DAILY_MONITOR（上轮已修）；宏观观测=MACRO_BRIEF 每日解读层，要求「每日读取和解析」。
+      查实 MACRO_BRIEF 停在 2026-09-30（假期 premarket 调度被 main 跳过），数据层 MACRO_DATA 今日 15:19 已更新 ⇒ 解读层假期空窗 7 天。
+      修复：手动 import cloud_fetch_v8.f_macro_brief()（绕过 main 假期闸门，不联网、基于当日真实 MACRO_DATA），
+      生成 2026-10-07 宏观解读（美债10Y 5.27%、中美利差-3.59%、VIX15.2、USD/CNH6.7072、黄金4155、危机32.9；a_impact=中性偏谨慎），
+      写 data/MACRO_BRIEF.js（纯 LF）并 Git Data API 推送。update_time 09-30 19:06 → 2026-10-07 18:31:36。
+      commit 8341e5c4ef，回读自证通过。根因属已知设计（假期 premarket 跳过）；10-09 开市后 premarket 08:25 自动每日生成。
+      明日 10-08 假期若仍空，将再手动补一次确保无空白。
+    verify_how: 回读 main data/MACRO_BRIEF.js update_time=2026-10-07 18:31:36、date=2026-10-07、size=1063、纯 LF；远端 tip 含 commit 8341e5c4ef。
