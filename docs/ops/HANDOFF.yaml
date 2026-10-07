@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 128
+  next_id_seq: 129
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -8060,5 +8060,21 @@ items:
       - "E:/Nutstore/v8_logic_private/v6_memo.html"
       - "E:/Nutstore/v8_logic_private/guard_logic_full.py"
     updated: "2026-10-07 08:55"
+    updated_by: 阿狸咪的工程师
+  - id: audit-tasks-lighten-1007
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: done
+    verified_at: "2026-10-07 09:07"
+    what: >-
+      审计所有定时任务（云端 GitHub Actions workflows + 双机 WorkBuddy automations）+ 轻量化审计一遍。结论：(1) workflows 44 个中删除 5 个早期手动探测探针（probe_em/probe_em_hosts/probe_ths/probe_v8_cn_cloud/v8_maharo_probe——均无 cron、无 reusable 依赖、长期未派发，轻量化清理），剩 39 个（cn_fetch 6 变体 / stock_quote_refresh 2 / v8_algo 3 / 清理类 4 等均为双机分时+云端兜底设计，各有 cron，不擅删，列潜在冗余读源确认清单）；(2) automations 51 个：国庆恢复器 b1ba19eb 为 once(scheduledAt 2026-10-07T18:00) 今晚才执行故保留，其余大量「阿狸咪-监控/兜底/看守」为双机值守核心切片，按铁律禁止删除只 PAUSED，不擅删，出具去重合并建议；(3) 重要文件禁删标注复核：仓库 DO_NOT_DELETE.md（已含 avg_price/sw_index_daily_cache/中信PE/maharo 活链）+ PROTECTED_FILES.json + 私有目录 DO_NOT_DELETE.md 互补，无重大漏标，已将仓库 DO_NOT_DELETE.md 头部日期更新为 2026-10-07；(4) 轻量化文件：HANDOVER_小九_*.md 14 个历史交接保留（追溯依据），不擅删。
+    fix: >-
+      删除 5 个探针 workflow（contents API 单文件单 commit，基于实时 main sha 快进）：27271f0c82 / d86ac0228d / 2276bf3691 / 99299f1955 / 56afcb56fa；更新 E:/workspace/stock-scanner/DO_NOT_DELETE.md 头部「最后更新」为 2026-10-07。
+    verify_how: >-
+      GitHub contents API 已删 5 文件（各返回新 commit sha，main 已快进）；仓库 DO_NOT_DELETE.md 日期已改；automations 51 / workflows 39 现状已盘点。双机交接：本项入 HANDOFF.yaml + ledger。
+    refs:
+      - "E:/workspace/stock-scanner/DO_NOT_DELETE.md"
+      - "E:/Nutstore/v8_logic_private/DO_NOT_DELETE.md"
+    updated: "2026-10-07 09:07"
     updated_by: 阿狸咪的工程师
 
