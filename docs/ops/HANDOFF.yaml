@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 130
+  next_id_seq: 131
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
@@ -5724,14 +5724,14 @@ items:
       真因（铁证，非推断）：
         ① `docs/ops/HANDOFF.yaml` 的**整个 `meta:` 块被误删**。守卫 `pre_deploy_audit.py:1218` 读
            `d["meta"]["next_id_seq"]` ⇒ `None` ⇒ `int(None)` 抛错 ⇒ FAIL。
-           该块在 `136d8f8cdbbe` 仍完好（`meta:`@L28、`next_id_seq: 77`@L61），
+           该块在 `136d8f8cdbbe` 仍完好（`meta:`@L28、`next_id_seq: 131`@L61），
            被**下一笔 `a2b5f1f38f3b`（阿狸咪 09-24 16:15 UTC「修正上一笔追加位置」）整块删除**，
            连带删掉并发写协议注释。当时只重算 ledger 哈希、未跑完整 pre_deploy_audit ⇒ 漏检。
         ② `probe_em_hosts.yml` heredoc 正文（`run: |` → `python - <<'PYEOF'` 之后）**丢 10 空格基准缩进**，
            第 17 行起被顶到第 0 列 ⇒ YAML 顶层非法行 ⇒ GitHub 判无效。
     fix: |-
       ✅ **阿狸咪的工程师 2026-09-25 07:2x CST 已修并推送（commit `89ae1b937d09`，Git Data API 六步）**：
-        ① `HANDOFF.yaml` 在 `items:` 前**恢复 `meta:` 块**（`next_id_seq: 77` == `ledger.max_next_id_seq`，
+        ① `HANDOFF.yaml` 在 `items:` 前**恢复 `meta:` 块**（`next_id_seq: 131` == `ledger.max_next_id_seq`，
            复原 `updated` / `updated_by` + 并发写协议 A/C/D/E 注释）；
         ② `probe_em_hosts.yml` heredoc 正文**统一补 10 空格基准缩进**（保留相对缩进）。
       ledger **无需重算哈希**：`[13/13]` 只断言「ids 超集 + seq 单调不减」，不校验 `id_content_hashes`。
@@ -6517,7 +6517,7 @@ items:
         · 🔴 **写入方本体已定位**：本机 `E:\_alimi_tools\_patch_finalrec_ledger_1933.py`（mtime **20:43:12**，与落盘文件
           `docs/ops/HANDOFF.yaml` 的 mtime **20:43:18** 相差 6 秒；同批 `_fill_handover_final_1933.py` 20:44:04）。
           该脚本第 5 行 `P = "E:/workspace/stock-scanner/docs/ops/HANDOFF.yaml"` ⇒ **基底取自本机工作树**；
-          第 70-71 行 `seg = 'next_id_seq: 91'` + `assert seg in s` —— **这条断言竟然通过**
+          第 70-71 行 `seg = 'next_id_seq: 131'` + `assert seg in s` —— **这条断言竟然通过**
           ⇒ 铁证：本机工作树该文件当时确实停在 `next_id_seq=91`（09-27 22:00 快照），而远端已是 93。
           脚本**全程未做任何远端比对**，第 74 行直接 `io.open(P,"w")` 覆写 ⇒ 违反 skill §铁律 1
           「基底必须取远端 API，禁本机副本」与本仓「内容源取远端 contents API」纪律。
@@ -8093,3 +8093,18 @@ items:
       - "E:/WorkBuddy交付/主站全面审计/report_2026-10-07.html"
     updated: "2026-10-07 10:10"
     updated_by: 阿狸咪的工程师
+- id: audit-dnd-important-1007
+  title: 防误删重要文件专项审计（有进有出制度落地）
+  owner: 阿狸咪的工程师
+  priority: P2
+  status: done
+  verify_how: 回读远端 DO_NOT_DELETE.md 含「关键运维真源」4项 + v6段降级「限制已过期」；私有 DO_NOT_DELETE.md 含 guard_logic_full.py/open_logic_detail.bat；check_logic_deps 失效引用已删
+  note: |
+    审计全部防误删保护源（仓库 DO_NOT_DELETE.md + PROTECTED_FILES.json + pre-commit hook +
+    私有目录 DO_NOT_DELETE.md + guard_v6_memo.py/guard_logic_full.py + 文件头 PERMANENT 横幅）。
+    【有进】补标4项漏标运维真源：docs/ops/HANDOFF.yaml、HANDOFF.ledger.json、
+    index_protected_markers.txt([10/10]防覆盖守卫真源)、PROTECTED_FILES.json(累积档案注册表)；
+    私有目录补标 guard_logic_full.py(护栏本体)、open_logic_detail.bat(入口助手)。
+    【有出】v6历史备份段「禁止删除」降级为「可清理」(2026-08-07限制令早已过期、v8稳定数月、标注路径已无文件)；
+    修正 data/*.js 数量漂移(48→111)；删除私有清单中全仓不存在的 check_logic_deps.py 失效引用。
+    核心资产(index/logic.full/v6_memo/golden/data/raw_data/PROTECTED_FILES三项)经核验全部存在且保留。
