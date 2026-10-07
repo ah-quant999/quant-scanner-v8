@@ -8151,3 +8151,19 @@ items:
       commit 8341e5c4ef，回读自证通过。根因属已知设计（假期 premarket 跳过）；10-09 开市后 premarket 08:25 自动每日生成。
       明日 10-08 假期若仍空，将再手动补一次确保无空白。
     verify_how: 回读 main data/MACRO_BRIEF.js update_time=2026-10-07 18:31:36、date=2026-10-07、size=1063、纯 LF；远端 tip 含 commit 8341e5c4ef。
+  - id: fix-macro-holiday-summary-1007
+    date: 2026-10-07
+    owner: 阿狸咪的工程师
+    priority: P2
+    status: done
+    title: 宏观观测·国庆假期宏观总结特刊覆盖 MACRO_BRIEF.js（主人令：假期最后一天做总结解析最好）
+    note: |
+      主人令：截图红灯=ETF_DAILY_MONITOR（已修）；宏观观测=MACRO_BRIEF 每日解读层，要求「每日读取和解析」，且
+      「假期最后一天要总结整个假期的更新和解析，这种最好，比如今晚」。
+      假期=10-01~10-07，今晚10-07即假期最后一天。生成「国庆假期宏观总结特刊」覆盖 data/MACRO_BRIEF.js：
+      以节前(9-30)真实基线 vs 节末(10-07)真实值做全对比（美债5.26→5.27、VIX15.8→15.2、黄金4215→4155、
+      DXY101.2→102.2、USD/CNH6.7066→6.7072、中美利差-3.58→-3.59、原油91.2→89.9），含 FOMC 9-16 加息25bp消化、
+      外盘假期走势、开市(10-08)展望。a_impact=中性偏谨慎。
+      纯 LF、Git Data API 快进；commit edac384599。开市10-08 premarket 08:25 自动覆盖回每日版（该特刊仅假期最后一天显示）。
+      建议：将「假期最后一天宏观总结」固化为 automation（需假期表+综述生成逻辑），待主人确认后建。
+    verify_how: 回读 main data/MACRO_BRIEF.js update_time=2026-10-07 18:47:19、is_holiday_summary=True、holiday_scope=2026-10-01~2026-10-07、8 key_numbers、5 news_brief、纯 LF；远端 tip 含 commit edac384599。
