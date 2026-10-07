@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-08 03:03"
+  updated: "2026-10-08 03:15"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -36,6 +36,20 @@ meta:
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
   next_id_seq: 133
 items:
+  - id: fix-handoff-b64-carrier-1008
+    owner: 阿狸咪的工程师
+    priority: P0
+    status: done
+    created: 2026-10-08
+    title: HANDOFF双b64载体事故根因修复（build_deploy [13/13] 恒红）
+    note: |
+      10-07 19:25 acc57eb3e7 起 HANDOFF.yaml/ledger 被整体 base64 化 ⇒ [13/13]「顶层不是映射」恒红，build_deploy 断链。
+      同文件另有两处 10-07 结构缺陷：protect-v6-memo-permanent-1007 错插头部（meta: 之前）、audit-dnd-important-1007 块缩进塌陷（2空格）。
+      修复：6a5545714898 恢复明文 + 错插块平移 items: 首位 + 缩进 +2 + ledger --fix 重算 150 项（--check 150/150）。
+      预防红线：两文件必须明文落库、item 只能进 items: 列表、推送前 hash --check 100% + PyYAML 解析断言（细则见 2026-10-08_0312 交接件）。
+    verify_how: CI run #9355（head=6a55457148）实测 ✅[13/13] items=150 ledger 锚全在 next_id_seq=133≥133，15 项门禁全过；远端回读双文件逐字节一致。
+    updated: "2026-10-08 03:15"
+    updated_by: 阿狸咪的工程师
   - id: protect-v6-memo-permanent-1007
     owner: 阿狸咪的工程师
     priority: P2
