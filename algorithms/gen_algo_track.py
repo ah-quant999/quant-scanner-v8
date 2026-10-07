@@ -406,7 +406,7 @@ def main():
     all_signals = {}
     
     # 1a. 四量终极（日线+60分钟合并）
-    fv_signals = _extract_four_volume()
+    fv_signals = _extract_from_four_volume()
     all_signals["four_volume"] = fv_signals
     print(f"  ▶ 四量终极 = {len(fv_signals)} 只: " +
           ", ".join(f"{s['name']}({s['code']})" for s in fv_signals))
