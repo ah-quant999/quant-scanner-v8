@@ -1,6 +1,6 @@
 # 九宝量化 v8.0 - 禁止删除清单
 
-**最后更新**: 2026-10-07（阿狸咪·防误删重要文件专项审计：补标 HANDOFF.yaml/HANDOFF.ledger.json/index_protected_markers.txt/PROTECTED_FILES.json 四项运维真源 + 私有目录补标 guard_logic_full.py/open_logic_detail.bat + 修正 data/*.js 数量漂移(48→111) + 降级 v6 历史备份段为可清理（有出）；私有逻辑目录禁删另见 E:/Nutstore/v8_logic_private/DO_NOT_DELETE.md）
+**最后更新**: 2026-10-07（阿狸咪·防误删重要文件专项审计：补标 HANDOFF.yaml/HANDOFF.ledger.json/index_protected_markers.txt/PROTECTED_FILES.json 四项运维真源 + 私有目录补标 guard_logic_full.py/open_logic_detail.bat + 修正 data/*.js 数量漂移(48→111) + 降级 v6 历史备份段为可清理（有出）；私有逻辑目录禁删另见 E:/Nutstore/v8_logic_private/DO_NOT_DELETE.md） + v6逻辑详解页永久保护再确认（澄清可清理段不含仓库内 v6_memo.html，与主人令一致）
 **维护人**: HH + AI助手
 **用途**: 防止误删核心资产，每次项目瘦身/清理前必须核对此清单
 **继承自**: v6 DO_NOT_DELETE.md（已验证 v6 2026-07-25 版本）
@@ -34,11 +34,13 @@
 
 > ⚠️ **限制已过期（2026-10-07 审计裁定）**：原 2026-08-07 主人令「v8 稳定满一周前禁止删」的条件早已满足——v8 已连续稳定运行数月，v6 于 2026 年即彻底弃用。本段由 🔴 禁止删除 **降级为 ⚪ 可清理**，即**撤销硬保护标签**（落实「有进有出」制度）。
 > 涉及文件位于 `/e/workspace`（不在本仓库内），且 2026-10-07 核查时该路径下已无对应 tar.gz。如日后确需释放磁盘，可清理；若仍想保留追溯，请移到非同步区自行保管。
+>
+> 🔴 **重要区分（2026-10-07 主人令澄清）**：本「⚪ 可清理」段 **仅** 覆盖 `/e/workspace` 下的 v6 整仓 tar.gz 与外部 `shared/` 副本。**仓库内 `v6_memo.html`（v6 逻辑详解页真身）+ `v6_memo.golden.html`（黄金备份）+ `guard_v6_memo.py` 属 🔴 永久禁止删除核心资产（见上「v6备忘录 防覆盖铁律」段），不在此段范围，任何清理 / 瘦身 / AI 自动化操作均不得波及。**
 
 | 文件路径/模式 | 内容描述 | 处置 |
 |---------|---------|------------|
 | `九宝量化v6.0_*.tar.gz` | v6 完整仓库归档备份 | 可清理（v6 已弃用） |
-| `shared/九宝量化v6.0_*` | v6 逻辑详解页/历史追踪页/交接总览 | 可清理（v6 已弃用） |
+| `shared/九宝量化v6.0_*` | v6 历史追踪页/交接总览（**外部冗余副本，非仓库内逻辑详解页**） | 可清理（v6 已弃用） |
 | `/e/workspace/stock-scanner/backup_2026*` | v6 时代每日增量备份 | 可清理（v6 已弃用） |
 
 **注意**：上述文件为 v6 时代遗留，v8 运行时已不依赖，且硬保护标签已于 2026-10-07 撤销。清理前如需追溯 v6 算法，请先确认 `v6_memo.html`（仍受 🔴 保护）已含所需逻辑。
