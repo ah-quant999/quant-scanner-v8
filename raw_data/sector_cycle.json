@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-08 00:35:23",
+  "update_time": "2026-10-08 02:00:50",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -12,7 +12,7 @@
     "10/08"
   ],
   "columns": 30,
-  "cycle_count": 18,
+  "cycle_count": 17,
   "cycles": [
     {
       "sector": "其他",
@@ -143,19 +143,6 @@
       "peak_date": "09/22",
       "total": 289,
       "ongoing": true
-    },
-    {
-      "sector": "军工",
-      "start": "08/27",
-      "end": "09/22",
-      "start_idx": 5,
-      "end_idx": 23,
-      "days": 19,
-      "hot_days": 15,
-      "peak": 24,
-      "peak_date": "09/09",
-      "total": 105,
-      "ongoing": false
     },
     {
       "sector": "电力",
