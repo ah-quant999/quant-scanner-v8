@@ -25,6 +25,20 @@
 # 数据采集时刻：2026-09-21 08:40 CST（小九机实测）
 # ============================================================================
 
+  - id: protect-v6-memo-permanent-1007
+    owner: 阿狸咪的工程师
+    priority: P2
+    status: done
+    created: 2026-10-07
+    title: v6逻辑详解页永久保护再确认（主人令）
+    note: |
+      主人令澄清：v6 逻辑详解页 v6_memo.html + 黄金备份 v6_memo.golden.html 永久不可删除、必须打永久标签；
+      其他无关联的 v6 残留（/e/workspace 下 tar.gz 整仓归档、外部 shared/ 副本）可清理。
+      执行：① DO_NOT_DELETE.md 抹掉「可清理」表里"v6 逻辑详解页"歧义 + 加红字区分段；
+      ② 仓库 v6_memo.html + v6_memo.golden.html 加 PERMANENT DO-NOT-DELETE 文件头横幅（对称私有版）；
+      ③ 护栏链确认覆盖三者：guard_v6_memo.py 自愈 + pre-commit 解析核心表第一列 + 🔴 永久段。
+    verify_how: 回读 main=149ca70a6c16：DND 含「重要区分」段且歧义词已移除；v6_memo.html/golden 含 PERMANENT 横幅；guard 校验逻辑不受影响。
+
 meta:
   updated: "2026-10-07 08:25"
   updated_by: 阿狸咪的工程师
@@ -34,7 +48,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 131
+  next_id_seq: 132
 items:
 
   # ── P0 · 部署链 ────────────────────────────────────────────────────────
