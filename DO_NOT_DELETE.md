@@ -168,17 +168,17 @@
 
 | 文件路径 | 内容描述 | 禁止删除原因 |
 |---------|---------|------------|
-| `v8_cn_fetch.yml` | 中国数据抓取（cn runner，7个 cron + dispatch） | **唯一数据源工作流**，丢失则全站不更新 |
+| `v8_cn_fetch_cloud.yml` | 中国数据抓取（云端 ubuntu，多 cron + dispatch；`_hosted`/`_selfhosted`/`_watchdog`/`_intraday_lemoncat` 为兜底/看门狗/盘中变体） | **唯一数据源工作流**，丢失则全站不更新 |
 | `v8_algo_run.yml` | 盘后算法链（cn runner，18:30） | **唯一算法工作流** |
 | `v8_build_deploy.yml` | 构建+部署（ubuntu，push 触发） | **唯一部署工作流** |
-| `v8_algo.yml` | 每日数据体检（ubuntu，09:00/17:00） | 新鲜度监控 |
-| `v8_safety_net.yml` | Safety Net 兜底监控（ubuntu，工作日每30min） | **P0 保险**：cn 断线自动补跑 |
-| `v8_self_heal.yml` | 云端自愈器（ubuntu，周六14:00） | **P1 自愈**：周末检测陈旧模块并补跑 |
+| `v8_daily_audit.yml` | 每日全站审核（原 `v8_algo.yml`，已改档至 22:30；新鲜度监控现由 `v8_health_patrol.yml` 每30min承担） | 新鲜度/一致性体检 |
+| `v8_cn_fetch_watchdog.yml` | 数据抓取看门狗·云端自愈（原 `v8_safety_net.yml`） | **P0 保险**：cn 断线自动补跑 |
+| `v8_health_patrol.yml` | 云端健康巡检·合并自愈+体检（原 `v8_self_heal.yml`；周六轻量维护在 `v8_weekend_light.yml`） | **P1 自愈**：检测陈旧模块并补跑 |
 | `cloud_weekly_cleanup.yml` | 每周清理（ubuntu，周六21:00） | orphan 清理 + 新鲜度体检 |
 | `v8_cleanup.yml` | 周日清理（ubuntu，23:00） | 缓存/日志修剪 |
-| `v8_sync_v6_data.yml` | v6→v8 应急同步（仅 dispatch） | 应急工具，无定时 |
+| `sync_v6_to_v8.py`（无独立 WF） | v6→v8 应急同步（原 `v8_sync_v6_data.yml` 工作流已移除，功能并入算法链：`sync_v6_to_v8.py` 被 `algorithms/*.py` import） | 应急工具，无定时 |
 
-**注意**: **9 个 yml 缺一不可**。丢失任何一个都会导致对应能力永久失效。特别是 `v8_cn_fetch.yml` 和 `v8_build_deploy.yml` 是整站的「呼吸」和「心跳」。
+**注意**: **8 个核心 yml + 1 个应急脚本缺一不可**。丢失任何一个都会导致对应能力永久失效。特别是 `v8_cn_fetch_cloud.yml` 和 `v8_build_deploy.yml` 是整站的「呼吸」和「心跳」。
 
 ---
 
