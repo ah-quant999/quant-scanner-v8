@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-08 03:26"
+  updated: "2026-10-08 07:55"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -8208,3 +8208,17 @@ items:
       周框架/月框架逐字继承线上稿(1062/1333字)，仅重写 daily 与 compare；36项等价闸门全绿(daily 4864字>防退化线3531、结论112字在80-140、禁用词0命中、update_time含HH:MM:SS)。
       纯 LF、Git Data API 快进；commit 1af175b157。开市 10-08 恢复盘前/午间/盘后三档正常出稿，本特刊仅假期最后一天显示。
     verify_how: 回读 main data/maharo_insights.js update_time=2026-10-07 19:08:00、daily.date=2026-10-07、假期特刊标志、纯 LF；远端 tip 含 commit 1af175b157。
+
+  - id: fix-gen-algo-track-nameerror-1008
+    date: 2026-10-08
+    updated: 2026-10-08 07:55
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: done
+    title: gen_algo_track.py:409 NameError 一行修复（intraday_lite 三算法追踪步 15 连 failure 止住）
+    note: |
+      根因=10-01 308d6a3288 引入：algorithms/gen_algo_track.py:409 调用旧名 _extract_four_volume()，L138 实际 def 为 _extract_from_four_volume()，凡轮到「单 algo（四量终极）追踪」模式必 NameError，看门狗重派无效（确定性代码 bug）。v8_algo_intraday_lite 00:07→06:14 累计 15 连 failure，全部失败于「三算法追踪入池(gen_algo_track)」步。
+      修复=commit 9eea55308a（Git Data API 快进：基底=远端真身 d6071a49c5、漂移断言通过、ast.parse 0 错、推后逐字节回读自证 blob 88e1c96237）；一行改名对齐 def，别无他改。
+      验证=dispatch run 37704257626（head=9eea55308a = 修复提交）：job algo_track_lite step#4「三算法追踪入池(gen_algo_track)」success；产物 raw_data/algo_track.json update_time=2026-10-08 07:48 前进，algos=1（四量终极单桶，符合 09-03 主人令下线另两桶）。09:00/11:00/13:00/15:00 CST 定时轮恢复。
+      巡检轮 52（2026-10-08 07:37 CST）自主处置：发现→根因→修复→验证→挂账，盘前窗口完成。
+    verify_how: run 37704257626 success@head=9eea55308a 且 step#4 三算法追踪入池 success；raw_data/algo_track.json update_time=2026-10-08 07:48 前进；远端 gen_algo_track.py blob=88e1c96237。
