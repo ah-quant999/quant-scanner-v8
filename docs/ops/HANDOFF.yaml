@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-08 03:15"
+  updated: "2026-10-08 03:26"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -49,6 +49,20 @@ items:
       预防红线：两文件必须明文落库、item 只能进 items: 列表、推送前 hash --check 100% + PyYAML 解析断言（细则见 2026-10-08_0312 交接件）。
     verify_how: CI run #9355（head=6a55457148）实测 ✅[13/13] items=150 ledger 锚全在 next_id_seq=133≥133，15 项门禁全过；远端回读双文件逐字节一致。
     updated: "2026-10-08 03:15"
+    updated_by: 阿狸咪的工程师
+  - id: indexhistory-holiday-stale-deploy-block-1008
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: todo
+    created: 2026-10-08
+    title: INDEX_HISTORY 假期陈旧阻断部署（deploy guard 3 天绝对时限 × 国庆）
+    note: |
+      run #9355/#9356 step14 日志原文：INDEX_HISTORY data 层 update_time 冻结在 2026-10-01 09:11:45（假期幂等跳过重写 ⇒ 不刷新），超 v8_deploy_guard「data 层超过 3 天未更新」阈值 ⇒ 跨层一致性校验阻断部署。
+      与在册「周度产物被 24h 红线误杀」同族（all-generic-redline-false-positive）：假期 × 绝对时限守卫结构误杀。
+      预期自愈：10-08 交易日盘中/盘后链（20:30 重建窗口前）刷新 INDEX_HISTORY ⇒ 阻断自动解除。
+      禁手动刷数（违「数据新鲜真实」铁律）、禁放宽守卫阈值（守卫在正确履职）；若 20:30 后仍被拦 ⇒ 查 INDEX_HISTORY 生成器并重新评估守卫「假期豁免」口径。
+    verify_how: 10-08 20:30 后任一 build_deploy run build job success（head ≥ 95bc2042a216）即自愈闭环；持续失败则升级查生成器。
+    updated: "2026-10-08 03:26"
     updated_by: 阿狸咪的工程师
   - id: protect-v6-memo-permanent-1007
     owner: 阿狸咪的工程师
