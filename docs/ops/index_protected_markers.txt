@@ -57,7 +57,6 @@ window.IMA_STRONG_STOCK|强势股数据源|2026-09-20
 window.LHB_DATA|龙虎榜数据源|2026-09-20
 window.TRIPLE_CONSENSUS|三重共识数据源|2026-09-20
 window.V8_POOL_TRACKER|候选池跟踪数据源|2026-09-20
-window.FACTOR_LAB_BACKTEST|因子实验室回测数据源|2026-09-20
 window.MAHORO_INSIGHTS|每日洞察数据源|2026-09-20
 
 # ── D. 窗口标记（当日核心改动，建议 30 天后复核是否转为永久锚点）────
