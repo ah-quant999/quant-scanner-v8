@@ -1572,7 +1572,19 @@ def _adjust_max_age_legacy(def_max, page=None, n=None):
     h = n.hour + n.minute / 60.0
     weekday = n.weekday()
     is_weekend = weekday >= 5
-    is_trade_day = weekday < 5
+    # 🔴 2026-10-08 一劳永逸根因修复（小九）：改用本文件权威日历 _is_trading_day(n.date())。
+    #   【病灶】原 `weekday < 5` 只剔周末、**不剔法定节假日** ⇒ 周中长假（本次国庆
+    #     10-01(四)~10-07(三)）被判 is_trade_day=True ⇒ 落进下方「实时数据 · 盘中
+    #     09:45-15:00」分支被 min(def_max,45) 夹到 45 分钟 ⇒ 日频数据（股指期货持仓等）
+    #     恒 FAIL ⇒ 触发自愈链路每 25 分钟派发一次 ⇒ 而 cn_fetch 侧用真实日历已跳过
+    #     intraday ⇒ **死循环空转**白烧 CI 分钟数。
+    #   【自相矛盾铁证】同一函数 L1620 分支注释原文写着「周末/节假日：给 2880（48h，覆盖
+    #     周末+周一开盘）」—— 节假日**本就该走那个分支**，但入口判据让它永远走不到，
+    #     实现与自身设计意图直接冲突。
+    #   【安全性】只放宽不收紧：交易日（周一~周五且非节假日）_is_trading_day 与 weekday<5
+    #     完全等价 ⇒ 行为一字不变；仅周中法定节假日由 True 转 False ⇒ 落到 2880 放宽分支。
+    #   ⚠️ 本文件 L368 已有权威日历（含 _HOLIDAYS_2026），禁止再引第二套判断。
+    is_trade_day = _is_trading_day(n.date())
 
     # 🛡 2026-08-31 一劳永逸：运维/静态卡（防误删清单/已下架/暂未上架，manual_dep）
     #   此前落到底部「未分类」分支，交易时段被 min(def_max,45) 夹紧到 45min →
