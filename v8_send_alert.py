@@ -65,6 +65,73 @@ _HOLIDAYS_2026 = {
     "10-01", "10-02", "10-03", "10-04", "10-05", "10-06", "10-07",  # 国庆
 }
 
+# ── 2026-10-08 一劳永逸止血（主人令「解决不了的才发」）──────────────────
+# 问题根因：统一闸门只有分级（infra/stale/info），但没有
+#   ①「知会类自动降级」——"✅已上线/已完成/已恢复/自检/空转" 等成功/知会邮件
+#      仍以默认 infra 发出，刷屏；
+#   ②「同源去重」——同一告警反复发（如 zsxq_token 丢失 11 次、小九失联 9 次）。
+# 修复：在 gate 放行后、实际发信前加两道闸：
+#   · 知会词命中 → 默认按 info 处理（不发），除非 V8_ALERT_FORCE=1 强制；
+#   · 同指纹（去时间戳）12h 内只发一次。
+_NOTICE_KEYWORDS = (
+    "已上线", "已完成", "已恢复", "✅", "自检", "空转", "巡检",
+    "自愈", "无需人工", "不需人工", "正常产出", "合规", "无异常", "无失败",
+    "全绿", "无缺失", "已修复", "已修", "已解决", "闭环", "已上线且",
+)
+DEDUP_FILE = Path(".workbuddy/v8_alert_dedup.json")
+DEDUP_WINDOW_SEC = 12 * 3600
+
+
+def _env_flag(name, default=False):
+    """读布尔型环境变量（空串→default）。模块级，gate/send_alert 共用。"""
+    v = os.environ.get(name, "")
+    if v == "":
+        return default
+    return v.strip().lower() in ("1", "true", "yes", "on")
+
+
+def _is_notice(subject, body):
+    s = f"{subject or ''}\n{body or ''}"
+    return any(k in s for k in _NOTICE_KEYWORDS)
+
+
+def _dedup_key(subject, level):
+    import hashlib
+    import re
+    norm = re.sub(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", "", subject or "")
+    norm = re.sub(r"\d{2}-\d{2} \d{2}:\d{2}", "", norm)
+    norm = re.sub(r"\(?\d{1,4} ?分钟\)?", "N分钟", norm)
+    norm = re.sub(r"\d+ ?项", "N项", norm)
+    fp = hashlib.md5(f"{norm}|{level or ''}".encode("utf-8")).hexdigest()
+    return fp
+
+
+def _dedup_allowed(fp):
+    try:
+        if DEDUP_FILE.exists():
+            d = json.loads(DEDUP_FILE.read_text(encoding="utf-8"))
+            last = d.get(fp)
+            if last and (datetime.now().timestamp() - float(last) < DEDUP_WINDOW_SEC):
+                return False, float(last)
+    except Exception:
+        pass
+    return True, 0.0
+
+
+def _dedup_mark(fp):
+    try:
+        d = {}
+        if DEDUP_FILE.exists():
+            try:
+                d = json.loads(DEDUP_FILE.read_text(encoding="utf-8"))
+            except Exception:
+                d = {}
+        d[fp] = datetime.now().timestamp()
+        DEDUP_FILE.parent.mkdir(parents=True, exist_ok=True)
+        DEDUP_FILE.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+
 
 def load_config():
     for p in CONFIG_PATHS:
@@ -125,12 +192,6 @@ def gate(level, cfg=None):
     if level not in _VALID_LEVELS:
         level = LEVEL_INFRA
 
-    def _env_flag(name, default=False):
-        v = os.environ.get(name, "")
-        if v == "":
-            return default
-        return v.strip().lower() in ("1", "true", "yes", "on")
-
     if _env_flag("V8_ALERT_DISABLE", bool(cfg.get("disable", False))):
         return False, "全局停发 V8_ALERT_DISABLE"
     if level == LEVEL_INFO and not _env_flag("V8_ALERT_INFO", False):
@@ -160,6 +221,19 @@ def send_alert(subject, body, config=None, level=None):
     if not cfg:
         print(f"[{datetime.now()}] [WARN] 找不到 SMTP 配置，跳过邮件告警")
         _trace(subject, body, level, "SKIP", "无 SMTP 配置")
+        return False
+
+    # ── 2026-10-08 止血闸①：知会类降级（默认不发）──
+    if _is_notice(subject, body) and not _env_flag("V8_ALERT_FORCE", False):
+        _trace(subject, body, level, "SKIP", "知会类(已上线/已恢复/自检/全绿等)默认不发")
+        return False
+
+    # ── 2026-10-08 止血闸②：同源去重（同指纹 12h 内只发一次）──
+    fp = _dedup_key(subject, level)
+    ok_d, last_d = _dedup_allowed(fp)
+    if not ok_d:
+        ago = int((datetime.now().timestamp() - last_d) // 60)
+        _trace(subject, body, level, "SKIP", f"同源去重(12h内已发, 上次{ago}分钟前)")
         return False
 
     sender = cfg.get("sender", "")
