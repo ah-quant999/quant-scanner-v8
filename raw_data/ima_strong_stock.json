@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-08 20:40:31",
+  "update_time": "2026-10-08 22:58:50",
   "source": "ima",
   "note_url": "https://ima.qq.com/wiki/?shareId=32c01f1da52044f743a01e4aa995d72e7940cc8e99cf413cc5f4c2eb39b4d389&folderId=folder_7507701210837524",
   "source_kind": "wiki",
@@ -10,7 +10,7 @@
   "stale_days": 8,
   "source_stale": true,
   "snapshot_expired": true,
-  "degraded_reason": "snapshot_age>191h",
+  "degraded_reason": "snapshot_age>194h",
   "cycle_stage": "起势期（温度分 3）",
   "position_advice": "20-40%",
   "themes_top": [
@@ -63,7 +63,7 @@
     "expected": null,
     "source_channel": "full-snapshot",
     "snapshot_fetched_at": "2026-09-30 21:20:43",
-    "snapshot_age_h": 191.33,
+    "snapshot_age_h": 193.64,
     "truncated": false,
     "note": "v2 换代水源「短线情绪选股」主报告全文快照（成员连接器）；introduction 兜底通道受 ~300 字硬墙（如实降级 detail_complete=false）。"
   },
