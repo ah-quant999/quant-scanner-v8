@@ -21,6 +21,11 @@ import sys
 OUT = os.path.join(BASE, "..", "out", "lhb_result.json")
 THRESHOLD = 8000  # 强买阈值：净买入 > 8000万
 SEATS_PATH = os.path.join(os.path.dirname(__file__), "..", "out", "lhb_seats.json")
+# 🔴 2026-10-09 主人令：金色营业部必须显示著名游资/机构名，拿不到就别留。
+#   泛词黑名单：patterns 模糊匹配曾混入「营业部/证券/财富/金融」泛词，未识别席位
+#   被打成无意义碎片标签（2026-10-08 数据实证）。双重防御：① lhb_seats.json 已清洗；
+#   ② 此处兜底过滤，防泛词再次混入。
+_ALIAS_BLOCKLIST = {'营业部', '证券', '财富', '金融', '公司', '股份', '有限', '总部', '营业'}
 DETAIL_LIMIT = 90  # 最多分析前90只股票的逐笔席位（2026-08-12 主人质疑8/4/5/7/10北向日历空白：原 40 太少，北向在排序靠后；提到 90 覆盖全天上榜股）
 
 def log(msg):
@@ -293,7 +298,7 @@ def fetch_seat_detail(stocks, date_str):
                     detail_map[code][stype]['buy'] += buy_amt
                     detail_map[code][stype]['sell'] += sell_amt
 
-                    if alias:
+                    if alias and alias not in _ALIAS_BLOCKLIST:
                         if 'aliases' not in detail_map[code][stype]:
                             detail_map[code][stype]['aliases'] = []
                         if alias not in detail_map[code][stype]['aliases']:
