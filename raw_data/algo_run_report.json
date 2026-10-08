@@ -1,16 +1,12 @@
 {
-  "update_time": "2026-10-09 01:02:42",
-  "run_start": "2026-10-08 23:56:19",
-  "ok": 25,
-  "fail": 2,
+  "update_time": "2026-10-09 02:41:04",
+  "run_start": "2026-10-09 01:28:12",
+  "ok": 26,
+  "fail": 1,
   "failed_scripts": [
     {
       "script": "calc_crds.py",
       "reason": "退出码 1 | NameError: name 'v8_date' is not defined"
-    },
-    {
-      "script": "backtest_expectancy.py",
-      "reason": "监督器静默杀(>15min 无输出)"
     }
   ],
   "skipped_by_time_gate": []
