@@ -1800,6 +1800,30 @@ def f_us_hk_map():
     return None
 
 
+def _raw_fresh_mtime(label, max_age_h=26):
+    """🛡 2026-10-08 小九 一劳永逸：「返回空」≠「数据断供」。
+
+    run() 对 None 判 empty，但 save() 未被调用 ⇒ raw_data 上一版产物仍在、
+    卡面继续诚实显示旧数据。若该产物仍然新鲜（默认 26h 内），运维诊断区
+    再报「返回空数据」就是**假警报**（血证 2026-10-08 盘中：ETF_DAILY_MONITOR /
+    US_HK_MAP 撞东财 502 返回空，但 08:10 盘前产物健在，主人截图质问红字告警）。
+    返回产物落盘时刻（HH:MM）表示可复用；无产物/产物过期返回 None（真断供，照常报警）。
+    """
+    try:
+        fname = VAR_TO_RAW.get(label)
+        if not fname:
+            return None
+        p = RAW_DIR / fname
+        if not p.exists():
+            return None
+        mt = p.stat().st_mtime
+        if (time.time() - mt) / 3600.0 <= max_age_h:
+            return time.strftime("%H:%M", time.localtime(mt))
+    except Exception:
+        pass
+    return None
+
+
 def run(label, fn, retries=2):
     last_err = None
     for attempt in range(retries + 1):
@@ -1811,7 +1835,17 @@ def run(label, fn, retries=2):
                 _run_status[label] = {"status": "ok", "msg": "成功"}
             else:
                 print(f"  ⚠️ {label}: 返回空，跳过")
-                _run_status[label] = {"status": "empty", "msg": "返回空"}
+                # 🛡 2026-10-08 小九 一劳永逸：返回空但有 26h 内存量产物 → 记 reused，
+                #   不再进前端「失败/诊断详情」（index.html 白名单只报 fail/empty，
+                #   新状态默认静默，符合 09-21 黑名单→白名单纪律）。
+                #   真断供（无产物/产物过期）仍记 empty，照常报警。
+                _reuse_hm = _raw_fresh_mtime(label)
+                if _reuse_hm:
+                    _run_status[label] = {"status": "reused",
+                                          "msg": f"本轮源返回空，沿用 {_reuse_hm} 上一版产物（卡面不受影响）"}
+                    print(f"  ♻️ {label}: 沿用 {_reuse_hm} 上一版产物（本轮源返回空，记 reused 不报警）")
+                else:
+                    _run_status[label] = {"status": "empty", "msg": "返回空"}
                 # 🛡 2026-09-03 一劳永逸：09:30 后盘中/盘后空结果 → 清盘前残留 premarket_cleared 标记，
                 #   避免「盘中仍顶着盘前清空标记」误报 HEALTH_CHECK fail（阿狸咪 08:55 文档漏报的 2 个新 bug）。
                 #   盘前(08:25-09:30)标记本就正确，跳过不清。
@@ -5080,7 +5114,14 @@ def main(category=None, only=None):
                 by_code = {it["code"]: it for it in idx_data.get("items", [])}
                 sh_amt = float(by_code.get("000001", {}).get("amount") or 0)
                 sz_amt = float(by_code.get("399001", {}).get("amount") or 0)
-                if sh_amt > 0 and sz_amt > 0:
+                # 🛡 2026-10-08 一劳永逸（小九）：当日追加剧毒护栏。
+                #   血证：2026 国庆 10/3~10/7 休市期间，index_quotes 顶着垃圾量级
+                #   （54 亿 ~ 124 亿甚至原始「元」数值）被无条件追加进序列 ⇒
+                #   与正常日（5000~20000 亿）相差百倍 ⇒ 前端 maxV 被撑爆，
+                #   整条曲线被压成 0 附近的「长平线」（主人截图质问「这科学吗」）。
+                #   A 股两市日成交额近十年从未低于约 3000 亿、从未高于 6 万亿 ⇒
+                #   合计落在 [1000, 60000] 亿带外的一律拒绝追加（单位错/假日脏值通杀）。
+                if sh_amt > 0 and sz_amt > 0 and 1000 <= (sh_amt + sz_amt) <= 60000:
                     total_amt = round(sh_amt + sz_amt, 1)
                     rec = {"date": today_md, "sh_amount": round(sh_amt, 1), "sz_amount": round(sz_amt, 1), "total": total_amt}
                     if amount_history and amount_history[-1].get("date") == today_md:
@@ -5131,6 +5172,25 @@ def main(category=None, only=None):
                 print(f"  ⚠️ 涨跌家数获取失败({ex})，沿用历史序列")
         else:
             print(f"  ⏸️ 今日非交易日，涨跌家数/成交额不追加新记录")
+
+        # 🛡 2026-10-08 一劳永逸消毒（小九）：不管来源是 akshare 日线、远端/本地基线
+        #   还是盘中追加，落盘前统一过量级带 [1000, 60000] 亿：
+        #   - 假日脏行（如 10/3~10/7 的 54~707 亿）< 1000 → 剔除；
+        #   - 单位错行（原始「元」数值 ~1e10）> 60000 → 剔除。
+        #   序列自愈：已被污染的历史文件在下一轮构建时自动洗净，无需手工修 raw_data。
+        _lo, _hi = 1000.0, 60000.0
+        _bad_dates = set()
+        for _h in amount_history:
+            try:
+                _t = float(_h.get("total") or 0)
+            except Exception:
+                _t = 0.0
+            if not (_lo <= _t <= _hi):
+                _bad_dates.add(_h.get("date"))
+        if _bad_dates:
+            print(f"  🧹 成交额序列消毒：剔除量级异常 {len(_bad_dates)} 天 {sorted(_bad_dates)[:6]}"
+                  f"（阈值 {_lo:.0f}~{_hi:.0f} 亿）")
+            amount_history = [h for h in amount_history if h.get("date") not in _bad_dates]
 
         amount_last_date = amount_history[-1].get("date") if amount_history else ""
         up_down_last_date = ds_hist[-1].get("date") if ds_hist else ""
