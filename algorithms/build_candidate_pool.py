@@ -35,6 +35,16 @@ import datetime
 # 名称归一化共享模块（2026-08-14 抽出，消除与 final_recommend/guanlan_extractor/scanner 的重复）
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from name_utils import strip_entitlement_prefix  # noqa: E402
+# 🔴 2026-10-09 根治（金股池 history 日期错位双假行·主人令「一劳永逸」）：模块级导入
+# v8_date（零第三方依赖，任何环境可安全加载），为 history/first_date 日期戳提供权威口径。
+try:
+    _V8_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if _V8_ROOT not in sys.path:
+        sys.path.insert(0, _V8_ROOT)
+    import v8_date
+except Exception as _v8_date_err:
+    v8_date = None
+    print(f"⚠️ 模块级导入 v8_date 失败: {_v8_date_err}", file=sys.stderr)
 try:
     import akshare as ak
 except ModuleNotFoundError:
@@ -926,8 +936,15 @@ def derive_and_save_gold_pool(members):
     返回金股池 dict，供调用方日志/调试使用。
     """
     # 🔴 2026-09-13 主人令（必修 1）：today 取「最近交易日」而非运行自然日。
+    # 🔴 2026-10-09 根治（主人令「一劳永逸」）：today 升级为「数据归属的已完成交易日」
+    #   （15:00 收盘前归上一交易日，非交易日回退）——09-30 盘中行冒充当日、
+    #   10-01 假日假行两大污染源由此根断。旧口径仅作 v8_date 不可用时的回退。
     _run_day = time.strftime("%Y-%m-%d")
-    today = _last_trade_date(_run_day) or _run_day
+    try:
+        today = v8_date.data_session_date()
+    except Exception:
+        today = None
+    today = today or _last_trade_date(_run_day) or _run_day
     now = time.strftime("%Y-%m-%d %H:%M:%S")
     # 🔴 同令（必修 2）：出池窗口按真交易日历精确回溯 45 个交易日。
     cutoff = _n_trade_days_ago_precise(GOLD_POOL_DAYS, today) or _n_trade_days_ago_approx(GOLD_POOL_DAYS, today)
@@ -1003,7 +1020,9 @@ def derive_and_save_gold_pool(members):
                 "last_qualified": today,
             })
         # 追加/覆盖今日 history
-        hist = [h for h in stocks[key].get("history", []) if isinstance(h, dict) and h.get("date") != today]
+        _old_rows = [h for h in stocks[key].get("history", []) if isinstance(h, dict)]
+        _prev_same = next((h for h in _old_rows if h.get("date") == today), None)
+        hist = [h for h in _old_rows if h.get("date") != today]
         # 🔴 2026-09-13 主人令（必修 3）：history 恢复 close/pct_chg。
         #   原实现只记 date/signal_count/sources ⇒ 历史轨迹没有价格，无法回看每日涨跌，
         #   也无法事后核对「入池当天买、第 N 天卖」的收益。价格取自候选池成员 metrics。
@@ -1021,6 +1040,13 @@ def derive_and_save_gold_pool(members):
             "close": (round(float(_close), 2) if isinstance(_close, (int, float)) else None),
             "pct_chg": (round(float(_pct), 2) if isinstance(_pct, (int, float)) else None),
         })
+        # 🔴 2026-10-09 根治（防信号丢失）：scanner.py 盘中精监写入的同日行携带
+        #   缠论/金钻等信号字段（generate_top10 从 hist[-1] 读取打分）；本函数的
+        #   同日覆盖行原本只有 5 键 ⇒ 信号被抹掉。现从被替换旧行回填本行没有的字段。
+        if _prev_same:
+            for _sk, _sv in _prev_same.items():
+                if _sk not in hist[-1]:
+                    hist[-1][_sk] = _sv
         stocks[key]["history"] = hist
 
     # 3) 🔴 2026-09-13 主人令（必修 4）：仅继承、今日不再符合口径的成员 → 降级「观察中」。
@@ -1036,6 +1062,50 @@ def derive_and_save_gold_pool(members):
         _watch_n += 1
     if _watch_n:
         print(f"    金股池：观察中（仅继承·今日未复现）{_watch_n} 只 / 今日命中 {len(qualified)} 只")
+
+    # 3.5) 🔴 2026-10-09 根治（主人令「一劳永逸」）：history 存量污染行卫生化。
+    #   污染源（运行自然日打戳 + 盘中陈旧快照冒充当日）已由 data_session_date 根断；
+    #   此处对存量池自愈（history 随继承跨轮存活，不清则永久带病）：
+    #   ① 非交易日行（假日假行，如 10-01）→ 剔除——其内容是错位的交易日数据；
+    #   ② 相邻交易日两行 close 全同、且本行 pct_chg 与「相对前行的真实涨跌幅」矛盾
+    #      （差>0.05pp）⇒ 盘中陈旧行复制前行数据（如 09-30 行复制 09-29）→ 剔除。
+    #   注意 ② 只对相邻交易日行生效：跨假期两行（09-30→10-08）不适用，防误删真行。
+    if v8_date is not None:
+        _bad_n = 0
+        for _k in stocks:
+            _hist = [h for h in (stocks[_k].get("history") or []) if isinstance(h, dict)]
+            _keep = []
+            for _h in _hist:
+                _hd = str(_h.get("date") or "")
+                try:
+                    if _hd and not v8_date.is_trading_day(_hd):
+                        _bad_n += 1
+                        continue
+                except Exception:
+                    pass
+                if _keep:
+                    _p = _keep[-1]
+                    _adj = False
+                    try:
+                        _adj = v8_date.trading_days_between(str(_p.get("date")), _hd) == 2
+                    except Exception:
+                        pass
+                    if (_adj and _h.get("close") is not None
+                            and isinstance(_h.get("pct_chg"), (int, float))
+                            and isinstance(_p.get("close"), (int, float)) and _p.get("close")
+                            and _p["close"] == _h["close"]):
+                        try:
+                            _recalc = (_h["close"] / _p["close"] - 1) * 100
+                            if abs(_recalc - _h["pct_chg"]) > 0.05:
+                                _bad_n += 1
+                                continue
+                        except Exception:
+                            pass
+                _keep.append(_h)
+            if len(_keep) != len(_hist):
+                stocks[_k]["history"] = _keep
+        if _bad_n:
+            print(f"    🛡 金股池 history 卫生化：剔除污染行 {_bad_n} 条")
 
     pool = {
         "update_time": now,
@@ -1204,7 +1274,12 @@ def build():
     # 今日派生集合(pool) 仅代表「当日成交额前N」；若直接用作候选池，个股会随每日
     # 排名抖动而每日 churn。改为：并入历史成员表，掉出前N者仍保留
     # MEMBER_HYSTERESIS_DAYS 个交易日（外资研投来源宽限 PIN_TTL_DAYS=63 自然日，非永久），成员稳定后才交给下游扫描。
-    today_date = time.strftime("%Y-%m-%d")
+    # 🔴 2026-10-09 根治：成员快照指标日期戳同口径（15:00 收盘前归上一交易日），
+    #   禁用运行自然日（与金股池 history 打戳同一铁律）。
+    try:
+        today_date = v8_date.data_session_date()
+    except Exception:
+        today_date = time.strftime("%Y-%m-%d")
     prev_members = {}
     for _pp in (MEMBERS_RAW, MEMBERS_OUT):
         if os.path.exists(_pp):
