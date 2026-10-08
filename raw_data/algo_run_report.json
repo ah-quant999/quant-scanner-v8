@@ -1,16 +1,12 @@
 {
-  "update_time": "2026-10-02 06:09:18",
-  "run_start": "2026-10-02 05:11:41",
-  "ok": 9,
-  "fail": 2,
+  "update_time": "2026-10-08 17:20:56",
+  "run_start": "2026-10-08 16:55:01",
+  "ok": 13,
+  "fail": 1,
   "failed_scripts": [
     {
-      "script": "backtest_comprehensive.py",
-      "reason": "监督器静默杀(>15min 无输出)"
-    },
-    {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
+      "script": "fetch_inst_trade.py",
+      "reason": "退出码 1 | [17:00:24] 全部接口重试仍失败，保留旧数据（如有）"
     }
   ],
   "skipped_by_time_gate": []

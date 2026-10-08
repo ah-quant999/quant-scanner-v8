@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-10-03 02:00",
-  "republish_time": "2026-10-05 22:12:23",
+  "update_time": "2026-10-08 16:06",
+  "republish_time": "2026-10-08 17:03:43",
   "data_date": "2026-09-30",
   "rule_ver": 2,
   "top_n": 5,
-  "source": "东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期 + 腾讯NeoData 板块成分明细（东财 push2 封禁兜底 1 板块）",
+  "source": "东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期",
   "phase": "主升+启动",
   "sector_count": 4,
   "sectors": [
@@ -52,7 +52,7 @@
           "main_net": 25469205.0
         }
       ],
-      "match": "exact"
+      "match": "retained:exact"
     },
     {
       "name": "生物制品",
@@ -98,7 +98,7 @@
           "main_net": 23049580.0
         }
       ],
-      "match": "exact"
+      "match": "retained:exact"
     },
     {
       "name": "汽车整车",
@@ -144,7 +144,7 @@
           "main_net": 37764100.0
         }
       ],
-      "match": "neodata"
+      "match": "retained:neodata"
     },
     {
       "name": "房地产",
@@ -190,13 +190,13 @@
           "main_net": 16806126.0
         }
       ],
-      "match": "exact"
+      "match": "retained:exact"
     }
   ],
   "nomatch_count": 0,
   "leaders_fail_count": 0,
-  "neo_fallback_count": 1,
-  "retained_count": 0,
-  "em_boards_source": "live",
+  "neo_fallback_count": 0,
+  "retained_count": 4,
+  "em_boards_source": "unavailable",
   "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*)"
 }
