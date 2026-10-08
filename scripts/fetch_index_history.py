@@ -49,7 +49,14 @@ def main(years=YEARS):
     rows.sort(key=lambda x: x["d"])
     log(f"拿到 {len(rows)} 条记录，时间跨度 {rows[0]['d']} ~ {rows[-1]['d']}")
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    _now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     payload = {
+        # 🛡 2026-10-08 一劳永逸：顶层 update_time 必须与 meta.update_time 同源。
+        #   原实现只把 update_time 放在 meta 内 → v8_verify_layer_parity 与 update_v8._write_js
+        #   都只认【顶层】日期字段 → index_history.json 被当「无日期」→ INDEX_HISTORY.js
+        #   时间戳永远冻结在首次构建日、自我复制 → 守卫判「data 层陈旧>3天」→ 单点阻断
+        #   整个 build_deploy 部署（09-29 同类死锁的 INDEX_HISTORY 变体）。顶层补日期即根治。
+        "update_time": _now,
         "meta": {
             "symbol": "sh000001",
             "name": "上证指数",
