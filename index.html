@@ -16613,6 +16613,9 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     }
     var d = window.UNLISTED_PANEL || {};
     var mods = d.modules || [];
+    // 🛡 2026-10-08 小九：状态码→中文标签（原样裸露 evaluation/spec_lock 等英文码；新增状态默认回退原码不失踪）
+    var _EXP_STATUS_TXT = {evaluation:'评估中', spec_lock:'规格锁定', blocked:'受阻', design:'待设计',
+                           shipped_via_v8_cal:'已上线（并入财年日历）', shipped:'已上线', dropped:'已删除'};
     function modulesHtml(){
       var h='<div class="card" style="border-left:4px solid #c4b5fd;">';
         // 🛡 2026-09-13 主人令（图7「手动？」）：本卡是**静态索引**（UNLISTED_PANEL，无数据管线），
@@ -16635,8 +16638,8 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       mods.forEach(function(m){
         h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">'
           +'<div style="font-weight:700;color:var(--txt);font-size:13px;margin-bottom:4px;">'+m.name+'</div>'
-          +'<div style="font-size:11.5px;color:var(--sub);line-height:1.6;">'+m.status+'</div>'
-          +'<div style="font-size:10.5px;color:var(--dim);margin-top:4px;">'+m.note+'</div>'
+          +'<div style="font-size:11.5px;color:var(--sub);line-height:1.6;">'+(_EXP_STATUS_TXT[m.status]||m.status||'')+'</div>'
+          +'<div style="font-size:10.5px;color:var(--dim);margin-top:4px;">'+(m.reason||m.note||'')+'</div>'
           +'</div>';
       });
       h+='</div>';
