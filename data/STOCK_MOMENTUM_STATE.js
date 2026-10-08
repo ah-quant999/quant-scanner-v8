@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-09 00:47",
- "generated": "2026-10-09 00:47",
+ "update_time": "2026-10-09 01:03",
+ "generated": "2026-10-09 01:03",
  "meta": {
-  "generated": "2026-10-09 00:47",
+  "generated": "2026-10-09 01:03",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 23,
   "days_with_consensus": 0,
@@ -8260,24 +8260,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "603200",
-      "name": "上海洗霸",
-      "change_pct": 9.991,
-      "price": 49.21,
-      "category": "突破"
-     },
-     {
-      "code": "300450",
-      "name": "先导智能",
-      "change_pct": 7.584,
-      "price": 37.59,
-      "category": "突破"
-     },
-     {
       "code": "603105",
       "name": "芯能科技",
       "change_pct": 3.529,
       "price": 8.8,
+      "category": "突破"
+     },
+     {
+      "code": "300162",
+      "name": "雷曼光电",
+      "change_pct": 6.462,
+      "price": 9.72,
       "category": "突破"
      },
      {
@@ -8418,24 +8411,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "603200",
-      "name": "上海洗霸",
-      "change_pct": 9.991,
-      "price": 49.21,
-      "category": "短线选股"
-     },
-     {
-      "code": "300450",
-      "name": "先导智能",
-      "change_pct": 7.584,
-      "price": 37.59,
-      "category": "短线选股"
-     },
-     {
       "code": "603105",
       "name": "芯能科技",
       "change_pct": 3.529,
       "price": 8.8,
+      "category": "短线选股"
+     },
+     {
+      "code": "300162",
+      "name": "雷曼光电",
+      "change_pct": 6.462,
+      "price": 9.72,
       "category": "短线选股"
      },
      {
@@ -8490,24 +8476,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "603200",
-      "name": "上海洗霸",
-      "change_pct": 9.991,
-      "price": 49.21,
-      "category": "强势股"
-     },
-     {
-      "code": "300450",
-      "name": "先导智能",
-      "change_pct": 7.584,
-      "price": 37.59,
-      "category": "强势股"
-     },
-     {
       "code": "603105",
       "name": "芯能科技",
       "change_pct": 3.529,
       "price": 8.8,
+      "category": "强势股"
+     },
+     {
+      "code": "300162",
+      "name": "雷曼光电",
+      "change_pct": 6.462,
+      "price": 9.72,
       "category": "强势股"
      },
      {
@@ -8610,24 +8589,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "603200",
-      "name": "上海洗霸",
-      "change_pct": 9.991,
-      "price": 49.21,
-      "category": "突破"
-     },
-     {
-      "code": "300450",
-      "name": "先导智能",
-      "change_pct": 7.584,
-      "price": 37.59,
-      "category": "突破"
-     },
-     {
       "code": "603105",
       "name": "芯能科技",
       "change_pct": 3.529,
       "price": 8.8,
+      "category": "突破"
+     },
+     {
+      "code": "300162",
+      "name": "雷曼光电",
+      "change_pct": 6.462,
+      "price": 9.72,
       "category": "突破"
      },
      {
@@ -8656,6 +8628,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "山东路桥",
       "change_pct": 4.259,
       "price": 6.12,
+      "category": "突破"
+     },
+     {
+      "code": "300756",
+      "name": "金马游乐",
+      "change_pct": 3.448,
+      "price": 29.1,
       "category": "突破"
      }
     ],
@@ -8768,24 +8747,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "603200",
-      "name": "上海洗霸",
-      "change_pct": 9.991,
-      "price": 49.21,
-      "category": "短线选股"
-     },
-     {
-      "code": "300450",
-      "name": "先导智能",
-      "change_pct": 7.584,
-      "price": 37.59,
-      "category": "短线选股"
-     },
-     {
       "code": "603105",
       "name": "芯能科技",
       "change_pct": 3.529,
       "price": 8.8,
+      "category": "短线选股"
+     },
+     {
+      "code": "300162",
+      "name": "雷曼光电",
+      "change_pct": 6.462,
+      "price": 9.72,
       "category": "短线选股"
      },
      {
@@ -8814,6 +8786,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "山东路桥",
       "change_pct": 4.259,
       "price": 6.12,
+      "category": "短线选股"
+     },
+     {
+      "code": "300756",
+      "name": "金马游乐",
+      "change_pct": 3.448,
+      "price": 29.1,
       "category": "短线选股"
      }
     ],
@@ -8840,24 +8819,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "603200",
-      "name": "上海洗霸",
-      "change_pct": 9.991,
-      "price": 49.21,
-      "category": "强势股"
-     },
-     {
-      "code": "300450",
-      "name": "先导智能",
-      "change_pct": 7.584,
-      "price": 37.59,
-      "category": "强势股"
-     },
-     {
       "code": "603105",
       "name": "芯能科技",
       "change_pct": 3.529,
       "price": 8.8,
+      "category": "强势股"
+     },
+     {
+      "code": "300162",
+      "name": "雷曼光电",
+      "change_pct": 6.462,
+      "price": 9.72,
       "category": "强势股"
      },
      {
@@ -8886,6 +8858,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "山东路桥",
       "change_pct": 4.259,
       "price": 6.12,
+      "category": "强势股"
+     },
+     {
+      "code": "300756",
+      "name": "金马游乐",
+      "change_pct": 3.448,
+      "price": 29.1,
       "category": "强势股"
      }
     ]
