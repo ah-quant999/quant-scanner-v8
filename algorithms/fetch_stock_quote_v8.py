@@ -109,6 +109,98 @@ def _fetch_all_spot_em():
     return out
 
 
+def _load_a_code_universe():
+    """腾讯兜底源的全市场 A 股代码清单。
+    优先 stock_names.json 的 full_code（sh600000 格式，每日元数据维护产出）；
+    缺失/不足时兜底上一版 stock_quote.json 的 A 股键（上一版守卫保证 ≥3000 才会写出）。"""
+    try:
+        with open(os.path.join(RAW_DIR, 'stock_names.json'), encoding='utf-8') as f:
+            names = json.load(f).get('data') or []
+        codes = [s.get('full_code') for s in names if s.get('full_code')]
+        codes = [c for c in codes if isinstance(c, str) and c.startswith(('sh', 'sz', 'bj'))]
+        if len(codes) >= 3000:
+            return codes
+        print(f"⚠️ stock_names.json 代码仅 {len(codes)} 只(<3000)，转用上一版 stock_quote.json")
+    except Exception as e:
+        print(f"⚠️ stock_names.json 代码清单不可用: {type(e).__name__} {str(e)[:60]}")
+    try:
+        with open(os.path.join(RAW_DIR, 'stock_quote.json'), encoding='utf-8') as f:
+            prev = json.load(f)
+        rows = prev.get('data') if isinstance(prev, dict) else prev
+        codes = [k for k in (rows.keys() if isinstance(rows, dict) else [])
+                 if isinstance(k, str) and k.startswith(('sh', 'sz', 'bj'))]
+        if len(codes) >= 3000:
+            return codes
+    except Exception as e:
+        print(f"⚠️ 上一版 stock_quote.json 也不可用: {type(e).__name__} {str(e)[:60]}")
+    return []
+
+
+def _fetch_all_spot_tencent():
+    """腾讯批量行情兜底（第三源，2026-10-08 阿狸咪的工程师·一劳永逸）。
+    场景：新浪反爬(403/HTML) + 东财连接重置(push2 系 HTTP 000) 双源全灭 —— 实测 09-21 云端、
+    10-08 阿狸咪机两次同因断更（fetch_stock_quote「全部接口重试仍失败」→ A 批永不就绪 →
+    B/D/E 批永不执行 → 盘后卡整批陈旧）。腾讯 qt.gtimg.cn 独立于上述两家网络，
+    支持逗号分隔批量（60 只/批，~5400 只 ≈ 90 请求，全程约 2-3 分钟）。
+
+    字段位（2026-10-08 实测 sh600519/sz000001/sz300750 三样本核对：
+      v_sh600519="1~贵州茅台~600519~1255.79~1258.62~1252.90~25168~...~20261008161457~-2.83~-0.22~1258.00~1242.00~..."）：
+      [1]名称 [3]现价 [4]昨收 [5]今开 [6]成交量(手) [30]时间YYYYMMDDHHMMSS
+      [31]涨跌 [32]涨跌幅 [33]最高 [34]最低 [37]成交额(万元)
+    单位对齐东财 fallback 口径：volume=手、amount=元（万元×1e4）。
+    北交所(bj) 腾讯可能不覆盖 ⇒ 少量缺失可接受，main() 的 <3000 只守卫兜底残缺表。"""
+    import urllib.request
+    codes = _load_a_code_universe()
+    if not codes:
+        print("❌ 腾讯兜底放弃：无可用代码清单（stock_names.json 与上一版 stock_quote.json 均不可用）")
+        return {}
+    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).strftime('%H:%M:%S')
+    out = {}
+    BATCH = 60
+    total = (len(codes) + BATCH - 1) // BATCH
+    for bi in range(0, len(codes), BATCH):
+        batch = codes[bi:bi + BATCH]
+        url = 'https://qt.gtimg.cn/q=' + ','.join(batch)
+        text = None
+        for attempt in range(2):
+            try:
+                req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0', 'Referer': 'https://gu.qq.com/'})
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    text = resp.read().decode('gbk', 'ignore')
+                break
+            except Exception as e:
+                if attempt == 0:
+                    time.sleep(2)
+                else:
+                    print(f"⚠️ 腾讯批 {bi // BATCH + 1}/{total} 两次失败: {type(e).__name__} {str(e)[:50]}")
+        if not text:
+            continue
+        for m in re.finditer(r'v_(\w+)="([^"]*)"', text):
+            key, payload = m.group(1), m.group(2)
+            f_ = payload.split('~')
+            if len(f_) < 35 or not f_[3]:
+                continue
+            try:
+                out[key] = {
+                    'name': f_[1],
+                    'price': _safe_float(f_[3]),
+                    'change': _safe_float(f_[31]),
+                    'pct': _safe_float(f_[32]),
+                    'prev_close': _safe_float(f_[4]),
+                    'open': _safe_float(f_[5]),
+                    'high': _safe_float(f_[33]),
+                    'low': _safe_float(f_[34]),
+                    'volume': _safe_float(f_[6]),
+                    'amount': (_safe_float(f_[37]) or 0) * 1e4 if _safe_float(f_[37]) is not None else None,
+                    'snapshot_time': now,
+                }
+            except Exception:
+                continue
+        time.sleep(0.15)
+    print(f"✅ 腾讯A股行情：{len(out)} 只（{total} 批，新浪+东财均不可用时第三源兜底）")
+    return out
+
+
 def fetch_all_spot():
     """全市场 A 股实时行情（约 5537 只，14 列，27s）。
     2026-08-19 一劳永逸：主源新浪 stock_zh_a_spot，失败自动 fallback 东财 stock_zh_a_spot_em，
@@ -147,7 +239,12 @@ def fetch_all_spot():
         return out
     except Exception as e:
         print(f"⚠️ 新浪A股行情失败（3 次重试后）: {type(e).__name__} {str(e)[:80]} → fallback 东财")
-        return _fetch_all_spot_em()
+        out = _fetch_all_spot_em()
+        if out:
+            return out
+        # 2026-10-08 一劳永逸：东财也灭（新浪反爬 + push2 连接重置同发，实测两次）→ 腾讯第三源
+        print("⚠️ 东财A股行情也不可用 → fallback 腾讯（第三源）")
+        return _fetch_all_spot_tencent()
 
 
 def fetch_hk_spot():
