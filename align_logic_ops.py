@@ -67,6 +67,10 @@ MUST_HAVE_CRON = {
     # 2026-09-10 阿狸咪归类纠正：准点档调度器**事实持有 14 条 cron**（9:40–15:00 每 20 分），
     #   旧版把它归入 ALLOW_NO_CRON 属分类错误（当时 cron 一度被注释，现早已恢复）。
     "v8_cn_fetch_intraday_lemoncat": "盘中准点档调度器(14 档·唯一主线)",
+    # 2026-10-09 阿狸咪的工程师：selfhosted 兜底链升格为常规档（装 cron）——
+    #   W52_HIGH/AVG_PRICE_880003 等 cn-IP 硬约束源在境外托管主力链上结构性不可达
+    #   （10-08 实证 W52 冻结 22h），本链装盘前 08:25 / 盘后 17:20 两档常规兜底。
+    "v8_cn_fetch_cloud_selfhosted": "中国数据抓取(cn-IP 硬约束兜底·工作日08:25/17:20)",
     # 2026-09-10 阿狸咪升格：实验卡抓取链有 16:30 CST cron 且已文档化 → ALLOW → MUST
     "v8_cn_fetch_experiments": "暂未上架·实验卡抓取(16:30)",
     # 2026-09-23 补登记（本机·小九）：大基金（国家集成电路产业投资基金一/二/三期）增减持监控。
@@ -102,7 +106,6 @@ MUST_HAVE_CRON = {
 #   四个 workflow 文件**早已不存在于仓库**，留着只会误导后来人（第 4 项校验会拦住复活）。
 ALLOW_NO_CRON = {
     "v8_algo_run": "盘后算法链应急回退（主链已迁 v8_algo_cloud）",
-    "v8_cn_fetch_cloud_selfhosted": "selfhosted 备援（无 cron，按需 dispatch）",
     "v8_build_deploy": "由 push / workflow_run 触发，无 cron",
     # 🔴 2026-09-23 阿狸咪的工程师：门禁「前移」链 —— 新增/改 cron 的 workflow 实例化后，
     #   由它在 workflow/logic.html 变更的那一次 push 上立即验证双登记（不等下一次 data push）。

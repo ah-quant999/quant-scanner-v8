@@ -8399,6 +8399,7 @@ window.__renderIndexObserve = function(){
         <tr><td>v8_ima_strong_stock</td><td>工作日 15:45</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>ima 强势股自动同步（强势跟踪卡水源 · 三道防回归锁）</td></tr>
         <tr><td>v8_lhb_fetch</td><td>工作日 17:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>龙虎榜 fetcher（cn runner · 共振日历水源）</td></tr>
         <tr><td>v8_dajijin_fetch</td><td>工作日 20:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>大基金增减持 fetcher（cn runner · 暂未上架·观测类）</td></tr>
+        <tr><td>v8_cn_fetch_cloud_selfhosted</td><td>工作日 08:25 / 17:20</td><td><span class="status-dot s-ok"></span>self-hosted cn</td><td>中国数据抓取 cn-IP 硬约束兜底（盘前/盘后各一档 · 东财 push2delay 系）</td></tr>
         <tr><td>v8_cn_fetch_cloud_hosted</td><td>工作日 20:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>中国数据抓取（云端 hosted 兜底）</td></tr>
         <tr><td>v8_cn_fetch_experiments</td><td>工作日 16:30</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>实验卡数据抓取（暂未上架区）</td></tr>
         <tr><td>v8_stock_quote_refresh</td><td>工作日 09:00-16:00 每30分</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>个股行情轻量刷新（STOCK_QUOTE）</td></tr>
@@ -12533,6 +12534,7 @@ function drawUpDownChart(){
           {name:'龙虎榜抓取(v8_lhb_fetch)', source:'LHB_DATA', freq:'工作日17:30', slots:['17:30'], note:'共振日历水源'},
 
           {name:'大基金增减持(v8_dajijin_fetch)', source:'DAJIJIN_REDUCTION', freq:'工作日20:30', slots:['20:30'], note:'暂未上架·观测类'},
+          {name:'中国数据抓取cn兜底(v8_cn_fetch_cloud_selfhosted)', source:'W52_HIGH', freq:'工作日08:25/17:20', slots:['08:25','17:20'], note:'cn-IP硬约束源兜底·东财push2delay系'},
 
           {name:'☁️持仓云端同步(westock)', source:'PORTFOLIO_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'实时持仓', sourceMissing:true},
 
