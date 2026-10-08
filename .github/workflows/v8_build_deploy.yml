@@ -548,9 +548,24 @@ jobs:
             #     ③ 断开**不视为致命**：继续走既有「fetch → 全量重建 → 重试」路径
             #   ⇒ 最坏情况从「阻塞到 job 超时」变成「3 分钟后正常重试」。
             _GITSLOW="-c http.lowSpeedLimit=1000 -c http.lowSpeedTime=60"
-            if timeout 180 git $_GITSLOW push "$REPO" HEAD:main; then
-              echo "✅ 已部署 main（第 $i 次尝试，GitHub Pages 自动重建）"; exit 0
-            fi
+            # 🔧 2026-10-08 一劳永逸修复（主人令「部署永不落地」P0·小九）：
+            #   原「单次 push 被拒→回到循环顶部全量重建再推」→ 重建 ~8min 期间 main 又被
+            #   reconcile/fetch 推进 → 永远非快进 → 无限追尾（实测今日连续 5 轮 failure）。
+            #   修法：提交后进入「紧循环」——每次 fetch→merge -X ours（保我方新构建的
+            #   data/index，丢弃 reconcile 的纯 ?v 装饰提交）→ push；最多 6 次、间隔 8s，
+            #   专抓 reconcile 15 分钟档间的稳定窗口。merge -X ours 不产生冲突（data 由构建
+            #   决定、非合并决定），且只在推送被拒（竞态）时触发，正常快进路径不受影响。
+            _deployed=0
+            for j in 1 2 3 4 5 6; do
+              timeout 60 git $_GITSLOW fetch "$REPO" main
+              git merge -X ours --no-edit FETCH_HEAD 2>/dev/null || true
+              if timeout 120 git $_GITSLOW push "$REPO" HEAD:main; then
+                echo "✅ 已部署 main（第 $i 轮构建·第 $j 次推送尝试，GitHub Pages 自动重建）"; _deployed=1; break
+              fi
+              echo "  ⚠️ 第 $i 轮·第 $j 次推送被拒/超时，merge 远端后重试"; sleep 8
+            done
+            if [ $_deployed -eq 1 ]; then exit 0; fi
+            echo "⚠️ 本构建 6 次推送均未成功（远端高频 churn），回到顶层全量重建重试 ($i/3)"
             echo "⚠️ push 被拒/超时（远端已前进或传输停滞），同步远端并按最新 raw_data 全量重建后重试 ($i/3)"
             # 🛡🛡 2026-09-21 小九（线上 7 轮 failure 取证后·补护栏缺口）
             #   实证：加固 301b30acd5b7(09-21 04:03) 上线后，本步 **仍** 出现 failure：
