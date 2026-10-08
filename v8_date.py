@@ -74,6 +74,18 @@ def _is_trading_day_impl(date_str: str) -> bool:
         import v8_calendar as _cal
         if _cal.covers(date_str) and _cal.in_holiday_range(date_str):
             return False
+        # 🔴 2026-10-10 根治（数据会话日误判·主人令「一劳永逸」）：静态权威表覆盖
+        #   年份内的日期**离线终判**，不再依赖不稳定的在线日历层——本机/弱网实测：
+        #   fetch_lhb 在线层把 2026-10-09/09-30 交易日误判 False（日历拉取失败时
+        #   未收录日期保守判非交易），连带 data_session_date 把交易日归错会话。
+        #   覆盖表 = 国务院安排 + 交易所休市公告 + MAKEUP_DAYS(调休交易日)：
+        #   覆盖年份内 非假日 weekday 必为交易日；周末仅 MAKEUP_DAYS 内交易。
+        if _cal.covers(date_str):
+            import datetime as _dtmod
+            _dd = _dtmod.datetime.strptime(date_str, "%Y-%m-%d").date()
+            if _dd.weekday() < 5:
+                return True
+            return date_str in (getattr(_cal, "MAKEUP_DAYS", None) or set())
     except Exception:
         pass  # 静态日历不可用时回落原链路（fetch_lhb → 原兜底），不放大故障
     # 把 fetch_lhb 加入路径后复用其缓存的交易日历
@@ -154,6 +166,45 @@ def resolve_data_date(
 def today_data_date() -> str:
     """今天对应的数据日期（与 resolve_data_date(now_cst()) 等价）。"""
     return resolve_data_date(now_cst())
+
+
+def data_session_date(
+    ref: Optional[datetime.date | datetime.datetime | str] = None,
+    close_hour: int = 15,
+    close_min: int = 0,
+) -> str:
+    """解析「当前行情快照/K线数据归属的【已完成交易日】」——history/日期戳专用口径。
+
+    与 resolve_data_date 的区别：交易日当天 close_hour 点收盘前，当日 K 线尚未
+    走完、快照价实为上一交易日收盘 ⇒ 归上一交易日；收盘后归当天；非交易日回退
+    上一交易日。
+
+    🔴 2026-10-09 根治（金股池 history「日期错位双假行」·主人令「一劳永逸」）：
+      - 09-30 02:14 跑批用 09-29 收盘 1638.5 冒充 09-30 行（运行自然日打戳）；
+      - 10-01 假日跑批把 09-30 收盘 1613.0 盖上 10-01 的戳（日历失败回退自然日）。
+      一律改用本口径打戳后，所有 history 写入变幂等（同日覆盖），假行不可能再产生。
+    """
+    if ref is None:
+        dt = now_cst()
+    elif isinstance(ref, datetime.datetime):
+        dt = ref
+    elif isinstance(ref, datetime.date):
+        dt = datetime.datetime.combine(ref, datetime.time(12, 0))
+    else:
+        # 🔴 字符串可能带时刻（如 '2026-10-09 18:10:00'）——先按完整格式解析，
+        #   失败再退纯日期（时刻缺失按 12:00 中性处理，不误判为收盘前）。
+        _s = str(ref).strip()
+        try:
+            dt = datetime.datetime.strptime(_s[:19], "%Y-%m-%d %H:%M:%S")
+        except Exception:
+            dt = datetime.datetime.strptime(_s[:10], "%Y-%m-%d")
+            dt = dt.replace(hour=12)
+    d = dt.date()
+    _is_td = _is_trading_day_impl(d.strftime("%Y-%m-%d"))
+    if _is_td and dt.time() >= datetime.time(close_hour, close_min):
+        return d.strftime("%Y-%m-%d")
+    ref2 = d if not _is_td else d - datetime.timedelta(days=1)
+    return last_trading_day(ref2)
 
 
 def trading_days_between(start: str, end: str) -> int:

@@ -2651,7 +2651,15 @@ def update_gold_pool_from_scan(output):
     + 外资研投 + mahoro研报)。若候选池缺失则退化为旧逻辑(不限制候选宇宙)。
     """
     pool = load_gold_pool()
-    today = datetime.now().strftime("%Y-%m-%d")
+    # 🔴 2026-10-09 根治（金股池 history 日期错位双假行·主人令「一劳永逸」）：
+    #   日期戳禁用运行自然日 datetime.now()，改用「数据归属的已完成交易日」
+    #   （15:00 收盘前归上一交易日，非交易日回退）——盘中跑批用昨日收盘冒充当日、
+    #   假日跑批盖假日戳两大污染源由此根断。v8_date 不可用时回退旧口径不中断链。
+    try:
+        import v8_date as _v8_date
+        today = _v8_date.data_session_date()
+    except Exception:
+        today = datetime.now().strftime("%Y-%m-%d")
     cutoff = get_n_trade_days_ago(GOLD_POOL_DAYS)
 
     # ── 存量修复：补全缺失的顶层 signal_count 字段 ──
@@ -2771,11 +2779,16 @@ def update_gold_pool_from_scan(output):
                 "signal_count": s["signal_count"],
             },
         }
-        # 防止同一天多次调用时重复追加：先检查今天是否已有记录
+        # 防止同一天多次调用时重复追加：按日期全列表覆盖（🔴 2026-10-09 根治：
+        #   原实现只看 history[-1]，若池内存在乱序同日行会重复追加假行）
         history = pool["stocks"][key]["history"]
-        if history and history[-1].get("date") == today:
-            history[-1] = history_entry  # 覆盖当天已有记录
-        else:
+        _replaced = False
+        for _i, _h in enumerate(history):
+            if isinstance(_h, dict) and _h.get("date") == today:
+                history[_i] = history_entry
+                _replaced = True
+                break
+        if not _replaced:
             history.append(history_entry)
         # 更新名称(可能有变化)
         # 🛡 2026-09-24 一劳永逸（错名再犯根治）：写入前再过一次唯一校入口
@@ -2838,7 +2851,13 @@ def update_gold_pool_from_scan(output):
 def update_gold_pool_from_watch(watch_output):
     """盘中精监后更新金股池"""
     pool = load_gold_pool()
-    today = datetime.now().strftime("%Y-%m-%d")
+    # 🔴 2026-10-09 根治：盘中精监的日期戳同口径（数据归属的已完成交易日，15:00
+    #   前归上一交易日）——盘中快照价实为昨日收盘，禁止用运行自然日冒充当日。
+    try:
+        import v8_date as _v8_date
+        today = _v8_date.data_session_date()
+    except Exception:
+        today = datetime.now().strftime("%Y-%m-%d")
     # 候选宇宙限制（与盘后一致）；未构建候选池时放行
     _cand = load_candidate_pool()
     cand_keys = set(_cand.keys()) if _cand else None
