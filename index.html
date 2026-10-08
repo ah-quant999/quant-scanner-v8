@@ -18260,6 +18260,21 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     }
     return 2*60*60*1000;                                 // 非交易日 07:00–23:00 → 2 小时
   }
+  // 盘中开盘锚点（9:30 / 13:00）：进入开盘后若上次刷新停在开盘前（午休/盘后/隔夜），立即刷一次，
+  // 避免「开盘首段新数据」迟到到午休那一小时末尾才进页面（2026-10-08 主人令）。
+  function _sessionOpenHM(){
+    var t=_bjHM();
+    if(t >= 9*60+30 && t < 11*60+30) return 9*60+30;     // 上午开盘
+    if(t >= 13*60    && t < 15*60)    return 13*60;        // 下午开盘
+    return -1;                                             // 非盘中
+  }
+  function _sessionOpenEpochMs(){
+    var openHM=_sessionOpenHM();
+    if(openHM < 0) return -1;
+    var d=_bj();
+    d.setUTCHours(Math.floor(openHM/60), openHM%60, 0, 0);
+    return d.getTime() - 8*3600*1000;                     // 转回真实 epoch 与 _last 同口径
+  }
 
   var _last = Date.now();
   /* 🔴 2026-09-22 一劳永逸修复（小九）：刷新链断裂自愈。
@@ -18274,6 +18289,14 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   function _maybeReload(){
     var iv = _targetIntervalMs();
     if(iv === 0) return false;                           // 夜间不刷
+    // 🔴 2026-10-08 开盘锚点：进入盘中（9:30/13:00）且上次刷新在开盘前 ⇒ 立即刷一次
+    var so=_sessionOpenEpochMs();
+    if(so > 0 && _last < so){
+      _last = Date.now();
+      _reloadRequestedAt = Date.now();                   // 登记：用于 90s 后自愈重试
+      try{ location.reload(); }catch(e){}
+      return true;                                       // 已请求重载（页可能未被销毁）
+    }
     if((Date.now() - _last) >= iv){
       _last = Date.now();
       _reloadRequestedAt = Date.now();                   // 登记：用于 90s 后自愈重试
