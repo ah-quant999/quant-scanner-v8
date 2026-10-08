@@ -225,6 +225,40 @@ def check_value(var, key, val):
         return (SOFT, f"{key}={f} 市盈率越界({PE_HARD_MIN}~{PE_HARD_MAX})(数值越界,仅告警不阻断)")
     return None
 
+def _trading_lag_days(t0, t1):
+    """(t0, t1] 的 A 股交易日天数（周一~周五 且 不在 v8_calendar.HOLIDAY_RANGES 休市区间）。
+
+    🛡 2026-10-08 阿狸咪的工程师·根治「假期后盘后批次未到 ⇒ 上交易日产物被判真断更」假失败：
+      update_time 是**写入时刻**，长假期间只有盘中档在刷 ⇒ B/D/E 批产物 write-stamp 停在
+      节前交易日（数据 vintage 本身正确），自然日口径 lag=7 天 ⇒ 被 ③ 判硬失败
+      （实测 10-08 17:25 run#2286 A 批被 step16 连坐 21 项 → 整 run 假 failure）。
+      改交易日口径：A股周末永不交易（含调休补班周六）＋法定休市区间不计入。
+    日历不可用/异常 ⇒ 返回 None（调用方回退自然日旧口径，保守不放宽）。"""
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        import v8_calendar  # 仓库根：权威静态交易日历（HOLIDAY_RANGES）
+    except Exception:
+        return None
+    try:
+        n = 0
+        d = t0.date()
+        end = t1.date()
+        while d < end:
+            d += dt.timedelta(days=1)
+            if d.weekday() >= 5:      # A 股周末永不交易
+                continue
+            ds = d.strftime('%Y-%m-%d')
+            try:
+                if v8_calendar.in_holiday_range(ds):
+                    continue
+            except Exception:
+                return None
+            n += 1
+        return n
+    except Exception:
+        return None
+
+
 def check_var(var, obj, site_latest=None):
     """单 VAR 全量体检（site_latest = 全站最新 update_time，用于假期共享停更豁免判断）"""
     if var in SKIP_CONTENT:
@@ -246,9 +280,23 @@ def check_var(var, obj, site_latest=None):
             if days > STALE_FAIL_DAYS:
                 # 计算「本 VAR 落后全站多少天」（无基准则视为 0，保持原有严格行为）
                 lag = 0.0
+                lag_td = None
                 if site_latest is not None:
                     lag = (site_latest - t).total_seconds() / 86400.0
-                if lag > SHARED_STALE_GRACE_DAYS:
+                    # 交易日口径（2026-10-08 一劳永逸）：假期/盘后批次未到窗口不判真断更；
+                    # 日历不可用 ⇒ lag_td=None 回退自然日旧口径（保守不放宽）。
+                    lag_td = _trading_lag_days(t, site_latest)
+                if lag_td is not None:
+                    if lag_td > SHARED_STALE_GRACE_DAYS:
+                        issues.append((HARD, var,
+                            f"update_time 陈旧 {days:.1f} 天({t:%Y-%m-%d %H:%M})，"
+                            f"且比全站最新落后 {lag_td} 个交易日(>{SHARED_STALE_GRACE_DAYS} 天)——本 VAR 独自落后，真断更"))
+                    else:
+                        issues.append((SOFT, var,
+                            f"update_time 陈旧 {days:.1f} 天({t:%Y-%m-%d %H:%M})，"
+                            f"但落后全站仅 {lag_td} 个交易日(≤{SHARED_STALE_GRACE_DAYS} 天)——"
+                            f"假期/盘后批次未到窗口，豁免硬失败仅告警"))
+                elif lag > SHARED_STALE_GRACE_DAYS:
                     issues.append((HARD, var,
                         f"update_time 陈旧 {days:.1f} 天({t:%Y-%m-%d %H:%M})，"
                         f"且比全站最新落后 {lag:.1f} 天(>{SHARED_STALE_GRACE_DAYS} 天)——本 VAR 独自落后，真断更"))
