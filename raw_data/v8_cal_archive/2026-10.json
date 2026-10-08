@@ -1,6 +1,6 @@
 {
  "month": "2026年10月",
- "update_time": "2026-10-08 22:56",
+ "update_time": "2026-10-09 00:36",
  "legend": [
   {
    "title": "重要政策",
@@ -252,13 +252,13 @@
     {
      "num": 8,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": []
     },
     {
      "num": 9,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇺🇸 密歇根消费者信心预公布",

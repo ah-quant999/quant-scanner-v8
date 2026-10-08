@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-10-08 23:05",
+  "update_time": "2026-10-09 00:43",
   "data_date": "2026-10-08",
   "data_date_source": "kline",
-  "fetch_date": "2026-10-08",
+  "fetch_date": "2026-10-09",
   "data_available": true,
   "source": "同花顺",
   "sectors": [
@@ -537,14 +537,14 @@
       "pct_60d": -1.43,
       "pct_90d": -15.27,
       "pct_180d": -8.09,
-      "pct_52w": -6.48,
+      "pct_52w": null,
       "relative_5d": -5.09,
       "relative_20d": -5.05,
       "relative_30d": 2.77,
       "relative_60d": -1.43,
       "relative_90d": -15.27,
       "relative_180d": -8.09,
-      "relative_52w": -6.48
+      "relative_52w": null
     },
     {
       "name": "化学纤维",
