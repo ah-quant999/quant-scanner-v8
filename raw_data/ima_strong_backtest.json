@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-08 17:22:58",
+ "generated": "2026-10-09 01:13:29",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -33,13 +33,13 @@
  "skipped_no_signal_date": 8,
  "signal_days": 44,
  "signal_date_range": "2026-06-09 ~ 2026-08-28",
- "ima_update_time": "2026-10-07 22:47:33",
+ "ima_update_time": "2026-10-08 22:58:50",
  "source_coverage": {
   "rows_parsed": 8,
   "expected": null,
   "source_channel": "full-snapshot",
   "snapshot_fetched_at": "2026-09-30 21:20:43",
-  "snapshot_age_h": 169.45,
+  "snapshot_age_h": 193.64,
   "truncated": false,
   "note": "v2 换代水源「短线情绪选股」主报告全文快照（成员连接器）；introduction 兜底通道受 ~300 字硬墙（如实降级 detail_complete=false）。"
  },
@@ -142,16 +142,16 @@
    "bench_days": 44
   },
   "30d": {
-   "samples": 86,
+   "samples": 87,
    "immature": false,
-   "win": 71,
+   "win": 72,
    "loss": 15,
-   "win_rate": 82.6,
-   "avg_return": 17.18,
-   "median_return": 7.71,
+   "win_rate": 82.8,
+   "avg_return": 17.64,
+   "median_return": 7.88,
    "best_return": 137.41,
    "worst_return": -29.2,
-   "max_drawdown": -14.51,
+   "max_drawdown": -14.63,
    "bench_avg_return": 0.0248,
    "bench_win_rate": 49.38,
    "bench_days": 36
