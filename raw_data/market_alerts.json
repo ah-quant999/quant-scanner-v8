@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-10-08 17:04:26",
-  "summary": "上证指数跌0.79%，涨停43只、跌停0只。情绪积极。",
+  "update_time": "2026-10-08 18:04:58",
+  "summary": "上证指数跌0.79%。",
   "indices": [
     {
       "name": "上证指数",
@@ -54,11 +54,5 @@
   ],
   "top_sectors": [],
   "bottom_sectors": [],
-  "mood": {
-    "up": 1654,
-    "down": 3516,
-    "flat": 116,
-    "limit_up": 43,
-    "limit_down": 0
-  }
+  "mood": {}
 }

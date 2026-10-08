@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-10-08 16:06",
-  "republish_time": "2026-10-08 17:03:43",
+  "update_time": "2026-10-08 17:00",
+  "republish_time": "2026-10-08 18:04:03",
   "data_date": "2026-09-30",
   "rule_ver": 2,
   "top_n": 5,
@@ -52,7 +52,7 @@
           "main_net": 25469205.0
         }
       ],
-      "match": "retained:exact"
+      "match": "retained:retained:exact"
     },
     {
       "name": "生物制品",
@@ -98,7 +98,7 @@
           "main_net": 23049580.0
         }
       ],
-      "match": "retained:exact"
+      "match": "retained:retained:exact"
     },
     {
       "name": "汽车整车",
@@ -144,7 +144,7 @@
           "main_net": 37764100.0
         }
       ],
-      "match": "retained:neodata"
+      "match": "retained:retained:neodata"
     },
     {
       "name": "房地产",
@@ -190,7 +190,7 @@
           "main_net": 16806126.0
         }
       ],
-      "match": "retained:exact"
+      "match": "retained:retained:exact"
     }
   ],
   "nomatch_count": 0,

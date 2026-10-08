@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-10-08 17:20:56",
-  "run_start": "2026-10-08 16:55:01",
+  "update_time": "2026-10-08 18:21:26",
+  "run_start": "2026-10-08 17:55:50",
   "ok": 13,
   "fail": 1,
   "failed_scripts": [
     {
-      "script": "fetch_inst_trade.py",
-      "reason": "退出码 1 | [17:00:24] 全部接口重试仍失败，保留旧数据（如有）"
+      "script": "fetch_orphan_sector_fund_flow.py",
+      "reason": "监督器静默杀(>15min 无输出)"
     }
   ],
   "skipped_by_time_gate": []
