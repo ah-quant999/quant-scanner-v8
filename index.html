@@ -4698,101 +4698,6 @@ function fmtSigned(v){
     } else { h += '<div style="color:var(--dim);font-size:12px">暂无游资独买信号</div>'; }
     h += '</div>';
     h += '</div>'; // 🛠 2026-09-20 修复：补上「机游共振（短线）」insight-grid 缺失的闭合标签（此前未闭合 ⇒ 月度汇总标题/两卡/口径说明被吸入网格第 2 行，挤成 419px 窄列）
-    // ===== 📊 月度汇总 · 三方共振净流入/净流出 TOP10（2026-09-20 主人令）=====
-    //   口径：三方 = 龙虎榜席位的「机构 + 北向 + 游资」三方（seats 结构），
-    //        个股单日三方净额 = (机构buy-机构sell)+(北向buy-北向sell)+(游资buy-游资sell)。
-    //        当月 = 自然月内所有有龙虎榜数据的交易日，同股跨日累加（同一股票多次上榜则金额相加）。
-    //   排序：净额 > 0 取 TOP10 降序（流入）；净额 < 0 取 TOP10 升序（流出，跌得最狠在前）。
-    //   排版：与「机游共振日历 · 月度汇总」共用 .month-summary/.ms-col/.ms-item 类，保证视觉一致。
-    (function(){
-      var days = (window._rcDays ? window._rcDays() : []) || [];
-      if(!days.length) return;
-
-      // 取「最新有数据的交易日」所属的自然月作为汇总月（与机游月度汇总同口径，不依赖访客本机时区）
-      var lastIso = String(days[days.length-1].iso || '');
-      if(lastIso.length !== 10) return;
-      var _my = parseInt(lastIso.slice(0,4),10), _mm = parseInt(lastIso.slice(5,7),10);
-      var _mLabel = _my + '年' + _mm + '月';
-
-      var _mDays = days.filter(function(d){
-        var iso = String(d.iso || '');
-        return iso.length===10 && parseInt(iso.slice(0,4),10)===_my && parseInt(iso.slice(5,7),10)===_mm;
-      });
-      if(!_mDays.length) return;
-      var _latestDay = String(_mDays[_mDays.length-1].iso);
-
-      // 同股跨日累加三方净额
-      var _agg = {};
-      _mDays.forEach(function(d){
-        (d.stocks || []).forEach(function(s){
-          var code = s.code || '';
-          if(!code) return;
-          var seats = s.seats || {};
-          var net = 0, has = false;
-          ['机构','北向','游资'].forEach(function(k){
-            var seat = seats[k];
-            if(!seat) return;
-            var v = (seat.buy||0) - (seat.sell||0);
-            if(seat.buy!=null || seat.sell!=null){ has = true; }
-            net += v;
-          });
-          // 无 seats 明细时降级用主字段（inst_net_万 + yz_net_万），北向无主字段则不计
-          if(!has){
-            net = (s.inst_net_万||0) + (s.yz_net_万||0);
-          }
-          if(!net) return;
-          if(!_agg[code]) _agg[code] = {code:code, name:s.name||'', net:0, days:0};
-          _agg[code].net += net;
-          _agg[code].days += 1;
-        });
-      });
-
-      var _list = Object.keys(_agg).map(function(k){ return _agg[k]; });
-      var _in  = _list.filter(function(x){ return x.net > 0; }).sort(function(a,b){ return b.net - a.net; }).slice(0,10);
-      var _out = _list.filter(function(x){ return x.net < 0; }).sort(function(a,b){ return a.net - b.net; }).slice(0,10);
-
-      h += '<h3 style="margin-top:22px;font-size:15px;color:var(--txt)">📊 月度汇总 <span style="font-size:11px;color:var(--dim);font-weight:400">· ' + _mLabel + '三方共振净买卖（机构+北向+游资 · 仅当月 · 最新交易日 ' + _latestDay + '）</span></h3>';
-      // 两卡宽度对齐上方「机游共振（短线）」三卡：改三列网格（每列 ≈419px，与 .insight-grid 的 1fr1fr1fr 同宽）
-      //   2026-09-21 主人令：口径说明自「标题下方」移至「两卡右侧空白格」（第 3 列）。
-      h += '<div class="month-summary" style="grid-template-columns:repeat(2,1fr);gap:12px">';
-      if(!_in.length && !_out.length){
-        h += '<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:28px 12px;font-size:13px;background:var(--bg2);border:1px dashed var(--border);border-radius:10px;">📭 ' + _mLabel + ' 暂无三方共振席位数据</div>';
-      } else {
-        h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--up)">▲</span> 净流入TOP10</div>';
-        if(_in.length){
-          _in.forEach(function(s, idx){
-            h += '<div class="ms-item"><span>' + (idx+1) + _rcEsc(s.name) + '<span class="ms-code">' + _rcEsc(s.code) + '</span></span><span class="ms-val c-up">' + _rcFmtYi(s.net) + '</span></div>';
-          });
-        } else { h += '<div style="color:var(--dim);font-size:12px;padding:6px 0">本期无净流入标的</div>'; }
-        h += '</div>';
-
-        h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--down)">▼</span> 净流出TOP10</div>';
-        if(_out.length){
-          _out.forEach(function(s, idx){
-            h += '<div class="ms-item"><span>' + (idx+1) + _rcEsc(s.name) + '<span class="ms-code">' + _rcEsc(s.code) + '</span></span><span class="ms-val c-down">' + _rcFmtYi(s.net) + '</span></div>';
-          });
-        } else { h += '<div style="color:var(--dim);font-size:12px;padding:6px 0">本期无净流出标的</div>'; }
-        h += '</div>';
-
-      }
-
-      // 2026-09-21 主人令：口径说明自「两卡右侧第 3 列」移至「第二行通栏」——
-      //   第 3 列在窄屏会被压成细条、与两卡不同高；第二行通栏后与上方两卡等宽，阅读更顺。
-      if(_in.length || _out.length){
-        h += '<div class="ms-note-card">';
-        h += '<div class="ms-note-head"><span style="color:#38bdf8">\u2261</span> 口径说明'
-           + '<span class="ms-note-tag">当月共 ' + _mDays.length + ' 个交易日</span></div>';
-        h += '<div class="ms-note-body">';
-        h += '<span class="ms-note-item">\u8303\u56f4\uff1a\u9f99\u864e\u699c\u5e2d\u4f4d\u300c\u673a\u6784 + \u5317\u5411 + \u6e38\u8d44\u300d\u4e09\u65b9\u51c0\u4e70\u5356</span>';
-        h += '<span class="ms-note-item">\u540c\u4e00\u80a1\u7968\u5f53\u6708\u591a\u6b21\u4e0a\u699c\u6309\u91d1\u989d\u7d2f\u52a0</span>';
-        h += '<span class="ms-note-item">\u6392\u5e8f\uff1a\u51c0\u989d\u964d\u5e8f\uff08\u6d41\u5165\uff09/ \u5347\u5e8f\uff08\u6d41\u51fa\uff09\u5404\u53d6 TOP10</span>';
-        h += '</div>';
-        h += '<div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--border);font-size:10px;color:var(--dim);opacity:.85">\u4ec5\u4f9b\u53c2\u8003\uff0c\u4e0d\u6784\u6210\u6295\u8d44\u5efa\u8bae</div>';
-        h += '</div>';
-      }
-      h += '</div>';
-    })();
-
         /* ===== 📜 每日记录 + 📊 每周汇总（2026-10-04 主人令：仿两个共振日历下方样式，
        洞察口径=机构+游资+北向三通道；从有数据开始逐月回溯，随 LHB_HISTORY 每交易日 17:30 自动延伸） ===== */
     (function(){
@@ -12491,7 +12396,7 @@ function drawUpDownChart(){
 
           {name:'净买卖TOP10', source:'LHB_DATA', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'北向净买 TOP10'},
 
-          {name:'月度汇总·三方共振净买卖', source:'LHB_DATA', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'三方共振'},
+          {name:'月度汇总·三通道净买卖', source:'LHB_DATA', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'三通道月度'},
 
         ]
 
