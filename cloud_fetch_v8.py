@@ -128,7 +128,10 @@ CATEGORY_MAP = {
     "MACRO_DATA": "premarket,post_close",
     "CRISIS_DATA": "premarket,intraday",
     "MACRO_BRIEF": "premarket,intraday",
-    "JUDGMENT_DATA": "premarket,intraday",
+    # 🛡 2026-10-08 阿狸咪（主人令「今日判定·环境综合 没盘后更新·一劳永逸修复」）：
+    #   补挂 post_close：盘后轮用收盘定型数据重算今日判定（与 update_v8.py 注入侧
+    #   同步修改，两侧口径一致）。对齐 ETF_DAILY_MONITOR "intraday,post_close" 双档先例。
+    "JUDGMENT_DATA": "premarket,intraday,post_close",
     "NORTH_FUND": "premarket,post_close",
     # 🛡 2026-09-18 孤儿链清理（同上）
     # 🔴 2026-09-22 恢复登记（同 VAR_TO_RAW 注释）· 接线②（小九）：

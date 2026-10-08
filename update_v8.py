@@ -244,7 +244,12 @@ CATEGORY_MAP = {
     # 🛡 2026-09-11 小九的工程师（三档归档对齐）：同上漏同步。抓取侧 cloud_fetch_v8.py 两者均为
     #   "premarket,intraday"（09-07 主人令），注入侧只有 premarket → 盘中 raw 已新、
     #   data/JUDGMENT_DATA.js（今日判定卡）/ data/MACRO_BRIEF.js（宏观解读卡）不重建。
-    "JUDGMENT_DATA": "premarket,intraday",
+    "JUDGMENT_DATA": "premarket,intraday,post_close",
+    # 🛡 2026-10-08 阿狸咪（主人令「今日判定·环境综合 没盘后更新·一劳永逸修复」）：
+    #   今日判定卡此前只挂 premarket,intraday ⇒ 盘后轮不重建 data/JUDGMENT_DATA.js，
+    #   卡面时间戳永远停在 14:5x「盘中」，无盘后定稿档。现对齐 ETF_DAILY_MONITOR
+    #   双档先例（09-11），补挂 post_close：盘后轮用收盘定型数据重算判定并刷新时间戳。
+    #   抓取侧 cloud_fetch_v8.py 的同名映射已同步加 post_close，两侧口径一致。
     "MACRO_BRIEF": "premarket,intraday",
 
     # 盘后（由 v6 算法 calc_volatility_watch.py 同步桥推送）
