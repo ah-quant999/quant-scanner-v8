@@ -22,6 +22,17 @@ from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 
+# 🔴 2026-10-09 修复（CRDS 卡死 8 天 · 真根因）：v8_date 此前仅在 L380 函数内局部 import，
+# 但本模块 L1281 等处在其余作用域引用 v8_date ⇒ NameError: name 'v8_date' is not defined，
+# 致 calc_crds.py 整轮 exit 1、crds_card_data.json 不产出、final_recommend 就绪门控失败被跳过。
+# 现于模块级全局 import（v8_date.py 仅依赖标准库，任何环境可安全加载），彻底消除作用域缺口。
+try:
+    _V8_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if _V8_ROOT not in sys.path:
+        sys.path.insert(0, _V8_ROOT)
+    import v8_date
+except Exception as _v8_date_err:
+    print(f"⚠️ 模块级导入 v8_date 失败: {_v8_date_err}", file=sys.stderr)
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "out")
 WATCH_RESULT = os.path.join(DATA_DIR, "watch_result.json")
 # 2026-09-03 一劳永逸根因修复：原 OUTPUT_FILE 指向 out/crds_result.json，但 update_v8 /
