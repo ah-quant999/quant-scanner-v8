@@ -322,6 +322,21 @@ def check_var(var, obj, site_latest=None):
     if not saw_record and var not in EMPTY_OK:
         issues.append((HARD, var, "整表无记录(空/截断?)"))
 
+    # ③ LHB 游资口径自洽哨兵（2026-10-09 根治后固化：卡面金额与金色标签必须同源。
+    #   曾发事故：yz_net_万 混入量化·国际席位 → 源杰科技+2.75亿有钱无名、金色标签对不上。
+    #   判据：每只股 yz_net_万 必须等于 seats.游资 净额（容差 0.11万=round 精度）。
+    if var == "LHB_DATA" and isinstance(obj, dict):
+        for s in (obj.get("stocks") or []):
+            if not isinstance(s, dict):
+                continue
+            yz = (s.get("seats") or {}).get("游资") or {}
+            yz_net = s.get("yz_net_万") or 0
+            seat_net = (yz.get("buy") or 0) - (yz.get("sell") or 0)
+            if abs(yz_net - seat_net) > 0.11:
+                issues.append((HARD, var,
+                    f"游资口径不自洽 @{s.get('name')}: yz_net_万={yz_net} 但 seats.游资净={round(seat_net, 1)}"
+                    "（量化/未识别席位冒充游资？查 fetch_lhb yz 聚合是否偏离纯游资口径）"))
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-baseline", action="store_true", help="不读取/不写基线(纯体检)")
