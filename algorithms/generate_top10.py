@@ -724,8 +724,13 @@ def _kline_volume_metrics(code, asof_date=None):
 
 def _volume_surge_score(vm):
     """量能突破：A股实证中换手率/量能是 t 值最高的有效因子。
-    放量确认价格行为时加分，缩量拉升不额外奖励。"""
+    放量确认价格行为时加分，缩量拉升不额外奖励。
+    🔴 2026-10-09 方向闸（主人令「价跌放量≠突破」）：量能分仅对当日收阳（close>open）
+    生效——源杰科技 -20% 跌停封死日 vol_ratio 1.8 仍拿满量能分（实证 bug）；
+    放量下跌是出货/恐慌，不是突破确认。当日收阴/平 一律 0 分。"""
     if not vm:
+        return 0
+    if vm.get("pct_today", 0) <= 0:
         return 0
     vr = vm["vol_ratio"]
     if vr >= 2.5:
@@ -1733,6 +1738,22 @@ def main():
             print(f"  ⛔ 质差一票否决 {name}({raw_code}): {_veto_reason}")
             VETO_COUNT += 1
             continue
+
+        # ── 跌停日一票否决（2026-10-09 主人令·源杰科技 -20%/-东山精密 -10% 跌停封死仍被推 Top3 实证）──
+        # 口径：信号日涨跌幅触及/逼近跌停（10cm 板 ≤-9.7%，20cm 板 ≤-19.7%）⇒ 禁入。
+        # 依据：①79 档 top10_daily 账本回测，跌停日入选 T+5 胜率 28.6%(n=7) vs 普通日 38.2%；
+        #      ②跌停收盘次日常低开、真实不可成交（盘后推荐无意义）；③支撑/止损位全建立在
+        #        错误价格结构上（实证 support 1439 > close 1290）。20cm 板=300/301/688/689。
+        _pct_day = latest.get("pct_chg")
+        if not isinstance(_pct_day, (int, float)):
+            _pct_day = s.get("pct_chg")
+        if (isinstance(_pct_day, (int, float))
+                and raw_code.isdigit() and len(raw_code) == 6):
+            _lim = 20.0 if raw_code[:3] in ("300", "301", "688", "689") else 10.0
+            if _pct_day <= -(_lim - 0.3):
+                print(f"  ⛔ 跌停日一票否决 {name}({raw_code}): 信号日 {_pct_day}% 触及 {_lim}cm 跌停阈 ⇒ 禁入")
+                VETO_COUNT += 1
+                continue
 
         # ── 原始总分（各维度绝对加分之和）──
         # 🔴 2026-10-01 C 类：inst 为 IC 最强因子(+0.116/ICIR0.435) → 加权 ×2；
