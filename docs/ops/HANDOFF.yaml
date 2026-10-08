@@ -105,6 +105,8 @@ items:
     updated: "2026-09-29 18:55"
     handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
+    xiaojiu_verify_20261008_1625: >-
+      小九 2026-10-08 16:25 CST 交接 B 组回填实证（硬 HTTP 抓 Pages 真身 + 远端 API，禁状态延续推断）：① 概念资金热度已含真实数据——data/SECTOR_FUND_FLOW.js update_time=2026-10-08 14:55:52、concept_fallback=false、含 443 处「概念」字段、republish 15:26 → 概念腿真源可达，判据②达成；② 隔夜美股锚点非 null——data/US_HK_MAP.js us_indices 三指数（标普7801.77/纳指27538.69/道指51179.87）price 均非 null、update_time=2026-10-08 10:21:28 → 判据③达成；③ 收盘后刷新未达成——data/W52_HIGH.js update_time 仍=2026-10-08 07:14:39（早盘）、raw_data/w52_high.json 末次提交 2026-10-08 07:15（无收盘后重写），同轮 post_close 的 SECTOR_FUND_FLOW 已 14:55 刷新 → W52_HIGH 在 post_close 档未重写，判据①未达。结论：三卡中两卡修复生效、W52_HIGH 收盘后刷新仍未落实 → 保持 pending-verify，不谎报。
   - id: freshness-falsealarm-rootfix-0929
     priority: P1
     owner: lemoncat-cn
@@ -377,6 +379,8 @@ items:
       job 原始日志 run #2609（job 108997948527）/ #2610（job 109012740483）。
     handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
+    xiaojiu_verify_20261008_1625: >-
+      小九 2026-10-08 16:25 CST 回填实证（GitHub API steps 真身）：post_close run #37746525380（head c346b30ea453，15:56 CST，结论 success）的 STEP22「板块龙头股字典（SECTOR_LEADERS，仅 post_close）」conclusion=success → step22 当日确已真跑（非 skipped）；但 raw_data/sector_leaders.json 末次提交仍=2026-10-05（b06080ffacb8），10-08 无新提交 → 与 item 已登记的「step22 写 raw 但推送步 step17 排在其前、step23 只推 data/」结构性缺口一致，raw 产物仍落不了地。结论：step22 实际执行已确认，但 raw 推送缺口未修 → 保持 todo（item 结构性修复待小九 workflow 车道），不谎报。
   - id: build-deploy-blocked-by-crosslayer-stale-guard-0929
     title: "build_deploy 部署链被自家跨层闸门恒阻断（4/12 档同因失败）：HB_ALIMI / HB_XIAOJIU 内层 update_time 被钉旧 + IMA_STRONG_BACKTEST 停更 ⇒ v8_verify_layer_parity STALE_DAYS=3 恒判失败"
     priority: P0
@@ -1583,6 +1587,8 @@ items:
     updated: '2026-09-22 17:02'
     handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
+    xiaojiu_verify_20261008_1625: >-
+      小九 2026-10-08 16:25 CST 回填实证（GitHub API runs 真身）：yml 确已注册 09:31 首档 cron（v8_cn_fetch_intraday_lemoncat.yml L53 `31 1 * * 1-5`=09:31 CST）；但 10-08 当天该 workflow 4 个 run 中 schedule 仅 15:56/15:57 两档 + 09:57 一次 workflow_dispatch + 16:29 排队 → 09:30–09:34 区间内 0 条 schedule run（09:31 首档被 GitHub schedule 静默跳过，与 intraday-chain-cron-deregistered / intraday-schedule-morning-absent 同源复发）；09:57 workflow_dispatch 过守卫（HHMM=957>932，无「迟到档/窗外」）→ 守卫本身未误杀。结论：09:31 首档窗口无实测 run（cron 跳过），判据「09:30–09:32 dispatch 且非 skipped」未达成 → 保持 pending-verify。
   - id: diagnostics-info-status-leak
     priority: P1
     owner: 小九
@@ -2364,6 +2370,8 @@ items:
       〔09-22 16:4x 现场终验·❌ 判据未达成（新故障）〕实测 data/maharo_insights.js update_time=**2026-09-22 09:00**；提交历史仅 09-22 08:57:07 与 11:39:15 两笔（均「经发布闸门核对」），**12:3x 与 15:1x 两档均无产出** ⇒ verify_how 判据（应为当日 12:3x / 15:1x）未达成。查本机 automation 表：c613b8ad（午间版 12:30·MO-FR）与 a1542082（盘后第二版 15:10·MO-FR）**两条 status 均为 ACTIVE** ⇒ 存在「automation 标 ACTIVE 但未产出」的执行层缺口，需专项排查（下一步：查其执行历史/触发日志）。
     handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
+    xiaojiu_verify_20261008_1625: >-
+      小九 2026-10-08 16:25 CST 回填实证（硬 HTTP 抓 Pages data/maharo_insights.js 真身）：update_time=2026-10-08 12:33:00 → 午间 12:30 版已产出并落库（判据「12:3x」达成）；盘后 15:10 版未体现——文件 update_time 未前进到 15:1x，15:10 自动化档未见改写（15:10 档归阿狸咪机 night/weekend 调度，工作日白天该档是否在小九机触发待核）。结论：午间版确认、盘后版未观察 → 判据未全满足，保持 pending-verify，不谎报。
   - id: north-fund-dead-source-fix
     priority: P1
     owner: shared
@@ -4909,7 +4917,7 @@ items:
   - id: intraday-eastmoney-stall-4cards
     priority: P1
     owner: 小九(lemoncat-cn)
-    status: pending-verify
+    status: done
     what: >-
       〔2026-09-24 11:5x 小九〕主人报多卡「昨日数据」。全量审计 110 个 data/*.js：盘中东财系四卡
       （亚太概览全0.00/ETF横幅/ETF盘中异动/概念热力）停昨日=hosted 海外 IP 被东财拒答且 landcheck
@@ -4945,6 +4953,11 @@ items:
 
   # ── P0 · 数据链（阿狸咪 2026-09-24 15:4x CST 实测新增）──────────────────    handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
+    done_evidence: "【小九 2026-10-08 16:25 CST 回填结项·硬 HTTP 抓 Pages 真身实证，非状态延续推断】东财盘中四卡停昨日根因已修复并验证：① 概念热力/ETF异动盘中前进——data/CONCEPT_RANKING.js update_time=2026-10-08 14:57:10、data/ETF_PULSE.js update_time=2026-10-08 14:48:12（均盘中时刻，非陈旧）；② 亚太概览不再全 0.00——data/OVERSEAS_MARKETS.js 四指数（恒生23859.5/日经44946.64/KOSPI6666.92/台湾49313.44）均为真实值且 chg_pct 非 0、update_time=2026-10-08 14:49:26；③ 附带 AVG_PRICE_DATA.js（880003 曾停更）update_time=2026-10-08 14:56:54 已恢复盘中刷新。判据①②全过；③④（东财组判红 run / EXPERIMENT·SECTOR_LEADERS 长期停更）属独立条目，本项不阻塞。"
+    verified_at: '2026-10-08 16:25'
+    verified_by: 小九(xiaojiu-cn 自动化回填)
+    xiaojiu_verify_20261008_1625: >-
+      回填实证同上 done_evidence；B 组交接清单 B4 判据①②全过，status 由 pending-verify 转 done。
   - id: cnfetch-fallback-concurrency-orphan
     priority: P0
     owner: shared
@@ -7736,6 +7749,8 @@ items:
     updated_by: 小九(lemoncat-cn)
     handoff_to_xiaojiu: "2026-10-01 19:52 阿狸咪交接 -> docs/ops/handover/20261001_1952_xiaojiu_runlist.md"
 
+    xiaojiu_verify_20261008_1625: >-
+      小九 2026-10-08 16:25 CST 回填实证（GitHub API runs 真身）：v8_intraday_snapshot.yml 设计每 10 分钟 cron（09:00–15:50 CST，两条 `*/10` 段）；但 10-08 当天该 workflow 28 个 run 中 event=schedule 仅 1 次（14:57）+ 1 排队（16:29），其余 27 个为 workflow_run（被其他 workflow 触发）或 workflow_dispatch → 独立 cron 实质仍停摆，与标题「again」复发病一致；数据仍经 workflow_run 触发产出——data/SECTOR_FUND_FLOW_INTRADAY.js update_time=2026-10-08 14:58:21（卡面有数据），但「09:3x 起连续」的独立调度未恢复。结论：schedule 事件未恢复连续触发 → 保持 pending-verify。
   - id: watchdog-heartbeat-falsekill-rootfix-0929
     priority: P0
     owner: 阿狸咪(alimi-cn)
