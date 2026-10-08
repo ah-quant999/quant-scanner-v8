@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-10-08 22:29:10",
-  "data_date": "2026-10-08",
-  "track_start": "2026-10-08",
-  "history_days": 36,
+  "update_time": "2026-10-09 00:33:21",
+  "data_date": "2026-10-09",
+  "track_start": "2026-10-09",
+  "history_days": 37,
   "strict_count": 0,
   "near_count": 1,
   "tracked": [
@@ -16,19 +16,19 @@
       "quality_grade": "B",
       "industry": "水上运输业",
       "sectors": [
-        "大盘价值",
         "2026中报预增",
-        "天然气",
-        "HS300",
         "MSCI中国",
-        "周期股",
         "央国企改革",
-        "水上运输业"
+        "水上运输业",
+        "HS300",
+        "周期股",
+        "天然气",
+        "大盘价值"
       ],
       "signal_count": 2,
       "enter_date": "2026-10-08",
       "hold_days": 1,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "first_close": 22.03,
       "current_close": 22.03,
       "pnl_pct": 0.0,
@@ -480,6 +480,12 @@
       "code": "300394",
       "name": "",
       "text": "(300394) 于 2026-09-30 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300450",
+      "name": "",
+      "text": "(300450) 于 2026-10-08 跌出共识（曾连续 1 日）"
     }
   ],
   "sector_cluster": {
@@ -494,27 +500,11 @@
     ],
     "by_sector": [
       {
-        "sector": "大盘价值",
-        "count": 1
-      },
-      {
         "sector": "2026中报预增",
         "count": 1
       },
       {
-        "sector": "天然气",
-        "count": 1
-      },
-      {
-        "sector": "HS300",
-        "count": 1
-      },
-      {
         "sector": "MSCI中国",
-        "count": 1
-      },
-      {
-        "sector": "周期股",
         "count": 1
       },
       {
@@ -523,6 +513,22 @@
       },
       {
         "sector": "水上运输业",
+        "count": 1
+      },
+      {
+        "sector": "HS300",
+        "count": 1
+      },
+      {
+        "sector": "周期股",
+        "count": 1
+      },
+      {
+        "sector": "天然气",
+        "count": 1
+      },
+      {
+        "sector": "大盘价值",
         "count": 1
       }
     ],
@@ -653,18 +659,18 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-10-08",
-    "history_days": 36,
+    "track_start": "2026-10-09",
+    "history_days": 37,
     "summary": {
       "1d": {
-        "count": 52,
-        "win_rate": 38.46,
-        "avg_return": 0.61
+        "count": 54,
+        "win_rate": 37.04,
+        "avg_return": 0.59
       },
       "3d": {
-        "count": 43,
-        "win_rate": 41.86,
-        "avg_return": -0.49
+        "count": 45,
+        "win_rate": 40.0,
+        "avg_return": -0.81
       },
       "5d": {
         "count": 36,
@@ -1333,13 +1339,31 @@
         "name": "跨境通",
         "enter_date": "2026-09-30",
         "offsets": {
-          "1d": 0.0
+          "1d": 0.0,
+          "3d": -5.37
         }
       },
       {
         "code": "300394",
         "name": "",
         "enter_date": "2026-09-30",
+        "offsets": {
+          "1d": 0.0,
+          "3d": -9.86
+        }
+      },
+      {
+        "code": "300450",
+        "name": "",
+        "enter_date": "2026-10-08",
+        "offsets": {
+          "1d": 0.0
+        }
+      },
+      {
+        "code": "601872",
+        "name": "招商轮船",
+        "enter_date": "2026-10-08",
         "offsets": {
           "1d": 0.0
         }
