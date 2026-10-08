@@ -658,6 +658,38 @@ def handle_side(side, status, silent_min, hb_last, detail, peer_name, kind):
     return 1
 
 
+def _runner_online(name):
+    """🔴 2026-10-08 一劳永逸（主人令「别再发假失联报警」）：查 GitHub Actions
+    runner **真实在线状态**作为「该机存活」的权威硬证据。
+
+    原监控只读远端 HB_*.js 心跳时间戳判活，而心跳文件由各自心跳腿写入，
+    一旦某侧心跳腿因抖动 / 首跑未落地而陈旧，监控即误判 down 并发「失联」邮件——
+    但 GitHub runner API 显示该机明明 online。心跳源不如 runner API 权威。
+
+    故：任何一侧 runner 实际 online ⇒ 强制置 alive，绝不发失联邮件。
+    返回 True / False / None（None=查询失败，保守按原判定走，不覆盖）。"""
+    token = _load_token()
+    if not token:
+        return None
+    url = f"https://api.github.com/repos/{REPO}/actions/runners"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    try:
+        req = urllib.request.Request(url, headers=headers, method="GET")
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode("utf-8"))
+    except Exception as e:
+        log(f"  ⚠️ 查询 runner 状态失败（保守按原判定）: {type(e).__name__} {e}")
+        return None
+    for rn in data.get("runners", []):
+        if rn.get("name") == name:
+            return rn.get("status") == "online"
+    return False  # 列表里没有该 runner（异常态），交给原判定
+
+
 def dispatch_rescue():
     """小九掉线时，向云端 dispatch 现存主链 workflow（v8_cn_fetch_cloud.yml / v8_algo_cloud.yml）补跑"""
     token = _load_token()
@@ -744,6 +776,20 @@ def main():
         log("📅 今日非交易日 → 心跳判活豁免（holiday-skip）")
         status = "holiday-skip"
         al_status = "holiday-skip"
+
+    # 🔴 2026-10-08 一劳永逸（主人令「别再发假失联报警」）：GitHub runner 真实在线状态
+    # 是最权威的活体证据。双机任一 runner 在线 ⇒ 该侧心跳陈旧也强制 alive，彻底杜绝
+    # 「双机都 online 却发失联邮件」的假警。runner 查询失败则保守按原判定（不覆盖）。
+    _RUNNER_MAP = {"xiaoju": "lemoncat-cn", "alimi": "alimi-cn"}
+    for _side, _rn in _RUNNER_MAP.items():
+        _on = _runner_online(_rn)
+        if _on is True:
+            if _side == "xiaoju" and status not in ("alive", "holiday-skip"):
+                log(f"✅ GitHub runner {_rn} 在线 ⇒ 覆盖小九心跳陈旧判定为 alive（不发失联邮件）")
+                status = "alive"
+            elif _side == "alimi" and al_status not in ("alive", "holiday-skip"):
+                log(f"✅ GitHub runner {_rn} 在线 ⇒ 覆盖阿狸咪心跳陈旧判定为 alive（不发失联邮件）")
+                al_status = "alive"
 
     # [4] 无论结论如何，先落自证（含两侧判定）
     run_ctx = {
