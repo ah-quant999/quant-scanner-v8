@@ -264,21 +264,10 @@ CARD_DEFS = [
     {"id": "VOLATILITY", "name": "波动率", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     # 运维/静态说明页（逻辑详解页「防删」子页）
     {"id": "DO_NOT_DELETE", "name": "防误删清单", "page": "运维", "freq": "周日+手动", "max_age": 10080, "key_fields": ["update_time"], "_window_var": "DO_NOT_DELETE", "heal_cat": "algo_run"},
-    # 2026-08-30 一劳永逸：UNLISTED_PANEL/AVG_PRICE_DATA 新看板卡此前未注册 CARD_DEFS → 红灯；已注册。
-    # DELISTED（已下架股票目录）于 2026-09-09 主人令整链下线：前端「已下架股票目录」卡从 index.html/logic.html 删除 +
-    #   data/DELISTED.js 删除 + scripts/build_delisted.py 停用 + 本 CARD_DEFS 登记移除，故不再注册（避免删文件后报缺失红灯）。
-    # · UNLISTED_PANEL  ← data/UNLISTED_PANEL.js  注入 window.UNLISTED_PANEL（暂未上架模块去向索引）
-    # · AVG_PRICE_DATA  ← data/AVG_PRICE_DATA.js  注入 window.AVG_PRICE_DATA（通达信880003 平均股价）
-
-    # 🛡 2026-09-18 一劳永逸（阿狸咪的工程师 · 修「灰灯文案不明」）：
-    #   原写法两处不妥 ——
-    #   ① heal_cat="algo_run" 是**误配**：手动策划的静态索引挂「算法链自愈」= 无意义派发
-    #      （algo_run 跑完也不会重新策划模块去向）。已删除该键，与本项「非自动产出」的
-    #      真实性质对齐（同族 MACRO_KSHAPE 就未设 heal_cat）。
-    #   ② 文案只说「手动生成」，主人看图仍疑「是不是坏了」。改为**前置性质声明**
-    #      「静态索引 · 无自动刷新」+ 快照日期，与前端同卡徽章（index.html 15921 行
-    #      「📋 静态索引 · 无自动刷新」）口径一致 —— 同一事实两处不同说法本身就是矛盾源。
-    {"id": "UNLISTED_PANEL", "name": "暂未上架模块索引", "page": "运维", "freq": "手动策划", "max_age": 10080, "key_fields": ["modules", "meta"], "_window_var": "UNLISTED_PANEL", "manual_dep": True, "manual_note": "静态索引 · 无自动刷新（非故障）：模块去向由主人拍板，内容变更才由 scripts/build_unlisted_panel.py 手动重建；快照 2026-09-06"},
+    # 🗑 2026-10-08 主人令：「实验区·模块去向索引」卡整链退役 —— 前端卡+_renderV8StockLists 渲染函数+
+    #   UNLISTED_PANEL.js 注入+scripts/build_unlisted_panel.py 生成器同批删除，CARD_DEFS 登记随之移除
+    #   （同 DELISTED 2026-09-09 先例：删文件后不注销登记会报「缺失红灯」）。沿革：2026-08-30 注册、
+    #   2026-09-18 修 heal_cat 误配与灰灯文案（见 git 历史）。
     # 🛡 2026-08-31 一劳永逸（主人「运维还有失败亮黄灯」令）：
     #   position_vs_ma20 / position_vs_ma60 在 history 累积满 20 / 60 个交易日之前
     #   【按设计】就是 None（数据层刻意不给假水位，见 cloud_fetch_v8.f_avg_price 注释），

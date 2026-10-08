@@ -80,9 +80,8 @@ CRITICAL = [
     #   在远端 main **均不存在**（contents API 实测）⇒ 恒进 missing 列表打印「⚠️ 缺失」，
     #   制造噪声并误导后来人以为「漏推了文件」。真身位置如下两行，均为 2026-09-13/14
     #   `scripts/` 归位后的实际落点：
-    #     · scripts/build_unlisted_panel.py（生成 data/UNLISTED_PANEL.js）
     #     · v8_t1_guard.py（仓根；由 .github/workflows/v8_t1_guard.yml 在仓根执行）
-    "scripts/build_unlisted_panel.py",
+    #   （scripts/build_unlisted_panel.py 于 2026-10-08 主人令随「实验区·模块去向索引」卡整链退役，条目同批移除）
     "v8/backtest_crds.py",
     "v8/factor_lab_gen.py",
     ".github/scripts/v8_stage_gate.py",
