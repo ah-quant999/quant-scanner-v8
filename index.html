@@ -613,8 +613,8 @@ window.__domReadyFns=[];
   .tp-hist-cell .tp-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
 </style>
-    <script src="data/ETF_INTRADAY_HEAT.js?v=1419118f95" defer></script>
-    <script src="data/SECTOR_FUND_FLOW.js?v=1a24b99cb5" defer></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=e7cc215a9a" defer></script>
+    <script src="data/SECTOR_FUND_FLOW.js?v=18d53d5323" defer></script>
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=63dc009022" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=4750f4b20a" defer></script>
@@ -636,9 +636,9 @@ window.__domReadyFns=[];
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
-<script src="data/CONCEPT_RANKING.js?v=89b8de7988" defer></script>
+<script src="data/CONCEPT_RANKING.js?v=795e6055b7" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
-<script src="data/INDEX_QUOTES.js?v=1632f399e8" defer></script>
+<script src="data/INDEX_QUOTES.js?v=fc730e7d15" defer></script>
 <script src="data/AI_MARKET_BRIEF.js?v=d5e899b460" defer></script>
 <script src="data/MARGIN_DATA.js?v=b42ee55bdb" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=92226518ad" defer></script>
@@ -682,8 +682,8 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=6f795afb2f" defer></script>
-  <script src="data/AVG_PRICE_DATA.js?v=28d722b6ad" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=634eeb6345" defer></script>
+  <script src="data/AVG_PRICE_DATA.js?v=af18759666" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
@@ -1821,9 +1821,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=fdd3243964" defer></script>
 <script src="data/HB_XIAOJIU.js?v=24dd59c7e4" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=2a169c6b41" defer></script>
-<script src="data/HEALTH_CHECK.js?v=ba12638f8e" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=f7a69fac36" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=770e777e6c" defer></script>
+<script src="data/HEALTH_CHECK.js?v=8bbc53530e" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=53d390b63b" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=a9778690cb" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=93f583df55" defer></script>
@@ -1837,7 +1837,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=bae759de3e" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=30af891994" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=18049c0a98" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=4fdb594294" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=5cd934e5b2" defer></script>
@@ -19112,7 +19112,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=7dfe36c2f0', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=aca7dbbb8f', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=cf677c86fd', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=c4901d69c3', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
