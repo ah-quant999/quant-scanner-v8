@@ -110,7 +110,15 @@ CATEGORY_MAP = {
     "IPO_DATA": "premarket,post_close",
     "MARGIN_DATA": "premarket,post_close",
     # 2026-08-31：期指主力合约为盘中实时，放回实时数据页，改为 intraday 抓取
-    "CFFEX_HOLDINGS": "intraday",
+    # 🔴 2026-10-08 一劳永逸根因修复（小九）：升为双档 intraday,post_close。
+    #   【病灶】只挂 intraday ⇒ 抓取时刻永远早于当日日行情发布（中金所日行情收盘后才有）
+    #     ⇒ f_cffex_holdings 每轮都只能回溯到「上一交易日」，当日定稿**永远没有抓取窗口**。
+    #     实测 10-08 盘中日志：`⚠️ CFFEX_HOLDINGS: 返回空，跳过`（配合回看窗口仅 8 天，
+    #     长假后连上一交易日都回溯不到）⇒ 线上卡死 09-30。
+    #   【修法】补 post_close 档，与 V8_CAL/IPO_DATA/MARGIN_DATA 等日频数据同口径——
+    #     盘中 intraday 保证 spot 现货价与基差实时；盘后 17:20 拿当日定稿日行情。
+    #   ⚠️ 与 health_check 的 freq 声明（v8_health_check.py:195）必须同步，否则口径再次漂移。
+    "CFFEX_HOLDINGS": "intraday,post_close",
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：盘后数据页「宏观数据速览」卡读本变量，
     #   原只标 premarket → 盘后档(17:20/18:20/19:20)根本不抓它，页面却标着「收盘后」语义，
     #   主人截图质问「盘后数据页每个卡时间都不对」。加 post_close 使盘后必重抓一次。
@@ -2498,7 +2506,17 @@ def f_cffex_holdings():
     #    前端算 基差=期货-现货、年化升贴水率=基差率/剩余天数*365 —— 卡片从"跌了没"升级"情绪温度计"。
     ak = get_ak()
     base = now_cst()
-    for back in range(0, 8):
+    # 🔴 2026-10-08 一劳永逸根因修复（小九）：
+    #   【病灶】回看窗口只有 8 天（range(0,8)）⇒ 遇长假必失效。
+    #     实测 2026-10-08 09:43 盘中日志原文 `⚠️ CFFEX_HOLDINGS: 返回空，跳过`：
+    #     base=10-08 时 back∈[0,7] 只覆盖 10-01~10-08，而 10-01~10-07 国庆休市、
+    #     10-08 当日日行情要收盘后才发布 ⇒ 窗口内**一个交易日都没有** ⇒ 返回 None
+    #     ⇒ 线上 CFFEX_HOLDINGS 卡死在 09-30 19:02（主人截图「更新于 8天前」）。
+    #   【连带】health_check 判 FAIL ⇒ 自愈每 25 分钟派发一次 intraday ⇒ 每轮都返回空
+    #     ⇒ **死循环空转**白烧 CI（日志 `[HEAL✓] …近 25 分钟内已派发，跳过重复`）。
+    #   【修法】窗口放宽到 15 天，覆盖国庆/春节等最长休市（含调休周末）。
+    #   ⚠️ 数量级务必与语义匹配：日行情按「自然日回溯」取最近交易日，不是按分钟。
+    for back in range(0, 15):
         dd = (base - timedelta(days=back)).strftime("%Y%m%d")
         try:
             df = ak.get_cffex_daily(date=dd)
