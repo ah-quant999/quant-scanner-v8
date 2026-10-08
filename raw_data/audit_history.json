@@ -3226,5 +3226,58 @@
   },
   "warn_items": [],
   "fail_items": []
+ },
+ {
+  "date": "2026-10-09",
+  "time": "04:02:09",
+  "tz": "Asia/Shanghai",
+  "overall": "fail",
+  "summary": {
+   "ok": 122,
+   "warn": 0,
+   "fail": 7,
+   "limited": 1,
+   "info": 0,
+   "other": 0,
+   "total": 130
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "W52_HIGH",
+    "name": "市场宽度·新高家数",
+    "message": "更新于 昨日 07:14；超过阈值 932 分钟"
+   },
+   {
+    "id": "maharo_insights",
+    "name": "机构研究·AI解析",
+    "message": "更新于 09-30 12:22；超过阈值 1307 分钟"
+   },
+   {
+    "id": "all_BACKTEST_COMPREHENSIVE",
+    "name": "BACKTEST_COMPREHENSIVE",
+    "message": "BACKTEST_COMPREHENSIVE.js 更新于 10-02 03:57；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_BACKTEST_TDX",
+    "name": "BACKTEST_TDX",
+    "message": "BACKTEST_TDX.js 更新于 10-02 05:43；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_CRDS_BACKTEST",
+    "name": "CRDS_BACKTEST",
+    "message": "CRDS_BACKTEST.js 更新于 10-02 06:04；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_FACTOR_LAB_BACKTEST",
+    "name": "FACTOR_LAB_BACKTEST",
+    "message": "FACTOR_LAB_BACKTEST.js 更新于 10-02 06:01；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_FACTOR_WALKFORWARD",
+    "name": "FACTOR_WALKFORWARD",
+    "message": "FACTOR_WALKFORWARD.js 更新于 10-02 06:09；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
