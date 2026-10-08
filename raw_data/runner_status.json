@@ -1,12 +1,13 @@
 {
-  "update_time": "2026-10-09 06:02:23",
+  "update_time": "2026-10-09 06:11:21",
   "status": "ok",
   "process": {
     "ok": true,
     "listener": true,
-    "worker": false,
+    "worker": true,
     "details": [
-      "runner.listener"
+      "runner.listener",
+      "runner.worker"
     ]
   },
   "service": {
@@ -17,7 +18,7 @@
   "worker_logs": {
     "ok": true,
     "errors": [],
-    "scanned": 0,
+    "scanned": 1,
     "message": "最近日志无错误"
   },
   "github": {
@@ -26,11 +27,11 @@
     "checkout_failures": 0,
     "latest_run_id": 37850874102,
     "latest_failed": false,
-    "latest_status": "queued",
-    "stuck_min": 0,
+    "latest_status": "in_progress",
+    "stuck_min": 9,
     "is_fail": false,
     "is_warn": false,
-    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) queued"
+    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) in_progress (已卡住 9 分)"
   },
   "runner_env": {
     "ok": true,
@@ -38,7 +39,7 @@
     "message": "阈值=2000（一劳永逸目标 2000）"
   },
   "actions_taken": [],
-  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) queued",
+  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) in_progress (已卡住 9 分)",
   "run_time": "2026-10-09 05:26:21",
   "category": "all",
   "hostname": "",
