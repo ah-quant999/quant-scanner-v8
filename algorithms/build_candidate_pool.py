@@ -718,15 +718,30 @@ def _fetch_price_amount_gtimg(codes):
     return out
 
 
+# 🔴 2026-10-08 主人质询「这科学吗？」→ pinned 由「永久保留」改 TTL（小九）：
+#   63 自然日 ≈ 45 个交易日，与金股池 GOLD_POOL_DAYS 口径对齐。pinned 成员掉出
+#   今日集合后最多宽限 63 自然日，再提及即续命；到期无再提及 → 退出活跃区。
+PIN_TTL_DAYS = 63
+
+
 def _merge_membership(today, prev, hyst_days, today_date):
-    """慢变成员表合并：今日派生集合 ∪ 历史成员(hysteresis 防抖)。
+    """慢变成员表合并：今日派生集合 ∩∪ 历史成员(hysteresis 防抖)。
 
     - 今日出现的成员：采用今日数据，更新 last_seen=today。
     - 今日未出现但历史在册的成员：
-        * 来源含「外资研投」(自选/研报) → 永久保留(pinned)；
+        * 来源含「外资研投」(自选/研报) → 宽容忍窗保留(pinned TTL)；
         * 否则若在 hyst_days 内曾出现 → 保留（防单日成交额排名抖动 churn）；
         * 否则 → 剔除（真正退出活跃区）。
     - 首次运行(prev 为空) → 成员 = 今日集合。
+
+    🔴 2026-10-08 主人质询「这科学吗？」→ 一劳永逸修正（小九）：
+      原 pinned=「永不因天数退出」⇒ 研报**一次提及**的个股永久占住候选池成员表，
+      池子只进不出必然膨胀污染（自选类成员本就在自选文件里、每日重建今日集合时
+      会自然续 last_seen，根本不需要永久 pin 兜底）。现改为 **TTL 宽容忍窗**：
+      pinned 成员掉出今日集合后最多再保留 PIN_TTL_DAYS 自然日（≈45 个交易日，
+      与金股池 GOLD_POOL_DAYS 口径对齐），期间任何一次再提及即续命；到期仍无
+      再提及 → 与普通成员一样退出活跃区。自选股只要还在自选文件里就每日刷新
+      last_seen，实际不受影响；只清「曾被研报提及但早已无人再提」的陈旧成员。
     """
     members = {}
     for k, v in today.items():
@@ -746,7 +761,7 @@ def _merge_membership(today, prev, hyst_days, today_date):
                              datetime.date.fromisoformat(last)).days
             except Exception:
                 days_gone = 999
-        if pinned or days_gone <= hyst_days:
+        if days_gone <= (PIN_TTL_DAYS if pinned else hyst_days):
             e = dict(v)
             e.pop("_today", None)
             members[k] = e
@@ -1188,7 +1203,7 @@ def build():
     # ── #14 解耦：慢变成员表（hysteresis 防抖） ──
     # 今日派生集合(pool) 仅代表「当日成交额前N」；若直接用作候选池，个股会随每日
     # 排名抖动而每日 churn。改为：并入历史成员表，掉出前N者仍保留
-    # MEMBER_HYSTERESIS_DAYS 个交易日（外资研投来源永久保留），成员稳定后才交给下游扫描。
+    # MEMBER_HYSTERESIS_DAYS 个交易日（外资研投来源宽限 PIN_TTL_DAYS=63 自然日，非永久），成员稳定后才交给下游扫描。
     today_date = time.strftime("%Y-%m-%d")
     prev_members = {}
     for _pp in (MEMBERS_RAW, MEMBERS_OUT):
