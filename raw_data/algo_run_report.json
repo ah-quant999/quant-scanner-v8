@@ -1,24 +1,12 @@
 {
-  "update_time": "2026-10-08 21:04:17",
-  "run_start": "2026-10-08 20:26:26",
-  "ok": 23,
-  "fail": 4,
+  "update_time": "2026-10-08 22:45:31",
+  "run_start": "2026-10-08 21:50:39",
+  "ok": 26,
+  "fail": 1,
   "failed_scripts": [
-    {
-      "script": "v8/factor_lab_gen.py",
-      "reason": "退出码 1 | logout success!"
-    },
     {
       "script": "calc_crds.py",
       "reason": "退出码 1 | NameError: name 'v8_date' is not defined"
-    },
-    {
-      "script": "strategy_four_volume_60m.py",
-      "reason": "退出码 1 |      → 保留上次真实产物（不写假 0），本脚本以退出码 1 上报失败"
-    },
-    {
-      "script": "backtest_expectancy.py",
-      "reason": "监督器静默杀(>15min 无输出)"
     }
   ],
   "skipped_by_time_gate": []

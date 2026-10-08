@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-10-08 20:33:01",
-  "data_time": "2026-10-08 20:30:49",
+  "update_time": "2026-10-08 22:29:05",
+  "data_time": "2026-10-08 22:24:00",
   "count": 0,
   "near_miss_count": 1,
   "criteria": "主站TOP10精选（rank≤10 & score≥min(max(max_score×0.5,25), max_score)） · 基本面A档",
@@ -32,14 +32,14 @@
         "form_A": false
       },
       "sectors": [
-        "大盘价值",
         "2026中报预增",
-        "天然气",
-        "HS300",
         "MSCI中国",
-        "周期股",
         "央国企改革",
-        "水上运输业"
+        "水上运输业",
+        "HS300",
+        "周期股",
+        "天然气",
+        "大盘价值"
       ],
       "enter_date": "2026-10-08",
       "industry": "水上运输业",

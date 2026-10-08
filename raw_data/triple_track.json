@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-08 20:33:06",
+  "update_time": "2026-10-08 22:29:10",
   "data_date": "2026-10-08",
   "track_start": "2026-10-08",
   "history_days": 36,
@@ -7,33 +7,39 @@
   "near_count": 1,
   "tracked": [
     {
-      "code": "300450",
-      "name": "先导智能",
-      "market": "sz",
-      "board": "创业板",
+      "code": "601872",
+      "name": "招商轮船",
+      "market": "sh",
+      "board": "主板",
       "status": "near",
-      "total_score": 14.0,
-      "quality_grade": "D",
-      "industry": "专用设备制造业",
+      "total_score": 17.4,
+      "quality_grade": "B",
+      "industry": "水上运输业",
       "sectors": [
-        "机器视觉",
-        "深股通",
+        "大盘价值",
+        "2026中报预增",
+        "天然气",
         "HS300",
-        "固态电池",
-        "专用设备制造业",
         "MSCI中国",
-        "独角兽",
-        "人工智能"
+        "周期股",
+        "央国企改革",
+        "水上运输业"
       ],
       "signal_count": 2,
       "enter_date": "2026-10-08",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 37.59,
-      "current_close": 37.59,
+      "first_close": 22.03,
+      "current_close": 22.03,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "catalysts": []
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
     }
   ],
   "alerts": [
@@ -479,20 +485,24 @@
   "sector_cluster": {
     "by_industry": [
       {
-        "industry": "专用设备制造业",
+        "industry": "水上运输业",
         "count": 1,
         "names": [
-          "先导智能"
+          "招商轮船"
         ]
       }
     ],
     "by_sector": [
       {
-        "sector": "机器视觉",
+        "sector": "大盘价值",
         "count": 1
       },
       {
-        "sector": "深股通",
+        "sector": "2026中报预增",
+        "count": 1
+      },
+      {
+        "sector": "天然气",
         "count": 1
       },
       {
@@ -500,23 +510,19 @@
         "count": 1
       },
       {
-        "sector": "固态电池",
-        "count": 1
-      },
-      {
-        "sector": "专用设备制造业",
-        "count": 1
-      },
-      {
         "sector": "MSCI中国",
         "count": 1
       },
       {
-        "sector": "独角兽",
+        "sector": "周期股",
         "count": 1
       },
       {
-        "sector": "人工智能",
+        "sector": "央国企改革",
+        "count": 1
+      },
+      {
+        "sector": "水上运输业",
         "count": 1
       }
     ],
