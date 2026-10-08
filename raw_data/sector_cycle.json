@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-08 10:16:59",
+  "update_time": "2026-10-08 10:50:00",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -12,7 +12,7 @@
     "10/08"
   ],
   "columns": 30,
-  "cycle_count": 18,
+  "cycle_count": 17,
   "cycles": [
     {
       "sector": "其他",
@@ -24,7 +24,7 @@
       "hot_days": 30,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 3080,
+      "total": 3082,
       "ongoing": true
     },
     {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 82,
       "peak_date": "08/20",
-      "total": 607,
+      "total": 608,
       "ongoing": true
     },
     {
@@ -145,19 +145,6 @@
       "ongoing": true
     },
     {
-      "sector": "军工",
-      "start": "08/27",
-      "end": "09/22",
-      "start_idx": 5,
-      "end_idx": 23,
-      "days": 19,
-      "hot_days": 15,
-      "peak": 24,
-      "peak_date": "09/09",
-      "total": 105,
-      "ongoing": false
-    },
-    {
       "sector": "电力",
       "start": "08/28",
       "end": "10/08",
@@ -219,7 +206,7 @@
       "hot_days": 12,
       "peak": 7,
       "peak_date": "09/29",
-      "total": 54,
+      "total": 55,
       "ongoing": true
     },
     {
@@ -245,7 +232,7 @@
       "hot_days": 8,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 47,
+      "total": 49,
       "ongoing": true
     }
   ]
