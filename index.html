@@ -848,6 +848,12 @@ window.V8_CAL = {weeks:[],legend:[]};
   window._parseAsCST = function(ts){
     if(!ts) return null;
     var s = String(ts).trim();
+    // 🛡 2026-10-09 一劳永逸（主人令「卡上最后的时间日期要标注清楚」）：
+    //   剥掉文字时区后缀并补齐缺秒——根因案例 MARKET_THERMO.generated="2026-10-08 23:32 CST"：
+    //   带 " CST" 且无秒 ⇒ 结构化正则(要求秒)与 fallback 均解析失败 ⇒ fmtDataTime/_fmtAshareRel
+    //   回落裸串，卡面显示原始串而非「昨日(10-08) 23:32」。本仓数据源时间一律北京时间，
+    //   CST/GMT/UTC 文字后缀按 +08:00 语义处理，与下方无时区口径一致。
+    s = s.replace(/\s+(?:CST|GMT|UTC)\s*$/i, '').replace(/^(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2})$/, '$1:00');
     // ISO 8601 带 Z / +00:00 / -00:00 视为 UTC，转北京时间（+8h）
     var m = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/);
     if(m){
@@ -1012,8 +1018,11 @@ window.V8_CAL = {weeks:[],legend:[]};
       var dsFull = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
       return '上一交易日(' + dsFull + ') ' + hm;
     }
-    if(diff === 1) return '昨日 ' + hm;
-    return diff + '天前 ' + hm;
+    // 🛡 2026-10-09 主人令「卡上最后的时间日期要标注清楚」：昨日/N天前一律带具体日期，
+    //   让「每日更新还是停更」一眼可判，不再需要截图问 AI。
+    var dsRel = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+    if(diff === 1) return '昨日(' + dsRel + ') ' + hm;
+    return diff + '天前(' + dsRel + ') ' + hm;
   };
   /* 🛡 2026-09-04 主人令「一劳永逸」：全站「更新于」胶囊内置陈旧度自判。
      ── 背景（主人 09-04 19:39 提问「盘后数据页每个卡时间都不对…是不是数据也是错的啊」）──
@@ -14813,8 +14822,10 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     let txt;
     if(dayDiff>=1 && window._isAshareTradingDay && !window._isAshareTradingDay(today0)) txt='上一交易日收盘 '+hm;
     else if(dayDiff<=0) txt='今日 '+hm;
-    else if(dayDiff===1) txt='昨日 '+hm;
-    else txt=dayDiff+'天前 '+hm;
+    // 🛡 2026-10-09 主人令：昨日/N天前带具体日期（与 _fmtAshareRel 同口径）
+    var dsF = dataStr.replace(/\//g,'-').slice(5);
+    else if(dayDiff===1) txt='昨日('+dsF+') '+hm;
+    else txt=dayDiff+'天前('+dsF+') '+hm;
     return {text:txt};
   }
 
