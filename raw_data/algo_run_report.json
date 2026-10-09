@@ -1,13 +1,8 @@
 {
-  "update_time": "2026-10-09 03:47:31",
-  "run_start": "2026-10-09 02:50:13",
-  "ok": 26,
-  "fail": 1,
-  "failed_scripts": [
-    {
-      "script": "calc_crds.py",
-      "reason": "退出码 1 | NameError: name 'v8_date' is not defined"
-    }
-  ],
+  "update_time": "2026-10-09 08:05:22",
+  "run_start": "2026-10-09 07:19:35",
+  "ok": 27,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }

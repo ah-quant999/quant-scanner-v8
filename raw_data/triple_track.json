@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-09 03:27:00",
+  "update_time": "2026-10-09 07:47:36",
   "data_date": "2026-10-09",
   "track_start": "2026-10-09",
   "history_days": 37,
@@ -16,14 +16,14 @@
       "quality_grade": "B",
       "industry": "水上运输业",
       "sectors": [
-        "2026中报预增",
-        "MSCI中国",
+        "周期股",
         "大盘价值",
-        "天然气",
-        "水上运输业",
-        "央国企改革",
         "HS300",
-        "周期股"
+        "MSCI中国",
+        "央国企改革",
+        "水上运输业",
+        "2026中报预增",
+        "天然气"
       ],
       "signal_count": 2,
       "enter_date": "2026-10-08",
@@ -500,11 +500,7 @@
     ],
     "by_sector": [
       {
-        "sector": "2026中报预增",
-        "count": 1
-      },
-      {
-        "sector": "MSCI中国",
+        "sector": "周期股",
         "count": 1
       },
       {
@@ -512,11 +508,11 @@
         "count": 1
       },
       {
-        "sector": "天然气",
+        "sector": "HS300",
         "count": 1
       },
       {
-        "sector": "水上运输业",
+        "sector": "MSCI中国",
         "count": 1
       },
       {
@@ -524,11 +520,15 @@
         "count": 1
       },
       {
-        "sector": "HS300",
+        "sector": "水上运输业",
         "count": 1
       },
       {
-        "sector": "周期股",
+        "sector": "2026中报预增",
+        "count": 1
+      },
+      {
+        "sector": "天然气",
         "count": 1
       }
     ],

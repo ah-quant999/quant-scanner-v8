@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-10-09 03:26:55",
-  "data_time": "2026-10-09 03:21:46",
+  "update_time": "2026-10-09 07:47:31",
+  "data_time": "2026-10-09 07:43:20",
   "count": 0,
   "near_miss_count": 1,
   "criteria": "主站TOP10精选（rank≤10 & score≥min(max(max_score×0.5,25), max_score)） · 基本面A档",
@@ -12,7 +12,7 @@
       "name": "招商轮船",
       "market": "sh",
       "board": "主板",
-      "total_score": 17.4,
+      "total_score": 9.9,
       "top10_rank": 1,
       "a_score": 0,
       "quality_grade": "B",
@@ -32,14 +32,14 @@
         "form_A": false
       },
       "sectors": [
-        "周期股",
-        "大盘价值",
-        "HS300",
-        "MSCI中国",
-        "央国企改革",
         "水上运输业",
+        "央国企改革",
+        "MSCI中国",
+        "周期股",
         "2026中报预增",
-        "天然气"
+        "HS300",
+        "天然气",
+        "大盘价值"
       ],
       "enter_date": "2026-10-08",
       "industry": "水上运输业",
