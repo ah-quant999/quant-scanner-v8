@@ -1,8 +1,13 @@
 {
-  "update_time": "2026-10-09 18:24:27",
-  "run_start": "2026-10-09 18:07:36",
-  "ok": 14,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-10-09 20:57:49",
+  "run_start": "2026-10-09 19:26:26",
+  "ok": 26,
+  "fail": 1,
+  "failed_scripts": [
+    {
+      "script": "backtest_expectancy.py",
+      "reason": "监督器静默杀(>15min 无输出)"
+    }
+  ],
   "skipped_by_time_gate": []
 }

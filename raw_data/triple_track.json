@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-09 08:38:38",
+  "update_time": "2026-10-09 20:27:03",
   "data_date": "2026-10-09",
   "track_start": "2026-10-09",
   "history_days": 37,
@@ -12,26 +12,26 @@
       "market": "sh",
       "board": "主板",
       "status": "near",
-      "total_score": 17.4,
+      "total_score": 9.9,
       "quality_grade": "B",
       "industry": "水上运输业",
       "sectors": [
-        "周期股",
-        "大盘价值",
         "HS300",
+        "大盘价值",
         "MSCI中国",
         "央国企改革",
-        "水上运输业",
+        "周期股",
+        "天然气",
         "2026中报预增",
-        "天然气"
+        "水上运输业"
       ],
       "signal_count": 2,
       "enter_date": "2026-10-08",
       "hold_days": 1,
       "consecutive_days": 2,
       "first_close": 22.03,
-      "current_close": 22.03,
-      "pnl_pct": 0.0,
+      "current_close": 22.07,
+      "pnl_pct": 0.18,
       "price_source": "quote",
       "catalysts": [
         {
@@ -500,15 +500,11 @@
     ],
     "by_sector": [
       {
-        "sector": "周期股",
+        "sector": "HS300",
         "count": 1
       },
       {
         "sector": "大盘价值",
-        "count": 1
-      },
-      {
-        "sector": "HS300",
         "count": 1
       },
       {
@@ -520,7 +516,11 @@
         "count": 1
       },
       {
-        "sector": "水上运输业",
+        "sector": "周期股",
+        "count": 1
+      },
+      {
+        "sector": "天然气",
         "count": 1
       },
       {
@@ -528,7 +528,7 @@
         "count": 1
       },
       {
-        "sector": "天然气",
+        "sector": "水上运输业",
         "count": 1
       }
     ],
@@ -664,13 +664,13 @@
     "summary": {
       "1d": {
         "count": 54,
-        "win_rate": 37.04,
-        "avg_return": 0.59
+        "win_rate": 38.89,
+        "avg_return": 0.55
       },
       "3d": {
         "count": 45,
         "win_rate": 40.0,
-        "avg_return": -0.81
+        "avg_return": -0.79
       },
       "5d": {
         "count": 36,
@@ -1340,7 +1340,7 @@
         "enter_date": "2026-09-30",
         "offsets": {
           "1d": 0.0,
-          "3d": -5.37
+          "3d": -4.6
         }
       },
       {
@@ -1349,7 +1349,7 @@
         "enter_date": "2026-09-30",
         "offsets": {
           "1d": 0.0,
-          "3d": -9.86
+          "3d": -9.87
         }
       },
       {
@@ -1357,7 +1357,7 @@
         "name": "",
         "enter_date": "2026-10-08",
         "offsets": {
-          "1d": 0.0
+          "1d": -2.29
         }
       },
       {
@@ -1365,7 +1365,7 @@
         "name": "招商轮船",
         "enter_date": "2026-10-08",
         "offsets": {
-          "1d": 0.0
+          "1d": 0.18
         }
       }
     ]

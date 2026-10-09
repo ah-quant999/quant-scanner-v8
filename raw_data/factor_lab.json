@@ -1,14 +1,14 @@
 {
-  "update_time": "2026-10-09 08:32:29",
-  "data_date": "2026-10-08",
+  "update_time": "2026-10-09 20:12:01",
+  "data_date": "2026-10-09",
   "meta": {
-    "data_date": "2026-10-08",
+    "data_date": "2026-10-09",
     "close_semantics": "⚠️ 记录里的 close 是「上次算到这只票那天」的快照（roe 按季 asof_q / abn 按月 asof_ym 缓存），**不是当日报价**；需要当日价请查 STOCK_QUOTE.js 或 CANDIDATE_QUOTES.js。同时看 close_date 字段。",
     "liquid_def": "liquid=false 表示最新K线日 != 数据日 或 当月换手率为 0（停牌/零成交），已从榜单剔除",
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
-    "n_universe": 481,
-    "n_at_valid": 971,
-    "n_roe_large": 566,
+    "n_universe": 507,
+    "n_at_valid": 976,
+    "n_roe_large": 657,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
     "roe_universe": "全市场主板"
@@ -605,6 +605,27 @@
         "roe_equity": 881992929.0
       },
       {
+        "code": "sz.002842",
+        "name": "翔鹭钨业",
+        "close": 30.35,
+        "close_date": "2026-10-09",
+        "liquid": true,
+        "roe_ttm": 46.35,
+        "size_proxy": 1587777064.9,
+        "asof_q": "2026Q4",
+        "roe_ver": 4,
+        "roe_ok": true,
+        "roe_gate": "",
+        "roe_singles": [
+          0.035123,
+          0.090739,
+          0.187869,
+          0.149802
+        ],
+        "roe_n_neg": 0,
+        "roe_equity": 1427694327.0
+      },
+      {
         "code": "sh.603629",
         "name": "利通电子",
         "close": 93.64,
@@ -773,27 +794,6 @@
         "roe_equity": 4600945698.0
       },
       {
-        "code": "sz.003010",
-        "name": "若羽臣",
-        "close": 28.75,
-        "close_date": "2026-09-11",
-        "liquid": true,
-        "roe_ttm": 36.04,
-        "size_proxy": 268859194.1,
-        "asof_q": "2026Q3",
-        "roe_ver": 4,
-        "roe_ok": true,
-        "roe_gate": "",
-        "roe_singles": [
-          0.036983,
-          0.102283,
-          0.095765,
-          0.125406
-        ],
-        "roe_n_neg": 0,
-        "roe_equity": 757122675.0
-      },
-      {
         "code": "sh.601899",
         "name": "紫金矿业",
         "close": 29.37,
@@ -834,6 +834,27 @@
         ],
         "roe_n_neg": 0,
         "roe_equity": 16679574082.0
+      },
+      {
+        "code": "sh.600610",
+        "name": "中毅达",
+        "close": 7.56,
+        "close_date": "2026-10-08",
+        "liquid": true,
+        "roe_ttm": 34.05,
+        "size_proxy": 260589753.4,
+        "asof_q": "2026Q4",
+        "roe_ver": 4,
+        "roe_ok": true,
+        "roe_gate": "",
+        "roe_singles": [
+          0.046209,
+          0.042349,
+          0.142741,
+          0.10921
+        ],
+        "roe_n_neg": 0,
+        "roe_equity": 137842511.0
       },
       {
         "code": "sz.002378",
@@ -1107,27 +1128,6 @@
         ],
         "roe_n_neg": 0,
         "roe_equity": 28261454486.0
-      },
-      {
-        "code": "sh.600988",
-        "name": "赤峰黄金",
-        "close": 39.07,
-        "close_date": "2026-10-08",
-        "liquid": true,
-        "roe_ttm": 30.05,
-        "size_proxy": 2392386395.5,
-        "asof_q": "2026Q4",
-        "roe_ver": 4,
-        "roe_ok": true,
-        "roe_gate": "",
-        "roe_singles": [
-          0.087999,
-          0.087598,
-          0.071342,
-          0.053548
-        ],
-        "roe_n_neg": 0,
-        "roe_equity": 16857676193.0
       }
     ]
   }

@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-10-09 08:48:53",
-  "generated": "2026-10-09 08:48:53",
+  "update_time": "2026-10-09 20:39:28",
+  "generated": "2026-10-09 20:39:28",
   "period_start": "2026-09-28",
   "period_end": "2026-10-04",
   "stats": {
@@ -16,28 +16,28 @@
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-10-09 06:44:46",
-      "size_kb": 24.3
+      "update_time": "2026-10-09 18:13:40",
+      "size_kb": 28.2
     },
     {
       "file": "triple_history.json",
       "label": "三重共振历史",
       "status": "ok",
-      "update_time": "2026-10-09 03:26:40",
+      "update_time": "2026-10-09 07:47:16",
       "size_kb": 94.2
     },
     {
       "file": "top10_daily.json",
       "label": "TOP10推荐池",
       "status": "ok",
-      "update_time": "2026-10-09 08:35:47",
-      "size_kb": 33.2
+      "update_time": "2026-10-09 20:17:46",
+      "size_kb": 35.7
     },
     {
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-10-09 06:47",
+      "update_time": "2026-10-09 18:12",
       "size_kb": 106.3
     },
     {
@@ -51,15 +51,15 @@
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-10-09 08:34:31",
-      "size_kb": 1199.1
+      "update_time": "2026-10-09 20:17:01",
+      "size_kb": 1342.7
     },
     {
       "file": "candidate.json",
       "label": "候选池",
       "status": "ok",
-      "update_time": "2026-10-09 03:20:38",
-      "size_kb": 243.9
+      "update_time": "2026-10-09 17:51:00",
+      "size_kb": 262.4
     },
     {
       "file": "four_volume.json",
@@ -71,8 +71,8 @@
       "file": "crds_card_data.json",
       "label": "逆势龙头",
       "status": "ok",
-      "update_time": "2026-10-09 08:33:46",
-      "size_kb": 232.0
+      "update_time": "2026-10-09 20:15:57",
+      "size_kb": 244.7
     }
   ],
   "source_note": "v8 周度运行汇总（轻量，离线可跑；由 algorithms/run_algorithms.py 周末链路调用）"
