@@ -3279,5 +3279,38 @@
     "message": "FACTOR_WALKFORWARD.js 更新于 10-02 06:09；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
+ },
+ {
+  "date": "2026-10-10",
+  "time": "03:37:07",
+  "tz": "Asia/Shanghai",
+  "overall": "fail",
+  "summary": {
+   "ok": 126,
+   "warn": 0,
+   "fail": 3,
+   "limited": 1,
+   "info": 0,
+   "other": 0,
+   "total": 130
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "W52_HIGH",
+    "name": "市场宽度·新高家数",
+    "message": "更新于 昨日 08:38；超过阈值 906 分钟"
+   },
+   {
+    "id": "WAVE_ELLIOTT",
+    "name": "艾略特波浪·深度分析",
+    "message": "更新于 2天前 16:51；超过阈值 1281 分钟"
+   },
+   {
+    "id": "DAJIJIN_REDUCTION",
+    "name": "大基金增减持监控",
+    "message": "更新于 昨日 02:58；超过阈值 1281 分钟"
+   }
+  ]
  }
 ]
