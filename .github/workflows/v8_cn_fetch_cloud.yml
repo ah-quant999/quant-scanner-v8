@@ -782,6 +782,15 @@ jobs:
         id: soft_13b
         if: steps.cat.outputs.category == 'post_close'
         continue-on-error: true
+        env:
+          # 🛡 2026-10-09 阿狸咪的工程师（主人令「成分股怎么又挂了」·东财断连日兜底接电）：
+          #   实证链：东财 push2 全家族断连（09-30/10-01/10-09 三次复发）→ boards/members
+          #   缓存从未入仓 ⇒ 云端 checkout 无缓存 → 腾讯兜底无从取名单 → NeoData 无 token
+          #   （repo secrets 只有 MAHORO_COOKIE/V8_GH_TOKEN/ZSXQ_TOKEN，实测）⇒ 四层兜底
+          #   全断 → 9 板块全 no_match、成分股—。本轮修复：缓存入仓 bootstrap + token
+          #   接线 secret（_neo_token 已支持 env，2026-10-05 预留口）。12h 过期由名单+
+          #   腾讯兜底主链承接（token 仅真·别名缺失场景需要）。
+          NEODATA_TOKEN: ${{ secrets.NEODATA_TOKEN }}
         shell: bash
         run: |
           python scripts/fetch_sector_leaders.py
