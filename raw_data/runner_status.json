@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-09 09:42:22",
+  "update_time": "2026-10-09 10:40:00",
   "status": "ok",
   "process": {
     "ok": true,
@@ -24,13 +24,13 @@
     "ok": true,
     "consecutive_failures": 0,
     "checkout_failures": 0,
-    "latest_run_id": 37854866141,
+    "latest_run_id": 37875467035,
     "latest_failed": false,
-    "latest_status": "completed",
+    "latest_status": "pending",
     "stuck_min": 0,
     "is_fail": false,
     "is_warn": false,
-    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) completed"
+    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) pending"
   },
   "runner_env": {
     "ok": true,
@@ -38,7 +38,7 @@
     "message": "阈值=2000（一劳永逸目标 2000）"
   },
   "actions_taken": [],
-  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) completed",
+  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) pending",
   "run_time": "2026-10-09 09:26:16",
   "category": "intraday",
   "hostname": "",
