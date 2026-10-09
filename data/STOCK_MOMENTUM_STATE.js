@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-09 20:54",
- "generated": "2026-10-09 20:54",
+ "update_time": "2026-10-09 21:06",
+ "generated": "2026-10-09 21:06",
  "meta": {
-  "generated": "2026-10-09 20:54",
+  "generated": "2026-10-09 21:06",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 23,
   "days_with_consensus": 0,
@@ -8561,6 +8561,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "688244",
+      "name": "永信至诚",
+      "change_pct": 16.223,
+      "price": 24.0,
+      "category": "突破"
+     },
+     {
       "code": "002811",
       "name": "郑中设计",
       "change_pct": 9.982,
@@ -8638,10 +8645,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "688152",
+      "name": "麒麟信安",
+      "change_pct": 19.995,
+      "price": 45.85,
+      "category": "突破"
+     },
+     {
       "code": "600712",
       "name": "南宁百货",
       "change_pct": 5.816,
       "price": 5.64,
+      "category": "突破"
+     },
+     {
+      "code": "603200",
+      "name": "上海洗霸",
+      "change_pct": 9.571,
+      "price": 53.92,
       "category": "突破"
      },
      {
@@ -8687,17 +8708,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "001330",
+      "name": "博纳影业",
+      "change_pct": 9.937,
+      "price": 6.97,
+      "category": "突破"
+     },
+     {
+      "code": "603067",
+      "name": "振华股份",
+      "change_pct": 10.01,
+      "price": 42.31,
+      "category": "突破"
+     },
+     {
       "code": "000829",
       "name": "天音控股",
       "change_pct": 3.482,
       "price": 9.51,
-      "category": "突破"
-     },
-     {
-      "code": "603200",
-      "name": "上海洗霸",
-      "change_pct": 9.571,
-      "price": 53.92,
       "category": "突破"
      },
      {
@@ -8719,13 +8747,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "金现代",
       "change_pct": 3.209,
       "price": 8.04,
-      "category": "突破"
-     },
-     {
-      "code": "000679",
-      "name": "大连友谊",
-      "change_pct": 6.677,
-      "price": 6.71,
       "category": "突破"
      }
     ],
@@ -8745,6 +8766,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
+      "code": "688244",
+      "name": "永信至诚",
+      "change_pct": 16.223,
+      "price": 24.0,
+      "category": "加速"
+     },
+     {
       "code": "002811",
       "name": "郑中设计",
       "change_pct": 9.982,
@@ -8819,6 +8847,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "三人行",
       "change_pct": 10.008,
       "price": 52.1,
+      "category": "加速"
+     },
+     {
+      "code": "688152",
+      "name": "麒麟信安",
+      "change_pct": 19.995,
+      "price": 45.85,
       "category": "加速"
      }
     ],
@@ -8838,6 +8873,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688244",
+      "name": "永信至诚",
+      "change_pct": 16.223,
+      "price": 24.0,
+      "category": "短线选股"
+     },
+     {
       "code": "002811",
       "name": "郑中设计",
       "change_pct": 9.982,
@@ -8915,10 +8957,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688152",
+      "name": "麒麟信安",
+      "change_pct": 19.995,
+      "price": 45.85,
+      "category": "短线选股"
+     },
+     {
       "code": "600712",
       "name": "南宁百货",
       "change_pct": 5.816,
       "price": 5.64,
+      "category": "短线选股"
+     },
+     {
+      "code": "603200",
+      "name": "上海洗霸",
+      "change_pct": 9.571,
+      "price": 53.92,
       "category": "短线选股"
      },
      {
@@ -8964,17 +9020,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "001330",
+      "name": "博纳影业",
+      "change_pct": 9.937,
+      "price": 6.97,
+      "category": "短线选股"
+     },
+     {
+      "code": "603067",
+      "name": "振华股份",
+      "change_pct": 10.01,
+      "price": 42.31,
+      "category": "短线选股"
+     },
+     {
       "code": "000829",
       "name": "天音控股",
       "change_pct": 3.482,
       "price": 9.51,
-      "category": "短线选股"
-     },
-     {
-      "code": "603200",
-      "name": "上海洗霸",
-      "change_pct": 9.571,
-      "price": 53.92,
       "category": "短线选股"
      },
      {
@@ -8996,13 +9059,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "金现代",
       "change_pct": 3.209,
       "price": 8.04,
-      "category": "短线选股"
-     },
-     {
-      "code": "000679",
-      "name": "大连友谊",
-      "change_pct": 6.677,
-      "price": 6.71,
       "category": "短线选股"
      }
     ],
@@ -9015,6 +9071,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "603200",
+      "name": "上海洗霸",
+      "change_pct": 9.571,
+      "price": 53.92,
+      "category": "强势股"
+     },
+     {
       "code": "600318",
       "name": "新力金融",
       "change_pct": 5.952,
@@ -9057,17 +9120,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "001330",
+      "name": "博纳影业",
+      "change_pct": 9.937,
+      "price": 6.97,
+      "category": "强势股"
+     },
+     {
+      "code": "603067",
+      "name": "振华股份",
+      "change_pct": 10.01,
+      "price": 42.31,
+      "category": "强势股"
+     },
+     {
       "code": "000829",
       "name": "天音控股",
       "change_pct": 3.482,
       "price": 9.51,
-      "category": "强势股"
-     },
-     {
-      "code": "603200",
-      "name": "上海洗霸",
-      "change_pct": 9.571,
-      "price": 53.92,
       "category": "强势股"
      },
      {
@@ -9089,13 +9159,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "金现代",
       "change_pct": 3.209,
       "price": 8.04,
-      "category": "强势股"
-     },
-     {
-      "code": "000679",
-      "name": "大连友谊",
-      "change_pct": 6.677,
-      "price": 6.71,
       "category": "强势股"
      }
     ]
