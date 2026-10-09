@@ -1,18 +1,18 @@
 {
-  "update_time": "2026-10-09 20:15:57",
+  "update_time": "2026-10-09 21:29:58",
   "data_time": "2026-10-09 15:30:00",
   "total_scanned": 505,
   "scan_stats": {
     "candidates": 507,
     "succeeded": 505,
     "failed": 2,
-    "kline_source_used": "腾讯gtimg(主源 509/505 只)",
-    "elapsed_sec": 226.6,
-    "throughput_per_sec": 2.2,
-    "cache_fresh": 0,
+    "kline_source_used": "本地缓存(主源 319/505 只)",
+    "elapsed_sec": 29.6,
+    "throughput_per_sec": 17.1,
+    "cache_fresh": 319,
     "cache_miss": 8,
-    "cache_stale": 499,
-    "net_tx": 509,
+    "cache_stale": 180,
+    "net_tx": 190,
     "net_mootdx": 0,
     "net_em": 0,
     "kline_fail": 2,
@@ -152,21 +152,6 @@
   ],
   "cond2_list": [
     {
-      "code": "002565",
-      "name": "顺灏股份",
-      "board_label": "主板"
-    },
-    {
-      "code": "300522",
-      "name": "世名科技",
-      "board_label": "创业板"
-    },
-    {
-      "code": "601975",
-      "name": "招商南油",
-      "board_label": "主板"
-    },
-    {
       "code": "000592",
       "name": "平潭发展",
       "board_label": "主板"
@@ -187,6 +172,11 @@
       "board_label": "主板"
     },
     {
+      "code": "002565",
+      "name": "顺灏股份",
+      "board_label": "主板"
+    },
+    {
       "code": "002580",
       "name": "圣阳股份",
       "board_label": "主板"
@@ -199,6 +189,11 @@
     {
       "code": "300300",
       "name": "海峡创新",
+      "board_label": "创业板"
+    },
+    {
+      "code": "300522",
+      "name": "世名科技",
       "board_label": "创业板"
     },
     {
@@ -262,6 +257,11 @@
       "board_label": "主板"
     },
     {
+      "code": "601975",
+      "name": "招商南油",
+      "board_label": "主板"
+    },
+    {
       "code": "603200",
       "name": "上海洗霸",
       "board_label": "主板"
@@ -284,11 +284,6 @@
   ],
   "cond3_list": [
     {
-      "code": "000636",
-      "name": "风华高科",
-      "board_label": "主板"
-    },
-    {
       "code": "002028",
       "name": "思源电气",
       "board_label": "主板"
@@ -304,16 +299,6 @@
       "board_label": "主板"
     },
     {
-      "code": "002281",
-      "name": "光迅科技",
-      "board_label": "主板"
-    },
-    {
-      "code": "002407",
-      "name": "多氟多",
-      "board_label": "主板"
-    },
-    {
       "code": "002422",
       "name": "四川科伦药业",
       "board_label": "主板"
@@ -324,69 +309,14 @@
       "board_label": "主板"
     },
     {
-      "code": "002565",
-      "name": "顺灏股份",
-      "board_label": "主板"
-    },
-    {
       "code": "002572",
       "name": "索菲亚",
       "board_label": "主板"
     },
     {
-      "code": "300133",
-      "name": "华策影视",
-      "board_label": "创业板"
-    },
-    {
-      "code": "300136",
-      "name": "信维通信",
-      "board_label": "创业板"
-    },
-    {
-      "code": "300182",
-      "name": "捷成股份",
-      "board_label": "创业板"
-    },
-    {
-      "code": "300209",
-      "name": "行云科技",
-      "board_label": "创业板"
-    },
-    {
-      "code": "300433",
-      "name": "蓝思科技",
-      "board_label": "创业板"
-    },
-    {
-      "code": "300522",
-      "name": "世名科技",
-      "board_label": "创业板"
-    },
-    {
-      "code": "300821",
-      "name": "东岳硅材",
-      "board_label": "创业板"
-    },
-    {
-      "code": "300964",
-      "name": "本川智能",
-      "board_label": "创业板"
-    },
-    {
       "code": "300979",
       "name": "300979",
       "board_label": "创业板"
-    },
-    {
-      "code": "301217",
-      "name": "铜冠铜箔",
-      "board_label": "创业板"
-    },
-    {
-      "code": "600176",
-      "name": "中国巨石",
-      "board_label": "主板"
     },
     {
       "code": "600406",
@@ -402,21 +332,6 @@
       "code": "601099",
       "name": "太平洋",
       "board_label": "主板"
-    },
-    {
-      "code": "601975",
-      "name": "招商南油",
-      "board_label": "主板"
-    },
-    {
-      "code": "688036",
-      "name": "传音控股",
-      "board_label": "科创板"
-    },
-    {
-      "code": "688111",
-      "name": "金山办公",
-      "board_label": "科创板"
     },
     {
       "code": "000002",
@@ -446,6 +361,11 @@
     {
       "code": "000620",
       "name": "盈新发展",
+      "board_label": "主板"
+    },
+    {
+      "code": "000636",
+      "name": "风华高科",
       "board_label": "主板"
     },
     {
@@ -534,8 +454,18 @@
       "board_label": "主板"
     },
     {
+      "code": "002281",
+      "name": "光迅科技",
+      "board_label": "主板"
+    },
+    {
       "code": "002371",
       "name": "北方华创",
+      "board_label": "主板"
+    },
+    {
+      "code": "002407",
+      "name": "多氟多",
       "board_label": "主板"
     },
     {
@@ -556,6 +486,11 @@
     {
       "code": "002487",
       "name": "大金重工",
+      "board_label": "主板"
+    },
+    {
+      "code": "002565",
+      "name": "顺灏股份",
       "board_label": "主板"
     },
     {
@@ -644,6 +579,16 @@
       "board_label": "创业板"
     },
     {
+      "code": "300133",
+      "name": "华策影视",
+      "board_label": "创业板"
+    },
+    {
+      "code": "300136",
+      "name": "信维通信",
+      "board_label": "创业板"
+    },
+    {
       "code": "300139",
       "name": "晓程科技",
       "board_label": "创业板"
@@ -664,6 +609,11 @@
       "board_label": "创业板"
     },
     {
+      "code": "300182",
+      "name": "捷成股份",
+      "board_label": "创业板"
+    },
+    {
       "code": "300192",
       "name": "科德教育",
       "board_label": "创业板"
@@ -676,6 +626,11 @@
     {
       "code": "300207",
       "name": "欣旺达",
+      "board_label": "创业板"
+    },
+    {
+      "code": "300209",
+      "name": "行云科技",
       "board_label": "创业板"
     },
     {
@@ -734,6 +689,11 @@
       "board_label": "创业板"
     },
     {
+      "code": "300433",
+      "name": "蓝思科技",
+      "board_label": "创业板"
+    },
+    {
       "code": "300438",
       "name": "鹏辉能源",
       "board_label": "创业板"
@@ -781,6 +741,11 @@
     {
       "code": "300497",
       "name": "富祥股份",
+      "board_label": "创业板"
+    },
+    {
+      "code": "300522",
+      "name": "世名科技",
       "board_label": "创业板"
     },
     {
@@ -899,6 +864,11 @@
       "board_label": "创业板"
     },
     {
+      "code": "300821",
+      "name": "东岳硅材",
+      "board_label": "创业板"
+    },
+    {
       "code": "300829",
       "name": "金丹科技",
       "board_label": "创业板"
@@ -931,6 +901,11 @@
     {
       "code": "300917",
       "name": "特发服务",
+      "board_label": "创业板"
+    },
+    {
+      "code": "300964",
+      "name": "本川智能",
       "board_label": "创业板"
     },
     {
@@ -991,6 +966,11 @@
     {
       "code": "301205",
       "name": "联特科技",
+      "board_label": "创业板"
+    },
+    {
+      "code": "301217",
+      "name": "铜冠铜箔",
       "board_label": "创业板"
     },
     {
@@ -1126,6 +1106,11 @@
     {
       "code": "600118",
       "name": "中国卫星",
+      "board_label": "主板"
+    },
+    {
+      "code": "600176",
+      "name": "中国巨石",
       "board_label": "主板"
     },
     {
@@ -1294,6 +1279,11 @@
       "board_label": "主板"
     },
     {
+      "code": "601975",
+      "name": "招商南油",
+      "board_label": "主板"
+    },
+    {
       "code": "603002",
       "name": "宏昌电子",
       "board_label": "主板"
@@ -1419,6 +1409,11 @@
       "board_label": "科创板"
     },
     {
+      "code": "688036",
+      "name": "传音控股",
+      "board_label": "科创板"
+    },
+    {
       "code": "688037",
       "name": "芯源微",
       "board_label": "科创板"
@@ -1466,6 +1461,11 @@
     {
       "code": "688105",
       "name": "诺唯赞",
+      "board_label": "科创板"
+    },
+    {
+      "code": "688111",
+      "name": "金山办公",
       "board_label": "科创板"
     },
     {
@@ -1964,14 +1964,14 @@
   ],
   "advanced": [
     {
-      "code": "300522",
-      "name": "世名科技",
+      "code": "300300",
+      "name": "海峡创新",
       "score": 100,
       "enter_date": "2026-10-09"
     },
     {
-      "code": "300300",
-      "name": "海峡创新",
+      "code": "300522",
+      "name": "世名科技",
       "score": 100,
       "enter_date": "2026-10-09"
     },
@@ -2104,12 +2104,6 @@
       "enter_date": "2026-10-09"
     },
     {
-      "code": "000636",
-      "name": "风华高科",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
       "code": "002028",
       "name": "思源电气",
       "score": 0,
@@ -2124,18 +2118,6 @@
     {
       "code": "002270",
       "name": "华明装备",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
-      "code": "002281",
-      "name": "光迅科技",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
-      "code": "002407",
-      "name": "多氟多",
       "score": 0,
       "enter_date": "2026-10-09"
     },
@@ -2158,62 +2140,8 @@
       "enter_date": "2026-10-09"
     },
     {
-      "code": "300133",
-      "name": "华策影视",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
-      "code": "300136",
-      "name": "信维通信",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
-      "code": "300182",
-      "name": "捷成股份",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
-      "code": "300209",
-      "name": "行云科技",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
-      "code": "300433",
-      "name": "蓝思科技",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
-      "code": "300821",
-      "name": "东岳硅材",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
-      "code": "300964",
-      "name": "本川智能",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
       "code": "300979",
       "name": "300979",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
-      "code": "301217",
-      "name": "铜冠铜箔",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
-      "code": "600176",
-      "name": "中国巨石",
       "score": 0,
       "enter_date": "2026-10-09"
     },
@@ -2236,18 +2164,6 @@
       "enter_date": "2026-10-09"
     },
     {
-      "code": "688036",
-      "name": "传音控股",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
-      "code": "688111",
-      "name": "金山办公",
-      "score": 0,
-      "enter_date": "2026-10-09"
-    },
-    {
       "code": "000063",
       "name": "上证周期",
       "score": 0,
@@ -2262,6 +2178,12 @@
     {
       "code": "000620",
       "name": "盈新发展",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
+      "code": "000636",
+      "name": "风华高科",
       "score": 0,
       "enter_date": "2026-10-09"
     },
@@ -2356,8 +2278,20 @@
       "enter_date": "2026-10-09"
     },
     {
+      "code": "002281",
+      "name": "光迅科技",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
       "code": "002371",
       "name": "北方华创",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
+      "code": "002407",
+      "name": "多氟多",
       "score": 0,
       "enter_date": "2026-10-09"
     },
@@ -2470,6 +2404,18 @@
       "enter_date": "2026-10-09"
     },
     {
+      "code": "300133",
+      "name": "华策影视",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
+      "code": "300136",
+      "name": "信维通信",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
       "code": "300139",
       "name": "晓程科技",
       "score": 0,
@@ -2494,6 +2440,12 @@
       "enter_date": "2026-10-09"
     },
     {
+      "code": "300182",
+      "name": "捷成股份",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
       "code": "300192",
       "name": "科德教育",
       "score": 0,
@@ -2508,6 +2460,12 @@
     {
       "code": "300207",
       "name": "欣旺达",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
+      "code": "300209",
+      "name": "行云科技",
       "score": 0,
       "enter_date": "2026-10-09"
     },
@@ -2568,6 +2526,12 @@
     {
       "code": "300418",
       "name": "昆仑万维",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
+      "code": "300433",
+      "name": "蓝思科技",
       "score": 0,
       "enter_date": "2026-10-09"
     },
@@ -2770,6 +2734,12 @@
       "enter_date": "2026-10-09"
     },
     {
+      "code": "300821",
+      "name": "东岳硅材",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
       "code": "300829",
       "name": "金丹科技",
       "score": 0,
@@ -2808,6 +2778,12 @@
     {
       "code": "300917",
       "name": "特发服务",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
+      "code": "300964",
+      "name": "本川智能",
       "score": 0,
       "enter_date": "2026-10-09"
     },
@@ -2874,6 +2850,12 @@
     {
       "code": "301205",
       "name": "联特科技",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
+      "code": "301217",
+      "name": "铜冠铜箔",
       "score": 0,
       "enter_date": "2026-10-09"
     },
@@ -3024,6 +3006,12 @@
     {
       "code": "600127",
       "name": "金健米业",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
+      "code": "600176",
+      "name": "中国巨石",
       "score": 0,
       "enter_date": "2026-10-09"
     },
@@ -3286,6 +3274,12 @@
       "enter_date": "2026-10-09"
     },
     {
+      "code": "688036",
+      "name": "传音控股",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
       "code": "688037",
       "name": "芯源微",
       "score": 0,
@@ -3342,6 +3336,12 @@
     {
       "code": "688105",
       "name": "诺唯赞",
+      "score": 0,
+      "enter_date": "2026-10-09"
+    },
+    {
+      "code": "688111",
+      "name": "金山办公",
       "score": 0,
       "enter_date": "2026-10-09"
     },
@@ -3881,21 +3881,6 @@
       "market_label": "sz",
       "board_label": "主板"
     },
-    "000636": {
-      "name": "风华高科",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.56,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "主板"
-    },
     "002028": {
       "name": "思源电气",
       "score": 0,
@@ -3941,21 +3926,6 @@
       "market_label": "sz",
       "board_label": "主板"
     },
-    "002281": {
-      "name": "光迅科技",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.51,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "主板"
-    },
     "002311": {
       "name": "海大集团",
       "score": 0,
@@ -3967,21 +3937,6 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.45,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "主板"
-    },
-    "002407": {
-      "name": "多氟多",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 2.23,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4012,21 +3967,6 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.65,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "主板"
-    },
-    "002565": {
-      "name": "顺灏股份",
-      "score": 73,
-      "conds": 2,
-      "cond1": false,
-      "cond2": true,
-      "cond3": true,
-      "zt_count": 1,
-      "zt_down_count": 1,
-      "af_peak": 3.67,
-      "vr_peak": 3.13,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -4076,126 +4016,6 @@
       "market_label": "sz",
       "board_label": "主板"
     },
-    "300133": {
-      "name": "华策影视",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 2.82,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
-    "300136": {
-      "name": "信维通信",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.53,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
-    "300182": {
-      "name": "捷成股份",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 2.91,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
-    "300209": {
-      "name": "行云科技",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.66,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
-    "300433": {
-      "name": "蓝思科技",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.77,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
-    "300522": {
-      "name": "世名科技",
-      "score": 100,
-      "conds": 2,
-      "cond1": false,
-      "cond2": true,
-      "cond3": true,
-      "zt_count": 1,
-      "zt_down_count": 1,
-      "af_peak": 7.38,
-      "vr_peak": 3.3,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
-    "300821": {
-      "name": "东岳硅材",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 1,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 3.87,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
-    "300964": {
-      "name": "本川智能",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.7,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
     "300979": {
       "name": "300979",
       "score": 0,
@@ -4210,36 +4030,6 @@
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
-    },
-    "301217": {
-      "name": "铜冠铜箔",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.66,
-      "ts_peak": 0,
-      "market_label": "sz",
-      "board_label": "创业板"
-    },
-    "600176": {
-      "name": "中国巨石",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.82,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "主板"
     },
     "600406": {
       "name": "国电南瑞",
@@ -4331,21 +4121,6 @@
       "market_label": "sh",
       "board_label": "主板"
     },
-    "601975": {
-      "name": "招商南油",
-      "score": 48,
-      "conds": 2,
-      "cond1": false,
-      "cond2": true,
-      "cond3": true,
-      "zt_count": 1,
-      "zt_down_count": 1,
-      "af_peak": 3.68,
-      "vr_peak": 1.98,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "主板"
-    },
     "603338": {
       "name": "浙江鼎力",
       "score": 0,
@@ -4375,36 +4150,6 @@
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
-    },
-    "688036": {
-      "name": "传音控股",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 2.51,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "科创板"
-    },
-    "688111": {
-      "name": "金山办公",
-      "score": 0,
-      "conds": 1,
-      "cond1": false,
-      "cond2": false,
-      "cond3": true,
-      "zt_count": 0,
-      "zt_down_count": 0,
-      "af_peak": 0,
-      "vr_peak": 1.67,
-      "ts_peak": 0,
-      "market_label": "sh",
-      "board_label": "科创板"
     },
     "000002": {
       "name": "万科A",
@@ -4537,6 +4282,21 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.12,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "主板"
+    },
+    "000636": {
+      "name": "风华高科",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.56,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -5006,6 +4766,21 @@
       "market_label": "sz",
       "board_label": "主板"
     },
+    "002281": {
+      "name": "光迅科技",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.51,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "主板"
+    },
     "002371": {
       "name": "北方华创",
       "score": 0,
@@ -5032,6 +4807,21 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.46,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "主板"
+    },
+    "002407": {
+      "name": "多氟多",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 2.23,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -5197,6 +4987,21 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.18,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "主板"
+    },
+    "002565": {
+      "name": "顺灏股份",
+      "score": 73,
+      "conds": 2,
+      "cond1": false,
+      "cond2": true,
+      "cond3": true,
+      "zt_count": 1,
+      "zt_down_count": 1,
+      "af_peak": 3.67,
+      "vr_peak": 3.13,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "主板"
@@ -5696,6 +5501,36 @@
       "market_label": "sz",
       "board_label": "创业板"
     },
+    "300133": {
+      "name": "华策影视",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 2.82,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
+    "300136": {
+      "name": "信维通信",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.53,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
     "300139": {
       "name": "晓程科技",
       "score": 0,
@@ -5786,6 +5621,21 @@
       "market_label": "sz",
       "board_label": "创业板"
     },
+    "300182": {
+      "name": "捷成股份",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 2.91,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
     "300189": {
       "name": "神农种业",
       "score": 0,
@@ -5842,6 +5692,21 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 2.04,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
+    "300209": {
+      "name": "行云科技",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.66,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6176,6 +6041,21 @@
       "market_label": "sz",
       "board_label": "创业板"
     },
+    "300433": {
+      "name": "蓝思科技",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.77,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
     "300438": {
       "name": "鹏辉能源",
       "score": 0,
@@ -6382,6 +6262,21 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 0.84,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
+    "300522": {
+      "name": "世名科技",
+      "score": 100,
+      "conds": 2,
+      "cond1": false,
+      "cond2": true,
+      "cond3": true,
+      "zt_count": 1,
+      "zt_down_count": 1,
+      "af_peak": 7.38,
+      "vr_peak": 3.3,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -6911,6 +6806,21 @@
       "market_label": "sz",
       "board_label": "创业板"
     },
+    "300821": {
+      "name": "东岳硅材",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 1,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 3.87,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
     "300829": {
       "name": "金丹科技",
       "score": 0,
@@ -7121,6 +7031,21 @@
       "market_label": "sz",
       "board_label": "创业板"
     },
+    "300964": {
+      "name": "本川智能",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.7,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
     "301041": {
       "name": "金百泽",
       "score": 0,
@@ -7327,6 +7252,21 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.84,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "创业板"
+    },
+    "301217": {
+      "name": "铜冠铜箔",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.66,
       "ts_peak": 0,
       "market_label": "sz",
       "board_label": "创业板"
@@ -7897,6 +7837,21 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.1,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
+    "600176": {
+      "name": "中国巨石",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.82,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "主板"
@@ -8876,6 +8831,21 @@
       "market_label": "sh",
       "board_label": "主板"
     },
+    "601975": {
+      "name": "招商南油",
+      "score": 48,
+      "conds": 2,
+      "cond1": false,
+      "cond2": true,
+      "cond3": true,
+      "zt_count": 1,
+      "zt_down_count": 1,
+      "af_peak": 3.68,
+      "vr_peak": 1.98,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "主板"
+    },
     "601988": {
       "name": "中国银行",
       "score": 0,
@@ -9491,6 +9461,21 @@
       "market_label": "sh",
       "board_label": "科创板"
     },
+    "688036": {
+      "name": "传音控股",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 2.51,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "科创板"
+    },
     "688037": {
       "name": "芯源微",
       "score": 0,
@@ -9652,6 +9637,21 @@
       "zt_down_count": 0,
       "af_peak": 0,
       "vr_peak": 1.5,
+      "ts_peak": 0,
+      "market_label": "sh",
+      "board_label": "科创板"
+    },
+    "688111": {
+      "name": "金山办公",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.67,
       "ts_peak": 0,
       "market_label": "sh",
       "board_label": "科创板"
