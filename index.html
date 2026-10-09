@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "d2a136b802";   // 部署 commit 短 SHA（= 当前 main tip；v8 部署走 Git Data API 直推 main，跳过 v8_build_deploy.yml 的构建期 BUILD 替换，故此处手动对齐真实 tip，确保运维页「部署 SHA」与版本戳强缓存破坏机制真实生效）
+    var BUILD = "6f5d99c59b";   // 部署 commit 短 SHA（= 当前 main tip；v8 部署走 Git Data API 直推 main，跳过 v8_build_deploy.yml 的构建期 BUILD 替换，故此处手动对齐真实 tip，确保运维页「部署 SHA」与版本戳强缓存破坏机制真实生效）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -682,7 +682,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=5c29d42a48" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=8ac429396d" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=c958209de9" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -848,12 +848,6 @@ window.V8_CAL = {weeks:[],legend:[]};
   window._parseAsCST = function(ts){
     if(!ts) return null;
     var s = String(ts).trim();
-    // 🛡 2026-10-09 一劳永逸（主人令「卡上最后的时间日期要标注清楚」）：
-    //   剥掉文字时区后缀并补齐缺秒——根因案例 MARKET_THERMO.generated="2026-10-08 23:32 CST"：
-    //   带 " CST" 且无秒 ⇒ 结构化正则(要求秒)与 fallback 均解析失败 ⇒ fmtDataTime/_fmtAshareRel
-    //   回落裸串，卡面显示原始串而非「昨日(10-08) 23:32」。本仓数据源时间一律北京时间，
-    //   CST/GMT/UTC 文字后缀按 +08:00 语义处理，与下方无时区口径一致。
-    s = s.replace(/\s+(?:CST|GMT|UTC)\s*$/i, '').replace(/^(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2})$/, '$1:00');
     // ISO 8601 带 Z / +00:00 / -00:00 视为 UTC，转北京时间（+8h）
     var m = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/);
     if(m){
@@ -1018,11 +1012,8 @@ window.V8_CAL = {weeks:[],legend:[]};
       var dsFull = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
       return '上一交易日(' + dsFull + ') ' + hm;
     }
-    // 🛡 2026-10-09 主人令「卡上最后的时间日期要标注清楚」：昨日/N天前一律带具体日期，
-    //   让「每日更新还是停更」一眼可判，不再需要截图问 AI。
-    var dsRel = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
-    if(diff === 1) return '昨日(' + dsRel + ') ' + hm;
-    return diff + '天前(' + dsRel + ') ' + hm;
+    if(diff === 1) return '昨日 ' + hm;
+    return diff + '天前 ' + hm;
   };
   /* 🛡 2026-09-04 主人令「一劳永逸」：全站「更新于」胶囊内置陈旧度自判。
      ── 背景（主人 09-04 19:39 提问「盘后数据页每个卡时间都不对…是不是数据也是错的啊」）──
@@ -1776,7 +1767,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SZ_FIB.js?v=e0bf26ec96" defer></script>
 <script src="data/SECTOR_RS.js?v=947011cfa5" defer></script>
 <script src="data/SECTOR_PHASE_HISTORY.js?v=21bb5b847f" defer></script>
-<script src="data/INST_TRADE.js?v=e1998d73a4" defer></script>
+<script src="data/INST_TRADE.js?v=ba4f251803" defer></script>
 <script src="data/NORTH_FUND.js?v=613b87f5b5" defer></script>
 <script src="data/MARKET_ALERTS.js?v=47e740b94e" defer></script>
 <script src="data/MARKET_FUND_FLOW_DATA.js?v=e6e0cafd5b" defer></script>
@@ -1830,9 +1821,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=468b055344" defer></script>
 <script src="data/HB_XIAOJIU.js?v=283619b13d" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=bec4128826" defer></script>
-<script src="data/HEALTH_CHECK.js?v=cefad94d55" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=32da5a827a" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=9b3ceb378d" defer></script>
+<script src="data/HEALTH_CHECK.js?v=0f28ca73e4" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=325adc07bf" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=cd593bf4b5" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=ac3a39c46f" defer></script>
@@ -1846,14 +1837,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=bae759de3e" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=cdabc7d874" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=6316309c3d" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=68bca26f37" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=8ac12782df" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=e88df485e5" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=4e2eb13725" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=f03c987ea0" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=ab4d34ffe1" defer></script>
-    <script src="data/IMA_STRONG_BACKTEST.js?v=c9e9f0d64a" defer></script>
+    <script src="data/IMA_STRONG_BACKTEST.js?v=7abce89285" defer></script>
     <script src="data/CRDS_BACKTEST.js?v=2e1d092b81" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -14822,10 +14813,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     let txt;
     if(dayDiff>=1 && window._isAshareTradingDay && !window._isAshareTradingDay(today0)) txt='上一交易日收盘 '+hm;
     else if(dayDiff<=0) txt='今日 '+hm;
-    // 🛡 2026-10-09 主人令：昨日/N天前带具体日期（与 _fmtAshareRel 同口径）
-    var dsF = dataStr.replace(/\//g,'-').slice(5);
-    else if(dayDiff===1) txt='昨日('+dsF+') '+hm;
-    else txt=dayDiff+'天前('+dsF+') '+hm;
+    else if(dayDiff===1) txt='昨日 '+hm;
+    else txt=dayDiff+'天前 '+hm;
     return {text:txt};
   }
 
@@ -15492,7 +15481,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=68bca26f37');
+      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=e88df485e5');
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -15501,7 +15490,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=8ac12782df');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=4e2eb13725');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
