@@ -1,67 +1,67 @@
 window.CRDS_BACKTEST = {
- "update_time": "2026-10-02 06:04:07",
+ "update_time": "2026-10-10 00:04:32",
  "summary": {
-  "update_time": "2026-10-02 06:04:07",
-  "total_signals": 390,
-  "calc_time": "2026-10-02 06:04:07",
+  "update_time": "2026-10-10 00:04:32",
+  "total_signals": 412,
+  "calc_time": "2026-10-10 00:04:32",
   "method": "CRDS 逆势龙头 advanced 档历史回测：信号日取真实下一交易日开盘买入，持有 N 个真实交易日收盘价卖出（前复权；胜率=win/(win+loss) 排平盘；已扣双边交易成本 0.3%）",
-  "signal_date_range": "2026-08-01 ~ 2026-10-01",
+  "signal_date_range": "2026-08-01 ~ 2026-10-09",
   "cost_bps_per_side": 15,
   "by_period": {
    "1": {
-    "samples": 338,
+    "samples": 373,
     "draws": 0,
-    "win_rate": 39.35,
-    "avg_return": -0.54,
+    "win_rate": 38.34,
+    "avg_return": -0.71,
     "best_return": 27.75,
-    "worst_return": -15.56,
-    "win_avg": 5.26,
-    "loss_avg": -4.3,
-    "profit_loss_ratio": 1.22,
-    "max_drawdown": -2.61,
-    "sharpe_ratio": -0.09,
+    "worst_return": -18.92,
+    "win_avg": 5.3,
+    "loss_avg": -4.45,
+    "profit_loss_ratio": 1.19,
+    "max_drawdown": -2.74,
+    "sharpe_ratio": -0.11,
     "cost_adjusted": true
    },
    "3": {
-    "samples": 248,
+    "samples": 338,
     "draws": 0,
-    "win_rate": 33.87,
-    "avg_return": -2.55,
+    "win_rate": 30.18,
+    "avg_return": -3.23,
     "best_return": 52.25,
     "worst_return": -19.08,
-    "win_avg": 8.73,
-    "loss_avg": -8.33,
-    "profit_loss_ratio": 1.05,
-    "max_drawdown": -7.24,
-    "sharpe_ratio": -0.23,
+    "win_avg": 7.76,
+    "loss_avg": -7.98,
+    "profit_loss_ratio": 0.97,
+    "max_drawdown": -7.41,
+    "sharpe_ratio": -0.33,
     "cost_adjusted": true
    },
    "5": {
-    "samples": 205,
+    "samples": 248,
     "draws": 0,
-    "win_rate": 27.32,
-    "avg_return": -3.69,
+    "win_rate": 24.6,
+    "avg_return": -4.9,
     "best_return": 57.39,
     "worst_return": -22.16,
-    "win_avg": 11.43,
-    "loss_avg": -9.37,
-    "profit_loss_ratio": 1.22,
-    "max_drawdown": -10.16,
-    "sharpe_ratio": -0.29,
+    "win_avg": 10.89,
+    "loss_avg": -10.04,
+    "profit_loss_ratio": 1.08,
+    "max_drawdown": -10.76,
+    "sharpe_ratio": -0.4,
     "cost_adjusted": true
    },
    "10": {
-    "samples": 29,
+    "samples": 85,
     "draws": 0,
-    "win_rate": 41.38,
-    "avg_return": -0.06,
-    "best_return": 47.07,
-    "worst_return": -22.63,
-    "win_avg": 17.73,
-    "loss_avg": -12.63,
-    "profit_loss_ratio": 1.4,
-    "max_drawdown": -13.39,
-    "sharpe_ratio": -0.0,
+    "win_rate": 34.12,
+    "avg_return": -2.25,
+    "best_return": 92.25,
+    "worst_return": -23.66,
+    "win_avg": 18.41,
+    "loss_avg": -12.95,
+    "profit_loss_ratio": 1.42,
+    "max_drawdown": -16.21,
+    "sharpe_ratio": -0.11,
     "cost_adjusted": true
    },
    "20": {
@@ -2542,10 +2542,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 0.7,
+     "gross_return": 1.0,
+     "exit_price": 8.08,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -2623,10 +2623,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -12.71,
+     "gross_return": -12.41,
+     "exit_price": 50.4,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -2704,10 +2704,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -4.59,
+     "gross_return": -4.29,
+     "exit_price": 2.68,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -2785,10 +2785,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -12.92,
+     "gross_return": -12.62,
+     "exit_price": 172.0,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -2866,10 +2866,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -14.99,
+     "gross_return": -14.69,
+     "exit_price": 10.45,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -2947,10 +2947,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -2.02,
+     "gross_return": -1.72,
+     "exit_price": 6.87,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -3028,10 +3028,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -13.17,
+     "gross_return": -12.87,
+     "exit_price": 55.85,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -3109,10 +3109,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -7.69,
+     "gross_return": -7.39,
+     "exit_price": 14.53,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -3190,10 +3190,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -12.52,
+     "gross_return": -12.22,
+     "exit_price": 23.7,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -3271,10 +3271,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -12.03,
+     "gross_return": -11.73,
+     "exit_price": 95.6,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -3352,10 +3352,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 4.58,
+     "gross_return": 4.88,
+     "exit_price": 64.64,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -3433,10 +3433,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 32.88,
+     "gross_return": 33.18,
+     "exit_price": 11.88,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -3514,10 +3514,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 6.15,
+     "gross_return": 6.45,
+     "exit_price": 3.3,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -3595,10 +3595,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 3.78,
+     "gross_return": 4.08,
+     "exit_price": 39.81,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -3676,10 +3676,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -17.98,
+     "gross_return": -17.68,
+     "exit_price": 13.5,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -3757,10 +3757,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -19.5,
+     "gross_return": -19.2,
+     "exit_price": 17.38,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -3838,10 +3838,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -11.58,
+     "gross_return": -11.28,
+     "exit_price": 13.92,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -3919,10 +3919,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 92.25,
+     "gross_return": 92.55,
+     "exit_price": 150.0,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -4000,10 +4000,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -17.86,
+     "gross_return": -17.56,
+     "exit_price": 96.51,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -4081,10 +4081,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -11.1,
+     "gross_return": -10.8,
+     "exit_price": 9.99,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -4162,10 +4162,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -16.54,
+     "gross_return": -16.24,
+     "exit_price": 14.23,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -4243,10 +4243,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -6.14,
+     "gross_return": -5.84,
+     "exit_price": 30.5,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -4324,10 +4324,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -21.45,
+     "gross_return": -21.15,
+     "exit_price": 32.09,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -4405,10 +4405,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -19.07,
+     "gross_return": -18.77,
+     "exit_price": 42.77,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -4486,10 +4486,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 3.31,
+     "gross_return": 3.61,
+     "exit_price": 5.16,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -4567,10 +4567,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -1.74,
+     "gross_return": -1.44,
+     "exit_price": 40.41,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -4648,10 +4648,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -11.3,
+     "gross_return": -11.0,
+     "exit_price": 104.96,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -4729,10 +4729,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 19.91,
+     "gross_return": 20.21,
+     "exit_price": 13.8,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -4810,10 +4810,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 6.78,
+     "gross_return": 7.08,
+     "exit_price": 15.12,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -4891,10 +4891,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-23"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -14.18,
+     "gross_return": -13.88,
+     "exit_price": 46.59,
+     "exit_date": "2026-10-08"
     },
     "20": {
      "return_pct": null,
@@ -4972,10 +4972,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -18.49,
+     "gross_return": -18.19,
+     "exit_price": 47.17,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -5053,10 +5053,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 8.69,
+     "gross_return": 8.99,
+     "exit_price": 4.85,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -5134,10 +5134,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -2.49,
+     "gross_return": -2.19,
+     "exit_price": 2.68,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -5215,10 +5215,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -16.5,
+     "gross_return": -16.2,
+     "exit_price": 164.67,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -5296,10 +5296,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -14.43,
+     "gross_return": -14.13,
+     "exit_price": 10.45,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -5377,10 +5377,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 11.37,
+     "gross_return": 11.67,
+     "exit_price": 7.56,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -5458,10 +5458,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -8.48,
+     "gross_return": -8.18,
+     "exit_price": 59.59,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -5539,10 +5539,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -2.42,
+     "gross_return": -2.12,
+     "exit_price": 15.23,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -5620,10 +5620,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -15.14,
+     "gross_return": -14.84,
+     "exit_price": 22.61,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -5701,10 +5701,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -23.66,
+     "gross_return": -23.36,
+     "exit_price": 88.14,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -5782,10 +5782,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 0.85,
+     "gross_return": 1.15,
+     "exit_price": 60.92,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -5863,10 +5863,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 4.19,
+     "gross_return": 4.49,
+     "exit_price": 3.26,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -5944,10 +5944,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 1.79,
+     "gross_return": 2.09,
+     "exit_price": 38.54,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -6025,10 +6025,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -16.96,
+     "gross_return": -16.66,
+     "exit_price": 13.61,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -6106,10 +6106,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -19.0,
+     "gross_return": -18.7,
+     "exit_price": 16.96,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -6187,10 +6187,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -11.26,
+     "gross_return": -10.96,
+     "exit_price": 13.98,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -6268,10 +6268,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -5.89,
+     "gross_return": -5.59,
+     "exit_price": 12.49,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -6349,10 +6349,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 87.31,
+     "gross_return": 87.61,
+     "exit_price": 161.18,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -6430,10 +6430,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -23.11,
+     "gross_return": -22.81,
+     "exit_price": 92.02,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -6511,10 +6511,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -9.9,
+     "gross_return": -9.6,
+     "exit_price": 38.51,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -6592,10 +6592,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -23.26,
+     "gross_return": -22.96,
+     "exit_price": 18.86,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -6673,10 +6673,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -12.13,
+     "gross_return": -11.83,
+     "exit_price": 105.42,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -6754,10 +6754,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -8.86,
+     "gross_return": -8.56,
+     "exit_price": 3.42,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -6835,10 +6835,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 26.2,
+     "gross_return": 26.5,
+     "exit_price": 15.18,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -6916,10 +6916,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 10.33,
+     "gross_return": 10.63,
+     "exit_price": 15.61,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -6997,10 +6997,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-24"
     },
     "10": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -17.72,
+     "gross_return": -17.42,
+     "exit_price": 206.46,
+     "exit_date": "2026-10-09"
     },
     "20": {
      "return_pct": null,
@@ -16792,10 +16792,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -14.04,
+     "gross_return": -13.74,
+     "exit_price": 50.4,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -16873,10 +16873,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -5.54,
+     "gross_return": -5.24,
+     "exit_price": 6.87,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -16954,10 +16954,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -13.39,
+     "gross_return": -13.09,
+     "exit_price": 16.4,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -17035,10 +17035,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -10.8,
+     "gross_return": -10.5,
+     "exit_price": 22.51,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -17116,10 +17116,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -12.86,
+     "gross_return": -12.56,
+     "exit_price": 95.6,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -17197,10 +17197,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -7.53,
+     "gross_return": -7.23,
+     "exit_price": 64.64,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -17278,10 +17278,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -17.6,
+     "gross_return": -17.3,
+     "exit_price": 67.81,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -17359,10 +17359,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -14.11,
+     "gross_return": -13.81,
+     "exit_price": 13.92,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -17440,10 +17440,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -4.1,
+     "gross_return": -3.8,
+     "exit_price": 12.9,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -17521,10 +17521,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -16.52,
+     "gross_return": -16.22,
+     "exit_price": 18.95,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -17602,10 +17602,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -17.32,
+     "gross_return": -17.02,
+     "exit_price": 41.39,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -17683,10 +17683,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -15.65,
+     "gross_return": -15.35,
+     "exit_price": 96.51,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -17764,10 +17764,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 6.26,
+     "gross_return": 6.56,
+     "exit_price": 4.06,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -17845,10 +17845,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -2.71,
+     "gross_return": -2.41,
+     "exit_price": 3.65,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -17926,10 +17926,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -19.4,
+     "gross_return": -19.1,
+     "exit_price": 19.78,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -18007,10 +18007,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -3.23,
+     "gross_return": -2.93,
+     "exit_price": 8.96,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -18088,10 +18088,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -14.17,
+     "gross_return": -13.87,
+     "exit_price": 30.85,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -18169,10 +18169,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -19.32,
+     "gross_return": -19.02,
+     "exit_price": 3.15,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -18250,10 +18250,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 1.54,
+     "gross_return": 1.84,
+     "exit_price": 45.32,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -18331,10 +18331,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -10.06,
+     "gross_return": -9.76,
+     "exit_price": 12.58,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -18412,10 +18412,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 5.61,
+     "gross_return": 5.91,
+     "exit_price": 22.03,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -18493,10 +18493,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -2.71,
+     "gross_return": -2.41,
+     "exit_price": 224.25,
+     "exit_date": "2026-10-08"
     },
     "10": {
      "return_pct": null,
@@ -18574,10 +18574,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -18.83,
+     "gross_return": -18.53,
+     "exit_price": 47.17,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -18655,10 +18655,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -16.2,
+     "gross_return": -15.9,
+     "exit_price": 15.71,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -18736,10 +18736,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -12.73,
+     "gross_return": -12.43,
+     "exit_price": 21.62,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -18817,10 +18817,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -18.74,
+     "gross_return": -18.44,
+     "exit_price": 88.14,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -18898,10 +18898,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -17.98,
+     "gross_return": -17.68,
+     "exit_price": 60.92,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -18979,10 +18979,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -12.43,
+     "gross_return": -12.13,
+     "exit_price": 69.33,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -19060,10 +19060,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -19.09,
+     "gross_return": -18.79,
+     "exit_price": 10.76,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -19141,10 +19141,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -11.82,
+     "gross_return": -11.52,
+     "exit_price": 13.98,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -19222,10 +19222,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -3.48,
+     "gross_return": -3.18,
+     "exit_price": 12.49,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -19303,10 +19303,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -20.25,
+     "gross_return": -19.95,
+     "exit_price": 17.69,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -19384,10 +19384,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -19.52,
+     "gross_return": -19.22,
+     "exit_price": 40.4,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -19465,10 +19465,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -20.43,
+     "gross_return": -20.13,
+     "exit_price": 92.02,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -19546,10 +19546,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 4.07,
+     "gross_return": 4.37,
+     "exit_price": 4.06,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -19627,10 +19627,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -21.78,
+     "gross_return": -21.48,
+     "exit_price": 18.86,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -19708,10 +19708,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -14.89,
+     "gross_return": -14.59,
+     "exit_price": 30.15,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -19789,10 +19789,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -8.61,
+     "gross_return": -8.31,
+     "exit_price": 3.31,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -19870,10 +19870,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -2.03,
+     "gross_return": -1.73,
+     "exit_price": 22.75,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -19951,10 +19951,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -7.24,
+     "gross_return": -6.94,
+     "exit_price": 44.66,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -20032,10 +20032,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -14.87,
+     "gross_return": -14.57,
+     "exit_price": 7.39,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -20113,10 +20113,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -0.69,
+     "gross_return": -0.39,
+     "exit_price": 12.61,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -20194,10 +20194,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "5": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 6.71,
+     "gross_return": 7.01,
+     "exit_price": 40.28,
+     "exit_date": "2026-10-09"
     },
     "10": {
      "return_pct": null,
@@ -20269,10 +20269,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -9.37,
+     "gross_return": -9.07,
+     "exit_price": 50.4,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -20350,10 +20350,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -11.12,
+     "gross_return": -10.82,
+     "exit_price": 16.4,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -20431,10 +20431,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -5.72,
+     "gross_return": -5.42,
+     "exit_price": 22.51,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -20512,10 +20512,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 0.18,
+     "gross_return": 0.48,
+     "exit_price": 10.45,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -20593,10 +20593,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -7.66,
+     "gross_return": -7.36,
+     "exit_price": 95.6,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -20674,10 +20674,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -4.28,
+     "gross_return": -3.98,
+     "exit_price": 64.64,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -20755,10 +20755,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -11.17,
+     "gross_return": -10.87,
+     "exit_price": 67.81,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -20836,10 +20836,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -10.91,
+     "gross_return": -10.61,
+     "exit_price": 11.46,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -20917,10 +20917,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -9.85,
+     "gross_return": -9.55,
+     "exit_price": 13.92,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -20998,10 +20998,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -0.07,
+     "gross_return": 0.23,
+     "exit_price": 12.9,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -21079,10 +21079,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -10.91,
+     "gross_return": -10.61,
+     "exit_price": 18.95,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -21160,10 +21160,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -13.16,
+     "gross_return": -12.86,
+     "exit_price": 41.39,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -21241,10 +21241,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -11.76,
+     "gross_return": -11.46,
+     "exit_price": 96.51,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -21322,10 +21322,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -8.27,
+     "gross_return": -7.97,
+     "exit_price": 8.08,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -21403,10 +21403,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 7.11,
+     "gross_return": 7.41,
+     "exit_price": 4.06,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -21484,10 +21484,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -1.92,
+     "gross_return": -1.62,
+     "exit_price": 3.65,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -21565,10 +21565,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -16.49,
+     "gross_return": -16.19,
+     "exit_price": 19.78,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -21646,10 +21646,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -13.3,
+     "gross_return": -13.0,
+     "exit_price": 30.85,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -21727,10 +21727,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -9.0,
+     "gross_return": -8.7,
+     "exit_price": 3.15,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -21808,10 +21808,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 5.75,
+     "gross_return": 6.05,
+     "exit_price": 24.72,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -21889,10 +21889,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -12.49,
+     "gross_return": -12.19,
+     "exit_price": 45.32,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -21970,10 +21970,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -6.27,
+     "gross_return": -5.97,
+     "exit_price": 7.24,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -22051,10 +22051,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -1.32,
+     "gross_return": -1.02,
+     "exit_price": 12.58,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -22132,10 +22132,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-29"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -2.43,
+     "gross_return": -2.13,
+     "exit_price": 39.6,
+     "exit_date": "2026-10-08"
     },
     "5": {
      "return_pct": null,
@@ -22213,10 +22213,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -5.92,
+     "gross_return": -5.62,
+     "exit_price": 47.17,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -22294,10 +22294,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -6.17,
+     "gross_return": -5.87,
+     "exit_price": 15.71,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -22375,10 +22375,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -1.31,
+     "gross_return": -1.01,
+     "exit_price": 21.62,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -22456,10 +22456,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 1.2,
+     "gross_return": 1.5,
+     "exit_price": 10.8,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -22537,10 +22537,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -6.25,
+     "gross_return": -5.95,
+     "exit_price": 88.14,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -22618,10 +22618,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -5.5,
+     "gross_return": -5.2,
+     "exit_price": 60.92,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -22699,10 +22699,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -4.61,
+     "gross_return": -4.31,
+     "exit_price": 69.33,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -22780,10 +22780,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -8.73,
+     "gross_return": -8.43,
+     "exit_price": 10.76,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -22861,10 +22861,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -3.28,
+     "gross_return": -2.98,
+     "exit_price": 13.98,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -22942,10 +22942,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -1.88,
+     "gross_return": -1.58,
+     "exit_price": 12.49,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -23023,10 +23023,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -8.59,
+     "gross_return": -8.29,
+     "exit_price": 17.69,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -23104,10 +23104,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -8.63,
+     "gross_return": -8.33,
+     "exit_price": 40.4,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -23185,10 +23185,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -8.1,
+     "gross_return": -7.8,
+     "exit_price": 92.02,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -23266,10 +23266,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -7.39,
+     "gross_return": -7.09,
+     "exit_price": 8.13,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -23347,10 +23347,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 7.11,
+     "gross_return": 7.41,
+     "exit_price": 4.06,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -23428,10 +23428,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -3.2,
+     "gross_return": -2.9,
+     "exit_price": 3.68,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -23509,10 +23509,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -6.05,
+     "gross_return": -5.75,
+     "exit_price": 18.86,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -23590,10 +23590,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -11.07,
+     "gross_return": -10.77,
+     "exit_price": 30.15,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -23671,10 +23671,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 2.5,
+     "gross_return": 2.8,
+     "exit_price": 3.31,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -23752,10 +23752,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -11.74,
+     "gross_return": -11.44,
+     "exit_price": 22.75,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -23833,10 +23833,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -9.55,
+     "gross_return": -9.25,
+     "exit_price": 44.66,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -23914,10 +23914,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 3.64,
+     "gross_return": 3.94,
+     "exit_price": 7.39,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -23995,10 +23995,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 0.58,
+     "gross_return": 0.88,
+     "exit_price": 12.61,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -24076,10 +24076,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -3.08,
+     "gross_return": -2.78,
+     "exit_price": 40.28,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -24157,10 +24157,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -5.92,
+     "gross_return": -5.62,
+     "exit_price": 47.17,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -24238,10 +24238,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -6.17,
+     "gross_return": -5.87,
+     "exit_price": 15.71,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -24319,10 +24319,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -1.31,
+     "gross_return": -1.01,
+     "exit_price": 21.62,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -24400,10 +24400,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 1.2,
+     "gross_return": 1.5,
+     "exit_price": 10.8,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -24481,10 +24481,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -6.25,
+     "gross_return": -5.95,
+     "exit_price": 88.14,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -24562,10 +24562,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -5.5,
+     "gross_return": -5.2,
+     "exit_price": 60.92,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -24643,10 +24643,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -4.61,
+     "gross_return": -4.31,
+     "exit_price": 69.33,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -24724,10 +24724,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -8.73,
+     "gross_return": -8.43,
+     "exit_price": 10.76,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -24805,10 +24805,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -3.28,
+     "gross_return": -2.98,
+     "exit_price": 13.98,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -24886,10 +24886,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -1.88,
+     "gross_return": -1.58,
+     "exit_price": 12.49,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -24967,10 +24967,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -8.59,
+     "gross_return": -8.29,
+     "exit_price": 17.69,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -25048,10 +25048,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -8.63,
+     "gross_return": -8.33,
+     "exit_price": 40.4,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -25129,10 +25129,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -8.1,
+     "gross_return": -7.8,
+     "exit_price": 92.02,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -25210,10 +25210,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -7.39,
+     "gross_return": -7.09,
+     "exit_price": 8.13,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -25291,10 +25291,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 7.11,
+     "gross_return": 7.41,
+     "exit_price": 4.06,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -25372,10 +25372,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -3.2,
+     "gross_return": -2.9,
+     "exit_price": 3.68,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -25453,10 +25453,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -6.05,
+     "gross_return": -5.75,
+     "exit_price": 18.86,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -25534,10 +25534,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -11.07,
+     "gross_return": -10.77,
+     "exit_price": 30.15,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -25615,10 +25615,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 2.5,
+     "gross_return": 2.8,
+     "exit_price": 3.31,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -25696,10 +25696,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -11.74,
+     "gross_return": -11.44,
+     "exit_price": 22.75,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -25777,10 +25777,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -9.55,
+     "gross_return": -9.25,
+     "exit_price": 44.66,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -25858,10 +25858,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 3.64,
+     "gross_return": 3.94,
+     "exit_price": 7.39,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -25939,10 +25939,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 0.58,
+     "gross_return": 0.88,
+     "exit_price": 12.61,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -26020,10 +26020,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -3.08,
+     "gross_return": -2.78,
+     "exit_price": 40.28,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -26101,10 +26101,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -4.74,
+     "gross_return": -4.44,
+     "exit_price": 21.33,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -26182,10 +26182,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -6.17,
+     "gross_return": -5.87,
+     "exit_price": 15.71,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -26263,10 +26263,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 1.2,
+     "gross_return": 1.5,
+     "exit_price": 10.8,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -26344,10 +26344,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -6.25,
+     "gross_return": -5.95,
+     "exit_price": 88.14,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -26425,10 +26425,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -5.5,
+     "gross_return": -5.2,
+     "exit_price": 60.92,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -26506,10 +26506,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -4.61,
+     "gross_return": -4.31,
+     "exit_price": 69.33,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -26587,10 +26587,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -18.67,
+     "gross_return": -18.37,
+     "exit_price": 32.61,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -26668,10 +26668,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -8.73,
+     "gross_return": -8.43,
+     "exit_price": 10.76,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -26749,10 +26749,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -2.54,
+     "gross_return": -2.24,
+     "exit_price": 8.74,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -26830,10 +26830,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -10.61,
+     "gross_return": -10.31,
+     "exit_price": 7.92,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -26911,10 +26911,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -11.13,
+     "gross_return": -10.83,
+     "exit_price": 8.73,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -26992,10 +26992,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 7.11,
+     "gross_return": 7.41,
+     "exit_price": 4.06,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -27073,10 +27073,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -3.2,
+     "gross_return": -2.9,
+     "exit_price": 3.68,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -27154,10 +27154,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -6.05,
+     "gross_return": -5.75,
+     "exit_price": 18.86,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -27235,10 +27235,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 2.5,
+     "gross_return": 2.8,
+     "exit_price": 3.31,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -27316,10 +27316,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -9.55,
+     "gross_return": -9.25,
+     "exit_price": 44.66,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -27397,10 +27397,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 3.64,
+     "gross_return": 3.94,
+     "exit_price": 7.39,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -27478,10 +27478,10 @@ window.CRDS_BACKTEST = {
      "exit_date": "2026-09-30"
     },
     "3": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 0.58,
+     "gross_return": 0.88,
+     "exit_price": 12.61,
+     "exit_date": "2026-10-09"
     },
     "5": {
      "return_pct": null,
@@ -27553,10 +27553,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 10.99,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -5.21,
+     "gross_return": -4.91,
+     "exit_price": 10.45,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -27634,10 +27634,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 38.38,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -10.54,
+     "gross_return": -10.24,
+     "exit_price": 34.45,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -27715,10 +27715,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 21.48,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -4.16,
+     "gross_return": -3.86,
+     "exit_price": 20.65,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -27796,10 +27796,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 8.89,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -4.35,
+     "gross_return": -4.05,
+     "exit_price": 8.53,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -27877,10 +27877,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 31.65,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -6.75,
+     "gross_return": -6.45,
+     "exit_price": 29.61,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -27958,10 +27958,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 8.5,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -0.77,
+     "gross_return": -0.47,
+     "exit_price": 8.46,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -28039,10 +28039,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 9.57,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -4.69,
+     "gross_return": -4.39,
+     "exit_price": 9.15,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -28120,10 +28120,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 6.69,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -5.53,
+     "gross_return": -5.23,
+     "exit_price": 6.34,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -28201,10 +28201,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 3.8,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 6.54,
+     "gross_return": 6.84,
+     "exit_price": 4.06,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -28282,10 +28282,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 3.38,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 7.69,
+     "gross_return": 7.99,
+     "exit_price": 3.65,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -28363,10 +28363,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 20.88,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -5.57,
+     "gross_return": -5.27,
+     "exit_price": 19.78,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -28444,10 +28444,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 3.24,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -3.08,
+     "gross_return": -2.78,
+     "exit_price": 3.15,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -28525,10 +28525,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 50.0,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -9.66,
+     "gross_return": -9.36,
+     "exit_price": 45.32,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -28606,10 +28606,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 7.15,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": 0.96,
+     "gross_return": 1.26,
+     "exit_price": 7.24,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -28687,10 +28687,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 12.9,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -2.78,
+     "gross_return": -2.48,
+     "exit_price": 12.58,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -28768,10 +28768,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 24.0,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -3.42,
+     "gross_return": -3.12,
+     "exit_price": 23.25,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -28849,10 +28849,10 @@ window.CRDS_BACKTEST = {
    "entry_price": 59.6,
    "periods": {
     "1": {
-     "return_pct": null,
-     "gross_return": null,
-     "exit_price": null,
-     "exit_date": null
+     "return_pct": -18.92,
+     "gross_return": -18.62,
+     "exit_price": 48.5,
+     "exit_date": "2026-10-08"
     },
     "3": {
      "return_pct": null,
@@ -28928,6 +28928,2760 @@ window.CRDS_BACKTEST = {
    "code": "688137",
    "name": "近岸蛋白",
    "entry_price": 135.7,
+   "periods": {
+    "1": {
+     "return_pct": 10.24,
+     "gross_return": 10.54,
+     "exit_price": 150.0,
+     "exit_date": "2026-10-08"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "300300",
+   "name": "海峡创新",
+   "entry_price": 10.91,
+   "periods": {
+    "1": {
+     "return_pct": -1.31,
+     "gross_return": -1.01,
+     "exit_price": 10.8,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "301699",
+   "name": "洛轴股份",
+   "entry_price": 35.48,
+   "periods": {
+    "1": {
+     "return_pct": -8.39,
+     "gross_return": -8.09,
+     "exit_price": 32.61,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "688244",
+   "name": "永信至诚",
+   "entry_price": 21.23,
+   "periods": {
+    "1": {
+     "return_pct": 12.75,
+     "gross_return": 13.05,
+     "exit_price": 24.0,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "002413",
+   "name": "雷科防务",
+   "entry_price": 8.66,
+   "periods": {
+    "1": {
+     "return_pct": 0.62,
+     "gross_return": 0.92,
+     "exit_price": 8.74,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "000513",
+   "name": "丽珠集团",
+   "entry_price": 32.49,
+   "periods": {
+    "1": {
+     "return_pct": -6.42,
+     "gross_return": -6.12,
+     "exit_price": 30.5,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "002342",
+   "name": "巨力索具",
+   "entry_price": 8.28,
+   "periods": {
+    "1": {
+     "return_pct": -4.65,
+     "gross_return": -4.35,
+     "exit_price": 7.92,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "600707",
+   "name": "彩虹股份",
+   "entry_price": 9.94,
+   "periods": {
+    "1": {
+     "return_pct": -12.47,
+     "gross_return": -12.17,
+     "exit_price": 8.73,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "001330",
+   "name": "博纳影业",
+   "entry_price": 6.4,
+   "periods": {
+    "1": {
+     "return_pct": 8.61,
+     "gross_return": 8.91,
+     "exit_price": 6.97,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "000002",
+   "name": "万科A",
+   "entry_price": 4.11,
+   "periods": {
+    "1": {
+     "return_pct": -1.52,
+     "gross_return": -1.22,
+     "exit_price": 4.06,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "000560",
+   "name": "我爱我家",
+   "entry_price": 3.51,
+   "periods": {
+    "1": {
+     "return_pct": 4.54,
+     "gross_return": 4.84,
+     "exit_price": 3.68,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "600059",
+   "name": "古越龙山",
+   "entry_price": 11.88,
+   "periods": {
+    "1": {
+     "return_pct": -2.15,
+     "gross_return": -1.85,
+     "exit_price": 11.66,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "600641",
+   "name": "先导基电",
+   "entry_price": 49.13,
+   "periods": {
+    "1": {
+     "return_pct": -9.4,
+     "gross_return": -9.1,
+     "exit_price": 44.66,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "600664",
+   "name": "哈药股份",
+   "entry_price": 7.58,
+   "periods": {
+    "1": {
+     "return_pct": -2.81,
+     "gross_return": -2.51,
+     "exit_price": 7.39,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "600721",
+   "name": "百花医药",
+   "entry_price": 13.36,
+   "periods": {
+    "1": {
+     "return_pct": -5.91,
+     "gross_return": -5.61,
+     "exit_price": 12.61,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "603626",
+   "name": "科森科技",
+   "entry_price": 24.8,
+   "periods": {
+    "1": {
+     "return_pct": -1.55,
+     "gross_return": -1.25,
+     "exit_price": 24.49,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "605058",
+   "name": "澳弘电子",
+   "entry_price": 52.57,
+   "periods": {
+    "1": {
+     "return_pct": 1.18,
+     "gross_return": 1.48,
+     "exit_price": 53.35,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-30",
+   "entry_trade_date": "2026-10-08",
+   "code": "688137",
+   "name": "近岸蛋白",
+   "entry_price": 152.0,
+   "periods": {
+    "1": {
+     "return_pct": 5.74,
+     "gross_return": 6.04,
+     "exit_price": 161.18,
+     "exit_date": "2026-10-09"
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "300300",
+   "name": "海峡创新",
+   "entry_price": 10.41,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "301699",
+   "name": "洛轴股份",
+   "entry_price": 34.0,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "688244",
+   "name": "永信至诚",
+   "entry_price": 20.04,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "002413",
+   "name": "雷科防务",
+   "entry_price": 8.51,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "000513",
+   "name": "丽珠集团",
+   "entry_price": 29.51,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "002342",
+   "name": "巨力索具",
+   "entry_price": 8.31,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "600707",
+   "name": "彩虹股份",
+   "entry_price": 8.88,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "001330",
+   "name": "博纳影业",
+   "entry_price": 6.47,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "000002",
+   "name": "万科A",
+   "entry_price": 4.13,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "000560",
+   "name": "我爱我家",
+   "entry_price": 3.68,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "600059",
+   "name": "古越龙山",
+   "entry_price": 12.11,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "600641",
+   "name": "先导基电",
+   "entry_price": 44.2,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "600664",
+   "name": "哈药股份",
+   "entry_price": 7.17,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "600721",
+   "name": "百花医药",
+   "entry_price": 12.64,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "603626",
+   "name": "科森科技",
+   "entry_price": 23.0,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "605058",
+   "name": "澳弘电子",
+   "entry_price": 48.01,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "3": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "5": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "10": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "20": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "30": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "45": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "60": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "75": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "90": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "180": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    },
+    "250": {
+     "return_pct": null,
+     "gross_return": null,
+     "exit_price": null,
+     "exit_date": null
+    }
+   }
+  },
+  {
+   "signal_date": "2026-10-01",
+   "entry_trade_date": "2026-10-09",
+   "code": "688137",
+   "name": "近岸蛋白",
+   "entry_price": 148.0,
    "periods": {
     "1": {
      "return_pct": null,
