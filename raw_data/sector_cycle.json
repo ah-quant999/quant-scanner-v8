@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-09 17:35:12",
+  "update_time": "2026-10-09 17:38:59",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -24,7 +24,7 @@
       "hot_days": 30,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 3100,
+      "total": 3083,
       "ongoing": true
     },
     {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 539,
+      "total": 533,
       "ongoing": true
     },
     {
@@ -76,7 +76,7 @@
       "hot_days": 27,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 256,
+      "total": 254,
       "ongoing": true
     },
     {
@@ -128,33 +128,33 @@
       "hot_days": 26,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 302,
+      "total": 296,
       "ongoing": true
     },
     {
       "sector": "新能源车",
       "start": "08/25",
-      "end": "10/09",
+      "end": "10/08",
       "start_idx": 2,
-      "end_idx": 29,
-      "days": 28,
-      "hot_days": 25,
+      "end_idx": 28,
+      "days": 27,
+      "hot_days": 24,
       "peak": 20,
       "peak_date": "09/01",
-      "total": 231,
+      "total": 221,
       "ongoing": true
     },
     {
       "sector": "电力",
       "start": "08/28",
-      "end": "10/09",
+      "end": "10/08",
       "start_idx": 5,
-      "end_idx": 29,
-      "days": 25,
-      "hot_days": 24,
-      "peak": 13,
-      "peak_date": "10/09",
-      "total": 179,
+      "end_idx": 28,
+      "days": 24,
+      "hot_days": 23,
+      "peak": 12,
+      "peak_date": "09/09",
+      "total": 166,
       "ongoing": true
     },
     {
@@ -212,27 +212,27 @@
     {
       "sector": "机器人",
       "start": "09/16",
-      "end": "10/09",
+      "end": "10/08",
       "start_idx": 18,
-      "end_idx": 29,
-      "days": 12,
-      "hot_days": 12,
+      "end_idx": 28,
+      "days": 11,
+      "hot_days": 11,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 190,
+      "total": 184,
       "ongoing": true
     },
     {
       "sector": "白酒消费",
       "start": "09/18",
-      "end": "10/09",
+      "end": "10/08",
       "start_idx": 20,
-      "end_idx": 29,
-      "days": 10,
-      "hot_days": 9,
+      "end_idx": 28,
+      "days": 9,
+      "hot_days": 8,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 58,
+      "total": 49,
       "ongoing": true
     }
   ]
