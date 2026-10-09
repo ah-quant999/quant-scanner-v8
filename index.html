@@ -613,12 +613,12 @@ window.__domReadyFns=[];
   .tp-hist-cell .tp-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
 </style>
-    <script src="data/ETF_INTRADAY_HEAT.js?v=dcd0a261b3" defer></script>
-    <script src="data/SECTOR_FUND_FLOW.js?v=869a314d79" defer></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=dce52bfff9" defer></script>
+    <script src="data/SECTOR_FUND_FLOW.js?v=f240464b23" defer></script>
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=637a35b5dc" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=22ff1c7f96" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=78f6c29d2b" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=60c15c16db" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=90ecbe1124" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=2e6cb33d9d" defer></script>
@@ -636,14 +636,14 @@ window.__domReadyFns=[];
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
-<script src="data/CONCEPT_RANKING.js?v=830d27f2ae" defer></script>
+<script src="data/CONCEPT_RANKING.js?v=a4c51524aa" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
-<script src="data/INDEX_QUOTES.js?v=b196046996" defer></script>
+<script src="data/INDEX_QUOTES.js?v=80eb7e5a67" defer></script>
 <script src="data/AI_MARKET_BRIEF.js?v=de8109718a" defer></script>
 <script src="data/MARGIN_DATA.js?v=b96564ca35" defer></script>
-<script src="data/CFFEX_HOLDINGS.js?v=b1278382ed" defer></script>
-<script src="data/IPO_DATA.js?v=e49b01b5e0" defer></script>
-    <script src="data/CRISIS_DATA.js?v=ca93ff0c45" defer></script>
+<script src="data/CFFEX_HOLDINGS.js?v=8296f6a1ae" defer></script>
+<script src="data/IPO_DATA.js?v=5c9b55ad5a" defer></script>
+    <script src="data/CRISIS_DATA.js?v=18a354e33d" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=98d5534709" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=3cc0081f2f" defer></script>
 <!-- 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测卡）。
@@ -664,9 +664,9 @@ window.__domReadyFns=[];
          一个 404 + 一条 Console 报错。其消费方 renderMahoroCard() 现读
          window.MAHORO_INSIGHTS（下一行的独立文件，云端重生成不会覆盖），
          故删此行零功能损失。若日后云端产出 maharo_macro.js，恢复本行即可。 -->
-    <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=578cfff41d） -->
+    <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20261009） -->
     <!-- 🔴 2026-10-03 阿狸咪更正：data/maharo_macro.js 实际仍被家机 maharo 自动化每日产出（git 仍追踪）但前端零引用，已登记为退役孤儿（v8_health_check._RETIRED_FILES + api_push_raw._RETIRED_ARTIFACTS 防再生）；属可删死数据，非活链。 -->
-    <script src="data/maharo_insights.js?v=e3c1ce8fe8" defer></script>
+    <script src="data/maharo_insights.js?v=20261009" defer></script>
     <!-- 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡整卡下线（白河愁单源观点卡）。
          data/BAIHECHOU_MACRO.js、data/BAIHECHOU_ANALYSIS.js、raw_data/baihechou_posts.json、
          scripts/{baihechou_daily,fetch_baihechou_v8,set_baihechou_analysis}.py 与本机 06:30/08:30
@@ -675,15 +675,15 @@ window.__domReadyFns=[];
         <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=9948bab379" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
-    <script src="data/RISK_GAUGE.js?v=2586656cdc" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
+    <script src="data/RISK_GAUGE.js?v=d3c74ba88d" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=40fb9bb361" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=c6128c8288" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
     <!-- 2026-09-13 阿狸咪的工程师：补注入 FRESHNESS_STATUS（2.7 KB）。
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=66b7a4e5d7" defer></script>
-  <script src="data/AVG_PRICE_DATA.js?v=0289029448" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=f742b1ce9c" defer></script>
+  <script src="data/AVG_PRICE_DATA.js?v=073ad0d76d" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
@@ -1823,7 +1823,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/HB_XIAOJIU.js?v=d7d9ee4211" defer></script>
     <script src="data/AUDIT_TRAIL.js?v=7b567a4207" defer></script>
 <script src="data/HEALTH_CHECK.js?v=9fd770c3bc" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=0c1e865127" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=a5776ef25a" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=cd593bf4b5" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=ac3a39c46f" defer></script>
@@ -10488,11 +10488,11 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=e49b01b5e0"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=5c9b55ad5a"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=e49b01b5e0';
+        return 'data/IPO_DATA.js?v=5c9b55ad5a';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
@@ -18973,7 +18973,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=826b026c8f', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=890b453be8', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=344c4ca69c', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=e50e01e60b', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
