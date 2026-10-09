@@ -9087,16 +9087,16 @@
       "board": "主板"
     }
   ],
-  "generated_at": "2026-10-09 20:39:40",
-  "update_time": "2026-10-09 20:39:40",
+  "generated_at": "2026-10-10 02:06:57",
+  "update_time": "2026-10-10 02:06:57",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖",
   "kline_stat": {
-    "cache_fresh": 93,
+    "cache_fresh": 155,
     "cache_stale": 608,
-    "net": 89,
+    "net": 27,
     "fail": 419
   },
   "degraded": false,
   "degraded_reason": "",
-  "quote_stale_days": 0
+  "quote_stale_days": 1
 }

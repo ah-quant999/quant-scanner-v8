@@ -1,54 +1,48 @@
 {
-  "update_time": "2026-10-09 21:31:33",
-  "data_date": "2026-10-09",
-  "track_start": "2026-10-09",
-  "history_days": 37,
-  "strict_count": 0,
-  "near_count": 1,
+  "update_time": "2026-10-10 02:00:06",
+  "data_date": "2026-10-10",
+  "track_start": "2026-10-10",
+  "history_days": 38,
+  "strict_count": 1,
+  "near_count": 0,
   "tracked": [
     {
-      "code": "601872",
-      "name": "招商轮船",
+      "code": "601899",
+      "name": "紫金矿业",
       "market": "sh",
       "board": "主板",
-      "status": "near",
-      "total_score": 9.9,
-      "quality_grade": "B",
-      "industry": "水上运输业",
+      "status": "strict",
+      "total_score": 23.9,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
       "sectors": [
-        "HS300",
-        "大盘价值",
-        "MSCI中国",
-        "央国企改革",
-        "周期股",
-        "天然气",
+        "反转股",
+        "有色金属矿采选业",
+        "稀缺资源",
         "2026中报预增",
-        "水上运输业"
+        "锂矿概念",
+        "一带一路",
+        "MSCI中国",
+        "机构重仓"
       ],
-      "signal_count": 2,
-      "enter_date": "2026-10-08",
-      "hold_days": 1,
-      "consecutive_days": 2,
-      "first_close": 22.03,
-      "current_close": 22.07,
-      "pnl_pct": 0.18,
+      "signal_count": 1,
+      "enter_date": "2026-08-17",
+      "hold_days": 10,
+      "consecutive_days": 1,
+      "first_close": 33.36,
+      "current_close": 30.8,
+      "pnl_pct": -7.67,
       "price_source": "quote",
       "catalysts": [
         {
           "tag": "中报预增",
           "score": 15,
-          "reaction": "观察中"
+          "reaction": "走弱"
         }
       ]
     }
   ],
   "alerts": [
-    {
-      "level": "warn",
-      "code": "601899",
-      "name": "紫金矿业",
-      "text": "紫金矿业(601899) 于 2026-09-08 跌出共识（曾连续 1 日）"
-    },
     {
       "level": "warn",
       "code": "603993",
@@ -486,41 +480,35 @@
       "code": "300450",
       "name": "",
       "text": "(300450) 于 2026-10-08 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "601872",
+      "name": "招商轮船",
+      "text": "招商轮船(601872) 于 2026-10-09 跌出共识（曾连续 2 日）"
     }
   ],
   "sector_cluster": {
     "by_industry": [
       {
-        "industry": "水上运输业",
+        "industry": "有色金属矿采选业",
         "count": 1,
         "names": [
-          "招商轮船"
+          "紫金矿业"
         ]
       }
     ],
     "by_sector": [
       {
-        "sector": "HS300",
+        "sector": "反转股",
         "count": 1
       },
       {
-        "sector": "大盘价值",
+        "sector": "有色金属矿采选业",
         "count": 1
       },
       {
-        "sector": "MSCI中国",
-        "count": 1
-      },
-      {
-        "sector": "央国企改革",
-        "count": 1
-      },
-      {
-        "sector": "周期股",
-        "count": 1
-      },
-      {
-        "sector": "天然气",
+        "sector": "稀缺资源",
         "count": 1
       },
       {
@@ -528,7 +516,19 @@
         "count": 1
       },
       {
-        "sector": "水上运输业",
+        "sector": "锂矿概念",
+        "count": 1
+      },
+      {
+        "sector": "一带一路",
+        "count": 1
+      },
+      {
+        "sector": "MSCI中国",
+        "count": 1
+      },
+      {
+        "sector": "机构重仓",
         "count": 1
       }
     ],
@@ -544,47 +544,47 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
-    "latest_date": "2026-10-02 03:57:35",
-    "total": 411,
+    "latest_date": "2026-10-09 23:55:16",
+    "total": 423,
     "best_hold_days": 10,
     "periods": {
       "1d": {
-        "win_rate": 37.8,
-        "avg_return": -1.38,
+        "win_rate": 38.3,
+        "avg_return": -1.37,
         "sharpe": -0.27,
-        "count": 381,
+        "count": 399,
         "best": 15.09,
         "worst": -12.95
       },
       "3d": {
-        "win_rate": 38.4,
-        "avg_return": -1.6,
-        "sharpe": -0.24,
-        "count": 357,
+        "win_rate": 37.8,
+        "avg_return": -1.74,
+        "sharpe": -0.27,
+        "count": 381,
         "best": 15.21,
         "worst": -13.43
       },
       "5d": {
-        "win_rate": 42.2,
-        "avg_return": -0.87,
-        "sharpe": -0.11,
-        "count": 346,
+        "win_rate": 41.2,
+        "avg_return": -1.05,
+        "sharpe": -0.13,
+        "count": 357,
         "best": 19.25,
         "worst": -15.32
       },
       "10d": {
-        "win_rate": 43.7,
-        "avg_return": -0.58,
+        "win_rate": 43.6,
+        "avg_return": -0.56,
         "sharpe": -0.06,
-        "count": 318,
+        "count": 321,
         "best": 19.25,
         "worst": -15.32
       },
       "20d": {
-        "win_rate": 35.3,
-        "avg_return": -1.6,
-        "sharpe": -0.16,
-        "count": 269,
+        "win_rate": 34.9,
+        "avg_return": -1.72,
+        "sharpe": -0.18,
+        "count": 275,
         "best": 19.25,
         "worst": -16.53
       }
@@ -593,17 +593,17 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 181,
-      "win_rate_5d": 49.3,
-      "avg_ret_5d": 0.01,
+      "count": 187,
+      "win_rate_5d": 48.0,
+      "avg_ret_5d": -0.2,
       "best_win_rate": 50.0,
-      "best_hold_days": 30
+      "best_hold_days": 45
     },
     {
       "band": "70~80",
-      "count": 230,
-      "win_rate_5d": 37.3,
-      "avg_ret_5d": -1.49,
+      "count": 236,
+      "win_rate_5d": 36.4,
+      "avg_ret_5d": -1.65,
       "best_win_rate": 42.8,
       "best_hold_days": 10
     }
@@ -612,45 +612,45 @@
     "periods": [
       {
         "period": "1d",
-        "strict_win": 37.8,
-        "strict_ret": -1.38,
-        "strict_count": 381,
+        "strict_win": 38.3,
+        "strict_ret": -1.37,
+        "strict_count": 399,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "3d",
-        "strict_win": 38.4,
-        "strict_ret": -1.6,
-        "strict_count": 357,
+        "strict_win": 37.8,
+        "strict_ret": -1.74,
+        "strict_count": 381,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "5d",
-        "strict_win": 42.2,
-        "strict_ret": -0.87,
-        "strict_count": 346,
+        "strict_win": 41.2,
+        "strict_ret": -1.05,
+        "strict_count": 357,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "10d",
-        "strict_win": 43.7,
-        "strict_ret": -0.58,
-        "strict_count": 318,
+        "strict_win": 43.6,
+        "strict_ret": -0.56,
+        "strict_count": 321,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "20d",
-        "strict_win": 35.3,
-        "strict_ret": -1.6,
-        "strict_count": 269,
+        "strict_win": 34.9,
+        "strict_ret": -1.72,
+        "strict_count": 275,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -659,8 +659,8 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-10-09",
-    "history_days": 37,
+    "track_start": "2026-10-10",
+    "history_days": 38,
     "summary": {
       "1d": {
         "count": 54,
@@ -678,14 +678,14 @@
         "avg_return": -0.69
       },
       "10d": {
-        "count": 33,
-        "win_rate": 33.33,
-        "avg_return": -0.72
+        "count": 36,
+        "win_rate": 30.56,
+        "avg_return": -1.36
       },
       "20d": {
-        "count": 21,
-        "win_rate": 14.29,
-        "avg_return": -7.01
+        "count": 23,
+        "win_rate": 17.39,
+        "avg_return": -6.14
       }
     },
     "per_stock": [
@@ -1062,7 +1062,8 @@
         "offsets": {
           "1d": 0.0,
           "3d": -0.46,
-          "10d": -3.65
+          "10d": -3.65,
+          "20d": -11.49
         }
       },
       {
@@ -1071,7 +1072,8 @@
         "enter_date": "2026-09-12",
         "offsets": {
           "1d": 0.0,
-          "3d": -0.4
+          "3d": -0.4,
+          "20d": 17.46
         }
       },
       {
@@ -1291,7 +1293,8 @@
         "offsets": {
           "1d": 1.84,
           "3d": -2.31,
-          "5d": -4.44
+          "5d": -4.44,
+          "10d": -0.59
         }
       },
       {
@@ -1301,7 +1304,8 @@
         "offsets": {
           "1d": -1.68,
           "3d": -1.42,
-          "5d": -2.27
+          "5d": -2.27,
+          "10d": -7.08
         }
       },
       {
@@ -1311,7 +1315,8 @@
         "offsets": {
           "1d": 4.26,
           "3d": -0.36,
-          "5d": -4.96
+          "5d": -4.96,
+          "10d": -17.32
         }
       },
       {
