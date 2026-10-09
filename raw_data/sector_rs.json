@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-09 21:32",
+  "update_time": "2026-10-09 23:14",
   "data_date": "2026-10-09",
   "data_date_source": "kline",
   "fetch_date": "2026-10-09",
@@ -1167,14 +1167,14 @@
       "pct_60d": -3.83,
       "pct_90d": -18.89,
       "pct_180d": -14.23,
-      "pct_52w": -18.21,
+      "pct_52w": null,
       "relative_5d": -5.79,
       "relative_20d": -7.07,
       "relative_30d": -5.55,
       "relative_60d": -3.83,
       "relative_90d": -18.89,
       "relative_180d": -14.23,
-      "relative_52w": -18.21
+      "relative_52w": null
     },
     {
       "name": "通信设备",
