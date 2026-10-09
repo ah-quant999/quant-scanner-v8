@@ -15000,19 +15000,20 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       var h = '';
 
       /* ── ① 隔夜大盘锚（三大指数，显式 secid 取，非探测）── */
+      /* 2026-10-09 主人令：bias 标签从行尾（margin-left:auto，指数名多时被挤出视野）移到「隔夜美股大盘」标签后紧跟显示 */
       var ai = d.us_indices || [];
+      var _bc = (String(d.bias || '').indexOf('偏强') >= 0) ? 'var(--up)'
+              : ((String(d.bias || '').indexOf('偏弱') >= 0) ? 'var(--down)' : 'var(--sub)');
       if(ai.length){
         h += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 11px;margin-bottom:10px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.25);border-radius:7px;font-size:12.5px;">';
         h += '<span style="color:#a78bfa;font-weight:700;">&#x1F6F0; 隔夜美股大盘</span>';
+        h += '<span style="font-weight:700;color:' + _bc + ';">' + _esc(d.bias || '') + '</span>';
         ai.forEach(function(a){
           h += '<span style="color:var(--sub);">' + _esc(a.name)
              + ' <b style="color:' + _col(a.pct) + ';">' + _pct(a.pct) + '</b>'
              + (a.price == null ? '' : ' <span style="color:var(--dim);">' + Number(a.price).toFixed(2) + '</span>')
              + '</span>';
         });
-        var _bc = (String(d.bias || '').indexOf('偏强') >= 0) ? 'var(--up)'
-                : ((String(d.bias || '').indexOf('偏弱') >= 0) ? 'var(--down)' : 'var(--sub)');
-        h += '<span style="margin-left:auto;font-weight:700;color:' + _bc + ';">' + _esc(d.bias || '') + '</span>';
         h += '</div>';
       }
 
