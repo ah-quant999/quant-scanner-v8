@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-09 11:59:29",
+  "update_time": "2026-10-09 12:49:35",
   "status": "ok",
   "process": {
     "ok": true,
@@ -18,12 +18,12 @@
     "ok": true,
     "errors": [
       {
-        "file": "Worker_20261009-025838-utc.log",
+        "file": "Worker_20261009-040446-utc.log",
         "pattern": "exit code 128",
         "desc": "git退出码128",
         "level": "warn",
         "count": 2,
-        "mtime": "2026-10-09 11:38:59"
+        "mtime": "2026-10-09 12:35:55"
       }
     ],
     "scanned": 1,
@@ -35,11 +35,11 @@
     "checkout_failures": 0,
     "latest_run_id": 37880573222,
     "latest_failed": false,
-    "latest_status": "pending",
+    "latest_status": "completed",
     "stuck_min": 0,
     "is_fail": false,
     "is_warn": false,
-    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) pending"
+    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) completed"
   },
   "runner_env": {
     "ok": true,
@@ -47,7 +47,7 @@
     "message": "阈值=2000（一劳永逸目标 2000）"
   },
   "actions_taken": [],
-  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=扫描 1 份日志，发现 1 类错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) pending",
+  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=扫描 1 份日志，发现 1 类错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) completed",
   "run_time": "2026-10-09 11:55:15",
   "category": "intraday",
   "hostname": "LEMONCAT",
