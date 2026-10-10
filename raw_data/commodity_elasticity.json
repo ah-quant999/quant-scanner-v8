@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-10 17:07:16",
+  "update_time": "2026-10-10 17:34:13",
   "data_date": "2026-10-10",
   "source": "三通道: MACRO_DATA(gold/silver/copper/oil) + Sina免费外盘期货(LME/NYMEX/CBOT共15个，westock-mcp不可用/缓存陈旧时兜底) + eastmoney-push2国内期货(GFEX碳酸锂+ZCE纯碱)",
   "hot_count": 0,
@@ -697,35 +697,35 @@
       "current_price": 1001.0,
       "price_date": "",
       "source": "eastmoney-push2(郑商所·纯碱主力)",
-      "baseline_30d": 1053.4,
+      "baseline_30d": 1051.167,
       "baseline_label": "30日z-score",
-      "dev_pct": -4.97,
+      "dev_pct": -4.77,
       "is_hot": false,
-      "hot_basis": "z-score=-1.601(σ=32.732, μ=1053.4)",
-      "z_score": -1.601,
-      "ma30": 1053.4,
-      "std30": 32.732,
+      "hot_basis": "z-score=-1.477(σ=33.964, μ=1051.167)",
+      "z_score": -1.477,
+      "ma30": 1051.167,
+      "std30": 33.964,
       "use_zscore": true,
       "stocks": [
         {
           "code": "000822",
           "name": "山东海化",
           "business_pct": 0.75,
-          "elasticity_pct": -180.11,
+          "elasticity_pct": -166.16,
           "note": "纯碱+小苏打"
         },
         {
           "code": "000683",
           "name": "远兴能源",
           "business_pct": 0.85,
-          "elasticity_pct": -204.13,
+          "elasticity_pct": -188.32,
           "note": "天然碱低成本"
         },
         {
           "code": "000707",
           "name": "双环科技",
           "business_pct": 0.9,
-          "elasticity_pct": -216.13,
+          "elasticity_pct": -199.4,
           "note": "联碱法"
         }
       ]
