@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-11 01:19",
+  "update_time": "2026-10-11 01:57",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -412,8 +412,8 @@
       "source": "本地累加",
       "consecutive_days": 3,
       "trend": "in",
-      "net_5d_days": 34,
-      "net_20d_days": 34
+      "net_5d_days": 5,
+      "net_20d_days": 20
     },
     {
       "name": "证券",
@@ -916,8 +916,8 @@
       "source": "本地累加",
       "consecutive_days": 3,
       "trend": "in",
-      "net_5d_days": 34,
-      "net_20d_days": 34
+      "net_5d_days": 5,
+      "net_20d_days": 20
     },
     {
       "name": "证券",
