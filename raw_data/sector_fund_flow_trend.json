@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-11 02:54",
+  "update_time": "2026-10-11 03:49",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -412,8 +412,8 @@
       "source": "本地累加",
       "consecutive_days": 3,
       "trend": "in",
-      "net_5d_days": 34,
-      "net_20d_days": 34
+      "net_5d_days": 5,
+      "net_20d_days": 20
     },
     {
       "name": "证券",
@@ -916,8 +916,8 @@
       "source": "本地累加",
       "consecutive_days": 3,
       "trend": "in",
-      "net_5d_days": 34,
-      "net_20d_days": 34
+      "net_5d_days": 5,
+      "net_20d_days": 20
     },
     {
       "name": "证券",
@@ -1288,6 +1288,22 @@
       "trend": "in"
     },
     {
+      "name": "DeepSeek概念",
+      "net": 57.73,
+      "net_5d": 142.95,
+      "net_20d": 151.82,
+      "type": "概念",
+      "net_5d_days": 5,
+      "net_10d": 95.5,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d": 124.3,
+      "net_60d_days": 46,
+      "source": "本地累加",
+      "consecutive_days": 3,
+      "trend": "in"
+    },
+    {
       "name": "同花顺中特估100",
       "net": 30.34,
       "net_5d": 133.33,
@@ -1322,17 +1338,6 @@
       "net_5d_days": 5,
       "source": "本地累加",
       "consecutive_days": 9,
-      "trend": "in"
-    },
-    {
-      "name": "钠离子电池",
-      "net": 33.79,
-      "net_5d": 116.43,
-      "net_20d": 0,
-      "type": "概念",
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "consecutive_days": 8,
       "trend": "in"
     }
   ],
@@ -1552,6 +1557,18 @@
       "net_60d_days": 41
     },
     {
+      "name": "人形机器人",
+      "net": -64.99,
+      "net_5d": 0,
+      "net_20d": 272.05,
+      "net_60d": 422.92,
+      "type": "行业",
+      "consecutive_days": 4,
+      "trend": "out",
+      "net_20d_days": 20,
+      "net_60d_days": 39
+    },
+    {
       "name": "半导体",
       "net": -72.44,
       "net_5d": -379.79,
@@ -1673,34 +1690,20 @@
       "net_60d_days": 30
     },
     {
-      "name": "医疗服务",
-      "net": -13.22,
-      "net_5d": 66.09,
-      "net_20d": 151.26,
-      "net_60d": 55.46,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "out",
+      "name": "DeepSeek概念",
+      "net": 57.73,
+      "net_5d": 142.95,
+      "net_20d": 151.82,
+      "type": "概念",
       "net_5d_days": 5,
-      "net_10d": 148.03,
+      "net_10d": 95.5,
       "net_10d_days": 10,
       "net_20d_days": 20,
-      "net_60d_days": 52
-    },
-    {
-      "name": "汽车芯片",
-      "net": -52.36,
-      "net_5d": -130.17,
-      "net_20d": 144.69,
-      "net_60d": 406.83,
-      "type": "行业",
-      "consecutive_days": 7,
-      "trend": "out",
-      "net_5d_days": 5,
-      "net_10d": -130.19,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 40
+      "net_60d": 124.3,
+      "net_60d_days": 46,
+      "source": "本地累加",
+      "consecutive_days": 3,
+      "trend": "in"
     }
   ],
   "trend_60d": [
@@ -1781,6 +1784,21 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 50
+    },
+    {
+      "name": "F5G概念",
+      "net": -58.97,
+      "net_5d": -109.02,
+      "net_20d": 91.75,
+      "net_60d": 690.85,
+      "type": "概念",
+      "consecutive_days": 2,
+      "trend": "out",
+      "net_5d_days": 5,
+      "net_10d": -221.1,
+      "net_10d_days": 10,
+      "net_20d_days": 20,
+      "net_60d_days": 43
     },
     {
       "name": "消费电子概念",
@@ -1869,21 +1887,6 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 46
-    },
-    {
-      "name": "半导体",
-      "net": -72.44,
-      "net_5d": -379.79,
-      "net_20d": 258.93,
-      "net_60d": 427.3,
-      "type": "行业",
-      "consecutive_days": 6,
-      "trend": "out",
-      "net_5d_days": 5,
-      "net_10d": -573.99,
-      "net_10d_days": 10,
-      "net_20d_days": 20,
-      "net_60d_days": 51
     }
   ]
 }
