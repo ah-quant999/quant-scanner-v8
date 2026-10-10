@@ -1,13 +1,8 @@
 {
-  "update_time": "2026-10-10 03:18:03",
-  "run_start": "2026-10-10 02:49:17",
-  "ok": 10,
-  "fail": 1,
-  "failed_scripts": [
-    {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
-    }
-  ],
+  "update_time": "2026-10-10 16:04:04",
+  "run_start": "2026-10-10 15:38:13",
+  "ok": 14,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }
