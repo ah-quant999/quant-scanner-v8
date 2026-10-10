@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-10 16:24:25",
+  "update_time": "2026-10-10 22:54:26",
   "total": 621,
   "grade_summary": {
     "A": 26,
@@ -6291,6 +6291,15 @@
       "reason": "ROE差(-0.9%) | 营收持平(9.1%)",
       "cf_queried": true
     },
+    "sz_301292": {
+      "score": 55,
+      "grade": "C",
+      "roe": 14.414399999999999,
+      "revenue_growth": 40.3316,
+      "reason": "ROE一般(14.4%) | 营收高增(40.3%)",
+      "cfo_to_asset": -1.19,
+      "cf_queried": true
+    },
     "sz_301297": {
       "score": 0,
       "grade": "D",
@@ -6510,18 +6519,6 @@
           "三季报略增"
         ]
       }
-    },
-    "sz_301292": {
-      "score": 55,
-      "grade": "C",
-      "roe": 14.414399999999999,
-      "revenue_growth": 40.3316,
-      "reason": "ROE一般(14.4%) | 营收高增(40.3%)",
-      "statDate": "2026-06-30",
-      "cfo_to_asset": -1.19,
-      "cfo_to_or": -0.0296,
-      "asset_turn": 0.4033,
-      "cf_queried": true
     }
   }
 }

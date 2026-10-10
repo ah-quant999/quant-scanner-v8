@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-10-10 16:36:04",
-  "summary": "上证指数涨0.05%。",
+  "update_time": "2026-10-10 23:03:59",
+  "summary": "上证指数涨0.05%，涨停69只、跌停0只。情绪积极。",
   "indices": [
     {
       "name": "上证指数",
@@ -54,5 +54,11 @@
   ],
   "top_sectors": [],
   "bottom_sectors": [],
-  "mood": {}
+  "mood": {
+    "up": 3039,
+    "down": 2122,
+    "flat": 126,
+    "limit_up": 69,
+    "limit_down": 0
+  }
 }
