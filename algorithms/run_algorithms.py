@@ -197,7 +197,7 @@ ORDER = [
     # 🔴 2026-10-11 主人令「完全下架」：calc_crds.py 已摘链（逆势龙头真实池回测全档败，见预算表处注释）。
     # "calc_crds.py",
     "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（B批最前：final_recommend 前必产完，因子融合用当日新鲜因子；2026-09-09 主人令由 E 前置至此）
-    "algorithms/gen_lqsq_top30.py",    # 🚀 2026-10-11 主人令：量质双擎每日生成器（读 factor_lab 的 kline_cache 全市场打分选 Top30 → lqsq_history 真实流归档 + LQSQ_BACKTEST 主榜视图；上线首日即建归档）
+    "algorithms/gen_lqsq_top30.py",    # 🚀 2026-10-11 主人令：量质双擎每日生成器（kline_cache 副产物缓存 + 自刷新 GTimg 700根整根替换 → 全市场异常量比打分选 Top30 → lqsq_history 真实流归档 + LQSQ_BACKTEST 主榜视图；上线首日即建归档）
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
     # 🛡 2026-08-29 主人令：A/B 对照（金股池/候选池/全市场同一信号收益），每日累积信号、T+N 后回填收益。

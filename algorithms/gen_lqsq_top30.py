@@ -69,7 +69,7 @@ EXT_BARS = 700            # 扩展缓存/拉取根数（覆盖 261+240+余量）
 EXT_MIN_LEN = 300         # 视为「根数足够」的下限（<MIN_HISTORY+BASELINE 缓冲）
 STALE_SKIP_DAYS = 60      # 末根落后超过 60 个自然日的僵尸股跳过不拉（反正被数据日对齐剔除）
 REFRESH_WORKERS = 6       # 云端并发拉取线程数（GTimg 轻量 HTTP，6 并发 ≈ 20 QPS）
-REFRESH_BUDGET_SEC = float(os.environ.get("LQSQ_REFRESH_BUDGET_SEC", "840"))
+REFRESH_BUDGET_SEC = float(os.environ.get("LQSQ_REFRESH_BUDGET_SEC", "780"))  # 链内 900s 预算留 120s 收尾；云端 6 并发日常实拉 ~280s 远够
 
 _T0 = time.time()
 
