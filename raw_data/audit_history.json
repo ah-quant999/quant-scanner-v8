@@ -3355,5 +3355,33 @@
     "message": "更新于 2天前 02:58；超过阈值 2670 分钟"
    }
   ]
+ },
+ {
+  "date": "2026-10-12",
+  "time": "03:05:57",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 117,
+   "warn": 0,
+   "fail": 2,
+   "limited": 1,
+   "info": 0,
+   "other": 0,
+   "total": 120
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "DO_NOT_DELETE",
+    "name": "防误删清单",
+    "message": "更新于 10-05 02:33；超过阈值 10080 分钟"
+   },
+   {
+    "id": "WAVE_ELLIOTT",
+    "name": "艾略特波浪·深度分析",
+    "message": "更新于 4天前 16:51；超过阈值 4130 分钟"
+   }
+  ]
  }
 ]
