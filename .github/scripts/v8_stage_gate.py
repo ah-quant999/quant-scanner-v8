@@ -224,7 +224,9 @@ READY_SPEC: dict[str, dict] = {
         #   修法：纳入 5 个刚从 experiments workflow 收编的新产物，使「B 批已就绪」
         #   必须以它们也鲜活为前提 —— 标本兼治（挂链 + 闸门双向对齐）。
         "items": [
-            "data/TRIPLE_CONSENSUS.js", "data/FOUR_VOLUME.js", "data/CRDS_CARD_DATA.js",
+            # 🔴 2026-10-11 主人令「完全下架」：TRIPLE_CONSENSUS.js / CRDS_CARD_DATA.js 移出
+            #   （两策略下架，生成器已摘链、data 文件已删 ⇒ 这两项永不产出，留在清单=恒陈旧）。
+            "data/FOUR_VOLUME.js",
             "raw_data/ai_insights_compare.json",
             "raw_data/factor_audit.json",
             "raw_data/factor_progress.json",
@@ -261,7 +263,9 @@ READY_SPEC: dict[str, dict] = {
             "data/FOUR_VOLUME_HISTORY.js",
             "data/FOUR_VOLUME_TRACK.js",
         ],
-        "need": 8,
+        # 🔴 2026-10-11 主人令「完全下架」：items 12→10（TRIPLE/CRDS_CARD_DATA 移出），
+        #   need 8→6 —— 保持「容忍 4 项不新鲜」语义不变（10-4=6）。
+        "need": 6,
         # need 用 8/9：3 个核心选股产物 + 5 个收编产物 + gold_pool，即「只容忍 1 项不新鲜」。
         #   ⚠️ 为何不是 5：实测发现 dedup 去重器会把「内容天然稳定」的卡判为伪变更而丢弃
         #   （见 .github/scripts/dedup_fetch_manifest.py 的 _ALWAYS_PUSH）。在去重器修好之前，
@@ -278,10 +282,13 @@ READY_SPEC: dict[str, dict] = {
         #   四量终极 / 逆势龙头时，闸门仍判「B 已就绪」→ 空转 → 三张核心卡整日停更
         #   而全链零红灯（主人 09-12 令「必新」在 B 批从未真正生效）。
         #   🔴 与 dedup 的联动不变式（缺一即锁死，详见 dedup_fetch_manifest.py::_ALWAYS_PUSH）：
-        #      must 项必须同时在 _ALWAYS_PUSH 中，否则内容天然稳定的 must 项
-        #      （FOUR_VOLUME 长期命中 0 只 ⇒ 剥时间戳后逐字节相同）会被判「伪变更」永不推送
-        #      ⇒ update_time 恒旧 ⇒ must 恒不满足 ⇒ B 批每轮重跑 60~90min 永不收敛。
-        "must": ["data/TRIPLE_CONSENSUS.js", "data/FOUR_VOLUME.js", "data/CRDS_CARD_DATA.js"],
+        #   🔴 2026-10-11 主人令「完全下架」：must 由 3 项缩为 1 项 —— TRIPLE_CONSENSUS /
+        #      CRDS_CARD_DATA 已下架移除，唯余 FOUR_VOLUME.js（B 批必产核心卡）。
+        #      🔴 与 dedup 的联动不变式不变（缺一即锁死，详见 dedup_fetch_manifest.py::_ALWAYS_PUSH）：
+        #         must 项必须同时在 _ALWAYS_PUSH 中，否则内容天然稳定的 must 项
+        #         （FOUR_VOLUME 长期命中 0 只 ⇒ 剥时间戳后逐字节相同）会被判「伪变更」永不推送
+        #         ⇒ update_time 恒旧 ⇒ must 恒不满足 ⇒ B 批每轮重跑 60~90min 永不收敛。
+        "must": ["data/FOUR_VOLUME.js"],
     },
     "D": {"items": ["data/FINAL_RECOMMEND_DATA.js"], "need": 1, "must": []},
     # 🔴 2026-09-12 主人令（拍板第 2 项·一劳永逸）：E 批就绪清单 2 → 3 项，need 1 → 2。
@@ -303,7 +310,10 @@ READY_SPEC: dict[str, dict] = {
     # 🔴 2026-09-14 主人令更正：候选池 / 金股池(=黄金池) 是算法**上游水源**（B 批基础股池），
     #   不是选股策略 ⇒ **不需要回测**。原 5 项 / need 4 里的两池回测已移除（3 项 / need 2），
     #   同时删除 algorithms/backtest_pools.py 与 data/{CANDIDATE,GOLD_POOL}_BACKTEST.js。
-    "E": {"items": ["data/CRDS_BACKTEST.js", "data/BACKTEST_TDX.js",
+    # 🔴 2026-10-11 主人令「完全下架」：CRDS_BACKTEST.js 移出（逆势龙头下架，回测脚本已摘链，
+    #   data/CRDS_BACKTEST.js 已删）。items 3→2；need 2 与 must=[ALL_ALGOS, TDX] 不变
+    #   ⇒ 语义收紧为「两项必须新」，比原「2+1 任一」更严但两者本就是同批必产，无锁死风险。
+    "E": {"items": ["data/BACKTEST_TDX.js",
                     "data/BACKTEST_ALL_ALGOS.js"], "need": 2,
           # 🔴 2026-09-18 阿狸咪的工程师（双盲区根治·P0）：must 补入 BACKTEST_TDX。
           #   根因（实测闭环）：原它只占 items（need=2 的「任一」位）⇒ 陈旧**不阻塞**就绪；
@@ -490,14 +500,11 @@ def _escape_gate(root: str, day: str) -> tuple[bool, str, int]:
 #   基准只挑「单一来源、写一次就固定」的产物，避免被后续抓取链刷新导致反复重算。
 SEQ_REF: dict[str, str] = {
     "B": "data/LHB_DATA.js",             # A 批核心标志（17:30 落盘后不再变）
-    "D": "data/TRIPLE_CONSENSUS.js",     # B 批代表产物
-    # 🔴🔴 2026-09-17 一劳永逸（小九，同 PREREQ 处说明）：原值 = "data/FINAL_RECOMMEND_DATA.js"（D 批产物）。
-    #   该基准把 E 的「就绪」判定绑死在 D 的时间戳上（check_ready L444-454：E 产物早于基准即判未就绪需重算），
-    #   与 PREREQ 双锁叠加 ⇒ 即使 PREREQ 改了，E 仍会被本行卡住。故必须同改。
-    #   新值 = B 批代表产物，与 D 同基准（语义自洽：E 与 D 同依赖 B，互为平行兄弟）。
-    #   ⚠️ 基准须满足「单一来源、写一次就固定」：TRIPLE_CONSENSUS.js 由 B 批 gen_triple_consensus.py
-    #     一次产出，不被后续抓取链刷新 ⇒ 符合要求。
-    "E": "data/TRIPLE_CONSENSUS.js",     # B 批代表产物（2026-09-17 由 D 批产物改；解 E 被 D 串死）
+    # 🔴 2026-10-11 主人令「完全下架」：D/E 基准锚由 data/TRIPLE_CONSENSUS.js（已下架删除）改为
+    #   data/FOUR_VOLUME.js —— 同为 B 批生成器一次产出、不被后续抓取链刷新，满足「单一来源、
+    #   写一次就固定」要求；且它是 B 批 must 必新项，鲜活性由双重机制保证。
+    "D": "data/FOUR_VOLUME.js",          # B 批代表产物
+    "E": "data/FOUR_VOLUME.js",          # B 批代表产物（2026-09-17 由 D 批产物改；解 E 被 D 串死）
 }
 
 

@@ -40,7 +40,6 @@ WEEKLY_TRACK = [
     ("gold_pool.json",           "黄金池"),
     ("candidate.json",           "候选池"),
     ("four_volume.json",         "四量终极"),
-    ("crds_card_data.json",      "逆势龙头"),
 ]
 
 

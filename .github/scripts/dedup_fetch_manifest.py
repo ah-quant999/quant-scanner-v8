@@ -85,9 +85,8 @@ _ALWAYS_PUSH = {
     #     ⇒ 该批每轮判「未就绪」→ 重跑 60~90min → **永久不收敛**（比不加 must 更危险）。
     #   实证风险路径：FOUR_VOLUME 长期命中 0 只时其 stocks 恒为空 ⇒ 内容稳定 ⇒ 必被丢弃。
     #   ⇒ 凡把某项写进 READY_SPEC 的 must，本白名单必须同步添加（两处联动，缺一即锁死）。
-    "data/TRIPLE_CONSENSUS.js",       # READY_SPEC["B"].must
+    # 🔴 2026-10-11 主人令「完全下架」：TRIPLE_CONSENSUS.js / CRDS_CARD_DATA.js 两行移除（策略下架）
     "data/FOUR_VOLUME.js",            # READY_SPEC["B"].must
-    "data/CRDS_CARD_DATA.js",         # READY_SPEC["B"].must
     "data/BACKTEST_ALL_ALGOS.js",     # READY_SPEC["E"].must
     # 🔴 2026-09-14 摘除（主人令「候选池 / 金股池是算法**上游水源**，不是策略，不需要回测」）：
     #   原此二行 `data/CANDIDATE_BACKTEST.js` / `data/GOLD_POOL_BACKTEST.js`（标注
@@ -136,7 +135,7 @@ _ALWAYS_PUSH = {
     "raw_data/sector_fund_flow_trend.json",# READY_SPEC["A"].items
     "raw_data/market_alerts.json",         # READY_SPEC["A"].items
     "data/FINAL_RECOMMEND_DATA.js",        # READY_SPEC["D"].items（need=1，零余量，最高危）
-    "data/CRDS_BACKTEST.js",               # READY_SPEC["E"].items
+    # 🔴 2026-10-11 主人令「完全下架」：CRDS_BACKTEST.js 行移除（E 批 items 已删该项）
     "data/BACKTEST_TDX.js",                # READY_SPEC["E"].must（2026-09-18 由 items 提为 must —— 双盲区根治，见 v8_stage_gate.py E 段注释）
     # ── 🛡 2026-09-13 同步 stage_gate 的「A 批 9 项纳入」────────────────
     #   契约同前：凡 READY_SPEC[*] 的 items 一律纳入本白名单（一一对应，可断言）。

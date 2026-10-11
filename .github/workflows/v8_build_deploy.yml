@@ -523,9 +523,6 @@ jobs:
             git add data/ index.html logic.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
               raw_data/sh_sz_history.json \
               raw_data/sector_fund_flow_history.json \
-              raw_data/triple_resonance_history.json \
-              raw_data/triple_history.json \
-              raw_data/triple_track.json \
               raw_data/h_auto_buy_history.json \
               raw_data/lhb_history.json \
               raw_data/stock_profile.json
@@ -576,9 +573,6 @@ jobs:
               git add data/ index.html logic.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
                 raw_data/sh_sz_history.json \
                 raw_data/sector_fund_flow_history.json \
-                raw_data/triple_resonance_history.json \
-                raw_data/triple_history.json \
-                raw_data/triple_track.json \
                 raw_data/h_auto_buy_history.json \
                 raw_data/lhb_history.json \
                 raw_data/stock_profile.json

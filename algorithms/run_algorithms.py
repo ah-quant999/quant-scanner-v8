@@ -159,7 +159,7 @@ PUSH = os.environ.get("V8_PUSH", "0") == "1"
 INPUTS_FROM_V6 = [
     "gold_pool.json",
     "scan_result.json",
-    "watch_result.json",       # calc_crds 的输入（逆势龙头候选），过渡期由 v6 scanner 供给
+    # 🔴 2026-10-11 主人令「完全下架」：watch_result.json 条目移除（其唯一消费者 calc_crds 已删）
     "guanlan_watchlist.json",
     "guanlan_reports.json",
     "maharo_signals.json",

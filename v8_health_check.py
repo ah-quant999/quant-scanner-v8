@@ -212,7 +212,8 @@ CARD_DEFS = [
     {"id": "GOLD_POOL", "name": "黄金池", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
     {"id": "LHB_DATA", "name": "龙虎榜", "page": "共振日历", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
     {"id": "INST_TRADE", "name": "机构买卖", "page": "运维", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top_buy", "top_sell"], "heal_cat": "algo_run", "raw_file": "inst_trade.json"},  # 🛡 2026-09-10 一劳永逸：raw_file 交叉校验，根治「raw已新/js待D批重建」误报 fail
-    {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
+    # 🔴 2026-10-11 主人令「完全下架」：TRIPLE_CONSENSUS / CRDS_CARD_DATA / TRIPLE_HISTORY 三条
+    #   CARD_DEFS 登记项移除（两策略下架，生成器摘链、data 文件已删 ⇒ 留在注册表=每日审计恒红灯）。
     # 2026-08-29 一劳永逸：MARKET_REGIME / SECTOR_RECOMMENDATION 由 market_regime.py / sector_recommendation.py
     #   每日盘后产出，原属通用全量审计分支（被 parse_time T 格式误伤判黄灯）。正式纳入 CARD_DEFS：
     #   · 健康检查按 24h 红线（交易所/宏观日频数据，1440min）
@@ -225,7 +226,6 @@ CARD_DEFS = [
     {"id": "SECTOR_RECOMMENDATION", "name": "板块推荐", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["regime", "current_rates", "trends", "meta"], "heal_cat": "algo_run"},
     # 选股策略
     {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
-    {"id": "CRDS_CARD_DATA", "name": "逆势龙头", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["elite", "watch"], "heal_cat": "algo_run", "picking": True},
     # 🔴 2026-09-11 主人令（选项A·软告警→硬告警）：FOUR_VOLUME_60M 由「低频白名单（仅 >7 天才告警）」
     #   升为**正式登记卡**，按 24h 红线判定。
     #   原白名单理由（2026-08-27）是「baostock 60min 源本身滞后 → 常陈旧 → 误报红灯」，该前提自
@@ -252,7 +252,6 @@ CARD_DEFS = [
 
 
 
-    {"id": "TRIPLE_HISTORY", "name": "三重历史", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     # 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」（历史追踪 + 跟踪/前向回测）。
     #   与 FOUR_VOLUME / FOUR_VOLUME_60M 同页同批（B 批盘后算法链），故 picking=True：
     #   ① 新鲜度按「交易日」判定（根治周末/节假日整日误标红）；
@@ -2847,14 +2846,15 @@ def check_site_dom(site_html=None):
     # 静态 HTML 内是空壳/“加载中…”占位符（旧 critical_ids 中 4 个 id 已删除）。
     # 故改为：① 关键容器存在性检查（缺失=fail）；② 静态占位符（空/加载中）=warn（JS 渲染属常态）。
     # 🛡 2026-09-11 移除 phMacroBody（opTab4 已删，HTML 中无此元素，DOM 检查永久 fail 假阳性）
-    critical_ids = ["taskScheduleBody", "ttBackBody", "ttThrBody", "ttSvlBody", "ttTrackBody",
-                    "stcrdsAdvBody", "stcrdsEliteBody", "runnerTrackBody", "healthCheckBody"]
+    # 🔴 2026-10-11 主人令「完全下架」：ttBack/ttThr/ttSvl/ttTrack（三重跟踪页 DOM）与
+    #   stcrdsAdv/stcrdsElite（逆势龙头页 DOM）6 锚随两策略下架移除（index.html 已无这些元素，
+    #   留在清单=每日审计 6 条「未找到元素」假 fail）。
+    critical_ids = ["taskScheduleBody", "runnerTrackBody", "healthCheckBody"]
     # 🛡 2026-09-22 主人令「审计实打实」升级：下列容器由 JS 从 data/*.js 动态渲染，静态 HTML 内是空壳/
     #   “加载中…”占位符属设计行为（2026-08-08 重构说明已载明），每日 audit 据此报 8 条**永久 warn 噪声**，
     #   把 LHB/FOUR_VOLUME 等真问题稀释。修正：这些 id 仅做“存在性”检查（缺失=fail）；占位符态一律记 ok
     #   （数据新鲜度由 check_data_cards 独立查），不再占用 warn 位 ⇒ 每日审计只暴露真实异常。
-    JS_RENDERED_OK = {"taskScheduleBody", "ttBackBody", "ttThrBody", "ttSvlBody", "ttTrackBody",
-                      "stcrdsAdvBody", "stcrdsEliteBody", "runnerTrackBody", "healthCheckBody"}
+    JS_RENDERED_OK = {"taskScheduleBody", "runnerTrackBody", "healthCheckBody"}
     results = []
     for cid in critical_ids:
         m = re.search(rf'id=["\']{re.escape(cid)}["\'][^>]*>(.*?)</[^>]+>', site_html, re.S)
@@ -2980,8 +2980,7 @@ _A_SHARE_POOLS = [
     # (data/*.js 路径, window var 名, 卡片名, heal_cat)
     ("CANDIDATE.js",            "CANDIDATE",            "候选池",       "algo_run"),
     ("GOLD_POOL.js",            "GOLD_POOL",            "黄金池",       "algo_run"),
-    ("TRIPLE_CONSENSUS.js",     "TRIPLE_CONSENSUS",     "三重共识",     "algo_run"),
-    ("CRDS_CARD_DATA.js",       "CRDS_CARD_DATA",       "逆势龙头",     "algo_run"),
+    # 🔴 2026-10-11 主人令「完全下架」：TRIPLE_CONSENSUS.js / CRDS_CARD_DATA.js 两行移除（策略下架，文件已删）
     ("FOUR_VOLUME.js",          "FOUR_VOLUME",          "四量终极",     "algo_run"),
     ("LHB_DATA.js",             "LHB_DATA",             "龙虎榜",       "cn_fetch"),
     ("FINAL_RECOMMEND_DATA.js", "FINAL_RECOMMEND_DATA", "最终推荐",     "algo_run"),

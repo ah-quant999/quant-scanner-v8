@@ -5,7 +5,7 @@
 产出 data/STOCK_STOP_DATA.js（window.STOCK_STOP_DATA），为「今日可入手候选」卡片与
 个股查询界面提供固定10%止损 + R:R=1.5止盈的统一口径。
 
-候选宇宙：TRIPLE_CONSENSUS + FOUR_VOLUME + GOLD_POOL（COCKPIT_TIER_RECOMMEND 源已随 09-03 主人令「干掉驾驶舱」移除）
+候选宇宙：FOUR_VOLUME + GOLD_POOL（🔴 2026-10-11 主人令：TRIPLE_CONSENSUS 源随三重共识下架移除；COCKPIT_TIER_RECOMMEND 源已随 09-03 主人令「干掉驾驶舱」移除）
 （金股池虽已移出候选卡，但其独立卡片与个股查询仍可用精确止损，故一并计算）。
 """
 import json
@@ -66,11 +66,7 @@ def collect_universe():
             "name": s.get("name", ""),
         }
 
-    tc = load_js("TRIPLE_CONSENSUS.js")
-    if tc:
-        for s in tc.get("stocks", []) or []:
-            add(s)
-
+    # 🔴 2026-10-11 主人令「完全下架」：TRIPLE_CONSENSUS 宇宙源移除（策略下架，data 文件已删）
     # 2026-09-04 主人令收尾：COCKPIT_TIER_RECOMMEND(tier_a) 宇宙源已删（驾驶舱模块下线）
 
     fv = load_js("FOUR_VOLUME.js")

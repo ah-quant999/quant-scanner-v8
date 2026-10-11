@@ -341,9 +341,8 @@ CATEGORY_MAP = {
     "SECTOR_FUND_FLOW_TREND": "post_close",
     "GOLD_POOL": "post_close",
     "CANDIDATE": "post_close",
-    "TRIPLE_CONSENSUS": "post_close",
-    "TRIPLE_TRACK": "post_close",
-    "TRIPLE_HISTORY": "post_close",
+    # 🔴 2026-10-11 主人令「完全下架」：TRIPLE_CONSENSUS / TRIPLE_TRACK / TRIPLE_HISTORY /
+    #   CRDS_CARD_DATA 四行随两策略下架移除（生成器摘链、data 文件已删）。
     # 🆕 2026-09-15 主人令：四量终极历史追踪 + 跟踪/前向回测（B 批盘后算法链产出，与三重同档）。
     #   → _file_category() 返回 {"post_close"} → _pure_pc=True → 仅盘后 --category 构建重建（正确）
     "FOUR_VOLUME_HISTORY": "post_close",
@@ -355,7 +354,6 @@ CATEGORY_MAP = {
     "SH_FIB": "post_close",
     "SZ_FIB": "post_close",
     "INST_TRADE": "post_close",
-    "CRDS_CARD_DATA": "post_close",
     # 2026-09-04 主人令收尾：COCKPIT_TIER_RECOMMEND/COCKPIT_ADVICE/COCKPIT_BACKTEST heal 分类已删（模块下线）
     "BACKTEST_TDX": "post_close",
     "BACKTEST_COMPREHENSIVE": "post_close",
