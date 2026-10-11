@@ -154,9 +154,10 @@
     "fix-macro-holiday-summary-1007",
     "fix-maharo-holiday-1007",
     "fix-gen-algo-track-nameerror-1008",
-    "fix-nightly-audit-5items-1011"
+    "fix-nightly-audit-5items-1011",
+    "switch-fourvolume-realstream-1011"
   ],
-  "updated": "2026-10-11 18:51",
+  "updated": "2026-10-11 19:35",
   "generated_by": "阿狸咪的工程师(/scripts/handoff_ledger_hash.py 口径)",
   "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
   "id_content_hashes": {
@@ -301,6 +302,7 @@
     "strategy-page-dead-injection-cleanup-1006": "0672e737298e029b",
     "strategy-page-deadcode-cleanup-1006": "b220b55e78f14c05",
     "strong-breakout-purge": "f7c2151df2a4b0c6",
+    "switch-fourvolume-realstream-1011": "3636f2012ae46443",
     "theme-value-concept-layer-zero": "ed9f717475ff5378",
     "threecard-fundflow-anchor-0929": "8700bd2befbe5afa",
     "top10-close-quote-gate": "dcb756e75f8378c0",
@@ -314,7 +316,7 @@
     "update-v8-readtext-newline-py312": "40f9335816abeee5",
     "watchdog-heartbeat-falsekill-rootfix-0929": "d4458c3cff9259fa",
     "wave-elliott-daily-miss-0928": "e997e7d287d5615b",
-    "switch-fourvolume-realstream-1011": "aeb55c1da153c200"
+    "lqsq-launch-gate-replay-1011": "f267fa6bc5846445"
   },
   "id_content_hash_note": "每 id 内容哈希（sha256 前 16 位；计算时把该 item 的 updated 时间戳归一化为 <ts>，并剔除块尾分隔注释，以排除纯时间漂移与插项造成的假阳性）。用途：现「ids 集合」锚只能抓 item 消失或整体回滚，抓不到「id 仍在、但内容被旧版顶掉」—— 那恰是防覆盖要防的主类。校验：按同一规则重算，逐 id 比对，不一致即视为内容被回退。（2026-09-23 阿狸咪的工程师 修正块边界：改为截到最后一个非空非注释行，解决插新项导致后续项哈希变化的误报）。 ｜2026-09-23 17:5x 小九实测留证：按本口径用**未编辑的线上 YAML** 重算，**62 项命中 0 项**（2026-09-22 17:0x 同口径尚能对齐），且 ids=64 而 hashes=62 与本口径的 recalc_ledger 代码路径不自洽 ⇒ 判定为**口径变更或既存漂移**。在口径确认前**刻意不重写哈希**（盲改＝写入不可验证数据），只补 ids / 计数；详见 docs/ops/HANDOFF.yaml 的 item handoff-ledger-hash-desync。",
   "next_id_seq": 133

@@ -8281,3 +8281,23 @@ items:
       非自动下架，等主人裁定）。pre_deploy_audit 15/15 全绿。
       今晚链路：B 批 track 刷新→视图重出；E 批聚合器重算；build 转换+重打缓存戳上线。
       注意：策略回测页四量卡今晚起显示真实流数字（难看是如实，不是故障）。
+
+  - id: lqsq-launch-gate-replay-1011
+    date: 2026-10-11
+    updated: 2026-10-11 19:35
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: doing
+    note: |
+      第一支自研算法「量质双擎」(LQSQ) 启动：主人令「按你建议做吧」。因子实验室继续为其他算法评分排序不变；
+      新算法=异常量比(缩量=强势)×ROE 双因子全市场直选 Top30、T+20 调仓。第一步=上线前置点位重放：
+      scripts/replay_lqsq_top30.py + 一次性 workflow v8_lqsq_pit_replay.yml（仅 dispatch，runs-on [self-hosted,cn]）。
+      因子 point-in-time：r=mean(近20日vol)/mean(之前240日vol) 升序 Top30；过滤=上市≥261交易日/当日未停牌/
+      近20日无停牌/收盘≥2元/日均 vol×close≥5000万/当前名单剔 ST。次开买入扣双边 0.3%，基准=同过滤 universe 等权。
+      🔴 ROE 不参与回放（财务 point-in-time 不可回溯，当前快照回放=未来函数）——上线版真实信号流中叠 ROE 过滤。
+      🔴 按铁令回放不进主榜，仅作上线门槛；上线后第一天建真实流归档（四量欠账教训）。产物 raw_data/lqsq_pit_replay.json。
+
+      【19:55 更新·已上线】主人令「今晚上线，和四量一起，真实跑出来的股票做回测，跟踪20日再打分」：
+      gen_lqsq_top30.py 挂 B 批 factor_lab 紧后（每交易日真实选股→lqsq_history 首日建档→前向跟踪→LQSQ_BACKTEST 主榜视图）；
+      update_v8 映射+缓存戳、主榜聚合器登记（样本不足走 insufficient 不排名=「跟踪20日再打分」）、健康检查登记；
+      保护闸=数据日对齐率<60% 中止；本地冒烟全链通过后产物即删不入库。首日归档由一次性 workflow v8_lqsq_bootstrap.yml 于 runner 出数自推。

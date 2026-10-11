@@ -172,6 +172,7 @@ CARD_DEFS = [
     # 🛡 2026-09-30 主人令（盘后页映射对齐）：FOUR_VOLUME_BACKTEST 唯一 UI = 选股策略页四量终极子页
     #   回测表（fvBackBody）。page 迁"选股策略"（与该页既有项同一阈值分支，逐字节同值）。
     {"id": "FOUR_VOLUME_BACKTEST", "name": "四量终极回测", "page": "选股策略", "freq": "每日盘后(真实信号流视图随B批track刷新)", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🛡 2026-09-07 22:2x：原 key_fields=["periods"] 但 periods 在 summary.by_period 嵌套、回测未跑时顶层缺失 → 永久 warn。改为 summary（永远非空 dict，by_period/calc_time 都在内）。2026-10-11 内容源切真实信号流（同变量名，结构同构）。
+    {"id": "LQSQ_BACKTEST", "name": "量质双擎回测", "page": "选股策略", "freq": "每日回测批(B批 factor_lab 紧后)", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🚀 2026-10-11 主人令：第一支自研算法（gen_lqsq_top30.py），真实信号流口径上主榜，与四量同榜同纪律。
 
     # 🔴 2026-09-12 主人令（拍板第 2 项·一劳永逸）：BACKTEST_ALL_ALGOS 正式登记。
     #   根因（实测）：algorithms/gen_backtest_all_algos.py 已挂 STAGES["E"]（ORDER 47/48），

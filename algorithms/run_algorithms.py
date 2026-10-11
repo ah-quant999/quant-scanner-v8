@@ -78,6 +78,9 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   导致 data/FACTOR_LAB.js 长期无人刷新（运维暗灯）。现正式挂链并给足冷启动预算
     #   （脚本自述冷启动 50-90min；热缓存后分钟级）。
     "v8/factor_lab_gen.py": 5400,
+    # 🚀 2026-10-11 主人令：量质双擎（第一支自研算法）挂 factor_lab_gen 紧后——
+    #   读其维护的全市场 kline_cache 打分选股，零重复拉数；分钟级，给 900s 预算。
+    "algorithms/gen_lqsq_top30.py": 900,
     # 🔴 2026-10-11 主人令「完全下架」：v8/backtest_crds.py 已摘链（逆势龙头整体下架）。
     # "v8/backtest_crds.py": 3600,            # （已摘链 2026-10-11）CRDS 回测：逐只回测，给 1h 预算
     # 🛡 2026-09-11 一劳永逸（主人令·选项A）：四量终极 60min 此前**未登记预算** → 走默认 1800s。
@@ -194,6 +197,7 @@ ORDER = [
     # 🔴 2026-10-11 主人令「完全下架」：calc_crds.py 已摘链（逆势龙头真实池回测全档败，见预算表处注释）。
     # "calc_crds.py",
     "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（B批最前：final_recommend 前必产完，因子融合用当日新鲜因子；2026-09-09 主人令由 E 前置至此）
+    "algorithms/gen_lqsq_top30.py",    # 🚀 2026-10-11 主人令：量质双擎每日生成器（读 factor_lab 的 kline_cache 全市场打分选 Top30 → lqsq_history 真实流归档 + LQSQ_BACKTEST 主榜视图；上线首日即建归档）
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
     # 🛡 2026-08-29 主人令：A/B 对照（金股池/候选池/全市场同一信号收益），每日累积信号、T+N 后回填收益。

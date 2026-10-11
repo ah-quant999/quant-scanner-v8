@@ -105,6 +105,14 @@ SOURCES = [
          var="FOUR_VOLUME_BACKTEST", rel="data/FOUR_VOLUME_BACKTEST.js",
          parser="by_period", label_prefix="持有", primary="持有 T+5",
          method="真实信号流口径：每日真实选股累积归档 → 前向跟踪（基准=入选日收盘，T+N 真实交易日，扣双边 0.3%；2026-10-11 切换，回放口径作废）"),
+    # 🚀 2026-10-11 主人令：第一支自研算法「量质双擎」——全市场异常量比直选 Top30，
+    #   真实信号流口径（gen_lqsq_top30.py，B批 factor_lab 紧后），与四量同榜同纪律。
+    #   上线首日 2026-10-11；T+20 为主档（主人令「跟踪20日再打分」），样本随天数成熟，
+    #   未达 MIN_SAMPLES 走 insufficient 诚实路径（不排名、标积累中）。
+    dict(card="量质双擎", kind="strategy", page="选股策略", icon="🚀", cat="trade",
+         var="LQSQ_BACKTEST", rel="data/LQSQ_BACKTEST.js",
+         parser="by_period", label_prefix="持有", primary="持有 T+20",
+         method="真实信号流口径：每日全市场按异常量比（缩量=强势）打分选 Top30，次开买入持有 20 个交易日收盘卖出（前复权·扣双边 0.3%）；ROE 质地过滤 v2 待接"),
     # 🗑 2026-10-11 主人令「完全下架」：逆势龙头（CRDS）登记条目随策略下架移除。
     #   原条目：dict(card="逆势龙头", var="CRDS_BACKTEST", rel="data/CRDS_BACKTEST.js",
     #              parser="by_period", label_prefix="持有", primary="持有 T+5")
