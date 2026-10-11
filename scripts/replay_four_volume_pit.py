@@ -211,9 +211,10 @@ def main():
             for T in win_days:
                 if code not in uni_by_day[T]:
                     continue
-                # T 必须是该股的最后一根已有 K 线（等价实盘「末根 XG」）
+                # 2026-10-11 修复：历史重放中 T 之后还有 K 线，「末根」条件误滤掉全部信号。
+                # 指标全因果（rolling/ewm 只向后看），全序列计算后读 j 位即等价「当时只知道 ≤T」。
                 j = idx_by_day[T].get(code)
-                if j is None or j != len(dates) - 1:
+                if j is None:
                     continue
                 if not bool(xg[j]):
                     continue
