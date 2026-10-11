@@ -163,15 +163,15 @@ CARD_DEFS = [
     #     "intraday,post_close"），但自愈优先派发更轻的 intraday，避免抢占盘后 25min debounce 锁。
     {"id": "ETF_DAILY_MONITOR", "name": "ETF 日监控", "page": "盘后数据", "dual_page": "实时数据", "freq": "盘中每30分 + 收盘后定稿", "max_age": 60, "key_fields": ["top_inflow", "top_outflow"], "premarket_keep": True, "heal_cat": "intraday"},
     # 🛡 2026-09-04 主人令一劳永逸：孤儿文件转正——此前无生成调度（all_ 动态扫描按通用 1440 红线误报 fail）。
-    #   FACTOR_LAB 由 v8/factor_lab_gen.py 挂 STAGES[B] 产出；FOUR_VOLUME_BACKTEST 由 strategy_four_volume.py
-    #   在回测批（STAGES[E]，注入 V8_BACKTEST_YEARS）产出。登记后走运维卡区正式判定，all_ 扫描跳过。
+    #   FACTOR_LAB 由 v8/factor_lab_gen.py 挂 STAGES[B] 产出；FOUR_VOLUME_BACKTEST 自 2026-10-11 起
+    #   由 gen_four_volume_track.py（STAGES[B]）产出真实信号流视图（回测批回放模式已摘链）。登记后走运维卡区正式判定，all_ 扫描跳过。
     # 🛡 2026-09-30 主人令（盘后页映射对齐）：FACTOR_LAB 唯一 UI =「🏆 最终推荐」页 🧪因子实验室 tab
     #   （因子定位卡/每日因子计算/当日计分榜，2026-09-20 主人令已从策略回测页整体移除回测卡）。
     #   page 迁"最终推荐"，阈值走盘后元组（该页已显式加入），有效阈值仍 = def_max(1440)，逐字节同值。
     {"id": "FACTOR_LAB", "name": "因子实验室", "page": "最终推荐", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "net_dep": True, "net_dep_note": "本机baostock被风控黑名单(err=10001011匿名用户)，无替代数据源，需小九中国IP+浏览器UA在线刷全市场3200只财务+ROE+异常换手。本机无法产出，保留旧数据待小九。"},
     # 🛡 2026-09-30 主人令（盘后页映射对齐）：FOUR_VOLUME_BACKTEST 唯一 UI = 选股策略页四量终极子页
     #   回测表（fvBackBody）。page 迁"选股策略"（与该页既有项同一阈值分支，逐字节同值）。
-    {"id": "FOUR_VOLUME_BACKTEST", "name": "四量终极回测", "page": "选股策略", "freq": "每日回测批", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🛡 2026-09-07 22:2x：原 key_fields=["periods"] 但 periods 在 summary.by_period 嵌套、回测未跑时顶层缺失 → 永久 warn。改为 summary（永远非空 dict，by_period/calc_time 都在内）。
+    {"id": "FOUR_VOLUME_BACKTEST", "name": "四量终极回测", "page": "选股策略", "freq": "每日盘后(真实信号流视图随B批track刷新)", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🛡 2026-09-07 22:2x：原 key_fields=["periods"] 但 periods 在 summary.by_period 嵌套、回测未跑时顶层缺失 → 永久 warn。改为 summary（永远非空 dict，by_period/calc_time 都在内）。2026-10-11 内容源切真实信号流（同变量名，结构同构）。
 
     # 🔴 2026-09-12 主人令（拍板第 2 项·一劳永逸）：BACKTEST_ALL_ALGOS 正式登记。
     #   根因（实测）：algorithms/gen_backtest_all_algos.py 已挂 STAGES["E"]（ORDER 47/48），

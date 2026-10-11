@@ -428,7 +428,12 @@ STAGES = {
         # 🔴 2026-10-11 主人令「完全下架」：v8/backtest_crds.py 已摘链（逆势龙头整体下架）。
         # "v8/backtest_crds.py",   # （已摘链 2026-10-11）→ data/CRDS_BACKTEST.js
         # 2026-09-06 主人令：AI预测卡回测 INVALID → 下架，停跑 path_probability_backtest.py
-        "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=5 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
+        # 🔴 2026-10-11 主人令「所有回测只认真实信号流口径」：strategy_four_volume.py 回测模式
+        #   （V8_BACKTEST_YEARS=5 历史规则回放 → FOUR_VOLUME_BACKTEST.js）从本批摘链。
+        #   接替：gen_four_volume_track.py（B 批）产出真实信号流视图 raw_data/four_volume_backtest.json
+        #   → update_v8 转换层注入同名 window.FOUR_VOLUME_BACKTEST（口径注记见该视图 method 字段）。
+        #   历史回放含当前股池幸存者偏差（点位重放参考已另行单测：8月窗口 T+5 39.7%/-0.67%），
+        #   禁作主榜/评级/上下架依据。回放函数体保留于 strategy_four_volume.py 仅供考古，不再被链触发。
         # 🔴 2026-09-14 主人令更正：候选池 / 金股池是**上游水源**（基础股池），不是选股策略
         #   ⇒ 不做回测（原 backtest_pools.py 已删除，见 ORDER 同处说明）。
         # 🆕 2026-09-11 主人令：全算法回测汇总（按前端卡名、胜率/收益降序、低绩效提请下架）。
@@ -459,8 +464,10 @@ STAGES = {
     ]}
 
 # 🛡 2026-09-04 主人令：回测批需要「选股脚本以回测模式运行」——runner 对所有脚本无参调用，
-#   故按脚本注入环境变量（strategy_four_volume.py 读 V8_BACKTEST_YEARS>0 时同时跑近 N 年回测
-#   并补写 data/FOUR_VOLUME_BACKTEST.js）。仅影响 E 回测批；B 选股批无注入、保持轻快。
+#   故按脚本注入环境变量。仅影响 E 回测批；B 选股批无注入、保持轻快。
+# 🗑 2026-10-11 主人令「所有回测只认真实信号流口径」：唯一的注入项（strategy_four_volume.py
+#   V8_BACKTEST_YEARS=5 回测模式）已随 E 批摘链移除 ⇒ 本表当前仅剩 backtest_expectancy 的
+#   baostock 开关。机制保留（未来新脚本需按批注入时复用），历史争论存档如下：
 # 🔴 2026-09-17 主人令·全站口径统一（作用域根治）：
 #   原键 = **脚本名**（"strategy_four_volume.py"），但该脚本同时在 B（选股）与 E（回测）两批出现
 #   ⇒ 键无法区分批次，B 批也被注入 V8_BACKTEST_YEARS=5；且注入写的是**进程级** os.environ
@@ -468,11 +475,10 @@ STAGES = {
 #   的子进程继承 =5 ⇒ 症状「D 批跑 5 年回测」。
 #   现键改为 (stage, script) 二元组，精确到批次；注入侧配套「跑完即还原」（见 step_run）。
 SCRIPT_ENV = {
-    # 🔴 2026-09-13 主人令（档位扩至 250 交易日）：3 → 5 年。
-    #   根因：years=3 时 bars≈810 根，扣掉信号检测窗口后 T+180/T+250 落在区间外
-    #   ⇒ 两档恒零样本（前端只能显示「累积中」），并非策略失效而是**回看区间不够**。
-    #   years=5 → bars = max(DAILY_BARS, 5*250+250=1500) 足以覆盖 250 交易日最长持有。
-    ("E", "strategy_four_volume.py"): {"V8_BACKTEST_YEARS": "5"},
+    # 🗑 2026-10-11 主人令「所有回测只认真实信号流口径」：("E","strategy_four_volume.py")
+    #   的 V8_BACKTEST_YEARS=5 注入随回测模式摘链一并移除（历史回放口径作废）。
+    #   原注入动机存档：years=3 时 bars≈810 根，扣信号窗口后 T+180/T+250 恒零样本；
+    #   years=5 → bars=max(DAILY_BARS, 1500) 覆盖 250 交易日最长持有。
     ("B", "backtest_expectancy.py"): {"V8_USE_BAOSTOCK": "1"},   # 🔴 2026-09-22 小九：由 ("E",...) 改 ("B",...)，与生产 STAGES 迁 B 批尾配套（B批尾执行时注入 baostock 参考集）
 }
 # 自校验：STAGES 并集必须精确覆盖 ORDER（无遗漏/多余，保证分批模式不丢脚本）

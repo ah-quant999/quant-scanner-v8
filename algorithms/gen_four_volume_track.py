@@ -46,9 +46,11 @@ HISTORY_FILE = os.path.join(RAW_DIR, "four_volume_history.json")
 META_FILE = os.path.join(ALGO_DIR, "stock_industry_concepts.json")
 QUOTE_JSON = os.path.join(RAW_DIR, "stock_quote.json")
 
-# 前向累积的可成熟档位。长档（75/90/180/250）需数百交易日才成熟，由
-# strategy_four_volume.py 的回测分层（data/FOUR_VOLUME_BACKTEST.js，近5年1457信号）
-# 负责，前端「回测 N 日胜率」卡直接读那份 —— 二者互补、口径同源、不重复。
+# 前向累积的可成熟档位。长档（75/90/180/250）需数百交易日才成熟，等真实信号流
+# 自然累积成熟（2026-10-11 主人令「所有回测只认真实信号流口径」后不再用历史回放顶替）。
+# 🔄 2026-10-11 口径切换：本脚本除 track 主产物外，还产出「真实信号流回测视图」
+#    raw_data/four_volume_backtest.json（经 update_v8 转换层注入 window.FOUR_VOLUME_BACKTEST，
+#    变量名与文件名不变 ⇒ 前端渲染器/回测聚合器零结构改动）。回放模式已从 E 批摘链。
 HOLD_HORIZONS = (1, 3, 5, 10, 20, 30, 45, 60)
 
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -96,6 +98,76 @@ def board_from_code(code):
     if c.startswith(("8", "4", "92")):
         return "北交所"
     return ""
+
+
+def emit_backtest_view(result):
+    """真实信号流回测视图 → raw_data/four_volume_backtest.json。
+
+    2026-10-11 主人令「所有回测只认真实信号流口径」：data/FOUR_VOLUME_BACKTEST.js 的
+    内容源由「近 5 年规则回放」切换为本视图（update_v8 转换层注入同名变量，
+    前端渲染器/回测聚合器零结构改动）。
+
+    诚实铁律：
+      · summary.by_period **只含成熟档**（该档已有 ≥1 个真实前向样本）；
+        未成熟档不显示（样本随持有天数自然成熟后自动出现）。
+      · 与 self_backtest.summary 的 count 交叉核对，不一致即报错（防口径漂移）。
+      · win_rate / *_return 单位 = 百分数（与 self_summary 同单位，前端直接渲染）。
+    """
+    sb = result.get("self_backtest") or {}
+    per_stock = sb.get("per_stock") or []
+    bp = {}
+    for h in sb.get("horizons") or []:
+        key = str(h).replace("d", "")
+        vals = [p.get("offsets", {}).get(h) for p in per_stock]
+        vals = [v for v in vals if isinstance(v, (int, float))]
+        if not vals:
+            continue
+        bp[key] = {
+            "samples": len(vals),
+            "win_rate": round(sum(1 for v in vals if v > 0) * 100.0 / len(vals), 2),
+            "avg_return": round(sum(vals) / len(vals), 4),
+            "best_return": round(max(vals), 2),
+            "worst_return": round(min(vals), 2),
+        }
+    # 🔒 与 self_summary 交叉核对（count 必须一致；win_rate 允许 ±0.05 浮点差）
+    for k, row in bp.items():
+        ref = (sb.get("summary") or {}).get(k + "d") or {}
+        if ref.get("count") is not None and int(ref["count"]) != row["samples"]:
+            raise SystemExit(
+                f"[口径漂移] T+{k} 样本数不一致：per_stock 重算 {row['samples']} "
+                f"vs self_summary {ref['count']} —— 禁止产出，先修聚合逻辑")
+    view = {
+        "update_time": result.get("update_time"),
+        "calc_time": result.get("update_time"),
+        "data_date": result.get("data_date"),
+        "method": ("真实信号流口径（2026-10-11 主人令）：算法每日真实选股 → 累积归档 → 前向跟踪；"
+                   "基准=入选日收盘，T+N 按真实交易日推进，扣双边 0.30%；未成熟档不显示，"
+                   "样本随持有天数成熟而增加。历史规则回放口径已作废下线。"),
+        "signal_source": "four_volume_history 逐日真实信号归档（自 track_start 起累积，含已回落/淘汰票，防幸存者偏差）",
+        "track_start": sb.get("track_start") or result.get("track_start"),
+        "signal_date_range": "%s ~ %s" % (sb.get("track_start") or result.get("track_start") or "—",
+                                          result.get("data_date") or "—"),
+        "total_signals": len(per_stock),
+        "cost_adjusted": True,
+        "summary": {"by_period": bp},
+    }
+    # 🔁 镜像元数据进 summary：前端 fvRenderBacktest 与聚合器 parse_by_period 均从
+    #   bt.summary 里读 method/total_signals/signal_date_range/calc_time（历史同构约定）。
+    view["summary"].update({
+        "method": view["method"],
+        "total_signals": view["total_signals"],
+        "signal_date_range": view["signal_date_range"],
+        "calc_time": view["calc_time"],
+        "update_time": view["update_time"],
+        "cost_adjusted": view["cost_adjusted"],
+        "track_start": view["track_start"],
+        "signal_source": view["signal_source"],
+    })
+    out = os.path.join(RAW_DIR, "four_volume_backtest.json")
+    with open(out, "w", encoding="utf-8") as f:
+        json.dump(view, f, ensure_ascii=False, indent=2)
+    print(f"  📤 真实信号流回测视图 → {out}（成熟档 {sorted(bp, key=int) or '无'}，"
+          f"总信号 {len(per_stock)} 笔）")
 
 
 def main():
@@ -386,6 +458,7 @@ def main():
     if missing:
         print(f"  ⚠️ 无价 {len(missing)} 只（留空不用 0 冒充）: {', '.join(missing[:10])}")
     print(f"  输出: {OUT}")
+    emit_backtest_view(result)   # 🔄 2026-10-11 口径切换：真实信号流回测视图（window.FOUR_VOLUME_BACKTEST 内容源）
     return 0
 
 

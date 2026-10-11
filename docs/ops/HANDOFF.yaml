@@ -8256,3 +8256,28 @@ items:
       17:5x 发现后重做并提交——交接件同批补登。
       校验：py_compile 0 错、pre_deploy_audit 15/15 绿、workflow YAML 全量解析通过。
     verify_how: pre_deploy_audit 15/15 绿（本地实测）；最终验证=当晚 nightly audit 该 5 项转绿 + 下次 build 后直推不被回退。
+  - id: switch-fourvolume-realstream-1011
+    date: 2026-10-11
+    updated: 2026-10-11 18:50
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: done
+    title: 四量终极回测口径切换为真实信号流（主人令 2026-10-11「所有回测只认真实信号流口径」）
+    note: |
+      变更（本地 61ad023240 之后新提交）：
+      1. gen_four_volume_track.py 新增 emit_backtest_view()：B 批随 track 产出真实信号流
+         回测视图 raw_data/four_volume_backtest.json（summary.by_period 同构，仅成熟档；
+         与 self_summary count 交叉核对，漂移即 SystemExit）。
+      2. update_v8.py 映射 +1 行：four_volume_backtest.json → FOUR_VOLUME_BACKTEST
+         （变量名/文件名不变，前端渲染器与回测聚合器零结构改动）。
+      3. run_algorithms.py：E 批 strategy_four_volume.py 回测模式（V8_BACKTEST_YEARS=5
+         近5年规则回放）摘链；SCRIPT_ENV 对应注入删除。回放口径作废（幸存者偏差）。
+      4. gen_backtest_all_algos.py SOURCES 四量终极 method 文案更新（真实流口径）。
+      5. index.html 三处文案（卡 desc/总表 tooltip/同源校正块注记）同步口径。
+      6. v8_health_check.py 注释与 freq 文案同步。
+      验证：视图与 self_summary 交叉核对全对上（T+1 89/37.08%、T+3 78/43.59%、
+      T+5 76/31.58%、T+10 67/13.43%）；本地跑聚合器（ALLOW_LOCAL_ALGO=1 调试豁免）
+      rank3=四量 T+5 31.58%/-1.25% n=76，delist_advice 已如实触发下架提请（红线判定，
+      非自动下架，等主人裁定）。pre_deploy_audit 15/15 全绿。
+      今晚链路：B 批 track 刷新→视图重出；E 批聚合器重算；build 转换+重打缓存戳上线。
+      注意：策略回测页四量卡今晚起显示真实流数字（难看是如实，不是故障）。

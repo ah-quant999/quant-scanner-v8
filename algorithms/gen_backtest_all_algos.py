@@ -95,10 +95,16 @@ SOURCES = [
     #       T+10 34.1%/-2.2% n=85 —— 所有成熟档全败；唯一正值 T+20 仅 n=4（信号档案
     #       08-02~09-13 空窗），无统计意义。
     #   ⚠️ 不得登记回本表；如日后要恢复，须先恢复算法链生成器与前端卡（主人令）。
+    # 🔄 2026-10-11 主人令「所有回测只认真实信号流口径」：本条目的数据源内容由
+    #   「近5年规则回放（strategy_four_volume.py 回测模式，已摘链）」切换为
+    #   gen_four_volume_track.py 产出的真实信号流视图（raw_data/four_volume_backtest.json
+    #   → update_v8 转换层 → 同名 data/FOUR_VOLUME_BACKTEST.js）。summary.by_period 结构
+    #   同构 ⇒ parse_by_period 零改动；仅成熟档出现在表里，样本随持有天数成熟而增加。
+    #   ⚠️ 观察期样本尚小（09-14 起累积），delist_advice 阈值判定照常生效（主人：不行也只能下架）。
     dict(card="四量终极", kind="strategy", page="选股策略", icon="📊", cat="trade",
          var="FOUR_VOLUME_BACKTEST", rel="data/FOUR_VOLUME_BACKTEST.js",
          parser="by_period", label_prefix="持有", primary="持有 T+5",
-         method="信号日次一交易日开盘买入、持有 N 个真实交易日收盘卖出（前复权·扣双边 0.3%）"),
+         method="真实信号流口径：每日真实选股累积归档 → 前向跟踪（基准=入选日收盘，T+N 真实交易日，扣双边 0.3%；2026-10-11 切换，回放口径作废）"),
     # 🗑 2026-10-11 主人令「完全下架」：逆势龙头（CRDS）登记条目随策略下架移除。
     #   原条目：dict(card="逆势龙头", var="CRDS_BACKTEST", rel="data/CRDS_BACKTEST.js",
     #              parser="by_period", label_prefix="持有", primary="持有 T+5")

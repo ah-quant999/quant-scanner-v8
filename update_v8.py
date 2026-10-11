@@ -75,6 +75,10 @@ DATA_SOURCES = {
     #   （四量族原有的 FOUR_VOLUME / FOUR_VOLUME_60M 属脚本直写 data/，不登记本表，勿混淆）
     "four_volume_history.json":    "FOUR_VOLUME_HISTORY",
     "four_volume_track.json":      "FOUR_VOLUME_TRACK",
+    # 🔄 2026-10-11 主人令「所有回测只认真实信号流口径」：FOUR_VOLUME_BACKTEST 内容源
+    #   由「近5年规则回放（strategy_four_volume.py 回测模式，已摘链）」切换为
+    #   gen_four_volume_track.py 产出的真实信号流视图（同口径同变量名，前端零结构改动）。
+    "four_volume_backtest.json":   "FOUR_VOLUME_BACKTEST",
     # 2026-09-04 主人令收尾：cockpit_tier_recommend / cockpit_advice / cockpit_backtest 三映射已删
     #   （09-03「干掉驾驶舱」系列删了生成器与 raw_data，映射永不命中，纯死代码）
     "top10_daily.json":            "TOP10_DAILY",
