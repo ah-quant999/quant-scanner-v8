@@ -8901,14 +8901,11 @@ function switchSec(sec,el){
                    ? (_len(_gpObj.stocks) ? _gpObj.stocks : [])
                    : (_gpObj.candidates || []);
     // COCKPIT 优先用 tier_a/tier_b（array 数组）合并 —— 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND 已全方位下线
-    // CRDS 用 cond1_list/cond2_list/cond3_list/cond4_list（按实际 schema）
-    const crds = window.CRDS_CARD_DATA||{};
-    const crdsList = [].concat(crds.cond1_list||[], crds.cond2_list||[], crds.cond3_list||[], crds.cond4_list||[]);
+    // 🔴 2026-10-11 主人令「完全下架」：CRDS 策略共振腿移除（模块下架，window.CRDS_CARD_DATA 恒 undefined）
     // FOUR_VOLUME 用 stocks（array）
     const fourList = (window.FOUR_VOLUME && window.FOUR_VOLUME.stocks) || [];
     if(_in(candList)) hitN++;
     if(_in(goldList)) hitN++;
-    if(_in(crdsList)) hitN++;
     if(_in(fourList)) hitN++;
     if(hitN>=3){ signals.push({t:hitN+' 策略共振命中',a:'强共识买点',c:'up'}); score+=2; }
     else if(hitN>=1){ signals.push({t:hitN+' 策略命中',a:'有支撑',c:'sub'}); score+=hitN; }
@@ -9135,12 +9132,6 @@ window.v8SectorFlow = window.v8SectorFlow || (function(){
     const cstocks = cd.stocks || {};
     const ckey = Object.keys(cstocks).find(k=>normCode(cstocks[k].code)===nc);
     if(ckey) hits.push({name:'🎯 候选池', detail:(cstocks[ckey].sources||[]).join(' / ')});
-    const crds = window.CRDS_CARD_DATA||{};
-    let crdsCond='';
-    if((crds.cond1_list||[]).find(r=>normCode(r.code)===nc)) crdsCond='条件① 逆势涨停';
-    else if((crds.cond2_list||[]).find(r=>normCode(r.code)===nc)) crdsCond='条件② 大跌日涨停';
-    else if((crds.cond3_list||[]).find(r=>normCode(r.code)===nc)) crdsCond='条件③ 强α';
-    if(crdsCond) hits.push({name:'🐉 逆势龙头', detail:crdsCond});
     const fv = window.FOUR_VOLUME || {};
     const frow = window._safeArr(fv.stocks).find(r=>normCode(r.code)===nc);
     if(frow) hits.push({name:'🔥 四量终极', detail:'游资+机构+金叉+四路翻多'});
@@ -9254,13 +9245,7 @@ window.v8SectorFlow = window.v8SectorFlow || (function(){
     const ckey = Object.keys(cstocks).find(k=>normCode(cstocks[k].code)===nc);
     if(ckey) hits.push({name:'🎯 候选池', color:'var(--cyan)', detail:(cstocks[ckey].sources||[]).join(' / ')});
     // COCKPIT_TIER_RECOMMEND 已下线（2026-09-03）：cp/cpa/cpb 占位变量连同 if(cpa)/else if(cpb) 命中 push 一起不再保留
-    // 逆势龙头
-    const crds = window.CRDS_CARD_DATA || {};
-    let crdsCond='';
-    if((crds.cond1_list||[]).find(r=>normCode(r.code)===nc)) crdsCond='条件① 逆势涨停';
-    else if((crds.cond2_list||[]).find(r=>normCode(r.code)===nc)) crdsCond='条件② 大跌日涨停';
-    else if((crds.cond3_list||[]).find(r=>normCode(r.code)===nc)) crdsCond='条件③ 强α';
-    if(crdsCond) hits.push({name:'🐉 逆势龙头', color:'var(--down)', detail:crdsCond});
+    // 🔴 逆势龙头 CRDS 命中腿已删（2026-10-11 主人令「完全下架」）
     // 四量终极
     const fv = window.FOUR_VOLUME || {};
     const frow = window._safeArr(fv.stocks).find(r=>normCode(r.code)===nc);
