@@ -1,9 +1,9 @@
 {
-  "update_time": "2026-10-10 01:59:56",
+  "update_time": "2026-10-11 12:43:19",
   "data_date": "2026-10-09",
   "track_start": "2026-09-14",
   "history_days": 14,
-  "price_days": 15,
+  "price_days": 16,
   "signal_count": 8,
   "tracked_total": 89,
   "active_count": 8,
@@ -152,10 +152,11 @@
       "price_source": "quote",
       "offsets": {
         "1d": 6.63,
-        "3d": 2.63
+        "3d": 2.63,
+        "5d": 9.91
       },
-      "best_n": 1,
-      "best_pct": 6.63,
+      "best_n": 5,
+      "best_pct": 9.91,
       "qd": null,
       "yzc": null,
       "jg": null,
@@ -191,7 +192,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": 3.5,
-        "3d": 11.34
+        "3d": 11.34,
+        "5d": 8.8
       },
       "best_n": 3,
       "best_pct": 11.34,
@@ -434,7 +436,8 @@
       "offsets": {
         "1d": 4.31,
         "3d": 0.45,
-        "5d": -3.63
+        "5d": -3.63,
+        "10d": 0.57
       },
       "best_n": 1,
       "best_pct": 4.31,
@@ -471,9 +474,11 @@
       "current_close": 17.15,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -515,9 +520,11 @@
       "current_close": 106.0,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -559,9 +566,11 @@
       "current_close": 35.68,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -603,9 +612,11 @@
       "current_close": 92.25,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -647,9 +658,11 @@
       "current_close": 7.2,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -691,9 +704,11 @@
       "current_close": 99.71,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -735,9 +750,11 @@
       "current_close": 23.49,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -772,9 +789,11 @@
       "current_close": 87.18,
       "pnl_pct": 0.0,
       "price_source": "quote",
-      "offsets": {},
-      "best_n": null,
-      "best_pct": null,
+      "offsets": {
+        "1d": 0.0
+      },
+      "best_n": 1,
+      "best_pct": 0.0,
       "qd": true,
       "yzc": true,
       "jg": true,
@@ -1007,7 +1026,8 @@
       "offsets": {
         "1d": 0.47,
         "3d": -3.62,
-        "5d": -3.74
+        "5d": -3.74,
+        "10d": -2.95
       },
       "best_n": 1,
       "best_pct": 0.47,
@@ -1125,7 +1145,8 @@
       "price_source": "quote",
       "offsets": {
         "1d": -1.56,
-        "3d": -7.11
+        "3d": -7.11,
+        "5d": -4.67
       },
       "best_n": 1,
       "best_pct": -1.56,
@@ -1206,7 +1227,8 @@
       "offsets": {
         "1d": -5.16,
         "3d": -5.08,
-        "5d": -7.1
+        "5d": -7.1,
+        "10d": -5.12
       },
       "best_n": 3,
       "best_pct": -5.08,
@@ -1492,7 +1514,8 @@
       "offsets": {
         "1d": 0.55,
         "3d": -1.86,
-        "5d": -6.0
+        "5d": -6.0,
+        "10d": -10.39
       },
       "best_n": 1,
       "best_pct": 0.55,
@@ -1819,7 +1842,8 @@
       "offsets": {
         "1d": -4.6,
         "3d": -6.74,
-        "5d": -9.14
+        "5d": -9.14,
+        "10d": -12.16
       },
       "best_n": 1,
       "best_pct": -4.6,
@@ -2996,7 +3020,8 @@
       "offsets": {
         "1d": 0.6,
         "3d": -3.96,
-        "5d": -7.87
+        "5d": -7.87,
+        "10d": -19.55
       },
       "best_n": 1,
       "best_pct": 0.6,
@@ -4336,7 +4361,7 @@
     "note": "四量信号自上线起逐日累积真实收盘价前向样本（基准=入选日收盘，T+N 按真实交易日推进，不含未来函数）。样本随持有天数成熟而增加；长档（75/90/180/250）见上方「回测 N 日胜率」的信号层回测。",
     "track_start": "2026-09-14",
     "history_days": 14,
-    "price_days": 15,
+    "price_days": 16,
     "horizons": [
       "1d",
       "3d",
@@ -4355,8 +4380,8 @@
     ],
     "summary": {
       "1d": {
-        "count": 81,
-        "win_rate": 40.74,
+        "count": 89,
+        "win_rate": 37.08,
         "avg_return": -0.01
       },
       "3d": {
@@ -4365,14 +4390,14 @@
         "avg_return": 0.56
       },
       "5d": {
-        "count": 73,
-        "win_rate": 30.14,
-        "avg_return": -1.49
+        "count": 76,
+        "win_rate": 31.58,
+        "avg_return": -1.25
       },
       "10d": {
-        "count": 61,
-        "win_rate": 13.11,
-        "avg_return": -10.44
+        "count": 67,
+        "win_rate": 13.43,
+        "avg_return": -10.25
       },
       "20d": {
         "count": 0,
@@ -4396,6 +4421,86 @@
       }
     },
     "per_stock": [
+      {
+        "code": "300821",
+        "name": "东岳硅材",
+        "enter_date": "2026-10-09",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
+      {
+        "code": "688661",
+        "name": "和林微纳",
+        "enter_date": "2026-10-09",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
+      {
+        "code": "002709",
+        "name": "天赐材料",
+        "enter_date": "2026-10-09",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
+      {
+        "code": "301269",
+        "name": "华大九天",
+        "enter_date": "2026-10-09",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
+      {
+        "code": "600256",
+        "name": "广汇能源",
+        "enter_date": "2026-10-09",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
+      {
+        "code": "688099",
+        "name": "晶晨股份",
+        "enter_date": "2026-10-09",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
+      {
+        "code": "600026",
+        "name": "中远海能",
+        "enter_date": "2026-10-09",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
+      {
+        "code": "688353",
+        "name": "华盛锂电",
+        "enter_date": "2026-10-09",
+        "offsets": {
+          "1d": 0.0
+        },
+        "best_n": 1,
+        "best_pct": 0.0
+      },
       {
         "code": "688018",
         "name": "乐鑫科技",
@@ -4454,7 +4559,8 @@
         "enter_date": "2026-09-29",
         "offsets": {
           "1d": 3.5,
-          "3d": 11.34
+          "3d": 11.34,
+          "5d": 8.8
         },
         "best_n": 3,
         "best_pct": 11.34
@@ -4465,7 +4571,8 @@
         "enter_date": "2026-09-29",
         "offsets": {
           "1d": -1.56,
-          "3d": -7.11
+          "3d": -7.11,
+          "5d": -4.67
         },
         "best_n": 1,
         "best_pct": -1.56
@@ -4476,10 +4583,11 @@
         "enter_date": "2026-09-29",
         "offsets": {
           "1d": 6.63,
-          "3d": 2.63
+          "3d": 2.63,
+          "5d": 9.91
         },
-        "best_n": 1,
-        "best_pct": 6.63
+        "best_n": 5,
+        "best_pct": 9.91
       },
       {
         "code": "600206",
@@ -4586,7 +4694,8 @@
         "offsets": {
           "1d": 4.31,
           "3d": 0.45,
-          "5d": -3.63
+          "5d": -3.63,
+          "10d": 0.57
         },
         "best_n": 1,
         "best_pct": 4.31
@@ -4598,7 +4707,8 @@
         "offsets": {
           "1d": 0.47,
           "3d": -3.62,
-          "5d": -3.74
+          "5d": -3.74,
+          "10d": -2.95
         },
         "best_n": 1,
         "best_pct": 0.47
@@ -4610,7 +4720,8 @@
         "offsets": {
           "1d": -4.6,
           "3d": -6.74,
-          "5d": -9.14
+          "5d": -9.14,
+          "10d": -12.16
         },
         "best_n": 1,
         "best_pct": -4.6
@@ -4622,7 +4733,8 @@
         "offsets": {
           "1d": 0.55,
           "3d": -1.86,
-          "5d": -6.0
+          "5d": -6.0,
+          "10d": -10.39
         },
         "best_n": 1,
         "best_pct": 0.55
@@ -4634,7 +4746,8 @@
         "offsets": {
           "1d": -5.16,
           "3d": -5.08,
-          "5d": -7.1
+          "5d": -7.1,
+          "10d": -5.12
         },
         "best_n": 3,
         "best_pct": -5.08
@@ -4646,7 +4759,8 @@
         "offsets": {
           "1d": 0.6,
           "3d": -3.96,
-          "5d": -7.87
+          "5d": -7.87,
+          "10d": -19.55
         },
         "best_n": 1,
         "best_pct": 0.6

@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-10-10 02:32:47",
-  "data_date": "2026-10-10",
-  "track_start": "2026-10-10",
-  "history_days": 38,
+  "update_time": "2026-10-11 12:43:30",
+  "data_date": "2026-10-11",
+  "track_start": "2026-10-11",
+  "history_days": 39,
   "strict_count": 1,
   "near_count": 0,
   "tracked": [
@@ -16,19 +16,19 @@
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
-        "反转股",
-        "有色金属矿采选业",
-        "稀缺资源",
-        "2026中报预增",
-        "锂矿概念",
-        "一带一路",
+        "机构重仓",
         "MSCI中国",
-        "机构重仓"
+        "2026中报预增",
+        "一带一路",
+        "锂矿概念",
+        "反转股",
+        "稀缺资源",
+        "有色金属矿采选业"
       ],
       "signal_count": 1,
       "enter_date": "2026-08-17",
-      "hold_days": 10,
-      "consecutive_days": 1,
+      "hold_days": 11,
+      "consecutive_days": 2,
       "first_close": 33.36,
       "current_close": 30.8,
       "pnl_pct": -7.67,
@@ -500,27 +500,7 @@
     ],
     "by_sector": [
       {
-        "sector": "反转股",
-        "count": 1
-      },
-      {
-        "sector": "有色金属矿采选业",
-        "count": 1
-      },
-      {
-        "sector": "稀缺资源",
-        "count": 1
-      },
-      {
-        "sector": "2026中报预增",
-        "count": 1
-      },
-      {
-        "sector": "锂矿概念",
-        "count": 1
-      },
-      {
-        "sector": "一带一路",
+        "sector": "机构重仓",
         "count": 1
       },
       {
@@ -528,7 +508,27 @@
         "count": 1
       },
       {
-        "sector": "机构重仓",
+        "sector": "2026中报预增",
+        "count": 1
+      },
+      {
+        "sector": "一带一路",
+        "count": 1
+      },
+      {
+        "sector": "锂矿概念",
+        "count": 1
+      },
+      {
+        "sector": "反转股",
+        "count": 1
+      },
+      {
+        "sector": "稀缺资源",
+        "count": 1
+      },
+      {
+        "sector": "有色金属矿采选业",
         "count": 1
       }
     ],
@@ -544,8 +544,8 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
-    "latest_date": "2026-10-09 23:55:16",
-    "total": 423,
+    "latest_date": "2026-10-10 02:59:48",
+    "total": 429,
     "best_hold_days": 10,
     "periods": {
       "1d": {
@@ -593,7 +593,7 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 187,
+      "count": 190,
       "win_rate_5d": 48.0,
       "avg_ret_5d": -0.2,
       "best_win_rate": 50.0,
@@ -601,7 +601,7 @@
     },
     {
       "band": "70~80",
-      "count": 236,
+      "count": 239,
       "win_rate_5d": 36.4,
       "avg_ret_5d": -1.65,
       "best_win_rate": 42.8,
@@ -659,8 +659,8 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-10-10",
-    "history_days": 38,
+    "track_start": "2026-10-11",
+    "history_days": 39,
     "summary": {
       "1d": {
         "count": 54,
@@ -668,19 +668,19 @@
         "avg_return": 0.55
       },
       "3d": {
-        "count": 45,
-        "win_rate": 40.0,
-        "avg_return": -0.79
+        "count": 47,
+        "win_rate": 40.43,
+        "avg_return": -0.81
       },
       "5d": {
-        "count": 36,
-        "win_rate": 33.33,
-        "avg_return": -0.69
+        "count": 38,
+        "win_rate": 31.58,
+        "avg_return": -1.03
       },
       "10d": {
-        "count": 36,
-        "win_rate": 30.56,
-        "avg_return": -1.36
+        "count": 38,
+        "win_rate": 28.95,
+        "avg_return": -2.26
       },
       "20d": {
         "count": 23,
@@ -1326,7 +1326,8 @@
         "offsets": {
           "1d": -5.8,
           "3d": -11.94,
-          "5d": -9.31
+          "5d": -9.31,
+          "10d": -6.75
         }
       },
       {
@@ -1336,7 +1337,8 @@
         "offsets": {
           "1d": -2.01,
           "3d": -8.27,
-          "5d": -7.03
+          "5d": -7.03,
+          "10d": -30.49
         }
       },
       {
@@ -1345,7 +1347,8 @@
         "enter_date": "2026-09-30",
         "offsets": {
           "1d": 0.0,
-          "3d": -4.6
+          "3d": -4.6,
+          "5d": -4.6
         }
       },
       {
@@ -1354,7 +1357,8 @@
         "enter_date": "2026-09-30",
         "offsets": {
           "1d": 0.0,
-          "3d": -9.87
+          "3d": -9.87,
+          "5d": -9.87
         }
       },
       {
@@ -1362,7 +1366,8 @@
         "name": "",
         "enter_date": "2026-10-08",
         "offsets": {
-          "1d": -2.29
+          "1d": -2.29,
+          "3d": -2.29
         }
       },
       {
@@ -1370,7 +1375,8 @@
         "name": "招商轮船",
         "enter_date": "2026-10-08",
         "offsets": {
-          "1d": 0.18
+          "1d": 0.18,
+          "3d": 0.18
         }
       }
     ]
