@@ -1,6 +1,6 @@
 {
  "month": "2026年10月",
- "update_time": "2026-10-10 16:32",
+ "update_time": "2026-10-11 08:34",
  "legend": [
   {
    "title": "重要政策",
@@ -270,13 +270,13 @@
     {
      "num": 10,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": []
     },
     {
      "num": 11,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": []
     }
    ]
