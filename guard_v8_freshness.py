@@ -315,9 +315,13 @@ SELFHEAL_COOLDOWN_MIN = 30   # 同 category 自愈派发冷却，避免每小时
 ALGO_VARS = {
     # 2026-09-04 主人令收尾：COCKPIT_BACKTEST/COCKPIT_TIER_RECOMMEND/COCKPIT_ADVICE 已删（模块下线）
     "BACKTEST_COMPREHENSIVE", "BACKTEST_TDX",
-    "CRDS_CARD_DATA", "TRIPLE_CONSENSUS", "TRIPLE_TRACK", "TRIPLE_HISTORY",
+    # 🔴 2026-10-11 主人令「完全下架」：CRDS_CARD_DATA / TRIPLE_CONSENSUS / TRIPLE_TRACK /
+    #   TRIPLE_HISTORY 移出——模块已下架、data 文件已删、index.html 零注入，
+    #   自愈面不再派发永远刷不出的 algo_run。
     "FINAL_RECOMMEND_DATA", "ALGO_TRACK",
-    "SENTIMENT_CYCLE", "H_AUTO_BUY", "H_AUTO_BUY_TRACK",
+    "SENTIMENT_CYCLE",
+    # 2026-10-11 一劳永逸（阿狸咪）：H_AUTO_BUY / H_AUTO_BUY_TRACK 移出——模块已下线，
+    #   data 文件已删（CDN 404）、index.html 零注入 ⇒ 自愈面不再派发永远刷不出的 algo_run。
     # LHB_7D 已移出（2026-09-14 阿狸咪的工程师）：无生产者，不再属 algo_cloud 自愈面，
     #   详见上方 CORE_SOURCES_ALGO 段注释。
     "INDEX_HISTORY",

@@ -53,17 +53,19 @@ DATA_SOURCES = {
     "ipo_score.json":              "IPO_DATA",
     "crisis_data.json":            "CRISIS_DATA",
     "judgment_data.json":          "JUDGMENT_DATA",
-    "crds_card_data.json":         "CRDS_CARD_DATA",
+    # 🔴 2026-10-11 主人令「完全下架」：crds_card_data / triple 三映射随两策略下架摘除
+    #   （生成器已摘链，raw_data 不再更新；前端 script 标签已删，无消费方）。
+    # "crds_card_data.json":         "CRDS_CARD_DATA",
     # 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合）。
     #   从 algo_track.json 读三 algo 跟踪池，去重 → 状态机判 status → 输出
     #   raw_data/v8_pool_tracker.json + data/V8_POOL_TRACKER.js，注入 window.V8_POOL_TRACKER。
     "v8_pool_tracker.json":        "V8_POOL_TRACKER",
-    "triple_consensus.json":       "TRIPLE_CONSENSUS",
-    "triple_track.json":           "TRIPLE_TRACK",
+    # "triple_consensus.json":       "TRIPLE_CONSENSUS",
+    # "triple_track.json":           "TRIPLE_TRACK",
     # 🛡 2026-08-26 一劳永逸根因修复：生成器 update_triple_resonance_history.py 写的是
     #   raw_data/triple_resonance_history.json，而此处原读旧名 triple_history.json（同源不同名），
     #   桥接顺序一错位就吃陈旧基线 → 共振日历缺 08-24 等。改为直接读生成器真输出，消除重命名歧义。
-    "triple_resonance_history.json": "TRIPLE_HISTORY",
+    # "triple_resonance_history.json": "TRIPLE_HISTORY",
     # 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」——历史追踪 + 跟踪/前向回测。
     #   产出链（B 批算法链，读当日新鲜 data/FOUR_VOLUME.js）：
     #     algorithms/update_four_volume_history.py → raw_data/four_volume_history.json

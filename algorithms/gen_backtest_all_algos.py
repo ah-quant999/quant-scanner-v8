@@ -57,8 +57,8 @@ MIN_SAMPLES = 30          # 累积样本门槛：低于此只观测、不进排�
 #   ② **本文件 L54 铁律**：主口径刻意取 T+5 —— 四量/CRDS 主口径均为 T+5，
 #      卡级主表是「同口径横比」，三重共识取 T+20 会使跨卡横比失效（= 文件头警告场景）。
 #   ③ `SOURCES.primary` 与产出 label 必须**逐字一致** ⇒ 兜底匹配（label == primary）才成立。
-CONSENSUS_PRIMARY_BAND = "共振≥80（严格）"   # = 前端 __STAR_COMPARISON_CARDS 的 resonance_gte80
-CONSENSUS_PRIMARY_HOLD = 5                   # T+5，与其余各卡主口径同档
+# 🔴 2026-10-11 主人令「完全下架」：CONSENSUS_PRIMARY_BAND/HOLD 常量随三重共识下架删除
+#   （唯一消费者 parse_comprehensive 与三重 SOURCES 条目一并移除）。
 # 🔴 2026-09-12 主人令（拍板第 1 项·①）：各回测脚本持有期已扩为
 #   [1, 3] + [5,10,20,30,45,60,75,90,180,250]（同源常量 HOLD_LADDER，见各脚本）。
 #   🔴 2026-09-13 主人令扩档：+180/+250（原 8 档）。主人原话：「所有接入算法链的
@@ -87,20 +87,21 @@ FACTOR_PRIMARY_HOLD = 5
 
 # ── 源登记表：**card = 前端卡名**（权威出处 index.html 的 V8_PAGE_SCHEDULE + 策略回测页）──
 SOURCES = [
-    dict(card="三重共识", kind="strategy", page="选股策略", icon="🧲", cat="trade",
-         var="BACKTEST_COMPREHENSIVE", rel="data/BACKTEST_COMPREHENSIVE.js",
-         parser="comprehensive", label_prefix="共振",
-         # ⚠️ 必须与 parse_comprehensive 产出的主口径 label **逐字一致**（见上方常量块 ③）
-         primary=f"{CONSENSUS_PRIMARY_BAND} · T+{CONSENSUS_PRIMARY_HOLD}",
-         method="信号日次一交易日开盘买入、持有 N 个真实交易日收盘卖出（baostock 前复权·扣双边 0.3%）"),
+    # 🔴🔴 2026-10-11 主人令「完全下架」：三重共识 / 逆势龙头两卡随策略整体下架，SOURCES 条目移除。
+    #   下架依据（真实池回测，与 CRDS/四量同源 K 线·前复权·扣双边 0.3%）：
+    #     · 三重共识（TOP10精选∩基本面A档）：T+1 17.0%/-3.4% n=47、T+5 12.1%/-8.3% n=33、
+    #       T+10 0%/-6.7% n=12 —— 全档全败。
+    #     · 逆势龙头（CRDS advanced）：T+1 38.3%/-0.7% n=373、T+5 24.6%/-4.9% n=248、
+    #       T+10 34.1%/-2.2% n=85 —— 所有成熟档全败；唯一正值 T+20 仅 n=4（信号档案
+    #       08-02~09-13 空窗），无统计意义。
+    #   ⚠️ 不得登记回本表；如日后要恢复，须先恢复算法链生成器与前端卡（主人令）。
     dict(card="四量终极", kind="strategy", page="选股策略", icon="📊", cat="trade",
          var="FOUR_VOLUME_BACKTEST", rel="data/FOUR_VOLUME_BACKTEST.js",
          parser="by_period", label_prefix="持有", primary="持有 T+5",
          method="信号日次一交易日开盘买入、持有 N 个真实交易日收盘卖出（前复权·扣双边 0.3%）"),
-    dict(card="逆势龙头", kind="strategy", page="选股策略", icon="🐉", cat="trade",
-         var="CRDS_BACKTEST", rel="data/CRDS_BACKTEST.js",
-         parser="by_period", label_prefix="持有", primary="持有 T+5",
-         method="信号日次一交易日开盘买入、持有 N 日收盘卖出（前复权·扣双边 0.3%）"),
+    # 🗑 2026-10-11 主人令「完全下架」：逆势龙头（CRDS）登记条目随策略下架移除。
+    #   原条目：dict(card="逆势龙头", var="CRDS_BACKTEST", rel="data/CRDS_BACKTEST.js",
+    #              parser="by_period", label_prefix="持有", primary="持有 T+5")
     # 🗑 2026-09-19 主人令：「强势突破」全站删除 ⇒ 本登记条目一并移除。
     #   原条目：dict(card="强势突破", var="ALGO_BACKTEST_COMPARE",
     #              rel="data/ALGO_BACKTEST_COMPARE.js", parser="algo_compare",
@@ -405,73 +406,6 @@ def _attach_bench(rows, bench, day):
     return n_att
 
 
-def parse_comprehensive(src, obj):
-    """BACKTEST_COMPREHENSIVE：共振三档 × **每个持有期一行**（统一 10/12 档矩阵）。
-
-    🔴 2026-09-13 主人令「统一测算标准 · 用最科学的计算」（小九周末审计 P1-2 采纳）：
-      原实现「每档只取『最佳持有期』」= 从 12 档里**事后挑最好的那档**报告
-      ⇒ 多重比较偏差 / cherry-picking，**系统性高估**该策略；
-      且三重共识在 10 档矩阵里只有 1~2 列有数 ⇒ 主人「统一 10 档」的要求只落地了一半
-      （与「只加 items 不抬 need = 没加」属同一类「改一半」错误）。
-      现改为：**每个持有期各出一行**，全部进矩阵（3 档 × 12 持有期 = 36 行）；
-      主口径固定「严格档 · T+5」且**恰好 1 行**（可用 V8_CONSENSUS_PRIMARY_HOLD 覆盖），
-      其余档位同为观测值 —— **不再替使用者做「择优」**。
-      零样本档由 `_mk_row` 既有兜底自动归 None（绝不用 0 冒充）。
-
-    🔴 2026-09-13 小九审计二次修复（本函数主口径两处错）：
-① 主口径原取 **T+20**，与 L54 铁律「主口径刻意取 T+5」矛盾，且四量/CRDS
-主口径均为 T+5 ⇒ 卡级主表跨卡横比失效（= 文件头警告的场景）；
-      ② 原 `primary=(hd == 主口径)` 使**三档各出 1 行 primary**（共 3 行），
-         违反 L638「卡级主表每卡只取 1 行」，且前端取到 band 顺序最前的**宽松档**去评星。
-      现：primary 恒为 `CONSENSUS_PRIMARY_BAND · T+CONSENSUS_PRIMARY_HOLD` 一行。
-    """
-    rows = []
-    ov = (obj or {}).get("overview") or {}
-    band = [("resonance_all", "共振≥2（宽松）"), ("resonance_gte70_lt80", "共振70-79分"),
-            ("resonance_gte80", CONSENSUS_PRIMARY_BAND)]
-    primary_hd = _num(__import__("os").environ.get(
-        "V8_CONSENSUS_PRIMARY_HOLD", str(CONSENSUS_PRIMARY_HOLD)))
-    primary_hd = CONSENSUS_PRIMARY_HOLD if primary_hd is None else int(primary_hd)
-    for key, name in band:
-        o = ov.get(key)
-        per_all = (o or {}).get("periods") or {}
-        if not isinstance(o, dict) or not per_all:
-            rows.append(_mk_row(src, name, None, None, None, None,
-                                status="该分档无有效样本"))
-            continue
-        for pk in sorted(per_all.keys(), key=lambda x: (_hold_days_of(x) is None,
-                                                        _hold_days_of(x) or 0)):
-            per = per_all.get(pk) or {}
-            hd = _hold_days_of(pk)
-            # ⚠️ 唯一一行 primary = 严格档 · 主口径持有期。
-            #    label **不得加任何后缀**（如「（主口径）」）：前端 `__committeePeriods()`
-            #    把 label 的 T+数字归一成 T+# 后要求与主口径行**逐字相等**，
-            #    加后缀会把同档其余 11 档全部过滤掉（实测：12 档退化为 1 档 ⇒ 星级失真）。
-            is_primary = (hd is not None and hd == primary_hd
-                          and name == CONSENSUS_PRIMARY_BAND)
-            lbl = ("%s · T+%d" % (name, hd)) if hd is not None else name
-            rows.append(_mk_row(
-                src, lbl, per.get("count"),
-                per.get("win_rate"), per.get("avg_return"),
-                ("T+%d" % hd) if hd is not None else None,
-                extra={"best_return": _num(per.get("best_return")),
-                       "worst_return": _num(per.get("worst_return")),
-                       "max_drawdown": _num(per.get("max_drawdown")),
-                       "sharpe": _num(per.get("sharpe_ratio")),
-                       "median_return": _num(per.get("median_return")),
-                       "decided": _int(per.get("decided")),
-                       # 🆕 2026-09-13 主人令「统一测算标准·ret_hold 接线」：
-                       #   09-12 新增的**严格持有口径**（忽略中途 stop/target，持到第 hp
-                       #   个交易日收盘）此前只写明细、产物/聚合/前端三层全无 ⇒ 功能空转。
-                       #   现随旧口径并列下发；缺字段/零样本一律 None（禁止 0 冒充）。
-                       "win_rate_hold": _num(per.get("win_rate_hold")),
-                       "avg_return_hold": _num(per.get("avg_return_hold")),
-                       "count_hold": _int(per.get("count_hold"))},
-                primary=is_primary,
-            ))
-    return rows
-
-
 def parse_by_period(src, obj):
     """summary.by_period：四量/CRDS/RPS 同构。每个持有期一行（主人要按收益/胜率排序）。"""
     sm = (obj or {}).get("summary") or {}
@@ -676,7 +610,7 @@ def parse_factor_lab(src, obj):
 
 
 PARSERS = {
-    "comprehensive": parse_comprehensive,
+    # 🔴 2026-10-11：「comprehensive」解析器随三重共识下架删除（已无登记源）。
     "by_period": parse_by_period,
     "ima_strong": parse_ima_strong,      # 🆕 2026-09-17 强势跟踪（顶层 periods 结构）
 

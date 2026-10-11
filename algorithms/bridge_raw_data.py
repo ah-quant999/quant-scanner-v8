@@ -45,7 +45,8 @@ def _now_cst_str():
 # 任何「生成器直写 raw_data/<src>，但 update_v8 读 raw_data/<dst>」的改名场景必须登记在此
 BRIDGE_MAP = {
     # 🛡 2026-08-18 主人紧急令根治：4 天前 TRIPLE_HISTORY 不更新的根因
-    "triple_resonance_history.json": "triple_history.json",
+    # 🔴 2026-10-11 主人令「完全下架」：triple_resonance_history 已随三重共识下架，桥接移除。
+    # "triple_resonance_history.json": "triple_history.json",
     # 未来扩展点：所有 raw_data 改名场景都登记在这里
 }
 

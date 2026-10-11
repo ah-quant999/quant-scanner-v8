@@ -31,8 +31,9 @@ def now_cst():
 # gen_triple_track 于 08-06 改造），out/ 下同名文件是历史僵尸副本。
 # 若继续搬运，会用 08-06 旧数据覆盖当日新结果 -> 前端长期显示 3 天前数据。
 SKIP_STAGE = {
-    "triple_consensus.json",
-    "triple_track.json",
+    # 🔴 2026-10-11 主人令「完全下架」：triple 两产物已随三重共识下架，登记项随之保留为注释。
+    # "triple_consensus.json",
+    # "triple_track.json",
     # 🔴 2026-09-19 阿狸咪的工程师：`sector_rs.json` 的生成器 fetch_sector_rs.py 已改为
     #   **直写 raw_data/sector_rs.json**（原写 out/ 中间态再经本文件搬运）。理由两点：
     #     ① 实测：raw_data/sector_rs.json 自 09-19 00:41 起冻结在旧产物（data_date=生成日），
@@ -92,16 +93,17 @@ V6_TO_V8 = {
     "stock_names.json":                  "stock_names.json",
     "gold_pool.json":                    "gold_pool.json",
     "candidate_pool.json":               "candidate.json",
-    "triple_consensus.json":             "triple_consensus.json",
-    "triple_track.json":                 "triple_track.json",
-    "triple_resonance_history.json":     "triple_history.json",
+    # 🔴 2026-10-11 主人令「完全下架」：triple/crds 五项映射已随两策略下架删除。
+    # "triple_consensus.json":             "triple_consensus.json",
+    # "triple_track.json":                 "triple_track.json",
+    # "triple_resonance_history.json":     "triple_history.json",
     "top10_daily.json":                  "top10_daily.json",
     "lhb_result.json":                   "lhb_data.json",
     "sector_rs.json":                    "sector_rs.json",
     "sh_index_fib.json":                 "sh_fib.json",
     "sz_index_fib.json":                 "sz_fib.json",
     "inst_trade.json":                   "inst_trade.json",
-    "crds_result.json":                  "crds_card_data.json",
+    # "crds_result.json":                  "crds_card_data.json",
     # 2026-09-18 主人令「清除干净」：cockpit_tier_recommend/cockpit_advice/cockpit_backtest 三映射随驾驶舱 09-03 下线彻底删除
     "backtest_tdx.json":                 "backtest_tdx.json",
     "backtest_comprehensive.json":       "backtest_comprehensive.json",

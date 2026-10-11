@@ -48,7 +48,10 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     # 🛡 2026-09-11 一劳永逸：2700s(45min) 实测不足 —— run#1692 于 05:22 起跑、06:07 被
     #   「超时 >45min」杀掉 → 无产物 → B 批 2/3 → target_stage 恒为 B → D/E 永不执行
     #   （FINAL_RECOMMEND_DATA 停在昨日的结构性真凶）。放宽到 90min 留足余量。
-    "calc_crds.py": 5400,        # 逆势龙头 CRDS（全池遍历，实测需 >45min）
+    # 🔴 2026-10-11 主人令「完全下架」：calc_crds.py（逆势龙头）已摘链——真实池回测全档败
+    #   （T+1 38.3%/-0.7% n=373、T+5 24.6%/-4.9% n=248，唯一正值 T+20 仅 n=4 无统计意义）。
+    #   final_recommend 的 CRDS 输入同步摘除（见 _FINAL_RECOMMEND_INPUTS 注释）。
+    # "calc_crds.py": 5400,        # （已摘链 2026-10-11）逆势龙头 CRDS（全池遍历，实测需 >45min）
     # 2026-09-18：backtest_tdx 产品产物不再含逐笔明细（体积根治），续跑明细缓存
     #   raw_data/_tdx_cache/ 被 .gitignore 排除 ⇒ 云端 runner 每轮需全量重取 221 只日K
     #   （原先靠复用上轮明细仅 ~40s）。给足 90min 总预算，防被 30min 默认超时误杀而再次停更。
@@ -75,7 +78,8 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   导致 data/FACTOR_LAB.js 长期无人刷新（运维暗灯）。现正式挂链并给足冷启动预算
     #   （脚本自述冷启动 50-90min；热缓存后分钟级）。
     "v8/factor_lab_gen.py": 5400,
-    "v8/backtest_crds.py": 3600,            # CRDS 回测：逐只回测，给 1h 预算 （2026-09-09 挂链时补）
+    # 🔴 2026-10-11 主人令「完全下架」：v8/backtest_crds.py 已摘链（逆势龙头整体下架）。
+    # "v8/backtest_crds.py": 3600,            # （已摘链 2026-10-11）CRDS 回测：逐只回测，给 1h 预算
     # 🛡 2026-09-11 一劳永逸（主人令·选项A）：四量终极 60min 此前**未登记预算** → 走默认 1800s。
     #   它是全链少数走 baostock 独立数据源 + 逐只拉 120 根 60min K 线的脚本（冷缓存慢），
     #   240 只逐只取数在源抖动时极易超过 30min → 被监督器硬超时杀 → 产物写不出。
@@ -187,7 +191,8 @@ ORDER = [
     # 🛡 2026-08-20 一劳永逸：5 年长 K 线 fetcher 补入算法链（此前无任何调度方，
     #   且只写 out/ 不 bridge raw_data/ → INDEX_HISTORY 永不更新）。
     # 🛡 2026-08-29 主人令：补跑第二基准（中证1000 / 国证A指），判断 +6% excess 是 alpha 还是风格 beta。
-    "calc_crds.py",
+    # 🔴 2026-10-11 主人令「完全下架」：calc_crds.py 已摘链（逆势龙头真实池回测全档败，见预算表处注释）。
+    # "calc_crds.py",
     "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（B批最前：final_recommend 前必产完，因子融合用当日新鲜因子；2026-09-09 主人令由 E 前置至此）
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
@@ -199,9 +204,11 @@ ORDER = [
     "strategy_four_volume.py",         # 🛡 2026-08-19 阿狸咪根治孤儿：日线版 FOUR_VOLUME.js 一直在 ORDER 漏挂 → 四星终极卡 4 格 0。render 端已合并读 60m 兜底，这里补齐日线数据链。
     "market_regime.py",                # 🛡 2026-08-19 阿狸咪补对齐：宏观环境卡 → data/MACRO.js + data/MARKET_REGIME.js（国债+LPR+银行间利率+利率上行期板块推荐框架）
     "sector_recommendation.py",        # 🛡 2026-08-19 阿狸咪补对齐：板块推荐卡 → data/SECTOR_RECOMMENDATION.js（13板块按优先级+异动跟随/已涨过标）
-    "update_triple_resonance_history.py",  # 累积 triple_resonance_history
-    "gen_triple_consensus.py",         # 读 top10 / fundamental / gold_pool
-    "gen_triple_track.py",             # 读 triple_history / gold_pool / backtest
+    # 🔴 2026-10-11 主人令「完全下架」：三重共识整体下架（真实池回测全档败：T+1 17.0%/-3.4% n=47、
+    #   T+5 12.1%/-8.3% n=33、T+10 0%/-6.7% n=12）——生成器/历史累积/跟踪器一并摘链。
+    # "update_triple_resonance_history.py",  # （已摘链 2026-10-11）累积 triple_resonance_history
+    # "gen_triple_consensus.py",         # （已摘链 2026-10-11）读 top10 / fundamental / gold_pool
+    # "gen_triple_track.py",             # （已摘链 2026-10-11）读 triple_history / gold_pool / backtest
     # 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」= 历史追踪 + 跟踪/前向回测。
     #   必须排在 strategy_four_volume.py（L156，产 data/FOUR_VOLUME.js）之后，
     #   且二者内部有序：history 累积账本 → track 消费账本。
@@ -265,7 +272,8 @@ ORDER = [
     # 🆕 2026-09-04 主人令「都按你的建议做」：因子实验室独立分层回测（升4⭐证据链）
     # 🛡 2026-09-09 主人令：因子实验室生成器已前置到 B 批最前（ORDER 下方 B 区 calc_crds 之后），此处 E 区仅留分层回测
     "factor_lab_backtest.py",         # → data/FACTOR_LAB_BACKTEST.js（五分位分层·胜率/回撤/OOS）
-    "v8/backtest_crds.py",               # → data/CRDS_BACKTEST.js （逆势龙头回测；2026-09-09 挂链补登，此前零调度成孤儿 → 红灯 age 1447min）
+    # 🔴 2026-10-11 主人令「完全下架」：v8/backtest_crds.py 已摘链（逆势龙头整体下架）。
+    # "v8/backtest_crds.py",               # （已摘链 2026-10-11）→ data/CRDS_BACKTEST.js
     # 🛡 2026-09-07 修复：以下两脚本曾只挂 E 批 STAGES、漏挂 ORDER → 模块级自校验
     #   `_STAGE_UNION == set(ORDER)` 断言崩（仅STAGES有两脚本），盘后链启动即死、0 产出。
     #   此前被 V5 心跳闸门跳过链本体掩盖，2026-09-07 17:40 #1579 首次真跑暴露。
@@ -364,15 +372,20 @@ STAGES = {
         # 🛡 2026-09-09 主人令：因子实验室生成器前置到 B 批最前——必须在 final_recommend(D批20:00) 之前产完，
         #   否则「为更好选股」的因子融合只能吃昨日陈旧数据。生成器 50-90min baostock 冷启动，18:10 起跑→19:40 前产完，D 批必吃到当日新鲜因子。
         "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js + raw_data/factor_lab.json（baostock，冷启动长）
-        "calc_crds.py", "build_candidate_pool.py", "generate_top10.py",
+        # 🔴 2026-10-11 主人令「完全下架」：calc_crds.py 已摘链（逆势龙头整体下架）。
+        # "calc_crds.py",
+        "build_candidate_pool.py", "generate_top10.py",
         "strategy_four_volume_60m.py", "strategy_four_volume.py",
         "market_regime.py", "sector_recommendation.py",
-        "update_triple_resonance_history.py",   # 累积 triple_resonance_history（在 gen_triple_consensus 之前）
+        # 🔴 2026-10-11 主人令「完全下架」：update_triple_resonance_history.py 已摘链。
+        # "update_triple_resonance_history.py",   # （已摘链 2026-10-11）累积 triple_resonance_history
         # 🆕 2026-09-15 主人令：四量终极历史追踪 + 跟踪/前向回测（与三重同批、同序）。
         #   插在 strategy_four_volume.py 之后 → 读到当日新鲜 data/FOUR_VOLUME.js；
         #   ⚠️ 必须在 gen_triple_consensus 之前（本行位置天然满足）。
         "update_four_volume_history.py", "gen_four_volume_track.py",
-        "gen_triple_consensus.py", "gen_triple_track.py", "calc_volatility_watch.py",
+        # 🔴 2026-10-11 主人令「完全下架」：gen_triple_consensus / gen_triple_track 已摘链。
+        # "gen_triple_consensus.py", "gen_triple_track.py",
+        "calc_volatility_watch.py",
         "gen_stock_stop.py", "gen_algo_track.py", "calc_sentiment_cycle.py",
         "refresh_dividend_cninfo.py",
         "refresh_stock_metadata.py", "fetch_weekend_run.py",   # 周末复盘/周度汇总（原 ORDER 漏挂 STAGE）
@@ -412,7 +425,8 @@ STAGES = {
         #   此处 E 批仅保留其「分层回测」——读 FACTOR_LAB 做五分位分层验证（研究性质，不进选股打分），置于最终推荐之后无害。
         #   链内由 run_algorithms.py 统一注入 V8_IN_CHAIN=1 → 本脚本自带 git push 自动跳过。
         "factor_lab_backtest.py",   # 🆕 因子实验室分层回测
-        "v8/backtest_crds.py",   # → data/CRDS_BACKTEST.js （逆势龙头回测；2026-09-09 挂链补登，此前仅存在于 v8/ 目录、STAGES/ORDER 均未挂 → 永远跑不到）
+        # 🔴 2026-10-11 主人令「完全下架」：v8/backtest_crds.py 已摘链（逆势龙头整体下架）。
+        # "v8/backtest_crds.py",   # （已摘链 2026-10-11）→ data/CRDS_BACKTEST.js
         # 2026-09-06 主人令：AI预测卡回测 INVALID → 下架，停跑 path_probability_backtest.py
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=5 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
         # 🔴 2026-09-14 主人令更正：候选池 / 金股池是**上游水源**（基础股池），不是选股策略
@@ -576,14 +590,15 @@ def step_seed_inputs():
 #         上游纯数据采集（fetch_*）不受影响，仍可提前跑。
 STOCK_PICKING_SCRIPTS = {
     # 核心选股策略
-    "calc_crds.py",                  # CRDS 逆势龙头（前端 17:13 更新元凶）
+    # 🔴 2026-10-11 主人令「完全下架」：calc_crds / 三重三件套已下架摘链，移出门控名单。
+    # "calc_crds.py",                  # （已摘链 2026-10-11）CRDS 逆势龙头
     "build_candidate_pool.py",       # 候选池/金股池聚合
     "generate_top10.py",             # 多维共振 TOP10 精选
     "strategy_four_volume.py",       # 四量终极 日线选股
     "strategy_four_volume_60m.py",   # 四量终极 60min 选股
-    "update_triple_resonance_history.py",  # 三重历史累积
-    "gen_triple_consensus.py",       # 三重共识选股
-    "gen_triple_track.py",           # 三重跟踪
+    # "update_triple_resonance_history.py",  # （已摘链 2026-10-11）三重历史累积
+    # "gen_triple_consensus.py",       # （已摘链 2026-10-11）三重共识选股
+    # "gen_triple_track.py",           # （已摘链 2026-10-11）三重跟踪
     # 🆕 2026-09-15 主人令：四量历史追踪 + 跟踪（读当日 FOUR_VOLUME.js，属盘后选股产物）。
     #   与三重同族一致纳入 18:00 门控 —— 盘中 force 跑链也不得重算（免半日数据假产物）。
     "update_four_volume_history.py",  # 四量历史累积
@@ -739,13 +754,15 @@ def _run_mode():
 #   再次 stage；仍失败则拒绝产出最终推荐（绝不拿陈旧数据冒充今日推荐，遵守铁律「不得造假」）。
 #   映射： 输入文件 → (生成器脚本, 是否写 out/ 需二次 stage)
 _FINAL_RECOMMEND_INPUTS = {
-    "triple_consensus.json":       ("gen_triple_consensus.py", False),
+    # 🔴 2026-10-11 主人令「完全下架」：triple_consensus / crds_card_data / triple_track 三输入
+    #   已随两策略下架摘除；final_recommend.py 内消费点同步拆除。
+    # "triple_consensus.json":       ("gen_triple_consensus.py", False),
     "top10_daily.json":            ("generate_top10.py", False),
-    "crds_card_data.json":         ("calc_crds.py", True),
+    # "crds_card_data.json":         ("calc_crds.py", True),
     "lhb_data.json":               ("fetch_lhb.py", True),
     "sector_rs.json":              ("fetch_sector_rs.py", True),
     "stock_profile.json":          ("gen_stock_profile.py", False),
-    "triple_track.json":           ("gen_triple_track.py", False),
+    # "triple_track.json":           ("gen_triple_track.py", False),
     # crisis_data.json 由云端 cloud_fetch_v8.py 产出，本地链不重跑；仅做新鲜度告警（见 final_recommend 内部兜底）
 }
 
@@ -1007,7 +1024,7 @@ SILENCE_OVERRIDE = {
     "v8/factor_lab_gen.py": 3600,
     # 🛡 2026-09-11：CRDS 逐只抓取，段落间可能长时间无 stdout → 给 30min 静默预算，
     #   避免被全局 15min 静默杀误杀（与 2.3 的 90min 总预算配套）。
-    "calc_crds.py": 1800,   # 冷启动 50-90min，给 1h 静默预算（总时长仍受 5400s 超时约束）
+    # "calc_crds.py": 1800,   # （已摘链 2026-10-11）冷启动 50-90min，给 1h 静默预算
     # 🛡 2026-09-16 阿狸咪的工程师 · 同型第三例（D7）：日线版四量终极 5 年回测在逐只循环内零 stdout，
     #   2026-09-16 03:16:55~03:32:00 被全局 900s 静默杀误杀 ⇒ 产物写不出、卡永久陈旧。
     #   照既有范式双保险：① 脚本自带心跳（strategy_four_volume.py 已补，60s 一片，带 flush）

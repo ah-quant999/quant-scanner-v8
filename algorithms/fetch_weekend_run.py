@@ -32,7 +32,8 @@ HEALTH_REPORT = BASE / ".workbuddy" / "v8_health_report.json"
 # 周度核心数据清单（不与具体窗口挂钩：抓最近 5 个交易日，覆盖周六/周一/节假日）
 WEEKLY_TRACK = [
     ("lhb_data.json",            "龙虎榜"),
-    ("triple_history.json",      "三重共振历史"),
+    # 🔴 2026-10-11 主人令「完全下架」：triple_history 已随三重共识下架，移出周末报表。
+    # ("triple_history.json",      "三重共振历史"),
     ("top10_daily.json",         "TOP10推荐池"),
     ("sector_rs.json",           "板块相对强度"),
     ("final_recommend.json",     "最终推荐池"),

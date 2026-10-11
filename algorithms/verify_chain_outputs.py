@@ -60,13 +60,15 @@ ROOT = os.path.dirname(ALGO)
 CRITICAL = [
     ("候选池",       "raw_data/candidate.json",        True,  "A"),
     ("候选池(前端)", "data/CANDIDATE.js",              False, "A"),
-    ("逆势龙头CRDS", "raw_data/crds_card_data.json",   True,  "B"),
-    ("逆势龙头(前端)", "data/CRDS_CARD_DATA.js",       False, "B"),
+    # 🔴 2026-10-11 主人令「完全下架」：逆势龙头 CRDS 两产物已随策略下架移出校验清单。
+    # ("逆势龙头CRDS", "raw_data/crds_card_data.json",   True,  "B"),
+    # ("逆势龙头(前端)", "data/CRDS_CARD_DATA.js",       False, "B"),
     ("相对强度RPS",  "data/STOCK_RPS.js",              False, "B"),
     ("TOP10推荐池", "raw_data/top10_daily.json",     True,  "B"),
     ("TOP10推荐池(前端)", "data/TOP10_DAILY.js",       False, "B"),
-    ("三重共识",     "raw_data/triple_consensus.json", True,  "B"),
-    ("三重共识(前端)", "data/TRIPLE_CONSENSUS.js",     False, "B"),
+    # 🔴 2026-10-11 主人令「完全下架」：三重共识两产物已随策略下架移出校验清单。
+    # ("三重共识",     "raw_data/triple_consensus.json", True,  "B"),
+    # ("三重共识(前端)", "data/TRIPLE_CONSENSUS.js",     False, "B"),
     ("四量终极",     "data/FOUR_VOLUME.js",            False, "B"),
     ("四量终极60m",  "data/FOUR_VOLUME_60M.js",        False, "B"),
     ("最终推荐",     "raw_data/final_recommend.json",  True,  "D"),

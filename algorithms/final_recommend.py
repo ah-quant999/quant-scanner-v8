@@ -3,13 +3,12 @@
 """final_recommend.py — 跨策略共振 + 板块强度 生成最终推荐 Top3
 
 输入：
-  - raw_data/triple_consensus.json
   - raw_data/top10_daily.json   (四量终极 / 主站 TOP10)
-  - raw_data/crds_card_data.json (逆势龙头)
   - raw_data/sector_rs.json     (板块相对强度)
   - raw_data/stock_profile.json (个股行业/概念)
-  - raw_data/crisis_data.json   (危机雷达，决定是否并入逆势龙头)
-  - raw_data/triple_track.json     (三重跟踪告警，用于 Top3 跟踪)
+  - raw_data/crisis_data.json   (危机雷达， crisis_high 仅作输出元数据)
+  - 🔴 2026-10-11 主人令「完全下架」：triple_consensus / crds_card_data / triple_track 三输入
+    已随三重共识、逆势龙头两策略整体下架而摘除（真实池回测全档败，详见 run_algorithms.py 同日注释）。
   - (2026-09-04 主人令：cockpit_tier_recommend / cockpit_backtest / lhb 数据源整段删除——驾驶舱/大牛股猎手已下线，
      backtest 输出字段一并移除，前端无消费方，verify_chain_outputs 不校验)
 
@@ -619,9 +618,10 @@ def main():
     # 加统一选股策略守门：早于 18:00 直接 sys.exit(1)；应急可设 TIME_GATE_BYPASS=1。
     from utils.time_gate import check_stock_picking_ready
     check_stock_picking_ready(by='final_recommend')
-    triple = load_json("triple_consensus.json")
+    # 🔴 2026-10-11 主人令「完全下架」：triple_consensus / crds_card_data 两输入已随策略下架摘除。
+    # triple = load_json("triple_consensus.json")
     top10 = load_json("top10_daily.json")
-    crds = load_json("crds_card_data.json")
+    # crds = load_json("crds_card_data.json")
     sector_rs = load_json("sector_rs.json")
     profile = load_json("stock_profile.json")
     crisis = load_json("crisis_data.json")
@@ -675,13 +675,8 @@ def main():
     print(f"[info] 四量数据({_four_vol_src}): 加载 {len(_60m_hits)} 只命中")
 
     # 2026-09-04 主人令：cockpit_backtest 死数据源整段删除（生成器 09-03 下线，load 恒空，仅产出全零 backtest 垃圾）
-    tt = load_json("triple_track.json")
+    # 🔴 2026-10-11 主人令「完全下架」：triple_track.json 输入已随三重共识下架摘除，tt_alerts 恒空。
     tt_alerts = {}
-    for a in tt.get("alerts") or []:
-        code = a.get("code")
-        if not code:
-            continue
-        tt_alerts.setdefault(code, []).append(a)
 
     crisis_score = safe_float(crisis.get("score"), 0.0)
     crisis_high = crisis_score >= CRISIS_HIGH_THRESHOLD
@@ -777,29 +772,8 @@ def main():
            那正是本判据要禁止的「进池」，故必须先 in 判断。"""
         return norm_code(code).lstrip('.') in pool
 
-    # 1) 三重共识
-    for s in triple.get("stocks") or []:
-        code = s.get("code")
-        if not code:
-            continue
-        r = ensure(code, s.get("name"), s.get("market"), s.get("board"))
-        score = safe_float(s.get("total_score") or s.get("score"))
-        # 2026-08-13 公平性修复：去掉 score>=25 硬门槛（低于直接出局=歧视），
-        # 改为统一归一化；入选即给基础分，避免强三重共识信号被误杀。
-        src_score = min(4.0, max(0.5, score / 25.0))
-        if src_score > 0:
-            r["sources"].append("三重共识")
-            r["source_scores"]["三重共识"] = round(src_score, 2)
-            _set_close(r, s.get("close"), s.get("pct_chg"), "三重共识", triple.get("update_time"))
-            r["stop_loss"] = s.get("stop_loss") or r["stop_loss"]
-            r["target_price"] = s.get("target_price") or r["target_price"]
-            r["risk_reward"] = s.get("risk_reward") or r["risk_reward"]
-            r["industry"] = r["industry"] or (s.get("industry") or "")
-            r["concepts"] = list(set((r["concepts"] or []) + (s.get("concepts") or [])))
-            r["reasons"].append(f"三重共识 评分{score:.0f}")
-            r["signals"].append("跨策略共振")
-            if s.get("enter_date"):
-                r["enter_dates"].append(s["enter_date"])
+    # 🔴 2026-10-11 主人令「完全下架」：三重共识 source 整段下线（策略已整体下架——真实池回测
+    #   全档败：T+1 17.0%/-3.4% n=47、T+5 12.1%/-8.3% n=33、T+10 0%/-6.7% n=12）。
 
     # 2026-09-03 主人令：#2 驾驶舱 A/B 档 source 整段下线（cockpit.* 不再读，sources 也不再 append "驾驶舱A档/B档"）
     # 2026-09-07 一劳永逸：清理该次下线遗留的孤儿代码块（仍引用已删除的 label/tech/qs/tier），
@@ -881,24 +855,9 @@ def main():
 
     # 2026-09-03 主人令：#4 全站精选 source 整段下线（allsite.* 不再读）
 
-    # 5) 逆势龙头：仅在危机雷达高位时并入
-    if crisis_high:
-        for tier, label, base in [
-            ("elite", "逆势龙头·精锐", 3.0),
-            ("advanced", "逆势龙头·进阶", 2.0),
-            ("watch", "逆势龙头·观察", 1.0),
-        ]:
-            for s in crds.get(tier) or []:
-                code = s.get("code")
-                if not code:
-                    continue
-                r = ensure(code, s.get("name"), "", "")
-                r["sources"].append(label)
-                r["source_scores"][label] = round(base, 2)
-                r["reasons"].append(f"{label} 评分{s.get('score')}")
-                r["signals"].append(f"{label}")
-                if s.get("enter_date"):
-                    r["enter_dates"].append(s["enter_date"])
+    # 🔴 2026-10-11 主人令「完全下架」：逆势龙头（CRDS）source 整段下线——真实池回测所有成熟档
+    #   全败（T+1 38.3%/-0.7% n=373、T+3 30.2%/-3.2% n=338、T+5 24.6%/-4.9% n=248、T+10 34.1%/-2.2% n=85），
+    #   唯一正值 T+20 仅 n=4（信号档案 08-02~09-13 空窗所致）无统计意义，策略整体下架。
 
     # 2026-09-03 主人令：#6 大牛股猎手 source 整段下线（不再 append "大牛股猎手"，lhb 数据仍可被其他源使用）
     # 2026-09-03 主人令：#7 板块龙头 source 整段下线（不再 append "板块龙头"，sec_score 仍可用于其他源加分）
@@ -1504,7 +1463,7 @@ def main():
             signals = [f"{src}共振" for src in sorted(set(s["sources"]))]
 
         # ---- 回测 & 跟踪（当前 Top3 股票的历史表现与入选后状态） ----
-        alerts = tt_alerts.get(code, [])
+        alerts = []  # 🔴 2026-10-11：triple_track 随三重共识下架，tt_alerts 恒空
 
         if close:
             # 没有历史跟踪记录：以今日入选价 = 当前价展示
@@ -1691,7 +1650,7 @@ def main():
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "crisis_score": round(crisis_score, 1),
         "crisis_high": crisis_high,
-        "crisis_note": "逆势龙头已并入" if crisis_high else "危机雷达未达高位，逆势龙头暂不并入",
+        "crisis_note": "逆势龙头已于 2026-10-11 下架，不再并入最终推荐",
         "total_candidates": len(scored),
         "top_n": _effective_top_n,
         "data_degraded": _degraded,
