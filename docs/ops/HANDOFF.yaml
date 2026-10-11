@@ -8301,3 +8301,13 @@ items:
       gen_lqsq_top30.py 挂 B 批 factor_lab 紧后（每交易日真实选股→lqsq_history 首日建档→前向跟踪→LQSQ_BACKTEST 主榜视图）；
       update_v8 映射+缓存戳、主榜聚合器登记（样本不足走 insufficient 不排名=「跟踪20日再打分」）、健康检查登记；
       保护闸=数据日对齐率<60% 中止；本地冒烟全链通过后产物即删不入库。首日归档由一次性 workflow v8_lqsq_bootstrap.yml 于 runner 出数自推。
+
+      【20:15 更新·bootstrap 首跑失败→自刷新根治】run 38137482029 failure：runner 上 kline_cache 末根对齐率仅 12%
+      （562/4810，末根碎片化）触发保护闸中止——保护闸按设计工作，非 bug。真根因：kline_cache 是 gen_strong_breakout
+      副产物缓存（仅 ~251 根/只、只逐晚回写强势股），原设计假设「factor_lab 维护的全市场缓存」不成立。
+      根治（一劳永逸）：gen_lqsq_top30.py 新增 refresh_stale() 全量自刷新——末根落后/根数不足的股票经
+      scanner.fetch_a_daily（云端=GTimg 前复权与实盘同通道）6 线程并发拉 700 根整根替换（禁增量拼接防除权断缝），
+      成功写 raw_data/kline_cache_ext/（runner 持久、不入仓、.gitignore 隔离）；预算 840s 兜底；刷新后保护闸复评；
+      单只异常隔离不打死整轮。本地冒烟验证：单只隔离/限流/保护闸中止全链路 ✅。逻辑详解私有副本已补量质双擎专节+
+      对比表行（E:\Nutstore\v8_logic_private\logic.full.html，公开 logic.html 保持下架不动）。
+      待办：重派 bootstrap → 首批 Top30 落库后向主人报名单。

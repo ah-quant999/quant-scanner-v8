@@ -22,8 +22,13 @@
     **上线第一天即建归档**（四量「算法早跑、归档晚建」的欠账不再犯）。
   · 主榜只认本文件产出的真实流自回测（raw_data/lqsq_backtest.json → LQSQ_BACKTEST），
     未走满 T+20 的样本不计入，成熟一档进一档。
-  · 数据源：raw_data/kline_cache/*.json（v8/factor_lab_gen.py B 批最前维护的全市场日 K，
-    本脚本挂其紧后，零重复拉数）。
+  · 数据源 raw_data/kline_cache/*.json 是 gen_strong_breakout 的副产物缓存（仅 ~251 根/只、
+    且只逐晚回写强势股 —— 末根碎片化是常态，2026-10-11 bootstrap 实测对齐率仅 12%）。
+    🔴 本脚本因此**自带全量自刷新**（refresh_stale）：对末根落后/根数不足的股票，
+    经 scanner.fetch_a_daily（云端=GTimg 前复权，与实盘同通道）6 线程并发拉 700 根
+    **整根替换**（禁增量拼接——除权会使拼接缝量纲断裂），内存参与打分；
+    成功（末根=数据日）的写入 raw_data/kline_cache_ext/（runner 持久、不入仓，
+    .gitignore 隔离），次日仅增量请求，日常全市场 ~4 分钟。
 
 输出：
   raw_data/lqsq_history.json   真实信号逐日归档（主档，只增不改）
@@ -36,6 +41,7 @@ import sys
 import json
 import time
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone, timedelta
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -44,6 +50,7 @@ sys.path.insert(0, os.path.join(ROOT, "algorithms"))
 
 RAW_DIR = os.path.join(ROOT, "raw_data")
 KLINE_DIR = os.path.join(RAW_DIR, "kline_cache")
+EXT_DIR = os.path.join(RAW_DIR, "kline_cache_ext")  # 本脚本专属扩展缓存（700根，不入仓）
 HISTORY = os.path.join(RAW_DIR, "lqsq_history.json")
 TRACK = os.path.join(RAW_DIR, "lqsq_track.json")
 VIEW = os.path.join(RAW_DIR, "lqsq_backtest.json")
@@ -57,6 +64,12 @@ TOP_N = 30
 COST_PCT = 0.3
 MIN_PRICE = 2.0
 MIN_TURNOVER_YUAN = 50_000_000
+# ── 自刷新 ──
+EXT_BARS = 700            # 扩展缓存/拉取根数（覆盖 261+240+余量）
+EXT_MIN_LEN = 300         # 视为「根数足够」的下限（<MIN_HISTORY+BASELINE 缓冲）
+STALE_SKIP_DAYS = 60      # 末根落后超过 60 个自然日的僵尸股跳过不拉（反正被数据日对齐剔除）
+REFRESH_WORKERS = 6       # 云端并发拉取线程数（GTimg 轻量 HTTP，6 并发 ≈ 20 QPS）
+REFRESH_BUDGET_SEC = float(os.environ.get("LQSQ_REFRESH_BUDGET_SEC", "840"))
 
 _T0 = time.time()
 
@@ -108,11 +121,139 @@ def load_bars():
     return out
 
 
+# ───────────────────────── 全量自刷新（2026-10-11 bootstrap 对齐率 12% 根治） ─────────────────────────
+
+def _df_to_records(df):
+    """fetch_a_daily 的 df → kline records（与缓存同构）。字段缺失返回 None。"""
+    try:
+        cols = df.columns
+        need = ("date", "open", "close", "high", "low", "volume")
+        if any(c not in cols for c in need):
+            return None
+        return [{"date": str(d), "open": round(float(o), 4), "high": round(float(h), 4),
+                 "low": round(float(l), 4), "close": round(float(c), 4),
+                 "volume": round(float(v), 2)}
+                for d, o, h, l, c, v in zip(df["date"], df["open"], df["high"],
+                                            df["low"], df["close"], df["volume"])]
+    except Exception:
+        return None
+
+
+def _ext_path(code):
+    return os.path.join(EXT_DIR, "%s.json" % code)
+
+
+def _ext_load_fresh(code, data_date):
+    """读扩展缓存：仅当末根 == 数据日（且根数足）才可信返回，否则 None（触发重拉）。"""
+    try:
+        with open(_ext_path(code), encoding="utf-8") as f:
+            bars = json.load(f)
+        if isinstance(bars, list) and len(bars) >= EXT_MIN_LEN and bars[-1]["date"] == data_date:
+            return bars
+    except Exception:
+        pass
+    return None
+
+
+def _ext_save(code, records):
+    try:
+        os.makedirs(EXT_DIR, exist_ok=True)
+        tmp = _ext_path(code) + ".tmp"
+        with open(tmp, "w", encoding="utf-8", newline="\n") as f:
+            json.dump(records, f, ensure_ascii=False)
+        os.replace(tmp, _ext_path(code))
+    except Exception:
+        pass
+
+
+def _fetch_one(code):
+    from scanner import fetch_a_daily
+    df = fetch_a_daily(code, bars=EXT_BARS)
+    return _df_to_records(df) if df is not None else None
+
+
+def refresh_stale(bars_map):
+    """全量自刷新：末根落后或根数不足的股票 → GTimg 700 根整根替换（并发、预算内、可续跑）。
+    成功（末根=数据日）写扩展缓存；停牌/僵尸不写（重拉判定天然兜底）。原地更新 bars_map。"""
+    t0 = time.time()
+    data_date = max(r[-1]["date"] for r in bars_map.values())
+    from datetime import datetime as _dt
+
+    def _days_lag(dstr):
+        try:
+            return (_dt.strptime(data_date, "%Y-%m-%d") - _dt.strptime(dstr, "%Y-%m-%d")).days
+        except Exception:
+            return 9999
+
+    todo = []
+    for code, bars in bars_map.items():
+        ld = bars[-1]["date"]
+        if ld == data_date and len(bars) >= EXT_MIN_LEN:
+            continue  # 新鲜且根数足
+        if ld != data_date and _days_lag(ld) > STALE_SKIP_DAYS:
+            continue  # 僵尸/长期停牌：跳过（数据日对齐过滤天然剔除）
+        # 扩展缓存命中（末根==数据日）直接换上，零请求
+        ext = _ext_load_fresh(code, data_date)
+        if ext is not None:
+            bars_map[code] = ext
+            continue
+        todo.append(code)
+    log("自刷新：需拉取 %d 只（数据日 %s；预算 %.0fs / 并发 %d）" % (
+        len(todo), data_date, REFRESH_BUDGET_SEC, REFRESH_WORKERS))
+    ok = fail = 0
+    cloud = os.environ.get("CLOUD_RUNNER", "").lower() == "true" or \
+            os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+
+    def _work(code):
+        try:
+            return code, _fetch_one(code)
+        except Exception as e:  # 单只隔离：网络抖动/单票异常只计失败，绝不打死整轮
+            return code, ("%s %s" % (type(e).__name__, str(e)[:60]))
+
+    pool = ThreadPoolExecutor(max_workers=REFRESH_WORKERS if cloud else 1)
+    try:
+        futs = {pool.submit(_work, c): c for c in todo}
+        err_shown = 0
+        for fut in as_completed(futs):
+            code, recs = fut.result()
+            if isinstance(recs, str):  # 异常摘要（明细限流：最多打印 5 条）
+                fail += 1
+                if err_shown < 5:
+                    log("⚠️ 单只异常 %s: %s" % (code, recs))
+                    err_shown += 1
+                continue
+            if recs and len(recs) >= 60 and recs[-1]["date"] >= bars_map.get(code, [{}])[-1].get("date", ""):
+                bars_map[code] = recs
+                if recs[-1]["date"] == data_date:
+                    _ext_save(code, recs)
+                ok += 1
+            else:
+                fail += 1
+                if recs is None and err_shown < 5:
+                    log("⚠️ 单只无数据 %s（源返回空）" % code)
+                    err_shown += 1
+            if (ok + fail) % 500 == 0:
+                log("  自刷新进度 %d/%d（ok=%d fail=%d，%.0fs）" % (
+                    ok + fail, len(todo), ok, fail, time.time() - t0))
+            if time.time() - t0 > REFRESH_BUDGET_SEC:
+                log("⚠️ 自刷新预算 %.0fs 耗尽（完成 %d/%d）——余下按缓存旧值参与（保护闸把关）" % (
+                    REFRESH_BUDGET_SEC, ok + fail, len(todo)))
+                break
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
+    log("自刷新完成：%d 只成功 / %d 失败（%.0fs）" % (ok, fail, time.time() - t0))
+    return ok, fail
+
+
 def main():
     bars_map = load_bars()
     if len(bars_map) < 3000:
         raise SystemExit("缓存不足 3000 只（%d），保护性中止" % len(bars_map))
     names = load_names()
+
+    # ── 全量自刷新（kline_cache 是强势股副产物缓存，末根碎片化/仅251根是常态） ──
+    if os.environ.get("LQSQ_REFRESH") != "0":
+        refresh_stale(bars_map)
 
     # ── 数据日 = 各股末根的最大日期（缓存新鲜度保护闸：对齐率<60% 保护性中止，宁停不选错） ──
     last_dates = Counter(r[-1]["date"] for r in bars_map.values())

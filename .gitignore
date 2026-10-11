@@ -40,6 +40,8 @@ raw_data/_rps_cache/
 # raw_data/kline_cache/   ← 2026-09-08 主人令：改为入仓（云端零网络取数，根治静默断更）
 raw_data/_tdx_cache/
 raw_data/backtest_kline_cache/
+raw_data/kline_cache_ext/
+# 🚀 2026-10-11 量质双擎扩展缓存（700根前复权，runner 持久不入仓，防仓库膨胀）
 
 # 🛡 2026-08-30 阿狸咪加注：raw_data/_archive/ — raw_retention.py 归档目录
 #   移走 >7 天的 .bak、>14 天的 h_auto_buy_*.json 详情，不再被 git 索引。
