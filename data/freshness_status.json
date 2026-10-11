@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-10-11 16:32:39",
+  "check_time": "2026-10-11 19:34:47",
   "last_trade_close": "2026-10-09 15:30:00",
   "is_trading_day": false,
   "core_stale": [
@@ -73,9 +73,6 @@
     "SECTOR_FUND_FLOW_TREND": "post_close",
     "GOLD_POOL": "post_close",
     "CANDIDATE": "post_close",
-    "TRIPLE_CONSENSUS": "post_close",
-    "TRIPLE_TRACK": "post_close",
-    "TRIPLE_HISTORY": "post_close",
     "FOUR_VOLUME_HISTORY": "post_close",
     "FOUR_VOLUME_TRACK": "post_close",
     "TOP10_DAILY": "post_close",
@@ -85,7 +82,6 @@
     "SH_FIB": "post_close",
     "SZ_FIB": "post_close",
     "INST_TRADE": "post_close",
-    "CRDS_CARD_DATA": "post_close",
     "BACKTEST_TDX": "post_close",
     "BACKTEST_COMPREHENSIVE": "post_close",
     "FACTOR_LAB": "post_close",
