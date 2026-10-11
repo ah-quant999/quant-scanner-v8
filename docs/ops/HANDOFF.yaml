@@ -8237,3 +8237,22 @@ items:
       验证=dispatch run 37704257626（head=9eea55308a = 修复提交）：job algo_track_lite step#4「三算法追踪入池(gen_algo_track)」success；产物 raw_data/algo_track.json update_time=2026-10-08 07:48 前进，algos=1（四量终极单桶，符合 09-03 主人令下线另两桶）。09:00/11:00/13:00/15:00 CST 定时轮恢复。
       巡检轮 52（2026-10-08 07:37 CST）自主处置：发现→根因→修复→验证→挂账，盘前窗口完成。
     verify_how: run 37704257626 success@head=9eea55308a 且 step#4 三算法追踪入池 success；raw_data/algo_track.json update_time=2026-10-08 07:48 前进；远端 gen_algo_track.py blob=88e1c96237。
+
+  - id: fix-nightly-audit-5items-1011
+    date: 2026-10-11
+    updated: 2026-10-11 17:48
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: done
+    title: 每晚审计连3晚同5红项·一劳永逸修复（节拍锚4项+build防覆盖1项）
+    note: |
+      红项① 两个已下线自动买入产物「找不到数据文件」→ v8_health_check.py CARD_DEFS 移除（防每晚假红）；
+      ② W52_HIGH 真实节拍=盘前 07:15~08:45 → cycle=(8,45)；③ WAVE_ELLIOTT 小九机日频 17:50 → cycle=(18,0)；
+      ④ DAJIJIN_REDUCTION 夜间档 cron 次日 02:30~04:40 → cycle=(3,30)；
+      ⑤ check_data_cards 增逐卡 cycle 锚点下界重算（只放宽不收紧，真停摆下个产出点一过即 fail）；
+      ⑥ v8_build_deploy.yml 两处 git add data/ 前先取回远端直推文件（wave/dajijin/maharo），
+      根治「独立自动化直推新版被 build 旧 checkout 覆盖回退」（10-09 17:49→17:50 回退 42h 实证）。
+      ⚠️ 事故记录：本修复 16:2x 首次落盘后，被同窗口下架自动化（基于旧基线写回）整体洗掉，
+      17:5x 发现后重做并提交——交接件同批补登。
+      校验：py_compile 0 错、pre_deploy_audit 15/15 绿、workflow YAML 全量解析通过。
+    verify_how: pre_deploy_audit 15/15 绿（本地实测）；最终验证=当晚 nightly audit 该 5 项转绿 + 下次 build 后直推不被回退。

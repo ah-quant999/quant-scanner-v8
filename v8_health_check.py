@@ -283,14 +283,10 @@ CARD_DEFS = [
     #   两者均显式登记 manual_dep + manual_note，让面板明确显示「本机限制」而非「陈旧」，
     #   自愈链不去派发永远刷不出的任务，避免日复一日假派发噪声邮件。
     {"id": "STOCK_STOP_DATA", "name": "精确止损止盈", "page": "选股策略", "freq": "盘后", "max_age": 1440, "key_fields": ["stocks"], "heal_cat": "algo_run", "net_dep": True, "net_dep_note": "需 gtimg 日K(腾讯 urllib HTTPS) 计算 fixedP10/rrK1.5 止损止盈。本机实测 gtimg HTTPS=HTTP 501（腾讯waf反爬虫JS challenge拦截 urllib 类爬虫），无浏览器UA绕不开。本机无替代源，需小九中国IP+浏览器UA在线跑原版。"},
-    # 🛡 2026-09-10 主人令一劳永逸：H_AUTO_BUY / H_AUTO_BUY_TRACK 此前未登记 CARD_DEFS
-    #   → 落入 check_all_data_files 全量审计按「通用 24h 红线」误判 fail（all_H_AUTO_BUY / all_H_AUTO_BUY_TRACK）。
-    #   根因同 STOCK_STOP_DATA：track_h_auto_buy.py / auto_run_dn_algorithm.py 经腾讯 gtimg 拉日K，
-    #   云端 runner 无浏览器UA → HTTPS 501 腾讯 waf 拦截，永远刷不出。本机/云端均无法自动产出。
-    #   登记 manual_dep + manual_note，让面板显示「本机限制」(warn) 而非「陈旧」(fail)，
-    #   自愈链不去派发永远刷不出的任务；小九中国IP+浏览器UA在线跑原版刷新后即转 ok。
-    {"id": "H_AUTO_BUY", "name": "精确自动买入(H反推)", "page": "选股策略", "freq": "盘后(挂链)", "max_age": 1440, "key_fields": ["date", "total_scanned"], "heal_cat": "algo_run", "net_dep": True, "net_dep_note": "需 gtimg 日K(腾讯 urllib HTTPS) 反推涨幅≥3%+量比≥1.2 选股。本机实测 gtimg HTTPS=HTTP 501（腾讯waf反爬虫JS challenge拦截 urllib 类爬虫），无浏览器UA绕不开。本机无替代源，需小九中国IP+浏览器UA在线跑原版。"},
-    {"id": "H_AUTO_BUY_TRACK", "name": "精确自动买入追踪", "page": "选股策略", "freq": "盘后(挂链)", "max_age": 1440, "key_fields": ["update_time", "by_date"], "heal_cat": "algo_run", "manual_note": "2026-09-11 一劳永逸修复：同 H_AUTO_BUY，data_source_gtimg 域名级故障转移已上线，track_h_auto_buy.py 本机恢复产出（此前 gtimg 501 全败 → 胜率 0% 假数据）。"},
+    # 🔴 2026-10-11 一劳永逸（阿狸咪的工程师）：H_AUTO_BUY / H_AUTO_BUY_TRACK 移出 CARD_DEFS
+    #   ——模块已下线（选股框架轻量化），data/*.js 已删（CDN 404/远端 MISSING）、index.html 零注入，
+    #   留在清单里 = 每晚审计固定报「找不到数据文件」假红（10-09/10/10-11 连 3 晚实证）；
+    #   且自愈面（guard ALGO_VARS 已同步移出）不再派发永远刷不出的 algo_run。
     # ══ 2026-10-01 主人令「全面审计·按导航序每个前端都要有胶囊」批量补登（阿狸咪的工程师）══
     #   此前以下 16 项有真实前端卡但未登记 CARD_DEFS ⇒ 健康胶囊只能落到「全量数据」组（all_* 通用审计），
     #   本页组内无灯。补登后胶囊归位真实导航页组；max_age 一律宽松口径防误报红灯；producer 可考者才填（禁编造）。
@@ -298,18 +294,18 @@ CARD_DEFS = [
     {"id": "AI_MARKET_BRIEF", "name": "AI 市场速览", "page": "实时数据", "freq": "盘中+每日3档(08:50/12:30/15:10)", "max_age": 720, "key_fields": ["sentiment"]},
     {"id": "COMMODITY_ELASTICITY", "name": "商品涨价弹性榜", "page": "实时数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["hot_count"], "heal_cat": "post_close", "raw_file": "commodity_elasticity.json"},
     {"id": "ETF_NET_SUBSCRIPTION", "name": "资金热度·净申赎", "page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["total_net_amount_yi"], "heal_cat": "premarket", "raw_file": "etf_net_subscription.json"},
-    {"id": "W52_HIGH", "name": "市场宽度·新高家数", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["total", "top_gainers"], "heal_cat": "post_close", "raw_file": "w52_high.json"},
+    {"id": "W52_HIGH", "name": "市场宽度·新高家数", "page": "盘后数据", "freq": "每交易日盘前(07:15~08:45)", "max_age": 1440, "key_fields": ["total", "top_gainers"], "heal_cat": "post_close", "raw_file": "w52_high.json", "cycle": (8, 45)},
     {"id": "RESTRICTED_RELEASE", "name": "今日解禁", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "stats"], "heal_cat": "premarket", "raw_file": "restricted_release.json"},
     {"id": "PERFORMANCE_FORECAST", "name": "今日业绩预告", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "summary"], "heal_cat": "premarket", "raw_file": "performance_forecast.json"},
     {"id": "IMA_STRONG_STOCK", "name": "强势跟踪", "page": "选股策略", "freq": "工作日15:45", "max_age": 1440, "key_fields": ["data_date", "source"], "raw_file": "ima_strong_stock.json", "producer": "fetch_ima_strong_stock.py"},
     {"id": "TOP10_DAILY", "name": "最终推荐·Top5因子评分", "page": "最终推荐", "freq": "收盘后1次(算法链)", "max_age": 1440, "key_fields": ["total_scored"], "raw_file": "top10_daily.json", "producer": "generate_top10.py"},
     {"id": "maharo_insights", "name": "机构研究·AI解析", "page": "观测平台", "freq": "盘中+每日3档", "max_age": 1440, "key_fields": ["update_time"], "_window_var": "MAHORO_INSIGHTS"},
     {"id": "INDEX_VALUE_FRAMEWORK", "name": "指数观测·四框架", "page": "观测平台", "freq": "每日盘前", "max_age": 1440, "key_fields": ["indices"], "raw_file": "index_value_framework.json"},
-    {"id": "WAVE_ELLIOTT", "name": "艾略特波浪·深度分析", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["meta"]},
+    {"id": "WAVE_ELLIOTT", "name": "艾略特波浪·深度分析", "page": "观测平台", "freq": "每交易日17:50前后(小九机日频)", "max_age": 1440, "key_fields": ["meta"], "cycle": (18, 0)},
     {"id": "CITIC_PE_THERMO", "name": "中信PE热力", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current", "percentile"]},
     {"id": "SECTOR_LEADERS", "name": "主升/启动板块·龙头股", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["phase", "sector_count"], "raw_file": "sector_leaders.json", "producer": "scripts/fetch_sector_leaders.py"},
     {"id": "FIRST_BOARD_ALERT", "name": "连板梯队前哨", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["alerts"]},
-    {"id": "DAJIJIN_REDUCTION", "name": "大基金增减持监控", "page": "暂未上架", "freq": "工作日20:30", "max_age": 1440, "key_fields": ["update_time"]},
+    {"id": "DAJIJIN_REDUCTION", "name": "大基金增减持监控", "page": "暂未上架", "freq": "工作日夜间档(cron次日02:30~04:40)", "max_age": 1440, "key_fields": ["update_time"], "cycle": (3, 30)},
 ]
 
 
@@ -1857,6 +1853,16 @@ def check_data_cards():
             # 🛡 主人铁律 2026-08-18：分 page × 分时段红线（仅实时数据盘中 2h / 其他 24h）
             # 硬 cap 必须在 adjust_max_age 之后叠加，否则盘中/盘后自适应逻辑被绕过
             max_age = min(max_age, _dual_hard_cap(d.get("page"), d.get("dual_page")))
+            # 🛡 2026-10-11 一劳永逸（阿狸咪的工程师）·逐卡真实节拍锚点：
+            #   有 cycle=(hh,mm) 的卡按「距上一产出点」放宽下界（只放宽不收紧）——
+            #   W52_HIGH 盘前 07:15~08:45 / WAVE_ELLIOTT 17:50 / DAJIJIN 次日凌晨 02:30~04:40
+            #   这类错峰节拍，原「通用 24h」口径在周末/延迟窗口必误判假红（10-09~10-11 连 3 晚实证）。
+            #   真停摆不受掩护：下一 cycle 产出点一过即恢复 fail。
+            _cyc = d.get("cycle")
+            if _cyc:
+                _n = now_cst()
+                _mk = _recent_trading_mark(_n, *_cyc)
+                max_age = max(max_age, int((_n - _mk).total_seconds() / 60) + _REG_GRACE_MIN)
 
         # 盘中 premarket_cleared 异常自愈检测：实时数据在交易时段被标记为盘前清空，属于误清空
         prem_cleared = data.get("premarket_cleared") is True

@@ -520,6 +520,13 @@ jobs:
             git rm --cached --ignore-unmatch \
               data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json \
               data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
+            # 🛡 2026-10-11 一劳永逸（阿狸咪的工程师）·防「直推文件被 build 回退」：
+            #   WAVE_ELLIOTT / DAJIJIN_REDUCTION / MAHORO_INSIGHTS 由独立自动化直推远端 main，
+            #   不经本 build；本 job 的 checkout 是启动时快照，git add data/ 全量暂存会把
+            #   直推的新版覆盖回旧版（10-09 17:49 直推被 17:50 build 回退成 42h 陈旧实证）。
+            #   ⇒ add 前先取回远端最新版（不存在则忽略）。
+            git fetch origin main
+            git checkout origin/main -- data/WAVE_ELLIOTT.js data/DAJIJIN_REDUCTION.js data/MAHORO_INSIGHTS.js 2>/dev/null || true
             git add data/ index.html logic.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
               raw_data/sh_sz_history.json \
               raw_data/sector_fund_flow_history.json \
@@ -570,6 +577,13 @@ jobs:
               git rm --cached --ignore-unmatch \
                 data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json \
                 data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
+                            # 🛡 2026-10-11 一劳永逸（阿狸咪的工程师）·防「直推文件被 build 回退」：
+            #   WAVE_ELLIOTT / DAJIJIN_REDUCTION / MAHORO_INSIGHTS 由独立自动化直推远端 main，
+            #   不经本 build；本 job 的 checkout 是启动时快照，git add data/ 全量暂存会把
+            #   直推的新版覆盖回旧版（10-09 17:49 直推被 17:50 build 回退成 42h 陈旧实证）。
+            #   ⇒ add 前先取回远端最新版（不存在则忽略）。
+              git fetch origin main
+              git checkout origin/main -- data/WAVE_ELLIOTT.js data/DAJIJIN_REDUCTION.js data/MAHORO_INSIGHTS.js 2>/dev/null || true
               git add data/ index.html logic.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
                 raw_data/sh_sz_history.json \
                 raw_data/sector_fund_flow_history.json \

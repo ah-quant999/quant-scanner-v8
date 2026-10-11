@@ -47,9 +47,12 @@
   A 采集批：13 项中 ≥11 项鲜活（老 10 项容错保留 6 项 + 新增 3 项）+ **龙虎榜 / lhb_data / ETF_NET_SUBSCRIPTION must 必新** ← 以 READY_SPEC["A"] 为唯一真源
            ⚠️ 2026-09-14 00:1x P0 修正：原扩至「19 项 / ≥13 / must 含 AVG_PRICE_DATA」，其中 7 项在仓库中**并不存在**（TDX_BACKTEST 真名 BACKTEST_TDX 且属 E 批；AVG_PRICE 真名 AVG_PRICE_DATA；ETF_SUBSCRIPTION 系旧口径已下线；etf_subscription/avg_price/etf_spot/zsxq_posts 从未存在）⇒ read_ut() 返 None ⇒ must 恒不满足 ⇒ **A 批永久锁死且不报错**。已收敛为 13/11/3。
            🔴 `AVG_PRICE_DATA` 现为**非 must**：cloud_fetch_v8 的 post_close 档不写其时戳（仅 intraday 写）⇒ 放回 must 会立即复现锁死；须待「方案乙」落地后方可考虑加回。
-  B 选股批：12 项产物中 ≥8 项鲜活 + 三重共识/四量终极/逆势龙头（must）必新  ← 以 READY_SPEC["B"] 为唯一真源
+  B 选股批：10 项产物中 ≥6 项鲜活 + 四量终极（must）必新  ← 以 READY_SPEC["B"] 为唯一真源
+           🔴 2026-10-11 主人令「完全下架」对齐：items 12→10（两下架策略移出）、need 8→6
+              （保持「容忍 4 项不新鲜」语义不变）、must 3→1（唯余 B 批必产核心卡）。
   D 汇总批：最终推荐                              → 1/1
-  E 回测批：全算法回测汇总 + TDX 回测（**两项必新 must**）+ CRDS 回测 → 2/3 项
+  E 回测批：全算法回测汇总 + TDX 回测（两项必新 must）→ 2 项
+            🔴 2026-10-11 主人令「完全下架」对齐：CRDS 回测移出，items 3→2，need/must 不变。
             ⚠️ 原 must 仅 [BACKTEST_ALL_ALGOS]：need 是**纯计数**，表达不了「哪几项必新」；
                只占「任一」位的 BACKTEST_TDX 陈旧时**不阻塞**就绪，而健康检查又把它列低频豁免
                ⇒ **双盲区**。实测后果（2026-09-18）：其产物涨到 76 MB 超 GitHub 单文件上限，
