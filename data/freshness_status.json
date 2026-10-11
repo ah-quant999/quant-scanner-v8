@@ -1,15 +1,37 @@
 {
-  "check_time": "2026-10-10 00:53:53",
+  "check_time": "2026-10-11 16:32:39",
   "last_trade_close": "2026-10-09 15:30:00",
   "is_trading_day": false,
-  "core_stale": [],
-  "warn_stale": [],
+  "core_stale": [
+    {
+      "var": "CRDS_CARD_DATA",
+      "reason": "文件缺失",
+      "category": "post_close"
+    }
+  ],
+  "warn_stale": [
+    {
+      "var": "TRIPLE_CONSENSUS",
+      "reason": "文件缺失",
+      "category": "post_close"
+    },
+    {
+      "var": "TRIPLE_TRACK",
+      "reason": "文件缺失",
+      "category": "post_close"
+    },
+    {
+      "var": "TRIPLE_HISTORY",
+      "reason": "文件缺失",
+      "category": "post_close"
+    }
+  ],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 43,
-    "core_stale": 0,
-    "warn_stale": 0,
+    "core_stale": 1,
+    "warn_stale": 3,
     "frozen_stale": 0,
     "no_timestamp": 0
   },
