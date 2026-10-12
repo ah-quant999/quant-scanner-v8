@@ -3383,5 +3383,33 @@
     "message": "更新于 4天前 16:51；超过阈值 4130 分钟"
    }
   ]
+ },
+ {
+  "date": "2026-10-13",
+  "time": "06:11:52",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 118,
+   "warn": 0,
+   "fail": 2,
+   "limited": 1,
+   "info": 0,
+   "other": 0,
+   "total": 121
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "runner_local",
+    "name": "runner 本地检测",
+    "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 3 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) 失败"
+   },
+   {
+    "id": "runner",
+    "name": "self-hosted runner",
+    "message": "runner 本地检测:fail-runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 3 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数"
+   }
+  ]
  }
 ]
