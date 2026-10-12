@@ -1,6 +1,6 @@
 {
  "month": "2026年10月",
- "update_time": "2026-10-12 23:48",
+ "update_time": "2026-10-13 00:27",
  "legend": [
   {
    "title": "重要政策",
@@ -288,19 +288,19 @@
     {
      "num": 12,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇨🇳 CPI/PPI数据",
        "cls": "data2",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 13,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": []
     },
     {
