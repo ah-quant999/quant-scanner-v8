@@ -222,9 +222,8 @@ WARN_SOURCES = {
     "EXPERIMENT": 72,
     "GOLD_POOL": 48,
     "CANDIDATE": 48,
-    "TRIPLE_CONSENSUS": 48,
-    "TRIPLE_TRACK": 48,
-    "TRIPLE_HISTORY": 48,
+    # 🔴 2026-10-12 闭环：TRIPLE_CONSENSUS/TRIPLE_TRACK/TRIPLE_HISTORY 随三重共识完全下架已删 data，
+    #   移出 WARN 自检集，避免每轮必判 stale=结构性恒黄灯。
     # 2026-09-04 主人令收尾：COCKPIT_ADVICE/COCKPIT_TIER_RECOMMEND 阈值已删（驾驶舱模块下线）
     "LHB_DATA": 48,
     "SH_FIB": 48,
@@ -256,7 +255,8 @@ CORE_SOURCES_ALGO = {
     # 2026-09-04 主人令收尾：COCKPIT_BACKTEST 已删（驾驶舱模块下线）
     "BACKTEST_COMPREHENSIVE": 24,
     "BACKTEST_TDX": 24,
-    "CRDS_CARD_DATA": 24,
+    # 🔴 2026-10-12 闭环：CRDS_CARD_DATA 随逆势龙头 CRDS 完全下架已删 data，移出 CORE 自愈组，
+    #   避免每轮必派 algo_cloud 且永远治不好=结构性恒红灯。
     # 🛡 2026-09-14 阿狸咪的工程师（双机独立复核后裁定）：LHB_7D 已从本组**移出**。
     #    → 09-15 小九的工程师进一步**退役删除**（data/LHB_7D.js 已不存在，见下方 FROZEN_SOURCES 注释）。
     #    根因：唯一生产者 gen_lhb_7d.py 于 09-13 主动停跑（run_algorithms.py 摘除调度 + 注释调用），
@@ -317,7 +317,8 @@ ALGO_VARS = {
     "BACKTEST_COMPREHENSIVE", "BACKTEST_TDX",
     # 🔴 2026-10-11 主人令「完全下架」：CRDS_CARD_DATA / TRIPLE_CONSENSUS / TRIPLE_TRACK /
     #   TRIPLE_HISTORY 移出——模块已下架、data 文件已删、index.html 零注入，
-    #   自愈面不再派发永远刷不出的 algo_run。
+    #   自愈面不再派发永远刷不出的 algo_run。2026-10-12 闭环：上述 4 项已同步移出
+    #   WARN_SOURCES 与 CORE_SOURCES_ALGO（见各自段注释），彻底灭掉结构性恒红/恒黄灯。
     "FINAL_RECOMMEND_DATA", "ALGO_TRACK",
     "SENTIMENT_CYCLE",
     # 2026-10-11 一劳永逸（阿狸咪）：H_AUTO_BUY / H_AUTO_BUY_TRACK 移出——模块已下线，
