@@ -618,7 +618,7 @@ window.__domReadyFns=[];
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=fa3546254f" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=2951d76e37" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=71549a9cd8" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=4d3b8437c5" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=af03476f1b" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=d84bcce2e3" defer></script>
@@ -626,7 +626,7 @@ window.__domReadyFns=[];
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_PROFILE 不再单独下载（1.4MB 与 STOCK_LIST 100% 重复），由 STOCK_LIST 合成 -->
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
-    <script src="data/MACRO_DATA.js?v=2971c0835f" defer></script>
+    <script src="data/MACRO_DATA.js?v=3c8475b200" defer></script>
     <!-- 🔮 2026-10-05 主人令：未来预测子TAB（牛转熊指标观测台）数据，gen_market_thermo.py 日更 -->
     <script src="data/MARKET_THERMO.js?v=96787044c8" defer></script>
     <script src="data/MACRO_BRIEF.js?v=3087b8fe4f" defer></script>
@@ -638,7 +638,7 @@ window.__domReadyFns=[];
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=c29ab24913" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
-<script src="data/INDEX_QUOTES.js?v=f45743f1a1" defer></script>
+<script src="data/INDEX_QUOTES.js?v=02aa89e286" defer></script>
 <script src="data/AI_MARKET_BRIEF.js?v=b62679c9bb" defer></script>
 <script src="data/MARGIN_DATA.js?v=e80f45cc85" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=192d9514ee" defer></script>
@@ -689,7 +689,7 @@ window.__domReadyFns=[];
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
     <script src="data/SECTOR_LEADERS.js?v=dd4c034874" defer></script>
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
-    <script src="data/PORTFOLIO.js?v=3ae1bb63f2" defer></script>
+    <script src="data/PORTFOLIO.js?v=fa80db62ca" defer></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -1754,7 +1754,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/LIMIT_UP_HEATMAP.js?v=1fd570ed2c" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
-<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=ef11ac4cbe" defer></script>
+<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=2d8e1b8d7f" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=5d42909299" defer></script>
 <script src="data/VOLATILITY.js?v=878e6b282f" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=59e78b27fb" defer></script>
@@ -2979,10 +2979,10 @@ function fmtSigned(v){
     <div class="st-tabs">
       <!-- 2026-08-29 主人令：选股池作为选股策略子页面；2026-08-30 主人令：选股池移到三重共识前面 -->
       <button class="st-tab active" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
+      <button class="st-tab" data-st="life" onclick="switchSt('life')">📡 强势跟踪 <span class="st-tab-star" data-card="强势跟踪"></span></button>
       <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span class="st-tab-star" data-card="四量终极"></span></button>
       <!-- 🆕 2026-10-12 小九：量质双擎（LQSQ）子页 tab —— 第一支自研算法，与四量同页并列 -->
       <button class="st-tab" data-st="lqsq" onclick="switchSt('lqsq')">⚖️ 量质双擎 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
-      <button class="st-tab" data-st="life" onclick="switchSt('life')">📡 强势跟踪 <span class="st-tab-star" data-card="强势跟踪"></span></button>
       <!-- 2026-09-18 晚 原记录：此处硬编码「弱市专用·0★观测」被改为接 st-tab-star chip（__committeeRate 实时计算）。
            🔴 2026-09-18 (g) 更正 —— 该次改动的**方向对（统一星级出口）**，但它引用的依据是错的，
               而且它把一处**潜藏的口径漏洞显性化**了（主人随即截图质问「这个也评星么」）：
@@ -5267,19 +5267,19 @@ c.innerHTML = h;
   window.__STRATEGY_BACKTESTS = [
     // 2026-09-03 主人令：已下架策略（cockpit/allsite/hunter）整体从回测区退出，
     // 既然选股策略子页已彻底删除（九宝不让「选股已删回测还在」），回测卡也不必保留。
-    // 当前 active 仅留真正仍在选股策略子页展示的 2 个主策略（fourvolume/crds）。
+    // 当前 active 主策略：四量终极 → 量质双擎（双擎紧接四量下方）→ 强势跟踪。
     {key:'fourvolume', name:'四量终极',     icon:'📊', desc:'四量真实信号流回测（2026-10-11 主人令切换，历史回放口径作废）· 样本自 09-14 累积中，仅显示成熟档 · 观察期：胜率/收益未达红线时回测页出下架提请', color:'#38bdf8', var:'FOUR_VOLUME_BACKTEST'},
+    /* 🆕 2026-10-12 小九：第一支自研算法「量质双擎」(LQSQ) —— 真实信号流口径直上主榜，
+       与四量同榜同纪律（gen_lqsq_top30.py → LQSQ_BACKTEST，summary.by_period 与四量同构，
+       故 _renderPeriodBacktestCard 零结构改动直接复用）。样本自 10-09 起累积、未走满 T+20
+       不计入 ⇒ 首期卡头走「累积中」，成熟一档进一档。 */
+    {key:'lqsq',    name:'量质双擎',   icon:'⚖️', desc:'第一支自研算法 · 异常量比缩量选强 Top30 · 次开买入持有 20 日 · 样本自 10-09 累积中，仅显示成熟档', color:'#22c55e', var:'LQSQ_BACKTEST'},
     /* 🆕 2026-09-16 主人令「生命周期三个算法里明显高手的更好 ⇒ 改为强势跟踪」：
        原「高手强势股跟踪」升为本页正式策略卡，名称统一为「强势跟踪」。
        数据源 window.IMA_STRONG_BACKTEST（真实日K · 已扣双边 0.30%），
        由 __strongTrackBacktest() 适配成 _renderPeriodBacktestCard 认的 by_period 结构。
        ⚠️ 它来自 ima 外部同步，不进 v8 星级委员会 ⇒ 卡头显示「—」，不硬凑星。 */
     {key:'strongtrack',name:'强势跟踪',     icon:'📡', desc:'ima 真实首次入选日 · 信号层回测', color:'#a78bfa', var:'__strongTrackBacktest'},
-    /* 🆕 2026-10-12 小九：第一支自研算法「量质双擎」(LQSQ) —— 真实信号流口径直上主榜，
-       与四量同榜同纪律（gen_lqsq_top30.py → LQSQ_BACKTEST，summary.by_period 与四量同构，
-       故 _renderPeriodBacktestCard 零结构改动直接复用）。样本自 10-09 起累积、未走满 T+20
-       不计入 ⇒ 首期卡头走「累积中」，成熟一档进一档。 */
-    {key:'lqsq',    name:'量质双擎',   icon:'⚖️', desc:'第一支自研算法 · 异常量比缩量选强 Top30 · 次开买入持有 20 日 · 样本自 10-09 累积中，仅显示成熟档', color:'#22c55e', var:'LQSQ_BACKTEST'},
   ];
   // 2026-09-03 主人令：cockpit/allsite 大牛股/全站精选 全部移出回测区，DELISTED 保留为空数组
   //   (防止 _renderBacktestCardsFrom 空引用报错)。如需历史胜率回溯请前往逻辑详解页相关章节。
@@ -18217,7 +18217,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=280658aea6', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=fe974b3203', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=2c06e6fb0b', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=86b939c61e', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
