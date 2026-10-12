@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-12 12:47:50",
+  "update_time": "2026-10-12 13:22:13",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -12,7 +12,7 @@
     "10/12"
   ],
   "columns": 31,
-  "cycle_count": 17,
+  "cycle_count": 18,
   "cycles": [
     {
       "sector": "其他",
@@ -24,7 +24,7 @@
       "hot_days": 31,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 3180,
+      "total": 3182,
       "ongoing": true
     },
     {
@@ -128,7 +128,7 @@
       "hot_days": 27,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 314,
+      "total": 315,
       "ongoing": true
     },
     {
@@ -204,9 +204,9 @@
       "end_idx": 30,
       "days": 14,
       "hot_days": 13,
-      "peak": 7,
-      "peak_date": "09/29",
-      "total": 61,
+      "peak": 9,
+      "peak_date": "10/12",
+      "total": 65,
       "ongoing": true
     },
     {
@@ -233,6 +233,19 @@
       "peak": 9,
       "peak_date": "09/23",
       "total": 63,
+      "ongoing": true
+    },
+    {
+      "sector": "通信设备",
+      "start": "10/12",
+      "end": "10/12",
+      "start_idx": 30,
+      "end_idx": 30,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 3,
+      "peak_date": "10/12",
+      "total": 3,
       "ongoing": true
     }
   ]
