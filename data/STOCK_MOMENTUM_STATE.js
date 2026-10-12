@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-12 23:42",
- "generated": "2026-10-12 23:42",
+ "update_time": "2026-10-13 00:01",
+ "generated": "2026-10-13 00:01",
  "meta": {
-  "generated": "2026-10-12 23:42",
+  "generated": "2026-10-13 00:01",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 24,
+  "total_days": 25,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -9191,17 +9191,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "001330",
+      "name": "博纳影业",
+      "change_pct": 10.043,
+      "price": 7.67,
+      "category": "突破"
+     },
+     {
       "code": "301234",
       "name": "五洲医疗",
       "change_pct": 6.054,
       "price": 155.9,
-      "category": "突破"
-     },
-     {
-      "code": "300133",
-      "name": "华策影视",
-      "change_pct": 8.353,
-      "price": 9.08,
       "category": "突破"
      },
      {
@@ -9293,17 +9293,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "001330",
+      "name": "博纳影业",
+      "change_pct": 10.043,
+      "price": 7.67,
+      "category": "短线选股"
+     },
+     {
       "code": "301234",
       "name": "五洲医疗",
       "change_pct": 6.054,
       "price": 155.9,
-      "category": "短线选股"
-     },
-     {
-      "code": "300133",
-      "name": "华策影视",
-      "change_pct": 8.353,
-      "price": 9.08,
       "category": "短线选股"
      },
      {
@@ -9365,6 +9365,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "001330",
+      "name": "博纳影业",
+      "change_pct": 10.043,
+      "price": 7.67,
+      "category": "强势股"
+     },
+     {
       "code": "301234",
       "name": "五洲医疗",
       "change_pct": 6.054,
@@ -9372,10 +9379,269 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "300133",
-      "name": "华策影视",
-      "change_pct": 8.353,
-      "price": 9.08,
+      "code": "002343",
+      "name": "慈文传媒",
+      "change_pct": 10.033,
+      "price": 6.69,
+      "category": "强势股"
+     },
+     {
+      "code": "600192",
+      "name": "长城电工",
+      "change_pct": 9.986,
+      "price": 7.93,
+      "category": "强势股"
+     },
+     {
+      "code": "603105",
+      "name": "芯能科技",
+      "change_pct": 3.476,
+      "price": 8.93,
+      "category": "强势股"
+     },
+     {
+      "code": "002264",
+      "name": "新 华 都",
+      "change_pct": 10.0,
+      "price": 8.14,
+      "category": "强势股"
+     },
+     {
+      "code": "001231",
+      "name": "农心科技",
+      "change_pct": 10.009,
+      "price": 25.61,
+      "category": "强势股"
+     },
+     {
+      "code": "605080",
+      "name": "浙江自然",
+      "change_pct": 3.062,
+      "price": 23.56,
+      "category": "强势股"
+     },
+     {
+      "code": "003030",
+      "name": "祖名股份",
+      "change_pct": 3.954,
+      "price": 26.03,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-10-13",
+   "categories": {
+    "突破": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 10.0,
+      "price": 17.82,
+      "category": "突破"
+     },
+     {
+      "code": "603757",
+      "name": "大元泵业",
+      "change_pct": 3.517,
+      "price": 75.34,
+      "category": "突破"
+     },
+     {
+      "code": "603721",
+      "name": "中广天择",
+      "change_pct": 3.107,
+      "price": 19.91,
+      "category": "突破"
+     },
+     {
+      "code": "001330",
+      "name": "博纳影业",
+      "change_pct": 10.043,
+      "price": 7.67,
+      "category": "突破"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 6.054,
+      "price": 155.9,
+      "category": "突破"
+     },
+     {
+      "code": "002343",
+      "name": "慈文传媒",
+      "change_pct": 10.033,
+      "price": 6.69,
+      "category": "突破"
+     },
+     {
+      "code": "600192",
+      "name": "长城电工",
+      "change_pct": 9.986,
+      "price": 7.93,
+      "category": "突破"
+     },
+     {
+      "code": "603105",
+      "name": "芯能科技",
+      "change_pct": 3.476,
+      "price": 8.93,
+      "category": "突破"
+     },
+     {
+      "code": "002264",
+      "name": "新 华 都",
+      "change_pct": 10.0,
+      "price": 8.14,
+      "category": "突破"
+     },
+     {
+      "code": "001231",
+      "name": "农心科技",
+      "change_pct": 10.009,
+      "price": 25.61,
+      "category": "突破"
+     },
+     {
+      "code": "605080",
+      "name": "浙江自然",
+      "change_pct": 3.062,
+      "price": 23.56,
+      "category": "突破"
+     },
+     {
+      "code": "003030",
+      "name": "祖名股份",
+      "change_pct": 3.954,
+      "price": 26.03,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 10.0,
+      "price": 17.82,
+      "category": "加速"
+     },
+     {
+      "code": "603757",
+      "name": "大元泵业",
+      "change_pct": 3.517,
+      "price": 75.34,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 10.0,
+      "price": 17.82,
+      "category": "短线选股"
+     },
+     {
+      "code": "603757",
+      "name": "大元泵业",
+      "change_pct": 3.517,
+      "price": 75.34,
+      "category": "短线选股"
+     },
+     {
+      "code": "603721",
+      "name": "中广天择",
+      "change_pct": 3.107,
+      "price": 19.91,
+      "category": "短线选股"
+     },
+     {
+      "code": "001330",
+      "name": "博纳影业",
+      "change_pct": 10.043,
+      "price": 7.67,
+      "category": "短线选股"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 6.054,
+      "price": 155.9,
+      "category": "短线选股"
+     },
+     {
+      "code": "002343",
+      "name": "慈文传媒",
+      "change_pct": 10.033,
+      "price": 6.69,
+      "category": "短线选股"
+     },
+     {
+      "code": "600192",
+      "name": "长城电工",
+      "change_pct": 9.986,
+      "price": 7.93,
+      "category": "短线选股"
+     },
+     {
+      "code": "603105",
+      "name": "芯能科技",
+      "change_pct": 3.476,
+      "price": 8.93,
+      "category": "短线选股"
+     },
+     {
+      "code": "002264",
+      "name": "新 华 都",
+      "change_pct": 10.0,
+      "price": 8.14,
+      "category": "短线选股"
+     },
+     {
+      "code": "001231",
+      "name": "农心科技",
+      "change_pct": 10.009,
+      "price": 25.61,
+      "category": "短线选股"
+     },
+     {
+      "code": "605080",
+      "name": "浙江自然",
+      "change_pct": 3.062,
+      "price": 23.56,
+      "category": "短线选股"
+     },
+     {
+      "code": "003030",
+      "name": "祖名股份",
+      "change_pct": 3.954,
+      "price": 26.03,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "603721",
+      "name": "中广天择",
+      "change_pct": 3.107,
+      "price": 19.91,
+      "category": "强势股"
+     },
+     {
+      "code": "001330",
+      "name": "博纳影业",
+      "change_pct": 10.043,
+      "price": 7.67,
+      "category": "强势股"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 6.054,
+      "price": 155.9,
       "category": "强势股"
      },
      {
