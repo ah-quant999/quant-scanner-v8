@@ -613,12 +613,12 @@ window.__domReadyFns=[];
   .tp-hist-cell .tp-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
 </style>
-    <script src="data/ETF_INTRADAY_HEAT.js?v=bdf220dd3d" defer></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=2e7f5751a0" defer></script>
     <script src="data/SECTOR_FUND_FLOW.js?v=3d03460ee7" defer></script>
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=fa3546254f" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=2951d76e37" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=4d3b8437c5" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=71549a9cd8" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=af03476f1b" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=d84bcce2e3" defer></script>
@@ -626,7 +626,7 @@ window.__domReadyFns=[];
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_PROFILE 不再单独下载（1.4MB 与 STOCK_LIST 100% 重复），由 STOCK_LIST 合成 -->
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
-    <script src="data/MACRO_DATA.js?v=3c8475b200" defer></script>
+    <script src="data/MACRO_DATA.js?v=2971c0835f" defer></script>
     <!-- 🔮 2026-10-05 主人令：未来预测子TAB（牛转熊指标观测台）数据，gen_market_thermo.py 日更 -->
     <script src="data/MARKET_THERMO.js?v=96787044c8" defer></script>
     <script src="data/MACRO_BRIEF.js?v=3087b8fe4f" defer></script>
@@ -636,9 +636,9 @@ window.__domReadyFns=[];
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
-<script src="data/CONCEPT_RANKING.js?v=ce45fa10fb" defer></script>
+<script src="data/CONCEPT_RANKING.js?v=387c4e8a77" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
-<script src="data/INDEX_QUOTES.js?v=02aa89e286" defer></script>
+<script src="data/INDEX_QUOTES.js?v=a6e5badcee" defer></script>
 <script src="data/AI_MARKET_BRIEF.js?v=b62679c9bb" defer></script>
 <script src="data/MARGIN_DATA.js?v=e80f45cc85" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=192d9514ee" defer></script>
@@ -689,7 +689,7 @@ window.__domReadyFns=[];
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
     <script src="data/SECTOR_LEADERS.js?v=dd4c034874" defer></script>
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
-    <script src="data/PORTFOLIO.js?v=fa80db62ca" defer></script>
+    <script src="data/PORTFOLIO.js?v=3ae1bb63f2" defer></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -1754,8 +1754,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/LIMIT_UP_HEATMAP.js?v=1fd570ed2c" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
-<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=2d8e1b8d7f" defer></script>
-<script src="data/LIMIT_UP_BROKEN.js?v=c7b598c3bb" defer></script>
+<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=ef11ac4cbe" defer></script>
+<script src="data/LIMIT_UP_BROKEN.js?v=cd8d48ab38" defer></script>
 <script src="data/VOLATILITY.js?v=878e6b282f" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=59e78b27fb" defer></script>
 <script src="data/SH_SZ_HISTORY.js?v=4fd6de6f70" defer></script>
@@ -1789,7 +1789,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
     <script src="data/FACTOR_LAB.js?v=e9c8a75df0" defer></script>
 <!-- 🔴 2026-10-06 阿狸咪的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
-<script src="data/ETF_PULSE.js?v=d0746e12be" defer></script>
+<script src="data/ETF_PULSE.js?v=35275c8133" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=f7d59966e9" defer></script>
 <script src="data/TOP10_DAILY.js?v=9e218e6a27" defer></script>
 <script src="data/WEEKEND_RUN.js?v=d24506d857" defer></script>
@@ -18217,7 +18217,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=280658aea6', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=2c06e6fb0b', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=fe974b3203', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=86b939c61e', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
