@@ -6,7 +6,7 @@
   "total_scanned": 8387,
   "skipped_no_quote": 0,
   "hit_chg_only": 490,
-  "final_count": 224,
+  "final_count": 226,
   "candidates": [
     {
       "code": "600241",
@@ -2310,6 +2310,19 @@
       "board": ""
     },
     {
+      "code": "920018",
+      "symbol": "bj920018",
+      "name": "宏远股份",
+      "pct": 7.96,
+      "price": 16.01,
+      "prev_close": 14.83,
+      "volume": 7116472.0,
+      "avg_vol_4d": 750085.0,
+      "vol_ratio": 9.488,
+      "industry": "",
+      "board": ""
+    },
+    {
       "code": "301030",
       "symbol": "sz301030",
       "name": "*ST仕净",
@@ -2778,6 +2791,19 @@
       "board": "科创板"
     },
     {
+      "code": "920090",
+      "symbol": "bj920090",
+      "name": "*ST同辉",
+      "pct": 4.26,
+      "price": 3.18,
+      "prev_close": 3.05,
+      "volume": 2909383.0,
+      "avg_vol_4d": 1392962.25,
+      "vol_ratio": 2.089,
+      "industry": "",
+      "board": ""
+    },
+    {
       "code": "688023",
       "symbol": "sh688023",
       "name": "安恒信息",
@@ -2977,16 +3003,16 @@
       "board": "主板"
     }
   ],
-  "generated_at": "2026-10-12 20:50:13",
-  "update_time": "2026-10-12 20:50:13",
+  "generated_at": "2026-10-13 06:37:18",
+  "update_time": "2026-10-13 06:37:18",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖",
   "kline_stat": {
-    "cache_fresh": 23,
+    "cache_fresh": 52,
     "cache_stale": 186,
-    "net": 27,
-    "fail": 254
+    "net": 0,
+    "fail": 252
   },
   "degraded": false,
   "degraded_reason": "",
-  "quote_stale_days": 0
+  "quote_stale_days": 1
 }

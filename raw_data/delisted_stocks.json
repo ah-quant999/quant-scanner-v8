@@ -40,5 +40,33 @@
 "delisted_date": "2026-10-09",
 "last_board": "",
 "last_industry": ""
+},
+{
+"code": "00232",
+"name": "大陆航空科技控股",
+"delisted_date": "2026-10-13",
+"last_board": "主板",
+"last_industry": ""
+},
+{
+"code": "00286",
+"name": "爱帝宫",
+"delisted_date": "2026-10-13",
+"last_board": "主板",
+"last_industry": ""
+},
+{
+"code": "00924",
+"name": "坤集团",
+"delisted_date": "2026-10-13",
+"last_board": "",
+"last_industry": ""
+},
+{
+"code": "01598",
+"name": "２１世纪教育",
+"delisted_date": "2026-10-13",
+"last_board": "",
+"last_industry": ""
 }
 ]
