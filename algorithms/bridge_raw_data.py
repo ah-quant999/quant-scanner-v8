@@ -45,8 +45,7 @@ def _now_cst_str():
 # 任何「生成器直写 raw_data/<src>，但 update_v8 读 raw_data/<dst>」的改名场景必须登记在此
 BRIDGE_MAP = {
     # 🛡 2026-08-18 主人紧急令根治：4 天前 TRIPLE_HISTORY 不更新的根因
-    # 🔴 2026-10-11 主人令「完全下架」：triple_resonance_history 已随三重共识下架，桥接移除。
-    # "triple_resonance_history.json": "triple_history.json",
+    "triple_resonance_history.json": "triple_history.json",
     # 未来扩展点：所有 raw_data 改名场景都登记在这里
 }
 
@@ -81,6 +80,16 @@ def main():
     if not RAW.exists():
         print(f"❌ raw_data 目录不存在: {RAW}")
         return 1
+
+    # 🛡 2026-10-12 根治（小九机 runner 守护实查）：三重共识 2026-10-11 完全下架后
+    #   BRIDGE_MAP 可能整体为空（唯一条目已注释）。空表 = 无事可做 = 正常状态，
+    #   必须返回 0；旧逻辑 `return 0 if bridged>0 else 1 if skipped==0 else 0`
+    #   在 bridged=0/skipped=0 时返回 1，导致 v8_cn_fetch_cloud / _selfhosted /
+    #   algo 链（无 || true 的两处）自 10-11 起每轮必红、update_v8/health_check
+    #   后续步骤全被阻断（实测 10-12 主线 6 连红 + selfhosted 4 连红，双机均中招）。
+    if not BRIDGE_MAP:
+        print(f"  [info] BRIDGE_MAP 为空（无登记桥接项）——无事可做，正常退出（{_now_cst_str()}）")
+        return 0
 
     bridged = 0
     skipped = 0
