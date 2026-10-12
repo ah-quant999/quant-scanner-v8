@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-10-11 07:52",
-  "republish_time": "2026-10-11 08:54:48",
+  "update_time": "2026-10-12 19:10",
+  "republish_time": "2026-10-12 19:32:19",
   "data_date": "2026-10-09",
   "rule_ver": 2,
   "top_n": 5,
@@ -17,38 +17,38 @@
       "cons_count": 18,
       "leaders": [
         {
-          "code": "300182",
-          "name": "捷成股份",
-          "price": 5.56,
-          "chg": 10.98,
-          "main_net": null
-        },
-        {
-          "code": "300133",
-          "name": "华策影视",
-          "price": 8.38,
-          "chg": 10.85,
-          "main_net": null
-        },
-        {
-          "code": "601595",
-          "name": "上海电影",
-          "price": 24.74,
-          "chg": 10.0,
-          "main_net": null
-        },
-        {
           "code": "000892",
           "name": "欢瑞世纪",
-          "price": 4.85,
-          "chg": 9.98,
+          "price": 5.34,
+          "chg": 10.1,
+          "main_net": null
+        },
+        {
+          "code": "001330",
+          "name": "博纳影业",
+          "price": 7.67,
+          "chg": 10.04,
           "main_net": null
         },
         {
           "code": "002343",
           "name": "慈文传媒",
-          "price": 6.08,
-          "chg": 9.95,
+          "price": 6.69,
+          "chg": 10.03,
+          "main_net": null
+        },
+        {
+          "code": "601595",
+          "name": "上海电影",
+          "price": 27.21,
+          "chg": 9.98,
+          "main_net": null
+        },
+        {
+          "code": "300133",
+          "name": "华策影视",
+          "price": 9.08,
+          "chg": 8.35,
           "main_net": null
         }
       ],
@@ -74,38 +74,38 @@
       "cons_count": 87,
       "leaders": [
         {
-          "code": "300530",
-          "name": "领湃科技",
-          "price": 28.9,
-          "chg": 20.02,
+          "code": "600241",
+          "name": "时代万恒",
+          "price": 12.94,
+          "chg": 10.03,
           "main_net": null
         },
         {
-          "code": "300340",
-          "name": "科恒股份",
-          "price": 10.72,
-          "chg": 15.89,
+          "code": "603032",
+          "name": "德新科技",
+          "price": 20.42,
+          "chg": 10.02,
           "main_net": null
         },
         {
           "code": "688345",
           "name": "博力威",
-          "price": 51.9,
-          "chg": 12.24,
+          "price": 56.0,
+          "chg": 7.9,
           "main_net": null
         },
         {
-          "code": "002805",
-          "name": "丰元股份",
-          "price": 19.44,
-          "chg": 10.02,
+          "code": "300919",
+          "name": "中伟新材",
+          "price": 40.61,
+          "chg": 5.67,
           "main_net": null
         },
         {
-          "code": "600241",
-          "name": "时代万恒",
-          "price": 11.76,
-          "chg": 10.01,
+          "code": "300477",
+          "name": "ST合纵",
+          "price": 2.93,
+          "chg": 5.4,
           "main_net": null
         }
       ],
@@ -153,38 +153,38 @@
       "cons_count": 100,
       "leaders": [
         {
-          "code": "000736",
-          "name": "中交发展",
-          "price": 5.21,
-          "chg": 9.92,
+          "code": "600510",
+          "name": "黑牡丹",
+          "price": 6.41,
+          "chg": 2.56,
+          "main_net": null
+        },
+        {
+          "code": "600007",
+          "name": "中国国贸",
+          "price": 20.97,
+          "chg": 2.54,
           "main_net": null
         },
         {
           "code": "000909",
           "name": "*ST数源",
-          "price": 5.61,
-          "chg": 5.65,
+          "price": 5.71,
+          "chg": 1.78,
           "main_net": null
         },
         {
-          "code": "000011",
-          "name": "深物业A",
-          "price": 12.59,
-          "chg": 3.88,
+          "code": "600082",
+          "name": "ST海泰",
+          "price": 3.29,
+          "chg": 0.92,
           "main_net": null
         },
         {
-          "code": "000014",
-          "name": "沙河股份",
-          "price": 11.85,
-          "chg": 3.04,
-          "main_net": null
-        },
-        {
-          "code": "600266",
-          "name": "城建发展",
-          "price": 4.45,
-          "chg": 2.3,
+          "code": "600136",
+          "name": "ST明诚",
+          "price": 1.49,
+          "chg": 0.68,
           "main_net": null
         }
       ],
@@ -201,36 +201,36 @@
         {
           "code": "002242",
           "name": "九阳股份",
-          "price": 15.13,
-          "chg": 10.04,
-          "main_net": null
-        },
-        {
-          "code": "003023",
-          "name": "彩虹集团",
-          "price": 26.99,
-          "chg": 4.33,
-          "main_net": null
-        },
-        {
-          "code": "002403",
-          "name": "爱仕达",
-          "price": 10.34,
-          "chg": 2.48,
+          "price": 16.64,
+          "chg": 9.98,
           "main_net": null
         },
         {
           "code": "688793",
           "name": "倍轻松",
-          "price": 17.97,
-          "chg": 1.93,
+          "price": 18.81,
+          "chg": 4.67,
           "main_net": null
         },
         {
-          "code": "301332",
-          "name": "德尔玛",
-          "price": 7.78,
-          "chg": 1.83,
+          "code": "603219",
+          "name": "富佳股份",
+          "price": 13.02,
+          "chg": 1.56,
+          "main_net": null
+        },
+        {
+          "code": "002032",
+          "name": "苏 泊 尔",
+          "price": 41.69,
+          "chg": 1.12,
+          "main_net": null
+        },
+        {
+          "code": "300824",
+          "name": "北鼎股份",
+          "price": 8.35,
+          "chg": 1.09,
           "main_net": null
         }
       ],
@@ -247,36 +247,36 @@
         {
           "code": "301190",
           "name": "善水科技",
-          "price": 43.99,
-          "chg": 11.31,
+          "price": 48.45,
+          "chg": 10.14,
           "main_net": null
         },
         {
-          "code": "603067",
-          "name": "振华股份",
-          "price": 42.31,
-          "chg": 10.01,
+          "code": "000635",
+          "name": "英 力 特",
+          "price": 8.07,
+          "chg": 3.46,
           "main_net": null
         },
         {
-          "code": "301118",
-          "name": "恒光股份",
-          "price": 25.56,
-          "chg": 5.75,
+          "code": "900921",
+          "name": "金煤B股",
+          "price": 0.18,
+          "chg": 1.65,
           "main_net": null
         },
         {
-          "code": "600746",
-          "name": "江苏索普",
-          "price": 7.56,
-          "chg": 5.29,
+          "code": "301069",
+          "name": "凯盛新材",
+          "price": 16.2,
+          "chg": 1.57,
           "main_net": null
         },
         {
-          "code": "600722",
-          "name": "金牛化工",
-          "price": 16.88,
-          "chg": 4.26,
+          "code": "600623",
+          "name": "华谊集团",
+          "price": 8.81,
+          "chg": 1.03,
           "main_net": null
         }
       ],
@@ -412,38 +412,38 @@
       "cons_count": 54,
       "leaders": [
         {
-          "code": "688806",
-          "name": "泰诺麦博-U",
-          "price": 30.34,
-          "chg": 11.75,
+          "code": "688331",
+          "name": "荣昌生物",
+          "price": 108.91,
+          "chg": 0.97,
           "main_net": null
         },
         {
-          "code": "688137",
-          "name": "近岸蛋白",
-          "price": 161.18,
-          "chg": 7.45,
+          "code": "002581",
+          "name": "*ST未名",
+          "price": 5.26,
+          "chg": 0.38,
           "main_net": null
         },
         {
-          "code": "688670",
-          "name": "金迪克",
-          "price": 19.17,
-          "chg": 5.21,
+          "code": "688443",
+          "name": "智翔金泰-U",
+          "price": 25.01,
+          "chg": 0.24,
           "main_net": null
         },
         {
-          "code": "300142",
-          "name": "沃森生物",
-          "price": 14.75,
-          "chg": 4.76,
+          "code": "600211",
+          "name": "西藏药业",
+          "price": 36.83,
+          "chg": 0.14,
           "main_net": null
         },
         {
-          "code": "688765",
-          "name": "禾元生物-U",
-          "price": 37.86,
-          "chg": 4.5,
+          "code": "600739",
+          "name": "辽宁成大",
+          "price": 10.32,
+          "chg": -0.1,
           "main_net": null
         }
       ],
