@@ -618,7 +618,7 @@ window.__domReadyFns=[];
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=fa3546254f" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=2951d76e37" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=4d3b8437c5" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=e6bf82c460" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=af03476f1b" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=d84bcce2e3" defer></script>
@@ -689,7 +689,7 @@ window.__domReadyFns=[];
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
     <script src="data/SECTOR_LEADERS.js?v=dd4c034874" defer></script>
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
-    <script src="data/PORTFOLIO.js?v=fa80db62ca" defer></script>
+    <script src="data/PORTFOLIO.js?v=786a0a4e2e" defer></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -1754,7 +1754,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/LIMIT_UP_HEATMAP.js?v=1fd570ed2c" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
-<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=2d8e1b8d7f" defer></script>
+<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=c6550afafb" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=c7b598c3bb" defer></script>
 <script src="data/VOLATILITY.js?v=878e6b282f" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=59e78b27fb" defer></script>
@@ -18231,7 +18231,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=280658aea6', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=2c06e6fb0b', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=334bb02459', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=86b939c61e', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
