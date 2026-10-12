@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-12 22:04",
- "generated": "2026-10-12 22:04",
+ "update_time": "2026-10-12 22:18",
+ "generated": "2026-10-12 22:18",
  "meta": {
-  "generated": "2026-10-12 22:04",
+  "generated": "2026-10-12 22:18",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 24,
   "days_with_consensus": 0,
@@ -9191,17 +9191,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "001330",
-      "name": "博纳影业",
-      "change_pct": 10.043,
-      "price": 7.67,
-      "category": "突破"
-     },
-     {
       "code": "301234",
       "name": "五洲医疗",
       "change_pct": 6.054,
       "price": 155.9,
+      "category": "突破"
+     },
+     {
+      "code": "300133",
+      "name": "华策影视",
+      "change_pct": 8.353,
+      "price": 9.08,
       "category": "突破"
      },
      {
@@ -9293,17 +9293,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "001330",
-      "name": "博纳影业",
-      "change_pct": 10.043,
-      "price": 7.67,
-      "category": "短线选股"
-     },
-     {
       "code": "301234",
       "name": "五洲医疗",
       "change_pct": 6.054,
       "price": 155.9,
+      "category": "短线选股"
+     },
+     {
+      "code": "300133",
+      "name": "华策影视",
+      "change_pct": 8.353,
+      "price": 9.08,
       "category": "短线选股"
      },
      {
@@ -9365,17 +9365,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "001330",
-      "name": "博纳影业",
-      "change_pct": 10.043,
-      "price": 7.67,
-      "category": "强势股"
-     },
-     {
       "code": "301234",
       "name": "五洲医疗",
       "change_pct": 6.054,
       "price": 155.9,
+      "category": "强势股"
+     },
+     {
+      "code": "300133",
+      "name": "华策影视",
+      "change_pct": 8.353,
+      "price": 9.08,
       "category": "强势股"
      },
      {
