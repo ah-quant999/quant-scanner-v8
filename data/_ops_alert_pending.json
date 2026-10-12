@@ -1,30 +1,42 @@
 {
-  "check_time": "2026-08-10 21:15:28",
+  "check_time": "2026-10-12 22:13:47",
   "repo": "ah-quant999/quant-scanner-v8",
   "health_summary": {
-    "ok": 37,
-    "warn": 1,
-    "fail": 4,
-    "total": 42
+    "ok": 91,
+    "warn": 3,
+    "fail": 23,
+    "limited": 1,
+    "info": 0,
+    "other": 0,
+    "total": 118
   },
-  "anomaly_count": 3,
+  "anomaly_count": 13,
   "anomalies": [
     {
-      "name": "大牛股猎手",
-      "id": "BIG_BULL_HUNTER",
-      "page": "选股策略",
+      "name": "大基金增减持监控",
+      "id": "DAJIJIN_REDUCTION",
+      "page": "暂未上架",
       "status": "fail",
-      "message": "找不到数据文件 BIG_BULL_HUNTER.js 或解析失败",
-      "last_update": "--",
+      "message": "更新于 3天前 02:58；超过阈值 1440 分钟",
+      "last_update": "2026-10-09 02:58",
       "heal": null
     },
     {
-      "name": "相对强度",
-      "id": "STOCK_RPS",
-      "page": "选股策略",
+      "name": "runner 本地检测",
+      "id": "runner_local",
+      "page": "管线",
       "status": "fail",
-      "message": "更新于 2天前 23:47；超过阈值 360 分钟",
-      "last_update": "2026-08-08 23:47:05",
+      "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 3 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) 失败",
+      "last_update": null,
+      "heal": null
+    },
+    {
+      "name": "self-hosted runner",
+      "id": "runner",
+      "page": "管线",
+      "status": "fail",
+      "message": "runner 本地检测:fail-runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 3 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) 失败 | runner GitHub API 检测:ok-最近运行正常（本地状态: runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 3 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) 失败）",
+      "last_update": null,
       "heal": null
     },
     {
@@ -32,33 +44,269 @@
       "id": "final_enter_stale",
       "page": "内容审计",
       "status": "warn",
-      "message": "最新 enter_date 2026-08-07 早于最近交易日 2026-08-10，最终推荐数据陈旧",
-      "last_update": null,
-      "heal": null
-    }
-  ],
-  "noise_count": 2,
-  "noise": [
-    {
-      "name": "Pages 部署同步",
-      "id": "site_sync",
-      "page": "管线",
-      "status": "fail",
-      "message": "本地 HEAD 84a9ec2 / 线上 d72f75d 不同步，落后 22 commit，部署链路需检查",
+      "message": "最新 enter_date 2026-10-11 早于最近交易日 2026-10-12，最终推荐数据陈旧",
       "last_update": null,
       "heal": null
     },
     {
-      "name": "本地与 origin/main 同步",
-      "id": "local_sync",
-      "page": "管线",
+      "name": "BACKTEST_COMPREHENSIVE",
+      "id": "all_BACKTEST_COMPREHENSIVE",
+      "page": "全量数据",
       "status": "fail",
-      "message": "本地 84a9ec2 / origin/main 47458e7 本地落后，需 pull/push",
+      "message": "BACKTEST_COMPREHENSIVE.js 更新于 2天前 02:59；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-10 02:59:48",
+      "heal": null
+    },
+    {
+      "name": "BACKTEST_TDX",
+      "id": "all_BACKTEST_TDX",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "BACKTEST_TDX.js 更新于 2天前 02:59；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-10 02:59:43",
+      "heal": null
+    },
+    {
+      "name": "FACTOR_LAB_BACKTEST",
+      "id": "all_FACTOR_LAB_BACKTEST",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "FACTOR_LAB_BACKTEST.js 更新于 2天前 03:06；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-10 03:06:02",
+      "heal": null
+    },
+    {
+      "name": "FACTOR_WALKFORWARD",
+      "id": "all_FACTOR_WALKFORWARD",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "FACTOR_WALKFORWARD.js 更新于 2天前 03:17；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-10 03:17:44",
+      "heal": null
+    },
+    {
+      "name": "MARKET_THERMO",
+      "id": "all_MARKET_THERMO",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "MARKET_THERMO.js 更新于 3天前 23:20；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-09 23:20:47",
+      "heal": null
+    },
+    {
+      "name": "CRDS_CARD_DATA",
+      "id": "CRDS_CARD_DATA",
+      "page": "新鲜度守卫",
+      "status": "fail",
+      "message": "核心数据过期: 文件缺失",
+      "last_update": null,
+      "heal": null
+    },
+    {
+      "name": "TRIPLE_CONSENSUS",
+      "id": "TRIPLE_CONSENSUS",
+      "page": "新鲜度守卫",
+      "status": "warn",
+      "message": "数据过期: 文件缺失",
+      "last_update": null,
+      "heal": null
+    },
+    {
+      "name": "TRIPLE_TRACK",
+      "id": "TRIPLE_TRACK",
+      "page": "新鲜度守卫",
+      "status": "warn",
+      "message": "数据过期: 文件缺失",
+      "last_update": null,
+      "heal": null
+    },
+    {
+      "name": "TRIPLE_HISTORY",
+      "id": "TRIPLE_HISTORY",
+      "page": "新鲜度守卫",
+      "status": "warn",
+      "message": "数据过期: 文件缺失",
       "last_update": null,
       "heal": null
     }
   ],
-  "signature": "BIG_BULL_HUNTER:fail|STOCK_RPS:fail|final_enter_stale:warn",
+  "recovered_count": 17,
+  "recovered": [
+    {
+      "name": "因子实验室",
+      "id": "FACTOR_LAB",
+      "page": "最终推荐",
+      "status": "warn",
+      "message": "更新于 昨日 12:32",
+      "last_update": "2026-10-11 12:32:47",
+      "heal": null,
+      "remote_update": "2026-10-12 20:17:40"
+    },
+    {
+      "name": "四量终极60m",
+      "id": "FOUR_VOLUME_60M",
+      "page": "选股策略",
+      "status": "fail",
+      "message": "更新于 昨日 13:20；超过阈值 1440 分钟",
+      "last_update": "2026-10-11 13:20:00",
+      "heal": null,
+      "remote_update": "2026-10-12 21:33:39"
+    },
+    {
+      "name": "精确止损止盈",
+      "id": "STOCK_STOP_DATA",
+      "page": "选股策略",
+      "status": "warn",
+      "message": "更新于 昨日 12:43",
+      "last_update": "2026-10-11 12:43:50",
+      "heal": null,
+      "remote_update": "2026-10-12 20:40:06"
+    },
+    {
+      "name": "最终推荐·Top5因子评分",
+      "id": "TOP10_DAILY",
+      "page": "最终推荐",
+      "status": "fail",
+      "message": "更新于 昨日 13:11；超过阈值 1440 分钟",
+      "last_update": "2026-10-11 13:11:09",
+      "heal": null,
+      "remote_update": "2026-10-12 21:28:03"
+    },
+    {
+      "name": "指数观测·四框架",
+      "id": "INDEX_VALUE_FRAMEWORK",
+      "page": "观测平台",
+      "status": "fail",
+      "message": "更新于 昨日 12:54；超过阈值 1440 分钟",
+      "last_update": "2026-10-11 12:54:26",
+      "heal": null,
+      "remote_update": "2026-10-12 20:54:32"
+    },
+    {
+      "name": "FACTOR_AUDIT",
+      "id": "all_FACTOR_AUDIT",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "FACTOR_AUDIT.js 更新于 昨日 12:54；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-11 12:54:05",
+      "heal": null,
+      "remote_update": "2026-10-12 20:50:49"
+    },
+    {
+      "name": "FACTOR_PROGRESS",
+      "id": "all_FACTOR_PROGRESS",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "FACTOR_PROGRESS.js 更新于 昨日 12:54；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-11 12:54:10",
+      "heal": null,
+      "remote_update": "2026-10-12 20:50:54"
+    },
+    {
+      "name": "FINAL_RECOMMEND_DATA",
+      "id": "all_FINAL_RECOMMEND_DATA",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "FINAL_RECOMMEND_DATA.js 更新于 昨日 13:21；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-11 13:21:53",
+      "heal": null,
+      "remote_update": "2026-10-12 21:35:08"
+    },
+    {
+      "name": "FUNDAMENTAL_QUALITY",
+      "id": "all_FUNDAMENTAL_QUALITY",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "FUNDAMENTAL_QUALITY.js 更新于 昨日 08:45；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-11 08:45:42",
+      "heal": null,
+      "remote_update": "2026-10-12 19:25:50"
+    },
+    {
+      "name": "H_AUTO_BUY",
+      "id": "all_H_AUTO_BUY",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "H_AUTO_BUY.js 更新于 昨日 12:53；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-11 12:53:35",
+      "heal": null,
+      "remote_update": "2026-10-12 20:50:13"
+    },
+    {
+      "name": "H_AUTO_BUY_TRACK",
+      "id": "all_H_AUTO_BUY_TRACK",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "H_AUTO_BUY_TRACK.js 更新于 昨日 12:54；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-11 12:54:00",
+      "heal": null,
+      "remote_update": "2026-10-12 20:50:46"
+    },
+    {
+      "name": "INDEX_HISTORY",
+      "id": "all_INDEX_HISTORY",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "INDEX_HISTORY.js 更新于 昨日 08:49；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-11 08:49:28",
+      "heal": null,
+      "remote_update": "2026-10-12 19:29:05"
+    },
+    {
+      "name": "LQSQ_TRACK",
+      "id": "all_LQSQ_TRACK",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "LQSQ_TRACK.js 更新于 昨日 20:24；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-11 20:24:48",
+      "heal": null,
+      "remote_update": "2026-10-12 20:20:59"
+    },
+    {
+      "name": "SECTOR_FUND_FLOW_TREND",
+      "id": "all_SECTOR_FUND_FLOW_TREND",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "SECTOR_FUND_FLOW_TREND.js 更新于 昨日 08:55；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-11 08:55",
+      "heal": null,
+      "remote_update": "2026-10-12 19:33:00"
+    },
+    {
+      "name": "SUSPENSION_ALERT",
+      "id": "all_SUSPENSION_ALERT",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "SUSPENSION_ALERT.js 更新于 昨日 08:54；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-11 08:54:54",
+      "heal": null,
+      "remote_update": "2026-10-12 19:32:25"
+    },
+    {
+      "name": "V8_POOL_TRACKER",
+      "id": "all_V8_POOL_TRACKER",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "V8_POOL_TRACKER.js 更新于 2天前 02:29；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-10 02:29:48",
+      "heal": null,
+      "remote_update": "2026-10-12 21:27:54"
+    },
+    {
+      "name": "VALUATION_PERCENTILE",
+      "id": "all_VALUATION_PERCENTILE",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "VALUATION_PERCENTILE.js 更新于 昨日 12:54；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-11 12:54:20",
+      "heal": null,
+      "remote_update": "2026-10-12 20:51:04"
+    }
+  ],
+  "noise_count": 0,
+  "noise": [],
+  "signature": "CRDS_CARD_DATA:fail|DAJIJIN_REDUCTION:fail|TRIPLE_CONSENSUS:warn|TRIPLE_HISTORY:warn|TRIPLE_TRACK:warn|all_BACKTEST_COMPREHENSIVE:fail|all_BACKTEST_TDX:fail|all_FACTOR_LAB_BACKTEST:fail|all_FACTOR_WALKFORWARD:fail|all_MARKET_THERMO:fail|final_enter_stale:warn|runner:fail|runner_local:fail",
   "notify": true,
-  "cooled": false
+  "cooled": false,
+  "last_notify_ts": "2026-10-12 22:13:47"
 }
