@@ -14,7 +14,7 @@
   2) 5 组件全链路：本地 index.html / v6_memo.html / data/HEALTH_CHECK.js vs 线上；
      .github/workflows/*.yml vs origin/main（git show，免网络）；
      双机自动化 = 查 workbuddy.db。
-  3) 双机自动化 model 落库核验：所有 ACTIVE model_id 必须为 deepseek-v4-flash。
+  3) 双机自动化 model 落库核验：所有 ACTIVE model_id 必须为 glm-5.3-flash。
   4) 受保护文件完整性：v6_memo.html / guard_v6_memo.py / 北向席位日历标记
      (northCalContainer+renderNorthCalendar DO_NOT_DELETE)。
   5) 本地 HEAD vs origin/main 同步。
@@ -162,7 +162,7 @@ def main():
             "SELECT id,name,model_id,status FROM automations WHERE status='ACTIVE'").fetchall()
         conn.close()
         for r in rows:
-            if (r[2] or "NULL") != "deepseek-v4-flash":
+            if (r[2] or "NULL") != "glm-5.3-flash":
                 problems.append("自动化 model 异常: %s | %s | model=%s" % (r[0], r[1], r[2] or "NULL"))
     else:
         print("  ℹ️ (info) workbuddy.db 不存在，跳过双机 model 核验（由双机交接脚本人工核对）")
@@ -236,7 +236,7 @@ def main():
 
     print("发现失配 %d 项：" % len(problems))
     print("\n".join(" - " + p for p in problems) or
-          "✅ 全链路对齐：?v 真一致、五组件同步、双机 model 全 deepseek-v4-flash、受保护文件完整")
+          "✅ 全链路对齐：?v 真一致、五组件同步、双机 model 全 glm-5.3-flash、受保护文件完整")
     sys.exit(1 if problems else 0)
 
 
