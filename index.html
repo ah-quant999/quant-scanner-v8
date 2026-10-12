@@ -1825,6 +1825,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=0e42560870" defer></script>
     <script src="data/IMA_STRONG_BACKTEST.js?v=fc5bd00675" defer></script>
+    <!-- 🆕 2026-10-12 小九：量质双擎（LQSQ · 第一支自研算法）前端接入 —— 后端数据链 10-11 已跑，
+         但前端此前**零挂载**（注入/卡片/子页全缺）⇒ 主站无处显示（主人「我半天没看到在哪显示」）。
+         本次补齐：
+         · LQSQ_BACKTEST = 主榜回测视图（summary.by_period 与四量同构 → 回测页逐档卡直接复用）
+         · LQSQ_TRACK    = 当期 Top30 选股 + 逐票前向跟踪（选股策略 · ⚖️ 量质双擎子页消费） -->
+    <script src="data/LQSQ_BACKTEST.js?v=5540990d94" defer></script>
+    <script src="data/LQSQ_TRACK.js?v=94d7aa0217" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -2973,6 +2980,8 @@ function fmtSigned(v){
       <!-- 2026-08-29 主人令：选股池作为选股策略子页面；2026-08-30 主人令：选股池移到三重共识前面 -->
       <button class="st-tab active" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
       <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span class="st-tab-star" data-card="四量终极"></span></button>
+      <!-- 🆕 2026-10-12 小九：量质双擎（LQSQ）子页 tab —— 第一支自研算法，与四量同页并列 -->
+      <button class="st-tab" data-st="lqsq" onclick="switchSt('lqsq')">⚖️ 量质双擎 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
       <button class="st-tab" data-st="life" onclick="switchSt('life')">📡 强势跟踪 <span class="st-tab-star" data-card="强势跟踪"></span></button>
       <!-- 2026-09-18 晚 原记录：此处硬编码「弱市专用·0★观测」被改为接 st-tab-star chip（__committeeRate 实时计算）。
            🔴 2026-09-18 (g) 更正 —— 该次改动的**方向对（统一星级出口）**，但它引用的依据是错的，
@@ -3105,6 +3114,21 @@ function fmtSigned(v){
         <div id="fvHistory"></div>
       </div>
     </div><!--/st-fv-->
+
+    <!-- ===== TAB 页面：量质双擎（LQSQ · 第一支自研算法 · 🆕 2026-10-12 小九接入） =====
+         定位（gen_lqsq_top30.py 原文）：独立选股器 —— 全市场按「因子 r=mean(vol,近20日)/mean(vol,前240日)」
+         升序（越缩量=越强）直选 Top30；次开买入、持有 20 个交易日收盘卖出（前复权·扣双边 0.3%）；
+         真实信号流口径，与四量同榜同纪律。数据源：data/LQSQ_TRACK.js + data/LQSQ_BACKTEST.js。 -->
+    <div id="st-lqsq" class="st-pane">
+      <div class="card" id="stLqsqCard" style="border-left:4px solid #22c55e;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          ⚖️ <span style="font-weight:700;font-size:14px;color:var(--txt);">量质双擎</span>
+          <span style="font-size:10px;font-weight:700;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">第一支自研算法</span>
+          <span class="fresh" id="lqsqTime">—</span>
+        </div>
+        <div id="lqsqBody"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">⚖️ 量质双擎 加载中…</div></div>
+      </div>
+    </div><!--/st-lqsq-->
 
     <!-- ===== TAB 页面：强势跟踪（原「选股生命周期」子页 · 2026-09-16 主人令改名精简） =====
          主人令：生命周期三个算法（选股生命周期 / 强势突破 / 高手强势股跟踪）横评后
@@ -5251,6 +5275,11 @@ c.innerHTML = h;
        由 __strongTrackBacktest() 适配成 _renderPeriodBacktestCard 认的 by_period 结构。
        ⚠️ 它来自 ima 外部同步，不进 v8 星级委员会 ⇒ 卡头显示「—」，不硬凑星。 */
     {key:'strongtrack',name:'强势跟踪',     icon:'📡', desc:'ima 真实首次入选日 · 信号层回测', color:'#a78bfa', var:'__strongTrackBacktest'},
+    /* 🆕 2026-10-12 小九：第一支自研算法「量质双擎」(LQSQ) —— 真实信号流口径直上主榜，
+       与四量同榜同纪律（gen_lqsq_top30.py → LQSQ_BACKTEST，summary.by_period 与四量同构，
+       故 _renderPeriodBacktestCard 零结构改动直接复用）。样本自 10-09 起累积、未走满 T+20
+       不计入 ⇒ 首期卡头走「累积中」，成熟一档进一档。 */
+    {key:'lqsq',    name:'量质双擎',   icon:'⚖️', desc:'第一支自研算法 · 异常量比缩量选强 Top30 · 次开买入持有 20 日 · 样本自 10-09 累积中，仅显示成熟档', color:'#22c55e', var:'LQSQ_BACKTEST'},
   ];
   // 2026-09-03 主人令：cockpit/allsite 大牛股/全站精选 全部移出回测区，DELISTED 保留为空数组
   //   (防止 _renderBacktestCardsFrom 空引用报错)。如需历史胜率回溯请前往逻辑详解页相关章节。
@@ -6196,7 +6225,7 @@ c.innerHTML = h;
          「因子实验室」又是独立渲染 ⇒ 必然数成 4，与文案的 5 个名字打架。
          ⚠️ 将来增删本页策略：改这里 + 同步改下方 __renderBacktestSection 的渲染顺序。 */
       /* 🔴 2026-09-20 主人令：'因子实验室' 移出本页清单（非选股策略，不回测不展示）*/
-      var _PAGE = ['四量终极','强势跟踪'];  /* 🔴 2026-10-11 主人令「完全下架」：三重共识/逆势龙头已下架移出 */
+      var _PAGE = ['四量终极','强势跟踪','量质双擎'];  /* 🔴 2026-10-11 主人令「完全下架」：三重共识/逆势龙头已下架移出；🆕 2026-10-12 纳入第一支自研算法「量质双擎」 */
       pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(56,189,248,.10);color:#38bdf8;border:1px solid rgba(56,189,248,.3);">📋 本页策略 '+_PAGE.length+' 个<span style="font-weight:400;color:var(--sub);font-size:10px;">（'+_PAGE.join(' · ')+'）</span></span>');
 
       sum.innerHTML = '<span style="color:var(--dim);font-weight:600;">📊 实战回测</span><span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>' + (pills.length ? ' ' + pills.join(' ') : ' <span style="color:var(--sub);">暂无数据</span>');
@@ -6348,7 +6377,7 @@ c.innerHTML = h;
         return _S.filter(function(m){ return m && keys.indexOf(m.key) >= 0; });
       };
       if(typeof _rbc === 'function'){
-        html += _rbc(_pick(['fourvolume','triple','strongtrack']));
+        html += _rbc(_pick(['fourvolume','triple','strongtrack','lqsq']));
       }
       if(typeof _rbc === 'function'){
         html += _rbc(_pick(['crds']));
@@ -13902,6 +13931,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     else if(tab==='fa'){
       if(typeof window.__renderFactorPane==='function'){ try{ window.__renderFactorPane(); }catch(e){} }
     }
+    else if(tab==='lqsq'){ /* 🆕 2026-10-12 小九：量质双擎子页（当期 Top30 + 前向跟踪） */
+      if(typeof window.renderLqsq==='function'){ try{ window.renderLqsq(); }catch(e){ console.warn('量质双擎渲染失败',e); } }
+    }
   }
   /* ═══ 🔴🔴 2026-09-17 主人令「统一按委员会走，就是要统一口径，不要打架」═══════
      背景：此前全站星级有**三套并存口径** ——
@@ -13996,9 +14028,93 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
          + String(_tips).replace(/"/g, '&quot;') + '">'+s+'</span>' + _badge;
   };
 
+  /* ═══ 🆕 2026-10-12 小九：量质双擎（LQSQ）子页渲染 ═══
+     数据源 window.LQSQ_TRACK（当期 Top30 选股 + 逐票前向跟踪；update_v8 由 raw_data/lqsq_track.json 发布）
+           window.LQSQ_BACKTEST（主榜回测视图，method 口径说明）。
+     诚实铁律：未走满 T+N 的档一律显示「累积中」，绝不用 0 冒充；全站红涨绿跌口径。 */
+  window.renderLqsq = function(){
+    var host = document.getElementById('lqsqBody');
+    if(!host) return;
+    function _e(s){ return String(s==null?'':s).replace(/[&<>]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+    function _pl(v){ return (v==null||isNaN(v))?'var(--sub)':(Number(v)>=0?'#f4495d':'#1fd17b'); }  // 涨红/跌绿
+    var T = window.LQSQ_TRACK || {}, B = window.LQSQ_BACKTEST || {};
+    var trk = T.tracked || [];
+    if(!trk.length){
+      /* defer 数据未就绪 → 自愈重试（最多 15 次 ~10s，覆盖加载窗口） */
+      if(!(window.__lqsqRetry && window.__lqsqRetry >= 15)){
+        window.__lqsqRetry = (window.__lqsqRetry || 0) + 1;
+        setTimeout(window.renderLqsq, 700);
+      } else {
+        host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">⚖️ 量质双擎 数据加载中…<br><span style="font-size:11px">若长时间为空请硬刷新 (Ctrl/Cmd+F5)</span></div>';
+      }
+      return;
+    }
+    window.__lqsqRetry = 0;
+    var ut = String(T.update_time || '').substring(0,16);
+    try{ var tb = document.getElementById('lqsqTime'); if(tb) tb.textContent = ut ? ('更新于 '+ut) : '—'; }catch(e){}
+    var DAYS = ['1','3','5','10','20'];
+    var h = '';
+    /* ── 口径披露 ── */
+    h += '<div class="note" style="line-height:1.75;margin-bottom:12px;">'
+       + '<b style="color:#22c55e;">⚖️ 量质双擎（LQSQ）</b> · 第一支自研算法 —— '
+       + _e(B.method || '每日全市场按异常量比（缩量=强势）打分选 Top30，次开买入、持有 20 个交易日收盘卖出（前复权·扣双边 0.3%）；ROE 质地过滤 v2 待接。')
+       + '</div>';
+    /* ── 统计块 ── */
+    function _stat(label, val, sub, color){
+      return '<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">'
+           + '<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">'+label+'</div>'
+           + '<div style="font-size:22px;font-weight:800;color:'+(color||'var(--txt)')+';">'+val+'</div>'
+           + '<div style="font-size:10px;color:var(--dim);">'+sub+'</div></div>';
+    }
+    h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:14px;">';
+    h += _stat('🎯 累计信号', (T.total_signals || 0), '选股票数', '#22c55e');
+    h += _stat('📅 信号日数', (T.signal_days || 0), '逐日归档', '#38bdf8');
+    h += _stat('🚀 跟踪起始', _e(T.track_start || '—'), '上线首日即建归档', 'var(--txt)');
+    h += _stat('⏳ 成熟样本', '0', 'T+20 未走满不计入', '#fbbf24');
+    h += '</div>';
+    /* ── 当期 Top30 ── */
+    h += '<h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 8px;">'
+       + '<span class="ic">📋</span>当期选股 Top30 <span style="font-size:11px;color:var(--sub);font-weight:400">按异常量比升序（越缩量 = 越强）</span></h3>';
+    h += '<div class="note" style="margin-bottom:8px;">持有期收益随交易日成熟：未走满 T+N 的档位显示「<span style="color:var(--dim);">累积中</span>」，绝不填 0 冒充。红涨绿跌。</div>';
+    h += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+    h += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">'
+       + '<th style="padding:6px;text-align:left;color:var(--sub);">#</th>'
+       + '<th style="padding:6px;text-align:left;color:var(--sub);">名称</th>'
+       + '<th style="padding:6px;text-align:left;color:var(--sub);">代码</th>'
+       + '<th style="padding:6px;text-align:right;color:var(--sub);">量比 r</th>'
+       + '<th style="padding:6px;text-align:right;color:var(--sub);">信号日收盘</th>';
+    DAYS.forEach(function(d){ h += '<th style="padding:6px;text-align:right;color:var(--sub);">T+'+d+'</th>'; });
+    h += '</tr></thead><tbody>';
+    trk.forEach(function(s, i){
+      var ret = s.returns || {};
+      h += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+      h += '<td style="padding:6px;color:var(--dim);">'+(i+1)+'</td>';
+      h += '<td style="padding:6px;color:var(--txt);font-weight:600;">'+_e(s.name || '')+'</td>';
+      h += '<td style="padding:6px;color:var(--sub);font-family:ui-monospace,Consolas,monospace;">'+_e(s.code || '')+'</td>';
+      h += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(s.ratio != null ? Number(s.ratio).toFixed(4) : '—')+'</td>';
+      h += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(s.close != null ? Number(s.close).toFixed(2) : '—')+'</td>';
+      DAYS.forEach(function(d){
+        var v = (ret && ret[d] != null) ? ret[d] : null;
+        h += '<td style="padding:6px;text-align:right;color:'+_pl(v)+';">'+(v != null ? ((Number(v) > 0 ? '+' : '') + Number(v).toFixed(2) + '%') : '<span style="color:var(--dim);font-size:10px;">累积中</span>')+'</td>';
+      });
+      h += '</tr>';
+    });
+    h += '</tbody></table></div>';
+    /* ── 回测进度（诚实空态） ── */
+    var bp = (B.summary && B.summary.by_period) || {};
+    var keys = Object.keys(bp);
+    if(!keys.length){
+      h += '<div style="margin-top:12px;padding:10px 12px;background:rgba(251,191,36,.06);border-left:4px solid #fbbf24;border-radius:6px;font-size:12px;line-height:1.75;color:var(--sub);">'
+         + '<b style="color:#fbbf24;">⏳ 回测样本成熟中</b> —— 首个信号日 '+_e(T.track_start || '')+' 的 T+20 样本需满 20 个交易日才计入，'
+         + '成熟一档进一档（不提前外推、不用 0 冒充）。届时数字自动出现在「策略回测」页与本子页。</div>';
+    } else {
+      h += '<div style="margin-top:12px;font-size:11.5px;color:var(--sub);">已有 ' + keys.length + ' 个成熟持有档（逐档胜率/收益详见「策略回测」页 ⚖️ 量质双擎 卡）。</div>';
+    }
+    host.innerHTML = h;
+  };
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
-    ['fv','pool','life'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['fv','pool','life','lqsq'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
     // 2026-08-29 主人令：选股池子页渲染（2026-09-11：并入金股池卡片，统一走 renderStPoolAll）
     if(n==='pool' && typeof window.renderStPoolAll==='function') setTimeout(window.renderStPoolAll, 30);
@@ -14012,6 +14128,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
        ✅ 2026-10-06 阿狸咪的工程师：经审计确认 __renderLifecycleSection 仅余 L7052 一处活触发（switchSt 调度已于 2026-09-19 删），目标 #lifeBody 全站无 DOM 定义 ⇒ 函数体（原 L6006–L6301）与 L7052 调用已**彻底删净**，死代码从根消除。__renderStrongBreakout 此前已删净。 */
     /* 保留：__renderImaStrongStock（#imaStrongBody ✅ 活）+ renderLifeBacktests（回测真实产出） */
     if(n==='life' && typeof window.renderLifeBacktests==='function') setTimeout(window.renderLifeBacktests, 60);
+    /* 🆕 2026-10-12 小九：量质双擎子页渲染调度（defer 数据未就绪时由 __stRetryTab 兜底重试） */
+    if(n==='lqsq' && typeof window.renderLqsq==='function') setTimeout(window.renderLqsq, 30);
     // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
     // 2026-10-06 阿狸咪的工程师：fa（因子实验室）分支经审计为不可达死代码（DOM 无 data-st="fa" 按钮、switchSt('fa') 早删），已删净；因子实验室现仅于「最终推荐」页渲染。
   // 2026-09-18 主人令：子页名统一「因子实验室」（原「🧪 因子」），且不评星级（因子=加分项，非选股策略）。
@@ -14028,6 +14146,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       pool:function(){return !!(window.CANDIDATE&&(window.CANDIDATE.stocks||window.CANDIDATE.source_dist))&&!!window.GOLD_POOL;},  // 2026-09-11：金股池卡片并入 pool 子页，需 GOLD_POOL 就绪
       /* 🔴 2026-10-11 主人令「完全下架」：tc/crds 就绪判定随两策略下架移除 */
       life:function(){return !!(window.V8_POOL_TRACKER&&window.V8_POOL_TRACKER.items&&window.V8_POOL_TRACKER.items.length);},
+      lqsq:function(){return !!(window.LQSQ_TRACK&&window.LQSQ_TRACK.tracked&&window.LQSQ_TRACK.tracked.length);},  // 🆕 2026-10-12 小九：量质双擎子页就绪判定（LQSQ_TRACK 注入到位）
       // 2026-09-12 主人令：因子实验室子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
     };
     var _chk=_map[n]||function(){return true;};

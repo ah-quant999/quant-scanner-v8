@@ -82,6 +82,10 @@ DATA_SOURCES = {
     # 🚀 2026-10-11 主人令：第一支自研算法「量质双擎」(algorithms/gen_lqsq_top30.py，B批
     #   factor_lab_gen 紧后) —— 真实信号流口径直上主榜，与四量同榜同纪律。
     "lqsq_backtest.json":          "LQSQ_BACKTEST",
+    # 🆕 2026-10-12 小九：量质双擎「当期 Top30 选股 + 逐票前向跟踪」明细发布（同一生成器产出的
+    #   raw_data/lqsq_track.json → data/LQSQ_TRACK.js）。消费方=「选股策略 · ⚖️ 量质双擎」子页；
+    #   修「后端在跑、前端零挂载」的结构性漏点（LQSQ 10-11 上线后主站无处显示）。
+    "lqsq_track.json":             "LQSQ_TRACK",
     # 2026-09-04 主人令收尾：cockpit_tier_recommend / cockpit_advice / cockpit_backtest 三映射已删
     #   （09-03「干掉驾驶舱」系列删了生成器与 raw_data，映射永不命中，纯死代码）
     "top10_daily.json":            "TOP10_DAILY",
@@ -355,6 +359,7 @@ CATEGORY_MAP = {
     "FOUR_VOLUME_HISTORY": "post_close",
     "FOUR_VOLUME_TRACK": "post_close",
     "LQSQ_BACKTEST": "post_close",
+    "LQSQ_TRACK": "post_close",
     "TOP10_DAILY": "post_close",
     "LHB_DATA": "post_close",
     "LHB_HISTORY": "post_close",
