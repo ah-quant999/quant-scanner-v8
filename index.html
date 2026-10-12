@@ -14065,7 +14065,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     }
     window.__lqsqRetry = 0;
     var ut = String(T.update_time || '').substring(0,16);
-    try{ var tb = document.getElementById('lqsqTime'); if(tb) tb.textContent = ut ? ('更新于 '+ut) : '—'; }catch(e){}
+    /* 🛡 2026-10-12 主人令：改走全站统一「更新于」胶囊 setBadge（相对语义 今日/昨日/N天前 + 盘后档标注），
+       与四量/候选池等算法卡同款式；原手拼 textContent 显示裸时间戳（如 2026-10-11 20:24）不合全站规范 */
+    try{ if(typeof setBadge === 'function'){ setBadge('lqsqTime','盘后','短线', T.update_time || ''); } else { var tb = document.getElementById('lqsqTime'); if(tb) tb.textContent = ut ? ('更新于 '+ut) : '—'; } }catch(e){}
     var DAYS = ['1','3','5','10','20'];
     var h = '';
     /* ── 口径披露 ── */

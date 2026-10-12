@@ -80,7 +80,7 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "v8/factor_lab_gen.py": 5400,
     # 🚀 2026-10-11 主人令：量质双擎（第一支自研算法）挂 factor_lab_gen 紧后——
     #   读其维护的全市场 kline_cache 打分选股，零重复拉数；分钟级，给 900s 预算。
-    "algorithms/gen_lqsq_top30.py": 900,
+    "gen_lqsq_top30.py": 900,
     # 🔴 2026-10-11 主人令「完全下架」：v8/backtest_crds.py 已摘链（逆势龙头整体下架）。
     # "v8/backtest_crds.py": 3600,            # （已摘链 2026-10-11）CRDS 回测：逐只回测，给 1h 预算
     # 🛡 2026-09-11 一劳永逸（主人令·选项A）：四量终极 60min 此前**未登记预算** → 走默认 1800s。
@@ -197,7 +197,7 @@ ORDER = [
     # 🔴 2026-10-11 主人令「完全下架」：calc_crds.py 已摘链（逆势龙头真实池回测全档败，见预算表处注释）。
     # "calc_crds.py",
     "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（B批最前：final_recommend 前必产完，因子融合用当日新鲜因子；2026-09-09 主人令由 E 前置至此）
-    "algorithms/gen_lqsq_top30.py",    # 🚀 2026-10-11 主人令：量质双擎每日生成器（kline_cache 副产物缓存 + 自刷新 GTimg 700根整根替换 → 全市场异常量比打分选 Top30 → lqsq_history 真实流归档 + LQSQ_BACKTEST 主榜视图；上线首日即建归档）
+    "gen_lqsq_top30.py",    # 🚀 2026-10-11 主人令：量质双擎每日生成器（kline_cache 副产物缓存 + 自刷新 GTimg 700根整根替换 → 全市场异常量比打分选 Top30 → lqsq_history 真实流归档 + LQSQ_BACKTEST 主榜视图；上线首日即建归档）。🔴 2026-10-12 去掉 algorithms/ 前缀：ORDER 与 STAGES/预算表三处字符串必须逐字一致（双层路径解析只认 scripts/ 与 v8/ 前缀，其余一律落 algorithms/ 目录）
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
     # 🛡 2026-08-29 主人令：A/B 对照（金股池/候选池/全市场同一信号收益），每日累积信号、T+N 后回填收益。
@@ -376,8 +376,9 @@ STAGES = {
         # 🛡 2026-09-09 主人令：因子实验室生成器前置到 B 批最前——必须在 final_recommend(D批20:00) 之前产完，
         #   否则「为更好选股」的因子融合只能吃昨日陈旧数据。生成器 50-90min baostock 冷启动，18:10 起跑→19:40 前产完，D 批必吃到当日新鲜因子。
         "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js + raw_data/factor_lab.json（baostock，冷启动长）
-        # 🔴 2026-10-11 主人令「完全下架」：calc_crds.py 已摘链（逆势龙头整体下架）。
-        # "calc_crds.py",
+        # 🔴 2026-10-12 主人令「一劳永逸」：gen_lqsq_top30 补进 STAGES（10-11 上线时只加 ORDER 漏加 STAGES，
+        #   模块级 assert 炸链：今晚 A 批两连崩 algo exit 1，全链停摆——与 ORDER L200 成对，位置一致=候选池之前）。
+        "gen_lqsq_top30.py",      # → data/LQSQ_BACKTEST.js + lqsq_history（量质双擎，必须与 ORDER 成对）
         "build_candidate_pool.py", "generate_top10.py",
         "strategy_four_volume_60m.py", "strategy_four_volume.py",
         "market_regime.py", "sector_recommendation.py",
