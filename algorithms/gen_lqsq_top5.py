@@ -3,7 +3,7 @@
 """量质双擎（LQSQ）· 每日生成器 —— 第一支自研算法（2026-10-11 主人令「按你建议做吧/今晚上线」）
 
 定位：与「因子实验室」严格区隔 —— 因子实验室继续为其他算法的股票评分排序（评分卡）；
-本算法是**独立选股器**：全市场直选 Top30，真实信号流口径上主榜（与四量同榜同纪律）。
+本算法是**独立选股器**：全市场直选 Top5，真实信号流口径上主榜（与四量同榜同纪律）。
 
 【选股规则 v1】（全部 ≤T 日可得，无未来函数）：
   · 因子 r = mean(vol, 近20交易日) / mean(vol, 之前240交易日)；r 越小=越缩量=越强
@@ -11,7 +11,7 @@
     成交量代换手率——同一股票内比值对流通股本变化近似不敏感）。
   · 过滤：上市≥261 交易日；数据日未停牌且近20日每日未停牌；收盘≥2元（仙股过滤）；
     流动性代理=近20日日均 vol×close ≥ 5000 万元；按当前名单剔除 ST/退。
-  · 选股：r 升序 Top30。
+  · 选股：r 升序 Top5（2026-10-13 主人令「每天按评分最高推荐 3-5 只就好」由 Top30 收紧）。
   · 持有：T+20 个交易日收盘卖出（主人令「跟踪20日再打分」；1/3/5/10 为参考档）。
   · 成本：双边 0.3%（次开买入口径）。
   · 🔴 ROE 质地引擎 v2 待接：财务 point-in-time 历史不可回溯，回放/真实流 v1 先单量因子
@@ -60,7 +60,7 @@ BASELINE_N = 240
 MIN_HISTORY = 261
 HOLD_HORIZONS = (1, 3, 5, 10, 20)
 PRIMARY_HOLD = 20
-TOP_N = 30
+TOP_N = 5  # 🔴 2026-10-13 主人令「这个太多了，才3天都90只了，没必要，每天也是按评分最高推荐3-5只就好」：30 → 5
 COST_PCT = 0.3
 MIN_PRICE = 2.0
 MIN_TURNOVER_YUAN = 50_000_000
@@ -290,14 +290,14 @@ def main():
         ratio = (sum(recent) / RECENT_N) / (sum(base) / BASELINE_N)
         scored.append((round(ratio, 4), code, close))
     scored.sort()
-    log("打分完成：过滤后 %d 只 → Top%d（min_ratio=%.3f / 第30名=%.3f）" % (
+    log("打分完成：过滤后 %d 只 → Top%d（min_ratio=%.3f / 第%d名=%.3f）" % (
         len(scored), TOP_N, scored[0][0] if scored else -1,
-        scored[TOP_N - 1][0] if len(scored) >= TOP_N else -1))
+        TOP_N, scored[TOP_N - 1][0] if len(scored) >= TOP_N else -1))
 
     # ── 真实信号流归档（只增不改；同日重跑幂等） ──
     hist = {"meta": {
         "algo_name": "量质双擎（LQSQ）",
-        "factor_def": "r=mean(vol[近20日])/mean(vol[之前240日])，升序Top30（最缩量=最强）",
+        "factor_def": "r=mean(vol[近20日])/mean(vol[之前240日])，升序Top5（最缩量=最强）",
         "filters": "上市≥261交易日/当日未停牌/近20日无停牌/收盘≥2元/日均vol×close≥5000万/当前名单剔ST",
         "cost_pct": COST_PCT, "primary_hold": PRIMARY_HOLD,
     }, "signals": {}}
@@ -429,7 +429,8 @@ def main():
         "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
         "calc_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
         "data_date": data_date,
-        "method": ("真实信号流口径（2026-10-11 主人令）：每日全市场按异常量比（缩量=强势）打分选 Top30，"
+        "method": ("真实信号流口径（2026-10-11 主人令）：每日全市场按异常量比（缩量=强势）打分选 Top5"
+                   "（2026-10-13 主人令由 Top30 收紧为每日评分最高 3-5 只），"
                    "次开买入、持有 20 个交易日收盘卖出（前复权·扣双边 0.3%）；基准=同过滤 universe 等权。"
                    "样本随持有天数成熟而增加，未走满 T+20 不计入；ROE 质地过滤 v2 待接。"),
         "signal_source": "lqsq_history 逐日真实选股归档（上线首日即建，含已回落票，防幸存者偏差）",

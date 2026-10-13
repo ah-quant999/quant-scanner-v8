@@ -79,10 +79,10 @@ DATA_SOURCES = {
     #   由「近5年规则回放（strategy_four_volume.py 回测模式，已摘链）」切换为
     #   gen_four_volume_track.py 产出的真实信号流视图（同口径同变量名，前端零结构改动）。
     "four_volume_backtest.json":   "FOUR_VOLUME_BACKTEST",
-    # 🚀 2026-10-11 主人令：第一支自研算法「量质双擎」(algorithms/gen_lqsq_top30.py，B批
+    # 🚀 2026-10-11 主人令：第一支自研算法「量质双擎」(algorithms/gen_lqsq_top5.py，B批
     #   factor_lab_gen 紧后) —— 真实信号流口径直上主榜，与四量同榜同纪律。
     "lqsq_backtest.json":          "LQSQ_BACKTEST",
-    # 🆕 2026-10-12 小九：量质双擎「当期 Top30 选股 + 逐票前向跟踪」明细发布（同一生成器产出的
+    # 🆕 2026-10-12 小九：量质双擎「当期 Top5 选股 + 逐票前向跟踪」明细发布（同一生成器产出的
     #   raw_data/lqsq_track.json → data/LQSQ_TRACK.js）。消费方=「选股策略 · ⚖️ 量质双擎」子页；
     #   修「后端在跑、前端零挂载」的结构性漏点（LQSQ 10-11 上线后主站无处显示）。
     "lqsq_track.json":             "LQSQ_TRACK",

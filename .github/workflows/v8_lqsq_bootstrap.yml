@@ -2,7 +2,8 @@
 #
 # 2026-10-11 阿狸咪的工程师（主人令「按你建议做吧」）：
 #   第一支自研算法「量质双擎」从因子实验室已验证的异常量比因子出发。
-#   本工作流跑 algorithms/gen_lqsq_top30.py（LQSQ_PUSH=1 自推）：全市场打分选 Top30、
+#   本工作流跑 algorithms/gen_lqsq_top5.py（LQSQ_PUSH=1 自推）：全市场打分选 Top5
+#   （2026-10-13 主人令由 Top30 收紧为每日 3-5 只）、
 #   真实信号流首日归档 + 主榜视图自推 main（runner kline_cache 新鲜，保护闸对齐率≥60%）。
 #   🔴 真实信号流口径：首日即建归档（lqsq_history），此后每交易日随 B 批常规产出。
 #
@@ -171,4 +172,4 @@ jobs:
       - name: "🔬 跑点位重放（脚本自带逐只缓存可续跑 + 结果 Contents API 推 main）"
         shell: bash
         run: |
-          LQSQ_PUSH=1 python algorithms/gen_lqsq_top30.py
+          LQSQ_PUSH=1 python algorithms/gen_lqsq_top5.py

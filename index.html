@@ -1829,9 +1829,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          但前端此前**零挂载**（注入/卡片/子页全缺）⇒ 主站无处显示（主人「我半天没看到在哪显示」）。
          本次补齐：
          · LQSQ_BACKTEST = 主榜回测视图（summary.by_period 与四量同构 → 回测页逐档卡直接复用）
-         · LQSQ_TRACK    = 当期 Top30 选股 + 逐票前向跟踪（选股策略 · ⚖️ 量质双擎子页消费） -->
-    <script src="data/LQSQ_BACKTEST.js?v=a765309b4c" defer></script>
-    <script src="data/LQSQ_TRACK.js?v=c2886edd59" defer></script>
+         · LQSQ_TRACK    = 归档信号（每日 Top5，2026-10-13 主人令由 Top30 收紧）+ 逐票前向跟踪（选股策略 · ⚖️ 量质双擎子页消费） -->
+    <script src="data/LQSQ_BACKTEST.js?v=c450b7d391" defer></script>
+    <script src="data/LQSQ_TRACK.js?v=97504b364c" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -3129,8 +3129,8 @@ function fmtSigned(v){
     </div><!--/st-fv-->
 
     <!-- ===== TAB 页面：量质双擎（LQSQ · 第一支自研算法 · 🆕 2026-10-12 小九接入） =====
-         定位（gen_lqsq_top30.py 原文）：独立选股器 —— 全市场按「因子 r=mean(vol,近20日)/mean(vol,前240日)」
-         升序（越缩量=越强）直选 Top30；次开买入、持有 20 个交易日收盘卖出（前复权·扣双边 0.3%）；
+         定位（gen_lqsq_top5.py 原文）：独立选股器 —— 全市场按「因子 r=mean(vol,近20日)/mean(vol,前240日)」
+         升序（越缩量=越强）直选 Top5（2026-10-13 主人令由 Top30 收紧）；次开买入、持有 20 个交易日收盘卖出（前复权·扣双边 0.3%）；
          真实信号流口径，与四量同榜同纪律。数据源：data/LQSQ_TRACK.js + data/LQSQ_BACKTEST.js。 -->
     <div id="st-lqsq" class="st-pane">
       <div class="card" id="stLqsqCard" style="border-left:4px solid #22c55e;">
@@ -5283,10 +5283,10 @@ c.innerHTML = h;
     // 当前 active 主策略：四量终极 → 量质双擎（双擎紧接四量下方）→ 强势跟踪。
     {key:'fourvolume', name:'四量终极',     icon:'📊', desc:'四量真实信号流回测（2026-10-11 主人令切换，历史回放口径作废）· 样本自 09-14 累积中，仅显示成熟档 · 观察期：胜率/收益未达红线时回测页出下架提请', color:'#38bdf8', var:'FOUR_VOLUME_BACKTEST'},
     /* 🆕 2026-10-12 小九：第一支自研算法「量质双擎」(LQSQ) —— 真实信号流口径直上主榜，
-       与四量同榜同纪律（gen_lqsq_top30.py → LQSQ_BACKTEST，summary.by_period 与四量同构，
+       与四量同榜同纪律（gen_lqsq_top5.py → LQSQ_BACKTEST，summary.by_period 与四量同构，
        故 _renderPeriodBacktestCard 零结构改动直接复用）。样本自 10-09 起累积、未走满 T+20
        不计入 ⇒ 首期卡头走「累积中」，成熟一档进一档。 */
-    {key:'lqsq',    name:'量质双擎',   icon:'⚖️', desc:'第一支自研算法 · 异常量比缩量选强 Top30 · 次开买入持有 20 日 · 样本自 10-09 累积中，仅显示成熟档', color:'#22c55e', var:'LQSQ_BACKTEST'},
+    {key:'lqsq',    name:'量质双擎',   icon:'⚖️', desc:'第一支自研算法 · 异常量比缩量选强 Top5 · 次开买入持有 20 日 · 样本自 10-09 累积中，仅显示成熟档', color:'#22c55e', var:'LQSQ_BACKTEST'},
     /* 🆕 2026-09-16 主人令「生命周期三个算法里明显高手的更好 ⇒ 改为强势跟踪」：
        原「高手强势股跟踪」升为本页正式策略卡，名称统一为「强势跟踪」。
        数据源 window.IMA_STRONG_BACKTEST（真实日K · 已扣双边 0.30%），
@@ -13961,7 +13961,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     else if(tab==='fa'){
       if(typeof window.__renderFactorPane==='function'){ try{ window.__renderFactorPane(); }catch(e){} }
     }
-    else if(tab==='lqsq'){ /* 🆕 2026-10-12 小九：量质双擎子页（当期 Top30 + 前向跟踪） */
+    else if(tab==='lqsq'){ /* 🆕 2026-10-12 小九：量质双擎子页（归档信号每日 Top5 + 前向跟踪） */
       if(typeof window.renderLqsq==='function'){ try{ window.renderLqsq(); }catch(e){ console.warn('量质双擎渲染失败',e); } }
     }
   }
@@ -14059,7 +14059,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
   };
 
   /* ═══ 🆕 2026-10-12 小九：量质双擎（LQSQ）子页渲染 ═══
-     数据源 window.LQSQ_TRACK（当期 Top30 选股 + 逐票前向跟踪；update_v8 由 raw_data/lqsq_track.json 发布）
+     数据源 window.LQSQ_TRACK（归档信号每日 Top5 + 逐票前向跟踪；update_v8 由 raw_data/lqsq_track.json 发布）
            window.LQSQ_BACKTEST（主榜回测视图，method 口径说明）。
      诚实铁律：未走满 T+N 的档一律显示「累积中」，绝不用 0 冒充；全站红涨绿跌口径。 */
   window.renderLqsq = function(){
@@ -14089,7 +14089,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     /* ── 口径披露 ── */
     h += '<div class="note" style="line-height:1.75;margin-bottom:12px;">'
        + '<b style="color:#22c55e;">⚖️ 量质双擎（LQSQ）</b> · 第一支自研算法 —— '
-       + _e(B.method || '每日全市场按异常量比（缩量=强势）打分选 Top30，次开买入、持有 20 个交易日收盘卖出（前复权·扣双边 0.3%）；ROE 质地过滤 v2 待接。')
+       + _e(B.method || '每日全市场按异常量比（缩量=强势）打分选 Top5，次开买入、持有 20 个交易日收盘卖出（前复权·扣双边 0.3%）；ROE 质地过滤 v2 待接。')
        + '</div>';
     /* ── 统计块 ── */
     function _stat(label, val, sub, color){
@@ -14104,15 +14104,16 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     h += _stat('🚀 跟踪起始', _e(T.track_start || '—'), '上线首日即建归档', 'var(--txt)');
     h += _stat('⏳ 成熟样本', '0', 'T+20 未走满不计入', '#fbbf24');
     h += '</div>';
-    /* ── 当期 Top30 ── */
+    /* ── 归档信号（每日 Top5；🔴 2026-10-13 主人令「每天按评分最高推荐3-5只就好」由 Top30 收紧） ── */
     h += '<h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 8px;">'
-       + '<span class="ic">📋</span>当期选股 Top30 <span style="font-size:11px;color:var(--sub);font-weight:400">按异常量比升序（越缩量 = 越强）</span></h3>';
+       + '<span class="ic">📋</span>归档信号 · 每日 Top5 <span style="font-size:11px;color:var(--sub);font-weight:400">按异常量比升序（越缩量 = 越强）</span></h3>';
     h += '<div class="note" style="margin-bottom:8px;">持有期收益随交易日成熟：未走满 T+N 的档位显示「<span style="color:var(--dim);">累积中</span>」，绝不填 0 冒充。红涨绿跌。</div>';
     h += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
     h += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">'
        + '<th style="padding:6px;text-align:left;color:var(--sub);">#</th>'
        + '<th style="padding:6px;text-align:left;color:var(--sub);">名称</th>'
        + '<th style="padding:6px;text-align:left;color:var(--sub);">代码</th>'
+       + '<th style="padding:6px;text-align:left;color:var(--sub);">信号日</th>'
        + '<th style="padding:6px;text-align:right;color:var(--sub);">量比 r</th>'
        + '<th style="padding:6px;text-align:right;color:var(--sub);">信号日收盘</th>';
     DAYS.forEach(function(d){ h += '<th style="padding:6px;text-align:right;color:var(--sub);">T+'+d+'</th>'; });
@@ -14123,6 +14124,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       h += '<td style="padding:6px;color:var(--dim);">'+(i+1)+'</td>';
       h += '<td style="padding:6px;color:var(--txt);font-weight:600;">'+_e(s.name || '')+'</td>';
       h += '<td style="padding:6px;color:var(--sub);font-family:ui-monospace,Consolas,monospace;">'+_e(s.code || '')+'</td>';
+      h += '<td style="padding:6px;color:var(--sub);">'+_e(s.signal_date || '—')+'</td>';
       h += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(s.ratio != null ? Number(s.ratio).toFixed(4) : '—')+'</td>';
       h += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(s.close != null ? Number(s.close).toFixed(2) : '—')+'</td>';
       DAYS.forEach(function(d){
