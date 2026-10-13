@@ -1,18 +1,13 @@
 {
-"update_time": "2026-10-13 06:37:06",
-"total": 8034,
+"update_time": "2026-10-13 19:47:19",
+"total": 9677,
 "new_listings_count": 0,
-"delisted_count": 4,
+"delisted_count": 0,
 "new_listings": [],
-"delisted": [
-"00232 大陆航空科技控股",
-"00286 爱帝宫",
-"00924 坤集团",
-"01598 ２１世纪教育"
-],
+"delisted": [],
 "meta_enriched": 0,
 "guard_tripped": false,
 "guard_reasons": [],
-"old_universe": 8038,
-"fresh_universe": 8034
+"old_universe": 9677,
+"fresh_universe": 9677
 }

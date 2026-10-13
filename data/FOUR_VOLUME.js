@@ -1,99 +1,15 @@
 window.FOUR_VOLUME={
- "update_time": "2026-10-13 07:39:37",
- "total": 4,
+ "update_time": "2026-10-13 19:34:44",
+ "total": 1,
  "stocks": [
   {
-   "code": "300006",
-   "name": "莱美药业",
-   "market": "sz",
-   "board_label": "创业板",
-   "close": 6.56,
-   "pct_chg": 19.93,
-   "turnover_rate": 19.34,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": false,
-    "散户金叉": true,
-    "主力金叉": false
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
-   "signal_date": "2026-10-12",
-   "enter_date": "2026-10-12"
-  },
-  {
-   "code": "002027",
-   "name": "分众传媒",
-   "market": "sz",
-   "board_label": "主板",
-   "close": 5.1,
-   "pct_chg": 3.87,
-   "turnover_rate": 3.32,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": true,
-    "散户金叉": false,
-    "主力金叉": true
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-   "signal_date": "2026-10-12",
-   "enter_date": "2026-10-12"
-  },
-  {
-   "code": "300244",
-   "name": "迪安诊断",
-   "market": "sz",
-   "board_label": "创业板",
-   "close": 21.0,
-   "pct_chg": 2.94,
-   "turnover_rate": 10.99,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": false,
-    "散户金叉": false,
-    "主力金叉": false
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
-   "signal_date": "2026-10-12",
-   "enter_date": "2026-10-12"
-  },
-  {
-   "code": "601166",
-   "name": "兴业银行",
+   "code": "600693",
+   "name": "东百集团",
    "market": "sh",
    "board_label": "主板",
-   "close": 18.44,
-   "pct_chg": 2.16,
-   "turnover_rate": 0.48,
+   "close": 12.3,
+   "pct_chg": 10.02,
+   "turnover_rate": 19.75,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -103,16 +19,16 @@ window.FOUR_VOLUME={
     "主力动量翻多": true,
     "机构金叉": true,
     "散户金叉": false,
-    "主力金叉": true
+    "主力金叉": false
    },
    "yzc": true,
    "jg": true,
    "xc": true,
    "four": true,
    "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-   "signal_date": "2026-10-12",
-   "enter_date": "2026-10-12"
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉",
+   "signal_date": "2026-10-13",
+   "enter_date": "2026-10-13"
   }
  ]
 };
