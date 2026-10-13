@@ -661,6 +661,33 @@ jobs:
             exit 1
           fi
 
+          # 🛡 2026-10-13 一劳永逸（主人实锤「主力净额卡停在 10:58」）：soft_9 写的盘中快照与
+          #   index.html 缓存戳同链对齐。旧链路 ?v 靠 build/reconcile 事后追（慢 3-5 分钟），
+          #   期间浏览器/CDN 按旧 URL 吐旧缓存 ⇒ 卡面停在旧时刻（10-13 实测：11:45 数据上线
+          #   后戳到 11:54 才被 build 追平，用户 11:49 截图看到的是 10:58）。
+          #   ⚠ index.html 绝不进 PUSH_FILES / api_push_raw（其两道守卫不收 index.html，血训见
+          #   api_push_raw.py 295-302 行）⇒ 独立 git rebase+push，与 snapshot job 同款三重试；
+          #   失败不阻断（reconcile 每 15 分钟仍兜底）。
+          if echo "${MANIFEST:-}" | grep -q 'SECTOR_FUND_FLOW_INTRADAY.js'; then
+            python update_v8.py --only-cache-busters || echo "⚠️ 缓存戳重算失败（reconcile 兜底，不阻断）"
+            if ! git diff --quiet index.html; then
+              git config user.name "v8-cloud-bot"
+              git config user.email "v8-bot@users.noreply.github.com"
+              git add index.html
+              git commit -q -m "chore: 盘中快照缓存戳原子对齐 (fetch soft_9) $(TZ=Asia/Shanghai date '+%H:%M')"
+              for _i in 1 2 3; do
+                git fetch -q origin main
+                git -c rebase.autoStash=true rebase origin/main >/dev/null 2>&1 || git rebase --abort >/dev/null 2>&1
+                python update_v8.py --only-cache-busters
+                git add index.html
+                if git diff --cached --quiet; then echo "ℹ️ 重试时缓存戳已一致"; break; fi
+                git commit -q -m "chore: 盘中快照缓存戳原子对齐 (fetch soft_9 retry $_i)"
+                if git push origin HEAD:main >/dev/null 2>&1; then echo "✅ 缓存戳同链对齐已推 (attempt=$_i)"; break; fi
+                echo "⚠️ 缓存戳推送第 $_i 次失败，重试"
+              done
+            fi
+          fi
+
       # 🛡 2026-08-18 主人紧急令根治：抓完 raw_data 之后立即桥接（bridge_raw_data.py）
       #   + 重生成 data/*.js（update_v8.py）+ 刷新 HEALTH_CHECK.js（v8_health_check.py），
       #   闭环 4 步：fetch → bridge → update_v8 → health_check。否则 raw_data 新了但
