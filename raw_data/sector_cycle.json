@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-13 10:33:39",
+  "update_time": "2026-10-13 10:48:52",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -199,14 +199,14 @@
     {
       "sector": "白酒消费",
       "start": "09/18",
-      "end": "10/12",
+      "end": "10/13",
       "start_idx": 18,
-      "end_idx": 28,
-      "days": 11,
-      "hot_days": 10,
+      "end_idx": 29,
+      "days": 12,
+      "hot_days": 11,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 63,
+      "total": 66,
       "ongoing": true
     },
     {
