@@ -38,8 +38,14 @@ name: "📈 板块资金日内快照(独立高频·根治上午空白)"
 
 on:
   schedule:
-    - cron: '*/10 1-3 * * 1-5'   # UTC 01:00-03:50 = CST 09:00-11:50（上午盘中，每 10 分钟）
-    - cron: '*/10 4-7 * * 1-5'   # UTC 04:00-07:50 = CST 12:00-15:50（下午盘中，每 10 分钟）
+    # 🔴 2026-10-13 小九 · 四修（cron 第三次被静默注销后强制重注册）：
+    #   10-13 实证：上午段 cron 再度失效（10:58 后零 schedule run，盘中 11:00-11:40 断档
+    #   40 分钟，全靠 workflow_run 保底续命；主人实锤主力净额卡停在 10:58）。
+    #   同仓铁律：注释变更不足以让 GitHub 重新注册 cron ⇒ 必须对 schedule 段做结构性变更。
+    #   本轮把两条 cron 边界同时外扩（0-3 / 4-8）⇒ 覆盖北京 08:00-16:50 全天，
+    #   且两条 schedule 条目值全变，构成结构性变更强制重注册。
+    - cron: '*/10 0-3 * * 1-5'   # UTC 00:00-03:50 = CST 08:00-11:50（盘前+上午盘中，每 10 分钟）
+    - cron: '*/10 4-8 * * 1-5'   # UTC 04:00-08:50 = CST 12:00-16:50（下午盘中+收盘末班，每 10 分钟）
   workflow_dispatch:
   # 🛡 2026-09-29 小九 · 三修（根治「schedule 再次静默注销」）：
   #   实测 09-26~09-28 三天 36 个 run 中 schedule 仅 2 次（09-21 同款注销复发），
@@ -108,7 +114,12 @@ jobs:
         run: |
           git config user.email "2814546@qq.com"
           git config user.name "ah-quant999"
-          git add data/SECTOR_FUND_FLOW_INTRADAY.js raw_data/sector_fund_flow_intraday.json
+          # 🛡 2026-10-13 一劳永逸（主人实锤「卡在 10:58」）：快照数据与 index.html 缓存戳
+          #   同 commit 原子更新。旧链路数据文件先上线、?v 靠 build/reconcile 事后追（慢 3-5
+          #   分钟），期间浏览器/CDN 按旧 URL 吐旧缓存 ⇒ 卡面停在旧时刻。update_v8.py 仅依赖
+          #   标准库，py3.11 可直接跑；失败不阻断快照推送（reconcile 每 15 分钟仍兜底）。
+          python update_v8.py --only-cache-busters || echo "⚠️ 缓存戳重算失败（不阻断快照推送，reconcile 兜底）"
+          git add data/SECTOR_FUND_FLOW_INTRADAY.js raw_data/sector_fund_flow_intraday.json index.html
           if git diff --cached --quiet; then
             echo "ℹ️ 本次无快照变更，跳过推送"
             exit 0
