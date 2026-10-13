@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-13 09:54:44",
+  "update_time": "2026-10-13 10:03:48",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 3115,
+      "total": 3121,
       "ongoing": true
     },
     {
@@ -186,14 +186,14 @@
     {
       "sector": "机器人",
       "start": "09/16",
-      "end": "10/12",
+      "end": "10/13",
       "start_idx": 16,
-      "end_idx": 28,
-      "days": 13,
-      "hot_days": 13,
+      "end_idx": 29,
+      "days": 14,
+      "hot_days": 14,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 205,
+      "total": 208,
       "ongoing": true
     },
     {
