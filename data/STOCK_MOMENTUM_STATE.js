@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-13 15:45",
- "generated": "2026-10-13 15:45",
+ "update_time": "2026-10-13 15:48",
+ "generated": "2026-10-13 15:48",
  "meta": {
-  "generated": "2026-10-13 15:45",
+  "generated": "2026-10-13 15:48",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 25,
   "days_with_consensus": 0,
@@ -9445,22 +9445,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002909",
       "name": "集泰股份",
-      "change_pct": 5.599,
-      "price": 6.79,
+      "change_pct": 5.443,
+      "price": 6.78,
       "category": "突破"
      },
      {
       "code": "000978",
       "name": "桂林旅游",
-      "change_pct": 4.271,
-      "price": 7.08,
-      "category": "突破"
-     },
-     {
-      "code": "300464",
-      "name": "星徽股份",
-      "change_pct": 3.118,
-      "price": 8.6,
+      "change_pct": 3.535,
+      "price": 7.03,
       "category": "突破"
      },
      {
@@ -9478,24 +9471,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "920075",
-      "name": "柏星龙",
-      "change_pct": 7.761,
-      "price": 16.94,
+      "code": "002702",
+      "name": "海欣食品",
+      "change_pct": 3.061,
+      "price": 6.06,
       "category": "突破"
      },
      {
-      "code": "601999",
-      "name": "出版传媒",
-      "change_pct": 3.39,
-      "price": 7.32,
+      "code": "920075",
+      "name": "柏星龙",
+      "change_pct": 8.015,
+      "price": 16.98,
       "category": "突破"
      },
      {
       "code": "600313",
       "name": "农发种业",
-      "change_pct": 4.024,
-      "price": 6.98,
+      "change_pct": 3.875,
+      "price": 6.97,
       "category": "突破"
      },
      {
@@ -9506,10 +9499,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "300691",
-      "name": "联合光电",
-      "change_pct": 9.079,
-      "price": 17.3,
+      "code": "002306",
+      "name": "ST云网",
+      "change_pct": 3.046,
+      "price": 2.03,
       "category": "突破"
      },
      {
@@ -9522,15 +9515,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600318",
       "name": "新力金融",
-      "change_pct": 9.13,
-      "price": 7.53,
+      "change_pct": 10.0,
+      "price": 7.59,
       "category": "突破"
      },
      {
       "code": "002272",
       "name": "川润股份",
-      "change_pct": 3.356,
-      "price": 13.55,
+      "change_pct": 3.585,
+      "price": 13.58,
       "category": "突破"
      },
      {
@@ -9543,50 +9536,43 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600838",
       "name": "上海九百",
-      "change_pct": 4.091,
-      "price": 8.65,
+      "change_pct": 4.573,
+      "price": 8.69,
       "category": "突破"
      },
      {
       "code": "002902",
       "name": "铭普光磁",
-      "change_pct": 4.861,
-      "price": 23.73,
+      "change_pct": 5.303,
+      "price": 23.83,
       "category": "突破"
      },
      {
       "code": "600698",
       "name": "湖南天雁",
-      "change_pct": 3.894,
-      "price": 6.67,
+      "change_pct": 3.427,
+      "price": 6.64,
       "category": "突破"
      },
      {
       "code": "300992",
       "name": "泰福泵业",
-      "change_pct": 3.06,
-      "price": 26.27,
-      "category": "突破"
-     },
-     {
-      "code": "000428",
-      "name": "华天酒店",
-      "change_pct": 3.235,
-      "price": 3.83,
+      "change_pct": 3.335,
+      "price": 26.34,
       "category": "突破"
      },
      {
       "code": "002564",
       "name": "天沃科技",
-      "change_pct": 3.386,
-      "price": 5.19,
+      "change_pct": 3.187,
+      "price": 5.18,
       "category": "突破"
      },
      {
       "code": "301149",
       "name": "隆华新材",
-      "change_pct": 9.682,
-      "price": 8.61,
+      "change_pct": 10.446,
+      "price": 8.67,
       "category": "突破"
      },
      {
@@ -9594,13 +9580,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "慈文传媒",
       "change_pct": 10.015,
       "price": 7.36,
-      "category": "突破"
-     },
-     {
-      "code": "002913",
-      "name": "奥士康",
-      "change_pct": 6.785,
-      "price": 89.87,
       "category": "突破"
      }
     ],
@@ -9615,22 +9594,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002909",
       "name": "集泰股份",
-      "change_pct": 5.599,
-      "price": 6.79,
+      "change_pct": 5.443,
+      "price": 6.78,
       "category": "加速"
      },
      {
       "code": "000978",
       "name": "桂林旅游",
-      "change_pct": 4.271,
-      "price": 7.08,
-      "category": "加速"
-     },
-     {
-      "code": "300464",
-      "name": "星徽股份",
-      "change_pct": 3.118,
-      "price": 8.6,
+      "change_pct": 3.535,
+      "price": 7.03,
       "category": "加速"
      },
      {
@@ -9648,24 +9620,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "920075",
-      "name": "柏星龙",
-      "change_pct": 7.761,
-      "price": 16.94,
+      "code": "002702",
+      "name": "海欣食品",
+      "change_pct": 3.061,
+      "price": 6.06,
       "category": "加速"
      },
      {
-      "code": "601999",
-      "name": "出版传媒",
-      "change_pct": 3.39,
-      "price": 7.32,
+      "code": "920075",
+      "name": "柏星龙",
+      "change_pct": 8.015,
+      "price": 16.98,
       "category": "加速"
      },
      {
       "code": "600313",
       "name": "农发种业",
-      "change_pct": 4.024,
-      "price": 6.98,
+      "change_pct": 3.875,
+      "price": 6.97,
       "category": "加速"
      },
      {
@@ -9676,10 +9648,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "300691",
-      "name": "联合光电",
-      "change_pct": 9.079,
-      "price": 17.3,
+      "code": "002306",
+      "name": "ST云网",
+      "change_pct": 3.046,
+      "price": 2.03,
       "category": "加速"
      }
     ],
@@ -9694,22 +9666,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002909",
       "name": "集泰股份",
-      "change_pct": 5.599,
-      "price": 6.79,
+      "change_pct": 5.443,
+      "price": 6.78,
       "category": "短线选股"
      },
      {
       "code": "000978",
       "name": "桂林旅游",
-      "change_pct": 4.271,
-      "price": 7.08,
-      "category": "短线选股"
-     },
-     {
-      "code": "300464",
-      "name": "星徽股份",
-      "change_pct": 3.118,
-      "price": 8.6,
+      "change_pct": 3.535,
+      "price": 7.03,
       "category": "短线选股"
      },
      {
@@ -9727,24 +9692,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "920075",
-      "name": "柏星龙",
-      "change_pct": 7.761,
-      "price": 16.94,
+      "code": "002702",
+      "name": "海欣食品",
+      "change_pct": 3.061,
+      "price": 6.06,
       "category": "短线选股"
      },
      {
-      "code": "601999",
-      "name": "出版传媒",
-      "change_pct": 3.39,
-      "price": 7.32,
+      "code": "920075",
+      "name": "柏星龙",
+      "change_pct": 8.015,
+      "price": 16.98,
       "category": "短线选股"
      },
      {
       "code": "600313",
       "name": "农发种业",
-      "change_pct": 4.024,
-      "price": 6.98,
+      "change_pct": 3.875,
+      "price": 6.97,
       "category": "短线选股"
      },
      {
@@ -9755,10 +9720,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "300691",
-      "name": "联合光电",
-      "change_pct": 9.079,
-      "price": 17.3,
+      "code": "002306",
+      "name": "ST云网",
+      "change_pct": 3.046,
+      "price": 2.03,
       "category": "短线选股"
      },
      {
@@ -9771,15 +9736,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600318",
       "name": "新力金融",
-      "change_pct": 9.13,
-      "price": 7.53,
+      "change_pct": 10.0,
+      "price": 7.59,
       "category": "短线选股"
      },
      {
       "code": "002272",
       "name": "川润股份",
-      "change_pct": 3.356,
-      "price": 13.55,
+      "change_pct": 3.585,
+      "price": 13.58,
       "category": "短线选股"
      },
      {
@@ -9792,50 +9757,43 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600838",
       "name": "上海九百",
-      "change_pct": 4.091,
-      "price": 8.65,
+      "change_pct": 4.573,
+      "price": 8.69,
       "category": "短线选股"
      },
      {
       "code": "002902",
       "name": "铭普光磁",
-      "change_pct": 4.861,
-      "price": 23.73,
+      "change_pct": 5.303,
+      "price": 23.83,
       "category": "短线选股"
      },
      {
       "code": "600698",
       "name": "湖南天雁",
-      "change_pct": 3.894,
-      "price": 6.67,
+      "change_pct": 3.427,
+      "price": 6.64,
       "category": "短线选股"
      },
      {
       "code": "300992",
       "name": "泰福泵业",
-      "change_pct": 3.06,
-      "price": 26.27,
-      "category": "短线选股"
-     },
-     {
-      "code": "000428",
-      "name": "华天酒店",
-      "change_pct": 3.235,
-      "price": 3.83,
+      "change_pct": 3.335,
+      "price": 26.34,
       "category": "短线选股"
      },
      {
       "code": "002564",
       "name": "天沃科技",
-      "change_pct": 3.386,
-      "price": 5.19,
+      "change_pct": 3.187,
+      "price": 5.18,
       "category": "短线选股"
      },
      {
       "code": "301149",
       "name": "隆华新材",
-      "change_pct": 9.682,
-      "price": 8.61,
+      "change_pct": 10.446,
+      "price": 8.67,
       "category": "短线选股"
      },
      {
@@ -9843,13 +9801,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "慈文传媒",
       "change_pct": 10.015,
       "price": 7.36,
-      "category": "短线选股"
-     },
-     {
-      "code": "002913",
-      "name": "奥士康",
-      "change_pct": 6.785,
-      "price": 89.87,
       "category": "短线选股"
      }
     ],
@@ -9864,15 +9815,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600318",
       "name": "新力金融",
-      "change_pct": 9.13,
-      "price": 7.53,
+      "change_pct": 10.0,
+      "price": 7.59,
       "category": "强势股"
      },
      {
       "code": "002272",
       "name": "川润股份",
-      "change_pct": 3.356,
-      "price": 13.55,
+      "change_pct": 3.585,
+      "price": 13.58,
       "category": "强势股"
      },
      {
@@ -9885,50 +9836,43 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600838",
       "name": "上海九百",
-      "change_pct": 4.091,
-      "price": 8.65,
+      "change_pct": 4.573,
+      "price": 8.69,
       "category": "强势股"
      },
      {
       "code": "002902",
       "name": "铭普光磁",
-      "change_pct": 4.861,
-      "price": 23.73,
+      "change_pct": 5.303,
+      "price": 23.83,
       "category": "强势股"
      },
      {
       "code": "600698",
       "name": "湖南天雁",
-      "change_pct": 3.894,
-      "price": 6.67,
+      "change_pct": 3.427,
+      "price": 6.64,
       "category": "强势股"
      },
      {
       "code": "300992",
       "name": "泰福泵业",
-      "change_pct": 3.06,
-      "price": 26.27,
-      "category": "强势股"
-     },
-     {
-      "code": "000428",
-      "name": "华天酒店",
-      "change_pct": 3.235,
-      "price": 3.83,
+      "change_pct": 3.335,
+      "price": 26.34,
       "category": "强势股"
      },
      {
       "code": "002564",
       "name": "天沃科技",
-      "change_pct": 3.386,
-      "price": 5.19,
+      "change_pct": 3.187,
+      "price": 5.18,
       "category": "强势股"
      },
      {
       "code": "301149",
       "name": "隆华新材",
-      "change_pct": 9.682,
-      "price": 8.61,
+      "change_pct": 10.446,
+      "price": 8.67,
       "category": "强势股"
      },
      {
@@ -9936,13 +9880,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "慈文传媒",
       "change_pct": 10.015,
       "price": 7.36,
-      "category": "强势股"
-     },
-     {
-      "code": "002913",
-      "name": "奥士康",
-      "change_pct": 6.785,
-      "price": 89.87,
       "category": "强势股"
      }
     ]
