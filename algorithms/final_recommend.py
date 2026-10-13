@@ -1752,6 +1752,17 @@ def main():
     except Exception as e:
         print(f"[warn] final_recommend history archive skipped: {e}")
 
+    # 🆕 2026-10-13 主人令「最终推荐的前5名我也想有个回测…我要看到底靠不靠谱」：
+    #   归档落盘后立即重算 Top5 信号层真实回测（读全部 dated 归档 + kline_cache，
+    #   真实信号流口径，与 IMA 卡同入场/出场/成本）。**回测失败绝不影响 D 批主产物**
+    #   （try/except 包裹，与 v8_delist_advice 调用同哲学）；本调用在 final_recommend.py
+    #   自己的 3300s 预算内，纯本地计算（秒级），不新增链步骤、不动 ORDER/STAGES。
+    try:
+        import gen_final_recommend_backtest as _frb
+        _frb.main([])
+    except Exception as e:
+        print(f"[warn] final_recommend backtest skipped: {e.__class__.__name__}: {e}")
+
     # 打印 top3
     for s in out_stocks:
         print(f"  #{s['rank']} {s['name']}({s['code']}) 综合{s['final_score']} 共振{s['resonance']} 板块+{s['sector_score']} 来源{','.join(s['sources'])}")

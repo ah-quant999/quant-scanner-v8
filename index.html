@@ -1776,7 +1776,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=d35a2387a5" defer></script>
 <script src="data/EXPERIMENT.js?v=9bfbafbdbc" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=610a9f1de9" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=610a9f1de9" defer></script><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=5f3dde8e36" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=92946fe485" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=96ed8f6d2c" defer></script>
@@ -1886,6 +1886,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <span id="finalStatusBadges" style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;"></span>
         </h3>
         <div id="finalRecBody" style="padding:4px 2px 2px;"><div class="note">加载中…</div></div>
+      </div>
+      <!-- 🆕 2026-10-13 主人令「最终推荐的前5名我也想有个回测…我要看到底靠不靠谱」：
+           最终推荐 Top5 信号层真实回测卡（与「强势跟踪 · 回测 N 日胜率」同渲染器同口径）。
+           数据源 data/FINAL_RECOMMEND_BACKTEST.js（真实信号流：每日真实选股 dated 归档
+           → 前向跟踪，非历史规则回放）；gen_final_recommend_backtest.py 产出，
+           final_recommend.py 末尾调用（D 批内，秒级纯本地计算，不影响主产物）。 -->
+      <div class="card" id="finalRecBackCard" style="margin-top:16px;border-left:4px solid #fbbf24;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 最终推荐 Top5 · 回测 N 日胜率（信号层）</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>
+        </div>
+        <div class="note" id="finalRecBackNote">加载中…</div>
+        <table id="finalRecBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>中位数</th><th>最好</th><th>最差</th><th>最大回撤</th></tr></thead><tbody id="finalRecBackBody"></tbody></table>
       </div>
     </div>
 
@@ -13730,6 +13743,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       });
     }catch(e){ console.warn('IMA 回测渲染失败',e); }
   };
+  /* 🆕 2026-10-13 主人令：暴露渲染器给「最终推荐 Top5 回测」卡复用 —— 同渲染器同口径，
+     禁在别处复制一份（两份必然漂移，主人「不要不一致会引起误会」）。 */
+  window.lifeRenderBacktest = lifeRenderBacktest;
 
   /* 🔴 2026-10-04 主人令：fvRenderSelf（前向累积跟踪渲染）整函数删除——卡已删重 */
 
@@ -18197,6 +18213,16 @@ window.__renderV8CalToday();
     // 🔴 2026-08-13 修复: renderFinalRec/renderFinalCand 内部已有 try/catch,
     //   这里只做调用(错误显示也由内部函数负责),不再 console.warn 吞错
     renderFinalRec();
+    // 🆕 2026-10-13 主人令：最终推荐 Top5 回测卡（复用 lifeRenderBacktest，与强势跟踪卡同口径）
+    try{
+      var fb = window.FINAL_RECOMMEND_BACKTEST;
+      if (typeof window.lifeRenderBacktest === 'function') {
+        window.lifeRenderBacktest('finalRecBackBody','finalRecBackNote', fb && fb.periods, {
+          method: fb && fb.method, total_signals: fb && fb.total_signals,
+          signal_date_range: fb && fb.signal_date_range, generated: fb && fb.generated
+        });
+      }
+    }catch(e){ console.warn('最终推荐回测渲染失败',e); }
     // 候选池只在切换到该 tab 时渲染，默认不渲染
   };
   if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', window.__renderFinalSec); }

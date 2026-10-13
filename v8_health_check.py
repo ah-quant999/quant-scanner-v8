@@ -244,6 +244,13 @@ CARD_DEFS = [
     #   （09-20 判定全链退役，实测 index.html / logic.html 的 <script src> 引用 = 0/0，
     #    但产物仍在远端 data/，且被同一次回推提交 8bc8275fdc 复活）⇒ 本批一并删除并登记同上两处护栏。
     {"id": "IMA_STRONG_BACKTEST", "name": "高手强势股跟踪回测", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["periods"], "heal_cat": "algo_run"},
+    # 🆕 2026-10-13 主人令「最终推荐的前5名我也想有个回测…我要看到底靠不靠谱」：
+    #   最终推荐 Top5 信号层真实回测卡（data/FINAL_RECOMMEND_BACKTEST.js）。
+    #   与 FINAL_RECOMMEND_DATA 同批产出（final_recommend.py 末尾调用
+    #   gen_final_recommend_backtest.py，D 批盘后算法链内，秒级纯本地计算）。
+    #   故 picking=True（与 FOUR_VOLUME_HISTORY/TRACK 同理由）：① 新鲜度按「交易日」判定，
+    #   根治周末/节假日整日误标红；② 陈旧自愈守 18:00 盘后门控，不盘前派发假产物。
+    {"id": "FINAL_RECOMMEND_BACKTEST", "name": "最终推荐Top5回测", "page": "最终推荐", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["periods"], "heal_cat": "algo_run", "picking": True},
 
 
 
