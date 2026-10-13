@@ -1,9 +1,13 @@
 {
-  "update_time": "2026-10-14 03:30:26",
-  "run_start": "2026-10-14 01:39:24",
-  "ok": 23,
-  "fail": 1,
+  "update_time": "2026-10-14 05:14:16",
+  "run_start": "2026-10-14 03:55:40",
+  "ok": 22,
+  "fail": 2,
   "failed_scripts": [
+    {
+      "script": "strategy_four_volume_60m.py",
+      "reason": "监督器静默杀(>15min 无输出)"
+    },
     {
       "script": "backtest_expectancy.py",
       "reason": "监督器静默杀(>15min 无输出)"
