@@ -293,7 +293,15 @@ READY_SPEC: dict[str, dict] = {
         #         ⇒ update_time 恒旧 ⇒ must 恒不满足 ⇒ B 批每轮重跑 60~90min 永不收敛。
         "must": ["data/FOUR_VOLUME.js"],
     },
-    "D": {"items": ["data/FINAL_RECOMMEND_DATA.js"], "need": 1, "must": []},
+    # 🛡 2026-10-13 阿狸咪（主人令「最终推荐的前5名我也想有个回测…我要看到底靠不靠谱」）：
+    #   D 批 items 纳 data/FINAL_RECOMMEND_BACKTEST.js —— 生产者与 FINAL_RECOMMEND_DATA
+    #   **同批同源**（final_recommend.py 主函数末尾调用 gen_final_recommend_backtest.py，
+    #   纯本地秒级计算，try/except 包裹，失败绝不影响 D 批主产物）。
+    #   need 保持 1：伴生卡**参与计数、受双盲区护栏覆盖**，但不单点挟持 D 批就绪
+    #   （与 B 批 FOUR_VOLUME_60M「加分因子」同哲学；必新项由 must 表达，D 批 must=[] 不变）。
+    #   🔴 联动不变式（guard_double_blind.py I-1/I-2 机器断言）：已同步纳入
+    #      dedup_fetch_manifest.py::_ALWAYS_PUSH（内容稳定日不得被判「伪变更」丢弃）。
+    "D": {"items": ["data/FINAL_RECOMMEND_DATA.js", "data/FINAL_RECOMMEND_BACKTEST.js"], "need": 1, "must": []},
     # 🔴 2026-09-12 主人令（拍板第 2 项·一劳永逸）：E 批就绪清单 2 → 3 项，need 1 → 2。
     #   根因（实测）：algorithms/gen_backtest_all_algos.py 已挂 STAGES["E"]（ORDER 47/48），
     #   但 data/BACKTEST_ALL_ALGOS.js **远端不存在**时全链零红灯 —— 它不在本清单里。

@@ -135,6 +135,10 @@ _ALWAYS_PUSH = {
     "raw_data/sector_fund_flow_trend.json",# READY_SPEC["A"].items
     "raw_data/market_alerts.json",         # READY_SPEC["A"].items
     "data/FINAL_RECOMMEND_DATA.js",        # READY_SPEC["D"].items（need=1，零余量，最高危）
+    # 🛡 2026-10-13 阿狸咪（主人令：最终推荐Top5回测卡）：D 批 items 新增伴生卡。
+    #   纳入理由：信号日无新增/推荐名单不变时，回测产物剥时间戳后内容逐字节稳定
+    #   ⇒ 不进白名单必被判「伪变更」丢弃 ⇒ update_time 恒旧 ⇒ 卡片停更且健康检查恒 WARN。
+    "data/FINAL_RECOMMEND_BACKTEST.js",    # READY_SPEC["D"].items（2026-10-13 新增，伴生卡）
     # 🔴 2026-10-11 主人令「完全下架」：CRDS_BACKTEST.js 行移除（E 批 items 已删该项）
     "data/BACKTEST_TDX.js",                # READY_SPEC["E"].must（2026-09-18 由 items 提为 must —— 双盲区根治，见 v8_stage_gate.py E 段注释）
     # ── 🛡 2026-09-13 同步 stage_gate 的「A 批 9 项纳入」────────────────
