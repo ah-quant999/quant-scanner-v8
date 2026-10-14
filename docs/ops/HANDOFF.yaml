@@ -36,6 +36,36 @@ meta:
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
   next_id_seq: 134
 items:
+  - id: guanlan-token-hardfail-rootfix-1014
+    owner: 小九(lemoncat-cn)
+    priority: P0
+    status: pending-verify
+    created: 2026-10-14
+    title: 外资研投双token死亡28天盲区——一劳永逸硬失败改造（主人22:22授权）
+    note: >
+      10-14 实证：本地 token 10-14 08:45 起 401、云端 Secret 约 09-16 死亡，
+      candidate 外资研投 47 只化石停更 28 天，八道防线全盲（P0-1 只查 key 存在、
+      extractor 401x3 静默 success、soft_8 continue-on-error 无邮件、监控八道全空转）。
+      主人 22:22 拍板授权（maharo 稿明早自动恢复、面板 CREDS 交接阿狸咪）。
+      本批已上线（双文件逐字节回读自验）：
+      ① algorithms/guanlan_extractor.py（commit 3561310f2189）——API 全空硬失败
+      exit 42(401凭据)/43(空数据) 且不覆盖旧产物（last-good 保护，maharo/前端仍可用旧料）；
+      有帖但 0 研报 exit 44；打 ::error:: annotation。行为级实测：假 token → exit=42 + md5 不变。
+      ② self_heal_monitor.py（commit a09668ca7dd）——P0-1 改实测口径
+      （外资研投 last_seen 距今 >4 天=FAIL，实测抓出本地 511 池 28 天陈旧）；
+      watchlist 陈旧(非今日)也重跑 extractor；无法自愈 → _alert_guanlan_down 邮件
+      （v8_send_alert infra 级、状态翻转即发、6h 冷却，本机唯一邮件出口）。
+      附带：本地 raw_data/candidate.json 已同步云端 22:29 版（540 只/外资研投 77，
+      last_seen=10-14），消除「本地旧池自愈反推线上」回退风险。
+      验证判据（verify_how）：下一次云端 post_close run 15 步日志出现
+      「API 获取帖子: N>0 条」且线上 CANDIDATE.js 外资研投 last_seen=当日（token 链健康路径）；
+      或人为失效 token 后 self_heal 10 分钟内发邮件（断供告警路径）。
+      🔴 ledger 刷新遗留：本 item 未同步 HANDOFF.ledger.json（_v8_ledger_refresh
+      口径校准不通过拒绝重算，既有漂移集在内）——留待阿狸咪校准流或下次 build
+      [13/13] 门禁按惯例消化；本条目本身已含完成证据。
+    verify_how: 云端 post_close 15 步 N>0 帖子且线上 last_seen=当日；或失效 token 后 10 分钟内收到断供邮件
+    updated: "2026-10-14 22:45"
+    updated_by: 小九(lemoncat-cn)
   - id: fix-handoff-b64-carrier-1008
     owner: 阿狸咪的工程师
     priority: P0
