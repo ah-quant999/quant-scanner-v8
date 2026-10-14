@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-14 18:36",
- "generated": "2026-10-14 18:36",
+ "update_time": "2026-10-14 18:40",
+ "generated": "2026-10-14 18:40",
  "meta": {
-  "generated": "2026-10-14 18:36",
+  "generated": "2026-10-14 18:40",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 26,
   "days_with_consensus": 0,
@@ -9704,8 +9704,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600792",
       "name": "云煤能源",
-      "change_pct": 3.95,
-      "price": 5.0,
+      "change_pct": 3.534,
+      "price": 4.98,
       "category": "突破"
      },
      {
@@ -9718,15 +9718,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301227",
       "name": "森鹰窗业",
-      "change_pct": 8.802,
-      "price": 31.52,
+      "change_pct": 9.182,
+      "price": 31.63,
       "category": "突破"
      },
      {
       "code": "000993",
       "name": "闽东电力",
-      "change_pct": 6.838,
-      "price": 18.75,
+      "change_pct": 6.097,
+      "price": 18.62,
       "category": "突破"
      },
      {
@@ -9739,15 +9739,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603721",
       "name": "中广天择",
-      "change_pct": 3.013,
-      "price": 20.17,
+      "change_pct": 3.166,
+      "price": 20.2,
       "category": "突破"
      },
      {
       "code": "301234",
       "name": "五洲医疗",
-      "change_pct": 4.988,
-      "price": 149.03,
+      "change_pct": 3.994,
+      "price": 147.62,
       "category": "突破"
      },
      {
@@ -9762,8 +9762,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600792",
       "name": "云煤能源",
-      "change_pct": 3.95,
-      "price": 5.0,
+      "change_pct": 3.534,
+      "price": 4.98,
       "category": "加速"
      },
      {
@@ -9776,15 +9776,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301227",
       "name": "森鹰窗业",
-      "change_pct": 8.802,
-      "price": 31.52,
+      "change_pct": 9.182,
+      "price": 31.63,
       "category": "加速"
      },
      {
       "code": "000993",
       "name": "闽东电力",
-      "change_pct": 6.838,
-      "price": 18.75,
+      "change_pct": 6.097,
+      "price": 18.62,
       "category": "加速"
      }
     ],
@@ -9792,8 +9792,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600792",
       "name": "云煤能源",
-      "change_pct": 3.95,
-      "price": 5.0,
+      "change_pct": 3.534,
+      "price": 4.98,
       "category": "短线选股"
      },
      {
@@ -9806,15 +9806,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301227",
       "name": "森鹰窗业",
-      "change_pct": 8.802,
-      "price": 31.52,
+      "change_pct": 9.182,
+      "price": 31.63,
       "category": "短线选股"
      },
      {
       "code": "000993",
       "name": "闽东电力",
-      "change_pct": 6.838,
-      "price": 18.75,
+      "change_pct": 6.097,
+      "price": 18.62,
       "category": "短线选股"
      },
      {
@@ -9827,15 +9827,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603721",
       "name": "中广天择",
-      "change_pct": 3.013,
-      "price": 20.17,
+      "change_pct": 3.166,
+      "price": 20.2,
       "category": "短线选股"
      },
      {
       "code": "301234",
       "name": "五洲医疗",
-      "change_pct": 4.988,
-      "price": 149.03,
+      "change_pct": 3.994,
+      "price": 147.62,
       "category": "短线选股"
      },
      {
@@ -9857,15 +9857,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603721",
       "name": "中广天择",
-      "change_pct": 3.013,
-      "price": 20.17,
+      "change_pct": 3.166,
+      "price": 20.2,
       "category": "强势股"
      },
      {
       "code": "301234",
       "name": "五洲医疗",
-      "change_pct": 4.988,
-      "price": 149.03,
+      "change_pct": 3.994,
+      "price": 147.62,
       "category": "强势股"
      },
      {
