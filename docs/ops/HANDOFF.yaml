@@ -8447,6 +8447,7 @@ items:
 
   - id: finalrec-replay-card-live-1014
     owner: 阿狸咪的工程师
+    priority: P1
     status: done
     title: 最终推荐回测卡=回放口径上线主页，11 月中切回真实信号流（同批 IMA 卡补 v2）
     detail: |
