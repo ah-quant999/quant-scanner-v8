@@ -42,21 +42,45 @@ def now_cst():
     return datetime.datetime.now(CST)
 
 
+def _http_get_json(url, timeout=8):
+    """仓内统一的 eastmoney 取数通道：**curl 子进程优先，urllib 兜底**，都失败返回 None。
+
+    🛡 2026-10-14 一劳永逸（指数线死平根因）：东方财富对 **Python urllib 的 TLS 指纹
+    有风控**——本机与云端 runner 双实测：urllib 一律被 RemoteDisconnected 断连
+    （旧代码 push2 恒 0.0、12:26 档新代码 urllib→push2his 仍 0.0 皆因此），
+    而 curl / requests（fetcher 全线用法）从无失败。故本脚本取数一律走 curl；
+    curl 缺失的极端环境才回退 urllib（行为退化为旧逻辑，不崩）。"""
+    try:
+        out = subprocess.run(
+            ["curl", "-s", "--max-time", str(timeout), "-H", "User-Agent: Mozilla/5.0", url],
+            capture_output=True, timeout=timeout + 5,
+        )
+        if out.returncode == 0 and out.stdout:
+            return json.loads(out.stdout.decode("utf-8"))
+    except Exception:
+        pass
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except Exception:
+        return None
+
+
 def get_index_chg():
     """取上证指数当前涨跌幅%（用于双轴对照）。失败返回 0.0，绝不强依赖。
 
     🛡 2026-10-14 主人令一劳永逸：原 push2 实时快照接口在云端 runner 上被网关静默拒返
-    （实测空 body）⇒ index_chg 恒 0.0 ⇒ 前端 idxHasReal=false，整条指数线 + 图例都不画，
-    双轴图只剩板块线（主人实锤「线条平坦」观感的根因之一）。改走 push2his 日K接口
-    （fetcher 同源、实测可达），取「当日」最新一条的涨跌幅（盘中即实时滚动值）；
-    当日K尚未生成（09:30 前）返回 0.0，绝不拿昨日收盘涨幅冒充。"""
+    （线上快照 index_chg 恒 0.0 ⇒ 前端 idxHasReal=false 整条指数线+图例都不画，
+    双轴图只剩板块线——主人实锤「线条平坦」观感的根因之一）。改走 push2his 日K接口
+    （fetcher 同源、云端实证可达），取「当日」最新一条的涨跌幅（盘中即实时滚动值）；
+    当日K尚未生成（09:30 前）返回 0.0，绝不拿昨日收盘涨幅冒充。
+    取数通道见 _http_get_json（curl 优先——urllib 的 TLS 指纹被东财风控断连）。"""
     try:
         url = ("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.000001"
                "&klt=101&fqt=0&fields1=f1&fields2=f51,f59&end=20500101&lmt=2")
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=6) as r:
-            j = json.loads(r.read().decode("utf-8"))
-        kl = (j.get("data") or {}).get("klines") or []
+        j = _http_get_json(url)
+        kl = ((j or {}).get("data") or {}).get("klines") or []
         if not kl:
             return 0.0
         parts = kl[-1].split(",")
