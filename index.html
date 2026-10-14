@@ -1776,7 +1776,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=2d063a47db" defer></script>
 <script src="data/EXPERIMENT.js?v=8893013f0f" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=631d035321" defer></script><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=842493b7e5" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=96e0958778" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=631d035321" defer></script><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=842493b7e5" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=30811d90a0" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=a22d3019c7" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=00b89aa7fd" defer></script>
@@ -1910,15 +1910,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
            18 个 v1 日无因子榜归档不计入。 -->
       <div class="card" id="finalRecBackCard" style="margin-top:16px;border-left:4px solid #fbbf24;">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 最终推荐 Top3 · 回测 N 日胜率（新方法混排）</span>
+          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 最终推荐 Top3 · 回测 N 日胜率（强势×因子 + 四量闸门）</span>
+          <span id="finalRecBackBadge"></span>
           <span style="font-size:10px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">回放口径 · 非真实信号流</span>
         </div>
         <div class="note" id="finalRecBackNote">加载中…</div>
         <table id="finalRecBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>中位数</th><th>最好</th><th>最差</th><th>最大回撤</th></tr></thead><tbody id="finalRecBackBody"></tbody></table>
         <div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.75;">
-          口径：新方法混排 = 强势跟踪当日新入选 × 当日因子榜，双池各自 min-max 归一竞位取 Top3（同分因子榜优先）；
+          算法 = 「强势×因子 + 四量闸门」（本表回放其混排层）：强势跟踪当日新入选 × 当日因子榜，双池各自 min-max 归一竞位取 Top3（同分因子榜优先）；
           次日开盘买 / N 日收盘卖 / 双边 0.30%；基准=全市场等权同成本口径（按信号日对齐，覆盖至信号日 10-09）。
-          仅统计双池同场信号日（34 日，06-09~10-12，数据截至 10-13 收盘）。
+          仅统计双池同场信号日（34 日，06-09~10-12，数据截至 10-13 收盘）；
+          四量闸门无逐日历史快照 ⇒ 本回放未套入闸门（线上实盘带闸门，可自动 3→2）。
           18 个 v1 日无因子榜归档不计入；v1 期归档无强度分，IMA 池内归一同分退化（Top3=因子前 2 + IMA）。
           真实信号流自 10-13 起累积，11 月中切回真实口径。
         </div>
@@ -18261,6 +18263,12 @@ window.__renderV8CalToday();
           method: fb && fb.method, total_signals: fb && fb.total_signals,
           signal_date_range: fb && fb.signal_date_range, generated: fb && fb.generated
         });
+        // 🆕 2026-10-14 主人令「这卡更新于…加上」：卡头补全站统一「更新于」胶囊
+        //   （与兄弟回测卡同范式 _uBadge('盘后','回测', ts)，读 REPLAY.update_time 真值）
+        var _frbEl = document.getElementById('finalRecBackBadge');
+        if (_frbEl && typeof window._uBadge === 'function') {
+          _frbEl.innerHTML = window._uBadge('盘后', '回测', fb && (fb.update_time || fb.generated));
+        }
       }
     }catch(e){ console.warn('最终推荐回测渲染失败',e); }
     // 候选池只在切换到该 tab 时渲染，默认不渲染
