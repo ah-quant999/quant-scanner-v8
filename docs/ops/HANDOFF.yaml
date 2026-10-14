@@ -39,7 +39,7 @@ items:
   - id: index-creds-panel-refresh-1014
     owner: 阿狸咪的工程师
     priority: P1
-    status: pending-verify
+    status: done
     created: 2026-10-14
     title: index.html 凭证面板 CREDS 更新交接（小九→阿狸咪，夜班窗口执行）
     note: >
@@ -61,8 +61,13 @@ items:
       probe_maharo.py」，剩余天数与灯色由面板逻辑自动重算（余 30 天 s-ok）。
       ② 按交接注「另立项」→ 登记 creds-panel-live-probe-1014（todo）。
       验证方式：Pages 上线后 HTTP 硬抓 index.html 核对凭证区字面值。
-    verify_how: 线上 index.html 运维面板凭证区 zsxq 显示 2026-10-14 且 Ctrl+F5 可见
-    updated: "2026-10-14 23:15"
+      【已验证 2026-10-14 23:40】CI 10163/10165 全绿（[13/13] 过，含 finalrec
+      priority 缺字段就地补齐）；Pages 硬抓（cache-buster）实证：zsxq 条目
+      updated=2026-10-14 ✅、mahoro expire_note「cookie 已换新/旧到期口径作废/
+      唯一消费方 probe_maharo.py」✅。面板剩余天数与灯色自动重算（均 s-ok）。
+    verify_how: Pages 硬抓 index.html 凭证区 zsxq updated=2026-10-14 + mahoro 换新标注（23:40 实测在位）
+    verified_at: "2026-10-14 23:40"
+    updated: "2026-10-14 23:40"
     updated_by: 阿狸咪的工程师
   - id: creds-panel-live-probe-1014
     owner: 阿狸咪的工程师
