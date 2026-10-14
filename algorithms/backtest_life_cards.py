@@ -330,6 +330,16 @@ def run_ima_strong():
     if len(sigs) < SOURCE_COVERAGE_MIN_ROWS:
         _qdeg = True
         _qwhy = _qwhy + [f"可比信号仅 {len(sigs)} 笔 < {SOURCE_COVERAGE_MIN_ROWS} 笔"]
+    # 🔴🔴 2026-10-14 主人令「立即修复」：断流守卫（补总量守卫的盲区）
+    #   2026-10-14 凌晨实证：v2 换代（09-30）后 parse_v2 漏写 first_selected ⇒
+    #   最新日报 0 笔入库，而总量 112 笔（v1 归档）远超下限 ⇒ 总量守卫沉默，
+    #   断流 2 周无人知（signal_date_range 停在 08-28）。判据（与总量正交）：
+    #   「最新日报贡献 0 笔 + 归档非空」= 源还在更新但信号提取断了，
+    #   样本全是旧归档 ⇒ 不反映当前源行为 ⇒ 必须降级，不许静默 ok。
+    if not _sig_latest and _sig_hist:
+        _qdeg = True
+        _qwhy = _qwhy + ["最新日报贡献 0 笔信号（first_selected 缺失/换代断流）⇒ "
+                         "样本全部来自历史归档，不反映当前源行为，不具代表性"]
     _qf["source_degrade_reasons"] = _qwhy
     _qf["source_integrity"] = "degraded" if _qdeg else "ok"
     _qf["backtest_representative"] = (not _qdeg)

@@ -123,7 +123,11 @@ V8_FUSION_ALPHA_SELECT = os.environ.get("V8_FUSION_ALPHA_SELECT", "1").strip() !
 
 CRISIS_HIGH_THRESHOLD = 50  # 危机雷达≥50才并入逆势龙头
 SECTOR_TOP_N = 15
-TOP_N = 5  # 2026-08-13 主人令：从 3 扩到 5（共振优先 + 分数其次，覆盖更多共识强票）
+TOP_N = 3  # 🔴 2026-10-14 主人令「改造融合器后重新观察」：真实信号流复盘（2026-10-14 凌晨）
+#   89 笔/18 信号日 T+5 超额 −3.77%、T+10 −4.79%（基准=全市场等权同日真算）——
+#   Top5 摊薄了单位信号质量且集中在高位热门赛道股（新易盛/翰宇药业各霸榜 7 次）。
+#   故由 5 收紧为 3（2026-08-13 由 3 扩 5 的命令本次反转）。regime 非开仓期的
+#   减半公式同步联动（见下方 max(2, TOP_N-1)，保底 2 只不断流）。
 # 2026-08-11 主人令：去掉港股降权+去掉 A 股保底——「谁好谁上」原则。
 #   之前 HK_PENALTY=1.5 + hard_a=MIN_A_SHARES_IN_TOP-1=1 是「主做 A 股」假设下的保护，
 #   实际效果是市场歧视（港股凭空少 1.5 分）。现在改公平竞争，靠数据说话。
@@ -706,11 +710,71 @@ def main():
     _regime_name = (_regime_info or {}).get("regime") if _regime_ok else None
     _regime_date = (_regime_info or {}).get("date") if _regime_ok else None
     if not _regime_ok:
-        print(f"  [warn] ⚠️ regime 不可用（{_regime_reason}）→ 按保守处置：观望、推票数 {TOP_N}→{max(2, TOP_N // 2)}")
-    _effective_top_n = TOP_N if _open_regime else max(2, TOP_N // 2)
+        print(f"  [warn] ⚠️ regime 不可用（{_regime_reason}）→ 按保守处置：观望、推票数 {TOP_N}→{max(2, TOP_N - 1)}")
+    # 🔴 2026-10-14 主人令「改造融合器后重新观察」：减半公式由 TOP_N//2 改为 TOP_N-1。
+    #   联动原因：TOP_N 5→3 后旧公式 max(2, 3//2)=1 只，非开仓期只剩 1 票，
+    #   信号流过薄 ⇒ 回测样本积累断流。新公式保底 2 只。
+    _effective_top_n = TOP_N if _open_regime else max(2, TOP_N - 1)
     _action_label = "买入" if _open_regime else "观察（市场企稳/反弹，历史回测负期望）"
     print(f"[regime] 市场状态={_regime_name or '未知'}({_regime_date}) ok={_regime_ok} "
           f"开仓={_open_regime} 推票数 {TOP_N}→{_effective_top_n}")
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # 🔴🔴 2026-10-14 主人令「只允许 excess5>0 的源入榜」·真实流 edge 闸门
+    # ───────────────────────────────────────────────────────────────────────────
+    # 背景（2026-10-14 凌晨复盘，数据全链已线上取证）：
+    #   最终推荐 89 笔/18 信号日真实信号流 T+5 超额 −3.77%、T+10 −4.79%（基准=等权全市场）；
+    #   唯一在池源「四量终极」真实流（track_start 2026-09-14）T+5 −1.21%/n=78、
+    #   T+10 −10.49%/n=70（胜率 12.86%）——上游负 alpha，融合器救不回来。
+    # 口径说明（防混用）：
+    #   · backtest_expectancy.json 的 by_factor.excess5 是**回放口径**（含当前股池
+    #     幸存者偏差，memory 已记为「禁作主榜/上下架依据」）⇒ 不能拿来当入榜闸门；
+    #   · 本闸门改用**真实流口径**：raw_data/four_volume_track.json 的
+    #     self_backtest.summary（信号逐日累积的真收盘价前向样本，无未来函数）。
+    # 规则：
+    #   · T+5 成熟档 n ≥ 30（薄样本保护）且 avg_return < 0 ⇒ 四量负 edge
+    #     ⇒ _open_regime 强制 False（推票 3→2 + 行动标签改「观察」），信号流不断、
+    #     回测样本继续积累，负 edge 状态对主人明示；
+    #   · avg_return ≥ 0 ⇒ 正 edge，正常推（自适应：四量真实流转正自动恢复）；
+    #   · 样本不足/读失败 ⇒ 不启用闸门 + 显式 warn（绝不静默）。
+    # 回退：V8_FUSION_REALFLOW_GATE=0 → 关闭本闸门（恢复旧行为）。
+    # ═══════════════════════════════════════════════════════════════════════════
+    V8_FUSION_REALFLOW_GATE = os.environ.get("V8_FUSION_REALFLOW_GATE", "1").strip() != "0"
+    _FV_GATE_MIN_N = 30   # 薄样本保护：低于此样本量不启用闸门
+    _fv_gate_on = False
+    _fv_real = {"source": "raw_data/four_volume_track.json::self_backtest.summary[5d]",
+                "min_n": _FV_GATE_MIN_N, "count": None, "avg_return": None, "win_rate": None,
+                "enabled": False, "note": ""}
+    if V8_FUSION_REALFLOW_GATE:
+        try:
+            _fv_track = load_json("four_volume_track.json") or {}
+            _fv_sb = (_fv_track.get("self_backtest") or {}).get("summary") or {}
+            _fv5 = _fv_sb.get("5d") or {}
+            _n = _fv5.get("count") or 0
+            _avg = _fv5.get("avg_return")
+            _fv_real.update({"count": _n, "avg_return": _avg, "win_rate": _fv5.get("win_rate")})
+            if isinstance(_avg, (int, float)) and _n >= _FV_GATE_MIN_N:
+                _fv_gate_on = _avg < 0
+                _fv_real["enabled"] = True
+                if _fv_gate_on:
+                    print(f"[realflow-gate] 四量真实流 T+5 n={_n} 胜率={_fv5.get('win_rate')}% "
+                          f"均={_avg}% < 0 ⇒ 负 edge ⇒ 最终推荐降级观察（推票 {TOP_N}→{max(2, TOP_N - 1)}）")
+                else:
+                    print(f"[realflow-gate] 四量真实流 T+5 n={_n} 均={_avg}% ≥ 0 ⇒ 正 edge，正常推")
+            else:
+                _fv_real["note"] = f"样本不足或缺失（n={_n} < {_FV_GATE_MIN_N}），不启用闸门"
+                print(f"  [warn] realflow-gate 样本不足/缺失（n={_n}）⇒ 不启用闸门")
+        except Exception as e:
+            _fv_real["note"] = f"读取失败，不启用闸门: {e}"
+            print(f"  [warn] realflow-gate 读取失败，不启用: {e}")
+        if _fv_gate_on:
+            _open_regime = False
+            _effective_top_n = max(2, TOP_N - 1)
+            _action_label = "观察（四量真实流负 edge，见 realflow_gate）"
+            print(f"[realflow-gate] 闸门生效：开仓=False 推票数→{_effective_top_n} 行动={_action_label}")
+    else:
+        _fv_real["note"] = "V8_FUSION_REALFLOW_GATE=0 手动关闭"
+        print("  [info] realflow-gate 已手动关闭（V8_FUSION_REALFLOW_GATE=0）")
 
     profiles = (profile or {}).get("profiles") or {}
 
@@ -1162,6 +1226,7 @@ def main():
         ima = {}
     if ima:
         _ima_norm = {}
+        _ima_new = []   # 🔴 2026-10-14 主人令「符合入选的」= 当日新入选（first_selected==data_date）
         for s in (ima.get("stocks") or []):
             _c = s.get("code")
             _st = (s.get("status") or "")
@@ -1170,6 +1235,41 @@ def main():
             if _st in ("见顶", "走弱"):
                 continue
             _ima_norm[norm_code(_c).lstrip('.')] = s
+            if _ima_dd and str(s.get("first_selected") or "").strip() == _ima_dd:
+                _ima_new.append(s)
+        # ── 强势跟踪入池（🔴🔴 2026-10-14 主人令「符合入选的，凭因子真实排序」）──
+        # 背景（2026-10-14 凌晨诊断）：最终推荐 89 笔真实流 T+5 超额 −3.77%，
+        #   根因是唯一在池源四量终极真实流负 alpha（T+10 胜率 12.86%/−10.49%）；
+        #   而强势跟踪（IMA 高手短线情绪选股）真实流全档正超额（T+1 +1.10% →
+        #   T+45 +23.04%），是全站唯一正 edge 链路，却因 09-20「唯一口径=因子榜」
+        #   被架空成展示标签。本段把它恢复为**真入池源**。
+        # 口径（三条铁律）：
+        #   ① 「符合入选的」= first_selected==data_date（当日新入选），与回测卡
+        #      信号定义严格一致（backtest_life_cards._load_sigs 同判据）；
+    #   ② 「凭因子真实排序」= 强度分与因子榜 total_score 经**池内 min-max 归一化**
+    #      （两池头部都=100）后公平竞位混排——直接比分会变成 IMA 全量切换
+    #      （81 vs 16.8 恒赢），主人已否决该形态；归一化细则见下方混排段注释；
+        #   ③ 矛盾证据如实并列：09-18 walk-forward 曾测「高手跟踪」作四量
+        #      **加分项**的边际 −1.76pp（n=13、回放口径、四量池上下文）——
+        #      与本次接入的「IMA 自身信号真实流」不是同一口径同一场景，不隐瞒。
+        # 回退：V8_IMA_INTAKE=0 → 本段入池整段关闭（恢复 09-20 后旧行为）。
+        V8_IMA_INTAKE = os.environ.get("V8_IMA_INTAKE", "1").strip() != "0"
+        _ima_in = 0
+        if V8_IMA_INTAKE:
+            for s in _ima_new:
+                _k = norm_code(s["code"]).lstrip('.')
+                r = ensure(_k, s.get("name"), s.get("market"), s.get("board"))
+                _sc = safe_float(s.get("score"))
+                r["sources"].append("强势跟踪")
+                r["source_scores"]["强势跟踪"] = _sc
+                r["signals"].append("强势跟踪·当日新入选")
+                r["reasons"].append(f"强势跟踪（短线情绪选股）当日新入选·强度分 {_sc:g}")
+                r["enter_dates"].append(_ima_dd)
+                _ima_in += 1
+            print(f"[ima-intake] 强势跟踪入池：当日池 {len(_ima_norm)} 只中"
+                  f"新入选 {len(_ima_new)} 只 ⇒ 入池 {_ima_in} 只（强度分混排）")
+        else:
+            print("  [info] V8_IMA_INTAKE=0：强势跟踪入池已手动关闭")
         _hit = 0
         for key, r in pool.items():
             _k = key.lstrip('.') if key.startswith('.') else key
@@ -1178,6 +1278,9 @@ def main():
                 # 🔴 2026-09-18 改动2a：高手跟踪 = 负 alpha 源（边际 −1.76pp / 13 命中 / 胜率 30.8 vs 22.5）
                 #   这里原本给它 **固定 +1.0**，与四量终极同权 ⇒ 正是「数量优势淹没有效信号」的来源之一。
                 #   ⇒ 整源剔除、不进 sources（不计共振/strength）；写 tags 仅作展示。
+                # ⚠️ 2026-10-14 主人令分层：当日新入选票已由上方入池为独立源「强势跟踪」
+                #   （真实流口径正 edge）；本处「老票延续命中」维持 09-18 处置（仅 tag），
+                #   两层次不混——新入选入榜、延续命中仅展示。
                 if V8_FUSION_NOISE_FILTER:
                     r["tags"].append("高手跟踪")
                 else:
@@ -1281,6 +1384,11 @@ def main():
         strength = sum(r["source_scores"].values())
         # 2026-08-13 公平性修复：若已是板块龙头源，板块强度已在源分体现，
         # 此处只对非板块龙头票加全局板块加分，避免板块被双重计价。
+        # 🔴🔴 2026-10-14 现状固化（防误判）：sec_add/sec_score 自 2026-09-20
+        #   「唯一口径=因子榜 total_score」起**已不参与 final_score/排序**
+        #   （final_score 在下方被因子榜值覆写），仅为展示字段；walk-forward
+        #   edge=−0.525（薄样本为负）⇒ 保持不排序即是正确处置，无需再「关闭」。
+        #   89 笔真实流复盘中「sector 加分拖累」的猜测不成立——它早已不影响名次。
         sec_add = 0.0 if "板块龙头" in r["sources"] else sec_score
         # 方案B 放量弱势扣分：被异常换手率 bottom 命中的票，若同时被其他源选中则 −0.5
         # 🔴🔴 2026-09-18 审计（主人问「扣分标准科学吗？别一开始就犯错」）——本行是全链**唯一**
@@ -1351,11 +1459,40 @@ def main():
             _e["_aligned_topfactor"] = True
             _al_hit += 1
 
-    # 名次 = 因子榜原序；不在榜上的压到最后（理论上无：四量终极即因子榜来源）
-    scored.sort(key=lambda x: (
-        _ord_by_key.get(x.get("key") or norm_code(x.get("code", "")).lstrip("."), 10 ** 6),
-        -safe_float(x.get("final_score") or 0),
-    ))
+    # 🔴🔴 2026-10-14 主人令「凭因子真实排序」·双源混排（池内 min-max 归一化）
+    # ───────────────────────────────────────────────────────────────────────────
+    # 为什么必须归一化（实测标尺差异，不是想当然）：
+    #   因子榜 total_score 与 IMA 强度分虽都写成 0-100，但标尺不同——
+    #   · 因子榜 = 26 因子 raw/NORM_DIVISOR(130)*100，全市场头部实测仅 14~17
+    #     （理论满分 100 无人接近，头部密集 ⇒ 区分度在 1 分量级）；
+    #   · IMA 强度分 = 源侧主观 0-100，实测 65~81。
+    #   直接比分 ⇒ IMA 永远碾压（81 vs 16.8）= 变相「IMA 全量切换」，
+    #   主人 2026-10-14 已明确否决该形态（选的是「符合入选的，凭因子真实排序」）。
+    # ⇒ 各池内 min-max 归一到 0-100 后混排：各池头部都=100、尾部=0，
+    #   按「池内相对强度」公平竞位，谁的相对强度高谁上。
+    # 局限（如实标注，不装作完美）：池内相对强度仅当日横比有效，跨日不可比绝对值；
+    #   同分（两池榜首都=100）时因子榜票优先——全市场 26 因子横比 > 单源主观强度分。
+    # 回退：V8_IMA_INTAKE=0 ⇒ IMA 票根本不在 scored，本段自动退化为纯因子榜序。
+    _fv_raw = [safe_float(_ts_by_key.get(_e.get("key") or norm_code(_e.get("code", "")).lstrip(".")) or 0)
+               for _e in scored if _e.get("_aligned_topfactor")]
+    _fv_lo, _fv_hi = (min(_fv_raw), max(_fv_raw)) if _fv_raw else (0.0, 0.0)
+    _ima_raw = [safe_float((_e.get("source_scores") or {}).get("强势跟踪"))
+                for _e in scored
+                if not _e.get("_aligned_topfactor") and "强势跟踪" in (_e.get("sources") or [])]
+    _ima_lo, _ima_hi = (min(_ima_raw), max(_ima_raw)) if _ima_raw else (0.0, 0.0)
+    for _e in scored:
+        _k = _e.get("key") or norm_code(_e.get("code", "")).lstrip(".")
+        if _e.get("_aligned_topfactor"):
+            _raw = safe_float(_ts_by_key.get(_k) or 0)
+            _e["mix_pct"] = round((_raw - _fv_lo) / (_fv_hi - _fv_lo) * 100, 1) if _fv_hi > _fv_lo else 100.0
+        elif "强势跟踪" in (_e.get("sources") or []):
+            _raw = safe_float((_e.get("source_scores") or {}).get("强势跟踪"))
+            _e["final_score"] = round(_raw, 2)     # 展示值：强度分原值（副标口径）
+            _e["buy_score"] = _e["final_score"]
+            _e["mix_pct"] = round((_raw - _ima_lo) / (_ima_hi - _ima_lo) * 100, 1) if _ima_hi > _ima_lo else 100.0
+        else:
+            _e["mix_pct"] = 0.0
+    scored.sort(key=lambda x: (-safe_float(x.get("mix_pct") or 0), 0 if x.get("_aligned_topfactor") else 1))
     print("  [唯一口径] final_score 取自因子榜 total_score，命中 %d/%d 只" % (_al_hit, len(scored)))
 
     # ── Top3 选取（2026-08-11 主人令：公平竞争，谁好谁上）──
@@ -1508,6 +1645,9 @@ def main():
             "sector_hits": s["sector_hits"],
             "sector_fund": sector_fund,
             "final_score": s["final_score"],
+            # 🔴 2026-10-14 双源混排竞位分（池内 min-max 归一化，0-100）：
+            #   Top 卡与候选池的「⭐ 综合」展示口径，跨源可比（详见混排段注释）。
+            "mix_pct": s.get("mix_pct"),
             "buy_score": s["final_score"],
             "enter_date": enter_date,
             "signals": signals[:8],
@@ -1669,6 +1809,20 @@ def main():
             "note": "grind/panic=可开仓(正常推)；stabilize/rebound=历史回测≥3共振负期望，应观察/少推；"
                     "ok=false 表示 regime 取数失败已按保守处置（regime=null、不推满仓）",
         },
+        # 🔴🔴 2026-10-14 主人令「只允许 excess5>0 的源入榜」：四量真实流 edge 闸门回显。
+        "realflow_gate": _fv_real,
+        # 🔴🔴 2026-10-14 主人令「符合入选的，凭因子真实排序」：强势跟踪入池回显。
+        "ima_intake": {
+            "data_date": _ima_dd,
+            "pool_total": len(_ima_norm) if ima else 0,
+            "new_selected": _ima_in if ima else 0,
+            "rule": "first_selected==data_date（当日新入选）⇒ 入池独立源；强度分与因子榜分"
+                    "各自池内 min-max 归一化到 0-100 后混排（两把标尺头部都=100，公平竞位，"
+                    "无席位偏向；同分时因子榜优先）",
+            "note": "09-18 walk-forward 曾测「高手跟踪」作四量加分项边际 −1.76pp（n=13、回放口径、"
+                    "四量池上下文）——与本处「IMA 自身信号真实流」非同口径同场景，如实并列不隐瞒；"
+                    "回退开关 V8_IMA_INTAKE=0",
+        },
         "price_source": {
             "date": _qs["date"],
             "source": _qs["source"],
@@ -1691,6 +1845,7 @@ def main():
                 "close_verified": bool(x.get("close_verified")),
                 "pct_chg": _num2(x.get("pct_chg")),
                 "final_score": x["final_score"],
+                "mix_pct": x.get("mix_pct"),
                 "resonance": x["resonance"],
                 "sources": sorted(set(x["sources"])),
                 "signals": sorted(set(x.get("signals") or []))[:6],
@@ -1716,6 +1871,7 @@ def main():
                 "code": x["key"],
                 "name": _resolve_name(x["key"], x["name"]),
                 "final_score": x["final_score"],
+                "mix_pct": x.get("mix_pct"),
                 "resonance": x["resonance"],
                 "sources": sorted(set(x["sources"])),
                 "actions": x.get("factor_actions") or [],

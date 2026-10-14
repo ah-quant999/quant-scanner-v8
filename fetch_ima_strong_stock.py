@@ -148,6 +148,49 @@ def parse_v2(text):
                     "themes_top": themes_top}
 
 
+# 🔴🔴 2026-10-14 主人令「立即修复」·first_selected 差集计算（根治 v2 换代断流）
+# ───────────────────────────────────────────────────────────────────────────
+# 根因（2026-10-14 凌晨线上铁证）：parse_v2 的 docstring 声明
+#   first_selected(=数据日)/trade_date(=数据日)，但实现**从未写这两个键** ⇒
+#   下游回测 backtest_life_cards._load_sigs 按 first_selected 定位信号时点，
+#   拿不到即跳过 ⇒ 线上 IMA_STRONG_BACKTEST 112 笔样本**全部来自 v1 历史归档**
+#   （signal_date_range 2026-06-09~08-28），v2「短线情绪选股」（09-30 换代至今）
+#   贡献 0 笔，当日候选 8 只全被跳过（skipped_no_signal_date=8）——
+#   覆盖度守卫只看总量 112>下限 ⇒ 断流静默 2 周无人报。
+# 修法（差集法，语义严谨）：
+#   · 滚动归档 raw_data/ima_strong_daily.json = {data_date: [codes]}，只增不改、同日幂等；
+#   · first_selected = 该 code 在归档中**最早出现**的日期；从未出现 ⇒ 数据日（当日首入）；
+#   · ⛔ 绝不直接填「=数据日」：那会让同一只票每天都被当成「新信号」，
+#     回测把持有期每天重复计一笔（样本爆炸+语义错误）。
+#   · 冷启动（归档为空）= 当日池全部记为首次入选（系统视角如实，不伪造历史）。
+#   · 衔接：回测与最终推荐「符合入选的」判据统一为 first_selected == data_date。
+def _update_daily_archive(dd, codes):
+    p = os.path.join(RAW_DIR, "ima_strong_daily.json")
+    arch = {}
+    try:
+        if os.path.exists(p):
+            with open(p, encoding="utf-8") as f:
+                arch = json.load(f) or {}
+    except Exception as e:
+        print(f"[warn] ima_strong_daily 读取失败，按空归档处理: {e}")
+    if dd and codes:
+        arch[dd] = sorted(set(codes))   # 同日幂等覆盖
+    try:
+        with open(p, "w", encoding="utf-8", newline="\n") as f:
+            json.dump(arch, f, ensure_ascii=False, indent=1)
+    except Exception as e:
+        print(f"[warn] ima_strong_daily 写入失败: {e}")
+    return arch
+
+
+def _first_selected(dd, code, arch):
+    """差集法取首次入选日：归档中最早出现日；从未出现 ⇒ dd；dd 也空 ⇒ None（回测跳过）。"""
+    days = sorted(d for d, cs in (arch or {}).items() if code in (cs or []))
+    if days:
+        return days[0]
+    return dd or None
+
+
 def load_snapshot():
     """读全文快照。任何异常返回 None（调用方回退/降级），绝不抛死整条链。"""
     if not (os.path.exists(SNAPSHOT_MD) and os.path.exists(SNAPSHOT_META)):
@@ -334,6 +377,21 @@ def main():
     _now = datetime.now(timezone(timedelta(hours=8)))
     stocks = data["stocks"]
     data_date = data["data_date"]
+    # 🔴🔴 2026-10-14 first_selected 差集修复（根因与语义见 _update_daily_archive 注释）：
+    #   先落当日滚动归档，再逐只算 first_selected/trade_date 并写回 stocks。
+    _codes_today = [str(s.get("code") or "").strip() for s in stocks if s.get("code")]
+    _daily_arch = _update_daily_archive(data_date, _codes_today)
+    _fs_new = 0
+    for s in stocks:
+        _c = str(s.get("code") or "").strip()
+        if not _c:
+            continue
+        s["first_selected"] = _first_selected(data_date, _c, _daily_arch)
+        s["trade_date"] = data_date or None
+        if s["first_selected"] == data_date and data_date:
+            _fs_new += 1
+    print(f"[first_selected] 数据日 {data_date or '?'}：池 {len(stocks)} 只，"
+          f"当日新入选 {_fs_new} 只，延续 {len(stocks) - _fs_new} 只（差集法·滚动归档）")
     try:
         stale_days = (_now.date() - datetime.strptime(data_date, "%Y-%m-%d").date()).days
     except Exception:

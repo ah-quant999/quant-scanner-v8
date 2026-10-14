@@ -666,7 +666,7 @@ window.__domReadyFns=[];
          故删此行零功能损失。若日后云端产出 maharo_macro.js，恢复本行即可。 -->
     <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20261013） -->
     <!-- 🔴 2026-10-03 阿狸咪更正：data/maharo_macro.js 实际仍被家机 maharo 自动化每日产出（git 仍追踪）但前端零引用，已登记为退役孤儿（v8_health_check._RETIRED_FILES + api_push_raw._RETIRED_ARTIFACTS 防再生）；属可删死数据，非活链。 -->
-    <script src="data/maharo_insights.js?v=a7405bb3eb" defer></script>
+    <script src="data/maharo_insights.js?v=a253c599b5" defer></script>
     <!-- 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡整卡下线（白河愁单源观点卡）。
          data/BAIHECHOU_MACRO.js、data/BAIHECHOU_ANALYSIS.js、raw_data/baihechou_posts.json、
          scripts/{baihechou_daily,fetch_baihechou_v8,set_baihechou_analysis}.py 与本机 06:30/08:30
@@ -1779,7 +1779,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/FINAL_RECOMMEND_DATA.js?v=631d035321" defer></script><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=842493b7e5" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=a22d3019c7" defer></script>
-    <script src="data/IMA_STRONG_STOCK.js?v=e756933ac3" defer></script>
+    <script src="data/IMA_STRONG_STOCK.js?v=86b0e0caed" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=a7838f761e" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
 <script src="data/BACKTEST_ALL_ALGOS.js?v=8f6e06c4a0" defer></script>
@@ -1870,16 +1870,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <main>
   <!-- ============ 🏆 最终推荐（2026-08-08 新建：全站唯一买卖决策入口） ============ -->
   <section id="sec-final" class="active">
-    <div class="sec-head"><h2>🏆 最终推荐</h2><span class="tag" id="finalHeaderTag">跨策略共振 + 板块强度加权 · Top5 · --</span></div>
+    <div class="sec-head"><h2>🏆 最终推荐</h2><span class="tag" id="finalHeaderTag">强势跟踪强度分 × 四量因子榜混排 · Top3 · --</span></div>
 
     <!-- 子 Tab 导航 -->
     <div class="final-tabs" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-      <button class="final-tab active" data-final="rec" onclick="switchFinalTab('rec')">🏆 最终推荐 · Top5</button>
+      <button class="final-tab active" data-final="rec" onclick="switchFinalTab('rec')">🏆 最终推荐 · Top3</button>
       <button class="final-tab" data-final="cand" onclick="switchFinalTab('cand')">🎯 今日推荐候选池</button>
       <button class="final-tab" data-final="fa" onclick="switchFinalTab('fa')">🧪 因子实验室 <span style="font-size:10px;color:var(--dim);">非策略·加分项</span></button>
     </div>
 
-    <!-- 子 Pane：最终推荐 Top5 -->
+    <!-- 子 Pane：最终推荐 Top3（2026-10-14 主人令：强势跟踪强度分×四量因子榜同量纲混排，由 Top5 收紧） -->
     <div id="final-pane-rec" class="final-pane active">
       <div class="card" style="margin-bottom:16px;border-left:4px solid #fbbf24;">
         <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">🏆</span>最终推荐 · Top<span id="finalTopN">5</span>
@@ -1888,17 +1888,22 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div id="finalRecBody" style="padding:4px 2px 2px;"><div class="note">加载中…</div></div>
       </div>
       <!-- 🆕 2026-10-13 主人令「最终推荐的前5名我也想有个回测…我要看到底靠不靠谱」：
-           最终推荐 Top5 信号层真实回测卡（与「强势跟踪 · 回测 N 日胜率」同渲染器同口径）。
+           最终推荐 Top3 信号层真实回测卡（与「强势跟踪 · 回测 N 日胜率」同渲染器同口径）。
            数据源 data/FINAL_RECOMMEND_BACKTEST.js（真实信号流：每日真实选股 dated 归档
            → 前向跟踪，非历史规则回放）；gen_final_recommend_backtest.py 产出，
-           final_recommend.py 末尾调用（D 批内，秒级纯本地计算，不影响主产物）。 -->
+           final_recommend.py 末尾调用（D 批内，秒级纯本地计算，不影响主产物）。
+           🔴🔴 2026-10-14 主人令「先把最终推荐的回测卡隐藏，等重算出来后，看成绩再定夺」：
+           强势跟踪已按「入选后因子排行」接入 ⇒ 本卡暂停展示（__FINAL_REC_BT_PAUSED）。
+           重算口径=回放实验：2026-06-09~08-28 强势跟踪 first_selected 信号 × 当日因子榜
+           （top10_daily 归档）池内 min-max 混排取 Top3，T+1/T+5/T+10 前向对比。
+           恢复方法：① __renderFinalSec 内 guard 删/置 false ② 还原下方 <table> ③ 徽章改回
+           「✅ 真实数据回测」④ 视重算成绩决定是否更新 data/FINAL_RECOMMEND_BACKTEST.js。 -->
       <div class="card" id="finalRecBackCard" style="margin-top:16px;border-left:4px solid #fbbf24;">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 最终推荐 Top5 · 回测 N 日胜率（信号层）</span>
-          <span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>
+          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 最终推荐 Top3 · 回测 N 日胜率（信号层）</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">⏸ 重算中 · 暂停展示</span>
         </div>
-        <div class="note" id="finalRecBackNote">加载中…</div>
-        <table id="finalRecBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>中位数</th><th>最好</th><th>最差</th><th>最大回撤</th></tr></thead><tbody id="finalRecBackBody"></tbody></table>
+        <div class="note">强势跟踪已按「入选后因子排行」接入最终推荐，回测正按新口径重算（回放实验：2026-06-09~08-28 强势跟踪信号 × 当日因子榜混排，T+1/T+5/T+10 对比）——成绩出来后恢复展示。</div>
       </div>
     </div>
 
@@ -10244,7 +10249,7 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
       applyData(window.IPO_DATA);
     }else{
       /* 🛡 2026-08-28 一劳永逸（主站审计 P1-8）：缓存戳 ?v= 从页面已注入的
-         「script src=data/IPO_DATA.js?v=1790031455」标签 实时读取，不再手写 hash。
+         「script src=data/IPO_DATA.js?v=1ccedbaf29」标签 实时读取，不再手写 hash。
          历史债务：本处注释写死一个旧 hash、实际引用是另一个、报错信息又写一遍，
          三处漂移；且手写 hash 不随构建更新 → CDN 吐旧副本 → 打新数据陈旧。
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
@@ -12170,7 +12175,7 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'最终推荐·Top5', source:'TOP10_DAILY/FOUR_VOLUME', freq:'收盘后1次', slots:['19:15','20:15'], note:'聚合推荐+因子评分'},
+          {name:'最终推荐·Top3', source:'IMA_STRONG_STOCK/TOP10_DAILY/FOUR_VOLUME', freq:'收盘后1次', slots:['19:15','20:15'], note:'强势跟踪强度分×因子榜混排'},
 
           {name:'今日推荐候选池聚合', source:'CANDIDATE', freq:'收盘后1次', slots:['2','0',':','0','0'], note:'候选池聚合'},
 
@@ -13743,7 +13748,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       });
     }catch(e){ console.warn('IMA 回测渲染失败',e); }
   };
-  /* 🆕 2026-10-13 主人令：暴露渲染器给「最终推荐 Top5 回测」卡复用 —— 同渲染器同口径，
+  /* 🆕 2026-10-13 主人令：暴露渲染器给「最终推荐 Top3 回测」卡复用 —— 同渲染器同口径，
      禁在别处复制一份（两份必然漂移，主人「不要不一致会引起误会」）。 */
   window.lifeRenderBacktest = lifeRenderBacktest;
 
@@ -17816,7 +17821,11 @@ window.__renderV8CalToday();
     h+='<span class="fr-enter">· 入选日 '+_fe(s.enter_date||'—')+'</span>';
     h+='<span class="fr-tag '+horizon[1]+'">'+_fe(horizon[0])+'</span>';
     // 2026-09-03 主人令：综合评分写出来（所有名次统一渲染）
-    if(s.final_score!=null) h+='<span class="fr-tag" style="background:rgba(245,158,11,.15);color:#f59e0b;border-color:rgba(245,158,11,.4);font-weight:800">⭐ 综合 '+_fn(s.final_score,1)+'</span>';
+    // 🔴 2026-10-14：展示口径改 mix_pct（池内 min-max 归一化竞位分）——因子榜票与强势跟踪票
+    //   分属两把标尺（26 因子头部 14~17 vs 源侧强度分 65~81），直接显示各自原值会误导；
+    //   mix_pct 把两池各自拉回 0-100 公平竞位（详见 final_recommend.py 混排段注释）。
+    var _sc=(s.mix_pct!=null?s.mix_pct:s.final_score);
+    if(_sc!=null) h+='<span class="fr-tag" style="background:rgba(245,158,11,.15);color:#f59e0b;border-color:rgba(245,158,11,.4);font-weight:800">⭐ 综合 '+_fn(_sc,1)+'</span>';
     h+='</div>';
 
     // 概念标签
@@ -17930,7 +17939,14 @@ window.__renderV8CalToday();
     }
     var n=document.getElementById('finalTopN'); if(n) n.textContent=(D.stocks.length||3);
     var tag=document.getElementById('finalHeaderTag');
-    if(tag) tag.textContent='双轨排名 · Top'+D.stocks.length+'（分数最强 + 共振最强 · 多algo共识加权）· 候选池 '+(D.total_candidates||0)+' 只';
+    // 🔴 2026-10-14 主人令「符合入选的，凭因子真实排序」：卡头标签改新口径——
+    //   强势跟踪当日新入选（强度分）与四量因子榜（26 因子分）池内归一化混排；
+    //   四量真实流负 edge 时闸门降级观察，标签明示（不许静默）。
+    var _ig=D.ima_intake||{}, _rg=D.realflow_gate||{};
+    var _lab='强势跟踪强度分 × 因子榜混排 · Top'+D.stocks.length+' · 候选池 '+(D.total_candidates||0)+' 只'
+      +'（强势跟踪当日新入选 '+(_ig.new_selected||0)+' 只入池）';
+    if(_rg.enabled) _lab+=' · ⚠️ 四量真实流负 edge，降级观察';
+    if(tag) tag.textContent=_lab;
     // 2026-09-01 主人令：构建 code → {consensus_count, algos_hit} 索引，给股票卡片加 🤝 N/3 蓝色 chip
     var _algoIndex = {};
     try{
@@ -18092,7 +18108,9 @@ window.__renderV8CalToday();
       var price=s.close;
       var tags='';
       // 2026-09-03 主人令：评分写出来（按 final_score 降序、分数越高排越前面）——含基本面因子 ROE_TTM 计分
-      if(s.final_score!=null) tags+='<span class="no-shrink" style="display:inline-block;padding:2px 7px;border-radius:999px;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.4);font-size:11px;font-weight:800;white-space:nowrap" title="综合评分 = 各源强度 + 共振×1.5 + 板块加分（基本面因子 ROE_TTM 计入源强度）">⭐ '+_fn(s.final_score,1)+'分</span>';
+      // 🔴 2026-10-14：评分口径同步 Top 卡（mix_pct 池内归一化竞位分，fallback final_score）
+      var _sc=(s.mix_pct!=null?s.mix_pct:s.final_score);
+      if(_sc!=null) tags+='<span class="no-shrink" style="display:inline-block;padding:2px 7px;border-radius:999px;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.4);font-size:11px;font-weight:800;white-space:nowrap" title="综合 = 池内相对强度（min-max 归一化 0-100）：强势跟踪强度分与四量因子榜分两把标尺各自拉回公平竞位，跨源可比、当日横比有效">⭐ '+_fn(_sc,1)+'分</span>';
       tags+=_mkTag(board, _boardColor(board));
       // 2026-08-13 主人令：取消「已降权」市场歧视标签；港股暂无基本面数据源，
       // 以灰色信息标签「数据待补」提示，不压分、不警告。
