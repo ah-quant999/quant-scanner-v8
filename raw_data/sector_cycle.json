@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-14 08:15:00",
+  "update_time": "2026-10-14 09:27:17",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -17,14 +17,14 @@
     {
       "sector": "AI算力",
       "start": "08/26",
-      "end": "10/14",
+      "end": "10/13",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 28,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 27,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 336,
+      "total": 324,
       "ongoing": true
     },
     {
@@ -37,20 +37,20 @@
       "hot_days": 30,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 3177,
+      "total": 3113,
       "ongoing": true
     },
     {
       "sector": "医药",
       "start": "08/26",
-      "end": "10/14",
+      "end": "10/13",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 30,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 29,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 504,
+      "total": 499,
       "ongoing": true
     },
     {
@@ -82,14 +82,14 @@
     {
       "sector": "消费电子",
       "start": "08/26",
-      "end": "10/14",
+      "end": "10/13",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 28,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 27,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 264,
+      "total": 258,
       "ongoing": true
     },
     {
@@ -108,14 +108,14 @@
     {
       "sector": "电力",
       "start": "08/28",
-      "end": "10/14",
+      "end": "10/13",
       "start_idx": 2,
-      "end_idx": 29,
-      "days": 28,
-      "hot_days": 27,
+      "end_idx": 28,
+      "days": 27,
+      "hot_days": 26,
       "peak": 17,
       "peak_date": "10/12",
-      "total": 204,
+      "total": 200,
       "ongoing": true
     },
     {
@@ -180,20 +180,20 @@
       "hot_days": 15,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 233,
+      "total": 223,
       "ongoing": true
     },
     {
       "sector": "白酒消费",
       "start": "09/18",
-      "end": "10/14",
+      "end": "10/13",
       "start_idx": 17,
-      "end_idx": 29,
-      "days": 13,
-      "hot_days": 12,
+      "end_idx": 28,
+      "days": 12,
+      "hot_days": 11,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 71,
+      "total": 67,
       "ongoing": true
     },
     {
