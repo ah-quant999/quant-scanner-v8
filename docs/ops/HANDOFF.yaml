@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-08 07:55"
+  updated: "2026-10-14 11:30"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -8311,3 +8311,51 @@ items:
       单只异常隔离不打死整轮。本地冒烟验证：单只隔离/限流/保护闸中止全链路 ✅。逻辑详解私有副本已补量质双擎专节+
       对比表行（E:\Nutstore\v8_logic_private\logic.full.html，公开 logic.html 保持下架不动）。
       待办：重派 bootstrap → 首批 Top30 落库后向主人报名单。
+  - id: ima-strong-fusion-replay-1014
+    owner: 阿狸咪的工程师
+    priority: P0
+    status: pending-verify
+    created: 2026-10-14
+    title: 强势跟踪接入最终推荐融合器+Top5→Top3+回测卡暂停+回放重算（主人令三步）
+    note: |
+      动因（10-14 凌晨线上取证）：最终推荐 89 笔真实流 T+5 超额 -3.77%/T+10 -4.79%，
+      根因=唯一在池源四量终极真实流负 alpha（T+5 -1.21% n=78、T+10 -10.49% n=70）；
+      强势跟踪（IMA）是全站唯一正 edge 链路却被 09-20「唯一口径=因子榜」架空成展示标签。
+      主人令三步：①先隐藏最终推荐回测卡 ②强势跟踪当日新入选按「入选后因子排行」入池混排 ③重算看成绩再定夺。
+
+      已上线（commit 0b646fefa2，2026-10-14 10:5x，plumbing 推送因远端根目录脏文件
+      'E:/qs_workspaces/quant-scanner-v8' 挡 Windows 树操作——同提交已整树删除该脏条目，
+      正版 data/CITIC_PE_BACKTEST.js 在仓内；8/8 blob 远端对表 MATCH）：
+      1) final_recommend.py：TOP_N 5→3；非开仓期 max(2,TOP_N//2)→max(2,TOP_N-1)；
+         强势跟踪入池（first_selected==data_date 当日新入选，与回测卡同判据；V8_IMA_INTAKE=0 可回退）；
+         双池 min-max 归一到 0-100 公平竞位（直接比分=IMA 恒赢=变相全量切换，主人已否决；同分因子榜优先）；
+         四量真实流 edge 闸门（V8_FUSION_REALFLOW_GATE=1，T+5 n≥30 且均<0 ⇒ 推票 3→2+标签明示）。
+      2) fetch_ima_strong_stock.py：滚动归档 raw_data/ima_strong_daily.json + 差集法 first_selected
+         （根治 v2 换代 parse_v2 漏写字段致回测断流 2 周——总量守卫只看 112 旧归档静默 ok 的盲区，
+         已在 backtest_life_cards.run_ima_strong 补「最新日报贡献 0 笔即降级」断流守卫）。
+      3) index.html：卡头/评分新口径（mix_pct 竞位分+闸门提示）、Top5 文案→Top3；
+         最终推荐回测卡暂停展示（__FINAL_REC_BT_PAUSED guard+「⏸ 重算中」徽章，主人令①）。
+      4) data/IMA_STRONG_STOCK.js ?v 按新内容中性化哈希重算（86b0e0caed），其余 ?v 保留远端对齐值。
+      线上终验：暂停 guard 生效、IMA js 新 ?v 200、Top3 卡头文案在位。
+
+      回放重算（主人令③，_replay_ima_mix.py 口径逐字镜像生产+backtest_life_cards）：
+      信号=v1 冻结归档 112 笔（06-09~08-28）+ v2 新夹「短线情绪选股」每日主报告 76 笔
+      （09-18~10-13，经 ima-mcp fetch_media_content 逐篇取全文、差集法重建 first_selected；
+      缺口 08-29~09-17 旧夹已删除不可恢复——git/本地备份/坚果云均无留档，已如实报主人）。
+      自证：IMA-only v1 112 笔 T+1 超额 +1.10% 与线上卡完全一致 ⇒ 方法学无误。
+      结果（回放口径，T+1/T+5/T+10 胜率/均收益/超额）：
+        A 混排Top3（52 信号日/136 笔）：54.4%/+0.51%/+0.65%｜58.1%/+2.41%/+3.32%｜58.9%/+4.48%/+4.91%
+        B 纯因子榜Top3（同口径）：39.6%/-0.77%/-0.67%｜36.7%/-1.92%/-2.26%｜52.3%/+2.79%/+0.17%
+        仅双池同场子集（35 天）：A 49.4%/+0.38%｜62.2%/+1.76%｜60.9%/+1.98%；B 同上（全档负/平）。
+      限定（已报主人）：回放≠真实流（v1=09-02 全量累计池、top10=v6 轻量回填，幸存者偏差风险）；
+      K线缓存深度不一致长档 immature 非随机缩水；v1 期 IMA 无强度分⇒池内全落 100⇒Top3 形态=因子#1+IMA×2；
+      对照组 B 是「纯因子榜」反事实而非线上最终推荐卡的复现（四量等池源当期无归档）。
+      结论（主人定夺）：回放全档转正、对纯因子榜 T+5/T+10 超额差 +5.6/+4.7pp，双池同场亦全面占优；
+      生产新代码已上线，v2 真实流样本自 10-14 起重新积累——建议观察 2-4 周真实流后再最终定夺。
+    verify_how: |
+      推送：远端 TIP 0b646fefa2（parent fcc5ad24）；8 文件 blob 对表 MATCH；根条目 116→115（E: 脏树消失）。
+      线上：index.html __FINAL_REC_BT_PAUSED guard 生效；data/IMA_STRONG_STOCK.js?v=86b0e0caed → 200/4793B；
+      卡头「强势跟踪强度分 × 四量因子榜混排 · Top3」在位。回放自证：v1-only T+1 超额 +1.10% = 线上卡值。
+      待验证：10-14 盘后 D 批 final_recommend 首跑（IMA 入池+闸门+Top3 全链生效）⇒ 转 done 需填 verified_at。
+    updated: "2026-10-14 11:30"
+    updated_by: 阿狸咪的工程师

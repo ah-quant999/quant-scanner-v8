@@ -124,3 +124,16 @@ firstBoardAlertCard" class="card" style="margin-top:14px;margin-bottom:16px;back
 # 🔮 2026-10-05 阿狸咪：未来预测子TAB（牛转熊指标观测台）
 window.__renderFutureCard|未来预测子TAB渲染函数|2026-10-05
 window.MARKET_THERMO|未来预测数据源全局名|2026-10-05
+
+# ── F. 最终推荐融合器锚点（2026-10-14 防覆盖补登）─────────────────
+# 事故（10-14 11:36 CST，commit 4ffd68f805「data: index.html 经发布闸门核对 20261014」）：
+#   某「跑发布闸门核对后用 PAT 直推」的脚本（提交信息同型于 push_maharo_insights.py 的
+#   「data: <file> 经发布闸门核对 <date>」模板，身份 ah-quant999）用**落后基线**的
+#   index.html 做 ?v 对齐后直推；父提交=当时 tip ⇒ fast-forward **静默顶掉** 11:2x
+#   融合器前端改动：__FINAL_REC_BT_PAUSED guard / ⏸ 徽章 / mix_pct 评分列 /
+#   「强势跟踪强度分 × 四量因子榜混排」卡头 / 时窗矩阵「最终推荐·Top3」行全 x0，
+#   IMA ?v 亦被从 86b0e0caed 改成 e756933ac3。同型事故 09-20 已发过一次（D 段
+#   _SIG_EDGE_SRC / win_best_ok 等即其产物），本次新改动未及登记 ⇒ 补登以下两条
+#   **代码级**锚点（跨「暂停展示/恢复展示」两态均稳定，符合纪律 3）。
+mix_pct|最终推荐混排竞位分字段（强势跟踪强度分×因子榜池内 min-max 归一化评分；融合器上线结构性锚点）|2026-10-14
+IMA_STRONG_STOCK/TOP10_DAILY/FOUR_VOLUME|时窗矩阵「最终推荐·Top3」行 source 值（融合器三数据源口径）|2026-10-14
