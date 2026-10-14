@@ -97,6 +97,10 @@ def log(msg, level="INFO"):
 # ── P0-1: candidate.json 外资研投源检查 ─────────────────
 
 def check_candidate_guanlan():
+    # 🔴 2026-10-14 实测口径改造（主人授权，根治 28 天化石盲区）：
+    #   旧口径只查 source_dist 是否含「外资研投」key —— 47 只 09-16 化石无缝通过 28 天。
+    #   新口径: key 存在 **且** 外资研投股票 last_seen 最大值距今 ≤ 4 个日历日。
+    #   （4 天 > 单个长周末，覆盖 10-01~10-08 国庆之外的常规假期；真断供第 5 天必炸）
     if not CANDIDATE_FILE.exists():
         return False, {}, 0, "FILE_MISSING"
     try:
@@ -104,7 +108,35 @@ def check_candidate_guanlan():
         sd = d.get("source_dist") or {}
         has = "外资研投" in sd
         total = d.get("total", 0)
-        return has, sd, total, "sources=" + str(list(sd.keys())) + ", total=" + str(total)
+        det = "sources=" + str(list(sd.keys())) + ", total=" + str(total)
+        if not has:
+            return False, sd, total, det + "（缺外资研投源）"
+        # 实测新鲜度：扫外资研投股票的 last_seen 最大值
+        stocks = d.get("stocks") or {}
+        if isinstance(stocks, list):
+            stocks = {str(i): s for i, s in enumerate(stocks)}
+        max_seen = ""
+        n_gk = 0
+        for s in stocks.values():
+            try:
+                if "外资研投" in (s.get("sources") or []):
+                    n_gk += 1
+                    ls = str(s.get("last_seen", "") or "")
+                    if ls > max_seen:
+                        max_seen = ls
+            except Exception:
+                continue
+        if n_gk == 0 or not max_seen:
+            return False, sd, total, det + "（外资研投 0 只/无 last_seen）"
+        try:
+            age_days = (datetime.now(CST).date()
+                        - datetime.strptime(max_seen, "%Y-%m-%d").date()).days
+        except ValueError:
+            return False, sd, total, det + f"（last_seen 格式异常: {max_seen}）"
+        if age_days > 4:
+            return False, sd, total, (det + f"（陈旧: last_seen 最大值 {max_seen}"
+                                      f"，距今 {age_days} 天 —— token/抓取链疑断供）")
+        return True, sd, total, det + f"（外资研投 {n_gk} 只, last_seen={max_seen}, 新鲜）"
     except Exception as e:
         return False, {}, 0, "PARSE_ERROR: " + str(e)
 
@@ -113,16 +145,30 @@ def heal_candidate_guanlan(dry_run=False):
     # 1. 检查 token
     if not ZSXQ_TOKEN_FILE.exists():
         return False, "zsxq_token.json 不存在，无法拉取外资研投数据。需用户提供 token。"
-    # 2. 检查/生成 watchlist
-    if not GUANLAN_WATCHLIST.exists():
-        log("外资研投 watchlist 不存在，先运行 guanlan_extractor.py...", "RUN")
+    # 2. 检查/生成 watchlist —— 🔴 2026-10-14: 缺失 **或陈旧(非今日)** 都重跑 extractor
+    #    （旧逻辑只在缺失时跑 → watchlist 停在旧日期也无人刷新，配合池子化石盲区 28 天）
+    need_fetch = True
+    gw_updated_day = ""
+    if GUANLAN_WATCHLIST.exists():
+        try:
+            gw = json.load(open(GUANLAN_WATCHLIST, encoding="utf-8"))
+            gw_updated_day = str(gw.get("updated", ""))[:10]
+            need_fetch = (gw_updated_day != now_cst().strftime("%Y-%m-%d"))
+        except Exception:
+            need_fetch = True
+    if need_fetch:
+        log("外资研投 watchlist 缺失或陈旧(updated=" + str(gw_updated_day) + ")，运行 guanlan_extractor.py...", "RUN")
         r = subprocess.run(
             [PYTHON, str(ALGO_DIR / "guanlan_extractor.py")],
-            capture_output=True, text=True, cwd=str(ROOT), timeout=120
+            capture_output=True, text=True, cwd=str(ROOT), timeout=300
         )
         if r.returncode != 0:
-            return False, "guanlan_extractor 失败(rc=" + str(r.returncode) + "): " + r.stderr[-200:]
-        log("guanlan_extractor 成功: " + r.stdout[:100], "OK")
+            reason = {42: "HTTP 401 凭据失效（token 过期/被注销）",
+                      43: "API 持续返回空（限流/接口变化）",
+                      44: "帖子解析出 0 研报（解析器疑似失效）"}.get(
+                r.returncode, "rc=" + str(r.returncode))
+            return False, "guanlan_extractor 硬失败: " + reason + " | " + (r.stdout or "")[-200:]
+        log("guanlan_extractor 成功: " + (r.stdout or "")[:100], "OK")
     if not GUANLAN_WATCHLIST.exists():
         return False, "guanlan_extractor 跑完但 watchlist 仍不存在"
     try:
@@ -386,6 +432,63 @@ def _write_alert_state(state):
         log("告警状态写入失败(不影响主流程): " + str(e), "WARN")
 
 
+def _alert_guanlan_down(heal_msg, check_det):
+    """🔴 2026-10-14 新增（主人授权）：P0-1 实测口径失败且**无法自愈** → 邮件告警。
+    这是外资研投断供的唯一邮件出口（云端无 SMTP，extractor 只出 exit 码）。
+    状态翻转即发；同状态 6h 冷却去重（复用 _alert_token_lost 同款模式）。
+    告警失败绝不阻断主流程。"""
+    try:
+        state = _read_alert_state()
+        last_state = state.get("guanlan_state")
+        last_alert = state.get("guanlan_last_alert", "")
+        now = now_cst()
+        cooled = False
+        if last_state == "bad" and last_alert:
+            try:
+                last_dt = datetime.fromisoformat(last_alert)
+                cooled = (now - last_dt) < timedelta(hours=TOKEN_ALERT_COOLDOWN_HOURS)
+            except Exception:
+                cooled = False
+        state["guanlan_state"] = "bad"
+        state["guanlan_last_seen_bad"] = now.isoformat()
+        _write_alert_state(state)
+        if cooled:
+            log("P0-1 断供告警处于 6h 冷却内(上轮已发)，本轮不重复发信", "WARN")
+            return
+        from v8_send_alert import send_alert
+        subject = "[v8自愈] 外资研投断供且无法自愈 —— token/抓取链需人工介入"
+        body = (
+            "自愈监控（self_heal_monitor.py，每 10 分钟一轮）检测到：\n\n"
+            "  P0-1  外资研投源缺失或陈旧（实测口径: last_seen 距今 >4 天）\n"
+            "    检查详情: " + str(check_det) + "\n"
+            "    自愈结果: " + str(heal_msg) + "\n\n"
+            "影响面：\n"
+            "  · 候选池外资研投腿停更（last-good 旧料保留，不再被空数据洗掉）；\n"
+            "  · maharo 出稿素材冻结；\n"
+            "  · 云端 Secret ZSXQ_TOKEN 与本地 data/zsxq_token.json 需逐一排查换新。\n\n"
+            "恢复步骤：\n"
+            "  1. 浏览器登录 wx.zsxq.com 取新 zsxq_access_token；\n"
+            "  2. 更新本地 data/zsxq_token.json + 云端 Secret ZSXQ_TOKEN（两处都要）；\n"
+            "  3. 手动跑一次 guanlan_extractor.py 验证 exit=0。\n"
+        )
+        send_alert(subject, body, level="infra")
+    except Exception as e:
+        log("P0-1 告警邮件异常(不阻断): " + str(e), "WARN")
+
+
+def _mark_guanlan_state_ok():
+    """P0-1 恢复正常 → 状态翻回 ok（下次断供状态翻转即立即发信，不吃冷却）。"""
+    try:
+        state = _read_alert_state()
+        if state.get("guanlan_state") not in (None, "ok"):
+            log("P0-1 状态翻转: bad → ok（断供恢复）", "HEAL")
+        state["guanlan_state"] = "ok"
+        state["guanlan_last_ok"] = now_cst().isoformat()
+        _write_alert_state(state)
+    except Exception:
+        pass
+
+
 def _alert_token_lost(det_repo, det_backup):
     """真异常（两处皆无 token）→ 邮件告警。状态翻转即发；同状态 6h 内冷却去重。
     告警失败绝不阻断主流程（自愈脚本不能因为发不出邮件而崩）。"""
@@ -540,19 +643,22 @@ def run_heal(json_output=False):
     # P0-1
     has, sd, total, det = check_candidate_guanlan()
     if not has:
-        log("[FAIL] P0-1: candidate.json 缺失外资研投源! " + det, "FAIL")
+        log("[FAIL] P0-1: candidate.json 外资研投源缺失或陈旧! " + det, "FAIL")
         success, msg = heal_candidate_guanlan()
         heal_results["candidate_guanlan"] = {"ok": success, "message": msg}
         if success:
             log("[HEAL] P0-1 已自愈: " + msg, "HEAL")
             actions_taken.append("并入外资研投: " + msg)
+            _mark_guanlan_state_ok()
         else:
             log("[FAIL] P0-1 无法自愈: " + msg, "FAIL")
+            _alert_guanlan_down(msg, det)
             exit_code = 2
     else:
         guanlan_count = sd.get("外资研投", 0)
-        log("[OK] P0-1: candidate.json 含外资研投(" + str(guanlan_count) + "只)", "OK")
+        log("[OK] P0-1: candidate.json 含外资研投(" + str(guanlan_count) + "只) " + det, "OK")
         heal_results["candidate_guanlan"] = {"ok": True, "message": det}
+        _mark_guanlan_state_ok()
 
     # P0-2: STOCK_MOMENTUM_STATE 新鲜度（源=PDF OCR 人工流程；陈旧只 WARN 免邮件，与 v8_health_check.py 对齐）
     fresh, last_day, age, det2 = check_momentum_state()
