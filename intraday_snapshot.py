@@ -269,6 +269,17 @@ def main():
     #   判据：某快照的 sectors_in 板块名单与「当日最新一档」零交集 → 两者不是同一口径
     #   （典型：开盘前档写的是昨日收盘累计「互联网金融/农林牧渔」，盘中档是「线缆/铜缆/国防军工」）。
     #   这类点与后段画不成同一条累计曲线，且会撑爆 Y 轴 → 直接剔除，让曲线只保留同一口径的连续点。
+    #   🛡 2026-10-14 补（G1 上线首日实证）：先剔「sectors_in 为空」的退化档 ——
+    #   G1 上线前/在途旧代码写的存量脏点（实证 12:29 in:0）画不出进侧曲线，且若它恰好是
+    #   末条会令下面 _l_names 取空 ⇒ 整个口径断裂清理被跳过。故必须**先剔空名单档、
+    #   再以剔除后的新末条为参考**跑口径断裂清理。
+    if data["snapshots"]:
+        _keep = [s for s in data["snapshots"]
+                 if {x.get("name") for x in (s.get("sectors_in") or []) if x.get("name")}]
+        _n_empty = len(data["snapshots"]) - len(_keep)
+        if _n_empty:
+            print(f"🧹 剔除退化档快照 {_n_empty} 个（sectors_in 空，无板块可画）")
+            data["snapshots"] = _keep
     if len(data["snapshots"]) >= 2:
         _latest = data["snapshots"][-1]
         _l_names = {x.get("name") for x in (_latest.get("sectors_in") or []) if x.get("name")}
