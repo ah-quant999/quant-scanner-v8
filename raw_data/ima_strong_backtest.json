@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-14 07:01:43",
+ "generated": "2026-10-14 18:32:18",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -24,22 +24,22 @@
  "card": "高手强势股跟踪",
  "signal_source": "raw_data/ima_strong_stock.json（最新日报） ∪ raw_data/ima_strong_history.json（历史全量归档，含已回落/见顶）",
  "signal_sources_merged": {
-  "latest": 0,
+  "latest": 8,
   "history": 112,
-  "merged": 112,
+  "merged": 120,
   "rule": "同 code 取最早 first_selected（真实首次入选日）；归档为冻结文件，不被 fetch 覆写"
  },
- "total_signals": 112,
- "skipped_no_signal_date": 8,
- "signal_days": 44,
- "signal_date_range": "2026-06-09 ~ 2026-08-28",
- "ima_update_time": "2026-10-13 23:19:28",
+ "total_signals": 120,
+ "skipped_no_signal_date": 0,
+ "signal_days": 45,
+ "signal_date_range": "2026-06-09 ~ 2026-10-13",
+ "ima_update_time": "2026-10-14 09:01:02",
  "source_coverage": {
   "rows_parsed": 8,
   "expected": null,
   "source_channel": "full-snapshot",
   "snapshot_fetched_at": "2026-10-13 17:48:09",
-  "snapshot_age_h": 5.52,
+  "snapshot_age_h": 15.21,
   "truncated": false,
   "note": "v2 换代水源「短线情绪选股」主报告全文快照（成员连接器）；introduction 兜底通道受 ~300 字硬墙（如实降级 detail_complete=false）。"
  },
