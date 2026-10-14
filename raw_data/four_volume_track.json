@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-10-14 23:32:18",
-  "data_date": "2026-10-14",
+  "update_time": "2026-10-15 00:37:24",
+  "data_date": "2026-10-15",
   "track_start": "2026-09-14",
-  "history_days": 17,
+  "history_days": 18,
   "price_days": 19,
   "signal_count": 0,
   "tracked_total": 94,
@@ -4401,7 +4401,7 @@
   "self_backtest": {
     "note": "四量信号自上线起逐日累积真实收盘价前向样本（基准=入选日收盘，T+N 按真实交易日推进，不含未来函数）。样本随持有天数成熟而增加；长档（75/90/180/250）见上方「回测 N 日胜率」的信号层回测。",
     "track_start": "2026-09-14",
-    "history_days": 17,
+    "history_days": 18,
     "price_days": 19,
     "horizons": [
       "1d",

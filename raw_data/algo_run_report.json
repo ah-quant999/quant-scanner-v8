@@ -1,13 +1,8 @@
 {
-  "update_time": "2026-10-14 23:53:04",
-  "run_start": "2026-10-14 23:20:08",
-  "ok": 23,
-  "fail": 1,
-  "failed_scripts": [
-    {
-      "script": "generate_top10.py",
-      "reason": "退出码 1 | TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'"
-    }
-  ],
+  "update_time": "2026-10-15 01:00:25",
+  "run_start": "2026-10-15 00:23:49",
+  "ok": 24,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }
