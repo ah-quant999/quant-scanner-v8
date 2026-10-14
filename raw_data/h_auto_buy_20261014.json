@@ -6,7 +6,7 @@
   "total_scanned": 8385,
   "skipped_no_quote": 0,
   "hit_chg_only": 435,
-  "final_count": 191,
+  "final_count": 187,
   "candidates": [
     {
       "code": "001216",
@@ -438,19 +438,6 @@
       "board": "主板"
     },
     {
-      "code": "600408",
-      "symbol": "sh600408",
-      "name": "安泰集团",
-      "pct": 10.03,
-      "price": 4.06,
-      "prev_close": 3.69,
-      "volume": 292853032.0,
-      "avg_vol_4d": 634478.25,
-      "vol_ratio": 461.565,
-      "industry": "黑色金属冶炼和压延加工业",
-      "board": "主板"
-    },
-    {
       "code": "600633",
       "symbol": "sh600633",
       "name": "浙数文化",
@@ -828,32 +815,6 @@
       "board": "主板"
     },
     {
-      "code": "300436",
-      "symbol": "sz300436",
-      "name": "广生堂",
-      "pct": 6.57,
-      "price": 81.81,
-      "prev_close": 76.77,
-      "volume": 6738901.0,
-      "avg_vol_4d": 27166.75,
-      "vol_ratio": 248.057,
-      "industry": "医药制造业",
-      "board": "创业板"
-    },
-    {
-      "code": "603598",
-      "symbol": "sh603598",
-      "name": "引力传媒",
-      "pct": 9.99,
-      "price": 21.91,
-      "prev_close": 19.92,
-      "volume": 54608600.0,
-      "avg_vol_4d": 230930.25,
-      "vol_ratio": 236.472,
-      "industry": "商务服务业",
-      "board": "主板"
-    },
-    {
       "code": "301592",
       "symbol": "sz301592",
       "name": "六九一二",
@@ -932,6 +893,19 @@
       "board": "创业板"
     },
     {
+      "code": "301132",
+      "symbol": "sz301132",
+      "name": "满坤科技",
+      "pct": 18.32,
+      "price": 75.0,
+      "prev_close": 63.39,
+      "volume": 20542926.0,
+      "avg_vol_4d": 97961.75,
+      "vol_ratio": 209.704,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "创业板"
+    },
+    {
       "code": "601985",
       "symbol": "sh601985",
       "name": "中国核电",
@@ -942,6 +916,19 @@
       "avg_vol_4d": 988532.5,
       "vol_ratio": 215.837,
       "industry": "电力、热力生产和供应业",
+      "board": "主板"
+    },
+    {
+      "code": "600938",
+      "symbol": "sh600938",
+      "name": "中国海油",
+      "pct": 4.26,
+      "price": 35.75,
+      "prev_close": 34.29,
+      "volume": 73484758.0,
+      "avg_vol_4d": 341919.0,
+      "vol_ratio": 214.919,
+      "industry": "石油和天然气开采业",
       "board": "主板"
     },
     {
@@ -1010,19 +997,6 @@
       "board": "主板"
     },
     {
-      "code": "301132",
-      "symbol": "sz301132",
-      "name": "满坤科技",
-      "pct": 18.32,
-      "price": 75.0,
-      "prev_close": 63.39,
-      "volume": 20542926.0,
-      "avg_vol_4d": 104985.75,
-      "vol_ratio": 195.673,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "创业板"
-    },
-    {
       "code": "600316",
       "symbol": "sh600316",
       "name": "洪都航空",
@@ -1046,19 +1020,6 @@
       "avg_vol_4d": 58786.25,
       "vol_ratio": 197.154,
       "industry": "医药制造业",
-      "board": "主板"
-    },
-    {
-      "code": "600938",
-      "symbol": "sh600938",
-      "name": "中国海油",
-      "pct": 4.26,
-      "price": 35.75,
-      "prev_close": 34.29,
-      "volume": 73484758.0,
-      "avg_vol_4d": 377255.0,
-      "vol_ratio": 194.788,
-      "industry": "石油和天然气开采业",
       "board": "主板"
     },
     {
@@ -1257,19 +1218,6 @@
       "board": "创业板"
     },
     {
-      "code": "301251",
-      "symbol": "sz301251",
-      "name": "威尔高",
-      "pct": 6.41,
-      "price": 80.15,
-      "prev_close": 75.32,
-      "volume": 16336437.0,
-      "avg_vol_4d": 104403.75,
-      "vol_ratio": 156.474,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "创业板"
-    },
-    {
       "code": "603058",
       "symbol": "sh603058",
       "name": "永吉股份",
@@ -1283,6 +1231,19 @@
       "board": "主板"
     },
     {
+      "code": "301251",
+      "symbol": "sz301251",
+      "name": "威尔高",
+      "pct": 6.41,
+      "price": 80.15,
+      "prev_close": 75.32,
+      "volume": 16336437.0,
+      "avg_vol_4d": 104639.0,
+      "vol_ratio": 156.122,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "创业板"
+    },
+    {
       "code": "300852",
       "symbol": "sz300852",
       "name": "四会富仕",
@@ -1290,8 +1251,8 @@
       "price": 70.85,
       "prev_close": 68.72,
       "volume": 14110494.0,
-      "avg_vol_4d": 90936.25,
-      "vol_ratio": 155.169,
+      "avg_vol_4d": 91752.25,
+      "vol_ratio": 153.789,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -1322,6 +1283,19 @@
       "board": "主板"
     },
     {
+      "code": "603920",
+      "symbol": "sh603920",
+      "name": "世运电路",
+      "pct": 4.17,
+      "price": 43.02,
+      "prev_close": 41.3,
+      "volume": 38065017.0,
+      "avg_vol_4d": 266372.0,
+      "vol_ratio": 142.902,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "主板"
+    },
+    {
       "code": "000815",
       "symbol": "sz000815",
       "name": "美利云",
@@ -1333,19 +1307,6 @@
       "vol_ratio": 139.001,
       "industry": "造纸和纸制品业",
       "board": "主板"
-    },
-    {
-      "code": "301373",
-      "symbol": "sz301373",
-      "name": "凌玮科技",
-      "pct": 6.15,
-      "price": 107.0,
-      "prev_close": 100.8,
-      "volume": 8940865.0,
-      "avg_vol_4d": 65298.0,
-      "vol_ratio": 136.924,
-      "industry": "化学原料和化学制品制造业",
-      "board": "创业板"
     },
     {
       "code": "300483",
@@ -1387,6 +1348,19 @@
       "board": "创业板"
     },
     {
+      "code": "301373",
+      "symbol": "sz301373",
+      "name": "凌玮科技",
+      "pct": 6.15,
+      "price": 107.0,
+      "prev_close": 100.8,
+      "volume": 8940865.0,
+      "avg_vol_4d": 67560.25,
+      "vol_ratio": 132.339,
+      "industry": "化学原料和化学制品制造业",
+      "board": "创业板"
+    },
+    {
       "code": "002436",
       "symbol": "sz002436",
       "name": "兴森科技",
@@ -1400,15 +1374,15 @@
       "board": "主板"
     },
     {
-      "code": "603920",
-      "symbol": "sh603920",
-      "name": "世运电路",
-      "pct": 4.17,
-      "price": 43.02,
-      "prev_close": 41.3,
-      "volume": 38065017.0,
-      "avg_vol_4d": 295203.25,
-      "vol_ratio": 128.945,
+      "code": "605058",
+      "symbol": "sh605058",
+      "name": "澳弘电子",
+      "pct": 6.11,
+      "price": 64.08,
+      "prev_close": 60.39,
+      "volume": 23765158.0,
+      "avg_vol_4d": 184326.0,
+      "vol_ratio": 128.93,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
     },
@@ -1433,8 +1407,8 @@
       "price": 23.25,
       "prev_close": 21.14,
       "volume": 66054217.0,
-      "avg_vol_4d": 540234.5,
-      "vol_ratio": 122.27,
+      "avg_vol_4d": 537084.75,
+      "vol_ratio": 122.987,
       "industry": "新闻和出版业",
       "board": "主板"
     },
@@ -1475,19 +1449,6 @@
       "avg_vol_4d": 306019.0,
       "vol_ratio": 120.978,
       "industry": "广播、电视、电影和录音制作业",
-      "board": "主板"
-    },
-    {
-      "code": "605058",
-      "symbol": "sh605058",
-      "name": "澳弘电子",
-      "pct": 6.11,
-      "price": 64.08,
-      "prev_close": 60.39,
-      "volume": 23765158.0,
-      "avg_vol_4d": 197400.25,
-      "vol_ratio": 120.391,
-      "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
     },
     {
@@ -1634,19 +1595,6 @@
       "board": "主板"
     },
     {
-      "code": "301218",
-      "symbol": "sz301218",
-      "name": "华是科技",
-      "pct": 4.12,
-      "price": 69.04,
-      "prev_close": 66.31,
-      "volume": 19339919.0,
-      "avg_vol_4d": 197275.5,
-      "vol_ratio": 98.035,
-      "industry": "软件和信息技术服务业",
-      "board": "创业板"
-    },
-    {
       "code": "600403",
       "symbol": "sh600403",
       "name": "大有能源",
@@ -1658,6 +1606,19 @@
       "vol_ratio": 93.633,
       "industry": "煤炭开采和洗选业",
       "board": "主板"
+    },
+    {
+      "code": "301218",
+      "symbol": "sz301218",
+      "name": "华是科技",
+      "pct": 4.12,
+      "price": 69.04,
+      "prev_close": 66.31,
+      "volume": 19339919.0,
+      "avg_vol_4d": 206513.25,
+      "vol_ratio": 93.65,
+      "industry": "软件和信息技术服务业",
+      "board": "创业板"
     },
     {
       "code": "300044",
@@ -1829,19 +1790,6 @@
       "board": "主板"
     },
     {
-      "code": "301052",
-      "symbol": "sz301052",
-      "name": "果麦文化",
-      "pct": 14.49,
-      "price": 34.06,
-      "prev_close": 29.75,
-      "volume": 37142289.0,
-      "avg_vol_4d": 6299606.25,
-      "vol_ratio": 5.896,
-      "industry": "新闻和出版业",
-      "board": "创业板"
-    },
-    {
       "code": "00400",
       "symbol": "hk00400",
       "name": "硬蛋创新",
@@ -1918,19 +1866,6 @@
       "vol_ratio": 5.258,
       "industry": "纺织服装、服饰业",
       "board": "主板"
-    },
-    {
-      "code": "688685",
-      "symbol": "sh688685",
-      "name": "迈信林",
-      "pct": 12.35,
-      "price": 39.12,
-      "prev_close": 34.82,
-      "volume": 8549089.0,
-      "avg_vol_4d": 5693390.75,
-      "vol_ratio": 1.502,
-      "industry": "铁路、船舶、航空航天和其他运输设备制造业",
-      "board": "科创板"
     },
     {
       "code": "600310",
@@ -2258,6 +2193,19 @@
       "board": ""
     },
     {
+      "code": "300436",
+      "symbol": "sz300436",
+      "name": "广生堂",
+      "pct": 6.57,
+      "price": 81.81,
+      "prev_close": 76.77,
+      "volume": 6738901.0,
+      "avg_vol_4d": 5465986.25,
+      "vol_ratio": 1.233,
+      "industry": "医药制造业",
+      "board": "创业板"
+    },
+    {
       "code": "00901",
       "symbol": "hk00901",
       "name": "华曦达",
@@ -2509,12 +2457,12 @@
       "board": "主板"
     }
   ],
-  "generated_at": "2026-10-14 22:26:42",
-  "update_time": "2026-10-14 22:26:42",
+  "generated_at": "2026-10-14 23:39:32",
+  "update_time": "2026-10-14 23:39:32",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖",
   "kline_stat": {
-    "cache_fresh": 30,
-    "cache_stale": 178,
+    "cache_fresh": 22,
+    "cache_stale": 186,
     "net": 0,
     "fail": 227
   },

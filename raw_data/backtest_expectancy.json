@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-10-14 22:42:52",
+    "generated": "2026-10-14 23:53:02",
     "method": "walk-forward / out-of-sample, shrinkage_k=10",
     "horizons": [
       3,
@@ -16,7 +16,7 @@
       "stocks_total": 1484,
       "with_kline": 1484,
       "occ_total": 2457,
-      "p4_evaluated": 952,
+      "p4_evaluated": 956,
       "p4_skipped_no_mkt": 0,
       "excluded_garbage": 0
     },
@@ -45,7 +45,7 @@
     "entry_fallback_stat": {
       "next_open": 2808,
       "close_fallback": 0,
-      "too_short": 399,
+      "too_short": 411,
       "no_entry": 0
     },
     "note": "P4 版 + 次日开盘/扣成本/IS-OOS/超额判据（2026-09-20 口径改造）：含低波/残差动量因子与漂移门控诊断（sh.000001 市场代理）+ 噪声代码闸门"

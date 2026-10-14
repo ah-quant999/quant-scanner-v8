@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-14 22:19",
+  "update_time": "2026-10-14 23:32",
   "window_days": 90,
   "horizons": [
     5,
@@ -26,36 +26,36 @@
       "today_signals": 0,
       "by_horizon": {
         "5": {
-          "samples": 177,
-          "win_rate": 34.5,
-          "avg_return": -3.34,
+          "samples": 176,
+          "win_rate": 34.1,
+          "avg_return": -3.43,
           "best_return": 42.13,
           "worst_return": -36.94,
           "median_return": -3.35
         },
         "10": {
-          "samples": 133,
-          "win_rate": 36.8,
-          "avg_return": -3.8,
+          "samples": 130,
+          "win_rate": 37.7,
+          "avg_return": -3.57,
           "best_return": 43.88,
           "worst_return": -38.85,
-          "median_return": -4.79
+          "median_return": -4.75
         },
         "20": {
-          "samples": 72,
-          "win_rate": 15.3,
-          "avg_return": -10.34,
+          "samples": 71,
+          "win_rate": 14.1,
+          "avg_return": -10.76,
           "best_return": 35.43,
           "worst_return": -48.48,
-          "median_return": -12.08
+          "median_return": -12.14
         },
         "30": {
-          "samples": 31,
-          "win_rate": 19.4,
-          "avg_return": -11.88,
+          "samples": 30,
+          "win_rate": 20.0,
+          "avg_return": -11.49,
           "best_return": 14.44,
           "worst_return": -34.53,
-          "median_return": -11.68
+          "median_return": -11.6
         },
         "45": {
           "samples": 0,
@@ -123,9 +123,9 @@
         "items": 208,
         "with_series": 203,
         "missing_cache": 5,
-        "bar_asof": "2026-10-14",
-        "t5_ready": 177,
-        "t5_ready_pct": 85.1
+        "bar_asof": "2026-10-09",
+        "t5_ready": 176,
+        "t5_ready_pct": 84.6
       }
     }
   },
@@ -144,36 +144,36 @@
         "today_signals": 0,
         "by_horizon": {
           "5": {
-            "samples": 177,
-            "win_rate": 34.5,
-            "avg_return": -3.34,
+            "samples": 176,
+            "win_rate": 34.1,
+            "avg_return": -3.43,
             "best_return": 42.13,
             "worst_return": -36.94,
             "median_return": -3.35
           },
           "10": {
-            "samples": 133,
-            "win_rate": 36.8,
-            "avg_return": -3.8,
+            "samples": 130,
+            "win_rate": 37.7,
+            "avg_return": -3.57,
             "best_return": 43.88,
             "worst_return": -38.85,
-            "median_return": -4.79
+            "median_return": -4.75
           },
           "20": {
-            "samples": 72,
-            "win_rate": 15.3,
-            "avg_return": -10.34,
+            "samples": 71,
+            "win_rate": 14.1,
+            "avg_return": -10.76,
             "best_return": 35.43,
             "worst_return": -48.48,
-            "median_return": -12.08
+            "median_return": -12.14
           },
           "30": {
-            "samples": 31,
-            "win_rate": 19.4,
-            "avg_return": -11.88,
+            "samples": 30,
+            "win_rate": 20.0,
+            "avg_return": -11.49,
             "best_return": 14.44,
             "worst_return": -34.53,
-            "median_return": -11.68
+            "median_return": -11.6
           },
           "45": {
             "samples": 0,
@@ -241,9 +241,9 @@
           "items": 208,
           "with_series": 203,
           "missing_cache": 5,
-          "bar_asof": "2026-10-14",
-          "t5_ready": 177,
-          "t5_ready_pct": 85.1
+          "bar_asof": "2026-10-09",
+          "t5_ready": 176,
+          "t5_ready_pct": 84.6
         }
       },
       "tracking": [
@@ -3872,9 +3872,9 @@
         {
           "code": "300672",
           "name": "国科微",
-          "bars": 23,
+          "bars": 22,
           "pct": -12.27,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "688167",
@@ -3921,9 +3921,9 @@
         {
           "code": "688813",
           "name": "泰金新能",
-          "bars": 22,
+          "bars": 21,
           "pct": -4.19,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "301511",
@@ -3956,9 +3956,9 @@
         {
           "code": "301183",
           "name": "东田微",
-          "bars": 22,
+          "bars": 21,
           "pct": 0.13,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "688583",
@@ -3970,9 +3970,9 @@
         {
           "code": "688800",
           "name": "瑞可达",
-          "bars": 22,
+          "bars": 21,
           "pct": -24.43,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "688127",
@@ -3984,9 +3984,9 @@
         {
           "code": "601138",
           "name": "工业富联",
-          "bars": 22,
+          "bars": 21,
           "pct": -26.99,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "688002",
@@ -4082,9 +4082,9 @@
         {
           "code": "002815",
           "name": "崇达技术",
-          "bars": 21,
+          "bars": 20,
           "pct": 19.75,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "688809",
@@ -4117,9 +4117,9 @@
         {
           "code": "301176",
           "name": "逸豪新材",
-          "bars": 18,
+          "bars": 17,
           "pct": -11.68,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "603601",
@@ -4159,9 +4159,9 @@
         {
           "code": "300207",
           "name": "欣旺达",
-          "bars": 18,
+          "bars": 17,
           "pct": 1.7,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "600667",
@@ -4173,9 +4173,9 @@
         {
           "code": "600900",
           "name": "长江电力",
-          "bars": 18,
+          "bars": 17,
           "pct": 3.21,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "600744",
@@ -4187,16 +4187,16 @@
         {
           "code": "601288",
           "name": "农业银行",
-          "bars": 18,
+          "bars": 17,
           "pct": 2.71,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "601398",
           "name": "工商银行",
-          "bars": 18,
+          "bars": 17,
           "pct": 3.89,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "600186",
@@ -4257,9 +4257,9 @@
         {
           "code": "301373",
           "name": "凌玮科技",
-          "bars": 16,
+          "bars": 15,
           "pct": -9.58,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "301389",
@@ -4306,9 +4306,9 @@
         {
           "code": "600206",
           "name": "有研新材",
-          "bars": 15,
+          "bars": 14,
           "pct": -23.39,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "600353",
@@ -4334,9 +4334,9 @@
         {
           "code": "688662",
           "name": "富信科技",
-          "bars": 15,
+          "bars": 14,
           "pct": 4.72,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "605589",
@@ -4376,9 +4376,9 @@
         {
           "code": "688222",
           "name": "成都先导",
-          "bars": 14,
+          "bars": 13,
           "pct": -2.08,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "300398",
@@ -4390,9 +4390,9 @@
         {
           "code": "300725",
           "name": "药石科技",
-          "bars": 14,
+          "bars": 13,
           "pct": 0.5,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "300671",
@@ -4425,16 +4425,16 @@
         {
           "code": "688114",
           "name": "华大智造",
-          "bars": 13,
+          "bars": 12,
           "pct": -14.57,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "301205",
           "name": "联特科技",
-          "bars": 13,
+          "bars": 12,
           "pct": -9.43,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "688820",
@@ -4551,9 +4551,9 @@
         {
           "code": "600048",
           "name": "保利发展",
-          "bars": 12,
+          "bars": 11,
           "pct": -3.82,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "000725",
@@ -4586,9 +4586,9 @@
         {
           "code": "688105",
           "name": "诺唯赞生物",
-          "bars": 11,
+          "bars": 10,
           "pct": -11.23,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "688608",
@@ -4621,23 +4621,23 @@
         {
           "code": "300209",
           "name": "行云科技",
-          "bars": 11,
+          "bars": 10,
           "pct": -11.19,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "688234",
           "name": "天岳先进",
-          "bars": 11,
+          "bars": 8,
           "pct": -18.31,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-09"
         },
         {
           "code": "300613",
           "name": "富瀚微",
-          "bars": 10,
+          "bars": 9,
           "pct": -12.27,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "600418",
@@ -4649,9 +4649,9 @@
         {
           "code": "688131",
           "name": "皓元医药",
-          "bars": 10,
+          "bars": 9,
           "pct": -21.01,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "688578",
@@ -4684,9 +4684,9 @@
         {
           "code": "300142",
           "name": "沃森生物",
-          "bars": 10,
+          "bars": 9,
           "pct": -5.62,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "300814",
@@ -4726,23 +4726,23 @@
         {
           "code": "002119",
           "name": "康强电子",
-          "bars": 8,
+          "bars": 7,
           "pct": -25.02,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "300450",
           "name": "先导智能",
-          "bars": 7,
+          "bars": 6,
           "pct": -4.68,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "688469",
           "name": "芯联集成",
-          "bars": 7,
+          "bars": 6,
           "pct": -10.86,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "301550",
@@ -4761,9 +4761,9 @@
         {
           "code": "300182",
           "name": "捷成股份",
-          "bars": 6,
+          "bars": 5,
           "pct": 11.89,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "688099",
@@ -4817,9 +4817,9 @@
         {
           "code": "300821",
           "name": "东岳硅材",
-          "bars": 4,
+          "bars": 3,
           "pct": 4.71,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "688661",
@@ -4887,16 +4887,16 @@
         {
           "code": "300390",
           "name": "天华新能",
-          "bars": 37,
+          "bars": 36,
           "pct": -31.66,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "300661",
           "name": "圣邦股份",
-          "bars": 37,
+          "bars": 36,
           "pct": -23.89,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "300014",
@@ -4978,9 +4978,9 @@
         {
           "code": "603773",
           "name": "沃格光电",
-          "bars": 33,
+          "bars": 35,
           "pct": -33.51,
-          "last_bar": "2026-10-09"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "603186",
@@ -4999,9 +4999,9 @@
         {
           "code": "002028",
           "name": "思源电气",
-          "bars": 36,
+          "bars": 35,
           "pct": -36.69,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "688380",
@@ -5062,9 +5062,9 @@
         {
           "code": "600522",
           "name": "中天科技",
-          "bars": 36,
+          "bars": 35,
           "pct": -21.65,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "002436",
@@ -5083,9 +5083,9 @@
         {
           "code": "002821",
           "name": "凯莱英",
-          "bars": 34,
+          "bars": 33,
           "pct": -13.38,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "300418",
@@ -5111,23 +5111,23 @@
         {
           "code": "002747",
           "name": "埃斯顿",
-          "bars": 34,
+          "bars": 33,
           "pct": -30.55,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "300308",
           "name": "中际旭创",
-          "bars": 33,
+          "bars": 30,
           "pct": -26.82,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-09"
         },
         {
           "code": "601318",
           "name": "中国平安",
-          "bars": 33,
+          "bars": 32,
           "pct": -4.27,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "601872",
@@ -5160,9 +5160,9 @@
         {
           "code": "300620",
           "name": "光库科技",
-          "bars": 27,
+          "bars": 26,
           "pct": -25.46,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         },
         {
           "code": "301666",
@@ -5272,9 +5272,9 @@
         {
           "code": "300857",
           "name": "协创数据",
-          "bars": 23,
+          "bars": 22,
           "pct": -17.66,
-          "last_bar": "2026-10-14"
+          "last_bar": "2026-10-13"
         }
       ]
     }
