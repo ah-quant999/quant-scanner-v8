@@ -22,6 +22,15 @@ guanlan_extractor.py — 知识星球研报自动提取器（API优先 + Seleniu
   2026-07-07  重写为 API 优先模式，新增摘星阁双星球支持
              根因修复: cookie 名从 xq_a_token → zsxq_access_token
   2026-07-17  放弃摘星阁源(数据陈旧且未被候选池消费)，从 GROUPS 移除
+  2026-10-14  🔴 一劳永逸硬失败改造（主人授权，根治「401 静默成功」）：
+             背景: 10-14 双 token 死亡后，云端 soft_8 步 401×3 仍标记 success，
+                   池子用 47 只 09-16 化石重建，八道防线全盲 28 天。
+             改造: ① API 全空(401/限流持续) → exit 42(凭据)/43(空数据)，
+                   且 **不覆盖旧产物**（保住 last-good 素材给 maharo 出稿与前端）；
+                   ② topics>0 但解析出 0 研报 → exit 44（页面结构疑似变化）仍写文件；
+                   ③ 打 ::error:: annotation（GitHub 步骤层面可见）。
+                   邮件不在本脚本发（云端无 SMTP 配置）——由本机 self_heal_monitor
+                   每 10 分钟实测口径检查失败后统一发（唯一邮件出口，防重复骚扰）。
 """
 import html
 import json
@@ -112,6 +121,7 @@ STOCK_NAMES_FILE = os.path.join(DATA_DIR, "stock_names.json")
 GOLD_POOL_FILE = os.path.join(DATA_DIR, "gold_pool.json")  # 港股补充索引源
 _NAME_INDEX = None  # [(name, code, full_code, exchange, market), ...] 按名字长度降序
 NAME_INDEX = None   # 全局索引（main 中构建后供 parse_stock_codes 使用）
+AUTH_FAILED = False  # 🔴 2026-10-14: 本轮抓取是否出现 HTTP 401（凭据失效标记，main() 据此 exit 42）
 
 
 def _load_sn_rows():
@@ -391,6 +401,10 @@ def api_fetch_topics(group_id, token, count=20):
             # 401 = 凭据失效/被注销；其它码单独点明（原代码只当普通异常，看不出是认证问题）
             hint = "  ← 凭据可能已失效或被注销（需重新取 zsxq_access_token）" \
                    if e.code == 401 else ""
+            if e.code == 401:
+                # 🔴 2026-10-14: 401 记入全局标记，main() 据此区分 exit 42(凭据) / 43(空数据)
+                global AUTH_FAILED
+                AUTH_FAILED = True
             print(f"    (第{attempt+1}次 HTTP {e.code} {e.reason}{hint})")
             if attempt >= 2:
                 return []
@@ -656,7 +670,9 @@ def parse_api_time(time_str):
 def process_group(key, config, token):
     """处理单个星球: API抓取 → 解析 → 写文件
 
-    返回: (reports_list, watch_stocks_dict)
+    返回: (reports_list, watch_stocks_dict, topics_count)
+          topics_count = API 层取到的帖子数（2026-10-14 硬失败闸门需要区分
+          「API 全空」与「有帖但解析为空」两种故障）
     """
     name = config["name"]
     group_id = config["group_id"]
@@ -670,7 +686,7 @@ def process_group(key, config, token):
 
     if not topics:
         print(f"  ⚠️ {name} 无数据（可能 token 过期或未加入该星球）")
-        return [], {}
+        return [], {}, 0
 
     dates = []
     # 2. 解析研报
@@ -731,6 +747,10 @@ def process_group(key, config, token):
     reports.sort(key=lambda r: r.get("create_time", ""), reverse=True)
 
     # 3. 写文件（包装为对象，带 update_time，供前端状态表读取）
+    #    🔴 2026-10-14: 解析出 0 条时**不覆盖**旧文件（last-good 保护，配合 main() exit 44）
+    if not reports:
+        print(f"  ⚠️ {name} 有帖子但 0 条解析出研报 —— 保留旧 {os.path.basename(out_path)} 不覆盖")
+        return [], {}, len(topics)
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     out_obj = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -746,7 +766,7 @@ def process_group(key, config, token):
     print(f"  ✓ 推股池新增: {len(watch_stocks)} 只")
     print(f"  ✓ 已保存: {os.path.basename(out_path)}")
 
-    return reports, watch_stocks
+    return reports, watch_stocks, len(topics)
 
 
 def main():
@@ -765,16 +785,39 @@ def main():
 
     all_watch = {}  # 合并推股池
     total_reports = 0
+    total_topics = 0  # 🔴 2026-10-14: API 层帖子总数（区分「API 全空」与「解析为空」）
 
     for key, config in GROUPS.items():
         try:
-            reps, watches = process_group(key, config, token)
+            reps, watches, n_topics = process_group(key, config, token)
             total_reports += len(reps)
+            total_topics += n_topics
             all_watch.update(watches)  # 外资研投股票入推股池
         except Exception as e:
             print(f"  [ERR] {config['name']} 处理异常: {e}")
 
-    # 写合并推股池
+    # 🔴 2026-10-14 硬失败闸门（主人授权）——API 层全空 = 真故障，不是「无新研报」：
+    #   本接口取的是最新 20 条帖子（与是否有新帖无关），返回空只能是
+    #   ① 401 凭据失效 ② 1059 限流持续 ③ 接口/结构变化 —— 三者都必须炸出来。
+    #   且 **不覆盖旧产物**：保住 last-good 的 reports/watchlist，
+    #   maharo 出稿与前端至少还能用旧料，池子重建时外资研投腿保持旧值（不再被空数据洗成化石假成功）。
+    if total_topics == 0:
+        code = 42 if AUTH_FAILED else 43
+        reason = ("HTTP 401 凭据失效（token 过期/被注销，需主人换新）" if AUTH_FAILED
+                  else "API 持续返回空（限流未恢复或接口变化）")
+        print(f"\n❌ 硬失败: 外资研投 API 层 0 帖子 —— {reason}")
+        print(f"   已保留旧产物不覆盖（last-good 保护）。exit={code}")
+        print("::error title=v8-guanlan-hardfail::📚 知识星球研报抓取硬失败"
+              f"（exit={code}）: {reason} —— 本轮不覆盖旧素材，池子外资研投腿维持旧值，请检查 token。")
+        return code
+    if total_reports == 0:
+        # topics>0 但一条研报都解析不出 —— 页面/富文本结构疑似变化，解析器失效
+        print("\n❌ 硬失败: 有帖子但解析出 0 条研报（解析器疑似失效）exit=44")
+        print("::error title=v8-guanlan-hardfail::📚 知识星球帖子解析出 0 研报"
+              "（exit=44）—— guanlan_extractor 解析器疑似失效，请人工核对。")
+        return 44
+
+    # 写合并推股池（仅在有真实产出时才覆盖 —— 硬失败路径已提前 return）
     watchlist = {
         "version": "2.0",
         "updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
