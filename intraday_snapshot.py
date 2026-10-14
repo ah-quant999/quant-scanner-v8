@@ -17,6 +17,7 @@ import os
 import sys
 import json
 import datetime
+import subprocess
 import urllib.request
 import urllib.error
 from zoneinfo import ZoneInfo
@@ -42,14 +43,26 @@ def now_cst():
 
 
 def get_index_chg():
-    """取上证指数涨跌幅%（用于双轴对照）。失败返回 0.0，绝不强依赖。"""
+    """取上证指数当前涨跌幅%（用于双轴对照）。失败返回 0.0，绝不强依赖。
+
+    🛡 2026-10-14 主人令一劳永逸：原 push2 实时快照接口在云端 runner 上被网关静默拒返
+    （实测空 body）⇒ index_chg 恒 0.0 ⇒ 前端 idxHasReal=false，整条指数线 + 图例都不画，
+    双轴图只剩板块线（主人实锤「线条平坦」观感的根因之一）。改走 push2his 日K接口
+    （fetcher 同源、实测可达），取「当日」最新一条的涨跌幅（盘中即实时滚动值）；
+    当日K尚未生成（09:30 前）返回 0.0，绝不拿昨日收盘涨幅冒充。"""
     try:
-        url = "https://push2.eastmoney.com/api/qt/stock/get?secid=1.000001&fields=f3&fltt=2"
+        url = ("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.000001"
+               "&klt=101&fqt=0&fields1=f1&fields2=f51,f59&end=20500101&lmt=2")
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=6) as r:
             j = json.loads(r.read().decode("utf-8"))
-        f = j.get("data", {}).get("f3")
-        return round(float(f), 2) if f is not None else 0.0
+        kl = (j.get("data") or {}).get("klines") or []
+        if not kl:
+            return 0.0
+        parts = kl[-1].split(",")
+        if len(parts) < 2 or parts[0] != now_cst().strftime("%Y-%m-%d"):
+            return 0.0  # 盘前：当日K未生成，不拿昨日收盘涨幅冒充
+        return round(float(parts[1]), 2)
     except Exception:
         return 0.0
 
@@ -65,6 +78,36 @@ def _load_today_intraday(today):
             continue
         if ex.get("date") == today and isinstance(ex.get("snapshots"), list):
             return ex
+    return None
+
+
+def _load_remote_intraday(today):
+    """🛡 G3 2026-10-14 主人令一劳永逸：追加前先从 origin/main 取「最新已提交」当日档作基座。
+
+    根因（丢失更新竞态）：盘中快照有两个写者——① v8_intraday_snapshot.yml 独立 job
+    （git rebase 推送）② v8_cn_fetch_cloud.yml soft_9 内联跑本脚本、soft_10 经 Git
+    Data API 推送。两者都基于「各自 checkout 的旧档」读-改-写 ⇒ 10:37 已累积 4 条，
+    10:44 的运行基于 ~25 分钟前的陈旧 checkout（仅 1 条）整文件写回 ⇒ 当日累积被
+    清空为 1 条（主人实锤「曲线断档、只剩 1 条快照」）。
+
+    修法：追加前 git fetch origin main --depth=1 + git show 读已提交最新档；
+    已提交档永远比任何本地 checkout 新 ⇒ 从根上消灭「基于陈旧基座整文件回写」。
+    取不到（网络抖动/当日尚未有提交）才回退本地文件，行为与原逻辑一致。"""
+    try:
+        subprocess.run(
+            ["git", "fetch", "origin", "main", "--depth=1"],
+            cwd=_BASE, capture_output=True, timeout=90,
+        )
+        out = subprocess.run(
+            ["git", "show", "origin/main:raw_data/sector_fund_flow_intraday.json"],
+            cwd=_BASE, capture_output=True, timeout=30,
+        )
+        if out.returncode == 0 and out.stdout:
+            ex = json.loads(out.stdout.decode("utf-8"))
+            if ex.get("date") == today and isinstance(ex.get("snapshots"), list):
+                return ex
+    except Exception:
+        pass
     return None
 
 
@@ -176,13 +219,27 @@ def main():
     top_out = [{"name": s["name"], "net": round(float(s.get("net", 0)), 2)}
                for s in so[:5] if s.get("name") not in _NOISE]
 
+    # 🛡 G1 2026-10-14 主人令一劳永逸：退化源守卫 —— 实证 10:30:41 源档 sectors_in 为空
+    #   （概念腿静默归零）旧逻辑仍写出「0 进 5 出」快照 ⇒ 曲线进侧全空、图例选板块失真、
+    #   线条平坦。健康源必有流入板块（今日实测 99 进/181 出——流出条数本就可达百余，
+    #   不能拿 out 条数判退化）；流入为空即判退化，跳过写盘，下一档源恢复后自动补齐。
+    if not top_in:
+        print(f"⚠️ 退化源守卫触发（sectors_in 空，in={len(si)}/out={len(so)}），跳过写快照")
+        return 0
+
     # 🛡 2026-09-29：收盘归位 —— 15:00 后的运行点统一记作 "15:00"（A股收盘），
     #   避免 x 轴出现 15:01–15:05 这类非交易刻度；同刻幂等覆盖。
     _snap_hhmm = "15:00" if hhmm > "15:00" else hhmm
     snap = {"time": _snap_hhmm, "sectors_in": top_in, "sectors_out": top_out, "index_chg": idx_chg}
 
     # 读取 / 合并（盘日切换则清空旧数据；主文件损坏自动回退 .bak —— 复用 _load_today_intraday）
-    data = _load_today_intraday(today) or {"date": today, "snapshots": []}
+    # 🛡 G3 2026-10-14：优先取 origin/main 已提交最新档作基座（防双写者丢失更新竞态），
+    #   取不到才回退本地文件（原逻辑）。
+    data = _load_remote_intraday(today) or _load_today_intraday(today) or {"date": today, "snapshots": []}
+    # 不变式兜底：基座必须是当日档（两个加载器均已按 date 过滤；此处防未来回归把
+    # 昨日档混进当日曲线 —— 沙盒实证：非当日基座会带着昨日 14:55 点一起写）。
+    if data.get("date") != today:
+        data = {"date": today, "snapshots": []}
 
     # 🧹 2026-09-02 主人令一劳永逸：自愈清理 —— 剔除当日「口径断裂」的历史快照（幂等，每次运行都收敛）。
     #   判据：某快照的 sectors_in 板块名单与「当日最新一档」零交集 → 两者不是同一口径
@@ -201,6 +258,18 @@ def main():
                 _keep.append(s)
             if len(_keep) != len(data["snapshots"]):
                 data["snapshots"] = _keep
+
+    # 🛡 G2 2026-10-14 主人令一劳永逸：同内容去重 —— 源档半小时量级才随抓取链提交一次，
+    #   期间每 ~10 分钟的运行会写出数值完全相同的快照（实证 10:17 与 10:20 两条一模一样）
+    #   ⇒ 曲线平坦重影段 + x 轴不规则密刻度（「10:17、10:20、10:36、10:37」）。与末条
+    #   快照的板块数据（进/出）完全一致即判定无新信息，跳过写盘；指数涨跌幅每次实时取、
+    #   不作为去重判据（避免指数线被板块刷新率绑架）。源更新后下一档自然补点，曲线连续不断。
+    if data["snapshots"]:
+        _last = data["snapshots"][-1]
+        if (_last.get("sectors_in") == snap["sectors_in"]
+                and _last.get("sectors_out") == snap["sectors_out"]):
+            print(f"⏭️ 板块数据与上一条快照（{_last.get('time')}）一致（源未刷新），跳过写盘")
+            return 0
 
     # 幂等：按「归位后时刻」覆盖而非重复追加（杜绝双机/重试/盘后归位导致的重复快照，
     # 尤其 15:01–15:05 多次运行若不按 _snap_hhmm 比对会追加第二个 "15:00" 重影点）
