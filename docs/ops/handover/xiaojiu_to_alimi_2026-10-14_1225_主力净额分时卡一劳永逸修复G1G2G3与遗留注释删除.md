@@ -28,3 +28,11 @@ L2642 note 仅删迁移句，保留口径解释句「盘中异动=ETF 5 分钟�
 2. 两个 workflow（`v8_intraday_snapshot.yml` / `v8_cn_fetch_cloud.yml` soft_9）**调用契约未变**（同参数、退出码 0）。G2/G3 跳盘不写文件 ⇒ dispatcher 25 分钟陈旧阈值仍可能触发补跑（秒级、无邮件）；health_check 无该文件引用，无告警链。
 3. 今日（10-14）早晨 10:17–10:37 快照已被竞态清空，线上文件自 10:44 起；**新逻辑自本次推送后下一档快照生效**，明日为第一个完整干净交易日。验收点：线上 `SECTOR_FUND_FLOW_INTRADAY.js` 的 `index_chg` 出现非零值、快照条数持续累积不清零。
 4. 验证记录：沙盒 7 场景全过（G1 拦退化源 / G2 同源跳过 / G3 远程基座合并 / 指数三态解析 / 跨日兜底 / 无基座新建 / 违约输入兜底）；`py_compile` OK；推送后 API 回读两文件 md5 逐字节一致。
+
+## 追记（12:33 · commit `bb5c551824`）：指数取数通道改 curl 优先
+
+- 12:26 档（新代码首档）实证：快照持续累积至 6 条不清零（G3 生效 ✓），但 `index_chg` 仍 0。
+- 根因：**东方财富对 Python urllib 的 TLS 指纹风控**——本机与 runner 双实测 urllib 一律 RemoteDisconnected，而 curl / requests（fetcher 全线用法）从无失败。旧代码 urllib→push2 恒 0.0、12:26 档 urllib→push2his 仍 0.0 皆因此病。
+- 修法：新增 `_http_get_json()`（curl 子进程优先 + urllib 兜底 + 双挂返回 None），`get_index_chg()` 改走该通道。**无需给 workflow 装 requests**（curl 为 ubuntu-latest 自带）。
+- 验证：HTTP 双通道六态打桩全过（curl 通 / curl 挂→urllib 兜底 / 双挂降级 / curl 空体→urllib / 无当日档 / 非 JSON）；`py_compile` OK；推送回读自验一致。
+- 终验待办：12:40 及之后的快照档 `index_chg` 应出现非零值（上证当日涨跌幅，今日约 +0.0x% 量级）。
