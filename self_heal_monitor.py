@@ -6,7 +6,7 @@ v8 自愈监控闭环（self_heal_monitor.py）
 每 10-20 分钟自动运行，检测以下异常并自动修复：
 
   P0-1: candidate.json 丢失「外资研投」源 → 自动拉取外资研投数据并入 + push
-  P0-2: STOCK_MOMENTUM_STATE.js 新鲜度 → 普通盘后日频卡（2026-08-22 起脱离 PDF，由 gen_strong_breakout 每日盘后自选强势突破重算；陈旧即 FAIL 升级）
+  P0-2: STOCK_MOMENTUM_STATE.js 新鲜度 → 源=PDF OCR 人工流程（主人盘后选股 PDF → OCR）；陈旧只记 WARN 免邮件，不升级 FAIL（与 v8_health_check.py 方针对齐，禁止某模块特立独行）
   P0-3: MOMENTUM_FILTER.js（动量共识筛选卡源）新鲜度确认：缺失/解析失败=FAIL（真异常）；V2 源比 filter 新=待重算 WARN 留痕（dispatcher 应已派发）；其余=OK。本机不 push（云端 cloud_dispatcher/算法链为修复方）
   P1-1: zsxq_token 缺失/失效 → 告警（需用户补 token）
 
@@ -66,14 +66,15 @@ MOMENTUM_FILE = DATA_DIR / "STOCK_MOMENTUM_STATE.js"
 MOMENTUM_FILTER_FILE = DATA_DIR / "MOMENTUM_FILTER.js"
 GUANLAN_WATCHLIST = OUT_DIR / "guanlan_watchlist.json"
 
-# STOCK_MOMENTUM_STATE 最大允许陈旧天数
-# 2026-08-22 起：数据源改为 v8 自有信号合成（脱离 PDF OCR），每日盘后自动重算。
-# 容忍 3 天日历间隔（覆盖周末 + 短假），避免非交易日误报。
+# STOCK_MOMENTUM_STATE 最大允许陈旧天数（仅用于计龄与展示，不再作为 FAIL 升级阈值）
+# 源为 PDF OCR 人工流程：主人盘后选股 PDF → OCR 后才刷新，自动巡检无法修复。
+# 容忍 3 天日历间隔用于展示 age，但陈旧本身只记 WARN、不升级 FAIL（与 v8_health_check.py 对齐）。
 MOMENTUM_MAX_STALE_DAYS = 3
 
-# 2026-08-22 废除：原 momentum 依赖主人 PDF→OCR 人工流程，设 MANUAL_DEPENDENCY 免告警。
-# 现已自合成，按普通盘后日频卡监控（陈旧即 FAIL 正常升级）。
-MOMENTUM_MANUAL_DEPENDENCY = False
+# 🔴 2026-10-14 一劳永逸对齐：P0-2 源=PDF OCR 人工流程 → 陈旧只 WARN 免邮件，绝不升级 FAIL。
+#   （此前误设为 False 并把陈旧判 FAIL/exit=2，与 v8_health_check.py L2297 的「MOMENTUM→warn」降级口径矛盾，
+#    造成每轮 P0-2 陈旧都误报 exit=2。现改回 True，陈旧仅留痕、不阻断。）
+MOMENTUM_MANUAL_DEPENDENCY = True
 
 # 保留兼容占位（不再使用）
 _MOMENTUM_KNOWN_QUIET_PREFIXES = ("last_day=",)
@@ -553,13 +554,12 @@ def run_heal(json_output=False):
         log("[OK] P0-1: candidate.json 含外资研投(" + str(guanlan_count) + "只)", "OK")
         heal_results["candidate_guanlan"] = {"ok": True, "message": det}
 
-    # P0-2: STOCK_MOMENTUM_STATE 新鲜度（2026-08-22 起脱离 PDF，按普通盘后日频卡监控）
+    # P0-2: STOCK_MOMENTUM_STATE 新鲜度（源=PDF OCR 人工流程；陈旧只 WARN 免邮件，与 v8_health_check.py 对齐）
     fresh, last_day, age, det2 = check_momentum_state()
     if not fresh:
-        log("[FAIL] P0-2: STOCK_MOMENTUM_STATE.js 陈旧! " + det2, "FAIL")
-        heal_results["momentum_state"] = {"ok": False, "message": det2}
-        actions_taken.append("MOMENTUM_STATE 陈旧(" + str(last_day) + ", " + str(age) + "天): 检查 gen_strong_breakout 是否随盘后构建运行")
-        exit_code = max(exit_code, 2)
+        # 🔴 2026-10-14 一劳永逸：陈旧=OCR 人工依赖预期态，只 WARN 留痕，不升级 FAIL、不阻断、不发邮件。
+        log("[WARN] P0-2: STOCK_MOMENTUM_STATE.js 陈旧(需主人 PDF→OCR 刷新, 免邮件): " + det2, "WARN")
+        heal_results["momentum_state"] = {"ok": True, "known_manual_dependency": True, "message": det2}
     else:
         log("[OK] P0-2: STOCK_MOMENTUM_STATE.js 新鲜 (" + det2 + ")", "OK")
         heal_results["momentum_state"] = {"ok": True, "message": det2}
