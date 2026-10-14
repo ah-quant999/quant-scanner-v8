@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-10-15 00:48:35",
-  "generated": "2026-10-15 00:48:35",
+  "update_time": "2026-10-15 01:28:55",
+  "generated": "2026-10-15 01:28:55",
   "period_start": "2026-10-05",
   "period_end": "2026-10-11",
   "stats": {
@@ -16,21 +16,21 @@
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-10-14 23:42:20",
+      "update_time": "2026-10-15 00:23:30",
       "size_kb": 27.3
     },
     {
       "file": "top10_daily.json",
       "label": "TOP10推荐池",
       "status": "ok",
-      "update_time": "2026-10-15 00:31:08",
-      "size_kb": 34.9
+      "update_time": "2026-10-15 01:17:10",
+      "size_kb": 35.1
     },
     {
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-10-14 23:47",
+      "update_time": "2026-10-15 00:26",
       "size_kb": 106.6
     },
     {
@@ -44,7 +44,7 @@
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-10-15 00:29:58",
+      "update_time": "2026-10-15 01:16:04",
       "size_kb": 1399.0
     },
     {
