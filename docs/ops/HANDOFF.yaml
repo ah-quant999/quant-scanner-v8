@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-14 11:30"
+  updated: "2026-10-14 22:40"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 133
+  next_id_seq: 134
 items:
   - id: fix-handoff-b64-carrier-1008
     owner: 阿狸咪的工程师
@@ -8368,4 +8368,33 @@ items:
       回放自证：v1-only T+1 超额 +1.10% = 线上卡值。
       待验证：10-14 盘后 D 批 final_recommend 首跑（IMA 入池+闸门+Top3 全链生效）⇒ 转 done 需填 verified_at。
     updated: \"2026-10-14 12:40"
+    updated_by: 阿狸咪的工程师
+
+  - id: finalrec-replay-card-live-1014
+    owner: 阿狸咪的工程师
+    status: pending-verify
+    title: 最终推荐回测卡=回放口径上线主页，11 月中切回真实信号流（同批 IMA 卡补 v2）
+    detail: |
+      主人令（10-14 晚）「那这个就是新方法的最终推荐回测了，可以放上主页了」+ 三项拍板：
+      ①结构维持「强势×因子 + 四量闸门」（回放实证：双池同场 34 日 A 混排全面胜过纯因子榜，
+        v2 退潮期四量闸门刹车正确，四量真实流 T+5 32.1% 全负——四量不升格选手）；
+      ②回测卡现在凭回放上线：卡读 data/FINAL_RECOMMEND_REPLAY.js（双池同场 34 信号日
+        06-09~10-12 · 数据截至 10-13 收盘 · T+1 48.5%/+0.74 · T+3 50.5%/+1.17 ·
+        T+5 60.7%/+1.61 · T+10 50.6%/+2.04），徽章如实标「回放口径·非真实信号流」，
+        渲染复用 lifeRenderBacktest 唯一份；链上真实流 FINAL_RECOMMEND_BACKTEST.js
+        照常每晚重产不受影响（前端 REPLAY 优先、缺失自动回落）。
+      ③IMA 强势跟踪卡补 v2：raw_data/ima_strong_history_v2.json 持久归档（09-18~10-12
+        真实选股 68 只，差集口径，知识星球逐日笔记已核验转录）+ backtest_life_cards.py
+        三源合并（最新 ∪ v1 112 ∪ v2 68 = 188 笔），断流守卫同步修正；链上重跑稳定可复现。
+      🔴 切回真实流操作（触发：真实流成熟样本 ≥30 笔，预计 11 月中）：
+        删 index.html 中 FINAL_RECOMMEND_REPLAY.js 引用行 + 徽章改回「✅ 真实数据回测」
+        + 删 data/FINAL_RECOMMEND_REPLAY.js，前端即自动回落链上真实流卡。
+      口径限定（如实）：v1 归档无强度分 ⇒ IMA 池内归一同分退化（Top3=因子前2+IMA）；
+        18 个 v1 日无因子榜归档不计入；基准按信号日对齐覆盖至 10-09。
+    verify_how: |
+      本地：pre_deploy_audit 15/15（双份：主仓+隔离 worktree）；node 实测两 data JS 装载
+      （REPLAY periods 1d/3d/5d/10d、IMA total_signals=188）；回放引擎自检 IMA-only v1
+      三档精确命中线上卡（58.6/61.3/64.0, n=111）。待验证：Pages 发布后 HTTP 抓
+      index.html 含 FINAL_RECOMMEND_REPLAY.js 引用 + 两 data JS 200 可达 ⇒ 转 done。
+    updated: "2026-10-14 22:40"
     updated_by: 阿狸咪的工程师

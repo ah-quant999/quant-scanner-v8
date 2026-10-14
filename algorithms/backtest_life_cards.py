@@ -314,16 +314,21 @@ def run_ima_strong():
 
     _sig_latest, _sk_latest = _load_sigs(fp, "最新日报")
     _sig_hist, _sk_hist = _load_sigs(RAW / "ima_strong_history.json", "历史全量归档")
+    # 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v2 期（换代后 09-18~）真实选股单独归档
+    #   raw_data/ima_strong_history_v2.json（知识星球「短线情绪选股」逐日笔记已核验转录，
+    #   差集口径 = v1 已收录 code 不重复收录）。该文件与 v1 归档同为**人工/脚本维护的
+    #   冻结归档**，不会被 fetch_ima_strong_stock.py 覆写 ⇒ 链上重跑稳定可复现。
+    _sig_v2, _sk_v2 = _load_sigs(RAW / "ima_strong_history_v2.json", "v2 期归档")
     _merged = {}
-    for c, d in _sig_hist + _sig_latest:
+    for c, d in _sig_hist + _sig_v2 + _sig_latest:
         if c not in _merged or d < _merged[c]:
             _merged[c] = d                     # 同 code 取最早 = 真实首次入选日
     sigs = sorted(_merged.items(), key=lambda kv: (kv[1], kv[0]))
-    skipped = _sk_latest + _sk_hist
+    skipped = _sk_latest + _sk_hist + _sk_v2
     if not sigs:
         print("  ⚠️ IMA 无可定位信号时点的标的，跳过")
         return
-    print(f"  · 并集去重后 **{len(sigs)} 笔**（最新 {len(_sig_latest)} ∪ 归档 {len(_sig_hist)}）")
+    print(f"  · 并集去重后 **{len(sigs)} 笔**（最新 {len(_sig_latest)} ∪ v1 归档 {len(_sig_hist)} ∪ v2 归档 {len(_sig_v2)}）")
     days = sorted({d for _, d in sigs})
     # 🔴 源覆盖度守卫（2026-09-19）：消费上游标注，把「为什么样本这么少」写进产物。
     _qf, _qdeg, _qwhy = _source_quality(obj)
@@ -336,7 +341,9 @@ def run_ima_strong():
     #   断流 2 周无人知（signal_date_range 停在 08-28）。判据（与总量正交）：
     #   「最新日报贡献 0 笔 + 归档非空」= 源还在更新但信号提取断了，
     #   样本全是旧归档 ⇒ 不反映当前源行为 ⇒ 必须降级，不许静默 ok。
-    if not _sig_latest and _sig_hist:
+    #   2026-10-14 晚：v2 期归档（09-18~10-12 真实选股 68 只）落地后，
+    #   「最新日报 0 笔但 v2 归档已覆盖近期信号」不再视为断流（样本代表当前源行为）。
+    if not _sig_latest and not _sig_v2 and _sig_hist:
         _qdeg = True
         _qwhy = _qwhy + ["最新日报贡献 0 笔信号（first_selected 缺失/换代断流）⇒ "
                          "样本全部来自历史归档，不反映当前源行为，不具代表性"]
@@ -353,9 +360,11 @@ def run_ima_strong():
     _emit("ima_strong_backtest.json", _envelope(
         card="高手强势股跟踪",
         signal_source=("raw_data/ima_strong_stock.json（最新日报）"
-                       " ∪ raw_data/ima_strong_history.json（历史全量归档，含已回落/见顶）"),
+                       " ∪ raw_data/ima_strong_history.json（v1 历史全量归档，含已回落/见顶）"
+                       " ∪ raw_data/ima_strong_history_v2.json（v2 期归档 09-18~，知识星球已核验转录）"),
         signal_sources_merged={
-            "latest": len(_sig_latest), "history": len(_sig_hist), "merged": len(sigs),
+            "latest": len(_sig_latest), "history": len(_sig_hist), "v2": len(_sig_v2),
+            "merged": len(sigs),
             "rule": "同 code 取最早 first_selected（真实首次入选日）；归档为冻结文件，不被 fetch 覆写",
         },
         total_signals=len(sigs),

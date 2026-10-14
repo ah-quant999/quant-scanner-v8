@@ -1776,7 +1776,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=2d063a47db" defer></script>
 <script src="data/EXPERIMENT.js?v=355fbbaaa5" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=631d035321" defer></script><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=842493b7e5" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=631d035321" defer></script><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=842493b7e5" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=3a1ec69933" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=a22d3019c7" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=00b89aa7fd" defer></script>
@@ -1824,7 +1824,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/MOMENTUM_FILTER.js?v=284c59b92d" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=05d0ba77de" defer></script>
-    <script src="data/IMA_STRONG_BACKTEST.js?v=e3907b1823" defer></script>
+    <script src="data/IMA_STRONG_BACKTEST.js?v=7d4c5a21c8" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🆕 2026-10-12 小九：量质双擎（LQSQ · 第一支自研算法）前端接入 —— 后端数据链 10-11 已跑，
          但前端此前**零挂载**（注入/卡片/子页全缺）⇒ 主站无处显示（主人「我半天没看到在哪显示」）。
          本次补齐：
@@ -1897,13 +1897,31 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
            重算口径=回放实验：2026-06-09~08-28 强势跟踪 first_selected 信号 × 当日因子榜
            （top10_daily 归档）池内 min-max 混排取 Top3，T+1/T+5/T+10 前向对比。
            恢复方法：① __renderFinalSec 内 guard 删/置 false ② 还原下方 <table> ③ 徽章改回
-           「✅ 真实数据回测」④ 视重算成绩决定是否更新 data/FINAL_RECOMMEND_BACKTEST.js。 -->
+           「✅ 真实数据回测」④ 视重算成绩决定是否更新 data/FINAL_RECOMMEND_BACKTEST.js。
+           ══ 2026-10-14 21:50 阿狸咪的工程师·已恢复 ══
+           主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」→ 卡片恢复展示，
+           数据源改为 data/FINAL_RECOMMEND_REPLAY.js（新方法混排回放：强势新入选×因子榜
+           池内归一竞位 Top3，双池同场 34 信号日 06-09~10-12，数据截至 10-13 收盘，
+           渲染引擎仍复用 lifeRenderBacktest 全站唯一份）。
+           🔴 诚实标注：回放口径 ≠ 真实信号流（三源合体 10-14 才上线）⇒ 徽章为
+           「回放口径·非真实信号流」；真实流自 10-13 起由链上 final_recommend 归档累积，
+           11 月中样本足够后删 FINAL_RECOMMEND_REPLAY.js 引用即切回真实口径（已挂账 HANDOFF）。
+           v1 期限定：v1 归档无强度分 ⇒ IMA 池内归一同分退化（Top3=因子前2+IMA）；
+           18 个 v1 日无因子榜归档不计入。 -->
       <div class="card" id="finalRecBackCard" style="margin-top:16px;border-left:4px solid #fbbf24;">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 最终推荐 Top3 · 回测 N 日胜率（信号层）</span>
-          <span style="font-size:10px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">⏸ 重算中 · 暂停展示</span>
+          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 最终推荐 Top3 · 回测 N 日胜率（新方法混排）</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">回放口径 · 非真实信号流</span>
         </div>
-        <div class="note">强势跟踪已按「入选后因子排行」接入最终推荐，回测正按新口径重算（回放实验：2026-06-09~08-28 强势跟踪信号 × 当日因子榜混排，T+1/T+5/T+10 对比）——成绩出来后恢复展示。</div>
+        <div class="note" id="finalRecBackNote">加载中…</div>
+        <table id="finalRecBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>中位数</th><th>最好</th><th>最差</th><th>最大回撤</th></tr></thead><tbody id="finalRecBackBody"></tbody></table>
+        <div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.75;">
+          口径：新方法混排 = 强势跟踪当日新入选 × 当日因子榜，双池各自 min-max 归一竞位取 Top3（同分因子榜优先）；
+          次日开盘买 / N 日收盘卖 / 双边 0.30%；基准=全市场等权同成本口径（按信号日对齐，覆盖至信号日 10-09）。
+          仅统计双池同场信号日（34 日，06-09~10-12，数据截至 10-13 收盘）。
+          18 个 v1 日无因子榜归档不计入；v1 期归档无强度分，IMA 池内归一同分退化（Top3=因子前 2 + IMA）。
+          真实信号流自 10-13 起累积，11 月中切回真实口径。
+        </div>
       </div>
     </div>
 
@@ -18234,8 +18252,10 @@ window.__renderV8CalToday();
     //   这里只做调用(错误显示也由内部函数负责),不再 console.warn 吞错
     renderFinalRec();
     // 🆕 2026-10-13 主人令：最终推荐 Top5 回测卡（复用 lifeRenderBacktest，与强势跟踪卡同口径）
+    // 🆕 2026-10-14 主人令：优先读新方法混排回放（FINAL_RECOMMEND_REPLAY，双池同场 34 信号日）；
+    //   replay 文件缺失时自动回落链上真实流 FINAL_RECOMMEND_BACKTEST —— 11 月中切回=删 replay 引用即可。
     try{
-      var fb = window.FINAL_RECOMMEND_BACKTEST;
+      var fb = window.FINAL_RECOMMEND_REPLAY || window.FINAL_RECOMMEND_BACKTEST;
       if (typeof window.lifeRenderBacktest === 'function') {
         window.lifeRenderBacktest('finalRecBackBody','finalRecBackNote', fb && fb.periods, {
           method: fb && fb.method, total_signals: fb && fb.total_signals,
