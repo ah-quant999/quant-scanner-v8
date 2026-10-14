@@ -8353,9 +8353,19 @@ items:
       结论（主人定夺）：回放全档转正、对纯因子榜 T+5/T+10 超额差 +5.6/+4.7pp，双池同场亦全面占优；
       生产新代码已上线，v2 真实流样本自 10-14 起重新积累——建议观察 2-4 周真实流后再最终定夺。
     verify_how: |
-      推送：远端 TIP 0b646fefa2（parent fcc5ad24）；8 文件 blob 对表 MATCH；根条目 116→115（E: 脏树消失）。
-      线上：index.html __FINAL_REC_BT_PAUSED guard 生效；data/IMA_STRONG_STOCK.js?v=86b0e0caed → 200/4793B；
-      卡头「强势跟踪强度分 × 四量因子榜混排 · Top3」在位。回放自证：v1-only T+1 超额 +1.10% = 线上卡值。
+      推送：commit 0b646fefa2（10:5x，8 文件 blob MATCH、根条目 116→115 E: 脏树消失）；
+      compare API 0b646fe...main = ahead 56/behind 0 ⇒ 确为 main 祖先（本地浅克隆 graft
+      曾致 merge-base 误判「不在历史」，实为假象，历史从未被重写）。
+      ⚠️ 事故+恢复（双机必读）：11:36 commit 4ffd68f805「data: index.html 经发布闸门核对
+      20261014」用**落后基线**的 index.html 做 ?v 对齐后 PAT 直推，父提交=当时 tip ⇒
+      fast-forward **静默顶掉** 0b646fe 全部前端改动（guard/⏸徽章/mix_pct/卡头/时窗矩阵
+      「最终推荐·Top3」行全 x0，IMA ?v 被 86b0e0caed→e756933ac3）；后端 8 文件内容未受损。
+      12:3x commit 6b54b3a0918 恢复全部前端改动（内容=我方版、?v=远端当前对齐 105 处、
+      IMA=86b0e0caed、BUILD 取远端），4 blob 远端 MATCH；线上复验 guard=1、IMA ?v 200/4793B。
+      防再发：docs/ops/index_protected_markers.txt F 段新增 2 条代码级锚点（mix_pct /
+      IMA_STRONG_STOCK/TOP10_DAILY/FOUR_VOLUME），同型陈旧基线直推将被 [10/10] 核心标记
+      守卫阻断 deploy；事故全程记录见该文件 F 段注释。ledger --check 157/157。
+      回放自证：v1-only T+1 超额 +1.10% = 线上卡值。
       待验证：10-14 盘后 D 批 final_recommend 首跑（IMA 入池+闸门+Top3 全链生效）⇒ 转 done 需填 verified_at。
-    updated: "2026-10-14 11:30"
+    updated: \"2026-10-14 12:40"
     updated_by: 阿狸咪的工程师
