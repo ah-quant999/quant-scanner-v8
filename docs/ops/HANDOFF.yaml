@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-14 22:56"
+  updated: "2026-10-14 23:15"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,12 +34,12 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 134
+  next_id_seq: 135
 items:
   - id: index-creds-panel-refresh-1014
     owner: 阿狸咪的工程师
     priority: P1
-    status: todo
+    status: pending-verify
     created: 2026-10-14
     title: index.html 凭证面板 CREDS 更新交接（小九→阿狸咪，夜班窗口执行）
     note: >
@@ -55,9 +55,32 @@ items:
       推算新鲜度着色，替代静态日期倒计时（本次 28 天化石盲区的面板侧根源）。
       背景：本日已完成 extractor 硬失败 + self_heal 实测口径 + 断供邮件（见
       guanlan-token-hardfail-rootfix-1014），本 item 只剩面板显示层。
+      【阿狸咪夜班执行 2026-10-14 23:1x】① 已完成并推送：CREDS 表 zsxq
+      updated=2026-10-14、mahoro 条目 updated=2026-10-14 + expire_note 标注
+      「cookie 已换新/旧到期 2026-10-09 口径作废/唯一消费方=闲置探针
+      probe_maharo.py」，剩余天数与灯色由面板逻辑自动重算（余 30 天 s-ok）。
+      ② 按交接注「另立项」→ 登记 creds-panel-live-probe-1014（todo）。
+      验证方式：Pages 上线后 HTTP 硬抓 index.html 核对凭证区字面值。
     verify_how: 线上 index.html 运维面板凭证区 zsxq 显示 2026-10-14 且 Ctrl+F5 可见
-    updated: "2026-10-14 22:55"
-    updated_by: 小九(lemoncat-cn)
+    updated: "2026-10-14 23:15"
+    updated_by: 阿狸咪的工程师
+  - id: creds-panel-live-probe-1014
+    owner: 阿狸咪的工程师
+    priority: P2
+    status: todo
+    created: 2026-10-14
+    title: 凭证面板改「实时探测」口径（index-creds-panel-refresh-1014 可选项②另立项）
+    note: >
+      凭证卡由静态日期倒计时改为实测口径：前端不发任何凭证请求，读
+      HEALTH_CHECK.js / guanlan 报告（candidate 外资研投 last_seen）的
+      update_time 推算新鲜度着色，替代静态日期倒计时——根治「面板显示
+      正常但实际化石 28 天」的盲区（本次 token 事故的面板侧根源）。
+      源自小九 index-creds-panel-refresh-1014 注②（可选项另立项）。
+      2026-10-14 夜班窗口与算法链接力并行，为控制 index.html 变更面
+      未同批实施，另立此项待做。
+    verify_how: 运维页凭证卡着色随 HEALTH_CHECK / candidate last_seen 实时变化（改 SYSTEM 侧日期可复现变色）
+    updated: "2026-10-14 23:15"
+    updated_by: 阿狸咪的工程师
   - id: guanlan-token-hardfail-rootfix-1014
     owner: 小九(lemoncat-cn)
     priority: P0
