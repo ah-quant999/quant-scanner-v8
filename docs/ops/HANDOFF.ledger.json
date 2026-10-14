@@ -163,7 +163,7 @@
   "finalrec-replay-card-live-1014",
   "creds-panel-live-probe-1014"
  ],
- "updated": "2026-10-14 23:21",
+ "updated": "2026-10-14 23:30",
  "generated_by": "阿狸咪的工程师(/scripts/handoff_ledger_hash.py 口径)",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -229,7 +229,7 @@
   "factorlab-conflict-tree-pollution": "3c2a180e257943c6",
   "final-raw-sync-1001": "3ac9a1e171b0783a",
   "final-recommend-killed-by-1800s-0928": "e9c1fc32a459be02",
-  "finalrec-replay-card-live-1014": "f6f24033f2ef4ce1",
+  "finalrec-replay-card-live-1014": "968917d1f0993283",
   "first-board-alert-0930": "6e60d97faf5b2a20",
   "fix-etf-daily-monitor-empty-1007": "6ac3ca47fe5a28ff",
   "fix-gen-algo-track-nameerror-1008": "e5452b3a70cd6bbc",
