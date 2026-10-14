@@ -36,6 +36,28 @@ meta:
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
   next_id_seq: 134
 items:
+  - id: index-creds-panel-refresh-1014
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: todo
+    created: 2026-10-14
+    title: index.html 凭证面板 CREDS 更新交接（小九→阿狸咪，夜班窗口执行）
+    note: >
+      小九 2026-10-14 22:2x 主人批注「3可以，交接好，我让她做」——index.html
+      夜班归阿狸咪，小九不碰。任务两件事：
+      ① 凭证面板 CREDS 两条目日期更新：zsxq 条目 updated 09-11 → 2026-10-14
+      （今日 22:3x 双 token 已全部换新：本地 data/zsxq_token.json + 云端 Secret
+      ZSXQ_TOKEN 均为新值，线上池外资研投 77 只/last_seen=10-14 已实证）；
+      mahoro 条目同步标注 cookie 已换新（云端 Secret MAHORO_COOKIE 已更新，
+      唯一消费方为闲置探针 scripts/probe_maharo.py）。
+      ② 面板改实测口径（可选项，若工作量大可另立项）：凭证卡改为「实时探测」
+      ——前端不发凭证请求，但可读 HEALTH_CHECK.js / guanlan 报告 update_time
+      推算新鲜度着色，替代静态日期倒计时（本次 28 天化石盲区的面板侧根源）。
+      背景：本日已完成 extractor 硬失败 + self_heal 实测口径 + 断供邮件（见
+      guanlan-token-hardfail-rootfix-1014），本 item 只剩面板显示层。
+    verify_how: 线上 index.html 运维面板凭证区 zsxq 显示 2026-10-14 且 Ctrl+F5 可见
+    updated: "2026-10-14 22:55"
+    updated_by: 小九(lemoncat-cn)
   - id: guanlan-token-hardfail-rootfix-1014
     owner: 小九(lemoncat-cn)
     priority: P0
