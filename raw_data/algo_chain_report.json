@@ -1,20 +1,9 @@
 {
-  "update_time": "2026-10-12 21:16:43",
-  "base_trade_date": "2026-10-12",
-  "stage_window": "B",
-  "skipped_out_of_window": [
-    {
-      "name": "最终推荐",
-      "path": "raw_data/final_recommend.json",
-      "batch": "D"
-    },
-    {
-      "name": "最终推荐(前端)",
-      "path": "data/FINAL_RECOMMEND_DATA.js",
-      "batch": "D"
-    }
-  ],
-  "ok": 7,
+  "update_time": "2026-10-15 22:15:47",
+  "base_trade_date": "2026-10-15",
+  "stage_window": "E",
+  "skipped_out_of_window": [],
+  "ok": 9,
   "failed_required": 0,
   "ts_blind": 0,
   "items": [
@@ -22,7 +11,7 @@
       "name": "候选池",
       "path": "raw_data/candidate.json",
       "status": "✅ 本日新鲜",
-      "ts": "2026-10-12 20:21:37",
+      "ts": "2026-10-15 20:35:07",
       "required": true,
       "note": ""
     },
@@ -30,7 +19,7 @@
       "name": "候选池(前端)",
       "path": "data/CANDIDATE.js",
       "status": "✅ 本日新鲜",
-      "ts": "2026-10-12 20:21:37",
+      "ts": "2026-10-15 20:35:07",
       "required": false,
       "note": ""
     },
@@ -46,7 +35,7 @@
       "name": "TOP10推荐池",
       "path": "raw_data/top10_daily.json",
       "status": "✅ 本日新鲜",
-      "ts": "2026-10-12 20:24:02",
+      "ts": "2026-10-15 20:27:03",
       "required": true,
       "note": ""
     },
@@ -54,7 +43,7 @@
       "name": "TOP10推荐池(前端)",
       "path": "data/TOP10_DAILY.js",
       "status": "✅ 本日新鲜",
-      "ts": "2026-10-12 20:24:02",
+      "ts": "2026-10-15 20:27:03",
       "required": false,
       "note": ""
     },
@@ -62,7 +51,7 @@
       "name": "四量终极",
       "path": "data/FOUR_VOLUME.js",
       "status": "✅ 本日新鲜",
-      "ts": "2026-10-12 20:33:13",
+      "ts": "2026-10-15 20:37:32",
       "required": false,
       "note": ""
     },
@@ -70,7 +59,23 @@
       "name": "四量终极60m",
       "path": "data/FOUR_VOLUME_60M.js",
       "status": "✅ 本日新鲜",
-      "ts": "2026-10-12 20:32:10",
+      "ts": "2026-10-15 20:36:37",
+      "required": false,
+      "note": ""
+    },
+    {
+      "name": "最终推荐",
+      "path": "raw_data/final_recommend.json",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-10-15 20:39:06",
+      "required": true,
+      "note": ""
+    },
+    {
+      "name": "最终推荐(前端)",
+      "path": "data/FINAL_RECOMMEND_DATA.js",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-10-15 20:39:06",
       "required": false,
       "note": ""
     },
@@ -78,7 +83,7 @@
       "name": "金股池",
       "path": "raw_data/gold_pool.json",
       "status": "✅ 本日新鲜",
-      "ts": "2026-10-12 20:21:36",
+      "ts": "2026-10-15 19:21:11",
       "required": false,
       "note": ""
     }
