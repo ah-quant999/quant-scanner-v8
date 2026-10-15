@@ -8561,3 +8561,24 @@ items:
     verified_at: "2026-10-15 17:40 硬抓 Pages + 仓库 tip 双向核对"
     updated: "2026-10-15 17:40"
     updated_by: 小九(lemoncat-cn)
+  - id: future-todo-heatmap-dates-ar-1015
+    owner: 待排期（阿狸咪夜班或小九下一窗口）
+    priority: P2
+    status: todo
+    created: 2026-10-15
+    title: 10-15 防覆盖审计遗留三事项（小九收班登记）
+    note: >
+      ①涨停热力 dates 数组缺 10/12-14 三个交易日（板块趋势图少 3 天；zt_pool 历史抓取缺口，
+      今日值正常但窗口停在 10/09）——修 f_limit_up_heatmap 窗口逻辑，补回三日历史。
+      注：该缺口本次已实证会放大旧版 calc 的板块兜底失真（求和 141），修复版 calc 用 prev_total
+      同口径已免疫，但趋势图本身缺 3 天仍要补。
+      ②AR 吸收率因子（图5）：10-14 查重已过（全站无「吸收率/共振度」口径，CRISIS_DATA 仅宏观三维度），
+      确为增量；需新算法+回测自证，按 10-14 评估标准落地，忌赶工塞入。
+      ③STOCK_QUOTE cron 静默注销观察：10-15 14:46 后零 run（疑 GitHub cron 注销三度复发），
+      明早小九窗口确认是否复发；若复发，按 09-22 历史条目（本档 2928 行起）的巡检错配教训处理。
+    verify_how: |
+      ①修完后 dates 末 5 位应为 10/09-10/15 连续无缺口；②AR 因子须附回测自证再上前端；
+      ③明早 09:30 前查 v8_stock_quote_refresh.yml 最近 run 时间。
+    verified_at: "2026-10-15 21:40 登记（未开工）"
+    updated: "2026-10-15 21:40"
+    updated_by: 小九(lemoncat-cn)
