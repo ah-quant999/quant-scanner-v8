@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-10-15 22:46:52",
+  "check_time": "2026-10-16 06:39:51",
   "last_trade_close": "2026-10-15 15:30:00",
   "is_trading_day": true,
   "core_stale": [],
@@ -57,6 +57,8 @@
     "TRIPLE_HISTORY": "post_close",
     "FOUR_VOLUME_HISTORY": "post_close",
     "FOUR_VOLUME_TRACK": "post_close",
+    "LQSQ_TRACK": "post_close",
+    "LQSQ_BACKTEST": "post_close",
     "TOP10_DAILY": "post_close",
     "LHB_DATA": "post_close",
     "LHB_HISTORY": "post_close",
