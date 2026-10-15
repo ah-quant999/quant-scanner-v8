@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-16 06:51"
+  updated: "2026-10-16 07:15"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -8647,7 +8647,7 @@ items:
   - id: backtest-caliber-audit-replay-violation-1015
     owner: 阿狸咪的工程师
     priority: P0
-    status: doing
+    status: done
     created: 2026-10-15
     title: 全站回测口径审计实锤——四量终极主榜仍跑历史回放（违反 10-11 令），真实流视图被 update_v8 映射缺口挡住；修复待主人裁定
     note: |
@@ -8729,12 +8729,12 @@ items:
       (d) 星级/聚合随真实流自动重算：data/FOUR_VOLUME_BACKTEST.js 已由真实流视图重建
           （update_time 2026-10-15 19:34:03/method 真实流/total_signals=94/
           by_period 成熟档 1/3/5/10，T+5 89 样本 33.71%/-1.38%，回放外壳同 source 覆盖）。
-    verified_at: "2026-10-15 23:45 线上 Pages 双文件硬抓+本地三文件+前端登记表五重自证（审计结论已验证）；2026-10-16 06:5x 四步已执行+本地七重验证（pre_deploy_audit 15/15、双盲区、ledger 169/169、smoke 三层、降级堵口三场景、py_compile 200、update_v8 转换实测），待上线后线上硬抓复核改 done"
+    verified_at: "2026-10-15 23:45 审计五重自证；2026-10-16 07:15 线上硬抓终态实证：data/FOUR_VOLUME_BACKTEST.js=真实信号流口径（update_time 05:46:11/94 信号/T+5 89 样本 33.71%/-1.38%/by_period 1,3,5,10 成熟档），云端构建 902fb24ca1 经 update_v8 新映射自动重建、?v 自动翻替 acd70f2c2a；commit aebfc30fef + CI 三条全绿（构建部署/缓存戳对齐/Pages success）"
 
   - id: finalrec-degrade-block-1016
     owner: 阿狸咪的工程师
     priority: P0
-    status: doing
+    status: done
     created: 2026-10-16
     title: 最终推荐降级堵口——data_degraded 产物一律不展示（主人令「没成功就不能展示」），前端零渲染漏洞堵死
     note: |
@@ -8757,12 +8757,12 @@ items:
         文案（✅）；② smoke_index.js 三层全过（L1 29/29、L2 无运行时错误、
         L3 关键函数+renderFinalRec 渲染 470 字符）；③ pre_deploy_audit 15/15
         （含 [2/8] inline new Function 29 块 0 错、[10/10] 核心标记 45/45）。
-    verified_at: "2026-10-16 06:5x 本地三场景单测+smoke 三层+audit 15/15 验证通过，待上线后线上硬抓复核改 done"
+    verified_at: "2026-10-16 07:15 线上硬抓实证：index.html（BUILD=c4847459d0）降级堵口在位（未达全口径/_tickLbl 特征 grep 命中），data_degraded 时线上即显示「按主人令不予展示」；本地三场景单测+smoke+audit 全绿"
 
   - id: deadcard-conclusion-realtime-1016
     owner: 阿狸咪的工程师
     priority: P1
-    status: doing
+    status: done
     created: 2026-10-16
     title: 死卡结论文案/图表实时化六处修复上线（主人令「没变化」⇒ 直接改直接上线）
     note: |
@@ -8780,7 +8780,7 @@ items:
       ① 合并自证：冲突标记 0、_tickLbl×3/观测台×8/结论拼装在位、BUILD=14140b8a0e、
         ?v=cc51744247 等远端新值全在、diff vs theirs=37 行恰六处编辑；
       ② smoke 三层 + pre_deploy_audit 15/15 + guard_double_blind 三不变式全过。
-    verified_at: "2026-10-16 06:5x 本地合并自证+六重验证通过，待上线后线上硬抓（结论数字天天滚/末月 2026-09 可见）复核改 done"
+    verified_at: "2026-10-16 07:15 线上硬抓实证：index.html 新版特征在位（结论实时拼装/观测台_v10/_tickLbl×3/两图 xAxis 全量标签），BUILD=c4847459d0，CI 三条全绿；结论数字随当日数据天天滚"
     updated: "2026-10-16 05:59"
     updated_by: 阿狸咪(alimi-cn)
   - id: future-logic-if-cffex-1016
