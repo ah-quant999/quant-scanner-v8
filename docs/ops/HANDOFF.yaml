@@ -8521,3 +8521,23 @@ items:
     verified_at: "2026-10-15 13:35 硬抓 Pages 确认 by_cat 在线"
     updated: "2026-10-15 13:35"
     updated_by: 小九(lemoncat-cn)
+  - id: future-card-sentiment-cffex-1015
+    owner: 小九(lemoncat-cn)
+    priority: P1
+    status: done
+    created: 2026-10-15
+    title: 情绪周期/涨停热力一劳永逸修复 + IF会员持仓择时新卡 + AI速览参与条件（主人15:30拍板）
+    note: >
+      ①根因：f_limit_up_heatmap 的 except:pass 静默吞 zt_pool 失败 ⇒ 线上 total 成数组、
+      ladder 空占位 ⇒ 情绪分 NaN/高连0/环比-80.33失真(板块口径183混算)。修法：失败告警+继承真值、
+      total 归位家数、prev_total 同口径(36/36→0.0%)、calc 类型防御、前端 _numOrNull 防御、
+      删死代码 _fillSentimentCycle + 实时数据页孤儿注释残留。
+      ②新增 f_cffex_position()：中金所前20会员IF净空比z(逆向择时)，历史增量回补(37样本)，
+      盘后数据页新卡(10-14 nlr=6.03% z=-0.84 中性)。
+      ③AI速览加「参与条件」行(✓顺势/○半仓试探/✗观望 三条件计数)。
+    verify_how: |
+      Pages 硬抓 data/SENTIMENT_CYCLE.js phase=高潮 delta_pct=0.0 prev_total=36；
+      data/CFFEX_POSITION.js nlr_z=-0.84 sample=37；commit 76f66662 九文件逐字节自验。
+    verified_at: "2026-10-15 16:15 硬抓 Pages 确认"
+    updated: "2026-10-15 16:15"
+    updated_by: 小九(lemoncat-cn)
