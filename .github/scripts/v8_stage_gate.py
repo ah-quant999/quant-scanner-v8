@@ -47,7 +47,7 @@
   A 采集批：13 项中 ≥11 项鲜活（老 10 项容错保留 6 项 + 新增 3 项）+ **龙虎榜 / lhb_data / ETF_NET_SUBSCRIPTION must 必新** ← 以 READY_SPEC["A"] 为唯一真源
            ⚠️ 2026-09-14 00:1x P0 修正：原扩至「19 项 / ≥13 / must 含 AVG_PRICE_DATA」，其中 7 项在仓库中**并不存在**（TDX_BACKTEST 真名 BACKTEST_TDX 且属 E 批；AVG_PRICE 真名 AVG_PRICE_DATA；ETF_SUBSCRIPTION 系旧口径已下线；etf_subscription/avg_price/etf_spot/zsxq_posts 从未存在）⇒ read_ut() 返 None ⇒ must 恒不满足 ⇒ **A 批永久锁死且不报错**。已收敛为 13/11/3。
            🔴 `AVG_PRICE_DATA` 现为**非 must**：cloud_fetch_v8 的 post_close 档不写其时戳（仅 intraday 写）⇒ 放回 must 会立即复现锁死；须待「方案乙」落地后方可考虑加回。
-  B 选股批：10 项产物中 ≥6 项鲜活 + 四量终极（must）必新  ← 以 READY_SPEC["B"] 为唯一真源
+  B 选股批：11 项产物中 ≥6 项鲜活 + 四量终极（must）必新  ← 以 READY_SPEC["B"] 为唯一真源
            🔴 2026-10-11 主人令「完全下架」对齐：items 12→10（两下架策略移出）、need 8→6
               （保持「容忍 4 项不新鲜」语义不变）、must 3→1（唯余 B 批必产核心卡）。
   D 汇总批：最终推荐                              → 1/1
@@ -265,6 +265,15 @@ READY_SPEC: dict[str, dict] = {
             #   ✅ 不变式：已同步纳入 dedup_fetch_manifest.py::_ALWAYS_PUSH。
             "data/FOUR_VOLUME_HISTORY.js",
             "data/FOUR_VOLUME_TRACK.js",
+            # 🛡 2026-10-16 阿狸咪的工程师（LQSQ 发布链断裂根因修复配套·双盲区 I-1 不变式）：
+            #   gen_lqsq_top5.py（STAGES["B"]）产 raw_data/lqsq_track.json → update_v8 映射
+            #   （本日补登记 lqsq_track.json→LQSQ_TRACK）→ data/LQSQ_TRACK.js；
+            #   v8_health_check.py CARD_DEFS 同日补登记 LQSQ_TRACK（picking=True）
+            #   ⇒ 依 I-1 不变式必须进本闸门，否则该卡陈旧不阻塞就绪 = 闸门空转盲区
+            #   （与 09-18 四量两产物同型，本轮由 guard_double_blind.py 机器发现）。
+            #   ✅ 可达性：与四量同批同源（B 批盘后算法链直出，CATEGORY_MAP=post_close）。
+            #   ✅ 不变式：已同步纳入 dedup_fetch_manifest.py::_ALWAYS_PUSH（见该文件）。
+            "data/LQSQ_TRACK.js",
         ],
         # 🔴 2026-10-11 主人令「完全下架」：items 12→10（TRIPLE/CRDS_CARD_DATA 移出），
         #   need 8→6 —— 保持「容忍 4 项不新鲜」语义不变（10-4=6）。

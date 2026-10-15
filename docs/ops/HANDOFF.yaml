@@ -8645,6 +8645,8 @@ items:
     updated: "2026-10-15 22:05"
     updated_by: 阿狸咪(alimi-cn)
   - id: backtest-caliber-audit-replay-violation-1015
+    owner: 阿狸咪的工程师
+    priority: P0
     status: blocked
     created: 2026-10-15
     title: 全站回测口径审计实锤——四量终极主榜仍跑历史回放（违反 10-11 令），真实流视图被 update_v8 映射缺口挡住；修复待主人裁定
@@ -8712,7 +8714,7 @@ items:
       ⑤ index.html L4899-4949 __STAR_PROFILE_OF（'四量终极':'long' 登记在册）+
         L6368 _PAGE 主榜 3 卡 ⇒ 回放数据确实驱动主榜星级。
     verified_at: "2026-10-15 23:45 线上 Pages 双文件硬抓+本地三文件+前端登记表五重自证（审计结论已验证；修复未动，等裁定）"
-    updated: "2026-10-15 23:45"
+    updated: "2026-10-16 05:59"
     updated_by: 阿狸咪(alimi-cn)
   - id: future-logic-if-cffex-1016
     owner: 阿狸咪(alimi-cn)

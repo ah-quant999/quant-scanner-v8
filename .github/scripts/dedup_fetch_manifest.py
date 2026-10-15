@@ -111,6 +111,12 @@ _ALWAYS_PUSH = {
     #   同受「READY_SPEC items ⊆ _ALWAYS_PUSH」不变式约束。
     "data/FOUR_VOLUME_HISTORY.js",    # READY_SPEC["B"].items
     "data/FOUR_VOLUME_TRACK.js",      # READY_SPEC["B"].items
+    # 🛡 2026-10-16 阿狸咪的工程师（LQSQ 发布链断裂根因修复配套·I-2 不变式）：
+    #   READY_SPEC["B"].items 本日新增 data/LQSQ_TRACK.js（guard_double_blind I-1 要求），
+    #   依「items ∪ must ⊆ _ALWAYS_PUSH」零特例不变式必须同步纳入：信号日无新增 Top5 时
+    #   该文件剥时间戳后内容逐字节稳定 ⇒ 不进白名单必被判「伪变更」丢弃 ⇒ update_time
+    #   恒旧 ⇒ 既占 B 批容错名额又让卡片停更（与 FINAL_RECOMMEND_BACKTEST 同病同防）。
+    "data/LQSQ_TRACK.js",             # READY_SPEC["B"].items（2026-10-16 新增）
     # 🛡 2026-09-13 一劳永逸（小九周末审计 P2 采纳 · 主人令「按你顺序都做」）：
     #   **READY_SPEC[*] 的 items 与 must 全部纳入**（零特例，机器可断言）。
     #   原不变式只覆盖 must，但 items 同样参与 need 的命中计数 ⇒ 任一项被本去重器判
