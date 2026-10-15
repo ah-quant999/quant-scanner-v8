@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "d4ed071411";   // 部署 commit 短 SHA（= 当前 main tip；v8 部署走 Git Data API 直推 main，跳过 v8_build_deploy.yml 的构建期 BUILD 替换，故此处手动对齐真实 tip，确保运维页「部署 SHA」与版本戳强缓存破坏机制真实生效）
+    var BUILD = "8f674654a4";   // 部署 commit 短 SHA（= 当前 main tip；v8 部署走 Git Data API 直推 main，跳过 v8_build_deploy.yml 的构建期 BUILD 替换，故此处手动对齐真实 tip，确保运维页「部署 SHA」与版本戳强缓存破坏机制真实生效）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -622,7 +622,7 @@ window.__domReadyFns=[];
     <script src="data/DO_NOT_DELETE.js?v=af03476f1b" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=9039f231b0" defer></script>
-    <script src="data/GOLD_POOL.js?v=cdee1ee312" defer></script>
+    <script src="data/GOLD_POOL.js?v=b194de43c5" defer></script>
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_PROFILE 不再单独下载（1.4MB 与 STOCK_LIST 100% 重复），由 STOCK_LIST 合成 -->
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
@@ -632,7 +632,7 @@ window.__domReadyFns=[];
     <script src="data/MACRO_BRIEF.js?v=d1d767ab78" defer></script>
     <!-- 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役（巡检自动化已消亡、09-23 后死数据；生产者/渲染/派发/时窗一并清理，见 git 历史） -->
     <script src="data/NT_DATA.js?v=4ad24b6d92" defer></script>
-<script src="data/LHB_DATA.js?v=568ca0bf38" defer></script>
+<script src="data/LHB_DATA.js?v=fa4dabdb3d" defer></script>
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
@@ -642,7 +642,7 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=63d3ecac66" defer></script>
 <script src="data/MARGIN_DATA.js?v=2bb103eed9" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=d7e92db1aa" defer></script>
-<script src="data/IPO_DATA.js?v=07d5be304e" defer></script>
+<script src="data/IPO_DATA.js?v=53f38469a5" defer></script>
     <script src="data/CRISIS_DATA.js?v=2b9bc71909" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=b994e91ca7" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=3067574274" defer></script>
@@ -682,7 +682,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=580a6808a5" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=fff0b49461" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=4e9c7fbd6e" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1746,7 +1746,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WAVE_ELLIOTT.js?v=a8cab8e91b" defer></script>
 <script src="data/SZ_FIB.js?v=008c81bace" defer></script>
 <script src="data/SECTOR_RS.js?v=e9bf3715ad" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=ca8b5528f8" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=00187f0f12" defer></script>
 <script src="data/INST_TRADE.js?v=7fa4664bbc" defer></script>
 <script src="data/NORTH_FUND.js?v=011a0aebcc" defer></script>
 <script src="data/MARKET_ALERTS.js?v=57a545bbf7" defer></script>
@@ -1776,9 +1776,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=c6743b3df0" defer></script>
 <script src="data/EXPERIMENT.js?v=50485d971e" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=c7fbe99f06" defer></script><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=24294161a8" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=356f54e99c" defer></script><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=24617e54e6" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=32c1d2f464" defer></script>
+<script src="data/V8_POOL_TRACKER.js?v=c31d617a8e" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=ec62d17cba" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=6431873d39" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
@@ -1791,7 +1791,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 🔴 2026-10-06 阿狸咪的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
 <script src="data/ETF_PULSE.js?v=7c1f1924a0" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=a90aa0395b" defer></script>
-<script src="data/TOP10_DAILY.js?v=af474a879d" defer></script>
+<script src="data/TOP10_DAILY.js?v=7cf3b492b4" defer></script>
 <script src="data/WEEKEND_RUN.js?v=37faf49283" defer></script>
 <script src="data/W52_HIGH.js?v=4c836035f6" defer></script>
 <!-- 2026-08-30：盘后数据页新增解禁日历 + 业绩预告 -->
@@ -1800,11 +1800,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CFFEX_POSITION.js?v=4cce16f5bf" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=ad15aa8d85" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=bc615c44f0" defer></script>
+<script src="data/RUNNER_STATUS.js?v=b7fd5f70db" defer></script>
 <script src="data/HB_XIAOJIU.js?v=401f7c260f" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=8b3d991238" defer></script>
-<script src="data/HEALTH_CHECK.js?v=b6ea968413" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=a624648600" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=910d67d251" defer></script>
+<script src="data/HEALTH_CHECK.js?v=e7448e0750" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=8ee7d396b6" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=cbbb99819f" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=145d966e82" defer></script>
@@ -1818,14 +1818,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=4b25866ad8" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=e08142a858" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=d9a8fb8f0e" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=7066fe69f6" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=97d9be4ff0" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=fcc65f77a0" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=b6bab41131" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=f2708467f9" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=af66d07fb5" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/FOUR_VOLUME_BACKTEST.js?v=ed92fb68ad" defer></script>
-    <script src="data/IMA_STRONG_BACKTEST.js?v=c408199d2e" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/FOUR_VOLUME_BACKTEST.js?v=6773c57377" defer></script>
+    <script src="data/IMA_STRONG_BACKTEST.js?v=498306784d" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🆕 2026-10-12 小九：量质双擎（LQSQ · 第一支自研算法）前端接入 —— 后端数据链 10-11 已跑，
          但前端此前**零挂载**（注入/卡片/子页全缺）⇒ 主站无处显示（主人「我半天没看到在哪显示」）。
          本次补齐：
@@ -5336,8 +5336,11 @@ c.innerHTML = h;
     /* 🆕 2026-10-12 小九：第一支自研算法「量质双擎」(LQSQ) —— 真实信号流口径直上主榜，
        与四量同榜同纪律（gen_lqsq_top5.py → LQSQ_BACKTEST，summary.by_period 与四量同构，
        故 _renderPeriodBacktestCard 零结构改动直接复用）。样本自 10-09 起累积、未走满 T+20
-       不计入 ⇒ 首期卡头走「累积中」，成熟一档进一档。 */
-    {key:'lqsq',    name:'量质双擎',   icon:'⚖️', desc:'第一支自研算法 · 异常量比缩量选强 Top5 · 次开买入持有 20 日 · 样本自 10-09 累积中，仅显示成熟档', color:'#22c55e', var:'LQSQ_BACKTEST'},
+       不计入 ⇒ 首期卡头走「累积中」，成熟一档进一档。
+       🆕 2026-10-15 主人令「这个回测算到哪要写出来」：登记 fullLadder=[1,3,5,10,20] ——
+       产物里还没样本的持有档（T+5/10/20）也上屏，明示「未满持有期」+ 累积进度/预计成熟日，
+       不再让用户对着一张空表猜「算到哪」。 */
+    {key:'lqsq',    name:'量质双擎',   icon:'⚖️', desc:'第一支自研算法 · 异常量比缩量选强 Top5 · 次开买入持有 20 日 · 样本自 10-09 累积中，未满持有期档位明确标注', color:'#22c55e', var:'LQSQ_BACKTEST', fullLadder:[1,3,5,10,20]},
     /* 🆕 2026-09-16 主人令「生命周期三个算法里明显高手的更好 ⇒ 改为强势跟踪」：
        原「高手强势股跟踪」升为本页正式策略卡，名称统一为「强势跟踪」。
        数据源 window.IMA_STRONG_BACKTEST（真实日K · 已扣双边 0.30%），
@@ -5410,8 +5413,11 @@ c.innerHTML = h;
       var _v = (typeof m.var === 'function') ? m.var() : window[m.var];
       var _bd = (typeof _v === 'function') ? _v() : _v;
       /* 🔴 2026-10-01 主人令：传 _score（真源 rt.ready 的实算分）给卡头星徽章——
-         不传整个 _rt，避免改变 _renderPeriodBacktestCard 的卡头身份标签分支。 */
+         不传整个 _rt，避免改变 _renderPeriodBacktestCard 的卡头身份标签分支。
+         🆕 2026-10-15 主人令「回测算到哪要写出来」：透传 fullLadder（完整持有档梯），
+         让未成熟档也上屏明示（见 _renderPeriodBacktestCard 内 periods 合并逻辑）。 */
       h += _rpc({key:m.key, name:m.name, stars:m.stars, icon:m.icon, desc:m.desc, color:m.color,
+                 fullLadder:m.fullLadder,
                  _score:(m._rt && m._rt.ready) ? m._rt.score : null}, _bd);
     });
     return h;
@@ -5530,6 +5536,21 @@ c.innerHTML = h;
   }
   if(typeof window !== 'undefined') window._holdLadder = _holdLadder;
 
+  /* 🆕 2026-10-15 主人令「这个回测算到哪要写出来」：持有档首批成熟日估算。
+     输入：最早信号日（track_start）+ 持有交易日数 p；输出：约成熟日期字符串。
+     近似口径：1 交易日 ≈ 7/5 自然日（A 股每周 5 交易日）⇒ p*7/5 个自然日，
+     结果一律以「约」字标注（粗估，不承诺精确到日；真实成熟以逐票 returns 落数为准）。
+     例：10-09 + T+20 ⇒ 约 11-06。解析失败返回 '—'，绝不编造日期。 */
+  function _matureEta(startStr, p){
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(startStr || '');
+    if(!m || !(p > 0)) return '—';
+    var d = new Date(Date.UTC(+m[1], +m[2]-1, +m[3]));
+    d.setUTCDate(d.getUTCDate() + Math.ceil(p * 7 / 5));
+    function _z(n){ return (n < 10 ? '0' : '') + n; }
+    return d.getUTCFullYear() + '-' + _z(d.getUTCMonth()+1) + '-' + _z(d.getUTCDate());
+  }
+  if(typeof window !== 'undefined') window._matureEta = _matureEta;
+
   function _btStars(n){
     if(n>=5) return '⭐⭐⭐⭐⭐';
     if(n>=4) return '⭐⭐⭐⭐';
@@ -5539,6 +5560,21 @@ c.innerHTML = h;
     return '—';
   }
   function _renderPeriodBacktestCard(meta, data){
+    /* 🛡 2026-10-15 根因修复（主人截图「暂无历史回测信号」实证）：不同算法产物的
+       「总量/时间/方法」字段层级不一致 —— 四量 FOUR_VOLUME_BACKTEST 放在 summary 内，
+       而量质双擎 LQSQ_BACKTEST 放在**根级**（total_signals/update_time/method/track_start/
+       signal_date_range）。10-12 接入 LQSQ 时只核对了 by_period 同构，没核对总量字段层级
+       ⇒ 渲染器只读 data.summary.* ⇒ LQSQ 卡 total_signals 恒为 undefined
+       ⇒ `data.summary.total_signals > 0` 恒 false ⇒ 永远走 else 显示「暂无历史回测信号」
+       （与浏览器缓存无关，是真实结构缺陷）。
+       现统一归一：根级字段回填进 summary 视图 _S，两种产物结构都能正确渲染（一劳永逸）。 */
+    var _d = data || {};
+    var _S = {};
+    if(_d.summary && typeof _d.summary === 'object'){ for(var _k in _d.summary){ _S[_k] = _d.summary[_k]; } }
+    if(_S.total_signals == null && _d.total_signals != null) _S.total_signals = _d.total_signals;
+    if(_S.update_time == null && _d.update_time != null) _S.update_time = _d.update_time;
+    if(_S.method == null && _d.method != null) _S.method = _d.method;
+    if(_S.by_period == null && _d.by_period != null) _S.by_period = _d.by_period;
     var html = '<div style="margin:14px 0;border-left:4px solid '+meta.color+';" class="card">';
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
     html += '<span style="font-size:15px;font-weight:700;color:'+meta.color+';">'+meta.icon+' '+meta.name+'</span>';
@@ -5580,15 +5616,22 @@ c.innerHTML = h;
         + '</span>';
     }
     html += _starBadge;
-    var totalS = (data && data.summary && data.summary.total_signals) || 0;
+    var totalS = _S.total_signals || 0;
     var lowSample = totalS > 0 && totalS < 30;
     if(lowSample){
       html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(239,83,80,.12);color:#ef5350;border:1px solid rgba(239,83,80,.35);margin-left:4px;">[样本不足 n<'+totalS+']</span>';
     }
     html += '</div>';
-    var bp = data && data.summary && data.summary.by_period;
-    if(bp && data.summary.total_signals > 0){
+    var bp = _S.by_period;
+    if(bp && _S.total_signals > 0){
       var periods = window._holdLadder ? window._holdLadder(bp) : [1,3,5,10,20];
+      /* 🆕 2026-10-15 主人令「这个回测算到哪要写出来」：卡配置登记了 fullLadder
+         （如量质双擎 [1,3,5,10,20]）时，把产物里还没样本的持有档也并入上屏 ——
+         每行明示「未满持有期/不计入」，让「算到哪」一眼可见，而不是只显示已有档。 */
+      if(meta && meta.fullLadder && meta.fullLadder.length){
+        meta.fullLadder.forEach(function(p){ if(periods.indexOf(p) < 0) periods.push(p); });
+        periods.sort(function(a,b){ return a - b; });
+      }
       html += '<div style="overflow-x:auto;overflow-y:hidden;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
       html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
       html += '<th style="padding:6px;text-align:left;color:var(--sub);">持有期</th>';
@@ -5601,10 +5644,12 @@ c.innerHTML = h;
       periods.forEach(function(p){
         var r = bp[String(p)] || {};
         var wr = r.win_rate, ar = r.avg_return, br = r.best_return, wst = r.worst_return;
-        var rowDim = (lowSample || (r.samples||0) < 30) ? ';opacity:.55;background:rgba(148,163,184,.04);' : '';
+        var _n0 = (r.samples || 0);
+        var rowDim = (lowSample || _n0 < 30) ? ';opacity:.55;background:rgba(148,163,184,.04);' : '';
         html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+rowDim+'">';
-        html += '<td style="padding:6px;color:var(--txt);font-weight:700;">T+'+p+'天</td>';
-        html += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(r.samples||0)+'</td>';
+        html += '<td style="padding:6px;color:var(--txt);font-weight:700;"'+(_n0===0?' title="该持有档样本尚未走满持有期，按真实信号流纪律不计入回测"':'')+'>T+'+p+'天</td>';
+        /* 🆕 2026-10-15 主人令：0 样本不再画成光秃秃的「0」——明示「未满持有期」 */
+        html += '<td style="padding:6px;text-align:right;'+(_n0===0?'color:var(--dim);font-style:italic;':'color:var(--sub);')+'">'+(_n0===0?'未满持有期':_n0)+'</td>';
         html += '<td style="padding:6px;text-align:right;font-weight:700;color:'+_colorWR(wr)+';">'+(wr!=null?wr.toFixed(1):'—')+'%</td>';
         html += '<td style="padding:6px;text-align:right;color:'+_colorPL(ar)+';">'+(ar!=null?(ar>0?'+':'')+ar.toFixed(2):'—')+'%</td>';
         html += '<td style="padding:6px;text-align:right;color:var(--up);">'+(br!=null?br.toFixed(2):'—')+'%</td>';
@@ -5612,11 +5657,32 @@ c.innerHTML = h;
         html += '</tr>';
       });
       html += '</tbody></table></div>';
-      var method = (data.summary.method||'').replace(/</g,'&lt;');
+      var method = (_S.method||'').replace(/</g,'&lt;');
       if(method.length > 70) method = method.substring(0,70)+'…';
-      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">方法：'+method+' · 数据 '+(data.summary.update_time||'').substring(0,16)+' · 信号数 '+(data.summary.total_signals||0)+(lowSample?' <span style="color:#ef5350;font-weight:700;">[样本<30，仅观测，不参与排名]</span>':'')+'</div>';
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">方法：'+method+' · 数据 '+(_S.update_time||'').substring(0,16)+' · 信号数 '+(_S.total_signals||0)+(lowSample?' <span style="color:#ef5350;font-weight:700;">[样本<30，仅观测，不参与排名]</span>':'')+'</div>';
+      /* 🆕 2026-10-15 主人令「这个回测算到哪要写出来」：存在未满持有期的档位时，
+         输出累积进度总账 —— 信号总量 + 信号日期区间 + 每个未成熟档的首批成熟预计日，
+         口径写死「未满期不计入 · 真实信号流纪律」，杜绝用户对空表猜进度。 */
+      var _zeroPs = periods.filter(function(p){ return !((bp[String(p)]||{}).samples > 0); });
+      if(_zeroPs.length){
+        var _start = _d.track_start || (_d.signal_date_range||'').split('~')[0].trim() || (_S.update_time||'').substring(0,10);
+        var _etaTxt = _zeroPs.map(function(p){ return 'T+'+p+' 约 '+_matureEta(_start, p); }).join(' · ');
+        html += '<div style="font-size:11px;color:var(--dim);margin-top:4px;line-height:1.6;">📦 累积进度：共 <b style="color:var(--txt);">'+(_S.total_signals||0)+'</b> 个信号'
+          + (_d.signal_date_range ? '（'+_esc(_d.signal_date_range)+'）' : '')
+          + '；' + _etaTxt + ' 起出成熟档（按最早信号日 + 持有交易日估算；未满持有期不计入 · 真实信号流纪律）</div>';
+      }
     } else {
-      html += '<div class="note">暂无历史回测信号</div>';
+      /* 🆕 2026-10-15 主人令：连一档都没成熟时也不要说「暂无」就完事 ——
+         有累积信号就写出「累积到哪了」；确实 0 信号才显示暂无。 */
+      var _tot = _S.total_signals || 0;
+      var _rng = _d.signal_date_range || _S.signal_date_range || '';
+      if(_tot > 0){
+        html += '<div class="note" style="line-height:1.7;text-align:left;">📦 信号累积中：<b style="color:var(--txt);">'+_tot+'</b> 个'
+          + (_rng ? '（'+_esc(_rng)+'）' : '')
+          + '<br><span style="font-size:11px;color:var(--dim);">全部信号尚未走满任一持有档 ⇒ 暂无成熟回测档；样本每日盘后累积，走满一档进一档（真实信号流纪律：未满持有期不计入）。</span></div>';
+      } else {
+        html += '<div class="note">暂无历史回测信号</div>';
+      }
     }
     html += '</div>';
     return html;
@@ -10301,11 +10367,11 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=07d5be304e"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=53f38469a5"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=07d5be304e';
+        return 'data/IPO_DATA.js?v=53f38469a5';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
@@ -15243,7 +15309,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=7066fe69f6');
+      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=b6bab41131');
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -15252,7 +15318,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=97d9be4ff0');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=f2708467f9');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -18325,7 +18391,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=463a8d3d3f', fallbacks:[A2_CDN+'STOCK_LIST.js']},
     {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=594838e55d', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
-    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=51c013fff9', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
+    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=435a5c32c1', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
     var srcs=[item.url].concat(item.fallbacks||[]);
