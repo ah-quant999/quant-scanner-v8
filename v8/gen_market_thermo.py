@@ -107,6 +107,24 @@ def build_D():
 
     cur = eq_m.iloc[-1]
     cur_val10 = val10[-1]
+    # ── 日频温度 val10_d：实时上证 vs 滚动120月上证收盘分位 ──
+    #   动机：月度 val10 仅月末变，曾让用户误以为「未来预测」两张卡“死”。
+    #   页面“当前”温度改读 val10_d → 随每日行情滚动；抓取失败则回退月度值（宁旧勿错）。
+    val10_d = cur_val10
+    try:
+        import urllib.request as _ur
+        _req = _ur.Request("https://qt.gtimg.cn/q=sh000001", headers=UA)
+        _txt = _ur.urlopen(_req, timeout=15).read().decode("gbk", "replace")
+        _seg = [s for s in _txt.split(";") if s.strip().startswith("v_sh000001=")]
+        if _seg:
+            _f = _seg[0].split('="')[1].split("~")
+            _live = float(_f[3]) if len(_f) > 3 else None
+            _hist = [x for x in sh if x]
+            if _live is not None and len(_hist) >= 60:
+                _win = _hist[-120:]
+                val10_d = round(float(sum(1 for x in _win if x <= _live) / len(_win)) * 100, 1)
+    except Exception:
+        pass
     fwd12 = eq_m / eq_m.shift(12) - 1
     cur_dd = round(float(fwd12.iloc[-1]) * -100, 1) if not pd.isna(fwd12.iloc[-1]) else None
 
@@ -120,6 +138,7 @@ def build_D():
             "date": dates[-1],
             "eq": round(float(cur), 2),
             "val10": round(cur_val10) if cur_val10 is not None else None,
+            "val10_d": val10_d,
             "drawdown": cur_dd,
             "margin_yoy": margin_yoy,
             "pe": round(float(pe.iloc[-1]), 1) if pe.iloc[-1] is not None and not pd.isna(pe.iloc[-1]) else None,

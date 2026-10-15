@@ -17031,7 +17031,7 @@ h+=`</div>`;
     var lvlTag={green:'&#x1F7E2; 正常',yellow:'&#x1F7E1; 警惕',red:'&#x1F534; 警示',muted:'&#x26AA; 待接入'};
     var lvlCol={green:C_GRN,yellow:C_AMB,red:C_RED,muted:C_DIM};
     var obs=[
-      {name:'全市场PE·10年分位',val:(c.val10!=null?c.val10:'—'),thr:'&gt;80 贵 / &lt;50 便宜',lvl:(c.val10==null?'muted':(c.val10>=80?'red':(c.val10<50?'green':'yellow'))),hist:'27年最高 '+vMax+' / 最低 '+vMin+'；三轮大顶(07/15/21)：'+vTops.join(' / ')},
+      {name:'全市场PE·10年分位',val:(c.val10!=null?c.val10:'—')+(c.date?' (月末 '+c.date+')':''),thr:'&gt;80 贵 / &lt;50 便宜',lvl:(c.val10==null?'muted':(c.val10>=80?'red':(c.val10<50?'green':'yellow'))),hist:'27年最高 '+vMax+' / 最低 '+vMin+'；三轮大顶(07/15/21)：'+vTops.join(' / ')},
       {name:'距牛市峰值回撤(EDHEC)',val:edhecDD.toFixed(1)+'%',thr:'≤-20% 确认熊市',lvl:(edhecDD<=-20?'red':(edhecDD<=-10?'yellow':'green')),hist:'当前='+(bst==='bear'?'熊市段':'牛市上行')+'；历史熊市最深 '+(worstDD==null?'—':worstDD.toFixed(0)+'%')},
       {name:'等权/上证 12M 背离',val:(ex12*100).toFixed(1)+'%',thr:'持续为负=赚指数不赚钱',lvl:(ex12<-0.10?'red':(ex12<0?'yellow':'green')),hist:'三轮大顶时：'+exTops.map(function(x){return x.toFixed(0)+'%';}).join(' / ')+'——大顶时未必为负，仅作辅助信号不单独判顶'},
       {name:'上证 vs 自身200月线',val:((D.sh[n-1]-shMA)>=0?'线上 +':'线下 ')+shMaPct.toFixed(1)+'%',thr:'跌破=长期转熊',lvl:((D.sh[n-1]-shMA)>=0?'green':'red'),hist:'历史最深偏离 '+(maMinDev==null?'—':maMinDev.toFixed(0)+'%')},
@@ -17057,6 +17057,7 @@ h+=`</div>`;
     // ── 图② ──
     html+='<div style="font-size:14px;font-weight:800;color:'+C_AMB+';margin:12px 0 6px;">&#x2461; 10年PE分位（&gt;80 贵 / &lt;50 便宜）</div>';
     html+='<div id="futureC2" style="height:260px;"></div>';
+    html+='<div style="font-size:11px;color:var(--dim);margin:6px 0 0;line-height:1.7;">📡 实时：上证 '+(SPOT.sh||'—')+' / 沪深300 '+(SPOT.hs300||'—')+' · 数据更新于 '+T.generated+'（每日刷新）<br>📅 两图为月度序列（右端每月末追加新点）；日频温度与实时点位每日滚动，故卡面“当前”值每天都在变，并非卡死。</div>';
     // ── 2027 情景 ──
     function tgt(v,r){ return Math.round(v*(1+r/100)); }
     var scn=[{name:'牛市',p:25,r:[15,22],col:C_GRN,drv:'强财政货币延续 + 居民资金入市 + 估值扩张 + 盈利兑现'},
@@ -17095,7 +17096,8 @@ h+=`</div>`;
           markPoint:{silent:true,symbol:'circle',symbolSize:0.1,
             label:{show:true,fontSize:12,fontWeight:700,textBorderColor:'#14181e',textBorderWidth:3},
             data:[{coord:['2007-10',6124.04],itemStyle:{color:'transparent'},label:{color:C_RED,position:'top',distance:10,formatter:'6124'}},
-                  {coord:['2024-02',2635.09],itemStyle:{color:'transparent'},label:{color:C_GRN,position:'right',distance:8,formatter:'2635'}}]}},
+                  {coord:['2024-02',2635.09],itemStyle:{color:'transparent'},label:{color:C_GRN,position:'right',distance:8,formatter:'2635'}},
+                  {coord:[D.dates[D.dates.length-1],(SPOT.sh||D.sh[D.sh.length-1])],itemStyle:{color:'transparent'},label:{color:C_BLU,position:'right',distance:8,fontWeight:700,formatter:'今 '+(SPOT.sh||D.sh[D.sh.length-1])}}]}},
         {name:'等权指数',type:'line',data:D.eq,showSymbol:false,lineStyle:{width:1.2,color:'rgba(96,165,250,0.7)'},areaStyle:{color:'rgba(96,165,250,0.05)'}},
         {name:'200MA',type:'line',data:D.ma200,showSymbol:false,lineStyle:{width:1,color:'#8b93a1',type:'dashed'}}
       ]
@@ -17112,8 +17114,9 @@ h+=`</div>`;
       if(isMin&&v2<=20) ext2.push({coord:[D.dates[i2],v2],symbol:'circle',symbolSize:0.1,itemStyle:{color:'transparent'},
         label:{show:true,formatter:D.dates[i2].slice(2,7)+'·'+v2,fontSize:10,fontWeight:700,color:C_GRN,textBorderColor:'#14181e',textBorderWidth:3,position:'top',distance:6}});
     }
-    ext2.push({coord:[D.dates[D.dates.length-1],c.val10],symbol:'circle',symbolSize:0.1,itemStyle:{color:'transparent'},
-      label:{show:true,formatter:'当前 '+c.val10,fontSize:11,fontWeight:700,color:C_PUR,textBorderColor:'#14181e',textBorderWidth:3,position:'right',distance:6}});
+    var _curV = (c.val10_d!=null?c.val10_d:c.val10);
+    ext2.push({coord:[D.dates[D.dates.length-1],_curV],symbol:'circle',symbolSize:0.1,itemStyle:{color:'transparent'},
+      label:{show:true,formatter:'当前 '+_curV+(c.val10_d!=null?' (日频)':''),fontSize:11,fontWeight:700,color:C_PUR,textBorderColor:'#14181e',textBorderWidth:3,position:'right',distance:6}});
     c2.setOption({
       backgroundColor:'transparent', tooltip:TIP,
       grid:{left:44,right:56,top:24,bottom:36},
