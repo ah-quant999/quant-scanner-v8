@@ -8600,3 +8600,47 @@ items:
     verified_at: "2026-10-15 21:57 推送即自验"
     updated: "2026-10-15 21:57"
     updated_by: 小九(lemoncat-cn)
+  - id: build-retry-mixedreset-freshness-guard-1015
+    owner: 阿狸咪(alimi-cn)·已完成待小九知悉
+    priority: P1
+    status: done
+    created: 2026-10-15
+    title: 部署重试soft→mixed reset根治静默回退+新鲜度守卫摘4个下架变量（均含实证与回滚说明）
+    note: >
+      ① v8_build_deploy.yml 内层推送重试 git reset --soft→git reset（mixed）。soft 只搬 HEAD、
+      索引仍是 run 启动快照 ⇒ run 期间远端直推的、未列入 add 清单的文件（脚本/工作流/文档）
+      会被构建 commit 静默整文件回退。实证：83cd5ce92e（21:29 直推 guard_v8_freshness.py）
+      被 21:31「v8 build (fast-forward retry #1)」回退；与 10-09 WAVE_ELLIOTT 族同病，
+      但当时只护了 3+4 个 data 文件，脚本/工作流在裸奔。mixed reset 后 HEAD 与索引一并对齐
+      tip ⇒ 提交=tip+构建产物、非构建路径零回退；HEAD 仍为 tip 直接子提交 ⇒ push 仍纯快进、
+      仍不 force（10-09 二次根治的竞态修复语义全部保留）。
+      ② guard_v8_freshness.py：10-11 主人令「完全下架」三重共识/CRDS 时只清了 ALGO_VARS，
+      漏清 WARN_SOURCES×3（TRIPLE_CONSENSUS/TRIPLE_TRACK/TRIPLE_HISTORY）+ CORE_SOURCES_ALGO×1
+      （CRDS_CARD_DATA）⇒ 每轮巡检恒报 1 红 3 黄「文件缺失」假警报（10-15 实证 core_stale=
+      [CRDS_CARD_DATA]、warn_stale=[TRIPLE×3]，无一真信号被掩埋，纯稀释信噪比）。按 09-16
+      ANALYST_RATINGS / 09-15 LHB_7D 同族 pattern 摘除（注释+回滚说明），受检模块 43→39。
+      注意：guard 有 08-18 幂等机制（状态不变不重写）⇒ 修复后状态首次变化时 patrol 才会推送
+      新 freshness_status.json（≤30min），再经 update_v8 转成 FRESHNESS_STATUS.js 后面板转绿。
+      ③ 关联（同晚已上线）：量质双擎回测卡根因修复 6b94aea52e —— LQSQ_BACKTEST 的
+      total_signals/update_time 等在根级而渲染器只读 data.summary.*，致恒显「暂无历史回测
+      信号」；已做结构归一回填+fullLadder 未成熟档上屏+「累积进度/预计成熟日」明示
+      （75 信号·10-09~10-15·T+1 成熟 70/T+3 成熟 60/T+5 约 10-16、T+10 约 10-23、T+20 约 11-06）。
+    fix: >-
+      （a）v8_build_deploy.yml L588：git reset --soft FETCH_HEAD → git reset FETCH_HEAD（mixed），
+          并在上方补 🔴 注释记录实证与语义保持论证；外层循环既有 reset --hard 不动。
+      （b）guard_v8_freshness.py：WARN_SOURCES 3 条与 CORE_SOURCES_ALGO 1 条按仓内退役
+          pattern 注释化（保留回滚指引），AST+py_compile 双重自证。
+      （c）两文件以 Git Data API 原子双文件提交（92138d4ef2，parent=当时 tip）防 straddle；
+          另取消旧工作流在途 run 10329（其 soft reset 会二次回退），由 10330（新工作流·
+          head=92138d4ef2）承接部署。
+    verify_how: |
+      ① git show origin/main:.github/workflows/v8_build_deploy.yml | grep -n "git reset"
+        ⇒ 381/652 为 --hard（外层），588 为 mixed（本期）；无 --soft 命令行。
+      ② 远端 guard AST 复验：4 个下架变量在四张 SLA 表 0 命中；py_compile 通过；
+         sha256 与本地逐字节一致（8d513616…）。
+      ③ 粘滞自证：92138d4ef2 之后 origin/main 无任何构建提交改动这两个文件；
+         线上 Pages 硬抓 index.html 含「累积进度×3/未满持有期×8/fullLadder×7」，
+         BUILD=0aa1af62b6（21:06 链构建，我的功能改动被完整保留）。
+    verified_at: "2026-10-15 22:05 远端 AST/py_compile/git log/Pages 硬抓四重自证"
+    updated: "2026-10-15 22:05"
+    updated_by: 阿狸咪(alimi-cn)
