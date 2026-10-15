@@ -1,6 +1,6 @@
 {
-  "check_time": "2026-10-14 15:42:42",
-  "last_trade_close": "2026-10-14 15:30:00",
+  "check_time": "2026-10-15 16:37:54",
+  "last_trade_close": "2026-10-15 15:30:00",
   "is_trading_day": true,
   "core_stale": [
     {
@@ -41,6 +41,7 @@
     "NT_DATA": "premarket",
     "MARGIN_DATA": "premarket,post_close",
     "CFFEX_HOLDINGS": "intraday,post_close",
+    "CFFEX_POSITION": "post_close",
     "MACRO_DATA": "premarket,post_close",
     "CRISIS_DATA": "premarket,intraday",
     "NORTH_FUND": "premarket,post_close",
@@ -73,10 +74,11 @@
     "SECTOR_FUND_FLOW_TREND": "post_close",
     "GOLD_POOL": "post_close",
     "CANDIDATE": "post_close",
+    "TRIPLE_CONSENSUS": "post_close",
+    "TRIPLE_TRACK": "post_close",
+    "TRIPLE_HISTORY": "post_close",
     "FOUR_VOLUME_HISTORY": "post_close",
     "FOUR_VOLUME_TRACK": "post_close",
-    "LQSQ_BACKTEST": "post_close",
-    "LQSQ_TRACK": "post_close",
     "TOP10_DAILY": "post_close",
     "LHB_DATA": "post_close",
     "LHB_HISTORY": "post_close",
@@ -84,6 +86,7 @@
     "SH_FIB": "post_close",
     "SZ_FIB": "post_close",
     "INST_TRADE": "post_close",
+    "CRDS_CARD_DATA": "post_close",
     "BACKTEST_TDX": "post_close",
     "BACKTEST_COMPREHENSIVE": "post_close",
     "FACTOR_LAB": "post_close",
