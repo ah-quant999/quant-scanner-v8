@@ -62,6 +62,7 @@ VAR_TO_RAW = {
     "IPO_DATA": "ipo_score.json",
     "MARGIN_DATA": "margin_data.json",
     "CFFEX_HOLDINGS": "cffex_data.json",
+    "CFFEX_POSITION": "cffex_position.json",  # 🆕 2026-10-15 IF会员持仓净空比z（图4建议①）
     "MACRO_DATA": "macro_data.json",
     "CRISIS_DATA": "crisis_data.json",
     "MACRO_BRIEF": "macro_brief.json",
@@ -119,6 +120,7 @@ CATEGORY_MAP = {
     #     盘中 intraday 保证 spot 现货价与基差实时；盘后 17:20 拿当日定稿日行情。
     #   ⚠️ 与 health_check 的 freq 声明（v8_health_check.py:195）必须同步，否则口径再次漂移。
     "CFFEX_HOLDINGS": "intraday,post_close",
+    "CFFEX_POSITION": "post_close",  # 🆕 中金所持仓排名 16:30 后公布，归盘后档
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：盘后数据页「宏观数据速览」卡读本变量，
     #   原只标 premarket → 盘后档(17:20/18:20/19:20)根本不抓它，页面却标着「收盘后」语义，
     #   主人截图质问「盘后数据页每个卡时间都不对」。加 post_close 使盘后必重抓一次。
@@ -1919,13 +1921,21 @@ def _has_critical_failures(category):
 
 # 涨停池缓存（limit_up_heatmap 复用；herding 消费方已于 2026-09-11 随「精选预判信号」卡下线删除）
 _zt_cache = {"date": None, "df": None}
-def _get_zt_pool():
-    d = now_cst().strftime("%Y%m%d")
-    if _zt_cache["date"] == d and _zt_cache["df"] is not None:
+def _get_zt_pool(date_str=None):
+    """东财涨停池（个股口径，含「连板数」列）。
+
+    date_str 形如 "20261015"；缺省 = 今日（走当日内存缓存，避免同轮重复请求）。
+    🛡 2026-10-15 一劳永逸：新增 date_str 参数 —— f_limit_up_heatmap 需要抓**上一交易日**
+    涨停池来算同口径环比（旧实现用板块口径求和当昨日值，与个股口径的今日值混算 ⇒
+    SENTIMENT_CYCLE.delta_pct 失真，2026-10-15 线上实测 -80.87% 即此症）。
+    """
+    d = date_str or now_cst().strftime("%Y%m%d")
+    if date_str is None and _zt_cache["date"] == d and _zt_cache["df"] is not None:
         return _zt_cache["df"]
     df = get_ak().stock_zt_pool_em(date=d)
-    _zt_cache["date"] = d
-    _zt_cache["df"] = df
+    if date_str is None:
+        _zt_cache["date"] = d
+        _zt_cache["df"] = df
     return df
 
 # ───────────────────────── 各模块抓取（akshare） ─────────────────────────
@@ -3078,14 +3088,132 @@ def f_crisis_data():
                f"全球维度=基于MACRO_DATA的VIX({(vix_v or 0):.1f})+美债10Y({(us10y_v or 0):.2f}%)日级数据动态计算",
     }
 
+def _prev_heatmap_raw():
+    """读上一轮 raw_data/limit_up_heatmap.json —— 仅供补全失败时"继承真值"，读不到返回 {}。"""
+    try:
+        p = RAW_DIR / "limit_up_heatmap.json"
+        if p.exists():
+            with open(p, encoding="utf-8") as f:
+                d = json.load(f)
+            return d if isinstance(d, dict) else {}
+    except Exception:
+        pass
+    return {}
+
+
+def _zt_prev_total():
+    """上一交易日涨停池家数（与 total 同口径）；失败返回 None（调用方按 0 环比处理）。"""
+    try:
+        import fetch_limit_up_heatmap_v8 as hm
+        ds = hm.get_trade_dates(2)
+        if len(ds) < 2:
+            return None
+        return int(len(_get_zt_pool(date_str=ds[-2])))
+    except Exception as e:
+        print(f"  ⚠️ 昨日涨停家数获取失败（环比按 0 处理）: {type(e).__name__}: {e}")
+        return None
+
+
+def f_cffex_position():
+    # 🆕 2026-10-15 主人令（图4 建议①落地）：IF 会员持仓净空比 z 分数择时。
+    #   数据源：中金所前20会员持仓排名（akshare get_cffex_rank_table，每日 16:30 后公布）。
+    #   口径：IF 全合约合计 net_short_ratio (nlr) = (Σshort_oi − Σlong_oi) / (Σlong_oi + Σshort_oi)；
+    #         nlr > 0 = 空头占优。z = (今日nlr − 20日均值) / 20日标准差。
+    #   择时（逆向）：z ≥ +1 空头拥挤→偏多；z ≤ −1 多头拥挤→偏空/减仓；否则中性。
+    #   历史增量持久化到 raw_data/cffex_position.json（幂等回补，已有日期跳过）；
+    #   样本 <21 个交易日时不出信号（warmup），绝不拿短样本瞎报 z。
+    raw_path = ROOT / "raw_data" / "cffex_position.json"
+    hist = []
+    if raw_path.exists():
+        try:
+            hist = json.loads(raw_path.read_text(encoding="utf-8")).get("history", []) or []
+        except Exception as e:
+            print(f"  ⚠️ cffex_position 历史读取失败（重建）: {type(e).__name__}: {e}")
+            hist = []
+    have = {h.get("date") for h in hist}
+    today = now_cst().date()
+    fetched = 0
+    for back in range(1, 60):          # 回补窗口：约 40 个交易日
+        if fetched >= 45:              # 单轮抓取上限（防预算失控）
+            break
+        d = today - timedelta(days=back)
+        ds = d.strftime("%Y%m%d")
+        dkey = d.strftime("%Y-%m-%d")
+        if dkey in have:
+            continue
+        try:
+            big = get_ak().get_cffex_rank_table(date=ds, vars_list=["IF"])
+        except Exception:
+            continue                    # 非交易日/接口抖动：静默跳过该日
+        if not isinstance(big, dict):
+            continue
+        long_oi = short_oi = 0
+        for k, df in big.items():
+            if not str(k).startswith("IF") or df is None or len(df) == 0:
+                continue
+            try:
+                long_oi += int(pd.to_numeric(df["long_open_interest"]).sum())
+                short_oi += int(pd.to_numeric(df["short_open_interest"]).sum())
+            except Exception:
+                continue
+        if long_oi + short_oi <= 0:
+            continue
+        hist.append({"date": dkey, "long_oi": long_oi, "short_oi": short_oi,
+                     "nlr": round((short_oi - long_oi) / (long_oi + short_oi), 4)})
+        fetched += 1
+    hist.sort(key=lambda x: x.get("date", ""))
+    hist = hist[-180:]                  # 保留近 180 个交易日
+    if not hist:
+        print("  ⚠️ cffex_position: 无有效样本（接口不可达？），跳过写入")
+        return None
+    last = hist[-1]
+    z = None
+    if len(hist) >= 21:
+        win = [h["nlr"] for h in hist[-21:-1]]
+        m = sum(win) / len(win)
+        sd = (sum((x - m) ** 2 for x in win) / len(win)) ** 0.5
+        if sd > 1e-9:
+            z = round((last["nlr"] - m) / sd, 2)
+    if z is None:
+        posture, advice = "样本累积中", f"≥21个交易日出信号（当前{len(hist)}）"
+    elif z >= 1.0:
+        posture, advice = "偏多", "空头拥挤（逆向）"
+    elif z <= -1.0:
+        posture, advice = "偏空/减仓", "多头拥挤（逆向）"
+    else:
+        posture, advice = "中性", "持仓结构均衡"
+    out = {
+        "data_date": last["date"], "long_oi": last["long_oi"], "short_oi": last["short_oi"],
+        "nlr": last["nlr"], "nlr_z": z, "posture": posture, "advice": advice,
+        "sample_size": len(hist), "history_tail": hist[-30:],
+        "note": "中金所前20会员IF持仓净空比z分数（逆向择时）；16:30后更新",
+    }
+    save("CFFEX_POSITION", out)
+    print(f"  ✅ CFFEX_POSITION: {last['date']} nlr={last['nlr']} z={z} → {posture}（样本{len(hist)}）")
+    return out
+
+
 def f_limit_up_heatmap():
     # 涨停热力图：近10个交易日板块涨停家数日历时序（v6风格）。
     # 复用 fetch_limit_up_heatmap_v8.generate() 做重建/增量。
+    #
+    # 🔴 2026-10-15 一劳永逸（主人令·发现错误即刻根治）：本函数是 `total`/`ladder`/`top`
+    #   三字段的**唯一正确来源**（个股涨停池口径）。旧实现把补全逻辑裹在
+    #   `except Exception: pass` 里 ⇒ 失败时静默无日志，且上一轮正确的值被 generate()
+    #   的板块口径占位覆盖：
+    #     · total  被写成"近30日每日家数"数组 → 前端渲染 "139,234,253,…,85只"，
+    #       且 Math.min(数组,100)=NaN ⇒ 「情绪分 NaN/100」；
+    #     · ladder 被写成空数组 [] → 前端「高连 0只」（高连 = 3/4/5/10 档之和）；
+    #   2026-10-15 主人截图实锤（线上 update_time 14:18:44 的产物即此状态）。
+    #   现改为：① 失败**必须告警**（不再静默）；② 失败时**继承上一轮真值**，绝不写坏；
+    #   ③ 顺带回填 prev_total（昨日涨停池家数，与 total 同口径）供 calc_sentiment_cycle
+    #      算真实环比（旧实现拿板块口径求和当昨日值 ⇒ 与个股口径混算，环比失真）。
     try:
         import fetch_limit_up_heatmap_v8 as hm
         result = hm.generate()
         if not result:
             return None
+        _prev = _prev_heatmap_raw()
         # 补充今日涨停池的连板梯队与TOP（保持前端兼容）
         try:
             df = _get_zt_pool()
@@ -3110,8 +3238,18 @@ def f_limit_up_heatmap():
             result["ladder"] = ladder
             result["top"] = top
             result["total"] = int(len(df))
-        except Exception:
-            pass
+            result["prev_total"] = _zt_prev_total()
+        except Exception as e:
+            print(f"  ⚠️ 涨停池连板梯队补充失败（改为继承上一轮真值，不写空）: "
+                  f"{type(e).__name__}: {e}")
+            if isinstance(_prev.get("ladder"), dict) and _prev["ladder"]:
+                result["ladder"] = _prev["ladder"]
+            if isinstance(_prev.get("top"), list) and _prev["top"]:
+                result["top"] = _prev["top"]
+            if isinstance(_prev.get("total"), int):
+                result["total"] = _prev["total"]
+        if result.get("prev_total") is None and isinstance(_prev.get("prev_total"), int):
+            result["prev_total"] = _prev["prev_total"]
         result["note"] = "东方财富涨停池（真实），近10日板块涨停家数"
         return result
     except Exception as e:
@@ -5756,6 +5894,7 @@ def main(category=None, only=None):
         ("IPO_DATA", f_ipo_data),
         ("MARGIN_DATA", f_margin_data),
         ("CFFEX_HOLDINGS", f_cffex_holdings),
+        ("CFFEX_POSITION", f_cffex_position),  # 🆕 2026-10-15 IF会员持仓净空比z（图4建议①）
         ("MACRO_DATA", f_macro_data),
         ("CRISIS_DATA", f_crisis_data),
         ("LIMIT_UP_HEATMAP", f_limit_up_heatmap),

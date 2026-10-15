@@ -50,22 +50,21 @@ DATA_SOURCES = {
     "concept_ranking.json":        "CONCEPT_RANKING",
     "margin_data.json":            "MARGIN_DATA",
     "cffex_data.json":             "CFFEX_HOLDINGS",
+    "cffex_position.json":         "CFFEX_POSITION",  # 🆕 2026-10-15 IF会员持仓净空比z（图4建议①）
     "ipo_score.json":              "IPO_DATA",
     "crisis_data.json":            "CRISIS_DATA",
     "judgment_data.json":          "JUDGMENT_DATA",
-    # 🔴 2026-10-11 主人令「完全下架」：crds_card_data / triple 三映射随两策略下架摘除
-    #   （生成器已摘链，raw_data 不再更新；前端 script 标签已删，无消费方）。
-    # "crds_card_data.json":         "CRDS_CARD_DATA",
+    "crds_card_data.json":         "CRDS_CARD_DATA",
     # 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合）。
     #   从 algo_track.json 读三 algo 跟踪池，去重 → 状态机判 status → 输出
     #   raw_data/v8_pool_tracker.json + data/V8_POOL_TRACKER.js，注入 window.V8_POOL_TRACKER。
     "v8_pool_tracker.json":        "V8_POOL_TRACKER",
-    # "triple_consensus.json":       "TRIPLE_CONSENSUS",
-    # "triple_track.json":           "TRIPLE_TRACK",
+    "triple_consensus.json":       "TRIPLE_CONSENSUS",
+    "triple_track.json":           "TRIPLE_TRACK",
     # 🛡 2026-08-26 一劳永逸根因修复：生成器 update_triple_resonance_history.py 写的是
     #   raw_data/triple_resonance_history.json，而此处原读旧名 triple_history.json（同源不同名），
     #   桥接顺序一错位就吃陈旧基线 → 共振日历缺 08-24 等。改为直接读生成器真输出，消除重命名歧义。
-    # "triple_resonance_history.json": "TRIPLE_HISTORY",
+    "triple_resonance_history.json": "TRIPLE_HISTORY",
     # 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」——历史追踪 + 跟踪/前向回测。
     #   产出链（B 批算法链，读当日新鲜 data/FOUR_VOLUME.js）：
     #     algorithms/update_four_volume_history.py → raw_data/four_volume_history.json
@@ -75,17 +74,6 @@ DATA_SOURCES = {
     #   （四量族原有的 FOUR_VOLUME / FOUR_VOLUME_60M 属脚本直写 data/，不登记本表，勿混淆）
     "four_volume_history.json":    "FOUR_VOLUME_HISTORY",
     "four_volume_track.json":      "FOUR_VOLUME_TRACK",
-    # 🔄 2026-10-11 主人令「所有回测只认真实信号流口径」：FOUR_VOLUME_BACKTEST 内容源
-    #   由「近5年规则回放（strategy_four_volume.py 回测模式，已摘链）」切换为
-    #   gen_four_volume_track.py 产出的真实信号流视图（同口径同变量名，前端零结构改动）。
-    "four_volume_backtest.json":   "FOUR_VOLUME_BACKTEST",
-    # 🚀 2026-10-11 主人令：第一支自研算法「量质双擎」(algorithms/gen_lqsq_top5.py，B批
-    #   factor_lab_gen 紧后) —— 真实信号流口径直上主榜，与四量同榜同纪律。
-    "lqsq_backtest.json":          "LQSQ_BACKTEST",
-    # 🆕 2026-10-12 小九：量质双擎「当期 Top5 选股 + 逐票前向跟踪」明细发布（同一生成器产出的
-    #   raw_data/lqsq_track.json → data/LQSQ_TRACK.js）。消费方=「选股策略 · ⚖️ 量质双擎」子页；
-    #   修「后端在跑、前端零挂载」的结构性漏点（LQSQ 10-11 上线后主站无处显示）。
-    "lqsq_track.json":             "LQSQ_TRACK",
     # 2026-09-04 主人令收尾：cockpit_tier_recommend / cockpit_advice / cockpit_backtest 三映射已删
     #   （09-03「干掉驾驶舱」系列删了生成器与 raw_data，映射永不命中，纯死代码）
     "top10_daily.json":            "TOP10_DAILY",
@@ -238,6 +226,7 @@ CATEGORY_MAP = {
     "MARGIN_DATA": "premarket,post_close",
     # 2026-08-31：期指主力合约卡移回「实时数据」页，改为 intraday 盘中实时
     "CFFEX_HOLDINGS": "intraday,post_close",
+    "CFFEX_POSITION": "post_close",  # 🆕 2026-10-15 与 cloud_fetch 同步：持仓排名16:30后公布
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：与 cloud_fetch_v8.py 同步加 post_close。
     #   盘后数据页「宏观数据速览」卡读本变量，原只标 premarket → 盘后档不重生成 data/MACRO_DATA.js。
     # 🛡 2026-09-11 主人令：宏观为日级/月级数据，不随盘中实时刷——与 cloud_fetch_v8.py 同步移出
@@ -352,14 +341,13 @@ CATEGORY_MAP = {
     "SECTOR_FUND_FLOW_TREND": "post_close",
     "GOLD_POOL": "post_close",
     "CANDIDATE": "post_close",
-    # 🔴 2026-10-11 主人令「完全下架」：TRIPLE_CONSENSUS / TRIPLE_TRACK / TRIPLE_HISTORY /
-    #   CRDS_CARD_DATA 四行随两策略下架移除（生成器摘链、data 文件已删）。
+    "TRIPLE_CONSENSUS": "post_close",
+    "TRIPLE_TRACK": "post_close",
+    "TRIPLE_HISTORY": "post_close",
     # 🆕 2026-09-15 主人令：四量终极历史追踪 + 跟踪/前向回测（B 批盘后算法链产出，与三重同档）。
     #   → _file_category() 返回 {"post_close"} → _pure_pc=True → 仅盘后 --category 构建重建（正确）
     "FOUR_VOLUME_HISTORY": "post_close",
     "FOUR_VOLUME_TRACK": "post_close",
-    "LQSQ_BACKTEST": "post_close",
-    "LQSQ_TRACK": "post_close",
     "TOP10_DAILY": "post_close",
     "LHB_DATA": "post_close",
     "LHB_HISTORY": "post_close",
@@ -367,6 +355,7 @@ CATEGORY_MAP = {
     "SH_FIB": "post_close",
     "SZ_FIB": "post_close",
     "INST_TRADE": "post_close",
+    "CRDS_CARD_DATA": "post_close",
     # 2026-09-04 主人令收尾：COCKPIT_TIER_RECOMMEND/COCKPIT_ADVICE/COCKPIT_BACKTEST heal 分类已删（模块下线）
     "BACKTEST_TDX": "post_close",
     "BACKTEST_COMPREHENSIVE": "post_close",

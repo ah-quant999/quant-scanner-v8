@@ -1751,7 +1751,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/NORTH_FUND.js?v=7bc381d44b" defer></script>
 <script src="data/MARKET_ALERTS.js?v=f36195dc4e" defer></script>
 <script src="data/MARKET_FUND_FLOW_DATA.js?v=2b0f67c3bb" defer></script>
-<script src="data/LIMIT_UP_HEATMAP.js?v=f5b5b1dc37" defer></script>
+<script src="data/LIMIT_UP_HEATMAP.js?v=df95c13897" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
 <script src="data/SECTOR_CYCLE_ARCHIVE.js?v=1ea6e76076" defer></script>
@@ -1797,6 +1797,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-30：盘后数据页新增解禁日历 + 业绩预告 -->
 <script src="data/RESTRICTED_RELEASE.js?v=102435d9ed" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=d1a63b4b15" defer></script>
+<script src="data/CFFEX_POSITION.js?v=d4f8d04869" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=e81fe76372" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=46a3baa766" defer></script>
@@ -1817,7 +1818,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=4b25866ad8" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=71d560a503" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=b3134d1a0c" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=00d937b463" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=c03aaf7c72" defer></script>
@@ -2395,6 +2396,25 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         h+=hparts.join(' · ');
         h+='</div>';
 
+        // 🆕 2026-10-15 参与条件式（主人令·图3建议②落地）：状态之上给「可执行性」——
+        //   条件不满足只观察、不设主动仓。三条件：①回测门控 v8IntradayGate().ok；
+        //   ②日内风向偏暖；③市场健康度偏暖。满足数 3=✓顺势 / 1-2=○半仓试探 / 0=✗观望。
+        var _sentTxt=(sent.label||'')+' '+(sent.description||'');
+        var _healthTxt = ((health.structure&&health.structure.join('')||'')+(health.fund&&health.fund.join('')||'')+(health.emotion&&health.emotion.join('')||''));
+        var _sentWarm = /偏暖|炽热|高涨|强势|偏强|领涨|大涨|流入/.test(_sentTxt);
+        var _healthWarm = /偏暖|炽热|高涨|强势|偏强|流入|领涨|改善|扩张/.test(_healthTxt);
+        var _condN = (_ga.ok?1:0) + (_sentWarm?1:0) + (_healthWarm?1:0);
+        var _pc = _condN>=3 ? {ic:'✓',txt:'顺势参与',c:'#5ee0a0'}
+                : _condN>=1 ? {ic:'○',txt:'半仓试探 · 只做强趋势（未全满足不设主动仓）',c:'#fbbf24'}
+                : {ic:'✗',txt:'观望 · 只观察不设仓',c:'#ff6b81'};
+        h+='<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:6px 12px;margin-bottom:8px;'
+         + 'border:1px dashed '+_pc.c+'66;border-radius:8px;font-size:11.5px;line-height:1.6;">'
+         +   '<span style="font-weight:800;color:'+_pc.c+';">参与条件</span>'
+         +   '<span style="font-weight:800;color:'+_pc.c+';font-size:13px;">'+_pc.ic+'</span>'
+         +   '<span style="color:var(--txt);">'+_pc.txt+'</span>'
+         +   '<span style="color:var(--dim);opacity:.6;">（门控'+(_ga.ok?'✓':'✗')+' · 风向'+(_sentWarm?'✓':'✗')+' · 健康度'+(_healthWarm?'✓':'✗')+'）</span>'
+         + '</div>';
+
         // 4. 市场异动（最多5条）
         var anoms=d.anomalies||[];
         /* 2026-09-15 主人令：个股异动「主力大单流入 / 主力大单流出」原为两条独立行，合并为一行
@@ -2603,7 +2623,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
         <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
     <div id="cycleLadderCard" style="margin-bottom:12px;"></div>
-         原因：仅基础口径观察名单、无买入信号，不占实时数据主位；且此处 tryRun 单发派发早于 defer 数据脚本 ⇒ 恒显「无数据」死卡。 -->
 
     <!-- 涨停热力矩阵（整行宽度）
          🌡 2026-09-15 主人令（六项）：卡名去掉旧「近15日」口径 → 主表固定展示最近 20 个交易日（≈一个月）；
@@ -2972,6 +2991,13 @@ function fmtSigned(v){
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="etfHeatByCat"><div class="ipo-empty" style="grid-column:1/3">加载中…</div></div>
       </div>
       <div class="note">口径：上交所官方基金份额日环比（当日份额 − 上一交易日份额）＝真实申购/赎回引致的份额变动，<b>不是</b>按主动成交方向推断的主力净流入估算值；交易所盘后披露，数据日 T-1。</div>
+    </div>
+
+    <!-- 🆕 IF会员持仓择时（2026-10-15 主人令·图4建议①：中金所前20会员净空比z分数，逆向择时） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🧭</span>IF 会员持仓择时 · <span class="fresh" id="cffexPosTime">—</span></h3>
+      <div id="cffexPosBody"><div class="ipo-empty">加载中…</div></div>
+      <div class="note">口径：中金所前20会员 IF 全合约，净空占比 =（空单−多单）/（多单+空单），z 分数对 20 日均值；<b>逆向择时</b>——z≥+1 空头拥挤→偏多，z≤−1 多头拥挤→偏空/减仓。交易所每日 16:30 后披露。</div>
     </div>
 
     <!-- 市场宽度：52周新高广度 -->
@@ -12997,6 +13023,68 @@ function drawUpDownChart(){
   }
   window.renderMarketBreadth = renderMarketBreadth;
 
+  /* ---- 6b. IF 会员持仓择时（2026-10-15 图4建议①：净空比 z 分数，逆向） ---- */
+  function renderCffexPosition(d){
+    const $b=$('cffexPosBody'), $t=$('cffexPosTime');
+    if(!$b) return;
+    d = d || window.CFFEX_POSITION || {};
+    if(!d.data_date){
+      $b.innerHTML='<div class="ipo-empty">IF 持仓数据暂不可用</div>';
+      if($t) $t.textContent='—';
+      return;
+    }
+    const z=(typeof d.nlr_z==='number')?d.nlr_z:null;
+    const nlr=(typeof d.nlr==='number')?d.nlr:null;
+    // 档位：z≥+1 偏多(红/up)；z≤-1 偏空(绿/down)；null 样本累积(灰)；否则中性(金)
+    const st = z===null ? {label:'样本累积中',col:'var(--sub)'}
+             : z>=1 ? {label:'偏多 · 逆向',col:'var(--up)'}
+             : z<=-1 ? {label:'偏空 · 逆向',col:'var(--down)'}
+             : {label:'中性',col:'var(--gold)'};
+    const _zp=function(v){return (Math.max(-2,Math.min(2,v))+2)/4*100;};
+    let h='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:8px;">';
+    h+='<span style="font-size:12px;color:var(--sub);">'+d.data_date+' · 净空占比 <b style="color:var(--txt);">'+(nlr===null?'—':(nlr*100).toFixed(2)+'%')+'</b>'
+     + ' · z 分数 <b style="font-size:16px;color:'+st.col+';">'+(z===null?'—':z)+'</b></span>';
+    h+='<span style="font-size:12px;font-weight:800;color:'+st.col+';">'+st.label+'</span></div>';
+    // z 轴（-2..+2）：左偏空(绿) 右偏多(红)，指针=当前 z
+    h+='<div style="position:relative;height:18px;display:flex;border-radius:6px;margin:4px 0 2px;">';
+    h+='<div style="width:25%;background:var(--down);opacity:.55;border-radius:6px 0 0 6px;"></div>';
+    h+='<div style="width:25%;background:var(--down);opacity:.22;"></div>';
+    h+='<div style="width:25%;background:var(--up);opacity:.22;"></div>';
+    h+='<div style="flex:1;background:var(--up);opacity:.55;border-radius:0 6px 6px 0;"></div>';
+    if(z!==null){
+      const _px=Math.max(2,Math.min(98,_zp(z)));
+      h+='<div style="position:absolute;left:calc('+_px+'% - 4px);top:1px;width:4px;height:16px;border-radius:2px;background:var(--txt);box-shadow:0 0 4px rgba(0,0,0,.7);"></div>';
+      h+='<div style="position:absolute;left:calc('+_px+'% - 8px);top:-9px;font-size:9px;color:var(--txt);text-shadow:0 1px 3px #000;">z='+z+'</div>';
+    }
+    h+='</div>';
+    h+='<div style="display:flex;font-size:9px;color:var(--dim);margin-bottom:8px;">';
+    h+='<span style="flex:1;text-align:left;">−2 多头拥挤→偏空</span>';
+    h+='<span style="flex:1;text-align:center;">0 中性</span>';
+    h+='<span style="flex:1;text-align:right;">+2 空头拥挤→偏多</span></div>';
+    h+='<div style="font-size:11.5px;color:var(--txt);line-height:1.7;">结论：<b style="color:'+st.col+';">'+(d.posture||'—')+'</b>'
+     + (d.advice?(' · '+d.advice):'') + '（样本 '+ (d.sample_size||'—') +' 个交易日）</div>';
+    // 近10日净空占比迷你走势（文字条形，宽度按 nlr 相对极值）
+    const tail=(d.history_tail||[]).slice(-10);
+    if(tail.length){
+      const vals=tail.map(function(x){return x.nlr||0;});
+      const mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals), rg=Math.max(mx-mn,1e-6);
+      h+='<div style="margin-top:8px;font-size:10px;color:var(--dim);">近10日净空占比</div>';
+      tail.forEach(function(x){
+        const w=18+((x.nlr||0)-mn)/rg*82;
+        h+='<div style="display:flex;align-items:center;gap:6px;font-size:9.5px;color:var(--dim);line-height:1.55;">'
+         + '<span style="width:64px;">'+x.date.slice(5)+'</span>'
+         + '<span style="flex:1;height:7px;border-radius:3px;background:var(--card);position:relative;overflow:hidden;">'
+         + '<span style="position:absolute;left:0;top:0;height:100%;width:'+w+'%;border-radius:3px;background:var(--sub);opacity:.8;"></span></span>'
+         + '<span style="width:44px;text-align:right;">'+((x.nlr||0)*100).toFixed(2)+'%</span></div>';
+      });
+    }
+    h+='</div>';
+    $b.innerHTML=h;
+    if($t) $t.textContent=(d.update_time||'').slice(5,16)||'—';
+  }
+  window.renderCffexPosition = renderCffexPosition;
+
   /* ---- 12. 指数快览（实时数据补位） ---- */
   function renderIndexQuotes(d){
     const $b=$('indexQuotesBody'), $t=$('indexQuotesTime');
@@ -13507,6 +13595,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 2026-08-30 主人令：盘后数据页扩展（宽度/期指/宏观/解禁日历/业绩预告）
     // 情绪温度条、龙虎榜净买榜已删除（分别与实时「连板天梯」、共振日历重复）
     safe(window.renderMarketBreadth, window.W52_HIGH || {});
+    safe(window.renderCffexPosition, window.CFFEX_POSITION || {});  // 🆕 2026-10-15 IF会员持仓择时
     safe(window.renderFuturesMain, window.CFFEX_HOLDINGS || {});
     safe(window.renderMacroSummary, window.MACRO_DATA || {});
     safe(window.renderRestrictedCalendar, window.RESTRICTED_RELEASE || {});
@@ -15709,106 +15798,6 @@ h += '</div>'; // /ulPaneObserve
   };
 
 
-  // 🌡️ 情绪周期定位（2026-08-14 主人令：外框阶段用实时计算取真实值，明细展开不变）
-  window._fillSentimentCycle = function(){
-    var dst = document.getElementById('scBody');
-    if(!dst) return;
-    var sc = window.SENTIMENT_CYCLE || {};
-    var m = sc.metrics || {};
-
-    // ── 外框阶段：实时计算（与 __renderCycleLadderCard 同源，解决"温和 vs 狂热"歧义）──
-    var cr = window.CRISIS_DATA || {};
-    var lh = window.LIMIT_UP_HEATMAP || {};
-    var lhb = window.LHB_DATA || {};
-    var crisisScore = (cr.currency||0)*0.4 + (cr.economy||0)*0.35 + (cr.global||0)*0.25;
-    var crisisPct = Math.round(crisisScore * 100);
-    var totalUp = lh.total || 0;
-    var ladder = lh.ladder || {};
-    var highLbc = (ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0);
-    var lhbCount = (lhb.stocks && lhb.stocks.length) || 0;
-    var phase, phaseColor, phaseDesc, posAdvice;
-    if(crisisPct >= 70){ phase='冰点'; phaseColor='var(--down)'; phaseDesc='危机雷达高位'; posAdvice='空仓'; }
-    else if(crisisPct >= 50){ phase='降温'; phaseColor='#f59e0b'; phaseDesc='风险累积'; posAdvice='≤30%'; }
-    else if(totalUp >= 80 && highLbc >= 15){ phase='狂热'; phaseColor='#ef4444'; phaseDesc='涨停泛滥'; posAdvice='兑现'; }
-    else if(totalUp >= 40 && crisisPct <= 30){ phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪偏暖'; posAdvice='50%'; }
-    else if(totalUp < 30 || crisisPct > 35){ phase='修复'; phaseColor='#38bdf8'; phaseDesc='低位筑底'; posAdvice='30%'; }
-    else { phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪平稳'; posAdvice='50%'; }
-
-    // 情绪分：用实时数据合成（危机反转 + 涨停热度），保留 SENTIMENT_CYCLE 做fallback
-    var liveScore = Math.round(Math.max(0, Math.min(100, 100 - crisisPct*0.6 + Math.min(totalUp,100)*0.25)));
-    var score = (sc.score > 0) ? Math.round((liveScore + sc.score) / 2) : liveScore;
-    var delta_pct = sc.delta_pct || 0;
-    // 🛡 2026-08-30 审计：停用 SENTIMENT_CYCLE.js 陈旧的 sc.advice，统一用实时计算，消除「退潮 vs 温和」矛盾
-    var advice = (phaseDesc+' · 建议'+posAdvice+'仓位');
-
-    var html = '';
-    // 顶部：phase 大色块（实时计算值）
-    html += '<div style="background:linear-gradient(135deg,'+phaseColor+'22,'+phaseColor+'08);border:2px solid '+phaseColor+';border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">';
-    html += '<div style="text-align:center;min-width:120px;">';
-    html += '<div style="font-size:11px;color:var(--dim);">当前阶段</div>';
-    html += '<div style="font-size:24px;font-weight:800;color:'+phaseColor+';line-height:1.1;">'+phase+'</div>';
-    html += '</div>';
-    html += '<div style="text-align:center;min-width:80px;">';
-    html += '<div style="font-size:11px;color:var(--dim);">情绪分</div>';
-    html += '<div style="font-size:22px;font-weight:700;color:var(--txt);line-height:1.1;">'+score+'</div>';
-    html += '</div>';
-    html += '<div style="text-align:center;min-width:80px;">';
-    html += '<div style="font-size:11px;color:var(--dim);">环比</div>';
-    html += '<div style="font-size:18px;font-weight:700;color:'+(delta_pct>=0?'var(--up)':'var(--down)')+';line-height:1.1;">'+(delta_pct>0?'+':'')+delta_pct+'%</div>';
-    html += '</div>';
-    html += '<div style="flex:1;min-width:200px;font-size:13px;color:var(--txt);line-height:1.5;">'+advice+'</div>';
-    html += '</div>';
-    // 指标行
-    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;">';
-    var metrics = [
-      {label:'涨停家数', value:m.total_up, unit:'家', color:'#fbbf24'},
-      {label:'最高连板', value:m.max_ladder+'板', unit:'', color:'#22d3ee'},
-      {label:'≥3板家数', value:m.high_ladder_count, unit:'家', color:'#c4b5fd'},
-      {label:'活跃板块', value:m.sectors_count, unit:'个', color:'#22c55e'},
-    ];
-    metrics.forEach(function(mt){
-      html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;">';
-      html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px;">'+mt.label+'</div>';
-      html += '<div style="font-size:18px;font-weight:700;color:'+mt.color+';">'+mt.value+'<span style="font-size:11px;color:var(--dim);font-weight:400;"> '+mt.unit+'</span></div>';
-      html += '</div>';
-    });
-    html += '</div>';
-    // 连板梯队
-    if (sc.ladder_dist && Object.keys(sc.ladder_dist).length){
-      html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:4px;">📊 连板梯队：</div>';
-      html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">';
-      Object.keys(sc.ladder_dist).forEach(function(k){
-        var n = sc.ladder_dist[k];
-        var bg = parseInt(k) >= 3 ? 'background:rgba(167,139,250,.18);border-color:rgba(167,139,250,.5);' : 'background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.3);';
-        html += '<span style="display:inline-block;padding:4px 10px;border:1px solid;border-radius:6px;font-size:12px;font-weight:600;color:#c4b5fd;'+bg+'">'+k+'板 <b style="color:var(--txt);margin-left:4px;">'+n+'只</b></span>';
-      });
-      html += '</div>';
-    }
-    // 龙头（含分红方案跟踪）
-    if (sc.leaders && sc.leaders.length){
-      html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:4px;">🏆 龙头连板：</div>';
-      html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
-      sc.leaders.forEach(function(l){
-        // ⚖️ 2026-08-14 主人令：三张新卡加分红方案跟踪（情绪龙头 chip 后追加）
-        // 2026-09-01 修复：加分红异常待核标记
-        var sq = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) ? window.STOCK_QUOTE.stocks[l.code] : null;
-        var dv = sq ? sq.dividend : null;
-        var dyTag = '';
-        var divCk = {ok:true, badge:''};
-        if (dv && dv.cash_ratio != null){
-          var dC = dv.cash_ratio >= 30 ? '#fbbf24' : (dv.cash_ratio >= 10 ? '#22c55e' : '#94a3b8');
-          var prog = dv.progress && /实施|已/.test(dv.progress) ? '已实施' : (dv.progress || '预案');
-          dyTag = '<span style="margin-left:4px;font-size:9.5px;padding:1px 5px;border-radius:3px;background:rgba(251,146,60,.15);color:'+dC+';font-weight:600;">💰10派'+String(+dv.cash_ratio.toFixed(2))+'元·'+prog+'</span>';
-          divCk = window._dividendCheck ? window._dividendCheck(dv, sq ? sq.price : 0) : {ok:true, badge:''};
-        }
-        html += '<span style="display:inline-block;padding:4px 10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:6px;font-size:12px;color:#22c55e;font-weight:600;">'+l.name+' <b style="color:var(--txt);margin-left:2px;">'+l.lbc+'板</b>'+dyTag+(divCk.badge||'')+'</span>';
-      });
-      html += '</div>';
-    }
-    if (sc.note) html += '<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.5;">'+sc.note+'</div>';
-    dst.innerHTML = html;
-  };
-
   // 2026-09-06 主人令：潜力挖掘卡全链下线（填充函数与数据注入已删）。
 
   /* ===== 📦 TOP3 持仓跟踪（2026-08-10 暂未上架·localStorage 持久化） =====
@@ -15822,18 +15811,34 @@ h += '</div>'; // /ulPaneObserve
     var cr = window.CRISIS_DATA || {};
     var lh = window.LIMIT_UP_HEATMAP || {};
     var lhb = window.LHB_DATA || {};
+    var sc = window.SENTIMENT_CYCLE || {};
+    var scm = sc.metrics || {};
+    /* 🛡 2026-10-15 一劳永逸（主人令·发现错误即刻根治）：类型防御 + 权威源。
+       线上实测（2026-10-15 14:18:44 产物）：LIMIT_UP_HEATMAP 的 total 是「近30日每日家数」数组、
+       ladder 是生成器占位写死的空数组 []，而本卡按「total＝数字 / ladder＝dict」读取，于是：
+         · 涨停家数被渲染成 "139,234,253,…,85只"（数组 toString）；
+         · Math.min(totalUp,100) 得到 NaN ⇒ 情绪分显示 "NaN/100"；
+         · ladder['3']/['4']/['5']/['10'] 全 undefined ⇒ 「高连 0只」。
+       三重保障：① 严格数值校验（数组/非有限数一律拒绝，绝不参与算术）；
+       ② 优先取 SENTIMENT_CYCLE.metrics 的权威聚合值（total_up / high_ladder_count，
+          由 calc_sentiment_cycle.py 从**个股涨停池**算出）；③ ladder/top 先做类型校验。
+       即便数据侧再被写坏，本卡也不会出现 NaN / 数组串 / 假 0。 */
+    function _numOrNull(v){ return (typeof v === 'number' && isFinite(v)) ? v : null; }
     var crisisScore = (cr.currency||0)*0.4 + (cr.economy||0)*0.35 + (cr.global||0)*0.25;
-    var crisisPct = Math.round(crisisScore * 100);
-    var totalUp = lh.total || 0;
-    var ladder = lh.ladder || {};
-    var top = lh.top || [];
+    var crisisPct = _numOrNull(crisisScore) != null ? Math.round(crisisScore * 100) : 0;
+    var totalUp = _numOrNull(lh.total);
+    if(totalUp == null) totalUp = _numOrNull(scm.total_up);
+    if(totalUp == null) totalUp = 0;
+    var ladder = (lh.ladder && typeof lh.ladder === 'object' && !Array.isArray(lh.ladder)) ? lh.ladder : {};
+    var top = (Array.isArray(lh.top) ? lh.top : []).filter(function(t){ return t && typeof t.lbc === 'number'; });
     var lhbCount = (lhb.stocks && lhb.stocks.length) || 0;
     // 首板平铺用：LHB_DATA.stocks 去重（首板个股明细从此取）
     var lhbSeen = {}, lhbUniq = [];
     (window._safeArr(lhb.stocks)).forEach(function(s){
       if(s && s.code && !lhbSeen[s.code]){ lhbSeen[s.code]=true; lhbUniq.push(s); }
     });
-    var highLbc = (ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0);
+    var highLbc = _numOrNull(scm.high_ladder_count);
+    if(highLbc == null) highLbc = (ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0);
     // 阶段判定
     var phase, phaseColor, phaseDesc, posAdvice;
     if(crisisPct >= 70){ phase='冰点'; phaseColor='var(--down)'; phaseDesc='危机雷达高位'; posAdvice='空仓'; }
@@ -15852,10 +15857,9 @@ h += '</div>'; // /ulPaneObserve
     html += v8CardHeader('🎭','情绪周期 · 连板天梯','危机雷达+涨停热力+连板梯队+龙虎榜','update_time',
       {update_time:updateTime, slot:_cycleSlot.slot, horizon:_cycleSlot.horizon}, !hasData);
     html += '<div style="padding:12px 14px;">';
-    var sc = window.SENTIMENT_CYCLE || {};
-    var scm = sc.metrics || {};
     var liveScore = Math.round(Math.max(0, Math.min(100, 100 - crisisPct*0.6 + Math.min(totalUp,100)*0.25)));
-    var score = (sc.score > 0) ? Math.round((liveScore + sc.score) / 2) : liveScore;
+    var _scScore = _numOrNull(sc.score);
+    var score = (_scScore > 0) ? Math.round((liveScore + _scScore) / 2) : liveScore;
 
     // 阶段 + 四指标（字号放大，去掉 scale 压缩）
     html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">';
