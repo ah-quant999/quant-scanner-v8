@@ -1,7 +1,90 @@
 window.FOUR_VOLUME={
- "update_time": "2026-10-15 02:43:52",
- "total": 0,
- "stocks": [],
- "zero_hit": true,
- "note": "本轮扫描 0 命中（真实无信号）；且无可用历史批"
+ "update_time": "2026-10-15 18:25:35",
+ "total": 3,
+ "stocks": [
+  {
+   "code": "688652",
+   "name": "京仪装备",
+   "market": "sh",
+   "board_label": "科创板",
+   "close": 149.74,
+   "pct_chg": 8.58,
+   "turnover_rate": 5.18,
+   "mv_yi": 0,
+   "fund_type": "混合",
+   "components": {
+    "游资点火": true,
+    "机构托底": true,
+    "广度翻多": true,
+    "主力动量翻多": true,
+    "机构金叉": true,
+    "散户金叉": true,
+    "主力金叉": true
+   },
+   "yzc": true,
+   "jg": true,
+   "xc": true,
+   "four": true,
+   "qd": true,
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 散户金叉 + 主力金叉",
+   "signal_date": "2026-10-15",
+   "enter_date": "2026-10-15"
+  },
+  {
+   "code": "688213",
+   "name": "思特威",
+   "market": "sh",
+   "board_label": "科创板",
+   "close": 100.14,
+   "pct_chg": 3.98,
+   "turnover_rate": 3.55,
+   "mv_yi": 0,
+   "fund_type": "混合",
+   "components": {
+    "游资点火": true,
+    "机构托底": true,
+    "广度翻多": true,
+    "主力动量翻多": true,
+    "机构金叉": true,
+    "散户金叉": false,
+    "主力金叉": true
+   },
+   "yzc": true,
+   "jg": true,
+   "xc": true,
+   "four": true,
+   "qd": true,
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+   "signal_date": "2026-10-15",
+   "enter_date": "2026-10-15"
+  },
+  {
+   "code": "600519",
+   "name": "贵州茅台",
+   "market": "sh",
+   "board_label": "主板",
+   "close": 1312.97,
+   "pct_chg": 2.1,
+   "turnover_rate": 0.46,
+   "mv_yi": 0,
+   "fund_type": "混合",
+   "components": {
+    "游资点火": true,
+    "机构托底": true,
+    "广度翻多": true,
+    "主力动量翻多": true,
+    "机构金叉": false,
+    "散户金叉": false,
+    "主力金叉": false
+   },
+   "yzc": true,
+   "jg": true,
+   "xc": true,
+   "four": true,
+   "qd": true,
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+   "signal_date": "2026-10-15",
+   "enter_date": "2026-10-15"
+  }
+ ]
 };
