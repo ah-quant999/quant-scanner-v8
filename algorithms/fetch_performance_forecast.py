@@ -47,11 +47,11 @@ def _parse_change_pct(s):
 def _type_to_key(t):
     """预告类型 -> 汇总计数键。"""
     t = str(t)
-    if "预增" in t or "略增" in t:
+    if "预增" in t or "略增" in t or "扭亏" in t or "续盈" in t:
         return "increase"
     elif "预减" in t or "略减" in t:
         return "decrease"
-    elif "预亏" in t or "首亏" in t or "续亏" in t:
+    elif "预亏" in t or "首亏" in t or "续亏" in t or "减亏" in t or "增亏" in t:
         return "loss"
     else:
         return "uncertain"
@@ -119,6 +119,7 @@ def fetch_performance_forecast():
                 "code": str(r.get("code", "")),
                 "name": str(r.get("name", "")),
                 "type": t,
+                "cat": _type_to_key(t),
                 "change_pct": pct,
                 "indicator": str(r.get("indicator", "")),
                 "notice_date": str(r.get("notice_date", "")),
@@ -141,6 +142,16 @@ def fetch_performance_forecast():
         # 按预增幅度排序，取前 15（全报告期 TOP，供盘后「业绩预告」汇总卡）
         items.sort(key=lambda x: (x.get("change_pct") if x.get("change_pct") is not None else -99999), reverse=True)
         today_items.sort(key=lambda x: (x.get("change_pct") if x.get("change_pct") is not None else -99999), reverse=True)
+        # 2026-10-15 一劳永逸修复：按分类预分明细池，保证预减/预亏等负向类型也有明细可展开
+        #   （旧逻辑只取 change_pct 最高的 TOP15，负向类型沉底被截断 -> 预减/预亏胶囊点开无明细）。
+        #   前端 showForecastItems 优先读此池，并按记录的 cat 字段聚合（修复「强票(扭亏/续盈)不入预增列表」）。
+        BY_CAT_CAP = 25
+        by_cat = {"increase": [], "decrease": [], "loss": [], "uncertain": []}
+        for rec in items:
+            by_cat.setdefault(rec.get("cat", "uncertain"), []).append(rec)
+        for k in by_cat:
+            by_cat[k].sort(key=lambda x: (x.get("change_pct") if x.get("change_pct") is not None else -99999), reverse=True)
+        out["by_cat"] = {k: v[:BY_CAT_CAP] for k, v in by_cat.items()}
         out["items"] = items[:15]
         out["summary"] = summary
         out["today_summary"] = today_summary

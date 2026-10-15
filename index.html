@@ -13162,8 +13162,18 @@ function showForecastItems(typeKey){
   if(!$tbl) return;
   const typeMap = {increase:'预增', decrease:'预减', loss:'预亏', uncertain:'不确定'};
   const label = typeMap[typeKey] || typeKey;
+  // 2026-10-15 一劳永逸修复：优先用后端按分类预分的明细池 by_cat（保证预减/预亏也有明细），
+  //   并按记录的 cat 字段聚合（修复「强票(扭亏/续盈)不入预增列表」）；兼容无 cat 的旧数据回退按 type 字面匹配。
+  let pool;
+  if(d.by_cat && d.by_cat[typeKey]){
+    pool = d.by_cat[typeKey].slice();
+  } else {
+    pool = (d.items||[]).filter(function(it){
+      return (it.cat||'') === typeKey || (it.cat == null && (it.type||'').trim() === label);
+    });
+  }
   // 按 code 去重：同一股票取 change_pct 最大的一条（避免江波龙因归母/扣非两条指标重复出现）
-  const uniq = d.items.filter(it => (it.type||'').trim() === label).reduce(function(map, it){
+  const uniq = pool.reduce(function(map, it){
     var cur = map[it.code];
     if(!cur || (it.change_pct||-Infinity) > (cur.change_pct||-Infinity)) map[it.code] = it;
     return map;
