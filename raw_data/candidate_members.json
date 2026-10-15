@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-15 19:55:55",
+  "update_time": "2026-10-15 20:35:10",
   "total": 570,
   "hysteresis_days": 5,
   "source_dist": {
@@ -10506,7 +10506,7 @@
     },
     "sh_605117": {
       "code": "605117",
-      "name": "德业股",
+      "name": "德业股份",
       "market": "sh",
       "board_label": "主板",
       "sources": [
