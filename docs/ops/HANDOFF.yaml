@@ -8483,7 +8483,7 @@ items:
   - id: future-card-daily-fix-1015
     owner: 小九(lemoncat-cn)
     priority: P1
-    status: done-pending-publish
+    status: done
     created: 2026-10-15
     title: 未来预测两张卡「看起来死」一劳永逸修复（主人10-15令）
     note: >
