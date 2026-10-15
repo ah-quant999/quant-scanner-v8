@@ -8502,3 +8502,22 @@ items:
     verified_at: "2026-10-15 09:0x CST · 前端三处已 Pages 硬抓实证在线；val10_d 数据待 run"
     updated: "2026-10-15 12:25"
     updated_by: 小九(lemoncat-cn)
+  - id: future-card-forecast-cls-1015
+    owner: 小九(lemoncat-cn)
+    priority: P1
+    status: done
+    created: 2026-10-15
+    title: 业绩预告分类一劳永逸修复（主人10-15铁律令）
+    note: >
+      根因：_type_to_key 把扭亏/续盈/减亏/增亏等非标准类型全丢 uncertain 致 uncertain 虚高；
+      强票（扭亏/续盈）不入「预增」列表；旧明细池仅 TOP15 致预减/预亏胶囊点开无明细。
+      修复（commit b50f019）：① _type_to_key 正确四分类（扭亏/续盈→increase、减亏/增亏→loss）；
+      ② rec 加 cat 字段；③ 输出 by_cat 分类明细池（每类≤25）。
+      部署层：PERFORMANCE_FORECAST 归 premarket,post_close，盘中 cn fetch 选择性构建跳过 →
+      线上 data 停更无 by_cat；本地重建 data + ?v 刷新，推 d37ba0e 触发 CI 全量重建，Pages 含 by_cat。
+    verify_how: |
+      Pages 硬抓 data/PERFORMANCE_FORECAST.js 含 by_cat（分类25/14/16/2，14251B，md5 27c5a59a434a）；
+      index.html showForecastItems 读 by_cat（4 处，含 10-15 修复注释）；?v 已刷新。
+    verified_at: "2026-10-15 13:35 硬抓 Pages 确认 by_cat 在线"
+    updated: "2026-10-15 13:35"
+    updated_by: 小九(lemoncat-cn)
