@@ -573,7 +573,19 @@ jobs:
               #     内容仍完全由本轮构建决定（对齐「产物由构建决定」铁律）。
               #     单轮仅 fetch+commit+push ≈ 1-3 分钟，6 次覆盖 ≥10 分钟推送间隙窗口。
               #   若暂存后与 tip 零差异 = 远端已有等价/更新内容 ⇒ 等价已部署，成功退出。
-              git reset --soft FETCH_HEAD
+              # 🔴🔴 2026-10-15 阿狸咪的工程师（同族第三次·根因升级）：
+              #   soft 只搬 HEAD，**索引仍是 run 启动快照** ⇒ 未列入 add 清单的路径
+              #   （脚本/工作流/文档/直推文件）若在 run 期间被远端更新，会被本 commit
+              #   **静默整文件回退**。实证：83cd5ce92e（21:29 直推 guard_v8_freshness.py）
+              #   被 21:31「v8 build (fast-forward retry #1)」回退（10-09 WAVE_ELLIOTT 族
+              #   同病，但当时只护了 3+4 个 data 文件，脚本/工作流仍在裸奔）。
+              #   ⇒ 改 **mixed reset**：HEAD 与索引一并对齐 FETCH_HEAD（HEAD 仍是 tip 的
+              #     直接子提交 ⇒ push 仍纯快进、仍不 force），工作树保留本轮构建产物，
+              #     add 清单只暂存构建输出 ⇒ 提交 = tip + 构建产物，非构建路径零回退。
+              #   ⚠️ 已知残余（不在本期范围）：add 清单内路径（data/ 等）仍暂存工作树版，
+              #     远端 mid-run 直推的同类文件由算法链分钟级重推自愈；index.html 正文
+              #     由外层 reset --hard + 全量重建路径保护。
+              git reset FETCH_HEAD
               git rm --cached --ignore-unmatch \
                 data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json \
                 data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true

@@ -222,9 +222,19 @@ WARN_SOURCES = {
     "EXPERIMENT": 72,
     "GOLD_POOL": 48,
     "CANDIDATE": 48,
-    "TRIPLE_CONSENSUS": 48,
-    "TRIPLE_TRACK": 48,
-    "TRIPLE_HISTORY": 48,
+    # 🧹 2026-10-15 阿狸咪的工程师：TRIPLE_CONSENSUS / TRIPLE_TRACK / TRIPLE_HISTORY
+    #   已**退役摘除**（原阈值 48）。依据（与 09-16 ANALYST_RATINGS、09-15 LHB_7D 同族同法）：
+    #   ① 2026-10-11 主人令「完全下架」三重共识策略——data/TRIPLE_*.js 已删、index.html
+    #      零注入、ALGO_VARS 已移出（自愈面不再派发永远刷不出的 algo_run）；
+    #   ② 本表当日漏清 ⇒ 每轮巡检必报 🟡「文件缺失」，属**结构性恒黄灯**：永远无法转绿，
+    #      只会稀释真黄的信号（10-15 实测：warn_stale 恒为这 3 项，无一真黄被掩埋）；
+    #   ③ raw_data/triple_*.json 亦不存在 ⇒ update_v8 映射 inert，无生产者无消费者。
+    #   ⚠️ 回滚：从 10-11 及更早提交取回 data/TRIPLE_*.js 与 raw_data/triple_*.json，
+    #     恢复 index.html 三处注入 + run_algorithms 调度 + ALGO_VARS，
+    #     并把这三条阈值 48 加回本表。
+    # "TRIPLE_CONSENSUS": 48,
+    # "TRIPLE_TRACK": 48,
+    # "TRIPLE_HISTORY": 48,
     # 2026-09-04 主人令收尾：COCKPIT_ADVICE/COCKPIT_TIER_RECOMMEND 阈值已删（驾驶舱模块下线）
     "LHB_DATA": 48,
     "SH_FIB": 48,
@@ -256,7 +266,16 @@ CORE_SOURCES_ALGO = {
     # 2026-09-04 主人令收尾：COCKPIT_BACKTEST 已删（驾驶舱模块下线）
     "BACKTEST_COMPREHENSIVE": 24,
     "BACKTEST_TDX": 24,
-    "CRDS_CARD_DATA": 24,
+    # 🧹 2026-10-15 阿狸咪的工程师：CRDS_CARD_DATA 已**退役摘除**（原阈值 24）。
+    #   依据：① 2026-10-11 主人令「完全下架」逆势龙头 CRDS——data/CRDS_CARD_DATA.js 已删、
+    #      index.html 零注入（L9079 注释实证「模块下架，window.CRDS_CARD_DATA 恒 undefined」）、
+    #      ALGO_VARS 已移出；② 本表当日漏清 ⇒ 每轮巡检必报 🔴「文件缺失」，且因在 CORE_ALGO 组
+    #      会进 core_stale 红灯（10-15 实测：core_stale 恒为这 1 项）——结构性恒红灯，
+    #      与 09-16 ANALYST_RATINGS 同族病，同法处置；③ raw_data/crds_card_data.json 不存在
+    #      ⇒ update_v8 映射 inert。
+    #   ⚠️ 回滚：从 10-11 及更早提交取回 data/CRDS_CARD_DATA.js 与 raw_data/crds_card_data.json，
+    #     恢复 index.html 注入 + 算法生产者 + ALGO_VARS，并把本条阈值 24 加回本表。
+    # "CRDS_CARD_DATA": 24,
     # 🛡 2026-09-14 阿狸咪的工程师（双机独立复核后裁定）：LHB_7D 已从本组**移出**。
     #    → 09-15 小九的工程师进一步**退役删除**（data/LHB_7D.js 已不存在，见下方 FROZEN_SOURCES 注释）。
     #    根因：唯一生产者 gen_lhb_7d.py 于 09-13 主动停跑（run_algorithms.py 摘除调度 + 注释调用），
