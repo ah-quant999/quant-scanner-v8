@@ -8714,3 +8714,30 @@ items:
     verified_at: "2026-10-15 23:45 线上 Pages 双文件硬抓+本地三文件+前端登记表五重自证（审计结论已验证；修复未动，等裁定）"
     updated: "2026-10-15 23:45"
     updated_by: 阿狸咪(alimi-cn)
+  - id: future-logic-if-cffex-1016
+    owner: 阿狸咪(alimi-cn)
+    priority: P2
+    status: todo
+    created: 2026-10-16
+    title: IF持仓择时卡「解读四态口径」待入 logic.full.html 母版（主人10-16 05:26令；公开页按10-04令禁入）
+    note: >
+      主人令「这个记录到逻辑详解页」。但公开站 logic.html 与 index.html 逻辑详解tab 已于 2026-10-04 主人令下架
+      （阈值/口径类内容禁入公开页）⇒ 只入私有母版 v8_logic_private/logic.full.html（仅阿狸咪机持有；本机无副本，
+      本地最新为 10-15 10:31 陈旧版、缺 IF 卡记载）⇒ 禁整文件回传（会覆盖母版后续新增记录），按条目文本合并。
+      请把下面两段并入母版：
+      【段1·📜最近变更记录区顶部新增一条】
+      <b style="color:var(--gold)">■ 2026-10-15 IF 会员持仓择时新卡 + 解读行四态口径（主人令）</b><br>
+      新卡（盘后数据页·资金热度卡下方，commit 76f66662）：中金所前20会员 IF 全合约净空占比
+      nlr=(空单−多单)/(空单+多单)，对20日均值取 z 分数，逆向择时；数据源 CFFEX_POSITION
+      （akshare get_cffex_rank_table，交易所每日16:30后披露，post_close 档，盘中不刷新）。
+      卡头「更新于」统一胶囊 + 结论行下「解读」行于 22:07 补齐（commit bbf1c8564）。<br>
+      解读行四态口径（与卡内注释同源、零编造）：z≥+1 → 空头持仓拥挤，逆向信号偏多（红 var(--up)）；
+      z≤−1 → 多头持仓拥挤，逆向信号偏空/减仓（绿 var(--down)）；|z|＜1 → 多空均衡，无逆向信号，中性观察；
+      样本不足20日 → 暂不出信号。z 轴色带左偏空(绿)右偏多(红)，指针=当前 z。<br><br>
+      【段2·lg-ph 盘后数据卡片矩阵新增一行】
+      <tr><td><b>IF 会员持仓择时</b></td><td><b>CFFEX_POSITION</b></td><td><b>云端 v8_cn_fetch_cloud</b></td><td><b>盘后数据 / 盘后档 · 短线（16:30后披露·盘中不刷新）</b></td></tr>
+    verify_how: |
+      母版「📜 最近变更记录」区顶部出现 10-15 IF 条目；lg-ph 矩阵含 IF 会员持仓择时行；公开站 logic.html 保持下架桩不动。
+    verified_at: "2026-10-16 05:30 登记待合并（未入母版）"
+    updated: "2026-10-16 05:30"
+    updated_by: 小九(lemoncat-cn)
