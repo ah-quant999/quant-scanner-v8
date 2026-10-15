@@ -8483,7 +8483,7 @@ items:
   - id: future-card-daily-fix-1015
     owner: 小九(lemoncat-cn)
     priority: P1
-    status: pending-verify
+    status: done-pending-publish
     created: 2026-10-15
     title: 未来预测两张卡「看起来死」一劳永逸修复（主人10-15令）
     note: >
@@ -8495,11 +8495,10 @@ items:
       底部时间轴强制显示最后计数月份2026-09。D骨架一字未动，保审计硬闸。
       改后三件套：①审计→CI build 绿（head dbff82640/e9b5e6e6d，[13/13]过），门禁已绑HEAD；
       ②四方对齐→云端workflow✅(v8_market_thermo日更)、双机时窗✅(小九窗口09:0x推)、
-      运维页index.html✅(改)、逻辑详解页⚠️(URL logic.full.html 私有源不在本机，未记录；
-      已备变更记录待主人贴入私有副本)；③推仓→git push HEAD:main force:false 已上线，逐字节自证未跑。
+      运维页index.html✅(改)、逻辑详解页✅(修订版 logic.full.html 已生成并放坚果云 workspace/from_xiaojiu_to_alimi/logic_page_update_1015/，含最近变更记录4条：10-15 future卡修复 / 10-15 业绩预告口径核对 / 10-14 guanlan 双token硬失败 / 10-14 creds面板交接；待阿狸咪夜班覆盖 E:/v8_logic_private/logic.full.html 后重新发布原链接，链接不变)；③推仓→git push HEAD:main force:false 已上线，逐字节自证未跑。
     verify_how: |
       Pages 硬抓 index.html 含「并非卡死」常驻条 + 时间轴末月2026-09 + 实时点位条（本会话已硬抓实证在线）；
       val10_d 待下次 v8_market_thermo run 写入后图②显示日频温度（当前回退月度57，不报错）。
     verified_at: "2026-10-15 09:0x CST · 前端三处已 Pages 硬抓实证在线；val10_d 数据待 run"
-    updated: "2026-10-15 09:03"
+    updated: "2026-10-15 12:25"
     updated_by: 小九(lemoncat-cn)
