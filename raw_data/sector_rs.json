@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-15 22:29",
+  "update_time": "2026-10-15 23:03",
   "data_date": "2026-10-15",
   "data_date_source": "kline",
   "fetch_date": "2026-10-15",
@@ -818,21 +818,21 @@
     },
     {
       "name": "旅游及酒店",
-      "pct_day": -2.31,
-      "pct_5d": -1.88,
-      "pct_20d": -13.87,
-      "pct_30d": -7.32,
-      "pct_60d": 2.21,
-      "pct_90d": -9.17,
-      "pct_180d": -24.31,
-      "pct_52w": -23.29,
-      "relative_5d": -1.88,
-      "relative_20d": -13.87,
-      "relative_30d": -7.32,
-      "relative_60d": 2.21,
-      "relative_90d": -9.17,
-      "relative_180d": -24.31,
-      "relative_52w": -23.29
+      "pct_day": -0.67,
+      "pct_5d": -0.24,
+      "pct_20d": -12.42,
+      "pct_30d": -5.77,
+      "pct_60d": 3.92,
+      "pct_90d": -7.65,
+      "pct_180d": -23.05,
+      "pct_52w": -22.0,
+      "relative_5d": -0.24,
+      "relative_20d": -12.42,
+      "relative_30d": -5.77,
+      "relative_60d": 3.92,
+      "relative_90d": -7.65,
+      "relative_180d": -23.05,
+      "relative_52w": -22.0
     },
     {
       "name": "美容护理",
@@ -1737,6 +1737,24 @@
       "relative_52w": -4.35
     },
     {
+      "name": "旅游及酒店",
+      "pct_day": -0.67,
+      "pct_5d": -0.24,
+      "pct_20d": -12.42,
+      "pct_30d": -5.77,
+      "pct_60d": 3.92,
+      "pct_90d": -7.65,
+      "pct_180d": -23.05,
+      "pct_52w": -22.0,
+      "relative_5d": -0.24,
+      "relative_20d": -12.42,
+      "relative_30d": -5.77,
+      "relative_60d": 3.92,
+      "relative_90d": -7.65,
+      "relative_180d": -23.05,
+      "relative_52w": -22.0
+    },
+    {
       "name": "软件开发",
       "pct_day": -2.68,
       "pct_5d": -0.38,
@@ -1789,24 +1807,6 @@
       "relative_90d": -12.73,
       "relative_180d": -31.54,
       "relative_52w": -22.11
-    },
-    {
-      "name": "银行",
-      "pct_day": -1.09,
-      "pct_5d": -1.24,
-      "pct_20d": -0.39,
-      "pct_30d": 1.42,
-      "pct_60d": 5.77,
-      "pct_90d": 5.84,
-      "pct_180d": 5.44,
-      "pct_52w": 8.05,
-      "relative_5d": -1.24,
-      "relative_20d": -0.39,
-      "relative_30d": 1.42,
-      "relative_60d": 5.77,
-      "relative_90d": 5.84,
-      "relative_180d": 5.44,
-      "relative_52w": 8.05
     }
   ],
   "strong_relative_5d": [
@@ -1919,6 +1919,24 @@
       "relative_52w": -4.35
     },
     {
+      "name": "旅游及酒店",
+      "pct_day": -0.67,
+      "pct_5d": -0.24,
+      "pct_20d": -12.42,
+      "pct_30d": -5.77,
+      "pct_60d": 3.92,
+      "pct_90d": -7.65,
+      "pct_180d": -23.05,
+      "pct_52w": -22.0,
+      "relative_5d": -0.24,
+      "relative_20d": -12.42,
+      "relative_30d": -5.77,
+      "relative_60d": 3.92,
+      "relative_90d": -7.65,
+      "relative_180d": -23.05,
+      "relative_52w": -22.0
+    },
+    {
       "name": "软件开发",
       "pct_day": -2.68,
       "pct_5d": -0.38,
@@ -1971,24 +1989,6 @@
       "relative_90d": -12.73,
       "relative_180d": -31.54,
       "relative_52w": -22.11
-    },
-    {
-      "name": "银行",
-      "pct_day": -1.09,
-      "pct_5d": -1.24,
-      "pct_20d": -0.39,
-      "pct_30d": 1.42,
-      "pct_60d": 5.77,
-      "pct_90d": 5.84,
-      "pct_180d": 5.44,
-      "pct_52w": 8.05,
-      "relative_5d": -1.24,
-      "relative_20d": -0.39,
-      "relative_30d": 1.42,
-      "relative_60d": 5.77,
-      "relative_90d": 5.84,
-      "relative_180d": 5.44,
-      "relative_52w": 8.05
     }
   ],
   "strong_20d": [
