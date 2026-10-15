@@ -17084,7 +17084,7 @@ h+=`</div>`;
     c1.setOption({
       backgroundColor:'transparent', tooltip:TIP,
       grid:{left:56,right:58,top:30,bottom:44},
-      xAxis:Object.assign({type:'category',data:D.dates,axisLabel:{interval:Math.floor(D.dates.length/12),color:'#9aa4b2',fontSize:10},axisLine:{lineStyle:{color:'#3a4149'}}},{}),
+      xAxis:Object.assign({type:'category',data:D.dates,axisLabel:{interval:function(i){return i%Math.floor(D.dates.length/12)===0||i===D.dates.length-1;},color:'#9aa4b2',fontSize:10},axisLine:{lineStyle:{color:'#3a4149'}}},{}),
       yAxis:[Object.assign({type:'log',name:'等权(左)',scale:true,nameTextStyle:{color:C_DIM}},AXS),
              Object.assign({type:'value',name:'上证(右)',min:0,max:6500,splitLine:{show:false},nameTextStyle:{color:C_DIM}},AXS)],
       legend:{data:['上证综指','等权指数','200MA'],top:0,textStyle:{color:'#c9d1dc',fontSize:11}},
@@ -17120,7 +17120,7 @@ h+=`</div>`;
     c2.setOption({
       backgroundColor:'transparent', tooltip:TIP,
       grid:{left:44,right:56,top:24,bottom:36},
-      xAxis:{type:'category',data:D.dates,axisLabel:{interval:Math.floor(D.dates.length/12),color:'#9aa4b2',fontSize:10},axisLine:{lineStyle:{color:'#3a4149'}}},
+      xAxis:{type:'category',data:D.dates,axisLabel:{interval:function(i){return i%Math.floor(D.dates.length/12)===0||i===D.dates.length-1;},color:'#9aa4b2',fontSize:10},axisLine:{lineStyle:{color:'#3a4149'}}},
       yAxis:Object.assign({type:'value',name:'分位',min:0,max:100,nameTextStyle:{color:C_DIM}},AXS),
       series:[{name:'10年PE分位',type:'line',data:D.val10,showSymbol:false,lineStyle:{width:1.6,color:C_PUR},areaStyle:{color:'rgba(192,132,252,0.08)'},
         markPoint:{silent:true,data:ext2},
