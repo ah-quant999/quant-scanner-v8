@@ -8644,3 +8644,73 @@ items:
     verified_at: "2026-10-15 22:05 远端 AST/py_compile/git log/Pages 硬抓四重自证"
     updated: "2026-10-15 22:05"
     updated_by: 阿狸咪(alimi-cn)
+  - id: backtest-caliber-audit-replay-violation-1015
+    status: blocked
+    created: 2026-10-15
+    title: 全站回测口径审计实锤——四量终极主榜仍跑历史回放（违反 10-11 令），真实流视图被 update_v8 映射缺口挡住；修复待主人裁定
+    note: |
+      主人令「确认所有的回测，都要用自己算法跑出来的股票回测」全站复核结论
+      （BACKTEST_ALL_ALGOS.js 5 卡 147 行 + 最终推荐 Top3，线上硬抓+本地双轨比对）：
+      ① 策略回测页主榜仅 3 卡（index.html L6368 _PAGE=['四量终极','强势跟踪','量质双擎']）：
+         · 强势跟踪 ✅ 真实信号流：IMA_STRONG_BACKTEST（caliber=signal_layer，
+           188 信号·2026-06-09~10-13·信号源 ima_strong_history.json∪_v2.json 含已回落票，
+           T+45 56 样本/87.5%/+24.53%，与主人截图一致）；
+         · 量质双擎 ✅ 真实信号流：LQSQ_BACKTEST（每日全市场异常量比直选 Top5 归档，
+           75 信号·10-09~10-15，10-13 主人令由 Top30 收紧）；
+         · 四量终极 ❌ 历史规则回放：硬抓线上 Pages data/FOUR_VOLUME_BACKTEST.js
+           （2026-10-15 20:38:06 版）= method「四量终极历史回测」/signal_date_range
+           「近 5 年」/total_signals=1566/T+250 samples=941（与主人截图 n=941 一致）；
+           线上 BACKTEST_ALL_ALGOS.js（22:47:17）四量主口径 T+5 n=1559/51.6%/+1.94、
+           T+250 n=941/85.5%/+116.46 全源出该回放外壳，★4.34 由 __committeeRate()
+           （L4878-4895，从 rows 实时算、无硬编码）据此算出 ⇒ 主榜/评星/档位全违规。
+      ② 违规根因三段（「文案 vs 实现不符」实锤）：
+         · algorithms/strategy_four_volume.py::write_four_volume_backtest_js()（L358-437）
+           每晚选股后即写 data/FOUR_VOLUME_BACKTEST.js 回放外壳（数据源 backtest_four_volume
+           历史规则回放，V8_BACKTEST_YEARS 默认 3/run_algorithms 注入 5），且 L420-436
+           「防降级覆盖」令低档不得覆盖高档 ⇒ 5 年回放真值永驻（10-15 19:33:24 与 20:38:06
+           连续两晚实证刷新）；L443-445 残留 09-06 旧令「默认跑回测保外壳永不空」与 10-11
+           新令冲突未清；
+         · update_v8.py raw→data 映射表（L75-76）只有 four_volume_history.json→
+           FOUR_VOLUME_HISTORY 与 four_volume_track.json→FOUR_VOLUME_TRACK，**缺
+           four_volume_backtest.json→FOUR_VOLUME_BACKTEST** ⇒ gen_four_volume_track.py
+           产的真实流视图（raw_data/four_volume_backtest.json，19:34:03：total_signals=94、
+           track_start=2026-09-14、method 明示「历史规则回放口径已作废下线」、
+           T+1 36.17%/-0.06%、T+5 89 样本 33.71%/-1.38%、T+10 73 样本 12.33%/-10.70%）
+           从未触达前端；
+         · gen_backtest_all_algos.py L98-103 注释宣称本条「已摘链/已切换真实流」、rows method
+           字段写「2026-10-11 切换，回放口径作废」，数字实为回放 ⇒ 前端 L5335 卡 desc
+           「四量真实信号流回测…回放口径作废」同样失真。
+      ③ 研究类边界合规（不违反「历史规则回放数据禁作主榜/评级/上下架依据」）：
+         · K线信号层（BACKTEST_TDX=backtest_tdx.py 拉**金池股当前池** 60 日 K 线回溯，
+           108 行 n 高达 4 万）：cat=signal/kind=signal/is_primary 全 0，09-16 主人令已删
+           星籍（__STAR_PROFILE_OF 不登记⇒不评级），是技术信号参考层；
+         · 因子实验室（FACTOR_LAB_BACKTEST=重点池 A 股五分位分层）：2026-09-20 主人令已
+           整体移出策略回测页（非选股策略，因子跟踪只在最终推荐页）。
+           二者股池口径含幸存者偏差、样本量指数级虚高，仅限研究参考，严禁与真实信号流
+           主榜数字混列。
+      ④ 最终推荐 Top3 回测（FINAL_RECOMMEND_BACKTEST，signal_source=raw_data/history/
+         final_recommend_YYYYMMDD.json 算法链每日真实选股 dated 快照归档）✅ 真实信号流。
+    fix: >-
+      待主人裁定后执行（依据 10-11 令「历史规则回放数据禁作主榜/评级/上下架依据」）：
+      (a) update_v8.py 补映射 four_volume_backtest.json→FOUR_VOLUME_BACKTEST（真实流视图
+          接管同名注入，summary.by_period 同构零改动）；
+      (b) 摘除/闸断 strategy_four_volume.py::write_four_volume_backtest_js() 回放写入，
+          同步清 09-06 旧令残留注释与 L420-436 防降级覆盖段；
+      (c) gen_backtest_all_algos.py 四量条目确认改读真实流视图并同步 method 文案；
+      (d) 星级随真实流重算：94 信号预计远低于 4.34★（T+5 仅 33.71%/-1.38%），
+          delist_advice 阈值判定照常生效（主人原话「不行也只能下架」）。
+      注意 v8 铁律：本地改好不上线，须主人明令「上线」才 commit+push。
+    verify_how: |
+      ① curl -s https://ah-quant999.github.io/quant-scanner-v8/data/FOUR_VOLUME_BACKTEST.js
+        ⇒ method=「四量终极历史回测」/近 5 年/total_signals=1566/T+250 samples=941
+        （与主人截图一致；本地 19:33:24 版为近 3 年 1553，同属回放）；
+      ② 本地 raw_data/four_volume_backtest.json（19:34:03）⇒ 94 信号/09-14 起/
+        T+1 36.17%/T+5 89 样本 33.71%/-1.38%；
+      ③ 线上 BACKTEST_ALL_ALGOS.js（22:47:17）⇒ 四量 T+5 主口径 n=1559/51.6%/+1.94、
+        src=FOUR_VOLUME_BACKTEST、src_time=2026-10-15 20:38；
+      ④ grep update_v8.py L75-76 ⇒ 无 four_volume_backtest.json 映射（缺口实锤）；
+      ⑤ index.html L4899-4949 __STAR_PROFILE_OF（'四量终极':'long' 登记在册）+
+        L6368 _PAGE 主榜 3 卡 ⇒ 回放数据确实驱动主榜星级。
+    verified_at: "2026-10-15 23:45 线上 Pages 双文件硬抓+本地三文件+前端登记表五重自证（审计结论已验证；修复未动，等裁定）"
+    updated: "2026-10-15 23:45"
+    updated_by: 阿狸咪(alimi-cn)
