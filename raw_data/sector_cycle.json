@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-15 09:56:55",
+  "update_time": "2026-10-15 10:10:51",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -17,14 +17,14 @@
     {
       "sector": "AI算力",
       "start": "08/27",
-      "end": "10/14",
+      "end": "10/15",
       "start_idx": 0,
-      "end_idx": 28,
-      "days": 29,
-      "hot_days": 27,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 28,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 331,
+      "total": 334,
       "ongoing": true
     },
     {
@@ -50,7 +50,7 @@
       "hot_days": 30,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 485,
+      "total": 486,
       "ongoing": true
     },
     {
@@ -193,7 +193,7 @@
       "hot_days": 13,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 76,
+      "total": 77,
       "ongoing": true
     },
     {
@@ -217,9 +217,9 @@
       "end_idx": 29,
       "days": 2,
       "hot_days": 2,
-      "peak": 4,
-      "peak_date": "10/14",
-      "total": 8,
+      "peak": 5,
+      "peak_date": "10/15",
+      "total": 9,
       "ongoing": true
     }
   ]
