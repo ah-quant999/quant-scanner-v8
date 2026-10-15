@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-15 08:58",
- "generated": "2026-10-15 08:58",
+ "update_time": "2026-10-15 15:42",
+ "generated": "2026-10-15 15:42",
  "meta": {
-  "generated": "2026-10-15 08:58",
+  "generated": "2026-10-15 15:42",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 27,
   "days_with_consensus": 0,
@@ -10220,177 +10220,93 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
-      "code": "600792",
-      "name": "云煤能源",
-      "change_pct": 3.95,
-      "price": 5.0,
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 3.302,
+      "price": 2.19,
       "category": "突破"
      },
      {
-      "code": "300290",
-      "name": "ST荣科",
-      "change_pct": 3.416,
-      "price": 6.66,
+      "code": "000626",
+      "name": "远大控股",
+      "change_pct": 9.976,
+      "price": 9.15,
       "category": "突破"
      },
      {
-      "code": "301227",
-      "name": "森鹰窗业",
-      "change_pct": 8.802,
-      "price": 31.52,
+      "code": "300691",
+      "name": "联合光电",
+      "change_pct": 4.75,
+      "price": 16.98,
       "category": "突破"
      },
      {
-      "code": "000993",
-      "name": "闽东电力",
-      "change_pct": 6.838,
-      "price": 18.75,
-      "category": "突破"
-     },
-     {
-      "code": "603386",
-      "name": "骏亚科技",
-      "change_pct": 5.381,
-      "price": 18.41,
-      "category": "突破"
-     },
-     {
-      "code": "603721",
-      "name": "中广天择",
-      "change_pct": 3.013,
-      "price": 20.17,
-      "category": "突破"
-     },
-     {
-      "code": "301234",
-      "name": "五洲医疗",
-      "change_pct": 4.988,
-      "price": 149.03,
-      "category": "突破"
-     },
-     {
-      "code": "002343",
-      "name": "慈文传媒",
-      "change_pct": 10.054,
-      "price": 8.1,
+      "code": "605003",
+      "name": "众望布艺",
+      "change_pct": 10.0,
+      "price": 25.96,
       "category": "突破"
      }
     ],
     "加速": [
      {
-      "code": "600792",
-      "name": "云煤能源",
-      "change_pct": 3.95,
-      "price": 5.0,
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 3.302,
+      "price": 2.19,
       "category": "加速"
      },
      {
-      "code": "300290",
-      "name": "ST荣科",
-      "change_pct": 3.416,
-      "price": 6.66,
+      "code": "000626",
+      "name": "远大控股",
+      "change_pct": 9.976,
+      "price": 9.15,
       "category": "加速"
      },
      {
-      "code": "301227",
-      "name": "森鹰窗业",
-      "change_pct": 8.802,
-      "price": 31.52,
-      "category": "加速"
-     },
-     {
-      "code": "000993",
-      "name": "闽东电力",
-      "change_pct": 6.838,
-      "price": 18.75,
+      "code": "300691",
+      "name": "联合光电",
+      "change_pct": 4.75,
+      "price": 16.98,
       "category": "加速"
      }
     ],
     "短线选股": [
      {
-      "code": "600792",
-      "name": "云煤能源",
-      "change_pct": 3.95,
-      "price": 5.0,
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 3.302,
+      "price": 2.19,
       "category": "短线选股"
      },
      {
-      "code": "300290",
-      "name": "ST荣科",
-      "change_pct": 3.416,
-      "price": 6.66,
+      "code": "000626",
+      "name": "远大控股",
+      "change_pct": 9.976,
+      "price": 9.15,
       "category": "短线选股"
      },
      {
-      "code": "301227",
-      "name": "森鹰窗业",
-      "change_pct": 8.802,
-      "price": 31.52,
+      "code": "300691",
+      "name": "联合光电",
+      "change_pct": 4.75,
+      "price": 16.98,
       "category": "短线选股"
      },
      {
-      "code": "000993",
-      "name": "闽东电力",
-      "change_pct": 6.838,
-      "price": 18.75,
-      "category": "短线选股"
-     },
-     {
-      "code": "603386",
-      "name": "骏亚科技",
-      "change_pct": 5.381,
-      "price": 18.41,
-      "category": "短线选股"
-     },
-     {
-      "code": "603721",
-      "name": "中广天择",
-      "change_pct": 3.013,
-      "price": 20.17,
-      "category": "短线选股"
-     },
-     {
-      "code": "301234",
-      "name": "五洲医疗",
-      "change_pct": 4.988,
-      "price": 149.03,
-      "category": "短线选股"
-     },
-     {
-      "code": "002343",
-      "name": "慈文传媒",
-      "change_pct": 10.054,
-      "price": 8.1,
+      "code": "605003",
+      "name": "众望布艺",
+      "change_pct": 10.0,
+      "price": 25.96,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "603386",
-      "name": "骏亚科技",
-      "change_pct": 5.381,
-      "price": 18.41,
-      "category": "强势股"
-     },
-     {
-      "code": "603721",
-      "name": "中广天择",
-      "change_pct": 3.013,
-      "price": 20.17,
-      "category": "强势股"
-     },
-     {
-      "code": "301234",
-      "name": "五洲医疗",
-      "change_pct": 4.988,
-      "price": 149.03,
-      "category": "强势股"
-     },
-     {
-      "code": "002343",
-      "name": "慈文传媒",
-      "change_pct": 10.054,
-      "price": 8.1,
+      "code": "605003",
+      "name": "众望布艺",
+      "change_pct": 10.0,
+      "price": 25.96,
       "category": "强势股"
      }
     ]
