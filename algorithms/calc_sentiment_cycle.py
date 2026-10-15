@@ -104,8 +104,21 @@ def main():
         return
 
     ladder = lm.get("ladder", {}) or {}
+    # 🛡 2026-10-15 一劳永逸：类型防御。
+    #   `total` 现为**数字**＝今日个股涨停池家数（由 cloud_fetch_v8.f_limit_up_heatmap 回填）；
+    #   历史/异常产物里它曾是"近N日每日家数"数组（与「今日家数」同名不同义），一旦当数字用，
+    #   下游 min(60, 数组) 会得到 NaN ⇒ 情绪分显示 NaN（2026-10-15 主人截图实锤）。
+    #   数组时退化为 today_total 并告警，绝不把数组当标量。
     total = lm.get("total", 0)
+    if isinstance(total, (list, tuple)):
+        print("[warn] LIMIT_UP_HEATMAP.total 为数组（旧 schema 残留），退化为 today_total")
+        total = lm.get("today_total", 0) or 0
+    if isinstance(ladder, list):
+        # ladder 曾被占位写成 []（假占位）⇒ 退化为空 dict，由 cloud_fetch 回填真值
+        ladder = {}
     top = lm.get("top", []) or []
+    if not isinstance(top, list):
+        top = []
     sectors = lm.get("sectors", []) or []
 
     # 最高连板数 = ladder 的最大 key
@@ -114,11 +127,17 @@ def main():
     ladder_dist = {int(k): int(v) for k, v in ladder.items()}
     ladder_dist = dict(sorted(ladder_dist.items()))
 
-    # 昨日全市场涨停总数 = 所有板块昨日涨停数之和
-    # 注意：sectors 是板块列表（非按日期排），每个 s.data 是该板块近 10 日涨停家数序列
-    # 取所有板块 data[-2]（昨日）求和 = 全市场昨日总数（口径：LIMIT_UP_HEATMAP 注 "近10日板块涨停家数"）
+    # 昨日全市场涨停家数（用于环比 delta_pct）
+    # 🛡 2026-10-15 一劳永逸：**优先**用 cloud_fetch 回填的 prev_total = 上一交易日**涨停池家数**
+    #   （与今日 total 完全同口径）⇒ 环比是真实、口径一致的比较。
+    #   旧实现直接用"所有板块昨日家数之和"（板块口径，实测 183）与个股口径今日值（35）相减
+    #   ⇒ delta_pct 恒失真（2026-10-15 线上实测 -80.87%，属典型口径混算）。
+    #   板块口径求和仅作**兜底**（prev_total 缺失时），并在日志标注口径。
     prev_total = None
-    if sectors:
+    _pt = lm.get("prev_total")
+    if isinstance(_pt, int) and _pt > 0:
+        prev_total = _pt
+    elif sectors:
         yesterday_vals = []
         for s in sectors:
             d = s.get("data", []) if isinstance(s, dict) else []
@@ -129,11 +148,15 @@ def main():
                     pass
         if yesterday_vals:
             prev_total = sum(yesterday_vals)
+            print("[warn] prev_total 缺失，环比退回板块口径求和（与个股口径混算，仅供参考）")
 
     phase, score, color, advice, delta_pct = calc_phase(total, max_ladder, ladder_dist, prev_total)
 
     # 龙头票（连板最高的 3 只）
-    top_sorted = sorted(top, key=lambda x: x.get("lbc", 0), reverse=True)[:3]
+    # 🛡 2026-10-15：过滤掉无 lbc 的条目 —— top 在异常产物里可能是"板块榜"（name/total/recent5），
+    #   若不过滤会把板块名当成"龙头个股"渲染。
+    top_sorted = sorted([t for t in top if isinstance(t, dict) and t.get("lbc")],
+                        key=lambda x: x.get("lbc", 0), reverse=True)[:3]
     leaders = [{"code": s.get("code"), "name": s.get("name"), "lbc": s.get("lbc"), "chg": s.get("chg")} for s in top_sorted]
 
     # 高连板家数
