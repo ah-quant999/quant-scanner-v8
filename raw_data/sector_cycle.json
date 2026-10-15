@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-15 13:40:16",
+  "update_time": "2026-10-15 13:55:37",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 3167,
+      "total": 3168,
       "ongoing": true
     },
     {
@@ -82,14 +82,14 @@
     {
       "sector": "消费电子",
       "start": "08/27",
-      "end": "10/14",
+      "end": "10/15",
       "start_idx": 0,
-      "end_idx": 28,
-      "days": 29,
-      "hot_days": 27,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 28,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 255,
+      "total": 258,
       "ongoing": true
     },
     {
