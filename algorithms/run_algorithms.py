@@ -887,7 +887,8 @@ def _gate_hardwait_four_volume(run_start, max_retry=3, wait_sec=90, total_budget
             # 收敛到剩余预算（下限 600s）：保证整段硬等待总耗时 ≤ 预算 + 600s，而非 3×5400s 叠加
             _gto = max(600, min(_gto, int(total_budget_sec - _used)))
             _fv_env = dict(os.environ)
-            _fv_env["V8_BACKTEST_YEARS"] = "5"  # 防重跑写回3年降级档，与L440 SCRIPT_ENV(E批)同口径
+            # 🔴 2026-10-16 阿狸咪的工程师（摘链）：V8_BACKTEST_YEARS=5 注入随回放口径作废一并移除
+            #   （L437/L474 注释宣称的摘链，此处为最后残留实证点；不注入即走 argparse 默认，回测链已摘）
             r = subprocess.run([PY, prod], cwd=ALGO, capture_output=True, text=True, timeout=_gto, env=_fv_env)
             print(f"     {'✅' if r.returncode == 0 else '⚠️ 退出码 ' + str(r.returncode)} 重跑 strategy_four_volume.py")
         except Exception as e:

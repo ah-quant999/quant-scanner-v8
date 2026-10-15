@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "5c2c137ef0";   // 部署 commit 短 SHA（= 当前 main tip；v8 部署走 Git Data API 直推 main，跳过 v8_build_deploy.yml 的构建期 BUILD 替换，故此处手动对齐真实 tip，确保运维页「部署 SHA」与版本戳强缓存破坏机制真实生效）
+    var BUILD = "c4847459d0";   // 部署 commit 短 SHA（= 当前 main tip；v8 部署走 Git Data API 直推 main，跳过 v8_build_deploy.yml 的构建期 BUILD 替换，故此处手动对齐真实 tip，确保运维页「部署 SHA」与版本戳强缓存破坏机制真实生效）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -1824,7 +1824,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=4bc1891646" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=a6edd711ea" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/FOUR_VOLUME_BACKTEST.js?v=80d5473ba7" defer></script>
+    <script src="data/FOUR_VOLUME_BACKTEST.js?v=2930eda78c" defer></script>
     <script src="data/IMA_STRONG_BACKTEST.js?v=ef1f7e4215" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🆕 2026-10-12 小九：量质双擎（LQSQ · 第一支自研算法）前端接入 —— 后端数据链 10-11 已跑，
          但前端此前**零挂载**（注入/卡片/子页全缺）⇒ 主站无处显示（主人「我半天没看到在哪显示」）。
@@ -17107,8 +17107,22 @@ h+=`</div>`;
       +'<b style="color:'+C_AMB+';">&#x1F4A1; 用法：</b>①看观测台9项指示灯(&#x1F7E2;正常/&#x1F7E1;警惕/&#x1F534;警示)定「贵不贵/险不险/牛熊哪一程」；②看2027情景表定「预期与仓位倾向」；③图①看长周期位置、图②看估值分位。<br>'
       +'<b style="color:'+C_AMB+';">&#x26A0; 限制：</b>情景表为研究性推演(非买卖建议)，概率随数据滚动更新；社融/PMI等宏观源滞后1–5个月属正常并已如实标注；本页只判「周期位置与风险水位」，不给具体买卖点。'
       +'</div>';
-    // ── 一句话结论（2026-10-05 主人令：从情景表下方移至「核心/用法/限制」下方）──
-    html+='<div style="background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.42);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.85;color:'+C_TXT+';"><b style="color:'+C_AMB+';">&#x1F4A1; 一句话结论：</b>当前处于「牛市中段、估值中性偏低、信用收缩初现」的脆弱平衡——估值与情绪不贵（地量+低估值分位+股债性价比高），但社融脉冲已转负、杠杆温和退潮是历史上每轮转熊的宏观先兆；宜保持中性仓位、重结构、控回撤，重点盯两个红灯触发条件：val10 冲上 80 或 脉冲 ≤ −10%。</div>';
+    // ── 一句话结论（2026-10-16 主人令「都是活卡不要死的」：禁硬编码死文案——
+    //    全部由当日数据实时拼装：EDHEC 牛熊态 + val10 日频/月末 + 社融脉冲 + 杠杆 + ERP +
+    //    成交热度，数字天天滚。此前为写死字符串，连看多日无变化，被误判死卡）──
+    var _v10=(c.val10_d!=null?c.val10_d:c.val10), _v10Tag=(c.val10_d!=null?'日频·今':'月末'+c.date);
+    var _bstTxt=(bst==='bear'?'熊市确认段':(bst==='side'?'牛市中回调段':'牛市上行段'));
+    var _valTxt=(_v10==null?'数据累积中':(_v10>=80?'偏贵':(_v10<50?'偏低':'中性')));
+    var _tsfY=(EXT.tsf&&EXT.tsf.yoy!=null)?EXT.tsf.yoy:null;
+    var _tsfTxt=(_tsfY==null?'待接入':(_tsfY<=-10?'崩塌':(_tsfY<0?'收缩初现':'扩张')));
+    var _mgChg=(EXT.margin&&EXT.margin.chg!=null)?EXT.margin.chg:null;
+    var _mgTxt=(_mgChg==null?'待接入':(_mgChg>20?'快速膨胀':(_mgChg>10?'温和加杠杆':(_mgChg>0?'小幅增持':'温和退潮'))));
+    var _erpTxt=(EXT.erp!=null?EXT.erp+'pp':'—');
+    var _redV=(_v10!=null&&_v10>=80), _redT=(_tsfY!=null&&_tsfY<=-10);
+    var _redN=(_redV?1:0)+(_redT?1:0);
+    var _posTxt=(_redN>=2?'立即降仓防守':(_redN===1?'降低仓位、严控回撤':'中性仓位、重结构、控回撤'));
+    var _tsfClause=(_tsfY==null?'社融脉冲待接入':(_tsfY<0?('社融脉冲已转负（'+_tsfY+'%）、杠杆'+_mgTxt+'——历史上每轮转熊的宏观先兆，需盯'):('社融脉冲仍为正（'+_tsfY+'%）、杠杆'+_mgTxt+'——信用尚未收缩，维持观察')));
+    html+='<div style="background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.42);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.85;color:'+C_TXT+';"><b style="color:'+C_AMB+';">&#x1F4A1; 一句话结论：</b>当前处于「'+_bstTxt+'、估值'+_valTxt+'、信用'+_tsfTxt+'」的状态——估值与情绪'+(EXT.erp>=4?'不贵':(EXT.erp>=2?'中性':'偏贵'))+'（val10='+(_v10==null?'—':_v10)+'·'+_v10Tag+'·成交热度 '+(EXT.turnover&&EXT.turnover.pct!=null?EXT.turnover.pct+'%':'—')+' 分位·股债性价比 '+_erpTxt+'），距牛市峰值回撤 '+edhecDD.toFixed(1)+'%；'+_tsfClause+'；宜'+_posTxt+'。红灯触发条件：val10 冲上 80 或 社融脉冲 ≤ −10%——当前已触发 <b style="color:'+(_redN?'#ef5350':'#26a69a')+';">'+_redN+'/2</b>'+(_redN?'（⚠️ 按红灯纪律执行）':'（均未触发）')+'。<span style="color:var(--dim);font-size:11px;">（结论由上方指标实时拼装 · 数据更新于 '+T.generated+' · 月度序列截至 '+D.dates[D.dates.length-1]+' 末）</span></div>';
     // ── 上证/沪深300 实时点位（2026-10-05 主人令：从KPI行胶囊移至一句话结论下方；更新时间已由统一卡头承载，此处删除）──
     html+='<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--dim);">'
       +'<span>&#x1F4CD; 上证 / 沪深300：</span>'
@@ -17119,7 +17133,7 @@ h+=`</div>`;
     var lvlTag={green:'&#x1F7E2; 正常',yellow:'&#x1F7E1; 警惕',red:'&#x1F534; 警示',muted:'&#x26AA; 待接入'};
     var lvlCol={green:C_GRN,yellow:C_AMB,red:C_RED,muted:C_DIM};
     var obs=[
-      {name:'全市场PE·10年分位',val:(c.val10!=null?c.val10:'—')+(c.date?' (月末 '+c.date+')':''),thr:'&gt;80 贵 / &lt;50 便宜',lvl:(c.val10==null?'muted':(c.val10>=80?'red':(c.val10<50?'green':'yellow'))),hist:'27年最高 '+vMax+' / 最低 '+vMin+'；三轮大顶(07/15/21)：'+vTops.join(' / ')},
+      {name:'全市场PE·10年分位',val:(_v10!=null?_v10:'—')+(_v10!=null?(c.val10_d!=null?' (日频·今)':' (月末 '+c.date+')'):''),thr:'&gt;80 贵 / &lt;50 便宜',lvl:(_v10==null?'muted':(_v10>=80?'red':(_v10<50?'green':'yellow'))),hist:'27年最高 '+vMax+' / 最低 '+vMin+'；三轮大顶(07/15/21)：'+vTops.join(' / ')},
       {name:'距牛市峰值回撤(EDHEC)',val:edhecDD.toFixed(1)+'%',thr:'≤-20% 确认熊市',lvl:(edhecDD<=-20?'red':(edhecDD<=-10?'yellow':'green')),hist:'当前='+(bst==='bear'?'熊市段':'牛市上行')+'；历史熊市最深 '+(worstDD==null?'—':worstDD.toFixed(0)+'%')},
       {name:'等权/上证 12M 背离',val:(ex12*100).toFixed(1)+'%',thr:'持续为负=赚指数不赚钱',lvl:(ex12<-0.10?'red':(ex12<0?'yellow':'green')),hist:'三轮大顶时：'+exTops.map(function(x){return x.toFixed(0)+'%';}).join(' / ')+'——大顶时未必为负，仅作辅助信号不单独判顶'},
       {name:'上证 vs 自身200月线',val:((D.sh[n-1]-shMA)>=0?'线上 +':'线下 ')+shMaPct.toFixed(1)+'%',thr:'跌破=长期转熊',lvl:((D.sh[n-1]-shMA)>=0?'green':'red'),hist:'历史最深偏离 '+(maMinDev==null?'—':maMinDev.toFixed(0)+'%')},
@@ -17145,11 +17159,11 @@ h+=`</div>`;
     // ── 图② ──
     html+='<div style="font-size:14px;font-weight:800;color:'+C_AMB+';margin:12px 0 6px;">&#x2461; 10年PE分位（&gt;80 贵 / &lt;50 便宜）</div>';
     html+='<div id="futureC2" style="height:260px;"></div>';
-    html+='<div style="font-size:11px;color:var(--dim);margin:6px 0 0;line-height:1.7;">📡 实时：上证 '+(SPOT.sh||'—')+' / 沪深300 '+(SPOT.hs300||'—')+' · 数据更新于 '+T.generated+'（每日刷新）<br>📅 两图为月度序列（右端每月末追加新点）；日频温度与实时点位每日滚动，故卡面“当前”值每天都在变，并非卡死。</div>';
+    html+='<div style="font-size:11px;color:var(--dim);margin:6px 0 0;line-height:1.7;">📡 实时：上证 '+(SPOT.sh||'—')+' / 沪深300 '+(SPOT.hs300||'—')+' · 数据更新于 '+T.generated+'（每日刷新）<br>📅 两图为月度序列，右端末档 = 数据末月 <b style="color:'+C_TXT+';">'+D.dates[D.dates.length-1]+'</b>（每月末追加新点，轴终点即最新完整月）；日频温度与实时点位每日滚动，卡面“当前”值天天在变，并非卡死。</div>';
     // ── 2027 情景 ──
     function tgt(v,r){ return Math.round(v*(1+r/100)); }
     var scn=[{name:'牛市',p:25,r:[15,22],col:C_GRN,drv:'强财政货币延续 + 居民资金入市 + 估值扩张 + 盈利兑现'},
-             {name:'基准',p:50,r:[8,14],col:C_BLU,drv:'政策托底 + 盈利弱复苏 + 估值中性(val10='+c.val10+') + 区间下沿均值回归'},
+             {name:'基准',p:50,r:[8,14],col:C_BLU,drv:'政策托底 + 盈利弱复苏 + 估值中性(val10='+(_v10==null?'—':_v10)+(_v10Tag?'·'+_v10Tag:'')+') + 区间下沿均值回归'},
              {name:'熊市',p:25,r:[-13,-5],col:C_RED,drv:'外部冲击 + 盈利证伪 + 流动性收紧 + 杠杆退潮'}];
     html+='<div style="font-size:14px;font-weight:800;color:'+C_AMB+';margin:12px 0 6px;">&#x2462; 2027 年度展望（多因子情景法 · 1年维度 · 研究性推演非买卖建议）</div>';
     html+='<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim);">情景</th><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim);">概率</th><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim);">上证综指</th><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim);">沪深300</th><th style="border:1px solid var(--border);padding:6px;background:rgba(255,255,255,.04);color:var(--dim);">核心驱动</th></tr></thead><tbody>';
@@ -17162,9 +17176,16 @@ h+=`</div>`;
     });
     html+='</tbody></table>';
     html+='<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.7;">&#x1F4CC; 数据锚：val10&#x2208;[50,60] 时，历史之后12个月等权指数均值 <b style="color:'+C_TXT+'">+'+(base12==null?'—':base12)+'%</b>（27年数据实算）。'
-      +'⚠️ 活跃黄旗：社融脉冲已转负（'+EXT.tsf.yoy+'%），信用扩张失速是历史上每轮熊市的宏观先兆；红灯条件 = val10 冲上 80 或 脉冲 ≤ −10%。数据更新：'+T.generated+'。</div>';
+      +(_tsfY==null?'社融脉冲待接入。':(_tsfY<0?('&#x26A0;&#xFE0F; 活跃黄旗：社融脉冲已转负（'+_tsfY+'%），信用扩张失速是历史上每轮熊市的宏观先兆。'):('&#x2705; 黄旗未激活：社融脉冲仍为正（'+_tsfY+'%）。')))
+      +'红灯条件 = val10 冲上 80 或 脉冲 ≤ −10%——当前 val10='+(_v10==null?'—':_v10)+' / 脉冲='+(_tsfY==null?'—':_tsfY)+'%，已触发 '+_redN+'/2。数据更新：'+T.generated+'。</div>';
     html+='</div>'; // /卡头下方内容包裹层（2026-10-05）
     host.innerHTML=html;
+    // ── x 轴末档刻度（2026-10-16 主人令「底轴不是应该写到今天么」：原 interval 回调函数
+    //    的末档 clause 实测不渲染（末档标签 2026-09 不显示，用户看着像停在 2025-12）⇒ 改
+    //    interval:0 + formatter 对非刻度位返回空串（空串不占位不叠字），保「每 26 个月一档」
+    //    且强制数据末月可见；末档前 8 个月内不再出常规档，防与末档叠字）──
+    var _step=Math.floor(D.dates.length/12), _lastI=D.dates.length-1;
+    function _tickLbl(v,i){ return (i===_lastI||(i%_step===0&&_lastI-i>=_step))?v:''; }
     // ── ECharts 渲染（暗色）──
     var AXS={axisLine:{lineStyle:{color:'#3a4149'}},axisLabel:{color:'#9aa4b2',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.06)'}}};
     var TIP={trigger:'axis',backgroundColor:'rgba(20,24,30,.94)',borderColor:'#3a4149',textStyle:{color:C_TXT,fontSize:11}};
@@ -17172,7 +17193,7 @@ h+=`</div>`;
     c1.setOption({
       backgroundColor:'transparent', tooltip:TIP,
       grid:{left:56,right:58,top:30,bottom:44},
-      xAxis:Object.assign({type:'category',data:D.dates,axisLabel:{interval:function(i){return i%Math.floor(D.dates.length/12)===0||i===D.dates.length-1;},color:'#9aa4b2',fontSize:10},axisLine:{lineStyle:{color:'#3a4149'}}},{}),
+      xAxis:Object.assign({type:'category',data:D.dates,axisLabel:{interval:0,formatter:_tickLbl,color:'#9aa4b2',fontSize:10},axisLine:{lineStyle:{color:'#3a4149'}}},{}),
       yAxis:[Object.assign({type:'log',name:'等权(左)',scale:true,nameTextStyle:{color:C_DIM}},AXS),
              Object.assign({type:'value',name:'上证(右)',min:0,max:6500,splitLine:{show:false},nameTextStyle:{color:C_DIM}},AXS)],
       legend:{data:['上证综指','等权指数','200MA'],top:0,textStyle:{color:'#c9d1dc',fontSize:11}},
@@ -17208,7 +17229,7 @@ h+=`</div>`;
     c2.setOption({
       backgroundColor:'transparent', tooltip:TIP,
       grid:{left:44,right:56,top:24,bottom:36},
-      xAxis:{type:'category',data:D.dates,axisLabel:{interval:function(i){return i%Math.floor(D.dates.length/12)===0||i===D.dates.length-1;},color:'#9aa4b2',fontSize:10},axisLine:{lineStyle:{color:'#3a4149'}}},
+      xAxis:{type:'category',data:D.dates,axisLabel:{interval:0,formatter:_tickLbl,color:'#9aa4b2',fontSize:10},axisLine:{lineStyle:{color:'#3a4149'}}},
       yAxis:Object.assign({type:'value',name:'分位',min:0,max:100,nameTextStyle:{color:C_DIM}},AXS),
       series:[{name:'10年PE分位',type:'line',data:D.val10,showSymbol:false,lineStyle:{width:1.6,color:C_PUR},areaStyle:{color:'rgba(192,132,252,0.08)'},
         markPoint:{silent:true,data:ext2},
@@ -18046,6 +18067,24 @@ window.__renderV8CalToday();
     var sb=document.getElementById('finalStatusBadges'); if(sb) sb.innerHTML='';
     if(!D || !D.stocks || !D.stocks.length){
       el.innerHTML='<div class="note" style="padding:16px;text-align:center;color:var(--dim)">最终推荐数据暂不可用（等待盘后算法生成）</div>';
+      return;
+    }
+    // 🔴 2026-10-16 主人令「方案B 因子融合整轮跳过·degrade_note 明示非全口径成功 ⇒ 没成功就不能展示」：
+    //   降级产物（DEGRADED_UPSTREAM / 因子实验室 data_date 非今日 / signal_edge 动态缺失）一律不推票，
+    //   只明示原因与数据时点，处置权交主人（此前前端对 data_degraded/degrade_note 零渲染，
+    //   降级产物被当正常推荐展示的漏洞由此堵死）。
+    if(D && D.data_degraded){
+      var _dn=String(D.degrade_note||'').replace(/[<>&"]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});
+      var _dut=D.update_time||'';
+      el.innerHTML='<div style="padding:20px;text-align:center">'
+        +'<div style="font-size:15px;font-weight:700;color:#fb923c;margin-bottom:8px">⚠️ 今日推荐未达全口径成功，按主人令不予展示</div>'
+        +'<div style="font-size:12.5px;color:var(--dim);line-height:1.7">'+(_dn||'上游数据降级，具体原因见 degrade_note')+'</div>'
+        +(_dut?'<div style="font-size:11.5px;color:var(--dim);margin-top:6px">数据时点：'+_dut+'</div>':'')
+        +'</div>';
+      var _sb2=document.getElementById('finalStatusBadges');
+      if(_sb2) _sb2.innerHTML='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">⚠️ 未达全口径 · 不予展示</span>';
+      var _tn2=document.getElementById('finalTopN'); if(_tn2) _tn2.textContent='0';
+      var _tg2=document.getElementById('finalHeaderTag'); if(_tg2) _tg2.textContent='降级未展示';
       return;
     }
     var n=document.getElementById('finalTopN'); if(n) n.textContent=(D.stocks.length||3);

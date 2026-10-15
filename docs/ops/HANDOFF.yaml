@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-14 23:15"
+  updated: "2026-10-16 06:51"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -8647,7 +8647,7 @@ items:
   - id: backtest-caliber-audit-replay-violation-1015
     owner: 阿狸咪的工程师
     priority: P0
-    status: blocked
+    status: doing
     created: 2026-10-15
     title: 全站回测口径审计实锤——四量终极主榜仍跑历史回放（违反 10-11 令），真实流视图被 update_v8 映射缺口挡住；修复待主人裁定
     note: |
@@ -8713,7 +8713,74 @@ items:
       ④ grep update_v8.py L75-76 ⇒ 无 four_volume_backtest.json 映射（缺口实锤）；
       ⑤ index.html L4899-4949 __STAR_PROFILE_OF（'四量终极':'long' 登记在册）+
         L6368 _PAGE 主榜 3 卡 ⇒ 回放数据确实驱动主榜星级。
-    verified_at: "2026-10-15 23:45 线上 Pages 双文件硬抓+本地三文件+前端登记表五重自证（审计结论已验证；修复未动，等裁定）"
+    exec_log: |
+      2026-10-16 06:25 主人令「早就说过了，发现错误直接改，改好直接上线不用一直问我！」
+      ⇒ 四步全执行（本地已验证）：
+      (a) update_v8.py L77 补 four_volume_backtest.json→FOUR_VOLUME_BACKTEST 映射 +
+          CATEGORY_MAP post_close 档（v8_health_check.py CARD_DEFS L174 原已登记，
+          三处同口径铁律满足）；实测 _write_js 单测转换 raw→data 通过。
+      (b) strategy_four_volume.py 摘链：write_four_volume_backtest_js() 全函数（L358-439）、
+          backtest_four_volume() 回放引擎（L449-610）、argparse --backtest、main 回测段
+          （L640-663）整体删除（668→404 行）；09-06 旧令残留注释与 L420-436 防降级覆盖段
+          随清；run_algorithms.py L890 _fv_env["V8_BACKTEST_YEARS"]="5" 注入摘除
+          （L437/474 注释宣称摘链后的最后残留实证点）。
+      (c) gen_backtest_all_algos.py 四量条目 method 文案 10-11 已是真实流口径（读
+          data/FOUR_VOLUME_BACKTEST.js），数据通路修好后自动读真实流，零改动。
+      (d) 星级/聚合随真实流自动重算：data/FOUR_VOLUME_BACKTEST.js 已由真实流视图重建
+          （update_time 2026-10-15 19:34:03/method 真实流/total_signals=94/
+          by_period 成熟档 1/3/5/10，T+5 89 样本 33.71%/-1.38%，回放外壳同 source 覆盖）。
+    verified_at: "2026-10-15 23:45 线上 Pages 双文件硬抓+本地三文件+前端登记表五重自证（审计结论已验证）；2026-10-16 06:5x 四步已执行+本地七重验证（pre_deploy_audit 15/15、双盲区、ledger 169/169、smoke 三层、降级堵口三场景、py_compile 200、update_v8 转换实测），待上线后线上硬抓复核改 done"
+
+  - id: finalrec-degrade-block-1016
+    owner: 阿狸咪的工程师
+    priority: P0
+    status: doing
+    created: 2026-10-16
+    title: 最终推荐降级堵口——data_degraded 产物一律不展示（主人令「没成功就不能展示」），前端零渲染漏洞堵死
+    note: |
+      主人 06:14 两问裁定：方案B 因子融合整轮跳过·degrade_note 明示非全口径成功
+      ⇒「那就是没成功，那就不能展示」。此前 origin/main index.html 对 data_degraded/
+      degrade_note **零引用**（grep 实证）⇒ 03:35:36 降级版（degraded=true、
+      FACTOR_LAB data_date=10-15 非今日、2 只全「观察」、regime=panic 却 open=false）
+      被当正常推荐展示，属「半假数据」上屏。
+      修复（index.html renderFinalRecInner，L18072 无数据判断后、推票渲染前）：
+      data_degraded=true ⇒ 早返——不推票，卡体显示「⚠️ 今日推荐未达全口径成功，
+      按主人令不予展示」+ degrade_note 原文（HTML 转义防注入）+ 数据时点；
+      徽章行「⚠️ 未达全口径 · 不予展示」、TopN=0、卡头「降级未展示」。
+      非降级路径零影响（三场景单测实证）。
+    fix: >-
+      已在 renderFinalRecInner 内实现早返堵口（见 note）；degrade_note 经
+      [<>&"] 转义后原样展示（原因透明，处置权交主人）。
+    verify_how: |
+      ① jsdom 三场景单测（E:\_alimi_tools\_test_degrade_block.js）：降级⇒不推票+示因
+        +TopN=0（✅）；非降级⇒正常渲染 1189 字符卡片（✅）；无 degrade_note⇒兜底
+        文案（✅）；② smoke_index.js 三层全过（L1 29/29、L2 无运行时错误、
+        L3 关键函数+renderFinalRec 渲染 470 字符）；③ pre_deploy_audit 15/15
+        （含 [2/8] inline new Function 29 块 0 错、[10/10] 核心标记 45/45）。
+    verified_at: "2026-10-16 06:5x 本地三场景单测+smoke 三层+audit 15/15 验证通过，待上线后线上硬抓复核改 done"
+
+  - id: deadcard-conclusion-realtime-1016
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: doing
+    created: 2026-10-16
+    title: 死卡结论文案/图表实时化六处修复上线（主人令「没变化」⇒ 直接改直接上线）
+    note: |
+      主人 06:25 截图实证「没变化」：结论卡硬文案卡死、两图表不滚动、修复清单未生效。
+      六处编辑（基于 origin/main tip 0398f04cad4 三方合并落地，冲突 0、
+      diff vs theirs 恰 37 行=六处编辑、远端 ?v/BUILD 新值全保留）：
+      ① L17110-17125 结论实时拼装（替换硬文案）；② L17136 观测台 _v10；
+      ③ L17162 脚注末月；④ L17166 情景表 drv；⑤ L17179-17180 黄旗条件化；
+      ⑥ L17183-17188 _step/_tickLbl + L17196/L17232 两图 xAxis interval:0+formatter
+      （横轴标签全量显示，图表随结论天天滚）。
+    fix: >-
+      已落地（合并产物 18663 行）；BUILD 戳随推送对齐新 tip（远端同惯例：构建提交
+      BUILD=父 tip）。
+    verify_how: |
+      ① 合并自证：冲突标记 0、_tickLbl×3/观测台×8/结论拼装在位、BUILD=14140b8a0e、
+        ?v=cc51744247 等远端新值全在、diff vs theirs=37 行恰六处编辑；
+      ② smoke 三层 + pre_deploy_audit 15/15 + guard_double_blind 三不变式全过。
+    verified_at: "2026-10-16 06:5x 本地合并自证+六重验证通过，待上线后线上硬抓（结论数字天天滚/末月 2026-09 可见）复核改 done"
     updated: "2026-10-16 05:59"
     updated_by: 阿狸咪(alimi-cn)
   - id: future-logic-if-cffex-1016

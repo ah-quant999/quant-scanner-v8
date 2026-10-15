@@ -74,6 +74,15 @@ DATA_SOURCES = {
     #   （四量族原有的 FOUR_VOLUME / FOUR_VOLUME_60M 属脚本直写 data/，不登记本表，勿混淆）
     "four_volume_history.json":    "FOUR_VOLUME_HISTORY",
     "four_volume_track.json":      "FOUR_VOLUME_TRACK",
+    # 🆕 2026-10-16 阿狸咪的工程师（一劳永逸根因修复）：四量终极回测卡真实信号流通路补齐。
+    #   根因（10-16 实测实锤）：10-11 口径切换设计里「gen_four_volume_track.py 产
+    #   raw_data/four_volume_backtest.json（真实流）→ update_v8 转换层注入同名变量」的
+    #   第二段从未落地（疑被 0e5ccd6777 快照式大入库冲掉）⇒ 该 js 一直由
+    #   strategy_four_volume.py::write_four_volume_backtest_js() 回放外壳直写，
+    #   每晚产生新的违规展示（近5年/1546/T+5 51.8%/+1.97%，与主人 10-11 令直接冲突）。
+    #   本映射落地后：raw 真实流视图 → data/FOUR_VOLUME_BACKTEST.js（回放外壳同步摘链），
+    #   前端渲染器/回测聚合器 parse_by_period 零结构改动（by_period 同构）。
+    "four_volume_backtest.json":   "FOUR_VOLUME_BACKTEST",
     # 🆕 2026-10-16 阿狸咪的工程师（一劳永逸根因修复）：量质双擎双映射补齐。
     #   根因（10-16 实测实锤）：10-12 接入时只让 gen_lqsq_top5.py 直写+直推 LQSQ_BACKTEST.js，
     #   本表零 lqsq 登记 ⇒ update_v8 永不重建 data/LQSQ_TRACK.js（index.html L14252 注释
@@ -357,6 +366,10 @@ CATEGORY_MAP = {
     #   → _file_category() 返回 {"post_close"} → _pure_pc=True → 仅盘后 --category 构建重建（正确）
     "FOUR_VOLUME_HISTORY": "post_close",
     "FOUR_VOLUME_TRACK": "post_close",
+    # 🆕 2026-10-16 同上：四量终极回测卡（真实信号流视图，B 批盘后算法链紧后四人之一产出，
+    #   与四量族同档 post_close；此前由 strategy_four_volume.py 回放外壳直写，与盘后构建
+    #   时序错位，改走本转换层后由盘后 --category 构建统一重建）
+    "FOUR_VOLUME_BACKTEST": "post_close",
     # 🆕 2026-10-16 同上：量质双擎跟踪/回测（B 批盘后算法链产出，与四量同档 post_close）
     "LQSQ_TRACK": "post_close",
     "LQSQ_BACKTEST": "post_close",
