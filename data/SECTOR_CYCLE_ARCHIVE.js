@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-10-15 10:29:17
+// 最后更新：2026-10-15 10:32:30
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-10-15 10:29:17",
+  "update_time": "2026-10-15 10:32:30",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -32,14 +32,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "AI算力",
       "start": "08/27",
-      "end": "10/15",
+      "end": "10/14",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 28,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 27,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 334,
+      "total": 331,
       "ongoing": true
     },
     {
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 3162,
+      "total": 3140,
       "ongoing": true
     },
     {
@@ -65,7 +65,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 487,
+      "total": 481,
       "ongoing": true
     },
     {
@@ -123,14 +123,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "电力",
       "start": "08/28",
-      "end": "10/15",
+      "end": "10/14",
       "start_idx": 1,
-      "end_idx": 29,
-      "days": 29,
-      "hot_days": 28,
+      "end_idx": 28,
+      "days": 28,
+      "hot_days": 27,
       "peak": 17,
       "peak_date": "10/12",
-      "total": 217,
+      "total": 213,
       "ongoing": true
     },
     {
@@ -188,14 +188,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "机器人",
       "start": "09/16",
-      "end": "10/15",
+      "end": "10/14",
       "start_idx": 14,
-      "end_idx": 29,
-      "days": 16,
-      "hot_days": 16,
+      "end_idx": 28,
+      "days": 15,
+      "hot_days": 15,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 235,
+      "total": 232,
       "ongoing": true
     },
     {
