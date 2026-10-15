@@ -1,20 +1,15 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-15 23:55",
- "generated": "2026-10-15 23:55",
+ "update_time": "2026-10-16 01:03",
+ "generated": "2026-10-16 01:03",
  "meta": {
-  "generated": "2026-10-15 23:55",
+  "generated": "2026-10-16 01:03",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 27,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
  "days": [
-  {
-   "date": "2026-08-31",
-   "categories": {},
-   "consensus": []
-  },
   {
    "date": "2026-09-02",
    "categories": {},
@@ -10217,6 +10212,104 @@ window.STOCK_MOMENTUM_STATE = (function() {
   },
   {
    "date": "2026-10-15",
+   "categories": {
+    "突破": [
+     {
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 4.245,
+      "price": 2.21,
+      "category": "突破"
+     },
+     {
+      "code": "000626",
+      "name": "远大控股",
+      "change_pct": 9.976,
+      "price": 9.15,
+      "category": "突破"
+     },
+     {
+      "code": "300691",
+      "name": "联合光电",
+      "change_pct": 4.565,
+      "price": 16.95,
+      "category": "突破"
+     },
+     {
+      "code": "605003",
+      "name": "众望布艺",
+      "change_pct": 10.0,
+      "price": 25.96,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 4.245,
+      "price": 2.21,
+      "category": "加速"
+     },
+     {
+      "code": "000626",
+      "name": "远大控股",
+      "change_pct": 9.976,
+      "price": 9.15,
+      "category": "加速"
+     },
+     {
+      "code": "300691",
+      "name": "联合光电",
+      "change_pct": 4.565,
+      "price": 16.95,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 4.245,
+      "price": 2.21,
+      "category": "短线选股"
+     },
+     {
+      "code": "000626",
+      "name": "远大控股",
+      "change_pct": 9.976,
+      "price": 9.15,
+      "category": "短线选股"
+     },
+     {
+      "code": "300691",
+      "name": "联合光电",
+      "change_pct": 4.565,
+      "price": 16.95,
+      "category": "短线选股"
+     },
+     {
+      "code": "605003",
+      "name": "众望布艺",
+      "change_pct": 10.0,
+      "price": 25.96,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "605003",
+      "name": "众望布艺",
+      "change_pct": 10.0,
+      "price": 25.96,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-10-16",
    "categories": {
     "突破": [
      {
