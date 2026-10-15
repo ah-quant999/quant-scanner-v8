@@ -8541,3 +8541,23 @@ items:
     verified_at: "2026-10-15 16:15 硬抓 Pages 确认"
     updated: "2026-10-15 16:15"
     updated_by: 小九(lemoncat-cn)
+  - id: future-card-calc-fixpush-1015
+    owner: 小九(lemoncat-cn)
+    priority: P1
+    status: done
+    created: 2026-10-15
+    title: calc_sentiment_cycle 修复版漏推事故的一劳永逸补救（17:26 CI跑旧版致环比-74.47失真复活）
+    note: >
+      事故：10-15 16:0x 的 76f66662 九文件清单漏推 algorithms/calc_sentiment_cycle.py（修复版只在本地工作树），
+      17:26 CI 全量构建跑 08:16 旧版 calc ⇒ 走「板块求和」兜底口径，且 dates 数组缺 10/12-14（停在 10/09 求和 141）
+      ⇒ 线上 SENTIMENT_CYCLE delta_pct=-74.47%、phase 高潮→退潮（10-15 刚修掉的混算失真复活）。
+      修复：①e0fabc4 净室推送修复版 calc（expect-base 1564c77f094e，逐字节自验 991710662e3c）；
+      ②17:36/17:38 两轮构建均用新版 calc 重生成：高潮/61分/环比0.0%/prev_total同口径36 ⇒ 根治确认（连续两轮稳定）。
+      教训：本地修复必须核对「推送清单 ≠ 本地改动集」——git show --stat 逐个文件点数，禁凭记忆。
+    verify_how: |
+      Pages 硬抓 data/SENTIMENT_CYCLE.js phase=高潮 delta_pct=0.0 prev_total=36；
+      另三产物 md5 与 origin/main tip 逐字节一致（PERFORMANCE_FORECAST by_cat/CFFEX nlr_z=-0.84 37样本/LIMIT_UP_HEATMAP total=36）；
+      index.html 1.32MB 十处标记（renderCffexPosition/_numOrNull/顺势参与）在位、?v 四戳对齐。
+    verified_at: "2026-10-15 17:40 硬抓 Pages + 仓库 tip 双向核对"
+    updated: "2026-10-15 17:40"
+    updated_by: 小九(lemoncat-cn)
