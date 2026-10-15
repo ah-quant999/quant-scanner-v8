@@ -74,6 +74,15 @@ DATA_SOURCES = {
     #   （四量族原有的 FOUR_VOLUME / FOUR_VOLUME_60M 属脚本直写 data/，不登记本表，勿混淆）
     "four_volume_history.json":    "FOUR_VOLUME_HISTORY",
     "four_volume_track.json":      "FOUR_VOLUME_TRACK",
+    # 🆕 2026-10-16 阿狸咪的工程师（一劳永逸根因修复）：量质双擎双映射补齐。
+    #   根因（10-16 实测实锤）：10-12 接入时只让 gen_lqsq_top5.py 直写+直推 LQSQ_BACKTEST.js，
+    #   本表零 lqsq 登记 ⇒ update_v8 永不重建 data/LQSQ_TRACK.js（index.html L14252 注释
+    #   宣称「update_v8 由 raw_data/lqsq_track.json 发布」实为无映射的空头承诺）⇒ 该 js
+    #   自 2026-10-15 02:02:45 起冻结（raw 已推进到 10-16 02:50:21，total_signals 70→75，
+    #   卡片「更新于昨日02:02」27h 不换）。与四量族同构补双映射；BACKTEST 映射为同源冗余
+    #   兜底（生成器 _write_js 直写仍在，双路同函数同源不冲突，防直写失败时无人补发）。
+    "lqsq_track.json":             "LQSQ_TRACK",
+    "lqsq_backtest.json":          "LQSQ_BACKTEST",
     # 2026-09-04 主人令收尾：cockpit_tier_recommend / cockpit_advice / cockpit_backtest 三映射已删
     #   （09-03「干掉驾驶舱」系列删了生成器与 raw_data，映射永不命中，纯死代码）
     "top10_daily.json":            "TOP10_DAILY",
@@ -348,6 +357,9 @@ CATEGORY_MAP = {
     #   → _file_category() 返回 {"post_close"} → _pure_pc=True → 仅盘后 --category 构建重建（正确）
     "FOUR_VOLUME_HISTORY": "post_close",
     "FOUR_VOLUME_TRACK": "post_close",
+    # 🆕 2026-10-16 同上：量质双擎跟踪/回测（B 批盘后算法链产出，与四量同档 post_close）
+    "LQSQ_TRACK": "post_close",
+    "LQSQ_BACKTEST": "post_close",
     "TOP10_DAILY": "post_close",
     "LHB_DATA": "post_close",
     "LHB_HISTORY": "post_close",
