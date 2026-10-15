@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-15 15:42",
- "generated": "2026-10-15 15:42",
+ "update_time": "2026-10-15 17:19",
+ "generated": "2026-10-15 17:19",
  "meta": {
-  "generated": "2026-10-15 15:42",
+  "generated": "2026-10-15 17:19",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 27,
   "days_with_consensus": 0,
@@ -10222,8 +10222,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "000056",
       "name": "*ST皇庭",
-      "change_pct": 3.302,
-      "price": 2.19,
+      "change_pct": 4.245,
+      "price": 2.21,
       "category": "突破"
      },
      {
@@ -10236,8 +10236,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300691",
       "name": "联合光电",
-      "change_pct": 4.75,
-      "price": 16.98,
+      "change_pct": 4.565,
+      "price": 16.95,
       "category": "突破"
      },
      {
@@ -10252,8 +10252,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "000056",
       "name": "*ST皇庭",
-      "change_pct": 3.302,
-      "price": 2.19,
+      "change_pct": 4.245,
+      "price": 2.21,
       "category": "加速"
      },
      {
@@ -10266,8 +10266,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300691",
       "name": "联合光电",
-      "change_pct": 4.75,
-      "price": 16.98,
+      "change_pct": 4.565,
+      "price": 16.95,
       "category": "加速"
      }
     ],
@@ -10275,8 +10275,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "000056",
       "name": "*ST皇庭",
-      "change_pct": 3.302,
-      "price": 2.19,
+      "change_pct": 4.245,
+      "price": 2.21,
       "category": "短线选股"
      },
      {
@@ -10289,8 +10289,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300691",
       "name": "联合光电",
-      "change_pct": 4.75,
-      "price": 16.98,
+      "change_pct": 4.565,
+      "price": 16.95,
       "category": "短线选股"
      },
      {
