@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-15 08:19:52",
+  "update_time": "2026-10-15 09:56:55",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -17,14 +17,14 @@
     {
       "sector": "AI算力",
       "start": "08/27",
-      "end": "10/15",
+      "end": "10/14",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 28,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 27,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 341,
+      "total": 331,
       "ongoing": true
     },
     {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 3244,
+      "total": 3162,
       "ongoing": true
     },
     {
@@ -50,20 +50,20 @@
       "hot_days": 30,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 482,
+      "total": 485,
       "ongoing": true
     },
     {
       "sector": "新能源车",
       "start": "08/27",
-      "end": "10/15",
+      "end": "10/14",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 26,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 25,
       "peak": 20,
       "peak_date": "09/01",
-      "total": 234,
+      "total": 231,
       "ongoing": true
     },
     {
@@ -82,14 +82,14 @@
     {
       "sector": "消费电子",
       "start": "08/27",
-      "end": "10/15",
+      "end": "10/14",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 28,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 27,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 258,
+      "total": 255,
       "ongoing": true
     },
     {
@@ -115,7 +115,7 @@
       "hot_days": 28,
       "peak": 17,
       "peak_date": "10/12",
-      "total": 226,
+      "total": 217,
       "ongoing": true
     },
     {
@@ -180,7 +180,7 @@
       "hot_days": 16,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 245,
+      "total": 235,
       "ongoing": true
     },
     {
@@ -193,7 +193,7 @@
       "hot_days": 13,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 79,
+      "total": 76,
       "ongoing": true
     },
     {
