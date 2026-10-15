@@ -8582,3 +8582,21 @@ items:
     verified_at: "2026-10-15 21:40 登记（未开工）"
     updated: "2026-10-15 21:40"
     updated_by: 小九(lemoncat-cn)
+  - id: future-card-cffex-badge-1015
+    owner: 小九(lemoncat-cn)
+    priority: P2
+    status: done
+    created: 2026-10-15
+    title: IF持仓择时卡补「更新于」统一胶囊+「解读」行（主人21:47令，阿狸咪窗口内改index.html）
+    note: >
+      ①卡头时间戳由裸文本改走全站统一胶囊 setBadge('cffexPosTime','盘后','短线',update_time,null,'盘后')
+      （🦊 更新于 今日 HH:MM 盘后 短线 · 盘后档数据，盘中不刷新，范式同同页资金热度卡）；
+      ②结论行下新增「解读：」行——z≥+1→逆向偏多 / z≤−1→逆向偏空减仓 / |z|<1→中性观察 / 样本不足→暂不出信号，
+      口径同卡内注释，无编造概率。函数 JS 语法 node --check 通过。
+      ⚠️ 并发警示：本条在阿狸咪窗口（21:5x）推送 index.html；阿狸咪会话若持旧本地树整体推送会覆盖本条——
+      推前必 git fetch 重取，或走 v8_push_files.py 净室推送（fresh TIP + expect-base 双保险）。
+    verify_how: |
+      Pages 硬抓 index.html 含 setBadge('cffexPosTime' 调用与「解读：」渲染行；数据 CFFEX_POSITION.js 含 update_time。
+    verified_at: "2026-10-15 21:57 推送即自验"
+    updated: "2026-10-15 21:57"
+    updated_by: 小九(lemoncat-cn)

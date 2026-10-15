@@ -13130,6 +13130,13 @@ function drawUpDownChart(){
     h+='<span style="flex:1;text-align:right;">+2 空头拥挤→偏多</span></div>';
     h+='<div style="font-size:11.5px;color:var(--txt);line-height:1.7;">结论：<b style="color:'+st.col+';">'+(d.posture||'—')+'</b>'
      + (d.advice?(' · '+d.advice):'') + '（样本 '+ (d.sample_size||'—') +' 个交易日）</div>';
+    // 解读行（2026-10-15 主人令：与卡头「更新于」胶囊配套，让卡片自己说话；口径同卡内注释）
+    const _rd = z===null
+      ? '样本累积中（'+(d.sample_size||0)+'/20 日）→ 暂不出逆向信号'
+      : z>=1 ? '空头持仓接挥（z='+z+' ≥ +1）→ 逆向信号<b style="color:var(--up);">偏多</b>'
+      : z<=-1 ? '多头持仓採挤（z='+z+' ≤ −1）→ 逆向信号<b style="color:var(--down);">偏空/减仓</b>'
+      : '多空持仓均衡（|z|='+Math.abs(z).toFixed(2)+' ＜ 1）→ 无逆向信号，中性观察';
+    h+='<div style="font-size:11.5px;color:var(--sub);line-height:1.7;margin-top:4px;"><b style="color:'+st.col+';">解读：</b>'+_rd+'</div>';
     // 近10日净空占比迷你走势（文字条形，宽度按 nlr 相对极值）
     const tail=(d.history_tail||[]).slice(-10);
     if(tail.length){
@@ -13147,7 +13154,8 @@ function drawUpDownChart(){
     }
     h+='</div>';
     $b.innerHTML=h;
-    if($t) $t.textContent=(d.update_time||'').slice(5,16)||'—';
+    if($t && typeof setBadge==='function'){ try{ setBadge('cffexPosTime','盘后','短线', d.update_time || '', null, '盘后'); }catch(e){} }
+    else if($t){ $t.textContent=(d.update_time||'').slice(5,16)||'—'; }
   }
   window.renderCffexPosition = renderCffexPosition;
 
