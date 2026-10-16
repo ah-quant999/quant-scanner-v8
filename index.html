@@ -10393,7 +10393,41 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
   else init();
 })();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js" defer></script>
+<!-- 🛡 2026-10-16 一劳永逸（主人截图实锤：主力净额分时卡永卡「加载中…」）：
+     根因 = 跨境 CDN cdn.jsdelivr.net 自国内网络 TCP 重置（实测 curl 000/0.19s）⇒ window.echarts
+     undefined ⇒ 全站 4 处 echarts.init 抛错被 safe() 吞掉 ⇒ 图表卡永远停在占位「加载中…」。
+     修法三层：① echarts 5.4.3 本地同源化（assets/echarts.min.js，fastly/npmmirror 双源 sha256
+     一致：1156429a…4d19），GitHub Pages 同域投放，免疫任何跨境拦截；
+     ② 下方 loader 于 DOMContentLoaded 兜底检测，未就绪则依次尝试 fastly.jsdelivr / npmmirror，
+     任一成功即派发 'echartsready' 事件，各图表渲染函数监听后自动重渲（自愈，无需人工刷新）；
+     ③ 4 处渲染函数统一加降级守卫：echarts 缺失时显示可操作文案，绝不永久停留在「加载中…」。 -->
+<script src="assets/echarts.min.js?v=5.4.3" defer></script>
+<script>
+/* ===== echarts 多源兜底 loader（2026-10-16 一劳永逸） ===== */
+(function(){
+  var _CDN=['https://fastly.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js',
+            'https://registry.npmmirror.com/echarts/5.4.3/files/dist/echarts.min.js'];
+  var _booted=false, _loading=false;
+  function _fire(n){ try{ document.dispatchEvent(new Event(n)); }catch(e){ var ev=document.createEvent('Event'); ev.initEvent(n,true,true); document.dispatchEvent(ev); } }
+  function _tryCdn(i){
+    if(i>=_CDN.length){ window.__ECHARTS_DEAD=true; _fire('echartsdead'); return; }
+    var s=document.createElement('script'); s.src=_CDN[i];
+    s.onload=function(){ if(window.echarts){ _fire('echartsready'); } else { _tryCdn(i+1); } };
+    s.onerror=function(){ _tryCdn(i+1); };
+    document.head.appendChild(s);
+  }
+  function _boot(){
+    if(_booted) return; _booted=true;
+    if(window.echarts){ _fire('echartsready'); return; }
+    _loading=true; _tryCdn(0);
+  }
+  /* defer 脚本先于 DOMContentLoaded 执行完毕 ⇒ 此刻本地 assets 应已就绪；
+     未就绪（本地文件异常）才走 CDN 兜底链；load 事件再做一次终检防时序偏差。 */
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', _boot);
+  else _boot();
+  window.addEventListener('load', function(){ if(!window.echarts && !window.__ECHARTS_DEAD && !_loading) _boot(); });
+})();
+</script>
 <script>
 /* ===== 盘后数据六大模块 ===== */
 (function(){
@@ -10768,6 +10802,17 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     var dom=$('sfIntradayChart');
     if(!dom) return;
     var d=window.SECTOR_FUND_FLOW_INTRADAY || {};
+    // 🛡 2026-10-16 一劳永逸：echarts 未就绪 ⇒ 降级文案 + 'echartsready' 事件自动重渲
+    //   （根治跨境 CDN 被重置时本卡永久停在「加载中…」；监听只绑一次，重渲走完整流程）
+    if(!window.echarts){
+      dom.innerHTML='<div class="ipo-empty">⚠️ 图表组件（ECharts）加载失败——已自动尝试备用源，请稍候或刷新页面</div>';
+      var _tElG=$('sfIntradayTime'); if(_tElG) _tElG.innerHTML='—';
+      if(!window.__SF_RETRY){
+        window.__SF_RETRY=function(){ renderSfIntradayChart(); };
+        document.addEventListener('echartsready', window.__SF_RETRY);
+      }
+      return;
+    }
     // 🛡 2026-09-17 主人令（截图实锤）：「这个是昨天的！盘前要清空！」
     //    「交易日 9 点 20 分后，不再显示昨天的旧值」
     // 🔴 根因：原判定 `_isPreMarket = hh<9 || (hh==9 && mm<30)` ⇒ 09:20–09:30 已算「盘中」，
@@ -11627,6 +11672,15 @@ function drawUpDownChart(){
     var d = window.MARKET_FUND_FLOW_DATA || {};
     var chartDom = $('mffChart');
     if(!chartDom || !d.daily || !d.daily.length) return;
+    // 🛡 2026-10-16 一劳永逸：echarts 未就绪 ⇒ 降级文案 + 'echartsready' 事件自动重渲
+    if(!window.echarts){
+      chartDom.innerHTML='<div class="ipo-empty">⚠️ 图表组件（ECharts）加载失败——已自动尝试备用源，请稍候或刷新页面</div>';
+      if(!window.__MFF_RETRY){
+        window.__MFF_RETRY=function(){ renderMffChart(); };
+        document.addEventListener('echartsready', window.__MFF_RETRY);
+      }
+      return;
+    }
     var range = __MFF_CURRENT_RANGE;
     var daily = d.daily;
     if(range !== 'all' && range < daily.length){
@@ -17191,6 +17245,18 @@ h+=`</div>`;
     //    且强制数据末月可见；末档前 8 个月内不再出常规档，防与末档叠字）──
     var _step=Math.floor(D.dates.length/12), _lastI=D.dates.length-1;
     function _tickLbl(v,i){ return (i===_lastI||(i%_step===0&&_lastI-i>=_step))?v:''; }
+    // 🛡 2026-10-16 一劳永逸：echarts 未就绪 ⇒ 两图降级文案 + 'echartsready' 事件整页重渲
+    if(!window.echarts){
+      var _oC1=document.getElementById('futureC1'), _oC2=document.getElementById('futureC2');
+      var _oMsg='<div class="ipo-empty">⚠️ 图表组件（ECharts）加载失败——已自动尝试备用源，请稍候或刷新页面</div>';
+      if(_oC1) _oC1.innerHTML=_oMsg;
+      if(_oC2) _oC2.innerHTML=_oMsg;
+      if(!window.__OBS_RETRY){
+        window.__OBS_RETRY=function(){ if(typeof window.__obsRenderPane==='function') window.__obsRenderPane(tab); };
+        document.addEventListener('echartsready', window.__OBS_RETRY);
+      }
+      return;
+    }
     // ── ECharts 渲染（暗色）──
     var AXS={axisLine:{lineStyle:{color:'#3a4149'}},axisLabel:{color:'#9aa4b2',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.06)'}}};
     var TIP={trigger:'axis',backgroundColor:'rgba(20,24,30,.94)',borderColor:'#3a4149',textStyle:{color:C_TXT,fontSize:11}};
