@@ -16628,7 +16628,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       }
     }catch(e){ console.warn('[renderFourVolume] stfvTime write failed', e); }
     var noteEl = document.getElementById('stfvNote');
-    if(noteEl) noteEl.innerHTML = '⚡ 四路信号同时共振的当日候选 · 持有期 T+1/3/5/10/20 日可观测<br><span style="font-size:10px;color:var(--dim)">（以 60 分钟版为准；日线版 FOUR_VOLUME 未入算法链 ORDER，total 常为 0 属正常、非故障）</span>';
+    if(noteEl) noteEl.innerHTML = '⚡ 四路信号同时共振的当日候选 · 持有期 T+1/3/5/10/20 日可观测<br><span style="font-size:10px;color:var(--dim)">（日线版 + 60 分钟版合并展示 · 2026-10-16 订正旧注：日线版已于 2026-08-19 补入算法链 ORDER，「total=0 属正常」作废——真 0 命中会明示「真实无信号 · 已算完」，旧批次信号绝不沿用冒充今日）</span>';
     var stocks = d.stocks || [];
     var qd = stocks.filter(function(s){ return s.qd || (s.yzc && s.jg && s.xc && s.four); }).length;
     var yzc = stocks.filter(function(s){ return s.yzc; }).length;
