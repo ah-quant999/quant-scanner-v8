@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-16 19:28:07",
+  "update_time": "2026-10-16 21:13:55",
   "total_scored": 432,
   "count_80plus": 0,
   "max_score": 20.9,
@@ -11,28 +11,28 @@
     "confidence": "低",
     "market_trend": "unknown",
     "recommended_sectors": [
-      "计算机设备",
-      "半导体",
-      "公用事业",
-      "通信运营",
-      "医疗服务",
-      "银行",
-      "中药",
-      "通信设备",
       "保险",
-      "煤炭",
       "化学制药",
+      "通信设备",
+      "煤炭",
+      "医疗服务",
       "贵金属",
+      "通信运营",
+      "银行",
+      "计算机设备",
+      "公用事业",
+      "半导体",
+      "中药",
       "油气"
     ],
     "avoid_sectors": [
-      "半导体",
-      "家用电器",
-      "电子元件",
-      "通信设备",
-      "计算机",
       "食品饮料",
-      "白酒"
+      "通信设备",
+      "白酒",
+      "电子元件",
+      "计算机",
+      "半导体",
+      "家用电器"
     ],
     "strategy_weights": {
       "triple_consensus": 1.0,
@@ -117,73 +117,10 @@
       "quality_detail": "ROE优质(35.7%) | 营收高增(66.9%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前64%+3"
+      "p5_detail": "换手率趋势池内前63%+3"
     },
     {
       "rank": 2,
-      "code": "688385",
-      "name": "复旦微电",
-      "market": "sh",
-      "board": "科创板",
-      "sig_count": 2,
-      "close": 47.3,
-      "pct_chg": 14.609,
-      "close_source": "STOCK_STOP_DATA",
-      "pct_chg_20d": 2.47637051039698,
-      "breakout_5d": true,
-      "total_score": 19.1,
-      "current_regime": "panic",
-      "regime_open": true,
-      "regime_adjust": 1.0,
-      "sectors": [
-        "计算机、通信和其他电子设备制造业",
-        "MSCI中国",
-        "AH股",
-        "半导体概念",
-        "2026中报预增",
-        "存储芯片",
-        "中证500",
-        "融资融券"
-      ],
-      "stop_loss": 42.57,
-      "target_price": 64.39,
-      "stop_loss_method": "fixedP10",
-      "target_price_method": "prevHighN60",
-      "risk_reward": 3.61,
-      "stop_precise": false,
-      "score_base": 7,
-      "score_enhance": 15,
-      "score_form": 0.07,
-      "score_fund": 0,
-      "score_sector": 5,
-      "score_inst": 0.0,
-      "score_quality": 3.8,
-      "score_backtest": 0,
-      "score_breakout": 5,
-      "score_research": 3,
-      "score_p4": 0,
-      "score_p5": 3,
-      "win_rate": 49.7,
-      "quality_grade": "C",
-      "signals": {
-        "chan": true,
-        "jinzuan": true,
-        "jigou": false,
-        "trend": false,
-        "form_A": false
-      },
-      "consecutive_days": 1,
-      "form_detail": "非涨停",
-      "fund_detail": "",
-      "sector_detail": "半导体概念+39.8亿",
-      "inst_detail": "",
-      "quality_detail": "ROE一般(12.9%) | 营收高增(23.2%) | 消息:三季报预增",
-      "research_detail": "量能突破x4.0+3",
-      "p4_detail": "",
-      "p5_detail": "换手率趋势池内前69%+3"
-    },
-    {
-      "rank": 3,
       "code": "300620",
       "name": "光库科技",
       "market": "sz",
@@ -243,10 +180,10 @@
       "quality_detail": "ROE偏低(6.7%) | 营收高增(25.9%) | 消息:三季报预增",
       "research_detail": "",
       "p4_detail": "残差动量+5.5%-4",
-      "p5_detail": "换手率趋势池内前93%+6"
+      "p5_detail": "换手率趋势池内前92%+6"
     },
     {
-      "rank": 4,
+      "rank": 3,
       "code": "600105",
       "name": "永鼎股份",
       "market": "sh",
@@ -309,6 +246,69 @@
       "p5_detail": "换手率趋势池内前67%+3"
     },
     {
+      "rank": 4,
+      "code": "688385",
+      "name": "复旦微电",
+      "market": "sh",
+      "board": "科创板",
+      "sig_count": 2,
+      "close": 47.3,
+      "pct_chg": 14.609,
+      "close_source": "STOCK_STOP_DATA",
+      "pct_chg_20d": 2.47637051039698,
+      "breakout_5d": true,
+      "total_score": 17.3,
+      "current_regime": "panic",
+      "regime_open": true,
+      "regime_adjust": 1.0,
+      "sectors": [
+        "计算机、通信和其他电子设备制造业",
+        "MSCI中国",
+        "AH股",
+        "半导体概念",
+        "2026中报预增",
+        "存储芯片",
+        "中证500",
+        "融资融券"
+      ],
+      "stop_loss": 42.57,
+      "target_price": 64.39,
+      "stop_loss_method": "fixedP10",
+      "target_price_method": "prevHighN60",
+      "risk_reward": 3.61,
+      "stop_precise": false,
+      "score_base": 7,
+      "score_enhance": 12,
+      "score_form": 0.07,
+      "score_fund": 0,
+      "score_sector": 5,
+      "score_inst": 0.0,
+      "score_quality": 3.8,
+      "score_backtest": 0,
+      "score_breakout": 5,
+      "score_research": 3,
+      "score_p4": 0,
+      "score_p5": 0,
+      "win_rate": 49.7,
+      "quality_grade": "C",
+      "signals": {
+        "chan": true,
+        "jinzuan": true,
+        "jigou": false,
+        "trend": false,
+        "form_A": false
+      },
+      "consecutive_days": 1,
+      "form_detail": "非涨停",
+      "fund_detail": "",
+      "sector_detail": "半导体概念+39.8亿",
+      "inst_detail": "",
+      "quality_detail": "ROE一般(12.9%) | 营收高增(23.2%) | 消息:三季报预增",
+      "research_detail": "量能突破x4.0+3",
+      "p4_detail": "",
+      "p5_detail": ""
+    },
+    {
       "rank": 5,
       "code": "300857",
       "name": "协创数据",
@@ -369,7 +369,7 @@
       "quality_detail": "ROE优质(35.2%) | 营收高增(34.8%) | 消息:中报预增",
       "research_detail": "超跌反弹+0.87",
       "p4_detail": "残差动量+8.0%-4",
-      "p5_detail": "换手率趋势池内前72%+3"
+      "p5_detail": "换手率趋势池内前73%+3"
     },
     {
       "rank": 6,
@@ -432,7 +432,7 @@
       "quality_detail": "ROE优质(39.2%) | 营收高增(73.1%)",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前70%+3"
+      "p5_detail": "换手率趋势池内前68%+3"
     },
     {
       "rank": 7,
@@ -495,7 +495,7 @@
       "quality_detail": "ROE良好(18.6%) | 营收高增(28.6%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "低波动45%-3",
-      "p5_detail": "换手率趋势池内前86%+6"
+      "p5_detail": "换手率趋势池内前84%+6"
     },
     {
       "rank": 8,
@@ -558,7 +558,7 @@
       "quality_detail": "ROE一般(12.9%) | 营收高增(43.0%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前61%+3"
+      "p5_detail": "换手率趋势池内前63%+3"
     },
     {
       "rank": 9,
@@ -621,7 +621,7 @@
       "quality_detail": "ROE良好(19.4%) | 营收高增(26.0%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "残差动量+16.1%-6",
-      "p5_detail": "换手率趋势池内前76%+3"
+      "p5_detail": "换手率趋势池内前78%+3"
     },
     {
       "rank": 10,
@@ -684,7 +684,7 @@
       "quality_detail": "ROE优质(68.0%) | 营收高增(283.4%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "残差动量+12.2%-6",
-      "p5_detail": "换手率趋势池内前90%+6"
+      "p5_detail": "换手率趋势池内前88%+6"
     },
     {
       "rank": 11,
@@ -747,7 +747,7 @@
       "quality_detail": "ROE偏低(9.8%) | 营收高增(20.6%) | 消息:三季报预增",
       "research_detail": "",
       "p4_detail": "低波动39%-6",
-      "p5_detail": "换手率趋势池内前87%+6"
+      "p5_detail": "换手率趋势池内前85%+6"
     },
     {
       "rank": 12,
@@ -810,7 +810,7 @@
       "quality_detail": "ROE偏低(9.2%) | 营收高增(27.7%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前85%+6"
+      "p5_detail": "换手率趋势池内前83%+6"
     },
     {
       "rank": 13,
@@ -873,7 +873,7 @@
       "quality_detail": "ROE优质(92.2%) | 营收高增(77.2%) | 消息:中报扭亏,回购",
       "research_detail": "",
       "p4_detail": "低波动48%-3",
-      "p5_detail": "换手率趋势池内前82%+6"
+      "p5_detail": "换手率趋势池内前81%+6"
     },
     {
       "rank": 14,
@@ -936,7 +936,7 @@
       "quality_detail": "ROE良好(15.9%) | 营收高增(40.7%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "残差动量+24.3%-6",
-      "p5_detail": "换手率趋势池内前89%+6"
+      "p5_detail": "换手率趋势池内前87%+6"
     },
     {
       "rank": 15,
@@ -1062,7 +1062,7 @@
       "quality_detail": "ROE偏低(7.4%) | 营收高增(23.0%)",
       "research_detail": "",
       "p4_detail": "低波动48%-3",
-      "p5_detail": "换手率趋势池内前87%+6"
+      "p5_detail": "换手率趋势池内前85%+6"
     },
     {
       "rank": 17,
@@ -1125,7 +1125,7 @@
       "quality_detail": "ROE优质(80.0%) | 营收高增(73.4%) | 消息:三季报预增",
       "research_detail": "",
       "p4_detail": "低波动43%-6",
-      "p5_detail": "换手率趋势池内前95%+6"
+      "p5_detail": "换手率趋势池内前94%+6"
     },
     {
       "rank": 18,
@@ -1188,7 +1188,7 @@
       "quality_detail": "ROE优质(24.4%) | 营收高增(36.3%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "低波动53%-3",
-      "p5_detail": "换手率趋势池内前73%+3"
+      "p5_detail": "换手率趋势池内前71%+3"
     },
     {
       "rank": 19,
@@ -1251,7 +1251,7 @@
       "quality_detail": "ROE一般(10.6%) | 营收高增(32.5%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "低波动47%-3",
-      "p5_detail": "换手率趋势池内前88%+6"
+      "p5_detail": "换手率趋势池内前87%+6"
     },
     {
       "rank": 20,

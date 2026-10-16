@@ -1,15 +1,15 @@
 window.FOUR_VOLUME={
- "update_time": "2026-10-16 07:42:34",
+ "update_time": "2026-10-16 21:15:51",
  "total": 3,
  "stocks": [
   {
-   "code": "688652",
-   "name": "京仪装备",
-   "market": "sh",
-   "board_label": "科创板",
-   "close": 149.74,
-   "pct_chg": 8.58,
-   "turnover_rate": 5.18,
+   "code": "300699",
+   "name": "光威复材",
+   "market": "sz",
+   "board_label": "创业板",
+   "close": 24.32,
+   "pct_chg": 9.45,
+   "turnover_rate": 4.96,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -27,17 +27,17 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 散户金叉 + 主力金叉",
-   "signal_date": "2026-10-15",
-   "enter_date": "2026-10-15"
+   "signal_date": "2026-10-16",
+   "enter_date": "2026-10-16"
   },
   {
-   "code": "688213",
-   "name": "思特威",
+   "code": "688568",
+   "name": "中科星图",
    "market": "sh",
    "board_label": "科创板",
-   "close": 100.14,
-   "pct_chg": 3.98,
-   "turnover_rate": 3.55,
+   "close": 30.54,
+   "pct_chg": 8.49,
+   "turnover_rate": 2.56,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -55,17 +55,17 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-   "signal_date": "2026-10-15",
-   "enter_date": "2026-10-15"
+   "signal_date": "2026-10-16",
+   "enter_date": "2026-10-16"
   },
   {
-   "code": "600519",
-   "name": "贵州茅台",
+   "code": "688271",
+   "name": "联影医疗",
    "market": "sh",
-   "board_label": "主板",
-   "close": 1312.97,
-   "pct_chg": 2.1,
-   "turnover_rate": 0.46,
+   "board_label": "科创板",
+   "close": 108.04,
+   "pct_chg": 0.59,
+   "turnover_rate": 0.66,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -83,8 +83,8 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
-   "signal_date": "2026-10-15",
-   "enter_date": "2026-10-15"
+   "signal_date": "2026-10-16",
+   "enter_date": "2026-10-16"
   }
  ]
 };
