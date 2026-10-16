@@ -13182,14 +13182,14 @@ function drawUpDownChart(){
     h+='<span style="flex:1;text-align:left;">−2 多头拥挤→偏空</span>';
     h+='<span style="flex:1;text-align:center;">0 中性</span>';
     h+='<span style="flex:1;text-align:right;">+2 空头拥挤→偏多</span></div>';
-    h+='<div style="font-size:11.5px;color:var(--txt);line-height:1.7;">结论：<b style="color:'+st.col+';">'+(d.posture||'—')+'</b>'
-     + (d.advice?(' · '+d.advice):'') + '（样本 '+ (d.sample_size||'—') +' 个交易日）</div>';
-    // 解读行（2026-10-15 主人令：与卡头「更新于」胶囊配套，让卡片自己说话；口径同卡内注释）
+    // 解读行（2026-10-16 主人令：原「结论」与「解读」两行去重合并为单行解读——z 档位推导即结论本身，
+    // 样本数附后；口径同卡内注释，且与数据端 posture/advice 生成逻辑逐分支一致。
+    // 历史注：2026-10-15 曾分两行；顺手修掉旧文案「接挥/採挤」两处错字（应为「拥挤」）。）
     const _rd = z===null
       ? '样本累积中（'+(d.sample_size||0)+'/20 日）→ 暂不出逆向信号'
-      : z>=1 ? '空头持仓接挥（z='+z+' ≥ +1）→ 逆向信号<b style="color:var(--up);">偏多</b>'
-      : z<=-1 ? '多头持仓採挤（z='+z+' ≤ −1）→ 逆向信号<b style="color:var(--down);">偏空/减仓</b>'
-      : '多空持仓均衡（|z|='+Math.abs(z).toFixed(2)+' ＜ 1）→ 无逆向信号，中性观察';
+      : z>=1 ? '空头持仓拥挤（z='+z+' ≥ +1）→ 逆向信号<b style="color:var(--up);">偏多</b> · 样本 '+(d.sample_size||'—')+' 个交易日'
+      : z<=-1 ? '多头持仓拥挤（z='+z+' ≤ −1）→ 逆向信号<b style="color:var(--down);">偏空/减仓</b> · 样本 '+(d.sample_size||'—')+' 个交易日'
+      : '多空持仓均衡（|z|='+Math.abs(z).toFixed(2)+' ＜ 1）→ 无逆向信号，中性观察 · 样本 '+(d.sample_size||'—')+' 个交易日';
     h+='<div style="font-size:11.5px;color:var(--sub);line-height:1.7;margin-top:4px;"><b style="color:'+st.col+';">解读：</b>'+_rd+'</div>';
     // 近10日净空占比迷你走势（文字条形，宽度按 nlr 相对极值）
     const tail=(d.history_tail||[]).slice(-10);
