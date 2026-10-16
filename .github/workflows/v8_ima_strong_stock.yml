@@ -58,6 +58,9 @@ jobs:
           # 🛡 2026-09-12 一劳永逸根治（与实验卡同根因）：原 git fetch + git push HEAD:main
           #   偶发非 fast-forward / 网络超时失败。改用 api_push_raw.py（零 git fetch，免疫 cn git 墙），
           #   index.html 由 update_v8.py --only-cache-busters 已重写 ?v，一并纳入 PUSH_FILES。
-          PUSH_FILES="raw_data/ima_strong_stock.json,data/IMA_STRONG_STOCK.js,index.html" \
+          # 🔴 2026-10-16 补缺口：raw_data/ima_strong_daily.json（first_selected 归档）此前
+          #   从不入推送清单 ⇒ 仓内归档冻结、每日 fetcher 在 runner 上算的归档随跑随丢，
+          #   跨日 first_selected 判定失真（连选两日的票被误判「当日首入」）。补入清单。
+          PUSH_FILES="raw_data/ima_strong_stock.json,raw_data/ima_strong_daily.json,data/IMA_STRONG_STOCK.js,index.html" \
             python api_push_raw.py
-          echo "✅ ima 强势股 data/raw_data/index.html 已推送（Contents API）"
+          echo "✅ ima 强势股 data/raw_data(含归档)/index.html 已推送（Contents API）"
