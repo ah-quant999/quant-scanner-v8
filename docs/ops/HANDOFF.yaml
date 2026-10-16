@@ -8947,7 +8947,39 @@ items:
       index.html ?v=6194cb5ffe 已刷新；ledger 173/173、CI [13/13] 门禁 PASS。
       唯一未实证项：停更邮件恰 1 封（云端日志 API 匿名 403 拉不到 run logs）——
       待主人在 2814546@qq.com 收件箱确认「ima 短线情绪选股源停更 3 天」后即转 done。
-    updated: "2026-10-16 19:55"
+    xiaojiu_recover_20261016_2054: >-
+      〔小九 2026-10-16 20:35-20:54 CST · ima 授权恢复，断更三日数据已追回，A/C 修复双路径实证闭环〕
+      【缘起】主人令「ima 你再试试」——本会话 ima-mcp 连接器已 connected（主人在连接器页
+      重授）。上一 addendum 里「本机无 ima-mcp 绑定、替取不了」的判断随授权恢复作废
+      （connector 状态是动态的，此为一例证）。
+      【代取实录】经 ima-mcp 查库（九型人格 kb=7500816604757970，订阅库）→ 列
+      「短线情绪选股」文件夹（UPDATE_TS_DESC）→ fetch_media_content 取全文：
+      10-16 盘后笔记 15:32 已发布（8 只候选：金盾股份 86 / 吉大正元 81 / 佳力奇 80 /
+      冰山冷热 73 / 英搏尔 72 / 天汽模 71 / 中鼎股份 71 / 捷众科技 70；主流题材
+      低空经济 11 家）。顺取 10-14、10-15 两日笔记提取候选代码。
+      【推送与派发】commit 1db8a34c0a 推快照三件套（md 全文 + json meta + 归档补录
+      10-14/15）；派发 run=38902176802 success（head=1db8a34c0a 零 churn）。
+      硬抓 main+Pages 终验 13/13 PASS：data_date=2026-10-16 · 8 只 ·
+      stale_days=0 · source_stale=false · snapshot_expired=false ·
+      snapshot_meta_mismatch=false · degraded_reason 空（干净态）·
+      first_selected 抽查 000530=10-15（补录生效的直接证据，无补录本该是 10-16）。
+      前端从「⚠️ 源停更 3 天」红胶囊恢复为当日真实数据。
+      【顺手抓到的第二个真 bug·归档推送缺口】run 成功后查 main：归档仍 3 日缺 10-16 ——
+      v8_ima_strong_stock.yml 的 PUSH_FILES 只有三件套（raw json + data js + index.html），
+      raw_data/ima_strong_daily.json（first_selected 归档）**从不入推送清单** ⇒ fetcher
+      每轮在 runner 上算的归档随跑随丢、仓内归档冻结，跨日 first_selected 判定失真
+      （连选两日的票被误判「当日首入」，污染回测与推荐判据）。
+      修法：PUSH_FILES 补 raw_data/ima_strong_daily.json（commit d555b62d5，workflow
+      +5/-2 行）+ 归档补 10-16 条目；再派发 run=38903485312 success 端到端实证：
+      归档由 workflow 自己推上 main（commit 7c341b794，4 日齐全）。
+      【剩余外部依赖】①家机（阿狸咪）快照自动化 149ad8ff 的 ima 授权仍过期
+      （本机授权恢复不跨机传播）——须主人在家机侧重授，否则下轮（10-17 15:45 后）
+      无人推新快照，将重新进入 retained-last（届时 A 修复会正确示警+发信，不再假新鲜）；
+      ②家机 push_snapshot.py 的「列表标题/正文错位」根因未修（B 修复已能标记留证，
+      但根治须阿狸咪改其推送前断言：正文标题日期 == 列表最新标题日期）。
+      【本 item 状态】A/B/C 三修复 + 归档缺口修复均已线上实证；仅「停更邮件恰 1 封」
+      待主人收件箱确认（20:42 起数据已新鲜，不会再发新停更信）。
+    updated: "2026-10-16 20:54"
     updated_by: 小九(lemoncat-cn)
   - id: main-history-truncated-by-cloudbot-1016
     owner: 小九(lemoncat-cn)
