@@ -3,7 +3,36 @@
 <head>
 <meta charset="utf-8">
 <title>A股艾略特波浪定位 · 2026-09-14</title>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="../assets/echarts.min.js?v=5.4.3"></script>
+<script>
+/* ECharts 本地同源 + 双 CDN 兜底（2026-10-16 一劳永逸·阿狸咪的工程师）：
+   原引用 cdn.jsdelivr.net 自国内网络 TCP 重置（实测 HTTP 000/0.19s）⇒ window.echarts
+   缺失 ⇒ echarts.init 抛错 ⇒ 图表永久卡「加载中…」。现改为仓库内本地文件（与 npm
+   官方 dist 逐字节一致），并保留 fastly.jsdelivr / npmmirror 顺序兜底，
+   兜底成功派发 echartsready 事件驱动图表自动重渲，无需人工刷新。 */
+(function(){
+  function _fire(){
+    try { document.dispatchEvent(new Event('echartsready')); }
+    catch (e) { var ev = document.createEvent('Event'); ev.initEvent('echartsready', true, false); document.dispatchEvent(ev); }
+  }
+  if (window.echarts) { return; }
+  var _CDN = ['https://fastly.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js',
+              'https://registry.npmmirror.com/echarts/5.4.3/files/dist/echarts.min.js'];
+  function _boot(){
+    if (window.echarts) { _fire(); return; }
+    var i = 0;
+    (function _next(){
+      if (i >= _CDN.length) { return; }
+      var s = document.createElement('script');
+      s.src = _CDN[i++];
+      s.onload = function(){ if (window.echarts) { _fire(); } else { _next(); } };
+      s.onerror = _next;
+      document.head.appendChild(s);
+    })();
+  }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', _boot); } else { _boot(); }
+})();
+</script>
 <style>
 :root{--up:#d63a34;--dn:#1f9d55;--ink:#1b1f24;--sub:#5b6570;--line:#e3e7ec;--bg:#f7f8fa;--card:#fff;--gold:#b8860b;}
 *{box-sizing:border-box}
@@ -197,11 +226,13 @@ function sw(k){
     document.getElementById('pane'+x).classList.toggle('hide', x!==k);
     document.getElementById('btn'+x).classList.toggle('on', x===k);
   });
-  if(k==='C'){ setTimeout(function(){ chartWave.resize(); }, 30); }
-  if(k==='B'){ setTimeout(function(){ chartIdx.resize(); }, 30); }
+  if(k==='C'){ setTimeout(function(){ if(chartWave) chartWave.resize(); }, 30); }
+  if(k==='B'){ setTimeout(function(){ if(chartIdx) chartIdx.resize(); }, 30); }
 }
 
-var chartWave = echarts.init(document.getElementById('chartWave'));
+var chartWave = null, chartIdx = null;
+function __waveRenderCharts(){
+chartWave = echarts.init(document.getElementById('chartWave'));
 chartWave.setOption({
   tooltip: { trigger:'axis' },
   grid: { left:64, right:26, top:34, bottom:56 },
@@ -229,7 +260,7 @@ chartWave.setOption({
   }]
 });
 
-var chartIdx = echarts.init(document.getElementById('chartIdx'));
+chartIdx = echarts.init(document.getElementById('chartIdx'));
 chartIdx.setOption({
   tooltip:{ trigger:'axis', axisPointer:{type:'shadow'}, valueFormatter:function(v){ return v + '%'; } },
   grid:{ left:96, right:110, top:26, bottom:40 },
@@ -243,7 +274,16 @@ chartIdx.setOption({
     label:{ show:true, position:'right', formatter:'{c}%', color:'#1b1f24', fontSize:12 }
   }]
 });
-window.addEventListener('resize', function(){ chartWave.resize(); chartIdx.resize(); });
+}
+if (window.echarts) { __waveRenderCharts(); }
+else {
+  ['chartWave','chartIdx'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#5b6570;font-size:13px;text-align:center;padding:0 20px;">⚠️ 图表组件（ECharts）加载失败——已自动尝试备用源，请稍候或刷新页面</div>';
+  });
+  document.addEventListener('echartsready', function(){ __waveRenderCharts(); });
+}
+window.addEventListener('resize', function(){ if(chartWave) chartWave.resize(); if(chartIdx) chartIdx.resize(); });
 
 (function(){
   var tb = document.getElementById('tbIdx');

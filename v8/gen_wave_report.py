@@ -14,7 +14,7 @@ A股艾略特波浪定位研报 · 渲染脚本（零 westock 依赖）
   cd quant-scanner-v8
   git pull
   python v8/gen_wave_report.py
-  # 产出 out/A股波浪定位-YYYYMMDD.html（浏览器打开即看，需联网加载 ECharts CDN）
+  # 产出 out/A股波浪定位-YYYYMMDD.html（浏览器打开即看；ECharts 已改仓库内本地同源 + 双 CDN 兜底，不再依赖跨境 cdn.jsdelivr.net）
 
 【数据更新（小九/weekend 负责）】
   用 westock 重拉上证日K/5指数日K → 覆盖 data/WAVE_ELLIOTT.js 的
