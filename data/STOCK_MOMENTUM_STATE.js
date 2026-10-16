@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-16 16:26",
- "generated": "2026-10-16 16:26",
+ "update_time": "2026-10-16 16:35",
+ "generated": "2026-10-16 16:35",
  "meta": {
-  "generated": "2026-10-16 16:26",
+  "generated": "2026-10-16 16:35",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 27,
   "days_with_consensus": 0,
@@ -10390,6 +10390,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 30.0,
+      "price": 19.24,
+      "category": "突破"
+     },
+     {
       "code": "300553",
       "name": "集智股份",
       "change_pct": 3.333,
@@ -10493,13 +10500,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.339,
       "price": 10.34,
       "category": "突破"
-     },
-     {
-      "code": "002264",
-      "name": "新 华 都",
-      "change_pct": 3.856,
-      "price": 7.81,
-      "category": "突破"
      }
     ],
     "加速": [
@@ -10578,6 +10578,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "四川美丰",
       "change_pct": 5.455,
       "price": 7.54,
+      "category": "加速"
+     },
+     {
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 30.0,
+      "price": 19.24,
       "category": "加速"
      },
      {
@@ -10674,6 +10681,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "920690",
+      "name": "捷众科技",
+      "change_pct": 30.0,
+      "price": 19.24,
+      "category": "短线选股"
+     },
+     {
       "code": "300553",
       "name": "集智股份",
       "change_pct": 3.333,
@@ -10777,13 +10791,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.339,
       "price": 10.34,
       "category": "短线选股"
-     },
-     {
-      "code": "002264",
-      "name": "新 华 都",
-      "change_pct": 3.856,
-      "price": 7.81,
-      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -10876,13 +10883,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "海波重科",
       "change_pct": 4.339,
       "price": 10.34,
-      "category": "强势股"
-     },
-     {
-      "code": "002264",
-      "name": "新 华 都",
-      "change_pct": 3.856,
-      "price": 7.81,
       "category": "强势股"
      }
     ]
