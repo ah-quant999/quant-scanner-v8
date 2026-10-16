@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-16 21:46:24",
+ "generated": "2026-10-16 22:48:11",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -34,13 +34,13 @@
  "skipped_no_signal_date": 0,
  "signal_days": 56,
  "signal_date_range": "2026-06-09 ~ 2026-10-16",
- "ima_update_time": "2026-10-16 20:46:46",
+ "ima_update_time": "2026-10-16 20:53:17",
  "source_coverage": {
   "rows_parsed": 8,
   "expected": null,
   "source_channel": "full-snapshot",
   "snapshot_fetched_at": "2026-10-16 20:35:30",
-  "snapshot_age_h": 0.19,
+  "snapshot_age_h": 0.3,
   "truncated": false,
   "note": "v2 换代水源「短线情绪选股」主报告全文快照（成员连接器）；introduction 兜底通道受 ~300 字硬墙（如实降级 detail_complete=false）。"
  },
