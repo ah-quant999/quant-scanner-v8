@@ -8900,12 +8900,29 @@ items:
       快照自动化在家机（阿狸咪）且授权已过期；本机（lemoncat）连接器无 ima-mcp 绑定
       （connector-states.json 仅 westock/tdx/github）⇒ 替取不了，须主人在连接器页
       重新授权 ima 后，家机下一轮自动化才能推新快照。
+      【C 修复·2026-10-16 18:5x 云端首轮派发实测后补】首轮派发 run=38889140671 success
+      后硬抓 main 分支产物：stale_days=3 / source_stale=true / snapshot_expired=true /
+      degraded_reason=data_date-regressed(2026-10-12<2026-10-13);retained-last-good;
+      source-stale-3d —— A 修复全生效；但抓出两个**模块行为不一致**缺口（违反
+      「code 行为一致」铁律，当场补刀）：
+      ① _regress 分支调 _write_retained 时传的是硬拼字符串，main() 顶部算出的
+         snapshot_age>72h;meta-md-date-mismatch 被丢弃 ⇒ B 修复只在正常路径生效，
+         retained-last 路径（正是断更实发通道）不留错位证据；
+      ② snapshot_age_h 仍是上一版旧值 15.21，与 snapshot_expired=true 自相矛盾。
+      修法 C：_write_retained 增 snap_info 形参（_regress 分支必传本次 load_snapshot()
+      返回值）——合并本次快照的 expired/mismatch 证据进 degraded_reason 前缀 +
+      产物字段；snapshot_age_h 按上一版 fetched_at 同步重算，与 expired 对齐。
+      both-channels-empty 路径无本次快照 ⇒ 不传 snap_info，行为不回退（单测 S9 锁死）。
+      单测扩到 46/46 全过（新增 S8/S9 两组 11 断言）。停更邮件不重复发：
+      main 分支产物 source_stale 已 true ⇒ 下轮 _prev_stale=True ⇒ 静默留证。
     verify_how: |
       ① 派发 run success；② 硬抓 Pages data/IMA_STRONG_STOCK.js：stale_days=3、
          source_stale=true、degraded_reason 含 source-stale-3d、data_date 仍为 2026-10-13
          （不被回退）、snapshot_meta_mismatch 留证；③ 停更邮件收到恰 1 封；
       ④ index.html 的 IMA_STRONG_STOCK.js ?v 与新内容中性化 sha1 对齐（本推送已带或
          cache_buster_reconcile 15 分钟内自愈）；⑤ ledger --check 全命中。
+      ⑥ C 修复后：degraded_reason 还含 snapshot_age>72h;meta-md-date-mismatch 前缀、
+         sample_coverage.snapshot_age_h≈72.9 与 snapshot_expired=true 对齐。
       转 done 需填 verified_at（派发+硬抓+邮件三证齐后再转）。
-    updated: "2026-10-16 18:05"
+    updated: "2026-10-16 18:55"
     updated_by: 小九(lemoncat-cn)

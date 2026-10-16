@@ -37,6 +37,10 @@ schema v2（stocks[] 换代；旧「基准价/最新价/涨幅/回撤/状态」�
      （实测事故：meta 记 10-13 而正文实为 10-12 ⇒ 抓取器列表标题/正文错位）。
      内容日期优先，不一致只标记（snapshot_meta_mismatch）不阻断 —— 防回归守卫
      本就挡住旧内容覆盖已发布新版，无需丢弃真数据。
+  C. B 的证据必须同样覆盖 retained-last 路径（_regress 分支传 snap_info=data，
+     线上实测缺口：10-16 首轮修复后 retained 产物无 meta_mismatch 字段、
+     snapshot_age_h 仍是 15.21 旧值与 expired=true 自相矛盾）——
+     杜绝「正常路径有留证、retained 路径裸奔」的模块行为不一致。
 
 用法：
   python fetch_ima_strong_stock.py            # 快照优先，缺失/过期回退访客路
@@ -366,23 +370,48 @@ def _recompute_stale(prev, now=None):
     return stale_days, source_stale, snapshot_expired
 
 
-def _write_retained(prev, degraded_reason, now=None):
+def _write_retained(prev, degraded_reason, now=None, snap_info=None):
     """两处 retained-last 分支共用：重算停更态 → 按需发停更邮件 → 落盘 raw/js。
 
     邮件纪律（与主路径同阈、2026-09-29 立）：仅「非停更 → 停更」迁移当次发一封，
     此后静默留证；stale 级仅交易日放行（周末/节假日属预期静默）。
     now 仅供单测注入固定时刻，生产路径不传。
+    snap_info：本次 load_snapshot() 的返回（_regress 分支必传）——retained-last
+      也必须如实带上「本次快照的过期/错位」证据，否则前端只见陈旧数据却无任何
+      留证（2026-10-16 线上实测缺口：snapshot_expired=true 而 age_h=15.21 旧值）。
     """
     now = now or datetime.now(timezone(timedelta(hours=8)))
     _prev_stale = bool(prev.get("source_stale"))   # 迁移判据取「本次写入前」的值
     stale_days, source_stale, snapshot_expired = _recompute_stale(prev, now)
+    # 本次快照证据合并（内容日期优先；不一致只标记不阻断）
+    _si = snap_info or {}
+    _snap_expired_now = bool(_si.get("snapshot_expired"))
+    _meta_mismatch_now = bool(_si.get("snapshot_meta_mismatch"))
+    _prefix = []
+    if _snap_expired_now:
+        _prefix.append("snapshot_age>%.0fh" % (_si.get("age_h") or 0))
+    if _meta_mismatch_now:
+        _prefix.append("meta-md-date-mismatch")
     prev["stale_days"] = stale_days
     prev["source_stale"] = source_stale
-    prev["snapshot_expired"] = snapshot_expired
+    prev["snapshot_expired"] = snapshot_expired or _snap_expired_now
+    prev["snapshot_meta_mismatch"] = _meta_mismatch_now
+    if _si.get("meta_title"):
+        prev["meta_title"] = _si["meta_title"]
     prev["detail_channel"] = "retained-last"
-    prev["degraded_reason"] = degraded_reason
+    degraded_reason = ";".join(_prefix + [degraded_reason]) if _prefix else degraded_reason
     if source_stale and stale_days is not None:
-        prev["degraded_reason"] = "%s;source-stale-%dd" % (degraded_reason, stale_days)
+        degraded_reason = "%s;source-stale-%dd" % (degraded_reason, stale_days)
+    prev["degraded_reason"] = degraded_reason
+    # snapshot_age_h 展示值与 snapshot_expired 对齐（重算，杜绝「已过期却显示 15h」）
+    _fa = str(((prev.get("sample_coverage") or {}).get("snapshot_fetched_at")) or "")
+    try:
+        _dt = datetime.strptime(_fa, "%Y-%m-%d %H:%M:%S").replace(
+            tzinfo=timezone(timedelta(hours=8)))
+        prev.setdefault("sample_coverage", {})["snapshot_age_h"] = \
+            round((now - _dt).total_seconds() / 3600.0, 2)
+    except Exception:
+        pass
     prev["update_time"] = now.strftime("%Y-%m-%d %H:%M:%S")
     if source_stale and not _prev_stale and v8_send_alert:
         try:
@@ -578,7 +607,8 @@ def main():
             _write_retained(
                 _prev,
                 "data_date-regressed(%s<%s);retained-last-good" % (
-                    data_date, _prev.get("data_date")))
+                    data_date, _prev.get("data_date")),
+                snap_info=data)
             print("⛔ 数据日倒退（%s < 上一版 %s）—— 已保留上一版产物，拒绝回退到旧版。"
                   % (data_date, _prev.get("data_date")))
             return
