@@ -1856,7 +1856,7 @@ items:
   - id: all-generic-redline-false-positive
     priority: P1
     owner: shared
-    status: doing
+    status: done
     what: >-
       **HEALTH_CHECK 的两个 `all_*` fail 属「通用 24h 红线打到结构性低频产物」的假红灯**
       （阿狸咪 2026-09-21 16:2x CST 实测定位；与 `baihechou-analysis-no-producer` 同族，
@@ -1947,6 +1947,11 @@ items:
       ⚠️ 删时必须**同批**把该路径加进 `api_push_raw.py` 的退役守卫（否则会被第三次推回）；
       该执行面 owner 在 小九（涉及 `_RETIRED_ARTIFACTS` 与删除感知并集）。
       我方本轮**未改任何代码**（本轮任务明令只 detect + dispatch，不跑数据）。
+      ── 小九 2026-10-16 补（本族第 4 / 5 例 · 主人「一劳永逸根治」收尾）──
+      · 第 4 例 `all_FINAL_RECOMMEND_REPLAY`：静态归档产物（回放口径、一次性产出、仅 index.html 消费、0 生产者引用），被 24h 通用红线判 fail ⇒ 永不绿假红。修法：`v8_health_check.py` 新增第 4 类白名单 `_STATIC_ARCHIVE_FILES`（与 `_LOW_FREQ_FILES`/`_RETIRED_FILES` 并列），仅校验存在性+可装载性、不套年龄红线、status 强制 ok。
+      · 第 5 例 `ETF_DAILY_MONITOR`：生产侧 `f_etf_daily_monitor` 依赖全市场 17 页拼装（东财单页 ~88%），盘中(09:30–15:05)禁复用上一版 ⇒ 某日拼不齐+盘后档未拼齐则整日不写盘（设计内），却被按 dual_page=实时数据 套 45min 盘中严格阈值 ⇒ 每天必红假红。修法：给该卡加 `cycle=(15,5)` 真实节拍锚点（挂既有「逐卡真实节拍」放宽），白天合法持有上一交易日收盘值、仅 T-2 连续两日失败才判 fail（真故障不掩盖）。
+      · 两处随 commit `163c3eaa2`（2026-10-16 12:02，双 CI 全绿：guard_double_blind RC=0 / pre_deploy_audit 15/15）推送 main；线上核验 `all_FINAL_RECOMMEND_REPLAY` status=ok（即便文件是 10-14 静态归档）、HEALTH_CHECK overall=ok。
+      · 本批改了代码（与 09-21 那轮只 detect 不同）；本条目 status 已转 done（A/B/第3例/第4例/第5例 五例全部根治闭环）。
     fix_done: >
       小九 2026-09-21 18:45 落地（A / B 两条**分别处置、未合并**）：
       【A · 退役孤儿】data/ALGO_BACKTEST_COMPARE.js 已由本批一次性删除提交清除（远端 404）。
