@@ -8622,7 +8622,18 @@ items:
       ②AR 吸收率因子：仍未开工（需新算法+回测自证，忌赶工）。
       ③STOCK_QUOTE cron 观察：10-16 15:45 前后已有云端 run（本地 git log 见
         "v8 cn fetch: 2026-10-16 16:47"）⇒ 当日未复发；持续观察至下周一。
-    updated: "2026-10-16 18:05"
+    xiaojiu_verify_20261016_1955: >-
+      〔小九 2026-10-16 19:5x CST · 事项①已上线实证；②③仍未开工〕
+      ①涨停热力 dates 回补**已上线实证**：19:20 盘后档 run 3224（id=38893167367）
+        step19 update_v8 + step23 自闭环推送均 success；硬抓 Pages
+        data/LIMIT_UP_HEATMAP.js：update_time=19:28:09、dates 末段
+        …10/08、10/09、10/12、10/13、10/14、10/15、10/16 —— 三日回补且连续
+        无缺口（2687B→3061B，+3 列数据）；index.html ?v=61f05bc793 与内容
+        中性化 sha1[:10]（权威口径：剔 republish_time）逐位对齐；
+        raw_data/limit_up_heatmap.json 同步 33 列。事项①闭环。
+      ②AR 吸收率因子：仍未开工（需新算法+回测自证，忌赶工）。
+      ③STOCK_QUOTE cron 观察：10-16 当日有云端 run，未复发；持续观察至下周一。
+    updated: "2026-10-16 19:55"
     updated_by: 小九(lemoncat-cn)
   - id: future-card-cffex-badge-1015
     owner: 小九(lemoncat-cn)
@@ -8924,5 +8935,54 @@ items:
       ⑥ C 修复后：degraded_reason 还含 snapshot_age>72h;meta-md-date-mismatch 前缀、
          sample_coverage.snapshot_age_h≈72.9 与 snapshot_expired=true 对齐。
       转 done 需填 verified_at（派发+硬抓+邮件三证齐后再转）。
-    updated: "2026-10-16 18:55"
+    xiaojiu_verify_20261016_1955: >-
+      〔小九 2026-10-16 19:5x CST · A/C 全链路实证已过，仅剩邮件待主人在收件箱确认〕
+      二轮派发 run=38890603377（head=e976d1bb）success；硬抓 main 分支 + Pages
+      产物（两处语义零差异）：stale_days=3 · source_stale=true ·
+      snapshot_expired=true · snapshot_meta_mismatch=true ·
+      meta_title=短线情绪选股 2026-10-13 · data_date=2026-10-13（不回退）·
+      snapshot_age_h=73.19（与 expired 对齐）· detail_channel=retained-last ·
+      degraded_reason=snapshot_age>73h;meta-md-date-mismatch;
+      data_date-regressed(2026-10-12<2026-10-13);retained-last-good;source-stale-3d；
+      index.html ?v=6194cb5ffe 已刷新；ledger 173/173、CI [13/13] 门禁 PASS。
+      唯一未实证项：停更邮件恰 1 封（云端日志 API 匿名 403 拉不到 run logs）——
+      待主人在 2814546@qq.com 收件箱确认「ima 短线情绪选股源停更 3 天」后即转 done。
+    updated: "2026-10-16 19:55"
+    updated_by: 小九(lemoncat-cn)
+  - id: main-history-truncated-by-cloudbot-1016
+    owner: 小九(lemoncat-cn)
+    priority: P1
+    status: pending-verify
+    created: 2026-10-16
+    title: "🔴 main 历史 19:02 被云端 bot 无 parent 根 commit 截断（内容零丢失；制造 step 待定位）"
+    note: |
+      【事故实证·2026-10-16 19:5x 本地 git 取证】origin/main 于 19:02:39 CST
+      出现**无 parent 的孤儿根 commit** 8bf8938ae（「v8 cn fetch: 2026-10-16 19:02」，
+      author=github-actions[bot]，committer=GitHub ⇒ Git Data API 创建、非本地 git push），
+      stat 为全仓文件全量新增（370KB）⇒ 19:02 起 main 历史被截断为该一棵树，
+      此前全部历史（含本日两笔修复 6637293cd / e976d1bb）被挤出 origin/main 可达集。
+      【内容零丢失·已逐项验证】孤儿树 = 19:02 时点含全部修复的完整快照：
+      ① fetch_ima_strong_stock.py 含 C 修复（snap_info 5 处命中）；
+      ② fetch_limit_up_heatmap_v8.py 含 dates 回补（backfill 6 处命中）；
+      ③ HANDOFF.ledger.json 173/173 哈希、目标哈希 ba0e7fbdfaac05e9 正确；
+      ④ 19:17-19:40 各自动 commit 均以孤儿树为 parent 正常延续，
+         数据产物（IMA 停更态 / 热力三日回补）已全部硬抓 Pages 实证上线。
+      【本机无责证据】本机推送日志 ~/.workbuddy/v8_push_log/ 今日最后两条为
+      18:42（6637293cd）与 18:57（e976d1bb），均走 v8_push_files.py 净室推送
+      （fresh TIP + expect-base + 禁 force + 逐字节回读），19:02 无任何本机推送记录；
+      本机所有推送 parent 均基于当时 TIP，不可能产生无 parent 提交。
+      【嫌疑范围】制造者为 GHA（committer=GitHub）。19:20 档 run 3224 自身历史正常
+      （有 parent），⇒ 嫌疑在 19:02 前后的另一 run 或某机器的 API 全量推送工具
+      （Git Data API 创建 commit 时未传 parent + 更新 ref）。待定位具体 step。
+      【影响评估】功能/数据/交接档零丢失（线上运行正常）；损失限于 git 历史纵深
+      （blame/回溯 19:02 前记录需本地旧对象或 GitHub 缓存）。
+      【待主人拍板】是否把被截断的旧历史嫁接回 main（如创建 merge commit 双父），
+      或接受现状（内容优先、历史为辅）。本机不擅自改历史（嫁接有回退风险）。
+    verify_how: |
+      ① git merge-base --is-ancestor 6637293cd origin/main 当前为 False（已实证截断）；
+      ② 孤儿树四项内容核验（ima C 修复 / 热力回补 / ledger 哈希 / 后续 commit 延续）已过；
+      ③ 制造 step 定位：比对 19:00-19:05 全部 workflow runs 的 head 与 8bf8938ae 树 sha；
+      ④ 主人决策历史处理方式后，按决策执行并回填本档。
+    verified_at: "2026-10-16 19:5x 取证登记（待定位制造 step + 待主人决策）"
+    updated: "2026-10-16 19:55"
     updated_by: 小九(lemoncat-cn)
