@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-16 17:30",
+  "update_time": "2026-10-16 19:36",
   "window_days": 90,
   "horizons": [
     5,
@@ -16,7 +16,7 @@
   "cost_pct_roundtrip": 0.3,
   "total_stats": {
     "four_volume": {
-      "tracking": 110,
+      "tracking": 113,
       "history_samples": 100,
       "win_rate": null,
       "avg_return": -10.63,
@@ -26,25 +26,25 @@
       "today_signals": 3,
       "by_horizon": {
         "5": {
-          "samples": 178,
-          "win_rate": 34.8,
-          "avg_return": -3.31,
+          "samples": 181,
+          "win_rate": 35.4,
+          "avg_return": -3.32,
           "best_return": 42.13,
           "worst_return": -36.94,
           "median_return": -3.27
         },
         "10": {
-          "samples": 142,
-          "win_rate": 34.5,
-          "avg_return": -4.66,
+          "samples": 144,
+          "win_rate": 34.0,
+          "avg_return": -4.94,
           "best_return": 43.88,
-          "worst_return": -38.85,
-          "median_return": -5.52
+          "worst_return": -39.92,
+          "median_return": -5.86
         },
         "20": {
-          "samples": 73,
-          "win_rate": 15.1,
-          "avg_return": -10.33,
+          "samples": 74,
+          "win_rate": 14.9,
+          "avg_return": -10.38,
           "best_return": 35.43,
           "worst_return": -48.48,
           "median_return": -12.08
@@ -120,12 +120,12 @@
       ],
       "cost_pct_roundtrip": 0.3,
       "coverage": {
-        "items": 210,
+        "items": 213,
         "with_series": 204,
-        "missing_cache": 6,
-        "bar_asof": "2026-10-15",
-        "t5_ready": 178,
-        "t5_ready_pct": 84.8
+        "missing_cache": 9,
+        "bar_asof": "2026-10-16",
+        "t5_ready": 181,
+        "t5_ready_pct": 85.0
       }
     }
   },
@@ -134,7 +134,7 @@
       "algo": "four_volume",
       "display_name": "四量终极",
       "stats": {
-        "tracking": 110,
+        "tracking": 113,
         "history_samples": 100,
         "win_rate": null,
         "avg_return": -10.63,
@@ -144,25 +144,25 @@
         "today_signals": 3,
         "by_horizon": {
           "5": {
-            "samples": 178,
-            "win_rate": 34.8,
-            "avg_return": -3.31,
+            "samples": 181,
+            "win_rate": 35.4,
+            "avg_return": -3.32,
             "best_return": 42.13,
             "worst_return": -36.94,
             "median_return": -3.27
           },
           "10": {
-            "samples": 142,
-            "win_rate": 34.5,
-            "avg_return": -4.66,
+            "samples": 144,
+            "win_rate": 34.0,
+            "avg_return": -4.94,
             "best_return": 43.88,
-            "worst_return": -38.85,
-            "median_return": -5.52
+            "worst_return": -39.92,
+            "median_return": -5.86
           },
           "20": {
-            "samples": 73,
-            "win_rate": 15.1,
-            "avg_return": -10.33,
+            "samples": 74,
+            "win_rate": 14.9,
+            "avg_return": -10.38,
             "best_return": 35.43,
             "worst_return": -48.48,
             "median_return": -12.08
@@ -238,12 +238,12 @@
         ],
         "cost_pct_roundtrip": 0.3,
         "coverage": {
-          "items": 210,
+          "items": 213,
           "with_series": 204,
-          "missing_cache": 6,
-          "bar_asof": "2026-10-15",
-          "t5_ready": 178,
-          "t5_ready_pct": 84.8
+          "missing_cache": 9,
+          "bar_asof": "2026-10-16",
+          "t5_ready": 181,
+          "t5_ready_pct": 85.0
         }
       },
       "tracking": [
@@ -257,7 +257,7 @@
           "last_close": 82.51,
           "last_pct": -24.92,
           "peak_pct": 12.49,
-          "days_in": 88,
+          "days_in": 89,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -276,7 +276,7 @@
           "last_close": 97.18,
           "last_pct": -21.86,
           "peak_pct": 5.31,
-          "days_in": 88,
+          "days_in": 89,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -295,7 +295,7 @@
           "last_close": 18.22,
           "last_pct": -1.35,
           "peak_pct": 23.82,
-          "days_in": 88,
+          "days_in": 89,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -314,7 +314,7 @@
           "last_close": 14.63,
           "last_pct": -24.97,
           "peak_pct": 5.59,
-          "days_in": 88,
+          "days_in": 89,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -333,7 +333,7 @@
           "last_close": 29.38,
           "last_pct": 3.27,
           "peak_pct": 4.04,
-          "days_in": 88,
+          "days_in": 89,
           "appear_count": 1,
           "last_seen": "20260929",
           "signal_detail": {
@@ -352,7 +352,7 @@
           "last_close": 5.71,
           "last_pct": -19.12,
           "peak_pct": 0.0,
-          "days_in": 88,
+          "days_in": 89,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -371,7 +371,7 @@
           "last_close": 7.24,
           "last_pct": 3.87,
           "peak_pct": 4.16,
-          "days_in": 88,
+          "days_in": 89,
           "appear_count": 1,
           "last_seen": "20260928",
           "signal_detail": {
@@ -390,7 +390,7 @@
           "last_close": 8.48,
           "last_pct": 4.56,
           "peak_pct": 4.81,
-          "days_in": 88,
+          "days_in": 89,
           "appear_count": 1,
           "last_seen": "20260914",
           "signal_detail": {
@@ -409,7 +409,7 @@
           "last_close": 9.51,
           "last_pct": -27.85,
           "peak_pct": 3.11,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260924",
           "signal_detail": {
@@ -428,7 +428,7 @@
           "last_close": 14.07,
           "last_pct": -9.81,
           "peak_pct": 12.18,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260924",
           "signal_detail": {
@@ -447,7 +447,7 @@
           "last_close": 125.12,
           "last_pct": -7.79,
           "peak_pct": 11.38,
-          "days_in": 81,
+          "days_in": 82,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -466,7 +466,7 @@
           "last_close": 30.42,
           "last_pct": -19.37,
           "peak_pct": 2.01,
-          "days_in": 80,
+          "days_in": 81,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -485,7 +485,7 @@
           "last_close": 55.47,
           "last_pct": -24.03,
           "peak_pct": 0.66,
-          "days_in": 80,
+          "days_in": 81,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -504,7 +504,7 @@
           "last_close": 12.3,
           "last_pct": -21.31,
           "peak_pct": 9.98,
-          "days_in": 80,
+          "days_in": 81,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -523,7 +523,7 @@
           "last_close": 21.86,
           "last_pct": -29.14,
           "peak_pct": 4.25,
-          "days_in": 80,
+          "days_in": 81,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -542,7 +542,7 @@
           "last_close": 30.52,
           "last_pct": -27.54,
           "peak_pct": 0.81,
-          "days_in": 78,
+          "days_in": 79,
           "appear_count": 1,
           "last_seen": "20260916",
           "signal_detail": {
@@ -561,7 +561,7 @@
           "last_close": 100.3,
           "last_pct": -14.96,
           "peak_pct": 15.89,
-          "days_in": 78,
+          "days_in": 79,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -580,7 +580,7 @@
           "last_close": 43.98,
           "last_pct": -31.26,
           "peak_pct": 0.0,
-          "days_in": 78,
+          "days_in": 79,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -599,7 +599,7 @@
           "last_close": 10.1,
           "last_pct": -16.74,
           "peak_pct": 3.3,
-          "days_in": 78,
+          "days_in": 79,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -618,7 +618,7 @@
           "last_close": 45.65,
           "last_pct": -27.52,
           "peak_pct": 1.98,
-          "days_in": 78,
+          "days_in": 79,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -637,7 +637,7 @@
           "last_close": 77.35,
           "last_pct": -27.91,
           "peak_pct": 8.11,
-          "days_in": 78,
+          "days_in": 79,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -656,7 +656,7 @@
           "last_close": 89.92,
           "last_pct": -17.29,
           "peak_pct": 3.8,
-          "days_in": 78,
+          "days_in": 79,
           "appear_count": 1,
           "last_seen": "20260915",
           "signal_detail": {
@@ -675,7 +675,7 @@
           "last_close": 2.44,
           "last_pct": -19.21,
           "peak_pct": 0.0,
-          "days_in": 77,
+          "days_in": 78,
           "appear_count": 1,
           "last_seen": "20260916",
           "signal_detail": {
@@ -694,7 +694,7 @@
           "last_close": 37.51,
           "last_pct": -27.35,
           "peak_pct": 0.02,
-          "days_in": 76,
+          "days_in": 77,
           "appear_count": 1,
           "last_seen": "20260929",
           "signal_detail": {
@@ -713,7 +713,7 @@
           "last_close": 22.98,
           "last_pct": -33.12,
           "peak_pct": 0.49,
-          "days_in": 76,
+          "days_in": 77,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -732,7 +732,7 @@
           "last_close": 18.18,
           "last_pct": -25.52,
           "peak_pct": 3.93,
-          "days_in": 76,
+          "days_in": 77,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -751,7 +751,7 @@
           "last_close": 915.0,
           "last_pct": -19.66,
           "peak_pct": 0.0,
-          "days_in": 76,
+          "days_in": 77,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -770,7 +770,7 @@
           "last_close": 87.05,
           "last_pct": -5.07,
           "peak_pct": 42.43,
-          "days_in": 76,
+          "days_in": 77,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -789,7 +789,7 @@
           "last_close": 31.3,
           "last_pct": -24.54,
           "peak_pct": 0.0,
-          "days_in": 75,
+          "days_in": 76,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -808,7 +808,7 @@
           "last_close": 663.0,
           "last_pct": -2.43,
           "peak_pct": 7.47,
-          "days_in": 75,
+          "days_in": 76,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -827,7 +827,7 @@
           "last_close": 20.35,
           "last_pct": -24.91,
           "peak_pct": 0.0,
-          "days_in": 75,
+          "days_in": 76,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -846,7 +846,7 @@
           "last_close": 336.0,
           "last_pct": -6.33,
           "peak_pct": 7.88,
-          "days_in": 74,
+          "days_in": 75,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -865,7 +865,7 @@
           "last_close": 126.1,
           "last_pct": -35.7,
           "peak_pct": 7.19,
-          "days_in": 74,
+          "days_in": 75,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -884,7 +884,7 @@
           "last_close": 35.63,
           "last_pct": -5.44,
           "peak_pct": 22.13,
-          "days_in": 74,
+          "days_in": 75,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -903,7 +903,7 @@
           "last_close": 27.04,
           "last_pct": -27.16,
           "peak_pct": 5.44,
-          "days_in": 74,
+          "days_in": 75,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -922,7 +922,7 @@
           "last_close": 44.03,
           "last_pct": -4.92,
           "peak_pct": 19.52,
-          "days_in": 74,
+          "days_in": 75,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -941,7 +941,7 @@
           "last_close": 42.6,
           "last_pct": -27.72,
           "peak_pct": 5.63,
-          "days_in": 74,
+          "days_in": 75,
           "appear_count": 1,
           "last_seen": "20260917",
           "signal_detail": {
@@ -960,7 +960,7 @@
           "last_close": 58.97,
           "last_pct": -27.53,
           "peak_pct": 0.0,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -979,7 +979,7 @@
           "last_close": 47.88,
           "last_pct": -27.01,
           "peak_pct": 1.37,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -998,7 +998,7 @@
           "last_close": 14.03,
           "last_pct": -22.19,
           "peak_pct": 2.88,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -1017,7 +1017,7 @@
           "last_close": 58.65,
           "last_pct": -18.51,
           "peak_pct": 4.68,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -1036,7 +1036,7 @@
           "last_close": 284.53,
           "last_pct": -12.08,
           "peak_pct": 1.19,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -1055,7 +1055,7 @@
           "last_close": 90.44,
           "last_pct": -36.7,
           "peak_pct": 0.0,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -1074,7 +1074,7 @@
           "last_close": 54.21,
           "last_pct": -9.03,
           "peak_pct": 2.15,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260923",
           "signal_detail": {
@@ -1093,7 +1093,7 @@
           "last_close": 270.43,
           "last_pct": -23.43,
           "peak_pct": 1.35,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -1112,7 +1112,7 @@
           "last_close": 49.51,
           "last_pct": -22.97,
           "peak_pct": 0.39,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -1131,7 +1131,7 @@
           "last_close": 24.6,
           "last_pct": -20.34,
           "peak_pct": 1.23,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -1150,7 +1150,7 @@
           "last_close": 176.4,
           "last_pct": -32.27,
           "peak_pct": 0.0,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -1169,7 +1169,7 @@
           "last_close": 28.35,
           "last_pct": -23.27,
           "peak_pct": 0.73,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -1188,7 +1188,7 @@
           "last_close": 34.85,
           "last_pct": -25.05,
           "peak_pct": 3.96,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -1207,7 +1207,7 @@
           "last_close": 212.8,
           "last_pct": -25.24,
           "peak_pct": 0.0,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -1226,7 +1226,7 @@
           "last_close": 40.3,
           "last_pct": 8.04,
           "peak_pct": 38.23,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -1245,7 +1245,7 @@
           "last_close": 122.67,
           "last_pct": -37.46,
           "peak_pct": 1.0,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260923",
           "signal_detail": {
@@ -1264,7 +1264,7 @@
           "last_close": 42.0,
           "last_pct": -25.0,
           "peak_pct": 0.0,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -1283,7 +1283,7 @@
           "last_close": 247.88,
           "last_pct": -5.9,
           "peak_pct": 0.0,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260920",
           "signal_detail": {
@@ -1302,7 +1302,7 @@
           "last_close": 181.22,
           "last_pct": -46.27,
           "peak_pct": 7.41,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -1321,7 +1321,7 @@
           "last_close": 84.83,
           "last_pct": -31.13,
           "peak_pct": 5.96,
-          "days_in": 72,
+          "days_in": 73,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -1340,7 +1340,7 @@
           "last_close": 127.21,
           "last_pct": -18.46,
           "peak_pct": 9.74,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260923",
           "signal_detail": {
@@ -1359,7 +1359,7 @@
           "last_close": 5.52,
           "last_pct": -2.82,
           "peak_pct": 2.82,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -1378,7 +1378,7 @@
           "last_close": 5.13,
           "last_pct": -15.49,
           "peak_pct": 0.0,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -1397,7 +1397,7 @@
           "last_close": 39.45,
           "last_pct": -33.78,
           "peak_pct": 2.25,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -1416,7 +1416,7 @@
           "last_close": 4.54,
           "last_pct": -10.63,
           "peak_pct": 0.0,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -1435,7 +1435,7 @@
           "last_close": 214.43,
           "last_pct": -24.1,
           "peak_pct": 0.0,
-          "days_in": 66,
+          "days_in": 67,
           "appear_count": 1,
           "last_seen": "20260921",
           "signal_detail": {
@@ -1454,7 +1454,7 @@
           "last_close": 21.24,
           "last_pct": -19.7,
           "peak_pct": 4.31,
-          "days_in": 65,
+          "days_in": 66,
           "appear_count": 1,
           "last_seen": "20260923",
           "signal_detail": {
@@ -1473,7 +1473,7 @@
           "last_close": 92.26,
           "last_pct": -18.33,
           "peak_pct": 0.47,
-          "days_in": 65,
+          "days_in": 66,
           "appear_count": 1,
           "last_seen": "20260923",
           "signal_detail": {
@@ -1492,7 +1492,7 @@
           "last_close": 13.13,
           "last_pct": -17.27,
           "peak_pct": 0.0,
-          "days_in": 65,
+          "days_in": 66,
           "appear_count": 1,
           "last_seen": "20260923",
           "signal_detail": {
@@ -1511,7 +1511,7 @@
           "last_close": 101.09,
           "last_pct": -24.04,
           "peak_pct": 0.55,
-          "days_in": 65,
+          "days_in": 66,
           "appear_count": 1,
           "last_seen": "20260923",
           "signal_detail": {
@@ -1530,7 +1530,7 @@
           "last_close": 118.43,
           "last_pct": -3.16,
           "peak_pct": 1.07,
-          "days_in": 65,
+          "days_in": 66,
           "appear_count": 1,
           "last_seen": "20261009",
           "signal_detail": {
@@ -1549,7 +1549,7 @@
           "last_close": 32.24,
           "last_pct": -16.39,
           "peak_pct": 0.0,
-          "days_in": 65,
+          "days_in": 66,
           "appear_count": 1,
           "last_seen": "20260922",
           "signal_detail": {
@@ -1568,7 +1568,7 @@
           "last_close": 86.13,
           "last_pct": -22.48,
           "peak_pct": 2.67,
-          "days_in": 65,
+          "days_in": 66,
           "appear_count": 1,
           "last_seen": "20260923",
           "signal_detail": {
@@ -1587,7 +1587,7 @@
           "last_close": 65.73,
           "last_pct": -22.7,
           "peak_pct": 2.18,
-          "days_in": 64,
+          "days_in": 65,
           "appear_count": 1,
           "last_seen": "20260923",
           "signal_detail": {
@@ -1606,7 +1606,7 @@
           "last_close": 22.37,
           "last_pct": -4.61,
           "peak_pct": 17.14,
-          "days_in": 62,
+          "days_in": 63,
           "appear_count": 1,
           "last_seen": "20260924",
           "signal_detail": {
@@ -1625,7 +1625,7 @@
           "last_close": 81.43,
           "last_pct": -26.22,
           "peak_pct": 0.0,
-          "days_in": 62,
+          "days_in": 63,
           "appear_count": 1,
           "last_seen": "20260924",
           "signal_detail": {
@@ -1644,7 +1644,7 @@
           "last_close": 81.79,
           "last_pct": -26.8,
           "peak_pct": 0.62,
-          "days_in": 61,
+          "days_in": 62,
           "appear_count": 1,
           "last_seen": "20260923",
           "signal_detail": {
@@ -1663,7 +1663,7 @@
           "last_close": 54.51,
           "last_pct": -19.21,
           "peak_pct": 0.8,
-          "days_in": 61,
+          "days_in": 62,
           "appear_count": 1,
           "last_seen": "20260928",
           "signal_detail": {
@@ -1682,7 +1682,7 @@
           "last_close": 171.01,
           "last_pct": -23.67,
           "peak_pct": 0.0,
-          "days_in": 61,
+          "days_in": 62,
           "appear_count": 1,
           "last_seen": "20260924",
           "signal_detail": {
@@ -1701,7 +1701,7 @@
           "last_close": 73.03,
           "last_pct": -22.32,
           "peak_pct": 2.06,
-          "days_in": 61,
+          "days_in": 62,
           "appear_count": 1,
           "last_seen": "20260924",
           "signal_detail": {
@@ -1720,7 +1720,7 @@
           "last_close": 13.27,
           "last_pct": -5.89,
           "peak_pct": 4.61,
-          "days_in": 61,
+          "days_in": 62,
           "appear_count": 1,
           "last_seen": "20261008",
           "signal_detail": {
@@ -1739,7 +1739,7 @@
           "last_close": 104.52,
           "last_pct": -28.03,
           "peak_pct": 0.0,
-          "days_in": 60,
+          "days_in": 61,
           "appear_count": 1,
           "last_seen": "20260924",
           "signal_detail": {
@@ -1758,7 +1758,7 @@
           "last_close": 130.3,
           "last_pct": -39.62,
           "peak_pct": 0.0,
-          "days_in": 59,
+          "days_in": 60,
           "appear_count": 1,
           "last_seen": "20260924",
           "signal_detail": {
@@ -1777,7 +1777,7 @@
           "last_close": 26.03,
           "last_pct": -22.71,
           "peak_pct": 0.27,
-          "days_in": 59,
+          "days_in": 60,
           "appear_count": 1,
           "last_seen": "20260924",
           "signal_detail": {
@@ -1796,7 +1796,7 @@
           "last_close": 263.27,
           "last_pct": -13.43,
           "peak_pct": 0.0,
-          "days_in": 56,
+          "days_in": 57,
           "appear_count": 1,
           "last_seen": "20260928",
           "signal_detail": {
@@ -1815,7 +1815,7 @@
           "last_close": 54.76,
           "last_pct": -30.17,
           "peak_pct": 0.0,
-          "days_in": 56,
+          "days_in": 57,
           "appear_count": 1,
           "last_seen": "20260928",
           "signal_detail": {
@@ -1834,7 +1834,7 @@
           "last_close": 20.99,
           "last_pct": -29.11,
           "peak_pct": 0.34,
-          "days_in": 55,
+          "days_in": 56,
           "appear_count": 1,
           "last_seen": "20260928",
           "signal_detail": {
@@ -1853,7 +1853,7 @@
           "last_close": 31.04,
           "last_pct": -8.06,
           "peak_pct": 12.2,
-          "days_in": 46,
+          "days_in": 47,
           "appear_count": 1,
           "last_seen": "20260930",
           "signal_detail": {
@@ -1872,7 +1872,7 @@
           "last_close": 7.78,
           "last_pct": -13.56,
           "peak_pct": 0.0,
-          "days_in": 46,
+          "days_in": 47,
           "appear_count": 1,
           "last_seen": "20260930",
           "signal_detail": {
@@ -1891,7 +1891,7 @@
           "last_close": 88.32,
           "last_pct": -6.03,
           "peak_pct": 9.91,
-          "days_in": 46,
+          "days_in": 47,
           "appear_count": 1,
           "last_seen": "20260930",
           "signal_detail": {
@@ -1910,7 +1910,7 @@
           "last_close": 36.39,
           "last_pct": -19.08,
           "peak_pct": 0.29,
-          "days_in": 38,
+          "days_in": 39,
           "appear_count": 1,
           "last_seen": "20261008",
           "signal_detail": {
@@ -1929,7 +1929,7 @@
           "last_close": 5.48,
           "last_pct": 4.38,
           "peak_pct": 12.19,
-          "days_in": 38,
+          "days_in": 39,
           "appear_count": 1,
           "last_seen": "20261008",
           "signal_detail": {
@@ -1948,7 +1948,7 @@
           "last_close": 87.54,
           "last_pct": -7.15,
           "peak_pct": 5.78,
-          "days_in": 38,
+          "days_in": 39,
           "appear_count": 1,
           "last_seen": "20261012",
           "signal_detail": {
@@ -1967,7 +1967,7 @@
           "last_close": 42.02,
           "last_pct": -16.96,
           "peak_pct": 0.0,
-          "days_in": 38,
+          "days_in": 39,
           "appear_count": 1,
           "last_seen": "20261001",
           "signal_detail": {
@@ -1986,7 +1986,7 @@
           "last_close": 29.97,
           "last_pct": -17.51,
           "peak_pct": 0.0,
-          "days_in": 38,
+          "days_in": 39,
           "appear_count": 1,
           "last_seen": "20261008",
           "signal_detail": {
@@ -2005,7 +2005,7 @@
           "last_close": 97.53,
           "last_pct": -0.28,
           "peak_pct": 2.39,
-          "days_in": 35,
+          "days_in": 36,
           "appear_count": 1,
           "last_seen": "20261016",
           "signal_detail": {
@@ -2024,7 +2024,7 @@
           "last_close": 12.57,
           "last_pct": -7.91,
           "peak_pct": 0.37,
-          "days_in": 35,
+          "days_in": 36,
           "appear_count": 1,
           "last_seen": "20261008",
           "signal_detail": {
@@ -2043,7 +2043,7 @@
           "last_close": 46.49,
           "last_pct": -3.09,
           "peak_pct": 9.09,
-          "days_in": 32,
+          "days_in": 33,
           "appear_count": 1,
           "last_seen": "20261009",
           "signal_detail": {
@@ -2062,7 +2062,7 @@
           "last_close": 42.45,
           "last_pct": 1.77,
           "peak_pct": 2.61,
-          "days_in": 32,
+          "days_in": 33,
           "appear_count": 1,
           "last_seen": "20261009",
           "signal_detail": {
@@ -2081,7 +2081,7 @@
           "last_close": 17.66,
           "last_pct": 2.97,
           "peak_pct": 12.24,
-          "days_in": 26,
+          "days_in": 27,
           "appear_count": 1,
           "last_seen": "20261012",
           "signal_detail": {
@@ -2100,7 +2100,7 @@
           "last_close": 101.21,
           "last_pct": -4.52,
           "peak_pct": 7.8,
-          "days_in": 26,
+          "days_in": 27,
           "appear_count": 1,
           "last_seen": "20261012",
           "signal_detail": {
@@ -2119,7 +2119,7 @@
           "last_close": 28.73,
           "last_pct": -19.48,
           "peak_pct": 0.0,
-          "days_in": 26,
+          "days_in": 27,
           "appear_count": 1,
           "last_seen": "20261012",
           "signal_detail": {
@@ -2138,7 +2138,7 @@
           "last_close": 98.35,
           "last_pct": 6.61,
           "peak_pct": 6.94,
-          "days_in": 26,
+          "days_in": 27,
           "appear_count": 1,
           "last_seen": "20261012",
           "signal_detail": {
@@ -2157,7 +2157,7 @@
           "last_close": 7.07,
           "last_pct": -1.81,
           "peak_pct": 2.5,
-          "days_in": 26,
+          "days_in": 27,
           "appear_count": 1,
           "last_seen": "20261012",
           "signal_detail": {
@@ -2176,7 +2176,7 @@
           "last_close": 20.07,
           "last_pct": -14.56,
           "peak_pct": 0.0,
-          "days_in": 26,
+          "days_in": 27,
           "appear_count": 1,
           "last_seen": "20261012",
           "signal_detail": {
@@ -2195,7 +2195,7 @@
           "last_close": 77.66,
           "last_pct": -10.92,
           "peak_pct": 0.14,
-          "days_in": 26,
+          "days_in": 27,
           "appear_count": 1,
           "last_seen": "20261012",
           "signal_detail": {
@@ -2214,7 +2214,7 @@
           "last_close": 9.75,
           "last_pct": 48.63,
           "peak_pct": 48.63,
-          "days_in": 20,
+          "days_in": 21,
           "appear_count": 1,
           "last_seen": "20261013",
           "signal_detail": {
@@ -2233,7 +2233,7 @@
           "last_close": 5.16,
           "last_pct": 1.18,
           "peak_pct": 3.33,
-          "days_in": 20,
+          "days_in": 21,
           "appear_count": 1,
           "last_seen": "20261013",
           "signal_detail": {
@@ -2252,7 +2252,7 @@
           "last_close": 18.63,
           "last_pct": -11.29,
           "peak_pct": 0.0,
-          "days_in": 20,
+          "days_in": 21,
           "appear_count": 1,
           "last_seen": "20261013",
           "signal_detail": {
@@ -2271,7 +2271,7 @@
           "last_close": 18.45,
           "last_pct": 0.05,
           "peak_pct": 0.05,
-          "days_in": 20,
+          "days_in": 21,
           "appear_count": 1,
           "last_seen": "20261013",
           "signal_detail": {
@@ -2290,7 +2290,7 @@
           "last_close": 9.87,
           "last_pct": -19.76,
           "peak_pct": 0.0,
-          "days_in": 16,
+          "days_in": 17,
           "appear_count": 1,
           "last_seen": "20261014",
           "signal_detail": {
@@ -2309,7 +2309,7 @@
           "last_close": 141.9,
           "last_pct": -5.24,
           "peak_pct": 0.0,
-          "days_in": 5,
+          "days_in": 6,
           "appear_count": 1,
           "last_seen": "20261016",
           "signal_detail": {
@@ -2328,13 +2328,70 @@
           "last_close": 1329.0,
           "last_pct": 1.22,
           "peak_pct": 1.22,
-          "days_in": 5,
+          "days_in": 6,
           "appear_count": 1,
           "last_seen": "20261016",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
             "pct_chg": 2.1
+          }
+        },
+        {
+          "code": "300699",
+          "name": "光威复材",
+          "algo": "four_volume",
+          "list_date": "20261016",
+          "list_date_dashed": "2026-10-16",
+          "entry_price": 24.32,
+          "last_close": 24.32,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20261016",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 散户金叉 + 主力金叉",
+            "pct_chg": 9.45
+          }
+        },
+        {
+          "code": "688568",
+          "name": "中科星图",
+          "algo": "four_volume",
+          "list_date": "20261016",
+          "list_date_dashed": "2026-10-16",
+          "entry_price": 30.54,
+          "last_close": 30.54,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20261016",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+            "pct_chg": 8.49
+          }
+        },
+        {
+          "code": "688271",
+          "name": "联影医疗",
+          "algo": "four_volume",
+          "list_date": "20261016",
+          "list_date_dashed": "2026-10-16",
+          "entry_price": 108.04,
+          "last_close": 108.04,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20261016",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+            "pct_chg": 0.59
           }
         }
       ],
@@ -3658,23 +3715,23 @@
         {
           "code": "300207",
           "name": "欣旺达",
-          "bars": 19,
+          "bars": 20,
           "pct": -1.65,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600667",
           "name": "太极实业",
-          "bars": 19,
+          "bars": 20,
           "pct": -25.27,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600900",
           "name": "长江电力",
-          "bars": 19,
+          "bars": 20,
           "pct": 2.97,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600744",
@@ -3686,51 +3743,51 @@
         {
           "code": "601288",
           "name": "农业银行",
-          "bars": 19,
+          "bars": 20,
           "pct": 3.57,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "601398",
           "name": "工商银行",
-          "bars": 19,
+          "bars": 20,
           "pct": 4.26,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600186",
           "name": "莲花控股",
-          "bars": 18,
+          "bars": 19,
           "pct": -28.15,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300568",
           "name": "星源材质",
-          "bars": 18,
+          "bars": 19,
           "pct": -10.11,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300454",
           "name": "深信服",
-          "bars": 18,
+          "bars": 19,
           "pct": -8.09,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300657",
           "name": "弘信电子",
-          "bars": 18,
+          "bars": 19,
           "pct": -19.67,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300037",
           "name": "新宙邦",
-          "bars": 18,
+          "bars": 19,
           "pct": -24.33,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600410",
@@ -3742,9 +3799,9 @@
         {
           "code": "301526",
           "name": "国际复材",
-          "bars": 18,
+          "bars": 19,
           "pct": -29.44,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300905",
@@ -3756,9 +3813,9 @@
         {
           "code": "301373",
           "name": "凌玮科技",
-          "bars": 17,
+          "bars": 18,
           "pct": -15.26,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "301389",
@@ -3784,16 +3841,16 @@
         {
           "code": "688535",
           "name": "华海诚科",
-          "bars": 17,
+          "bars": 18,
           "pct": -28.21,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300903",
           "name": "科翔股份",
-          "bars": 17,
+          "bars": 18,
           "pct": -17.59,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "000981",
@@ -3805,9 +3862,9 @@
         {
           "code": "600206",
           "name": "有研新材",
-          "bars": 16,
+          "bars": 17,
           "pct": -27.65,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600353",
@@ -3833,9 +3890,9 @@
         {
           "code": "688662",
           "name": "富信科技",
-          "bars": 16,
+          "bars": 17,
           "pct": -5.37,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "605589",
@@ -3875,9 +3932,9 @@
         {
           "code": "688222",
           "name": "成都先导",
-          "bars": 15,
+          "bars": 16,
           "pct": -5.74,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300398",
@@ -3889,9 +3946,9 @@
         {
           "code": "300725",
           "name": "药石科技",
-          "bars": 15,
+          "bars": 16,
           "pct": -5.22,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300671",
@@ -3924,16 +3981,16 @@
         {
           "code": "688114",
           "name": "华大智造",
-          "bars": 14,
+          "bars": 15,
           "pct": -18.81,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "301205",
           "name": "联特科技",
-          "bars": 14,
+          "bars": 15,
           "pct": -12.38,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688820",
@@ -3945,16 +4002,16 @@
         {
           "code": "688385",
           "name": "复旦微电",
-          "bars": 14,
+          "bars": 15,
           "pct": -9.33,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688536",
           "name": "思瑞浦股份",
-          "bars": 14,
+          "bars": 15,
           "pct": -23.73,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300260",
@@ -3973,9 +4030,9 @@
         {
           "code": "300666",
           "name": "江丰电子",
-          "bars": 14,
+          "bars": 15,
           "pct": -32.57,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "000021",
@@ -3994,23 +4051,23 @@
         {
           "code": "300394",
           "name": "天孚通信",
-          "bars": 14,
+          "bars": 15,
           "pct": -25.54,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600641",
           "name": "先导基电",
-          "bars": 14,
+          "bars": 15,
           "pct": 7.74,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "002384",
           "name": "东山精密",
-          "bars": 14,
+          "bars": 15,
           "pct": -37.76,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300346",
@@ -4029,30 +4086,30 @@
         {
           "code": "688048",
           "name": "长光华芯",
-          "bars": 14,
+          "bars": 15,
           "pct": -46.57,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300776",
           "name": "帝尔激光",
-          "bars": 14,
+          "bars": 15,
           "pct": -31.43,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688123",
           "name": "聚辰半导体",
-          "bars": 13,
+          "bars": 14,
           "pct": -18.76,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600048",
           "name": "保利发展",
-          "bars": 13,
+          "bars": 14,
           "pct": -3.12,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "000725",
@@ -4064,9 +4121,9 @@
         {
           "code": "688257",
           "name": "新锐股份",
-          "bars": 13,
+          "bars": 14,
           "pct": -34.08,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "000100",
@@ -4078,16 +4135,16 @@
         {
           "code": "300604",
           "name": "长川科技",
-          "bars": 13,
+          "bars": 14,
           "pct": -24.4,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688105",
           "name": "诺唯赞生物",
-          "bars": 12,
+          "bars": 13,
           "pct": -20.0,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688608",
@@ -4113,30 +4170,30 @@
         {
           "code": "688018",
           "name": "乐鑫科技",
-          "bars": 12,
+          "bars": 13,
           "pct": -3.46,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300209",
           "name": "行云科技",
-          "bars": 12,
+          "bars": 13,
           "pct": -16.69,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688234",
           "name": "天岳先进",
-          "bars": 12,
+          "bars": 13,
           "pct": -22.78,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300613",
           "name": "富瀚微",
-          "bars": 11,
+          "bars": 12,
           "pct": -23.0,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600418",
@@ -4148,16 +4205,16 @@
         {
           "code": "688131",
           "name": "皓元医药",
-          "bars": 11,
+          "bars": 12,
           "pct": -26.52,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688578",
           "name": "艾力斯医药科技",
-          "bars": 11,
+          "bars": 12,
           "pct": -27.1,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300442",
@@ -4183,9 +4240,9 @@
         {
           "code": "300142",
           "name": "沃森生物",
-          "bars": 11,
+          "bars": 12,
           "pct": -6.19,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300814",
@@ -4197,9 +4254,9 @@
         {
           "code": "300870",
           "name": "欧陆通",
-          "bars": 10,
+          "bars": 11,
           "pct": -39.92,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300458",
@@ -4225,44 +4282,44 @@
         {
           "code": "002119",
           "name": "康强电子",
-          "bars": 9,
+          "bars": 10,
           "pct": -29.41,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300450",
           "name": "先导智能",
-          "bars": 8,
+          "bars": 9,
           "pct": -8.36,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688469",
           "name": "芯联集成",
-          "bars": 8,
+          "bars": 9,
           "pct": -13.86,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "301550",
           "name": "斯菱智驱",
-          "bars": 8,
+          "bars": 9,
           "pct": -6.33,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300759",
           "name": "康龙化成",
-          "bars": 7,
+          "bars": 8,
           "pct": -19.38,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300182",
           "name": "捷成股份",
-          "bars": 7,
+          "bars": 8,
           "pct": 4.08,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688099",
@@ -4309,16 +4366,16 @@
         {
           "code": "600036",
           "name": "招商银行",
-          "bars": 6,
+          "bars": 7,
           "pct": 1.47,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300821",
           "name": "东岳硅材",
-          "bars": 5,
+          "bars": 6,
           "pct": 2.67,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688661",
@@ -4351,9 +4408,9 @@
         {
           "code": "600026",
           "name": "中远海能",
-          "bars": 5,
+          "bars": 6,
           "pct": -14.86,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688353",
@@ -4365,23 +4422,23 @@
         {
           "code": "300006",
           "name": "莱美药业",
-          "bars": 4,
+          "bars": 5,
           "pct": 48.33,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600693",
           "name": "东百集团",
-          "bars": 3,
+          "bars": 4,
           "pct": -20.06,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600498",
           "name": "烽火通信",
-          "bars": 38,
+          "bars": 39,
           "pct": -28.25,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "002353",
@@ -4393,23 +4450,23 @@
         {
           "code": "300390",
           "name": "天华新能",
-          "bars": 38,
+          "bars": 39,
           "pct": -36.1,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300661",
           "name": "圣邦股份",
-          "bars": 38,
+          "bars": 39,
           "pct": -26.26,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300014",
           "name": "亿纬锂能",
-          "bars": 34,
+          "bars": 39,
           "pct": -16.98,
-          "last_bar": "2026-10-09"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300814",
@@ -4456,9 +4513,9 @@
         {
           "code": "300548",
           "name": "长芯博创",
-          "bars": 38,
+          "bars": 39,
           "pct": -21.26,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300236",
@@ -4477,9 +4534,9 @@
         {
           "code": "300684",
           "name": "中石科技",
-          "bars": 37,
+          "bars": 38,
           "pct": -16.67,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "603773",
@@ -4491,9 +4548,9 @@
         {
           "code": "603186",
           "name": "华正新材",
-          "bars": 37,
+          "bars": 38,
           "pct": 2.21,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688508",
@@ -4505,9 +4562,9 @@
         {
           "code": "002028",
           "name": "思源电气",
-          "bars": 37,
+          "bars": 38,
           "pct": -35.86,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688380",
@@ -4526,16 +4583,16 @@
         {
           "code": "600487",
           "name": "亨通光电",
-          "bars": 37,
+          "bars": 38,
           "pct": -28.48,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300223",
           "name": "君正股份",
-          "bars": 37,
+          "bars": 38,
           "pct": -33.44,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688702",
@@ -4554,30 +4611,30 @@
         {
           "code": "688025",
           "name": "杰普特",
-          "bars": 37,
+          "bars": 38,
           "pct": -15.99,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688141",
           "name": "杰华特",
-          "bars": 37,
+          "bars": 38,
           "pct": -43.58,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600522",
           "name": "中天科技",
-          "bars": 37,
+          "bars": 38,
           "pct": -24.63,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "002436",
           "name": "兴森科技",
-          "bars": 37,
+          "bars": 38,
           "pct": -3.45,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688548",
@@ -4589,23 +4646,23 @@
         {
           "code": "002821",
           "name": "凯莱英",
-          "bars": 35,
+          "bars": 36,
           "pct": -20.84,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300418",
           "name": "昆仑万维",
-          "bars": 35,
+          "bars": 36,
           "pct": -13.73,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "002202",
           "name": "金风科技",
-          "bars": 35,
+          "bars": 36,
           "pct": -34.4,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600118",
@@ -4617,58 +4674,58 @@
         {
           "code": "002747",
           "name": "埃斯顿",
-          "bars": 35,
+          "bars": 36,
           "pct": -33.26,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300308",
           "name": "中际旭创",
-          "bars": 34,
+          "bars": 35,
           "pct": -29.25,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "601318",
           "name": "中国平安",
-          "bars": 34,
+          "bars": 35,
           "pct": -3.06,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "601872",
           "name": "招商轮船",
-          "bars": 34,
+          "bars": 35,
           "pct": -8.57,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688183",
           "name": "生益电子",
-          "bars": 28,
+          "bars": 29,
           "pct": -30.66,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600183",
           "name": "生益科技",
-          "bars": 28,
+          "bars": 29,
           "pct": -24.28,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300475",
           "name": "香农芯创",
-          "bars": 28,
+          "bars": 29,
           "pct": -37.31,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300620",
           "name": "光库科技",
-          "bars": 28,
+          "bars": 29,
           "pct": -26.81,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "301666",
@@ -4680,16 +4737,16 @@
         {
           "code": "601208",
           "name": "东材科技",
-          "bars": 28,
+          "bars": 29,
           "pct": -16.64,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "002851",
           "name": "麦格米特",
-          "bars": 28,
+          "bars": 29,
           "pct": -28.18,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "002466",
@@ -4701,9 +4758,9 @@
         {
           "code": "002463",
           "name": "沪电股份",
-          "bars": 28,
+          "bars": 29,
           "pct": -9.95,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "002155",
@@ -4736,23 +4793,23 @@
         {
           "code": "000425",
           "name": "徐工机械",
-          "bars": 3,
+          "bars": 27,
           "pct": -16.74,
-          "last_bar": "2026-09-04"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600989",
           "name": "宝丰能源",
-          "bars": 26,
+          "bars": 27,
           "pct": -9.9,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "002602",
           "name": "世纪华通",
-          "bars": 26,
+          "bars": 27,
           "pct": -12.28,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "002297",
@@ -4764,9 +4821,9 @@
         {
           "code": "600150",
           "name": "中国船舶",
-          "bars": 24,
+          "bars": 25,
           "pct": 2.81,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300179",
@@ -4778,9 +4835,9 @@
         {
           "code": "300857",
           "name": "协创数据",
-          "bars": 24,
+          "bars": 25,
           "pct": -19.76,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688170",
@@ -4792,37 +4849,37 @@
         {
           "code": "300300",
           "name": "海峡创新",
-          "bars": 24,
+          "bars": 25,
           "pct": 24.89,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300672",
           "name": "国科微",
-          "bars": 24,
+          "bars": 25,
           "pct": -19.69,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688167",
           "name": "炬光科技",
-          "bars": 24,
+          "bars": 25,
           "pct": -30.58,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "603067",
           "name": "振华股份",
-          "bars": 24,
+          "bars": 25,
           "pct": -2.96,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600601",
           "name": "方正科技",
-          "bars": 24,
+          "bars": 25,
           "pct": -13.81,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688020",
@@ -4841,23 +4898,23 @@
         {
           "code": "688001",
           "name": "华兴源创",
-          "bars": 23,
+          "bars": 24,
           "pct": -16.16,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688813",
           "name": "泰金新能",
-          "bars": 23,
+          "bars": 24,
           "pct": -13.47,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "301511",
           "name": "德福科技",
-          "bars": 23,
+          "bars": 24,
           "pct": -24.31,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300811",
@@ -4869,9 +4926,9 @@
         {
           "code": "688498",
           "name": "源杰科技",
-          "bars": 23,
+          "bars": 24,
           "pct": -39.87,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688700",
@@ -4883,9 +4940,9 @@
         {
           "code": "301183",
           "name": "东田微",
-          "bars": 23,
+          "bars": 24,
           "pct": -5.14,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688583",
@@ -4897,44 +4954,44 @@
         {
           "code": "688800",
           "name": "瑞可达",
-          "bars": 23,
+          "bars": 24,
           "pct": -30.22,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688127",
           "name": "蓝特光学",
-          "bars": 23,
+          "bars": 24,
           "pct": -29.8,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "601138",
           "name": "工业富联",
-          "bars": 23,
+          "bars": 24,
           "pct": -28.53,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688002",
           "name": "睿创微纳",
-          "bars": 23,
+          "bars": 24,
           "pct": -9.51,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "603228",
           "name": "景旺电子",
-          "bars": 23,
+          "bars": 24,
           "pct": -14.32,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300570",
           "name": "太辰光",
-          "bars": 23,
+          "bars": 24,
           "pct": -13.48,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300607",
@@ -4946,58 +5003,58 @@
         {
           "code": "300747",
           "name": "锐科激光",
-          "bars": 23,
+          "bars": 24,
           "pct": 1.19,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688808",
           "name": "联讯仪器",
-          "bars": 23,
+          "bars": 24,
           "pct": -53.65,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600330",
           "name": "天通股份",
-          "bars": 22,
+          "bars": 23,
           "pct": -23.6,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300593",
           "name": "新雷能",
-          "bars": 22,
+          "bars": 23,
           "pct": -27.79,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688690",
           "name": "纳微科技",
-          "bars": 22,
+          "bars": 23,
           "pct": -5.13,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600362",
           "name": "江西铜业",
-          "bars": 22,
+          "bars": 23,
           "pct": -19.05,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600096",
           "name": "云天化",
-          "bars": 22,
+          "bars": 23,
           "pct": -15.22,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688333",
           "name": "铂力特",
-          "bars": 22,
+          "bars": 23,
           "pct": -30.25,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688090",
@@ -5009,9 +5066,9 @@
         {
           "code": "002815",
           "name": "崇达技术",
-          "bars": 22,
+          "bars": 23,
           "pct": 32.98,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "688809",
@@ -5023,9 +5080,9 @@
         {
           "code": "002916",
           "name": "深南电路",
-          "bars": 22,
+          "bars": 23,
           "pct": -21.18,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "300395",
@@ -5044,16 +5101,16 @@
         {
           "code": "301176",
           "name": "逸豪新材",
-          "bars": 19,
+          "bars": 20,
           "pct": -15.86,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "603601",
           "name": "再升科技",
-          "bars": 19,
+          "bars": 20,
           "pct": -19.58,
-          "last_bar": "2026-10-15"
+          "last_bar": "2026-10-16"
         },
         {
           "code": "600396",
