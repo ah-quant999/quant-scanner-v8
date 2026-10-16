@@ -174,7 +174,7 @@
     "deadcard-conclusion-realtime-1016",
     "future-logic-if-cffex-1016"
   ],
-  "updated": "2026-10-16 07:15",
+  "updated": "2026-10-16 17:47",
   "generated_by": "阿狸咪的工程师(/scripts/handoff_ledger_hash.py 口径)",
   "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
   "id_content_hashes": {
@@ -188,7 +188,7 @@
     "align-gate-unregistered-cron-workflow": "6c624f682dae1a12",
     "alimi-same-family-check": "e985164c73b845ff",
     "all-generic-redline-cap-cliff": "21d4a47d6b94a270",
-    "all-generic-redline-false-positive": "921d05b1bcec122e",
+    "all-generic-redline-false-positive": "24399a9b68836cdc",
     "api-push-stale-base-index-clobber": "7adc6905b562f8ec",
     "audit-dnd-important-1007": "7f56606ed4e6fd58",
     "audit-logic-page-1007": "99942a981a4d1255",
