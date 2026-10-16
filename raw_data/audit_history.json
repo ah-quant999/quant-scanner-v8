@@ -3468,5 +3468,22 @@
     "message": "FINAL_RECOMMEND_REPLAY.js 更新于 2天前 21:32；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
+ },
+ {
+  "date": "2026-10-17",
+  "time": "02:15:58",
+  "tz": "Asia/Shanghai",
+  "overall": "ok",
+  "summary": {
+   "ok": 123,
+   "warn": 0,
+   "fail": 0,
+   "limited": 1,
+   "info": 0,
+   "other": 0,
+   "total": 124
+  },
+  "warn_items": [],
+  "fail_items": []
  }
 ]
