@@ -6838,8 +6838,8 @@
       "board": "主板"
     }
   ],
-  "generated_at": "2026-10-16 22:22:10",
-  "update_time": "2026-10-16 22:22:10",
+  "generated_at": "2026-10-17 01:42:39",
+  "update_time": "2026-10-17 01:42:39",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖",
   "kline_stat": {
     "cache_fresh": 114,
@@ -6849,5 +6849,5 @@
   },
   "degraded": false,
   "degraded_reason": "",
-  "quote_stale_days": 0
+  "quote_stale_days": 1
 }
