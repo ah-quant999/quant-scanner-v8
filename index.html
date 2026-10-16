@@ -613,7 +613,7 @@ window.__domReadyFns=[];
   .tp-hist-cell .tp-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
 </style>
-    <script src="data/ETF_INTRADAY_HEAT.js?v=1f406a8e3b" defer></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=c48d00dba0" defer></script>
     <script src="data/SECTOR_FUND_FLOW.js?v=27e5eb1720" defer></script>
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=e5d442b46b" defer></script>
 
@@ -638,12 +638,12 @@ window.__domReadyFns=[];
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=6004a61fb1" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
-<script src="data/INDEX_QUOTES.js?v=90e8a3863f" defer></script>
+<script src="data/INDEX_QUOTES.js?v=fe55c71b56" defer></script>
 <script src="data/AI_MARKET_BRIEF.js?v=9744508a0b" defer></script>
 <script src="data/MARGIN_DATA.js?v=cc2c746de9" defer></script>
-<script src="data/CFFEX_HOLDINGS.js?v=fdaf3b459b" defer></script>
+<script src="data/CFFEX_HOLDINGS.js?v=61c2f622ba" defer></script>
 <script src="data/IPO_DATA.js?v=0c96631d15" defer></script>
-    <script src="data/CRISIS_DATA.js?v=1a008751b9" defer></script>
+    <script src="data/CRISIS_DATA.js?v=2d5d6260a5" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=5489da5a94" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=9b1df0372b" defer></script>
 <!-- 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测卡）。
@@ -682,7 +682,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=3f4e976ace" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=17f354317c" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=13060c3172" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1802,9 +1802,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=e5e4078398" defer></script>
 <script src="data/HB_XIAOJIU.js?v=ca57cec8e5" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=e526839163" defer></script>
-<script src="data/HEALTH_CHECK.js?v=a1bdf53012" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=63a5ca6b0f" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=964b00842b" defer></script>
+<script src="data/HEALTH_CHECK.js?v=0a2c6a9572" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=f5f61ec057" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=bfdabf0ef0" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=2a2f419c57" defer></script>
@@ -1818,7 +1818,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=52dd7be753" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=bee07d4fda" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=96b0c09210" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=25cddf7bdf" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=77992750e1" defer></script>
