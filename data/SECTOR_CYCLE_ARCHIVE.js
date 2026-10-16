@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-10-16 13:14:42
+// 最后更新：2026-10-16 13:28:40
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-10-16 13:14:42",
+  "update_time": "2026-10-16 13:28:40",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -39,7 +39,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 28,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 311,
+      "total": 310,
       "ongoing": true
     },
     {
@@ -52,34 +52,34 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 3076,
+      "total": 3072,
       "ongoing": true
     },
     {
       "sector": "医药",
       "start": "08/25",
-      "end": "10/16",
+      "end": "10/15",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 30,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 29,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 514,
+      "total": 504,
       "ongoing": true
     },
     {
       "sector": "新能源车",
       "start": "08/25",
-      "end": "10/09",
+      "end": "10/16",
       "start_idx": 0,
-      "end_idx": 27,
-      "days": 28,
-      "hot_days": 25,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 26,
       "peak": 20,
       "peak_date": "09/01",
-      "total": 231,
-      "ongoing": false
+      "total": 249,
+      "ongoing": true
     },
     {
       "sector": "机器人",
@@ -97,14 +97,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "消费电子",
       "start": "08/25",
-      "end": "10/16",
+      "end": "10/15",
       "start_idx": 0,
-      "end_idx": 29,
-      "days": 30,
-      "hot_days": 28,
+      "end_idx": 28,
+      "days": 29,
+      "hot_days": 27,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 257,
+      "total": 254,
       "ongoing": true
     },
     {
@@ -136,14 +136,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "电力",
       "start": "08/28",
-      "end": "10/16",
+      "end": "10/15",
       "start_idx": 3,
-      "end_idx": 29,
-      "days": 27,
-      "hot_days": 26,
+      "end_idx": 28,
+      "days": 26,
+      "hot_days": 25,
       "peak": 13,
       "peak_date": "10/09",
-      "total": 189,
+      "total": 183,
       "ongoing": true
     },
     {
@@ -175,14 +175,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "半导体",
       "start": "09/08",
-      "end": "10/16",
+      "end": "10/15",
       "start_idx": 10,
-      "end_idx": 29,
-      "days": 20,
-      "hot_days": 18,
+      "end_idx": 28,
+      "days": 19,
+      "hot_days": 17,
       "peak": 21,
       "peak_date": "09/22",
-      "total": 171,
+      "total": 166,
       "ongoing": true
     },
     {
@@ -208,20 +208,20 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 14,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 198,
+      "total": 209,
       "ongoing": true
     },
     {
       "sector": "白酒消费",
       "start": "09/18",
-      "end": "10/16",
+      "end": "10/15",
       "start_idx": 18,
-      "end_idx": 29,
-      "days": 12,
-      "hot_days": 11,
+      "end_idx": 28,
+      "days": 11,
+      "hot_days": 10,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 65,
+      "total": 62,
       "ongoing": true
     }
   ]
