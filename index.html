@@ -15922,9 +15922,14 @@ h += '</div>'; // /ulPaneObserve
     else if(totalUp < 30 || crisisPct > 35){ phase='修复'; phaseColor='#38bdf8'; phaseDesc='低位筑底'; posAdvice='30%'; }
     else { phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪平稳'; posAdvice='50%'; }
     function _vra(c,a){ return c.indexOf("var(")===0 ? "rgba(0,0,0,"+a+")" : (c+"22").slice(0,9); }
-    var hasData = cr.update_time || lh.update_time;
+    // 🛡️ 2026-10-16 一劳永逸（主人令·发现错误即刻根治）：表头时间取「四源最新」，不再只认危机/涨停热力
+    //   根因：本卡聚合 危机雷达(CRISIS_DATA)+涨停热力(LIMIT_UP_HEATMAP)+龙虎榜(LHB_DATA)+情绪周期(SENTIMENT_CYCLE) 四源，
+    //   旧代码只取 cr/lh 的 update_time；当情绪周期(权威源, 常比 cr/lh 更新)刷新后，表头仍显示 cr/lh 的陈旧时间（如 09:54）。
+    //   现取四源字符串最大者（格式 YYYY-MM-DD HH:MM:SS 字典序=时间序），谁最新就显示谁，杜绝任何单源陈旧导致的假旧。
+    function _latestTs4(){ var a=[sc&&sc.update_time, cr&&cr.update_time, cr&&cr.republish_time, lh&&lh.update_time]; var m=null; for(var i=0;i<a.length;i++){ if(a[i]&&(m===null||a[i]>m)) m=a[i]; } return m; }
+    var updateTime = _latestTs4();
+    var hasData = !!updateTime;
     var html = '<div class="card" style="margin-bottom:12px;border-left:4px solid #38bdf8;">';
-    var updateTime = cr.update_time || lh.update_time;
     // 🛡️ 2026-09-13 主人令：本卡属「实时数据」页（涨停热力/连板梯队驱动，盘中持续刷），
     //   时段语义固定为**盘中**。旧实现按产出时刻自动判 ⇒ 15:37 刷新被误标「盘后」。
     var _cycleSlot = {slot:'盘中', horizon:'短线'};

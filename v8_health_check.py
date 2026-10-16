@@ -161,7 +161,20 @@ CARD_DEFS = [
     #     既有 45~60min 敏感性不丢，也不会在「15:30 末班车 → 17:20 盘后首轮」之间天天假红灯。
     #   · heal_cat="intraday" —— 主刷新通道是盘中 30 分链；盘后档同样已登记（CATEGORY_MAP
     #     "intraday,post_close"），但自愈优先派发更轻的 intraday，避免抢占盘后 25min debounce 锁。
-    {"id": "ETF_DAILY_MONITOR", "name": "ETF 日监控", "page": "盘后数据", "dual_page": "实时数据", "freq": "盘中每30分 + 收盘后定稿", "max_age": 60, "key_fields": ["top_inflow", "top_outflow"], "premarket_keep": True, "heal_cat": "intraday"},
+    # 🛡 2026-10-16 一劳永逸（小九 · HANDOFF::all-generic-redline-false-positive 本族第 5 例）：
+    #   ETF_DAILY_MONITOR 是「日监控」—— 真值在**15:05 收盘定稿**（T+1 主力净流入自该刻冻结，
+    #   源码 _etf_daily_monitor_reuse 注释明写「f62 自最近交易日 15:05 收盘起冻结」）。
+    #   盘中 30 分仅是 best-effort：生产侧 `f_etf_daily_monitor` 依赖全市场 17 页拼装
+    #   （东财单页成功率 ~88%，交易日靠几十轮跨轮累积才拼齐），且盘中(09:30–15:05)明文
+    #   **禁复用上一版**；于是「某天盘中拼不齐 + 当晚盘后档也没拼齐 ⇒ 整日不写盘」
+    #   是**设计内行为**（源码注释「保留远端旧数据」）。实测 2026-10-16 盘中数据停在
+    #   2026-10-15 14:08（昨盘中值），年龄 ~1197min。原健康侧却按 dual_page="实时数据"
+    #   套「盘中严格 45 分钟」⇒ 这种天**每天必红**（假红）。
+    #   修法：锚定其真实节拍 `cycle=(15,5)`（收盘定稿冻结点）—— 挂到第 1875 行已有的
+    #   「逐卡真实节拍」放宽机制：白天合法持有上一交易日收盘值（距上一 15:05 + 180min 天花板），
+    #   仅当**数据早到 T-2（连续两日全失败）**时才判 fail（年龄 2579 > 1320）⇒ 真·连续停摆
+    #   不被掩盖、单日拼不齐的假红被根除。双档/2h 铁律在其它时段一字未变。
+    {"id": "ETF_DAILY_MONITOR", "name": "ETF 日监控", "page": "盘后数据", "dual_page": "实时数据", "freq": "盘中每30分 + 收盘后定稿", "max_age": 60, "key_fields": ["top_inflow", "top_outflow"], "premarket_keep": True, "heal_cat": "intraday", "cycle": (15, 5)},
     # 🛡 2026-09-04 主人令一劳永逸：孤儿文件转正——此前无生成调度（all_ 动态扫描按通用 1440 红线误报 fail）。
     #   FACTOR_LAB 由 v8/factor_lab_gen.py 挂 STAGES[B] 产出；FOUR_VOLUME_BACKTEST 自 2026-10-11 起
     #   由 gen_four_volume_track.py（STAGES[B]）产出真实信号流视图（回测批回放模式已摘链）。登记后走运维卡区正式判定，all_ 扫描跳过。
@@ -2125,6 +2138,11 @@ _LOW_FREQ_FILES = {
     # 🔴 2026-09-11 主人令（选项A）：FOUR_VOLUME_60M **已移出本白名单**，并正式登记进 CARD_DEFS
     #   （「选股策略」段，max_age=1440）。原白名单把 24h 红线降到「>7天才告警」，
     #   导致该卡产物冻结 3 天（09-08→09-11）全程零告警。现由 check_data_cards 按 d.max_age 正常判定。
+    # 🗂 2026-10-16 一劳永逸（小九 · HANDOFF::all-generic-redline-false-positive 本族第 4 例）：
+    #   FINAL_RECOMMEND_REPLAY —— **静态归档产物**（有产物、**无周期生产者**、设计上一次冻结）。
+    #   它不是「节拍长的在跑产物」⇒ **刻意不登记 _LOW_FREQ_MAX_AGE**（那会给它一个时间红线，
+    #   到期必再造一次假红）。真实监控面见下方 _STATIC_ARCHIVE_FILES。
+    "FINAL_RECOMMEND_REPLAY",
 }
 # 🗑 2026-09-21 一劳永逸（小九）：**已退役产物**子集 —— 从 _LOW_FREQ_FILES 中区分出来，
 #   只为让巡检文案说真话（「已退役」而非「低频/手动维护」）。
@@ -2140,6 +2158,44 @@ _RETIRED_FILES = {
     "BAIHECHOU_ANALYSIS",        # 新周期判定·AI解析（同上，同批退役）
     "MACRO_KSHAPE",              # 宏观景气背景·K型分层（2026-09-30 主人令整卡退役：巡检自动化已消亡，09-23 后死数据）
     "maharo_macro",              # 机构研究·maharo 聚合旧文件（2026-10-03 阿狸咪：前端 09-13 起零引用，window.MAHORO_MACRO 恒{}；家机 maharo 自动化仍每日产出属孤儿死数据；登记退役护栏→若被放回即当场说真话「已退役但仍存在」）
+}
+
+# 🗂 2026-10-16 一劳永逸（小九）：**静态归档产物**子集 —— 与 _RETIRED_FILES（已退役·产物该删）、
+#   _LOW_FREQ_MAX_AGE（有周期生产者·只是节拍长）**三分**，互不混用：
+#   · _RETIRED_FILES      产物**应该被删**；若还在 = 有副本被放回（放行但说真话）。
+#   · _LOW_FREQ_MAX_AGE   有周期生产者；**按生产者节拍给红线**（超节拍照判 fail）。
+#   · _STATIC_ARCHIVE     产物**按设计就该冻结**（一次性产出、无任何周期生产者）
+#     ⇒ **永远不该按时间判龄**（其 update_time 就是「归档那一刻」，再放多久都不代表故障），
+#        但**不得因此取消监控** —— 监控面从「时间」换成「文件本身」：
+#        存在性 + 可被前端装载（本函数天然只遍历已存在的 *.js，故落点 = 解析成功 + 体积正常）。
+#
+#   🔴 登记门槛（三条全满足才可入本表，缺一即不得登记 —— 防被当成「万能免检口」滥用）：
+#     ① 无任何**周期**生产者（run_algorithms / workflow / cron 均不重产它）；
+#     ② 有明确生命周期终点（到期删除 / 切回另一产物），且已登记 docs/ops/HANDOFF.yaml；
+#     ③ 前端按「优先读它、缺失自动回落」引用 ⇒ 冻结期内站点不受影响。
+#   ⚠️ 与 guard_v8_freshness.py 的口径关系：本类产物**不在**彼处 CORE/WARN/CORE_ALGO/
+#      FROZEN_SOURCES 任一表内（两守卫对「无人看守的产物」口径一致 = 都不按时间判它）；
+#      若日后把它加进彼处任何表，本表须同批复核 —— 两守卫口径不一致本身就是 bug。
+_STATIC_ARCHIVE_FILES = {
+    # 最终推荐 Top3 · 回放口径回测归档。
+    # 登记依据（逐条对应上述门槛，全部为线上实测）：
+    #   ① 无周期生产者：`v8/factor_lab_gen.py`、`algorithms/backtest_life_cards.py` 产的是
+    #      `data/FINAL_RECOMMEND_DATA.js` / `data/FINAL_RECOMMEND_BACKTEST.js`（链上真实流，
+    #      照常每晚重产）；**本文件由一次性回放脚本产出后即冻结**
+    #      （内容自述 `"generated":"2026-10-13 15:00:00"`、`"data_cutoff":"数据截至 2026-10-13 收盘"`），
+    #      全仓 py/yml 对 `FINAL_RECOMMEND_REPLAY` 的**生产者引用 = 0 处**（仅 index.html 消费）。
+    #   ② 生命周期终点已挂账：HANDOFF.yaml `ima-strong-fusion-replay-1014` 明载
+    #      「切回真实流操作（触发：真实流成熟样本 ≥30 笔，预计 11 月中）：删 index.html 引用行
+    #        + 删 data/FINAL_RECOMMEND_REPLAY.js，前端即自动回落链上真实流卡」。
+    #   ③ 前端回落已就位：index.html L1779 引用 + L18390
+    #      `var fb = window.FINAL_RECOMMEND_REPLAY || window.FINAL_RECOMMEND_BACKTEST;`
+    #      ⇒ 本文件缺失/冻结都不影响站点，删引用即切回。
+    # 🔴 假红实证（本族第 4 例，前 3 例 = all_ALGO_BACKTEST_COMPARE / all_STOCK_LIST / AVG_PRICE_DATA）：
+    #    2026-10-16 09:06 线上 HEALTH_CHECK.js：`all_FINAL_RECOMMEND_REPLAY` status=fail、
+    #    age 2134.3min、message「更新于 2天前 21:32；超过通用红线 1620 分钟」，
+    #    且为**唯一 fail 项**（summary = ok119/warn0/fail1/limited1/total121, overall=warn）
+    #    —— 即：通用 24h/T+1 红线打到「按设计冻结」的产物上，且永远无法转绿。
+    "FINAL_RECOMMEND_REPLAY",
 }
 
 # ⏱ 2026-09-21（本批）小九：低频产物「按生产者节拍判龄」表 ——
@@ -2240,6 +2296,22 @@ def check_all_data_files():
         #   正确顺序：先看是否低频白名单 → 友好 OK；不在白名单才走时间戳 warn。
         if vid in _LOW_FREQ_FILES:
             rel = str(ts)[:19] if ts and ts != "--" else "—"
+            if vid in _STATIC_ARCHIVE_FILES:
+                # 🗂 2026-10-16 一劳永逸（小九）：静态归档 —— **只校验「文件还在、还能被前端装载」，
+                #   不判时间**（归档后陈旧是设计预期，陈旧 ≠ 故障）。
+                #   last_update / age_min 照旧输出，仅为可观测（便于肉眼确认归档没被悄悄换掉），
+                #   **不参与 status 判定** —— 否则又变回「到期必假红」，等于没修。
+                _age_sa = (now_cst() - dt).total_seconds() / 60 if dt is not None else None
+                results.append({
+                    "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                    "status": "ok", "last_update": rel,
+                    "age_min": round(_age_sa, 1) if _age_sa is not None else None,
+                    "heal_cat": vid_heal,
+                    "message": (f"{p.name} 静态归档产物（回放口径 · 一次性产出 · 无周期生产者），"
+                                f"更新于 {rel}；按设计不套 24h 通用红线"
+                                f"（归档后不再刷新属预期，非故障），仅校验存在性与可装载性"),
+                })
+                continue
             if vid in _RETIRED_FILES:
                 # 🗑 已退役产物：既已删除就不该再出现；此处若仍命中，说明有副本被放回
                 #   （放行但不冒充正常 —— 文案须说真话，避免「它还在正常使用」的错觉）。
