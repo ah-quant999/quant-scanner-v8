@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-16 20:07",
- "generated": "2026-10-16 20:07",
+ "update_time": "2026-10-16 20:09",
+ "generated": "2026-10-16 20:09",
  "meta": {
-  "generated": "2026-10-16 20:07",
+  "generated": "2026-10-16 20:09",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 27,
   "days_with_consensus": 0,
@@ -10313,6 +10313,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
+      "code": "300006",
+      "name": "莱美药业",
+      "change_pct": 19.926,
+      "price": 9.75,
+      "category": "突破"
+     },
+     {
       "code": "301046",
       "name": "能辉科技",
       "change_pct": 5.853,
@@ -10460,13 +10467,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "300111",
-      "name": "向日葵",
-      "change_pct": 8.625,
-      "price": 4.03,
-      "category": "突破"
-     },
-     {
       "code": "002100",
       "name": "天康生物",
       "change_pct": 5.22,
@@ -10500,9 +10500,23 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.339,
       "price": 10.34,
       "category": "突破"
+     },
+     {
+      "code": "002264",
+      "name": "新 华 都",
+      "change_pct": 3.856,
+      "price": 7.81,
+      "category": "突破"
      }
     ],
     "加速": [
+     {
+      "code": "300006",
+      "name": "莱美药业",
+      "change_pct": 19.926,
+      "price": 9.75,
+      "category": "加速"
+     },
      {
       "code": "301046",
       "name": "能辉科技",
@@ -10604,6 +10618,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
     ],
     "短线选股": [
      {
+      "code": "300006",
+      "name": "莱美药业",
+      "change_pct": 19.926,
+      "price": 9.75,
+      "category": "短线选股"
+     },
+     {
       "code": "301046",
       "name": "能辉科技",
       "change_pct": 5.853,
@@ -10751,13 +10772,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "300111",
-      "name": "向日葵",
-      "change_pct": 8.625,
-      "price": 4.03,
-      "category": "短线选股"
-     },
-     {
       "code": "002100",
       "name": "天康生物",
       "change_pct": 5.22,
@@ -10790,6 +10804,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "海波重科",
       "change_pct": 4.339,
       "price": 10.34,
+      "category": "短线选股"
+     },
+     {
+      "code": "002264",
+      "name": "新 华 都",
+      "change_pct": 3.856,
+      "price": 7.81,
       "category": "短线选股"
      }
     ],
@@ -10844,13 +10865,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "300111",
-      "name": "向日葵",
-      "change_pct": 8.625,
-      "price": 4.03,
-      "category": "强势股"
-     },
-     {
       "code": "002100",
       "name": "天康生物",
       "change_pct": 5.22,
@@ -10883,6 +10897,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "海波重科",
       "change_pct": 4.339,
       "price": 10.34,
+      "category": "强势股"
+     },
+     {
+      "code": "002264",
+      "name": "新 华 都",
+      "change_pct": 3.856,
+      "price": 7.81,
       "category": "强势股"
      }
     ]
