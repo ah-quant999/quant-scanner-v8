@@ -172,9 +172,10 @@
     "backtest-caliber-audit-replay-violation-1015",
     "finalrec-degrade-block-1016",
     "deadcard-conclusion-realtime-1016",
-    "future-logic-if-cffex-1016"
+    "future-logic-if-cffex-1016",
+    "ima-strong-retained-last-stale-recompute-1016"
   ],
-  "updated": "2026-10-16 17:47",
+  "updated": "2026-10-16 18:40",
   "generated_by": "阿狸咪的工程师(/scripts/handoff_ledger_hash.py 口径)",
   "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
   "id_content_hashes": {
@@ -259,7 +260,7 @@
     "future-card-daily-fix-1015": "80d5489e836cf2d4",
     "future-card-forecast-cls-1015": "224cb7d8e7be28f8",
     "future-card-sentiment-cffex-1015": "3933646252ba8992",
-    "future-todo-heatmap-dates-ar-1015": "fae236e40bac9e8b",
+    "future-todo-heatmap-dates-ar-1015": "343b4ea425d39260",
     "gate-1010-marker-stale-ms-note": "817635a132706bbd",
     "guanlan-token-hardfail-rootfix-1014": "dbff75819403b87a",
     "handoff-ai-entry-file": "4feae0d4e00778b9",
@@ -278,9 +279,10 @@
     "heartbeat-files-clobbered-by-cnfetch": "7d813354e174f3ff",
     "hk-shortcode-hkname-pollution": "709c9cc94d4ee530",
     "holiday-trading-day-fix-1001": "02e71080b4c64914",
-    "ima-connector-unbound-enterprise-switch": "0ad0b65d7b341b2c",
+    "ima-connector-unbound-enterprise-switch": "363e5e5f4afac95a",
     "ima-snapshot-72h-expiry-trap": "ca4e378dff07e431",
     "ima-strong-fusion-replay-1014": "51709f35041ffbd6",
+    "ima-strong-retained-last-stale-recompute-1016": "e9eb816d1bea3408",
     "index-creds-panel-refresh-1014": "a71ab441faa9b01a",
     "index-tail-truncation-2220": "b0d1fbb8510d946a",
     "indexhistory-holiday-stale-deploy-block-1008": "44fb53ba9e43c973",

@@ -6490,8 +6490,26 @@ items:
       C. 残留判据③④ 待印证：假期（10-01~10-08 休市）源方停更，自动化 fetched_at 暂未真实前进；
          待 10-09 前下一轮 ima 快照自动化(149ad8ff)真实落库后，VERIFY③④ 补全即结项。
       D. status 维持 pending-verify：连接层已复原，仅余自动跑批端到端印证。
-    updated: "2026-10-02 19:09"
-    updated_by: 阿狸咪的工程师(alimi-cn)
+    xiaojiu_note_20261016_1805: >-
+      〔小九 2026-10-16 18:0x CST · 断更缺口已定位到本项；脚本侧已一劳永逸修复，上游仍须主人授权〕
+      A. 缺口实证：raw_data/ima_strong_stock_full.json fetched_at 冻结 2026-10-13 17:48:09
+         （10-14/15/16 三日零新快照）⇒ 家机自动化 149ad8ff 自 10-13 夜起停摆，与 10-01
+         实证的「ima 授权短时效、过夜即失效」同型复发；线上 data/IMA_STRONG_STOCK.js
+         data_date 冻结 10-13、raw_data/ima_strong_daily.json 仅 10-13 一日、
+         IMA_STRONG_BACKTEST signal_date_range 冻结 06-09~10-13。
+      B. 新发现（本项原判据未覆盖的快照质量 bug）：该快照 meta title=「短线情绪选股 2026-10-13」
+         而正文实为「# 短线情绪选股 2026-10-12」（3002B）—— 抓取器「列表标题/正文内容」错位
+         （标题取自列表最新篇、正文取到另一篇）。云端脚本已增一致性校验并留证
+         （snapshot_meta_mismatch，内容优先，见 ima-strong-retained-last-stale-recompute-1016），
+         但**家机 push_snapshot.py 侧的错位根因须阿狸咪在家机修**：建议推送前断言
+         「fetched 正文标题日期 == 列表最新标题日期」，不等即重试或放弃本次推送 ——
+         绝不把错位快照推上官仓（本次连续三日 retained-last 正是它触发）。
+      C. 影响面：仅「强势跟踪」一卡断流 3 日（10-14~16，前端已如实显示数据日 10-13）；
+         全站其余卡独立水源不受影响。
+      D. status 维持 pending-verify：判据③④ 未过，上游恢复须**主人在连接器页重新授权 ima
+         （家机）**；脚本侧健壮性修复已同批上线（见上述新条目）。
+    updated: "2026-10-16 18:05"
+    updated_by: 小九(lemoncat-cn)
   - id: cn-singleflight-schedule-trigger-offset
     priority: P1
     owner: shared
@@ -8585,7 +8603,26 @@ items:
       ①修完后 dates 末 5 位应为 10/09-10/15 连续无缺口；②AR 因子须附回测自证再上前端；
       ③明早 09:30 前查 v8_stock_quote_refresh.yml 最近 run 时间。
     verified_at: "2026-10-15 21:40 登记（未开工）"
-    updated: "2026-10-15 21:40"
+    xiaojiu_fix_20261016_1805: >-
+      〔小九 2026-10-16 18:0x CST · 事项①已修待云端印证；②③仍未开工〕
+      ①涨停热力 dates 空洞根因：增量路径只更新「今天」，历史某日抓取失败被 build_heatmap 的
+        「整列全 0 剔除」清掉后**永不回补**（实测缺 10/12/13/14 三日）。修法（一劳永逸）：
+        fetch_limit_up_heatmap_v8.py 新增 backfill_missing_dates()——每次运行按近 30 交易日
+        窗口自动回补缺失日；_merge_backfill_into_dates() 按时间序并入（窗口内升序、窗口外历史
+        保持原位，防跨年错位）；main() 增量分支与 generate() 兜底分支**两处同构同改**
+        （该文件自带注释警告「两处同构分支必须同改」，上次同类 bug 即漏改一处复发）；
+        _recent_sum 改读 by_date 使回补数据参与冷板块判定。单测 4/4 场景通过
+        （A 真实增量流 / B 今日为新增列+回补 / C 无缺口零回补 / D 跨年顺序保护）。
+        ⚠️ 回归保险：回补只补「窗口内且当日 API 有数据」的日期，无数据日不入列（不伪造）；
+        今日列恒在；回补抓取异常单日隔离不打死整轮。
+      上线：本提交同批推送 fetch_limit_up_heatmap_v8.py；下一轮 v8_cn_fetch_cloud 跑批
+      （LIMIT_UP_HEATMAP.js 在其 manifest 内）自动拾用，回补 10/12-14 三日。
+      验证（转 done 前必做）：硬抓 Pages data/LIMIT_UP_HEATMAP.js，dates 末段应出现
+      10/12、10/13、10/14 且 10/15、10/16 连续无缺口。
+      ②AR 吸收率因子：仍未开工（需新算法+回测自证，忌赶工）。
+      ③STOCK_QUOTE cron 观察：10-16 15:45 前后已有云端 run（本地 git log 见
+        "v8 cn fetch: 2026-10-16 16:47"）⇒ 当日未复发；持续观察至下周一。
+    updated: "2026-10-16 18:05"
     updated_by: 小九(lemoncat-cn)
   - id: future-card-cffex-badge-1015
     owner: 小九(lemoncat-cn)
@@ -8814,4 +8851,61 @@ items:
       母版「📜 最近变更记录」区顶部出现 10-15 IF 条目；lg-ph 矩阵含 IF 会员持仓择时行；公开站 logic.html 保持下架桩不动。
     verified_at: "2026-10-16 05:30 登记待合并（未入母版）"
     updated: "2026-10-16 05:30"
+    updated_by: 小九(lemoncat-cn)
+
+  - id: ima-strong-retained-last-stale-recompute-1016
+    owner: 小九(lemoncat-cn)
+    priority: P0
+    status: pending-verify
+    created: 2026-10-16
+    title: 强势跟踪断更三连bug一劳永逸（主人令「强势跟踪断了，一劳永逸修复！」）
+    note: |
+      【线上铁证·2026-10-16 18:0x 硬抓 Pages】data/IMA_STRONG_STOCK.js：
+      update_time=2026-10-16 15:53:35（看着新）· data_date=2026-10-13（已 3 天前）·
+      stale_days=1 · source_stale=false · snapshot_age_h=15.21 · 8 只 ——
+      陈旧度三字段全是上一次「好写入」的冻结值；前端只显示「📅 数据日 · 1 天前」琥珀胶囊，
+      无「⚠️ 源停更」红胶囊，停更邮件从未触发。断链五环（只读诊断，未改数据）：
+      ① 上游停摆：ima 快照 fetched_at 冻结 2026-10-13 17:48:09（家机自动化 149ad8ff
+         10-13 夜起无新快照，ima 授权短时效过夜即失效的老毛病，详见
+         ima-connector-unbound-enterprise-switch 本轮 addendum）；
+      ② 快照质量bug：meta title=「短线情绪选股 2026-10-13」而正文实为
+         「# 短线情绪选股 2026-10-12」（3002B）—— 抓取器「列表标题/正文内容」错位；
+      ③ 云端脚本 10-14 起每日判「数据日倒退」→ retained-last 保留 10-13 好版（守卫本身正确）；
+      ④ retained-last 只刷 update_time，**不重算 stale_days/source_stale/snapshot_expired**；
+      ⑤ ⇒ data_date 冻结 10-13 + 假新鲜展示 + 告警全盲（同款「八道防线全盲」病）。
+      【修法·fetch_ima_strong_stock.py（+112/−23，两处同构分支同改）】
+      A. 新增 _recompute_stale() / _write_retained()：retained-last 保留上一版时按保留的
+         data_date 重算 stale_days/source_stale/snapshot_expired（快照龄按上一版
+         sample_coverage.snapshot_fetched_at 重算，拿不到不猜）；degraded_reason 追加
+         ;source-stale-Nd；「非停更→停更」迁移当次发一封 stale 级邮件（与主路径同阈，
+         邮件纪律不破；停更二字不在知会类关键字、stale 级仅交易日放行，已核闸门源码）。
+         两处 retained-last 分支（两条路都空 / 数据日倒退）全部改走共用 helper ——
+         本文件历史上就因「漏改一处同构分支」复发过同类 bug，本次同改 + 单测锁死。
+      B. load_snapshot() 增 meta 标题日期 vs 正文标题日期一致性校验：不一致只标记
+         snapshot_meta_mismatch（内容日期优先，正文才是可信全文），不阻断 ——
+         防回归守卫本就挡住旧内容覆盖已发布新版；产物新增 snapshot_meta_mismatch
+         字段并计入生产者自检必填键（形状不对拒绝写出）。
+      【单测】E:/v8data/qs8-tmp/test_ima_fix_1016.py（stub v8_send_alert + 临时目录，不联网）：
+      31/31 全过 —— 线上实况复现（stale_days=3 / source_stale=True / 停更邮件恰 1 封 /
+      degraded_reason 带 source-stale-3d / data_date 不被回退）；快照龄边界 69.2h 未过期
+      vs 72.2h 过期；已停更态次日再跑不重复发信；meta/md 错位标记 + 内容优先；
+      竞价校验拒绝；空池拒绝；无 data_date 不猜（None）。py_compile + AST 双过；
+      旧式直写残留 0 处（4 处 _write_retained 引用 = 文档 1 + 定义 1 + 两分支 2）。
+      【上线路径】推 .py 后**派发云端 v8_ima_strong_stock.yml**（workflow_dispatch）今日重跑：
+      云端产 corrected 产物（stale_days=3 + 红胶囊）+ 云端 SMTP 发停更邮件 +
+      update_v8 --only-cache-busters 刷 ?v + api_push_raw 三件套
+      （raw_data/ima_strong_stock.json、data/IMA_STRONG_STOCK.js、index.html）
+      —— 全复现生产链，不本地手搓数据。派发走 v8_dispatch.py（204 即成功、绝不读 body 重试）。
+      【无法自行消除的外部依赖·如实报主人】补 10-14~10-16 三日真实信号需 ima 登录态抓快照，
+      快照自动化在家机（阿狸咪）且授权已过期；本机（lemoncat）连接器无 ima-mcp 绑定
+      （connector-states.json 仅 westock/tdx/github）⇒ 替取不了，须主人在连接器页
+      重新授权 ima 后，家机下一轮自动化才能推新快照。
+    verify_how: |
+      ① 派发 run success；② 硬抓 Pages data/IMA_STRONG_STOCK.js：stale_days=3、
+         source_stale=true、degraded_reason 含 source-stale-3d、data_date 仍为 2026-10-13
+         （不被回退）、snapshot_meta_mismatch 留证；③ 停更邮件收到恰 1 封；
+      ④ index.html 的 IMA_STRONG_STOCK.js ?v 与新内容中性化 sha1 对齐（本推送已带或
+         cache_buster_reconcile 15 分钟内自愈）；⑤ ledger --check 全命中。
+      转 done 需填 verified_at（派发+硬抓+邮件三证齐后再转）。
+    updated: "2026-10-16 18:05"
     updated_by: 小九(lemoncat-cn)

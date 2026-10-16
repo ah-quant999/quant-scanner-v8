@@ -29,6 +29,15 @@ schema v2（stocks[] 换代；旧「基准价/最新价/涨幅/回撤/状态」�
     快照缺失/过期(>72h) ⇒ 尝试访客 wiki 路（服务端 ~300 字硬墙，通常仅 1~2 条，
     如实标 detail_complete=false）；两条路都拿不到 ⇒ 保留上一版产物并降级标注，绝不伪造。
 
+🔴🔴 2026-10-16 一劳永逸修复（实测断更 3 天全程无告警、前端把 3 天前数据当 1 天前展示）：
+  A. retained-last 保留上一版时，**必须按保留的 data_date 重算** stale_days /
+     source_stale / snapshot_expired（原只刷 update_time ⇒ 停更态永不进入、
+     告警邮件永不触发、前端假新鲜）。两处 retained-last 分支共用 _write_retained()。
+  B. load_snapshot() 增 meta 标题日期 vs 正文标题日期一致性校验
+     （实测事故：meta 记 10-13 而正文实为 10-12 ⇒ 抓取器列表标题/正文错位）。
+     内容日期优先，不一致只标记（snapshot_meta_mismatch）不阻断 —— 防回归守卫
+     本就挡住旧内容覆盖已发布新版，无需丢弃真数据。
+
 用法：
   python fetch_ima_strong_stock.py            # 快照优先，缺失/过期回退访客路
   python fetch_ima_strong_stock.py --source snapshot-only   # 只读快照（云端默认够用）
@@ -231,11 +240,27 @@ def load_snapshot():
     title = m.group(1).strip() if m else str(snap.get("title") or "")
     md_date = re.search(r"(20\d{2})-(\d{2})-(\d{2})", title)
     data_date = "%s-%s-%s" % md_date.groups() if md_date else ""
+    # 🔴 2026-10-16 一劳永逸：meta 与正文一致性校验。
+    #   实测事故（2026-10-13 17:48 快照）：meta title 记「短线情绪选股 2026-10-13」
+    #   而正文实为「# 短线情绪选股 2026-10-12」⇒ 抓取器「列表标题 / 正文内容」
+    #   错位（标题取自列表最新篇、正文取到另一篇）。**内容日期优先**（正文才是
+    #   可信全文），不一致只标记不阻断 —— 防回归守卫会挡住旧内容覆盖已发布的新版，
+    #   本就挡住旧内容覆盖已发布新版，无需在此丢弃真数据。
+    meta_title = str(snap.get("title") or "")
+    _mt = re.search(r"(20\d{2}-\d{2}-\d{2})", meta_title)
+    meta_date = _mt.group(1) if _mt else ""
+    snapshot_meta_mismatch = bool(meta_date and data_date and meta_date != data_date)
+    if snapshot_meta_mismatch:
+        print("⚠️ [snapshot] meta 标题日期 %s 与正文标题日期 %s 不一致"
+              "（内容优先；疑抓取器列表标题/正文错位）—— 已记录 snapshot_meta_mismatch"
+              % (meta_date, data_date))
     print("%s [snapshot] %s · 候选 %d 条 · 数据日 %s · 快照龄 %.1f h%s"
           % ("⚠️" if snapshot_expired else "✅", title or "?", len(stocks),
              data_date or "?", age_h, "[已过期]" if snapshot_expired else ""))
     return {"title": title, "data_date": data_date, "stocks": stocks, "header": header,
             "age_h": age_h, "snapshot_expired": snapshot_expired,
+            "snapshot_meta_mismatch": snapshot_meta_mismatch,
+            "meta_title": meta_title,
             "fetched_at": _fa, "channel": "full-snapshot"}
 
 
@@ -312,6 +337,77 @@ def parse_intro_v2(intro):
     return stocks
 
 
+def _recompute_stale(prev, now=None):
+    """🔴 2026-10-16 一劳永逸：retained-last 保留上一版时，按保留的数据日**重算**
+    stale_days / source_stale / snapshot_expired。
+
+    根因（实测）：原 retained-last 分支只刷 update_time，三个陈旧度字段全部冻结在
+    上一次「好写入」的值 ⇒ 源停更 N 天仍显示「1 天前 / source_stale=false /
+    snapshot_expired=false」，停更告警永不触发、前端把 3 天前数据当新的展示
+    （线上 2026-10-16 15:53 产物实证：data_date=10-13 而 stale_days=1）。
+    返回 (stale_days, source_stale, snapshot_expired)；数据日缺失 ⇒ 不猜（None）。
+    """
+    now = now or datetime.now(timezone(timedelta(hours=8)))
+    _pd = str(prev.get("data_date") or "")
+    try:
+        stale_days = (now.date() - datetime.strptime(_pd, "%Y-%m-%d").date()).days
+    except Exception:
+        stale_days = None
+    source_stale = bool(stale_days is not None and stale_days > WIKI_STALE_DAYS_ALERT)
+    # 快照龄：按上一版记录的 snapshot_fetched_at 重算（拿不到则沿用旧值，不猜）
+    snapshot_expired = bool(prev.get("snapshot_expired"))
+    _fa = str(((prev.get("sample_coverage") or {}).get("snapshot_fetched_at")) or "")
+    try:
+        _dt = datetime.strptime(_fa, "%Y-%m-%d %H:%M:%S").replace(
+            tzinfo=timezone(timedelta(hours=8)))
+        snapshot_expired = (now - _dt).total_seconds() / 3600.0 > SNAPSHOT_MAX_AGE_H
+    except Exception:
+        pass
+    return stale_days, source_stale, snapshot_expired
+
+
+def _write_retained(prev, degraded_reason, now=None):
+    """两处 retained-last 分支共用：重算停更态 → 按需发停更邮件 → 落盘 raw/js。
+
+    邮件纪律（与主路径同阈、2026-09-29 立）：仅「非停更 → 停更」迁移当次发一封，
+    此后静默留证；stale 级仅交易日放行（周末/节假日属预期静默）。
+    now 仅供单测注入固定时刻，生产路径不传。
+    """
+    now = now or datetime.now(timezone(timedelta(hours=8)))
+    _prev_stale = bool(prev.get("source_stale"))   # 迁移判据取「本次写入前」的值
+    stale_days, source_stale, snapshot_expired = _recompute_stale(prev, now)
+    prev["stale_days"] = stale_days
+    prev["source_stale"] = source_stale
+    prev["snapshot_expired"] = snapshot_expired
+    prev["detail_channel"] = "retained-last"
+    prev["degraded_reason"] = degraded_reason
+    if source_stale and stale_days is not None:
+        prev["degraded_reason"] = "%s;source-stale-%dd" % (degraded_reason, stale_days)
+    prev["update_time"] = now.strftime("%Y-%m-%d %H:%M:%S")
+    if source_stale and not _prev_stale and v8_send_alert:
+        try:
+            v8_send_alert.send_alert(
+                "ima 短线情绪选股源停更 %s 天" % stale_days,
+                "源笔记：%s\n数据日：%s\n已停更：%s 天（阈值 %d 天）\n源 URL：%s\n"
+                "（retained-last 保留上一版期间检测到停更；仅停更态进入时发一次，此后静默留证）"
+                % (prev.get("source_title"), prev.get("data_date"), stale_days,
+                   WIKI_STALE_DAYS_ALERT, NOTE_URL),
+                level="stale")
+        except Exception as _ae:
+            print("[WARN] 源停更邮件发送失败（非致命）: %s" % _ae)
+    with open(os.path.join(RAW_DIR, "ima_strong_stock.json"), "w",
+              encoding="utf-8", newline="\n") as f:
+        json.dump(prev, f, ensure_ascii=False, indent=2)
+    with open(os.path.join(DATA_DIR, "IMA_STRONG_STOCK.js"), "w",
+              encoding="utf-8", newline="\n") as f:
+        f.write("window.IMA_STRONG_STOCK = ")
+        json.dump(prev, f, ensure_ascii=False, separators=(",", ":"))
+        f.write(";\n")
+    print("⛔ 已保留上一版产物并**重算停更态**：数据日 %s · 停更 %s 天 · source_stale=%s"
+          % (prev.get("data_date"), stale_days, source_stale))
+    return prev
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--source", choices=["auto", "snapshot-only"], default="auto",
@@ -328,8 +424,12 @@ def main():
     channel = "full-snapshot" if data else "none"
     degraded_reason = ""
     snapshot_expired = bool(data and data.get("snapshot_expired"))
+    snapshot_meta_mismatch = bool(data and data.get("snapshot_meta_mismatch"))
     if data and snapshot_expired:
         degraded_reason = "snapshot_age>%.0fh" % data["age_h"]
+    if data and snapshot_meta_mismatch:
+        degraded_reason = (degraded_reason + ";" if degraded_reason else "") \
+            + "meta-md-date-mismatch"
 
     if data is None and args.source == "auto":
         # 访客兜底（~300 字硬墙：通常仅 1~2 条，detail_complete=false 如实降级）
@@ -352,22 +452,14 @@ def main():
 
     if data is None:
         # 🔴 两条路都空：保留上一版产物 + 降级标注（绝不写空 stocks 把卡打白，也绝不伪造）
+        #   2026-10-16：改走 _write_retained —— 重算 stale_days/source_stale/snapshot_expired，
+        #   否则断更期间产物永远显示「新鲜」（实测线上 10-16：data_date=10-13 而 stale_days=1）。
         prev_path = os.path.join(RAW_DIR, "ima_strong_stock.json")
         if os.path.exists(prev_path):
             try:
                 with open(prev_path, encoding="utf-8") as f:
                     prev = json.load(f)
-                prev["detail_channel"] = "retained-last"
-                prev["degraded_reason"] = "both-channels-empty;retained-last-good"
-                prev["update_time"] = datetime.now(timezone(timedelta(hours=8))).strftime(
-                    "%Y-%m-%d %H:%M:%S")
-                with open(prev_path, "w", encoding="utf-8", newline="\n") as f:
-                    json.dump(prev, f, ensure_ascii=False, indent=2)
-                js_path = os.path.join(DATA_DIR, "IMA_STRONG_STOCK.js")
-                with open(js_path, "w", encoding="utf-8", newline="\n") as f:
-                    f.write("window.IMA_STRONG_STOCK = ")
-                    json.dump(prev, f, ensure_ascii=False, separators=(",", ":"))
-                    f.write(";\n")
+                _write_retained(prev, "both-channels-empty;retained-last-good")
                 print("⛔ 两条取数路均无数据 —— 已保留上一版产物并标注 degraded（不伪造）。")
                 return
             except Exception as e:
@@ -429,6 +521,7 @@ def main():
         "stale_days": stale_days,
         "source_stale": source_stale,
         "snapshot_expired": snapshot_expired,
+        "snapshot_meta_mismatch": snapshot_meta_mismatch,
         "degraded_reason": degraded_reason,
         # ── v2 新增：情绪周期头部（源侧自述，如实搬运）──
         "cycle_stage": (data.get("header") or {}).get("cycle_stage", ""),
@@ -477,20 +570,15 @@ def main():
         print("[WARN] 回归检查读上一版失败（不阻断，按正常写）：%s" % _e)
     if _regress:
         # 保留上一版（已是 newer 的好版本），标注 degraded，绝不回写旧数据
+        #   2026-10-16：同改走 _write_retained（重算停更态 + 停更邮件）—— 本分支正是
+        #   2026-10-14~16 连续三日断更的实发通道（快照 meta 10-13 / 正文 10-12 错位）。
         try:
             with open(_prev_path, encoding="utf-8") as _pf:
                 _prev = json.load(_pf) or {}
-            _prev["detail_channel"] = "retained-last"
-            _prev["degraded_reason"] = "data_date-regressed(%s<%s);retained-last-good" % (
-                data_date, _prev.get("data_date"))
-            _prev["update_time"] = datetime.now(timezone(timedelta(hours=8))).strftime(
-                "%Y-%m-%d %H:%M:%S")
-            with open(_prev_path, "w", encoding="utf-8", newline="\n") as f:
-                json.dump(_prev, f, ensure_ascii=False, indent=2)
-            with open(os.path.join(DATA_DIR, "IMA_STRONG_STOCK.js"), "w", encoding="utf-8", newline="\n") as f:
-                f.write("window.IMA_STRONG_STOCK = ")
-                json.dump(_prev, f, ensure_ascii=False, separators=(",", ":"))
-                f.write(";\n")
+            _write_retained(
+                _prev,
+                "data_date-regressed(%s<%s);retained-last-good" % (
+                    data_date, _prev.get("data_date")))
             print("⛔ 数据日倒退（%s < 上一版 %s）—— 已保留上一版产物，拒绝回退到旧版。"
                   % (data_date, _prev.get("data_date")))
             return
@@ -500,7 +588,8 @@ def main():
 
     # 🔴 生产者自检（沿用 v1「谁产出谁负责」）：形状不对拒绝写出
     _viol = []
-    for _k in ("data_date", "source_stale", "stale_days", "source_title", "cycle_stage"):
+    for _k in ("data_date", "source_stale", "stale_days", "source_title", "cycle_stage",
+               "snapshot_meta_mismatch"):
         if _k not in out:
             _viol.append("产物缺字段 %s" % _k)
     if not stocks:

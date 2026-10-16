@@ -291,6 +291,64 @@ def _is_future_label(label, ty, tm, td):
     return False
 
 
+def backfill_missing_dates(existing_dates, today_str, max_days=30):
+    """🔴 2026-10-16 一劳永逸：自动回补「近期窗口内缺失的交易日」。
+
+    根因（HANDOFF future-todo-heatmap-dates-ar-1015①，主人 10-15 登记）：
+    增量路径**只更新「今天」**；历史某日抓取失败被 build_heatmap 的
+    「整列全 0 剔除」逻辑清掉后，该日期**永不回补** ⇒ dates 出现永久空洞。
+    实测：data/LIMIT_UP_HEATMAP.js 缺 10/12、10/13、10/14 三个交易日
+    （板块趋势图断档、前端矩阵前段空白）。
+
+    本函数每次运行都扫描近 max_days 个交易日（与东财 API 保留窗口对齐），
+    把**缺失日**重新抓取并交回调用方合并 ⇒ 漏一天下次自动补，不再依赖人工 --rebuild。
+
+    返回 (filled, window_labels)：
+      filled         {MM/DD: {板块: {股票: 涨停次数}}}  成功回补的日期数据
+      window_labels  [MM/DD, ...]  近 max_days 个交易日标签（升序，含今日）
+    """
+    existing_set = set(existing_dates or [])
+    window = get_trade_dates(max_days)
+    window_labels = [datetime.strptime(td, "%Y%m%d").strftime("%m/%d") for td in window]
+
+    missing = [(td, lbl) for td, lbl in zip(window, window_labels)
+               if lbl != today_str and lbl not in existing_set]
+    if not missing:
+        return {}, window_labels
+
+    print(f"  🔧 发现 {len(missing)} 个缺失交易日，自动回补: {[l for _, l in missing]}")
+    filled = {}
+    for td, label in missing:
+        try:
+            stocks = get_limit_up_by_date(td)
+        except Exception as e:
+            print(f"    {label}: 回补抓取异常 {e}")
+            stocks = []
+        time.sleep(0.3)  # 限流，与全量重建一致
+        if stocks:
+            filled[label] = classify_by_sector(stocks)
+            total = sum(sum(v.values()) for v in filled[label].values())
+            print(f"    {label}: 回补成功 {total} 只涨停")
+        else:
+            print(f"    {label}: 仍无数据（API 已过期或非交易日），本次跳过")
+    return filled, window_labels
+
+
+def _merge_backfill_into_dates(new_dates, filled, window_labels):
+    """把回补日期按时间序并入 new_dates（窗口内升序，窗口外历史保持原位）。"""
+    if not filled:
+        return list(new_dates)
+    win = list(window_labels or [])
+    win_set = set(win)
+    older = [d for d in new_dates if d not in win_set]
+    in_win = [l for l in win if l in set(new_dates) or l in filled]
+    merged = older + in_win
+    added = len(merged) - len(new_dates)
+    if added > 0:
+        print(f"  🗂 回补并入 {added} 个历史列（{len(new_dates)} → {len(merged)} 列）")
+    return merged
+
+
 def _gen_cycle_archive():
     """🔴 2026-09-16 主人令「放宽，用于累积」：热力矩阵产出后自动联动生成板块周期档案。
 
@@ -443,18 +501,46 @@ def main():
         #       券商(1)/固态电池(0) → 退出；地产链(5)/光伏(7) → 保留。零误杀。
         #     为什么保底板块也要退出：保底的语义是「有热度时优先展示」，
         #       不是「没热度也占位」。故保底只保留**排序优先权**，不再豁免退出。
-        #   ⚠️ 全部读 existing 里的历史列（含今日已写入的值），不额外依赖今日 sector_counts。
+        #   ⚠️ 2026-10-16 起改为读 by_date（existing ∪ 回补 ∪ 今日），见下方。
         HEAT_MIN = 2          # 冷掉阈值：近 N 日合计 ≤ 此值 ⇒ 退出
         STALE_WINDOW = 5      # 观察窗：最近 N 个交易日
-        _hist = {}
-        for s0 in existing.get("sectors", []):
-            _hist[s0["name"]] = s0.get("data") or []
-        all_sec = set(fixed_sectors) | set(_hist.keys()) | set(sector_counts.keys())
+
+        # 🔴 2026-10-16 一劳永逸：先回补「近期窗口内缺失的交易日」，再算板块进出。
+        #   回补数据必须参与冷板块判定，否则用陈旧历史会误判退出/保留。
+        filled, win_labels = backfill_missing_dates(existing_dates, today_str)
+        by_date = {}
+        for i, dd in enumerate(existing_dates):
+            by_date[dd] = {
+                s["name"]: (s["data"][i] if i < len(s["data"]) else 0)
+                for s in existing.get("sectors", [])
+            }
+        for _lbl, _sc in (filled or {}).items():
+            by_date[_lbl] = {k: sum(v.values()) for k, v in _sc.items()}
+        by_date[today_str] = {k: sum(v.values()) for k, v in sector_counts.items()}
+        hist_names = set()
+        for _d in by_date.values():
+            hist_names.update(_d.keys())
+        all_sec = set(fixed_sectors) | hist_names | set(sector_counts.keys())
+
+        # 日期：如果今天已存在则替换，否则追加
+        ed = list(existing_dates)
+        if today_str in ed:
+            # 替换今天的列（保留今天位置之后的所有日期，不再截断！）
+            idx = len(ed) - 1 - ed[::-1].index(today_str)
+            new_dates = ed[:idx] + [today_str] + ed[idx + 1:]
+        else:
+            new_dates = (ed[-29:] + [today_str]) if len(ed) >= 29 else (ed + [today_str])
+        # 🔴 2026-09-16 主人令「放宽，用于累积」：不再截断，永久保留全部历史列。
+        #   原 `new_dates[-30:]` 会把累积的板块周期档案永久砍到 30 日。
+        #   现改为**只增不减**；数据源(东财)本身只给 1 个月，历史靠每日增量攒出来。
+        #   ⚠️ 本文件有**两处**同构分支（增量路径 + 兜底路径），必须同改。
+        #   # 永久保留（原为 new_dates = new_dates[-30:]）
+        # 🔴 2026-10-16：把回补到的历史缺失日按时间序并入（治 dates 永久空洞）。
+        new_dates = _merge_backfill_into_dates(new_dates, filled, win_labels)
 
         def _recent_sum(name):
-            """该板块最近 STALE_WINDOW 个交易日的涨停家数合计（含今日）。"""
-            arr = list(_hist.get(name) or [])
-            return sum(arr[-STALE_WINDOW:])
+            """该板块最近 STALE_WINDOW 个交易日（含今日与回补日）的涨停家数合计。"""
+            return sum(by_date.get(d, {}).get(name, 0) for d in new_dates[-STALE_WINDOW:])
 
         _dropped = sorted(
             [x for x in all_sec if _recent_sum(x) <= HEAT_MIN],
@@ -472,36 +558,12 @@ def main():
             reverse=True
         )[:15]
 
-        # 日期：如果今天已存在则替换，否则追加
-        ed = list(existing_dates)
-        if today_str in ed:
-            # 替换今天的列（保留今天位置之后的所有日期，不再截断！）
-            idx = len(ed) - 1 - ed[::-1].index(today_str)
-            new_dates = ed[:idx] + [today_str] + ed[idx + 1:]
-        else:
-            new_dates = (ed[-29:] + [today_str]) if len(ed) >= 29 else (ed + [today_str])
-        # 🔴 2026-09-16 主人令「放宽，用于累积」：不再截断，永久保留全部历史列。
-        #   原 `new_dates[-30:]` 会把累积的板块周期档案永久砍到 30 日。
-        #   现改为**只增不减**；数据源(东财)本身只给 1 个月，历史靠每日增量攒出来。
-        #   ⚠️ 本文件有**两处**同构分支（增量路径 + 兜底路径），必须同改。
-        #   # 永久保留（原为 new_dates = new_dates[-30:]）
-
         # 用「日期→板块→数值」映射做精确对齐，避免丢列/错位
-        old_by_date = {}
-        for i, dd in enumerate(existing_dates):
-            old_by_date[dd] = {
-                s["name"]: (s["data"][i] if i < len(s["data"]) else 0)
-                for s in existing.get("sectors", [])
-            }
-
         new_sectors = []
         for sec in sorted_sec:
             row = []
             for dd in new_dates:
-                if dd == today_str:
-                    row.append(sum(sector_counts.get(sec, {}).values()))
-                else:
-                    row.append(old_by_date.get(dd, {}).get(sec, 0))
+                row.append(by_date.get(dd, {}).get(sec, 0))
             new_sectors.append({"name": sec, "data": row})
 
     # ── 写入结果 ──
@@ -670,15 +732,40 @@ def generate():
         #           fixed_sectors 只保留排序优先权，不再豁免退出闸门。
         HEAT_MIN = 2          # 冷掉阈值：近 N 日合计 <= 此值 ⇒ 退出
         STALE_WINDOW = 5      # 观察窗：最近 N 个交易日
-        _hist = {}
-        for s0 in existing.get("sectors", []):
-            _hist[s0["name"]] = s0.get("data") or []
-        all_sec = set(fixed_sectors) | set(_hist.keys()) | set(sector_counts.keys())
+
+        # 🔴 2026-10-16 一劳永逸：与主路径同构 —— 先回补近期缺失交易日再算板块进出。
+        filled, win_labels = backfill_missing_dates(existing_dates, today_str)
+        by_date = {}
+        for i, dd in enumerate(existing_dates):
+            by_date[dd] = {
+                s["name"]: (s["data"][i] if i < len(s["data"]) else 0)
+                for s in existing.get("sectors", [])
+            }
+        for _lbl, _sc in (filled or {}).items():
+            by_date[_lbl] = {k: sum(v.values()) for k, v in _sc.items()}
+        by_date[today_str] = {k: sum(v.values()) for k, v in sector_counts.items()}
+        hist_names = set()
+        for _d in by_date.values():
+            hist_names.update(_d.keys())
+        all_sec = set(fixed_sectors) | hist_names | set(sector_counts.keys())
+
+        ed = list(existing_dates)
+        if today_str in ed:
+            idx = len(ed) - 1 - ed[::-1].index(today_str)
+            new_dates = ed[:idx] + [today_str] + ed[idx + 1:]
+        else:
+            new_dates = (ed[-29:] + [today_str]) if len(ed) >= 29 else (ed + [today_str])
+        # 🔴 2026-09-16 主人令「放宽，用于累积」：不再截断，永久保留全部历史列。
+        #   原 `new_dates[-30:]` 会把累积的板块周期档案永久砍到 30 日。
+        #   现改为**只增不减**；数据源(东财)本身只给 1 个月，历史靠每日增量攒出来。
+        #   ⚠️ 本文件有**两处**同构分支（增量路径 + 兜底路径），必须同改。
+        #   # 永久保留（原为 new_dates = new_dates[-30:]）
+        # 🔴 2026-10-16：把回补到的历史缺失日按时间序并入（治 dates 永久空洞）。
+        new_dates = _merge_backfill_into_dates(new_dates, filled, win_labels)
 
         def _recent_sum(name):
-            """该板块最近 STALE_WINDOW 个交易日的涨停家数合计（含今日）。"""
-            arr = list(_hist.get(name) or [])
-            return sum(arr[-STALE_WINDOW:])
+            """该板块最近 STALE_WINDOW 个交易日（含今日与回补日）的涨停家数合计。"""
+            return sum(by_date.get(d, {}).get(name, 0) for d in new_dates[-STALE_WINDOW:])
 
         _dropped = sorted(
             [x for x in all_sec if _recent_sum(x) <= HEAT_MIN],
@@ -695,31 +782,11 @@ def generate():
                            sum(sector_counts.get(x, {}).values())),
             reverse=True
         )[:15]
-        ed = list(existing_dates)
-        if today_str in ed:
-            idx = len(ed) - 1 - ed[::-1].index(today_str)
-            new_dates = ed[:idx] + [today_str] + ed[idx + 1:]
-        else:
-            new_dates = (ed[-29:] + [today_str]) if len(ed) >= 29 else (ed + [today_str])
-        # 🔴 2026-09-16 主人令「放宽，用于累积」：不再截断，永久保留全部历史列。
-        #   原 `new_dates[-30:]` 会把累积的板块周期档案永久砍到 30 日。
-        #   现改为**只增不减**；数据源(东财)本身只给 1 个月，历史靠每日增量攒出来。
-        #   ⚠️ 本文件有**两处**同构分支（增量路径 + 兜底路径），必须同改。
-        #   # 永久保留（原为 new_dates = new_dates[-30:]）
-        old_by_date = {}
-        for i, dd in enumerate(existing_dates):
-            old_by_date[dd] = {
-                s["name"]: (s["data"][i] if i < len(s["data"]) else 0)
-                for s in existing.get("sectors", [])
-            }
         new_sectors = []
         for sec in sorted_sec:
             row = []
             for dd in new_dates:
-                if dd == today_str:
-                    row.append(sum(sector_counts.get(sec, {}).values()))
-                else:
-                    row.append(old_by_date.get(dd, {}).get(sec, 0))
+                row.append(by_date.get(dd, {}).get(sec, 0))
             new_sectors.append({"name": sec, "data": row})
 
     result = {
