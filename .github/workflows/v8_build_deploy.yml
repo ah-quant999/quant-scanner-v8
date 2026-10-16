@@ -596,6 +596,19 @@ jobs:
             #   ⇒ add 前先取回远端最新版（不存在则忽略）。
               git fetch origin main
               git checkout origin/main -- data/WAVE_ELLIOTT.js data/DAJIJIN_REDUCTION.js data/MAHORO_INSIGHTS.js 2>/dev/null || true
+              # 🔴🔴 2026-10-16 一劳永逸（阿狸咪的工程师·同族第四病·正文回退根因收口）：
+              #   mixed reset（上方 L588）只搬 HEAD+索引，**工作树的 index.html/logic.html
+              #   仍是 run 启动快照** ⇒ 下方 git add 会把 mid-run 人工推送的正文当旧构建
+              #   产物静默回退。实证：20:57「v8 build (fast-forward retry #1)」回退了
+              #   20:56 推送的 CFFEX 卡合并编辑（归一化后与推送前 base 逐字节一致）。
+              #   同族病史：10-09 WAVE_ELLIOTT 族被 build 回退、10-15 21:29 直推 guard
+              #   脚本被 21:31 retry 回退——前几轮只护了 data/脚本/工作流；L585-587 自记
+              #   「已知残余：index.html 正文仅由外层 reset --hard 保护，快速重试环裸奔」。
+              #   修法：按最新 tip 刷新两个正文文件（= 外层 reset --hard 的同等保护），
+              #   仅 data/ 等构建产物继续走 add；?v 重算交给 only-cache-busters，
+              #   失败不致命（15 分钟档 reconcile 兜底对齐）。
+              git checkout FETCH_HEAD -- index.html logic.html
+              timeout 180 python update_v8.py --only-cache-busters || echo "⚠️ retry 环 ?v 刷新失败，留给 reconcile 兜底"
               git add data/ index.html logic.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
                 raw_data/sh_sz_history.json \
                 raw_data/sector_fund_flow_history.json \
