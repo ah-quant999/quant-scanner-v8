@@ -17257,18 +17257,6 @@ h+=`</div>`;
       }
       return;
     }
-    // 🛡 2026-10-16 一劳永逸：echarts 未就绪 ⇒ 两图降级文案 + 'echartsready' 事件整页重渲
-    if(!window.echarts){
-      var _oC1=document.getElementById('futureC1'), _oC2=document.getElementById('futureC2');
-      var _oMsg='<div class="ipo-empty">⚠️ 图表组件（ECharts）加载失败——已自动尝试备用源，请稍候或刷新页面</div>';
-      if(_oC1) _oC1.innerHTML=_oMsg;
-      if(_oC2) _oC2.innerHTML=_oMsg;
-      if(!window.__OBS_RETRY){
-        window.__OBS_RETRY=function(){ if(typeof window.__obsRenderPane==='function') window.__obsRenderPane(tab); };
-        document.addEventListener('echartsready', window.__OBS_RETRY);
-      }
-      return;
-    }
     // ── ECharts 渲染（暗色）──
     var AXS={axisLine:{lineStyle:{color:'#3a4149'}},axisLabel:{color:'#9aa4b2',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.06)'}}};
     var TIP={trigger:'axis',backgroundColor:'rgba(20,24,30,.94)',borderColor:'#3a4149',textStyle:{color:C_TXT,fontSize:11}};
