@@ -9124,3 +9124,24 @@ items:
     verified_at: "2026-10-17 周六 代码部署+语法核验完成，运行时待盘后首跑"
     updated: "2026-10-17 13:30"
     updated_by: 阿狸咪的工程师
+  - id: obs-27y-tail-visibility-1017
+    owner: 阿狸咪的工程师
+    priority: P2
+    status: done
+    title: 27年走势/PE分位图「看不到最后面」根治（末档刻度裁剪+尾段过窄）
+    note: |
+      主人截图报「今的数据还是看不到最后面」。取证：MARKET_THERMO D.dates 末档=2026-10、
+      sh 末值=3716.28（本地/远端/Pages 三处一致），数据未断——真因是显示层：
+      ① 横轴末档刻度 2026-10 落在 grid 右缘被裁，可视最后刻度停 2025-10，看着像断更；
+      ② 27年压一图，最近一年仅占右端~4%宽，肉眼看不清尾段；
+      ③ 「今 3716.x」markPoint position:'right' 伸出右缘被部分裁切。
+      修复（index.html 891cc12066）：两图 axisLabel 加 showMaxLabel:true 强制显示末档刻度；
+      加 dataZoom（inside 关 wheel 缩放防劫持页面滚动 + slider 滑条拖近看尾部）；
+      grid bottom 44/36→66/58 给滑条让位；今值标签 position right→top 居中防裁。
+    verify_how: |
+      ① ls-tree 891cc12066：index.html 入树字节一致(f28a6cef)；31 个 inline script node --check 全过；
+      ② 线上 Pages index.html 含 showMaxLabel+dataZoom 新代码；
+      ③ 线上 MARKET_THERMO.js D.dates 末档=2026-10（数据本就未断）。
+    verified_at: "2026-10-17 14:5x 推送+入树核验完成"
+    updated: "2026-10-17 14:55"
+    updated_by: 阿狸咪的工程师
