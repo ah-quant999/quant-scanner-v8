@@ -291,6 +291,30 @@ def ext_tsf(prev):
                 if val != val:  # 未发布月份整行为空 → 丢弃
                     continue
                 month_map[f"{mm.group(1)}{int(ms):02d}"] = float(val)
+        # ── 合并历史段（<2021-01）── 央行官方 xls 仅 2021+ 可解析；
+        # 历史月度增量是同一套 PBOC 官方数（旧 akshare 商务部源，冻结于 2026-04 但历史正确），
+        # 缓存为 json 供云端 runner 免 akshare 复现真实极值（+43.1%@202010 / -14.1%@202111）。
+        _histf = os.path.join(cache, "tsf_history_pre2021.json")
+        if os.path.exists(_histf):
+            try:
+                _hist = json.load(open(_histf, encoding="utf-8")).get("data", {})
+                for _m, _v in _hist.items():
+                    if _m < "202101":
+                        month_map.setdefault(_m, float(_v))
+            except Exception as _he:
+                print(f"  ⚠️ 社融历史缓存读取失败: {_he}")
+        else:  # 兜底（本地开发）：直接拉旧源
+            try:
+                import akshare as ak
+                _h = ak.macro_china_shrzgm().reset_index(drop=True)
+                for _mm, _v in zip(_h["月份"].astype(str), _h["社会融资规模增量"]):
+                    _m = re.sub(r"\D", "", str(_mm))
+                    if len(_m) >= 6 and _m < "202101":
+                        _val = pd.to_numeric(_v, errors="coerce")
+                        if _val == _val:
+                            month_map.setdefault(_m[:6], float(_val))
+            except Exception as _he:
+                print(f"  ⚠️ 社融历史源不可用，极值窗口退为央行 2021+（仍标注 since）: {_he}")
         months = sorted(month_map)
         incr = [month_map[m] for m in months]
         pulse, pm = [], []
