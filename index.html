@@ -17380,7 +17380,8 @@ h+=`</div>`;
     }
     var _curV = (c.val10_d!=null?c.val10_d:c.val10);
     ext2.push({coord:[D.dates[D.dates.length-1],_curV],symbol:'circle',symbolSize:0.1,itemStyle:{color:'transparent'},
-      label:{show:true,formatter:'当前 '+_curV+(c.val10_d!=null?' (日频)':''),fontSize:11,fontWeight:700,color:C_PUR,textBorderColor:'#14181e',textBorderWidth:3,position:'right',distance:6}});
+      /* 2026-10-17 修复「最新数据的显示丢了」：末档 x=grid 右缘(56px 边距)，label position:'right' 整段伸出被容器裁掉（(日频) 尾缀丢失+与 26-06 极值标叠压）→ 改 position:'top' 居中于末档上方 */
+      label:{show:true,formatter:'当前 '+_curV+(c.val10_d!=null?' (日频)':''),fontSize:11,fontWeight:700,color:C_PUR,textBorderColor:'#14181e',textBorderWidth:3,position:'top',distance:8}});
     c2.setOption({
       backgroundColor:'transparent', tooltip:TIP,
       grid:{left:44,right:56,top:24,bottom:36},
