@@ -18466,9 +18466,21 @@ window.__renderV8CalToday();
         });
         // 🆕 2026-10-14 主人令「这卡更新于…加上」：卡头补全站统一「更新于」胶囊
         //   （与兄弟回测卡同范式 _uBadge('盘后','回测', ts)，读 REPLAY.update_time 真值）
+        // 🗂 2026-10-17 阿狸咪的工程师：静态归档产物改显「归档徽章」而非「更新于 X天前」——
+        //   REPLAY 是按设计一次冻结的回放归档（无周期生产者，v8_health_check.py::_STATIC_ARCHIVE_FILES
+        //   已登记；HANDOFF ima-strong-fusion-replay-1014：真实流 ≥30 成熟样本、预计 11 月中删引用切回）。
+        //   时间徽章把「归档时刻」显示成「停更 N 天」，主人 10-17 截图误判「这个断了」⇒ 假红同族第 5 例。
+        //   归档态如实显示：回放区间 + 数据截止 + 冻结语义；REPLAY 缺失（已切回）时自动回落时间徽章。
         var _frbEl = document.getElementById('finalRecBackBadge');
-        if (_frbEl && typeof window._uBadge === 'function') {
-          _frbEl.innerHTML = window._uBadge('盘后', '回测', fb && (fb.update_time || fb.generated));
+        if (_frbEl) {
+          var _isArchive = (fb === window.FINAL_RECOMMEND_REPLAY) && !!window.FINAL_RECOMMEND_REPLAY;
+          if (_isArchive) {
+            var _rng = String(fb.signal_date_range || '').replace(/（[^）]*）/g, '').trim() || '2026-06-09 ~ 2026-10-12';
+            var _cut = String(fb.data_cutoff || '数据截至 2026-10-13 收盘').replace('数据截至 ', '截至 ').replace('2026-', '');
+            _frbEl.innerHTML = '<span title="回放归档（一次性产出 · 按设计冻结，非日更产物）：信号日 ' + _rng + '；' + _cut + '" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(148,163,184,.12);color:#94a3b8;border:1px solid rgba(148,163,184,.3);white-space:nowrap">📦 回放归档 · ' + _rng.replace(/2026-/g, '') + ' · ' + _cut + ' · 冻结非日更</span>';
+          } else if (typeof window._uBadge === 'function') {
+            _frbEl.innerHTML = window._uBadge('盘后', '回测', fb && (fb.update_time || fb.generated));
+          }
         }
       }
     }catch(e){ console.warn('最终推荐回测渲染失败',e); }
