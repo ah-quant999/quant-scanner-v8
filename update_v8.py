@@ -159,6 +159,8 @@ DATA_SOURCES = {
     #   （今日实测：11:13 新鲜 -> cn_fetch 后回退 09:58，主站个股行情断档）。移除后 cn_fetch 不再重建它，
     #   refresh 工作流为唯一写入方，根因消除。其余卡仍由本映射正常重建。
     "avg_price_data.json":         "AVG_PRICE_DATA",
+    # 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填）
+    "sector_year_flow.json":       "SECTOR_YEAR_FLOW",
     "algo_track.json":              "ALGO_TRACK",   # 2026-08-15 三算法独立追踪（四量终极/板块龙头/大牛股猎手）
     "ima_strong_backtest.json":      "IMA_STRONG_BACKTEST",       # 2026-09-16 生命周期子页·高手强势股跟踪信号层真实回测
 
@@ -393,6 +395,9 @@ CATEGORY_MAP = {
     # 2026-08-31：AVG_PRICE_DATA 由 scripts/fetch_avg_price.py 在盘中/盘后/周末生成，
     #   映射为 intraday 使 update_v8 在盘中也刷新 AVG_PRICE_DATA.js（数据源单点，无双写冲突）。
     "AVG_PRICE_DATA": "intraday,post_close",
+    # 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表。cn-IP 硬约束源，
+    #   仅 post_close 档授权重建（与 AVG_PRICE_880003 同源 push2his）。
+    "SECTOR_YEAR_FLOW": "post_close",
     # 2026-08-15：ALGO_TRACK 依赖 FINAL_RECOMMEND_DATA + FOUR_VOLUME，归属盘后
     "ALGO_TRACK": "post_close",
     "IMA_STRONG_BACKTEST":      "post_close",

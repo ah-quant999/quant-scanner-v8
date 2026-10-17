@@ -101,6 +101,9 @@ VAR_TO_RAW = {
     # 2026-09-18：880003 主口径（真 MA + 历史回填）。本函数自写合并结果，
     # 但登记项必须存在，否则 run() 的状态记录与 save() 的兜底路径会静默失效。
     "AVG_PRICE_880003": "avg_price_data.json",  # 2026-08-31 修复：f_avg_price 已加入 tasks，必须对应 raw_data/avg_price_data.json，否则 save() 因 fname=None 直接返回，数据永不被写入
+    # 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填）。
+    #   本表必须登记：否则 save() 取不到 fname 会直接 return，raw 永不落盘。
+    "SECTOR_YEAR_FLOW": "sector_year_flow.json",
 }
 
 # 变量名 → 更新时段（与 update_v8.py 的 CATEGORY_MAP 对齐）
@@ -191,7 +194,15 @@ CATEGORY_MAP = {
     #   本函数是该文件唯一写入者（standalone fetch_avg_price.py 步骤已从 workflow 摘除）。
     "AVG_PRICE_DATA": "intraday",
     # 2026-09-18：880003 主口径随等权同档（intraday），保证每轮都刷新 MA 与历史
-    "AVG_PRICE_880003": "intraday",
+    # 🔴 2026-10-17 根治（阿狸咪·实锤）：云端 hosted/主链 runner 在境外，东财 push2his
+    #   对境外结构性不可达（run 38879662624 日志实锤双 secid 全 RemoteDisconnected）
+    #   ⇒ 880003 主口径上线近月从未落盘一次。修法对齐 W52_HIGH 同款 cn-IP 硬约束处置：
+    #   档位扩为 "premarket,intraday,post_close"，让 selfhosted（小九 cn）08:25 盘前 /
+    #   17:20 盘后两班常规兜底档必跑本源；云端境外轮失败仍为软失败不阻断（既有语义）。
+    "AVG_PRICE_880003": "premarket,intraday,post_close",
+    # 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表。同源 push2his fflow daykline
+    #   ⇒ 与 AVG_PRICE_880003 同属 cn-IP 硬约束，挂 post_close（selfhosted 17:20 常规班覆盖）。
+    "SECTOR_YEAR_FLOW": "post_close",
     "OVERSEAS_MARKETS": "premarket,intraday",  # 亚太市场(日经/恒生/KOSPI/台湾)：盘前档随08:25盘前cron刷新（日经/KOSPI 08:00先于A股开盘，2026-09-28 主人令「亚太比A股早开盘，和盘前一起8点多更新」）+ 盘中每轮刷新
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告，日频更新即可
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：注释写「盘后数据页」却只在盘前抓 —— 语义错配。
@@ -5345,41 +5356,47 @@ def main(category=None, only=None):
             "up_down_last_date": up_down_last_date,
         }
 
-    def _fetch_880003_history(days=130):
+    def _fetch_880003_history(days=430):
         """通达信平均股价 880003 官方指数日K（东财 push2his，双 secid 兜底）。
         这是「平均股价」这个指标的官方本体；只读历史，不做任何估算。
         返回 [(date, close), ...] 升序；失败返回 []。
+        2026-10-17：130→430 根（约 21 个月真实历史一次回填到位，主人授权），
+          MA20/MA30/MA60 全部由官方全量真历史计算；单 secid 失败补抓 2 次
+          （东财单 host 单次成功率 6-10% 的既有实测，同 _EM_HOSTS 结论）。
         """
         for secid in ("88.0003", "90.0003"):
-            try:
-                r = _requests.get(
-                    "https://push2his.eastmoney.com/api/qt/stock/kline/get",
-                    params={
-                        "secid": secid, "klt": "101", "fqt": "1",
-                        "fields1": "f1,f2,f3,f4,f5,f6",
-                        "fields2": "f51,f52,f53,f54,f55,f56,f57",
-                        "beg": "0", "end": "20500101", "lmt": str(days + 20),
-                        "ut": "fa5fd1943c7b386f172d6893dbfba1a9",
-                        "_": int(time.time() * 1000),
-                    },
-                    headers=_EM_HEADERS, timeout=25,
-                )
-                j = r.json()
-                kl = ((j.get("data") or {}).get("klines")) or []
-                recs = []
-                for ln in kl:
-                    p = ln.split(",")
-                    if len(p) >= 3:
-                        try:
-                            recs.append((p[0], float(p[2])))
-                        except ValueError:
-                            continue
-                if len(recs) >= 2:
-                    print(f"  [880003] secid={secid} 取到 {len(recs)} 根日K "
-                          f"({recs[0][0]} ~ {recs[-1][0]})")
-                    return recs
-            except Exception as e:
-                print(f"  [880003] secid={secid} 失败: {e}")
+            for _att in range(2):
+                try:
+                    r = _requests.get(
+                        "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+                        params={
+                            "secid": secid, "klt": "101", "fqt": "1",
+                            "fields1": "f1,f2,f3,f4,f5,f6",
+                            "fields2": "f51,f52,f53,f54,f55,f56,f57",
+                            "beg": "0", "end": "20500101", "lmt": str(days + 20),
+                            "ut": "fa5fd1943c7b386f172d6893dbfba1a9",
+                            "_": int(time.time() * 1000),
+                        },
+                        headers=_EM_HEADERS, timeout=25,
+                    )
+                    j = r.json()
+                    kl = ((j.get("data") or {}).get("klines")) or []
+                    recs = []
+                    for ln in kl:
+                        p = ln.split(",")
+                        if len(p) >= 3:
+                            try:
+                                recs.append((p[0], float(p[2])))
+                            except ValueError:
+                                continue
+                    if len(recs) >= 2:
+                        print(f"  [880003] secid={secid} 取到 {len(recs)} 根日K "
+                              f"({recs[0][0]} ~ {recs[-1][0]})")
+                        return recs
+                except Exception as e:
+                    print(f"  [880003] secid={secid} 失败(att{_att+1}): {e}")
+                    if _att == 0:
+                        time.sleep(1.0)
         return []
 
     def f_avg_price_880003():
@@ -5401,8 +5418,10 @@ def main(category=None, only=None):
 
         # 真 MA：样本不足一律 None，绝不用 min() 伪装
         ma20 = round(sum(closes[-20:]) / 20, 4) if len(closes) >= 20 else None
+        ma30 = round(sum(closes[-30:]) / 30, 4) if len(closes) >= 30 else None
         ma60 = round(sum(closes[-60:]) / 60, 4) if len(closes) >= 60 else None
         pos20 = round((cur / ma20 - 1) * 100, 4) if ma20 else None
+        pos30 = round((cur / ma30 - 1) * 100, 4) if ma30 else None
         pos60 = round((cur / ma60 - 1) * 100, 4) if ma60 else None
 
         hist = []
@@ -5416,7 +5435,7 @@ def main(category=None, only=None):
 
         n = len(closes)
         print(f"  [880003] 主口径: date={dates[-1]} close={cur} "
-              f"ma20={ma20} ma60={ma60} 样本={n}")
+              f"ma20={ma20} ma30={ma30} ma60={ma60} 样本={n}")
 
         out_path = RAW_DIR / "avg_price_data.json"
         base = {}
@@ -5432,10 +5451,13 @@ def main(category=None, only=None):
             "index_880003_change_pct": round((cur / prev - 1) * 100, 4) if prev else None,
             "index_880003_date": dates[-1],
             "ma20": ma20,
+            "ma30": ma30,
             "ma60": ma60,
             "position_vs_ma20": pos20,
+            "position_vs_ma30": pos30,
             "position_vs_ma60": pos60,
             "ma20_ready": n >= 20,
+            "ma30_ready": n >= 30,
             "ma60_ready": n >= 60,
             "ma_caliber": "通达信880003(官方指数)",
             "history_days": len(hist),
@@ -5450,6 +5472,103 @@ def main(category=None, only=None):
         out_path.write_text(json.dumps(merged, ensure_ascii=False, indent=2),
                             encoding="utf-8")
         return merged
+
+    def f_sector_year_flow():
+        """🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填）。
+        口径：东财行业板块（clist m:90+t:2）逐日主力净流入官方历史
+              （push2his fflow daykline，f51=日期 f52=主力净流入额·元）按自然年累加 ——
+              历史段为官方披露数据回填，非自算估算（主人 10-17 授权回填·要求真实）。
+        产出：raw_data/sector_year_flow.json → data/SECTOR_YEAR_FLOW.js
+              sectors=[{code,name,cur,prev,days,last_date}]，cur/prev 单位亿元。
+        幂等：当日已产出 → 跳过（防同日多轮重复 90+ 请求，同 us_hk_map 预算闸门语义）。
+        防护：失败板块 >30% → 不覆盖既有文件（宁缺勿错，同 save() 空壳防护铁律）。
+        执行位：post_close（cn-IP 硬约束源，selfhosted 小九 17:20 常规班覆盖；云端境外轮软失败）。
+        """
+        _today = now_cst().date()
+        out_path = RAW_DIR / "sector_year_flow.json"
+        # ① 幂等闸门：今日已产出 → 跳过
+        if out_path.exists():
+            try:
+                _prev = json.loads(out_path.read_text(encoding="utf-8") or "{}")
+                if str(_prev.get("update_time", ""))[:10] == _today.isoformat():
+                    print("  [sector_year_flow] 今日已产出 → 跳过重抓（幂等闸门）")
+                    return None
+            except Exception:
+                pass
+        cur_year, prev_year = _today.year, _today.year - 1
+        # ② 行业板块清单（clist 换 host 重试，复用公共层）
+        rows = _em_clean_rows(em_clist("m:90+t:2", "f12,f14", fid="f12",
+                                       pz=500, po="0", pn=1, timeout=20) or [])
+        boards = []
+        for r in rows:
+            _c = str(r.get("f12") or "")
+            _n = str(r.get("f14") or "")
+            if _c.startswith("BK") and _n:
+                boards.append((_c, _n))
+        if len(boards) < 30:
+            print(f"  ⚠️ [sector_year_flow] 行业板块清单仅 {len(boards)} 个（<30）→ 放弃本轮不覆盖")
+            return None
+        # ③ 逐板块拉日度主力净流入历史，按年累加（每板块最多 2 轮补抓）
+        _EMU = 1e8  # 元 → 亿元
+        sectors, fails = [], 0
+        _cy, _py = str(cur_year), str(prev_year)
+        for code, name in boards:
+            recs = None
+            for _att in range(2):
+                try:
+                    d = _em_get_with_retry(
+                        "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get",
+                        params={"secid": f"90.{code}", "klt": "101", "lmt": "560",
+                                "fields1": "f1,f2,f3,f7", "fields2": "f51,f52",
+                                "ut": "b2884a393a59ad64002292a3e90d46a5"},
+                        headers=_EM_HEADERS, timeout=20, label=f"syf_{code}",
+                        max_attempts=3)
+                    kl = ((d.get("data") or {}).get("klines")) or []
+                    if kl:
+                        recs = kl
+                        break
+                except Exception as _e:
+                    if _att == 1:
+                        print(f"  ⚠️ [sector_year_flow] {name}({code}) 拉取失败: {_e}")
+            if not recs:
+                fails += 1
+                continue
+            acc = {_cy: 0.0, _py: 0.0}
+            days_n = {_cy: 0, _py: 0}
+            last_date = ""
+            for ln in recs:
+                p = ln.split(",")
+                if len(p) < 2:
+                    continue
+                _y = p[0][:4]
+                if _y not in acc:
+                    continue
+                try:
+                    _v = float(p[1])
+                except ValueError:
+                    continue
+                acc[_y] += _v
+                days_n[_y] += 1
+                last_date = p[0]
+            if days_n[_cy] == 0:
+                fails += 1
+                continue
+            sectors.append({"code": code, "name": name,
+                            "cur": round(acc[_cy] / _EMU, 2),
+                            "prev": round(acc[_py] / _EMU, 2),
+                            "days": days_n[_cy], "last_date": last_date})
+        if not sectors or fails / max(1, len(boards)) > 0.3:
+            print(f"  ⚠️ [sector_year_flow] 成功 {len(sectors)}/{len(boards)}"
+                  f"（空/失败率超 30%）→ 不覆盖既有文件（宁缺勿错）")
+            return None
+        sectors.sort(key=lambda s: s["cur"], reverse=True)
+        print(f"  [sector_year_flow] 板块 {len(sectors)}/{len(boards)} 成功，"
+              f"{cur_year} 净流入榜首: {sectors[0]['name']} {sectors[0]['cur']}亿")
+        return {"year": cur_year, "prev_year": prev_year,
+                "source": "东方财富行业板块逐日主力净流入官方历史按年累加(自建累积表·历史回填)",
+                "total": len(boards), "fail_count": fails,
+                "data_date": sectors and max(s["last_date"] for s in sectors),
+                "sectors": sectors}
 
     def f_avg_price():
         """全A等权平均股价：通过 em_clist(push2delay) 取全市场个股最新价/涨跌幅，
