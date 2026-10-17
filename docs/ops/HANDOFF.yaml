@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 135
+  next_id_seq: 136
 items:
   - id: index-creds-panel-refresh-1014
     owner: 阿狸咪的工程师
@@ -8839,7 +8839,7 @@ items:
   - id: future-logic-if-cffex-1016
     owner: 阿狸咪(alimi-cn)
     priority: P2
-    status: todo
+    status: done
     created: 2026-10-16
     title: IF持仓择时卡「解读四态口径」待入 logic.full.html 母版（主人10-16 05:26令；公开页按10-04令禁入）
     note: >
@@ -8860,9 +8860,9 @@ items:
       <tr><td><b>IF 会员持仓择时</b></td><td><b>CFFEX_POSITION</b></td><td><b>云端 v8_cn_fetch_cloud</b></td><td><b>盘后数据 / 盘后档 · 短线（16:30后披露·盘中不刷新）</b></td></tr>
     verify_how: |
       母版「📜 最近变更记录」区顶部出现 10-15 IF 条目；lg-ph 矩阵含 IF 会员持仓择时行；公开站 logic.html 保持下架桩不动。
-    verified_at: "2026-10-16 05:30 登记待合并（未入母版）"
-    updated: "2026-10-16 05:30"
-    updated_by: 小九(lemoncat-cn)
+    verified_at: "2026-10-17 12:25 阿狸咪已合并母版（坚果云 E:/Nutstore/v8_logic_private/logic.full.html）：段1→新建「📜 最近变更记录」区；段2→lg-ph 盘后矩阵市场宽度行后；另补 IF 说明卡（四态全量 + 主人 10-17 图令 IF×宽度联合解读框架）。本档关闭。"
+    updated: "2026-10-17 12:25"
+    updated_by: 阿狸咪(alimi-cn)
 
   - id: ima-strong-retained-last-stale-recompute-1016
     owner: 小九(lemoncat-cn)
@@ -9018,3 +9018,40 @@ items:
     verified_at: "2026-10-16 19:5x 取证登记（待定位制造 step + 待主人决策）"
     updated: "2026-10-16 19:55"
     updated_by: 小九(lemoncat-cn)
+  - id: realtime-audit-11fix-and-logic-master-align-1017
+    owner: 阿狸咪(alimi-cn)
+    priority: P2
+    status: done
+    created: 2026-10-17
+    title: "实时数据板块逐卡审计 11 处修复上线生根 + 连板天梯死代码清理 + 逻辑详解母版三方对齐（三件套收尾）"
+    note: |
+      【①审计+修复】主人令「实时数据很重要，认真一条一条审计前端和算法，不能有任何错误」。
+      3 并行子代理审 9 卡 + 阿狸咪亲核 5 个高风险结论，共修 11 处（index.html 8 / cloud_fetch_v8.py 2 /
+      v8_health_check.py 1）：商品卡红涨绿跌反色、无数据计数错位、ETF 分析硬编码「涨」、行业树图图例错位、
+      连板天梯高连漏计 11 板（硬编码键→动态遍历≥3）、相位与权威源矛盾（优先 SENTIMENT_CYCLE.phase）、
+      首板用龙虎榜 59 只冒充（66≠61→改涨停池 lh.top lbc==1）、主力净额曲线 freshness 监控源错配
+      （MARKET_FUND_FLOW_DATA→SECTOR_FUND_FLOW_INTRADAY，index watch 元数据+_PAGE_CARD_ORDER+health_check 三处对齐）、
+      平均股价 avg_change_pct 符号错根因（个股涨跌均值→真实价格比，生成器已修；线上 data 快照由管线拉新代码后自纠，
+      手补一版被管线冲掉即停手，不打地鼠）。
+      【推送+生根】plumbing 快进推送 0fcb194f75（3-way 重放于远端 tip，保留小九 14 提交；ls-tree 字节核对；
+      线上硬抓 6 标记 ALL_PRESENT=True，历经 11:18/11:26/11:37 多轮构建重试未回退）。
+      【②四方对齐】云端 workflow 不涉及；运维页=index.html 本身；健康检查已对齐；逻辑详解母版见下。
+      【死代码清理追加推送】0deb70a237：删除连板天梯内无消费方的 lhbUniq/lhbSeen 去重块及过期注释
+      （首板口径已改 lh.top(lbc==1)，该块零引用），node 语法校验过，同样 plumbing 快进。
+      【逻辑详解母版对齐（真源=坚果云 E:/Nutstore/v8_logic_private/logic.full.html，改后 783,310B）】
+      a. __renderCycleLadderCard 整函数与主站 index.html 逐字节对齐（补 10-15 硬化/10-16 四源表头时间/10-17 三修，diff 12 块恰为近三日修复，其余逐字节相同）；
+      b. 新增「IF 会员持仓择时（逆向）· 说明」卡（lg-ph 区）：小九段1 四态口径全量收录（|z|<1 中性/样本<20日暂不出信号）
+         + 主人 10-17 图令「IF×市场宽度联合解读框架（为什么不矛盾）」四点方法论（两市场/方向天然相反一红一绿是常态/合读自洽/强度对称看极端）；
+      c. lg-ph 盘后矩阵按小九段2 原文补 IF 行；实时矩阵连板天梯行补四源聚合口径注；rt 矩阵误插行已移除；
+      d. 新建「📜 最近变更记录」区（10-14 补录之前）：小九 10-15 IF 条目 + 10-17 母版对齐条目（只记口径级改动）。
+      断言 fail-closed 全程生效（两次在写盘前拦住误插位置与计数错误，零污染）。
+      【未合并项·如实报】小九 logic_page_update_1015 更新包在本机坚果云可见树中不存在
+      （E:/Nutstore/sigs1/1c45ae2/from_xiaojiu_to_alimi/logic_page_update_1015/ 仅含内部加密块 2whuq2ra.22x 30632B，无法读取），
+      其「最近变更记录4条」未并入母版——需坚果云客户端补同步或小九重放；母版已建 📜 区可直接落位。
+    verify_how: |
+      ① 远端 main 含 0fcb194f75 与 0deb70a237（git merge-base --is-ancestor 实测）；
+      ② 线上 Pages index.html 6 标记 ALL_PRESENT=True + 'var lhbUniq' 消失；
+      ③ 母版 grep：sc.phase&&sc.color / 为什么不矛盾×2 / 盘后数据·盘后档 IF 行 =1 / 错位行=0 / node 函数块语法 OK。
+    verified_at: "2026-10-17 12:2x 推送+母版对齐完成（待对方机器回读确认）"
+    updated: "2026-10-17 12:25"
+    updated_by: 阿狸咪(alimi-cn)
