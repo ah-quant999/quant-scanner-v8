@@ -1,0 +1,23 @@
+window.LIANBAN_WINRATE = {
+  "groups": {
+    "first_all": {"n":0,"promo":0,"gap":0,"t1_n":0,"t1_win":0,"t1t_n":0,"t1t_win":0,"t5_n":0,"t5_win":0},
+    "first_vr3": {"n":0,"promo":0,"gap":0,"t1_n":0,"t1_win":0,"t1t_n":0,"t1t_win":0,"t5_n":0,"t5_win":0},
+    "first_vr3_5": {"n":0,"promo":0,"gap":0,"t1_n":0,"t1_win":0,"t1t_n":0,"t1t_win":0,"t5_n":0,"t5_win":0},
+    "first_vr5_8": {"n":0,"promo":0,"gap":0,"t1_n":0,"t1_win":0,"t1t_n":0,"t1t_win":0,"t5_n":0,"t5_win":0},
+    "first_vr8": {"n":0,"promo":0,"gap":0,"t1_n":0,"t1_win":0,"t1t_n":0,"t1t_win":0,"t5_n":0,"t5_win":0},
+    "second_all": {"n":0,"promo":0,"gap":0,"t1_n":0,"t1_win":0,"t1t_n":0,"t1t_win":0,"t5_n":0,"t5_win":0},
+    "second_vr3": {"n":0,"promo":0,"gap":0,"t1_n":0,"t1_win":0,"t1t_n":0,"t1t_win":0,"t5_n":0,"t5_win":0},
+    "second_vrlt3": {"n":0,"promo":0,"gap":0,"t1_n":0,"t1_win":0,"t1t_n":0,"t1t_win":0,"t5_n":0,"t5_win":0}
+  },
+  "pending": [],
+  "recorded": [],
+  "signals_total": 0,
+  "matured_total": 0,
+  "expired": 0,
+  "dropped_yiziban": 0,
+  "first_date": null,
+  "last_mature_date": null,
+  "last_run_date": null,
+  "params": {"cost_rt": 0.003, "mature_bars": 5, "vr_min": 3.0, "vr_window": 20, "kline": "sina_daily", "universe": "akshare涨停池(连板数1/2)", "caliber": "真实信号流日累积"},
+  "note": "首次累积中（占位）：真实数据由 v8/lianban_winrate.py 每日 post_close 生成后自动覆盖；需小九 cn runner 拉取最新 main 后生效，T+5 窗口成熟后才计入分组统计"
+};

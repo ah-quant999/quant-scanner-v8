@@ -87,6 +87,9 @@ VAR_TO_RAW = {
     "EXPERIMENT": "experiment.json",
     "V8_CAL": "v8_cal.json",
     "FIRST_BOARD_ALERT": "first_board_alert.json",  # 2026-09-30 主人令：连板梯队前哨（一进二前哨+二进三观察）
+    # 2026-10-17 主人令「要日更」：回测实证卡改真实信号流日累积（v8/lianban_winrate.py）。
+    # ⚠️ 必须登记：否则 save() 取不到 fname 直接 return，raw 永不落盘（血证见 US_HK_MAP 注）。
+    "LIANBAN_WINRATE": "lianban_winrate.json",
     "CANDIDATE_QUOTES": "candidate_quotes.json",
     "SH_SZ_HISTORY": "sh_sz_history.json",
     "MARKET_ALERTS": "market_alerts.json",
@@ -111,6 +114,8 @@ CATEGORY_MAP = {
     # 盘前
     "V8_CAL": "premarket,post_close",
     "FIRST_BOARD_ALERT": "post_close",  # 2026-09-30 首板倍量前哨：盘后涨停池定型后抓
+    # 2026-10-17 回测实证日更：涨停池信号须收盘定型后录入，同前哨卡 post_close。
+    "LIANBAN_WINRATE": "post_close",
     "IPO_DATA": "premarket,post_close",
     "MARGIN_DATA": "premarket,post_close",
     # 2026-08-31：期指主力合约为盘中实时，放回实时数据页，改为 intraday 抓取
@@ -5989,9 +5994,69 @@ def main(category=None, only=None):
             print(f"  ⚠️ FIRST_BOARD_ALERT: 模块调用失败 {e}")
             return None
 
+    def f_lianban_winrate():
+        """🔁 2026-10-17 主人令「要日更」：连板一进二/二进三回测实证改**真实信号流日累积**。
+
+        原卡为 2026-10-09 一次性静态跑批（bt_lianban_winrate.py 不在仓内、无法日更）；
+        按 10-11 回测口径铁律（唯一合法口径=真实信号流，历史回放含幸存者偏差禁作依据），
+        本函数每日 post_close 从涨停池录首板/二连板信号，由 v8/lianban_winrate.py
+        随 T+5 窗口成熟逐步计入分组统计（晋级率/隔夜高开/T+1/可成交T+1/T+5 胜率）。
+
+        基线三级回退：远端 main（_fetch_remote_raw 权威基线，治本地 raw_data 被
+        intraday 轮清空）→ 本地 raw_data → data/*.js（_load_judgment_raw 兜底）。
+        幂等：当日已产出（last_run_date）跳过；信号按 (code, board_date) 去重。
+        空载：无在途且无成熟样本 → 不写盘（保留远端旧数据，宁缺勿错）。
+        """
+        import importlib.util
+        store_path = RAW_DIR / "lianban_winrate.json"
+        base = _fetch_remote_raw("lianban_winrate.json")
+        if not isinstance(base, dict) or not base.get("groups"):
+            base = _load_judgment_raw("LIANBAN_WINRATE", "lianban_winrate.json") or None
+        # 幂等闸门：当日已产出过 → 跳过（防同日多轮重复取数；run() 记 reused 不报警）
+        if isinstance(base, dict) and base.get("last_run_date") == now_cst().strftime("%Y-%m-%d"):
+            print("  ♻️ LIANBAN_WINRATE: 当日已产出，跳过（防重复取数）")
+            return None
+        try:
+            spec = importlib.util.spec_from_file_location(
+                "lianban_winrate", str(ROOT / "v8" / "lianban_winrate.py"))
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+        except Exception as e:
+            print(f"  ⚠️ LIANBAN_WINRATE: 模块加载失败 {e}")
+            return None
+        # 涨停池（失败不阻断：在途队列照常成熟推进）
+        pool_rows = []
+        try:
+            df = _get_zt_pool()
+            if df is not None and len(df):
+                pool = df[df["连板数"].isin([1, 2])]
+                for _, r in pool.iterrows():
+                    try:
+                        lbc = int(r.get("连板数") or 1)
+                    except Exception:
+                        lbc = 1
+                    pool_rows.append({"code": str(r["代码"]),
+                                      "name": r.get("名称"), "lbc": lbc})
+        except Exception as e:
+            print(f"  ⚠️ LIANBAN_WINRATE: 涨停池获取失败 {e}（仅推进在途成熟）")
+        try:
+            store = mod.update(base, pool_rows)
+        except Exception as e:
+            print(f"  ⚠️ LIANBAN_WINRATE: 累积更新失败 {e}")
+            return None
+        # 空载守卫：无在途且无成熟样本 → 不写盘（保留远端旧数据）
+        if not store.get("pending") and all(
+                (g or {}).get("n", 0) == 0 for g in (store.get("groups") or {}).values()):
+            print("  ⚠️ LIANBAN_WINRATE: 无信号无成熟样本，跳过写入（保留远端旧数据）")
+            return None
+        return store
+
     tasks = [
         ("ETF_INTRADAY_HEAT", f_etf_intraday_heat),
         ("FIRST_BOARD_ALERT", f_first_board_alert),  # 2026-09-30 主人令：连板梯队前哨
+        # 2026-10-17 主人令「要日更」：回测实证·一进二/二进三 真实信号流日累积。
+        # 紧跟 FIRST_BOARD_ALERT：复用同轮涨停池内存缓存（_zt_cache），零额外请求拿宇宙。
+        ("LIANBAN_WINRATE", f_lianban_winrate),
         # 🔴 2026-09-27 一劳永逸修复（阿狸咪·主人令「今晚全部修复好」）：
         #   【病灶】EXPERIMENT 原排在 tasks 第 21 位（约 30 个源之中）。抓取循环有 720s 总预算
         #     （FETCH_BUDGET_SEC，防单源 hung 拖死整轮），预算耗尽后剩余源整轮跳过（L5256）。
