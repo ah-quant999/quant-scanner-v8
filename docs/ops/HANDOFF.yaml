@@ -9101,3 +9101,25 @@ items:
     verified_at: "2026-10-17 12:50 推送+Pages硬抓核验完成"
     updated: "2026-10-17 12:50"
     updated_by: 阿狸咪的工程师
+  - id: thermo-lhb-push-fix-1017
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: done
+    title: 龙虎榜推送断裂一劳永逸根治（fetch_lhb落点+工作流直推）
+    note: |
+      根因（4环断裂）：① fetch_lhb.py 把机游共振历史写到 out/lhb_history.json（gitignored），
+      但构建链消费 raw_data/lhb_history.json → 路径错配，线上该文件卡 2026-07-08；
+      ② 推送步 python api_push_raw.py --only lhb 是空操作（api_push_raw.py 无 --only 参数），
+      且 out/ 不在任何推送集 → out/lhb_result.json / out/lhb_seats.json 永推不上 main，
+      图14 window.LHB_DATA 因此陈旧。
+      修复：fetch_lhb.py 落点 out/→raw_data/lhb_history.json（读写同源）；工作流 v8_lhb_fetch.yml
+      推送步改为 Contents API 单文件直推三件套（raw_data/lhb_history.json + out/lhb_result.json +
+      out/lhb_seats.json），用 V8_GH_TOKEN，不依赖 api_push_raw，杜绝全量推送踩踏/限流。
+      提交 d328ed5ac6（快进 90e12ef760..）。
+    verify_how: |
+      ① ls-tree d328ed5ac6：两文件入树字节一致；fetch_lhb.py 落点=raw_data/lhb_history.json；
+      ② 待周一 17:30 盘后首跑验证：raw_data/lhb_history.json 更新至当日、data/LHB_DATA.js（图14）刷新；
+      ③ 家机无 cn IP/令牌无法本地跑，故仅代码级验证（Python AST + YAML 合法），运行时真值待 cn runner。
+    verified_at: "2026-10-17 周六 代码部署+语法核验完成，运行时待盘后首跑"
+    updated: "2026-10-17 13:30"
+    updated_by: 阿狸咪的工程师
