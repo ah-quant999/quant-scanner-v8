@@ -491,7 +491,10 @@ def main():
 def _update_lhb_history(results, date_str, trading=True):
     """写入机游共振日历（2026-07-17 改：纯共振→机游共振）。
     trading=False 用于节假日占位，避免历史日历显示陈旧数据。"""
-    path = os.path.join(BASE, "..", "out", "lhb_history.json")
+    # 🔧 2026-10-17 阿狸咪一劳永逸修复：原落点 out/lhb_history.json（gitignored）与构建链
+    #   消费的 raw_data/lhb_history.json 路径错配，导致机游共振日历永远推不上 main（卡 2026-07）。
+    #   改为直接写 raw_data/lhb_history.json（读写同源），工作流再 Contents API 直推该文件。
+    path = os.path.join(BASE, "..", "raw_data", "lhb_history.json")
     hist = {}
     if os.path.exists(path):
         try:

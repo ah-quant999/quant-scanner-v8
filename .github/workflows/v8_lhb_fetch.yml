@@ -124,44 +124,46 @@ jobs:
             Write-Host "[warn] out/lhb_result.json missing"
           }
 
-      # api_push_raw.py 推送仓内 OUT_DIR 中产出的龙虎榜明细，
-      # 以 api_push_raw.py --only lhb 限定只推送 lhb_result.json + lhb_seats.json。
-      - name: "📤 推送到仓库（api_push_raw.py 中 LHB 分支）"
-        # 🔴 2026-08-30 22:3x 同类 bug 一次清干净（实测 run 33312102792 / 33309687912
-        #   均因推送步跑 13-22 分钟被 job 级 timeout 硬杀，连带后续消费步全 skipped）。
-        #   推送慢的根因是 api_push_raw.py 防倒退守卫要逐个下载远端 blob 比时间戳
-        #   （raw_data 117 个 json / 26 MB，cn 出海串行传输），守卫不能删只能限时。
-        #   步级 timeout + continue-on-error 组合：推送超时只判该步失败，job 存活，
-        #   后续 bridge/update_v8/health_check 照常跑完，raw_data 交下一轮补推。
-        timeout-minutes: 30
+      # 🔧 2026-10-17 阿狸咪一劳永逸修复（根因：api_push_raw.py 无 --only 参数 + out/ 不在推送集
+      #   → out/lhb_result.json / out/lhb_seats.json / out/lhb_history.json 永推不上 main，
+      #   机游共振日历卡 2026-07、图14 window.LHB_DATA 陈旧）。
+      #   改为直接用 Contents API 单文件直推 LHB 三件套，不依赖 api_push_raw（避免全量推送踩踏/限流）：
+      #     - raw_data/lhb_history.json  ← 机游共振日历消费文件（fetch_lhb.py 已改由此路径落盘）
+      #     - out/lhb_result.json / out/lhb_seats.json ← 云端链转 data/LHB_DATA.js（图14）的输入
+      #   用 V8_GH_TOKEN；文件已存在则带 sha 更新，否则新建；单文件直推，绝不触发全量推送。
+      - name: "📤 推送龙虎榜产物到仓库（Contents API 直推，根治 --only 空操作缺陷）"
         if: always() && steps.fetch_lhb.outcome == 'success'
         shell: powershell
+        timeout-minutes: 20
         continue-on-error: true
         env:
-          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
-          GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
         run: |
-          cd $env:GITHUB_WORKSPACE
-          # 2026-09-26 alimi: fix exit-code semantics (stop double full push / API quota burn).
-          #   api_push_raw.py rc: 0=ok | 9=soft-deadline, only finished part committed
-          #   (by design, NOT a failure; next dispatch continues) | 1=hard fail.
-          #   Old "-ne 0" treated 9 as failure -> ran a SECOND full push -> 403 secondary
-          #   rate limit. Evidence run#31: 1st wave committed 4426 files (rc=9), fallback
-          #   wave then had 4332 upload failures + main-ref 403 -> whole step exit 1.
-          # NOTE (tracked in HANDOFF, NOT changed here - needs owner decision):
-          #   api_push_raw.py has NO "--only" arg (no argv parsing at all) -> this very line
-          #   is the full-push fallback (5572 files); and "out/" is in no push set ->
-          #   out/lhb_result.json can never land.
-          python api_push_raw.py --only lhb
-          $rc = $LASTEXITCODE
-          if ($rc -ne 0 -and $rc -ne 9) {
-            Write-Host "[warn] api_push_raw rc=$rc, falling back to full push" -ForegroundColor Yellow
-            python api_push_raw.py
-            $rc = $LASTEXITCODE
+          $ErrorActionPreference = 'Stop'
+          $token = $env:GH_PAT
+          if (-not $token) { Write-Host "[warn] 无 V8_GH_TOKEN，跳过 LHB 推送"; exit 0 }
+          $headers = @{
+            'User-Agent'    = 'v8-lhb-push'
+            'Authorization' = "Bearer $token"
+            'Accept'        = 'application/vnd.github+json'
           }
-          if ($rc -eq 9) {
-            Write-Host "[info] api_push_raw rc=9 = soft-deadline partial commit (by design, not a failure)"
-            exit 0
+          $repo = 'ah-quant999/quant-scanner-v8'
+          $files = @('raw_data/lhb_history.json', 'out/lhb_result.json', 'out/lhb_seats.json')
+          foreach ($f in $files) {
+            if (-not (Test-Path $f)) { Write-Host "[skip] $f 不存在，跳过"; continue }
+            $content = [System.IO.File]::ReadAllText($f, [System.Text.Encoding]::UTF8)
+            $b64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($content))
+            $url = "https://api.github.com/repos/$repo/contents/$([System.Uri]::EscapeDataString($f))"
+            $sha = $null
+            try { $r = Invoke-RestMethod -Uri $url -Headers $headers -TimeoutSec 30 -Method Get; $sha = $r.sha } catch { }
+            $body = @{ message = "data(lhb): 龙虎榜单飞推送 $f"; content = $b64; branch = 'main' }
+            if ($sha) { $body.sha = $sha }
+            $json = $body | ConvertTo-Json
+            try {
+              $resp = Invoke-RestMethod -Uri $url -Headers $headers -TimeoutSec 60 -Method Put -Body $json -ContentType 'application/json'
+              Write-Host "[ok] $f 推送成功 -> $($resp.content.html_url)"
+            } catch {
+              Write-Host "[warn] $f 推送失败: $_"
+            }
           }
-          if ($rc -ne 0) { Write-Host "api_push_raw failed (rc=$rc), non-blocking" -ForegroundColor Yellow }
-          exit $rc
+          Write-Host "[done] LHB 三件套直推结束"
