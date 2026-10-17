@@ -9145,3 +9145,26 @@ items:
     verified_at: "2026-10-17 14:5x 推送+入树核验完成"
     updated: "2026-10-17 14:55"
     updated_by: 阿狸咪的工程师
+  - id: t1-guard-skip-manual-dispatch-1017
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: done
+    title: 周六T+1守门调度被GitHub跳过→人工补dispatch云端补跑 + 补周一盘前兜底cron
+    note: |
+      10-17 周六实锤：v8_t1_guard.yml 周六 08:30+09:30 两班 schedule 全被 GitHub 跳过
+      （上周六 10-10 两班正常，workflow state=active 非禁用），T+1 补跑链整天没触发。
+      15:07 主人令「今天下午就跑，别等周一」。本机实查发现守门脚本认的令牌文件
+      ~/.workbuddy/v8_gh_token.txt 在（此前「阿狸咪机无令牌」结论已订正），
+      家机可直接 dispatch，无需交接小九。
+      dry-run 判定 10 文件未刷新（inst_trade/triple_consensus/sh_fib/sz_fib/nt_data
+      及其 raw_data 源，卡 10-16 17:49-17:52）；真跑双 dispatch HTTP 204；
+      15:11 云端「中国数据抓取(all)」+「盘后算法链(云端)」双 in_progress。
+      根治：v8_t1_guard.yml 补周一 07:00 CST 盘前兜底 cron（0 23 * * 0，提交 0cf37e109e）——
+      脚本文档自 08-16 起写明周一兜底（weekday∈{5,0}+周一9点前语义已内置），cron 一直漏编排。
+    verify_how: |
+      ① dispatch 后 API 查两 run created_at=07:11Z evt=workflow_dispatch in_progress；
+      ② 云端跑完后 v8_t1_guard.py --dry-run 应报「所有关键数据文件均已刷新」；
+      ③ ls-tree 0cf37e109e workflow 入树字节一致，YAML 3 crons 解析通过。
+    verified_at: "2026-10-17 15:1x dispatch成功+cron兜底已上线；数据落地待云端跑完复验"
+    updated: "2026-10-17 15:15"
+    updated_by: 阿狸咪的工程师
