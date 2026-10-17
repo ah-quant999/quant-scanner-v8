@@ -1760,8 +1760,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CAPITAL_FLOW_DATA.js?v=3f9744f3a8" defer></script>
 <script src="data/SH_SZ_HISTORY.js?v=dc16513372" defer></script>
 <script src="data/CANDIDATE.js?v=70ecca622b" defer></script>
-    <script src="data/FOUR_VOLUME.js?v=9ac9533b5c" defer></script>
-    <script src="data/FOUR_VOLUME_60M.js?v=cc642fe76d" defer></script>
+    <script src="data/FOUR_VOLUME.js?v=2f3d7539bb" defer></script>
+    <script src="data/FOUR_VOLUME_60M.js?v=fe8a6ef0bb" defer></script>
 
     <!-- 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」= 历史追踪 + 回测
          数据源：algorithms/update_four_volume_history.py（逐日账本+真实收盘价序列）
@@ -1770,7 +1770,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          ?v= 由 scripts/reconcile_cache_busters.py 自动对齐，此处写任意值即可。 -->
     <script src="data/FOUR_VOLUME_TRACK.js?v=603eaae1c8" defer></script>
     <script src="data/FOUR_VOLUME_HISTORY.js?v=e8bc6b82ee" defer></script>
-    <script src="data/STOCK_STOP_DATA.js?v=b7dcd0d9a6" defer></script>
+    <script src="data/STOCK_STOP_DATA.js?v=33e819cd89" defer></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=30d965a348" defer></script>
 <script src="data/BACKTEST_TDX.js?v=901169b2fb" defer></script>
 
@@ -17296,7 +17296,7 @@ h+=`</div>`;
     // ── 图② ──
     html+='<div style="font-size:14px;font-weight:800;color:'+C_AMB+';margin:12px 0 6px;">&#x2461; 10年PE分位（&gt;80 贵 / &lt;50 便宜）</div>';
     html+='<div id="futureC2" style="height:260px;"></div>';
-    html+='<div style="font-size:11px;color:var(--dim);margin:6px 0 0;line-height:1.7;">📡 实时：上证 '+(SPOT.sh||'—')+' / 沪深300 '+(SPOT.hs300||'—')+' · 数据更新于 '+T.generated+'（每日刷新）<br>📅 两图为月度序列，右端末档 = 数据末月 <b style="color:'+C_TXT+';">'+D.dates[D.dates.length-1]+'</b>（每月末追加新点，轴终点即最新完整月）；日频温度与实时点位每日滚动，卡面“当前”值天天在变，并非卡死。</div>';
+    html+='<div style="font-size:11px;color:var(--dim);margin:6px 0 0;line-height:1.7;">📡 实时：上证 '+(SPOT.sh||'—')+' / 沪深300 '+(SPOT.hs300||'—')+' · 数据更新于 '+T.generated+'（每日刷新）<br>📅 两图为月度序列，右端末档 = <b style="color:'+C_TXT+';">'+D.dates[D.dates.length-1]+'</b>（当月至今·进行中，交易日滚动更新；估值分位为月频，当月值月末补齐）；日频温度与实时点位每日滚动，卡面“当前”值天天在变，并非卡死。</div>';
     // ── 2027 情景 ──
     function tgt(v,r){ return Math.round(v*(1+r/100)); }
     var scn=[{name:'牛市',p:25,r:[15,22],col:C_GRN,drv:'强财政货币延续 + 居民资金入市 + 估值扩张 + 盈利兑现'},

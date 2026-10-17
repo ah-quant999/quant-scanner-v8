@@ -44,22 +44,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $TARGETS = @('v8/gen_market_thermo.py', 'v8/audit_market_thermo.py', 'v8/fetch_raw_data_thermo.py')
+          # 2026-10-17 补 scripts/update_sw_index_cache.py（27年走势截断根因修复：行业日K缓存此前无人日更）
+          $TARGETS = @('v8/gen_market_thermo.py', 'v8/audit_market_thermo.py', 'v8/fetch_raw_data_thermo.py', 'scripts/update_sw_index_cache.py')
           $headers = @{
             'User-Agent' = 'v8-market-thermo'
             'Accept'     = 'application/vnd.github.raw'
             'Authorization' = "Bearer $env:GH_PAT"
           }
-          New-Item -ItemType Directory -Force -Path v8 | Out-Null
+          New-Item -ItemType Directory -Force -Path v8, scripts | Out-Null
           foreach ($TARGET in $TARGETS) {
             $URL = "https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/$($TARGET -replace '/','%2F')?ref=main"
-            $local = $TARGET -replace '^v8/', 'v8/_'
-            $local = $local -replace '\.py$', '.py.tmp'
+            $local = ($TARGET -replace '/', '_') + '.tmp'
             try {
               $r = Invoke-RestMethod -Uri $URL -Headers $headers -TimeoutSec 60 -Method Get
               [System.IO.File]::WriteAllText($local, $r, [System.Text.Encoding]::UTF8)
-              $dest = if ($TARGET -eq 'v8/gen_market_thermo.py') { 'v8/gen_market_thermo.py' } elseif ($TARGET -eq 'v8/fetch_raw_data_thermo.py') { 'v8/fetch_raw_data_thermo.py' } else { 'v8/audit_market_thermo.py' }
-              Move-Item -Force $local $dest
+              Move-Item -Force $local $TARGET
               Write-Host "fetched $TARGET from origin/main"
             } catch {
               Write-Host "[warn] API fetch failed for ${TARGET}: $_ ; using local copy" -ForegroundColor Yellow
@@ -84,12 +83,26 @@ jobs:
         run: |
           python v8/fetch_raw_data_thermo.py
 
+      - name: "🏭 日更申万一级行业日K缓存（31文件·截断根因修复 2026-10-17）"
+        shell: powershell
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          # 根因：gen_market_thermo 读本地 31 个行业日K CSV，此前 10-05 手工种下后无人日更
+          #      → 缓存冻结在月末 → 27年走势图右端整月缺失（主人 10-17「今的数据又被截断了」）。
+          #      update_sw_index_cache.py 幂等增量合并（无新交易日文件不动），cn 出口直连 akshare。
+          python scripts/update_sw_index_cache.py
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "[GATE-FAIL] SW cache update failed -> red (prefer visible alarm)" -ForegroundColor Red
+            exit 1
+          }
+
       - name: "📊 跑 gen_market_thermo.py（交易日闸）"
         id: gen
         shell: powershell
         run: |
           $dow = (Get-Date).DayOfWeek.value__
-          if ($dow -eq 0 -or $dow -ge 6) { Write-Host "[skip] weekend"; exit 0 }
+          # 2026-10-17：周末闸仅对 schedule 生效；workflow_dispatch 允许（幂等，主人周末手动跑批惯例）
+          if (($dow -eq 0 -or $dow -ge 6) -and '${{ github.event_name }}' -eq 'schedule') { Write-Host "[skip] weekend (scheduled)"; exit 0 }
           cd $env:GITHUB_WORKSPACE
           python v8/gen_market_thermo.py
           if (Test-Path 'data/MARKET_THERMO.js') {

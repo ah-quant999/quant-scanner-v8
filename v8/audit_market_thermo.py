@@ -97,7 +97,11 @@ def audit_structure(T):
         else:
             ok("val10 非None全部 ∈[0,100]，末值 %s（头部预热None %d 个，合法）" % (v10[nn_idx[-1]], nn_idx[0]))
         gaps = [i for i in range(nn_idx[0], n) if v10[i] is None]
-        if gaps:
+        if gaps == [n - 1]:
+            # 2026-10-17 主人令「今的数据又被截断」：月度序列末档改为「当月至今·进行中」，
+            # PE月表（外部月频源）当月末出 → 末档 val10=None 属口径内合法，月末自动补齐。
+            ok("val10 末档(idx %d) None = 当月至今·进行中（PE月表月末补齐，合法）" % (n - 1))
+        elif gaps:
             fail("val10 预热期后仍有 %d 个 None（中断，如 idx %s）" % (len(gaps), gaps[:3]))
         else:
             ok("val10 预热后无中断（%d → %d 连续有效）" % (nn_idx[0], n - 1))
