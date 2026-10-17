@@ -178,9 +178,10 @@
   "realtime-audit-11fix-and-logic-master-align-1017",
   "thermo-27y-truncation-rootfix-1017",
   "thermo-tsf-pbc-source-merge-1017",
-  "thermo-lhb-push-fix-1017"
+  "thermo-lhb-push-fix-1017",
+  "obs-27y-tail-visibility-1017"
  ],
- "updated": "2026-10-17 14:48",
+ "updated": "2026-10-17 14:58",
  "generated_by": "阿狸咪的工程师(/scripts/handoff_ledger_hash.py 口径)",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -319,6 +320,7 @@
   "market-alerts-subprocess-timeout": "4927391e217eb9b9",
   "namefix-10cards-restore-1001": "d4f650fb6518f9b0",
   "north-fund-dead-source-fix": "325473156a53d8b1",
+  "obs-27y-tail-visibility-1017": "d7f218ebe042c27e",
   "pages-publish-bypasses-gate": "3d3310f33ecafa84",
   "peer-monitor-holiday-silence-false-down": "7408bf6116502161",
   "postclose-reliability-trio": "cd8345766bb04483",
