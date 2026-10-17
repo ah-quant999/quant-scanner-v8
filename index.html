@@ -8373,9 +8373,69 @@ window.__renderIndexObserve = function(){
     <script src="data/FIRST_BOARD_ALERT.js?v=d62ec06fa6" defer></script>
     <div id="firstBoardAlertCard" class="card" style="margin-top:14px;margin-bottom:16px;background:#1a1d24;border:1px solid #2a2f3a;border-left:4px solid #fbbf24;border-radius:10px;">
       <div style="padding:10px 12px;font-weight:700;color:#e6e9ef;border-bottom:1px solid #2a2f3a;">🔭 连板梯队前哨 <span style="font-size:11px;color:#8a93a6;font-weight:400;">一进二前哨 · 二进三观察 · 量比≥3</span> <span id="fbaUpd"></span></div>
-      <div style="padding:6px 12px 0;font-size:12px;line-height:1.7;color:#8a93a6;"><b style="color:#fbbf24;">&#x1F4CC; 核心（回测胜率）：</b>T+1 开盘买入<b style="color:#fbbf24;">胜率全部不足五成</b>——全体首板 44.4%（n=8544）、倍量&#8805;3 = 46.2%（n=1408）、二连板 45.9%（n=1074）；隔夜高开率虽达 60%（二板缩量 77%），但高开发生在买入前、溢价拿不到；持有到 T+5 胜率再降至 40%~47%。晋级率：首板 14.1%、倍量&#8805;3 = 13.9%（无增量）、二连板 23.0% ⇒ <b style="color:#fbbf24;">观察哨非买点</b>。回测口径：全市场 3988 只 · 2025-08~2026-09 · 双边 0.3%<br><b style="color:#fbbf24;">&#x1F4A1; 用法：</b>盘后出名单，次日盘中确认非一字开盘、分时弱转强再介入；量比3~5倍是健康区，<b>不是越大越好</b>（&gt;8倍多为巨分歧）。<br><b style="color:#fbbf24;">&#x26A0; 限制：</b>盘后更新、非盘中实时；观察名单&#8800;买点；一字板买不进；涨停判定按板块限幅（主板10% / 创业板·科创板20%）。</div>
+      <div style="padding:6px 12px 0;font-size:12px;line-height:1.7;color:#8a93a6;"><b style="color:#fbbf24;">&#x1F4CC; 核心（回测胜率）：</b>T+1 开盘买入<b style="color:#fbbf24;">胜率全部不足五成</b>——全体首板 44.4%（n=8544）、倍量&#8805;3 = 46.2%（n=1408）、二连板 45.9%（n=1074）；隔夜高开率虽达 60%（二板缩量 77%），但高开发生在买入前、溢价拿不到；持有到 T+5 胜率再降至 32%~47%（倍量&gt;8 小样本低至 32.1%）。晋级率：首板 14.1%、倍量&#8805;3 = 13.9%（无增量）、二连板 23.0% ⇒ <b style="color:#fbbf24;">观察哨非买点</b>。回测口径：全市场 3988 只 · 2025-04~2026-10 上旬（274 个首板信号日）· T+1 开盘买入扣双边 0.3%<br><b style="color:#fbbf24;">&#x1F4A1; 用法：</b>盘后出名单，次日盘中确认非一字开盘、分时弱转强再介入；量比3~5倍是健康区，<b>不是越大越好</b>（&gt;8倍多为巨分歧）。<br><b style="color:#fbbf24;">&#x26A0; 限制：</b>盘后更新、非盘中实时；观察名单&#8800;买点；一字板买不进；涨停判定按板块限幅（主板10% / 创业板·科创板20%）。</div>
       <div id="fbaBody" style="padding:10px 12px;font-size:13px;color:#8a93a6;">加载中…</div>
     </div>
+    <div id="fbaBtPanel" style="margin-bottom:16px;background:#1a1d24;border:1px solid #2a2f3a;border-left:4px solid #fbbf24;border-radius:10px;">
+      <div style="padding:10px 12px;font-weight:700;color:#e6e9ef;border-bottom:1px solid #2a2f3a;">📊 回测实证 · 一进二 / 二进三 <span style="font-size:11px;color:#8a93a6;font-weight:400;">晋级率 · 隔夜高开 · T+1 开盘买入胜率 · T+5 胜率</span> <span style="font-size:10px;font-weight:400;padding:1px 7px;border-radius:9px;background:rgba(56,189,248,.12);color:#7dd3fc;">📦 静态回测 · 跑批 2026-10-09 · 非日更</span></div>
+      <div id="fbaBtBody" style="padding:10px 12px;font-size:12px;color:#8a93a6;">加载中…</div>
+    </div>
+    <script>
+    (function(){
+      var _FBA_BT={
+        cap:'全市场 3988 只 · 2025-04~2026-10 上旬 · 274 个首板信号日 · T+1 开盘买入扣双边 0.3% · 尾部剔 3 日 · 分板块涨停判定（主板 10% / 双创 20%）· 一字板剔除',
+        t1:[
+          ['全体首板','8,544','14.1%','60.2%','44.4%','45.4%','41.8%'],
+          ['倍量≥3（① 入选口径）','1,408','13.9%','49.6%','46.2%','47.4%','40.3%'],
+          ['倍量 3~5','1,057','13.7%','51.2%','45.4%','46.6%','40.6%'],
+          ['倍量 5~8','298','15.1%','45.0%','49.0%','50.0%','40.6%'],
+          ['倍量 >8','53*','11.3%','45.3%','47.2%','47.2%','32.1%']
+        ],
+        t2:[
+          ['二连板（② 入选口径）','1,074','23.0%','59.0%','45.9%','48.6%','41.1%'],
+          ['二板放量','318','23.0%','46.5%','47.8%','49.8%','36.8%'],
+          ['二板缩量','217','25.8%','76.5%','47.0%','50.7%','47.0%']
+        ]
+      };
+      function _fbaCell(v,hi,cls){
+        return '<td style="padding:4px 8px;border-bottom:1px solid #2a2f3a;text-align:right;'+(cls||'')+'">'+v+'</td>';
+      }
+      function _fbaRow(r,hi){
+        var bg=hi?'background:rgba(251,191,36,.06);':'';
+        return '<tr style="'+bg+'">'
+          +'<td style="padding:4px 8px;border-bottom:1px solid #2a2f3a;white-space:nowrap;'+(hi?'color:#e6e9ef;':'color:#8a93a6;')+'">'+r[0]+'</td>'
+          +_fbaCell(r[1],hi,'color:#8a93a6;')
+          +_fbaCell(r[2],hi,'color:#fbbf24;font-weight:600;')
+          +_fbaCell(r[3],hi,'color:#8a93a6;')
+          +_fbaCell(r[4],hi,'color:#e6e9ef;')
+          +_fbaCell(r[5],hi,'color:#8a93a6;')
+          +_fbaCell(r[6],hi,'color:#8a93a6;')
+          +'</tr>';
+      }
+      function _fbaTable(rows){
+        var h='<div style="overflow-x:auto;"><table style="border-collapse:collapse;width:100%;font-size:11.5px;line-height:1.5;">'
+          +'<tr style="color:#8a93a6;font-size:10.5px;">'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:left;font-weight:400;">分组</th>'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">样本 n</th>'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">晋级率</th>'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">隔夜高开</th>'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">T+1 胜率</th>'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">可成交 T+1</th>'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">T+5 胜率</th>'
+          +'</tr>';
+        rows.forEach(function(r,i){ h+=_fbaRow(r,i===1); });
+        return h+'</table></div>';
+      }
+      var _h='<div style="color:#c9d1dc;font-weight:600;margin:2px 0 4px;">① 一进二（首板 → 次日）</div>'
+        +_fbaTable(_FBA_BT.t1)
+        +'<div style="color:#c9d1dc;font-weight:600;margin:10px 0 4px;">② 二进三（二连板 → 次日）</div>'
+        +_fbaTable(_FBA_BT.t2)
+        +'<div style="margin-top:8px;padding:7px 10px;background:rgba(251,191,36,.07);border-left:3px solid #fbbf24;border-radius:4px;font-size:11.5px;line-height:1.7;color:#c9d1dc;">📌 结论：倍量无晋级增量（13.9% ≤ 全体首板 14.1%）· T+1 胜率全部不足五成 · 持有到 T+5 再降 ⇒ <b style="color:#fbbf24;">观察哨非买点</b>；二板缩量隔夜高开 76.5%，但 T+1 均值 -0.59%——高开发生在买入前、溢价拿不到。</div>'
+        +'<div style="margin-top:6px;font-size:10.5px;line-height:1.6;color:#6b7280;">* n&lt;100 小样本仅供参考 · 晋级率=次日涨停占比 · 可成交=T+1 开盘非一字（现实中买得进） · 高亮行=本卡 ①/② 入选口径 · 口径：'+_FBA_BT.cap+' · 数据源：本地 kline_cache 全市场复盘（bt_lianban_winrate.py）· 静态归档、非日更</div>';
+      var el=document.getElementById('fbaBtBody');
+      if(el){ el.innerHTML=_h; }
+    })();
+    </script>
     <script>
     (function(){
       function esc(s){ return String(s==null?'':s); }
