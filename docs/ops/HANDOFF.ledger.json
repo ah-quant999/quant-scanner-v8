@@ -180,7 +180,7 @@
   "thermo-tsf-pbc-source-merge-1017",
   "thermo-lhb-push-fix-1017"
  ],
- "updated": "2026-10-17 13:09",
+ "updated": "2026-10-17 14:48",
  "generated_by": "阿狸咪的工程师(/scripts/handoff_ledger_hash.py 口径)",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -308,7 +308,7 @@
   "ladder-ui-legend-5col-0930": "c0e6c432f5801aa3",
   "lhb-history-size-slim": "e68e9e8a991fe4ba",
   "lhb-history-today-empty-placeholder": "ba567953944a7c2a",
-  "lhb-push-only-arg-noop-out-dir-unpushed": "c2c52f9f6988dce1",
+  "lhb-push-only-arg-noop-out-dir-unpushed": "343f0c686f6a70fe",
   "local-worktree-behind": "6d5739ce875822c7",
   "logic-html-schedule-label": "a0e8a06f4d4934c4",
   "logic-private-align-protect-1007": "fecd58eee12d26c8",
