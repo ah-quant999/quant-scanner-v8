@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-10-17 08:23:01",
+  "check_time": "2026-10-17 15:45:28",
   "last_trade_close": "2026-10-16 15:30:00",
   "is_trading_day": false,
   "core_stale": [],
@@ -76,6 +76,7 @@
     "STOCK_LIST": "post_close",
     "V8_POOL_TRACKER": "post_close",
     "AVG_PRICE_DATA": "intraday,post_close",
+    "SECTOR_YEAR_FLOW": "post_close",
     "ALGO_TRACK": "post_close",
     "IMA_STRONG_BACKTEST": "post_close",
     "INDEX_HISTORY": "post_close",
