@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-17 20:13:26",
+  "update_time": "2026-10-17 21:33:50",
   "total": 606,
   "hysteresis_days": 5,
   "source_dist": {
@@ -10444,7 +10444,7 @@
     },
     "hk_00358": {
       "code": "00358",
-      "name": "江西铜业",
+      "name": "江西铜业股份",
       "market": "hk",
       "board_label": "港股",
       "sources": [
