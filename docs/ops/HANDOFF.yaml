@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 136
+  next_id_seq: 137
 items:
   - id: index-creds-panel-refresh-1014
     owner: 阿狸咪的工程师
@@ -9054,4 +9054,27 @@ items:
       ③ 母版 grep：sc.phase&&sc.color / 为什么不矛盾×2 / 盘后数据·盘后档 IF 行 =1 / 错位行=0 / node 函数块语法 OK。
     verified_at: "2026-10-17 12:2x 推送+母版对齐完成（待对方机器回读确认）"
     updated: "2026-10-17 12:25"
+    updated_by: 阿狸咪(alimi-cn)
+  - id: thermo-27y-truncation-rootfix-1017
+    owner: 阿狸咪(alimi-cn)
+    priority: P1
+    status: done
+    note: |
+      主人 10-17 12:04 令：「27年走势」今的数据又被截断（图右端停在 2026-09）。
+      根因：v8_market_thermo.yml（cn runner）只同步 5 个依赖文件，gen_market_thermo 读的
+      raw_data/sw_index_daily_cache/ 31 个申万行业日K CSV 是 10-05 手工种下的一次性快照，
+      全仓无任何任务日更它们（scripts/update_sw_index_cache.py 10-04 建成却从未挂调度）
+      ⇒ 缓存冻结在 2026-09-30，月度序列末月停 2026-09。
+      根治四件：①workflow 挂入日更步骤（gen 前 update_sw_index_cache.py，失败红灯）+源码同步加该脚本；
+      ②周末闸改为仅 schedule 生效（dispatch 允许，幂等）；
+      ③月度序列末档口径改「当月至今·进行中」（交易日滚动），审计门禁放宽：仅末档 val10=None 合法（PE月频月末补），中断仍硬闸；
+      ④卡底口径注同步改写。
+      手动补跑：本地日更缓存(+186行至10-16)→gen 重建(323月,末档2026-10,sh=3716.28)→审计 PASS→
+      plumbing f7ed512080 快进推送 37 文件（数据+代码+31CSV）。
+    verify_how: |
+      ① ls-tree f7ed512080：MARKET_THERMO/yml/audit/index/CSV 全在树内；
+      ② 线上硬抓：data/MARKET_THERMO.js 323月末档2026-10 sh=3716.28 ✓；index.html「当月至今·进行中」在、「每月末追加新点」消失；
+      ③ 本地审计门禁 PASS（含新末档规则）；yml PyYAML 解析 OK；index 修改块 node new Function OK。
+    verified_at: "2026-10-17 12:35 推送+线上核验完成"
+    updated: "2026-10-17 12:35"
     updated_by: 阿狸咪(alimi-cn)
