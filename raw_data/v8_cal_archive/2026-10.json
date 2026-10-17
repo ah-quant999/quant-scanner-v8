@@ -1,6 +1,6 @@
 {
  "month": "2026年10月",
- "update_time": "2026-10-16 23:28",
+ "update_time": "2026-10-17 08:32",
  "legend": [
   {
    "title": "重要政策",
@@ -350,29 +350,29 @@
     {
      "num": 16,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "中金所IF/IH/IC/IM股指期货交割",
        "cls": "future",
-       "released": false
+       "released": true
       },
       {
        "text": "中金所股指期权到期",
        "cls": "option",
-       "released": false
+       "released": true
       },
       {
        "text": "🇺🇸 费城联储制造业指数",
        "cls": "us",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 17,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": []
     },
     {
