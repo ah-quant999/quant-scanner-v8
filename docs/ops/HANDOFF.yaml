@@ -9168,7 +9168,7 @@ items:
     verified_at: "2026-10-17 15:1x dispatch成功+cron兜底已上线；数据落地待云端跑完复验"
     updated: "2026-10-17 15:15"
     updated_by: 阿狸咪的工程师
-- id: avgprice-ma30-row-1017
+  - id: avgprice-ma30-row-1017
     owner: 阿狸咪的工程师
     priority: P0
     status: done

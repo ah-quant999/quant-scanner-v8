@@ -1134,6 +1134,13 @@ def check_handoff_ledger():
       · 断言 meta.next_id_seq >= ledger.max_next_id_seq（单调不减）
       ⇒ 「被旧版本覆盖」会让两条同时失败，必然被抓住。
 
+    🔴 2026-10-17 补刀（当日事故实证 · 防同型二次复发）：
+      15:48 追加 item 时首行缩进写丢（`- id:` 零缩进）致 YAML 结构损坏，
+      [13/13] parse 断言连拦 12 笔 build；修复 parse 后暴露第二形态——
+      ledger 漏收该 item（YAML 有、ledger 无）而原设计「超集放行」不拦。
+      故新增**双向封堵**：ledger.ids 必须 ⊇ YAML ids 的新增部分（漏收 ⇒ 阻断）；
+      反方向（ledger 有、YAML 无＝清理分批）维持放行，不破坏月度清理节奏。
+
     维护纪律（有意的摩擦力）：
       · 推 `HANDOFF.yaml` 时**同一提交**同步刷新 ledger（追加 id、抬高 max_next_id_seq）；
       · 每月清理已完成项 ⇒ 须同批更新 ledger 的 ids（这正是「人工拍板」的时刻）；
@@ -1214,6 +1221,18 @@ def check_handoff_ledger():
     if lost:
         return False, ("%d 个 item 从状态源消失（疑似被落后基线覆盖 / 误删）：%s"
                        % (len(lost), "；".join(map(str, lost[:8]))))
+
+    # 🔴 2026-10-17 补刀：漏收检测（YAML 已加 item 但 ledger 未同步收录 ⇒ 阻断）。
+    #   当日事故：avgprice-ma30-row-1017 追加时 YAML 首行零缩进 + ledger 漏收，
+    #   形态二「漏收」原设计放行 ⇒ parse 修好后仍会静默失真，必须硬拦。
+    _led_ids = L.get("ids")
+    if not isinstance(_led_ids, list) or not _led_ids:
+        return False, "HANDOFF.ledger.json 缺 ids 数组或为空（外部锚结构损坏）"
+    unrec = [x for x in ids if x not in set(_led_ids)]
+    if unrec:
+        return False, ("%d 个 item 未收录进 ledger（YAML 已加、外部锚未同步）：%s；"
+                       "纪律＝推 HANDOFF.yaml 须同一提交跑 scripts/handoff_ledger_hash.py --fix"
+                       % (len(unrec), "；".join(map(str, unrec[:8]))))
 
     cur_seq = (d.get("meta") or {}).get("next_id_seq")
     old_seq = L.get("max_next_id_seq")
