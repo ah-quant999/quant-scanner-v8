@@ -1,20 +1,15 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-17 23:04",
- "generated": "2026-10-17 23:04",
+ "update_time": "2026-10-18 00:17",
+ "generated": "2026-10-18 00:17",
  "meta": {
-  "generated": "2026-10-17 23:04",
+  "generated": "2026-10-18 00:17",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 27,
+  "total_days": 26,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
  "days": [
-  {
-   "date": "2026-09-02",
-   "categories": {},
-   "consensus": []
-  },
   {
    "date": "2026-09-03",
    "categories": {
