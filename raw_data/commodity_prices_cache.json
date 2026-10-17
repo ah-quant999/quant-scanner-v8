@@ -1,0 +1,94 @@
+{
+  "fetch_time": "2026-08-15 21:27:00",
+  "source": "westock-mcp futures (MCP connector)",
+  "prices": {
+    "aluminum": {
+      "code": "hf_AHD",
+      "name": "LME铝",
+      "price": 3246.2,
+      "change_pct": -0.18,
+      "unit": "$/吨",
+      "currency": "USD"
+    },
+    "nickel": {
+      "code": "hf_NID",
+      "name": "LME镍",
+      "price": 16811.65,
+      "change_pct": -0.02,
+      "unit": "$/吨",
+      "currency": "USD"
+    },
+    "zinc": {
+      "code": "hf_ZSD",
+      "name": "LME锌",
+      "price": 3763.76,
+      "change_pct": 0.19,
+      "unit": "$/吨",
+      "currency": "USD"
+    },
+    "lead": {
+      "code": "hf_PBD",
+      "name": "LME铅",
+      "price": 1895.61,
+      "change_pct": 0.03,
+      "unit": "$/吨",
+      "currency": "USD"
+    },
+    "tin": {
+      "code": "hf_SND",
+      "name": "LME锡",
+      "price": 55988.55,
+      "change_pct": -0.37,
+      "unit": "$/吨",
+      "currency": "USD"
+    },
+    "platinum": {
+      "code": "fuPL",
+      "name": "NYMEX铂金",
+      "price": 1756.8,
+      "change_pct": 1.42,
+      "unit": "$/oz",
+      "currency": "USD"
+    },
+    "palladium": {
+      "code": "fuPA",
+      "name": "NYMEX钯金",
+      "price": 1316.5,
+      "change_pct": -0.71,
+      "unit": "$/oz",
+      "currency": "USD"
+    },
+    "natural_gas": {
+      "code": "fuNG",
+      "name": "NYMEX天然气",
+      "price": 2.715,
+      "change_pct": -0.44,
+      "unit": "$/MMBtu",
+      "currency": "USD"
+    },
+    "soybean": {
+      "code": "fuZS",
+      "name": "CBOT大豆",
+      "price": 1191.25,
+      "change_pct": 0.76,
+      "unit": "美分/蒲式耳",
+      "currency": "USX"
+    },
+    "corn": {
+      "code": "fuZC",
+      "name": "CBOT玉米",
+      "price": 483.75,
+      "change_pct": 2.49,
+      "unit": "美分/蒲式耳",
+      "currency": "USX"
+    },
+    "wheat": {
+      "code": "fuZW",
+      "name": "CBOT小麦",
+      "price": 689.0,
+      "change_pct": 3.11,
+      "unit": "美分/蒲式耳",
+      "currency": "USX"
+    }
+  }
+}

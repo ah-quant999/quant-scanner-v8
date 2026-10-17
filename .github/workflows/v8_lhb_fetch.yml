@@ -1,0 +1,169 @@
+# 九宝量化 v8.0 — 龙虎榜单飞 fetcher 调度（cn runner）
+#
+# 2026-08-30 F7-挂账：本 workflow 独立调度 fetch_lhb.py + api_push_raw.py，
+#   不依赖 v8_algo_run.yml（其 cron 已禁用，cn runner 仅 workflow_dispatch 应急），
+#   也不依赖 v8_algo_cloud.yml（云端跑，但 fetch_lhb 在 cn 才稳定）。
+# 每周一至周五 17:30（盘后+龙虎榜当日发布+留 30 分钟缓冲）单飞补算 LHB 数据。
+#
+# 🛡 2026-08-30 19:2x 一劳永逸修复（首次 dispatch 报 422 才暴露）：
+#   ① 原文件 name / description 用了「反斜杠 + u + d83c 型」UTF-16 surrogate pair 转义，
+#      go-yaml（GitHub Actions 解析器）不接受 → 整份 workflow 解析失败，
+#      GitHub 把 name 显示成文件路径，并判定「没有 workflow_dispatch trigger」→ dispatch 422。
+#      本次全部改为真实 UTF-8 字符，不再使用任何 \uXXXX 转义。
+#   ② 原推送步骤条件 `steps.fetch_lhb.outcome == 'success'` 引用了一个没有 id 的 step
+#      → 条件恒为 false，即使抓到数据也永不入仓。本次给抓取步骤补 `id: fetch_lhb`。
+#
+# 安全铁律（与 v8_algo_run.yml 同步）：
+#   1. 严禁 actions/checkout / rm -rf / git clean -fdx / Remove-Item -Recurse
+#      （cn runner 系统级 BULK_CONFIRM 拦截，会挂 job）。
+#   2. 严禁 git clone/fetch（cn runner 到 github.com:443 被连接重置），
+#      仅走 GitHub Contents API 同步源码。
+#   3. 单一职责：只调 fetch_lhb.py → out/lhb_result.json + api_push → 入仓；
+#      不动其他 raw_data 文件。
+name: "🐉 v8 龙虎榜单飞 fetcher (cn runner)"
+
+on:
+  schedule:
+    # 每周一至五 17:30 CST（交易日 17:00 后发布龙虎榜，17:30 起跑「当日龙虎榜」，
+    # 周末不触发）。以 UTC cron 表达：CST 17:30 = UTC 09:30。
+    - cron: '30 9 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      skip_trading_day_gate:
+        description: "应急手动调用时绕过交易日闸（默认 false，true 仅供非交易日补算）"
+        required: false
+        type: choice
+        options:
+          - "false"
+          - "true"
+        default: "false"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-lhb-fetch
+  cancel-in-progress: false
+
+jobs:
+  lhb-only:
+    runs-on: [self-hosted, cn]
+    # 🔴 2026-09-10 主人令：safe-delete 批量删除守卫阈值统一 2000。
+    #   本链是 runs-on: [self-hosted, cn]（Windows runner），铁律要求必须显式设；
+    #   不设则吃默认 50，checkout/git clean 批量删必被拦。
+    env:
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
+      # 🔴 2026-09-17 阿狸咪（拍-8 落地）：cn runner（Windows）默认 GBK ——
+      #   python 打印 emoji/中文会 UnicodeEncodeError('gbk') 崩链。job 级强制
+      #   UTF-8，与 v8_algo_cloud.yml / v8_stock_quote_refresh.yml 同口径。
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+    # 🔴 2026-08-30 22:3x 抬高 job 墙钟（实测本 workflow run 33309687912 跑满
+    #   25 分钟被硬杀，杀点是推送步 13.8 分钟未完成 → 数据抓到却推不上 main）。
+    timeout-minutes: 50
+    steps:
+      # 仅调 GitHub Contents API 拉取 algorithms/fetch_lhb.py（本 workflow 唯一需要的脚本），
+      # 避开 git clone（cn runner 上 github.com 被 connection reset）也避开 checkout action。
+      # 需要的环境变量：V8_GH_TOKEN（仓内 Secrets 只登记 V8_GH_TOKEN；
+      #   原 secrets.GH_PAT 不存在 ⇒ 解析为空 ⇒ Bearer 空 ⇒ 401，2026-09-25 阿狸咪实证）
+      - name: "📝 同步源码（安全）"
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $TARGET = 'algorithms/fetch_lhb.py'
+          $URL = "https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/$($TARGET -replace '/','%2F')?ref=main"
+          $headers = @{
+            'User-Agent' = 'v8-lhb-fetcher'
+            'Accept'     = 'application/vnd.github.raw'
+            'Authorization' = "Bearer $env:GH_PAT"
+          }
+          $tmpPath = "algorithms/_lhb_fetch.py.tmp"
+          New-Item -ItemType Directory -Force -Path algorithms | Out-Null
+          try {
+            $r = Invoke-RestMethod -Uri $URL -Headers $headers -TimeoutSec 60 -Method Get
+            [System.IO.File]::WriteAllText($tmpPath, $r, [System.Text.Encoding]::UTF8)
+            Move-Item -Force $tmpPath "algorithms/fetch_lhb.py"
+            Write-Host "fetched $TARGET from origin/main"
+          } catch {
+            Write-Host "[warn] API fetch failed: $_ ; using local copy (LHB may be stale)" -ForegroundColor Yellow
+          }
+
+      - name: "🐍 Python / akshare 环境检查"
+        shell: powershell
+        run: |
+          python --version
+          python -c "import akshare, pandas, requests" 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "deps missing, installing from tsinghua mirror..."
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas requests
+          } else { Write-Host "deps ready" }
+
+      - name: "📊 跑 fetch_lhb.py（产出 out/lhb_result.json）"
+        id: fetch_lhb
+        shell: powershell
+        continue-on-error: true
+        run: |
+          # 交易日闸（默认）：周末静默跳过（fetch_lhb 内部已有交易日判断，调度端双保险再判一次）
+          $skip = "${{ github.event.inputs.skip_trading_day_gate || 'false' }}"
+          if ($skip -eq 'true') {
+            Write-Host "skip_trading_day_gate=true: force run"
+          } else {
+            $dow = (Get-Date).DayOfWeek.value__
+            if ($dow -eq 0 -or $dow -ge 6) {
+              Write-Host "[skip] weekend, exit ok"
+              exit 0
+            }
+          }
+          cd $env:GITHUB_WORKSPACE
+          python algorithms/fetch_lhb.py
+          if (Test-Path 'out/lhb_result.json') {
+            Write-Host "[ok] out/lhb_result.json generated"
+          } else {
+            Write-Host "[warn] out/lhb_result.json missing"
+          }
+
+      # 🔧 2026-10-17 阿狸咪一劳永逸修复（根因：api_push_raw.py 无 --only 参数 + out/ 不在推送集
+      #   → out/lhb_result.json / out/lhb_seats.json / out/lhb_history.json 永推不上 main，
+      #   机游共振日历卡 2026-07、图14 window.LHB_DATA 陈旧）。
+      #   改为直接用 Contents API 单文件直推 LHB 三件套，不依赖 api_push_raw（避免全量推送踩踏/限流）：
+      #     - raw_data/lhb_history.json  ← 机游共振日历消费文件（fetch_lhb.py 已改由此路径落盘）
+      #     - out/lhb_result.json / out/lhb_seats.json ← 云端链转 data/LHB_DATA.js（图14）的输入
+      #   用 V8_GH_TOKEN；文件已存在则带 sha 更新，否则新建；单文件直推，绝不触发全量推送。
+      - name: "📤 推送龙虎榜产物到仓库（Contents API 直推，根治 --only 空操作缺陷）"
+        if: always() && steps.fetch_lhb.outcome == 'success'
+        shell: powershell
+        timeout-minutes: 20
+        continue-on-error: true
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $token = $env:GH_PAT
+          if (-not $token) { Write-Host "[warn] 无 V8_GH_TOKEN，跳过 LHB 推送"; exit 0 }
+          $headers = @{
+            'User-Agent'    = 'v8-lhb-push'
+            'Authorization' = "Bearer $token"
+            'Accept'        = 'application/vnd.github+json'
+          }
+          $repo = 'ah-quant999/quant-scanner-v8'
+          $files = @('raw_data/lhb_history.json', 'out/lhb_result.json', 'out/lhb_seats.json')
+          foreach ($f in $files) {
+            if (-not (Test-Path $f)) { Write-Host "[skip] $f 不存在，跳过"; continue }
+            $content = [System.IO.File]::ReadAllText($f, [System.Text.Encoding]::UTF8)
+            $b64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($content))
+            $url = "https://api.github.com/repos/$repo/contents/$([System.Uri]::EscapeDataString($f))"
+            $sha = $null
+            try { $r = Invoke-RestMethod -Uri $url -Headers $headers -TimeoutSec 30 -Method Get; $sha = $r.sha } catch { }
+            $body = @{ message = "data(lhb): 龙虎榜单飞推送 $f"; content = $b64; branch = 'main' }
+            if ($sha) { $body.sha = $sha }
+            $json = $body | ConvertTo-Json
+            try {
+              $resp = Invoke-RestMethod -Uri $url -Headers $headers -TimeoutSec 60 -Method Put -Body $json -ContentType 'application/json'
+              Write-Host "[ok] $f 推送成功 -> $($resp.content.html_url)"
+            } catch {
+              Write-Host "[warn] $f 推送失败: $_"
+            }
+          }
+          Write-Host "[done] LHB 三件套直推结束"

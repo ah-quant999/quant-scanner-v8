@@ -1,0 +1,216 @@
+{
+  "update_time": "2026-10-16 20:53:17",
+  "source": "ima",
+  "note_url": "https://ima.qq.com/wiki/?shareId=32c01f1da52044f743a01e4aa995d72e7940cc8e99cf413cc5f4c2eb39b4d389&folderId=folder_7507701210837524",
+  "source_kind": "wiki",
+  "detail_channel": "full-snapshot",
+  "source_title": "短线情绪选股 2026-10-16",
+  "source_updated_at": "",
+  "data_date": "2026-10-16",
+  "stale_days": 0,
+  "source_stale": false,
+  "snapshot_expired": false,
+  "snapshot_meta_mismatch": false,
+  "degraded_reason": "",
+  "cycle_stage": "起势期（温度分 3）",
+  "position_advice": "20-40%",
+  "themes_top": [
+    [
+      "低空经济",
+      11
+    ],
+    [
+      "机器人",
+      6
+    ],
+    [
+      "商业航天",
+      4
+    ],
+    [
+      "汽车零部件",
+      4
+    ],
+    [
+      "飞行汽车",
+      3
+    ],
+    [
+      "人形机器人",
+      3
+    ],
+    [
+      "智能驾驶",
+      2
+    ],
+    [
+      "水泥熟料",
+      2
+    ],
+    [
+      "特斯拉概念",
+      2
+    ],
+    [
+      "数据中心液冷",
+      2
+    ]
+  ],
+  "summary": {
+    "pool": 8
+  },
+  "sample_coverage": {
+    "rows_parsed": 8,
+    "expected": null,
+    "source_channel": "full-snapshot",
+    "snapshot_fetched_at": "2026-10-16 20:35:30",
+    "snapshot_age_h": 0.3,
+    "truncated": false,
+    "note": "v2 换代水源「短线情绪选股」主报告全文快照（成员连接器）；introduction 兜底通道受 ~300 字硬墙（如实降级 detail_complete=false）。"
+  },
+  "detail_complete": true,
+  "wiki_latest": "短线情绪选股 2026-10-16",
+  "parse_health": {
+    "total": 8,
+    "no_score": 0,
+    "no_score_pct": 0.0,
+    "note": "v2 候选池 schema；score 缺失数必须为 0，>0 说明源表格列位变了。"
+  },
+  "stocks": [
+    {
+      "rank": 1,
+      "code": "300411",
+      "market": "SZ",
+      "name": "金盾股份",
+      "score": 86,
+      "turnover_pct": 11.8,
+      "vol_ratio": 6.34,
+      "mktcap_yi": 29.7,
+      "seal_yi": 0.89,
+      "theme": "军工通风/低空经济",
+      "note": "主流题材核心（所属题材合计 14 家涨停）；换手 11.8%（尚可）；量比 6.34（显著放量）；封单 0.89 亿；非一字板，可参与",
+      "_parse_missing": [],
+      "first_selected": "2026-10-16",
+      "trade_date": "2026-10-16"
+    },
+    {
+      "rank": 2,
+      "code": "003029",
+      "market": "SZ",
+      "name": "吉大正元",
+      "score": 81,
+      "turnover_pct": 21.0,
+      "vol_ratio": 3.6,
+      "mktcap_yi": 38.6,
+      "seal_yi": 0.44,
+      "theme": "密码安全/数字货币",
+      "note": "题材有跟随（合计 6 家）；换手 21.0%（心法优质区间）；量比 3.60（显著放量）；封单 0.44 亿；非一字板，可参与",
+      "_parse_missing": [],
+      "first_selected": "2026-10-16",
+      "trade_date": "2026-10-16"
+    },
+    {
+      "rank": 3,
+      "code": "301586",
+      "market": "SZ",
+      "name": "佳力奇",
+      "score": 80,
+      "turnover_pct": 13.9,
+      "vol_ratio": 7.13,
+      "mktcap_yi": 17.5,
+      "seal_yi": 0.05,
+      "theme": "低空经济/军工复材",
+      "note": "主流题材核心（所属题材合计 12 家涨停）；换手 13.9%（尚可）；量比 7.13（显著放量）；非一字板，可参与",
+      "_parse_missing": [],
+      "first_selected": "2026-10-16",
+      "trade_date": "2026-10-16"
+    },
+    {
+      "rank": 4,
+      "code": "000530",
+      "market": "SZ",
+      "name": "冰山冷热",
+      "score": 73,
+      "turnover_pct": 33.2,
+      "vol_ratio": 2.92,
+      "mktcap_yi": 45.7,
+      "seal_yi": 0.88,
+      "theme": "冰雪工程/数据中心液冷",
+      "note": "题材有跟随（合计 6 家）；换手 33.2%（心法优质区间）；量比 2.92（温和放量）；封单 0.88 亿；非一字板，可参与",
+      "_parse_missing": [],
+      "first_selected": "2026-10-15",
+      "trade_date": "2026-10-16"
+    },
+    {
+      "rank": 5,
+      "code": "300681",
+      "market": "SZ",
+      "name": "英搏尔",
+      "score": 72,
+      "turnover_pct": 12.9,
+      "vol_ratio": 2.98,
+      "mktcap_yi": 48.1,
+      "seal_yi": 0.14,
+      "theme": "低空经济/新能源汽车电驱",
+      "note": "主流题材核心（所属题材合计 14 家涨停）；换手 12.9%（尚可）；量比 2.98（温和放量）；非一字板，可参与",
+      "_parse_missing": [],
+      "first_selected": "2026-10-16",
+      "trade_date": "2026-10-16"
+    },
+    {
+      "rank": 6,
+      "code": "002510",
+      "market": "SZ",
+      "name": "天汽模",
+      "score": 71,
+      "turnover_pct": 6.5,
+      "vol_ratio": 4.58,
+      "mktcap_yi": 60.5,
+      "seal_yi": 0.55,
+      "theme": "低空经济/航空零部件",
+      "note": "主流题材核心（所属题材合计 13 家涨停）；量比 4.58（显著放量）；封单 0.55 亿；非一字板，可参与",
+      "_parse_missing": [],
+      "first_selected": "2026-10-16",
+      "trade_date": "2026-10-16"
+    },
+    {
+      "rank": 7,
+      "code": "000887",
+      "market": "SZ",
+      "name": "中鼎股份",
+      "score": 71,
+      "turnover_pct": 4.9,
+      "vol_ratio": 3.18,
+      "mktcap_yi": 232.9,
+      "seal_yi": 0.32,
+      "theme": "飞行汽车/人形机器人",
+      "note": "主流题材核心（所属题材合计 12 家涨停）；量比 3.18（显著放量）；封单 0.32 亿；非一字板，可参与",
+      "_parse_missing": [],
+      "first_selected": "2026-10-16",
+      "trade_date": "2026-10-16"
+    },
+    {
+      "rank": 8,
+      "code": "920690",
+      "market": "BJ",
+      "name": "捷众科技",
+      "score": 70,
+      "turnover_pct": 15.2,
+      "vol_ratio": 10.8,
+      "mktcap_yi": 10.8,
+      "seal_yi": 0.14,
+      "theme": "低空经济/机器人",
+      "note": "主流题材核心（所属题材合计 22 家涨停）；换手 15.2%（尚可）；量比 10.80（显著放量）；非一字板，可参与；流通市值 10.8 亿（偏离游资偏好区间）",
+      "_parse_missing": [],
+      "first_selected": "2026-10-16",
+      "trade_date": "2026-10-16"
+    }
+  ],
+  "kb": {
+    "kb_id": "7500816604757970",
+    "kb_name": "九型人格",
+    "kb_creator": "梧谷枫灯",
+    "folder_id": "folder_7507701210837524",
+    "folder_name": "短线情绪选股"
+  }
+}

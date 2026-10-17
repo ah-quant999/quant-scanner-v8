@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>重要日历 - 九宝量化 V8.0</title>
+<style>
+:root{
+  --bg:#0d0e15;--bg2:#15151e;--card:#1a1a26;--txt:#eee;--sub:#aaa;--dim:#666;
+  --bd:#262633;--bd2:#3a3a4a;
+  --important:#c62828;--cb:#1565c0;--data:#f57f17;--data2:#43a047;
+  --fomc:#9c27b0;--us:#42a5f5;--hk:#ef5350;--tw:#ff9800;--a50:#e91e63;
+  --ipo:#673ab7;--option:#00838f;--future:#1d6f42;--appl:#37474f;
+  --sg:#8e24aa;--kr:#00acc1;
+  --us-earnings:#66bb6a;--eu:#26a69a;--jp:#ab47bc;--caixin:#5c6bc0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;padding:16px;line-height:1.5}
+.back{font-size:13px;color:var(--sub);margin-bottom:12px}
+.back a{color:var(--cb);text-decoration:none}
+.back a:hover{text-decoration:underline}
+h1{font-size:22px;font-weight:800;color:var(--txt);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.meta{font-size:11px;color:var(--dim);margin-bottom:16px}
+.week-label{font-size:13px;color:var(--sub);margin:16px 0 6px;padding-left:4px;font-weight:600}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px}
+.cal .head{font-size:12px;color:var(--sub);text-align:center;padding:8px 0;font-weight:700;background:var(--bg2);border-radius:4px}
+.day{background:var(--card);border:1px solid var(--bd);border-radius:6px;min-height:80px;padding:8px;display:flex;flex-direction:column;gap:3px;position:relative}
+.day.today{border-color:var(--cb);box-shadow:0 0 0 1px var(--cb)}
+.day-num{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:4px}
+.day.dim{opacity:.4}
+.event{font-size:11px;line-height:1.4;padding:3px 6px;border-radius:3px;display:flex;align-items:center;gap:3px}
+.event .ck{font-size:10px;color:#0d6e2a;background:#a5d6a7;padding:0 3px;border-radius:2px;font-weight:700}
+.event.imp{background:rgba(198,40,40,.15);color:#ff8a80;border-left:3px solid var(--important)}
+.event.cb{background:rgba(21,101,192,.15);color:#64b5f6;border-left:3px solid var(--cb)}
+.event.data{background:rgba(245,127,23,.15);color:#ffb74d;border-left:3px solid var(--data)}
+.event.data2{background:rgba(67,160,71,.15);color:#81c784;border-left:3px solid var(--data2)}
+.event.fomc{background:rgba(156,39,176,.15);color:#ce93d8;border-left:3px solid var(--fomc)}
+.event.us{background:rgba(66,165,245,.15);color:#90caf9;border-left:3px solid var(--us)}
+.event.hk{background:rgba(239,83,80,.15);color:#ef9a9a;border-left:3px solid var(--hk)}
+.event.tw{background:rgba(255,152,0,.15);color:#ffcc80;border-left:3px solid var(--tw)}
+.event.a50{background:rgba(233,30,99,.15);color:#f48fb1;border-left:3px solid var(--a50)}
+.event.ipo{background:rgba(103,52,183,.15);color:#b39ddb;border-left:3px solid var(--ipo)}
+.event.option{background:rgba(0,131,143,.15);color:#4dd0e1;border-left:3px solid var(--option)}
+.event.future{background:rgba(29,111,66,.15);color:#81c784;border-left:3px solid var(--future)}
+.event.appl{background:rgba(55,71,79,.15);color:#90a4ae;border-left:3px solid var(--appl)}
+.event.sg{background:rgba(142,36,170,.15);color:#ce93d8;border-left:3px solid var(--sg)}
+.event.kr{background:rgba(0,172,193,.15);color:#80deea;border-left:3px solid var(--kr)}
+.event.us_earnings{background:rgba(102,187,106,.15);color:#81c784;border-left:3px solid var(--us-earnings)}
+.event.eu{background:rgba(38,166,154,.15);color:#80cbc4;border-left:3px solid var(--eu)}
+.event.jp{background:rgba(171,71,188,.15);color:#ce93d8;border-left:3px solid var(--jp)}
+.event.caixin{background:rgba(92,107,192,.15);color:#9fa8da;border-left:3px solid var(--caixin)}
+.legend{margin-top:32px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:20px}
+.legend-title{font-size:16px;font-weight:800;color:var(--txt);margin-bottom:14px}
+.legend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.legend-item{background:var(--card);border-left:4px solid;border-radius:4px;padding:10px 12px;font-size:12px}
+.legend-item .lt{font-weight:700;color:var(--txt);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.legend-item .ld{color:var(--sub);line-height:1.6;font-size:11px}
+.legend-item .swatch{width:14px;height:14px;border-radius:3px;flex-shrink:0}
+.empty{padding:8px 0;color:var(--dim);font-size:11px}
+</style>
+</head>
+<body>
+<div class="back">📅 <a href="index.html">返回九宝量化 V8.0</a></div>
+<h1>📅 重要日历</h1>
+<div class="meta">重要日历 · 动态自动更新（cloud_fetch 每日生成）· 全18类事件覆盖<br>仅供参考，不构成投资建议 | 更新日期：<span id="v8caltime"></span></div>
+
+<!-- 重要日历由 V8_CAL 数据注入 -->
+<div id="v8calcontent"></div>
+
+<div class="legend">
+<div class="legend-title">🎨 色块标注说明</div>
+<div class="legend-grid" id="v8callegend"></div>
+</div>
+
+<!-- 占位：window.V8_CAL 由下方 data/V8_CAL.js 注入，避免内联硬编码数据与自动化不同步 -->
+<!-- 重要日历由 data/V8_CAL.js 自动注入（cloud_fetch_v8.py 的 f_v8_cal 每日生成，自动切月） -->
+<script src="data/V8_CAL.js"></script>
+<script>
+// 2026-08-09 修复：V8_CAL.js 里的 today 是数据生成时刻写死的，calendar.html 单独页面也按实际北京时间重新计算。
+function _v8CalTodayKeys(cal){
+  var keys = {};
+  var baseMatch = String((cal||{}).month||'').match(/(\d{4})年(\d{1,2})月/);
+  var baseY = baseMatch ? +baseMatch[1] : (new Date().getFullYear());
+  var baseM = baseMatch ? +baseMatch[2] : ((new Date().getMonth())+1);
+  var now = new Date();
+  var tY, tM, tD;
+  try{
+    var fmt = new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+    var p = {}; (fmt.formatToParts(now)||[]).forEach(function(part){ if(part && part.type) p[part.type]=part.value; });
+    tY = +p.year; tM = +p.month; tD = +p.day;
+  }catch(e){ tY = now.getFullYear(); tM = now.getMonth()+1; tD = now.getDate(); }
+  (cal.weeks||[]).forEach(function(w){
+    var range = String(w.dates||'').split('-');
+    if(range.length !== 2) return;
+    var parseMD = function(s){
+      var m = String(s).trim().match(/(\d{1,2})\/(\d{1,2})/);
+      return m ? {m:+m[1], d:+m[2]} : null;
+    };
+    var start = parseMD(range[0]);
+    if(!start) return;
+    var y = baseY;
+    if(start.m !== baseM){
+      if(start.m === 12 && baseM === 1) y = baseY - 1;
+      else if(start.m === 1 && baseM === 12) y = baseY + 1;
+    }
+    var cur = new Date(Date.UTC(y, start.m-1, start.d));
+    (w.days||[]).forEach(function(d){
+      if(!d) return;
+      if(tY === cur.getUTCFullYear() && tM === (cur.getUTCMonth()+1) && tD === cur.getUTCDate()){
+        keys[String(w.no)+'-'+String(d.num)] = true;
+      }
+      cur.setUTCDate(cur.getUTCDate()+1);
+    });
+  });
+  return keys;
+}
+
+// 渲染日历
+(function(){
+  var D = window.V8_CAL || {weeks:[],legend:[]};
+  var days = ['周一','周二','周三','周四','周五','周六','周日'];
+  function fmtEvents(events){
+    if(!events || !events.length) return '';
+    return events.map(function(e){
+      var cls = e.cls || 'data';
+      var mark = e.released ? '<span class="ck">✅已发</span>' : '';
+      return '<div class="event '+cls+'">'+mark+e.text+'</div>';
+    }).join('');
+  }
+  var todayKeys = _v8CalTodayKeys(D);
+  var c = document.getElementById('v8calcontent');
+  if(c){
+    var html = '';
+    D.weeks.forEach(function(w){
+      html += '<div class="week-label">第'+w.no+'周 ' + w.dates + '</div>';
+      html += '<div class="cal">';
+      html += days.map(function(d){return '<div class="head">'+d+'</div>';}).join('');
+      w.days.forEach(function(d,i){
+        var cl = d.dim ? 'day dim' : 'day';
+        if(todayKeys[String(w.no)+'-'+String(d.num)]) cl += ' today';
+        html += '<div class="'+cl+'">';
+        html += '<div class="day-num">'+d.num+'</div>';
+        html += fmtEvents(d.events);
+        html += '</div>';
+      });
+      html += '</div>';
+    });
+    c.innerHTML = html || '<div class="empty">暂无日历数据</div>';
+  }
+  var lg = document.getElementById('v8callegend');
+  if(lg && D.legend && D.legend.length){
+    lg.innerHTML = D.legend.map(function(l){
+      return '<div class="legend-item" style="border-left-color:'+l.color+'">'
+        + '<div class="lt"><span class="swatch" style="background:'+l.color+'"></span>'+l.title+'</div>'
+        + '<div class="ld">'+l.desc+'</div></div>';
+    }).join('');
+  }
+  var tm = document.getElementById('v8caltime');
+  if(tm && D.update_time) tm.textContent = D.update_time;
+})();
+</script>
+</body>
+</html>

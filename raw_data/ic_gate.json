@@ -1,0 +1,45 @@
+{
+  "policy": "ic_gate_v1_conservative",
+  "update_time": "2026-08-29 12:41:40",
+  "thresholds": {
+    "min_T1_win": 45.0,
+    "min_T3_win": 35.0,
+    "min_T5_win": 30.0,
+    "min_fixed_T1_win": 47.0,
+    "min_fixed_T3_win": 32.0,
+    "min_n_signals": 80
+  },
+  "overall_action": "warn",
+  "factors": {
+    "ge3": {
+      "name": "ge3",
+      "n_signals": 371,
+      "T1_win": 49.1,
+      "T3_win": 32.3,
+      "T5_win": 38.3,
+      "fixed_T1_win": 49.7,
+      "fixed_T3_win": 25.9,
+      "fixed_T5_win": 33.9,
+      "gate": "warn",
+      "reasons": [
+        "T3胜率32.3<35.0"
+      ],
+      "ic_weight": 0.5,
+      "update_time": "2026-08-28 22:46:23"
+    },
+    "top5_累计": {
+      "name": "top5_累计",
+      "T1_win": null,
+      "T3_win": null,
+      "T5_win": null,
+      "n_signals": null,
+      "update_time": "2026-08-29 09:16"
+    },
+    "h_auto_buy_累计": null
+  },
+  "todo": [
+    "下游接入 generate_top10.py：score_backtest 改读 ic_gate.json 的 ic_weight 做微调",
+    "下游接入 gen_triple_consensus / calc_crds：select 前读 overall_action 做准出门禁",
+    "src 仅产出 JSON，**不改选股逻辑**——MVP"
+  ]
+}

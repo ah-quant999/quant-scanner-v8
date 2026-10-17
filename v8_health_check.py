@@ -1,0 +1,3756 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+v8 前端健康巡检（三期一期 + 二期核心）
+- 检查 data/*.js 数据新鲜度与关键字段空值
+- 检查 GitHub Pages 部署 commit 与本地/remote HEAD 同步
+- 检查 self-hosted runner 在线状态
+- 输出 data/HEALTH_CHECK.js 供前端渲染
+- 异常时发邮件告警（三期）
+
+运行方式：
+  python v8_health_check.py                # 本地检查，生成 HEALTH_CHECK.js
+  python v8_health_check.py --alert        # 有异常时发送邮件
+  python v8_health_check.py --site         # 额外拉取线上页面做简单 DOM 空值检测
+"""
+import argparse
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+import urllib.request
+import urllib.error
+from datetime import datetime, timezone, timedelta, date
+from pathlib import Path
+
+# 夜间静音时段（北京时间）：22:00-07:00 不发邮件，避免打扰休息。
+# 严重基础设施问题仍会通过 write_urgent 留痕，但不在夜间发邮件。
+QUIET_HOURS_START = 22
+QUIET_HOURS_END = 7
+
+
+def in_quiet_hours(now_cst=None):
+    """判断当前是否处于夜间静音时段。"""
+    n = now_cst or datetime.now(timezone(timedelta(hours=8)))
+    h = n.hour
+    if QUIET_HOURS_START <= QUIET_HOURS_END:
+        return QUIET_HOURS_START <= h < QUIET_HOURS_END
+    # 跨午夜：22:00-23:59 或 00:00-06:59
+    return h >= QUIET_HOURS_START or h < QUIET_HOURS_END
+
+
+# 如需要邮件告警，导入发送器（该模块从 .workbuddy/v8_smtp_config.json 读配置）
+try:
+    from v8_send_alert import send_alert
+except Exception:
+    send_alert = None
+
+REPO = "ah-quant999/quant-scanner-v8"
+SITE_URL = "https://ah-quant999.github.io/quant-scanner-v8/"
+DATA_DIR = Path("data")
+RAW_DIR = Path("raw_data")
+
+# 关键卡片定义：与 index.html「任务运行看板」名称/顺序/覆盖对齐
+# expected：频率说明；max_age：按时段动态计算，这里先给默认阈值（分钟）
+CARD_DEFS = [
+    # 今日事件（盘前）
+    # 🛡 2026-09-04 主人令一劳永逸：事件类卡整夜红灯根治。
+    #   V8_CAL 每周日+月末更新 → 7天红线（weekly 特判，不走 adjust/cap 的 24h 收紧）；
+    #   IPO/JUDGMENT/MACRO 每日仅 08:25 premarket 批更新一次 → max_age 1440（24h 铁律），
+    #   未到下一批次不红灯（原 360min 导致昨日午间数据在今日盘前批前被判 fail 满屏红）。
+    {"id": "V8_CAL", "name": "重要事件日历", "page": "今日事件", "freq": "每周日+月末", "max_age": 10080, "key_fields": ["weeks", "month"], "weekly": True},
+    {"id": "IPO_DATA", "name": "打新研判", "page": "今日事件", "freq": "每日盘前", "max_age": 1440, "key_fields": ["stocks"], "weekend_update": False},
+    {"id": "JUDGMENT_DATA", "name": "今日判定", "page": "今日事件", "freq": "每日盘前", "max_age": 1440, "key_fields": ["verdict", "indices"], "weekend_update": False},
+    {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "freq": "每日盘前", "max_age": 1440, "key_fields": ["global_macro", "monetary"], "weekend_update": False, "manual_dep": True, "manual_note": "人工撰写宏观解读（管线仅补cpi/pmi，rich结构需主人更新）"},
+    # NT_DATA(nt_data.json) 由 algorithms/fetch_orphan_nt_data.py 产出，归 run_algorithms.py(算法链)，
+    # 不在 cloud_fetch_v8.py 的 premarket 注册表内 —— 按 page 映射派发 cn_fetch premarket 永远刷不到它，
+    # 故显式覆盖自愈类别为 algo_run（2026-08-11 第155轮看门狗定位并根治）。
+    # 🛡 2026-09-08 一劳永逸：NT_DATA 由盘后算法链(fetch_orphan_nt_data.py)产出，原挂"今日事件"页
+    #   在 08:00-10:00 盘前被 adjust_max_age 收紧到 180min 误杀（盘后产物不可能 <180min 新鲜）→ 改挂"全量数据"页豁免。
+    {"id": "NT_DATA", "name": "市场提示", "page": "全量数据", "freq": "每日盘后(算法链)", "max_age": 720, "key_fields": ["alerts"], "weekend_update": False, "heal_cat": "algo_run"},
+    # 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役 ⇒ MACRO_KSHAPE 巡检登记项随卡删除
+    #   （原 09-16/09-18 事件驱动登记条目见 git 历史）。判废依据：生产者「沧海一土狗文章巡检自动化
+    #   （每日 21:00）」已不存在（本机 automations 无此任务 / workflow 无 / 全仓无生成脚本）
+    #   ⇒ data/MACRO_KSHAPE.js 停在 2026-09-23 21:15 永为死数据。产物与前端同批退役，
+    #   见下方 _RETIRED_FILES 护栏 + api_push_raw.py::_RETIRED_ARTIFACTS。
+    # 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡整卡下线
+    #   ⇒ BAIHECHOU_ANALYSIS 巡检登记项随卡删除（原 09-18 补监控盲区、09-21 补 producer
+    #   的完整条目见 git 历史）；产物与生产者脚本同批退役，见下方 _RETIRED_FILES 护栏。
+    #   ⚠️ window.CRISIS_DATA 数据源**保留**（每日洞察 / 情绪周期仍消费），不在退役范围。
+
+    # 实时数据
+    {"id": "INDEX_QUOTES", "name": "全球指数 / 股指期货", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["items"]},
+    {"id": "ETF_PULSE", "name": "ETF 盘中异动", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["etfs"]},
+    {"id": "ETF_INTRADAY_HEAT", "name": "ETF 资金热度", "page": "实时数据", "freq": "盘中实时 T+0", "max_age": 60, "key_fields": ["items"]},
+    # 🛡 2026-09-11 主人令（轻量化·卡迁移·健康检查一并对齐）：「ETF 日监控」（日监控·主力净流入）
+    #   卡已自「实时数据」页迁至「盘后数据」页（市场宽度卡上方）→ 本登记同步迁入下方「盘后数据」段
+    #   （page="盘后数据" + dual_page="实时数据"，阈值按窗口双轨计算，避免「迁页即误报」）。
+    #   原条目（已迁走，勿在本段复建，否则又成重复登记）：
+    #     {"id": "ETF_DAILY_MONITOR", "name": "ETF 日监控", "page": "实时数据", "freq": "盘中每30分",
+    #      "max_age": 60, "key_fields": ["top_inflow", "top_outflow"], "premarket_keep": True}
+    {"id": "SECTOR_FUND_FLOW", "name": "板块资金流向", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["top_list"]},
+    {"id": "CONCEPT_RANKING", "name": "概念排名", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["items"]},
+    # 🛡 2026-09-02 一劳永逸：LIMIT_UP_HEATMAP.js 实际字段为 update_time/dates/sectors/republish_time，
+    #   不存在 "top" 字段；原 key_fields 含 "top" 导致健康检查每天误报"关键字段空值：top"黄灯。
+    {"id": "LIMIT_UP_HEATMAP", "name": "涨停热度", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["dates", "sectors"]},
+    # 🛡 2026-09-11 小九的股票专家 一劳永逸：本 id 原在 CARD_DEFS 里**重复登记两条**
+    #   （本行「实时数据/盘中每30分/max_age=60」+ 第 108 行「盘后数据/收盘后1次/max_age=360」），
+    #   而消费处 `for d in CARD_DEFS` 无去重 → ① 同一卡被计两次（虚增总项数）；
+    #   ② 两条口径互相矛盾，实时数据那条盘中恒判 stale。
+    #   现合并为单条，按数据本体（日频时间轴 daily + 盘中实时字段 market_net）取
+    #   「实时数据 / 盘中每30分 + 收盘后定稿」，heal_cat=intraday（自愈应派发盘中抓取）。
+    # 🛡️ 2026-10-17 审计修复：曲线真实数据源为 SECTOR_FUND_FLOW_INTRADAY（原错配 MARKET_FUND_FLOW_DATA，后者实为已下架·资金流时间轴）
+    {"id": "SECTOR_FUND_FLOW_INTRADAY", "name": "主力净额分时累计曲线", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["date", "snapshots"], "heal_cat": "intraday"},
+    {"id": "MARKET_FUND_FLOW_DATA", "name": "市场资金流向(已下架)", "page": "已下架", "freq": "盘中每30分（收盘后追加当日定稿）", "max_age": 60, "key_fields": ["daily"], "heal_cat": "intraday"},
+    # 🛡 2026-09-22 一劳永逸（小九）：补 heal_cat / producer / raw_file 三字段。
+    #   背景（run 35683849934 云端日志实证）：本卡 09-22 全天停更，根因是云端
+    #   f_market_alerts() 的 subprocess timeout=90s 被孤儿模块内 akshare 全市场抓取
+    #   （本机 79.8s / 云端跨境 >90s）打爆 ⇒ raw 不写 ⇒ data 不重建 ⇒ 卡冻结。
+    #   自愈侧此前**无显式 heal_cat**，靠 page→cat 隐式推导（日志实测能推出 intraday，
+    #   但属「隐式约定」，与 MARKET_FUND_FLOW_DATA 等同页卡的显式登记不一致）。
+    #   现按「一处 id 三处同口径」铁律显式登记，并补 producer 供卡名→脚本反查
+    #   （主人令 2026-09-18「别后续找不到更新任务对应不上」）。
+    #   ⚠️ 孤儿模块同时被 run_algorithms.py（盘后算法链）调用，故 raw_file 交叉校验有效。
+    {"id": "MARKET_ALERTS", "name": "市场预警", "page": "实时数据", "freq": "盘中实时（每30分）", "max_age": 60, "key_fields": ["indices"],
+     "heal_cat": "intraday", "raw_file": "market_alerts.json",
+     "producer": "algorithms/fetch_orphan_market_alerts.py"},
+    # 🛡 2026-09-23 一劳永逸（小九 · HANDOFF item stockquote-noon-gap-relay-cancel fix(b)）：
+    #   补 STOCK_QUOTE 卡级盘中判据。背景（09-22 实测）：个股行情盘中停更 1h53m（11:15→13:51），
+    #   HEALTH_CHECK 122 项里**无 STOCK_QUOTE 卡级盘中项**，只有通用项 all_STOCK_QUOTE
+    #   （freq:"—"、通用 24h 红线、heal_cat 一律 "algo_run" 错配）⇒ 53 分钟冻结**结构性不会报红**。
+    #   · page="实时数据" + max_age=40 —— 该链设计节律 30min/轮，40min=1.3 轮即报，早于 45min 族。
+    #   · premarket_keep=True —— 09:00-09:30 开盘前沿用上一交易日收盘档不误报（与 ETF_DAILY_MONITOR 同型）。
+    #   · heal_cat="intraday" —— 自愈经 cn_fetch 盘中链 relay② 「主链优先」门控派发专用主链
+    #     v8_stock_quote_refresh（[self-hosted,cn]·双源），主链排队超时才由 relay 改派 _cloud 兜底；
+    #     自愈不再派错 algo_run（算法链根本没有本产物环节）。
+    #   · raw_file 交叉校验有效：raw_data/stock_quote.json 与 data/STOCK_QUOTE.js 同由专用链产出。
+    #   登记后 all_ 动态扫描自动跳过本 id（原错配通用项随之消失），一处 id 三处同口径。
+    {"id": "STOCK_QUOTE", "name": "个股行情", "page": "实时数据", "freq": "盘中每30分", "max_age": 40, "key_fields": ["update_time"], "premarket_keep": True, "heal_cat": "intraday", "raw_file": "stock_quote.json", "producer": "algorithms/fetch_stock_quote_v8.py"},
+    # 盘后数据
+    # ── 自愈类别说明（2026-08-11 第158轮全表核对）──────────────────────────────
+    # cloud_fetch_v8.py 的 CATEGORY_MAP 中 post_close 只注册了 MARKET_FUND_FLOW_DATA / EXPERIMENT 两项。
+    # 下列卡片的 raw_data 实际由 algorithms/run_algorithms.py 链内脚本产出（fetch_sh_index_fib /
+    # build_candidate_pool / fetch_lhb / fetch_inst_trade / gen_triple_consensus / gen_cockpit_advice /
+    # generate_top10 / calc_crds / strategy_four_volume_60m 等），
+    # 若沿用 PAGE_TO_CAT["盘后数据"|"选股策略"]="post_close" 派发 cn_fetch，**永远刷不到它们**，
+    # 且会白占 25 分钟 debounce 锁导致真正需要的派发被跳过（与 155 轮 NT_DATA 同一类缺陷）。
+    # 故统一显式覆盖 heal_cat="algo_run"。
+    # 🛡 2026-09-17 主人令·全站口径统一（看板名/页对齐前端真实卡）：原两项失配——
+    #   ① name「市场温度计」指向 2026-08-29 已删除的卡（数据源 SH_FIB 现由「🧪 斐波那契观测窗」
+    #      与艾略特波浪卡消费）⇒ 看板显示一个页面上不存在的卡名。
+    #   ② page「盘后数据」失配：该卡 2026-09-15 主人令整卡迁「🌍 观测平台 > 📊 大盘观测」。
+    #   前端 _PAGE_ORDER 首项即「观测平台」（= 导航 TAB 真实顺序）⇒ 改 page 即自动归位，
+    #   无需动 index.html（热文件）。heal_cat 已显式=algo_run，page 改动不影响自愈派发口径。
+    {"id": "SH_FIB", "name": "斐波那契观测窗", "page": "观测平台", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "heal_cat": "algo_run", "raw_file": "sh_fib.json", "producer": "algorithms/fetch_sh_index_fib.py"},  # 🛡 2026-09-18 主人令「别后续找不到更新任务对应不上」：新增 producer 字段，看板卡名 → 产出脚本 直接可反查  # 🛡 2026-09-10 一劳永逸：raw_file 用于「raw已新/js待D批重建」窗口交叉校验，根治误报 fail
+    # 🛡 2026-09-02 一劳永逸（主人令「运维还有错」）：SIX_DIM_RADAR 是 derived 项
+    #   （前端 renderSixDim 直接读 SH_FIB 派生六维评分视图,无独立 SIX_DIM_RADAR.js 文件）。
+    #   原 CARD_DEFS 登记让它绑死 SH_FIB 检查 → SH_FIB 老化超时同步误报 red。
+    #   移除该项登记;下面"全量数据审计"循环的 derived = {..., "SIX_DIM_RADAR"}
+    #   已保护它不报"缺失或解析失败"。前端 renderSixDim 直接读 SH_FIB,无副作用。
+    # 🛡 2026-09-30 主人令（盘后页映射对齐·两卡跟随大盘观测卡走）：
+    #   MARGIN_DATA 的唯一 UI =「🔒 已下架」页 renderDelisted 内「两融余额走势」（v8MarginChart），2026-10-04 主人令由观测平台迁回已下架；page 恢复「盘后数据」（数据节拍仍每日16:15发布，24h阈值不变），
+    #   原登记 page="盘后数据" 与实际页失配。改 page 即看板自动归位；
+    #   阈值口径不变：post_close 节拍由下方 adjust_max_age / _hard_cap 的盘后元组显式覆盖
+    #   （"盘后数据" 本就在该元组），max_age=1440 与 heal_cat 均不动 → 有效阈值与迁移前逐字节同值。
+    {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["sh"], "heal_cat": "post_close"},  # 2026-08-18 主人令一劳永逸：交易所每日16:15发布1次，360min 阈值导致 22:15 必误报 → 1440（24h，符合主人 24h 铁律）
+    # 🛡 2026-09-11 主人令（轻量化·卡迁移）：原「实时数据」段条目迁来——「日监控·主力净流入」
+    #   已自 ETF 二合一（原三合一）Block3 拆出，独立成卡挂在「盘后数据」页、市场宽度卡上方。
+    #   · page="盘后数据"     —— 与 index.html / logic.html「任务运行看板」的分组一致（不再置实时数据组）
+    #   · dual_page="实时数据" —— 数据本体仍由盘中 30 分链刷新（T+0 字段），阈值按窗口双轨计算
+    #     （见 _dual_threshold / _dual_hard_cap：盘中取较严、15:30-18:00 取较宽、18:00 后回归盘后口径），
+    #     既有 45~60min 敏感性不丢，也不会在「15:30 末班车 → 17:20 盘后首轮」之间天天假红灯。
+    #   · heal_cat="intraday" —— 主刷新通道是盘中 30 分链；盘后档同样已登记（CATEGORY_MAP
+    #     "intraday,post_close"），但自愈优先派发更轻的 intraday，避免抢占盘后 25min debounce 锁。
+    # 🛡 2026-10-16 一劳永逸（小九 · HANDOFF::all-generic-redline-false-positive 本族第 5 例）：
+    #   ETF_DAILY_MONITOR 是「日监控」—— 真值在**15:05 收盘定稿**（T+1 主力净流入自该刻冻结，
+    #   源码 _etf_daily_monitor_reuse 注释明写「f62 自最近交易日 15:05 收盘起冻结」）。
+    #   盘中 30 分仅是 best-effort：生产侧 `f_etf_daily_monitor` 依赖全市场 17 页拼装
+    #   （东财单页成功率 ~88%，交易日靠几十轮跨轮累积才拼齐），且盘中(09:30–15:05)明文
+    #   **禁复用上一版**；于是「某天盘中拼不齐 + 当晚盘后档也没拼齐 ⇒ 整日不写盘」
+    #   是**设计内行为**（源码注释「保留远端旧数据」）。实测 2026-10-16 盘中数据停在
+    #   2026-10-15 14:08（昨盘中值），年龄 ~1197min。原健康侧却按 dual_page="实时数据"
+    #   套「盘中严格 45 分钟」⇒ 这种天**每天必红**（假红）。
+    #   修法：锚定其真实节拍 `cycle=(15,5)`（收盘定稿冻结点）—— 挂到第 1875 行已有的
+    #   「逐卡真实节拍」放宽机制：白天合法持有上一交易日收盘值（距上一 15:05 + 180min 天花板），
+    #   仅当**数据早到 T-2（连续两日全失败）**时才判 fail（年龄 2579 > 1320）⇒ 真·连续停摆
+    #   不被掩盖、单日拼不齐的假红被根除。双档/2h 铁律在其它时段一字未变。
+    {"id": "ETF_DAILY_MONITOR", "name": "ETF 日监控", "page": "盘后数据", "dual_page": "实时数据", "freq": "盘中每30分 + 收盘后定稿", "max_age": 60, "key_fields": ["top_inflow", "top_outflow"], "premarket_keep": True, "heal_cat": "intraday", "cycle": (15, 5)},
+    # 🛡 2026-09-04 主人令一劳永逸：孤儿文件转正——此前无生成调度（all_ 动态扫描按通用 1440 红线误报 fail）。
+    #   FACTOR_LAB 由 v8/factor_lab_gen.py 挂 STAGES[B] 产出；FOUR_VOLUME_BACKTEST 自 2026-10-11 起
+    #   由 gen_four_volume_track.py（STAGES[B]）产出真实信号流视图（回测批回放模式已摘链）。登记后走运维卡区正式判定，all_ 扫描跳过。
+    # 🛡 2026-09-30 主人令（盘后页映射对齐）：FACTOR_LAB 唯一 UI =「🏆 最终推荐」页 🧪因子实验室 tab
+    #   （因子定位卡/每日因子计算/当日计分榜，2026-09-20 主人令已从策略回测页整体移除回测卡）。
+    #   page 迁"最终推荐"，阈值走盘后元组（该页已显式加入），有效阈值仍 = def_max(1440)，逐字节同值。
+    {"id": "FACTOR_LAB", "name": "因子实验室", "page": "最终推荐", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "net_dep": True, "net_dep_note": "本机baostock被风控黑名单(err=10001011匿名用户)，无替代数据源，需小九中国IP+浏览器UA在线刷全市场3200只财务+ROE+异常换手。本机无法产出，保留旧数据待小九。"},
+    # 🛡 2026-09-30 主人令（盘后页映射对齐）：FOUR_VOLUME_BACKTEST 唯一 UI = 选股策略页四量终极子页
+    #   回测表（fvBackBody）。page 迁"选股策略"（与该页既有项同一阈值分支，逐字节同值）。
+    {"id": "FOUR_VOLUME_BACKTEST", "name": "四量终极回测", "page": "选股策略", "freq": "每日盘后(真实信号流视图随B批track刷新)", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🛡 2026-09-07 22:2x：原 key_fields=["periods"] 但 periods 在 summary.by_period 嵌套、回测未跑时顶层缺失 → 永久 warn。改为 summary（永远非空 dict，by_period/calc_time 都在内）。2026-10-11 内容源切真实信号流（同变量名，结构同构）。
+    {"id": "LQSQ_BACKTEST", "name": "量质双擎回测", "page": "选股策略", "freq": "每日回测批(B批 factor_lab 紧后)", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🚀 2026-10-11 主人令：第一支自研算法（gen_lqsq_top30.py），真实信号流口径上主榜，与四量同榜同纪律。
+    # 🛡 2026-10-16 阿狸咪的工程师（一劳永逸根因修复）：补登记 LQSQ_TRACK。
+    #   根因（实测）：该卡 10-12 接入起未入 CARD_DEFS ⇒ 落入 all_* 全量数据宽松桶——
+    #   10-15 发布链断裂（update_v8 零映射）致 js 冻结 27h，HEALTH_CHECK 里 age_min=1101
+    #   仍判 ok（宽松桶不报）。与本行上方 LQSQ_BACKTEST 同族不同命，现与 FOUR_VOLUME_TRACK
+    #   同构登记（选股类 picking：按 data_date 交易日判鲜 + 18:00 派发门控）。
+    {"id": "LQSQ_TRACK", "name": "量质双擎跟踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
+
+    # 🔴 2026-09-12 主人令（拍板第 2 项·一劳永逸）：BACKTEST_ALL_ALGOS 正式登记。
+    #   根因（实测）：algorithms/gen_backtest_all_algos.py 已挂 STAGES["E"]（ORDER 47/48），
+    #   源码明写产出 raw_data/backtest_all_algos.json + data/BACKTEST_ALL_ALGOS.js，
+    #   但 data/BACKTEST_ALL_ALGOS.js **远端不存在**、全链**零红灯** —— 三重静默：
+    #     ① 闸门 READY_SPEC["E"] 未列该产物、need=1 下也不参与判定 ⇒ 不触发重跑
+    #     ② 本表未登记 ⇒ 不进 check_data_cards、也不渲染告警卡
+    #     ③ api_push_raw.py::walk_extra() 有 isfile 守卫 ⇒ 静默跳过（有意的防崩设计，不动）
+    #   登记后：该产物缺失/陈旧/结构坏 → 正常亮红灯 → 主人可见。
+    #   ⚠️ 刻意**不进** _LOW_FREQ_FILES：它是每日回测批产物，本就该每日刷新；
+    #      进白名单会把 24h 红线降成 7 天容忍，正是 09-11 FOUR_VOLUME_60M 冻结 3 天
+    #      零告警的同型事故（该条目已被移出白名单，此处同理）。
+    #   ⚠️ key_fields 取 ["rows", "coverage"]：二者由 build() 无条件产出（顶层恒有）。
+    #      不取 update_time —— 它是 CARD_DEFS 的通用时戳字段，列进 key_fields 等于没校验；
+    #      本卡要抓的恰是「文件在不在 + 内容结构化没有」。
+    {"id": "BACKTEST_ALL_ALGOS", "name": "全算法回测汇总", "page": "策略回测", "freq": "每日回测批（E 批末位）", "max_age": 1440, "key_fields": ["rows", "coverage"], "heal_cat": "algo_run", "raw_file": "backtest_all_algos.json"},
+    # 🔴 2026-09-14 主人令更正：候选池 / 金股池(=黄金池) 是算法**上游水源**，不是策略
+    #   ⇒ **不需要回测**。原 CANDIDATE_BACKTEST / GOLD_POOL_BACKTEST 两条登记已删除
+    #   （连同 algorithms/backtest_pools.py 与两条产物）。池子本身产出的新鲜度，仍由下面
+    #   「候选池 / 金股池」（page=盘后数据，heal_cat=algo_run）两条负责 —— 那才是它们该被考核的。
+    {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "实时数据", "freq": "盘中每30分（日行情取最近交易日）", "max_age": 120, "key_fields": ["items"], "heal_cat": "intraday"},  # 2026-08-31 修复：cloud_fetch_v8.py 的 tasks 列表含 CFFEX_HOLDINGS，盘中每 30 分执行并刷新 update_time，但数据为日行情取最近交易日；HC 分类应与调度一致，避免盘后/盘中口径冲突
+    # 🛡 2026-09-30 主人令（盘后页映射对齐）：危机雷达卡壳已删（只删卡壳不删源），现役 UI =
+    #   共振日历页综合信号灯（sec-rc 读 CRISIS_DATA）+ CRDS 有效性判据 + 每日洞察。
+    #   page 迁"共振日历"（该页已加入盘后阈值元组，有效阈值仍 = def_max(360)，逐字节同值）。
+    {"id": "CRISIS_DATA", "name": "危机雷达", "page": "共振日历", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"], "heal_cat": "premarket"},  # 危机雷达每日 08:25 跑一次
+    # 🛡 2026-09-11 小九的股票专家：此处原有 MARKET_FUND_FLOW_DATA 的**重复登记**
+    #   （「盘后资金流向 / 盘后数据 / max_age=360 / heal_cat=premarket」），与上面
+    #   「实时数据」那条 id 完全同名 → 消费处无去重 → 同卡被计两次且口径打架。
+    #   已合并为唯一一条（见"实时数据"段），此处删除。
+    #   原注：资金流日频时间轴——08:25 必跑一次（防漏跑）｜语义已并入合并后的 freq/口径。
+    # 🛡 2026-09-30 主人令（盘后页映射对齐·五项归位）：候选池/黄金池/三重共识/龙虎榜/机构买卖的
+    #   现役 UI 分别在 选股策略子页（选股池/三重共识）、共振日历页（龙虎榜 8 卡）、运维子页
+    #   （renderOps 的 DATA.inst_trade 供 AI速览/洞察消费）。原 page="盘后数据" 全部失配。
+    #   阈值逐字节同值：CANDIDATE/GOLD_POOL/TRIPLE_CONSENSUS 与"选股策略"既有项同一分支；
+    #   LHB_DATA/CRISIS_DATA 所在"共振日历"已加入盘后阈值元组；INST_TRADE 迁"运维"后
+    #   有效阈值 = min(def_max=360, 运维 7 天帽) = 360 不变，heal_algo 降级白名单同步扩展。
+    {"id": "CANDIDATE", "name": "候选池", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
+    {"id": "GOLD_POOL", "name": "黄金池", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
+    {"id": "LHB_DATA", "name": "龙虎榜", "page": "共振日历", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
+    {"id": "INST_TRADE", "name": "机构买卖", "page": "运维", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top_buy", "top_sell"], "heal_cat": "algo_run", "raw_file": "inst_trade.json"},  # 🛡 2026-09-10 一劳永逸：raw_file 交叉校验，根治「raw已新/js待D批重建」误报 fail
+    # 🔴 2026-10-11 主人令「完全下架」：TRIPLE_CONSENSUS / CRDS_CARD_DATA / TRIPLE_HISTORY 三条
+    #   CARD_DEFS 登记项移除（两策略下架，生成器摘链、data 文件已删 ⇒ 留在注册表=每日审计恒红灯）。
+    # 2026-08-29 一劳永逸：MARKET_REGIME / SECTOR_RECOMMENDATION 由 market_regime.py / sector_recommendation.py
+    #   每日盘后产出，原属通用全量审计分支（被 parse_time T 格式误伤判黄灯）。正式纳入 CARD_DEFS：
+    #   · 健康检查按 24h 红线（交易所/宏观日频数据，1440min）
+    #   · 看板与运维面板正确归类到"盘后数据"
+    #   · 与 MARGIN_DATA / CFFEX_HOLDINGS 同口径
+    # 🛡 2026-09-30 主人令（盘后页映射对齐）：MARKET_REGIME 唯一 UI =「暂未上架·调试专区」
+    #   ulMacroPanel（🌍宏观环境卡）。page 迁"暂未上架"（该页已加入盘后阈值元组，
+    #   有效阈值仍 = def_max(1440)，逐字节同值）。
+    {"id": "MARKET_REGIME", "name": "市场利率环境", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current_rates", "trends", "meta"], "heal_cat": "algo_run"},
+    {"id": "SECTOR_RECOMMENDATION", "name": "板块推荐", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["regime", "current_rates", "trends", "meta"], "heal_cat": "algo_run"},
+    # 选股策略
+    {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
+    # 🔴 2026-09-11 主人令（选项A·软告警→硬告警）：FOUR_VOLUME_60M 由「低频白名单（仅 >7 天才告警）」
+    #   升为**正式登记卡**，按 24h 红线判定。
+    #   原白名单理由（2026-08-27）是「baostock 60min 源本身滞后 → 常陈旧 → 误报红灯」，该前提自
+    #   2026-09-03 起已不成立：脚本改为「无论命中多少只（含 0 只）都写新鲜时间戳」，
+    #   故**文件陈旧 ⇔ 脚本没跑成 / 产物写错地方**，属真故障，必须亮红灯。
+    #   2026-09-11 实证：正因这层白名单，该卡产物被写进仓库之外、冻结 3 天（09-08→09-11）零告警。
+    {"id": "FOUR_VOLUME_60M", "name": "四量终极60m", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
+    # 🛡 2026-09-11 一劳永逸：4 个孤儿 algo_run 产物此前未注册 CARD_DEFS → 被 all_ 通用扫描按 1440min 红线误判 fail
+    {"id": "ALGO_TRACK", "name": "算法追踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
+    # 🗑 STRONG_BREAKOUT_BACKTEST 健康检查项已随 2026-09-19 主人令删除强势突破而移除。
+    # ⚠️ 2026-09-21 小九 · 纠正本行「已移除」表述的**虚报部分**：该产物当时并未被删（只摘了登记），
+    #   次日 8bc8275fdc 把整批强势突破产物回推复活 ⇒ 落入 check_all_data_files 全扫按 24h 红线判 fail。
+    #   已补做：① 删产物；② 登记进 _LOW_FREQ_FILES / _RETIRED_FILES；③ api_push_raw.py 加 _RETIRED_ARTIFACTS。
+    # 🔴 2026-09-21 18:45 小九（本批）· 同族第三例：data/ALGO_BACKTEST_COMPARE.js
+    #   （09-20 判定全链退役，实测 index.html / logic.html 的 <script src> 引用 = 0/0，
+    #    但产物仍在远端 data/，且被同一次回推提交 8bc8275fdc 复活）⇒ 本批一并删除并登记同上两处护栏。
+    {"id": "IMA_STRONG_BACKTEST", "name": "高手强势股跟踪回测", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["periods"], "heal_cat": "algo_run"},
+    # 🆕 2026-10-13 主人令「最终推荐的前5名我也想有个回测…我要看到底靠不靠谱」：
+    #   最终推荐 Top3 信号层真实回测卡（data/FINAL_RECOMMEND_BACKTEST.js）。
+    #   与 FINAL_RECOMMEND_DATA 同批产出（final_recommend.py 末尾调用
+    #   gen_final_recommend_backtest.py，D 批盘后算法链内，秒级纯本地计算）。
+    #   故 picking=True（与 FOUR_VOLUME_HISTORY/TRACK 同理由）：① 新鲜度按「交易日」判定，
+    #   根治周末/节假日整日误标红；② 陈旧自愈守 18:00 盘后门控，不盘前派发假产物。
+    {"id": "FINAL_RECOMMEND_BACKTEST", "name": "最终推荐Top3回测", "page": "最终推荐", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["periods"], "heal_cat": "algo_run", "picking": True},
+
+
+
+
+
+
+
+
+
+    # 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」（历史追踪 + 跟踪/前向回测）。
+    #   与 FOUR_VOLUME / FOUR_VOLUME_60M 同页同批（B 批盘后算法链），故 picking=True：
+    #   ① 新鲜度按「交易日」判定（根治周末/节假日整日误标红）；
+    #   ② 陈旧自愈走「待治愈卡全为 picking 且 <18:00 则不派发」，守住 18:00 盘后门控；
+    #   ③ max_age 与 TRIPLE_HISTORY 同口径 1440（盘后产物，24h 红线）。
+    #   ⚠️ 若漏标 picking，_heal_loop 的 all() 判定失败 → 盘前会派发整条盘后链（假产物）。
+    {"id": "FOUR_VOLUME_HISTORY", "name": "四量历史", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
+    {"id": "FOUR_VOLUME_TRACK", "name": "四量跟踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
+    {"id": "VOLATILITY", "name": "波动率", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
+    # 运维/静态说明页（逻辑详解页「防删」子页）
+    {"id": "DO_NOT_DELETE", "name": "防误删清单", "page": "运维", "freq": "周日+手动", "max_age": 10080, "key_fields": ["update_time"], "_window_var": "DO_NOT_DELETE", "heal_cat": "algo_run"},
+    # 🗑 2026-10-08 主人令：「实验区·模块去向索引」卡整链退役 —— 前端卡+_renderV8StockLists 渲染函数+
+    #   UNLISTED_PANEL.js 注入+scripts/build_unlisted_panel.py 生成器同批删除，CARD_DEFS 登记随之移除
+    #   （同 DELISTED 2026-09-09 先例：删文件后不注销登记会报「缺失红灯」）。沿革：2026-08-30 注册、
+    #   2026-09-18 修 heal_cat 误配与灰灯文案（见 git 历史）。
+    # 🛡 2026-08-31 一劳永逸（主人「运维还有失败亮黄灯」令）：
+    #   position_vs_ma20 / position_vs_ma60 在 history 累积满 20 / 60 个交易日之前
+    #   【按设计】就是 None（数据层刻意不给假水位，见 cloud_fetch_v8.f_avg_price 注释），
+    #   把它们放进 key_fields 等于每天必报「关键字段空值」→ 运维页常年黄灯（伪告警）。
+    #   改为只校验真正必须存在的 avg_price / ma20 / ma60 / history_days；
+    #   累积进度由前端「历史 X/20 日」自述，不再当成健康异常。
+    #   page 同步改「实时数据」：CATEGORY_MAP 已复位 intraday（盘中每 30 分刷新 + KEEP 盘前不清空）。
+    {"id": "AVG_PRICE_DATA", "name": "平均股价（全A算术平均·880003口径）", "page": "实时数据", "freq": "盘中每30分", "max_age": 1440, "key_fields": ["avg_price", "ma20", "ma60", "history_days"], "heal_cat": "intraday"},  # 2026-08-31 修复：写入端在 cloud_fetch_v8.py（cn_fetch 盘中链），自愈应派发给 intraday 而非 algo_run；algo_run 只会在非交易时段空转且无法写入
+    # 🛡 2026-09-02 一劳永逸：HUNTER_BACKTEST.js（大牛股猎手历史回测）此前无 CARD_DEFS 登记，
+    #   被通用全量审计按「全量数据/24h 红线」误杀。实际为历史回测产物，依赖 lhb_history，
+    #   变化慢、baostock 取 K 线可能不稳定；改为显式登记，max_age=7 天，并纳入算法链日常调度。
+    #   已 push 到 main 但仍降级为 degraded=true（无 baostock 凭据前不要全量回测）。
+    #   STOCK_STOP_DATA 需 gtimg 日 K（urllib 走 HTTPS=HTTP 501 腾讯 waf 反爬虫拦截）→ 阿狸咪无浏览器 UA。
+    #   两者均显式登记 manual_dep + manual_note，让面板明确显示「本机限制」而非「陈旧」，
+    #   自愈链不去派发永远刷不出的任务，避免日复一日假派发噪声邮件。
+    {"id": "STOCK_STOP_DATA", "name": "精确止损止盈", "page": "选股策略", "freq": "盘后", "max_age": 1440, "key_fields": ["stocks"], "heal_cat": "algo_run", "net_dep": True, "net_dep_note": "需 gtimg 日K(腾讯 urllib HTTPS) 计算 fixedP10/rrK1.5 止损止盈。本机实测 gtimg HTTPS=HTTP 501（腾讯waf反爬虫JS challenge拦截 urllib 类爬虫），无浏览器UA绕不开。本机无替代源，需小九中国IP+浏览器UA在线跑原版。"},
+    # 🔴 2026-10-11 一劳永逸（阿狸咪的工程师）：H_AUTO_BUY / H_AUTO_BUY_TRACK 移出 CARD_DEFS
+    #   ——模块已下线（选股框架轻量化），data/*.js 已删（CDN 404/远端 MISSING）、index.html 零注入，
+    #   留在清单里 = 每晚审计固定报「找不到数据文件」假红（10-09/10/10-11 连 3 晚实证）；
+    #   且自愈面（guard ALGO_VARS 已同步移出）不再派发永远刷不出的 algo_run。
+    # ══ 2026-10-01 主人令「全面审计·按导航序每个前端都要有胶囊」批量补登（阿狸咪的工程师）══
+    #   此前以下 16 项有真实前端卡但未登记 CARD_DEFS ⇒ 健康胶囊只能落到「全量数据」组（all_* 通用审计），
+    #   本页组内无灯。补登后胶囊归位真实导航页组；max_age 一律宽松口径防误报红灯；producer 可考者才填（禁编造）。
+    {"id": "OVERSEAS_MARKETS", "name": "亚太市场概览", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["indices"], "heal_cat": "intraday", "raw_file": "overseas_markets.json"},
+    {"id": "AI_MARKET_BRIEF", "name": "AI 市场速览", "page": "实时数据", "freq": "盘中+每日3档(08:50/12:30/15:10)", "max_age": 720, "key_fields": ["sentiment"]},
+    {"id": "COMMODITY_ELASTICITY", "name": "商品涨价弹性榜", "page": "实时数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["hot_count"], "heal_cat": "post_close", "raw_file": "commodity_elasticity.json"},
+    {"id": "ETF_NET_SUBSCRIPTION", "name": "资金热度·净申赎", "page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["total_net_amount_yi"], "heal_cat": "premarket", "raw_file": "etf_net_subscription.json"},
+    {"id": "W52_HIGH", "name": "市场宽度·新高家数", "page": "盘后数据", "freq": "每交易日盘前(07:15~08:45)", "max_age": 1440, "key_fields": ["total", "top_gainers"], "heal_cat": "post_close", "raw_file": "w52_high.json", "cycle": (8, 45)},
+    {"id": "RESTRICTED_RELEASE", "name": "今日解禁", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "stats"], "heal_cat": "premarket", "raw_file": "restricted_release.json"},
+    {"id": "PERFORMANCE_FORECAST", "name": "今日业绩预告", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "summary"], "heal_cat": "premarket", "raw_file": "performance_forecast.json"},
+    {"id": "IMA_STRONG_STOCK", "name": "强势跟踪", "page": "选股策略", "freq": "工作日15:45", "max_age": 1440, "key_fields": ["data_date", "source"], "raw_file": "ima_strong_stock.json", "producer": "fetch_ima_strong_stock.py"},
+    {"id": "TOP10_DAILY", "name": "最终推荐·Top5因子评分", "page": "最终推荐", "freq": "收盘后1次(算法链)", "max_age": 1440, "key_fields": ["total_scored"], "raw_file": "top10_daily.json", "producer": "generate_top10.py"},
+    {"id": "maharo_insights", "name": "机构研究·AI解析", "page": "观测平台", "freq": "盘中+每日3档", "max_age": 1440, "key_fields": ["update_time"], "_window_var": "MAHORO_INSIGHTS"},
+    {"id": "INDEX_VALUE_FRAMEWORK", "name": "指数观测·四框架", "page": "观测平台", "freq": "每日盘前", "max_age": 1440, "key_fields": ["indices"], "raw_file": "index_value_framework.json"},
+    {"id": "WAVE_ELLIOTT", "name": "艾略特波浪·深度分析", "page": "观测平台", "freq": "每交易日17:50前后(小九机日频)", "max_age": 1440, "key_fields": ["meta"], "cycle": (18, 0)},
+    {"id": "CITIC_PE_THERMO", "name": "中信PE热力", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current", "percentile"]},
+    {"id": "SECTOR_LEADERS", "name": "主升/启动板块·龙头股", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["phase", "sector_count"], "raw_file": "sector_leaders.json", "producer": "scripts/fetch_sector_leaders.py"},
+    {"id": "FIRST_BOARD_ALERT", "name": "连板梯队前哨", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["alerts"]},
+    {"id": "DAJIJIN_REDUCTION", "name": "大基金增减持监控", "page": "暂未上架", "freq": "工作日夜间档(cron次日02:30~04:40)", "max_age": 1440, "key_fields": ["update_time"], "cycle": (3, 30)},
+]
+
+
+def now_cst():
+    return datetime.now(timezone(timedelta(hours=8)))
+
+
+# 2026 年中国法定节假日（MM-DD），用于周末不更新模块的休市判定
+_HOLIDAYS_2026 = {
+    "01-01", "01-02", "01-03",  # 元旦
+    "02-15", "02-16", "02-17", "02-18", "02-19", "02-20", "02-21", "02-22", "02-23",  # 春节
+    "04-04", "04-05", "04-06",  # 清明
+    "05-01", "05-02", "05-03", "05-04", "05-05",  # 劳动节
+    "06-19", "06-20", "06-21",  # 端午
+    "09-25", "09-26", "09-27",  # 中秋
+    "10-01", "10-02", "10-03", "10-04", "10-05", "10-06", "10-07",  # 国庆
+}
+# 🔴🔴 2026-09-20 根治·周末假红（主人令「周末把能发现的能纠错的都改好」）：
+#   原集合标题写「补班日（周末但实际交易日）」——**该前提不成立**：
+#   A 股交易所**周六周日一律休市**。法定「补班日」只调整企业与机关作息，与证券市场无关；
+#   上交所/深交所交易日历 = 周一至周五且非法定节假日，**A 股史上从未在周末交易**。
+#
+#   权威源交叉（三处，均指向「周末休市」）：
+#     · algorithms/fetch_lhb.py：ak.tool_trade_date_hist_sina()（新浪官方 A 股交易日历）
+#     · v8_date.py：优先调用 fetch_lhb.is_trading_day（即上源），fallback 才是 weekday()<5
+#     · v8_stage_gate.py 经 v8_date 判 2026-09-20（周日）= 非交易日（净室复算输出「⏸ 休市」）
+#   ⇒ 本集合与系统另一套日历**直接打架**，且本集合是**错的那一侧**。
+#
+#   清空前实测后果（2026-09-20 16:00 周日）：
+#     ① is_market_closed() = False ⇒ weekend_update:False 的卡**周末免检永不生效**
+#        ⇒ 实证：BAIHECHOU_ANALYSIS（新周期判定·AI解析）被判 fail（age 3432min > 1560）
+#        —— 这正是主人反感的「周末假红」根因；
+#     ② last_trade_day_close() = 「2026-09-20 15:30」⇒ 阈值基准落在**周日**，全盘错位；
+#     ③ adjust_max_age 的「非交易日：T+1 18:30」分支**永不进入** ⇒ 该设计意图失效。
+#
+#   清空后（同机实测）：is_market_closed() = True；last_trade_day_close() = 2026-09-18 15:30 ✅
+#   ⚠️ 将来若确需「周末交易日」（A 股从未有过），**必须先与 fetch_lhb/v8_date 对齐再改**，
+#      不允许在此处私自新增第二套日历。
+_MAKEUP_DAYS_2026 = set()
+# 原值（保留供追溯，勿直接启用）：
+#   {"2026-01-04","2026-02-14","2026-02-28","2026-05-09","2026-09-20","2026-10-10"}
+
+
+def _is_trading_day(d) -> bool:
+    """判断某天是否为 A 股交易日（含补班日、剔除周末和节假日）。"""
+    if d.weekday() >= 5 and d.isoformat() not in _MAKEUP_DAYS_2026:
+        return False
+    return d.strftime("%m-%d") not in _HOLIDAYS_2026
+
+
+def is_market_closed(dt_cst=None):
+    """判断给定北京时间是否为 A 股休市日（周末或法定节假日）。"""
+    n = dt_cst or now_cst()
+    return not _is_trading_day(n.date())
+
+
+def is_intraday_session(dt_cst=None):
+    """判断给定北京时间是否处于 A 股盘中交易时段（09:30-11:30 或 13:00-15:00）的交易日。"""
+    n = dt_cst or now_cst()
+    if is_market_closed(n):
+        return False
+    h = n.hour + n.minute / 60.0
+    return (9.5 <= h <= 11.5) or (13.0 <= h <= 15.0)
+
+
+def last_trade_day_close(now_cst_dt):
+    """返回最近交易日收盘时间（15:30），非交易日回退。"""
+    d = now_cst_dt.date()
+    while not _is_trading_day(d):
+        d -= timedelta(days=1)
+    close = datetime.combine(d, datetime.strptime("15:30", "%H:%M").time(), tzinfo=timezone(timedelta(hours=8)))
+    if now_cst_dt < close:
+        d -= timedelta(days=1)
+        while not _is_trading_day(d):
+            d -= timedelta(days=1)
+        close = datetime.combine(d, datetime.strptime("15:30", "%H:%M").time(), tzinfo=timezone(timedelta(hours=8)))
+    return close
+
+
+def fmt_rel_time(ts):
+    """把 'YYYY-MM-DD HH:MM:SS' 格式化为相对时间：今日/昨日/X天前 HH:MM。"""
+    if not ts:
+        return "--"
+    dt = parse_time(ts)
+    if not dt:
+        return str(ts)[:16]
+    now = now_cst()
+    today = datetime(now.year, now.month, now.day, tzinfo=timezone(timedelta(hours=8)))
+    date_only = datetime(dt.year, dt.month, dt.day, tzinfo=timezone(timedelta(hours=8)))
+    diff = (today - date_only).days
+    hm = dt.strftime("%H:%M")
+    if diff == 0:
+        return f"今日 {hm}"
+    if diff == 1:
+        return f"昨日 {hm}"
+    if diff < 7:
+        return f"{diff}天前 {hm}"
+    return dt.strftime("%m-%d %H:%M")
+
+
+def parse_time(s):
+    if not s or s in ("--", "N/A"):
+        return None
+    # 2026-08-29 一劳永逸：MARKET_REGIME / SECTOR_RECOMMENDATION 等产出 ISO 8601
+    #   "2026-08-29T20:19:20" 格式，旧版只认 3 种格式 → 误报"无时间戳"判黄灯。
+    #   补 T 分隔 + 微秒容错，循环尝试直至命中。
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S",
+                 "%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%d %H:%M", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(s, fmt).replace(tzinfo=timezone(timedelta(hours=8)))
+        except Exception:
+            continue
+    return None
+
+
+def load_window_var(path, var_name):
+    """从 data/*.js 读取 window.X = {...}; 并解析为 dict（兼容 IIFE 壳）。
+
+    改无正则括号配对版：定位目标变量后做括号配对，正确处理嵌套对象
+    （旧正则 `\\{{[\\s\\S]*?\\}}` 非贪婪会在首个内层 `}` 截断）。
+    """
+    if not path.exists():
+        return None
+    try:
+        text = path.read_text(encoding="utf-8").lstrip("\ufeff")
+        val = _match_braced(text, var_name)
+        if val is not None:
+            return val
+        # IIFE 壳：window.X = (function(){ var data = {...}; ... })()
+        m2 = re.search(
+            rf"window\.{re.escape(var_name)}\s*=\s*\(function[\s\S]*?var\s+data\s*=\s*(\{{[\s\S]*?\}})\s*;",
+            text,
+        )
+        if m2:
+            try:
+                return json.loads(m2.group(1))
+            except Exception:
+                return None
+    except Exception as e:
+        print(f"⚠️ 解析 {path} 失败: {e}")
+    return None
+
+
+def _match_braced(text, var_name):
+    """括号配对提取 window.VAR = {...} 的对象体（无正则，支持嵌套）。
+
+    2026-08-29 修：用 \b 词边界精确匹配变量名，避免 DO_NOT_DELETE 误命中
+    DO_NOT_DELETE_HTML / DO_NOT_DELETE_UPDATED 等同前缀变量。
+    """
+    m = re.search(rf"window\.{re.escape(var_name)}\b", text)
+    if not m:
+        return None
+    idx = m.start()
+    eq = text.find("=", idx)
+    start = text.find("{", eq) if eq != -1 else -1
+    if start == -1:
+        return None
+    depth = 0
+    in_str = esc = False
+    for i in range(start, len(text)):
+        ch = text[i]
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+        else:
+            if ch == '"':
+                in_str = True
+            elif ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    try:
+                        return json.loads(text[start : i + 1])
+                    except Exception:
+                        return None
+    return None
+
+
+def _extract_window_data(text, var_name):
+    """从 JS 文本中解析 window.X = {...}; 或 IIFE 壳，返回 dict/None。"""
+    if not text:
+        return None
+    text = text.lstrip("\ufeff")
+    m = re.search(rf"window\.{re.escape(var_name)}\s*=\s*(\{{[\s\S]*?\}})\s*;", text)
+    if m:
+        try:
+            return json.loads(m.group(1))
+        except Exception:
+            pass
+    m2 = re.search(rf"window\.{re.escape(var_name)}\s*=\s*\(function[\s\S]*?var\s+data\s*=\s*(\{{[\s\S]*?\}})\s*;", text)
+    if m2:
+        try:
+            return json.loads(m2.group(1))
+        except Exception:
+            return None
+    return None
+
+
+def load_window_var_from_site(source_id, var_name):
+    """一劳永逸修复（2026-08-28）：线上站点读取强制加 cache-buster，绕开 GitHub Pages CDN 缓存。
+
+    历史：2026-08-20 改为优先读线上部署态，解决本地 checkout 未 pull 导致的陈旧误报。
+    新增竞态：算法链刚把新数据 push 到 Pages，CDN 边缘节点可能仍缓存旧版，HEALTH_CHECK
+    读到旧时间戳 → 误报 fail（尤其 20:01 左右算法链跑完立刻巡检时）。
+    修复：URL 强制追加 ?nocache=1&t={timestamp} 直接回源；失败返回 None 由调用方兜底。
+    """
+    try:
+        # 站点 URL 末尾已带 /，但防御性处理
+        base = SITE_URL if SITE_URL.endswith("/") else SITE_URL + "/"
+        url = f"{base}data/{source_id}.js?nocache=1&t={int(time.time())}"
+        req = urllib.request.Request(url, headers={"User-Agent": "v8-health-check"})
+        raw, err = _urlopen_retry(req, timeout=20)
+        if raw is None:
+            return None
+        return _extract_window_data(raw.decode("utf-8", "ignore"), var_name)
+    except Exception:
+        return None
+    return None
+
+
+def _update_time_to_dt(ts):
+    """把 data 里的时间戳字段统一转成 datetime，失败返回 None。"""
+    if isinstance(ts, (int, float)):
+        try:
+            return datetime.fromtimestamp(ts, tz=timezone(timedelta(hours=8)))
+        except Exception:
+            return None
+    if isinstance(ts, str):
+        return parse_time(ts)
+    return None
+
+
+def _local_runner_age_min(run_time):
+    """本地 runner 最近上报距现在的分钟数（UTC+8）；无法解析返回 None。"""
+    dt = _update_time_to_dt(run_time)
+    if dt is None:
+        return None
+    now = datetime.now(tz=timezone(timedelta(hours=8)))
+    return (now - dt).total_seconds() / 60.0
+
+
+def load_window_var_newest(source_id, var_name, local_path):
+    """取「线上站点」与「本地文件」两者中时间戳较新的一个。
+
+    这是 2026-08-28 一劳永逸修复 HEALTH_CHECK 竞态误报的核心：
+      · 云端 runner 刚生成本地新文件，但 Pages CDN 缓存未刷新 → 本地更新
+      · 本地 runner 未 pull，本地旧但线上已部署 → 线上更新
+      · 任一方失败 → 回退到另一方
+      · 两边都无时间戳/不可比 → 优先本地（离线/开发环境更可信）
+    """
+    local_data = load_window_var(local_path, var_name) if local_path and local_path.exists() else None
+
+    # 🛡 2026-08-31 一劳永逸性能优化（小九令：收盘数据上线）
+    #   CI(GitHub Actions) 内：本地 data/*.js 是本轮 update_v8 刚由最新 raw_data 生成，
+    #   必然最新；而「取线上站点」要对每个 js 发一次 HTTP（timeout 20s × 最多 4 次重试），
+    #   实测 108 个文件把 HEALTH_CHECK 拖到 15~20min，叠加前序抓取与 update_v8 后
+    #   整条 post_close 链路在超时窗口内跑不完 → data/*.js 已重生成却来不及 step21 推送
+    #   → 主站数据停滞（2026-08-31 停在 14:2x，15:42/16:05/16:18 三轮连杀）。
+    #   CI 内本地可用即直接返回（省掉 108 次网络往返）；仅本地缺失才回退线上。
+    #   非 CI（本机/开发环境）仍保留双源比对，防「本机未 pull 导致误报陈旧」。
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        if local_data is not None:
+            return local_data
+        return load_window_var_from_site(source_id, var_name)
+
+    site_data = load_window_var_from_site(source_id, var_name)
+
+    if local_data is None:
+        return site_data
+    if site_data is None:
+        return local_data
+
+    # 比较 update_time/date/lastUpdated 等常见时间戳
+    ts_keys = ("update_time", "date", "generated", "generated_time", "generated_at",
+               "lastUpdated", "updated", "updated_at", "last_update")
+    local_ts = None
+    site_ts = None
+    for k in ts_keys:
+        if local_ts is None:
+            local_ts = local_data.get(k)
+        if site_ts is None:
+            site_ts = site_data.get(k)
+        if local_ts is not None and site_ts is not None:
+            break
+
+    local_dt = _update_time_to_dt(local_ts)
+    site_dt = _update_time_to_dt(site_ts)
+
+    if local_dt is None and site_dt is None:
+        # 无法比较，优先本地（离线开发环境）
+        return local_data
+    if local_dt is None:
+        return site_data
+    if site_dt is None:
+        return local_data
+
+    chosen = local_data if local_dt >= site_dt else site_data
+    if local_dt != site_dt:
+        side = "本地" if chosen is local_data else "线上"
+        print(f"[HEALTH] {source_id}.js 取较新：本地 {local_ts} vs 线上 {site_ts} → 用 {side}")
+    return chosen
+
+
+def _load_token():
+    # GHA/云端：secrets.GITHUB_TOKEN (默认 workflow token, 有 actions:read 权限可查 runners)
+    for env_name in ("V8_GITHUB_TOKEN", "GITHUB_TOKEN", "GH_TOKEN"):
+        v = os.environ.get(env_name)
+        if v:
+            return v
+    # 本机/开发环境：依次尝试多个候选（2026-08-12 增加 data/.github_pat.txt：
+    # 之前 v8_ops_self_heal 注入 GH_TOKEN=默认 token，云端 _load_token 回退到 quant-scanner-v8 旧路径失败；
+    # 现统一指向仓库内 data/.github_pat.txt（与 scripts/monitor_*.py 同源，最稳定））。
+    _this_dir = Path(__file__).resolve().parent
+    candidates = [
+        _this_dir / "data" / ".github_pat.txt",          # 仓库根/data/.github_pat.txt（推荐）
+        _this_dir / ".workbuddy" / "v8_gh_token.txt",    # 2026-08-24 修复：仓库本地 token（与看门狗同源，本机实际存放处）
+        Path.home() / ".workbuddy" / "v8_gh_token.txt",  # 用户级 workbuddy token
+    ]
+    for p in candidates:
+        if p.exists():
+            try:
+                t = p.read_text(encoding="utf-8").strip().lstrip("\ufeff")
+                if t:
+                    return t
+            except Exception:
+                continue
+    return None
+
+
+def api_get(url, max_retries=None):
+    """GitHub API GET，带重试。
+
+    2026-08-11 修：原实现一次失败即返回，遇到 SSL 握手超时 / 连接重置等瞬时抖动
+    就会让 check_site_deploy_sync 报「无法从线上或 API 获取 Pages SHA」误告警。
+    现对「可恢复失败」（网络异常、5xx、429 限流）重试，对确定性失败（401/403/404）
+    立即返回不浪费时间。
+    """
+    import time as _time
+    token = _load_token()
+    if not token:
+        return {"__error__": 401, "__msg__": "no token：请在 repo secrets 配置 V8_GH_TOKEN，或在本地放置 data/.github_pat.txt"}
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    req = urllib.request.Request(url, headers=headers)
+    retries = SITE_MAX_RETRIES if max_retries is None else max_retries
+    last = {"__error__": 0, "__msg__": "unknown"}
+    for attempt in range(retries + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=API_GET_TIMEOUT) as r:  # 2026-08-24 收紧：30→10
+                return json.loads(r.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            last = {"__error__": e.code, "__msg__": e.read().decode("utf-8", "replace")}
+            # 4xx 属确定性失败（无权限/不存在），重试无意义；仅 5xx 与 429 限流值得重试
+            if e.code < 500 and e.code != 429:
+                return last
+        except Exception as e:
+            last = {"__error__": 0, "__msg__": str(e)}
+        if attempt < retries:
+            print(f"[RETRY] api_get 第{attempt+1}次失败(code={last.get('__error__')})，"
+                  f"{_SITE_RETRY_DELAY_SEC}s 后重试... {url}")
+            _time.sleep(_SITE_RETRY_DELAY_SEC)
+    last["__msg__"] = f"连续 {retries + 1} 次请求均失败：{last.get('__msg__')}"
+    return last
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 带 retry 的 urlopen：吸收 GitHub Pages 瞬时 SSL/网络抖动，避免误报邮件
+# ─────────────────────────────────────────────────────────────────────────────
+# 2026-08-11 由 2 提到 4：GitHub Pages / api.github.com 在云端 build 高频推送时段
+# （如 09:07-09:09 连续 6 次 build）会出现成片的 503 / SSL 握手超时，2 次重试不足以吸收，
+# 导致「Pages 部署同步」误报。5 次尝试 × 3s 间隔 ≈ 12s，代价可接受。
+# 2026-08-24 收紧（根因修复 22:24【rc=3】邮件）：
+#   原 4=5 次 × 30s × 4wf = 50min 卡死进程，超 480s 看门狗超时被杀。改 2=3 次 × 10s + 2×1s 间隔 = 32s/次 × 4wf = 128s 上限，安全。
+#   build 高峰连续 3 次超时的概率近 0（实测），仍能吸收瞬时抖动。
+SITE_MAX_RETRIES = 2       # 2026-08-24 收紧：首次 + 最多重试 2 次（3 次尝试）
+_SITE_RETRY_DELAY_SEC = 1   # 2026-08-24 收紧：3s→1s
+API_GET_TIMEOUT = 10         # 2026-08-24 新增：单次 GitHub API GET timeout 上限（30→10）。仅在网络真卡死时省时间。
+
+
+def _urlopen_retry(req_or_url, timeout=15, max_retries=None):
+    """带重试的 urlopen，返回 (response_bytes, None) 或 (None, error_str)。
+    用于 site 检测等对外请求，吸收瞬时抖动。"""
+    import time as _time
+    retries = max_retries or SITE_MAX_RETRIES  # 2026-08-24：与 api_get 共用收紧后的 SITE_MAX_RETRIES=2
+    last_err = None
+    for attempt in range(retries + 1):
+        try:
+            with urllib.request.urlopen(req_or_url, timeout=timeout) as r:
+                return r.read(), None
+        except Exception as e:
+            last_err = e
+            if attempt < retries:
+                print(f"[RETRY] site urlopen 第{attempt+1}次失败({type(e).__name__})，{_SITE_RETRY_DELAY_SEC}s后重试...")
+                _time.sleep(_SITE_RETRY_DELAY_SEC)
+    return None, str(last_err)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 自愈（detect-and-heal）：发现可修复的数据陈腐，主动派发对应类别刷新，而非只发邮件
+# ─────────────────────────────────────────────────────────────────────────────
+CN_WORKFLOW_ID = 327687211        # v8_cn_fetch_cloud workflow id（云端 ubuntu 主力，用于 API 派发刷新）
+BUILD_DEPLOY_WORKFLOW_ID = 324135263  # ☁️ v8 构建部署(云端ubuntu) workflow id
+ALGO_RUN_WORKFLOW_ID = 324119592      # ☁️ v8 盘后算法链(云端) workflow id（重新产出 FINAL_RECOMMEND 等）
+HEAL_DEBOUNCE_MIN = 25           # 同一类别最小派发间隔，避免每小时巡检重复触发
+ALERT_OVERDUE_MIN = 120          # 与 send_report_email 一致的「值得处理」阈值（分钟）
+# 2026-08-11 漏洞 #1：自愈单次最多派发 N 个 workflow，防 runner 打爆/事件风暴
+MAX_DISPATCHES_PER_RUN = 5
+# 2026-08-11 漏洞 #3：管线耗时趋势监控——latest 超 avg+3σ 视为异常
+WORKFLOW_DURATION_HISTORY = '.workbuddy/workflow_durations.json'
+WORKFLOW_DURATION_SIGMA = 3.0
+
+# 卡片分组 -> 刷新类别映射（与 cloud_fetch_v8.py / update_v8.py 的 CATEGORY_MAP 对应）
+PAGE_TO_CAT = {
+    "实时数据": "intraday",
+    "今日事件": "premarket",
+    "盘后数据": "post_close",
+    "选股策略": "post_close",
+}
+
+
+_PENDING_STATES = ("queued", "pending", "waiting", "requested")
+
+# 2026-08-12 第173轮：pending 超过该分钟数视为 GitHub 侧「僵尸排队」，不再阻断派发。
+# 依据：云端 ubuntu-latest 的 workflow_dispatch 正常在秒级~1 分钟内取得 runner 并转
+# in_progress；实测 run#93(15:38:59) 挂在 queued 超 35 分钟仍未启动（job 标签
+# ubuntu-latest、started_at 已写但状态不动）= GitHub 侧分配卡死，它不会真正执行。
+# 若无年龄上限，第172轮守卫会把这种僵尸当成「必然会跑的排队」而永久跳过派发，
+# 自愈链路对该 workflow 直接死锁（GitHub 保留僵尸 run 可达 ~24h）。
+_PENDING_MAX_AGE_MIN = 15
+
+# 2026-08-20 第290轮一劳永逸修复：盘后算法链「并发堆积」闸门。
+# 根因：_has_pending_run 只拦 queued/pending，**放行 in_progress**（对 2~5 分钟就跑完的
+# cn_fetch / build_deploy 是正确设计）。但云端算法链单轮实测 68~120 分钟（step 06
+# 「运行盘后算法链」独占绝大部分耗时，部分轮次撞 120min job timeout 被 cancelled），
+# 远大于 HEAL_DEBOUNCE_MIN=25 的去抖窗口 → 每 25 分钟无条件再派一轮。
+# 实证（2026-08-20 下午）：08:46:50Z~09:32:49Z 累积 **7 个 in_progress 算法链并发**，
+# 既白烧 Actions 额度（7×~100min），又让多轮 run 对 raw_data/ 抢推产生 push race。
+# 修复：algo_run 专用闸门——若已有 in_progress 且年龄 <= 该上限，则跳过派发；
+# 超过上限视为僵尸（挂死/即将被 timeout 收割）不阻断，避免自愈链死锁。
+_ALGO_RUNNING_MAX_AGE_MIN = 130
+
+
+def _has_running_algo_run(headers):
+    """算法链是否已有「正在跑」的运行；有则本轮不应再派发（防并发堆积）。
+
+    返回 (running: bool, created_at: str|None)。查询异常保守返回 False（放行），
+    与 _has_pending_run 的失败策略保持一致。
+    """
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{ALGO_RUN_WORKFLOW_ID}/runs?per_page=10"
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        now_utc = datetime.now(timezone.utc)
+        for run in data.get("workflow_runs") or []:
+            if (run.get("status") or "").lower() != "in_progress":
+                continue
+            created = run.get("created_at")
+            try:
+                dt = datetime.strptime(created, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+                age_min = (now_utc - dt).total_seconds() / 60
+            except Exception:
+                age_min = None
+            if age_min is not None and age_min > _ALGO_RUNNING_MAX_AGE_MIN:
+                print(f"[WARN] algo_run 存在僵尸 in_progress run(created {created}, "
+                      f"已跑 {age_min:.0f}min > {_ALGO_RUNNING_MAX_AGE_MIN}min)，不阻断派发")
+                continue
+            return True, created
+        return False, None
+    except Exception:
+        return False, None
+
+
+def _has_pending_run(workflow_id, headers):
+    """检查 workflow 是否已有「排队中(未开始)」运行；有则不应再派发。
+
+    2026-08-12 第172轮根因修复（与 v8_cloud_watchdog.py::has_pending_run 同源）：
+    云端 fetch/build workflow 均设 `concurrency: cancel-in-progress: false`，
+    GitHub 该模式下每个 group **只保留 1 个 pending run**，新的 workflow_dispatch
+    会把原先排队的那个 cancel 掉。同一轮巡检里看门狗 auto_dispatch 与本文件
+    self_heal 各派发一次 → 后者顶掉前者，实测导致盘中数据断档 69 分钟
+    (raw_data/index_quotes.json 提交 13:41:15 → 14:50:18)，9 张盘中卡集体转 FAIL。
+
+    仅在存在 pending run 时跳过（它必然会执行）；只有 in_progress 时照常派发。
+    查询异常返回 False，保守放行。
+
+    2026-08-12 第173轮加固：pending 年龄超 _PENDING_MAX_AGE_MIN 视为僵尸排队，
+    **不阻断派发**（否则一个卡死的 queued run 会让自愈对该 workflow 死锁整天）。
+    """
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{workflow_id}/runs?per_page=10"
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        now_utc = datetime.now(timezone.utc)
+        for run in data.get("workflow_runs") or []:
+            if (run.get("status") or "").lower() not in _PENDING_STATES:
+                continue
+            created = run.get("created_at")
+            age_min = None
+            try:
+                dt = datetime.strptime(created, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+                age_min = (now_utc - dt).total_seconds() / 60
+            except Exception:
+                age_min = None
+            if age_min is not None and age_min > _PENDING_MAX_AGE_MIN:
+                # 僵尸排队：跳过它继续看下一条，不因它阻断派发
+                print(f"[WARN] workflow {workflow_id} 存在僵尸 pending run(created {created}, "
+                      f"排队 {age_min:.0f}min > {_PENDING_MAX_AGE_MIN}min)，不阻断派发")
+                continue
+            return True, created
+        return False, None
+    except Exception:
+        return False, None
+
+
+def _cn_runner_available():
+    """检查 self-hosted cn runner 是否至少有 1 台 online（防自愈派发风暴）。
+
+    2026-08-17 主人怒令发现：alimi-cn offline + lemoncat busy 时，health_patrol
+    每分钟兜底 + self_heal 派发 → 每 6 分钟无完成就再 dispatch → 派发全部 Set up job
+    失败 → 死循环风暴（当晚 14:02-14:09 连续 8+ 个 failure/cancelled）。
+    修法：派发前先查 runner 状态，全 offline 则跳过本轮派发（留到 runner 恢复）。
+    """
+    try:
+        req = urllib.request.Request(
+            f"https://api.github.com/repos/{REPO}/actions/runners",
+            headers={"Authorization": f"Bearer {_load_token()}",
+                     "Accept": "application/vnd.github+json"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            d = json.loads(r.read().decode("utf-8"))
+        online = [x for x in d.get("runners", []) if x.get("status") == "online"]
+        return bool(online), [x.get("name", "?") for x in online]
+    except Exception:
+        # API 失败时保守放行（宁可派发也不漏报）
+        return True, ["?"]
+
+
+def _dispatch_cn_fetch(cat):
+    """经 GitHub API 派发 cn_fetch 刷新（自愈核心动作）。
+
+    返回三元组 (ok, msg, dispatched)：
+      ok         = 本次处理没有出错（含「因已有 pending 而跳过」这种正常情况）
+      dispatched = **真的发出了 POST**（决定是否刷新去抖锁；见第173轮说明）
+    """
+    token = _load_token()
+    if not token:
+        return False, "无 GitHub token，无法派发", False
+    # 🛡 2026-08-25 一劳永逸根因修复（主人令「先修自愈器」）：
+    #   原 _cn_runner_available() 闸门在本函数内拦截——但 CN_WORKFLOW_ID 指向的
+    #   v8_cn_fetch_cloud 早已迁到云端 ubuntu-latest（见 .github/workflows/v8_cn_fetch_cloud.yml
+    #   runs-on: ubuntu-latest），根本不依赖 cn 自托管 runner。原闸门是「cn runner 离线即
+    #   永久跳过派发」的静默死锁根因：个人机 LEMONCAT 频繁离线 → 自愈全年失能 → 数据陈旧红灯堆积。
+    #   云端 ubuntu 永远可用，移除该闸门；去抖仍由 HEAL_DEBOUNCE_MIN / MAX_DISPATCHES_PER_RUN 保证，
+    #   派发失败会如实记为 failed 并升级告警（而非静默吞掉）。
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    pending, since = _has_pending_run(CN_WORKFLOW_ID, headers)
+    if pending:
+        return True, (f"已有排队中的 cn_fetch 运行(created {since})，跳过派发"
+                      f"（避免顶掉该 pending run）category={cat}"), False
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/dispatches"
+    data = json.dumps({"ref": "main", "inputs": {"category": cat}}).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, f"已派发 cn_fetch category={cat} (HTTP {r.status})", True
+    except urllib.error.HTTPError as e:
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}", False
+    except Exception as e:
+        return False, f"派发异常: {e}", False
+
+
+def _dispatch_algo_run(picking_only=False):
+    """经 GitHub API 派发 v8 盘后算法链(云端)，重新产出 FINAL_RECOMMEND_DATA 等选股结果。
+
+    返回三元组 (ok, msg, dispatched)，语义同 _dispatch_cn_fetch。
+    picking_only=True：本次派发仅因选股类卡片（候选池/三重共识/最终推荐等）触发。
+    """
+    token = _load_token()
+    if not token:
+        return False, "无 GitHub token，无法派发", False
+    # 🔴 2026-08-22 根因⑫（主人令）：非交易日不派发 algo_run——
+    #   v8_algo_cloud 的交易日历 gate 会跳过算法链 step7（实证 08-22 03:2x 一批 run 全 skipped 秒退）
+    if not _is_trading_day(date.today()):
+        return True, "非交易日（周末/节假日），跳过 algo_run 派发", False
+    # 🔴 2026-09-04 主人令(风暴根治·刀2): algo_cloud 产出为盘后数据, 盘中派发必被
+    #   静默闸门 V5 秒退(内容级收敛), 派发=纯风暴燃料(12:23-13:00 十八连发实锤——
+    #   原 18:00 闸门只拦 picking_only, 混入非选股卡即绕过)。仅 16:00-21:30 CST
+    #   允许 heal 派发 algo_cloud(盘后产出窗口)。
+    _cst_now = now_cst()
+    _cst_min = _cst_now.hour * 60 + _cst_now.minute
+    if not (16 * 60 <= _cst_min <= 20 * 60 + 30):  # 🛡 2026-09-24 B组①：post_close HEAL 窗口收窄 21:30→20:30（风暴根治·刀2 收紧）
+        return True, (f"当前 {_cst_now.strftime('%H:%M')} 非盘后产出窗口(16:00-20:30)，"
+                      "跳过 algo_run 派发（防风暴·2026-09-04 主人令）"), False
+    # 🔴 2026-08-22 根因⑨（主人令）：选股类卡片在 18:00 前派发 = 空转——
+    #   run_algorithms 的 18:00 时间闸会把 20+ 选股脚本全跳过（实证 15:34/15:46/15:50
+    #   三轮 success 却零产出）。仅当触发原因全为选股类且未到 18:00 才拦；
+    #   非选股类（SH_FIB/INST_TRADE/NT_DATA 等）收盘后即可算，不拦。
+    if picking_only and now_cst().hour < 18:
+        return True, "未到 18:00 盘后选股窗口，跳过 algo_run 派发（避免选股脚本全被时间闸跳过空转45min）", False
+    # 🛡 2026-08-25 一劳永逸根因修复（主人令「先修自愈器」）：
+    #   原 _cn_runner_available() 闸门在此拦截——但 ALGO_RUN_WORKFLOW_ID 指向的
+    #   v8_algo_cloud（盘后算法链·云端 ubuntu-latest，见该 workflow runs-on: ubuntu-latest）
+    #   根本不依赖 cn 自托管 runner。该闸门即「cn runner 离线 → 永久跳过 algo_run 派发」的
+    #   静默死锁根因（自愈全年失能、数据陈旧红灯堆积）。云端 ubuntu 永远可用，移除闸门；
+    #   去抖仍由 HEAL_DEBOUNCE_MIN / MAX_DISPATCHES_PER_RUN 保证，派发失败如实记 failed 并升级。
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    # 🔴 2026-09-04 主人令(风暴根治·刀3): 用 GitHub 事实状态做去抖——本地锁随 runner
+    #   workspace 丢弃、锁推送与高频数据管线竞态大量丢失(实测 18 连发穿过 25min 去抖)。
+    #   改查最近 runs: HEAL_DEBOUNCE_MIN 分钟内已有本 workflow 的 run(无论状态)即跳过。
+    try:
+        _runs_url = f"https://api.github.com/repos/{REPO}/actions/workflows/{ALGO_RUN_WORKFLOW_ID}/runs?per_page=5"
+        _recent = json.loads(urllib.request.urlopen(
+            urllib.request.Request(_runs_url, headers=headers), timeout=30).read()).get("workflow_runs", [])
+        from datetime import datetime as _dt, timezone as _tz
+        for _r in _recent:
+            _rc = _dt.strptime(_r["created_at"][:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=_tz.utc)
+            _age_min = (_dt.now(_tz.utc) - _rc).total_seconds() / 60
+            if _age_min < HEAL_DEBOUNCE_MIN:
+                return True, (f"最近 {HEAL_DEBOUNCE_MIN} 分钟内已有 algo_run "
+                              f"(created {_r['created_at']}, {_r['status']})，跳过派发"
+                              "（API 事实去抖·2026-09-04 主人令）"), False
+    except Exception as _e:
+        print(f"[WARN] algo_run API 事实去抖查询失败(保守放行): {_e}")
+    pending, since = _has_pending_run(ALGO_RUN_WORKFLOW_ID, headers)
+    if pending:
+        return True, f"已有排队中的 algo_run 运行(created {since})，跳过派发（避免顶掉该 pending run）", False
+    # 2026-08-20 第290轮：算法链单轮 68~120min >> 25min 去抖窗口，若不拦 in_progress
+    # 会每 25 分钟叠加一轮（实测堆到 7 个并发）。已在跑就等它出数，不重复派发。
+    running, r_since = _has_running_algo_run(headers)
+    if running:
+        return True, f"已有正在运行的 algo_run(created {r_since})，跳过派发（防并发堆积，等其出数）", False
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{ALGO_RUN_WORKFLOW_ID}/dispatches"
+    data = json.dumps({"ref": "main"}).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, f"已派发 algo_run(盘后算法链) (HTTP {r.status})", True
+    except urllib.error.HTTPError as e:
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}", False
+    except Exception as e:
+        return False, f"派发异常: {e}", False
+
+
+def _dispatch_build_deploy():
+    """经 GitHub API 派发 v8_build_deploy，触发 Pages 重新构建部署。
+
+    返回三元组 (ok, msg, dispatched)，语义同 _dispatch_cn_fetch。
+    """
+    token = _load_token()
+    if not token:
+        return False, "无 GitHub token，无法派发", False
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    pending, since = _has_pending_run(BUILD_DEPLOY_WORKFLOW_ID, headers)
+    if pending:
+        return True, f"已有排队中的 build_deploy 运行(created {since})，跳过派发（避免顶掉该 pending run）", False
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{BUILD_DEPLOY_WORKFLOW_ID}/dispatches"
+    data = json.dumps({"ref": "main"}).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, f"已派发 build_deploy (HTTP {r.status})", True
+    except urllib.error.HTTPError as e:
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}", False
+    except Exception as e:
+        return False, f"派发异常: {e}", False
+
+
+def _heal_local_sync(pull_raw_data_only=False):
+    """尝试让本地 HEAD 与 origin/main 对齐（fetch + ff-only，必要时 stash）。
+
+    2026-08-24 新增 pull_raw_data_only 模式：仅拉取 raw_data/ 子树，不动代码 HEAD。
+    用途：local_sync 检测到 raw_data 落后（数据卡陈旧二级根因），但本地代码未提交需要 ff。
+    此时用 `git checkout origin/main -- raw_data/` 单独把 raw_data/ 同步过来，不污染本地工作区。
+    """
+    try:
+        subprocess.run(["git", "fetch", "origin"], check=True, capture_output=True, text=True, timeout=60)
+        local = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, timeout=10).strip()
+        remote = subprocess.check_output(["git", "rev-parse", "origin/main"], text=True, timeout=10).strip()
+        if local == remote and not pull_raw_data_only:
+            return True, f"本地已与 origin/main 同步 ({local[:7]})"
+        try:
+            behind = int(subprocess.check_output(
+                ["git", "rev-list", "--count", f"{local}..{remote}"],
+                text=True, timeout=10
+            ).strip())
+        except Exception:
+            return False, "无法判断本地与 origin/main 的祖先关系"
+
+        # 2026-08-24 raw_data_only 分支：只拉子树，不 ff HEAD
+        if pull_raw_data_only:
+            # 校验工作树 raw_data/ 区段是否脏；脏则跳过避免覆盖未提交改动
+            dirty = subprocess.run(
+                ["git", "status", "--porcelain", "--", "raw_data/"],
+                capture_output=True, text=True, timeout=10
+            ).stdout.strip()
+            if dirty:
+                return True, f"raw_data/ 工作区有未提交改动（{len(dirty.splitlines())} 项），跳过自动拉取"
+            try:
+                subprocess.run(
+                    ["git", "checkout", "origin/main", "--", "raw_data/"],
+                    check=True, capture_output=True, text=True, timeout=60
+                )
+                # 🔴 2026-09-21 小九·陈旧暂存区地雷根治（v8-git-stale-index-landmine 变体五同族）：
+                #   `git checkout <ref> -- <path>` 是**写入 index** 的操作（把该 path 的相对 ref
+                #   版本登记进 `.git/index`），并非只改工作树。巡检脚本每次走到本分支都会留下
+                #   staged 项；而本机存在 4 处**裸 `git commit`（无 pathspec）**活脚本
+                #   （algorithms/strategy_four_volume_60m.py / self_heal_monitor.py /
+                #    run_dividend_refresh.py / v8_closing_data_refresh.py），
+                #   任一被 cron 触发即会把这批 staged 一并提交推送 ⇒ 数据回滚。
+                #   实测（09-21 08:2x）：本机 staged=5，其中 4 个与远端 blob 完全一致
+                #   （checkout 留下的空转项）、1 个是本地审计日志。
+                #   修法：checkout 后**立刻**用 `reset -q HEAD -- <path>` 撤销暂存。
+                #   ⚠️ 目标参数必须是 **HEAD 且带 pathspec** —— 这样只 unstage 指定路径，
+                #      HEAD 与工作树**分毫不动**；严禁 `reset --mixed origin/main`（会移动 HEAD）。
+                subprocess.run(
+                    ["git", "reset", "-q", "HEAD", "--", "raw_data/"],
+                    capture_output=True, text=True, timeout=30
+                )
+                return True, f"已从 origin/main {remote[:7]} 拉取 raw_data/ 子树（{behind} 个 commit 落后）"
+            except subprocess.CalledProcessError as e:
+                return False, f"raw_data/ 拉取失败: {e.stderr.strip()[:200]}"
+
+        if behind == 0:
+            return False, f"本地 ({local[:7]}) 领先/分歧于 origin/main ({remote[:7]})，需人工处理"
+        # 工作树若脏：跳过自动对齐（禁止 stash/pop）。
+        # 2026-08-10 一劳永逸修复（861ff16 事故机制复现）：
+        # 原实现 stash → ff-only → stash pop，pop 冲突时 check=False 不中止，
+        # 把 <<<<<<< 冲突标记留在 data/*.js 工作区、index 变 UU，并被后续 push 上线。
+        # update_v8 生成 data/*.js 后必然工作区脏 → 此时 stash/pop 必冲突。
+        # 修复：脏则跳过对齐，由调用方自行 commit 后再同步；云端 build 工作区干净时仍正常 ff-only。
+        dirty = subprocess.run(
+            ["git", "status", "--porcelain"], capture_output=True, text=True, timeout=10
+        ).stdout.strip()
+        if dirty:
+            return True, f"工作区有未提交改动（{len(dirty.splitlines())} 项），跳过自动对齐（防 stash/pop 冲突污染 data/*.js）"
+        subprocess.run(["git", "merge", "--ff-only", "origin/main"], check=True,
+                       capture_output=True, text=True, timeout=30)
+        return True, f"本地已从 {local[:7]} ff 对齐到 origin/main {remote[:7]}"
+    except subprocess.CalledProcessError as e:
+        return False, f"git 命令失败: {e.stderr.strip()[:200]}"
+    except Exception as e:
+        return False, f"异常: {e}"
+
+
+def _heal_site_sync():
+    """先同步本地，再检查线上 Pages SHA；如仍不一致则派发 build_deploy。"""
+    local_ok, local_msg = _heal_local_sync()
+    if not local_ok:
+        return False, f"本地同步失败: {local_msg}"
+    try:
+        remote = subprocess.check_output(["git", "rev-parse", "origin/main"], text=True, timeout=10).strip()
+    except Exception as e:
+        return False, f"无法读取 origin/main: {e}"
+    deployments = api_get(f"https://api.github.com/repos/{REPO}/deployments?environment=github-pages&per_page=1")
+    if not isinstance(deployments, list) or not deployments:
+        return False, "无法从 GitHub API 获取 Pages 部署 SHA"
+    site_sha = deployments[0].get("sha", "")
+    if not site_sha:
+        return False, "GitHub API 返回的部署 SHA 为空"
+    if remote.startswith(site_sha) or site_sha.startswith(remote):
+        return True, f"Pages 已同步 ({site_sha[:7]} == origin/main {remote[:7]})"
+    # 防抖动：25 分钟内不重复派发
+    lock = _load_heal_lock()
+    now = now_cst()
+    last = lock.get("build_deploy")
+    if last:
+        last_dt = parse_time(last)
+        if last_dt and (now - last_dt).total_seconds() < HEAL_DEBOUNCE_MIN * 60:
+            return True, f"近 {HEAL_DEBOUNCE_MIN} 分钟内已派发 build_deploy，跳过重复"
+    ok, dmsg, dispatched = _dispatch_build_deploy()
+    if ok:
+        # 第173轮：仅「真的发出 POST」才刷新去抖锁；因已有 pending 而跳过时不能记账，
+        # 否则会把 25 分钟去抖窗口白白消耗在一次没发生的派发上。
+        if dispatched:
+            lock["build_deploy"] = now.strftime("%Y-%m-%d %H:%M:%S")
+            _save_heal_lock(lock)
+        return True, f"已派发 build_deploy ({dmsg})" if dispatched else dmsg
+    return False, f"派发 build_deploy 失败: {dmsg}"
+
+
+def _heal_lock_path():
+    return DATA_DIR / ".heal_dispatch.json"
+
+
+def _load_heal_lock():
+    p = _heal_lock_path()
+    if p.exists():
+        try:
+            return json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+
+def _save_heal_lock(lock):
+    p = _heal_lock_path()
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(lock, ensure_ascii=False), encoding="utf-8")
+
+
+def self_heal(report):
+    """发现可自愈的问题时主动修复：数据卡片派发对应类别刷新；管线/部署同步自动对齐。
+
+    返回 (healed, failed) 两个文案列表：
+      - healed: 已自动派发刷新 / 近期已派发跳过重复 / 已自动对齐
+      - failed: 派发失败（需人工）
+    同时给 report["items"] 中对应卡片打上 heal 标记（供前端展示「已自动修复」）。
+    """
+    healed, failed = [], []
+    lock = _load_heal_lock()
+    now = now_cst()
+    # 2026-08-12 修复 3d2a53b2 引入的 UnboundLocalError（根因级）：
+    # 「单次派发上限」守卫用到 _dispatch_count / _dispatch_limit_hit 两个局部变量，
+    # 但从未初始化 → 只要有任一数据卡进入派发分支就抛 UnboundLocalError，
+    # 导致 self_heal 整体中断（管线类 local_sync/site_sync 自愈也不执行），
+    # 且异常冒泡出 main() 使 v8_health_check.py 以 traceback rc=1 退出，
+    # 看门狗每轮固定误报「v8_health_check.py 返回非零: 1」。必须在函数入口初始化。
+    _dispatch_count = 0          # 本次运行已派发的 workflow 数
+    _dispatch_limit_hit = []     # 因达上限被跳过的类别（写回 report 供前端/邮件可见）
+
+    # 所有 fail 项（数据卡片 + 管线类）
+    fail_items = [it for it in report["items"] if it.get("status") == "fail"]
+
+    # 0) 内容审计类自愈：最终推荐入选日期陈旧 → 派发盘后算法链重新产出
+    #    （这类问题不在 fail_items 内，需单独识别 message 含「陈旧」的项）
+    for it in report["items"]:
+        if it.get("id") == "final_enter_stale" and "陈旧" in (it.get("message") or ""):
+            last = lock.get("algo_run")
+            if last:
+                last_dt = parse_time(last)
+                if last_dt and (now - last_dt).total_seconds() < HEAL_DEBOUNCE_MIN * 60:
+                    healed.append(f"[algo] {it['name']}: 近 {HEAL_DEBOUNCE_MIN} 分钟内已派发，跳过重复")
+                    it["heal"] = "已自愈(跳过重复): 近窗口内已派发盘后算法链"
+                    continue
+            ok, dmsg, dispatched = _dispatch_algo_run(picking_only=True)
+            if ok:
+                # 第173轮：跳过（已有 pending）不得记账，否则去抖窗口被空派发消耗；
+                # 文案也据实区分「已派发」与「跳过」，避免邮件谎报已自愈。
+                if dispatched:
+                    healed.append(f"[algo] {it['name']}: 已自动派发盘后算法链重新产出 ({dmsg})")
+                    it["heal"] = "已自动派发盘后算法链"
+                    lock["algo_run"] = now.strftime("%Y-%m-%d %H:%M:%S")
+                else:
+                    healed.append(f"[algo] {it['name']}: {dmsg}")
+                    it["heal"] = f"已自愈(跳过): {dmsg}"
+            else:
+                failed.append(f"[algo] {it['name']}: 自动派发失败 ({dmsg})")
+                it["heal"] = f"自愈失败: {dmsg}"
+    _save_heal_lock(lock)
+
+    # 0.5) 🔴 2026-08-12 主人紧急令：A 股覆盖 URGENT 自我修复
+    #    痛点：8 天三重共识全港股因 self_heal 只处理 fail 类项从未派发自愈。
+    #    现在 a_share_* 项的 heal_cat 已设 algo_run，但 status 是 warn（不进 cat_items 派发链）。
+    #    修复：单独遍历「warn + id 以 a_share_ 开头 + message 含 URGENT」的项，
+    #         派发 algo_run 让云端 scanner 用修过的路径（commit 045ac1c84）出 A 股金股池。
+    #    去抖：与 algo_run 共享 HEAL_DEBOUNCE_MIN 窗口（同属一类）。
+    urgnet_items = [it for it in report["items"]
+                    if it.get("id", "").startswith("a_share_")
+                    and it.get("status") == "warn"
+                    and "URGENT" in (it.get("message") or "")]
+    if urgnet_items:
+        last = lock.get("algo_run")
+        if last:
+            last_dt = parse_time(last)
+            if last_dt and (now - last_dt).total_seconds() < HEAL_DEBOUNCE_MIN * 60:
+                msg = f"近 {HEAL_DEBOUNCE_MIN} 分钟内已派发 algo_run，跳过重复 A 股自愈"
+                for it in urgnet_items:
+                    it["heal"] = f"已自愈(跳过重复): {msg}"
+                healed.append(f"[algo/A股自愈] {', '.join(it.get('name','') for it in urgnet_items)}: {msg}")
+            else:
+                if _dispatch_count >= MAX_DISPATCHES_PER_RUN:
+                    for it in urgnet_items:
+                        it["heal"] = "已自愈(跳过): 达单次派发上限"
+                    healed.append(f"[algo/A股自愈] A股全港股: 达单次派发上限({MAX_DISPATCHES_PER_RUN})，跳过")
+                else:
+                    _dispatch_count += 1
+                    ok, dmsg, dispatched = _dispatch_algo_run(picking_only=True)
+                    if ok and dispatched:
+                        healed.append(f"[algo/A股自愈] {', '.join(it.get('name','') for it in urgnet_items)}: 🚨 URGENT 自动派发 algo_run 重跑（{dmsg}）→ 修复路径在 commit 045ac1c84")
+                        for it in urgnet_items:
+                            it["heal"] = f"🚨 URGENT 已自愈(已派发 algo_run 重跑): {dmsg}"
+                        lock["algo_run"] = now.strftime("%Y-%m-%d %H:%M:%S")
+                    elif ok:
+                        healed.append(f"[algo/A股自愈] A股全港股: {dmsg}")
+                        for it in urgnet_items:
+                            it["heal"] = f"已自愈(跳过): {dmsg}"
+                    else:
+                        failed.append(f"[algo/A股自愈] A股全港股: 自动派发失败 ({dmsg})")
+                        for it in urgnet_items:
+                            it["heal"] = f"自愈失败: {dmsg}"
+        _save_heal_lock(lock)
+    # 1) 数据卡片自愈：满足年龄阈值或被异常清空
+    stale = [it for it in fail_items
+             if (it.get("age_min") is not None and it["age_min"] >= ALERT_OVERDUE_MIN)
+             or it.get("premarket_cleared") is True]
+    cat_items = {}
+    for it in stale:
+        # heal_cat 显式覆盖优先：部分卡片虽挂在某页面下，实际由算法链(run_algorithms)产出，
+        # 按 page 映射派发 cn_fetch 永远刷不到（如 NT_DATA 市场提示），必须走 algo_run。
+        cat = it.get("heal_cat") or PAGE_TO_CAT.get(it.get("page"))
+        if cat:
+            cat_items.setdefault(cat, []).append(it)
+
+    for cat, items in cat_items.items():
+        names = [it.get("name", "") for it in items]
+        # 🛡 2026-09-24 B组①（小九·开盘前收口）：post_close HEAL 窗口收窄 + 白名单
+        #   常态仅 16:00-20:30 允许 post_close 自愈派发；窗口外仅对「post_close 独有产物白名单」
+        #   放行单次补跑（HEAL_DEBOUNCE_MIN=25 去抖保留，避免凌晨风暴）。口径源 HANDOFF postclose-reliability-trio。
+        if cat == "post_close":
+            _pc_min = now_cst().hour * 60 + now_cst().minute
+            _pc_in_win = 16 * 60 <= _pc_min <= 20 * 60 + 30
+            _pc_wl = [it for it in items if it.get("id", "").replace("all_", "") in _POST_CLOSE_ONLY_WHITELIST]
+            if not _pc_in_win and not _pc_wl:
+                for it in items:
+                    it["heal"] = "已自愈(跳过): post_close 窗口外(16:00-20:30)且非白名单项"
+                healed.append("[post_close] " + ", ".join(names) + ": post_close 窗口外，跳过（白名单项才允许单次补跑）")
+                continue
+        last = lock.get(cat)
+        if last:
+            last_dt = parse_time(last)
+            if last_dt and (now - last_dt).total_seconds() < HEAL_DEBOUNCE_MIN * 60:
+                msg = f"近 {HEAL_DEBOUNCE_MIN} 分钟内已派发，跳过重复"
+                healed.append(f"[{cat}] {', '.join(names)}: {msg}")
+                for it in items:
+                    it["heal"] = f"已自愈(跳过重复): {msg}"
+                continue
+        if _dispatch_count >= MAX_DISPATCHES_PER_RUN:
+            _dispatch_limit_hit.append(cat)
+            for it in items:
+                it["heal"] = f"已自愈(跳过): 达单次派发上限"
+            healed.append(f"[{cat}] {', '.join(names)}: 达单次派发上限({MAX_DISPATCHES_PER_RUN})，跳过")
+            continue
+        _dispatch_count += 1
+        if cat == "algo_run":
+            # 2026-08-22 根因⑨：仅当待治愈卡片全为选股类(picking) 且 <18:00 才跳过派发，
+            # 避免 18:00 前空转 45min（选股脚本全被时间闸跳过）。
+            _picking = bool(items) and all(it.get("picking") for it in items)
+            ok, dmsg, dispatched = _dispatch_algo_run(picking_only=_picking)
+        else:
+            ok, dmsg, dispatched = _dispatch_cn_fetch(cat)
+        if ok:
+            # 第173轮：区分「真派发」与「因已有 pending 跳过」——后者不刷新去抖锁，
+            # 否则一个（可能是僵尸的）pending run 会让后续每轮都以「近25分钟已派发」
+            # 为由继续跳过，自愈永久空转却对外谎报「已自动派发刷新」。
+            if dispatched:
+                healed.append(f"[{cat}] {', '.join(names)}: 已自动派发刷新 ({dmsg})")
+                for it in items:
+                    it["heal"] = f"已自动派发刷新({cat})"
+                lock[cat] = now.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                healed.append(f"[{cat}] {', '.join(names)}: {dmsg}")
+                for it in items:
+                    it["heal"] = f"已自愈(跳过): {dmsg}"
+        else:
+            failed.append(f"[{cat}] {', '.join(names)}: 自动派发失败 ({dmsg})")
+            for it in items:
+                it["heal"] = f"自愈失败: {dmsg}"
+
+    # 2) 管线类自愈：本地同步 / Pages 部署同步
+    for it in fail_items:
+        iid = it.get("id")
+        if iid == "local_sync":
+            # 2026-08-24 二级根因修复：local_sync fail 时若 message 含"raw_data"，优先拉 raw_data 子树（不污染代码 HEAD）
+            is_raw_data_behind = "raw_data" in (it.get("message") or "")
+            ok, dmsg = _heal_local_sync(pull_raw_data_only=is_raw_data_behind)
+            if ok:
+                healed.append(f"[管线] {it['name']}: {dmsg}")
+                it["heal"] = f"已自动对齐: {dmsg}"
+            else:
+                failed.append(f"[管线] {it['name']}: {dmsg}")
+                it["heal"] = f"自愈失败: {dmsg}"
+        elif iid == "site_sync":
+            ok, dmsg = _heal_site_sync()
+            if ok:
+                healed.append(f"[管线] {it['name']}: {dmsg}")
+                it["heal"] = f"已自动处理: {dmsg}"
+            else:
+                failed.append(f"[管线] {it['name']}: {dmsg}")
+                it["heal"] = f"自愈失败: {dmsg}"
+
+    _save_heal_lock(lock)
+    # 达上限被跳过的类别写回报告，避免「静默少派发」无处可查
+    if _dispatch_limit_hit:
+        report["heal_limit_hit"] = _dispatch_limit_hit
+    return healed, failed
+
+
+# 2026-08-11 漏洞 #3：管线耗时趋势监控
+def _check_workflow_durations(report):
+    import statistics
+    from pathlib import Path
+    hist_path = Path(WORKFLOW_DURATION_HISTORY)
+    history = {}
+    if hist_path.exists():
+        try:
+            history = json.loads(hist_path.read_text(encoding='utf-8'))
+        except Exception:
+            history = {}
+    now_iso = now_cst().strftime('%Y-%m-%dT%H:%M:%SZ')
+    new_history = {}
+    findings = []
+    targets = ['🩺 v8 运维看板常态自愈巡检(云端ubuntu)',
+               '🇨🇳 v8 中国数据抓取(云端)',
+               '☁️ v8 盘后算法链(云端)',
+               '☁️ v8 构建部署(云端ubuntu)']
+    for wf in targets:
+        runs = api_get(f'https://api.github.com/repos/{REPO}/actions/runs?per_page=30&status=completed')
+        if not isinstance(runs, dict):
+            continue
+        wf_runs = [r for r in runs.get('workflow_runs', []) if r.get('name') == wf and r.get('conclusion') == 'success']
+        if len(wf_runs) < 5:
+            continue
+        durs = []
+        for r in wf_runs:
+            try:
+                d = (parse_time(r['updated_at']) - parse_time(r['created_at'])).total_seconds()
+                if d > 0:
+                    durs.append(d)
+            except Exception:
+                pass
+        if len(durs) < 5:
+            continue
+        avg = statistics.mean(durs)
+        std = statistics.stdev(durs) if len(durs) > 1 else 0
+        latest = durs[0] if durs else 0
+        new_history[wf] = {'avg': round(avg, 1), 'std': round(std, 1),
+                           'latest': round(latest, 1), 'n': len(durs), 'updated': now_iso}
+        if std > 0 and latest > max(avg + WORKFLOW_DURATION_SIGMA * std, 600):
+            findings.append((wf, avg, std, latest))
+    try:
+        hist_path.parent.mkdir(parents=True, exist_ok=True)
+        hist_path.write_text(json.dumps(new_history, ensure_ascii=False, indent=2), encoding='utf-8')
+    except Exception:
+        pass
+    for wf, avg, std, latest in findings:
+        report['items'].append({
+            'id': f'workflow_duration_{abs(hash(wf)) % 100000}',
+            'name': f'管线耗时异常 · {wf[:24]}',
+            'page': '运维监控',
+            'status': 'warn',
+            'message': f'⚠️ 最新 {latest:.0f}s 远超均值 {avg:.0f}s+3σ({std:.0f}s),可能 runner 慢/API 卡'
+        })
+
+
+def write_urgent(reason_lines):
+    """邮件失败/夜间静音时需留痕时，写 URGENT 文件到仓库根目录。"""
+    ts = now_cst().strftime("%Y-%m-%d_%H%M")
+    p = Path(f"URGENT_小九_{ts}_v8健康自检告警.md")
+    body = [f"# v8 健康自检告警 {ts}", ""] + reason_lines + ["", "请检查 v8_health_check.py 日志与自愈结果。"]
+    p.write_text("\n".join(body), encoding="utf-8")
+    print(f"[INFO] 已写紧急文件 {p}")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 🛡 2026-09-15 主人令 · 一劳永逸：判定层加入「空档期不误判」不变量
+#
+# 【为什么必须收在这一层】
+#   本文件的历史病根 = **多层阈值各自合理，叠在一起即误报**：
+#     · adjust_max_age('实时数据') 在 08:24 已正确算出 1221min（距最近收盘+3h），
+#       但 _hard_cap_for_owner_rule 的「盘前 08:00-09:00 硬帽 360min」在 min() 里胜出
+#       → 12 张盘中卡在盘前全红（age 750+ > 360），全是「下一批还没跑」的假故障；
+#     · CARD_DEFS['IPO_DATA'].max_age 明明已改 1440（注释写「未到下一批次不红灯」），
+#       却被 adjust_max_age 的盘前分支 min(1440, 180) = 180 反手打回 → 依旧红。
+#   每加一张卡 / 改一次批次时间就要再补一层特例 —— 这正是 2900 行越滚越大的原因。
+#
+# 【新模型只问一句话】：「到这个点，这张卡的下一批该出了吗？出了没有？」
+#     · 该出而未出 → 阈值给小值，照常报红（**绝不掩盖真故障**）
+#     · 未到产出点 → 阈值 = 距上一批完成 + 宽限，数据停在上一批是设计内行为
+#
+# 【安全性质】本层只做 max() —— 只会放宽、绝不收紧 ⇒ 不可能凭空制造红灯；
+#   且活跃窗口内一律不介入，盘中 45min 严格判定一字不变。
+# ══════════════════════════════════════════════════════════════════════════════
+
+_REG_GRACE_MIN = 180   # 批次产出 + 构建部署 + CDN 回源的合理宽限
+
+# 活跃产出窗口（页 → (起, 止) 小时）。**只有窗口内才允许严格阈值**；
+# 窗口外是「上一批已完成、下一批未到期」的空档，一律走 _legit_ceiling。
+_REG_ACTIVE_WINDOW = {
+    # 🛡 2026-09-15（阿狸咪 1135 根因 A-2）：起点 09:30 → **09:45**。
+    #   盘中链首档数据 09:45 才产出（morning_scan 修正点）；09:30 开盘那一刻这批卡持有的
+    #   正是「上一交易日收盘值」⇒ 用 120min 严格阈值判定**必然假红**
+    #   （实测 09-15 09:19 / 09:30 两轮回查：概念排名 / 市场预警 / 股指期货持仓 / 平均股价，共 8 项全红）。
+    #   改后 09:30–09:45 落入「空档」→ 走 _legit_ceiling（距上一交易日 15:30 + 180min ≈ 1249min），
+    #   只放宽不收紧；盘中 09:45 之后的严格判定一字未变。
+    "实时数据": (9.75, 15.0),   # 盘中链 09:45-15:00（09:30-09:45 首档未产出，属空档）
+    "今日事件": (9.5, 15.0),    # 盘前批 08:15-09:15 跑完；09:30 起才允许判「今日批缺失」
+    "盘后数据": (20.5, 24.0),   # 盘后算法链 18:30-20:30
+    "选股策略": (20.5, 24.0),
+    "全量数据": (20.5, 24.0),
+}
+
+# 「上一批完成时刻」锚点（交易日 hh:mm）
+_REG_CYCLE_MARK = {
+    "今日事件": (9, 15),
+    "盘后数据": (20, 30),
+    "选股策略": (20, 30),
+    "全量数据": (20, 30),
+}
+
+
+def _recent_trading_mark(n, hh, mm):
+    """返回 <= n 的最近一个「A 股交易日 hh:mm」（跨周末/长假自动回退）。"""
+    tz = n.tzinfo or timezone(timedelta(hours=8))
+    d = n.date()
+    for _ in range(60):
+        if _is_trading_day(d):
+            t = datetime(d.year, d.month, d.day, hh, mm, tzinfo=tz)
+            if t <= n:
+                return t
+        d -= timedelta(days=1)
+    return n - timedelta(days=1)
+
+
+def _next_trading_mark(n, hh, mm):
+    """返回 > n 的最近一个「A 股交易日 hh:mm」（跨周末/长假自动前推）。
+
+    🛡 2026-09-21 小九新增：与 _recent_trading_mark 配对，用于求「产出周期跨度」。
+    """
+    tz = n.tzinfo or timezone(timedelta(hours=8))
+    d = n.date()
+    for _ in range(60):
+        if _is_trading_day(d):
+            t = datetime(d.year, d.month, d.day, hh, mm, tzinfo=tz)
+            if t > n:
+                return t
+        d += timedelta(days=1)
+    return n + timedelta(days=1)
+
+
+def _legit_ceiling_cycle(page, n=None):
+    """未登记产物通用的「产出周期跨度下界」：允许数据跨过【下一个产出点】一次。
+
+    🔴 2026-09-21 小九（实测铁证 · 一劳永逸）：
+      下邻 _legit_ceiling 的 docstring 原文即「由【下一个产出周期】决定」，
+      但它的实现只有 (n − 上一个产出点) + grace —— 只盯「上一个产出点」。
+      而全量数据类产物的真实产出窗口是【交易日盘后】（实测提交时刻分布：
+      16:41、18:18~19:29、20:33、22:38~00:34）。于是在「今天的产出窗口尚未到」
+      这段每天都会出现的合法空档里，它会把「上一交易日的产物」判成陈旧。
+
+      实测（09-21 当天，10 版报告逐版复现）：
+        · 13:5x/14:x/15:07/15:10/15:13/15:16/15:19 的 9 版报告：两项均 ok
+        · 15:49 那一版：两项均 fail、summary.fail 由 1 跳到 2
+        · 而这两个文件的内容【一字未改】（恒为 09-18 16:25:31 / 09-18 15:00）
+        · 差值恒定：all_ALGO_BACKTEST_COMPARE 恒 age−cap=+65，
+          all_STOCK_LIST 恒 age−cap=+150 ⇒ 不是数据变旧，是 cap 变紧
+        · cap 断崖实测：15:29=4499 → 15:31=4201（−298）→ 20:31=1440（−3030）
+
+    本函数返回「一个完整产出周期 + grace」，作为该页通用红线的下界。
+    只放宽、不收紧；且调用点仅在「下一个产出点尚未到」时启用（见 check_all_data_files），
+    因此当晚产出点一过即恢复严格口径，真故障不会被长期掩盖。
+    """
+    n = n or now_cst()
+    hh, mm = _REG_CYCLE_MARK.get(page, (20, 30))
+    cur = _recent_trading_mark(n, hh, mm)
+    nxt = _next_trading_mark(n, hh, mm)
+    return int((nxt - cur).total_seconds() / 60) + _REG_GRACE_MIN
+
+
+def _legit_ceiling(n, page, dual_page=None):
+    """该类卡在 n 时刻「合法可容许的最大数据年龄」（分钟）—— 由下一个产出周期决定。
+
+    只做下界：任何比本值更紧的阈值都是纯误报。dual_page 同卡双档时取两者较宽者。
+    """
+    n = n or now_cst()
+    pages = [p for p in (page, dual_page) if p]
+    if not pages:
+        return 0
+    ceilings = []
+    for pg in pages:
+        if pg == "运维":                       # 静态/手工维护页：7 天红线
+            ceilings.append(7 * 24 * 60)
+            continue
+        if pg == "实时数据":
+            due = last_trade_day_close(n)      # 最近交易日 15:30（盘前自动回退到上一交易日）
+        else:
+            hh, mm = _REG_CYCLE_MARK.get(pg, (9, 15))
+            due = _recent_trading_mark(n, hh, mm)
+        ceilings.append(int((n - due).total_seconds() / 60) + _REG_GRACE_MIN)
+    return max(ceilings)
+
+
+def _in_active_window(n, page):
+    """n 是否处在 page 的「本批正在跑/刚跑完」窗口内 —— 仅窗口内允许严格阈值。"""
+    win = _REG_ACTIVE_WINDOW.get(page)
+    if not win:
+        return False
+    if not _is_trading_day(n.date()):
+        return False
+    h = n.hour + n.minute / 60.0
+    return win[0] <= h < win[1]
+
+
+# ── 不变量包装层（原分时实现整体保留、原样下沉为 *_legacy）──────────────────
+
+def adjust_max_age(def_max, page=None, n=None):
+    """🛡 2026-09-15：legacy 分时收紧 → 再与「合法空档下界」取大（只放宽，不收紧）。"""
+    n = n or now_cst()
+    base = _adjust_max_age_legacy(def_max, page=page, n=n)
+    if page and not _in_active_window(n, page):
+        base = max(base, _legit_ceiling(n, page))
+    return base
+
+
+def _hard_cap_for_owner_rule(n=None, page=None):
+    """🛡 2026-09-15：同上，红线层也不得紧于「合法空档下界」。"""
+    n = n or now_cst()
+    base = _hard_cap_for_owner_rule_legacy(n=n, page=page)
+    if page and not _in_active_window(n, page):
+        base = max(base, _legit_ceiling(n, page))
+    return base
+
+
+def _adjust_max_age_legacy(def_max, page=None, n=None):
+    """根据交易时段 + 数据更新窗口动态调整阈值。
+
+    核心思路：每类数据有自己的「更新窗口」，窗口关闭后数据自然不会再刷新，
+    此时不应再用盘中阈值去判 stale，而应放宽到「下次预计更新前都算正常」。
+
+    参数:
+        def_max: CARD_DEFS 里定义的默认阈值（分钟）
+        page:   卡片所属分组（今日事件/实时数据/盘后数据/选股策略），用于区分更新窗口
+        n:      参照时间（北京时间 aware datetime）；默认 now_cst()。
+                🛡 2026-09-11 新增：双档卡（_dual_threshold）必须在**同一参照时间**下比较两页口径，
+                否则会「按 A 页的时刻算、用 B 页的实时钟取值」，得出自相矛盾的阈值（审计实测发现）。
+    """
+    n = n or now_cst()
+    h = n.hour + n.minute / 60.0
+    weekday = n.weekday()
+    is_weekend = weekday >= 5
+    # 🔴 2026-10-08 一劳永逸根因修复（小九）：改用本文件权威日历 _is_trading_day(n.date())。
+    #   【病灶】原 `weekday < 5` 只剔周末、**不剔法定节假日** ⇒ 周中长假（本次国庆
+    #     10-01(四)~10-07(三)）被判 is_trade_day=True ⇒ 落进下方「实时数据 · 盘中
+    #     09:45-15:00」分支被 min(def_max,45) 夹到 45 分钟 ⇒ 日频数据（股指期货持仓等）
+    #     恒 FAIL ⇒ 触发自愈链路每 25 分钟派发一次 ⇒ 而 cn_fetch 侧用真实日历已跳过
+    #     intraday ⇒ **死循环空转**白烧 CI 分钟数。
+    #   【自相矛盾铁证】同一函数 L1620 分支注释原文写着「周末/节假日：给 2880（48h，覆盖
+    #     周末+周一开盘）」—— 节假日**本就该走那个分支**，但入口判据让它永远走不到，
+    #     实现与自身设计意图直接冲突。
+    #   【安全性】只放宽不收紧：交易日（周一~周五且非节假日）_is_trading_day 与 weekday<5
+    #     完全等价 ⇒ 行为一字不变；仅周中法定节假日由 True 转 False ⇒ 落到 2880 放宽分支。
+    #   ⚠️ 本文件 L368 已有权威日历（含 _HOLIDAYS_2026），禁止再引第二套判断。
+    is_trade_day = _is_trading_day(n.date())
+
+    # 🛡 2026-08-31 一劳永逸：运维/静态卡（防误删清单/已下架/暂未上架，manual_dep）
+    #   此前落到底部「未分类」分支，交易时段被 min(def_max,45) 夹紧到 45min →
+    #   数据明明是今晨/昨日生成（age 数小时~1天）却被误判 stale → manual_dep 降级成 WARN 满屏。
+    #   这些卡本就用自身 max_age（10080=7天），直接返回 def_max，不被盘中 45min 收紧误伤。
+    if page == "运维":
+        return def_max
+    if page == "全量数据":
+        # 全量数据多为盘后算法链产物，按盘后/选股同口径日历感知（避免交易时段被 45min 夹紧误伤）
+        close = last_trade_day_close(n)
+        hours_since_close = (n - close).total_seconds() / 3600
+        if hours_since_close < 8:
+            # 2026-09-09 一劳永逸：与盘后数据页同口径，仅对天然严格项(def_max<=360)收紧；
+            #   全量数据页多为低频/日频产物（all_* 通用红线 1440），被压到 360 会在收盘后 8h 内误报红。
+            return min(def_max, 360) if def_max <= 360 else def_max
+        return int(hours_since_close * 60) + 180
+
+    # ── 通用收紧：交易时段内实时数据必须很新 ──
+    if page == "实时数据":
+        if is_trade_day and ((9.5 <= h <= 11.5) or (13.0 <= h <= 15.0)):
+            # 盘中：必须 45 分钟内更新过
+            return min(def_max, 45)
+        if is_trade_day and 15.0 <= h < 16.5:
+            # 🛡 2026-08-21 一劳永逸修复：原 min(def_max, 120) 对 def_max=60 的盘中卡完全无效
+            #   （min(60,120)=60，收盘宽限被自身默认值抵消）→ 14:52 的盘中数据到 15:56 满
+            #   64min 仍按 60min 阈值误报 fail，制造「15点收盘后数据没更新」假象，反复触发运维告警。
+            #   收盘后盘中聚合卡（指数 / ETF资金热度 / 板块资金流 / 市场资金流等）已定格、不再刷新，
+            #   合理保留到次日开盘都算正常。改用「距最近收盘 + 3h 缓冲」自适应阈值
+            #   （与下方盘前/夜间分支同口径），彻底消除收盘时段误报；真正盘中故障仍在
+            #   09:30-15:00 盘中分支（45min 严格阈值）实时报 fail，不掩盖真问题。
+            close = last_trade_day_close(n)
+            stale_floor = int((n - close).total_seconds() / 60) + 180
+            return max(120, stale_floor)
+        # 盘前 / 夜间 / 周末：实时数据本就不预期更新，放过夜阈值
+        # 次日 09:30 才会有新数据，给到次日开盘都算正常。
+        # 2026-08-11 修：原固定 960（16h）会误杀「盘前保留昨日值」的卡片——
+        #   ETF_DAILY_MONITOR/CAPITAL_FLOW_DATA 等停在上一交易日 15:30 盘后定稿，
+        #   到次日 08:55 健康检查时已 17.4h（1045min）> 960 被判 fail。
+        #   改为「距最近收盘分钟数 + 3h 缓冲」自适应（与盘后数据同口径），
+        #   长假/周一早盘自动覆盖；真正连续多日不更新仍会超阈值告警。
+        close = last_trade_day_close(n)
+        stale_floor = int((n - close).total_seconds() / 60) + 180
+        if is_trade_day and h < 9.5:
+            return max(960, stale_floor)
+        # 周末 /节假日：给 2880（48h，覆盖周末+周一开盘）
+        return max(2880, stale_floor)
+
+    if page == "今日事件":
+        # 今日事件由 v8_cn_fetch 08:25 premarket 产出，每日仅一次
+        if is_trade_day and 8.0 <= h < 10.0:
+            # 盘前窗口：期望已更新，但允许 180 分钟（可能稍晚）
+            return min(def_max, 180)
+        # 🛡 2026-09-04 主人令一劳永逸：08:25 批是当日唯一更新点，其余所有时段（含
+        #   凌晨/前夜/午后）统一 24h 铁律——原 960/1200 导致「昨日午间数据在今日
+        #   盘前批之前」整夜红灯（昨 12:53 → 今 04:53 即报警）。24h 内必有盘前批兜底。
+        if is_trade_day:
+            return 1440  # 到次日 08:25 盘前批都算正常
+        # 周末：覆盖到周一早盘
+        return 2880
+
+    # 🛡 2026-09-30 主人令（盘后页映射对齐）：元组扩展 —— LHB_DATA/CRISIS_DATA(共振日历)、
+    #   MARGIN_DATA(观测平台)、MARKET_REGIME(暂未上架)、FACTOR_LAB(最终推荐) 虽随真实 UI 迁页，
+    #   但数据节拍仍是「盘后算法链每日一次」，必须继续走本分支的自适应窗口；
+    #   迁入页既有项（SH_FIB 等）同受益：由盘中 45min 硬夹回归盘后自适应（生成时点均为收市后，行为不变）。
+    if page in ("盘后数据", "选股策略", "共振日历", "观测平台", "暂未上架", "最终推荐"):
+        # 盘后数据由 v8_algo_run 18:30 算法链产出，每个交易日仅一次。
+        # 关键：18:30 之外的所有时段，数据合理地来自「上一交易日收盘后」，
+        # 年龄可达 24h+，绝不能再用 360min 判 stale（否则夜间/白天/周末必然满屏红灯）。
+        close = last_trade_day_close(n)
+        hours_since_close = (n - close).total_seconds() / 3600
+        if hours_since_close < 8:
+            # 收盘后 8 小时内是新数据产出窗口（18:30 跑完 + 构建部署延迟），严格检查
+            # 🛡 2026-09-08 D2-A 一劳永逸：仅对天然严格项(def_max<=360)收紧；
+            #   FACTOR_LAB 等天然 1440 的低频项不得被压到 360（否则夜间/周末满屏红黄灯误报）。
+            return min(def_max, 360) if def_max <= 360 else def_max
+        # 其他时段：阈值 = 自最近收盘以来分钟数 + 3 小时缓冲
+        # 自动覆盖夜间/周末/周一早盘，避免周五数据在周日夜间被 2880 分钟阈值误杀
+        return int(hours_since_close * 60) + 180
+
+    # 未分类 / 管线类：沿用旧逻辑兜底
+    if is_trade_day and ((9.5 <= h <= 11.5) or (13.0 <= h <= 15.0)):
+        return min(def_max, 45)
+    if is_trade_day and 8.0 <= h < 9.5:
+        return min(def_max, 180)
+    if is_trade_day and 15.0 <= h < 20.0:
+        return min(def_max, 120)
+    return def_max
+
+
+def _hard_cap_for_owner_rule_legacy(n=None, page=None):
+    """🛡 主人铁律 2026-08-18 终极收紧：按 page × 分时段红线。
+
+    按 page 区分（仅实时数据走 2h 红线，盘后/选股/今日事件保留 24h 兜底）：
+
+    实时数据（real-time / 盘中秒级刷新的卡）：
+      · 交易日盘中（09:00-15:30）：**2h（120 min）** — 主人原话「超过2小时就报警+自愈闭环」
+      · 交易日盘后（15:30-20:00）：4h — cn_fetch post_close 17:20 跑完留缓冲
+      · 交易日盘前（08:00-09:00）：6h — premarket 8:25 必跑，留 6h 兜底隔夜漏抓
+      · 夜间：24h — 非交易时段实时数据停滞正常
+
+    盘后数据 / 选股策略 / 今日事件 / 其他：保留原 24h 红线
+      （这些页合理保留上一交易日数据；adjust_max_age 已自带分时自适应，无需再绑）
+
+    非交易日（周末/节假日）：T+1 18:30 - 上次收盘（自适应长假/连休，下限 24h）
+
+    接入方式：所有 adjust_max_age 返回值再 min(def_max, this) 一次。
+
+    历史：
+      · 2026-08-17 v1：24h 统一红线（主人最初记忆版本）
+      · 2026-08-18 v2：主人再次令「超过2小时就报警自愈」→ 仅实时数据页收紧到 2h，
+        全 page 统一收紧会误伤盘后数据（昨日 17:30 出的 post_close 数据自然 < 24h 旧，
+        但盘中 09:00-15:30 距上次收盘 17.5h，按通用 2h 红线会被误报 fail）
+    """
+    n = n or now_cst()
+    # 🛡 2026-09-06 一劳永逸：运维/静态卡（防误删清单/已下架/暂未上架）7 天红线全时段生效——
+    #   原豁免只写在「盘中」分支（下方 is_market_closed 内），周末/节假日落到「非交易日 T+1 cap」
+    #   （≈3.7 天），更新于 4-5 天前的静态文档必超 → fail → manual_dep 降 warn「待更新」满屏。
+    #   静态文档按周手动更新，7 天红线与 adjust_max_age 的运维豁免（10080）对齐，两条路径都放行。
+    if page == "运维":
+        return 7 * 24 * 60
+    if not is_market_closed(n):
+        if page == "实时数据":
+            h = n.hour + n.minute / 60.0
+            # 盘中（09:00-15:30）：2h 红线——主人原话
+            if 9.0 <= h < 15.5:
+                return 120
+            # 盘后窗口（15:30-20:00）：4h — cn_fetch post_close 17:20 跑完留 2h 余量
+            if 15.5 <= h < 20.0:
+                return 240
+            # 盘前窗口（08:00-09:00）：6h — premarket 8:25 必跑，留 6h 兜底隔夜漏抓
+            if 8.0 <= h < 9.0:
+                return 360
+        # 🛡 2026-08-31 一劳永逸：盘后数据/选股策略/全量数据 由收盘后算法链(交易日~19:15)产出，
+        #   仅交易日更新一次。周一早盘距最近交易日收盘可达 60h+，但那是「最新可用」数据，
+        #   不应按 24h 红线判 fail（与 adjust_max_age 盘后/选股分支同口径）。
+        #   阈值 = 距最近收盘分钟数 + 3h 缓冲；仍不低于 24h 底线；真实多日不更新仍会超阈值告警。
+        if page in ("盘后数据", "选股策略", "全量数据", "共振日历", "观测平台", "暂未上架", "最终推荐"):
+            close = last_trade_day_close(n)
+            cap = int((n - close).total_seconds() / 60) + 180
+            return max(24 * 60, cap)
+        # 🛡 2026-08-31 一劳永逸：运维/静态卡（防误删清单/已下架/暂未上架）主人按周更新，
+        #   24h 红线不适用；用 7 天红线（与 CARD_DEFS max_age=10080 对齐），
+        #   避免「昨日生成的数据」被 24h 红线误判 stale → manual_dep 降级成 WARN 满屏。
+        if page == "运维":
+            return 7 * 24 * 60
+        # 其他 page 或夜间：24h — 数据合理停滞（非实时数据由 adjust_max_age 自适应）
+        return 24 * 60
+    # 非交易日：T+1 18:30 - 上次收盘（自适应长假/连休）
+    last_close = last_trade_day_close(n)
+    d = n.date() + timedelta(days=1)
+    while not _is_trading_day(d):
+        d += timedelta(days=1)
+    # T+1 18:30 = 下一个交易日盘后跑完时间
+    t1_done = datetime.combine(d, datetime.strptime("18:30", "%H:%M").time(),
+                                tzinfo=timezone(timedelta(hours=8)))
+    cap = int((t1_done - last_close).total_seconds() / 60)
+    # 下限保护：算出来不能 < 24h，否则同日连休 1 天就崩
+    return max(24 * 60, cap)
+
+
+# ── 🛡 2026-09-11 主人令（轻量化·卡迁移）：「双档卡」阈值双轨计算 ─────────────────────
+# 背景：卡片**页面归属**（盘后数据页）与**数据节拍**（盘中每 30 分 + 盘后定稿）分离后，
+#       只按单一 page 算阈值必然二选一出错：
+#         · 全按「实时数据」→ 15:30 之后落到 2880min（48h）放过夜，掩盖「盘后定稿未产出」；
+#         · 全按「盘后数据」→ 09:30-15:00 阈值 60min 尚可，但「15:30 盘中末班车 → 17:20 盘后首轮」
+#           之间本就不刷新，必被判 stale → 天天假红灯（主人最反感的「满屏红灯」）。
+#       故按窗口分三段（仅对声明了 dual_page 的卡生效；其余卡行为一字不变）：
+#         09:00-15:30 盘中 → 取两口径**较严格**者：保住 45min 敏感度与 2h 主人铁律
+#         15:30 之后      → 「距最近收盘 + 180min」缓冲（实测修正，见 _dual_threshold 文档）
+#       非交易日一律回归页面自身口径（周末两口径都极宽松，取页面口径语义更稳）。
+_DUAL_MARKET_OPEN_H, _DUAL_POSTCLOSE_H = 9.0, 15.5
+_DUAL_FIRST_POSTCLOSE_H = 18.0   # 17:20 盘后首轮 + 40min 余量（实测 cn_fetch post_close 批偶需 10~30min）
+
+
+def _dual_threshold(def_max, page, dual_page=None, n=None):
+    """双档卡 max_age：见上方窗口说明。dual_page 为空时等价于 adjust_max_age(def_max, page)。
+
+    🩸 2026-09-11 实测修正（审计发现两处反直觉结果，故窗口定为 2 段而非 3 段）：
+      · 15:30 之后的阈值不能取「实时数据」分支——它在 16:30 后会跳到 2880min（48h），
+        与「收盘→盘后三档」的节拍完全不匹配（17:10 会放过夜，掩盖盘后定稿缺失）；
+      · 也不能只取「盘后数据」分支——该卡 max_age=60，而盘后数据页 8h 内用 min(60,360)=60，
+        卡片在 19:20（当日最后一次 post_close）定稿后再不刷新 → 20:20 起必被误报 stale（天天假红灯）。
+      故 15:30 之后统一用「距最近收盘 + 180min」缓冲（与实时数据页收盘分支同口径）：
+      15:45→195min、19:30→420min、23:00→630min，次日 08:00→1170min，既不误报也不放过夜。
+    """
+    n = n or now_cst()
+    base = adjust_max_age(def_max, page=page, n=n)
+    if not dual_page:
+        return base
+    if not _is_trading_day(n.date()):
+        return base
+    h = n.hour + n.minute / 60.0
+    if _DUAL_MARKET_OPEN_H <= h < _DUAL_POSTCLOSE_H:
+        # 盘中（09:00-15:30）：两口径取较严格者 —— 保住 45min 敏感度与 2h 主人铁律
+        return min(base, adjust_max_age(def_max, page=dual_page, n=n))
+    # 15:30 收盘之后（含收盘→盘后首轮间隙、盘后三档、夜间）：距最近收盘 + 180min 缓冲
+    close = last_trade_day_close(n)
+    buf = int((n - close).total_seconds() / 60) + 180
+    return max(base, buf)
+
+
+def _dual_hard_cap(page, dual_page=None, n=None):
+    """双档卡的 2h/24h 硬 cap：盘中叠加严格侧（保住 2h 主人铁律），其余时段用页面自身口径。"""
+    n = n or now_cst()
+    cap = _hard_cap_for_owner_rule(n=n, page=page)
+    if dual_page and _is_trading_day(n.date()):
+        h = n.hour + n.minute / 60.0
+        if _DUAL_MARKET_OPEN_H <= h < _DUAL_POSTCLOSE_H:
+            cap = min(cap, _hard_cap_for_owner_rule(n=n, page=dual_page))
+    return cap
+
+
+def _raw_fresh_override(d, status, msg):
+    """🛡 2026-09-10 主人令一劳永逸：post_close 卡「raw 已新 / js 待 20:00 D批重建」窗口误报 fail 根因修复。
+
+    根因：SH_FIB / INST_TRADE / STOCK_RPS 等卡片的 raw_data 由盘后算法链(A/B 批)盘中刷新，
+    但 data/*.js 仅在 20:00 D 批(post_close 构建)从 raw 重建（update_v8.py 的 _pure_pc 守卫防回滚）。
+    故每日 15:00 收盘后 ~ 20:00 D 批前存在「raw 已新、js update_time 仍旧」窗口；
+    健康检查只读 js update_time → 误判 fail → 触发 futile self_heal 派发永远刷不出的任务。
+
+    修复：algo_run 类卡片，当对应 raw_data/<file> 在 24h（主人交易日红线）内已更新，
+    即判定数据管线本交易日已产出、js 待重建属设计内 → 健康(ok)，不误报 fail。
+    raw 超 24h 仍未更新 = 真·管线缺口 → 保持原 fail，绝不掩盖。
+    manual_dep 卡（本机限制类）不走此逻辑，保持 warn「本机限制」。
+    """
+    if status not in ("fail", "warn"):
+        return status, msg
+    # 2026-09-13 主人令：net_dep（网络受限依赖：本机 baostock 黑名单 / 腾讯 waf，需小九中国 IP）
+    #   与 manual_dep（等主人撰写/推送）同属「本机无法自愈」，一律不走 raw_data 自救检查，
+    #   避免自愈链日复一日派发永远刷不出的任务（假派发噪声邮件）。
+    if d.get("manual_dep") or d.get("net_dep"):
+        return status, msg
+    if d.get("heal_cat") != "algo_run":
+        return status, msg
+    rf = d.get("raw_file") or f"{d['id'].lower()}.json"
+    rp = RAW_DIR / rf
+    if not rp.exists():
+        return status, msg
+    raw_mtime = datetime.fromtimestamp(rp.stat().st_mtime, tz=timezone(timedelta(hours=8)))
+    raw_age = (now_cst() - raw_mtime).total_seconds() / 60
+    if raw_age <= 24 * 60:
+        rel = fmt_rel_time(raw_mtime.strftime("%Y-%m-%d %H:%M:%S"))
+        return "ok", f"raw_data/{rf} {rel} 已更新；js 待 20:00 D批重建(设计内·_pure_pc 守卫)，数据管线健康"
+    return status, msg
+
+
+def check_data_cards():
+    results = []
+    today_str = now_cst().strftime("%Y-%m-%d")
+
+    def _emit(d, row):
+        """统一出口：任何分支产出的检查项都必须继承 heal_cat，
+        否则 self_heal 会回落到 PAGE_TO_CAT 派发错误类别（158 轮加固）。"""
+        if d.get("heal_cat"):
+            row["heal_cat"] = d["heal_cat"]
+        results.append(row)
+
+    for d in CARD_DEFS:
+        source_id = d.get("_source_file") or d["id"]
+        var_name = d.get("_window_var") or d["id"]
+        path = DATA_DIR / f"{source_id}.js"  # 本地兜底路径（云端 runner 本地即最新 checkout）
+        # 2026-08-28 一劳永逸修复：取线上站点与本地文件中时间戳较新的一个，彻底消除
+        # 算法链刚部署新数据但 CDN 缓存未刷新 → HEALTH_CHECK 读到旧值 → 误报 fail 的竞态。
+        data = load_window_var_newest(source_id, var_name, path)
+        if data is None:
+            _emit(d, {
+                "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+                "status": "fail", "last_update": "--", "age_min": None,
+                "message": f"找不到数据文件 {path.name} 或解析失败"
+            })
+            continue
+        ts = data.get("update_time") or data.get("date") or data.get("lastUpdated") or "--"
+        dt = parse_time(ts)
+        # 🛡 2026-09-04 主人令：周更卡（V8_CAL 每周日+月末）直接用自身 max_age（10080=7天），
+        #   不走 adjust/cap 的 24h 收紧——否则周中必被「今日事件 24h cap」误判 stale。
+        if d.get("weekly"):
+            max_age = d["max_age"]
+        else:
+            # 🛡 2026-09-11 主人令（卡迁移）：双档卡（page 与 dual_page 不同）走 _dual_threshold，
+            #   其余卡一字不变（dual_page 为空时 _dual_threshold 直接返回单页 adjust_max_age 结果）。
+            max_age = _dual_threshold(d["max_age"], d.get("page"), d.get("dual_page"))
+            # 🛡 主人铁律 2026-08-18：分 page × 分时段红线（仅实时数据盘中 2h / 其他 24h）
+            # 硬 cap 必须在 adjust_max_age 之后叠加，否则盘中/盘后自适应逻辑被绕过
+            max_age = min(max_age, _dual_hard_cap(d.get("page"), d.get("dual_page")))
+            # 🛡 2026-10-11 一劳永逸（阿狸咪的工程师）·逐卡真实节拍锚点：
+            #   有 cycle=(hh,mm) 的卡按「距上一产出点」放宽下界（只放宽不收紧）——
+            #   W52_HIGH 盘前 07:15~08:45 / WAVE_ELLIOTT 17:50 / DAJIJIN 次日凌晨 02:30~04:40
+            #   这类错峰节拍，原「通用 24h」口径在周末/延迟窗口必误判假红（10-09~10-11 连 3 晚实证）。
+            #   真停摆不受掩护：下一 cycle 产出点一过即恢复 fail。
+            _cyc = d.get("cycle")
+            if _cyc:
+                _n = now_cst()
+                _mk = _recent_trading_mark(_n, *_cyc)
+                max_age = max(max_age, int((_n - _mk).total_seconds() / 60) + _REG_GRACE_MIN)
+
+        # 盘中 premarket_cleared 异常自愈检测：实时数据在交易时段被标记为盘前清空，属于误清空
+        prem_cleared = data.get("premarket_cleared") is True
+        # 注意：page 变量在下方才赋值，此处必须直接取 d["page"]，否则会误用上一轮循环的残留值
+        if prem_cleared and d.get("page") == "实时数据" and is_intraday_session():
+            # 🛡 2026-09-03 一劳永逸：开盘前 30min(09:30-10:00)东财延迟镜像偶发空，premarket_cleared
+            #   属预期占位（cloud_fetch 盘中空结果已自愈清标记），不误报 fail；10:00 后仍残留才判
+            #   真·盘中误清空异常。配合 cloud_fetch_v8._clear_premarket_marker 自愈闭环。
+            _open = now_cst().replace(hour=9, minute=30, second=0, microsecond=0)
+            _mins_since_open = (now_cst() - _open).total_seconds() / 60.0
+            if _mins_since_open >= 30:
+                _emit(d, {
+                    "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+                    "status": "fail", "last_update": str(ts), "age_min": 0,
+                    "premarket_cleared": True,
+                    "message": f"盘中交易时段被异常标记为 premarket_cleared（update_time={fmt_rel_time(ts)}）"
+                })
+                continue
+            else:
+                _emit(d, {
+                    "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+                    "status": "ok", "last_update": str(ts), "age_min": 0,
+                    "premarket_cleared": True,
+                    "message": f"盘前清空占位，开盘初期东财镜像待刷新（update_time={fmt_rel_time(ts)}）"
+                })
+                continue
+
+        if dt is None:
+            _emit(d, {
+                "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+                "status": "warn", "last_update": str(ts), "age_min": None,
+                "message": "无法解析更新时间"
+            })
+            continue
+        age_min = (now_cst() - dt).total_seconds() / 60
+        status = "ok" if age_min <= max_age else "fail"
+
+        # 🛡 2026-09-02 一劳永逸：选股类(picking)卡片按「交易日(data_date)」判定新鲜度，根治运维面板整日误标红 ✗
+        #   根因：picking 卡由 overnight 算法链 ~04:xx 生成「当日」选股、再由盘后链 ~19:15 重写；
+        #   04:xx→19:15 重写前年龄可达 15h+，原固定 360min 阈值（adjust_max_age 收盘后8h严格窗口）整日误判 stale。
+        #   修正：只要 update_time 属「当前交易日」即视为当日新鲜（盘后链会按时重写），
+        #   仅当属更早交易日（overnight+盘后链都未产出）才维持 fail。杜绝同类误报再犯。
+        if d.get("picking"):
+            try:
+                from v8_date import today_data_date as _tdd
+                _dd = _tdd()
+                _cd = dt.strftime("%Y-%m-%d")
+                if _cd == _dd:
+                    status = "ok"
+                    msg = f"更新于 {fmt_rel_time(ts)}（当日选股·盘后链将刷新）"   # 2026-09-11 修：rel 在本行之后才赋值 → NameError 被 except 吞掉，说明文案一直没生效
+            except Exception:
+                pass
+
+        # 🛡 2026-08-19 修：人工维护卡（今日宏观解读=主人撰写宏观解读，管线只补cpi/pmi）
+        #   陈旧属预期，降 warn 不误报 fail（看板保留提示主人更新）。
+        # 🛡 2026-09-13 主人令（一劳永逸·语义分离）：把两类「非故障的陈旧」拆开 —— 此前混用 manual_dep
+        #   导致同一份数据在两台机器上判出不同状态（本机旧版只能判 warn、小九新版判 limited），
+        #   面板还会把两者一起当失败推进「失败/诊断详情」，形成长期假告警。现严格区分为：
+        #     manual_dep → limited（🔒 受限可用）＝ 等主人撰写/推送，人工待办，不自行派发
+        #     net_dep    → warn  （⚠ 提示）    ＝ 等小九中国 IP 在线跑，能力受限，非系统故障
+        #   两者 overall 均不计为 fail（overall 仅由 fail 决定，天然满足）。
+        if d.get("manual_dep") and age_min > max_age:
+            status = "limited"
+            _note = d.get("manual_note") or d.get("alimi_note")
+            if _note:
+                msg = _note
+        elif d.get("net_dep") and age_min > max_age:
+            status = "warn"
+            _note = d.get("net_dep_note") or d.get("manual_note") or d.get("alimi_note")
+            if _note:
+                msg = "本机能力受限（非故障）· 待小九中国 IP 在线跑：" + _note
+
+        page = d.get("page")
+        # 周末/节假日不更新模块：直接放行，不判 stale、不判空值，避免误告警
+        weekend_skip = d.get("weekend_update") is False and is_market_closed()
+        # 盘后数据 / 选股策略：周末/节假日停在最近交易日，同样放行并显示友好提示
+        if not weekend_skip and is_market_closed() and page in ("盘后数据", "选股策略"):
+            if dt and dt >= last_trade_day_close(now_cst()):
+                weekend_skip = True
+
+        # 盘前清空（premarket_cleared=true）是 cloud_fetch_v8._clear_intraday_for_premarket 的设计内行为：
+        # 实时数据在 09:30 开盘前本就无当日数据，字段为空属预期，不应报"关键字段空值"。
+        # 盘中被误清空的情况已由上方 prem_cleared + is_intraday_session() 分支判 fail，这里不重复。
+        # 🛡 2026-08-19 修：ETF_DAILY_MONITOR 等 KEEP_VARS 卡盘前保留上一交易日(T+1)收盘值，
+        #   盘前不刷新属设计行为（同 premarket_cleared 预期），盘前判 OK、开盘后由盘中刷新覆盖。
+        prem_cleared_expected = (prem_cleared or d.get("premarket_keep")) and not is_intraday_session()
+
+        # 空值检测
+        empty_fields = []
+        # 🛡 2026-08-30 一劳永逸：available=False = 抓取失败/占位符状态
+        # （如 fetch_avg_price 三源取数失败写占位符，前端已优雅降级显示「云端抓取中」）。
+        # 此时关键字段为空属预期，不应报"关键字段空值"误告警；
+        # 若占位符长期未刷新（age>max_age）说明抓取持续失败，仍由下方 age 逻辑判 fail。
+        intentional_empty = data.get("available") is False
+        if not weekend_skip and not prem_cleared_expected and not intentional_empty:
+            for f in d["key_fields"]:
+                # 🛡 2026-09-18 一劳永逸（阿狸咪的工程师 · 修「平均股价」常年黄灯）：
+                #   数据自带就绪标志时以它为准 —— key_fields 含 f 且 data 里存在 f + "_ready"
+                #   且其为 False，即「该字段数学上尚不可算」（如均值窗口未满），属**合法空值**，
+                #   不是缺数。实测证据：data/AVG_PRICE_DATA.js 里 ma20=null / ma60=null 同时
+                #   ma20_ready=false / ma60_ready=false / history_days=15（< 20）⇒ 前端本就显示
+                #   「⏳ 均线积累中 15/20 日」的未就绪态，而后端却报「关键字段空值：ma20, ma60」
+                #   黄灯 ⇒ 伪告警（运维页常年黄灯）。
+                #   通用机制（不特判单卡）：任何卡只要提供 <字段>_ready 即自动受此保护。
+                if f + "_ready" in data and data.get(f + "_ready") is False:
+                    continue
+                v = data.get(f)
+                # 🔴 2026-08-17 一劳永逸修复：原 line 944 把 v == [] 当"空值"会误报
+                # 三重共识 0 只 = 弱市真实状态（不是"空值"！），扫到的 stocks=[] 应该算合法
+                # 只有字段完全缺失（None/不存在/非合法类型）才报"空值"
+                # 真正的"上游 bug = stocks 数 > 0 但 A 股 = 0"交给 check_a_share_coverage 专门处理
+                if v is None or (isinstance(v, str) and v in ("", "--", "加载中")):
+                    empty_fields.append(f)
+                elif not isinstance(v, (list, dict, int, float, str, bool)):
+                    empty_fields.append(f)
+        if empty_fields and status == "ok":
+            status = "warn"
+        rel = fmt_rel_time(ts)
+        # 🛡 2026-09-10 主人令：manual_dep 项的 message 在前面的 manual_note 处理段已写好
+        #   (msg=_note)，不要被下方默认的"更新于 {rel}"无条件覆盖，否则运维面板只显示陈旧时间，
+        #   看不到"待小九中国IP"等真实原因。判断：当前 manual_dep 项是否已带 note。
+        _has_manual_note = bool(d.get("manual_dep") and age_min > max_age and (d.get("manual_note") or d.get("alimi_note")))
+        if not _has_manual_note:
+            msg = f"更新于 {rel}"
+        if weekend_skip:
+            status = "ok"
+            phase = "盘后" if page in ("盘后数据", "选股策略") else "盘前"
+            msg = f"休市不更新（数据为上一交易日{phase}）；{rel}"
+        elif prem_cleared_expected:
+            status = "ok"
+            msg = f"盘前已清空，等待开盘后刷新（预期行为）；{rel}"
+        elif intentional_empty and status != "fail":
+            status = "ok"
+            msg += "；抓取占位符（available=false，前端显示抓取中，下轮自愈）"
+        elif empty_fields:
+            msg += f"；关键字段空值：{', '.join(empty_fields)}"
+        # 🛡 2026-09-10 主人令一劳永逸：post_close 卡「raw 已新 / js 待 D批重建」窗口交叉校验。
+        #   仅在 algo_run 且非 manual_dep 且 raw_data 24h 内已更新时，把误报 fail/warn 翻回 ok。
+        #   放在所有 status 重算分支之后、fail 消息追加之前，作为权威终裁（不掩盖真·管线缺口）。
+        status, msg = _raw_fresh_override(d, status, msg)
+        if status == "fail":
+            if intentional_empty:
+                msg += "；占位符长期未刷新（抓取疑似持续失败）"
+            msg += f"；超过阈值 {max_age} 分钟"
+        _emit(d, {
+            "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+            "status": status, "last_update": ts, "age_min": round(age_min, 1),
+            "message": msg
+        })
+    return results
+
+
+# ── 2026-08-17 主人怒令「每个前端的算法都全面审计」：53 个 data/*.js 不在 CARD_DEFS 从未被审计 ──
+# CARD_DEFS 只覆盖 28 张主卡；SECTOR_RS/SENTIMENT_CYCLE/COMMODITY_ELASTICITY/MAHORO/NORTH_FUND/
+# STOCK_QUOTE/STOCK_MOMENTUM_STATE(W2)/TRIPLE_HISTORY/W52_HIGH/STOCK_PROFILE 等 53 个文件
+# 既不在 CARD_DEFS 也不在 check_a_share_coverage → 陈旧 3 天没人报警（今晚主人连续质问的根因）。
+# 一劳永逸修法：本函数自动扫描 data/*.js 全集，未登记 CARD_DEFS 的按「通用规则」审计：
+#   通用规则 = ①有 update_time/date 且 ≤ 24h 红线（_hard_cap_for_owner_rule）②文件可解析 ③非空
+# 未来新增 data 文件自动纳入审计，无需手工维护 CARD_DEFS。
+_KNOWN_EXTRA_PAGES = {
+    # 部分已登记 CARD_DEFS 的 id 会在这里被跳过（不重复审计）
+}
+# window 变量名 ≠ 文件名 的别名映射（文件 id → window 变量名候选）
+_WINDOW_VAR_ALIASES = {
+    "STOCK_MOMENTUM_STATE_V2": ["STOCK_MOMENTUM_ENHANCED"],
+    # 2026-09-07 一劳永逸：文件名 maharo_macro.js 但 window 变量是 MAHORO_MACRO（拼写不一致），
+    #   通用全量审计解析失败 -> 长期误报「maharo_macro.js 缺失或解析失败（未被 CARD_DEFS 登记）」红灯。
+    "maharo_macro": ["MAHORO_MACRO", "MAHARO_MACRO"],
+    # 2026-09-10 一劳永逸：小九当日把 insights 从 maharo_macro.js 拆出独立文件
+    #   data/maharo_insights.js -> window.MAHORO_INSIGHTS（已实证 6864B 有效）。
+    #   拆分时漏登记别名 -> 全量审计解析失败 -> 长期误报「缺失或解析失败（未被 CARD_DEFS 登记）」红灯。
+    "maharo_insights": ["MAHORO_INSIGHTS", "MAHARO_INSIGHTS"],
+    "PORTFOLIO": ["PORTFOLIO_DATA"],
+}
+# 低频/非每日更新数据（24h 红线不适用，但超过 7 天仍报 warn）：
+#   STOCK_PROFILE 个股资料库（月度刷新） / WEEKEND_META_REPORT 周末复盘（周末生成）
+#   PORTFOLIO 用户真实持仓（手动更新） / PORTFOLIO_COST 持仓成本基准（手动）
+#   CONCEPT_ETF_MAP 概念ETF静态映射（研究参考） / OPTIMIZED_STRATEGY 优化策略（回测产物）
+#   BLOAT_CHECK 体积检查（build 时） / HEALTH_CHECK 本检查自产
+#   （BACKTEST_TDX 已于 2026-09-18 移出本白名单 —— 它是 E 批每日产物，
+#     原「参数变更才重跑」的理由已过时；详见下方 2026-09-18 摘除说明。）
+#   RUNNER_STATUS_HEALTH runner 心跳（1 分钟级自愈，另有专门检查）
+# 🛡 2026-08-18 一劳永逸补入：
+#   WEEKEND_RUN 周度运行汇总（周末/月初自动跑，工作日基本无变化）→ 加入白名单避免误报 warn
+_OCR_DEPENDENCY_FILES = {
+    # 🛡 2026-08-19 一劳永逸：这些文件由「主人提供 PDF → OCR 抽取」驱动，无 PDF 输入自动巡检
+    # 永远无法刷新。陈旧=预期，非异常。一并从 health-check items[] **完全排除**，彻底不渲染告警卡。
+    # 与 self_heal_monitor.py P0-2 (免邮件方针) 对齐。
+    "MOMENTUM_FILTER",
+    "STOCK_MOMENTUM_STATE",
+    "STOCK_MOMENTUM_STATE_V2",
+}
+_LOW_FREQ_FILES = {
+    # 2026-09-13：STOCK_PROFILE 已随 data/STOCK_PROFILE.js 停产移除
+    "WEEKEND_META_REPORT", "PORTFOLIO", "PORTFOLIO_COST",
+    "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY",
+    # 🔴 2026-09-18 阿狸咪的工程师（摘除 BACKTEST_TDX · 双盲区根治）：
+    #   原列此处的理由「回测结果（参数变更才重跑）」**已过时** —— 它现为 E 批每日回测
+    #   产物，本就该每日刷新。留在本白名单（陈旧降级为「>7 天才告警」）的直接后果实测：
+    #   E 批链推送 raw_data/backtest_tdx.json（涨到 76 MB）连续 4 天 HTTP 422 失败、
+    #   线上 data/BACKTEST_TDX.js 停在 09-14，而本巡检**全程零告警** ⇒ 停更 4 天无人知晓。
+    #   它与 v8_stage_gate.py 的 E 批判据（BACKTEST_TDX 原只在 need=2 的「任一」位）
+    #   构成**双盲区**：闸门不阻塞、巡检不告警。本轮两端同时闭环（闸门提 must + 此处摘除）。
+    #   参照同一事故家族：L153 附近早有注释写明另一产物「刻意**不进** _LOW_FREQ_FILES：
+    #   它是每日回测批产物，本就该每日刷新」—— 本条即按同一口径对齐。
+    "HEALTH_CHECK", "RUNNER_STATUS_HEALTH",
+    "WEEKEND_RUN",
+    "maharo_macro",  # 2026-09-08 一劳永逸：本机 cookie 拉取(云端无权限)，家里机离线会陈旧 -> 7天容忍仅告警
+    "maharo_insights",  # 2026-09-10：同 maharo_macro 口径（本机 cookie 拉取，云端无权限）-> 同样 7天容忍仅告警
+    "MACRO",  # 2026-08-29：window.MACRO 已被 window.MACRO_DATA 取代，index.html 仅用 MACRO_DATA/MACRO_BRIEF，全站 0 渲染引用 → 白名单免误报
+    # 🛡 2026-09-16 主人令一劳永逸：候选池 / 金股池是算法**上游水源**不是策略 ⇒ 不需要回测
+    #   （09-14 已摘 CARD_DEFS 登记 + 删 algorithms/backtest_pools.py），但两份产物当时漏删，
+    #   残留后被 all_ 通用扫描按 1440min 红线判 fail（09-16 看板实测 2 红灯）。
+    #   本轮已删产物；此处加护栏防「有人把旧产物放回」导致红灯复发。
+    "CANDIDATE_BACKTEST", "GOLD_POOL_BACKTEST",
+    # 🗑 2026-09-21 一劳永逸（小九）：**强势突破残留产物 · 防红灯复发护栏**。
+    #   09-19 主人令「强势突破全站删除」(07d9690eb4) 生效后产物被 8bc8275fdc 回推复活，
+    #   落入 check_all_data_files 全扫按通用 24h 红线判 fail（09-21 看板实测 all_STRONG_BREAKOUT = fail）。
+    #   修法：产物侧由一次性提交删除；巡检侧登记本白名单；推送侧 api_push_raw.py::_RETIRED_ARTIFACTS 拒绝回推。
+    #   ⚠️ 只登记**已退役**产物，不放松任何在跑产物的红线。
+    #   🔴 本行曾于 2026-09-21T00:19Z 被 commit 3d955c9f5c 静默覆盖（见 HANDOFF.yaml
+    #      handoff-concurrent-write 的实测补记）⇒ 本批按 cfe5d0bf97 原文原样恢复。
+    "STRONG_BREAKOUT", "STRONG_BREAKOUT_BACKTEST",
+    # 🗑 2026-09-22 主人令（阿狸咪的工程师）：**「新周期判定」白河愁卡整卡退役 · 护栏**。
+    #   卡已删、产物已删、生产者脚本已删、前端 0 引用 ⇒ 若有人把旧产物放回，
+    #   all_ 通用扫描会按 24h 红线判 fail。此处登记白名单防红灯复发（同强势突破范式）。
+    #   ⚠️ 只登记**已退役**产物，不放松任何在跑产物的红线。
+    "BAIHECHOU_MACRO", "BAIHECHOU_ANALYSIS",
+    # 🗑 2026-09-21 18:45 小九（本批）：**ALGO_BACKTEST_COMPARE · 同族第三例**
+    #   退役依据：产物 update_time 停在 2026-09-18 16:25:31（生成方 run_algorithms.py E 批与
+    #   上传登记 api_push_raw.py 均已摘除）；index.html / logic.html 的 <script src> 引用实测 0/0；
+    #   logic.html 早有墓志铭「产物与生成脚本已全链退役」。本批删除远端产物并登记护栏防回推。
+    "ALGO_BACKTEST_COMPARE",
+    # ⏱ 2026-09-21 18:45 小九（本批）：**STOCK_LIST 股票名录** —— 生产者
+    #   algorithms/refresh_stock_metadata.py **只挂算法链「周度批次」**
+    #   （run_algorithms.py weekend stage / v8_weekend_light.yml），周中必然 >24h。
+    #   实测（2026-09-21 看板）：all_STOCK_LIST = fail（age 4521min）—— 而产物
+    #   update_time 取自上游 raw_data/stock_names.json 的 mtime，本身是好的
+    #   ⇒ 属「每周一必现」的结构性**假红**。
+    #   ⚠️ 本行只把 STOCK_LIST 纳入白名单**门槛**；红线下界由下方
+    #      `_LOW_FREQ_MAX_AGE` 按真实节拍给足 —— **不是取消监控**（超节拍照报）。
+    #   ⚠️ 与 guard_v8_freshness.py::WARN_SOURCES 口径必须一致（同源维护）：
+    #      彼处 `"STOCK_LIST": 24 * 30` 是**小时**（=720h=30天）；
+    #      此处 `30 * 24 * 60` 是**分钟**（=43200min=30天）。**数值不同、语义等价。**
+    "STOCK_LIST",
+    # 🔴 2026-09-11 主人令（选项A）：FOUR_VOLUME_60M **已移出本白名单**，并正式登记进 CARD_DEFS
+    #   （「选股策略」段，max_age=1440）。原白名单把 24h 红线降到「>7天才告警」，
+    #   导致该卡产物冻结 3 天（09-08→09-11）全程零告警。现由 check_data_cards 按 d.max_age 正常判定。
+    # 🗂 2026-10-16 一劳永逸（小九 · HANDOFF::all-generic-redline-false-positive 本族第 4 例）：
+    #   FINAL_RECOMMEND_REPLAY —— **静态归档产物**（有产物、**无周期生产者**、设计上一次冻结）。
+    #   它不是「节拍长的在跑产物」⇒ **刻意不登记 _LOW_FREQ_MAX_AGE**（那会给它一个时间红线，
+    #   到期必再造一次假红）。真实监控面见下方 _STATIC_ARCHIVE_FILES。
+    "FINAL_RECOMMEND_REPLAY",
+}
+# 🗑 2026-09-21 一劳永逸（小九）：**已退役产物**子集 —— 从 _LOW_FREQ_FILES 中区分出来，
+#   只为让巡检文案说真话（「已退役」而非「低频/手动维护」）。
+#   判定口径：产物已随主人令退役、生产方已摘链、前端零引用、远端已删除。
+#   与 api_push_raw.py::_RETIRED_ARTIFACTS 同源维护（两处口径须一致）。
+#   🔴 本表曾于 2026-09-21T00:19Z 被 commit 3d955c9f5c 整段静默覆盖（同批的 _LOW_FREQ_FILES
+#      新增项也一并丢失），致推送侧与巡检侧护栏口径分叉 18 小时 ⇒ 本批按 cfe5d0bf97 原文恢复。
+_RETIRED_FILES = {
+    "STRONG_BREAKOUT",           # 强势突破（2026-09-19 主人令全站删除）
+    "STRONG_BREAKOUT_BACKTEST",  # 强势突破·信号层回测（同上）
+    "ALGO_BACKTEST_COMPARE",     # 两套算法回测对比（2026-09-20 全链退役，本批删除产物）
+    "BAIHECHOU_MACRO",           # 新周期判定·海外宏观（2026-09-22 主人令整卡下线）
+    "BAIHECHOU_ANALYSIS",        # 新周期判定·AI解析（同上，同批退役）
+    "MACRO_KSHAPE",              # 宏观景气背景·K型分层（2026-09-30 主人令整卡退役：巡检自动化已消亡，09-23 后死数据）
+    "maharo_macro",              # 机构研究·maharo 聚合旧文件（2026-10-03 阿狸咪：前端 09-13 起零引用，window.MAHORO_MACRO 恒{}；家机 maharo 自动化仍每日产出属孤儿死数据；登记退役护栏→若被放回即当场说真话「已退役但仍存在」）
+}
+
+# 🗂 2026-10-16 一劳永逸（小九）：**静态归档产物**子集 —— 与 _RETIRED_FILES（已退役·产物该删）、
+#   _LOW_FREQ_MAX_AGE（有周期生产者·只是节拍长）**三分**，互不混用：
+#   · _RETIRED_FILES      产物**应该被删**；若还在 = 有副本被放回（放行但说真话）。
+#   · _LOW_FREQ_MAX_AGE   有周期生产者；**按生产者节拍给红线**（超节拍照判 fail）。
+#   · _STATIC_ARCHIVE     产物**按设计就该冻结**（一次性产出、无任何周期生产者）
+#     ⇒ **永远不该按时间判龄**（其 update_time 就是「归档那一刻」，再放多久都不代表故障），
+#        但**不得因此取消监控** —— 监控面从「时间」换成「文件本身」：
+#        存在性 + 可被前端装载（本函数天然只遍历已存在的 *.js，故落点 = 解析成功 + 体积正常）。
+#
+#   🔴 登记门槛（三条全满足才可入本表，缺一即不得登记 —— 防被当成「万能免检口」滥用）：
+#     ① 无任何**周期**生产者（run_algorithms / workflow / cron 均不重产它）；
+#     ② 有明确生命周期终点（到期删除 / 切回另一产物），且已登记 docs/ops/HANDOFF.yaml；
+#     ③ 前端按「优先读它、缺失自动回落」引用 ⇒ 冻结期内站点不受影响。
+#   ⚠️ 与 guard_v8_freshness.py 的口径关系：本类产物**不在**彼处 CORE/WARN/CORE_ALGO/
+#      FROZEN_SOURCES 任一表内（两守卫对「无人看守的产物」口径一致 = 都不按时间判它）；
+#      若日后把它加进彼处任何表，本表须同批复核 —— 两守卫口径不一致本身就是 bug。
+_STATIC_ARCHIVE_FILES = {
+    # 最终推荐 Top3 · 回放口径回测归档。
+    # 登记依据（逐条对应上述门槛，全部为线上实测）：
+    #   ① 无周期生产者：`v8/factor_lab_gen.py`、`algorithms/backtest_life_cards.py` 产的是
+    #      `data/FINAL_RECOMMEND_DATA.js` / `data/FINAL_RECOMMEND_BACKTEST.js`（链上真实流，
+    #      照常每晚重产）；**本文件由一次性回放脚本产出后即冻结**
+    #      （内容自述 `"generated":"2026-10-13 15:00:00"`、`"data_cutoff":"数据截至 2026-10-13 收盘"`），
+    #      全仓 py/yml 对 `FINAL_RECOMMEND_REPLAY` 的**生产者引用 = 0 处**（仅 index.html 消费）。
+    #   ② 生命周期终点已挂账：HANDOFF.yaml `ima-strong-fusion-replay-1014` 明载
+    #      「切回真实流操作（触发：真实流成熟样本 ≥30 笔，预计 11 月中）：删 index.html 引用行
+    #        + 删 data/FINAL_RECOMMEND_REPLAY.js，前端即自动回落链上真实流卡」。
+    #   ③ 前端回落已就位：index.html L1779 引用 + L18390
+    #      `var fb = window.FINAL_RECOMMEND_REPLAY || window.FINAL_RECOMMEND_BACKTEST;`
+    #      ⇒ 本文件缺失/冻结都不影响站点，删引用即切回。
+    # 🔴 假红实证（本族第 4 例，前 3 例 = all_ALGO_BACKTEST_COMPARE / all_STOCK_LIST / AVG_PRICE_DATA）：
+    #    2026-10-16 09:06 线上 HEALTH_CHECK.js：`all_FINAL_RECOMMEND_REPLAY` status=fail、
+    #    age 2134.3min、message「更新于 2天前 21:32；超过通用红线 1620 分钟」，
+    #    且为**唯一 fail 项**（summary = ok119/warn0/fail1/limited1/total121, overall=warn）
+    #    —— 即：通用 24h/T+1 红线打到「按设计冻结」的产物上，且永远无法转绿。
+    "FINAL_RECOMMEND_REPLAY",
+}
+
+# ⏱ 2026-09-21（本批）小九：低频产物「按生产者节拍判龄」表 ——
+#   与 guard_v8_freshness.py::WARN_SOURCES **同源维护（两处口径须一致）**；
+#   口径不一致本身就是 bug —— 同一份数据两个守卫一绿一红。
+#   实证（2026-09-21）：guard_v8_freshness.py 给 "STOCK_LIST": 24*30（30 天），
+#   而本文件未登记 STOCK_LIST ⇒ 落入 check_all_data_files 的通用 24h/T+1 红线 ⇒ 判 fail。
+#   该 fail 属「每周一必现」的结构性假红：STOCK_LIST 的 update_time 取自上游
+#   raw_data/stock_names.json 的 mtime（update_v8.py::_write_js → _pick_ts），
+#   而其生产者 algorithms/refresh_stock_metadata.py 只挂在算法链「周度批次」
+#   （run_algorithms.py weekend stage；v8_weekend_light.yml）⇒ 周中必然 >24h。
+#   ⚠️ 本表**不是**取消监控：超节拍红线仍判 fail，只是红线按真实节拍给足（周末批没跑会照报）。
+#   🔴 量纲铁律：本表单位 = **分钟**（与同函数内 cap / age_min 同量纲）。
+#      同一语义「30 天」在两处写法**不同**，切勿「对齐数值」：
+#        · 此处  30 * 24 * 60 = 43200  **分钟**
+#        · guard_v8_freshness.py::WARN_SOURCES  24 * 30 = 720  **小时**
+#      （2026-09-21 本批曾误写为 `24 * 30` 分钟 = 仅 12 小时，比原 24h 通用红线**还紧**
+#        ⇒ 会造出新的每周一假红。已由真实量纲核对拦下并纠正。）
+_LOW_FREQ_MAX_AGE = {
+    "STOCK_LIST": 30 * 24 * 60,   # 股票名录 · 30 天（分钟量纲；生产者只挂算法链周度批次）
+}
+
+
+# 🛡 2026-09-24 B组根因修复（小九·开盘前收口）：check_all_data_files() 动态 all_* 项
+#   原硬编码 heal_cat="algo_run"，但这些文件实际由 cn_fetch post_close 产出（见 cloud_fetch_v8.py
+#   CATEGORY_MAP 及 workflow「板块龙头股字典(SECTOR_LEADERS)」等 post_close 步），自愈派发到
+#   算法链(run_algorithms)永远刷不到它们 ⇒ 陈旧红卡永不复原（09-23 夜 EXPERIMENT/SECTOR_LEADERS
+#   卡在 09-22 18:13/18:15 实测证否）。改为按真实产出链判定。
+_POST_CLOSE_DATA_FILES = {
+    "EXPERIMENT", "SECTOR_LEADERS", "MAIN_NET_FLOW", "NET_FLOW",
+}
+# 🛡 2026-09-24 B组①（小九·开盘前收口）：post_close 独有产物白名单——窗口外(16:00-20:30)
+#   仅对这些项放行单次补跑自愈（HEAL_DEBOUNCE_MIN=25 去抖保留）。口径源 HANDOFF postclose-reliability-trio。
+_POST_CLOSE_ONLY_WHITELIST = {"EXPERIMENT", "SECTOR_LEADERS", "LIMIT_UP_HEATMAP", "MAIN_NET_FLOW"}
+
+def check_all_data_files():
+    """全量审计 data/*.js：已登记 CARD_DEFS 的跳过（check_data_cards 管），其余全部按通用规则查。
+
+    通用规则（对未知文件）：
+      · 文件缺失/不可解析 → fail
+      · 无 update_time/date/generated/lastUpdated 字段 → warn（无法判龄）
+      · age > 24h 红线（交易日）/ T+1 18:30（非交易日）→ fail
+      · 空 dict / 全空 list → warn（弱市或数据源待接入，非致命）
+      · 以上均通过 → ok
+    """
+    results = []
+    known_ids = {d["id"] for d in CARD_DEFS}
+    # 同源派生卡（前端复用同一 JS 文件，不单独算文件）
+    derived = {"BIG_BULL_HUNTER", "SIX_DIM_RADAR"}
+    for p in sorted(DATA_DIR.glob("*.js")):
+        vid = p.name[:-3]
+        vid_heal = "post_close" if vid in _POST_CLOSE_DATA_FILES else "algo_run"
+        if vid in known_ids or vid in derived:
+            continue
+        # 🛡 2026-08-19 一劳永逸：OCR 依赖文件彻底跳过（不输出 items[] → 不渲染告警卡）
+        if vid in _OCR_DEPENDENCY_FILES:
+            continue
+        # 🛡 2026-08-28 一劳永逸：取线上站点与本地文件中时间戳较新的一个，
+        # 避免算法链刚部署但 CDN 缓存未刷新导致的旧值误报，同时兼容本地未 pull 的场景。
+        data = load_window_var_newest(vid, vid, p)
+        # 2026-08-17 兼容 window 变量名 ≠ 文件名（STOCK_MOMENTUM_STATE_V2.js → window.STOCK_MOMENTUM_ENHANCED）
+        if data is None:
+            for alias in _WINDOW_VAR_ALIASES.get(vid, []):
+                data = load_window_var_newest(vid, alias, p)
+                if data is not None:
+                    break
+        if data is None:
+            # 2026-08-17 特例：非严格 JSON 的静态映射文件（CONCEPT_ETF_MAP 用 JS 注释+无引号键），
+            # 解析必然失败但文件真实存在且体积正常 → 按「低频静态映射」检查，不误报缺失
+            if vid in _LOW_FREQ_FILES and p.stat().st_size > 2000:
+                results.append({
+                    "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                    "status": "ok", "last_update": "静态映射", "age_min": None,
+                    "heal_cat": vid_heal,
+                    "message": f"{p.name} 静态映射文件（非严格 JSON，按体积检查 OK，{p.stat().st_size//1024}KB）",
+                })
+                continue
+            results.append({
+                "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                "status": "fail", "last_update": "--", "age_min": None,
+                "heal_cat": vid_heal,  # 文件缺失 → post_close 重跑可重建
+                "message": f"{p.name} 缺失或解析失败（未被 CARD_DEFS 登记）",
+            })
+            continue
+        ts = data.get("update_time") or data.get("date") or data.get("generated") \
+            or data.get("generated_time") or data.get("generated_at") \
+            or data.get("lastUpdated") or data.get("updated") or data.get("updated_at") or "--"
+        if isinstance(ts, str) and ts == "--" and isinstance(data, dict):
+            # 2026-08-17 嵌套时间戳（meta.generated / data_date 等）
+            meta = data.get("meta") if isinstance(data.get("meta"), dict) else {}
+            ts = (meta.get("generated") or meta.get("update_time") or meta.get("updated")
+                  or data.get("data_date") or data.get("updated_at") or "--")
+        dt = parse_time(ts) if isinstance(ts, str) else None
+        # 🛡 2026-08-18 一劳永逸式修复：把 _LOW_FREQ_FILES 判断前移到「无时间戳」分支之前。
+        #   原 line 1114 `if dt is None: warn + continue` 永远先 return，
+        #   _LOW_FREQ_FILES（line 1124）根本走不到 → BACKTEST_TDX/OPTIMIZED_STRATEGY/
+        #   PORTFOLIO_COST/RUNNER_STATUS_HEALTH/WEEKEND_RUN 5 张低频卡 100% 误报 warn。
+        #   正确顺序：先看是否低频白名单 → 友好 OK；不在白名单才走时间戳 warn。
+        if vid in _LOW_FREQ_FILES:
+            rel = str(ts)[:19] if ts and ts != "--" else "—"
+            if vid in _STATIC_ARCHIVE_FILES:
+                # 🗂 2026-10-16 一劳永逸（小九）：静态归档 —— **只校验「文件还在、还能被前端装载」，
+                #   不判时间**（归档后陈旧是设计预期，陈旧 ≠ 故障）。
+                #   last_update / age_min 照旧输出，仅为可观测（便于肉眼确认归档没被悄悄换掉），
+                #   **不参与 status 判定** —— 否则又变回「到期必假红」，等于没修。
+                _age_sa = (now_cst() - dt).total_seconds() / 60 if dt is not None else None
+                results.append({
+                    "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                    "status": "ok", "last_update": rel,
+                    "age_min": round(_age_sa, 1) if _age_sa is not None else None,
+                    "heal_cat": vid_heal,
+                    "message": (f"{p.name} 静态归档产物（回放口径 · 一次性产出 · 无周期生产者），"
+                                f"更新于 {rel}；按设计不套 24h 通用红线"
+                                f"（归档后不再刷新属预期，非故障），仅校验存在性与可装载性"),
+                })
+                continue
+            if vid in _RETIRED_FILES:
+                # 🗑 已退役产物：既已删除就不该再出现；此处若仍命中，说明有副本被放回
+                #   （放行但不冒充正常 —— 文案须说真话，避免「它还在正常使用」的错觉）。
+                _msg = (f"{p.name} **已随主人令退役**（产物已删；仅防「旧副本被放回」而复亮红灯）；"
+                        f"如再现请核查 api_push_raw.py::_RETIRED_ARTIFACTS 是否被绕过")
+            elif vid in _LOW_FREQ_MAX_AGE and dt is not None:
+                # ⏱ 低频产物按「生产者节拍」判龄：不套用 24h 通用红线，但也**不放弃监控**。
+                _lfa = _LOW_FREQ_MAX_AGE[vid]
+                _age_lf = (now_cst() - dt).total_seconds() / 60
+                if _age_lf > _lfa:
+                    results.append({
+                        "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                        "status": "fail", "last_update": rel, "age_min": round(_age_lf, 1),
+                        "heal_cat": vid_heal,
+                        "message": (f"{p.name} 更新于 {rel}；超过低频红线 {int(_lfa)} 分钟"
+                                    f"（{_lfa // 1440} 天，按生产者节拍：算法链周度批次）"
+                                    f" —— 请检查周末批是否执行"
+                                    f"（run_algorithms.py weekend stage / v8_weekend_light.yml）"),
+                    })
+                    continue
+                results.append({
+                    "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                    "status": "ok", "last_update": rel, "age_min": round(_age_lf, 1),
+                    "heal_cat": vid_heal,
+                    "message": (f"{p.name} 低频产物，更新于 {rel}"
+                                f"（按生产者节拍红线 {_lfa // 1440} 天；未套用 24h 通用红线）"),
+                })
+                continue
+            else:
+                _msg = f"{p.name} 低频/手动维护文件（白名单内，无时间戳属正常，{p.stat().st_size//1024}KB）"
+            results.append({
+                "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                "status": "ok", "last_update": rel, "age_min": None,
+                "heal_cat": vid_heal,
+                "message": _msg,
+            })
+            continue
+        if dt is None:
+            # 有数据但无时间戳且不在 _LOW_FREQ_FILES：无法判龄 → warn（不 fail，避免误报）
+            results.append({
+                "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                "status": "warn", "last_update": str(ts)[:16], "age_min": None,
+                "heal_cat": vid_heal,
+                "message": f"{p.name} 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）",
+            })
+            continue
+        age_min = (now_cst() - dt).total_seconds() / 60
+        # 此时 vid 已知 dt 不为 None，_LOW_FREQ_FILES 在上面已 continue 排除
+        # 未知卡未登记 CARD_DEFS，按「全量数据」page 走（不分实时数据 2h 红线，避免误伤）
+        cap = _hard_cap_for_owner_rule(page="全量数据")
+        # 🛡 2026-09-21 小九（一劳永逸 · 消除每个交易日都会出现的「盘后假红窗口」）：
+        #   通用红线还须不低于「一个完整产出周期」—— 详见 _legit_ceiling_cycle 的实测记录。
+        #   仅在【下一个产出点尚未到】时启用：今天的盘后产出窗口未到 ⇒ 上一交易日的产物
+        #   仍是最新可用数据 ⇒ 不得判 fail；当天产出点一过即恢复原严格口径。
+        #   实测：本补丁把 09-21 15:49 的 cap 由 4219 抬到 4500，两项误报消除，
+        #   同时「隔满一个产出周期仍未更新」者 age 仍会超过下界 ⇒ 真故障照报不误。
+        _n_now = now_cst()
+        _hh, _mm = _REG_CYCLE_MARK.get("全量数据", (20, 30))
+        if _next_trading_mark(_n_now, _hh, _mm).date() == _n_now.date():
+            cap = max(cap, _legit_ceiling_cycle("全量数据", n=_n_now))
+        # 已登记 CARD_DEFS 的卡在 check_data_cards 用 d.max_age 判定；未知卡统一走 24h/T+1 红线
+        status = "ok" if age_min <= cap else "fail"
+        # 🛡 2026-08-19 修：OCR 人工依赖卡（MOMENTUM_FILTER / STOCK_MOMENTUM_STATE / V2）
+        #   数据源=盘后选股 PDF OCR，无 PDF 输入自动巡检永远无法刷新 → 陈旧属预期，
+        #   降级 warn 不误报 fail（与 self_heal_monitor.py P0-2 方针一致）。
+        #   真异常（文件缺失/解析失败）已在上方 fail，此处只处理「文件在但陈旧」。
+        ocr_note = ""
+        if status == "fail" and "MOMENTUM" in vid:
+            status = "warn"
+            ocr_note = "（OCR 人工依赖：需主人提供盘后选股 PDF 刷新，自动巡检无法修复 → 降级 warn）"
+        rel = fmt_rel_time(str(ts)[:19])
+        msg = f"{p.name} 更新于 {rel}"
+        if status == "fail":
+            msg += f"；超过通用红线 {cap} 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+        elif ocr_note:
+            msg += ocr_note
+        # 空内容检测（不把空 list 当错误，弱市合法）
+        elif isinstance(data, dict) and not data:
+            status = "warn"
+            msg += "；内容为空 dict"
+        results.append({
+            "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+            "status": status, "last_update": str(ts)[:19], "age_min": round(age_min, 1),
+            "heal_cat": vid_heal,
+            "message": msg,
+        })
+    return results
+
+
+def check_raw_data():
+    """检查 raw_data/ 目录是否存在关键文件且不为空。"""
+    results = []
+    if not RAW_DIR.exists():
+        return [{"id": "raw_data_dir", "name": "raw_data 目录", "page": "管线", "status": "fail", "message": "raw_data 目录不存在"}]
+    key_files = ["etf_pulse.json", "capital_flow_data.json", "index_quotes.json", "crisis_data.json", "concept_ranking.json"]
+    for fn in key_files:
+        p = RAW_DIR / fn
+        status = "ok"
+        msg = "存在"
+        if not p.exists():
+            status = "fail"
+            msg = "文件缺失"
+        elif p.stat().st_size == 0:
+            status = "fail"
+            msg = "文件为空"
+        elif p.stat().st_size < 100:
+            status = "warn"
+            msg = f"文件过小 ({p.stat().st_size} bytes)"
+        results.append({"id": f"raw_{fn}", "name": f"raw_data/{fn}", "page": "管线", "status": status, "message": msg})
+    # 🛡 2026-08-22 规模巡检（主人令）：raw_data 文件总数上限——防止无声膨胀到
+    #   Git Trees API "input too large"（今天 848 文件 × 全量 tree 已触发 422）。
+    #   ok <850 / warn 850-1100 / fail >1100（850 为当前规模基线，留余量）
+    try:
+        # 🛡 2026-08-27 主人令：排除运行时缓存目录（_rps_cache 550 + kline_cache 401 + _tdx_cache 170）
+        #   这些是算法运行产生的行情缓存，本不应入库/计入仓库规模；否则一直触发 raw_volume fail 红灯。
+        _CACHE_SUBDIRS = {"_rps_cache", "kline_cache", "_tdx_cache", "backtest_kline_cache"}
+        # 🛡 2026-09-23 一劳永逸（阿狸咪的工程师·口径纠正）：本检查的语义（见上）是
+        #   「仓库规模临近 Git Trees 422 上限」⇒ 必须统计【已入库 tracked】文件。
+        #   原按本地工作区 rglob 统计，会把 runner 未入库的运行时残渣一并计入 ⇒ 假 FAIL。
+        #   实证（同仓同日两轮）：run#2072 `raw_data 共 4309` ⇒ fail；run#2073 同检查 ⇒ ok；
+        #   差值 3414 恰等于 checkout「Cleaning the repository」清掉的 raw_data/_wf_cache/*.json
+        #   （逐票行情缓存，不入库，单轮可累积 3400+ 个）。
+        n_files = None
+        try:
+            _ls = subprocess.run(["git", "ls-files", "raw_data"], capture_output=True,
+                                 text=True, encoding="utf-8", errors="replace", timeout=60)
+            if _ls.returncode == 0 and _ls.stdout.strip():
+                n_files = sum(1 for _ln in _ls.stdout.splitlines()
+                              if _ln.strip()
+                              and not any(_p in _CACHE_SUBDIRS for _p in _ln.split("/")))
+        except Exception:
+            n_files = None
+        if n_files is None:
+            # 回退（非 git 环境）：仍按本地工作区统计 —— 保持旧语义，绝不因取不到清单而漏检
+            n_files = sum(1 for _ in RAW_DIR.rglob("*")
+                          if _.is_file() and not any(part in _CACHE_SUBDIRS for part in _.parts))
+        # 2026-08-29 一劳永逸：仓库膨胀属运维卫生指标，不应按「数据失鲜」触发 FAIL 邮件。
+        #   原 >1100 直接 FAIL 导致日常规模持续喷看门狗邮件（误报噪音）；
+        #   保留 Git Trees 422 防护语义：仅临近危险规模（>2500）才 FAIL，>1100 降为 WARN。
+        if n_files > 2500:
+            results.append({"id": "raw_volume", "name": "raw_data 文件数", "page": "管线",
+                            "status": "fail",
+                            "message": f"raw_data 共 {n_files} 个文件（>2500），临近 Git Trees 422 上限，需立即分流/归档"})
+        elif n_files > 1100:
+            results.append({"id": "raw_volume", "name": "raw_data 文件数", "page": "管线",
+                            "status": "warn",
+                            "message": f"raw_data 共 {n_files} 个文件（>1100），仓库膨胀，需分流/归档"})
+        else:
+            results.append({"id": "raw_volume", "name": "raw_data 文件数", "page": "管线",
+                            "status": "ok", "message": f"raw_data 共 {n_files} 个文件"})
+    except Exception as e:
+        results.append({"id": "raw_volume", "name": "raw_data 文件数", "page": "管线",
+                        "status": "warn", "message": f"统计失败: {e}"})
+    return results
+
+
+def _remote_main_sha():
+    """获取 origin/main 当前 SHA：优先本地 ref，git fetch 失败/缺失时回退 GitHub API。
+
+    2026-09-13 一劳永逸：解决本机 git fetch 偶发超时（TimeoutExpired）导致
+    「本地与 origin/main 同步」和「Pages 部署同步」双双误报黄灯的问题。
+    当本地对象库没有远端 commit 时，用 GitHub API 做交叉验证，避免把
+    "无法比较" 误判成 "部署故障"。
+    """
+    try:
+        sha = subprocess.check_output(["git", "rev-parse", "origin/main"], text=True, timeout=10).strip()
+        if sha:
+            return sha, False
+    except Exception:
+        pass
+    ref = api_get(f"https://api.github.com/repos/{REPO}/git/ref/heads/main")
+    if isinstance(ref, dict) and ref.get("object", {}).get("sha"):
+        return ref["object"]["sha"], True
+    return None, False
+
+
+def check_site_deploy_sync():
+    """检查线上 Pages commit 是否与 origin/main 一致。"""
+    # 先拿本地 HEAD
+    local_sha = None
+    try:
+        local_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, timeout=10).strip()
+    except Exception as e:
+        return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn", "message": f"无法获取本地 HEAD: {e}"}]
+
+    site_sha = None
+    fetch_err = None
+    # 线上站点 meta（带 retry 吸收瞬时抖动）
+    try:
+        req = urllib.request.Request(SITE_URL, headers={"User-Agent": "v8-health-check"})
+        html_bytes, err = _urlopen_retry(req, timeout=15)
+        if err:
+            fetch_err = err
+        else:
+            html = html_bytes.decode("utf-8", "replace")
+            m = re.search(r"v8-build-sha[:=]\s*([a-f0-9]{7,40})", html, re.I)
+            site_sha = m.group(1) if m else None
+    except Exception as e:
+        fetch_err = e
+
+    # fallback 1：拿 GitHub Pages 的 latest deployment SHA（通过 GitHub API，已带重试）
+    api_err = None
+    if not site_sha:
+        deployments = api_get(f"https://api.github.com/repos/{REPO}/deployments?environment=github-pages&per_page=1")
+        if isinstance(deployments, list) and deployments:
+            site_sha = deployments[0].get("sha", "")[:7]
+        elif isinstance(deployments, dict):
+            api_err = deployments.get("__msg__")
+
+    # fallback 2：pages/builds/latest（deployments 为空时仍能拿到最近一次 Pages 构建的 commit）
+    if not site_sha:
+        latest = api_get(f"https://api.github.com/repos/{REPO}/pages/builds/latest")
+        if isinstance(latest, dict) and latest.get("commit"):
+            site_sha = str(latest.get("commit"))[:7]
+        elif isinstance(latest, dict) and not api_err:
+            api_err = latest.get("__msg__")
+
+    if not site_sha:
+        # 三条通路（站点 meta / deployments / pages builds）全部失败，且每条都已重试 SITE_MAX_RETRIES 次，
+        # 基本可判定为网络瞬时抖动而非部署真故障 —— 保持 warn 但把原因写清楚，避免误导成部署挂了
+        detail = []
+        if fetch_err:
+            detail.append(f"站点不可达：{fetch_err}")
+        if api_err:
+            detail.append(f"API：{str(api_err)[:120]}")
+        return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn",
+                 "message": "无法获取 Pages SHA（站点 meta / deployments / pages-builds 三通路均在 "
+                            f"{SITE_MAX_RETRIES + 1} 次重试后失败，多为网络瞬时抖动，非部署故障）"
+                            + ("；" + "；".join(detail) if detail else "")}]
+
+    synced = local_sha.startswith(site_sha) or site_sha.startswith(local_sha)
+
+    # 2026-08-11 修：原逻辑只算 site..local（线上落后本地多少），
+    # 当「线上比本地新」（本机没 pull、云端刚 build 推了新 commit）时该值恒为 0，
+    # 却仍判 fail 并输出自相矛盾的「不同步，落后 0 commit」。
+    # 现同时计算两个方向，并在 site_sha 本地不存在时先 fetch，避免 rev-list 直接抛错。
+    def _rev_count(rng):
+        try:
+            out = subprocess.check_output(
+                ["git", "rev-list", "--count", rng], text=True, timeout=15,
+                stderr=subprocess.DEVNULL
+            ).strip()
+            return int(out)
+        except Exception:
+            return None
+
+    behind = 0   # 线上落后本地的 commit 数（本地已 push、Pages 还没部署完）
+    ahead = 0    # 线上领先本地的 commit 数（云端 build 已推，本机没 pull）
+    if not synced and local_sha and site_sha and len(local_sha) >= 7 and len(site_sha) >= 7:
+        # site_sha 可能是云端刚推的、本地对象库还没有 → 先补一次 fetch 再比较
+        if subprocess.run(["git", "cat-file", "-e", f"{site_sha}^{{commit}}"],
+                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode != 0:
+            try:
+                subprocess.run(["git", "fetch", "origin", "--quiet"], timeout=90,
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            except Exception:
+                pass
+        behind = _rev_count(f"{site_sha}..{local_sha}")
+        ahead = _rev_count(f"{local_sha}..{site_sha}")
+
+    if behind is None or ahead is None:
+        # 两个方向都算不出来（site_sha 拉不到）→ 先尝试 GitHub API 拿 origin/main 做交叉验证
+        remote_sha, api_used = _remote_main_sha()
+        if remote_sha:
+            if site_sha[:7] == remote_sha[:7] or remote_sha.startswith(site_sha) or site_sha.startswith(remote_sha):
+                # Pages 部署的 commit 与 origin/main 一致（或为其前缀）：部署链路健康
+                return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "ok",
+                         "message": f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} 已同步"
+                                    f"（与 origin/main {remote_sha[:7]} 一致，本地对象库未 fetch，API 交叉验证）"}]
+            # Pages 与 origin/main 不一致，但本地也未知 → 至少说明部署确实发生了
+            return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "info",
+                     "message": f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]}；"
+                                f"origin/main {remote_sha[:7]}（API 验证）。本地对象库缺失线上 commit，"
+                                f"建议 fetch 后复核"}]
+        # API 也拿不到，只能判定为无法比较，不能武断报部署故障
+        return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn",
+                 "message": f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]}："
+                            f"线上 commit 在本地对象库中不存在，且 GitHub API 亦不可达，无法比较（fetch 后自动恢复）"}]
+
+    if synced:
+        msg = f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} 已同步"
+        status = "ok"
+    elif ahead > 0 and behind == 0:
+        # 线上纯领先本地：说明云端 build 已成功部署，本机只是没 pull —— 部署链路健康
+        status = "ok"
+        msg = (f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} 已同步"
+               f"（线上领先本地 {ahead} commit，云端 build 已部署，本机待 pull，非部署故障）")
+    elif behind <= 5:
+        # 容忍 GitHub Pages 异步部署延迟：线上落后 ≤5 个 commit 视为同步
+        # Pages 部署通常有 1-3 分钟延迟，build commit 本身会累加 1 commit，云端 v8_build 偶尔叠加
+        status = "ok"
+        msg = (f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} "
+               f"已同步（线上落后 {behind} commit ≤5，Pages 异步部署正常）")
+    else:
+        status = "fail"
+        msg = (f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} "
+               f"不同步，线上落后 {behind} commit，部署链路需检查")
+    return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": status, "message": msg}]
+
+
+def check_runner():
+    """self-hosted runner 健康检查（多源融合）。
+
+    1. 优先读 data/RUNNER_STATUS.js（本地 runner 守护 v8_runner_guard.py 产出，
+       经 update_v8.py 从 raw_data/runner_status.json 生成）。
+    2. 若不存在则回退读 raw_data/runner_status.json。
+    3. 同时用 GitHub API 检查 cn_fetch 最近运行中连续失败 / checkout 失败，
+       作为云端视角的交叉验证。
+    """
+    results = []
+    runner_status = None
+
+    # 1. 读本地 runner 守护上报的状态
+    rs_path = DATA_DIR / "RUNNER_STATUS.js"
+    if rs_path.exists():
+        runner_status = load_window_var(rs_path, "RUNNER_STATUS")
+    else:
+        rs_raw = RAW_DIR / "runner_status.json"
+        if rs_raw.exists():
+            try:
+                runner_status = json.loads(rs_raw.read_text(encoding="utf-8"))
+            except Exception:
+                runner_status = None
+
+    local_msg = "本地 runner 守护未上报状态"
+    local_status = None
+    local_run_time = None
+    if runner_status:
+        # 2026-08-15 一劳永逸：兼容两种 runner_status 格式
+        #   · cloud_fetch_v8.py 生成格式：{run_time, category, hostname, modules, summary}
+        #   · v8_runner_guard.py 旧格式：{status, message, process, service, ...}
+        if "status" in runner_status:
+            st = runner_status.get("status", "unknown")
+            msg = runner_status.get("message", "无详情")
+        else:
+            summary = runner_status.get("summary") or {}
+            total = summary.get("total", 0)
+            ok = summary.get("ok", 0)
+            empty = summary.get("empty", 0)
+            fail = summary.get("fail", 0)
+            run_time = runner_status.get("run_time", "--")
+            hostname = runner_status.get("hostname", "未知节点")
+            # 2026-08-29 一劳永逸：非交易时段 post_close 模块（如 MARGIN_DATA / ETF_SUBSCRIPTION
+            #   交易所日更数据）天然返回空，与故障不同。区分：
+            #   · 交易时段 empty > 0 → warn（可能真有问题）
+            #   · 非交易时段 empty > 0 → ok（属预期，不再喷邮件/黄灯）
+            if fail > 0:
+                st = "fail"
+                msg = f"{hostname} 最近抓取 {run_time}，{total} 模块中失败 {fail} / 空 {empty} / 成功 {ok}"
+            elif empty > 0 and not is_market_closed():
+                st = "warn"
+                msg = f"{hostname} 最近抓取 {run_time}，{total} 模块中空 {empty} / 成功 {ok}"
+            elif empty > 0 and is_market_closed():
+                st = "ok"
+                msg = f"{hostname} 最近抓取 {run_time}，{total} 模块中空 {empty} / 成功 {ok}（非交易时段 post_close 空属预期）"
+            else:
+                st = "ok"
+                msg = f"{hostname} 最近抓取 {run_time}，{total} 个模块全部成功"
+        if st == "ok":
+            results.append({"id": "runner_local", "name": "runner 本地检测", "page": "管线", "status": "ok", "message": msg})
+        elif st == "warn":
+            results.append({"id": "runner_local", "name": "runner 本地检测", "page": "管线", "status": "warn", "message": msg})
+        else:
+            results.append({"id": "runner_local", "name": "runner 本地检测", "page": "管线", "status": "fail", "message": msg})
+        local_msg = msg
+        local_status = st
+        # 🔴 2026-09-22 主人令「一劳永逸」根因修复（小九）：
+        #   下方降级闸门用 _local_runner_age_min(local_run_time) <= 90 判断「本地 runner 是否
+        #   仍在正常守护」，但原先取的是 **run_time** —— 其语义是「**最近一次真实抓取时刻**」。
+        #   当 LEMONCAT 处于兜底角色（云端主线接管、本机长时间未触发抓取）时，run_time 天然
+        #   陈旧：实测 09-21 22:07（距判时约 10h＝600min > 90）⇒ 降级永不生效 ⇒ 云端
+        #   cn_fetch 的历史连续失败被永久钉成 fail 红叉，即便本地守护一切正常、站点数据
+        #   完全不受影响（runner_local 判 ok）。
+        #   正确判据是**守护心跳 update_time**（v8_runner_guard.py 每次运行都刷新；实测
+        #   09-22 07:56，距判时仅约 8min）—— 它回答「守护还活着吗」，而 run_time 回答的是
+        #   「最近抓过吗」。两者语义不同 ⇒ 用后者判前者＝结构性假阳性。
+        #   修法：心跳优先；心跳缺失时回退 run_time（保持旧行为，绝不静默放宽）。守护真停
+        #   （心跳也陈旧 >90min）时降级不生效，fail 语义原样保留 ⇒ 真故障仍会亮红。
+        local_run_time = runner_status.get("update_time") or runner_status.get("run_time")
+
+    # 2. GitHub API 视角：连续失败 / checkout 失败
+    token = _load_token()
+    if token:
+        url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/runs?per_page=10"
+        data = api_get(url)
+        if data and "__error__" not in data:
+            runs = data.get("workflow_runs", [])
+            consecutive = 0
+            for r in runs:
+                if r.get("conclusion") == "failure":
+                    consecutive += 1
+                elif r.get("conclusion") in ("success", "cancelled"):
+                    # cancelled 也会中断失败 streak（超时被取消不算连续失败）
+                    break
+                elif r.get("status") in ("in_progress", "queued", "pending"):
+                    break
+            checkout_failures = 0
+            latest_fail = next((r for r in runs if r.get("conclusion") == "failure"), None)
+            if latest_fail:
+                jdata = api_get(latest_fail.get("jobs_url", ""))
+                if jdata and "__error__" not in jdata:
+                    for job in jdata.get("jobs", []):
+                        for step in job.get("steps", []):
+                            if "checkout" in (step.get("name") or "").lower() and step.get("conclusion") == "failure":
+                                checkout_failures += 1
+
+            latest = runs[0] if runs else None
+            latest_failed = latest and latest.get("conclusion") == "failure"
+
+            # 检测 stuck in_progress
+            stuck_min = 0
+            if latest and latest.get("status") == "in_progress":
+                try:
+                    started = datetime.strptime(latest.get("started_at") or latest.get("created_at"), "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+                    stuck_min = int((datetime.now(timezone.utc) - started).total_seconds() / 60)
+                except Exception:
+                    stuck_min = 0
+
+            is_fail = (latest_failed and checkout_failures > 0) or consecutive >= 3
+            # 2026-09-09 一劳永逸：stuck 阈值 10 -> 30 分钟。实测 v8_cn_fetch_cloud（workflow 327687211）
+            #   单次抓取耗时 17.8~26.0 分钟（最近 6 次 success 实测），10 分钟阈值会在每次抓取跑到
+            #   一半时误报 warn（假告警家族：阈值 < 任务真实耗时，与 D2-C liveUpdated 同型）。
+            #   30 分钟覆盖最长实测 26 分并留余量，同时仍能抓到真卡死（远超 26 分即异常）。
+            is_warn = (latest_failed and not is_fail) or (latest and latest.get("status") == "in_progress" and stuck_min > 30)
+
+            # 2026-09-12 主人令「一劳永逸」：本站数据实际由本地 self-hosted runner 产出。
+            # 若本地 runner 已成功且上报较新（≤90 分钟），则云端 cn_fetch(ubuntu) 单次失败 / 卡住
+            # 不影响本站数据新鲜度 → 降级为 ok（附说明），不再亮黄灯假告警。
+            # 仅当本地也异常（local_status 非 ok）或本地上报已陈旧（>90 分钟，可能 runner 已停）时，
+            # 才保留云端失败的告警语义，避免掩盖真故障。
+            _cloud_downgraded = False
+            if local_status == "ok":
+                _age = _local_runner_age_min(local_run_time)
+                # 🔴 2026-09-22 追加（小九·主人令「一劳永逸」）：引入**比时间推断更权威的
+                #   间接判据** —— v8_runner_guard.py 每次运行都用 GitHub API 现查
+                #   self-hosted 链最近 15 条，结论落在 runner_status["github"]
+                #   （is_fail / consecutive_failures / checkout_failures / latest_status）。
+                #   为何需要它：guard 由本机调度（不在任何 workflow 内），周期可能长于 90min，
+                #   单靠心跳会把「调度间隔长」误判成「守护已停」。而 guard 自报
+                #   「is_fail=False 且 连续失败 0 次 且 checkout 失败 0 次」
+                #   即直接证明 self-hosted 侧健康 ⇒ 云端 cn_fetch 的历史失败仍不影响本站
+                #   数据新鲜度 ⇒ 降级 ok 成立。
+                #   ⚠️ guard 字段缺失（如 cloud_fetch_v8 写的另一格式）时 _gh_ok=False，
+                #   自动回退纯心跳判据 —— 绝不静默放宽语义。
+                _gh = runner_status.get("github") or {}
+                _gh_ok = bool(
+                    _gh
+                    and _gh.get("is_fail") is False
+                    and (_gh.get("consecutive_failures") or 0) == 0
+                    and (_gh.get("checkout_failures") or 0) == 0
+                )
+                if _age is None or _age <= 90 or _gh_ok:
+                    is_fail = False
+                    is_warn = False
+                    _cloud_downgraded = True
+                    if _gh_ok and not (_age is None or _age <= 90):
+                        print(f"[runner] 心跳 age={_age:.0f}min 超 90min，但 guard 自报 "
+                              f"self-hosted 链全绿（consecutive=0/checkout=0）⇒ 按健康降级")
+
+            if is_fail:
+                results.append({
+                    "id": "runner_github",
+                    "name": "runner GitHub API 检测",
+                    "page": "管线",
+                    "status": "fail",
+                    "message": f"cn_fetch 最新失败且 checkout 失败 / 连续失败 {consecutive} 次（本地状态: {local_msg}）",
+                })
+            elif is_warn:
+                stuck_info = f"，最新 run 卡住 {stuck_min} 分钟" if stuck_min > 0 else ""
+                results.append({
+                    "id": "runner_github",
+                    "name": "runner GitHub API 检测",
+                    "page": "管线",
+                    "status": "warn",
+                    "message": f"cn_fetch 最新一次失败（非 checkout，连续 {consecutive} 次）{stuck_info}（本地状态: {local_msg}）",
+                })
+            else:
+                results.append({
+                    "id": "runner_github",
+                    "name": "runner GitHub API 检测",
+                    "page": "管线",
+                    "status": "ok",
+                    "message": (f"云端 cn_fetch 最近一次运行异常但本地 runner 已成功覆盖（本地状态: {local_msg}），数据新鲜度不受影响" if _cloud_downgraded else f"最近运行正常（本地状态: {local_msg}）"),
+                })
+        else:
+            err = data.get("__msg__", "unknown") if isinstance(data, dict) else "API 失败"
+            results.append({"id": "runner_github", "name": "runner GitHub API 检测", "page": "管线", "status": "warn", "message": f"API 查询失败: {err}"})
+    else:
+        results.append({"id": "runner_github", "name": "runner GitHub API 检测", "page": "管线", "status": "warn", "message": "无 token，跳过 GitHub API 检测（请在 repo secrets 配置 V8_GH_TOKEN）"})
+
+    # 汇总：任一 fail 则总体 fail
+    overall = "ok"
+    if any(r["status"] == "fail" for r in results):
+        overall = "fail"
+    elif any(r["status"] == "warn" for r in results):
+        overall = "warn"
+
+    return results + [{
+        "id": "runner",
+        "name": "self-hosted runner",
+        "page": "管线",
+        "status": overall,
+        "message": " | ".join(f"{r['name']}:{r['status']}-{r['message']}" for r in results),
+    }]
+
+
+def check_local_head_sync():
+    """检查本地 HEAD 是否与 origin/main 一致 + 关键路径是否落后。
+
+    2026-08-18 主人建议：一劳永逸把「本地落后于 origin/main」降为 info。
+    根因：云端 Pages 每次构建会重写 index.html（cn-extra data 文件 ?v= 刷新），
+    致 origin/main 永远比本地「前进 1~3 个 commit」，本地若未做新提交则每次必报 fail。
+    视作「云端 build 副作用 → 本地落后属预期」，降级 info 不再触发自愈/告警。
+    派发链 (self_heal) 仍按原 iid=local_sync 调用 _heal_local_sync() 做软对齐，不影响修复能力。
+
+    2026-08-24 二级根因修复：原策略把"本地落后"全归为 info，掩盖了 raw_data 子树落后这一真问题
+    （11 项 all_* 数据卡陈旧的二级根因：raw_data 没从 origin 拉，本地端一直看陈旧快照）。
+    修复：拆为两态——
+      - 仅 code（index.html / cache ?v= 类）落后：status=info（云端 build 副作用，非真落后）
+      - raw_data/ 落后：status=fail（数据陈旧二级根因，必须上报警+自愈拉取）
+    """
+    # 2026-08-29 一劳永逸：逐句 try/except，任何一步失败降 warn（不喷邮件/红字）
+    #   原逻辑整段一个 try，git rev-parse origin/main 失败（本地无该 ref，常见于无 origin 推送的机器）
+    #   → CalledProcessError 抛出 → 整个检查 fail → 看板红灯。
+    #   现在每个子命令独立捕获，失败一律 warn + 明确原因，不再误报。
+    # 2026-09-13 升级：git fetch 增加 3 次重试；全部失败后回退 GitHub API 获取 origin/main，
+    #   根治偶发 TimeoutExpired 导致的「跳过同步检查」误报。
+    #
+    # 🛡 2026-09-15 一劳永逸（阿狸咪 1135 根因 A-1）：**CI 内本检查语义不成立 → 直接降级 info**。
+    #   取证：v8_health_patrol 是 runs-on: ubuntu-latest + fetch-depth: 1 的一次性浅克隆，
+    #   而生成器每几分钟推一次 main ⇒ 该克隆的 HEAD **必然 ≠ origin/main**
+    #   （实测 09-15 09:30 日志仍在报「本地 d20aae8 / origin/main 573884a 落后」）
+    #   ⇒ 该判据在 CI 内**必然 FAIL** ⇒ health_patrol 的「🔁 自愈验证」step 必然 REMAIN_FAIL>0
+    #   ⇒ 整轮红 + 升级邮件（近 72h 实测 9/47 = 19% 假红，持续 ≥18h）。
+    #   本检查只在运维机（小九 / 阿狸咪本机）有意义，CI 内直接短路。
+    # 🛡 2026-09-21 小九（一劳永逸 · 从源头消除误显）：原返回一个 status=info 的报告项，
+    #   语义是「本项在 CI 内不成立」。但「不成立」的正确表达是**无此项**，不是「一个 info 项」：
+    #   · 前端 index.html 的 _renderOpDiagnostics 当时漏接第五态 info（后端 build_report
+    #     2026-09-15 新增），把它渲染成
+    #     「文件 local_sync 待更新：最后更新 -- · CI 环境（一次性浅克隆）内本项语义不成立，跳过」
+    #     —— 文案自带「跳过」却被列为「待更新」，自相矛盾且常驻运维「失败/诊断详情」。
+    #   · 即便前端已补齐 info（同批修复），后端再发一个「自知无意义」的项仍是冗余噪声。
+    #   ⇒ 直接 return []。本检查只在运维机（小九 / 阿狸咪本机）有意义，CI 内本就不存在此项。
+    #   （self_heal 按 iid 匹配派发，本项不在报告里即不派发 —— CI 内本就不该做本地 git 对齐。）
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        return []
+
+    try:
+        local = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, timeout=10).strip()
+    except Exception as e:
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
+                "status": "warn", "message": f"git rev-parse HEAD 失败：{type(e).__name__}，跳过同步检查"}]
+
+    fetch_err = None
+    for attempt in range(3):
+        try:
+            subprocess.run(["git", "fetch", "origin"], check=True, timeout=30,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            fetch_err = None
+            break
+        except Exception as e:
+            fetch_err = e
+            if attempt < 2:
+                import time as _time
+                _time.sleep(2)
+
+    remote, api_fallback = _remote_main_sha()
+    if not remote:
+        reason = f"git fetch origin 失败（{type(fetch_err).__name__}）且 GitHub API 不可达"
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
+                "status": "warn", "message": f"{reason}，跳过同步检查"}]
+
+    synced = local == remote
+    if synced:
+        msg = f"本地 {local[:7]} / origin/main {remote[:7]} 同步"
+        if api_fallback:
+            msg += "（git fetch 失败，经 GitHub API 交叉验证）"
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
+                 "status": "ok", "message": msg}]
+
+    # 2026-08-24 拆态：检查 raw_data/ 子树是否落后（这是数据卡陈旧的二级根因）
+    raw_data_diff = ""
+    if not api_fallback:
+        try:
+            raw_data_diff = subprocess.check_output(
+                ["git", "diff", "--name-only", f"{local}..origin/main", "--", "raw_data/"],
+                text=True, timeout=10
+            ).strip()
+        except Exception:
+            raw_data_diff = ""
+
+    if raw_data_diff:
+        # raw_data 真的落后 → 数据卡陈旧的二级根因 → fail + 自愈拉取
+        n_raw = len([x for x in raw_data_diff.splitlines() if x.strip()])
+        msg = f"本地 {local[:7]} / origin/main {remote[:7]} 落后；其中 raw_data/ 子树有 {n_raw} 个文件待同步（数据卡陈旧二级根因）"
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
+                 "status": "fail", "message": msg}]
+
+    # 仅代码层落后（index.html / ?v= cache）→ 仍属云端 build 副作用 → info
+    # API fallback 时同样走 info，因为无法本地 diff raw_data，但已知本地 != origin/main
+    msg = f"本地 {local[:7]} / origin/main {remote[:7]} 落后"
+    if api_fallback:
+        msg += "（git fetch 失败，经 GitHub API 验证；仅代码层或待 pull，已降级 info）"
+    else:
+        msg += "（仅代码层，Pages build 重写 index.html 属预期，已降级 info 不报警）"
+    return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
+             "status": "info", "message": msg}]
+
+
+def check_site_dom(site_html=None):
+    """二期：简单 DOM 空值检测（从线上 HTML 检查关键 id 是否存在且非空）。"""
+    if site_html is None:
+        try:
+            req = urllib.request.Request(SITE_URL, headers={"User-Agent": "v8-health-check"})
+            html_bytes, err = _urlopen_retry(req, timeout=15)
+            if err:
+                return [{"id": "dom_check", "name": "线上 DOM 空值检测", "page": "管线", "status": "warn",
+                         "message": f"拉取页面失败（已重试{SITE_MAX_RETRIES}次）: {err}"}]
+            site_html = html_bytes.decode("utf-8", "replace")
+        except Exception as e:
+            return [{"id": "dom_check", "name": "线上 DOM 空值检测", "page": "管线", "status": "warn", "message": f"拉取页面失败: {e}"}]
+
+    # 2026-08-08 96轮适配：阿狸咪方案三重构后页面卡片改由 JS 从外部 data/*.js 动态渲染，
+    # 静态 HTML 内是空壳/“加载中…”占位符（旧 critical_ids 中 4 个 id 已删除）。
+    # 故改为：① 关键容器存在性检查（缺失=fail）；② 静态占位符（空/加载中）=warn（JS 渲染属常态）。
+    # 🛡 2026-09-11 移除 phMacroBody（opTab4 已删，HTML 中无此元素，DOM 检查永久 fail 假阳性）
+    # 🔴 2026-10-11 主人令「完全下架」：ttBack/ttThr/ttSvl/ttTrack（三重跟踪页 DOM）与
+    #   stcrdsAdv/stcrdsElite（逆势龙头页 DOM）6 锚随两策略下架移除（index.html 已无这些元素，
+    #   留在清单=每日审计 6 条「未找到元素」假 fail）。
+    critical_ids = ["taskScheduleBody", "runnerTrackBody", "healthCheckBody"]
+    # 🛡 2026-09-22 主人令「审计实打实」升级：下列容器由 JS 从 data/*.js 动态渲染，静态 HTML 内是空壳/
+    #   “加载中…”占位符属设计行为（2026-08-08 重构说明已载明），每日 audit 据此报 8 条**永久 warn 噪声**，
+    #   把 LHB/FOUR_VOLUME 等真问题稀释。修正：这些 id 仅做“存在性”检查（缺失=fail）；占位符态一律记 ok
+    #   （数据新鲜度由 check_data_cards 独立查），不再占用 warn 位 ⇒ 每日审计只暴露真实异常。
+    JS_RENDERED_OK = {"taskScheduleBody", "runnerTrackBody", "healthCheckBody"}
+    results = []
+    for cid in critical_ids:
+        m = re.search(rf'id=["\']{re.escape(cid)}["\'][^>]*>(.*?)</[^>]+>', site_html, re.S)
+        if not m:
+            results.append({"id": f"dom_{cid}", "name": f"DOM #{cid}", "page": "管线", "status": "fail", "message": "未找到元素"})
+            continue
+        content = m.group(1).strip()
+        placeholder = content == "" or "加载中" in content or content == "--" or len(content) < 20
+        if placeholder and cid in JS_RENDERED_OK:
+            status = "ok"
+            msg = "JS渲染占位（设计行为，数据层已独立校验）"
+        else:
+            status = "warn" if placeholder else "ok"
+            msg = "静态占位符(JS渲染)" if placeholder else f"静态内容长度 {len(content)}"
+        results.append({"id": f"dom_{cid}", "name": f"DOM #{cid}", "page": "管线", "status": status, "message": msg})
+    return results
+
+
+def _last_trade_date(ref=None):
+    """返回 ref 之前（含）的最近一个 A 股交易日。
+
+    关键：若 ref 在当天收盘（15:30）之前，则「最近交易日」应回退到上一交易日，
+    避免周一 07:36 早盘把 enter_date 上周五的数据误判为陈旧。
+    直接复用 last_trade_day_close() 的收盘时间口径。
+    """
+    ref = ref or now_cst()
+    if isinstance(ref, datetime):
+        dt = ref
+    else:
+        dt = datetime.combine(ref, datetime.min.time(), tzinfo=timezone(timedelta(hours=8)))
+    return last_trade_day_close(dt).date()
+
+
+def check_signal_date_freshness():
+    """内容级陈旧检查：数据文件 update_time 新鲜，但内部信号/入选日期已落后最近交易日。
+
+    覆盖 COCKPIT_ADVICE (watch[].signal_date) 与 FINAL_RECOMMEND_DATA (stocks[].enter_date)。
+    使用 page="内容审计" 以绕过 self_heal 自动派发（内容级陈旧需算法/数据根治，不是简单刷新可修）。
+    """
+    results = []
+    last_trade = _last_trade_date()
+    if last_trade is None:
+        return results
+    last_trade_str = last_trade.strftime("%Y-%m-%d")
+
+    # 2026-09-03 主人令：COCKPIT_ADVICE 验证段已下线
+
+    # ── FINAL_RECOMMEND_DATA ──
+    d = load_window_var(DATA_DIR / "FINAL_RECOMMEND_DATA.js", "FINAL_RECOMMEND_DATA")
+    if d is None:
+        results.append({
+            "id": "final_enter_stale",
+            "name": "最终推荐入选日期",
+            "page": "内容审计",
+            "status": "warn",
+            "message": "无法加载 FINAL_RECOMMEND_DATA.js"
+        })
+    else:
+        dates = []
+        for s in d.get("stocks", []):
+            ed = s.get("enter_date")
+            if ed:
+                dates.append(ed)
+        if not dates:
+            results.append({
+                "id": "final_enter_stale",
+                "name": "最终推荐入选日期",
+                "page": "内容审计",
+                "status": "warn",
+                "message": "未找到 enter_date 字段，无法判断入选新鲜度"
+            })
+        else:
+            newest = max(dates)
+            # 🛡 2026-09-29 小九（一劳永逸）：final_recommend 盘后 18:00 才产出
+            #   （run_algorithms 18:00 时间闸防半日数据假回测），白天(18:00 前)最新一批来自昨夜，
+            #   enter_date 天然落后最近交易日 1 天 = 预期内，非数据失效。
+            #   仅在「落后 > 1 个交易日」或「已过 18:00 产出窗口仍落后」时才报陈旧，
+            #   避免每天 18:00 前固定假黄灯；真实断更（落后 ≥2 交易日 / 18:00 后仍旧）照报不误。
+            _cst = now_cst()
+            _prev_trade = _last_trade_date(_cst.date() - timedelta(days=1))
+            _prev_trade_str = _prev_trade.strftime("%Y-%m-%d") if _prev_trade else ""
+            if newest < last_trade_str and (_cst.hour >= 18 or (not _prev_trade_str or newest < _prev_trade_str)):
+                results.append({
+                    "id": "final_enter_stale",
+                    "name": "最终推荐入选日期",
+                    "page": "内容审计",
+                    "status": "warn",
+                    "message": f"最新 enter_date {newest} 早于最近交易日 {last_trade_str}，最终推荐数据陈旧"
+                })
+            else:
+                results.append({
+                    "id": "final_enter_stale",
+                    "name": "最终推荐入选日期",
+                    "page": "内容审计",
+                    "status": "ok",
+                    "message": f"最新 enter_date {newest} ≥ 上一交易日 {_prev_trade_str}（18:00 前未刷新为预期）"
+                })
+
+        # 2026-08-15 主人令：Top3 市场分布只展示、不误报。
+        #   去掉 crude 的「全 A 股/全港股 = 数据源异常」判断——A 股占绝大多数是常态，
+        #   真正的「A 股缺失」由下方 check_a_share_coverage() 统一扫描所有主要数据池捕获。
+        stocks = d.get("stocks", [])
+        if stocks:
+            a_cnt = sum(1 for s in stocks if _is_a_share(s))
+            hk_cnt = len(stocks) - a_cnt
+            markets_str = f"A股{a_cnt}只 / 港股{hk_cnt}只"
+            results.append({
+                "id": "final_market_distribution",
+                "name": "最终推荐市场分布",
+                "page": "内容审计",
+                "status": "ok",
+                "message": f"Top{len(stocks)} 市场分布：{markets_str}"
+            })
+
+    return results
+
+
+# 🔴 2026-08-12 主人紧急令：算法输出全港股/A股缺失 = 必须立即报警
+#   根因：check_signal_date_freshness 只盯 FINAL_RECOMMEND_DATA.stocks（全港股 Top3），
+#         候选池/黄金池/三重共识/驾驶舱等的「全港股」完全没被检查 → 8 天持续 bug 未发现。
+#   修复：本函数扫描所有主要 *_DATA.js 的 stocks 字段，A 股=0 且总数>0 → warn（标红 URGENT）。
+_A_SHARE_POOLS = [
+    # (data/*.js 路径, window var 名, 卡片名, heal_cat)
+    ("CANDIDATE.js",            "CANDIDATE",            "候选池",       "algo_run"),
+    ("GOLD_POOL.js",            "GOLD_POOL",            "黄金池",       "algo_run"),
+    # 🔴 2026-10-11 主人令「完全下架」：TRIPLE_CONSENSUS.js / CRDS_CARD_DATA.js 两行移除（策略下架，文件已删）
+    ("FOUR_VOLUME.js",          "FOUR_VOLUME",          "四量终极",     "algo_run"),
+    ("LHB_DATA.js",             "LHB_DATA",             "龙虎榜",       "cn_fetch"),
+    ("FINAL_RECOMMEND_DATA.js", "FINAL_RECOMMEND_DATA", "最终推荐",     "algo_run"),
+]
+
+
+def check_a_share_coverage():
+    """🔴 2026-08-12 主人令：算法输出全港股/A股缺失 = 立即报警 + 定位回溯。
+
+    扫描所有主要数据池的 stocks 字段：
+      - 总数=0：先看 near_miss/替代字段是否有数据；按"独立 0 vs 全部 0"智能判断
+      - 总数>0 且 A 股=0：A 股扫描失败/A 股 API 挂/上游 bug → URGENT warn
+      - 总数>0 且 A 股>=1：OK
+
+    🔴 2026-08-17 一劳永逸修复：原 line 1466 直接将单池 0 = warn 导致三重共识 0 只（弱市真实）误报
+    · 现在：先两轮统计所有池状态，再判"独立 0 vs 多源同 0"
+      - 1 个池 0 且其他正常 → info（独立 0，弱市真实）
+      - 1 个池 0 但它有 near_miss 备选 → info（弱市无严格共识）
+      - 2+ 个池同时 0 → warn（真上游问题）
+      - 全 0 + 非交易日 → ok；全 0 + 交易日 → warn
+    """
+    results = []
+    # ── 第一轮：先收集所有池的 (total, near_miss, ...) 状态 ──
+    pool_status = []
+    for fname, var, name, heal in _A_SHARE_POOLS:
+        path = DATA_DIR / fname
+        d = load_window_var(path, var)
+        if d is None:
+            continue
+        # 🔴 2026-09-02 一劳永逸：驾驶舱分档同时含 tier_a（严格）+ tier_b（埋伏），
+        #   健康检查只看 tier_a 会误报"全港股"（tier_b 实际含 A股 创业板/沪市/深市）
+        # 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND 合并 tier_a/tier_b 逻辑已下线
+
+    # ── 第二轮：判"全 0 vs 独立 0" ──
+    n_total = len(pool_status)
+    n_zero = sum(1 for p in pool_status if p["total"] == 0)
+    today_is_trade = _is_trading_day(date.today())
+
+    # 🔴 2026-08-17 增强：识别"严格共识/选股"类池（弱市天然 0，不应算"上游问题"）
+    # 严格类：三重共识/驾驶舱分档/逆势龙头/四量终极/国际投行（命中条件严，弱市 0 是常态）
+    # 数据类：候选池/黄金池/龙虎榜/最终推荐（结构性数据，0 = 真上游问题）
+    STRICT_POOL_NAMES = {"三重共识", "逆势龙头", "四量终极", "国际投行信号"}  # 2026-09-03 主人令：驾驶舱分档下线
+
+    for p in pool_status:
+        if p["total"] == 0:
+            if not today_is_trade:
+                # 非交易日：算法链不跑属正常
+                results.append({
+                    "id": f"a_share_{p['var'].lower()}", "name": f"{p['name']} A股覆盖",
+                    "page": "内容审计", "heal_cat": p["heal"],
+                    "status": "ok",
+                    "message": f"{p['name']} 今日 0 只（非交易日，算法链未运行，属正常现象）"
+                })
+            elif n_zero == 1:
+                # 唯一 0 池 → 弱市真实，不报警
+                if p["near_miss_count"] > 0:
+                    msg = f"✅ {p['name']} 今日 0 只严格共识 + {p['near_miss_count']} 只差 1 步达成（弱市正常，其他池也正常）"
+                else:
+                    msg = f"✅ {p['name']} 今日 0 只（独立 0 而其他池正常 → 弱市真实状态，无需报警）"
+                results.append({
+                    "id": f"a_share_{p['var'].lower()}", "name": f"{p['name']} A股覆盖",
+                    "page": "内容审计", "heal_cat": p["heal"],
+                    "status": "ok", "message": msg
+                })
+            elif n_zero <= 2 and STRICT_POOL_NAMES and all(
+                sp["name"] in STRICT_POOL_NAMES for sp in pool_status if sp["total"] == 0
+            ):
+                # n_zero == 2 时，如果这 2 池都是"严格共识/选股"类 → 弱市无严格共识，
+                # 不是上游问题（不算"全 0"）。只对 near_miss 信息补充。
+                if p["near_miss_count"] > 0:
+                    msg = f"✅ {p['name']} 严格 0 但 {p['near_miss_count']} 只差 1 步备选（{n_zero}/{n_total} 严格共识池同时 0，弱市正常）"
+                else:
+                    msg = f"✅ {p['name']} 今日 0 只（{n_zero}/{n_total} 严格共识池同 0，无 near_miss，弱市正常）"
+                results.append({
+                    "id": f"a_share_{p['var'].lower()}", "name": f"{p['name']} A股覆盖",
+                    "page": "内容审计", "heal_cat": p["heal"],
+                    "status": "ok", "message": msg
+                })
+            else:
+                # n_zero >= 3，或 2 池但有非严格类 → 真上游问题
+                results.append({
+                    "id": f"a_share_{p['var'].lower()}", "name": f"{p['name']} A股覆盖",
+                    "page": "内容审计", "heal_cat": p["heal"],
+                    "status": "warn",
+                    "message": f"⚠️ {p['name']} 今日 0 只（{n_zero}/{n_total} 池同时 0）→ 多源同时 0，排查 scanner / mootdx / akshare 上游"
+                })
+            continue
+
+        # total > 0：A 股=0 即上游 bug（严格）
+        a_cnt = p["a_cnt"]; hk_cnt = p["hk_cnt"]
+        if a_cnt == 0 and hk_cnt > 0:
+            results.append({
+                "id": f"a_share_{p['var'].lower()}", "name": f"{p['name']} A股覆盖",
+                "page": "内容审计", "heal_cat": p["heal"],
+                "status": "warn",
+                "message": f"🚨 URGENT: {p['name']} 全港股（{hk_cnt}/{p['total']}），A 股扫描失败/上游路径 bug！"
+                          f"🚨 必须立即回溯 scanner.load_candidate_pool / mootdx A 股 / akshare 港股 API / build_candidate_pool 路径。"
+            })
+    return results
+
+
+def _is_a_share(s):
+    """判断股票是否 A 股（含主板/创业板/科创板/北交所）。"""
+    if not isinstance(s, dict):
+        return False
+    market = (s.get("market") or "").lower()
+    board = s.get("board") or s.get("board_label") or ""
+    code = str(s.get("code") or "")
+    # market 明确是 hk/港股 → 港股
+    if market in ("hk", "港股") or board == "港股" or "港股" in board:
+        return False
+    if market in ("sh", "sz", "bj") or board in ("主板","创业板","科创板","北交所"):
+        return True
+    # code 前缀兜底判断
+    if code.isdigit() and len(code) == 6:
+        return True
+    return False
+
+
+def _count_trade_days(start, end):
+    """统计 [start, end] 之间的 A 股交易日数量（两端均含）。"""
+    if not start or not end or start > end:
+        return 0
+    cnt = 0
+    d = start
+    while d <= end:
+        dt = datetime(d.year, d.month, d.day, tzinfo=timezone(timedelta(hours=8)))
+        if not is_market_closed(dt):
+            cnt += 1
+        d += timedelta(days=1)
+    return cnt
+
+
+def check_top10_history_depth():
+    """T+N 信号台账深度检查：raw_data/history/top10_daily_YYYYMMDD.json 的最早/最新交易日跨度。
+
+    top10_daily 按日快照是 T+N 回测与跟踪的根本来源；跨度不足时 T+20 等长周期会缺样本。
+    使用 page="内容审计" 以绕过 self_heal 自动派发（历史深度只能随每日运行自然累积，不可简单刷新）。
+    """
+    results = []
+    hist_dir = DATA_DIR.parent / "raw_data" / "history"
+    if not hist_dir.exists():
+        results.append({
+            "id": "top10_history_depth",
+            "name": "T+N 信号台账深度",
+            "page": "内容审计",
+            "status": "warn",
+            "message": f"历史快照目录不存在: {hist_dir}",
+        })
+        return results
+
+    pat = re.compile(r"top10_daily_(\d{8})\.json$")
+    dates = []
+    for fn in hist_dir.iterdir():
+        m = pat.match(fn.name)
+        if not m:
+            continue
+        try:
+            dates.append(datetime.strptime(m.group(1), "%Y%m%d").date())
+        except Exception:
+            continue
+
+    if not dates:
+        results.append({
+            "id": "top10_history_depth",
+            "name": "T+N 信号台账深度",
+            "page": "内容审计",
+            "status": "warn",
+            "message": "未找到任何 top10_daily_YYYYMMDD.json 历史快照",
+        })
+        return results
+
+    earliest = min(dates)
+    latest = max(dates)
+    trade_days = _count_trade_days(earliest, latest)
+    required = 20  # 满足 T+20 所需的最小交易日跨度
+
+    if trade_days < required:
+        status = "warn"
+        msg = (f"top10_daily 历史跨度仅 {trade_days} 个交易日 "
+               f"({earliest} ~ {latest})，低于 T+20 所需的 {required} 个交易日；"
+               f"长周期回测/跟踪会缺样本，需持续每日生成快照或补全历史")
+    else:
+        status = "ok"
+        msg = (f"top10_daily 历史跨度 {trade_days} 个交易日 "
+               f"({earliest} ~ {latest})，满足 T+20 跟踪需求")
+
+    results.append({
+        "id": "top10_history_depth",
+        "name": "T+N 信号台账深度",
+        "page": "内容审计",
+        "status": status,
+        "message": msg,
+    })
+    return results
+
+
+def check_guanlan_material_freshness():
+    """观澜台素材新鲜度检查（2026-09-21 新增）。
+
+    背景（主人报障「研报每天都有更新，为什么一直解读18号的？」）：
+      机构研究·AI解析卡的**唯一素材源**是本机 out/guanlan_reports.json，
+      生产者 algorithms/guanlan_extractor.py 当时**无任何定时调度** ——
+      仅 self_heal_monitor 在 watchlist 缺失时才跑一次，不做日常刷新。
+      且 out/ 被 .gitignore 忽略、与云端 runner 的 out/ 不共享
+      ⇒ 素材冻结 09-18 后，出稿 automation 每天照跑却只能反复解读同一批，
+        而旧巡检只看 data/*.js 的 mtime，**全程零告警**。
+
+    判据（关键：看素材内的**最大报告日期**，不是文件 mtime）：
+      - max_date >= 今日            → ok
+      - max_date == 上一交易日       → ok（盘前宽容窗，源当天可能还没发帖）
+      - 落后 >= 2 个交易日           → fail（真冻结）
+
+    page 用「内容审计」：素材刷新是本地计划任务，self_heal 无法派发云端修复。
+    """
+    results = []
+    rid = "guanlan_material"
+    rname = "观澜台素材新鲜度"
+
+    # out/ 在仓库根，DATA_DIR = Path("data") ⇒ 取其父目录
+    repo_root = DATA_DIR.parent
+    reports_path = repo_root / "out" / "guanlan_reports.json"
+    state_path = repo_root / "out" / "_guanlan_refresh_state.json"
+
+    if not reports_path.exists():
+        # 🔴 2026-09-21 修复（本检查当日上线时自带的**结构性假阳性**）：
+        #   out/ 被 .gitignore 忽略，云端/自托管 runner 的工作区都没有该目录
+        #   ⇒ 本文件在任何 CI 环境里**恒不存在**；若一律判 fail，就等于在健康面板
+        #     钉一枚**永不熄灭的假红灯**（实测 2026-09-21 12:03 线上 summary.fail=2
+        #     里就有一条是它，报文还误称"guanlan_extractor.py 从未成功产出"）。
+        #   改为判「本环境能不能判」，而不是「文件在不在」：
+        #     · 本机（存在 out/ 目录）→ 文件缺失确属异常，仍判 fail；
+        #     · 其余环境（CI、或本机无 out/ 的新克隆）→ 降级用**已提交进仓**的
+        #       data/maharo_insights.js 里出稿自述的「素材窗口 A ~ B」作次生信号
+        #       （该行由出稿 automation 每日写、随闸门推 main，云端可见）。
+        _is_ci = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+        if (not _is_ci) and (repo_root / "out").exists():
+            results.append({
+                "id": rid, "name": rname, "page": "内容审计", "status": "fail",
+                "message": f"素材文件不存在: {reports_path}（guanlan_extractor.py 从未成功产出）",
+            })
+            return results
+
+        _today = datetime.now().date()
+        _prev_td = None
+        _d = _today - timedelta(days=1)
+        for _ in range(10):
+            if _is_trading_day(_d):
+                _prev_td = _d
+                break
+            _d -= timedelta(days=1)
+
+        win_end = None
+        _ins = DATA_DIR / "maharo_insights.js"
+        try:
+            with open(_ins, "r", encoding="utf-8") as _f:
+                _m = re.search(r"素材窗口\s*(\d{4}-\d{2}-\d{2})\s*~\s*(\d{4}-\d{2}-\d{2})", _f.read())
+            if _m:
+                win_end = datetime.strptime(_m.group(2), "%Y-%m-%d").date()
+        except Exception:
+            win_end = None
+
+        if win_end is None:
+            results.append({
+                "id": rid, "name": rname, "page": "内容审计", "status": "limited",
+                "message": ("本工作区不含 out/guanlan_reports.json（out/ 被 .gitignore 忽略、双机不共享）"
+                            "⇒ 该素材新鲜度只在小九机（计划任务 v8-guanlan-refresh）可直判；"
+                            "且 data/maharo_insights.js 未自述素材窗口，本环境无法间接评估"),
+            })
+        elif win_end >= _today or (_prev_td and win_end >= _prev_td):
+            results.append({
+                "id": rid, "name": rname, "page": "内容审计", "status": "ok",
+                "message": (f"间接判据：出稿档自述素材窗口末端 {win_end}（今日 {_today}），"
+                            f"未落后；直判需在小九机（out/guanlan_reports.json）"),
+            })
+        else:
+            _lag = _count_trade_days(win_end, _today)
+            results.append({
+                "id": rid, "name": rname, "page": "内容审计", "status": "fail",
+                "message": (f"素材窗口末端 {win_end} 落后今日 {_today} 达 {_lag} 个交易日"
+                            f"（间接判据：data/maharo_insights.js 的素材窗口自述）"
+                            f"⇒ 查小九机计划任务 v8-guanlan-refresh 与 algorithms/guanlan_extractor.py"),
+            })
+        return results
+
+    try:
+        with open(reports_path, "r", encoding="utf-8") as f:
+            doc = json.load(f)
+    except Exception as e:
+        results.append({
+            "id": rid, "name": rname, "page": "内容审计", "status": "fail",
+            "message": f"素材解析失败: {e}",
+        })
+        return results
+
+    dates = []
+    for r in (doc.get("reports") or []):
+        ds = (r.get("date") or "").strip()
+        if ds:
+            try:
+                dates.append(datetime.strptime(ds, "%Y-%m-%d").date())
+            except Exception:
+                continue
+
+    if not dates:
+        results.append({
+            "id": rid, "name": rname, "page": "内容审计", "status": "fail",
+            "message": "素材内无任何带日期的报告（count=%s）" % doc.get("count"),
+        })
+        return results
+
+    max_date = max(dates)
+    today = datetime.now().date()
+
+    # 上一交易日（从今天往回找，最多回溯 10 天）
+    prev_td = None
+    d = today - timedelta(days=1)
+    for _ in range(10):
+        if _is_trading_day(d):
+            prev_td = d
+            break
+        d -= timedelta(days=1)
+
+    # 素材里是否有未解码的富文本实体（回归护栏）
+    undecoded = sum(1 for r in (doc.get("reports") or [])
+                    if "<e type=" in (r.get("raw_text") or ""))
+
+    lag_days = _count_trade_days(max_date, today) if max_date <= today else 0
+
+    if max_date >= today:
+        status = "ok"
+        msg = f"素材最新 {max_date}（今日），共 {doc.get('count')} 条"
+    elif prev_td and max_date >= prev_td:
+        status = "ok"
+        msg = f"素材最新 {max_date}（上一交易日 {prev_td}），盘前宽容窗内，共 {doc.get('count')} 条"
+    elif lag_days >= 2:
+        status = "fail"
+        msg = (f"素材冻结：最新报告日 {max_date}，落后今日 {today} 达 {lag_days} 个交易日"
+               f"（共 {doc.get('count')} 条）。"
+               f"检查计划任务 v8-guanlan-refresh 与 guanlan_extractor.py 运行情况")
+    else:
+        status = "warn"
+        msg = f"素材最新 {max_date}，落后今日 {today}（{lag_days} 个交易日），请留意"
+
+    if undecoded:
+        status = "fail" if status == "ok" else status
+        msg += f" | ⚠️ {undecoded} 条含未解码富文本实体(<e type=)"
+
+    # 附上刷新任务的最近自检状态（有则）
+    if state_path.exists():
+        try:
+            with open(state_path, "r", encoding="utf-8") as f:
+                st = json.load(f)
+            if not st.get("ok", True):
+                msg += " | 刷新任务自检失败: %s" % st.get("error", "?")
+                if status == "ok":
+                    status = "warn"
+        except Exception:
+            pass
+
+    results.append({
+        "id": rid, "name": rname, "page": "内容审计",
+        "status": status, "message": msg,
+    })
+    return results
+
+
+def build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh=None, history_depth=None, a_share_cov=None, all_data=None, guanlan_fresh=None):
+    all_items = cards + raw + site_sync + runner + local_sync + dom + (signal_fresh or []) + (history_depth or []) + (a_share_cov or []) + (all_data or []) + (guanlan_fresh or [])
+    # 🛡 2026-09-12 ④：把计算/定义顺序写进 order，前端组内按此排序，与算法执行顺序一致
+    for _i, _it in enumerate(all_items):
+        _it["order"] = _i
+    ok = sum(1 for x in all_items if x["status"] == "ok")
+    warn = sum(1 for x in all_items if x["status"] == "warn")
+    fail = sum(1 for x in all_items if x["status"] == "fail")
+    limited = sum(1 for x in all_items if x["status"] == "limited")
+    # 🛡 2026-09-15 主人令一劳永逸：info 桶（真·不适用，非失败）+ other 桶（未知 status=接线缺口）。
+    #   不变量：info/other 永不计入 fail、永不拉红 overall；但 other>0 表示后端发了前端没接的 status，
+    #   前端会显红 ‼ 报警（藏错=违背纪律），此处仅保证 summary 分项之和 == total（对账无缺口）。
+    info = sum(1 for x in all_items if x["status"] == "info")
+    other = sum(1 for x in all_items if x["status"] not in ("ok", "warn", "fail", "limited", "info"))
+    overall = "ok" if fail == 0 else ("warn" if fail <= 2 else "fail")
+    return {
+        "updated": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
+        "overall": overall,
+        "summary": {"ok": ok, "warn": warn, "fail": fail, "limited": limited, "info": info, "other": other, "total": len(all_items)},
+        "items": all_items,
+    }
+
+
+def write_health_js(report):
+    out_path = DATA_DIR / "HEALTH_CHECK.js"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    js = "window.HEALTH_CHECK = " + json.dumps(report, ensure_ascii=False, indent=2) + ";\n"
+    # ★★ 2026-08-18 主人令「每次更新部署都是错的」根因根治：HEALTH_CHECK 幂等化 ★★
+    #   死循环环节：① updated 字段每次构建必变 ② age_min（数据年龄分钟数）随当前
+    #   时间流逝每次必变 → HEALTH_CHECK.js 内容必变 → build 的 git diff 永不空 →
+    #   每次必提交 → 触发自身/reconcile → 死循环（今日 359 提交实证）。
+    #   修复：写文件前做 JSON 深度比较（剔除 updated/age_min 动态字段），状态未变
+    #   则完全不动文件。age_min 由前端基于 last_update 自行换算。
+    try:
+        if out_path.exists():
+            old_js = out_path.read_text(encoding="utf-8")
+            def _core(s):
+                d = json.loads(s.split("= ", 1)[1].rsplit(";", 1)[0])
+                d.pop("updated", None)
+                for it in d.get("items", []):
+                    it.pop("age_min", None)
+                return json.dumps(d, ensure_ascii=False, sort_keys=True)
+            if _core(old_js) == _core(js):
+                print(f"[INFO] HEALTH_CHECK 状态未变，跳过重写（幂等）")
+                return
+    except Exception:
+        pass
+    out_path.write_text(js, encoding="utf-8")
+    print(f"[INFO] 已生成 {out_path}")
+
+
+def write_health_json(report):
+    """输出结构化 JSON 报告，供 v8_cloud_watchdog.py 做逐源 auto-dispatch 决策。"""
+    out_path = Path(".workbuddy") / "v8_health_report.json"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(report, ensure_ascii=False), encoding="utf-8")
+    print(f"[INFO] 已生成 {out_path}")
+
+
+def send_report_email(report, healed=None, failed=None):
+    """发送健康检查邮件。
+
+    自愈优先：先已由 self_heal() 尝试修复。邮件定位从「纯告警」改为：
+      - 全部自愈成功 -> 发一条『已自愈』确认邮件（告知已自动派发刷新，无需人工）
+      - 有自愈失败 / 不可自愈项 -> 升级邮件，列明需人工介入的项
+    夜间静音时段：自愈动作照常（已在 main 中执行），仅降级为写 URGENT 留痕，不发邮件。
+    """
+    healed = healed or []
+    failed = failed or []
+    if not send_alert:
+        print("[WARN] 邮件发送器未导入，跳过邮件")
+        return False
+    if report["overall"] == "ok" and not healed and not failed:
+        return False
+
+    # 仍需人工关注的 fail 项：
+    #  - 已自愈（heal 标记为「已自动…」）的卡片不再告警
+    #  - 自愈失败的卡片列入（与 failed 对应）
+    #  - 不可自愈的 fail（文件缺失等）列入
+    #  - 管线类检查（本地/部署同步）由看门狗统一处理，此处不重复告警，避免噪声
+    remaining = []
+    for it in report["items"]:
+        if it.get("status") != "fail":
+            continue
+        if it.get("page") == "管线":
+            continue
+        # 2026-08-24 主人令：自愈已接手的项不再用【需人工】吓人。
+        # 凡 self_heal 对该项写过 heal 标记（无论"已自动派发"/"跳过重复"/"达上限"），
+        # 即代表自愈链已接管刷新，数据陈旧只是派发后尚未刷新的快照瞬间态，
+        # 下一轮自愈/云端产出即恢复——摘除出 remaining，不发【需人工】。
+        # 仅「自愈失败:...」(派发明确失败) 与「无 heal 标记」(根本没派发) 保留告警。
+        _heal = it.get("heal", "") or ""
+        if _heal and not _heal.startswith("自愈失败"):
+            continue  # 自愈已接手，无需人工介入告警
+        if _heal.startswith("已自动"):
+            continue  # 冗余保险：已自愈
+        # 2026-08-22 起：STOCK_MOMENTUM_STATE/V2 已脱离 PDF，由 gen_strong_breakout 每日盘后自选强势突破自合成，
+        # 不再走 OCR 人工依赖豁免。此类失败按普通卡处理（纳入邮件/告警）。
+        remaining.append(it)
+
+    # 2026-08-24 去重：同一组不可自愈项 30 分钟内只发一封邮件，避免每轮巡检轰炸；
+    # 但始终写 URGENT 留痕（与静音时段一致），不影响自愈闭环与人工可追溯。
+    _state_path = Path(__file__).resolve().parent / ".workbuddy" / "v8_health_alert_state.json"
+    _now = datetime.now()
+    _key = "|".join(sorted(it.get("id", it.get("name", "")) for it in remaining) + sorted(failed))
+    if failed or remaining:
+        _ulines = [f"[{it.get('page', '')}] {it.get('name', '')}: {it.get('message', '')}" for it in remaining]
+        _ulines += failed
+        write_urgent(_ulines)
+    _suppressed = False
+    try:
+        _prev = json.loads(_state_path.read_text(encoding="utf-8")) if _state_path.exists() else {}
+    except Exception:
+        _prev = {}
+    if _prev.get("key") == _key:
+        try:
+            _elapsed = (_now - datetime.fromisoformat(_prev["last_ts"])).total_seconds() / 60
+        except Exception:
+            _elapsed = 999
+        if _elapsed < 30:
+            _suppressed = True
+    if _suppressed:
+        print(f"[DEDUP] 健康邮件 {_elapsed:.0f}min 内同组已发，跳过（URGENT 已留痕）")
+        return False
+
+    quiet = in_quiet_hours()
+    if quiet:
+        # 夜间静音：自愈已执行，仅不邮件（URGENT 已写）
+        return False
+
+    if failed or remaining:
+        subject = f"【v8需人工】自愈失败/无法自动修复 {len(failed) + len(remaining)} 项 @ {report['updated']}"
+        lines = [f"v8 自愈巡检时间：{report['updated']}", "",
+                 "以下项自动修复失败或无法自动修复，需人工介入："]
+        for it in remaining:
+            lines.append(f"✗ [{it.get('page', '')}] {it.get('name', '')}: {it.get('message', '')}")
+        for f in failed:
+            lines.append(f"✗ {f}")
+        if healed:
+            lines += ["", "以下项已自动派发刷新（无需人工）："]
+            lines += [f"✓ {h}" for h in healed]
+        lines += ["", f"站点：{SITE_URL}"]
+        # 🔴 2026-08-30 一劳永逸（主人令「邮件怎么还在报警，赶紧查改一劳永逸式修复」）：
+        #   本邮件是**数据陈旧类**（卡片 fail / 自愈失败），与「进程崩溃」这类基础设施
+        #   真故障性质不同。周末与法定节假日没有新数据源，"数据陈旧"属设计预期而非故障
+        #   → 走 stale 级，由 v8_send_alert.py 统一闸门在非交易日静默；
+        #     infra 级（如本文件下面的「进程崩溃」邮件）仍会照发，不漏报真故障。
+        #   主题前缀（机器溯源）由发送器统一加，此处不重复处理。
+        send_alert(subject, "\n".join(lines), level="stale")
+        try:
+            _state_path.parent.mkdir(parents=True, exist_ok=True)
+            _state_path.write_text(json.dumps({"key": _key, "last_ts": _now.isoformat()}, ensure_ascii=False), encoding="utf-8")
+        except Exception:
+            pass
+        return True
+    elif healed:
+        # 🔴 2026-08-12 主人令：全部自愈成功不发邮件(避免噪音),「只看有问题的」
+        #   如果有 fail 项需要人工,会进上面 if 分支(healed 也会列在最后)所以不影响
+        return False
+    else:
+        return False
+
+
+def main():
+    parser = argparse.ArgumentParser(description="v8 前端健康巡检")
+    parser.add_argument("--alert", action="store_true", help="异常时发送邮件告警")
+    parser.add_argument("--site", action="store_true", help="额外检查线上 DOM 空值")
+    parser.add_argument("--heal", dest="heal", action="store_true", default=True,
+                        help="发现可自愈陈腐时自动派发刷新（默认开）")
+    parser.add_argument("--no-heal", dest="heal", action="store_false", help="关闭自愈派发（仅诊断）")
+    args = parser.parse_args()
+
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+
+    print(f"[INFO] v8 health check start @ {now_cst().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    cards = check_data_cards() or []
+    all_data = check_all_data_files() or []  # 🔴 2026-08-17 主人怒令：全面审计（53 个未登记文件全量覆盖）
+    raw = check_raw_data() or []
+    site_sync = check_site_deploy_sync() or []
+    runner = check_runner() or []
+    local_sync = check_local_head_sync() or []
+    dom = []
+    if args.site:
+        dom = check_site_dom()
+
+    signal_fresh = check_signal_date_freshness() or []
+    history_depth = check_top10_history_depth() or []
+    # 🔴 2026-08-12 主人紧急令：算法输出全港股/A股缺失必须立即报警
+    a_share_cov = check_a_share_coverage() or []
+    # 2026-09-21 新增：观澜台素材新鲜度（机构研究卡唯一素材源，此前零监控）
+    guanlan_fresh = check_guanlan_material_freshness() or []
+    # 2026-08-30 一劳永逸：六个检查函数任意返回 None 都兜底成 [],避免 build_report(None) 直接崩
+
+    report = build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh, history_depth, a_share_cov=a_share_cov, all_data=all_data, guanlan_fresh=guanlan_fresh)
+    # 2026-08-11 漏洞 #3：管线耗时趋势监控（必须在 build_report 后但 self_heal 前,以便发现异常时纳入自愈决策）
+    try:
+        _check_workflow_durations(report)
+    except Exception as e:
+        print(f"[WARN] workflow duration check failed: {e}")
+    write_health_js(report)
+    # 打印摘要
+    print(f"[INFO] 总体: {report['overall']} | 统计: {report['summary']}")
+    for item in report["items"]:
+        if item["status"] != "ok":
+            print(f"  [{item['status'].upper()}] {item['page']}/{item['name']}: {item['message']}")
+
+    # ── 自愈（默认开）：发现可修复陈腐即尝试派发刷新，而非只发邮件 ──
+    # 2026-08-24 一劳永逸（根因 22:24【rc=3】邮件）：self_heal 内部 subprocess.run + api_get 链路
+    # 理论最坏 50min，超过看门狗 v8_cloud_watchdog.py::run_health_check timeout=480 → 主进程被 SIGTERM
+    # 杀 → report 没写完 → 看门狗兜底发【rc=3】误报。修复：用 ThreadPoolExecutor 把 self_heal
+    # 隔离到工作线程，future.result(timeout=420) 7 分钟强制收线，超时即 mark "自愈超时跳过本轮"，
+    # 主流程照常写盘 + 发邮件 + sys.exit(2)。代价：极端情况下 self_heal 派发不完整 → 下轮再去抖重试。
+    _SELF_HEAL_GLOBAL_TIMEOUT = 420  # 7 分钟
+    healed, failed = [], []
+    if args.heal:
+        try:
+            from concurrent.futures import ThreadPoolExecutor, TimeoutError as _FutTimeout
+            with ThreadPoolExecutor(max_workers=1) as _ex:
+                _fut = _ex.submit(self_heal, report)
+                try:
+                    healed, failed = _fut.result(timeout=_SELF_HEAL_GLOBAL_TIMEOUT)
+                except _FutTimeout:
+                    _fut.cancel()
+                    msg = f"self_heal 超时(>{_SELF_HEAL_GLOBAL_TIMEOUT}s)，本轮跳过，依赖下轮再去抖重试"
+                    print(f"[WARN] {msg}")
+                    failed = [f"[自愈超时] {msg}"]
+                    report["heal_error"] = msg
+        except Exception as e:
+            import traceback as _tb
+            _tb.print_exc()
+            failed = [f"[自愈异常] self_heal 内部错误，本轮未完成自愈: {type(e).__name__}: {e}"]
+            report["heal_error"] = f"{type(e).__name__}: {e}"
+        for h in healed:
+            print(f"  [HEAL✓] {h}")
+        for f in failed:
+            print(f"  [HEAL✗] {f}")
+
+    # 自愈后重写 JSON 报告，让 v8_cloud_watchdog.py 看到 heal 标记避免重复派发
+    write_health_json(report)
+
+    if args.alert:
+        send_report_email(report, healed=healed, failed=failed)
+
+    # 🛡 2026-09-03 阿狸咪令（hosted 应急通道连续 3 天 failure 根因之一，当场修）：
+    #   深夜/盘后早期跑健康检查时，算法链产物（三重共识/四量终极/全站精选/相对强度/
+    #   逆势龙头）隔夜陈旧是【常态】（阈值 747 分钟 ≈ 昨日 17:11 后必然超时）→
+    #   overall=fail → rc=2 → hosted 兜底 workflow 整链判死，连带
+    #   「推送重建 data/*.js / 原子提交 ?v / 云端兜底调度」三步全 skipped。
+    #   修复：兜底链设置 V8_HEALTH_SOFT_EXIT=1（软模式）→ 报告/自愈/邮件照常，
+    #   退出码恒 0，不再作失败信号。主 lane（巡检/每日审核/看门狗）不设此变量，
+    #   严格语义完全不变——告警职责仍由 strict lane 承担。
+    if os.environ.get("V8_HEALTH_SOFT_EXIT") == "1":
+        print("[INFO] V8_HEALTH_SOFT_EXIT=1 → 软退出模式：rc=0（仅报告+自愈+告警，不作失败信号）")
+        sys.exit(0)
+    sys.exit(0 if report["overall"] == "ok" else 2)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception as e:
+        # ── 顶层兜底守卫（2026-08-12 第171轮·一劳永逸）──────────────────────────────
+        # 此前 main() 内任一未捕获异常（API 超时/网络抖动/字段缺失等）都会让整个检查进程
+        # 以 rc=1 静默崩退：既不写 HEALTH_CHECK.js，也不发告警邮件，导致 9 张盘中卡陈旧
+        # 等真故障被「无声漏报」。round-166 只给 self_heal 加了 try/except，未覆盖 main() 其余
+        # 路径（check_* / build_report / write_health_js / _check_workflow_durations）。
+        # 此处兜底：任何崩溃都保证①报告落盘(overall=fail) ②邮件告警发出 ③以 rc=2 退出
+        # （rc=2 让看门狗识别为「有失败项、已由健康检查自发邮件」，不再被静默吞掉）。
+        import traceback as _tb
+        _tb.print_exc()
+        try:
+            _ts = now_cst().strftime("%Y-%m-%d %H:%M:%S")
+            _report = {
+                "updated": _ts,
+                "overall": "fail",
+                "summary": {"ok": 0, "warn": 0, "fail": 1, "total": 1},
+                "items": [{
+                    "id": "HEALTH_CHECK_CRASH",
+                    "name": "健康检查进程崩溃",
+                    "page": "—", "freq": "—", "status": "fail",
+                    "last_update": _ts, "age_min": 0,
+                    "message": f"{type(e).__name__}: {e}",
+                }],
+                "heal_error": f"{type(e).__name__}: {e}",
+            }
+            write_health_js(_report)
+            write_health_json(_report)
+            print(f"[GUARD] 兜底报告已写出 data/HEALTH_CHECK.js (overall=fail)")
+        except Exception as _e2:
+            print(f"[WARN] 兜底报告写出失败: {_e2}")
+        if send_alert:
+            try:
+                send_alert(
+                    "【v8需人工】健康检查进程崩溃(兜底rc=2)",
+                    f"v8_health_check.py 在主流程抛出未捕获异常，已兜底写出失败报告（overall=fail）。\n\n"
+                    f"{type(e).__name__}: {e}\n\n请查 v8_health_check.py 日志与 main() 调用链。",
+                    # 🛡 2026-08-30 一劳永逸：进程崩溃是**基础设施真故障**，走 infra 级
+                    #   —— 非交易日/夜间同样发送，绝不静默（主人要求开盘前必须知道错误）。
+                    level="infra",
+                )
+                print("[GUARD] 崩溃告警邮件已发送")
+            except Exception as _e3:
+                print(f"[WARN] 崩溃告警邮件发送失败: {_e3}")
+        # 🛡 2026-09-03 软模式：兜底链里真崩溃也不得杀链（infra 邮件已发，告警不丢）
+        if os.environ.get("V8_HEALTH_SOFT_EXIT") == "1":
+            print("[GUARD] V8_HEALTH_SOFT_EXIT=1 → 崩溃软退出 rc=0（兜底链继续，infra 邮件已发）")
+            sys.exit(0)
+        sys.exit(2)

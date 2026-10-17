@@ -1,0 +1,66 @@
+name: "📡 ima 强势股自动同步"
+
+on:
+  schedule:
+    # 北京时间 15:45（收盘后）= UTC 07:45；工作日执行
+    - cron: "45 7 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-ima-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "📥 Checkout（fetch-depth:0 保证基于最新 main）"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "🐍 配置 Python"
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: "📦 安装 playwright + chromium"
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install playwright
+          python -m playwright install chromium
+
+      - name: "🔄 同步远端最新 main（避免 ?v 漂移竞态，best-effort）"
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main || echo "⚠️ fetch 失败，沿用 checkout 已拉取的最新 main"
+          git reset --hard origin/main || echo "⚠️ reset 失败，沿用 checkout 已拉取的最新 main"
+
+      - name: "🕸️ 抓取 ima 强势股日报"
+        run: python fetch_ima_strong_stock.py
+
+      - name: "🔁 重写 index.html 的 ?v 缓存戳（与刚生成的 data 文件对齐）"
+        run: python update_v8.py --only-cache-busters
+
+      - name: "🚀 推送到仓库（api_push_raw.py，Contents API 增量）"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          # 🛡 2026-09-12 一劳永逸根治（与实验卡同根因）：原 git fetch + git push HEAD:main
+          #   偶发非 fast-forward / 网络超时失败。改用 api_push_raw.py（零 git fetch，免疫 cn git 墙），
+          #   index.html 由 update_v8.py --only-cache-busters 已重写 ?v，一并纳入 PUSH_FILES。
+          # 🔴 2026-10-16 补缺口：raw_data/ima_strong_daily.json（first_selected 归档）此前
+          #   从不入推送清单 ⇒ 仓内归档冻结、每日 fetcher 在 runner 上算的归档随跑随丢，
+          #   跨日 first_selected 判定失真（连选两日的票被误判「当日首入」）。补入清单。
+          PUSH_FILES="raw_data/ima_strong_stock.json,raw_data/ima_strong_daily.json,data/IMA_STRONG_STOCK.js,index.html" \
+            python api_push_raw.py
+          echo "✅ ima 强势股 data/raw_data(含归档)/index.html 已推送（Contents API）"

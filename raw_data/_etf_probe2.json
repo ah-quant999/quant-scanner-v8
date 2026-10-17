@@ -1,0 +1,208 @@
+{
+ "probe_time": "2026-09-23 10:04:41",
+ "matrix": [
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.0,
+   "tag": "pz5000_delay"
+  },
+  {
+   "base": "push2",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.1,
+   "tag": "pz5000_push2"
+  },
+  {
+   "base": "push2his",
+   "err": "ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connecti",
+   "secs": 1.0,
+   "tag": "pz5000_push2his"
+  },
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.0,
+   "tag": "pz100_delay"
+  },
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.0,
+   "tag": "pz500_delay"
+  },
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.0,
+   "tag": "pz1000_delay"
+  },
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.0,
+   "tag": "pz3000_delay"
+  },
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.0,
+   "tag": "single_sh_pz5000"
+  },
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.1,
+   "tag": "single_sz_pz5000"
+  }
+ ],
+ "stability": [
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.0,
+   "tag": "streak#1"
+  },
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.0,
+   "tag": "streak#2"
+  },
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 16.0,
+   "tag": "streak#3"
+  },
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.0,
+   "tag": "streak#4"
+  },
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.0,
+   "tag": "streak#5"
+  },
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.0,
+   "tag": "streak#6"
+  },
+  {
+   "base": "delay",
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r <center><h1>502 Bad",
+   "secs": 1.0,
+   "tag": "after_30s_rest"
+  }
+ ],
+ "prod_clist": [
+  {
+   "rows": 0,
+   "secs": 5.1,
+   "sample": null,
+   "tag": "prod_clist_cmb_pz5000"
+  },
+  {
+   "rows": 0,
+   "secs": 5.7,
+   "sample": null,
+   "tag": "prod_clist_sh_pz5000"
+  },
+  {
+   "rows": 0,
+   "secs": 5.4,
+   "sample": null,
+   "tag": "prod_clist_cmb_pz100"
+  }
+ ],
+ "prod_fn": [
+  {
+   "fn": "f_etf_daily_monitor",
+   "secs": 66.3,
+   "type": "dict",
+   "keys": [
+    "total_etf",
+    "total_net",
+    "top_inflow",
+    "top_outflow"
+   ],
+   "total_net": 1381199328.0,
+   "total_etf": 264,
+   "tag": "first(fn·干净)"
+  },
+  {
+   "fn": "f_etf_pulse",
+   "secs": 20.4,
+   "type": "NoneType",
+   "value": "None",
+   "tag": "first(fn·干净)"
+  },
+  {
+   "fn": "f_etf_daily_monitor",
+   "secs": 5.5,
+   "type": "NoneType",
+   "value": "None",
+   "tag": "last#1(矩阵后)"
+  },
+  {
+   "fn": "f_etf_daily_monitor",
+   "secs": 5.1,
+   "type": "NoneType",
+   "value": "None",
+   "tag": "last#2(矩阵后)"
+  }
+ ],
+ "import_ok": true,
+ "em_clist_sig": "(fs, fields, fid='f62', stat='1', pz=5000, po='1', pn=1, timeout=15)",
+ "elapsed_secs": 202.7
+}

@@ -1,0 +1,46 @@
+{
+  "_comment": "方案三产物 → 2026-08-17 主人令改为 prevHighN60（对齐 stop_target_optimization.json 回测最优）。全站默认 general+tdx 改为固定10%止损+前60日高点止盈；comprehensive/cockpit 信号不足保持 rrK1.5；default 兜底保持 rrK1.5。auto=回退方案二默认口径。",
+  "tdx": {
+    "stop": "fixedP10",
+    "target": "prevHighN60",
+    "metrics": {
+      "win_rate": 46.59,
+      "avg_return": 0.43,
+      "profit_factor": 1.083,
+      "median_rr": 2.136,
+      "source": "stop_target_optimization.json 2026-08-17 18:26 全量回测(5095信号)"
+    }
+  },
+  "comprehensive": {
+    "stop": "fixedP10",
+    "target": "rrK1.5",
+    "metrics": {
+      "note": "信号仅24条,回测结果不可靠,保持方案三原口径：固定10%止损 + R:R=1.5止盈"
+    }
+  },
+  "cockpit": {
+    "stop": "fixedP10",
+    "target": "rrK1.5",
+    "metrics": {
+      "note": "信号仅24条,回测结果不可靠,保持方案三原口径：固定10%止损 + R:R=1.5止盈"
+    }
+  },
+  "general": {
+    "stop": "fixedP10",
+    "target": "prevHighN60",
+    "metrics": {
+      "win_rate": 46.59,
+      "avg_return": 0.43,
+      "profit_factor": 1.083,
+      "median_rr": 2.136,
+      "source": "stop_target_optimization.json 2026-08-17 18:26 全量回测(5095信号);被 gen_stock_stop.py 引用"
+    }
+  },
+  "default": {
+    "stop": "fixedP10",
+    "target": "rrK1.5",
+    "metrics": {
+      "note": "全站默认兜底：未指定 strategy 时采用,保持方案三原口径(综合 win_rate/avg_return 旧版更优)"
+    }
+  }
+}

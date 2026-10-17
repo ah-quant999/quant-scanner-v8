@@ -1,0 +1,306 @@
+{
+ "date": "2026-08-17",
+ "category": "短线买点",
+ "total": 33,
+ "hit": 25,
+ "hit_rate": 75.8,
+ "rows": [
+  {
+   "code": "sz301516",
+   "name": "中远通",
+   "close_817": 19.32,
+   "close_814": 16.1,
+   "chg_pct": 20.0,
+   "vol_ratio": 4.12,
+   "hit": true
+  },
+  {
+   "code": "sz301127",
+   "name": "武汉天源",
+   "close_817": 18.14,
+   "close_814": 15.12,
+   "chg_pct": 19.97,
+   "vol_ratio": 2.49,
+   "hit": true
+  },
+  {
+   "code": "sz002156",
+   "name": "通富微电",
+   "close_817": 69.26,
+   "close_814": 62.96,
+   "chg_pct": 10.01,
+   "vol_ratio": 1.74,
+   "hit": true
+  },
+  {
+   "code": "sz300553",
+   "name": "集智股份",
+   "close_817": 47.76,
+   "close_814": 43.9,
+   "chg_pct": 8.79,
+   "vol_ratio": 1.52,
+   "hit": true
+  },
+  {
+   "code": "sh688362",
+   "name": "南矽电子",
+   "close_817": 73.91,
+   "close_814": 67.99,
+   "chg_pct": 8.71,
+   "vol_ratio": 1.26,
+   "hit": true
+  },
+  {
+   "code": "sz002536",
+   "name": "飞龙股份",
+   "close_817": 46.11,
+   "close_814": 42.6,
+   "chg_pct": 8.24,
+   "vol_ratio": 0.86,
+   "hit": false
+  },
+  {
+   "code": "sz002046",
+   "name": "国机精工",
+   "close_817": 50.93,
+   "close_814": 47.3,
+   "chg_pct": 7.67,
+   "vol_ratio": 1.91,
+   "hit": true
+  },
+  {
+   "code": "sz001309",
+   "name": "德明利",
+   "close_817": 435.4,
+   "close_814": 406.19,
+   "chg_pct": 7.19,
+   "vol_ratio": 1.2,
+   "hit": true
+  },
+  {
+   "code": "sz301307",
+   "name": "美利信",
+   "close_817": 56.8,
+   "close_814": 52.99,
+   "chg_pct": 7.19,
+   "vol_ratio": 1.29,
+   "hit": true
+  },
+  {
+   "code": "sh688584",
+   "name": "上海合晶",
+   "close_817": 30.56,
+   "close_814": 28.53,
+   "chg_pct": 7.12,
+   "vol_ratio": 1.19,
+   "hit": true
+  },
+  {
+   "code": "sh688359",
+   "name": "三孚新科",
+   "close_817": 113.18,
+   "close_814": 106.2,
+   "chg_pct": 6.57,
+   "vol_ratio": 1.06,
+   "hit": true
+  },
+  {
+   "code": "sh603986",
+   "name": "兆易创新",
+   "close_817": 444.0,
+   "close_814": 417.48,
+   "chg_pct": 6.35,
+   "vol_ratio": 1.16,
+   "hit": true
+  },
+  {
+   "code": "sh688168",
+   "name": "安博通",
+   "close_817": 40.09,
+   "close_814": 37.86,
+   "chg_pct": 5.89,
+   "vol_ratio": 1.46,
+   "hit": true
+  },
+  {
+   "code": "sh601133",
+   "name": "柏诚股份",
+   "close_817": 28.38,
+   "close_814": 26.81,
+   "chg_pct": 5.86,
+   "vol_ratio": 1.34,
+   "hit": true
+  },
+  {
+   "code": "sh688220",
+   "name": "翱捷科技-U",
+   "close_817": 107.84,
+   "close_814": 102.17,
+   "chg_pct": 5.55,
+   "vol_ratio": 1.17,
+   "hit": true
+  },
+  {
+   "code": "sh603757",
+   "name": "大元泵业",
+   "close_817": 64.48,
+   "close_814": 61.2,
+   "chg_pct": 5.36,
+   "vol_ratio": 0.9,
+   "hit": false
+  },
+  {
+   "code": "sz002843",
+   "name": "泰嘉股份",
+   "close_817": 17.21,
+   "close_814": 16.35,
+   "chg_pct": 5.26,
+   "vol_ratio": 1.35,
+   "hit": true
+  },
+  {
+   "code": "sh603050",
+   "name": "科林电气",
+   "close_817": 18.79,
+   "close_814": 17.94,
+   "chg_pct": 4.74,
+   "vol_ratio": 2.63,
+   "hit": true
+  },
+  {
+   "code": "sh605178",
+   "name": "时空科技",
+   "close_817": 68.28,
+   "close_814": 65.27,
+   "chg_pct": 4.61,
+   "vol_ratio": 1.65,
+   "hit": true
+  },
+  {
+   "code": "sh688783",
+   "name": "西安奕材-U",
+   "close_817": 32.8,
+   "close_814": 31.45,
+   "chg_pct": 4.29,
+   "vol_ratio": 1.12,
+   "hit": true
+  },
+  {
+   "code": "sh605389",
+   "name": "长龄液压",
+   "close_817": 76.19,
+   "close_814": 73.09,
+   "chg_pct": 4.24,
+   "vol_ratio": 1.33,
+   "hit": true
+  },
+  {
+   "code": "sh688386",
+   "name": "泛亚微透",
+   "close_817": 56.75,
+   "close_814": 54.51,
+   "chg_pct": 4.11,
+   "vol_ratio": 1.04,
+   "hit": true
+  },
+  {
+   "code": "sh600598",
+   "name": "北大荒",
+   "close_817": 12.24,
+   "close_814": 11.85,
+   "chg_pct": 3.29,
+   "vol_ratio": 2.04,
+   "hit": true
+  },
+  {
+   "code": "sz003009",
+   "name": "中飞火箭",
+   "close_817": 51.44,
+   "close_814": 50.0,
+   "chg_pct": 2.88,
+   "vol_ratio": 0.86,
+   "hit": false
+  },
+  {
+   "code": "sh600810",
+   "name": "神马股份",
+   "close_817": 6.44,
+   "close_814": 6.28,
+   "chg_pct": 2.55,
+   "vol_ratio": 0.93,
+   "hit": false
+  },
+  {
+   "code": "sh600248",
+   "name": "陕建股份",
+   "close_817": 2.92,
+   "close_814": 2.85,
+   "chg_pct": 2.46,
+   "vol_ratio": 1.69,
+   "hit": true
+  },
+  {
+   "code": "sh688591",
+   "name": "泰凌微",
+   "close_817": 28.57,
+   "close_814": 27.91,
+   "chg_pct": 2.36,
+   "vol_ratio": 1.38,
+   "hit": true
+  },
+  {
+   "code": "sz301618",
+   "name": "长春经开",
+   "close_817": 34.18,
+   "close_814": 33.4,
+   "chg_pct": 2.34,
+   "vol_ratio": 1.4,
+   "hit": true
+  },
+  {
+   "code": "sz300145",
+   "name": "南方泵业",
+   "close_817": 4.42,
+   "close_814": 4.34,
+   "chg_pct": 1.84,
+   "vol_ratio": 0.89,
+   "hit": false
+  },
+  {
+   "code": "sz300938",
+   "name": "信测标准",
+   "close_817": 30.33,
+   "close_814": 29.79,
+   "chg_pct": 1.81,
+   "vol_ratio": 0.85,
+   "hit": false
+  },
+  {
+   "code": "sh688101",
+   "name": "三达膜",
+   "close_817": 15.68,
+   "close_814": 15.44,
+   "chg_pct": 1.55,
+   "vol_ratio": 0.85,
+   "hit": false
+  },
+  {
+   "code": "sz000541",
+   "name": "佛山照明",
+   "close_817": 4.98,
+   "close_814": 4.91,
+   "chg_pct": 1.43,
+   "vol_ratio": 1.92,
+   "hit": true
+  },
+  {
+   "code": "sz000920",
+   "name": "沃顿科技",
+   "close_817": 11.9,
+   "close_814": 11.74,
+   "chg_pct": 1.36,
+   "vol_ratio": 0.95,
+   "hit": false
+  }
+ ]
+}

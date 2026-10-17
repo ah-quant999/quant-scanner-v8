@@ -1,0 +1,35 @@
+{
+ "fetched_at": "2026-09-19 20:22:11",
+ "fetched_tz": "CST+8",
+ "kb_id": "7500816604757970",
+ "kb_name": "强势股跟踪",
+ "kb_creator": "梧谷枫灯",
+ "folder_id": "folder_7506360161825717",
+ "folder_name": "缠论买点每日推荐",
+ "title": "缠论买入筛选报告",
+ "media_id": null,
+ "docs": [
+  {
+   "file": "_chan_0916.md",
+   "data_date": "2026-09-16",
+   "rows_parsed": 38,
+   "claimed": 38,
+   "pool": 88
+  },
+  {
+   "file": "_chan_0917.md",
+   "data_date": "2026-09-17",
+   "rows_parsed": 17,
+   "claimed": 17,
+   "pool": 52
+  }
+ ],
+ "rows_parsed": 55,
+ "source_chars": 7314,
+ "signal_dates": [
+  "2026-09-16",
+  "2026-09-17"
+ ],
+ "channel": "member-full-text-snapshot",
+ "note": "本快照由本机（有 ima 登录态）经知识连接器取**全文**后落盘；云端 fetch_chan_buy_point.py 优先读它，缺失/过期自动回退访客通道。"
+}

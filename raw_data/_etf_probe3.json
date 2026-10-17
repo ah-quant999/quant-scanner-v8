@@ -1,0 +1,268 @@
+{
+ "probe_time": "2026-09-23 10:15:31",
+ "cold": [
+  {
+   "rows": 100,
+   "uniq": 100,
+   "secs": 1.0,
+   "sum_net_yi": 26.056,
+   "sh": 100,
+   "sz": 0,
+   "sample": [
+    "511990",
+    "588170",
+    "511360",
+    "512100",
+    "510050",
+    "518880"
+   ],
+   "at": "10:15:33",
+   "tag": "f62_pz5000_CMB_po1"
+  },
+  {
+   "rows": 0,
+   "uniq": 0,
+   "secs": 25.2,
+   "sum_net_yi": 0.0,
+   "sh": 0,
+   "sz": 0,
+   "sample": [],
+   "at": "10:15:59",
+   "tag": "f62_pz5000_CMB_po0"
+  },
+  {
+   "rows": 0,
+   "uniq": 0,
+   "secs": 5.2,
+   "sum_net_yi": 0.0,
+   "sh": 0,
+   "sz": 0,
+   "sample": [],
+   "at": "10:16:04",
+   "tag": "f62_pz3000_SH"
+  },
+  {
+   "rows": 0,
+   "uniq": 0,
+   "secs": 44.5,
+   "sum_net_yi": 0.0,
+   "sh": 0,
+   "sz": 0,
+   "sample": [],
+   "at": "10:16:49",
+   "tag": "f62_pz3000_SZ"
+  },
+  {
+   "rows": 0,
+   "uniq": 0,
+   "secs": 5.7,
+   "sum_net_yi": 0.0,
+   "sh": 0,
+   "sz": 0,
+   "sample": [],
+   "at": "10:16:55",
+   "tag": "f3_pz100_CMB_pn1"
+  }
+ ],
+ "pages": [
+  {
+   "rows": 0,
+   "uniq": 0,
+   "secs": 25.4,
+   "sum_net_yi": 0.0,
+   "sh": 0,
+   "sz": 0,
+   "sample": [],
+   "at": "10:17:21",
+   "tag": "f3_pz100_pn1"
+  },
+  {
+   "rows": 0,
+   "uniq": 0,
+   "secs": 46.7,
+   "sum_net_yi": 0.0,
+   "sh": 0,
+   "sz": 0,
+   "sample": [],
+   "at": "10:18:08",
+   "tag": "f3_pz100_pn2"
+  },
+  {
+   "rows": 0,
+   "uniq": 0,
+   "secs": 6.3,
+   "sum_net_yi": 0.0,
+   "sh": 0,
+   "sz": 0,
+   "sample": [],
+   "at": "10:18:15",
+   "tag": "f3_pz100_pn3"
+  },
+  {
+   "rows": 0,
+   "uniq": 0,
+   "secs": 17.3,
+   "sum_net_yi": 0.0,
+   "sh": 0,
+   "sz": 0,
+   "sample": [],
+   "at": "10:18:33",
+   "tag": "f62_pz100_pn1"
+  },
+  {
+   "rows": 0,
+   "uniq": 0,
+   "secs": 5.3,
+   "sum_net_yi": 0.0,
+   "sh": 0,
+   "sz": 0,
+   "sample": [],
+   "at": "10:18:39",
+   "tag": "f62_pz100_pn2"
+  },
+  {
+   "rows": 0,
+   "uniq": 0,
+   "secs": 5.5,
+   "sum_net_yi": 0.0,
+   "sh": 0,
+   "sz": 0,
+   "sample": [],
+   "at": "10:18:44",
+   "tag": "f62_pz100_pn3"
+  }
+ ],
+ "coverage": {
+  "cmb_pz5000_uniq": 100,
+  "sh_uniq": 0,
+  "sz_uniq": 0,
+  "sh_plus_sz": 0
+ },
+ "robust": [
+  {
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r",
+   "secs": 0.9,
+   "at": "10:18:46",
+   "tag": "try#1"
+  },
+  {
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r",
+   "secs": 1.0,
+   "at": "10:18:52",
+   "tag": "try#2"
+  },
+  {
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r",
+   "secs": 1.0,
+   "at": "10:18:58",
+   "tag": "try#3"
+  },
+  {
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r",
+   "secs": 1.2,
+   "at": "10:19:04",
+   "tag": "try#4"
+  },
+  {
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r",
+   "secs": 1.0,
+   "at": "10:19:10",
+   "tag": "try#5"
+  },
+  {
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r",
+   "secs": 1.0,
+   "at": "10:19:16",
+   "tag": "try#6"
+  },
+  {
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r",
+   "secs": 1.0,
+   "at": "10:19:22",
+   "tag": "try#7"
+  },
+  {
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r",
+   "secs": 1.0,
+   "at": "10:19:28",
+   "tag": "try#8"
+  },
+  {
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r",
+   "secs": 1.0,
+   "at": "10:19:34",
+   "tag": "try#9"
+  },
+  {
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r",
+   "secs": 1.0,
+   "at": "10:19:40",
+   "tag": "try#10"
+  },
+  {
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r",
+   "secs": 1.0,
+   "at": "10:19:46",
+   "tag": "try#11"
+  },
+  {
+   "http": 502,
+   "json": false,
+   "bytes": 559,
+   "head": "<html>\r <head><title>502 Bad Gateway</title></head>\r <body>\r",
+   "secs": 1.0,
+   "at": "10:19:52",
+   "tag": "try#12"
+  }
+ ],
+ "heavy": [
+  {
+   "type": "NoneType",
+   "secs": 5.2,
+   "tag": "fn_after#1"
+  },
+  {
+   "type": "NoneType",
+   "secs": 5.9,
+   "tag": "fn_after#2"
+  }
+ ],
+ "import_ok": true,
+ "em_clist_sig": "(fs, fields, fid='f62', stat='1', pz=5000, po='1', pn=1, timeout=15)",
+ "em_clist_src": "def em_clist(fs, fields, fid=\"f62\", stat=\"1\", pz=5000, po=\"1\", pn=1, timeout=15):\n    \"\"\"东方财富 clist 接口（push2delay 镜像）。返回 data.diff 列表（每项为字段字典）。\n    po=\"1\" 降序(取净流入最高)，po=\"0\" 升序(取净流出最高)。\n    pn 页码（默认 1），pz 单页大小（默认 5000，但 push2delay 实际硬截 100，分页需自循环）。\n    2026-08-19 主人令：em_clist/em_ulist_np 加 _em_get_with_retry 指数退避，根治云端 WAF 抖动。\n    \"\"\"\n    params = {\n        \"pn\": str(pn), \"pz\": str(pz), \"po\": po, \"np\": \"1\", \"fltt\": \"2\", \"invt\": \"2\",\n        \"ut\": \"b2884a393a59ad64002292a3e90d46a5\",\n        \"fid\": fid, \"fs\": fs, \"stat\": stat,\n        \"fields\": fields, \"_\": int(time.time() * 1000),\n    }\n    try:\n        d = _em_get_with_retry(\n            f\"{_EM_DELAY}/api/qt/clist/get\", params=params,\n            headers=_EM_HEADERS, timeout=timeout,\n            label=f\"clist {fs.split(' ')[0]} pz={pz} po={po}\",\n        )\n    except RuntimeError:\n        return []\n    if not d.get(\"data\"):\n        return []\n    return _em_clean_rows(d[\"data\"].get(\"diff\", []) or [])\n",
+ "probe_url": "https://push2delay.eastmoney.com/api/qt/clist/get",
+ "elapsed_secs": 282.7
+}

@@ -1,0 +1,58 @@
+{
+  "update_time": "2026-09-07 15:22:03",
+  "methodology": "回看型分组检验（当期增速快照 × 过去N日收益），隐含增速排名持续性假设",
+  "methodology_limit": true,
+  "sample_size": 288,
+  "layers": {
+    "L1(最高增速)": {
+      "count": 57,
+      "mean_growth": 101.92,
+      "past_20d_ret_pct": 7.46,
+      "past_60d_ret_pct": 4.05,
+      "past_120d_ret_pct": 28.18
+    },
+    "L2": {
+      "count": 57,
+      "mean_growth": 46.06,
+      "past_20d_ret_pct": 8.42,
+      "past_60d_ret_pct": 3.65,
+      "past_120d_ret_pct": 30.61
+    },
+    "L3": {
+      "count": 57,
+      "mean_growth": 31.28,
+      "past_20d_ret_pct": 7.41,
+      "past_60d_ret_pct": 4.11,
+      "past_120d_ret_pct": 31.98
+    },
+    "L4": {
+      "count": 57,
+      "mean_growth": 22.3,
+      "past_20d_ret_pct": 3.42,
+      "past_60d_ret_pct": -2.99,
+      "past_120d_ret_pct": 28.09
+    },
+    "L5(最低增速)": {
+      "count": 60,
+      "mean_growth": 10.92,
+      "past_20d_ret_pct": 10.01,
+      "past_60d_ret_pct": 8.99,
+      "past_120d_ret_pct": 21.21
+    }
+  },
+  "ic": {
+    "past_20d": -0.0444,
+    "past_60d": -0.1094,
+    "past_120d": 0.1016
+  },
+  "spread_L1_L5": {
+    "past_20d": -2.55,
+    "past_60d": -4.94,
+    "past_120d": 6.97
+  },
+  "monotonic": {
+    "past_20d": false,
+    "past_60d": false,
+    "past_120d": false
+  }
+}

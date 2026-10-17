@@ -1,0 +1,43 @@
+#!/bin/sh
+# .githooks/pre-commit — 提交前凭据闸门（2026-09-14 小九）
+#
+# 治「手工全域 git add -f 把凭据提交进 public 仓」的复发：
+#   2026-08-24 data/.mahoro_cookies.txt、2026-09-11 data/zsxq_token.json（暴露 61.4h）。
+# 防线必须在提交闸门 —— 写在某个脚本里的守卫挡不住手工操作。
+#
+# 安装（双机各一次，幂等）：
+#   git config core.hooksPath .githooks
+#   或直接跑：python scripts/install_git_hooks.py
+#
+# 临时旁路（仅在确认误报时）：SECRET_GUARD_ALLOW=1 git commit ...
+
+# 找到仓库根（hook 执行时 cwd 通常是仓库根，但仍稳妥起见）
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+GUARD="$ROOT/scripts/secret_guard.py"
+
+# 闸门脚本不存在（如旧克隆）→ 不阻断
+[ -f "$GUARD" ] || exit 0
+
+# 选一个可用的 Python：优先仓库约定路径，其次 PATH
+PY=""
+for c in \
+  "C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe" \
+  "C:/Users/Administrator/.workbuddy/binaries/python/versions/3.13.12/python.exe" \
+  "python3" "python"
+do
+  if command -v "$c" >/dev/null 2>&1 || [ -x "$c" ]; then PY="$c"; break; fi
+done
+
+# 找不到 Python → 退化为纯 shell 兜底（只做最基本的路径名检查）
+if [ -z "$PY" ]; then
+  BAD=$(git diff --cached --name-only --diff-filter=ACMR \
+        | grep -iE '(data|raw_data|out)/.*(token|secret|cookie|credential|passwd|\.env|\.pat)' || true)
+  if [ -n "$BAD" ]; then
+    echo "🚫 凭据闸门（shell 兜底）：以下文件疑似凭据，提交被拒绝：" >&2
+    echo "$BAD" >&2
+    exit 1
+  fi
+  exit 0
+fi
+
+exec "$PY" "$GUARD" --staged

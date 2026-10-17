@@ -1,0 +1,53 @@
+--- a/.github/workflows/v8_build_deploy.yml
++++ b/.github/workflows/v8_build_deploy.yml
+@@ -93,15 +93,49 @@
+     timeout-minutes: 5
+     outputs:
+       trading: ${{ steps.t.outputs.trading }}
++      is_trading_day: ${{ steps.td_run.outputs.is_trading_day }}
+     steps:
++      # 🔴🔴 2026-09-19（阿狸咪的工程师）：原判据**只有时钟窗，没有星期/交易日维度**。
++      #    实证（我方 11:55 档，全天 28 个 run）：唯一被判 trading=true 的 #7073（10:34:05）
++      #    正是唯一 build=skipped 的那个；把原判据逐 run 复算与 build 真实结论比对 = 28/28 一致
++      #    ⇒ 排除偶发/并发/超时解释，这是判据自身的确定性行为。
++      #    危害：① 非交易日该窗内的 push（含 index.html 结构改动）拿不到 update_v8 重建与部署；
++      #          ② 主人「周末手动跑更新和部署」在手动手动派发时**也被 skip**（下方 build 的
++      #             if 白名单含 workflow_dispatch）⇒ 诉求直接落空；③ run 顶层全绿掩盖以上两点。
++      - id: td
++        continue-on-error: true      # 日历/checkout 异常不得掐断 gate（下方逻辑已保证不降级）
++        uses: actions/checkout@v4
++        with:
++          ref: main
++          sparse-checkout: |
++            algorithms/check_trading_day.py
++            v8_date.py
++          sparse-checkout-cone-mode: false
++      - id: td_run
++        continue-on-error: true
++        shell: bash
++        run: |
++          # 复用仓库既有交易日历（v8_date.is_trading_day）。该脚本对「日历拉取失败」
++          # 保守视为交易日（不误伤工作日），并支持 V8_FORCE_RUN=1 强制视为交易日。
++          python algorithms/check_trading_day.py || true
+       - id: t
+         shell: bash
+         run: |
+           TH=$(TZ=Asia/Shanghai date +%-H); TM=$(TZ=Asia/Shanghai date +%-M)
++          DW=$(TZ=Asia/Shanghai date +%u)          # 1..7（1=周一；6=周六，7=周日）
+           TR=0
+           if { [ "$TH" -eq 9 ] && [ "$TM" -ge 25 ]; } || [ "$TH" -eq 10 ] || { [ "$TH" -eq 11 ] && [ "$TM" -le 30 ]; } || [ "$TH" -eq 13 ] || [ "$TH" -eq 14 ]; then TR=1; fi
++          # 🔴 2026-09-19 新增：交易时段判定叠加「交易日」维度（两层短路）。
++          #   短路一（周末）：date +%u 离线可判且**确定**（A 股周末必无行情）⇒ 恒判非盘中。
++          #   短路二（法定假日/调休）：由上面的交易日历明确输出 is_trading_day=false 时判非盘中。
++          #   🔴 安全边界：日历步骤失败 ⇒ 输出为空 ⇒ **保持原时钟判据不降级**。
++          #     否则工作日盘中一旦日历接口抖动，全量 build 会在盘中开跑，复发 2026-09-03
++          #     的盘中风暴（该风暴正是本闸门当初要根治的对象）。
++          IF_TD="${{ steps.td_run.outputs.is_trading_day }}"
++          if [ "$DW" -ge 6 ]; then TR=0; fi
++          if [ "$IF_TD" = "false" ]; then TR=0; fi
+           echo "trading=$([ "$TR" -eq 1 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+-          echo "🕒 当前北京时间 ${TH}:${TM} → 交易时段=$([ "$TR" -eq 1 ] && echo YES || echo NO)"
++          echo "🕒 北京时间 ${TH}:${TM}（周${DW}）交易日=${IF_TD:-未知} → 交易时段=$([ "$TR" -eq 1 ] && echo YES || echo NO)"
+   build:
+     needs: [gate]
+     runs-on: ubuntu-latest

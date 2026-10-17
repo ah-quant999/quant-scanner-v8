@@ -1,0 +1,1794 @@
+#!/usr/bin/env python3
+"""v8 数据构建脚本 — 从 raw_data/*.json 生成 data/*.js
+
+改造要点（2026-07-31 周末·阿狸咪）：
+- 支持按 category 选择性构建：premarket / intraday / post_close / weekly。
+- 支持 --detect-changes：只构建本次 push 发生变化的 raw_data 所属类别。
+- 缺失 raw_data 的模块：保持既有 data/*.js 不变（carry-forward），由 guard 标陈旧。
+- 删除死数据文件 RECOMMEND / SCAN_DATA 的映射。
+"""
+
+import json, os, re, subprocess, sys, time, hashlib
+from datetime import datetime
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+ROOT = Path(__file__).resolve().parent
+RAW_DIR = ROOT / "raw_data"
+DATA_DIR = ROOT / "data"
+CST = ZoneInfo("Asia/Shanghai")
+
+def now_cst():
+    """返回中国标准时间（Asia/Shanghai）的当前 datetime。"""
+    return datetime.now(CST)
+
+# 原始文件名 → window 变量名
+DATA_SOURCES = {
+    "etf_net_subscription.json":   "ETF_NET_SUBSCRIPTION",  # 2026-09-11 主人 P1：真实 ETF 份额申赎（上交所日环比）
+    "etf_intraday_heat.json":      "ETF_INTRADAY_HEAT",
+    "sector_phase_history.json":   "SECTOR_PHASE_HISTORY",  # 2026-08-17 主人令：盘后每日阶段快照（自动累积+前端"今日 vs 上次"对比）
+    "sector_fund_flow.json":       "SECTOR_FUND_FLOW",
+    "sector_fund_flow_trend.json": "SECTOR_FUND_FLOW_TREND",
+    # 🛡 2026-08-19 主人令一劳永逸式修复：原 DATA_SOURCES 缺 sector_fund_flow_intraday.json 映射，
+    #   cloud_fetch_v8.py f_sector_fund_flow() 已在抓取时按 intraday 追加快照（line 1168），
+    #   但 update_v8 转换层漏挂 → data/SECTOR_FUND_FLOW_INTRADAY.js 永远停在 09:56 的 2 快照版。
+    #   根因：与 8/18 OVERSEAS_MARKETS 同类疏漏（fetch 注册了 raw 写，build 没映射）。
+    "sector_fund_flow_intraday.json": "SECTOR_FUND_FLOW_INTRADAY",
+    "gold_pool.json":              "GOLD_POOL",
+    "first_board_alert.json":       "FIRST_BOARD_ALERT",  # 2026-09-30 主人令：首板倍量前哨
+    "stock_names.json":            "STOCK_LIST",
+    # 🔴 2026-09-13 主人令「前后端都无人读，删干净」：stock_profile.json → STOCK_PROFILE
+    #   data/STOCK_PROFILE.js 转换已停产（省 1.33 MB/次入库）。
+    #   前端 window.STOCK_PROFILE 由 STOCK_LIST 就地合成（index.html:15290-15304）；
+    #   全仓无脚本读 data/STOCK_PROFILE.js。raw_data/stock_profile.json **保留**
+    #   （3 个真消费者：build_pool_tracker / final_recommend:396 / A 批闸门 must）。
+    "macro_data.json":             "MACRO_DATA",
+    "macro_brief.json":            "MACRO_BRIEF",
+    "nt_data.json":                "NT_DATA",
+    "lhb_data.json":               "LHB_DATA",
+    "lhb_history.json":           "LHB_HISTORY",
+    "concept_ranking.json":        "CONCEPT_RANKING",
+    "margin_data.json":            "MARGIN_DATA",
+    "cffex_data.json":             "CFFEX_HOLDINGS",
+    "cffex_position.json":         "CFFEX_POSITION",  # 🆕 2026-10-15 IF会员持仓净空比z（图4建议①）
+    "ipo_score.json":              "IPO_DATA",
+    "crisis_data.json":            "CRISIS_DATA",
+    "judgment_data.json":          "JUDGMENT_DATA",
+    "crds_card_data.json":         "CRDS_CARD_DATA",
+    # 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合）。
+    #   从 algo_track.json 读三 algo 跟踪池，去重 → 状态机判 status → 输出
+    #   raw_data/v8_pool_tracker.json + data/V8_POOL_TRACKER.js，注入 window.V8_POOL_TRACKER。
+    "v8_pool_tracker.json":        "V8_POOL_TRACKER",
+    "triple_consensus.json":       "TRIPLE_CONSENSUS",
+    "triple_track.json":           "TRIPLE_TRACK",
+    # 🛡 2026-08-26 一劳永逸根因修复：生成器 update_triple_resonance_history.py 写的是
+    #   raw_data/triple_resonance_history.json，而此处原读旧名 triple_history.json（同源不同名），
+    #   桥接顺序一错位就吃陈旧基线 → 共振日历缺 08-24 等。改为直接读生成器真输出，消除重命名歧义。
+    "triple_resonance_history.json": "TRIPLE_HISTORY",
+    # 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」——历史追踪 + 跟踪/前向回测。
+    #   产出链（B 批算法链，读当日新鲜 data/FOUR_VOLUME.js）：
+    #     algorithms/update_four_volume_history.py → raw_data/four_volume_history.json
+    #     algorithms/gen_four_volume_track.py     → raw_data/four_volume_track.json
+    #   与三重完全同构（triple_resonance_history/triple_track → TRIPLE_HISTORY/TRIPLE_TRACK）。
+    #   ⚠️ 铁律「一处 id 三处同口径」：本表 × cloud_fetch_v8.py × v8_health_check.py::CARD_DEFS。
+    #   （四量族原有的 FOUR_VOLUME / FOUR_VOLUME_60M 属脚本直写 data/，不登记本表，勿混淆）
+    "four_volume_history.json":    "FOUR_VOLUME_HISTORY",
+    "four_volume_track.json":      "FOUR_VOLUME_TRACK",
+    # 🆕 2026-10-16 阿狸咪的工程师（一劳永逸根因修复）：四量终极回测卡真实信号流通路补齐。
+    #   根因（10-16 实测实锤）：10-11 口径切换设计里「gen_four_volume_track.py 产
+    #   raw_data/four_volume_backtest.json（真实流）→ update_v8 转换层注入同名变量」的
+    #   第二段从未落地（疑被 0e5ccd6777 快照式大入库冲掉）⇒ 该 js 一直由
+    #   strategy_four_volume.py::write_four_volume_backtest_js() 回放外壳直写，
+    #   每晚产生新的违规展示（近5年/1546/T+5 51.8%/+1.97%，与主人 10-11 令直接冲突）。
+    #   本映射落地后：raw 真实流视图 → data/FOUR_VOLUME_BACKTEST.js（回放外壳同步摘链），
+    #   前端渲染器/回测聚合器 parse_by_period 零结构改动（by_period 同构）。
+    "four_volume_backtest.json":   "FOUR_VOLUME_BACKTEST",
+    # 🆕 2026-10-16 阿狸咪的工程师（一劳永逸根因修复）：量质双擎双映射补齐。
+    #   根因（10-16 实测实锤）：10-12 接入时只让 gen_lqsq_top5.py 直写+直推 LQSQ_BACKTEST.js，
+    #   本表零 lqsq 登记 ⇒ update_v8 永不重建 data/LQSQ_TRACK.js（index.html L14252 注释
+    #   宣称「update_v8 由 raw_data/lqsq_track.json 发布」实为无映射的空头承诺）⇒ 该 js
+    #   自 2026-10-15 02:02:45 起冻结（raw 已推进到 10-16 02:50:21，total_signals 70→75，
+    #   卡片「更新于昨日02:02」27h 不换）。与四量族同构补双映射；BACKTEST 映射为同源冗余
+    #   兜底（生成器 _write_js 直写仍在，双路同函数同源不冲突，防直写失败时无人补发）。
+    "lqsq_track.json":             "LQSQ_TRACK",
+    "lqsq_backtest.json":          "LQSQ_BACKTEST",
+    # 2026-09-04 主人令收尾：cockpit_tier_recommend / cockpit_advice / cockpit_backtest 三映射已删
+    #   （09-03「干掉驾驶舱」系列删了生成器与 raw_data，映射永不命中，纯死代码）
+    "top10_daily.json":            "TOP10_DAILY",
+    "sh_fib.json":                 "SH_FIB",
+    "sz_fib.json":                 "SZ_FIB",
+    "sector_rs.json":              "SECTOR_RS",
+    "inst_trade.json":             "INST_TRADE",
+    "north_fund.json":             "NORTH_FUND",
+    "market_alerts.json":          "MARKET_ALERTS",
+    "market_fund_flow_data.json":  "MARKET_FUND_FLOW_DATA",
+    "w52_high.json":               "W52_HIGH",
+    "limit_up_heatmap.json":       "LIMIT_UP_HEATMAP",
+    # 🔴 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要档案）
+    #   由 build_sector_cycle_archive.py 从 limit_up_heatmap.json 派生，
+    #   记录每个板块「启动→退潮」区间，可逐年回查。
+    #   ⚠️ 本文件在 PROTECTED_FILES.json 清单内，禁止误删（见 guard_protected_files.py）。
+    "sector_cycle.json":           "SECTOR_CYCLE_ARCHIVE",
+    "limit_up_broken.json":        "LIMIT_UP_BROKEN",
+    # 🔴 2026-09-23 主人拍板：「解禁&机构关注」因子观测卡整卡删除（解禁段与盘后页「解禁日历」同源纯重复；
+    #   机构关注段从未离线回测验证）。INST_COVERAGE 注入/转换/频次同步退役，data/INST_COVERAGE.js 已下架。
+    #   analyst_ratings.json raw 本身仍由 algorithms/generate_top10.py 消费 ⇒ 抓取链保留，仅不再产出该 js。
+    #   （历史：09-11 曾因前端零引用停发；09-22 05:31 因子观测卡上线曾改指 INST_COVERAGE，随卡删除一并退役。）
+    "suspension_alert.json":       "SUSPENSION_ALERT",
+    "volatility.json":             "VOLATILITY",
+    "index_quotes.json":           "INDEX_QUOTES",
+    "index_history.json":           "INDEX_HISTORY",   # 🛡 2026-09-08 一劳永逸：原 DATA_SOURCES 漏挂此映射 → data/INDEX_HISTORY.js 永停 09-04；现补，post_close 段自动重建
+    "capital_flow_data.json":      "CAPITAL_FLOW_DATA",
+    "candidate.json":              "CANDIDATE",
+    "backtest_comprehensive.json": "BACKTEST_COMPREHENSIVE",
+    # 2026-09-04 主人令收尾：cockpit_backtest.json 映射已删（驾驶舱模块下线）
+    "backtest_tdx.json":           "BACKTEST_TDX",
+    "optimized_strategy.json":     "OPTIMIZED_STRATEGY",
+    "experiment.json":             "EXPERIMENT",
+    "etf_pulse.json":              "ETF_PULSE",
+    "etf_daily_monitor.json":      "ETF_DAILY_MONITOR",
+    # 🛡 2026-08-18 一劳永逸式修复：原 DATA_SOURCES 缺 overseas_markets.json 映射，
+    #   update_v8 永远不生成 data/OVERSEAS_MARKETS.js，导致该卡 4 天没更新被健康巡检报 fail。
+    #   根本原因：raw_data/overseas_markets.json 由 cloud_fetch_v8.py 抓（line 116 注册 intraday），
+    #   但 update_v8 转换层漏挂，data/*.js 永远停在 8/14 旧版本。
+    "overseas_markets.json":       "OVERSEAS_MARKETS",
+    "v8_cal.json":                 "V8_CAL",
+    # 🔴 2026-09-11 阿狸咪的股票专家（A 类修复·撤回误判）：恢复 CANDIDATE_QUOTES 映射。
+    #   原注释「前端零引用」不成立 —— algorithms/final_recommend.py 是 **Python 侧**消费方
+    #   （`load_js("CANDIDATE_QUOTES.js", ...)`，用作候选池行情兜底），只 grep 前端自然查不到。
+    #   停发后果实测：data/CANDIDATE_QUOTES.js 在远端不存在 → 兜底恒为空；且
+    #   data/FRESHNESS_STATUS.js 长期把它报成 core_stale「文件缺失」（红灯挂着无人处置）。
+    #   注：最终推荐的当日价权威源已在 final_recommend.py 改为 STOCK_QUOTE.js（价格真实性闸门），
+    #   本映射恢复是为了让健康巡检与「候选池行情」这条数据链回到自洽状态。
+    "candidate_quotes.json":       "CANDIDATE_QUOTES",
+    "sh_sz_history.json":         "SH_SZ_HISTORY",
+    "ai_market_brief.json":        "AI_MARKET_BRIEF",
+    "runner_status.json":          "RUNNER_STATUS",
+    # ⚠️ 产物名一律**大写** HB_XIAOJIU.js（与实产/前端/pre_deploy_audit 第 8 项门禁一致）；
+    #    原先注释写成小写 hb_xiaojiu.js 属笔误，2026-09-14 午休更正（曾致 v8_peer_monitor
+    #    HB_FILE 照抄小写 → Windows 侥幸能过、换 Linux/mac 必 silent 判掉线）。
+    "hb_xiaojiu.json":             "HB_XIAOJIU",     # 🆕 2026-09-12 主人令：小九心跳 raw_data -> data/HB_XIAOJIU.js (window.HB_XIAOJIU)
+    # 🆕 2026-09-14 主人令（反向心跳·第 5 条我方半）：阿狸咪心跳 raw_data/hb_alimi.json -> data/HB_ALIMI.js
+    #   发送侧（写 raw_data/hb_alimi.json）由阿狸咪独占落地，我方只挂注入映射 + 接收侧镜像判定。
+    #   她尚未推该文件时，本映射查无源文件 → 静默跳过、不产 data/HB_ALIMI.js（无害）。
+    "hb_alimi.json":               "HB_ALIMI",
+    "risk_gauge.json":             "RISK_GAUGE",
+    # 🛡 2026-09-08 一劳永逸式根因修复：STOCK_QUOTE.js 由独立工作流 v8_stock_quote_refresh.yml 独占产出
+    #   （fetch_stock_quote_v8.py -> 写入 data/STOCK_QUOTE.js），不调用本脚本。若仍挂此映射，cn_fetch 跑 update_v8
+    #   会用仓库里陈旧的 raw_data/stock_quote.json 重生成 STOCK_QUOTE.js，把 refresh 刚写的新鲜版覆盖回旧时间戳
+    #   （今日实测：11:13 新鲜 -> cn_fetch 后回退 09:58，主站个股行情断档）。移除后 cn_fetch 不再重建它，
+    #   refresh 工作流为唯一写入方，根因消除。其余卡仍由本映射正常重建。
+    "avg_price_data.json":         "AVG_PRICE_DATA",
+    # 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填）
+    "sector_year_flow.json":       "SECTOR_YEAR_FLOW",
+    "algo_track.json":              "ALGO_TRACK",   # 2026-08-15 三算法独立追踪（四量终极/板块龙头/大牛股猎手）
+    "ima_strong_backtest.json":      "IMA_STRONG_BACKTEST",       # 2026-09-16 生命周期子页·高手强势股跟踪信号层真实回测
+
+
+
+
+
+
+
+
+
+    "weekend_meta_report.json":      "WEEKEND_META_REPORT",
+    # 🛡 2026-08-29 一劳永逸式修复：DELISTED_STOCKS 已删（1MB 死数据，全站 0 渲染引用，renderDelisted 走 CANDIDATE）
+    # 映射移除后 update_v8.py 不再尝试写 data/DELISTED_STOCKS.js；data/HEALTH_CHECK.js 健康巡检条目待下次跑批自动收敛
+    # 🛡 2026-08-18 一劳永逸式修复：补入 weekend_run.json → WEEKEND_RUN 映射
+    #   原 update_v8 漏挂此映射 → data/WEEKEND_RUN.js 永远不被重新生成 → 健康巡检永远 warn
+    "weekend_run.json":            "WEEKEND_RUN",
+    # 2026-08-19 主人令：利率上行期板块推荐框架（宏观+板块RS+资金流+周期融合；macro.json 删除孤儿后由 market_regime.json 单源触发）
+    "market_regime.json":           "MARKET_REGIME",
+    "sector_recommendation.json":   "SECTOR_RECOMMENDATION",
+    # 2026-09-09 主人令：A股主要指数 PE-TTM 历史分位（估值分位切换实验卡，暂未上架）
+    "valuation_percentile.json":    "VALUATION_PERCENTILE",
+    # 2026-09-09 主人令：A股质量价值中小盘多因子 vs v8 选股因子审计（暂未上架）
+    "factor_audit.json":            "FACTOR_AUDIT",
+    # 2026-09-09 主人令：A股指数价格中枢+趋势门控框架迁移（QQQ/TQQQ → A股，暂未上架）
+    "index_value_framework.json":   "INDEX_VALUE_FRAMEWORK",
+    # 🗑 2026-09-15 主人令：AI 洞察多源观点对比卡已改读 window.MAHORO_INSIGHTS（前端直供「实情解析」），
+    #   原 ai_insights_compare.json → AI_INSIGHTS_COMPARE 的桥接映射，连同其 fetcher
+    #   （scripts/fetch_ai_insights_compare.py）、产物 data/AI_INSIGHTS_COMPARE.js、
+    #   raw_data/ai_insights_compare.json 一并从仓库下线，此后不再重建。
+    # 2026-09-10 主人令：因子补缺 walk-forward 进度跟踪卡（暂未上架），源 FACTOR_AUDIT
+    "factor_progress.json":         "FACTOR_PROGRESS",
+    # 🆕🔴 2026-09-19 主人令（阿狸咪的工程师）：walk-forward 真值上站，供「🧪 已纳入因子」
+    #   与「🧮 每日因子计算」两卡读 P5 段 verdict —— 前端据此把「verdict=PASS 才真计分」
+    #   如实投影，绝不写死文案。
+    #   为什么必须补这条映射：实测 index.html 里 `FACTOR_WALKFORWARD` 命中 **0** 次、
+    #   data/FACTOR_WALKFORWARD.js **不存在** => 若不补，新卡 P5 段将**永远显示「已停用」**
+    #   （假结论，且正是主人最恨的「版面全在等待」）。
+    #   ⚠️ _make_lite() 无本键分支 => **全量透传**（文件实测仅 21.7KB，无需裁剪）。
+    "factor_walkforward.json":      "FACTOR_WALKFORWARD",
+    # 🛡 2026-08-26 一劳永逸根因修复：原 DATA_SOURCES 漏挂 final_recommend.json 映射，
+    #   该 .js 仅由算法脚本 final_recommend.py 写入，而云端 build 的 update_v8 步骤
+    #   不覆盖它 → data/FINAL_RECOMMEND_DATA.js 站点读的 window.* 永远停在 08-22（源 raw_data 已是 08-25 新鲜）。
+    #   补映射后，云端 build 自动按 raw_data 重建，杜绝复发。
+    "final_recommend.json":        "FINAL_RECOMMEND_DATA",
+    # 🛡 2026-09-10 主人令：factor_lab.json 原只在 run_algorithms B 批由 v8/factor_lab_gen.py
+    #   直接写 data/FACTOR_LAB.js，但 B 批在云端/家里机常因 baostock 超时失败 → FACTOR_LAB.js
+    #   停更 2 天。补映射后，只要 raw_data/factor_lab.json 已新鲜提交，update_v8 即可独立重建 js。
+    "factor_lab.json":             "FACTOR_LAB",
+    "factor_lab_backtest.json":    "FACTOR_LAB_BACKTEST",  # 🆕 2026-09-04 因子实验室独立分层回测
+    # "path_probability_backtest.json": "PATH_PROB_BACKTEST",  # 2026-09-06 已注释：AI预测卡下架，停止发布
+    # 🗑 2026-09-11 主人 P3（清理孤儿链）：ETF_SUBSCRIPTION_EM 全链下线 ——
+    #   原 fetcher（scripts/fetch_etf_subscription_em.py）在 workflow 里一直跑、raw 一直产出，
+    #   但注入映射早已注释掉 → data/ETF_SUBSCRIPTION_EM.js 从不生成、前端 0 引用 = 半截接线死链；
+    #   且其「净申赎(亿)」实取「主力净流入-净额」（A 类估算贴 B 类标签）。
+    #   真实 ETF 份额申赎已由 "etf_net_subscription.json": "ETF_NET_SUBSCRIPTION" 取代（见本表顶部）。
+    # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告
+    "restricted_release.json":    "RESTRICTED_RELEASE",
+    "performance_forecast.json":  "PERFORMANCE_FORECAST",
+    # 🆕 2026-09-19 主人令：「隔夜美股强势 → A股/港股 映射」观测卡。
+    #   raw_data/us_hk_map.json 由 cloud_fetch_v8.py 的 f_us_hk_map() 盘前(08:25)产出；
+    #   ⚠️ 本表必须登记：否则 update_v8 永不生成 data/US_HK_MAP.js —— 与 2026-08-18 的
+    #   overseas_markets.json 漏挂属同一类「raw 已新、js 永旧」半截更新事故。
+    "us_hk_map.json":             "US_HK_MAP",
+    # 🆕 2026-10-02 主人令「三项齐」：主题空间卡基本面证据源（候选/金股池 A股 ROE/营收增速，Baostock 日更）。
+    #   ⚠️ 本表必须登记：否则 update_v8 永不生成 data/FUNDAMENTAL_QUALITY.js ——
+    #   与 2026-08-18 overseas_markets / 2026-08-26 final_recommend 同类「raw 已新、js 永旧」半截更新事故预防。
+    "fundamental_quality.json":   "FUNDAMENTAL_QUALITY",
+}
+
+# 🆕 2026-09-05 主人令一劳永逸：运维看板全量覆盖 + 审计轨迹
+#   ALL_MODULE_NAMES = 数据管线全部模块变量名（剔除仅元数据/健康类），
+#   供 RUNNER_STATUS 补全 + AUDIT_TRAIL 复用，确保运维卡真实覆盖所有模块。
+_AUDIT_TRAIL_EXCLUDE = {"RUNNER_STATUS", "RUNNER_STATUS_HEALTH", "HEALTH_CHECK", "AUDIT_TRAIL"}
+ALL_MODULE_NAMES = sorted(n for n in DATA_SOURCES.values() if n not in _AUDIT_TRAIL_EXCLUDE)
+
+# 变量名 → 更新时段
+CATEGORY_MAP = {
+    # 盘前（08:25 cn / 08:35 deploy）
+    "V8_CAL": "premarket,post_close",
+    "IPO_DATA": "premarket,post_close",
+    "NT_DATA": "premarket",
+    "MARGIN_DATA": "premarket,post_close",
+    # 2026-08-31：期指主力合约卡移回「实时数据」页，改为 intraday 盘中实时
+    "CFFEX_HOLDINGS": "intraday,post_close",
+    "CFFEX_POSITION": "post_close",  # 🆕 2026-10-15 与 cloud_fetch 同步：持仓排名16:30后公布
+    # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：与 cloud_fetch_v8.py 同步加 post_close。
+    #   盘后数据页「宏观数据速览」卡读本变量，原只标 premarket → 盘后档不重生成 data/MACRO_DATA.js。
+    # 🛡 2026-09-11 主人令：宏观为日级/月级数据，不随盘中实时刷——与 cloud_fetch_v8.py 同步移出
+    #   intraday（两侧曾于 09-11 上午对齐为三档，本条即回归盘前+盘后两档），归盘后更新链。
+    "MACRO_DATA": "premarket,post_close",
+    "CRISIS_DATA": "premarket,intraday",
+    "NORTH_FUND": "premarket,post_close",
+    # （INST_COVERAGE 频次项已于 2026-09-23 主人拍板随因子观测卡整卡删除，见 CATEGORY_MAP 处注记。）
+    "SUSPENSION_ALERT": "premarket",
+    "MARKET_ALERTS": "intraday,post_close",
+    # 🛡 2026-09-28 主人令「亚太比A股早开盘，和盘前一起8点多更新」：与 cloud_fetch_v8.py 侧同步升三档。
+    #   血证：09-28 09:17 selfhosted premarket 轮 raw 已新(09:35落main)但本表缺 premarket ⇒
+    #   build(premarket) 跳过重建 data/OVERSEAS_MARKETS.js，卡面冻结 09-24。第三处同口径对齐。
+    "OVERSEAS_MARKETS": "premarket,intraday,post_close",
+    # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
+    "W52_HIGH": "premarket,post_close",
+    # 🛡 2026-09-11 小九的工程师（三档归档对齐）：同上漏同步。抓取侧 cloud_fetch_v8.py 两者均为
+    #   "premarket,intraday"（09-07 主人令），注入侧只有 premarket → 盘中 raw 已新、
+    #   data/JUDGMENT_DATA.js（今日判定卡）/ data/MACRO_BRIEF.js（宏观解读卡）不重建。
+    "JUDGMENT_DATA": "premarket,intraday,post_close",
+    # 🛡 2026-10-08 阿狸咪（主人令「今日判定·环境综合 没盘后更新·一劳永逸修复」）：
+    #   今日判定卡此前只挂 premarket,intraday ⇒ 盘后轮不重建 data/JUDGMENT_DATA.js，
+    #   卡面时间戳永远停在 14:5x「盘中」，无盘后定稿档。现对齐 ETF_DAILY_MONITOR
+    #   双档先例（09-11），补挂 post_close：盘后轮用收盘定型数据重算判定并刷新时间戳。
+    #   抓取侧 cloud_fetch_v8.py 的同名映射已同步加 post_close，两侧口径一致。
+    "MACRO_BRIEF": "premarket,intraday",
+
+    # 盘后（由 v6 算法 calc_volatility_watch.py 同步桥推送）
+    "VOLATILITY": "post_close",
+
+    # 盘中（每30分钟 09:40~15:10，由 cn runner 刷新）
+    # 🛡 2026-09-11 主人令（轻量化·卡迁移·注入侧一并对齐）：「日监控·主力净流入」卡已自
+    #   「实时数据」页迁至「盘后数据」页（市场宽度卡上方）→ ETF_DAILY_MONITOR 维持
+    #   "intraday,post_close" 双档：intraday 保证盘中每 30 分重建（数据本体含 T+0 字段），
+    #   post_close 保证盘后页该卡有 T+1 定稿重建；与 cloud_fetch_v8.py 侧同档。
+    #   （原注释「为配合 ETF 三连板实时卡」中的「三连板」已随 2026-09-11 轻量化拆为
+    #    「ETF 二合一」，勿再按旧名检索或复建。）
+    "INDEX_QUOTES": "intraday,post_close",
+    "ETF_PULSE": "intraday,post_close",
+    "ETF_INTRADAY_HEAT": "intraday,post_close",
+    # 🆕 2026-09-11 主人 P1（真实数据优先）：ETF 净申赎 = 上交所官方基金份额日环比（真实申赎，
+    #   非估算）。份额为日频披露 → 抓取侧只挂 premarket/post_close，注入侧同档对齐，
+    #   盘中不重建（盘中数据与盘前同值），前端如实标注「上交所口径 · 数据日 T-1」。
+    "ETF_NET_SUBSCRIPTION": "premarket,post_close",
+    "ETF_DAILY_MONITOR": "intraday,post_close",
+    # 🛡 2026-09-04 一劳永逸（两处映射不一致根治）：cloud_fetch_v8.py 早在 2026-09-03 就把这两个
+    #   改成 "intraday,post_close"（盘中 cron 偶发丢档→收盘定格值无着落），但 update_v8.py 侧漏同步，
+    #   仍是 "intraday" → 盘后档抓取更新了 raw_data，update_v8 却跳过重生成 data/*.js，
+    #   造成「raw 已新、js 仍旧」的半截更新。现补齐对齐。
+    "SECTOR_FUND_FLOW": "intraday,post_close",
+    "SECTOR_FUND_FLOW_INTRADAY": "intraday,post_close",  # 2026-08-19 主人令：分时快照盘中每30分随 SECTOR_FUND_FLOW 同步发布
+    "CAPITAL_FLOW_DATA": "intraday,post_close",
+    "CONCEPT_RANKING": "intraday,post_close",
+    "LIMIT_UP_HEATMAP": "intraday,post_close",
+    "LIMIT_UP_BROKEN": "intraday,post_close",
+    # 🛡 2026-09-21 小九的工程师（P1 口径漂移漏改根治）：恢复 CANDIDATE_QUOTES 档位登记。
+    #   沿革：2026-09-11 曾以「前端零引用 / 死数据」为由注释掉本行；**同日**阿狸咪以「Python 侧
+    #   仍有消费方」为由**恢复了上方 DATA_SOURCES 映射**（见 L115-122 注释），但**漏同步恢复
+    #   本档位条目** ⇒ 两表口径不一致。
+    #
+    #   🔴 机制（已读 v8_build_deploy.yml 核实，勿按「不重建」理解）：
+    #   它**并非不重建** —— v8_build_deploy.yml 部署步内另有一处**全量构建**
+    #   （`python update_v8.py`，无 --category ⇒ target_files=全部 raw_data），靠该路径兜底。
+    #   真正的损害是**更新频率数量级劣化**：无档位 ⇒ _file_category() 返回空集 ⇒
+    #   `--category X` selective 与 `--detect-changes` 两条常规路径**都不命中**它 ⇒
+    #   只能等偶发的全量构建，盘中每 20 分钟一轮的刷新**完全吃不到**。
+    #
+    #   📊 硬证据（GitHub /commits?path= 实测最近 20 次提交间隔，2026-09-21 11:4x）：
+    #     · data/CANDIDATE_QUOTES.js     中位 **102 min**，最大 **1111 min（≈18.5h）**
+    #     · data/SH_SZ_HISTORY.js（已登记 intraday,post_close）中位 **7 min**  ← 对照
+    #     · 最长空窗实例：2026-09-20 17:07 → 2026-09-21 11:38
+    #
+    #   ⚠️ 实际损害：消费方 algorithms/final_recommend.py::_quote_snapshot() 要求
+    #   update_time 日期 == 今日，否则**整份作废** ⇒ 空窗一旦跨零点，该兜底当日即失效；
+    #   盘后算法链（约 17:00 起跑）之前若当日尚未发生全量构建，即命中此情形。
+    #
+    #   档位定夺 = "intraday,post_close"：
+    #     · intraday   —— 承载盘中每轮重建（核心诉求，把中位间隔拉回 ~7 min 量级）；
+    #       且 _pure_pc=False，不会被 L1265 防回滚逻辑跳过；
+    #     · post_close —— 盘后定稿一次；本文件实测 12/12 条 intraday 类产物**全部**为
+    #       "intraday,post_close"，无一例外，属既有惯例。
+    #   🔴 与 cloud_fetch_v8.py L147（"intraday"）的差异属「重建层比抓取层多一次盘后定稿」，
+    #      非漂移；两表须同改的只有「是否归某档」。
+    "CANDIDATE_QUOTES": "intraday,post_close",
+    "SH_SZ_HISTORY": "intraday,post_close",
+    "AI_MARKET_BRIEF": "intraday,post_close",
+    # 🛡 2026-09-11 小九的工程师（三档归档普查·补「无档位」盲区）：
+    #   以下 3 个在 DATA_SOURCES 有文件映射，却**从未登记 CATEGORY_MAP** →
+    #   _file_category() 返回空集 → ① `--category X` 构建永不命中；② `--detect-changes`
+    #   构建时它们既不贡献 affected_cats、也不进 target_files（而 push 触发的部署链
+    #   v8_build_deploy.yml 走的正是 detect-changes 模式）→ data/*.js 只能靠全量构建
+    #   兜底；实测 raw 已新而 js 停在前一日（半截更新）。
+    "RISK_GAUGE": "premarket,intraday",            # 实时风险温度计：v8_risk_gauge.yml 每30分（08:00-16:30 CST）
+    # 2026-09-11 P3：ETF_SUBSCRIPTION_EM 全链下线（孤儿死链，见 DATA_SOURCES 顶部说明）
+    "RUNNER_STATUS": "premarket,intraday,post_close",  # 任务跟踪看板：每轮抓取都写，全时段
+    "HB_XIAOJIU": "intraday,post_close",            # 🆕 2026-09-12 主人令：小九心跳实时，盘中+盘后双档重建
+    "HB_ALIMI": "intraday,post_close",              # 🆕 2026-09-14 主人令：阿狸咪心跳（反向），档位照抄 HB_XIAOJIU
+    # 🛡 2026-09-11 小九的股票专家 一劳永逸（主人令·「市场资金流向」盘中红灯）：
+    #   原只标 post_close → _pure_pc=True → data/MARKET_FUND_FLOW_DATA.js 仅由
+    #   17:20/18:20/19:20 三档 --category post_close 构建重建。
+    #   但本卡：① 位于前端「实时数据」页；② 抓取侧 f_market_fund_flow_data()
+    #   属 cn_fetch 盘中 tasks（实测 main 上 raw 10:00:29 鲜活）；
+    #   ③ v8_health_check.py CARD_DEFS 以「实时数据 / 盘中每30分 / max_age=60」登记。
+    #   → 归类自相矛盾，结果：整个交易时段 js 停在盘前值（实测 00:39:54），
+    #     前端「实时数据·市场资金流向」盘中恒红，且盘中永不可能转绿（半截更新）。
+    #   数据本体为「日频时间轴 daily(148 天) + 盘中实时字段 market_net/sh_quote/cumulative」
+    #   双性质 → 正确口径为两档都建：intraday 承载盘中实时字段，
+    #   post_close 追加收盘定稿的当日 daily 点。
+    "MARKET_FUND_FLOW_DATA": "intraday,post_close",
+
+    # 盘后（17:00，主要由 v6 算法推送；cloud_fetch 暂无生产者）
+    "SECTOR_FUND_FLOW_TREND": "post_close",
+    "GOLD_POOL": "post_close",
+    "CANDIDATE": "post_close",
+    "TRIPLE_CONSENSUS": "post_close",
+    "TRIPLE_TRACK": "post_close",
+    "TRIPLE_HISTORY": "post_close",
+    # 🆕 2026-09-15 主人令：四量终极历史追踪 + 跟踪/前向回测（B 批盘后算法链产出，与三重同档）。
+    #   → _file_category() 返回 {"post_close"} → _pure_pc=True → 仅盘后 --category 构建重建（正确）
+    "FOUR_VOLUME_HISTORY": "post_close",
+    "FOUR_VOLUME_TRACK": "post_close",
+    # 🆕 2026-10-16 同上：四量终极回测卡（真实信号流视图，B 批盘后算法链紧后四人之一产出，
+    #   与四量族同档 post_close；此前由 strategy_four_volume.py 回放外壳直写，与盘后构建
+    #   时序错位，改走本转换层后由盘后 --category 构建统一重建）
+    "FOUR_VOLUME_BACKTEST": "post_close",
+    # 🆕 2026-10-16 同上：量质双擎跟踪/回测（B 批盘后算法链产出，与四量同档 post_close）
+    "LQSQ_TRACK": "post_close",
+    "LQSQ_BACKTEST": "post_close",
+    "TOP10_DAILY": "post_close",
+    "LHB_DATA": "post_close",
+    "LHB_HISTORY": "post_close",
+    "SECTOR_RS": "post_close",
+    "SH_FIB": "post_close",
+    "SZ_FIB": "post_close",
+    "INST_TRADE": "post_close",
+    "CRDS_CARD_DATA": "post_close",
+    # 2026-09-04 主人令收尾：COCKPIT_TIER_RECOMMEND/COCKPIT_ADVICE/COCKPIT_BACKTEST heal 分类已删（模块下线）
+    "BACKTEST_TDX": "post_close",
+    "BACKTEST_COMPREHENSIVE": "post_close",
+    "FACTOR_LAB": "post_close",
+    "FACTOR_LAB_BACKTEST": "post_close",
+    "EXPERIMENT": "post_close",
+    "STOCK_LIST": "post_close",
+    # 🆕 2026-08-31：v8 选股生命周期跟踪归属盘后（依赖算法跟踪池，每日盘后产出）。
+    "V8_POOL_TRACKER": "post_close",
+    # 2026-08-31：AVG_PRICE_DATA 由 scripts/fetch_avg_price.py 在盘中/盘后/周末生成，
+    #   映射为 intraday 使 update_v8 在盘中也刷新 AVG_PRICE_DATA.js（数据源单点，无双写冲突）。
+    "AVG_PRICE_DATA": "intraday,post_close",
+    # 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表。cn-IP 硬约束源，
+    #   仅 post_close 档授权重建（与 AVG_PRICE_880003 同源 push2his）。
+    "SECTOR_YEAR_FLOW": "post_close",
+    # 2026-08-15：ALGO_TRACK 依赖 FINAL_RECOMMEND_DATA + FOUR_VOLUME，归属盘后
+    "ALGO_TRACK": "post_close",
+    "IMA_STRONG_BACKTEST":      "post_close",
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    # 2026-08-19：INDEX_HISTORY（5年K线）数据源（盘后跑，与算法链节奏一致）
+    "INDEX_HISTORY": "post_close",
+    # 2026-08-19：板块推荐框架数据源（盘后跑宏观+板块融合；MACRO.js 已删孤儿→不注册）
+    "MARKET_REGIME": "post_close",
+    "SECTOR_RECOMMENDATION": "post_close",
+    # 🛡 2026-08-26 一劳永逸根因修复：final_recommend 与 FINAL_RECOMMEND_DATA
+    #   归属盘后（与 finalRec 同节奏），补类别映射使 --category post_close / --detect-changes 能正确重建。
+    "FINAL_RECOMMEND_DATA": "post_close",
+    # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告（cloud_fetch 注册为 premarket，日频）
+    # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：与 cloud_fetch_v8.py 同步加 post_close。
+    #   注释写着「盘后数据页」却只在盘前重建 data/*.js —— 盘后重抓了 raw 却不重生成 js，半截更新。
+    "RESTRICTED_RELEASE": "premarket,post_close",
+    "PERFORMANCE_FORECAST": "premarket,post_close",
+    # 🆕 2026-09-19 主人令：「隔夜美股强势 → A股/港股 映射」。
+    #   ⚠️ 必须与 cloud_fetch_v8.py 侧同档（两表同档铁律）：
+    #   抓取侧挂 premarket,intraday,post_close、注入侧必须同档，否则「raw 已新、data/*.js 不重建」半截更新。
+    #   🔴 2026-09-29 小九（一劳永逸）：原只挂 premarket 单档 → 盘前轮被并发组挤兑排队 4.5h 后
+    #     变「僵尸盘前档」重判 → 本模块全天漏跑（卡面冻结 09-28 09:20 实测）。改三档，
+    #     语义与预算由生成器内双闸门保证（scripts/fetch_us_hk_map.py build() 开头）：
+    #     美东交易时段拒绝产出（防隔夜语义漂移）+ 当日已产出跳过重抓；盘前失败时盘中/盘后轮自动补位自愈。
+    "US_HK_MAP": "premarket,intraday,post_close",
+}
+
+CATEGORY_LABEL = {
+    "premarket": "盘前",
+    "intraday": "盘中",
+    "post_close": "盘后",
+    "weekly": "每周清理",
+}
+
+
+def _load_json(path):
+    try:
+        with open(path, encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"  ⚠️  读取失败 {path}: {e}")
+        return None
+
+
+def _make_lite(name, obj):
+    """轻量裁剪：只保留累计/计算数值，去掉历史明细。"""
+    if not isinstance(obj, dict):
+        return obj
+    if name == 'BACKTEST_TDX':
+        return {
+            # 🛡 2026-09-11：必须透传 update_time，否则下方组装逻辑会退回
+            #   `or obj.get('calc_time')` 兜底 → 产物只剩日期精度 → 闸门 floor 判据失效。
+            'update_time': obj.get('update_time'),
+            'calc_time': obj.get('calc_time'),
+            'method': obj.get('method'),
+            'gold_pool_size': obj.get('gold_pool_size'),
+            'stocks_analyzed': obj.get('stocks_analyzed'),
+            'summary': obj.get('summary', {}),
+            # 🔴 2026-09-14 小九审计修复：口径审计字段必须一并透传。
+            #   本函数是白名单裁剪，新增字段默认被丢 ⇒ 算法侧写的
+            #   entry_caliber_ver / stale_caliber_dropped 到不了 window.BACKTEST_TDX，
+            #   前端与看门狗就失去了「口径混用」的判据（审计链断在搬运层）。
+            'entry_caliber_ver': obj.get('entry_caliber_ver'),
+            'stale_caliber_dropped': obj.get('stale_caliber_dropped'),
+            '_lite_note': '个股历史信号明细已裁剪，仅保留汇总统计',
+        }
+    if name == 'BACKTEST_COMPREHENSIVE':
+        lite = {k: v for k, v in obj.items() if k != 'details'}
+        lite['_lite_note'] = 'details 回测明细已裁剪，仅保留 overview/comparison'
+        return lite
+    # 2026-09-04 主人令收尾：COCKPIT_BACKTEST lite 裁剪分支已删（驾驶舱模块下线，永不命中）
+    if name == 'GOLD_POOL':
+        lite = {k: v for k, v in obj.items() if k != 'stocks'}
+        stocks_lite = {}
+        for sid, s in obj.get('stocks', {}).items():
+            # 2026-09-11：history 被裁剪后 latest 常为 null（老条目无 latest 字段）→
+            # 前端金股池卡片拿不到「最近一日信号」。改为 history[-1].latest > history[-1] 兜底，
+            # 保证卡片能显示缠论买/金钻/机构变红/上涨趋势/三线共振等最新信号（不新增文件体积源）。
+            _hist = s.get('history') or []
+            _last = _hist[-1] if (_hist and isinstance(_hist[-1], dict)) else None
+            _latest = s.get('latest') or ((_last or {}).get('latest') if _last else None) or _last
+            stocks_lite[sid] = {
+                'code': s.get('code'),
+                'name': s.get('name'),
+                'market': s.get('market'),
+                'board_label': s.get('board_label'),
+                'fund_type': s.get('fund_type'),
+                'first_date': s.get('first_date'),
+                'first_signal': s.get('first_signal'),
+                'max_signal': s.get('max_signal'),
+                'signal_count': s.get('signal_count'),
+                'sources': s.get('sources'),
+                'latest': _latest,
+                'industry': s.get('industry'),
+                'sectors': s.get('sectors'),
+                'concepts': s.get('concepts'),
+                'board': s.get('board'),
+            }
+        lite['stocks'] = stocks_lite
+        lite['_lite_note'] = 'stocks 已去掉 history 日明细，仅保留 latest 聚合'
+        return lite
+    if name == 'ANALYST_RATINGS':
+        # v6 源结构(upgrades/downgrades/hot_stocks/latest_reports) → v8 期望 {ratings:[...]}
+        merged = {}
+        for k in ('hot_stocks', 'latest_reports', 'upgrades', 'downgrades', 'new_coverage'):
+            for r in (obj.get(k) or []):
+                code = str(r.get('code', ''))
+                if not code or code in merged:
+                    continue
+                merged[code] = {
+                    'code': code,
+                    'name': r.get('name', ''),
+                    'rating': r.get('rating', '-'),
+                    'count': r.get('report_count_1m') or 1,
+                    'date_range': r.get('date', ''),
+                }
+        return {'update_time': obj.get('update_time'), 'ratings': list(merged.values())}
+    # （INST_COVERAGE 转换分支已于 2026-09-23 主人拍板随因子观测卡整卡删除，见 CATEGORY_MAP 处注记。）
+    if name == 'SUSPENSION_ALERT':
+        # v6 源结构(suspended/near_trigger) → v8 期望 {stocks:[...]}
+        stocks = []
+        for r in (obj.get('suspended') or []):
+            code = str(r.get('code', ''))
+            if not code:
+                continue
+            stocks.append({'code': code, 'name': r.get('name', ''), 'status': '停牌',
+                           'days': r.get('days'), 'reason': r.get('reason', '')})
+        for r in (obj.get('near_trigger') or []):
+            code = str(r.get('code', ''))
+            if not code:
+                continue
+            stocks.append({'code': code, 'name': r.get('name', ''), 'status': '临停预警',
+                           'days': None,
+                           'reason': '临近触发阈值(pct=%s, gap=%s)' % (r.get('pct'), r.get('gap'))})
+        return {'update_time': obj.get('update_time'), 'stocks': stocks}
+    if name == 'IPO_DATA':
+        # 校正 recommend + 自动补全 shadows（依赖 stock_names.json / candidate_quotes.json）
+        return _build_ipo_shadows(obj)
+    if name == 'W52_HIGH':
+        lite = {k: v for k, v in obj.items() if k != 'stocks'}
+        lite['_lite_note'] = 'stocks 完整列表已裁剪，仅保留 top_gainers 与 total'
+        return lite
+    if name == 'SECTOR_PHASE_HISTORY':
+        # 2026-08-22 主人令：顶层 update_time 取最新一期快照时间（raw 文件 mtime 因
+        # git checkout 重置会失真，但 snaps 内每期自带 update_time，以数据为准）。
+        snaps = obj.get('snaps') or []
+        latest = ""
+        for s in snaps:
+            t = s.get('update_time') or s.get('date') or ""
+            if t > latest:
+                latest = t
+        out = dict(obj)
+        out['update_time'] = latest or obj.get('update_time', '')
+        out['snap_count'] = len(snaps)
+        return out
+    return obj
+
+
+# ── IPO 影子股与 recommend 校正 ──
+
+# 非推荐等级、不应出现在 recommend 字段的状态词
+_IPO_STATUS_WORDS = {
+    "待定价", "待上市", "待申购", "申购中", "今日上市", "上市首日",
+    "追踪中", "已上市", "过期", "", "—", "-",
+}
+
+# 判断 recommend 是否已包含有效建议等级
+_IPO_REC_PATTERNS = re.compile(r"强烈|建议|谨慎|不建议|放弃")
+
+# 明显属于市场/风格/指数的通用概念，不应拿来做关联匹配
+_IPO_GENERIC_CONCEPTS = {
+    "MSCI中国", "机构重仓", "证金持股", "富时罗素", "标准普尔", "沪股通", "深股通",
+    "融资融券", "破净股", "长期破净", "权重股", "上证180", "沪深300", "中证500",
+    "中证1000", "中证A500", "中证2000", "大盘股", "中盘股", "小盘股", "大盘价值",
+    "小盘成长", "低价股", "高价股", "ST板块", "壳资源", "重组", "次新股", "近期新高",
+    "近期新低", "预盈预增", "预亏预减", "高送转", "高分红", "高股息", "央企",
+    "地方国企", "国企改革", "央企国资改革", "地方国资改革", "债转股", "股权转让",
+    "股权激励", "员工持股", "回购", "举牌", "要约收购", "重大合同", "中标", "定增",
+    "外资背景", "台资背景", "高校背景", "军工背景", "QFII", "社保基金", "保险重仓",
+    "信托重仓", "基金重仓", "券商重仓", "国家队", "汇金", "养老金", "陆股通", "港股通",
+    "转融通", "两融标的", "融资融券标的", "节能环保", "碳中和", "碳交易", "ESG",
+}
+
+
+def _sanitize_ipo_recommend(stock):
+    """把被 status 污染的 recommend 字段按 score 重新映射为建议等级。
+
+    注意：上市后（tracking / listed_today）的追入建议由 fetch_ipo_data_v8.py
+    的 tracking_advice() 生成，含 emoji 与状态描述，不能按申购 score 覆盖为
+    「不建议申购」。该 bug 曾于 2026-08-13 导致杰理科技/超纯应材等暴涨 tracking
+    股被错误显示为不建议申购。
+    """
+    status = (stock.get("status") or "").strip()
+    rec = (stock.get("recommend") or "").strip()
+
+    # 上市后状态：保留追入/首日建议，仅缺失时兜底
+    if status in ("tracking", "listed_today"):
+        if not rec:
+            stock["recommend"] = "数据不足，无法判断"
+            stock["tag_color"] = "#999"
+            stock["bg_color"] = "#f5f5f5"
+        return stock
+
+    # 已有有效申购建议等级时直接保留
+    if rec and rec not in _IPO_STATUS_WORDS and _IPO_REC_PATTERNS.search(rec):
+        return stock
+
+    score = stock.get("score") or 0
+    if score >= 80:
+        rec, tc, bc = "强烈推荐申购", "#2e7d32", "#e8f5e9"
+    elif score >= 65:
+        rec, tc, bc = "建议申购", "#e65100", "#fff3e0"
+    elif score >= 50:
+        rec, tc, bc = "谨慎参与", "#f57f17", "#fffde7"
+    else:
+        rec, tc, bc = "不建议申购", "#c62828", "#ffebee"
+    stock["recommend"] = rec
+    stock["tag_color"] = tc
+    stock["bg_color"] = bc
+    return stock
+
+
+def _clean_concept_name(name):
+    """去掉「概念/板块/产业/主题」等后缀，提高 IPO 主营业务文本的匹配率。"""
+    return re.sub(r"(概念|板块|产业|主题|指数|风格)$", "", name).strip()
+
+
+def _build_ipo_shadows(obj):
+    """基于 stock_names.json 的行业/概念映射，为 IPO 自动生成影子股列表。
+
+    匹配逻辑（按优先级降序）：
+    1. 同行业精确匹配（+3 分，rel_type='同业'）
+    2. 主营业务文本命中 A 股概念关键词（+1 分，rel_type='供应链'）
+    3. 按总市值从大到小取 top 5，保证关联股质量
+    """
+    stocks = obj.get("stocks") if isinstance(obj, dict) else None
+    if not stocks:
+        return obj
+
+    # 读取全市场股票名称/行业/概念
+    names_path = RAW_DIR / "stock_names.json"
+    if not names_path.exists():
+        return obj
+    names_data = _load_json(names_path)
+    if not names_data or not isinstance(names_data, dict):
+        return obj
+    stock_items = names_data.get("data") or names_data.get("stocks") or []
+    if not stock_items:
+        return obj
+
+    # 读取候选行情（取涨跌幅）
+    quotes = {}
+    quotes_path = RAW_DIR / "candidate_quotes.json"
+    if quotes_path.exists():
+        qdata = _load_json(quotes_path)
+        if qdata and isinstance(qdata, dict):
+            for it in (qdata.get("items") or []):
+                c = str(it.get("code", ""))
+                if c:
+                    quotes[c] = it
+
+    candidates = []
+    for s in stock_items:
+        code = str(s.get("code", ""))
+        if not code:
+            continue
+        concepts = []
+        for c in (s.get("concepts") or []):
+            if not c or len(c) < 2:
+                continue
+            cc = _clean_concept_name(c)
+            if cc and cc not in _IPO_GENERIC_CONCEPTS:
+                concepts.append(cc)
+        candidates.append({
+            "code": code,
+            "name": s.get("name", ""),
+            "industry": (s.get("industry") or "").strip(),
+            "concepts": list(set(concepts)),
+            "mv": 0,
+        })
+
+    def _shadows_for(ipo):
+        ipo_code = str(ipo.get("code") or "")
+        fund = ipo.get("fundamentals") or {}
+        industry = (fund.get("industry") or ipo.get("industry_name") or "").strip()
+        text = " ".join([
+            industry,
+            fund.get("main_business") or "",
+            ipo.get("name") or "",
+            " ".join(ipo.get("highlights") or []),
+            ipo.get("track_label") or "",
+        ]).strip()
+        text_lower = text.lower()
+
+        # ── 关键词双向匹配（2026-08-07 修复：原完整概念名子串匹配命中率极低）──
+        # 拆 IPO 文本为 ≥2 字关键词，拆概念名为 ≥2 字关键词，
+        # 任一方向命中即算概念关联（score +1），行业精确匹配仍 +3。
+        # 关键：长词也生成所有 2~4 字子串，解决「汽车座椅」vs「汽车」粒度不匹配。
+        import re as _re
+        _STOP = {'的','与','和','或','及','等','其','在','有','为','是','以','中','上','下','从事','研发','生产','销售','服务','提供','制造','开发','设计'}
+        def _kw(s):
+            base = set(w for w in _re.findall(r'[\u4e00-\u9fff]{2,}', s) if w not in _STOP)
+            # 对每个 ≥3 字词生成 2~4 字滑动窗口子串
+            extra = set()
+            for w in base:
+                for L in range(2, min(len(w), 4) + 1):
+                    for i in range(len(w) - L + 1):
+                        sub = w[i:i+L]
+                        if sub not in _STOP:
+                            extra.add(sub)
+            return base | extra
+
+        ipo_kws = _kw(text)
+        ipo_concepts = set()
+        for cand in candidates:
+            for c in cand["concepts"]:
+                c_kws = _kw(c)
+                # 双向：概念关键词 ∩ IPO关键词 非空 → 命中
+                if ipo_kws & c_kws:
+                    ipo_concepts.add(c)
+
+        scored = []
+        for cand in candidates:
+            if cand["code"] == ipo_code:
+                continue
+            score = 0
+            rel_type = "同业"
+            if industry and cand["industry"] == industry:
+                score += 3
+            else:
+                rel_type = "供应链"
+            matched = [c for c in cand["concepts"] if c in ipo_concepts]
+            if matched:
+                score += len(matched)
+            if score <= 0:
+                continue
+            q = quotes.get(cand["code"])
+            mv = q.get("total_mv") if q else 0
+            chg = q.get("chg") if q else None
+            scored.append({
+                "code": cand["code"],
+                "name": cand["name"],
+                "rel_type": rel_type,
+                "chg": chg,
+                "_score": score,
+                "_mv": mv or 0,
+            })
+        # 按匹配分降序，同分按总市值降序
+        scored.sort(key=lambda x: (-x["_score"], -x["_mv"]))
+        return [{"code": x["code"], "name": x["name"], "rel_type": x["rel_type"], "chg": x["chg"]}
+                for x in scored[:5]]
+
+    for s in stocks:
+        _sanitize_ipo_recommend(s)
+        s["shadows"] = _shadows_for(s)
+    return obj
+
+
+def _write_js(var_name, obj):
+    """把 obj 写入 data/<var>.js，同时强制注入顶层 update_time。
+
+    强制规则（2026-08-02 收紧）：
+    - 顶层是 dict 且已有 update_time/calc_time：保留较新者
+    - 顶层是 dict 但缺 update_time：用源文件 mtime 兜底，无源文件则用当前时间
+    - 顶层是 list（如 STOCK_LIST）：包装成 {"data": [...], "update_time": ...}，
+      index.html 需读 .data；此规则对应 sync_v6_to_v8._add_timestamp()
+    """
+    DATA_DIR.mkdir(exist_ok=True)
+    out_path = DATA_DIR / f"{var_name}.js"
+    lite_obj = _make_lite(var_name, obj)
+
+    # 找源文件以取 mtime
+    src_path = None
+    for fname, var in DATA_SOURCES.items():
+        if var == var_name:
+            sp = RAW_DIR / fname
+            if sp.exists():
+                src_path = sp
+            break
+
+    now_ts = now_cst().strftime("%Y-%m-%d %H:%M:%S")
+    mtime_ts = ""
+    if src_path is not None:
+        try:
+            mtime_ts = datetime.fromtimestamp(src_path.stat().st_mtime, tz=CST).strftime("%Y-%m-%d %H:%M:%S")
+        except Exception:
+            pass
+
+    def _pick_ts(existing, obj=None, _existing_file_ts=""):
+        """真实优先：源数据自带时间戳 > _meta.last_update（子级更新） > 源文件 mtime > 当前时间。
+
+        2026-08-07 修（主人铁律「不得造假」）：原实现取 max(existing, mtime, now)，
+        now_ts 永远最大 → 每次构建都把所有卡片的「更新于」刷成构建时刻，
+        导致 ①「更新于」全是假时间 ②「今日已跑完」胶囊在开盘前判错（数据日期被
+        改成今天，而交易日归上一日 → 胶囊隐藏）。禁止再改回 max。
+
+        2026-08-27 一劳永逸修复：TRIPLE_HISTORY 等带 _meta 的数据，
+        算法跟踪只更新 _meta.last_update 而忘同步顶层 update_time → HEALTH_CHECK 读到陈旧值报 fail。
+        此处增加 _meta.last_update 作为第二优先源，取较新者。
+
+        🛡 2026-09-29 小九（v8_build_deploy 连环红根治）：心跳/回测类 raw 顶层只有
+        last_time（hb_xiaojiu/hb_alimi 心跳时间）/ generated（ima_strong_backtest 生成时间）
+        ——原判据只认 update_time/calc_time ⇒ 这类文件 existing 与 obj_had_ts 恒空
+        ⇒ 恒走 _existing_file_ts 兜底 ⇒ data 的 update_time **永冻在首次构建时刻**
+        （实测三文件停在 2026-09-25 21:21~21:31，而 raw 语义时间每轮新鲜且被 cn fetch
+        正常重建/提交——republish_time 活的、update_time 死的）。冻结值被
+        v8_verify_layer_parity 判「data 层陈旧>3 天」→ 09-29 01:49 CST 起 build_deploy
+        连续 failure 50+ 条、盘后部署全灭，且每轮重建无法自愈（冻结值自我复制=死锁）。
+        修法：语义时间源扩展 +last_time +generated（影响面仅此 3 个 raw，其余文件
+        有 update_time/calc_time 先短路，行为不变）；源语义时间优先于旧值兜底。
+        """
+        # 源数据自带语义时间戳（含心跳/回测类专字段），优先级最高
+        _src_ts = ""
+        if isinstance(obj, dict):
+            for _k in ("update_time", "calc_time", "last_time", "generated"):
+                _v = obj.get(_k)
+                if _v:
+                    _src_ts = str(_v)
+                    break
+        if _src_ts and (not existing or _src_ts > existing):
+            return _src_ts
+        if existing:
+            # 有 _meta.last_update 且比 existing 更新？→ 用它（消除顶层/子级时间不同步）
+            if obj and isinstance(obj, dict):
+                meta_last = (obj.get("_meta") or {}).get("last_update") or ""
+                if meta_last and meta_last > existing:
+                    return meta_last
+            return existing
+        # 🛡 2026-09-25 阿狸咪的工程师（主人令「改好直接上线」· 卡面假刷新根治）：
+        #   existing 为空时的旧回退顺序是 「mtime_ts → now_ts」。而云端 runner 每次 checkout
+        #   都会刷新 raw_data 文件的 mtime ⇒ **每个构建周期都把该卡的「更新于」重写成本次
+        #   checkout 时刻**，业务数据却一个字节没变。实测证据：09-25 19:44 那轮提交
+        #   (0802df64e81c) 的 17 个 data/*.js 全部是 ±1 行改动 = 只刷时间戳、内容未变，
+        #   而 raw 层同一轮根本没产出 ⇒ 主人看到「更新于今天」，实际数据仍是 T-1。
+        #   修法：在 mtime 之前插入一层「现有 data/*.js 已带的 update_time」——它才是真实语义
+        #   时间；仅在 data 层首次构建（无历史值）时才回退 mtime / now_ts，保持幂等。
+        # obj_had_ts = 本次载荷自身是否已带时间戳（缺失定义导致 NameError 已补）
+        obj_had_ts = bool(
+            isinstance(obj, dict)
+            and (obj.get("update_time") or obj.get("calc_time"))
+        )
+        if not existing and not obj_had_ts and _existing_file_ts:
+            return _existing_file_ts
+        if mtime_ts:
+            return mtime_ts
+        return now_ts
+
+    # ① 现有 data/<var>.js 已有的 update_time（真实语义时间的兜底源，防云端 checkout 刷 mtime）
+    _existing_file_ts = ""
+    try:
+        if out_path.exists():
+            _m = re.search(r'"update_time"\s*:\s*"([^"]+)"', out_path.read_text(encoding='utf-8'))
+            if _m:
+                _existing_file_ts = _m.group(1)
+    except Exception:
+        _existing_file_ts = ""
+
+    if isinstance(lite_obj, list):
+        # 顶层数组：包装成 dict（同步 sync_v6_to_v8 规则）
+        lite_obj = {"data": lite_obj, "update_time": _pick_ts(None, _existing_file_ts=_existing_file_ts),
+                    "republish_time": now_ts}
+    elif isinstance(lite_obj, dict):
+        existing = lite_obj.get("update_time") or lite_obj.get("calc_time") or ""
+        lite_obj["update_time"] = _pick_ts(existing, lite_obj,
+                                           _existing_file_ts=_existing_file_ts)
+        # republish_time = 本次构建/重部署时间，仅用于排障与缓存戳，前端不得当作「数据时间」展示
+        lite_obj["republish_time"] = now_ts
+
+    # ★★ 2026-08-18 主人令「每次更新部署都是错的」根因根治：构建幂等化 ★★
+    #   死循环机制（今日 359 提交实证）：
+    #     republish_time 每轮构建必变 → 69 个 data/*.js 文件内容每轮必变 →
+    #     build 提交 → 触发 cache_buster_reconcile → 改 index.html ?v → 再触发 build
+    #     → 无限循环，每次部署都错。
+    #   修复：写文件前先与现有文件比较「中性化 republish_time 后」的内容，
+    #    真实数据未变则跳过重写（republish_time 保持旧值）→ git diff 为空 →
+    #    build 不提交 → 死循环断开。?v 中性化逻辑与 _sha10 完全一致。
+    try:
+        if out_path.exists():
+            old_text = out_path.read_text(encoding='utf-8')
+            new_text = f"window.{var_name} = " + json.dumps(lite_obj, ensure_ascii=False, separators=(',', ':')) + ";\n"
+            _neut = lambda t: re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', t)
+            if _neut(old_text) == _neut(new_text):
+                print(f"  ⏭️  {var_name} 数据未变，跳过重写（幂等）")
+                return out_path
+    except Exception:
+        pass
+
+    with open(out_path, "w", encoding='utf-8', newline='') as f:   # 🔴 2026-10-02 阿狸咪修：缺 newline='' ⇒ Windows 本地跑批把尾行写成 CRLF（云端 LF/本地 CRLF 漂移）；与写盘铁律对齐
+        f.write(f"window.{var_name} = ")
+        json.dump(lite_obj, f, ensure_ascii=False, separators=(',', ':'))
+        f.write(";\n")
+    return out_path
+
+
+# 单调部署令牌缓存：同一进程内所有 data/*.js 共用，保证一次构建 ?v 统一失效。
+# ⚠️ 2026-09-24 起**已废弃**：`?v=` 口径回归「中性化内容哈希」，权威实现在
+#   `_neutral_content_sha1()`。本全局（unix 秒单调令牌）不再被任何函数读取，
+#   保留定义仅为兼容历史引用（全仓已确认无其他调用点）。**禁止**再把它接回 ?v。
+_UPDATE_TOKEN = None
+
+
+def _data_file_update_time(var_name):
+    """获取 data/*.js 的 cache-busting 标记。
+
+    ★ 2026-08-14 主人令永久修复（主站刷新慢根因）：
+    原实现优先语义时间、mtime 晚则用 mtime——云端 build 每几分钟 republish 一次
+    data 文件，mtime 每次都变 → index.html 里 73 个 ?v= 每次 build 全变 →
+    浏览器/CDN 缓存全部失效 → 每次刷新都全量重下 10MB+ → 主站"刷新非常慢"。
+
+    改为「内容哈希」：取文件内容 sha1 前 10 位。内容没变 → URL 不变 → 缓存命中；
+    内容真变了（数据更新）→ 哈希变 → 只重下变化的文件。语义时间仅作可读性兜底。
+
+    失败则回退到空字符串。空文件返回空字符串。
+
+    ★ 2026-08-15 根治「build clobber reconcile / CI API 节流致次日 ?v 失配」：
+    ?v 一律取自「即将提交到仓库的本地 data/<var>.js 文件本身」——本地文件即权威，
+    ?v 与落库文件天然一致，不再依赖线上 API（CI 偶发节流会把回退值算成陈旧本地副本
+    致失配），也不因 build 内部 reset/重跑竞态产生新旧内容错位。跨流水线的最终一致性
+    （如 cn 单独推送的 5 个 extra 文件被别处再次更新）由独立 reconcile workflow
+    （git blobs API 取线上真实内容）每 15 分钟自愈。
+    """
+    # ★ 2026-08-15 根治「build clobber reconcile / CI API 节流致次日 ?v 失配」：
+    # ?v 一律取自「即将提交到仓库的本地 data/<var>.js 文件本身」——本地文件即权威，
+    # ?v 与落库文件天然一致，不再依赖线上 API（CI 偶发节流会把回退值算成陈旧本地副本
+    # 致失配），也不因 build 内部 reset/重跑竞态产生新旧内容错位。
+    # 跨流水线的最终一致性（如 cn 单独推送的 5 个 extra 文件被别处再次更新）由独立
+    # reconcile workflow（git blobs API 取线上真实内容）每 15 分钟自愈。
+    path = DATA_DIR / f"{var_name}.js"
+    if not path.exists():
+        return ""
+    # 🔴🔴 2026-09-24 17:4x 小九 紧急根治「主站转半天打不开」（可用性 P0 事故）
+    #   【事故现象】主人报主站转半天打不开。实测首页 code=200 但 **TTFB 16s / 总计 33s**
+    #     （跨境明文 1.36MB），带 --compressed 仅 2.8s ⇒ 瓶颈=全站资源被判定为「全新 URL」而重下。
+    #   【根因】本函数自 2026-09-10 起返回 **unix 秒单调令牌**（下方旧注释自承「代价是全量重载」）。
+    #     该代价在线上已演变为事故，因为 09-10 之后新增了两条放大器：
+    #       ① `v8_cache_buster_reconcile` 每 15 分钟 + **每次 data/** push** 都跑（今日实测 23+ 档）；
+    #       ② 云端 churn 使 index.html 每 2–10 分钟重建一次 ⇒ CDN 恒 `X-Cache: MISS` / `Age: 0`；
+    #     叠加后 ⇒ index.html 中 ~100 个 `data/*.js` 的 ?v **几乎永远在变**
+    #     ⇒ 浏览器对 10MB+ 数据资源**缓存命中率恒为 0**，每次访问全量跨境重下 ⇒「转半天」。
+    #   【为何 09-10 的理由不成立】其注释称「数据回滚到旧内容 ⇒ 哈希=旧版 ⇒ 浏览器永远吐旧数据」：
+    #     回滚发生时**线上文件内容也回滚了**，浏览器命中旧 ?v 取回的正是线上当前内容 ⇒ **一致**。
+    #     真正会造成「显示与线上不符」的是 CDN 边缘缓存异常，与 ?v 取内容哈希还是时间戳无关。
+    #   【现口径】中性化内容哈希（剔除 `republish_time` 这类构建时间戳，只对**数据本体**取 sha1[:10]）
+    #     —— 正是 2026-08-14 主人令的原意：
+    #       · 内容未变 ⇒ ?v 不变 ⇒ 浏览器/CDN 命中（恢复速度）；
+    #       · 内容真变 ⇒ ?v 变（且**只有**变化的文件变）⇒ 精准刷新，无需全量重下。
+    #     口径与 `api_push_raw._neutral_sha` **逐字节同源**；三处同源点见下方「同族矩阵」。
+    #   ⚠️ 同族矩阵（改本口径必须三处同改，禁只改一处 —— 本仓已有两次「判据未同步」血训）：
+    #       ① 本函数（update_v8.py）                    —— 构建期生成
+    #       ② api_push_raw._stamp_remote_index_v        —— 推送期生成
+    #       ③ v8_build_deploy.yml「提交前核验」步       —— 门禁判据
+    return _neutral_content_sha1(path)
+
+
+def _neutral_content_sha1(path):
+    """index.html `?v=` 的唯一权威口径 = 中性化内容哈希（sha1 前 10 位）。
+
+    「中性化」= 先剔除 `republish_time` 字段值（纯构建时刻、非数据本体），再对全文取 sha1。
+    与 `api_push_raw._neutral_sha(content: bytes)` 完全同源（同正则、同截断长度）。
+    🔴 必须走 `read_bytes().decode()` —— **不可用 `path.read_text()`**：
+       read_text 默认启用 universal newlines，会把 CRLF 静默转成 LF，而推送端 `_stamp_remote_index_v`
+       拿到的是**原始字节**。两者对含 CRLF 的 data/*.js 会算出不同哈希（实测 10 抽样中 3 例失配：
+       VALUATION_PERCENTILE / SECTOR_RECOMMENDATION / STOCK_LIST）⇒ ?v 永远对不上 ⇒ 缓存恒失效。
+    """
+    raw = path.read_bytes()
+    try:
+        text = raw.decode("utf-8")
+    except Exception:
+        text = raw.decode("utf-8", "replace")
+    neutral = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', text)
+    return hashlib.sha1(neutral.encode("utf-8")).hexdigest()[:10]
+
+
+def _atomic_write_index_html(idx_path, text, baseline_len, baseline_lines):
+    """🔴 2026-09-22 P0 根治（index.html 截断事故）：原子落盘 + 落盘后自证。
+
+    事故（2026-09-22 20:10 CST，cn fetch 轮）：原实现 `idx_path.write_text(...)` 会
+    **先 truncate 再逐块写**，进程在写入中途被杀（OOM / job 抢占）⇒ 文件停在
+    5,027/19,148 行、断在 `window.__STAR_ALT_SOURCES = {` 对象定义中间
+    （1,347,523 → 366,154 B，21/34 核心标记消失、`_renderPostReady` 全无）
+    ⇒ **线上整站白屏 9 分钟**（20:10:42 ~ 20:19:49 CST）。`force:false`、[10/10] 门禁
+    都拦不住它 —— 因为坏文件已经进了 main，而 GitHub 内置 pages 构建不等 v8 门禁。
+
+    本函数做三件事：
+      ① 同目录临时文件写入 + flush + fsync，再用 `Path.replace` **原子换入**
+         （同一文件系统内 rename 原子；中断只会留下一个 .tmp，**绝不伤正本**）；
+      ② 落盘后自证：末尾须含 `</html>`，且行数/长度不得较基线缩水 >5%；
+      ③ 自证不过 ⇒ 删临时文件 + 抛异常 ⇒ 调用方（各 workflow 的 bash -e step，
+         **均位于 `git add index.html` 之前**）直接失败 ⇒ **半个文件永远上不了 main**。
+
+    行尾纪律：读写一律 `newline=''` **原样透传**。main:index.html 实测为**纯 LF**
+    （2026-09-22 实测 1,347,523 B 中 CR=0）；而 `write_text` 的 newline=None 在
+    Windows 侧会写 CRLF、Linux 侧写 LF ⇒ **跨 OS 行尾翻转会造成全量假 diff**
+    （防覆盖铁律已明令禁止），故一律 newline='' 原样透传。
+    """
+    import os
+
+    if idx_path.suffix != ".html":
+        raise ValueError("_atomic_write_index_html 仅用于 .html 产物")
+    if "</html>" not in text[-200:]:
+        raise RuntimeError(
+            "index.html 自证失败：末尾 200 字符内未见 </html>（疑似被截断），拒绝落盘")
+    if baseline_lines and text.count("\n") < baseline_lines * 0.95:
+        raise RuntimeError(
+            "index.html 自证失败：行数 %d 较基线 %d 缩水 >5%%（疑似被截断），拒绝落盘"
+            % (text.count("\n"), baseline_lines))
+    if baseline_len and len(text) < baseline_len * 0.95:
+        raise RuntimeError(
+            "index.html 自证失败：长度 %d 较基线 %d 缩水 >5%%（疑似被截断），拒绝落盘"
+            % (len(text), baseline_len))
+    tmp_path = idx_path.with_name(idx_path.name + ".tmp")
+    try:
+        with open(tmp_path, "w", encoding="utf-8", newline="") as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+        tmp_path.replace(idx_path)
+    except BaseException:
+        try:
+            if tmp_path.exists():
+                tmp_path.unlink()
+        except Exception:
+            pass
+        raise
+
+
+def _rewrite_cache_busters_for(html_path):
+    """通用：为任意 html 文件（index.html / logic.html）中 data/*.js 引用重写 ?v 缓存戳。
+    抽出自 _rewrite_index_html_cache_busters，使 logic.html 与 index.html 共用同一套权威 ?v
+    逻辑，根治「reconcile 只处理 index.html 漏掉 logic.html」导致的戳失配（logic.html
+    707-711 行是真 <script src="data/X.js?v=..." defer> 加载，旧戳会读陈旧数据）。
+
+    核心用途：防止浏览器/CDN 在数据更新后继续返回旧 data/*.js（典型问题：
+    AI市场速览已生成新数据，但页面仍显示旧时间戳）。
+    只有文件本身的时间戳发生变化时，对应的 URL 才会变化，未变更文件保持原 URL。
+    """
+    if not html_path.exists():
+        return
+    idx_path = html_path
+    # 🔴 2026-09-23 阿狸咪修：Path.read_text(newline=) 需 Python ≥3.13，
+    #   而 v8_ima_strong_stock.yml 固定 python-version "3.12" ⇒ TypeError 使该链 step7 恒红。
+    #   改用 open(..., newline='')（3.12/3.13 通吃），行尾纪律与语义不变。
+    with open(idx_path, 'r', encoding='utf-8', newline='') as _fh:
+        html = _fh.read()
+    _base_len, _base_lines = len(html), html.count('\n')
+    # 🔴 2026-08-12 主人令修复：原 `[A-Z_]+` 不匹配含数字的变量名（V8_CAL/W52_HIGH/TOP10_DAILY）
+    #   → 这些文件永远不加 ?v= 缓存戳 → 浏览器/CDN 永远缓存旧版 → 主站/本地都不更新！
+    #   修复：加 0-9，匹配所有 data/*.js
+    # 🔴 2026-08-15 根因修复：原正则不匹配 `<script src="..." defer></script>`，
+    #   导致 index.html 里所有含 defer 的 data/*.js 缓存戳永远不更新，主站长期回旧版。
+    #   改为捕获 tag 前缀/后缀，保留 defer 等全部属性。
+    # 🔴 2026-08-15 根因修复（审计发现）：原正则只匹配 `<script src="data/X.js..."></script>` 整段，
+    #   但 A2 懒加载把 4 个大文件改为 `var BIG=[{name,url:'data/X.js?v=...'}]` 里的字符串，
+    #   正则漏掉 → 这些 ?v 永远是 A2 手填的旧值，CDN 长期吐旧副本（缓存戳失配，正是防覆盖铁律最忌）。
+    #   改为全量匹配 index.html 中所有「带引号」的 data/X.js(?:\?v=...)? 出现
+    #   （script 标签 / fetch / BIG 数组均引号包裹），统一按内容 sha1 重写 ?v。
+    # 🔴 2026-09-24 17:4x 小九补漏（第三类根因）：原 `[A-Z0-9_]` **不含小写字母**
+    #   ⇒ 真实被 index.html 引用的 2 个**小写**文件名（`data/maharo_insights.js` /
+    #     `data/maharo_macro.js`）**从不被重写 ?v** ⇒ 内容更新而 URL 恒定 ⇒ 浏览器/CDN
+    #     永久吐旧副本 = 前端「数据不刷新」的**结构性根因**之一。
+    #   （与 2026-08-12 那次「`[A-Z_]+` 漏数字 ⇒ V8_CAL/W52_HIGH/TOP10_DAILY 永不更新」**完全同型**，
+    #     本次是漏小写。⇒ 教训：该正则的字符类必须与「实际文件名集合」对齐，而非只对大写下划线。）
+    #   【实测口径（勿凭想象扩大）】线上 index.html 带 ?v 的引用共 110 处/101 文件，其中含小写的
+    #     仅上述 2 个；其余小写名（algo_track / limit_up_heatmap / ima_strong_stock / us_hk_map /
+    #     factor_progress / four_volume_track / hb_xiaojiu / ima_strong_backtest）**只出现在注释文案里**、
+    #     并非真实 `<script src>` 引用（它们由别的大写同名文件或后端直接读 raw_data 承载）。
+    #   改为 `[A-Za-z0-9_]+` 后覆盖面与「真实引用集合」一致。
+    #   ⚠️ 仍**不含 `/`**：`data/archive/V8_CAL_INDEX.js` 等子目录引用有意不处理（非主站卡）。
+    #   🔴 同族矩阵（改本正则必须四处同改）：本行 · api_push_raw._RE_V · api_push_raw 的 _pat ·
+    #      v8_build_deploy.yml「提交前核验」步。
+    pat = re.compile(r'([\'"])(data/[A-Za-z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
+
+    def repl(m):
+        q1, src, q2 = m.group(1), m.group(2), m.group(3)
+        var_name = src.split('/')[-1].replace('.js', '')
+        ts = _data_file_update_time(var_name)
+        if ts:
+            # 内容哈希（含字母数字）直接作为 ?v=
+            return f'{q1}{src}?v={ts}{q2}'
+        return m.group(0)
+
+    new_html = pat.sub(repl, html)
+    if new_html != html:
+        _atomic_write_index_html(idx_path, new_html, _base_len, _base_lines)
+        print(f"✅ {idx_path.name} cache-busting 参数已更新")
+
+def _rewrite_index_html_cache_busters():
+    """为 index.html 中 data/*.js 引用追加基于文件更新时间的 cache-busting 参数（委托通用函数）。"""
+    _rewrite_cache_busters_for(ROOT / "index.html")
+
+
+
+def _ensure_momentum_loader():
+    """确保 index.html 含 STOCK_MOMENTUM_STATE.js 加载标签（构建机偶发以陈旧 checkout 重置
+    index.html 会冲掉手动加的 head 标签，导致「个股动量状态」卡显示「数据不可用」）。
+    每次构建强制补回；缓存戳逻辑随后为其写入正确的 ?v=。"""
+    idx_path = ROOT / "index.html"
+    if not idx_path.exists():
+        return
+    # 🔴 2026-09-23 阿狸咪修：Path.read_text(newline=) 需 Python ≥3.13，
+    #   而 v8_ima_strong_stock.yml 固定 python-version "3.12" ⇒ TypeError 使该链 step7 恒红。
+    #   改用 open(..., newline='')（3.12/3.13 通吃），行尾纪律与语义不变。
+    with open(idx_path, 'r', encoding='utf-8', newline='') as _fh:
+        html = _fh.read()
+    _base_len, _base_lines = len(html), html.count('\n')
+    if "data/STOCK_MOMENTUM_STATE.js" in html:
+        return  # 已存在（含 ?v 或刚注入），交给缓存戳逻辑处理
+    tag = '<script src="data/STOCK_MOMENTUM_STATE.js" defer></script>'
+    # 2026-08-20：原 marker 用 POTENTIAL_PICKS.js（已随「潜力挖掘→AI 预测」删除），
+    # 改用同区块的 SENTIMENT_CYCLE.js 作为插入锚点，防止引用失效后行为漂移。
+    marker = '<script src="data/SENTIMENT_CYCLE.js'
+    if marker in html:
+        html = html.replace(marker, marker + "\n    " + tag, 1)
+    else:
+        html = html.replace("</head>", tag + "\n</head>", 1)
+    _atomic_write_index_html(idx_path, html, _base_len, _base_lines)
+    print("✅ 已补回 STOCK_MOMENTUM_STATE.js 加载标签（防构建冲掉）")
+
+
+def _var_category(var_name):
+    c = CATEGORY_MAP.get(var_name, "post_close")
+    # 支持多类别（逗号分隔），如 "premarket,intraday"
+    return [x.strip() for x in c.split(",")]
+
+
+def _file_category(filename):
+    var_name = DATA_SOURCES.get(filename)
+    return _var_category(var_name) if var_name else []
+
+
+def _list_changed_raw_files():
+    """通过 git diff HEAD~1..HEAD 找出变化的 raw_data 文件（用于 v6 push 触发构建）。"""
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--name-only", "HEAD~1", "HEAD"],
+            cwd=ROOT, capture_output=True, text=True, check=False, timeout=30
+        )
+        if result.returncode != 0:
+            # 可能是第一次提交或浅克隆，尝试 HEAD
+            result = subprocess.run(
+                ["git", "diff", "--name-only", "HEAD"],
+                cwd=ROOT, capture_output=True, text=True, check=False, timeout=30
+            )
+        if result.returncode != 0:
+            return []
+        changed = [line.strip() for line in result.stdout.splitlines()
+                   if line.strip().startswith("raw_data/")]
+        return [Path(ROOT) / p for p in changed]
+    except Exception as e:
+        print(f"  ⚠️  git diff 检测失败: {e}")
+        return []
+
+
+def _load_js_var_file(path):
+    """解析 data/*.js 形如 window.X = {...}; 或 IIFE 壳，返回 (var_name, obj) 或 (None, None)。
+
+    2026-08-28 扩展：支持 IIFE 壳 window.X = (function(){ var data = {...}; ... })()
+    （STOCK_MOMENTUM_STATE 等 OCR 产物用此格式），使 stamp_missing_update_time
+    不再漏判这些文件。数组壳仍返回 (var, list)。
+    """
+    try:
+        txt = path.read_text(encoding='utf-8')
+    except Exception:
+        return None, None
+    m = re.search(r'window\.([A-Z0-9_]+)\s*=\s*', txt)
+    if not m:
+        return None, None
+    var = m.group(1)
+    body = txt[m.end():].rstrip()
+    if body.endswith(';'):
+        body = body[:-1]
+    try:
+        obj = json.loads(body)
+        return var, obj
+    except Exception:
+        pass
+    # IIFE 壳：window.X = (function(){ var data = {...}; ... })();
+    m2 = re.search(r'var\s+data\s*=\s*(\{[\s\S]*?\})\s*;', txt)
+    if m2:
+        try:
+            return var, json.loads(m2.group(1))
+        except Exception:
+            return var, None
+    return var, None
+
+
+def _is_raw_empty_or_stale(raw_path):
+    """🆕 2026-09-05 cn 离线兜底：判空/占位。空则不重建 data/X.js（保留线上旧版）。
+    返回 (is_empty, reason)。阈值保守，不误杀合法小产物（CRDS 带 scan_stats 空产物~200B 不误杀）。"""
+    try:
+        size = raw_path.stat().st_size
+    except Exception:
+        return (True, "文件不存在")
+    if size < 30:
+        return (True, f"文件过小({size}B)")
+    try:
+        obj = json.loads(raw_path.read_text(encoding="utf-8"))
+    except Exception:
+        return (True, "JSON 解析失败")
+    if isinstance(obj, list) and len(obj) == 0:
+        return (True, "顶层为空列表")
+    if isinstance(obj, dict):
+        if obj.get("validity") == "unknown":
+            return (True, "数据源异常占位(validity=unknown)")
+        # 🛡 2026-09-08 一劳永逸：LHB/龙虎榜 raw_data/lhb_data.json 结构为 {date,update_time,stocks,summary}
+        #   stocks 列表有真实数据，但无 total_scanned/market_context，此前被误杀为"0命中+数据源异常"，
+        #   导致 data/LHB_DATA.js 长期为空。对含真实列表数据的 dict 放行。
+        for arr_key in ("stocks", "data", "list", "items", "rows"):
+            arr = obj.get(arr_key)
+            if isinstance(arr, list) and len(arr) > 0:
+                return (False, "")
+        mc = obj.get("market_context") or {}
+        if obj.get("total_scanned") == 0 and mc.get("validity") not in ("ok", "good", "normal"):
+            return (True, "0命中且数据源有效性异常")
+        if set(obj.keys()) <= {"update_time"}:
+            return (True, "仅含时间戳的占位对象")
+    return (False, "")
+
+
+def _should_skip_data_staleness_guard(var_name, obj):
+    """🛡 2026-09-09 主人令根治「旧 raw 洗新 data」P0 回滚事故：data 比 raw 新则跳过覆盖。
+
+    触发场景：云端 build / 本地自托管跑批，仓库里的 raw_data/*.json 因某种原因（外部
+    已先推 data 而 raw 还没补推 / 上一轮 build 失败留下残缺 raw / 第三方协作编辑了
+    data 但 raw 漏推）变得陈旧，update_v8 仍会按 raw 重建 data/*.js → 用旧内容覆盖
+    新内容，等于「旧 raw 洗新 data」回滚。
+
+    判据：data/<var>.js 的 update_time（语义时间，不是 republish_time 那种构建时刻）
+    > raw 的「真实时间」= max(顶层 update_time, _meta.last_update, 源文件 mtime)，
+    则跳过本次重写（前端拿到的是 data 已有的更新版本，不会被旧 raw 拉回）。
+
+    设计要点：
+    1) **不影响计数**：走 skipped += 1，统计保持一致，CI 日志更易读。
+    2) **不影响 detect-changes / 全量构建**：只跳过「覆盖动作」，流程照常推进。
+    3) **不误伤**：data 不存在（首次构建）/ data 无 update_time / 源 raw 不存在
+       / raw 时间无法取得 → 全部走正常构建，不护栏。
+    4) **不阻断：raw 是空 / 占位的**：由 _is_raw_empty_or_stale 在更前一道拦截，
+       此函数不会被调用到（顺序：empty → staleness → build）。
+    5) **不依赖 mtime 单独**：raw 文件 mtime 在 git checkout 时会被重置（见本脚本
+       334 行 SECTOR_PHASE_HISTORY 注释），用 max 三源兜底最稳。
+
+    返回 (is_skipped: bool, reason: str)。
+    """
+    data_path = DATA_DIR / f"{var_name}.js"
+    if not data_path.exists():
+        return (False, "data 不存在（首次构建）")
+    try:
+        data_text = data_path.read_text(encoding='utf-8')
+    except Exception:
+        return (False, "data 读取失败")
+    m = re.search(r'"update_time"\s*:\s*"([^"]+)"', data_text)
+    if not m:
+        return (False, "data 无 update_time")
+    data_ts = m.group(1)
+    if not data_ts or data_ts in ("", "0001-01-01 00:00:00"):
+        return (False, "data update_time 为空")
+    src_path = None
+    for fname, var in DATA_SOURCES.items():
+        if var == var_name:
+            sp = RAW_DIR / fname
+            if sp.exists():
+                src_path = sp
+            break
+    if src_path is None:
+        return (False, "raw 源不在 DATA_SOURCES 或文件不存在")
+    candidates = []
+    if isinstance(obj, dict):
+        top = obj.get("update_time") or ""
+        if top:
+            candidates.append(("顶层 ut", top))
+        meta = (obj.get("_meta") or {}).get("last_update") or ""
+        if meta:
+            candidates.append(("_meta.lu", meta))
+    try:
+        mtime_ts = datetime.fromtimestamp(src_path.stat().st_mtime, tz=CST).strftime("%Y-%m-%d %H:%M:%S")
+        candidates.append(("mtime", mtime_ts))
+    except Exception:
+        pass
+    raw_ts = max([t for _, t in candidates], default="")
+    if not raw_ts:
+        return (False, "raw 真实时间无法取得")
+    if data_ts > raw_ts:
+        return (True, f"data={data_ts} 已新于 raw={raw_ts}（{dict(candidates)}），跳过覆盖")
+    return (False, f"data={data_ts} ≤ raw={raw_ts}（{dict(candidates)}）")
+
+
+# 🆕 2026-09-05 变量名→raw_data 文件名反向映射（供 RUNNER_STATUS 标 stale）
+_VAR_TO_RAW = {v: k for k, v in DATA_SOURCES.items()}
+
+
+def stamp_missing_update_time():
+    """2026-08-22 主人令：为缺失 update_time 的 data/*.js 补入生成时间戳。
+
+    目的：审计发现 9 个文件（HEALTH_CHECK / H_AUTO_BUY / MOMENTUM_FILTER / PORTFOLIO /
+    PORTFOLIO_COST / BLOAT_CHECK / RUNNER_STATUS_HEALTH / STOCK_MOMENTUM_STATE /
+    STOCK_MOMENTUM_STATE_V2）无 update_time 字段，无法纳入新鲜度监控。
+
+    规则（不造假）：注入的是「文件真实生成时间」= mtime，非数据造假；无法解析为 dict
+    的文件（数组壳/IIFE 壳）跳过；已有 update_time 的不动。幂等：补一次后下次构建即跳过。
+    """
+    stamp_count = 0
+    for p in DATA_DIR.glob("*.js"):
+        var, obj = _load_js_var_file(p)
+        if not isinstance(obj, dict):
+            continue
+        if "update_time" in obj:
+            continue
+        mtime = datetime.fromtimestamp(p.stat().st_mtime, tz=CST).strftime("%Y-%m-%d %H:%M:%S")
+        obj["update_time"] = mtime
+        with open(p, "w", encoding='utf-8') as f:
+            f.write(f"window.{var} = ")
+            json.dump(obj, f, ensure_ascii=False, separators=(',', ':'))
+            f.write(";\n")
+        stamp_count += 1
+        print(f"  🕒 补 update_time → {var} ({mtime})")
+    if stamp_count:
+        print(f"✅ 已为 {stamp_count} 个 data/*.js 补 update_time")
+
+
+# 🆕 2026-09-05 主人令一劳永逸：运维看板全量覆盖 + 审计轨迹
+def _expand_runner_status():
+    """把 runner_status.json 的 modules 补全到 ALL_MODULE_NAMES 全量。
+    已跑模块用其 status/msg；未跑模块标 skip（运维看板真实覆盖，不再只报跑过的若干）。"""
+    p = RAW_DIR / "runner_status.json"
+    if not p.exists():
+        print("  ⏭️  runner_status.json 不存在，跳过 RUNNER_STATUS 补全")
+        return
+    try:
+        src = json.loads(p.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"  [WARN] runner_status.json 解析失败，跳过补全: {e}")
+        return
+    modules = src.get("modules", {}) or {}
+    expanded = {}
+    for name in ALL_MODULE_NAMES:
+        if name in modules:
+            expanded[name] = modules[name]
+        else:
+            expanded[name] = {"status": "skip", "msg": "本周期未运行（未出现在 runner_status）"}
+        # 🆕 2026-09-05 cn 离线兜底：该模块 raw_data 空/占位 → 标 stale（数据源离线可见）
+        _fname = _VAR_TO_RAW.get(name)
+        if _fname:
+            _rp = RAW_DIR / _fname
+            if _rp.exists():
+                _e, _r = _is_raw_empty_or_stale(_rp)
+                if _e:
+                    expanded[name] = {**expanded[name], "status": "stale",
+                                      "msg": f"数据源离线/产物空：{_r}"}
+    out = dict(src)
+    # 🛡 2026-09-08 确保 RUNNER_STATUS.js 总有 update_time，兼容旧 runner_status.json
+    if not out.get("update_time") and out.get("run_time"):
+        out["update_time"] = out["run_time"]
+    out["modules"] = expanded
+    out["_expanded"] = True
+    out["_module_total"] = len(ALL_MODULE_NAMES)
+    out["_module_run"] = len(modules)
+    js_path = DATA_DIR / "RUNNER_STATUS.js"
+    try:
+        with open(js_path, "w", encoding="utf-8") as f:
+            f.write("window.RUNNER_STATUS = ")
+            json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
+            f.write(";\n")
+        print(f"  ✅ RUNNER_STATUS 补全 {len(modules)}/{len(ALL_MODULE_NAMES)} 模块")
+    except Exception as e:
+        print(f"  [WARN] 写出 RUNNER_STATUS.js 失败: {e}")
+
+
+def _generate_audit_trail():
+    """合并云端 audit_history.json（v8_daily_audit 22:30 CST 写）
+    + 本机 audit_nightly.log（23:30 写 JSONL，可能不存在）为 AUDIT_TRAIL。"""
+    history = []
+    hp = RAW_DIR / "audit_history.json"
+    if hp.exists():
+        try:
+            history = json.loads(hp.read_text(encoding="utf-8"))
+            if not isinstance(history, list):
+                history = [history]
+        except Exception as e:
+            print(f"  [WARN] audit_history.json 解析失败: {e}")
+            history = []
+    nightly = []
+    nl = RAW_DIR / "audit_nightly.log"
+    if nl.exists():
+        try:
+            for line in nl.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    nightly.append(json.loads(line))
+                except Exception:
+                    continue
+        except Exception as e:
+            print(f"  [WARN] audit_nightly.log 读取失败: {e}")
+    latest = history[-1] if history else None
+    return {
+        "latest": latest,
+        "history": history[-20:],
+        "nightly": nightly,
+        "generated_at": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+def _write_audit_trail_js(trail):
+    js_path = DATA_DIR / "AUDIT_TRAIL.js"
+    try:
+        with open(js_path, "w", encoding="utf-8") as f:
+            f.write("window.AUDIT_TRAIL = ")
+            json.dump(trail, f, ensure_ascii=False, separators=(',', ':'))
+            f.write(";\n")
+        print(f"  ✅ 写出 AUDIT_TRAIL.js（latest={'有' if trail.get('latest') else '无'}, "
+              f"history={len(trail.get('history', []))}, nightly={len(trail.get('nightly', []))}）")
+    except Exception as e:
+        print(f"  [WARN] 写出 AUDIT_TRAIL.js 失败: {e}")
+
+
+def _emit_freshness_status_js():
+    """2026-09-11 小九的股票专家（P2 死功能修复）：运维面板「文件新鲜度」读 window.FRESHNESS_STATUS，
+    但 data/freshness_status.json 从未被转成 data/FRESHNESS_STATUS.js → 面板永远空对象。
+    本函数在每次 build 后无条件转换（若存在），使新鲜度总览真正可用。"""
+    src = DATA_DIR / "freshness_status.json"
+    if not src.exists():
+        print("  ⏭️  data/freshness_status.json 不存在，跳过 FRESHNESS_STATUS.js")
+        return
+    obj = _load_json(src)
+    if obj is None:
+        print("  ⏭️  data/freshness_status.json 读取失败，跳过 FRESHNESS_STATUS.js")
+        return
+    # 🛡 2026-09-29 小九（一劳永逸）：freshness_status.json 顶层无语义时间字段
+    #   ⇒ _write_js → _pick_ts 恒走 existing 兜底 ⇒ FRESHNESS_STATUS.js 的 update_time
+    #   永冻在首次构建时刻（实测停在 2026-09-25 21:34），运维面板「新鲜度」卡误报陈旧/冻结。
+    #   本状态是每次 build 重新生成的报告，其 update_time 应 = 本次构建时刻；
+    #   注入后 _pick_ts 走「源数据自带时间戳」最高优先级 ⇒ 死锁破除（与 09-29 心跳三文件同款根治）。
+    obj["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")
+    _write_js("FRESHNESS_STATUS", obj)
+    print("  ✅ data/freshness_status.json → data/FRESHNESS_STATUS.js")
+
+
+def _post_build_extras():
+    """🆕 2026-09-05：build 后补 RUNNER_STATUS 全量 + AUDIT_TRAIL（供运维看板消费）。"""
+    print("  🔧 生成运维 extras（RUNNER_STATUS 全量 + AUDIT_TRAIL）...")
+    _expand_runner_status()
+    _write_audit_trail_js(_generate_audit_trail())
+    _emit_freshness_status_js()
+
+
+
+# 🔴 2026-09-17 阿狸咪的工程师（P-6 落盘）：当前构建类别，供 run_experiment_cards()
+#   做「开关 vs 盘后构建」互斥断言（见该函数内）。由 build() 显式写入。
+_CURRENT_BUILD_CATEGORY = None
+
+
+def build(category=None, detect_changes=False):
+    global _CURRENT_BUILD_CATEGORY
+    _CURRENT_BUILD_CATEGORY = category
+    if not RAW_DIR.exists():
+        print(f"⚠️  raw_data/ 目录不存在（{RAW_DIR}）。保持既有 data/*.js 不变。")
+        return 0
+
+    files = [p for p in RAW_DIR.iterdir() if p.suffix == '.json']
+    if not files:
+        print(f"⚠️  raw_data/ 为空，无数据可更新。保持既有 data/*.js 不变。")
+        return 0
+
+    if detect_changes:
+        changed = _list_changed_raw_files()
+        changed_names = {p.name for p in changed}
+        affected_cats = set()
+        for p in changed:
+            affected_cats.update(_file_category(p.name))
+        print(f"🔍 detect_changes 模式：变化 raw_data {len(changed)} 个，涉及类别 {sorted(affected_cats) or '无'}")
+        if not affected_cats:
+            print("   无受影响的类别，跳过构建。")
+            return 0
+        target_files = [p for p in files if set(_file_category(p.name)) & affected_cats]
+    elif category:
+        print(f"🔍 category={category}（{CATEGORY_LABEL.get(category, category)}） selective build")
+        target_files = [p for p in files if category in _file_category(p.name)]
+    else:
+        print("🔍 全量构建模式")
+        target_files = files
+
+    # runner_status.json 跨所有时段，每次构建都带上，保证前端任务跟踪看板最新
+    runner_path = RAW_DIR / "runner_status.json"
+    if runner_path.exists() and runner_path not in target_files:
+        target_files.append(runner_path)
+
+    if not target_files:
+        print(f"⚠️ 没有属于目标类别的 raw_data 文件，保持 data/*.js 不变。")
+        return 0
+
+    updated = 0
+    skipped = 0
+    for src_path in sorted(target_files):
+        var_name = DATA_SOURCES.get(src_path.name)
+        if not var_name:
+            print(f"  ⏭️  {src_path.name} 不在 DATA_SOURCES 映射中，跳过（避免废弃数据复活）")
+            skipped += 1
+            continue
+        # 🛡 2026-09-10 主人令根治「最终推荐盘中反复回退」P0 事故：
+        #   纯盘后产物（FINAL_RECOMMEND_DATA / CRDS_CARD_DATA / TRIPLE_CONSENSUS 等，
+        #   _file_category 仅含 post_close、不含 intraday/premarket）在非 post_close 构建
+        #   （盘中 intraday / 全量 None / detect-changes）时绝不重写 —— 杜绝「旧 raw 洗新 data」
+        #   回滚（13:48 同类：盘中全量 build 用退化 raw 把今日真推荐洗成旧版）。
+        #   仅 --category post_close 显式授权时才重建（盘后/实验 workflow 已用此参数）。
+        _vc = _file_category(src_path.name)
+        _pure_pc = ("post_close" in _vc) and ("intraday" not in _vc) and ("premarket" not in _vc)
+        if _pure_pc and category != "post_close":
+            print(f"  ⏭️  {src_path.name} → data/{var_name}.js | 纯盘后产物，非 post_close 构建跳过（防回滚）")
+            skipped += 1
+            continue
+        obj = _load_json(src_path)
+        if obj is None:
+            skipped += 1
+            continue
+        # 🆕 2026-09-05 cn 离线兜底：空/占位产物跳过重建，保留线上旧版 data/X.js（不写空污染前端）
+        is_empty, empty_reason = _is_raw_empty_or_stale(src_path)
+        if is_empty:
+            print(f"  ⏭️  {src_path.name} 判空/占位（{empty_reason}），跳过重建 data/{var_name}.js（保留线上旧版）")
+            skipped += 1
+            continue
+        # 🛡 2026-09-09 主人令根治「旧 raw 洗新 data」P0 回滚事故：data 比 raw 新则跳过覆盖
+        #   判据：data/<var>.js 的 update_time > raw 的「真实时间」(max(顶层 ut, _meta.last_update, mtime))
+        #   仅跳过本次重写，不影响计数（skipped += 1），前端拿到的是 data 已有的更新版本。
+        is_skipped, skip_reason = _should_skip_data_staleness_guard(var_name, obj)
+        if is_skipped:
+            print(f"  ⏭️  {src_path.name} → data/{var_name}.js | {skip_reason}（云端 build 护栏）")
+            skipped += 1
+            continue
+        out_path = _write_js(var_name, obj)
+        updated += 1
+        print(f"  ✅ {src_path.name} → {out_path.name}")
+
+    print(f"\n完成：更新 {updated} 个，跳过 {skipped} 个。输出目录：{DATA_DIR}")
+    return 0
+
+
+def run_health_check():
+    """构建完成后生成 data/HEALTH_CHECK.js，供前端健康面板渲染。"""
+    hc_path = Path(__file__).resolve().parent / "v8_health_check.py"
+    if not hc_path.exists():
+        return
+    try:
+        # 显式继承当前进程环境（GHA 上的 secrets.GITHUB_TOKEN 等），防 subprocess 默认过滤
+        subprocess.run(
+            [sys.executable, str(hc_path)],
+            check=False, timeout=300,
+            env=os.environ.copy(),
+        )
+    except Exception as e:
+        print(f"[WARN] 健康检查调用失败: {e}")
+
+
+def run_experiment_cards():
+    """2026-08-13 主人令：暂未上架三张新卡（涨价弹性榜/情绪周期/潜力挖掘）随数据刷新自动重算。
+    三脚本读 data/*.js（build 刚生成的），写 data/COMMODITY_ELASTICITY.js 等。
+    2026-08-16 主人令：新增动量共识筛选器（momentum_common_filter.py --emit-js →
+    data/MOMENTUM_FILTER.js），与动量卡一起跟踪。
+    2026-08-20 主人令：潜力挖掘页已删除 → calc_potential_picks.py 从实验链路移除；2026-09-06 主人令：全链（脚本/数据/前端卡）彻底删除。
+    任何模块失败不阻断主流程（仅告警），避免拖垮云端抓取。
+    """
+    # 🔴 2026-09-16 阿狸咪的工程师 · 修「轻量环境必挂」（D2）：
+    #   v8_algo_intraday_lite.yml 是**轻量** workflow（不装 requirements.txt ⇒ 无 pandas），
+    #   而下面的强势突破生成器需 pandas 取 K 线；拿不到 K 线时该脚本会守住
+    #   「拒绝发布虚假回测」闸门并抛错 ⇒ 整个 update_v8 中断 ⇒ 当晚 ALGO_TRACK 不重生、
+    #   推送步骤被 skip（实测 run 35095625053，09-11~09-16 每晚一红）。
+    #   该 workflow 自述「动量共识筛选已迁到盘后 19:15 算法链，盘中不再重复跑」⇒ 按契约整段跳过；
+    #   实验卡由云端构建（装了 requirements.txt）负责重算。
+    #   注意：这里**不放松**任何诚实闸门——生成器自己的「拒绝发布虚假回测」原样保留，
+    #   云端构建仍会在缺 K 线时照旧 raise。
+    if os.environ.get("V8_SKIP_EXPERIMENT_CARDS") == "1":
+        # 🔴 2026-09-17 阿狸咪的工程师（P-6 落盘）：**互斥断言** —— 防未来有人把
+        #   `V8_SKIP_EXPERIMENT_CARDS: "1"` 照抄到盘后构建里（`--category post_close`）。
+        #   契约：该开关只为「轻量环境无 pandas」而生（v8_algo_intraday_lite.yml 盘中轻量链）；
+        #   盘后构建**必须**重算实验卡（强势突破/商品弹性/情绪周期），否则盘后产物永久缺卡。
+        #   前置核实（本机全仓穷举）：全仓 workflow 中仅 v8_algo_intraday_lite.yml 设该开关，
+        #   且它跑的是 `python update_v8.py`（无 --category）⇒ 断言不会误伤任何现有 CI。
+        if _CURRENT_BUILD_CATEGORY == "post_close":
+            print("[experiment] ⛔ 契约冲突：`--category post_close` 与 "
+                  "`V8_SKIP_EXPERIMENT_CARDS=1` 互斥 —— 盘后构建必须重算实验卡，"
+                  "该开关仅适用于无 pandas 的盘中轻量环境。请去掉开关或改用 `--category intraday`。")
+            raise SystemExit(1)
+        print("[experiment] ⏭️ V8_SKIP_EXPERIMENT_CARDS=1 → 按契约跳过实验卡"
+              "（轻量环境无 pandas；实验卡由云端构建重算，避免误报假 failure）")
+        return
+    import subprocess
+    algo_dir = Path(__file__).resolve().parent / "algorithms"
+    for script in ("calc_commodity_elasticity.py", "calc_sentiment_cycle.py"):
+        path = algo_dir / script
+        if not path.exists():
+            print(f"[experiment] ⚠️ 缺失 {script}，跳过")
+            continue
+        print(f"[experiment] ▶ {script} ({datetime.now():%H:%M:%S})")
+        try:
+            r = subprocess.run([sys.executable, str(path)], cwd=str(algo_dir),
+                               capture_output=True, text=True, timeout=300)
+            if r.returncode == 0:
+                last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
+                print(f"[experiment]   ✅ {last[0][:80]}")
+            else:
+                print(f"[experiment]   ⚠️ {script} 退出码 {r.returncode}")
+                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-2:] + r.stderr.strip().splitlines()[-2:])[:300])
+        except Exception as e:
+            print(f"[experiment]   ⚠️ {script} 异常: {e}")
+
+    # 2026-08-22 主人令·脱离PDF：先由「H反推升级算法」(涨幅≥3%+量比≥1.2+突破+RS) 自选强势突破
+    # + 重算 V2 动量（写 data/STOCK_MOMENTUM_STATE.js / STOCK_MOMENTUM_STATE_V2.js），
+    # 再跑 momentum_common_filter 消费 V2。顺序不可颠倒。
+    momentum_self_py = Path(__file__).resolve().parent / "scripts" / "gen_strong_breakout.py"
+    if momentum_self_py.exists():
+        print(f"[experiment] ▶ gen_strong_breakout.py ({datetime.now():%H:%M:%S})")
+        try:
+            r = subprocess.run([sys.executable, str(momentum_self_py)],
+                               capture_output=True, text=True, timeout=1800)
+            if r.returncode == 0:
+                last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
+                print(f"[experiment]   ✅ {last[0][:80]}")
+            else:
+                print(f"[experiment]   ❌ gen_strong_breakout 退出码 {r.returncode}")
+                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-4:] + r.stderr.strip().splitlines()[-4:])[:500])
+                # 🔴 2026-08-31 07:0x 一劳永逸修复（开盘前紧急，实测 build_deploy 连续 3 次 failure 坐实）：
+                #   08-29 的「硬化」把两种性质完全不同的失败混为一谈：
+                #     (a) [time_gate] 数据未就绪（需 ≥15:30 CST）—— 凌晨/盘前跑批时的**设计内**状态，
+                #         此刻 A 股当日数据本来就不存在，属预期；
+                #     (b) 回测数据造假（data_available=false 全 0）—— 真故障，必须阻断。
+                #   原实现无差别 raise → 每次凌晨 push 触发 build_deploy 都在 step 8 中断，
+                #   导致 data/*.js 明明已更新 57 个却**不部署**（step 9/10 skipped），
+                #   夜间抓取的新数据全部卡在本地不上线，线上长期停留在上一交易日。
+                #   实测证据：run 33329876518 / 33324547960 / 33321855111 三连 failure，
+                #   报错均为 `🚫 [time_gate] A股 数据未就绪（需 ≥ 15:30 CST，当前 03:07）`。
+                #   ⇒ (a) 降级为告警并跳过该实验卡，保留其余 data/*.js 正常部署；
+                #     (b) 仍照旧 raise，不放松「拒绝发布虚假回测」的红线。
+                _sb_out = (r.stdout or "") + "\n" + (r.stderr or "")
+                if "[time_gate]" in _sb_out:
+                    print("[experiment]   ⏭️ 识别为【时间门控未就绪】——非数据造假，属设计内状态；"
+                          "跳过本卡，其余 data/*.js 照常部署（15:30 后本轮会自然产出真实数据）")
+                else:
+                    # 🛡 2026-08-29 硬化：动量 V2 回测数据必须真实，禁止「data_available=false 全 0」继续发布。
+                    #   直接抛异常让 update_v8 / build 失败，触发重试或人工介入。
+                    raise RuntimeError(f"gen_strong_breakout 失败（退出码 {r.returncode}），拒绝发布虚假回测")
+        except Exception as e:
+            if isinstance(e, RuntimeError):
+                raise
+            print(f"[experiment]   ⚠️ gen_strong_breakout 异常: {e}")
+    else:
+        print("[experiment] ⚠️ 缺失 scripts/gen_strong_breakout.py，跳过")
+
+    # ── 生命周期两卡「信号层真实回测」（强势突破 / 高手强势股跟踪）──────────────
+    # 🔴 2026-09-16 阿狸咪的工程师 · 修「契约未落地」：
+    #   本调用原先被放在上面的 `else` 分支里（=「gen_strong_breakout 缺失时才跑」），
+    #   而它**永远不缺失** ⇒ 正常路径下本脚本从不执行，两卡回测只在人工跑过时才更新。
+    #   实测证据：raw_data/strong_breakout_backtest.json 的 generated 长期停在人工那一次，
+    #   而 data/*.js 的 update_time 只是 update_v8 桥接重写、**内容没重算**（假新鲜）。
+    #   本脚本自己的 docstring 写的是「由 update_v8.py 的 experiment 段调用（紧随
+    #   scripts/gen_strong_breakout.py 之后，确保读到当日最新信号账本）」——现按契约落地。
+    #   失败仅告警、不阻断主链（与本段其它实验卡一致）；真停更由 v8_health_check.py 的
+    #   IMA_STRONG_BACKTEST（max_age 1440 分钟）兜底告警。（STRONG_BREAKOUT_BACKTEST 已随 2026-09-19 主人令删除强势突破而移除）
+    life_bt_py = Path(__file__).resolve().parent / "algorithms" / "backtest_life_cards.py"
+    if life_bt_py.exists():
+        try:
+            print(f"[experiment] ▶ backtest_life_cards.py ({datetime.now():%H:%M:%S})")
+            r = subprocess.run([sys.executable, str(life_bt_py)], capture_output=True, text=True, timeout=900)
+            if r.returncode != 0:
+                print(f"[experiment]   ❌ backtest_life_cards 退出码 {r.returncode}")
+                if r.stderr: print(r.stderr[-400:])
+            else:
+                print("[experiment]   ✅ backtest_life_cards 完成（强势突破/高手强势股跟踪 真实信号层回测已产出）")
+        except Exception as e:
+            print(f"[experiment]   ⚠️ backtest_life_cards 异常: {e}")
+    else:
+        print("[experiment] ⚠️ 缺失 algorithms/backtest_life_cards.py，跳过")
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    # 2026-08-16 主人令：动量共识筛选器（读 data/STOCK_MOMENTUM_STATE_V2.js + STOCK_QUOTE + SECTOR_RS）
+    filter_py = Path(__file__).resolve().parent / "scripts" / "momentum_common_filter.py"
+    if filter_py.exists():
+        print(f"[experiment] ▶ momentum_common_filter.py --emit-js ({datetime.now():%H:%M:%S})")
+        try:
+            r = subprocess.run([sys.executable, str(filter_py), "--emit-js"],
+                               capture_output=True, text=True, timeout=300)
+            if r.returncode == 0:
+                last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
+                print(f"[experiment]   ✅ {last[0][:80]}")
+            else:
+                print(f"[experiment]   ⚠️ momentum_common_filter 退出码 {r.returncode}")
+                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-2:] + r.stderr.strip().splitlines()[-2:])[:300])
+        except Exception as e:
+            print(f"[experiment]   ⚠️ momentum_common_filter 异常: {e}")
+    else:
+        print("[experiment] ⚠️ 缺失 scripts/momentum_common_filter.py，跳过")
+
+    # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：ALGO_BACKTEST_COMPARE.js 前端零引用，
+    #   停止调用 algo_backtest_compare.py 生成该死数据。
+    # 🔵 2026-09-13 状态更新（阿狸咪的工程师，主人令「只要接入算法链的选股策略都要有回测」）：
+    #   该判定**已被主人令推翻** —— 强势突破（algorithms/strong_breakout.py）就在 B 批链内，
+    #   而本文件是它唯一的回测源；"前端零引用"的结论也漏扫了 logic.html
+    #   （其 L6707「两套算法回测对比」卡一直在读 window.ALGO_BACKTEST_COMPARE）。
+    #   ⚠️ 但**不在本构建链恢复调用**：回测汇总器 algorithms/gen_backtest_all_algos.py
+    #   （E 批末位）必须先读到本文件，而构建链跑在 run_algorithms 之后 ⇒ 会永远读到昨天。
+    #   故已改挂 **算法链 E 批**（algorithms/run_algorithms.py 的 ORDER + STAGES["E"]，
+    #   位于聚合器之前）。此处保留墓志铭以防被误当"仍需生成"而重复挂链。
+
+
+def main():
+    import argparse
+    # 🔴 2026-09-13 一劳永逸（阿狸咪的工程师）：跑批前「工作区 vs 远端」一致性守卫。
+    #   根因（09-13 实测）：本机工作区内容由坚果云从另一台机同步，常与远端 HEAD 不一致，
+    #   而跑批直接执行工作区里那份脚本 ⇒ 远端已修好的代码被从产物侧**静默撤销**（假成功）。
+    #   守卫先把不一致的关键脚本备份到**仓库外**，再 `git checkout <ref> -- <文件>` 拉齐；
+    #   拉不齐则**中止本次跑批**（fail-closed，禁止用落后代码出产物）。
+    #   逃生舱：环境变量 V8_SKIP_WS_GUARD=1（正常不要设）。
+    try:
+        import subprocess as _sp, sys as _sys, os as _os
+        _d = _os.path.dirname(_os.path.abspath(__file__))
+        _cands = [_os.path.join(_d, "v8_ws_sync_guard.py"),
+                  _os.path.join(_os.path.dirname(_d), "v8_ws_sync_guard.py")]
+        _g = next((c for c in _cands if _os.path.exists(c)), None)
+        if _g:
+            _r = _sp.run([_sys.executable, _g, "--heal"], capture_output=True, text=True,
+                         encoding="utf-8", errors="replace")
+            print((_r.stdout or "").rstrip())
+            if _r.returncode != 0:
+                print("🔴 工作区一致性守卫未通过 → 中止本次跑批（禁止用落后代码出产物）")
+                return 2
+        else:
+            print("⚠️ 未找到 v8_ws_sync_guard.py → 跳过工作区一致性守卫")
+    except Exception as _e:
+        print(f"🔴 工作区一致性守卫异常：{_e} → 中止本次跑批（fail-closed）")
+        return 2
+    parser = argparse.ArgumentParser(description="v8 data builder")
+    parser.add_argument("--category", choices=["premarket", "intraday", "post_close", "weekly"],
+                        help="只构建某一时段类别")
+    parser.add_argument("--detect-changes", action="store_true",
+                        help="只构建最近 git diff 发生变化的 raw_data 所属类别")
+    parser.add_argument("--only-cache-busters", action="store_true",
+                        help="仅重写 index.html 的 data/*.js ?v 缓存戳（基于本地文件内容哈希），不重建任何数据。"
+                             "供 v8_cache_buster_reconcile（兜底自愈）/ v8_build_deploy（提交前守卫）/"
+                             "生成器 workflow（原子提交 ?v）三处复用同一套权威 ?v 逻辑，彻底消除各 workflow 各算各的导致的失配。")
+    args = parser.parse_args()
+    # 🛡 2026-09-02 一劳永逸根治「?v 缓存戳失配」：新增 --only-cache-busters 独立开关。
+    #   只重写 index.html 的 data/*.js ?v（基于本地文件内容哈希），不重建任何数据。
+    #   供 v8_cache_buster_reconcile（兜底自愈）/ v8_build_deploy（提交前守卫）/
+    #   生成器 workflow（原子提交 ?v）三处复用同一套权威 ?v 逻辑，彻底消除"各 workflow
+    #   各算各的"导致的失配。
+    if args.only_cache_busters:
+        _ensure_momentum_loader()
+        _rewrite_cache_busters_for(ROOT / "logic.html")
+        _rewrite_index_html_cache_busters()
+        print("✅ 仅重写 ?v 完成（未重建数据）")
+        return 0
+    rc = build(category=args.category, detect_changes=args.detect_changes)
+    if rc == 0:
+        run_health_check()
+        run_experiment_cards()
+        # 2026-08-22 主人令：为缺 update_time 的 data/*.js 补时间戳（须在全部生成之后）
+        stamp_missing_update_time()
+        # 🆕 2026-09-05 主人令：build 后补 RUNNER_STATUS 全量 + AUDIT_TRAIL
+        _post_build_extras()
+        # 2026-08-15 缓存戳铁律修复：必须在全部数据生成（含 run_experiment_cards
+        # 重写的 COMMODITY_ELASTICITY.js 等）之后才算 ?v，否则 ?v 与最终文件内容
+        # 不符 → CDN 吐旧副本。
+        _ensure_momentum_loader()
+        _rewrite_cache_busters_for(ROOT / "logic.html")
+        _rewrite_index_html_cache_busters()
+    return rc
+
+
+if __name__ == '__main__':
+    sys.exit(main())

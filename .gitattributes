@@ -1,0 +1,105 @@
+# workflow 里的多行 bash 脚本在 ubuntu-latest runner 上执行，
+# 若被 Windows 端 checkout 成 CRLF 会导致 `\r` 混入命令而报错，故强制 LF。
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh  text eol=lf
+*.py  text eol=lf
+
+# v6备忘录 防覆盖：钉死 LF，保证本机(Windows CRLF)与 CI(Linux)/origin 计算的内容 sha 一致，
+# 从而 index.html 的 ?v= 缓存戳永远等于实际部署文件 sha，杜绝 CDN 按旧 URL 吐旧副本。
+v6_memo.html        text eol=lf
+v6_memo.golden.html text eol=lf
+
+# ═══ 2026-09-13 主人令（收尾·阿狸咪的工程师）：页面与数据文件行尾锁定 ═══
+#
+# 【根因】本机 `core.autocrlf` = true（仓库级），而本文件原先**未锁** index.html /
+#   logic.html ⇒ 双机（各机 autocrlf 取值未必相同）+ CI（Linux）三方各按本地设置
+#   转换，同一文件被反复整文件改写。证据：8cb2bbb7e 提交标题即
+#   「重打被 a40abe2ec 静默回退的三处 index.html 口径文案（双机共写热文件覆盖事故）」
+#   —— 那次「静默回退」的机制之一正是行尾整文件改写。
+#
+# 【全仓 .html 行尾实测（blob 原始字节）】
+#   index.html / calendar.html / v6_memo.html / v6_memory.html / docs/ops/audit/*.html = 纯 LF
+#   logic.html                                                                        = 纯 CRLF  ← 唯一例外
+#   ⇒ 统一锁 LF，再对 logic.html 单独开例外。
+#
+# 【logic.html 为何必须用 -text 而不是 eol=crlf】—— 临时仓库对照实验实测：
+#     `logic.html text eol=crlf` → 索引 blob 被规范化成 LF（704701 B）⇒ **整文件改写**
+#     `logic.html text eol=lf`   → 同上（整文件改写）
+#     `logic.html -text`         → 索引 blob 与远端逐字节相同（713347 B）✅
+#   因 logic.html 的 blob **本身**就存着 CRLF，凡带 `text` 属性的规则都会把它「规范化掉」。
+#   故只能用 `-text`（= 二进制，禁止任何行尾转换）：既冻结现状，又杜绝未来再被平台转换。
+#
+# ⚠⚠ 【规则顺序 + 必须同时解掉 eol】gitattributes 是**后面的规则覆盖前面的**。
+#   但 `-text` 只把 text 置 unset，**并不会解掉前面 `*.html` 设下的 `eol=lf`** ⇒
+#   会得到 `text: unset` + `eol: lf` 这种自相矛盾的组合（实测踩过，check-attr 可见）。
+#   正解：用 `-text -eol`，两个属性一起解，让该文件彻底回到「二进制、零转换」。
+#   （顺序仍必须在本段 `*.html` 之后。）
+
+*.html              text eol=lf
+logic.html          -text -eol
+
+# 本文件自己也要锁：原为 CRLF，按惯例应为 LF（防 Windows checkout 改写规则文件本身）
+.gitattributes      text eol=lf
+
+# 数据文件锁 LF：index.html 的 ?v= 缓存戳按「内容 sha」计算，
+# 若行尾被平台转换则 sha 变化 ⇒ 戳与实际部署文件不符 ⇒ CDN 按旧 URL 吐旧副本。
+data/*.js           text eol=lf
+raw_data/*.json     text eol=lf
+# 2026-09-20 阿狸咪补漏（同类根因：glob `*` 不跨 `/` ⇒ 上述两行漏掉子目录与 .json）
+#   data/*.js 漏掉 data/*.json；raw_data/*.json 漏掉 raw_data/history/*.json
+#   ⇒ 这两族里残留 CRLF blob 一直未被 fold_eol 收口。fold_eol 的判定真源是
+#     scripts/normalize_eol.py → git check-attr，故**补此规则即自动扩展收口范围**。
+data/*.json         text eol=lf
+raw_data/history/*.json  text eol=lf
+# 2026-09-24 小九补漏（同源根因第三处 · 交接件 `rawdata-md-crlf-flip`）
+#   实测（阿狸咪 17:2x 只读取证，证据链完整）：`raw_data/*.md` 全族**无任何规则**
+#   ⇒ 属性 unspecified ⇒ Windows checkout 后工作树为 CRLF；
+#   而走 GitHub API 逐文件上传的推送器读的是**工作树字节**（绕过 git clean filter）
+#   ⇒ 2026-09-24 12:04:59 CST（commit fabb6e6434）把这两个 .md 整篇翻成 CRLF 落库：
+#     `raw_data/ima_strong_stock_full.md`  5504 → 5632 B（+128 行 CRLF）
+#     `raw_data/chan_buy_point_full.md`    +115/−115
+#   （同批 16 个 raw_data/*.json 只 +1/−1 —— 它们**已有** `raw_data/*.json text eol=lf`。）
+#   后果：① 快照「逐字节 == ima 源方原文」契约被破坏（该文件全部价值前提）；
+#         ② `push_snapshot.py` 断言 `remote_md == fetched_md` ⇒ 通道一恢复，任何刷新（含新篇）必 abort。
+#   本族 .md 全量枚举 = **仅这 2 个文件** ⇒ 影响面精确锁定，与 09-21 段「逐族列窄规则」同法。
+#   ⚠️ 收口必须用 `git add --renormalize <显式路径>`（普通 add 对 stat 未变者跳过 clean filter，静默无效）。
+raw_data/*.md       text eol=lf
+# 2026-09-21 阿狸咪再补漏（同源根因第二处）
+#   ⚠️ 更正 09-21 早先写入本段的错误表述：原文称该文件「永久脏」——**不成立**。
+#      实测：属性 unspecified 时 blob 与工作树**同为 CRLF** ⇒ git 判为一致，`git status` 全空。
+#      「永久脏」的**完整判据**是三元组：`i/crlf` **且** `attr 含 eol=lf` **且** `w/crlf`
+#      ——缺 attr 那一项就会把「一致态」误报成脏（笔者本轮踩过：awk 漏检 attr 项，
+#      误称「全仓 18 个永久脏」，实测真值为 **0 个**）。
+#   本规则的真实价值 = **预防**：一旦有人对同类加宽泛规则，这批文件会集体变真永久脏。
+#   两件同做：① 补本规则；② `git add` 令 clean filter 自动把 blob 归一为 LF（无需手工改工作树）。
+docs/ops/*.txt      text eol=lf
+
+# 🔴 累积型重要档案（禁止误删）—— 由 guard_protected_files.py 守卫
+data/SECTOR_CYCLE_ARCHIVE.js -diff -merge
+PROTECTED_FILES.json -diff -merge
+
+# ═══ 2026-09-21 主人授权（阿狸咪的工程师）：残留 CRLF blob 预防性收口 ═══
+# 【为什么做】以下文件「入库 blob = CRLF + 无 text 属性」⇒ 当前 git 判为**一致、并不脏**
+#   （实测 `git status` 全空、`git diff HEAD` 无差异）。但它们是**隐患**：一旦有人对同类
+#   加宽泛规则（如 `*.md text eol=lf`），这批会**集体变成真·永久脏**
+#   （判据三元组：i/crlf + attr 含 eol=lf + w/crlf ⇒ clean filter 输出 LF ≠ 库中 CRLF，永不等）。
+# 【为什么用窄规则】**刻意不写 `*.md` / `*` 等宽泛式**：本仓 .md 近千、路径分散，
+#   宽泛规则会让「下次谁 add 某个 md」就意外改写一个 blob ⇒ 就是踩踏/暴风的来源。
+#   逐族列窄规则，把影响面**精确锁定**在已知的这几个文件。
+# 【归一化命令 = `git add --renormalize <显式路径>`】**不是** 普通 `git add`！
+#   实测教训：普通 `git add` 对「内容未变（stat 未变）」的文件会**跳过 clean filter**，
+#   blob 保持 CRLF ⇒ 加规则后跑 `git add` 会**静默无效**（笔者本轮踩过）。
+#   只有 `--renormalize` 会强制对每个文件重跑 clean。
+# 【例外】logic.html 保持 `-text -eol` 不动 —— 其 blob **有意**存 CRLF，见上文 2026-09-13 段。
+.gitignore              text eol=lf
+DO_NOT_DELETE.md        text eol=lf
+PROTECTED_FILES.json    text eol=lf
+机构研究_关注词.txt      text eol=lf
+#
+# 【刻意**不做**的一项，留证以免后人重复踩】`docs/ops/handover/*.md`
+#   实测：该目录 **541 个** .md 的 blob 均为 CRLF。加 glob 规则 ⇒ 一次改写 541 个 blob。
+#   但它们是**审计凭据**，且当前处于「一致态、不脏、无任何实际危害」
+#   ⇒ 收益（纯预防）远小于代价（批量改写凭据 + 541 文件 diff 风暴 + 触发多 workflow）。
+#   故**只对计划内的单文件族收口，不动整目录**。若将来确要治理，须**单独开批次**并
+#   在交接件里显式公告影响面。

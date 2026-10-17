@@ -1,0 +1,151 @@
+# 九宝量化 v8.0 — 板块资金日内快照（独立高频 job，根治主力净额卡上午空白）
+#
+# 🛡 2026-09-10 双管齐下根治「主力净额分时上午断档」：
+#   第一管（已推）：intraday_snapshot.py 守卫放宽（口径只卡今天 + 陈旧 40→90min）。
+#   第二管（本文件）：把快照从 fetch job 内「合并步骤」彻底解耦为独立高频 job。
+#
+# 🔴 根因（已查明）：原 soft_9 嵌在 v8_cn_fetch_cloud 的 fetch job 内，快照 time 取
+#   脚本运行时刻（intraday_snapshot.py:59）。上午某档 fetch 在 GHA 队列排队延迟后跑到，
+#   写的 time 已是延迟后的时刻 → 10:20/10:40 这些「目标档期」点永远缺失，上午仅剩
+#   10:00 档准时跑出的 10:12 一个点。守卫放宽救不了「档期错位」。
+#
+# ✅ 本 job 独立每 10 分钟触发（不被 fetch 排队/取消风暴波及），跑 intraday_snapshot.py
+#   读「已提交的 raw_data/sector_fund_flow.json」（fetch 成功一次后长时间新鲜，≤90min
+#   守卫放过）→ 准时写「当前档期时刻」点。即使某档 fetch 整轮失败，只要今日有过一次
+#   成功提交，本 job 后续每 10 分钟持续补点 → 曲线连续不断。
+#
+# 🔴 2026-09-21（本批）小九 · 更正上面原注记的**两个过时判断**：
+#   ① 「单条 cron 不触发多 cron 失效坑」**不成立** —— 本链 09-21 实测被 GitHub schedule
+#      静默注销（冻结 63.4h，全靠 workflow_dispatch 应急顶着），见 HANDOFF.yaml 的
+#      intraday-chain-cron-deregistered（P0）。同仓既有铁律：**注释变更不足以让 GitHub
+#      重新注册 cron ⇒ 需对 schedule 段做结构性变更**（见 v8_stock_quote_refresh.yml 09-07 记录）。
+#   ② 因此把单条 `*/10 1-7` 拆为**两条显式 cron 行**（上午段 / 下午段），
+#      语义完全等价（1,2,3 ∪ 4,5,6,7 = 1-7），但 schedule 条目数 1→2 构成结构性变更。
+#      为何是 2 条而非更多：本仓实测「多条 cron 会被整段漏触发」（v8_algo_cloud 4 条 0 次、
+#      v8_cn_fetch_cloud 原 17 条 0 次），而 **2 条已被两条链长期实证可正常触发**
+#      （v8_stock_quote_refresh 09-07 二修后恢复；v8_risk_gauge 每日 9 次）⇒ 取 2 条。
+#   ⏳ 待验证：改后须观察 1 个交易日，确认出现 event=schedule 的 run（只看 schedule 事件）。
+#   午休（11:30-13:00）也跑，但脚本守卫 09:25-16:05 会写（用上次新鲜数据填旧点，
+#   保曲线连续，无害）。
+#   午休（11:30-13:00）也跑，但脚本守卫 09:25-16:05 会写（用上次新鲜数据填旧点，
+#   保曲线连续，无害）。
+#
+# 🛡 并发安全：独立 concurrency group（v8-intraday-snapshot, cancel-in-progress:true），
+#   与 v8-cn-fetch-cloud 组隔离，互不取消；高频秒级完成，cancel 不会丢（上一次已跑完）。
+#   推送仅限 2 个快照文件（data/SECTOR_FUND_FLOW_INTRADAY.js + raw_data/sector_fund_flow_intraday.json），
+#   与 fetch job 的 soft_10 全量推送文件不重叠 → rebase 无冲突，fast-forward 安全。
+name: "📈 板块资金日内快照(独立高频·根治上午空白)"
+
+on:
+  schedule:
+    # 🔴 2026-10-13 小九 · 四修（cron 第三次被静默注销后强制重注册）：
+    #   10-13 实证：上午段 cron 再度失效（10:58 后零 schedule run，盘中 11:00-11:40 断档
+    #   40 分钟，全靠 workflow_run 保底续命；主人实锤主力净额卡停在 10:58）。
+    #   同仓铁律：注释变更不足以让 GitHub 重新注册 cron ⇒ 必须对 schedule 段做结构性变更。
+    #   本轮把两条 cron 边界同时外扩（0-3 / 4-8）⇒ 覆盖北京 08:00-16:50 全天，
+    #   且两条 schedule 条目值全变，构成结构性变更强制重注册。
+    - cron: '*/10 0-3 * * 1-5'   # UTC 00:00-03:50 = CST 08:00-11:50（盘前+上午盘中，每 10 分钟）
+    - cron: '*/10 4-8 * * 1-5'   # UTC 04:00-08:50 = CST 12:00-16:50（下午盘中+收盘末班，每 10 分钟）
+  workflow_dispatch:
+  # 🛡 2026-09-29 小九 · 三修（根治「schedule 再次静默注销」）：
+  #   实测 09-26~09-28 三天 36 个 run 中 schedule 仅 2 次（09-21 同款注销复发），
+  #   09-29 上午 9:00-11:13 零快照、卡面空白（主人实锤）。cron 何时被 GitHub 注销不可控，
+  #   唯一可控的稳定触发源 = fetch 链（watchdog 每 15min + 本机调度器每 20min 双保险派发，
+  #   09-29 实测即使 schedule 全灭，fetch 链仍每 ~40min 完成一轮并已靠 soft_9 步骤写出 11:13 起的点）。
+  #   故挂 workflow_run 保底：fetch 链每完成一轮 → 本 job 追加一个当前时刻点。
+  #   无环：本 job 推的 2 个快照文件不会反向触发 fetch 链（它无 push 触发器）。
+  workflow_run:
+    workflows: ["🇨🇳 v8 中国数据抓取(云端)"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-intraday-snapshot
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Shanghai
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: "⬇️ checkout main"
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: "🐍 setup-python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: "📈 追加快日快照（独立解耦·重试5）"
+        id: snap
+        continue-on-error: true
+        shell: bash
+        run: |
+          _ok=0
+          for i in 1 2 3 4 5; do
+            echo "尝试 $i/5 追加板块资金日内快照"
+            if python intraday_snapshot.py; then
+              echo "✅ 快照追加成功"
+              _ok=1
+              break
+            fi
+            echo "⚠️ 第 $i 次失败，6s 后重试"
+            sleep 6
+          done
+          if [ "$_ok" != "1" ]; then
+            echo "::error title=v8-softfail:intraday-snapshot::📈 独立快照追加失败（5次重试均败），本步不阻断 job，请核对健康面板主力净额卡新鲜度。"
+          fi
+
+      - name: "📤 推送 2 个快照文件（仅快照，rebase 无冲突）"
+        id: push
+        continue-on-error: true
+        shell: bash
+        run: |
+          git config user.email "2814546@qq.com"
+          git config user.name "ah-quant999"
+          # 🛡 2026-10-13 一劳永逸（主人实锤「卡在 10:58」）：快照数据与 index.html 缓存戳
+          #   同 commit 原子更新。旧链路数据文件先上线、?v 靠 build/reconcile 事后追（慢 3-5
+          #   分钟），期间浏览器/CDN 按旧 URL 吐旧缓存 ⇒ 卡面停在旧时刻。update_v8.py 仅依赖
+          #   标准库，py3.11 可直接跑；失败不阻断快照推送（reconcile 每 15 分钟仍兜底）。
+          python update_v8.py --only-cache-busters || echo "⚠️ 缓存戳重算失败（不阻断快照推送，reconcile 兜底）"
+          git add data/SECTOR_FUND_FLOW_INTRADAY.js raw_data/sector_fund_flow_intraday.json index.html
+          if git diff --cached --quiet; then
+            echo "ℹ️ 本次无快照变更，跳过推送"
+            exit 0
+          fi
+          git commit -q -m "snapshot: 板块资金日内快照 $(TZ=Asia/Shanghai date '+%F %H:%M') CST"
+          for i in 1 2 3 4; do
+            git fetch origin >/dev/null 2>&1
+            # 🛡 2026-09-20 小九：先清「虚拟脏」，否则 rebase 启动前即被拒（同 v8_risk_gauge 根因）
+            git checkout -- . 2>/dev/null || true
+            if git -c rebase.autoStash=true rebase origin/main >/dev/null 2>&1; then  # 🔴 2026-09-17 阿狸咪：加 autoStash —— 裸 rebase 遇脏树会启动前即被拒，3 次重试全空转
+              if git push origin HEAD:main 2>&1 | tail -2; then
+                echo "✅ 快照推送成功 (attempt=$i)"
+                break
+              fi
+            else
+              git rebase --abort >/dev/null 2>&1
+            fi
+            echo "⚠️ 第 $i 次推送冲突/失败，重试"
+          done
+
+      - name: "📢 软失败告警（不阻断）"
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.snap.outcome }}" != "success" ] || [ "${{ steps.push.outcome }}" != "success" ]; then
+            echo "::error title=v8-intraday-snapshot-softfail::独立快照 job 软失败（snap=${{ steps.snap.outcome }} push=${{ steps.push.outcome }}），主力净额卡可能未刷新，请检查。"
+          else
+            echo "✅ 独立快照 job 本轮无软失败"
+          fi

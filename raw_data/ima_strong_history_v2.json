@@ -1,0 +1,553 @@
+{
+ "note": "v2 期（换代后）高手强势股跟踪真实选股全量归档 —— 与 v1 冻结归档同规则：保留全部，防幸存者偏差；同 code 取最早 first_selected。",
+ "data_date": "2026-10-13",
+ "generated": "2026-10-14 21:50:00",
+ "maintainer": "阿狸咪的工程师（人工/脚本维护，不被 fetch_ima_strong_stock.py 覆写）",
+ "pool_caliber": "差集口径：v1 已收录 code 不再重复收录；每日整池转录已与竞价校验笔记交叉核验",
+ "stocks": [
+  {
+   "code": "603248",
+   "name": "锡华科技",
+   "first_selected": "2026-09-18",
+   "strength_score": 88,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "601026",
+   "name": "道生天合",
+   "first_selected": "2026-09-18",
+   "strength_score": 86,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "301583",
+   "name": "托伦斯",
+   "first_selected": "2026-09-18",
+   "strength_score": 82,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "001399",
+   "name": "惠科股份",
+   "first_selected": "2026-09-18",
+   "strength_score": 78,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "603402",
+   "name": "陕西旅游",
+   "first_selected": "2026-09-18",
+   "strength_score": 78,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "601123",
+   "name": "马矿股份",
+   "first_selected": "2026-09-18",
+   "strength_score": 76,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "603230",
+   "name": "内蒙新华",
+   "first_selected": "2026-09-18",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002453",
+   "name": "华软科技",
+   "first_selected": "2026-09-18",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002900",
+   "name": "哈三联",
+   "first_selected": "2026-09-21",
+   "strength_score": 86,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002792",
+   "name": "通宇通讯",
+   "first_selected": "2026-09-21",
+   "strength_score": 81,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002589",
+   "name": "瑞康医药",
+   "first_selected": "2026-09-21",
+   "strength_score": 78,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "600448",
+   "name": "华纺股份",
+   "first_selected": "2026-09-21",
+   "strength_score": 75,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "000566",
+   "name": "海南海药",
+   "first_selected": "2026-09-21",
+   "strength_score": 75,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002795",
+   "name": "永和智控",
+   "first_selected": "2026-09-21",
+   "strength_score": 72,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "300110",
+   "name": "华仁药业",
+   "first_selected": "2026-09-22",
+   "strength_score": 96,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "000756",
+   "name": "新华制药",
+   "first_selected": "2026-09-22",
+   "strength_score": 86,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "600503",
+   "name": "华丽家族",
+   "first_selected": "2026-09-22",
+   "strength_score": 86,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002178",
+   "name": "延华智能",
+   "first_selected": "2026-09-22",
+   "strength_score": 86,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "920526",
+   "name": "凯华材料",
+   "first_selected": "2026-09-22",
+   "strength_score": 80,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "688781",
+   "name": "视涯科技",
+   "first_selected": "2026-09-22",
+   "strength_score": 75,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "001266",
+   "name": "宏英智能",
+   "first_selected": "2026-09-22",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "603598",
+   "name": "引力传媒",
+   "first_selected": "2026-09-22",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002614",
+   "name": "奥佳华",
+   "first_selected": "2026-09-23",
+   "strength_score": 96,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "688628",
+   "name": "优利德",
+   "first_selected": "2026-09-23",
+   "strength_score": 78,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "603773",
+   "name": "沃格光电",
+   "first_selected": "2026-09-23",
+   "strength_score": 77,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "600743",
+   "name": "华远控股",
+   "first_selected": "2026-09-23",
+   "strength_score": 75,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "603636",
+   "name": "南威软件",
+   "first_selected": "2026-09-23",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "688512",
+   "name": "慧智微",
+   "first_selected": "2026-09-23",
+   "strength_score": 65,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002286",
+   "name": "保龄宝",
+   "first_selected": "2026-09-23",
+   "strength_score": 63,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002342",
+   "name": "巨力索具",
+   "first_selected": "2026-09-28",
+   "strength_score": 81,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "603396",
+   "name": "金辰股份",
+   "first_selected": "2026-09-28",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "603278",
+   "name": "大业股份",
+   "first_selected": "2026-09-28",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "601218",
+   "name": "吉鑫科技",
+   "first_selected": "2026-09-28",
+   "strength_score": 67,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002962",
+   "name": "五方光电",
+   "first_selected": "2026-09-28",
+   "strength_score": 65,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "605366",
+   "name": "宏柏新材",
+   "first_selected": "2026-09-28",
+   "strength_score": 63,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "600802",
+   "name": "福建水泥",
+   "first_selected": "2026-09-28",
+   "strength_score": 63,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "001368",
+   "name": "通达创智",
+   "first_selected": "2026-09-28",
+   "strength_score": 57,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "301190",
+   "name": "善水科技",
+   "first_selected": "2026-09-29",
+   "strength_score": 78,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002494",
+   "name": "华斯股份",
+   "first_selected": "2026-09-29",
+   "strength_score": 78,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "301560",
+   "name": "众捷股份",
+   "first_selected": "2026-09-29",
+   "strength_score": 67,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "000607",
+   "name": "华媒控股",
+   "first_selected": "2026-09-29",
+   "strength_score": 66,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "920779",
+   "name": "武汉蓝电",
+   "first_selected": "2026-09-29",
+   "strength_score": 65,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002882",
+   "name": "金龙羽",
+   "first_selected": "2026-09-29",
+   "strength_score": 63,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "600982",
+   "name": "宁波能源",
+   "first_selected": "2026-09-29",
+   "strength_score": 63,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "603200",
+   "name": "上海洗霸",
+   "first_selected": "2026-09-30",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "000011",
+   "name": "深物业A",
+   "first_selected": "2026-09-30",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "000678",
+   "name": "襄阳轴承",
+   "first_selected": "2026-09-30",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002866",
+   "name": "传艺科技",
+   "first_selected": "2026-09-30",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "603590",
+   "name": "康辰药业",
+   "first_selected": "2026-09-30",
+   "strength_score": 65,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "000504",
+   "name": "南华生物",
+   "first_selected": "2026-09-30",
+   "strength_score": 61,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "920627",
+   "name": "力王股份",
+   "first_selected": "2026-10-08",
+   "strength_score": 80,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "600241",
+   "name": "时代万恒",
+   "first_selected": "2026-10-08",
+   "strength_score": 75,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002490",
+   "name": "山东墨龙",
+   "first_selected": "2026-10-08",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "300530",
+   "name": "领湃科技",
+   "first_selected": "2026-10-08",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002733",
+   "name": "雄韬股份",
+   "first_selected": "2026-10-08",
+   "strength_score": 67,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002058",
+   "name": "紫竹高科",
+   "first_selected": "2026-10-08",
+   "strength_score": 67,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "600408",
+   "name": "安泰集团",
+   "first_selected": "2026-10-09",
+   "strength_score": 81,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "300821",
+   "name": "东岳硅材",
+   "first_selected": "2026-10-09",
+   "strength_score": 75,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "001336",
+   "name": "楚环科技",
+   "first_selected": "2026-10-09",
+   "strength_score": 75,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "000710",
+   "name": "贝瑞基因",
+   "first_selected": "2026-10-09",
+   "strength_score": 73,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002242",
+   "name": "九阳股份",
+   "first_selected": "2026-10-09",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "301052",
+   "name": "果麦文化",
+   "first_selected": "2026-10-12",
+   "strength_score": 81,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "301658",
+   "name": "首航新能",
+   "first_selected": "2026-10-12",
+   "strength_score": 75,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "000892",
+   "name": "欢瑞世纪",
+   "first_selected": "2026-10-12",
+   "strength_score": 73,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "002591",
+   "name": "恒大高新",
+   "first_selected": "2026-10-12",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "601929",
+   "name": "吉视传媒",
+   "first_selected": "2026-10-12",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "688517",
+   "name": "金冠电气",
+   "first_selected": "2026-10-12",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  },
+  {
+   "code": "300006",
+   "name": "莱美药业",
+   "first_selected": "2026-10-12",
+   "strength_score": 71,
+   "status": "正常",
+   "source": "知识星球「短线情绪选股」逐日笔记（ima-mcp 已核验转录 2026-10-14）"
+  }
+ ]
+}

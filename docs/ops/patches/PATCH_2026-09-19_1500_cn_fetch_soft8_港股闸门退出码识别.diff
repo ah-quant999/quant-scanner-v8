@@ -1,0 +1,44 @@
+diff --git a/.github/workflows/v8_cn_fetch_cloud.yml b/.github/workflows/v8_cn_fetch_cloud.yml
+index b5a10bb49..2c822632b 100644
+--- a/.github/workflows/v8_cn_fetch_cloud.yml
++++ b/.github/workflows/v8_cn_fetch_cloud.yml
+@@ -411,7 +411,38 @@ jobs:
+           cp raw_data/stock_names.json out/stock_names.json 2>/dev/null || true
+           cp raw_data/gold_pool.json out/gold_pool.json 2>/dev/null || true
+           python algorithms/guanlan_extractor.py
+-          python algorithms/build_candidate_pool.py
++
++          # 🔴🔴 2026-09-19 主人令·一劳永逸（阿狸咪的工程师）—— 港股收盘前禁止重建金股池
++          #
++          # 【主人原话】「这逻辑不对，要等港股 16 点 10 分收盘后才能出股票池。」
++          #
++          # 【铁证】2026-09-18（周四交易日）raw_data/gold_pool.json 三笔提交：
++          #   72e58b9313 15:20:50 / 36c2c7c955 16:09:04 / b764d7d7fa 16:59:23，
++          #   前两笔均早于港股 16:10 收盘竞价完成，把 60 只港股的**盘中未定稿价**
++          #   固化进池。经 GitHub API 逐笔核验，三笔提交信息均为「v8 cn fetch: HH:MM」，
++          #   且**全部**含 raw_data/build_candidate_debug.json（本脚本的产物）。
++          #
++          # 【真凶机制】派发时刻不是元凶 —— 覆盖 15:20 的是 run#1856（08:28:40Z 起跑
++          #   = 16:28 CST 起），它连跑 55 分钟（08:28:40Z→09:23:04Z），
++          #   执行到本步时已跨过 16:00 港股收市。即「盘中/盘后档起跑的长任务」
++          #   会在运行途中跨过收盘点，仅靠派发时刻闸门无法拦住。
++          #   ⇒ 必须在**写库的最后一刻**判时刻（脚本内闸门），此处再补能力：
++          #     若脚本被闸门拦下（退出码 1），本步**必须显式告警且不再往下走 stage_to_raw**，
++          #     否则 stage_to_raw 会把 out/ 里的**上一轮陈旧 gold_pool** 搬进 raw_data 固化。
++          #
++          # 【为何此处不直接 skip 本步】category=='post_close' 的 cron 最早 17:20 CST，
++          #   正常情况早已过 16:30；此处保留重跑能力（自愈用途），只拦「确实早于 16:30」的越界运行。
++          _v8_tg_rc=0
++          python algorithms/build_candidate_pool.py || _v8_tg_rc=$?
++          if [ "$_v8_tg_rc" = "1" ]; then
++            echo "::warning title=v8-timegate:soft_8::🚫 金股池重建被时间闸门拦下（港股需 ≥16:30 CST）——本步跳过 stage_to_raw，保证 raw_data/gold_pool.json 保留上一版已定稿数据，绝不用盘中未定稿价覆盖。"
++            echo "🛡 时间闸门拦截：跳过 stage_to_raw（防陈旧 out/ 反灌 raw_data）"
++            exit 0
++          fi
++          if [ "$_v8_tg_rc" != "0" ]; then
++            echo "::error title=v8-softfail:soft_8(build_candidate_pool exit=$_v8_tg_rc)::build_candidate_pool.py 非闸门原因的失败（退出码 $_v8_tg_rc），金股池未重建。"
++            exit 1
++          fi
+           python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
+ 
+           # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），

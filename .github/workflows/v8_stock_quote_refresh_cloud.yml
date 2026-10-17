@@ -1,0 +1,436 @@
+# 九宝量化 v8.0 — STOCK_QUOTE 轻量 refresh · 云端兜底副本
+#
+# 🔁 本文件是 v8_stock_quote_refresh.yml 的云端(ubuntu-latest)兜底版，仅由哨兵 v3 在
+#   「本机 self-hosted runner 接单超时(>12分，判定离线)」时派发，平时不跑、无 schedule。
+#   主路径走 [self-hosted]（中国 IP 根治反爬）；本副本是美国 IP 反爬风险下的保底，
+#   避免 runner 离线时 STOCK_QUOTE 整段断更。详见 v8_deploy_watch.py。
+#
+# 🔴 2026-09-17 阿狸咪的工程师·派发源补正（原文只列哨兵 v3，实测不止）：
+#   仓内**另有**一处派发点：v8_cn_fetch_cloud.yml 的 relay ②（当时每轮无条件派发本文件）。
+#   实测 09-17 本文件跑 27 轮（10:05-15:02）⇒ 原文「平时不跑、无 schedule」不成立。
+#
+# ✅ 2026-09-21 阿狸咪的工程师·**漂移已治本**（修法甲落地 · 最终口径以此段为准）：
+#   relay ② 已改为「主链优先 + 主链离线才兜底」三态门控 ⇒ 本文件**只在**
+#   「主链 v8_stock_quote_refresh.yml 排队 ≥10 分钟仍未起 job（判 cn runner 离线）」时被派发；
+#   主链新鲜（<12 分钟且 success）或在途时**不派本文件**。哨兵 v3 的接单超时兜底仍并行有效。
+#   修复前实测（09-21 盘中）：本文件 **15 档** vs 主链 **1 档** ⇒ 主力 100% 漂在海外 IP（美国 IP
+#   撞新浪/东财反爬 ⇒ 10:08、11:21 两次双源全灭）；修复后预期反转为主链为主、本文件近零。
+#   ↳ 判据/证据/源级重试一并见：
+#      docs/ops/handover/2026-09-21_1230_阿狸咪的工程师给小九的工程师_STOCK_QUOTE漂移治本_relay门控与源级重试.md
+#
+# 九宝量化 v8.0 — STOCK_QUOTE 轻量 refresh
+#
+# 🆕 2026-08-18 阿狸咪新建：解决"STOCK_QUOTE.js 0 字节 → 全站个股查询无报价"问题。
+#   背景：fetch_stock_quote_v8.py 仅在 v8_algo_cloud 整套算法链（cron 19:15 每天）里跑一次，
+#   8/15 周五 18:30 最后一次成功后，8/16-17 调度丢触发或写入失败 → data/STOCK_QUOTE.js 0 字节。
+#   表现：个股查询实时行情 stale 9 天 + 全站个股查询无报价。
+#   解决：本 workflow 单独跑 fetch_stock_quote_v8.py（5-10 分钟），cron 兜底 17:00 盘后
+#   + workflow_dispatch 手动触发应急。比 v8_algo_cloud 整套 1-2h 轻量得多。
+#
+# 调度策略：
+#   - 交易时间 09:00-16:30（北京时间）每 30 分钟刷新一次，保证盘中实时性
+#   - workflow_dispatch 应急手动触发（仍受 09:00-16:30 交易时间门控，除非显式 skip）
+#   - 内部走 A 股交易日历 gate，非交易日自动跳过（与 v8_algo_cloud 一致）
+#
+# ⚠️ 2026-08-20 主人令·一劳永逸：改为 ubuntu-latest（云端）。
+#   原 [self-hosted, cn] 在主人出差期间会随小九单位机离线而失效，导致 STOCK_QUOTE 整周断更。
+#   本 workflow 仅抓个股行情（akshare 新浪/东财接口），境外 runner 偶有抖动但可通过多源重试兜底；
+#   同步源码走 GitHub REST API（api.github.com 畅通），绕开 git 协议墙。
+#   模板完全复用 v8_algo_cloud.yml 的 sync_src_v8cloud.py。
+#
+# 🔄 2026-09-08 主人令·一劳永逸回迁 [self-hosted]（小九单位机·中国 IP）：
+#   实测云端 ubuntu-latest（美国 IP）盘中遭新浪/东财反爬 → STOCK_QUOTE 断档 8 小时（09-08 09:58→11:13
+#   才靠手动补救）；中国 IP 本机双源畅通。runner 离线风险由哨兵 v3「接单超时→改派云端兜底
+#   v8_stock_quote_refresh_cloud.yml」覆盖（见 C:/Users/Administrator/qs8-tmp/v8_deploy_watch.py）。
+#   GitHub cron 仍不可靠，统一由哨兵每 10 分派发本工作流（不再依赖 schedule 触发）。
+#
+# 输出：
+#   - raw_data/stock_quote.json  (5.25MB / 9915 只)
+#   - data/STOCK_QUOTE.js  (供前端嵌入)
+
+name: "📈 v8 STOCK_QUOTE 轻量 refresh (云端兜底)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_trading_day_gate:
+        description: '跳过交易日历 gate（应急手动触发时用）'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-stock-quote-refresh-cloud
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TZ: Asia/Shanghai
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # safe-delete 守卫：cn runner 默认 50 会被拦，抬到 2000
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
+    defaults:
+      run:
+        shell: bash
+    steps:
+      # 🛡️ 2026-08-21 20:45 一劳永逸根因修复（主人令「核查，一劳永逸式修复」）：
+      #   本 job runs-on 已是 ubuntu-latest（云端兜底·美国 IP 反爬风险下的保底），源码同步仍沿用
+      #   给 [self-hosted, cn] 写的「逐 blob 走 Contents API 拉全仓上千文件」方案。
+      #   后果与 v8_algo_cloud 同源：并发场景下上千次 API 打爆 secondary rate limit
+      #   → blob 全 403 Forbidden → 同步步骤超时 → job 失败。
+      #   修复：checkout 优先（秒级、0 次 blob API），仅当 checkout 失败才回退 API 同步。
+      - name: "📥 Checkout 源码（云端 git 直连，秒级）"
+        id: co
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: "📥 回退·经 GitHub API 同步源码（仅 checkout 失败时）"
+        if: steps.co.outcome == 'failure'
+        timeout-minutes: 10
+        run: |
+          set -e
+          cat > "$RUNNER_TEMP/sync_src_v8cloud.py" <<'PYEOF'
+          import os, base64, json, hashlib, urllib.request, time, sys
+          token = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          H = {"Authorization": "Bearer " + token,
+               "Accept": "application/vnd.github+json",
+               "X-GitHub-Api-Version": "2022-11-28"}
+
+          def local_blob_sha(path):
+              try:
+                  data = open(path, "rb").read()
+              except Exception:
+                  return None
+              h = hashlib.sha1()
+              h.update(("blob %d\0" % len(data)).encode())
+              h.update(data)
+              return h.hexdigest()
+
+          def sha_of(data):
+              h = hashlib.sha1()
+              h.update(("blob %d\0" % len(data)).encode())
+              h.update(data)
+              return h.hexdigest()
+
+          def get_json(url, tries=6):
+              last = None
+              for i in range(tries):
+                  try:
+                      return json.load(urllib.request.urlopen(
+                          urllib.request.Request(url, headers=H), timeout=120))
+                  except Exception as e:
+                      last = e
+                      print("  retry %d: %s" % (i + 1, e), flush=True)
+                      time.sleep(min(2 ** i, 20))
+              raise SystemExit("API fetch failed: %s (%s)" % (url, last))
+
+          def fetch_blob(sha, tries=6):
+              url = "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, sha)
+              raw_h = dict(H); raw_h["Accept"] = "application/vnd.github.raw"
+              last = None
+              for i in range(tries):
+                  try:
+                      req = urllib.request.Request(url, headers=raw_h)
+                      with urllib.request.urlopen(req, timeout=180) as r:
+                          return r.read()
+                  except Exception as e:
+                      last = e
+                      print("  blob retry %d: %s" % (i + 1, e), flush=True)
+                      time.sleep(min(2 ** i, 20))
+              raise SystemExit("blob fetch failed: %s (%s)" % (url, last))
+
+          ref_data = get_json("https://api.github.com/repos/%s/git/ref/heads/main" % REPO)
+          head_sha = ref_data["object"]["sha"]
+          commit = get_json("https://api.github.com/repos/%s/git/commits/%s" % (REPO, head_sha))
+          # [ALIMI 2026-09-12] 分层 tree 枚举（旧全量递归实测 1.24MB / 26.4s / 真实 IncompleteRead）。
+          #   ⚠️ 子树返回的 path 相对子树根（algorithms 子树给 "_x.py" 而非 "algorithms/_x.py"），
+          #   必须逐层拼接前缀，否则前缀过滤会 100% 落空（首版实测 旧 177 / 新 162 全错位）。
+          def _list_all_blobs(prefixes):
+              root = get_json("https://api.github.com/repos/%s/git/trees/%s" % (REPO, commit["tree"]["sha"]))
+              if not isinstance(root, dict) or "tree" not in root:
+                  return get_json("https://api.github.com/repos/%s/git/trees/%s?recursive=1" % (REPO, commit["tree"]["sha"])).get("tree", [])
+              out = []
+
+              def _walk(node, prefix, depth):
+                  for e in node.get("tree", []):
+                      rel = e.get("path", "")
+                      full = prefix + rel
+                      if e.get("type") == "blob":
+                          out.append({"type": "blob", "path": full, "sha": e.get("sha")})
+                      elif e.get("type") == "tree" and depth < 3:
+                          if any(full == p.split("/")[0] or full + "/" == p or p.startswith(full + "/")
+                                 or full.startswith(p.rstrip("/") + "/") for p in prefixes):
+                              sub = get_json("https://api.github.com/repos/%s/git/trees/%s" % (REPO, e.get("sha")))
+                              if isinstance(sub, dict) and "tree" in sub:
+                                  _walk(sub, full + "/", depth + 1)
+
+              _walk(root, "", 0)
+              return out
+          tree = {"tree": _list_all_blobs(("algorithms/",))}
+          for item in tree.get("tree", []):
+              if item["type"] != "blob":
+                  continue
+              path = item["path"]
+              # [ALIMI 2026-09-12] 一并补上源码过滤：旧实现无任何过滤，会把全仓 3961 个 blob
+              #   逐个 local_blob_sha() 比较（每个都要算 sha）—— 叠加 26.4s 的清单拉取必然撞 job 超时。
+              #   本步只需 fetcher 依赖的源码（algorithms/ + 根级 .py）。
+              if not (path.startswith("algorithms/") or (path.count("/") == 0 and path.endswith(".py"))):
+                  continue
+              l_sha = local_blob_sha(path)
+              if l_sha == item["sha"]:
+                  continue
+              data = fetch_blob(item["sha"])
+              if sha_of(data) != item["sha"]:
+                  raise SystemExit("blob sha mismatch: %s" % path)
+              os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+              with open(path, "wb") as f:
+                  f.write(data)
+              if l_sha == item["sha"]:
+                  continue
+              data = fetch_blob(item["sha"])
+              if sha_of(data) != item["sha"]:
+                  raise SystemExit("blob sha mismatch: %s" % path)
+              os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+              with open(path, "wb") as f:
+                  f.write(data)
+              print("  synced: %s (%d bytes)" % (path, len(data)))
+          print("sync_src OK, HEAD=%s" % head_sha)
+          PYEOF
+          python "$RUNNER_TEMP/sync_src_v8cloud.py"
+
+      - name: "🐍 安装 akshare 依赖（轻量：仅本次需要的）"
+        run: |
+          set -e
+          # 复用 v8_algo_cloud 的安装命令：python -m pip + 官方源优先 + 双镜像兜底 + import 校验
+          # （之前用 `pip install` 失败——cn runner 的 PATH 中 pip 可能指向其他 Python）
+          CORE="akshare pandas numpy requests"
+          ok=0
+          for IDX in "https://pypi.org/simple" \
+                     "https://pypi.tuna.tsinghua.edu.cn/simple" \
+                     "https://mirrors.aliyun.com/pypi/simple"; do
+            for TRY in 1 2; do
+              echo "=== pip install [index=$IDX try=$TRY] ==="
+              if python -m pip install -q --retries 3 --timeout 60 -i "$IDX" $CORE; then
+                if python -c "import akshare, pandas, numpy, requests; print('deps OK via', '$IDX', 'try=', $TRY)"; then
+                  ok=1; break 2
+                fi
+                echo "!! pip exit 0 but import 校验失败，继续换源/重试"
+              fi
+              echo "!! [$IDX] 第 $TRY 次安装失败"
+            done
+          done
+          if [ "$ok" != "1" ]; then
+            echo "::error::依赖安装失败（三源全灭）"
+            exit 1
+          fi
+          echo "✅ akshare 依赖装好"
+
+      - name: "🕘 交易时间 gate（09:00-16:30 北京时间）"
+        id: trading_hours
+        run: |
+          if [ "${{ github.event.inputs.skip_trading_day_gate }}" = "true" ]; then
+            echo "is_trading_hours=true" >> "$GITHUB_OUTPUT"
+            echo "  ⚡ 应急模式：跳过交易时间 gate（手动触发 + skip=true）"
+          else
+            python - <<'PY'
+          from datetime import datetime, timedelta
+          now = datetime.utcnow() + timedelta(hours=8)
+          hm = now.hour * 60 + now.minute
+          ok = 540 <= hm <= 990  # 09:00..16:30
+          print(f"  Beijing time: {now:%H:%M} ({'inside' if ok else 'outside'} 09:00-16:30)")
+          import os
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f"is_trading_hours={'true' if ok else 'false'}\n")
+          if not ok:
+              print("  ⏸️ 不在交易时间，跳过本次 refresh")
+          PY
+          fi
+
+      - name: "📅 交易日历 gate（非交易日自动跳过）"
+        id: trading
+        if: steps.trading_hours.outputs.is_trading_hours == 'true'
+        run: |
+          if [ "${{ github.event.inputs.skip_trading_day_gate }}" = "true" ]; then
+            echo "is_trading_day=true" >> "$GITHUB_OUTPUT"
+            echo "  ⚡ 应急模式：跳过交易日历 gate（手动触发 + skip=true）"
+          else
+            python algorithms/check_trading_day.py
+          fi
+
+      - name: "🧮 跑 fetch_stock_quote_v8.py（5-10 分钟）"
+        if: steps.trading.outputs.is_trading_day == 'true'
+        run: |
+          set +e
+          cd algorithms && python fetch_stock_quote_v8.py
+          rc=$?
+          echo "fetch_stock_quote_v8 exit: $rc"
+          # 🛡 2026-09-07 假 success 根治（主人令「禁止假 success · 一劳永逸」）：
+          #   fetch_stock_quote_v8.py 内置 A 股数量守卫——a_count < 3000（新浪+东财双源均不可用）
+          #   时 return 1 且【刻意不写输出、保留旧文件】，以防残缺数据覆盖全市场表。
+          #   但旧文件必然非空 → 下方 -s 检查 100% 通过 → 原本无条件 exit 0 → job 全绿，
+          #   2026-09-07 实测：本 workflow 一天 7 次 dispatch 全 success，
+          #   而 raw_data/stock_quote.json 停在 09-04 18:32（3 天未更新），
+          #   下游 TOP10/三重共识/最终推荐/候选池/CRDS 全部陈旧，主人看板「已停更 N 天」才暴露。
+          #   修复：rc != 0 一律显式 exit 1，让运维页/告警链路可见（与 2026-08-22「推送失败
+          #   不得被 exit 0 吞掉」的铁律同源）。保留旧数据的保护逻辑不动——那是正确的。
+          if [ "$rc" != "0" ]; then
+            echo "::error::fetch_stock_quote_v8 抓取失败 rc=$rc —— A股行情双源(新浪/东财)不可用，已按设计保留旧数据，本次未产出新行情"
+            exit 1
+          fi
+          # 单独跑 fetch 时，merge_fundamental_quality 可能因 raw_data/fundamental_quality.json
+          # 缺失而跳过（脚本内已 try/except），不影响主产物。我们对失败也兜底：raw_data 有内容即可。
+          if [ ! -s ../raw_data/stock_quote.json ] || [ ! -s ../data/STOCK_QUOTE.js ]; then
+            echo "::error::输出缺失：raw_data/stock_quote.json 或 data/STOCK_QUOTE.js 之一为空"
+            ls -la ../raw_data/stock_quote.json ../data/STOCK_QUOTE.js 2>&1 || true
+            exit 1
+          fi
+          echo "✅ raw_data/stock_quote.json: $(wc -c < ../raw_data/stock_quote.json) bytes"
+          echo "✅ data/STOCK_QUOTE.js:       $(wc -c < ../data/STOCK_QUOTE.js) bytes"
+          exit 0
+
+      - name: "📤 推送 raw_data/stock_quote.json + data/STOCK_QUOTE.js（Contents API，绕开 cn git 墙）"
+        if: steps.trading.outputs.is_trading_day == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os, json, base64, urllib.request, urllib.error, hashlib, time
+          TOK = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          H = {"Authorization": "Bearer " + TOK,
+               "Content-Type": "application/json",
+               "Accept": "application/vnd.github+json",
+               "X-GitHub-Api-Version": "2022-11-28"}
+
+          def api(method, url, data=None):
+              body = json.dumps(data).encode() if data is not None else None
+              req = urllib.request.Request(url, data=body, headers=H, method=method)
+              for i in range(5):
+                  try:
+                      with urllib.request.urlopen(req, timeout=120) as r:
+                          return json.load(r)
+                  except urllib.error.HTTPError as e:
+                      if e.code in (409, 422) and method == "GET":
+                          # GET should not 409; re-raise
+                          raise
+                      if e.code in (409, 422) and method == "PUT":
+                          # sha mismatch, refetch and retry
+                          pass
+                      if i == 4:
+                          raise
+                      time.sleep(2 ** i)
+                  except Exception:
+                      if i == 4:
+                          raise
+                      time.sleep(2 ** i)
+
+          files = [
+              ("raw_data/stock_quote.json", "raw_data/stock_quote.json"),
+              ("data/STOCK_QUOTE.js", "data/STOCK_QUOTE.js"),
+          ]
+          for local, remote in files:
+              if not os.path.exists(local):
+                  print(f"  ❌ {local} 不存在，跳过")
+                  continue
+              with open(local, "rb") as f:
+                  content = f.read()
+              print(f"  push {remote}  ({len(content)} bytes)")
+              # get existing sha
+              get_url = f"https://api.github.com/repos/{REPO}/contents/{remote}"
+              try:
+                  existing = api("GET", get_url)
+                  sha = existing.get("sha")
+              except urllib.error.HTTPError as e:
+                  if e.code == 404:
+                      sha = None
+                  else:
+                      raise
+              payload = {
+                  "message": "chore(stock-quote): refresh STOCK_QUOTE via v8_stock_quote_refresh",
+                  "content": base64.b64encode(content).decode(),
+                  "branch": "main",
+              }
+              if sha:
+                  payload["sha"] = sha
+              put_url = f"https://api.github.com/repos/{REPO}/contents/{remote}"
+              api("PUT", put_url, payload)
+              print(f"    ✅ pushed {remote}")
+          print("push done")
+          PY
+
+      # 🔴 2026-08-18 与 v8_algo_cloud 一致：刷新 data/STOCK_QUOTE.js 后，必须更新
+      #   index.html 里 ?v= 内容 sha，否则 CDN 继续吐旧 STOCK_QUOTE 副本。
+      - name: "🔄 同步 STOCK_QUOTE.js 缓存戳 ?v 并推送 index.html"
+        if: steps.trading.outputs.is_trading_day == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os, re, json, base64, urllib.request, urllib.error
+          TOK = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          H = {"Authorization": "Bearer " + TOK,
+               "Content-Type": "application/json",
+               "Accept": "application/vnd.github+json",
+               "X-GitHub-Api-Version": "2022-11-28"}
+
+          def api(method, url, data=None):
+              body = json.dumps(data).encode() if data is not None else None
+              req = urllib.request.Request(url, data=body, headers=H, method=method)
+              with urllib.request.urlopen(req, timeout=120) as r:
+                  return json.load(r)
+
+          # 1) 算 STOCK_QUOTE.js 内容 sha1（取前 10 位，?v= 约定）
+          with open("data/STOCK_QUOTE.js", "rb") as f:
+              content_sha = __import__("hashlib").sha1(f.read()).hexdigest()[:10]
+          print(f"  new STOCK_QUOTE.js sha10 = {content_sha}")
+
+          # 2) 读 index.html，找 STOCK_QUOTE.js?v=xxxxxx 替换
+          with open("index.html", "r", encoding="utf-8") as f:
+              html = f.read()
+          # 匹配: <script src="data/STOCK_QUOTE.js?v=..."></script>
+          pattern = r'(<script[^>]*src=["\']data/STOCK_QUOTE\.js\?v=)([a-f0-9]+)(["\'])'
+          new_html, n = re.subn(pattern, lambda m: m.group(1) + content_sha + m.group(3), html)
+          if n == 0:
+              print("  ⚠️ index.html 中未找到 STOCK_QUOTE.js?v= 引用，可能已被外链替换；跳过 ?v 更新")
+          elif new_html == html:
+              print(f"  STOCK_QUOTE.js?v= 已是 {content_sha}，无需变更")
+          else:
+              print(f"  替换了 {n} 处 STOCK_QUOTE.js?v= → {content_sha}")
+              # 3) 推送 index.html
+              idx_url = f"https://api.github.com/repos/{REPO}/contents/index.html"
+              try:
+                  existing = api("GET", idx_url)
+                  sha = existing.get("sha")
+              except urllib.error.HTTPError as e:
+                  if e.code == 404:
+                      sha = None
+                  else:
+                      raise
+              payload = {
+                  "message": f"chore(cache): STOCK_QUOTE.js?v={content_sha}",
+                  "content": base64.b64encode(new_html.encode("utf-8")).decode(),
+                  "branch": "main",
+              }
+              if sha:
+                  payload["sha"] = sha
+              api("PUT", idx_url, payload)
+              print(f"  ✅ index.html 已推送（?v={content_sha}）")
+          PY
+
+      - name: "✅ 完成摘要"
+        if: steps.trading.outputs.is_trading_day == 'true'
+        run: |
+          echo "=== STOCK_QUOTE 轻量 refresh 完成 ==="
+          ls -la data/STOCK_QUOTE.js raw_data/stock_quote.json
+          echo "==="
+          echo "下次 v8_build_deploy 会自动把新 STOCK_QUOTE.js 嵌入 index.html（?v 已对齐）"

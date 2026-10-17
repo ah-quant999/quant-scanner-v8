@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# 🛡 防覆盖闸门 v2（2026-09-20）— quant-scanner-v8 家机跟随者保护
+#
+# 定位：家机（阿狸咪 / alimi-cn / hostname Cat）是**跟随者**，发布一律走
+#       Git Data API（base_tree + force:false）或 Contents API；本地 `git push`
+#       一旦是非快进/强推，就会**改写远端 main 权威历史**（覆盖他人提交）。
+#
+# 主机感知：仅当存在标记 ~/.workbuddy/v8_home_block_push 时启用。
+#           小九机（lemoncat-cn）无此标记 → 完全放行，行为与安装前一致。
+#
+# 判据（**不依赖 git 喂给 pre-push 的 stdin** —— 实测非快进场景 stdin 为空）：
+#   · 推非 main 分支/标签            → 放行（不影响任何人）
+#   · 推 main 且「远端 main 是本地 main 的祖先」→ 放行（快进=纯追加，无损）
+#   · 推 main 且非快进(non-fast-forward) → 🚫 拦截（含 --force，会覆盖远端历史）
+#
+# 不影响：心跳/数据推送走 Contents API（alimi_heartbeat / api_push_*）；
+#         deploy_v8 / guard_v8 在【临时克隆】里推送（各用自己 clone 的 hooks）。
+# 安装：python scripts/install_git_hooks.py   （幂等；双机各跑一次）
+# 卸载：删 ~/.workbuddy/v8_home_block_push（或本文件）
+set -uo pipefail
+
+MARKER="$HOME/.workbuddy/v8_home_block_push"
+[ -f "$MARKER" ] || exit 0
+
+remote_name="${1:-origin}"
+zero="0000000000000000000000000000000000000000"
+BLOCK=0
+
+# 远端 main 真值：优先远程跟踪分支，退化到 FETCH_HEAD（浅克隆/API 拉取后常见）
+REMOTE_MAIN="$(git rev-parse --verify --quiet "refs/remotes/${remote_name}/main" 2>/dev/null \
+  || git rev-parse --verify --quiet FETCH_HEAD 2>/dev/null || echo '')"
+
+# --- 路径A：解析 stdin（git 正常会喂 ref 行；空则跳过）---
+while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
+  [ -z "$local_ref" ] && continue
+  [ "$remote_ref" = "refs/heads/main" ] || continue
+  [ "$local_sha" = "$zero" ] && continue          # 删分支：放行
+  base="$remote_sha"
+  [ "$base" = "$zero" ] && base="$REMOTE_MAIN"    # 远端尚无该 ref → 用真值
+  [ -z "$base" ] && continue
+  git merge-base --is-ancestor "$base" "$local_sha" 2>/dev/null || BLOCK=1
+done
+
+# --- 路径B：状态直查（关键防护，不依赖 stdin）---
+if [ "$BLOCK" != "1" ]; then
+  cur="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
+  if [ "$cur" = "main" ] && [ -n "$REMOTE_MAIN" ]; then
+    git merge-base --is-ancestor "$REMOTE_MAIN" main 2>/dev/null || BLOCK=1
+  fi
+fi
+
+if [ "$BLOCK" = "1" ]; then
+  cat >&2 <<'MSG'
+🚫 pre-push 拦截（防覆盖·家机跟随者铁律）
+   本次 `git push` 会【覆盖/改写远端 main 权威历史】——已在本机拦下，未触网。
+   放行条件：远端 main 是本地 main 的祖先（快进推送，纯追加）。
+   当前状态：远端 main 不是本地 main 的祖先（本地落后 或 历史分叉）→ 拒绝（含 --force）。
+   正确发布路径：
+     · 源码/配置 → Git Data API（base_tree + force:false）
+     · 心跳/数据 → Contents API（alimi_heartbeat / api_push_*）
+     · 或交小九机（lemoncat-cn，工作日腿）推送
+   绕过（不推荐）：删除 ~/.workbuddy/v8_home_block_push 或本文件
+MSG
+  exit 1
+fi
+
+exit 0

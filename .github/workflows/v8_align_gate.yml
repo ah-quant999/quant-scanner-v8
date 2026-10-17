@@ -1,0 +1,77 @@
+# 九宝量化 v8.0 — [4/8] align_logic_ops 门禁「前移」（GitHub 云端 ubuntu-latest）
+#
+# 2026-09-23 阿狸咪的工程师 —— 同族第 4 次复发后的一劳永逸收口。
+#
+# 🔴 故障史（同一根因，48 小时内外共 4 次）：
+#   新增/修改**带 cron 的 workflow** 时漏「同批双登记」——
+#     ① align_logic_ops.py 的 MUST_HAVE_CRON / ALLOW_NO_CRON 名单
+#     ② 文档源（index.html 的 sec-op 隐藏同步清单 / logic.html 的 sec-lg 防漏表）
+#   而双登记**只在 v8_build_deploy 的 [4/8] 里校验** ⇒ 门禁 exit 2 ⇒ 阻断 deploy
+#   ⇒ **数据推了不部署**（线上停更，但 Actions 里看见的是「build failure」）。
+#   最近两次实证：v8_zombie_reaper（15:35 入库 → 15:41 起 5 档红）、
+#                v8_dajijin_fetch（21:13:49 入库 → 21:17 起 4 档红，其中含我方 3 档）。
+#
+# 🔴 结构性缺口（本次实测定性，非推断）：
+#   `v8_build_deploy.yml` 的 `on.push.paths` **不含 `.github/workflows/**`**
+#   ⇒ 推入 / 修改 workflow **根本不触发该门禁**，只能等**下一次 data / index push** 才暴露。
+#   再叠加同并发组连续 `cancelled`（2026-09-23 的 #7914–#7919 全 cancelled）
+#   ⇒ 阻断被静默掩盖近 4 分钟，连红 4 档才被人看见。
+#
+# ✅ 本链 = 把校验**前移**到「workflow / 门禁脚本自身变更的那一次 push」，1 分钟内显红。
+#   🔴 刻意**不**把 `.github/workflows/**` 加进 `v8_build_deploy` 的 paths：
+#      实测近 20 笔 workflow 提交 ≈ 13 笔/日（多为一次性探针 workflow 的建/删对），
+#      那样会让每次探针增删都触发一次**全量构建部署（~8min）**，正是本项目已明令避免的风暴形态
+#      （参见 v8_build_deploy.yml 内 paths 注释：「不用 docs/ops/** —— 否则每次改交接档
+#        都触发一次全量构建（风暴）」）。
+#   本链只做：`actions/checkout` + `python3 align_logic_ops.py`（纯读文件比对，~20s，
+#   **无 build、无 deploy、不推送任何东西**）。
+#
+# 🧩 为什么不监听 index.html：它**已在** `v8_build_deploy` 的 paths 内（本身就会跑 [4/8]），
+#   且每次构建都会被改写 ?v ⇒ 纳入本链只会产生与 build_deploy 重复的空跑。
+#   而 `logic.html` **不在** build_deploy 的 paths 内 ⇒ 单独改它（例如误删某个 stem）
+#   同样不会触发任何门禁 ⇒ 本链把它一并纳入，补齐这半个盲区。
+#
+# 安全（与仓内其余云端链同口径）：
+#   1. 只读（`permissions.contents: read`），不写仓库、不用任何 secret；
+#   2. 不装第三方依赖（align_logic_ops.py 只用标准库）；
+#   3. 单职责：只跑门禁脚本，**退出码即结论**（0 = 通过；2 = 有漂移，会打印与 CI step10 同款文本）。
+
+name: "🧭 v8 门禁前移(双登记校验)"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - 'align_logic_ops.py'
+      - 'logic.html'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v8-align-gate
+  cancel-in-progress: true
+
+jobs:
+  align:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: "🧭 [4/8] align_logic_ops —— 新增/改 cron 的 workflow 必须同批双登记"
+        run: |
+          echo "── 门禁前移：与 v8_build_deploy 的 step10 [4/8] 同脚本、同真源、同判据 ──"
+          echo "判据 ①：有 cron 的 workflow 必须登记进 MUST_HAVE_CRON 或 ALLOW_NO_CRON；"
+          echo "判据 ②：MUST_HAVE_CRON 项必须在文档源（index.html sec-op / logic.html sec-lg）出现字面量；"
+          echo "判据 ③：名单自净 —— 登记了但 .github/workflows/ 下无对应文件 = 死登记。"
+          echo "🔴 有漂移时的修法："
+          echo "   1) 在 align_logic_ops.py 的 MUST_HAVE_CRON 增加一行 \"<stem>\": \"<中文说明>\"；"
+          echo "   2) 在 index.html 的 sec-op 隐藏同步清单（搜「项 MUST_HAVE_CRON」）更新计数 + 加 stem；"
+          echo "   3) 在 logic.html 的 sec-lg「本表之外仍在跑的定时项（防漏）」表补一行；"
+          echo "   4) 三处同批推送（缺一即红）。"
+          python3 align_logic_ops.py
