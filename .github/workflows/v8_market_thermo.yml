@@ -1,0 +1,169 @@
+# 九宝量化 v8.0 — 🔮「未来预测」子TAB数据 fetcher 调度（cn runner）
+#
+# 2026-10-05 阿狸咪的工程师 建（主人令：未来预测子TAB · 牛转熊指标观测台 · 每日更新）。
+# 2026-10-05 补（主人令："每日自动审计不能只是说说，要落实到位"）：
+#   推送前强制跑 v8/audit_market_thermo.py 审计门禁（结构层+akshare真值交叉核验），
+#   审计 exit!=0 -> 推送步骤不执行 -> Actions 红灯可见。硬闸，非日志说说。
+# 单一职责：跑 v8/gen_market_thermo.py -> data/MARKET_THERMO.js -> 审计门禁 -> api_push_raw 入仓。
+# 数据链路：sw_index_daily_cache(等权/PE分位) + gtimg(上证月K/成交量/实时点位)
+#           + akshare(社融脉冲/PMI) + raw_data 缓存(融资/国债/沪深300PE)。
+# 健壮性：单源失败自动回退上一版同字段；D 骨架重建失败则不写盘退出（宁旧勿错）。
+#
+# 安全铁律（与 v8_lhb_fetch.yml 同步）：
+#   1. 严禁 actions/checkout / rm -rf / git clean -fdx / Remove-Item -Recurse。
+#   2. 严禁 git clone/fetch，仅走 GitHub Contents API 同步源码。
+#   3. index.html 绝不经本链推送（_SKIP_LOCAL_PUSH 护栏）。
+name: "🔮 v8 未来预测数据 fetcher (cn runner)"
+
+on:
+  schedule:
+    # 交易日 16:10 CST 盘后（收盘数据落定后；社融/PMI 月频公布，当日未发布沿用最近值）
+    - cron: '10 8 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-market-thermo
+  cancel-in-progress: false
+
+jobs:
+  market-thermo:
+    runs-on: [self-hosted, cn]
+    env:
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+    timeout-minutes: 30
+    steps:
+      - name: "📝 同步源码（安全）"
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # 2026-10-17 补 scripts/update_sw_index_cache.py（27年走势截断根因修复：行业日K缓存此前无人日更）
+          $TARGETS = @('v8/gen_market_thermo.py', 'v8/audit_market_thermo.py', 'v8/fetch_raw_data_thermo.py', 'scripts/update_sw_index_cache.py')
+          $headers = @{
+            'User-Agent' = 'v8-market-thermo'
+            'Accept'     = 'application/vnd.github.raw'
+            'Authorization' = "Bearer $env:GH_PAT"
+          }
+          New-Item -ItemType Directory -Force -Path v8, scripts | Out-Null
+          foreach ($TARGET in $TARGETS) {
+            $URL = "https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/$($TARGET -replace '/','%2F')?ref=main"
+            $local = ($TARGET -replace '/', '_') + '.tmp'
+            try {
+              $r = Invoke-RestMethod -Uri $URL -Headers $headers -TimeoutSec 60 -Method Get
+              [System.IO.File]::WriteAllText($local, $r, [System.Text.Encoding]::UTF8)
+              Move-Item -Force $local $TARGET
+              Write-Host "fetched $TARGET from origin/main"
+            } catch {
+              Write-Host "[warn] API fetch failed for ${TARGET}: $_ ; using local copy" -ForegroundColor Yellow
+            }
+          }
+
+      - name: "🐍 Python / deps 环境检查"
+        shell: powershell
+        run: |
+          python --version
+          python -c "import pandas, requests, openpyxl" 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "deps missing, installing from tsinghua mirror..."
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pandas requests openpyxl
+          } else { Write-Host "deps ready" }
+
+      - name: "📦 同步 raw_data 缓存依赖（gen 输入·仅5文件·Git Data API·sha校验·tries=6）"
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          python v8/fetch_raw_data_thermo.py
+
+      - name: "🏭 日更申万一级行业日K缓存（31文件·截断根因修复 2026-10-17）"
+        shell: powershell
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          # 根因：gen_market_thermo 读本地 31 个行业日K CSV，此前 10-05 手工种下后无人日更
+          #      → 缓存冻结在月末 → 27年走势图右端整月缺失（主人 10-17「今的数据又被截断了」）。
+          #      update_sw_index_cache.py 幂等增量合并（无新交易日文件不动），cn 出口直连 akshare。
+          python scripts/update_sw_index_cache.py
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "[GATE-FAIL] SW cache update failed -> red (prefer visible alarm)" -ForegroundColor Red
+            exit 1
+          }
+
+      - name: "📊 跑 gen_market_thermo.py（交易日闸）"
+        id: gen
+        shell: powershell
+        run: |
+          $dow = (Get-Date).DayOfWeek.value__
+          # 2026-10-17：周末闸仅对 schedule 生效；workflow_dispatch 允许（幂等，主人周末手动跑批惯例）
+          if (($dow -eq 0 -or $dow -ge 6) -and '${{ github.event_name }}' -eq 'schedule') { Write-Host "[skip] weekend (scheduled)"; exit 0 }
+          cd $env:GITHUB_WORKSPACE
+          python v8/gen_market_thermo.py
+          if (Test-Path 'data/MARKET_THERMO.js') {
+            Write-Host "[ok] data/MARKET_THERMO.js refreshed"
+          } else {
+            Write-Host "[warn] MARKET_THERMO.js missing (D rebuild failed; keep old to avoid error)"
+          }
+
+      - name: "🔍 审计门禁（结构层+akshare真值交叉核验 · 硬闸）"
+        id: audit
+        if: steps.gen.outcome == 'success'
+        shell: powershell
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          if (-not (Test-Path 'data/MARKET_THERMO.js')) {
+            Write-Host "[GATE-FAIL] gen ok but product missing -> abnormal, red block" -ForegroundColor Red
+            exit 2
+          }
+          $venvPy = "$env:USERPROFILE\.workbuddy\binaries\python\envs\default\Scripts\python.exe"
+          $audPy = if (Test-Path $venvPy) { $venvPy } else { 'python' }
+          & $audPy v8/audit_market_thermo.py
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "[GATE-FAIL] audit gate failed(exit=$LASTEXITCODE) -> block push" -ForegroundColor Red
+            exit $LASTEXITCODE
+          }
+          Write-Host "[GATE-PASS] audit all green -> allow push"
+
+      - name: "📤 推送到仓库（api_push_raw · PUSH_FILES）"
+        id: push
+        if: steps.gen.outcome == 'success' && steps.audit.outcome == 'success'
+        shell: powershell
+        env:
+          PUSH_FILES: "data/MARKET_THERMO.js"
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          if ((Test-Path 'data/MARKET_THERMO.js') -and ((Get-Item 'data/MARKET_THERMO.js').Length -gt 3000)) {
+            python api_push_raw.py
+          } else {
+            Write-Host "[skip] product missing or too small, not pushing (guard: prevent blank overwrite)"
+          }
+
+      - name: "🚨 结果闸门（gen失败/审计skip/推送skip -> 红灯，禁绿灯假象）"
+        if: always()
+        shell: powershell
+        run: |
+          $gen = '${{ steps.gen.outcome }}'
+          $aud = '${{ steps.audit.outcome }}'
+          $push = '${{ steps.push.outcome }}'
+          Write-Host "gen=$gen audit=$aud push=$push"
+          if ($gen -ne 'success') {
+            Write-Host "[GATE] gen not success($gen) -> RED (prefer visible alarm over silent stale data)" -ForegroundColor Red
+            exit 1
+          }
+          if ($aud -ne 'success') {
+            Write-Host "[GATE] audit failed or skipped($aud) -> RED" -ForegroundColor Red
+            exit 1
+          }
+          if ($push -ne 'success') {
+            Write-Host "[GATE] push not executed($push) -> RED" -ForegroundColor Red
+            exit 1
+          }
+          Write-Host "[GATE] gen+audit+push full chain OK [OK]" -ForegroundColor Green
