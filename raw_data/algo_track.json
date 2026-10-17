@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-17 23:52",
+  "update_time": "2026-10-18 00:54",
   "window_days": 90,
   "horizons": [
     5,
@@ -2197,7 +2197,7 @@
           "peak_pct": 0.0,
           "days_in": 5,
           "appear_count": 1,
-          "last_seen": "20261017",
+          "last_seen": "20261018",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 散户金叉 + 主力金叉",
@@ -2216,7 +2216,7 @@
           "peak_pct": 0.0,
           "days_in": 5,
           "appear_count": 1,
-          "last_seen": "20261017",
+          "last_seen": "20261018",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
@@ -2235,7 +2235,7 @@
           "peak_pct": 0.0,
           "days_in": 5,
           "appear_count": 1,
-          "last_seen": "20261017",
+          "last_seen": "20261018",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -5083,7 +5083,7 @@
   ],
   "_meta": {
     "version": "v1",
-    "schema_date": "2026-10-17",
+    "schema_date": "2026-10-18",
     "note": "单算法（四量终极）独立追踪；entry=信号日收盘；by_horizon=从近到远的分档前向收益 T+5…T+90（有多少天算多少天，只取 kline_cache 日线，扣双边 0.3%，不含中途止损止盈）；unrealized=当日浮动（用实时价）；coverage=样本就绪度；win_rate/avg_return 无历史样本时为 null（不是 0）"
   }
 }

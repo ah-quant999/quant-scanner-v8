@@ -1,8 +1,10 @@
 {
-  "update_time": "2026-10-18 00:09:36",
-  "run_start": "2026-10-17 23:41:29",
-  "ok": 24,
+  "update_time": "2026-10-18 01:14:05",
+  "run_start": "2026-10-18 00:43:49",
+  "ok": 23,
   "fail": 0,
   "failed_scripts": [],
-  "skipped_by_time_gate": []
+  "skipped_by_time_gate": [
+    "fetch_weekend_run.py"
+  ]
 }
