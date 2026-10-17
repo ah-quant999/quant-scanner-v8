@@ -1745,8 +1745,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      故不再注入 AI_INSIGHTS_COMPARE 数据文件（文件本身连同 fetcher 一并从仓库删除）。 -->
 <script src="data/WAVE_ELLIOTT.js?v=58cff151d2" defer></script>
 <script src="data/SZ_FIB.js?v=37e6cce1db" defer></script>
-<script src="data/SECTOR_RS.js?v=bacc1ad072" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=7a6c385414" defer></script>
+<script src="data/SECTOR_RS.js?v=19a1b2eb64" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=be46504c78" defer></script>
 <script src="data/INST_TRADE.js?v=7abd6f27ee" defer></script>
 <script src="data/NORTH_FUND.js?v=bb27b3633d" defer></script>
 <script src="data/MARKET_ALERTS.js?v=60b8d1c763" defer></script>
@@ -1776,7 +1776,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=3a7981a78c" defer></script>
 <script src="data/EXPERIMENT.js?v=92856cca6e" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=7f73b7018f" defer></script><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=b7c63aabaa" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=7f73b7018f" defer></script><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=4a5dec2573" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=79689616ec" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=a4cd098fcf" defer></script>
@@ -1791,11 +1791,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 🔴 2026-10-06 阿狸咪的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
 <script src="data/ETF_PULSE.js?v=89d783bdae" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=ed993b740c" defer></script>
-<script src="data/TOP10_DAILY.js?v=f2da99ec4d" defer></script>
+<script src="data/TOP10_DAILY.js?v=7f80f8aa4f" defer></script>
 <script src="data/WEEKEND_RUN.js?v=051b92f12d" defer></script>
 <script src="data/W52_HIGH.js?v=67c4bb927b" defer></script>
 <!-- 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填） -->
-<script src="data/SECTOR_YEAR_FLOW.js?v=1f4c9e7a02" defer></script>
+<script src="data/SECTOR_YEAR_FLOW.js?v=5155a7ca34" defer></script>
 <!-- 2026-08-30：盘后数据页新增解禁日历 + 业绩预告 -->
 <script src="data/RESTRICTED_RELEASE.js?v=9a1162559b" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=0ec356c368" defer></script>
@@ -1805,7 +1805,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RUNNER_STATUS.js?v=34d689895b" defer></script>
 <script src="data/HB_XIAOJIU.js?v=b619e22add" defer></script>
     <script src="data/AUDIT_TRAIL.js?v=7e1f7224dd" defer></script>
-<script src="data/HEALTH_CHECK.js?v=d36b309e9c" defer></script>
+<script src="data/HEALTH_CHECK.js?v=fb34277c41" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=db61a9604e" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=019b78f97e" defer></script>
@@ -18682,7 +18682,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=71951a8cb5', fallbacks:[A2_CDN+'STOCK_LIST.js']},
     {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=cdf1f4e154', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
-    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=bf5621d1a4', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
+    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=c81070c656', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
     var srcs=[item.url].concat(item.fallbacks||[]);
