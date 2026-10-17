@@ -2537,10 +2537,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           // 2026-08-30：标签不再硬写 880003（数据可能来自全A等权口径），按 source 字段自述
           var _srcTag=(ap.source&&String(ap.source).indexOf('880003')>=0)?'880003':'全A等权';
           h+='<span style="padding:2px 8px;border-radius:4px;background:'+ac.tag+';color:'+ac.c+';">💰 平均股价·'+_srcTag+'</span>';
-          h+=lightDot(_chg>0?'green':(_chg<-0.2?'red':'yellow'), 11);
+          h+=lightDot(_chg>0.2?'red':(_chg<-0.2?'green':'yellow'), 11);
           h+='<b style="font-size:15px;">'+Number(ap.avg_price).toFixed(2)+'</b>';
           h+=' <span style="color:'+_cCol+';font-weight:700;">'+_cTxt+'</span>';
-          if(ap.prev_avg_price!=null){ var _df=ap.avg_price-ap.prev_avg_price; h+=' <span style="color:'+(_df>=0?'var(--up)':'var(--down)')+';font-size:12px;">较昨日 '+(_df>=0?'+':'')+_df.toFixed(3)+'</span>'; }
+          /* 2026-10-17 主人令「统一口径」：删除「较昨日」均价水平差——它与左侧等权涨跌幅（avg_change_pct·个股涨跌幅等权平均）是两个不同数学事实并排易误读（当日实证 +0.50% vs -0.042）。本卡涨跌语义统一为等权涨跌幅单一口径；圆点同步修为红涨绿跌+阈值对称±0.2%。 */
           // 2026-09-16 主人令：截图标注的「均线对比文本段」整段删除（20 日线、60 日线两项）。
           //   原两行文本已删。注意 _hd 必须保留——超买超卖胶囊的未就绪态要用它承载
           //   「数据积累进度」（原由该段承担）；另 ap.ma20/ma60 在未就绪时数据层会写同一个占位值，
