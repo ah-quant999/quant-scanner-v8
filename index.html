@@ -16275,7 +16275,8 @@ h += '</div>'; // /ulPaneObserve
       var li=shData.length-1, lx=xScale(li);
       var ldt=shData[li].date||'';
       if(ldt && ldt.length===8 && ldt.indexOf('/')<0) ldt=ldt.slice(4,6)+'/'+ldt.slice(6);
-      html+='<text x="'+lx.toFixed(1)+'" y="'+(H-PAD.bottom+14)+'" text-anchor="middle" font-size="10" fill="#e91e63" font-weight="bold">'+ldt+'</text>';
+      /* 2026-10-17 修复：末标签原 middle 锚定位在图最右缘(PAD.right=10)，「10/15」右半溢出 viewBox 被裁成「10/1」→ 改 end 锚收进图内 */
+      html+='<text x="'+(lx+8).toFixed(1)+'" y="'+(H-PAD.bottom+14)+'" text-anchor="end" font-size="10" fill="#e91e63" font-weight="bold">'+ldt+'</text>';
     }
     html+='<text x="'+(PAD.left+5)+'" y="'+(PAD.top-8)+'" font-size="11" fill="#42a5f5">● 融资余额</text>';
     html+='<text x="'+(PAD.left+95)+'" y="'+(PAD.top-8)+'" font-size="11" fill="#e91e63">● 融券余额</text>';
