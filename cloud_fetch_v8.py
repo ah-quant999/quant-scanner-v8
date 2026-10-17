@@ -5745,7 +5745,7 @@ def main(category=None, only=None):
             hist.append({
                 "date": today_str,
                 "avg_price": round(avg_price, 4),
-                "avg_change_pct": round(avg_change, 4),
+                "avg_change_pct": round((avg_price / prev_price - 1) * 100, 4) if prev_price else 0.0,
                 "count": count,
             })
             hist = sorted(hist, key=lambda x: x.get("date", ""))[-60:]
@@ -5800,7 +5800,7 @@ def main(category=None, only=None):
                 "source": "全A等权自算(东财em_clist)",
                 "index_name": "平均股价(全A等权)",
                 "avg_price": round(avg_price, 4),
-                "avg_change_pct": round(avg_change, 4),
+                "avg_change_pct": round((avg_price / prev_price - 1) * 100, 4) if prev_price else 0.0,
                 "prev_avg_price": round(prev_price, 4) if prev_price else None,
                 "count": count,
                 # 🔴 2026-09-18：样本不足写 null，不再用 min() 伪装；MA 由 880003 主口径覆盖

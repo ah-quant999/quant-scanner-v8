@@ -2847,8 +2847,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <h3><span class="ic">🏭</span>行业树图 · 细分赛道 · <span class="fresh" id="htUpdateTime">—</span></h3>
       <div id="industryTreemap" style="min-height:260px;overflow:visible;"></div>
       <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center;">
-        <span>大块=行业 &nbsp; 小块=个股</span>
-        <span>颜色=涨跌 &nbsp; 面积≈市值</span>
+        <span>方块=行业/概念板块</span>
+        <span>颜色=涨跌（红涨绿跌）&nbsp; 面积≈|当日涨幅%|</span>
       </div>
     </div>
 
@@ -11361,14 +11361,14 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
       if(!strongest || v>strongest.net){ strongest={name:x.name, code:x.code, net:v, chg:x.chg||0, pct:x.pct||0}; }
     });
     if(strongest && strongest.net>0){
-      analysis.push('📊 <b>今日最强：</b>'+strongest.name+'（'+strongest.code+'）主力净流入 '+(strongest.net/1e8).toFixed(1)+'亿，涨'+strongest.chg.toFixed(2)+'%，占成交比 '+strongest.pct.toFixed(1)+'%，获资金主动追捧。');
+      analysis.push('📊 <b>今日最强：</b>'+strongest.name+'（'+strongest.code+'）主力净流入 '+(strongest.net/1e8).toFixed(1)+'亿，'+(strongest.chg>=0?'涨':'跌')+strongest.chg.toFixed(2)+'%，占成交比 '+strongest.pct.toFixed(1)+'%，获资金主动追捧。');
     }
 
     // 3) 盘中异动：量比最显著的 ETF + 异动榜收红广度
     if(pulseEtfs.length){
       var top=pulseEtfs[0];
       var upN=pulseEtfs.filter(function(e){ return e.chg>=0; }).length;
-      analysis.push('⚡ <b>盘中异动：</b>'+top.name+'（'+top.code+'） 量比高达 '+top.vol.toFixed(1)+'（涨'+top.chg.toFixed(2)+'%），放量最突出；异动榜 '+upN+'/'+pulseEtfs.length+' 只收红，短线情绪偏'+(upN>pulseEtfs.length/2?'热':'分化')+'。');
+      analysis.push('⚡ <b>盘中异动：</b>'+top.name+'（'+top.code+'） 量比高达 '+top.vol.toFixed(1)+'（'+(top.chg>=0?'涨':'跌')+top.chg.toFixed(2)+'%），放量最突出；异动榜 '+upN+'/'+pulseEtfs.length+' 只收红，短线情绪偏'+(upN>pulseEtfs.length/2?'热':'分化')+'。');
     }
 
     // 4) 综合：全市场净流入总额 + 居首类别 + 上涨广度
@@ -12333,7 +12333,7 @@ function drawUpDownChart(){
 
           {name:'ETF盘中异动', source:'ETF_PULSE', freq:'盘中实时', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'T+0 资金流向'},
 
-          {name:'主力净额分时累计曲线', source:'MARKET_FUND_FLOW_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'两市净流入'},
+          {name:'主力净额分时累计曲线', source:'SECTOR_FUND_FLOW_INTRADAY', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'板块主力净额分时(两市累加)'},
 
           {name:'商品涨价弹性榜', source:'COMMODITY_ELASTICITY', freq:'每日盘后', slots:['1','7',':','3','0'], note:'商品弹性'},
 
@@ -13047,7 +13047,7 @@ function drawUpDownChart(){
   const _PAGE_CARD_ORDER = {
     '观测平台': ['SH_FIB', 'maharo_insights', 'INDEX_VALUE_FRAMEWORK', 'WAVE_ELLIOTT', 'CITIC_PE_THERMO'],
     '今日事件': ['V8_CAL', 'IPO_DATA', 'JUDGMENT_DATA', 'MACRO_DATA', 'RESTRICTED_RELEASE', 'PERFORMANCE_FORECAST'],
-    '实时数据': ['INDEX_QUOTES', 'ETF_PULSE', 'ETF_INTRADAY_HEAT', 'SECTOR_FUND_FLOW', 'CONCEPT_RANKING', 'LIMIT_UP_HEATMAP', 'MARKET_FUND_FLOW_DATA', 'MARKET_ALERTS', 'STOCK_QUOTE', 'CFFEX_HOLDINGS', 'AVG_PRICE_DATA', 'OVERSEAS_MARKETS', 'AI_MARKET_BRIEF', 'COMMODITY_ELASTICITY'],
+    '实时数据': ['INDEX_QUOTES', 'ETF_PULSE', 'ETF_INTRADAY_HEAT', 'SECTOR_FUND_FLOW', 'CONCEPT_RANKING', 'LIMIT_UP_HEATMAP', 'SECTOR_FUND_FLOW_INTRADAY', 'MARKET_ALERTS', 'STOCK_QUOTE', 'CFFEX_HOLDINGS', 'AVG_PRICE_DATA', 'OVERSEAS_MARKETS', 'AI_MARKET_BRIEF', 'COMMODITY_ELASTICITY'],
     '盘后数据': ['MARGIN_DATA', 'ETF_DAILY_MONITOR', 'SECTOR_RECOMMENDATION', 'ETF_NET_SUBSCRIPTION', 'W52_HIGH'],
     '共振日历': ['CRISIS_DATA', 'LHB_DATA'],
     '最终推荐': ['FACTOR_LAB', 'TOP10_DAILY'],
@@ -15932,7 +15932,8 @@ h += '</div>'; // /ulPaneObserve
       var dev = _realDev;
       var _z = (c.z_score != null) ? c.z_score : 0;
       var devStr = (dev > 0 ? '+' : '') + dev.toFixed(1) + '%' + (_z ? ' <span style="font-size:9px;color:var(--dim);">z=' + _z.toFixed(1) + '</span>' : '');
-      var devColor = _z >= 2 ? '#fbbf24' : (_z <= -2 ? '#f87171' : '#94a3b8');
+      // 🛡️ 2026-10-17 审计修复：红涨绿跌铁律——涨(_z>=2)染红 var(--up)、跌(_z<=-2)染绿 var(--down)
+      var devColor = _z >= 2 ? 'var(--up)' : (_z <= -2 ? 'var(--down)' : '#94a3b8');
       var bg = opts.bg || 'rgba(245,158,11,.08)';
       var border = opts.border || 'rgba(245,158,11,.35)';
       var icon = opts.icon || '';
@@ -15966,7 +15967,8 @@ h += '</div>'; // /ulPaneObserve
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11.5px;color:var(--sub);flex-wrap:wrap;">';
     html += '<span><b style="color:#fbbf24">'+hotList.length+'</b>/<b>'+ce.total_commodities+'</b> 涨价窗口</span>';
     html += '<span>平/跌 <b style="color:#94a3b8">'+coolList.length+'</b></span>';
-    if(unavailList.length > 0) html += '<span>无数据 <b style="color:var(--dim)">'+unavailList.length+'</b></span>';
+    var _unavailN = (ce.unavailable ? ce.unavailable.length : 0) + unavailList.length;
+    if(_unavailN > 0) html += '<span>无数据 <b style="color:var(--dim)">'+_unavailN+'</b></span>';
     html += '<span style="color:var(--dim);margin-left:auto;">'+(ce.data_date||'')+'</span>';
     html += '</div>';
 
@@ -16049,10 +16051,18 @@ h += '</div>'; // /ulPaneObserve
       if(s && s.code && !lhbSeen[s.code]){ lhbSeen[s.code]=true; lhbUniq.push(s); }
     });
     var highLbc = _numOrNull(scm.high_ladder_count);
-    if(highLbc == null) highLbc = (ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0);
+    if(highLbc == null) highLbc = Object.keys(ladder).reduce(function(s,k){ return s + (parseInt(k,10)>=3 ? (ladder[k]||0) : 0); }, 0);
     // 阶段判定
     var phase, phaseColor, phaseDesc, posAdvice;
-    if(crisisPct >= 70){ phase='冰点'; phaseColor='var(--down)'; phaseDesc='危机雷达高位'; posAdvice='空仓'; }
+    // 🛡️ 2026-10-17 审计根因修复：原本地重算相位与权威源 SENTIMENT_CYCLE.phase 矛盾
+    //   （如 score=85/狂热 却显示「温和」，卡内自相矛盾）。现优先采用权威源，缺失再回退本地重算。
+    var _phaseMap = {'冰点':['危机雷达高位','空仓'], '降温':['风险累积','≤30%'], '狂热':['涨停泛滥','兑现'], '温和':['情绪偏暖','50%'], '修复':['低位筑底','30%'], '平稳':['情绪平稳','50%']};
+    if(sc && sc.phase && sc.color){
+      phase = sc.phase; phaseColor = sc.color;
+      var _pm = _phaseMap[sc.phase] || ['', ''];
+      phaseDesc = _pm[0]; posAdvice = _pm[1];
+    }
+    else if(crisisPct >= 70){ phase='冰点'; phaseColor='var(--down)'; phaseDesc='危机雷达高位'; posAdvice='空仓'; }
     else if(crisisPct >= 50){ phase='降温'; phaseColor='#f59e0b'; phaseDesc='风险累积'; posAdvice='≤30%'; }
     else if(totalUp >= 80 && highLbc >= 15){ phase='狂热'; phaseColor='#ef4444'; phaseDesc='涨停泛滥'; posAdvice='兑现'; }
     else if(totalUp >= 40 && crisisPct <= 30){ phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪偏暖'; posAdvice='50%'; }
@@ -16127,31 +16137,18 @@ h += '</div>'; // /ulPaneObserve
         var list = lbMap[k] || [];
         var lbl = k==='1'?'首板':k+'连板';
         var barColor = parseInt(k)>=4 ? '#ef4444' : (parseInt(k)>=3 ? '#f59e0b' : (parseInt(k)>=2 ? '#38bdf8' : 'var(--up)'));
-        var isFirst = k==='1';
+        // 2026-10-17 审计修复：首板不再用龙虎榜数据冒充，统一用涨停池 lh.top(lbc==1) 渲染
         var pct = totalUp>0 ? Math.round(v/totalUp*100) : 0;
         html += '<div style="display:flex;align-items:flex-start;gap:8px">';
         html += '<div class="no-shrink"  style="min-width:58px;text-align:right;padding-top:2px">';
         html += '<div style="font-size:14px;font-weight:800;color:'+barColor+'">'+lbl+'</div>';
-        html += '<div style="font-size:11px;color:var(--dim)">共'+(isFirst?lhbUniq.length:v)+'只</div>';
+        html += '<div style="font-size:11px;color:var(--dim)">共'+v+'只</div>';
         html += '</div>';
-        if(isFirst){
-          // 首板：10只/行全部平铺，不折叠；代码完整显示（数据来自 LHB_DATA.stocks）
-          html += '<div style="flex:1;">';
-          if(lhbUniq.length){
-            html += '<div style="display:grid;grid-template-columns:repeat(6, minmax(0,1fr));gap:5px 6px;">';
-            lhbUniq.forEach(function(s){
-              html += '<span style="font-size:11px;color:var(--text);background:var(--card2);padding:3px 5px;border-radius:4px;border:1px solid var(--border2);white-space:nowrap;overflow:visible;text-overflow:clip;text-align:center;" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:10px;letter-spacing:-0.2px;">'+s.code+'</span></span>';
-            });
-            html += '</div>';
-          }
-          html += '</div>';
-        } else {
           html += '<div style="flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:4px 8px">';
           list.forEach(function(s){
             html += '<span style="font-size:13px;color:var(--text);white-space:nowrap;" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:11px">'+s.code+'</span></span>';
           });
           html += '</div>';
-        }
         html += '</div>';
       });
       html += '</div>';

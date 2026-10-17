@@ -101,7 +101,9 @@ CARD_DEFS = [
     #   ② 两条口径互相矛盾，实时数据那条盘中恒判 stale。
     #   现合并为单条，按数据本体（日频时间轴 daily + 盘中实时字段 market_net）取
     #   「实时数据 / 盘中每30分 + 收盘后定稿」，heal_cat=intraday（自愈应派发盘中抓取）。
-    {"id": "MARKET_FUND_FLOW_DATA", "name": "市场资金流向", "page": "实时数据", "freq": "盘中每30分（收盘后追加当日定稿）", "max_age": 60, "key_fields": ["daily"], "heal_cat": "intraday"},
+    # 🛡️ 2026-10-17 审计修复：曲线真实数据源为 SECTOR_FUND_FLOW_INTRADAY（原错配 MARKET_FUND_FLOW_DATA，后者实为已下架·资金流时间轴）
+    {"id": "SECTOR_FUND_FLOW_INTRADAY", "name": "主力净额分时累计曲线", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["date", "snapshots"], "heal_cat": "intraday"},
+    {"id": "MARKET_FUND_FLOW_DATA", "name": "市场资金流向(已下架)", "page": "已下架", "freq": "盘中每30分（收盘后追加当日定稿）", "max_age": 60, "key_fields": ["daily"], "heal_cat": "intraday"},
     # 🛡 2026-09-22 一劳永逸（小九）：补 heal_cat / producer / raw_file 三字段。
     #   背景（run 35683849934 云端日志实证）：本卡 09-22 全天停更，根因是云端
     #   f_market_alerts() 的 subprocess timeout=90s 被孤儿模块内 akshare 全市场抓取
