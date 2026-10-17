@@ -9078,3 +9078,26 @@ items:
     verified_at: "2026-10-17 12:35 推送+线上核验完成"
     updated: "2026-10-17 12:35"
     updated_by: 阿狸咪(alimi-cn)
+  - id: thermo-tsf-pbc-source-merge-1017
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: done
+    title: 社融脉冲换源人民银行官方xls + 历史段合并还原真实极值
+    note: |
+      旧源 ak.macro_china_shrzgm（商务部 data.mofcom.gov.cn）上游停更于 2026-04，
+      社融脉冲卡在 202604 无告警（审计盲区，主人截图指正）。
+      换源人民银行官网《社会融资规模增量统计表》xls（三级跳：索引→年份→社融专题→xls，
+      仅 2021+ 新版式可解析；央行偶发壳页已加多链接×重试对抗）。
+      历史段（2015-2020）月度增量同源 PBOC（旧源冻结但历史正确），缓存
+      raw_data/tsf_pbc_cache/tsf_history_pre2021.json 入库供云端 runner 免 akshare，
+      与央行 2021+ 实时合并 → 还原真实极值 max=43.1@202010 / min=-14.1@202110；当前月 202609。
+      双机并行：小九先换源(3a7ea2439b)但极值被 2021+ 窗口收窄(15.7/-10.7)；
+      阿狸咪补历史合并修正(57f08dbede)并入库缓存。审计真值层同步换央行源；
+      前端 hist 文案标注「since 年以来（人民银行官方）」。
+    verify_how: |
+      ① ls-tree 57f08dbede：gen/MARKET_THERMO.js/tsf_pbc_cache(6xlsx+1json) 全在树内，字节一致；
+      ② 线上硬抓 Pages：tsf max=43.1@202010 / min=-14.1@202110 / month=202609 未被构建回退；
+      ③ 本地审计门禁 PASS（含 tsf.month 新鲜度红线≤100天 + 真值层央行源一致）。
+    verified_at: "2026-10-17 12:50 推送+Pages硬抓核验完成"
+    updated: "2026-10-17 12:50"
+    updated_by: 阿狸咪的工程师
