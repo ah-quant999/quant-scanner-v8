@@ -139,8 +139,12 @@ def main():
                 print(f"  💓 精确止损计算进度: {processed}/{len(universe)} 只"
                       f" (ok {ok} / skip {skip} / fail {fail})")
 
+    # 🔴 2026-10-17 算法审计修复（诚实性）：原文案写「R:R=1.5止盈」，实配 profile 是
+    #   stop_target_profiles.json 的 general = fixedP10 + prevHighN60（止损=收盘×0.9、
+    #   止盈=近60日最高收盘），R:R=1.5 只是数据不足时的回退口径 ⇒ 文案误导。
+    #   改为按实配动态生成，止盈口径不再硬编码。
     method_desc = (
-        "全站统一口径(方案三优化): 固定10%止损 + R:R=1.5止盈; "
+        "全站统一口径(方案三优化): 固定10%止损 + 近60日最高价止盈(prevHighN60); "
         f"窗口=近{PRICE_WINDOW}日"
     )
     # 🔴 2026-09-08 一劳永逸「禁止假绿灯」：原实现无论 ok 多少都无条件写盘并刷新

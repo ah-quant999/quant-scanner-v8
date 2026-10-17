@@ -546,7 +546,15 @@ def main():
     mcodes = get_main_universe(); log("主板 universe", len(mcodes))
     if len(mcodes) < 1000:
         log("ERROR: 主板 universe 异常过少（" + str(len(mcodes)) + "），中止推送，避免空 ROE 数据上线")
-        bs.logout(); return
+        try:
+            bs.logout()
+        except Exception:
+            pass
+        # 🔴 2026-10-17 算法审计修复（P0·假成功）：原 `return` 退出码 0 ⇒ 监督器判 ok，
+        #   与 09-17 已修的登录/push 失败同族（日志有 ERROR、退出码却成功）。
+        print("⛔ 主板 universe 异常过少 ⇒ 本轮不产出任何产物（保留上次真实 FACTOR_LAB），以退出码 1 上报失败",
+              flush=True)
+        sys.exit(1)
     r = load_cache(CACHE_R)
     # 2026-09-07 一劳永逸「夜预算」：全市场主板 ~3200 只逐只走 baostock，
     # 冷启动 2h+ 常撞 workflow timeout（云端 90min / 夜间服务端更慢）-> 整轮被杀、
@@ -630,7 +638,13 @@ def main():
             _n_gate_missing, "只无 roe_ok 字段（>50%，缓存系闸门上线前版本或升版后未刷完）。"
             "拒绝推送以免半开闸门出失真榜。处置：删", CACHE_R,
             "或抬高 ROE_VER 让下轮全量重算。")
-        bs.logout(); return
+        try:
+            bs.logout()
+        except Exception:
+            pass
+        # 🔴 2026-10-17 算法审计修复（P0·假成功）：原 `return` 退出码 0 ⇒ 监督器判 ok。
+        print("⛔ ROE 闸门判据大面积缺失 ⇒ 拒绝推送，以退出码 1 上报失败", flush=True)
+        sys.exit(1)
     if _GATE_ON:
         # 🔴 关键：默认值必须是 **False**（无判据 = 未过闸 = 剔除），不能写 True。
         #   写 True 会让 `v.get("roe_ok", True) is True` 在缺字段时命中默认值而放行，
@@ -646,14 +660,23 @@ def main():
         log("⚠️ V8_ROE_GATE=0 —— ROE 质量闸门已被人为关闭（仅诊断用途）")
     if len(large) < 10:
         log("ERROR: ROE 闸门后样本不足（" + str(len(large)) + "），拒绝推送以免榜单失真")
-        return
+        # 🔴 2026-10-17 算法审计修复（P0·假成功）：原裸 `return` 退出码 0 ⇒ 监督器判 ok。
+        print("⛔ ROE 闸门后样本不足 ⇒ 拒绝推送，以退出码 1 上报失败", flush=True)
+        sys.exit(1)
     large.sort(key=lambda x: x["roe_ttm"], reverse=True)
     top30 = large[:30]
     log("全市场有效", n, "大市值档(闸门后)", len(large), "Top30首只", top30[0]["code"] if top30 else "无")
 
     if len(at_valid) < 10 or len(large) < 10:
         log("ERROR: 有效样本不足（abn=" + str(len(at_valid)) + ", roe_large=" + str(len(large)) + "），中止推送")
-        bs.logout(); return
+        try:
+            bs.logout()
+        except Exception:
+            pass
+        # 🔴 2026-10-17 算法审计修复（P0·假成功）：原 `return` 退出码 0 ⇒ 监督器判 ok。
+        print("⛔ 有效样本不足 ⇒ 本轮不产出任何产物（保留上次真实 FACTOR_LAB），以退出码 1 上报失败",
+              flush=True)
+        sys.exit(1)
 
     out = {
         "update_time": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),

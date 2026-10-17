@@ -9289,3 +9289,60 @@ items:
     verified_at: "2026-10-17 本地15/15+模块自测+DOM模拟全过；线上待 build 落地后硬抓复核"
     updated: "2026-10-17 20:05"
     updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: algo-audit-1017
+    owner: 阿狸咪的工程师(alimi-cn)
+    priority: P1
+    status: done
+    created: 2026-10-17
+    title: "🔍 全仓算法审计 + 5 个 P0 修复（主人令「审计所有算法」）"
+    note: |
+      【范围】algorithms/ 82 + v8/ 11 + scripts/ 全量脚本，对照 run_algorithms ORDER/STAGES
+      （A14/B25/D1/E10）、cloud_fetch_v8 tasks、专属 workflow 三侧调度逐个判定。
+      【P0 修复·5 项（本次已推，小九 runner 拉码后生效）】
+      ① gen_lqsq_top5.py 流动性闸门量纲混用：kline_cache.volume 手/股混存 ⇒ 绝对成交额闸门
+         漂移 100 倍（手口径需 50 亿/日才过闸、股口径 5000 万即过）⇒ 上线后选中 33 只中
+         32 只科创板、「全市场选股」退化为「股口径数据股票选股」。修=量纲哨兵（抄 generate_top10
+         P5 已验证区间），报警则放弃闸门不静默清零；早期偏斜在 meta.liq_gate_caliber 披露、
+         归档只增不改不追溯重算。
+      ② gen_four_volume_track.py「扣双边 0.30%」文案从未实现：四量终极主榜全部收益高估 0.3pp、
+         胜率口径失真、delist_advice「已扣成本」理由失实、与 bench 比较偏斜 0.3pp。修=按文案补扣
+         （COST_ROUND_TRIP_PCT=0.30 全量重算）；顺带删「长档见信号层回测」过时指引（该层 10-11 已作废）。
+      ③ factor_lab_gen.py 4 处 rc=0 假成功（universe<1000/闸门缺失过半/large<10/at_valid<10 裸
+         return）⇒ 监督器判 ok。修=统一 sys.exit(1)（对齐 09-17 已修的登录/push 失败范式）。
+      ④ build_candidate_pool.py 候选池补回不查 last_seen ⇒ 数月前掉出成员被补回当日池冒充
+         「今日成员」（指标还是 GTimg 补全的现价，看似新鲜实为古董）。修=补回仅允许 ≤5 交易日
+         +7 日历日；顺带修 out.total/source_dist 补回后不刷新。
+      ⑤ generate_top10.py fund/inst/sector 缺数据静默记 0 分（「数据缺失」与「数据差」不可区分）。
+         轻修=产物显式标注（明细写「无数据」+ 顶层 data_missing 清单），刻意不改打分数学
+         （改分母会全站变分，属未验证行为变更，留待真实流样本验证）。
+      【一句话诚实性修复·3 处】gen_stock_stop method 文案 R:R=1.5→实配 prevHighN60；
+      backtest_tdx 文件头「60天」→实为 520 根≈2 年 + 复权注释 adjustflag=2 是前非后；
+      calc_volatility_watch update_time 无时区→显式 CST（云 runner 曾慢 8h 落戳判龄偏老）。
+      【审计判定】✅ 合规：backtest_expectancy（全站最严谨）/gen_market_bench/generate_top10/
+      update_four_volume_history/四量日线与 60m 选股模式（zero_hit 诚实空态）；
+      ⚠️ 需披露：factor_walkforward（9 年窗×当前在册 universe 幸存者偏差未披露+判据重解释需主人
+      签字）/backtest_tdx（OPTIMIZED 规则与止损止盈参数样本内归纳未标 OOS）/backtest_comprehensive
+      （best_hold 12 档同数据选优+strategy ID 跨日口径混合）/factor_lab_backtest（调仓点横截面混日）/
+      final_recommend（Top3≠Top5 文案+回测失败静默）/factor_lab_gen（KL_ABN_START 硬编码+abn 榜
+      含退池股）/calc_sentiment_cycle（文档四象限 vs 实现六态）/CITIC_PE 观测卡（缺「历史规则回放」
+      显式标注）；
+      ❌ 死代码/孤儿（清理待主人拍板）：H 反推两条（auto_run_dn_algorithm+track_h_auto_buy 前端
+      10-06 已摘注入仍日产+巡检）/strong_breakout.py 与 algo_backtest_compare.py 退役残留仍在树且
+      git 跟踪/9 个孤儿脚本（verify_chain_consistency 前缀豁免表让 CI 对它们系统性失明）。
+      【重大背景（各脚本自曝）】最终推荐真实流 89 笔 T+5 超额 -3.77%/T+10 -4.79%；四量真实流
+      T+10 胜率 12.86%/-10.49%；IMA 强势跟踪真实流全档正超额（T+45 +23.04%）⇒ 北极星未转正，
+      当前 Top3 是「负超额环境中相对最好」。四量终极下架提请系统已生成（T+5 33.71%/-1.38%，n=89，
+      基准 38.59%/-2.04% 跑输）；扣费修复后数字将再差约 0.3pp，下架结论不变、理由变诚实。
+    verify_how: |
+      ① 8 个算法文件 py_compile 0 错；LQSQ 哨兵/四量扣费/候选池 last_seen 三项内存自测全过
+         （股口径/手口径/报警放弃/茅台不误杀；净额=毛额-0.3；补回 ≤12 日历日边界）；
+      ② plumbing 推送：FETCH_HEAD 上重放，hash-object -w --no-filters ×8，仓库外 IDX
+         read-tree+update-index --add --cacheinfo，commit-tree -p FETCH_HEAD，
+         推送后 git ls-tree -r 逐一核对 8 文件+2 挂账文件在树内；
+      ③ HANDOFF.yaml yaml.safe_load + ledger --check 全命中后同提交推送（[13/13] 门禁）；
+      ④ 生效前提：小九 cn runner 拉最新 main（量纲/扣费改变未来选股与回测数字，历史归档
+         只增不改不追溯；FOUR_VOLUME_BACKTEST 数字将在 runner 重跑后变诚实）。
+    verified_at: "2026-10-17 语法+自测+plumbing 自证完成；线上数字待 runner 拉码后复核"
+    updated: "2026-10-17 21:39"
+    updated_by: 阿狸咪的工程师(alimi-cn)

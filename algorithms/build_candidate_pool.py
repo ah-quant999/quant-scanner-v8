@@ -1321,6 +1321,21 @@ def build():
                         continue
                     if _src not in (_v.get("sources") or []):
                         continue
+                    # 🔴 2026-10-17 算法审计修复（P0）：补回必须查 last_seen ——
+                    #   原实现无脑补回全部历史成员，数月前掉出者会被补回当日池
+                    #   「冒充今日成员」（指标还是 GTimg 补全的现价，看似新鲜实为古董）。
+                    #   说明：_merge_membership 已按 MEMBER_HYSTERESIS_DAYS(5 交易日)
+                    #   保留近期成员 ⇒ 能走到这里的都是已过期者；补回仅允许「刚过期」
+                    #   （≤ 5 交易日 + 7 日历日缓冲，覆盖单次抓取失败/数量抖动场景），
+                    #   更早的坚决不复活（宁可池小，不许陈旧池冒充当日池）。
+                    _ls = _v.get("last_seen") or ""
+                    try:
+                        _age = (datetime.datetime.strptime(today_date, "%Y-%m-%d")
+                                - datetime.datetime.strptime(_ls[:10], "%Y-%m-%d")).days
+                    except Exception:
+                        _age = 9999
+                    if _age > MEMBER_HYSTERESIS_DAYS + 7:
+                        continue
                     members[_k] = {kk: _v.get(kk) for kk in
                                   ("code", "name", "market", "board_label", "sources",
                                    "first_seen", "last_seen", "metrics")}
@@ -1330,7 +1345,11 @@ def build():
             for v in members.values():
                 for s in v["sources"]:
                     dist[s] += 1
-            print(f"  🛡 候选池数量不足保护：补回历史成员 {_merged} 只 → total={len(members)}")
+            # 🔴 2026-10-17 审计修复：out 的 total/source_dist 是补回前的快照，
+            #   补回后必须刷新，否则落盘 total 与实际 stocks 条数自相矛盾。
+            out["total"] = len(members)
+            out["source_dist"] = dict(dist)
+            print(f"  🛡 候选池数量不足保护：补回近期历史成员 {_merged} 只 → total={len(members)}")
     except Exception as e:
         print(f"  ⚠️ 候选池数量保护异常（继续）: {e}")
     # 6) 快变每日指标：今日成员用当日指标覆盖；历史留存成员 GTimg 补全现价/成交额（best-effort）

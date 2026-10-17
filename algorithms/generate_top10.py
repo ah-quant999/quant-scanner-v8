@@ -1382,6 +1382,23 @@ def main():
             if tags:
                 ind_map[clean] = tags
 
+    # 🔴 2026-10-17 算法审计修复（P0·缺数据可见性）：fund/inst/sector 维度上游缺失时，
+    #   各股该维度静默记 0 分 ⇒「数据缺失」与「数据差」在产物上不可区分（0 分既可能是
+    #   「主力净流出」也可能是「主力资金源整个挂了」）。此处按各消费映射是否为空
+    #   判定可用性；缺失时明细显式写「无数据」、产物顶层落 data_missing 清单。
+    #   ⚠️ 刻意**不改打分数学**：缺数据暂按 0 计是既有保守口径（宁少给分、不凭空给分），
+    #   改成「维度不参与分母」会全站变分，属未验证行为变更，留待真实流样本验证后再议。
+    _dim_src_empty = {
+        "fund_main": not main_map,
+        "fund_lhb": not lhb_map,
+        "sector": not ind_map,
+        "inst_w52": not w52_codes and not w52_names,
+        "inst_analyst": not analyst_codes and not analyst_names,
+    }
+    if any(_dim_src_empty.values()):
+        print("  ⚠️ 维度上游缺失（该维度各股记 0 分并显式标注无数据）: "
+              + ", ".join(k for k, v in _dim_src_empty.items() if v))
+
     # ── 3.5 P5 预扫（2026-09-16）：候选池内分位一次算好，供循环内 O(1) 取用 ──
     _p5_codes = []
     for _k5, _s5 in gp_stocks.items():
@@ -1603,6 +1620,11 @@ def main():
         # 北向资金：2024年5月起港交所不再披露明细，仅data_date空壳，不再加分
         # 铁律：宁可空着也不用假数据
 
+        # 🔴 2026-10-17 审计修复：主力/龙虎榜两源全空时显式标注「无数据」，
+        #   不与「数据差」混同（0 分 + 空明细会被前端读成「无主力关注」）。
+        if not fund_detail and _dim_src_empty["fund_main"] and _dim_src_empty["fund_lhb"]:
+            fund_detail.append("无数据（主力资金/龙虎榜上游缺失，非零流入）")
+
         # 板块共振 (0 ~ +10)
         sector_score = 0
         sector_detail = ""
@@ -1646,6 +1668,9 @@ def main():
             sector_detail = f"{best_sector_name}{best_sector_flow:.1f}亿"
         else:
             sector_detail = f"{best_sector_name}{best_sector_flow:+.1f}亿"
+        # 🔴 2026-10-17 审计修复：行业映射整表缺失时显式标注，不与「无热门板块」混同。
+        if not sector_detail and _dim_src_empty["sector"]:
+            sector_detail = "无数据（板块资金/行业映射上游缺失）"
 
         # 机构/投行 (0 ~ +7)  2026-08-28：mahoro 已移除，只剩 52周新高 + 分析师关注
         inst = 0
@@ -1658,6 +1683,10 @@ def main():
         if raw_code in analyst_codes or name in analyst_names:
             inst += 3
             inst_detail.append("分析师关注")
+
+        # 🔴 2026-10-17 审计修复：两源全空时显式标注，不与「未入选」混同。
+        if not inst_detail and _dim_src_empty["inst_w52"] and _dim_src_empty["inst_analyst"]:
+            inst_detail.append("无数据（52周新高/分析师上游缺失，非未入选）")
 
         # ── 止损位 / 目标价 ──
         close_price = latest.get("close") or s.get("close") or 0
@@ -1963,6 +1992,10 @@ def main():
             "applied_to": "ge3 (generate_top10)",
         },
         "top10": top10,
+        # 🔴 2026-10-17 审计修复：本轮评分维度上游缺失清单（空=全源正常）。
+        #   消费者（前端「每日因子计算」/最终推荐页）可据此把该维度显示为「无数据」，
+        #   杜绝「数据缺失」被读成「数据差」。打分数学未变（见 _dim_src_empty 处注释）。
+        "data_missing": [k for k, v in _dim_src_empty.items() if v],
     }
 
     # 保存当日文件

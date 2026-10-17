@@ -52,6 +52,11 @@ QUOTE_JSON = os.path.join(RAW_DIR, "stock_quote.json")
 #    raw_data/four_volume_backtest.json（经 update_v8 转换层注入 window.FOUR_VOLUME_BACKTEST，
 #    变量名与文件名不变 ⇒ 前端渲染器/回测聚合器零结构改动）。回放模式已从 E 批摘链。
 HOLD_HORIZONS = (1, 3, 5, 10, 20, 30, 45, 60)
+# 🔴 2026-10-17 算法审计修复（P0·诚实性）：method 文案自 10-11 口径切换起即声称
+#   「扣双边 0.30%」，但收益聚合从未扣 ⇒ 主榜全部收益系统性高估 0.3pp、胜率口径失真，
+#   delist_advice 的「已扣成本」理由失实；且 market_bench 基准扣 0.3% 而策略不扣，
+#   超额比较额外偏斜 0.3pp。现按文案补扣（次开买卖双边），全量重算统一适用。
+COST_ROUND_TRIP_PCT = 0.30
 
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
@@ -294,7 +299,9 @@ def main():
                             td = all_dates[ti]
                             px = series.get(td)           # 停牌则无价 → 跳过该档
                             if px:
-                                ret = (px / base_close - 1) * 100
+                                # 🔴 2026-10-17 审计修复：按 method 文案补扣双边 0.30%
+                                #   （此前从未扣，见 COST_ROUND_TRIP_PCT 处注释）。
+                                ret = (px / base_close - 1) * 100 - COST_ROUND_TRIP_PCT
                                 offs[f"{n}d"] = r2(ret)
                                 agg[n]["count"] += 1
                                 agg[n]["sum"] += ret
@@ -413,8 +420,9 @@ def main():
     matured = [f"{n}d" for n in HOLD_HORIZONS if agg[n]["count"] > 0]
     self_backtest = {
         "note": ("四量信号自上线起逐日累积真实收盘价前向样本（基准=入选日收盘，"
-                 "T+N 按真实交易日推进，不含未来函数）。样本随持有天数成熟而增加；"
-                 "长档（75/90/180/250）见上方「回测 N 日胜率」的信号层回测。"),
+                 "T+N 按真实交易日推进，次开买卖双边扣 0.30%，不含未来函数）。"
+                 "样本随持有天数成熟而增加；长档（75/90/180/250）尚未有足够成熟样本，"
+                 "成熟前不显示、不插值。"),
         "track_start": meta.get("track_start", data_date),
         "history_days": len(date_keys),
         "price_days": len(all_dates),

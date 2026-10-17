@@ -313,7 +313,10 @@ def main():
 
     comp = regime(metrics)
     result = {
-        "update_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        # 🔴 2026-10-17 算法审计修复：原 datetime.now() 无时区，云 runner（UTC）
+        #   会比 CST 慢 8h 落戳 ⇒ 健康面板判龄偏老。全仓统一显式 CST。
+        "update_time": datetime.datetime.now(
+            datetime.timezone(datetime.timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S"),
         "update_date": end,
         "available": len(metrics) > 0,
         "indices": metrics,

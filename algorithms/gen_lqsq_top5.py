@@ -64,6 +64,15 @@ TOP_N = 5  # 🔴 2026-10-13 主人令「这个太多了，才3天都90只了，
 COST_PCT = 0.3
 MIN_PRICE = 2.0
 MIN_TURNOVER_YUAN = 50_000_000
+# 🔴 2026-10-17 算法审计修复（P0·量纲铁律，与 generate_top10.py P5 段同一口径）：
+#   kline_cache.volume 单位「手」（GTimg 写）与「股」（akshare 兜底写）混存 ⇒
+#   绝对成交额闸门必须先判量纲再套阈值。不修的实证后果：手口径股票真实需 50 亿/日
+#   才过闸（茅级别被误杀）、股口径 5000 万/日即过 ⇒ 上线后选中 33 只中 32 只为
+#   科创板、31/33 依赖股口径数据过闸，「全市场选股」退化为「股口径数据股票选股」。
+#   哨兵区间抄 generate_top10.py P5_AMT_MEDIAN_LO/HI（该处有 000039 实测铁证：
+#   cache 322622 对 新浪 32,262,172 股 = ×100）：池内中位成交额判量纲；
+#   raw / ×100 两都不落常识区间 ⇒ 放弃绝对闸门，绝不静默清零。
+AMT_MEDIAN_LO, AMT_MEDIAN_HI = 1.0e8, 2.0e10
 # ── 自刷新 ──
 EXT_BARS = 700            # 扩展缓存/拉取根数（覆盖 261+240+余量）
 EXT_MIN_LEN = 300         # 视为「根数足够」的下限（<MIN_HISTORY+BASELINE 缓冲）
@@ -269,6 +278,41 @@ def main():
 
     # ── 当日打分（因子只用 ≤T） ──
     scored = []
+    # ── 量纲哨兵（2026-10-17 审计修复）：先判 kline_cache.volume 单位，再套绝对成交额闸门 ──
+    #   与 generate_top10.py P5 段同口径同哨兵区间；手/股混存时绝对阈值漂移 100 倍，
+    #   必须运行时判定。判定优先级：raw 落区间⇒股口径；raw×100 落区间⇒手口径；
+    #   两不落⇒报警并放弃绝对闸门（宁松勿错杀，且绝不以静默清零冒充过滤）。
+    _raw_liq = []
+    for _c, _bars in bars_map.items():
+        if len(_bars) < MIN_HISTORY or _bars[-1]["date"] != data_date:
+            continue
+        if _c not in names:
+            continue
+        _j = len(_bars) - 1
+        if _bars[_j]["close"] < MIN_PRICE:
+            continue
+        _recent = [b["volume"] for b in _bars[_j - RECENT_N + 1: _j + 1]]
+        if len(_recent) < RECENT_N or any(v <= 0 for v in _recent):
+            continue
+        _raw_liq.append(sum(v * b["close"] for v, b in
+                            zip(_recent, _bars[_j - RECENT_N + 1: _j + 1])) / RECENT_N)
+    _vol_unit = 1.0
+    if _raw_liq:
+        _med = sorted(_raw_liq)[len(_raw_liq) // 2]
+        if AMT_MEDIAN_LO <= _med <= AMT_MEDIAN_HI:
+            _vol_unit = 1.0                      # 股口径
+        elif AMT_MEDIAN_LO <= _med * 100 <= AMT_MEDIAN_HI:
+            _vol_unit = 100.0                    # 手口径
+        else:
+            _vol_unit = 0.0                      # 两不落 ⇒ 哨兵报警，放弃绝对闸门
+            log("⚠️ 量纲哨兵报警：池内中位成交额 %.3g 元不落常识区间 [%g, %g] ⇒ 放弃绝对流动性闸门（不静默清零）"
+                % (_med, AMT_MEDIAN_LO, AMT_MEDIAN_HI))
+        log("量纲哨兵：池内中位原始成交额 %.3g 元 ⇒ vol 单位=%s（候选 %d 只）"
+            % (_med, "股×1" if _vol_unit == 1.0 else ("手×100" if _vol_unit == 100.0 else "放弃闸门"),
+               len(_raw_liq)))
+    else:
+        _vol_unit = 0.0
+        log("⚠️ 量纲哨兵：候选为空，放弃绝对流动性闸门")
     for code, bars in bars_map.items():
         if len(bars) < MIN_HISTORY or bars[-1]["date"] != data_date:
             continue
@@ -284,8 +328,9 @@ def main():
             continue
         if any(v <= 0 for v in recent):
             continue  # 近月有停牌
-        liq = sum(v * b["close"] for v, b in zip(recent, bars[j - RECENT_N + 1: j + 1])) / RECENT_N
-        if liq < MIN_TURNOVER_YUAN:
+        liq = (sum(v * b["close"] for v, b in zip(recent, bars[j - RECENT_N + 1: j + 1]))
+               / RECENT_N * _vol_unit)
+        if _vol_unit and liq < MIN_TURNOVER_YUAN:
             continue
         ratio = (sum(recent) / RECENT_N) / (sum(base) / BASELINE_N)
         scored.append((round(ratio, 4), code, close))
@@ -299,6 +344,10 @@ def main():
         "algo_name": "量质双擎（LQSQ）",
         "factor_def": "r=mean(vol[近20日])/mean(vol[之前240日])，升序Top5（最缩量=最强）",
         "filters": "上市≥261交易日/当日未停牌/近20日无停牌/收盘≥2元/日均vol×close≥5000万/当前名单剔ST",
+        "liq_gate_caliber": ("2026-10-17 起：kline_cache.volume 手/股混存，绝对成交额闸门经量纲哨兵运行时判定"
+                             "（哨兵报警则放弃闸门，不静默清零）；10-11~10-16 未判量纲，手口径股被系统性误杀、"
+                             "股口径股（多为科创板）被系统性放行 ⇒ 早期归档选中池偏科创板属已知口径缺陷，"
+                             "归档只增不改、不做追溯重算，历史信号保持原样"),
         "cost_pct": COST_PCT, "primary_hold": PRIMARY_HOLD,
     }, "signals": {}}
     if os.path.exists(HISTORY):

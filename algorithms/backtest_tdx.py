@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-backtest_tdx.py — 通达信60天全量回测引擎 V3.2（方案二：止损止盈升级）
+backtest_tdx.py — 通达信全量回测引擎 V3.2（方案二：止损止盈升级）
 ==========================================================================
-用通达信K线拉金池股60天日K，计算全部可检测信号的T+1/T+3/T+5/T+10/T+20胜率。
+用通达信K线拉金池股日K（TDX_BARS≈520 根≈2 年，非旧头所称「60天」——2026-10-17 审计订正），
 收益口径已升级为「统一止损止盈 + 提前出场」：
   止损 = max(近20日低点, close-2ATR, 固定百分比)
   止盈 = cascade：前高 → 0.618回撤位 → R:R=2对称位（盈亏比≥1.5）
@@ -296,7 +296,7 @@ def tdx_kline(code, setcode, period="4", count=TDX_BARS):  # 2026-09-13：默认
             rs = bs.query_history_k_data_plus(bs_code,
                 "date,close,high,low,open,volume,amount",
                 start_date=start_date, end_date=end_date,
-                frequency="d", adjustflag="2")  # 后复权
+                frequency="d", adjustflag="2")  # 前复权（baostock adjustflag=2=前复权；2026-10-17 审计订正：原注释误写「后复权」）
             bs.logout()
         
         # rs 可能为 None（查询失败）
