@@ -14356,10 +14356,21 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     h += _stat('🚀 跟踪起始', _e(T.track_start || '—'), '上线首日即建归档', 'var(--txt)');
     h += _stat('⏳ 成熟样本', '0', 'T+20 未走满不计入', '#fbbf24');
     h += '</div>';
-    /* ── 归档信号（每日 Top5；🔴 2026-10-13 主人令「每天按评分最高推荐3-5只就好」由 Top30 收紧） ── */
+    /* ── 归档信号（每日 Top5；🔴 2026-10-13 主人令「每天按评分最高推荐3-5只就好」由 Top30 收紧；
+       🗂 2026-10-17 主人令「最新日期的显示在最上面，每天显示评分最高的5条，13号以前的也是」：
+       按信号日倒序分组（最新在上）→ 组内按量比 r 升序（越缩量 = 越强）取每日前 5；
+       10-13 前的 Top30 归档日（10-09/10-12 各 30 只）同样只展示前 5 —— 纯展示层收紧，
+       归档数据与 LQSQ_BACKTEST 回测口径不动（后者独立消费 raw 归档）。） ── */
     h += '<h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 8px;">'
-       + '<span class="ic">📋</span>归档信号 · 每日 Top5 <span style="font-size:11px;color:var(--sub);font-weight:400">按异常量比升序（越缩量 = 越强）</span></h3>';
-    h += '<div class="note" style="margin-bottom:8px;">持有期收益随交易日成熟：未走满 T+N 的档位显示「<span style="color:var(--dim);">累积中</span>」，绝不填 0 冒充。红涨绿跌。</div>';
+       + '<span class="ic">📋</span>归档信号 · 每日 Top5 <span style="font-size:11px;color:var(--sub);font-weight:400">按异常量比升序（越缩量 = 越强）· 最新信号日置顶</span></h3>';
+    /* 先按信号日分组倒序，再组内排序取前 5（防御性排序：不信任归档数组顺序） */
+    var _lqByDay = {};
+    trk.forEach(function(s){ var _k = s.signal_date || '—'; (_lqByDay[_k] = _lqByDay[_k] || []).push(s); });
+    var _lqDays = Object.keys(_lqByDay).sort().reverse();
+    var _lqCapped = _lqDays.filter(function(d){ return _lqByDay[d].length > 5; });
+    h += '<div class="note" style="margin-bottom:8px;">持有期收益随交易日成熟：未走满 T+N 的档位显示「<span style="color:var(--dim);">累积中</span>」，绝不填 0 冒充。红涨绿跌。<br>'
+       + '🕐 最新信号日置顶，每日按量比 r 升序（越缩量 = 越强）取前 5 只'
+       + (_lqCapped.length ? '；' + _lqCapped.map(_e).join('、') + ' 为 10-13 收紧令前的 Top30 归档期，本表同样只展示其前 5（完整归档与回测口径不受影响）' : '') + '。</div>';
     h += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
     h += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">'
        + '<th style="padding:6px;text-align:left;color:var(--sub);">#</th>'
@@ -14370,20 +14381,32 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
        + '<th style="padding:6px;text-align:right;color:var(--sub);">信号日收盘</th>';
     DAYS.forEach(function(d){ h += '<th style="padding:6px;text-align:right;color:var(--sub);">T+'+d+'</th>'; });
     h += '</tr></thead><tbody>';
-    trk.forEach(function(s, i){
-      var ret = s.returns || {};
-      h += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-      h += '<td style="padding:6px;color:var(--dim);">'+(i+1)+'</td>';
-      h += '<td style="padding:6px;color:var(--txt);font-weight:600;">'+_e(s.name || '')+'</td>';
-      h += '<td style="padding:6px;color:var(--sub);font-family:ui-monospace,Consolas,monospace;">'+_e(s.code || '')+'</td>';
-      h += '<td style="padding:6px;color:var(--sub);">'+_e(s.signal_date || '—')+'</td>';
-      h += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(s.ratio != null ? Number(s.ratio).toFixed(4) : '—')+'</td>';
-      h += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(s.close != null ? Number(s.close).toFixed(2) : '—')+'</td>';
-      DAYS.forEach(function(d){
-        var v = (ret && ret[d] != null) ? ret[d] : null;
-        h += '<td style="padding:6px;text-align:right;color:'+_pl(v)+';">'+(v != null ? ((Number(v) > 0 ? '+' : '') + Number(v).toFixed(2) + '%') : '<span style="color:var(--dim);font-size:10px;">累积中</span>')+'</td>';
+    var _NCOL = 6 + DAYS.length;
+    _lqDays.forEach(function(day){
+      var _lqAll = _lqByDay[day];
+      var _lqList = _lqAll.slice().sort(function(a,b){
+        return (a.ratio != null ? Number(a.ratio) : 9e9) - (b.ratio != null ? Number(b.ratio) : 9e9);
+      }).slice(0, 5);
+      h += '<tr style="background:rgba(56,189,248,.07);">'
+         + '<td colspan="'+_NCOL+'" style="padding:5px 6px;font-size:11px;font-weight:700;color:#38bdf8;">📅 '+_e(day)
+         + ' <span style="color:var(--dim);font-weight:400;">· 前 '+_lqList.length+' 只'
+         + (_lqAll.length > 5 ? '（当日归档 '+_lqAll.length+' 只 · 10-13 前 Top30 归档期）' : '')
+         + '</span></td></tr>';
+      _lqList.forEach(function(s, i){
+        var ret = s.returns || {};
+        h += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+        h += '<td style="padding:6px;color:var(--dim);">'+(i+1)+'</td>';
+        h += '<td style="padding:6px;color:var(--txt);font-weight:600;">'+_e(s.name || '')+'</td>';
+        h += '<td style="padding:6px;color:var(--sub);font-family:ui-monospace,Consolas,monospace;">'+_e(s.code || '')+'</td>';
+        h += '<td style="padding:6px;color:var(--sub);">'+_e(s.signal_date || '—')+'</td>';
+        h += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(s.ratio != null ? Number(s.ratio).toFixed(4) : '—')+'</td>';
+        h += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(s.close != null ? Number(s.close).toFixed(2) : '—')+'</td>';
+        DAYS.forEach(function(d){
+          var v = (ret && ret[d] != null) ? ret[d] : null;
+          h += '<td style="padding:6px;text-align:right;color:'+_pl(v)+';">'+(v != null ? ((Number(v) > 0 ? '+' : '') + Number(v).toFixed(2) + '%') : '<span style="color:var(--dim);font-size:10px;">累积中</span>')+'</td>';
+        });
+        h += '</tr>';
       });
-      h += '</tr>';
     });
     h += '</tbody></table></div>';
     /* ── 回测进度（诚实空态） ── */
