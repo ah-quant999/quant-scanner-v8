@@ -9252,3 +9252,40 @@ items:
     verified_at: "2026-10-17 18:10 run39023386088 success + step14 部署 success 实证"
     updated: "2026-10-17 18:10"
     updated_by: 小九(lemoncat-cn)
+
+  - id: lianban-winrate-daily-1017
+    owner: 阿狸咪的工程师(alimi-cn)
+    priority: P1
+    status: done
+    created: 2026-10-17
+    title: "🔁 回测实证·一进二/二进三 改真实信号流日累积（主人令「要日更」）"
+    note: |
+      【背景】原卡为 2026-10-09 一次性静态跑批（bt_lianban_winrate.py 不在仓内、无法日更），
+      徽章自述「静态回测·非日更」；主人 10-17 19:25 看图令「要日更」。
+      【口径裁定·10-11 铁律】唯一合法口径=真实信号流（历史规则回放含当前股池幸存者偏差，
+      禁作主榜/评级/上下架依据）⇒ 不做历史重放，改每日 post_close 从涨停池录首板/二连板
+      信号，T+5 窗口成熟后计入分组统计（晋级率/隔夜高开/T+1/可成交T+1/T+5 胜率，扣双边0.3%）。
+      【实现】新模块 v8/lianban_winrate.py（自测5场景：成熟计分组/immature在途/过期丢弃/
+      同日去重/ST剔除全过）；cloud_fetch_v8 三重登记（VAR_TO_RAW + CATEGORY_MAP post_close
+      + tasks，紧跟 FIRST_BOARD_ALERT 复用同轮涨停池缓存零额外请求）；update_v8 DATA_SOURCES
+      + CATEGORY_MAP；v8_health_check 登记（max_age 1440 / key_fields=[groups]）；
+      前端改读 window.LIANBAN_WINRATE 动态徽章（成熟n/在途/update_time），空态显「首次累积中」；
+      data/LIANBAN_WINRATE.js 占位防 [6/8] 断链。历史跑批结论（10-09 冻结）保留在前哨卡正文
+      并加冻结标注，与新表互不混算。
+      【审计】本地 pre_deploy_audit 15/15 全过；node --check 31 inline 块 0 错；
+      node 模拟 DOM 验证表格数值正确；推送 commit 6ebdc197d5（6 文件 plumbing 快进，
+      索引自证 + ls-tree 复核 + 守卫全过）。
+      【前置条件】小九 cn runner 拉最新 main 后才开始真实累积（10-17 16:52 已实证其跑旧代码）；
+      T+5 成熟才有数字，首周样本小属预期（卡片自带 n<100 小样本提示）。
+    verify_how: |
+      ① git ls-tree origin/main：6 文件在树内（v8/lianban_winrate.py / cloud_fetch_v8.py /
+        update_v8.py / v8_health_check.py / index.html / data/LIANBAN_WINRATE.js）；
+      ② 本地 .github/scripts/pre_deploy_audit.py 15/15 PASS（含 [6/8] 新引用存在、
+        [11/11] defer 缓存无固化、[3/8] data 111 个）；
+      ③ python v8/lianban_winrate.py 自测 5 场景全过 + py_compile 0 错；
+      ④ node 模拟 DOM：徽章「🔄 日更累积·成熟n·在途」+ 表格百分比正确；
+      ⑤ Pages 部署后线上核验：回测卡徽章变「🔄 日更累积·首日累积中」、前哨卡核心行带
+        「2026-10-09 跑批冻结」标注、硬编码 _FBA_BT 与「非日更」徽章消失。
+    verified_at: "2026-10-17 本地15/15+模块自测+DOM模拟全过；线上待 build 落地后硬抓复核"
+    updated: "2026-10-17 20:05"
+    updated_by: 阿狸咪的工程师(alimi-cn)
