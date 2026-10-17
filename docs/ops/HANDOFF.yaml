@@ -9168,3 +9168,54 @@ items:
     verified_at: "2026-10-17 15:1x dispatch成功+cron兜底已上线；数据落地待云端跑完复验"
     updated: "2026-10-17 15:15"
     updated_by: 阿狸咪的工程师
+- id: avgprice-ma30-row-1017
+    owner: 阿狸咪的工程师
+    priority: P0
+    status: done
+    title: 平均股价卡新增 MA30 状态行 + 880003 官方真历史回填（挂小九 cn 兜底档）
+    note: |
+      主人 10-17 授权「加」（截图落位建议第1档·平均股价 MA30 状态行）。
+      根因实证：880003 主口径函数 f_avg_price_880003 已在 tasks 内，但长期从未落盘——
+      云端 hosted/主链 runner 在境外，东财 push2his 对境外结构性 RemoteDisconnected
+      （run 38879662624 双 secid 全失败日志实锤）；而 AVG_PRICE_880003 档位旧值仅 "intraday"，
+      小九 selfhosted 兜底档(08:25 premarket / 17:20 post_close) 也不含它 → 任何执行点都不跑。
+      修复（cloud_fetch_v8.py @e35649f10d）：
+        ① CATEGORY_MAP "AVG_PRICE_880003" intraday → premarket,intraday,post_close
+           （对齐 W52_HIGH 同款 cn-IP 硬约束处置，让小九两班必跑）；
+        ② _fetch_880003_history 130→430 根（约21个月真实官方日K一次回填到位，主人授权）；
+        ③ f_avg_price_880003 增 ma30/position_vs_ma30/ma30_ready（真 MA，由全量历史算）；
+        ④ index.html 平均股价卡加 MA30 状态行（880003 收盘 vs 其 MA30，红涨绿跌，未就绪显回填态）。
+      历史回填真活交给小九 cn runner：15:43 派发 selfhosted category=all（周六降 post_close）
+      → 跑 880003 + 板块年度净流入两源；本机 push2his 不可达故不自跑（主人「你不行让小九试试」）。
+    verify_how: |
+      ① ls-tree e35649f10d：index.html/cloud_fetch_v8.py/update_v8.py 入树字节一致；
+        31 个 inline script node --check 全过（0 错）；
+      ② 小九 run 39014716008 in_progress → 落地后查 raw_data/avg_price_data.json
+         index_880003/ma30/position_vs_ma30 非空、ma30_ready=true；
+      ③ 线上平均股价卡出现「📏 MA30·880003」状态行。
+    verified_at: "2026-10-17 15:4x 代码审计+plumbing快进推送完成；回填待小九 run 落地复验"
+    updated: "2026-10-17 15:43"
+    updated_by: 阿狸咪的工程师
+  - id: sector-year-flow-1017
+    owner: 阿狸咪的工程师
+    priority: P0
+    status: done
+    title: 板块年度主力净流入累积表（自建·真实历史回填）新增卡
+    note: |
+      主人 10-17 授权「加」（截图落位建议第2档·板块年度净流入自建累积表）。
+      口径：东财行业板块（clist m:90+t:2）逐日主力净流入官方历史
+      （push2his fflow daykline，f51=日期 f52=主力净流入额·元）按自然年累加 ——
+      历史段为官方披露数据回填（主人要求真实，已授权），非自算估算。
+      实现（cloud_fetch_v8.py @e35649f10d）：新 f_sector_year_flow() 挂 post_close（cn-IP 硬约束）；
+        幂等闸门（今日已产出→跳过）；单板块 2 轮补抓、失败率>30% 不覆盖（宁缺勿错）；
+        产出 raw_data/sector_year_flow.json → data/SECTOR_YEAR_FLOW.js（update_v8 映射同加）。
+      前端：盘后数据页新卡「板块年度主力净流入」Top10流入+Top5流出表（今年/去年双列，红涨绿跌）；
+        缺数据优雅回落「首次回填中」。卡片注册进 '盘后数据' 清单。
+      数据首次生成同样交由小九 cn runner（39014716008 同轮 post_close 产出）。
+    verify_how: |
+      ① 同上 ls-tree + node --check 全过；
+      ② 小九 run 落地后查 raw_data/sector_year_flow.json sectors>30、fail_count<30%；
+      ③ 线上盘后数据页出现该卡且榜首为真实净流入板块。
+    verified_at: "2026-10-17 15:4x 代码审计+plumbing快进推送完成；首份数据待小九 run 落地复验"
+    updated: "2026-10-17 15:43"
+    updated_by: 阿狸咪的工程师
