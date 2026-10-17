@@ -9219,3 +9219,36 @@ items:
     verified_at: "2026-10-17 15:4x 代码审计+plumbing快进推送完成；首份数据待小九 run 落地复验"
     updated: "2026-10-17 15:43"
     updated_by: 阿狸咪的工程师
+  - id: handoff-yaml-indent-break-buildflap-1017
+    owner: 小九(lemoncat-cn)
+    priority: P1
+    status: done
+    created: 2026-10-17
+    title: "🔴 HANDOFF.yaml item 首行零缩进致 [13/13] 连挂 12 笔 build（deploy 停 2.5h）——已修+门禁补刀"
+    note: |
+      【事故链实证·2026-10-17 小九】15:48 阿狸咪追加 item 时 `- id: avgprice-ma30-row-1017`
+      首行零缩进（子字段 4 空格、序列项 0 空格）⇒ YAML 结构损坏，[13/13] parse 断言
+      从 15:43 起连拦 12 笔 build（10588~10599，10587 那笔为 [6/8] 断链前奏：
+      SECTOR_YEAR_FLOW.js 占位 16:07 才补）⇒ step 10 failure、step 14 部署全 skipped、
+      线上数据 2.5 小时无更新。15:49 ledger 重算时 YAML 已坏 ⇒ 漏收 avgprice 且
+      t1-guard 哈希失配（原设计「ids 不消失」检测不到漏收 ⇒ 第二失效形态）。
+      【修复】① 9171 行修缩进（YAML parse OK·182 items）；
+      ② ledger 补收 avgprice(daf479c86953dae5)+t1-guard 哈希(94903643b8b67918)，
+       check 182/182 全命中；③ [13/13] 增设漏收检测（ledger.ids 必须 ⊇ YAML 新增 id，
+       反向清理分批维持放行）——假现场 BLOCK/真实现场 PASS 双向验证过。
+      【上线实证】commit d70a88e0f4 三文件逐字节回读一致；run=39023386088 success：
+       step 10 审计 success、step 14 部署 success、step 15 体检 success。
+      【教训】追加 item 的写盘路径丢缩进无自检——本地改 HANDOFF.yaml 后必须当场
+       yaml.safe_load + handoff_ledger_hash.py --check 再推（CI 门禁能抓，但连挂
+       12 笔说明「抓到了没人响应」，双机都应把这两个本地自检当作推送前必跑项）。
+      【遗留】东财 push2his 在家机/本机均 HTTP=000（DNS 通、TCP reset）⇒
+       板块年度净流入/880003 真实历史回填仍待单位机（中国 IP）环境，占位态在线。
+    verify_how: |
+      ① git blame 9171 行指向 5ccefe61f（recovery 重放保留了 15:48 的坏行）；
+      ② 净室复现：origin/main 树跑 pre_deploy_audit 报 [13/13] parse FAIL（修前）
+         → 15/15 PASS（修后）；③ 反向验证：假 ledger 漏收 avgprice ⇒ BLOCK 且点名；
+      ④ run 39023386088 job/step 级 success（step10+step14 非 skipped）；
+      ⑤ Pages 数据在部署 step 后恢复更新（run 内含 data 构建与推送）。
+    verified_at: "2026-10-17 18:10 run39023386088 success + step14 部署 success 实证"
+    updated: "2026-10-17 18:10"
+    updated_by: 小九(lemoncat-cn)
