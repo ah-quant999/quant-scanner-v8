@@ -16045,11 +16045,8 @@ h += '</div>'; // /ulPaneObserve
     var ladder = (lh.ladder && typeof lh.ladder === 'object' && !Array.isArray(lh.ladder)) ? lh.ladder : {};
     var top = (Array.isArray(lh.top) ? lh.top : []).filter(function(t){ return t && typeof t.lbc === 'number'; });
     var lhbCount = (lhb.stocks && lhb.stocks.length) || 0;
-    // 首板平铺用：LHB_DATA.stocks 去重（首板个股明细从此取）
-    var lhbSeen = {}, lhbUniq = [];
-    (window._safeArr(lhb.stocks)).forEach(function(s){
-      if(s && s.code && !lhbSeen[s.code]){ lhbSeen[s.code]=true; lhbUniq.push(s); }
-    });
+    // 2026-10-17 死代码清理：原「首板平铺用 lhbUniq（LHB_DATA.stocks 去重）」已废——
+    //   首板口径改为涨停池 lh.top(lbc==1)（见下方连板分布渲染），此去重块无任何消费方，删。
     var highLbc = _numOrNull(scm.high_ladder_count);
     if(highLbc == null) highLbc = Object.keys(ladder).reduce(function(s,k){ return s + (parseInt(k,10)>=3 ? (ladder[k]||0) : 0); }, 0);
     // 阶段判定
