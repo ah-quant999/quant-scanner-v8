@@ -628,7 +628,7 @@ window.__domReadyFns=[];
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
     <script src="data/MACRO_DATA.js?v=ec07c1a2bd" defer></script>
     <!-- 🔮 2026-10-05 主人令：未来预测子TAB（牛转熊指标观测台）数据，gen_market_thermo.py 日更 -->
-    <script src="data/MARKET_THERMO.js?v=d4e292e807" defer></script>
+    <script src="data/MARKET_THERMO.js?v=7643323747" defer></script>
     <script src="data/MACRO_BRIEF.js?v=67126dbe69" defer></script>
     <!-- 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役（巡检自动化已消亡、09-23 后死数据；生产者/渲染/派发/时窗一并清理，见 git 历史） -->
     <script src="data/NT_DATA.js?v=bbbe395f96" defer></script>
@@ -1760,8 +1760,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CAPITAL_FLOW_DATA.js?v=3f9744f3a8" defer></script>
 <script src="data/SH_SZ_HISTORY.js?v=dc16513372" defer></script>
 <script src="data/CANDIDATE.js?v=70ecca622b" defer></script>
-    <script src="data/FOUR_VOLUME.js?v=2f3d7539bb" defer></script>
-    <script src="data/FOUR_VOLUME_60M.js?v=fe8a6ef0bb" defer></script>
+    <script src="data/FOUR_VOLUME.js?v=9ac9533b5c" defer></script>
+    <script src="data/FOUR_VOLUME_60M.js?v=cc642fe76d" defer></script>
 
     <!-- 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」= 历史追踪 + 回测
          数据源：algorithms/update_four_volume_history.py（逐日账本+真实收盘价序列）
@@ -1770,7 +1770,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          ?v= 由 scripts/reconcile_cache_busters.py 自动对齐，此处写任意值即可。 -->
     <script src="data/FOUR_VOLUME_TRACK.js?v=603eaae1c8" defer></script>
     <script src="data/FOUR_VOLUME_HISTORY.js?v=e8bc6b82ee" defer></script>
-    <script src="data/STOCK_STOP_DATA.js?v=33e819cd89" defer></script>
+    <script src="data/STOCK_STOP_DATA.js?v=b7dcd0d9a6" defer></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=30d965a348" defer></script>
 <script src="data/BACKTEST_TDX.js?v=901169b2fb" defer></script>
 
@@ -1787,7 +1787,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
-    <script src="data/FACTOR_LAB.js?v=49241fc600" defer></script>
+    <script src="data/FACTOR_LAB.js?v=554e7b19cb" defer></script>
 <!-- 🔴 2026-10-06 阿狸咪的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
 <script src="data/ETF_PULSE.js?v=89d783bdae" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=16a93db9f1" defer></script>
@@ -1831,7 +1831,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          本次补齐：
          · LQSQ_BACKTEST = 主榜回测视图（summary.by_period 与四量同构 → 回测页逐档卡直接复用）
          · LQSQ_TRACK    = 归档信号（每日 Top5，2026-10-13 主人令由 Top30 收紧）+ 逐票前向跟踪（选股策略 · ⚖️ 量质双擎子页消费） -->
-    <script src="data/LQSQ_BACKTEST.js?v=7414eadaf1" defer></script>
+    <script src="data/LQSQ_BACKTEST.js?v=0ae427b514" defer></script>
     <script src="data/LQSQ_TRACK.js?v=f1ccd078a9" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
