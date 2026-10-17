@@ -7035,7 +7035,8 @@ items:
     title: "v8_lhb_fetch 的 `--only lhb` 是**不存在的参数**（实为无 PUSH_FILES 的全量回退推送）；且 `out/` 不在任何推送面 ⇒ 该链产物结构性永远落不了地"
     priority: P1
     owner: shared
-    status: todo
+    status: done
+    closed_by: thermo-lhb-push-fix-1017  # 已被同轮 thermo-lhb-push-fix-1017 根治（fetch_lhb落点 out/→raw_data/ + 工作流 Contents API 直推三件套）；线上 2026-10-17 已验证生效
     scope: workflow
     created: "2026-09-26 17:37"
     what: >-
