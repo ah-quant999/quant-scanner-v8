@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 137
+  next_id_seq: 138
 items:
   - id: index-creds-panel-refresh-1014
     owner: 阿狸咪的工程师
@@ -9355,4 +9355,14 @@ items:
     four_volume_note: "四量终极下架挂起：市场 beta 对比已出（上证 9-14~10-16 月跌 4.35%、T+5 胜率 28.6%；四量毛 -1.379% 仅较大盘 -1.174% 差 0.205pp、胜率反高 5pp，自身无 alpha），叠加 realflow 幽灵闸门+样本仅 1 月，删除与否待主人定夺。"
     verified_at: "2026-10-18 py_compile 0 错 + ls-tree 复核通过"
     updated: "2026-10-18 11:30"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: fourvolume-delist-1018
+    priority: P1
+    owner: shared
+    status: done
+    what: "四量终极完全下架删除（2026-10-18 主人令）。前端消费面全清(index.html 20处引用)+构建管线checkout修复+审计卡清单摘除+4处后端编排引用清理;真删15个四量相关跟踪文件(5脚本+6 data.js/json+pit_replay工作流/脚本/json);保留raw_data四量取证档案不删不拦。下架根因:真实信号流口径切换后主榜T+5 33.71%/-1.38%(n=89)跑输基准38.59%/-2.04%。"
+    evidence: "commit afc1d72e3264c188257ff1904fb92b8e12f14bd6 on main(快进自8c59436,非强推);git ls-tree -r 确认15文件已出树,仅留raw_data取证档案+v8_lqsq_pit_replay.yml(lqsq);前端残留大写FOUR_VOLUME仅11处为回测卡惰性分支字符串无害;run_algorithms.py四量10处全注释摘链。"
+    verify_how: "① 七文件清理脚本20+4处断言全过(py_compile 4后端0错);② plumbing推送commit-tree -p origin/main,推送后git ls-tree -r逐一核对15文件出树+7覆盖文件sha在树内;③ 远端链ORDER四量全注释佐证下架生效。"
+    verified_at: "2026-10-18 plumbing推送+ls-tree复核通过"
+    updated: "2026-10-18 22:30"
     updated_by: 阿狸咪的工程师(alimi-cn)
