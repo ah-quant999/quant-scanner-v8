@@ -5907,47 +5907,6 @@ c.innerHTML = h;
              又因标志位先清零而形成**无限重渲**，故删除。 */
         }catch(e){}
       })();
-      /* 🆕 2026-09-16 主人令「我只要真实数据最准确的回测…不要不一致会引起误会！」
-         —— 总表「四量终极」行改为**按真值源强制同源**。
-         🔄 2026-10-11 口径切换：真值源 data/FOUR_VOLUME_BACKTEST.js 已切为真实信号流
-            （gen_four_volume_track.py 产出，仅成熟档入表），本校正块逻辑不变、自动适配。
-         为什么必须做（实证）：
-           · 总表数据源 BACKTEST_ALL_ALGOS 是**聚合快照**，它那一行记的 source_time 是
-             2026-09-16 02:09，signal_date_range「近 3 年」，T+250 = 843 样本 / 90.7%——
-             而 02:09 正是云端刷新链用「3 年口径」覆盖 5 年真值的时刻（见小九 16:20 交接）。
-           · 源文件 data/FOUR_VOLUME_BACKTEST.js 事后已被恢复为真值：09-15 17:25:48、
-             近 5 年、861 信号、T+250 = 651 样本 / 70.0%，并加了防降级守卫。
-           · 本页「四量终极」回测卡读的正是该真值源 ⇒ 总表若继续用聚合值，同一页同一策略
-             会出现 90.7% 与 70.0% 两个数字，正是主人说的「不一致会引起误会」。
-         ⇒ 此处让总表该行与卡片强制同源（不造数、不插值、不手工改数，只是改读哪个真值）。 */
-      (function(){
-        try{
-          var _FV = window.FOUR_VOLUME_BACKTEST || {};
-          var _fp = (_FV.summary || {}).by_period;
-          if(!_fp) return;              /* 源未就绪 ⇒ 保留聚合值（下次渲染再校正） */
-          var _fb = null;
-          Object.keys(_fp).forEach(function(k){
-            var r = _fp[k] || {};
-            if((r.samples || 0) < MINS || r.win_rate == null) return;
-            if(!_fb || r.win_rate > _fb.win_rate
-               || (r.win_rate === _fb.win_rate && (r.avg_return || 0) > (_fb.avg_return || 0))){
-              _fb = { hold:'T+'+k, sample:r.samples, win_rate:r.win_rate, avg_return:r.avg_return };
-            }
-          });
-          if(!_fb) return;
-          var _fixed = 0;
-          _bestList = _bestList.map(function(x){
-            if(!x || x.card !== '四量终极') return x;
-            _fixed++;
-            var y = {};
-            Object.keys(x).forEach(function(kk){ y[kk] = x[kk]; });
-            y.hold = _fb.hold; y.sample = _fb.sample;
-            y.win_rate = _fb.win_rate; y.avg_return = _fb.avg_return;
-            y.srcFixed = 'FOUR_VOLUME_BACKTEST';   /* 供验收断言：本行已按真值源校正 */
-            return y;
-          });
-        }catch(e){}
-      })();
       var byWr = _bestList.slice().sort(function(a,b){ return (b.win_rate==null?-1:b.win_rate) - (a.win_rate==null?-1:a.win_rate); });
       var byAr = _bestList.slice().sort(function(a,b){ return (b.avg_return==null?-999:b.avg_return) - (a.avg_return==null?-999:a.avg_return); });
       var bestWr = byWr[0] || null, bestAr = byAr[0] || null;
@@ -18281,7 +18240,7 @@ window.__renderV8CalToday();
           tags += '<span class="no-shrink" style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;background:rgba(56,189,248,.18);color:#38bdf8;border:1px solid rgba(56,189,248,.4);white-space:nowrap;" title="四量强势信号：强度 '+_ai.cons+' / 2（单算法时代按信号强度计）">🔥 强 '+_ai.cons+'</span>';
         }
       }catch(_){}
-      var srcColor={'三重共识':'var(--purple)','四量终极':'#ff7043','逆势龙头·精锐':'#06b6d4'};
+      var srcColor={'三重共识':'var(--purple)','逆势龙头·精锐':'#06b6d4'};
       var _srcs = (s.sources||[]);
       var _isMulti = (_srcs.length >= 2);
       var srcChips=_srcs.map(function(src){ return '<span class="no-shrink"  style="font-size:'+(_isMulti?'12px':'11px')+';padding:2px 8px;border-radius:999px;background:'+(srcColor[src]||(_isMulti?'#f59e0b':'#64748b'))+'22;color:'+(srcColor[src]||(_isMulti?'#f59e0b':'#64748b'))+';border:1px solid '+(srcColor[src]||(_isMulti?'#f59e0b':'#64748b'))+'40;font-weight:'+(_isMulti?'800':'600')+';white-space:nowrap">'+(_isMulti?'🔥 ':'')+_fe(src)+'</span>'; }).join('');
