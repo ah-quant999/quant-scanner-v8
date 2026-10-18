@@ -17060,7 +17060,13 @@ h+=`</div>`;
     // ── 一句话结论（2026-10-16 主人令「都是活卡不要死的」：禁硬编码死文案——
     //    全部由当日数据实时拼装：EDHEC 牛熊态 + val10 日频/月末 + 社融脉冲 + 杠杆 + ERP +
     //    成交热度，数字天天滚。此前为写死字符串，连看多日无变化，被误判死卡）──
-    var _v10=(c.val10_d!=null?c.val10_d:c.val10), _v10Tag=(c.val10_d!=null?'日频·今':'月末'+c.date);
+    /* 🔴 2026-10-18 主人令「一劳永逸」口径归一：val10_d 实为「上证收盘·10年价格分位」
+       （gen_market_thermo.py L113-116 自证：实时上证 vs 滚动120月上证收盘），此前被前端
+       冒充「全市场PE·10年分位」用 ⇒ 图②线(PE月末分位)与标注(价格分位)口径打架。
+       现全站 _v10 一律取「PE 月末分位最后非空档」；价格水位只在观测台以真实名目并列展示。
+       铁律：任何显示位禁止把 val10_d 当 PE 分位引用。 */
+    var _pvI=-1; for(var _pi=D.val10.length-1;_pi>=0;_pi--){ if(D.val10[_pi]!=null){ _pvI=_pi; break; } }
+    var _v10=(_pvI>=0?D.val10[_pvI]:(c.val10!=null?c.val10:null)), _v10Tag=(_pvI>=0?('月末'+D.dates[_pvI]):'');
     var _bstTxt=(bst==='bear'?'熊市确认段':(bst==='side'?'牛市中回调段':'牛市上行段'));
     var _valTxt=(_v10==null?'数据累积中':(_v10>=80?'偏贵':(_v10<50?'偏低':'中性')));
     var _tsfY=(EXT.tsf&&EXT.tsf.yoy!=null)?EXT.tsf.yoy:null;
@@ -17083,7 +17089,7 @@ h+=`</div>`;
     var lvlTag={green:'&#x1F7E2; 正常',yellow:'&#x1F7E1; 警惕',red:'&#x1F534; 警示',muted:'&#x26AA; 待接入'};
     var lvlCol={green:C_GRN,yellow:C_AMB,red:C_RED,muted:C_DIM};
     var obs=[
-      {name:'全市场PE·10年分位',val:(_v10!=null?_v10:'—')+(_v10!=null?(c.val10_d!=null?' (日频·今)':' (月末 '+c.date+')'):''),thr:'&gt;80 贵 / &lt;50 便宜',lvl:(_v10==null?'muted':(_v10>=80?'red':(_v10<50?'green':'yellow'))),hist:'27年最高 '+vMax+' / 最低 '+vMin+'；三轮大顶(07/15/21)：'+vTops.join(' / ')},
+      {name:'全市场PE·10年分位',val:(_v10!=null?_v10:'—')+(_v10!=null?(' (月末 '+D.dates[_pvI]+')'+(c.val10_d!=null?' · 水位'+c.val10_d+'(日频·价格分位)':'')):''),thr:'&gt;80 贵 / &lt;50 便宜',lvl:(_v10==null?'muted':(_v10>=80?'red':(_v10<50?'green':'yellow'))),hist:'27年最高 '+vMax+' / 最低 '+vMin+'；三轮大顶(07/15/21)：'+vTops.join(' / ')},
       {name:'距牛市峰值回撤(EDHEC)',val:edhecDD.toFixed(1)+'%',thr:'≤-20% 确认熊市',lvl:(edhecDD<=-20?'red':(edhecDD<=-10?'yellow':'green')),hist:'当前='+(bst==='bear'?'熊市段':'牛市上行')+'；历史熊市最深 '+(worstDD==null?'—':worstDD.toFixed(0)+'%')},
       {name:'等权/上证 12M 背离',val:(ex12*100).toFixed(1)+'%',thr:'持续为负=赚指数不赚钱',lvl:(ex12<-0.10?'red':(ex12<0?'yellow':'green')),hist:'三轮大顶时：'+exTops.map(function(x){return x.toFixed(0)+'%';}).join(' / ')+'——大顶时未必为负，仅作辅助信号不单独判顶'},
       {name:'上证 vs 自身200月线',val:((D.sh[n-1]-shMA)>=0?'线上 +':'线下 ')+shMaPct.toFixed(1)+'%',thr:'跌破=长期转熊',lvl:((D.sh[n-1]-shMA)>=0?'green':'red'),hist:'历史最深偏离 '+(maMinDev==null?'—':maMinDev.toFixed(0)+'%')},
@@ -17188,10 +17194,12 @@ h+=`</div>`;
       if(isMin&&v2<=20) ext2.push({coord:[D.dates[i2],v2],symbol:'circle',symbolSize:0.1,itemStyle:{color:'transparent'},
         label:{show:true,formatter:D.dates[i2].slice(2,7)+'·'+v2,fontSize:10,fontWeight:700,color:C_GRN,textBorderColor:'#14181e',textBorderWidth:3,position:'top',distance:6}});
     }
-    var _curV = (c.val10_d!=null?c.val10_d:c.val10);
-    ext2.push({coord:[D.dates[D.dates.length-1],_curV],symbol:'circle',symbolSize:0.1,itemStyle:{color:'transparent'},
-      /* 2026-10-17 修复「最新数据的显示丢了」：末档 x=grid 右缘(56px 边距)，label position:'right' 整段伸出被容器裁掉（(日频) 尾缀丢失+与 26-06 极值标叠压）→ 改 position:'top' 居中于末档上方 */
-      label:{show:true,formatter:'当前 '+_curV+(c.val10_d!=null?' (日频)':''),fontSize:11,fontWeight:700,color:C_PUR,textBorderColor:'#14181e',textBorderWidth:3,position:'top',distance:8}});
+    /* 🔴 2026-10-18 口径归一：图②线=PE 月末分位，标注必须挂同一序列同一坐标
+       （此前挂 val10_d 价格分位 88.3 于最末月槽，线本身没到 80 ⇒ 视觉割裂）。
+       保留 position:'top'（2026-10-17 修复的右缘裁切问题，末非空槽靠近右缘仍适用）。 */
+    var _curV = (_pvI>=0?D.val10[_pvI]:null);
+    if(_curV!=null) ext2.push({coord:[D.dates[_pvI],_curV],symbol:'circle',symbolSize:0.1,itemStyle:{color:'transparent'},
+      label:{show:true,formatter:'当前 '+_curV+' ('+D.dates[_pvI]+' 月末)',fontSize:11,fontWeight:700,color:C_PUR,textBorderColor:'#14181e',textBorderWidth:3,position:'top',distance:8}});
     c2.setOption({
       backgroundColor:'transparent', tooltip:TIP,
       grid:{left:44,right:56,top:24,bottom:58},
