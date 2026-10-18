@@ -9426,3 +9426,13 @@ items:
     verified_at: "2026-10-18 真机点击验证通过"
     updated: "2026-10-18 22:10"
     updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: intraday-momentum-launch-1018
+    priority: P1
+    owner: 阿狸咪的工程师
+    status: done
+    what: "第三支自研算法『日内动量』(S7) 上线（2026-10-18 主人令『可靠科学且有效的我都要·值得做的都放选股策略，跟在低波后面，一个算法一个子页面，和低波一样要有回测』）。上市前置回测唯一显著跑赢档：N=20 α+1.73pp/胜率42.6%（动量策略正偏度天然胜率偏低，非缺陷）；N≥45 衰减⇒主档 T+20。S5 短期反转/S6 52周新高贴近全档 α 负，留档未上线。接入=注册三件套(run_algorithms 预算表/ORDER/STAGES + gen_backtest_all_algos 总表 dict + v8_health_check 监控) + 前端8处(跟低波后独立子页 st-intraday，含真实信号流选股+回测双段渲染)。producer strategy_intraday_momentum.py 已落盘 data/INTRADAY_MOMENTUM*.js + raw_data 归档。"
+    evidence: "launch commit 9a9cb7646ac2（9文件：producer+2 data js+2 raw json+ra/gba/hc+index，plumbing 快进非强推，ls-tree 核验全入树）。文案补刀 commit a8a4245bebf8（renderIntraday 从低波镜像残留『60日波动率最低/低波+趋稳/60日低波Top/20日日内率最低/__lowvolRetry』，精准替换仅动 intraday 段，低波卡原文案保留）。"
+    verify_how: "①改 index.html 后对全部 31 个内联脚本块跑 node --check，0 错（铁律）；②推送后观察两个完整 build 周期（含一次 build 失败），远端 tip 前进且 intraday 修正未被回退，低波卡文案不变；③🔴真机无头浏览器(playwright-core+msedge)点击日内动量 tab：paneDisplay=block、activePanes=[st-intraday]、10 只选股注入到位、回测 8 行(历史回放)渲染、note 文案 noteIsFixed=true（非低波残留）；④仅 favicon 404 全站旧存，与 intraday 无关。"
+    verified_at: "2026-10-18 真机点击验证通过"
+    updated: "2026-10-18 22:35"
+    updated_by: 阿狸咪的工程师(alimi-cn)
