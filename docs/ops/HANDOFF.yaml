@@ -9406,3 +9406,13 @@ items:
     verified_at: "2026-10-18 线上实时抓取验证通过"
     updated: "2026-10-18 20:45"
     updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: lowvol-replay-fill-1018
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: done
+    what: "低波趋稳回测卡填入历史规则回放（2026-10-18 20:24 主人令「先用已有数据回测一下，明天开始用算法跑出来的股票回测」）。bt_newalgos S2 同口径规则在窗口 2025-04-24~2026-10-16（全A过滤后2574只）逐日重放，8 档持有期全量：T+60 avg+5.99%/基准+1.99%/α+4.00pp/胜率53.3%（n=2013）唯显著档；短档 T+1~T+20 α 在 ±0.3pp 内（诚实展示不隐藏）。"
+    evidence: "commit c259240344 快进自 c4ceb0ec5b（非强推）。①data/LOWVOL_TREND_BACKTEST.js 加独立 replay 字段（kind=historical_rule_replay_sample_in，明标样本内选择偏差、禁作主榜/评级/上下架依据）；②producer strategy_lowvol_trend.py 写 OUT_JS 时从旧文件透传 replay（防链上日跑冲掉）；③index.html renderLowvol 回测卡双段渲染（📡真实信号流=权威 + 🧪历史回放=参考）。summary.by_period（真实信号流）保持空未污染。"
+    verify_how: "①31 个内联脚本块 node --check 全过（改动前后各一遍）；②构建周期复验远端 7f65fed41a 仍含修复未回退；③实时抓 Pages 主站：31 块 0 语法错误、双段组头在线、replay 8 档 T+60 avg 5.99/α 4.0 在线、真实信号流区仍空。"
+    verified_at: "2026-10-18 线上实时抓取验证通过"
+    updated: "2026-10-18 20:50"
+    updated_by: 阿狸咪的工程师(alimi-cn)
