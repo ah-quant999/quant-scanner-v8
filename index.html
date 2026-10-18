@@ -14471,7 +14471,9 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
   };
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
-    ['fv','pool','life','lqsq'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    // 🔴 2026-10-18 主人截图修复：原数组 ['fv','pool','life','lqsq'] 漏 'lowvol' → 低波 pane 永不显示（全黑）；
+    // 且 'fv' 为死项（st-fv DOM 全站 0）。pane id 必须与 .st-pane DOM 一一对应。
+    ['pool','life','lqsq','lowvol'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
     // 2026-08-29 主人令：选股池子页渲染（2026-09-11：并入金股池卡片，统一走 renderStPoolAll）
     if(n==='pool' && typeof window.renderStPoolAll==='function') setTimeout(window.renderStPoolAll, 30);
