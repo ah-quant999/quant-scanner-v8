@@ -9396,3 +9396,13 @@ items:
     verified_at: "2026-10-18 线上实时抓取验证通过"
     updated: "2026-10-18 20:15"
     updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: st-tab-chain-fix-1018
+    priority: P0
+    owner: 阿狸咪的工程师
+    status: done
+    what: "选股策略子页全 tab 点不动（2026-10-18 20:08 主人截图报障，控制台 Unexpected token 'else'）。根因=lowvol-trend-launch-1018 接入时把 window.renderLowvol 函数定义误插进 renderStTab 的 if/else 分发链中间 ⇒ else if(tab==='lqsq') 悬空 ⇒ 主脚本整块语法错误，全站交互失效。教训：改 index.html 后必须对全部内联脚本块跑 node --check，锚点断言不等于语法正确。"
+    evidence: "commit 88410e1958fe 快进自 c0661508fd（非强推）。重建分发链（lqsq 分支闭合 + lowvol 独立分支）+ 定义外移至 renderStTab 之后；全部 31 个内联脚本块 node --check 通过。"
+    verify_how: "①修复后逐块 node --check 31/31 通过；②完整构建周期复验（远端 5f5d980bcb 仍含修复，未被回退）；③实时抓 Pages 主站重新逐块检查：0 语法错误、else if(tab==='lowvol') 恰 1 处、无悬空 else。"
+    verified_at: "2026-10-18 线上实时抓取验证通过"
+    updated: "2026-10-18 20:45"
+    updated_by: 阿狸咪的工程师(alimi-cn)
