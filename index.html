@@ -1266,24 +1266,6 @@ function __judgmentCandidatesHTML(){
 
 
 
-  // 3) 四量终极（QD 共振，短线量能突破）
-  _safeArr(window.FOUR_VOLUME && window.FOUR_VOLUME.stocks).forEach(function(s){
-    var comp = s.components || {};
-    var trueCount = Object.keys(comp).filter(function(k){return comp[k];}).length;
-    _push({
-      code:s.code, name:s.name, market:(s.market||'sz'), board:(s.board_label||''),
-      src:'四量终极', srcEmoji:'🔥', srcColor:'#ff7043',
-      score:trueCount,
-      buyScore:trueCount/7*100,
-      horizon:'短线',
-      close:s.close, pct:s.pct_chg,
-      stopLoss:null, targetPrice:null,
-      industry:'', concepts:[],
-      reason:s.reason || '',
-      enterDate:s.enter_date,
-      worth: !!s.qd && trueCount >= 5
-    });
-  });
 
   // 去重：同代码保留最高 buyScore
   var map = {};
@@ -1474,15 +1456,6 @@ function __judgmentCandidatesHTML(){
         var _e = (_srcs.length >= 2) ? '🔥' : (s.srcEmoji || '');
         var _sz = (_srcs.length >= 2) ? '13px' : '12px';
         return '<span style="font-size:'+_sz+';padding:3px 10px;border-radius:999px;background:'+_c+'22;color:'+_c+';font-weight:800;letter-spacing:.3px;">'+_e+' '+_r+'</span>';
-      })()
-      // ── 60m 共振标记 ──
-      + (function(){
-        var _60d = window.FOUR_VOLUME_60M || {};
-        var _60h = window._safeArr(_60d.hits || _60d.stocks);
-        var _nc = String(s.code||'').replace(/\D/g,'');
-        var _hit = _60h.some(function(x){ return String(x.code||'').replace(/\D/g,'') === _nc; });
-        if(_hit) return '<span style="font-size:11px;color:#a78bfa;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.40);padding:2px 8px;border-radius:10px;font-weight:800;">🔔 60m</span>';
-        return '';
       })()
       + (priceText ? '<span style="font-size:14px;font-weight:800;color:var(--txt)">'+priceText+'</span>' : '')
       + (pctText ? '<span style="font-size:12px;font-weight:700;color:'+pctColor+'">'+pctText+'</span>' : '')
@@ -1760,16 +1733,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CAPITAL_FLOW_DATA.js?v=3f9744f3a8" defer></script>
 <script src="data/SH_SZ_HISTORY.js?v=dc16513372" defer></script>
 <script src="data/CANDIDATE.js?v=5af550c1ef" defer></script>
-    <script src="data/FOUR_VOLUME.js?v=ec821450a5" defer></script>
-    <script src="data/FOUR_VOLUME_60M.js?v=ee271a9ced" defer></script>
 
-    <!-- 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」= 历史追踪 + 回测
-         数据源：algorithms/update_four_volume_history.py（逐日账本+真实收盘价序列）
-                algorithms/gen_four_volume_track.py（持仓跟踪/告警/前向累积/聚类/重叠）
-         经 update_v8.py 的 CATEGORY_MAP 生成 data/*.js 注入 window 变量。
-         ?v= 由 scripts/reconcile_cache_busters.py 自动对齐，此处写任意值即可。 -->
-    <script src="data/FOUR_VOLUME_TRACK.js?v=4dd9431f17" defer></script>
-    <script src="data/FOUR_VOLUME_HISTORY.js?v=d41ec7deef" defer></script>
     <script src="data/STOCK_STOP_DATA.js?v=7984c9fcd1" defer></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=dd4f3fc356" defer></script>
 <script src="data/BACKTEST_TDX.js?v=11575415f9" defer></script>
@@ -1826,7 +1790,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=ea1c7bcadd" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=fe0da93ea7" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/FOUR_VOLUME_BACKTEST.js?v=66ec04861b" defer></script>
     <script src="data/IMA_STRONG_BACKTEST.js?v=ff5f08a343" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🆕 2026-10-12 小九：量质双擎（LQSQ · 第一支自研算法）前端接入 —— 后端数据链 10-11 已跑，
          但前端此前**零挂载**（注入/卡片/子页全缺）⇒ 主站无处显示（主人「我半天没看到在哪显示」）。
@@ -3120,91 +3083,6 @@ function fmtSigned(v){
       </div>
     </div><!--/st-pool-->
 
-    <!-- ===== TAB 页面：四量终极（2026-09-02 主人令：从已下架·选股模块迁回选股策略子页） ===== -->
-    <div id="st-fv" class="st-pane">
-      <div class="card" id="stfvCard">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-          🔥 <span style="font-weight:700;font-size:14px;color:var(--txt);">四量终极</span>
-          <span class="st-tab-star" data-card="四量终极"></span>
-          <span id="stfvTime"><span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新于</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">已加载</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span></span>
-          <!-- 2026-08-31 主人令：统一胶囊版式（绿色 ✅ 与 finalStatusBadges 一致）。JS 会 textContent 覆盖 --><span id="stfvRunBadge" style="display:none;margin-left:6px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);align-items:center;gap:4px;white-space:nowrap;">✅ 已就绪</span>
-          <span id="stfvHoldBadge" style="display:none;margin-left:6px;"></span>
-        </div>
-        <div id="stfvNote" style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6;"></div>
-        <!-- 2026-09-11 主人 P2：A 类（成交方向推断）卡统一口径披露 -->
-        <div class="note">⚠️ 口径披露：本卡资金相关数值为<b>按主动成交方向推断的估算值</b>（东方财富「主力净额」口径），<b>非真实资金进出</b>。真实资金行为请看「资金热度·净申赎」（真实份额申赎）与「龙虎榜」（真实席位）。</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px;">
-          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
-            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">🎯 QD 命中</div>
-            <div id="stfvQD" style="font-size:24px;font-weight:800;color:var(--orange);">0</div>
-            <div style="font-size:10px;color:var(--dim);">四路共振</div>
-          </div>
-          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
-            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">🔥 游资点火</div>
-            <div id="stfvYZC" style="font-size:24px;font-weight:800;color:var(--up);">0</div>
-            <div style="font-size:10px;color:var(--dim);">YZC 触发</div>
-          </div>
-          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
-            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">🏦 机构托底</div>
-            <div id="stfvJG" style="font-size:24px;font-weight:800;color:var(--cyan);">0</div>
-            <div style="font-size:10px;color:var(--dim);">JG 托底</div>
-          </div>
-          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
-            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">⚡ 当天金叉</div>
-            <div id="stfvXC" style="font-size:24px;font-weight:800;color:var(--gold);">0</div>
-            <div style="font-size:10px;color:var(--dim);">XC 金叉</div>
-          </div>
-          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
-            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">📈 四路翻多</div>
-            <div id="stfvFOUR" style="font-size:24px;font-weight:800;color:var(--purple);">0</div>
-            <div style="font-size:10px;color:var(--dim);">FOUR 信号</div>
-          </div>
-        </div>
-        <div id="stfvHits"></div>
-      </div>
-      <!-- ===== 2026-09-15 主人令：四量终极「自己的一整套系统」 =====
-           「四量是现查收益率最好的选股方式，必须有自己的一整套系统，特别是历史追踪。」
-           以下 6 张子卡与「严格三重共识」页同版式、同数据口径族：
-             持仓盈亏跟踪 / 状态迁移告警 / 回测 N 日胜率（信号层）
-             / 板块聚类 / 每日入选历史
-           （原第 7 张「选股池重叠度」已于 2026-09-16 主人令整卡删除 —— 数据源从未产出；
-             原「前向累积跟踪」已于 2026-10-04 主人令整卡删除 —— 与回测N日胜率重复）
-           数据源：data/FOUR_VOLUME_TRACK.js + data/FOUR_VOLUME_HISTORY.js
-                  （update_v8 由 raw_data/four_volume_track.json /
-                    four_volume_history.json 生成） -->
-      <div class="card">
-        <h3><span class="ic">📈</span>持仓盈亏跟踪 <span style="font-size:11px;color:var(--sub);font-weight:400">- 盘后 ·</span> <span class="fresh" id="fvTrackTime">—</span></h3>
-        <div class="note">入选以来涨跌 = 入选信号日收盘价 → 最新收盘价（真实收盘价逐日累积）；持有/连续按「信号日批次」计。价格源标注 quote=全市场行情快照 / ledger=账本自记 / none=取不到（留空不用 0 冒充）。</div>
-        <!-- 2026-10-04 主人令：改由 JS 按入选月分组渲染（本月展开、历史月折叠），表头随月内表格生成 -->
-        <div id="fvTrackBody"><div style="color:var(--sub);text-align:center;padding:14px">加载中…</div></div>
-      </div>
-      <div class="card">
-        <h3><span class="ic">🔔</span>状态迁移 &amp; 告警 · <span class="fresh" id="fvAlertCount">0</span></h3>
-        <div id="fvAlerts"></div>
-      </div>
-      <div class="card">
-        <h3><span class="ic">📊</span>回测 N 日胜率（信号层 · 近5年） - 历史<span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:6px;">✅ 真实数据回测</span></h3>
-        <div class="note" id="fvBackNote">加载中…</div>
-        <table id="fvBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>最好</th><th>最差</th><th>最大回撤</th><th>夏普</th></tr></thead><tbody id="fvBackBody"></tbody></table>
-      </div>
-      <!-- 🔴 2026-10-04 主人令：前向累积跟踪整卡删除（与回测N日胜率高度重复：
-           回测卡=近5年1518信号大样本回溯全期限谱；本卡=上线以来仅12信号日小样本，
-           为回测卡实时子集，统计意义弱 ⇒ 删重留回测卡。fvRenderSelf 同步删除。 -->
-      <div class="card">
-        <h3><span class="ic">🏭</span>板块聚类（相关性风险） - 盘后</h3>
-        <div class="note">当前在池（active）票的行业分布；单一行业占比过高提示同涨同跌相关性风险。</div>
-        <div id="fvCluster"></div>
-      </div>
-      <!-- 🔴 2026-09-16 主人令（第三轮纠偏）：「选股池重叠度」整卡删除（与三重共识页同一张死卡）。
-           数据源 track.overlap / top10_ge70 / total_tracked 在 ALGO_TRACK 数据层全无，
-           生成脚本 gen_algo_track.py 亦不产出 ⇒ 永久只显示「无重叠数据」。
-           其说明文字仍在引用已删除的「全站精选层」⇒ 双重问题（死卡 + 已删策略残留），整卡移除。 -->
-      <div class="card">
-        <h3><span class="ic">📅</span>四量入选历史（每日记录） - 历史</h3>
-        <div class="note">每个信号日的四量命中清单与最新跟踪状态（来自 four_volume_history.json）。</div>
-        <div id="fvHistory"></div>
-      </div>
-    </div><!--/st-fv-->
 
     <!-- ===== TAB 页面：量质双擎（LQSQ · 第一支自研算法 · 🆕 2026-10-12 小九接入） =====
          定位（gen_lqsq_top5.py 原文）：独立选股器 —— 全市场按「因子 r=mean(vol,近20日)/mean(vol,前240日)」
@@ -4853,7 +4731,7 @@ c.innerHTML = h;
   /* 2026-09-02 主人令：选股模块星级表全局化（原在已下架分组内，现卡片迁回选股策略仍需共享） */
   /* 2026-09-13 主人令「统一测算标准」——**本表不再是星级真源**，改为校验用的人工覆写口（默认空）。全站星级一律由 window.__committeeRate() 从**多期真实样本**实时计算，一处算、全站用，根治「同一策略两处不同星」。星级覆写见 window.__MODULE_STARS_OVERRIDE。 */
   window.__MODULE_STARS = {};
-  window.__STAR_KEY2CARD = {fourvolume:'四量终极', candidate:'候选池', goldpool:'金股池'};  /* 🔴 2026-10-11：triple/crds 随两策略下架移除 */
+  window.__STAR_KEY2CARD = {candidate:'候选池', goldpool:'金股池'};  /* 🔴 2026-10-11：triple/crds 随两策略下架移除 */
   window.__moduleStarsHTML = function(k){
     var card = window.__STAR_KEY2CARD[k] || k;
     var n = window.__committeeStarsOf(card);
@@ -5358,8 +5236,7 @@ c.innerHTML = h;
   window.__STRATEGY_BACKTESTS = [
     // 2026-09-03 主人令：已下架策略（cockpit/allsite/hunter）整体从回测区退出，
     // 既然选股策略子页已彻底删除（九宝不让「选股已删回测还在」），回测卡也不必保留。
-    // 当前 active 主策略：四量终极 → 量质双擎（双擎紧接四量下方）→ 强势跟踪。
-    {key:'fourvolume', name:'四量终极',     icon:'📊', desc:'四量真实信号流回测（2026-10-11 主人令切换，历史回放口径作废）· 样本自 09-14 累积中，仅显示成熟档 · 观察期：胜率/收益未达红线时回测页出下架提请', color:'#38bdf8', var:'FOUR_VOLUME_BACKTEST'},
+    // 当前 active 主策略：量质双擎（双擎）→ 强势跟踪。
     /* 🆕 2026-10-12 小九：第一支自研算法「量质双擎」(LQSQ) —— 真实信号流口径直上主榜，
        与四量同榜同纪律（gen_lqsq_top5.py → LQSQ_BACKTEST，summary.by_period 与四量同构，
        故 _renderPeriodBacktestCard 零结构改动直接复用）。样本自 10-09 起累积、未走满 T+20
@@ -5881,7 +5758,7 @@ c.innerHTML = h;
         }
       });
       if(!R.length && !INS.length) return '';
-      var _STARKEY = { '三重共识':'triple', '四量终极':'fourvolume', '逆势龙头':'crds', '候选池':'candidate', '金股池':'goldpool' };
+      var _STARKEY = { '三重共识':'triple', '逆势龙头':'crds', '候选池':'candidate', '金股池':'goldpool' };
       function _n(v,d){ return (v==null || isNaN(v)) ? '—' : Number(v).toFixed(d==null?1:d); }
       function _sgn(v){ return (v==null||isNaN(v)) ? '' : (Number(v)>=0 ? '+' : ''); }
       /* 2026-09-13 主人令「统一测算标准」：星级一律取全站唯一真源 __committeeRate。
@@ -6413,16 +6290,12 @@ c.innerHTML = h;
     (function(){
       var _STRATS = [
         /* 🔴 2026-10-11 主人令「完全下架」：triple（三重共识）/ crds（逆势龙头）条目随两策略下架移除。 */
-        { key:'fourvolume', name:'四量终极', icon:'📊', color:'#38bdf8',
-          method:'四量终极历史回测（前复权·扣双边 0.3%）：信号日次一交易日开盘买入，持有 N 个真实交易日末日收盘价卖出，最大回撤/夏普比下方展示。',
-          def:'胜率=收益>0占比（排平盘）；最大回撤=全局累计收益峰谷。' },
       ];
       // P2-A：低样本判定阈
       var SAMPLE_LOW_THRESHOLD = 30;
       function _metric(s){
         /* 🔴 2026-10-11 主人令「完全下架」：triple 旧代理分支（BACKTEST_COMPREHENSIVE）已删。 */
-        var vname = s.key==='fourvolume' ? 'FOUR_VOLUME_BACKTEST'
-                  : null;
+        var vname = null;
         var sm=((window[vname]||{}).summary||{});
         var total=sm.total_signals||0, bp=sm.by_period||{}, upd=sm.update_time||sm.calc_time||'';
 
@@ -6548,7 +6421,7 @@ c.innerHTML = h;
       };
       if(typeof _rbc === 'function'){
         /* 🔴 2026-10-12 主人令：双擎紧跟四量下方（四量 → 双擎 → 强势跟踪） */
-        html += _rbc(_pick(['fourvolume','lqsq','strongtrack']));
+        html += _rbc(_pick(['lqsq','strongtrack']));
       }
       if(typeof _rbc === 'function'){
         html += _rbc(_pick(['crds']));
@@ -9417,9 +9290,6 @@ window.v8SectorFlow = window.v8SectorFlow || (function(){
     const cstocks = cd.stocks || {};
     const ckey = Object.keys(cstocks).find(k=>normCode(cstocks[k].code)===nc);
     if(ckey) hits.push({name:'🎯 候选池', detail:(cstocks[ckey].sources||[]).join(' / ')});
-    const fv = window.FOUR_VOLUME || {};
-    const frow = window._safeArr(fv.stocks).find(r=>normCode(r.code)===nc);
-    if(frow) hits.push({name:'🔥 四量终极', detail:'游资+机构+金叉+四路翻多'});
     const hitN = hits.length;
 
     // === 口径②：算法综合分（技术面+基本面+资金面，0-100） ===
@@ -9531,10 +9401,6 @@ window.v8SectorFlow = window.v8SectorFlow || (function(){
     if(ckey) hits.push({name:'🎯 候选池', color:'var(--cyan)', detail:(cstocks[ckey].sources||[]).join(' / ')});
     // COCKPIT_TIER_RECOMMEND 已下线（2026-09-03）：cp/cpa/cpb 占位变量连同 if(cpa)/else if(cpb) 命中 push 一起不再保留
     // 🔴 逆势龙头 CRDS 命中腿已删（2026-10-11 主人令「完全下架」）
-    // 四量终极
-    const fv = window.FOUR_VOLUME || {};
-    const frow = window._safeArr(fv.stocks).find(r=>normCode(r.code)===nc);
-    if(frow) hits.push({name:'🔥 四量终极', color:'#ff7043', detail:'游资+机构+金叉+四路翻多'});
 
     if(!hits.length) return '';
     let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
@@ -12451,7 +12317,7 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'最终推荐·Top3', source:'IMA_STRONG_STOCK/TOP10_DAILY/FOUR_VOLUME', freq:'收盘后1次', slots:['19:15','20:15'], note:'强势跟踪强度分×因子榜混排'},
+          {name:'最终推荐·Top3', source:'IMA_STRONG_STOCK/TOP10_DAILY', freq:'收盘后1次', slots:['19:15','20:15'], note:'强势跟踪强度分×因子榜混排'},
 
           {name:'今日推荐候选池聚合', source:'CANDIDATE', freq:'收盘后1次', slots:['2','0',':','0','0'], note:'候选池聚合'},
 
@@ -12487,24 +12353,16 @@ function drawUpDownChart(){
 
 
 
-          {name:'回测N日胜率(信号层)', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'信号层回测'},
 
-          {name:'严格vs宽松', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'阈值对照'},
 
-          {name:'阈值敏感性', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'敏感性'},
 
-          {name:'板块聚类(相关性风险)', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'板块聚类'},
 
           /* 🔴 2026-10-11：三重入选历史行随三重共识下架移除 */
 
-          {name:'回测N日胜率(近5年)', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'近5年回测'},
-
-          {name:'四量入选历史', source:'FOUR_VOLUME_HISTORY', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'四量历史'},
 
 
-          {name:'四量终极60m', source:'FOUR_VOLUME_60M', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'60m 量价'},
 
-          {name:'算法追踪', source:'ALGO_TRACK', freq:'收盘后1次', slots:['1','9',':','1','5'], note:'算法链追踪'},
+
 
         ]
 
@@ -12566,7 +12424,6 @@ function drawUpDownChart(){
 
           {name:'运维常态巡检(v8_health_patrol)', source:'HEALTH_CHECK', freq:'每30分云端cron', slots:['00:08','00:38','01:08','01:38','02:08','02:38','03:08','03:38','04:08','04:38','05:08','05:38','06:08','06:38','07:08','07:38','08:08','08:38','09:08','09:38','10:08','10:38','11:08','11:38','12:08','12:38','13:08','13:38','14:08','14:38','15:08','15:38','16:08','16:38','17:08','17:38','18:08','18:38','19:08','19:38','20:08','20:38','21:08','21:38','22:08','22:38','23:08','23:38'], note:'全站巡检+自愈'},
 
-          {name:'盘中/隔夜Lite算法链(v8_algo_intraday_lite)', source:'ALGO_TRACK', freq:'工作日·4唤醒点', slots:['09:00','11:00','13:00','15:00'], note:'算法追踪+健康面板'},
 
           {name:'强势跟踪水源(v8_ima_strong_stock)', source:'IMA_STRONG_STOCK', freq:'工作日15:45', slots:['15:45'], note:'ima 短线情绪选股'},
 
@@ -13103,7 +12960,7 @@ function drawUpDownChart(){
     '盘后数据': ['MARGIN_DATA', 'ETF_DAILY_MONITOR', 'SECTOR_RECOMMENDATION', 'ETF_NET_SUBSCRIPTION', 'W52_HIGH', 'SECTOR_YEAR_FLOW'],
     '共振日历': ['CRISIS_DATA', 'LHB_DATA'],
     '最终推荐': ['FACTOR_LAB', 'TOP10_DAILY'],
-    '选股策略': ['FOUR_VOLUME_BACKTEST', 'CANDIDATE', 'GOLD_POOL', 'FOUR_VOLUME', 'FOUR_VOLUME_60M', 'ALGO_TRACK', 'IMA_STRONG_BACKTEST', 'FOUR_VOLUME_HISTORY', 'FOUR_VOLUME_TRACK', 'VOLATILITY', 'STOCK_STOP_DATA', 'H_AUTO_BUY', 'H_AUTO_BUY_TRACK', 'IMA_STRONG_STOCK'],  /* 🔴 2026-10-11：TRIPLE_CONSENSUS/TRIPLE_HISTORY/CRDS_CARD_DATA 随两策略下架移除 */
+    '选股策略': ['CANDIDATE', 'GOLD_POOL', 'IMA_STRONG_BACKTEST', 'VOLATILITY', 'STOCK_STOP_DATA', 'H_AUTO_BUY', 'H_AUTO_BUY_TRACK', 'IMA_STRONG_STOCK'],  /* 🔴 2026-10-11：TRIPLE_CONSENSUS/TRIPLE_HISTORY/CRDS_CARD_DATA 随两策略下架移除；🔴 2026-10-18：四量终极+ALGO_TRACK 随四量下架移除 */
     '策略回测': ['BACKTEST_ALL_ALGOS'],
     '暂未上架': ['MARKET_REGIME', 'SECTOR_LEADERS', 'FIRST_BOARD_ALERT', 'DAJIJIN_REDUCTION'],
     '运维': ['INST_TRADE', 'DO_NOT_DELETE'],
@@ -14223,29 +14080,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     box.innerHTML=h;
   }
 
-  window.renderFourVolumeExtra = function(){
-    var TRACK = window.FOUR_VOLUME_TRACK || null;
-    var HIST  = window.FOUR_VOLUME_HISTORY || null;
-    var BT    = window.FOUR_VOLUME_BACKTEST || null;
-    var safe = function(fn, a1, a2){ try{ fn(a1, a2); }catch(e){ console.warn('四量跟踪渲染失败', e); } };
-    safe(fvRenderTrack, TRACK);
-    safe(fvRenderBacktest, BT);
-    safe(fvRenderHistory, HIST, TRACK);
-    return {track:!!TRACK, hist:!!HIST, bt:!!BT};
-  };
-  window.renderFourVolumeExtra();
-  // 🛡 自愈轮询：data/*.js 为 defer 脚本，首调时可能尚未注入 → 每 800ms 补渲一次（与 initTriple 同法）
-  (function(){
-    var _n=0;
-    window.__fvExtraHealTimer = setInterval(function(){
-      _n++;
-      if(window.FOUR_VOLUME_TRACK && window.FOUR_VOLUME_HISTORY){
-        clearInterval(window.__fvExtraHealTimer); window.__fvExtraHealTimer=null;
-        try{ window.renderFourVolumeExtra(); }catch(e){ console.warn('[fvHeal]', e); }
-      }
-      if(_n > 60){ clearInterval(window.__fvExtraHealTimer); window.__fvExtraHealTimer=null; }
-    }, 800);
-  })();
 
   // ════════════════════════════════════════════════════════════════════
   // 2026-09-01 主人令：🆕 多 algo 共识 · 独立子页渲染
@@ -14368,11 +14202,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     try{ if(window.__renderOps) window.__renderOps(); }catch(e){}
     if(tab==='pool'){ /* 2026-09-11 补齐：pool 原无分支 → 重试路径永不重渲（金股池+选股池一起） */
       try{ if(window.renderStPoolAll) window.renderStPoolAll(); }catch(e){ console.warn('选股池渲染失败',e); } }
-    else if(tab==='fv'){ /* 跨脚本块：必须走 window，裸调用会 ReferenceError（2026-08-07 修） */
-      if(!stRendered.fv){ stRendered.fv=1; }
-      /* 🆕 2026-09-15 主人令：四量自己的历史追踪 + 回测子卡（每次切 tab 重渲，防 stale） */
-      if(window.renderFourVolumeExtra){ try{ window.renderFourVolumeExtra(); }catch(e){ console.warn('四量跟踪渲染失败',e); } }
-      try{ window.renderFourVolume(); }catch(e){ console.warn('四量终极渲染失败',e); } }
     else if(tab==='fa'){
       if(typeof window.__renderFactorPane==='function'){ try{ window.__renderFactorPane(); }catch(e){} }
     }
@@ -16769,168 +16598,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
         renderUnlisted / renderDelisted` 顶层注册全部中断（四量终极/暂未上架/已下架 三卡失效）。
         现删除该悬空行，恢复三卡注册。 */
 
-  /* ===== 四量终极 · tab 渲染（2026-08-06 主人令·从暂未上架移出） ===== */
-  function renderFourVolume(){
-    // 🛡 2026-08-19 主人令修复：四星终极卡同时读日线 FOUR_VOLUME + 60min FOUR_VOLUME_60M
-    // （strategy_four_volume.py 日线版孤儿·未在算法链 ORDER 里，60m 版持续维护；
-    // 之前 render 只读 FOUR_VOLUME → 60m 有信号也显示为 0。让两条线合并展示，yzc/jg/xc/four/qd
-    // 顶层字段一致可直接合并去重。时间戳取最新。修后今天的中石科技 300684 60m 信号可见）
-    var d = window.FOUR_VOLUME || {};
-    var d60 = window.FOUR_VOLUME_60M || {};
-    if(d60 && d60.stocks && d60.stocks.length){
-      var seen = {};
-      (d.stocks || []).forEach(function(s){ if(s && s.code) seen[s.code] = true; });
-      var merged = (d.stocks || []).slice();
-      (d60.stocks || []).forEach(function(s){
-        if(s && s.code && !seen[s.code]) merged.push(s);
-      });
-      d = Object.assign({}, d, {stocks: merged});
-      if(d60.update_time && (!d.update_time || d60.update_time > d.update_time)){
-        d.update_time = d60.update_time;
-      }
-    }
-    // 2026-08-06 修复：占位胶囊用 setBadge 标准格式（带盘后+短线），与其他算法胶囊完全一致。
-    // data.update_time 有值 → 显示「🐻 更新于 19:43 · 盘后 · 短线」；
-    // data.update_time 缺失（备份数据无时间戳）→ 显示「🐻 更新于 — · 盘后 · 短线」。
-    // 2026-08-06 22:59 主人无痕模式截图四量终极仍不见胶囊 — 用 try/catch 包 + fallback 直接 innerHTML
-    // 让胶囊必定可见（数据缺失时显示「已加载」，数据完整时显示「🐻 更新于 HH:MM · 盘后 · 短线」）
-    // 2026-08-06 23:18 主人截图胶囊反复不见 → try/catch 包 _uBadge 调用 + 双保险 fallback
-    try{
-      var _stfv=document.getElementById('stfvTime');
-      var _ts=d && d.update_time ? d.update_time : '已加载';
-      if(_stfv){
-        var _badgeHtml = _uBadge('auto','短线',_ts);
-        if(_badgeHtml && _badgeHtml.length > 30){
-          _stfv.innerHTML = _badgeHtml;
-        } else {
-          // _uBadge 异常返回空 → 强制 innerHTML 注入（保证胶囊可见）
-          _stfv.innerHTML = '<span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新于</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">'+_ts+'</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span>';
-        }
-      }
-    }catch(e){ console.warn('[renderFourVolume] stfvTime write failed', e); }
-    var noteEl = document.getElementById('stfvNote');
-    if(noteEl) noteEl.innerHTML = '⚡ 四路信号同时共振的当日候选 · 持有期 T+1/3/5/10/20 日可观测<br><span style="font-size:10px;color:var(--dim)">（日线版 + 60 分钟版合并展示 · 2026-10-16 订正旧注：日线版已于 2026-08-19 补入算法链 ORDER，「total=0 属正常」作废——真 0 命中会明示「真实无信号 · 已算完」，旧批次信号绝不沿用冒充今日）</span>';
-    var stocks = d.stocks || [];
-    var qd = stocks.filter(function(s){ return s.qd || (s.yzc && s.jg && s.xc && s.four); }).length;
-    var yzc = stocks.filter(function(s){ return s.yzc; }).length;
-    var jg = stocks.filter(function(s){ return s.jg; }).length;
-    var xc = stocks.filter(function(s){ return s.xc; }).length;
-    var four = stocks.filter(function(s){ return s.four; }).length;
-    function set(id,v){ var e=document.getElementById(id); if(e) e.textContent = v; }
-    set('stfvQD', qd); set('stfvYZC', yzc); set('stfvJG', jg); set('stfvXC', xc); set('stfvFOUR', four);
-    // 「已跑完」胶囊：统一调用 _runBadgeInfo（2026-08-07 修复）
-    var _fvTs = d.data_time || d.gen_time || d.update_time || '';
-    var _fvInfo = window._runBadgeInfo(_fvTs);
-    var _fvRun = document.getElementById('stfvRunBadge');
-    if(_fvRun){
-      if(_fvInfo.show){ _fvRun.textContent = _fvInfo.label; _fvRun.style.display='inline-flex'; }
-      else _fvRun.style.display='none';
-    }
-    // 「已入仓」胶囊：统一为 🧺 MM-DD 已入仓 N
-    var _hb=document.getElementById('stfvHoldBadge');
-    if(_hb){
-      try{
-        if(qd>0){
-          _hb.innerHTML=_holdBadge(_fvTs || d.update_time || '今日', qd);
-          _hb.style.display='inline-flex';
-        } else {
-          _hb.style.display='none';
-        }
-      }catch(e){ console.warn('[renderFourVolume] stfvHoldBadge failed', e); }
-    }
-    var hits = document.getElementById('stfvHits');
-    if(!hits) return;
-    if(!stocks.length){
-      /* 🛡 2026-09-16 阿狸咪的工程师：producer 零命中已改为「仍写盘 + zero_hit:true」
-         （根治 FOUR_VOLUME 闸门死锁），故原文案「暂未生成」在真 0 命中时是假话。
-         真 0 命中必须如实说 0（宗旨①数据新鲜真实），并明示旧批未沿用。 */
-      var _fvz = (d && d.zero_hit) ? d : null;
-      if(_fvz){
-        var _co = _fvz.carryover || null;
-        var _coMsg = (_co && _co.total)
-          ? '<br><span style="font-size:11px;color:var(--dim)">上一有效批 ' + (_co.update_time || '—')
-            + ' 的 ' + _co.total + ' 只 <b>未沿用</b>（避免把旧信号冒充今日）</span>'
-          : '';
-        var _errMsg = _fvz.scan_error
-          ? '<br><span style="font-size:11px;color:var(--dim)">扫描异常：' + _fvz.scan_error + '</span>'
-          : '';
-        hits.innerHTML = '<div style="padding:14px;background:rgba(148,163,184,.05);border:1px solid rgba(148,163,184,.22);border-radius:8px;font-size:13px;color:var(--sub);text-align:center;">⚡ 本轮扫描 <b>0 命中</b>（真实无信号 · 已算完）' + _errMsg + _coMsg + '</div>';
-        return;
-      }
-      hits.innerHTML = '<div style="padding:14px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.2);border-radius:8px;font-size:13px;color:var(--gold);text-align:center;">⚡ 四量终极信号暂未生成（盘后扫描填充）</div>';
-      return;
-    }
-    // ── 2026-08-08 充实：每股一行富信息（实时行情/行业概念/组件灯/关联板块资金/参考止损止盈/操作建议）──
-    function _fvNum(v, d){ if(v===null||v===undefined||isNaN(v)) return '—'; return Number(v).toFixed(d===undefined?2:d); }
-    function _fvCompChip(label, on){
-      return '<span style="font-size:10px;padding:1px 7px;border-radius:10px;background:'+(on?'rgba(244,73,93,.14)':'rgba(255,255,255,.04)')+';color:'+(on?'#f4495d':'#5f7099')+';border:1px solid '+(on?'rgba(244,73,93,.4)':'rgba(255,255,255,.1)')+';">'+label+'</span>';
-    }
-    function _fvAdvice(s){
-      var p=[];
-      if(s.yzc&&s.jg) p.push('游资点火+机构托底，资金合力强');
-      else if(s.yzc) p.push('游资点火，短线情绪活跃');
-      else if(s.jg) p.push('机构托底，下方有支撑');
-      var xc=(s.components&&(s.components['机构金叉']||s.components['主力金叉']||s.components['散户金叉']));
-      if(xc) p.push('叠加均线金叉');
-      p.push('回踩不破参考止损可持有');
-      return p.join('，')+'；仓位建议≤2成';
-    }
-    /* 💧 关联板块资金流向统一走 window.v8SectorFlow（2026-09-18），不再自建 _sffMap */
-    var _rows = stocks.map(function(s){
-      var _key=(s.market||'')+(s.code||'');
-      var _q=(window.STOCK_QUOTE&&window.STOCK_QUOTE.stocks)?window.STOCK_QUOTE.stocks[_key]:null;
-      var _price=(_q&&_q.price!=null)?_q.price:s.close;
-      var _pct=(_q&&_q.pct!=null)?_q.pct:s.pct_chg;
-      var _ind=(_q&&_q.industry)?_q.industry:'';
-      var _conc=(_q&&_q.concepts)?_q.concepts:[];
-      var _cmp=[
-        ['游资点火', s.yzc],
-        ['机构托底', s.jg],
-        ['广度翻多', s.components&&s.components['广度翻多']],
-        ['主力动量翻多', s.components&&s.components['主力动量翻多']],
-        ['机构金叉', s.components&&s.components['机构金叉']],
-        ['散户金叉', s.components&&s.components['散户金叉']],
-        ['主力金叉', s.components&&s.components['主力金叉']]
-      ];
-      var _chips=_cmp.map(function(c){ return _fvCompChip(c[0], !!c[1]); }).join('');
-      var _flowRows=(window.v8SectorFlow ? window.v8SectorFlow.match(_conc, 3) : []);
-      var _flow=_flowRows.map(function(r){
-        var _up=(r.value||0)>=0;
-        return '<span>'+r.name+' <b style="color:'+(_up?'#f4495d':'#1fd17b')+'">'+( _up?'+':'')+(_fvNum(r.value,1))+'亿</b> <span style="color:'+((r.pct||0)>=0?'#f4495d':'#1fd17b')+'">'+( (r.pct||0)>=0?'+':'')+(_fvNum(r.pct,2))+'%</span></span>';
-      }).join('<span style="color:var(--border);margin:0 6px;">·</span>');
-      var _stopPct=(s.board_label&&/创业板|科创板/.test(s.board_label))?0.90:0.93;
-      var _close=(s.close!=null)?s.close:_price;
-      var _refStop=_close*_stopPct, _refTarget=_close*1.12;
-      var _sd=(s.signal_date||'').replace(/^\d{4}-/,'').replace('-','-');
-      return '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;">'
-        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
-          + '<b style="font-size:14px;color:var(--txt);">'+(s.name||'')+'</b>'
-          + '<span style="font-size:11px;color:var(--dim);">'+(s.code||'')+'</span>'
-          + '<span style="font-size:10px;color:#9fd0ff;background:rgba(159,208,255,.1);border:1px solid rgba(159,208,255,.3);padding:1px 7px;border-radius:10px;">'+(s.board_label||'')+'</span>'
-          + (s.qd?'<span style="font-size:10px;color:#fbbf24;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.35);padding:1px 7px;border-radius:10px;font-weight:700;">QD四量共振</span>':'')
-          + '<span style="margin-left:auto;font-size:13px;font-weight:700;color:'+((_pct||0)>=0?'var(--up)':'var(--down)')+';">'+( (_pct||0)>=0?'+':'')+(_fvNum(_pct,2))+'%</span>'
-        + '</div>'
-        + '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--dim);margin-top:6px;">'
-          + '<span>现价 <b style="color:var(--txt);">'+(_fvNum(_price,2))+'</b></span>'
-          + '<span>换手 <b style="color:var(--txt);">'+(s.turnover_rate!=null?_fvNum(s.turnover_rate,2):'—')+'%</b></span>'
-          + (_ind?'<span style="max-width:60%;">行业 <b style="color:var(--txt);font-weight:500;">'+_ind+'</b></span>':'')
-        + '</div>'
-        + (_conc.length?'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;">'+_conc.slice(0,5).map(function(c){return '<span style="font-size:10px;color:#7fb4ff;background:rgba(127,180,255,.1);border:1px solid rgba(127,180,255,.25);padding:1px 7px;border-radius:10px;">'+c+'</span>';}).join('')+'</div>':'')
-        + '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;">'+_chips+'</div>'
-        + (_flow?'<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--dim);margin-top:7px;border-top:1px dashed var(--border);padding-top:7px;"><span style="color:#9fd0ff;">关联板块资金</span>'+_flow+'</div>':'')
-        + '<div style="font-size:11px;color:var(--dim);margin-top:7px;">'
-          + '参考<span style="color:#1fd17b;">止损 '+(_fvNum(_refStop,2))+'</span>（'+((1-_stopPct)*100).toFixed(0)+'%）· 参考<span style="color:#f4495d;">止盈 '+(_fvNum(_refTarget,2))+'</span>（+12%）'
-          + ' ｜ 操作：'+_fvAdvice(s)
-          + (_sd?' ｜ 信号日 '+_sd:'')
-        + '</div>'
-        + '</div>';
-    });
-    hits.innerHTML = '<h4 style="margin:14px 0 8px 0;font-size:13px;color:var(--txt);">🎯 QD 共振命中 <b style="color:#fbbf24;">'+qd+'</b> 只</h4>' + _rows.join('');
-  }
-  // 2026-08-06 23:48 修复：renderFourVolume 之前只在 IIFE 内部（被 switchSt 直接调用），
-  // 末尾 initCardBadges 通过 window.renderFourVolume 找不到它 → 四量终极胶囊永远不显示。
-  // 现挂到 window 上与 renderV8Crds 一致。
-  window.renderFourVolume = renderFourVolume;
   window.__renderBtExtraPane = function(){
     var hm = '';
 hm += '<div id="ulPaneBacktest">';
@@ -18019,7 +17686,6 @@ window.__renderV8CalToday();
     }catch(e){ console.warn('[init '+name+'] '+prefix, e); }
   }
   // 选股策略 tab 上的 6 张算法卡（非 query/tc/crds 的都有 lazy render，需要显式激活）
-  tryRun('renderFourVolume', (typeof window.renderFourVolume==='function')?window.renderFourVolume:null, 'fv-badge init');
   // 今日事件「今日判定」卡头+内容（脚本块位于 v8CardHeader 定义之前，只能延后到此处渲染）
   tryRun('renderJudgmentHeader', window.__renderJudgmentHeader, 'judgment-header init');
   tryRun('renderJudgmentBody', window.__renderJudgmentBody, 'judgment-body init');

@@ -130,7 +130,7 @@ CHAINS = [
         "gate_mode": "morning_only",
         "due_min": 9 * 60 + 5,         # 09:00 档 + 5min：此时刻只可能有 09:00 档
         "due_max": 9 * 60 + 25,        # 超过 09:25 即出窗（其后 trading 闸门接管）
-        "artifacts": ["data/ALGO_TRACK.js"],
+        "artifacts": ["data/CANDIDATE.js"],
         "max_age": 150,
     },
     {

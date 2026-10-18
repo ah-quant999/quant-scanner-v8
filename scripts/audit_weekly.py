@@ -224,7 +224,6 @@ def main():
     sources = [
         ("STOCK_QUOTE.js", "update_time", "个股查询实时行情"),
         ("LHB_DATA.js", "date", "龙虎榜"),
-        ("ALGO_TRACK.js", "update_time", "算法跟踪"),
         ("FINAL_RECOMMEND_DATA.js", "update_time", "最终推荐"),
     ]
     for path, field, name in sources:

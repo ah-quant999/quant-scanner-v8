@@ -341,25 +341,8 @@ def _momentum_filter_needs_recompute():
         return True, "解析异常: " + str(e)
 
 def _algo_track_needs_recompute():
-    """ALGO_TRACK（四量终极/RPS/CRDS 追踪）由本链盘中每 2h 重生；若其 update_time 日期 < 今日
-    （盘中漏派发）则仍需补算。2026-09-28 一劳永逸根因修复：原 _momentum_filter_needs_recompute
-    只判 MOMENTUM_FILTER.js（该文件已由 19:15 盘后链每日保新鲜）→ 恒判「无需重算」→
-    dispatch_momentum_intraday 永不派发 v8_algo_intraday_lite → ALGO_TRACK 停更（实测至 09-25）。
-    本判据使本链真正服务于其真实产物 ALGO_TRACK。"""
-    p = os.path.join(REPO_ROOT, "data", "ALGO_TRACK.js")
-    if not os.path.exists(p):
-        return True, "ALGO_TRACK.js 缺失"
-    try:
-        s = open(p, encoding="utf-8").read()
-        mg = re.search(r'["\'](?:update_time|generated)["\']\s*[:=]\s*["\']([\d-]+\s*[\d:]+)', s)
-        today = datetime.datetime.now(CST).strftime("%Y-%m-%d")
-        if not mg:
-            return True, "ALGO_TRACK 无法解析日期"
-        if mg.group(1)[:10] < today:
-            return True, "ALGO_TRACK 陈旧(%s < 今日 %s)，需补算" % (mg.group(1)[:10], today)
-        return False, "ALGO_TRACK 已为今日(%s)" % mg.group(1)[:10]
-    except Exception as e:
-        return True, "ALGO_TRACK 解析异常: " + str(e)
+    """四量终极已下架（2026-10-18 主人令）：ALGO_TRACK.js 不再由任何链重生，本判据恒返回无需补算。"""
+    return False, "四量终极已下架，ALGO_TRACK 不再监控"
 
 def _intraday_snapshot_needs_recompute():
     """板块资金日内快照由 v8_intraday_snapshot 独立高频 job 写；该 workflow 仅依赖被 GitHub 静默

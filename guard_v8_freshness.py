@@ -337,7 +337,7 @@ ALGO_VARS = {
     # 🔴 2026-10-11 主人令「完全下架」：CRDS_CARD_DATA / TRIPLE_CONSENSUS / TRIPLE_TRACK /
     #   TRIPLE_HISTORY 移出——模块已下架、data 文件已删、index.html 零注入，
     #   自愈面不再派发永远刷不出的 algo_run。
-    "FINAL_RECOMMEND_DATA", "ALGO_TRACK",
+    "FINAL_RECOMMEND_DATA",
     "SENTIMENT_CYCLE",
     # 2026-10-11 一劳永逸（阿狸咪）：H_AUTO_BUY / H_AUTO_BUY_TRACK 移出——模块已下线，
     #   data 文件已删（CDN 404）、index.html 零注入 ⇒ 自愈面不再派发永远刷不出的 algo_run。
