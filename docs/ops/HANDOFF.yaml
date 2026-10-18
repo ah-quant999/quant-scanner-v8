@@ -9346,3 +9346,13 @@ items:
     verified_at: "2026-10-17 语法+自测+plumbing 自证完成；线上数字待 runner 拉码后复核"
     updated: "2026-10-17 21:39"
     updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: algo-audit-deadcode-purge-1018
+    priority: P1
+    owner: shared
+    status: done
+    what: "算法审计死代码清理（2026-10-18）：删 7 个零引用脚本（strong_breakout/algo_backtest_compare/check_cli_contract/alpha101_backtest/alpha_vs_beta/auto_run_dn_algorithm/track_h_auto_buy）+ H_AUTO_BUY 2 数据；factor_walkforward 加 9 年窗口幸存者偏差披露；verify_chain_consistency 孤儿检测收窄 alpha_ 前缀豁免（CI 对 3 个四量待删脚本恢复可见）。"
+    evidence: "commit cc0afe5ea5d0481b6a2e15ad494310876653fd82；git ls-tree 删项已出树、四量文件保留待定。"
+    four_volume_note: "四量终极下架挂起：市场 beta 对比已出（上证 9-14~10-16 月跌 4.35%、T+5 胜率 28.6%；四量毛 -1.379% 仅较大盘 -1.174% 差 0.205pp、胜率反高 5pp，自身无 alpha），叠加 realflow 幽灵闸门+样本仅 1 月，删除与否待主人定夺。"
+    verified_at: "2026-10-18 py_compile 0 错 + ls-tree 复核通过"
+    updated: "2026-10-18 11:30"
+    updated_by: 阿狸咪的工程师(alimi-cn)
