@@ -154,8 +154,6 @@ def _signal_type(it, reason, algos_hit):
     if "回调" in r:
         return "回调"
     algo = it.get("_algo", "")
-    if algo == "四量终极":
-        return "短线买点"
     # ↓ 以下两条分支为 2026-09-03 主人令死代码（sector_lead/big_bull 已全方位下线，不进入 merged）：
     if algo == "板块龙头":
         return "板块联动"
@@ -374,7 +372,9 @@ def main():
     else:
         # 2026-09-03 主人令：已全方位下线的「板块龙头 / 大牛股猎手」algo 在此处过滤丢弃，
         # 既不进 dedupe_by_code 的合并池，也不进 by_algo / items。
-        _RETIRED_ALGOS = {"板块龙头", "大牛股猎手", "sector_lead", "big_bull"}
+        # 🔴 2026-10-18 主人令「完全下架」：四量终极入 retired 集 —— raw_data/algo_track.json 取证档案
+        #   仍在盘，若不过滤则档案内四量条目会持续进池（空占位仅文件缺失时生效）。
+        _RETIRED_ALGOS = {"板块龙头", "大牛股猎手", "sector_lead", "big_bull", "四量终极"}
         raw_algos = data.get("algos", []) or []
         retained_algos = [a for a in raw_algos if (a.get("algo") not in _RETIRED_ALGOS
                                                    and a.get("display_name") not in _RETIRED_ALGOS)]

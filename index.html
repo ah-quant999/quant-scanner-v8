@@ -1242,7 +1242,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge; window._holdBadge = _holdB
 
 /* ===== 🎯 今日判定 · 可入手候选 HTML 构建（2026-08-08 重构） =====
    规则：① 只保留「值得买入」的股票；② 按统一买入评分降序；③ 每只股票汇总关键详情；④ 三不原则独立第二行。
-   数据：🥇三重共识 > 🥉四量终极（金股池/金股池【当前无独立卡片】：renderGoldPool 已于 2026-08-06
+   数据：🥇三重共识（🔴 2026-10-18：四量终极已下架移出；金股池【当前无独立卡片】：renderGoldPool 已于 2026-08-06
    轻量化时删除，GOLD_POOL 仅在「个股查询 → 策略命中」以 ⭐ 命中标签呈现）；渲染由 initCardBadges / switchSec('td') 触发。 */
 function __judgmentCandidatesHTML(){
   var SQ = window.STOCK_QUOTE || {};
@@ -1896,7 +1896,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 子 Pane：今日推荐候选池 -->
     <div id="final-pane-cand" class="final-pane">
       <div class="card" style="margin-bottom:16px;border-left:4px solid #ff7043;">
-        <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">🎯</span>今日推荐候选池 <span style="font-size:11px;color:var(--sub);font-weight:400">聚合 四量终极</span><!-- 🔴 2026-10-11：三重共识已下架移出聚合 -->
+        <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">🎯</span>今日推荐候选池 <!-- 🔴 2026-10-11：三重共识已下架移出聚合；🔴 2026-10-18：四量终极下架移出聚合 -->
           <span id="finalCandBadges" style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;"></span>
         </h3>
         <div id="finalCandBody" style="padding:12px 4px 2px;"><div class="note">加载中…</div></div>
@@ -1914,7 +1914,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div style="font-size:12px;line-height:1.8;color:var(--sub);">
     <b style="color:#22d3ee;">定位</b>：本页只研究「这个因子有没有区分度」，<b>不进选股层、不产出股票池</b>。<br>
     <b style="color:#22d3ee;">它做什么</b>：只对<b>已经选出来的股</b>做<b>加分 / 减分</b> —— 命中即加计入 <code style="background:rgba(34,211,238,.1);padding:1px 4px;border-radius:3px;">final_score</code> 让排序前移，不命中则不动；<b style="color:#fbbf24;">绝不会因为某只票命中某个因子就把它拉进池子</b>。<br>
-    <b style="color:#22d3ee;">与左侧策略的区别</b>：四量终极 / 三重共识 / 强势跟踪 / 逆势龙头<b>各自产出股票池</b>；本页<b>不产池</b>，故与「逆势龙头」同为 <b>0⭐</b> 观测项，不参与星级评定。<br>
+    <b style="color:#22d3ee;">与左侧策略的区别</b>：强势跟踪<b>产出股票池</b>；本页<b>不产池</b>，故为 <b>0⭐</b> 观测项，不参与星级评定。（🔴 2026-10-18：四量终极/三重共识/逆势龙头已下架）<br>
     <b style="color:#22d3ee;">与「策略回测」页的区别</b>：本页 = <b>因子分层研究</b>（五分位/看区分度）。（2026-09-20 主人令：策略回测页的 🧪 因子实验室回测卡<b>已整体移除</b> —— 它不是选股策略，不回测、不展示；因子跟踪只在最终推荐页。）<br>
     <b style="color:#f59e0b;">无转正路径</b>（2026-09-18 主人令）：因子<b>不做选股、不产池</b> ⇒ <b>不评星级</b>，也<b>不存在「升格为独立策略」</b>一说。
     </div>
@@ -2005,10 +2005,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <ul style="margin:0;padding:0;font-size:12.5px;line-height:1.9;color:var(--txt);list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;">
           <li>⚡ <b>操作信号（置顶）</b>：6 维综合买卖判断 → 🟢偏多机会 / 🔴建议减仓 / ⏸中性观望</li>
           <li>📊 <b>实时行情</b>：现价、涨跌幅、成交量/额、今开/昨收/最高/最低</li>
-          <li>🧮 <b>算法现场评分</b>：策略命中(三重共识/金股池/候选池/逆势龙头/四量终极) + 0-100 综合分</li>
+          <li>🧮 <b>算法现场评分</b>：策略命中(三重共识/金股池/候选池/逆势龙头) + 0-100 综合分</li>
           <li>🎯 <b>止盈止损</b>：止损位、目标位、盈亏比、操作建议</li>
           <li>🏷 <b>概念行业概览</b>：板块、行业、题材概念标签（含 💧 关联板块资金流向，按净额排序取前 8）</li>
-          <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、逆势龙头、四量终极</li>
+          <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、逆势龙头</li>
           <li>🐉 <b>龙虎榜</b>：上榜日期、机构/游资净买、上榜原因</li>
           <li>🚫 <b>停牌识别</b>：停牌状态与原因</li>
           <li>🌾 <b>基本面画像</b>：综合评级、ROE、营收增速、EPS、股息率、分红方案等</li>
@@ -3026,7 +3026,7 @@ function fmtSigned(v){
   <section id="sec-st">
     <div class="sec-head" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h2 style="margin:0;">🎯 选股策略</h2>
-      <span class="tag">选股池 · 四量终极 · 选股生命周期</span><!-- 🔴 2026-10-11：三重共识/逆势龙头(CRDS) 已下架移出 -->
+      <span class="tag">选股池 · 选股生命周期</span><!-- 🔴 2026-10-11：三重共识/逆势龙头(CRDS) 已下架移出；🔴 2026-10-18：四量终极下架移出 -->
     </div>
     <!-- 建议持有期纪律 banner 已于 2026-08-30 移至逻辑详解页「选股策略·持有期纪律」段，此处不再展示（避免客户可看区域堆文字） -->
     <!-- TAB 按钮行（横排，独立于内容区） -->
@@ -3034,8 +3034,7 @@ function fmtSigned(v){
       <!-- 2026-08-29 主人令：选股池作为选股策略子页面；2026-08-30 主人令：选股池移到三重共识前面 -->
       <button class="st-tab active" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
       <button class="st-tab" data-st="life" onclick="switchSt('life')">📡 强势跟踪 <span class="st-tab-star" data-card="强势跟踪"></span></button>
-      <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span class="st-tab-star" data-card="四量终极"></span></button>
-      <!-- 🆕 2026-10-12 小九：量质双擎（LQSQ）子页 tab —— 第一支自研算法，与四量同页并列 -->
+      <!-- 🆕 2026-10-12 小九：量质双擎（LQSQ）子页 tab —— 第一支自研算法（🔴 2026-10-18：四量终极已下架移出） -->
       <button class="st-tab" data-st="lqsq" onclick="switchSt('lqsq')">⚖️ 量质双擎 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
       <!-- 2026-09-18 晚 原记录：此处硬编码「弱市专用·0★观测」被改为接 st-tab-star chip（__committeeRate 实时计算）。
            🔴 2026-09-18 (g) 更正 —— 该次改动的**方向对（统一星级出口）**，但它引用的依据是错的，
@@ -4817,7 +4816,7 @@ c.innerHTML = h;
          · ❌ 'K线信号层' —— cat=signal / kind=signal / is_primary 全 0，是技术信号参考层
          · ❌ '强势突破'   —— page=暂未上架，未进选股策略页（其定位见回测页"不列入排名"区块）
        清掉后这两张卡不再获得任何选股策略口径的评级待遇。 */
-    '三重共识': 'medium', '四量终极': 'long', '逆势龙头': 'short',
+    '三重共识': 'medium', '逆势龙头': 'short',   /* 🔴 2026-10-18：'四量终极': 'long' 随四量下架移除 */
     /* 🔴🔴 2026-09-18 主人令（第四轮纠偏）：「因子只是加分减分项，不是选股策略」——
        ⇒ **因子实验室不评星级**：本表不再登记它（原 2026-09-16 的 'medium' 登记作废）。
        撤销登记后，两个派生问题自动消解（它们本由「位置在选股策略页」错误推导而来）：
@@ -6269,7 +6268,7 @@ c.innerHTML = h;
          「因子实验室」又是独立渲染 ⇒ 必然数成 4，与文案的 5 个名字打架。
          ⚠️ 将来增删本页策略：改这里 + 同步改下方 __renderBacktestSection 的渲染顺序。 */
       /* 🔴 2026-09-20 主人令：'因子实验室' 移出本页清单（非选股策略，不回测不展示）*/
-      var _PAGE = ['四量终极','强势跟踪','量质双擎'];  /* 🔴 2026-10-11 主人令「完全下架」：三重共识/逆势龙头已下架移出；🆕 2026-10-12 纳入第一支自研算法「量质双擎」 */
+      var _PAGE = ['强势跟踪','量质双擎'];  /* 🔴 2026-10-11 主人令「完全下架」：三重共识/逆势龙头已下架移出；🆕 2026-10-12 纳入第一支自研算法「量质双擎」；🔴 2026-10-18：四量终极下架移出 */
       pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(56,189,248,.10);color:#38bdf8;border:1px solid rgba(56,189,248,.3);">📋 本页策略 '+_PAGE.length+' 个<span style="font-weight:400;color:var(--sub);font-size:10px;">（'+_PAGE.join(' · ')+'）</span></span>');
 
       sum.innerHTML = '<span style="color:var(--dim);font-weight:600;">📊 实战回测</span><span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>' + (pills.length ? ' ' + pills.join(' ') : ' <span style="color:var(--sub);">暂无数据</span>');
@@ -9060,11 +9059,9 @@ function switchSec(sec,el){
                    : (_gpObj.candidates || []);
     // COCKPIT 优先用 tier_a/tier_b（array 数组）合并 —— 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND 已全方位下线
     // 🔴 2026-10-11 主人令「完全下架」：CRDS 策略共振腿移除（模块下架，window.CRDS_CARD_DATA 恒 undefined）
-    // FOUR_VOLUME 用 stocks（array）
-    const fourList = (window.FOUR_VOLUME && window.FOUR_VOLUME.stocks) || [];
+    // 🔴 2026-10-18 主人令「完全下架」：四量共振腿移除（window.FOUR_VOLUME 恒 undefined）
     if(_in(candList)) hitN++;
     if(_in(goldList)) hitN++;
-    if(_in(fourList)) hitN++;
     if(hitN>=3){ signals.push({t:hitN+' 策略共振命中',a:'强共识买点',c:'up'}); score+=2; }
     else if(hitN>=1){ signals.push({t:hitN+' 策略命中',a:'有支撑',c:'sub'}); score+=hitN; }
 
