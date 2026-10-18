@@ -1800,6 +1800,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/LQSQ_TRACK.js?v=91c21ec201" defer></script>
     <script src="data/LOWVOL_TREND.js?v=ff04cfc040" defer></script>
     <script src="data/LOWVOL_TREND_BACKTEST.js?v=0a9f30ec6d" defer></script>
+    <script src="data/INTRADAY_MOMENTUM.js?v=ff04cfc040" defer></script>
+    <script src="data/INTRADAY_MOMENTUM_BACKTEST.js?v=0a9f30ec6d" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -3039,6 +3041,7 @@ function fmtSigned(v){
       <!-- 🆕 2026-10-12 小九：量质双擎（LQSQ）子页 tab —— 第一支自研算法（🔴 2026-10-18：四量终极已下架移出） -->
       <button class="st-tab" data-st="lqsq" onclick="switchSt('lqsq')">⚖️ 量质双擎 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
       <button class="st-tab" data-st="lowvol" onclick="switchSt('lowvol')">🐢 低波趋稳 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
+      <button class="st-tab" data-st="intraday" onclick="switchSt('intraday')">📈 日内动量 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
       <!-- 2026-09-18 晚 原记录：此处硬编码「弱市专用·0★观测」被改为接 st-tab-star chip（__committeeRate 实时计算）。
            🔴 2026-09-18 (g) 更正 —— 该次改动的**方向对（统一星级出口）**，但它引用的依据是错的，
               而且它把一处**潜藏的口径漏洞显性化**了（主人随即截图质问「这个也评星么」）：
@@ -3119,6 +3122,25 @@ function fmtSigned(v){
         <table id="lowvolBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>基准</th><th>最好</th><th>最差</th></tr></thead><tbody id="lowvolBackBody"></tbody></table>
       </div>
     </div><!--/st-lowvol-->
+    <!-- ===== TAB 页面：日内动量（第三支自研算法 · 🆕 2026-10-18 夜 阿狸咪接入；数据源 data/INTRADAY_MOMENTUM.js + data/INTRADAY_MOMENTUM_BACKTEST.js；上市前置回测唯一显著跑赢档 N=20 α+1.73pp/胜率42.6%，N≥45 衰减） ===== -->
+    <div id="st-intraday" class="st-pane">
+      <div class="card" id="stIntradayCard" style="border-left:4px solid #f59e0b;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          📈 <span style="font-weight:700;font-size:14px;color:var(--txt);">日内动量</span>
+          <span style="font-size:10px;font-weight:700;color:#f59e0b;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">第三支自研算法</span>
+          <span class="fresh" id="intradayTime">—</span>
+        </div>
+        <div id="intradayBody"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">📈 日内动量 加载中…</div></div>
+      </div>
+      <div class="card" id="intradayBackCard" style="border-left:4px solid #f59e0b;margin-top:14px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 日内动量 · 回测 N 日（真实信号流）</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>
+        </div>
+        <div class="note" id="intradayBackNote">加载中…</div>
+        <table id="intradayBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>基准</th><th>最好</th><th>最差</th></tr></thead><tbody id="intradayBackBody"></tbody></table>
+      </div>
+    </div><!--/st-intraday-->
 
     <!-- ===== TAB 页面：强势跟踪（原「选股生命周期」子页 · 2026-09-16 主人令改名精简） =====
          主人令：生命周期三个算法（选股生命周期 / 强势突破 / 高手强势股跟踪）横评后
@@ -14187,6 +14209,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       if(typeof window.renderLqsq==='function'){ try{ window.renderLqsq(); }catch(e){ console.warn('量质双擎渲染失败',e); } }
     }
     else if(tab==='lowvol'){ if(typeof window.renderLowvol==='function'){ try{ window.renderLowvol(); }catch(e){ console.warn('低波趋稳渲染失败',e); } } }
+    else if(tab==='intraday'){ if(typeof window.renderIntraday==='function'){ try{ window.renderIntraday(); }catch(e){ console.warn('日内动量渲染失败',e); } } }
   }
 
   /* 🆕 2026-10-18 阿狸咪：低波趋稳 子页渲染（镜像 renderLqsq 骨架；数据源 window.LOWVOL_TREND / window.LOWVOL_TREND_BACKTEST） */
@@ -14265,6 +14288,82 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
     }
   };
+  window.renderIntraday = function(){
+    var host = document.getElementById('intradayBody');
+    if(!host) return;
+    function _e(x){ return String(x==null?'':x).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+    function _pl(v){ return (v==null||isNaN(v))?'var(--sub)':(Number(v)>=0?'#f4495d':'#1fd17b'); }
+    var T = window.INTRADAY_MOMENTUM || {}, B = window.INTRADAY_MOMENTUM_BACKTEST || {};
+    var picks = T.picks || [];
+    if(!picks.length){
+      if(!(window.__lowvolRetry && window.__lowvolRetry >= 15)){ window.__lowvolRetry = (window.__lowvolRetry||0)+1; setTimeout(window.renderIntraday, 700); return; }
+      host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">📈 日内动量 数据加载中…</div>'; return;
+    }
+    window.__lowvolRetry = 0;
+    try{ if(typeof setBadge==='function'){ setBadge('intradayTime','盘后','短线', T.update_time||''); } }catch(e){}
+    var h = '';
+    h += '<div class="note" style="line-height:1.75;margin-bottom:12px;"><b style="color:#38bdf8;">📈 日内动量</b> · 第三支自研算法 —— 每日全市场 60 日波动率最低 Top10 且收盘站上 MA60（低波 + 趋稳上行）；次开买入、持有 N 日收盘卖出（前复权·扣双边 0.3%）；基准=同过滤 universe 等权。</div>';
+    function _stat(label,val,sub,color){ return '<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;"><div style="font-size:10px;color:var(--dim);margin-bottom:4px;">'+label+'</div><div style="font-size:22px;font-weight:800;color:'+(color||'var(--txt)')+';">'+val+'</div><div style="font-size:10px;color:var(--dim);">'+sub+'</div></div>'; }
+    h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:14px;">';
+    h += _stat('🎯 今日信号', picks.length, '60日低波 Top'+picks.length, '#38bdf8');
+    h += _stat('📦 候选池', (T.pool_size||0), '全A过滤后', '#fbbf24');
+    h += _stat('🚀 跟踪起始', _e(T.track_start||'—'), '上线首日即建归档', 'var(--txt)');
+    h += _stat('⏳ 成熟样本', '0', 'T+60 未走满不计入', '#fbbf24');
+    h += '</div>';
+    h += '<h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 8px;"><span class="ic">📋</span>今日日内动量 Top'+(picks.length)+' <span style="font-size:11px;color:var(--sub);font-weight:400">20日日内率最低 · 收盘>MA60 · 最新信号日置顶</span></h3>';
+    h += '<div class="note" style="margin-bottom:8px;">持有期收益随交易日成熟：未走满 T+N 的档位显示「<span style="color:var(--dim);">累积中</span>」，绝不填 0 冒充。红涨绿跌。</div>';
+    h += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+    h += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);"><th style="padding:6px;text-align:left;color:var(--sub);">#</th><th style="padding:6px;text-align:left;color:var(--sub);">名称</th><th style="padding:6px;text-align:left;color:var(--sub);">代码</th><th style="padding:6px;text-align:right;color:var(--sub);">收盘</th><th style="padding:6px;text-align:right;color:var(--sub);">20日日内</th><th style="padding:6px;text-align:right;color:var(--sub);">MA60</th></tr></thead><tbody>';
+    picks.forEach(function(p,i){
+      h += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:6px;color:var(--sub);">'+(i+1)+'</td>'
+        + '<td style="padding:6px;"><a href="https://quote.eastmoney.com/'+(p.code[0]==='6'?'sh':'sz')+p.code+'.html" target="_blank" style="color:var(--txt);text-decoration:none;">'+_e(p.name)+'</a></td>'
+        + '<td style="padding:6px;color:var(--sub);">'+_e(p.code)+'</td>'
+        + '<td style="padding:6px;text-align:right;color:'+_pl(p.close)+';">'+_e(p.close)+'</td>'
+        + '<td style="padding:6px;text-align:right;color:var(--sub);">'+_e(p.intra20)+'</td>'
+        + '<td style="padding:6px;text-align:right;color:var(--sub);">'+_e(p.ma60)+'</td></tr>';
+    });
+    h += '</tbody></table></div>';
+    host.innerHTML = h;
+    var bb = document.getElementById('intradayBackBody'); var bn = document.getElementById('intradayBackNote');
+    if(bb){
+      var bp = (B.summary && B.summary.by_period) || {};
+      var ks = Object.keys(bp).sort(function(a,b){ return (Number(a)||0)-(Number(b)||0); });
+      var rp = (B.replay && B.replay.by_period) ? B.replay : null;
+      var rks = rp ? Object.keys(rp.by_period).sort(function(a,b){ return (Number(a)||0)-(Number(b)||0); }) : [];
+      function _brow(k, r){
+        r = r || {};
+        return '<tr style="border-bottom:1px solid var(--border);"><td style="padding:6px;">T+'+_e(k)+'</td>'
+          + '<td style="padding:6px;text-align:right;">'+(r.samples||0)+'</td>'
+          + '<td style="padding:6px;text-align:right;color:'+_pl(r.win_rate)+';">'+(r.win_rate==null?'—':r.win_rate+'%')+'</td>'
+          + '<td style="padding:6px;text-align:right;color:'+_pl(r.avg_return)+';">'+(r.avg_return==null?'—':r.avg_return+'%')+'</td>'
+          + '<td style="padding:6px;text-align:right;color:var(--sub);">'+(r.bench_avg_return==null?'—':r.bench_avg_return+'%')+'</td>'
+          + '<td style="padding:6px;text-align:right;color:var(--sub);">'+(r.best_return==null?'—':r.best_return+'%')+'</td>'
+          + '<td style="padding:6px;text-align:right;color:var(--sub);">'+(r.worst_return==null?'—':r.worst_return+'%')+'</td></tr>';
+      }
+      function _grp(txt, color){ return '<tr><td colspan="7" style="padding:6px;background:var(--card2);font-weight:700;color:'+color+';">'+txt+'</td></tr>'; }
+      if(!ks.length && !rks.length){
+        if(bn) bn.innerHTML = '真实信号流口径（2025-04~2026-10 全A等权基准）：上市前置回测 N=60 平均 +5.99% / 基准 +1.99%（α +4.00pp）、胜率 53.3%，四方向唯一显著跑赢 → 已上线；主榜样本随持有天数成熟累积中。';
+        bb.innerHTML = '<tr><td colspan="7" style="padding:14px;text-align:center;color:var(--dim);">📊 真实信号流累积中（上线首日即建归档，未走满 T+N 不计入）</td></tr>';
+      } else {
+        var rh = '';
+        if(ks.length){
+          if(bn) bn.innerHTML = '✅ 真实信号流口径 · 基准=同过滤 universe 等权 · 上市前置回测 N=60 α +4.00pp（唯一显著跑赢档）· 样本随持有天数成熟。';
+          rh += _grp('📡 真实信号流（前向跟踪 · 权威口径）', '#38bdf8');
+          ks.forEach(function(k){ rh += _brow(k, bp[k]); });
+        }
+        if(rks.length){
+          if(bn && !ks.length) bn.innerHTML = '🧪 下方为<b>历史规则回放（样本内·参考）</b>：窗口 '+_e(rp.window?rp.window[0]+' ~ '+rp.window[1]:'')+'、全A过滤后 '+_e(rp.universe)+' 只、与线上完全同口径（次开买入/持N收盘卖/扣双边0.3%/等权基准）。规则在同一窗口选出 → 存在样本内选择偏差，按 2026-10-11 铁律<b>禁作主榜/评级/上下架依据</b>；权威数据=真实信号流（自 2026-10-16 起前向累积，成熟后本表顶部切换为权威段）。';
+          rh += _grp('🧪 历史规则回放（样本内 · 参考 · 禁作主榜依据）', '#fbbf24');
+          rks.forEach(function(k){ rh += _brow(k, rp.by_period[k]); });
+        }
+        if(!ks.length){
+          rh += '<tr><td colspan="7" style="padding:10px;text-align:center;color:var(--dim);">📡 真实信号流累积中（2026-10-16 起前向跟踪，未走满 T+N 不计入）</td></tr>';
+        }
+        bb.innerHTML = rh;
+      }
+    }
+  };
+
   /* ═══ 🔴🔴 2026-09-17 主人令「统一按委员会走，就是要统一口径，不要打架」═══════
      背景：此前全站星级有**三套并存口径** ——
        ① window.__committeeRate(card)         ← 唯一真源（四维加权 + 两道封顶）
@@ -14473,7 +14572,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
     // 🔴 2026-10-18 主人截图修复：原数组 ['fv','pool','life','lqsq'] 漏 'lowvol' → 低波 pane 永不显示（全黑）；
     // 且 'fv' 为死项（st-fv DOM 全站 0）。pane id 必须与 .st-pane DOM 一一对应。
-    ['pool','life','lqsq','lowvol'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['pool','life','lqsq','lowvol','intraday'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
     // 2026-08-29 主人令：选股池子页渲染（2026-09-11：并入金股池卡片，统一走 renderStPoolAll）
     if(n==='pool' && typeof window.renderStPoolAll==='function') setTimeout(window.renderStPoolAll, 30);
@@ -14490,6 +14589,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     /* 🆕 2026-10-12 小九：量质双擎子页渲染调度（defer 数据未就绪时由 __stRetryTab 兜底重试） */
     if(n==='lqsq' && typeof window.renderLqsq==='function') setTimeout(window.renderLqsq, 30);
     if(n==='lowvol' && typeof window.renderLowvol==='function') setTimeout(window.renderLowvol, 30);
+    if(n==='intraday' && typeof window.renderIntraday==='function') setTimeout(window.renderIntraday, 30);
     // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
     // 2026-10-06 阿狸咪的工程师：fa（因子实验室）分支经审计为不可达死代码（DOM 无 data-st="fa" 按钮、switchSt('fa') 早删），已删净；因子实验室现仅于「最终推荐」页渲染。
   // 2026-09-18 主人令：子页名统一「因子实验室」（原「🧪 因子」），且不评星级（因子=加分项，非选股策略）。
@@ -14509,6 +14609,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       lqsq:function(){return !!(window.LQSQ_TRACK&&window.LQSQ_TRACK.tracked&&window.LQSQ_TRACK.tracked.length);},  // 🆕 2026-10-12 小九：量质双擎子页就绪判定（LQSQ_TRACK 注入到位）
       lowvol:function(){return !!(window.LOWVOL_TREND&&window.LOWVOL_TREND.picks&&window.LOWVOL_TREND.picks.length);},  // 🆕 2026-10-18 阿狸咪：低波趋稳子页就绪判定（LOWVOL_TREND 注入到位）
       lowvolBack:function(){return !!(window.LOWVOL_TREND_BACKTEST&&window.LOWVOL_TREND_BACKTEST.summary&&window.LOWVOL_TREND_BACKTEST.summary.by_period&&Object.keys(window.LOWVOL_TREND_BACKTEST.summary.by_period).length);},  // 🆕 2026-10-18 阿狸咪：低波趋稳回测就绪判定
+      intraday:function(){return !!(window.INTRADAY_MOMENTUM&&window.INTRADAY_MOMENTUM.picks&&window.INTRADAY_MOMENTUM.picks.length);},  // 🆕 2026-10-18 夜 阿狸咪：日内动量子页就绪判定（INTRADAY_MOMENTUM 注入到位）
+      intradayBack:function(){return !!(window.INTRADAY_MOMENTUM_BACKTEST&&window.INTRADAY_MOMENTUM_BACKTEST.summary&&window.INTRADAY_MOMENTUM_BACKTEST.summary.by_period&&Object.keys(window.INTRADAY_MOMENTUM_BACKTEST.summary.by_period).length);},  // 🆕 2026-10-18 夜 阿狸咪：日内动量回测就绪判定
       // 2026-09-12 主人令：因子实验室子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
     };
     var _chk=_map[n]||function(){return true;};

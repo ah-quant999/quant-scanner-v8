@@ -126,6 +126,14 @@ SOURCES = [
          var="LOWVOL_TREND_BACKTEST", rel="data/LOWVOL_TREND_BACKTEST.js",
          parser="by_period", label_prefix="持有", primary="持有 T+60",
          method="真实信号流口径：每日全市场 60 日波动率最低 Top10 且收盘>MA60，次开买入持有 N 个交易日收盘卖出（前复权·扣双边 0.3%）；基准=同过滤 universe 等权"),
+    # 🚀 2026-10-18 夜 主人令「可靠科学且有效的我都要」：第三支自研算法「日内动量」——
+    #   近 20 日日内累计收益 Σ(close/open−1) 最高 Top10 ∧ 收盘>MA60（strategy_intraday_momentum.py，B批 lowvol 紧后），
+    #   真实信号流口径，与低波趋稳同榜同纪律。上线首日 2026-10-18；主档 T+20
+    #   （上市前置回测唯一显著跑赢档：N=20 α+1.73pp/胜率42.6%；N≥45 衰减 ⇒ 短中持有期有效）。
+    dict(card="日内动量", kind="strategy", page="选股策略", icon="📈", cat="trade",
+         var="INTRADAY_MOMENTUM_BACKTEST", rel="data/INTRADAY_MOMENTUM_BACKTEST.js",
+         parser="by_period", label_prefix="持有", primary="持有 T+20",
+         method="真实信号流口径：每日全市场近20日日内累计收益(Σclose/open−1)最高 Top10 且收盘>MA60，次开买入持有 N 个交易日收盘卖出（前复权·扣双边 0.3%）；基准=同过滤 universe 等权"),
     # 🗑 2026-10-11 主人令「完全下架」：逆势龙头（CRDS）登记条目随策略下架移除。
     #   原条目：dict(card="逆势龙头", var="CRDS_BACKTEST", rel="data/CRDS_BACKTEST.js",
     #              parser="by_period", label_prefix="持有", primary="持有 T+5")
