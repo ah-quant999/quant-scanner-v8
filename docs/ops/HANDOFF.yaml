@@ -9386,3 +9386,13 @@ items:
     verified_at: "2026-10-18 线上实时抓取验证通过"
     updated: "2026-10-18 20:05"
     updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: pe-percentile-caliber-1018
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: done
+    what: "10年PE分位图口径归一（2026-10-18 主人令「写着88.3但线看不到超80，一劳永逸修复」）。根因=val10_d 实为上证收盘·10年价格分位（gen_market_thermo.py L113-116 自证），此前被前端冒充「全市场PE·10年分位」用于图②标注与观测台 ⇒ 线(PE月末分位 2026-09=57.5)与标注(价格分位88.3)口径打架。"
+    evidence: "commit 078df2f28aa1 快进自 2a2ccba3f9（非强推）。index.html 三处：①_v10 一律取 PE 月末分位最后非空档(_pvI)；②图②标注挂同序列同坐标(当前 57.5 (2026-09 月末))；③观测台 PE 分位如实标月末月份、价格水位以「水位88.3(日频·价格分位)」真实名目并列。"
+    verify_how: "①val10_d 冒充消费点(c.val10_d!=null?c.val10_d:c.val10) 前端清零；②完整构建周期复验 TIP 未动未回退；③实时抓 Pages 主站：新逻辑在线、此前四量清理与低波卡未被破坏。数据源 market_valuation_cache.csv 为月度(最新2026-09)，无日频PE源 ⇒ 日频价格分位保留但必须如实名目。"
+    verified_at: "2026-10-18 线上实时抓取验证通过"
+    updated: "2026-10-18 20:15"
+    updated_by: 阿狸咪的工程师(alimi-cn)
