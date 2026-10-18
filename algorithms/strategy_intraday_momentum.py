@@ -18,7 +18,7 @@ strategy_intraday_momentum.py — 日内动量（第三支自研算法）· 真�
     · 数据日对齐（末根=data_date）· 近 20 日无停牌
   · 信号：近 20 日日内累计收益（∑ close/open − 1）全市场最高 + 收盘 > MA60
     （Lou-Polk-Skouras 隔夜/日内拆分：日内动量延续、隔夜溢价衰减）
-  · 每日取日内累计收益 Top10，逐日归档 raw_data/intraday_momentum_history.json
+  · 每日取日内累计收益最高 Top5，逐日归档 raw_data/intraday_momentum_history.json
     （真实信号流，上线首日即建，含已回落票，防幸存者偏差——同 LQSQ 纪律）
 
 自回测主榜（data/INTRADAY_MOMENTUM_BACKTEST.js，真实信号流口径 2026-10-11 主人令）：
@@ -52,7 +52,7 @@ RECENT_N = 20
 MOM_WIN = 20
 LIQ_AMT = 50_000_000.0
 AMT_MEDIAN_LO, AMT_MEDIAN_HI = 1e7, 1e10
-TOP_K = 10
+TOP_K = 5
 ALIGN_RATIO = 0.60
 LADDERS = [5, 10, 20, 30, 45, 60]
 PRIMARY_N = 20
@@ -60,12 +60,12 @@ MIN_UNIVERSE = 500
 
 # ── replay：bt_factors.py S7 上市前置回放（样本内·参考·禁作主榜依据）──
 REPLAY_BY_PERIOD = {
-    "5":  {"samples": 2617, "win_rate": 43.6, "avg_return": 0.14, "bench_avg_return": -0.04, "alpha_pp": 0.18,  "best_return": 72.9,  "worst_return": -40.0},
-    "10": {"samples": 2552, "win_rate": 42.9, "avg_return": 0.88, "bench_avg_return": 0.31,  "alpha_pp": 0.57,  "best_return": 113.8, "worst_return": -50.3},
-    "20": {"samples": 2411, "win_rate": 42.6, "avg_return": 2.59, "bench_avg_return": 0.86,  "alpha_pp": 1.73,  "best_return": 166.0, "worst_return": -61.9},
-    "30": {"samples": 2283, "win_rate": 41.5, "avg_return": 2.62, "bench_avg_return": 1.41,  "alpha_pp": 1.21,  "best_return": 247.0, "worst_return": -65.1},
-    "45": {"samples": 2177, "win_rate": 38.8, "avg_return": 1.53, "bench_avg_return": 2.10,  "alpha_pp": -0.57, "best_return": 349.5, "worst_return": -65.6},
-    "60": {"samples": 2054, "win_rate": 37.8, "avg_return": 1.17, "bench_avg_return": 1.99,  "alpha_pp": -0.82, "best_return": 278.3, "worst_return": -67.2},
+    "5":  {"samples": 1315, "win_rate": 45.1, "avg_return": 0.76, "bench_avg_return": -0.04, "alpha_pp": 0.80,  "best_return": 72.9,  "worst_return": -40.0},
+    "10": {"samples": 1281, "win_rate": 43.4, "avg_return": 1.78, "bench_avg_return": 0.31,  "alpha_pp": 1.47,  "best_return": 113.8, "worst_return": -50.3},
+    "20": {"samples": 1209, "win_rate": 45.7, "avg_return": 4.13, "bench_avg_return": 0.86,  "alpha_pp": 3.27,  "best_return": 154.5, "worst_return": -61.9},
+    "30": {"samples": 1133, "win_rate": 45.6, "avg_return": 4.80, "bench_avg_return": 1.41,  "alpha_pp": 3.39,  "best_return": 247.0, "worst_return": -65.1},
+    "45": {"samples": 1095, "win_rate": 41.6, "avg_return": 4.20, "bench_avg_return": 2.10,  "alpha_pp": 2.10,  "best_return": 349.5, "worst_return": -65.6},
+    "60": {"samples": 1035, "win_rate": 41.4, "avg_return": 2.89, "bench_avg_return": 1.99,  "alpha_pp": 0.90,  "best_return": 248.9, "worst_return": -67.1},
 }
 
 
@@ -211,7 +211,7 @@ def main():
     if len(uni) < MIN_UNIVERSE:
         raise SystemExit("候选池 %d < %d —— 放弃本日（宁缺勿滥）" % (len(uni), MIN_UNIVERSE))
 
-    # ── 选股：近20日日内累计收益最高 ∧ 收盘>MA60 → Top10 ──
+    # ── 选股：近20日日内累计收益最高 ∧ 收盘>MA60 → Top5 ──
     scored = []
     for code, bars in uni.items():
         intra20, ma60 = indicators(bars)
@@ -244,7 +244,7 @@ def main():
     json.dump(hist, open(HISTORY, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
     json.dump({"update_time": now_cst(), "data_date": data_date,
-               "method": "日内动量：近20日日内累计收益(∑close/open-1)最高 Top10 ∧ 收盘>MA60（真实信号流，次开买入）",
+               "method": "日内动量：近20日日内累计收益(∑close/open-1)最高 Top5 ∧ 收盘>MA60（真实信号流，次开买入）",
                "pool_size": len(uni), "picks": pick_rows},
               open(OUT_JSON, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
@@ -315,31 +315,34 @@ def main():
                    by_period[str(N)]["bench_avg_return"] or 0, bcnt))
 
     total_signals = sum(len(v.get("picks") or []) for v in days.values())
-    # 透传旧 replay（防链上日跑冲掉；本文件内置的 REPLAY_BY_PERIOD 仅在无旧值时兜底）
+    # 透传旧 replay（防链上日跑冲掉；仅当旧 replay 同为 Top5 口径才透传，
+    # 否则用本文件内置 REPLAY_BY_PERIOD 兜底——保证口径升级后旧 Top10 回放不被误留）
     _replay_keep = None
     try:
         if os.path.exists(OUT_JS):
             _old = open(OUT_JS, encoding="utf-8").read()
             _i, _j = _old.find("{"), _old.rfind("}")
             if 0 <= _i < _j:
-                _replay_keep = json.loads(_old[_i:_j + 1]).get("replay")
+                _rp = json.loads(_old[_i:_j + 1]).get("replay")
+                if isinstance(_rp, dict) and _rp.get("top_per_day") == 5:
+                    _replay_keep = _rp
     except Exception:
         _replay_keep = None
     if _replay_keep is None:
         _replay_keep = {
             "kind": "historical_rule_replay_sample_in",
-            "note": ("历史规则回放（样本内·参考）：与线上完全同口径规则（近20日日内累计收益Top10且收盘>MA60）"
+            "note": ("历史规则回放（样本内·参考）：与线上完全同口径规则（近20日日内累计收益Top5且收盘>MA60）"
                      "在窗口 2025-04-24~2026-10-16 逐日重放（bt_factors.py）；规则在同一窗口选出→存在样本内"
                      "选择偏差，按 2026-10-11 铁律禁作主榜/评级/上下架依据；权威口径=真实信号流（summary.by_period）"),
-            "window": ["2025-04-24", "2026-10-16"], "universe": 2574, "top_per_day": 10,
+            "window": ["2025-04-24", "2026-10-16"], "universe": 2574, "top_per_day": 5,
             "cost_pct": 0.3,
             "engine": "上市前置·等权基准（同过滤 universe）·与 bt_factors 同源",
             "by_period": REPLAY_BY_PERIOD,
         }
     payload = {
         "update_time": now_cst(), "calc_time": now_cst(), "data_date": data_date,
-        "method": ("真实信号流口径（2026-10-11 主人令）：每日全市场近 20 日日内累计收益（∑close/open−1）最高 Top10 "
-                   "且收盘>MA60（日内动量，上市前置回测 N=20 α+1.73pp 唯一跑赢档；N≥45 衰减 ⇒ 主档 T+"
+        "method": ("真实信号流口径（2026-10-11 主人令）：每日全市场近 20 日日内累计收益（∑close/open−1）最高 Top5 "
+                   "且收盘>MA60（日内动量，Top5 口径上市前置回测 N=20 α+3.27pp/胜率45.7pct 全档正α；N≥60 衰减 ⇒ 主档 T+"
                    + str(PRIMARY_N) + "），次开买入、持有 N 个交易日收盘卖出（前复权·扣双边 0.3pct）；"
                    "基准=同过滤 universe 等权。样本随持有天数成熟而增加，未走满不计入。"),
         "signal_source": "intraday_momentum_history 逐日真实选股归档（上线首日即建，含已回落票，防幸存者偏差）",
