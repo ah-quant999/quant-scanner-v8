@@ -9436,3 +9436,13 @@ items:
     verified_at: "2026-10-18 真机点击验证通过"
     updated: "2026-10-18 22:35"
     updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: lowvol-intraday-top5-narrow-1019
+    priority: P1
+    owner: 阿狸咪的工程师
+    status: done
+    what: "低波趋稳+日内动量两策略按主人令收窄为『每天评分最高5只』：两 producer TOP_K 10→5 + 两回放引擎 TOP_PER_DAY 10→5 同口径重算（S2 低波 Top5 主档 T+60 α+3.72pp/胜率55.6%；S7 日内动量 Top5 主档 T+20 α+3.27pp/胜率45.7% 全档正α——Top5 比 Top10 更强，排序头部效应）。低波 producer 补 _replay_keep 透传（原重跑会冲掉线上 replay，仅 top_per_day==5 才透传，防口径升级误留旧 Top10 回放）；intraday 透传同步加同 guard。历史归档 2026-10-16 picks 同步收窄为 5 只（同日重跑幂等覆盖）。前端两卡方法论文案 Top10→Top5（标签 TopN 为 picks.length 动态拼接自动跟随）。"
+    evidence: "commit 83dae8eeb02c（11 文件：index.html + 4 data js + 4 raw json + 2 producer，plumbing 快进非强推，ls-tree 核验全入树）。回放重算 bt_factors.py/bt_newalgos.py（仓库外 E:/_alimi_tools/fv_delist_tmp/run_root/algorithms）。"
+    verify_how: "①两 producer py_compile 通过；②index.html 全部 31 内联脚本块 node --check 0 错；③推送后观察一个完整 build 周期：tip 前进至 d127f4e81b 且 commit 仍为祖先、index 含 Top5 文案×2、LOWVOL_TREND.js picks=5 只；④🔴真机无头浏览器(msedge)点击两 tab：低波 picksCount=5/label『低波 Top5』/replayTopPerDay=5/无 Top10 残留，日内 picksCount=5/label『日内动量 Top5』/replayTopPerDay=5，仅 favicon 404 全站旧存。"
+    verified_at: "2026-10-19 07:05 真机点击验证通过"
+    updated: "2026-10-19 07:05"
+    updated_by: 阿狸咪的工程师(alimi-cn)
