@@ -9376,3 +9376,13 @@ items:
     verified_at: "2026-10-18 推仓复读自证+构建周期复验通过+代码审计完成"
     updated: "2026-10-18 19:50"
     updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: fourvolume-residue-clean-1018
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: done
+    what: "四量终极下架收尾：回测汇总页（策略回顾总表）仍显示「四量终极」一行（主人 10-18 截图指认）。根因=data/BACKTEST_ALL_ALGOS.js 是 2026-10-17 聚合快照（下架前生成，rows/ranking/ranking_all/delist_advice/coverage 共 12 处四量条目+primary_rule 文字），下架只摘了生成器条目、没人重刷快照。"
+    evidence: "commit 推后复读：总表四量计数 0（rows 141→136）；index.html 删惰性同源校正块（2619 字节，FOUR_VOLUME_BACKTEST 恒 undefined 死分支）与 srcColor 四量死键。生成器 primary_rule 从 SOURCES 派生（四量条目已注释）重跑不回写；update_v8.py 19 处全为已摘注释。"
+    verify_how: "① plumbing 快进推送（commit-tree -p 最新 tip，非强推）+ ls-tree 复读；② 完整构建周期复验：远端后续提交后我的提交仍为其祖先、清理标记未丢；③ 实时抓 Pages 主站（cache-buster）：线上总表四量=0、前端校正块=0、死键=0、低波卡正常。剩余 index.html 30 处四量字样全为注释/历史注记（非显示），srcFixed 通用兜底消费逻辑不点名四量保留。"
+    verified_at: "2026-10-18 线上实时抓取验证通过"
+    updated: "2026-10-18 20:05"
+    updated_by: 阿狸咪的工程师(alimi-cn)
