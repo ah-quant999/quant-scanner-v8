@@ -186,7 +186,15 @@ CARD_DEFS = [
     {"id": "FACTOR_LAB", "name": "因子实验室", "page": "最终推荐", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "net_dep": True, "net_dep_note": "本机baostock被风控黑名单(err=10001011匿名用户)，无替代数据源，需小九中国IP+浏览器UA在线刷全市场3200只财务+ROE+异常换手。本机无法产出，保留旧数据待小九。"},
     # 🛡 2026-09-30 主人令（盘后页映射对齐）：FOUR_VOLUME_BACKTEST 唯一 UI = 选股策略页四量终极子页
     #   回测表（fvBackBody）。page 迁"选股策略"（与该页既有项同一阈值分支，逐字节同值）。
-    {"id": "FOUR_VOLUME_BACKTEST", "name": "四量终极回测", "page": "选股策略", "freq": "每日盘后(真实信号流视图随B批track刷新)", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🛡 2026-09-07 22:2x：原 key_fields=["periods"] 但 periods 在 summary.by_period 嵌套、回测未跑时顶层缺失 → 永久 warn。改为 summary（永远非空 dict，by_period/calc_time 都在内）。2026-10-11 内容源切真实信号流（同变量名，结构同构）。
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架（T+5 胜率 33.71%/均益 -1.68% n=89 跑输基准，
+    #   delist_advice 已提请、主人裁定）⇒ 四量族 5 条新鲜度监控全部摘除。
+    #   不摘的后果：生产者停跑 → 数据冻结 → 本监控每日假警报 + heal_cat=algo_run 触发自愈重跑
+    #   已摘链脚本（跑又跑不动）→ 运维面板常红。墓碑保留原条目文本备查。
+    # {"id": "FOUR_VOLUME_BACKTEST", "name": "四量终极回测", "page": "选股策略", "freq": "每日盘后(真实信号流视图随B批track刷新)", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},
+    # {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
+    # {"id": "FOUR_VOLUME_60M", "name": "四量终极60m", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
+    # 🔴 2026-10-18 主人令「完全下架」：ALGO_TRACK 唯一信号源四量已下架、gen_algo_track 同批摘链删除。
+    # {"id": "ALGO_TRACK", "name": "算法追踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     {"id": "LQSQ_BACKTEST", "name": "量质双擎回测", "page": "选股策略", "freq": "每日回测批(B批 factor_lab 紧后)", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🚀 2026-10-11 主人令：第一支自研算法（gen_lqsq_top30.py），真实信号流口径上主榜，与四量同榜同纪律。
     # 🛡 2026-10-16 阿狸咪的工程师（一劳永逸根因修复）：补登记 LQSQ_TRACK。
     #   根因（实测）：该卡 10-12 接入起未入 CARD_DEFS ⇒ 落入 all_* 全量数据宽松桶——
@@ -247,16 +255,19 @@ CARD_DEFS = [
     {"id": "MARKET_REGIME", "name": "市场利率环境", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current_rates", "trends", "meta"], "heal_cat": "algo_run"},
     {"id": "SECTOR_RECOMMENDATION", "name": "板块推荐", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["regime", "current_rates", "trends", "meta"], "heal_cat": "algo_run"},
     # 选股策略
-    {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极监控摘除（条目文本见上方墓碑区）。
+    # {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
     # 🔴 2026-09-11 主人令（选项A·软告警→硬告警）：FOUR_VOLUME_60M 由「低频白名单（仅 >7 天才告警）」
     #   升为**正式登记卡**，按 24h 红线判定。
     #   原白名单理由（2026-08-27）是「baostock 60min 源本身滞后 → 常陈旧 → 误报红灯」，该前提自
     #   2026-09-03 起已不成立：脚本改为「无论命中多少只（含 0 只）都写新鲜时间戳」，
     #   故**文件陈旧 ⇔ 脚本没跑成 / 产物写错地方**，属真故障，必须亮红灯。
     #   2026-09-11 实证：正因这层白名单，该卡产物被写进仓库之外、冻结 3 天（09-08→09-11）零告警。
-    {"id": "FOUR_VOLUME_60M", "name": "四量终极60m", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
+    # 🔴 2026-10-18 主人令「完全下架」：四量 60m 监控摘除（条目文本见上方墓碑区）。
+    # {"id": "FOUR_VOLUME_60M", "name": "四量终极60m", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
     # 🛡 2026-09-11 一劳永逸：4 个孤儿 algo_run 产物此前未注册 CARD_DEFS → 被 all_ 通用扫描按 1440min 红线误判 fail
-    {"id": "ALGO_TRACK", "name": "算法追踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
+    # 🔴 2026-10-18 主人令「完全下架」：ALGO_TRACK 监控摘除（四量下架、gen_algo_track 摘链删除）。
+    # {"id": "ALGO_TRACK", "name": "算法追踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     # 🗑 STRONG_BREAKOUT_BACKTEST 健康检查项已随 2026-09-19 主人令删除强势突破而移除。
     # ⚠️ 2026-09-21 小九 · 纠正本行「已移除」表述的**虚报部分**：该产物当时并未被删（只摘了登记），
     #   次日 8bc8275fdc 把整批强势突破产物回推复活 ⇒ 落入 check_all_data_files 全扫按 24h 红线判 fail。
@@ -287,8 +298,9 @@ CARD_DEFS = [
     #   ② 陈旧自愈走「待治愈卡全为 picking 且 <18:00 则不派发」，守住 18:00 盘后门控；
     #   ③ max_age 与 TRIPLE_HISTORY 同口径 1440（盘后产物，24h 红线）。
     #   ⚠️ 若漏标 picking，_heal_loop 的 all() 判定失败 → 盘前会派发整条盘后链（假产物）。
-    {"id": "FOUR_VOLUME_HISTORY", "name": "四量历史", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
-    {"id": "FOUR_VOLUME_TRACK", "name": "四量跟踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
+    # 🔴 2026-10-18 主人令「完全下架」：四量历史/跟踪监控摘除（条目文本见上方墓碑区）。
+    # {"id": "FOUR_VOLUME_HISTORY", "name": "四量历史", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
+    # {"id": "FOUR_VOLUME_TRACK", "name": "四量跟踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
     {"id": "VOLATILITY", "name": "波动率", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
     # 运维/静态说明页（逻辑详解页「防删」子页）
     {"id": "DO_NOT_DELETE", "name": "防误删清单", "page": "运维", "freq": "周日+手动", "max_age": 10080, "key_fields": ["update_time"], "_window_var": "DO_NOT_DELETE", "heal_cat": "algo_run"},
@@ -3078,7 +3090,7 @@ _A_SHARE_POOLS = [
     ("CANDIDATE.js",            "CANDIDATE",            "候选池",       "algo_run"),
     ("GOLD_POOL.js",            "GOLD_POOL",            "黄金池",       "algo_run"),
     # 🔴 2026-10-11 主人令「完全下架」：TRIPLE_CONSENSUS.js / CRDS_CARD_DATA.js 两行移除（策略下架，文件已删）
-    ("FOUR_VOLUME.js",          "FOUR_VOLUME",          "四量终极",     "algo_run"),
+    # 🔴 2026-10-18 主人令「完全下架」：FOUR_VOLUME.js 行移除（四量终极整体下架，文件已删）
     ("LHB_DATA.js",             "LHB_DATA",             "龙虎榜",       "cn_fetch"),
     ("FINAL_RECOMMEND_DATA.js", "FINAL_RECOMMEND_DATA", "最终推荐",     "algo_run"),
 ]

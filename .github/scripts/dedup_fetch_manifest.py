@@ -83,10 +83,18 @@ _ALWAYS_PUSH = {
     #     「真被推送」。若它同时满足「内容天然稳定」（剥掉时间戳后与远端逐字节相同），
     #     本去重器就会判「伪变更」丢弃它 ⇒ update_time 恒旧 ⇒ 闸门 must 恒不满足
     #     ⇒ 该批每轮判「未就绪」→ 重跑 60~90min → **永久不收敛**（比不加 must 更危险）。
-    #   实证风险路径：FOUR_VOLUME 长期命中 0 只时其 stocks 恒为空 ⇒ 内容稳定 ⇒ 必被丢弃。
+    #   实证风险路径：FOUR_VOLUME 长期命中 0 只时其 stocks 恒为空 ⇒ 内容稳定 ⇒ 必被丢弃
+    #   （2026-10-18 该产物已随四量终极下架删除，此处仅存历史教训；现行 must 见下方 TOP10_DAILY 行）。
     #   ⇒ 凡把某项写进 READY_SPEC 的 must，本白名单必须同步添加（两处联动，缺一即锁死）。
     # 🔴 2026-10-11 主人令「完全下架」：TRIPLE_CONSENSUS.js / CRDS_CARD_DATA.js 两行移除（策略下架）
-    "data/FOUR_VOLUME.js",            # READY_SPEC["B"].must
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架 ⇒ must 继任为 TOP10_DAILY.js（见下新增行）。
+    # "data/FOUR_VOLUME.js",            # READY_SPEC["B"].must（2026-10-18 随四量下架移除）
+    # 🛡 2026-10-18 阿狸咪的工程师（四量下架配套·must 继任）：data/TOP10_DAILY.js 纳入。
+    #   不变式（must ⊆ _ALWAYS_PUSH）：TOP10 名单连续两日相同时，剥时间戳后逐字节相同
+    #   ⇒ 不进白名单必被判「伪变更」丢弃 ⇒ update_time 恒旧 ⇒ B 批 must 恒不满足 ⇒ 永不收敛。
+    #   raw_data/top10_daily.json 同步纳入（SEQ_REF["D"]/["E"] 跨批锚点，锚点戳须随 B 批前进）。
+    "data/TOP10_DAILY.js",             # READY_SPEC["B"].must（2026-10-18 继任）
+    "raw_data/top10_daily.json",       # SEQ_REF["D"]/["E"] 锚点（generate_top10.py 直写）
     "data/BACKTEST_ALL_ALGOS.js",     # READY_SPEC["E"].must
     # 🔴 2026-09-14 摘除（主人令「候选池 / 金股池是算法**上游水源**，不是策略，不需要回测」）：
     #   原此二行 `data/CANDIDATE_BACKTEST.js` / `data/GOLD_POOL_BACKTEST.js`（标注
@@ -101,16 +109,11 @@ _ALWAYS_PUSH = {
     #   实测该文件仅 23 KB，白名单化带来的每日多推开销可忽略。
     #   ⇒ 规则：凡 READY_SPEC[*]["must"] 中的产物，一律纳入本白名单（一一对应，可断言）。
     "data/LHB_DATA.js",               # READY_SPEC["A"].must
-    # 🛡 2026-09-18 小九（双盲区根治·P0 · 事故家族第三次复发）：
-    #   READY_SPEC["B"].items 新增 data/FOUR_VOLUME_60M.js ⇒ 依上述**零特例不变式**
-    #   必须同步进本白名单，否则它一旦「内容天然稳定」（60m 命中数相同 ⇒ 剥掉 update_time
-    #   后逐字节相同）就会被本去重器判「伪变更」丢弃 ⇒ update_time 恒旧 ⇒ B 批恒判未就绪
-    #   ⇒ **永久不收敛**（比不加更危险，正是 L85-87 已警示过的路径）。
-    "data/FOUR_VOLUME_60M.js",        # READY_SPEC["B"].items
-    #   同轮（2026-09-18）一并纳入：四量终极自建系统两产物（09-15 新增，闸门漏登记）。
-    #   同受「READY_SPEC items ⊆ _ALWAYS_PUSH」不变式约束。
-    "data/FOUR_VOLUME_HISTORY.js",    # READY_SPEC["B"].items
-    "data/FOUR_VOLUME_TRACK.js",      # READY_SPEC["B"].items
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架 ⇒ 以下三行（2026-09-18 双盲区根治时
+    #   补入的 FOUR_VOLUME_60M/HISTORY/TRACK）随 READY_SPEC["B"].items 同批移除。
+    # "data/FOUR_VOLUME_60M.js",        # READY_SPEC["B"].items（2026-10-18 移除）
+    # "data/FOUR_VOLUME_HISTORY.js",    # READY_SPEC["B"].items（2026-10-18 移除）
+    # "data/FOUR_VOLUME_TRACK.js",      # READY_SPEC["B"].items（2026-10-18 移除）
     # 🛡 2026-10-16 阿狸咪的工程师（LQSQ 发布链断裂根因修复配套·I-2 不变式）：
     #   READY_SPEC["B"].items 本日新增 data/LQSQ_TRACK.js（guard_double_blind I-1 要求），
     #   依「items ∪ must ⊆ _ALWAYS_PUSH」零特例不变式必须同步纳入：信号日无新增 Top5 时

@@ -101,10 +101,14 @@ SOURCES = [
     #   → update_v8 转换层 → 同名 data/FOUR_VOLUME_BACKTEST.js）。summary.by_period 结构
     #   同构 ⇒ parse_by_period 零改动；仅成熟档出现在表里，样本随持有天数成熟而增加。
     #   ⚠️ 观察期样本尚小（09-14 起累积），delist_advice 阈值判定照常生效（主人：不行也只能下架）。
-    dict(card="四量终极", kind="strategy", page="选股策略", icon="📊", cat="trade",
-         var="FOUR_VOLUME_BACKTEST", rel="data/FOUR_VOLUME_BACKTEST.js",
-         parser="by_period", label_prefix="持有", primary="持有 T+5",
-         method="真实信号流口径：每日真实选股累积归档 → 前向跟踪（基准=入选日收盘，T+N 真实交易日，扣双边 0.3%；2026-10-11 切换，回放口径作废）"),
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架 —— 本登记条目移除（同 CRDS/三重模式）。
+    #   下架依据（真实信号流，扣双边 0.3% 诚实口径）：T+5 胜率 33.71% < 红线 45%、均益 -1.68% ≤ 0、
+    #   n=89（T+10 胜率 11.84%/-10.94% n=76），跑输等权基准；delist_advice 已提请、主人裁定执行。
+    #   ⚠️ 不得登记回本表；如日后要恢复，须先恢复算法链生成器与前端卡（主人令）。
+    # dict(card="四量终极", kind="strategy", page="选股策略", icon="📊", cat="trade",
+    #      var="FOUR_VOLUME_BACKTEST", rel="data/FOUR_VOLUME_BACKTEST.js",
+    #      parser="by_period", label_prefix="持有", primary="持有 T+5",
+    #      method="真实信号流口径：每日真实选股累积归档 → 前向跟踪（基准=入选日收盘，T+N 真实交易日，扣双边 0.3%；2026-10-11 切换，回放口径作废）"),
     # 🚀 2026-10-11 主人令：第一支自研算法「量质双擎」——全市场异常量比直选 Top5
     #   （2026-10-13 主人令由 Top30 收紧为每日 3-5 只），
     #   真实信号流口径（gen_lqsq_top5.py，B批 factor_lab 紧后），与四量同榜同纪律。

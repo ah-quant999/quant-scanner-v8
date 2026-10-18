@@ -6115,50 +6115,9 @@ def main(category=None, only=None):
         ("US_HK_MAP", f_us_hk_map),   # 🆕 2026-09-19 隔夜美股强势 → A股/港股 映射
     ]
 
-    def f_four_volume():
-        """四量终极 选股：子进程跑 strategy_four_volume.py（盘后日线，直接写 data/FOUR_VOLUME.js）。
-        [2026-08-26 一劳永逸-理顺cn fetch时序] 若 data/FOUR_VOLUME.js 已是「今日」产出，
-           说明算法链(run_algorithms, 19:15 CST，先于 final_recommend) 本轮已生成四量 -> 跳过，
-           避免 30 分 patrol 在 final_recommend 之后又重发四量 -> 四量卡时间戳晚于最终推荐(逻辑倒置)。"""
-        # 🛡 2026-09-11 小九的工程师·一劳永逸「盘中禁跑盘后策略」：
-        #   四量是**盘后日线**策略，非收盘时段跑，当日日线尚未成型 → 必然命中 0 只。
-        #   实证 09-11：盘中某轮把线上非空的 FOUR_VOLUME.js（5 只）洗成 total:0（commit 049925d5）
-        #   → ① 前端「四量终极」卡空；② CI pre_deploy_audit 判「data/ 下过小文件」硬阻断整站部署。
-        #   15:05 CST 前一律不重算；盘后由本函数或算法链按当日收盘数据产出。
-        _now = now_cst()
-        if _now.hour * 60 + _now.minute < 15 * 60 + 5:
-            print("  [skip] 四量终极为盘后日线策略，当前 %s 未到收盘(15:05)，跳过重算（防洗空）"
-                  % _now.strftime("%H:%M"))
-            return
-        # 当日新鲜度闸门：仅当四量尚未是今日产出时才重算(同时自愈陈旧/缺失)。
-        import re as _re
-        _fv = ROOT / "data" / "FOUR_VOLUME.js"
-        try:
-            if _fv.exists():
-                _txt = _fv.read_text(encoding="utf-8", errors="replace")
-                _m = _re.search(r"[\'\"]update_time[\'\"]\s*:\s*[\'\"]([\d-]+)", _txt)
-                if _m and _m.group(1)[:10] == now_cst().strftime("%Y-%m-%d"):
-                    print("  [skip] 四量终极已为今日(%s)产出，跳过重算(防覆盖算法链先于 final_recommend 的四量)" % _m.group(1)[:10])
-                    return
-        except Exception as _e:
-            print("  [warn] 四量新鲜度检查异常，继续重算: %s" % _e)
-        import subprocess as _sp
-        try:
-            script = ROOT / "algorithms" / "strategy_four_volume.py"
-            print(f"🔥 四量终极选股: {script.name}")
-            # 云端强制 CLOUD_RUNNER=true：scanner 统一走腾讯 GTimg 数据源（东财/mootdx 云端不可靠）
-            _env = dict(os.environ)
-            _env["CLOUD_RUNNER"] = "true"
-            r = _sp.run([sys.executable, str(script), "--top", "80"],
-                        cwd=str(ROOT), capture_output=True, text=True, timeout=1200,
-                        env=_env)
-            out = (r.stdout or "") + (r.stderr or "")
-            for line in out.strip().splitlines()[-6:]:
-                print("   ", line)
-            if r.returncode != 0:
-                print(f"  ⚠️ 四量终极返回码 {r.returncode}")
-        except Exception as e:
-            print(f"  ⚠️ 四量终极子进程失败: {e}")
+    # 🔴 2026-10-18 主人令「完全下架」：f_four_volume 任务移除 —— 四量终极整体下架，
+    #   strategy_four_volume.py 已摘链删除。原任务逻辑（15:05 盘后闸门 + 当日新鲜度跳过 +
+    #   子进程 --top 80 + CLOUD_RUNNER GTimg 源）见 git 历史。
 
     # 🔴 2026-09-22 主人令「一劳永逸」· 接线完整性硬自检（小九）
     #   一条抓取链要真正出数，**三重接线缺一不可**：
@@ -6238,12 +6197,7 @@ def main(category=None, only=None):
         except Exception as e:
             print(f"  ⚠️ gen_market_brief 调用失败: {e}")
 
-    # 四量终极 选股策略（盘后日线，直接写 data/FOUR_VOLUME.js，不进 raw_data）
-    if category in ("post_close", "all"):
-        try:
-            f_four_volume()
-        except Exception as e:
-            print(f"  ⚠️ 四量终极策略失败: {e}")
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极任务注册移除（策略已下架，见上方 f_four_volume 墓碑）。
 
     # 2026-08-22 主人令：STOCK_PROFILE 自愈（从已维护的 stock_names 派生）
     #   原仅 legacy_v6/sync_v6_to_v8.py 生成、不在 v8 云端链路 → 永久陈旧。

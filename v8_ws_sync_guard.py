@@ -65,7 +65,9 @@ CRITICAL = [
     "api_push_raw.py",
     "algorithms/run_algorithms.py",
     "algorithms/scanner.py",
-    "algorithms/strategy_four_volume.py",
+    # 🔴 2026-10-18 主人令「完全下架」：四量/H 反推/gen_algo_track 相关脚本已真删，
+    #   白名单条目一并摘除（文件不存在 ⇒ 留条目只会恒报「缺失」噪声）。
+    # "algorithms/strategy_four_volume.py",
     "algorithms/final_recommend.py",
     "algorithms/generate_top10.py",
     "algorithms/build_candidate_pool.py",
@@ -73,7 +75,8 @@ CRITICAL = [
     "algorithms/gen_backtest_all_algos.py",
     "algorithms/backtest_tdx.py",
     "algorithms/backtest_comprehensive.py",
-    "algorithms/gen_algo_track.py",
+    # 🔴 2026-10-18 主人令「完全下架」：gen_algo_track.py 随四量下架整链拆除（已删）。
+    # "algorithms/gen_algo_track.py",
     "algorithms/gen_market_brief.py",
     # 🔴 2026-09-18 阿狸咪的工程师·零幽灵路径更正（独立实测复核，见 HANDOVER 09-18 回执）：
     #   原写 `algorithms/build_unlisted_panel.py` 与下方 `.github/scripts/v8_t1_guard.py`

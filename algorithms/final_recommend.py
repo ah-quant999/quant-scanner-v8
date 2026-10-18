@@ -647,36 +647,9 @@ def main():
     stop_data = load_js("STOCK_STOP_DATA.js", "STOCK_STOP_DATA")
     stop_stocks = stop_data.get("stocks") or {}
 
-    # ── 读取四量终极共振数据（多周期确认）──
-    # 🛡 2026-08-26 一劳永逸：优先 60min 版(FOUR_VOLUME_60M)；但其 update_time 非今日
-    #   （baostock 60min 源常滞后，曾陈旧到 8/22）→ 回退读日线版 FOUR_VOLUME.js（新鲜），
-    #   避免最终推荐用几天前的陈旧四量汇总（"逻辑不对"根因）。两份 schema 兼容(stocks[])。
-    _four_vol_raw = load_js("FOUR_VOLUME_60M.js", "FOUR_VOLUME_60M")
-    _four_vol_src = "60m"
-    try:
-        _ut = _four_vol_raw.get("update_time", "")
-        _ut_date = datetime.strptime(_ut, "%Y-%m-%d %H:%M:%S").date()
-        # 🔴 2026-09-11 A 类修复：原判据只看 update_time —— 但只要 60m 文件是"今天生成的空壳"
-        #   （实测 09-11 21:33 的 FOUR_VOLUME_60M.js：total=0 / stocks=[]），就被当成有效
-        #   数据源，日线版 FOUR_VOLUME.js（11 只命中）**永远不被读取** → 60m 多周期共振加分
-        #   恒为 0，且看不出一丝异常。现补「空数据」判据：命中数 0 视同不可用。
-        _n60 = len(_four_vol_raw.get("hits") or _four_vol_raw.get("stocks") or [])
-        if _ut_date < datetime.now().date():
-            _four_vol_raw = load_js("FOUR_VOLUME.js", "FOUR_VOLUME")
-            _four_vol_src = "day(60m陈旧回退)"
-            print(f"[warn] 60m 四量 update_time={_ut} 非今日，回退读日线四量终极")
-        elif _n60 == 0:
-            _four_vol_raw = load_js("FOUR_VOLUME.js", "FOUR_VOLUME")
-            _four_vol_src = "day(60m空数据回退)"
-            print(f"[warn] ⚠️ 60m 四量 update_time={_ut} 是今日但命中数=0（空壳），回退读日线四量终极")
-    except Exception as e:
-        print(f"[warn] 四量新鲜度校验失败，沿用 60m: {e}")
-    _60m_hits = {}  # norm_code → {reason, signals[], qd, pct_chg, ...}
-    for item in (_four_vol_raw.get("hits") or _four_vol_raw.get("stocks") or []):
-        c = norm_code(item.get("code") or item.get("code"))
-        if c:
-            _60m_hits[c] = item
-    print(f"[info] 四量数据({_four_vol_src}): 加载 {len(_60m_hits)} 只命中")
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架 —— 共振读数块（60m 优先/新鲜度校验/
+    #   空壳判据/日线回退）一并移除：FOUR_VOLUME*.js 停更后继续读=读陈旧数据充当日新鲜，
+    #   恰是本块 09-11 修的那个 bug 的镜像。完整实现见 git 历史。
 
     # 2026-09-04 主人令：cockpit_backtest 死数据源整段删除（生成器 09-03 下线，load 恒空，仅产出全零 backtest 垃圾）
     # 🔴 2026-10-11 主人令「完全下架」：triple_track.json 输入已随三重共识下架摘除，tt_alerts 恒空。
@@ -721,60 +694,15 @@ def main():
 
     # ═══════════════════════════════════════════════════════════════════════════
     # 🔴🔴 2026-10-14 主人令「只允许 excess5>0 的源入榜」·真实流 edge 闸门
+    # 🔴 2026-10-18 主人令「完全下架」：本闸门随四量终极整体下架移除。
+    #   裁决取证（下架即永久结论，非样本不足）：四量真实流 T+5 均益 -1.68%（扣费修复后口径，
+    #   此前的 -1.38%/-1.21% 均系未扣成本的高估）、胜率 33.71%、n=89，跑输等权基准 ⇒
+    #   闸门自 10-14 起持续生效（推票 3→2 + 行动标签「观察」）。四量不再是融合池源后，
+    #   闸门失去主体；若保留则会读冻结的 four_volume_track.json 永久锁死「观察」态，
+    #   那是以幽灵数据驱动生产决策，违反「数据新鲜真实」宗旨 ⇒ 整块移除。
+    #   最终推荐自身的负超额（T+5 -3.77%）是独立议题，记入 HANDOFF algo-audit-1017 待观察，
+    #   不借四量幽灵闸门表达。完整实现见 git 历史。
     # ───────────────────────────────────────────────────────────────────────────
-    # 背景（2026-10-14 凌晨复盘，数据全链已线上取证）：
-    #   最终推荐 89 笔/18 信号日真实信号流 T+5 超额 −3.77%、T+10 −4.79%（基准=等权全市场）；
-    #   唯一在池源「四量终极」真实流（track_start 2026-09-14）T+5 −1.21%/n=78、
-    #   T+10 −10.49%/n=70（胜率 12.86%）——上游负 alpha，融合器救不回来。
-    # 口径说明（防混用）：
-    #   · backtest_expectancy.json 的 by_factor.excess5 是**回放口径**（含当前股池
-    #     幸存者偏差，memory 已记为「禁作主榜/上下架依据」）⇒ 不能拿来当入榜闸门；
-    #   · 本闸门改用**真实流口径**：raw_data/four_volume_track.json 的
-    #     self_backtest.summary（信号逐日累积的真收盘价前向样本，无未来函数）。
-    # 规则：
-    #   · T+5 成熟档 n ≥ 30（薄样本保护）且 avg_return < 0 ⇒ 四量负 edge
-    #     ⇒ _open_regime 强制 False（推票 3→2 + 行动标签改「观察」），信号流不断、
-    #     回测样本继续积累，负 edge 状态对主人明示；
-    #   · avg_return ≥ 0 ⇒ 正 edge，正常推（自适应：四量真实流转正自动恢复）；
-    #   · 样本不足/读失败 ⇒ 不启用闸门 + 显式 warn（绝不静默）。
-    # 回退：V8_FUSION_REALFLOW_GATE=0 → 关闭本闸门（恢复旧行为）。
-    # ═══════════════════════════════════════════════════════════════════════════
-    V8_FUSION_REALFLOW_GATE = os.environ.get("V8_FUSION_REALFLOW_GATE", "1").strip() != "0"
-    _FV_GATE_MIN_N = 30   # 薄样本保护：低于此样本量不启用闸门
-    _fv_gate_on = False
-    _fv_real = {"source": "raw_data/four_volume_track.json::self_backtest.summary[5d]",
-                "min_n": _FV_GATE_MIN_N, "count": None, "avg_return": None, "win_rate": None,
-                "enabled": False, "note": ""}
-    if V8_FUSION_REALFLOW_GATE:
-        try:
-            _fv_track = load_json("four_volume_track.json") or {}
-            _fv_sb = (_fv_track.get("self_backtest") or {}).get("summary") or {}
-            _fv5 = _fv_sb.get("5d") or {}
-            _n = _fv5.get("count") or 0
-            _avg = _fv5.get("avg_return")
-            _fv_real.update({"count": _n, "avg_return": _avg, "win_rate": _fv5.get("win_rate")})
-            if isinstance(_avg, (int, float)) and _n >= _FV_GATE_MIN_N:
-                _fv_gate_on = _avg < 0
-                _fv_real["enabled"] = True
-                if _fv_gate_on:
-                    print(f"[realflow-gate] 四量真实流 T+5 n={_n} 胜率={_fv5.get('win_rate')}% "
-                          f"均={_avg}% < 0 ⇒ 负 edge ⇒ 最终推荐降级观察（推票 {TOP_N}→{max(2, TOP_N - 1)}）")
-                else:
-                    print(f"[realflow-gate] 四量真实流 T+5 n={_n} 均={_avg}% ≥ 0 ⇒ 正 edge，正常推")
-            else:
-                _fv_real["note"] = f"样本不足或缺失（n={_n} < {_FV_GATE_MIN_N}），不启用闸门"
-                print(f"  [warn] realflow-gate 样本不足/缺失（n={_n}）⇒ 不启用闸门")
-        except Exception as e:
-            _fv_real["note"] = f"读取失败，不启用闸门: {e}"
-            print(f"  [warn] realflow-gate 读取失败，不启用: {e}")
-        if _fv_gate_on:
-            _open_regime = False
-            _effective_top_n = max(2, TOP_N - 1)
-            _action_label = "观察（四量真实流负 edge，见 realflow_gate）"
-            print(f"[realflow-gate] 闸门生效：开仓=False 推票数→{_effective_top_n} 行动={_action_label}")
-    else:
-        _fv_real["note"] = "V8_FUSION_REALFLOW_GATE=0 手动关闭"
-        print("  [info] realflow-gate 已手动关闭（V8_FUSION_REALFLOW_GATE=0）")
 
     profiles = (profile or {}).get("profiles") or {}
 
@@ -878,21 +806,8 @@ def main():
             _alpha_skipped += 1
         if qd and _alpha_qualified:
             src_score += 0.5
-        # ── 60min 多周期共振加分（同算法不同时间框架 = 经典共振）──
-        _60m_item = _60m_hits.get(norm_code(code))
-        if _60m_item:
-            _60m_qd = bool(_60m_item.get("qd") or _60m_item.get("XG"))
-            _60m_bonus = 0.8 if _60m_qd else 0.5
-            if _alpha_qualified:
-                src_score += _60m_bonus
-            # 🔴 2026-09-11 A 类修复：标签必须与真实口径一致。_four_vol_src 非 60m
-            #   （60m 陈旧/空壳回退日线）时不得再标「60min多周期共振」—— 那是日线共振。
-            if _four_vol_src.startswith("60m"):
-                r["signals"].append("60min多周期共振")
-                r["_60m_resonance"] = True
-            else:
-                r["signals"].append("多周期共振(日线口径)")
-        # ── end 60m ──
+        # 🔴 2026-10-18 主人令「完全下架」：四量多周期共振加分（0.5/0.8 两档 + 信号标签）
+        #   随四量整体下架移除 —— 加分主体已不存在，见上方共振读数块墓碑。
         src_score = round(min(4.5, max(0.0, src_score)), 2)
         if src_score > 0:
             r["sources"].append("四量终极")
@@ -1809,8 +1724,8 @@ def main():
             "note": "grind/panic=可开仓(正常推)；stabilize/rebound=历史回测≥3共振负期望，应观察/少推；"
                     "ok=false 表示 regime 取数失败已按保守处置（regime=null、不推满仓）",
         },
-        # 🔴🔴 2026-10-14 主人令「只允许 excess5>0 的源入榜」：四量真实流 edge 闸门回显。
-        "realflow_gate": _fv_real,
+        # 🔴 2026-10-18 主人令「完全下架」：realflow_gate 回显字段随闸门移除。
+        #   下架裁决（T+5 -1.68%/胜率 33.71%/n=89）已入 HANDOFF algo-audit-1017，不在产物复述。
         # 🔴🔴 2026-10-14 主人令「符合入选的，凭因子真实排序」：强势跟踪入池回显。
         "ima_intake": {
             "data_date": _ima_dd,

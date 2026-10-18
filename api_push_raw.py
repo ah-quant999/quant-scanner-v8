@@ -377,6 +377,22 @@ _RETIRED_ARTIFACTS = {
     #   远端产物由本次退役提交一次性删除；本行只拦「本地残留副本/自动化回推复活」（与 v8_health_check._RETIRED_FILES 同源维护）。
     #   ⚠️ 注意：data/maharo_insights.js（window.MAHORO_INSIGHTS）是活链，勿误伤。
     "data/maharo_macro.js",
+    # 🗑 2026-10-18 主人令「完全下架」（同族第五例）：四量终极整链下架 + H 反推摘链。
+    #   生产者已从 run_algorithms.py ORDER/STAGES 成对摘除并真删 .py；update_v8 映射、
+    #   v8_health_check CARD_DEFS/监视名单、v8_stage_gate READY_SPEC、dedup _ALWAYS_PUSH、
+    #   verify_chain_outputs CRITICAL、v8_deploy_guard 基线、v8_ws_sync_guard 白名单同批清理；
+    #   前端 index.html 注入/渲染同批摘除。远端产物由本次下架提交一次性删除；
+    #   本段只拦「本地残留副本/他机同步层回推复活」（与 v8_health_check._RETIRED_FILES 同源维护）。
+    #   ⚠️ raw_data/four_volume*.json 按主人裁决**保留为下架取证档案**（不再刷新不再发布），
+    #     故不在此拦截清单内；data/*.js 产物已全删，拦的是回推复活。
+    "data/FOUR_VOLUME.js",
+    "data/FOUR_VOLUME_60M.js",
+    "data/FOUR_VOLUME_BACKTEST.js",
+    "data/FOUR_VOLUME_HISTORY.js",
+    "data/FOUR_VOLUME_TRACK.js",
+    "data/ALGO_TRACK.js",
+    "data/H_AUTO_BUY.js",
+    "data/H_AUTO_BUY_TRACK.js",
 }
 # 按前缀兜底：raw_data/strong_breakout_YYYYMMDD.json（逐日留档）
 _RETIRED_PREFIXES = (
@@ -544,7 +560,9 @@ def walk_raw():
         "backtest",          # backtest_tdx.py / backtest_comprehensive.py 等
         # 2026-09-18 主人令：cockpit_backtest 前缀随驾驶舱下线彻底删除
         "optimized_strategy",# export_optimized_strategy.py
-        "algo_track",         # gen_algo_track.py（2026-08-15 三算法追踪）
+        # 🔴 2026-10-18 主人令「完全下架」：gen_algo_track.py 随四量终极整体下架整链拆除
+        #   （唯一信号源=四量，前端注入 10-06 已判死）⇒ 前缀移除。
+        # "algo_track",         # gen_algo_track.py（2026-08-15 三算法追踪）
         "commodity_prices_cache",  # calc_commodity_elasticity.py westock 价格缓存（MCP 预抓取）
     )
     push_algo_raw = os.environ.get("PUSH_ALGO_RAW") == "1"
@@ -640,17 +658,20 @@ def walk_extra():
     """
     out = {}
     extra = [
-        "data/FOUR_VOLUME.js",          # 四量终极日线版（gen_triple_consensus 产出）
+        # 🔴 2026-10-18 主人令「完全下架」：四量终极两产物随策略下架删除，登记移除。
+        # "data/FOUR_VOLUME.js",          # 四量终极日线版（2026-10-18 移除）
+        # "data/FOUR_VOLUME_60M.js",      # 四量终极60min版（2026-10-18 移除）
         "data/STOCK_STOP_DATA.js",      # ATR止损止盈（gen_stock_stop 产出）
         # ── 2026-08-10 补入：之前缺失导致这些文件永远不刷新 ──
         "data/FINAL_RECOMMEND_DATA.js", # 跨策略共振 Top3（final_recommend.py 产出）
-        "data/FOUR_VOLUME_60M.js",      # 四量终极60min版（strategy_four_volume_60m.py 产出）
         # ── 2026-08-17 补入：商品涨价弹性榜（calc_commodity_elasticity.py 产出）──
         # 之前未注册，导致国内期货 LC/SA 数据永远不显示；现加入云端自动跑 + 推送
         "data/COMMODITY_ELASTICITY.js",
         # ── 2026-08-19 补入：H 反推短线买点 + 跟踪（auto_run_dn_algorithm / track_h_auto_buy） ──
         # 之前仅手动 commit，未注册到 api_push 队列 → 每天盘后算法链跑完也不上传。
-        "data/H_AUTO_BUY.js",           # 反推算法当日候选（脱离 PDF OCR）
+        # 🔴 2026-10-18 主人令：H 反推两条已摘链（ORDER/STAGES 成对，前端零消费仍日产=纯浪费）
+        #   ⇒ 当日候选产物登记一并移除（auto_run_dn_algorithm.py 已删）。
+        # "data/H_AUTO_BUY.js",           # 反推算法当日候选（脱离 PDF OCR）
         # ── 🆕 2026-09-11 补入：全算法回测汇总（gen_backtest_all_algos.py 产出）──
         #   本文件不在 update_v8.py 的 raw→js 映射表内（由脚本自己直接写 data/），
         #   按本函数约定「需在此注册才能被 api_push 推到 main」。
@@ -663,7 +684,8 @@ def walk_extra():
         #        ulPaneStrong 非元素 ⇒ 该卡**全站零生效路径**，产物无人可见；
         #     ③ 生成脚本已同步从算法链 E 批摘除（algorithms/run_algorithms.py ORDER + STAGES）。
         #   ⚠️ 不得再登记回本表；如日后恢复该卡，须先恢复前端渲染（主人令）再一并恢复生产与上传。
-        "data/H_AUTO_BUY_TRACK.js",     # 反推算法累计胜率（每日跟踪 T+1/T+3/T+5/T+10）
+        # 🔴 2026-10-18 主人令：H 反推两条摘链 ⇒ 累计胜率产物登记移除（track_h_auto_buy.py 已删）。
+        # "data/H_AUTO_BUY_TRACK.js",     # 反推算法累计胜率（每日跟踪 T+1/T+3/T+5/T+10）
         # 🧹 2026-09-15：data/LHB_7D.js 已随「无生产者 + 前端零引用」一并退役删除，
         #   故此处不再登记（原 2026-08-20 登记项作废）。
         # 🆕 2026-09-13 主人令「PE/PB 方案 A 落地」：中信 PE 极值温度计双卡产物。
@@ -691,13 +713,13 @@ def walk_extra():
 # 说明：无论 build / cn / 盘后算法链谁推送 data，reconcile workflow 仍是
 # 全局自愈兜底；此处只是把「最高频的 cn extra 推送」做成零窗口。
 _EXTRA_FILES = (
-    "data/FOUR_VOLUME.js",
+    # 🔴 2026-10-18 主人令「完全下架」：四量两产物 + H 反推两产物随摘链删除，?v 重写集同步摘除。
+    # "data/FOUR_VOLUME.js",
+    # "data/FOUR_VOLUME_60M.js",
+    # "data/H_AUTO_BUY.js",
+    # "data/H_AUTO_BUY_TRACK.js",
     "data/STOCK_STOP_DATA.js",
     "data/FINAL_RECOMMEND_DATA.js",
-    "data/FOUR_VOLUME_60M.js",
-    # 🛡 2026-08-19：H 反推算法相关文件注册到 ?v 重写集，确保 api_push 推送后 index.html 同步对齐缓存戳
-    "data/H_AUTO_BUY.js",
-    "data/H_AUTO_BUY_TRACK.js",
     # 🧹 2026-09-15：data/LHB_7D.js 已退役删除（同上方 extra 段说明），?v 重写集一并摘除。
     # 2026-08-19：路径概率预测卡（艾略特+江恩+缠论+形态匹配）注册到 ?v 重写集
     "data/INDEX_HISTORY.js",

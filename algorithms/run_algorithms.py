@@ -58,12 +58,9 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "backtest_tdx.py": 5400,
     "gen_stock_profile.py": 2700,
     "factor_lab_backtest.py": 1800,  # 🆕 700日长历史抓取+五分位分层回测（cn ~5min / 云端 ~15min）
-    # 🛡 2026-09-07 一劳永逸：H 反推对「全市场涨幅≥3%」的数百只逐只取前 4 日均量。
-    #   原为串行逐只 HTTP（云端抓中国源必挂）→ 30min 被 kill → 产物文件写不出来
-    #   → track 兜底读旧 H_AUTO_BUY.js → 前端卡冻结 3 天（09-05~09-07 事故）。
-    #   现已改为「本地缓存优先 + 三级兜底链 + 16 线程并发」，实测分钟级；此处登记
-    #   显式预算 2400s，避免冷缓存首轮（缓存未命中、全走网络）时再被误杀。
-    "auto_run_dn_algorithm.py": 2400,
+    # 🔴 2026-10-18 主人令「直接上线」：H 反推两条摘链——前端注入 2026-10-06 已全面摘除
+    #   （H_AUTO_BUY/H_AUTO_BUY_TRACK 零消费），仍每日跑+巡检=纯浪费。脚本同批删除。
+    # "auto_run_dn_algorithm.py": 2400,
     # 🛡 2026-09-08 全链审计补登：以下重活此前未登记，走默认 1800s 易被误杀
     #   （被杀 = 产物写不出 = 下游读旧文件 = 静默断更，与 H_AUTO_BUY 同类）。
     "gen_stock_stop.py": 2400,             # 147~200 只逐只 250 根 K 线（已改并发，冷网络留足预算）
@@ -88,12 +85,14 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   240 只逐只取数在源抖动时极易超过 30min → 被监督器硬超时杀 → 产物写不出。
     #   注意：被杀与「源不可用秒退」是两种不同故障，登记预算只解决前者，后者由
     #   ScanUnavailable 硬失败上报（见该脚本 main()）。给足 90min 余量。
-    "strategy_four_volume_60m.py": 5400,
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架，脚本已删，预算条目随摘。
+    # "strategy_four_volume_60m.py": 5400,
     # 🛡 2026-09-16 阿狸咪的工程师 · 修「5 年版未登记预算」（D7 配套）：
     #   日线版同样逐只取数，且 E 批经 SCRIPT_ENV 注入 V8_BACKTEST_YEARS=5 ⇒ bars >= 1500 全池回测，
     #   实测 > 15min（run 35006805941 实证）。此前未登记 ⇒ 走默认 1800s，与 60min 版同档补 90min。
     #   ⚠️ 总预算与静默阈值是两把锁（见 SILENCE_OVERRIDE），缺任何一把仍会被杀。
-    "strategy_four_volume.py": 5400,
+    # 🔴 2026-10-18 主人令「完全下架」：随四量整体下架摘除。
+    # "strategy_four_volume.py": 5400,
     # 🛡 2026-09-11 一劳永逸：以下 5 个实验/研究卡脚本从 v8_cn_fetch_experiments.yml
     #   正式收编进 B 批链尾（详见 ORDER / STAGES["B"] 注释）。均为纯本地计算或
     #   单接口调用（不遍历全 universe），给 900s 足够余量；显式登记避免走默认 1800s
@@ -109,8 +108,9 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   history 读 data/FOUR_VOLUME.js + raw_data/stock_quote.json（全市场快照，一次载入、
     #   按 code 建索引，不逐只网络请求）；track 读账本 + 本地 json，零网络。
     #   与三重同族给出 900s 显式预算（避免走默认 1800s 拖长 B 批，B 批在 D 批 20:00 关键路径上）。
-    "update_four_volume_history.py": 900,
-    "gen_four_volume_track.py": 900,
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架，脚本已删，预算条目随摘。
+    # "update_four_volume_history.py": 900,
+    # "gen_four_volume_track.py": 900,
     # 🛡 2026-09-28 阿狸咪的工程师（🔴 最终推荐连续 3 天不出 · 真根因根治）：
     #   final_recommend.py 是 D 批末步、跨策略共振的**最终产物**；其 main() 内含
     #   「等 FACTOR_LAB.js 当日新鲜」轮询，最长 _fl_max_wait=20 分钟（每次 sleep 60s）。
@@ -204,8 +204,15 @@ ORDER = [
     "backtest_tdx.py",                 # 读 gold_pool 输入
     "backtest_comprehensive.py",       # 读 raw_data/history/top10_daily_YYYYMMDD.json（必须在 generate_top10 之后）
     "export_optimized_strategy.py",    # → raw_data/optimized_strategy.json（读 backtest_tdx.json 汇总优化策略效果）
-    "strategy_four_volume_60m.py",     # → data/FOUR_VOLUME_60M.js（四量终极60min版，baostock独立数据源）
-    "strategy_four_volume.py",         # 🛡 2026-08-19 阿狸咪根治孤儿：日线版 FOUR_VOLUME.js 一直在 ORDER 漏挂 → 四星终极卡 4 格 0。render 端已合并读 60m 兜底，这里补齐日线数据链。
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架——真实信号流 T+5 胜率 33.71% < 红线 45%、
+    #   均益 -1.68% ≤ 0（n=89，扣费修复后口径；此前 -1.38% 系未扣成本的高估值），跑输基准；
+    #   delist_advice（BACKTEST_ALL_ALGOS）已提请「是否下架并停止跟踪」，主人裁定执行。
+    #   选股两件套 + 历史累积 + 跟踪器一并摘链（与 STAGES["B"] 成对）；前端消费面同批清除
+    #   （选股策略 fv 子页/统一候选池/驾驶舱共振/命中标签/回测卡/星级表/运维数据源登记）；
+    #   health_check 5 条新鲜度监控同批摘除（否则停产后假警报 + 自愈重跑已摘链脚本）。
+    #   脚本文件同批删除（对齐 10-11 三重/CRDS「完全下架」模式；git 历史即考古档案）。
+    # "strategy_four_volume_60m.py",     # （已摘链 2026-10-18）→ data/FOUR_VOLUME_60M.js（四量终极60min版）
+    # "strategy_four_volume.py",         # （已摘链 2026-10-18）→ data/FOUR_VOLUME.js（四量终极日线版）
     "market_regime.py",                # 🛡 2026-08-19 阿狸咪补对齐：宏观环境卡 → data/MACRO.js + data/MARKET_REGIME.js（国债+LPR+银行间利率+利率上行期板块推荐框架）
     "sector_recommendation.py",        # 🛡 2026-08-19 阿狸咪补对齐：板块推荐卡 → data/SECTOR_RECOMMENDATION.js（13板块按优先级+异动跟随/已涨过标）
     # 🔴 2026-10-11 主人令「完全下架」：三重共识整体下架（真实池回测全档败：T+1 17.0%/-3.4% n=47、
@@ -214,10 +221,12 @@ ORDER = [
     # "gen_triple_consensus.py",         # （已摘链 2026-10-11）读 top10 / fundamental / gold_pool
     # "gen_triple_track.py",             # （已摘链 2026-10-11）读 triple_history / gold_pool / backtest
     # 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」= 历史追踪 + 跟踪/前向回测。
-    #   必须排在 strategy_four_volume.py（L156，产 data/FOUR_VOLUME.js）之后，
-    #   且二者内部有序：history 累积账本 → track 消费账本。
-    "update_four_volume_history.py",   # → raw_data/four_volume_history.json（逐日账本 + 自建真实收盘价序列）
-    "gen_four_volume_track.py",        # → raw_data/four_volume_track.json（持仓跟踪/告警/前向累积/聚类/重叠）
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架（见上方选股两件套摘链注）——
+    #   历史累积 + 跟踪器一并摘链。raw_data/four_volume_history.json + four_volume_track.json
+    #   作为下架裁决的真实流取证档案保留（不删、不再刷新）；final_recommend 的 realflow-gate
+    #   同批移除（四量不再是融合池源，闸门失去主体；负 edge 裁决记录见 HANDOFF algo-audit-1017）。
+    # "update_four_volume_history.py",   # （已摘链 2026-10-18）→ raw_data/four_volume_history.json（逐日账本）
+    # "gen_four_volume_track.py",        # （已摘链 2026-10-18）→ raw_data/four_volume_track.json（持仓跟踪/前向累积）
     "calc_volatility_watch.py",         # → raw_data/volatility.json（v8 原生，独立无依赖）
     "gen_stock_stop.py",                # → data/STOCK_STOP_DATA.js（ATR 精确止损止盈，读候选宇宙日K）
     # ── 孤儿模块原生化（2026-08-02）：原靠 v6→v8 sync_legacy 同步，现由 v8 直接产出 ──
@@ -230,7 +239,11 @@ ORDER = [
     #   → raw_data/final_recommend.json + data/FINAL_RECOMMEND_DATA.js（Top5 + 全量推荐池）
     # 🛡 2026-08-26 一劳永逸：原排在 ORDER 前部，可能先于部分选股脚本完成就产出推荐。
     #   现整体移至 ORDER 末尾（见下方 track_h_auto_buy.py 之后），确保所有选股策略数据跑完后再汇总。
-    "gen_algo_track.py",                # → ALGO_TRACK.js（四量终极/板块龙头/大牛股猎手 独立追踪，2026-08-15 落地）
+    # 🔴 2026-10-18 主人令「完全下架」：gen_algo_track.py 摘链删除——唯一信号源四量终极已下架
+    #   （板块龙头/大牛股猎手 09-03 已下线），前端 ALGO_TRACK 注入 10-06 已判死；
+    #   脚本同批删除，raw_data/algo_track.json 删除（build_pool_tracker 有空占位降级路径，
+    #   选股生命周期卡将诚实显示空态，不用冻结的幽灵池充数）。
+    # "gen_algo_track.py",                # （已摘链 2026-10-18）→ ALGO_TRACK.js
     # ── 2026-08-17 主人怒令「每个前端的算法都全面审计」补入：之前完全不调度，前端卡永远陈旧 ──
     "calc_sentiment_cycle.py",          # → data/SENTIMENT_CYCLE.js（情绪周期，读 LIMIT_UP_HEATMAP；之前无任何 workflow 调用 = 孤儿）
     "refresh_dividend_cninfo.py",       # → 更新 STOCK_QUOTE 分红字段（读 PORTFOLIO/CANDIDATE/GOLD_POOL；之前无任何 workflow 调用）
@@ -240,13 +253,10 @@ ORDER = [
     "refresh_stock_metadata.py",
     "fetch_weekend_run.py",
 
-    # 🛡 2026-08-19 一劳永逸式修复：H 反推算法从PDF OCR 脱离，反推代码 + 每日盘后自跑 + 跟踪回测。
-    #   auto_run_dn_algorithm.py 默认 emit-js（写 data/H_AUTO_BUY.js）；
-    #   track_h_auto_buy.py 默认 emit-js（写 data/H_AUTO_BUY_TRACK.js，写 raw_data/h_auto_buy_history.json）。
-    #   这两个之前一直在算法链外，导致反推算法即使跑出结果也没人调度、没人推送、没人可见。
-    "auto_run_dn_algorithm.py",
-    # 🗑 2026-09-19 主人令：强势突破（strong_breakout.py）全站删除，不再调度。
-    "track_h_auto_buy.py",
+    # 🔴 2026-10-18 主人令「直接上线」：H 反推两条摘链——前端注入 2026-10-06 已全面摘除
+    #   （H_AUTO_BUY/H_AUTO_BUY_TRACK 零消费），仍每日跑+巡检=纯浪费。脚本同批删除。
+    # "auto_run_dn_algorithm.py",
+    # "track_h_auto_buy.py",
     # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：LHB_7D.js 前端零引用，
     #   停止调度 gen_lhb_7d.py，释放 B 批算力。
     # "gen_lhb_7d.py",                   # → data/LHB_7D.js（龙虎榜 7 日累计，依赖 A 批 fetch_lhb.py）
@@ -380,22 +390,23 @@ STAGES = {
         #   模块级 assert 炸链：今晚 A 批两连崩 algo exit 1，全链停摆——与 ORDER L200 成对，位置一致=候选池之前）。
         "gen_lqsq_top5.py",      # → data/LQSQ_BACKTEST.js + lqsq_history（量质双擎，必须与 ORDER 成对）
         "build_candidate_pool.py", "generate_top10.py",
-        "strategy_four_volume_60m.py", "strategy_four_volume.py",
+        # 🔴 2026-10-18 主人令「完全下架」：四量终极选股两件套已摘链（与 ORDER 成对）。
+        # "strategy_four_volume_60m.py", "strategy_four_volume.py",
         "market_regime.py", "sector_recommendation.py",
         # 🔴 2026-10-11 主人令「完全下架」：update_triple_resonance_history.py 已摘链。
         # "update_triple_resonance_history.py",   # （已摘链 2026-10-11）累积 triple_resonance_history
         # 🆕 2026-09-15 主人令：四量终极历史追踪 + 跟踪/前向回测（与三重同批、同序）。
-        #   插在 strategy_four_volume.py 之后 → 读到当日新鲜 data/FOUR_VOLUME.js；
-        #   ⚠️ 必须在 gen_triple_consensus 之前（本行位置天然满足）。
-        "update_four_volume_history.py", "gen_four_volume_track.py",
+        # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架，历史累积 + 跟踪器已摘链（与 ORDER 成对）。
+        # "update_four_volume_history.py", "gen_four_volume_track.py",
         # 🔴 2026-10-11 主人令「完全下架」：gen_triple_consensus / gen_triple_track 已摘链。
         # "gen_triple_consensus.py", "gen_triple_track.py",
         "calc_volatility_watch.py",
-        "gen_stock_stop.py", "gen_algo_track.py", "calc_sentiment_cycle.py",
+        "gen_stock_stop.py", "calc_sentiment_cycle.py",
         "refresh_dividend_cninfo.py",
         "refresh_stock_metadata.py", "fetch_weekend_run.py",   # 周末复盘/周度汇总（原 ORDER 漏挂 STAGE）
 
-        "auto_run_dn_algorithm.py", "track_h_auto_buy.py",
+        # 🔴 2026-10-18 主人令「直接上线」：H 反推两条已摘链（与 ORDER 成对；前端零消费仍日产=纯浪费）。
+        # "auto_run_dn_algorithm.py", "track_h_auto_buy.py",
         # 🛡 2026-09-11 小九的股票专家（死数据清理·P1）：LHB_7D.js 前端零引用，停止调度 gen_lhb_7d.py。
         # "gen_lhb_7d.py",
 
@@ -605,20 +616,23 @@ STOCK_PICKING_SCRIPTS = {
     # "calc_crds.py",                  # （已摘链 2026-10-11）CRDS 逆势龙头
     "build_candidate_pool.py",       # 候选池/金股池聚合
     "generate_top10.py",             # 多维共振 TOP10 精选
-    "strategy_four_volume.py",       # 四量终极 日线选股
-    "strategy_four_volume_60m.py",   # 四量终极 60min 选股
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极四件套已摘链，移出门控名单。
+    # "strategy_four_volume.py",       # （已摘链 2026-10-18）四量终极 日线选股
+    # "strategy_four_volume_60m.py",   # （已摘链 2026-10-18）四量终极 60min 选股
     # "update_triple_resonance_history.py",  # （已摘链 2026-10-11）三重历史累积
     # "gen_triple_consensus.py",       # （已摘链 2026-10-11）三重共识选股
     # "gen_triple_track.py",           # （已摘链 2026-10-11）三重跟踪
     # 🆕 2026-09-15 主人令：四量历史追踪 + 跟踪（读当日 FOUR_VOLUME.js，属盘后选股产物）。
-    #   与三重同族一致纳入 18:00 门控 —— 盘中 force 跑链也不得重算（免半日数据假产物）。
-    "update_four_volume_history.py",  # 四量历史累积
-    "gen_four_volume_track.py",       # 四量跟踪/前向回测
+    # 🔴 2026-10-18 主人令「完全下架」：随四量整体下架摘除。
+    # "update_four_volume_history.py",  # （已摘链 2026-10-18）四量历史累积
+    # "gen_four_volume_track.py",       # （已摘链 2026-10-18）四量跟踪/前向回测
     "final_recommend.py",            # 跨策略共振 Top5（管线最终产物）
-    "gen_algo_track.py",             # 算法追踪
+    # 🔴 2026-10-18 主人令「完全下架」：gen_algo_track 已摘链（唯一信号源四量已下架，脚本同批删除）。
+    # "gen_algo_track.py",             # （已摘链 2026-10-18）算法追踪
     "calc_sentiment_cycle.py",       # 情绪周期（读 LIMIT_UP_HEATMAP）
-    "auto_run_dn_algorithm.py",      # H 反推算法
-    "track_h_auto_buy.py",           # H 反推跟踪
+    # 🔴 2026-10-18 主人令「直接上线」：H 反推两条已摘链（前端 10-06 摘注入后零消费）。
+    # "auto_run_dn_algorithm.py",      # （已摘链 2026-10-18）H 反推算法
+    # "track_h_auto_buy.py",           # （已摘链 2026-10-18）H 反推跟踪
     "calc_volatility_watch.py",      # 波动率观察选股
     "gen_stock_stop.py",             # ATR 止损止盈（读候选宇宙日K）
     # LHB_7D 已停跑（2026-09-13）：gen_lhb_7d.py 从选股门控名单移除（前端零引用 + raw 无消费方）
@@ -785,10 +799,12 @@ _FINAL_RECOMMEND_INPUTS = {
 #   - FOUR_VOLUME_60M.js：🔴 2026-09-11 起 = 【硬告警·计败不阻断】——陈旧时计入失败账本
 #     （algo_run_report.json），但不阻断 final_recommend（final_recommend.py 已做
 #      「60m 非今日 → 回退日线版」降级）。
-#   - FOUR_VOLUME.js（日线版，主信号源）：升级为【硬等待】——见 _final_recommend_gate，非今日则重跑生成器并等待，
+#   - FOUR_VOLUME.js（日线版，主信号源）：升级为【硬等待】——见 _final_recommend_gate，非今日则重跑生成器并等待,
 #     超时才拒绝产出（绝不用陈日落盘汇总）。主人 19:52 拍板："盘后算的才有效，算法链停下等重算出来再继续"。
+# 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架——选股两件套摘链、FOUR_VOLUME*.js 停更，
+#   final_recommend 的四量共振加分与 realflow-gate 同批移除 ⇒ 本表现在为空（保留骨架备将来登记）。
 _FINAL_RECOMMEND_DATA_INPUTS = {
-    "FOUR_VOLUME_60M.js": ("strategy_four_volume_60m.py", False),  # 硬告警·计败不阻断
+    # "FOUR_VOLUME_60M.js": ("strategy_four_volume_60m.py", False),  # （已摘链 2026-10-18）硬告警·计败不阻断
 }
 
 
@@ -848,59 +864,12 @@ def _gate_ensure_inputs(inputs_map, base_dir, run_start, soft=False):
     return (True, bad) if soft else (len(bad) == 0, bad)
 
 
-def _gate_hardwait_four_volume(run_start, max_retry=3, wait_sec=90, total_budget_sec=None):
-    """🛡 2026-09-10 主人令：四量终极其日线版(FOUR_VOLUME.js)硬等待。
-    盘后 final_recommend 必须等日线四量今日新鲜产出；非今日则重跑 strategy_four_volume.py 并 sleep 等待，
-    最多 max_retry 次。成功产出当日数据→返回 True；超时仍陈旧→返回 False（gate 据此拒绝产出，不用陈旧）。
-    区别于旧软告警：旧逻辑陈旧也照常产出（用旧）；本函数实现主人诉求"停下等重算出来再继续"。
-
-    🔴 2026-09-17 主人令·全站口径统一（补总预算 · 与 max_retry 互补）：
-      实测单次重跑 strategy_four_volume.py ~55min（9.5s/只 × ~350 只，逐只 HTTP）。
-      原实现只有「次数上限 3」而**没有时间上限** ⇒ 最坏 3×5400s(SCRIPT_TIMEOUT_OVERRIDE)
-      + 2×90s ≈ 4.5h，足以把整夜盘后链拖死（D 批在拒绝产出之前先空等数小时）。
-      现加显式 wall-clock 总预算（默认 5400s=90min，可用 V8_FV_HARDWAIT_BUDGET 覆盖）：
-        · 每次重跑**前**检查预算，耗尽 → 立即返回 False（沿用既有语义「拒绝用陈旧数据产出」，不造假）；
-        · 重跑的 subprocess timeout 收敛为「剩余预算」（下限 600s），使总耗时**有界**而非线性叠加；
-        · 预算正常时（首轮剩余=5400s）行为与改动前**完全一致**，不误杀单次合法重跑。
-    """
-    import time
-    if total_budget_sec is None:
-        try:
-            total_budget_sec = int(os.environ.get("V8_FV_HARDWAIT_BUDGET", "5400"))
-        except ValueError:
-            total_budget_sec = 5400
-    _t0 = time.time()
-    fpath = os.path.join(V8_ROOT, "data", "FOUR_VOLUME.js")
-    prod = os.path.join(ALGO, "strategy_four_volume.py")
-    for attempt in range(1, max_retry + 1):
-        if os.path.exists(fpath) and datetime.fromtimestamp(os.path.getmtime(fpath)) >= run_start:
-            return True
-        _used = time.time() - _t0
-        if _used >= total_budget_sec:
-            print(f"  🛑 四量硬等待总预算耗尽（已等 {_used/60:.0f}min ≥ 上限 {total_budget_sec/60:.0f}min）"
-                  f"，停止重跑；本项按「陈旧·拒绝产出」处理")
-            return False
-        print(f"  ⏳ 四量终极其日线版非今日(run_start={run_start})，第{attempt}/{max_retry}次重跑 strategy_four_volume.py 并等待{wait_sec}s"
-              f"（预算余额 {(total_budget_sec-_used)/60:.0f}min）")
-        try:
-            _gto = _script_timeout("strategy_four_volume.py")
-            # 收敛到剩余预算（下限 600s）：保证整段硬等待总耗时 ≤ 预算 + 600s，而非 3×5400s 叠加
-            _gto = max(600, min(_gto, int(total_budget_sec - _used)))
-            _fv_env = dict(os.environ)
-            # 🔴 2026-10-16 阿狸咪的工程师（摘链）：V8_BACKTEST_YEARS=5 注入随回放口径作废一并移除
-            #   （L437/L474 注释宣称的摘链，此处为最后残留实证点；不注入即走 argparse 默认，回测链已摘）
-            r = subprocess.run([PY, prod], cwd=ALGO, capture_output=True, text=True, timeout=_gto, env=_fv_env)
-            print(f"     {'✅' if r.returncode == 0 else '⚠️ 退出码 ' + str(r.returncode)} 重跑 strategy_four_volume.py")
-        except Exception as e:
-            print(f"     ❌ 重跑 strategy_four_volume.py 异常: {e}")
-        if os.path.exists(fpath) and datetime.fromtimestamp(os.path.getmtime(fpath)) >= run_start:
-            return True
-        if time.time() - _t0 >= total_budget_sec:
-            print(f"  🛑 四量硬等待总预算耗尽（重跑后已用 {(time.time()-_t0)/60:.0f}min），停止重试")
-            return False
-        if attempt < max_retry:
-            time.sleep(wait_sec)
-    return False
+# 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架 —— _gate_hardwait_four_volume（日线版硬等待，
+#   含 V8_FV_HARDWAIT_BUDGET wall-clock 总预算）随摘链一并删除。
+#   设计动机存档：主人 2026-09-10 令「盘后算的才有效，算法链停下等重算出来再继续」；
+#   实测单次重跑 strategy_four_volume.py ~55min，最坏 3 次+等待 ≈ 4.5h 曾把整夜盘后链拖死，
+#   故 09-17 补总预算使耗时 有界。四量不再是 final_recommend 输入后，等待已无主体。
+#   完整实现见 git 历史（本 commit 之前）。
 
 
 def _final_recommend_gate(run_start):
@@ -913,33 +882,20 @@ def _final_recommend_gate(run_start):
         故：核心选股输入硬门控，四量软告警；四量陈旧的告警仍打印，但 final_recommend 照常产出。
     🔴 2026-09-11 主人令（选项A）：四量 60m 由「软告警」升级为【硬告警·计败不阻断】——
         仍不阻断 final_recommend（理由同上），但陈旧必计入 FAILED_SCRIPTS →
-        raw_data/algo_run_report.json，使运维面板/健康检查可见。"""
-    print(f"\n  🚦 final_recommend 就绪门控（核心选股输入硬门控 + 四量终极为加分因子软告警）")
+        raw_data/algo_run_report.json，使运维面板/健康检查可见。
+    🔴 2026-10-18 主人令「完全下架」：四量终极整体下架 ⇒ 四量 60m 软告警块 + 日线版硬等待
+        （_gate_hardwait_four_volume，含 V8_FV_HARDWAIT_BUDGET）一并移除；本门控现仅剩
+        核心选股输入硬门控。四量的负 edge 裁决（T+5 33.71%/-1.68% n=89）见 HANDOFF algo-audit-1017。"""
+    print(f"\n  🚦 final_recommend 就绪门控（核心选股输入硬门控）")
     # (1) 先把本轮 out/ 产物搬运到 raw_data/，使 out-依赖输入新鲜
     _stage_out_to_raw()
     # 核心选股输入：硬门控（缺失/陈旧且重跑仍失败 → 拒绝产出）
     ok_raw, bad_raw = _gate_ensure_inputs(_FINAL_RECOMMEND_INPUTS, os.path.join(V8_ROOT, "raw_data"), run_start)
-    # 四量终极 60m：🔴 2026-09-11 主人令（选项A：软告警 → 硬告警）
-    #   **仍不阻断** final_recommend（脚本自带「60m 非今日 → 回退日线版」降级，
-    #   2026-08-31 已实证硬门控会反复阻断整轮推荐、反而让站点展示更旧的 FINAL_RECOMMEND），
-    #   但**必须计入失败账本**：写进 raw_data/algo_run_report.json 的 failed_scripts
-    #   → 运维面板红灯 + 健康检查可见，杜绝「静默烂 3 天无人喊」。
-    _, bad_data = _gate_ensure_inputs(_FINAL_RECOMMEND_DATA_INPUTS, os.path.join(V8_ROOT, "data"), run_start, soft=True)
-    if bad_data:
-        print(f"  🔴 四量 60m 输入陈旧【硬告警·计败不阻断】: {', '.join(bad_data)}")
-        print(f"     （final_recommend 将回退日线版 FOUR_VOLUME.js；本项已计入失败账本）")
-        FAILED_SCRIPTS.append(
-            ("strategy_four_volume_60m.py",
-             f"四量60m 输入陈旧（{'、'.join(bad_data)}）——已回退日线版，计为失败项")
-        )
-    else:
-        print(f"  ✅ 四量 60m 输入为本轮新鲜产出")
-    # 🛡 2026-09-10 主人令：四量终极其日线版【硬等待】——必须今日新鲜，否则停等重算，超时拒绝产出
-    if not _gate_hardwait_four_volume(run_start):
-        print(f"  🛑 四量终极其日线版等待超时仍非今日，拒绝产出最终推荐（避免陈日落盘汇总）")
-        return False
+    # 🔴 2026-10-18 主人令「完全下架」：四量 60m 软告警块 + 日线版硬等待（_gate_hardwait_four_volume）
+    #   随四量整体下架一并移除——四量不再是 final_recommend 的输入（共振加分与 realflow-gate 同批删除），
+    #   等一个已摘链策略的新鲜产出没有意义；FAILED_SCRIPTS 台账也不再登记四量项。
     if ok_raw:
-        print(f"  ✅ 核心选股输入+四量终极其日线版均为本轮新鲜产出，放行 final_recommend")
+        print(f"  ✅ 核心选股输入均为本轮新鲜产出，放行 final_recommend")
         return True
     print(f"  🛑 核心门控未通过，拒绝产出最终推荐（避免陈旧/造假数据）: {', '.join(bad_raw)}")
     return False
@@ -1041,7 +997,8 @@ SILENCE_OVERRIDE = {
     #   2026-09-16 03:16:55~03:32:00 被全局 900s 静默杀误杀 ⇒ 产物写不出、卡永久陈旧。
     #   照既有范式双保险：① 脚本自带心跳（strategy_four_volume.py 已补，60s 一片，带 flush）
     #   ② 此处给静默预算兜底。日后新增「长跑 + 长段落无输出」脚本，同样两处一起加。
-    "strategy_four_volume.py": 3600,
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架，脚本已删，静默预算随摘。
+    # "strategy_four_volume.py": 3600,
     # 2026-09-18：同型 —— backtest_tdx 全量重算期间逐只取数、段落间可长时间无 stdout，
     #   全局 900s 静默杀会误杀 ⇒ 给 1h 静默预算（总时长仍受上方 5400s 超时约束）。
     "backtest_tdx.py": 3600,

@@ -4,7 +4,8 @@
 #   已迁到 19:15 CST 盘后算法链（v8_algo_cloud.yml → v8_build_deploy.yml），
 #   避免盘中 09:28 等时间点用未完整数据提前计算。
 # 本 workflow 仅保留：
-#   ① 盘中每 2h 真跑 gen_algo_track.py（三算法追踪入池：四量终极/RPS/CRDS）
+#   ① 🔴 2026-10-18 主人令「完全下架」：原「盘中每 2h 真跑 gen_algo_track.py（四量终极追踪入池）」
+#      已整步移除——四量终极整体下架，唯一信号源消失，ALGO_TRACK 前端注入 10-06 已判死。
 #   ② dispatcher 兜底：v8_dispatch_fetch.py 加 intraday_lite 子命令，时间窗 09:30-15:00 CST
 #
 # 推送：仅 workflow_dispatch 可用；内容未变（?v 已是最新）则跳过推送。
@@ -84,26 +85,11 @@ jobs:
       #   盘中不再重复跑，避免 09:28 等时间点基于未完整数据刷新。
       #   脚本入口已加 check_stock_picking_ready() 双保险，任何手动触发在 18:00 前都会直接退出。
 
-      - name: "📊 三算法追踪入池（gen_algo_track）"
-        # 🔴 2026-08-19 一劳永逸补齐：盘中每 2h 重算四量终极/CRDS追踪
-        # 写入 raw_data/algo_track.json（git tracked，下一步 api_push_raw 推），保证盘中卡片不过期
-        run: |
-          # 🔴 2026-09-08 主人令「禁止假 success」：原 set +e + echo + 无条件 exit 0
-          #    会让 gen_algo_track 崩溃也显示绿色 → ALGO_TRACK 停更无人知。
-          #    改为捕获真实退出码，非零即让 job 变红。
-          # 🔴 2026-09-16 阿狸咪的工程师「假 success 回归」修复：
-          #   2026-09-08 e190e5fc39 为补退出码捕获，把真正的调用行**误删**——
-          #   `rc=$?` 取的是本 shell 上一条命令（新 shell 恒为 0）⇒ 本步骤恒定绿、
-          #   脚本从未执行。下面这行与 09-03 版原文等价。
-          rc=0
-          python algorithms/gen_algo_track.py || rc=$?
-          echo "gen_algo_track exit: $rc"
-          if [ "$rc" != "0" ]; then
-            echo "::error::gen_algo_track.py 失败（exit=$rc），ALGO_TRACK 未刷新"
-            exit 1
-          fi
+      # 🔴 2026-10-18 主人令「完全下架」：原「📊 三算法追踪入池（gen_algo_track）」步骤整步移除 ——
+      #   唯一信号源四量终极已下架（gen_algo_track.py 摘链删除、ALGO_TRACK 前端注入 10-06 已判死），
+      #   盘中再跑=空转。下方 update_v8 / HEALTH_CHECK / dispatcher 兜底步骤保留原义。
 
-      - name: "🔄 重生成 data/ALGO_TRACK.js 并更新 index.html ?v 缓存戳"
+      - name: "🔄 重生成 data/*.js 并更新 index.html ?v 缓存戳"
         # ALGO_TRACK.js 由 update_v8.py 的 _make_js 从原始 raw_data 重生，
         # 流水线单一写者原则防止双写竞态击穿 ?v 防覆盖铁律（2026-08-15 根因修复）。
         # 不传 --category：默认 build() 内部读 raw_data/*.json 全量重生，盘中每 2h 漂移可控（<5min）。

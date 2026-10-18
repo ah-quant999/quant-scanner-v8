@@ -69,8 +69,10 @@ CRITICAL = [
     # 🔴 2026-10-11 主人令「完全下架」：三重共识两产物已随策略下架移出校验清单。
     # ("三重共识",     "raw_data/triple_consensus.json", True,  "B"),
     # ("三重共识(前端)", "data/TRIPLE_CONSENSUS.js",     False, "B"),
-    ("四量终极",     "data/FOUR_VOLUME.js",            False, "B"),
-    ("四量终极60m",  "data/FOUR_VOLUME_60M.js",        False, "B"),
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极两产物已随策略下架移出校验清单
+    #   （生成器已摘链真删、data 文件已删 ⇒ 永不产出，留在清单=恒陈旧假红）。
+    # ("四量终极",     "data/FOUR_VOLUME.js",            False, "B"),
+    # ("四量终极60m",  "data/FOUR_VOLUME_60M.js",        False, "B"),
     ("最终推荐",     "raw_data/final_recommend.json",  True,  "D"),
     ("最终推荐(前端)", "data/FINAL_RECOMMEND_DATA.js", False, "D"),
     ("金股池",       "raw_data/gold_pool.json",        False, "A"),

@@ -4,9 +4,15 @@
 build_pool_tracker.py — v8 选股生命周期跟踪（阶段 1）+ 二维精选（K 批·板块流入×情绪周期）
 
 输入：
-  raw_data/algo_track.json — v8 算法（四量终极）的真实跟踪池
+  raw_data/algo_track.json — v8 算法的真实跟踪池
+    🔴 2026-10-18 主人令「完全下架」：四量终极整链下架，该文件已随 gen_algo_track.py 删除，
+       load_algo_track() 现恒走「空占位」降级路径（L360 附近输出 note=「algo_track.json 缺失或解析失败」）
+       —— **这是设计内的诚实降级，不是故障**：跟踪池无生产者即无信号，本脚本拒绝伪造。
+       待日后有新算法挂 STAGES 并提供 algo_track.json 时自然恢复填充；在那之前：
+         · 二维精选（板块流入 × 情绪周期）维度不受影响，照常计算；
+         · 前端「选股生命周期跟踪」卡显示空态文案，不冒充有信号。
     2026-09-03 主人令：已下线算法「板块龙头 / 大牛股猎手」全方位下线，其 tracking 数据在 main() 里直接过滤丢弃，
-        既不留作共识源也不进 by_algo / items。前端文案与数据源统一为「v8 三大 algo = 四量终极」。
+        既不留作共识源也不进 by_algo / items。前端文案与数据源统一为「v8 三大 algo」。
   raw_data/sentiment_cycle.json — 情绪周期
   raw_data/sector_fund_flow.json — 板块资金流
   raw_data/stock_profile.json — 股票→行业/概念映射

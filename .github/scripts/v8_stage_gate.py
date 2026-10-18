@@ -229,7 +229,9 @@ READY_SPEC: dict[str, dict] = {
         "items": [
             # 🔴 2026-10-11 主人令「完全下架」：TRIPLE_CONSENSUS.js / CRDS_CARD_DATA.js 移出
             #   （两策略下架，生成器已摘链、data 文件已删 ⇒ 这两项永不产出，留在清单=恒陈旧）。
-            "data/FOUR_VOLUME.js",
+            # 🔴 2026-10-18 主人令「完全下架」：四量终极日线版移出（策略整体下架，
+            #   生成器 strategy_four_volume.py 已摘链+真删，data/FOUR_VOLUME.js 已删）。
+            # "data/FOUR_VOLUME.js",
             "raw_data/ai_insights_compare.json",
             "raw_data/factor_audit.json",
             "raw_data/factor_progress.json",
@@ -242,29 +244,16 @@ READY_SPEC: dict[str, dict] = {
             #   本项保留为「上游新鲜度抵押」：它鲜活即证明采集批正常。
             #   need=8 的容错语义与 items 清单均未改动。
             "raw_data/gold_pool.json",
-            # 🛡 2026-09-18 小九（双盲区根治·P0 · 事故家族第三次复发）：补入 FOUR_VOLUME_60M.js。
-            #   根因（实测闭环）：该项**既不在 items 也不在 must**，而 v8_health_check.py 的
-            #   _LOW_FREQ_FILES 于 09-11 已按主人令把它移出（max_age=1440 硬告警）
-            #   ⇒ 闸门不覆盖（陈旧不阻塞就绪 → target=NONE 空转 → **永不重跑**）
-            #     + 健康检查只报不做 ⇒ 产物自 09-17 06:54 冻结逾 24h 而全链「零阻塞」。
-            #   与 09-18 阿狸咪修的 BACKTEST_TDX 属**同一事故家族**
-            #   （注释原文：「两个监控都不覆盖」），本次为第三次复发 ⇒ 另加机器可断言护栏。
-            #   ✅ 可达性核验：它与 data/FOUR_VOLUME.js 同批同源（ORDER 190/191，STAGES["B"]），
-            #      nightly 夜窗 00:00~08:59 由 picking 门控放行（run_algorithms.py L627）
-            #      ⇒ 不恒 STALE；实测 runner 环境(CLOUD_RUNNER=true)全链 96s 跑通、命中 11 只。
-            #   ✅ 不变式核验：已同步纳入 dedup_fetch_manifest.py::_ALWAYS_PUSH（见该文件）。
-            #   ⚠️ need 仍为 8（2026-09-18 更正：items 已达 12 项 ⇒ 实为「12 项容忍 4 项不新鲜」）—— 60m 是「加分因子」，
-            #      不因此收紧要挟整条 B 批；它参与计数即可驱散空转。
-            "data/FOUR_VOLUME_60M.js",
-            # 🛡 2026-09-18 小九（同轮双盲区根治·家族第四次同型）：四量终极自建系统两产物。
-            #   2026-09-15 主人令「四量也要像三重共识有自己的整套系统」新增
-            #   update_four_volume_history.py / gen_four_volume_track.py（STAGES["B"] ORDER 200+），
-            #   但**未同步登记进本闸门** ⇒ 与 60m 完全同型的「闸门不覆盖」盲区。
-            #   本轮由 guard_double_blind.py（机器可断言护栏）自动发现，非人工逐个补。
-            #   ✅ 可达性：与 data/FOUR_VOLUME.js 同批同源（读它刚产的当日新鲜账本）。
-            #   ✅ 不变式：已同步纳入 dedup_fetch_manifest.py::_ALWAYS_PUSH。
-            "data/FOUR_VOLUME_HISTORY.js",
-            "data/FOUR_VOLUME_TRACK.js",
+            # 🔴 2026-10-18 主人令「完全下架」：FOUR_VOLUME_60M.js 移出。
+            #   该条目 2026-09-18 由小九补入（双盲区根治·P0，治「闸门不覆盖+巡检不告警」），
+            #   随四量终极整体下架（60m 版策略已摘链真删、data 文件已删、CARD_DEFS 监控已摘除）
+            #   而失效；双盲区护栏（guard_double_blind.py I-1）已同步无此卡 ⇒ 不构成盲区。
+            # "data/FOUR_VOLUME_60M.js",
+            # 🔴 2026-10-18 主人令「完全下架」：四量终极自建系统两产物（2026-09-15 新增、
+            #   09-18 双盲区根治时补入本闸门）随整体下架移出 —— 生成器已摘链真删、
+            #   data 文件已删、CARD_DEFS 监控已摘除 ⇒ 留在清单=恒陈旧。
+            # "data/FOUR_VOLUME_HISTORY.js",
+            # "data/FOUR_VOLUME_TRACK.js",
             # 🛡 2026-10-16 阿狸咪的工程师（LQSQ 发布链断裂根因修复配套·双盲区 I-1 不变式）：
             #   gen_lqsq_top5.py（STAGES["B"]）产 raw_data/lqsq_track.json → update_v8 映射
             #   （本日补登记 lqsq_track.json→LQSQ_TRACK）→ data/LQSQ_TRACK.js；
@@ -274,10 +263,19 @@ READY_SPEC: dict[str, dict] = {
             #   ✅ 可达性：与四量同批同源（B 批盘后算法链直出，CATEGORY_MAP=post_close）。
             #   ✅ 不变式：已同步纳入 dedup_fetch_manifest.py::_ALWAYS_PUSH（见该文件）。
             "data/LQSQ_TRACK.js",
+            # 🛡 2026-10-18 阿狸咪的工程师（四量下架配套·B 批核心选股项补入）：data/TOP10_DAILY.js。
+            #   继任理由：四量终极下架后，B 批选股产物核心卡即 TOP10（多维共振精选）与
+            #   LQSQ（量质双擎）；TOP10 是 B 批第一个选股脚本（generate_top10.py，STAGES["B"]），
+            #   且是 D 批 final_recommend 的直接输入（final_recommend.py L627 读 top10_daily.json）。
+            #   ① 它同时是 SEQ_REF["D"]/["E"] 的跨批锚点本体（raw_data/top10_daily.json）
+            #      —— 锚点与 items/must 同源，观测面统一；
+            #   ② verify_chain_outputs.py CRITICAL 早已把它列为 B 批必新（True）；
+            #   ③ I-2 不变式：已同步纳入 dedup_fetch_manifest.py::_ALWAYS_PUSH（内容稳定日不得丢）。
+            "data/TOP10_DAILY.js",
         ],
-        # 🔴 2026-10-11 主人令「完全下架」：items 12→10（TRIPLE/CRDS_CARD_DATA 移出），
-        #   need 8→6 —— 保持「容忍 4 项不新鲜」语义不变（10-4=6）。
-        "need": 6,
+        # 🔴 2026-10-18 主人令「完全下架」：四量 4 项移出 + TOP10_DAILY 补入 ⇒ items 11→8；
+        #   need 6→4 —— 保持「容忍 4 项不新鲜」语义不变（8-4=4）。
+        "need": 4,
         # need 用 8/9：3 个核心选股产物 + 5 个收编产物 + gold_pool，即「只容忍 1 项不新鲜」。
         #   ⚠️ 为何不是 5：实测发现 dedup 去重器会把「内容天然稳定」的卡判为伪变更而丢弃
         #   （见 .github/scripts/dedup_fetch_manifest.py 的 _ALWAYS_PUSH）。在去重器修好之前，
@@ -296,18 +294,20 @@ READY_SPEC: dict[str, dict] = {
         #   🔴 与 dedup 的联动不变式（缺一即锁死，详见 dedup_fetch_manifest.py::_ALWAYS_PUSH）：
         #   🔴 2026-10-11 主人令「完全下架」：must 由 3 项缩为 1 项 —— TRIPLE_CONSENSUS /
         #      CRDS_CARD_DATA 已下架移除，唯余 FOUR_VOLUME.js（B 批必产核心卡）。
+        #   🔴 2026-10-18 主人令「完全下架」：四量终极整体下架 ⇒ must 继任为
+        #      data/TOP10_DAILY.js（B 批核心选股产物，补入理由见 items 内 10-18 注释）。
         #      🔴 与 dedup 的联动不变式不变（缺一即锁死，详见 dedup_fetch_manifest.py::_ALWAYS_PUSH）：
         #         must 项必须同时在 _ALWAYS_PUSH 中，否则内容天然稳定的 must 项
-        #         （FOUR_VOLUME 长期命中 0 只 ⇒ 剥时间戳后逐字节相同）会被判「伪变更」永不推送
+        #         （如 TOP10 名单连续两日相同 ⇒ 剥时间戳后逐字节相同）会被判「伪变更」永不推送
         #         ⇒ update_time 恒旧 ⇒ must 恒不满足 ⇒ B 批每轮重跑 60~90min 永不收敛。
-        "must": ["data/FOUR_VOLUME.js"],
+        "must": ["data/TOP10_DAILY.js"],
     },
     # 🛡 2026-10-13 阿狸咪（主人令「最终推荐的前5名我也想有个回测…我要看到底靠不靠谱」）：
     #   D 批 items 纳 data/FINAL_RECOMMEND_BACKTEST.js —— 生产者与 FINAL_RECOMMEND_DATA
     #   **同批同源**（final_recommend.py 主函数末尾调用 gen_final_recommend_backtest.py，
     #   纯本地秒级计算，try/except 包裹，失败绝不影响 D 批主产物）。
     #   need 保持 1：伴生卡**参与计数、受双盲区护栏覆盖**，但不单点挟持 D 批就绪
-    #   （与 B 批 FOUR_VOLUME_60M「加分因子」同哲学；必新项由 must 表达，D 批 must=[] 不变）。
+    #   （与 B 批 LQSQ_TRACK「跟踪卡」同哲学；必新项由 must 表达，D 批 must=[] 不变）。
     #   🔴 联动不变式（guard_double_blind.py I-1/I-2 机器断言）：已同步纳入
     #      dedup_fetch_manifest.py::_ALWAYS_PUSH（内容稳定日不得被判「伪变更」丢弃）。
     "D": {"items": ["data/FINAL_RECOMMEND_DATA.js", "data/FINAL_RECOMMEND_BACKTEST.js"], "need": 1, "must": []},
@@ -523,8 +523,17 @@ SEQ_REF: dict[str, str] = {
     # 🔴 2026-10-11 主人令「完全下架」：D/E 基准锚由 data/TRIPLE_CONSENSUS.js（已下架删除）改为
     #   data/FOUR_VOLUME.js —— 同为 B 批生成器一次产出、不被后续抓取链刷新，满足「单一来源、
     #   写一次就固定」要求；且它是 B 批 must 必新项，鲜活性由双重机制保证。
-    "D": "data/FOUR_VOLUME.js",          # B 批代表产物
-    "E": "data/FOUR_VOLUME.js",          # B 批代表产物（2026-09-17 由 D 批产物改；解 E 被 D 串死）
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架 ⇒ D/E 基准锚改指
+    #   raw_data/top10_daily.json —— 继任依据（三重核验）：
+    #     ① 单一来源、写一次就固定：generate_top10.py（STAGES["B"] 首个选股脚本）直写，
+    #        不被抓取链/build 重刷（build 只写 data/*.js，raw_data/ 仅生成器落笔）
+    #        ⇒ 其 update_time 恒为生成器运行时刻，不会被 build 时间戳抬早（防锚点永新锁死）；
+    #     ② 语义同源：它就是 D 批 final_recommend 的直接输入（该脚本 L627 load_json），
+    #        「下游早于上游即重算」防的正是「拿旧 TOP10 算最终推荐」；
+    #     ③ 鲜活性双重保证：B 批 must = data/TOP10_DAILY.js（同生成器产物，update_v8 映射），
+    #        B 不就绪则 D/E 不跑；锚点本体已纳入 dedup _ALWAYS_PUSH（内容稳定日不被丢）。
+    "D": "raw_data/top10_daily.json",    # B 批代表产物（2026-10-18 起继任）
+    "E": "raw_data/top10_daily.json",    # B 批代表产物（2026-09-17 由 D 批产物改；解 E 被 D 串死）
 }
 
 

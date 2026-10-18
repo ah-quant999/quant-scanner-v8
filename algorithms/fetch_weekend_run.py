@@ -39,7 +39,8 @@ WEEKLY_TRACK = [
     ("final_recommend.json",     "最终推荐池"),
     ("gold_pool.json",           "黄金池"),
     ("candidate.json",           "候选池"),
-    ("four_volume.json",         "四量终极"),
+    # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架，周末汇总不再登记 four_volume.json。
+    # ("four_volume.json",         "四量终极"),
 ]
 
 

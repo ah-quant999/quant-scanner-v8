@@ -58,8 +58,9 @@ MIN_SIZE = {
     "BACKTEST_COMPREHENSIVE.js": 1395,
     "OPTIMIZED_STRATEGY.js": 342,
     "INDEX_QUOTES.js": 348,
-    "FOUR_VOLUME.js": 669,
-    "FOUR_VOLUME_60M.js": 895,
+    # 🔴 2026-10-18 主人令「完全下架」：四量两产物已删，基线体积条目摘除。
+    # "FOUR_VOLUME.js": 669,
+    # "FOUR_VOLUME_60M.js": 895,
     "VOLATILITY.js": 716,
     "NT_DATA.js": 628,
     "ANALYST_RATINGS.js": 1076,
