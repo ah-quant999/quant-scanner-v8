@@ -14183,6 +14183,12 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     else if(tab==='fa'){
       if(typeof window.__renderFactorPane==='function'){ try{ window.__renderFactorPane(); }catch(e){} }
     }
+    else if(tab==='lqsq'){ /* 🆕 2026-10-12 小九：量质双擎子页（归档信号每日 Top5 + 前向跟踪） */
+      if(typeof window.renderLqsq==='function'){ try{ window.renderLqsq(); }catch(e){ console.warn('量质双擎渲染失败',e); } }
+    }
+    else if(tab==='lowvol'){ if(typeof window.renderLowvol==='function'){ try{ window.renderLowvol(); }catch(e){ console.warn('低波趋稳渲染失败',e); } } }
+  }
+
   /* 🆕 2026-10-18 阿狸咪：低波趋稳 子页渲染（镜像 renderLqsq 骨架；数据源 window.LOWVOL_TREND / window.LOWVOL_TREND_BACKTEST） */
   window.renderLowvol = function(){
     var host = document.getElementById('lowvolBody');
@@ -14244,11 +14250,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
     }
   };
-    else if(tab==='lqsq'){ /* 🆕 2026-10-12 小九：量质双擎子页（归档信号每日 Top5 + 前向跟踪） */
-      if(typeof window.renderLqsq==='function'){ try{ window.renderLqsq(); }catch(e){ console.warn('量质双擎渲染失败',e); } }
-      else if(tab==='lowvol'){ if(typeof window.renderLowvol==='function'){ try{ window.renderLowvol(); }catch(e){ console.warn('低波趋稳渲染失败',e); } } }
-    }
-  }
   /* ═══ 🔴🔴 2026-09-17 主人令「统一按委员会走，就是要统一口径，不要打架」═══════
      背景：此前全站星级有**三套并存口径** ——
        ① window.__committeeRate(card)         ← 唯一真源（四维加权 + 两道封顶）
