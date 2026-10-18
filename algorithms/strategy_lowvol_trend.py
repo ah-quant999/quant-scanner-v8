@@ -313,6 +313,17 @@ def main():
                    by_period[str(N)]["bench_avg_return"] or 0, bcnt))
 
     total_signals = sum(len(v.get("picks") or []) for v in days.values())
+    # 透传历史规则回放段（replay，2026-10-18 主人令「先用已有数据回测」）：一次性样本内回放结果，
+    # 每次重写 OUT_JS 时从旧文件原样保留，防链上日跑冲掉；禁与本表真实信号流口径混写。
+    _replay_keep = None
+    try:
+        if os.path.exists(OUT_JS):
+            _old = open(OUT_JS, encoding="utf-8").read()
+            _i, _j = _old.find("{"), _old.rfind("}")
+            if 0 <= _i < _j:
+                _replay_keep = json.loads(_old[_i:_j + 1]).get("replay")
+    except Exception:
+        _replay_keep = None
     payload = {
         "update_time": now_cst(), "calc_time": now_cst(), "data_date": data_date,
         "method": ("真实信号流口径（2026-10-11 主人令）：每日全市场 60 日波动率最低 Top10 且收盘>MA60"
@@ -324,6 +335,7 @@ def main():
         "signal_date_range": "%s ~ %s" % (min(sig_days), max(sig_days)) if sig_days else data_date,
         "total_signals": total_signals,
         "cost_adjusted": True,
+        **({"replay": _replay_keep} if _replay_keep else {}),
         "summary": {"by_period": by_period},
         "republish_time": now_cst(),
     }

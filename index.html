@@ -14230,22 +14230,37 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     if(bb){
       var bp = (B.summary && B.summary.by_period) || {};
       var ks = Object.keys(bp).sort(function(a,b){ return (Number(a)||0)-(Number(b)||0); });
-      if(!ks.length){
+      var rp = (B.replay && B.replay.by_period) ? B.replay : null;
+      var rks = rp ? Object.keys(rp.by_period).sort(function(a,b){ return (Number(a)||0)-(Number(b)||0); }) : [];
+      function _brow(k, r){
+        r = r || {};
+        return '<tr style="border-bottom:1px solid var(--border);"><td style="padding:6px;">T+'+_e(k)+'</td>'
+          + '<td style="padding:6px;text-align:right;">'+(r.samples||0)+'</td>'
+          + '<td style="padding:6px;text-align:right;color:'+_pl(r.win_rate)+';">'+(r.win_rate==null?'—':r.win_rate+'%')+'</td>'
+          + '<td style="padding:6px;text-align:right;color:'+_pl(r.avg_return)+';">'+(r.avg_return==null?'—':r.avg_return+'%')+'</td>'
+          + '<td style="padding:6px;text-align:right;color:var(--sub);">'+(r.bench_avg_return==null?'—':r.bench_avg_return+'%')+'</td>'
+          + '<td style="padding:6px;text-align:right;color:var(--sub);">'+(r.best_return==null?'—':r.best_return+'%')+'</td>'
+          + '<td style="padding:6px;text-align:right;color:var(--sub);">'+(r.worst_return==null?'—':r.worst_return+'%')+'</td></tr>';
+      }
+      function _grp(txt, color){ return '<tr><td colspan="7" style="padding:6px;background:var(--card2);font-weight:700;color:'+color+';">'+txt+'</td></tr>'; }
+      if(!ks.length && !rks.length){
         if(bn) bn.innerHTML = '真实信号流口径（2025-04~2026-10 全A等权基准）：上市前置回测 N=60 平均 +5.99% / 基准 +1.99%（α +4.00pp）、胜率 53.3%，四方向唯一显著跑赢 → 已上线；主榜样本随持有天数成熟累积中。';
         bb.innerHTML = '<tr><td colspan="7" style="padding:14px;text-align:center;color:var(--dim);">📊 真实信号流累积中（上线首日即建归档，未走满 T+N 不计入）</td></tr>';
       } else {
-        if(bn) bn.innerHTML = '✅ 真实信号流口径 · 基准=同过滤 universe 等权 · 上市前置回测 N=60 α +4.00pp（唯一显著跑赢档）· 样本随持有天数成熟。';
         var rh = '';
-        ks.forEach(function(k){
-          var r = bp[k] || {};
-          rh += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:6px;">T+'+_e(k)+'</td>'
-            + '<td style="padding:6px;text-align:right;">'+(r.samples||0)+'</td>'
-            + '<td style="padding:6px;text-align:right;color:'+_pl(r.win_rate)+';">'+(r.win_rate==null?'—':r.win_rate+'%')+'</td>'
-            + '<td style="padding:6px;text-align:right;color:'+_pl(r.avg_return)+';">'+(r.avg_return==null?'—':r.avg_return+'%')+'</td>'
-            + '<td style="padding:6px;text-align:right;color:var(--sub);">'+(r.bench_avg_return==null?'—':r.bench_avg_return+'%')+'</td>'
-            + '<td style="padding:6px;text-align:right;color:var(--sub);">'+(r.best_return==null?'—':r.best_return+'%')+'</td>'
-            + '<td style="padding:6px;text-align:right;color:var(--sub);">'+(r.worst_return==null?'—':r.worst_return+'%')+'</td></tr>';
-        });
+        if(ks.length){
+          if(bn) bn.innerHTML = '✅ 真实信号流口径 · 基准=同过滤 universe 等权 · 上市前置回测 N=60 α +4.00pp（唯一显著跑赢档）· 样本随持有天数成熟。';
+          rh += _grp('📡 真实信号流（前向跟踪 · 权威口径）', '#38bdf8');
+          ks.forEach(function(k){ rh += _brow(k, bp[k]); });
+        }
+        if(rks.length){
+          if(bn && !ks.length) bn.innerHTML = '🧪 下方为<b>历史规则回放（样本内·参考）</b>：窗口 '+_e(rp.window?rp.window[0]+' ~ '+rp.window[1]:'')+'、全A过滤后 '+_e(rp.universe)+' 只、与线上完全同口径（次开买入/持N收盘卖/扣双边0.3%/等权基准）。规则在同一窗口选出 → 存在样本内选择偏差，按 2026-10-11 铁律<b>禁作主榜/评级/上下架依据</b>；权威数据=真实信号流（自 2026-10-16 起前向累积，成熟后本表顶部切换为权威段）。';
+          rh += _grp('🧪 历史规则回放（样本内 · 参考 · 禁作主榜依据）', '#fbbf24');
+          rks.forEach(function(k){ rh += _brow(k, rp.by_period[k]); });
+        }
+        if(!ks.length){
+          rh += '<tr><td colspan="7" style="padding:10px;text-align:center;color:var(--dim);">📡 真实信号流累积中（2026-10-16 起前向跟踪，未走满 T+N 不计入）</td></tr>';
+        }
         bb.innerHTML = rh;
       }
     }
