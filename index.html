@@ -14296,21 +14296,21 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     var T = window.INTRADAY_MOMENTUM || {}, B = window.INTRADAY_MOMENTUM_BACKTEST || {};
     var picks = T.picks || [];
     if(!picks.length){
-      if(!(window.__lowvolRetry && window.__lowvolRetry >= 15)){ window.__lowvolRetry = (window.__lowvolRetry||0)+1; setTimeout(window.renderIntraday, 700); return; }
+      if(!(window.__intradayRetry && window.__intradayRetry >= 15)){ window.__intradayRetry = (window.__intradayRetry||0)+1; setTimeout(window.renderIntraday, 700); return; }
       host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">📈 日内动量 数据加载中…</div>'; return;
     }
-    window.__lowvolRetry = 0;
+    window.__intradayRetry = 0;
     try{ if(typeof setBadge==='function'){ setBadge('intradayTime','盘后','短线', T.update_time||''); } }catch(e){}
     var h = '';
-    h += '<div class="note" style="line-height:1.75;margin-bottom:12px;"><b style="color:#38bdf8;">📈 日内动量</b> · 第三支自研算法 —— 每日全市场 60 日波动率最低 Top10 且收盘站上 MA60（低波 + 趋稳上行）；次开买入、持有 N 日收盘卖出（前复权·扣双边 0.3%）；基准=同过滤 universe 等权。</div>';
+    h += '<div class="note" style="line-height:1.75;margin-bottom:12px;"><b style="color:#38bdf8;">📈 日内动量</b> · 第三支自研算法 —— 近 20 日日内累计收益（∑close/open-1）最高 Top10 且收盘站上 MA60（日内动量·隔夜/日内拆分）；次开买入、持有 N 日收盘卖出（前复权·扣双边 0.3%）；基准=同过滤 universe 等权。</div>';
     function _stat(label,val,sub,color){ return '<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;"><div style="font-size:10px;color:var(--dim);margin-bottom:4px;">'+label+'</div><div style="font-size:22px;font-weight:800;color:'+(color||'var(--txt)')+';">'+val+'</div><div style="font-size:10px;color:var(--dim);">'+sub+'</div></div>'; }
     h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:14px;">';
-    h += _stat('🎯 今日信号', picks.length, '60日低波 Top'+picks.length, '#38bdf8');
+    h += _stat('🎯 今日信号', picks.length, '20日日内动量 Top'+picks.length, '#38bdf8');
     h += _stat('📦 候选池', (T.pool_size||0), '全A过滤后', '#fbbf24');
     h += _stat('🚀 跟踪起始', _e(T.track_start||'—'), '上线首日即建归档', 'var(--txt)');
     h += _stat('⏳ 成熟样本', '0', 'T+60 未走满不计入', '#fbbf24');
     h += '</div>';
-    h += '<h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 8px;"><span class="ic">📋</span>今日日内动量 Top'+(picks.length)+' <span style="font-size:11px;color:var(--sub);font-weight:400">20日日内率最低 · 收盘>MA60 · 最新信号日置顶</span></h3>';
+    h += '<h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 8px;"><span class="ic">📋</span>今日日内动量 Top'+(picks.length)+' <span style="font-size:11px;color:var(--sub);font-weight:400">20日日内累计收益最高 · 收盘>MA60 · 最新信号日置顶</span></h3>';
     h += '<div class="note" style="margin-bottom:8px;">持有期收益随交易日成熟：未走满 T+N 的档位显示「<span style="color:var(--dim);">累积中</span>」，绝不填 0 冒充。红涨绿跌。</div>';
     h += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
     h += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);"><th style="padding:6px;text-align:left;color:var(--sub);">#</th><th style="padding:6px;text-align:left;color:var(--sub);">名称</th><th style="padding:6px;text-align:left;color:var(--sub);">代码</th><th style="padding:6px;text-align:right;color:var(--sub);">收盘</th><th style="padding:6px;text-align:right;color:var(--sub);">20日日内</th><th style="padding:6px;text-align:right;color:var(--sub);">MA60</th></tr></thead><tbody>';
