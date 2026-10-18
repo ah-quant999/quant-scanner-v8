@@ -118,6 +118,14 @@ SOURCES = [
          var="LQSQ_BACKTEST", rel="data/LQSQ_BACKTEST.js",
          parser="by_period", label_prefix="持有", primary="持有 T+20",
          method="真实信号流口径：每日全市场按异常量比（缩量=强势）打分选 Top5（2026-10-13 主人令由 Top30 收紧），次开买入持有 20 个交易日收盘卖出（前复权·扣双边 0.3%）；ROE 质地过滤 v2 待接"),
+    # 🚀 2026-10-18 主人令「按建议做新算法」：第二支自研算法「低波趋势」——
+    #   60 日波动率最低 Top10 ∧ 收盘>MA60（strategy_lowvol_trend.py，B批 gen_lqsq 紧后），
+    #   真实信号流口径，与量质双擎同榜同纪律。上线首日 2026-10-18；主档 T+60
+    #   （上市前置回测唯一显著跑赢档：α+4.00pp/胜率53.3%），样本随天数成熟，未走满不计入。
+    dict(card="低波趋势", kind="strategy", page="选股策略", icon="🐢", cat="trade",
+         var="LOWVOL_TREND_BACKTEST", rel="data/LOWVOL_TREND_BACKTEST.js",
+         parser="by_period", label_prefix="持有", primary="持有 T+60",
+         method="真实信号流口径：每日全市场 60 日波动率最低 Top10 且收盘>MA60，次开买入持有 N 个交易日收盘卖出（前复权·扣双边 0.3%）；基准=同过滤 universe 等权"),
     # 🗑 2026-10-11 主人令「完全下架」：逆势龙头（CRDS）登记条目随策略下架移除。
     #   原条目：dict(card="逆势龙头", var="CRDS_BACKTEST", rel="data/CRDS_BACKTEST.js",
     #              parser="by_period", label_prefix="持有", primary="持有 T+5")

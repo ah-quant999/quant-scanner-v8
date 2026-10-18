@@ -78,6 +78,10 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     # 🚀 2026-10-11 主人令：量质双擎（第一支自研算法）挂 factor_lab_gen 紧后——
     #   读其维护的全市场 kline_cache 打分选股，零重复拉数；分钟级，给 900s 预算。
     "gen_lqsq_top5.py": 900,
+    # 🚀 2026-10-18 主人令「按建议做新算法·回测过了才上线」：第二支自研算法「低波趋势」
+    #   （上市前置回测 N=60 α+4.00pp/胜率53.3% 全场唯一显著跑赢；S1板块轮动/S3稳健突破/S4回踩
+    #   MA20 未跑赢基准不上线）· 零重复拉数（复用 gen_lqsq 的 ext 刷新），给 600s 预算。
+    "strategy_lowvol_trend.py": 600,
     # 🔴 2026-10-11 主人令「完全下架」：v8/backtest_crds.py 已摘链（逆势龙头整体下架）。
     # "v8/backtest_crds.py": 3600,            # （已摘链 2026-10-11）CRDS 回测：逐只回测，给 1h 预算
     # 🛡 2026-09-11 一劳永逸（主人令·选项A）：四量终极 60min 此前**未登记预算** → 走默认 1800s。
@@ -198,6 +202,7 @@ ORDER = [
     # "calc_crds.py",
     "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（B批最前：final_recommend 前必产完，因子融合用当日新鲜因子；2026-09-09 主人令由 E 前置至此）
     "gen_lqsq_top5.py",    # 🚀 2026-10-11 主人令：量质双擎每日生成器（kline_cache 副产物缓存 + 自刷新 GTimg 700根整根替换 → 全市场异常量比打分选 Top5（10-13 主人令由 Top30 收紧）→ lqsq_history 真实流归档 + LQSQ_BACKTEST 主榜视图；上线首日即建归档）。🔴 2026-10-12 去掉 algorithms/ 前缀：ORDER 与 STAGES/预算表三处字符串必须逐字一致（双层路径解析只认 scripts/ 与 v8/ 前缀，其余一律落 algorithms/ 目录）
+    "strategy_lowvol_trend.py",   # 🚀 2026-10-18 主人令：低波趋势每日生成器（60日波动率最低 Top10 ∧ 收盘>MA60 → lowvol_trend_history 真实流归档 + LOWVOL_TREND_BACKTEST 主榜；上线首日即建归档）。挂 gen_lqsq 紧后复用其 kline_cache_ext 刷新（禁第二套拉数）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
     # 🛡 2026-08-29 主人令：A/B 对照（金股池/候选池/全市场同一信号收益），每日累积信号、T+N 后回填收益。
@@ -389,6 +394,7 @@ STAGES = {
         # 🔴 2026-10-12 主人令「一劳永逸」：gen_lqsq_top5 补进 STAGES（10-11 上线时只加 ORDER 漏加 STAGES，
         #   模块级 assert 炸链：今晚 A 批两连崩 algo exit 1，全链停摆——与 ORDER L200 成对，位置一致=候选池之前）。
         "gen_lqsq_top5.py",      # → data/LQSQ_BACKTEST.js + lqsq_history（量质双擎，必须与 ORDER 成对）
+        "strategy_lowvol_trend.py",   # → data/LOWVOL_TREND_BACKTEST.js + lowvol_trend_history（低波趋势，与 ORDER 成对）
         "build_candidate_pool.py", "generate_top10.py",
         # 🔴 2026-10-18 主人令「完全下架」：四量终极选股两件套已摘链（与 ORDER 成对）。
         # "strategy_four_volume_60m.py", "strategy_four_volume.py",
