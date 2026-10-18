@@ -1,5 +1,5 @@
 {
-  "max_next_id_seq": 143,
+  "max_next_id_seq": 144,
   "ids": [
     "index-creds-panel-refresh-1014",
     "creds-panel-live-probe-1014",
@@ -192,7 +192,8 @@
     "fourvolume-residue-clean-1018",
     "pe-percentile-caliber-1018",
     "st-tab-chain-fix-1018",
-    "lowvol-replay-fill-1018"
+    "lowvol-replay-fill-1018",
+    "lowvol-pane-toggle-fix-1018"
   ],
   "updated": "2026-10-18 11:15",
   "generated_by": "阿狸咪的工程师(/scripts/handoff_ledger_hash.py 口径)",

@@ -9416,3 +9416,13 @@ items:
     verified_at: "2026-10-18 线上实时抓取验证通过"
     updated: "2026-10-18 20:50"
     updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: lowvol-pane-toggle-fix-1018
+    priority: P0
+    owner: 阿狸咪的工程师
+    status: done
+    what: "低波趋稳 tab 高亮但整页全黑（2026-10-18 21:45 主人截图第二报）。根因=lowvol-trend-launch-1018 接入时 switchSt 的 pane 显隐数组写死 ['fv','pool','life','lqsq'] 漏 'lowvol'（且 fv 为死项，st-fv DOM 全站 0）⇒ st-lowvol pane 永不 .active（.st-pane{display:none}）⇒ 按钮高亮但 pane 隐藏、其余 pane 同时全关 ⇒ 全黑。与 st-tab-chain-fix-1018（else 悬空）为同次接入的两处独立遗漏。"
+    evidence: "commit fb6c0901e6 快进自 49ef88ff53（非强推）。switchSt 数组改为 ['pool','life','lqsq','lowvol'] 并注释铁律「pane id 必须与 .st-pane DOM 一一对应」。"
+    verify_how: "①31 块 node --check 0 错；②构建周期复验未回退；③🔴首次采用真机无头浏览器验证（playwright-core+msedge）：实际点击低波 tab → paneDisplay=block、activePanes=[st-lowvol]、回测表 10 行渲染（回放 8 档+组头+累积占位）、picks/replay 数据注入到位、0 页面异常（仅 favicon 404 旧存）。"
+    verified_at: "2026-10-18 真机点击验证通过"
+    updated: "2026-10-18 22:10"
+    updated_by: 阿狸咪的工程师(alimi-cn)
