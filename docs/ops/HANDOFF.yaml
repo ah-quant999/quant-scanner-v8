@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 138
+  next_id_seq: 139
 items:
   - id: index-creds-panel-refresh-1014
     owner: 阿狸咪的工程师
@@ -9365,4 +9365,14 @@ items:
     verify_how: "① 七文件清理脚本20+4处断言全过(py_compile 4后端0错);② plumbing推送commit-tree -p origin/main,推送后git ls-tree -r逐一核对15文件出树+7覆盖文件sha在树内;③ 远端链ORDER四量全注释佐证下架生效。"
     verified_at: "2026-10-18 plumbing推送+ls-tree复核通过"
     updated: "2026-10-18 22:30"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: lowvol-trend-launch-1018
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: done
+    what: "第二支自研算法「低波趋稳」上线（2026-10-18 主人令：按建议做新算法·回测过了才上线）。选股=每日全市场60日波动率最低Top10且收盘>MA60（低波+趋稳上行），零重复拉数复用gen_lqsq的kline_cache_ext刷新；上市前置回测N=60平均+5.99%/基准+1.99%（α+4.00pp、胜率53.3%）——四方向（板块轮动/低波趋势/稳健突破/回踩MA20）唯一显著跑赢档，其余三方向未跑赢基准故留档不上线。真实信号流口径：上线首日即建lowvol_trend_history归档，前向跟踪样本随持有天数成熟，未走满不计入（前端回测表显示「累积中」占位，禁填0冒充）。"
+    evidence: "commit 8e466ce4460a 快进自 7a01b22571（非强推）；git ls-tree -r 确认 9 文件在树内：index.html(st-lowvol卡+renderLowvol)/algorithms/run_algorithms.py(预算表+ORDER+STAGES三处逐字一致)/algorithms/gen_backtest_all_algos.py(总表)/v8_health_check.py(监控)/algorithms/strategy_lowvol_trend.py(新生产者)/data/LOWVOL_TREND.js/data/LOWVOL_TREND_BACKTEST.js/raw_data/lowvol_trend_history.json/raw_data/lowvol_trend.json。构建周期复验：部署管线提交 872a119624 后我的提交仍为其祖先、低波卡标记未丢失=>吸收mid-run推送修复生效、已生根。"
+    verify_how: "① py_compile 4 后端文件 0 错；② 生产者实跑产出真实Top10（中国核电/雅戈尔/中国移动/平安银行/杭州银行/长江电力/青岛港/伊利股份/宝钢股份/招商银行）pool_size=2490；③ 代码审计：零未来函数(数据日=bars[-1].date、选股用≤j指标、回测T+1开买/T+N收卖)、防幸存者偏差(逐日全量归档含回落票)、口径一致(同universe等权基准/双边0.3%/限价过滤)、零信号或池<500即SystemExit不补假数据。"
+    verified_at: "2026-10-18 推仓复读自证+构建周期复验通过+代码审计完成"
+    updated: "2026-10-18 19:50"
     updated_by: 阿狸咪的工程师(alimi-cn)
