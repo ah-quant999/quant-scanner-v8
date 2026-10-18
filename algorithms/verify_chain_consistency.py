@@ -55,11 +55,18 @@ SCRIPT_EXEMPT = {
     "math_helpers.py", "pandas_helpers.py", "numpy_helpers.py",
 }
 # 工具类脚本前缀：本就不进算法链（构建/抓取/监控/审计/同步/治理等），不报孤儿
+# 🔴 2026-10-18（算法审计）：移除 "alpha_" 前缀 —— 该前缀下 alpha101_backtest.py /
+#   alpha_vs_beta.py 是**真孤儿**（零活引用），旧豁免让 CI 对其永久失明。
+#   其余前缀（fetch_/calc_/gen_/build_/monitor_ …）仍保留：这些脚本由 cloud_fetch_v8 /
+#   workflow / ORDER 系统性调度，前缀豁免是对「调度图复杂（函数名注册+多变体调用）」
+#   的工程化近似；若改走精确调用图需同步解析 cloud_fetch 注册表与 workflow 调用形态，
+#   风险高，暂缓。新增脚本若带上述前缀且确为孤儿，需显式加入 SCRIPT_EXEMPT 反向登记
+#   或单独清理，不能靠前缀自动豁免掩盖。
 SCRIPT_TOOL_PREFIXES = (
     "fetch_", "calc_", "gen_", "build_", "monitor_", "audit_", "backfill_",
     "sync_", "setup_", "check_", "show_", "write_", "reconcile_", "optimize_",
     "regime_", "apply_", "stage_", "data_", "factor_", "raw_", "api_",
-    "guanlan_", "alimi_", "alpha_", "algo_", "freshness_", "fix_",
+    "guanlan_", "alimi_", "algo_", "freshness_", "fix_",
     "renormalize_", "stop_target_", "scanner", "v8_verify", "verify_",
     "update_", "cloud_", "bridge_", "dedup_", "align_",
 )
