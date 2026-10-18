@@ -1,6 +1,6 @@
 {
  "month": "2026年10月",
- "update_time": "2026-10-18 23:04",
+ "update_time": "2026-10-19 02:26",
  "legend": [
   {
    "title": "重要政策",
@@ -378,7 +378,7 @@
     {
      "num": 18,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": []
     }
    ]
@@ -390,7 +390,7 @@
     {
      "num": 19,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇭🇰 港股休市（重阳节）",
