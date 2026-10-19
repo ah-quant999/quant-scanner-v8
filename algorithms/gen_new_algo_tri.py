@@ -143,6 +143,8 @@ def scan_vcp(limit=None):
     if limit:
         files = files[:limit]
     scanned = 0
+    # ── 第一遍：载池 + 取全池最新K线日（数据日闸基准） ──
+    pool = {}
     for fp in files:
         code = Path(fp).stem
         if not code.isdigit() or len(code) != 6:
@@ -153,6 +155,16 @@ def scan_vcp(limit=None):
             continue
         if not isinstance(bars, list) or len(bars) < 60:
             continue
+        pool[code] = bars
+    latest = max((b[-1].get("date") or "" for b in pool.values()), default="")
+    fresh = {c: b for c, b in pool.items() if (b[-1].get("date") or "") == latest}
+    if latest and len(fresh) < TRI_VCP_MIN_FRESH:
+        return {"scanned": len(pool), "items": [], "data_date": latest,
+                "fresh_count": len(fresh),
+                "reason": ("K线缓存整体陈旧：全池最新日 %s（新鲜票 %d < %d）"
+                           "——拒绝用旧形态冒充满仓信号，等缓存刷新" %
+                           (latest, len(fresh), TRI_VCP_MIN_FRESH))}
+    for code, bars in sorted(fresh.items()):
         scanned += 1
         b = bars[-60:]
         closes = [x["close"] for x in b]
@@ -325,6 +337,8 @@ def calc_lhb_follow():
         )
         items.append({
             "code": s.get("code"), "name": s.get("name"),
+            "date": (lambda _s: "%s-%s-%s" % (_s[:4], _s[4:6], _s[6:8])
+                     if len(_s) == 8 and _s.isdigit() else _s)(str(d.get("date") or "")),
             "pct": round(pct, 2), "inst_net_wan": round(inst_net, 0),
             "yz_net_wan": round(yz_net, 0), "category": cat,
             "follow": follow, "score": round(score, 1),
@@ -339,6 +353,14 @@ def calc_lhb_follow():
 #    样本随持有天数成熟累积，未走满不计入；基准 = 全市场等权（剔 ST/退、价≥2）。
 #    三算法（vcp/rotation/lhb）共用同一归档文件 new_algo_tri_history.json。
 # ══════════════════════════════════════════════════════════════
+# 🛡 2026-10-20 数据日闸（一劳永逸·防旧形态冒充满仓信号）：
+#   实证 10-20 早批次：vcp 命中 9 只的 K 线 date 散布 09-07~10-14（kline_cache 陈旧），
+#   却被打包进 10-20 批次、按自然日归档进前向回测 ⇒ 信号日与形态日错配近一个月。
+#   门控：① vcp 只收「末根K线=全池最新日」的票；新鲜票不足 ⇒ 整节降级不产出；
+#         ② 归档 signal_date 用**信号真实数据日**而非自然日；
+#         ③ lhb 用榜单自身 date；数据日缺失/陈旧 ⇒ 不归档（保留旧档，绝不污染）。
+TRI_STALE_SKIP_DAYS = 5       # 容忍滞后（停牌/节假日/缓存欠账）
+TRI_VCP_MIN_FRESH = 200       # 新鲜票下限：低于此判「缓存整体陈旧」，VCP 整节降级
 TRI_COST = 0.003
 TRI_N_LIST = [1, 3, 5, 10, 20]
 TRI_HISTORY = RAW / "new_algo_tri_history.json"
@@ -472,10 +494,35 @@ def _tri_run_backtest(out):
             if c:
                 rot_codes.append(c)
     # 载入/更新归档（同 signal_date 去重，防重跑重复追加）
+    # 🛡 2026-10-20 数据日闸：signal_date = 信号**真实数据日**（非自然日）——
+    #   vcp=全池最新K线日；lhb=榜单 date（20261019→2026-10-19）；rotation=板块数据日。
+    #   无数据日/无信号 ⇒ 不归档（保留旧档，绝不用陈旧数据污染前向跟踪）。
     hist = load_json(TRI_HISTORY, {"vcp": [], "rotation": [], "lhb": []})
+
+    def _norm_day(s):
+        s = str(s or "").strip().replace("-", "")
+        if len(s) == 8 and s.isdigit():
+            return "%s-%s-%s" % (s[:4], s[4:6], s[6:8])
+        return str(s or "")
+
+    _sf_day = ""
+    try:
+        _sf_day = _norm_day((load_json(RAW / "sector_fund_flow_trend.json", {})
+                             .get("update_time") or "")[:10])
+    except Exception:
+        pass
+    sig_days = {
+        "vcp": (out.get("vcp") or {}).get("data_date") if (out.get("vcp") or {}).get("items") else "",
+        "rotation": _sf_day if rot_codes else "",
+        "lhb": _norm_day((out.get("lhb") or {}).get("date")) if lhb_codes else "",
+    }
     for key, codes in (("vcp", vcp_codes), ("rotation", rot_codes), ("lhb", lhb_codes)):
-        lst = [h for h in (hist.get(key) or []) if h.get("signal_date") != today]
-        lst.append({"signal_date": today, "picks": codes})
+        d = sig_days.get(key) or ""
+        if not d:
+            print("  ⏭ %s 无数据日/无信号 —— 不归档（保留旧档）" % key)
+            continue
+        lst = [h for h in (hist.get(key) or []) if h.get("signal_date") != d]
+        lst.append({"signal_date": d, "picks": codes})
         hist[key] = lst
     TRI_HISTORY.write_text(json.dumps(hist, ensure_ascii=False), encoding="utf-8")
     # 计算（载入全 A 日线缓存 + ST 集合）
