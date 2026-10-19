@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-19 19:21",
- "generated": "2026-10-19 19:21",
+ "update_time": "2026-10-19 19:35",
+ "generated": "2026-10-19 19:35",
  "meta": {
-  "generated": "2026-10-19 19:21",
+  "generated": "2026-10-19 19:35",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 26,
   "days_with_consensus": 0,
@@ -10644,6 +10644,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 3.555,
       "price": 16.02,
       "category": "突破"
+     },
+     {
+      "code": "300756",
+      "name": "金马游乐",
+      "change_pct": 4.374,
+      "price": 29.83,
+      "category": "突破"
      }
     ],
     "加速": [
@@ -10795,6 +10802,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 3.555,
       "price": 16.02,
       "category": "短线选股"
+     },
+     {
+      "code": "300756",
+      "name": "金马游乐",
+      "change_pct": 4.374,
+      "price": 29.83,
+      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -10859,6 +10873,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "铁流股份",
       "change_pct": 3.555,
       "price": 16.02,
+      "category": "强势股"
+     },
+     {
+      "code": "300756",
+      "name": "金马游乐",
+      "change_pct": 4.374,
+      "price": 29.83,
       "category": "强势股"
      }
     ]
