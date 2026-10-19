@@ -4572,7 +4572,7 @@ function fmtSigned(v){
       return !!_nb && ((_nb.buy||0) - (_nb.sell||0)) > 0;
     });
     var _insightSignalCount = _rcArr(CAND.stocks).length
-      + _rcArr(LHB.stocks).filter(function(s){ return (s.inst_net_万||0)>0 && (s.yz_net_万||0)>0; }).length
+      + window.__resonanceStocks(_rcArr(LHB.stocks)).length
       + (SR.sectors || []).length
       + (_nbHasNetBuy ? 1 : 0);
     h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">';
@@ -4747,7 +4747,7 @@ function fmtSigned(v){
     h += '<div style="margin-top:16px;font-size:12px;font-weight:700;color:var(--purple);margin-bottom:8px">⚡ 机游共振（短线）· 仅龙虎榜上榜个股</div>';
     h += '<div class="insight-grid" style="grid-template-columns:1fr 1fr 1fr">';
     // 最强共振
-    var _strong = _lhb.filter(function(s){ return (function(a,b){return a>0 && b>0 && (a+b)>=8000;})(s.inst_net_万||0, s.yz_net_万||0); })
+    var _strong = window.__resonanceStocks(_lhb)
                      .sort(function(a,b){ return ((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0)); }).slice(0,4);
     h += '<div class="insight-card" style="border-left-color:var(--purple)"><h4>🔥 最强共振 <span style="font-size:10px;color:var(--purple);font-weight:400">机构+游资</span></h4>';
     if(_strong.length){
@@ -4805,7 +4805,7 @@ function fmtSigned(v){
         var risk = all.filter(function(s){ return _net3(s) < 0; })
           .map(function(s){ s._net=_net3(s); return s; })
           .sort(function(a,b){ return a._net - b._net; }).slice(0,5);
-        var strong = all.filter(function(s){ return (s.inst_net_万||0)>0 && (s.yz_net_万||0)>0 && ((s.inst_net_万||0)+(s.yz_net_万||0))>=TH; })
+        var strong = window.__resonanceStocks(all, TH)
           .sort(function(a,b){ return ((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0)); }).slice(0,4)
           .map(function(s){ s._net=(s.inst_net_万||0)+(s.yz_net_万||0); return s; });
         var instOnly = all.filter(function(s){ return (s.inst_net_万||0)>0 && (s.yz_net_万||0)<=0; })
@@ -8746,6 +8746,14 @@ function switchSec(sec,el){
     if(Array.isArray(d)) return d;
     if(typeof d==='object') return Object.values(d);
     return [];
+  };
+  /* 2026-10-19 一劳永逸：机游共振唯一真源口径（全站统一，杜绝再分叉）。 */
+  window.__resonanceStocks = function __resonanceStocks(stocks, TH){
+    TH = (TH == null) ? 8000 : TH;
+    return (window._safeArr(stocks)).filter(function(s){
+      var i = (s.inst_net_万||0), y = (s.yz_net_万||0);
+      return i > 0 && y > 0 && (i + y) >= TH;
+    });
   };
   function fullKey(s){ return (s.market||'') + '_' + (s.code||''); }
   // STOCK_LIST 兼容两种 schema：直接数组（旧）或 {data:[...]} 包装（2026-08-02 收紧 update_time 后）
