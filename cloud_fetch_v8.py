@@ -5556,6 +5556,7 @@ def main(category=None, only=None):
                 continue
             acc = {_cy: 0.0, _py: 0.0}
             days_n = {_cy: 0, _py: 0}
+            _cy_series = []  # 2026-10-19 主人令：保留今年日度序列 → 顺算近5/20日增量
             last_date = ""
             for ln in recs:
                 p = ln.split(",")
@@ -5571,12 +5572,18 @@ def main(category=None, only=None):
                 acc[_y] += _v
                 days_n[_y] += 1
                 last_date = p[0]
+                if _y == _cy:
+                    _cy_series.append(_v)
             if days_n[_cy] == 0:
                 fails += 1
                 continue
+            # 近5日/近20日净流入（滚动增量窗）：治「只看总数、增减无感」
+            _d5 = round(sum(_cy_series[-5:]) / _EMU, 2) if len(_cy_series) >= 5 else None
+            _d20 = round(sum(_cy_series[-20:]) / _EMU, 2) if len(_cy_series) >= 20 else None
             sectors.append({"code": code, "name": name,
                             "cur": round(acc[_cy] / _EMU, 2),
                             "prev": round(acc[_py] / _EMU, 2),
+                            "d5": _d5, "d20": _d20,
                             "days": days_n[_cy], "last_date": last_date})
         if not sectors or fails / max(1, len(boards)) > 0.3:
             print(f"  ⚠️ [sector_year_flow] 成功 {len(sectors)}/{len(boards)}"

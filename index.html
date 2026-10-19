@@ -13155,7 +13155,8 @@ function drawUpDownChart(){
 
   /* ---- 6. 市场宽度（52周新高） ---- */
   // 🏔 板块年度主力净流入累积表（2026-10-17 主人令「加」：自建·真实历史回填）
-  //   红=净流入、绿=净流出（全站红涨绿跌铁律）。两张列：今年(年初至今) / 去年全年。
+  //   红=净流入、绿=净流出（全站红涨绿跌铁律）。列：今年(年初至今) / 近5日 / 近20日 / 去年全年。
+  //   近5/20日=滚动增量窗（2026-10-19 主人令：只看总数看不出增减，增量才是边际信号）。
   function renderSectorYearFlow(d){
     var $b=$('sectorYearFlowBody'), $t=$('sectorYearFlowTime');
     if(!$b) return;
@@ -13184,6 +13185,8 @@ function drawUpDownChart(){
     h+='<thead><tr style="color:var(--dim);text-align:right;">'
       +'<th style="padding:5px 8px;text-align:left;">板块</th>'
       +'<th style="padding:5px 8px;">'+data.year+' 年初至今</th>'
+      +'<th style="padding:5px 8px;" title="近5个交易日主力净流入合计（滚动增量）">近5日</th>'
+      +'<th style="padding:5px 8px;" title="近20个交易日主力净流入合计（滚动增量）">近20日</th>'
       +'<th style="padding:5px 8px;" title="'+(data.partial?'去年全年接口受限，暂缺':'去年全年')+'">'+(data.partial?'去年*':'')+data.prev_year+' 全年</th>'
       +'<th style="padding:5px 8px;">交易日</th></tr></thead><tbody>';
     list.forEach(function(s, i){
@@ -13193,12 +13196,14 @@ function drawUpDownChart(){
         +(s.cur>=0?'<span style="color:var(--up);margin-right:4px;">▲</span>':'<span style="color:var(--down);margin-right:4px;">▼</span>')
         +s.name+'</td>';
       h+='<td style="padding:5px 8px;text-align:right;">'+_chip(s.cur)+'</td>';
+      h+='<td style="padding:5px 8px;text-align:right;">'+_chip(s.d5)+'</td>';
+      h+='<td style="padding:5px 8px;text-align:right;">'+_chip(s.d20)+'</td>';
       h+='<td style="padding:5px 8px;text-align:right;color:'+_col(s.prev)+';">'+_fmt(s.prev)+'</td>';
       h+='<td style="padding:5px 8px;text-align:right;color:var(--dim);">'+Number(s.days||0)+'</td>';
       h+='</tr>';
     });
     h+='</tbody></table></div>';
-    var _foot='流入 Top10 + 流出 Top5（共 '+secs.length+' 板块）；单位亿元。较去年同期放大=资金加速涌入该板块。';
+    var _foot='流入 Top10 + 流出 Top5（共 '+secs.length+' 板块）；单位亿元。近5日/近20日=滚动增量，看资金进退方向（总数是存量，增量才是边际信号）。';
     if(data.partial){ _foot+=' <span style="color:var(--gold);">⚠️ 临时数据：覆盖 '+data.data_date+' 真实累计；东财年度接口海外云runner不可达，年初至今/去年全年口径待路由中国IP runner后补全。</span>'; }
     h+='<div style="margin-top:6px;font-size:11px;color:var(--sub);">'+_foot+'</div>';
     $b.innerHTML=h;
