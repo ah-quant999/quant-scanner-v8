@@ -6094,6 +6094,7 @@ def main(category=None, only=None):
         ("EXPERIMENT", f_experiment),
         ("ETF_NET_SUBSCRIPTION", f_etf_net_subscription),  # 2026-09-11 主人 P1：真实份额申赎（上交所日环比）
         ("SECTOR_FUND_FLOW", f_sector_fund_flow),
+        ("SECTOR_YEAR_FLOW", f_sector_year_flow),  # 🛠 2026-10-19 补注册：三表登记齐但漏本表⇒任务永不执行(149行注释警告的假修复同族)；并启 近5/20日增量列(主人10-19令)
         ("AVG_PRICE_DATA", f_avg_price),
         ("AVG_PRICE_880003", f_avg_price_880003),
         ("INDEX_QUOTES", f_index_quotes),
