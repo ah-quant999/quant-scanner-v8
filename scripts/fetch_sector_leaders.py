@@ -35,6 +35,12 @@ OUT_JS = os.path.join(ROOT, "data", "SECTOR_LEADERS.js")
 #     no_match/leaders_error），dict **每日刷新绝不中断**，不再整脚本崩退出 1。
 CACHE_BOARDS = os.path.join(ROOT, "raw_data", "em_boards_cache.json")
 CACHE_MEMBERS = os.path.join(ROOT, "raw_data", "em_members_cache.json")
+# 🛡 2026-10-19 小九（龙头股「全部没数据」根治 · 一劳永逸）：同花顺行业成分兜底缓存。
+#   fr 强势板块名本身是**同花顺行业名**，可精确对应同花顺行业代码，无需 MANUAL_ALIAS。
+#   同花顺 thshy 详情页(免 cookie、服务端按涨幅降序)给出成分股名单；行情走腾讯兜底。
+#   本缓存仅记录 同花顺行业名→代码 的映射（成功轮回写，随 git 跨 run 累积）。
+THS_INDUSTRY_CACHE = os.path.join(ROOT, "raw_data", "ths_industry_cache.json")
+THS_LIST_URL = "https://q.10jqka.com.cn/thshy/"
 
 # 本轮板块名→BK 映射的来源审计（live=东财在线 / cache=本地缓存兜底 / unavailable=缓存也缺）
 EM_BOARDS_SOURCE = "live"
@@ -416,6 +422,70 @@ def _tx_cons(members):
     return out
 
 
+# 🛡 2026-10-19 小九（龙头股「全部没数据」根治 · 一劳永逸）：
+#   fr 强势板块名 = 同花顺行业名，可直接去同花顺取成分股名单（按涨幅降序），
+#   彻底摆脱对东财 clist（云 runner 海外 IP 被封）的依赖。名单→腾讯行情取涨幅，
+#   与现有缓存兜底同源同规则。任何失败 return None 不抛错（走后续 leaders_error 明示）。
+def _ths_name_to_code(force=False):
+    """同花顺行业名→代码映射（缓存轮回写）。返回 dict。"""
+    import re as _re
+    cache = _cache_load(THS_INDUSTRY_CACHE) or {}
+    if not force and cache.get("map"):
+        return cache["map"]
+    try:
+        t = _get_url_text(THS_LIST_URL)
+        m = _re.findall(r'code/(\d{6})/?"[^>]*>([^<]{2,12})</a>', t)
+        mp = {n: c for c, n in m}
+        if mp:
+            _cache_save(THS_INDUSTRY_CACHE, {"_updated": time.strftime("%Y-%m-%d %H:%M:%S"), "map": mp})
+            return mp
+    except Exception as e:
+        log("ths industry list fail: %s" % str(e)[:50])
+    return cache.get("map") or {}
+
+
+def _ths_members_by_name(name):
+    """同花顺行业名→成分股名单(按涨幅降序前20)，返回 [{code,name}] 或 None。"""
+    import re as _re
+    mp = _ths_name_to_code()
+    code = mp.get(name)
+    if not code:
+        return None
+    try:
+        t = _get_url_text("https://q.10jqka.com.cn/thshy/detail/code/%s/order/desc/" % code)
+        rows = _re.findall(r"<tr[^>]*>(.*?)</tr>", t, _re.S)
+        out = []
+        for tr in rows[1:]:
+            # 真实结构：每行两只独立 <a>（代码链接带尾斜杠文本=代码；名字链接无尾斜杠
+            # 且夹 target="_blank" 文本=中文名）。故取所有 stockpage href 拿代码，
+            # 名字取锚文本里非纯数字那条。
+            hrefs = _re.findall(r'stockpage\.10jqka\.com\.cn/(\d{6})', tr)
+            if not hrefs:
+                continue
+            code6 = hrefs[0]
+            names = _re.findall(r'stockpage\.10jqka\.com\.cn/\d+"?[^>]*>([^<]{2,8})</a>', tr)
+            nm = next((n for n in names if not n.isdigit()), None)
+            if nm:
+                out.append({"code": code6, "name": nm})
+        return out or None
+    except Exception as e:
+        log("ths members fail %s: %s" % (name, str(e)[:50]))
+        return None
+
+
+def _get_url_text(url, timeout=15, retry=3, sleep=2.0):
+    last = None
+    for i in range(retry):
+        try:
+            req = urllib.request.Request(url, headers=UA)
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read().decode("gbk", "replace")
+        except Exception as e:
+            last = e
+            time.sleep(sleep + i)
+    raise last
+
+
 def fetch_cons_safe(bk):
     """双轮重试（东财）：每轮内部 _get_json 已带 3 重试；轮间 2.5s 缓冲防东财限流。
     🛡 2026-09-30 小九：东财两轮全断（RemoteDisconnected/502）时改走**腾讯成员缓存兜底**
@@ -602,6 +672,20 @@ def build():
                 fr_out.append({"name": nm, "bk": bk, "cons_count": len(cons),
                                "leaders": cons[:TOP_N], "match": how})
             except Exception as e:
+                # 🛡 2026-10-19 小九（龙头股「全部没数据」根治）：fetch_cons_safe 三层
+                #   （东财在线/成员缓存/腾讯行情）全失效时，改用**同花顺行业名直取**成分股
+                #   （fr 名即同花顺行业名，精确对应），名单→腾讯行情取涨幅。彻底摆脱对
+                #   东财 clist（云 runner 海外 IP 被封）的依赖，新板块自动解析免 MANUAL_ALIAS。
+                _thsm = _ths_members_by_name(nm)
+                if _thsm:
+                    try:
+                        _rows = _tx_cons(_thsm)
+                        fr_out.append({"name": nm, "bk": bk, "cons_count": len(_thsm),
+                                       "leaders": _rows[:TOP_N], "match": "ths"})
+                        time.sleep(0.3)
+                        continue
+                    except Exception as _te:
+                        log("fr ths quote fail %s: %s（回退 NeoData）" % (nm, str(_te)[:50]))
                 _neo = _neo_cons(nm)
                 if _neo:
                     fr_out.append({"name": nm, "bk": bk, "cons_count": len(_neo),
