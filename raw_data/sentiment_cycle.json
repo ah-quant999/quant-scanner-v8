@@ -1,11 +1,11 @@
 {
-  "update_time": "2026-10-20 02:32:31",
-  "data_date": "2026-10-19",
+  "update_time": "2026-10-20 02:55:50",
+  "data_date": "2026-10-20",
   "source": "LIMIT_UP_HEATMAP",
   "phase": "高潮",
   "color": "#f59e0b",
   "score": 61.0,
-  "delta_pct": -24.59,
+  "delta_pct": 0.0,
   "advice": "✨ 高潮持续：聚焦核心龙头，注意仓位管理",
   "metrics": {
     "total_up": 46,
@@ -38,6 +38,6 @@
       "chg": 10.07
     }
   ],
-  "prev_total": 61,
+  "prev_total": 46,
   "note": "冰点=涨停<30家且最高板≤2（报复性窗口临近）；高潮=涨停≥80且最高板≥5；退潮=较昨日-30%+"
 }
