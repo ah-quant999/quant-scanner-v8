@@ -134,6 +134,28 @@ SOURCES = [
          var="INTRADAY_MOMENTUM_BACKTEST", rel="data/INTRADAY_MOMENTUM_BACKTEST.js",
          parser="by_period", label_prefix="持有", primary="持有 T+20",
          method="真实信号流口径：每日全市场近20日日内累计收益(Σclose/open−1)最高 Top10 且收盘>MA60，次开买入持有 N 个交易日收盘卖出（前复权·扣双边 0.3%）；基准=同过滤 universe 等权"),
+    # 🆕 2026-10-19 主人令「这些算法的回测在策略回测页也要加上」：三新算法并入本总表。
+    #   三算法（缩量回踩VCP / 板块资金共振轮动 / 龙虎榜机构跟随）共用同一产物
+    #   data/NEW_ALGO_TRI_BACKTEST.js（window 下 vcp/rotation/lhb 三个子键，结构与
+    #   summary.by_period 同构）⇒ 新 parser `tri_sub` 按 src["sub"] 取子键，行构造逻辑
+    #   与 parse_by_period 逐字同源（诚实铁律同源：零样本 ⇒ win/avg 归 null +「累积中」，
+    #   绝不把「算不出」显示成「算出来且很差」）。
+    #   口径 = 真实信号流（gen_new_algo_tri.py::_tri_run_backtest；上线首日 2026-10-19
+    #   即建归档 raw_data/new_algo_tri_history.json，含已回落票防幸存者偏差）；
+    #   档位 TRI_N_LIST=[1,3,5,10,20]；主档 T+5（与因子卡/四量同口径横比；
+    #   10-19 上线即挂总表，样本随持有天数成熟，未走满不计入，MIN_SAMPLES 前只观测）。
+    dict(card="缩量回踩", kind="strategy", page="选股策略", icon="📐", cat="trade",
+         var="NEW_ALGO_TRI_BACKTEST", rel="data/NEW_ALGO_TRI_BACKTEST.js",
+         parser="tri_sub", sub="vcp", label_prefix="持有", primary="持有 T+5",
+         method="真实信号流口径：每日全市场「中期多头+放量启动后缩量回踩(VCP)」扫描，次开买入持有 N 个交易日收盘卖出（前复权·扣双边 0.3%）；基准=全市场等权（剔 ST/退、价格≥2）"),
+    dict(card="板块共振", kind="strategy", page="选股策略", icon="🔄", cat="trade",
+         var="NEW_ALGO_TRI_BACKTEST", rel="data/NEW_ALGO_TRI_BACKTEST.js",
+         parser="tri_sub", sub="rotation", label_prefix="持有", primary="持有 T+5",
+         method="真实信号流口径：行业资金流×SECTOR_RS×涨停热力×龙头四源共振的周期定位，取其龙头组合前向测（次开买入持有 N 个交易日收盘卖出，前复权·扣双边 0.3%）；基准=全市场等权（剔 ST/退、价格≥2）"),
+    dict(card="龙虎机构", kind="strategy", page="选股策略", icon="🐉", cat="trade",
+         var="NEW_ALGO_TRI_BACKTEST", rel="data/NEW_ALGO_TRI_BACKTEST.js",
+         parser="tri_sub", sub="lhb", label_prefix="持有", primary="持有 T+5",
+         method="真实信号流口径：LHB 机构席位净买≥3000万 跟随榜单（顺势/逆势两档），次开买入持有 N 个交易日收盘卖出（前复权·扣双边 0.3%）；基准=全市场等权（剔 ST/退、价格≥2）"),
     # 🗑 2026-10-11 主人令「完全下架」：逆势龙头（CRDS）登记条目随策略下架移除。
     #   原条目：dict(card="逆势龙头", var="CRDS_BACKTEST", rel="data/CRDS_BACKTEST.js",
     #              parser="by_period", label_prefix="持有", primary="持有 T+5")
@@ -540,6 +562,41 @@ def parse_ima_strong(src, obj):
     return rows
 
 
+def parse_tri_sub(src, obj):
+    """NEW_ALGO_TRI_BACKTEST 的三子键（vcp/rotation/lhb）：结构与 summary.by_period 同构。
+
+    2026-10-19 主人令「这些算法的回测在策略回测页也要加上」。三新算法共用一个产物
+    文件，按 src["sub"] 取子键后**完全复用** parse_by_period 的行构造（含 _mk_row
+    的零样本归零兜底）；signal_date_range/total_signals 取自该子键自身。
+    """
+    sub = src.get("sub")
+    node = (obj or {}).get(sub) or {}
+    sm = node.get("summary") or {}
+    bp = sm.get("by_period") or {}
+    rows = []
+    if not bp:
+        return [_mk_row(src, "—", None, None, None, None,
+                        status="无 by_period 数据（归档信号尚无成熟样本，累积中）"
+                        if node.get("total_signals") else "无 by_period 数据（尚无归档信号）")]
+    for k in sorted(bp.keys(), key=lambda x: (_num(x) is None, _num(x) or 0)):
+        r = bp.get(k) or {}
+        n = _num(r.get("samples"))
+        if n is None:
+            n = _num(r.get("count"))
+        rows.append(_mk_row(
+            src, f"持有 T+{k}", n, r.get("win_rate"), r.get("avg_return"), f"T+{k}",
+            extra={"best_return": _num(r.get("best_return")),
+                   "worst_return": _num(r.get("worst_return")),
+                   "max_drawdown": _num(r.get("max_drawdown")),
+                   "sharpe": _num(r.get("sharpe_ratio")),
+                   "win_avg": _num(r.get("win_avg")), "loss_avg": _num(r.get("loss_avg")),
+                   "signal_date_range": node.get("signal_date_range"),
+                   "total_signals": _int(node.get("total_signals"))},
+            status=None if (n or 0) > 0 else "样本为 0（尚无历史信号）",
+        ))
+    return rows
+
+
 def parse_tdx(src, obj):
     """BACKTEST_TDX.summary：每类 K 线信号 × **每个持有期档位** 一行。
 
@@ -649,6 +706,7 @@ PARSERS = {
     "by_period": parse_by_period,
     "ima_strong": parse_ima_strong,      # 🆕 2026-09-17 强势跟踪（顶层 periods 结构）
 
+    "tri_sub": parse_tri_sub,      # 🆕 2026-10-19 三新算法（NEW_ALGO_TRI_BACKTEST 子键）
     "tdx": parse_tdx,
     # 🗑 2026-09-19：algo_compare 解析器随「强势突破」全站删除一并摘除（见上墓碑）。
     "factor_lab": parse_factor_lab,
