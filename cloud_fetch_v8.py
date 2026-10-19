@@ -6163,6 +6163,13 @@ def main(category=None, only=None):
         _probs.append(f"未登记 CATEGORY_MAP ⇒ 永不进 target_vars、永不执行: {_no_cat}")
     if _no_raw:
         _probs.append(f"未登记 VAR_TO_RAW ⇒ save() 直接 return、raw 永不落盘: {_no_raw}")
+    # 🔴 2026-10-19 反向自检补盲（阿狸咪·主人令一劳永逸）：原自检只查正向(tasks→两表)，
+    #   反向(两表已登记但 tasks 未注册)没查 ⇒ SECTOR_YEAR_FLOW 当日实锤：定义+三表齐、
+    #   自检照样「通过」，任务却永不执行(孤儿假修复同族)。
+    _EXTERNAL_PRODUCERS = {"SECTOR_FUND_FLOW_INTRADAY"}  # 白名单：intraday_snapshot.py 快照专链自产，不经 tasks
+    _no_task = sorted((set(CATEGORY_MAP.keys()) | set(VAR_TO_RAW.keys())) - _wf_set - _EXTERNAL_PRODUCERS)
+    if _no_task:
+        _probs.append(f"两表已登记但 tasks 未注册 ⇒ 定义了也永不执行(孤儿假修复): {_no_task}")
     if _probs:
         for _p in _probs:
             print(f"  🔴 接线自检失败：{_p}")
