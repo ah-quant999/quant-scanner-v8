@@ -3,12 +3,12 @@
   "V8_OUT_DIR": "out",
   "guanlan_watchlist": {
     "exists": true,
-    "stocks": 31
+    "stocks": 32
   },
   "guanlan_reports": {
     "exists": true,
     "reports": 19,
-    "stocks_in_reports": 34
+    "stocks_in_reports": 35
   },
   "source_dist": {
     "主板成交前100": 147,
