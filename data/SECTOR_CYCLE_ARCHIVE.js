@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-10-19 09:29:09
+// 最后更新：2026-10-19 09:39:10
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-10-19 09:29:09",
+  "update_time": "2026-10-19 09:39:10",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -32,14 +32,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "AI算力",
       "start": "08/31",
-      "end": "10/16",
+      "end": "10/19",
       "start_idx": 0,
-      "end_idx": 28,
-      "days": 29,
-      "hot_days": 27,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 28,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 327,
+      "total": 331,
       "ongoing": true
     },
     {
@@ -52,20 +52,20 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 2998,
+      "total": 3007,
       "ongoing": true
     },
     {
       "sector": "医药",
       "start": "08/31",
-      "end": "10/16",
+      "end": "10/19",
       "start_idx": 0,
-      "end_idx": 28,
-      "days": 29,
-      "hot_days": 29,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 30,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 455,
+      "total": 459,
       "ongoing": true
     },
     {
@@ -78,7 +78,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 24,
       "peak": 20,
       "peak_date": "09/01",
-      "total": 227,
+      "total": 230,
       "ongoing": true
     },
     {
@@ -97,14 +97,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "消费电子",
       "start": "08/31",
-      "end": "10/16",
+      "end": "10/19",
       "start_idx": 0,
-      "end_idx": 28,
-      "days": 29,
-      "hot_days": 27,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 28,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 246,
+      "total": 249,
       "ongoing": true
     },
     {
@@ -175,14 +175,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "机器人",
       "start": "09/16",
-      "end": "10/16",
+      "end": "10/19",
       "start_idx": 12,
-      "end_idx": 28,
-      "days": 17,
-      "hot_days": 17,
+      "end_idx": 29,
+      "days": 18,
+      "hot_days": 18,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 241,
+      "total": 247,
       "ongoing": true
     },
     {
@@ -240,14 +240,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "军工",
       "start": "10/14",
-      "end": "10/16",
+      "end": "10/19",
       "start_idx": 26,
-      "end_idx": 28,
-      "days": 3,
-      "hot_days": 2,
+      "end_idx": 29,
+      "days": 4,
+      "hot_days": 3,
       "peak": 7,
       "peak_date": "10/16",
-      "total": 10,
+      "total": 14,
       "ongoing": true
     },
     {
