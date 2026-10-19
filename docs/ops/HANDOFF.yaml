@@ -9511,7 +9511,7 @@ items:
   - id: yearflow-delta-cols-1019
     priority: P2
     owner: 阿狸咪的工程师
-    status: done_code_pending_data
+    status: pending-verify
     created: 2026-10-19
     title: 板块年度净流入卡加近5日/近20日增量列 + SECTOR_YEAR_FLOW孤儿假修复(补tasks注册+自检反向硬检)
     what: "主人10-19令『这卡看到的是总数，一旦增加或者减退我也不知道』。修三处：①前端 renderSectorYearFlow 加『近5日/近20日』两列(滚动增量窗，红涨绿跌，缺数据显示—)；②生成器 f_sector_year_flow 顺算 d5/d20(保留今年日度序列取尾窗)；③当日实锤孤儿假修复同族病：该任务定义+VAR_TO_RAW+CATEGORY_MAP 三表登记齐、接线自检照样『通过』，但 tasks 列表漏注册=全链永不执行(线上现有数据来自小九机未提交本地版cloud_fetch_v8.py，其 partial/note 措辞从未入过仓库任何历史)。已补 tasks 注册 + 接线自检补反向硬检(两表已登记但tasks未注册→启动即炸；白名单={SECTOR_FUND_FLOW_INTRADAY}快照专链自产)。"
