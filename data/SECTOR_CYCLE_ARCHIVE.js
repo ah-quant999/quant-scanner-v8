@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-10-19 09:39:10
+// 最后更新：2026-10-19 09:51:43
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-10-19 09:39:10",
+  "update_time": "2026-10-19 09:51:43",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -39,7 +39,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 28,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 331,
+      "total": 333,
       "ongoing": true
     },
     {
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 296,
       "peak_date": "09/01",
-      "total": 3007,
+      "total": 3014,
       "ongoing": true
     },
     {
@@ -65,7 +65,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 459,
+      "total": 460,
       "ongoing": true
     },
     {
@@ -188,14 +188,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "白酒消费",
       "start": "09/18",
-      "end": "10/16",
+      "end": "10/19",
       "start_idx": 14,
-      "end_idx": 28,
-      "days": 15,
-      "hot_days": 14,
+      "end_idx": 29,
+      "days": 16,
+      "hot_days": 15,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 80,
+      "total": 83,
       "ongoing": true
     },
     {
