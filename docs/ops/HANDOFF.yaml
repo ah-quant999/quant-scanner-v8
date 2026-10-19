@@ -26,8 +26,8 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-19 09:41"
-  updated_by: 小九的工程师
+  updated: "2026-10-19 14:42"
+  updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
@@ -9470,4 +9470,16 @@ items:
     verify_how: "①两 producer py_compile 通过；②index.html 全部 31 内联脚本块 node --check 0 错；③推送后观察一个完整 build 周期：tip 前进至 d127f4e81b 且 commit 仍为祖先、index 含 Top5 文案×2、LOWVOL_TREND.js picks=5 只；④🔴真机无头浏览器(msedge)点击两 tab：低波 picksCount=5/label『低波 Top5』/replayTopPerDay=5/无 Top10 残留，日内 picksCount=5/label『日内动量 Top5』/replayTopPerDay=5，仅 favicon 404 全站旧存。"
     verified_at: "2026-10-19 07:05 真机点击验证通过"
     updated: "2026-10-19 07:05"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: cnfetch-dispatch-storm-cancel-deadlock-1019
+    priority: P0
+    owner: 小九的工程师
+    status: todo
+    created: 2026-10-19
+    title: cn_fetch 自愈派发风暴 + cancel-in-progress 自残死锁（14 时段 46+ 枚/小时，最后 success 13:03）
+    what: "2026-10-19 09:00 CST 起 v8_cn_fetch_cloud(wf 327687211) 被 workflow_dispatch 连片派发（基线 1 枚/小时 → 高峰 46+ 枚/小时、5 秒/枚仍在到），且新派发把在跑轮 cancel（39208501716 于 14:28:17 被取消实证）⇒ 跑不完→派发方视角永不修复→继续派发的结构性死锁；同风格风暴同打 v8_stock_quote_refresh_cloud(wf 352790648)。派发 actor=ah-quant999，两机 token 同账号无法从 API 归因，需两机各自自查本机 dispatch 循环（嫌疑：某 stale 检查无冷却自愈重派）。若死锁不解 EXPERIMENT(现 08:44) 今晚阈值后转真红卡。交接件：docs/ops/handover/2026-10-19_1440_URGENT_阿狸咪的工程师给小九的工程师_cn_fetch派发风暴cancel死锁.md"
+    evidence: "GitHub API 实拉（14:25-14:31 CST）：runs 按小时 workflow_dispatch 计数 09h=22/10h=45/11h=24/12h=10/13h=2/14h=46+（10-18 基线每小时 1）；在跑轮被取消 runs 39208501716/39208636974；最后 success=39189871402（13:03 CST）；health_patrol 最新轮 skipped（非源）、cn_fetch_watchdog 今日仅 2 轮（非源）。"
+    verify_how: "①两机止血（停本机 dispatch 循环）；②手动补一枚 cn_fetch 追平积压防 18:30 红卡；③自愈派发加冷却+同 group 未完成 run 存在即跳过+连续派发上限；④复核 stock_quote push→dispatch 反馈环。验收：cn_fetch 恢复 ≤2 pending 且出现新 success、EXPERIMENT update_time 前进。"
+    updated: "2026-10-19 14:42"
     updated_by: 阿狸咪的工程师(alimi-cn)
