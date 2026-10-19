@@ -9483,3 +9483,13 @@ items:
     verify_how: "①两机止血（停本机 dispatch 循环）；②手动补一枚 cn_fetch 追平积压防 18:30 红卡；③自愈派发加冷却+同 group 未完成 run 存在即跳过+连续派发上限；④复核 stock_quote push→dispatch 反馈环。验收：cn_fetch 恢复 ≤2 pending 且出现新 success、EXPERIMENT update_time 前进。"
     updated: "2026-10-19 14:42"
     updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: sector-yearflow-move-unlisted-1019
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: done
+    what: "『🏔 板块年度主力净流入』卡按主人令自盘后数据页迁往『🔒 暂未上架 > 📡 观测类』卡尾位。容器 id（sectorYearFlowBody/sectorYearFlowTime）与渲染函数 renderSectorYearFlow 未变仅换宿主；填充迁入 renderUnlisted.__ulRenderPane 派发名单（新增 window.__renderSectorYearFlowCard，600ms×30 自愈轮询范式同 _fillEtfMap）；仪表盘链旧 safe() 填充调用删除；_PAGE_CARD_ORDER SECTOR_YEAR_FLOW 自『盘后数据』组迁『暂未上架』组（运维面板组内顺序跟随）。数据管线不动（cloud_fetch_v8 照常产出 data/SECTOR_YEAR_FLOW.js）。"
+    evidence: "迁卡 commit 2846b7844a77（6 处编辑：盘后删卡壳/_PAGE_CARD_ORDER 两组/派发名单/pane卡壳/自愈wrapper/删旧safe调用）。⚠️ 事故与自纠：该提交基于旧基底 71d8008e 编辑却快进到新基底 1402fdf9，误回退了 build 的 STOCK_STOP_DATA 缓存戳 bump 一版 → 补推 8cdee4beaf79 恢复 08b8921e09 并经 build 周期复验。"
+    verify_how: "①31 内联块 node --check 0 错；②build 周期后 tip 前进且迁卡标记/缓存戳均未被回退；③🔴真机 msedge 直接调 renderUnlisted()：旧盘后宿主无 sectorYearFlowBody、unlistedPanel 内卡渲染 15 行表、首行『▲芯片概念+4475.9』与主人截图一致、timeText『2026-08-04~2026-10-19 · 真实累计』；④仅 favicon 404 旧存。"
+    verified_at: "2026-10-19 19:50 真机验证通过"
+    updated: "2026-10-19 19:50"
+    updated_by: 阿狸咪的工程师(alimi-cn)
