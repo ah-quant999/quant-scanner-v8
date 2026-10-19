@@ -5,6 +5,7 @@ html>
 <!-- deploy-trigger 2026-09-01T07:30 rebuild-from buckets-to-details + grid2col - 4桶胶囊改为<details>默认展开+前8只股票预览;共识段grid 2列+卡内3行(代码名🤝/chips/入场以来%);删__jumpBucket+document代理 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
+<link rel="icon" href="data:,">
 <meta http-equiv="Expires" content="0">
 <meta http-equiv="Expires" content="0">
 <script>
@@ -14621,13 +14622,28 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     function _e(x){ return String(x==null?'':x).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
     function _pl(v){ return (v==null||isNaN(v))?'var(--sub)':(Number(v)>=0?'#f4495d':'#1fd17b'); }
     var D = window.NEW_ALGO_TRI || {};
-    var vi = (D.vcp && D.vcp.items) || [];
-    if(!vi.length){
+    var _sec = D.vcp || null;
+    if(!_sec || !_sec.items){
+      /* 数据未注入：重试；耗尽后诚实报「未加载」（2026-10-19 晚修复：不再冒充加载中） */
       if(!(window.__vcpRetry && window.__vcpRetry >= 15)){ window.__vcpRetry = (window.__vcpRetry||0)+1; setTimeout(window.renderVcp, 700); return; }
-      host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">📐 缩量回踩 数据加载中…</div>'; return;
+      host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">📐 缩量回踩 数据未加载（请刷新重试；持续出现请到运维页检查 NEW_ALGO_TRI 注入）</div>'; return;
     }
+    var vi = _sec.items;
     window.__vcpRetry = 0;
     try{ if(typeof setBadge==='function'){ setBadge('vcpTime','盘后','短线', (D.update_time||'')); } }catch(e){}
+    if(!vi.length){
+      /* 🆕 2026-10-19 晚修复：数据已注入但今日 0 命中 ⇒ 诚实空态（原 bug：0 命中被当未加载，永远「数据加载中…」） */
+      host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">📐 缩量回踩 今日无命中 —— 形态信号随盘后日更累积，有命中当日自动亮榜。</div>';
+      var _B0 = window.NEW_ALGO_TRI_BACKTEST || {};
+      var _s0 = _B0.vcp || {};
+      if(typeof window.__renderBacktestTable==='function'){
+        window.__renderBacktestTable(document.getElementById('vcpBackBody'), document.getElementById('vcpBackNote'), (_s0.summary&&_s0.summary.by_period)||{}, {
+          method: '✅ 真实信号流口径（次开买入、持有 N 日收盘卖出、前复权·扣双边 0.3%）；基准=全市场等权（剔 ST/退、价格≥2）；样本随持有天数成熟累积，未走满不计入。',
+          defaultNote: '真实信号流口径：上线首日即建归档，样本随持有天数成熟累积，未走满 T+N 不计入。'
+        });
+      }
+      return;
+    }
     var h = '';
     h += '<div class="note" style="line-height:1.75;margin-bottom:12px;"><b style="color:#22d3ee;">📐 缩量回踩（VCP）</b> · 三新算法① —— 全 K 线库扫描「中期多头 + 放量启动后缩量回踩 + 波动逐级收缩」形态；现有算法无一覆盖「缩量回踩买点」形态 ⇒ 差异互补。评分=缩量深度+收缩级数+守位+强度。</div>';
     h += '<div class="note" style="margin-bottom:8px;">红涨绿跌；形态观测口径，持有期收益随交易日成熟，未走满 T+N 档位显示「<span style="color:var(--dim);">累积中</span>」。</div>';
@@ -14665,13 +14681,28 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     function _pl(v){ return (v==null||isNaN(v))?'var(--sub)':(Number(v)>=0?'#f4495d':'#1fd17b'); }
     function _stg(t){ var m={'主升':'#f4495d','启动':'#f4495d','吸筹':'#fbbf24','退潮':'#1fd17b','观察':'var(--dim)'}; return '<span style="color:'+(m[t]||'var(--dim)')+';font-weight:700;">'+_e(t)+'</span>'; }
     var D = window.NEW_ALGO_TRI || {};
-    var ri = (D.rotation && D.rotation.items) || [];
-    if(!ri.length){
+    var _sec = D.rotation || null;
+    if(!_sec || !_sec.items){
+      /* 数据未注入：重试；耗尽后诚实报「未加载」（2026-10-19 晚修复：不再冒充加载中） */
       if(!(window.__rotRetry && window.__rotRetry >= 15)){ window.__rotRetry = (window.__rotRetry||0)+1; setTimeout(window.renderRotation, 700); return; }
-      host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">🔄 板块共振轮动 数据加载中…</div>'; return;
+      host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">🔄 板块共振轮动 数据未加载（请刷新重试；持续出现请到运维页检查 NEW_ALGO_TRI 注入）</div>'; return;
     }
+    var ri = _sec.items;
     window.__rotRetry = 0;
     try{ if(typeof setBadge==='function'){ setBadge('rotationTime','盘后','短线', (D.update_time||'')); } }catch(e){}
+    if(!ri.length){
+      /* 🆕 2026-10-19 晚修复：数据已注入但今日 0 命中 ⇒ 诚实空态（原 bug：0 命中被当未加载，永远「数据加载中…」） */
+      host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">🔄 板块共振轮动 今日无命中 —— 四源共振信号随盘后日更累积，有命中当日自动亮榜。</div>';
+      var _B0 = window.NEW_ALGO_TRI_BACKTEST || {};
+      var _s0 = _B0.rotation || {};
+      if(typeof window.__renderBacktestTable==='function'){
+        window.__renderBacktestTable(document.getElementById('rotationBackBody'), document.getElementById('rotationBackNote'), (_s0.summary&&_s0.summary.by_period)||{}, {
+          method: '✅ 真实信号流口径（各板块当日龙头个股次开买入、持有 N 日收盘卖出、前复权·扣双边 0.3%）；基准=全市场等权（剔 ST/退、价格≥2）；样本随持有天数成熟累积，未走满不计入。',
+          defaultNote: '真实信号流口径：上线首日即建归档，样本随持有天数成熟累积，未走满 T+N 不计入。'
+        });
+      }
+      return;
+    }
     var h = '';
     h += '<div class="note" style="line-height:1.75;margin-bottom:12px;"><b style="color:#a78bfa;">🔄 板块资金共振轮动</b> · 三新算法② —— 四源共振定位板块周期（吸筹/启动/主升/退潮）+ 龙头组合：资金流（连续流入天数+5日净额）× SECTOR_RS（相对强度）× 涨停热力（近5日家数）× SECTOR_LEADERS（龙头）。「板块资金趋势」卡只看资金，本卡给<b>周期定位+龙头组合</b>。</div>';
     h += '<div class="note" style="margin-bottom:8px;">红涨绿跌；周期观测口径，回测按各板块当日龙头个股前向测，样本随持有天数成熟。</div>';
@@ -14715,14 +14746,28 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     function _e(x){ return String(x==null?'':x).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
     function _pl(v){ return (v==null||isNaN(v))?'var(--sub)':(Number(v)>=0?'#f4495d':'#1fd17b'); }
     var D = window.NEW_ALGO_TRI || {};
-    var li = (D.lhb && D.lhb.items) || [];
-    var ldate = (D.lhb && D.lhb.date) || '';
-    if(!li.length || !ldate){
+    var _sec = D.lhb || null;
+    if(!_sec || !_sec.items){
+      /* 数据未注入：重试；耗尽后诚实报「未加载」（2026-10-19 晚修复：不再冒充加载中） */
       if(!(window.__lhbRetry && window.__lhbRetry >= 15)){ window.__lhbRetry = (window.__lhbRetry||0)+1; setTimeout(window.renderLhb, 700); return; }
-      host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">🐉 龙虎机构跟随 数据加载中…</div>'; return;
+      host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">🐉 龙虎机构跟随 数据未加载（请刷新重试；持续出现请到运维页检查 NEW_ALGO_TRI 注入）</div>'; return;
     }
+    var li = _sec.items;
     window.__lhbRetry = 0;
     try{ if(typeof setBadge==='function'){ setBadge('lhbTime','盘后','短线', (D.update_time||'')); } }catch(e){}
+    if(!li.length){
+      /* 🆕 2026-10-19 晚修复：数据已注入但今日 0 命中 ⇒ 诚实空态（原 bug：0 命中被当未加载，永远「数据加载中…」） */
+      host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">🐉 龙虎机构跟随 今日无命中 —— 机构净买≥3000万信号随盘后日更累积，有命中当日自动亮榜。</div>';
+      var _B0 = window.NEW_ALGO_TRI_BACKTEST || {};
+      var _s0 = _B0.lhb || {};
+      if(typeof window.__renderBacktestTable==='function'){
+        window.__renderBacktestTable(document.getElementById('lhbBackBody'), document.getElementById('lhbBackNote'), (_s0.summary&&_s0.summary.by_period)||{}, {
+          method: '✅ 真实信号流口径（机构净买标的次开买入、持有 N 日收盘卖出、前复权·扣双边 0.3%）；基准=全市场等权（剔 ST/退、价格≥2）；样本随持有天数成熟累积，未走满不计入。',
+          defaultNote: '真实信号流口径：上线首日即建归档，样本随持有天数成熟累积，未走满 T+N 不计入。'
+        });
+      }
+      return;
+    }
     var h = '';
     h += '<div class="note" style="line-height:1.75;margin-bottom:12px;"><b style="color:#fb923c;">🐉 龙虎榜 · 机构跟随</b> · 三新算法③ —— 龙虎榜机构席位净买 ≥3000万 的跟随榜，分<b style="color:#f4495d">顺势跟随</b>（当日上涨）与<b style="color:#1fd17b">逆势接货</b>（当日下跌）；机构独买加分、机游共振再加分。「机游共振」卡是日历统计视角，本卡是个股可操作跟随意愿榜。</div>';
     h += '<div class="note" style="margin-bottom:8px;">红涨绿跌；席位跟随观测口径，样本随持有天数成熟，未走满 T+N 档位显示「<span style="color:var(--dim);">累积中</span>」。</div>';
@@ -14906,10 +14951,10 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       lowvolBack:function(){return !!(window.LOWVOL_TREND_BACKTEST&&window.LOWVOL_TREND_BACKTEST.summary&&window.LOWVOL_TREND_BACKTEST.summary.by_period&&Object.keys(window.LOWVOL_TREND_BACKTEST.summary.by_period).length);},  // 🆕 2026-10-18 阿狸咪：低波趋稳回测就绪判定
       intraday:function(){return !!(window.INTRADAY_MOMENTUM&&window.INTRADAY_MOMENTUM.picks&&window.INTRADAY_MOMENTUM.picks.length);},  // 🆕 2026-10-18 夜 阿狸咪：日内动量子页就绪判定（INTRADAY_MOMENTUM 注入到位）
       intradayBack:function(){return !!(window.INTRADAY_MOMENTUM_BACKTEST&&window.INTRADAY_MOMENTUM_BACKTEST.summary&&window.INTRADAY_MOMENTUM_BACKTEST.summary.by_period&&Object.keys(window.INTRADAY_MOMENTUM_BACKTEST.summary.by_period).length);},  // 🆕 2026-10-18 夜 阿狸咪：日内动量回测就绪判定
-      /* 🆕 2026-10-19 主人令：三新算法子页就绪判定（NEW_ALGO_TRI 注入到位即渲染；回测表 by_period 首日空，由卡片内「累积中」诚实展示，不依赖此判定） */
-      vcp:function(){return !!(window.NEW_ALGO_TRI&&window.NEW_ALGO_TRI.vcp&&window.NEW_ALGO_TRI.vcp.items&&window.NEW_ALGO_TRI.vcp.items.length);},
-      rotation:function(){return !!(window.NEW_ALGO_TRI&&window.NEW_ALGO_TRI.rotation&&window.NEW_ALGO_TRI.rotation.items&&window.NEW_ALGO_TRI.rotation.items.length);},
-      lhb:function(){return !!(window.NEW_ALGO_TRI&&window.NEW_ALGO_TRI.lhb&&window.NEW_ALGO_TRI.lhb.items&&window.NEW_ALGO_TRI.lhb.items.length&&window.NEW_ALGO_TRI.lhb.date);},
+      /* 🆕 2026-10-19 主人令：三新算法子页就绪判定（2026-10-19 晚修复：原判 items.length>0 把「今日 0 命中」误判为未就绪 ⇒ 永远「数据加载中…」；现就绪=数据注入到位，0 命中由渲染器诚实空态展示） */
+      vcp:function(){return !!(window.NEW_ALGO_TRI&&window.NEW_ALGO_TRI.vcp&&window.NEW_ALGO_TRI.vcp.items);},
+      rotation:function(){return !!(window.NEW_ALGO_TRI&&window.NEW_ALGO_TRI.rotation&&window.NEW_ALGO_TRI.rotation.items);},
+      lhb:function(){return !!(window.NEW_ALGO_TRI&&window.NEW_ALGO_TRI.lhb&&window.NEW_ALGO_TRI.lhb.items);},
       // 2026-09-12 主人令：因子实验室子页（原暂未上架·因子类迁入）就绪判定，双源任一到位即可
     };
     var _chk=_map[n]||function(){return true;};
