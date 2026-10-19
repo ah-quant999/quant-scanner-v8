@@ -16079,21 +16079,6 @@ h += '<div class="card" id="sectorLeadersCard" style="display:none;margin-bottom
    + '<div id="sectorLeadersBody"><div class="note">加载中&#x2026;</div></div>'
    + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 「主升/启动」判定与「板块资金趋势」卡<b style="color:#f87171;">同源同规则</b>（同一份 SECTOR_RS 数据 + 同一个判定函数）&#8658; 两卡板块计数一致（主升 5日&gt;3%且20日&gt;5%；启动 5日&gt;1.5%且20日&gt;-8%）；个股为板块内当日涨幅排序，<b style="color:#fbbf24">非推荐信号，不构成投资建议</b>。</div></div>';
 
-// ═══ 📊 2026-10-19 主人令：最终推荐 · 强势板块龙头股（观测类第 2 卡，紧跟主升/启动卡）═══
-//   需求原话：「在暂未上架新建卡，把最终推荐这里显示的板块对应的龙头股写进去，跟着最终推荐日更」。
-//   板块清单 = window.FINAL_RECOMMEND_DATA.strong_sectors（与最终推荐卡顶部「当前强势板块」同源同序，
-//   跟着最终推荐日更）；个股 = window.SECTOR_LEADERS.fr_sectors（scripts/fetch_sector_leaders.py
-//   扩展节：东财对应板块成分股当日涨幅前 5，与主升/启动卡同口径同兜底）。
-//   无数据 ⇒ 整卡保持 display:none（不产空壳卡）；填充见 window._fillFrLeaders（600ms×30 自愈）。
-h += '<div class="card" id="frLeadersCard" style="display:none;margin-bottom:16px;border-left:4px solid #fbbf24;">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
-   + '<span style="font-size:15px;font-weight:700;color:#fbbf24;">&#x1F4CA; 最终推荐 &#183; 强势板块龙头股</span>'
-   + '<span class="fresh" id="frLeadersFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 跟随「最终推荐」日更</span></div>'
-   + '<div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.25);border-radius:7px;padding:8px 11px;margin-bottom:10px;font-size:12px;line-height:1.7;color:var(--txt);">'
-   + '<b style="color:#fbbf24;">&#x1F4CC; 核心：</b>把「最终推荐」判定的强势板块直接翻译成龙头股。板块名单 = 最终推荐卡顶部「当前强势板块（相对强度 TOP）」<b>同一份名单、同一顺序</b>；个股 = 东财对应板块成分股当日涨幅前 5。</div>'
-   + '<div id="frLeadersBody"><div class="note">加载中&#x2026;</div></div>'
-   + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 个股为板块内当日涨幅排序，<b style="color:#fbbf24">非推荐信号，不构成投资建议</b>。</div></div>';
 // 🆕 2026-10-19 主人令：三新算法（VCP/板块共振/LHB）已迁入选股策略独立子页（st-vcp / st-rotation / st-lhb，
 //   各带信号卡 + 真实信号流回测卡，仿日内动量），原「暂未上架」三张观测卡（triVcpCard/triRotCard/triLhbCard）
 //   整段删除（避免死代码 + 重复展示）。三张卡内容现由 renderVcp/renderRotation/renderLhb 在选股策略子页渲染。
@@ -16119,6 +16104,22 @@ h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;
    + '<div id="dbgEtfMapBody"><div class="note">加载中&#x2026;</div></div>'
    + '<hr style="border:none;border-top:1px dashed rgba(56,189,248,.25);margin:12px 0;">'
    + '<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;color:var(--sub);">研究信号，未纳入推荐链路。</div></div>';
+
+// ═══ 📊 2026-10-19 主人令：最终推荐 · 强势板块龙头股（观测类第 3 卡；21:55 主人令：实时的卡置顶，纯盘后日更卡下移至「概念/行业 → ETF·龙头 参考」卡之后）═══
+//   需求原话：「在暂未上架新建卡，把最终推荐这里显示的板块对应的龙头股写进去，跟着最终推荐日更」。
+//   板块清单 = window.FINAL_RECOMMEND_DATA.strong_sectors（与最终推荐卡顶部「当前强势板块」同源同序，
+//   跟着最终推荐日更）；个股 = window.SECTOR_LEADERS.fr_sectors（scripts/fetch_sector_leaders.py
+//   扩展节：东财对应板块成分股当日涨幅前 5，与主升/启动卡同口径同兜底）。
+//   无数据 ⇒ 整卡保持 display:none（不产空壳卡）；填充见 window._fillFrLeaders（600ms×30 自愈）。
+h += '<div class="card" id="frLeadersCard" style="display:none;margin-bottom:16px;border-left:4px solid #fbbf24;">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+   + '<span style="font-size:15px;font-weight:700;color:#fbbf24;">&#x1F4CA; 最终推荐 &#183; 强势板块龙头股</span>'
+   + '<span class="fresh" id="frLeadersFresh">&#x2014;</span>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 跟随「最终推荐」日更</span></div>'
+   + '<div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.25);border-radius:7px;padding:8px 11px;margin-bottom:10px;font-size:12px;line-height:1.7;color:var(--txt);">'
+   + '<b style="color:#fbbf24;">&#x1F4CC; 核心：</b>把「最终推荐」判定的强势板块直接翻译成龙头股。板块名单 = 最终推荐卡顶部「当前强势板块（相对强度 TOP）」<b>同一份名单、同一顺序</b>；个股 = 东财对应板块成分股当日涨幅前 5。</div>'
+   + '<div id="frLeadersBody"><div class="note">加载中&#x2026;</div></div>'
+   + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 个股为板块内当日涨幅排序，<b style="color:#fbbf24">非推荐信号，不构成投资建议</b>。</div></div>';
 // 2026-09-14 主人令：恢复被删的两张观测卡（卡容器 + 函数定义 + 数据注入三件同时补齐，避免只补壳子变恒空）
 // 🚚 2026-09-15 主人令：AI 洞察·多源观点对比 整卡迁往「🌍 观测平台 > 🌍 宏观观测」（K 型分层卡上方），
 //   容器 id 未变 ⇒ 本页不再渲染它；观测类 pane 现为 1 卡（主题空间），派发名单同步收窄为 __renderThemeValue。
