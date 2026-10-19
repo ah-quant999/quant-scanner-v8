@@ -1754,7 +1754,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_SZ_HISTORY.js?v=41f72919d7" defer></script>
 <script src="data/CANDIDATE.js?v=f20f7e6575" defer></script>
 
-    <script src="data/STOCK_STOP_DATA.js?v=08b8921e09" defer></script>
+    <script src="data/STOCK_STOP_DATA.js?v=7984c9fcd1" defer></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=dd4f3fc356" defer></script>
 <script src="data/BACKTEST_TDX.js?v=11575415f9" defer></script>
 
@@ -3013,12 +3013,9 @@ function fmtSigned(v){
       <div id="breadthBody"><div class="ipo-empty">加载中…</div></div>
     </div>
 
-    <!-- 🏔 板块年度主力净流入累积表（2026-10-17 主人令「加」：自建·真实历史回填） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🏔</span>板块年度主力净流入 · <span class="fresh" id="sectorYearFlowTime">—</span></h3>
-      <div id="sectorYearFlowBody"><div class="ipo-empty">加载中…</div></div>
-      <div class="note">口径：东财行业板块逐日主力净流入官方历史按自然年累加（自建累积表·历史回填真实数据，非估算）；红=净流入、绿=净流出。盘后更新。</div>
-    </div>
+    <!-- 🚚 2026-10-19 主人令：「🏔 板块年度主力净流入」整卡迁往「🔒 暂未上架 > 📡 观测类」
+         （容器 id sectorYearFlowBody/sectorYearFlowTime 与渲染函数 renderSectorYearFlow 未变，仅换宿主；
+           填充派发见 renderUnlisted.__ulRenderPane / window.__renderSectorYearFlowCard 600ms×30 自愈轮询） -->
 
     <!-- 宏观数据速览（2026-08-30：盘后数据补位） -->
     <div class="card" style="margin-bottom:16px">
@@ -12996,12 +12993,12 @@ function drawUpDownChart(){
     '观测平台': ['SH_FIB', 'maharo_insights', 'INDEX_VALUE_FRAMEWORK', 'WAVE_ELLIOTT', 'CITIC_PE_THERMO'],
     '今日事件': ['V8_CAL', 'IPO_DATA', 'JUDGMENT_DATA', 'MACRO_DATA', 'RESTRICTED_RELEASE', 'PERFORMANCE_FORECAST'],
     '实时数据': ['INDEX_QUOTES', 'ETF_PULSE', 'ETF_INTRADAY_HEAT', 'SECTOR_FUND_FLOW', 'CONCEPT_RANKING', 'LIMIT_UP_HEATMAP', 'SECTOR_FUND_FLOW_INTRADAY', 'MARKET_ALERTS', 'STOCK_QUOTE', 'CFFEX_HOLDINGS', 'AVG_PRICE_DATA', 'OVERSEAS_MARKETS', 'AI_MARKET_BRIEF', 'COMMODITY_ELASTICITY'],
-    '盘后数据': ['MARGIN_DATA', 'ETF_DAILY_MONITOR', 'SECTOR_RECOMMENDATION', 'ETF_NET_SUBSCRIPTION', 'W52_HIGH', 'SECTOR_YEAR_FLOW'],
+    '盘后数据': ['MARGIN_DATA', 'ETF_DAILY_MONITOR', 'SECTOR_RECOMMENDATION', 'ETF_NET_SUBSCRIPTION', 'W52_HIGH'],  /* 🚚 2026-10-19：SECTOR_YEAR_FLOW 随卡迁往暂未上架 */
     '共振日历': ['CRISIS_DATA', 'LHB_DATA'],
     '最终推荐': ['FACTOR_LAB', 'TOP10_DAILY'],
     '选股策略': ['CANDIDATE', 'GOLD_POOL', 'IMA_STRONG_BACKTEST', 'VOLATILITY', 'STOCK_STOP_DATA', 'H_AUTO_BUY', 'H_AUTO_BUY_TRACK', 'IMA_STRONG_STOCK', 'FIRST_BOARD_ALERT', 'LIANBAN_WINRATE'],  /* 🆕 2026-10-19：连板梯队两卡自暂未上架迁入 */  /* 🔴 2026-10-11：TRIPLE_CONSENSUS/TRIPLE_HISTORY/CRDS_CARD_DATA 随两策略下架移除；🔴 2026-10-18：四量终极+ALGO_TRACK 随四量下架移除 */
     '策略回测': ['BACKTEST_ALL_ALGOS'],
-    '暂未上架': ['MARKET_REGIME', 'SECTOR_LEADERS', 'DAJIJIN_REDUCTION'],  /* 🔴 2026-10-19：FIRST_BOARD_ALERT 随卡迁入选股策略 */
+    '暂未上架': ['MARKET_REGIME', 'SECTOR_LEADERS', 'DAJIJIN_REDUCTION', 'SECTOR_YEAR_FLOW'],  /* 🔴 2026-10-19：FIRST_BOARD_ALERT 随卡迁入选股策略；🚚 SECTOR_YEAR_FLOW 自盘后数据迁入 */
     '运维': ['INST_TRADE', 'DO_NOT_DELETE'],
     '全量数据': ['NT_DATA', 'all_AUDIT_TRAIL', 'all_BACKTEST_COMPREHENSIVE', 'all_BACKTEST_TDX', 'all_CANDIDATE_BACKTEST', 'all_CANDIDATE_QUOTES', 'all_CAPITAL_FLOW_DATA', 'all_CITIC_PE_BACKTEST', 'all_CONCEPT_ETF_MAP', 'all_EXPERIMENT', 'all_FACTOR_AUDIT', 'all_FACTOR_LAB_BACKTEST', 'all_FACTOR_PROGRESS', 'all_FACTOR_WALKFORWARD', 'all_FINAL_RECOMMEND_DATA', 'all_FRESHNESS_STATUS', 'all_FUNDAMENTAL_QUALITY', 'all_GOLD_POOL_BACKTEST', 'all_HB_ALIMI', 'all_HB_XIAOJIU', 'all_HEALTH_CHECK', 'all_INDEX_HISTORY', 'all_LHB_HISTORY', 'all_LIMIT_UP_BROKEN', 'all_MACRO_BRIEF', 'all_MARKET_THERMO', 'all_NORTH_FUND', 'all_OPTIMIZED_STRATEGY', 'all_PORTFOLIO', 'all_RISK_GAUGE', 'all_RUNNER_STATUS', 'all_RUNNER_STATUS_HEALTH', 'all_SECTOR_CYCLE_ARCHIVE', 'all_SECTOR_FUND_FLOW_INTRADAY', 'all_SECTOR_FUND_FLOW_TREND', 'all_SECTOR_PHASE_HISTORY', 'all_SECTOR_RS', 'all_SENTIMENT_CYCLE', 'all_SH_SZ_HISTORY', 'all_STOCK_LIST', 'all_SUSPENSION_ALERT', 'all_SZ_FIB', 'all_US_HK_MAP', 'all_V8_POOL_TRACKER', 'all_VALUATION_PERCENTILE', 'all_WEEKEND_META_REPORT', 'all_WEEKEND_RUN'],  /* 🔴 2026-10-11：all_CRDS_BACKTEST/all_TRIPLE_TRACK 随两策略下架移除 */
     '管线': ['raw_etf_pulse.json', 'raw_capital_flow_data.json', 'raw_index_quotes.json', 'raw_crisis_data.json', 'raw_concept_ranking.json', 'raw_volume', 'site_sync', 'runner_local', 'runner_github', 'runner'],
@@ -13782,7 +13779,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 2026-08-30 主人令：盘后数据页扩展（宽度/期指/宏观/解禁日历/业绩预告）
     // 情绪温度条、龙虎榜净买榜已删除（分别与实时「连板天梯」、共振日历重复）
     safe(window.renderMarketBreadth, window.W52_HIGH || {});
-    safe(window.renderSectorYearFlow, window.SECTOR_YEAR_FLOW || {});
+    /* 🚚 2026-10-19：renderSectorYearFlow 填充调用已随卡迁往 renderUnlisted.__ulRenderPane 派发（原盘后容器不存在） */
     safe(window.renderCffexPosition, window.CFFEX_POSITION || {});  // 🆕 2026-10-15 IF会员持仓择时
     safe(window.renderFuturesMain, window.CFFEX_HOLDINGS || {});
     safe(window.renderMacroSummary, window.MACRO_DATA || {});
@@ -15708,6 +15705,21 @@ window._fillTriAlgos = function(){
 
 
 
+  // 🚚 2026-10-19：「板块年度主力净流入」卡填充派发器（自盘后数据迁入暂未上架·观测类）。
+  //   范式同 _fillEtfMap/_fillUsHkMap：defer 数据未到时 600ms×30 自愈轮询；容器消失（未进页/迁走）即停。
+  window.__renderSectorYearFlowCard = function(){
+    var n = 0;
+    (function _go(){
+      var b = document.getElementById('sectorYearFlowBody');
+      if(!b) return;                                   // 容器不存在：未进「暂未上架」或卡已再迁，静默退出
+      if(window.SECTOR_YEAR_FLOW && (window.SECTOR_YEAR_FLOW.sectors || []).length){
+        try{ window.renderSectorYearFlow(window.SECTOR_YEAR_FLOW); }catch(e){}
+        return;
+      }
+      if(n++ < 30) setTimeout(_go, 600);               // data/SECTOR_YEAR_FLOW.js 尚未注入：继续等
+    })();
+  };
+
   function renderUnlisted(){
     // 🛡 2026-08-20 一劳永逸加固（主人「新建 AI 预测空白 + v6 备忘录空白」）：
     //   1) $ 兜底：$ 是 IIFE 闭包变量，若因加载时序未就绪会 TypeError → 整页空白。
@@ -15727,7 +15739,7 @@ window._fillTriAlgos = function(){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       // 2026-09-15：__renderAiInsightsCompare 已随卡迁往「🌍 观测平台 > 🌍 宏观观测」，
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderThemeValue', '_fillFrLeaders', '_fillTriAlgos'];   /* 📊 2026-10-19：+最终推荐·强势板块龙头股 */
+      var names = ['__renderThemeValue', '_fillFrLeaders', '_fillTriAlgos', '__renderSectorYearFlowCard'];   /* 📊 2026-10-19：+最终推荐·强势板块龙头股；🚚 2026-10-19：+板块年度主力净流入（自盘后数据迁入） */
       var probe = document.getElementById('themeValueBody');
       if(probe) probe.setAttribute('data-ulpane', tab);
       var out = [];
@@ -15988,6 +16000,13 @@ h += '<div class="card" id="dajijinCard" style="display:none;margin-bottom:16px;
 //   全仓无生成脚本）⇒ 09-23 21:15 后永为死数据，卡上「每日巡检」标签失实。
 //   渲染函数 __renderMacroKShape / 派发块 / V8_PAGE_SCHEDULE / _PAGE_CARD_ORDER / script 注入
 //   / v8_health_check.py 条目 / data/MACRO_KSHAPE.js 同批清理（见 git 历史）。
+// 🚚 2026-10-19 主人令：「🏔 板块年度主力净流入」自盘后数据迁入观测类（卡尾位）
+h += '<div class="card" style="margin-bottom:16px;">'
+   + '<h3><span class="ic">🏔</span>板块年度主力净流入 · <span class="fresh" id="sectorYearFlowTime">—</span></h3>'
+   + '<div id="sectorYearFlowBody"><div class="ipo-empty">加载中…</div></div>'
+   + '<div class="note">口径：东财行业板块逐日主力净流入官方历史按自然年累加（自建累积表·历史回填真实数据，非估算）；红=净流入、绿=净流出。盘后更新。</div>'
+   + '</div>';
+
 h += '</div>'; // /ulPaneObserve
 
 // ===== 📊 大盘观察 pane —— 🚚 2026-09-15 主人令：整页迁出 =====
