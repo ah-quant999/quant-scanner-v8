@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-19 17:58",
- "generated": "2026-10-19 17:58",
+ "update_time": "2026-10-19 18:08",
+ "generated": "2026-10-19 18:08",
  "meta": {
-  "generated": "2026-10-19 17:58",
+  "generated": "2026-10-19 18:08",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 26,
   "days_with_consensus": 0,
@@ -10564,8 +10564,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "920690",
       "name": "捷众科技",
-      "change_pct": 7.484,
-      "price": 20.68,
+      "change_pct": 7.536,
+      "price": 20.69,
       "category": "突破"
      },
      {
@@ -10671,8 +10671,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "920690",
       "name": "捷众科技",
-      "change_pct": 7.484,
-      "price": 20.68,
+      "change_pct": 7.536,
+      "price": 20.69,
       "category": "加速"
      },
      {
@@ -10715,8 +10715,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "920690",
       "name": "捷众科技",
-      "change_pct": 7.484,
-      "price": 20.68,
+      "change_pct": 7.536,
+      "price": 20.69,
       "category": "短线选股"
      },
      {

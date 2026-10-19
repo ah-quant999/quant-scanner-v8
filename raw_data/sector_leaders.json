@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-10-17 02:15",
-  "republish_time": "2026-10-17 10:08:00",
+  "update_time": "2026-10-19 16:05",
+  "republish_time": "2026-10-19 16:46:04",
   "data_date": "2026-10-16",
   "rule_ver": 2,
   "top_n": 5,
-  "source": "东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期 + 腾讯NeoData 板块成分明细（东财 push2 封禁兜底 3 板块）",
+  "source": "东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期",
   "phase": "主升+启动",
   "sector_count": 4,
   "sectors": [
@@ -52,7 +52,7 @@
           "main_net": 1022200.0
         }
       ],
-      "match": "neodata"
+      "match": "retained:norm"
     },
     {
       "name": "军工装备",
@@ -98,7 +98,7 @@
           "main_net": -49264200.0
         }
       ],
-      "match": "neodata"
+      "match": "retained:alias:exact"
     },
     {
       "name": "文化传媒",
@@ -144,7 +144,7 @@
           "main_net": 6117800.0
         }
       ],
-      "match": "neodata"
+      "match": "retained:alias:exact"
     },
     {
       "name": "影视院线",
@@ -157,46 +157,250 @@
         {
           "code": "002343",
           "name": "慈文传媒",
-          "price": 9.33,
-          "chg": 4.71,
-          "main_net": null
+          "price": 10.26,
+          "chg": 9.97,
+          "main_net": 337546243.0
         },
         {
-          "code": "603103",
-          "name": "横店影视",
-          "price": 16.53,
-          "chg": -0.24,
-          "main_net": null
+          "code": "300182",
+          "name": "捷成股份",
+          "price": 5.59,
+          "chg": 2.01,
+          "main_net": 85719143.0
+        },
+        {
+          "code": "002739",
+          "name": "儒意电影",
+          "price": 8.27,
+          "chg": 1.6,
+          "main_net": -20063337.0
         },
         {
           "code": "600977",
           "name": "中国电影",
-          "price": 14.14,
-          "chg": -0.28,
-          "main_net": null
+          "price": 14.32,
+          "chg": 1.27,
+          "main_net": -672860.0
         },
         {
-          "code": "002905",
-          "name": "金逸影视",
-          "price": 8.77,
-          "chg": -0.9,
-          "main_net": null
-        },
-        {
-          "code": "300027",
-          "name": "ST华谊",
-          "price": 1.6,
-          "chg": -1.23,
-          "main_net": null
+          "code": "600088",
+          "name": "中视传媒",
+          "price": 13.43,
+          "chg": 1.13,
+          "main_net": -2236602.0
         }
       ],
       "match": "exact"
     }
   ],
+  "fr_count": 12,
+  "fr_sectors": [
+    {
+      "name": "公路铁路运输",
+      "bk": "BK0421",
+      "cons_count": 36,
+      "leaders": [
+        {
+          "code": "000429",
+          "name": "粤高速Ａ",
+          "price": 13.91,
+          "chg": 1.83,
+          "main_net": -13079416.0
+        },
+        {
+          "code": "600012",
+          "name": "皖通高速",
+          "price": 17.85,
+          "chg": 1.77,
+          "main_net": -11331941.0
+        },
+        {
+          "code": "000828",
+          "name": "东莞控股",
+          "price": 10.19,
+          "chg": 1.39,
+          "main_net": -982808.0
+        },
+        {
+          "code": "600368",
+          "name": "五洲交通",
+          "price": 4.32,
+          "chg": 1.17,
+          "main_net": 7299270.0
+        },
+        {
+          "code": "601816",
+          "name": "京沪高铁",
+          "price": 5.19,
+          "chg": 1.17,
+          "main_net": -5275568.0
+        }
+      ],
+      "match": "alias:exact"
+    },
+    {
+      "name": "军工装备",
+      "bk": "BK1204",
+      "cons_count": 100,
+      "leaders": [
+        {
+          "code": "000576",
+          "name": "甘化科工",
+          "price": 9.65,
+          "chg": 10.03,
+          "main_net": 52920460.0
+        },
+        {
+          "code": "688563",
+          "name": "航材股份",
+          "price": 53.8,
+          "chg": 8.71,
+          "main_net": 12937463.0
+        },
+        {
+          "code": "600435",
+          "name": "北方导航",
+          "price": 12.88,
+          "chg": 8.33,
+          "main_net": 147522782.0
+        },
+        {
+          "code": "688543",
+          "name": "国科军工",
+          "price": 48.59,
+          "chg": 7.95,
+          "main_net": 41161550.0
+        },
+        {
+          "code": "688084",
+          "name": "晶品特装",
+          "price": 42.29,
+          "chg": 6.26,
+          "main_net": 4263285.0
+        }
+      ],
+      "match": "alias:exact"
+    },
+    {
+      "name": "小金属",
+      "bk": "BK1027",
+      "cons_count": 0,
+      "leaders": [],
+      "leaders_error": 1,
+      "match": "exact"
+    },
+    {
+      "name": "影视院线",
+      "bk": "BK1222",
+      "cons_count": 18,
+      "leaders": [
+        {
+          "code": "002343",
+          "name": "慈文传媒",
+          "price": 10.26,
+          "chg": 9.97,
+          "main_net": null
+        },
+        {
+          "code": "300182",
+          "name": "捷成股份",
+          "price": 5.59,
+          "chg": 2.01,
+          "main_net": null
+        },
+        {
+          "code": "002739",
+          "name": "儒意电影",
+          "price": 8.27,
+          "chg": 1.6,
+          "main_net": null
+        },
+        {
+          "code": "600977",
+          "name": "中国电影",
+          "price": 14.32,
+          "chg": 1.27,
+          "main_net": null
+        },
+        {
+          "code": "600088",
+          "name": "中视传媒",
+          "price": 13.43,
+          "chg": 1.13,
+          "main_net": null
+        }
+      ],
+      "match": "exact"
+    },
+    {
+      "name": "文化传媒",
+      "bk": "BK0486",
+      "cons_count": 0,
+      "leaders": [],
+      "leaders_error": 1,
+      "match": "alias:exact"
+    },
+    {
+      "name": "机场航运",
+      "bk": "BK0420",
+      "cons_count": 0,
+      "leaders": [],
+      "leaders_error": 1,
+      "match": "alias:exact"
+    },
+    {
+      "name": "游戏",
+      "bk": "BK1046",
+      "cons_count": 0,
+      "leaders": [],
+      "leaders_error": 1,
+      "match": "norm"
+    },
+    {
+      "name": "白酒",
+      "bk": "BK1277",
+      "cons_count": 0,
+      "leaders": [],
+      "leaders_error": 1,
+      "match": "norm"
+    },
+    {
+      "name": "证券",
+      "bk": "BK0473",
+      "cons_count": 0,
+      "leaders": [],
+      "leaders_error": 1,
+      "match": "norm"
+    },
+    {
+      "name": "贵金属",
+      "bk": "BK0732",
+      "cons_count": 0,
+      "leaders": [],
+      "leaders_error": 1,
+      "match": "exact"
+    },
+    {
+      "name": "轨交设备",
+      "bk": "BK1236",
+      "cons_count": 0,
+      "leaders": [],
+      "leaders_error": 1,
+      "match": "norm"
+    },
+    {
+      "name": "银行",
+      "bk": "BK1283",
+      "cons_count": 0,
+      "leaders": [],
+      "leaders_error": 1,
+      "match": "exact"
+    }
+  ],
   "nomatch_count": 0,
   "leaders_fail_count": 0,
-  "neo_fallback_count": 3,
-  "retained_count": 0,
+  "neo_fallback_count": 0,
+  "retained_count": 3,
   "em_boards_source": "cache",
   "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*)"
 }

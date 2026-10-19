@@ -1,13 +1,36 @@
 {
-  "update_time": "2026-10-18 02:59:29",
-  "run_start": "2026-10-18 02:37:38",
-  "ok": 8,
-  "fail": 1,
+  "update_time": "2026-10-19 18:02:47",
+  "run_start": "2026-10-19 16:33:23",
+  "ok": 30,
+  "fail": 4,
   "failed_scripts": [
     {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
+      "script": "v8/factor_lab_gen.py",
+      "reason": "退出码 1 | 接收数据异常，请稍后再试。"
+    },
+    {
+      "script": "gen_lqsq_top5.py",
+      "reason": "退出码 1 | 数据日 2026-10-19 对齐率不足（1/5008= 0% < 60%）——kline_cache 新鲜度异常，保护性中止（末根分布 top5: 2026-09-16:610, 2026-09-07:561, 2026-10-16:499, 2026-09-08:448, 2026-09-21:395）"
+    },
+    {
+      "script": "strategy_lowvol_trend.py",
+      "reason": "超时 >10min"
+    },
+    {
+      "script": "strategy_intraday_momentum.py",
+      "reason": "超时 >10min"
     }
   ],
-  "skipped_by_time_gate": []
+  "skipped_by_time_gate": [
+    "build_candidate_pool.py",
+    "generate_top10.py",
+    "backtest_tdx.py",
+    "backtest_comprehensive.py",
+    "export_optimized_strategy.py",
+    "calc_volatility_watch.py",
+    "gen_stock_stop.py",
+    "calc_sentiment_cycle.py",
+    "backtest_expectancy.py",
+    "final_recommend.py"
+  ]
 }

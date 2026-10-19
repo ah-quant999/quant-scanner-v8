@@ -412,6 +412,9 @@ STAGES = {
         # "gen_triple_consensus.py", "gen_triple_track.py",
         "calc_volatility_watch.py",
         "gen_stock_stop.py", "calc_sentiment_cycle.py",
+        # 🆕 2026-10-19 主人令三新算法（与 ORDER L256 成对补挂；10-11 gen_lqsq_top5 同款
+        #   「只加 ORDER 漏加 STAGES」断言炸链，本轮 15:30 任务实测秒退后修复）。
+        "gen_new_algo_tri.py",              # → data/NEW_ALGO_TRI.js（缩量回踩VCP/板块资金共振轮动/LHB机构跟随）
         "refresh_dividend_cninfo.py",
         "refresh_stock_metadata.py", "fetch_weekend_run.py",   # 周末复盘/周度汇总（原 ORDER 漏挂 STAGE）
 
