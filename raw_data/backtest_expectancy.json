@@ -1,20 +1,20 @@
 {
   "meta": {
-    "generated": "2026-10-19 23:17:08",
+    "generated": "2026-10-20 01:18:18",
     "method": "walk-forward / out-of-sample, shrinkage_k=10",
     "horizons": [
       3,
       5,
       10
     ],
-    "n_snapshots": 88,
+    "n_snapshots": 89,
     "date_range": [
       "2026-06-06",
-      "2026-10-19"
+      "2026-10-20"
     ],
     "coverage": {
-      "stocks_total": 1584,
-      "with_kline": 1584,
+      "stocks_total": 1604,
+      "with_kline": 1604,
       "occ_total": 2634,
       "p4_evaluated": 1010,
       "p4_skipped_no_mkt": 0,
@@ -30,14 +30,14 @@
     "is_oos": {
       "is_ratio": 0.6,
       "is_dates": 53,
-      "oos_dates": 35,
+      "oos_dates": 36,
       "is_range": [
         "2026-06-06",
         "2026-09-07"
       ],
       "oos_range": [
         "2026-09-08",
-        "2026-10-19"
+        "2026-10-20"
       ],
       "note": "按时间顺序切分；OOS 段结论才是可外推的"
     },
