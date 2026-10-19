@@ -1,35 +1,17 @@
 {
-  "check_time": "2026-10-19 19:00:32",
+  "check_time": "2026-10-19 21:04:30",
   "repo": "ah-quant999/quant-scanner-v8",
   "health_summary": {
     "ok": 115,
-    "warn": 2,
-    "fail": 2,
+    "warn": 1,
+    "fail": 4,
     "limited": 1,
     "info": 0,
     "other": 0,
-    "total": 120
+    "total": 121
   },
-  "anomaly_count": 4,
+  "anomaly_count": 5,
   "anomalies": [
-    {
-      "name": "因子实验室",
-      "id": "FACTOR_LAB",
-      "page": "最终推荐",
-      "status": "warn",
-      "message": "更新于 昨日 00:45",
-      "last_update": "2026-10-18 00:45:41",
-      "heal": null
-    },
-    {
-      "name": "最终推荐·Top5因子评分",
-      "id": "TOP10_DAILY",
-      "page": "最终推荐",
-      "status": "fail",
-      "message": "更新于 昨日 01:35；超过阈值 1440 分钟",
-      "last_update": "2026-10-18 01:35:33",
-      "heal": null
-    },
     {
       "name": "大基金增减持监控",
       "id": "DAJIJIN_REDUCTION",
@@ -47,14 +29,41 @@
       "message": "最新 enter_date 2026-10-18 早于最近交易日 2026-10-19，最终推荐数据陈旧",
       "last_update": null,
       "heal": null
+    },
+    {
+      "name": "BACKTEST_COMPREHENSIVE",
+      "id": "all_BACKTEST_COMPREHENSIVE",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "BACKTEST_COMPREHENSIVE.js 更新于 昨日 02:47；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-18 02:47:15",
+      "heal": null
+    },
+    {
+      "name": "BACKTEST_TDX",
+      "id": "all_BACKTEST_TDX",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "BACKTEST_TDX.js 更新于 昨日 02:47；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-18 02:47:11",
+      "heal": null
+    },
+    {
+      "name": "FINAL_RECOMMEND_DATA",
+      "id": "all_FINAL_RECOMMEND_DATA",
+      "page": "全量数据",
+      "status": "fail",
+      "message": "FINAL_RECOMMEND_DATA.js 更新于 昨日 01:40；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）",
+      "last_update": "2026-10-18 01:40:03",
+      "heal": null
     }
   ],
   "recovered_count": 0,
   "recovered": [],
   "noise_count": 0,
   "noise": [],
-  "signature": "DAJIJIN_REDUCTION:fail|FACTOR_LAB:warn|TOP10_DAILY:fail|final_enter_stale:warn",
+  "signature": "DAJIJIN_REDUCTION:fail|all_BACKTEST_COMPREHENSIVE:fail|all_BACKTEST_TDX:fail|all_FINAL_RECOMMEND_DATA:fail|final_enter_stale:warn",
   "notify": true,
   "cooled": true,
-  "last_notify_ts": "2026-10-19 19:00:32"
+  "last_notify_ts": "2026-10-19 21:04:30"
 }
