@@ -9493,3 +9493,16 @@ items:
     verified_at: "2026-10-19 19:50 真机验证通过"
     updated: "2026-10-19 19:50"
     updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: resonance-unify-1019
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: done
+    created: 2026-10-19
+    title: 机游共振口径一劳永逸统一（前端三处 + 数据生成器 classify 共用同一判据）
+    what: "主人令：每日洞察有共振、机游共振卡缺=0，要一致对齐、一劳永逸修复。根因：全站机游共振存在三套互不一致口径——①每日洞察KPI只判机构>0且游资>0（双正无合计门槛）多算；②短线卡最强共振与周月汇总用『双正+合计>=8000万』；③数据生成器 fetch_lhb.py/backfill_lhb_history.py 的 classify 用『机构净买>8000万 且 游资净买>8000万（双方各自严格>阈值）』喂共振日历 category。同一天日卡与日历对不上。抽全局真源函数 window.__resonanceStocks(stocks, TH=8000)，判据改为『机构>TH 且 游资>TH』，与生成器 classify(THRESHOLD=8000, 各自严格>)字节级一致；每日洞察KPI/短线卡最强共振/周月汇总 strong 三处调用共用此函数。"
+    evidence: "commit 78e2f566（仅改 index.html：新增全局 __resonanceStocks + 三处调用改走该函数；plumbing 快进非强推，ls-tree 核验 index.html 入树）。"
+    verify_how: "①31 内联脚本块 node --check 0 错；②推送后观察完整 build 周期：origin/main tip 前进至 78e2f566 且索引未被回退、线上 Pages 含 __resonanceStocks 4 处（定义1+调用3）、三处调用均在；③🔴Node 单测抽取线上真实函数，样例6股（含边界 inst==8000 不严格>应排除）前端命中集与生成器 classify 逐股完全一致（A,E），三处调用计数 KPI/短线/周月 同为2。"
+    verified_at: "2026-10-19 21:16 单测+线上验证通过"
+    updated: "2026-10-19 21:16"
+    updated_by: 阿狸咪的工程师(alimi-cn)
