@@ -1,1 +1,23 @@
-[]
+[
+{
+"code": "601059",
+"name": "信达证券",
+"delisted_date": "2026-10-19",
+"last_board": "主板",
+"last_industry": "资本市场服务"
+},
+{
+"code": "601198",
+"name": "东兴证券",
+"delisted_date": "2026-10-19",
+"last_board": "主板",
+"last_industry": "资本市场服务"
+},
+{
+"code": "00362",
+"name": "中国天化工",
+"delisted_date": "2026-10-19",
+"last_board": "主板",
+"last_industry": ""
+}
+]
