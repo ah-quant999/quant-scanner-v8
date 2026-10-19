@@ -47,7 +47,7 @@
   A 采集批：13 项中 ≥11 项鲜活（老 10 项容错保留 6 项 + 新增 3 项）+ **龙虎榜 / lhb_data / ETF_NET_SUBSCRIPTION must 必新** ← 以 READY_SPEC["A"] 为唯一真源
            ⚠️ 2026-09-14 00:1x P0 修正：原扩至「19 项 / ≥13 / must 含 AVG_PRICE_DATA」，其中 7 项在仓库中**并不存在**（TDX_BACKTEST 真名 BACKTEST_TDX 且属 E 批；AVG_PRICE 真名 AVG_PRICE_DATA；ETF_SUBSCRIPTION 系旧口径已下线；etf_subscription/avg_price/etf_spot/zsxq_posts 从未存在）⇒ read_ut() 返 None ⇒ must 恒不满足 ⇒ **A 批永久锁死且不报错**。已收敛为 13/11/3。
            🔴 `AVG_PRICE_DATA` 现为**非 must**：cloud_fetch_v8 的 post_close 档不写其时戳（仅 intraday 写）⇒ 放回 must 会立即复现锁死；须待「方案乙」落地后方可考虑加回。
-  B 选股批：11 项产物中 ≥6 项鲜活 + 四量终极（must）必新  ← 以 READY_SPEC["B"] 为唯一真源
+  B 选股批：8 项产物中 ≥4 项鲜活 + TOP10_DAILY（must）必新  ← 以 READY_SPEC["B"] 为唯一真源（2026-10-19 对齐：四量终极/低波/日内动量历史批摘链后 items 11→8、need 6→4、must 唯余 B 批必产核心卡）
            🔴 2026-10-11 主人令「完全下架」对齐：items 12→10（两下架策略移出）、need 8→6
               （保持「容忍 4 项不新鲜」语义不变）、must 3→1（唯余 B 批必产核心卡）。
   D 汇总批：最终推荐                              → 1/1
