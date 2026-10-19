@@ -53,13 +53,12 @@ MANUAL_ALIAS = {
     "塑料制品": "塑料",           # 申万二级「塑料制品」↔ 东财「塑料」
     "橡胶制品": "橡胶",           # ↔ 东财「橡胶」
     "汽车服务及其他": "汽车服务",   # ↔ 东财「汽车服务」
-    # 2026-10-17 阿狸咪的工程师（主人截卡「军工装备/文化传媒 no_match」根治）：
-    # 实证东财全量行业板块（raw_data/em_boards_cache.json 496 条，10-11 成功轮）无「文化传媒」同名，
-    # 东财对应板块为「传媒 BK0486」（同花顺「文化传媒」与东财「传媒」同为传媒产业集合：出版/影视/广告/游戏）。
-    "文化传媒": "传媒",           # ↔ 东财「传媒 BK0486」
-    # ⚠️ 「军工装备」刻意不配别名：同花顺「军工装备」为二级（与「军工电子」并列，SECTOR_RS 两者同期在榜），
-    #   东财无同名二级，最近似「国防军工 BK1204」为一级（含军工电子）⇒ 配了会把电子股混进装备榜，
-    #   属张冠李戴。该板块走 NeoData 按名兜底（_neo_cons），不经东财映射，语义最保真。
+    # 📊 2026-10-19 小九（最终推荐·强势板块龙头股 扩展配套）：最终推荐 strong_sectors
+    #   常见同花顺名与东财板块名的已核对等价映射（沿用「语义等价才放行」纪律）。
+    "公路铁路运输": "铁路公路",     # 同花顺「公路铁路运输」↔ 东财「铁路公路」（两侧均含铁路+公路运输）
+    "军工装备": "国防军工",         # 同花顺「军工装备」↔ 东财「国防军工」
+    "文化传媒": "传媒",             # 同花顺「文化传媒」↔ 东财「传媒」（东财无「文化传媒」独立板块）
+    "机场航运": "航空机场",         # 同花顺「机场航运」↔ 东财「航空机场」（⚠️ 主体=机场+航空；东财航运在「航运港口」不在本映射内，龙头以机场/航空为主）
 }
 
 UA = {
@@ -469,6 +468,7 @@ def build():
     n_fail = 0
     n_nomatch = 0
     n_neo = 0
+    boards_exact = boards_norm = None   # 📊 2026-10-19：提升到外层，主升/启动与最终推荐两个 loop 共用一次板块列表抓取
     if leaders_all:
         boards_exact, boards_norm = fetch_em_boards()
         log("em boards: exact=%d norm=%d" % (len(boards_exact), len(boards_norm)))
@@ -558,6 +558,72 @@ def build():
             n_retained += 1
             log("retained %s: %d leaders（同 data_date=%s 自上一版过继，防洗回）"
                 % (x["name"], len(_pl), src_date))
+
+    # ═══ 📊 2026-10-19 主人令：最终推荐 · 强势板块龙头股（同一管线扩展）═══
+    #   需求原话：「把最终推荐这里显示的板块对应的龙头股写进去，跟着最终推荐日更」。
+    #   板块清单 = data/FINAL_RECOMMEND_DATA.js 的 strong_sectors（相对强度 TOP，同花顺名空间，
+    #   与 SECTOR_RS 同名空间 ⇒ _resolve_bk / MANUAL_ALIAS 直接复用）；个股 = 东财对应板块
+    #   成分股当日涨幅前 5（与主升/启动卡同口径）。产物键 fr_sectors（与 sectors 平级）。
+    #   兜底全复用：em_boards 双缓存 / 腾讯行情 / NeoData / 同款「同日保底锁」防云端洗回。
+    fr_out = []
+    fr_names = []
+    try:
+        _fr = _read_window_js(os.path.join(ROOT, "data", "FINAL_RECOMMEND_DATA.js"))
+        fr_names = [str(x) for x in ((_fr or {}).get("strong_sectors") or []) if x]
+    except Exception as _fe:
+        log("FINAL_RECOMMEND 读取失败（强势板块龙头节跳过）: %s" % str(_fe)[:60])
+    if fr_names:
+        log("fr strong_sectors: %d 个（来自 FINAL_RECOMMEND）" % len(fr_names))
+        if boards_exact is None:
+            boards_exact, boards_norm = fetch_em_boards()
+            log("fr em boards: exact=%d norm=%d" % (len(boards_exact), len(boards_norm)))
+        # 同日保底锁底稿：上一版 fr_sectors（同 data_date 才有效，防跨日冒充）
+        _prev_fr = {}
+        if src_date:
+            _prev_raw = _cache_load(OUT_RAW)
+            if isinstance(_prev_raw, dict) and str(_prev_raw.get("data_date") or "")[:10] == src_date:
+                for _p in (_prev_raw.get("fr_sectors") or []):
+                    if isinstance(_p, dict) and _p.get("name"):
+                        _prev_fr[_p["name"]] = _p
+        for nm in fr_names:
+            bk, how = _resolve_bk(nm, boards_exact, boards_norm)
+            if not bk:
+                _neo = _neo_cons(nm)
+                if _neo:
+                    fr_out.append({"name": nm, "bk": None, "cons_count": len(_neo),
+                                   "leaders": _neo[:TOP_N], "match": "neodata"})
+                    continue
+                fr_out.append({"name": nm, "bk": None, "cons_count": 0, "leaders": [],
+                               "no_match": 1, "match": ""})
+                log("fr no-match: %s（东财无对应板块；已保留 + no_match=1，请补 MANUAL_ALIAS）" % nm)
+                continue
+            try:
+                cons = fetch_cons_safe(bk)
+                fr_out.append({"name": nm, "bk": bk, "cons_count": len(cons),
+                               "leaders": cons[:TOP_N], "match": how})
+            except Exception as e:
+                _neo = _neo_cons(nm)
+                if _neo:
+                    fr_out.append({"name": nm, "bk": bk, "cons_count": len(_neo),
+                                   "leaders": _neo[:TOP_N], "match": "neodata"})
+                else:
+                    fr_out.append({"name": nm, "bk": bk, "cons_count": 0, "leaders": [],
+                                   "leaders_error": 1, "match": how})
+                    log("fr cons fail %s(%s): %s —— 保留板块，个股留空待下轮补抓" % (nm, bk, str(e)[:60]))
+            time.sleep(0.3)
+        # 同日保底锁（与主升/启动同规则）：本轮空 + 上一版同日有 ⇒ 过继，防云端无 token 跑批洗回
+        for x in fr_out:
+            if x.get("leaders"):
+                continue
+            _pl = (_prev_fr.get(x["name"]) or {}).get("leaders") or []
+            if _pl:
+                x["leaders"] = _pl
+                x["bk"] = (_prev_fr[x["name"]].get("bk"))
+                x["cons_count"] = (_prev_fr[x["name"]].get("cons_count")) or len(_pl)
+                x["match"] = "retained:" + (x.get("match") or "")
+                log("fr retained %s: %d leaders（同 data_date=%s 自上一版过继，防洗回）"
+                    % (x["name"], len(_pl), src_date))
+
     # 🛡 2026-09-25 阿狸咪的工程师（主人令「改好直接上线」· 卡面假刷新根治）：
     #   原口径 `"update_time": time.strftime(...)` = **本脚本落盘时刻**，与数据日期无关。
     #   实测后果：卡面「更新于」永远显示成今晚上次构建时间，而内容可能仍是 T-1
@@ -580,6 +646,7 @@ def build():
         "source": ("东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期"
                    + (" + 腾讯NeoData 板块成分明细（东财 push2 封禁兜底 %d 板块）" % n_neo if n_neo else "")),
         "phase": "主升+启动", "sector_count": len(sectors_out), "sectors": sectors_out,
+        "fr_count": len(fr_out), "fr_sectors": fr_out,
         "nomatch_count": n_nomatch, "leaders_fail_count": n_fail,
         "neo_fallback_count": n_neo,
         "retained_count": n_retained,

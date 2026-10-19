@@ -618,7 +618,7 @@ window.__domReadyFns=[];
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=a5c277155b" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=42e81ebedd" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=e4123bdddb" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=137df5187d" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=67e6e83cc2" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=30fa777704" defer></script>
@@ -15034,6 +15034,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       //   （data/SECTOR_LEADERS.js，生成器 scripts/fetch_sector_leaders.py）降级为
       //   「板块名 → 龙头股」字典。此处保留一次调用，作为独立卡的自愈触发点之一。
       _fillSectorLeaders();
+      /* 📊 2026-10-19 主人令：最终推荐·强势板块龙头股 独立卡（自愈触发点之一） */
+      try{ window._fillFrLeaders(); }catch(e2f){}
       var em = window.CONCEPT_ETF_MAP || {};
       var tm=document.getElementById('prEtfFresh');
       var _etfSrcTs = (window.CONCEPT_RANKING||{}).update_time || (window.SECTOR_FUND_FLOW||{}).update_time || em.update_time || null;
@@ -15490,6 +15492,116 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     }catch(e){ console.warn('主升启动龙头股渲染失败', e); }
   };
 
+  /* ═══ 📊 2026-10-19 主人令：最终推荐 · 强势板块龙头股（观测类 · 跟随最终推荐日更）═══
+     数据：window.FINAL_RECOMMEND_DATA.strong_sectors（板块名单+顺序，与最终推荐卡同源同序）
+         + window.SECTOR_LEADERS.fr_sectors（生成器 scripts/fetch_sector_leaders.py 扩展节：
+           东财对应板块成分股当日涨幅前 5；同款 no_match/leaders_error 明示 + 同日保底锁防洗回）。
+     无数据 ⇒ 整卡保持 display:none（不产空壳）+ 600ms×30 自愈轮询补渲（与 _fillSectorLeaders 同范式）。 */
+  window._fillFrLeaders = function(){
+    try{
+      var card = document.getElementById('frLeadersCard');
+      var body = document.getElementById('frLeadersBody');
+      if(!card || !body) return;
+      var fr = window.FINAL_RECOMMEND_DATA || null;
+      var names = (fr && fr.strong_sectors) || [];
+      var sl = window.SECTOR_LEADERS || null;
+      var frSecs = (sl && sl.fr_sectors) || [];
+      if(!names.length && !frSecs.length){
+        /* 🛡 自愈：两个数据源均 defer，首调时可能尚未注入 → 600ms×30 轮询补渲 */
+        if(!window.__frlRetryTimer){
+          window.__frlRetryN = 0;
+          window.__frlRetryTimer = setInterval(function(){
+            window.__frlRetryN++;
+            var _n2 = ((window.FINAL_RECOMMEND_DATA || {}).strong_sectors) || [];
+            var _f2 = ((window.SECTOR_LEADERS || {}).fr_sectors) || [];
+            if(_n2.length || _f2.length){
+              clearInterval(window.__frlRetryTimer); window.__frlRetryTimer = null; window.__frlRetryN = 0;
+              try{ window._fillFrLeaders(); }catch(e){}
+            } else if(window.__frlRetryN > 30){
+              clearInterval(window.__frlRetryTimer); window.__frlRetryTimer = null; window.__frlRetryN = 0;
+            }
+          }, 600);
+        }
+        return;
+      }
+      if(window.__frlRetryTimer){ clearInterval(window.__frlRetryTimer); window.__frlRetryTimer = null; window.__frlRetryN = 0; }
+      /* 龙头字典（生成器 fr_sectors.name 取自 strong_sectors 同名空间 ⇒ 精确匹配） */
+      var dict = {};
+      (frSecs || []).forEach(function(x){ if(x && x.name) dict[x.name] = x; });
+      /* 名单顺序 = 最终推荐 strong_sectors（同源同序）；字典有而 FR 未列的板块不显示 */
+      var rows = [];
+      (names.length ? names : frSecs.map(function(x){ return x.name; })).forEach(function(nm){
+        if(!nm) return;
+        var hit = dict[nm] || null;
+        rows.push({
+          name: nm,
+          leaders: (hit && hit.leaders) || [],
+          cons_count: hit ? (hit.cons_count || 0) : 0,
+          no_match: !!(hit && hit.no_match),
+          leaders_error: !!(hit && hit.leaders_error),
+          in_dict: !!hit
+        });
+      });
+      if(!rows.length) return;
+      var fb = document.getElementById('frLeadersFresh');
+      if(fb){
+        var ts = (fr && fr.update_time) || '';
+        if(typeof _uBadge === 'function'){ try{ fb.innerHTML = _uBadge('auto', '盘后', ts); }catch(e2){ fb.textContent = ts; } }
+        else { fb.textContent = ts; }
+      }
+      /* 四种「没龙头股」的原因分别明示（与主升/启动卡同口径），绝不静默丢板块 */
+      var _dsrc = (window.SECTOR_LEADERS || {}).em_boards_source || '';
+      var MSG_NOMATCH = '&#x26A0;&#xFE0F; 该板块在东财无对应行业板块（需人工别名表补）';
+      var MSG_EMLIMIT = '&#x26A0;&#xFE0F; 东财接口本轮受限（全 host 断连），龙头股名单暂缺，下轮自动补抓';
+      var MSG_FAIL    = '&#x26A0;&#xFE0F; 龙头股行情本轮抓取失败，待下轮盘后自动补抓';
+      var MSG_NOCOV   = '&#x26A0;&#xFE0F; 本轮新晋板块，龙头股名单下轮自动生成（上游字典尚未收录）';
+      var _msgOf = function(s){
+        if(s.no_match) return (_dsrc === 'unavailable') ? MSG_EMLIMIT : MSG_NOMATCH;
+        if(s.leaders_error) return MSG_FAIL;
+        return MSG_NOCOV;
+      };
+      var h = '';
+      rows.forEach(function(s, i){
+        h += '<div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);margin-bottom:7px;">';
+        h += '  <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:' + ((s.leaders && s.leaders.length) ? '7px' : '0') + ';">';
+        h += '    <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:#fbbf24;font-size:11px;font-weight:700;flex:none;">' + (i + 1) + '</span>';
+        h += '    <span style="font-weight:700;color:var(--txt);font-size:13px;">' + s.name + '</span>';
+        h += '    <span style="font-size:10px;color:var(--dim);">成分股 ' + ((s.leaders_error || s.no_match || !s.in_dict) ? '—' : (s.cons_count || 0) + ' 只') + '</span>';
+        h += '  </div>';
+        var _hasL = s.leaders && s.leaders.length;
+        if(_hasL){
+          h += '  <div style="display:flex;flex-wrap:wrap;gap:6px 10px;">';
+          s.leaders.forEach(function(p, idx){
+            var _c = (p.chg == null) ? 0 : p.chg;
+            var col = (_c >= 0) ? 'var(--up)' : 'var(--down)';
+            h += '<span style="display:inline-flex;align-items:baseline;gap:5px;padding:3px 8px;border-radius:5px;background:rgba(255,255,255,.04);border-left:3px solid ' + col + ';font-size:12px;white-space:nowrap;">';
+            h += '  <span style="color:var(--dim);font-size:10px;">' + (idx + 1) + '</span>';
+            h += '  <span style="color:var(--txt);font-weight:600;">' + p.name + '</span>';
+            h += '  <span style="color:var(--sub);font-size:10px;">' + p.code + '</span>';
+            h += '  <span style="color:' + col + ';font-weight:700;">' + (_c >= 0 ? '+' : '') + _c.toFixed(2) + '%</span>';
+            h += '</span>';
+          });
+          h += '  </div>';
+        } else {
+          h += '  <div style="font-size:11px;color:#fbbf24;background:rgba(251,191,36,.07);border:1px dashed rgba(251,191,36,.35);border-radius:6px;padding:6px 9px;">' + _msgOf(s) + '</div>';
+        }
+        h += '</div>';
+      });
+      /* 口径脚注：名单来源 + 龙头快照时间，滞后即明示（禁止用新鲜徽标掩盖停更） */
+      var slTs = (sl && sl.update_time) || '—';
+      var frDate = (fr && fr.update_time) || '';
+      var slDate = (sl && sl.data_date) || '';
+      var slLag = '';
+      var _frd = (frDate || '').slice(0, 10);
+      if(_frd && slDate && slDate !== _frd) slLag = ' <b style="color:#f59e0b;">&#x26A0;&#xFE0F; 龙头快照早于最终推荐 ' + _frd + '</b>';
+      h += '<div style="font-size:10px;color:var(--dim);line-height:1.7;margin-top:6px;border-top:1px dashed var(--border);padding-top:6px;">'
+         + '&#x1F517; 板块清单与「最终推荐」卡<b style="color:var(--sub);">同源同序</b>（FINAL_RECOMMEND_DATA · ' + (frDate || '—') + '）；'
+         + '个股 = 东财板块成分股当日涨幅前 5；龙头快照 ' + slTs + slLag + '。</div>';
+      body.innerHTML = h;
+      card.style.display = 'block';
+    }catch(e){ console.warn('[fillFrLeaders]', e); }
+  };
+
 
   function renderUnlisted(){
     // 🛡 2026-08-20 一劳永逸加固（主人「新建 AI 预测空白 + v6 备忘录空白」）：
@@ -15510,7 +15622,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       // 2026-09-15：__renderAiInsightsCompare 已随卡迁往「🌍 观测平台 > 🌍 宏观观测」，
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderThemeValue'];
+      var names = ['__renderThemeValue', '_fillFrLeaders'];   /* 📊 2026-10-19：+最终推荐·强势板块龙头股 */
       var probe = document.getElementById('themeValueBody');
       if(probe) probe.setAttribute('data-ulpane', tab);
       var out = [];
@@ -15646,6 +15758,22 @@ h += '<div class="card" id="sectorLeadersCard" style="display:none;margin-bottom
    + '<span style="font-size:12px;color:var(--dim);">观测类 · 板块周期龙头（当日涨幅前5）</span></div>'
    + '<div id="sectorLeadersBody"><div class="note">加载中&#x2026;</div></div>'
    + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 「主升/启动」判定与「板块资金趋势」卡<b style="color:#f87171;">同源同规则</b>（同一份 SECTOR_RS 数据 + 同一个判定函数）&#8658; 两卡板块计数一致（主升 5日&gt;3%且20日&gt;5%；启动 5日&gt;1.5%且20日&gt;-8%）；个股为板块内当日涨幅排序，<b style="color:#fbbf24">非推荐信号，不构成投资建议</b>。</div></div>';
+
+// ═══ 📊 2026-10-19 主人令：最终推荐 · 强势板块龙头股（观测类第 2 卡，紧跟主升/启动卡）═══
+//   需求原话：「在暂未上架新建卡，把最终推荐这里显示的板块对应的龙头股写进去，跟着最终推荐日更」。
+//   板块清单 = window.FINAL_RECOMMEND_DATA.strong_sectors（与最终推荐卡顶部「当前强势板块」同源同序，
+//   跟着最终推荐日更）；个股 = window.SECTOR_LEADERS.fr_sectors（scripts/fetch_sector_leaders.py
+//   扩展节：东财对应板块成分股当日涨幅前 5，与主升/启动卡同口径同兜底）。
+//   无数据 ⇒ 整卡保持 display:none（不产空壳卡）；填充见 window._fillFrLeaders（600ms×30 自愈）。
+h += '<div class="card" id="frLeadersCard" style="display:none;margin-bottom:16px;border-left:4px solid #fbbf24;">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+   + '<span style="font-size:15px;font-weight:700;color:#fbbf24;">&#x1F4CA; 最终推荐 &#183; 强势板块龙头股</span>'
+   + '<span class="fresh" id="frLeadersFresh">&#x2014;</span>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 跟随「最终推荐」日更</span></div>'
+   + '<div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.25);border-radius:7px;padding:8px 11px;margin-bottom:10px;font-size:12px;line-height:1.7;color:var(--txt);">'
+   + '<b style="color:#fbbf24;">&#x1F4CC; 核心：</b>把「最终推荐」判定的强势板块直接翻译成龙头股。板块名单 = 最终推荐卡顶部「当前强势板块（相对强度 TOP）」<b>同一份名单、同一顺序</b>；个股 = 东财对应板块成分股当日涨幅前 5。</div>'
+   + '<div id="frLeadersBody"><div class="note">加载中&#x2026;</div></div>'
+   + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 个股为板块内当日涨幅排序，<b style="color:#fbbf24">非推荐信号，不构成投资建议</b>。</div></div>';
 
 // 🔧 2026-09-19 主人令：此处原有一段「孤儿卡头」——
 //   `h += '<div class="card" style="...border-left:4px solid #38bdf8;">'` + 未闭合的 flex 头行（两个 div 都没闭合），
@@ -18603,7 +18731,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=c0396e2e2e', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=b7edbc051b', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=f82f013a09', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=a086bd0fe3', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
