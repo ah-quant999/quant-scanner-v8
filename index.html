@@ -259,6 +259,10 @@ window.__domReadyFns=[];
        前一日仍 ≥3 只涨停、当日骤降到 ≤1 ⇒ 这天是这轮热度的退潮日。
        退潮标记只保留 5 个交易日，之后自动退出（不长期挂着误导）。 */
   .limit-up-content .lu-ebb{box-shadow:inset 0 0 0 2px #38bdf8;border-radius:4px}
+  /* 🛡 2026-10-19 主人令一劳永逸：前导「未启动」合并格 —— 板块首信号之前的全 0 列
+     不再逐列显示近不可见的「·」（观感＝板块前面空一大片），改为单格标注「MM/DD 起」；
+     colspan 精确占位，与表头日期列仍逐列对齐，合/势统计口径不变。 */
+  .limit-up-content td.lu-pre{text-align:center;color:var(--dim);font-size:10px;letter-spacing:.5px;background:rgba(148,163,184,.06);border-radius:4px;white-space:nowrap;overflow:hidden}
   .limit-up-legend .lu-legend-ebb{border:2px solid #38bdf8;color:#7dd3fc;padding:1px 6px}
   /* 🗂 卡底「历史折叠」（2026-09-15 主人令：让历史可查） */
   .lu-fold-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);
@@ -9668,7 +9672,14 @@ function renderLimitUpHeatmap(){
       /* 🔁 2026-09-16 主人令（列序互换）：首列＝「板块」名（左对齐·宽），第 2 列＝「启动日」（窄·居中·金色） */
       h+='<td>'+sector.name+(_isOther?' <span style="font-size:9px;color:var(--dim)">(汇总·非主线)</span>':'')+'</td>';
       h+='<td class="lu-start'+(_sl && _sl.charAt(0)==='≤' ? ' lu-start-open' : '')+'"'+(opts.tip?(' title="'+esc(opts.tip)+'"'):'')+'>'+(_sl||'·')+'</td>';
-      for(var j=startIdx;j<full.length;j++){
+      /* 🛡 2026-10-19 主人令一劳永逸：前导零区（本板块窗口内首信号之前）合并为「MM/DD 起」标记格，
+         消除「板块前面空一大片」观感；中间零值仍显示「·」（真实 0，有信息量），不受影响。 */
+      var _i0=-1;
+      for(var q=0;q<view.length;q++){ if((view[q]||0)>0){ _i0=q; break; } }
+      if(_i0>0){
+        h+='<td class="lu-pre" colspan="'+_i0+'" title="该板块 '+showDates[_i0]+' 之前无涨停信号（未启动）">'+showDates[_i0]+' 起</td>';
+      }
+      for(var j=startIdx+Math.max(_i0,0);j<full.length;j++){
         var val=full[j];
         var cls=val>=8?'lu-h5':val>=5?'lu-h4':val>=3?'lu-h3':val>=2?'lu-h2':val>=1?'lu-h1':'lu-h0';
         var mark=isIgnite(full,j)?' lu-ignite':(isEbb(full,j)?' lu-ebb':'');
