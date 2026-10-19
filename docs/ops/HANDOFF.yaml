@@ -26,8 +26,8 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-16 07:15"
-  updated_by: 阿狸咪的工程师
+  updated: "2026-10-19 08:56"
+  updated_by: 小九的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
@@ -36,6 +36,31 @@ meta:
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
   next_id_seq: 139
 items:
+  - id: selfalgo-audit-fix-1019
+    owner: 小九的工程师
+    priority: P1
+    status: pending-verify
+    created: 2026-10-19
+    title: 三自研算法审计七项全修 + 连板梯队两卡迁入选股策略末位新子TAB
+    note: >
+      2026-10-19 早 主人令「全修」（此前审计结论 7 项）＋「把暂未上架的连板梯队前哨/
+      回测实证两卡迁到选股策略最后新子TAB」。代码已推 main（本提交）：
+      ① lowvol/intraday 量纲哨兵常量 1e7,1e10 → 1.0e8,2.0e10 对齐权威源；
+      ② intraday 头注对齐内置回放表（N=20 α+3.27pp 主档 T+20；N=45/60 衰减但仍正，
+      原「N≥45 转负」文案被自身回放表推翻）；
+      ③ lowvol/intraday 自回测轴/仓位表扩全缓存池 + 基准改逐日点内构建
+      （修「今日过滤池套历史信号日」的前视+幸存者偏差，与 LQSQ 口径对齐）；
+      ④ LQSQ 头注名实注（质引擎 ROE v2 待接）；
+      ⑤ LQSQ 基准同扣双边 0.3%（原毛收益低估 alpha）；
+      ⑥ T+p 口径注 + run_algorithms.py 两处 Top10→Top5 注释修正（代码 TOP_K=5）；
+      ⑦ 量纲改按票判（gen_lqsq_top5.amt_unit_for，三算法同源复用，批中位口径兜底）。
+      index.html：新增 st-lianban 子TAB（按钮+pane+switchSt 列表）+ 连板梯队前哨/
+      回测实证两卡整体迁入（firstBoardAlertCard 受保护标记串原样保留）+
+      运维页数据源看板/新鲜度看板两处登记随迁；v8_health_check.py 两源 page
+      暂未上架→选股策略。
+      待验证：下一 B 批跑批产物正常 + Pages 线上形态（选股策略末位出现「🪜 连板梯队」
+      子TAB、暂未上架区不再有这两卡）。
+
   - id: index-creds-panel-refresh-1014
     owner: 阿狸咪的工程师
     priority: P1

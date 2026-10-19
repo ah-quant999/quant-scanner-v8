@@ -347,10 +347,10 @@ CARD_DEFS = [
     {"id": "WAVE_ELLIOTT", "name": "艾略特波浪·深度分析", "page": "观测平台", "freq": "每交易日17:50前后(小九机日频)", "max_age": 1440, "key_fields": ["meta"], "cycle": (18, 0)},
     {"id": "CITIC_PE_THERMO", "name": "中信PE热力", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current", "percentile"]},
     {"id": "SECTOR_LEADERS", "name": "主升/启动板块·龙头股", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["phase", "sector_count"], "raw_file": "sector_leaders.json", "producer": "scripts/fetch_sector_leaders.py"},
-    {"id": "FIRST_BOARD_ALERT", "name": "连板梯队前哨", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["alerts"]},
+    {"id": "FIRST_BOARD_ALERT", "name": "连板梯队前哨", "page": "选股策略", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["alerts"]},  # 2026-10-19 主人令：随卡迁入选股策略·连板梯队子页
     # 2026-10-17 主人令「要日更」：真实信号流日累积。key_fields 取 groups（成熟样本分组统计）；
     #   首日累积中 groups 全 0 但结构在 ⇒ 不误报 missing（age 维度照常 1440 分钟红线）。
-    {"id": "LIANBAN_WINRATE", "name": "回测实证·一进二/二进三", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["groups"]},
+    {"id": "LIANBAN_WINRATE", "name": "回测实证·一进二/二进三", "page": "选股策略", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["groups"]},  # 2026-10-19 主人令：随卡迁入选股策略·连板梯队子页
     {"id": "DAJIJIN_REDUCTION", "name": "大基金增减持监控", "page": "暂未上架", "freq": "工作日夜间档(cron次日02:30~04:40)", "max_age": 1440, "key_fields": ["update_time"], "cycle": (3, 30)},
 ]
 

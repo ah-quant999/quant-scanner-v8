@@ -4,6 +4,9 @@
 
 定位：与「因子实验室」严格区隔 —— 因子实验室继续为其他算法的股票评分排序（评分卡）；
 本算法是**独立选股器**：全市场直选 Top5，真实信号流口径上主榜（与四量同榜同纪律）。
+⚠️ 名实注（2026-10-19 算法审计 #4）：当前 v1 仅上线「量引擎」（异常量比·缩量=强势）；
+「质引擎」（ROE 财务质地过滤）v2 待接（见下【选股规则】）——v2 上线前，对外文案
+一律注明「量引擎已上线 / 质引擎待接」，不得宣称已双引擎。
 
 【选股规则 v1】（全部 ≤T 日可得，无未来函数）：
   · 因子 r = mean(vol, 近20交易日) / mean(vol, 之前240交易日)；r 越小=越缩量=越强
@@ -58,6 +61,8 @@ VIEW = os.path.join(RAW_DIR, "lqsq_backtest.json")
 RECENT_N = 20
 BASELINE_N = 240
 MIN_HISTORY = 261
+# T+p 口径注（2026-10-19 算法审计 #6）：T+p = 信号日后第 p 个交易日**收盘卖出**；
+#   T+1 即「次开买入 → 次日收盘」同日往返最短档（非持有 1 整日），前端展示标签同此口径。
 HOLD_HORIZONS = (1, 3, 5, 10, 20)
 PRIMARY_HOLD = 20
 TOP_N = 5  # 🔴 2026-10-13 主人令「这个太多了，才3天都90只了，没必要，每天也是按评分最高推荐3-5只就好」：30 → 5
@@ -73,6 +78,27 @@ MIN_TURNOVER_YUAN = 50_000_000
 #   cache 322622 对 新浪 32,262,172 股 = ×100）：池内中位成交额判量纲；
 #   raw / ×100 两都不落常识区间 ⇒ 放弃绝对闸门，绝不静默清零。
 AMT_MEDIAN_LO, AMT_MEDIAN_HI = 1.0e8, 2.0e10
+
+
+def amt_unit_for(raw_amt, batch_unit):
+    """按票判量纲（2026-10-19 算法审计修复 #7）：
+    单票近 20 日中位原始成交额 raw_amt = mean(vol×close)（未乘单位）。
+      · 仅「手」假设落哨兵区间（raw<LO 且 raw×100∈[LO,HI]）⇒ 100.0
+      · 仅「股」假设落区间（raw∈[LO,HI] 且 raw×100>HI，即 raw>HI/100）⇒ 1.0
+      · 两假设皆落（raw∈[LO, HI/100] 重叠带，闸门两判都放行、判哪边不影响过闸）
+        或皆不落（raw<LO/100 或 raw>HI）⇒ 回退批中位口径 batch_unit
+        （batch_unit=0 即整批放弃闸门）。
+    背景：kline_cache 手/股混存（10-11~10-16 已踩过），批级单一单位会让混批里
+    一半票被误判 100 倍 ⇒ 按票各判、批中位数只做兜底。低波趋稳/日内动量复用本函数，
+    禁第二套实现（防口径漂移）。"""
+    if raw_amt and raw_amt > 0:
+        if raw_amt < AMT_MEDIAN_LO and AMT_MEDIAN_LO <= raw_amt * 100 <= AMT_MEDIAN_HI:
+            return 100.0
+        if AMT_MEDIAN_LO <= raw_amt <= AMT_MEDIAN_HI and raw_amt * 100 > AMT_MEDIAN_HI:
+            return 1.0
+    return batch_unit
+
+
 # ── 自刷新 ──
 EXT_BARS = 700            # 扩展缓存/拉取根数（覆盖 261+240+余量）
 EXT_MIN_LEN = 300         # 视为「根数足够」的下限（<MIN_HISTORY+BASELINE 缓冲）
@@ -328,9 +354,11 @@ def main():
             continue
         if any(v <= 0 for v in recent):
             continue  # 近月有停牌
-        liq = (sum(v * b["close"] for v, b in zip(recent, bars[j - RECENT_N + 1: j + 1]))
-               / RECENT_N * _vol_unit)
-        if _vol_unit and liq < MIN_TURNOVER_YUAN:
+        _raw = (sum(v * b["close"] for v, b in zip(recent, bars[j - RECENT_N + 1: j + 1]))
+                / RECENT_N)
+        # 2026-10-19 审计修复 #7：按票判量纲（批中位数兜底），混批不再互相误伤
+        _u = amt_unit_for(_raw, _vol_unit)
+        if _u and _raw * _u < MIN_TURNOVER_YUAN:
             continue
         ratio = (sum(recent) / RECENT_N) / (sum(base) / BASELINE_N)
         scored.append((round(ratio, 4), code, close))
@@ -345,7 +373,8 @@ def main():
         "factor_def": "r=mean(vol[近20日])/mean(vol[之前240日])，升序Top5（最缩量=最强）",
         "filters": "上市≥261交易日/当日未停牌/近20日无停牌/收盘≥2元/日均vol×close≥5000万/当前名单剔ST",
         "liq_gate_caliber": ("2026-10-17 起：kline_cache.volume 手/股混存，绝对成交额闸门经量纲哨兵运行时判定"
-                             "（哨兵报警则放弃闸门，不静默清零）；10-11~10-16 未判量纲，手口径股被系统性误杀、"
+                             "（哨兵报警则放弃闸门，不静默清零；2026-10-19 审计修复升级为按票判量纲、"
+                             "批中位口径仅兜底）；10-11~10-16 未判量纲，手口径股被系统性误杀、"
                              "股口径股（多为科创板）被系统性放行 ⇒ 早期归档选中池偏科创板属已知口径缺陷，"
                              "归档只增不改、不做追溯重算，历史信号保持原样"),
         "cost_pct": COST_PCT, "primary_hold": PRIMARY_HOLD,
@@ -406,7 +435,8 @@ def main():
                     (bars[e]["close"] / entry - 1.0) * 100.0 - COST_PCT, 2)
             tracked.append(rec)
 
-        # 基准：当日过滤 universe（缓存内与数据日对齐、满足同过滤）等权无成本
+        # 基准：当日过滤 universe（缓存内逐日点内构建、满足同过滤）等权 ·
+        # 2026-10-19 审计修复 #5：同扣双边 0.3%（原基准为毛收益、alpha 被系统性低估，保守偏废）
         uni_day = bench_pool_by_date.get(sd)
         if uni_day is None:
             uni = []
@@ -432,7 +462,8 @@ def main():
             j = next((k for k, b in enumerate(bars) if b["date"] == sd), None)
             if j is None or j + PRIMARY_HOLD >= len(bars):
                 continue
-            vals.append((bars[j + PRIMARY_HOLD]["close"] / bars[j + 1]["open"] - 1.0) * 100.0)
+            vals.append((bars[j + PRIMARY_HOLD]["close"] / bars[j + 1]["open"] - 1.0) * 100.0
+                        - COST_PCT)
         bench_by_date[sd] = round(sum(vals) / len(vals), 2) if vals else None
 
     # ── 分档统计 ──

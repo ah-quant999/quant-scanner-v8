@@ -203,8 +203,8 @@ ORDER = [
     # "calc_crds.py",
     "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（B批最前：final_recommend 前必产完，因子融合用当日新鲜因子；2026-09-09 主人令由 E 前置至此）
     "gen_lqsq_top5.py",    # 🚀 2026-10-11 主人令：量质双擎每日生成器（kline_cache 副产物缓存 + 自刷新 GTimg 700根整根替换 → 全市场异常量比打分选 Top5（10-13 主人令由 Top30 收紧）→ lqsq_history 真实流归档 + LQSQ_BACKTEST 主榜视图；上线首日即建归档）。🔴 2026-10-12 去掉 algorithms/ 前缀：ORDER 与 STAGES/预算表三处字符串必须逐字一致（双层路径解析只认 scripts/ 与 v8/ 前缀，其余一律落 algorithms/ 目录）
-    "strategy_lowvol_trend.py",   # 🚀 2026-10-18 主人令：低波趋势每日生成器（60日波动率最低 Top10 ∧ 收盘>MA60 → lowvol_trend_history 真实流归档 + LOWVOL_TREND_BACKTEST 主榜；上线首日即建归档）。挂 gen_lqsq 紧后复用其 kline_cache_ext 刷新（禁第二套拉数）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
-    "strategy_intraday_momentum.py", # 🚀 2026-10-18 主人令：日内动量每日生成器（近20日日内累计收益最高 Top10 ∧ 收盘>MA60 → intraday_momentum_history 真实流归档 + INTRADAY_MOMENTUM_BACKTEST 主榜）。挂 strategy_lowvol_trend 紧后复用同一 ext 刷新。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
+    "strategy_lowvol_trend.py",   # 🚀 2026-10-18 主人令：低波趋势每日生成器（60日波动率最低 Top5 ∧ 收盘>MA60 → lowvol_trend_history 真实流归档 + LOWVOL_TREND_BACKTEST 主榜；上线首日即建归档；2026-10-19 审计修正注释 Top10→Top5，代码 TOP_K=5）。挂 gen_lqsq 紧后复用其 kline_cache_ext 刷新（禁第二套拉数）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
+    "strategy_intraday_momentum.py", # 🚀 2026-10-18 主人令：日内动量每日生成器（近20日日内累计收益最高 Top5 ∧ 收盘>MA60 → intraday_momentum_history 真实流归档 + INTRADAY_MOMENTUM_BACKTEST 主榜；2026-10-19 审计修正注释 Top10→Top5，代码 TOP_K=5）。挂 strategy_lowvol_trend 紧后复用同一 ext 刷新。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
     # 🛡 2026-08-29 主人令：A/B 对照（金股池/候选池/全市场同一信号收益），每日累积信号、T+N 后回填收益。

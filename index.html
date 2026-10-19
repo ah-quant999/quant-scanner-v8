@@ -3042,6 +3042,8 @@ function fmtSigned(v){
       <button class="st-tab" data-st="lqsq" onclick="switchSt('lqsq')">⚖️ 量质双擎 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
       <button class="st-tab" data-st="lowvol" onclick="switchSt('lowvol')">🐢 低波趋稳 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
       <button class="st-tab" data-st="intraday" onclick="switchSt('intraday')">📈 日内动量 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
+      <!-- 🆕 2026-10-19 主人令：连板梯队子页 tab（两卡自暂未上架迁入，置于末位） -->
+      <button class="st-tab" data-st="lianban" onclick="switchSt('lianban')">🪜 连板梯队 <span style="font-size:10px;color:var(--dim);font-weight:600;">观察</span></button>
       <!-- 2026-09-18 晚 原记录：此处硬编码「弱市专用·0★观测」被改为接 st-tab-star chip（__committeeRate 实时计算）。
            🔴 2026-09-18 (g) 更正 —— 该次改动的**方向对（统一星级出口）**，但它引用的依据是错的，
               而且它把一处**潜藏的口径漏洞显性化**了（主人随即截图质问「这个也评星么」）：
@@ -3164,6 +3166,150 @@ function fmtSigned(v){
            撤除事实不变（数据层 / 渲染函数 / 回测源已于 2026-09-19 删除），
            只是不再在本页底部展示这段历史说明。 -->
     </div><!--/st-life-->
+
+    <!-- ===== 🆕 2026-10-19 主人令：连板梯队 子页（选股策略末位新子TAB） =====
+         「🔭 连板梯队前哨」+「📊 回测实证·一进二/二进三」两卡自「暂未上架」实验区整体迁入。
+         数据源 window.FIRST_BOARD_ALERT / window.LIANBAN_WINRATE 注入脚本随卡同迁（铁律不变：只读 window.X）。
+         🔴 docs/ops/index_protected_markers.txt 的 firstBoardAlertCard 属性串原样保留（防 [10/10] 标记守卫拦截）。
+         两卡为自渲染 IIFE（数据未就绪自重试），不接 renderStTab / 不评星级（观察哨≠选股策略）。 -->
+    <div id="st-lianban" class="st-pane">
+    <!-- 2026-09-30 阿狸咪：连板梯队前哨卡（一进二前哨 + 二进三观察 · 仅暂未上架实验区可见） -->
+    <script src="data/FIRST_BOARD_ALERT.js?v=1be553279e" defer></script>
+    <script src="data/LIANBAN_WINRATE.js?v=6075cba978" defer></script>
+    <div id="firstBoardAlertCard" class="card" style="margin-top:14px;margin-bottom:16px;background:#1a1d24;border:1px solid #2a2f3a;border-left:4px solid #fbbf24;border-radius:10px;">
+      <div style="padding:10px 12px;font-weight:700;color:#e6e9ef;border-bottom:1px solid #2a2f3a;">🔭 连板梯队前哨 <span style="font-size:11px;color:#8a93a6;font-weight:400;">一进二前哨 · 二进三观察 · 量比≥3</span> <span id="fbaUpd"></span></div>
+      <div style="padding:6px 12px 0;font-size:12px;line-height:1.7;color:#8a93a6;"><b style="color:#fbbf24;">&#x1F4CC; 核心（回测胜率 · 2026-10-09 跑批冻结；日更累积见下方「📊 回测实证」卡）：</b>T+1 开盘买入<b style="color:#fbbf24;">胜率全部不足五成</b>——全体首板 44.4%（n=8544）、倍量&#8805;3 = 46.2%（n=1408）、二连板 45.9%（n=1074）；隔夜高开率虽达 60%（二板缩量 77%），但高开发生在买入前、溢价拿不到；持有到 T+5 胜率再降至 32%~47%（倍量&gt;8 小样本低至 32.1%）。晋级率：首板 14.1%、倍量&#8805;3 = 13.9%（无增量）、二连板 23.0% ⇒ <b style="color:#fbbf24;">观察哨非买点</b>。回测口径：全市场 3988 只 · 2025-04~2026-10 上旬（274 个首板信号日）· T+1 开盘买入扣双边 0.3%<br><b style="color:#fbbf24;">&#x1F4A1; 用法：</b>盘后出名单，次日盘中确认非一字开盘、分时弱转强再介入；量比3~5倍是健康区，<b>不是越大越好</b>（&gt;8倍多为巨分歧）。<br><b style="color:#fbbf24;">&#x26A0; 限制：</b>盘后更新、非盘中实时；观察名单&#8800;买点；一字板买不进；涨停判定按板块限幅（主板10% / 创业板·科创板20%）。</div>
+      <div id="fbaBody" style="padding:10px 12px;font-size:13px;color:#8a93a6;">加载中…</div>
+    </div>
+    <div id="fbaBtPanel" style="margin-bottom:16px;background:#1a1d24;border:1px solid #2a2f3a;border-left:4px solid #fbbf24;border-radius:10px;">
+      <div style="padding:10px 12px;font-weight:700;color:#e6e9ef;border-bottom:1px solid #2a2f3a;">📊 回测实证 · 一进二 / 二进三 <span style="font-size:11px;color:#8a93a6;font-weight:400;">晋级率 · 隔夜高开 · T+1 开盘买入胜率 · T+5 胜率</span> <span id="fbaBtBadge" style="font-size:10px;font-weight:400;padding:1px 7px;border-radius:9px;background:rgba(56,189,248,.12);color:#7dd3fc;">⏳ 加载中</span></div>
+      <div id="fbaBtBody" style="padding:10px 12px;font-size:12px;color:#8a93a6;">加载中…</div>
+    </div>
+    <script>
+    (function(){
+      /* 🔁 2026-10-17 主人令「要日更」：本卡由 2026-10-09 一次性静态跑批改为**真实信号流日累积**
+         （v8/lianban_winrate.py → data/LIANBAN_WINRATE.js）。每日 post_close 从涨停池录
+         首板/二连板信号，T+5 窗口成熟后计入分组统计；未成熟不计入、绝不半路插值。
+         历史跑批结论（2026-10-09 冻结批次）见上方「🔭 连板梯队前哨」卡，与本表互不混算。 */
+      var _DEFS1=[
+        ['first_all','全体首板',false],
+        ['first_vr3','倍量≥3（① 入选口径）',true],
+        ['first_vr3_5','倍量 3~5',false],
+        ['first_vr5_8','倍量 5~8',false],
+        ['first_vr8','倍量 >8',false]
+      ];
+      var _DEFS2=[
+        ['second_all','二连板（② 入选口径）',true],
+        ['second_vr3','二板放量（倍量≥3）',false],
+        ['second_vrlt3','二板缩量（倍量<3）',false]
+      ];
+      function _pct(a,b){ return (b>0)?(a/b*100).toFixed(1)+'%':'—'; }
+      function _cell(v,hi,cls){
+        return '<td style="padding:4px 8px;border-bottom:1px solid #2a2f3a;text-align:right;'+(cls||'')+'">'+v+'</td>';
+      }
+      function _row(g,label,hi){
+        var bg=hi?'background:rgba(251,191,36,.06);':'';
+        return '<tr style="'+bg+'">'
+          +'<td style="padding:4px 8px;border-bottom:1px solid #2a2f3a;white-space:nowrap;'+(hi?'color:#e6e9ef;':'color:#8a93a6;')+'">'+label+'</td>'
+          +_cell((g&&g.n)||0,hi,'color:#8a93a6;')
+          +_cell(_pct(g&&g.promo,g&&g.n),hi,'color:#fbbf24;font-weight:600;')
+          +_cell(_pct(g&&g.gap,g&&g.n),hi,'color:#8a93a6;')
+          +_cell(_pct(g&&g.t1_win,g&&g.t1_n),hi,'color:#e6e9ef;')
+          +_cell(_pct(g&&g.t1t_win,g&&g.t1t_n),hi,'color:#8a93a6;')
+          +_cell(_pct(g&&g.t5_win,g&&g.t5_n),hi,'color:#8a93a6;')
+          +'</tr>';
+      }
+      function _table(g,defs){
+        var h='<div style="overflow-x:auto;"><table style="border-collapse:collapse;width:100%;font-size:11.5px;line-height:1.5;">'
+          +'<tr style="color:#8a93a6;font-size:10.5px;">'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:left;font-weight:400;">分组</th>'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">样本 n</th>'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">晋级率</th>'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">隔夜高开</th>'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">T+1 胜率</th>'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">可成交 T+1</th>'
+          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">T+5 胜率</th>'
+          +'</tr>';
+        defs.forEach(function(d){ h+=_row(g[d[0]],d[1],d[2]); });
+        return h+'</table></div>';
+      }
+      function _fbaBtFill(){
+        var d=window.LIANBAN_WINRATE||{};
+        var el=document.getElementById('fbaBtBody');
+        var bd=document.getElementById('fbaBtBadge');
+        if(!el) return;
+        var g=d.groups||{};
+        var pend=(d.pending||[]).length;
+        var n=(d.matured_total)||0;
+        var ut=d.update_time?' · '+d.update_time:'';
+        if(bd){
+          bd.textContent=(n>0)
+            ? '🔄 日更累积 · 成熟 n='+n+' · 在途 '+pend+ut
+            : '🔄 日更累积 · 首日累积中'+ut;
+        }
+        if(!window.LIANBAN_WINRATE || (n===0 && pend===0)){
+          el.innerHTML='<div style="color:#8a93a6;line-height:1.8;">⏳ 首次累积中：每日 post_close 从涨停池录入首板/二连板真实信号（T+5 窗口成熟后计入本表，未成熟不插值）。<br>历史跑批结论（2026-10-09 静态批次·已冻结）见上方「🔭 连板梯队前哨」卡。</div>';
+          return;
+        }
+        var h='<div style="color:#c9d1dc;font-weight:600;margin:2px 0 4px;">① 一进二（首板 → 次日）</div>'
+          +_table(g,_DEFS1)
+          +'<div style="color:#c9d1dc;font-weight:600;margin:10px 0 4px;">② 二进三（二连板 → 次日）</div>'
+          +_table(g,_DEFS2)
+          +'<div style="margin-top:8px;padding:7px 10px;background:rgba(251,191,36,.07);border-left:3px solid #fbbf24;border-radius:4px;font-size:11.5px;line-height:1.7;color:#c9d1dc;">📌 口径：真实信号流日累积（akshare 涨停池 + 新浪日K）· T+1 开盘买入扣双边 0.3% · 晋级=次日涨停（主板 10%/双创 20%/北交所 30%）· 隔夜高开=次日开&gt;信号收 · 可成交=次日非一字板 · T+5=第 5 个交易日收盘卖 · 剔 ST/一字板信号 · T+5 成熟才计入（在途 '+pend+' 笔）· 样本自 '+(d.first_date||'—')+' 累积</div>'
+          +'<div style="margin-top:6px;font-size:10.5px;line-height:1.6;color:#6b7280;">* n&lt;100 小样本仅供参考 · 高亮行=本卡 ①/② 入选口径 · 历史跑批结论（2026-10-09 冻结批次：T+1 胜率全部不足五成、倍量无晋级增量 ⇒ 观察哨非买点）见上方前哨卡，与本表互不混算</div>';
+        el.innerHTML=h;
+      }
+      _fbaBtFill();
+      var t=0; var iv=setInterval(function(){ if(window.LIANBAN_WINRATE){ clearInterval(iv); _fbaBtFill(); } else if(++t>30){ clearInterval(iv); _fbaBtFill(); } },800);
+    })();
+    </script>
+    <script>
+    (function(){
+      function esc(s){ return String(s==null?'':s); }
+      function cell(r, priceLabel){
+        var to=(r.turnover!=null && isFinite(+r.turnover))?(+r.turnover).toFixed(2)+'%':'-';
+        return '<div style="border:1px solid #2a2f3a;border-radius:8px;padding:5px 7px;background:#14161c;">'
+          +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;">'
+          +'<b style="color:#e6e9ef;font-size:12.5px">'+esc(r.name)+'</b>'
+          +'<span style="color:#8a93a6;font-size:11px">'+esc(r.code)+'</span></div>'
+          +'<div style="display:flex;justify-content:space-between;margin-top:3px;font-size:11.5px;">'
+          +'<span style="color:#ef5350">'+priceLabel+' <b>'+esc(r.board_close)+'</b></span>'
+          +'<span style="color:#ef5350">量比 <b>'+esc(r.vol_ratio)+'</b>×</span></div>'
+          +'<div style="display:flex;justify-content:space-between;margin-top:2px;font-size:11px;color:#8a93a6;">'
+          +'<span>换手 '+to+'</span>'
+          +'<span>'+esc(r.industry||'-')+'</span></div></div>';
+      }
+      function tbl(rows, priceLabel){
+        rows=rows.slice().sort(function(x,y){ return (+y.vol_ratio||0)-(+x.vol_ratio||0); });
+        var h='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">';
+        rows.forEach(function(r){ h+=cell(r,priceLabel); });
+        return h+'</div>';
+      }
+      function fbaFill(){
+        var d=window.FIRST_BOARD_ALERT; var el=document.getElementById('fbaBody');
+        if(!el) return;
+        if(!d){ setTimeout(fbaFill,800); return; }
+        var a=(d.alerts||[]), l2=(d.ladder2||[]);
+        var upd=document.getElementById('fbaUpd');
+        if(upd && d.update_time){
+          if(typeof setBadge==='function'){ setBadge('fbaUpd','盘后','短线',d.update_time); }
+          else if(window._uBadge){ upd.innerHTML=window._uBadge('盘后','短线',d.update_time); }
+          else { upd.textContent='更新于 '+d.update_time; }
+        }
+        var h='';
+        h+='<div style="color:#c9d1dc;font-weight:600;margin:2px 0 4px;">① 首板倍量（一进二候选）</div>';
+        if(!a.length){ h+='<div style="color:#8a93a6;margin-bottom:8px;">暂无首板倍量信号（非交易日或无符合倍量条件的首板）</div>'; }
+        else { h+=tbl(a,'首板价'); }
+        h+='<div style="color:#c9d1dc;font-weight:600;margin:10px 0 4px;">② 二进三临界观察 <span style="font-size:11px;color:#8a93a6;font-weight:400;">连板数=2 · 非推荐</span></div>';
+        if(!l2.length){ h+='<div style="color:#8a93a6;">今日无二连板（或均已一字/ST）</div>'; }
+        else { h+=tbl(l2,'二板价'); }
+        el.innerHTML=h;
+      }
+      fbaFill();
+      var t=0; var iv=setInterval(function(){ if(window.FIRST_BOARD_ALERT){ clearInterval(iv); fbaFill(); } else if(++t>30){ clearInterval(iv); } },800);
+    })();
+    </script>
+    </div><!--/st-lianban-->
 
 
 
@@ -8271,142 +8417,6 @@ window.__renderIndexObserve = function(){
 
     <!-- 💰 平均股价（全A等权）已于 2026-08-12 主人令从暂未上架移除，仅保留在「📡 实时数据」tab 跟随 AI 市场速览的紧凑版渲染 -->
 
-    <!-- 2026-09-30 阿狸咪：连板梯队前哨卡（一进二前哨 + 二进三观察 · 仅暂未上架实验区可见） -->
-    <script src="data/FIRST_BOARD_ALERT.js?v=1be553279e" defer></script>
-    <script src="data/LIANBAN_WINRATE.js?v=6075cba978" defer></script>
-    <div id="firstBoardAlertCard" class="card" style="margin-top:14px;margin-bottom:16px;background:#1a1d24;border:1px solid #2a2f3a;border-left:4px solid #fbbf24;border-radius:10px;">
-      <div style="padding:10px 12px;font-weight:700;color:#e6e9ef;border-bottom:1px solid #2a2f3a;">🔭 连板梯队前哨 <span style="font-size:11px;color:#8a93a6;font-weight:400;">一进二前哨 · 二进三观察 · 量比≥3</span> <span id="fbaUpd"></span></div>
-      <div style="padding:6px 12px 0;font-size:12px;line-height:1.7;color:#8a93a6;"><b style="color:#fbbf24;">&#x1F4CC; 核心（回测胜率 · 2026-10-09 跑批冻结；日更累积见下方「📊 回测实证」卡）：</b>T+1 开盘买入<b style="color:#fbbf24;">胜率全部不足五成</b>——全体首板 44.4%（n=8544）、倍量&#8805;3 = 46.2%（n=1408）、二连板 45.9%（n=1074）；隔夜高开率虽达 60%（二板缩量 77%），但高开发生在买入前、溢价拿不到；持有到 T+5 胜率再降至 32%~47%（倍量&gt;8 小样本低至 32.1%）。晋级率：首板 14.1%、倍量&#8805;3 = 13.9%（无增量）、二连板 23.0% ⇒ <b style="color:#fbbf24;">观察哨非买点</b>。回测口径：全市场 3988 只 · 2025-04~2026-10 上旬（274 个首板信号日）· T+1 开盘买入扣双边 0.3%<br><b style="color:#fbbf24;">&#x1F4A1; 用法：</b>盘后出名单，次日盘中确认非一字开盘、分时弱转强再介入；量比3~5倍是健康区，<b>不是越大越好</b>（&gt;8倍多为巨分歧）。<br><b style="color:#fbbf24;">&#x26A0; 限制：</b>盘后更新、非盘中实时；观察名单&#8800;买点；一字板买不进；涨停判定按板块限幅（主板10% / 创业板·科创板20%）。</div>
-      <div id="fbaBody" style="padding:10px 12px;font-size:13px;color:#8a93a6;">加载中…</div>
-    </div>
-    <div id="fbaBtPanel" style="margin-bottom:16px;background:#1a1d24;border:1px solid #2a2f3a;border-left:4px solid #fbbf24;border-radius:10px;">
-      <div style="padding:10px 12px;font-weight:700;color:#e6e9ef;border-bottom:1px solid #2a2f3a;">📊 回测实证 · 一进二 / 二进三 <span style="font-size:11px;color:#8a93a6;font-weight:400;">晋级率 · 隔夜高开 · T+1 开盘买入胜率 · T+5 胜率</span> <span id="fbaBtBadge" style="font-size:10px;font-weight:400;padding:1px 7px;border-radius:9px;background:rgba(56,189,248,.12);color:#7dd3fc;">⏳ 加载中</span></div>
-      <div id="fbaBtBody" style="padding:10px 12px;font-size:12px;color:#8a93a6;">加载中…</div>
-    </div>
-    <script>
-    (function(){
-      /* 🔁 2026-10-17 主人令「要日更」：本卡由 2026-10-09 一次性静态跑批改为**真实信号流日累积**
-         （v8/lianban_winrate.py → data/LIANBAN_WINRATE.js）。每日 post_close 从涨停池录
-         首板/二连板信号，T+5 窗口成熟后计入分组统计；未成熟不计入、绝不半路插值。
-         历史跑批结论（2026-10-09 冻结批次）见上方「🔭 连板梯队前哨」卡，与本表互不混算。 */
-      var _DEFS1=[
-        ['first_all','全体首板',false],
-        ['first_vr3','倍量≥3（① 入选口径）',true],
-        ['first_vr3_5','倍量 3~5',false],
-        ['first_vr5_8','倍量 5~8',false],
-        ['first_vr8','倍量 >8',false]
-      ];
-      var _DEFS2=[
-        ['second_all','二连板（② 入选口径）',true],
-        ['second_vr3','二板放量（倍量≥3）',false],
-        ['second_vrlt3','二板缩量（倍量<3）',false]
-      ];
-      function _pct(a,b){ return (b>0)?(a/b*100).toFixed(1)+'%':'—'; }
-      function _cell(v,hi,cls){
-        return '<td style="padding:4px 8px;border-bottom:1px solid #2a2f3a;text-align:right;'+(cls||'')+'">'+v+'</td>';
-      }
-      function _row(g,label,hi){
-        var bg=hi?'background:rgba(251,191,36,.06);':'';
-        return '<tr style="'+bg+'">'
-          +'<td style="padding:4px 8px;border-bottom:1px solid #2a2f3a;white-space:nowrap;'+(hi?'color:#e6e9ef;':'color:#8a93a6;')+'">'+label+'</td>'
-          +_cell((g&&g.n)||0,hi,'color:#8a93a6;')
-          +_cell(_pct(g&&g.promo,g&&g.n),hi,'color:#fbbf24;font-weight:600;')
-          +_cell(_pct(g&&g.gap,g&&g.n),hi,'color:#8a93a6;')
-          +_cell(_pct(g&&g.t1_win,g&&g.t1_n),hi,'color:#e6e9ef;')
-          +_cell(_pct(g&&g.t1t_win,g&&g.t1t_n),hi,'color:#8a93a6;')
-          +_cell(_pct(g&&g.t5_win,g&&g.t5_n),hi,'color:#8a93a6;')
-          +'</tr>';
-      }
-      function _table(g,defs){
-        var h='<div style="overflow-x:auto;"><table style="border-collapse:collapse;width:100%;font-size:11.5px;line-height:1.5;">'
-          +'<tr style="color:#8a93a6;font-size:10.5px;">'
-          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:left;font-weight:400;">分组</th>'
-          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">样本 n</th>'
-          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">晋级率</th>'
-          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">隔夜高开</th>'
-          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">T+1 胜率</th>'
-          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">可成交 T+1</th>'
-          +'<th style="padding:3px 8px;border-bottom:1px solid #2a2f3a;text-align:right;font-weight:400;">T+5 胜率</th>'
-          +'</tr>';
-        defs.forEach(function(d){ h+=_row(g[d[0]],d[1],d[2]); });
-        return h+'</table></div>';
-      }
-      function _fbaBtFill(){
-        var d=window.LIANBAN_WINRATE||{};
-        var el=document.getElementById('fbaBtBody');
-        var bd=document.getElementById('fbaBtBadge');
-        if(!el) return;
-        var g=d.groups||{};
-        var pend=(d.pending||[]).length;
-        var n=(d.matured_total)||0;
-        var ut=d.update_time?' · '+d.update_time:'';
-        if(bd){
-          bd.textContent=(n>0)
-            ? '🔄 日更累积 · 成熟 n='+n+' · 在途 '+pend+ut
-            : '🔄 日更累积 · 首日累积中'+ut;
-        }
-        if(!window.LIANBAN_WINRATE || (n===0 && pend===0)){
-          el.innerHTML='<div style="color:#8a93a6;line-height:1.8;">⏳ 首次累积中：每日 post_close 从涨停池录入首板/二连板真实信号（T+5 窗口成熟后计入本表，未成熟不插值）。<br>历史跑批结论（2026-10-09 静态批次·已冻结）见上方「🔭 连板梯队前哨」卡。</div>';
-          return;
-        }
-        var h='<div style="color:#c9d1dc;font-weight:600;margin:2px 0 4px;">① 一进二（首板 → 次日）</div>'
-          +_table(g,_DEFS1)
-          +'<div style="color:#c9d1dc;font-weight:600;margin:10px 0 4px;">② 二进三（二连板 → 次日）</div>'
-          +_table(g,_DEFS2)
-          +'<div style="margin-top:8px;padding:7px 10px;background:rgba(251,191,36,.07);border-left:3px solid #fbbf24;border-radius:4px;font-size:11.5px;line-height:1.7;color:#c9d1dc;">📌 口径：真实信号流日累积（akshare 涨停池 + 新浪日K）· T+1 开盘买入扣双边 0.3% · 晋级=次日涨停（主板 10%/双创 20%/北交所 30%）· 隔夜高开=次日开&gt;信号收 · 可成交=次日非一字板 · T+5=第 5 个交易日收盘卖 · 剔 ST/一字板信号 · T+5 成熟才计入（在途 '+pend+' 笔）· 样本自 '+(d.first_date||'—')+' 累积</div>'
-          +'<div style="margin-top:6px;font-size:10.5px;line-height:1.6;color:#6b7280;">* n&lt;100 小样本仅供参考 · 高亮行=本卡 ①/② 入选口径 · 历史跑批结论（2026-10-09 冻结批次：T+1 胜率全部不足五成、倍量无晋级增量 ⇒ 观察哨非买点）见上方前哨卡，与本表互不混算</div>';
-        el.innerHTML=h;
-      }
-      _fbaBtFill();
-      var t=0; var iv=setInterval(function(){ if(window.LIANBAN_WINRATE){ clearInterval(iv); _fbaBtFill(); } else if(++t>30){ clearInterval(iv); _fbaBtFill(); } },800);
-    })();
-    </script>
-    <script>
-    (function(){
-      function esc(s){ return String(s==null?'':s); }
-      function cell(r, priceLabel){
-        var to=(r.turnover!=null && isFinite(+r.turnover))?(+r.turnover).toFixed(2)+'%':'-';
-        return '<div style="border:1px solid #2a2f3a;border-radius:8px;padding:5px 7px;background:#14161c;">'
-          +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;">'
-          +'<b style="color:#e6e9ef;font-size:12.5px">'+esc(r.name)+'</b>'
-          +'<span style="color:#8a93a6;font-size:11px">'+esc(r.code)+'</span></div>'
-          +'<div style="display:flex;justify-content:space-between;margin-top:3px;font-size:11.5px;">'
-          +'<span style="color:#ef5350">'+priceLabel+' <b>'+esc(r.board_close)+'</b></span>'
-          +'<span style="color:#ef5350">量比 <b>'+esc(r.vol_ratio)+'</b>×</span></div>'
-          +'<div style="display:flex;justify-content:space-between;margin-top:2px;font-size:11px;color:#8a93a6;">'
-          +'<span>换手 '+to+'</span>'
-          +'<span>'+esc(r.industry||'-')+'</span></div></div>';
-      }
-      function tbl(rows, priceLabel){
-        rows=rows.slice().sort(function(x,y){ return (+y.vol_ratio||0)-(+x.vol_ratio||0); });
-        var h='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">';
-        rows.forEach(function(r){ h+=cell(r,priceLabel); });
-        return h+'</div>';
-      }
-      function fbaFill(){
-        var d=window.FIRST_BOARD_ALERT; var el=document.getElementById('fbaBody');
-        if(!el) return;
-        if(!d){ setTimeout(fbaFill,800); return; }
-        var a=(d.alerts||[]), l2=(d.ladder2||[]);
-        var upd=document.getElementById('fbaUpd');
-        if(upd && d.update_time){
-          if(typeof setBadge==='function'){ setBadge('fbaUpd','盘后','短线',d.update_time); }
-          else if(window._uBadge){ upd.innerHTML=window._uBadge('盘后','短线',d.update_time); }
-          else { upd.textContent='更新于 '+d.update_time; }
-        }
-        var h='';
-        h+='<div style="color:#c9d1dc;font-weight:600;margin:2px 0 4px;">① 首板倍量（一进二候选）</div>';
-        if(!a.length){ h+='<div style="color:#8a93a6;margin-bottom:8px;">暂无首板倍量信号（非交易日或无符合倍量条件的首板）</div>'; }
-        else { h+=tbl(a,'首板价'); }
-        h+='<div style="color:#c9d1dc;font-weight:600;margin:10px 0 4px;">② 二进三临界观察 <span style="font-size:11px;color:#8a93a6;font-weight:400;">连板数=2 · 非推荐</span></div>';
-        if(!l2.length){ h+='<div style="color:#8a93a6;">今日无二连板（或均已一字/ST）</div>'; }
-        else { h+=tbl(l2,'二板价'); }
-        el.innerHTML=h;
-      }
-      fbaFill();
-      var t=0; var iv=setInterval(function(){ if(window.FIRST_BOARD_ALERT){ clearInterval(iv); fbaFill(); } else if(++t>30){ clearInterval(iv); } },800);
-    })();
-    </script>
     <div id="unlistedPanel"></div>
   </section>
 
@@ -12351,6 +12361,9 @@ function drawUpDownChart(){
 
           {name:'持仓盈亏跟踪', source:'H_AUTO_BUY', freq:'盘后', slots:['1','7',':','3','0'], note:'持仓盈亏'},
 
+          {name:'连板梯队前哨', source:'FIRST_BOARD_ALERT', freq:'收盘后1次', slots:['23:30'], note:'🆕 2026-10-19 自暂未上架迁入·连板梯队子页'},
+          {name:'回测实证·一进二/二进三', source:'LIANBAN_WINRATE', freq:'收盘后1次', slots:['17:20'], note:'🆕 2026-10-19 自暂未上架迁入·真实信号流日累积'},
+
 
 
 
@@ -12389,9 +12402,7 @@ function drawUpDownChart(){
 
           {name:'主升/启动板块·龙头股', source:'SECTOR_LEADERS', freq:'收盘后1次', slots:['21:45'], note:'观测类·板块龙头'},
 
-          {name:'连板梯队前哨', source:'FIRST_BOARD_ALERT', freq:'收盘后1次', slots:['23:30'], note:'一进二/二进三观察'},
 
-          {name:'回测实证·一进二/二进三', source:'LIANBAN_WINRATE', freq:'收盘后1次', slots:['17:20'], note:'真实信号流日累积·T+5成熟计入'},
 
           {name:'大基金增减持监控', source:'DAJIJIN_REDUCTION', freq:'工作日20:30', slots:['20:30'], note:'观测类'}
 
@@ -12960,9 +12971,9 @@ function drawUpDownChart(){
     '盘后数据': ['MARGIN_DATA', 'ETF_DAILY_MONITOR', 'SECTOR_RECOMMENDATION', 'ETF_NET_SUBSCRIPTION', 'W52_HIGH', 'SECTOR_YEAR_FLOW'],
     '共振日历': ['CRISIS_DATA', 'LHB_DATA'],
     '最终推荐': ['FACTOR_LAB', 'TOP10_DAILY'],
-    '选股策略': ['CANDIDATE', 'GOLD_POOL', 'IMA_STRONG_BACKTEST', 'VOLATILITY', 'STOCK_STOP_DATA', 'H_AUTO_BUY', 'H_AUTO_BUY_TRACK', 'IMA_STRONG_STOCK'],  /* 🔴 2026-10-11：TRIPLE_CONSENSUS/TRIPLE_HISTORY/CRDS_CARD_DATA 随两策略下架移除；🔴 2026-10-18：四量终极+ALGO_TRACK 随四量下架移除 */
+    '选股策略': ['CANDIDATE', 'GOLD_POOL', 'IMA_STRONG_BACKTEST', 'VOLATILITY', 'STOCK_STOP_DATA', 'H_AUTO_BUY', 'H_AUTO_BUY_TRACK', 'IMA_STRONG_STOCK', 'FIRST_BOARD_ALERT', 'LIANBAN_WINRATE'],  /* 🆕 2026-10-19：连板梯队两卡自暂未上架迁入 */  /* 🔴 2026-10-11：TRIPLE_CONSENSUS/TRIPLE_HISTORY/CRDS_CARD_DATA 随两策略下架移除；🔴 2026-10-18：四量终极+ALGO_TRACK 随四量下架移除 */
     '策略回测': ['BACKTEST_ALL_ALGOS'],
-    '暂未上架': ['MARKET_REGIME', 'SECTOR_LEADERS', 'FIRST_BOARD_ALERT', 'DAJIJIN_REDUCTION'],
+    '暂未上架': ['MARKET_REGIME', 'SECTOR_LEADERS', 'DAJIJIN_REDUCTION'],  /* 🔴 2026-10-19：FIRST_BOARD_ALERT 随卡迁入选股策略 */
     '运维': ['INST_TRADE', 'DO_NOT_DELETE'],
     '全量数据': ['NT_DATA', 'all_AUDIT_TRAIL', 'all_BACKTEST_COMPREHENSIVE', 'all_BACKTEST_TDX', 'all_CANDIDATE_BACKTEST', 'all_CANDIDATE_QUOTES', 'all_CAPITAL_FLOW_DATA', 'all_CITIC_PE_BACKTEST', 'all_CONCEPT_ETF_MAP', 'all_EXPERIMENT', 'all_FACTOR_AUDIT', 'all_FACTOR_LAB_BACKTEST', 'all_FACTOR_PROGRESS', 'all_FACTOR_WALKFORWARD', 'all_FINAL_RECOMMEND_DATA', 'all_FRESHNESS_STATUS', 'all_FUNDAMENTAL_QUALITY', 'all_GOLD_POOL_BACKTEST', 'all_HB_ALIMI', 'all_HB_XIAOJIU', 'all_HEALTH_CHECK', 'all_INDEX_HISTORY', 'all_LHB_HISTORY', 'all_LIMIT_UP_BROKEN', 'all_MACRO_BRIEF', 'all_MARKET_THERMO', 'all_NORTH_FUND', 'all_OPTIMIZED_STRATEGY', 'all_PORTFOLIO', 'all_RISK_GAUGE', 'all_RUNNER_STATUS', 'all_RUNNER_STATUS_HEALTH', 'all_SECTOR_CYCLE_ARCHIVE', 'all_SECTOR_FUND_FLOW_INTRADAY', 'all_SECTOR_FUND_FLOW_TREND', 'all_SECTOR_PHASE_HISTORY', 'all_SECTOR_RS', 'all_SENTIMENT_CYCLE', 'all_SH_SZ_HISTORY', 'all_STOCK_LIST', 'all_SUSPENSION_ALERT', 'all_SZ_FIB', 'all_US_HK_MAP', 'all_V8_POOL_TRACKER', 'all_VALUATION_PERCENTILE', 'all_WEEKEND_META_REPORT', 'all_WEEKEND_RUN'],  /* 🔴 2026-10-11：all_CRDS_BACKTEST/all_TRIPLE_TRACK 随两策略下架移除 */
     '管线': ['raw_etf_pulse.json', 'raw_capital_flow_data.json', 'raw_index_quotes.json', 'raw_crisis_data.json', 'raw_concept_ranking.json', 'raw_volume', 'site_sync', 'runner_local', 'runner_github', 'runner'],
@@ -14572,7 +14583,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
     // 🔴 2026-10-18 主人截图修复：原数组 ['fv','pool','life','lqsq'] 漏 'lowvol' → 低波 pane 永不显示（全黑）；
     // 且 'fv' 为死项（st-fv DOM 全站 0）。pane id 必须与 .st-pane DOM 一一对应。
-    ['pool','life','lqsq','lowvol','intraday'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['pool','life','lqsq','lowvol','intraday','lianban'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
     // 2026-08-29 主人令：选股池子页渲染（2026-09-11：并入金股池卡片，统一走 renderStPoolAll）
     if(n==='pool' && typeof window.renderStPoolAll==='function') setTimeout(window.renderStPoolAll, 30);

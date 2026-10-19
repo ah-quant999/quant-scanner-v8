@@ -6,9 +6,11 @@ strategy_intraday_momentum.py — 日内动量（第三支自研算法）· 真�
 🚀 2026-10-18 主人令「可靠科学且有效的我都要。今晚能做都做」：第二批候选因子
    上市前置回测（bt_factors.py，口径=全市场等权基准·T+1 开盘买·持 N 收盘卖·双边 0.3%，
    窗口 2025-04-24~2026-10-16，全 A 2574 只过滤后）结果——
-   · S7 日内动量 ✅ 唯一跑赢：N=20 avg +2.59% vs 基准 +0.86%（α +1.73pp，n=2411）；
-     N=10 α +0.57pp、N=30 α +1.21pp；**N≥45 衰减转负（-0.57/-0.82pp）⇒ 短中持有期有效，
-     主档 T+20**。胜率 42.6% 为动量类天然特征（正偏度策略：小亏多次+大赢少数覆盖）。
+   · S7 日内动量 ✅ 全档正 α（2026-10-19 审计修复 #2：本段与内置 REPLAY_BY_PERIOD 对齐，
+     原文案"N≥45 衰减转负"被自身回放表推翻）：N=20 avg +4.13% vs 基准 +0.86%
+     （α +3.27pp，胜率 45.7%，n=1209）；N=30 α +3.39pp 为峰值；N=45/60 衰减但仍正
+     （+2.10 / +0.90pp）⇒ 中短持有期有效，主档 T+20（动量未明显衰减前、样本量最充足档）。
+     胜率 ~45% 为动量类天然特征（正偏度策略：小亏多次+大赢少数覆盖）。
    · 同批 S5 短期反转（全档 α −0.7~−4.1pp）/ S6 52周新高贴近（全档 α −0.3~−1.1pp）
      未跑赢基准 ⇒ 留档不上线。
 
@@ -22,7 +24,8 @@ strategy_intraday_momentum.py — 日内动量（第三支自研算法）· 真�
     （真实信号流，上线首日即建，含已回落票，防幸存者偏差——同 LQSQ 纪律）
 
 自回测主榜（data/INTRADAY_MOMENTUM_BACKTEST.js，真实信号流口径 2026-10-11 主人令）：
-  · 每日归档信号 → 次日开盘买 → 持 N 收盘卖 → 扣双边 0.3%；基准=同过滤 universe 等权
+  · 每日归档信号 → 次日开盘买 → 持 N 收盘卖 → 扣双边 0.3%；
+    基准=逐日点内构建的同过滤 universe 等权（2026-10-19 审计修复 #3，同 LQSQ 口径）
   · 未走满不计入；主档 T+20；🔴 历史规则回放禁作主榜——主榜只认本归档前向跟踪
   · replay 段（样本内·参考·禁作主榜依据）内置 bt_factors S7 全档结果，重写时透传保留
 
@@ -51,7 +54,7 @@ EXT_MIN_LEN = 300
 RECENT_N = 20
 MOM_WIN = 20
 LIQ_AMT = 50_000_000.0
-AMT_MEDIAN_LO, AMT_MEDIAN_HI = 1e7, 1e10
+AMT_MEDIAN_LO, AMT_MEDIAN_HI = 1.0e8, 2.0e10  # 2026-10-19 算法审计修复 #1：对齐权威源 generate_top10.py P5 / gen_lqsq_top5（原 1e7,1e10 区间偏窄致口径漂移）
 TOP_K = 5
 ALIGN_RATIO = 0.60
 LADDERS = [5, 10, 20, 30, 45, 60]
@@ -153,12 +156,16 @@ def main():
     bars_map = load_bars()
     log("载入 %d 只（ext 优先）" % len(bars_map))
 
-    # ── 自刷新：复用 gen_lqsq_top5.refresh_stale（与量质双擎/低波同源同通道，禁第二套实现）──
+    # ── 自刷新：复用 gen_lqsq_top5.refresh_stale（与量质双擎/低波同源同通道，禁第二套实现）；
+    #    amt_unit_for = 按票判量纲（2026-10-19 审计修复 #7，同源复用禁第二套）──
     try:
-        from gen_lqsq_top5 import refresh_stale
+        from gen_lqsq_top5 import refresh_stale, amt_unit_for
         refresh_stale(bars_map)
     except Exception as e:
         log("⚠️ refresh_stale 复用失败（退化为纯缓存口径）: %s" % str(e)[:100])
+
+        def amt_unit_for(raw_amt, batch_unit):
+            return batch_unit  # 降级兜底：批中位口径（refresh 复用失败时的离线退化路径）
 
     # ── 数据日：最近一个对齐率 ≥60% 的交易日 ──
     last_dates = Counter(b[-1]["date"] for b in bars_map.values() if len(b) >= MIN_BARS)
@@ -204,9 +211,14 @@ def main():
     else:
         unit = 0.0
     if unit:
-        uni = {c: b for c, b in uni.items()
-               if sum(float(x.get("volume") or 0.0) * float(x.get("close") or 0.0)
-                      for x in b[-RECENT_N:]) / RECENT_N * unit >= LIQ_AMT}
+        _kept = {}
+        for c, b in uni.items():
+            _raw = sum(float(x.get("volume") or 0.0) * float(x.get("close") or 0.0)
+                       for x in b[-RECENT_N:]) / RECENT_N
+            _u = amt_unit_for(_raw, unit)  # 2026-10-19 审计修复 #7：按票判量纲，批中位兜底
+            if _u and _raw * _u >= LIQ_AMT:
+                _kept[c] = b
+        uni = _kept
     log("过滤后候选池：%d 只" % len(uni))
     if len(uni) < MIN_UNIVERSE:
         raise SystemExit("候选池 %d < %d —— 放弃本日（宁缺勿滥）" % (len(uni), MIN_UNIVERSE))
@@ -249,18 +261,51 @@ def main():
               open(OUT_JSON, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
     # ── 自回测（真实信号流口径；未走满不计入）──
+    # 2026-10-19 审计修复 #3：轴/仓位表从「今日过滤池 uni」扩展到**全缓存池 bars_map** ——
+    #   原实现里历史信号的收益与基准都被今日过滤池截断（今日 ST/退/落闸的票从历史回测中
+    #   消失 = 幸存者偏差）。picks 归档时已按当日口径选入，回测只取价、不重套今日过滤。
     gset = set()
-    for b in uni.values():
+    for b in bars_map.values():
         gset.update(x["date"] for x in b)
     gd = sorted(gset)
     gidx = {d: i for i, d in enumerate(gd)}
     pos_map, bar_map = {}, {}
-    for c, b in uni.items():
+    for c, b in bars_map.items():
         pos_map[c] = {gidx[x["date"]]: i for i, x in enumerate(b)}
         bar_map[c] = b
-    lim = {c: (1.197 if c[0] == "3" or c[:2] == "68" else 1.097) for c in uni}
+    lim = {c: (1.197 if c[0] == "3" or c[:2] == "68" else 1.097) for c in bars_map}
 
     sig_days = sorted(days)
+
+    # 基准 universe：逐日点内构建（2026-10-19 审计修复 #3；每信号日一次、各 N 档复用）——
+    # 在每个信号日当天下，用各股自身 ≤当日 数据重建同款过滤（名称/价格/近20日停牌/流动性），
+    # 与 LQSQ 逐日构建口径对齐；只含当时存在的股票，不再用今日池套历史日。
+    bench_uni = {}
+    for d in sig_days:
+        g = gidx.get(d)
+        if g is None:
+            bench_uni[d] = []
+            continue
+        members = []
+        for c, b in bars_map.items():
+            i = pos_map[c].get(g)
+            if i is None or i < MIN_BARS:
+                continue  # 当日未上市/历史不足
+            if ok_names is not None and c not in ok_names:
+                continue
+            if float(b[i].get("close") or 0.0) < MIN_PRICE:
+                continue
+            seg = b[i - RECENT_N + 1: i + 1]
+            if len(seg) < RECENT_N or any(float(x.get("volume") or 0.0) <= 0 for x in seg):
+                continue
+            _raw = sum(float(x.get("volume") or 0.0) * float(x.get("close") or 0.0)
+                       for x in seg) / RECENT_N
+            _u = amt_unit_for(_raw, unit)
+            if _u and _raw * _u < LIQ_AMT:
+                continue
+            members.append(c)
+        bench_uni[d] = members
+
     by_period = {}
     for N in LADDERS:
         rets, bsum, bcnt = [], 0.0, 0
@@ -282,9 +327,11 @@ def main():
                 if pc <= 0 or op <= 0 or xc <= 0 or op >= pc * lim[c]:
                     continue
                 rets.append(xc / op - 1.0 - COST)
+            # 基准（同日同梯）：逐日点内 universe 等权（bench_uni，2026-10-19 修复 #3）
             s = 0.0
             k = 0
-            for c, pos in pos_map.items():
+            for c in bench_uni.get(d, ()):
+                pos = pos_map[c]
                 ie, ix = pos.get(g + 1), pos.get(g + 1 + N)
                 if ie is None or ix is None or ie == 0:
                     continue
@@ -344,7 +391,8 @@ def main():
         "method": ("真实信号流口径（2026-10-11 主人令）：每日全市场近 20 日日内累计收益（∑close/open−1）最高 Top5 "
                    "且收盘>MA60（日内动量，Top5 口径上市前置回测 N=20 α+3.27pp/胜率45.7pct 全档正α；N≥60 衰减 ⇒ 主档 T+"
                    + str(PRIMARY_N) + "），次开买入、持有 N 个交易日收盘卖出（前复权·扣双边 0.3pct）；"
-                   "基准=同过滤 universe 等权。样本随持有天数成熟而增加，未走满不计入。"),
+                   "基准=逐日点内构建的同过滤 universe 等权（2026-10-19 审计修复 #3）。"
+                   "样本随持有天数成熟而增加，未走满不计入。"),
         "signal_source": "intraday_momentum_history 逐日真实选股归档（上线首日即建，含已回落票，防幸存者偏差）",
         "track_start": min(sig_days) if sig_days else data_date,
         "signal_date_range": "%s ~ %s" % (min(sig_days), max(sig_days)) if sig_days else data_date,
