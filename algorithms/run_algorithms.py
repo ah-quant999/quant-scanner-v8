@@ -253,6 +253,7 @@ ORDER = [
     # "gen_algo_track.py",                # （已摘链 2026-10-18）→ ALGO_TRACK.js
     # ── 2026-08-17 主人怒令「每个前端的算法都全面审计」补入：之前完全不调度，前端卡永远陈旧 ──
     "calc_sentiment_cycle.py",          # → data/SENTIMENT_CYCLE.js（情绪周期，读 LIMIT_UP_HEATMAP；之前无任何 workflow 调用 = 孤儿）
+    "gen_new_algo_tri.py",              # 🆕 2026-10-19 主人令三新算法：缩量回踩VCP/板块资金共振轮动/LHB机构跟随 → data/NEW_ALGO_TRI.js
     "refresh_dividend_cninfo.py",       # → 更新 STOCK_QUOTE 分红字段（读 PORTFOLIO/CANDIDATE/GOLD_POOL；之前无任何 workflow 调用）
     # 🛡 2026-08-18 一劳永逸式修复：以下两脚本原不在 run_algorithms 链中，导致前端卡长期陈旧
     #   - refresh_stock_metadata.py → raw_data/weekend_meta_report.json（周末复盘，月度个股资料）
