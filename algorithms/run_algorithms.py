@@ -366,6 +366,11 @@ ORDER = [
     #   产出 raw_data/factor_walkforward.json → scripts/gen_factor_progress.py 判 done/删除 + generate_top10.py 仅 PASS 启用。
     #   ⚠️ 与 STAGES["E"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
     "factor_walkforward.py",   # → raw_data/factor_walkforward.json（walk-forward 回测，全市场 K 线）
+    # 🆕 2026-10-19 主人令「最终推荐回测日更」：gen_final_recommend_backtest.py 此前只手工跑过、未入链
+    #   ⇒ FINAL_RECOMMEND_BACKTEST 长期 stale（与 FINAL_RECOMMEND_DATA 不同步）。现补挂 E 批最末（依赖 D 批
+    #   final_recommend 真实信号归档 final_recommend_history + 当日 FINAL_RECOMMEND_DATA）；与 STAGES["E"] 成对。
+    #   ⚠️ 与 STAGES["E"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
+    "gen_final_recommend_backtest.py",   # → data/FINAL_RECOMMEND_BACKTEST.js（最终推荐真实信号流回测）
     ]
 
 
@@ -487,6 +492,8 @@ STAGES = {
         "v8/gen_citic_pe.py",     # → data/CITIC_PE_THERMO.js + CITIC_PE_BACKTEST.js
         # 🆕 2026-09-17 主人令·全站口径统一（⑭）：factor_walkforward 引擎补挂主链 E 批最末（与 ORDER 同位置，成对修改）
         "factor_walkforward.py",   # → raw_data/factor_walkforward.json（walk-forward 回测，全市场 K 线）
+        # 🆕 2026-10-19 主人令「最终推荐回测日更」：与 ORDER 成对补挂（gen_final_recommend_backtest.py）。
+        "gen_final_recommend_backtest.py",   # → data/FINAL_RECOMMEND_BACKTEST.js（最终推荐真实信号流回测）
     ],
     "D": [  # 汇总批（~20:00 CST，依赖全部）：仅 final_recommend（LHB历史/7d/生命周期/factor_lab_gen 前置到 B 批·互踢暴风根治）
         "final_recommend.py",   # 必需上游 = B 批产物（CRDS/TOP10/三重共识/crisis/sector_rs/stock_profile/triple_track）

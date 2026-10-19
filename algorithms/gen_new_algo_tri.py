@@ -28,6 +28,7 @@ import os
 import re
 import sys
 import glob
+import bisect
 import argparse
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
@@ -280,7 +281,7 @@ def calc_rotation():
         leaders = []
         if lead:
             for L in (lead.get("leaders") or [])[:3]:
-                leaders.append({"name": L.get("name"), "chg": L.get("chg")})
+                leaders.append({"name": L.get("name"), "chg": L.get("chg"), "code": L.get("code")})
         rows.append({
             "sector": name, "type": sec.get("type", ""), "stage": stage,
             "consecutive_days": cons, "net_5d": net5, "net_20d": net20,
@@ -332,6 +333,179 @@ def calc_lhb_follow():
     return {"date": d.get("date", ""), "count": len(items), "items": items[:15]}
 
 
+# ══════════════════════════════════════════════════════════════
+# ④ 真实信号流回测（仿 strategy_intraday_momentum.py / gen_lqsq_top5.py）
+#    每日信号 → 次开买入 → 持有 N 日收盘卖出（扣双边 0.3%）→ 胜率/均益/基准；
+#    样本随持有天数成熟累积，未走满不计入；基准 = 全市场等权（剔 ST/退、价≥2）。
+#    三算法（vcp/rotation/lhb）共用同一归档文件 new_algo_tri_history.json。
+# ══════════════════════════════════════════════════════════════
+TRI_COST = 0.003
+TRI_N_LIST = [1, 3, 5, 10, 20]
+TRI_HISTORY = RAW / "new_algo_tri_history.json"
+TRI_BACKTEST_JS = DATA / "NEW_ALGO_TRI_BACKTEST.js"
+
+
+def _tri_load_bars():
+    """全 A 日线缓存 → {code:(dates,bars)} + 全局交易日历 + 每票 date→index。"""
+    series, all_dates = {}, set()
+    for fp in glob.glob(str(KLINE_DIR / "*.json")):
+        code = Path(fp).stem
+        if len(code) != 6 or code[0] not in "0368":
+            continue
+        try:
+            bars = json.loads(Path(fp).read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if not isinstance(bars, list) or len(bars) < 60:
+            continue
+        ds = [b.get("date") for b in bars]
+        series[code] = (ds, bars)
+        all_dates.update(d for d in ds if d)
+    gdates = sorted(all_dates)
+    pos = {c: {d: i for i, d in enumerate(ds)} for c, (ds, _) in series.items()}
+    return series, pos, gdates
+
+
+def _tri_st_set():
+    """ST / 退 股票代码集合（基准排除用）。"""
+    st = set()
+    try:
+        d = json.loads((RAW / "stock_names.json").read_text(encoding="utf-8"))
+        rows = d.get("data") if isinstance(d, dict) else d
+        if isinstance(rows, list):
+            for it in rows:
+                if isinstance(it, dict) and "name" in it and "code" in it:
+                    nm = str(it["name"])
+                    if "ST" in nm.upper() or "退" in nm:
+                        st.add(str(it["code"]))
+    except Exception:
+        pass
+    return st
+
+
+def _tri_backtest_section(series, pos, gdates, history, st_set):
+    """history: [{signal_date, picks:[codes]}] → by_period（真实信号流前向回测）。"""
+    picks_map = {h["signal_date"]: (h.get("picks") or []) for h in history}
+    sig_days = sorted(picks_map.keys())
+    bench_cache = {}
+
+    def bench(gi, N):
+        key = (gi, N)
+        if key in bench_cache:
+            return bench_cache[key]
+        ti, tx = gi + 1, gi + 1 + N
+        if tx >= len(gdates):
+            bench_cache[key] = None
+            return None
+        dt_i, dt_x = gdates[ti], gdates[tx]
+        s, k = 0.0, 0
+        for code, p in pos.items():
+            if code in st_set:
+                continue
+            ii, xx = p.get(dt_i), p.get(dt_x)
+            if ii is None or xx is None or ii == 0 or xx == 0:
+                continue
+            bars = series[code][1]
+            pc = float(bars[ii - 1].get("close") or 0)
+            op = float(bars[ii].get("open") or 0)
+            xc = float(bars[xx].get("close") or 0)
+            if pc <= 0 or op <= 0 or xc <= 0:
+                continue
+            if pc < 2.0:  # 价格≥2 过滤（与文档基准口径对齐）
+                continue
+            s += xc / op - 1.0 - TRI_COST
+            k += 1
+        res = (s, k) if k >= 50 else None
+        bench_cache[key] = res
+        return res
+
+    by = {}
+    for N in TRI_N_LIST:
+        rets, bs, bc = [], 0.0, 0
+        for d in sig_days:
+            gi = bisect.bisect_left(gdates, d)
+            if gi >= len(gdates) or gdates[gi] != d:
+                continue
+            for code in (picks_map.get(d) or []):
+                p = pos.get(code)
+                if not p:
+                    continue
+                ti, tx = gi + 1, gi + 1 + N
+                if tx >= len(gdates):
+                    continue
+                ii, xx = p.get(gdates[ti]), p.get(gdates[tx])
+                if ii is None or xx is None or ii == 0 or xx == 0:
+                    continue
+                bars = series[code][1]
+                pc = float(bars[ii - 1].get("close") or 0)
+                op = float(bars[ii].get("open") or 0)
+                xc = float(bars[xx].get("close") or 0)
+                if pc <= 0 or op <= 0 or xc <= 0:
+                    continue
+                rets.append(xc / op - 1.0 - TRI_COST)
+            b = bench(gi, N)
+            if b is not None:
+                bs += b[0] / b[1]   # 先除以个股数 k 得「当日等权均值」，再跨日累加（仿日内动量 bsum += s/k）
+                bc += 1
+        if rets:
+            by[str(N)] = {
+                "samples": len(rets),
+                "win_rate": round(100.0 * sum(1 for r in rets if r > 0) / len(rets), 1),
+                "avg_return": round(100.0 * sum(rets) / len(rets), 2),
+                "best_return": round(100.0 * max(rets), 2),
+                "worst_return": round(100.0 * min(rets), 2),
+                "bench_avg_return": round(100.0 * bs / bc, 2) if bc else None,
+                "bench_days": bc,
+            }
+    total = sum(len(h.get("picks") or []) for h in history)
+    return by, total
+
+
+def _tri_run_backtest(out):
+    today = datetime.now(CST).strftime("%Y-%m-%d")
+    vcp_codes = [x["code"] for x in (out.get("vcp") or {}).get("items") or [] if x.get("code")]
+    lhb_codes = [x["code"] for x in (out.get("lhb") or {}).get("items") or [] if x.get("code")]
+    rot_codes = []
+    for it in (out.get("rotation") or {}).get("items") or []:
+        for L in (it.get("leaders") or []):
+            c = L.get("code")
+            if c:
+                rot_codes.append(c)
+    # 载入/更新归档（同 signal_date 去重，防重跑重复追加）
+    hist = load_json(TRI_HISTORY, {"vcp": [], "rotation": [], "lhb": []})
+    for key, codes in (("vcp", vcp_codes), ("rotation", rot_codes), ("lhb", lhb_codes)):
+        lst = [h for h in (hist.get(key) or []) if h.get("signal_date") != today]
+        lst.append({"signal_date": today, "picks": codes})
+        hist[key] = lst
+    TRI_HISTORY.write_text(json.dumps(hist, ensure_ascii=False), encoding="utf-8")
+    # 计算（载入全 A 日线缓存 + ST 集合）
+    series, pos, gdates = _tri_load_bars()
+    st_set = _tri_st_set()
+    payload = {"update_time": now_cst()}
+    for key in ("vcp", "rotation", "lhb"):
+        by, total = _tri_backtest_section(series, pos, gdates, hist.get(key) or [], st_set)
+        sd = [h["signal_date"] for h in (hist.get(key) or [])]
+        payload[key] = {
+            "update_time": now_cst(),
+            "method": ("真实信号流口径（2026-10-19 主人令）：每日盘后产出信号 → 次开买入、持有 N 个交易日"
+                       "收盘卖出（前复权·扣双边 0.3%）；基准=全市场等权（剔 ST/退、价格≥2）。"
+                       "样本随持有天数成熟累积，未走满不计入。"),
+            "signal_source": "new_algo_tri_history 逐日真实信号归档（上线首日即建，含已回落票，防幸存者偏差）",
+            "track_start": min(sd) if sd else today,
+            "signal_date_range": ("%s ~ %s" % (min(sd), max(sd))) if sd else today,
+            "total_signals": total,
+            "cost_adjusted": True,
+            "summary": {"by_period": by},
+        }
+    TRI_BACKTEST_JS.write_text(
+        "window.NEW_ALGO_TRI_BACKTEST = " + json.dumps(payload, ensure_ascii=False) + ";\n",
+        encoding="utf-8")
+    print("  ✅ 回测已写 %s（vcp档=%d rotation档=%d lhb档=%d）" % (
+        TRI_BACKTEST_JS.name, len(payload["vcp"]["summary"]["by_period"]),
+        len(payload["rotation"]["summary"]["by_period"]),
+        len(payload["lhb"]["summary"]["by_period"])))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--vcp-limit", type=int, default=None)
@@ -371,6 +545,12 @@ def main():
     except Exception as e:
         out["lhb"] = {"date": "", "count": 0, "items": [], "reason": f"error: {e}"}
         print(f"  ③ LHB 失败: {e}")
+
+    # ── 真实信号流回测（三算法共用归档 new_algo_tri_history.json → NEW_ALGO_TRI_BACKTEST.js）──
+    try:
+        _tri_run_backtest(out)
+    except Exception as e:
+        print(f"  ⚠️ 三新算法回测计算失败（不影响信号产出）: {e}")
 
     OUT_RAW.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
     OUT_JS.write_text("window.NEW_ALGO_TRI = " + json.dumps(out, ensure_ascii=False) + ";\n",
