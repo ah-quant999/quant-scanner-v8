@@ -1533,6 +1533,22 @@ function _buildJudgmentEnvHTML(d){
   var fullMb = (typeof window !== 'undefined' && window.MACRO_BRIEF) || {};
   var mb = (fullMb.headline ? fullMb : (d.macro_brief || {})) || {};
   var news = (fullMb.news_brief && fullMb.news_brief.length ? fullMb.news_brief : (mb.news_brief || [])) || [];
+  /* 🛡 2026-10-19 一劳永逸（环境态势·美联储旧闻根治）：
+     生成器对议息条目打 _fed_date（决议日）标记，但前端从未使用 ⇒ 决议日 2026-09-16 的
+     旧闻一直顶在卡首 33 天不退（实测确证）。此处加保鲜守卫：带 _fed_date 且超过
+     2 个自然日的条目一律不渲染（决议影响已由 key_numbers 美债10Y/美元指数实时承接）。
+     双保险：生成器侧 cloud_fetch_v8.py 同步改为过期不注入。 */
+  var _newsFreshToday = (function(){
+    var _p = (typeof window !== 'undefined' && window._cstParts) ? window._cstParts(new Date()) : null;
+    if(_p) return new Date(_p.y, _p.m-1, _p.d).getTime();
+    var _n = new Date(); return new Date(_n.getFullYear(), _n.getMonth(), _n.getDate()).getTime();
+  })();
+  news = news.filter(function(_n){
+    var _fd = _n && _n._fed_date ? String(_n._fed_date).match(/(\d{4})-(\d{2})-(\d{2})/) : null;
+    if(!_fd) return true; /* 无决议日标记的条目（生成器当日直出）照常渲染 */
+    var _age = Math.floor((_newsFreshToday - new Date(+_fd[1], +_fd[2]-1, +_fd[3]).getTime()) / 86400000);
+    return _age <= 2;
+  });
   if(mb.headline || news.length){
     h += '<div style="margin-bottom:8px;padding:8px 10px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.22);border-radius:8px;font-size:12px;line-height:1.5">';
     if(mb.headline) h += '<div style="font-weight:700;color:#38bdf8;margin-bottom:3px">🌐 时事滚动 · '+mb.headline+'</div>';
@@ -17874,15 +17890,20 @@ window.__renderV8CalToday();
   tryRun('renderJudgmentBody', window.__renderJudgmentBody, 'judgment-body init');
   // 2026-08-15 修复：data/*.js 用 defer，内联渲染在解析阶段读到空占位；DOMContentLoaded 时 defer 已执行，重绘兜底
   if(typeof document !== 'undefined'){
-    var _v8CalRetryDone = false;
     var _jdRetryDone = false;
     function doV8CalRetry(){
-      if(_v8CalRetryDone) return;
-      _v8CalRetryDone = true;
+      /* 🛡 2026-10-19 一劳永逸（今日事件详情空白根治）：
+         原 doV8CalRetry 把 __renderV8CalFull 与 __renderV8CalToday 共用一个 try + 一次性旗标——
+         实测真机：__renderV8CalFull 抛错 ⇒ __renderV8CalToday 被跳过 ⇒ 旗标已消费，
+         400/1200ms 兜底全部空转 ⇒ 卡片永久「今日日历无标注事件」（数据 V8_CAL 明明有当日事件）。
+         修法：① 两次渲染各自独立 try（互不拖垮）；② 去掉一次性旗标（渲染幂等，重试安全）；
+               ③ 追加 1.5s 永久自愈轮询（与 ceBody / limitUpHeat 同范式）。 */
       try{
         if(typeof window.__renderV8CalFull==='function') window.__renderV8CalFull();
+      }catch(e){ console.warn('[v8cal full retry]', e); }
+      try{
         if(typeof window.__renderV8CalToday==='function') window.__renderV8CalToday();
-      }catch(e){ console.warn('[v8cal DOMContentLoaded retry]', e); }
+      }catch(e){ console.warn('[v8cal today retry]', e); }
     }
     function doJdRetry(){
       if(_jdRetryDone) return;
@@ -17900,6 +17921,33 @@ window.__renderV8CalToday();
     // 额外再拍一次：defer 脚本可能在 DOMContentLoaded 之后才全部跑完
     setTimeout(function(){ doV8CalRetry(); doJdRetry(); }, 400);
     setTimeout(function(){ doV8CalRetry(); doJdRetry(); }, 1200);
+    // 🛡 2026-10-19 第四道保险：今日事件详情自愈轮询（与 ceBody / limitUpHeat 同范式）——
+    //   每 1.5s 检查：V8_CAL 已就位 且 卡片仍显「无标注事件/加载中」且 今日确有事件 ⇒ 重渲染（幂等）。
+    //   覆盖一切时序竞态（defer 晚到 / 渲染被异常打断 / CDN 旧版），卡片不会再永久空着。
+    if(!window.__v8TodayHealStarted){
+      window.__v8TodayHealStarted = true;
+      (function selfHealV8Today(){
+        try{
+          var _box = document.getElementById('v8TodayAll');
+          var _cal = window.V8_CAL || {};
+          if(_box && (_cal.weeks||[]).length){
+            var _html = _box.innerHTML || '';
+            var _stale = !_html || _html.indexOf('今日日历无标注事件') >= 0 || _html.indexOf('加载中') >= 0;
+            if(_stale && typeof window._v8CalTodayKeys === 'function'){
+              var _keys = window._v8CalTodayKeys(_cal);
+              var _hit = false;
+              (_cal.weeks||[]).forEach(function(w){
+                (w.days||[]).forEach(function(d){
+                  if(d && _keys[String(w.no)+'-'+String(d.num)] && (d.events||[]).length) _hit = true;
+                });
+              });
+              if(_hit && typeof window.__renderV8CalToday === 'function') window.__renderV8CalToday();
+            }
+          }
+        }catch(e){}
+        setTimeout(selfHealV8Today, 1500);
+      })();
+    }
   }
   // 实时数据区：情绪周期·连板天梯（迁到涨停热力矩阵上方）
   tryRun('renderCycleLadderCard', window.__renderCycleLadderCard, 'cycle-ladder init');

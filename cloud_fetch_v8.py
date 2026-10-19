@@ -1194,7 +1194,23 @@ def f_macro_brief():
 
             # 日期：注明决议日，避免用户误以为是当日事件
             _d = str(_fed.get("date") or "")
-            news.insert(0, {"tag": _tag, "text": _txt, "_fed_date": _d})
+            # 🛡 2026-10-19 主人令「美联储那条都多久了还在！一劳永逸修复」：
+            #   议息条目原为无条件注入 news_brief ⇒ 决议日 2026-09-16 的旧闻在
+            #   环境态势卡顶了 33 天不退（实测确证，update_time 却是当日 ⇒ 更具迷惑性）。
+            #   修法：决议条目仅在决议日后 2 个自然日内注入，过期一律跳过
+            #   （决议影响由 key_numbers 美债10Y/美元指数 实时承接，无需旧闻占位）。
+            #   前端 _buildJudgmentEnvHTML 另有 _fed_date 保鲜守卫双保险（CDN 旧数据窗口兜底）。
+            _fed_fresh = True
+            try:
+                _fed_dt = datetime.strptime(_d[:10], "%Y-%m-%d").date()
+                _fed_today = datetime.now(ZoneInfo("Asia/Shanghai")).date()
+                _fed_fresh = (_fed_today - _fed_dt).days <= 2
+            except Exception:
+                _fed_fresh = bool(_d)  # 决议日缺失时保守保留（不误杀）
+            if _fed_fresh:
+                news.insert(0, {"tag": _tag, "text": _txt, "_fed_date": _d})
+            else:
+                print(f"  ↩️ 议息条目已过期（决议日 {_d}，>2 天），跳过注入 news_brief")
         except Exception as _e:
             print(f"  ⚠️ 议息条目生成失败: {_e}")
 
