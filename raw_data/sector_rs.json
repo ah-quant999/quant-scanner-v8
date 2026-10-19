@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-20 00:02",
+  "update_time": "2026-10-20 01:22",
   "data_date": "2026-10-19",
   "data_date_source": "kline",
   "fetch_date": "2026-10-20",
@@ -195,14 +195,14 @@
       "pct_60d": 1.36,
       "pct_90d": -6.88,
       "pct_180d": -22.77,
-      "pct_52w": -14.56,
+      "pct_52w": null,
       "relative_5d": -3.02,
       "relative_20d": -4.59,
       "relative_30d": -7.31,
       "relative_60d": 1.36,
       "relative_90d": -6.88,
       "relative_180d": -22.77,
-      "relative_52w": -14.56
+      "relative_52w": null
     },
     {
       "name": "电子化学品",
