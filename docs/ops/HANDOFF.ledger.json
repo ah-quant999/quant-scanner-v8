@@ -1,5 +1,5 @@
 {
- "max_next_id_seq": 155,
+ "max_next_id_seq": 157,
  "ids": [
   "selfalgo-audit-fix-1019",
   "index-creds-panel-refresh-1014",
@@ -208,9 +208,11 @@
   "factor-gate-asof-1020",
   "fourcard-fix-1020",
   "querynote-align-1020",
-  "autorefresh-hardreload-1020"
+  "autorefresh-hardreload-1020",
+  "mail-channel-smtp-config-lost-1020",
+  "ima-connector-injection-discipline-1020"
  ],
- "updated": "2026-10-20 22:12",
+ "updated": "2026-10-20 22:19",
  "generated_by": "阿狸咪的工程师(/scripts/handoff_ledger_hash.py 口径)",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -329,6 +331,7 @@
   "heartbeat-files-clobbered-by-cnfetch": "7d813354e174f3ff",
   "hk-shortcode-hkname-pollution": "709c9cc94d4ee530",
   "holiday-trading-day-fix-1001": "02e71080b4c64914",
+  "ima-connector-injection-discipline-1020": "241ec047aac8d42b",
   "ima-connector-unbound-enterprise-switch": "363e5e5f4afac95a",
   "ima-snapshot-72h-expiry-trap": "ca4e378dff07e431",
   "ima-strong-fusion-replay-1014": "51709f35041ffbd6",
@@ -362,6 +365,7 @@
   "lqsq-launch-gate-replay-1011": "e914e62df05da40a",
   "maharo-daily-s4u": "bb66f29ac9037efb",
   "maharo-plan-b-three-editions": "993d4fd982266dcb",
+  "mail-channel-smtp-config-lost-1020": "b363dda643eb4ef5",
   "main-history-truncated-by-cloudbot-1016": "4891e911fa426d71",
   "market-alerts-subprocess-timeout": "4927391e217eb9b9",
   "namefix-10cards-restore-1001": "d4f650fb6518f9b0",
