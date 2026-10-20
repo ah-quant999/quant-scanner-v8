@@ -615,6 +615,35 @@ def sector_score_for(stock, rel_set, abs_set, score_map):
     return round(score, 2), hits
 
 
+def _resolve_fl_asof(now_dt):
+    """因子 data_date 判据基准 = 本批跑批**归属的交易日**（不是执行日）。
+
+    🔴🔴 2026-10-20 主人令根治（实测复现：因子榜 Top3 不进最终推荐）：
+      夜窗/跨午夜接力跑批（00:00-08:59 CST）归属**上一交易日** —— 与批次闸门
+      v8_stage_gate.py::decide 的 `if hh < _NIGHT_CUT: ref -= 1`、
+      time_gate.py::_NIGHT_CUT_HOUR=9、run_algorithms._NEXT_DAY_CUTOFF_HOUR
+      四处同口径。而 FACTOR_LAB 的 data_date 来自 factor_lab_gen.resolve_data_date()
+      （从 baostock 实测「真正已有数据」的最近交易日）⇒ 夜窗里它必然 = 上一交易日。
+      实证 10-20 07:16：FACTOR_LAB data_date=2026-10-19（正是归属日 10-19 的
+      正确数据）、update_time=2026-10-20 06:17（夜窗 B 批刚产完）⇒ 旧判据
+      `data_date == _today`（_today=执行日 10-20）恒不满足 ⇒ 空等 12 分钟 +
+      data_degraded=True + 前端闸门整卡拦截，而因子榜与最终推荐其实同源同分。
+
+    口径：hour < 9（夜窗，与 _NIGHT_CUT=9 同源）⇒ 归属前一交易日（回退跳过周末）；
+          hour ≥ 9（含 18:00 后正常盘后链）⇒ 仍严格当日。
+    🛡 防护不放松：① 傍晚跑批要今日因子，拿不到就降级 —— 09-17「用昨日因子冒充
+       今日」原样保留；② 上游真停更（data_date 不前进）仍保守降级，绝不假新鲜；
+       ③ 本仓无节假日历，节假日边界的回退只跳周末 ⇒ 多一次保守降级（方向安全）。
+    """
+    _asof = now_dt.strftime("%Y-%m-%d")
+    if now_dt.hour < 9:   # 夜窗：与批次闸门 _NIGHT_CUT=9 / time_gate._NIGHT_CUT_HOUR 同口径
+        _d = now_dt - timedelta(days=1)
+        while _d.weekday() >= 5:      # 回退跳过周六/周日（节假日历缺失 ⇒ 保守降级，见 Docstring）
+            _d = _d - timedelta(days=1)
+        _asof = _d.strftime("%Y-%m-%d")
+    return _asof
+
+
 def main():
     # 🛡 2026-08-20 主人令·一劳永逸：所有选股策略必须 18:00 后才能跑。
     # final_recommend 是跨策略共振最终产物，依赖港股/龙虎榜/北向/板块资金等全部盘后数据。
@@ -860,9 +889,18 @@ def main():
     _n_roe_hit = 0         # ROE_TTM：命中池内票数
     _n_weak_hit = 0        # 放量弱势：扣分票数
     _today = datetime.now().strftime("%Y-%m-%d")
+    # 🔴🔴 2026-10-20 主人令根治（根因：因子榜 Top3 不进最终推荐）：
+    #   因子 data_date 判据基准从「执行日 _today」改为「**本批归属交易日 _fl_asof**」。
+    #   夜窗(00:00-08:59)跑批归属上一交易日（与批次闸门 _NIGHT_CUT=9 等同口径），
+    #   因子 data_date 必然=上一交易日 ⇒ 旧判据在每个工作日早间补跑时恒误报降级。
+    #   实证 10-20 07:16：data_date=2026-10-19 正是归属日 10-19 的正确数据、
+    #   update_time=2026-10-20 06:17 夜窗 B 批刚产完 ⇒ 空等12min + 整卡拦截，
+    #   而因子榜与最终推荐明明同源同分（详见 _resolve_fl_asof Docstring）。
+    _fl_asof = _resolve_fl_asof(datetime.now())
     # 🛡 2026-09-28 阿狸咪的工程师（最终推荐连续 3 天不出 · 配套根治）：
     #   原「固定等满 20 分钟」是个**无效空等**——FACTOR_LAB 的 data_date 是脚本生成时刻
-    #   从 baostock 实测到的最近交易日（非「今天」）；而本判据要求 data_date == 今天。
+    #   从 baostock 实测到的最近交易日（非「今天」）；判据基准 2026-10-20 起为 _fl_asof
+    #   （本批归属交易日，见上方 🔴 块），傍晚(≥18:00)仍严格当日。
     #   实证 09-28：FACTOR_LAB update_time=09-28 18:45 但 data_date=2026-09-24 ⇒ 判据永不满足
     #   ⇒ 白等 20min ⇒ 撞 run_algorithms 默认 1800s 被杀 ⇒ 产物**完全没落盘**（回不到降级路径）。
     #   现改为「可配上限 + 内容无变化即提前降级」（见下方 _fl_prev_fp 指纹判据），
@@ -887,8 +925,8 @@ def main():
         #        data_degraded=True —— 否则会造出比现状更糟的「D 批不出推荐」；
         #     ② 老版本产物无 data_date 字段 ⇒ 回退 update_time 单口径（保守兼容）。
         _fl_dd = str((_cand or {}).get("data_date") or "").strip()
-        _fl_dd_ok = (not _fl_dd) or (_fl_dd == _today) or (_fl_wd >= 5 and _fl_dd >= _fl_floor)
-        if _cand and str(_cand.get("update_time", "")).startswith(_today) and _fl_dd_ok:
+        _fl_dd_ok = (not _fl_dd) or (_fl_dd == _fl_asof) or (_fl_wd >= 5 and _fl_dd >= _fl_floor)
+        if _cand and str(_cand.get("update_time", ""))[:10] >= _fl_asof and _fl_dd_ok:
             fl = _cand
             break
         if _cand and _fl_dd and not _fl_dd_ok:
@@ -915,7 +953,7 @@ def main():
                   f"降级跳过因子融合（不用旧因子冒充今日，产物置 data_degraded=True）", flush=True)
             break
         _fl_prev_fp = _fl_fp
-        print(f"  💓 等待 FACTOR_LAB.js 当日新鲜数据（因子实验室，要求 data_date={_today}{_fl_hint}）"
+        print(f"  💓 等待 FACTOR_LAB.js 数据日达标（因子实验室，要求 data_date={_fl_asof}{_fl_hint}）"
               f"… 已等 {_wi+1}/{_fl_max_wait} 分钟", flush=True)
         time.sleep(60)
     if fl:
@@ -1102,7 +1140,7 @@ def main():
         _fl_degraded = True
         print("[warn] FACTOR_LAB.js 缺失/内容陈旧（update_time 或 data_date 未达 %s%s），"
               "等待 %d 次后仍不可用，跳过因子实验室方案B融合（降级推荐）"
-              % (_today, ("（实际 data_date=%s）" % _fl_last_dd) if _fl_last_dd else "", 20))
+              % (_fl_asof, ("（实际 data_date=%s）" % _fl_last_dd) if _fl_last_dd else "", 20))
         _factor_chain_meta = {
             "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "score_formula": "final_score = 因子榜 TOP10_DAILY.total_score（2026-09-20 唯一口径：第二套 final_score 公式已整段清除）",
