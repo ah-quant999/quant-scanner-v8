@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-20 07:55"
+  updated: "2026-10-20 08:34"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 150
+  next_id_seq: 151
 items:
   - id: selfalgo-audit-fix-1019
     owner: 小九的工程师
@@ -9555,4 +9555,16 @@ items:
     evidence: "见 what 内 commit；plumbing 快进非强推，ls-tree 逐一核验入树。"
     verify_how: "见 what 内『验证/待验证』段。"
     updated: "2026-10-20 07:55"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: sfft-fallback-1020
+    priority: P1
+    owner: 阿狸咪的工程师
+    status: pending-verify
+    created: 2026-10-20
+    title: 板块资金趋势卡一劳永逸：intraday 快照回落+趋势派生+防覆写+前端回落读
+    what: "主人令「没修好啊！一劳永逸修复！」。根因三连实锤：①10-19 17:22 收盘链跑云端 ubuntu（v8_algo_cloud.yml 08-20 起主档 18:10），东财 push2delay/push2his 海外 IP 全挂，akshare/westock(仓内无缓存文件)/neodata(云端无 token) 全不可用 ⇒ data_type=empty、sectors_in/out 全空（commit 0dd29d6128）；②同 run 的 history 累加照跑 ⇒ trend_5d/10d/20d/60d 全真数据（线上 9734B：主区空+趋势区 13+ 板块真）；③前端「资金净额趋势」allTrend 只读 sectors_in/out（index.html:10607-10610）不读 trend_5d ⇒ 卡面「暂无」；板块共振算法 calc_rotation 同读 sectors_in/out ⇒ 0 信号同根因。修复四层：L1 生成器 intraday 盘中快照回落源（cloud_fetch 中国 IP 链真数据，10-19 17 快照末次 14:56 净额真实，≤2 天新鲜闸）；L2 趋势派生兜底（主区仍空 ⇒ candidate 5 日符号派生+最近真实数据日标注）；L3 防覆写（全不可得且旧主区有真数据 ⇒ 保留旧主区只更新趋势）；L4 前端 allTrend 空回落读 trend_5d/20d+data_note 诚实提示行；附加 EM 主源页级 3 次重试。验证：py_compile 0 错；模块单测（stub 全实时源）端到端 data_type=intraday_snapshot、主区非空、5 日值已富化；index.html 全内联块 node --check 0 错。待验证：今晚 E 批/收盘链重跑后线上卡面出真数据（或诚实降级文案），rotation 视板块数据恢复情况。架构根因挂账后续：东财硬约束 fetcher应移出自托管 cn 链（v8_algo_run.yml），云端链只跑纯计算算法。"
+    evidence: "plumbing 快进非强推；ls-tree 逐一核验入树；worktree=FETCH_HEAD=75ba95199b。"
+    verify_how: "见 what 内『验证/待验证』段。"
+    updated: "2026-10-20 08:34"
     updated_by: 阿狸咪的工程师(alimi-cn)

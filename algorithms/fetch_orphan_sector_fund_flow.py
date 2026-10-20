@@ -745,6 +745,35 @@ def fetch_em_fflow_windows(top_list, max_n=60):
     return result
 
 
+
+def _load_intraday_snapshot(max_age_days=2):
+    """🛡 2026-10-20 一劳永逸（主人令「没修好啊」）：intraday 盘中快照回落源。
+
+    raw_data/sector_fund_flow_intraday.json 由 cloud_fetch 链（中国 IP）产出，是真数据
+    （10-19 当日 17 个快照、末次 14:56、主力净额真实）。算法链在云端跑时东财实时源全挂，
+    旧逻辑直接 data_type=empty、主区全空 ⇒ 卡面「暂无」而趋势区有真数据。
+    返回 (date, time, in_list, out_list)；无文件/太旧/无快照 ⇒ None（宁空勿假）。
+    """
+    p = os.path.join(ROOT, "raw_data", "sector_fund_flow_intraday.json")
+    try:
+        with open(p, "r", encoding="utf-8") as f:
+            d = json.load(f)
+        snaps = d.get("snapshots") or []
+        if not snaps:
+            return None
+        idate = str(d.get("date") or "")
+        try:
+            dd = datetime.strptime(idate, "%Y-%m-%d")
+            if abs((datetime.now() - dd).days) > max_age_days:
+                print(f"  ⚠️ [回落] intraday 快照过旧({idate})，弃用")
+                return None
+        except Exception:
+            return None
+        last = snaps[-1]
+        return (idate, last.get("time") or "", last.get("sectors_in") or [], last.get("sectors_out") or [])
+    except Exception:
+        return None
+
 def fetch_from_neodata():
     """使用 NeoData 接口获取板块资金流向（备选数据源）"""
     import requests as req
@@ -875,11 +904,24 @@ def fetch_eastmoney_realtime_fund_flow():
                     "fltt": "2", "invt": "2", "fid": "f3", "fs": fs,
                     "fields": "f12,f14,f62,f164,f166,f170,f172",
                 }
-                r = requests.get(url, params=params, timeout=20,
-                                 headers={"User-Agent": "Mozilla/5.0"})
-                r.raise_for_status()
-                j = r.json()
-                diff = (j.get("data") or {}).get("diff") or []
+                # 🛡 2026-10-20 一劳永逸：页级 3 次重试（退避 2/4/6s）——
+                #   旧逻辑一遇瞬时失败即 break 整市场放弃 ⇒ 主区全空、卡面「暂无」。
+                diff = None
+                _last_err = None
+                for _try in range(3):
+                    try:
+                        r = requests.get(url, params=params, timeout=20,
+                                         headers={"User-Agent": "Mozilla/5.0"})
+                        r.raise_for_status()
+                        diff = (r.json().get("data") or {}).get("diff") or []
+                        break
+                    except Exception as _e2:
+                        _last_err = _e2
+                        print(f"  ⚠️ 东财实时({label})第{pn}页重试{_try+1}/3: {_e2}")
+                        time.sleep(2 * (_try + 1))
+                if diff is None:
+                    print(f"  ⚠️ 东财实时({label})第{pn}页3次重试均失败({_last_err})，放弃剩余页")
+                    break
                 if not diff:
                     break
                 for it in diff:
@@ -943,6 +985,7 @@ def fetch_sector_flow():
     top_list = []
     use_mock = False
     em_primary = False
+    intraday_mode = False  # 🛡 2026-10-20 一劳永逸：intraday 盘中快照回落标志
 
     # ===== 2026-09-20 主人令「一劳永逸」：东财 push2delay 实时主源（权威，含净流出） =====
     # 旧链路（akshare 当日仅~40板块 + 本地稀疏history累加跨13日却标5日 + 已停用同花顺估算）
@@ -1182,6 +1225,26 @@ def fetch_sector_flow():
                 result["data_note"] = "所有数据源不可用"
                 _carry_forward_history(today)
 
+                # 🛡 2026-10-20 一劳永逸（主人令「没修好啊」·第一层回落）：intraday 盘中快照。
+                #   cloud_fetch 链（中国 IP）产出的盘中快照是真数据；算法链在云端跑时东财
+                #   实时源全挂，旧逻辑到此就 data_type=empty 全空收场。快照日距今天 ≤2 天
+                #   才用（跨周末/节假日容忍），source 如实标注，绝不冒充收盘值。
+                _intra = _load_intraday_snapshot()
+                if _intra:
+                    _idate, _itime, _iin, _iout = _intra
+                    top_list = [dict(x) for x in (_iin + _iout) if x.get("name")]
+                    for _it in top_list:
+                        _it.setdefault("net_5d", 0)
+                        _it.setdefault("net_20d", 0)
+                        _it["source"] = "东财盘中快照"
+                    result["data_type"] = "intraday_snapshot"
+                    result["data_note"] = ("收盘实时资金源不可用；主区为 %s %s 盘中快照"
+                                           "（真实盘中主力净额，非收盘值），5/10/20/60 日趋势按历史与东财日K呈现"
+                                           % (_idate, _itime))
+                    intraday_mode = True
+                    print("  🟣 [回落] intraday 盘中快照生效：%s %s，%d 个板块（流入%d 流出%d）"
+                          % (_idate, _itime, len(top_list), len(_iin), len(_iout)))
+
     # 去重并排序
     seen = {}
     for item in top_list:
@@ -1355,6 +1418,13 @@ def fetch_sector_flow():
                 result["sectors_in"].append(item)
             else:
                 result["sectors_out"].append(item)
+    elif intraday_mode:
+        # 🛡 2026-10-20 一劳永逸：intraday 快照回落——保留快照自身符号分类（盘中口径，不过 1 亿阈值）。
+        for item in result["top_list"]:
+            if (item.get("net") or 0) >= 0:
+                result["sectors_in"].append(item)
+            else:
+                result["sectors_out"].append(item)
     else:
         for item in result["top_list"]:
             if item["net"] >= THRESHOLD:
@@ -1380,6 +1450,27 @@ def fetch_sector_flow():
         for k in ("net_5d_days", "net_10d_days", "net_20d_days", "net_60d_days"):
             if k in c and k not in item:
                 item[k] = c[k]
+
+    # 🛡 2026-10-20 一劳永逸（第二层回落·趋势派生）：主区仍空（实时源/快照都不可得）但
+    #   candidate_list 有真实 5 日趋势 ⇒ 按 5 日净额符号派生流入/流出（与 em_primary 同规则），
+    #   「今日」列取最近真实数据日净额并如实标注。同时救活「板块共振」算法
+    #   （gen_new_algo_tri.calc_rotation 只读 sectors_in/out，此前因此 0 信号）。
+    if not result["sectors_in"] and not result["sectors_out"]:
+        _fb = [c for c in candidate_list if (c.get("net_5d") or 0) != 0 and c.get("name")]
+        if _fb:
+            _latest = ""
+            for _c in candidate_list:
+                _real = [x for x in history.get(_c.get("name"), []) if not x.get("carried")]
+                if _real and str(_real[-1].get("date", "")) > _latest:
+                    _latest = str(_real[-1].get("date", ""))
+            for _c in _fb:
+                _cc = dict(_c)
+                _cc["source"] = _cc.get("source") or "历史趋势派生"
+                (result["sectors_in"] if (_cc.get("net_5d") or 0) > 0 else result["sectors_out"]).append(_cc)
+            result["data_type"] = "trend_fallback"
+            result["data_note"] = ("当日实时资金源不可用且无盘中快照；流入/流出按 5 日净额趋势派生，"
+                                   "「今日」列为最近真实数据日（%s）净额，非当日实时值" % (_latest or "未知"))
+            print("  🟣 [回落] 趋势派生生效：%d 个板块（最近真实数据日 %s）" % (len(_fb), _latest or "未知"))
 
     in_names = [f"{s['name']}({s['net']:.1f}亿)" for s in result["sectors_in"]]
     out_names = [f"{s['name']}({s['net']:.1f}亿)" for s in result["sectors_out"]]
@@ -1416,6 +1507,26 @@ def fetch_sector_flow():
     if out_details:
         alerts.append("💨 " + "、".join(out_details))
     result["summary"]["alert"] = "；".join(alerts) if alerts else "板块资金流向平稳"
+
+    # 🛡 2026-10-20 一劳永逸（第三层·防覆写）：本次主区空（实时源/快照/趋势全不可得）但旧版
+    #   主区有真数据 ⇒ 保留旧主区（标注旧数据时间），只更新趋势区。杜绝云端链把中国 IP
+    #   产出的真数据覆写成空（10-19 18:14 的 0dd29d6128 即此类覆写）。
+    if not result["sectors_in"] and not result["sectors_out"] and os.path.exists(OUTPUT_FILE):
+        try:
+            with open(OUTPUT_FILE, "r", encoding="utf-8") as _of:
+                _old = json.load(_of)
+            _oi = _old.get("sectors_in") or []
+            _oo = _old.get("sectors_out") or []
+            if _oi or _oo:
+                result["sectors_in"] = _oi
+                result["sectors_out"] = _oo
+                result["data_type"] = "stale_main"
+                result["data_note"] = ("今日实时资金源不可用；主区保留 %s 的真实数据（非今日），"
+                                       "趋势区已按最新历史更新" % (_old.get("update_time") or "未知时间"))
+                print("  🟣 [防覆写] 保留旧主区：流入%d 流出%d（来自 %s）"
+                      % (len(_oi), len(_oo), _old.get("update_time")))
+        except Exception as _e:
+            print("  ⚠️ [防覆写] 读取旧版失败: %s" % _e)
 
     # 写文件
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)

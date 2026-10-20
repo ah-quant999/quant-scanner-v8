@@ -10608,6 +10608,18 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     const allTrend = [];
     sftIn.forEach(s => { if (s && s.name && !seen2.has(s.name)) { seen2.add(s.name); allTrend.push(Object.assign({ trend: 'in' }, s)); } });
     sftOut.forEach(s => { if (s && s.name && !seen2.has(s.name)) { seen2.add(s.name); allTrend.push(Object.assign({ trend: 'out' }, s)); } });
+    // 🛡 2026-10-20 一劳永逸（主人令「没修好啊」）：主区（sectors_in/out）空但 trend_5d/20d 有真数据时
+    //   回落读趋势真数据——云端链东财实时源全挂 ⇒ 主区空、趋势区真，卡面却显示「暂无」。
+    if (allTrend.length === 0) {
+      const _fbArr = (sft.trend_5d && sft.trend_5d.length) ? sft.trend_5d
+                   : ((sft.trend_20d && sft.trend_20d.length) ? sft.trend_20d : []);
+      _fbArr.forEach(function(s) {
+        if (s && s.name && !seen2.has(s.name)) {
+          seen2.add(s.name);
+          allTrend.push(Object.assign({}, s, { trend: s.trend || ((s.net_5d || 0) >= 0 ? 'in' : 'out') }));
+        }
+      });
+    }
 
     if (allTrend.length > 0) {
       const rows = allTrend.map(s => ({ s: s, st: classifyStatus(s), meta: statusMeta[classifyStatus(s)] }))
@@ -10856,6 +10868,7 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
       })();
 
       h3 += '<div style="font-size:13px;font-weight:700;color:#c4b5fd;margin:16px 0 8px;">💰 资金净额趋势</div>';
+      if (sft.data_note) h3 += '<div style="font-size:11px;color:var(--dim);margin:-2px 0 6px;">⚠️ ' + sft.data_note + '</div>';
       h3 += '<div class="sf-trend-grid">';
       h3 += sfMiniTrend('5日', allTrend, 'net_5d');
       h3 += sfMiniTrend('20日', allTrend, 'net_20d');
