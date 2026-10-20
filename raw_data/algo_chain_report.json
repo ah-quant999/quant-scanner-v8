@@ -1,20 +1,9 @@
 {
-  "update_time": "2026-10-20 18:49:50",
+  "update_time": "2026-10-20 21:18:36",
   "base_trade_date": "2026-10-20",
-  "stage_window": "B",
-  "skipped_out_of_window": [
-    {
-      "name": "最终推荐",
-      "path": "raw_data/final_recommend.json",
-      "batch": "D"
-    },
-    {
-      "name": "最终推荐(前端)",
-      "path": "data/FINAL_RECOMMEND_DATA.js",
-      "batch": "D"
-    }
-  ],
-  "ok": 5,
+  "stage_window": "ALL",
+  "skipped_out_of_window": [],
+  "ok": 7,
   "failed_required": 0,
   "ts_blind": 0,
   "items": [
@@ -22,7 +11,7 @@
       "name": "候选池",
       "path": "raw_data/candidate.json",
       "status": "✅ 本日新鲜",
-      "ts": "2026-10-20 18:12:23",
+      "ts": "2026-10-20 06:22:30",
       "required": true,
       "note": ""
     },
@@ -30,7 +19,7 @@
       "name": "候选池(前端)",
       "path": "data/CANDIDATE.js",
       "status": "✅ 本日新鲜",
-      "ts": "2026-10-20 18:12:23",
+      "ts": "2026-10-20 18:44:02",
       "required": false,
       "note": ""
     },
@@ -59,10 +48,26 @@
       "note": ""
     },
     {
+      "name": "最终推荐",
+      "path": "raw_data/final_recommend.json",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-10-20 21:11:48",
+      "required": true,
+      "note": ""
+    },
+    {
+      "name": "最终推荐(前端)",
+      "path": "data/FINAL_RECOMMEND_DATA.js",
+      "status": "✅ 本日新鲜",
+      "ts": "2026-10-20 21:11:48",
+      "required": false,
+      "note": ""
+    },
+    {
       "name": "金股池",
       "path": "raw_data/gold_pool.json",
       "status": "✅ 本日新鲜",
-      "ts": "2026-10-20 18:12:22",
+      "ts": "2026-10-20 06:22:29",
       "required": false,
       "note": ""
     }
