@@ -1,6 +1,6 @@
 {
  "month": "2026年10月",
- "update_time": "2026-10-20 21:33",
+ "update_time": "2026-10-21 02:09",
  "legend": [
   {
    "title": "重要政策",
@@ -402,29 +402,29 @@
     {
      "num": 20,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "LPR利率报价（1年/5年以上）",
        "cls": "cb",
-       "released": false
+       "released": true
       },
       {
        "text": "🇺🇸 美国领先指标",
        "cls": "us",
-       "released": false
+       "released": true
       },
       {
        "text": "特斯拉Q3财报",
        "cls": "us_earnings",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 21,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "ASML Q3财报",
