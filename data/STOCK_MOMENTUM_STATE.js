@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-20 19:23",
- "generated": "2026-10-20 19:23",
+ "update_time": "2026-10-20 19:56",
+ "generated": "2026-10-20 19:56",
  "meta": {
-  "generated": "2026-10-20 19:23",
+  "generated": "2026-10-20 19:56",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 26,
   "days_with_consensus": 0,
@@ -10956,13 +10956,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "300244",
-      "name": "迪安诊断",
-      "change_pct": 19.989,
-      "price": 21.79,
-      "category": "突破"
-     },
-     {
       "code": "688696",
       "name": "极米科技",
       "change_pct": 5.781,
@@ -11044,6 +11037,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "海波重科",
       "change_pct": 4.365,
       "price": 10.52,
+      "category": "突破"
+     },
+     {
+      "code": "301337",
+      "name": "亚华电子",
+      "change_pct": 4.845,
+      "price": 25.97,
       "category": "突破"
      }
     ],
@@ -11191,13 +11191,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "300244",
-      "name": "迪安诊断",
-      "change_pct": 19.989,
-      "price": 21.79,
-      "category": "短线选股"
-     },
-     {
       "code": "688696",
       "name": "极米科技",
       "change_pct": 5.781,
@@ -11279,18 +11272,18 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "海波重科",
       "change_pct": 4.365,
       "price": 10.52,
+      "category": "短线选股"
+     },
+     {
+      "code": "301337",
+      "name": "亚华电子",
+      "change_pct": 4.845,
+      "price": 25.97,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "300244",
-      "name": "迪安诊断",
-      "change_pct": 19.989,
-      "price": 21.79,
-      "category": "强势股"
-     },
-     {
       "code": "688696",
       "name": "极米科技",
       "change_pct": 5.781,
@@ -11372,6 +11365,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "海波重科",
       "change_pct": 4.365,
       "price": 10.52,
+      "category": "强势股"
+     },
+     {
+      "code": "301337",
+      "name": "亚华电子",
+      "change_pct": 4.845,
+      "price": 25.97,
       "category": "强势股"
      }
     ]
