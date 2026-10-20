@@ -9541,32 +9541,32 @@ items:
     title: 三新算法（缩量回踩/板块共振/龙虎机构）接入策略回测总表 BACKTEST_ALL_ALGOS
     what: "主人 10-20 令『这些算法的回测在策略回测页也要加上』。gen_backtest_all_algos.py 新增 parser tri_sub（按 src[sub] 取 NEW_ALGO_TRI_BACKTEST 的 vcp/rotation/lhb 子键，行构造与 parse_by_period 逐字同源：零样本⇒win/avg 归 null+累积中，不造假）+ SOURCES 登记三卡（主档 T+5，档位 1/3/5/10/20）。前端策略回测页读 rows 自动渲染，零前端改动。commit 6db445e117（plumbing 快进，ls-tree 核验入树；worktree 同 commit audit 15/15 全过；本地 --dry 干跑三卡行输出正确：无 by_period 时诚实标『归档信号尚无成熟样本，累积中』）。待验证：今晚 21:00 E 批跑仓库版 gen_backtest_all_algos.py ⇒ 线上 BACKTEST_ALL_ALGOS.rows 出现三卡（vcp/lhb 的 T+1 档应有 10-19 信号的成熟样本；rotation 若板块数据恢复则有 leaders）。"
     evidence: "见 what 内 commit；plumbing 快进非强推，ls-tree 逐一核验入树。"
-    verify_how: "见 what 内『验证/待验证』段。"
-    updated: "2026-10-20 07:55"
+    verify_how: "10-20 晚终验（git 读远端真身）：BACKTEST_ALL_ALGOS.js update_time=2026-10-20 22:18:53，rows 已出现『缩量回踩』『板块共振』『龙虎机构』三卡（接入生效），但三卡 by_period 均无成熟样本（诚实空态『归档信号尚无成熟样本，累积中』）——任务预期『vcp/lhb 的 T+1 档应含 10-19 成熟样本』未达标。根因二连：①回测口径 tx=gi+1+N（与全仓 intraday momentum 同款），10-19 信号的 N=1 档卖点=10-21 收盘 ⇒ 10-20 晚尚差一个交易日，属口径内正常累积，非链路故障；②10-20 当日新码 vcp 对 452 只新鲜票扫描 0 命中（诚实空态，未拿旧数据充数）。复验时点：10-21 晚 E 批后，lhb（10-20 真归档在档）与 vcp 的 T+1 档应出现首批成熟样本，届时再判 done。"
+    updated: "2026-10-20 23:19"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: tri-data-day-gate-1020
     priority: P2
     owner: 阿狸咪的工程师
-    status: pending-verify
+    status: done
     created: 2026-10-20
     title: 三新算法数据日闸——防旧 K 线形态冒充满仓信号（一劳永逸）
     what: "实证 10-20 早批次：vcp 命中 9 只的 K 线 date 散布 09-07~10-14（kline_cache 陈旧），却被打包进 10-20 批次并按自然日归档进前向回测 ⇒ 信号日与形态日错配近一个月。修复 commit cfeb65709a（gen_new_algo_tri.py 四处）：①常量 TRI_STALE_SKIP_DAYS=5 / TRI_VCP_MIN_FRESH=200；②scan_vcp 池化+新鲜度闸：只收末根K线=全池最新日的票，新鲜票<200 整节降级（不产出不归档）；③归档 signal_date 改信号真实数据日（vcp=全池最新K线日/lhb=榜单 date/rotation=板块数据 update_time 日），无数据日不归档（保留旧档）；④lhb item 补 date 字段。语法+补丁串自证过。待验证：今晚 E 批跑新版 ⇒ vcp 信号 date 全部=数据日、归档 signal_date 与形态日一致；若云端 kline_cache 仍整体陈旧 ⇒ vcp 整节降级（诚实空态）而非拿旧数据充数。关联遗留：kline_cache 更新机制不完整（09-10 就有记录，本地 600 只样本末根日分布09-04~10-19 极不均）——属独立数据坑，待排。"
     evidence: "见 what 内 commit；plumbing 快进非强推，ls-tree 逐一核验入树。"
-    verify_how: "见 what 内『验证/待验证』段。"
-    updated: "2026-10-20 07:55"
+    verify_how: "10-20 晚终验通过（git 读远端真身）：①晚批新码（NEW_ALGO_TRI_BACKTEST update_time=2026-10-20 18:13:34）vcp 全池 452 只新鲜票（末根K线=全池最新日）扫描 0 命中 ⇒ 节内诚实空态，未拿旧 K 线充数；②lhb 10-20 归档条目与当晚榜单（lhb_data date=2026-10-20）逐票一致，signal_date=榜单 date；③归档中 vcp 10-20 条目（9 只，K线末根散布 09-07~10-14 陈旧）经证为早批旧码残留（修复只防新污染、未清旧档），新码不再产生同类污染。遗留（不阻断本项）：kline_cache 更新机制不完整（末根日 09-02~10-20 极不均，10-19 已有记录）+ 旧档残留清洗，属独立数据坑待排。"
+    updated: "2026-10-20 23:19"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: sfft-fallback-1020
     priority: P1
     owner: 阿狸咪的工程师
-    status: pending-verify
+    status: done
     created: 2026-10-20
     title: 板块资金趋势卡一劳永逸：intraday 快照回落+趋势派生+防覆写+前端回落读
     what: "主人令「没修好啊！一劳永逸修复！」。根因三连实锤：①10-19 17:22 收盘链跑云端 ubuntu（v8_algo_cloud.yml 08-20 起主档 18:10），东财 push2delay/push2his 海外 IP 全挂，akshare/westock(仓内无缓存文件)/neodata(云端无 token) 全不可用 ⇒ data_type=empty、sectors_in/out 全空（commit 0dd29d6128）；②同 run 的 history 累加照跑 ⇒ trend_5d/10d/20d/60d 全真数据（线上 9734B：主区空+趋势区 13+ 板块真）；③前端「资金净额趋势」allTrend 只读 sectors_in/out（index.html:10607-10610）不读 trend_5d ⇒ 卡面「暂无」；板块共振算法 calc_rotation 同读 sectors_in/out ⇒ 0 信号同根因。修复四层：L1 生成器 intraday 盘中快照回落源（cloud_fetch 中国 IP 链真数据，10-19 17 快照末次 14:56 净额真实，≤2 天新鲜闸）；L2 趋势派生兜底（主区仍空 ⇒ candidate 5 日符号派生+最近真实数据日标注）；L3 防覆写（全不可得且旧主区有真数据 ⇒ 保留旧主区只更新趋势）；L4 前端 allTrend 空回落读 trend_5d/20d+data_note 诚实提示行；附加 EM 主源页级 3 次重试。验证：py_compile 0 错；模块单测（stub 全实时源）端到端 data_type=intraday_snapshot、主区非空、5 日值已富化；index.html 全内联块 node --check 0 错。待验证：今晚 E 批/收盘链重跑后线上卡面出真数据（或诚实降级文案），rotation 视板块数据恢复情况。架构根因挂账后续：东财硬约束 fetcher应移出自托管 cn 链（v8_algo_run.yml），云端链只跑纯计算算法。"
     evidence: "plumbing 快进非强推；ls-tree 逐一核验入树；worktree=FETCH_HEAD=75ba95199b。"
-    verify_how: "见 what 内『验证/待验证』段。"
-    updated: "2026-10-20 08:34"
+    verify_how: "10-20 晚终验通过（git 读远端真身 + 线上 Pages 双验）：收盘链（16:40/18:10 唤醒）重跑后 data/SECTOR_FUND_FLOW_TREND.js update_time=2026-10-20 17:02，data_type=real（东财实时源恢复，未触发 intraday_snapshot 回落亦未回 empty），sectors_in=40 / sectors_out=0（与 summary.out_count=0 一致，当天无净流出板块，非空态），trend_5d=12 条真数据。架构根因（东财硬约束源应移出云端链）维持挂账后续。"
+    updated: "2026-10-20 23:19"
     updated_by: 阿狸咪的工程师(alimi-cn)
 
   - id: factor-gate-asof-1020

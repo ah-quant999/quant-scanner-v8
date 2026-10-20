@@ -99,6 +99,11 @@ MUST_HAVE_CRON = {
     #      **严禁**再用 run.updated_at 单指标判僵尸。
     # 注：v8_freshness_watch / v8_slot_scheduler 已于 2026-09-10 删除（派发源精简），
     #     从本名单彻底移除，勿再登记。
+    # 2026-10-20 补登记（本机门禁 [4/8] 拦截补漏）：隔夜美股强势映射 fetcher——
+    #   f_us_hk_map 原挂 v8_cn_fetch_cloud（境外 IP，东财/新浪美股双不可达 ⇒ mom 全 null
+    #   ⇒ strong_count=0），摘出为 cn runner 专链：工作日 05:35 CST 收盘后首抓 +
+    #   08:15 CST 盘前兜底；已同步在运维页调度表挂文档行。
+    "v8_us_hk_map": "隔夜美股强势映射fetcher(工作日05:35/08:15·cn runner专链)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────

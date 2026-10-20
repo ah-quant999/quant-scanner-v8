@@ -212,7 +212,7 @@
   "mail-channel-smtp-config-lost-1020",
   "ima-connector-injection-discipline-1020"
  ],
- "updated": "2026-10-20 22:19",
+ "updated": "2026-10-20 23:19",
  "generated_by": "阿狸咪的工程师(/scripts/handoff_ledger_hash.py 口径)",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {
@@ -394,7 +394,7 @@
   "sector-year-flow-1017": "cd292ed02cd47df8",
   "sector-yearflow-move-unlisted-1019": "f617e1551f0e55eb",
   "selfalgo-audit-fix-1019": "5b22f4ccb2a012c1",
-  "sfft-fallback-1020": "61ac903b359dc379",
+  "sfft-fallback-1020": "b8c773e5a16cbdc5",
   "st-tab-chain-fix-1018": "7c867127b373c13a",
   "stale-index-landmine": "81e6a2b75f2c8729",
   "stock-name-code-fallback": "5249b4e6a390062e",
@@ -415,8 +415,8 @@
   "top10-close-quote-gate": "dcb756e75f8378c0",
   "top10-restore-formula-1001": "e4af63a892050004",
   "trading-day-gate-predeps-fallback": "881f7ee93cc12691",
-  "tri-backtest-table-1020": "0b09de5de7a79b9c",
-  "tri-data-day-gate-1020": "60ea9f0706f13701",
+  "tri-backtest-table-1020": "7cf3ae3a39a61780",
+  "tri-data-day-gate-1020": "eae4eaf368aa0ff7",
   "triple-history-accumulator-caliber": "ad612ef25e585ed7",
   "triple-price-single-source": "24a839fa9aa64c48",
   "trunc-read-treated-as-success": "a6e78c2e2dd2dcc1",
