@@ -1,8 +1,13 @@
 {
-  "update_time": "2026-10-20 17:15:25",
-  "run_start": "2026-10-20 16:54:44",
-  "ok": 14,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-10-20 18:43:48",
+  "run_start": "2026-10-20 18:02:37",
+  "ok": 19,
+  "fail": 1,
+  "failed_scripts": [
+    {
+      "script": "strategy_intraday_momentum.py",
+      "reason": "退出码 1 | 无任何交易日对齐率 ≥60%——缓存新鲜度异常"
+    }
+  ],
   "skipped_by_time_gate": []
 }

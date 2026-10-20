@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-20 08:03:13",
+  "update_time": "2026-10-20 18:02:37",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -9,54 +9,54 @@
   "items": [],
   "sentiment_meta": {
     "phase": "高潮",
-    "score": 61.0,
-    "delta_pct": 0.0,
+    "score": 74.0,
+    "delta_pct": 17.39,
     "advice": "✨ 高潮持续：聚焦核心龙头，注意仓位管理",
     "source": "LIMIT_UP_HEATMAP"
   },
   "sector_meta": {
     "top_in": [
       {
-        "name": "上证180_",
+        "name": "人形机器人",
         "type": "概念",
-        "net": 31.0
+        "net": 50.58
       },
       {
-        "name": "上证50_",
+        "name": "机器人概念",
         "type": "概念",
-        "net": 28.41
+        "net": 49.44
       },
       {
-        "name": "通信线缆及配套",
-        "type": "行业",
-        "net": 27.23
+        "name": "AI眼镜",
+        "type": "概念",
+        "net": 36.9
       },
       {
-        "name": "通信设备",
-        "type": "行业",
-        "net": 26.99
+        "name": "虚拟现实",
+        "type": "概念",
+        "net": 34.27
       },
       {
-        "name": "通信",
-        "type": "行业",
-        "net": 26.5
+        "name": "智能穿戴",
+        "type": "概念",
+        "net": 32.72
       }
     ],
     "top_out": [
       {
-        "name": "化妆品",
+        "name": "风电整机",
         "type": "行业",
-        "net": -1.62
+        "net": -1.24
       },
       {
-        "name": "体外诊断",
+        "name": "环保",
         "type": "行业",
-        "net": -1.64
+        "net": -1.24
       },
       {
-        "name": "纺织服饰",
+        "name": "航空运输",
         "type": "行业",
-        "net": -1.68
+        "net": -1.29
       }
     ]
   },
