@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 155
+  next_id_seq: 157
 items:
   - id: selfalgo-audit-fix-1019
     owner: 小九的工程师
@@ -9616,3 +9616,25 @@ items:
     verify_how: "下一次盘中自动刷新（≤15 分钟）卡面数据时间戳前进且主人无需 Ctrl+F5 即算生效；夜间/午休不刷属设计内。若主人下午仍需手动刷新 ⇒ 回滚排查（保留 _hardReload 定义但恢复旧 reload 行为待查）。"
     updated: "2026-10-20 15:10"
     updated_by: 小九的工程师
+  - id: mail-channel-smtp-config-lost-1020
+    priority: P1
+    owner: 阿狸咪的工程师
+    status: todo
+    created: 2026-10-20
+    title: 邮件告警通道 SMTP 配置消失（10-20 全天 0 封告警）——可观测四件套已上线，待主人补 QQ 授权码
+    what: "10-19 17:04 最后一封 SENT 之后 v8_smtp_config.json 消失（疑与同批被清空的 workbuddy venv 有关），两处标准路径均无、全盘无备份（含 app file-history/blobs）、git 历史从未收录 ⇒ 10-20 阿狸咪机邮件双通道全断（SMTP 缺配置 + agent-mail not_bound）：当天至少 5 次告警尝试全部 SKIP（07:15 zsxq 知会类 / 17:03 自检邮件 / 18:14 zsxq 无配置 / ima 17:0x 缺口 2 篇告警未发出 / 小九机 host=Cat 两次无配置）⇒ 主人 10-20 全天 0 封告警邮件。双机近两日邮件全貌（trace log 实证）：仅 10-19 两封 SENT——14:45 P0 cn_fetch 派发风暴（已闭环见 cnfetch-dispatch-storm-cancel-deadlock-1019）+ 17:04 ima 连接器会话未注入（已自愈见 ima-connector-injection-discipline-1020）。"
+    evidence: "trace log：10-19 17:04:50 最后 SENT ⇒ 10-20 07:15/17:03/18:14 三条 SKIP（知会类/无 SMTP 配置）；ima 自动化 149ad8ff 第 28 轮记忆档『邮件双通道全断（SMTP 配置文件消失 + agent-mail 未开通）』；本机全盘 find/grep（含 /e/.workbuddy file-history/blobs/cache）零配置残留。"
+    verify_how: "①代码四件套已上线并实测：v8_send_alert 通道旗标 .workbuddy/v8_mail_channel_status.json（state=down/first_down_at/down_streak，发送成功即清除）；scripts/alimi_heartbeat.py mail_channel 字段（已推送上线，raw_data/hb_alimi.json 现携 mail_channel=down+detail）；scripts/v8_smtp_config.template.json 一键恢复模板（脱敏占位可入仓）；v8_peer_monitor 邮件通道互看代鸣（对端 mail_channel=down ⇒ 本机发信附恢复指引，6h 冷却按机侧隔离，unknown 不响）。②zsxq_token 每日刷屏已止：self_heal_monitor P1-1 改口径——P0-1 外资研投实测新鲜=云端 Secret 兜底有效 ⇒ 本地 token 缺失静默留证（zsxq_state=covered）不发信；生产真断供时 P0-1/P1-1 双路齐响（实测 covered 分支通过）。③待主人动作：QQ邮箱→设置→账户→POP3/IMAP→生成授权码，填入模板三字段（sender/receiver/auth_code）放至任一标准路径，跑 python v8_send_alert.py --selftest 通过 ⇒ 本项转 done。验收：下一轮心跳 mail_channel 翻 ok、通道旗标文件被清除、peer monitor 互看两侧 ok。"
+    updated: "2026-10-20 22:15"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+  - id: ima-connector-injection-discipline-1020
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: todo
+    created: 2026-10-20
+    title: ima 连接器会话注入失效告警纪律（应用重启即复发·已 6 次）——数据链已自愈，告警去抖待自动化 prompt 侧落地
+    what: "ima 快照自动化依赖「ima 知识连接器」会话注入取全文；应用重启后注入失效（后端授权仍 ready）⇒ 本地快照停刷 ⇒ 10-09/12/13/15/16/19 连发 6 次「ima连接器会话未注入」邮件（10-19 17:04 那封即此）。10-20 复现全程：17:0x 缺口 2 篇（10-19/10-20 主报告源侧已发）⇒ 18:15 应用重启后注入生效，快照刷新到 10-20 全文（fetched_at=18:15:39）⇒ 21:01 云端工作流产出新鲜数据（data_date=10-20/source_stale=false/pool=8）⇒ 数据链自愈、缺口清零（10-19 篇按设计只追最新水位）。云端访客路对 GitHub 出口 IP 仅能取 ~300 字 intro（09-22 实证）⇒ 全文腿必须靠本机连接器，属架构固有依赖非缺陷；根治需 ima 登录态凭证进 GitHub Secret（与 zsxq 同模式），待拍板。"
+    evidence: "远端 raw_data/ima_strong_stock_full.json fetched_at=2026-10-20 18:15:39/title=短线情绪选股 2026-10-20；data/IMA_STRONG_STOCK.js update_time=21:01:38/data_date=10-20/source_stale=false/detail_channel=full-snapshot；v8_ima_strong_stock.yml run#69 success（20:59 CST schedule）；ima 自动化 149ad8ff 记忆档第 28 轮（17:0x 缺口 2 篇+双通道全断+0 落盘）。"
+    verify_how: "①数据链健康信号已在产物内自证（snapshot_age_h/source_stale/snapshot_expired 前端运维页可读），停更迁移邮件已有状态翻转去抖（fetch_ima_strong_stock._write_retained 仅非停更→停更当次发一封）；②待落地：ima 快照自动化 prompt 增加『会话无注入』状态翻转+24h 冷却纪律，并写明『应用重启后首轮自动恢复』的自愈预期——automation 配置不在仓库内（本环境无 automation 编辑工具），需主人在自动化面板调整；③旁路发现：小九机 10-20 12:00/18:00 两轮交接档缺失（runner 在线/HB_XIAOJIU 20:08 前进=流程缺口非故障；昨日 3 项拍板仍悬）——待小九机侧排查交接自动化。"
+    updated: "2026-10-20 22:15"
+    updated_by: 阿狸咪的工程师(alimi-cn)
