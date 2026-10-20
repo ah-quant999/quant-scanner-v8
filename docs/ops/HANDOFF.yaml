@@ -9475,13 +9475,13 @@ items:
   - id: cnfetch-dispatch-storm-cancel-deadlock-1019
     priority: P0
     owner: 小九的工程师
-    status: todo
+    status: done
     created: 2026-10-19
     title: cn_fetch 自愈派发风暴 + cancel-in-progress 自残死锁（14 时段 46+ 枚/小时，最后 success 13:03）
     what: "2026-10-19 09:00 CST 起 v8_cn_fetch_cloud(wf 327687211) 被 workflow_dispatch 连片派发（基线 1 枚/小时 → 高峰 46+ 枚/小时、5 秒/枚仍在到），且新派发把在跑轮 cancel（39208501716 于 14:28:17 被取消实证）⇒ 跑不完→派发方视角永不修复→继续派发的结构性死锁；同风格风暴同打 v8_stock_quote_refresh_cloud(wf 352790648)。派发 actor=ah-quant999，两机 token 同账号无法从 API 归因，需两机各自自查本机 dispatch 循环（嫌疑：某 stale 检查无冷却自愈重派）。若死锁不解 EXPERIMENT(现 08:44) 今晚阈值后转真红卡。交接件：docs/ops/handover/2026-10-19_1440_URGENT_阿狸咪的工程师给小九的工程师_cn_fetch派发风暴cancel死锁.md"
     evidence: "GitHub API 实拉（14:25-14:31 CST）：runs 按小时 workflow_dispatch 计数 09h=22/10h=45/11h=24/12h=10/13h=2/14h=46+（10-18 基线每小时 1）；在跑轮被取消 runs 39208501716/39208636974；最后 success=39189871402（13:03 CST）；health_patrol 最新轮 skipped（非源）、cn_fetch_watchdog 今日仅 2 轮（非源）。"
-    verify_how: "①两机止血（停本机 dispatch 循环）；②手动补一枚 cn_fetch 追平积压防 18:30 红卡；③自愈派发加冷却+同 group 未完成 run 存在即跳过+连续派发上限；④复核 stock_quote push→dispatch 反馈环。验收：cn_fetch 恢复 ≤2 pending 且出现新 success、EXPERIMENT update_time 前进。"
-    updated: "2026-10-19 14:42"
+    verify_how: "①两机止血（停本机 dispatch 循环）；②手动补一枚 cn_fetch 追平积压防 18:30 红卡；③自愈派发加冷却+同 group 未完成 run 存在即跳过+连续派发上限；④复核 stock_quote push→dispatch 反馈环。验收：cn_fetch 恢复 ≤2 pending 且出现新 success、EXPERIMENT update_time 前进。【闭环 2026-10-20 · 阿狸咪的工程师(alimi-cn) 复验】①小九 10-19 16:37 回执：根因=本机 dispatch POST 重试扇出+fail-open+遗留重复哨兵集，本机微修已落地（fail-closed+POST 不重试+重派前查活跃）；风暴 16:37 停、数据已追平（10-19 19:30 双源取证）。②仓库侧复验无同源缺陷：cloud_dispatcher.dispatch_repo_dispatch 单次 POST 无重试扇出；僵尸看门狗 kill_zombie_stale 已有年龄硬条件（370min>job timeout 360+10 余量）防误杀长批（09-19 误杀事故修复在线）。③验收四项全过：cn_fetch 队列干净（10-20 多轮 pending=0+success、近 20 轮无 failure）、EXPERIMENT 10-20 19:31:58 前进、数据追平、双机 runner 在线。④遗留另立条目：小九机 10-20 12:00/18:00 两轮交接档缺失（runner 在线、心跳正常=流程缺口非故障）。"
+    updated: "2026-10-20 22:06"
     updated_by: 阿狸咪的工程师(alimi-cn)
   - id: sector-yearflow-move-unlisted-1019
     priority: P2
