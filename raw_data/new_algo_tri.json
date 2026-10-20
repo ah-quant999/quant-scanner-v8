@@ -1,7 +1,7 @@
 {
- "update_time": "2026-10-20 18:13:27",
+ "update_time": "2026-10-21 00:23:02",
  "vcp": {
-  "scanned": 452,
+  "scanned": 524,
   "items": []
  },
  "rotation": {
@@ -10,15 +10,15 @@
    {
     "sector": "消费电子",
     "type": "行业",
-    "stage": "观察",
+    "stage": "退潮",
     "consecutive_days": 3,
     "net_5d": -21.85,
     "net_20d": -125.39,
-    "rs_5d": -4.75,
-    "rs_20d": -10.57,
-    "rs_60d": -4.35,
+    "rs_5d": -1.92,
+    "rs_20d": -8.49,
+    "rs_60d": 4.93,
     "heat_5d": 23,
-    "score": 34.6,
+    "score": 39.9,
     "leaders": []
    },
    {
@@ -28,11 +28,11 @@
     "consecutive_days": 3,
     "net_5d": -477.16,
     "net_20d": -670.5,
-    "rs_5d": -7.81,
-    "rs_20d": -13.1,
-    "rs_60d": -15.37,
+    "rs_5d": -5.12,
+    "rs_20d": -11.02,
+    "rs_60d": -6.95,
     "heat_5d": 21,
-    "score": 32.0,
+    "score": 33.8,
     "leaders": []
    }
   ]
