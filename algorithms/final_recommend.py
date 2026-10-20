@@ -1220,7 +1220,7 @@ def main():
                 r["enter_dates"].append(_ima_dd)
                 _ima_in += 1
             print(f"[ima-intake] 强势跟踪入池：当日池 {len(_ima_norm)} 只中"
-                  f"新入选 {len(_ima_new)} 只 ⇒ 入池 {_ima_in} 只（强度分混排）")
+                  f"新入选 {len(_ima_new)} 只 ⇒ 入池 {_ima_in} 只（入池展示·不竞位 Top3，2026-10-20 主人令）")
         else:
             print("  [info] V8_IMA_INTAKE=0：强势跟踪入池已手动关闭")
         _hit = 0
@@ -1412,20 +1412,33 @@ def main():
             _e["_aligned_topfactor"] = True
             _al_hit += 1
 
-    # 🔴🔴 2026-10-14 主人令「凭因子真实排序」·双源混排（池内 min-max 归一化）
+    # 🔴🔴 2026-10-20 主人令「要口径和评分都一致」·双源竞位退出 Top 选取
     # ───────────────────────────────────────────────────────────────────────────
-    # 为什么必须归一化（实测标尺差异，不是想当然）：
-    #   因子榜 total_score 与 IMA 强度分虽都写成 0-100，但标尺不同——
-    #   · 因子榜 = 26 因子 raw/NORM_DIVISOR(130)*100，全市场头部实测仅 14~17
-    #     （理论满分 100 无人接近，头部密集 ⇒ 区分度在 1 分量级）；
-    #   · IMA 强度分 = 源侧主观 0-100，实测 65~81。
-    #   直接比分 ⇒ IMA 永远碾压（81 vs 16.8）= 变相「IMA 全量切换」，
-    #   主人 2026-10-14 已明确否决该形态（选的是「符合入选的，凭因子真实排序」）。
-    # ⇒ 各池内 min-max 归一到 0-100 后混排：各池头部都=100、尾部=0，
-    #   按「池内相对强度」公平竞位，谁的相对强度高谁上。
-    # 局限（如实标注，不装作完美）：池内相对强度仅当日横比有效，跨日不可比绝对值；
-    #   同分（两池榜首都=100）时因子榜票优先——全市场 26 因子横比 > 单源主观强度分。
+    # 事故回归（2026-10-20 20:40 主人截图实锤）：最终推荐 Top3 =
+    #   [佰维存储18.6, 迪安诊断78.0, 长飞光纤17.2]，而当日因子积分榜 Top3 =
+    #   [佰维存储18.2, 德明利17.8, 长飞光纤17.3] —— 名单第 2 名对不上
+    #   （迪安诊断 vs 德明利）、同票分也对不上（18.6 vs 18.2 / 17.2 vs 17.3）。
+    #   两层病灶：
+    #   ① 2026-10-14 双源混排（本段 mix_pct 竞位）让 IMA 强势跟踪票凭池内
+    #      归一化分插队进 Top3 ⇒ 最终推荐名单 ≠ 因子榜名单；
+    #   ② 本段把 IMA 票 final_score 覆写为强度分原值（78.0）⇒ 与因子榜
+    #      total_score（头部实测 15~18）不同量纲，两张榜分数列不可比。
+    # 主人令（原话）：「为什么最终推荐和因子积分榜的不一致，要口径和评分都一致！
+    #   之前说过的」⇒ 恢复并严格执行 2026-09-20 唯一口径：
+    #   · 排序：因子榜命中票按 top10 数组原序（_ord_by_key）排前；未命中票
+    #     （纯强势跟踪源等）按 mix_pct 降序排后——只决定候选池展示序，
+    #     永不进入 Top3 竞位（无因子榜分数 ⇒ 无同口径名次，凭第二把标尺
+    #     插队 = 制造双口径，正是本次事故根因）；
+    #   · 评分：final_score := 因子榜 total_score（同分）。未命中因子榜的票
+    #     final_score 保持占位 0.0（不覆写强度分），buy_score 同步；
+    #     强度分原值仍在 source_scores / reasons 如实展示，信息不丢失。
+    # mix_pct 字段保留：池内相对强度展示值（候选池「⭐ 综合」列），纯展示、
+    #    不参与名次 —— 10-14 竞位用途废止（见下方排序键）。
     # 回退：V8_IMA_INTAKE=0 ⇒ IMA 票根本不在 scored，本段自动退化为纯因子榜序。
+    # 标尺差异备忘（不删除，供将来若重启竞位时参考）：因子榜 total_score = 26 因子
+    #   raw/NORM_DIVISOR(130) 归一，全市场头部实测仅 14~18；IMA 强度分 = 源侧主观
+    #   0-100，实测 65~81。直接比分 IMA 恒赢（81 vs 16.8）= 变相 IMA 全量切换，
+    #   主人 10-14 已否决该形态；10-20 进一步否定「归一化后竞位」形态本身。
     _fv_raw = [safe_float(_ts_by_key.get(_e.get("key") or norm_code(_e.get("code", "")).lstrip(".")) or 0)
                for _e in scored if _e.get("_aligned_topfactor")]
     _fv_lo, _fv_hi = (min(_fv_raw), max(_fv_raw)) if _fv_raw else (0.0, 0.0)
@@ -1439,20 +1452,32 @@ def main():
             _raw = safe_float(_ts_by_key.get(_k) or 0)
             _e["mix_pct"] = round((_raw - _fv_lo) / (_fv_hi - _fv_lo) * 100, 1) if _fv_hi > _fv_lo else 100.0
         elif "强势跟踪" in (_e.get("sources") or []):
+            # 🔴 2026-10-20 主人令「评分一致」：不再用强度分覆写 final_score
+            #   （第二把标尺的分数写进因子口径列 = 两张榜分数不可比的直接病灶）。
+            #   未上当日因子榜 ⇒ final_score 保持占位 0.0，由候选池/前端明示
+            #   「未入因子榜」；强度分原值仍在 source_scores / reasons 如实展示。
             _raw = safe_float((_e.get("source_scores") or {}).get("强势跟踪"))
-            _e["final_score"] = round(_raw, 2)     # 展示值：强度分原值（副标口径）
-            _e["buy_score"] = _e["final_score"]
             _e["mix_pct"] = round((_raw - _ima_lo) / (_ima_hi - _ima_lo) * 100, 1) if _ima_hi > _ima_lo else 100.0
         else:
             _e["mix_pct"] = 0.0
-    scored.sort(key=lambda x: (-safe_float(x.get("mix_pct") or 0), 0 if x.get("_aligned_topfactor") else 1))
-    print("  [唯一口径] final_score 取自因子榜 total_score，命中 %d/%d 只" % (_al_hit, len(scored)))
+    # 排序（2026-10-20 主人令「同序」）：因子榜原序优先（同序），未命中票按
+    #   mix_pct 降序仅定候选池展示序、永不进 Top3 竞位。
+    scored.sort(key=lambda x: (
+        0 if x.get("_aligned_topfactor") else 1,
+        _ord_by_key.get(x.get("key") or norm_code(x.get("code", "")).lstrip("."), 10 ** 6),
+        -safe_float(x.get("mix_pct") or 0),
+    ))
+    print("  [唯一口径] final_score 取自因子榜 total_score，命中 %d/%d 只；"
+          "Top 选取仅认因子榜原序（2026-10-20 主人令：口径和评分都一致）" % (_al_hit, len(scored)))
 
     # ── Top3 选取（2026-08-11 主人令：公平竞争，谁好谁上）──
-    # 之前 A 股硬保底逻辑：先灌 A 股 + 余下从全局高分（已被 HK_PENALTY 减分）填。
+    # 2026-09-20 主人令唯一口径 + 2026-10-20 主人令「口径和评分都一致」重申：
+    #   Top 只从**当日因子榜命中票**按 top10 原序取；因子榜不足 N 只就取不足 N 只
+    #   （宁缺毋滥——用非因子票凑数 = 把没有因子分数的票塞进因子口径榜，
+    #   正是 10-20 事故「迪安诊断 78.0 插队」的同款病灶）。
+    #   之前 A 股硬保底逻辑：先灌 A 股 + 余下从全局高分（已被 HK_PENALTY 减分）填。
     #   实际效果：港股被歧视 + A 股被强保——两边都不公平。
-    # 现改为：完全去掉 A 股硬保底（hard_a=0），直接取 scored 全局高分前 TOP_N 名。
-    #   排序 key=(resonance, final_score, strength)——多源共振优先，分数次之，强度兜底。
+    # 现改为：完全去掉 A 股硬保底（hard_a=0），直接取 scored 前 TOP_N 名。
     # 监控兜底：v8_health_check 检查 Top3 市场分布，全港股/全 A 股写 URGENT 告警（数据源异常）。
     a_shares = [s for s in scored if s.get("board") != "港股" and market_prefix(s.get("code", "")) != "hk"]
     hk_stocks = [s for s in scored if s.get("board") == "港股" or market_prefix(s.get("code", "")) == "hk"]
@@ -1463,12 +1488,15 @@ def main():
         if len(top) >= _effective_top_n or len(top) >= hard_a:
             break
         top.append(s)
-    # 2) 余下 slot 从 scored 全局高分填补（A 股 + 港股，按 (resonance, final_score, strength) 排序）
+    # 2) 余下 slot 从 scored 前部填补（A 股 + 港股；scored 已按因子榜原序排好）
     top_codes = {t["key"] for t in top}
     for s in scored:
         if len(top) >= _effective_top_n:
             break
         if s["key"] in top_codes:
+            continue
+        # 🔴 2026-10-20 主人令：非因子榜命中票不进 Top 竞位（无因子分数 = 无同口径名次）
+        if not s.get("_aligned_topfactor"):
             continue
         top.append(s)
         top_codes.add(s["key"])
@@ -1598,8 +1626,10 @@ def main():
             "sector_hits": s["sector_hits"],
             "sector_fund": sector_fund,
             "final_score": s["final_score"],
-            # 🔴 2026-10-14 双源混排竞位分（池内 min-max 归一化，0-100）：
-            #   Top 卡与候选池的「⭐ 综合」展示口径，跨源可比（详见混排段注释）。
+            # 🔴 2026-10-20 主人令「口径和评分都一致」：mix_pct 降级为纯展示字段
+            #   （池内相对强度，候选池「⭐ 综合」列），不参与 Top3 名次——
+            #   10-14 双源竞位已废止（事故：IMA 票凭第二把标尺插队，
+            #   致最终推荐与因子积分榜名单/分数双双对不上）。
             "mix_pct": s.get("mix_pct"),
             "buy_score": s["final_score"],
             "enter_date": enter_date,
@@ -1765,13 +1795,16 @@ def main():
         # 🔴 2026-10-18 主人令「完全下架」：realflow_gate 回显字段随闸门移除。
         #   下架裁决（T+5 -1.68%/胜率 33.71%/n=89）已入 HANDOFF algo-audit-1017，不在产物复述。
         # 🔴🔴 2026-10-14 主人令「符合入选的，凭因子真实排序」：强势跟踪入池回显。
+        # 🔴 2026-10-20 主人令「要口径和评分都一致」：竞位形态废止——入池保留
+        #   （sources/signals/候选池展示），但不凭强度分混排竞位 Top3；
+        #   要进最终推荐，须先进入当日因子榜（26 因子真实打分、同序同分）。
         "ima_intake": {
             "data_date": _ima_dd,
             "pool_total": len(_ima_norm) if ima else 0,
             "new_selected": _ima_in if ima else 0,
-            "rule": "first_selected==data_date（当日新入选）⇒ 入池独立源；强度分与因子榜分"
-                    "各自池内 min-max 归一化到 0-100 后混排（两把标尺头部都=100，公平竞位，"
-                    "无席位偏向；同分时因子榜优先）",
+            "rule": "first_selected==data_date（当日新入选）⇒ 入池独立源（展示+候选池）；"
+                    "2026-10-20 起不参与 Top3 竞位——最终推荐严格=当日因子榜前 N 名"
+                    "（同序同分），进最终推荐须先入因子榜",
             "note": "09-18 walk-forward 曾测「高手跟踪」作四量加分项边际 −1.76pp（n=13、回放口径、"
                     "四量池上下文）——与本处「IMA 自身信号真实流」非同口径同场景，如实并列不隐瞒；"
                     "回退开关 V8_IMA_INTAKE=0",
@@ -1833,6 +1866,45 @@ def main():
             for x in scored if x.get("factor_actions")
         ],
     }
+
+    # 🔴🔴 2026-10-20 主人令「要口径和评分都一致」·落盘前硬断言（一劳永逸）
+    # ───────────────────────────────────────────────────────────────────────
+    # 事故（2026-10-20 20:40 主人截图实锤）：最终推荐 Top3 与因子积分榜 Top3
+    #   名单/分数双双对不上（迪安诊断 78.0 插队 vs 德明利 17.8；佰维 18.6 vs 18.2）。
+    #   新鲜度闸只判「当天产没产」、判不了「两卡是否同序同分」；链尾
+    #   verify_fr_factor_consistency 虽在，但跑在整链之后、且历史上只校 raw 层。
+    # ⇒ 产物层自禁：写任何文件前，stocks（按序）必须 == 因子榜 top10 前 N 名，
+    #   且逐票 final_score == total_score；不过 ⇒ 不落盘、exit 1 让链闸报警。
+    #   （宁可不更新，也不把对不上的推荐推上线——主人令「不能说一套做一套」。）
+    _as_codes = [norm_code(s.get("code")).lstrip(".") for s in out_stocks]
+    _as_rows = []
+    for _s in (top10.get("top10") or []):
+        _c = _s.get("code")
+        if not _c:
+            continue
+        _k = norm_code(_c).lstrip(".")
+        if _k in _as_rows:
+            continue
+        _as_rows.append((_k, safe_float(_s.get("total_score"))))
+    _as_exp_codes = [c for c, _ in _as_rows[:len(_as_codes)]]
+    _as_map = dict(_as_rows)
+    _as_bad = []
+    if _as_codes != _as_exp_codes:
+        _as_bad.append("名单不同序: FR=%s vs 因子榜前%d=%s" % (_as_codes, len(_as_codes), _as_exp_codes))
+    for _s in out_stocks:
+        _k = norm_code(_s.get("code")).lstrip(".")
+        _fs = safe_float(_s.get("final_score"))
+        _ts = _as_map.get(_k)
+        if _ts is None or abs(_fs - _ts) > 1e-9:
+            _as_bad.append("%s 分数不一致: final_score=%s vs total_score=%s" % (_k, _fs, _ts))
+    if _as_bad:
+        print("\n🛑 [硬断言·2026-10-20 主人令「口径和评分都一致」] 最终推荐与因子积分榜对不上，拒绝落盘：")
+        for _b in _as_bad:
+            print("   • " + _b)
+        print("   → 不写 raw_data/final_recommend.json、不写 data/FINAL_RECOMMEND_DATA.js、不归档；")
+        print("   → 请修复后重跑（或排查因子榜输入快照 raw_data/top10_daily.json 是否被旧数据覆盖）。")
+        sys.exit(1)
+    print("  [硬断言✅] 最终推荐与因子积分榜同序同分（%d 只）" % len(out_stocks))
 
     # 写 raw_data json
     out_path = os.path.join(RAW, "final_recommend.json")
