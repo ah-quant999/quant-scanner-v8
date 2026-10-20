@@ -1,7 +1,7 @@
 {
-  "update_time": "2026-10-21 03:37:29",
-  "run_start": "2026-10-21 03:07:03",
-  "ok": 20,
+  "update_time": "2026-10-21 03:52:28",
+  "run_start": "2026-10-21 03:47:17",
+  "ok": 1,
   "fail": 0,
   "failed_scripts": [],
   "skipped_by_time_gate": []
