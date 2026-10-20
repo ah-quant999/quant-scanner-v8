@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-19 14:42"
+  updated: "2026-10-20 07:55"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 147
+  next_id_seq: 150
 items:
   - id: selfalgo-audit-fix-1019
     owner: 小九的工程师
@@ -9519,4 +9519,40 @@ items:
     verify_how: "tip bae228ee 四项内容核验全过(前端列1/生成器d5 1/注册1/自检2)。⚠️数据侧待办(小九)：①下一交易日17:20 post_close 自宿主runner跑repo版cloud_fetch_v8.py→raw_data/sector_year_flow.json首仓入库(带d5/d20+真实去年全年，partial措辞自然消失)；②小九本机若存有未提交的cloud_fetch_v8.py本地改(生产者漂移版)，请与本仓bae228ee合流后提交，防持续双版本分叉；③家机alimi-cn实锤东财直连+代理双不可达(ProxyError+RemoteDisconnected)，与sfft『EM日K窗口累计0/120』同根因，家机不再承担东财源生产。"
     verified_at: "2026-10-19 21:51 代码侧已验证；数据侧待小九下一次post_close"
     updated: "2026-10-19 21:51"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: build-blocker-handoff-ledger-1020
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: done
+    created: 2026-10-20
+    title: 构建链 12 小时全挂根因：[13/13] 交接守卫三断叠加（ledger 坏 JSON + 非法 status + seq 差一）
+    what: "10-19 19:38 CST 起 v8_build_deploy 全量 failure（audit step10），持续至 10-20 07:4x。根因三断叠加（全部实锤）：①bae228eec0 之后某笔把 resonance-unify-1019/yearflow-delta-cols-1019 追加进 ledger.ids 时漏写行尾逗号 ⇒ ledger.json 坏 JSON ⇒ [13] json.loads 失败首拦；②yearflow-delta-cols-1019 的 status='done_code_pending_data' 不在白名单 ⇒ 结构断言拦（本地 managed python 无 PyYAML ⇒ [13] 整项跳过 ⇒ 三次本地自检全过都没暴露）；③90cff0ae49 起 ledger.max_next_id_seq=147 而 YAML meta.next_id_seq=146 ⇒ seq 回退断言拦。修复：47ddf8bf38（ledger 语法+ids 全量+hashes 200 项重算+max=147；YAML next_id_seq→147）+ ba94553d75（status→pending-verify + 该 item hash 同口径重算）。验证：py312（PyYAML 在位）跑 check_handoff_ledger 全函数通过 + 完整 15 项 audit 全过；CI run 39344098231（head=ba94553d75）build completed success，audit step10 与部署 step14 均 success。"
+    evidence: "见 what 内 commit；plumbing 快进非强推，ls-tree 逐一核验入树。"
+    verify_how: "见 what 内『验证/待验证』段。"
+    updated: "2026-10-20 07:55"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: tri-backtest-table-1020
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: pending-verify
+    created: 2026-10-20
+    title: 三新算法（缩量回踩/板块共振/龙虎机构）接入策略回测总表 BACKTEST_ALL_ALGOS
+    what: "主人 10-20 令『这些算法的回测在策略回测页也要加上』。gen_backtest_all_algos.py 新增 parser tri_sub（按 src[sub] 取 NEW_ALGO_TRI_BACKTEST 的 vcp/rotation/lhb 子键，行构造与 parse_by_period 逐字同源：零样本⇒win/avg 归 null+累积中，不造假）+ SOURCES 登记三卡（主档 T+5，档位 1/3/5/10/20）。前端策略回测页读 rows 自动渲染，零前端改动。commit 6db445e117（plumbing 快进，ls-tree 核验入树；worktree 同 commit audit 15/15 全过；本地 --dry 干跑三卡行输出正确：无 by_period 时诚实标『归档信号尚无成熟样本，累积中』）。待验证：今晚 21:00 E 批跑仓库版 gen_backtest_all_algos.py ⇒ 线上 BACKTEST_ALL_ALGOS.rows 出现三卡（vcp/lhb 的 T+1 档应有 10-19 信号的成熟样本；rotation 若板块数据恢复则有 leaders）。"
+    evidence: "见 what 内 commit；plumbing 快进非强推，ls-tree 逐一核验入树。"
+    verify_how: "见 what 内『验证/待验证』段。"
+    updated: "2026-10-20 07:55"
+    updated_by: 阿狸咪的工程师(alimi-cn)
+
+  - id: tri-data-day-gate-1020
+    priority: P2
+    owner: 阿狸咪的工程师
+    status: pending-verify
+    created: 2026-10-20
+    title: 三新算法数据日闸——防旧 K 线形态冒充满仓信号（一劳永逸）
+    what: "实证 10-20 早批次：vcp 命中 9 只的 K 线 date 散布 09-07~10-14（kline_cache 陈旧），却被打包进 10-20 批次并按自然日归档进前向回测 ⇒ 信号日与形态日错配近一个月。修复 commit cfeb65709a（gen_new_algo_tri.py 四处）：①常量 TRI_STALE_SKIP_DAYS=5 / TRI_VCP_MIN_FRESH=200；②scan_vcp 池化+新鲜度闸：只收末根K线=全池最新日的票，新鲜票<200 整节降级（不产出不归档）；③归档 signal_date 改信号真实数据日（vcp=全池最新K线日/lhb=榜单 date/rotation=板块数据 update_time 日），无数据日不归档（保留旧档）；④lhb item 补 date 字段。语法+补丁串自证过。待验证：今晚 E 批跑新版 ⇒ vcp 信号 date 全部=数据日、归档 signal_date 与形态日一致；若云端 kline_cache 仍整体陈旧 ⇒ vcp 整节降级（诚实空态）而非拿旧数据充数。关联遗留：kline_cache 更新机制不完整（09-10 就有记录，本地 600 只样本末根日分布09-04~10-19 极不均）——属独立数据坑，待排。"
+    evidence: "见 what 内 commit；plumbing 快进非强推，ls-tree 逐一核验入树。"
+    verify_how: "见 what 内『验证/待验证』段。"
+    updated: "2026-10-20 07:55"
     updated_by: 阿狸咪的工程师(alimi-cn)
