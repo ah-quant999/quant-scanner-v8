@@ -24,8 +24,18 @@
 
 【执行位】post_close（akshare 涨停池 + 新浪日K 均 cn-IP 友好；小九 selfhosted 17:20 常规班）。
 【产出】raw_data/lianban_winrate.json → data/LIANBAN_WINRATE.js（window.LIANBAN_WINRATE）
-【幂等】信号按 (code, board_date) 去重；当日已跑过（last_run_date）由调用方闸门跳过；
+【幂等】信号按 (code, board_date) 去重；board_date=**涨停池的真实日期**（调用方显式传入，
+        禁按运行日盖章——2026-10-20 事故：午夜跑按运行日错录上一交易日池，见
+        cloud_fetch_v8.f_lianban_winrate 三道闸门）；同日多轮由调用方按 last_signal_date 判重；
         成熟即移出 pending，同日重跑不重复计数。
+
+🔴 2026-10-20 一劳永逸修复（与本文件相关部分）：
+  · store 新增 last_signal_date / signal_dates{日期:条数}——幂等判重从「运行日」改为
+    「信号覆盖日」， midnight 看门狗派发（00:07-07:52 每 15 分）不再误伤晚场录入；
+  · _record_new 支持行级 board_date（补录旧日期用），默认仍取调用方传入日期；
+  · 受害数据修复：2026-10-17/18/19 三个 board_date 实为 10-16 池错录、10-20 实为
+    10-19 池错录（东财对未发布日期返最新池的实锤见 cloud_fetch_v8），已由
+    scripts/fix_lianban_store_1020.py 按真实池重建（58+44+48=150 条）。
 """
 import json
 import urllib.request
@@ -121,6 +131,9 @@ def skeleton():
         "first_date": None,
         "last_mature_date": None,
         "last_run_date": None,
+        # 2026-10-20 一劳永逸修复：信号覆盖日口径（幂等判重从运行日改为信号日）
+        "last_signal_date": None,   # 最后一次真实录入信号的日期（调用方闸门据此判重）
+        "signal_dates": {},         # {board_date: 录入条数}——补录缺口判定与审计
         "params": {
             "cost_rt": COST_RT, "mature_bars": MATURE_BARS, "vr_min": VR_MIN,
             "vr_window": VR_WINDOW, "kline": "sina_daily",
@@ -143,10 +156,14 @@ def _norm_store(base):
             st[k] = int(base.get(k) or 0)
         except Exception:
             pass
-    for k in ("first_date", "last_mature_date", "last_run_date"):
+    for k in ("first_date", "last_mature_date", "last_run_date", "last_signal_date"):
         v = base.get(k)
         if isinstance(v, str) and v:
             st[k] = v
+    sd = base.get("signal_dates")
+    if isinstance(sd, dict):
+        st["signal_dates"] = {str(k): int(v or 0) for k, v in sd.items()
+                              if isinstance(k, str) and k[:4].isdigit()}
     g = base.get("groups")
     if isinstance(g, dict):
         for gk in GROUP_KEYS:
@@ -159,11 +176,15 @@ def _norm_store(base):
     return st
 
 
-def _record_new(st, pool_rows, today):
-    """录入今日涨停池信号（lbc∈{1,2}，剔 ST，按 code|date 去重）。无取数——结果在成熟时才算。"""
+def _record_new(st, pool_rows, board_date):
+    """录入涨停池信号（lbc∈{1,2}，剔 ST，按 code|board_date 去重）。无取数——结果在成熟时才算。
+
+    board_date = 该池的**真实日期**（调用方传入，禁按运行日盖章——2026-10-20 事故根因）；
+    行内可带自带 "board_date"（补录旧日期用），优先于函数参数。"""
     seen = set(x for x in (st.get("recorded") or []) if isinstance(x, str))
     pend_keys = {(p.get("code"), p.get("board_date")) for p in st.get("pending", [])}
     added = 0
+    added_by_date = {}
     for row in pool_rows or []:
         code = str(row.get("code") or "").strip()
         name = str(row.get("name") or "")
@@ -175,19 +196,28 @@ def _record_new(st, pool_rows, today):
             continue
         if name.startswith(("ST", "*ST", "st", "*st")):
             continue
-        key = (code, today)
-        if key in pend_keys or f"{code}|{today}" in seen:
+        bd = str(row.get("board_date") or board_date or "")
+        if not bd:
+            continue
+        key = (code, bd)
+        if key in pend_keys or f"{code}|{bd}" in seen:
             continue
         st["pending"].append({"code": code, "name": name,
                               "type": "first" if lbc == 1 else "second",
-                              "board_date": today})
-        seen.add(f"{code}|{today}")
-        st["recorded"].append(f"{code}|{today}")
+                              "board_date": bd})
+        seen.add(f"{code}|{bd}")
+        st["recorded"].append(f"{code}|{bd}")
         st["recorded"] = st["recorded"][-RECORDED_KEEP:]
         st["signals_total"] = int(st.get("signals_total") or 0) + 1
         added += 1
-    if st.get("first_date") is None and added:
-        st["first_date"] = today
+        added_by_date[bd] = added_by_date.get(bd, 0) + 1
+    sd = st.setdefault("signal_dates", {})
+    for bd, n in added_by_date.items():
+        sd[bd] = int(sd.get(bd) or 0) + n
+    if added:
+        st["last_signal_date"] = max(added_by_date)     # 信号覆盖日（幂等判重键）
+        if st.get("first_date") is None or min(added_by_date) < st["first_date"]:
+            st["first_date"] = min(added_by_date)
     return added
 
 
@@ -264,17 +294,19 @@ def _mature_one(st, p, bars, today):
     return True
 
 
-def update(base, pool_rows, kline=None, now=None):
-    """主入口：基线 store + 今日涨停池信号行 → 更新后的 store。
+def update(base, pool_rows, kline=None, now=None, board_date=None):
+    """主入口：基线 store + 涨停池信号行 → 更新后的 store。
 
-    pool_rows: [{"code","name","lbc"}]（lbc=连板数；由 cloud_fetch_v8._get_zt_pool 提供）
+    pool_rows: [{"code","name","lbc"[,"board_date"]}]（lbc=连板数；由 cloud_fetch_v8._get_zt_pool 提供；
+               行内 board_date 优先——补录旧日期用；缺省取 board_date 参数）
+    board_date: 本批信号对应的**涨停池真实日期**（缺省=运行日；2026-10-20 修复后调用方显式传入）
     kline:    可选取数函数(code, n) → 新浪日K list（测试可注入假数据）
     """
     fetch = kline or _sina_kline
     st = _norm_store(base)
     now = now or _now_cst()
     today = now.strftime("%Y-%m-%d")
-    _record_new(st, pool_rows, today)
+    added = _record_new(st, pool_rows, board_date or today)
     still, matured = [], 0
     for p in st.get("pending", []):
         try:
@@ -297,8 +329,9 @@ def update(base, pool_rows, kline=None, now=None):
             still.append(p)
     st["pending"] = still
     st["last_run_date"] = today
-    print(f"  [LIANBAN] 在途 {len(still)} 笔 · 本轮成熟 {matured} 笔 · "
-          f"累计成熟 {st['matured_total']} · 过期 {st['expired']} · 一字剔除 {st['dropped_yiziban']}")
+    print(f"  [LIANBAN] 本轮录入 {added} 笔 · 在途 {len(still)} 笔 · 本轮成熟 {matured} 笔 · "
+          f"累计成熟 {st['matured_total']} · 过期 {st['expired']} · 一字剔除 {st['dropped_yiziban']} · "
+          f"信号覆盖 {sorted(st.get('signal_dates') or {})}")
     return st
 
 
@@ -368,6 +401,41 @@ def _selftest():
                  kline=lambda c, n: fake, now=datetime(2026, 10, 10, 17, 30, tzinfo=CST))
     assert st5["signals_total"] == 0 and st5["pending"] == []
     print("  ⑤ ST 剔除 OK")
+
+    # ⑥ 2026-10-20 修复：信号覆盖日盖章（last_signal_date/signal_dates）
+    st6 = update(skeleton(), [{"code": "600000", "name": "浦发银行", "lbc": 1}],
+                 kline=lambda c, n: fake, now=datetime(2026, 10, 10, 17, 30, tzinfo=CST))
+    assert st6["last_signal_date"] == "2026-10-10", st6["last_signal_date"]
+    assert st6["signal_dates"] == {"2026-10-10": 1}, st6["signal_dates"]
+    assert st6["first_date"] == "2026-10-10"
+    print("  ⑥ 信号覆盖日盖章 OK", st6["signal_dates"])
+
+    # ⑦ 2026-10-20 修复：行级 board_date 补录旧日期（复刻 10-16 池补录）
+    st7 = skeleton()
+    rows = [{"code": "600000", "name": "浦发银行", "lbc": 1, "board_date": "2026-10-16"},
+            {"code": "000001", "name": "平安银行", "lbc": 2, "board_date": "2026-10-16"}]
+    st7 = update(st7, rows, kline=lambda c, n: fake,
+                 now=datetime(2026, 10, 20, 17, 30, tzinfo=CST))
+    assert st7["signal_dates"] == {"2026-10-16": 2}, st7["signal_dates"]
+    assert st7["last_signal_date"] == "2026-10-16" and st7["first_date"] == "2026-10-16"
+    assert all(p["board_date"] == "2026-10-16" for p in st7["pending"])
+    # 同批重复补录 → dedup 不虚增
+    st7b = update(st7, rows, kline=lambda c, n: fake,
+                  now=datetime(2026, 10, 20, 17, 31, tzinfo=CST))
+    assert st7b["signal_dates"] == {"2026-10-16": 2} and st7b["signals_total"] == 2
+    print("  ⑦ 行级补录日期+去重 OK", st7b["signal_dates"])
+
+    # ⑧ 2026-10-20 修复：同 code 不同 board_date 不互相误去重（10-16 与 10-19 各录各的）
+    st8 = update(skeleton(),
+                 [{"code": "600000", "name": "浦发银行", "lbc": 1, "board_date": "2026-10-16"}],
+                 kline=lambda c, n: fake, now=datetime(2026, 10, 20, 17, 30, tzinfo=CST))
+    st8 = update(st8,
+                 [{"code": "600000", "name": "浦发银行", "lbc": 1, "board_date": "2026-10-19"}],
+                 kline=lambda c, n: fake, now=datetime(2026, 10, 20, 17, 31, tzinfo=CST))
+    assert st8["signals_total"] == 2, st8["signals_total"]
+    assert st8["signal_dates"] == {"2026-10-16": 1, "2026-10-19": 1}
+    assert st8["first_date"] == "2026-10-16" and st8["last_signal_date"] == "2026-10-19"
+    print("  ⑧ 跨日期不误去重 OK", st8["signal_dates"])
     print("LIANBAN 自测全部通过 ✅")
 
 
