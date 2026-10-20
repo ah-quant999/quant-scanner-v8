@@ -5121,6 +5121,110 @@ def _clear_intraday_for_premarket(category, only=None):
     print(f"🧹 盘前清空完成（保留 SH_SZ_HISTORY/CAPITAL_FLOW_DATA/LIMIT_UP_HEATMAP/ETF_DAILY_MONITOR）")
 
 
+# ───────────────────────── 涨停池消费方共用闸门（2026-10-20 一劳永逸修复） ─────────────────────────
+# 🔴 三连锤实锤（主人令「全部一劳永逸修复」· 连板两卡 + 前哨卡同根因）：
+#   锤① 幂等误伤：LIANBAN_WINRATE 原按 last_run_date（运行日）判重 ⇒ 看门狗 00:37 /
+#        周末 09:00 档盖了当日的章 ⇒ 当晚 15:30/17:20/18:20/19:20 全被跳过 ⇒
+#        当日真实信号录不上（10-19、10-20 两晚实测：last_run_date=10-20 而 groups 全 0）。
+#   锤② 东财 getTopicZTPool 对**未发布日期静默返回最新可用池**（实测请求 20261021/22
+#        均返回 10-20 池；过去非交易日返空）⇒ 午夜/晨跑按运行日把上一交易日池错录
+#        成当日信号（LIANBAN store 里 10-17/18/19 三条 58 信号与 10-16 真池逐一集合
+#        比对 0 差异、10-20 的 44 条与 10-19 真池 0 差异——全链错录实锤）。
+#   锤③ 错录信号 board_date 落在周六/周日 ⇒ 新浪日K无该日 ⇒ 永远无法成熟，218 条全毒。
+#   【修法】时段+交易日闸门（仅盘后可能产生新数据）＋信号覆盖日判重（last_signal_date）
+#       ＋发布新鲜度校验（与上一交易日池全等=未发布，宁缺勿错）＋过期补录（缺信号日
+#       按真实日期补录，东财对过去交易日返真池实测 20261019）＋毒数据一次性重建。
+#   注：FIRST_BOARD_ALERT（前哨卡）同源同修——只复用闸门，不改其自身口径。
+LIANBAN_PUBLISH_HM = 1510        # 涨停池 15:00 定型，15:10 后才有可信当日池（15:30 档最早）
+LIANBAN_BACKFILL_CAL_DAYS = 10   # 补录回看窗口（自然日）：覆盖约两周内漏录的交易日
+
+
+def _zt_pool_rows(date_str):
+    """东财涨停池（个股口径）→ [{"code","name","lbc"}]；无数据返 []，网络异常上抛。
+
+    date_str 形如 "20261016"。过去交易日返该日真池（实测 20261019）；未发布日期返
+    最新可用池（调用方必须做新鲜度校验，禁直接按 date_str 相信）。"""
+    df = _get_zt_pool(date_str)
+    if df is None or not len(df):
+        return []
+    pool = df[df["连板数"].isin([1, 2])]
+    rows = []
+    for _, r in pool.iterrows():
+        try:
+            lbc = int(r.get("连板数") or 1)
+        except Exception:
+            lbc = 1
+        rows.append({"code": str(r["代码"]), "name": r.get("名称"), "lbc": lbc})
+    return rows
+
+
+def _pool_key(rows):
+    """池指纹：(code, lbc) 集合——同日重录/跨日新鲜度比对用。"""
+    return frozenset((str(r.get("code")), int(r.get("lbc") or 1)) for r in rows or [])
+
+
+def _zt_pool_fresh(rows, ref_date):
+    """当日池新鲜度校验：非空 且 与上一交易日池不全等（东财未发布时返旧池，只能比对识破）。
+
+    ref_date=date 对象（上一交易日）。校验不过/取数失败 → False（调用方不录入，宁缺勿错）。"""
+    if not rows:
+        return False
+    try:
+        prev_rows = _zt_pool_rows(ref_date.strftime("%Y%m%d"))
+    except Exception as e:
+        print(f"  ⚠️ 涨停池新鲜度校验失败（上一交易日 {ref_date} 取数异常）: {e}")
+        return False
+    if not prev_rows:
+        print(f"  ⚠️ 涨停池新鲜度校验失败（上一交易日 {ref_date} 池为空/取数失败）")
+        return False
+    if _pool_key(rows) == _pool_key(prev_rows):
+        print(f"  ⚠️ 涨停池新鲜度校验失败：与上一交易日 {ref_date} 池完全相同——判定为未发布")
+        return False
+    return True
+
+
+def _lianban_backfill_dates(base, today):
+    """近窗口内「有交易但 signal_dates 缺记」的日期列表（升序）。
+
+    只补 first_date 之后的缺口——feature 上线前的日期不在真实信号流归档范围内
+    （10-11 口径铁律：上线第一天即建归档，不回补上线前）。"""
+    first = (base or {}).get("first_date")
+    if not first:
+        return []
+    try:
+        d0 = datetime.strptime(first, "%Y-%m-%d").date()
+    except Exception:
+        return []
+    have = set((base or {}).get("signal_dates") or {})
+    out, d = [], today - timedelta(days=LIANBAN_BACKFILL_CAL_DAYS)
+    while d < today:
+        if d >= d0 and _is_trading_day(d) and d.isoformat() not in have:
+            out.append(d)
+        d += timedelta(days=1)
+    return out
+
+
+def _lianban_first_eta(store, mod):
+    """最早可出数日估计 = 最早在途信号日 + 5 个交易日（且 ≥ +7 自然日，对齐 SKIP_AGE_DAYS）。
+
+    无在途 → None。展示口径（前端标「预计」）；节假日按 _is_trading_day 硬编码日历近似。"""
+    pend = [p for p in (store.get("pending") or []) if p.get("board_date")]
+    if not pend:
+        return None
+    try:
+        d0 = datetime.strptime(min(p["board_date"] for p in pend), "%Y-%m-%d").date()
+    except Exception:
+        return None
+    d, n_td = d0, 0
+    for _ in range(45):
+        d += timedelta(days=1)
+        if _is_trading_day(d):
+            n_td += 1
+        if n_td >= mod.MATURE_BARS and (d - d0).days >= mod.SKIP_AGE_DAYS:
+            return d.isoformat()
+    return None
+
+
 def main(category=None, only=None):
     print(f"=== v8 云端抓取开始 {now_cst().isoformat(timespec='seconds')} "
           f"category={category or 'all'} ===")
@@ -5987,23 +6091,42 @@ def main(category=None, only=None):
             return {}
 
     def f_first_board_alert():
-        """连板梯队前哨（一进二前哨+二进三观察）：连板数∈{1,2}宇宙；量比由 v8/first_board_alert.py 用新浪日K计算（单源）。"""
+        """连板梯队前哨（一进二前哨+二进三观察）：连板数∈{1,2}宇宙；量比由 v8/first_board_alert.py 用新浪日K计算（单源）。
+
+        🔴 2026-10-20 一劳永逸修复（与 LIANBAN_WINRATE 同根因，见上方三连锤实锤）：
+           原实现任何轮次都刷——非交易日/盘前/午夜轮拿到的其实是**上一交易日池**
+           （东财对未发布日期静默返最新可用池）却盖当日 update_time ⇒ 假刷新；
+           池为空时更把「空名单+新时间戳」写进 data（洗空）。
+           【修法】仅交易日且 ≥15:10 才刷，且过 _zt_pool_fresh 新鲜度校验；
+           不过 → return None 保留上一版真实数据（宁缺勿错，下一轮重试）。
+           应急口子：LIANBAN_FORCE=1 跳时段闸门（冒烟用；新鲜度校验仍强制）。"""
         import importlib.util
+        now = now_cst()
+        if os.environ.get("LIANBAN_FORCE") != "1":
+            if not _is_trading_day(now.date()) or now.hour * 100 + now.minute < LIANBAN_PUBLISH_HM:
+                print("  ℹ️ FIRST_BOARD_ALERT: 非交易日/未到盘后发布窗口，保留上一版数据")
+                return None
         try:
             df = _get_zt_pool()
         except Exception as e:
             print(f"  ⚠️ FIRST_BOARD_ALERT: 涨停池获取失败 {e}")
             return None
         if df is None or len(df) == 0:
-            return {"alerts": [], "ladder2": [], "params": {"vol_ratio_min": 3.0},
-                    "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S")}
+            print("  ℹ️ FIRST_BOARD_ALERT: 今日涨停池为空（无涨停或未发布），保留上一版数据")
+            return None
         try:
             pool = df[df["连板数"].isin([1, 2])]
         except Exception:
             return None
         if pool is None or len(pool) == 0:
-            return {"alerts": [], "ladder2": [], "params": {"vol_ratio_min": 3.0},
-                    "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S")}
+            print("  ℹ️ FIRST_BOARD_ALERT: 今日池无连板数∈{1,2} 标的，保留上一版数据")
+            return None
+        # 新鲜度校验：与上一交易日池全等 ⇒ 今日池未发布（东财未发布日期返旧池），禁刷
+        fresh_rows = [{"code": str(r["代码"]), "lbc": int(r.get("连板数") or 1)}
+                      for _, r in pool.iterrows()]
+        if not _zt_pool_fresh(fresh_rows, _last_trading_day(now.date() - timedelta(days=1))):
+            print("  ℹ️ FIRST_BOARD_ALERT: 今日池未通过新鲜度校验，保留上一版数据（下一轮重试）")
+            return None
         codes = [str(x) for x in pool["代码"].tolist()]
         meta = {}
         for _, r in pool.iterrows():
@@ -6042,17 +6165,39 @@ def main(category=None, only=None):
 
         基线三级回退：远端 main（_fetch_remote_raw 权威基线，治本地 raw_data 被
         intraday 轮清空）→ 本地 raw_data → data/*.js（_load_judgment_raw 兜底）。
-        幂等：当日已产出（last_run_date）跳过；信号按 (code, board_date) 去重。
-        空载：无在途且无成熟样本 → 不写盘（保留远端旧数据，宁缺勿错）。
+
+        🔴 2026-10-20 一劳永逸修复（三连锤实锤见上方 _zt_pool_fresh 注释区）：
+          闸门① 时段+交易日：仅交易日且 ≥15:10 才可能产生新数据；午夜看门狗派发
+                （00:07-07:52 每 15 分）/周末周度档/盘前档一律空转——既不会再误伤
+                晚场录入（旧 last_run_date 口径的病），也不会通宵重复写盘。
+          闸门② 信号覆盖日判重：今日信号已录入（last_signal_date==今日）⇒ 同日后续
+                轮次（17:20/18:20/19:20）跳过；写盘失败的轮次远端基线未更新，下一轮补录。
+          录入① 今日池三道校验：非空 + 与上一交易日池不全等（_zt_pool_fresh，识破
+                东财对未发布日期返旧池）+ board_date=池真实日（默认运行日，已过校验）。
+          录入② 过期补录：_lianban_backfill_dates 找出 first_date 之后有交易但
+                signal_dates 缺记的日期，按真实日期补录（东财对过去交易日返真池）；
+                dedup 由 (code, board_date) 兜底，只补漏不改旧（10-11 口径铁律）。
+          空载：无在途且无成熟样本 → 不写盘（保留远端旧数据，宁缺勿错）。
+          应急口子：LIANBAN_FORCE=1 跳闸门①（冒烟/补录用；新鲜度校验仍强制）。
         """
         import importlib.util
         store_path = RAW_DIR / "lianban_winrate.json"
         base = _fetch_remote_raw("lianban_winrate.json")
         if not isinstance(base, dict) or not base.get("groups"):
             base = _load_judgment_raw("LIANBAN_WINRATE", "lianban_winrate.json") or None
-        # 幂等闸门：当日已产出过 → 跳过（防同日多轮重复取数；run() 记 reused 不报警）
-        if isinstance(base, dict) and base.get("last_run_date") == now_cst().strftime("%Y-%m-%d"):
-            print("  ♻️ LIANBAN_WINRATE: 当日已产出，跳过（防重复取数）")
+        now = now_cst()
+        today = now.strftime("%Y-%m-%d")
+        # ── 闸门①：时段+交易日（2026-10-20 修复；午夜/周末/盘前档空转不写盘）──
+        if os.environ.get("LIANBAN_FORCE") != "1":
+            if not _is_trading_day(now.date()):
+                print("  ℹ️ LIANBAN_WINRATE: 非交易日，空转（在途信号待下一交易日盘后成熟）")
+                return None
+            if now.hour * 100 + now.minute < LIANBAN_PUBLISH_HM:
+                print("  ℹ️ LIANBAN_WINRATE: 未到盘后发布窗口，空转（在途信号待盘后成熟）")
+                return None
+        # ── 闸门②：信号覆盖日判重（替代旧 last_run_date 口径）──
+        if isinstance(base, dict) and base.get("last_signal_date") == today:
+            print("  ♻️ LIANBAN_WINRATE: 今日信号已录入，跳过（防重复取数）")
             return None
         try:
             spec = importlib.util.spec_from_file_location(
@@ -6062,26 +6207,41 @@ def main(category=None, only=None):
         except Exception as e:
             print(f"  ⚠️ LIANBAN_WINRATE: 模块加载失败 {e}")
             return None
-        # 涨停池（失败不阻断：在途队列照常成熟推进）
+        # ── 录入①：今日池（非空 + 新鲜度校验；board_date 缺省=运行日=已校验的池真实日）──
         pool_rows = []
         try:
-            df = _get_zt_pool()
-            if df is not None and len(df):
-                pool = df[df["连板数"].isin([1, 2])]
-                for _, r in pool.iterrows():
-                    try:
-                        lbc = int(r.get("连板数") or 1)
-                    except Exception:
-                        lbc = 1
-                    pool_rows.append({"code": str(r["代码"]),
-                                      "name": r.get("名称"), "lbc": lbc})
+            rows = _zt_pool_rows(now.strftime("%Y%m%d"))
+            if not rows:
+                print("  ⚠️ LIANBAN_WINRATE: 今日涨停池为空（无涨停或未发布），今日不录入")
+            elif _zt_pool_fresh(rows, _last_trading_day(now.date() - timedelta(days=1))):
+                pool_rows = rows
+                print(f"  ✅ LIANBAN_WINRATE: 今日池校验通过（lbc∈{{1,2}} 共 {len(rows)} 条）")
+            else:
+                print("  ⚠️ LIANBAN_WINRATE: 今日池未通过新鲜度校验，今日不录入（宁缺勿错，下一轮/次日补录）")
         except Exception as e:
-            print(f"  ⚠️ LIANBAN_WINRATE: 涨停池获取失败 {e}（仅推进在途成熟）")
+            print(f"  ⚠️ LIANBAN_WINRATE: 涨停池获取失败 {e}（仅推进在途成熟+补录）")
+        # ── 录入②：过期补录（缺信号日按真实日期补录；东财对过去交易日返真池）──
+        backfilled = []
+        try:
+            for d in _lianban_backfill_dates(base, now.date()):
+                r = _zt_pool_rows(d.strftime("%Y%m%d"))
+                if not r:
+                    print(f"  ⚠️ LIANBAN_WINRATE: 补录 {d} 池为空，跳过")
+                    continue
+                for x in r:
+                    x["board_date"] = d.isoformat()
+                pool_rows += r
+                backfilled.append(f"{d.isoformat()}({len(r)})")
+        except Exception as e:
+            print(f"  ⚠️ LIANBAN_WINRATE: 补录失败 {e}（不影响今日录入）")
+        if backfilled:
+            print(f"  🩹 LIANBAN_WINRATE: 过期补录 {len(backfilled)} 个信号日：{', '.join(backfilled)}")
         try:
             store = mod.update(base, pool_rows)
         except Exception as e:
             print(f"  ⚠️ LIANBAN_WINRATE: 累积更新失败 {e}")
             return None
+        store["first_mature_eta"] = _lianban_first_eta(store, mod)
         # 空载守卫：无在途且无成熟样本 → 不写盘（保留远端旧数据）
         if not store.get("pending") and all(
                 (g or {}).get("n", 0) == 0 for g in (store.get("groups") or {}).values()):
