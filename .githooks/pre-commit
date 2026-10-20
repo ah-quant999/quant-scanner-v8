@@ -18,14 +18,21 @@ GUARD="$ROOT/scripts/secret_guard.py"
 # 闸门脚本不存在（如旧克隆）→ 不阻断
 [ -f "$GUARD" ] || exit 0
 
-# 选一个可用的 Python：优先仓库约定路径，其次 PATH
+# 选一个**真正可运行**的 Python：优先仓库约定路径，其次 PATH
+# 🔴 2026-10-20 修复（本机 HH20210606 全部提交被阻·一劳永逸）：
+#   原判据 `command -v` 只验「存在」不验「能跑」——本机 PATH 里 python3 是 Windows
+#   商店别名桩（%LOCALAPPDATA%\Microsoft\WindowsApps\python3.exe，未装真解释器，
+#   一执行就弹 "Python was not found"），排在真 python 之前被选中 ⇒ exec 即失败
+#   ⇒ 提交静默中断（只余商店报错，极易误判为 git 故障）。
+#   改为「实测可运行」：`"$c" -c pass` 过不了就换下一个候选。
 PY=""
 for c in \
   "C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe" \
   "C:/Users/Administrator/.workbuddy/binaries/python/versions/3.13.12/python.exe" \
-  "python3" "python"
+  "python3" "python" \
+  "C:/Users/HH20210606/AppData/Local/Programs/Python/Python312/python.exe"
 do
-  if command -v "$c" >/dev/null 2>&1 || [ -x "$c" ]; then PY="$c"; break; fi
+  if "$c" -c pass >/dev/null 2>&1; then PY="$c"; break; fi
 done
 
 # 找不到 Python → 退化为纯 shell 兜底（只做最基本的路径名检查）
