@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-20 09:40"
+  updated: "2026-10-20 15:10"
   updated_by: 小九的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 152
+  next_id_seq: 155
 items:
   - id: selfalgo-audit-fix-1019
     owner: 小九的工程师
@@ -9580,3 +9580,39 @@ items:
     verify_how: "①今晚 18:00 CST 起 v8_algo_cloud 正常链（10-20 数据日）D 批跑线上版 final_recommend.py ⇒ 在线抓 data/FINAL_RECOMMEND_DATA.js 确认 data_degraded=false、stocks 非空、degrade_note 消失；②明早核对运维页/最终推荐卡恢复展示；③若仍 degraded，查当轮 run 日志心跳行『要求 data_date=』应为 2026-10-20 且 FACTOR_LAB data_date=2026-10-20。注：10-19 归属日的降级产物已被批次闸门判『就绪』（degraded 不算未就绪），现在派发重跑会被 09-17 让位逻辑判 NONE 空转，故不派发、等今晚链自愈（已验证 v8_stage_gate.decide 显式 D + --today 2026-10-19 路径推演）。"
     updated: "2026-10-20 09:40"
     updated_by: 小九的工程师(lemoncat-cn)
+  - id: fourcard-fix-1020
+    priority: P1
+    owner: 小九的工程师
+    status: pending-verify
+    created: 2026-10-20
+    title: 四卡修复一劳永逸上线（年度净流入迁卡重做+主升/启动THS回落+油气别名+美股映射专链）
+    what: "主人四张截图四令（『一劳永逸修复』×3+『没备用方案么』）。①🏔板块年度主力净流入卡迁『暂未上架>观测类』卡尾位——⚠️事故纠正：10-19 阿狸咪迁卡 commit 2846b7844a77（其挂账 sector-yearflow-move-unlisted-1019 标 done）被后续 ?v 原子提交静默回退（10-20 实证：现行 blob 无 sectorYearFlowCard、静态卡回到盘后页、73d0cffd 基座被 GC）⇒ 本次基于现行真身重放 7 处编辑（删盘后静态卡+墓碑注/_PAGE_CARD_ORDER 两组/新 _fillSectorYearFlow 600ms×30 自愈填充/renderUnlisted 派发/删旧 safe 调用）。②主升/启动板块龙头股 leaders_error 备用方案：fetch_sector_leaders.py 主升/启动 except+no_match 两分支对齐 fr 路径加同花顺成员回落（_ths_members_by_name→_tx_cons，match=ths）。③油气开采及服务 no_match：MANUAL_ALIAS 补『油气开采及服务→油气开采』（实测解析 BK1276 油气开采Ⅱ alias:norm，5 成分）。④隔夜美股映射 strong_count=0 根因=境外 IP 东财美股+新浪美股双不可达却挂在 v8_cn_fetch_cloud（ubuntu）⇒ cloud_fetch_v8.py CATEGORY_MAP US_HK_MAP 摘调度（空串+all 档过滤 target_vars）、新建 scripts/us_hk_map_need_push.py + 专链 workflow v8_us_hk_map.yml（[self-hosted, cn] runner，05:35/08:15 CST 双种子工作日，Contents API 同步 5 文件→--only US_HK_MAP→update_v8 --category premarket→need_push→api_put_file 推 raw+data 两件）。"
+    evidence: "commit 21ee0af（Git Data API 净室推送 5 文件：index.html 1.40MB 内存直推防本机同步层污染、expect-base 防覆盖、回读逐字节自验 blob=50236b612d 一致）；31 内联块 node --check 0 错/div 平衡/id 唯一性过；别名解析+THS 名空间单测过（油气开采 881107/军工装备 881166/白酒 881273 实时命中）。"
+    verify_how: "①迁卡部分已线上核验 ✅（blob+Pages 实抓 sectorYearFlowCard 在暂未上架卡尾位、旧盘后宿主无残留）；②THS 回落：今晚收盘链/fr 跑批后看 leaders_error 清零、产物出现 match=ths 记录；③油气别名：下次 fr 跑批后油气板块出龙头股；④美股专链：下一工作日 05:35/08:15 CST run success 且 data/US_HK_MAP.js mom d3-d60 转真值、strong_count>0。"
+    updated: "2026-10-20 15:10"
+    updated_by: 小九的工程师
+
+  - id: querynote-align-1020
+    priority: P2
+    owner: 小九的工程师
+    status: done
+    created: 2026-10-20
+    title: 个股查询扩展信息说明卡按现状重排 + 逻辑详解私有副本两段对齐
+    what: "主人令『扩展信息很多都没了，按现状调整说明，然后对齐逻辑详解页』。逐函数核验 doV8Query 八卡现状：操作信号/实时行情/止盈止损/概念行业/策略命中/算法评分/龙虎榜/停牌全在；🌾独立基本面画像卡已并入实时行情卡；逆势龙头/四量命中腿已删；止盈止损已升级三口径取最严+级联。index.html 说明卡 9→10 项重排（+🧬综合财务画像并入注记/+📌有数据才显示口径行）；logic.full.html 私有副本（坚果云 logic_page_update_1015，本机无 E:/v8_logic_private 真源）『查询后会展示什么』『网格卡片清单』两段同步对齐+命中腿下线段，备份 .bak.20261020。注：逻辑详解公开页 10-04 已下架，私有副本发布到导航站需阿狸咪机真源覆盖重发——待主人拍板。"
+    evidence: "commit 50ecfa31（expect-base 防覆盖；churn 冲突自动重试+护栏中止两轮后按协议D换新真身重放；blob b3655a5cd 回读逐字节一致）；旧清单（逆势龙头/四量）零残留、四卡改动完好。"
+    verify_how: "已线上核验 ✅：blob+Pages 实抓新清单在（📌 展示口径行/🧬并入注记）、旧条目清零。"
+    verified_at: "2026-10-20 15:10 线上 blob+Pages 核验通过"
+    updated: "2026-10-20 15:10"
+    updated_by: 小九的工程师
+
+  - id: autorefresh-hardreload-1020
+    priority: P1
+    owner: 小九的工程师
+    status: pending-verify
+    created: 2026-10-20
+    title: 主站自动刷新一劳永逸修复——_tick 链 location.reload 换 _hardReload 绕 CDN 缓存
+    what: "主人报『盘中自动刷新断了，都要手动刷新才行』并自证右下角刷新角标在倒数 ⇒ 定时器链健康；根因实锤=_tick 链 location.reload() 普通刷新不绕 GitHub Pages Cache-Control: max-age=600（index.html/data/*.js 实抓响应头实证）⇒ 刷新后仍拿旧 ?v ⇒ 数据不更新，只有 Ctrl+F5 才灵。修法：新增 _hardReload()=location.replace(唯一 fresh=时间戳)，4 处调用点（开盘锚点立即刷/间隔到达/90s 自愈重试/4h 硬上限兜底）全换；时段逻辑（盘中15分/午休盘后1小时/夜间不刷/回前台补链）原样保留。参数刻意用 fresh=（复用 __v8LiveDataProbe 同款范式）避开 nocache=1——那是版本戳 IIFE 的防循环哨兵（indexOf('nocache=1')），复用会令版本戳强缓存破坏机制永久哑火。附带 BUILD 版本戳 f789308ecb→50ecfa3102，触发全端一次性 nocache 硬刷直接拿到 10-20 全部修复。"
+    evidence: "commit 2cc07d7ba1f4（blob c853060079 1400720B 回读逐字节一致 + Pages 实抓同 md5=1aaa70e33006 部署即时生效）；31 内联块 node --check 0 错/div 平衡；刷新链段内裸 reload 仅剩 _hardReload 兜底 1 处。"
+    verify_how: "下一次盘中自动刷新（≤15 分钟）卡面数据时间戳前进且主人无需 Ctrl+F5 即算生效；夜间/午休不刷属设计内。若主人下午仍需手动刷新 ⇒ 回滚排查（保留 _hardReload 定义但恢复旧 reload 行为待查）。"
+    updated: "2026-10-20 15:10"
+    updated_by: 小九的工程师
