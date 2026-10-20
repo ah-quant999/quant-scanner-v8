@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-20 18:47",
- "generated": "2026-10-20 18:47",
+ "update_time": "2026-10-20 19:23",
+ "generated": "2026-10-20 19:23",
  "meta": {
-  "generated": "2026-10-20 18:47",
+  "generated": "2026-10-20 19:23",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 26,
   "days_with_consensus": 0,
@@ -10914,6 +10914,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "688018",
+      "name": "乐鑫科技",
+      "change_pct": 16.858,
+      "price": 140.72,
+      "category": "突破"
+     },
+     {
       "code": "920075",
       "name": "柏星龙",
       "change_pct": 3.604,
@@ -10946,6 +10953,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "三人行",
       "change_pct": 3.449,
       "price": 44.99,
+      "category": "突破"
+     },
+     {
+      "code": "300244",
+      "name": "迪安诊断",
+      "change_pct": 19.989,
+      "price": 21.79,
       "category": "突破"
      },
      {
@@ -11031,13 +11045,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 4.365,
       "price": 10.52,
       "category": "突破"
-     },
-     {
-      "code": "301337",
-      "name": "亚华电子",
-      "change_pct": 4.845,
-      "price": 25.97,
-      "category": "突破"
      }
     ],
     "加速": [
@@ -11067,6 +11074,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "爱仕达",
       "change_pct": 9.961,
       "price": 11.15,
+      "category": "加速"
+     },
+     {
+      "code": "688018",
+      "name": "乐鑫科技",
+      "change_pct": 16.858,
+      "price": 140.72,
       "category": "加速"
      },
      {
@@ -11135,6 +11149,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688018",
+      "name": "乐鑫科技",
+      "change_pct": 16.858,
+      "price": 140.72,
+      "category": "短线选股"
+     },
+     {
       "code": "920075",
       "name": "柏星龙",
       "change_pct": 3.604,
@@ -11170,6 +11191,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "300244",
+      "name": "迪安诊断",
+      "change_pct": 19.989,
+      "price": 21.79,
+      "category": "短线选股"
+     },
+     {
       "code": "688696",
       "name": "极米科技",
       "change_pct": 5.781,
@@ -11251,18 +11279,18 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "海波重科",
       "change_pct": 4.365,
       "price": 10.52,
-      "category": "短线选股"
-     },
-     {
-      "code": "301337",
-      "name": "亚华电子",
-      "change_pct": 4.845,
-      "price": 25.97,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
+      "code": "300244",
+      "name": "迪安诊断",
+      "change_pct": 19.989,
+      "price": 21.79,
+      "category": "强势股"
+     },
+     {
       "code": "688696",
       "name": "极米科技",
       "change_pct": 5.781,
@@ -11344,13 +11372,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "海波重科",
       "change_pct": 4.365,
       "price": 10.52,
-      "category": "强势股"
-     },
-     {
-      "code": "301337",
-      "name": "亚华电子",
-      "change_pct": 4.845,
-      "price": 25.97,
       "category": "强势股"
      }
     ]
