@@ -105,6 +105,12 @@ EXT_MIN_LEN = 300         # 视为「根数足够」的下限（<MIN_HISTORY+BAS
 STALE_SKIP_DAYS = 60      # 末根落后超过 60 个自然日的僵尸股跳过不拉（反正被数据日对齐剔除）
 REFRESH_WORKERS = 6       # 云端并发拉取线程数（GTimg 轻量 HTTP，6 并发 ≈ 20 QPS）
 REFRESH_BUDGET_SEC = float(os.environ.get("LQSQ_REFRESH_BUDGET_SEC", "780"))  # 链内 900s 预算留 120s 收尾；云端 6 并发日常实拉 ~280s 远够
+# 🔴 2026-10-20 事故修复（当晚 18:11 日内动量对齐率 <60% 中止，实锤 GTimg 代理 501 瞬断
+#   0/3274 全失败、且 ext 缓存因落盘条件 bug 从不积累 ⇒ 后续脚本零兜底）：
+#   总失败（ok==0）自动重试至多 2 次——颗粒失败（停牌/无数据）重试无益不触发；
+#   每次重试独立预算窗口（pass_t0），休眠 45s 等网络恢复。
+REFRESH_MAX_ATTEMPTS = 3
+REFRESH_RETRY_SLEEP_SEC = 45
 
 _T0 = time.time()
 
@@ -209,7 +215,12 @@ def _fetch_one(code):
 
 def refresh_stale(bars_map):
     """全量自刷新：末根落后或根数不足的股票 → GTimg 700 根整根替换（并发、预算内、可续跑）。
-    成功（末根=数据日）写扩展缓存；停牌/僵尸不写（重拉判定天然兜底）。原地更新 bars_map。"""
+    成功（末根≥数据日）写扩展缓存；停牌/僵尸不写（重拉判定天然兜底）。原地更新 bars_map。
+    🔴 2026-10-20 修复：落盘条件原为 == data_date，而 data_date 是刷新前从冻结缓存算出的
+    旧值——市场前进一日时新拉数据永远 != 旧值 ⇒ ext 永不落盘 ⇒ 缓存从不积累 ⇒ 后续脚本
+    （低波趋稳/日内动量同源复用）零兜底。放宽为 >= data_date（末根达到/超过数据日即落盘）。
+    🔴 2026-10-20 修复：总失败（ok==0）自动重试至多 REFRESH_MAX_ATTEMPTS-1 次——网络级
+    瞬断（代理 501 等）单轮颗粒皆挂，重试即可恢复；颗粒失败（停牌/无数据）不触发。"""
     t0 = time.time()
     data_date = max(r[-1]["date"] for r in bars_map.values())
     from datetime import datetime as _dt
@@ -236,6 +247,7 @@ def refresh_stale(bars_map):
     log("自刷新：需拉取 %d 只（数据日 %s；预算 %.0fs / 并发 %d）" % (
         len(todo), data_date, REFRESH_BUDGET_SEC, REFRESH_WORKERS))
     ok = fail = 0
+    failed = []              # 未成功代码（异常/无数据/旧值），供总失败重试轮接力
     cloud = os.environ.get("CLOUD_RUNNER", "").lower() == "true" or \
             os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
 
@@ -245,37 +257,59 @@ def refresh_stale(bars_map):
         except Exception as e:  # 单只隔离：网络抖动/单票异常只计失败，绝不打死整轮
             return code, ("%s %s" % (type(e).__name__, str(e)[:60]))
 
-    pool = ThreadPoolExecutor(max_workers=REFRESH_WORKERS if cloud else 1)
-    try:
-        futs = {pool.submit(_work, c): c for c in todo}
-        err_shown = 0
-        for fut in as_completed(futs):
-            code, recs = fut.result()
-            if isinstance(recs, str):  # 异常摘要（明细限流：最多打印 5 条）
-                fail += 1
-                if err_shown < 5:
-                    log("⚠️ 单只异常 %s: %s" % (code, recs))
-                    err_shown += 1
-                continue
-            if recs and len(recs) >= 60 and recs[-1]["date"] >= bars_map.get(code, [{}])[-1].get("date", ""):
-                bars_map[code] = recs
-                if recs[-1]["date"] == data_date:
-                    _ext_save(code, recs)
-                ok += 1
-            else:
-                fail += 1
-                if recs is None and err_shown < 5:
-                    log("⚠️ 单只无数据 %s（源返回空）" % code)
-                    err_shown += 1
-            if (ok + fail) % 500 == 0:
-                log("  自刷新进度 %d/%d（ok=%d fail=%d，%.0fs）" % (
-                    ok + fail, len(todo), ok, fail, time.time() - t0))
-            if time.time() - t0 > REFRESH_BUDGET_SEC:
-                log("⚠️ 自刷新预算 %.0fs 耗尽（完成 %d/%d）——余下按缓存旧值参与（保护闸把关）" % (
-                    REFRESH_BUDGET_SEC, ok + fail, len(todo)))
+    todo_all = len(todo)
+    for attempt in range(1, REFRESH_MAX_ATTEMPTS + 1):
+        if attempt > 1:
+            # 仅「总失败」重试：ok>0 说明网络通路正常，颗粒失败多是停牌/无数据，重试无益
+            if ok > 0 or not todo:
                 break
-    finally:
-        pool.shutdown(wait=False, cancel_futures=True)
+            log("🔁 自刷新总失败（上轮 0/%d 成功，疑似网络瞬断）——第 %d/%d 次重试，休眠 %.0fs" % (
+                todo_all, attempt, REFRESH_MAX_ATTEMPTS, REFRESH_RETRY_SLEEP_SEC))
+            time.sleep(REFRESH_RETRY_SLEEP_SEC)
+            todo = failed          # 上轮未成功的代码（含预算耗尽未拉的）
+            failed = []
+            ok = fail = 0
+        if not todo:
+            break
+        pass_t0 = time.time()      # 每轮独立预算窗口：总失败时上轮几乎无有效耗时，重试应获完整窗口
+        pool = ThreadPoolExecutor(max_workers=REFRESH_WORKERS if cloud else 1)
+        try:
+            futs = {pool.submit(_work, c): c for c in todo}
+            err_shown = 0
+            done = set()
+            for fut in as_completed(futs):
+                code, recs = fut.result()
+                done.add(code)
+                if isinstance(recs, str):  # 异常摘要（明细限流：最多打印 5 条）
+                    fail += 1
+                    failed.append(code)
+                    if err_shown < 5:
+                        log("⚠️ 单只异常 %s: %s" % (code, recs))
+                        err_shown += 1
+                    continue
+                if recs and len(recs) >= 60 and recs[-1]["date"] >= bars_map.get(code, [{}])[-1].get("date", ""):
+                    bars_map[code] = recs
+                    if recs[-1]["date"] >= data_date:
+                        _ext_save(code, recs)
+                    ok += 1
+                else:
+                    fail += 1
+                    failed.append(code)
+                    if recs is None and err_shown < 5:
+                        log("⚠️ 单只无数据 %s（源返回空）" % code)
+                        err_shown += 1
+                if (ok + fail) % 500 == 0:
+                    log("  自刷新进度 %d/%d（ok=%d fail=%d，%.0fs）" % (
+                        ok + fail, len(todo), ok, fail, time.time() - t0))
+                if time.time() - pass_t0 > REFRESH_BUDGET_SEC:
+                    log("⚠️ 自刷新预算 %.0fs 耗尽（完成 %d/%d）——余下按缓存旧值参与（保护闸把关）" % (
+                        REFRESH_BUDGET_SEC, ok + fail, len(todo)))
+                    break
+        finally:
+            pool.shutdown(wait=False, cancel_futures=True)
+        # 重试轮代码源 = 本轮失败代码 + 预算 break 未轮到/被取消的（done 之外）；
+        # 全部成功的正常轮此行为空，下一轮自然 break（总失败重试的唯一入口）
+        todo = failed + [c for c in todo if c not in done]
     log("自刷新完成：%d 只成功 / %d 失败（%.0fs）" % (ok, fail, time.time() - t0))
     return ok, fail
 
