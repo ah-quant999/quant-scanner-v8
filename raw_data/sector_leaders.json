@@ -1,406 +1,629 @@
 {
-  "update_time": "2026-10-19 16:05",
-  "republish_time": "2026-10-19 16:46:04",
-  "data_date": "2026-10-16",
+  "update_time": "2026-10-20 07:14",
+  "republish_time": "2026-10-20 17:02:06",
+  "data_date": "2026-10-19",
   "rule_ver": 2,
   "top_n": 5,
   "source": "东方财富(push2delay) 板块成分股 + 同花顺 SECTOR_RS 板块周期",
   "phase": "主升+启动",
-  "sector_count": 4,
+  "sector_count": 2,
   "sectors": [
+    {
+      "name": "军工装备",
+      "bk": "BK1204",
+      "phase": "启动",
+      "pct_5d": 5.62,
+      "pct_20d": -4.81,
+      "cons_count": 20,
+      "leaders": [
+        {
+          "code": "605123",
+          "name": "派克新材",
+          "price": 77.04,
+          "chg": 3.6,
+          "main_net": null
+        },
+        {
+          "code": "688523",
+          "name": "航天环宇",
+          "price": 35.8,
+          "chg": 2.64,
+          "main_net": null
+        },
+        {
+          "code": "300395",
+          "name": "菲利华",
+          "price": 77.39,
+          "chg": 2.54,
+          "main_net": null
+        },
+        {
+          "code": "688239",
+          "name": "航宇科技",
+          "price": 48.18,
+          "chg": 2.51,
+          "main_net": null
+        },
+        {
+          "code": "688237",
+          "name": "超卓航科",
+          "price": 56.11,
+          "chg": 2.2,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
+    },
     {
       "name": "白酒",
       "bk": "BK1277",
       "phase": "启动",
-      "pct_5d": 2.48,
-      "pct_20d": 0.85,
-      "cons_count": 20,
+      "pct_5d": 3.45,
+      "pct_20d": 3.82,
+      "cons_count": 19,
       "leaders": [
         {
-          "code": "000995",
-          "name": "皇台酒业",
-          "price": 14.28,
-          "chg": 6.81,
-          "main_net": -31950200.0
+          "code": "603369",
+          "name": "今世缘",
+          "price": 30.23,
+          "chg": 2.65,
+          "main_net": null
         },
         {
-          "code": "600199",
-          "name": "金种子酒",
-          "price": 8.12,
-          "chg": 4.77,
-          "main_net": 32787400.0
+          "code": "000860",
+          "name": "顺鑫农业",
+          "price": 11.18,
+          "chg": 1.91,
+          "main_net": null
         },
         {
-          "code": "603198",
-          "name": "迎驾贡酒",
-          "price": 40.0,
-          "chg": 3.63,
-          "main_net": -1136300.0
+          "code": "600519",
+          "name": "贵州茅台",
+          "price": 1331.88,
+          "chg": 0.52,
+          "main_net": null
         },
         {
-          "code": "002646",
-          "name": "天佑德酒",
-          "price": 7.16,
-          "chg": 2.58,
-          "main_net": -8515700.0
+          "code": "000858",
+          "name": "五 粮 液",
+          "price": 72.85,
+          "chg": 0.04,
+          "main_net": null
         },
         {
-          "code": "603919",
-          "name": "金徽酒",
-          "price": 17.25,
-          "chg": 2.56,
-          "main_net": 1022200.0
+          "code": "002304",
+          "name": "洋河股份",
+          "price": 37.98,
+          "chg": 0.03,
+          "main_net": null
         }
       ],
-      "match": "retained:norm"
-    },
-    {
-      "name": "军工装备",
-      "bk": null,
-      "phase": "启动",
-      "pct_5d": 2.08,
-      "pct_20d": -6.11,
-      "cons_count": 20,
-      "leaders": [
-        {
-          "code": "300045",
-          "name": "华力创通",
-          "price": 12.7,
-          "chg": 20.04,
-          "main_net": 218000900.0
-        },
-        {
-          "code": "300581",
-          "name": "晨曦航空",
-          "price": 11.81,
-          "chg": 20.02,
-          "main_net": 240076200.0
-        },
-        {
-          "code": "300411",
-          "name": "金盾股份",
-          "price": 9.6,
-          "chg": 20.0,
-          "main_net": 101882900.0
-        },
-        {
-          "code": "301586",
-          "name": "佳力奇",
-          "price": 33.0,
-          "chg": 20.0,
-          "main_net": 60318100.0
-        },
-        {
-          "code": "003029",
-          "name": "吉大正元",
-          "price": 21.99,
-          "chg": 10.01,
-          "main_net": -49264200.0
-        }
-      ],
-      "match": "retained:alias:exact"
-    },
-    {
-      "name": "文化传媒",
-      "bk": null,
-      "phase": "启动",
-      "pct_5d": 1.74,
-      "pct_20d": 6.72,
-      "cons_count": 20,
-      "leaders": [
-        {
-          "code": "002949",
-          "name": "华阳国际",
-          "price": 14.14,
-          "chg": 10.04,
-          "main_net": 51500500.0
-        },
-        {
-          "code": "000607",
-          "name": "华媒控股",
-          "price": 4.61,
-          "chg": 10.02,
-          "main_net": 51802200.0
-        },
-        {
-          "code": "603999",
-          "name": "读者传媒",
-          "price": 8.38,
-          "chg": 9.97,
-          "main_net": 32991200.0
-        },
-        {
-          "code": "002343",
-          "name": "慈文传媒",
-          "price": 9.33,
-          "chg": 4.71,
-          "main_net": -158119800.0
-        },
-        {
-          "code": "301052",
-          "name": "果麦文化",
-          "price": 36.3,
-          "chg": 2.63,
-          "main_net": 6117800.0
-        }
-      ],
-      "match": "retained:alias:exact"
-    },
-    {
-      "name": "影视院线",
-      "bk": "BK1222",
-      "phase": "启动",
-      "pct_5d": 1.73,
-      "pct_20d": 6.1,
-      "cons_count": 18,
-      "leaders": [
-        {
-          "code": "002343",
-          "name": "慈文传媒",
-          "price": 10.26,
-          "chg": 9.97,
-          "main_net": 337546243.0
-        },
-        {
-          "code": "300182",
-          "name": "捷成股份",
-          "price": 5.59,
-          "chg": 2.01,
-          "main_net": 85719143.0
-        },
-        {
-          "code": "002739",
-          "name": "儒意电影",
-          "price": 8.27,
-          "chg": 1.6,
-          "main_net": -20063337.0
-        },
-        {
-          "code": "600977",
-          "name": "中国电影",
-          "price": 14.32,
-          "chg": 1.27,
-          "main_net": -672860.0
-        },
-        {
-          "code": "600088",
-          "name": "中视传媒",
-          "price": 13.43,
-          "chg": 1.13,
-          "main_net": -2236602.0
-        }
-      ],
-      "match": "exact"
+      "match": "ths"
     }
   ],
   "fr_count": 12,
   "fr_sectors": [
     {
-      "name": "公路铁路运输",
-      "bk": "BK0421",
-      "cons_count": 36,
+      "name": "元件",
+      "bk": "BK0459",
+      "cons_count": 20,
       "leaders": [
         {
-          "code": "000429",
-          "name": "粤高速Ａ",
-          "price": 13.91,
-          "chg": 1.83,
-          "main_net": -13079416.0
+          "code": "603386",
+          "name": "骏亚科技",
+          "price": 21.71,
+          "chg": 9.98,
+          "main_net": null
         },
         {
-          "code": "600012",
-          "name": "皖通高速",
-          "price": 17.85,
-          "chg": 1.77,
-          "main_net": -11331941.0
+          "code": "605258",
+          "name": "协和电子",
+          "price": 46.06,
+          "chg": 7.37,
+          "main_net": null
         },
         {
-          "code": "000828",
-          "name": "东莞控股",
-          "price": 10.19,
-          "chg": 1.39,
-          "main_net": -982808.0
+          "code": "603738",
+          "name": "泰晶科技",
+          "price": 28.23,
+          "chg": 7.3,
+          "main_net": null
         },
         {
-          "code": "600368",
-          "name": "五洲交通",
-          "price": 4.32,
-          "chg": 1.17,
-          "main_net": 7299270.0
+          "code": "603936",
+          "name": "博敏电子",
+          "price": 17.5,
+          "chg": 6.77,
+          "main_net": null
         },
         {
-          "code": "601816",
-          "name": "京沪高铁",
-          "price": 5.19,
-          "chg": 1.17,
-          "main_net": -5275568.0
+          "code": "603920",
+          "name": "世运电路",
+          "price": 42.9,
+          "chg": 5.41,
+          "main_net": null
         }
       ],
-      "match": "alias:exact"
+      "match": "ths"
+    },
+    {
+      "name": "公路铁路运输",
+      "bk": "BK0421",
+      "cons_count": 20,
+      "leaders": [
+        {
+          "code": "002357",
+          "name": "富临运业",
+          "price": 10.99,
+          "chg": 2.61,
+          "main_net": null
+        },
+        {
+          "code": "603069",
+          "name": "海汽集团",
+          "price": 12.86,
+          "chg": 1.66,
+          "main_net": null
+        },
+        {
+          "code": "600350",
+          "name": "山东高速",
+          "price": 11.38,
+          "chg": 1.25,
+          "main_net": null
+        },
+        {
+          "code": "601107",
+          "name": "四川成渝",
+          "price": 6.55,
+          "chg": 1.24,
+          "main_net": null
+        },
+        {
+          "code": "600611",
+          "name": "大众交通",
+          "price": 4.16,
+          "chg": 0.97,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
+    },
+    {
+      "name": "军工电子",
+      "bk": "BK1233",
+      "cons_count": 20,
+      "leaders": [
+        {
+          "code": "688175",
+          "name": "高凌信息",
+          "price": 30.88,
+          "chg": 9.89,
+          "main_net": null
+        },
+        {
+          "code": "301571",
+          "name": "国科天成",
+          "price": 71.95,
+          "chg": 6.28,
+          "main_net": null
+        },
+        {
+          "code": "688272",
+          "name": "富吉瑞",
+          "price": 27.6,
+          "chg": 6.15,
+          "main_net": null
+        },
+        {
+          "code": "688011",
+          "name": "新光光电",
+          "price": 61.9,
+          "chg": 5.11,
+          "main_net": null
+        },
+        {
+          "code": "688375",
+          "name": "国博电子",
+          "price": 63.81,
+          "chg": 4.86,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
     },
     {
       "name": "军工装备",
       "bk": "BK1204",
-      "cons_count": 100,
+      "cons_count": 20,
       "leaders": [
         {
-          "code": "000576",
-          "name": "甘化科工",
-          "price": 9.65,
-          "chg": 10.03,
-          "main_net": 52920460.0
+          "code": "605123",
+          "name": "派克新材",
+          "price": 77.04,
+          "chg": 3.6,
+          "main_net": null
         },
         {
-          "code": "688563",
-          "name": "航材股份",
-          "price": 53.8,
-          "chg": 8.71,
-          "main_net": 12937463.0
+          "code": "688523",
+          "name": "航天环宇",
+          "price": 35.8,
+          "chg": 2.64,
+          "main_net": null
         },
         {
-          "code": "600435",
-          "name": "北方导航",
-          "price": 12.88,
-          "chg": 8.33,
-          "main_net": 147522782.0
+          "code": "300395",
+          "name": "菲利华",
+          "price": 77.39,
+          "chg": 2.54,
+          "main_net": null
         },
         {
-          "code": "688543",
-          "name": "国科军工",
-          "price": 48.59,
-          "chg": 7.95,
-          "main_net": 41161550.0
+          "code": "688239",
+          "name": "航宇科技",
+          "price": 48.18,
+          "chg": 2.51,
+          "main_net": null
         },
         {
-          "code": "688084",
-          "name": "晶品特装",
-          "price": 42.29,
-          "chg": 6.26,
-          "main_net": 4263285.0
+          "code": "688237",
+          "name": "超卓航科",
+          "price": 56.11,
+          "chg": 2.2,
+          "main_net": null
         }
       ],
-      "match": "alias:exact"
+      "match": "ths"
+    },
+    {
+      "name": "厨卫电器",
+      "bk": "BK1240",
+      "cons_count": 9,
+      "leaders": [
+        {
+          "code": "603366",
+          "name": "日出东方",
+          "price": 7.84,
+          "chg": 9.96,
+          "main_net": null
+        },
+        {
+          "code": "002543",
+          "name": "万和电气",
+          "price": 8.39,
+          "chg": 4.48,
+          "main_net": null
+        },
+        {
+          "code": "002677",
+          "name": "浙江美大",
+          "price": 6.17,
+          "chg": 2.49,
+          "main_net": null
+        },
+        {
+          "code": "300894",
+          "name": "火星人",
+          "price": 9.6,
+          "chg": 1.59,
+          "main_net": null
+        },
+        {
+          "code": "605336",
+          "name": "*ST帅电",
+          "price": 10.67,
+          "chg": 0.66,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
     },
     {
       "name": "小金属",
       "bk": "BK1027",
-      "cons_count": 0,
-      "leaders": [],
-      "leaders_error": 1,
-      "match": "exact"
-    },
-    {
-      "name": "影视院线",
-      "bk": "BK1222",
-      "cons_count": 18,
+      "cons_count": 20,
       "leaders": [
         {
-          "code": "002343",
-          "name": "慈文传媒",
-          "price": 10.26,
-          "chg": 9.97,
+          "code": "603407",
+          "name": "长裕集团",
+          "price": 48.29,
+          "chg": 10.0,
           "main_net": null
         },
         {
-          "code": "300182",
-          "name": "捷成股份",
-          "price": 5.59,
-          "chg": 2.01,
+          "code": "600392",
+          "name": "盛和资源",
+          "price": 16.66,
+          "chg": 2.9,
           "main_net": null
         },
         {
-          "code": "002739",
-          "name": "儒意电影",
-          "price": 8.27,
-          "chg": 1.6,
+          "code": "002428",
+          "name": "云南锗业",
+          "price": 78.92,
+          "chg": 2.88,
           "main_net": null
         },
         {
-          "code": "600977",
-          "name": "中国电影",
-          "price": 14.32,
-          "chg": 1.27,
+          "code": "600281",
+          "name": "华阳新材",
+          "price": 5.14,
+          "chg": 2.39,
           "main_net": null
         },
         {
-          "code": "600088",
-          "name": "中视传媒",
-          "price": 13.43,
-          "chg": 1.13,
+          "code": "000657",
+          "name": "中钨高新",
+          "price": 43.81,
+          "chg": 2.38,
           "main_net": null
         }
       ],
-      "match": "exact"
-    },
-    {
-      "name": "文化传媒",
-      "bk": "BK0486",
-      "cons_count": 0,
-      "leaders": [],
-      "leaders_error": 1,
-      "match": "alias:exact"
+      "match": "ths"
     },
     {
       "name": "机场航运",
       "bk": "BK0420",
-      "cons_count": 0,
-      "leaders": [],
-      "leaders_error": 1,
-      "match": "alias:exact"
+      "cons_count": 13,
+      "leaders": [
+        {
+          "code": "601021",
+          "name": "春秋航空",
+          "price": 38.66,
+          "chg": -0.08,
+          "main_net": null
+        },
+        {
+          "code": "600897",
+          "name": "厦门空港",
+          "price": 13.99,
+          "chg": -0.43,
+          "main_net": null
+        },
+        {
+          "code": "600004",
+          "name": "白云机场",
+          "price": 7.79,
+          "chg": -0.51,
+          "main_net": null
+        },
+        {
+          "code": "600009",
+          "name": "上海机场",
+          "price": 23.09,
+          "chg": -0.69,
+          "main_net": null
+        },
+        {
+          "code": "600515",
+          "name": "海南机场",
+          "price": 2.62,
+          "chg": -0.76,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
+    },
+    {
+      "name": "油气开采及服务",
+      "bk": "BK1276",
+      "cons_count": 5,
+      "leaders": [
+        {
+          "code": "600777",
+          "name": "新潮能源",
+          "price": 4.49,
+          "chg": 3.46,
+          "main_net": 6395752.0
+        },
+        {
+          "code": "600938",
+          "name": "中国海油",
+          "price": 35.59,
+          "chg": 0.54,
+          "main_net": -12957214.0
+        },
+        {
+          "code": "000968",
+          "name": "蓝焰控股",
+          "price": 6.83,
+          "chg": -0.29,
+          "main_net": -7917456.0
+        },
+        {
+          "code": "600759",
+          "name": "ST洲际",
+          "price": 2.2,
+          "chg": -0.45,
+          "main_net": -8541521.0
+        },
+        {
+          "code": "601969",
+          "name": "海南矿业",
+          "price": 8.37,
+          "chg": -1.18,
+          "main_net": 1074839.0
+        }
+      ],
+      "match": "alias:norm"
     },
     {
       "name": "游戏",
       "bk": "BK1046",
-      "cons_count": 0,
-      "leaders": [],
-      "leaders_error": 1,
-      "match": "norm"
+      "cons_count": 20,
+      "leaders": [
+        {
+          "code": "300031",
+          "name": "宝通科技",
+          "price": 26.27,
+          "chg": 6.62,
+          "main_net": null
+        },
+        {
+          "code": "300467",
+          "name": "迅游科技",
+          "price": 30.65,
+          "chg": 3.16,
+          "main_net": null
+        },
+        {
+          "code": "002425",
+          "name": "凯撒文化",
+          "price": 3.32,
+          "chg": 2.47,
+          "main_net": null
+        },
+        {
+          "code": "300459",
+          "name": "汤姆猫",
+          "price": 3.63,
+          "chg": 1.97,
+          "main_net": null
+        },
+        {
+          "code": "300315",
+          "name": "掌趣科技",
+          "price": 4.16,
+          "chg": 1.96,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
     },
     {
       "name": "白酒",
       "bk": "BK1277",
-      "cons_count": 0,
-      "leaders": [],
-      "leaders_error": 1,
-      "match": "norm"
-    },
-    {
-      "name": "证券",
-      "bk": "BK0473",
-      "cons_count": 0,
-      "leaders": [],
-      "leaders_error": 1,
-      "match": "norm"
+      "cons_count": 19,
+      "leaders": [
+        {
+          "code": "603369",
+          "name": "今世缘",
+          "price": 30.23,
+          "chg": 2.65,
+          "main_net": null
+        },
+        {
+          "code": "000860",
+          "name": "顺鑫农业",
+          "price": 11.18,
+          "chg": 1.91,
+          "main_net": null
+        },
+        {
+          "code": "600519",
+          "name": "贵州茅台",
+          "price": 1331.88,
+          "chg": 0.52,
+          "main_net": null
+        },
+        {
+          "code": "000858",
+          "name": "五 粮 液",
+          "price": 72.85,
+          "chg": 0.04,
+          "main_net": null
+        },
+        {
+          "code": "002304",
+          "name": "洋河股份",
+          "price": 37.98,
+          "chg": 0.03,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
     },
     {
       "name": "贵金属",
       "bk": "BK0732",
-      "cons_count": 0,
-      "leaders": [],
-      "leaders_error": 1,
-      "match": "exact"
-    },
-    {
-      "name": "轨交设备",
-      "bk": "BK1236",
-      "cons_count": 0,
-      "leaders": [],
-      "leaders_error": 1,
-      "match": "norm"
+      "cons_count": 14,
+      "leaders": [
+        {
+          "code": "001337",
+          "name": "四川黄金",
+          "price": 42.6,
+          "chg": 1.09,
+          "main_net": null
+        },
+        {
+          "code": "300139",
+          "name": "晓程科技",
+          "price": 39.22,
+          "chg": 0.8,
+          "main_net": null
+        },
+        {
+          "code": "600961",
+          "name": "株冶集团",
+          "price": 20.01,
+          "chg": 0.65,
+          "main_net": null
+        },
+        {
+          "code": "002237",
+          "name": "恒邦股份",
+          "price": 11.92,
+          "chg": 0.42,
+          "main_net": null
+        },
+        {
+          "code": "600547",
+          "name": "山东黄金",
+          "price": 26.86,
+          "chg": -0.22,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
     },
     {
       "name": "银行",
       "bk": "BK1283",
-      "cons_count": 0,
-      "leaders": [],
-      "leaders_error": 1,
-      "match": "exact"
+      "cons_count": 20,
+      "leaders": [
+        {
+          "code": "601988",
+          "name": "中国银行",
+          "price": 7.18,
+          "chg": 0.98,
+          "main_net": null
+        },
+        {
+          "code": "601166",
+          "name": "兴业银行",
+          "price": 18.51,
+          "chg": 0.05,
+          "main_net": null
+        },
+        {
+          "code": "601328",
+          "name": "交通银行",
+          "price": 8.23,
+          "chg": 0.0,
+          "main_net": null
+        },
+        {
+          "code": "601916",
+          "name": "浙商银行",
+          "price": 2.98,
+          "chg": 0.0,
+          "main_net": null
+        },
+        {
+          "code": "600000",
+          "name": "浦发银行",
+          "price": 9.76,
+          "chg": -0.2,
+          "main_net": null
+        }
+      ],
+      "match": "ths"
     }
   ],
   "nomatch_count": 0,
   "leaders_fail_count": 0,
   "neo_fallback_count": 0,
-  "retained_count": 3,
+  "retained_count": 0,
   "em_boards_source": "cache",
   "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*)"
 }
