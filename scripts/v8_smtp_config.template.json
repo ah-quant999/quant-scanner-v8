@@ -1,0 +1,23 @@
+{
+  "_README": "v8 邮件告警通道恢复模板（2026-10-20 新增，可入仓库无敏感信息）。用法：复制到任一标准路径（<repo>/.workbuddy/v8_smtp_config.json 或 ~/.workbuddy/v8_smtp_config.json），把三个 FILLME 字段填实即可生效；填完跑 python v8_send_alert.py --selftest 验证。字段口径与 v8_send_alert.py send_alert() 逐字对齐。",
+  "_fields": {
+    "sender": "发件QQ邮箱完整地址（告警邮件 From）",
+    "receiver": "收件人（默认同 sender；主人收件箱）",
+    "auth_code": "QQ邮箱授权码（非登录密码）：mail.qq.com → 设置 → 账户 → POP3/IMAP服务 → 开启 → 生成授权码",
+    "smtp_host": "SMTP服务器，默认 smtp.qq.com",
+    "smtp_port": "端口，默认 465（SSL）",
+    "smtp_ssl": "是否SSL，默认 true",
+    "host_label": "机器标识（进主题前缀 [v8·<host_label>]）：阿狸咪机填 阿狸咪，小九机填 小九单位机",
+    "disable": "总开关，false=正常发送",
+    "stale_on_weekend": "数据陈旧类告警是否周末也发，默认 false"
+  },
+  "sender": "FILLME_sender@qq.com",
+  "receiver": "FILLME_receiver@qq.com",
+  "smtp_host": "smtp.qq.com",
+  "smtp_port": 465,
+  "smtp_ssl": true,
+  "auth_code": "FILLME_qq_authcode",
+  "host_label": "阿狸咪",
+  "disable": false,
+  "stale_on_weekend": false
+}

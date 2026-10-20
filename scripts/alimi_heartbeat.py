@@ -116,6 +116,36 @@ def _read_local_last():
     return None
 
 
+def _mail_channel_status():
+    """邮件通道状态（2026-10-20 新增）：返回 (state, detail)。
+
+    判据与 v8_send_alert.py 同源（两处标准配置路径 + 通道旗标）：
+      · 旗标 .workbuddy/v8_mail_channel_status.json 存在 ⇒ down（附 first_down_at/streak）；
+      · 否则两处标准路径任一处有配置 ⇒ ok；
+      · 两者皆无且无旗标（从未成功发过信的本机）⇒ down(no_config)。
+    只读，无副作用。
+    """
+    flag_cands = [ROOT / ".workbuddy" / "v8_mail_channel_status.json",
+                  Path.home() / ".workbuddy" / "v8_mail_channel_status.json"]
+    for f in flag_cands:
+        try:
+            if f.exists():
+                d = json.loads(f.read_text(encoding="utf-8"))
+                return "down", "flag: reason=%s first_down_at=%s streak=%s" % (
+                    d.get("reason"), d.get("first_down_at"), d.get("down_streak"))
+        except Exception:
+            return "down", "flag unreadable: %s" % f
+    cfg_cands = [ROOT / ".workbuddy" / "v8_smtp_config.json",
+                 Path.home() / ".workbuddy" / "v8_smtp_config.json"]
+    for c in cfg_cands:
+        try:
+            if c.exists():
+                return "ok", "config: %s" % c
+        except Exception:
+            pass
+    return "down", "no_config (两处标准路径均无 v8_smtp_config.json，亦无通道旗标)"
+
+
 def _read_remote(token):
     """读远端现状。走 raw（Accept: vnd.github.raw）——contents 端点对较大文件
     会返回 encoding=none + content='' 的假成功，本链一律不用它取正文。"""
@@ -226,6 +256,14 @@ def main():
 
     payload = {"last_time": now.strftime("%Y-%m-%d %H:%M:%S"),
                "status": "ok", "machine": MACHINE, "source": SOURCE}
+    # 🔴 2026-10-20 一劳永逸（主人令「查一下双机这两天发的邮件，一劳永逸修复」）：
+    #   v8_smtp_config.json 消失导致 10-20 全天 0 封告警且无人知晓（trace log 无人读）。
+    #   心跳带上 mail_channel 字段 ⇒ 邮件断线在 HB_ALIMI.js / 运维页 / 双机互看可见。
+    #   判据（与 v8_send_alert 同源）：通道旗标存在=down；否则直查两处标准配置路径。
+    _mc_state, _mc_detail = _mail_channel_status()
+    payload["mail_channel"] = _mc_state
+    if _mc_state == "down":
+        payload["mail_channel_detail"] = _mc_detail
     content_str = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
     content = content_str.encode("utf-8")
     _write_state(payload, content_str)
