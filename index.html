@@ -618,7 +618,7 @@ window.__domReadyFns=[];
   .tp-hist-cell .tp-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
 </style>
-    <script src="data/ETF_INTRADAY_HEAT.js?v=64ef123f95" defer></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=47961aae6b" defer></script>
     <script src="data/SECTOR_FUND_FLOW.js?v=f5c375b1d6" defer></script>
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=0ba811fb5a" defer></script>
 
@@ -634,22 +634,22 @@ window.__domReadyFns=[];
     <script src="data/MACRO_DATA.js?v=631c006fcf" defer></script>
     <!-- 🔮 2026-10-05 主人令：未来预测子TAB（牛转熊指标观测台）数据，gen_market_thermo.py 日更 -->
     <script src="data/MARKET_THERMO.js?v=4dcd1e1407" defer></script>
-    <script src="data/MACRO_BRIEF.js?v=9cdc666558" defer></script>
+    <script src="data/MACRO_BRIEF.js?v=1154db44d7" defer></script>
     <!-- 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役（巡检自动化已消亡、09-23 后死数据；生产者/渲染/派发/时窗一并清理，见 git 历史） -->
     <script src="data/NT_DATA.js?v=0df812d63a" defer></script>
 <script src="data/LHB_DATA.js?v=34f82e66bc" defer></script>
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
-<script src="data/CONCEPT_RANKING.js?v=4b432c0579" defer></script>
+<script src="data/CONCEPT_RANKING.js?v=1971199f62" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
-<script src="data/INDEX_QUOTES.js?v=f84143be0b" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=ea250a37e6" defer></script>
+<script src="data/INDEX_QUOTES.js?v=27303641da" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=447cb86ea7" defer></script>
 <script src="data/MARGIN_DATA.js?v=69cd202161" defer></script>
-<script src="data/CFFEX_HOLDINGS.js?v=037b106e70" defer></script>
+<script src="data/CFFEX_HOLDINGS.js?v=863df9b7dd" defer></script>
 <script src="data/IPO_DATA.js?v=556ee301dd" defer></script>
-    <script src="data/CRISIS_DATA.js?v=42e81bfe8e" defer></script>
-    <script src="data/JUDGMENT_DATA.js?v=9e2d303d25" defer></script>
+    <script src="data/CRISIS_DATA.js?v=3974680594" defer></script>
+    <script src="data/JUDGMENT_DATA.js?v=bda8054720" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=6c694b4b79" defer></script>
 <!-- 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测卡）。
      数据由 cloud_fetch_v8.py::f_us_hk_map() 盘前 08:25 单档生成 → raw_data/us_hk_map.json
@@ -671,7 +671,7 @@ window.__domReadyFns=[];
          故删此行零功能损失。若日后云端产出 maharo_macro.js，恢复本行即可。 -->
     <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20261020） -->
     <!-- 🔴 2026-10-03 阿狸咪更正：data/maharo_macro.js 实际仍被家机 maharo 自动化每日产出（git 仍追踪）但前端零引用，已登记为退役孤儿（v8_health_check._RETIRED_FILES + api_push_raw._RETIRED_ARTIFACTS 防再生）；属可删死数据，非活链。 -->
-    <script src="data/maharo_insights.js?v=ebfb4a2660" defer></script>
+    <script src="data/maharo_insights.js?v=05bb44712e" defer></script>
     <!-- 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡整卡下线（白河愁单源观点卡）。
          data/BAIHECHOU_MACRO.js、data/BAIHECHOU_ANALYSIS.js、raw_data/baihechou_posts.json、
          scripts/{baihechou_daily,fetch_baihechou_v8,set_baihechou_analysis}.py 与本机 06:30/08:30
@@ -687,14 +687,14 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=e94fc500c0" defer></script>
-  <script src="data/AVG_PRICE_DATA.js?v=7116ab0869" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=ba4258d24c" defer></script>
+  <script src="data/AVG_PRICE_DATA.js?v=e16fb8adac" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
     <script src="data/SECTOR_LEADERS.js?v=3e10182f4c" defer></script><script src="data/NEW_ALGO_TRI.js?v=f3d3b07e13" defer></script><script src="data/NEW_ALGO_TRI_BACKTEST.js?v=c052819893" defer></script><!-- 🆕 2026-10-19 三新算法（VCP/板块共振轮动/LHB机构跟随）+ 真实信号流回测 -->
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
-    <script src="data/PORTFOLIO.js?v=2befd1716e" defer></script>
+    <script src="data/PORTFOLIO.js?v=e0337e5cb4" defer></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -1743,16 +1743,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SECTOR_PHASE_HISTORY.js?v=1a02ef7c44" defer></script>
 <script src="data/INST_TRADE.js?v=683cad597c" defer></script>
 <script src="data/NORTH_FUND.js?v=418a16815e" defer></script>
-<script src="data/MARKET_ALERTS.js?v=26de9cbd9c" defer></script>
-<script src="data/MARKET_FUND_FLOW_DATA.js?v=c54b7d7a57" defer></script>
-<script src="data/LIMIT_UP_HEATMAP.js?v=40d3934e87" defer></script>
+<script src="data/MARKET_ALERTS.js?v=aeb0b13058" defer></script>
+<script src="data/MARKET_FUND_FLOW_DATA.js?v=edaa66bbed" defer></script>
+<script src="data/LIMIT_UP_HEATMAP.js?v=eaa0c49caf" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
-<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=edcf1fc681" defer></script>
-<script src="data/LIMIT_UP_BROKEN.js?v=aa462ca486" defer></script>
+<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=af71f7da7c" defer></script>
+<script src="data/LIMIT_UP_BROKEN.js?v=617c57eea9" defer></script>
 <script src="data/VOLATILITY.js?v=5a12223bf6" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=defc578266" defer></script>
-<script src="data/SH_SZ_HISTORY.js?v=a112373fa6" defer></script>
+<script src="data/SH_SZ_HISTORY.js?v=b53d9d2df7" defer></script>
 <script src="data/CANDIDATE.js?v=862847e63b" defer></script>
 
     <script src="data/STOCK_STOP_DATA.js?v=c486d07c7a" defer></script>
@@ -1787,11 +1787,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CFFEX_POSITION.js?v=0a524bb993" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=22fec90c27" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=184119b667" defer></script>
+<script src="data/RUNNER_STATUS.js?v=042a26f195" defer></script>
 <script src="data/HB_XIAOJIU.js?v=1b3694c80d" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=48f7a1e53e" defer></script>
-<script src="data/HEALTH_CHECK.js?v=2b585d0d2d" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=82a0d2ce86" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=4d05c2564c" defer></script>
+<script src="data/HEALTH_CHECK.js?v=6b8cea1129" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=786d44b932" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=9c097a081e" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=bfe7a2e5c6" defer></script>
@@ -1805,13 +1805,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=e87ee88baf" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=3c19990194" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=0c06f2e040" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=6943e8d1fe" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=14377081e0" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=104a5f7e9b" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/IMA_STRONG_BACKTEST.js?v=f42a20ae92" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/IMA_STRONG_BACKTEST.js?v=fdff75bbd6" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🆕 2026-10-12 小九：量质双擎（LQSQ · 第一支自研算法）前端接入 —— 后端数据链 10-11 已跑，
          但前端此前**零挂载**（注入/卡片/子页全缺）⇒ 主站无处显示（主人「我半天没看到在哪显示」）。
          本次补齐：
@@ -2122,7 +2122,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       //   原 ok 仅校验 head 含卡名，但：defer 时序下需排序：
       //     1) HTML 分析到 line 1630+ 注册 ◐◦selfHealJudgmentHeader；
       //     2) HTML 继续分析到 line 10673 注册 v8CardHeader；
-      //     3) <script src="data/JUDGMENT_DATA.js?v=9e2d303d25" defer> 和 <script src="data/MACRO_BRIEF.js?v=9cdc666558" defer> 在 HTML 分析完成后才异步执行；
+      //     3) <script src="data/JUDGMENT_DATA.js?v=bda8054720" defer> 和 <script src="data/MACRO_BRIEF.js?v=1154db44d7" defer> 在 HTML 分析完成后才异步执行；
       //     4) 首次 initCardBadges / switchSec 触发 ◐◦renderJudgmentHeader 时，JUDGMENT_DATA.js 可能还没加载完；
       //     5) ts='' → v8CardHeader 返回的 HTML 中：卡名、副标题，但缺少「更新于」膠勢；
       //     6) 自愈校验 ok 通过（head.innerHTML.indexOf('今日判定')>=0）→ 永不重昆明；
@@ -3014,12 +3014,9 @@ function fmtSigned(v){
       <div id="breadthBody"><div class="ipo-empty">加载中…</div></div>
     </div>
 
-    <!-- 🏔 板块年度主力净流入累积表（2026-10-17 主人令「加」：自建·真实历史回填） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🏔</span>板块年度主力净流入 · <span class="fresh" id="sectorYearFlowTime">—</span></h3>
-      <div id="sectorYearFlowBody"><div class="ipo-empty">加载中…</div></div>
-      <div class="note">口径：东财行业板块逐日主力净流入官方历史按自然年累加（自建累积表·历史回填真实数据，非估算）；红=净流入、绿=净流出。盘后更新。</div>
-    </div>
+    <!-- 🚚 2026-10-20 主人令「这卡移到暂未上架」：🏔 板块年度主力净流入卡已迁往「🔒 暂未上架 > 📡 观测类」卡尾位。
+         ⚠️ 10-19 19:30 阿狸咪的迁卡 commit 2846b7844a77 曾被后续 ?v 原子提交静默回退（git blob 73d0cffd 实证：
+         现行 main 无 sectorYearFlowCard、静态卡仍在本页）⇒ 本次重做，并挂账 sector-yearflow-move-unlisted-1019。 -->
 
     <!-- 宏观数据速览（2026-08-30：盘后数据补位） -->
     <div class="card" style="margin-bottom:16px">
@@ -13092,12 +13089,12 @@ function drawUpDownChart(){
     '观测平台': ['SH_FIB', 'maharo_insights', 'INDEX_VALUE_FRAMEWORK', 'WAVE_ELLIOTT', 'CITIC_PE_THERMO'],
     '今日事件': ['V8_CAL', 'IPO_DATA', 'JUDGMENT_DATA', 'MACRO_DATA', 'RESTRICTED_RELEASE', 'PERFORMANCE_FORECAST'],
     '实时数据': ['INDEX_QUOTES', 'ETF_PULSE', 'ETF_INTRADAY_HEAT', 'SECTOR_FUND_FLOW', 'CONCEPT_RANKING', 'LIMIT_UP_HEATMAP', 'SECTOR_FUND_FLOW_INTRADAY', 'MARKET_ALERTS', 'STOCK_QUOTE', 'CFFEX_HOLDINGS', 'AVG_PRICE_DATA', 'OVERSEAS_MARKETS', 'AI_MARKET_BRIEF', 'COMMODITY_ELASTICITY'],
-    '盘后数据': ['MARGIN_DATA', 'ETF_DAILY_MONITOR', 'SECTOR_RECOMMENDATION', 'ETF_NET_SUBSCRIPTION', 'W52_HIGH', 'SECTOR_YEAR_FLOW'],
+    '盘后数据': ['MARGIN_DATA', 'ETF_DAILY_MONITOR', 'SECTOR_RECOMMENDATION', 'ETF_NET_SUBSCRIPTION', 'W52_HIGH'],  /* 🏔 2026-10-20：SECTOR_YEAR_FLOW 随卡迁「暂未上架」 */
     '共振日历': ['CRISIS_DATA', 'LHB_DATA'],
     '最终推荐': ['FACTOR_LAB', 'TOP10_DAILY'],
     '选股策略': ['CANDIDATE', 'GOLD_POOL', 'IMA_STRONG_BACKTEST', 'VOLATILITY', 'STOCK_STOP_DATA', 'H_AUTO_BUY', 'H_AUTO_BUY_TRACK', 'IMA_STRONG_STOCK', 'FIRST_BOARD_ALERT', 'LIANBAN_WINRATE'],  /* 🆕 2026-10-19：连板梯队两卡自暂未上架迁入 */  /* 🔴 2026-10-11：TRIPLE_CONSENSUS/TRIPLE_HISTORY/CRDS_CARD_DATA 随两策略下架移除；🔴 2026-10-18：四量终极+ALGO_TRACK 随四量下架移除 */
     '策略回测': ['BACKTEST_ALL_ALGOS'],
-    '暂未上架': ['MARKET_REGIME', 'SECTOR_LEADERS', 'DAJIJIN_REDUCTION'],  /* 🔴 2026-10-19：FIRST_BOARD_ALERT 随卡迁入选股策略 */
+    '暂未上架': ['MARKET_REGIME', 'SECTOR_LEADERS', 'DAJIJIN_REDUCTION', 'SECTOR_YEAR_FLOW'],  /* 🔴 2026-10-19：FIRST_BOARD_ALERT 随卡迁入选股策略；🏔 2026-10-20：SECTOR_YEAR_FLOW 随卡迁「暂未上架」 */
     '运维': ['INST_TRADE', 'DO_NOT_DELETE'],
     '全量数据': ['NT_DATA', 'all_AUDIT_TRAIL', 'all_BACKTEST_COMPREHENSIVE', 'all_BACKTEST_TDX', 'all_CANDIDATE_BACKTEST', 'all_CANDIDATE_QUOTES', 'all_CAPITAL_FLOW_DATA', 'all_CITIC_PE_BACKTEST', 'all_CONCEPT_ETF_MAP', 'all_EXPERIMENT', 'all_FACTOR_AUDIT', 'all_FACTOR_LAB_BACKTEST', 'all_FACTOR_PROGRESS', 'all_FACTOR_WALKFORWARD', 'all_FINAL_RECOMMEND_DATA', 'all_FRESHNESS_STATUS', 'all_FUNDAMENTAL_QUALITY', 'all_GOLD_POOL_BACKTEST', 'all_HB_ALIMI', 'all_HB_XIAOJIU', 'all_HEALTH_CHECK', 'all_INDEX_HISTORY', 'all_LHB_HISTORY', 'all_LIMIT_UP_BROKEN', 'all_MACRO_BRIEF', 'all_MARKET_THERMO', 'all_NORTH_FUND', 'all_OPTIMIZED_STRATEGY', 'all_PORTFOLIO', 'all_RISK_GAUGE', 'all_RUNNER_STATUS', 'all_RUNNER_STATUS_HEALTH', 'all_SECTOR_CYCLE_ARCHIVE', 'all_SECTOR_FUND_FLOW_INTRADAY', 'all_SECTOR_FUND_FLOW_TREND', 'all_SECTOR_PHASE_HISTORY', 'all_SECTOR_RS', 'all_SENTIMENT_CYCLE', 'all_SH_SZ_HISTORY', 'all_STOCK_LIST', 'all_SUSPENSION_ALERT', 'all_SZ_FIB', 'all_US_HK_MAP', 'all_V8_POOL_TRACKER', 'all_VALUATION_PERCENTILE', 'all_WEEKEND_META_REPORT', 'all_WEEKEND_RUN'],  /* 🔴 2026-10-11：all_CRDS_BACKTEST/all_TRIPLE_TRACK 随两策略下架移除 */
     '管线': ['raw_etf_pulse.json', 'raw_capital_flow_data.json', 'raw_index_quotes.json', 'raw_crisis_data.json', 'raw_concept_ranking.json', 'raw_volume', 'site_sync', 'runner_local', 'runner_github', 'runner'],
@@ -13883,7 +13880,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 2026-08-30 主人令：盘后数据页扩展（宽度/期指/宏观/解禁日历/业绩预告）
     // 情绪温度条、龙虎榜净买榜已删除（分别与实时「连板天梯」、共振日历重复）
     safe(window.renderMarketBreadth, window.W52_HIGH || {});
-    safe(window.renderSectorYearFlow, window.SECTOR_YEAR_FLOW || {});
+    // 🏔 2026-10-20 主人令：板块年度主力净流入卡已迁「暂未上架」（renderUnlisted._fillSectorYearFlow 派发），此处旧 safe() 调用删除
     safe(window.renderCffexPosition, window.CFFEX_POSITION || {});  // 🆕 2026-10-15 IF会员持仓择时
     safe(window.renderFuturesMain, window.CFFEX_HOLDINGS || {});
     safe(window.renderMacroSummary, window.MACRO_DATA || {});
@@ -15936,6 +15933,40 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
 
 
 
+    // 🏔 2026-10-20 主人令：板块年度主力净流入卡自「盘后数据」迁入「暂未上架」——
+    //   数据 window.SECTOR_YEAR_FLOW 为 defer 脚本注入，首调时可能尚未到达 ⇒ 600ms×30 自愈轮询补渲
+    //   （与 _fillFrLeaders / _fillUsHkMap 同范式）。无数据 ⇒ 整卡 display:none（不产空壳卡）。
+    //   渲染主体复用 renderSectorYearFlow（红涨绿跌、Top10 流入 + Top5 流出、近5/20日增量列）。
+    window._fillSectorYearFlow = function(){
+      try{
+        var card = document.getElementById('sectorYearFlowCard');
+        var body = document.getElementById('sectorYearFlowBody');
+        if(!card || !body) return;
+        var d = window.SECTOR_YEAR_FLOW || null;
+        var secs = (d && d.sectors) || [];
+        if(!secs.length){
+          /* 🛡 自愈：defer 数据未到 → 600ms×30 轮询补渲 */
+          if(!window.__syfRetryTimer){
+            window.__syfRetryN = 0;
+            window.__syfRetryTimer = setInterval(function(){
+              window.__syfRetryN++;
+              var _s2 = ((window.SECTOR_YEAR_FLOW || {}).sectors) || [];
+              if(_s2.length){
+                clearInterval(window.__syfRetryTimer); window.__syfRetryTimer = null; window.__syfRetryN = 0;
+                try{ window._fillSectorYearFlow(); }catch(e){}
+              } else if(window.__syfRetryN > 30){
+                clearInterval(window.__syfRetryTimer); window.__syfRetryTimer = null; window.__syfRetryN = 0;
+              }
+            }, 600);
+          }
+          return;
+        }
+        if(window.__syfRetryTimer){ clearInterval(window.__syfRetryTimer); window.__syfRetryTimer = null; window.__syfRetryN = 0; }
+        card.style.display = '';
+        if(typeof window.renderSectorYearFlow === 'function') window.renderSectorYearFlow(d);
+      }catch(e){ console.warn('板块年度主力净流入渲染失败', e); }
+    };
+
   function renderUnlisted(){
     // 🛡 2026-08-20 一劳永逸加固（主人「新建 AI 预测空白 + v6 备忘录空白」）：
     //   1) $ 兜底：$ 是 IIFE 闭包变量，若因加载时序未就绪会 TypeError → 整页空白。
@@ -15955,7 +15986,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       // 2026-09-15：__renderAiInsightsCompare 已随卡迁往「🌍 观测平台 > 🌍 宏观观测」，
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderThemeValue', '_fillFrLeaders'];   /* 📊 2026-10-19：+最终推荐·强势板块龙头股；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
+      var names = ['__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow'];   /* 📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
       var probe = document.getElementById('themeValueBody');
       if(probe) probe.setAttribute('data-ulpane', tab);
       var out = [];
@@ -16185,6 +16216,20 @@ h += '<div class="card" id="dajijinCard" style="display:none;margin-bottom:16px;
 //   全仓无生成脚本）⇒ 09-23 21:15 后永为死数据，卡上「每日巡检」标签失实。
 //   渲染函数 __renderMacroKShape / 派发块 / V8_PAGE_SCHEDULE / _PAGE_CARD_ORDER / script 注入
 //   / v8_health_check.py 条目 / data/MACRO_KSHAPE.js 同批清理（见 git 历史）。
+  // ═══ 🏔 2026-10-20 主人令「这卡移到暂未上架」：板块年度主力净流入（自「盘后数据」迁入，观测类卡尾位）═══
+  //   需求原话：「这卡移到暂未上架。这卡我看不出来到底现在是在继续买入卖出还是开始退潮，一劳永逸修复。」
+  //   数据 window.SECTOR_YEAR_FLOW（data/SECTOR_YEAR_FLOW.js ← cloud_fetch_v8.py::f_sector_year_flow()，
+  //        盘后生成；d5/d20 近5/20日滚动增量列 10-19 已进生成器，10-20 17:20 盘后班起随数据落地）。
+  //   口径：东财行业板块逐日主力净流入官方历史按自然年累加（自建累积表·历史回填真实数据，非估算）；
+  //        红=净流入、绿=净流出（全站红涨绿跌铁律）。盘后更新。
+  //   容器 id（sectorYearFlowBody/sectorYearFlowTime）与渲染函数 renderSectorYearFlow 未变仅换宿主；
+  //   无数据 ⇒ 整卡保持 display:none（不产空壳卡）；填充见 window._fillSectorYearFlow（600ms×30 自愈）。
+  h += '<div class="card" id="sectorYearFlowCard" style="display:none;margin-bottom:16px;border-left:4px solid #f97316;">'
+     + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+     + '<span style="font-size:15px;font-weight:700;color:#f97316;">&#x1F3D4; 板块年度主力净流入</span>'
+     + '<span class="fresh" id="sectorYearFlowTime">&#x2014;</span>'
+     + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 盘后口径（自建累积表）</span></div>'
+     + '<div id="sectorYearFlowBody"><div class="note">加载中&#x2026;</div></div></div>';
 h += '</div>'; // /ulPaneObserve
 
 // ===== 📊 大盘观察 pane —— 🚚 2026-09-15 主人令：整页迁出 =====
@@ -16227,6 +16272,10 @@ h += '</div>'; // /ulPaneObserve
     /* 🌙 2026-09-19：隔夜美股强势 → A股/港股 映射卡派发（与 _fillEtfMap 同在 renderUnlisted
        尾部，覆盖首渲即可触发；defer 数据未到时由 _fillUsHkMap 内部 600ms×30 自愈轮询补渲）。 */
     window._fillUsHkMap();
+      /* 🏔 2026-10-20 主人令：板块年度净流入卡派发（自「盘后数据」迁入，观测类卡尾位；
+         defer 数据未到时由 _fillSectorYearFlow 内部 600ms×30 自愈轮询补渲）。 */
+      window._fillSectorYearFlow();
+
     // 2026-09-12 搬迁收口：因子实验室 / 中信PE回测 / 指数估值中枢 /
     //   因子审计 / 因子补缺进度 / maharo 机构研究 共 7 卡的容器已迁出本页，
     //   其填充调用随之迁至各新宿主的骨架函数尾部（__renderBtExtraPane /

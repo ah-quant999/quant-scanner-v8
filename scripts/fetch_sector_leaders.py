@@ -65,6 +65,11 @@ MANUAL_ALIAS = {
     "军工装备": "国防军工",         # 同花顺「军工装备」↔ 东财「国防军工」
     "文化传媒": "传媒",             # 同花顺「文化传媒」↔ 东财「传媒」（东财无「文化传媒」独立板块）
     "机场航运": "航空机场",         # 同花顺「机场航运」↔ 东财「航空机场」（⚠️ 主体=机场+航空；东财航运在「航运港口」不在本映射内，龙头以机场/航空为主）
+    # 📊 2026-10-20 小九（主人令「这个坏了？一劳永逸修复」· 图3「油气开采及服务」no_match）：
+    #   同花顺「油气开采及服务」(881107) ↔ 东财无同名板块；norm 剥级后缀后命中
+    #   「油气开采」→ BK1276 油气开采Ⅱ（Ⅱ 级优先规则，实测 5 成分：中国海油/海南矿业/
+    #   新潮能源/蓝焰控股/ST洲际；Ⅲ BK1574 同为 5 成分）。THS 侧另含油服工程，龙头以开采主体为主。
+    "油气开采及服务": "油气开采",
 }
 
 UA = {
@@ -546,6 +551,23 @@ def build():
             nm = x["name"]
             bk, how = _resolve_bk(nm, boards_exact, boards_norm)
             if not bk:
+                # 🛡 2026-10-20 小九（主人令「一劳永逸」）：东财无对应板块 ≠ 无龙头 ——
+                #   SECTOR_RS 板块名即同花顺行业名，直取同花顺成分股 → 腾讯行情取涨幅，
+                #   免 MANUAL_ALIAS 也能出龙头；仅当同花顺也取不到才判 no_match
+                #   （前端明示「需人工别名表补」，两卡计数对齐）。
+                _thsm = _ths_members_by_name(nm)
+                if _thsm:
+                    try:
+                        _rows = _tx_cons(_thsm)
+                        sectors_out.append({
+                            "name": nm, "bk": None, "phase": x.get("phase", "主升"),
+                            "pct_5d": x.get("pct_5d"), "pct_20d": x.get("pct_20d"),
+                            "cons_count": len(_thsm), "leaders": _rows[:TOP_N], "match": "ths",
+                        })
+                        time.sleep(0.3)
+                        continue
+                    except Exception as _te:
+                        log("ths quote fail %s: %s（回退 NeoData）" % (nm, str(_te)[:50]))
                 _neo = _neo_cons(nm)
                 if _neo:
                     n_neo += 1
@@ -569,6 +591,23 @@ def build():
             try:
                 cons = fetch_cons_safe(bk)
             except Exception as e:
+                # 🛡 2026-10-20 小九（主人令「还是没对应好，没备用方案么？」· 兜底对齐 fr 路径）：
+                #   东财成分股断连（云 runner 海外 IP 对 push2 系列被封）时，改用**同花顺行业名
+                #   直取**成分股（主升/启动名与 fr 同为同花顺名空间）→ 腾讯行情取涨幅，
+                #   彻底摆脱对东财 clist 的依赖，新板块自动解析免 MANUAL_ALIAS；失败再走 NeoData。
+                _thsm = _ths_members_by_name(nm)
+                if _thsm:
+                    try:
+                        _rows = _tx_cons(_thsm)
+                        sectors_out.append({
+                            "name": nm, "bk": bk, "phase": x.get("phase", "主升"),
+                            "pct_5d": x.get("pct_5d"), "pct_20d": x.get("pct_20d"),
+                            "cons_count": len(_thsm), "leaders": _rows[:TOP_N], "match": "ths",
+                        })
+                        time.sleep(0.3)
+                        continue
+                    except Exception as _te:
+                        log("ths quote fail %s: %s（回退 NeoData）" % (nm, str(_te)[:50]))
                 _neo = _neo_cons(nm)
                 if _neo:
                     n_neo += 1
@@ -658,6 +697,18 @@ def build():
         for nm in fr_names:
             bk, how = _resolve_bk(nm, boards_exact, boards_norm)
             if not bk:
+                # 🛡 2026-10-20 小九（与主升/启动路径同款·code 行为一致）：东财无对应板块 ≠ 无龙头，
+                #   fr 名即同花顺行业名 ⇒ 直取同花顺成分股 → 腾讯行情；仅同花顺也失败才 no_match。
+                _thsm = _ths_members_by_name(nm)
+                if _thsm:
+                    try:
+                        _rows = _tx_cons(_thsm)
+                        fr_out.append({"name": nm, "bk": None, "cons_count": len(_thsm),
+                                       "leaders": _rows[:TOP_N], "match": "ths"})
+                        time.sleep(0.3)
+                        continue
+                    except Exception as _te:
+                        log("fr ths quote fail %s: %s（回退 NeoData）" % (nm, str(_te)[:50]))
                 _neo = _neo_cons(nm)
                 if _neo:
                     fr_out.append({"name": nm, "bk": None, "cons_count": len(_neo),

@@ -229,7 +229,19 @@ CATEGORY_MAP = {
     #       盘前失败时盘中/盘后轮自动补位自愈。
     #   🔴 原「禁止挂 intraday」禁令的语义保护不变 —— 由闸门①承担，档位仅触发。
     #   ⚠️ 两表同档铁律：update_v8.py CATEGORY_MAP 已同步三档。
-    "US_HK_MAP": "premarket,intraday,post_close",
+    #   🔴 2026-10-20 小九（主人令「这个坏了？一劳永逸修复」· 隔夜美股卡 strong_count=0 根治）：
+    #     【病灶】US_HK_MAP 挂本脚本三档 ⇒ 只能跑在 GitHub 托管 ubuntu（境外 IP）：
+    #       东财美股接口（push2delay 105.* secid）与新浪美股日K（US_MinKService.getDailyK）
+    #       双双不可达 ⇒ mom d3-d60 全 null ⇒ strong_count=0、86 项全「无数据」（线上
+    #       data/US_HK_MAP.js 实测：us_tx_fallback:86、仅 d1 有值）。
+    #     【修法】本表置空串 = **永不由本脚本调度**（含 all 档，见 main() 过滤），
+    #       改由专链 .github/workflows/v8_us_hk_map.yml 承接：runs-on [self-hosted, cn]
+    #       （小九单位机·中国 IP，新浪美股日K 实测可达：BABA 3038 根、末根与腾讯报价同日配对）。
+    #       生成器语义/预算双闸门（ET 交易时段拒绝 + 当日已产跳过）原样保留，由专链
+    #       `cloud_fetch_v8.py --only US_HK_MAP` 复用（save/update_v8 链路不变）。
+    #     ⚠️ 接线自检按「键存在」判 ⇒ 空串不误触孤儿检查；update_v8.py 侧三档登记不动
+    #       （专链 `update_v8.py --category premarket` 依赖它从 raw 重建 data/US_HK_MAP.js）。
+    "US_HK_MAP": "",
 }
 
 _ak = None
@@ -5146,7 +5158,10 @@ def main(category=None, only=None):
     # 分时段清理：只删除本次任务类别的 raw_data，避免盘中任务把盘前/盘后数据清掉
     target_vars = None
     if category == "all":
-        target_vars = set(CATEGORY_MAP.keys())
+        # 🔴 2026-10-20：空串类别 = 永不由本脚本调度（US_HK_MAP 已路由至专链 v8_us_hk_map.yml ·
+        #   selfhosted cn runner）⇒ all 档同样排除，防境外云 runner 产出 mom 全空的坏数据
+        #   覆盖专链好数据（云 IP 对东财美股/新浪美股日K 均不可达，见 CATEGORY_MAP 注）。
+        target_vars = {var for var, cat in CATEGORY_MAP.items() if cat.strip()}
         print(f"🎯 全量兜底模式，涉及 {len(target_vars)} 个变量")
     elif category:
         target_vars = {var for var, cat in CATEGORY_MAP.items() if category in [x.strip() for x in cat.split(",")]}

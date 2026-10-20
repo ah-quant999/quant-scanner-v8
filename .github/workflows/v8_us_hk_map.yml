@@ -1,0 +1,189 @@
+# 九宝量化 v8.0 — 隔夜美股强势映射 fetcher 调度（cn runner · 专链）
+#
+# 2026-10-20 小九（主人令「这个坏了？一劳永逸修复」· 图4 隔夜美股强势映射卡 strong_count=0）：
+#   根因 = cloud_fetch_v8.py::f_us_hk_map() 原本挂在 v8_cn_fetch_cloud.yml（ubuntu-latest · 境外 IP），
+#        境外 IP 下东财美股 + 新浪美股日K **双不可达** ⇒ mom d3-d60 全 null ⇒ strong_count=0。
+#   一劳永逸修法 = 摘出主调度（cf CATEGORY_MAP 改 ""，正常轮不再跑）+ 专链本 workflow 在
+#        [self-hosted, cn]（中国 IP）跑：东财美股 + 新浪美股日K 在 cn IP 下可达 ⇒ mom 真实值落地。
+#
+# 时点（双种子，覆盖美股收盘后首抓 + 次日盘前兜底）：
+#   ① 05:35 CST（= UTC 21:35 前一日的班次，周一~五）→ 美股收盘后首抓；
+#   ② 08:15 CST（= UTC 00:15）→ 盘前兜底补漏（防首抓偶发断连）。
+#
+# 链路：sync 5 文件 → `python cloud_fetch_v8.py --only US_HK_MAP`（产出 raw_data/us_hk_map.json）
+#      → `python update_v8.py --category premarket`（重建 data/US_HK_MAP.js；US_HK_MAP 归属 premarket 档）
+#      → us_hk_map_need_push.py 比对线上 → 内容不同则 api_put_file 推 raw + data 两件。
+#
+# 安全铁律（与 v8_dajijin_fetch.yml / v8_lhb_fetch.yml 同步）：
+#   1. 严禁 actions/checkout / rm -rf / git clean -fdx（cn runner 系统级拦截，会挂 job）；
+#   2. 严禁 git clone/fetch（cn runner 到 github.com:443 被连接重置），源码同步走 Contents API；
+#   3. 单一职责：只产出并推送 raw_data/us_hk_map.json + data/US_HK_MAP.js，不动任何其他文件。
+name: "🌐 v8 隔夜美股映射 fetcher (cn runner)"
+
+on:
+  schedule:
+    # 工作日 05:35 CST（UTC 21:35 前一日）= 美股收盘后首抓；08:15 CST（UTC 00:15）= 盘前兜底。
+    - cron: '35 21 * * 1-5'
+    - cron: '15 0 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      skip_trading_day_gate:
+        description: "应急手动调用时绕过交易日闸（true 仅供非交易日补算）"
+        required: false
+        type: choice
+        options:
+          - "false"
+          - "true"
+        default: "false"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-us-hk-map
+  cancel-in-progress: false
+
+jobs:
+  us-hk-map-only:
+    runs-on: [self-hosted, cn]
+    # 🔴 safe-delete 批量删除守卫阈值必须显式设 2000（cn runner 为 Windows，不设则吃默认 50）。
+    env:
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
+      # 🔴 cn runner（Windows）默认 GBK —— 本脚本打印中文会 UnicodeEncodeError('gbk') 崩链。
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+    timeout-minutes: 25
+    steps:
+      - name: "📝 同步源码（Contents API · 同域，避开 raw 302）"
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $repo = 'ah-quant999/quant-scanner-v8'
+          $headers = @{
+            'User-Agent'    = 'v8-us-hk-map-fetcher'
+            'Accept'        = 'application/vnd.github+json'
+            'Authorization' = "Bearer $env:GH_PAT"
+          }
+          # [ascii] Do NOT use `Accept: application/vnd.github.raw`: it 302-redirects to
+          #   raw.githubusercontent.com, which may be wholly unreachable => guaranteed failure.
+          $files = @('cloud_fetch_v8.py', 'scripts/fetch_us_hk_map.py', 'update_v8.py', 'scripts/api_put_file.py', 'scripts/us_hk_map_need_push.py')
+          foreach ($f in $files) {
+            $url = "https://api.github.com/repos/$repo/contents/$f`?ref=main"
+            try {
+              $r = Invoke-RestMethod -Uri $url -Headers $headers -TimeoutSec 60 -Method Get
+              $b64 = ($r.content -replace "\s", "")
+              $bytes = [Convert]::FromBase64String($b64)
+              $dir = Split-Path $f -Parent
+              if ($dir) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+              [System.IO.File]::WriteAllBytes($f, $bytes)
+              Write-Host "[ok] fetched $f ($($bytes.Length) bytes)"
+            } catch {
+              Write-Host "[warn] API fetch failed for $f : $_" -ForegroundColor Yellow
+            }
+          }
+          if (-not (Test-Path 'cloud_fetch_v8.py') -or -not (Test-Path 'scripts/fetch_us_hk_map.py')) {
+            Write-Host "[fatal] fetcher scripts not present; chain cannot continue" -ForegroundColor Red
+            exit 1
+          }
+
+      - name: "📊 跑 cloud_fetch_v8.py --only US_HK_MAP（产出 raw_data/us_hk_map.json）"
+        id: gen
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          python cloud_fetch_v8.py --only US_HK_MAP
+          if ($LASTEXITCODE -ne 0) { Write-Host "[fatal] cloud_fetch_v8 --only US_HK_MAP returned non-zero" -ForegroundColor Red; exit 1 }
+          if (-not (Test-Path 'raw_data/us_hk_map.json')) {
+            Write-Host "[warn] raw_data/us_hk_map.json not produced; chain stops (no data => no push)"
+            exit 0
+          }
+          Write-Host "[ok] raw_data/us_hk_map.json ready"
+
+      - name: "📦 update_v8.py --category premarket（重建 data/US_HK_MAP.js）"
+        id: build
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          if (-not (Test-Path 'raw_data/us_hk_map.json')) { Write-Host "[skip] no raw; nothing to build"; exit 0 }
+          python update_v8.py --category premarket
+          if ($LASTEXITCODE -ne 0) { Write-Host "[fatal] update_v8 --category premarket returned non-zero" -ForegroundColor Red; exit 1 }
+          if (-not (Test-Path 'data/US_HK_MAP.js')) {
+            Write-Host "[warn] data/US_HK_MAP.js not produced; chain stops"
+            exit 0
+          }
+          Write-Host "[ok] data/US_HK_MAP.js ready"
+
+      - name: "🔍 内容比对（相同则 SKIP，防空提交触发全量重建）"
+        id: diff
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          # [ascii] comparison logic lives in repo script scripts/us_hk_map_need_push.py (locally testable;
+          #   avoids the PowerShell here-string `'@`-at-column-0 vs YAML block indentation conflict).
+          $out = python scripts/us_hk_map_need_push.py 2>&1 | Out-String
+          Write-Host $out
+          if ($out -match 'NEED_PUSH=1') { "need=1" | Out-File -FilePath "_uhm_need.txt" -Encoding ascii }
+          else { "need=0" | Out-File -FilePath "_uhm_need.txt" -Encoding ascii }
+
+      - name: "📤 推送 raw_data/us_hk_map.json（api_put_file.py）"
+        if: always()
+        shell: powershell
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          $need = (Get-Content '_uhm_need.txt' -ErrorAction SilentlyContinue) -join ''
+          if ($need -notmatch 'need=1') {
+            Write-Host "[skip] content identical to remote; no push (avoid an empty commit triggering a full rebuild)"
+            exit 0
+          }
+          python scripts/api_put_file.py raw_data/us_hk_map.json "data: us_hk_map raw ($(Get-Date -Format 'yyyy-MM-dd HH:mm') CST)"
+          if ($LASTEXITCODE -ne 0) { Write-Host "[warn] push raw failed (non-blocking; retried next round)" -ForegroundColor Yellow }
+
+      - name: "📤 推送 data/US_HK_MAP.js（api_put_file.py）"
+        if: always()
+        shell: powershell
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          $need = (Get-Content '_uhm_need.txt' -ErrorAction SilentlyContinue) -join ''
+          if ($need -notmatch 'need=1') {
+            Write-Host "[skip] content identical to remote; no push (avoid an empty commit triggering a full rebuild)"
+            exit 0
+          }
+          python scripts/api_put_file.py data/US_HK_MAP.js "data: 隔夜美股强势映射 ($(Get-Date -Format 'yyyy-MM-dd HH:mm') CST)"
+          if ($LASTEXITCODE -ne 0) { Write-Host "[warn] push data failed (non-blocking; retried next round)" -ForegroundColor Yellow }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 中文原文备份（run 块 ASCII 化前逐字保留）  2026-10-20 小九
+#
+# 成因：cn runner 为 Windows 且系统码页 GBK；GitHub 写出的 .ps1 为 UTF-8 无 BOM，
+#   Windows PowerShell 5.1 按 ANSI(GBK) 解码 ⇒ 多字节字符尾字节「吃掉」紧随开引号/换行 ⇒
+#   ParserError。YAML 注释与 name/description 由 GitHub 按 UTF-8 读取、不经 PowerShell。
+# ─────────────────────────────────────────────────────────────────────────────
+# [step0 同步源码 L37]          # ⚠️ 不用 `Accept: application/vnd.github.raw`：它会 302 跳到 raw.githubusercontent.com，
+# [step0 同步源码 L38]          #    该域可能整域不可用 ⇒ 必失败。contents API 的 JSON+base64 全程同域 api.github.com。
+# [step1 跑脚本   L62]          if (-not (Test-Path 'raw_data/us_hk_map.json')) { Write-Host "[warn] 未产出 raw；本链停止" }
+# [step2 重建     L80]          if (-not (Test-Path 'data/US_HK_MAP.js')) { Write-Host "[warn] 未产出 data；本链停止" }
+# [step3 内容比对 L96]          # 比对逻辑放仓内脚本 scripts/us_hk_map_need_push.py（可本机实测、避免 PowerShell
+# [step3 内容比对 L97]          # here-string 的 `'@` 必须顶格 与 YAML 块缩进 的冲突，那会让整份 workflow 解析失败）。
+# [step4 推送     L118]         if ($need -notmatch 'need=1') { Write-Host "[skip] 内容与线上一致，不推送（避免空提交触发全量重建）" }
+# [step5 推送     L138]         if ($need -notmatch 'need=1') { Write-Host "[skip] 内容与线上一致，不推送（避免空提交触发全量重建）" }
+# ─────────────────────────────────────────────────────────────────────────────
