@@ -12,14 +12,23 @@ verify_fr_factor_consistency.py — v8 跨产物硬断言（防「最终推荐�
    （读的是旧因子榜快照）时，新鲜度闸放行（它确实是当天推的），却与线上因子榜
    对不上，且无人报警。
 
-本脚本断言：
-   ① raw_data/final_recommend.json 的 stocks 列表（按序）必须 == 因子榜
-      raw_data/top10_daily.json 按 total_score 降序的前 N 名（N = FR 实际条数）；
+🔴🔴 2026-10-20 二劳永逸（主人截图实锤第二宗事故）：上一条只校 raw_data 层，
+   而**页面真实显示的是 data/*.js 层**。当晚 raw 层两文件恰为同批旧版（互校
+   通过、放行），data 层却分裂：data/TOP10_DAILY.js 18:12（佰维18.2/德明利17.8/
+   长飞17.3）vs data/FINAL_RECOMMEND_DATA.js 19:07（佰维18.6/迪安诊断78.0/长飞17.2）
+   —— 名单第 2 名对不上、同票分对不上，链闸全程无报警。
+   根因：FR 运行时读的因子榜快照 ≠ 页面展示的因子榜版本（快照漂移），
+   叠加 10-14 双源混排竞位（已按主人 10-20 令废止，见 final_recommend.py）。
+   ⇒ 本版起**两层都校**：raw 归档层 + data 页面层，任一层不同序同分即 exit 1。
+
+本脚本断言（每层各一遍）：
+   ① 最终推荐 stocks 列表（按序）必须 == 因子榜 top10 按 total_score 降序的前 N 名
+      （N = 最终推荐实际条数）；
    ② 逐股 final_score 必须 == 因子榜对应 total_score。
 
 退出码
-   0  一致（唯一口径成立）
-   1  不一致 —— 疑似最终推荐被旧/错数据覆盖，必须拦截
+   0  两层均一致（唯一口径成立）
+   1  任一层不一致 —— 疑似最终推荐被旧/错数据覆盖，必须拦截
    2  输入缺失/解析失败，无法判定（不强制失败，交由新鲜度闸兜底）
 
 用法
@@ -30,6 +39,12 @@ import os
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# (层名, 最终推荐文件, 因子榜文件) —— raw 归档层 + data 页面层
+LAYERS = [
+    ("raw 归档层", "raw_data/final_recommend.json", "raw_data/top10_daily.json"),
+    ("data 页面层", "data/FINAL_RECOMMEND_DATA.js", "data/TOP10_DAILY.js"),
+]
 
 
 def _load(p):
@@ -60,18 +75,17 @@ def _factor_topN(fb, n):
     return rows[:n]
 
 
-def main():
-    fr, err1 = _load("raw_data/final_recommend.json")
-    fb, err2 = _load("raw_data/top10_daily.json")
+def _check_layer(name, fr_path, fb_path):
+    """返回 (rc, lines)。rc: 0=一致 1=不一致 2=无法判定"""
+    fr, err1 = _load(fr_path)
+    fb, err2 = _load(fb_path)
     if err1 or err2:
-        print("⚠️ 输入缺失，跳过一致性断言:", err1, err2)
-        return 2
+        return 2, ["⚠️ %s 输入缺失，跳过一致性断言: %s %s" % (name, err1, err2)]
 
     fr_codes = [_norm(s.get("code")) for s in fr.get("stocks", [])]
     n = len(fr_codes)
     if n == 0:
-        print("⚠️ 最终推荐为空，跳过一致性断言（交由新鲜度闸判空产物）")
-        return 2
+        return 2, ["⚠️ %s 最终推荐为空，跳过一致性断言（交由新鲜度闸判空产物）" % name]
 
     fb_top = _factor_topN(fb, n)
     fb_codes = [c for c, _ in fb_top]
@@ -83,15 +97,37 @@ def main():
         for s in fr.get("stocks", [])
     )
 
-    print("最终推荐前%d:" % n, fr_codes)
-    print("因子榜前%d  :" % n, fb_codes)
-    print("同序:", order_ok, "| 同分:", score_ok)
-
+    lines = ["%s 最终推荐前%d: %s" % (name, n, fr_codes),
+             "%s 因子榜前%d  : %s" % (name, n, fb_codes),
+             "%s 同序: %s | 同分: %s" % (name, order_ok, score_ok)]
     if order_ok and score_ok:
-        print("✅ 最终推荐与因子榜完全一致（唯一口径，无覆盖）")
-        return 0
-    print("❌ 不一致：最终推荐与因子榜对不上 —— 疑似被旧/错数据覆盖！")
-    return 1
+        lines.append("✅ %s 最终推荐与因子榜完全一致（唯一口径，无覆盖）" % name)
+        return 0, lines
+    lines.append("❌ %s 不一致：最终推荐与因子榜对不上 —— 疑似被旧/错数据覆盖！" % name)
+    return 1, lines
+
+
+def main():
+    worst = 0
+    for name, fr_path, fb_path in LAYERS:
+        rc, lines = _check_layer(name, fr_path, fb_path)
+        for l in lines:
+            print(l)
+        print()
+        if rc == 1:
+            worst = 1
+        elif rc == 2 and worst == 0:
+            worst = 2
+
+    if worst == 1:
+        print("🛑 跨产物一致性未通过（至少一层不同序同分）——最终推荐疑似被旧/错数据覆盖，"
+              "与因子榜对不上。交由告警链路处理；请勿绕过本闸门。")
+        return 1
+    if worst == 2:
+        print("⚠️ 部分层输入缺失，无法完整判定（交由新鲜度闸兜底）")
+        return 2
+    print("✅ 两层（raw 归档 + data 页面）均同序同分：最终推荐与因子积分榜口径、评分完全一致")
+    return 0
 
 
 if __name__ == "__main__":
