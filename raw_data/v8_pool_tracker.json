@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-21 02:31:19",
+  "update_time": "2026-10-21 03:07:03",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -10,7 +10,7 @@
   "sentiment_meta": {
     "phase": "高潮",
     "score": 74.0,
-    "delta_pct": 17.39,
+    "delta_pct": 0.0,
     "advice": "✨ 高潮持续：聚焦核心龙头，注意仓位管理",
     "source": "LIMIT_UP_HEATMAP"
   },
