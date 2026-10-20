@@ -1,5 +1,5 @@
 {
-  "calc_time": "2026-10-20 22:08:48",
+  "calc_time": "2026-10-21 05:19:18",
   "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
   "hold_periods_tested": [
     1,
@@ -24,7 +24,7 @@
   "cost_adjusted": true,
   "overview": {
     "resonance_all": {
-      "total": 489,
+      "total": 495,
       "valid": 471,
       "best_hold_days": 45,
       "best_win_rate": 42.7,
@@ -321,7 +321,7 @@
       }
     },
     "resonance_gte70_lt80": {
-      "total": 269,
+      "total": 272,
       "valid": 266,
       "best_hold_days": 10,
       "best_win_rate": 40.7,
@@ -618,7 +618,7 @@
       }
     },
     "resonance_gte80": {
-      "total": 220,
+      "total": 223,
       "valid": 205,
       "best_hold_days": 45,
       "best_win_rate": 54.9,
@@ -1267,7 +1267,7 @@
   },
   "details": {
     "resonance_all": {
-      "total_signals": 489,
+      "total_signals": 495,
       "valid_signals": 471,
       "best_hold_days": 45,
       "best_hold_win_rate": 42.7,
@@ -37449,7 +37449,7 @@
       ]
     },
     "resonance_gte70_lt80": {
-      "total_signals": 269,
+      "total_signals": 272,
       "valid_signals": 266,
       "best_hold_days": 10,
       "best_hold_win_rate": 40.7,
@@ -58756,7 +58756,7 @@
       ]
     },
     "resonance_gte80": {
-      "total_signals": 220,
+      "total_signals": 223,
       "valid_signals": 205,
       "best_hold_days": 45,
       "best_hold_win_rate": 54.9,
@@ -73930,5 +73930,5 @@
       ]
     }
   },
-  "update_stamp": 1792505328
+  "update_stamp": 1792531158
 }
