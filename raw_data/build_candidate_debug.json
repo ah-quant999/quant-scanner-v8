@@ -3,18 +3,18 @@
   "V8_OUT_DIR": "out",
   "guanlan_watchlist": {
     "exists": true,
-    "stocks": 8
+    "stocks": 9
   },
   "guanlan_reports": {
     "exists": true,
     "reports": 20,
-    "stocks_in_reports": 8
+    "stocks_in_reports": 9
   },
   "source_dist": {
     "主板成交前100": 143,
     "创业板成交前100": 132,
     "科创板成交前100": 132,
-    "外资研投": 95,
+    "外资研投": 96,
     "港股成交前50": 85
   }
 }
