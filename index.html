@@ -3323,6 +3323,7 @@ function fmtSigned(v){
         defs.forEach(function(d){ h+=_row(g[d[0]],d[1],d[2]); });
         return h+'</table></div>';
       }
+      function _md(s){ return String(s||'').slice(5).replace('-','/'); }  // 2026-10-20 起: MM-DD
       function _fbaBtFill(){
         var d=window.LIANBAN_WINRATE||{};
         var el=document.getElementById('fbaBtBody');
@@ -3332,20 +3333,36 @@ function fmtSigned(v){
         var pend=(d.pending||[]).length;
         var n=(d.matured_total)||0;
         var ut=d.update_time?' · '+d.update_time:'';
+        var eta=d.first_mature_eta||'';
+        var etaTxt=eta?(' · 预计 '+_md(eta)+' 起出数'):'';
         if(bd){
           bd.textContent=(n>0)
             ? '🔄 日更累积 · 成熟 n='+n+' · 在途 '+pend+ut
-            : '🔄 日更累积 · 首日累积中'+ut;
+            : (pend>0 ? '🔄 日更累积 · 在途 '+pend+' 笔'+etaTxt+ut : '⏳ 首次累积中'+ut);
         }
         if(!window.LIANBAN_WINRATE || (n===0 && pend===0)){
           el.innerHTML='<div style="color:#8a93a6;line-height:1.8;">⏳ 首次累积中：每日 post_close 从涨停池录入首板/二连板真实信号（T+5 窗口成熟后计入本表，未成熟不插值）。<br>历史跑批结论（2026-10-09 静态批次·已冻结）见上方「🔭 连板梯队前哨」卡。</div>';
           return;
         }
-        var h='<div style="color:#c9d1dc;font-weight:600;margin:2px 0 4px;">① 一进二（首板 → 次日）</div>'
+        /* 2026-10-20 诚实空态（主人令「为什么还没数据」）：未成熟期不裸展一排"—"，
+           明示在途笔数 / 信号覆盖日 / 预计出数日 / T+5 口径原因。 */
+        var cov='—';
+        if(d.signal_dates && Object.keys(d.signal_dates).length){
+          cov=Object.keys(d.signal_dates).sort().map(_md).join('、');
+        }else if(d.first_date){ cov=_md(d.first_date); }
+        var explain=(n===0)
+          ? '<div style="margin:2px 0 8px;padding:8px 10px;background:rgba(56,189,248,.07);border-left:3px solid #38bdf8;border-radius:4px;font-size:11.5px;line-height:1.7;color:#c9d1dc;">'
+            +'⏳ <b style="color:#e6e9ef;">为何暂无数值：</b>本表为<b>真实信号流日累积</b>——每日盘后从涨停池录入首板/二连板信号，须走满 <b>T+5 窗口</b>（信号日后第 5 个交易日收盘）才计入分组统计；未成熟不计入，绝不半路插值。<br>'
+            +'📥 当前在途 <b style="color:#7dd3fc;">'+pend+'</b> 笔 · 信号覆盖 '+cov
+            +(eta?' · <b style="color:#7dd3fc;">预计 '+_md(eta)+' 起出数</b>（最早信号日 +5 个交易日）':'')
+            +'<br>📌 历史跑批结论（2026-10-09 静态批次·已冻结：T+1 胜率全部不足五成、倍量无晋级增量 ⇒ 观察哨非买点）见上方「🔭 连板梯队前哨」卡。</div>'
+          : '';
+        var h=explain
+          +'<div style="color:#c9d1dc;font-weight:600;margin:2px 0 4px;">① 一进二（首板 → 次日）</div>'
           +_table(g,_DEFS1)
           +'<div style="color:#c9d1dc;font-weight:600;margin:10px 0 4px;">② 二进三（二连板 → 次日）</div>'
           +_table(g,_DEFS2)
-          +'<div style="margin-top:8px;padding:7px 10px;background:rgba(251,191,36,.07);border-left:3px solid #fbbf24;border-radius:4px;font-size:11.5px;line-height:1.7;color:#c9d1dc;">📌 口径：真实信号流日累积（akshare 涨停池 + 新浪日K）· T+1 开盘买入扣双边 0.3% · 晋级=次日涨停（主板 10%/双创 20%/北交所 30%）· 隔夜高开=次日开&gt;信号收 · 可成交=次日非一字板 · T+5=第 5 个交易日收盘卖 · 剔 ST/一字板信号 · T+5 成熟才计入（在途 '+pend+' 笔）· 样本自 '+(d.first_date||'—')+' 累积</div>'
+          +'<div style="margin-top:8px;padding:7px 10px;background:rgba(251,191,36,.07);border-left:3px solid #fbbf24;border-radius:4px;font-size:11.5px;line-height:1.7;color:#c9d1dc;">📌 口径：真实信号流日累积（akshare 涨停池 + 新浪日K）· T+1 开盘买入扣双边 0.3% · 晋级=次日涨停（主板 10%/双创 20%/北交所 30%）· 隔夜高开=次日开&gt;信号收 · 可成交=次日非一字板 · T+5=第 5 个交易日收盘卖 · 剔 ST/一字板信号 · T+5 成熟才计入（在途 '+pend+' 笔）· 样本自 '+(d.first_date||'—')+' 累积'+(eta?' · 预计 '+_md(eta)+' 起出数':'')+'</div>'
           +'<div style="margin-top:6px;font-size:10.5px;line-height:1.6;color:#6b7280;">* n&lt;100 小样本仅供参考 · 高亮行=本卡 ①/② 入选口径 · 历史跑批结论（2026-10-09 冻结批次：T+1 胜率全部不足五成、倍量无晋级增量 ⇒ 观察哨非买点）见上方前哨卡，与本表互不混算</div>';
         el.innerHTML=h;
       }
