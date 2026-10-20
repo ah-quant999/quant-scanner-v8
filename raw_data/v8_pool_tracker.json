@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-21 00:13:32",
+  "update_time": "2026-10-21 01:46:43",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -15,48 +15,22 @@
     "source": "LIMIT_UP_HEATMAP"
   },
   "sector_meta": {
-    "top_in": [
-      {
-        "name": "人形机器人",
-        "type": "概念",
-        "net": 50.58
-      },
-      {
-        "name": "机器人概念",
-        "type": "概念",
-        "net": 49.44
-      },
-      {
-        "name": "AI眼镜",
-        "type": "概念",
-        "net": 36.9
-      },
-      {
-        "name": "虚拟现实",
-        "type": "概念",
-        "net": 34.27
-      },
-      {
-        "name": "智能穿戴",
-        "type": "概念",
-        "net": 32.72
-      }
-    ],
+    "top_in": [],
     "top_out": [
       {
-        "name": "荣耀概念",
-        "type": "概念",
-        "net": -10.26
+        "name": "风电整机",
+        "type": "行业",
+        "net": -1.24
       },
       {
-        "name": "近期新高",
-        "type": "概念",
-        "net": -10.4
+        "name": "环保",
+        "type": "行业",
+        "net": -1.24
       },
       {
-        "name": "央视50_",
-        "type": "概念",
-        "net": -10.77
+        "name": "航空运输",
+        "type": "行业",
+        "net": -1.29
       }
     ]
   },
