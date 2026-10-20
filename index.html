@@ -16,7 +16,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "f789308ecb";   // 部署 commit 短 SHA（= 当前 main tip；v8 部署走 Git Data API 直推 main，跳过 v8_build_deploy.yml 的构建期 BUILD 替换，故此处手动对齐真实 tip，确保运维页「部署 SHA」与版本戳强缓存破坏机制真实生效）
+    var BUILD = "50ecfa3102";   // 部署 commit 短 SHA（= 当前 main tip；v8 部署走 Git Data API 直推 main，跳过 v8_build_deploy.yml 的构建期 BUILD 替换，故此处手动对齐真实 tip，确保运维页「部署 SHA」与版本戳强缓存破坏机制真实生效）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -18183,6 +18183,24 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
      jsdom 受控时钟实证：推进 45 分钟，reload 仅 1 次 @15.5min，之后零事件（链彻底断死）。
      ⇒ 修复三点：① _tick 无条件续排；② reload 被抑制 90s 后自愈重试；③ 回前台补链。 */
   var _reloadRequestedAt = 0;                            // 已请求 reload 的时刻（0=未请求）
+  /* 🛡 2026-10-20 主人令「盘中午间自动刷新断了，都要手动刷新才行」一劳永逸修复（小九）：
+     病灶：_tick 链用 location.reload()（普通刷新，不绕缓存），撞 GitHub Pages CDN
+     Cache-Control: max-age=600（index.html / data/*.js 实抓响应头实证）⇒ 刷新后仍拿
+     旧 ?v ⇒ 数据不更新，只有 Ctrl+F5 硬刷才灵。修法：换 _hardReload() =
+     location.replace(唯一 fresh=时间戳)，URL 每次唯一 ⇒ CDN 必回源 ⇒ 新 index.html
+     （含最新 ?v ⇒ data 也最新）。时段逻辑（盘中15分/午休盘后1小时/夜间不刷/90s自愈/
+     4h兜底/回前台补链）原样保留；参数名用 fresh=（复用 __v8LiveDataProbe 同款），
+     刻意避开 nocache=1 —— 那是版本戳 IIFE 的防循环哨兵（indexOf('nocache=1')），
+     若复用会把版本戳强缓存破坏机制永久哑火。 */
+  function _hardReload(){
+    try{
+      var hh = location.href.split('#');
+      var base = hh[0], hash = hh[1] ? '#' + hh[1] : '';
+      base = base.replace(/([?&])(nocache|fresh)=[^&]*/g, '$1');
+      var sep = base.indexOf('?') >= 0 ? '&' : '?';
+      location.replace(base + sep + 'fresh=' + Date.now() + hash);
+    }catch(e){ try{ location.reload(); }catch(e2){} }
+  }
   function _maybeReload(){
     var iv = _targetIntervalMs();
     if(iv === 0) return false;                           // 夜间不刷
@@ -18191,13 +18209,13 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     if(so > 0 && _last < so){
       _last = Date.now();
       _reloadRequestedAt = Date.now();                   // 登记：用于 90s 后自愈重试
-      try{ location.reload(); }catch(e){}
+      try{ _hardReload(); }catch(e){}
       return true;                                       // 已请求重载（页可能未被销毁）
     }
     if((Date.now() - _last) >= iv){
       _last = Date.now();
       _reloadRequestedAt = Date.now();                   // 登记：用于 90s 后自愈重试
-      try{ location.reload(); }catch(e){}
+      try{ _hardReload(); }catch(e){}
       return true;                                      // 已请求重载（但页可能未被销毁）
     }
     return false;
@@ -18226,7 +18244,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     // ② 自愈：已请求 reload 但 90 秒后页面仍存活 ⇒ 说明 reload 被抑制，重试一次
     if(_reloadRequestedAt && (Date.now() - _reloadRequestedAt) >= 90*1000){
       _reloadRequestedAt = 0;
-      try{ location.reload(); }catch(e){}
+      try{ _hardReload(); }catch(e){}
     }
     _updateBadge(iv);   // 可见倒计时角标：让主人实时确认自动刷新机制在跑（一眼看出卡没卡）
     // 注：本函数由外部 setInterval(_tick, 60s) 驱动，不再内部递归 setTimeout，
@@ -18244,7 +18262,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }catch(e){}
   // 兜底：陈旧硬上限（4 小时）—— 即便时段判定逻辑出错，也绝不「永不刷新」
   setInterval(function(){
-    if((Date.now() - _last) >= 4*60*60*1000){ _last = Date.now(); try{ location.reload(); }catch(e){} }
+    if((Date.now() - _last) >= 4*60*60*1000){ _last = Date.now(); try{ _hardReload(); }catch(e){} }
   }, 5*60*1000);
   // 🔴 2026-10-08 加固（小九）：原「递归 setTimeout(_tick)」单链驱动，一旦 _tick 抛异常未续排即永久不刷。
   //     改 setInterval 驱动 ⇒ 链断不死；后台标签 Chrome 会节流但仍每分钟跑一次，配合回前台补刷，
