@@ -3547,5 +3547,34 @@
     "message": "BACKTEST_TDX.js 更新于 2天前 02:47；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
+ },
+ {
+  "date": "2026-10-21",
+  "time": "02:37:27",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 121,
+   "warn": 1,
+   "fail": 1,
+   "limited": 1,
+   "info": 0,
+   "other": 0,
+   "total": 124
+  },
+  "warn_items": [
+   {
+    "id": "STOCK_STOP_DATA",
+    "name": "精确止损止盈",
+    "message": "更新于 昨日 06:24"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "all_SECTOR_YEAR_FLOW",
+    "name": "SECTOR_YEAR_FLOW",
+    "message": "SECTOR_YEAR_FLOW.js 更新于 2天前 17:43；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
