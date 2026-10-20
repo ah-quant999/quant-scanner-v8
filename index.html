@@ -692,7 +692,7 @@ window.__domReadyFns=[];
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
-    <script src="data/SECTOR_LEADERS.js?v=d26e4fadc5" defer></script><script src="data/NEW_ALGO_TRI.js?v=ac0ca579e1" defer></script><script src="data/NEW_ALGO_TRI_BACKTEST.js?v=d48e146357" defer></script><!-- 🆕 2026-10-19 三新算法（VCP/板块共振轮动/LHB机构跟随）+ 真实信号流回测 -->
+    <script src="data/SECTOR_LEADERS.js?v=d26e4fadc5" defer></script><script src="data/NEW_ALGO_TRI.js?v=021233669e" defer></script><script src="data/NEW_ALGO_TRI_BACKTEST.js?v=fcb26eb85a" defer></script><!-- 🆕 2026-10-19 三新算法（VCP/板块共振轮动/LHB机构跟随）+ 真实信号流回测 -->
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
     <script src="data/PORTFOLIO.js?v=ba89a37b6d" defer></script>
     <script>
@@ -1763,7 +1763,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/EXPERIMENT.js?v=1416b106f8" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=0b7412b7a8" defer></script><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=d8ed2d2305" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=18808cf0dd" defer></script>
+<script src="data/V8_POOL_TRACKER.js?v=dfff5fe3f2" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=dabc00bfa9" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=f87dacf44c" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
@@ -1772,7 +1772,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
-    <script src="data/FACTOR_LAB.js?v=a7def4740d" defer></script>
+    <script src="data/FACTOR_LAB.js?v=5506d4514f" defer></script>
 <!-- 🔴 2026-10-06 阿狸咪的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
 <script src="data/ETF_PULSE.js?v=c825df9a0a" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=d88bec3908" defer></script>
