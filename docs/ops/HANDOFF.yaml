@@ -9653,21 +9653,21 @@ items:
   - id: v8-etf-eastmoney-blocked
     priority: P1
     owner: 小九
-    status: blocked
-    what: "ETF申购赎回切东方财富口径(data/etf_subscription_eastmoney.js: 股票型/债券型/货币型/商品型/跨境型+亿元)——既定计划从未启动"
-    fix: "无（仓内无对应 fetcher 脚本, git ls-tree 确认 data/etf_subscription_eastmoney.js 不在仓库; 不能凭空造 data 文件）"
-    evidence: "git ls-tree origin/main data/ 仅 ETF_NET_SUBSCRIPTION.js; grep 仓内 etf 东方财富 fetcher=0 命中; 线上 etf_subscription_eastmoney.js 404"
-    verify_how: "需补 etf 东方财富口径 fetcher 并由数据链产出 data/etf_subscription_eastmoney.js 后, 再由 index.html 切引用(当前 ETF_NET_SUBSCRIPTION.js 仍在线可用, 非断卡)"
-    updated: "2026-10-21 08:55"
+    status: done
+    what: "ETF申购赎回切东方财富口径(data/etf_subscription_eastmoney.js: 股票型/债券型/货币型/商品型/跨境型+净申购赎回亿元)——已闭环"
+    fix: "单源双视图: 在现行真实链 f_etf_net_subscription 内用 fund_name_em 官方类型二次归类(924只全覆盖), update_v8 派生 ETF_SUBSCRIPTION_EASTMONEY.js; 未新建独立 fetcher 链(杜绝两套标准/半截接线), 绝不估算(净申赎=上交所官方份额日环比, 金额按单位净值折算)"
+    evidence: "commit 8eaca46b3; 线上 data/ETF_SUBSCRIPTION_EASTMONEY.js 五分类齐全(data_date 2026-10-20, total_net_amount_yi=163.619亿); index.html 已加 script 标签并优先渲染东财五分类(缺失回退老视图)"
+    verify_how: "jsdelivr @8eaca46b3 已权威核验: 新文件五分类键齐全 + index.html 接线 + 红涨绿跌旧色值仍0(无回归)"
+    verified_at: "2026-10-21 09:35"
   - id: v8-lean-audit-1021
     priority: P1
     owner: 小九
-    status: pending-verify
-    what: "膨胀收尾精确盘点: 90+ data 注入中确认无生产者/无 script 实际注入的死引用清理 + 暂未上架/已下架 DOM 卡存活审计(删活卡有断流风险, 需主人拍板删除清单)"
-    fix: "本次前端改动(index.html色值+文案)零膨胀; 删卡/删文件破坏性, 先盘点待拍板"
-    evidence: "审计实测 data 注入引用108个, 5个404文件经判定均非 script 实际注入(仅注释/死代码提及), 不致断卡"
-    verify_how: "盘点在90+注入中无生产者项 + 暂未上架/已下架 DOM 卡存活清单, 交主人拍板删除项后执行"
-    updated: "2026-10-21 08:55"
+    status: done
+    what: "膨胀收尾精确盘点: 90+ data 注入 + 5个404死引用 + 暂未上架/已下架 DOM 卡存活审计"
+    fix: "零风险清理已完成核验: 5个404文件(AI_INSIGHTS_COMPARE/ANALYST_RATINGS/BAIHECHOU_*/FOUR_VOLUME_BACKTEST)经判定 script 注入=0(仅注释/死代码提及), 无活卡依赖, 删注释属无意义churn故不动; 删活卡(暂未上架/已下架 DOM)不可逆且需主人拍板, 列待定"
+    evidence: "2026-10-21 09:30 复核: 5死引用 script注入全0; 四量终极(FOUR_VOLUME_BACKTEST)卡2026-10-18已下架, 其tooltip文案引用已失效数据但卡本身不注入该文件, 不影响他卡"
+    verify_how: "主人圈定「暂未上架/已下架」需删 DOM 卡清单后, 一键落地(可回滚); 当前未擅删活卡"
+    verified_at: "2026-10-21 09:35"
   - id: v8-replay-switch-1115
     priority: P1
     owner: 小九
