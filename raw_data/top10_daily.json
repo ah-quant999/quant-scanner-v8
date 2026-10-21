@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-22 06:25:13",
+  "update_time": "2026-10-22 07:15:13",
   "total_scored": 509,
   "count_80plus": 0,
   "max_score": 22.1,
@@ -11,28 +11,28 @@
     "confidence": "低",
     "market_trend": "unknown",
     "recommended_sectors": [
-      "中药",
-      "银行",
-      "保险",
-      "化学制药",
-      "医疗服务",
-      "通信设备",
-      "计算机设备",
-      "贵金属",
       "公用事业",
       "油气",
-      "半导体",
+      "贵金属",
+      "银行",
+      "通信设备",
+      "计算机设备",
+      "医疗服务",
+      "煤炭",
+      "化学制药",
       "通信运营",
-      "煤炭"
+      "半导体",
+      "中药",
+      "保险"
     ],
     "avoid_sectors": [
-      "通信设备",
-      "家用电器",
-      "白酒",
-      "电子元件",
       "食品饮料",
+      "通信设备",
+      "计算机",
+      "家用电器",
+      "电子元件",
       "半导体",
-      "计算机"
+      "白酒"
     ],
     "strategy_weights": {
       "triple_consensus": 1.0,
@@ -289,7 +289,7 @@
       "score_research": 3,
       "score_p4": 0,
       "score_p5": 0,
-      "win_rate": 37.6,
+      "win_rate": 37.2,
       "quality_grade": "A",
       "signals": {
         "chan": true,
@@ -597,7 +597,7 @@
       "score_research": 3,
       "score_p4": 0,
       "score_p5": 6,
-      "win_rate": 37.6,
+      "win_rate": 37.2,
       "quality_grade": "C",
       "signals": {
         "chan": true,
@@ -1227,7 +1227,7 @@
       "score_research": 1,
       "score_p4": -4,
       "score_p5": 6,
-      "win_rate": 37.6,
+      "win_rate": 37.2,
       "quality_grade": "C",
       "signals": {
         "chan": true,
