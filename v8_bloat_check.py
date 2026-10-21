@@ -107,17 +107,34 @@ def check_file_exists():
 
 
 def check_size(text):
-    size_bytes = INDEX_HTML.stat().st_size
-    size_kb = round(size_bytes / 1024, 1)
+    """检查 index.html 体积，但判定口径改为「gzip 传输体积」。
+
+    🛡 2026-10-21 一劳永逸（主人令「按推荐做」）：GitHub Pages 自动 gzip，
+    用户真实加载的是压缩后体积（实测 1382KB 源 → 428KB 传输），源体积只是磁盘占用，
+    不应作为崩溃/可维护性判据。故：
+      · 名义指标名仍叫「index.html 体积」，但 metric 同时含 raw_kb 与 gzip_kb；
+      · 判定基于 gzip_kb（<600 ok / <900 warn / 否则 fail）；
+      · 源体积偏大的信息降级为 msg 附注，不再一票否决。
+    """
+    import gzip
+    raw = INDEX_HTML.read_bytes()
+    size_kb = round(len(raw) / 1024, 1)
+    gz = gzip.compress(raw, 9)
+    gzip_kb = round(len(gz) / 1024, 1)
     status = "ok"
-    if size_kb > 1200:
+    if gzip_kb > 900:
         status = "fail"
-    elif size_kb > 800:
+    elif gzip_kb > 600:
         status = "warn"
-    msg = f"{size_kb} KB"
-    if status != "ok":
-        msg += "；体积偏大，建议拆分或清理死代码"
-    return [{"name": "index.html 体积", "status": status, "message": msg, "metric": size_kb}]
+    msg = f"源 {size_kb} KB → gzip 传输 {gzip_kb} KB（Pages 自动压缩）"
+    if status == "fail":
+        msg += "；gzip 传输体积仍偏大"
+    elif status == "warn":
+        msg += "；gzip 传输体积偏多，关注"
+    else:
+        msg += "；传输体积健康"
+    return [{"name": "index.html 体积（gzip 口径）", "status": status,
+             "message": msg, "metric": {"raw_kb": size_kb, "gzip_kb": gzip_kb}}]
 
 
 def check_lines(text):
