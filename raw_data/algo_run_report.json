@@ -1,17 +1,8 @@
 {
-  "update_time": "2026-10-21 19:49:35",
-  "run_start": "2026-10-21 19:11:12",
-  "ok": 18,
-  "fail": 2,
-  "failed_scripts": [
-    {
-      "script": "v8/factor_lab_gen.py",
-      "reason": "退出码 1 | logout failed!"
-    },
-    {
-      "script": "backtest_expectancy.py",
-      "reason": "监督器静默杀(>15min 无输出)"
-    }
-  ],
+  "update_time": "2026-10-21 20:25:59",
+  "run_start": "2026-10-21 20:19:18",
+  "ok": 1,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }
