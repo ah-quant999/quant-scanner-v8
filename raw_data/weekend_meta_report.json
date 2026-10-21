@@ -1,13 +1,15 @@
 {
-"update_time": "2026-10-21 21:40:12",
-"total": 8037,
+"update_time": "2026-10-21 23:32:46",
+"total": 8036,
 "new_listings_count": 0,
-"delisted_count": 0,
+"delisted_count": 1,
 "new_listings": [],
-"delisted": [],
+"delisted": [
+"08047 中国海洋发展"
+],
 "meta_enriched": 0,
 "guard_tripped": false,
 "guard_reasons": [],
 "old_universe": 8037,
-"fresh_universe": 8037
+"fresh_universe": 8036
 }

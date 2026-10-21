@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-10-21 21:40:14",
-  "generated": "2026-10-21 21:40:14",
+  "update_time": "2026-10-21 23:32:47",
+  "generated": "2026-10-21 23:32:47",
   "period_start": "2026-10-12",
   "period_end": "2026-10-18",
   "stats": {
@@ -16,42 +16,42 @@
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-10-21 20:28:04",
+      "update_time": "2026-10-21 22:45:27",
       "size_kb": 24.7
     },
     {
       "file": "top10_daily.json",
       "label": "TOP10推荐池",
       "status": "ok",
-      "update_time": "2026-10-21 21:22:09",
-      "size_kb": 36.2
+      "update_time": "2026-10-21 23:14:38",
+      "size_kb": 36.1
     },
     {
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-10-21 20:34",
-      "size_kb": 106.7
+      "update_time": "2026-10-21 22:15",
+      "size_kb": 106.9
     },
     {
       "file": "final_recommend.json",
       "label": "最终推荐池",
       "status": "ok",
-      "update_time": "2026-10-21 20:25:55",
-      "size_kb": 36.7
+      "update_time": "2026-10-21 22:17:09",
+      "size_kb": 36.5
     },
     {
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-10-21 21:21:38",
+      "update_time": "2026-10-21 23:14:26",
       "size_kb": 2120.7
     },
     {
       "file": "candidate.json",
       "label": "候选池",
       "status": "ok",
-      "update_time": "2026-10-21 20:38:13",
+      "update_time": "2026-10-21 21:28:17",
       "size_kb": 436.9
     }
   ],

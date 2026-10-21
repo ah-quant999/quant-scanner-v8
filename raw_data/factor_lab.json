@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-10-21 09:00:05",
-  "data_date": "2026-10-20",
+  "update_time": "2026-10-21 23:06:03",
+  "data_date": "2026-10-21",
   "meta": {
-    "data_date": "2026-10-20",
+    "data_date": "2026-10-21",
     "close_semantics": "⚠️ 记录里的 close 是「上次算到这只票那天」的快照（roe 按季 asof_q / abn 按月 asof_ym 缓存），**不是当日报价**；需要当日价请查 STOCK_QUOTE.js 或 CANDIDATE_QUOTES.js。同时看 close_date 字段。",
     "liquid_def": "liquid=false 表示最新K线日 != 数据日 或 当月换手率为 0（停牌/零成交），已从榜单剔除",
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
-    "n_universe": 588,
-    "n_at_valid": 1054,
+    "n_universe": 821,
+    "n_at_valid": 1067,
     "n_roe_large": 657,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
@@ -448,18 +448,6 @@
         "asof_ym": "2026-10"
       },
       {
-        "code": "sh.688026",
-        "name": "洁特生物",
-        "close": 21.21,
-        "close_date": "2026-09-11",
-        "liquid": true,
-        "abn": 1.663,
-        "factor_at": -1.6626,
-        "roe_ttm": null,
-        "size_proxy": 1135798983.1,
-        "asof_ym": "2026-09"
-      },
-      {
         "code": "sz.000930",
         "name": "中粮科技",
         "close": 5.88,
@@ -472,28 +460,40 @@
         "asof_ym": "2026-09"
       },
       {
-        "code": "sz.300311",
-        "name": "任子行",
-        "close": 6.32,
-        "close_date": "2026-09-14",
+        "code": "sh.688026",
+        "name": "洁特生物",
+        "close": 24.46,
+        "close_date": "2026-10-21",
         "liquid": true,
-        "abn": 1.476,
-        "factor_at": -1.4756,
+        "abn": 1.555,
+        "factor_at": -1.5548,
         "roe_ttm": null,
-        "size_proxy": 2344174346.5,
-        "asof_ym": "2026-09"
+        "size_proxy": 1399036714.4,
+        "asof_ym": "2026-10"
       },
       {
-        "code": "sz.000513",
-        "name": "丽珠集团",
-        "close": 32.23,
-        "close_date": "2026-09-29",
+        "code": "sz.300110",
+        "name": "华仁药业",
+        "close": 2.86,
+        "close_date": "2026-10-21",
         "liquid": true,
-        "abn": 1.452,
-        "factor_at": -1.4518,
+        "abn": 1.542,
+        "factor_at": -1.5424,
         "roe_ttm": null,
-        "size_proxy": 5695817191.3,
-        "asof_ym": "2026-09"
+        "size_proxy": 2013402875.4,
+        "asof_ym": "2026-10"
+      },
+      {
+        "code": "sh.600081",
+        "name": "东风科技",
+        "close": 10.02,
+        "close_date": "2026-10-21",
+        "liquid": true,
+        "abn": 1.478,
+        "factor_at": -1.4778,
+        "roe_ttm": null,
+        "size_proxy": 1310078827.3,
+        "asof_ym": "2026-10"
       }
     ]
   },
