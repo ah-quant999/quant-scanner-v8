@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 161
+  next_id_seq: 162
 items:
   - id: selfalgo-audit-fix-1019
     owner: 小九的工程师
@@ -9677,3 +9677,12 @@ items:
     evidence: "index.html:1900-1901 已挂账 HANDOFF; 回放卡徽章诚实标注(回放口径·非真实信号流)"
     verify_how: "摘除后复读 tip: FINAL_RECOMMEND_REPLAY 引用计数=0, 真实流 FINAL_RECOMMEND_DATA 仍生效"
     updated: "2026-10-21 08:55"
+  - id: lhb-follow-scientific-gate-1021
+    priority: P1
+    owner: 小九
+    status: done
+    what: "龙虎榜机构跟随(LHB)科学判定收口: 回测链三修复+442信号敏感性+闸门阈值语义修正+记分卡接线恢复"
+    fix: "①gen_new_algo_tri.py 三修复(信号K线不足剔除/档案回填/真实取价) ②data_source_gtimg.py min_bars透传 ③gen_backtest_all_algos.py ADMIT_MAX_WORST_TRADE 语义由 max_drawdown 修正为单笔尾部 worst_return ④新建 v8/algo_gate_thresholds.py 双向闸门阈值单一权威源 ⑤gen_algo_scorecard.py 接入阈值源 ⑥scorecard接线以远端tip 5b7135f229f 为底合并恢复(21:01/21:16夜班提交曾静默覆盖)"
+    evidence: "commit 63e8d508d63; 442信号(2026-06-10~10-20扣双边0.3%)敏感性: T+1 +0.66%(415样本/47.7%胜率) T+3 -0.09% T+5 -1.78%(407/42.8%) T+10 -5.70% T+20 -13.88%, 10变体无稳健正超额; 全链回测真实信号流(06:36-06:41修复后代码重跑): 龙虎机构T+5 n=407 wr=42.8% ar=-2.54% 超额-1.85% ⇒ gate=demote_candidate; 强势跟踪T+45 n=57 wr=87.7% ar=24.28% 超额23.24% gate=admit; audit 15/15; 四戳与数据文件中性sha1逐一对符(4bee7ce35b/0eb2b5e2a2/9e26e8c201/a1387c59a2)"
+    verify_how: "jsdelivr @63e8d508d63 硬验全过: algo_gate_thresholds.py 在站(ADMIT_MAX_WORST_TRADE=-15) + ALGO_SCORECARD 龙虎机构 gate=demote_candidate + index四新戳在站 + scorecard接线三件套 + 阿狸咪外链CSS保留"
+    verified_at: "2026-10-22 06:50"
