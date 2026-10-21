@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-21 05:43:06",
+  "update_time": "2026-10-21 09:49:50",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -12,7 +12,7 @@
     "10/21"
   ],
   "columns": 30,
-  "cycle_count": 17,
+  "cycle_count": 18,
   "cycles": [
     {
       "sector": "AI算力",
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 236,
       "peak_date": "09/08",
-      "total": 2637,
+      "total": 2628,
       "ongoing": true
     },
     {
@@ -63,7 +63,7 @@
       "hot_days": 24,
       "peak": 17,
       "peak_date": "09/03",
-      "total": 235,
+      "total": 228,
       "ongoing": true
     },
     {
@@ -89,7 +89,7 @@
       "hot_days": 28,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 249,
+      "total": 248,
       "ongoing": true
     },
     {
@@ -154,7 +154,7 @@
       "hot_days": 20,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 276,
+      "total": 273,
       "ongoing": true
     },
     {
@@ -212,14 +212,14 @@
     {
       "sector": "军工",
       "start": "10/14",
-      "end": "10/21",
+      "end": "10/20",
       "start_idx": 24,
-      "end_idx": 29,
-      "days": 6,
-      "hot_days": 5,
+      "end_idx": 28,
+      "days": 5,
+      "hot_days": 4,
       "peak": 9,
       "peak_date": "10/19",
-      "total": 25,
+      "total": 22,
       "ongoing": true
     },
     {
@@ -232,7 +232,20 @@
       "hot_days": 5,
       "peak": 6,
       "peak_date": "10/15",
-      "total": 26,
+      "total": 25,
+      "ongoing": true
+    },
+    {
+      "sector": "通信设备",
+      "start": "10/21",
+      "end": "10/21",
+      "start_idx": 29,
+      "end_idx": 29,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 3,
+      "peak_date": "10/21",
+      "total": 3,
       "ongoing": true
     }
   ]
