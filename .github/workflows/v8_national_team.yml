@@ -1,0 +1,113 @@
+# 九宝量化 v8.0 — 「国家队活跃度」卡数据生成器调度（云端 ubuntu）
+#
+# 2026-10-21 主人令：新卡放「暂未上架」（盘前预案之后）。
+# 2026-10-22 主人令「确认两新卡都是日更且有定时任务跟踪」：本链即国家队活跃度的
+#   **真实定时任务**（此前只有 10-21 20:19 一次手动跑，登记表里的 16:40 是空头声明，
+#   且那个时点 SECTOR_FUND_FLOW 当日盘后数据根本还没落盘——已按真实链序校准）。
+#
+# 时点：工作日 20:50 CST（UTC 12:50）。选此点三条理由：
+#   ① 数据就绪：主力抓取链 19:20 post_close 档实测约 20:33 把当日 SECTOR_FUND_FLOW
+#      推上 main（17:20/18:20 档为前置兜底），20:50 checkout 即为当日盘后数据；
+#   ② 无 runner 竞争：本链纯本地计算（三个 data/*.js 源，零网络），放 ubuntu-latest
+#      不占 [self-hosted, cn]（20:30 大基金链 / 21:00 算法链唤醒都在那台）；
+#   ③ 与 20:30 大基金链、21:00 算法链错开，降低推仓竞争。
+#
+# 防假新鲜双闸门（生成器内，2026-10-22 配套）：
+#   ① 盘后新鲜度：C 源（SECTOR_FUND_FLOW）update_time 必须是今日 ≥16:00，否则
+#      上游链未跑完/失败 ⇒ 不写盘、保留线上旧卡（宁缺勿错，看板 ✓/✗ 自然显形）；
+#   ② 同源去重：三源 update_time 均未变 ⇒ 上游无新数据 ⇒ 不写盘（免空推 + 防
+#      「回测/资金流链失败日靠刷新 update_time 冒充更新」）。
+#   应急口子：NT_FORCE=1 跳过闸门①（workflow_dispatch 手动补算用）。
+#
+# 空提交保护：v8_build_deploy 的 push.paths 含 data/** ⇒ 每推一次触发全量重建（~8min）。
+#   推送前先比对线上 blob（scripts/card_need_push.py），逐字节相同即 SKIP。
+name: "🏛️ v8 国家队活跃度生成器 (云端)"
+
+on:
+  schedule:
+    - cron: '50 12 * * 1-5'   # 北京 20:50 工作日（UTC 12:50，同日不错位）
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "应急手动调用时绕过盘后新鲜度闸门（true 仅供非盘后时段补算/冒烟）"
+        required: false
+        type: choice
+        options:
+          - "false"
+          - "true"
+        default: "false"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-national-team
+  cancel-in-progress: false
+
+jobs:
+  national-team:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: "📥 Checkout（默认深度即取 main 最新 tip；只读文件 + Contents API 推送，无需 git 操作）"
+        uses: actions/checkout@v4
+
+      - name: "🏛️ 跑 gen_national_team.py（产出 data/NATIONAL_TEAM.js）"
+        id: gen
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          # weekend gate only — holiday triggers are harmless no-ops (the generator's
+          # post-close freshness gate will keep the online card untouched anyway).
+          dow=$(date +%u)
+          if [ "$dow" -ge 6 ]; then echo "[skip] weekend, exit ok"; exit 0; fi
+          if [ "${{ github.event.inputs.force || 'false' }}" = "true" ]; then
+            echo "[force] NT_FORCE=1 — bypass post-close freshness gate"
+            export NT_FORCE=1
+          fi
+          python v8/gen_national_team.py
+          rc=$?
+          if [ "$rc" -ne 0 ]; then
+            echo "::error title=v8-national-team(exit=$rc)::🏛️ 国家队活跃度生成失败（退出码 $rc）。线上卡将沿用上一版；若连续多日失败请检查数据源（etf_subscription / SECTOR_RS / SECTOR_FUND_FLOW）就绪情况。"
+            exit 1
+          fi
+          if [ ! -f data/NATIONAL_TEAM.js ]; then
+            echo "::error title=v8-national-team(no-output)::🏛️ 未产出 data/NATIONAL_TEAM.js"
+            exit 1
+          fi
+          echo "[ok] data/NATIONAL_TEAM.js ready"
+
+      - name: "🔍 内容比对（相同则 SKIP，防空提交触发全量重建）"
+        id: diff
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          out=$(python scripts/card_need_push.py data/NATIONAL_TEAM.js 2>&1)
+          echo "$out"
+          if echo "$out" | grep -q 'NEED_PUSH=1'; then echo "need=1" >> "$GITHUB_OUTPUT"; else echo "need=0" >> "$GITHUB_OUTPUT"; fi
+
+      - name: "📤 推送 data/NATIONAL_TEAM.js（api_put_file.py）"
+        if: always()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          if [ "${{ steps.diff.outputs.need }}" != "1" ]; then
+            echo "[skip] content identical to remote (or gate kept the old card); no push"
+            exit 0
+          fi
+          python scripts/api_put_file.py data/NATIONAL_TEAM.js "data: national team activity refresh ($(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') CST)"
+          rc=$?
+          if [ "$rc" -ne 0 ]; then
+            echo "::error title=v8-national-team(push-failed)::📤 data/NATIONAL_TEAM.js 推送失败（非阻塞，下一轮补推）。"
+            exit 1
+          fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 链路备忘（2026-10-22 阿狸咪的工程师）：
+#   推送后 index.html 的 ?v 由 v8_cache_buster_reconcile（监听 data/** push）自动对齐。
+#   前端「暂未上架」页卡体徽章行显示「📅 数据日 · 已更新」；卡头显示「已更新 MM-DD HH:MM」。
+# ─────────────────────────────────────────────────────────────────────────────
