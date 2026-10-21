@@ -1236,8 +1236,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      故不再注入 AI_INSIGHTS_COMPARE 数据文件（文件本身连同 fetcher 一并从仓库删除）。 -->
 <script src="data/WAVE_ELLIOTT.js?v=f76f284560" defer></script>
 <script src="data/SZ_FIB.js?v=48e44f50a2" defer></script>
-<script src="data/SECTOR_RS.js?v=7a31b3a154" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=11ed89f5a4" defer></script>
+<script src="data/SECTOR_RS.js?v=4c9a848eb4" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=323985b492" defer></script>
 <script src="data/INST_TRADE.js?v=28fdd272c4" defer></script>
 <script src="data/NORTH_FUND.js?v=81d753b48b" defer></script>
 <script src="data/MARKET_ALERTS.js?v=ba7e085676" defer></script>
@@ -1260,7 +1260,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/EXPERIMENT.js?v=d7f9d343dc" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=20c520aa5c" defer></script><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=eb13abea9c" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=da63c38ccc" defer></script>
+<script src="data/V8_POOL_TRACKER.js?v=45da7c6d90" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=c94cab9770" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=b4f0662c45" defer></script>
 <!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日08:40派发；19:16 首跑真实数据） -->
@@ -1276,7 +1276,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 🔴 2026-10-06 阿狸咪的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
 <script src="data/ETF_PULSE.js?v=87b2078443" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=8f41ca2e78" defer></script>
-<script src="data/TOP10_DAILY.js?v=44956c4e77" defer></script>
+<script src="data/TOP10_DAILY.js?v=6d54257318" defer></script>
 <!-- 🆕 2026-10-21 主人令「要」：最强共振·回测跟踪（track_resonance.py 每日重算 raw_data/resonance_track.json → update_v8 转换） -->
 <script src="data/RESONANCE_TRACK.js?v=74e138c8c5" defer></script>
 <script src="data/WEEKEND_RUN.js?v=5d34a8234c" defer></script>
@@ -1292,7 +1292,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RUNNER_STATUS.js?v=2c5ae6a031" defer></script>
 <script src="data/HB_XIAOJIU.js?v=4700b9031a" defer></script>
     <script src="data/AUDIT_TRAIL.js?v=8c9d7d2cda" defer></script>
-<script src="data/HEALTH_CHECK.js?v=c6f67fca0a" defer></script>
+<script src="data/HEALTH_CHECK.js?v=fceb6433fa" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=c2151dc4e1" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=e9d59a5172" defer></script>
@@ -18818,7 +18818,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=a631e850c4', fallbacks:[A2_CDN+'STOCK_LIST.js']},
     {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=c17dcab523', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
-    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=b6d954b3f5', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
+    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=4ea4ac0128', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
     var srcs=[item.url].concat(item.fallbacks||[]);
