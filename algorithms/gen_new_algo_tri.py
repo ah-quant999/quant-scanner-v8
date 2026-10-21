@@ -11,6 +11,10 @@ gen_new_algo_tri.py — 三新算法生成器（主人 2026-10-19 批准「都�
   ② 板块资金共振轮动（板块级）：行业资金流(连续流入天数/net_5d/20d) ×
      SECTOR_RS(相对强度) × 涨停热力(扩散度) × SECTOR_LEADERS(龙头) 四源共振，
      输出「周期定位（吸筹/启动/主升/退潮）+ 龙头组合」。
+     🆕 2026-10-21 主人令「链路闭环」：非主升/启动板块（sector_leaders 不覆盖）
+     自动补**代理龙头**（同花顺行业成分当日涨幅前3，东财行业板块/NeoData 副援），
+     产物标 leaders_src 与真实龙头区分；修复 rotation 回测 rot_codes 零样本
+     （原病灶：信号全是吸筹/观察行业 ⇒ leaders 恒空 ⇒ 回测归档零交集）。
      「板块资金趋势」卡只展示资金数据，无周期判定/无龙头 ⇒ 不重叠。
   ③ 龙虎榜·机构跟随（个股事件）：LHB 机构席位净买 ≥3000万 的跟随榜单，
      分「顺势跟随/逆势接货」两档。「机游共振」卡是日历统计视角，
@@ -28,6 +32,7 @@ import os
 import re
 import sys
 import glob
+import time
 import bisect
 import time
 import argparse
@@ -267,6 +272,89 @@ def scan_vcp(limit=None):
 
 
 # ══════════════════════════════════════════════════════════════
+# 🆕 2026-10-21 主人令「链路闭环」：rotation 代理龙头引擎
+#   病灶实证：sector_leaders.json 只覆盖主升/启动板块（2026-10-21 全市场仅
+#     「厨卫电器」1 个），而 rotation 信号经 RS 闸门后全是同花顺行业名且多为
+#     吸筹/观察 ⇒ leaders 恒空 ⇒ _tri_run_backtest 的 rot_codes 零样本
+#     ⇒ 上线 3 天回测空表（主人令「后两个算法为什么没有真实回测数据」）。
+#   修法：复用 scripts/fetch_sector_leaders.py 同款取数设施（不另起炉灶）——
+#     ① 同花顺行业成分：ths_industry_cache 行业名→代码（缓存 90 个，今日 6 个
+#        信号板块 6/6 命中）+ 详情页涨幅降序名单 + 腾讯行情补 chg；
+#     ② 东财行业板块在线：fetch_em_boards → _resolve_bk → fetch_cons_safe
+#        （其内含成员名单缓存 + 腾讯行情两层兜底）；
+#     ③ NeoData「板块成分明细」末援（东财全断日）。
+#   产物标记 leaders_src='proxy(...)'，与真实龙头（sector_leaders）区分，绝不混算；
+#   任何一层失败返回 ([], '')，该板块 leaders 留空——不编造。
+# ══════════════════════════════════════════════════════════════
+ROT_PROXY_MAX = 6           # 每轮最多代理 enriched 板块数（按 score 降序，防网络预算爆）
+ROT_PROXY_BUDGET_SEC = 90   # 代理龙头总时间预算（东财/同花顺全断日不拖死 B 批）
+
+
+def _rot_proxy_engine():
+    """懒加载代理龙头引擎。返回 fetch(name) -> (rows, src)；
+    rows=[{code,name,chg,price}] 涨幅降序；失败 ([], '')。任何异常绝不外抛。"""
+    def _dead(_n):
+        return [], ""
+
+    try:
+        _sp = str(ROOT / "scripts")
+        if _sp not in sys.path:
+            sys.path.insert(0, _sp)
+        import fetch_sector_leaders as fsl
+    except Exception as e:
+        print("  ⚠️ 代理龙头引擎加载失败（%s）—— 本轮无代理龙头" % str(e)[:80])
+        return _dead
+
+    _t0 = time.time()
+    _n = [0]
+    _boards = [None]
+
+    def _em_boards():
+        if _boards[0] is None:
+            try:
+                _boards[0] = fsl.fetch_em_boards()
+            except Exception:
+                _boards[0] = ({}, {})
+        return _boards[0]
+
+    def _fetch(name):
+        if _n[0] >= ROT_PROXY_MAX or (time.time() - _t0) >= ROT_PROXY_BUDGET_SEC:
+            return [], ""
+        # ① 同花顺行业成分（rotation 名即同花顺行业名）
+        try:
+            members = fsl._ths_members_by_name(name)
+            if members:
+                try:
+                    rows = fsl._tx_cons(members)
+                except Exception:
+                    # 腾讯行情不可用：详情页本身已按涨幅降序，chg 留空不编造
+                    rows = [{"code": m.get("code"), "name": m.get("name"),
+                             "chg": None, "price": None} for m in members]
+                if rows:
+                    _n[0] += 1        # 闸门按**成功 enriched 数**计：取数失败的
+                    return rows, "ths"   # 板块不占额度，不饿死后面能成的板块
+        except Exception as e:
+            print("  ⚠️ 代理龙头(ths) %s: %s" % (name, str(e)[:60]))
+        # ② 东财行业板块在线（fetch_cons_safe 内含名单缓存 + 腾讯兜底）
+        try:
+            exact, norm = _em_boards()
+            bk, how = fsl._resolve_bk(name, exact, norm)
+            if bk:
+                try:
+                    rows = fsl.fetch_cons_safe(bk)
+                except Exception:
+                    rows = fsl._neo_cons(name)   # ③ NeoData 末援
+                if rows:
+                    _n[0] += 1
+                    return rows, "em:" + (how or "exact")
+        except Exception as e:
+            print("  ⚠️ 代理龙头(em) %s: %s" % (name, str(e)[:60]))
+        return [], ""
+
+    return _fetch
+
+
+# ══════════════════════════════════════════════════════════════
 # ② 板块资金共振轮动
 # ══════════════════════════════════════════════════════════════
 def calc_rotation():
@@ -319,14 +407,17 @@ def calc_rotation():
         lead_score = 10.0 if lead else 0.0
         score = flow_score + rs_score + heat_score + lead_score
         leaders = []
+        leaders_src = ""
         if lead:
             for L in (lead.get("leaders") or [])[:3]:
                 leaders.append({"name": L.get("name"), "chg": L.get("chg"), "code": L.get("code")})
+            leaders_src = "sector_leaders"
         rows.append({
             "sector": name, "type": sec.get("type", ""), "stage": stage,
             "consecutive_days": cons, "net_5d": net5, "net_20d": net20,
             "rs_5d": p5, "rs_20d": p20, "rs_60d": p60,
             "heat_5d": h5, "score": round(score, 1), "leaders": leaders,
+            "leaders_src": leaders_src,
         })
 
     for sec in (sf.get("sectors_in") or []):
@@ -335,6 +426,23 @@ def calc_rotation():
     for sec in (sf.get("sectors_out") or []):
         handle(sec, "out")
     rows.sort(key=lambda x: -x["score"])
+    # 🆕 2026-10-21 主人令「链路闭环」：无真实龙头的信号板块（吸筹/观察/退潮等，
+    #   sector_leaders 只覆盖主升/启动）补**代理龙头**——同花顺行业成分当日涨幅前 3
+    #   （rotation 名即同花顺行业名）+ 东财行业板块副援；标记 leaders_src='proxy(...)'
+    #   与真实龙头区分，前端卡面同标「（代理）」。只 enrichment 上榜 items（rows[:12]，
+    #   与 _tri_run_backtest 的 rot_codes 取数范围一致），按 score 降序、条数/时间
+    #   双闸门（_rot_proxy_engine）。全失败该板块 leaders 留空——不编造。
+    _need = [r for r in rows[:12] if not r.get("leaders")]
+    if _need:
+        _proxy = _rot_proxy_engine()
+        for r in _need:
+            prows, src = _proxy(r.get("sector") or "")
+            if prows:
+                r["leaders"] = [{"name": x.get("name"), "chg": x.get("chg"),
+                                 "code": x.get("code")} for x in prows[:3]]
+                r["leaders_src"] = "proxy(%s)" % (src or "?")
+                print("  🔗 代理龙头 %s → %s" % (
+                    r["sector"], "、".join(str(x.get("name")) for x in prows[:3])))
     return {"count": len(rows), "items": rows[:12]}
 
 
