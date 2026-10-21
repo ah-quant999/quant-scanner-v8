@@ -1264,7 +1264,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/IMA_STRONG_STOCK.js?v=c94cab9770" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=b4f0662c45" defer></script>
     <script src="data/ALGO_SCORECARD.js?v=a1387c59a2" defer></script>
-<!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日08:40派发；19:16 首跑真实数据） -->
+<!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日07:50派发；10-21 19:16 首跑真实数据） -->
 <script src="data/MORNING_PLAN.js?v=1c8b576937" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=ac89e9fd7b" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
@@ -12146,10 +12146,10 @@ function drawUpDownChart(){
 
 
           {name:'强势跟踪水源(v8_ima_strong_stock)', source:'IMA_STRONG_STOCK', freq:'工作日15:45', slots:['15:45'], note:'ima 短线情绪选股'},
-          {name:'国家队活跃度(v8_national_team)', source:'NATIONAL_TEAM', freq:'工作日16:40', slots:['16:40'], note:'暂未上架·托盘代理信号'},
-          {name:'算法记分卡(v8_algo_scorecard)', source:'ALGO_SCORECARD', freq:'工作日06:10', slots:['06:10'], note:'暂未上架·全链回测真实信号流聚合'},
+          {name:'国家队活跃度(v8_national_team)', source:'NATIONAL_TEAM', freq:'工作日20:50', slots:['20:50'], note:'暂未上架·托盘代理信号'},
+          {name:'算法记分卡(v8_algo_scorecard)', source:'ALGO_SCORECARD', freq:'工作日08:25', slots:['08:25'], note:'暂未上架·全链回测真实信号流聚合'},
 
-          {name:'盘前预案(v8_morning_plan)', source:'MORNING_PLAN', freq:'工作日08:40', slots:['08:40'], note:'暂未上架·观测类·首卡'},
+          {name:'盘前预案(v8_morning_plan)', source:'MORNING_PLAN', freq:'工作日07:50', slots:['07:50'], note:'暂未上架·观测类·首卡'},
 
           {name:'龙虎榜抓取(v8_lhb_fetch)', source:'LHB_DATA', freq:'工作日17:30', slots:['17:30'], note:'共振日历水源'},
 
@@ -15532,7 +15532,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
 
 
     // ═══ 📋 2026-10-21 主人令：「这个新卡啊，我让你放暂未上架顶部」——盘前预案卡（观测类首卡）═══
-    //   数据 window.MORNING_PLAN（data/MORNING_PLAN.js ← v8/gen_morning_plan.py，工作日 08:40 派发）。
+    //   数据 window.MORNING_PLAN（data/MORNING_PLAN.js ← v8/gen_morning_plan.py，工作日 07:50 派发）。
     //   口径：色条矩阵（可执行/相对占优/有条件·待确认/风险·回避/验证变量·方法论，规则自动生成）
     //         + 大盘预判/主线策略/回避清单 三栏。全部条目带真实数字；源缺失 ⇒ 显「数据未就绪」，绝不伪造。
     //   无数据 ⇒ 整卡 display:none（不产空壳卡）；600ms×30 自愈轮询（同 _fillSectorYearFlow 范式）。
@@ -15614,7 +15614,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     };
 
     // ═══ 🏛️ 2026-10-21 主人令：「国家队活跃度」复合信号卡（暂未上架·盘前预案之后）═══
-    //   数据 window.NATIONAL_TEAM（data/NATIONAL_TEAM.js ← v8/gen_national_team.py，工作日 16:40 盘后派发）。
+    //   数据 window.NATIONAL_TEAM（data/NATIONAL_TEAM.js ← v8/gen_national_team.py，工作日 20:50 盘后派发）。
     //   口径：3 子信号加权代理推算（宽基ETF净申购45% + 大金融相对强度35% + 大金融资金净流入20%），
     //         缺失子项权重按比例重分；汇金季报环比 v8 无源 ⇒ 永远「未接入」仅占位说明。
     //   无数据 ⇒ 整卡 display:none（不产空壳卡）；600ms×30 自愈轮询（同 __renderMorningPlan 范式）。
@@ -15639,6 +15639,11 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         }
         function _e(s){ return (s===null||s===undefined||s==='') ? '—' : s; }
         var h = '';
+        /* ── 头部徽章行（数据日 + 已更新；对齐盘前预案范式·09-23 防假新鲜口径） ── */
+        h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
+        h += '<span style="font-size:10px;color:#a78bfa;font-weight:600;background:rgba(167,139,250,.14);padding:1px 7px;border-radius:4px;">试运行</span>';
+        h += '<span style="font-size:11.5px;color:var(--dim);">📅 数据日 '+_e(D.data_date||'—')+' · 已更新 '+_e(D.update_time||'—')+'</span>';
+        h += '</div>';
         var sc = (D.score === null || D.score === undefined) ? '—' : Number(D.score).toFixed(1);
         var vc = D.verdict_color || '#38bdf8';
         h += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px;">'
@@ -15662,7 +15667,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         }
         body.innerHTML = h;
         var _fr = document.getElementById('nationalTeamFresh');
-        if(_fr){ try{ if(typeof setBadge === 'function'){ setBadge('nationalTeamFresh','盘后','超短', D.update_time || ''); } else { _fr.textContent = '更新于 ' + _e((D.update_time||'').slice(5,16)); } }catch(e){ _fr.textContent = '更新于 ' + _e((D.update_time||'').slice(5,16)); } }
+        if(_fr) _fr.textContent = '已更新 ' + _e((D.update_time||'').slice(5,16));
         card.style.display = 'block';
       }catch(e){ console.warn('[renderNationalTeam]', e); }
     };
@@ -15702,6 +15707,11 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
           return '';
         }
         var h = '';
+        /* ── 头部徽章行（数据日 + 已更新；对齐盘前预案范式·09-23 防假新鲜口径） ── */
+        h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
+        h += '<span style="font-size:10px;color:#f59e0b;font-weight:600;background:rgba(245,158,11,.14);padding:1px 7px;border-radius:4px;">试运行</span>';
+        h += '<span style="font-size:11.5px;color:var(--dim);">📅 数据日 '+_e(D.data_date||'—')+' · 已更新 '+_e(D.update_time||'—')+'</span>';
+        h += '</div>';
         // 🎯💡⚠ 核心结论/用法/限制 —— 置卡名下方（2026-10-21 主人定式，同国家队活跃度卡）
         h += '<div style="font-size:12px;color:var(--sub);line-height:1.85;margin:2px 0 10px;padding:8px 10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">'
            + '<div style="margin-bottom:4px;"><b style="color:#fbbf24;">&#x1F4CC; 核心：</b><b style="color:var(--txt);">' + _e(D.oneline) + '</b></div>'
@@ -15749,7 +15759,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         }
         body.innerHTML = h;
         var _fr = document.getElementById('scorecardFresh');
-        if(_fr){ try{ if(typeof setBadge === 'function'){ setBadge('scorecardFresh','盘后','超短', D.update_time || ''); } else { _fr.textContent = '更新于 ' + _e((D.update_time||'').slice(5,16)); } }catch(e){ _fr.textContent = '更新于 ' + _e((D.update_time||'').slice(5,16)); } }
+        if(_fr) _fr.textContent = '已更新 ' + _e((D.update_time||'').slice(5,16));
         card.style.display = 'block';
       }catch(e){ console.warn('[renderAlgoScorecard]', e); }
     };
@@ -15934,34 +15944,34 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
 //   概念ETF龙头参考
 h += '<div id="ulPaneObserve" style="display:block;">';
 // ═══ 📋 2026-10-21 主人令：「这个新卡啊，我让你放暂未上架顶部」——盘前预案（观测类首卡·置顶）═══
-//   数据 window.MORNING_PLAN（data/MORNING_PLAN.js ← v8/gen_morning_plan.py，工作日 08:40 派发；
+//   数据 window.MORNING_PLAN（data/MORNING_PLAN.js ← v8/gen_morning_plan.py，工作日 07:50 派发；
 //   2026-10-21 19:16 首跑真实数据）。色条矩阵 + 大盘预判/主线策略/回避清单 三栏，全规则生成。
 //   无数据 ⇒ 整卡保持 display:none（不产空壳卡）；填充见 window.__renderMorningPlan（600ms×30 自愈）。
 h += '<div class="card" id="morningPlanCard" style="display:none;margin-bottom:16px;border-left:4px solid #38bdf8;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#38bdf8;">&#x1F4CB; 盘前预案</span>'
    + '<span class="fresh" id="morningPlanFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 工作日 08:40 派发</span></div>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 工作日 07:50 派发</span></div>'
    + '<div id="morningPlanBody"><div class="note">加载中&#x2026;</div></div>'
    + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 全部条目由规则从真实数据自动生成，<b style="color:#fbbf24">非人工观点、不构成投资建议</b>。</div></div>';
 // ═══ 🏛️ 2026-10-21 主人令：「国家队活跃度」复合信号卡（暂未上架·盘前预案之后）═══
-//   数据 window.NATIONAL_TEAM（data/NATIONAL_TEAM.js ← v8/gen_national_team.py，工作日 16:40 盘后派发）。
+//   数据 window.NATIONAL_TEAM（data/NATIONAL_TEAM.js ← v8/gen_national_team.py，工作日 20:50 盘后派发）。
 //   3 子信号加权代理推算（宽基ETF净申购/大金融RS/大金融资金流），缺失项权重按比例重分；
 //   汇金季报环比 v8 无源 ⇒ 卡内「未接入」占位。无数据 ⇒ 整卡保持 display:none（不产空壳卡）。
 h += '<div class="card" id="nationalTeamCard" style="display:none;margin-bottom:16px;border-left:4px solid #a78bfa;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#a78bfa;">&#x1F3DB;&#xFE0F; 国家队活跃度</span>'
    + '<span class="fresh" id="nationalTeamFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 工作日 16:40 派发 &#183; 代理推算非官方持仓</span></div>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 工作日 20:50 派发 &#183; 代理推算非官方持仓</span></div>'
    + '<div id="nationalTeamBody"><div class="note">加载中&#x2026;</div></div></div>';
 // ═══ 🧮 2026-10-21 主人令：「算法记分卡」（暂未上架·国家队活跃度之后）═══
-//   数据 window.ALGO_SCORECARD（data/ALGO_SCORECARD.js ← v8/gen_algo_scorecard.py，工作日 06:10 盘前派发）。
+//   数据 window.ALGO_SCORECARD（data/ALGO_SCORECARD.js ← v8/gen_algo_scorecard.py，工作日 08:25 盘前派发）。
 //   全链回测·真实信号流口径聚合；样本≥30 进榜、<30 观察名单、研究型单独区；填充见 window.__renderAlgoScorecard。
 h += '<div class="card" id="algoScorecardCard" style="display:none;margin-bottom:16px;border-left:4px solid #f59e0b;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#f59e0b;">&#x1F9EE; 算法记分卡</span>'
    + '<span class="fresh" id="scorecardFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 回测链日更 &#183; 真实信号流口径</span></div>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 工作日 08:25 派发 &#183; 回测链日更 &#183; 真实信号流口径</span></div>'
    + '<div id="algoScorecardBody"><div class="note">加载中&#x2026;</div></div></div>';
 // 🚀 2026-09-18 主人令：主升/启动 板块·龙头股 独立卡（观测类首卡，置于「概念/行业 → ETF·龙头 参考」卡上方）
 //   数据 window.SECTOR_LEADERS（data/SECTOR_LEADERS.js，scripts/fetch_sector_leaders.py 盘后生成）。
