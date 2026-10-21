@@ -288,10 +288,10 @@ jobs:
         # ASCII-ONLY body: Windows PowerShell 5.1 reads generated .ps1 as ANSI/GBK.
         run: |
           python --version
-          python -c "import akshare, pandas, requests" 2>$null
+          python -c "import akshare, pandas, requests, pytdx" 2>$null
           if ($LASTEXITCODE -ne 0) {
             Write-Host "deps missing, installing from tsinghua mirror..."
-            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas requests
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas requests pytdx
           } else { Write-Host "deps ready" }
           exit 0
 

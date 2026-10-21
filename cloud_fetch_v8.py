@@ -5555,14 +5555,72 @@ def main(category=None, only=None):
             "up_down_last_date": up_down_last_date,
         }
 
+    def _fetch_880003_tdx(days=430):
+        """🛠 2026-10-21 主通道（主人令「MA30/KDJ-K」实测发现）：东财 push2his 对
+        880003（通达信自编指数）恒返回 0 根（生产数据 index_880003 从未写入、
+        前端永远「回补中」的根因）——唯一可用公开通道 = 通达信官方行情协议
+        pytdx get_index_bars(9, market=1, '880003')，117.34.114.x（国泰君安）实测
+        返回真实 H/L/C 日K。多机池轮询 + pytdx 内置 104 节点兜底；失败返回 []。
+        """
+        try:
+            from pytdx.hq import TdxHq_API
+        except ImportError:
+            print("  [880003] pytdx 未安装 → TDX 通道不可用（走东财兜底）")
+            return []
+        pool = [
+            ("117.34.114.13", 7709), ("117.34.114.14", 7709),
+            ("117.34.114.15", 7709), ("117.34.114.16", 7709),
+            ("218.6.170.47", 7709), ("202.108.253.130", 7709),
+            ("180.153.18.170", 7709), ("115.238.90.165", 7709),
+        ]
+        try:
+            from pytdx.config.hosts import hq_hosts
+            pool += [(ip, p) for _, ip, p in hq_hosts]
+        except Exception:
+            pass
+        tries = 0
+        for ip, port in pool:
+            tries += 1
+            if tries > 15:  # 上限 15 台：防海外 runner 大面积超时拖垮 job（实测前 8 台命中率高）
+                break
+            api = TdxHq_API()
+            try:
+                if not api.connect(ip, port, time_out=6):
+                    continue
+                bars = api.get_index_bars(9, 1, "880003", 0, days + 20) or []
+                if not bars:
+                    continue
+                recs = []
+                for b in sorted(bars, key=lambda x: x["datetime"]):
+                    recs.append((b["datetime"][:10], float(b["close"]),
+                                 float(b["high"]), float(b["low"])))
+                if len(recs) >= 9:
+                    print(f"  [880003] TDX {ip}:{port} 取到 {len(recs)} 根日K "
+                          f"({recs[0][0]} ~ {recs[-1][0]})")
+                    return recs
+            except Exception as e:
+                print(f"  [880003] TDX {ip}:{port} 失败: {e}")
+            finally:
+                try:
+                    api.disconnect()
+                except Exception:
+                    pass
+        return []
+
     def _fetch_880003_history(days=430):
-        """通达信平均股价 880003 官方指数日K（东财 push2his，双 secid 兜底）。
+        """通达信平均股价 880003 官方指数日K（主通道 pytdx 官方协议，东财兜底）。
         这是「平均股价」这个指标的官方本体；只读历史，不做任何估算。
-        返回 [(date, close), ...] 升序；失败返回 []。
+        返回 [(date, close, high, low), ...] 升序；失败返回 []。
         2026-10-17：130→430 根（约 21 个月真实历史一次回填到位，主人授权），
           MA20/MA30/MA60 全部由官方全量真历史计算；单 secid 失败补抓 2 次
           （东财单 host 单次成功率 6-10% 的既有实测，同 _EM_HOSTS 结论）。
+        2026-10-21：一并解析高低价（f54/f55）——KDJ 需要 H/L/C 三元组（主人令）。
+          实测东财对 880003 恒返回 0 根（index_880003 从未写入的根因）→
+          主通道改 pytdx 官方协议（_fetch_880003_tdx），东财降级兜底。
         """
+        tdx = _fetch_880003_tdx(days)
+        if tdx:
+            return tdx
         for secid in ("88.0003", "90.0003"):
             for _att in range(2):
                 try:
@@ -5583,9 +5641,10 @@ def main(category=None, only=None):
                     recs = []
                     for ln in kl:
                         p = ln.split(",")
-                        if len(p) >= 3:
+                        # f51日期,f52开,f53收,f54高,f55低 —— KDJ 需 H/L/C，一并解析
+                        if len(p) >= 5:
                             try:
-                                recs.append((p[0], float(p[2])))
+                                recs.append((p[0], float(p[2]), float(p[3]), float(p[4])))
                             except ValueError:
                                 continue
                     if len(recs) >= 2:
@@ -5611,9 +5670,27 @@ def main(category=None, only=None):
             return {}
         series = sorted(series, key=lambda x: x[0])
         closes = [s[1] for s in series]
+        highs = [s[2] for s in series]
+        lows = [s[3] for s in series]
         dates = [s[0] for s in series]
         cur = closes[-1]
         prev = closes[-2] if len(closes) > 1 else None
+
+        # 📊 KDJ-K（2026-10-21 主人令「加」）：官方 880003 日K 真值，9 日 RSV +
+        #   标准指数平滑 K=2/3·prevK+1/3·RSV（D=2/3·prevD+1/3·K，初值 50）。
+        #   全序列递推收敛后取末日 K；样本 <9 日不冒充，显式 None。
+        kdj_k = None
+        if len(closes) >= 9:
+            _k, _d = 50.0, 50.0
+            for _i in range(len(closes)):
+                if _i < 8:
+                    continue
+                _hh = max(highs[_i - 8:_i + 1])
+                _ll = min(lows[_i - 8:_i + 1])
+                _rsv = (closes[_i] - _ll) / (_hh - _ll) * 100.0 if _hh > _ll else 50.0
+                _k = (2.0 * _k + _rsv) / 3.0
+                _d = (2.0 * _d + _k) / 3.0
+            kdj_k = round(_k, 2)
 
         # 真 MA：样本不足一律 None，绝不用 min() 伪装
         ma20 = round(sum(closes[-20:]) / 20, 4) if len(closes) >= 20 else None
@@ -5624,8 +5701,10 @@ def main(category=None, only=None):
         pos60 = round((cur / ma60 - 1) * 100, 4) if ma60 else None
 
         hist = []
-        for i, (d, c) in enumerate(series[-130:]):
-            pc = series[i - 1][1] if i > 0 else None
+        _seg = series[-130:]
+        for i, (d, c, _h, _l) in enumerate(_seg):
+            # pc 必须取切片内前一日（原 series[i-1] 是全序列下标 → 错位假跌幅，2026-10-21 修复）
+            pc = _seg[i - 1][1] if i > 0 else None
             hist.append({
                 "date": d,
                 "avg_price": c,
@@ -5634,7 +5713,7 @@ def main(category=None, only=None):
 
         n = len(closes)
         print(f"  [880003] 主口径: date={dates[-1]} close={cur} "
-              f"ma20={ma20} ma30={ma30} ma60={ma60} 样本={n}")
+              f"ma20={ma20} ma30={ma30} ma60={ma60} kdj_k={kdj_k} 样本={n}")
 
         out_path = RAW_DIR / "avg_price_data.json"
         base = {}
@@ -5658,6 +5737,7 @@ def main(category=None, only=None):
             "ma20_ready": n >= 20,
             "ma30_ready": n >= 30,
             "ma60_ready": n >= 60,
+            "kdj_k": kdj_k,
             "ma_caliber": "通达信880003(官方指数)",
             "history_days": len(hist),
             "history_880003": hist,

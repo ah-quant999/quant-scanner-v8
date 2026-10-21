@@ -2566,6 +2566,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           // 🏔 2026-10-17 主人令「加」：MA30 状态行（880003 官方真值，历史回填后即时就绪）
           //   880003 收盘 vs 其 MA30：偏离正=红（在 MA30 上方，强势），负=绿（下方，弱势），
           //   与全站红涨绿跌铁律一致；ma30 未就绪（首次入库前）显式回填态，绝不用假档位冒充。
+          // 📊 2026-10-21 主人令「加」：行尾追加 880003 日K KDJ-K 值（后端随每次刷新重算），
+          //   K≥50 红偏多 / K<50 绿偏空，红涨绿跌铁律；三种状态行均展示（kdj_k 就绪即显）。
+          var _kdjSeg='';
+          if(ap.kdj_k!=null){
+            var _kk=Number(ap.kdj_k);
+            var _kc=_kk>=50?'var(--up)':'var(--down)';
+            _kdjSeg=' <span style="color:var(--dim);">KDJ</span> <span style="color:'+_kc+';font-weight:700;">K '+_kk.toFixed(1)+'</span>';
+          }
           if(ap.index_880003!=null && ap.ma30!=null && ap.ma30_ready){
             var _d303=ap.position_vs_ma30;
             var _c303=_d303>=0?'var(--up)':'var(--down)';
@@ -2574,11 +2582,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
             h+='<b style="font-size:13px;color:var(--txt);">'+Number(ap.ma30).toFixed(2)+'</b>';
             h+=' <span style="color:var(--dim);">收盘 '+Number(ap.index_880003).toFixed(2)+'</span>';
             h+=' <span style="color:'+_c303+';font-weight:700;">偏离 '+(_d303>0?'+':'')+Number(_d303).toFixed(2)+'%</span>';
+            h+=_kdjSeg;
             h+='</div>';
           }else if(ap.index_880003==null){
-            h+='<div style="margin-top:6px;font-size:12px;color:var(--dim);">📏 MA30·880003：回填中（官方 880003 历史首次入库后自动就绪）</div>';
+            h+='<div style="margin-top:6px;font-size:12px;color:var(--dim);">📏 MA30·880003：回填中（官方 880003 历史首次入库后自动就绪）'+_kdjSeg+'</div>';
           }else{
-            h+='<div style="margin-top:6px;font-size:12px;color:var(--dim);">📏 MA30·880003：样本累积中（待满 30 日）</div>';
+            h+='<div style="margin-top:6px;font-size:12px;color:var(--dim);">📏 MA30·880003：样本累积中（待满 30 日）'+_kdjSeg+'</div>';
           }
 
           // 🛡 2026-08-17 22:34 主人令：原「买卖信号面板」紧凑列表删除（已在「样本 N 只」后面显眼显示买/加 + 卖/减 双边框按钮）
