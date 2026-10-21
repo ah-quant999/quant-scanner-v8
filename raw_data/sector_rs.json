@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-21 17:55",
+  "update_time": "2026-10-21 19:30",
   "data_date": "2026-10-20",
   "data_date_source": "kline",
   "fetch_date": "2026-10-21",
@@ -699,14 +699,14 @@
       "pct_60d": 12.15,
       "pct_90d": -6.53,
       "pct_180d": -16.85,
-      "pct_52w": null,
+      "pct_52w": -7.27,
       "relative_5d": -3.09,
       "relative_20d": -1.54,
       "relative_30d": -4.33,
       "relative_60d": 12.15,
       "relative_90d": -6.53,
       "relative_180d": -16.85,
-      "relative_52w": null
+      "relative_52w": -7.27
     },
     {
       "name": "计算机设备",
@@ -2873,14 +2873,14 @@
       "pct_60d": 12.15,
       "pct_90d": -6.53,
       "pct_180d": -16.85,
-      "pct_52w": null,
+      "pct_52w": -7.27,
       "relative_5d": -3.09,
       "relative_20d": -1.54,
       "relative_30d": -4.33,
       "relative_60d": 12.15,
       "relative_90d": -6.53,
       "relative_180d": -16.85,
-      "relative_52w": null
+      "relative_52w": -7.27
     },
     {
       "name": "医疗服务",
@@ -3055,14 +3055,14 @@
       "pct_60d": 12.15,
       "pct_90d": -6.53,
       "pct_180d": -16.85,
-      "pct_52w": null,
+      "pct_52w": -7.27,
       "relative_5d": -3.09,
       "relative_20d": -1.54,
       "relative_30d": -4.33,
       "relative_60d": 12.15,
       "relative_90d": -6.53,
       "relative_180d": -16.85,
-      "relative_52w": null
+      "relative_52w": -7.27
     },
     {
       "name": "医疗服务",
@@ -4511,14 +4511,14 @@
       "pct_60d": 12.15,
       "pct_90d": -6.53,
       "pct_180d": -16.85,
-      "pct_52w": null,
+      "pct_52w": -7.27,
       "relative_5d": -3.09,
       "relative_20d": -1.54,
       "relative_30d": -4.33,
       "relative_60d": 12.15,
       "relative_90d": -6.53,
       "relative_180d": -16.85,
-      "relative_52w": null
+      "relative_52w": -7.27
     },
     {
       "name": "中药",
