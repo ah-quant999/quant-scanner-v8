@@ -4,6 +4,9 @@
 # 2026-10-05 补（主人令："每日自动审计不能只是说说，要落实到位"）：
 #   推送前强制跑 v8/audit_market_thermo.py 审计门禁（结构层+akshare真值交叉核验），
 #   审计 exit!=0 -> 推送步骤不执行 -> Actions 红灯可见。硬闸，非日志说说。
+# 2026-10-21 补（主人令「一劳永逸」）：10-21 16:16 审计门禁瞬时失败（本地 18:30 同输入复跑 PASS）
+#   且全链无重试 → 整天停更。gen+audit 合并为 3 轮重试循环（失败即重拉缓存依赖+等5min重算），
+#   3 轮仍败才红灯 —— 瞬时态自愈，真故障仍红灯可见。
 # 单一职责：跑 v8/gen_market_thermo.py -> data/MARKET_THERMO.js -> 审计门禁 -> api_push_raw 入仓。
 # 数据链路：sw_index_daily_cache(等权/PE分位) + gtimg(上证月K/成交量/实时点位)
 #           + akshare(社融脉冲/PMI) + raw_data 缓存(融资/国债/沪深300PE)。
@@ -96,43 +99,49 @@ jobs:
             exit 1
           }
 
-      - name: "📊 跑 gen_market_thermo.py（交易日闸）"
-        id: gen
+      - name: "📊🔍 gen+audit 重试循环（3轮×间隔5min · 瞬时态自愈 2026-10-21）"
+        id: genaudit
         shell: powershell
         run: |
           $dow = (Get-Date).DayOfWeek.value__
           # 2026-10-17：周末闸仅对 schedule 生效；workflow_dispatch 允许（幂等，主人周末手动跑批惯例）
-          if (($dow -eq 0 -or $dow -ge 6) -and '${{ github.event_name }}' -eq 'schedule') { Write-Host "[skip] weekend (scheduled)"; exit 0 }
-          cd $env:GITHUB_WORKSPACE
-          python v8/gen_market_thermo.py
-          if (Test-Path 'data/MARKET_THERMO.js') {
-            Write-Host "[ok] data/MARKET_THERMO.js refreshed"
-          } else {
-            Write-Host "[warn] MARKET_THERMO.js missing (D rebuild failed; keep old to avoid error)"
+          if (($dow -eq 0 -or $dow -ge 6) -and '${{ github.event_name }}' -eq 'schedule') {
+            Write-Host "[skip] weekend (scheduled)"
+            "outcome=skipped" | Out-File -Append -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+            exit 0
           }
-
-      - name: "🔍 审计门禁（结构层+akshare真值交叉核验 · 硬闸）"
-        id: audit
-        if: steps.gen.outcome == 'success'
-        shell: powershell
-        run: |
           cd $env:GITHUB_WORKSPACE
-          if (-not (Test-Path 'data/MARKET_THERMO.js')) {
-            Write-Host "[GATE-FAIL] gen ok but product missing -> abnormal, red block" -ForegroundColor Red
-            exit 2
-          }
           $venvPy = "$env:USERPROFILE\.workbuddy\binaries\python\envs\default\Scripts\python.exe"
           $audPy = if (Test-Path $venvPy) { $venvPy } else { 'python' }
-          & $audPy v8/audit_market_thermo.py
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "[GATE-FAIL] audit gate failed(exit=$LASTEXITCODE) -> block push" -ForegroundColor Red
-            exit $LASTEXITCODE
+          $max = 3
+          for ($i = 1; $i -le $max; $i++) {
+            Write-Host "===== gen+audit attempt $i/$max =====" -ForegroundColor Cyan
+            python v8/gen_market_thermo.py
+            if (-not (Test-Path 'data/MARKET_THERMO.js')) {
+              Write-Host "[attempt $i] product missing (D rebuild failed; keep old)" -ForegroundColor Yellow
+            } else {
+              & $audPy v8/audit_market_thermo.py
+              if ($LASTEXITCODE -eq 0) {
+                Write-Host "[GATE-PASS] audit green at attempt $i -> allow push" -ForegroundColor Green
+                "outcome=success" | Out-File -Append -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+                exit 0
+              }
+              Write-Host "[attempt $i] audit exit=$LASTEXITCODE (transient data state?) -> will retry" -ForegroundColor Yellow
+            }
+            if ($i -lt $max) {
+              # 瞬时态自愈：重拉 raw_data 缓存依赖 + 行业日K缓存（全新输入），等 5min 再重算
+              python v8/fetch_raw_data_thermo.py
+              python scripts/update_sw_index_cache.py
+              Start-Sleep -Seconds 300
+            }
           }
-          Write-Host "[GATE-PASS] audit all green -> allow push"
+          "outcome=fail" | Out-File -Append -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+          Write-Host "[GATE-FAIL] audit failed after $max attempts -> red block (prefer visible alarm)" -ForegroundColor Red
+          exit 2
 
       - name: "📤 推送到仓库（api_push_raw · PUSH_FILES）"
         id: push
-        if: steps.gen.outcome == 'success' && steps.audit.outcome == 'success'
+        if: steps.genaudit.outputs.outcome == 'success'
         shell: powershell
         env:
           PUSH_FILES: "data/MARKET_THERMO.js"
@@ -146,23 +155,18 @@ jobs:
             Write-Host "[skip] product missing or too small, not pushing (guard: prevent blank overwrite)"
           }
 
-      - name: "🚨 结果闸门（gen失败/审计skip/推送skip -> 红灯，禁绿灯假象）"
+      - name: "🚨 结果闸门（gen+audit失败/推送skip -> 红灯，禁绿灯假象）"
         if: always()
         shell: powershell
         run: |
-          $gen = '${{ steps.gen.outcome }}'
-          $aud = '${{ steps.audit.outcome }}'
+          $ga = '${{ steps.genaudit.outputs.outcome }}'
           $push = '${{ steps.push.outcome }}'
-          Write-Host "gen=$gen audit=$aud push=$push"
-          if ($gen -ne 'success') {
-            Write-Host "[GATE] gen not success($gen) -> RED (prefer visible alarm over silent stale data)" -ForegroundColor Red
+          Write-Host "genaudit=$ga push=$push"
+          if ($ga -ne 'success' -and $ga -ne 'skipped') {
+            Write-Host "[GATE] gen+audit not success($ga) -> RED (prefer visible alarm over silent stale data)" -ForegroundColor Red
             exit 1
           }
-          if ($aud -ne 'success') {
-            Write-Host "[GATE] audit failed or skipped($aud) -> RED" -ForegroundColor Red
-            exit 1
-          }
-          if ($push -ne 'success') {
+          if ($ga -eq 'success' -and $push -ne 'success') {
             Write-Host "[GATE] push not executed($push) -> RED" -ForegroundColor Red
             exit 1
           }
