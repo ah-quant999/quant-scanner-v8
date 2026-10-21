@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-21 20:51:31",
+  "update_time": "2026-10-21 20:58:30",
   "status": "fail",
   "process": {
     "ok": true,
@@ -38,7 +38,10 @@
     "threshold": 2000,
     "message": "阈值=2000（一劳永逸目标 2000）"
   },
-  "actions_taken": [],
+  "actions_taken": [
+    "[2026-10-21 20:58] 根因坐实: 应急#158(20:46 CST) step4 依赖检查失败 = 结构性缺陷(PS5.1 EAP=Stop 下 python -c import ... 2>$null 报错被包装成 NativeCommandError, 步骤立即 exit 1, pip install 与末尾 exit 0 均未执行) × 新事实: runner 可用 Python 缺依赖 — _tool/Python/3.13.14(.env PATH 首位)缺 pytdx, _tool/Python/3.12.10 缺 akshare 全套; job 日志 python --version 打印 3.12.8 与两套已装版本不符, 归因存疑不影响修复",
+    "[2026-10-21 20:58] 环境层自愈: 阿里云镜像(清华403已知被限)补装 pytdx→3.13.14, akshare+pandas+requests+pytdx→3.12.10, 终验两套 import 四件套全 IMPORT_OK; 下轮应急档 step4 应打印 deps ready 并 exit 0; workflow step4 改造(python -c 2>nul 前置/continue-on-error)维持转主人决策"
+  ],
   "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 3 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) 失败",
   "run_time": "2026-10-21 20:40:02",
   "category": "intraday",
