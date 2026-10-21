@@ -133,6 +133,25 @@ def check_lines(text):
     return [{"name": "index.html 行数", "status": status, "message": msg, "metric": lines}]
 
 
+class _IdCollector(html.parser.HTMLParser):
+    """用浏览器同款 HTML 解析收集真实 DOM id 属性。
+
+    🛡 2026-10-21 一劳永逸：原正则 id=["']...["'] 会把 HTML 注释（如
+    「容器 id="ceBody" ... 不变」）和 JS 行注释（如「// <section id="sec-ph">」）
+    里的字样当真 id 统计 → 实测 7 类「重复 id」全为注释文字误报（真实 DOM 零重复）。
+    HTMLParser 天然跳过 <!-- --> 注释，且 <script> 内容按 CDATA 处理不解析属性。
+    """
+
+    def __init__(self):
+        super().__init__(convert_charrefs=False)
+        self.ids = []
+
+    def handle_starttag(self, tag, attrs):
+        for k, v in attrs:
+            if k.lower() == "id" and v:
+                self.ids.append(v)
+
+
 class _ScriptCounter(html.parser.HTMLParser):
     """用浏览器同款 HTML 解析统计 <script>/</script>，天然忽略注释与 script 内容里的字样。"""
 
@@ -169,11 +188,19 @@ def check_script_balance(text):
 
 
 def check_duplicate_ids(text):
-    ids = re.findall(r'id=["\']([^"\']+)["\']', text)
+    """检查真实 DOM 重复 id（HTMLParser 解析，注释/JS 字样不计入）。"""
+    collector = _IdCollector()
+    try:
+        collector.feed(text)
+        collector.close()
+        ids = collector.ids
+    except Exception:
+        # 解析异常时退回正则（宁可误报不可漏报）
+        ids = re.findall(r'id=["\']([^"\']+)["\']', text)
     counts = Counter(ids)
     dups = {k: v for k, v in counts.items() if v > 1}
     status = "ok"
-    msg = f"共 {len(ids)} 个 id，无重复"
+    msg = f"共 {len(ids)} 个真实 DOM id，无重复"
     metric = {"total": len(ids), "duplicates": 0}
     if dups:
         status = "fail"
@@ -301,13 +328,18 @@ def check_data_js():
         msg = f"发现 {len(dups)} 个重复 window 变量：{', '.join(dups)}"
     add_item(items, "重复 window.X 注入", status, msg, {"total": len(var_counts), "duplicates": len(dups)})
 
-    # 未在 index.html 中引用的 data/*.js
-    # 三种引用方式都算已引用：
-    #   1. <script src="data/NAME.js" 或 src="data/NAME.js?v=sha10"（含 defer）
-    #   2. 代码中直接使用 window.NAME / window['NAME']
-    #   3. 字符串字面量 "data/NAME.js" 或 'data/NAME.js'
+    # 未在 index.html 前端注入、且全库无后端引用的 data/*.js
+    # 🛡 2026-10-21 一劳永逸：原仅查 index.html，会把「前端有意停注入、后端活跃」的
+    #   文件误报为死文件（实测 8 个全命中：HB_ALIMI=双机心跳、RUNNER_STATUS_HEALTH=
+    #   runner 健康工作流直写、INDEX_HISTORY=上证5年日K数据源、FACTOR_AUDIT/
+    #   FACTOR_PROGRESS=因子台账链、CANDIDATE_QUOTES=工作流每日刷新、
+    #   CANDIDATE/GOLD_POOL_BACKTEST=09-14 裁决漏删产物本批已退役）。
+    #   新语义：index.html 未引用 ⇒ 再查全库 .py/.yml/.html 引用；有后端引用 =
+    #   「后端专用·前端未注入」（ok，正是 08-31 轻量化目标态）；全库无引用才报 warn。
     html_text = INDEX_HTML.read_text(encoding="utf-8", errors="replace")
+    backend_texts = None  # 惰性加载：仅在有前端未引用文件时扫描全库
     unreferenced = []
+    backend_only = []
     for p in js_files:
         # 检查报告自身不需要被页面引用
         if p.name == OUT_JS.name:
@@ -319,14 +351,46 @@ def check_data_js():
         win_pat = re.compile(r'\bwindow\.["\']?' + re.escape(var_name) + r'["\']?\b')
         # 3) 字符串字面量中出现 data/NAME.js
         lit_pat = re.compile(r'["\']data/' + re.escape(p.name) + r'["\']')
-        if not (src_pat.search(html_text) or win_pat.search(html_text) or lit_pat.search(html_text)):
+        if src_pat.search(html_text) or win_pat.search(html_text) or lit_pat.search(html_text):
+            continue
+        # 前端未注入 ⇒ 查后端引用（py/yml/html 提及该文件名或 window 变量名）
+        if backend_texts is None:
+            backend_texts = []
+            for root in (REPO_ROOT / "algorithms", REPO_ROOT / "scripts", REPO_ROOT / ".github",
+                         REPO_ROOT / "v8"):
+                if root.exists():
+                    for rp in root.rglob("*"):
+                        if rp.suffix in (".py", ".yml", ".yaml", ".sh") and rp.is_file():
+                            try:
+                                backend_texts.append(rp.read_text(encoding="utf-8", errors="replace"))
+                            except Exception:
+                                pass
+            for hp in REPO_ROOT.glob("*.html"):
+                if hp.name != "index.html":
+                    try:
+                        backend_texts.append(hp.read_text(encoding="utf-8", errors="replace"))
+                    except Exception:
+                        pass
+        blob = var_name + ".js"
+        hit = any(blob in t or re.search(r'\bwindow\.["\']?' + re.escape(var_name) + r'["\']?\b', t)
+                  for t in backend_texts)
+        if hit:
+            backend_only.append(p.name)
+        else:
             unreferenced.append(p.name)
     status = "ok"
     msg = "全部已引用"
+    if backend_only:
+        status = "ok"
+        msg = f"{len(backend_only)} 个后端专用·前端未注入（轻量化正常态）：{', '.join(backend_only[:5])}"
+        if len(backend_only) > 5:
+            msg += " 等"
     if unreferenced:
         status = "warn"
-        msg = f"{len(unreferenced)} 个未引用：{', '.join(unreferenced[:5])}"
-    add_item(items, "data/*.js 引用检查", status, msg, {"unreferenced": len(unreferenced)})
+        msg = f"{len(unreferenced)} 个全库未引用（疑似死文件）：{', '.join(unreferenced[:5])}"
+    add_item(items, "data/*.js 引用检查", status, msg,
+             {"unreferenced": len(unreferenced), "backend_only": len(backend_only),
+             "backend_only_names": backend_only})
 
     return items
 

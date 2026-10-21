@@ -393,6 +393,16 @@ _RETIRED_ARTIFACTS = {
     "data/ALGO_TRACK.js",
     "data/H_AUTO_BUY.js",
     "data/H_AUTO_BUY_TRACK.js",
+    # 🗑 2026-10-21 主人令「该清就清，该删就删」（同族第六例 · 09-14 裁决的漏网收尾）：
+    #   09-14 主人令「金股池和候选股池是算法的上游水源，不是策略，不需要回测！」
+    #   当批删了生成器 backtest_pools.py + 前端引用，但 data/raw_data 四份产物漏删，
+    #   残留至今（bloat 体检实测「未引用」）。产物 update_time 停在 09-14 前永为死数据；
+    #   前端 index.html/logic.html 0 实引（仅注释提及）。远端产物由本次退役提交一次性删除；
+    #   本段拦「本地残留副本回推复活」（与 v8_health_check:2126 护栏登记同源维护）。
+    "data/CANDIDATE_BACKTEST.js",
+    "data/GOLD_POOL_BACKTEST.js",
+    "raw_data/candidate_backtest.json",
+    "raw_data/gold_pool_backtest.json",
 }
 # 按前缀兜底：raw_data/strong_breakout_YYYYMMDD.json（逐日留档）
 _RETIRED_PREFIXES = (
