@@ -123,10 +123,13 @@ def _kline_json(param, timeout=20):
     raise last or RuntimeError("no kline host attempts")
 
 
-def fetch_a_daily_gtimg(code, market="sh", bars=250):
+def fetch_a_daily_gtimg(code, market="sh", bars=250, min_bars=60):
     """腾讯前复权日K → DataFrame(date/open/close/high/low/volume/pct_chg)。
 
     与 scanner.fetch_a_daily 的 mootdx 分支列结构一致；非未来函数（仅截至当日）。
+    min_bars：最少行数闸（默认 60，保持既有调用方行为不变）。🆕 2026-10-21：
+    次新股回测场景需显式放低（如 20）——宇树科技(688836)上市不足 60 个交易日，
+    被 60 根闸误杀 ⇒ LHB 信号票里的新股永远无法回测（系统性样本偏差）。
     """
     sym = f"{market}{code}"
     d = _kline_json(f"{sym},day,,,{bars},qfq")
@@ -147,7 +150,7 @@ def fetch_a_daily_gtimg(code, market="sh", bars=250):
             })
         except Exception:  # noqa: BLE001
             continue
-    if len(rows) < 60:
+    if len(rows) < min_bars:
         return None
     df = pd.DataFrame(rows)
     df["pct_chg"] = 0.0

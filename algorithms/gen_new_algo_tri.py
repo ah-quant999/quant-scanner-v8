@@ -29,6 +29,7 @@ import re
 import sys
 import glob
 import bisect
+import time
 import argparse
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
@@ -340,10 +341,16 @@ def calc_rotation():
 # ══════════════════════════════════════════════════════════════
 # ③ 龙虎榜 · 机构跟随
 # ══════════════════════════════════════════════════════════════
-def calc_lhb_follow():
-    d = load_json(RAW / "lhb_data.json", {})
+def _lhb_picks_from_stocks(stocks, date_str):
+    """LHB 机构跟随信号规则 —— **唯一实现**，实盘(calc_lhb_follow)与时点回填共用。
+
+    规则（全部显式、可复现）：category ∈ (机构独买, 机游共振) 且 机构净买 ≥3000万
+    → 信号；按 score 降序取 TOP 15（与实盘卡面 items[:15] 同口径）。
+    🛡 2026-10-21 抽出为本函数：回填若另抄一份规则，实盘与回测口径分叉 ＝ 双权威
+    （主人铁律禁）；实测 10-19 历史节点规则命中与实盘归档逐只一致，复刻无误。
+    """
     items = []
-    for s in (d.get("stocks") or []):
+    for s in (stocks or []):
         cat = s.get("category", "")
         if cat not in ("机构独买", "机游共振"):
             continue
@@ -364,14 +371,21 @@ def calc_lhb_follow():
         )
         items.append({
             "code": s.get("code"), "name": s.get("name"),
-            "date": (lambda _s: "%s-%s-%s" % (_s[:4], _s[4:6], _s[6:8])
-                     if len(_s) == 8 and _s.isdigit() else _s)(str(d.get("date") or "")),
+            "date": date_str,
             "pct": round(pct, 2), "inst_net_wan": round(inst_net, 0),
             "yz_net_wan": round(yz_net, 0), "category": cat,
             "follow": follow, "score": round(score, 1),
         })
     items.sort(key=lambda x: -x["score"])
-    return {"date": d.get("date", ""), "count": len(items), "items": items[:15]}
+    return items[:15]
+
+
+def calc_lhb_follow():
+    d = load_json(RAW / "lhb_data.json", {})
+    date_str = (lambda _s: "%s-%s-%s" % (_s[:4], _s[4:6], _s[6:8])
+                if len(_s) == 8 and _s.isdigit() else _s)(str(d.get("date") or ""))
+    items = _lhb_picks_from_stocks(d.get("stocks"), date_str)
+    return {"date": d.get("date", ""), "count": len(items), "items": items}
 
 
 # ══════════════════════════════════════════════════════════════
@@ -392,6 +406,26 @@ TRI_COST = 0.003
 TRI_N_LIST = [1, 3, 5, 10, 20]
 TRI_HISTORY = RAW / "new_algo_tri_history.json"
 TRI_BACKTEST_JS = DATA / "NEW_ALGO_TRI_BACKTEST.js"
+
+# ══════════════════════════════════════════════════════════════
+# 🛡 2026-10-21 一劳永逸修复（主人令「可以，确保科学有效」）—— 两块：
+#   A. 信号票取价自愈（_tri_ensure_signal_bars）：
+#      实证 10-21：10-19/10-20 两批 9 只 lhb 信号票末根散布 09-02~10-20
+#      （kline_cache_ext 仅 226 只全新鲜池且不含它们；kline_cache 是
+#      gen_strong_breakout 副产物只回写强势股）⇒ 回测「次开买入」取不到价
+#      ⇒ by_period 恒空、记分卡 sample=None（算法被误判「无样本」）。
+#      修法：按已成熟窗口逐票检测，缺覆盖即 GTimg 前复权补拉 700 根落 ext。
+#   B. LHB 归档时点回填（_tri_backfill_lhb_archive）：
+#      lhb_history.json 有 2026-06-10 起逐日盘后快照（stage_to_raw 累积，
+#      字段与信号规则同构、10-19 规则命中与实盘归档逐只一致已实证）⇒ 按
+#      同一规则回填，让回测立刻有 4 个月真实样本，而非空等 30 天。
+#      回填条目带 backfill=true 标记，method 明示「时点回填+实盘跟踪」双来源。
+# ══════════════════════════════════════════════════════════════
+KLINE_EXT_DIR = RAW / "kline_cache_ext"   # 与 gen_lqsq_top5 同域（ext 优先 + cache 兜底）
+TRI_EXT_BARS = 700                        # 补拉根数（与 gen_lqsq_top5 EXT_BARS 对齐）
+TRI_FETCH_MIN_BARS = 20                   # 次新股放行（<60 根闸误杀新股，见 data_source_gtimg）
+TRI_ENSURE_MAX_CODES = 300                # 单轮补拉只数上限（防归档膨胀失控，剩余下轮接力）
+TRI_ENSURE_BUDGET_SEC = 150               # 单轮补拉时间预算
 
 
 def _tri_load_bars():
@@ -437,8 +471,160 @@ def _tri_st_set():
     return st
 
 
+def _tri_fetch_bars(code):
+    """补拉单票日K（前复权）→ kline records（与缓存同构）；失败返回 None。
+
+    通道：GTimg 优先（本机/云端同通道，2026-10-21 本机实测可通、与缓存零差异），
+    scanner.fetch_a_daily 兜底（mootdx/BaoStock/东财链，适配 GTimg 被墙的环境）。
+    次新股放行 min_bars=20：上市不足 60 个交易日的新票（如宇树科技 688836）
+    若按 60 根闸一律拒收 ⇒ LHB 信号票里的新股永远无法回测（样本偏差）。
+    """
+    market = "sh" if code.startswith(("6", "688", "9")) else "sz"
+    df = None
+    try:
+        import data_source_gtimg as _gt
+        df = _gt.fetch_a_daily_gtimg(code, market=market, bars=TRI_EXT_BARS,
+                                     min_bars=TRI_FETCH_MIN_BARS)
+    except Exception:
+        df = None
+    if df is None:
+        try:
+            from scanner import fetch_a_daily
+            df = fetch_a_daily(code, bars=TRI_EXT_BARS)
+        except Exception:
+            df = None
+    if df is None:
+        return None
+    try:
+        need = ("date", "open", "close", "high", "low", "volume")
+        if any(c not in df.columns for c in need):
+            return None
+        return [{"date": str(d), "open": round(float(o), 4), "high": round(float(h), 4),
+                 "low": round(float(l), 4), "close": round(float(c), 4),
+                 "volume": round(float(v), 2)}
+                for d, o, h, l, c, v in zip(df["date"], df["open"], df["high"],
+                                            df["low"], df["close"], df["volume"])]
+    except Exception:
+        return None
+
+
+def _tri_ext_save(code, records):
+    """原子写 kline_cache_ext/<code>.json（tmp + replace，防半写文件）。"""
+    try:
+        KLINE_EXT_DIR.mkdir(parents=True, exist_ok=True)
+        tmp = KLINE_EXT_DIR / ("%s.json.tmp" % code)
+        tmp.write_text(json.dumps(records, ensure_ascii=False), encoding="utf-8")
+        os.replace(str(tmp), str(KLINE_EXT_DIR / ("%s.json" % code)))
+        return True
+    except Exception:
+        return False
+
+
+def _tri_backfill_lhb_archive(hist):
+    """LHB 归档时点回填（2026-10-21 主人令「确保科学有效」）。
+
+    数据源：raw_data/lhb_history.json 逐日盘后快照（stage_to_raw 累积，
+    2026-06-10 起；字段与信号规则同构）+ raw_data/lhb_data.json（当日全量，
+    覆盖 history 中缺 stocks 的日期——fetch_lhb 曾以 {trading,pure} 格式
+    占写过 10-20，全量节点以 lhb_data.json 为准）。
+
+    时点完整性：每个节点 = 当日盘后发布的榜单（信号字段为当日原值；席位别名
+    标签可能后续增补，不影响 category/inst_net 信号口径）；买点=信号日次日
+    开盘、卖点=持有 N 交易日收盘 ⇒ 无未来函数。实盘归档条目优先（as-of 原票），
+    回填只补缺失日期；回填条目带 backfill=true，payload method 明示双来源。
+    返回回填充数。
+    """
+    hist_lhb = [h for h in (hist.get("lhb") or [])]
+    have = {h.get("signal_date") for h in hist_lhb}
+    sources = []
+    lhb_hist = load_json(RAW / "lhb_history.json", {})
+    for k, node in (lhb_hist or {}).items():
+        if k in ("update_time", "range") or not isinstance(node, dict):
+            continue
+        stocks = node.get("stocks") or []
+        if not stocks:
+            continue
+        sources.append((k, stocks))
+    cur = load_json(RAW / "lhb_data.json", {})
+    if cur.get("stocks"):
+        ds = str(cur.get("date") or "")
+        iso = "%s-%s-%s" % (ds[:4], ds[4:6], ds[6:8]) if len(ds) == 8 and ds.isdigit() else ""
+        if iso:
+            sources.append((iso, cur.get("stocks")))
+    added = 0
+    for day, stocks in sorted(sources):
+        if day in have:
+            continue
+        picks = [x["code"] for x in _lhb_picks_from_stocks(stocks, day) if x.get("code")]
+        if not picks:
+            continue
+        hist_lhb.append({"signal_date": day, "picks": picks, "backfill": True})
+        have.add(day)
+        added += 1
+    hist_lhb.sort(key=lambda h: h.get("signal_date") or "")
+    hist["lhb"] = hist_lhb
+    if added:
+        print("  🕰 LHB 归档时点回填：+%d 日（现共 %d 日，实盘+回填双来源）" % (
+            added, len(hist_lhb)))
+    return added
+
+
+def _tri_ensure_signal_bars(hist, series, pos, gdates):
+    """信号票取价自愈（2026-10-21 一劳永逸修复，主人令「确保科学有效」）。
+
+    根因实证：lhb/vcp 信号票多数不在 kline_cache_ext（仅 226 只全新鲜池），
+    kline_cache 又是 gen_strong_breakout 副产物（只回写强势股）⇒ 10-19/10-20
+    两批 9 只 lhb 信号票末根散布 09-02~10-20，回测「次开买入」取不到价
+    ⇒ by_period 恒空、记分卡 sample=None（算法被误判「无样本」实为「取价缺失」）。
+
+    修法：回测取价前，按**已成熟窗口**（买点=信号日次日、卖点=买点+N 个交易日，
+    两者均已在全局日历中）逐票检测 ext/cache 覆盖；缺覆盖即 _tri_fetch_bars
+    补拉 700 根落 ext（tmp+replace 原子写）。预算内收敛：每票成功一次即永久
+    覆盖全部历史窗口，下轮零成本。返回 {"fetched": [...], "failed": [...]}。
+    """
+    t0 = time.time()
+    need = set()
+    for _key, lst in (hist or {}).items():
+        for h in (lst or []):
+            d = h.get("signal_date") or ""
+            gi = bisect.bisect_left(gdates, d)
+            if gi >= len(gdates) or gdates[gi] != d:
+                continue
+            for N in TRI_N_LIST:
+                tx = gi + 1 + N
+                if tx >= len(gdates):
+                    continue  # 未成熟（卖点在未来）——现在无需取价
+                dt_i, dt_x = gdates[gi + 1], gdates[tx]
+                for code in (h.get("picks") or []):
+                    p = pos.get(code)
+                    if p is not None and p.get(dt_i) is not None and p.get(dt_x) is not None:
+                        continue
+                    need.add(code)
+    fetched, failed = [], []
+    for i, code in enumerate(sorted(need)):
+        if i >= TRI_ENSURE_MAX_CODES or (time.time() - t0) > TRI_ENSURE_BUDGET_SEC:
+            failed.append(code)  # 预算/只数耗尽：下轮接力（归档在，不会漏）
+            continue
+        recs = _tri_fetch_bars(code)
+        if recs and _tri_ext_save(code, recs):
+            fetched.append(code)
+        else:
+            failed.append(code)
+    if need:
+        print("  🛠 信号票取价自愈：需补 %d 只 → 成功 %d、仍缺 %d（%.0fs）" % (
+            len(need), len(fetched), len(failed), time.time() - t0))
+        if failed:
+            print("     ⚠️ 仍缺（停牌/退市/网络，如实不计入，绝不编造）: %s" % ", ".join(failed[:20]))
+    return {"fetched": fetched, "failed": failed}
+
+
 def _tri_backtest_section(series, pos, gdates, history, st_set):
-    """history: [{signal_date, picks:[codes]}] → by_period（真实信号流前向回测）。"""
+    """history: [{signal_date, picks:[codes]}] → by_period（真实信号流前向回测）。
+
+    返回 (by, total, missing)：missing = 已成熟窗口（买点+卖点均在日历中）但
+    取不到价的信号票集合（补拉后仍缺：停牌/退市/价格缺失）——如实透出，
+    绝不把「算不出」静默当成「没信号」（2026-10-21 主人令「确保科学有效」）。
+    """
     picks_map = {h["signal_date"]: (h.get("picks") or []) for h in history}
     sig_days = sorted(picks_map.keys())
     bench_cache = {}
@@ -474,6 +660,7 @@ def _tri_backtest_section(series, pos, gdates, history, st_set):
         return res
 
     by = {}
+    missing = set()
     for N in TRI_N_LIST:
         rets, bs, bc = [], 0.0, 0
         for d in sig_days:
@@ -481,20 +668,22 @@ def _tri_backtest_section(series, pos, gdates, history, st_set):
             if gi >= len(gdates) or gdates[gi] != d:
                 continue
             for code in (picks_map.get(d) or []):
-                p = pos.get(code)
-                if not p:
-                    continue
                 ti, tx = gi + 1, gi + 1 + N
                 if tx >= len(gdates):
-                    continue
-                ii, xx = p.get(gdates[ti]), p.get(gdates[tx])
-                if ii is None or xx is None or ii == 0 or xx == 0:
+                    continue  # 未成熟：卖点在未来，现在无需取价
+                p = pos.get(code)
+                ii = xx = None
+                if p:
+                    ii, xx = p.get(gdates[ti]), p.get(gdates[tx])
+                if not p or ii is None or xx is None or ii == 0 or xx == 0:
+                    missing.add(code)  # 已成熟但取不到价（补拉后仍缺）——如实计数
                     continue
                 bars = series[code][1]
                 pc = float(bars[ii - 1].get("close") or 0)
                 op = float(bars[ii].get("open") or 0)
                 xc = float(bars[xx].get("close") or 0)
                 if pc <= 0 or op <= 0 or xc <= 0:
+                    missing.add(code)  # 有K线但价格缺失——同样不计入、不编造
                     continue
                 rets.append(xc / op - 1.0 - TRI_COST)
             b = bench(gi, N)
@@ -512,7 +701,7 @@ def _tri_backtest_section(series, pos, gdates, history, st_set):
                 "bench_days": bc,
             }
     total = sum(len(h.get("picks") or []) for h in history)
-    return by, total
+    return by, total, sorted(missing)
 
 
 def _tri_run_backtest(out):
@@ -556,24 +745,42 @@ def _tri_run_backtest(out):
         lst = [h for h in (hist.get(key) or []) if h.get("signal_date") != d]
         lst.append({"signal_date": d, "picks": codes})
         hist[key] = lst
+    # 🕰 LHB 时点回填（2026-10-21）：lhb_history 逐日快照按同一规则补缺失日期，
+    #   实盘条目优先。回填后才落盘，保证归档文件即完整状态。
+    _tri_backfill_lhb_archive(hist)
     TRI_HISTORY.write_text(json.dumps(hist, ensure_ascii=False), encoding="utf-8")
     # 计算（载入全 A 日线缓存 + ST 集合）
     series, pos, gdates = _tri_load_bars()
+    # 🛠 信号票取价自愈（2026-10-21）：缺覆盖的信号票 GTimg 补拉落 ext，再重载生效
+    ensure = _tri_ensure_signal_bars(hist, series, pos, gdates)
+    if ensure["fetched"]:
+        series, pos, gdates = _tri_load_bars()
     st_set = _tri_st_set()
     payload = {"update_time": now_cst()}
     for key in ("vcp", "rotation", "lhb"):
-        by, total = _tri_backtest_section(series, pos, gdates, hist.get(key) or [], st_set)
+        by, total, miss = _tri_backtest_section(series, pos, gdates, hist.get(key) or [], st_set)
         sd = [h["signal_date"] for h in (hist.get(key) or [])]
+        bf = sum(1 for h in (hist.get(key) or []) if h.get("backfill"))
+        src = "new_algo_tri_history 逐日真实信号归档（上线首日即建，含已回落票，防幸存者偏差）"
+        if key == "lhb" and bf:
+            src += ("；另含 %d 日时点回填（lhb_history 逐日盘后快照按同一信号规则回补，"
+                    "实盘条目优先）" % bf)
         payload[key] = {
             "update_time": now_cst(),
             "method": ("真实信号流口径（2026-10-19 主人令）：每日盘后产出信号 → 次开买入、持有 N 个交易日"
                        "收盘卖出（前复权·扣双边 0.3%）；基准=全市场等权（剔 ST/退、价格≥2）。"
                        "样本随持有天数成熟累积，未走满不计入。"),
-            "signal_source": "new_algo_tri_history 逐日真实信号归档（上线首日即建，含已回落票，防幸存者偏差）",
+            "signal_source": src,
             "track_start": min(sd) if sd else today,
             "signal_date_range": ("%s ~ %s" % (min(sd), max(sd))) if sd else today,
             "total_signals": total,
+            "backfill_days": bf,
+            "live_days": len(sd) - bf,
             "cost_adjusted": True,
+            "price_missing": miss,
+            "price_missing_note": (
+                "%d 只信号票已成熟但取不到价（停牌/退市/价格缺失，补拉后仍缺）——"
+                "如实不计入样本，绝不用陈旧数据充数" % len(miss)) if miss else None,
             "summary": {"by_period": by},
         }
     TRI_BACKTEST_JS.write_text(

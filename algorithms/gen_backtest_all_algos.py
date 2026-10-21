@@ -39,6 +39,10 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "v8"))
+from algo_gate_thresholds import (ADMIT_MIN_SAMPLES, ADMIT_MIN_EXCESS, ADMIT_MAX_WORST_TRADE,
+                                 ADMIT_MAX_CORR_TOP, ADMIT_MIN_MARKETS, ADMIT_PENDING_FIELDS)
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 RAW = ROOT / "raw_data"
@@ -575,9 +579,19 @@ def parse_tri_sub(src, obj):
     bp = sm.get("by_period") or {}
     rows = []
     if not bp:
-        return [_mk_row(src, "—", None, None, None, None,
-                        status="无 by_period 数据（归档信号尚无成熟样本，累积中）"
-                        if node.get("total_signals") else "无 by_period 数据（尚无归档信号）")]
+        # 🛡 2026-10-21 诚实铁律：by_period 空要分因——「取价缺失」（信号票停牌/退市/
+        #   价格缺失，补拉后仍无法计价）≠「未成熟」（信号未走满持有期）≠「无归档信号」。
+        #   原实现一律显示「尚无成熟样本」，把数据坑粉饰成正常累积，主人令禁。
+        tsig = _int(node.get("total_signals")) or 0
+        pmiss = node.get("price_missing") or []
+        if not tsig:
+            st = "无 by_period 数据（尚无归档信号）"
+        elif pmiss:
+            st = ("无 by_period 数据（%d 只信号票取价缺失：停牌/退市/价格缺失，已成熟样本无法计价；"
+                  "其余信号未走满持有期，累积中）" % len(pmiss))
+        else:
+            st = "无 by_period 数据（归档信号尚无成熟样本，累积中）"
+        return [_mk_row(src, "—", None, None, None, None, status=st)]
     for k in sorted(bp.keys(), key=lambda x: (_num(x) is None, _num(x) or 0)):
         r = bp.get(k) or {}
         n = _num(r.get("samples"))
@@ -591,7 +605,8 @@ def parse_tri_sub(src, obj):
                    "sharpe": _num(r.get("sharpe_ratio")),
                    "win_avg": _num(r.get("win_avg")), "loss_avg": _num(r.get("loss_avg")),
                    "signal_date_range": node.get("signal_date_range"),
-                   "total_signals": _int(node.get("total_signals"))},
+                   "total_signals": _int(node.get("total_signals")),
+                   "price_missing": _int(len(node.get("price_missing") or []))},
             status=None if (n or 0) > 0 else "样本为 0（尚无历史信号）",
         ))
     return rows
@@ -758,6 +773,34 @@ def build(root, day, kind, note, extra_note=""):
     print("[bench] 基准超额接线：%d/%d 行补 bench_avg_return" % (_bench_n, len(rows))
           + ("" if _bench else "（raw_data/market_bench.json 不存在或为空 → 本轮不补，前端显示 —）"))
 
+    # ── 🆕 2026-10-21 主人令：准入闸门（研究区→交易区硬校验）──────────────
+    #   每个交易型 row 算 admit_eligible（新因子/算法进选股策略前的硬门槛）。
+    #   缺失字段（相关性 / 分市场胜率）按 ADMIT_PENDING_FIELDS 诚实标注「待接入」，不伪造。
+    for r in rows:
+        if r.get("cat") != "trade":
+            continue
+        ex = r.get("extra") or {}
+        reasons = []
+        n = r.get("sample") or 0
+        if n < ADMIT_MIN_SAMPLES:
+            reasons.append(f"样本 {n} < 准入门槛 {ADMIT_MIN_SAMPLES}")
+        avg = r.get("avg_return")
+        bench = ex.get("bench_avg_return")
+        excess = (avg - bench) if (avg is not None and bench is not None) else avg
+        if excess is not None and excess <= ADMIT_MIN_EXCESS:
+            reasons.append(f"成本后超额 {excess:+.2f}% ≤ 0（不贡献正超额）")
+        # 🛡 2026-10-21 字段语义修正：熔断线看**单笔最差收益**（尾部风险），
+        #   不是 max_drawdown（权益回撤随持有期机械放大：强势跟踪 T+1 -1.35%
+        #   → T+45 -19.27%，固定闸会误杀一切长持有期策略——实证翻车记录见
+        #   v8/algo_gate_thresholds.py 修正说明）。worst_return 缺失（老数据源
+        #   未产出）时该条不判，与相关性/分市场字段同等诚实，不伪造。
+        worst = ex.get("worst_return")
+        if worst is not None and worst <= ADMIT_MAX_WORST_TRADE:
+            reasons.append(f"单笔最差 {worst:+.2f}% 触及单笔熔断线 {ADMIT_MAX_WORST_TRADE}%")
+        r["admit_eligible"] = (len(reasons) == 0 and n >= ADMIT_MIN_SAMPLES)
+        r["admit_reasons"] = reasons
+        r["admit_pending"] = list(ADMIT_PENDING_FIELDS)  # 相关性/分市场胜率 待回测链补字段
+
     # ── 卡级主表（主人要的「按收益率和胜率从高到低排序」）──
     #   🔴 诚实性铁律①：**只比同口径**。主表每张卡只取 1 行「既定主口径」，
     #      绝不把 T+1 与 T+20 放进同一张表比大小（持有期不同，横比即误导）。
@@ -853,6 +896,9 @@ def build(root, day, kind, note, extra_note=""):
         "min_samples": MIN_SAMPLES,
         "low_win_rate": LOW_WIN_RATE,
         "low_avg_return": LOW_AVG_RETURN,
+        "admit_note": ("准入闸门（研究区→交易区）：累积样本≥%d 且 成本后超额>0 且 单笔最差收益>%d%%（单笔熔断）才准入；"
+                       "与头部算法重叠度<%.2f / 牛熊震荡≥%d档不亏 两项待回测链补字段后自动生效。"
+                       % (ADMIT_MIN_SAMPLES, ADMIT_MAX_WORST_TRADE, ADMIT_MAX_CORR_TOP, ADMIT_MIN_MARKETS)),
         "sort_rule": "胜率降序 → 平局看平均收益降序（与页内星级对比表同口径）",
 # 🔴 2026-09-13 根因修复：本串原先**手写死**，删 RPS 后仍残留「相对强度＝T+5」⇒
 #   产物里的口径说明与真实判定不一致（误导）。

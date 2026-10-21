@@ -12,6 +12,9 @@ v8/gen_algo_scorecard.py —— 「算法记分卡」规则聚合（盘后生成
   oneline : 一句话结论（规则拼装，数值全真实）
 """
 import json, os, sys, datetime
+from algo_gate_thresholds import (LOW_WIN_RATE as G_LOW_WIN, LOW_AVG_RETURN as G_LOW_RET,
+                                  ADMIT_MIN_SAMPLES, ADMIT_MIN_EXCESS, ADMIT_MAX_WORST_TRADE, ADMIT_MAX_CORR_TOP,
+                                  ADMIT_MIN_MARKETS, ADMIT_PENDING_FIELDS, OBSERVE_PERIOD)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -42,6 +45,20 @@ for r in rows:
     if cur is None or r.get('is_primary') or ((r.get('sample') or 0) > (cur.get('sample') or 0) and not cur.get('is_primary')):
         rep[k] = r
 
+def _gate_of(item, raw_row):
+    """🆕 双向闸门状态机（阈值来自 algo_gate_thresholds.py 权威源）：
+       'admit'(🟢准入) / 'demote_candidate'(🔴降级候选) / 'incubate'(🟡孵化观察)"""
+    n = item.get('sample') or 0
+    if n < MIN_SAMPLES:
+        return 'incubate'  # 样本不足，只观测不评级
+    # 🔴 降级候选：跌破红线 或 未过准入却已在榜（admit_eligible 为 False；缺失则不计）
+    below = (item.get('win_rate') is not None and item['win_rate'] < G_LOW_WIN) or \
+            (item.get('avg_return') is not None and item['avg_return'] <= G_LOW_RET)
+    admit = raw_row.get('admit_eligible')
+    if below or (admit is False):
+        return 'demote_candidate'
+    return 'admit'
+
 def _fmt_row(r, card_rows):
     ex = r.get('extra') or {}
     bench = ex.get('bench_avg_return')
@@ -68,6 +85,7 @@ ranked, watch = [], []
 for card, r in rep.items():
     card_rows = [x for x in rows if x['card'] == card and x.get('cat') == 'trade']
     item = _fmt_row(r, card_rows)
+    item['gate'] = _gate_of(item, r)  # 🆕 双向闸门状态机
     if (item['sample'] or 0) >= MIN_SAMPLES and item['win_rate'] is not None:
         ranked.append(item)
     else:
@@ -101,8 +119,12 @@ def _oneline():
         s += '·超额 %+s%%' % t['excess']
     s += '）；最弱 %s%s（胜率 %s%%·均收 %+s%%）。' % (
         w['card'], w['hold'] or '', w['win_rate'], w['avg_return'])
+    demote = [x for x in ranked if x.get('gate') == 'demote_candidate']
     low = [x for x in ranked if (x['win_rate'] or 0) < (bt.get('low_win_rate') or 45) or (x['avg_return'] or 0) <= (bt.get('low_avg_return') or 0)]
-    if low:
+    if demote:
+        s += '🔴降级候选 %d 家（跌破闸门，观察期 %d 笔自动裁决去留）：%s。' % (
+            len(demote), OBSERVE_PERIOD, '、'.join(x['card'] for x in demote))
+    elif low:
         s += '低于闸门（胜率<%s%% 或 均收≤%s%%）：%s —— 跑满观察期再裁决去留。' % (
             bt.get('low_win_rate') or 45, bt.get('low_avg_return') or 0, '、'.join(x['card'] for x in low))
     return s
@@ -119,6 +141,13 @@ out = {
         'min_samples': MIN_SAMPLES,
         'low_win_rate': bt.get('low_win_rate'),
         'low_avg_return': bt.get('low_avg_return'),
+        'admit_min_samples': ADMIT_MIN_SAMPLES,
+        'admit_min_excess': ADMIT_MIN_EXCESS,
+        'admit_max_worst_trade': ADMIT_MAX_WORST_TRADE,
+        'admit_max_corr_top': ADMIT_MAX_CORR_TOP,
+        'admit_min_markets': ADMIT_MIN_MARKETS,
+        'observe_period': OBSERVE_PERIOD,
+        'admit_pending_fields': ADMIT_PENDING_FIELDS,
         'honesty_note': bt.get('honesty_note'),
         'bench_note': bt.get('bench_note'),
         'chain_note': bt.get('chain_note'),
