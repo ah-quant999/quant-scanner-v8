@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-10-21 08:01",
-  "republish_time": "2026-10-21 16:40:10",
+  "update_time": "2026-10-21 16:35",
+  "republish_time": "2026-10-21 17:15:26",
   "data_date": "2026-10-20",
   "rule_ver": 2,
   "top_n": 5,
@@ -21,35 +21,35 @@
           "name": "浙江美大",
           "price": 6.22,
           "chg": 0.81,
-          "main_net": 707885.0
+          "main_net": null
         },
         {
           "code": "603366",
           "name": "日出东方",
           "price": 7.87,
           "chg": 0.38,
-          "main_net": -77154304.0
+          "main_net": null
         },
         {
           "code": "300911",
           "name": "亿田智能",
           "price": 33.26,
           "chg": -0.42,
-          "main_net": 64994.0
+          "main_net": null
         },
         {
           "code": "605336",
           "name": "*ST帅电",
           "price": 10.62,
           "chg": -0.47,
-          "main_net": -265464.0
+          "main_net": null
         },
         {
           "code": "002035",
           "name": "华帝股份",
           "price": 4.51,
           "chg": -1.53,
-          "main_net": -5758661.0
+          "main_net": null
         }
       ],
       "match": "exact"
@@ -60,42 +60,42 @@
     {
       "name": "军工电子",
       "bk": "BK1233",
-      "cons_count": 61,
+      "cons_count": 60,
       "leaders": [
         {
           "code": "688011",
           "name": "新光光电",
           "price": 67.0,
           "chg": 8.24,
-          "main_net": 2512319.0
+          "main_net": null
         },
         {
           "code": "300762",
           "name": "上海瀚讯",
           "price": 23.6,
           "chg": 2.3,
-          "main_net": 25044118.0
+          "main_net": null
         },
         {
           "code": "688053",
           "name": "ST思科瑞",
           "price": 36.8,
           "chg": 2.19,
-          "main_net": 1990863.0
+          "main_net": null
         },
         {
           "code": "300045",
           "name": "华力创通",
           "price": 13.34,
           "chg": 2.14,
-          "main_net": 81063831.0
+          "main_net": null
         },
         {
           "code": "301306",
           "name": "西测测试",
           "price": 76.46,
           "chg": 1.92,
-          "main_net": 9477629.0
+          "main_net": null
         }
       ],
       "match": "norm"
@@ -578,6 +578,6 @@
   "leaders_fail_count": 0,
   "neo_fallback_count": 0,
   "retained_count": 0,
-  "em_boards_source": "live",
+  "em_boards_source": "cache",
   "note": "板块清单与 phase/pct_5d/pct_20d 直接取自 SECTOR_RS（与前端「板块资金趋势」卡同源同规则）；个股涨幅/价格为东方财富实时口径；leaders_error=1=个股行情本轮抓取失败待补抓；no_match=1=该板块在东财无对应行业板块（需补 MANUAL_ALIAS）；match 记录匹配方式(exact/norm/alias:*)"
 }
