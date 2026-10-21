@@ -1,7 +1,7 @@
 {
- "update_time": "2026-10-21 23:15:37",
+ "update_time": "2026-10-22 01:49:55",
  "vcp": {
-  "scanned": 3711,
+  "scanned": 4226,
   "items": [
    {
     "code": "601801",
@@ -30,6 +30,20 @@
     "score": 99.2,
     "date": "2026-10-21",
     "name": "滨江集团"
+   },
+   {
+    "code": "605100",
+    "close": 38.53,
+    "pullback_pct": 6.3,
+    "vol_shrink": 0.28,
+    "amp_shrink": 0.66,
+    "contractions": 1,
+    "ma20_dist": 5.0,
+    "pct20d": 24.4,
+    "trigger": 39.56,
+    "score": 96.1,
+    "date": "2026-10-21",
+    "name": "华丰股份"
    },
    {
     "code": "301560",
