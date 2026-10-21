@@ -1,6 +1,6 @@
 {
  "month": "2026年10月",
- "update_time": "2026-10-21 21:12",
+ "update_time": "2026-10-22 03:33",
  "legend": [
   {
    "title": "重要政策",
@@ -424,19 +424,19 @@
     {
      "num": 21,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "ASML Q3财报",
        "cls": "eu",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 22,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇸🇬 SG公假（屠妖节）",
