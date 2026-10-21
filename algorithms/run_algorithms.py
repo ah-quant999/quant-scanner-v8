@@ -366,6 +366,9 @@ ORDER = [
     #   产出 raw_data/factor_walkforward.json → scripts/gen_factor_progress.py 判 done/删除 + generate_top10.py 仅 PASS 启用。
     #   ⚠️ 与 STAGES["E"] 成对修改，否则模块级 assert(_STAGE_UNION == set(ORDER)) 崩链。
     "factor_walkforward.py",   # → raw_data/factor_walkforward.json（walk-forward 回测，全市场 K 线）
+    # 🆕 2026-10-21 主人令「新算法全要·带回测」：generate_factor_combo 接 factor_walkforward 引擎输出，
+    #   读其 PASS+显著因子 → 截面z→对称正交去共线→因子层风险平价 → 新模块 FACTOR_COMBO.js（自带 OOS 回测）。与 STAGES["E"] 成对。
+    "generate_factor_combo.py",  # → raw_data/factor_combo.json + data/FACTOR_COMBO.js（window.FACTOR_COMBO）
     # 🆕 2026-10-19 主人令「最终推荐回测日更」：gen_final_recommend_backtest.py 此前只手工跑过、未入链
     #   ⇒ FINAL_RECOMMEND_BACKTEST 长期 stale（与 FINAL_RECOMMEND_DATA 不同步）。现补挂 E 批最末（依赖 D 批
     #   final_recommend 真实信号归档 final_recommend_history + 当日 FINAL_RECOMMEND_DATA）；与 STAGES["E"] 成对。
@@ -492,6 +495,8 @@ STAGES = {
         "v8/gen_citic_pe.py",     # → data/CITIC_PE_THERMO.js + CITIC_PE_BACKTEST.js
         # 🆕 2026-09-17 主人令·全站口径统一（⑭）：factor_walkforward 引擎补挂主链 E 批最末（与 ORDER 同位置，成对修改）
         "factor_walkforward.py",   # → raw_data/factor_walkforward.json（walk-forward 回测，全市场 K 线）
+        # 🆕 2026-10-21 主人令「新算法全要·带回测」：与 ORDER 成对补挂（generate_factor_combo.py）。
+        "generate_factor_combo.py",  # → raw_data/factor_combo.json + data/FACTOR_COMBO.js（window.FACTOR_COMBO）
         # 🆕 2026-10-19 主人令「最终推荐回测日更」：与 ORDER 成对补挂（gen_final_recommend_backtest.py）。
         "gen_final_recommend_backtest.py",   # → data/FINAL_RECOMMEND_BACKTEST.js（最终推荐真实信号流回测）
     ],

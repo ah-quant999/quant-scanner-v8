@@ -557,7 +557,45 @@ FACTOR_DEFS = [
     # ── 审计表里「数据现成(kline_cache)」的两项，一并纳入本次回测 ──
     ("vol60", "60日波动率", "近 60 日日收益标准差取负（低波异象）"),
     ("amt60", "60日成交额中位数", "近 60 日成交额中位数取负（小市值/低流动性溢价）"),
+    # ── 🆕 2026-10-21 新 alpha 因子（纯 OHLCV，引擎自动 PSR+可行域+IC 回测）──
+    ("rev5", "5日反转", "近5日收益取负（短期反转异象）"),
+    ("rev20", "20日反转", "近20日收益取负（中期反转）"),
+    ("rev60", "60日反转", "近60日收益取负（长期反转）"),
+    ("vamom", "波动调整动量", "12-1动量 / 60日波动（风险调整动量，越高越好）"),
+    ("h52", "52周新高 proximity", "收盘/近250日最高（突破动量子，越高越好）"),
+    ("amp20", "振幅异动", "近20日(高-低)/收盘均值取负（低振幅稳定异象）"),
+    ("skew60", "收益偏度", "近60日收益偏度取负（低偏度=反 lottery 异象）"),
+    ("dviol60", "下行波动", "近60日下半方差取负（下行风险异象）"),
+    ("vol_conf", "量价共振", "近20日收益与成交量 Pearson 相关（量价齐升=健康趋势，越高越好）"),
 ]
+
+
+def _skew(x):
+    """样本偏度（Fisher-Pearson 标准化）；样本<3 或方差=0 返 None。"""
+    n = len(x)
+    if n < 3:
+        return None
+    m = sum(x) / n
+    var = sum((v - m) ** 2 for v in x) / (n - 1)
+    if var <= 0:
+        return None
+    sd = var ** 0.5
+    return sum(((v - m) / sd) ** 3 for v in x) / n
+
+
+def _pearson(a, b):
+    """Pearson 相关系数；长度<3 或任一方差为0 返 None。"""
+    n = len(a)
+    if n < 3:
+        return None
+    ma = sum(a) / n
+    mb = sum(b) / n
+    sa = sum((v - ma) ** 2 for v in a)
+    sb = sum((v - mb) ** 2 for v in b)
+    if sa <= 0 or sb <= 0:
+        return None
+    cov = sum((a[i] - ma) * (b[i] - mb) for i in range(n))
+    return cov / (sa * sb) ** 0.5
 
 
 def make_prep(rows):
@@ -566,7 +604,10 @@ def make_prep(rows):
     r, o = stock_series(rows)
     vol = [x["volume"] for x in rows]
     close = [x["close"] for x in rows]
+    high = [x["high"] for x in rows]
+    low = [x["low"] for x in rows]
     ps_r, ps_o, ps_v = _psum(r), _psum(o), _psum(vol)
+    ps2 = _psum([x * x for x in r])
     f = {}
     f["mom12_1"] = lambda i: (close[i - 20] / close[i - 240] - 1.0
                               if i >= 240 and close[i - 240] > 0 else None)
@@ -578,19 +619,39 @@ def make_prep(rows):
     f["amt60"] = lambda i: (
         -(sum(vol[i - 59:i + 1]) / 60.0 * (sum(close[i - 59:i + 1]) / 60.0))
         if i >= 60 else None)
-    # 60 日收益标准差（低波异象，取负）——用前缀和算 O(1)
-    ps2 = _psum([x * x for x in r])
 
-    def _vol60(i):
+    def _vol60(i, neg=True):
         if i < 60:
             return None
         m = 60
         s = ps_r[i + 1] - ps_r[i - 59]
         ss = ps2[i + 1] - ps2[i - 59]
         var = (ss - s * s / m) / (m - 1)
-        return -(var ** 0.5) if var > 0 else None
+        if var <= 0:
+            return None
+        v = var ** 0.5
+        return -v if neg else v
 
-    f["vol60"] = _vol60
+    f["vol60"] = lambda i: _vol60(i, True)
+
+    # ── 🆕 2026-10-21 新 alpha 因子（纯 OHLCV，kline_cache 可算；引擎自动 PSR+可行域+IC 回测）──
+    def _mom_raw(i):
+        return close[i - 20] / close[i - 240] - 1.0 if i >= 240 and close[i - 240] > 0 else None
+
+    f["rev5"] = lambda i: (-(close[i] / close[i - 5] - 1.0) if i >= 5 and close[i - 5] > 0 else None)
+    f["rev20"] = lambda i: (-(close[i] / close[i - 20] - 1.0) if i >= 20 and close[i - 20] > 0 else None)
+    f["rev60"] = lambda i: (-(close[i] / close[i - 60] - 1.0) if i >= 60 and close[i - 60] > 0 else None)
+    f["vamom"] = lambda i: (_mom_raw(i) / _vol60(i, False)
+                            if (_mom_raw(i) is not None and _vol60(i, False)) else None)
+    f["h52"] = lambda i: (close[i] / max(close[i - 249:i + 1])
+                          if i >= 250 and max(close[i - 249:i + 1]) > 0 else None)
+    f["amp20"] = lambda i: (
+        -(sum((high[k] - low[k]) / close[k] for k in range(i - 19, i + 1)) / 20.0) if i >= 20 else None)
+    f["skew60"] = lambda i: (-_skew(r[i - 59:i + 1])
+                             if i >= 60 and _skew(r[i - 59:i + 1]) is not None else None)
+    f["dviol60"] = lambda i: (
+        -(sum(min(0.0, x) ** 2 for x in r[i - 59:i + 1]) / 60.0) ** 0.5 if i >= 60 else None)
+    f["vol_conf"] = lambda i: (_pearson(r[i - 19:i + 1], vol[i - 19:i + 1]) if i >= 20 else None)
     return {"f": f, "r": r, "ps_r": ps_r, "n": n, "vol": vol}
 
 
