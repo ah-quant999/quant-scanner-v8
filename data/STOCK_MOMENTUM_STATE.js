@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-21 08:55",
- "generated": "2026-10-21 08:55",
+ "update_time": "2026-10-21 15:43",
+ "generated": "2026-10-21 15:43",
  "meta": {
-  "generated": "2026-10-21 08:55",
+  "generated": "2026-10-21 15:43",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 27,
   "days_with_consensus": 0,
@@ -11385,162 +11385,92 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605577",
       "name": "龙版传媒",
-      "change_pct": 4.307,
-      "price": 15.5,
+      "change_pct": 7.742,
+      "price": 16.7,
+      "category": "突破"
+     },
+     {
+      "code": "600540",
+      "name": "新赛股份",
+      "change_pct": 3.297,
+      "price": 4.7,
+      "category": "突破"
+     },
+     {
+      "code": "301046",
+      "name": "能辉科技",
+      "change_pct": 3.284,
+      "price": 29.25,
       "category": "突破"
      },
      {
       "code": "002811",
       "name": "郑中设计",
-      "change_pct": 5.223,
-      "price": 21.96,
+      "change_pct": 10.018,
+      "price": 24.16,
       "category": "突破"
      },
      {
-      "code": "002988",
-      "name": "豪美新材",
-      "change_pct": 3.879,
-      "price": 29.19,
+      "code": "002357",
+      "name": "富临运业",
+      "change_pct": 5.096,
+      "price": 11.55,
       "category": "突破"
      },
      {
-      "code": "002403",
-      "name": "爱仕达",
-      "change_pct": 9.961,
-      "price": 11.15,
+      "code": "000993",
+      "name": "闽东电力",
+      "change_pct": 3.867,
+      "price": 15.31,
       "category": "突破"
      },
      {
       "code": "688018",
       "name": "乐鑫科技",
-      "change_pct": 16.858,
-      "price": 140.72,
+      "change_pct": 3.653,
+      "price": 145.86,
       "category": "突破"
      },
      {
-      "code": "920075",
-      "name": "柏星龙",
-      "change_pct": 3.604,
-      "price": 16.1,
+      "code": "601999",
+      "name": "出版传媒",
+      "change_pct": 10.014,
+      "price": 7.8,
       "category": "突破"
      },
      {
-      "code": "301086",
-      "name": "鸿富瀚",
-      "change_pct": 8.579,
-      "price": 132.26,
+      "code": "002201",
+      "name": "九鼎新材",
+      "change_pct": 5.083,
+      "price": 8.89,
       "category": "突破"
      },
      {
-      "code": "920690",
-      "name": "捷众科技",
-      "change_pct": 3.432,
-      "price": 21.4,
-      "category": "突破"
-     },
-     {
-      "code": "605258",
-      "name": "协和电子",
-      "change_pct": 7.366,
-      "price": 46.06,
-      "category": "突破"
-     },
-     {
-      "code": "605168",
-      "name": "三人行",
-      "change_pct": 3.449,
-      "price": 44.99,
+      "code": "000731",
+      "name": "四川美丰",
+      "change_pct": 3.01,
+      "price": 7.53,
       "category": "突破"
      },
      {
       "code": "300244",
       "name": "迪安诊断",
-      "change_pct": 19.989,
-      "price": 21.79,
+      "change_pct": 3.488,
+      "price": 22.55,
       "category": "突破"
      },
      {
-      "code": "688696",
-      "name": "极米科技",
-      "change_pct": 5.781,
-      "price": 92.4,
+      "code": "600838",
+      "name": "上海九百",
+      "change_pct": 10.048,
+      "price": 9.09,
       "category": "突破"
      },
      {
-      "code": "603386",
-      "name": "骏亚科技",
-      "change_pct": 9.98,
-      "price": 21.71,
-      "category": "突破"
-     },
-     {
-      "code": "603595",
-      "name": "ST东尼",
-      "change_pct": 3.741,
-      "price": 33.55,
-      "category": "突破"
-     },
-     {
-      "code": "688719",
-      "name": "爱科赛博",
-      "change_pct": 4.419,
-      "price": 44.9,
-      "category": "突破"
-     },
-     {
-      "code": "301234",
-      "name": "五洲医疗",
-      "change_pct": 4.37,
-      "price": 132.78,
-      "category": "突破"
-     },
-     {
-      "code": "920455",
-      "name": "汇隆活塞",
-      "change_pct": 3.967,
-      "price": 6.29,
-      "category": "突破"
-     },
-     {
-      "code": "688620",
-      "name": "安凯微",
-      "change_pct": 5.788,
-      "price": 13.16,
-      "category": "突破"
-     },
-     {
-      "code": "002518",
-      "name": "科士达",
-      "change_pct": 3.017,
-      "price": 29.02,
-      "category": "突破"
-     },
-     {
-      "code": "002913",
-      "name": "奥士康",
-      "change_pct": 3.699,
-      "price": 86.07,
-      "category": "突破"
-     },
-     {
-      "code": "003004",
-      "name": "声迅股份",
-      "change_pct": 7.618,
-      "price": 60.89,
-      "category": "突破"
-     },
-     {
-      "code": "300727",
-      "name": "润禾材料",
-      "change_pct": 3.383,
-      "price": 27.81,
-      "category": "突破"
-     },
-     {
-      "code": "300517",
-      "name": "海波重科",
-      "change_pct": 4.365,
-      "price": 10.52,
+      "code": "603721",
+      "name": "中广天择",
+      "change_pct": 9.984,
+      "price": 20.82,
       "category": "突破"
      }
     ],
@@ -11548,71 +11478,71 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605577",
       "name": "龙版传媒",
-      "change_pct": 4.307,
-      "price": 15.5,
+      "change_pct": 7.742,
+      "price": 16.7,
+      "category": "加速"
+     },
+     {
+      "code": "600540",
+      "name": "新赛股份",
+      "change_pct": 3.297,
+      "price": 4.7,
+      "category": "加速"
+     },
+     {
+      "code": "301046",
+      "name": "能辉科技",
+      "change_pct": 3.284,
+      "price": 29.25,
       "category": "加速"
      },
      {
       "code": "002811",
       "name": "郑中设计",
-      "change_pct": 5.223,
-      "price": 21.96,
+      "change_pct": 10.018,
+      "price": 24.16,
       "category": "加速"
      },
      {
-      "code": "002988",
-      "name": "豪美新材",
-      "change_pct": 3.879,
-      "price": 29.19,
+      "code": "002357",
+      "name": "富临运业",
+      "change_pct": 5.096,
+      "price": 11.55,
       "category": "加速"
      },
      {
-      "code": "002403",
-      "name": "爱仕达",
-      "change_pct": 9.961,
-      "price": 11.15,
+      "code": "000993",
+      "name": "闽东电力",
+      "change_pct": 3.867,
+      "price": 15.31,
       "category": "加速"
      },
      {
       "code": "688018",
       "name": "乐鑫科技",
-      "change_pct": 16.858,
-      "price": 140.72,
+      "change_pct": 3.653,
+      "price": 145.86,
       "category": "加速"
      },
      {
-      "code": "920075",
-      "name": "柏星龙",
-      "change_pct": 3.604,
-      "price": 16.1,
+      "code": "601999",
+      "name": "出版传媒",
+      "change_pct": 10.014,
+      "price": 7.8,
       "category": "加速"
      },
      {
-      "code": "301086",
-      "name": "鸿富瀚",
-      "change_pct": 8.579,
-      "price": 132.26,
+      "code": "002201",
+      "name": "九鼎新材",
+      "change_pct": 5.083,
+      "price": 8.89,
       "category": "加速"
      },
      {
-      "code": "920690",
-      "name": "捷众科技",
-      "change_pct": 3.432,
-      "price": 21.4,
-      "category": "加速"
-     },
-     {
-      "code": "605258",
-      "name": "协和电子",
-      "change_pct": 7.366,
-      "price": 46.06,
-      "category": "加速"
-     },
-     {
-      "code": "605168",
-      "name": "三人行",
-      "change_pct": 3.449,
-      "price": 44.99,
+      "code": "000731",
+      "name": "四川美丰",
+      "change_pct": 3.01,
+      "price": 7.53,
       "category": "加速"
      }
     ],
@@ -11620,162 +11550,92 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605577",
       "name": "龙版传媒",
-      "change_pct": 4.307,
-      "price": 15.5,
+      "change_pct": 7.742,
+      "price": 16.7,
+      "category": "短线选股"
+     },
+     {
+      "code": "600540",
+      "name": "新赛股份",
+      "change_pct": 3.297,
+      "price": 4.7,
+      "category": "短线选股"
+     },
+     {
+      "code": "301046",
+      "name": "能辉科技",
+      "change_pct": 3.284,
+      "price": 29.25,
       "category": "短线选股"
      },
      {
       "code": "002811",
       "name": "郑中设计",
-      "change_pct": 5.223,
-      "price": 21.96,
+      "change_pct": 10.018,
+      "price": 24.16,
       "category": "短线选股"
      },
      {
-      "code": "002988",
-      "name": "豪美新材",
-      "change_pct": 3.879,
-      "price": 29.19,
+      "code": "002357",
+      "name": "富临运业",
+      "change_pct": 5.096,
+      "price": 11.55,
       "category": "短线选股"
      },
      {
-      "code": "002403",
-      "name": "爱仕达",
-      "change_pct": 9.961,
-      "price": 11.15,
+      "code": "000993",
+      "name": "闽东电力",
+      "change_pct": 3.867,
+      "price": 15.31,
       "category": "短线选股"
      },
      {
       "code": "688018",
       "name": "乐鑫科技",
-      "change_pct": 16.858,
-      "price": 140.72,
+      "change_pct": 3.653,
+      "price": 145.86,
       "category": "短线选股"
      },
      {
-      "code": "920075",
-      "name": "柏星龙",
-      "change_pct": 3.604,
-      "price": 16.1,
+      "code": "601999",
+      "name": "出版传媒",
+      "change_pct": 10.014,
+      "price": 7.8,
       "category": "短线选股"
      },
      {
-      "code": "301086",
-      "name": "鸿富瀚",
-      "change_pct": 8.579,
-      "price": 132.26,
+      "code": "002201",
+      "name": "九鼎新材",
+      "change_pct": 5.083,
+      "price": 8.89,
       "category": "短线选股"
      },
      {
-      "code": "920690",
-      "name": "捷众科技",
-      "change_pct": 3.432,
-      "price": 21.4,
-      "category": "短线选股"
-     },
-     {
-      "code": "605258",
-      "name": "协和电子",
-      "change_pct": 7.366,
-      "price": 46.06,
-      "category": "短线选股"
-     },
-     {
-      "code": "605168",
-      "name": "三人行",
-      "change_pct": 3.449,
-      "price": 44.99,
+      "code": "000731",
+      "name": "四川美丰",
+      "change_pct": 3.01,
+      "price": 7.53,
       "category": "短线选股"
      },
      {
       "code": "300244",
       "name": "迪安诊断",
-      "change_pct": 19.989,
-      "price": 21.79,
+      "change_pct": 3.488,
+      "price": 22.55,
       "category": "短线选股"
      },
      {
-      "code": "688696",
-      "name": "极米科技",
-      "change_pct": 5.781,
-      "price": 92.4,
+      "code": "600838",
+      "name": "上海九百",
+      "change_pct": 10.048,
+      "price": 9.09,
       "category": "短线选股"
      },
      {
-      "code": "603386",
-      "name": "骏亚科技",
-      "change_pct": 9.98,
-      "price": 21.71,
-      "category": "短线选股"
-     },
-     {
-      "code": "603595",
-      "name": "ST东尼",
-      "change_pct": 3.741,
-      "price": 33.55,
-      "category": "短线选股"
-     },
-     {
-      "code": "688719",
-      "name": "爱科赛博",
-      "change_pct": 4.419,
-      "price": 44.9,
-      "category": "短线选股"
-     },
-     {
-      "code": "301234",
-      "name": "五洲医疗",
-      "change_pct": 4.37,
-      "price": 132.78,
-      "category": "短线选股"
-     },
-     {
-      "code": "920455",
-      "name": "汇隆活塞",
-      "change_pct": 3.967,
-      "price": 6.29,
-      "category": "短线选股"
-     },
-     {
-      "code": "688620",
-      "name": "安凯微",
-      "change_pct": 5.788,
-      "price": 13.16,
-      "category": "短线选股"
-     },
-     {
-      "code": "002518",
-      "name": "科士达",
-      "change_pct": 3.017,
-      "price": 29.02,
-      "category": "短线选股"
-     },
-     {
-      "code": "002913",
-      "name": "奥士康",
-      "change_pct": 3.699,
-      "price": 86.07,
-      "category": "短线选股"
-     },
-     {
-      "code": "003004",
-      "name": "声迅股份",
-      "change_pct": 7.618,
-      "price": 60.89,
-      "category": "短线选股"
-     },
-     {
-      "code": "300727",
-      "name": "润禾材料",
-      "change_pct": 3.383,
-      "price": 27.81,
-      "category": "短线选股"
-     },
-     {
-      "code": "300517",
-      "name": "海波重科",
-      "change_pct": 4.365,
-      "price": 10.52,
+      "code": "603721",
+      "name": "中广天择",
+      "change_pct": 9.984,
+      "price": 20.82,
       "category": "短线选股"
      }
     ],
@@ -11783,92 +11643,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300244",
       "name": "迪安诊断",
-      "change_pct": 19.989,
-      "price": 21.79,
+      "change_pct": 3.488,
+      "price": 22.55,
       "category": "强势股"
      },
      {
-      "code": "688696",
-      "name": "极米科技",
-      "change_pct": 5.781,
-      "price": 92.4,
+      "code": "600838",
+      "name": "上海九百",
+      "change_pct": 10.048,
+      "price": 9.09,
       "category": "强势股"
      },
      {
-      "code": "603386",
-      "name": "骏亚科技",
-      "change_pct": 9.98,
-      "price": 21.71,
-      "category": "强势股"
-     },
-     {
-      "code": "603595",
-      "name": "ST东尼",
-      "change_pct": 3.741,
-      "price": 33.55,
-      "category": "强势股"
-     },
-     {
-      "code": "688719",
-      "name": "爱科赛博",
-      "change_pct": 4.419,
-      "price": 44.9,
-      "category": "强势股"
-     },
-     {
-      "code": "301234",
-      "name": "五洲医疗",
-      "change_pct": 4.37,
-      "price": 132.78,
-      "category": "强势股"
-     },
-     {
-      "code": "920455",
-      "name": "汇隆活塞",
-      "change_pct": 3.967,
-      "price": 6.29,
-      "category": "强势股"
-     },
-     {
-      "code": "688620",
-      "name": "安凯微",
-      "change_pct": 5.788,
-      "price": 13.16,
-      "category": "强势股"
-     },
-     {
-      "code": "002518",
-      "name": "科士达",
-      "change_pct": 3.017,
-      "price": 29.02,
-      "category": "强势股"
-     },
-     {
-      "code": "002913",
-      "name": "奥士康",
-      "change_pct": 3.699,
-      "price": 86.07,
-      "category": "强势股"
-     },
-     {
-      "code": "003004",
-      "name": "声迅股份",
-      "change_pct": 7.618,
-      "price": 60.89,
-      "category": "强势股"
-     },
-     {
-      "code": "300727",
-      "name": "润禾材料",
-      "change_pct": 3.383,
-      "price": 27.81,
-      "category": "强势股"
-     },
-     {
-      "code": "300517",
-      "name": "海波重科",
-      "change_pct": 4.365,
-      "price": 10.52,
+      "code": "603721",
+      "name": "中广天择",
+      "change_pct": 9.984,
+      "price": 20.82,
       "category": "强势股"
      }
     ]
