@@ -295,10 +295,49 @@ def selftest():
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
     sys.stderr.reconfigure(encoding="utf-8")
-    if len(sys.argv) >= 2 and sys.argv[1] == "--selftest":
+
+    # ── 2026-10-21 一劳永逸修（实证 bug）──────────────────────────────────
+    # 有调用方按 SMTP 风格传参 `v8_send_alert.py --to 2814546@qq.com ...`，
+    # 旧 CLI 把 argv[1] 当主题 → 发出主题为「--to」、正文为邮箱地址的垃圾告警。
+    # 修复：CLI 兼容两种形式，杜绝再犯：
+    #   A) 位置参数（历史形式）：v8_send_alert.py "主题" "正文" [level]
+    #   B) flag 形式：v8_send_alert.py --subject "主题" --body "正文" [--level lv] [--to 邮箱]
+    # flag 的 --to 仅当与配置 receiver 一致时放行（防误发他人），否则拒发留痕。
+    argv = sys.argv[1:]
+    if argv and argv[0] == "--selftest":
         selftest()
-    elif len(sys.argv) >= 3:
-        send_alert(sys.argv[1], sys.argv[2],
-                   level=(sys.argv[3] if len(sys.argv) >= 4 else None))
+        sys.exit(0)
+    if any(str(a).startswith("-") for a in argv):
+        import argparse
+        ap = argparse.ArgumentParser(
+            prog="v8_send_alert.py",
+            description="v8 统一告警邮件出口（位置参数或 flag 两种形式均可）")
+        ap.add_argument("--subject", default="")
+        ap.add_argument("--body", default="")
+        ap.add_argument("--level", default=None)
+        ap.add_argument("--to", default=None,
+                        help="可选收件覆盖；仅当与配置 receiver 一致时放行")
+        ap.add_argument("positional", nargs="*",
+                        help='旧形式位置参数："主题" "正文" [level]')
+        args = ap.parse_args(argv)
+        if args.positional:
+            subject = args.positional[0]
+            body = args.positional[1] if len(args.positional) >= 2 else args.body
+            level = args.positional[2] if len(args.positional) >= 3 else args.level
+        else:
+            subject, body, level = args.subject, args.body, args.level
+        cfg_probe = load_config() or {}
+        receiver = str(cfg_probe.get("receiver", "")
+                       or cfg_probe.get("sender", "")).strip()
+        if args.to and receiver and args.to.strip() != receiver:
+            _trace(subject, body, level or LEVEL_INFRA, "SKIP",
+                   f"--to={args.to} 与配置 receiver 不一致，拒发（防误发）")
+            print(f"[{datetime.now()}] [GATE] SKIP: --to 与配置 receiver 不一致，拒发")
+            sys.exit(2)
+        send_alert(subject, body, level=level)
+        sys.exit(0)
+    # 纯位置参数（历史形式）：保持原行为
+    if len(argv) >= 2:
+        send_alert(argv[0], argv[1], level=(argv[2] if len(argv) >= 3 else None))
     else:
         send_alert("九宝量化 v8 自检邮件", "v8 邮件告警通道测试成功。", level=LEVEL_INFRA)
