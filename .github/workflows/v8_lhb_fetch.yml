@@ -148,7 +148,23 @@ jobs:
             'Accept'        = 'application/vnd.github+json'
           }
           $repo = 'ah-quant999/quant-scanner-v8'
-          $files = @('raw_data/lhb_history.json', 'out/lhb_result.json', 'out/lhb_seats.json')
+          # 🔧 2026-10-21 一劳永逸修复（根治 08-04 静默回退同构因）：单飞 workflow 自包含产出
+          #   raw_data/lhb_data.json（主链 stage_to_raw 后端源）与 data/LHB_DATA.js（图14 前端 window.LHB_DATA）。
+          #   原缺陷：fetch_lhb.py 只产出 out/lhb_result.json / out/lhb_seats.json / raw_data/lhb_history.json，
+          #   不写 lhb_data.json 与 LHB_DATA.js（二者原仅由主算法链 stage 产出）→ 主链停跑时这两份静默回退陈旧。
+          #   现由 out/lhb_result.json 本地直生两份，即使主链死，龙虎榜明细也不回退。
+          if (Test-Path 'out/lhb_result.json') {
+            $lhbJson = [System.IO.File]::ReadAllText('out/lhb_result.json', [System.Text.Encoding]::UTF8)
+            New-Item -ItemType Directory -Force -Path raw_data | Out-Null
+            [System.IO.File]::WriteAllText('raw_data/lhb_data.json', $lhbJson, [System.Text.Encoding]::UTF8)
+            Write-Host "[ok] 自生成 raw_data/lhb_data.json"
+            New-Item -ItemType Directory -Force -Path data | Out-Null
+            [System.IO.File]::WriteAllText('data/LHB_DATA.js', "window.LHB_DATA = $lhbJson;", [System.Text.Encoding]::UTF8)
+            Write-Host "[ok] 自生成 data/LHB_DATA.js"
+          } else {
+            Write-Host "[warn] out/lhb_result.json 缺失，跳过 LHB_DATA 自生成"
+          }
+          $files = @('raw_data/lhb_history.json', 'out/lhb_result.json', 'out/lhb_seats.json', 'raw_data/lhb_data.json', 'data/LHB_DATA.js')
           foreach ($f in $files) {
             if (-not (Test-Path $f)) { Write-Host "[skip] $f 不存在，跳过"; continue }
             $content = [System.IO.File]::ReadAllText($f, [System.Text.Encoding]::UTF8)
