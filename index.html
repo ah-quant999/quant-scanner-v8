@@ -14299,7 +14299,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       var _s0 = _B0.rotation || {};
       if(typeof window.__renderBacktestTable==='function'){
         window.__renderBacktestTable(document.getElementById('rotationBackBody'), document.getElementById('rotationBackNote'), (_s0.summary&&_s0.summary.by_period)||{}, {
-          method: '✅ 真实信号流口径（各板块当日龙头个股次开买入、持有 N 日收盘卖出、前复权·扣双边 0.3%）；基准=全市场等权（剔 ST/退、价格≥2）；样本随持有天数成熟累积，未走满不计入。',
+          method: '✅ 真实信号流口径（各板块当日龙头个股次开买入、持有 N 日收盘卖出、前复权·扣双边 0.3%；无真实龙头板块按同花顺行业成分涨幅前3代理，卡面标「（代理）」）；基准=全市场等权（剔 ST/退、价格≥2）；样本随持有天数成熟累积，未走满不计入。',
           defaultNote: '真实信号流口径：上线首日即建归档，样本随持有天数成熟累积，未走满 T+N 不计入。'
         });
       }
@@ -14317,6 +14317,12 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         y.leaders.forEach(function(L){
           lh += '<span style="margin-right:8px;white-space:nowrap;">'+_e(L.name)+' '+_pl_c(L.chg)+'</span>';
         });
+        // 🆕 2026-10-21 主人令「链路闭环」：代理龙头（非主升/启动板块、SECTOR_LEADERS
+        //    不覆盖，按同花顺行业成分当日涨幅前3 代理，东财行业板块/NeoData 副援）
+        //    显式标注，与真实龙头区分，绝不混算。
+        if(/^proxy/.test(y.leaders_src||'')){
+          lh += '<span style="font-size:10px;color:#8a93a6;white-space:nowrap;" title="该板块不在 SECTOR_LEADERS 覆盖范围（非主升/启动），按同花顺行业成分当日涨幅前3代理取数，仅供回测前向跟踪口径">（代理）</span>';
+        }
       }
       h += '<tr style="border-bottom:1px solid var(--border);">'
         + '<td style="padding:6px;"><b>'+_e(y.sector)+'</b>'+(y.type?' <span style="font-size:10px;color:var(--dim)">'+_e(y.type)+'</span>':'')+'</td>'
