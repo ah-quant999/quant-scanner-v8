@@ -2167,6 +2167,44 @@ def f_etf_net_subscription():
             return "主题"
         return "行业"
 
+    # 🆕 2026-10-21 主人 P1：东方财富官方五分类视图（股票型/债券型/货币型/商品型/跨境型）。
+    #   同一份真实份额日环比数据，按东财官方基金类型（fund_name_em）二次归类，
+    #   由 update_v8 派生 data/ETF_SUBSCRIPTION_EASTMONEY.js（单源双视图，禁止两套标准）。
+    #   兜底：fund_name_em 失败/未命中时按名称关键词降级（与 _cat_of 同源思想，宁全勿缺）。
+    em_type_map = {}
+    try:
+        _fn = ak.fund_name_em()
+        for _, r in _fn.iterrows():
+            _c = str(r.get("基金代码", "")).strip().zfill(6)
+            em_type_map[_c] = str(r.get("基金类型", "") or "")
+        print(f"  ✅ 东财基金类型表加载: {len(em_type_map)} 只")
+    except Exception as e:
+        print(f"  ⚠️ fund_name_em 失败（五分类按名称关键词降级）: {e}")
+
+    def _em_cat_of(code, name):
+        t = em_type_map.get(str(code), "")
+        if t:
+            if "债券" in t or "债" in t.split("-")[0]:
+                return "债券型"
+            if "货币" in t:
+                return "货币型"
+            if "商品" in t or "另类" in t:
+                return "商品型"
+            if "海外" in t or "QDII" in t.upper() or "REITs" in t.upper() or "港股" in t:
+                return "跨境型"
+        n = str(name or "")
+        if any(k in n for k in ["黄金", "白银", "原油", "石油", "豆粕", "能源", "矿业", "商品"]):
+            return "商品型"
+        if any(k in n for k in ["恒生", "纳斯达克", "标普", "纳指", "日经", "德国", "法国", "美国",
+                                 "道琼斯", "港股", "中概", "H股", "日本", "东南亚", "沙特", "越南",
+                                 "亚太", "跨境"]):
+            return "跨境型"
+        if any(k in n for k in ["国债", "地方债", "信用债", "短融", "转债", "可转债", "政金债", "债"]):
+            return "债券型"
+        if any(k in n for k in ["货币", "现金", "添益", "增利", "快线", "保证金"]):
+            return "货币型"
+        return "股票型"
+
     base = {}
     for _, r in df0.iterrows():
         try:
@@ -2175,6 +2213,7 @@ def f_etf_net_subscription():
             continue
 
     cats = {"宽基": [], "行业": [], "主题": [], "跨境": [], "商品": []}
+    cats_em = {"股票型": [], "债券型": [], "货币型": [], "商品型": [], "跨境型": []}
     for _, r in df1.iterrows():
         code = str(r.get("基金代码", "")).strip().zfill(6)
         name = str(r.get("基金简称", "")).strip()
@@ -2188,14 +2227,16 @@ def f_etf_net_subscription():
         d_share = sh1 - sh0
         p = nav.get(code) or 0.0
         d_yuan = d_share * (p if p > 0 else 1.0)
-        cats[_cat_of(name)].append({
+        _item = {
             "code": code, "name": name,
             "d_shares_yi": round(d_share / 1e8, 4),
             "d_amount_yi": round(d_yuan / 1e8, 4),
             "pct": round(d_share / sh0 * 100, 2),
             "shares_yi": round(sh1 / 1e8, 2),
             "_d": d_share,
-        })
+        }
+        cats[_cat_of(name)].append(_item)
+        cats_em[_em_cat_of(code, name)].append(_item)
 
     categories = {}
     for cn, lst in cats.items():
@@ -2208,6 +2249,20 @@ def f_etf_net_subscription():
             "top_sub": [{k: v for k, v in x.items() if k != "_d"} for x in top_sub if x["_d"] > 0],
             "top_redeem": [{k: v for k, v in x.items() if k != "_d"} for x in top_red if x["_d"] < 0],
         }
+
+    # 东财五分类视图（与 categories 完全同构，同一份真实数据）
+    categories_em = {}
+    for cn, lst in cats_em.items():
+        top_sub = sorted(lst, key=lambda x: x["_d"], reverse=True)[:5]
+        top_red = sorted(lst, key=lambda x: x["_d"])[:5]
+        categories_em[cn] = {
+            "net_share_yi": round(sum(x["_d"] for x in lst) / 1e8, 3),
+            "net_amount_yi": round(sum(x["d_amount_yi"] for x in lst), 3),
+            "count": len(lst),
+            "top_sub": [{k: v for k, v in x.items() if k != "_d"} for x in top_sub if x["_d"] > 0],
+            "top_redeem": [{k: v for k, v in x.items() if k != "_d"} for x in top_red if x["_d"] < 0],
+        }
+    em_items_n = sum(len(v) for v in cats_em.values())
 
     all_items = [x for lst in cats.values() for x in lst]
     if not all_items:
@@ -2226,8 +2281,12 @@ def f_etf_net_subscription():
         "total_net_amount_yi": round(sum(x["d_amount_yi"] for x in all_items), 3),
         "total_etf": len(all_items),
         "categories": categories,
+        "categories_em": categories_em,
+        "em_classified": em_items_n,
         "note": ("真实份额申赎口径：净申赎 = 当日基金份额 − 上一交易日份额（上交所官方披露），"
-                 "与「主力净流入」等按主动成交方向推断的估算值无关。"),
+                 "与「主力净流入」等按主动成交方向推断的估算值无关。"
+                 "categories_em=东方财富官方基金类型五分类（股票型/债券型/货币型/商品型/跨境型），"
+                 "与 categories（宽基/行业/主题/跨境/商品）为同一份数据的两种归类视图。"),
     }
 
 

@@ -621,6 +621,7 @@ window.__domReadyFns=[];
     <script src="data/ETF_INTRADAY_HEAT.js?v=073b0df237" defer></script>
     <script src="data/SECTOR_FUND_FLOW.js?v=2edda10634" defer></script>
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=d481b6b4fd" defer></script>
+    <script src="data/ETF_SUBSCRIPTION_EASTMONEY.js?v=a1021etf01" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=5b895eb760" defer></script>
     <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=b639900bf3" defer></script>
@@ -3001,7 +3002,7 @@ function fmtSigned(v){
     <!-- 🚚 资金热度·净申赎（2026-09-15 主人令：T-1 非实时，自「实时数据」页 ETF 盘中异动·主力净额分时卡 Block2 迁至本页「日监控·主力净流入」卡下方。
          容器 id="etfHeatBlock/etfHeatSummary/etfHeatByCat" 与 renderEtfHeatByCategory() 不变，仅 DOM 位置移动。） -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🔥</span>资金热度·净申赎（真实份额） <span style="font-size:10px;color:var(--dim);font-weight:600">上交所口径 · 数据日 T-1 · 非估算（交易所盘后披露）</span> · <span class="fresh" id="etfHeatTime">—</span></h3>
+      <h3><span class="ic">🔥</span>资金热度·净申赎（真实份额） <span style="font-size:10px;color:var(--dim);font-weight:600">上交所口径 · 东财五分类 · 金额亿元 · 数据日 T-1 · 非估算（交易所盘后披露）</span> · <span class="fresh" id="etfHeatTime">—</span></h3>
       <div id="etfHeatBlock">
         <div id="etfHeatSummary" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:12px;color:var(--sub)">加载中…</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="etfHeatByCat"><div class="ipo-empty" style="grid-column:1/3">加载中…</div></div>
@@ -11234,34 +11235,48 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
     }
   }
 
-  /* ---- ETF 资金热度（4 大类 TOP5流入+TOP5流出，横向 bar） ---- */
+  /* ---- ETF 资金热度（分类 TOP5流入+TOP5流出，横向 bar） ---- */
   /* 2026-09-11 主人 P1：ETF「资金热度·净申赎」块改为**真实数据**口径。
      数据源 window.ETF_NET_SUBSCRIPTION = 上交所 ETF 基金份额日环比
        （净申赎 = 当日份额 − 上一交易日份额，真实的申购/赎回引致的份额变动）。
      旧实现渲染的是 window.ETF_INTRADAY_HEAT 里的「主力净流入」——
-       那是按主动成交方向推断的**估算值**，与卡片标题「净申赎」名实不符，已整体替换。 */
+       那是按主动成交方向推断的**估算值**，与卡片标题「净申赎」名实不符，已整体替换。
+   🆕 2026-10-21 主人 P1：优先读 window.ETF_SUBSCRIPTION_EASTMONEY（东方财富官方基金类型
+       五分类：股票型/债券型/货币型/商品型/跨境型，净申赎金额按亿元展示）——与
+       ETF_NET_SUBSCRIPTION 同源同日（同一份真实份额数据、update_v8 单源派生），
+       仅归类维度不同；新视图缺失时回退老视图（宽基/行业/主题/跨境/商品 · 亿份）。 */
   function renderEtfHeatByCategory(netSub){
     const el0=$('etfHeatSummary'), el1=$('etfHeatByCat');
-    if(!netSub||!netSub.categories||!Object.keys(netSub.categories).length){
+    // 🆕 2026-10-21 主人 P1：优先东财官方五分类视图（ETF_SUBSCRIPTION_EASTMONEY，与 ETF_NET_SUBSCRIPTION
+    //   同一份真实份额日环比数据，仅归类维度不同：股票型/债券型/货币型/商品型/跨境型 + 净申赎金额亿元）。
+    //   缺失时回退老视图（宽基/行业/主题/跨境/商品 · 亿份），披露口径随视图切换，单源不混算。
+    const em=window.ETF_SUBSCRIPTION_EASTMONEY||null;
+    const isEm=!!(em&&em.categories&&Object.keys(em.categories).length);
+    const src=isEm?em:netSub;
+    if(!src||!src.categories||!Object.keys(src.categories).length){
       if(el0) el0.innerHTML='';
       if(el1) el1.innerHTML='<div class="ipo-empty">⏳ ETF 份额申赎（上交所真实口径）待生成 · 交易所披露后更新</div>';
       // 2026-09-15 主人令：资金热度·净申赎 T-1 非实时，卡已迁「盘后数据」页 → 徽章 etfHeatTime、时段「盘后」
-      if(el1 && netSub && netSub.update_time) setBadge('etfHeatTime','盘后','短线',netSub.update_time);
+      if(el1 && src && src.update_time) setBadge('etfHeatTime','盘后','短线',src.update_time);
       return;
     }
-    const catNames=['宽基','行业','主题','跨境','商品'];
-    const colorMap={宽基:'var(--cyan)',行业:'var(--purple)',主题:'var(--gold)',跨境:'var(--pink)',商品:'var(--up)'};
+    const catNames=isEm?['股票型','债券型','货币型','商品型','跨境型']:['宽基','行业','主题','跨境','商品'];
+    const colorMap=isEm?{'股票型':'var(--cyan)','债券型':'var(--purple)','货币型':'var(--sub)','商品型':'var(--gold)','跨境型':'var(--pink)'}
+                       :{'宽基':'var(--cyan)','行业':'var(--purple)','主题':'var(--gold)','跨境':'var(--pink)','商品':'var(--up)'};
     const fmtYi=v=>{const a=Math.abs(v);return(v>=0?'+':'-')+a.toFixed(2)+'亿';};
     const fmtPct=p=>(p>=0?'+':'')+p.toFixed(2)+'%';
-    const _dd=netSub.data_date?('数据日 '+netSub.data_date+(netSub.prev_date?('（较 '+netSub.prev_date+'）'):'')):'';
-    const tot=netSub.total_net_share_yi||0, tota=netSub.total_net_amount_yi||0;
+    const metKey=isEm?'d_amount_yi':'d_shares_yi';
+    const metUnit=isEm?'元':'份';
+    const _dd=src.data_date?('数据日 '+src.data_date+(src.prev_date?('（较 '+src.prev_date+'）'):'')):'';
+    const tota=src.total_net_amount_yi||0, tots=src.total_net_share_yi||0;
+    const tot=isEm?tota:tots;
     const totc=tot>=0?'var(--up)':'var(--down)';
-    let shtml='<span style="color:var(--dim)">ETF 净申赎 · 真实份额口径（上交所）'+(netSub.data_date?(' · '+_dd):'')+'：</span>';
-    shtml+='<span><span style="color:var(--txt);font-weight:700">合计</span> <span style="color:'+totc+';font-weight:700">'+fmtYi(tot)+'份</span> <span style="color:var(--sub);font-size:11px">（约 '+fmtYi(tota)+'元）</span> · '+(netSub.total_etf||0)+'只</span>';
+    let shtml='<span style="color:var(--dim)">ETF 净申赎 · '+(isEm?'东方财富五分类 · 金额口径':'真实份额口径（上交所）')+(src.data_date?(' · '+_dd):'')+'：</span>';
+    shtml+='<span><span style="color:var(--txt);font-weight:700">合计</span> <span style="color:'+totc+';font-weight:700">'+fmtYi(tot)+metUnit+'</span> '+(isEm?'':'<span style="color:var(--sub);font-size:11px">（约 '+fmtYi(tota)+'元）</span>')+'· '+(src.total_etf||0)+'只</span>';
     if(el0) el0.innerHTML=shtml;
     let h='';
     catNames.forEach(cn=>{
-      const c=netSub.categories[cn];
+      const c=src.categories[cn];
       if(!c){h+='<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px"><div style="font-weight:700;margin-bottom:6px;color:'+colorMap[cn]+'">'+cn+' · 暂无数据</div><div style="color:var(--dim);font-size:11.5px">该分类本期无份额申赎数据</div></div>';return;}
       const list=[];
       const seen=new Set();
@@ -11270,27 +11285,27 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
         seen.add(x.code);
         list.push(x);
       });
-      list.sort(function(a,b){return Math.abs(b.d_shares_yi||0)-Math.abs(a.d_shares_yi||0);});
+      list.sort(function(a,b){return Math.abs(b[metKey]||0)-Math.abs(a[metKey]||0);});
       list.splice(5);
-      const maxAbs=Math.max.apply(null,list.map(x=>Math.abs(x.d_shares_yi||0)))||1;
+      const maxAbs=Math.max.apply(null,list.map(x=>Math.abs(x[metKey]||0)))||1;
       let rows='';
       list.forEach(x=>{
-        const v=x.d_shares_yi||0, isIn=v>=0;
+        const v=x[metKey]||0, isIn=v>=0;
         const color=isIn?'var(--up)':'var(--down)';
         const bg=isIn?'linear-gradient(90deg,#ef5350,#f87171)':'linear-gradient(90deg,#26a69a,#4ade80)';
         const w=Math.min(100,Math.abs(v)/maxAbs*100);
         const dirMark=isIn?'▲':'▼';
-        rows+='<div class="flow-row" style="padding:2px 0"><span class="flow-name" style="width:110px;font-size:11px;line-height:1.25;display:flex;flex-direction:column;justify-content:center" title="'+x.name+' '+x.code+'"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+x.name+'</span><span style="font-size:9.5px;color:var(--dim);white-space:nowrap">（'+x.code+'）</span></span><div class="flow-bar"><div class="flow-fill" style="width:'+w.toFixed(1)+'%;background:'+bg+'"></div></div><span class="flow-val" style="width:130px;font-size:10.5px"><span style="color:'+color+';font-weight:700">'+dirMark+' '+fmtYi(v)+'份</span> <span style="color:var(--sub);font-size:9px;margin-left:4px">'+fmtPct(x.pct||0)+'</span></span></div>';
+        rows+='<div class="flow-row" style="padding:2px 0"><span class="flow-name" style="width:110px;font-size:11px;line-height:1.25;display:flex;flex-direction:column;justify-content:center" title="'+x.name+' '+x.code+'"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+x.name+'</span><span style="font-size:9.5px;color:var(--dim);white-space:nowrap">（'+x.code+'）</span></span><div class="flow-bar"><div class="flow-fill" style="width:'+w.toFixed(1)+'%;background:'+bg+'"></div></div><span class="flow-val" style="width:130px;font-size:10.5px"><span style="color:'+color+';font-weight:700">'+dirMark+' '+fmtYi(v)+metUnit+'</span> <span style="color:var(--sub);font-size:9px;margin-left:4px">'+fmtPct(x.pct||0)+'</span></span></div>';
       });
-      const yi=c.net_share_yi||0, c2=yi>=0?'var(--up)':'var(--down)';
+      const yi=isEm?(c.net_amount_yi||0):(c.net_share_yi||0), c2=yi>=0?'var(--up)':'var(--down)';
       h+='<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 10px">';
-      h+='<div style="font-weight:700;margin-bottom:4px;color:'+colorMap[cn]+';display:flex;justify-content:space-between;align-items:center;font-size:11.5px"><span>'+cn+' · '+c.count+'只</span><span style="font-size:10px;color:'+c2+';font-weight:700">'+fmtYi(yi)+'份</span></div>';
+      h+='<div style="font-weight:700;margin-bottom:4px;color:'+colorMap[cn]+';display:flex;justify-content:space-between;align-items:center;font-size:11.5px"><span>'+cn+' · '+c.count+'只</span><span style="font-size:10px;color:'+c2+';font-weight:700">'+fmtYi(yi)+metUnit+'</span></div>';
       h+=rows;
       h+='</div>';
     });
     if(el1) el1.innerHTML=h;
     // 2026-09-15 主人令：资金热度·净申赎 T-1 非实时 → 时段「盘后」（徽章 etfHeatTime 随卡在「盘后数据」页）
-    if(document.getElementById('etfHeatTime')) setBadge('etfHeatTime','盘后','短线',netSub.update_time);
+    if(document.getElementById('etfHeatTime')) setBadge('etfHeatTime','盘后','短线',src.update_time);
   }
 
   /* ---- 5.5 ETF 量能脉冲(盘中异动) / 日监控 渲染 ---- */
@@ -12429,6 +12444,7 @@ function drawUpDownChart(){
           {name:'日监控·主力净流入', source:'ETF_DAILY_MONITOR', freq:'盘中每30分+盘后定稿', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'ETF 主力净流入'},
 
           {name:'资金热度·净申赎', source:'ETF_NET_SUBSCRIPTION', freq:'每日盘前', slots:['0','8',':','2','5'], note:'真实份额申赎'},
+          {name:'资金热度·东财五分类', source:'ETF_SUBSCRIPTION_EASTMONEY', freq:'每日盘前', slots:['0','8',':','2','5'], note:'股票/债券/货币/商品/跨境'},
 
           {name:'市场宽度·新高家数', source:'W52_HIGH', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'52周新高广度'},
 
@@ -13115,7 +13131,7 @@ function drawUpDownChart(){
     '观测平台': ['SH_FIB', 'maharo_insights', 'INDEX_VALUE_FRAMEWORK', 'WAVE_ELLIOTT', 'CITIC_PE_THERMO'],
     '今日事件': ['V8_CAL', 'IPO_DATA', 'JUDGMENT_DATA', 'MACRO_DATA', 'RESTRICTED_RELEASE', 'PERFORMANCE_FORECAST'],
     '实时数据': ['INDEX_QUOTES', 'ETF_PULSE', 'ETF_INTRADAY_HEAT', 'SECTOR_FUND_FLOW', 'CONCEPT_RANKING', 'LIMIT_UP_HEATMAP', 'SECTOR_FUND_FLOW_INTRADAY', 'MARKET_ALERTS', 'STOCK_QUOTE', 'CFFEX_HOLDINGS', 'AVG_PRICE_DATA', 'OVERSEAS_MARKETS', 'AI_MARKET_BRIEF', 'COMMODITY_ELASTICITY'],
-    '盘后数据': ['MARGIN_DATA', 'ETF_DAILY_MONITOR', 'SECTOR_RECOMMENDATION', 'ETF_NET_SUBSCRIPTION', 'W52_HIGH'],  /* 🏔 2026-10-20：SECTOR_YEAR_FLOW 随卡迁「暂未上架」 */
+    '盘后数据': ['MARGIN_DATA', 'ETF_DAILY_MONITOR', 'SECTOR_RECOMMENDATION', 'ETF_NET_SUBSCRIPTION', 'ETF_SUBSCRIPTION_EASTMONEY', 'W52_HIGH'],  /* 🏔 2026-10-20：SECTOR_YEAR_FLOW 随卡迁「暂未上架」 */
     '共振日历': ['CRISIS_DATA', 'LHB_DATA'],
     '最终推荐': ['FACTOR_LAB', 'TOP10_DAILY'],
     '选股策略': ['CANDIDATE', 'GOLD_POOL', 'IMA_STRONG_BACKTEST', 'VOLATILITY', 'STOCK_STOP_DATA', 'H_AUTO_BUY', 'H_AUTO_BUY_TRACK', 'IMA_STRONG_STOCK', 'FIRST_BOARD_ALERT', 'LIANBAN_WINRATE'],  /* 🆕 2026-10-19：连板梯队两卡自暂未上架迁入 */  /* 🔴 2026-10-11：TRIPLE_CONSENSUS/TRIPLE_HISTORY/CRDS_CARD_DATA 随两策略下架移除；🔴 2026-10-18：四量终极+ALGO_TRACK 随四量下架移除 */

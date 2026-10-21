@@ -1539,9 +1539,56 @@ def build(category=None, detect_changes=False):
         out_path = _write_js(var_name, obj)
         updated += 1
         print(f"  ✅ {src_path.name} → {out_path.name}")
+        # 🆕 2026-10-21 主人 P1：ETF 净申赎 raw 同步派生东财五分类 js（单源双视图）
+        if var_name == "ETF_NET_SUBSCRIPTION":
+            _derive_etf_eastmoney(obj)
 
     print(f"\n完成：更新 {updated} 个，跳过 {skipped} 个。输出目录：{DATA_DIR}")
     return 0
+
+
+def _derive_etf_eastmoney(obj):
+    """🆕 2026-10-21 主人 P1：由 etf_net_subscription.json 派生 data/ETF_SUBSCRIPTION_EASTMONEY.js。
+
+    东方财富官方基金类型五分类视图（股票型/债券型/货币型/商品型/跨境型）——
+    与 ETF_NET_SUBSCRIPTION **同一份真实份额日环比数据**（上交所官方披露），
+    仅归类维度不同（东财 fund_name_em 官方类型 vs 宽基/行业/主题/跨境/商品关键词）。
+    单源双视图：raw 只抓一次、分类在 cloud_fetch_v8.f_etf_net_subscription 内一次生成，
+    此处仅做「选视图 + 改写披露文案」的纯转换，杜绝第二条抓取链（防两套标准/半截接线死链）。
+    """
+    try:
+        cats = obj.get("categories_em")
+        if not isinstance(cats, dict) or not cats:
+            print("  ⏭️ categories_em 缺失（raw 为旧版无五分类），派生 ETF_SUBSCRIPTION_EASTMONEY 跳过")
+            return None
+        derived = {
+            "update_time": obj.get("update_time", ""),
+            "data_date": obj.get("data_date", ""),
+            "prev_date": obj.get("prev_date", ""),
+            "source": (obj.get("source", "") + " · 东方财富官方基金类型五分类").strip(" ·"),
+            "scope": obj.get("scope", ""),
+            "unit": "net_amount_yi=分类净申赎亿元(按单位净值折算) / net_share_yi=净申赎亿份",
+            "total_net_share_yi": obj.get("total_net_share_yi", 0),
+            "total_net_amount_yi": obj.get("total_net_amount_yi", 0),
+            "total_etf": obj.get("total_etf", 0),
+            "categories": cats,
+            "note": ("东方财富五分类口径（股票型/债券型/货币型/商品型/跨境型）。"
+                     "数据与 ETF_NET_SUBSCRIPTION 同源同日：净申赎 = 当日份额 − 上一交易日份额"
+                     "（上交所官方披露），金额按单位净值折算，非按成交方向推断的估算值。"),
+        }
+        DATA_DIR.mkdir(exist_ok=True)
+        out = DATA_DIR / "ETF_SUBSCRIPTION_EASTMONEY.js"
+        out.write_text(
+            "window.ETF_SUBSCRIPTION_EASTMONEY = "
+            + json.dumps(derived, ensure_ascii=False, separators=(',', ':')) + ";\n",
+            encoding="utf-8",
+        )
+        n = sum(c.get("count", 0) for c in cats.values())
+        print(f"  ✅ 派生 {out.name}（东财五分类 {n} 只 · {derived['data_date']}）")
+        return out
+    except Exception as e:
+        print(f"  ⚠️ 派生 ETF_SUBSCRIPTION_EASTMONEY 失败（不影响主产物）: {e}")
+        return None
 
 
 def run_health_check():
