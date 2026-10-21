@@ -1330,7 +1330,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 
-<link rel="stylesheet" href="v8_main.css">
+<link rel="stylesheet" href="v8_main.css?v=610ea84f91">
 </head>
 <body>
 
@@ -5027,7 +5027,7 @@ c.innerHTML = h;
   window.__STRATEGY_BACKTESTS = [
     // 2026-09-03 主人令：已下架策略（cockpit/allsite/hunter）整体从回测区退出，
     // 既然选股策略子页已彻底删除（九宝不让「选股已删回测还在」），回测卡也不必保留。
-    // 当前 active 主策略：量质双擎（双擎）→ 强势跟踪。
+    // 当前 active 主策略：量质双擎 / 强势跟踪 / 低波趋稳 / 日内动量 / 缩量回踩 / 板块共振 / 龙虎机构（2026-10-21 主人令「其他的都跟上」后全量收录）。
     /* 🆕 2026-10-12 小九：第一支自研算法「量质双擎」(LQSQ) —— 真实信号流口径直上主榜，
        与四量同榜同纪律（gen_lqsq_top5.py → LQSQ_BACKTEST，summary.by_period 与四量同构，
        故 _renderPeriodBacktestCard 零结构改动直接复用）。样本自 10-09 起累积、未走满 T+20
@@ -5036,6 +5036,16 @@ c.innerHTML = h;
        产物里还没样本的持有档（T+5/10/20）也上屏，明示「未满持有期」+ 累积进度/预计成熟日，
        不再让用户对着一张空表猜「算到哪」。 */
     {key:'lqsq',    name:'量质双擎',   icon:'⚖️', desc:'第一支自研算法 · 异常量比缩量选强 Top5 · 次开买入持有 20 日 · 样本自 10-09 累积中，未满持有期档位明确标注', color:'#22c55e', var:'LQSQ_BACKTEST', fullLadder:[1,3,5,10,20]},
+    /* 🆕 2026-10-21 主人令「怎么只有这个新算法的回测？其他的都跟上」：
+       第二/三支自研算法 + 三新算法的回测卡全部补进本区 —— 与量质双擎同一渲染器
+       （_renderPeriodBacktestCard）、同一口径（真实信号流 · 次开买入持 N 收盘卖 · 扣双边 0.3%）。
+       低波趋稳/日内动量 = 独立产物根级结构，直接登记 var 名（渲染器 10-15 已做根级归一）；
+       三新算法共用 NEW_ALGO_TRI_BACKTEST，走 __vcpBacktest/__rotationBacktest/__lhbBacktest 适配器。 */
+    {key:'lowvol',   name:'低波趋稳',   icon:'🐢', desc:'第二支自研算法 · 60日波动率最低 Top5 + 收盘>MA60 · 次开买入持有 N 日（上市前置回测 N=60 α +4.00pp 唯一显著跑赢档）', color:'#38bdf8', var:'LOWVOL_TREND_BACKTEST'},
+    {key:'intraday', name:'日内动量',   icon:'📈', desc:'第三支自研算法 · 20日日内累计收益最高 Top5 + 收盘>MA60 · 次开买入持有 N 日（上市前置回测 N=20 α +1.73pp，N≥45 衰减）', color:'#f59e0b', var:'INTRADAY_MOMENTUM_BACKTEST'},
+    {key:'vcp',      name:'缩量回踩',   icon:'📐', desc:'三新算法① · 全K线库扫描「放量启动后缩量回踩+波动逐级收缩」形态 · 次开买入持有 N 日', color:'#22d3ee', var:'__vcpBacktest'},
+    {key:'rotation', name:'板块共振',   icon:'🔄', desc:'三新算法② · 四源板块资金共振轮动 · 次开买入持有 N 日', color:'#f472b6', var:'__rotationBacktest'},
+    {key:'lhb',      name:'龙虎机构',   icon:'🐉', desc:'三新算法③ · 龙虎榜机构净买≥3000万跟随 · 次开买入持有 N 日', color:'#34d399', var:'__lhbBacktest'},
     /* 🆕 2026-09-16 主人令「生命周期三个算法里明显高手的更好 ⇒ 改为强势跟踪」：
        原「高手强势股跟踪」升为本页正式策略卡，名称统一为「强势跟踪」。
        数据源 window.IMA_STRONG_BACKTEST（真实日K · 已扣双边 0.30%），
@@ -5081,6 +5091,26 @@ c.innerHTML = h;
       by_period:     bp
     }};
   };
+
+  /* 🆕 2026-10-21 主人令「怎么只有这个新算法的回测？其他的都跟上」：
+     三新算法（缩量回踩/板块共振/龙虎机构）共用一份产物 NEW_ALGO_TRI_BACKTEST
+     （vcp/rotation/lhb 三段），段内结构与 *_BACKTEST 同构 —— 根级 total_signals/method/
+     track_start/signal_date_range + summary.by_period。适配器按段名取数，
+     喂给与量质双擎**完全相同**的渲染器 _renderPeriodBacktestCard ⇒ 同列同口径，零逻辑复制。 */
+  window.__newAlgoTriSectionBacktest = function(sec){
+    var D = ((window.NEW_ALGO_TRI_BACKTEST || {})[sec]) || {};
+    return { summary: {
+      update_time:       D.update_time || '',
+      method:            D.method || '',
+      total_signals:     D.total_signals || 0,
+      signal_date_range: D.signal_date_range || '',
+      track_start:       D.track_start || '',
+      by_period:         (D.summary && D.summary.by_period) || {}
+    }};
+  };
+  window.__vcpBacktest      = function(){ return window.__newAlgoTriSectionBacktest('vcp'); };
+  window.__rotationBacktest = function(){ return window.__newAlgoTriSectionBacktest('rotation'); };
+  window.__lhbBacktest      = function(){ return window.__newAlgoTriSectionBacktest('lhb'); };
 
   window.__renderBacktestCardsFrom = function(list){
     var h = '';
@@ -5548,6 +5578,25 @@ c.innerHTML = h;
           INS.push(r);
         }
       });
+      /* 🆕 2026-10-21 主人令（截图实证「这里是不是少了个策略？」—— 低波趋势不见了）：
+         第三层兜底。样本 >0 但 <MINS 的卡（低波趋势全档样本 5、胜率 40%）既够不着
+         主表「样本≥MINS」门槛（ranking_all 不收），又不满足上面 null 兜底（win_rate 非 null）
+         ⇒ 在汇总页**静默消失**。现补齐：口径内、且没有任何「样本≥MINS 合格档」的卡，
+         取样本最大的一行作代表并入 INS，走表尾「样本不足」诚实渲染 —— 绝不静默丢策略。 */
+      (function(){
+        var _ok = {};   /* 已有合格档（样本≥MINS，将进主表）的卡 */
+        (A.ranking_all || []).forEach(function(r){ if(r && (r.sample||0) >= MINS) _ok[r.card] = 1; });
+        (A.rows || []).forEach(function(r){
+          if(!r || !_inScope(r) || _ok[r.card]) return;
+          for(var _i=0; _i<INS.length; _i++){ if(INS[_i].card === r.card) return; }
+          /* 取该卡样本最大的一行作代表（同一份产物取数，不造数） */
+          var _best = r;
+          (A.rows || []).forEach(function(x){
+            if(x && x.card === r.card && _inScope(x) && ((x.sample||0) > (_best.sample||0))) _best = x;
+          });
+          INS.push(_best);
+        });
+      })();
       if(!R.length && !INS.length) return '';
       var _STARKEY = { '三重共识':'triple', '逆势龙头':'crds', '候选池':'candidate', '金股池':'goldpool' };
       function _n(v,d){ return (v==null || isNaN(v)) ? '—' : Number(v).toFixed(d==null?1:d); }
@@ -6019,7 +6068,9 @@ c.innerHTML = h;
          「因子实验室」又是独立渲染 ⇒ 必然数成 4，与文案的 5 个名字打架。
          ⚠️ 将来增删本页策略：改这里 + 同步改下方 __renderBacktestSection 的渲染顺序。 */
       /* 🔴 2026-09-20 主人令：'因子实验室' 移出本页清单（非选股策略，不回测不展示）*/
-      var _PAGE = ['强势跟踪','量质双擎'];  /* 🔴 2026-10-11 主人令「完全下架」：三重共识/逆势龙头已下架移出；🆕 2026-10-12 纳入第一支自研算法「量质双擎」；🔴 2026-10-18：四量终极下架移出 */
+      /* 🆕 2026-10-21 主人令「其他的都跟上」：低波趋稳/日内动量/缩量回踩/板块共振/龙虎机构
+         回测卡全部进本页 ⇒ 清单同步扩为 7 个（与下方渲染顺序一一对应）。 */
+      var _PAGE = ['强势跟踪','量质双擎','低波趋稳','日内动量','缩量回踩','板块共振','龙虎机构'];  /* 🔴 2026-10-11 主人令「完全下架」：三重共识/逆势龙头已下架移出；🆕 2026-10-12 纳入第一支自研算法「量质双擎」；🔴 2026-10-18：四量终极下架移出；🆕 2026-10-21 五支新算法回测卡跟上 */
       pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(56,189,248,.10);color:#38bdf8;border:1px solid rgba(56,189,248,.3);">📋 本页策略 '+_PAGE.length+' 个<span style="font-weight:400;color:var(--sub);font-size:10px;">（'+_PAGE.join(' · ')+'）</span></span>');
 
       sum.innerHTML = '<span style="color:var(--dim);font-weight:600;">📊 实战回测</span><span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>' + (pills.length ? ' ' + pills.join(' ') : ' <span style="color:var(--sub);">暂无数据</span>');
@@ -6170,8 +6221,11 @@ c.innerHTML = h;
         return _S.filter(function(m){ return m && keys.indexOf(m.key) >= 0; });
       };
       if(typeof _rbc === 'function'){
-        /* 🔴 2026-10-12 主人令：双擎紧跟四量下方（四量 → 双擎 → 强势跟踪） */
-        html += _rbc(_pick(['lqsq','strongtrack']));
+        /* 🔴 2026-10-12 主人令：双擎紧跟四量下方（四量 → 双擎 → 强势跟踪）
+           🆕 2026-10-21 主人令「怎么只有这个新算法的回测？其他的都跟上」：
+           低波趋稳/日内动量/缩量回踩/板块共振/龙虎机构 五张回测卡全部跟上，
+           排在双擎与强势跟踪之后（同一渲染器、同一真实信号流口径）。 */
+        html += _rbc(_pick(['lqsq','strongtrack','lowvol','intraday','vcp','rotation','lhb']));
       }
       if(typeof _rbc === 'function'){
         html += _rbc(_pick(['crds']));

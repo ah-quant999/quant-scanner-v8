@@ -683,3 +683,12 @@
     .fr-reason{font-size:12px;color:var(--sub);line-height:1.6;background:var(--bg2);border-radius:8px;padding:8px 10px;border:1px solid var(--border);margin-top:8px}
     .fr-allrow{display:flex;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px dashed var(--border);font-size:12px}
     .fr-allrow:last-child{border-bottom:none}
+
+  /* ═══ 2026-10-21 主人令「所有的回测都要数字和标题对齐」═══
+     根因：全局 th{text-align:left;padding:9px 10px}，而各「回测 N 日」表的数据行 td
+     为 text-align:right;padding:6px（内联）⇒ 表头靠列左端、数字靠列右端，
+     配合 table{width:100%} 自动拉宽列 ⇒ 视觉整列错开。
+     修复：六张真实信号流回测表（量质双擎/低波趋稳/日内动量/缩量回踩/板块共振/龙虎机构）
+     表头与数据行同规则 —— 首列（持有期）左对齐，其余数字列全部右对齐，内边距统一 6px。 */
+  #lqsqBack th,#lowvolBack th,#intradayBack th,#vcpBack th,#rotationBack th,#lhbBack th{padding:6px;text-align:right;color:var(--sub)}
+  #lqsqBack th:first-child,#lowvolBack th:first-child,#intradayBack th:first-child,#vcpBack th:first-child,#rotationBack th:first-child,#lhbBack th:first-child{text-align:left}
