@@ -525,8 +525,15 @@ jobs:
             #   不经本 build；本 job 的 checkout 是启动时快照，git add data/ 全量暂存会把
             #   直推的新版覆盖回旧版（10-09 17:49 直推被 17:50 build 回退成 42h 陈旧实证）。
             #   ⇒ add 前先取回远端最新版（不存在则忽略）。
+            # 🛡 2026-10-21 主人令「一劳永逸」补漏：ima 系列同为直推文件（v8_ima_strong_stock.yml
+            #   15:45 与本机会话代取链直推），实测 10-21 17:48:41 直推的 IMA_STRONG_STOCK.js
+            #   (data_date=10-21) 被 17:48 启动的本 build 盖回 15:53 陈旧版（10-20）——
+            #   与 10-09 WAVE_ELLIOTT 同款竞态。ima 五件套全部纳入取回白名单。
             git fetch origin main
-            git checkout origin/main -- data/WAVE_ELLIOTT.js data/DAJIJIN_REDUCTION.js data/MAHORO_INSIGHTS.js 2>/dev/null || true
+            git checkout origin/main -- data/WAVE_ELLIOTT.js data/DAJIJIN_REDUCTION.js data/MAHORO_INSIGHTS.js \
+              data/IMA_STRONG_STOCK.js \
+              raw_data/ima_strong_stock_full.md raw_data/ima_strong_stock_full.json \
+              raw_data/ima_strong_stock.json raw_data/ima_strong_daily.json 2>/dev/null || true
             git add data/ index.html logic.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
               raw_data/sh_sz_history.json \
               raw_data/sector_fund_flow_history.json \
