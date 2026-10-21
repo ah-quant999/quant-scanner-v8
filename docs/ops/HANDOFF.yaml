@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 157
+  next_id_seq: 161
 items:
   - id: selfalgo-audit-fix-1019
     owner: 小九的工程师
@@ -9638,3 +9638,42 @@ items:
     verify_how: "①数据链健康信号已在产物内自证（snapshot_age_h/source_stale/snapshot_expired 前端运维页可读），停更迁移邮件已有状态翻转去抖（fetch_ima_strong_stock._write_retained 仅非停更→停更当次发一封）；②待落地：ima 快照自动化 prompt 增加『会话无注入』状态翻转+24h 冷却纪律，并写明『应用重启后首轮自动恢复』的自愈预期——automation 配置不在仓库内（本环境无 automation 编辑工具），需主人在自动化面板调整；③旁路发现：小九机 10-20 12:00/18:00 两轮交接档缺失（runner 在线/HB_XIAOJIU 20:08 前进=流程缺口非故障；昨日 3 项拍板仍悬）——待小九机侧排查交接自动化。"
     updated: "2026-10-20 22:15"
     updated_by: 阿狸咪的工程师(alimi-cn)
+
+
+  - id: v8-ui-color-unify-1021
+    priority: P0
+    owner: 小九
+    status: done
+    what: "P0/P2一劳永逸：红涨绿跌色值全站统一(#f4495d→#ef5350, #1fd17b→#26a69a 约30处含_colorPct/胜率/_pl/龙虎榜/星级表/CSS变量) + 最终推荐回测卡数据截至10-13加(仅回放样本区间,非主站停更)限定语"
+    fix: "worktree基于origin/main改index.html, rebase重放防覆盖, fast-forward推main(commit 9f096d86c)"
+    evidence: "commit 9f096d86c; 线上blob md5=f25e332ab045b290a0fe5c4a5325c1e4 逐字节一致; 旧色值计数0/规范色#ef5350=82/#26a69a=57/div平衡1517=1517"
+    verify_how: "jsdelivr指定commit抓index.html: f4495d=0, 1fd17b=0, 仅回放样本区间=1, div 1517=1517, data注入108不变"
+    verified_at: "2026-10-21 08:55"
+    updated: "2026-10-21 08:55"
+  - id: v8-etf-eastmoney-blocked
+    priority: P1
+    owner: 小九
+    status: blocked
+    what: "ETF申购赎回切东方财富口径(data/etf_subscription_eastmoney.js: 股票型/债券型/货币型/商品型/跨境型+亿元)——既定计划从未启动"
+    fix: "无（仓内无对应 fetcher 脚本, git ls-tree 确认 data/etf_subscription_eastmoney.js 不在仓库; 不能凭空造 data 文件）"
+    evidence: "git ls-tree origin/main data/ 仅 ETF_NET_SUBSCRIPTION.js; grep 仓内 etf 东方财富 fetcher=0 命中; 线上 etf_subscription_eastmoney.js 404"
+    verify_how: "需补 etf 东方财富口径 fetcher 并由数据链产出 data/etf_subscription_eastmoney.js 后, 再由 index.html 切引用(当前 ETF_NET_SUBSCRIPTION.js 仍在线可用, 非断卡)"
+    updated: "2026-10-21 08:55"
+  - id: v8-lean-audit-1021
+    priority: P1
+    owner: 小九
+    status: pending-verify
+    what: "膨胀收尾精确盘点: 90+ data 注入中确认无生产者/无 script 实际注入的死引用清理 + 暂未上架/已下架 DOM 卡存活审计(删活卡有断流风险, 需主人拍板删除清单)"
+    fix: "本次前端改动(index.html色值+文案)零膨胀; 删卡/删文件破坏性, 先盘点待拍板"
+    evidence: "审计实测 data 注入引用108个, 5个404文件经判定均非 script 实际注入(仅注释/死代码提及), 不致断卡"
+    verify_how: "盘点在90+注入中无生产者项 + 暂未上架/已下架 DOM 卡存活清单, 交主人拍板删除项后执行"
+    updated: "2026-10-21 08:55"
+  - id: v8-replay-switch-1115
+    priority: P1
+    owner: 小九
+    status: todo
+    what: "11月中样本足够后摘除 index.html 对 FINAL_RECOMMEND_REPLAY.js 引用, 切回真实信号流口径(回放卡转历史档案/隐藏)"
+    fix: "待11月中由数据链 run 自动或手动摘除引用"
+    evidence: "index.html:1900-1901 已挂账 HANDOFF; 回放卡徽章诚实标注(回放口径·非真实信号流)"
+    verify_how: "摘除后复读 tip: FINAL_RECOMMEND_REPLAY 引用计数=0, 真实流 FINAL_RECOMMEND_DATA 仍生效"
+    updated: "2026-10-21 08:55"
