@@ -397,6 +397,12 @@ def main():
 
     print("[3/4] 写 data/MARKET_THERMO.js …")
     payload = {
+        # 🔴 2026-10-21 主人令「一劳永逸」：顶层强制自带 update_time（全 v8 raw 文件统一约定）。
+        #   旧版只写 generated ⇒ 运维看板 renderTaskSchedule 的 _tsRaw 只认
+        #   update_time/last_update/run_time/updated/updated_at/checked_at_* ⇒ 查无时间字段恒「无」+红叉；
+        #   且 api_push_raw/update_v8 均不给本文件盖戳（不在 DATA_SOURCES），时间戳全凭外部偶然补写
+        #   ⇒ 每次云端重推后看板必挂。生成器自源头带戳，链路上任何推送方都不再依赖。
+        "update_time": bj_now().strftime("%Y-%m-%d %H:%M:%S"),
         "generated": bj_now().strftime("%Y-%m-%d %H:%M") + " CST",
         "D": D,
         "EXT": ext,
