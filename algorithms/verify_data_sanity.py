@@ -67,6 +67,17 @@ STALE_OK = {
 EXPECT_FILES = {
     # 前端 index.html 已引用、必须存在的数据文件
     "maharo_insights.js",     # window.MAHORO_INSIGHTS（机构研究 AI 解析，每日 07:22）
+    # 🔴 2026-10-21 科学升级 P1 新鲜度红线：显式登记关键下游数据文件，
+    #   防「生产者挂了但 sanity 全绿」的同构静默回退（呼应 08-04 LHB 缺口根治）。
+    "LHB_DATA.js",            # window.LHB_DATA（龙虎榜，曾 08-04 静默卡死）
+    "AVG_PRICE_DATA.js",      # window.AVG_PRICE_DATA（平均股价 880003，每轮 intraday）
+    "MORNING_PLAN.js",        # window.MORNING_PLAN（盘前预案卡）
+    "INDEX_QUOTES.js",        # window.INDEX_QUOTES（指数行情快照）
+    "FACTOR_LAB.js",          # window.FACTOR_LAB（因子实验室）
+    "NEW_ALGO_TRI.js",        # window.NEW_ALGO_TRI（新算法试跑）
+    "BACKTEST_ALL_ALGOS.js",  # window.BACKTEST_ALL_ALGOS（全算法回测）
+    "CITIC_PE_THERMO.js",     # window.CITIC_PE_THERMO（中信 PE 温度计）
+    "ETF_NET_SUBSCRIPTION.js",# window.ETF_NET_SUBSCRIPTION（ETF 净申赎，东方财富口径代表）
 }
 # PE 精确字段名（词边界集合成员判断，绝不子串匹配）
 PE_FIELDS = {"pe", "pe_ttm", "pe_lyr", "pes", "pe_ratio"}

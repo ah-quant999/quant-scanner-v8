@@ -36,6 +36,14 @@ factor_walkforward.py — 待回测候选因子的 walk-forward 回测引擎（2
 输出：raw_data/factor_walkforward.json
 """
 import os, sys, json, time, argparse, glob, re
+
+# 🔴 2026-10-21 科学超额算法升级：统一方法学库（PSR/Purged-WF/交易约束/regime/因子/组合层）
+#   防御式 import —— 即使本库暂未部署，引擎也降级运行（仅缺 PSR/约束），不崩。
+try:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import backtest_lib
+except Exception:
+    backtest_lib = None
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
@@ -224,6 +232,57 @@ def quantile_layers(vals, k=5):
     return layers
 
 
+def _spearman(pairs):
+    """截面 Spearman 秩相关（因子值 vs 前瞻收益）。样本 <10 或零方差 → None（宁缺勿错）。"""
+    n = len(pairs or [])
+    if n < 10:
+        return None
+    fr = sorted(range(n), key=lambda i: pairs[i][0])
+    rr = sorted(range(n), key=lambda i: pairs[i][1])
+    rkf = [0] * n
+    rkr = [0] * n
+    for rank, i in enumerate(fr):
+        rkf[i] = rank
+    for rank, i in enumerate(rr):
+        rkr[i] = rank
+    mf = sum(rkf) / n
+    mr = sum(rkr) / n
+    cov = sum((a - mf) * (b - mr) for a, b in zip(rkf, rkr))
+    vf = sum((a - mf) ** 2 for a in rkf) ** 0.5
+    vr = sum((b - mr) ** 2 for b in rkr) ** 0.5
+    return cov / vf / vr if vf > 0 and vr > 0 else None
+
+
+def _trade_ret(bars_c, j, hold, code):
+    """单笔交易净收益（🔴 升级②交易约束可行域，A股制度建模）：
+    买入 = 次日(t+1)开盘；次日一字涨停买不进 → 剔除；次日停牌（开盘无效/零成交）→ 剔除；
+    卖出 = (t+1+hold)开盘，若开盘即跌停卖不出 → 顺延至下一可交易日开盘（最多 3 日，
+          超出仍无可行价 → 该笔按「无法平仓」剔除，绝不虚构成交价）；
+    T+1 天然满足（买入次日开盘，卖出日 ≥ 买入日 + hold 且 hold ≥ 1）。
+    返回净收益（小数，已扣往返成本）或 None。"""
+    nb = len(bars_c)
+    jb = j + 1
+    if jb >= nb or jb + hold >= nb:
+        return None
+    b_in = bars_c[jb]
+    o1 = b_in.get("open")
+    # 停牌过滤：次日开盘无效或零成交 → 不可成交（与 buy_blocked 互补）
+    if not o1 or o1 <= 0 or b_in.get("volume") == 0:
+        return None
+    if backtest_lib is not None:
+        prev = bars_c[j]["close"]
+        if backtest_lib.buy_blocked(prev, b_in, code=code):
+            return None
+        kk, px = backtest_lib.sell_defer_days(bars_c, jb + hold, code=code)
+        if kk is None:
+            return None
+    else:
+        px = bars_c[jb + hold]["open"]
+    if not px or px <= 0:
+        return None
+    return px / o1 - 1.0 - COST
+
+
 def run_factor(name, dates, pos, bars, prep, hold):
     """单因子 walk-forward。prep[code] = 预计算字典。返回逐调仓点记录。"""
     recs = []
@@ -244,55 +303,44 @@ def run_factor(name, dates, pos, bars, prep, hold):
                 continue
             vals.append((c, vv))
         if len(vals) >= 15:
-            layers = quantile_layers(vals)
-            if layers:
-                row = {"date": dates[t], "layers": {}}
-                # 全池等权基准（同期同构造）——用于「相对基准胜率」，避免把市场 beta
-                # 混进因子 edge 的判定（绝对正收益率在震荡市恒 ≈ 50%，见 criteria_note）
-                base_rets = []
-                for c, _v in vals:
-                    p = pos[c]
-                    j = p[t]
-                    if j < 0:
-                        continue
-                    k = j + 1 + hold
-                    if k >= len(bars[c]):
-                        continue
-                    o1 = bars[c][j + 1]["open"]
-                    o2 = bars[c][k]["open"]
-                    if o1 > 0:
-                        base_rets.append(o2 / o1 - 1.0 - COST)
-                if base_rets:
+            # 🔴 升级②：全截面可成交收益一次性算（基准/分层/IC 同口径同源，杜绝口径漂移）
+            rets_map = {}
+            for c, _v in vals:
+                p = pos[c]
+                j = p[t]
+                if j < 0:
+                    continue
+                rr = _trade_ret(bars[c], j, hold, c)
+                if rr is not None:
+                    rets_map[c] = rr
+            if len(rets_map) >= 15:
+                layers = quantile_layers(vals)
+                if layers:
+                    row = {"date": dates[t], "layers": {}}
+                    # 全池等权基准（同期同构造）——用于「相对基准胜率」，避免把市场 beta
+                    # 混进因子 edge 的判定（绝对正收益率在震荡市恒 ≈ 50%，见 criteria_note）
+                    base_rets = list(rets_map.values())
                     row["base_avg"] = sum(base_rets) / len(base_rets)
                     row["base_win"] = sum(1 for x in base_rets if x > 0) / len(base_rets) * 100
-                for li, codes_l in layers.items():
-                    rets = []
-                    for c in codes_l:
-                        p = pos[c]
-                        j = p[t]
-                        if j < 0:
-                            continue
-                        k = j + 1 + hold
-                        if k >= len(bars[c]):
-                            continue
-                        o1 = bars[c][j + 1]["open"]
-                        o2 = bars[c][k]["open"]
-                        if o1 > 0:
-                            rets.append(o2 / o1 - 1.0 - COST)
-                    if rets:
-                        row["layers"][li] = {
-                            "n": len(rets),
-                            "avg": sum(rets) / len(rets),
-                            "win": sum(1 for x in rets if x > 0) / len(rets) * 100,
-                        }
-                if 1 in row["layers"] and 5 in row["layers"]:
-                    row["spread"] = row["layers"][1]["avg"] - row["layers"][5]["avg"]
-                    recs.append(row)
+                    # 🔴 升级④：逐调仓点截面 Spearman 秩 IC（因子值 vs 前瞻可成交收益）
+                    row["ic"] = _spearman([(v, rets_map[c]) for c, v in vals
+                                           if c in rets_map])
+                    for li, codes_l in layers.items():
+                        rets = [rets_map[c] for c in codes_l if c in rets_map]
+                        if rets:
+                            row["layers"][li] = {
+                                "n": len(rets),
+                                "avg": sum(rets) / len(rets),
+                                "win": sum(1 for x in rets if x > 0) / len(rets) * 100,
+                            }
+                    if 1 in row["layers"] and 5 in row["layers"]:
+                        row["spread"] = row["layers"][1]["avg"] - row["layers"][5]["avg"]
+                        recs.append(row)
         t += STEP
     return recs
 
 
-def summarize(recs):
+def summarize(recs, regime_map=None):
     if len(recs) < 20:
         return None
     sp = [r["spread"] for r in recs]
@@ -365,6 +413,83 @@ def summarize(recs):
     top_oos = top_all[cut:]
     sharpe_oos = _ir(top_oos)
 
+    # 🔴 ① D9 治「假显著」：OOS Top 层逐调仓点收益的概率夏普比率 PSR（小样本显著性）。
+    #   PSR≥0.95 才可视为统计显著；n<20 时 backtest_lib 返 None（宁缺勿错）。
+    psr_oos = backtest_lib.probability_sharpe_ratio(top_oos) if backtest_lib else None
+    psr_is = backtest_lib.probability_sharpe_ratio(top_all[:cut]) if backtest_lib else None
+    significant = (psr_oos is not None and psr_oos >= 0.95)
+    # 🔴 ① D2/D3 Purged walk-forward OOS IR（多折 + embargo 防邻近泄漏；补充报告，不替换 60/40 闸门）
+    pwf_oos_ir = None
+    pwf_n = 0
+    if backtest_lib is not None and len(recs) >= 120:
+        _folds = backtest_lib.purged_walkforward_splits(len(recs), n_splits=5, embargo=STEP)
+        _firs = [x for x in (_ir([recs[i]["spread"] for i in te]) for tr, te in _folds)
+                 if x is not None]
+        if _firs:
+            pwf_oos_ir = round(sum(_firs) / len(_firs), 3)
+            pwf_n = len(_firs)
+
+    # 🔴 升级④ 因子工程：IC 衰减检测（逐调仓点截面 IC 聚合；recent=后1/3，decay=recent-prior）
+    #   suggest=downgrade ⇒ 建议接 verdict 闸门降级（keep→watch），供 generate_top10 参考。
+    ics = [r["ic"] for r in recs if r.get("ic") is not None]
+    ic_st = None
+    if len(ics) >= 30:
+        _k3 = max(len(ics) // 3, 1)
+        _rec = sum(ics[-_k3:]) / _k3
+        _pri = sum(ics[:-_k3]) / max(len(ics) - _k3, 1)
+        _mic = sum(ics) / len(ics)
+        _sdic = (sum((x - _mic) ** 2 for x in ics) / (len(ics) - 1)) ** 0.5 if len(ics) > 1 else 0.0
+        ic_st = {"mean_ic": round(_mic, 4),
+                 "ic_ir": round(_mic / _sdic, 3) if _sdic > 1e-9 else None,
+                 "recent_ic": round(_rec, 4),
+                 "decay": round(_rec - _pri, 4),
+                 "suggest": ("downgrade" if (_rec < 0.02 and (_rec - _pri) < -0.05)
+                             else "keep")}
+
+    # 🔴 升级③ 市场状态分层：OOS 段 Top 层超额（相对基准）按 regime 四桶独立统计
+    #   （bull/bear × 高/低波动；regime 由全池等权指数逐日标注，无前视：MA20/σ20 仅用 ≤t 数据）
+    regime_oos = None
+    if regime_map:
+        _agg = {}
+        for r in recs[cut:]:
+            tag = regime_map.get(r["date"])
+            if not tag:
+                continue
+            d = _agg.setdefault(tag, {"n": 0, "s": 0.0})
+            d["n"] += 1
+            d["s"] += r["layers"][1]["avg"] - (r.get("base_avg") or 0.0)
+        if _agg:
+            regime_oos = {k: {"n": v["n"], "excess_avg_pct": round(v["s"] / v["n"] * 100, 3)}
+                          for k, v in sorted(_agg.items())}
+
+    # 🔴 升级⑤ 组合层：波动率目标仓位对照（OOS Top 层；权重仅用 ≤t 的已实现波动，无前视）
+    def _nav_stats(rs):
+        if not rs:
+            return None
+        nav, cur = [1.0], 1.0
+        for x in rs:
+            cur *= (1.0 + x)
+            nav.append(cur)
+        pk, md = nav[0], 0.0
+        for v in nav:
+            pk = max(pk, v)
+            md = min(md, v / pk - 1.0)
+        m = sum(rs) / len(rs)
+        sd = (sum((x - m) ** 2 for x in rs) / (len(rs) - 1)) ** 0.5 if len(rs) > 1 else 0.0
+        return sd * (REBAL_PER_YEAR ** 0.5) * 100, md * 100
+
+    vt = None
+    if backtest_lib is not None and len(top_all) >= 120:
+        _wts = backtest_lib.volatility_target_weights(
+            top_all, target_sigma=0.15, window=60, cap=1.0, ann_factor=REBAL_PER_YEAR)
+        if len(_wts) == len(top_all) and cut >= 60:
+            _a1 = _nav_stats(top_all[cut:])
+            _a2 = _nav_stats([top_all[i] * _wts[i] for i in range(cut, len(top_all))])
+            if _a1 and _a2:
+                vt = {"ann_vol_raw_pct": round(_a1[0], 2), "ann_vol_tgt_pct": round(_a2[0], 2),
+                      "mdd_raw_pct": round(_a1[1], 2), "mdd_tgt_pct": round(_a2[1], 2),
+                      "avg_weight_pct": round(sum(_wts[cut:]) / max(len(top_all) - cut, 1) * 100, 1)}
+
     n_ok = sum(1 for y, d in years.items() if d["beat_base"] > 55.0)
     n_y = len(years)
     ir_oos = ir(oos)
@@ -404,6 +529,20 @@ def summarize(recs):
         "win_years": WIN_YEARS, "win_pass_n": WIN_PASS_N,
         "win_best_ok": win_best,
         "pass_ir": pass_ir, "pass_years": pass_yr,
+        # 🔴 ① D9 显著性判据（补充，不替换既有 IR/年率闸门）：PSR(OOS)≥0.95 才显著；
+        #   verdict_psr=FAIL 表示该因子 OOS 收益大概率为噪声（小样本假显著预警）。
+        "psr_oos": round(psr_oos, 4) if psr_oos is not None else None,
+        "psr_is": round(psr_is, 4) if psr_is is not None else None,
+        "significant": significant,
+        "verdict_psr": ("PASS" if significant else ("WATCH" if psr_oos is None else "FAIL")),
+        "purged_wf_oos_ir": pwf_oos_ir,
+        "purged_wf_n_folds": pwf_n,
+        # 🔴 升级③ regime 分桶（OOS Top 超额按牛/熊×高/低波独立统计）
+        "regime_oos": regime_oos,
+        # 🔴 升级④ IC 衰减（suggest=downgrade ⇒ 建议降级，接 verdict 闸门）
+        "ic": ic_st,
+        # 🔴 升级⑤ 组合层波动率目标对照（OOS）
+        "vol_target_oos": vt,
         "verdict": "PASS" if (pass_ir and pass_yr) else "FAIL",
     }
 
@@ -524,6 +663,22 @@ def main():
     _log("  完成（有效日均 %d 只）" % (sum(pool_cnt) // max(1, len(pool_cnt))))
     del rmap, pool_sum, pool_cnt     # 释放内存（3057 只 × 2200 根，避免双份常驻）
 
+    # 🔴 升级③：全池等权指数逐日 regime 标注（牛/熊 × 高/低波动 四桶，无前视）
+    regime_map = {}
+    if backtest_lib is not None:
+        _eq, _cur = [], 1.0
+        for x in pool_r:
+            _cur *= (1.0 + x)
+            _eq.append(_cur)
+        _flags = backtest_lib.regime_flags(_eq)
+        for g, d in enumerate(dates):
+            if g < len(_flags) and _flags[g]:
+                regime_map[d] = _flags[g]
+        _cnt = {}
+        for v in regime_map.values():
+            _cnt[v] = _cnt.get(v, 0) + 1
+        _log("regime 四桶标注: %d 个交易日  %s" % (len(regime_map), _cnt))
+
     # 预计算
     _log("预计算因子序列 …")
     prep = {}
@@ -545,7 +700,7 @@ def main():
         per_hold = {}
         for hold in HOLDS:
             recs = run_factor(name, dates, pos, bars, prep, hold)
-            s = summarize(recs)
+            s = summarize(recs, regime_map)
             if not s:
                 _log("    hold=%2dd  调仓点不足，跳过" % hold)
                 continue
@@ -557,6 +712,24 @@ def main():
                     s["ir_is"], s["ir_oos"], s["max_drawdown_top_pct"]))
             _log("      年度跑赢基准率 %s  ⇒ %s（需 >55%% 的年份 ≥80%%）"
                  % ({y: d["beat_base"] for y, d in s["years"].items()}, s["verdict"]))
+            if s.get("psr_oos") is not None:
+                _log("      🔬 PSR(OOS)=%.3f %s  Purged-WF OOS IR=%s(%d折)"
+                     % (s["psr_oos"], "✅显著" if s["significant"] else "⚠️不显著(噪声?)",
+                        s["purged_wf_oos_ir"], s["purged_wf_n_folds"] or 0))
+            if s.get("ic"):
+                _ic = s["ic"]
+                _log("      📐 IC mean=%.4f  IR=%s  recent=%.4f  衰减=%+.4f ⇒ %s"
+                     % (_ic["mean_ic"], _ic["ic_ir"], _ic["recent_ic"], _ic["decay"],
+                        "⚠️建议降级" if _ic["suggest"] == "downgrade" else "keep"))
+            if s.get("regime_oos"):
+                _log("      🌦 OOS分regime超额(点): %s"
+                     % {k: (v["excess_avg_pct"], "n=%d" % v["n"])
+                        for k, v in sorted(s["regime_oos"].items())})
+            if s.get("vol_target_oos"):
+                _v = s["vol_target_oos"]
+                _log("      ⚖️ 组合层vol-target: 年化波动 %.1f%%→%.1f%%  回撤 %.1f%%→%.1f%%  平均仓位 %.0f%%"
+                     % (_v["ann_vol_raw_pct"], _v["ann_vol_tgt_pct"],
+                        _v["mdd_raw_pct"], _v["mdd_tgt_pct"], _v["avg_weight_pct"]))
             per_hold[hold] = s
         if not per_hold:
             continue
@@ -588,6 +761,8 @@ def main():
                 "spread_oos_pct": v["spread_oos_pct"],
                 "beat_base_rate": v["beat_base_rate"],
                 "years_beat_gt55": v["years_beat_gt55"], "years_total": v["years_total"],
+                "psr_oos": v.get("psr_oos"),
+                "ic_suggest": (v.get("ic") or {}).get("suggest"),
                 "verdict": v["verdict"]} for h, v in sorted(per_hold.items())},
         }
         if verdict == "PASS":
@@ -603,6 +778,13 @@ def main():
                         "调仓间隔 %d 交易日；分层=五分位(L1 最强)；成本=往返 %.2f%%；"
                         "IS/OOS = 调仓点前 60%%/后 40%% 切分。判据：IR_OOS>0.3 且 "
                         "连续 %d 年窗口内 ≥%d 年 Top 层胜率>55%%。"
+                        "  ⚠️2026-10-21科学升级(五项全接)：①OOS Top收益加PSR显著性(psr_oos≥0.95显著,治D9假显著)"
+                        "+Purged walk-forward多折OOS IR(D2/D3)；"
+                        "②交易约束可行域——次日一字涨停买不进剔除(buy_blocked)+开盘跌停卖出顺延≤3日(sell_defer_days)"
+                        "+停牌过滤，基准/分层/IC 同口径；"
+                        "③regime四桶(牛/熊×高/低波,全池等权指数逐日标注)分桶统计OOS超额(regime_oos)；"
+                        "④逐期截面Spearman IC+衰减检测(recent后1/3,decay<-0.05且recent<0.02⇒建议降级,接verdict闸门)；"
+                        "⑤组合层波动率目标仓位对照(targetσ=15%%,cap=1,按调仓频率年化,无前视)(vol_target_oos)。"
                         % (STEP, COST * 100, WIN_YEARS, WIN_PASS_N)),
         "universe_n": len(klines),
         "universe_src": "raw_data/kline_cache（A 股 6 位码）",
