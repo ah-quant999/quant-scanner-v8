@@ -125,8 +125,33 @@ def fetch_names_gtimg(codes):
 # ══════════════════════════════════════════════════════════════
 # ① 缩量回踩 · VCP
 # ══════════════════════════════════════════════════════════════
+def _tri_bar_files():
+    """K线文件清单（ext 优先 + cache 兜底）——2026-10-21 一劳永逸修复（主人令）。
+
+    根因（实测）：kline_cache 是 gen_strong_breakout 的**副产物缓存**（只逐晚回写
+    强势股、末根碎片化），VCP 直接扫它 ⇒ 扫描池每日随强势股回写范围漂移——
+    10-19/10-20 盘后批各命中 9 只、10-21 早盘批新鲜池骤降到 525 只且不含前两日
+    命中票 ⇒ 0 命中，卡面「时有时无」（主人报障「昨天就没数据」）。
+    修法：改读 **kline_cache_ext**（gen_lqsq_top5 在 ORDER 中先行维护的全市场
+    700 根新鲜缓存，GTimg 前复权与实盘同通道、runner 持久），kline_cache 只补
+    ext 缺票；同票 ext 覆盖 cache（数据更新更全）。fresh 闸与形态口径零改动。
+    """
+    out = {}
+    ext_dir = RAW / "kline_cache_ext"
+    if ext_dir.is_dir():
+        for fp in glob.glob(str(ext_dir / "*.json")):
+            c = Path(fp).stem
+            if len(c) == 6 and c[0] in "0368":
+                out[c] = fp
+    for fp in glob.glob(str(KLINE_DIR / "*.json")):
+        c = Path(fp).stem
+        if len(c) == 6 and c[0] in "0368" and c not in out:
+            out[c] = fp
+    return sorted(out.items())
+
+
 def scan_vcp(limit=None):
-    """全 kline_cache 扫描缩量回踩 VCP 形态。
+    """全市场扫描缩量回踩 VCP 形态（K线源见 _tri_bar_files：ext 优先 + cache 兜底）。
 
     口径（全部显式，可回测复现）：
       - 样本：K线 ≥60 根，最新一根为最新交易日
@@ -139,11 +164,12 @@ def scan_vcp(limit=None):
       - 守位：close ≥ MA20×0.97
     """
     items = []
-    files = sorted(glob.glob(str(KLINE_DIR / "*.json")))
+    files = [fp for _c, fp in _tri_bar_files()]
     if limit:
         files = files[:limit]
     scanned = 0
-    # ── 第一遍：载池 + 取全池最新K线日（数据日闸基准） ──
+    # ── 第一遍：载池 + 取全池最新K线日（数据日闸基准）；载入即截尾 70 根
+    #    （形态只用近 60 根，ext 700 根/只 × 全市场直接全载会白白多占数倍内存）──
     pool = {}
     for fp in files:
         code = Path(fp).stem
@@ -155,6 +181,7 @@ def scan_vcp(limit=None):
             continue
         if not isinstance(bars, list) or len(bars) < 60:
             continue
+        bars = bars[-70:]
         pool[code] = bars
     latest = max((b[-1].get("date") or "" for b in pool.values()), default="")
     fresh = {c: b for c, b in pool.items() if (b[-1].get("date") or "") == latest}
@@ -368,9 +395,14 @@ TRI_BACKTEST_JS = DATA / "NEW_ALGO_TRI_BACKTEST.js"
 
 
 def _tri_load_bars():
-    """全 A 日线缓存 → {code:(dates,bars)} + 全局交易日历 + 每票 date→index。"""
+    """全 A 日线缓存 → {code:(dates,bars)} + 全局交易日历 + 每票 date→index。
+
+    2026-10-21 一劳永逸：与 scan_vcp 同源走 _tri_bar_files（ext 优先 + cache 兜底）——
+    历史信号票（如 10-19/10-20 的 9 只 VCP）多数不在 kline_cache 新鲜数据里，
+    只扫 cache 会让回测连「次开买入」的价格都拿不到（by_period 恒空的帮凶之一）。
+    """
     series, all_dates = {}, set()
-    for fp in glob.glob(str(KLINE_DIR / "*.json")):
+    for _c, fp in _tri_bar_files():
         code = Path(fp).stem
         if len(code) != 6 or code[0] not in "0368":
             continue
