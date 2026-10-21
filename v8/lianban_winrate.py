@@ -10,7 +10,10 @@
 幸存者偏差，禁作主榜/评级/上下架依据）。故本模块**不做历史重放**，改为真实信号流日累积：
   · 每日 post_close 从东财涨停池录入当日信号（首板 连板数==1 / 二连板 ==2，剔 ST）；
   · 信号先入 pending 在途队列，随交易日推进用新浪日K（与 first_board_alert 同源）
-    逐笔补结果，**T+5 窗口成熟后才计入分组统计**——未成熟不计入，绝不半路插值；
+    逐笔补结果，**T+1 系指标（晋级率/隔夜高开/T+1胜率/可成交T+1）次日 K 线到齐
+    即计入**（打 t1_settled 标记留途），**T+5 走满后才计 T+5 列并移出 pending**——
+    两段各自成熟、绝不半路插值（2026-10-21 主人令「拆 T+1/T+5 成熟」：原实现
+    T+1 系指标被 T+5 门槛连坐，表上 T+1 列明明次日可算却跟 T+5 一起空）；
   · 分组与 10-09 跑批表保持一致：① 全体首板 / 倍量≥3 / 3~5 / 5~8 / >8；
     ② 二连板全体 / 放量(倍量≥3) / 缩量(倍量<3)。
 
@@ -221,47 +224,8 @@ def _record_new(st, pool_rows, board_date):
     return added
 
 
-def _mature_one(st, p, bars, today):
-    """单笔在途信号成熟判定与计入。返回 True=已了结（成熟/一字剔除/过期），移出 pending。"""
-    bd = p.get("board_date")
-    idx = None
-    for i, b in enumerate(bars):
-        if b[0] == bd:
-            idx = i
-            break
-    if idx is None:
-        try:
-            age = (today - datetime.strptime(bd, "%Y-%m-%d").date()).days
-        except Exception:
-            return False
-        if age > EXPIRE_DAYS:
-            st["expired"] = int(st.get("expired") or 0) + 1
-            return True                      # 过期丢弃
-        return False                         # 数据未到，留在途
-    if len(bars) < idx + 1 + MATURE_BARS:
-        return False                         # T+5 未满，留在途（绝不插值）
-    day, o, h, l, c, v = bars[idx]
-    if _is_yiziban(o, h, l, c):
-        st["dropped_yiziban"] = int(st.get("dropped_yiziban") or 0) + 1
-        return True                          # 一字板信号剔除（跑批口径）
-    nxt = bars[idx + 1]
-    t5 = bars[idx + MATURE_BARS]
-    next_open = nxt[1]
-    if next_open <= 0:
-        st["expired"] += 1
-        return True
-    limit = _limit_pct(p.get("code"))
-    promo = (nxt[4] / c - 1) >= (limit - 0.002)   # 容 0.2pp 价格取整
-    gap = next_open > c
-    tradable = not _is_yiziban(nxt[1], nxt[2], nxt[3], nxt[4])
-    t1_ret = nxt[4] / next_open - 1
-    t5_ret = t5[4] / next_open - 1
-    vr = None
-    if idx >= VR_WINDOW:
-        prev = [b[5] for b in bars[idx - VR_WINDOW:idx]]
-        avg = sum(prev) / len(prev)
-        if avg > 0:
-            vr = v / avg
+def _targets_of(p, vr):
+    """按信号类型 + 倍量分桶（T+1/T+5 两段共用同一 targets，防漂移）。"""
     if p.get("type") == "first":
         targets = ["first_all"]
         if vr is not None:
@@ -277,9 +241,49 @@ def _mature_one(st, p, bars, today):
         targets = ["second_all"]
         if vr is not None:
             targets.append("second_vr3" if vr >= VR_MIN else "second_vrlt3")
+    return targets
+
+
+def _vr_of(bars, idx, v):
+    """倍量 = 当日量 / 前 VR_WINDOW 日均量（不含当日；缓存不足返回 None）。"""
+    if idx < VR_WINDOW:
+        return None
+    prev = [b[5] for b in bars[idx - VR_WINDOW:idx]]
+    avg = sum(prev) / len(prev)
+    if avg <= 0:
+        return None
+    return v / avg
+
+
+def _settle_t1(st, p, bars, idx):
+    """T+1 口径成熟：信号日 + 次日 K 线到齐即结算（晋级/隔夜高开/T+1 胜率/可成交 T+1）。
+
+    🆕 2026-10-21 主人令「拆 T+1/T+5 成熟」：原实现 T+1 系指标被 T+5 门槛连坐
+    （len(bars) < idx+1+MATURE_BARS 整笔不许计入）⇒ 表上「T+1 胜率」列明明次日
+    就能算却跟 T+5 一起空。现拆开：T+1 次日即计、打 t1_settled 标记留途等 T+5。
+    返回 True = 本笔已了结应移出 pending（一字信号日 / 次日无有效开盘价）。"""
+    if p.get("t1_settled"):
+        return False                      # 已结算，等 T+5（防同批重跑重复计）
+    if len(bars) < idx + 2:
+        return False                      # 次日 K 未到，留在途（绝不插值）
+    day, o, h, l, c, v = bars[idx]
+    if _is_yiziban(o, h, l, c):
+        st["dropped_yiziban"] = int(st.get("dropped_yiziban") or 0) + 1
+        return True                       # 一字板信号剔除（跑批口径）——整笔作废
+    nxt = bars[idx + 1]
+    next_open = nxt[1]
+    if next_open <= 0:
+        st["expired"] = int(st.get("expired") or 0) + 1
+        return True                       # 无有效买入价，作废
+    limit = _limit_pct(p.get("code"))
+    promo = (nxt[4] / c - 1) >= (limit - 0.002)   # 容 0.2pp 价格取整
+    gap = next_open > c
+    tradable = not _is_yiziban(nxt[1], nxt[2], nxt[3], nxt[4])
+    t1_ret = nxt[4] / next_open - 1
+    vr = _vr_of(bars, idx, v)
+    targets = _targets_of(p, vr)
     for gk in targets:
         g = st["groups"][gk]
-        g["n"] += 1
         g["promo"] += 1 if promo else 0
         g["gap"] += 1 if gap else 0
         g["t1_n"] += 1
@@ -287,8 +291,34 @@ def _mature_one(st, p, bars, today):
         if tradable:
             g["t1t_n"] += 1
             g["t1t_win"] += 1 if t1_ret > COST_RT else 0
+    p["t1_settled"] = 1                   # 标记：T+1 系指标已计入，禁重复
+    p["_targets"] = targets               # T+5 段复用同组，防两段漂移
+    return False                          # T+5 未满，继续留途
+
+
+def _settle_t5(st, p, bars, idx):
+    """T+5 口径成熟：信号日后第 MATURE_BARS 根收盘到齐 → 计 T+5 胜率并完全移出。
+
+    g["n"] = 完全成熟（T+5 走满）样本数；T+1 系指标由 _settle_t1 先行计入，
+    本段只计 t5_n/t5_win 与 n/matured_total，绝不重复计 T+1。"""
+    if len(bars) < idx + 1 + MATURE_BARS:
+        return False                      # T+5 未满，留在途（绝不插值）
+    day, o, h, l, c, v = bars[idx]
+    nxt = bars[idx + 1]
+    t5 = bars[idx + MATURE_BARS]
+    next_open = nxt[1]
+    if next_open <= 0:
+        return True                       # _settle_t1 已计 expired；此处仅放行移出
+    t5_ret = t5[4] / next_open - 1
+    targets = p.get("_targets")
+    if not targets:
+        vr = _vr_of(bars, idx, v)
+        targets = _targets_of(p, vr)
+    for gk in targets:
+        g = st["groups"][gk]
         g["t5_n"] += 1
         g["t5_win"] += 1 if t5_ret > COST_RT else 0
+        g["n"] += 1                       # 完全成熟样本（与前端「样本 n」列同义）
     st["matured_total"] = int(st.get("matured_total") or 0) + 1
     st["last_mature_date"] = day
     return True
@@ -314,8 +344,12 @@ def update(base, pool_rows, kline=None, now=None, board_date=None):
         except Exception:
             still.append(p)
             continue
-        if age < SKIP_AGE_DAYS:
-            still.append(p)                  # 不可能成熟，不取数
+        # 🆕 2026-10-21 拆 T+1/T+5 后取数闸门同步拆：
+        #   T+1 未结算 → age>=2（次日 K 到齐即可算，信号日+1 自然日≈2）；
+        #   T+1 已结算等 T+5 → 仍守 SKIP_AGE_DAYS（不满 5 个交易日不可能熟）。
+        need = 2 if not p.get("t1_settled") else SKIP_AGE_DAYS
+        if age < need:
+            still.append(p)
             continue
         try:
             bars = _bars(fetch(p.get("code"), KLINES))
@@ -323,7 +357,21 @@ def update(base, pool_rows, kline=None, now=None, board_date=None):
             print(f"    ⚠️ {p.get('code')} K线取数失败: {e}")
             still.append(p)
             continue
-        if _mature_one(st, p, bars, now.date()):
+        bd = p.get("board_date")
+        idx = None
+        for i, b in enumerate(bars):
+            if b[0] == bd:
+                idx = i
+                break
+        if idx is None:
+            if age > EXPIRE_DAYS:
+                st["expired"] = int(st.get("expired") or 0) + 1   # 过期丢弃
+            else:
+                still.append(p)          # 数据未到，留在途
+            continue
+        if _settle_t1(st, p, bars, idx):
+            continue                      # 一字信号日/无有效开盘 ⇒ 整笔作废移出
+        if _settle_t5(st, p, bars, idx):
             matured += 1
         else:
             still.append(p)
@@ -369,14 +417,36 @@ def _selftest():
     assert st["groups"]["first_vr8"]["n"] == 0
     print("  ① 成熟计分组 OK", g)
 
-    # ② immature：信号日 10-16，今天 10-20（age=4<7 跳过取数）⇒ 留在途
+    # ② 🆕 2026-10-21 拆 T+1/T+5：T+1 先熟（fake_short 只到次日 10-13，T+5 未满）
+    #    ⇒ T+1 指标计入、t1_settled 标记、留在途；matured_total 不变、t5_n=0
+    fake_short = fake[:22]   # pre20 + sig(10-10) + nxt(10-13)，无 T+5
     st2 = skeleton()
     st2["pending"] = [{"code": "000001", "name": "平安银行", "type": "first",
-                       "board_date": "2026-10-16"}]
-    st2 = update(st2, [], kline=lambda c, n: fake,
+                       "board_date": "2026-10-10"}]
+    st2 = update(st2, [], kline=lambda c, n: fake_short,
                  now=datetime(2026, 10, 20, 17, 30, tzinfo=CST))
-    assert len(st2["pending"]) == 1 and st2["matured_total"] == 0, " immature 应留在途"
-    print("  ② immature 留在途 OK")
+    assert len(st2["pending"]) == 1 and st2["matured_total"] == 0, "T+1 结完应留在途等 T+5"
+    assert st2["pending"][0].get("t1_settled") == 1, st2["pending"][0]
+    g2 = st2["groups"]["first_all"]
+    assert g2["t1_n"] == 1 and g2["t5_n"] == 0 and g2["n"] == 0, g2
+    assert g2["promo"] == 1 and g2["gap"] == 1, g2   # 次日 +10% 晋级、开>信号收
+    print("  ② T+1 先熟 T+5 留途 OK", g2)
+
+    # ②b T+1 不重计：同批数据再跑一轮 ⇒ t1_n 仍为 1（幂等）
+    st2b = update(st2, [], kline=lambda c, n: fake_short,
+                  now=datetime(2026, 10, 20, 18, 30, tzinfo=CST))
+    assert st2b["groups"]["first_all"]["t1_n"] == 1, "T+1 不得重复计"
+    assert len(st2b["pending"]) == 1, st2b["pending"]
+    print("  ②b T+1 幂等不重计 OK")
+
+    # ②c T+5 后熟：数据到齐后同一笔接着走满 ⇒ t5 计入、移出、matured=1
+    st2c = update(st2b, [], kline=lambda c, n: fake,
+                  now=datetime(2026, 10, 21, 17, 30, tzinfo=CST))
+    assert st2c["pending"] == [] and st2c["matured_total"] == 1, st2c["matured_total"]
+    g2c = st2c["groups"]["first_all"]
+    assert g2c["t1_n"] == 1 and g2c["t5_n"] == 1 and g2c["n"] == 1, g2c
+    assert g2c["t1_win"] == 1 and g2c["t5_win"] == 1, g2c
+    print("  ②c T+5 后熟移出 OK", g2c)
 
     # ③ 过期：board_date 早于假K线覆盖范围（2026-08-01，假数据最早 09-01）且超 30 天 ⇒ expired+1 移出
     st3 = skeleton()
@@ -411,6 +481,8 @@ def _selftest():
     print("  ⑥ 信号覆盖日盖章 OK", st6["signal_dates"])
 
     # ⑦ 2026-10-20 修复：行级 board_date 补录旧日期（复刻 10-16 池补录）
+    #    🆕 2026-10-21：补录日 age>=2 ⇒ 过新闸门取数；完整 fake 覆盖 10-16+次日
+    #    ⇒ T+1 结算后仍留途等 T+5（10-16+5 根超出 fake 覆盖），pending 断言才稳。
     st7 = skeleton()
     rows = [{"code": "600000", "name": "浦发银行", "lbc": 1, "board_date": "2026-10-16"},
             {"code": "000001", "name": "平安银行", "lbc": 2, "board_date": "2026-10-16"}]
@@ -419,6 +491,7 @@ def _selftest():
     assert st7["signal_dates"] == {"2026-10-16": 2}, st7["signal_dates"]
     assert st7["last_signal_date"] == "2026-10-16" and st7["first_date"] == "2026-10-16"
     assert all(p["board_date"] == "2026-10-16" for p in st7["pending"])
+    assert all(p.get("t1_settled") == 1 for p in st7["pending"]), "T+1 应已结算"
     # 同批重复补录 → dedup 不虚增
     st7b = update(st7, rows, kline=lambda c, n: fake,
                   now=datetime(2026, 10, 20, 17, 31, tzinfo=CST))

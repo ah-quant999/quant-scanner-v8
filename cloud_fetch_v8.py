@@ -5284,6 +5284,31 @@ def _lianban_first_eta(store, mod):
     return None
 
 
+def _lianban_first_t1_eta(store, mod):
+    """最早 T+1 出数日估计 = 最早**未结算 T+1** 在途信号日 + 1 个交易日（且 ≥ +2 自然日）。
+
+    🆕 2026-10-21 主人令「拆 T+1/T+5 成熟」配套：T+1 系指标（晋级率/隔夜高开/
+    T+1 胜率/可成交 T+1）次日 K 线到齐即计入，取数闸门 age>=2（lianban_winrate.update）。
+    已打 t1_settled 的在途笔（等 T+5）不计——其 T+1 数据早已在表上。
+    无未结算 T+1 在途 → None。展示口径（前端标「预计」）；节假日同 _lianban_first_eta。"""
+    pend = [p for p in (store.get("pending") or [])
+            if p.get("board_date") and not p.get("t1_settled")]
+    if not pend:
+        return None
+    try:
+        d0 = datetime.strptime(min(p["board_date"] for p in pend), "%Y-%m-%d").date()
+    except Exception:
+        return None
+    d, n_td = d0, 0
+    for _ in range(15):
+        d += timedelta(days=1)
+        if _is_trading_day(d):
+            n_td += 1
+        if n_td >= 1 and (d - d0).days >= 2:
+            return d.isoformat()
+    return None
+
+
 def main(category=None, only=None):
     print(f"=== v8 云端抓取开始 {now_cst().isoformat(timespec='seconds')} "
           f"category={category or 'all'} ===")
@@ -6381,6 +6406,7 @@ def main(category=None, only=None):
             print(f"  ⚠️ LIANBAN_WINRATE: 累积更新失败 {e}")
             return None
         store["first_mature_eta"] = _lianban_first_eta(store, mod)
+        store["first_t1_eta"] = _lianban_first_t1_eta(store, mod)   # 🆕 2026-10-21 拆 T+1/T+5
         # 空载守卫：无在途且无成熟样本 → 不写盘（保留远端旧数据）
         if not store.get("pending") and all(
                 (g or {}).get("n", 0) == 0 for g in (store.get("groups") or {}).values()):
