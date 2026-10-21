@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-21 20:45",
- "generated": "2026-10-21 20:45",
+ "update_time": "2026-10-21 20:53",
+ "generated": "2026-10-21 20:53",
  "meta": {
-  "generated": "2026-10-21 20:45",
+  "generated": "2026-10-21 20:53",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 27,
   "days_with_consensus": 0,
@@ -11383,6 +11383,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
+      "code": "600825",
+      "name": "新华传媒",
+      "change_pct": 6.452,
+      "price": 16.17,
+      "category": "突破"
+     },
+     {
       "code": "605577",
       "name": "龙版传媒",
       "change_pct": 7.742,
@@ -11411,6 +11418,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "688018",
+      "name": "乐鑫科技",
+      "change_pct": 3.653,
+      "price": 145.86,
+      "category": "突破"
+     },
+     {
       "code": "002357",
       "name": "富临运业",
       "change_pct": 5.096,
@@ -11422,13 +11436,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "闽东电力",
       "change_pct": 3.867,
       "price": 15.31,
-      "category": "突破"
-     },
-     {
-      "code": "688018",
-      "name": "乐鑫科技",
-      "change_pct": 3.653,
-      "price": 145.86,
       "category": "突破"
      },
      {
@@ -11453,10 +11460,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "300244",
-      "name": "迪安诊断",
-      "change_pct": 3.488,
-      "price": 22.55,
+      "code": "603236",
+      "name": "移远通信",
+      "change_pct": 9.999,
+      "price": 83.72,
       "category": "突破"
      },
      {
@@ -11476,6 +11483,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
     ],
     "加速": [
      {
+      "code": "600825",
+      "name": "新华传媒",
+      "change_pct": 6.452,
+      "price": 16.17,
+      "category": "加速"
+     },
+     {
       "code": "605577",
       "name": "龙版传媒",
       "change_pct": 7.742,
@@ -11504,6 +11518,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
+      "code": "688018",
+      "name": "乐鑫科技",
+      "change_pct": 3.653,
+      "price": 145.86,
+      "category": "加速"
+     },
+     {
       "code": "002357",
       "name": "富临运业",
       "change_pct": 5.096,
@@ -11515,13 +11536,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "闽东电力",
       "change_pct": 3.867,
       "price": 15.31,
-      "category": "加速"
-     },
-     {
-      "code": "688018",
-      "name": "乐鑫科技",
-      "change_pct": 3.653,
-      "price": 145.86,
       "category": "加速"
      },
      {
@@ -11543,11 +11557,25 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "四川美丰",
       "change_pct": 3.01,
       "price": 7.53,
+      "category": "加速"
+     },
+     {
+      "code": "603236",
+      "name": "移远通信",
+      "change_pct": 9.999,
+      "price": 83.72,
       "category": "加速"
      }
     ],
     "短线选股": [
      {
+      "code": "600825",
+      "name": "新华传媒",
+      "change_pct": 6.452,
+      "price": 16.17,
+      "category": "短线选股"
+     },
+     {
       "code": "605577",
       "name": "龙版传媒",
       "change_pct": 7.742,
@@ -11576,6 +11604,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "688018",
+      "name": "乐鑫科技",
+      "change_pct": 3.653,
+      "price": 145.86,
+      "category": "短线选股"
+     },
+     {
       "code": "002357",
       "name": "富临运业",
       "change_pct": 5.096,
@@ -11587,13 +11622,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "闽东电力",
       "change_pct": 3.867,
       "price": 15.31,
-      "category": "短线选股"
-     },
-     {
-      "code": "688018",
-      "name": "乐鑫科技",
-      "change_pct": 3.653,
-      "price": 145.86,
       "category": "短线选股"
      },
      {
@@ -11618,10 +11646,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "300244",
-      "name": "迪安诊断",
-      "change_pct": 3.488,
-      "price": 22.55,
+      "code": "603236",
+      "name": "移远通信",
+      "change_pct": 9.999,
+      "price": 83.72,
       "category": "短线选股"
      },
      {
@@ -11640,13 +11668,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
      }
     ],
     "强势股": [
-     {
-      "code": "300244",
-      "name": "迪安诊断",
-      "change_pct": 3.488,
-      "price": 22.55,
-      "category": "强势股"
-     },
      {
       "code": "600838",
       "name": "上海九百",
