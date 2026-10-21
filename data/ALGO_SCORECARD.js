@@ -1,0 +1,151 @@
+window.ALGO_SCORECARD = {
+  "data_date": "2026-10-21",
+  "update_time": "2026-10-21 20:29:28",
+  "source_time": "2026-10-21 05:27:23",
+  "oneline": "样本≥30 交易型算法 2 家：最强 强势跟踪T+45（胜率 87.7%·均收 24.28%·超额 23.24%）；最弱 量质双擎T+1（胜率 34.1%·均收 -0.91%）。低于闸门（胜率<45.0% 或 均收≤0%）：量质双擎 —— 跑满观察期再裁决去留。",
+  "ranked": [
+    {
+      "card": "强势跟踪",
+      "icon": "📡",
+      "page": "选股策略",
+      "hold": "T+45",
+      "sample": 57,
+      "win_rate": 87.7,
+      "avg_return": 24.28,
+      "max_drawdown": -19.27,
+      "bench": 1.0357,
+      "excess": 23.24,
+      "best_hold": "T+45",
+      "best_ret": 24.28,
+      "fresh": false,
+      "status": "源未在数据日 2026-10-21 刷新（最后 2026-10-21 05:07）",
+      "source_time": "2026-10-21 05:07"
+    },
+    {
+      "card": "量质双擎",
+      "icon": "🚀",
+      "page": "选股策略",
+      "hold": "T+1",
+      "sample": 85,
+      "win_rate": 34.1,
+      "avg_return": -0.91,
+      "max_drawdown": null,
+      "bench": null,
+      "excess": null,
+      "best_hold": "T+1",
+      "best_ret": -0.91,
+      "fresh": false,
+      "status": "源未在数据日 2026-10-21 刷新（最后 2026-10-21 04:08）",
+      "source_time": "2026-10-21 04:08"
+    }
+  ],
+  "watch": [
+    {
+      "card": "低波趋势",
+      "icon": "🐢",
+      "page": "选股策略",
+      "hold": "T+1",
+      "sample": 5,
+      "win_rate": 40.0,
+      "avg_return": -0.2,
+      "max_drawdown": null,
+      "bench": null,
+      "excess": null,
+      "best_hold": null,
+      "best_ret": null,
+      "fresh": false,
+      "status": "源未在数据日 2026-10-21 刷新（最后 2026-10-21 04:11）",
+      "source_time": "2026-10-21 04:11"
+    },
+    {
+      "card": "日内动量",
+      "icon": "📈",
+      "page": "选股策略",
+      "hold": null,
+      "sample": null,
+      "win_rate": null,
+      "avg_return": null,
+      "max_drawdown": null,
+      "bench": null,
+      "excess": null,
+      "best_hold": null,
+      "best_ret": null,
+      "fresh": false,
+      "status": "样本为 0（该档累积中）；无 by_period 数据；源未在数据日 2026-10-21 刷新（最后 2026-10-21 04:13）",
+      "source_time": "2026-10-21 04:13"
+    },
+    {
+      "card": "缩量回踩",
+      "icon": "📐",
+      "page": "选股策略",
+      "hold": null,
+      "sample": null,
+      "win_rate": null,
+      "avg_return": null,
+      "max_drawdown": null,
+      "bench": null,
+      "excess": null,
+      "best_hold": null,
+      "best_ret": null,
+      "fresh": false,
+      "status": "无 by_period 数据（归档信号尚无成熟样本，累积中）；源未在数据日 2026-10-21 刷新（最后 2026-10-21 04:15）",
+      "source_time": "2026-10-21 04:15"
+    },
+    {
+      "card": "板块共振",
+      "icon": "🔄",
+      "page": "选股策略",
+      "hold": null,
+      "sample": null,
+      "win_rate": null,
+      "avg_return": null,
+      "max_drawdown": null,
+      "bench": null,
+      "excess": null,
+      "best_hold": null,
+      "best_ret": null,
+      "fresh": false,
+      "status": "样本为 0（该档累积中）；无 by_period 数据（尚无归档信号）；源未在数据日 2026-10-21 刷新（最后 2026-10-21 04:15）",
+      "source_time": "2026-10-21 04:15"
+    },
+    {
+      "card": "龙虎机构",
+      "icon": "🐉",
+      "page": "选股策略",
+      "hold": null,
+      "sample": null,
+      "win_rate": null,
+      "avg_return": null,
+      "max_drawdown": null,
+      "bench": null,
+      "excess": null,
+      "best_hold": null,
+      "best_ret": null,
+      "fresh": false,
+      "status": "无 by_period 数据（归档信号尚无成熟样本，累积中）；源未在数据日 2026-10-21 刷新（最后 2026-10-21 04:15）",
+      "source_time": "2026-10-21 04:15"
+    }
+  ],
+  "research": [
+    {
+      "card": "因子实验室",
+      "icon": "🧪",
+      "note": "因子分层研究（样本 25748，最佳 T+250 胜率 72.8%·均收 48.449%）——研究型，不与交易型同列排名"
+    },
+    {
+      "card": "K线信号层",
+      "icon": "🕯",
+      "note": "信号层测试 108 项（最优：📉 下跌趋势 T+180 胜率 58.0%·均收 6.04%）"
+    }
+  ],
+  "gates": {
+    "min_samples": 30,
+    "low_win_rate": 45.0,
+    "low_avg_return": 0.0,
+    "honesty_note": "未知一律 null（前端显示 —），绝不用 0 冒充；样本< 30 只观测、不进排名、不做下架评估；研究型（因子分层）不与交易型同列比较；源不在算法链内的，只入观察名单、不提议下架。",
+    "bench_note": "基准超额口径：extra.bench_avg_return = 各卡信号区间∩基准覆盖区间的全市场等权基准均收益（gen_market_bench.py，与策略同入场/出场/成本口径）；前端以 avg_return − bench 求差；区间覆盖不满时附 bench_from/bench_to 供核查。",
+    "chain_note": "闸门 chain_day：交易日 2026-10-21"
+  },
+  "method": "记分 = 全链回测真实信号流（次开买入/同持有期/扣双边 0.3%）+ 全市场等权基准超额；样本≥30 才进榜，未知一律留白不用 0 冒充。",
+  "disclaimer": "历史回测不代表未来收益；记分卡用于算法去留裁决参考，不构成投资建议。"
+};
