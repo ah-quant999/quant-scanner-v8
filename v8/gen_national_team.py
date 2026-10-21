@@ -99,6 +99,34 @@ def verdict(s):
 
 vtxt, vcol = verdict(score)
 
+# ── 一句话结论（规则拼装自子信号状态，数值全部来自真实源，禁编造） ──
+sc_str = ('—' if score is None else '%.1f' % score)
+def _oneline():
+    if score is None:
+        return '数据未就绪，无法给出结论。'
+    parts = []
+    if a_val is not None:
+        if a_val > 40:   parts.append('宽基ETF净申购 %.1f 亿＝国资托盘指纹明确' % a_val)
+        elif a_val >= 0: parts.append('宽基ETF净申购 %.1f 亿＝托盘力度中性' % a_val)
+        else:            parts.append('宽基ETF净赎回 %.1f 亿＝未见托盘' % a_val)
+    if b_val is not None:
+        if b_val > 1:    parts.append('大金融强势')
+        elif b_val < -1: parts.append('大金融弱势')
+        else:            parts.append('大金融中性')
+    if c_val is not None:
+        parts.append('大金融资金净%s %.1f 亿' % ('流入' if c_val > 0 else '流出', abs(c_val)))
+    if not parts:
+        return '数据未就绪。'
+    tail = ''
+    if a_val is not None and b_val is not None:
+        if a_val > 40 and b_val < -1:
+            tail = '——国家队托指数、市场缩量轮动，回调低吸优于追高'
+        elif a_val > 40 and b_val > 1:
+            tail = '——托盘与市场共振，风险偏好可适度放宽'
+        elif a_val <= 0 and b_val < -1:
+            tail = '——无托盘且市场走弱，宜收紧防守'
+    return '综合 %s（%s）：' % (sc_str, vtxt) + '，'.join(parts) + tail + '。'
+
 subs = []
 subs.append({
     'key':'A','name':'宽基ETF净申购突变','weight':W['A'],'ready':a_ready,
@@ -130,7 +158,8 @@ out = {
     'ready_count': sum(1 for k in ['A','B','C'] if ready[k]),
     'subs': subs,
     'method': '3 子信号加权（缺失项权重重分）；宽基ETF净申购45% + 大金融相对强度35% + 大金融资金净流入20%；汇金持仓季报未接入。',
-    'disclaimer': '代理推算·非汇金官方实时持仓；宽基ETF净申购为最强国资托盘指纹，但披露存 T+1 滞后，仅作 regime 参考，不构成交易建议。'
+    'disclaimer': '代理推算·非汇金官方实时持仓；宽基ETF净申购为最强国资托盘指纹，但披露存 T+1 滞后，仅作 regime 参考，不构成交易建议。',
+    'oneline': _oneline()
 }
 
 with open(os.path.join(ROOT, 'data/NATIONAL_TEAM.js'), 'w', encoding='utf-8') as f:
