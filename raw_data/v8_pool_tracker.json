@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-21 08:56:49",
+  "update_time": "2026-10-21 19:11:12",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -9,28 +9,54 @@
   "items": [],
   "sentiment_meta": {
     "phase": "高潮",
-    "score": 74.0,
-    "delta_pct": 0.0,
+    "score": 70.0,
+    "delta_pct": -7.41,
     "advice": "✨ 高潮持续：聚焦核心龙头，注意仓位管理",
     "source": "LIMIT_UP_HEATMAP"
   },
   "sector_meta": {
-    "top_in": [],
+    "top_in": [
+      {
+        "name": "电子",
+        "type": "行业",
+        "net": 58.35
+      },
+      {
+        "name": "通信技术",
+        "type": "概念",
+        "net": 42.94
+      },
+      {
+        "name": "5G概念",
+        "type": "概念",
+        "net": 33.43
+      },
+      {
+        "name": "小盘成长",
+        "type": "概念",
+        "net": 30.56
+      },
+      {
+        "name": "QFII重仓",
+        "type": "概念",
+        "net": 28.72
+      }
+    ],
     "top_out": [
       {
-        "name": "风电整机",
+        "name": "超市",
         "type": "行业",
-        "net": -1.24
+        "net": -1.1
       },
       {
-        "name": "环保",
+        "name": "快递",
         "type": "行业",
-        "net": -1.24
+        "net": -1.12
       },
       {
-        "name": "航空运输",
+        "name": "高速公路",
         "type": "行业",
-        "net": -1.29
+        "net": -1.13
       }
     ]
   },
