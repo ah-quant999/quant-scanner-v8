@@ -1,6 +1,6 @@
 {
-  "last_time": "2026-10-21 21:19:59",
-  "status": "fail",
+  "last_time": "2026-10-21 23:12:05",
+  "status": "warn",
   "machine": "lemoncat-cn",
   "source": "v8_runner_guard"
 }
