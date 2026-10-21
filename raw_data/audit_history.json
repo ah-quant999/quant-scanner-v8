@@ -3576,5 +3576,34 @@
     "message": "SECTOR_YEAR_FLOW.js 更新于 2天前 17:43；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
+ },
+ {
+  "date": "2026-10-22",
+  "time": "02:49:41",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 125,
+   "warn": 1,
+   "fail": 1,
+   "limited": 0,
+   "info": 0,
+   "other": 0,
+   "total": 127
+  },
+  "warn_items": [
+   {
+    "id": "STOCK_STOP_DATA",
+    "name": "精确止损止盈",
+    "message": "更新于 2天前 06:24"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "CITIC_PE_THERMO",
+    "name": "中信PE热力",
+    "message": "更新于 昨日 05:27；超过阈值 1234 分钟"
+   }
+  ]
  }
 ]
