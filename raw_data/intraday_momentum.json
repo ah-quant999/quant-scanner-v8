@@ -1,8 +1,8 @@
 {
- "update_time": "2026-10-22 01:47:25",
+ "update_time": "2026-10-22 03:02:41",
  "data_date": "2026-10-21",
  "method": "日内动量：近20日日内累计收益(∑close/open-1)最高 Top5 ∧ 收盘>MA60（真实信号流，次开买入）",
- "pool_size": 2583,
+ "pool_size": 2709,
  "picks": [
   {
    "code": "688175",
