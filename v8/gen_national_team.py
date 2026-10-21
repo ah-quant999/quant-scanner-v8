@@ -13,6 +13,9 @@ v8/gen_national_team.py —— 「国家队活跃度」复合信号（盘后规�
   B. 大金融相对强度（35%）     ← SECTOR_RS.js（银行/证券/保险/多元金融 relative_5d 均值）
   C. 大金融资金净流入（20%）   ← SECTOR_FUND_FLOW.js（银行/证券 板块净流入合计）
   D. 汇金持仓环比（未接入）    ← v8 无季报股东源 ⇒ 永远「未接入」，仅占位说明
+
+调度：.github/workflows/v8_national_team.yml 工作日 20:50 CST（GitHub Actions ubuntu-latest，
+      Contents API 稳健推送）；18:20/19:20 两档盘后资金流链落盘后运行，上游未就绪则保留上版不写盘（宁缺勿错）。
 """
 import json, os, sys, datetime
 
@@ -77,6 +80,25 @@ if sf:
 
 # ── D. 汇金持仓环比（未接入） ────────────────────────────────────────
 d_ready = False
+
+# ── 🛡️ 盘后新鲜度闸门（防假新鲜·主人令 09-23） ──────────────────────
+# C 源 SECTOR_FUND_FLOW.js 必须为「今日 ≥16:00」的盘后数据，否则整卡保留上版不写盘。
+# 手工急救可用 NT_FORCE=1 跳过闸门（会留下 source_time 审计痕迹）。
+_nt_today = bj_now().strftime('%Y-%m-%d')
+_sf_ut = (sf or {}).get('update_time') or ''
+_sf_ok = False
+if _sf_ut:
+    try:
+        _sf_dt = datetime.datetime.strptime(_sf_ut[:16], '%Y-%m-%d %H:%M')
+        _sf_ok = (_sf_dt.strftime('%Y-%m-%d') == _nt_today and _sf_dt.hour >= 16)
+    except ValueError:
+        _sf_ok = False
+if not _sf_ok and os.environ.get('NT_FORCE') != '1':
+    print('⏸️ NATIONAL_TEAM: 盘后资金流未就绪（SECTOR_FUND_FLOW.update_time=%r），'
+          '保留上版不写盘（宁缺勿错）' % _sf_ut)
+    sys.exit(0)
+if not _sf_ok:
+    print('⚠️ NATIONAL_TEAM: NT_FORCE=1 强制写盘（盘后资金流仍未就绪：%r）' % _sf_ut)
 
 # ── 权重重分 + 计分 ─────────────────────────────────────────────────
 W = {'A':45, 'B':35, 'C':20, 'D':0}
@@ -152,6 +174,9 @@ subs.append({
 out = {
     'data_date': (e.get('data_date') if e else None) or bj_now().strftime('%Y-%m-%d'),
     'update_time': bj_now().strftime('%Y-%m-%d %H:%M:%S'),
+    'source_time': max(x for x in [(e or {}).get('update_time') or '',
+                                   (rs or {}).get('update_time') or '',
+                                   (sf or {}).get('update_time') or '']),
     'score': score,
     'verdict': vtxt,
     'verdict_color': vcol,
@@ -161,6 +186,13 @@ out = {
     'disclaimer': '代理推算·非汇金官方实时持仓；宽基ETF净申购为最强国资托盘指纹，但披露存 T+1 滞后，仅作 regime 参考，不构成交易建议。',
     'oneline': _oneline()
 }
+
+# ── 🛡️ 同源去重（防假新鲜·主人令 09-23）：三源 update_time 均未变 ⇒ 不写盘 ──
+_prev_nt = load('data/NATIONAL_TEAM.js')
+_prev_st = (_prev_nt or {}).get('source_time') or ''
+if _prev_st and _prev_st == out['source_time']:
+    print('⏸️ NATIONAL_TEAM: 三源 update_time 未变（%s），保留上版不写盘' % _prev_st)
+    sys.exit(0)
 
 with open(os.path.join(ROOT, 'data/NATIONAL_TEAM.js'), 'w', encoding='utf-8') as f:
     f.write('window.NATIONAL_TEAM = ' + json.dumps(out, ensure_ascii=False, indent=2) + ';')

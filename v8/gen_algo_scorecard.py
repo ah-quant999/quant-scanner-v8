@@ -10,6 +10,10 @@ v8/gen_algo_scorecard.py —— 「算法记分卡」规则聚合（盘后生成
   watch   : 样本<30 或未就绪的交易型算法（观察名单）
   research: 研究型（因子实验室 / K线信号层）摘要
   oneline : 一句话结论（规则拼装，数值全真实）
+
+调度：.github/workflows/v8_algo_scorecard.yml 工作日 08:25 CST（GitHub Actions ubuntu-latest，
+      Contents API 稳健推送）；算法链 E 批（gen_backtest_all_algos.py，ORDER 47/48）实测约 06:40
+      收尾，08:25 跑可确保读到当日回测产物；回测源 update_time 未变则不写盘（同源去重）。
 """
 import json, os, sys, datetime
 from algo_gate_thresholds import (LOW_WIN_RATE as G_LOW_WIN, LOW_AVG_RETURN as G_LOW_RET,
@@ -155,6 +159,17 @@ out = {
     'method': '记分 = 全链回测真实信号流（次开买入/同持有期/扣双边 0.3%）+ 全市场等权基准超额；样本≥30 才进榜，未知一律留白不用 0 冒充。',
     'disclaimer': '历史回测不代表未来收益；记分卡用于算法去留裁决参考，不构成投资建议。',
 }
+
+# ── 🛡️ 同源去重（防假新鲜·主人令 09-23）：回测源 update_time 未变 ⇒ 不写盘 ──
+_prev_sc = None
+try:
+    _s = open(os.path.join(ROOT, 'data/ALGO_SCORECARD.js'), encoding='utf-8').read()
+    _prev_sc = json.loads(_s[_s.index('{'):_s.rindex('}') + 1])
+except Exception:
+    _prev_sc = None
+if _prev_sc and _prev_sc.get('source_time') and _prev_sc.get('source_time') == bt.get('update_time'):
+    print('⏸️ ALGO_SCORECARD: 回测源 update_time 未变（%s），保留上版不写盘' % bt.get('update_time'))
+    sys.exit(0)
 
 with open(os.path.join(ROOT, 'data/ALGO_SCORECARD.js'), 'w', encoding='utf-8') as f:
     f.write('window.ALGO_SCORECARD = ' + json.dumps(out, ensure_ascii=False, indent=2) + ';')

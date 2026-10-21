@@ -17,7 +17,8 @@
 任一源缺失 ⇒ 对应条目「数据未就绪」静默降级，绝不伪造。
 
 产出 data/MORNING_PLAN.js → window.MORNING_PLAN
-调度：工作日 08:40（小九机自动化跑本脚本 + v8_push_files.py 推仓）。
+调度：.github/workflows/v8_morning_plan.yml 工作日 07:50 CST（GitHub Actions [self-hosted, cn]，
+      东财 push2delay 仅境内可达；Contents API 源码同步 + PowerShell ASCII-only 运行块 + api_put_file.py 稳健推送）。
 ═══════════════════════════════════════════════════════════════════════
 """
 import json, os, sys, time
