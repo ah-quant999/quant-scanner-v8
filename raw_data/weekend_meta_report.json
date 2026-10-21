@@ -1,9 +1,12 @@
 {
-"update_time": "2026-10-21 08:33:52",
-"total": 8035,
-"new_listings_count": 0,
+"update_time": "2026-10-21 09:18:03",
+"total": 8037,
+"new_listings_count": 2,
 "delisted_count": 3,
-"new_listings": [],
+"new_listings": [
+"00910 中国三迪（新）",
+"08059 朝威控股（新）"
+],
 "delisted": [
 "02922 伟禄科技股份－旧",
 "02923 世纪集团国际－旧",
@@ -13,5 +16,5 @@
 "guard_tripped": false,
 "guard_reasons": [],
 "old_universe": 8038,
-"fresh_universe": 8035
+"fresh_universe": 8037
 }
