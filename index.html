@@ -5066,7 +5066,7 @@ c.innerHTML = h;
        低波趋稳/日内动量 = 独立产物根级结构，直接登记 var 名（渲染器 10-15 已做根级归一）；
        三新算法共用 NEW_ALGO_TRI_BACKTEST，走 __vcpBacktest/__rotationBacktest/__lhbBacktest 适配器。 */
     {key:'lowvol',   name:'低波趋稳',   icon:'🐢', desc:'第二支自研算法 · 60日波动率最低 Top5 + 收盘>MA60 · 次开买入持有 N 日（上市前置回测 N=60 α +4.00pp 唯一显著跑赢档）', color:'#38bdf8', var:'LOWVOL_TREND_BACKTEST'},
-    {key:'intraday', name:'日内动量',   icon:'📈', desc:'第三支自研算法 · 20日日内累计收益最高 Top5 + 收盘>MA60 · 次开买入持有 N 日（上市前置回测 N=20 α +1.73pp，N≥45 衰减）', color:'#f59e0b', var:'INTRADAY_MOMENTUM_BACKTEST'},
+    {key:'intraday', name:'日内动量',   icon:'📈', desc:'第三支自研算法 · 20日日内累计收益最高 Top5 + 收盘>MA60 · 次开买入持有 N 日（上市前置回测 N=20 α +1.73pp，N≥45 衰减）', color:'#f59e0b', var:'INTRADAY_MOMENTUM_BACKTEST', fullLadder:[1,3,5,10,20,30,45,60]},
     {key:'vcp',      name:'缩量回踩',   icon:'📐', desc:'三新算法① · 全K线库扫描「放量启动后缩量回踩+波动逐级收缩」形态 · 次开买入持有 N 日', color:'#22d3ee', var:'__vcpBacktest'},
     {key:'rotation', name:'板块共振',   icon:'🔄', desc:'三新算法② · 四源板块资金共振轮动 · 次开买入持有 N 日', color:'#f472b6', var:'__rotationBacktest'},
     {key:'lhb',      name:'龙虎机构',   icon:'🐉', desc:'三新算法③ · 龙虎榜机构净买≥3000万跟随 · 次开买入持有 N 日', color:'#34d399', var:'__lhbBacktest'},
