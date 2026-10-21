@@ -1780,6 +1780,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/ETF_PULSE.js?v=907bc3ab4c" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=a9fce359ad" defer></script>
 <script src="data/TOP10_DAILY.js?v=da16c1b816" defer></script>
+<!-- 🆕 2026-10-21 主人令「要」：最强共振·回测跟踪（track_resonance.py 每日重算 raw_data/resonance_track.json → update_v8 转换） -->
+<script src="data/RESONANCE_TRACK.js?v=20261021a" defer></script>
 <script src="data/WEEKEND_RUN.js?v=7e95640362" defer></script>
 <script src="data/W52_HIGH.js?v=b297e65dd2" defer></script>
 <!-- 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表（自建·真实历史回填） -->
@@ -3565,6 +3567,8 @@ function fmtSigned(v){
     <!-- ===== TAB3: 每日洞察 ===== -->
     <div id="rcTab3" class="rc-pane">
       <div id="insightContainer"></div>
+      <!-- 🆕 2026-10-21 主人令「要」：最强共振·回测跟踪（T+1→T+250 持久跟踪，成熟到哪档显示哪档） -->
+      <div id="resonTrackContainer"></div>
     </div>
 
     <!-- 2026-09-03 主人令：TAB4 HTML 容器（含已下线大牛股猎手）已删除（renderHunter 函数 + chips 都已全方位下线，仅保留共振日历三大功能 tab：机游共振/北向席位/每日洞察） -->
@@ -3605,10 +3609,92 @@ function fmtSigned(v){
     if(tabId === 'tab1' && _rcNeedRender('jyCalContainer')){ setTimeout(renderJyCalendar, 30); }
     if(tabId === 'tab2' && _rcNeedRender('northCalContainer')){ setTimeout(renderNorthCalendar, 30); }
     if(tabId === 'tab3' && _rcNeedRender('insightContainer')){ setTimeout(renderInsight, 30); }
+    if(tabId === 'tab3' && _rcNeedRender('resonTrackContainer')){ setTimeout(window.renderResonanceTrack, 30); }
     /* tab4 大牛股猎手已于 2026-09-03 主人令全方位下线（renderHunter 函数删除、不再挂载 window）
        —— 2026-09-03 二清：注释精简为通用已下线 trace，保留审计 */
   }
 
+  /* ===== 工具函数 ===== */
+  function _rc$(id){ return document.getElementById(id); }
+  /* 🆕 2026-10-21 主人令「要」：最强共振·回测跟踪渲染器（读 window.RESONANCE_TRACK）
+     口径：入场=T+1开盘(信号盘后可知次日可买)，单边成本0.15%净口径；基准=880003平均股价同成本。
+     判定徽章按 2026-10-21 实测回测结论固化为文案：次日买入=抛硬币 / 中期=单调负超额 /
+     长期(T+250)=等数据 / 子信号(重复共振)=唯一正短alpha保留观察。成熟到哪档显示哪档。 */
+  window.renderResonanceTrack = function(){
+    var c = document.getElementById('resonTrackContainer');
+    if(!c) return;
+    var T = window.RESONANCE_TRACK;
+    if(!T || !T.per_horizon){
+      c.innerHTML = '<div style="text-align:center;padding:24px;color:var(--dim);font-size:12px;">最强共振回测跟踪数据未就绪（盘后链产出后自动显示）</div>';
+      return;
+    }
+    function _st(v){ return v==null?'--':(v>0?'+'+v.toFixed(2):v.toFixed(2)); }
+    function _col(v){ if(v==null) return 'var(--dim)'; return v>0?'var(--up)':'var(--down)'; }
+    var HOR = ['T+1','T+5','T+10','T+20','T+30','T+60','T+90','T+120','T+180','T+250'];
+    var rows = '';
+    HOR.forEach(function(k){
+      var a = T.per_horizon[k]; if(!a) return;
+      if(!a.mature){
+        rows += '<tr><td style="padding:5px 8px;color:var(--dim);">'+k+'</td>'
+              + '<td colspan="5" style="padding:5px 8px;color:var(--dim);font-size:11px;">待熟 '+a.pending+' 笔（最早信号也要 '+({'T+90':'2027-02','T+120':'2027-03','T+180':'2027-05','T+250':'2027-06'}[k]||'—')+' 才有 250 交易日数据）</td></tr>';
+        return;
+      }
+      var ex = a.excess_avg, exw = a.excess_win;
+      rows += '<tr>'
+        + '<td style="padding:5px 8px;white-space:nowrap;">'+k+'</td>'
+        + '<td style="padding:5px 8px;color:var(--dim);">'+a.mature+(a.pending?'<span style="opacity:.6">/+'+a.pending+'</span>':'')+'</td>'
+        + '<td style="padding:5px 8px;'+(a['win%']<50?'color:var(--down);':'color:var(--up);')+'">'+a['win%']+'%</td>'
+        + '<td style="padding:5px 8px;color:'+_col(a['avg%'])+';">'+_st(a['avg%'])+'%</td>'
+        + '<td style="padding:5px 8px;color:'+_col(ex)+';">'+(ex==null?'--':_st(ex)+'%')+'</td>'
+        + '<td style="padding:5px 8px;color:var(--dim);">'+(exw==null?'--':exw+'%')+'</td>'
+        + '</tr>';
+    });
+    // 重复共振子信号（唯一正短 alpha）
+    var rep = (T.cohorts_T5_T30_T90_T250||{})['重复共振'];
+    var repRow = '';
+    if(rep && rep['T+1'] && rep['T+1'].mature){
+      var r1 = rep['T+1'];
+      repRow = '<div style="margin-top:8px;padding:7px 10px;border:1px solid var(--gold);border-radius:8px;font-size:11.5px;line-height:1.7;">'
+        + '🥇 <b style="color:var(--gold);">唯一正短 alpha 子信号：重复共振</b>（窗口内第2次+上榜，n='+rep.n+'）'
+        + ' · T+1 胜率 <b style="color:'+(r1['win%']>50?'var(--up)':'var(--down)')+';">'+r1['win%']+'%</b>'
+        + ' 均 <b style="color:'+_col(r1['avg%'])+';">'+_st(r1['avg%'])+'%</b>'
+        + (rep['T+5']&&rep['T+5'].mature?' · T+5 均 '+_st(rep['T+5']['avg%'])+'%':'')
+        + ' → 作观察项，不作主推信号</div>';
+    }
+    c.innerHTML = ''
+      + '<div style="margin-top:14px;padding:12px 14px;border:1px solid var(--line,#2a2f3a);border-radius:10px;background:var(--panel-bg,rgba(255,255,255,.02));">'
+      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+      + '<h3 style="margin:0;font-size:14px;">🎯 最强共振 · 回测跟踪</h3>'
+      + '<span style="font-size:10.5px;color:var(--dim);">T+1开盘入场·成本0.15%·vs 880003平均股价</span>'
+      + '<span style="font-size:10.5px;color:var(--dim);margin-left:auto;">'+(T.generated?('更新于 '+T.generated):'')+' · 样本 '+T.n_tracked+'/'+T.n_signals+'</span>'
+      + '</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 6px;font-size:11px;">'
+      + '<span style="padding:2px 8px;border-radius:10px;background:var(--down);color:#fff;">次日买入：抛硬币·无edge</span>'
+      + '<span style="padding:2px 8px;border-radius:10px;background:var(--down);color:#fff;">中期持有：单调负超额</span>'
+      + '<span style="padding:2px 8px;border-radius:10px;background:#64748b;color:#fff;">T+250：等数据成熟</span>'
+      + '<span style="padding:2px 8px;border-radius:10px;background:var(--gold);color:#1a1a1a;">子信号：保留·轻量</span>'
+      + '</div>'
+      + '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">'
+      + '<thead><tr style="color:var(--dim);font-size:11px;border-bottom:1px solid var(--line,#2a2f3a);">'
+      + '<th style="padding:5px 8px;text-align:left;">期限</th><th style="padding:5px 8px;text-align:left;">成熟</th>'
+      + '<th style="padding:5px 8px;text-align:left;">胜率</th><th style="padding:5px 8px;text-align:left;">均收益</th>'
+      + '<th style="padding:5px 8px;text-align:left;">超额</th><th style="padding:5px 8px;text-align:left;">超额胜率</th>'
+      + '</tr></thead><tbody>'+rows+'</tbody></table></div>'
+      + repRow
+      + '<div style="margin-top:7px;font-size:10.5px;color:var(--dim);line-height:1.6;">信号口径：龙虎榜机构+游资双正且合计≥8000万（转债剔除）。历史回测仅供研究参考，不构成个人投资建议。</div>'
+      + '</div>';
+  };
+  /* 数据懒到位兜底：RESONANCE_TRACK 走 defer，DOMContentLoaded 前后均可能晚于本段执行 */
+  (function(){
+    var n=0, iv=setInterval(function(){
+      n++;
+      if(window.RESONANCE_TRACK){
+        clearInterval(iv);
+        var el=document.getElementById('resonTrackContainer');
+        if(el && !el.innerHTML.trim() && window.__rcActiveTab==='tab3'){ window.renderResonanceTrack(); }
+      } else if(n>400){ clearInterval(iv); }
+    },300);
+  })();
   /* ===== 工具函数 ===== */
   function _rc$(id){ return document.getElementById(id); }
   function _rcEsc(s){ var d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }

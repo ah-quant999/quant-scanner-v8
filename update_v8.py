@@ -49,6 +49,10 @@ DATA_SOURCES = {
     "nt_data.json":                "NT_DATA",
     "lhb_data.json":               "LHB_DATA",
     "lhb_history.json":           "LHB_HISTORY",
+    # 🆕 2026-10-21 主人令「要」：最强共振(机构+游资)信号 T+1→T+250 持久回测跟踪
+    #   （真源 track_resonance.py 每日重算 raw_data/resonance_track.json；
+    #    前端每日洞察卡·「最强共振·回测跟踪」区块消费）
+    "resonance_track.json":        "RESONANCE_TRACK",
     "concept_ranking.json":        "CONCEPT_RANKING",
     "margin_data.json":            "MARGIN_DATA",
     "cffex_data.json":             "CFFEX_HOLDINGS",
@@ -242,6 +246,7 @@ CATEGORY_MAP = {
     # 2026-08-31：期指主力合约卡移回「实时数据」页，改为 intraday 盘中实时
     "CFFEX_HOLDINGS": "intraday,post_close",
     "CFFEX_POSITION": "post_close",  # 🆕 2026-10-15 与 cloud_fetch 同步：持仓排名16:30后公布
+    "RESONANCE_TRACK": "post_close",  # 🆕 2026-10-21 最强共振回测跟踪：信号源自龙虎榜(17:30后)，归盘后档
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：与 cloud_fetch_v8.py 同步加 post_close。
     #   盘后数据页「宏观数据速览」卡读本变量，原只标 premarket → 盘后档不重生成 data/MACRO_DATA.js。
     # 🛡 2026-09-11 主人令：宏观为日级/月级数据，不随盘中实时刷——与 cloud_fetch_v8.py 同步移出
