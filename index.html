@@ -184,14 +184,14 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=91e23fe38d" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=054f62b8d6" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=a098a45743" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
     <script src="data/SECTOR_LEADERS.js?v=47ea427c1f" defer></script><script src="data/NEW_ALGO_TRI.js?v=a83e31fdba" defer></script><script src="data/NEW_ALGO_TRI_BACKTEST.js?v=38c0af92fd" defer></script><!-- 🆕 2026-10-19 三新算法（VCP/板块共振轮动/LHB机构跟随）+ 真实信号流回测 -->
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
-    <script src="data/PORTFOLIO.js?v=568ef8ef70" defer></script>
+    <script src="data/PORTFOLIO.js?v=c7153b18a4" defer></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -1258,7 +1258,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=b3df65c105" defer></script>
 <script src="data/EXPERIMENT.js?v=d7f9d343dc" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=b82209ea55" defer></script><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=245d7d208d" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=b82209ea55" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=8f3c1a07d2" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=245d7d208d" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=b66435410d" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=c94cab9770" defer></script>
@@ -1292,9 +1292,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=c993b5ae99" defer></script>
 <script src="data/HB_XIAOJIU.js?v=7ed6d0d46a" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=61e7e08d3b" defer></script>
-<script src="data/HEALTH_CHECK.js?v=70aaf4fc0c" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=09514ed68d" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=f873e49cf3" defer></script>
+<script src="data/HEALTH_CHECK.js?v=e5199eaca5" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=64c35ac288" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=7cb0d60ac0" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=b6548e17fe" defer></script>
@@ -1308,13 +1308,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=7b01eb83c2" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=eaae5bbc48" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=67894f70cf" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=2ffc7908f4" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=c149349ac5" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=b2bf877869" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/IMA_STRONG_BACKTEST.js?v=1d66a21f51" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/IMA_STRONG_BACKTEST.js?v=8d002cbf53" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🆕 2026-10-12 小九：量质双擎（LQSQ · 第一支自研算法）前端接入 —— 后端数据链 10-11 已跑，
          但前端此前**零挂载**（注入/卡片/子页全缺）⇒ 主站无处显示（主人「我半天没看到在哪显示」）。
          本次补齐：
@@ -1373,6 +1373,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <button class="final-tab active" data-final="rec" onclick="switchFinalTab('rec')">🏆 最终推荐 · Top3</button>
       <button class="final-tab" data-final="cand" onclick="switchFinalTab('cand')">🎯 今日推荐候选池</button>
       <button class="final-tab" data-final="fa" onclick="switchFinalTab('fa')">🧪 因子实验室 <span style="font-size:10px;color:var(--dim);">非策略·加分项</span></button>
+      <button class="final-tab" data-final="hist" onclick="switchFinalTab('hist')">📜 每日 Top3 历史 <span style="font-size:10px;color:var(--dim);">每天前3名</span></button>
     </div>
 
     <!-- 子 Pane：最终推荐 Top3（2026-09-20 主人令唯一口径；🔴 2026-10-20 主人令「要口径和评分都一致」重申并废止 10-14 混排竞位）
@@ -1423,6 +1424,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           真实信号流自 10-13 起累积，11 月中切回真实口径。
           🔴 2026-10-20 主人令「口径和评分都一致」：线上最终推荐口径已回到唯一口径（=当日因子榜前 3 同序同分，混排竞位废止）⇒ 本卡为 10-14 混排方法的历史回放档案，仅存方法对比价值，不再描述线上现行口径。
         </div>
+      </div>
+    </div>
+
+    <!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：
+         每日 Top3 历史（真实每日选股 dated 快照汇总，非事后重算规则回放）。
+         数据源 data/FINAL_RECOMMEND_HISTORY.js（gen_final_recommend_history.py 产出，
+         读 raw_data/history/final_recommend_YYYYMMDD.json 逐日真实 Top3）。 -->
+    <div id="final-pane-hist" class="final-pane">
+      <div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">
+        <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">📜</span>每日推荐 Top3 历史
+          <span id="finalHistBadges" style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;"></span>
+        </h3>
+        <div id="finalHistBody" style="padding:12px 4px 2px;"><div class="note">加载中…</div></div>
       </div>
     </div>
 
@@ -18874,6 +18888,11 @@ window.__renderV8CalToday();
       window.__finalCandRendered = true;
       setTimeout(renderFinalCand, 30);
     }
+    // 🆕 2026-10-22 主人令「每天前3名历史」：首次切入才渲染（懒加载，避首屏开销）
+    if(name==='hist' && !window.__finalHistRendered){
+      window.__finalHistRendered = true;
+      setTimeout(function(){ try{ window.renderFinalHist(); }catch(e){ console.error('[renderFinalHist]', e); } }, 30);
+    }
     // 🔴 2026-09-20 主人令：「🧪 因子实验室」由「选股策略」页迁入本页第 3 子 Tab，
     //   渲染触发随之语义归位到此（原 window.switchSt('fa') 分支已删）。
     //   注：页面级 _renderPostReady 已在 DOMContentLoaded 无条件预渲
@@ -18883,6 +18902,74 @@ window.__renderV8CalToday();
       if(typeof window.__renderFactorPane==='function') setTimeout(window.__renderFactorPane, 30);
       try{ window.__stRetryTab('fa'); }catch(e){}
     }
+  };
+
+  // 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」
+  //   渲染「每日 Top3 历史」子 Tab：读 window.FINAL_RECOMMEND_HISTORY.by_date（日期键 → 当日 Top3）。
+  //   口径：真实每日选股 dated 快照汇总（gen_final_recommend_history.py），
+  //        归因日 = update_time 小时<9 归前一自然日；同一归因日只认最新版。
+  //   展示：日期倒序，每行一天，每行 3 只（code + 名称 + 收盘价 + 综合分），红涨绿跌由 close 与前一日 close 比较决定。
+  function _frHistEsc(x){
+    return String(x==null?'':x).replace(/[<>&"]/g,function(c){
+      return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});
+  }
+  window.renderFinalHist = function(){
+    var el=document.getElementById('finalHistBody'); if(!el) return;
+    var H=window.FINAL_RECOMMEND_HISTORY||{};
+    var by=H.by_date||{};
+    var days=Object.keys(by).sort().reverse();
+    var sb=document.getElementById('finalHistBadges');
+    if(sb) sb.innerHTML='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);white-space:nowrap">'+_frHistEsc(H.days||days.length)+' 天 · '+_frHistEsc(H.date_from||'—')+' → '+_frHistEsc(H.date_to||'—')+'</span>';
+    if(!days.length){
+      el.innerHTML='<div class="note" style="padding:16px;text-align:center;color:var(--dim)">暂无历史记录（等待每日算法落档）</div>';
+      return;
+    }
+    // 前一交易日收盘价映射（用于红涨绿跌）——同卡内按日期升序累积
+    var closeOf={};
+    days.slice().reverse().forEach(function(d){
+      (by[d].top3||[]).forEach(function(s){
+        if(s.close!=null) closeOf[d+'|'+s.code]=s.close;
+      });
+    });
+    var rows=[];
+    days.forEach(function(d){
+      var o=by[d]||{};
+      var cells=(o.top3||[]).map(function(s){
+        var c=_frHistEsc(s.code), nm=_frHistEsc(s.name||'');
+        var sc=(s.final_score!=null)?('综合 '+Number(s.final_score).toFixed(1)):'';
+        var cl=(s.close!=null)?Number(s.close).toFixed(2):'';
+        // 与该票前一次出现的收盘价比（同一只票跨日）
+        var prev=null;
+        for(var i=days.indexOf(d)+1;i<days.length;i++){
+          var k=days[i]+'|'+s.code;
+          if(closeOf[k]!=null){ prev=closeOf[k]; break; }
+        }
+        var col='';
+        if(s.close!=null&&prev!=null&&prev>0){
+          var pct=(s.close-prev)/prev*100;
+          if(Math.abs(pct)>=0.01){
+            col=(pct>0)?'color:#ef5350':'color:#26a69a';
+          }
+        }
+        return '<td style="padding:4px 6px;font-size:12px;white-space:nowrap">'
+          +'<span style="font-weight:600;color:#fbbf24">'+c+'</span> <span style="color:var(--txt)">'+nm+'</span>'
+          +'<span style="'+col+';font-size:11px;margin-left:4px">'+cl+'</span>'
+          +'<span style="color:var(--dim);font-size:10.5px;margin-left:4px">'+sc+'</span></td>';
+      });
+      rows.push('<tr style="border-bottom:1px solid rgba(148,163,184,.12)">'
+        +'<td style="padding:4px 8px;font-size:11.5px;color:var(--sub);white-space:nowrap;font-weight:600">'+_frHistEsc(d)+'</td>'
+        +'<td style="padding:4px 2px;font-size:10.5px;color:var(--dim);white-space:nowrap">'+_frHistEsc((o.update_time||'').slice(0,16))+'</td>'
+        +'<td style="padding:2px 2px;">'+(cells.join('')||'<td style="padding:4px 6px;color:var(--dim);font-size:11.5px">—</td>')+'</td></tr>');
+    });
+    el.innerHTML='<div style="font-size:11.5px;color:var(--dim);line-height:1.7;margin-bottom:8px">'
+      +'口径：<b style="color:#a78bfa">真实每日选股</b> dated 快照汇总（非事后重算）；归因日 = 落档时间 <b>09:00 前归前一自然日</b>，同一归因日只认最新版。'
+      +'价格与综合分为当日归档原值。</div>'
+      +'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;">'
+      +'<thead><tr style="border-bottom:1px solid rgba(148,163,184,.25)">'
+      +'<th style="text-align:left;padding:5px 8px;font-size:11px;color:var(--dim);font-weight:600">日期</th>'
+      +'<th style="text-align:left;padding:5px 2px;font-size:11px;color:var(--dim);font-weight:600">落档</th>'
+      +'<th style="text-align:left;padding:5px 2px;font-size:11px;color:var(--dim);font-weight:600">当日 Top3（代码 名称 收盘 综合分）</th>'
+      +'</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
   };
 
   window.__renderFinalSec=function(){
