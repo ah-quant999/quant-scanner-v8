@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-22 15:58:46",
+  "update_time": "2026-10-22 15:58:50",
   "data_date": "2026-10-22",
   "source": "三通道: MACRO_DATA(gold/silver/copper/oil) + Sina免费外盘期货(LME/NYMEX/CBOT共15个，westock-mcp不可用/缓存陈旧时兜底) + eastmoney-push2国内期货(GFEX碳酸锂+ZCE纯碱)",
   "hot_count": 0,
@@ -57,15 +57,15 @@
       "unit": "美分/蒲式耳",
       "exchange": "CBOT",
       "available": true,
-      "current_price": 464.42,
-      "price_date": "2026-10-22 15:58:31",
+      "current_price": 464.19,
+      "price_date": "2026-10-22 15:58:46",
       "source": "sina-futures(美国玉米)",
       "baseline_30d": 461.536,
       "baseline_label": "30日z-score",
-      "dev_pct": 0.62,
+      "dev_pct": 0.58,
       "is_hot": false,
-      "hot_basis": "z-score=0.797(σ=3.621, μ=461.536)",
-      "z_score": 0.797,
+      "hot_basis": "z-score=0.733(σ=3.621, μ=461.536)",
+      "z_score": 0.733,
       "ma30": 461.536,
       "std30": 3.621,
       "use_zscore": true,
@@ -74,21 +74,21 @@
           "code": "002385",
           "name": "北大荒",
           "business_pct": 0.5,
-          "elasticity_pct": 59.78,
+          "elasticity_pct": 54.97,
           "note": "粮食种植（含玉米）"
         },
         {
           "code": "002100",
           "name": "天康农业",
           "business_pct": 0.3,
-          "elasticity_pct": 35.87,
+          "elasticity_pct": 32.98,
           "note": "饲料+养殖"
         },
         {
           "code": "000876",
           "name": "新希望",
           "business_pct": 0.2,
-          "elasticity_pct": 23.91,
+          "elasticity_pct": 21.99,
           "note": "饲料玉米成本传导"
         }
       ]
@@ -394,7 +394,7 @@
       "exchange": "LME",
       "available": true,
       "current_price": 2997.725,
-      "price_date": "2026-10-22 15:58:19",
+      "price_date": "2026-10-22 15:58:47",
       "source": "sina-futures(伦铝)",
       "baseline_30d": 3017.43,
       "baseline_label": "30日z-score",
