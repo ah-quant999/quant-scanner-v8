@@ -36,6 +36,28 @@ meta:
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
   next_id_seq: 163
 items:
+  - id: logic-page-live-url-1022
+    owner: 小九的工程师
+    priority: P3
+    status: done
+    created: 2026-10-22
+    title: 逻辑详解页线上查看地址固化（主人 2026-10-22 指定，后续核查勿再问）
+    note: >
+      主人 2026-10-22 17:3x 明确指定：逻辑详解页线上查看地址 =
+      https://dd689fc661e24962a7090b39a618950e.app.workbuddy.host/index.html
+      （该地址为「九宝一站式导航」门户/主站，逻辑详解为其内板块；非 2026-10-04
+      下架的公开 logic.html 占位页）。历史口径不变：公开 logic.html 于 2026-10-04
+      主人令下架为占位；逻辑详解真源为私有母版
+      E:/Nutstore/v8_logic_private/logic.full.html（阿狸咪机持有，本机无副本）。
+      后续任何「对齐/核查逻辑详解页」的任务，默认查上述 workbuddy.host 地址
+      （线上真身），而非仅查下架的公开 logic.html。主站 GitHub Pages 源
+      ah-quant999.github.io/quant-scanner-v8 仍有效，workbuddy.host 为当前
+      主人实际查看入口。
+    verify_how: 主人亲口指定（2026-10-22 17:3x），地址已固化本项；下次核查逻辑详解页直接访问该 URL。
+    verified_at: "2026-10-22 17:39"
+    updated: "2026-10-22 17:39"
+    updated_by: 小九的工程师
+
   - id: selfalgo-audit-fix-1019
     owner: 小九的工程师
     priority: P1
