@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-10-23 01:01:16",
-  "data_date": "2026-10-22",
+  "update_time": "2026-10-23 02:25:16",
+  "data_date": "2026-10-23",
   "source": "LIMIT_UP_HEATMAP",
-  "phase": "退潮",
-  "color": "#f97316",
+  "phase": "回暖",
+  "color": "#10b981",
   "score": 58.0,
-  "delta_pct": -34.0,
-  "advice": "⚠️ 情绪退潮中：高位股注意回撤，关注高低切换",
+  "delta_pct": 0.0,
+  "advice": "🌱 情绪回暖：可适度参与，盯紧最高板扩展",
   "metrics": {
     "total_up": 33,
     "max_ladder": 5,
@@ -39,6 +39,6 @@
       "chg": 10.2
     }
   ],
-  "prev_total": 50,
+  "prev_total": 33,
   "note": "冰点=涨停<30家且最高板≤2（报复性窗口临近）；高潮=涨停≥80且最高板≥5；退潮=较昨日-30%+"
 }
