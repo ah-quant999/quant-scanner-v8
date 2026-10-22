@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-23 02:57:41",
+  "update_time": "2026-10-23 04:04:45",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -8,10 +8,10 @@
   "by_algo": {},
   "items": [],
   "sentiment_meta": {
-    "phase": "退潮",
+    "phase": "回暖",
     "score": 58.0,
-    "delta_pct": -34.0,
-    "advice": "⚠️ 情绪退潮中：高位股注意回撤，关注高低切换",
+    "delta_pct": 0.0,
+    "advice": "🌱 情绪回暖：可适度参与，盯紧最高板扩展",
     "source": "LIMIT_UP_HEATMAP"
   },
   "sector_meta": {
@@ -61,5 +61,5 @@
     ]
   },
   "select_threshold": 8.0,
-  "note": "基于 v8 算法跟踪池 0 只去重 → 0 只；K 批二维精选（板块流入 × 情绪周期 退潮）→ 进精选 0 只；阈值源自专家 track_daily.py analyze()（强势/回调6-12%/见顶/走弱）；2026-09-03 已下线「板块龙头 / 大牛股猎手」已过滤"
+  "note": "基于 v8 算法跟踪池 0 只去重 → 0 只；K 批二维精选（板块流入 × 情绪周期 回暖）→ 进精选 0 只；阈值源自专家 track_daily.py analyze()（强势/回调6-12%/见顶/走弱）；2026-09-03 已下线「板块龙头 / 大牛股猎手」已过滤"
 }
