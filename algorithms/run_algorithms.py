@@ -213,6 +213,7 @@ ORDER = [
     "strategy_intraday_momentum.py", # 🚀 2026-10-18 主人令：日内动量每日生成器（近20日日内累计收益最高 Top5 ∧ 收盘>MA60 → intraday_momentum_history 真实流归档 + INTRADAY_MOMENTUM_BACKTEST 主榜；2026-10-19 审计修正注释 Top10→Top5，代码 TOP_K=5）。挂 strategy_lowvol_trend 紧后复用同一 ext 刷新。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
     "gen_ff3_ranksum.py",    # 🚀 2026-10-22 主人令「上」：资金异动三因子每日生成器（factor_walkforward 引擎零第二口径：turntrend/amt60/ivol60 三因子降序秩和选 Top10 → ff3_ranksum_history 真实流归档 + FF3_RANKSUM_BACKTEST 主榜；上线首日即建归档）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
+    "gen_stock_winrate.py",            # 🔴 2026-10-23 主人令·嵌入因子榜：读 raw_data/history 真实信号流 + kline_cache 复算个股历史胜率/期望 → data/STOCK_WINRATE.js（generate_top10 嵌入因子用）；须在 generate_top10 之前（与 STAGES["B"] 成对）
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
     # 🛡 2026-08-29 主人令：A/B 对照（金股池/候选池/全市场同一信号收益），每日累积信号、T+N 后回填收益。
     "backtest_tdx.py",                 # 读 gold_pool 输入
@@ -416,7 +417,7 @@ STAGES = {
         "strategy_lowvol_trend.py",   # → data/LOWVOL_TREND_BACKTEST.js + lowvol_trend_history（低波趋势，与 ORDER 成对）
         "strategy_intraday_momentum.py", # → data/INTRADAY_MOMENTUM_BACKTEST.js + intraday_momentum_history（日内动量，与 ORDER 成对）
         "gen_ff3_ranksum.py",      # → data/FF3_RANKSUM_BACKTEST.js + ff3_ranksum_history（资金异动三因子，与 ORDER 成对）
-        "build_candidate_pool.py", "generate_top10.py",
+        "build_candidate_pool.py", "gen_stock_winrate.py", "generate_top10.py",  # 🔴 2026-10-23 主人令·嵌入因子榜：gen_stock_winrate 须在 generate_top10 之前（与 ORDER 成对）
         # 🔴 2026-10-18 主人令「完全下架」：四量终极选股两件套已摘链（与 ORDER 成对）。
         # "strategy_four_volume_60m.py", "strategy_four_volume.py",
         "market_regime.py", "sector_recommendation.py",

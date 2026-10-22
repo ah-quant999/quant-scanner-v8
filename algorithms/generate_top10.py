@@ -85,6 +85,17 @@ POOL_QUALITY_WEIGHT = 0.5
 INST_WEIGHT = 2.0                     # IC 最强因子加权
 FORM_NEUT_SCALE = 4.0                 # form rank 中性化零中心幅度
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 🔴 2026-10-23 主人令·嵌入因子榜：个股历史胜率/期望因子（gen_stock_winrate 产出）
+# 把"历史上这只票信号后赚不赚钱 / 胜率高不高"做实为因子分，并入 total_score，
+# 使因子榜自然把高胜率高期望的票顶上来（最终推荐=因子榜顺序，故高胜率票自动靠前）。
+# 标定（基于实测 winrate_score 分布：中位 -5.8 / p90 +17 / 最大 +71 / 最小 -123）：
+#   直接加 winrate_score 易极端（头部单票 +71 → +54 分碾压所有因子）→ 夹紧到 ±WINRATE_TERM_MAX，
+#   对应最终 total ≈ ±15 分，与既有回测反哺(±10)同量级，避免单因子独大，
+#   又足以让"收益最高/胜率最高"的票在因子榜脱颖而出。无历史记录→0（中性，不惩罚无史可查的票）。
+WINRATE_WEIGHT = 1.0
+WINRATE_TERM_MAX = 20.0
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 🔴 2026-10-01 质量分时效/活跃度衰减辅助函数（根治「总这几只」）
@@ -207,6 +218,33 @@ def _load_js_obj(name):
         return obj if isinstance(obj, dict) else {}
     except Exception:
         return {}
+
+
+# ── 个股历史胜率/期望因子数据源（2026-10-23 主人令·嵌入因子榜）──
+# 由 algorithms/gen_stock_winrate.py 产出 data/STOCK_WINRATE.js（window.STOCK_WINRATE）。
+_WINRATE_MAP = {}
+
+
+def _load_stock_winrate():
+    """读取 data/STOCK_WINRATE.js → {6位code: rec}；任何失败返回空 dict（中性，不影响原候选）。"""
+    obj = _load_js_obj("STOCK_WINRATE.js")
+    m = {}
+    if isinstance(obj, dict):
+        for r in (obj.get("stocks") or []):
+            c = r.get("code")
+            if c:
+                m[str(c)] = r
+    return m
+
+
+def _winrate_term(code6):
+    """个股历史胜率因子贡献（raw 分）。无记录→0（中性）。夹紧到 ±WINRATE_TERM_MAX 防极端。"""
+    rec = _WINRATE_MAP.get(str(code6))
+    if not rec:
+        return 0.0
+    ws = rec.get("winrate_score") or 0.0
+    t = ws * WINRATE_WEIGHT
+    return max(-WINRATE_TERM_MAX, min(WINRATE_TERM_MAX, t))
 
 
 def _num_or_none(x):
@@ -1221,6 +1259,12 @@ def main():
         return
     print(f"  📊 金股池: {len(gp_stocks)} 只")
 
+    # 🔴 2026-10-23 主人令·嵌入因子榜：加载个股历史胜率榜（gen_stock_winrate 产出），
+    # 供下方聚合把"高胜率高期望"做实进 total_score。
+    global _WINRATE_MAP
+    _WINRATE_MAP = _load_stock_winrate()
+    print(f"  📈 个股胜率榜: {len(_WINRATE_MAP)} 只（嵌入因子榜 total_score）")
+
     # ── 2. 加载辅助数据 ──
     # 🔴 2026-08-28 修复：以下 6 处此前读的是【不存在的文件/键】，导致
     #    score_fund / score_inst / score_sector 三个维度恒为 0（实测近 7 日
@@ -1791,6 +1835,14 @@ def main():
         _raw_noform = base + enhance + fund + sector_score + inst_effective + quality_effective
         raw_total = _raw_noform + form_score * FORM_WEIGHT
 
+        # ── 个股历史胜率/期望因子（2026-10-23 主人令·嵌入因子榜）──
+        # 复用 gen_stock_winrate 的收缩胜率分，把"高胜率高期望"做实进因子榜。
+        # 必须同步进 _raw_noform：横截面中性化后 1903 行用它重建 total_score（raw_total 此处仅为过程量），
+        # 与回测反哺(1804)同处理，确保"实现=意图"。无记录→0（中性，不影响原候选）。
+        wr_term = _winrate_term(_code6(raw_code))
+        _raw_noform += wr_term
+        raw_total += wr_term
+
         # ── 回测反哺（P2；🔴 2026-09-20 改动15）：walk-forward 信号组合 **T+5** 修正 ──
         # T+5 收益每 1% ≈ ±1 分，clamp ±10；组合缺失回退 0（中性）。
         # 旧版读 T+10 edge（被大盘 β 撑高）⇒ 8 个组合全为正分、无区分力；已换 T+5。
@@ -1868,6 +1920,7 @@ def main():
                 "inst": round(inst_effective, 1),
                 "quality": round(quality_effective, 1),
                 "backtest": score_backtest,
+                "winrate": round(wr_term, 1),
                 "breakout": 5 if breakout_5d else 0,
                 "research": research_score,
                 "p4": p4_score,
@@ -1947,6 +2000,7 @@ def main():
             "score_research": bd.get("research", 0),
             "score_p4": bd.get("p4", 0),
         "score_p5": bd.get("p5", 0),
+            "score_winrate": bd.get("winrate", 0),
             "win_rate": s.get("win_rate", None),
             "quality_grade": s.get("quality_grade", ""),
             "signals": bd["signals"],
