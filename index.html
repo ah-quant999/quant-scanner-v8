@@ -250,7 +250,12 @@ window.V8_CAL = {weeks:[],legend:[]};
     if(!_d || isNaN(_d.getTime())) return {slot:'盘中', horizon:'短线'};
     var _now = new Date();
     var _cstNow = window._cstParts ? window._cstParts(_now) : null;
-    var _today0 = _cstNow ? new Date(Date.UTC(_cstNow.y, _cstNow.m-1, _cstNow.d)).getTime() : new Date(_now.getFullYear(), _now.getMonth(), _now.getDate()).getTime();
+    // 🔴 2026-10-22 主人令（图4「更新于 今日 07:16 却标昨日盘后」自相矛盾）根因修复：
+    //   Date.UTC(y,m-1,d) 是 **UTC 零点 = 北京时间 08:00**，不是北京零点 ⇒
+    //   今日 00:00–07:59 产的（如 07:16 夜窗补跑的最终推荐）全被误判「昨日盘后」，
+    //   胶囊出现「今日 07:16 + 昨日盘后档数据」矛盾标签，主人误读为「被旧版覆盖」。
+    //   修法：CST 零点 = Date.UTC(y,m-1,d) − 8h（_parseAsCST 同口径，北京零点=前日16:00Z）。
+    var _today0 = _cstNow ? (new Date(Date.UTC(_cstNow.y, _cstNow.m-1, _cstNow.d)).getTime() - 8*3600*1000) : new Date(_now.getFullYear(), _now.getMonth(), _now.getDate()).getTime();
     var _dToday = _d.getTime() >= _today0;
     var _hr = _d.getHours() + _d.getMinutes()/60;
     if(!_dToday) return {slot:'昨日盘后', horizon:'短线'};
