@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-22 19:45",
- "generated": "2026-10-22 19:45",
+ "update_time": "2026-10-22 20:10",
+ "generated": "2026-10-22 20:10",
  "meta": {
-  "generated": "2026-10-22 19:45",
+  "generated": "2026-10-22 20:10",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11712,6 +11712,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
+      "code": "300839",
+      "name": "博汇股份",
+      "change_pct": 20.0,
+      "price": 19.92,
+      "category": "突破"
+     },
+     {
       "code": "601999",
       "name": "出版传媒",
       "change_pct": 10.0,
@@ -11723,6 +11730,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "九鼎新材",
       "change_pct": 4.949,
       "price": 9.33,
+      "category": "突破"
+     },
+     {
+      "code": "300045",
+      "name": "华力创通",
+      "change_pct": 7.346,
+      "price": 14.32,
       "category": "突破"
      },
      {
@@ -11745,23 +11759,16 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 10.04,
       "price": 8.33,
       "category": "突破"
-     },
-     {
-      "code": "300296",
-      "name": "利亚德",
-      "change_pct": 8.348,
-      "price": 6.1,
-      "category": "突破"
-     },
-     {
-      "code": "603926",
-      "name": "铁流股份",
-      "change_pct": 3.892,
-      "price": 16.55,
-      "category": "突破"
      }
     ],
     "加速": [
+     {
+      "code": "300839",
+      "name": "博汇股份",
+      "change_pct": 20.0,
+      "price": 19.92,
+      "category": "加速"
+     },
      {
       "code": "601999",
       "name": "出版传媒",
@@ -11779,6 +11786,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
     ],
     "短线选股": [
      {
+      "code": "300839",
+      "name": "博汇股份",
+      "change_pct": 20.0,
+      "price": 19.92,
+      "category": "短线选股"
+     },
+     {
       "code": "601999",
       "name": "出版传媒",
       "change_pct": 10.0,
@@ -11793,6 +11807,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "300045",
+      "name": "华力创通",
+      "change_pct": 7.346,
+      "price": 14.32,
+      "category": "短线选股"
+     },
+     {
       "code": "600838",
       "name": "上海九百",
       "change_pct": 10.011,
@@ -11811,25 +11832,18 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "长城电工",
       "change_pct": 10.04,
       "price": 8.33,
-      "category": "短线选股"
-     },
-     {
-      "code": "300296",
-      "name": "利亚德",
-      "change_pct": 8.348,
-      "price": 6.1,
-      "category": "短线选股"
-     },
-     {
-      "code": "603926",
-      "name": "铁流股份",
-      "change_pct": 3.892,
-      "price": 16.55,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
+      "code": "300045",
+      "name": "华力创通",
+      "change_pct": 7.346,
+      "price": 14.32,
+      "category": "强势股"
+     },
+     {
       "code": "600838",
       "name": "上海九百",
       "change_pct": 10.011,
@@ -11848,20 +11862,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "长城电工",
       "change_pct": 10.04,
       "price": 8.33,
-      "category": "强势股"
-     },
-     {
-      "code": "300296",
-      "name": "利亚德",
-      "change_pct": 8.348,
-      "price": 6.1,
-      "category": "强势股"
-     },
-     {
-      "code": "603926",
-      "name": "铁流股份",
-      "change_pct": 3.892,
-      "price": 16.55,
       "category": "强势股"
      }
     ]
