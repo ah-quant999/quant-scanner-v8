@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 162
+  next_id_seq: 163
 items:
   - id: selfalgo-audit-fix-1019
     owner: 小九的工程师
@@ -9686,3 +9686,30 @@ items:
     evidence: "commit 63e8d508d63; 442信号(2026-06-10~10-20扣双边0.3%)敏感性: T+1 +0.66%(415样本/47.7%胜率) T+3 -0.09% T+5 -1.78%(407/42.8%) T+10 -5.70% T+20 -13.88%, 10变体无稳健正超额; 全链回测真实信号流(06:36-06:41修复后代码重跑): 龙虎机构T+5 n=407 wr=42.8% ar=-2.54% 超额-1.85% ⇒ gate=demote_candidate; 强势跟踪T+45 n=57 wr=87.7% ar=24.28% 超额23.24% gate=admit; audit 15/15; 四戳与数据文件中性sha1逐一对符(4bee7ce35b/0eb2b5e2a2/9e26e8c201/a1387c59a2)"
     verify_how: "jsdelivr @63e8d508d63 硬验全过: algo_gate_thresholds.py 在站(ADMIT_MAX_WORST_TRADE=-15) + ALGO_SCORECARD 龙虎机构 gate=demote_candidate + index四新戳在站 + scorecard接线三件套 + 阿狸咪外链CSS保留"
     verified_at: "2026-10-22 06:50"
+  - id: intraday-first-batch-gate-1022
+    priority: P0
+    owner: 小九
+    status: done
+    what: "主人 10:22 令「9点30和13点30必须第一批数据上线」；今日9:30档整批空窗根因收口 + 盘中第一批数据补上线 + 中信PE卡断更补跑"
+    fix: "①新建 scripts/intraday_first_batch_gate.py：硬HTTP抓 GitHub Pages 主站 data/*.js 的 update_time，判定7张必需卡(STOCK_QUOTE/SECTOR_FUND_FLOW/SECTOR_FUND_FLOW_INTRADAY/LIMIT_UP_HEATMAP/MARKET_FUND_FLOW_DATA/CANDIDATE_QUOTES/AI_MARKET_BRIEF)是否达当日档位线；不达标自动派发重抓取(云端hosted)+板块资金日内快照+STOCK_QUOTE轻量刷新，复检3轮×4分钟 ②WorkBuddy 建两条 ACTIVE automation：v8-第一批盘中数据守门(09:30档 / 13:30档)，工作日 09:32 与 13:32 触发，过则静默、不过发邮件 2814546@qq.com ③盘中第一批本地补跑并推上线：cloud_fetch_v8 --category intraday --only SECTOR_FUND_FLOW + update_v8 + intraday_snapshot + 净室推送 ④中信PE链(baostock 增量 + gen_citic_pe)手动补跑推上线"
+    evidence: "9:30档空窗根因=lemoncat调度器今日0次schedule事件(仅workflow_dispatch，GitHub cron未触发)；raw_data/sector_fund_flow.json停在10-21 20:33:46 ⇒ intraday_snapshot.py 判「板块数据源非今日口径」跳过写快照 ⇒ data/SECTOR_FUND_FLOW_INTRADAY.js 停在10-21 15:03:41(线上仅941B，缺板块)；09:46快照轮 commit 只含index.html(+1/-1)无数据文件。补跑后主站硬HTTP实测：SECTOR_FUND_FLOW=10:19:34(371板块/47878B，线上原仅10375B)、SECTOR_FUND_FLOW_INTRADAY=10:26:02、AI_MARKET_BRIEF=10:19:45、LIMIT_UP_HEATMAP=10:16:30、STOCK_QUOTE=10:31:21、CITIC_PE_THERMO/BACKTEST=10:08(PE TTM 9.85 深度低估、PE<10信号166次)"
+    verify_how: "硬HTTP抓 https://ah-quant999.github.io/quant-scanner-v8/data/*.js 实测 update_time；守门脚本 --slot 0930 --check-only 7/7 全绿；commit 7a58a8c5436b(盘中数据)+69067a99d90d(中信PE双卡)+788017e1c9db(守门脚本+三项修复) 均当场回读逐字节自验一致"
+    verified_at: "2026-10-22 10:50"
+  - id: ci-streak-fail-rootcause-1022
+    priority: P0
+    owner: 小九
+    status: done
+    what: "盘后算法链 12 连败 + 每日自动备份 8 连败 的根因收口(与第一批空窗同批次处理)"
+    fix: "①algo链12连败唯一根因=algorithms/verify_data_sanity.py 把 FINAL_RECOMMEND_REPLAY(静态归档回放卡，v8_health_check早已判明无周期生产者、全仓生产者引用=0)按每日新鲜度阈值判「真断更」⇒ 登记 STALE_OK 豁免 ②备份8连败根因=.github/workflows/v8_intraday_snapshot.yml 用主人身份(ah-quant999/2814546@qq.com)提交 ⇒ 被 verify_daily_audit 判「人工commit」要求交接档命中，而快照是纯机器行为无交接档 ⇒ 改 bot 身份(v8-snapshot-bot/v8-bot@users.noreply.github.com，与仓内 v8-cloud-bot 等约定一致；该脚本设计哲学明确拒绝补消息前缀、明确禁止把人工身份加入bot集合) ③update_v8.py 摘除 CRDS_CARD_DATA/TRIPLE_CONSENSUS/TRIPLE_TRACK/TRIPLE_HISTORY 四条下架死注册 + 对应 CATEGORY_MAP 条目(沿用 2026-10-18 四量终极 precedent，防本地残留 raw 复活幽灵 data 文件) ④本地清理 5 个下架模块孤儿 data 文件(已移 E:/v8data/qs8-tmp/delisted_backup/data/)"
+    evidence: "v8_algo_cloud.yml 10-21 14:56Z~10-22 00:28Z 连续 12 次 failure，每轮都只死于 step16 机器校验(step1-15 含唯一推送全 success)；死因=verify_data_sanity 硬失败 FINAL_RECOMMEND_REPLAY 陈旧7.5天。v8_backup.yml 10-14~10-21 连续 8 天 failure，死于「每日审计发现漂移→真阻断本 job」，日志实证：1/1 人工 commit 010b6a39(snapshot: 板块资金日内快照) 关键词未提及比例100%>50%。本地复跑 verify_data_sanity = 0 硬失败(此前本地5项亦为下架模块孤儿文件所致的误报，已清)"
+    verify_how: "本地 py_compile 三文件通过 + update_v8 接线自检(DATA_SOURCES 78 VAR / VAR_TO_RAW 可逆 / 4 VAR 双表无残留) + verify_data_sanity --no-baseline 0 硬失败；线上 commit 788017e1c9db 四文件逐字节回读一致；门禁前移 CI 与构建部署 CI 均 success(788017e1)"
+    verified_at: "2026-10-22 10:45"
+  - id: ff3-composite-walkforward-1022
+    priority: P1
+    owner: 小九
+    status: pending-verify
+    what: "三因子复合(turntrend/amt60/ivol60) walk-forward 全链回测与闸门判定 + 高手信号画像(主人 go/no-go 拍板项①)"
+    fix: "按与 LHB 同规格跑完整链：信号规则→真实信号流回测→敏感性→闸门判定；三变体(等权z/秩和/turntrend加权)统一口径(截面五分位、STEP=10、COST=0.2%往返、MIN_BARS=515、HOLDS=[5,10,20,45])；另附高手信号在各因子上的截面画像"
+    evidence: "三变体全部 PASS：ff3_zsum hold10 IR_OOS=0.799 beat=58.6% 年达标4/8；ff3_ranksum hold10 IR_OOS=1.031 beat=59.8%；ff3_ttw hold10 IR_OOS=0.991 beat=59.4%；45d档利差+3.1~4.1%、PSR 0.999~1.000、Purged-WF IR 3.4~4.0。高手画像(123只可画像)：turntrend z=-0.129、amt60 z=+0.106(高于中位83%)、ivol60 z=+0.106(顶档15%)，但复合 z=+0.028(中性) ⇒ 高手 edge 不在量价因子(在题材/情绪/涨停聚众)，两者互补不可互替"
+    verify_how: "E:/v8data/qs8-tmp/factor_composite_ff3.json + ff3_run.log(EXIT=0，25s；池700只含高手186只强制入池；轴2473天 2016-08-08→2026-10-19)；接入前需主人拍板变体+主档位(建议 ff3_ranksum，hold=10d主口径/45d长档)"
+    updated: "2026-10-22 09:20"
