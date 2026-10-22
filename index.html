@@ -155,7 +155,7 @@ window.__domReadyFns=[];
 <!-- 🚨 2026-09-23 主人令：大基金 增减持监控（暂未上架 > 观测类）。
      数据由 algorithms/fetch_dajijin_reduction.py 产出（东财数据中心·股东增减持，按股东全名精确匹配
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
-<script src="data/DAJIJIN_REDUCTION.js?v=ff8cf40609" defer></script>
+<script src="data/DAJIJIN_REDUCTION.js?v=4e227b8a64" defer></script>
 <!-- 🔴 2026-10-06 阿狸咪的工程师：H_AUTO_BUY.js / H_AUTO_BUY_TRACK.js 经全文件审计为「全局零读取」死注入（H 反推短线买点策略已下线，无任何代码读 window.H_AUTO_BUY / window.H_AUTO_BUY_TRACK）⇒ 移除前端 script 注入。 -->
     <!-- 🗑 2026-10-08 主人令：「实验区·模块去向索引」卡退役：渲染函数 / 专用子容器 / 轮询补填 / 切页触发 / 注册表条目 / V8_PAGE_SCHEDULE 条目同批删除，本 js 注入随之移除（其全局对象全文件零读取）。 -->
     <!-- 2026-09-07 主人令：机构研究·maharo 聚合卡（本机 cookie 拉取，云端无权限；数据由 .workbuddy/maharo_daily_pull.py 每日生成 data/maharo_macro.js） -->
@@ -189,7 +189,7 @@ window.__domReadyFns=[];
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
-    <script src="data/SECTOR_LEADERS.js?v=bb395645f9" defer></script><script src="data/NEW_ALGO_TRI.js?v=89df721e4c" defer></script><script src="data/NEW_ALGO_TRI_BACKTEST.js?v=f99403f1f5" defer></script><!-- 🆕 2026-10-19 三新算法（VCP/板块共振轮动/LHB机构跟随）+ 真实信号流回测 -->
+    <script src="data/SECTOR_LEADERS.js?v=bb395645f9" defer></script><script src="data/NEW_ALGO_TRI.js?v=7fff1fb7a9" defer></script><script src="data/NEW_ALGO_TRI_BACKTEST.js?v=9496ecd86b" defer></script><!-- 🆕 2026-10-19 三新算法（VCP/板块共振轮动/LHB机构跟随）+ 真实信号流回测 -->
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
     <script src="data/PORTFOLIO.js?v=568ef8ef70" defer></script>
     <script>
@@ -1265,7 +1265,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/EXPERIMENT.js?v=a9153f1b39" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=3e70ed8ef2" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=8c8bcc4921" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=b77fcb4a0f" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=e738e3d414" defer></script>
+<script src="data/V8_POOL_TRACKER.js?v=1a2304598b" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=0d4200673b" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=b4f0662c45" defer></script>
     <script src="data/ALGO_SCORECARD.js?v=1b6087615d" defer></script>
@@ -1278,7 +1278,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
-    <script src="data/FACTOR_LAB.js?v=1c866657a2" defer></script>
+    <script src="data/FACTOR_LAB.js?v=119ad0b4fe" defer></script>
 <!-- 🔴 2026-10-06 阿狸咪的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
 <script src="data/ETF_PULSE.js?v=55047c2822" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=f97b2b4f55" defer></script>
@@ -1325,15 +1325,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          本次补齐：
          · LQSQ_BACKTEST = 主榜回测视图（summary.by_period 与四量同构 → 回测页逐档卡直接复用）
          · LQSQ_TRACK    = 归档信号（每日 Top5，2026-10-13 主人令由 Top30 收紧）+ 逐票前向跟踪（选股策略 · ⚖️ 量质双擎子页消费） -->
-    <script src="data/LQSQ_BACKTEST.js?v=ea3b7d3690" defer></script>
+    <script src="data/LQSQ_BACKTEST.js?v=16e9512fd6" defer></script>
     <script src="data/LQSQ_TRACK.js?v=971a0aef11" defer></script>
-    <script src="data/LOWVOL_TREND.js?v=1c307d701b" defer></script>
-    <script src="data/LOWVOL_TREND_BACKTEST.js?v=c035239c8a" defer></script>
-    <script src="data/INTRADAY_MOMENTUM.js?v=9768d2cdf3" defer></script>
-    <script src="data/INTRADAY_MOMENTUM_BACKTEST.js?v=be477a77a4" defer></script>
+    <script src="data/LOWVOL_TREND.js?v=8a92161657" defer></script>
+    <script src="data/LOWVOL_TREND_BACKTEST.js?v=8ed5830e7a" defer></script>
+    <script src="data/INTRADAY_MOMENTUM.js?v=27fde833e8" defer></script>
+    <script src="data/INTRADAY_MOMENTUM_BACKTEST.js?v=0be20d1f76" defer></script>
     <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）前端接入 —— 后端 gen_ff3_ranksum.py 每日重算 raw_data/ff3_ranksum_*.json → update_v8 转换 -->
-    <script src="data/FF3_RANKSUM_TRACK.js?v=58054c181e" defer></script>
-    <script src="data/FF3_RANKSUM_BACKTEST.js?v=ddd6c87893" defer></script>
+    <script src="data/FF3_RANKSUM_TRACK.js?v=98be05ba11" defer></script>
+    <script src="data/FF3_RANKSUM_BACKTEST.js?v=fb88dc10d4" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
