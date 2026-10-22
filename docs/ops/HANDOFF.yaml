@@ -36,6 +36,51 @@ meta:
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
   next_id_seq: 163
 items:
+  - id: backtest-ownsignal-ironrule-1022
+    owner: 小九的工程师
+    priority: P1
+    status: done
+    created: 2026-10-22
+    title: 回测铁律·所有算法只认「自己跑出来的股票回测」（禁历史数据回放）
+    note: >
+      主人 2026-10-22 17:5x 立令并写死（与逻辑详解页地址同处理，后续勿再重复问）：
+      「所有算法的回测都要用自己跑出来的股票回测，历史数据那种感觉不准。」
+      口径定义（唯一真源 = algorithms/gen_backtest_all_algos.py）：
+      ① 真实信号流 / 自己跑的：每日归档算法实际选股 → 次一交易日开盘买入 → 持有 N 个
+         真实交易日收盘卖出（前复权·扣双边 0.3%）→ 前向跟踪真实收益。金标准见
+         gen_ff3_ranksum.py（ff3_ranksum_history 逐日真实归档＋前向跟踪，防幸存者偏差）。
+      ② 严禁「历史数据回放式回测」：五分位分层超额 / 历史 K 线重放 / 策略回放模式。
+         本律 2026-10-11 已由 gen_backtest_all_algos.py 确立为策略回测页单一真源，
+         2026-10-22 重申并写死，覆盖范围扩至仍站回放口径的卡。
+      已知状态（2026-10-22 实测）：
+       · 真实信号流（合规）：量质双擎/低波趋势/缩量回踩(VCP)/龙虎机构(LHB)/
+         板块共振(rotation)/日内动量/FF3；K线信号层（真实K线前向跟踪）亦合规。
+       · 已下架不进页：三重共识·逆势龙头(CRDS)·四量终极（2026-10-11/10-18 主人令，条目已移除）。
+       · 漏网违规（须整改）：「因子实验室」卡仍走 FACTOR_LAB_BACKTEST 五分位分层
+         历史回放（factor_lab_backtest.py，700日重放，样本近5万、avg +50% 为回放幻觉），
+         却以 cat=trade 混进交易排名 —— 正是主人说的「历史数据不准」。整改方向二选一：
+         (a) 新建每日真实信号流生成器（仿 FF3）替换；(b) 降级为 research 研究区并标注
+         「历史分层·非实盘跟踪」，不得进交易排名。须经主人拍板。
+       · 死产出清算力：backtest_comprehensive.py / backtest_expectancy.py / backtest_tdx.py /
+         factor_lab_backtest.py / v8/backtest_crds.py 仍在 run_algorithms 日链里跑回放，
+         除因子实验室外不进策略回测页（backtest_expectancy 喂 final_recommend 信号 edge、
+         backtest_tdx 喂优化策略）；属浪费算力，建议评估摘除或转研究区。
+       · 信号源断裂（实测"感觉不准"真根因之一）：日内动量、板块共振(rotation) 样本=0
+         —— 生成器未产出信号，页上挂着空卡；须排查 NEW_ALGO_TRI / INTRADAY 是否在日链真跑。
+       · 基准缺口：聚合器 bench% 全为 None（gen_market_bench 未挂上/区间不交），
+         页上无法显示超额，须修复。
+      提升空间处置纪律：AI 主动发现算法改进点并及时测算提报；按 2026-09-11 主人令，
+      胜率<45% 或 成本后均益≤0 的算法须提醒主人是否下架，不得隐瞒。当前下架候选
+      （实测主档）：量质双擎 T+20 n=65 胜率12.3% 均益-6.38%（全败）；
+      龙虎机构 T+20 n=373 胜率20.1% 均益-15.03%（长持期全败，T+5 亦 42.8%/-2.54%）。
+    verify_how: >
+      核对 algorithms/gen_backtest_all_algs.py SOURCES 段（量质双擎/低波/日内/缩量/板块/龙虎
+      均标"真实信号流口径"；因子实验室标"因子五分位分层超额"=回放）；raw_data/backtest_all_algos.json
+      快照（2026-10-22 06:40）显示因子实验室 cat=trade 且 avg +50%、日内动量/板块共振样本=0。
+    verified_at: "2026-10-22 17:58"
+    updated: "2026-10-22 17:58"
+    updated_by: 小九的工程师
+
   - id: logic-page-live-url-1022
     owner: 小九的工程师
     priority: P3
