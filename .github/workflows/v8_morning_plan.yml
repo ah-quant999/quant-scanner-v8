@@ -64,7 +64,7 @@ jobs:
           # [ascii] Do NOT use `Accept: application/vnd.github.raw`: it 302-redirects to
           #   raw.githubusercontent.com, which may be wholly unreachable => guaranteed failure.
           # [ascii] Files: generator + push helpers + the 6 data/*.js sources it reads
-          #   (missing source => the card silently degrades to "data not ready" — sync them all).
+          #   (missing source => the card silently degrades to "data not ready" - sync them all).
           $files = @(
             'v8/gen_morning_plan.py',
             'scripts/card_need_push.py',
@@ -112,7 +112,7 @@ jobs:
         id: gen
         shell: powershell
         run: |
-          # [ascii] weekend gate only — holiday triggers are harmless no-ops (same stance
+          # [ascii] weekend gate only - holiday triggers are harmless no-ops (same stance
           #   as v8_cn_fetch_cloud_selfhosted: the card would just carry the last
           #   trading day's data, honestly labeled by its data_date line).
           $dow = (Get-Date).DayOfWeek.value__
@@ -120,13 +120,13 @@ jobs:
           cd $env:GITHUB_WORKSPACE
           python v8/gen_morning_plan.py
           if ($LASTEXITCODE -ne 0) {
-            Write-Host "[fatal] generator returned non-zero (eastmoney unreachable?) — no write, keep online card" -ForegroundColor Red
-            echo "::error title=v8-morning-plan(exit=$LASTEXITCODE)::📋 盘前预案生成失败（指数行情抓取失败即整体中止，宁缺毋假）。线上卡将沿用上一版；若连续多日失败请检查 cn runner 网络与 push2delay 可达性。"
+            Write-Host "[fatal] generator returned non-zero (eastmoney unreachable?) - no write, keep online card" -ForegroundColor Red
+            echo "::error title=v8-morning-plan(exit=$LASTEXITCODE)::Morning plan generator failed (index fetch abort = honest-no-fake). Online card keeps previous version; if failing repeatedly, check cn runner network and push2delay reachability."
             exit 1
           }
           if (-not (Test-Path 'data/MORNING_PLAN.js')) {
             Write-Host "[fatal] no output file" -ForegroundColor Red
-            echo "::error title=v8-morning-plan(no-output)::📋 盘前预案未产出 data/MORNING_PLAN.js"
+            echo "::error title=v8-morning-plan(no-output)::No data/MORNING_PLAN.js produced"
             exit 1
           }
           Write-Host "[ok] data/MORNING_PLAN.js ready"
@@ -163,7 +163,7 @@ jobs:
           python scripts/api_put_file.py data/MORNING_PLAN.js "data: morning plan refresh ($(Get-Date -Format 'yyyy-MM-dd HH:mm') CST)"
           if ($LASTEXITCODE -ne 0) {
             Write-Host "[warn] push failed (non-blocking; retried next round)" -ForegroundColor Yellow
-            echo "::error title=v8-morning-plan(push-failed)::📤 data/MORNING_PLAN.js 推送失败（非阻塞，下一轮补推）。"
+            echo "::error title=v8-morning-plan(push-failed)::Push of data/MORNING_PLAN.js failed (non-blocking, retried next round)."
             exit 1
           }
 

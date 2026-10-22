@@ -168,7 +168,7 @@ jobs:
             Write-Host "[skip] content identical to remote; no push (avoid an empty commit triggering a full rebuild)"
             exit 0
           }
-          python scripts/api_put_file.py data/US_HK_MAP.js "data: 隔夜美股强势映射 ($(Get-Date -Format 'yyyy-MM-dd HH:mm') CST)"
+          python scripts/api_put_file.py data/US_HK_MAP.js "data: us-hk-map refresh ($(Get-Date -Format 'yyyy-MM-dd HH:mm') CST)"
           if ($LASTEXITCODE -ne 0) { Write-Host "[warn] push data failed (non-blocking; retried next round)" -ForegroundColor Yellow }
 
 # ─────────────────────────────────────────────────────────────────────────────
