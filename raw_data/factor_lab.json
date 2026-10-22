@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-10-22 08:37:08",
-  "data_date": "2026-10-21",
+  "update_time": "2026-10-22 18:59:51",
+  "data_date": "2026-10-22",
   "meta": {
-    "data_date": "2026-10-21",
+    "data_date": "2026-10-22",
     "close_semantics": "⚠️ 记录里的 close 是「上次算到这只票那天」的快照（roe 按季 asof_q / abn 按月 asof_ym 缓存），**不是当日报价**；需要当日价请查 STOCK_QUOTE.js 或 CANDIDATE_QUOTES.js。同时看 close_date 字段。",
     "liquid_def": "liquid=false 表示最新K线日 != 数据日 或 当月换手率为 0（停牌/零成交），已从榜单剔除",
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
-    "n_universe": 821,
-    "n_at_valid": 1069,
+    "n_universe": 820,
+    "n_at_valid": 1079,
     "n_roe_large": 657,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
@@ -472,6 +472,18 @@
         "asof_ym": "2026-10"
       },
       {
+        "code": "sh.600178",
+        "name": "东安动力",
+        "close": 12.29,
+        "close_date": "2026-10-22",
+        "liquid": true,
+        "abn": 1.543,
+        "factor_at": -1.5432,
+        "roe_ttm": null,
+        "size_proxy": 3475740229.2,
+        "asof_ym": "2026-10"
+      },
+      {
         "code": "sz.300110",
         "name": "华仁药业",
         "close": 2.86,
@@ -481,18 +493,6 @@
         "factor_at": -1.5424,
         "roe_ttm": null,
         "size_proxy": 2013402875.4,
-        "asof_ym": "2026-10"
-      },
-      {
-        "code": "sh.600081",
-        "name": "东风科技",
-        "close": 10.02,
-        "close_date": "2026-10-21",
-        "liquid": true,
-        "abn": 1.478,
-        "factor_at": -1.4778,
-        "roe_ttm": null,
-        "size_proxy": 1310078827.3,
         "asof_ym": "2026-10"
       }
     ]

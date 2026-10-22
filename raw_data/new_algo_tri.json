@@ -1,63 +1,35 @@
 {
- "update_time": "2026-10-22 08:44:20",
+ "update_time": "2026-10-22 19:10:35",
  "vcp": {
-  "scanned": 4424,
+  "scanned": 4436,
   "items": [
    {
-    "code": "601801",
-    "close": 5.59,
-    "pullback_pct": 4.1,
-    "vol_shrink": 0.23,
-    "amp_shrink": 0.39,
-    "contractions": 1,
-    "ma20_dist": 1.0,
-    "pct20d": 6.1,
-    "trigger": 5.76,
-    "score": 100.8,
-    "date": "2026-10-21",
-    "name": "皖新传媒"
-   },
-   {
     "code": "002244",
-    "close": 9.42,
-    "pullback_pct": 7.7,
-    "vol_shrink": 0.14,
+    "close": 9.31,
+    "pullback_pct": 8.8,
+    "vol_shrink": 0.11,
     "amp_shrink": 0.61,
     "contractions": 1,
-    "ma20_dist": 2.4,
-    "pct20d": 18.6,
+    "ma20_dist": 0.4,
+    "pct20d": 17.6,
     "trigger": 9.81,
     "score": 99.2,
-    "date": "2026-10-21",
+    "date": "2026-10-22",
     "name": "滨江集团"
    },
    {
     "code": "605100",
-    "close": 38.53,
-    "pullback_pct": 6.3,
-    "vol_shrink": 0.28,
-    "amp_shrink": 0.66,
-    "contractions": 1,
-    "ma20_dist": 5.0,
-    "pct20d": 24.4,
+    "close": 37.65,
+    "pullback_pct": 8.4,
+    "vol_shrink": 0.25,
+    "amp_shrink": 0.63,
+    "contractions": 2,
+    "ma20_dist": 2.1,
+    "pct20d": 10.5,
     "trigger": 39.56,
-    "score": 96.1,
-    "date": "2026-10-21",
+    "score": 98.7,
+    "date": "2026-10-22",
     "name": "华丰股份"
-   },
-   {
-    "code": "301560",
-    "close": 37.41,
-    "pullback_pct": 6.3,
-    "vol_shrink": 0.34,
-    "amp_shrink": 0.69,
-    "contractions": 1,
-    "ma20_dist": 14.7,
-    "pct20d": 66.6,
-    "trigger": 38.51,
-    "score": 87.2,
-    "date": "2026-10-21",
-    "name": "众捷股份"
    }
   ]
  },
@@ -65,187 +37,187 @@
   "count": 6,
   "items": [
    {
-    "sector": "IT服务",
+    "sector": "证券",
     "type": "行业",
     "stage": "观察",
-    "consecutive_days": 3,
+    "consecutive_days": 9,
     "net_5d": 0,
     "net_20d": 0,
-    "rs_5d": 1.69,
-    "rs_20d": 1.01,
-    "rs_60d": 5.02,
+    "rs_5d": -3.24,
+    "rs_20d": -3.13,
+    "rs_60d": -7.12,
     "heat_5d": 0,
-    "score": 30.0,
+    "score": 44.6,
     "leaders": [
      {
-      "name": "慧辰股份",
-      "chg": 20.0,
-      "code": "688500"
+      "name": "华鑫股份",
+      "chg": 3.02,
+      "code": "600621"
      },
      {
-      "name": "海天瑞声",
-      "chg": 11.7,
-      "code": "688787"
+      "name": "中信证券",
+      "chg": 1.08,
+      "code": "600030"
      },
      {
-      "name": "南威软件",
-      "chg": 10.01,
-      "code": "603636"
+      "name": "红塔证券",
+      "chg": 0.15,
+      "code": "601236"
      }
     ],
     "leaders_src": "proxy(ths)"
    },
    {
-    "sector": "养殖业",
-    "type": "行业",
-    "stage": "吸筹",
-    "consecutive_days": 2,
-    "net_5d": 13.75,
-    "net_20d": 0,
-    "rs_5d": -0.74,
-    "rs_20d": -3.87,
-    "rs_60d": 6.84,
-    "heat_5d": 0,
-    "score": 26.8,
-    "leaders": [
-     {
-      "name": "东瑞股份",
-      "chg": 9.99,
-      "code": "001201"
-     },
-     {
-      "name": "神农集团",
-      "chg": 5.65,
-      "code": "605296"
-     },
-     {
-      "name": "巨星农牧",
-      "chg": 5.03,
-      "code": "603477"
-     }
-    ],
-    "leaders_src": "proxy(ths)"
-   },
-   {
-    "sector": "其他电子",
-    "type": "行业",
-    "stage": "观察",
-    "consecutive_days": 4,
-    "net_5d": 0,
-    "net_20d": 0,
-    "rs_5d": -0.78,
-    "rs_20d": -10.45,
-    "rs_60d": -3.62,
-    "heat_5d": 0,
-    "score": 24.6,
-    "leaders": [
-     {
-      "name": "富信科技",
-      "chg": 7.61,
-      "code": "688662"
-     },
-     {
-      "name": "润欣科技",
-      "chg": 7.33,
-      "code": "300493"
-     },
-     {
-      "name": "久之洋",
-      "chg": 5.88,
-      "code": "300516"
-     }
-    ],
-    "leaders_src": "proxy(ths)"
-   },
-   {
-    "sector": "光学光电子",
-    "type": "行业",
-    "stage": "退潮",
-    "consecutive_days": 3,
-    "net_5d": -52.23,
-    "net_20d": -490.27,
-    "rs_5d": -1.18,
-    "rs_20d": -4.95,
-    "rs_60d": 2.07,
-    "heat_5d": 0,
-    "score": 22.8,
-    "leaders": [
-     {
-      "name": "利亚德",
-      "chg": 20.04,
-      "code": "300296"
-     },
-     {
-      "name": "海洋王",
-      "chg": 10.04,
-      "code": "002724"
-     },
-     {
-      "name": "星光股份",
-      "chg": 9.87,
-      "code": "002076"
-     }
-    ],
-    "leaders_src": "proxy(ths)"
-   },
-   {
-    "sector": "元件",
-    "type": "行业",
-    "stage": "吸筹",
-    "consecutive_days": 2,
-    "net_5d": 15.21,
-    "net_20d": -302.66,
-    "rs_5d": -2.59,
-    "rs_20d": -10.78,
-    "rs_60d": 16.98,
-    "heat_5d": 0,
-    "score": 21.3,
-    "leaders": [
-     {
-      "name": "顺络电子",
-      "chg": 7.4,
-      "code": "002138"
-     },
-     {
-      "name": "嘉立创",
-      "chg": 7.29,
-      "code": "001232"
-     },
-     {
-      "name": "华正新材",
-      "chg": 5.33,
-      "code": "603186"
-     }
-    ],
-    "leaders_src": "proxy(ths)"
-   },
-   {
-    "sector": "电子化学品",
+    "sector": "保险",
     "type": "行业",
     "stage": "观察",
     "consecutive_days": 5,
-    "net_5d": -67.74,
-    "net_20d": -1107.28,
-    "rs_5d": -3.53,
-    "rs_20d": -18.15,
-    "rs_60d": -15.31,
+    "net_5d": -4.0,
+    "net_20d": -103.5,
+    "rs_5d": -2.07,
+    "rs_20d": -8.42,
+    "rs_60d": -8.64,
     "heat_5d": 0,
-    "score": 20.6,
+    "score": 27.7,
     "leaders": [
      {
-      "name": "莱特光电",
-      "chg": 13.32,
-      "code": "688150"
+      "name": "中国人寿",
+      "chg": -0.21,
+      "code": "601628"
      },
      {
-      "name": "鸿富诚",
-      "chg": 7.3,
-      "code": "301716"
+      "name": "中国平安",
+      "chg": -0.51,
+      "code": "601318"
      },
      {
-      "name": "天通股份",
-      "chg": 5.64,
-      "code": "600330"
+      "name": "中国太保",
+      "chg": -0.8,
+      "code": "601601"
+     }
+    ],
+    "leaders_src": "proxy(ths)"
+   },
+   {
+    "sector": "医疗器械",
+    "type": "行业",
+    "stage": "退潮",
+    "consecutive_days": 3,
+    "net_5d": -3.59,
+    "net_20d": -9.7,
+    "rs_5d": -1.16,
+    "rs_20d": 0.09,
+    "rs_60d": 5.06,
+    "heat_5d": 0,
+    "score": 25.3,
+    "leaders": [
+     {
+      "name": "华强科技",
+      "chg": 3.63,
+      "code": "688151"
+     },
+     {
+      "name": "美好医疗",
+      "chg": 3.46,
+      "code": "301363"
+     },
+     {
+      "name": "开立医疗",
+      "chg": 2.58,
+      "code": "300633"
+     }
+    ],
+    "leaders_src": "proxy(ths)"
+   },
+   {
+    "sector": "银行",
+    "type": "行业",
+    "stage": "退潮",
+    "consecutive_days": 1,
+    "net_5d": -5.34,
+    "net_20d": 176.41,
+    "rs_5d": -0.95,
+    "rs_20d": -0.22,
+    "rs_60d": 6.19,
+    "heat_5d": 0,
+    "score": 17.5,
+    "leaders": [
+     {
+      "name": "工商银行",
+      "chg": 1.66,
+      "code": "601398"
+     },
+     {
+      "name": "农业银行",
+      "chg": 1.51,
+      "code": "601288"
+     },
+     {
+      "name": "建设银行",
+      "chg": 1.48,
+      "code": "601939"
+     }
+    ],
+    "leaders_src": "proxy(ths)"
+   },
+   {
+    "sector": "白色家电",
+    "type": "行业",
+    "stage": "退潮",
+    "consecutive_days": 1,
+    "net_5d": -3.52,
+    "net_20d": -93.21,
+    "rs_5d": -2.51,
+    "rs_20d": -4.45,
+    "rs_60d": 2.77,
+    "heat_5d": 0,
+    "score": 13.0,
+    "leaders": [
+     {
+      "name": "美的集团",
+      "chg": 1.71,
+      "code": "000333"
+     },
+     {
+      "name": "奇精机械",
+      "chg": 0.88,
+      "code": "603677"
+     },
+     {
+      "name": "格力电器",
+      "chg": 0.81,
+      "code": "000651"
+     }
+    ],
+    "leaders_src": "proxy(ths)"
+   },
+   {
+    "sector": "电池",
+    "type": "行业",
+    "stage": "观察",
+    "consecutive_days": 1,
+    "net_5d": -92.36,
+    "net_20d": -859.67,
+    "rs_5d": -6.65,
+    "rs_20d": -7.47,
+    "rs_60d": -3.86,
+    "heat_5d": 0,
+    "score": 5.3,
+    "leaders": [
+     {
+      "name": "盟固利",
+      "chg": 1.47,
+      "code": "301487"
+     },
+     {
+      "name": "豪鹏科技",
+      "chg": 1.15,
+      "code": "001283"
+     },
+     {
+      "name": "璞泰来",
+      "chg": 0.42,
+      "code": "603659"
      }
     ],
     "leaders_src": "proxy(ths)"
@@ -253,52 +225,19 @@
   ]
  },
  "lhb": {
-  "date": "20261021",
-  "count": 4,
+  "date": "20261022",
+  "count": 1,
   "items": [
    {
-    "code": "603236",
-    "name": "移远通信",
-    "date": "2026-10-21",
-    "pct": 10.0,
-    "inst_net_wan": 14425.0,
-    "yz_net_wan": 10444.0,
-    "category": "机游共振",
-    "follow": "顺势跟随",
-    "score": 100.0
-   },
-   {
-    "code": "300006",
-    "name": "莱美药业",
-    "date": "2026-10-21",
-    "pct": 20.0,
-    "inst_net_wan": 9273.0,
-    "yz_net_wan": -1982.0,
-    "category": "机构独买",
-    "follow": "顺势跟随",
-    "score": 66.4
-   },
-   {
-    "code": "002792",
-    "name": "通宇通讯",
-    "date": "2026-10-21",
-    "pct": 10.01,
-    "inst_net_wan": 8735.0,
-    "yz_net_wan": -2252.0,
-    "category": "机构独买",
-    "follow": "顺势跟随",
-    "score": 63.7
-   },
-   {
-    "code": "000823",
-    "name": "超声电子",
-    "date": "2026-10-21",
-    "pct": -6.01,
-    "inst_net_wan": 8591.0,
+    "code": "301413",
+    "name": "安培龙",
+    "date": "2026-10-22",
+    "pct": 14.6,
+    "inst_net_wan": 13579.0,
     "yz_net_wan": 0.0,
     "category": "机构独买",
-    "follow": "逆势接货",
-    "score": 48.0
+    "follow": "顺势跟随",
+    "score": 70.0
    }
   ]
  }
