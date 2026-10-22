@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-22 20:02",
+  "update_time": "2026-10-22 20:27",
   "data_date": "2026-10-21",
   "data_date_source": "kline",
   "fetch_date": "2026-10-22",
@@ -267,14 +267,14 @@
       "pct_60d": -3.41,
       "pct_90d": -21.85,
       "pct_180d": -5.01,
-      "pct_52w": 6.06,
+      "pct_52w": null,
       "relative_5d": -3.44,
       "relative_20d": -10.34,
       "relative_30d": -12.94,
       "relative_60d": -3.41,
       "relative_90d": -21.85,
       "relative_180d": -5.01,
-      "relative_52w": 6.06
+      "relative_52w": null
     },
     {
       "name": "服装家纺",
@@ -1311,14 +1311,14 @@
       "pct_60d": 7.36,
       "pct_90d": -10.89,
       "pct_180d": -23.68,
-      "pct_52w": -18.5,
+      "pct_52w": null,
       "relative_5d": -2.65,
       "relative_20d": -5.3,
       "relative_30d": -7.64,
       "relative_60d": 7.36,
       "relative_90d": -10.89,
       "relative_180d": -23.68,
-      "relative_52w": -18.5
+      "relative_52w": null
     },
     {
       "name": "元件",
