@@ -81,6 +81,8 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     # 🚀 2026-10-11 主人令：量质双擎（第一支自研算法）挂 factor_lab_gen 紧后——
     #   读其维护的全市场 kline_cache 打分选股，零重复拉数；分钟级，给 900s 预算。
     "gen_lqsq_top5.py": 900,
+    # 🚀 2026-10-22 主人令「上」：资金异动三因子（第四支自研算法）每日生成器（复用 factor_walkforward 引擎零第二口径：读全 _wf_cache 宇宙 → 最新一日截面三因子降序秩和 → Top10 → ff3_ranksum_history 真实流归档 + FF3_RANKSUM_BACKTEST 主榜；上线首日即建归档）。~80s，给 900s 预算。🔴 与 ORDER/STAGES 三处字符串逐字一致
+    "gen_ff3_ranksum.py": 900,
     # 🚀 2026-10-18 主人令「按建议做新算法·回测过了才上线」：第二支自研算法「低波趋势」
     #   （上市前置回测 N=60 α+4.00pp/胜率53.3% 全场唯一显著跑赢；S1板块轮动/S3稳健突破/S4回踩
     #   MA20 未跑赢基准不上线）· 零重复拉数（复用 gen_lqsq 的 ext 刷新），给 600s 预算。
@@ -209,6 +211,7 @@ ORDER = [
     "gen_lqsq_top5.py",    # 🚀 2026-10-11 主人令：量质双擎每日生成器（kline_cache 副产物缓存 + 自刷新 GTimg 700根整根替换 → 全市场异常量比打分选 Top5（10-13 主人令由 Top30 收紧）→ lqsq_history 真实流归档 + LQSQ_BACKTEST 主榜视图；上线首日即建归档）。🔴 2026-10-12 去掉 algorithms/ 前缀：ORDER 与 STAGES/预算表三处字符串必须逐字一致（双层路径解析只认 scripts/ 与 v8/ 前缀，其余一律落 algorithms/ 目录）
     "strategy_lowvol_trend.py",   # 🚀 2026-10-18 主人令：低波趋势每日生成器（60日波动率最低 Top5 ∧ 收盘>MA60 → lowvol_trend_history 真实流归档 + LOWVOL_TREND_BACKTEST 主榜；上线首日即建归档；2026-10-19 审计修正注释 Top10→Top5，代码 TOP_K=5）。挂 gen_lqsq 紧后复用其 kline_cache_ext 刷新（禁第二套拉数）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
     "strategy_intraday_momentum.py", # 🚀 2026-10-18 主人令：日内动量每日生成器（近20日日内累计收益最高 Top5 ∧ 收盘>MA60 → intraday_momentum_history 真实流归档 + INTRADAY_MOMENTUM_BACKTEST 主榜；2026-10-19 审计修正注释 Top10→Top5，代码 TOP_K=5）。挂 strategy_lowvol_trend 紧后复用同一 ext 刷新。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
+    "gen_ff3_ranksum.py",    # 🚀 2026-10-22 主人令「上」：资金异动三因子每日生成器（factor_walkforward 引擎零第二口径：turntrend/amt60/ivol60 三因子降序秩和选 Top10 → ff3_ranksum_history 真实流归档 + FF3_RANKSUM_BACKTEST 主榜；上线首日即建归档）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
     # 🛡 2026-08-29 主人令：A/B 对照（金股池/候选池/全市场同一信号收益），每日累积信号、T+N 后回填收益。
@@ -412,6 +415,7 @@ STAGES = {
         "gen_lqsq_top5.py",      # → data/LQSQ_BACKTEST.js + lqsq_history（量质双擎，必须与 ORDER 成对）
         "strategy_lowvol_trend.py",   # → data/LOWVOL_TREND_BACKTEST.js + lowvol_trend_history（低波趋势，与 ORDER 成对）
         "strategy_intraday_momentum.py", # → data/INTRADAY_MOMENTUM_BACKTEST.js + intraday_momentum_history（日内动量，与 ORDER 成对）
+        "gen_ff3_ranksum.py",      # → data/FF3_RANKSUM_BACKTEST.js + ff3_ranksum_history（资金异动三因子，与 ORDER 成对）
         "build_candidate_pool.py", "generate_top10.py",
         # 🔴 2026-10-18 主人令「完全下架」：四量终极选股两件套已摘链（与 ORDER 成对）。
         # "strategy_four_volume_60m.py", "strategy_four_volume.py",

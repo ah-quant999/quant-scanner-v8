@@ -97,6 +97,9 @@ DATA_SOURCES = {
     #   兜底（生成器 _write_js 直写仍在，双路同函数同源不冲突，防直写失败时无人补发）。
     "lqsq_track.json":             "LQSQ_TRACK",
     "lqsq_backtest.json":          "LQSQ_BACKTEST",
+    # 🚀 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）双映射（与四量族同构：TRACK 主发布 + BACKTEST 同源冗余兜底防直写失败）。gen_ff3_ranksum.py 直写 data/FF3_RANKSUM_*.js，本表确保 update_v8 亦重建（杜绝 LQSQ 同款冻结事故）。
+    "ff3_ranksum_track.json":      "FF3_RANKSUM_TRACK",
+    "ff3_ranksum_backtest.json":   "FF3_RANKSUM_BACKTEST",
     # 2026-09-04 主人令收尾：cockpit_tier_recommend / cockpit_advice / cockpit_backtest 三映射已删
     #   （09-03「干掉驾驶舱」系列删了生成器与 raw_data，映射永不命中，纯死代码）
     "top10_daily.json":            "TOP10_DAILY",
@@ -257,6 +260,8 @@ CATEGORY_MAP = {
     "CFFEX_HOLDINGS": "intraday,post_close",
     "CFFEX_POSITION": "post_close",  # 🆕 2026-10-15 与 cloud_fetch 同步：持仓排名16:30后公布
     "RESONANCE_TRACK": "post_close",  # 🆕 2026-10-21 最强共振回测跟踪：信号源自龙虎榜(17:30后)，归盘后档
+    "FF3_RANKSUM_TRACK": "post_close",    # 🚀 2026-10-22 主人令「上」：资金异动三因子（FF3）信号/回测跟踪，盘后数据齐后归盘后档
+    "FF3_RANKSUM_BACKTEST": "post_close", # 🚀 同上：主榜回测视图
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：与 cloud_fetch_v8.py 同步加 post_close。
     #   盘后数据页「宏观数据速览」卡读本变量，原只标 premarket → 盘后档不重生成 data/MACRO_DATA.js。
     # 🛡 2026-09-11 主人令：宏观为日级/月级数据，不随盘中实时刷——与 cloud_fetch_v8.py 同步移出

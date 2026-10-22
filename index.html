@@ -1326,6 +1326,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/LOWVOL_TREND_BACKTEST.js?v=c0ccbcbaab" defer></script>
     <script src="data/INTRADAY_MOMENTUM.js?v=398cecf51e" defer></script>
     <script src="data/INTRADAY_MOMENTUM_BACKTEST.js?v=3882138c0e" defer></script>
+    <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）前端接入 —— 后端 gen_ff3_ranksum.py 每日重算 raw_data/ff3_ranksum_*.json → update_v8 转换 -->
+    <script src="data/FF3_RANKSUM_TRACK.js?v=ff3v1" defer></script>
+    <script src="data/FF3_RANKSUM_BACKTEST.js?v=ff3v1" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -2594,6 +2597,8 @@ function fmtSigned(v){
       <button class="st-tab" data-st="lqsq" onclick="switchSt('lqsq')">⚖️ 量质双擎 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
       <button class="st-tab" data-st="lowvol" onclick="switchSt('lowvol')">🐢 低波趋稳 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
       <button class="st-tab" data-st="intraday" onclick="switchSt('intraday')">📈 日内动量 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
+      <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）选股策略子页 -->
+      <button class="st-tab" data-st="ff3" onclick="switchSt('ff3')">⚡ 资金异动 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
       <!-- 🆕 2026-10-19 主人令：三新算法各立选股策略子页（仿日内动量，信号卡+真实信号流回测卡；自「暂未上架」观测区迁入） -->
       <button class="st-tab" data-st="vcp" onclick="switchSt('vcp')">📐 缩量回踩 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
       <button class="st-tab" data-st="rotation" onclick="switchSt('rotation')">🔄 板块共振 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
@@ -2707,6 +2712,26 @@ function fmtSigned(v){
         <table id="intradayBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>基准</th><th>最好</th><th>最差</th></tr></thead><tbody id="intradayBackBody"></tbody></table>
       </div>
     </div><!--/st-intraday-->
+
+    <!-- ===== TAB 页面：资金异动三因子 FF3（第四支自研算法 · 🆕 2026-10-22 主人令「上」；数据源 data/FF3_RANKSUM_TRACK.js + data/FF3_RANKSUM_BACKTEST.js；三因子 turntrend/amt60/ivol60 均经因子实验室 walk-forward 验证 PASS） ===== -->
+    <div id="st-ff3" class="st-pane">
+      <div class="card" id="stFf3Card" style="border-left:4px solid #a855f7;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          ⚡ <span style="font-weight:700;font-size:14px;color:var(--txt);">资金异动三因子</span>
+          <span style="font-size:10px;font-weight:700;color:#a855f7;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">第四支自研算法</span>
+          <span class="fresh" id="ff3Time">—</span>
+        </div>
+        <div id="ff3Body"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">⚡ 资金异动三因子 加载中…</div></div>
+      </div>
+      <div class="card" id="ff3BackCard" style="border-left:4px solid #a855f7;margin-top:14px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 资金异动三因子 · 回测 N 日（真实信号流）</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">✅ 真实数据回测</span>
+        </div>
+        <div class="note" id="ff3BackNote">加载中…</div>
+        <div id="ff3BackBody"></div>
+      </div>
+    </div><!--/st-ff3-->
 
     <!-- ===== TAB 页面：缩量回踩 VCP（三新算法① · 🆕 2026-10-19 从「暂未上架」观测区迁入选股策略子页；数据源 data/NEW_ALGO_TRI.js(vcp) + data/NEW_ALGO_TRI_BACKTEST.js(vcp)；真实信号流回测 N=1/3/5/10/20） ===== -->
     <div id="st-vcp" class="st-pane">
@@ -14418,6 +14443,118 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     }
   };
 
+  /* ═══ 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3）子页渲染 ═══
+     数据源 window.FF3_RANKSUM_TRACK（归档信号每日 Top10 + 逐票前向跟踪；update_v8 由 raw_data/ff3_ranksum_track.json 发布）
+           window.FF3_RANKSUM_BACKTEST（主榜回测视图，method 口径说明）。
+     诚实铁律：未走满 T+N 的档一律显示「累积中」，绝不用 0 冒充；全站红涨绿跌口径。 */
+  window.renderFf3 = function(){
+    var host = document.getElementById('ff3Body');
+    if(!host) return;
+    function _e(s){ return String(s==null?'':s).replace(/[&<>]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+    function _pl(v){ return (v==null||isNaN(v))?'var(--sub)':(Number(v)>=0?'#ef5350':'#26a69a'); }  // 涨红/跌绿
+    var T = window.FF3_RANKSUM_TRACK || {}, B = window.FF3_RANKSUM_BACKTEST || {};
+    var trk = T.tracked || [];
+    if(!trk.length){
+      if(!(window.__ff3Retry && window.__ff3Retry >= 15)){
+        window.__ff3Retry = (window.__ff3Retry || 0) + 1;
+        setTimeout(window.renderFf3, 700);
+      } else {
+        host.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">⚡ 资金异动三因子 数据加载中…<br><span style="font-size:11px">若长时间为空请硬刷新 (Ctrl/Cmd+F5)</span></div>';
+      }
+      return;
+    }
+    window.__ff3Retry = 0;
+    var ut = String(T.update_time || '').substring(0,16);
+    try{ if(typeof setBadge === 'function'){ setBadge('ff3Time','盘后','短线', T.update_time || ''); } else { var tb = document.getElementById('ff3Time'); if(tb) tb.textContent = ut ? ('更新于 '+ut) : '—'; } }catch(e){}
+    var DAYS = ['1','3','5','10','20'];
+    var h = '';
+    h += '<div class="note" style="line-height:1.75;margin-bottom:12px;">'
+       + '<b style="color:#a855f7;">⚡ 资金异动三因子（FF3）</b> · 第四支自研算法 —— '
+       + _e(B.method || '每日全市场按 turntrend(缩量) / amt60(低流动性) / ivol60(低波) 三因子降序秩和复合，选 Top10；次开买入、持有 N 日收盘卖出（前复权·扣双边 0.3%）。')
+       + '</div>';
+    function _stat(label, val, sub, color){
+      return '<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">'
+           + '<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">'+label+'</div>'
+           + '<div style="font-size:22px;font-weight:800;color:'+(color||'var(--txt)')+';">'+val+'</div>'
+           + '<div style="font-size:10px;color:var(--dim);">'+sub+'</div></div>';
+    }
+    h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:14px;">';
+    h += _stat('🎯 累计信号', (T.total_signals || 0), '选股票数', '#a855f7');
+    h += _stat('📅 信号日数', (T.signal_days || 0), '逐日归档', '#38bdf8');
+    h += _stat('🚀 跟踪起始', _e(T.track_start || '—'), '上线首日即建归档', 'var(--txt)');
+    h += _stat('⏳ 成熟样本', '0', 'T+20 未走满不计入', '#fbbf24');
+    h += '</div>';
+    h += '<h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 8px;">'
+       + '<span class="ic">📋</span>归档信号 · 每日 Top10 <span style="font-size:11px;color:var(--sub);font-weight:400">按复合分降序（三因子秩和，越接近 3 越强）· 最新信号日置顶</span></h3>';
+    var _byDay = {};
+    trk.forEach(function(s){ var _k = s.signal_date || '—'; (_byDay[_k] = _byDay[_k] || []).push(s); });
+    var _days = Object.keys(_byDay).sort().reverse();
+    h += '<div class="note" style="margin-bottom:8px;">持有期收益随交易日成熟：未走满 T+N 的档位显示「<span style="color:var(--dim);">累积中</span>」，绝不填 0 冒充。红涨绿跌。</div>';
+    h += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+    h += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">'
+       + '<th style="padding:6px;text-align:left;color:var(--sub);">#</th>'
+       + '<th style="padding:6px;text-align:left;color:var(--sub);">名称</th>'
+       + '<th style="padding:6px;text-align:left;color:var(--sub);">代码</th>'
+       + '<th style="padding:6px;text-align:left;color:var(--sub);">信号日</th>'
+       + '<th style="padding:6px;text-align:right;color:var(--sub);">复合分</th>'
+       + '<th style="padding:6px;text-align:right;color:var(--sub);">信号日收盘</th>';
+    DAYS.forEach(function(d){ h += '<th style="padding:6px;text-align:right;color:var(--sub);">T+'+d+'</th>'; });
+    h += '</tr></thead><tbody>';
+    var _NCOL = 6 + DAYS.length;
+    _days.forEach(function(day){
+      var _list = (_byDay[day]||[]).slice().sort(function(a,b){ return (Number(b.score||0)) - (Number(a.score||0)); });
+      h += '<tr style="background:rgba(168,85,247,.07);">'
+         + '<td colspan="'+_NCOL+'" style="padding:5px 6px;font-size:11px;font-weight:700;color:#a855f7;">📅 '+_e(day)
+         + ' <span style="color:var(--dim);font-weight:400;">· '+_list.length+' 只</span></td></tr>';
+      _list.forEach(function(s, i){
+        var ret = s.returns || {};
+        var im = s.immature || [];
+        h += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+        h += '<td style="padding:6px;color:var(--dim);">'+(i+1)+'</td>';
+        h += '<td style="padding:6px;color:var(--txt);font-weight:600;">'+_e(s.name || '')+'</td>';
+        h += '<td style="padding:6px;color:var(--sub);font-family:ui-monospace,Consolas,monospace;">'+_e(s.code || '')+'</td>';
+        h += '<td style="padding:6px;color:var(--sub);">'+_e(s.signal_date || '—')+'</td>';
+        h += '<td style="padding:6px;text-align:right;color:#a855f7;font-weight:700;">'+(s.score != null ? Number(s.score).toFixed(4) : '—')+'</td>';
+        h += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(s.close != null ? Number(s.close).toFixed(2) : '—')+'</td>';
+        DAYS.forEach(function(d){
+          if(im.indexOf(d) >= 0){ h += '<td style="padding:6px;text-align:right;color:var(--dim);">累积中</td>'; }
+          else {
+            var v = ret[d];
+            if(v == null){ h += '<td style="padding:6px;text-align:right;color:var(--dim);">—</td>'; }
+            else { h += '<td style="padding:6px;text-align:right;color:'+_pl(v)+';">'+(v>=0?'+':'')+Number(v).toFixed(2)+'%</td>'; }
+          }
+        });
+        h += '</tr>';
+      });
+    });
+    h += '</tbody></table></div>';
+    host.innerHTML = h;
+    var bh = document.getElementById('ff3BackBody');
+    if(bh){
+      var byp = (B.summary && B.summary.by_period) || {};
+      var _keys = Object.keys(byp);
+      if(!_keys.length){
+        bh.innerHTML = '<div class="note" style="padding:14px;text-align:center;color:var(--dim);">📊 真实信号流回测：暂无成熟样本（跟踪未满 T+20，样本随交易日成熟累积，绝不用 0 冒充）。<br><span style="font-size:11px">'+_e(B.method || '')+'</span></div>';
+      } else {
+        var bt = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;"><thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">'
+               + '<th style="padding:6px;text-align:left;color:var(--sub);">持有期</th><th style="padding:6px;text-align:right;color:var(--sub);">样本</th><th style="padding:6px;text-align:right;color:var(--sub);">胜率</th><th style="padding:6px;text-align:right;color:var(--sub);">平均收益</th><th style="padding:6px;text-align:right;color:var(--sub);">最好</th><th style="padding:6px;text-align:right;color:var(--sub);">最差</th></tr></thead><tbody>';
+        _keys.sort(function(a,b){ return Number(a)-Number(b); }).forEach(function(k){
+          var s = byp[k];
+          bt += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">'
+              + '<td style="padding:6px;color:var(--txt);">T+'+_e(k)+'</td>'
+              + '<td style="padding:6px;text-align:right;color:var(--sub);">'+(s.samples||0)+'</td>'
+              + '<td style="padding:6px;text-align:right;color:'+_pl((s.win_rate||0)-50)+';">'+(s.win_rate!=null?Number(s.win_rate).toFixed(1):'—')+'%</td>'
+              + '<td style="padding:6px;text-align:right;color:'+_pl(s.avg)+';">'+(s.avg!=null?(s.avg>=0?'+':'')+Number(s.avg).toFixed(2)+'%':'—')+'</td>'
+              + '<td style="padding:6px;text-align:right;color:'+_pl(s.best)+';">'+(s.best!=null?(s.best>=0?'+':'')+Number(s.best).toFixed(2)+'%':'—')+'</td>'
+              + '<td style="padding:6px;text-align:right;color:'+_pl(s.worst)+';">'+(s.worst!=null?(s.worst>=0?'+':'')+Number(s.worst).toFixed(2)+'%':'—')+'</td>'
+              + '</tr>';
+        });
+        bt += '</tbody></table></div>';
+        bh.innerHTML = bt;
+      }
+    }
+  };
+
   /* ═══ 🆕 2026-10-12 小九：量质双擎（LQSQ）子页渲染 ═══
      数据源 window.LQSQ_TRACK（归档信号每日 Top5 + 逐票前向跟踪；update_v8 由 raw_data/lqsq_track.json 发布）
            window.LQSQ_BACKTEST（主榜回测视图，method 口径说明）。
@@ -14548,6 +14685,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     if(n==='lqsq' && typeof window.renderLqsq==='function') setTimeout(window.renderLqsq, 30);
     if(n==='lowvol' && typeof window.renderLowvol==='function') setTimeout(window.renderLowvol, 30);
     if(n==='intraday' && typeof window.renderIntraday==='function') setTimeout(window.renderIntraday, 30);
+    if(n==='ff3' && typeof window.renderFf3==='function') setTimeout(window.renderFf3, 30);  // 🆕 2026-10-22 主人令：资金异动三因子子页渲染调度
     /* 🆕 2026-10-19 主人令：三新算法子页渲染调度（defer 数据未就绪时由 __stRetryTab 兜底重试） */
     if(n==='vcp' && typeof window.renderVcp==='function') setTimeout(window.renderVcp, 30);
     if(n==='rotation' && typeof window.renderRotation==='function') setTimeout(window.renderRotation, 30);
@@ -14573,6 +14711,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       lowvolBack:function(){return !!(window.LOWVOL_TREND_BACKTEST&&window.LOWVOL_TREND_BACKTEST.summary&&window.LOWVOL_TREND_BACKTEST.summary.by_period&&Object.keys(window.LOWVOL_TREND_BACKTEST.summary.by_period).length);},  // 🆕 2026-10-18 阿狸咪：低波趋稳回测就绪判定
       intraday:function(){return !!(window.INTRADAY_MOMENTUM&&window.INTRADAY_MOMENTUM.picks&&window.INTRADAY_MOMENTUM.picks.length);},  // 🆕 2026-10-18 夜 阿狸咪：日内动量子页就绪判定（INTRADAY_MOMENTUM 注入到位）
       intradayBack:function(){return !!(window.INTRADAY_MOMENTUM_BACKTEST&&window.INTRADAY_MOMENTUM_BACKTEST.summary&&window.INTRADAY_MOMENTUM_BACKTEST.summary.by_period&&Object.keys(window.INTRADAY_MOMENTUM_BACKTEST.summary.by_period).length);},  // 🆕 2026-10-18 夜 阿狸咪：日内动量回测就绪判定
+      ff3:function(){return !!(window.FF3_RANKSUM_TRACK&&window.FF3_RANKSUM_TRACK.tracked&&window.FF3_RANKSUM_TRACK.tracked.length);},  // 🆕 2026-10-22 主人令：资金异动三因子子页就绪判定（FF3_RANKSUM_TRACK 注入到位）
       /* 🆕 2026-10-19 主人令：三新算法子页就绪判定（2026-10-19 晚修复：原判 items.length>0 把「今日 0 命中」误判为未就绪 ⇒ 永远「数据加载中…」；现就绪=数据注入到位，0 命中由渲染器诚实空态展示） */
       vcp:function(){return !!(window.NEW_ALGO_TRI&&window.NEW_ALGO_TRI.vcp&&window.NEW_ALGO_TRI.vcp.items);},
       rotation:function(){return !!(window.NEW_ALGO_TRI&&window.NEW_ALGO_TRI.rotation&&window.NEW_ALGO_TRI.rotation.items);},
