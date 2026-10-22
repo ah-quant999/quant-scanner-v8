@@ -1,42 +1,42 @@
 {
-  "update_time": "2026-10-22 08:44:14",
+  "update_time": "2026-10-22 18:47:29",
   "data_date": "2026-10-22",
   "source": "LIMIT_UP_HEATMAP",
-  "phase": "高潮",
-  "color": "#f59e0b",
-  "score": 70.0,
-  "delta_pct": 0.0,
-  "advice": "✨ 高潮持续：聚焦核心龙头，注意仓位管理",
+  "phase": "退潮",
+  "color": "#f97316",
+  "score": 58.0,
+  "delta_pct": -34.0,
+  "advice": "⚠️ 情绪退潮中：高位股注意回撤，关注高低切换",
   "metrics": {
-    "total_up": 50,
-    "max_ladder": 4,
+    "total_up": 33,
+    "max_ladder": 5,
     "high_ladder_count": 4,
     "sectors_count": 13
   },
   "ladder_dist": {
-    "1": 34,
-    "2": 12,
-    "3": 1,
-    "4": 3
+    "1": 24,
+    "2": 5,
+    "3": 2,
+    "5": 2
   },
   "leaders": [
     {
       "code": "002724",
       "name": "海洋王",
-      "lbc": 4,
-      "chg": 10.04
-    },
-    {
-      "code": "600178",
-      "name": "东安动力",
-      "lbc": 4,
-      "chg": 9.99
+      "lbc": 5,
+      "chg": 10.01
     },
     {
       "code": "603278",
       "name": "大业股份",
-      "lbc": 4,
+      "lbc": 5,
       "chg": 10.01
+    },
+    {
+      "code": "002076",
+      "name": "星光股份",
+      "lbc": 3,
+      "chg": 10.2
     }
   ],
   "prev_total": 50,
