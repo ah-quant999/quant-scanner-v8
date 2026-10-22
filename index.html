@@ -1916,25 +1916,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         h+=hparts.join(' · ');
         h+='</div>';
 
-        // 🆕 2026-10-15 参与条件式（主人令·图3建议②落地）：状态之上给「可执行性」——
-        //   条件不满足只观察、不设主动仓。三条件：①回测门控 v8IntradayGate().ok；
-        //   ②日内风向偏暖；③市场健康度偏暖。满足数 3=✓顺势 / 1-2=○半仓试探 / 0=✗观望。
-        var _sentTxt=(sent.label||'')+' '+(sent.description||'');
-        var _healthTxt = ((health.structure&&health.structure.join('')||'')+(health.fund&&health.fund.join('')||'')+(health.emotion&&health.emotion.join('')||''));
-        var _sentWarm = /偏暖|炽热|高涨|强势|偏强|领涨|大涨|流入/.test(_sentTxt);
-        var _healthWarm = /偏暖|炽热|高涨|强势|偏强|流入|领涨|改善|扩张/.test(_healthTxt);
-        var _condN = (_ga.ok?1:0) + (_sentWarm?1:0) + (_healthWarm?1:0);
-        var _pc = _condN>=3 ? {ic:'✓',txt:'顺势参与',c:'#5ee0a0'}
-                : _condN>=1 ? {ic:'○',txt:'半仓试探 · 只做强趋势（未全满足不设主动仓）',c:'#fbbf24'}
-                : {ic:'✗',txt:'观望 · 只观察不设仓',c:'#ff6b81'};
-        h+='<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:6px 12px;margin-bottom:8px;'
-         + 'border:1px dashed '+_pc.c+'66;border-radius:8px;font-size:11.5px;line-height:1.6;">'
-         +   '<span style="font-weight:800;color:'+_pc.c+';">参与条件</span>'
-         +   '<span style="font-weight:800;color:'+_pc.c+';font-size:13px;">'+_pc.ic+'</span>'
-         +   '<span style="color:var(--txt);">'+_pc.txt+'</span>'
-         +   '<span style="color:var(--dim);opacity:.6;">（门控'+(_ga.ok?'✓':'✗')+' · 风向'+(_sentWarm?'✓':'✗')+' · 健康度'+(_healthWarm?'✓':'✗')+'）</span>'
-         + '</div>';
-
         // 4. 市场异动（最多5条）
         var anoms=d.anomalies||[];
         /* 2026-09-15 主人令：个股异动「主力大单流入 / 主力大单流出」原为两条独立行，合并为一行
