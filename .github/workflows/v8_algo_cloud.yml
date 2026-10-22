@@ -856,6 +856,17 @@ jobs:
       # 🛡 2026-08-18 主人紧急令根治：算法链收尾前先做 4 件事，确保 data/*.js 与 HEALTH_CHECK.js
       #   必刷新——bridge_raw_data 防 raw_data 内部改名断点（如 triple_resonance_history → triple_history），
       #   update_v8 重生成 data/*.js，v8_health_check 刷新 HEALTH_CHECK.js。
+      # 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：
+      #   D 档 final_recommend 落 dated 归档后，立即重算「每日 Top3 历史」汇总
+      #   （raw_data/final_recommend_history.json + data/FINAL_RECOMMEND_HISTORY.js）。
+      #   放在 update_v8 之前 ⇒ 随后的 update_v8 依 DATA_SOURCES 映射自动重建 data js。
+      #   try/except 包裹：历史汇总失败**绝不影响** D 档主产物（与 gen_final_recommend_backtest 同哲学）。
+      - name: "📜 重算每日 Top3 历史（gen_final_recommend_history）"
+        if: steps.gate.outputs.proceed == 'true'
+        run: |
+          set +e
+          python algorithms/gen_final_recommend_history.py || echo "⚠️ 每日 Top3 历史重算失败（不影响主产物）"
+
       - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
         if: steps.gate.outputs.proceed == 'true'
         run: |

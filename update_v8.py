@@ -213,6 +213,8 @@ DATA_SOURCES = {
     #   不覆盖它 → data/FINAL_RECOMMEND_DATA.js 站点读的 window.* 永远停在 08-22（源 raw_data 已是 08-25 新鲜）。
     #   补映射后，云端 build 自动按 raw_data 重建，杜绝复发。
     "final_recommend.json":        "FINAL_RECOMMEND_DATA",
+    # 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史汇总（真实每日选股 dated 快照 → 逐日 Top3 清单）。由 algorithms/gen_final_recommend_history.py 产出 raw_data/final_recommend_history.json，本映射让 update_v8 自动重建 data/FINAL_RECOMMEND_HISTORY.js（免手工同步）。
+    "final_recommend_history.json": "FINAL_RECOMMEND_HISTORY",
     # 🛡 2026-09-10 主人令：factor_lab.json 原只在 run_algorithms B 批由 v8/factor_lab_gen.py
     #   直接写 data/FACTOR_LAB.js，但 B 批在云端/家里机常因 baostock 超时失败 → FACTOR_LAB.js
     #   停更 2 天。补映射后，只要 raw_data/factor_lab.json 已新鲜提交，update_v8 即可独立重建 js。
@@ -434,6 +436,8 @@ CATEGORY_MAP = {
     # 🛡 2026-08-26 一劳永逸根因修复：final_recommend 与 FINAL_RECOMMEND_DATA
     #   归属盘后（与 finalRec 同节奏），补类别映射使 --category post_close / --detect-changes 能正确重建。
     "FINAL_RECOMMEND_DATA": "post_close",
+    # 🆕 2026-10-22：每日 Top3 历史归属盘后（与 final_recommend 同节奏，盘后跑 final_recommend 后重生成）。⚠️ 纯 post_close ⇒ 盘中 intraday/premarket 构建绝不重写，防「旧 raw 洗新 data」回滚。
+    "FINAL_RECOMMEND_HISTORY": "post_close",
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告（cloud_fetch 注册为 premarket，日频）
     # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：与 cloud_fetch_v8.py 同步加 post_close。
     #   注释写着「盘后数据页」却只在盘前重建 data/*.js —— 盘后重抓了 raw 却不重生成 js，半截更新。
