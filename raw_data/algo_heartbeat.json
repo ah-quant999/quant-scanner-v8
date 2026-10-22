@@ -1,9 +1,9 @@
 {
-  "update_time": "2026-10-22 20:04:50",
+  "update_time": "2026-10-22 21:14:45",
   "script": "(chain-end)",
   "step": "run_algorithms",
   "status": "completed",
-  "ok": 1,
-  "fail": 0,
+  "ok": 16,
+  "fail": 6,
   "note": "算法链本轮执行完毕"
 }
