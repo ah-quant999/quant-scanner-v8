@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-22 17:50:51",
+  "update_time": "2026-10-22 19:28:45",
   "total": 828,
   "hysteresis_days": 5,
   "source_dist": {
@@ -513,7 +513,7 @@
     },
     "sh_601398": {
       "code": "601398",
-      "name": "工商银",
+      "name": "工商银行",
       "market": "sh",
       "board_label": "主板",
       "sources": [
@@ -712,7 +712,7 @@
     },
     "sh_601288": {
       "code": "601288",
-      "name": "农业银",
+      "name": "农业银行",
       "market": "sh",
       "board_label": "主板",
       "sources": [
