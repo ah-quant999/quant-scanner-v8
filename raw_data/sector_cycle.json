@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-22 10:27:58",
+  "update_time": "2026-10-22 11:09:20",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -154,7 +154,7 @@
       "hot_days": 21,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 297,
+      "total": 298,
       "ongoing": true
     },
     {
@@ -212,15 +212,15 @@
     {
       "sector": "军工",
       "start": "10/14",
-      "end": "10/20",
+      "end": "10/22",
       "start_idx": 23,
-      "end_idx": 27,
-      "days": 5,
-      "hot_days": 4,
+      "end_idx": 29,
+      "days": 7,
+      "hot_days": 5,
       "peak": 9,
       "peak_date": "10/19",
-      "total": 22,
-      "ongoing": false
+      "total": 27,
+      "ongoing": true
     },
     {
       "sector": "半导体",

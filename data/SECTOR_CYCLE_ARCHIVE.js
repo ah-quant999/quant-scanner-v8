@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-10-22 10:16:28
+// 最后更新：2026-10-22 11:09:20
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-10-22 10:16:28",
+  "update_time": "2026-10-22 11:09:20",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -169,7 +169,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 21,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 297,
+      "total": 298,
       "ongoing": true
     },
     {
@@ -227,15 +227,15 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "军工",
       "start": "10/14",
-      "end": "10/20",
+      "end": "10/22",
       "start_idx": 23,
-      "end_idx": 27,
-      "days": 5,
-      "hot_days": 4,
+      "end_idx": 29,
+      "days": 7,
+      "hot_days": 5,
       "peak": 9,
       "peak_date": "10/19",
-      "total": 22,
-      "ongoing": false
+      "total": 27,
+      "ongoing": true
     },
     {
       "sector": "半导体",
