@@ -486,7 +486,8 @@ def parse_by_period(src, obj):
                    "max_drawdown": _num(r.get("max_drawdown")),
                    "sharpe": _num(r.get("sharpe_ratio")),
                    "win_avg": _num(r.get("win_avg")), "loss_avg": _num(r.get("loss_avg")),
-                   "signal_date_range": sm.get("signal_date_range")},
+                   "signal_date_range": sm.get("signal_date_range")
+                                      or (obj or {}).get("signal_date_range")},
             status=None if (n or 0) > 0 else "样本为 0（尚无历史信号）",
         ))
     return rows
@@ -762,9 +763,13 @@ def build(root, day, kind, note, extra_note=""):
                     f"源未在数据日 {day} 刷新（最后 {r['source_time'] or '未知'}）"
             ov = r.pop("_primary_override", None)
             r["is_primary"] = bool(ov) if ov is not None else (r["label"] == src.get("primary"))
-            # 🆕 2026-09-17 基准超额接线：记下该源 summary 的信号区间（供统一补基准）
-            r["_src_range"] = (_bench_range_of(((obj or {}).get("summary") or {})
-                                               .get("signal_date_range"), day) if obj else None)
+            # 🆕 2026-09-17 基准超额接线：记下该源的信号区间（供统一补基准）。
+            #   修复：部分源（如 LQSQ 量质双擎）把 signal_date_range 放在顶层而非
+            #   summary 下 ⇒ 旧实现只读 summary.signal_date_range 恒为 None，导致
+            #   基准超额全部缺失。现改为「summary 优先，缺则回落顶层」。
+            _sum = ((obj or {}).get("summary") or {}) if obj else {}
+            _rng = _sum.get("signal_date_range") or (obj or {}).get("signal_date_range")
+            r["_src_range"] = _bench_range_of(_rng, day)
             rows.append(r)
 
     # ── 🆕 2026-09-17 基准超额统一接线（主人令「全站口径统一·诚实」）────────────
