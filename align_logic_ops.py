@@ -104,6 +104,13 @@ MUST_HAVE_CRON = {
     #   ⇒ strong_count=0），摘出为 cn runner 专链：工作日 05:35 CST 收盘后首抓 +
     #   08:15 CST 盘前兜底；已同步在运维页调度表挂文档行。
     "v8_us_hk_map": "隔夜美股强势映射fetcher(工作日05:35/08:15·cn runner专链)",
+    # 2026-10-22 小九补登记（门禁前移 [4/8] 拦截补漏）：暂未上架三张新卡的定时生成链。
+    #   07:44 同批入库时只做了文档登记（index.html sec-op / logic.html sec-lg），漏了本名单
+    #   ⇒ 门禁连红；且 morning_plan 07:50 首触发还撞上 schedule 注册延迟（首日踩空）。
+    #   本次三链齐补：名单登记 + run 块 ASCII 化（WindowsPS 5.1 GBK 解码坑）+ 手动补跑验证。
+    "v8_morning_plan": "盘前预案生成器(工作日07:50·cn runner)",
+    "v8_algo_scorecard": "算法记分卡生成器(工作日08:25·云端ubuntu)",
+    "v8_national_team": "国家队活跃度生成器(工作日20:50·云端ubuntu)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────
