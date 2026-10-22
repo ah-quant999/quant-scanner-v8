@@ -1,6 +1,6 @@
 {
  "month": "2026年10月",
- "update_time": "2026-10-22 23:44",
+ "update_time": "2026-10-23 01:39",
  "legend": [
   {
    "title": "重要政策",
@@ -436,19 +436,19 @@
     {
      "num": 22,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇸🇬 SG公假（屠妖节）",
        "cls": "sg",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 23,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": []
     },
     {
