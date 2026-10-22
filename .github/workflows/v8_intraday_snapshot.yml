@@ -112,8 +112,15 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          git config user.email "2814546@qq.com"
-          git config user.name "ah-quant999"
+          # 🔴 2026-10-22 一劳永逸（小九）：提交身份改 bot。
+          #   原用主人身份(ah-quant999/2814546@qq.com) ⇒ verify_daily_audit.py 把它判为
+          #   「人工 commit」要求关键词在交接档命中，而快照是纯机器行为、无交接档
+          #   ⇒ 每日自动备份连续 8 天(10-14~10-21)硬失败阻断。
+          #   修法遵循该脚本既定设计哲学（2026-09-20 升级为「身份+前缀」双判、明确拒绝
+          #   补消息前缀、明确禁止把人工身份加入 bot 集合）⇒ 唯一正解是 workflow 侧改 bot 身份。
+          #   与仓内其余 20+ workflow（v8-cloud-bot/v8-cache-bot/v8-backup-bot）约定一致。
+          git config user.email "v8-bot@users.noreply.github.com"
+          git config user.name "v8-snapshot-bot"
           # 🛡 2026-10-13 一劳永逸（主人实锤「卡在 10:58」）：快照数据与 index.html 缓存戳
           #   同 commit 原子更新。旧链路数据文件先上线、?v 靠 build/reconcile 事后追（慢 3-5
           #   分钟），期间浏览器/CDN 按旧 URL 吐旧缓存 ⇒ 卡面停在旧时刻。update_v8.py 仅依赖

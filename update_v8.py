@@ -60,17 +60,25 @@ DATA_SOURCES = {
     "ipo_score.json":              "IPO_DATA",
     "crisis_data.json":            "CRISIS_DATA",
     "judgment_data.json":          "JUDGMENT_DATA",
-    "crds_card_data.json":         "CRDS_CARD_DATA",
+    # 🔴 2026-10-22 一劳永逸（小九）：CRDS / 三重族 4 条死注册摘除（沿用 2026-10-18 四量 precedent）。
+    #   2026-10-11 主人令「完全下架」：三重共识 / CRDS 策略共振已下架 ⇒ raw_data 对应 json
+    #   早已不在 git 仓内（本地仅留取证副本），但本映射仍在册 ⇒ update_v8 每轮扫到即报
+    #   「映射悬空 + 数据断链」，verify_chain_consistency 每日刷 8 条无用告警。
+    #   更危险：本地留有 untracked 的旧 raw（如 crds_card_data.json）时，本映射会把它
+    #   复活成 data/ 幽灵文件（时间戳还是新的）—— 与四量终极同族病灶。
+    #   ⇒ 同批摘除映射；raw 取证副本保留在本地（不跟踪、不发布），与四量处理一致。
+    # "crds_card_data.json":         "CRDS_CARD_DATA",
     # 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合）。
     #   从 algo_track.json 读三 algo 跟踪池，去重 → 状态机判 status → 输出
     #   raw_data/v8_pool_tracker.json + data/V8_POOL_TRACKER.js，注入 window.V8_POOL_TRACKER。
     "v8_pool_tracker.json":        "V8_POOL_TRACKER",
-    "triple_consensus.json":       "TRIPLE_CONSENSUS",
-    "triple_track.json":           "TRIPLE_TRACK",
+    # "triple_consensus.json":       "TRIPLE_CONSENSUS",   # 🔴 2026-10-22 死注册摘除（2026-10-11 完全下架）
+    # "triple_track.json":           "TRIPLE_TRACK",       # 🔴 2026-10-22 死注册摘除（2026-10-11 完全下架）
     # 🛡 2026-08-26 一劳永逸根因修复：生成器 update_triple_resonance_history.py 写的是
     #   raw_data/triple_resonance_history.json，而此处原读旧名 triple_history.json（同源不同名），
     #   桥接顺序一错位就吃陈旧基线 → 共振日历缺 08-24 等。改为直接读生成器真输出，消除重命名歧义。
-    "triple_resonance_history.json": "TRIPLE_HISTORY",
+    #   🔴 2026-10-22：随三重共识完全下架一并摘除（否则每日报悬空 + 可复活幽灵文件）。
+    # "triple_resonance_history.json": "TRIPLE_HISTORY",
     # 🆕 2026-09-15 主人令：四量终极「自己的一整套系统」——历史追踪 + 跟踪/前向回测。
     # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架（T+5 胜率 33.71%/均益 -1.68% n=89，
     #   跑输基准，delist_advice 已提请、主人裁定）⇒ 三条映射移除。raw_data/four_volume_*.json
@@ -361,9 +369,10 @@ CATEGORY_MAP = {
     "SECTOR_FUND_FLOW_TREND": "post_close",
     "GOLD_POOL": "post_close",
     "CANDIDATE": "post_close",
-    "TRIPLE_CONSENSUS": "post_close",
-    "TRIPLE_TRACK": "post_close",
-    "TRIPLE_HISTORY": "post_close",
+    # 🔴 2026-10-22：三重族 3 条分类条目随 DATA_SOURCES 映射一并摘除（2026-10-11 完全下架）。
+    # "TRIPLE_CONSENSUS": "post_close",
+    # "TRIPLE_TRACK": "post_close",
+    # "TRIPLE_HISTORY": "post_close",
     # 🆕 2026-09-15 主人令：四量终极历史追踪 + 跟踪/前向回测（B 批盘后算法链产出，与三重同档）。
     # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架 ⇒ 转换映射已摘，分类条目随摘
     #   （CATEGORY_MAP 无条目时 _file_category 兜底 post_close，行为不变）。
@@ -384,7 +393,8 @@ CATEGORY_MAP = {
     "SH_FIB": "post_close",
     "SZ_FIB": "post_close",
     "INST_TRADE": "post_close",
-    "CRDS_CARD_DATA": "post_close",
+    # 🔴 2026-10-22：CRDS 条目随映射一并摘除（2026-10-11 完全下架）。
+    # "CRDS_CARD_DATA": "post_close",
     # 2026-09-04 主人令收尾：COCKPIT_TIER_RECOMMEND/COCKPIT_ADVICE/COCKPIT_BACKTEST heal 分类已删（模块下线）
     "BACKTEST_TDX": "post_close",
     "BACKTEST_COMPREHENSIVE": "post_close",

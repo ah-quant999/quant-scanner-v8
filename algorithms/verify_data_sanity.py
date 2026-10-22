@@ -58,6 +58,12 @@ STALE_OK = {
     #   ⚠️ 后续彻底清理：删 data/CANDIDATE_BACKTEST.js / GOLD_POOL_BACKTEST.js + raw_data 同名 + 前端 index.html:1793 / logic.html:1507 引用（触及主文件，另行审慎处理）。
     "CANDIDATE_BACKTEST",
     "GOLD_POOL_BACKTEST",
+    # 2026-10-22 一劳永逸（小九）：FINAL_RECOMMEND_REPLAY 是**静态归档回放卡**
+    #   （v8_health_check.py 早已判明「有产物、无周期生产者、设计上一次冻结」；
+    #    全仓 py/yml 对其生产者引用 = 0 处，仅 index.html 消费），
+    #   拿每日新鲜度阈值卡它 = 品类误判 ⇒ 盘后算法链 12 连败（10-21 22:56~10-22 08:28
+    #   全部死于这一步误报，数据其实每轮都推送成功）。登记豁免，回归绿。
+    "FINAL_RECOMMEND_REPLAY",
 }
 # 🛡 2026-09-13 一劳永逸：关键数据文件**存在性**清单。
 #   原脚本用 data_dir.glob("*.js") 扫描 ⇒ 文件被删就压根不在扫描范围 ⇒ 静默漏检。
