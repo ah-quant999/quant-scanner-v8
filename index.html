@@ -1268,7 +1268,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/V8_POOL_TRACKER.js?v=7cc4ccaf54" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=0d4200673b" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=b4f0662c45" defer></script>
-    <script src="data/ALGO_SCORECARD.js?v=1b6087615d" defer></script>
 <!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日07:50派发；10-21 19:16 首跑真实数据） -->
 <script src="data/MORNING_PLAN.js?v=3272687c4b" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=035a6afc0f" defer></script>
@@ -12172,7 +12171,6 @@ function drawUpDownChart(){
 
           {name:'强势跟踪水源(v8_ima_strong_stock)', source:'IMA_STRONG_STOCK', freq:'工作日15:45', slots:['15:45'], note:'ima 短线情绪选股'},
           {name:'国家队活跃度(v8_national_team)', source:'NATIONAL_TEAM', freq:'工作日20:50', slots:['20:50'], note:'暂未上架·托盘代理信号'},
-          {name:'算法记分卡(v8_algo_scorecard)', source:'ALGO_SCORECARD', freq:'工作日08:25', slots:['08:25'], note:'暂未上架·全链回测真实信号流聚合'},
 
           {name:'盘前预案(v8_morning_plan)', source:'MORNING_PLAN', freq:'工作日07:50', slots:['07:50'], note:'暂未上架·观测类·首卡'},
 
@@ -12711,7 +12709,7 @@ function drawUpDownChart(){
     '最终推荐': ['FACTOR_LAB', 'TOP10_DAILY'],
     '选股策略': ['CANDIDATE', 'GOLD_POOL', 'IMA_STRONG_BACKTEST', 'VOLATILITY', 'STOCK_STOP_DATA', 'H_AUTO_BUY', 'H_AUTO_BUY_TRACK', 'IMA_STRONG_STOCK', 'FIRST_BOARD_ALERT', 'LIANBAN_WINRATE'],  /* 🆕 2026-10-19：连板梯队两卡自暂未上架迁入 */  /* 🔴 2026-10-11：TRIPLE_CONSENSUS/TRIPLE_HISTORY/CRDS_CARD_DATA 随两策略下架移除；🔴 2026-10-18：四量终极+ALGO_TRACK 随四量下架移除 */
     '策略回测': ['BACKTEST_ALL_ALGOS'],
-    '暂未上架': ['MORNING_PLAN', 'NATIONAL_TEAM', 'ALGO_SCORECARD', 'MARKET_REGIME', 'SECTOR_LEADERS', 'DAJIJIN_REDUCTION', 'SECTOR_YEAR_FLOW'],  /* 📋 2026-10-21：+盘前预案（观测类首卡）；🏛️ 2026-10-21：+国家队活跃度（第二卡）；🧮 2026-10-21：+算法记分卡（第三卡）；🔴 2026-10-19：FIRST_BOARD_ALERT 随卡迁入选股策略；🏔 2026-10-20：SECTOR_YEAR_FLOW 随卡迁「暂未上架」 */
+    '暂未上架': ['MORNING_PLAN', 'NATIONAL_TEAM', 'MARKET_REGIME', 'SECTOR_LEADERS', 'DAJIJIN_REDUCTION', 'SECTOR_YEAR_FLOW'],  /* 📋 2026-10-21：+盘前预案（观测类首卡）；🏛️ 2026-10-21：+国家队活跃度（第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（生产者/渲染/派发/workflow/数据 同批清理，见 git 历史）；🔴 2026-10-19：FIRST_BOARD_ALERT 随卡迁入选股策略；🏔 2026-10-20：SECTOR_YEAR_FLOW 随卡迁「暂未上架」 */
     '运维': ['INST_TRADE', 'DO_NOT_DELETE'],
     '全量数据': ['NT_DATA', 'all_AUDIT_TRAIL', 'all_BACKTEST_COMPREHENSIVE', 'all_BACKTEST_TDX', 'all_CANDIDATE_BACKTEST', 'all_CANDIDATE_QUOTES', 'all_CAPITAL_FLOW_DATA', 'all_CITIC_PE_BACKTEST', 'all_CONCEPT_ETF_MAP', 'all_EXPERIMENT', 'all_FACTOR_AUDIT', 'all_FACTOR_LAB_BACKTEST', 'all_FACTOR_PROGRESS', 'all_FACTOR_WALKFORWARD', 'all_FINAL_RECOMMEND_DATA', 'all_FRESHNESS_STATUS', 'all_FUNDAMENTAL_QUALITY', 'all_GOLD_POOL_BACKTEST', 'all_HB_ALIMI', 'all_HB_XIAOJIU', 'all_HEALTH_CHECK', 'all_INDEX_HISTORY', 'all_LHB_HISTORY', 'all_LIMIT_UP_BROKEN', 'all_MACRO_BRIEF', 'all_MARKET_THERMO', 'all_NORTH_FUND', 'all_OPTIMIZED_STRATEGY', 'all_PORTFOLIO', 'all_RISK_GAUGE', 'all_RUNNER_STATUS', 'all_RUNNER_STATUS_HEALTH', 'all_SECTOR_CYCLE_ARCHIVE', 'all_SECTOR_FUND_FLOW_INTRADAY', 'all_SECTOR_FUND_FLOW_TREND', 'all_SECTOR_PHASE_HISTORY', 'all_SECTOR_RS', 'all_SENTIMENT_CYCLE', 'all_SH_SZ_HISTORY', 'all_STOCK_LIST', 'all_SUSPENSION_ALERT', 'all_SZ_FIB', 'all_US_HK_MAP', 'all_V8_POOL_TRACKER', 'all_VALUATION_PERCENTILE', 'all_WEEKEND_META_REPORT', 'all_WEEKEND_RUN'],  /* 🔴 2026-10-11：all_CRDS_BACKTEST/all_TRIPLE_TRACK 随两策略下架移除 */
     '管线': ['raw_etf_pulse.json', 'raw_capital_flow_data.json', 'raw_index_quotes.json', 'raw_crisis_data.json', 'raw_concept_ranking.json', 'raw_volume', 'site_sync', 'runner_local', 'runner_github', 'runner'],
@@ -12795,7 +12793,9 @@ function drawUpDownChart(){
       $t.textContent='—';
       return;
     }
-    $t.textContent=(data.data_date||'')+(data.partial?' · 真实累计(覆盖区间·接口受限)':' · '+data.year+'年累计');
+    /* 🔄 2026-10-23 主人令：更新行统一全站 _uBadge 胶囊版式（同盘前预案卡）；口径说明降为胶囊后缀小字 */
+    if(window.setBadge) setBadge('sectorYearFlowTime','auto','',data.update_time||data.data_date||'','观测类 · 盘后口径（自建累积表'+(data.partial?'·接口受限':'')+'）');
+    else $t.textContent=(data.data_date||'')+(data.partial?' · 真实累计(覆盖区间·接口受限)':' · '+data.year+'年累计');
     var _fmt=function(v){ if(v==null) return '—'; return (v>0?'+':'')+Number(v).toFixed(1)+'亿'; };
     var _col=function(v){ return v==null?'var(--dim)':(v>=0?'var(--up)':'var(--down)'); };
     var _chip=function(v){
@@ -15746,8 +15746,10 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         }
         h += '</div></div>';
         body.innerHTML = h;
-        var _fr = document.getElementById('morningPlanFresh');
-        if(_fr) _fr.textContent = '已更新 ' + _e((D.update_time||'').slice(5,16));
+        /* 🔄 2026-10-23 主人令：更新行统一全站 _uBadge 胶囊版式（🦊 更新于 <时间> <档位> · <档位>档数据，盘中不刷新，
+           同「昨日盘后短线」参考卡）；原「已更新 + 观测类·派发」静态字样退役，派发信息降为胶囊后缀小字不丢失。 */
+        if(window.setBadge) setBadge('morningPlanFresh','auto','',D.update_time,'观测类 · 工作日 07:50 派发');
+        else { var _fr = document.getElementById('morningPlanFresh'); if(_fr) _fr.textContent = '已更新 ' + _e((D.update_time||'').slice(5,16)); }
         card.style.display = 'block';
       }catch(e){ console.warn('[renderMorningPlan]', e); }
     };
@@ -15805,102 +15807,11 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
              + '<span style="font-size:11.5px;color:var(--dim);flex:1;">' + _e(s.detail) + '</span></div>';
         }
         body.innerHTML = h;
-        var _fr = document.getElementById('nationalTeamFresh');
-        if(_fr) _fr.textContent = '已更新 ' + _e((D.update_time||'').slice(5,16));
+        /* 🔄 2026-10-23 主人令：更新行统一全站 _uBadge 胶囊版式（同盘前预案卡）；派发信息降为胶囊后缀小字 */
+        if(window.setBadge) setBadge('nationalTeamFresh','auto','',D.update_time,'观测类 · 工作日 20:50 派发 · 代理推算非官方持仓');
+        else { var _fr = document.getElementById('nationalTeamFresh'); if(_fr) _fr.textContent = '已更新 ' + _e((D.update_time||'').slice(5,16)); }
         card.style.display = 'block';
       }catch(e){ console.warn('[renderNationalTeam]', e); }
-    };
-
-    // ═══ 🧮 2026-10-21 主人令：「算法记分卡」（暂未上架·国家队活跃度之后）═══
-    //   数据 window.ALGO_SCORECARD（data/ALGO_SCORECARD.js ← v8/gen_algo_scorecard.py，
-    //   聚合 raw_data/backtest_all_algos.json 全链回测·真实信号流口径）。
-    //   诚实闸门（沿用回测链）：样本≥30 才进榜；样本<30 只列观察名单；未知留白绝不用 0 冒充；
-    //   研究型（因子分层）不与交易型同列排名。无数据 ⇒ 整卡 display:none（不产空壳卡）。
-    window.__renderAlgoScorecard = function(){
-      try{
-        var card = document.getElementById('algoScorecardCard');
-        var body = document.getElementById('algoScorecardBody');
-        if(!card || !body) return;
-        var D = window.ALGO_SCORECARD;
-        if(!D || !(D.ranked || D.watch)){
-          if(!window.__ascRetryTimer){
-            window.__ascRetryN = 0;
-            window.__ascRetryTimer = setInterval(function(){
-              window.__ascRetryN++;
-              if(window.ALGO_SCORECARD && (window.ALGO_SCORECARD.ranked || window.ALGO_SCORECARD.watch)){
-                clearInterval(window.__ascRetryTimer); window.__ascRetryTimer = null; window.__ascRetryN = 0;
-                try{ window.__renderAlgoScorecard(); }catch(e){}
-              } else if(window.__ascRetryN >= 30){ clearInterval(window.__ascRetryTimer); window.__ascRetryTimer = null; }
-            }, 600);
-          }
-          return;
-        }
-        function _e(s){ return (s===null||s===undefined||s==='') ? '—' : s; }
-        function _fv(v,nd,suf){ return (v===null||v===undefined) ? '—' : (Number(v).toFixed(nd===undefined?2:nd) + (suf||'')); }
-        function _pc(v){ return (v===null||v===undefined) ? 'var(--txt)' : (v>0 ? '#ef5350' : (v<0 ? '#26a69a' : 'var(--txt)')); }
-        var G = D.gates || {};
-        function _gateBadge(g){
-          if(g === 'demote_candidate') return ' <span title="跌破闸门·降级候选：拖后腿信号，观察期后自动裁决去留/下架" style="font-size:10px;color:#fbbf24;font-weight:700;">🔴降级候选</span>';
-          if(g === 'incubate') return ' <span title="样本不足·孵化观察：只观测不评级" style="font-size:10px;color:var(--dim);">🟡孵化</span>';
-          if(g === 'admit') return ' <span title="过准入·正常参与" style="font-size:10px;color:#26a69a;font-weight:700;">🟢准入</span>';
-          return '';
-        }
-        var h = '';
-        /* ── 头部徽章行（数据日 + 已更新；对齐盘前预案范式·09-23 防假新鲜口径） ── */
-        h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
-        h += '<span style="font-size:10px;color:#f59e0b;font-weight:600;background:rgba(245,158,11,.14);padding:1px 7px;border-radius:4px;">试运行</span>';
-        h += '<span style="font-size:11.5px;color:var(--dim);">📅 数据日 '+_e(D.data_date||'—')+' · 已更新 '+_e(D.update_time||'—')+'</span>';
-        h += '</div>';
-        // 🎯💡⚠ 核心结论/用法/限制 —— 置卡名下方（2026-10-21 主人定式，同国家队活跃度卡）
-        h += '<div style="font-size:12px;color:var(--sub);line-height:1.85;margin:2px 0 10px;padding:8px 10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">'
-           + '<div style="margin-bottom:4px;"><b style="color:#fbbf24;">&#x1F4CC; 核心：</b><b style="color:var(--txt);">' + _e(D.oneline) + '</b></div>'
-           + '<div style="margin-bottom:4px;"><b style="color:#fbbf24;">&#x1F4A1; 用法：</b>按真实胜率/均收/超额做算法去留裁决——记分长期垫底者降权或下架，头部者加权；观察名单（样本&lt;' + _e(G.min_samples||30) + '）只看不评。</div>'
-           + '<div><b style="color:#fbbf24;">&#x26A0; 限制：</b>' + _e(D.disclaimer) + '</div></div>';
-        // ── 主榜（样本≥30 交易型）──
-        var rk = D.ranked || [];
-        if(rk.length){
-          h += '<div style="display:flex;gap:6px;font-size:10.5px;color:var(--dim);padding:2px 0;border-bottom:1px solid var(--border);">'
-             + '<span style="flex:1.5;">算法</span><span style="width:52px;text-align:right;">持有</span><span style="width:52px;text-align:right;">样本</span>'
-             + '<span style="width:58px;text-align:right;">胜率%</span><span style="width:66px;text-align:right;">均收%</span>'
-             + '<span style="width:70px;text-align:right;">最大回撤%</span><span style="width:70px;text-align:right;">基准超额%</span></div>';
-          for(var i=0;i<rk.length;i++){
-            var x = rk[i];
-            var lowGate = (x.win_rate!==null && x.win_rate!==undefined && G.low_win_rate!=null && x.win_rate < G.low_win_rate)
-                       || (x.avg_return!==null && x.avg_return!==undefined && G.low_avg_return!=null && x.avg_return <= G.low_avg_return);
-            h += '<div style="display:flex;align-items:baseline;gap:6px;padding:7px 0;border-bottom:1px dashed var(--border);font-size:12px;flex-wrap:nowrap;">'
-               + '<span style="flex:1.5;min-width:0;"><b style="color:var(--txt);">' + _e(x.icon) + ' ' + _e(x.card) + '</b>' + _gateBadge(x.gate)
-               + (x.best_hold && x.best_hold !== x.hold ? '<span style="font-size:10px;color:var(--dim);"> 最佳' + _e(x.best_hold) + '</span>' : '')
-               + (!x.fresh ? '<span title="' + _e(x.status).replace(/"/g,'&quot;') + '" style="font-size:10px;color:var(--dim);">&#x26A0;&#xFE0F;</span>' : '')
-               + '</span>'
-               + '<span style="width:52px;text-align:right;color:var(--sub);">' + _e(x.hold) + '</span>'
-               + '<span style="width:52px;text-align:right;color:var(--sub);">' + _e(x.sample) + '</span>'
-               + '<span style="width:58px;text-align:right;font-weight:700;color:' + (lowGate ? '#fbbf24' : 'var(--txt)') + ';">' + _fv(x.win_rate,1) + (lowGate ? '&#x26A0;' : '') + '</span>'
-               + '<span style="width:66px;text-align:right;font-weight:700;color:' + _pc(x.avg_return) + ';">' + _fv(x.avg_return,2) + '</span>'
-               + '<span style="width:70px;text-align:right;color:' + _pc(x.max_drawdown) + ';">' + _fv(x.max_drawdown,2) + '</span>'
-               + '<span style="width:70px;text-align:right;color:' + _pc(x.excess) + ';">' + _fv(x.excess,2) + '</span></div>';
-          }
-        }
-        // ── 观察名单（样本不足，只看不评）──
-        var wt = D.watch || [];
-        if(wt.length){
-          h += '<div style="font-size:11px;color:var(--dim);line-height:1.8;margin-top:8px;">&#x1F440; 观察名单（样本&lt;' + _e(G.min_samples||30) + '，只观测不评级）：';
-          for(var j=0;j<wt.length;j++){
-            var w2 = wt[j];
-            h += '<b style="color:var(--sub);">' + _e(w2.card) + '</b>' + (w2.sample ? '(样本' + w2.sample + ')' : '(未就绪)') + _gateBadge(w2.gate);
-            if(j < wt.length-1) h += ' · ';
-          }
-          h += '</div>';
-        }
-        // ── 研究型（不与交易型同列）──
-        var rs = D.research || [];
-        for(var k=0;k<rs.length;k++){
-          h += '<div style="font-size:11px;color:var(--dim);line-height:1.8;">' + _e(rs[k].icon) + ' <b style="color:var(--sub);">' + _e(rs[k].card) + '</b>（研究型）：' + _e(rs[k].note) + '</div>';
-        }
-        body.innerHTML = h;
-        var _fr = document.getElementById('scorecardFresh');
-        if(_fr) _fr.textContent = '已更新 ' + _e((D.update_time||'').slice(5,16));
-        card.style.display = 'block';
-      }catch(e){ console.warn('[renderAlgoScorecard]', e); }
     };
 
     // 🏔 2026-10-20 主人令：板块年度主力净流入卡自「盘后数据」迁入「暂未上架」——
@@ -15956,7 +15867,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       // 2026-09-15：__renderAiInsightsCompare 已随卡迁往「🌍 观测平台 > 🌍 宏观观测」，
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderMorningPlan', '__renderNationalTeam', '__renderAlgoScorecard', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow'];   /* 📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🧮 2026-10-21：+算法记分卡（暂未上架第三卡）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
+      var names = ['__renderMorningPlan', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow'];   /* 📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
       var probe = document.getElementById('themeValueBody');
       if(probe) probe.setAttribute('data-ulpane', tab);
       var out = [];
@@ -16089,8 +16000,7 @@ h += '<div id="ulPaneObserve" style="display:block;">';
 h += '<div class="card" id="morningPlanCard" style="display:none;margin-bottom:16px;border-left:4px solid #38bdf8;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#38bdf8;">&#x1F4CB; 盘前预案</span>'
-   + '<span class="fresh" id="morningPlanFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 工作日 07:50 派发</span></div>'
+   + '<span id="morningPlanFresh" style="display:inline-flex;align-items:center;">&#x2014;</span></div>'
    + '<div id="morningPlanBody"><div class="note">加载中&#x2026;</div></div>'
    + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 全部条目由规则从真实数据自动生成，<b style="color:#fbbf24">非人工观点、不构成投资建议</b>。</div></div>';
 // ═══ 🏛️ 2026-10-21 主人令：「国家队活跃度」复合信号卡（暂未上架·盘前预案之后）═══
@@ -16100,18 +16010,8 @@ h += '<div class="card" id="morningPlanCard" style="display:none;margin-bottom:1
 h += '<div class="card" id="nationalTeamCard" style="display:none;margin-bottom:16px;border-left:4px solid #a78bfa;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#a78bfa;">&#x1F3DB;&#xFE0F; 国家队活跃度</span>'
-   + '<span class="fresh" id="nationalTeamFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 工作日 20:50 派发 &#183; 代理推算非官方持仓</span></div>'
+   + '<span id="nationalTeamFresh" style="display:inline-flex;align-items:center;">&#x2014;</span></div>'
    + '<div id="nationalTeamBody"><div class="note">加载中&#x2026;</div></div></div>';
-// ═══ 🧮 2026-10-21 主人令：「算法记分卡」（暂未上架·国家队活跃度之后）═══
-//   数据 window.ALGO_SCORECARD（data/ALGO_SCORECARD.js ← v8/gen_algo_scorecard.py，工作日 08:25 盘前派发）。
-//   全链回测·真实信号流口径聚合；样本≥30 进榜、<30 观察名单、研究型单独区；填充见 window.__renderAlgoScorecard。
-h += '<div class="card" id="algoScorecardCard" style="display:none;margin-bottom:16px;border-left:4px solid #f59e0b;">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
-   + '<span style="font-size:15px;font-weight:700;color:#f59e0b;">&#x1F9EE; 算法记分卡</span>'
-   + '<span class="fresh" id="scorecardFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 工作日 08:25 派发 &#183; 回测链日更 &#183; 真实信号流口径</span></div>'
-   + '<div id="algoScorecardBody"><div class="note">加载中&#x2026;</div></div></div>';
 // 🚀 2026-09-18 主人令：主升/启动 板块·龙头股 独立卡（观测类首卡，置于「概念/行业 → ETF·龙头 参考」卡上方）
 //   数据 window.SECTOR_LEADERS（data/SECTOR_LEADERS.js，scripts/fetch_sector_leaders.py 盘后生成）。
 //   无数据 ⇒ 整卡保持 display:none（不产出空壳卡）。
@@ -16227,8 +16127,7 @@ h += '<div class="card" id="dajijinCard" style="display:none;margin-bottom:16px;
   h += '<div class="card" id="sectorYearFlowCard" style="display:none;margin-bottom:16px;border-left:4px solid #f97316;">'
      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
      + '<span style="font-size:15px;font-weight:700;color:#f97316;">&#x1F3D4; 板块年度主力净流入</span>'
-     + '<span class="fresh" id="sectorYearFlowTime">&#x2014;</span>'
-     + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 盘后口径（自建累积表）</span></div>'
+     + '<span id="sectorYearFlowTime" style="display:inline-flex;align-items:center;">&#x2014;</span></div>'
      + '<div id="sectorYearFlowBody"><div class="note">加载中&#x2026;</div></div></div>';
 h += '</div>'; // /ulPaneObserve
 

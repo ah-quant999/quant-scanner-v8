@@ -4,10 +4,10 @@ v8/algo_gate_thresholds.py —— 算法「准入 + 降级」双向闸门阈值�
 
 🔴 设计目的（主人 2026-10-21 令）：
    确保进入 v8 选股策略的是「有正超额、非拖后腿」的因子/算法，而非噪声或伪增量。
-   本文件被以下三处共享引用，杜绝口径打架：
+   本文件被以下两处共享引用，杜绝口径打架：
      - algorithms/gen_backtest_all_algos.py  （回测链：产出 row.admit_eligible + delist_advice）
-     - v8/gen_algo_scorecard.py              （记分卡：gate 状态机 + 前端展示）
      - scripts/v8_delist_advice.py           （下架建议邮件触达）
+   （🗑 2026-10-23 主人令：第三消费方「算法记分卡」v8/gen_algo_scorecard.py 整卡退役，本文件不受影响、继续服务回测闸门。）
 
 🟢 准入闸门（研究区 → 交易区，新因子/算法进策略前的硬校验，缺一不可）：
     ADMIT_MIN_SAMPLES     累积样本 ≥ 30
