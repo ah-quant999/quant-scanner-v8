@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-10-22 11:09:20
+// 最后更新：2026-10-22 11:26:36
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-10-22 11:09:20",
+  "update_time": "2026-10-22 11:26:36",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -169,7 +169,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 21,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 298,
+      "total": 301,
       "ongoing": true
     },
     {
@@ -182,7 +182,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 18,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 101,
+      "total": 102,
       "ongoing": true
     },
     {
@@ -234,7 +234,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 5,
       "peak": 9,
       "peak_date": "10/19",
-      "total": 27,
+      "total": 28,
       "ongoing": true
     },
     {
