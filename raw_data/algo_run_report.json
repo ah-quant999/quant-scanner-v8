@@ -1,24 +1,12 @@
 {
-  "update_time": "2026-10-23 02:49:16",
-  "run_start": "2026-10-23 02:14:20",
-  "ok": 18,
-  "fail": 4,
+  "update_time": "2026-10-23 03:28:47",
+  "run_start": "2026-10-23 02:57:41",
+  "ok": 21,
+  "fail": 1,
   "failed_scripts": [
     {
       "script": "algorithms/refresh_kline_freshness.py",
       "reason": "脚本文件缺失"
-    },
-    {
-      "script": "gen_lqsq_top5.py",
-      "reason": "退出码 1 | 数据日 2026-10-22 对齐率不足（500/5160= 10% < 60%）——kline_cache 新鲜度异常，保护性中止（末根分布 top5: 2026-09-16:603, 2026-09-07:559, 2026-10-22:500, 2026-09-08:453, 2026-09-21:394）"
-    },
-    {
-      "script": "strategy_lowvol_trend.py",
-      "reason": "退出码 1 | 无任何交易日对齐率 ≥60%（最大 15%）——缓存新鲜度异常"
-    },
-    {
-      "script": "strategy_intraday_momentum.py",
-      "reason": "退出码 1 | 无任何交易日对齐率 ≥60%——缓存新鲜度异常"
     }
   ],
   "skipped_by_time_gate": []
