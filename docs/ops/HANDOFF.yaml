@@ -34,8 +34,30 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 163
+  next_id_seq: 164
 items:
+  - id: backtest-bench-attach-fix-1022
+    owner: 小九的工程师
+    priority: P2
+    status: done
+    created: 2026-10-22
+    title: 策略回测页基准超额挂接修复（by_period 真实信号流口径）
+    note: >
+      根因：gen_backtest_all_algos.py 的 parse_by_period（量质双擎/低波趋势/日内动量）
+      与 build() 的 _src_range 只读 summary.signal_date_range，但 LQSQ 等源把该字段放
+      顶层 ⇒ extra.signal_date_range 恒为 null ⇒ _attach_bench 全挂不上基准（bench 列全空）。
+      修复：两处均改「summary 优先、缺则回落顶层」。tri_sub（缩量/板块/龙虎机构）本读顶层无需改；
+      因子实验室豁免（研究口径不挂基准）。影响：下次云端 E 批聚合器即按真实信号区间∩基准覆盖区
+      补 bench_avg_return；日内动量/板块共振此前样本=0 系聚合器 06:40 早于当天 15-16 点信号
+      生成器刷新（陈旧快照），源与逻辑正常，夜间 E 批自动补齐。
+    verify_how: >
+      实时核验：origin/main 已含 2 处 fallback（md5=26fd98789ed9 逐字节一致）；
+      单元复现 LQSQ 式对象经 parse_by_period+_attach_bench，4 档全挂上 bench_avg_return(0.12,13天)，
+      且 summary 无顶层 range 的控制组仍兼容；GitHub API 比对线上基线=期望基线无覆盖风险。
+    verified_at: "2026-10-22 20:30"
+    updated: "2026-10-22 20:30"
+    updated_by: 小九的工程师
+
   - id: backtest-ownsignal-ironrule-1022
     owner: 小九的工程师
     priority: P1
