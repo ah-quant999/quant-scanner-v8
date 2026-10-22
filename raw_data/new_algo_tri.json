@@ -1,7 +1,7 @@
 {
- "update_time": "2026-10-22 20:37:29",
+ "update_time": "2026-10-23 01:01:21",
  "vcp": {
-  "scanned": 2237,
+  "scanned": 4436,
   "items": [
    {
     "code": "002244",
@@ -16,6 +16,20 @@
     "score": 99.2,
     "date": "2026-10-22",
     "name": "滨江集团"
+   },
+   {
+    "code": "605100",
+    "close": 37.65,
+    "pullback_pct": 8.4,
+    "vol_shrink": 0.25,
+    "amp_shrink": 0.63,
+    "contractions": 2,
+    "ma20_dist": 2.1,
+    "pct20d": 10.5,
+    "trigger": 39.56,
+    "score": 98.7,
+    "date": "2026-10-22",
+    "name": "华丰股份"
    }
   ]
  },
@@ -29,11 +43,11 @@
     "consecutive_days": 9,
     "net_5d": 0,
     "net_20d": 0,
-    "rs_5d": -3.24,
-    "rs_20d": -3.13,
-    "rs_60d": -7.12,
+    "rs_5d": -4.64,
+    "rs_20d": -5.04,
+    "rs_60d": -7.29,
     "heat_5d": 0,
-    "score": 44.6,
+    "score": 41.5,
     "leaders": [
      {
       "name": "华鑫股份",
@@ -60,11 +74,11 @@
     "consecutive_days": 5,
     "net_5d": -4.0,
     "net_20d": -103.5,
-    "rs_5d": -2.07,
-    "rs_20d": -8.42,
-    "rs_60d": -8.64,
+    "rs_5d": -3.03,
+    "rs_20d": -8.8,
+    "rs_60d": -11.62,
     "heat_5d": 0,
-    "score": 27.7,
+    "score": 26.1,
     "leaders": [
      {
       "name": "中国人寿",
@@ -91,11 +105,11 @@
     "consecutive_days": 3,
     "net_5d": -3.59,
     "net_20d": -9.7,
-    "rs_5d": -1.16,
-    "rs_20d": 0.09,
-    "rs_60d": 5.06,
+    "rs_5d": -1.39,
+    "rs_20d": -2.89,
+    "rs_60d": 3.53,
     "heat_5d": 0,
-    "score": 25.3,
+    "score": 23.5,
     "leaders": [
      {
       "name": "华强科技",
@@ -122,11 +136,11 @@
     "consecutive_days": 1,
     "net_5d": -5.34,
     "net_20d": 176.41,
-    "rs_5d": -0.95,
-    "rs_20d": -0.22,
-    "rs_60d": 6.19,
+    "rs_5d": -0.73,
+    "rs_20d": -0.32,
+    "rs_60d": 4.53,
     "heat_5d": 0,
-    "score": 17.5,
+    "score": 17.7,
     "leaders": [
      {
       "name": "工商银行",
@@ -153,11 +167,11 @@
     "consecutive_days": 1,
     "net_5d": -3.52,
     "net_20d": -93.21,
-    "rs_5d": -2.51,
-    "rs_20d": -4.45,
-    "rs_60d": 2.77,
+    "rs_5d": -1.7,
+    "rs_20d": -8.06,
+    "rs_60d": 2.29,
     "heat_5d": 0,
-    "score": 13.0,
+    "score": 12.4,
     "leaders": [
      {
       "name": "美的集团",
@@ -184,11 +198,11 @@
     "consecutive_days": 1,
     "net_5d": -92.36,
     "net_20d": -859.67,
-    "rs_5d": -6.65,
-    "rs_20d": -7.47,
-    "rs_60d": -3.86,
+    "rs_5d": -7.62,
+    "rs_20d": -11.45,
+    "rs_60d": -3.93,
     "heat_5d": 0,
-    "score": 5.3,
+    "score": 4.0,
     "leaders": [
      {
       "name": "盟固利",
