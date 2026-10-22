@@ -1,10 +1,14 @@
 {
-"update_time": "2026-10-22 06:43:49",
+"update_time": "2026-10-22 08:57:20",
 "total": 8036,
-"new_listings_count": 0,
-"delisted_count": 0,
-"new_listings": [],
-"delisted": [],
+"new_listings_count": 1,
+"delisted_count": 1,
+"new_listings": [
+"301718 通则康威"
+],
+"delisted": [
+"02925 金泰能源控股－旧"
+],
 "meta_enriched": 0,
 "guard_tripped": false,
 "guard_reasons": [],
