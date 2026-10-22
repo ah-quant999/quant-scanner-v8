@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-10-22 12:11:03",
+  "check_time": "2026-10-22 13:11:56",
   "last_trade_close": "2026-10-21 15:30:00",
   "is_trading_day": true,
   "core_stale": [],
@@ -77,6 +77,7 @@
     "MARKET_REGIME": "post_close",
     "SECTOR_RECOMMENDATION": "post_close",
     "FINAL_RECOMMEND_DATA": "post_close",
+    "FINAL_RECOMMEND_HISTORY": "post_close",
     "RESTRICTED_RELEASE": "premarket,post_close",
     "PERFORMANCE_FORECAST": "premarket,post_close",
     "US_HK_MAP": "premarket,intraday,post_close"
