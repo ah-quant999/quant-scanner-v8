@@ -254,15 +254,7 @@ READY_SPEC: dict[str, dict] = {
             #   data 文件已删、CARD_DEFS 监控已摘除 ⇒ 留在清单=恒陈旧。
             # "data/FOUR_VOLUME_HISTORY.js",
             # "data/FOUR_VOLUME_TRACK.js",
-            # 🛡 2026-10-16 阿狸咪的工程师（LQSQ 发布链断裂根因修复配套·双盲区 I-1 不变式）：
-            #   gen_lqsq_top5.py（STAGES["B"]）产 raw_data/lqsq_track.json → update_v8 映射
-            #   （本日补登记 lqsq_track.json→LQSQ_TRACK）→ data/LQSQ_TRACK.js；
-            #   v8_health_check.py CARD_DEFS 同日补登记 LQSQ_TRACK（picking=True）
-            #   ⇒ 依 I-1 不变式必须进本闸门，否则该卡陈旧不阻塞就绪 = 闸门空转盲区
-            #   （与 09-18 四量两产物同型，本轮由 guard_double_blind.py 机器发现）。
-            #   ✅ 可达性：与四量同批同源（B 批盘后算法链直出，CATEGORY_MAP=post_close）。
-            #   ✅ 不变式：已同步纳入 dedup_fetch_manifest.py::_ALWAYS_PUSH（见该文件）。
-            "data/LQSQ_TRACK.js",
+            # 🗑 2026-10-23 主人令：LQSQ_TRACK（量质双擎跟踪）随量质双擎整支下架删除，data/LQSQ_TRACK.js 已清除 ⇒ 本闸门 READY_SPEC["B"].items 对应项一并移除（B 批选股产物项 8→7，仍 ≥ need 阈值）。
             # 🛡 2026-10-18 阿狸咪的工程师（四量下架配套·B 批核心选股项补入）：data/TOP10_DAILY.js。
             #   继任理由：四量终极下架后，B 批选股产物核心卡即 TOP10（多维共振精选）与
             #   LQSQ（量质双擎）；TOP10 是 B 批第一个选股脚本（generate_top10.py，STAGES["B"]），

@@ -197,15 +197,7 @@ CARD_DEFS = [
     # {"id": "FOUR_VOLUME_60M", "name": "四量终极60m", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
     # 🔴 2026-10-18 主人令「完全下架」：ALGO_TRACK 唯一信号源四量已下架、gen_algo_track 同批摘链删除。
     # {"id": "ALGO_TRACK", "name": "算法追踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
-    {"id": "LQSQ_BACKTEST", "name": "量质双擎回测", "page": "选股策略", "freq": "每日回测批(B批 factor_lab 紧后)", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🚀 2026-10-11 主人令：第一支自研算法（gen_lqsq_top30.py），真实信号流口径上主榜，与四量同榜同纪律。
-    {"id": "LOWVOL_TREND_BACKTEST", "name": "低波趋势回测", "page": "选股策略", "freq": "每日回测批(B批 gen_lqsq 紧后)", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🚀 2026-10-18 主人令：第二支自研算法（strategy_lowvol_trend.py），真实信号流主榜。
-    {"id": "INTRADAY_MOMENTUM_BACKTEST", "name": "日内动量回测", "page": "选股策略", "freq": "每日回测批(B批 lowvol 紧后)", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🚀 2026-10-18 夜 主人令：第三支自研算法（strategy_intraday_momentum.py），真实信号流主榜。
-    # 🛡 2026-10-16 阿狸咪的工程师（一劳永逸根因修复）：补登记 LQSQ_TRACK。
-    #   根因（实测）：该卡 10-12 接入起未入 CARD_DEFS ⇒ 落入 all_* 全量数据宽松桶——
-    #   10-15 发布链断裂（update_v8 零映射）致 js 冻结 27h，HEALTH_CHECK 里 age_min=1101
-    #   仍判 ok（宽松桶不报）。与本行上方 LQSQ_BACKTEST 同族不同命，现与 FOUR_VOLUME_TRACK
-    #   同构登记（选股类 picking：按 data_date 交易日判鲜 + 18:00 派发门控）。
-    {"id": "LQSQ_TRACK", "name": "量质双擎跟踪", "page": "选股策略", "freq": "收盘后(算法链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "picking": True},
+    # 🗑 2026-10-23 主人令：量质双擎(LQSQ)/低波趋稳/日内动量 3 支自研算法（含 *_BACKTEST 与 LQSQ_TRACK 跟踪卡）经真实信号流回测确认不达标，整支下架删除；对应 data/LQSQ_*.js / LOWVOL_TREND_BACKTEST.js / INTRADAY_MOMENTUM_BACKTEST.js / LQSQ_TRACK.js 已随删除提交清除 ⇒ 此 4 条 CARD_DEFS 监控条目一并摘除，避免对不存在的数据持续误报。
 
     # 🔴 2026-09-12 主人令（拍板第 2 项·一劳永逸）：BACKTEST_ALL_ALGOS 正式登记。
     #   根因（实测）：algorithms/gen_backtest_all_algos.py 已挂 STAGES["E"]（ORDER 47/48），

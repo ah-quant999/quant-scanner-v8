@@ -104,6 +104,8 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     # 🆕 2026-09-11：全算法回测汇总——纯本地读 data/*.js + raw_data/algo_track.json，零网络
     "gen_market_bench.py": 900,   # 🆕 2026-09-17：3120 只×250 根纯本地计算（交接单口径 timeout 900s）
     "gen_backtest_all_algos.py": 900,
+    # 🚀 2026-10-22 主人令「上」：资金异动三因子（第四支自研算法）每日生成器（复用 factor_walkforward 引擎零第二口径：读全 _wf_cache 宇宙 → 最新一日截面三因子降序秩和 → Top10 → ff3_ranksum_history 真实流归档 + FF3_RANKSUM_BACKTEST 主榜；上线首日即建归档）。~80s，给 900s 预算。🔴 与 ORDER/STAGES 三处字符串逐字一致
+    "gen_ff3_ranksum.py": 900,
     # 🆕 2026-09-15 主人令（四量终极「自己的一整套系统」）：两个脚本均为**纯本地计算**——
     #   history 读 data/FOUR_VOLUME.js + raw_data/stock_quote.json（全市场快照，一次载入、
     #   按 code 建索引，不逐只网络请求）；track 读账本 + 本地 json，零网络。
@@ -197,6 +199,7 @@ ORDER = [
     # 🔴 2026-10-11 主人令「完全下架」：calc_crds.py 已摘链（逆势龙头真实池回测全档败，见预算表处注释）。
     # "calc_crds.py",
     "algorithms/refresh_kline_freshness.py",  # → 修 raw_data/_wf_cache 日K陈旧（不产 raw 产物，纯本地缓存修复）# 🆕 2026-10-22 K 线缓存新鲜度修复（ff3 对拍 ima 根因）：get_klines() 命中缓存即 return ⇒ 缓存永不更新，实测全池 4518 只里 10-13 后有日线的仅 394 只 ⇒ 下游因子算法在物理上选不出当日票。串行限速抓取（规避新浪 501 限流），只补陈旧票、增量幂等。
+    "gen_ff3_ranksum.py",    # 🚀 2026-10-22 主人令「上」：资金异动三因子每日生成器（factor_walkforward 引擎零第二口径：turntrend/amt60/ivol60 三因子降序秩和选 Top10 → ff3_ranksum_history 真实流归档 + FF3_RANKSUM_BACKTEST 主榜；上线首日即建归档）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
     "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（B批最前：final_recommend 前必产完，因子融合用当日新鲜因子；2026-09-09 主人令由 E 前置至此）
     # 🔴🔴 2026-10-23 主人令（P0-b）时序倒挂第二处根治：backtest_expectancy 从 B批尾/ORDER-D批前 再前移到
     #   generate_top10 之前。旧序 generate_top10(先) → backtest_expectancy(后) ⇒ 因子榜信号边权
@@ -400,6 +403,7 @@ STAGES = {
         # 🛡 2026-09-09 主人令：因子实验室生成器前置到 B 批最前——必须在 final_recommend(D批20:00) 之前产完，
         #   否则「为更好选股」的因子融合只能吃昨日陈旧数据。生成器 50-90min baostock 冷启动，18:10 起跑→19:40 前产完，D 批必吃到当日新鲜因子。
         "algorithms/refresh_kline_freshness.py",  # → 修 raw_data/_wf_cache 日K陈旧（与 ORDER 成对）# 🆕 2026-10-22 K 线缓存新鲜度修复（ff3 对拍 ima 根因）：get_klines() 命中缓存即 return ⇒ 缓存永不更新，实测全池 4518 只里 10-13 后有日线的仅 394 只 ⇒ 下游因子算法在物理上选不出当日票。串行限速抓取（规避新浪 501 限流），只补陈旧票、增量幂等。
+        "gen_ff3_ranksum.py",    # 🚀 2026-10-22 主人令「上」：资金异动三因子每日生成器（factor_walkforward 引擎零第二口径：turntrend/amt60/ivol60 三因子降序秩和选 Top10 → ff3_ranksum_history 真实流归档 + FF3_RANKSUM_BACKTEST 主榜；上线首日即建归档）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
         "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js + raw_data/factor_lab.json（baostock，冷启动长）
         "backtest_expectancy.py",          # 🔴 2026-10-23 主人令（P0-b）：再前移至 generate_top10 之前（与 ORDER 成对），选股吃当日最新 edge
         "build_candidate_pool.py", "gen_stock_winrate.py", "generate_top10.py",  # 🔴 2026-10-23 主人令·嵌入因子榜：gen_stock_winrate 须在 generate_top10 之前（与 ORDER 成对）

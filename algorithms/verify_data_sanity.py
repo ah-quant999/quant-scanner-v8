@@ -80,7 +80,7 @@ EXPECT_FILES = {
     "MORNING_PLAN.js",        # window.MORNING_PLAN（盘前预案卡）
     "INDEX_QUOTES.js",        # window.INDEX_QUOTES（指数行情快照）
     "FACTOR_LAB.js",          # window.FACTOR_LAB（因子实验室）
-    "NEW_ALGO_TRI.js",        # window.NEW_ALGO_TRI（新算法试跑）
+    # 🗑 2026-10-23 主人令：NEW_ALGO_TRI（三新算法共用产物）随三新算法整支下架删除，data/NEW_ALGO_TRI.js 已清除 ⇒ 移除此 sanity 校验项
     "BACKTEST_ALL_ALGOS.js",  # window.BACKTEST_ALL_ALGOS（全算法回测）
     "CITIC_PE_THERMO.js",     # window.CITIC_PE_THERMO（中信 PE 温度计）
     "ETF_NET_SUBSCRIPTION.js",# window.ETF_NET_SUBSCRIPTION（ETF 净申赎，东方财富口径代表）
