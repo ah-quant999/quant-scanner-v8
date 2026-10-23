@@ -212,6 +212,12 @@ ORDER = [
     "strategy_lowvol_trend.py",   # 🚀 2026-10-18 主人令：低波趋势每日生成器（60日波动率最低 Top5 ∧ 收盘>MA60 → lowvol_trend_history 真实流归档 + LOWVOL_TREND_BACKTEST 主榜；上线首日即建归档；2026-10-19 审计修正注释 Top10→Top5，代码 TOP_K=5）。挂 gen_lqsq 紧后复用其 kline_cache_ext 刷新（禁第二套拉数）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
     "strategy_intraday_momentum.py", # 🚀 2026-10-18 主人令：日内动量每日生成器（近20日日内累计收益最高 Top5 ∧ 收盘>MA60 → intraday_momentum_history 真实流归档 + INTRADAY_MOMENTUM_BACKTEST 主榜；2026-10-19 审计修正注释 Top10→Top5，代码 TOP_K=5）。挂 strategy_lowvol_trend 紧后复用同一 ext 刷新。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
     "gen_ff3_ranksum.py",    # 🚀 2026-10-22 主人令「上」：资金异动三因子每日生成器（factor_walkforward 引擎零第二口径：turntrend/amt60/ivol60 三因子降序秩和选 Top10 → ff3_ranksum_history 真实流归档 + FF3_RANKSUM_BACKTEST 主榜；上线首日即建归档）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
+    # 🔴🔴 2026-10-23 主人令（P0-b）时序倒挂第二处根治：backtest_expectancy 从 B批尾/ORDER-D批前 再前移到
+    #   generate_top10 之前。旧序 generate_top10(先) → backtest_expectancy(后) ⇒ 因子榜信号边权
+    #   与 BT_BY_SIGNAL 永远吃 T-1 edge（代码自认，见原 09-22 注释）；前移后选股必吃当日
+    #   （含今日收盘已到期 T+5 结果的）最新 edge。它只读 raw_data/history/top10_daily_*.json
+    #   归档 + kline_cache，不依赖 generate_top10 当日产物（当日账本明日自然入档，无损失）。
+    "backtest_expectancy.py",          # → raw_data/backtest_expectancy.json（四信号 edge；generate_top10 与 D批 final_recommend 双消费者，都必须在其后）
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "gen_stock_winrate.py",            # 🔴 2026-10-23 主人令·嵌入因子榜：读 raw_data/history 真实信号流 + kline_cache 复算个股历史胜率/期望 → data/STOCK_WINRATE.js（generate_top10 嵌入因子用）；须在 generate_top10 之前（与 STAGES["B"] 成对）
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
@@ -294,7 +300,6 @@ ORDER = [
     #   其唯一消费者 final_recommend（D批）之前。原 ORDER 把它排在 final_recommend 之后、STAGES 挂 E 批(21:00)
     #   ⇒ final_recommend 永远读到 T-1 edge（根 run_algorithms.py 的修复版从未移植到本生产真身，修复永不生效）。
     #   现前置到此（ORDER 内 生产<消费）+ STAGES 迁 B 批尾（见 STAGES["B"]），D批(20:00) 必吃当日 edge。
-    "backtest_expectancy.py",         # → raw_data/backtest_expectancy.json（四信号 edge，final_recommend 消费，须在 D批前产完）
     "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top5，管线最终产物，置于末尾）
     #   前端策略回顾卡长期为空/陈旧）。统一挂链尾（依赖各自历史/截面数据已就位）。
     #   三者失败均不影响选股结果，仅自身卡片可能不刷新。
@@ -417,6 +422,7 @@ STAGES = {
         "strategy_lowvol_trend.py",   # → data/LOWVOL_TREND_BACKTEST.js + lowvol_trend_history（低波趋势，与 ORDER 成对）
         "strategy_intraday_momentum.py", # → data/INTRADAY_MOMENTUM_BACKTEST.js + intraday_momentum_history（日内动量，与 ORDER 成对）
         "gen_ff3_ranksum.py",      # → data/FF3_RANKSUM_BACKTEST.js + ff3_ranksum_history（资金异动三因子，与 ORDER 成对）
+        "backtest_expectancy.py",          # 🔴 2026-10-23 主人令（P0-b）：再前移至 generate_top10 之前（与 ORDER 成对），选股吃当日最新 edge
         "build_candidate_pool.py", "gen_stock_winrate.py", "generate_top10.py",  # 🔴 2026-10-23 主人令·嵌入因子榜：gen_stock_winrate 须在 generate_top10 之前（与 ORDER 成对）
         # 🔴 2026-10-18 主人令「完全下架」：四量终极选股两件套已摘链（与 ORDER 成对）。
         # "strategy_four_volume_60m.py", "strategy_four_volume.py",
@@ -455,10 +461,10 @@ STAGES = {
         "scripts/gen_factor_progress.py",           # → raw_data/factor_progress.json（读 factor_audit）
         "scripts/fetch_valuation_percentile.py",    # → raw_data/valuation_percentile.json（A股指数 PE 分位）
         "scripts/fetch_index_value_framework.py",   # → raw_data/index_value_framework.json（指数中枢+趋势门控）
-        # 🔴 2026-09-22 小九：backtest_expectancy 前移至 B 批尾（与 ORDER 前置修复配套）。
-        #   它读 B 批同批产出的 raw_data/top10_daily.json 逐日账本做 walk-forward，须等 B 批选股脚本写完；
-        #   落盘约 19:00 → D批(20:00) final_recommend 拿到当日 edge。env 注入见 SCRIPT_ENV("B", ...)。
-        "backtest_expectancy.py",          # → raw_data/backtest_expectancy.json（四信号 edge，D批消费者）
+        # 🔴 2026-10-23 主人令（P0-b）：backtest_expectancy 再前移到 B批内 generate_top10 之前
+        #   （与 ORDER 成对）。它只读 history 归档 + kline_cache，无需等选股脚本写完；
+        #   前移后 generate_top10 与 D批 final_recommend 都吃当日最新 edge。
+        #   env 注入见 SCRIPT_ENV("B", ...)。
     ],
     # 🛡 2026-09-04 主人令「策略全部数据出来→最终数据上线→然后才是回测」时序重排：
     #   原 C(回测 19:15) 在 D(final_recommend 20:00) 之前 → 回测汇总胶囊早于最终推荐，时序倒挂。

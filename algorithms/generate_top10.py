@@ -82,7 +82,7 @@ POOL_QUALITY_WEIGHT = 0.5
 #   backtest 头部内 IC 负但去除反而显著变差(t-2.06) → 不动(防过拟合)。
 # 回测：N4+I2 TOP5 前向 +0.23%/胜48.1%/t+0.43(唯一转正) vs 基线 -0.47%/46.7%/-0.92；
 #   TOP10 -0.37% vs 基线 -0.31%(差 0.06pp 不显著)。
-INST_WEIGHT = 2.0                     # IC 最强因子加权
+INST_WEIGHT = 3.0                     # 🔴 2026-10-23 主人令·P2：IC 最强因子(+0.116/ICIR0.435/IC>0 76.5%) 但原权重仅 2.3% → 按证据再平衡 ×3（回测 N4+I2 TOP5 唯一转正组合佐证）
 FORM_NEUT_SCALE = 4.0                 # form rank 中性化零中心幅度
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -95,6 +95,21 @@ FORM_NEUT_SCALE = 4.0                 # form rank 中性化零中心幅度
 #   又足以让"收益最高/胜率最高"的票在因子榜脱颖而出。无历史记录→0（中性，不惩罚无史可查的票）。
 WINRATE_WEIGHT = 1.0
 WINRATE_TERM_MAX = 20.0
+
+# ── 🔴 2026-10-23 主人令「收益最高+胜率最高做实」·P0-a 胜率 rank-fusion + P1 强制降级 ──
+#   P0-a：在 wr_term（绝对 winrate_score 加项）之外，再按【当日候选池内】胜率分横截面
+#   名次百分位做 rank-fusion 加项——两榜（因子分 vs 胜率名次）分歧时由胜率名次拉动排序，
+#   不再只靠 ±1 分 edge 微调。池内无胜率记录 → 中性 0.5（不加不减）。
+#   WR_FUSION_SPAN=15 raw（≈±11.5 分 @NORM_DIVISOR=130），与 wr_term(±20 raw) 同量级。
+#   回退：V8_WR_RANK_FUSION=0 关闭 fusion 加项（wr_term 不受影响）。
+WR_FUSION_SPAN = 15.0
+#   P1：因子分再高，只要个股历史 T+5 胜率 < WINRATE_DEMOTE_LINE%（样本 ≥ WINRATE_DEMOTE_MIN_N）
+#   就强制降级（扣 WINRATE_DEMOTE_RAW raw ≈ −23 分），并在产物标 winrate_demote=true；
+#   final_recommend 侧另有 Top3 硬闸（不因其他分高而回捞）。依据：佰维存储型事故
+#   （因子榜 Top1 但历史信号 T+5 胜率极低）。回退：V8_WR_DEMOTE=0 关闭。
+WINRATE_DEMOTE_LINE = 30.0
+WINRATE_DEMOTE_MIN_N = 3
+WINRATE_DEMOTE_RAW = 30.0
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -397,6 +412,10 @@ try:
 except Exception as _e:
     print(f"  ⚠️ 回测边缘权重加载失败，用硬编码默认: {_e}")
 SIGNAL_SCORE = {k: _signal_score_from_edge(v) for k, v in SIGNAL_EDGE.items()}
+# 🔴 2026-10-23 主人令（P0-b）：IS/OOS 异号信号弃用可见化（原 0.5 半权重 → 0 权重）
+_inact_sig = sorted(k for k, v in SIGNAL_CONSISTENT.items() if not v)
+if _inact_sig:
+    print(f"  ⚠️ IS/OOS 分段超额异号 ⇒ 信号弃用(0权重，原半权重): {_inact_sig}")
 
 def signal_confidence(name):
     """P1 证据置信度（0~1）：样本少或跨期不一致 → 收缩，避免薄证据主导排名。
@@ -420,6 +439,11 @@ def signal_confidence(name):
 
 def signal_edge_score(name, present):
     if not present:
+        return 0
+    # 🔴 2026-10-23 主人令（P0-b）：IS/OOS 分段超额异号 ⇒ 证据矛盾，**直接弃用（0 权重）**，
+    #   不再保留 0.5 下限半权重。先例：P4 lowvol「T5/T10 异号 → 自动弃用」（_p4_effective_edge）。
+    #   实证：sig_trend IS ex5=-1.520 / OOS ex5=+0.204 异号，旧口径仍占 -1 分 ⇒ 已按主人令清零。
+    if not SIGNAL_CONSISTENT.get(name, True):
         return 0
     return int(round(SIGNAL_SCORE.get(name, 0) * signal_confidence(name)))
 
@@ -1829,7 +1853,7 @@ def main():
                 continue
 
         # ── 原始总分（各维度绝对加分之和）──
-        # 🔴 2026-10-01 C 类：inst 为 IC 最强因子(+0.116/ICIR0.435) → 加权 ×2；
+        # 🔴 2026-10-01 C 类：inst 为 IC 最强因子(+0.116/ICIR0.435) → 加权 ×3（🔴 2026-10-23 主人令·P2 再平衡，原 ×2）
         #   form 改走横截面中性化（循环后统一 rank 零中心 ±4），raw_total 拆出 noform 便于重算。
         inst_effective = inst * INST_WEIGHT
         _raw_noform = base + enhance + fund + sector_score + inst_effective + quality_effective
@@ -1839,7 +1863,15 @@ def main():
         # 复用 gen_stock_winrate 的收缩胜率分，把"高胜率高期望"做实进因子榜。
         # 必须同步进 _raw_noform：横截面中性化后 1903 行用它重建 total_score（raw_total 此处仅为过程量），
         # 与回测反哺(1804)同处理，确保"实现=意图"。无记录→0（中性，不影响原候选）。
-        wr_term = _winrate_term(_code6(raw_code))
+        # 🔴 P0-a/P1 同步捕获原始 winrate_score / T+5 胜率明细，供终排序段做
+        #    rank-fusion 与强制降级（跨截面名次需全池样本，只能在循环后算）。
+        _wr_code6 = _code6(raw_code)
+        wr_term = _winrate_term(_wr_code6)
+        _wr_rec = _WINRATE_MAP.get(str(_wr_code6)) or {}
+        _wr_score_raw = _num_or_none(_wr_rec.get("winrate_score"))
+        _h5 = (_wr_rec.get("horizons") or {}).get("5") or {}
+        _wr_win5 = _num_or_none(_h5.get("win"))
+        _wr_n5 = _num_or_none(_h5.get("n"))
         _raw_noform += wr_term
         raw_total += wr_term
 
@@ -1911,6 +1943,10 @@ def main():
             "_form_raw": form_score,
             "_raw_noform": _raw_noform,
             "_gate": gate_multiplier,
+            # 🔴 P0-a/P1：胜率 rank-fusion 与强制降级的原始证据（下划线=不进产物）
+            "_wr_score_raw": _wr_score_raw,
+            "_wr_win5": _wr_win5,
+            "_wr_n5": _wr_n5,
             "breakdown": {
                 "base": base,
                 "enhance": enhance,
@@ -1948,6 +1984,50 @@ def main():
         })
 
     # ── 5. 排序取TOP20 ──
+    # 🔴🔴 2026-10-23 主人令「收益最高+胜率最高做实」P0-a/P1（在 form 中性化前入账，走同一归一口径）：
+    #   P0-a 胜率 rank-fusion：按当日候选池内 winrate_score 横截面名次百分位，
+    #     给 (pct−0.5)×2×WR_FUSION_SPAN 的 raw 加项——因子分与胜率名次两榜分歧时，
+    #     由胜率名次实质拉动排序（不再只靠 ±1 分 edge 微调）。无记录→0.5 中性。
+    #     回退：V8_WR_RANK_FUSION=0 关闭。
+    #   P1 强制降级：T+5 胜率 < 30%（样本≥3）⇒ 扣 WINRATE_DEMOTE_RAW raw（≈−23 分），
+    #     产物标 winrate_demote=true；final_recommend Top3 另有硬闸双保险。
+    #     回退：V8_WR_DEMOTE=0 关闭。
+    _env_fusion = os.environ.get("V8_WR_RANK_FUSION", "1").strip() != "0"
+    _env_demote = os.environ.get("V8_WR_DEMOTE", "1").strip() != "0"
+    _demote_count = 0
+    if scored:
+        # 胜率分横截面名次百分位（有记录者参与排名，无记录者中性 0.5）
+        _wr_idx = [i for i, s in enumerate(scored) if s.get("_wr_score_raw") is not None]
+        _wr_sorted = sorted(_wr_idx, key=lambda i: scored[i]["_wr_score_raw"])
+        _n_wr = len(_wr_sorted)
+        _pct_of = {}
+        for _rk, _i in enumerate(_wr_sorted):
+            _pct_of[_i] = (_rk + 0.5) / _n_wr if _n_wr > 1 else 0.5
+        for _i, s in enumerate(scored):
+            if _env_fusion:
+                _pct = _pct_of.get(_i, 0.5)
+                _fus = (_pct - 0.5) * 2.0 * WR_FUSION_SPAN
+                s["_raw_noform"] += _fus
+                s["breakdown"]["winrate_fusion"] = round(_fus, 1)
+            else:
+                s["breakdown"]["winrate_fusion"] = 0.0
+            if _env_demote:
+                _w5, _n5 = s.get("_wr_win5"), s.get("_wr_n5")
+                if (_w5 is not None and _n5 is not None
+                        and _n5 >= WINRATE_DEMOTE_MIN_N and _w5 < WINRATE_DEMOTE_LINE):
+                    s["_raw_noform"] -= WINRATE_DEMOTE_RAW
+                    s["breakdown"]["winrate_demote"] = True
+                    _demote_count += 1
+                else:
+                    s["breakdown"]["winrate_demote"] = False
+            else:
+                s["breakdown"]["winrate_demote"] = False
+        if _env_fusion:
+            print(f"  ⚖️ 胜率 rank-fusion：池内有胜率记录 {_n_wr}/{len(scored)} 只，"
+                  f"跨度 ±{WR_FUSION_SPAN:g} raw（V8_WR_RANK_FUSION=1）")
+        if _demote_count:
+            print(f"  🔻 T+5 胜率<{WINRATE_DEMOTE_LINE:g}%（n≥{WINRATE_DEMOTE_MIN_N}）强制降级：{_demote_count} 只"
+                  f"（-{WINRATE_DEMOTE_RAW:g} raw，V8_WR_DEMOTE=1）")
     # 🔴 2026-10-01 C 类：form 横截面中性化（全候选 rank 零中心 ±FORM_NEUT_SCALE，
     #    消除「趋势日全员齐 6 分」的量纲膨胀；与 gate/regime 口径一致地重算 total）
     if scored:
@@ -1961,8 +2041,15 @@ def main():
         print(f"  ⛔ 质差一票否决合计: {VETO_COUNT} 只（ST/当期亏损/营收崩塌，未进评分）")
 
     # 格式化为简洁输出（含完整评分明细）
+    # 🔴 2026-10-23 主人令·P1：金池/主站排除港股（market=="hk"）——
+    #   港股无 A 股因子数据，混入因子榜会被 final_recommend 原序继承污染主站。
+    #   此处硬过滤并用纯 A 股名次重排 rank。
+    _hk_in_top20 = sum(1 for s in scored[:20] if s.get("market") == "hk")
+    _scored_out = [s for s in scored if s.get("market") != "hk"]
+    if _hk_in_top20:
+        print(f"  🚫 P1 金池排除港股：因子榜前20剔除 {_hk_in_top20} 只港股（market==hk），重排纯 A 股名次")
     top10 = []
-    for i, s in enumerate(scored[:20]):
+    for i, s in enumerate(_scored_out[:20]):
         bd = s["breakdown"]
         dt = s["details"]
         top10.append({
@@ -2001,6 +2088,10 @@ def main():
             "score_p4": bd.get("p4", 0),
         "score_p5": bd.get("p5", 0),
             "score_winrate": bd.get("winrate", 0),
+            "score_winrate_fusion": bd.get("winrate_fusion", 0),
+            "winrate_demote": bd.get("winrate_demote", False),
+            "wr_win5": s.get("_wr_win5"),
+            "wr_n5": s.get("_wr_n5"),
             "win_rate": s.get("win_rate", None),
             "quality_grade": s.get("quality_grade", ""),
             "signals": bd["signals"],
