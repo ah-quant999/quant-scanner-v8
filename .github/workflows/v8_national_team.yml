@@ -19,9 +19,13 @@
 #      「回测/资金流链失败日靠刷新 update_time 冒充更新」）。
 #   应急口子：NT_FORCE=1 跳过闸门①（workflow_dispatch 手动补算用）。
 #
+# 2026-10-23 主人令「一劳永逸修复」：板块年度主力净流入卡（SECTOR_YEAR_FLOW）原生成器
+#   在死代码清理中被误删、卡停更于 10-21 —— 重建 v8/gen_sector_year_flow.py（纯本地增量
+#   合并 raw_data/sector_fund_flow_history.json，零网络），挂入本链同槽位日更。
+#
 # 空提交保护：v8_build_deploy 的 push.paths 含 data/** ⇒ 每推一次触发全量重建（~8min）。
 #   推送前先比对线上 blob（scripts/card_need_push.py），逐字节相同即 SKIP。
-name: "🏛️ v8 国家队活跃度生成器 (云端)"
+name: "🏛️ v8 国家队活跃度+板块年度主力净流入 生成器 (云端)"
 
 on:
   schedule:
@@ -103,6 +107,51 @@ jobs:
           rc=$?
           if [ "$rc" -ne 0 ]; then
             echo "::error title=v8-national-team(push-failed)::📤 data/NATIONAL_TEAM.js 推送失败（非阻塞，下一轮补推）。"
+            exit 1
+          fi
+
+      - name: "📊 跑 gen_sector_year_flow.py（板块年度主力净流入·增量合并）"
+        if: always()
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          dow=$(date +%u)
+          if [ "$dow" -ge 6 ]; then echo "[skip] weekend, exit ok"; exit 0; fi
+          python v8/gen_sector_year_flow.py
+          rc=$?
+          if [ "$rc" -ne 0 ]; then
+            echo "::error title=v8-sector-year-flow(exit=$rc)::📊 板块年度主力净流入生成失败（退出码 $rc）。线上卡沿用上一版；连续多日失败请检查 raw_data/sector_fund_flow_history.json 是否停更。"
+            exit 1
+          fi
+          echo "[ok] data/SECTOR_YEAR_FLOW.js ready"
+
+      - name: "📊 板块年度卡比对（相同则 SKIP，防空提交）"
+        if: always()
+        id: diff_year
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          out=$(python scripts/card_need_push.py data/SECTOR_YEAR_FLOW.js 2>&1)
+          echo "$out"
+          if echo "$out" | grep -q 'NEED_PUSH=1'; then echo "need=1" >> "$GITHUB_OUTPUT"; else echo "need=0" >> "$GITHUB_OUTPUT"; fi
+
+      - name: "📊 推送 data/SECTOR_YEAR_FLOW.js（api_put_file.py）"
+        if: always()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          if [ "${{ steps.diff_year.outputs.need }}" != "1" ]; then
+            echo "[skip] content identical to remote; no push"
+            exit 0
+          fi
+          python scripts/api_put_file.py data/SECTOR_YEAR_FLOW.js "data: sector year flow refresh ($(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') CST)"
+          rc=$?
+          if [ "$rc" -ne 0 ]; then
+            echo "::error title=v8-sector-year-flow(push-failed)::📤 data/SECTOR_YEAR_FLOW.js 推送失败（非阻塞，下一轮补推）。"
             exit 1
           fi
 

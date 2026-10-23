@@ -84,7 +84,10 @@ d_ready = False
 # ── 🛡️ 盘后新鲜度闸门（防假新鲜·主人令 09-23） ──────────────────────
 # C 源 SECTOR_FUND_FLOW.js 必须为「今日 ≥16:00」的盘后数据，否则整卡保留上版不写盘。
 # 手工急救可用 NT_FORCE=1 跳过闸门（会留下 source_time 审计痕迹）。
-_nt_today = bj_now().strftime('%Y-%m-%d')
+# GitHub schedule 可能拖数小时跨过北京零点（实测 2026-10-22 拖 5h 落到次日 01:39 CST），
+# 跨零点时段（0-7 点）按「昨日」判定，否则盘后闸门永远过不了、卡永久停更。
+_nt_now = bj_now()
+_nt_today = (_nt_now - datetime.timedelta(days=1)).strftime('%Y-%m-%d') if _nt_now.hour < 7 else _nt_now.strftime('%Y-%m-%d')
 _sf_ut = (sf or {}).get('update_time') or ''
 _sf_ok = False
 if _sf_ut:
