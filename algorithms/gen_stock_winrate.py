@@ -166,11 +166,14 @@ def main():
             continue
         rec["horizons"] = h_stats
         s5, s10 = h_stats.get("5"), h_stats.get("10")
+        # 🔴 2026-10-23 晚主人令·终态：收益率(均益 avg)为第一驱动，胜率仅作微小质量修正。
+        #   主人原话"我只要收益率最高的股票能选出来就行"——故均益权重抬到 5.0/3.0，
+        #   胜率腿从 0.5 压到 0.3/0.2（≈20:1），使"历史信号后平均涨得最多"的票真正排前。
         score = 0.0
         if s5:
-            score += (s5["win_shrunk"] - 50.0) * 0.5 + s5["avg_shrunk"] * 3.0
+            score += s5["avg_shrunk"] * 5.0 + (s5["win_shrunk"] - 50.0) * 0.3
         if s10:
-            score += (s10["win_shrunk"] - 50.0) * 0.5 + s10["avg_shrunk"] * 2.0
+            score += s10["avg_shrunk"] * 3.0 + (s10["win_shrunk"] - 50.0) * 0.2
         rec["winrate_score"] = round(score, 2)
         stocks.append(rec)
 
@@ -184,7 +187,7 @@ def main():
             "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
             "cost_pct_roundtrip": COST_PCT,
             "shrinkage_k": SHRINK_K,
-            "score_formula": "winrate_score = Σ_h [(win_shrunk_h−50)×0.5 + avg_shrunk_h×w2]，h∈{5:3.0, 10:2.0}",
+            "score_formula": "winrate_score = Σ_h [avg_shrunk_h×w_a + (win_shrunk_h−50)×w_w]，h∈{5:(5.0,0.3), 10:(3.0,0.2)}；均益主导、胜率仅微修正",
             "n_signals": len(occ),
             "n_stocks": len(stocks),
             "signal_date_range": [min(o["signal_date"] for o in occ), max(o["signal_date"] for o in occ)] if occ else [],
