@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-23 13:26:07",
+  "update_time": "2026-10-23 14:01:31",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -24,7 +24,7 @@
       "hot_days": 28,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 313,
+      "total": 315,
       "ongoing": true
     },
     {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 236,
       "peak_date": "09/08",
-      "total": 2396,
+      "total": 2399,
       "ongoing": true
     },
     {
@@ -63,7 +63,7 @@
       "hot_days": 24,
       "peak": 17,
       "peak_date": "09/21",
-      "total": 219,
+      "total": 222,
       "ongoing": true
     },
     {
@@ -89,7 +89,7 @@
       "hot_days": 28,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 239,
+      "total": 241,
       "ongoing": true
     },
     {
@@ -154,7 +154,7 @@
       "hot_days": 22,
       "peak": 32,
       "peak_date": "09/22",
-      "total": 329,
+      "total": 333,
       "ongoing": true
     },
     {
@@ -225,14 +225,14 @@
     {
       "sector": "半导体",
       "start": "10/14",
-      "end": "10/22",
+      "end": "10/23",
       "start_idx": 22,
-      "end_idx": 28,
-      "days": 7,
-      "hot_days": 6,
+      "end_idx": 29,
+      "days": 8,
+      "hot_days": 7,
       "peak": 6,
       "peak_date": "10/15",
-      "total": 30,
+      "total": 34,
       "ongoing": true
     },
     {
