@@ -109,7 +109,6 @@ MUST_HAVE_CRON = {
     #   ⇒ 门禁连红；且 morning_plan 07:50 首触发还撞上 schedule 注册延迟（首日踩空）。
     #   本次三链齐补：名单登记 + run 块 ASCII 化（WindowsPS 5.1 GBK 解码坑）+ 手动补跑验证。
     "v8_morning_plan": "盘前预案生成器(工作日07:50·cn runner)",
-    "v8_algo_scorecard": "算法记分卡生成器(工作日08:25·云端ubuntu)",
     "v8_national_team": "国家队活跃度生成器(工作日20:50·云端ubuntu)",
 }
 
