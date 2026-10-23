@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-10-23 21:25:06",
+  "check_time": "2026-10-23 23:21:49",
   "last_trade_close": "2026-10-23 15:30:00",
   "is_trading_day": true,
   "core_stale": [],
@@ -21,6 +21,8 @@
     "CFFEX_HOLDINGS": "intraday,post_close",
     "CFFEX_POSITION": "post_close",
     "RESONANCE_TRACK": "post_close",
+    "FF3_RANKSUM_TRACK": "post_close",
+    "FF3_RANKSUM_BACKTEST": "post_close",
     "MACRO_DATA": "premarket,post_close",
     "CRISIS_DATA": "premarket,intraday",
     "NORTH_FUND": "premarket,post_close",
