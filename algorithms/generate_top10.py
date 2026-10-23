@@ -2041,15 +2041,9 @@ def main():
         print(f"  ⛔ 质差一票否决合计: {VETO_COUNT} 只（ST/当期亏损/营收崩塌，未进评分）")
 
     # 格式化为简洁输出（含完整评分明细）
-    # 🔴 2026-10-23 主人令·P1：金池/主站排除港股（market=="hk"）——
-    #   港股无 A 股因子数据，混入因子榜会被 final_recommend 原序继承污染主站。
-    #   此处硬过滤并用纯 A 股名次重排 rank。
-    _hk_in_top20 = sum(1 for s in scored[:20] if s.get("market") == "hk")
-    _scored_out = [s for s in scored if s.get("market") != "hk"]
-    if _hk_in_top20:
-        print(f"  🚫 P1 金池排除港股：因子榜前20剔除 {_hk_in_top20} 只港股（market==hk），重排纯 A 股名次")
+    # 🔴 2026-10-23 晚主人令撤销「金池排除港股」：港股照常进因子榜，不排除。
     top10 = []
-    for i, s in enumerate(_scored_out[:20]):
+    for i, s in enumerate(scored[:20]):
         bd = s["breakdown"]
         dt = s["details"]
         top10.append({

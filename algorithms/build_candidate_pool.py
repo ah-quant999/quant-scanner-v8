@@ -1200,34 +1200,31 @@ def build():
         print("  [A股] 行情获取失败，跳过该层")
 
     # 2) 港股 前50（按成交额）
-    # 🔴 2026-10-23 主人令·P1：金池排除港股 —— 默认不再把港股并入候选池
-    #   （主站/因子榜聚焦 A 股，港股无 A 股因子数据，混入会污染金池与最终推荐）。
-    #   如需恢复，设环境变量 V8_POOL_INCLUDE_HK=1。
-    if os.environ.get("V8_POOL_INCLUDE_HK", "0").strip() == "1":
-        hk = _hk_spot()
-        if hk is not None:
-            code_col = "代码" if "代码" in hk.columns else hk.columns[0]
-            name_col = "名称" if "名称" in hk.columns else hk.columns[1]
-            amt_cols = [c for c in hk.columns if "成交额" in c or "amount" in c.lower()]
-            if amt_cols:
-                amt = amt_cols[0]
-                sub = hk.sort_values(amt, ascending=False).head(HK_TOP)
-                for _, r in sub.iterrows():
-                    raw = str(r[code_col]).strip().upper().split(".")[0]
-                    raw = "".join(ch for ch in raw if ch.isdigit()).zfill(5)
-                    if not raw:
-                        continue
-                    m = {"amount": float(r[amt]) if amt in r and r[amt] is not None else 0.0,
-                         "price": 0.0, "pct_chg": 0.0, "volume_ratio": 0.0}
-                    add(f"hk_{raw}", raw, r[name_col], "hk", "港股", f"港股成交前{HK_TOP}", metrics=m)
-                print(f"  [港股] 前{HK_TOP} 已并入（akshare实时）")
-            else:
-                print("  [港股] 未找到成交额列，跳过")
+    # 🔴 2026-10-23 晚主人令撤销「金池排除港股」：港股照常并入候选池，不排除。
+    hk = _hk_spot()
+    if hk is not None:
+        code_col = "代码" if "代码" in hk.columns else hk.columns[0]
+        name_col = "名称" if "名称" in hk.columns else hk.columns[1]
+        amt_cols = [c for c in hk.columns if "成交额" in c or "amount" in c.lower()]
+        if amt_cols:
+            amt = amt_cols[0]
+            sub = hk.sort_values(amt, ascending=False).head(HK_TOP)
+            for _, r in sub.iterrows():
+                raw = str(r[code_col]).strip().upper().split(".")[0]
+                raw = "".join(ch for ch in raw if ch.isdigit()).zfill(5)
+                if not raw:
+                    continue
+                m = {"amount": float(r[amt]) if amt in r and r[amt] is not None else 0.0,
+                     "price": 0.0, "pct_chg": 0.0, "volume_ratio": 0.0}
+                add(f"hk_{raw}", raw, r[name_col], "hk", "港股", f"港股成交前{HK_TOP}", metrics=m)
+            print(f"  [港股] 前{HK_TOP} 已并入（akshare实时）")
         else:
-            # ── 兜底：从 gold_pool.json 港股板块补入 ──
-            _hk_from_goldpool(HK_TOP, add)
+            print("  [港股] 未找到成交额列，跳过")
     else:
-        print("  [港股] 已按主人令·P1 排除（候选池不再并入港股；V8_POOL_INCLUDE_HK=1 可恢复）")
+        # ── 兜底：从 gold_pool.json 港股板块补入 ──
+        # akshare 在云端 runner 可能因网络/限速返回空（非安装问题），
+        # 而 gold_pool 由算法链上游产出，含完整港股列表（board_label=港股）。
+        _hk_from_goldpool(HK_TOP, add)
 
     # 3) 外资研投 自选
     try:
