@@ -1,12 +1,16 @@
 {
-  "update_time": "2026-10-24 01:04:34",
-  "run_start": "2026-10-24 00:34:08",
-  "ok": 18,
-  "fail": 1,
+  "update_time": "2026-10-24 02:02:44",
+  "run_start": "2026-10-24 01:35:07",
+  "ok": 17,
+  "fail": 2,
   "failed_scripts": [
     {
       "script": "algorithms/refresh_kline_freshness.py",
       "reason": "脚本文件缺失"
+    },
+    {
+      "script": "v8/factor_lab_gen.py",
+      "reason": "退出码 1 | logout failed!"
     }
   ],
   "skipped_by_time_gate": []
