@@ -82,7 +82,9 @@ if sf:
 d_ready = False
 
 # ── 🛡️ 盘后新鲜度闸门（防假新鲜·主人令 09-23） ──────────────────────
-# C 源 SECTOR_FUND_FLOW.js 必须为「今日 ≥16:00」的盘后数据，否则整卡保留上版不写盘。
+# C 源 SECTOR_FUND_FLOW.js 必须为「今日收盘后（hour ≥ 15）」的盘后数据，否则整卡保留上版不写盘。
+# 阈值说明：A 股 15:00 收盘，盘后资金流管线固定在 ~15:45 落戳，故以 ≥15（收盘后）判定，
+#   原 ≥16 会把每天 15:45 的有效盘后数据误判为「未就绪」→ 卡永久停在旧版（实测卡在 10-20）。
 # 手工急救可用 NT_FORCE=1 跳过闸门（会留下 source_time 审计痕迹）。
 # GitHub schedule 可能拖数小时跨过北京零点（实测 2026-10-22 拖 5h 落到次日 01:39 CST），
 # 跨零点时段（0-7 点）按「昨日」判定，否则盘后闸门永远过不了、卡永久停更。
@@ -93,7 +95,7 @@ _sf_ok = False
 if _sf_ut:
     try:
         _sf_dt = datetime.datetime.strptime(_sf_ut[:16], '%Y-%m-%d %H:%M')
-        _sf_ok = (_sf_dt.strftime('%Y-%m-%d') == _nt_today and _sf_dt.hour >= 16)
+        _sf_ok = (_sf_dt.strftime('%Y-%m-%d') == _nt_today and _sf_dt.hour >= 15)
     except ValueError:
         _sf_ok = False
 if not _sf_ok and os.environ.get('NT_FORCE') != '1':
