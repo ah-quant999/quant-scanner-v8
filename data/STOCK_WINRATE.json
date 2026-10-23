@@ -1,5 +1,5 @@
 {
- "update_time": "2026-10-24 04:24:48",
+ "update_time": "2026-10-24 05:51:19",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
@@ -2295,12 +2295,12 @@
   {
    "code": "002353",
    "name": "杰瑞股份",
-   "n_signals": 2,
+   "n_signals": 1,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-07-20",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-07-20",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2490,7 +2490,7 @@
   {
    "code": "002636",
    "name": "金安国纪",
-   "n_signals": 21,
+   "n_signals": 20,
    "kinds": [
     "top10"
    ],
@@ -3390,12 +3390,12 @@
   {
    "code": "688432",
    "name": "有研硅",
-   "n_signals": 1,
+   "n_signals": 2,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-08-20",
-   "last_seen": "2026-08-20",
+   "last_seen": "2026-10-23",
    "is_final": false,
    "horizons": {
     "1": {
@@ -3586,7 +3586,7 @@
   {
    "code": "600498",
    "name": "烽火通信",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "top10"
    ],
