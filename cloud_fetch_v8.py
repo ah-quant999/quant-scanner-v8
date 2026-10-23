@@ -6203,6 +6203,26 @@ def main(category=None, only=None):
             ma30 = round(sum(prices[-30:]) / 30, 4) if len(prices) >= 30 else None
             pos30 = round((avg_price - ma30) / ma30 * 100, 4) if ma30 else None
 
+            # 🛡 2026-10-23 主人明确要「平均股价(880003)日线 KDJ 的 K 值」：
+            #   基于本函数算的全A等权日均价日序列（= 880003 等价口径）按标准日 KDJ
+            #   计算 K 值（RSV 周期 N=9，K/D 平滑 M1=M2=3，初值 K=D=50），前端
+            #   index.html:2088 已就绪（ap.kdj_k!=null 即显示「KDJ K XX.X」，>=50 红/<50 绿），
+            #   此前只差后端给值。样本 <9 日则 K 值无意义 → 写 None（前端不显示）。
+            _kdj_k = None
+            if len(prices) >= 9:
+                _K = 50.0
+                _D = 50.0
+                for _i, _c in enumerate(prices):
+                    if _i >= 8:
+                        _win = prices[_i - 8:_i + 1]
+                        _lo, _hi = min(_win), max(_win)
+                        _rsv = 50.0 if _hi == _lo else (_c - _lo) / (_hi - _lo) * 100.0
+                    else:
+                        _rsv = 50.0
+                    _K = _K + (_rsv - _K) / 3.0
+                    _D = _D + (_K - _D) / 3.0
+                _kdj_k = round(_K, 3)
+
             # 🔴🔴 2026-09-18 治本（主人「干嘛要累积够了才算？不对吧」+「肯定A·治本」）：
             #   【问题】上一轮去掉 min() 伪装后，样本<20 时 ma20/ma60 一律 None
             #          ⇒ 前端永远显示「⏳ 均线积累中 15/20日」，指标卡死在不可用态。
@@ -6260,6 +6280,8 @@ def main(category=None, only=None):
                 "position_vs_ma30": round(pos30, 4) if pos30 is not None else None,
                 "ma30_ready": len(prices) >= 30,
                 "ma_caliber": "全A等权日均价(880003定义等价·官方源不可用兜底)",
+                # 🛡 2026-10-23 主人要「平均股价日KDJ的K值」：基于等权日均价日序列标准日KDJ(N=9,M1=M2=3)
+                "kdj_k": _kdj_k,
                 # 🔴 2026-09-18 治本：有效窗口（能用即用，随样本自动升档）
                 "ma_eff": ma_eff,
                 "ma_eff_window": ma_eff_window,
