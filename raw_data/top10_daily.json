@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-24 02:28:22",
+  "update_time": "2026-10-24 02:50:58",
   "total_scored": 541,
   "count_80plus": 0,
   "max_score": 40.9,
@@ -11,27 +11,27 @@
     "confidence": "低",
     "market_trend": "unknown",
     "recommended_sectors": [
-      "半导体",
-      "公用事业",
-      "医疗服务",
-      "煤炭",
-      "保险",
-      "中药",
-      "计算机设备",
       "化学制药",
+      "保险",
+      "计算机设备",
+      "中药",
+      "半导体",
       "贵金属",
-      "油气",
+      "公用事业",
       "通信设备",
-      "银行",
-      "通信运营"
+      "煤炭",
+      "医疗服务",
+      "通信运营",
+      "油气",
+      "银行"
     ],
     "avoid_sectors": [
-      "半导体",
       "计算机",
-      "白酒",
+      "半导体",
       "家用电器",
       "通信设备",
       "电子元件",
+      "白酒",
       "食品饮料"
     ],
     "strategy_weights": {
@@ -327,7 +327,7 @@
       "board": "主板",
       "sig_count": 1,
       "close": 16.41,
-      "pct_chg": 0.17,
+      "pct_chg": -0.55,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -30.67173637515843,
       "breakout_5d": false,
@@ -453,7 +453,7 @@
       "quality_detail": "ROE偏低(8.7%) | 营收高增(34.0%) | 消息:中报预增",
       "research_detail": "超跌反弹+1.4",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前91%+6"
+      "p5_detail": "换手率趋势池内前90%+6"
     },
     {
       "rank": 7,
@@ -871,7 +871,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 37.0,
-      "pct_chg": -5.01,
+      "pct_chg": 2.55,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -6.44753476611883,
       "breakout_5d": false,
@@ -932,7 +932,7 @@
       "board": "主板",
       "sig_count": 0,
       "close": 30.35,
-      "pct_chg": 0,
+      "pct_chg": 4.62,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -10.65646158375036,
       "breakout_5d": true,
@@ -990,7 +990,7 @@
       "quality_detail": "ROE偏低(8.9%) | 营收高增(44.9%)",
       "research_detail": "超跌反弹+0.1",
       "p4_detail": "",
-      "p5_detail": "低成交额池内前82%+6 | 换手率趋势池内前90%+6"
+      "p5_detail": "低成交额池内前83%+6 | 换手率趋势池内前90%+6"
     },
     {
       "rank": 15,
@@ -1117,7 +1117,7 @@
       "quality_detail": "ROE良好(15.4%) | 营收高增(78.2%)",
       "research_detail": "量能突破x1.5+1",
       "p4_detail": "",
-      "p5_detail": "低成交额池内前85%+6 | 换手率趋势池内前81%+6"
+      "p5_detail": "低成交额池内前85%+6 | 换手率趋势池内前84%+6"
     },
     {
       "rank": 17,
