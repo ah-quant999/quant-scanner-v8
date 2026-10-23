@@ -13953,7 +13953,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     h += _stat('⏳ 成熟样本', '0', 'T+20 未走满不计入', '#fbbf24');
     h += '</div>';
     h += '<h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 8px;">'
-       + '<span class="ic">📋</span>归档信号 · 每日 Top10 <span style="font-size:11px;color:var(--sub);font-weight:400">按复合分降序（三因子秩和，越接近 3 越强）· 最新信号日置顶</span></h3>';
+       + '<span class="ic">📋</span>归档信号 · 每日 Top5 <span style="font-size:11px;color:var(--sub);font-weight:400">按复合分降序（三因子秩和，越接近 3 越强）· 最新信号日置顶</span></h3>';
     var _byDay = {};
     trk.forEach(function(s){ var _k = s.signal_date || '—'; (_byDay[_k] = _byDay[_k] || []).push(s); });
     var _days = Object.keys(_byDay).sort().reverse();

@@ -10,8 +10,8 @@
 【选股规则】（全部 ≤T 日可得，无未来函数；与 factor_composite_ff3.py 回测同方法论）：
   · 三因子 turntrend(缩量=强势,取负) / amt60(小市值低流动性溢价,取负) / ivol60(低波异象,取负)。
   · 截面：逐因子降序归一化秩 [0,1]（值越大=因子越强）；复合分 = 三因子秩之和（ff3_ranksum 变体）。
-  · 选股：复合分降序 TopN（N=10，与 LQSQ/低波/日内动量同档「每日 Top5 推荐」精神一致，
-    全宇宙秩和选出的 10 只即当日最强资金异动组合）。
+  · 选股：复合分降序 TopN（N=5，与 LQSQ/低波/日内动量同档「每日 Top5 推荐」精神一致，
+    全宇宙秩和选出的 5 只即当日最强资金异动组合；2026-10-24 主人令「每天5只，不要10只」）。
   · 持有：T+1/3/5/10/20 逐档前向跟踪（次开买入，扣 0.3%；未走满 T+N 不计入，绝不用 0 冒充）。
   · 成本：双边 0.3%（与 LQSQ 主口径同）。
 
@@ -43,7 +43,7 @@ HISTORY = os.path.join(RAW_DIR, "ff3_ranksum_history.json")
 TRACK = os.path.join(RAW_DIR, "ff3_ranksum_track.json")
 VIEW = os.path.join(RAW_DIR, "ff3_ranksum_backtest.json")
 
-TOP_N = 10               # 每日复合最强 Top10（全宇宙秩和选出）
+TOP_N = 5                # 每日复合最强 Top5（全宇宙秩和选出；2026-10-24 主人令「每天5只，不要10只」）
 FACTORS3 = ("turntrend", "amt60", "ivol60")
 HOLD_HORIZONS = (1, 3, 5, 10, 20)
 PRIMARY_HOLD = 20
