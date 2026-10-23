@@ -137,3 +137,7 @@ window.MARKET_THERMO|未来预测数据源全局名|2026-10-05
 #   **代码级**锚点（跨「暂停展示/恢复展示」两态均稳定，符合纪律 3）。
 mix_pct|最终推荐混排竞位分字段（强势跟踪强度分×因子榜池内 min-max 归一化评分；融合器上线结构性锚点）|2026-10-14
 TOP10_DAILY|时窗矩阵「最终推荐·Top3」行 source 值（2026-10-20 主人令：最终推荐与因子积分榜同序同分，source 由融合口径 IMA_STRONG_STOCK/TOP10_DAILY 收敛为 TOP10_DAILY，锚点同步收口）|2026-10-14
+
+__v8SmartRefreshStarted|主站智能时段自动刷新IIFE(盘中15分/午休盘后1h/夜间不刷/非交易日2h·10-20硬刷+90s自愈)|2026-10-23
+__v8LiveDataProbe|数据变化即刷新探测IIFE(HEAD探HEALTH_CHECK Last-Modified)|2026-10-23
+v8AutoRefreshBadge|自动刷新可见倒计时角标(右下角·主人一眼验证机制在跑)|2026-10-23

@@ -275,6 +275,11 @@ def build_payload(series, source_tag):
     prev = closes[-2] if len(closes) > 1 else None
     ma20 = _ma(closes, 20)
     ma60 = _ma(closes, 60)
+    # 🛡 2026-10-23 主人令「MA30 一直回填中→要实时」：前端（2026-10-21 主人令）消费
+    #   index_880003 / ma30 / ma30_ready / position_vs_ma30 四字段，但本 fetcher 从未产出
+    #   ⇒ 盘中卡面永远「回填中」。序列本就在手，直接补齐（与 ma20/ma60 同口径）。
+    ma30 = _ma(closes, 30)
+    pos30 = round((cur / ma30 - 1) * 100, 3) if ma30 else None
     chg = round((cur / prev - 1) * 100, 3) if prev else 0.0
     pos20 = round((cur / ma20 - 1) * 100, 3) if ma20 else None
     pos60 = round((cur / ma60 - 1) * 100, 3) if ma60 else None
@@ -298,6 +303,10 @@ def build_payload(series, source_tag):
         "prev_avg_price": prev,
         "avg_change_pct": chg,
         "count": None,
+        "index_880003": cur,
+        "ma30": ma30,
+        "ma30_ready": ma30 is not None,
+        "position_vs_ma30": pos30,
         "ma20": ma20,
         "ma60": ma60,
         "position_vs_ma20": pos20,

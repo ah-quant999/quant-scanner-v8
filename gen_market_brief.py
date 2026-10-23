@@ -762,6 +762,30 @@ def main():
     # 异动
     anomalies = detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, limitup)
 
+    # 🛡 2026-10-23 主人令「AI速览每条审计·根除假新鲜」：异动条加盖数据源诚实戳。
+    #   血证（10-23）：ETF条 09:43→10:50 四个版本内容逐字节相同（源 etf_daily_monitor.json
+    #   真实 update_time 停在 10:03），而卡头 update_time 每轮重打 ⇒ 「时间在跳、数据冻结」。
+    #   修法：每条按其数据源真实 update_time 校龄；盘中源龄 ≥25 分钟 ⇒ 条目尾部追加灰字
+    #   「｜⚠️数据截至 HH:MM」——源陈旧对主人可见，永不伪装实时；非盘中不出戳（盘后全旧属正常）。
+    _stamp_map = {
+        "ETF资金": etf_daily,
+        "概念热点": concepts,
+        "行业资金": sectors,
+        "个股异动": capital,
+    }
+    if market_status == "盘中":
+        _now = datetime.now()
+        for _a in anomalies:
+            _raw = _stamp_map.get(_a.get("tag"))
+            _ut = (_raw or {}).get("update_time") or ""
+            try:
+                _src = datetime.strptime(_ut[:19], "%Y-%m-%d %H:%M:%S")
+            except Exception:
+                continue
+            if (_now - _src).total_seconds() >= 25 * 60:
+                _a["text"] = (_a["text"] + '<span style="font-size:10px;color:#94a3b8;">'
+                              '｜⚠️数据截至 ' + _ut[11:16] + '</span>')
+
     # 操作建议
     strategies = build_strategy(sentiment_label, health, anomalies, indices, etf_daily, concepts, capital)
 

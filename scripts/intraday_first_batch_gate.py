@@ -153,7 +153,8 @@ def dispatch():
         return 0
     ok = 0
     for wf in DISPATCH_WFS:
-        url = "%s/actions/workflows/%s/dispatches" % (API, wf)
+        # workflow_id 只认裸文件名；带 .github/workflows/ 前缀必 404（2026-10-23 实测血证）
+        url = "%s/actions/workflows/%s/dispatches" % (API, wf.rsplit("/", 1)[-1])
         body = json.dumps({"ref": "main"}).encode()
         req = urllib.request.Request(url, data=body, method="POST",
                                      headers={"Authorization": "token %s" % tok,
@@ -190,6 +191,21 @@ def main():
         cutoff = n.replace(hour=13, minute=30, second=0, microsecond=0)
     if cutoff > n:
         cutoff = n  # 尚未到该档位 ⇒ 降级为「本档位尚未开始」，仅报告
+
+    # 🔴 2026-10-23 主人令「盘中高频盯住·一劳永逸」：盘中时段判定线动态抬升。
+    #   旧逻辑只认 09:30/13:30 档位线 ⇒ 10:32 跑守门时 10:0x 的数据也判「达标」，
+    #   30+ 分钟陈旧数据漏网（10-23 上午实证：10:03-10:06 卡到 10:40 仍报✅）。
+    #   盘中(交易日 09:30-11:30 / 13:00-15:00)时：判定线 = max(档位线, now-25分钟)，
+    #   与 20 分钟哨兵节奏对齐；非盘中维持原档位线不变。
+    def _is_trading_now(t):
+        if t.weekday() >= 5:
+            return False
+        hm = (t.hour, t.minute)
+        return ((9, 30) <= hm < (11, 30)) or ((13, 0) <= hm < (15, 0))
+    if _is_trading_now(n):
+        dyn = n - dt.timedelta(minutes=25)
+        if dyn > cutoff:
+            cutoff = dyn
 
     print("══ v8 第一批盘中数据守门 ══  %s  档位=%s 判定线=%s" % (
         n.strftime("%Y-%m-%d %H:%M:%S"), slot, cutoff.strftime("%H:%M")))
