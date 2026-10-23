@@ -1,20 +1,19 @@
 {
-  "DATA": "out",
-  "V8_OUT_DIR": "out",
+  "DATA": "D:\\actions\\cn-runner\\_work\\quant-scanner-v8\\quant-scanner-v8\\algorithms\\..\\out",
+  "V8_OUT_DIR": "",
   "guanlan_watchlist": {
-    "exists": true,
-    "stocks": 40
+    "exists": false,
+    "stocks": 0
   },
   "guanlan_reports": {
-    "exists": true,
-    "reports": 20,
-    "stocks_in_reports": 44
+    "exists": false,
+    "stocks": 0
   },
   "source_dist": {
     "主板成交前100": 237,
-    "外资研投": 145,
     "创业板成交前100": 213,
     "科创板成交前100": 199,
-    "港股成交前50": 85
+    "港股成交前50": 85,
+    "外资研投": 130
   }
 }
