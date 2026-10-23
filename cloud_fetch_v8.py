@@ -6192,6 +6192,17 @@ def main(category=None, only=None):
             pos20 = (avg_price - ma20) / ma20 * 100 if ma20 else None
             pos60 = (avg_price - ma60) / ma60 * 100 if ma60 else None
 
+            # 🛡 2026-10-23 一劳永逸根治「MA30·880003 永远回填中」：
+            #   880003 官方指数源（东财 push2his）在生产环境恒返回 0 根，f_avg_price_880003()
+            #   取数失败直接 return {} 不写盘 ⇒ index_880003/ma30/ma30_ready/position_vs_ma30
+            #   永不写入 ⇒ 前端 index.html:2094 永远命中「回填中」（主人 10-23「还是回填」复现）。
+            #   但 880003 的定义本就是「全A算术平均股价」（见上方 L5902），本函数算的全A等权
+            #   日均价即其等价口径，且实时可达、云端稳定。故在此直接用等权日均价序列补出四字段：
+            #   index_880003=最新日均价、ma30=30日MA，前端「偏离 X.XX%」即可实时显示。
+            #   真·880003 源若恢复，f_avg_price_880003() 成功时会以真值覆盖这四字段，无冲突。
+            ma30 = round(sum(prices[-30:]) / 30, 4) if len(prices) >= 30 else None
+            pos30 = round((avg_price - ma30) / ma30 * 100, 4) if ma30 else None
+
             # 🔴🔴 2026-09-18 治本（主人「干嘛要累积够了才算？不对吧」+「肯定A·治本」）：
             #   【问题】上一轮去掉 min() 伪装后，样本<20 时 ma20/ma60 一律 None
             #          ⇒ 前端永远显示「⏳ 均线积累中 15/20日」，指标卡死在不可用态。
@@ -6240,6 +6251,15 @@ def main(category=None, only=None):
                 "position_vs_ma60": round(pos60, 4) if pos60 is not None else None,
                 "ma20_ready": _n >= 20,
                 "ma60_ready": _n >= 60,
+                # 🛡 2026-10-23 880003 主口径兜底（定义等价·实时可达，根治「回填中」）
+                "index_880003": round(avg_price, 4),
+                "index_880003_prev": round(prev_price, 4) if prev_price else None,
+                "index_880003_change_pct": round((avg_price / prev_price - 1) * 100, 4) if prev_price else None,
+                "index_880003_date": today_str,
+                "ma30": ma30,
+                "position_vs_ma30": round(pos30, 4) if pos30 is not None else None,
+                "ma30_ready": len(prices) >= 30,
+                "ma_caliber": "全A等权日均价(880003定义等价·官方源不可用兜底)",
                 # 🔴 2026-09-18 治本：有效窗口（能用即用，随样本自动升档）
                 "ma_eff": ma_eff,
                 "ma_eff_window": ma_eff_window,
