@@ -113,53 +113,6 @@ SOURCES = [
     #      var="FOUR_VOLUME_BACKTEST", rel="data/FOUR_VOLUME_BACKTEST.js",
     #      parser="by_period", label_prefix="持有", primary="持有 T+5",
     #      method="真实信号流口径：每日真实选股累积归档 → 前向跟踪（基准=入选日收盘，T+N 真实交易日，扣双边 0.3%；2026-10-11 切换，回放口径作废）"),
-    # 🚀 2026-10-11 主人令：第一支自研算法「量质双擎」——全市场异常量比直选 Top5
-    #   （2026-10-13 主人令由 Top30 收紧为每日 3-5 只），
-    #   真实信号流口径（gen_lqsq_top5.py，B批 factor_lab 紧后），与四量同榜同纪律。
-    #   上线首日 2026-10-11；T+20 为主档（主人令「跟踪20日再打分」），样本随天数成熟，
-    #   未达 MIN_SAMPLES 走 insufficient 诚实路径（不排名、标积累中）。
-    dict(card="量质双擎", kind="strategy", page="选股策略", icon="🚀", cat="trade",
-         var="LQSQ_BACKTEST", rel="data/LQSQ_BACKTEST.js",
-         parser="by_period", label_prefix="持有", primary="持有 T+20",
-         method="真实信号流口径：每日全市场按异常量比（缩量=强势）打分选 Top5（2026-10-13 主人令由 Top30 收紧），次开买入持有 20 个交易日收盘卖出（前复权·扣双边 0.3%）；ROE 质地过滤 v2 待接"),
-    # 🚀 2026-10-18 主人令「按建议做新算法」：第二支自研算法「低波趋势」——
-    #   60 日波动率最低 Top10 ∧ 收盘>MA60（strategy_lowvol_trend.py，B批 gen_lqsq 紧后），
-    #   真实信号流口径，与量质双擎同榜同纪律。上线首日 2026-10-18；主档 T+60
-    #   （上市前置回测唯一显著跑赢档：α+4.00pp/胜率53.3%），样本随天数成熟，未走满不计入。
-    dict(card="低波趋势", kind="strategy", page="选股策略", icon="🐢", cat="trade",
-         var="LOWVOL_TREND_BACKTEST", rel="data/LOWVOL_TREND_BACKTEST.js",
-         parser="by_period", label_prefix="持有", primary="持有 T+60",
-         method="真实信号流口径：每日全市场 60 日波动率最低 Top10 且收盘>MA60，次开买入持有 N 个交易日收盘卖出（前复权·扣双边 0.3%）；基准=同过滤 universe 等权"),
-    # 🚀 2026-10-18 夜 主人令「可靠科学且有效的我都要」：第三支自研算法「日内动量」——
-    #   近 20 日日内累计收益 Σ(close/open−1) 最高 Top10 ∧ 收盘>MA60（strategy_intraday_momentum.py，B批 lowvol 紧后），
-    #   真实信号流口径，与低波趋稳同榜同纪律。上线首日 2026-10-18；主档 T+20
-    #   （上市前置回测唯一显著跑赢档：N=20 α+1.73pp/胜率42.6%；N≥45 衰减 ⇒ 短中持有期有效）。
-    dict(card="日内动量", kind="strategy", page="选股策略", icon="📈", cat="trade",
-         var="INTRADAY_MOMENTUM_BACKTEST", rel="data/INTRADAY_MOMENTUM_BACKTEST.js",
-         parser="by_period", label_prefix="持有", primary="持有 T+20",
-         method="真实信号流口径：每日全市场近20日日内累计收益(Σclose/open−1)最高 Top10 且收盘>MA60，次开买入持有 N 个交易日收盘卖出（前复权·扣双边 0.3%）；基准=同过滤 universe 等权"),
-    # 🆕 2026-10-19 主人令「这些算法的回测在策略回测页也要加上」：三新算法并入本总表。
-    #   三算法（缩量回踩VCP / 板块资金共振轮动 / 龙虎榜机构跟随）共用同一产物
-    #   data/NEW_ALGO_TRI_BACKTEST.js（window 下 vcp/rotation/lhb 三个子键，结构与
-    #   summary.by_period 同构）⇒ 新 parser `tri_sub` 按 src["sub"] 取子键，行构造逻辑
-    #   与 parse_by_period 逐字同源（诚实铁律同源：零样本 ⇒ win/avg 归 null +「累积中」，
-    #   绝不把「算不出」显示成「算出来且很差」）。
-    #   口径 = 真实信号流（gen_new_algo_tri.py::_tri_run_backtest；上线首日 2026-10-19
-    #   即建归档 raw_data/new_algo_tri_history.json，含已回落票防幸存者偏差）；
-    #   档位 TRI_N_LIST=[1,3,5,10,20]；主档 T+5（与因子卡/四量同口径横比；
-    #   10-19 上线即挂总表，样本随持有天数成熟，未走满不计入，MIN_SAMPLES 前只观测）。
-    dict(card="缩量回踩", kind="strategy", page="选股策略", icon="📐", cat="trade",
-         var="NEW_ALGO_TRI_BACKTEST", rel="data/NEW_ALGO_TRI_BACKTEST.js",
-         parser="tri_sub", sub="vcp", label_prefix="持有", primary="持有 T+5",
-         method="真实信号流口径：每日全市场「中期多头+放量启动后缩量回踩(VCP)」扫描，次开买入持有 N 个交易日收盘卖出（前复权·扣双边 0.3%）；基准=全市场等权（剔 ST/退、价格≥2）"),
-    dict(card="板块共振", kind="strategy", page="选股策略", icon="🔄", cat="trade",
-         var="NEW_ALGO_TRI_BACKTEST", rel="data/NEW_ALGO_TRI_BACKTEST.js",
-         parser="tri_sub", sub="rotation", label_prefix="持有", primary="持有 T+5",
-         method="真实信号流口径：行业资金流×SECTOR_RS×涨停热力×龙头四源共振的周期定位，取其龙头组合前向测（次开买入持有 N 个交易日收盘卖出，前复权·扣双边 0.3%）；基准=全市场等权（剔 ST/退、价格≥2）"),
-    dict(card="龙虎机构", kind="strategy", page="选股策略", icon="🐉", cat="trade",
-         var="NEW_ALGO_TRI_BACKTEST", rel="data/NEW_ALGO_TRI_BACKTEST.js",
-         parser="tri_sub", sub="lhb", label_prefix="持有", primary="持有 T+5",
-         method="真实信号流口径：LHB 机构席位净买≥3000万 跟随榜单（顺势/逆势两档），次开买入持有 N 个交易日收盘卖出（前复权·扣双边 0.3%）；基准=全市场等权（剔 ST/退、价格≥2）"),
     # 🗑 2026-10-11 主人令「完全下架」：逆势龙头（CRDS）登记条目随策略下架移除。
     #   原条目：dict(card="逆势龙头", var="CRDS_BACKTEST", rel="data/CRDS_BACKTEST.js",
     #              parser="by_period", label_prefix="持有", primary="持有 T+5")
@@ -722,7 +675,6 @@ PARSERS = {
     "by_period": parse_by_period,
     "ima_strong": parse_ima_strong,      # 🆕 2026-09-17 强势跟踪（顶层 periods 结构）
 
-    "tri_sub": parse_tri_sub,      # 🆕 2026-10-19 三新算法（NEW_ALGO_TRI_BACKTEST 子键）
     "tdx": parse_tdx,
     # 🗑 2026-09-19：algo_compare 解析器随「强势突破」全站删除一并摘除（见上墓碑）。
     "factor_lab": parse_factor_lab,

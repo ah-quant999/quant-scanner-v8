@@ -78,16 +78,6 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   导致 data/FACTOR_LAB.js 长期无人刷新（运维暗灯）。现正式挂链并给足冷启动预算
     #   （脚本自述冷启动 50-90min；热缓存后分钟级）。
     "v8/factor_lab_gen.py": 5400,
-    # 🚀 2026-10-11 主人令：量质双擎（第一支自研算法）挂 factor_lab_gen 紧后——
-    #   读其维护的全市场 kline_cache 打分选股，零重复拉数；分钟级，给 900s 预算。
-    "gen_lqsq_top5.py": 900,
-    # 🚀 2026-10-22 主人令「上」：资金异动三因子（第四支自研算法）每日生成器（复用 factor_walkforward 引擎零第二口径：读全 _wf_cache 宇宙 → 最新一日截面三因子降序秩和 → Top10 → ff3_ranksum_history 真实流归档 + FF3_RANKSUM_BACKTEST 主榜；上线首日即建归档）。~80s，给 900s 预算。🔴 与 ORDER/STAGES 三处字符串逐字一致
-    "gen_ff3_ranksum.py": 900,
-    # 🚀 2026-10-18 主人令「按建议做新算法·回测过了才上线」：第二支自研算法「低波趋势」
-    #   （上市前置回测 N=60 α+4.00pp/胜率53.3% 全场唯一显著跑赢；S1板块轮动/S3稳健突破/S4回踩
-    #   MA20 未跑赢基准不上线）· 零重复拉数（复用 gen_lqsq 的 ext 刷新），给 600s 预算。
-    "strategy_lowvol_trend.py": 600,
-    "strategy_intraday_momentum.py": 600,
     # 🔴 2026-10-11 主人令「完全下架」：v8/backtest_crds.py 已摘链（逆势龙头整体下架）。
     # "v8/backtest_crds.py": 3600,            # （已摘链 2026-10-11）CRDS 回测：逐只回测，给 1h 预算
     # 🛡 2026-09-11 一劳永逸（主人令·选项A）：四量终极 60min 此前**未登记预算** → 走默认 1800s。
@@ -208,10 +198,6 @@ ORDER = [
     # "calc_crds.py",
     "algorithms/refresh_kline_freshness.py",  # → 修 raw_data/_wf_cache 日K陈旧（不产 raw 产物，纯本地缓存修复）# 🆕 2026-10-22 K 线缓存新鲜度修复（ff3 对拍 ima 根因）：get_klines() 命中缓存即 return ⇒ 缓存永不更新，实测全池 4518 只里 10-13 后有日线的仅 394 只 ⇒ 下游因子算法在物理上选不出当日票。串行限速抓取（规避新浪 501 限流），只补陈旧票、增量幂等。
     "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（B批最前：final_recommend 前必产完，因子融合用当日新鲜因子；2026-09-09 主人令由 E 前置至此）
-    "gen_lqsq_top5.py",    # 🚀 2026-10-11 主人令：量质双擎每日生成器（kline_cache 副产物缓存 + 自刷新 GTimg 700根整根替换 → 全市场异常量比打分选 Top5（10-13 主人令由 Top30 收紧）→ lqsq_history 真实流归档 + LQSQ_BACKTEST 主榜视图；上线首日即建归档）。🔴 2026-10-12 去掉 algorithms/ 前缀：ORDER 与 STAGES/预算表三处字符串必须逐字一致（双层路径解析只认 scripts/ 与 v8/ 前缀，其余一律落 algorithms/ 目录）
-    "strategy_lowvol_trend.py",   # 🚀 2026-10-18 主人令：低波趋势每日生成器（60日波动率最低 Top5 ∧ 收盘>MA60 → lowvol_trend_history 真实流归档 + LOWVOL_TREND_BACKTEST 主榜；上线首日即建归档；2026-10-19 审计修正注释 Top10→Top5，代码 TOP_K=5）。挂 gen_lqsq 紧后复用其 kline_cache_ext 刷新（禁第二套拉数）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
-    "strategy_intraday_momentum.py", # 🚀 2026-10-18 主人令：日内动量每日生成器（近20日日内累计收益最高 Top5 ∧ 收盘>MA60 → intraday_momentum_history 真实流归档 + INTRADAY_MOMENTUM_BACKTEST 主榜；2026-10-19 审计修正注释 Top10→Top5，代码 TOP_K=5）。挂 strategy_lowvol_trend 紧后复用同一 ext 刷新。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
-    "gen_ff3_ranksum.py",    # 🚀 2026-10-22 主人令「上」：资金异动三因子每日生成器（factor_walkforward 引擎零第二口径：turntrend/amt60/ivol60 三因子降序秩和选 Top10 → ff3_ranksum_history 真实流归档 + FF3_RANKSUM_BACKTEST 主榜；上线首日即建归档）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
     # 🔴🔴 2026-10-23 主人令（P0-b）时序倒挂第二处根治：backtest_expectancy 从 B批尾/ORDER-D批前 再前移到
     #   generate_top10 之前。旧序 generate_top10(先) → backtest_expectancy(后) ⇒ 因子榜信号边权
     #   与 BT_BY_SIGNAL 永远吃 T-1 edge（代码自认，见原 09-22 注释）；前移后选股必吃当日
@@ -267,7 +253,6 @@ ORDER = [
     # "gen_algo_track.py",                # （已摘链 2026-10-18）→ ALGO_TRACK.js
     # ── 2026-08-17 主人怒令「每个前端的算法都全面审计」补入：之前完全不调度，前端卡永远陈旧 ──
     "calc_sentiment_cycle.py",          # → data/SENTIMENT_CYCLE.js（情绪周期，读 LIMIT_UP_HEATMAP；之前无任何 workflow 调用 = 孤儿）
-    "gen_new_algo_tri.py",              # 🆕 2026-10-19 主人令三新算法：缩量回踩VCP/板块资金共振轮动/LHB机构跟随 → data/NEW_ALGO_TRI.js
     "refresh_dividend_cninfo.py",       # → 更新 STOCK_QUOTE 分红字段（读 PORTFOLIO/CANDIDATE/GOLD_POOL；之前无任何 workflow 调用）
     # 🛡 2026-08-18 一劳永逸式修复：以下两脚本原不在 run_algorithms 链中，导致前端卡长期陈旧
     #   - refresh_stock_metadata.py → raw_data/weekend_meta_report.json（周末复盘，月度个股资料）
@@ -416,12 +401,6 @@ STAGES = {
         #   否则「为更好选股」的因子融合只能吃昨日陈旧数据。生成器 50-90min baostock 冷启动，18:10 起跑→19:40 前产完，D 批必吃到当日新鲜因子。
         "algorithms/refresh_kline_freshness.py",  # → 修 raw_data/_wf_cache 日K陈旧（与 ORDER 成对）# 🆕 2026-10-22 K 线缓存新鲜度修复（ff3 对拍 ima 根因）：get_klines() 命中缓存即 return ⇒ 缓存永不更新，实测全池 4518 只里 10-13 后有日线的仅 394 只 ⇒ 下游因子算法在物理上选不出当日票。串行限速抓取（规避新浪 501 限流），只补陈旧票、增量幂等。
         "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js + raw_data/factor_lab.json（baostock，冷启动长）
-        # 🔴 2026-10-12 主人令「一劳永逸」：gen_lqsq_top5 补进 STAGES（10-11 上线时只加 ORDER 漏加 STAGES，
-        #   模块级 assert 炸链：今晚 A 批两连崩 algo exit 1，全链停摆——与 ORDER L200 成对，位置一致=候选池之前）。
-        "gen_lqsq_top5.py",      # → data/LQSQ_BACKTEST.js + lqsq_history（量质双擎，必须与 ORDER 成对）
-        "strategy_lowvol_trend.py",   # → data/LOWVOL_TREND_BACKTEST.js + lowvol_trend_history（低波趋势，与 ORDER 成对）
-        "strategy_intraday_momentum.py", # → data/INTRADAY_MOMENTUM_BACKTEST.js + intraday_momentum_history（日内动量，与 ORDER 成对）
-        "gen_ff3_ranksum.py",      # → data/FF3_RANKSUM_BACKTEST.js + ff3_ranksum_history（资金异动三因子，与 ORDER 成对）
         "backtest_expectancy.py",          # 🔴 2026-10-23 主人令（P0-b）：再前移至 generate_top10 之前（与 ORDER 成对），选股吃当日最新 edge
         "build_candidate_pool.py", "gen_stock_winrate.py", "generate_top10.py",  # 🔴 2026-10-23 主人令·嵌入因子榜：gen_stock_winrate 须在 generate_top10 之前（与 ORDER 成对）
         # 🔴 2026-10-18 主人令「完全下架」：四量终极选股两件套已摘链（与 ORDER 成对）。
@@ -436,9 +415,6 @@ STAGES = {
         # "gen_triple_consensus.py", "gen_triple_track.py",
         "calc_volatility_watch.py",
         "gen_stock_stop.py", "calc_sentiment_cycle.py",
-        # 🆕 2026-10-19 主人令三新算法（与 ORDER L256 成对补挂；10-11 gen_lqsq_top5 同款
-        #   「只加 ORDER 漏加 STAGES」断言炸链，本轮 15:30 任务实测秒退后修复）。
-        "gen_new_algo_tri.py",              # → data/NEW_ALGO_TRI.js（缩量回踩VCP/板块资金共振轮动/LHB机构跟随）
         "refresh_dividend_cninfo.py",
         "refresh_stock_metadata.py", "fetch_weekend_run.py",   # 周末复盘/周度汇总（原 ORDER 漏挂 STAGE）
 
