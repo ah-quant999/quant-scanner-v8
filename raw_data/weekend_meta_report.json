@@ -1,13 +1,18 @@
 {
-"update_time": "2026-10-23 19:08:00",
+"update_time": "2026-10-23 08:53:36",
 "total": 8033,
 "new_listings_count": 0,
-"delisted_count": 0,
+"delisted_count": 4,
 "new_listings": [],
-"delisted": [],
+"delisted": [
+"000016 *ST康佳A",
+"02911 松景科技股权",
+"02920 卓悦控股（旧）",
+"08582 清大东方（四千）"
+],
 "meta_enriched": 0,
 "guard_tripped": false,
 "guard_reasons": [],
-"old_universe": 8033,
+"old_universe": 8037,
 "fresh_universe": 8033
 }
