@@ -114,8 +114,8 @@ window.__domReadyFns=[];
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 
-    <script src="data/ETF_INTRADAY_HEAT.js?v=7cae6c47e7" defer></script>
-    <script src="data/SECTOR_FUND_FLOW.js?v=dcbaa1b22d" defer></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=7019116bc4" defer></script>
+    <script src="data/SECTOR_FUND_FLOW.js?v=0d6a5223b3" defer></script>
     <script src="data/ETF_NET_SUBSCRIPTION.js?v=916ce11f7e" defer></script>
     <script src="data/ETF_SUBSCRIPTION_EASTMONEY.js?v=7680f0a657" defer></script>
 
@@ -131,23 +131,23 @@ window.__domReadyFns=[];
     <script src="data/MACRO_DATA.js?v=b4c63d4530" defer></script>
     <!-- 🔮 2026-10-05 主人令：未来预测子TAB（牛转熊指标观测台）数据，gen_market_thermo.py 日更 -->
     <script src="data/MARKET_THERMO.js?v=9ea902926a" defer></script>
-    <script src="data/MACRO_BRIEF.js?v=398b1e5e51" defer></script>
+    <script src="data/MACRO_BRIEF.js?v=fd9443872e" defer></script>
     <!-- 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役（巡检自动化已消亡、09-23 后死数据；生产者/渲染/派发/时窗一并清理，见 git 历史） -->
     <script src="data/NT_DATA.js?v=5b209dd423" defer></script>
-<script src="data/LHB_DATA.js?v=39d7a73229" defer></script>
+<script src="data/LHB_DATA.js?v=2c81901d12" defer></script>
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
-<script src="data/CONCEPT_RANKING.js?v=5afde52b2a" defer></script>
+<script src="data/CONCEPT_RANKING.js?v=9f6626825e" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
-<script src="data/INDEX_QUOTES.js?v=ff94073b63" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=f76e9cbf50" defer></script>
+<script src="data/INDEX_QUOTES.js?v=1be232762f" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=6acb5abb04" defer></script>
 <script src="data/MARGIN_DATA.js?v=8ea560638a" defer></script>
-<script src="data/CFFEX_HOLDINGS.js?v=1afae95e00" defer></script>
+<script src="data/CFFEX_HOLDINGS.js?v=ca16c1345f" defer></script>
 <script src="data/IPO_DATA.js?v=35b85f970b" defer></script>
-    <script src="data/CRISIS_DATA.js?v=8782dd976b" defer></script>
-    <script src="data/JUDGMENT_DATA.js?v=11b3e55db3" defer></script>
-    <script src="data/OVERSEAS_MARKETS.js?v=e2e4bfbca2" defer></script>
+    <script src="data/CRISIS_DATA.js?v=c916b05417" defer></script>
+    <script src="data/JUDGMENT_DATA.js?v=1841f49030" defer></script>
+    <script src="data/OVERSEAS_MARKETS.js?v=23fcb67265" defer></script>
 <!-- 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射（观测卡）。
      数据由 cloud_fetch_v8.py::f_us_hk_map() 盘前 08:25 单档生成 → raw_data/us_hk_map.json
      → update_v8.py → data/US_HK_MAP.js（window.US_HK_MAP）。此处漏注入 = 死块（恒 undefined）。 -->
@@ -184,8 +184,8 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=14823d9f81" defer></script>
-  <script src="data/AVG_PRICE_DATA.js?v=2b5d2eebe2" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=b200dc3eb3" defer></script>
+  <script src="data/AVG_PRICE_DATA.js?v=aea32c5c87" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
@@ -1244,17 +1244,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SECTOR_RS.js?v=f2e639402b" defer></script>
 <script src="data/SECTOR_PHASE_HISTORY.js?v=703094782f" defer></script>
 <script src="data/INST_TRADE.js?v=954d5cd091" defer></script>
-<script src="data/NORTH_FUND.js?v=fe1807fc7e" defer></script>
-<script src="data/MARKET_ALERTS.js?v=433f9e4dd6" defer></script>
-<script src="data/MARKET_FUND_FLOW_DATA.js?v=5270d94790" defer></script>
-<script src="data/LIMIT_UP_HEATMAP.js?v=2926fe0f4f" defer></script>
+<script src="data/NORTH_FUND.js?v=b71afd8a6d" defer></script>
+<script src="data/MARKET_ALERTS.js?v=858d597857" defer></script>
+<script src="data/MARKET_FUND_FLOW_DATA.js?v=6d9abe4f81" defer></script>
+<script src="data/LIMIT_UP_HEATMAP.js?v=8326a0fe72" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
      记录每个板块的「启动 → 退潮」周期区间，可跨年回查；由 build_sector_cycle_archive.py 派生。 -->
-<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=99a842e80a" defer></script>
-<script src="data/LIMIT_UP_BROKEN.js?v=bb254bc7c0" defer></script>
+<script src="data/SECTOR_CYCLE_ARCHIVE.js?v=7e49e0c0e3" defer></script>
+<script src="data/LIMIT_UP_BROKEN.js?v=6b9fd4ab7e" defer></script>
 <script src="data/VOLATILITY.js?v=979c75242a" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=3016a01055" defer></script>
-<script src="data/SH_SZ_HISTORY.js?v=0be8f2f29c" defer></script>
+<script src="data/SH_SZ_HISTORY.js?v=e8161de657" defer></script>
 <script src="data/CANDIDATE.js?v=173dd0b3be" defer></script>
 
     <script src="data/STOCK_STOP_DATA.js?v=ec2dde169d" defer></script>
@@ -1279,8 +1279,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
     <script src="data/FACTOR_LAB.js?v=d54107f788" defer></script>
 <!-- 🔴 2026-10-06 阿狸咪的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
-<script src="data/ETF_PULSE.js?v=78c0a52bd5" defer></script>
-<script src="data/ETF_DAILY_MONITOR.js?v=e6181fa979" defer></script>
+<script src="data/ETF_PULSE.js?v=e3869f42d6" defer></script>
+<script src="data/ETF_DAILY_MONITOR.js?v=0d59f42d74" defer></script>
 <script src="data/TOP10_DAILY.js?v=9bbbe3e6c4" defer></script>
 <!-- 🆕 2026-10-21 主人令「要」：最强共振·回测跟踪（track_resonance.py 每日重算 raw_data/resonance_track.json → update_v8 转换） -->
 <script src="data/RESONANCE_TRACK.js?v=b5c5ee6318" defer></script>
@@ -1294,11 +1294,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CFFEX_POSITION.js?v=f18ea5b941" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=c6293b71a7" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=b32a9ab72e" defer></script>
-<script src="data/HB_XIAOJIU.js?v=0390c1ed2c" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=e95ce60dd4" defer></script>
-<script src="data/HEALTH_CHECK.js?v=4892174586" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=d933a2e9c5" defer></script>
+<script src="data/RUNNER_STATUS.js?v=0d98860222" defer></script>
+<script src="data/HB_XIAOJIU.js?v=43fccd1521" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=14de066cb7" defer></script>
+<script src="data/HEALTH_CHECK.js?v=9affa105c7" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=9b417af9dd" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=0740ad2c85" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=623c8693a4" defer></script>
@@ -1312,13 +1312,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=bdbea4d33b" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=709cf7c066" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=79037ea556" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=6dd34c132c" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=f32f26b7d1" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=dc29c9d0c3" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=b4fe2c56d9" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=a3e0afb5c8" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=852a524954" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/IMA_STRONG_BACKTEST.js?v=0cee3ff86c" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/IMA_STRONG_BACKTEST.js?v=1cf072095c" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ · 第一支自研算法）经真实信号流回测确认不达标，整支下架删除（前端挂载 + 后端脚本 + 数据全部清除）；相关注入脚本已移除，仅 FF3 自研算法保留（见下方 FF3_RANKSUM 注入）。 -->
     <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）前端接入 —— 后端 gen_ff3_ranksum.py 每日重算 raw_data/ff3_ranksum_*.json → update_v8 转换 -->
     <script src="data/FF3_RANKSUM_TRACK.js?v=c5b5c866af" defer></script>
@@ -1646,7 +1646,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       //   原 ok 仅校验 head 含卡名，但：defer 时序下需排序：
       //     1) HTML 分析到 line 1630+ 注册 ◐◦selfHealJudgmentHeader；
       //     2) HTML 继续分析到 line 10673 注册 v8CardHeader；
-      //     3) <script src="data/JUDGMENT_DATA.js?v=11b3e55db3" defer> 和 <script src="data/MACRO_BRIEF.js?v=398b1e5e51" defer> 在 HTML 分析完成后才异步执行；
+      //     3) <script src="data/JUDGMENT_DATA.js?v=1841f49030" defer> 和 <script src="data/MACRO_BRIEF.js?v=fd9443872e" defer> 在 HTML 分析完成后才异步执行；
       //     4) 首次 initCardBadges / switchSec 触发 ◐◦renderJudgmentHeader 时，JUDGMENT_DATA.js 可能还没加载完；
       //     5) ts='' → v8CardHeader 返回的 HTML 中：卡名、副标题，但缺少「更新于」膠勢；
       //     6) 自愈校验 ok 通过（head.innerHTML.indexOf('今日判定')>=0）→ 永不重昆明；
@@ -8210,7 +8210,7 @@ function switchSec(sec,el){
         _slSelfInjected = true;
         try{
           var _sc = document.createElement('script');
-          _sc.src = (_v8ResUrl('STOCK_LIST') || 'data/STOCK_LIST.js?v=681e829b26'); _sc.async = true;
+          _sc.src = (_v8ResUrl('STOCK_LIST') || 'data/STOCK_LIST.js?v=fe5f3d89cd'); _sc.async = true;
           document.head.appendChild(_sc);
         }catch(e){}
       }
@@ -15294,7 +15294,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=6dd34c132c');
+      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=b4fe2c56d9');
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -15303,7 +15303,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=f32f26b7d1');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=a3e0afb5c8');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -18423,9 +18423,9 @@ window.__renderV8CalToday();
     return null;
   }
   var BIG=[
-    {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=681e829b26', fallbacks:[A2_CDN+'STOCK_LIST.js']},
+    {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=fe5f3d89cd', fallbacks:[A2_CDN+'STOCK_LIST.js']},
     {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=8c6ac66ca8', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
-    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=4094df48a4', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
+    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=0b97f098e0', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
     var srcs=[item.url].concat(item.fallbacks||[]);
