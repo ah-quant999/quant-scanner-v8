@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-23 21:59",
- "generated": "2026-10-23 21:59",
+ "update_time": "2026-10-23 22:42",
+ "generated": "2026-10-23 22:42",
  "meta": {
-  "generated": "2026-10-23 21:59",
+  "generated": "2026-10-23 22:42",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11425,24 +11425,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "300296",
-      "name": "利亚德",
-      "change_pct": 20.0,
-      "price": 7.32,
-      "category": "突破"
-     },
-     {
       "code": "688071",
       "name": "华依科技",
       "change_pct": 20.0,
       "price": 47.52,
-      "category": "突破"
-     },
-     {
-      "code": "300369",
-      "name": "绿盟科技",
-      "change_pct": 19.98,
-      "price": 11.71,
       "category": "突破"
      },
      {
@@ -11481,13 +11467,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "300031",
-      "name": "宝通科技",
-      "change_pct": 14.423,
-      "price": 28.56,
-      "category": "突破"
-     },
-     {
       "code": "000056",
       "name": "*ST皇庭",
       "change_pct": 4.878,
@@ -11499,13 +11478,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "春晖智控",
       "change_pct": 4.361,
       "price": 28.0,
-      "category": "突破"
-     },
-     {
-      "code": "300007",
-      "name": "汉威科技",
-      "change_pct": 9.84,
-      "price": 38.4,
       "category": "突破"
      },
      {
@@ -11534,13 +11506,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "得邦照明",
       "change_pct": 4.095,
       "price": 27.2,
-      "category": "突破"
-     },
-     {
-      "code": "300307",
-      "name": "慈星股份",
-      "change_pct": 20.0,
-      "price": 8.94,
       "category": "突破"
      },
      {
@@ -11583,13 +11548,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "丽珠集团",
       "change_pct": 3.651,
       "price": 26.97,
-      "category": "突破"
-     },
-     {
-      "code": "300378",
-      "name": "鼎捷数智",
-      "change_pct": 13.723,
-      "price": 43.92,
       "category": "突破"
      },
      {
@@ -11703,6 +11661,27 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 5.056,
       "price": 7.48,
       "category": "突破"
+     },
+     {
+      "code": "603161",
+      "name": "科华控股",
+      "change_pct": 3.287,
+      "price": 14.14,
+      "category": "突破"
+     },
+     {
+      "code": "688228",
+      "name": "开普云",
+      "change_pct": 7.436,
+      "price": 76.0,
+      "category": "突破"
+     },
+     {
+      "code": "920015",
+      "name": "锦华新材",
+      "change_pct": 6.331,
+      "price": 41.65,
+      "category": "突破"
      }
     ],
     "加速": [
@@ -11714,24 +11693,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "300296",
-      "name": "利亚德",
-      "change_pct": 20.0,
-      "price": 7.32,
-      "category": "加速"
-     },
-     {
       "code": "688071",
       "name": "华依科技",
       "change_pct": 20.0,
       "price": 47.52,
-      "category": "加速"
-     },
-     {
-      "code": "300369",
-      "name": "绿盟科技",
-      "change_pct": 19.98,
-      "price": 11.71,
       "category": "加速"
      },
      {
@@ -11770,13 +11735,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "300031",
-      "name": "宝通科技",
-      "change_pct": 14.423,
-      "price": 28.56,
-      "category": "加速"
-     },
-     {
       "code": "000056",
       "name": "*ST皇庭",
       "change_pct": 4.878,
@@ -11788,13 +11746,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "春晖智控",
       "change_pct": 4.361,
       "price": 28.0,
-      "category": "加速"
-     },
-     {
-      "code": "300007",
-      "name": "汉威科技",
-      "change_pct": 9.84,
-      "price": 38.4,
       "category": "加速"
      },
      {
@@ -11823,13 +11774,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "得邦照明",
       "change_pct": 4.095,
       "price": 27.2,
-      "category": "加速"
-     },
-     {
-      "code": "300307",
-      "name": "慈星股份",
-      "change_pct": 20.0,
-      "price": 8.94,
       "category": "加速"
      },
      {
@@ -11849,24 +11793,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "300296",
-      "name": "利亚德",
-      "change_pct": 20.0,
-      "price": 7.32,
-      "category": "短线选股"
-     },
-     {
       "code": "688071",
       "name": "华依科技",
       "change_pct": 20.0,
       "price": 47.52,
-      "category": "短线选股"
-     },
-     {
-      "code": "300369",
-      "name": "绿盟科技",
-      "change_pct": 19.98,
-      "price": 11.71,
       "category": "短线选股"
      },
      {
@@ -11905,13 +11835,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "300031",
-      "name": "宝通科技",
-      "change_pct": 14.423,
-      "price": 28.56,
-      "category": "短线选股"
-     },
-     {
       "code": "000056",
       "name": "*ST皇庭",
       "change_pct": 4.878,
@@ -11923,13 +11846,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "春晖智控",
       "change_pct": 4.361,
       "price": 28.0,
-      "category": "短线选股"
-     },
-     {
-      "code": "300007",
-      "name": "汉威科技",
-      "change_pct": 9.84,
-      "price": 38.4,
       "category": "短线选股"
      },
      {
@@ -11958,13 +11874,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "得邦照明",
       "change_pct": 4.095,
       "price": 27.2,
-      "category": "短线选股"
-     },
-     {
-      "code": "300307",
-      "name": "慈星股份",
-      "change_pct": 20.0,
-      "price": 8.94,
       "category": "短线选股"
      },
      {
@@ -12007,13 +11916,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "丽珠集团",
       "change_pct": 3.651,
       "price": 26.97,
-      "category": "短线选股"
-     },
-     {
-      "code": "300378",
-      "name": "鼎捷数智",
-      "change_pct": 13.723,
-      "price": 43.92,
       "category": "短线选股"
      },
      {
@@ -12126,6 +12028,27 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "太阳电缆",
       "change_pct": 5.056,
       "price": 7.48,
+      "category": "短线选股"
+     },
+     {
+      "code": "603161",
+      "name": "科华控股",
+      "change_pct": 3.287,
+      "price": 14.14,
+      "category": "短线选股"
+     },
+     {
+      "code": "688228",
+      "name": "开普云",
+      "change_pct": 7.436,
+      "price": 76.0,
+      "category": "短线选股"
+     },
+     {
+      "code": "920015",
+      "name": "锦华新材",
+      "change_pct": 6.331,
+      "price": 41.65,
       "category": "短线选股"
      }
     ],
@@ -12166,13 +12089,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "300378",
-      "name": "鼎捷数智",
-      "change_pct": 13.723,
-      "price": 43.92,
-      "category": "强势股"
-     },
-     {
       "code": "688696",
       "name": "极米科技",
       "change_pct": 7.129,
@@ -12282,6 +12198,27 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "太阳电缆",
       "change_pct": 5.056,
       "price": 7.48,
+      "category": "强势股"
+     },
+     {
+      "code": "603161",
+      "name": "科华控股",
+      "change_pct": 3.287,
+      "price": 14.14,
+      "category": "强势股"
+     },
+     {
+      "code": "688228",
+      "name": "开普云",
+      "change_pct": 7.436,
+      "price": 76.0,
+      "category": "强势股"
+     },
+     {
+      "code": "920015",
+      "name": "锦华新材",
+      "change_pct": 6.331,
+      "price": 41.65,
       "category": "强势股"
      }
     ]
