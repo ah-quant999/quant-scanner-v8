@@ -9805,3 +9805,13 @@ items:
     evidence: "三变体全部 PASS：ff3_zsum hold10 IR_OOS=0.799 beat=58.6% 年达标4/8；ff3_ranksum hold10 IR_OOS=1.031 beat=59.8%；ff3_ttw hold10 IR_OOS=0.991 beat=59.4%；45d档利差+3.1~4.1%、PSR 0.999~1.000、Purged-WF IR 3.4~4.0。高手画像(123只可画像)：turntrend z=-0.129、amt60 z=+0.106(高于中位83%)、ivol60 z=+0.106(顶档15%)，但复合 z=+0.028(中性) ⇒ 高手 edge 不在量价因子(在题材/情绪/涨停聚众)，两者互补不可互替"
     verify_how: "E:/v8data/qs8-tmp/factor_composite_ff3.json + ff3_run.log(EXIT=0，25s；池700只含高手186只强制入池；轴2473天 2016-08-08→2026-10-19)；接入前需主人拍板变体+主档位(建议 ff3_ranksum，hold=10d主口径/45d长档)"
     updated: "2026-10-22 09:20"
+  - id: unlisted-audit-and-fixes-1023
+    priority: P1
+    owner: 小九
+    status: done
+    what: "2026-10-23 主人令：暂未上架9卡审计 + 改后三件套。发现2真问题：①大基金增减持监控(DAJIJIN_REDUCTION)死卡——renderUnlisted dispatcher 漏挂 _fillDajijin，正常渲染路径永不调用，卡永久 display:none/加载中；②国家队活跃度(NATIONAL_TEAM)永久停更——gen_national_team.py 盘后闸门 _sf_dt.hour>=16 硬阈值，但 SECTOR_FUND_FLOW 盘后固定~15:45落戳(A股15:00收盘)，每日有效盘后数据被误判未就绪，卡停在10-20。"
+    fix: "①大基金死卡：index.html dispatcher names 数组补 '_fillDajijin'(commit dd4dbb5458 已上main，线上 _fillDajijin=7处确认在站)。②国家队闸门：gen_national_team.py 阈值 >=16 改 >=15(收盘后即有效盘后；跨零点按昨日判定不变)。③补推4个此前漏推的10-23主人令修复：gen_market_brief.py(AI速览异动条数据源诚实戳)、scripts/fetch_avg_price.py(补 ma30/index_880003 四字段，已停用fetcher无害)、scripts/intraday_first_batch_gate.py(workflow_id 裸文件名防404 + 盘中动态判定线 now-25min)、docs/ops/index_protected_markers.txt(三刷新锚点)。"
+    evidence: "NATIONAL_TEAM 派发 v8_national_team.yml(run 39930555662 success)重算 -> 线上 data_date=2026-10-23 update_time=17:15:54 score=39.0(静默·未见托盘)；SECTOR_YEAR_FLOW 实测 data_date=2026-10-23(100板块 fail=0，生成器逻辑本就正确、此前陈旧系CDN/回读滞后假象)；DAJIJIN_REDUCTION 数据今刷01:26、卡体修复后正常渲染。4漏推文件 commit a6f0c794 逐字节回读一致。"
+    verify_how: "API 硬回读 main 9卡 data_date/update_time 全为今日(底层快照日10-22属正常口径)；index.html 线上 _fillDajijin=7=本地确认死卡修复在站；gen_national_team.py 线上闸门 >=15 在站；git ls-remote main HEAD=a6f0c794f4d380e0b9f56e03a0e902d2df83e351。"
+    verified_at: "2026-10-23 17:50"
+
