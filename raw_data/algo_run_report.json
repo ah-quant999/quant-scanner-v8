@@ -1,8 +1,21 @@
 {
-  "update_time": "2026-10-23 17:32:47",
-  "run_start": "2026-10-23 16:53:11",
-  "ok": 14,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-10-23 19:08:35",
+  "run_start": "2026-10-23 18:18:53",
+  "ok": 20,
+  "fail": 3,
+  "failed_scripts": [
+    {
+      "script": "algorithms/refresh_kline_freshness.py",
+      "reason": "脚本文件缺失"
+    },
+    {
+      "script": "v8/factor_lab_gen.py",
+      "reason": "退出码 1 | logout failed!"
+    },
+    {
+      "script": "backtest_expectancy.py",
+      "reason": "超时 >30min"
+    }
+  ],
   "skipped_by_time_gate": []
 }
