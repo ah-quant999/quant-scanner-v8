@@ -1242,7 +1242,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WAVE_ELLIOTT.js?v=651d9b10a6" defer></script>
 <script src="data/SZ_FIB.js?v=ddcda2a9eb" defer></script>
 <script src="data/SECTOR_RS.js?v=a3b802a745" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=665a1d8473" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=2b8242c1be" defer></script>
 <script src="data/INST_TRADE.js?v=954d5cd091" defer></script>
 <script src="data/NORTH_FUND.js?v=7fc806fda0" defer></script>
 <script src="data/MARKET_ALERTS.js?v=36db909cda" defer></script>
@@ -1263,9 +1263,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=326e92d3a6" defer></script>
 <script src="data/EXPERIMENT.js?v=97a14243a9" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=f13c2814eb" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=8c8bcc4921" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=390df87f32" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=f13c2814eb" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=8c8bcc4921" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=2b71e91f6b" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=c48c57f938" defer></script>
+<script src="data/V8_POOL_TRACKER.js?v=231b7077d8" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=5614f713d5" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=c4c3508104" defer></script>
 <!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日07:50派发；10-21 19:16 首跑真实数据） -->
@@ -1296,8 +1296,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=e78ecdf178" defer></script>
 <script src="data/HB_XIAOJIU.js?v=ab42edad8d" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=4e144600a6" defer></script>
-<script src="data/HEALTH_CHECK.js?v=23c20b26b7" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=5e47de59b6" defer></script>
+<script src="data/HEALTH_CHECK.js?v=113d9e3ad9" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=31ac15eb1b" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=92e1b7362c" defer></script>
@@ -19067,7 +19067,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=681e829b26', fallbacks:[A2_CDN+'STOCK_LIST.js']},
     {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=8c6ac66ca8', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
-    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=b2753cb04d', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
+    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=285003b843', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
     var srcs=[item.url].concat(item.fallbacks||[]);
