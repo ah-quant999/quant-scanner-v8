@@ -63,7 +63,9 @@ CARD_DEFS = [
     {"id": "V8_CAL", "name": "重要事件日历", "page": "今日事件", "freq": "每周日+月末", "max_age": 10080, "key_fields": ["weeks", "month"], "weekly": True},
     {"id": "IPO_DATA", "name": "打新研判", "page": "今日事件", "freq": "每日盘前", "max_age": 1440, "key_fields": ["stocks"], "weekend_update": False},
     {"id": "JUDGMENT_DATA", "name": "今日判定", "page": "今日事件", "freq": "每日盘前", "max_age": 1440, "key_fields": ["verdict", "indices"], "weekend_update": False},
-    {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "freq": "每日盘前", "max_age": 1440, "key_fields": ["global_macro", "monetary"], "weekend_update": False, "manual_dep": True, "manual_note": "人工撰写宏观解读（管线仅补cpi/pmi，rich结构需主人更新）"},
+    # 🔧 2026-10-23 审计校正：宏观数据速览卡同时挂「今日事件」与「盘后数据」两页（DOM 实证），
+    #   补 dual_page 让运维看板「盘后数据」组不再漏排。
+    {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["global_macro", "monetary"], "weekend_update": False, "manual_dep": True, "manual_note": "人工撰写宏观解读（管线仅补cpi/pmi，rich结构需主人更新）"},
     # NT_DATA(nt_data.json) 由 algorithms/fetch_orphan_nt_data.py 产出，归 run_algorithms.py(算法链)，
     # 不在 cloud_fetch_v8.py 的 premarket 注册表内 —— 按 page 映射派发 cn_fetch premarket 永远刷不到它，
     # 故显式覆盖自愈类别为 algo_run（2026-08-11 第155轮看门狗定位并根治）。
@@ -150,11 +152,11 @@ CARD_DEFS = [
     #   移除该项登记;下面"全量数据审计"循环的 derived = {..., "SIX_DIM_RADAR"}
     #   已保护它不报"缺失或解析失败"。前端 renderSixDim 直接读 SH_FIB,无副作用。
     # 🛡 2026-09-30 主人令（盘后页映射对齐·两卡跟随大盘观测卡走）：
-    #   MARGIN_DATA 的唯一 UI =「🔒 已下架」页 renderDelisted 内「两融余额走势」（v8MarginChart），2026-10-04 主人令由观测平台迁回已下架；page 恢复「盘后数据」（数据节拍仍每日16:15发布，24h阈值不变），
-    #   原登记 page="盘后数据" 与实际页失配。改 page 即看板自动归位；
-    #   阈值口径不变：post_close 节拍由下方 adjust_max_age / _hard_cap 的盘后元组显式覆盖
-    #   （"盘后数据" 本就在该元组），max_age=1440 与 heal_cat 均不动 → 有效阈值与迁移前逐字节同值。
-    {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["sh"], "heal_cat": "post_close"},  # 2026-08-18 主人令一劳永逸：交易所每日16:15发布1次，360min 阈值导致 22:15 必误报 → 1440（24h，符合主人 24h 铁律）
+    #   MARGIN_DATA 的唯一 UI =「🔒 已下架」页 renderDelisted 内「两融余额走势」（v8MarginChart），2026-10-04 主人令由观测平台迁回已下架；
+    #   🔧 2026-10-23 审计校正（小九）：page 改「已下架」——看板组按 page 归类，登记 page="盘后数据"
+    #   会让运维看板「盘后数据」组多出一张页面上不存在的卡（当日盘后页审计实证）。改 page 即看板自动归位；
+    #   阈值口径不变：max_age=1440 显式 24h，与 page 元组无关，有效阈值逐字节同值。heal_cat 不动。
+    {"id": "MARGIN_DATA", "name": "融资融券", "page": "已下架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["sh"], "heal_cat": "post_close"},  # 2026-08-18 主人令一劳永逸：交易所每日16:15发布1次，360min 阈值导致 22:15 必误报 → 1440（24h，符合主人 24h 铁律）
     # 🛡 2026-09-11 主人令（轻量化·卡迁移）：原「实时数据」段条目迁来——「日监控·主力净流入」
     #   已自 ETF 二合一（原三合一）Block3 拆出，独立成卡挂在「盘后数据」页、市场宽度卡上方。
     #   · page="盘后数据"     —— 与 index.html / logic.html「任务运行看板」的分组一致（不再置实时数据组）
@@ -254,8 +256,11 @@ CARD_DEFS = [
     # 🛡 2026-09-30 主人令（盘后页映射对齐）：MARKET_REGIME 唯一 UI =「暂未上架·调试专区」
     #   ulMacroPanel（🌍宏观环境卡）。page 迁"暂未上架"（该页已加入盘后阈值元组，
     #   有效阈值仍 = def_max(1440)，逐字节同值）。
+    # 🔴 2026-10-23 审计移除（小九）：SECTOR_RECOMMENDATION（板块推荐）UI 已死——
+    #   唯一渲染函数 renderSectorRecommendationCard 零调用 + 宿主 ulSecPanel 在 DOM 中不存在；
+    #   留在注册表 = 运维看板「盘后数据」组永远多一张幽灵卡。生产链（sector_recommendation.py →
+    #   data/SECTOR_RECOMMENDATION.js）暂保留运行，整链退役待主人拍板（另立交接项）。
     {"id": "MARKET_REGIME", "name": "市场利率环境", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current_rates", "trends", "meta"], "heal_cat": "algo_run"},
-    {"id": "SECTOR_RECOMMENDATION", "name": "板块推荐", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["regime", "current_rates", "trends", "meta"], "heal_cat": "algo_run"},
     # 选股策略
     # 🔴 2026-10-18 主人令「完全下架」：四量终极监控摘除（条目文本见上方墓碑区）。
     # {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
@@ -338,6 +343,9 @@ CARD_DEFS = [
     {"id": "COMMODITY_ELASTICITY", "name": "商品涨价弹性榜", "page": "实时数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["hot_count"], "heal_cat": "post_close", "raw_file": "commodity_elasticity.json"},
     {"id": "ETF_NET_SUBSCRIPTION", "name": "资金热度·净申赎", "page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["total_net_amount_yi"], "heal_cat": "premarket", "raw_file": "etf_net_subscription.json"},
     {"id": "W52_HIGH", "name": "市场宽度·新高家数", "page": "盘后数据", "freq": "每交易日盘前(07:15~08:45)", "max_age": 1440, "key_fields": ["total", "top_gainers"], "heal_cat": "post_close", "raw_file": "w52_high.json", "cycle": (8, 45)},
+    # 🔧 2026-10-23 审计补登记（小九）：盘后页两张真实卡此前漏登记 → 运维看板「盘后数据」组错位/漏排。
+    {"id": "SECTOR_FUND_FLOW_TREND", "name": "板块资金趋势", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["summary", "sectors_in"], "heal_cat": "post_close", "raw_file": "sector_fund_flow_trend.json"},
+    {"id": "CFFEX_POSITION", "name": "IF会员持仓择时", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["nlr", "posture"], "heal_cat": "post_close", "raw_file": "cffex_position.json"},  # data_date=T-1 为设计内（中金所当日定稿无抓取窗口，gen 代码注明）
     {"id": "RESTRICTED_RELEASE", "name": "今日解禁", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "stats"], "heal_cat": "premarket", "raw_file": "restricted_release.json"},
     {"id": "PERFORMANCE_FORECAST", "name": "今日业绩预告", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "summary"], "heal_cat": "premarket", "raw_file": "performance_forecast.json"},
     {"id": "IMA_STRONG_STOCK", "name": "强势跟踪", "page": "选股策略", "freq": "工作日15:45", "max_age": 1440, "key_fields": ["data_date", "source"], "raw_file": "ima_strong_stock.json", "producer": "fetch_ima_strong_stock.py"},

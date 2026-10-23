@@ -12007,12 +12007,14 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'板块资金趋势', source:'SECTOR_RECOMMENDATION', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'收盘复盘+周期定位'},
+          {name:'板块资金趋势', source:'SECTOR_FUND_FLOW_TREND', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'收盘复盘+周期定位'},
 
           {name:'日监控·主力净流入', source:'ETF_DAILY_MONITOR', freq:'盘中每30分+盘后定稿', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'ETF 主力净流入'},
 
           {name:'资金热度·净申赎', source:'ETF_NET_SUBSCRIPTION', freq:'每日盘前', slots:['0','8',':','2','5'], note:'真实份额申赎'},
           {name:'资金热度·东财五分类', source:'ETF_SUBSCRIPTION_EASTMONEY', freq:'每日盘前', slots:['0','8',':','2','5'], note:'股票/债券/货币/商品/跨境'},
+
+          {name:'IF会员持仓择时', source:'CFFEX_POSITION', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'中金所持仓 T-1 披露'},
 
           {name:'市场宽度·新高家数', source:'W52_HIGH', freq:'收盘后1次', slots:['1','7',':','3','0'], note:'52周新高广度'},
 
@@ -12704,7 +12706,7 @@ function drawUpDownChart(){
     '观测平台': ['SH_FIB', 'maharo_insights', 'INDEX_VALUE_FRAMEWORK', 'WAVE_ELLIOTT', 'CITIC_PE_THERMO'],
     '今日事件': ['V8_CAL', 'IPO_DATA', 'JUDGMENT_DATA', 'MACRO_DATA', 'RESTRICTED_RELEASE', 'PERFORMANCE_FORECAST'],
     '实时数据': ['INDEX_QUOTES', 'ETF_PULSE', 'ETF_INTRADAY_HEAT', 'SECTOR_FUND_FLOW', 'CONCEPT_RANKING', 'LIMIT_UP_HEATMAP', 'SECTOR_FUND_FLOW_INTRADAY', 'MARKET_ALERTS', 'STOCK_QUOTE', 'CFFEX_HOLDINGS', 'AVG_PRICE_DATA', 'OVERSEAS_MARKETS', 'AI_MARKET_BRIEF', 'COMMODITY_ELASTICITY'],
-    '盘后数据': ['MARGIN_DATA', 'ETF_DAILY_MONITOR', 'SECTOR_RECOMMENDATION', 'ETF_NET_SUBSCRIPTION', 'ETF_SUBSCRIPTION_EASTMONEY', 'W52_HIGH'],  /* 🏔 2026-10-20：SECTOR_YEAR_FLOW 随卡迁「暂未上架」 */
+    '盘后数据': ['SECTOR_FUND_FLOW_TREND', 'ETF_DAILY_MONITOR', 'ETF_NET_SUBSCRIPTION', 'ETF_SUBSCRIPTION_EASTMONEY', 'CFFEX_POSITION', 'W52_HIGH', 'MACRO_DATA', 'RESTRICTED_RELEASE', 'PERFORMANCE_FORECAST'],  /* 🏔 2026-10-20：SECTOR_YEAR_FLOW 随卡迁「暂未上架」 */
     '共振日历': ['CRISIS_DATA', 'LHB_DATA'],
     '最终推荐': ['FACTOR_LAB', 'TOP10_DAILY'],
     '选股策略': ['CANDIDATE', 'GOLD_POOL', 'IMA_STRONG_BACKTEST', 'VOLATILITY', 'STOCK_STOP_DATA', 'H_AUTO_BUY', 'H_AUTO_BUY_TRACK', 'IMA_STRONG_STOCK', 'FIRST_BOARD_ALERT', 'LIANBAN_WINRATE'],  /* 🆕 2026-10-19：连板梯队两卡自暂未上架迁入 */  /* 🔴 2026-10-11：TRIPLE_CONSENSUS/TRIPLE_HISTORY/CRDS_CARD_DATA 随两策略下架移除；🔴 2026-10-18：四量终极+ALGO_TRACK 随四量下架移除 */

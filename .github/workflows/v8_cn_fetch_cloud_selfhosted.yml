@@ -284,16 +284,28 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: "🐍 Python / 依赖检查（缺才装·清华镜像）"
-        shell: powershell
-        # ASCII-ONLY body: Windows PowerShell 5.1 reads generated .ps1 as ANSI/GBK.
+        # 🔴 2026-10-23 根因修复（小九，run 39939545488 日志实证）：原 PowerShell 写法
+        #   `python -c "import ..." 2>$null` 在 PS 5.1 下 stderr 重定向触发 NativeCommandError
+        #   直接把本步打成 exit 1 —— 后面的「清华镜像 pip install」兜底从未有机会执行
+        #   ⇒ alimi-cn 依赖缺失后整条 cn 链连续 failure（10-22~10-23 全部 runs 全失败），
+        #   抓取/推送/update_v8 全 skipped ⇒ W52_HIGH 等 cn-IP 硬约束源盘后永不刷新。
+        #   改 bash 实现：2>/dev/null + if 退出码判定（bash 无 PS stderr 语义陷阱），
+        #   装完复检，仍缺才显式 ::error 失败。ASCII-only 注释约束不再适用（bash 无 GBK 坑）。
+        shell: bash
         run: |
           python --version
-          python -c "import akshare, pandas, requests, pytdx" 2>$null
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "deps missing, installing from tsinghua mirror..."
+          if python -c "import akshare, pandas, requests, pytdx" 2>/dev/null; then
+            echo "deps ready"
+          else
+            echo "deps missing, installing from tsinghua mirror..."
             python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas requests pytdx
-          } else { Write-Host "deps ready" }
-          exit 0
+            if python -c "import akshare, pandas, requests, pytdx" 2>/dev/null; then
+              echo "deps ready after install"
+            else
+              echo "::error title=deps-still-missing::依赖安装后仍缺失，后续抓取步将失败，请检查 runner Python 环境（pip 源可达性/磁盘空间）"
+              exit 1
+            fi
+          fi
 
       - name: "📡 抓中国数据 → raw_data/（selective）"
         # 🛡️ 2026-08-12 曾移除 continue-on-error（防空壳推送）。
