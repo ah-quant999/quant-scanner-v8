@@ -1,11 +1,11 @@
 {
- "update_time": "2026-10-24 02:28:08",
+ "update_time": "2026-10-24 03:54:08",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
   "shrinkage_k": 10,
   "score_formula": "winrate_score = Σ_h [avg_shrunk_h×w_a + (win_shrunk_h−50)×w_w]，h∈{5:(5.0,0.3), 10:(3.0,0.2)}；均益主导、胜率仅微修正",
-  "n_signals": 1706,
+  "n_signals": 1709,
   "n_stocks": 320,
   "signal_date_range": [
    "2026-06-06",
@@ -536,7 +536,7 @@
   {
    "code": "002138",
    "name": "顺络电子",
-   "n_signals": 8,
+   "n_signals": 9,
    "kinds": [
     "final",
     "top10"
@@ -667,7 +667,7 @@
   {
    "code": "300199",
    "name": "翰宇药业",
-   "n_signals": 27,
+   "n_signals": 28,
    "kinds": [
     "final",
     "top10"
@@ -1253,7 +1253,7 @@
   {
    "code": "688099",
    "name": "晶晨股份",
-   "n_signals": 8,
+   "n_signals": 9,
    "kinds": [
     "final",
     "top10"
@@ -2295,12 +2295,12 @@
   {
    "code": "002353",
    "name": "杰瑞股份",
-   "n_signals": 1,
+   "n_signals": 2,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-07-20",
-   "last_seen": "2026-07-20",
+   "last_seen": "2026-10-23",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2490,7 +2490,7 @@
   {
    "code": "002636",
    "name": "金安国纪",
-   "n_signals": 20,
+   "n_signals": 21,
    "kinds": [
     "top10"
    ],
@@ -3390,12 +3390,12 @@
   {
    "code": "688432",
    "name": "有研硅",
-   "n_signals": 2,
+   "n_signals": 1,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-08-20",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-08-20",
    "is_final": false,
    "horizons": {
     "1": {
@@ -3586,7 +3586,7 @@
   {
    "code": "600498",
    "name": "烽火通信",
-   "n_signals": 5,
+   "n_signals": 4,
    "kinds": [
     "top10"
    ],
