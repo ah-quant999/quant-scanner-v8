@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-23 14:01:31",
+  "update_time": "2026-10-23 14:26:52",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -24,7 +24,7 @@
       "hot_days": 28,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 315,
+      "total": 318,
       "ongoing": true
     },
     {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 236,
       "peak_date": "09/08",
-      "total": 2399,
+      "total": 2402,
       "ongoing": true
     },
     {
@@ -50,7 +50,7 @@
       "hot_days": 29,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 404,
+      "total": 405,
       "ongoing": true
     },
     {
@@ -63,7 +63,7 @@
       "hot_days": 24,
       "peak": 17,
       "peak_date": "09/21",
-      "total": 222,
+      "total": 225,
       "ongoing": true
     },
     {
@@ -89,7 +89,7 @@
       "hot_days": 28,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 241,
+      "total": 243,
       "ongoing": true
     },
     {
@@ -152,9 +152,9 @@
       "end_idx": 29,
       "days": 22,
       "hot_days": 22,
-      "peak": 32,
-      "peak_date": "09/22",
-      "total": 333,
+      "peak": 35,
+      "peak_date": "10/23",
+      "total": 337,
       "ongoing": true
     },
     {
@@ -212,14 +212,14 @@
     {
       "sector": "军工",
       "start": "10/14",
-      "end": "10/22",
+      "end": "10/23",
       "start_idx": 22,
-      "end_idx": 28,
-      "days": 7,
-      "hot_days": 5,
+      "end_idx": 29,
+      "days": 8,
+      "hot_days": 6,
       "peak": 9,
       "peak_date": "10/19",
-      "total": 28,
+      "total": 31,
       "ongoing": true
     },
     {
@@ -232,7 +232,7 @@
       "hot_days": 7,
       "peak": 6,
       "peak_date": "10/15",
-      "total": 34,
+      "total": 35,
       "ongoing": true
     },
     {
