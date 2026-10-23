@@ -26,5 +26,33 @@
 "delisted_date": "2026-10-21",
 "last_board": "",
 "last_industry": ""
+},
+{
+"code": "000016",
+"name": "*ST康佳A",
+"delisted_date": "2026-10-23",
+"last_board": "主板",
+"last_industry": "计算机、通信和其他电子设备制造业"
+},
+{
+"code": "02911",
+"name": "松景科技股权",
+"delisted_date": "2026-10-23",
+"last_board": "",
+"last_industry": ""
+},
+{
+"code": "02920",
+"name": "卓悦控股（旧）",
+"delisted_date": "2026-10-23",
+"last_board": "",
+"last_industry": ""
+},
+{
+"code": "08582",
+"name": "清大东方（四千）",
+"delisted_date": "2026-10-23",
+"last_board": "",
+"last_industry": ""
 }
 ]
