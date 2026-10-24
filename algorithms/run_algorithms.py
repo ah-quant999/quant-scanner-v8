@@ -59,7 +59,7 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "gen_stock_profile.py": 2700,
     # 🆕 2026-10-22 K线新鲜度修复：串行限速抓取，实测约 0.8~1.2s/只 × 陈旧票数，
     #   显式预算 2400s（40min）足够覆盖常规增量；超时则本步被跳过（不影响后续因子）。
-    "algorithms/refresh_kline_freshness.py": 2400,
+    "refresh_kline_freshness.py": 2400,
     "factor_lab_backtest.py": 1800,  # 🆕 700日长历史抓取+五分位分层回测（cn ~5min / 云端 ~15min）
     # 🔴 2026-10-18 主人令「直接上线」：H 反推两条摘链——前端注入 2026-10-06 已全面摘除
     #   （H_AUTO_BUY/H_AUTO_BUY_TRACK 零消费），仍每日跑+巡检=纯浪费。脚本同批删除。
@@ -198,7 +198,7 @@ ORDER = [
     # 🛡 2026-08-29 主人令：补跑第二基准（中证1000 / 国证A指），判断 +6% excess 是 alpha 还是风格 beta。
     # 🔴 2026-10-11 主人令「完全下架」：calc_crds.py 已摘链（逆势龙头真实池回测全档败，见预算表处注释）。
     # "calc_crds.py",
-    "algorithms/refresh_kline_freshness.py",  # → 修 raw_data/_wf_cache 日K陈旧（不产 raw 产物，纯本地缓存修复）# 🆕 2026-10-22 K 线缓存新鲜度修复（ff3 对拍 ima 根因）：get_klines() 命中缓存即 return ⇒ 缓存永不更新，实测全池 4518 只里 10-13 后有日线的仅 394 只 ⇒ 下游因子算法在物理上选不出当日票。串行限速抓取（规避新浪 501 限流），只补陈旧票、增量幂等。
+    "refresh_kline_freshness.py",  # → 修 raw_data/_wf_cache 日K陈旧（不产 raw 产物，纯本地缓存修复）# 🆕 2026-10-22 K 线缓存新鲜度修复（ff3 对拍 ima 根因）：get_klines() 命中缓存即 return ⇒ 缓存永不更新，实测全池 4518 只里 10-13 后有日线的仅 394 只 ⇒ 下游因子算法在物理上选不出当日票。串行限速抓取（规避新浪 501 限流），只补陈旧票、增量幂等。
     "gen_ff3_ranksum.py",    # 🚀 2026-10-22 主人令「上」：资金异动三因子每日生成器（factor_walkforward 引擎零第二口径：turntrend/amt60/ivol60 三因子降序秩和选 Top10 → ff3_ranksum_history 真实流归档 + FF3_RANKSUM_BACKTEST 主榜；上线首日即建归档）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
     "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（B批最前：final_recommend 前必产完，因子融合用当日新鲜因子；2026-09-09 主人令由 E 前置至此）
     # 🔴🔴 2026-10-23 主人令（P0-b）时序倒挂第二处根治：backtest_expectancy 从 B批尾/ORDER-D批前 再前移到
@@ -402,7 +402,7 @@ STAGES = {
     "B": [  # 选股批（~18:10 CST，盘后数据齐）：核心选股策略
         # 🛡 2026-09-09 主人令：因子实验室生成器前置到 B 批最前——必须在 final_recommend(D批20:00) 之前产完，
         #   否则「为更好选股」的因子融合只能吃昨日陈旧数据。生成器 50-90min baostock 冷启动，18:10 起跑→19:40 前产完，D 批必吃到当日新鲜因子。
-        "algorithms/refresh_kline_freshness.py",  # → 修 raw_data/_wf_cache 日K陈旧（与 ORDER 成对）# 🆕 2026-10-22 K 线缓存新鲜度修复（ff3 对拍 ima 根因）：get_klines() 命中缓存即 return ⇒ 缓存永不更新，实测全池 4518 只里 10-13 后有日线的仅 394 只 ⇒ 下游因子算法在物理上选不出当日票。串行限速抓取（规避新浪 501 限流），只补陈旧票、增量幂等。
+        "refresh_kline_freshness.py",  # → 修 raw_data/_wf_cache 日K陈旧（与 ORDER 成对）# 🆕 2026-10-22 K 线缓存新鲜度修复（ff3 对拍 ima 根因）：get_klines() 命中缓存即 return ⇒ 缓存永不更新，实测全池 4518 只里 10-13 后有日线的仅 394 只 ⇒ 下游因子算法在物理上选不出当日票。串行限速抓取（规避新浪 501 限流），只补陈旧票、增量幂等。
         "gen_ff3_ranksum.py",    # 🚀 2026-10-22 主人令「上」：资金异动三因子每日生成器（factor_walkforward 引擎零第二口径：turntrend/amt60/ivol60 三因子降序秩和选 Top10 → ff3_ranksum_history 真实流归档 + FF3_RANKSUM_BACKTEST 主榜；上线首日即建归档）。🔴 与 ORDER/STAGES/预算表三处字符串逐字一致
         "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js + raw_data/factor_lab.json（baostock，冷启动长）
         "backtest_expectancy.py",          # 🔴 2026-10-23 主人令（P0-b）：再前移至 generate_top10 之前（与 ORDER 成对），选股吃当日最新 edge
