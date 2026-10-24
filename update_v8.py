@@ -35,9 +35,6 @@ DATA_SOURCES = {
     #   根因：与 8/18 OVERSEAS_MARKETS 同类疏漏（fetch 注册了 raw 写，build 没映射）。
     "sector_fund_flow_intraday.json": "SECTOR_FUND_FLOW_INTRADAY",
     "gold_pool.json":              "GOLD_POOL",
-    "first_board_alert.json":       "FIRST_BOARD_ALERT",  # 2026-09-30 主人令：首板倍量前哨
-    # 2026-10-17 主人令「要日更」：回测实证·一进二/二进三 真实信号流日累积（替代 10-09 静态跑批）
-    "lianban_winrate.json":         "LIANBAN_WINRATE",
     "stock_names.json":            "STOCK_LIST",
     # 🔴 2026-09-13 主人令「前后端都无人读，删干净」：stock_profile.json → STOCK_PROFILE
     #   data/STOCK_PROFILE.js 转换已停产（省 1.33 MB/次入库）。
@@ -415,9 +412,6 @@ CATEGORY_MAP = {
     # 🏔 2026-10-17 主人令「加」：板块年度主力净流入累积表。cn-IP 硬约束源，
     #   仅 post_close 档授权重建（与 AVG_PRICE_880003 同源 push2his）。
     "SECTOR_YEAR_FLOW": "post_close",
-    # 🔁 2026-10-17 主人令「要日更」：回测实证·一进二/二进三。涨停池信号须收盘定型，
-    #   仅 post_close 档转换（与 FIRST_BOARD_ALERT 同）。
-    "LIANBAN_WINRATE": "post_close",
     # 2026-08-15：ALGO_TRACK 依赖 FINAL_RECOMMEND_DATA + FOUR_VOLUME，归属盘后
     # 🔴 2026-10-18 主人令「完全下架」：唯一信号源四量已下架、gen_algo_track 已摘链删除 ⇒ 随摘。
     # "ALGO_TRACK": "post_close",

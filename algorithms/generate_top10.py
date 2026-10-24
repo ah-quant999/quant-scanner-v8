@@ -1037,14 +1037,18 @@ def _p4_partial(full, ratio):
 #     ✅ ivol60    特质波动率（近60日 个股−上证 残差收益标准差，取低波） hold=10  IR_OOS 0.702
 #                  利差 +0.740%/10日 · Top 跑赢基准率 60.8% · 171 样本 · 2026-10-23 复跑新晋达标
 #                  残差基准用上证指数日收益（CAPM 式去系统化，比等权池均值更稳）
-#     ✅ skew60    收益偏度（近60日个股日收益 Fisher-Pearson 偏度，取低偏度=反 lottery） hold=20  IR_OOS 0.986
-#                  利差 +0.591%/20日 · Top 跑赢基准率 59.4% · 170 样本 · 2026-10-23 复跑新晋达标
+#     ❌ skew60    收益偏度（近60日个股日收益偏度）；2026-10-23 复跑曾新晋达标，但 2026-10-24
+#                  真实期望排行榜（strategy_expectancy_scan.py）证明：扣费后跑输全截面基准
+#                  （T+20 超额 −0.53%/笔、超额胜率 44.6%、均净仅 +0.41%）⇒ 负期望纯噪声，证据否决，
+#                  从因子榜 P5 消费链移除（walk-forward PASS ≠ 实战正期望）。
 #     ❌ 删除（不进评分）：mom12_1 / resid_mom / max20 / overnight20 / vol60
 #
 #   🆕 2026-10-23 复跑（factor_walkforward.py 候选因子扩军至 18）：新晋 PASS = ivol60 / skew60。
 #      原「❌ ivol60」作废 → 重新接入评分（残差基准由等权池均值改为上证指数代理，更稳）。
 #      skew60 同日达标一并接入。两因子接入口径与 amt60/turntrend 完全一致：
 #      候选池内分位前 20%/40% 两档 +6/+3，只加分不扣分，且仅当 walk-forward verdict=PASS 才启用。
+#   🗑 2026-10-24 主人令「发现不好的就删除」：skew60 真实期望为负（见上方 ❌ 行），已从 P5 消费链移除；
+#      ivol60 保留（真实期望为正，属可信任核心）。
 #
 # 权重口径（与 P4 同构，禁特立独行）：
 #   · 分层：walk-forward 用全市场五分位(L1 最强)；本处取【候选池内分位】前 20% / 20~40% 两档。
@@ -1071,7 +1075,6 @@ P5_FALLBACK = {
     "amt60":     {"hold": 10, "edge10": 0.947, "n": 170},
     "turntrend": {"hold": 5,  "edge10": 0.392, "n": 171},
     "ivol60":    {"hold": 10, "edge10": 0.740, "n": 171},
-    "skew60":    {"hold": 20, "edge10": 0.591, "n": 170},
 }
 P5_TIER_FULL, P5_TIER_HALF = 6, 3
 P5_TOP_Q, P5_MID_Q = 0.20, 0.40
@@ -1135,19 +1138,6 @@ def _p5_amt60_metrics(code):
     return v * 100.0 * c
 
 
-def _p5_skew(x):
-    """样本偏度(Fisher-Pearson 标准化)；样本<3 或方差=0 返 None。与 factor_walkforward._skew 同公式。"""
-    n = len(x)
-    if n < 3:
-        return None
-    m = sum(x) / n
-    var = sum((v - m) ** 2 for v in x) / (n - 1)
-    if var <= 0:
-        return None
-    sd = var ** 0.5
-    return sum(((v - m) / sd) ** 3 for v in x) / n
-
-
 def _p5_daily_rets(recs):
     """[{date,close}...] 升序 → {date: 日收益率}。"""
     out = {}
@@ -1185,20 +1175,6 @@ def _p5_ivol60_metrics(code):
     return var ** 0.5 if var > 0 else None
 
 
-def _p5_skew60_metrics(code):
-    """近 60 日个股日收益偏度(Fisher-Pearson 标准化)取原值；越小越强(低偏度=反 lottery 异象)。
-    与 walk-forward 中 skew60(-skew) 方向相反标记一致：本处取【原值·越小越强】，
-    由 _p5_tier_score 的 strength=1−pct 自动编码（值越小→分位越低→强度越高）。
-    数据不足 60 根或方差为 0 返回 None。"""
-    recs = _load_kline_full(code)
-    if len(recs) < 61:
-        return None
-    sr = _p5_daily_rets(recs)
-    if len(sr) < 60:
-        return None
-    return _p5_skew(list(sr.values())[-60:])
-
-
 def _p5_percentile(values):
     """{code: value} → {code: 分位(0~1，1=值最大)}；缺失值不参与分位；样本不足返回 {}。"""
     ok = {c: v for c, v in values.items() if v is not None}
@@ -1212,7 +1188,7 @@ def _p5_percentile(values):
 
 
 def _p5_tier_score(pct):
-    """分位 → 分档分。本处两个因子的原始量都是「越小越强」⇒ strength = 1 − pct。"""
+    """分位 → 分档分。本处三个因子(amt60/turntrend/ivol60)的原始量都是「越小越强」⇒ strength = 1 − pct。"""
     if pct is None:
         return 0
     strength = 1.0 - pct
@@ -1224,9 +1200,9 @@ def _p5_tier_score(pct):
 
 
 def p5_prepass(codes):
-    """候选池一次预扫：算 turntrend / amt60 / ivol60 / skew60 原始值 → 池内分位 → 全局缓存 _P5_PCT。"""
+    """候选池一次预扫：算 turntrend / amt60 / ivol60 原始值 → 池内分位 → 全局缓存 _P5_PCT。"""
     global _P5_PCT
-    raw_t, raw_a, raw_i, raw_s = {}, {}, {}, {}
+    raw_t, raw_a, raw_i = {}, {}, {}
     for c in codes:
         try:
             if P5_ON.get("turntrend"):
@@ -1235,8 +1211,6 @@ def p5_prepass(codes):
                 raw_a[c] = _p5_amt60_metrics(c)
             if P5_ON.get("ivol60"):
                 raw_i[c] = _p5_ivol60_metrics(c)
-            if P5_ON.get("skew60"):
-                raw_s[c] = _p5_skew60_metrics(c)
         except Exception:
             continue
     # ── amt60 流动性下限 + 量纲哨兵 ──
@@ -1251,7 +1225,7 @@ def p5_prepass(codes):
               f"不在常识区间 {P5_AMT_MEDIAN_LO / 1e8:.1f}~{P5_AMT_MEDIAN_HI / 1e8:.0f} 亿 "
               f"⇒ 本轮放弃绝对下限过滤（仅保留分位加分）")
     pt, pa = _p5_percentile(raw_t), _p5_percentile(raw_a)
-    pi, ps = _p5_percentile(raw_i), _p5_percentile(raw_s)
+    pi = _p5_percentile(raw_i)
     out = {}
     for c in codes:
         rec = {}
@@ -1263,13 +1237,11 @@ def p5_prepass(codes):
                 rec["amt60"] = pa[c]
         if c in pi:
             rec["ivol60"] = pi[c]
-        if c in ps:
-            rec["skew60"] = ps[c]
         if rec:
             out[c] = rec
     _P5_PCT = out
     print(f"     P5 分位覆盖：turntrend {len(pt)}/{len(codes)} · amt60 {len(pa)}/{len(codes)}"
-          f" · ivol60 {len(pi)}/{len(codes)} · skew60 {len(ps)}/{len(codes)}"
+          f" · ivol60 {len(pi)}/{len(codes)}"
           f" · 下限过滤={'开' if _floor_on else '关'} · 池内中位成交额 {_amed / 1e8:.2f} 亿")
     return out
 
@@ -1705,13 +1677,14 @@ def main():
 
         # ── P5 walk-forward 达标因子（2026-09-16 主人令「全部接入」）──
         # amt60 60日成交额中位数 @10日档 + turntrend 换手率趋势 @5日档
-        # ivol60 低特质波动 @10日档 + skew60 低偏度 @20日档（均「越小越强」，同 strength=1−pct）
-        # 口径/权重/闸门依据见模块顶部 P5 段头注（含已知口径偏离留痕）
+        # ivol60 低特质波动 @10日档（均「越小越强」，同 strength=1−pct）
+        # 口径/权重/闸门依据见模块顶部 P5 段头注（含已知口径偏离留痕）。
+        # 🗑 2026-10-24 主人令：skew60 真实期望为负（strategy_expectancy_scan 证据），已从消费链移除。
         p5_score = 0
         p5_detail = []
         _p5rec = _P5_PCT.get(raw_code) or {}
         for _p5n, _p5lab in (("amt60", "低成交额"), ("turntrend", "换手率趋势"),
-                             ("ivol60", "低特质波动"), ("skew60", "低偏度")):
+                             ("ivol60", "低特质波动")):
             if not P5_ON.get(_p5n):
                 continue
             _p5pct = _p5rec.get(_p5n)
