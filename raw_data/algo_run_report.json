@@ -1,15 +1,8 @@
 {
-  "update_time": "2026-10-25 05:37:53",
-  "run_start": "2026-10-25 05:11:12",
-  "ok": 17,
-  "fail": 1,
-  "failed_scripts": [
-    {
-      "script": "algorithms/refresh_kline_freshness.py",
-      "reason": "脚本文件缺失"
-    }
-  ],
-  "skipped_by_time_gate": [
-    "fetch_weekend_run.py"
-  ]
+  "update_time": "2026-10-25 06:11:37",
+  "run_start": "2026-10-25 06:09:33",
+  "ok": 1,
+  "fail": 0,
+  "failed_scripts": [],
+  "skipped_by_time_gate": []
 }
