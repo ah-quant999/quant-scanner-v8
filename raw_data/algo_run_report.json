@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-10-24 16:30:26",
-  "run_start": "2026-10-24 16:04:50",
-  "ok": 18,
+  "update_time": "2026-10-24 17:19:27",
+  "run_start": "2026-10-24 17:17:28",
+  "ok": 0,
   "fail": 1,
   "failed_scripts": [
     {
-      "script": "algorithms/refresh_kline_freshness.py",
-      "reason": "脚本文件缺失"
+      "script": "final_recommend.py",
+      "reason": "退出码 1 | NameError: name 'limit_up' is not defined"
     }
   ],
   "skipped_by_time_gate": []
