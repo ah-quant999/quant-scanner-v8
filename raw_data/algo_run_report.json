@@ -1,12 +1,16 @@
 {
-  "update_time": "2026-10-24 21:42:06",
-  "run_start": "2026-10-24 20:57:09",
-  "ok": 10,
-  "fail": 1,
+  "update_time": "2026-10-24 23:42:58",
+  "run_start": "2026-10-24 23:00:37",
+  "ok": 17,
+  "fail": 2,
   "failed_scripts": [
     {
-      "script": "v8/fetch_citic_pe.py",
-      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
+      "script": "algorithms/refresh_kline_freshness.py",
+      "reason": "脚本文件缺失"
+    },
+    {
+      "script": "v8/factor_lab_gen.py",
+      "reason": "退出码 1 | ⛔ 主板 universe 异常过少 ⇒ 本轮不产出任何产物（保留上次真实 FACTOR_LAB），以退出码 1 上报失败"
     }
   ],
   "skipped_by_time_gate": []
