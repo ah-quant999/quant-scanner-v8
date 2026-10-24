@@ -496,8 +496,14 @@
   },
   "2026-10-24": {
     "count_80plus": 0,
+    "total_scored": 541,
+    "max_score": 40.3,
+    "update_time": "2026-10-24 19:40:28"
+  },
+  "2026-10-25": {
+    "count_80plus": 0,
     "total_scored": 725,
     "max_score": 39.5,
-    "update_time": "2026-10-24 23:24:57"
+    "update_time": "2026-10-25 00:21:58"
   }
 }
