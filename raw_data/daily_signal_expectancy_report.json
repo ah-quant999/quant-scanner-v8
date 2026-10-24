@@ -1,0 +1,131 @@
+{
+  "update_time": "2026-10-24 17:15:01",
+  "purpose": "每日精选强势股信号(ima_v2 / 强势突破账本)独立期望 + 与现有因子相关性",
+  "caliber": "生产同源引擎 factor_walkforward._trade_ret：次开买入/一字板剔除/跌停顺延/双边0.3%",
+  "cache_last_date": "2026-10-23",
+  "sources": {
+    "ima_v2": {
+      "n_signals": 68,
+      "n_signal_dates": 10,
+      "date_range": [
+        "20260918",
+        "20261012"
+      ],
+      "skipped_T20_cache": 4
+    },
+    "strong_break": {
+      "n_signals": 605,
+      "n_signal_dates": 30,
+      "date_range": [
+        "20260903",
+        "20261023"
+      ],
+      "skipped_T20_cache": 49
+    }
+  },
+  "results": [
+    {
+      "label": "ima_v2",
+      "n_signal_dates": 10,
+      "n_signals": 68,
+      "date_range": [
+        "20260918",
+        "20261012"
+      ],
+      "expectancy": [
+        {
+          "hold": 5,
+          "n": 2,
+          "avg_net": -4.21,
+          "winrate": 50.0,
+          "n_excess": 2,
+          "avg_excess": 0.86,
+          "excess_winrate": 50.0
+        },
+        {
+          "hold": 10,
+          "n": 0,
+          "avg_net": null,
+          "winrate": null,
+          "n_excess": 0,
+          "avg_excess": null,
+          "excess_winrate": null
+        },
+        {
+          "hold": 20,
+          "n": 0,
+          "avg_net": null,
+          "winrate": null,
+          "n_excess": 0,
+          "avg_excess": null,
+          "excess_winrate": null
+        }
+      ],
+      "correlation": {
+        "amt60_pick_avg_percentile": 70.6,
+        "amt60_n_picks": 14,
+        "turntrend_pick_avg_percentile": 49.9,
+        "turntrend_n_picks": 14,
+        "interpretation": "分位越低=该因子越强；若信号偏好已被 amt60/turntrend 看好的票→分位偏低→冗余；≈50%→正交互补"
+      },
+      "skipped_T20_cache": 4
+    },
+    {
+      "label": "strong_break",
+      "n_signal_dates": 30,
+      "n_signals": 605,
+      "date_range": [
+        "20260903",
+        "20261023"
+      ],
+      "expectancy": [
+        {
+          "hold": 5,
+          "n": 32,
+          "avg_net": -10.43,
+          "winrate": 6.2,
+          "n_excess": 32,
+          "avg_excess": -6.58,
+          "excess_winrate": 15.6
+        },
+        {
+          "hold": 10,
+          "n": 10,
+          "avg_net": -9.0,
+          "winrate": 50.0,
+          "n_excess": 10,
+          "avg_excess": -4.54,
+          "excess_winrate": 50.0
+        },
+        {
+          "hold": 20,
+          "n": 2,
+          "avg_net": -19.09,
+          "winrate": 0.0,
+          "n_excess": 2,
+          "avg_excess": -14.24,
+          "excess_winrate": 50.0
+        }
+      ],
+      "correlation": {
+        "amt60_pick_avg_percentile": 63.1,
+        "amt60_n_picks": 128,
+        "turntrend_pick_avg_percentile": 47.2,
+        "turntrend_n_picks": 128,
+        "interpretation": "分位越低=该因子越强；若信号偏好已被 amt60/turntrend 看好的票→分位偏低→冗余；≈50%→正交互补"
+      },
+      "skipped_T20_cache": 49
+    }
+  ],
+  "overlap_with_factor_topN": {
+    "ima_v2": {
+      "n_common": 10,
+      "avg_jaccard": 0.0
+    },
+    "strong_break": {
+      "n_common": 29,
+      "avg_jaccard": 0.2
+    }
+  },
+  "caveat": "无 6 月数据(磁盘上 ima 转录最早 09-18、强势突破账本最早 08-31)；_wf_cache 末日 2026-10-23 致后期信号 T+20 截断；样本仍偏小且近期单窗口，任何正值均非稳健结论，仅作方向参考；正式准入须真实信号流≥30信号日"
+}
