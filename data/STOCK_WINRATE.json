@@ -1,5 +1,5 @@
 {
- "update_time": "2026-10-25 01:58:38",
+ "update_time": "2026-10-25 03:23:21",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
@@ -863,14 +863,13 @@
   {
    "code": "603186",
    "name": "华正新材",
-   "n_signals": 9,
+   "n_signals": 8,
    "kinds": [
-    "final",
     "top10"
    ],
    "first_seen": "2026-08-25",
    "last_seen": "2026-10-24",
-   "is_final": true,
+   "is_final": false,
    "horizons": {
     "1": {
      "n": 5,
@@ -1124,13 +1123,14 @@
   {
    "code": "301511",
    "name": "德福科技",
-   "n_signals": 5,
+   "n_signals": 6,
    "kinds": [
+    "final",
     "top10"
    ],
    "first_seen": "2026-08-28",
    "last_seen": "2026-10-24",
-   "is_final": false,
+   "is_final": true,
    "horizons": {
     "1": {
      "n": 2,
