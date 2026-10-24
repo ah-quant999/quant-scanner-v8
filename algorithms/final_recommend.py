@@ -1613,6 +1613,23 @@ def main():
         if alerts:
             tracking["alerts"] = alerts[:3]
 
+        # ---- ③执行层涨停旗标·计算定义（2026-10-24 补全，修复 534739bb8 漏写致 NameError）----
+        # 口径：收盘价 >= round(前收×(1+板别幅度),2)（创业/科创 20% 北交所 30% ST 5% 主板 10%）；
+        # 源=_quote_snapshot() 快照 price/prev_close 唯一权威；不用 pct_chg 阈值近似。
+        limit_up = False
+        _q = _quote_snapshot()["map"].get(code) if close else None
+        _prev = num_or_none(_q.get("prev_close")) if _q else None
+        if close and _prev:
+            if board in ("创业板", "科创板"):
+                _lim_ratio = 0.20
+            elif board == "北交所":
+                _lim_ratio = 0.30
+            elif "ST" in str(s.get("name") or "").upper():
+                _lim_ratio = 0.05
+            else:
+                _lim_ratio = 0.10
+            limit_up = close >= round(_prev * (1 + _lim_ratio), 2)
+
         out_stocks.append({
             "rank": len(out_stocks) + 1,
             "code": code,
