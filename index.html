@@ -1277,7 +1277,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      原 data/CANDIDATE_BACKTEST.js + data/GOLD_POOL_BACKTEST.js（E 批 backtest_pools.py 产出）
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
-    <script src="data/FACTOR_LAB.js?v=be12075e3a" defer></script>
+    <script src="data/FACTOR_LAB.js?v=c5acf7a629" defer></script>
 <!-- 🔴 2026-10-06 阿狸咪的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
 <script src="data/ETF_PULSE.js?v=e3869f42d6" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=374424b152" defer></script>
@@ -1296,7 +1296,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=60e1873f83" defer></script>
 <script src="data/HB_XIAOJIU.js?v=aeb7a59f77" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=ec808b9588" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=6c742ad24c" defer></script>
 <script src="data/HEALTH_CHECK.js?v=9c997e7823" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=36400b8e2e" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
@@ -1312,7 +1312,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=8b97f49ea1" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=5882c9a155" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=2ce13552b9" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=42cc6e5363" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=70aa421ce6" defer></script>
@@ -1321,8 +1321,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/IMA_STRONG_BACKTEST.js?v=95fa0793b4" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ · 第一支自研算法）经真实信号流回测确认不达标，整支下架删除（前端挂载 + 后端脚本 + 数据全部清除）；相关注入脚本已移除，仅 FF3 自研算法保留（见下方 FF3_RANKSUM 注入）。 -->
     <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）前端接入 —— 后端 gen_ff3_ranksum.py 每日重算 raw_data/ff3_ranksum_*.json → update_v8 转换 -->
-    <script src="data/FF3_RANKSUM_TRACK.js?v=257191bbe2" defer></script>
-    <script src="data/FF3_RANKSUM_BACKTEST.js?v=f1efd08f97" defer></script>
+    <script src="data/FF3_RANKSUM_TRACK.js?v=baba20ee9c" defer></script>
+    <script src="data/FF3_RANKSUM_BACKTEST.js?v=baebcd76a4" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
