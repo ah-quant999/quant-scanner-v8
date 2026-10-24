@@ -1,5 +1,5 @@
 {
- "update_time": "2026-10-24 09:04:05",
+ "update_time": "2026-10-24 13:05:07",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
@@ -9,7 +9,7 @@
   "n_stocks": 320,
   "signal_date_range": [
    "2026-06-06",
-   "2026-10-23"
+   "2026-10-24"
   ]
  },
  "stocks": [
@@ -542,7 +542,7 @@
     "top10"
    ],
    "first_seen": "2026-07-24",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": true,
    "horizons": {
     "1": {
@@ -673,7 +673,7 @@
     "top10"
    ],
    "first_seen": "2026-08-07",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": true,
    "horizons": {
     "1": {
@@ -868,7 +868,7 @@
     "top10"
    ],
    "first_seen": "2026-08-25",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -998,7 +998,7 @@
     "top10"
    ],
    "first_seen": "2026-09-09",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -1063,7 +1063,7 @@
     "top10"
    ],
    "first_seen": "2026-07-20",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -1128,7 +1128,7 @@
     "top10"
    ],
    "first_seen": "2026-08-28",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -1259,7 +1259,7 @@
     "top10"
    ],
    "first_seen": "2026-09-11",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": true,
    "horizons": {
     "1": {
@@ -1324,7 +1324,7 @@
     "top10"
    ],
    "first_seen": "2026-07-27",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -1520,7 +1520,7 @@
     "top10"
    ],
    "first_seen": "2026-09-08",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -1585,7 +1585,7 @@
     "top10"
    ],
    "first_seen": "2026-07-28",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -1715,7 +1715,7 @@
     "top10"
    ],
    "first_seen": "2026-08-07",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2105,7 +2105,7 @@
     "top10"
    ],
    "first_seen": "2026-06-11",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2170,7 +2170,7 @@
     "top10"
    ],
    "first_seen": "2026-07-17",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2495,7 +2495,7 @@
     "top10"
    ],
    "first_seen": "2026-07-22",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -3005,7 +3005,7 @@
     "top10"
    ],
    "first_seen": "2026-09-14",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -3070,7 +3070,7 @@
     "top10"
    ],
    "first_seen": "2026-07-17",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -3591,7 +3591,7 @@
     "top10"
    ],
    "first_seen": "2026-08-24",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -4288,7 +4288,7 @@
     "top10"
    ],
    "first_seen": "2026-08-12",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -4955,7 +4955,7 @@
     "top10"
    ],
    "first_seen": "2026-10-15",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": true,
    "horizons": {
     "1": {
@@ -6557,7 +6557,7 @@
     "top10"
    ],
    "first_seen": "2026-10-16",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-24",
    "is_final": true,
    "horizons": {
     "1": {
