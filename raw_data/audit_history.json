@@ -3672,5 +3672,39 @@
    }
   ],
   "fail_items": []
+ },
+ {
+  "date": "2026-10-25",
+  "time": "01:31:59",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 117,
+   "warn": 2,
+   "fail": 1,
+   "limited": 0,
+   "info": 0,
+   "other": 0,
+   "total": 120
+  },
+  "warn_items": [
+   {
+    "id": "runner_local",
+    "name": "runner 本地检测",
+    "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) in_p"
+   },
+   {
+    "id": "runner",
+    "name": "self-hosted runner",
+    "message": "runner 本地检测:warn-runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "all_SECTOR_YEAR_FLOW",
+    "name": "SECTOR_YEAR_FLOW",
+    "message": "SECTOR_YEAR_FLOW.js 更新于 4天前 16:06；超过通用红线 4500 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
