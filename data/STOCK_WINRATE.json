@@ -1,11 +1,11 @@
 {
- "update_time": "2026-10-25 00:21:09",
+ "update_time": "2026-10-25 01:58:38",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
   "shrinkage_k": 10,
   "score_formula": "winrate_score = Σ_h [avg_shrunk_h×w_a + (win_shrunk_h−50)×w_w]，h∈{5:(5.0,0.3), 10:(3.0,0.2)}；均益主导、胜率仅微修正",
-  "n_signals": 1709,
+  "n_signals": 1732,
   "n_stocks": 320,
   "signal_date_range": [
    "2026-06-06",
@@ -536,7 +536,7 @@
   {
    "code": "002138",
    "name": "顺络电子",
-   "n_signals": 9,
+   "n_signals": 11,
    "kinds": [
     "final",
     "top10"
@@ -667,7 +667,7 @@
   {
    "code": "300199",
    "name": "翰宇药业",
-   "n_signals": 28,
+   "n_signals": 30,
    "kinds": [
     "final",
     "top10"
@@ -863,13 +863,14 @@
   {
    "code": "603186",
    "name": "华正新材",
-   "n_signals": 7,
+   "n_signals": 9,
    "kinds": [
+    "final",
     "top10"
    ],
    "first_seen": "2026-08-25",
    "last_seen": "2026-10-24",
-   "is_final": false,
+   "is_final": true,
    "horizons": {
     "1": {
      "n": 5,
@@ -993,7 +994,7 @@
   {
    "code": "002491",
    "name": "通鼎互联",
-   "n_signals": 6,
+   "n_signals": 7,
    "kinds": [
     "top10"
    ],
@@ -1058,7 +1059,7 @@
   {
    "code": "300613",
    "name": "富瀚微",
-   "n_signals": 6,
+   "n_signals": 7,
    "kinds": [
     "top10"
    ],
@@ -1123,7 +1124,7 @@
   {
    "code": "301511",
    "name": "德福科技",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "top10"
    ],
@@ -1253,7 +1254,7 @@
   {
    "code": "688099",
    "name": "晶晨股份",
-   "n_signals": 9,
+   "n_signals": 10,
    "kinds": [
     "final",
     "top10"
@@ -1319,7 +1320,7 @@
   {
    "code": "600641",
    "name": "先导基电",
-   "n_signals": 11,
+   "n_signals": 12,
    "kinds": [
     "top10"
    ],
@@ -1515,7 +1516,7 @@
   {
    "code": "301183",
    "name": "东田微",
-   "n_signals": 3,
+   "n_signals": 4,
    "kinds": [
     "top10"
    ],
@@ -1580,7 +1581,7 @@
   {
    "code": "688689",
    "name": "银河微电",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "top10"
    ],
@@ -1710,7 +1711,7 @@
   {
    "code": "688409",
    "name": "富创精密",
-   "n_signals": 5,
+   "n_signals": 6,
    "kinds": [
     "top10"
    ],
@@ -2100,7 +2101,7 @@
   {
    "code": "688388",
    "name": "嘉元科技",
-   "n_signals": 3,
+   "n_signals": 4,
    "kinds": [
     "top10"
    ],
@@ -2165,7 +2166,7 @@
   {
    "code": "002050",
    "name": "三花智控",
-   "n_signals": 9,
+   "n_signals": 10,
    "kinds": [
     "top10"
    ],
@@ -2295,12 +2296,12 @@
   {
    "code": "002353",
    "name": "杰瑞股份",
-   "n_signals": 1,
+   "n_signals": 3,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-07-20",
-   "last_seen": "2026-07-20",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2935,43 +2936,43 @@
   {
    "code": "688110",
    "name": "东芯股份",
-   "n_signals": 2,
+   "n_signals": 4,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-08-07",
-   "last_seen": "2026-08-08",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
      "n": 2,
      "win": 0.0,
-     "avg": -3.23,
-     "med": -3.23,
-     "best": -3.23,
-     "worst": -3.23,
+     "avg": -3.25,
+     "med": -3.25,
+     "best": -3.25,
+     "worst": -3.25,
      "win_shrunk": 41.7,
      "avg_shrunk": -0.54
     },
     "3": {
      "n": 2,
      "win": 0.0,
-     "avg": -2.98,
-     "med": -2.98,
-     "best": -2.98,
-     "worst": -2.98,
+     "avg": -3.0,
+     "med": -3.0,
+     "best": -3.0,
+     "worst": -3.0,
      "win_shrunk": 41.7,
      "avg_shrunk": -0.5
     },
     "5": {
      "n": 2,
      "win": 100.0,
-     "avg": 8.69,
-     "med": 8.69,
-     "best": 8.69,
-     "worst": 8.69,
+     "avg": 8.73,
+     "med": 8.73,
+     "best": 8.73,
+     "worst": 8.73,
      "win_shrunk": 58.3,
-     "avg_shrunk": 1.45
+     "avg_shrunk": 1.46
     },
     "10": {
      "n": 2,
@@ -2994,7 +2995,7 @@
      "avg_shrunk": 0.02
     }
    },
-   "winrate_score": 11.46,
+   "winrate_score": 11.51,
    "rank": 46
   },
   {
@@ -3065,7 +3066,7 @@
   {
    "code": "600885",
    "name": "宏发股份",
-   "n_signals": 3,
+   "n_signals": 4,
    "kinds": [
     "top10"
    ],
@@ -3455,7 +3456,7 @@
   {
    "code": "300033",
    "name": "同花顺",
-   "n_signals": 8,
+   "n_signals": 9,
    "kinds": [
     "final",
     "top10"
@@ -3586,7 +3587,7 @@
   {
    "code": "600498",
    "name": "烽火通信",
-   "n_signals": 5,
+   "n_signals": 6,
    "kinds": [
     "top10"
    ],
@@ -3716,12 +3717,12 @@
   {
    "code": "300014",
    "name": "亿纬锂能",
-   "n_signals": 3,
+   "n_signals": 2,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-07-17",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-23",
    "is_final": false,
    "horizons": {
     "1": {
@@ -4283,12 +4284,12 @@
   {
    "code": "300866",
    "name": "安克创新",
-   "n_signals": 3,
+   "n_signals": 2,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-08-12",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-08-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -4949,13 +4950,13 @@
   {
    "code": "300497",
    "name": "富祥股份",
-   "n_signals": 3,
+   "n_signals": 2,
    "kinds": [
     "final",
     "top10"
    ],
    "first_seen": "2026-10-15",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-15",
    "is_final": true,
    "horizons": {
     "1": {
@@ -6551,7 +6552,7 @@
   {
    "code": "300054",
    "name": "鼎龙股份",
-   "n_signals": 8,
+   "n_signals": 9,
    "kinds": [
     "final",
     "top10"
@@ -6672,12 +6673,12 @@
   {
    "code": "301666",
    "name": "大普微",
-   "n_signals": 1,
+   "n_signals": 3,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-10-21",
-   "last_seen": "2026-10-21",
+   "last_seen": "2026-10-24",
    "is_final": false,
    "horizons": {
     "1": {
@@ -16779,7 +16780,7 @@
      "avg": -9.66,
      "med": -10.55,
      "best": -1.5,
-     "worst": -16.93,
+     "worst": -16.94,
      "win_shrunk": 38.5,
      "avg_shrunk": -2.23
     },
@@ -16788,25 +16789,25 @@
      "win": 33.3,
      "avg": -13.07,
      "med": -19.15,
-     "best": 3.38,
-     "worst": -23.44,
+     "best": 3.39,
+     "worst": -23.45,
      "win_shrunk": 46.2,
      "avg_shrunk": -3.02
     },
     "10": {
      "n": 3,
      "win": 0.0,
-     "avg": -7.16,
+     "avg": -7.17,
      "med": -5.76,
      "best": -1.65,
-     "worst": -14.08,
+     "worst": -14.09,
      "win_shrunk": 38.5,
      "avg_shrunk": -1.65
     },
     "20": {
      "n": 3,
      "win": 0.0,
-     "avg": -11.06,
+     "avg": -11.07,
      "med": -11.46,
      "best": -6.29,
      "worst": -15.45,
