@@ -2614,7 +2614,7 @@ function fmtSigned(v){
           <button id="stPoolOtherBtn" onclick="window.toggleStPoolOther()" style="background:transparent;color:var(--cyan);border:1px solid var(--cyan);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">▾ 展开其他来源（主板/创业板/科创板/港股）</button>
         </div>
         <div id="stPoolOtherList" class="tp-stocklist" style="display:none;"></div>
-        <div class="note">筛选：主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 外资研投(自选+研报)；防抖：掉出前N仍留5交易日(MEMBER_HYSTERESIS_DAYS=5)。三板合计≥280视为健康。</div>
+        <div class="note">筛选：主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 外资研投(自选+研报) + 全市场流动性溢出(A股成交额前300保底) + 因子优选(amt60/turntrend/ivol60三因子全中)；防抖：掉出前N仍留5交易日(MEMBER_HYSTERESIS_DAYS=5)。三板合计≥280 且 全市场流动性溢出>0 且 因子优选>0 视为健康。</div>
       </div>
     </div><!--/st-pool-->
 
@@ -14023,8 +14023,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 来源级分布（紧凑行，始终可见）
     const sdEl = $('stPoolSourceDist');
     if(sdEl){
-      const order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'];
-      const expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50};
+      const order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投','全市场流动性溢出','因子优选'];
+      const expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50,'全市场流动性溢出':100,'因子优选':50};
       let html = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:4px 0 10px;font-size:12px;">';
       order.forEach(function(s){
         const cnt = sd[s]||0;
@@ -14073,7 +14073,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         return h;
       };
       const allBySrc = {};
-      ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'].forEach(function(src){
+      ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投','全市场流动性溢出','因子优选'].forEach(function(src){
         allBySrc[src] = Object.values(stocks).filter(function(s){ return s && s.sources && s.sources.indexOf(src) >= 0; });
       });
       // 外资研投：直接展开
@@ -14086,7 +14086,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         }
       }
       // 其他来源：收起，提供弹窗式展开按钮
-      const otherOrder = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50'];
+      const otherOrder = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','全市场流动性溢出','因子优选'];
       const otherStocksTotal = otherOrder.reduce(function(acc, src){ return acc + (allBySrc[src]||[]).length; }, 0);
       if(otherEl){
         let html = '<div style="margin-top:8px;">';
@@ -14108,7 +14108,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     if(!otherEl) return;
     const expanded = otherEl.style.display !== 'none';
     otherEl.style.display = expanded ? 'none' : 'block';
-    if(btn) btn.textContent = expanded ? '▾ 展开其他来源（主板/创业板/科创板/港股）' : '▴ 收起其他来源';
+    if(btn) btn.textContent = expanded ? '▾ 展开其他来源（主板/创业板/科创板/港股/流动性溢出/因子优选）' : '▴ 收起其他来源';
   };
   // 2026-08-06 23:44 修复：胶囊激活 init 不放在这里 — renderFourVolume/renderV8Crds
   // 在后续的 script 块里定义（7799 之后），此处还看不到它们。
@@ -16185,8 +16185,8 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       var srcEl = document.getElementById('freshCandidateSources');
       var rowEl = document.getElementById('freshRowCandidateSrc');
       if(!srcEl || !rowEl) return;
-      var order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'];
-      var expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50};
+      var order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投','全市场流动性溢出','因子优选'];
+      var expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50,'全市场流动性溢出':100,'因子优选':50};
       var html = '<div style="display:flex;flex-wrap:wrap;gap:4px 12px;padding:4px 0;font-size:11px;">';
       order.forEach(function(s){
         var cnt = sd[s]||0;
