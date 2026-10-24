@@ -17842,6 +17842,9 @@ window.__renderV8CalToday();
     }
     h+='<span class="fr-enter">· 入选日 '+_fe(s.enter_date||'—')+'</span>';
     h+='<span class="fr-tag '+horizon[1]+'">'+_fe(horizon[0])+'</span>';
+    /* 🆕 2026-10-24 主人令「③执行层过滤小增强」：涨停旗标（后端精确判定 收盘价=round(前收×板别幅度,2)，
+       数据侧 limit_up=true 才显示；title 全文见 final_recommend.py limit_up_note） */
+    if(s.limit_up) h+='<span class="fr-tag" style="background:rgba(239,68,68,.16);color:#f87171;border-color:rgba(239,68,68,.45);font-weight:700;cursor:help" title="'+_fe(s.limit_up_note||'今日收盘已封涨停，次日大概率高开/一字板，实际可能买不进；若一字开盘请勿追高，等开板回踩再确认')+'">🚫 已涨停·次日难买</span>';
     // 2026-09-03 主人令：综合评分写出来（所有名次统一渲染）
     // 🔴 2026-10-20 主人令「口径和评分都一致」：Top3 全部来自当日因子榜 ⇒ 评分
     //   直接显示 final_score（=因子积分榜 total_score，两张卡一眼可比）；

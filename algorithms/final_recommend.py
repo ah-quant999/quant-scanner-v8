@@ -42,6 +42,8 @@ V8_OFFLINE = os.environ.get("V8_OFFLINE", "0") == "1"
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from name_utils import norm_code, fix_name, strip_entitlement_prefix, STANDARD_NAME_MAP  # noqa: E402
 from fundamental_helper import quality_veto  # noqa: E402  质差股一票否决（2026-09-07 主人令）
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import v8_date  # noqa: E402  统一交易日历（③执行层增强：闸门口径改已完成交易日）
 
 # ═══════════════════════════════════════════════════════════════════════════
 # 🔴🔴 2026-09-18 主人令「噪音不该进池」·改动2a：噪音源前置过滤
@@ -468,7 +470,16 @@ def _quote_snapshot():
 
     _sq = load_js("STOCK_QUOTE.js", "STOCK_QUOTE") or {}
     _d = str(_sq.get("update_time") or "")[:10]
-    if _d == today:
+    # 🔴 2026-10-24 修复（③执行层增强伴生 bug，实锤：顺络电子 10-24 卡显示 pct_chg=+10.0%、
+    #   STOCK_QUOTE 权威值 +1.83%）：闸门日期口径由「运行日自然日 == 快照日」改为
+    #   v8_date.data_session_date()（快照应归属的【已完成交易日】）。旧口径在周末/假日
+    #   跑批（如周六夜窗）时必判假 ⇒ 闸门整体跳过 ⇒ 四量终极等来源的陈旧 pct_chg
+    #   （历史上某涨停日的 +10%）不经验证直漏前端。新口径：快照日 == 应归属交易日即放行。
+    try:
+        _sess = v8_date.data_session_date()
+    except Exception:
+        _sess = today
+    if _d and _sess and _d == _sess:
         _m = {}
         for _k, _v in (_sq.get("stocks") or {}).items():
             if not isinstance(_v, dict):
@@ -476,7 +487,8 @@ def _quote_snapshot():
             _c = norm_code(_k).lstrip(".")
             _p = num_or_none(_v.get("price"))
             if _c and _p:
-                _m[_c] = {"price": _p, "pct": num_or_none(_v.get("pct"))}
+                _m[_c] = {"price": _p, "pct": num_or_none(_v.get("pct")),
+                          "prev_close": num_or_none(_v.get("prev_close"))}
         if _m:
             snap = {"date": _d, "source": "STOCK_QUOTE", "map": _m}
 
@@ -490,8 +502,9 @@ def _quote_snapshot():
                     continue
                 _c = norm_code(_it.get("code") or "").lstrip(".")
                 _p = num_or_none(_it.get("price"))
-                if _c and _p:
-                    _m[_c] = {"price": _p, "pct": num_or_none(_it.get("chg"))}
+            if _c and _p:
+                _m[_c] = {"price": _p, "pct": num_or_none(_it.get("chg")),
+                          "prev_close": num_or_none(_it.get("prev_close"))}
             if _m:
                 snap = {"date": _d2, "source": "CANDIDATE_QUOTES", "map": _m}
 
@@ -1611,7 +1624,9 @@ def main():
             "close_date": s.get("close_date"),
             "close_source": s.get("close_source"),
             "close_verified": bool(s.get("close_verified")),
-            "pct_chg": _num2(s.get("pct_chg")),
+                        "pct_chg": _num2(s.get("pct_chg")),
+            "limit_up": limit_up,
+            "limit_up_note": ("今日收盘已封涨停，次日大概率高开/一字板，实际可能买不进；若一字开盘请勿追高，等开板回踩再确认" if limit_up else None),
             "stop_loss": round(safe_float(stop), 2) if stop else None,
             "target_price": round(safe_float(target), 2) if target else None,
             "risk_reward": round(safe_float(rr), 2) if rr else None,
