@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-24 13:05:19",
+  "update_time": "2026-10-24 14:25:16",
   "total_scored": 541,
   "count_80plus": 0,
   "max_score": 42.2,
@@ -11,28 +11,28 @@
     "confidence": "低",
     "market_trend": "unknown",
     "recommended_sectors": [
-      "贵金属",
-      "煤炭",
-      "医疗服务",
+      "化学制药",
       "通信运营",
+      "医疗服务",
+      "贵金属",
+      "银行",
       "半导体",
-      "中药",
       "通信设备",
       "保险",
-      "银行",
       "计算机设备",
+      "煤炭",
       "油气",
       "公用事业",
-      "化学制药"
+      "中药"
     ],
     "avoid_sectors": [
-      "半导体",
-      "白酒",
-      "电子元件",
-      "计算机",
+      "家用电器",
       "通信设备",
       "食品饮料",
-      "家用电器"
+      "电子元件",
+      "计算机",
+      "白酒",
+      "半导体"
     ],
     "strategy_weights": {
       "triple_consensus": 1.0,
@@ -1059,7 +1059,7 @@
       "board": "主板",
       "sig_count": 0,
       "close": 30.35,
-      "pct_chg": 4.62,
+      "pct_chg": 0,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -10.65646158375036,
       "breakout_5d": true,
