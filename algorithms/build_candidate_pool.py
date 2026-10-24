@@ -3,8 +3,8 @@
 构建「候选股池」(candidate_pool.json) 并派生「金股池」(gold_pool.json)
 =========================================================================
 候选股池 = 主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50
-          + 外资研投(自选+研报)
-金股池   = 候选股池 ∩ (外资研投来源 或 多源共振≥2)
+          + 全市场流动性溢出(主板上浮) + 因子优选(amt60/turntrend/ivol60三因子同赞) + 外资研投(自选+研报)
+金股池   = 候选股池 ∩ (外资研投来源 或 因子优选 或 多源共振≥2)
            多源共振：候选股池 sources 中包含 ≥2 个不同来源
            保留 45 个交易日（与 scanner.py 过期口径一致），带防洗空闸门。
 
@@ -280,6 +280,7 @@ def resolve_clean_name(code, market, raw_name):
     return str(code).strip()             # 兜底代码(不出垃圾)
 
 TOP_PER_BOARD = 100   # 主板/创业板/科创板 各取成交额前 N
+FULL_MARKET_OVERFLOW = 300  # A：全市场流动性溢出——各板前100保底外，再补全市场成交额前N（放宽窄池·主板上浮）
 HK_TOP = 50           # 港股取成交额前 N
 
 # 港股精选代码池：HSI 蓝筹 + 港股通权重（稳定不易老化），用于 GTimg 批量行情兜底。
@@ -867,6 +868,112 @@ def _is_gold_research_source(source):
     return source in ("外资研投", "外资研投研报", "mahoro研报")
 
 
+# ──────────────────────────────────────────────────────────────────────────
+# 因子优选冷门腿（2026-10-24 主人令「源头选股不再纯动量」· 选 B：补逆向腿）
+# ──────────────────────────────────────────────────────────────────────────
+# 用生产同源引擎 factor_walkforward 的因子口径，在全市场流动性票中筛出
+# amt60 / turntrend / ivol60 正向(同 generate_top10 排名口径：因子值居前=被选中)的票，
+# 补入候选池源「因子优选」，使金股池在动量腿(各板成交前N) + 研究腿(外资研投) 之外，
+# 也含「低换手/低波/大票」的逆向腿 —— 让 turntrend/ivol60 这类逆向因子有冷门票可挑
+# （修「候选池纯成交额前N动量池 → 下游因子只能热中找冷」的病根）。
+#
+# ★ 数据口径：筛选用 raw_data/kline_cache（生产排名实际用的数据源，每票~251行/1年，
+#   足够算 amt60(60)/turntrend(240)/ivol60(60)）。多年级回测的 515 行 MIN_BARS 是
+#   walk-forward 回测引擎专用，此处为截面快照筛选，用 FW_SCREEN_MIN=250 即可。
+# ★ 防御式：任何失败/无数据 → 返回空集，金股池退回仅研究口径（不引入回归）。
+FACTOR_LEG_ENABLED = True
+FACTOR_TOP_Q = 0.25          # 因子值居前 25% 视为正向
+FACTOR_MIN_HITS = 3          # 3 因子须【全部】居前25%才标「因子优选」（严格·三因子同赞=质量/低波大票；实测≈177只，可控）
+FACTOR_SCREEN_MIN = 250      # 截面前需的最少历史根数（turntrend 要 ≥240）
+FACTOR_UNIVERSE_CACHE = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "raw_data", "kline_cache")
+
+
+def _screen_factor_preferred():
+    """返回「因子优选」代码集合（amt60/turntrend/ivol60 居前25% 且 ≥2 个命中）。
+
+    失败/无数据 → 返回空集（优雅降级：金股池退回仅研究口径，不引入回归）。
+    """
+    out = set()
+    if not FACTOR_LEG_ENABLED:
+        return out
+    try:
+        import sys as _sys
+        _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import factor_walkforward as _fw
+        if not os.path.isdir(FACTOR_UNIVERSE_CACHE):
+            print("  [因子优选] kline_cache 不存在，跳过该腿（降级）")
+            return out
+        codes = [f[:-5] for f in os.listdir(FACTOR_UNIVERSE_CACHE)
+                 if f.endswith(".json") and f[:-5].isdigit() and len(f[:-5]) == 6]
+        klines = {}
+        for c in codes:
+            p = os.path.join(FACTOR_UNIVERSE_CACHE, c + ".json")
+            try:
+                rows = json.load(open(p, encoding="utf-8"))
+            except Exception:
+                continue
+            rows = [r for r in rows if isinstance(r.get("open"), (int, float)) and r.get("open") > 0
+                    and isinstance(r.get("close"), (int, float)) and r.get("close") > 0
+                    and isinstance(r.get("volume"), (int, float))]
+            if rows and len(rows) >= FACTOR_SCREEN_MIN:
+                klines[c] = rows
+        if not klines:
+            print("  [因子优选] kline_cache 无足够历史票，跳过该腿（降级）")
+            return out
+        dates, pos, bars = _fw.build_panel(klines)
+        n = len(dates)
+        pool_sum = [0.0] * n
+        pool_cnt = [0] * n
+        for c, rows in klines.items():
+            r, _ = _fw.stock_series(rows)
+            p = pos[c]
+            for g, i in enumerate(p):
+                if i > 0:
+                    pool_sum[g] += r[i]
+                    pool_cnt[g] += 1
+        pool_r = [(pool_sum[g] / pool_cnt[g]) if pool_cnt[g] else 0.0 for g in range(n)]
+        FACTORS = ("amt60", "turntrend", "ivol60")
+        fvals = {k: {} for k in FACTORS}
+        hit = {}
+        for c, rows in klines.items():
+            if len(rows) < FACTOR_SCREEN_MIN:
+                continue
+            d = _fw.make_prep(rows)
+            pool_at = [None] * len(rows)
+            p = pos[c]
+            for g, ii in enumerate(p):
+                if ii >= 0:
+                    pool_at[ii] = pool_r[g]
+            d["f"].update(_fw.make_resid_prep(rows, pool_at))
+            i = len(rows) - 1           # 截面快照：取最新可算点
+            if i < FACTOR_SCREEN_MIN:
+                continue
+            for k in FACTORS:
+                fn = d["f"].get(k)
+                if fn is None:
+                    continue
+                v = fn(i)
+                if v is not None:
+                    fvals[k][c] = v
+        for k in FACTORS:
+            vs = fvals[k]
+            if len(vs) < 50:
+                continue
+            # 因子值居前 FACTOR_TOP_Q（高值=被 generate_top10 选中，与下游排名同口径）
+            thr = sorted(vs.values())[int(len(vs) * (1 - FACTOR_TOP_Q))]
+            for c, v in vs.items():
+                if v >= thr:
+                    hit[c] = hit.get(c, 0) + 1
+        out = {c for c, h in hit.items() if h >= FACTOR_MIN_HITS}
+        print("  [因子优选] 全市场筛出 %d 只（amt60/turntrend/ivol60 居前%d%%且≥%d命中）"
+              % (len(out), int(FACTOR_TOP_Q * 100), FACTOR_MIN_HITS))
+    except Exception as e:
+        print("  [因子优选] 筛选失败（降级：金股池退回仅研究口径）: %s" % e)
+        out = set()
+    return out
+
+
 def _derive_gold_qualified(members):
     """从候选股池成员中筛选符合金股口径的股票。
 
@@ -878,8 +985,12 @@ def _derive_gold_qualified(members):
     for key, st in members.items():
         sources = list(st.get("sources", []))
         is_research = any(_is_gold_research_source(src) for src in sources)
+        is_factor = "因子优选" in sources
         is_multi = len(set(sources)) >= 2
-        if is_research or is_multi:
+        # 🔴 2026-10-24 主人令「源头选股不再纯动量」· A+B：因子优选(proven正期望因子) 与
+        #   研究腿同位格，单独即可入金股池；并首次让「多源共振≥2」真正可行
+        #   （因子腿作为第3条独立来源轴：因子+动量 / 因子+研究 即可共振，修原「一票一板无法共振」病根）。
+        if is_research or is_factor or is_multi:
             qualified[key] = st
     return qualified
 
@@ -1137,6 +1248,71 @@ def _is_excluded_stock(name="", code="", amount=None):
 
 
 # ---------- 主构建 ----------
+def _full_a_codes():
+    """全 A 股代码表 [(code6, name, full_code, board)]（排除港股）。复用 stock_names 多级回退路径。"""
+    _paths = (
+        STOCK_NAMES_FILE,
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                     "raw_data", "stock_names.json"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "stock_names.json"),
+    )
+    for _p in _paths:
+        try:
+            with open(_p, "r", encoding="utf-8") as f:
+                _obj = json.load(f)
+            if isinstance(_obj, dict):
+                _obj = _obj.get("data") or []
+            out = []
+            for s in (_obj or []):
+                if not isinstance(s, dict):
+                    continue
+                c = (s.get("code") or "").strip()
+                fc = (s.get("full_code") or "").strip().lower()
+                if not c.isdigit() or len(c) != 6:
+                    continue
+                if fc.startswith("hk") or (s.get("market") or "").strip().lower() == "hk":
+                    continue
+                if not fc.startswith(("sh", "sz")):
+                    continue
+                name = (s.get("name") or "").strip()
+                board = _board_of_a(c) or "主板"
+                out.append((c.zfill(6), name, fc, board))
+            if out:
+                return out
+        except Exception:
+            continue
+    return []
+
+
+def _a_share_full_market_gtimg():
+    """全市场成交额快照（本机+云端通用）：取 stock_names 全 A 代码，经 qt.gtimg.cn 批量报价(~66批)
+    拿当日成交额。返回 DataFrame(代码/名称/成交额/_b) 或 None。
+    qt.gtimg.cn 本机实测 5/5 可达、审计版 _fetch_price_amount_gtimg 注明云端亦可达 → 解决「分板前N」窄池问题。
+    """
+    try:
+        sn = _full_a_codes()
+        if not sn:
+            return None
+        full_codes = [x[2] for x in sn]
+        pa = _fetch_price_amount_gtimg(full_codes)  # {gtimg_sym: {price, amount}}
+        if not pa:
+            return None
+        import pandas as pd
+        rows = []
+        for code6, name, full_code, board in sn:
+            p = pa.get(full_code)
+            if not p or not p.get("amount"):
+                continue
+            rows.append({"代码": code6, "名称": name or code6,
+                         "成交额": float(p["amount"]), "_b": board})
+        if not rows:
+            return None
+        return pd.DataFrame(rows)
+    except Exception as e:
+        print(f"  [A股-全市场GTimg] 失败: {type(e).__name__} {str(e)[:80]}")
+        return None
+
+
 def build():
     pool = {}  # key -> {code,name,market,board_label,sources:[]}
 
@@ -1198,6 +1374,27 @@ def build():
             print("  [A股] 未找到成交额列，跳过")
     else:
         print("  [A股] 行情获取失败，跳过该层")
+
+    # 1b) 全市场流动性溢出（A：放宽窄池——保留各板前100保底，再补全市场成交额前N）
+    #     经 qt.gtimg.cn 批量报价(本机+云端双环境可达，已实测) 拉全市场5218只A股当日成交额，
+    #     取全局前 FULL_MARKET_OVERFLOW；与各板前100 经 add() 自动去重（重叠票仅多打一个来源标签）。
+    #     主板上浮（其高成交额票远超各板100配额），创业/科创仍由各板前100保底 → 不重蹈「全市场纯排序挤掉小板」旧坑。
+    try:
+        fm = _a_share_full_market_gtimg()
+        if fm is not None and not fm.empty:
+            _amt = "成交额"
+            for _, r in fm.sort_values(_amt, ascending=False).head(FULL_MARKET_OVERFLOW).iterrows():
+                c = str(r["代码"]).strip().zfill(6)
+                if not c.isdigit() or len(c) != 6:
+                    continue
+                b = r.get("_b") or _board_of_a(c) or "主板"
+                mkt = "sh" if c.startswith("6") else "sz"
+                add(f"{mkt}_{c}", c, r.get("名称") or c, mkt, b, "全市场流动性溢出")
+            print(f"  [A股] 全市场流动性溢出 已并入（全局前{FULL_MARKET_OVERFLOW}，与各板前100合并去重）")
+        else:
+            print("  [A股] 全市场溢出快照为空，跳过（不影响各板前100）")
+    except Exception as e:
+        print(f"  [A股] 全市场溢出失败（降级，不影响各板前100）: {e}")
 
     # 2) 港股 前50（按成交额）
     # 🔴 2026-10-23 晚主人令撤销「金池排除港股」：港股照常并入候选池，不排除。
@@ -1267,6 +1464,26 @@ def build():
     except Exception as e:
         print(f"  [外资研投] 研报读取失败: {e}")
 
+    # 5) 因子优选腿（B：补逆向腿，注入 proven 正期望因子 amt60/turntrend/ivol60）
+    #     用生产同源引擎因子口径，在全市场流动性票中筛「三因子同赞」(居前25%且全部命中) 的票，
+    #     标来源「因子优选」→ 候选池新增该来源轴；金股池派生时与动量/研究并列可共振。
+    #     失败/无数据 → 空集降级（金股池退回仅研究/动量口径，不引入回归）。每日随 kline_cache 重算。
+    try:
+        fp = _screen_factor_preferred()
+        if fp:
+            _sn = _stock_names_map() or {}
+            for c in fp:
+                c = str(c).strip().zfill(6)
+                if not c.isdigit() or len(c) != 6:
+                    continue
+                b = _board_of_a(c) or "主板"
+                mkt = "sh" if c.startswith("6") else "sz"
+                add(f"{mkt}_{c}", c, (_sn.get(c) or c), mkt, b, "因子优选")
+            print(f"  [因子优选] {len(fp)} 只已并入候选池（来源「因子优选」）")
+        else:
+            print("  [因子优选] 空集（降级：金股池退回仅研究/动量口径）")
+    except Exception as e:
+        print(f"  [因子优选] 并入失败（降级）: {e}")
 
     # 补充行业 / 概念 / 板块元数据（用于个股查询展示）
     _enrich_industry_concepts(pool)
