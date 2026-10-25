@@ -1263,7 +1263,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=6ddc8bf071" defer></script>
 <script src="data/EXPERIMENT.js?v=ead4554419" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=2a4d4cc88e" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=8c8bcc4921" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=e3198fb653" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=d8d0f599cd" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=7eb78c5911" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=e3198fb653" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=0a662e037b" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=bc334d18b1" defer></script>
@@ -1370,7 +1370,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <button class="final-tab active" data-final="rec" onclick="switchFinalTab('rec')">🏆 最终推荐 · Top3</button>
       <button class="final-tab" data-final="cand" onclick="switchFinalTab('cand')">🎯 今日推荐候选池</button>
       <button class="final-tab" data-final="fa" onclick="switchFinalTab('fa')">🧪 因子实验室 <span style="font-size:10px;color:var(--dim);">非策略·加分项</span></button>
-      <button class="final-tab" data-final="hist" onclick="switchFinalTab('hist')">📜 每日 Top3 历史 <span style="font-size:10px;color:var(--dim);">每天前3名</span></button>
+      <!-- 🔄 2026-10-25 主人令「历史卡移到回测卡下方折叠显示」：📜 每日 Top3 历史独立子 Tab 撤销，
+           卡片迁入 final-pane-rec 内「最终推荐 Top3 · 回测」卡正下方，<details> 默认折叠；
+           数据仍读 FINAL_RECOMMEND_HISTORY.js（gen_final_recommend_history.py，
+           🔗 本日起挂链 final_recommend.py D 批末尾 → 每日算法跑完自动重写）。 -->
     </div>
 
     <!-- 子 Pane：最终推荐 Top3（2026-09-20 主人令唯一口径；🔴 2026-10-20 主人令「要口径和评分都一致」重申并废止 10-14 混排竞位）
@@ -1424,17 +1427,22 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
     </div>
 
-    <!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：
-         每日 Top3 历史（真实每日选股 dated 快照汇总，非事后重算规则回放）。
-         数据源 data/FINAL_RECOMMEND_HISTORY.js（gen_final_recommend_history.py 产出，
-         读 raw_data/history/final_recommend_YYYYMMDD.json 逐日真实 Top3）。 -->
-    <div id="final-pane-hist" class="final-pane">
-      <div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">
-        <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">📜</span>每日推荐 Top3 历史
+    <!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」
+         🔄 2026-10-25 主人令「这卡移到回测卡下方，折叠显示」：由独立子 Tab 迁入本面板（回测卡正下方），
+         <details> 默认折叠展开即看；每日记录自动写入（gen_final_recommend_history.py 已挂链
+         final_recommend.py D 批末尾，算法每晚跑完 → dated 快照汇总 → 本卡数据自动重写）；
+         回测侧 gen_final_recommend_backtest.py 同在 D 批末尾，每日新收盘数据出来后继续跟踪计算记录。
+         数据源 data/FINAL_RECOMMEND_HISTORY.js（读 raw_data/history/final_recommend_YYYYMMDD.json
+         逐日真实 Top3，滚动 120 天）。 -->
+      <details class="card" id="finalHistCard" style="margin-top:16px;border-left:4px solid #a78bfa;"
+               ontoggle="if(this.open&&!window.__finalHistRendered){window.__finalHistRendered=true;try{window.renderFinalHist();}catch(e){console.error('[renderFinalHist]',e);}}">
+        <summary style="cursor:pointer;font-size:14px;font-weight:700;color:var(--txt);user-select:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap;list-style:none;">
+          <span class="ic" style="font-style:normal;">📜</span>每日推荐 Top3 历史
+          <span style="font-size:10.5px;font-weight:600;color:var(--dim);">（每日自动记录 · 默认折叠，点开查看）</span>
           <span id="finalHistBadges" style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;"></span>
-        </h3>
-        <div id="finalHistBody" style="padding:12px 4px 2px;"><div class="note">加载中…</div></div>
-      </div>
+        </summary>
+        <div id="finalHistBody" style="padding:12px 4px 2px;"><div class="note">展开加载…</div></div>
+      </details>
     </div>
 
     <!-- 子 Pane：今日推荐候选池 -->
@@ -18203,6 +18211,21 @@ window.__renderV8CalToday();
       +'<th style="text-align:left;padding:5px 2px;font-size:11px;color:var(--dim);font-weight:600">当日 Top3（代码 名称 收盘 综合分）</th>'
       +'</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
   };
+
+  // 🔄 2026-10-25 主人令「历史卡移到回测卡下方折叠显示」：卡已迁入 rec 面板 <details> 常驻折叠，
+  //   不再依赖子 Tab 切换触发 → defer 数据脚本就绪后自动渲染一次（徽章天数/区间在折叠态也可见）；
+  //   展开时 ontoggle 兜底重入。FINAL_RECOMMEND_HISTORY.js 为 defer 外链，load 事件后必已执行；
+  //   极端慢网下数据未到则 1s×10 次重试，仍缺则留给 ontoggle 兜底。
+  (function(){
+    function _auto(){
+      if(window.__finalHistRendered) return;
+      if(!window.FINAL_RECOMMEND_HISTORY){ if((_auto._n=(_auto._n||0)+1)<10) setTimeout(_auto,1000); return; }
+      window.__finalHistRendered=true;
+      try{ window.renderFinalHist(); }catch(e){ console.error('[renderFinalHist]', e); }
+    }
+    if(document.readyState==='complete') setTimeout(_auto,200);
+    else window.addEventListener('load', function(){ setTimeout(_auto,200); });
+  })();
 
   window.__renderFinalSec=function(){
     // 🔴 2026-08-13 修复: renderFinalRec/renderFinalCand 内部已有 try/catch,

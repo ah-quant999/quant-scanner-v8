@@ -1976,6 +1976,17 @@ def main():
     except Exception as e:
         print(f"[warn] final_recommend backtest skipped: {e.__class__.__name__}: {e}")
 
+    # 🔄 2026-10-25 主人令「每日记录自动写进去，回测也是每日出来后继续跟踪计算和记录」：
+    #   dated 快照归档（上方）+ 真实流回测（上方）每日已自动，但前端「📜 每日推荐 Top3 历史」
+    #   折叠卡的数据源 data/FINAL_RECOMMEND_HISTORY.js 一直靠手动跑 gen_final_recommend_history.py
+    #   （10-22 上线后停在 10-20）→ 挂链 D 批末尾：算法每晚跑完自动汇总 dated 快照重写，
+    #   与回测同哲学（try/except 包裹，失败绝不影响 D 批主产物；纯本地秒级）。
+    try:
+        import gen_final_recommend_history as _frh
+        _frh.main()
+    except Exception as e:
+        print(f"[warn] final_recommend history skipped: {e.__class__.__name__}: {e}")
+
     # 打印 top3
     for s in out_stocks:
         print(f"  #{s['rank']} {s['name']}({s['code']}) 综合{s['final_score']} 共振{s['resonance']} 板块+{s['sector_score']} 来源{','.join(s['sources'])}")

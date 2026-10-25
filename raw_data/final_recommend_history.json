@@ -1,12 +1,12 @@
 {
-  "generated": "2026-10-22 11:50:32",
+  "generated": "2026-10-25 16:04:02",
   "card": "最终推荐 · 每日 Top3 历史",
   "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
   "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",
   "n_top": 3,
-  "days": 29,
+  "days": 34,
   "date_from": "2026-09-03",
-  "date_to": "2026-10-20",
+  "date_to": "2026-10-25",
   "by_date": {
     "2026-09-03": {
       "date": "2026-09-03",
@@ -1238,17 +1238,17 @@
     },
     "2026-10-20": {
       "date": "2026-10-20",
-      "update_time": "2026-10-21 08:02:51",
-      "file": "final_recommend_20261021.json",
+      "update_time": "2026-10-20 21:11:48",
+      "file": "final_recommend_20261020.json",
       "degraded": false,
       "top3": [
         {
           "rank": 1,
-          "code": "601869",
-          "name": "长飞光纤",
-          "close": 339.09,
-          "close_date": "2026-10-21",
-          "final_score": 16.0,
+          "code": "688525",
+          "name": "佰维存储",
+          "close": 159.13,
+          "close_date": "2026-10-20",
+          "final_score": 18.2,
           "resonance": 1,
           "sources": [
             "四量终极"
@@ -1256,11 +1256,11 @@
         },
         {
           "rank": 2,
-          "code": "300007",
-          "name": "汉威科技",
-          "close": 31.2,
-          "close_date": "2026-10-21",
-          "final_score": 15.6,
+          "code": "001309",
+          "name": "德明利",
+          "close": 219.55,
+          "close_date": "2026-10-20",
+          "final_score": 17.8,
           "resonance": 1,
           "sources": [
             "四量终极"
@@ -1268,11 +1268,231 @@
         },
         {
           "rank": 3,
+          "code": "601869",
+          "name": "长飞光纤",
+          "close": 339.09,
+          "close_date": "2026-10-20",
+          "final_score": 17.3,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        }
+      ]
+    },
+    "2026-10-21": {
+      "date": "2026-10-21",
+      "update_time": "2026-10-21 22:17:09",
+      "file": "final_recommend_20261021.json",
+      "degraded": true,
+      "top3": [
+        {
+          "rank": 1,
           "code": "688525",
           "name": "佰维存储",
-          "close": 159.13,
+          "close": 164.42,
           "close_date": "2026-10-21",
-          "final_score": 15.5,
+          "final_score": 22.7,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        },
+        {
+          "rank": 2,
+          "code": "301308",
+          "name": "江波龙",
+          "close": 248.98,
+          "close_date": "2026-10-21",
+          "final_score": 22.0,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        },
+        {
+          "rank": 3,
+          "code": "300054",
+          "name": "鼎龙股份",
+          "close": 58.2,
+          "close_date": "2026-10-21",
+          "final_score": 19.6,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        }
+      ]
+    },
+    "2026-10-22": {
+      "date": "2026-10-22",
+      "update_time": "2026-10-22 21:54:45",
+      "file": "final_recommend_20261022.json",
+      "degraded": false,
+      "top3": [
+        {
+          "rank": 1,
+          "code": "601168",
+          "name": "西部矿业",
+          "close": 30.83,
+          "close_date": "2026-10-22",
+          "final_score": 15.7,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        },
+        {
+          "rank": 2,
+          "code": "688525",
+          "name": "佰维存储",
+          "close": 159.5,
+          "close_date": "2026-10-22",
+          "final_score": 14.6,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        },
+        {
+          "rank": 3,
+          "code": "601869",
+          "name": "长飞光纤",
+          "close": 321.4,
+          "close_date": "2026-10-22",
+          "final_score": 12.5,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        }
+      ]
+    },
+    "2026-10-23": {
+      "date": "2026-10-23",
+      "update_time": "2026-10-23 19:54:00",
+      "file": "final_recommend_20261023.json",
+      "degraded": true,
+      "top3": [
+        {
+          "rank": 1,
+          "code": "300199",
+          "name": "翰宇药业",
+          "close": 25.8,
+          "close_date": "2026-10-23",
+          "final_score": 40.4,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        },
+        {
+          "rank": 2,
+          "code": "002138",
+          "name": "顺络电子",
+          "close": 42.18,
+          "close_date": "2026-10-23",
+          "final_score": 37.6,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        },
+        {
+          "rank": 3,
+          "code": "688099",
+          "name": "晶晨股份",
+          "close": 100.68,
+          "close_date": "2026-10-23",
+          "final_score": 34.3,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        }
+      ]
+    },
+    "2026-10-24": {
+      "date": "2026-10-24",
+      "update_time": "2026-10-24 20:23:34",
+      "file": "final_recommend_20261024.json",
+      "degraded": false,
+      "top3": [
+        {
+          "rank": 1,
+          "code": "002138",
+          "name": "顺络电子",
+          "close": 42.18,
+          "close_date": "2026-10-23",
+          "final_score": 40.3,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        },
+        {
+          "rank": 2,
+          "code": "300199",
+          "name": "翰宇药业",
+          "close": 25.8,
+          "close_date": "2026-10-23",
+          "final_score": 36.4,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        },
+        {
+          "rank": 3,
+          "code": "688099",
+          "name": "晶晨股份",
+          "close": 100.68,
+          "close_date": "2026-10-23",
+          "final_score": 36.0,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        }
+      ]
+    },
+    "2026-10-25": {
+      "date": "2026-10-25",
+      "update_time": "2026-10-25 15:40:03",
+      "file": "final_recommend_20261025.json",
+      "degraded": false,
+      "top3": [
+        {
+          "rank": 1,
+          "code": "002138",
+          "name": "顺络电子",
+          "close": 42.18,
+          "close_date": "2026-10-23",
+          "final_score": 36.8,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        },
+        {
+          "rank": 2,
+          "code": "300199",
+          "name": "翰宇药业",
+          "close": 25.8,
+          "close_date": "2026-10-23",
+          "final_score": 29.2,
+          "resonance": 1,
+          "sources": [
+            "四量终极"
+          ]
+        },
+        {
+          "rank": 3,
+          "code": "603186",
+          "name": "华正新材",
+          "close": 201.65,
+          "close_date": "2026-10-23",
+          "final_score": 28.0,
           "resonance": 1,
           "sources": [
             "四量终极"

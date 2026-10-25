@@ -68,6 +68,11 @@
   .card h3 .ic{font-size:16px;line-height:1}
   .card h3 .fresh{font-size:11px;color:var(--dim);font-weight:400;white-space:nowrap}
   .card .fresh{font-size:11px;color:var(--dim);font-weight:400}
+  /* 🔄 2026-10-25 主人令「历史卡移到回测卡下方折叠显示」：details 形态卡（每日 Top3 历史折叠卡）摘要行 */
+  details.card summary{list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::marker{content:''}
+  details.card[open] summary{margin-bottom:10px}
 
   /* 实时数据卡片：走势图 + 标题行数字 */
   .rt-card h3{justify-content:space-between;flex-wrap:wrap;gap:6px 10px}
