@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>九宝量化 v8 · 收益率提升方法论</title>
+<style>
+:root{
+  --bg:#0a0e17; --bg2:#0f1623; --card:rgba(148,163,184,.06); --card2:#121a28;
+  --border:rgba(148,163,184,.16); --txt:#e6edf7; --sub:#c7d2e0; --dim:#7e8aa0;
+  --gold:#f59e0b; --teal:#2dd4bf; --up:#22c55e; --down:#ef5350; --blue:#38bdf8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--sub);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;line-height:1.7;padding:0 0 60px}
+header{background:linear-gradient(135deg,#13203a,#0d1626);border-bottom:1px solid var(--border);padding:30px 24px 24px;margin-bottom:24px}
+header h1{margin:0 0 6px;font-size:24px;color:var(--txt)}
+header .tag{display:inline-block;font-size:12px;color:var(--gold);background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);padding:2px 10px;border-radius:10px}
+header p{margin:10px 0 0;color:var(--dim);font-size:13px}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px}
+h2{color:var(--txt);font-size:18px;margin:30px 0 14px;display:flex;align-items:center;gap:8px}
+h2 .ic{font-size:20px}
+.card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.lead{font-size:14px;color:var(--sub)}
+.lead b{color:var(--gold)}
+.found{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:680px){.found{grid-template-columns:1fr}}
+.found .item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.found .item .n{font-size:22px;font-weight:800;color:var(--gold);line-height:1}
+.found .item .t{font-size:13.5px;color:var(--txt);font-weight:700;margin:6px 0 4px}
+.found .item .d{font-size:12px;color:var(--dim);line-height:1.6}
+.pillar{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
+@media(max-width:680px){.pillar{grid-template-columns:1fr}}
+.pillar .p{background:linear-gradient(135deg,rgba(56,189,248,.1),rgba(45,212,191,.05));border:1px solid rgba(56,189,248,.25);border-radius:10px;padding:14px}
+.pillar .p b{color:var(--blue)}
+.redline{list-style:none;padding:0;margin:0}
+.redline li{padding:10px 12px;border-left:3px solid var(--down);background:rgba(239,83,80,.06);border-radius:0 8px 8px 0;margin-bottom:8px;font-size:13.5px;color:var(--sub)}
+.lever{background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(239,83,80,.05));border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:18px}
+.lever .big{font-size:16px;color:var(--gold);font-weight:800;margin:0 0 8px}
+.lever p{margin:0;font-size:13.5px;color:var(--sub)}
+.road{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:680px){.road{grid-template-columns:1fr}}
+.road .r{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px}
+.road .r .st{font-size:12px;color:var(--teal);font-weight:700;margin-bottom:6px}
+.road .r ul{margin:0;padding-left:18px;font-size:12px;color:var(--dim);line-height:1.7}
+.disclaimer{margin-top:36px;font-size:11.5px;color:var(--dim);border-top:1px solid var(--border);padding-top:14px;line-height:1.7}
+.back{display:inline-block;margin-top:16px;font-size:13px;color:var(--blue);text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>📐 收益率提升方法论</h1>
+  <span class="tag">九宝量化 v8 · 交易分析团队方法论框架</span>
+  <p>本页为团队（技术 / 基本面 / 新闻 / 情绪 / 交易执行 / 风控 八维）研讨产出的系统性方法论总结，非个股建议。</p>
+</header>
+<div class="wrap">
+
+  <div class="card">
+    <p class="lead">核心公式：<b>收益率 = 选股 α × 执行转化 × 风控保命</b>。<br>
+    先求「不亏大钱」，再求「赚得多」——回撤对复利是毁灭性的（回撤 −50% 需 +100% 回本），因此「活下来」是比「赚得快」更优先的第一性原理。</p>
+  </div>
+
+  <h2><span class="ic">🧱</span>十大基石（按重要性）</h2>
+  <div class="found">
+    <div class="item"><div class="n">1</div><div class="t">移动止损 / 追踪止盈</div><div class="d">不预测顶、用规则锁利润，是浮盈能否落袋的第一道闸门（权重 10）。</div></div>
+    <div class="item"><div class="n">2</div><div class="t">最大回撤硬约束</div><div class="d">账户生死线：−8% 减仓 / −12% 半仓 / −15% 清仓（权重 10）。</div></div>
+    <div class="item"><div class="n">3</div><div class="t">质量与财务排雷</div><div class="d">避开造假与价值陷阱（FCF 质量 + ROE 三维体检），选股无法绕开的安全底座（权重 10）。</div></div>
+    <div class="item"><div class="n">4</div><div class="t">样本外 / Walk-forward 验证</div><div class="d">区分真 alpha 与过拟合噪声的唯一试金石（权重 10）。</div></div>
+    <div class="item"><div class="n">5</div><div class="t">计划交易纪律</div><div class="d">买卖点预先写定，盘中只执行不决策（权重 10）。</div></div>
+    <div class="item"><div class="n">6</div><div class="t">量价配合 / 背离确认</div><div class="d">资金态度的最终裁判，多空共振的触发器（权重 10）。</div></div>
+    <div class="item"><div class="n">7</div><div class="t">估值分位均值回归</div><div class="d">买便宜、卖贵的胜率锚（权重 9）。</div></div>
+    <div class="item"><div class="n">8</div><div class="t">波动率目标化仓位</div><div class="d">狂躁时不失控、恐慌时不停摆的自动调平器（权重 9）。</div></div>
+    <div class="item"><div class="n">9</div><div class="t">单票 / 单行业上限</div><div class="d">用集中度上限换取「活下去」的权利（权重 9）。</div></div>
+    <div class="item"><div class="n">10</div><div class="t">盈利加速度 / 超预期</div><div class="d">业绩拐点与预期差是超额收益的主引擎（权重 9）。</div></div>
+  </div>
+
+  <h2><span class="ic">🔱</span>保命三角（最该先做的三件事）</h2>
+  <div class="pillar">
+    <div class="p"><b>① 纪律三件套</b><br>移动止损 + 回撤硬约束 + 计划交易。跨维度共识最高，且不需复杂数据即可执行。</div>
+    <div class="p"><b>② 选股三关</b><br>质量 + 估值分位 + 财务排雷。宁可少做、不可做错，从根源掐断大额亏损。</div>
+    <div class="p"><b>③ 仓位标尺</b><br>波动率目标化统一仓位标尺，彻底替代「感觉满仓 / 恐慌空仓」的拍脑袋决策。</div>
+  </div>
+
+  <h2><span class="ic">🚫</span>最该避免（红线）</h2>
+  <ul class="redline">
+    <li>无止损、无计划的「感觉交易」——散户最大亏损源，必须禁用。</li>
+    <li>高估值 + 情绪极度贪婪时追高——保守维度列为预警红线。</li>
+    <li>没有样本外 / Walk-forward 验证的「漂亮回测」——过拟合策略实盘必归零。</li>
+    <li>单一票 / 单一行业押注式满仓——黑天鹅中一次性出清。</li>
+    <li>利好出尽后仍持有、舆情反转时不止盈——把事件收益熬成回吐亏损。</li>
+  </ul>
+
+  <h2><span class="ic">⚡</span>最大杠杆点</h2>
+  <div class="lever">
+    <p class="big">移动止损</p>
+    <p>它是单一方法中对「收益率 → 实际到手收益」转化率影响最大的一环。无数策略回测夏普漂亮、实盘却归零，根因只有一个——没有纪律性的移动止损把浮盈变成实盈。它不改变选股 alpha，却能把账面收益率的兑现率直接提升一个量级。结论：把它作为第一条不可协商的铁律，与回撤硬约束、计划交易组成「保命三角」，是全框架投入产出比最高的起点。</p>
+  </div>
+
+  <h2><span class="ic">🗺️</span>落地路线</h2>
+  <div class="road">
+    <div class="r"><div class="st">最小可行闭环</div><ul>
+      <li>计划交易</li><li>质量 + 财务排雷</li><li>估值分位</li><li>量价配合确认</li><li>移动止损 + 回撤约束</li><li>波动率目标化</li>
+    </ul></div>
+    <div class="r"><div class="st">基础 0–3 月</div><ul>
+      <li>质量体检 + 估值分位 + 趋势/RS</li><li>计划交易 + 移动止损</li><li>回撤硬约束 + 波动仓位</li><li>财务排雷 + 单票上限</li>
+    </ul></div>
+    <div class="r"><div class="st">进阶 3–9 月</div><ul>
+      <li>超预期 PEAD / 一致预期</li><li>主力 / 北向 / 政策催化</li><li>金字塔加仓 + 时间止损</li><li>多因子合成 + 风险平价</li>
+    </ul></div>
+    <div class="r"><div class="st">高阶 9 月+</div><ul>
+      <li>核心-卫星 + 动态再平衡</li><li>不对称仓位 / 正偏度</li><li>期指 / 保护认沽对冲</li><li>Walk-forward 持续迭代</li>
+    </ul></div>
+  </div>
+
+  <a class="back" href="index.html">← 返回主站</a>
+
+  <div class="disclaimer">
+    ⚠️ 本页为方法论研究，不构成任何投资建议或个股推荐。所有阈值与权重均为示意，须经理样本外 / Walk-forward 验证与自身风险预算校准后方可实盘。
+  </div>
+</div>
+</body>
+</html>

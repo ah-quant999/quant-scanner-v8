@@ -184,7 +184,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=cd5d290385" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=16cd4a44d6" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=25677483f6" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1294,11 +1294,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CFFEX_POSITION.js?v=5ec62893da" defer></script>
 <script src="data/FUNDAMENTAL_QUALITY.js?v=c6293b71a7" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=831189bde3" defer></script>
-<script src="data/HB_XIAOJIU.js?v=af17a2375b" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=875b31d156" defer></script>
-<script src="data/HEALTH_CHECK.js?v=87b071bcbf" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=8ada113997" defer></script>
+<script src="data/RUNNER_STATUS.js?v=4c9a3eaae3" defer></script>
+<script src="data/HB_XIAOJIU.js?v=201b396d2d" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=fa2437531d" defer></script>
+<script src="data/HEALTH_CHECK.js?v=83c8a6face" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=83c6f9ef02" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=e343cae787" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=d389af2a9f" defer></script>
@@ -1312,13 +1312,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=cbf73e3f5c" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=2838a1e75c" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=85164e6063" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=1f1b1e7d1b" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2dd1f72783" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=0fc0970d5d" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=25a4a67118" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=1c1663096d" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=c46900c89d" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/IMA_STRONG_BACKTEST.js?v=9fd877e007" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/IMA_STRONG_BACKTEST.js?v=de66c0d411" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ · 第一支自研算法）经真实信号流回测确认不达标，整支下架删除（前端挂载 + 后端脚本 + 数据全部清除）；相关注入脚本已移除，仅 FF3 自研算法保留（见下方 FF3_RANKSUM 注入）。 -->
     <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）前端接入 —— 后端 gen_ff3_ranksum.py 每日重算 raw_data/ff3_ranksum_*.json → update_v8 转换 -->
     <script src="data/FF3_RANKSUM_TRACK.js?v=ebd9c8f2ec" defer></script>
@@ -1358,6 +1358,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <!-- 2026-08-29 主人令：已下架 从运维子 Tab 提升为一级 nav -->
   <div class="tab locked admin-only" data-sec="dl" data-lock="1" onclick="guardLock('dl',this)">🔒 已下架 <span class="lk">[锁]</span></div>
   <div class="tab locked admin-only" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
+  <a class="tab" href="methodology.html" style="text-decoration:none">📐 方法论</a>
 </nav>
 
 <main>
@@ -1425,7 +1426,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           🔴 2026-10-20 主人令「口径和评分都一致」：线上最终推荐口径已回到唯一口径（=当日因子榜前 3 同序同分，混排竞位废止）⇒ 本卡为 10-14 混排方法的历史回放档案，仅存方法对比价值，不再描述线上现行口径。
         </div>
       </div>
-    </div>
 
     <!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」
          🔄 2026-10-25 主人令「这卡移到回测卡下方，折叠显示」：由独立子 Tab 迁入本面板（回测卡正下方），
@@ -6576,7 +6576,7 @@ c.innerHTML = h;
         return '<td style="padding:5px 6px;text-align:right;">'+_v+'</td>';
       }).join('');
       var dets = [];
-      _detKeys.forEach(function(k){ var v = String(s[k]==null?'':s[k]).trim(); if(v) dets.push(v); });
+      _detKeys.forEach(function(k){ var v = String(s[k]==null?'':s[k]).trim(); if(v && !/^已下架/.test(v)) dets.push(v); });
       h += '<tr style="border-top:1px solid rgba(148,163,184,.16);'+(isRec?'background:rgba(239,83,80,.06);':'')+'">'
          + '<td style="padding:5px 6px;color:var(--dim);">'+(i+1)+'</td>'
          + '<td style="padding:5px 6px;white-space:nowrap;"><b style="color:var(--txt);">'+_e(s.name||'')+'</b> <span style="color:var(--dim);">'+_e(code)+'</span>'
@@ -7497,18 +7497,6 @@ window.__renderIndexObserve = function(){
 
     <!-- 2026-10-04 主人令：逻辑详解已下架，运维页说明同步收敛 -->
     <div style="font-size:12px;color:var(--dim);margin:0 0 14px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">ℹ️ <b style="color:var(--gold)">逻辑详解（指标/策略/安全口径）</b> 已于 2026-10-04 下架，公开站点不再承载其全部交易参数内容；管理员本地查看见本机同步盘私有副本 <code>v8_logic_private/logic.full.html</code>。</div>
-    <!-- 🔄 2026-10-25 主人令「现在到底多少个因子，写清楚；运维页也要对齐」：因子清账后口径固化在此，与「最终推荐 → 每日因子计算」明细全表同一口径，防止两处漂移 -->
-    <div style="font-size:12px;color:var(--dim);margin:0 0 14px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">🧮 <b style="color:var(--gold)">因子清账对齐（2026-10-25 主人令「好的留差的删」）</b>：generate_top10 评分体系<b>原 26 项 → 现全表 27 项 = 实际计分 13 + 已下架 14</b>。<br>
-      <b style="color:#22c55e">实际计分 13 项</b>：P2 四信号 edge 4（金钻/缠论买/机构变红反/上涨趋势反）+ 个股历史胜率均益 1（2026-10-23 嵌入，此前漏登全表已补）+ 回测反哺组合 1 + P5 walk-forward 达标 2（换手率趋势/60日成交额中位数，verdict=PASS 才启用，当前均 PASS）+ P4 研究 2（残差动量反/低波动）+ 过热惩罚 2（RSI&gt;70 −5 / 20日涨幅≥20% −6/−3/−1，只罚不奖）+ 质差一票否决 1（风控）。<br>
-      <b style="color:#94a3b8">已下架 14 项（整项）</b>：量能突破 / 温水煮青蛙 / 超跌反弹 / 上涨中继（P3 四因子）· EMA 结构 / 非涨停（form）· 连续共振天数（streak≥1 −3.81%, t=−4.26 实锤）· 5 日突破 · 主力净流入 / 龙虎榜机构净买入（fund −0.801%）· 板块资金共振（sector −0.415%）· 52 周新高（次新股标记不可测）· 分析师关注（+0.99% NO_EDGE）· 基本面质量分（−1.027%，质差否决保留）；<b>另半下架 2 项</b>：RSI&lt;30 超卖加分、20日涨幅 0~10% 温和加分（加分侧删、惩罚侧保留）。<br>
-      <b>每项下架原因与实测证据（样本量/t 值）逐行固化在「最终推荐 → 每日因子计算 → 展开明细全表」</b>（逻辑详解页已整体下架，该全表即因子逻辑唯一详解处）。回滚开关：<code>generate_top10.py DELIST_DIMS</code> 对应项改 False 即整体恢复计分。证据档案：<code>raw_data/untested_factor_verdicts.json</code> + <code>missing3_factor_verdicts.json</code>。</div>
-    <!-- 🔄 2026-10-25 主人令「现在马上做掉」：端到端组合层回放结论落档（两个提升开关：清账有效 + H1成本陷阱） -->
-    <div style="font-size:12px;color:var(--dim);margin:0 0 14px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">📈 <b style="color:var(--gold)">端到端组合层回放（2026-10-25 主人令「现在马上做掉」，commit 30795d1065）</b>：以 dated top10_daily 归档=系统每日真实发出名单，滚动等权满仓、次日开盘进、持有H日、双边0.3%成本；三口径 OLD(清账前)/CLEAN(清账后重排)/NEW(10-25纯净档)，92信号日 × N∈{5,10,20}×H∈{1,5,10} 全扫描。<br>
-      <b style="color:#22c55e">① 清账方向改善组合层（开关已验证有效）</b>：CLEAN vs OLD 单笔配对差全正 —— N5 +0.31%/+1.85%/+1.18%、N10 +0.13%/+0.39%/+0.24%（H1/H5/H10）；改善集中在 N5/N10 集中持仓，N20 两口径重合无差别。⇒ <code>DELIST_DIMS</code> 十项维持全 True（已核验）。<br>
-      <b style="color:#f59e0b">② H1 次日 flip = 成本陷阱（开关要关掉）</b>：三口径单笔均全负（OLD −0.54% / CLEAN −0.40%），双边 0.3% 成本即杀手 ⇒ 持有期建议已改为「5~10个交易日、等权分散5~10票」并同步最终推荐卡交易纪律横幅。<br>
-      组合层滚动净年化：CLEAN N5H5 +10.3% / N5H10 +63.4% / N10H10 +16.0%（OLD 对应 −45.1%/−35.1%/−10.2% 全负）。⚠️ 诚实口径：<b>此为每日再平衡等权分散账数字，持有到期单笔仍为负，非「每票都赢」，依赖连续滚动再平衡</b>。NEW 纯净档仅 2 信号日曲线不足，随真实交易日累积重跑脚本自动覆盖。<br>
-      产物：<code>scripts/e2e_system_backtest.py</code> + <code>raw_data/e2e_system_backtest.json</code>（含 tranche 退出基准 off-by-one 修复记录）。<br>
-      🤖 <b style="color:#38bdf8">自动复核</b>：<b>每周五 21:00 盘后自动重跑本脚本</b>，NEW 信号日累积≥10天自动出组合层曲线并比对上方 CLEAN 基线（N5H5 +10.3% / N5H10 +63.4% / N10H10 +16.0%），纯只读预警——NEW 实盘明显差于基线（CAGR 转负 / MaxDD 显著扩大）即明确告警。<b>未达 10 天则只报样本数、不下结论</b>。</div>
 
     
 
@@ -15156,7 +15144,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=1f1b1e7d1b');
+      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=25a4a67118');
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -15165,7 +15153,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=2dd1f72783');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=1c1663096d');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);

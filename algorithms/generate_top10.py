@@ -1763,7 +1763,7 @@ def main():
         form_score = 0
         form_detail = []
         if DELIST_DIMS.get("form"):
-            form_detail = ["已下架·因子清账(EMA≥5 DROP/其余 NO_EDGE)"]
+            form_detail = []
         else:
             if ema_up >= 5:
                 form_score += 5
@@ -1795,7 +1795,7 @@ def main():
         fund = 0
         fund_detail = []
         if DELIST_DIMS.get("fund"):
-            fund_detail = ["已下架·因子清账(by_factor −0.80% drop)"]
+            fund_detail = []
         else:
             # 主力（capital_flow_data 单位为【亿元】，非旧 main_stock 的万元）
             main_net = main_map.get(raw_code, 0)
@@ -1872,7 +1872,7 @@ def main():
             else:
                 sector_detail = f"{best_sector_name}{best_sector_flow:+.1f}亿"
         else:
-            sector_detail = "已下架·因子清账(by_factor −0.42% drop)" if best_sector_flow is not None else ""
+            sector_detail = "" if best_sector_flow is not None else ""
         if not sector_detail and _dim_src_empty["sector"]:
             sector_detail = "无数据（板块资金/行业映射上游缺失）"
 
@@ -1883,7 +1883,7 @@ def main():
         inst = 0
         inst_detail = []
         if DELIST_DIMS.get("inst"):
-            inst_detail = ["已下架·因子清账(52周新高 NO_EDGE/分析师 NO_DATA)"]
+            inst_detail = []
         else:
             if raw_code in w52_codes or name in w52_names:
                 inst += 4
