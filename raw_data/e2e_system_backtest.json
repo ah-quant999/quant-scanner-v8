@@ -1,0 +1,376 @@
+{
+ "generated": "2026-10-25",
+ "desc": "端到端系统回放·组合层（dated top10 归档=系统真实发出名单，滚动等权满仓，双边0.3%）",
+ "params": {
+  "N": [
+   5,
+   10,
+   20
+  ],
+  "H": [
+   1,
+   5,
+   10
+  ],
+  "cost": 0.003,
+  "weight": "equal",
+  "model": "rolling_full_invest"
+ },
+ "sysver": {
+  "OLD": "归档真实total_score排序(旧代码,<20261024)",
+  "CLEAN": "旧档同日清零DELIST_DIMS九维重排(清账口径)",
+  "NEW": "2026-10-25纯净档(仅1信号日,曲线不足)"
+ },
+ "result": {
+  "OLD": {
+   "N5H1": {
+    "n_signals": 65,
+    "n_tranche_events": 64,
+    "n_hold_days": 92,
+    "final_equity": 0.687,
+    "cagr": -0.6424,
+    "maxdd": -0.3353,
+    "daily_win": 0.4762,
+    "yearly": {
+     "2026": -0.313
+    },
+    "tranche_mean": -0.00661,
+    "tranche_t": -1.38,
+    "tranche_win": 0.4531
+   },
+   "N5H5": {
+    "n_signals": 65,
+    "n_tranche_events": 60,
+    "n_hold_days": 92,
+    "final_equity": 0.8036,
+    "cagr": -0.4507,
+    "maxdd": -0.2983,
+    "daily_win": 0.4507,
+    "yearly": {
+     "2026": -0.1964
+    },
+    "tranche_mean": -0.03116,
+    "tranche_t": -3.02,
+    "tranche_win": 0.3333
+   },
+   "N5H10": {
+    "n_signals": 65,
+    "n_tranche_events": 55,
+    "n_hold_days": 92,
+    "final_equity": 0.8538,
+    "cagr": -0.3513,
+    "maxdd": -0.2624,
+    "daily_win": 0.4342,
+    "yearly": {
+     "2026": -0.1462
+    },
+    "tranche_mean": -0.03146,
+    "tranche_t": -2.43,
+    "tranche_win": 0.2909
+   },
+   "N10H1": {
+    "n_signals": 65,
+    "n_tranche_events": 64,
+    "n_hold_days": 92,
+    "final_equity": 0.6991,
+    "cagr": -0.6248,
+    "maxdd": -0.3177,
+    "daily_win": 0.4444,
+    "yearly": {
+     "2026": -0.3009
+    },
+    "tranche_mean": -0.00537,
+    "tranche_t": -1.2,
+    "tranche_win": 0.4219
+   },
+   "N10H5": {
+    "n_signals": 65,
+    "n_tranche_events": 60,
+    "n_hold_days": 92,
+    "final_equity": 0.8568,
+    "cagr": -0.3452,
+    "maxdd": -0.2468,
+    "daily_win": 0.4789,
+    "yearly": {
+     "2026": -0.1432
+    },
+    "tranche_mean": -0.01971,
+    "tranche_t": -2.02,
+    "tranche_win": 0.3333
+   },
+   "N10H10": {
+    "n_signals": 65,
+    "n_tranche_events": 55,
+    "n_hold_days": 92,
+    "final_equity": 0.9616,
+    "cagr": -0.1016,
+    "maxdd": -0.2539,
+    "daily_win": 0.4474,
+    "yearly": {
+     "2026": -0.0384
+    },
+    "tranche_mean": -0.01345,
+    "tranche_t": -0.95,
+    "tranche_win": 0.3455
+   },
+   "N20H1": {
+    "n_signals": 65,
+    "n_tranche_events": 64,
+    "n_hold_days": 92,
+    "final_equity": 0.7432,
+    "cagr": -0.5565,
+    "maxdd": -0.2828,
+    "daily_win": 0.4286,
+    "yearly": {
+     "2026": -0.2568
+    },
+    "tranche_mean": -0.00451,
+    "tranche_t": -1.03,
+    "tranche_win": 0.4375
+   },
+   "N20H5": {
+    "n_signals": 65,
+    "n_tranche_events": 60,
+    "n_hold_days": 92,
+    "final_equity": 0.8874,
+    "cagr": -0.2791,
+    "maxdd": -0.2296,
+    "daily_win": 0.4225,
+    "yearly": {
+     "2026": -0.1126
+    },
+    "tranche_mean": -0.02068,
+    "tranche_t": -2.18,
+    "tranche_win": 0.3
+   },
+   "N20H10": {
+    "n_signals": 65,
+    "n_tranche_events": 55,
+    "n_hold_days": 92,
+    "final_equity": 0.9917,
+    "cagr": -0.0225,
+    "maxdd": -0.2303,
+    "daily_win": 0.4342,
+    "yearly": {
+     "2026": -0.0083
+    },
+    "tranche_mean": -0.01481,
+    "tranche_t": -1.16,
+    "tranche_win": 0.3455
+   }
+  },
+  "CLEAN": {
+   "N5H1": {
+    "n_signals": 65,
+    "n_tranche_events": 60,
+    "n_hold_days": 92,
+    "final_equity": 0.8418,
+    "cagr": -0.3761,
+    "maxdd": -0.3158,
+    "daily_win": 0.4667,
+    "yearly": {
+     "2026": -0.1582
+    },
+    "tranche_mean": -0.00353,
+    "tranche_t": -0.85,
+    "tranche_win": 0.45
+   },
+   "N5H5": {
+    "n_signals": 65,
+    "n_tranche_events": 56,
+    "n_hold_days": 92,
+    "final_equity": 1.0364,
+    "cagr": 0.1029,
+    "maxdd": -0.2876,
+    "daily_win": 0.4783,
+    "yearly": {
+     "2026": 0.0364
+    },
+    "tranche_mean": -0.01262,
+    "tranche_t": -1.2,
+    "tranche_win": 0.375
+   },
+   "N5H10": {
+    "n_signals": 65,
+    "n_tranche_events": 51,
+    "n_hold_days": 92,
+    "final_equity": 1.1965,
+    "cagr": 0.6344,
+    "maxdd": -0.1806,
+    "daily_win": 0.5405,
+    "yearly": {
+     "2026": 0.1965
+    },
+    "tranche_mean": -0.01969,
+    "tranche_t": -1.71,
+    "tranche_win": 0.3333
+   },
+   "N10H1": {
+    "n_signals": 65,
+    "n_tranche_events": 64,
+    "n_hold_days": 92,
+    "final_equity": 0.7628,
+    "cagr": -0.5237,
+    "maxdd": -0.2688,
+    "daily_win": 0.5238,
+    "yearly": {
+     "2026": -0.2372
+    },
+    "tranche_mean": -0.00405,
+    "tranche_t": -0.93,
+    "tranche_win": 0.4844
+   },
+   "N10H5": {
+    "n_signals": 65,
+    "n_tranche_events": 60,
+    "n_hold_days": 92,
+    "final_equity": 0.8902,
+    "cagr": -0.2729,
+    "maxdd": -0.2386,
+    "daily_win": 0.4648,
+    "yearly": {
+     "2026": -0.1098
+    },
+    "tranche_mean": -0.0158,
+    "tranche_t": -1.45,
+    "tranche_win": 0.35
+   },
+   "N10H10": {
+    "n_signals": 65,
+    "n_tranche_events": 55,
+    "n_hold_days": 92,
+    "final_equity": 1.0557,
+    "cagr": 0.1601,
+    "maxdd": -0.2173,
+    "daily_win": 0.4868,
+    "yearly": {
+     "2026": 0.0557
+    },
+    "tranche_mean": -0.01103,
+    "tranche_t": -0.83,
+    "tranche_win": 0.3818
+   },
+   "N20H1": {
+    "n_signals": 65,
+    "n_tranche_events": 64,
+    "n_hold_days": 92,
+    "final_equity": 0.7432,
+    "cagr": -0.5565,
+    "maxdd": -0.2828,
+    "daily_win": 0.4286,
+    "yearly": {
+     "2026": -0.2568
+    },
+    "tranche_mean": -0.00451,
+    "tranche_t": -1.03,
+    "tranche_win": 0.4375
+   },
+   "N20H5": {
+    "n_signals": 65,
+    "n_tranche_events": 60,
+    "n_hold_days": 92,
+    "final_equity": 0.8874,
+    "cagr": -0.2791,
+    "maxdd": -0.2296,
+    "daily_win": 0.4225,
+    "yearly": {
+     "2026": -0.1126
+    },
+    "tranche_mean": -0.02068,
+    "tranche_t": -2.18,
+    "tranche_win": 0.3
+   },
+   "N20H10": {
+    "n_signals": 65,
+    "n_tranche_events": 55,
+    "n_hold_days": 92,
+    "final_equity": 0.9917,
+    "cagr": -0.0225,
+    "maxdd": -0.2303,
+    "daily_win": 0.4342,
+    "yearly": {
+     "2026": -0.0083
+    },
+    "tranche_mean": -0.01481,
+    "tranche_t": -1.16,
+    "tranche_win": 0.3455
+   }
+  },
+  "NEW": {
+   "N5H1": null,
+   "N5H5": null,
+   "N5H10": null,
+   "N10H1": null,
+   "N10H5": null,
+   "N10H10": null,
+   "N20H1": null,
+   "N20H5": null,
+   "N20H10": null
+  }
+ },
+ "old_vs_clean": {
+  "N5H1": {
+   "OLD_cagr": -0.6424,
+   "CLEAN_cagr": -0.3761,
+   "OLD_tranche": -0.00661,
+   "CLEAN_tranche": -0.00353,
+   "delta_tranche": 0.00308
+  },
+  "N5H5": {
+   "OLD_cagr": -0.4507,
+   "CLEAN_cagr": 0.1029,
+   "OLD_tranche": -0.03116,
+   "CLEAN_tranche": -0.01262,
+   "delta_tranche": 0.01854
+  },
+  "N5H10": {
+   "OLD_cagr": -0.3513,
+   "CLEAN_cagr": 0.6344,
+   "OLD_tranche": -0.03146,
+   "CLEAN_tranche": -0.01969,
+   "delta_tranche": 0.01177
+  },
+  "N10H1": {
+   "OLD_cagr": -0.6248,
+   "CLEAN_cagr": -0.5237,
+   "OLD_tranche": -0.00537,
+   "CLEAN_tranche": -0.00405,
+   "delta_tranche": 0.00132
+  },
+  "N10H5": {
+   "OLD_cagr": -0.3452,
+   "CLEAN_cagr": -0.2729,
+   "OLD_tranche": -0.01971,
+   "CLEAN_tranche": -0.0158,
+   "delta_tranche": 0.00391
+  },
+  "N10H10": {
+   "OLD_cagr": -0.1016,
+   "CLEAN_cagr": 0.1601,
+   "OLD_tranche": -0.01345,
+   "CLEAN_tranche": -0.01103,
+   "delta_tranche": 0.00242
+  },
+  "N20H1": {
+   "OLD_cagr": -0.5565,
+   "CLEAN_cagr": -0.5565,
+   "OLD_tranche": -0.00451,
+   "CLEAN_tranche": -0.00451,
+   "delta_tranche": 0.0
+  },
+  "N20H5": {
+   "OLD_cagr": -0.2791,
+   "CLEAN_cagr": -0.2791,
+   "OLD_tranche": -0.02068,
+   "CLEAN_tranche": -0.02068,
+   "delta_tranche": 0.0
+  },
+  "N20H10": {
+   "OLD_cagr": -0.0225,
+   "CLEAN_cagr": -0.0225,
+   "OLD_tranche": -0.01481,
+   "CLEAN_tranche": -0.01481,
+   "delta_tranche": 0.0
+  }
+ }
+}
