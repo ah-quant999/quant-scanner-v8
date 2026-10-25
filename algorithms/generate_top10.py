@@ -1094,7 +1094,11 @@ def _p4_partial(full, ratio):
 # 权重口径（与 P4 同构，禁特立独行）：
 #   · 分层：walk-forward 用全市场五分位(L1 最强)；本处取【候选池内分位】前 20% / 20~40% 两档。
 #     理由：本因子只用于「池内排序」，池内分位才是落地口径；walk-forward 验证的是方向与强度。
-#     ⚠️ 已知口径偏离（已留痕）：未按「金股池 subset」复跑 walk-forward，池内单调性列为下一轮待办。
+#     ✅ 口径偏离已关闭（2026-10-25 主人令「今晚全完成」）：factor_walkforward.py 新增
+#     --universe gold_pool 子集口径并已实跑（764 池票 × 9 年 K线，产物
+#     raw_data/factor_walkforward_goldpool.json，不覆盖生产闸门文件）——
+#     子集 verdict 与全市场一致：PASS 仅 amt60(hold5, IR_OOS 0.578) / turntrend(hold5, IR_OOS 0.718)，
+#     其余 15 项（含 rev5 IR_OOS 0.811 但年率 1/8 不稳）全 FAIL ⇒ 生产 P5 闸门在真实作用域内正确，零改动。
 #   · 满额档 +6 / 次档 +3：6 与 P4 单因子上限 ±6 对齐（同为 K 线可得单因子的权限），
 #     两因子合计上限 +12 < P3 四因子合计 +13，远小于单信号上限 ±30。
 #   · 闸门：仅当 factor_walkforward.json 里 verdict=PASS 才启用（未来复跑不达标 ⇒ 自动失效）；

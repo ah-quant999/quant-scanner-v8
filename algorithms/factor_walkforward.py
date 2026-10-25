@@ -130,8 +130,23 @@ def fetch_one(code):
     return code, None
 
 
-def load_universe():
-    """universe = raw_data/kline_cache 里的 A 股 6 位码（与 factor_lab_backtest 同源）。"""
+def load_universe(mode="kline_cache"):
+    """universe 来源（🆕 2026-10-25 主人令「今晚全完成」加 gold_pool 子集口径，默认不变）：
+    kline_cache = raw_data/kline_cache 全名录（生产原口径，与 factor_lab_backtest 同源）；
+    gold_pool   = raw_data/gold_pool.json 金股池子集（关闭 generate_top10 P5 自留待办
+                  「未按金股池 subset 复跑 walk-forward」——P5 闸门实际作用域是金股池，
+                  全市场口径与作用域存在偏离，本模式一次性关掉）。"""
+    if mode == "gold_pool":
+        gp_path = os.path.join(RAW, "gold_pool.json")
+        gp = json.load(open(gp_path, encoding="utf-8"))
+        st = gp.get("stocks") or {}
+        codes = set()
+        for k, s in st.items():
+            raw = (s.get("code") if isinstance(s, dict) else None) or k
+            c = re.sub(r"\D", "", str(raw))
+            if len(c) == 6:
+                codes.add(c)
+        return sorted(codes)
     D = os.path.join(RAW, "kline_cache")
     codes = sorted(os.path.basename(f)[:-5] for f in glob.glob(os.path.join(D, "*.json"))
                    if re.match(r"^\d{6}\.json$", os.path.basename(f)))
@@ -686,17 +701,29 @@ def main():
     ap.add_argument("--workers", type=int, default=24)
     ap.add_argument("--no-fetch", action="store_true", help="只用本地缓存，不联网")
     ap.add_argument("--limit", type=int, default=0, help="只跑前 N 只（调试）")
+    # 🆕 2026-10-25 主人令「今晚全完成」：金股池子集口径（默认 kline_cache 不变，
+    #   产物默认写 factor_walkforward_goldpool.json，绝不覆盖生产 factor_walkforward.json）
+    ap.add_argument("--universe", choices=["kline_cache", "gold_pool"], default="kline_cache",
+                    help="universe 来源：kline_cache=全名录（生产）/ gold_pool=金股池子集")
+    ap.add_argument("--out", default="", help="输出 JSON 路径（默认按 universe 自动定）")
     args = ap.parse_args()
+
+    global OUT_JSON
+    if args.out:
+        OUT_JSON = args.out
+    elif args.universe == "gold_pool":
+        OUT_JSON = os.path.join(RAW, "factor_walkforward_goldpool.json")
 
     _log("=" * 74)
     _log("  因子 walk-forward 回测（待回测候选台账 A 组）  —  %s"
          % datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     _log("=" * 74)
 
-    codes = load_universe()
+    codes = load_universe(args.universe)
     if args.limit:
         codes = codes[:args.limit]
-    _log("universe: %d 只 A 股（raw_data/kline_cache 名录）" % len(codes))
+    _log("universe: %d 只（%s）" % (len(codes),
+         "raw_data/kline_cache 名录" if args.universe == "kline_cache" else "raw_data/gold_pool.json 金股池子集"))
 
     klines = get_klines(codes, args.workers, not args.no_fetch)
     if len(klines) < 100:
@@ -848,7 +875,9 @@ def main():
                         "⑤组合层波动率目标仓位对照(targetσ=15%%,cap=1,按调仓频率年化,无前视)(vol_target_oos)。"
                         % (STEP, COST * 100, WIN_YEARS, WIN_PASS_N)),
         "universe_n": len(klines),
-        "universe_src": "raw_data/kline_cache（A 股 6 位码）",
+        "universe_src": ("raw_data/kline_cache（A 股 6 位码）" if args.universe == "kline_cache"
+                         else "raw_data/gold_pool.json 金股池子集（P5 闸门真实作用域，关闭口径偏离待办）"),
+        "universe_mode": args.universe,
         "data_src": "新浪 datalen=%d（主）→ gtimg（兜底）" % DATALEN,
         "bars_min": min(len(v) for v in klines.values()),
         "bars_max": max(len(v) for v in klines.values()),
