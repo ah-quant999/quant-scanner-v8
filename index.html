@@ -184,7 +184,7 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=60c6f36c7c" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=cd5d290385" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=25677483f6" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -1296,9 +1296,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=831189bde3" defer></script>
 <script src="data/HB_XIAOJIU.js?v=af17a2375b" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=5d75ea91fa" defer></script>
-<script src="data/HEALTH_CHECK.js?v=bd582e59c8" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=bfbea8cf66" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=875b31d156" defer></script>
+<script src="data/HEALTH_CHECK.js?v=87b071bcbf" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=8ada113997" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=e343cae787" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=d389af2a9f" defer></script>
@@ -1312,13 +1312,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=cbf73e3f5c" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=b2ec574c80" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=2838a1e75c" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=607c4d9d41" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=b66ff8945d" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=ff76bfca9d" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=1f1b1e7d1b" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2dd1f72783" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=0fc0970d5d" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS 回测注入 -->
-    <script src="data/IMA_STRONG_BACKTEST.js?v=6a16ebe78c" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
+    <script src="data/IMA_STRONG_BACKTEST.js?v=9fd877e007" defer></script><!-- 🆕 2026-10-14 主人令「IMA 卡马上补 v2」：v1 112 ∪ v2 期归档 68 ∪ 最新 = 188 笔真实信号流（raw_data/ima_strong_history_v2.json 持久归档 + backtest_life_cards.py 合并装载） -->
     <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ · 第一支自研算法）经真实信号流回测确认不达标，整支下架删除（前端挂载 + 后端脚本 + 数据全部清除）；相关注入脚本已移除，仅 FF3 自研算法保留（见下方 FF3_RANKSUM 注入）。 -->
     <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）前端接入 —— 后端 gen_ff3_ranksum.py 每日重算 raw_data/ff3_ranksum_*.json → update_v8 转换 -->
     <script src="data/FF3_RANKSUM_TRACK.js?v=ebd9c8f2ec" defer></script>
@@ -1358,7 +1358,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <!-- 2026-08-29 主人令：已下架 从运维子 Tab 提升为一级 nav -->
   <div class="tab locked admin-only" data-sec="dl" data-lock="1" onclick="guardLock('dl',this)">🔒 已下架 <span class="lk">[锁]</span></div>
   <div class="tab locked admin-only" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
-  <a class="tab" href="methodology.html" style="text-decoration:none">📐 方法论</a>
 </nav>
 
 <main>
@@ -1386,6 +1385,20 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <span id="finalStatusBadges" style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;"></span>
         </h3>
         <div id="finalRecBody" style="padding:4px 2px 2px;"><div class="note">加载中…</div></div>
+      </div>
+      <!-- 🧮 2026-10-25 主人令「我要的是具体的算法合并到选股和算法中去」：
+           方法论不再单开一页 —— 可执行的那部分直接长在选股页上，逐票落数（仓位/止损/移动止损/时间止损），
+           算式与阈值同步写入「逻辑详解」页对应章节，两处同一套常量（window.__EXEC）。 -->
+      <div class="card" id="execAlgoCard" style="margin-bottom:16px;border-left:4px solid #38bdf8;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          <span style="font-size:15px;font-weight:700;color:var(--txt);">🧮 收益转化算法 · 选股 → 仓位 / 移动止损</span>
+          <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#38bdf822;color:#38bdf8;border:1px solid #38bdf84d;">逐票落数 · 公式固定 · 可复算</span>
+          <span style="font-size:10px;color:var(--dim);">与「逻辑详解 → 收益转化算法」同口径</span>
+        </div>
+        <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px;">
+          选出来只是起点：<b style="color:#38bdf8;">买多少、止损放哪、什么时候挪、什么时候走</b>，全部按固定公式算，不靠感觉。
+        </div>
+        <div id="execAlgoHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">🧮 算法加载中…</div></div>
       </div>
       <!-- 🆕 2026-10-13 主人令「最终推荐的前5名我也想有个回测…我要看到底靠不靠谱」：
            最终推荐 Top3 信号层真实回测卡（与「强势跟踪 · 回测 N 日胜率」同渲染器同口径）。
@@ -6527,11 +6540,25 @@ c.innerHTML = h;
       ['信号基础','score_base'], ['增强','score_enhance'], ['形态','score_form'],
       ['资金','score_fund'], ['板块','score_sector'], ['机构','score_inst'],
       ['质量','score_quality'], ['回测反哺','score_backtest'],
+      ['胜率','score_winrate'], ['胜率名次','score_winrate_fusion'],
       ['↳5日突破','score_breakout'], ['↳研究','score_research'],
       ['↳P4','score_p4'], ['↳P5','score_p5']
     ];
     // 上述「↳」子项列（已含在「增强」列内，渲染时弱化，避免主人重复相加）
     var _SUBCOLS = { score_breakout:1, score_research:1, score_p4:1, score_p5:1 };
+    // 🧮 2026-10-25 主人令「加加减减得到总分要算的明明白白」—— 三处口径修正：
+    //   ① 补漏：raw_total 里还有「胜率」「胜率名次」两个真实加数
+    //      （generate_top10.py L2015 wr_term / L2156 胜率 rank-fusion），
+    //      旧表只列 8 列 ⇒ 表内各列相加恒 ≠ 总分，主人算不通。现补齐为 10 个加数；
+    //      带 ↳ 的 4 列仍是「增强」的子项，父列已含，不计二次。
+    //   ② 逐股算式：每行下方加一行「算式」——
+    //      逐项相加 → raw → ×门禁 ÷归一化分母 ×100 → ×个股regime = 总分，可逐股复现。
+    //   ③ 空列自适应：全池恒为 0 的维度自动隐藏（当前 = 因子清账下架的 形态/资金/板块/机构），
+    //      四列 0 不再占版面（否则会被误读成「分数丢了」），底部一行注明隐藏了哪几维；
+    //      将来因子重启、任一票出现非 0 即自动回到表内。
+    var ADDKEYS = ['score_base','score_enhance','score_form','score_fund','score_sector',
+                   'score_inst','score_quality','score_backtest','score_winrate','score_winrate_fusion'];
+    var LBL = {}; FACTS.forEach(function(f){ LBL[f[1]] = f[0]; });
     var _detKeys = ['form_detail','fund_detail','sector_detail','inst_detail','quality_detail','research_detail','p4_detail','p5_detail'];
     // 🔴 2026-10-01 主人令（反转 09-23 置顶序）：本榜=因子计分榜，全榜统一按 total_score 降序；
     //   🏷「最终推荐」仅作行标记（见上方 _rec），不再置顶、不再向榜内注入因子池外标的。
@@ -6539,6 +6566,23 @@ c.innerHTML = h;
     //   置顶混排会把 FR 旧批的 final_score 冒充「总分」列、池外标的因子列全 0 —— 榜面即假。
     //   （09-23 置顶令的背景是两榜同批同源；盘中 lite 重算 TOP10 不联动 FR 后，置顶=混批，故按新令反转。）
     rows = rows.slice().sort(function(a,b){ return (Number(b.total_score)||0) - (Number(a.total_score)||0); });
+    // 🧮 ③ 空列自适应（全池恒 0 的维度不占列；算式行仍逐项列出，分数绝不隐藏）
+    //   DELIST_SET = 因子清账下架维度，与 algorithms/generate_top10.py 的 DELIST_DIMS 对齐
+    //   （2026-10-25 清账：form/fund/sector/inst/quality_score 正向倾斜下架，恒计 0；质差一票否决保留）
+    var DELIST_SET = { score_form:1, score_fund:1, score_sector:1, score_inst:1, score_quality:1 };
+    var _hide = {}, _hiddenKeys = [];
+    ADDKEYS.concat(Object.keys(_SUBCOLS)).forEach(function(k){
+      var _any = rows.some(function(s){ var n = Number(s[k]); return !isNaN(n) && n !== 0; });
+      if(!_any && k !== 'score_base'){ _hide[k] = 1; _hiddenKeys.push(k); }
+    });
+    var _dlLbl = _hiddenKeys.filter(function(k){ return DELIST_SET[k]; }).map(function(k){ return LBL[k]; });
+    var _zLbl  = _hiddenKeys.filter(function(k){ return !DELIST_SET[k]; }).map(function(k){ return LBL[k]; });
+    var VIS = FACTS.filter(function(f){
+      if(_hide[f[1]]) return false;
+      if(_SUBCOLS[f[1]] && _hide['score_enhance']) return false;
+      return true;
+    });
+    var ADDVIS = ADDKEYS.filter(function(k){ return !_hide[k]; });
     // 🔴 2026-09-22：从产物取「真实公式三段」的真值，用于卡面如实披露（不写死、产物缺则降级）
     var _gi  = D.gate_info || {};
     var _gm  = (_gi.gate_multiplier != null) ? Number(_gi.gate_multiplier) : null;
@@ -6549,12 +6593,16 @@ c.innerHTML = h;
     var _icwTxt = (_icw != null) ? _icw.toFixed(2) : '—';
     var _rgwTxt = (_rgw != null) ? _rgw.toFixed(2) : '—';
     var _divTxt = (_div != null) ? String(_div)    : '<span style="color:#94a3b8;">产物未含</span>';
+    // 算式里用纯文本版（_gmTxt/_divTxt 可能含 HTML 降级提示）
+    var _gmPlain  = (_gm  != null) ? _gm.toFixed(4) : '1';
+    var _divPlain = (_div != null) ? String(_div) : '—';
+    var _f1 = function(n){ var x = Number(n); if(!isFinite(x)) x = 0; return (Math.round(x*10)/10).toFixed(1); };
     var _regTxt = _gi.current_regime ? _e(_gi.current_regime) : '—';
     var h = '<div style="overflow-x:auto;overflow-y:hidden;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
           + '<thead><tr style="background:rgba(148,163,184,.07);color:var(--sub);text-align:left;">'
           + '<th style="padding:5px 6px;">#</th>'
           + '<th style="padding:5px 6px;">股票</th>'
-          + FACTS.map(function(f){
+          + VIS.map(function(f){
               var _sub = !!_SUBCOLS[f[1]];
               return '<th style="padding:5px 6px;text-align:right;white-space:nowrap;'
                    + (_sub ? 'color:var(--dim);font-weight:400;font-size:10.5px;' : '')
@@ -6566,7 +6614,23 @@ c.innerHTML = h;
     rows.forEach(function(s, i){
       var code = String(s.code==null?'':s.code).replace(/[^0-9]/g,'');
       var isRec = !!_rec[code];
-      var tds = FACTS.map(function(f){
+      // 🧮 逐股算式（2026-10-25 主人令：加加减减要算得明明白白）
+      var _rawSum = 0, _parts = [];
+      ADDVIS.forEach(function(k){
+        var _n = Number(s[k]); if(isNaN(_n)) _n = 0;
+        _rawSum += _n;
+        if(_n !== 0) _parts.push(LBL[k] + (_n > 0 ? ' +' : ' ') + _n);
+      });
+      if(s.winrate_demote){ _rawSum -= 30; _parts.push('强制降级 −30'); }   // WINRATE_DEMOTE_RAW=30
+      var _ra2 = (s.regime_adjust != null && isFinite(Number(s.regime_adjust))) ? Number(s.regime_adjust) : 1;
+      var _eq = (_parts.length ? _parts.join(' ') : '0')
+              + ' <span style="color:#94a3b8;">=</span> <b style="color:var(--sub);">' + _f1(_rawSum) + '</b>'
+              + ' <span style="color:#94a3b8;">→ ×门禁</span> ' + _gmPlain
+              + ' <span style="color:#94a3b8;">÷</span> ' + _divPlain
+              + ' <span style="color:#94a3b8;">×100</span>'
+              + (_ra2 !== 1 ? (' <span style="color:#94a3b8;">→ ×regime</span> ' + _ra2) : '')
+              + ' <span style="color:#94a3b8;">=</span> <b style="color:#fbbf24;">' + _e(s.total_score) + '</b>';
+      var tds = VIS.map(function(f){
         var _v = _vc(s[f[1]]);
         if(_SUBCOLS[f[1]]){
           // 子项：弱化为灰色小字，明示「已含在增强列内」，防主人重复相加
@@ -6584,10 +6648,13 @@ c.innerHTML = h;
          + '</td>'
          + tds
          + '<td style="padding:5px 6px;text-align:right;"><b style="color:#fbbf24;font-size:12.5px;">'+_e(s.total_score)+'</b></td>'
+         + '<tr'+(isRec?' style="background:rgba(239,83,80,.06);"':'')+'><td></td>'
+         + '<td colspan="'+(VIS.length+2)+'" style="padding:1px 6px 6px;font-size:10px;color:var(--dim);line-height:1.55;">'
+         + '<span style="color:#64748b;">🧮</span> ' + _eq + '</td></tr>'
          + '</tr>'
          + (dets.length
             ? '<tr style="'+(isRec?'background:rgba(239,83,80,.06);':'')+'"><td></td>'
-              + '<td colspan="'+(FACTS.length+2)+'" style="padding:0 6px 7px;font-size:10.5px;color:var(--dim);line-height:1.6;">'
+              + '<td colspan="'+(VIS.length+2)+'" style="padding:0 6px 7px;font-size:10.5px;color:var(--dim);line-height:1.6;">'
               + _e(dets.join(' ｜ ')) + '</td></tr>'
             : '');
     });
@@ -6597,12 +6664,20 @@ c.innerHTML = h;
        + '口径：本榜 = <code>algorithms/generate_top10.py</code> 的 total_score 评分体系（决定排序的主力分，产物原序=已降序）；'
        + '因子链 factor_chain（如放量弱势 weak_penalty）是推荐层的二次微调，两层各自如实、不混排。'
        + '因子列缺失记 0。<b style="color:var(--sub);">⚠️ 带 ↳ 的 4 列是「增强」的子项，已计入增强，<u>勿再相加</u></b>。'
-       + '<br><b style="color:var(--sub);">总分算法（2026-10-01 版 · 四步，可逐股复现）：</b>'
-       + '<br>① <b>表内 8 个加数列均为有效值</b>——质量列 = 原始质量分 ×0.5 ×池内0.5 ×报告时效(0.5~1，财报越旧越衰减) ×活跃度(0.35~1，当前无信号下沉)；机构列 = 原始机构分 ×2（IC 全维最强因子加权）；形态列 = <b>全池横截面中性化值</b>（按当日全部候选的形态分名次映射到 -4~+4，只保留相对强弱、消除趋势日全员齐高分，全员并列时≈0）；'
-       + '<br>② <code>raw = 信号基础 + 增强 + 形态 + 资金 + 板块 + 机构 + 质量 + 回测反哺</code>（8 列相加，各计一次；↳4 子项已含在增强内）；'
-       + '<br>③ <code>总分 = clamp( raw × 门禁乘子 ' + _gmTxt + ' ÷ 归一化分母 ' + _divTxt + ' × 100 , 0 , 100 ) × 个股regime系数</code>；门禁乘子 = clamp( 开仓系数 × IC权重 ' + _icwTxt + ' × regime权重 ' + _rgwTxt + ' , 0.3 , 1.05 )，全池统一；当日 regime = ' + _regTxt + '。'
-       + '<br>④ 全榜按总分降序排名（2026-10-01 主人令：🏷「最终推荐」仅作行标记，不再置顶、不注入因子池外标的——两管线错批时各自如实）。'
-       + '<br>⇒ 所以「各列直接相加」<b>不等于</b>总分，须走②③；表内列为两位小数展示值、中间计算为全精度，<b>逐列复现总分允许 ±0.1 舍入差</b>。'
+       + '<b style="color:var(--sub);">总分算法（2026-10-25 版 · 五步，可逐股复现）：</b>'
+       + '<br>① <b>表内 10 个加数列</b>——信号基础 / 增强 / 形态 / 资金 / 板块 / 机构 / 质量 / 回测反哺 / <b>胜率</b> / <b>胜率名次</b>；带 ↳ 的 4 列（5日突破·研究·P4·P5）已含在「增强」内，<u>勿再相加</u>。'
+       + '其中：质量 = 原始质量分 ×0.5 ×池内0.5 ×报告时效 ×活跃度；机构 = 原始机构分 ×3（IC 最强因子）；形态 = <b>全池横截面中性化值</b>（名次映射 -4~+4，只保留相对强弱）；'
+       + '<b>胜率</b> = 该股历史 T+5 收缩胜率分（无记录记 0）；<b>胜率名次</b> = 该股胜率在当日池内的名次百分位 ×±跨度（rank-fusion，无记录居中→0）。'
+       + '<br>② <code>raw = 10 个加数逐项相加</code>（T+5 胜率 &lt;30% 且样本≥3 的另扣 30 分「强制降级」，表内算式已列该项）；'
+       + '<br>③ <code>总分 = clamp( raw × 门禁乘子 ' + _gmTxt + ' ÷ 归一化分母 ' + _divTxt + ' × 100 , 0 , 100 ) × 个股regime系数</code>，门禁乘子 = clamp( 开仓系数 × IC权重 ' + _icwTxt + ' × regime权重 ' + _rgwTxt + ' , 0.3 , 1.05 )，全池统一；当日 regime = ' + _regTxt + '。'
+       + '<br>④ 每行下方「🧮 算式」= 该股完整推导（逐项相加 → raw → ×门禁 ÷分母 ×100 → ×regime = 总分），<b>拿计算器可逐股复现，允许 ±0.1 舍入差</b>。'
+       + '<br>⑤ 全榜按总分降序排名（🏷「最终推荐」仅作行标记，不置顶、不注入因子池外标的）。'
+       + (_hiddenKeys.length
+            ? '<br><span style="color:#f59e0b;">⚠️ 今日全池计 0 的维度已不占列：<b>' + _hiddenKeys.map(function(k){return LBL[k];}).join(' / ') + '</b></span>'
+              + (_dlLbl.length ? '（其中 <b>' + _dlLbl.join(' / ') + '</b> 为因子清账下架维度，恒计 0、不参与评分）' : '')
+              + (_zLbl.length ? '（<b>' + _zLbl.join(' / ') + '</b> 今日全池未得分）' : '')
+              + '。仅为版面清晰而收起，<u>分数并未删掉</u>：每行「🧮 算式」照样逐项列出该股全部加数；任一维度日后出现非 0 会自动回到表内。'
+            : '')
        + '数据源 data/TOP10_DAILY.js'
        + (D.update_time ? (' · 更新于 <b>'+_e(D.update_time)+'</b>') : '')
        + '。仅研究参考，非买卖建议。</div>';
@@ -6614,6 +6689,126 @@ c.innerHTML = h;
       var _nRec = rows.filter(function(x){ return _rec[String(x.code==null?'':x.code).replace(/[^0-9]/g,'')]; }).length;
       bd.innerHTML = '共 <b style="color:var(--txt);">'+rows.length+'</b> 只 · <b style="color:#ef5350;">'+_nRec+'</b> 只在当日推荐名单' + _ts;
     }
+  };
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // 🧮 收益转化算法 · 选股 → 仓位 / 移动止损（2026-10-25 主人令）
+  //   原话：「我不要这个（单独的方法论页），我要的是具体的算法合并到选股和算法中去。」
+  //   ⇒ 方法论不再单开一页：可执行的那部分「算法」直接长在选股页上，逐票落数；
+  //     算式与阈值同步写进「逻辑详解」页的对应章节，两处同一套常量。
+  //   本卡回答四个问题，全部按固定公式计算、可拿计算器复算：
+  //     ① 买多少     仓位 = 单票风险预算 1% ÷ 止损距离，再乘胜率/质量/regime 三道系数，夹在 2%~20%
+  //     ② 止损放哪   初始止损 = 产物 stop_loss（fixedP10 或前低，由 compute_stop_target_from_closes 给）
+  //     ③ 什么时候挪 浮盈 ≥1R → 止损提到成本价；≥2R → 提到成本+1R；之后按最高收盘 −8% 追踪
+  //     ④ 什么时候走 持有 ≥ 建议持有期 未达 1R → 减半；≥ 持有期+5 → 清出；账户 −8%/−12%/−15% 三级硬约束
+  //   数据源：data/TOP10_DAILY.js（与「当日因子计分榜」同一产物，close / stop_loss /
+  //     target_price / win_rate / wr_win5 / wr_n5 / regime_adjust / total_score），
+  //     持有期取产物 suggested_hold_days。常量集中在下面 4 行，改一处全站生效。
+  // ═════════════════════════════════════════════════════════════════════════
+  window.__EXEC = { RISK_PCT: 1.0, MAX_W: 20, MIN_W: 2, POOL_MAX: 60, TRAIL: 0.08, N: 3 };
+  window.__exRetry = 0;
+  window.__renderExecAlgo = function(){
+    var host = document.getElementById('execAlgoHost');
+    if(!host) return;
+    var D = window.TOP10_DAILY;
+    var rows = (D && D.top10) || [];
+    if(!rows.length){
+      if(window.__exRetry < 15){ window.__exRetry++; setTimeout(window.__renderExecAlgo, 700); return; }
+      host.innerHTML = '<div class="note" style="padding:14px;text-align:center;color:var(--dim);">🧮 算法数据未到位（data/TOP10_DAILY.js）· 待算法链下一轮更新</div>';
+      return;
+    }
+    window.__exRetry = 0;
+    var E = window.__EXEC || { RISK_PCT:1.0, MAX_W:20, MIN_W:2, POOL_MAX:60, TRAIL:0.08, N:3 };
+    var _e = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+    var _f = function(v, d){ var n = Number(v); if(!isFinite(n)) return '—'; return n.toFixed(d==null?2:d); };
+    var _hold = Number(D.suggested_hold_days) || 10;
+    var pick = rows.slice().sort(function(a,b){ return (Number(b.total_score)||0) - (Number(a.total_score)||0); }).slice(0, E.N);
+
+    var totFirst = 0, totFull = 0;
+    var body = '';
+    pick.forEach(function(s, i){
+      var close = Number(s.close), stop = Number(s.stop_loss), tgt = Number(s.target_price);
+      if(!(close > 0) || !(stop > 0) || stop >= close){
+        body += '<tr><td style="padding:6px;">'+(i+1)+'</td><td style="padding:6px;" colspan="9">'
+             + '<b style="color:var(--txt);">'+_e(s.name||'')+'</b> <span style="color:var(--dim);">'+_e(s.code||'')+'</span>'
+             + ' <span style="color:#f59e0b;">⚠️ 产物缺有效止损（stop_loss≥现价），本票不给仓位建议</span></td></tr>';
+        return;
+      }
+      var d = (close - stop) / close;               // 止损距离（= 1R 占现价比例）
+      var R = close - stop;                         // 1R 的价格幅度
+      var rr = (tgt > close) ? ((tgt - close) / R) : NaN;   // 盈亏比（产物 target 对应）
+      var w0 = E.RISK_PCT / d;                      // 风险预算仓位 % = 1% ÷ 止损距离
+      var k = 1, why = [];
+      // ① 个股历史 T+5 胜率闸门（样本 ≥3 才认）
+      var w5 = Number(s.wr_win5), n5 = Number(s.wr_n5), sigWr = Number(s.win_rate);
+      if(isFinite(w5) && isFinite(n5) && n5 >= 3 && w5 < 30){ k *= 0.5; why.push('个股T+5胜率'+_f(w5,0)+'%<30% → ×0.5'); }
+      // ② 信号层 T+5 胜率加权（组合 by_signal 实测）
+      if(isFinite(sigWr) && sigWr >= 60){ k *= 1.2; why.push('信号组合胜率'+_f(sigWr,0)+'%≥60% → ×1.2'); }
+      // ③ 质量档位（D = 财务偏弱，非否决，只降档）
+      if(String(s.quality_grade||'').toUpperCase() === 'D'){ k *= 0.8; why.push('质量D档 → ×0.8'); }
+      // ④ regime 乘数（<1 = 环境不利，整体降杠杆）
+      var ra = Number(s.regime_adjust);
+      if(isFinite(ra) && ra < 1){ k *= 0.7; why.push('regime×'+_f(ra,2)+' → ×0.7'); }
+      // ⑤ 20 日趋势闸：追高与接刀都降档，温和上涨才加档（t+pct_chg_20d 产物真值）
+      var p20 = Number(s.pct_chg_20d);
+      if(isFinite(p20)){
+        if(p20 >= 30){ k *= 0.8; why.push('20日已涨'+_f(p20,0)+'% 追高 → ×0.8'); }
+        else if(p20 <= -15){ k *= 0.8; why.push('20日已跌'+_f(Math.abs(p20),0)+'% 接刀 → ×0.8'); }
+        else if(p20 >= 0 && p20 <= 15){ k *= 1.1; why.push('20日温和上涨'+_f(p20,0)+'% → ×1.1'); }
+      }
+      // ⑥ 赔率闸：盈亏比 <1（目标涨幅 < 1R）不值得用满仓
+      if(isFinite(rr) && rr < 1){ k *= 0.7; why.push('盈亏比'+_f(rr,2)+'<1 → ×0.7'); }
+      var w = Math.min(E.MAX_W, Math.max(E.MIN_W, w0 * k));
+      var first = Math.round(w / 2 * 10) / 10;      // 首批建仓 = 目标仓位一半
+      totFirst += first; totFull += w;
+      body += '<tr style="border-top:1px solid rgba(148,163,184,.16);">'
+        + '<td style="padding:6px;color:var(--dim);">'+(i+1)+'</td>'
+        + '<td style="padding:6px;white-space:nowrap;"><b style="color:var(--txt);">'+_e(s.name||'')+'</b> <span style="color:var(--dim);">'+_e(s.code||'')+'</span><br>'
+        +   '<span style="font-size:10px;color:var(--dim);">总分 '+_f(s.total_score,1)+(s.quality_grade?(' · 质量'+_e(s.quality_grade)):'')+'</span></td>'
+        + '<td style="padding:6px;text-align:right;">'+_f(close)+'</td>'
+        + '<td style="padding:6px;text-align:right;color:#26a69a;">'+_f(stop)
+        +   '<br><span style="font-size:10px;color:var(--dim);">−'+_f(d*100,1)+'%</span></td>'
+        + '<td style="padding:6px;text-align:right;color:#ef5350;">'+_f(tgt)
+        +   '<br><span style="font-size:10px;color:var(--dim);">'+(isFinite(rr)?('盈亏比 '+_f(rr,2)):'—')+'</span></td>'
+        + '<td style="padding:6px;text-align:right;font-size:11px;">'
+        +   '<span style="color:#94a3b8;">+1R→成本</span> '+_f(close)+'<br>'
+        +   '<span style="color:#94a3b8;">+2R→锁1R</span> '+_f(close + R)+'</td>'
+        + '<td style="padding:6px;text-align:right;font-size:11px;">'
+        +   '<span style="color:#94a3b8;">其后</span> 最高收盘×(1−'+_f(E.TRAIL*100,0)+'%)</td>'
+        + '<td style="padding:6px;text-align:right;"><b style="color:#38bdf8;font-size:13px;">'+_f(w,1)+'%</b>'
+        +   '<br><span style="font-size:10px;color:var(--dim);">首批 '+_f(first,1)+'%</span></td>'
+        + '<td style="padding:6px;text-align:right;font-size:11px;">'+_hold+' 日'
+        +   '<br><span style="font-size:10px;color:var(--dim);">未达1R→减半</span></td>'
+        + '<td style="padding:6px;font-size:10px;color:var(--dim);line-height:1.5;min-width:150px;">'
+        +   '1R = '+_f(R)+' 元/股 ｜ 仓位 = '+_f(E.RISK_PCT,1)+'% ÷ '+_f(d*100,1)+'% = '+_f(w0,1)+'%'
+        +   (why.length ? ('<br>'+why.join('；')) : '')
+        +   '</td></tr>';
+    });
+
+    var h = '<div style="overflow-x:auto;overflow-y:hidden;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
+      + '<thead><tr style="background:rgba(148,163,184,.07);color:var(--sub);text-align:left;">'
+      + '<th style="padding:5px 6px;">#</th><th style="padding:5px 6px;">股票</th>'
+      + '<th style="padding:5px 6px;text-align:right;">入场参考</th>'
+      + '<th style="padding:5px 6px;text-align:right;">初始止损</th>'
+      + '<th style="padding:5px 6px;text-align:right;">目标价</th>'
+      + '<th style="padding:5px 6px;text-align:right;">移动止损</th>'
+      + '<th style="padding:5px 6px;text-align:right;">追踪</th>'
+      + '<th style="padding:5px 6px;text-align:right;">建议仓位</th>'
+      + '<th style="padding:5px 6px;text-align:right;">时间止损</th>'
+      + '<th style="padding:5px 6px;">推导</th>'
+      + '</tr></thead><tbody>' + body + '</tbody></table></div>';
+
+    h += '<div style="font-size:10.5px;color:var(--dim);margin-top:9px;line-height:1.8;">'
+      + '<b style="color:var(--sub);">算法四条铁律（本卡即执行口径）：</b>'
+      + '<br>① <b>仓位</b>：<code>仓位% = 单票风险预算 '+_f(E.RISK_PCT,1)+'% ÷ 止损距离% × 系数</code>，夹在 '+E.MIN_W+'%~'+E.MAX_W+'%；系数只由「个股T+5胜率 / 信号组合胜率 / 质量档 / regime」四项决定，逐票在「推导」列写明。'
+      + '<br>② <b>初始止损</b>：直接用产物 <code>stop_loss</code>（fixedP10 或前低），<u>入场即挂，不挪只上移</u>。'
+      + '<br>③ <b>移动止损</b>：浮盈 ≥1R → 止损提到成本价（保本）；≥2R → 提到「成本+1R」（锁死 1R）；此后按「最高收盘 ×(1−'+_f(E.TRAIL*100,0)+'%)」追踪，触价即走。'
+      + '<br>④ <b>时间止损</b>：持有 ≥'+_hold+' 个交易日仍未达 1R → 减半；≥'+(_hold+5)+' 日 → 清出（资金不趴窝）。'
+      + '<br>⑤ <b>组合闸</b>：单票 ≤'+E.MAX_W+'%、本卡 '+E.N+' 只合计目标仓位 <b>'+_f(totFull,1)+'%</b>（首批合计 '+_f(totFirst,1)+'%，上限 '+E.POOL_MAX+'%）；账户回撤 −8% 减半 / −12% 上限半仓 / −15% 清仓。'
+      + '<br>口径：仓位是「占账户权益」的比例，按止损距离反推，靠止损控制单票最大亏损 = '+_f(E.RISK_PCT,1)+'% 权益；'
+      + '止损/目标价取自 <code>data/TOP10_DAILY.js</code>（与计分榜同批产物，<code>compute_stop_target_from_closes</code> 计算）。仅研究参考，非买卖建议。'
+      + '</div>';
+    host.innerHTML = h;
   };
 
   // DOM ready hook
@@ -15144,7 +15339,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=607c4d9d41');
+      _smsScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE') || 'data/STOCK_MOMENTUM_STATE.js?v=1f1b1e7d1b');
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -15153,7 +15348,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=b66ff8945d');
+      _smeScript.src=(_v8ResUrl('STOCK_MOMENTUM_STATE_V2') || 'data/STOCK_MOMENTUM_STATE_V2.js?v=2dd1f72783');
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -16431,6 +16626,7 @@ hm += '</div>'; // /ulPaneBacktest
   window.__renderFactorPane = function(){
     try{ if(typeof window.__renderDailyFactorCalc==='function') window.__renderDailyFactorCalc(); }catch(e){ console.warn('每日因子计算卡渲染失败', e); }
     try{ if(typeof window.__renderDailyScoreboard==='function') window.__renderDailyScoreboard(); }catch(e){ console.warn('当日因子计分榜渲染失败', e); }
+    try{ if(typeof window.__renderExecAlgo==='function') window.__renderExecAlgo(); }catch(e){ console.warn('收益转化算法渲染失败', e); }
   };
   // ═══ 🧪 斐波那契观测窗（2026-09-15 主人令：由「🔒 已下架」盘前区迁入「🌍 观测平台 > 📊 大盘观测」）═══
   //   卡位：紧贴「📊 艾略特波浪 · 深度分析」卡下方（主人令：两卡都盘后更新，差别不大，**不合卡**）
