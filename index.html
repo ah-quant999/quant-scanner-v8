@@ -7507,7 +7507,8 @@ window.__renderIndexObserve = function(){
       <b style="color:#22c55e">① 清账方向改善组合层（开关已验证有效）</b>：CLEAN vs OLD 单笔配对差全正 —— N5 +0.31%/+1.85%/+1.18%、N10 +0.13%/+0.39%/+0.24%（H1/H5/H10）；改善集中在 N5/N10 集中持仓，N20 两口径重合无差别。⇒ <code>DELIST_DIMS</code> 十项维持全 True（已核验）。<br>
       <b style="color:#f59e0b">② H1 次日 flip = 成本陷阱（开关要关掉）</b>：三口径单笔均全负（OLD −0.54% / CLEAN −0.40%），双边 0.3% 成本即杀手 ⇒ 持有期建议已改为「5~10个交易日、等权分散5~10票」并同步最终推荐卡交易纪律横幅。<br>
       组合层滚动净年化：CLEAN N5H5 +10.3% / N5H10 +63.4% / N10H10 +16.0%（OLD 对应 −45.1%/−35.1%/−10.2% 全负）。⚠️ 诚实口径：<b>此为每日再平衡等权分散账数字，持有到期单笔仍为负，非「每票都赢」，依赖连续滚动再平衡</b>。NEW 纯净档仅 2 信号日曲线不足，随真实交易日累积重跑脚本自动覆盖。<br>
-      产物：<code>scripts/e2e_system_backtest.py</code> + <code>raw_data/e2e_system_backtest.json</code>（含 tranche 退出基准 off-by-one 修复记录）。</div>
+      产物：<code>scripts/e2e_system_backtest.py</code> + <code>raw_data/e2e_system_backtest.json</code>（含 tranche 退出基准 off-by-one 修复记录）。<br>
+      🤖 <b style="color:#38bdf8">自动复核</b>：<b>每周五 21:00 盘后自动重跑本脚本</b>，NEW 信号日累积≥10天自动出组合层曲线并比对上方 CLEAN 基线（N5H5 +10.3% / N5H10 +63.4% / N10H10 +16.0%），纯只读预警——NEW 实盘明显差于基线（CAGR 转负 / MaxDD 显著扩大）即明确告警。<b>未达 10 天则只报样本数、不下结论</b>。</div>
 
     
 
