@@ -899,7 +899,9 @@ jobs:
           txt = raw.decode("utf-8", "replace")
           nlines = txt.count(chr(10)) + 1
           errs = []
-          MIN_LINES = 18800
+          # 2026-10-26 巡检调低：fdbbe29e8(连板子页下架)+f5bf12ca9(9维度下架)后行数新常态 18721，
+          # 原 18800 阈值永久误报「疑尾部截断」⇒ ?v 原子提交被永久阻断（#3734 起每轮 soft_15）
+          MIN_LINES = 18000
           if nlines < MIN_LINES:
               errs.append("行数 %d < %d（疑尾部截断）" % (nlines, MIN_LINES))
           if "</html>" not in txt[-200:]:
