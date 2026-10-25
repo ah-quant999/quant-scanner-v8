@@ -227,7 +227,7 @@
   "broad-candidate-pool-ab-1024",
   "ab-pool-factor-expectancy-verify-1024"
   ],
- "updated": "2026-10-24 21:45",
+ "updated": "2026-10-25 09:45",
  "generated_by": "阿狸咪的工程师(/scripts/handoff_ledger_hash.py 口径) (2026-10-22 小九：+intraday-first-batch-gate-1022 +ci-streak-fail-rootcause-1022 +ff3-composite-walkforward-1022；next_id_seq/max_next_id_seq 162→163；线上失配哈希按不盲改原则保留原值)",
  "note": "[13/13] 交接状态源守卫的外部锚（只增不减）。推 docs/ops/HANDOFF.yaml 时须同一提交刷新本文件：追加新 id、抬高 max_next_id_seq；每月清理已完成项时同批更新 ids。门禁断言：当前 HANDOFF.yaml 的 ids ⊇ 本文件 ids 且 next_id_seq >= max_next_id_seq。设计理由：单文件下 next_id_seq 与条目序号会一起回滚，「文件内部自洽性」永远检查不出被旧版本覆盖 ⇒ 必须外部锚。",
  "id_content_hashes": {

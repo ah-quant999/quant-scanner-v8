@@ -20,15 +20,18 @@ validate_goldpool_expectancy.py — 验证宇宙对齐生产宇宙（补齐缺�
       每个再平衡日，对当日可算因子的票按 raw 升序（越小越强）取后 25%（因子优选档），
       等权篮子前向收益；跨再平衡日聚合得到 期望/胜率/样本数。
 
-重要诚实边界：本地 kline_cache 最长 ~351 根（约1年），240 回顾因子仅近数月可用。
-      本测试反映 2026 年近期 regime，非多年样本；生产级多年 WF 需云端 fetch 多年历史。
-      本脚本仅做「对齐金股池」的证据补齐，不替代生产引擎。
+重要诚实边界：旧版跑本地 kline_cache（~1年）只能反映 2026 近期 regime；
+      现支持 CACHE_DIR=kline_cache_multi（gtimg 640根≈2.6年，2024-03→今），
+      turntrend 240 回顾可获 ~19 个独立月度再平衡日。方法仍为月度再平衡分位篮子，
+      与生产 Purged-WF/IR 口径不同，数字不与生产 edge 直接对照，只作独立方向读数。
 """
 import json, os, math
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(ROOT, "raw_data")
-CACHE = os.path.join(RAW, "kline_cache")
+CACHE = os.environ.get("CACHE_DIR", os.path.join(RAW, "kline_cache"))
+if not os.path.isabs(CACHE):
+    CACHE = os.path.join(RAW, CACHE)
 GOLD = os.environ.get("GOLD_PATH", os.path.join(RAW, "gold_pool.json"))
 MKT = os.path.join(CACHE, "000001.json")  # 上证指数代理（生产同口径）
 
@@ -217,7 +220,8 @@ def main():
         print("  %-10s 期望=%+.2f%%  胜率=%d%%  再平衡日=%d  票次=%d  跨度=%s~%s  t=%.2f"
               % (name, r["expo"] * 100, int(r["winrate"] * 100), r["n_dates"],
                  r["n_stocks"], r["span"][0], r["span"][1], r["t"]))
-    print("\n（注：本地kline_cache约1年，240回顾因子仅近数月可用；反映2026近期regime。）")
+    print("\n（数据：%s，共 %d 文件；月度再平衡×后25%%分位篮子，非生产 Purged-WF 口径。）"
+          % (os.path.relpath(CACHE, RAW), len([f for f in os.listdir(CACHE) if f.endswith('.json')]) if os.path.isdir(CACHE) else 0))
     return results
 
 

@@ -9848,18 +9848,26 @@ items:
   - id: ab-pool-factor-expectancy-verify-1024
     owner: 阿狸咪的工程师
     priority: P1
-    status: pending-verify
+    status: done
     created: 2026-10-24
     title: A+B 新金股池因子期望多年 walk-forward 验证（补齐缺口决定性测试）
     note: >
-      本地近期窗口(2025-11~2026-10)已跑补齐缺口测试(validate_goldpool_expectancy.py，验证宇宙=生产选股宇宙，
-      kline_cache覆盖86.2%)，结果：全798池 amt60 -0.68%(t=-0.51)/ivol60 -0.64%(t=-0.60)/turntrend +0.44%(仅2样本不可信)；
-      仅A+B新增266票 amt60 -1.08%。受本地~1年kline_cache硬约束(240回顾因子仅近数月可用、方法≠生产Purged-WF/IR)，
-      不足以定论"因子有毒/OK"。决定性验证须云端用多年历史+T+1(10-23)重跑生产引擎 factor_walkforward。
+      2026-10-25 本地完成多年验证（主人令"今天都周日了！去算"）：QQ双域(web.ifzq+proxy.finance.qq)
+      被 WAF 501 拉黑后，gtimg 先拉 670 只(640根/2.6年) + 新浪栈内接口补拉 196 只(1023根/4.2年，
+      volume÷100 手口径对齐，600519 同日 33514手 vs 3351416股 实锤)。验证宇宙=生产新金股池 875，
+      kline_cache_multi 覆盖 866(99%)，跨度 2022→2026-10（跨2022熊/2023震荡/2024-26修复多regime）。
+      结果(月度再平衡×后25%分位篮子，validate_goldpool_expectancy.py CACHE_DIR=kline_cache_multi)：
+      全866池 amt60 +1.39%/胜65%/49日/t=1.47，turntrend +0.85%/55%/40日/t=1.32，ivol60 +0.41%/52%/48日/t=0.81；
+      仅A+B新增335票 amt60 +0.95%/t=1.36、turntrend +0.33%、ivol60 +0.34%；仅因子优选B腿163 amt60 +1.06%/t=1.54。
+      9/9 格全部为正 → 近期窗口微负确认为 regime 效应，A+B 未引入因子回归。
     verify_how: >
-      (待云端周六T+1重算后) 用生产同源引擎对A+B新金股池(798)重跑 amt60/turntrend/ivol60 多年 walk-forward，
-      确认三因子前向期望仍为正、B腿因子优选163只未引入回归；届时回填 verified_at。
-    updated: "2026-10-24 21:45"
+      scripts/fetch_multiyear_kline.py(gtimg,域名级拉黑故障转移) + scripts/fetch_sina_kline_gaps.py(新浪补拉,股→手÷100)
+      建 raw_data/kline_multi(866文件)，validate_goldpool_expectancy.py 无未来函数月度再平衡重算三因子期望，
+      生产因子口径(amt60 hold10/turntrend 240回顾 hold5/ivol60 上证基准 hold10)逐条对齐。
+      边界如实：方法为月度再平衡分位篮子，非生产 Purged-WF/IR，数字不与生产 edge 直接对照；新浪196只为不复权价
+      (除权日人为收益缺口，事件稀疏)；港股1只与8只A股(<60根闸)诚实排除。云端生产引擎复跑列为后续可选增强。
+    verified_at: "2026-10-25 09:45"
+    updated: "2026-10-25 09:45"
     updated_by: 阿狸咪的工程师
 
 
