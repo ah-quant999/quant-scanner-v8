@@ -54,7 +54,7 @@ FRESHNESS_RULES = {
     "ipo_score.json":             {"threshold": 180, "category": "premarket", "label": "打新速览"},
     "margin_data.json":           {"threshold": 180, "category": "premarket", "label": "融资融券"},
     "north_fund.json":            {"threshold": 60,  "category": "premarket", "label": "北向资金(已停披露)"},
-    "analyst_ratings.json":       {"threshold": 360, "category": "premarket", "label": "分析师评级"},
+    # 🔴 2026-10-25 因子清账：analyst_ratings 抓取链退役（唯一消费者 generate_top10 inst 维度下架），移除巡检项。
     "macro_data.json":            {"threshold": 360, "category": "premarket", "label": "宏观数据"},
     # ──盘后数据（15:30后）──
     "lhb_data.json":              {"threshold": 480, "category": "post_close", "label": "龙虎榜"},

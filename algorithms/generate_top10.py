@@ -86,6 +86,38 @@ INST_WEIGHT = 3.0                     # 🔴 2026-10-23 主人令·P2：IC 最�
 FORM_NEUT_SCALE = 4.0                 # form rank 中性化零中心幅度
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 🔴🔴 2026-10-25 主人令「好的留差的删，不要不确定的一直留着」：因子清账总开关
+# 证据一：raw_data/backtest_expectancy.json by_factor（WF/OOS T+5 超额，2026-10-22）
+#   fund −0.801%(n=69) / sector −0.415%(n=272) / quality 正向倾斜 −1.027%(n=679) → drop
+# 证据二：raw_data/untested_factor_verdicts.json（2026-10-25，4.2年 846池票×38再平衡日，
+#   信号组 vs 池基线前向10日期望差，scripts/verify_untested_factors.py 忠实复刻生产口径）
+#   form: EMA≥5 −0.57%(t=−2.06,n=8574) DROP；EMA3-4/1-2、非涨停、RSI<68、20日涨幅<35% 全 NO_EDGE；
+#         涨停−5 方向无证据（涨停组反而 +0.97%, t=0.52）
+#   P3:   量能3档(vr≥2.5) −1.69%(t=−2.01) DROP；蛙streak5 −1.67%(t=−2.04) DROP；
+#         1/2档、超跌反弹、上涨中继 全 NO_EDGE；连续共振天数无历史信号数据 NO_DATA
+#   5日突破: −0.29%(t=−0.68) NO_EDGE（旧「唯一 T+10 正期望」池内不成立）
+#   inst: 52周新高 −0.05%(t=−0.02,n=65) NO_EDGE；分析师关注无历史数据 NO_DATA；
+#         RSI<30 超卖加分 −0.33%(t=−0.85) DROP
+# 判读纪律与 skew60 先例一致：正向加分项命中组跑输基准 = 给跑输票加分 = 拖累收益 → 删。
+# 回滚：把对应值改 False 即恢复原评分（代码不硬删）。
+DELIST_DIMS = {
+    "fund": True,          # 主力净流入 + 龙虎榜机构净买入（by_factor −0.801% drop）
+    "sector": True,        # 板块资金共振（by_factor −0.415% drop）
+    "quality_score": True, # 基本面质量分【正向倾斜】（by_factor −1.027% drop；质差否决保留）
+    "form": True,          # 整个技术形态分（EMA结构/非涨停/RSI<68/20日涨幅/涨停−5/形态A）
+    "research_p3": True,   # P3 研究四因子（量能突破/温水煮青蛙/超跌反弹/上涨中继）
+    "consec_days": True,   # 连续共振天数（NO_DATA，无历史信号数据无法回测）
+    "brk5": True,          # 5日突破加分（NO_EDGE）
+    "inst": True,          # 机构/投行维度（52周新高 NO_EDGE + 分析师关注 NO_DATA）
+    "rsi_ob": True,        # RSI<30 超卖加分（−0.33% drop；RSI>70 过热惩罚保留，方向获证）
+    "mom_mild": True,      # 20日涨幅0~10% 温和上涨加分（−0.40% drop；≥20% 过热惩罚保留，方向获证）
+}
+# ⚠️ 上游管线处置（主人令「该删就删」，按消费图执行）：
+#   analyst_ratings → JS 早已退役，唯一评分消费者=inst（本令下架）→ 云端抓取链退役；
+#   w52_high/capital_flow/lhb/sector_flow → 另有前端展示/市场简报消费 → 抓取保留，仅切评分；
+#   fundamental → 质差一票否决仍依赖 → 保留。
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 🔴 2026-10-23 主人令·嵌入因子榜：个股历史胜率/期望因子（gen_stock_winrate 产出）
 # 把"历史上这只票信号后赚不赚钱 / 胜率高不高"做实为因子分，并入 total_score，
 # 使因子榜自然把高胜率高期望的票顶上来（最终推荐=因子榜顺序，故高胜率票自动靠前）。
@@ -1365,11 +1397,17 @@ def main():
     capital_flow = load_json(os.path.join(DATA_DIR, "capital_flow_data.json"), {})
     north_fund = load_json(os.path.join(DATA_DIR, "north_fund.json"), {})
     # 2026-08-28 主人令：mahoro 数据源不再跟踪，相关评分项已移除
-    w52_high = load_json(os.path.join(DATA_DIR, "w52_high.json"), {})
-    # 2026-07-21: 基本面质量分(A=+40, B=+5, D=-10, C=0)
+    # 🔴 2026-10-25 主人令·因子清账：inst 维度下架（DELIST_DIMS）→ w52_high/analyst 不再进评分。
+    #   w52_high 抓取链保留（前端市场宽度卡消费）；analyst 抓取链退役（本文件为其唯一消费者）。
+    if DELIST_DIMS.get("inst"):
+        w52_high = {}
+        analyst = {}
+    else:
+        w52_high = load_json(os.path.join(DATA_DIR, "w52_high.json"), {})
+        analyst = load_json(os.path.join(DATA_DIR, "analyst_ratings.json"), {})
+    # 2026-07-21: 基本面质量分(A=+40, B=+5, D=-10, C=0) —— 2026-10-25 起仅供质差否决，不进评分
     fundamental = load_json(os.path.join(DATA_DIR, "fundamental_quality.json"), {})
     fundamental_stocks = fundamental.get("stocks", {}) if isinstance(fundamental, dict) else {}
-    analyst = load_json(os.path.join(DATA_DIR, "analyst_ratings.json"), {})
     # 行业/概念映射：与 gold_pool 同构的时序坑 —— 本轮产物在 out/candidate_pool.json，
     # 要等 stage_to_raw 才搬运到 raw_data。直接读 raw_data 可能拿到上一轮（实测曾陈旧 2 天）。
     _out_cand = os.path.join(WORKSPACE, "..", "out", "candidate_pool.json")
@@ -1382,8 +1420,7 @@ def main():
     freshness_warn("板块资金流", sector_flow)
     freshness_warn("龙虎榜", lhb_data, max_age_days=2.0)
     freshness_warn("主力资金", capital_flow)
-    freshness_warn("52周新高", w52_high)
-    freshness_warn("分析师评级", analyst)
+    # 🔴 2026-10-25 因子清账：inst 维度下架，52周新高/分析师评级不再巡检（抓取链已退役/仅供展示）
     freshness_warn("基本面质量", fundamental)
     freshness_warn("行业概念映射", industry_map, max_age_days=2.0)
     print("  ────────────────")
@@ -1594,57 +1631,63 @@ def main():
             enhance -= 3          # 原 +5 → -3
         elif pct20 >= 20:
             enhance -= 1          # 原 +3 → -1
-        elif 0 < pct20 < 10:
-            enhance += 2          # 新增：温和上涨（未过热）给正分
+        elif 0 < pct20 < 10 and not DELIST_DIMS.get("mom_mild"):
+            enhance += 2          # 🔴 2026-10-25 清账：温和上涨组实测 −0.40%(t=−1.27) DROP → 下架
+                                  #   （过热惩罚段 ≥20% 组实测 −0.60% 跑输 → 惩罚方向获证，保留）
 
         rsi = latest.get("rsi_14") or s.get("rsi_14") or 50
         if rsi > 70:
-            enhance -= 5
-        elif rsi < 30:
-            enhance += 3
+            enhance -= 5                      # RSI>70 过热惩罚：实测过热组 −1.21% → 方向获证，保留
+        elif rsi < 30 and not DELIST_DIMS.get("rsi_ob"):
+            enhance += 3                      # 🔴 2026-10-25 清账：超卖组 −0.33%(t=−0.85) → 下架
 
         # 连续共振天数（P2：仅统计正向因子 金钻/缠论 的连续出现；反向因子不计入）
+        # 🔴 2026-10-25 主人令·因子清账：无历史信号数据无法回测（NO_DATA）→ 按「不留不确定」下架。
         consecutive = 0
-        sorted_hist = sorted(hist, key=lambda h: h.get("date", ""), reverse=True)
-        for h in sorted_hist:
-            h_sig = sum([
-                bool(h.get("金钻_起涨") or h.get("金钻_黄柱")),
-                bool(h.get("缠论买_日K")),
-            ])
-            if h_sig >= 1:
-                consecutive += 1
-            else:
-                break
-        enhance += min(consecutive * 2, 8)
+        if not DELIST_DIMS.get("consec_days"):
+            sorted_hist = sorted(hist, key=lambda h: h.get("date", ""), reverse=True)
+            for h in sorted_hist:
+                h_sig = sum([
+                    bool(h.get("金钻_起涨") or h.get("金钻_黄柱")),
+                    bool(h.get("缠论买_日K")),
+                ])
+                if h_sig >= 1:
+                    consecutive += 1
+                else:
+                    break
+            enhance += min(consecutive * 2, 8)
 
         # 5日突破（唯一 T+10 正期望信号，2026-08-30 P0 加权）
+        # 🔴 2026-10-25 因子清账：池内实泘 −0.29%(t=−0.68) NO_EDGE（旧结论不成立）→ 加分下架，仅留展示。
         breakout_5d = breakout_5d_of(raw_code)
-        if breakout_5d:
+        if breakout_5d and not DELIST_DIMS.get("brk5"):
             enhance += 5
 
         # ── P3 研究驱动量能/行为因子（2026-09-05）──
-        # 截图研究结论：A股换手率/量能 t 值最高；动量应捕捉「温水煮青蛙」式市场反应不足；
-        # 上涨中继 = 长周期强势 + 短周期回落。四个因子均只从 K 线（开高低收量）计算，
-        # 与现有信号正交，作为 enhance 增量，单票上限 +13。
-        vm = _kline_volume_metrics(raw_code)
+        # 🔴 2026-10-25 主人令·因子清账：整个 P3 维度下架（DELIST_DIMS.research_p3）。
+        #   实泘：量能3档(vr≥2.5) −1.69%(t=−2.01) DROP；蛙streak5 −1.67%(t=−2.04) DROP；
+        #   量能1/2档、超跌反弹、上涨中继 全 NO_EDGE。反证：此前「换手率/量能 t 值最高」
+        #   的全市场结论，在金股池内宇宙不成立（池已过滤量能极端票）。
         research_score = 0
         research_detail = []
-        rs = _volume_surge_score(vm)
-        if rs:
-            research_score += rs
-            research_detail.append(f"量能突破x{vm['vol_ratio']:.1f}+{rs}")
-        rs = _frog_in_pan_score(vm)
-        if rs:
-            research_score += rs
-            research_detail.append(f"温水煮青蛙+{rs}")
-        rs = _oversold_bounce_score(vm, pct20)
-        if rs:
-            research_score += rs
-            research_detail.append(f"超跌反弹+{rs}")
-        rs = _range_continuation_score(vm)
-        if rs:
-            research_score += rs
-            research_detail.append(f"上涨中继+{rs}")
+        if not DELIST_DIMS.get("research_p3"):
+            vm = _kline_volume_metrics(raw_code)
+            rs = _volume_surge_score(vm)
+            if rs:
+                research_score += rs
+                research_detail.append(f"量能突破x{vm['vol_ratio']:.1f}+{rs}")
+            rs = _frog_in_pan_score(vm)
+            if rs:
+                research_score += rs
+                research_detail.append(f"温水煮青蛙+{rs}")
+            rs = _oversold_bounce_score(vm, pct20)
+            if rs:
+                research_score += rs
+                research_detail.append(f"超跌反弹+{rs}")
+            rs = _range_continuation_score(vm)
+            if rs:
+                research_score += rs
+                research_detail.append(f"上涨中继+{rs}")
         enhance += research_score
 
         # ── P4 研究因子（2026-09-05）：残差动量（反向），漂移门控做状态优先定权 ──
@@ -1697,65 +1740,79 @@ def main():
         enhance += p5_score
 
         # ── 技术形态分 (2026-07-26): 把驾驶舱 A 档条件合并进主站打分 ──
-        # 条件：上涨趋势 + 机构变红 + RSI<68 + 20日涨幅<35% + EMA>=5 + 非涨停
+        # 🔴 2026-10-25 主人令·因子清账：整个 form 维度下架（DELIST_DIMS.form）。
+        #   实泘（846池票×38再平衡日）：EMA≥5 −0.57%(t=−2.06, n=8574) 实锤拖累（池内结构
+        #   完美=已涨过头）；EMA3-4/1-2、非涨停、RSI<68、20日涨幅<35% 全 NO_EDGE；
+        #   涨停−5 惩罚方向无证据（涨停组反而 +0.97%）。form 置零后中性化 rank 全同列
+        #   → 零中心贡献自然归零，无需改后处理。
         ema_up = s.get("ema_up") or latest.get("ema_up") or 0
         limit_up = bool(s.get("当日涨停") or latest.get("当日涨停") or False)
         form_score = 0
         form_detail = []
-        if ema_up >= 5:
-            form_score += 5
-            form_detail.append(f"EMA结构={ema_up}")
-        elif ema_up >= 3:
-            form_score += 3
-            form_detail.append(f"EMA结构={ema_up}")
-        elif ema_up >= 1:
-            form_score += 1
-            form_detail.append(f"EMA结构={ema_up}")
-        if not limit_up:
-            form_score += 2
-            form_detail.append("非涨停")
-        if pct20 < 35:
-            form_score += 2
-        if rsi < 68:
-            form_score += 2
-        if sig_jinzuan and has_chan and ema_up >= 5 and rsi < 68 and pct20 < 35 and not limit_up:
-            form_score += 5
-            form_detail.append("形态A(金钻+缠论)")
-        # 涨停过热直接惩罚（与形态A条件对齐）
-        if limit_up:
-            form_score -= 5
+        if DELIST_DIMS.get("form"):
+            form_detail = ["已下架·因子清账(EMA≥5 DROP/其余 NO_EDGE)"]
+        else:
+            if ema_up >= 5:
+                form_score += 5
+                form_detail.append(f"EMA结构={ema_up}")
+            elif ema_up >= 3:
+                form_score += 3
+                form_detail.append(f"EMA结构={ema_up}")
+            elif ema_up >= 1:
+                form_score += 1
+                form_detail.append(f"EMA结构={ema_up}")
+            if not limit_up:
+                form_score += 2
+                form_detail.append("非涨停")
+            if pct20 < 35:
+                form_score += 2
+            if rsi < 68:
+                form_score += 2
+            if sig_jinzuan and has_chan and ema_up >= 5 and rsi < 68 and pct20 < 35 and not limit_up:
+                form_score += 5
+                form_detail.append("形态A(金钻+缠论)")
+            # 涨停过热直接惩罚（与形态A条件对齐）
+            if limit_up:
+                form_score -= 5
 
         # 资金动力 (0 ~ +10)
+        # 🔴 2026-10-25 主人令·因子清账：fund 维度下架（DELIST_DIMS.fund）。
+        #   by_factor 实泘：主力净流入+龙虎榜命中组 T+5 超额 −0.801%(n=69) drop
+        #   = 正向加分却给跑输票加分 → 拖累。仅留展示，不进 raw_total。
         fund = 0
         fund_detail = []
+        if DELIST_DIMS.get("fund"):
+            fund_detail = ["已下架·因子清账(by_factor −0.80% drop)"]
+        else:
+            # 主力（capital_flow_data 单位为【亿元】，非旧 main_stock 的万元）
+            main_net = main_map.get(raw_code, 0)
+            if main_net >= 1:
+                fund += 5
+                fund_detail.append(f"主力净流入+{main_net:.2f}亿")
+            elif main_net > 0:
+                fund += 2
+                fund_detail.append(f"主力净流入+{main_net:.2f}亿")
+            elif main_net <= -1:
+                fund -= 2
+                fund_detail.append(f"主力净流出{main_net:.2f}亿")
 
-        # 主力（capital_flow_data 单位为【亿元】，非旧 main_stock 的万元）
-        main_net = main_map.get(raw_code, 0)
-        if main_net >= 1:
-            fund += 5
-            fund_detail.append(f"主力净流入+{main_net:.2f}亿")
-        elif main_net > 0:
-            fund += 2
-            fund_detail.append(f"主力净流入+{main_net:.2f}亿")
-        elif main_net <= -1:
-            fund -= 2
-            fund_detail.append(f"主力净流出{main_net:.2f}亿")
+            # 龙虎榜：仅保留「机构净买入」正期望分支；机游共振已剔除（2026-08-30 P0）
+            lhb_info = lhb_map.get(raw_code)
+            if lhb_info and lhb_info["inst_net"] > 0:
+                fund += 3
+                fund_detail.append(f"龙虎榜+{lhb_info['inst_net']:.0f}万")
 
-        # 龙虎榜：仅保留「机构净买入」正期望分支；机游共振已剔除（2026-08-30 P0）
-        lhb_info = lhb_map.get(raw_code)
-        if lhb_info and lhb_info["inst_net"] > 0:
-            fund += 3
-            fund_detail.append(f"龙虎榜+{lhb_info['inst_net']:.0f}万")
+            # 北向资金：2024年5月起港交所不再披露明细，仅data_date空壳，不再加分
+            # 铁律：宁可空着也不用假数据
 
-        # 北向资金：2024年5月起港交所不再披露明细，仅data_date空壳，不再加分
-        # 铁律：宁可空着也不用假数据
-
-        # 🔴 2026-10-17 审计修复：主力/龙虎榜两源全空时显式标注「无数据」，
-        #   不与「数据差」混同（0 分 + 空明细会被前端读成「无主力关注」）。
-        if not fund_detail and _dim_src_empty["fund_main"] and _dim_src_empty["fund_lhb"]:
-            fund_detail.append("无数据（主力资金/龙虎榜上游缺失，非零流入）")
+            # 🔴 2026-10-17 审计修复：主力/龙虎榜两源全空时显式标注「无数据」，
+            #   不与「数据差」混同（0 分 + 空明细会被前端读成「无主力关注」）。
+            if not fund_detail and _dim_src_empty["fund_main"] and _dim_src_empty["fund_lhb"]:
+                fund_detail.append("无数据（主力资金/龙虎榜上游缺失，非零流入）")
 
         # 板块共振 (0 ~ +10)
+        # 🔴 2026-10-25 主人令·因子清账：sector 维度下架（DELIST_DIMS.sector）。
+        #   by_factor 实泘：板块资金共振命中组 T+5 超额 −0.415%(n=272) drop。仅留展示。
         sector_score = 0
         sector_detail = ""
         stock_sectors = ind_map.get(raw_code, []) or s.get("sectors", [])
@@ -1785,38 +1842,47 @@ def main():
                 best_sector_flow = flow
                 best_sector_name = sec_name
 
-        if best_sector_flow is None:
-            sector_detail = ""                      # 无板块资金数据，不编造
-        elif best_sector_flow > 5:
-            sector_score += 5
-            sector_detail = f"{best_sector_name}+{best_sector_flow:.1f}亿"
-        elif best_sector_flow > 1:
-            sector_score += 2
-            sector_detail = f"{best_sector_name}+{best_sector_flow:.1f}亿"
-        elif best_sector_flow < -5:
-            sector_score -= 3                       # 修复后此处才真正可能触发
-            sector_detail = f"{best_sector_name}{best_sector_flow:.1f}亿"
-        else:
-            sector_detail = f"{best_sector_name}{best_sector_flow:+.1f}亿"
         # 🔴 2026-10-17 审计修复：行业映射整表缺失时显式标注，不与「无热门板块」混同。
+        # 🔴 2026-10-25 因子清账：sector 已下架 → 不再计分，仅保留 best_sector 展示。
+        if not DELIST_DIMS.get("sector"):
+            if best_sector_flow is None:
+                sector_detail = ""                      # 无板块资金数据，不编造
+            elif best_sector_flow > 5:
+                sector_score += 5
+                sector_detail = f"{best_sector_name}+{best_sector_flow:.1f}亿"
+            elif best_sector_flow > 1:
+                sector_score += 2
+                sector_detail = f"{best_sector_name}+{best_sector_flow:.1f}亿"
+            elif best_sector_flow < -5:
+                sector_score -= 3                       # 修复后此处才真正可能触发
+                sector_detail = f"{best_sector_name}{best_sector_flow:.1f}亿"
+            else:
+                sector_detail = f"{best_sector_name}{best_sector_flow:+.1f}亿"
+        else:
+            sector_detail = "已下架·因子清账(by_factor −0.42% drop)" if best_sector_flow is not None else ""
         if not sector_detail and _dim_src_empty["sector"]:
             sector_detail = "无数据（板块资金/行业映射上游缺失）"
 
         # 机构/投行 (0 ~ +7)  2026-08-28：mahoro 已移除，只剩 52周新高 + 分析师关注
+        # 🔴 2026-10-25 主人令·因子清账：inst 维度下架（DELIST_DIMS.inst）。
+        #   实泘：52周新高池内 −0.05%(t=−0.02, n=65) NO_EDGE；分析师关注无历史数据 NO_DATA。
+        #   （旧「IC 最强 +0.116」为候选池内自相关诊断，非前向期望证据。）
         inst = 0
         inst_detail = []
+        if DELIST_DIMS.get("inst"):
+            inst_detail = ["已下架·因子清账(52周新高 NO_EDGE/分析师 NO_DATA)"]
+        else:
+            if raw_code in w52_codes or name in w52_names:
+                inst += 4
+                inst_detail.append("52周新高")
 
-        if raw_code in w52_codes or name in w52_names:
-            inst += 4
-            inst_detail.append("52周新高")
+            if raw_code in analyst_codes or name in analyst_names:
+                inst += 3
+                inst_detail.append("分析师关注")
 
-        if raw_code in analyst_codes or name in analyst_names:
-            inst += 3
-            inst_detail.append("分析师关注")
-
-        # 🔴 2026-10-17 审计修复：两源全空时显式标注，不与「未入选」混同。
-        if not inst_detail and _dim_src_empty["inst_w52"] and _dim_src_empty["inst_analyst"]:
-            inst_detail.append("无数据（52周新高/分析师上游缺失，非未入选）")
+            # 🔴 2026-10-17 审计修复：两源全空时显式标注，不与「未入选」混同。
+            if not inst_detail and _dim_src_empty["inst_w52"] and _dim_src_empty["inst_analyst"]:
+                inst_detail.append("无数据（52周新高/分析师上游缺失，非未入选）")
 
         # ── 止损位 / 目标价 ──
         close_price = latest.get("close") or s.get("close") or 0
@@ -1881,12 +1947,17 @@ def main():
         #   RC2 报告期时效（fq.period，无则=1.0） / RC3 当前无信号打折。
         #   quality_effective 同时作为 raw_total 的「质量」项与卡片展示的 score_quality，
         #   保证前端展示与排序口径一致（不再展示虚高的 38 分静态质量）。
+        # 🔴 2026-10-25 主人令·因子清账：quality 正向倾斜下架（DELIST_DIMS.quality_score）——
+        #   by_factor 实泘命中组 T+5 超额 −1.027%(n=679 最大样本) drop；质差一票否决保留。
         _q_period = (fq or {}).get("statDate")
-        quality_effective = (quality_score
-                             * QUALITY_WEIGHT
-                             * POOL_QUALITY_WEIGHT
-                             * report_age_factor(_q_period)
-                             * activity_factor(sig_count))
+        if DELIST_DIMS.get("quality_score"):
+            quality_effective = 0.0
+        else:
+            quality_effective = (quality_score
+                                 * QUALITY_WEIGHT
+                                 * POOL_QUALITY_WEIGHT
+                                 * report_age_factor(_q_period)
+                                 * activity_factor(sig_count))
 
         # ── 质差股一票否决（2026-09-07 主人令·贝塔派审计缺口补齐）──
         # 共振链此前只做加分没有垃圾票出清。ST/当期亏损/营收崩塌直接出局，

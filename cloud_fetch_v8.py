@@ -6271,7 +6271,10 @@ def main(category=None, only=None):
         #   ⇒ 恢复抓取；注入侧同步改指 INST_COVERAGE（见 update_v8.py 的映射与转换分支）。
         #   🔴 2026-09-23 主人拍板：因子观测卡整卡删除（解禁段与「解禁日历」同源重复+机构关注未验证）
         #     ⇒ data/INST_COVERAGE.js 及注入/转换侧全部退役；本 raw 抓取链保留（generate_top10.py 消费）。
-        ("ANALYST_RATINGS", f_analyst_ratings),
+        # 🔴 2026-10-25 主人令·因子清账：generate_top10.py 的 inst 评分维度下架（52周新高 NO_EDGE/
+        #   分析师关注 NO_DATA，见 DELIST_DIMS 与 raw_data/untested_factor_verdicts.json）→
+        #   analyst_ratings 全链最后消费者消失 ⇒ 本抓取链正式退役（与 09-18 同判，这次是终态：
+        #   评分与前端两侧均无消费）。历史 raw 档保留在 raw_data/ 不删。
         ("V8_CAL", f_v8_cal),
         ("CANDIDATE_QUOTES", f_candidate_quotes),
         ("SH_SZ_HISTORY", f_sh_sz_history),
