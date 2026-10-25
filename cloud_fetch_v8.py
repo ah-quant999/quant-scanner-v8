@@ -82,7 +82,9 @@ VAR_TO_RAW = {
     #   ⚠️⚠️ 本表不登记 ⇒ save() 取不到 fname **直接 return** ⇒ raw 永不落盘。
     #   血证（09-22 08:xx）：只恢复了 tasks 注册、漏恢复本表与 CATEGORY_MAP，
     #   净室单测「函数能返回 27 条」全绿，线上却**零产出** —— 典型假修复。
-    "ANALYST_RATINGS": "analyst_ratings.json",
+    # 🔴 2026-10-26 退役收尾（巡检自愈）：f5bf12ca9 因子清账删 task 注册（analyst_ratings
+    #   全链最后消费者消失 ⇒ 抓取链正式退役），本表与 CATEGORY_MAP 登记漏删成孤儿
+    #   ⇒ 接线自检阻断 premarket 档（run #3734/#3735 连炸）。登记随退役一并移除。
     "INDEX_QUOTES": "index_quotes.json",
     "EXPERIMENT": "experiment.json",
     "V8_CAL": "v8_cal.json",
@@ -142,7 +144,7 @@ CATEGORY_MAP = {
     #   ⇒ main() 的 `for var, fn in tasks` 首行就 continue ⇒ **永不执行**（假修复）。
     #   档位 premarket：机构研报覆盖是日频 T+1 数据，盘前抓当日即可；
     #   （update_v8.py 侧 INST_COVERAGE 同档项已随因子观测卡 09-23 退役，本档位仅服务 raw 抓取。）
-    "ANALYST_RATINGS": "premarket",
+    # 🔴 2026-10-26 退役收尾（同 VAR_TO_RAW 注记）：task 注册已随 f5bf12ca9 删除，登记移除。
     # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
     "W52_HIGH": "premarket,post_close",
     # 盘中（ETF 二合一·盘中异动/资金热度、板块资金流向等实时场景。
