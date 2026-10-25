@@ -1370,10 +1370,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <button class="final-tab active" data-final="rec" onclick="switchFinalTab('rec')">🏆 最终推荐 · Top3</button>
       <button class="final-tab" data-final="cand" onclick="switchFinalTab('cand')">🎯 今日推荐候选池</button>
       <button class="final-tab" data-final="fa" onclick="switchFinalTab('fa')">🧪 因子实验室 <span style="font-size:10px;color:var(--dim);">非策略·加分项</span></button>
-      <!-- 🔄 2026-10-25 主人令「历史卡移到回测卡下方折叠显示」：📜 每日 Top3 历史独立子 Tab 撤销，
-           卡片迁入 final-pane-rec 内「最终推荐 Top3 · 回测」卡正下方，<details> 默认折叠；
-           数据仍读 FINAL_RECOMMEND_HISTORY.js（gen_final_recommend_history.py，
-           🔗 本日起挂链 final_recommend.py D 批末尾 → 每日算法跑完自动重写）。 -->
+      <!-- 2026-10-25 主人令：本页只留「选哪几只」——
+           执行层（收益转化算法）+ 复盘层（回测 N 日胜率 / 每日 Top3 历史）三卡整组迁至
+           「🎯 选股策略 → 📌 最终跟踪」子页（pane id=st-track），懒加载与数据源不变。 -->
     </div>
 
     <!-- 子 Pane：最终推荐 Top3（2026-09-20 主人令唯一口径；🔴 2026-10-20 主人令「要口径和评分都一致」重申并废止 10-14 混排竞位）
@@ -1386,76 +1385,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         </h3>
         <div id="finalRecBody" style="padding:4px 2px 2px;"><div class="note">加载中…</div></div>
       </div>
-      <!-- 🧮 2026-10-25 主人令「我要的是具体的算法合并到选股和算法中去」：
-           方法论不再单开一页 —— 可执行的那部分直接长在选股页上，逐票落数（仓位/止损/移动止损/时间止损），
-           算式与阈值同步写入「逻辑详解」页对应章节，两处同一套常量（window.__EXEC）。 -->
-      <div class="card" id="execAlgoCard" style="margin-bottom:16px;border-left:4px solid #38bdf8;">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-          <span style="font-size:15px;font-weight:700;color:var(--txt);">🧮 收益转化算法 · 选股 → 仓位 / 移动止损</span>
-          <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#38bdf822;color:#38bdf8;border:1px solid #38bdf84d;">逐票落数 · 公式固定 · 可复算</span>
-          <span style="font-size:10px;color:var(--dim);">与「逻辑详解 → 收益转化算法」同口径</span>
-        </div>
-        <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px;">
-          选出来只是起点：<b style="color:#38bdf8;">买多少、止损放哪、什么时候挪、什么时候走</b>，全部按固定公式算，不靠感觉。
-        </div>
-        <div id="execAlgoHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">🧮 算法加载中…</div></div>
-      </div>
-      <!-- 🆕 2026-10-13 主人令「最终推荐的前5名我也想有个回测…我要看到底靠不靠谱」：
-           最终推荐 Top3 信号层真实回测卡（与「强势跟踪 · 回测 N 日胜率」同渲染器同口径）。
-           数据源 data/FINAL_RECOMMEND_BACKTEST.js（真实信号流：每日真实选股 dated 归档
-           → 前向跟踪，非历史规则回放）；gen_final_recommend_backtest.py 产出，
-           final_recommend.py 末尾调用（D 批内，秒级纯本地计算，不影响主产物）。
-           🔴🔴 2026-10-14 主人令「先把最终推荐的回测卡隐藏，等重算出来后，看成绩再定夺」：
-           强势跟踪已按「入选后因子排行」接入 ⇒ 本卡暂停展示（__FINAL_REC_BT_PAUSED）。
-           重算口径=回放实验：2026-06-09~08-28 强势跟踪 first_selected 信号 × 当日因子榜
-           （top10_daily 归档）池内 min-max 混排取 Top3，T+1/T+5/T+10 前向对比。
-           恢复方法：① __renderFinalSec 内 guard 删/置 false ② 还原下方 <table> ③ 徽章改回
-           「✅ 真实数据回测」④ 视重算成绩决定是否更新 data/FINAL_RECOMMEND_BACKTEST.js。
-           ══ 2026-10-14 21:50 阿狸咪的工程师·已恢复 ══
-           主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」→ 卡片恢复展示，
-           数据源改为 data/FINAL_RECOMMEND_REPLAY.js（新方法混排回放：强势新入选×因子榜
-           池内归一竞位 Top3，双池同场 34 信号日 06-09~10-12，数据截至 10-13 收盘，
-           渲染引擎仍复用 lifeRenderBacktest 全站唯一份）。
-           🔴 诚实标注：回放口径 ≠ 真实信号流（三源合体 10-14 才上线）⇒ 徽章为
-           「回放口径·非真实信号流」；真实流自 10-13 起由链上 final_recommend 归档累积，
-           11 月中样本足够后删 FINAL_RECOMMEND_REPLAY.js 引用即切回真实口径（已挂账 HANDOFF）。
-           v1 期限定：v1 归档无强度分 ⇒ IMA 池内归一同分退化（Top3=因子前2+IMA）；
-           18 个 v1 日无因子榜归档不计入。 -->
-      <div class="card" id="finalRecBackCard" style="margin-top:16px;border-left:4px solid #fbbf24;">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 最终推荐 Top3 · 回测 N 日胜率（强势×因子 + 四量闸门）</span>
-          <span id="finalRecBackBadge"></span>
-          <span style="font-size:10px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">回放口径 · 非真实信号流</span>
-        </div>
-        <div class="note" id="finalRecBackNote">加载中…</div>
-        <table id="finalRecBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>中位数</th><th>最好</th><th>最差</th><th>最大回撤</th></tr></thead><tbody id="finalRecBackBody"></tbody></table>
-        <div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.75;">
-          算法 = 「强势×因子 + 四量闸门」（本表回放其混排层）：强势跟踪当日新入选 × 当日因子榜，双池各自 min-max 归一竞位取 Top3（同分因子榜优先）；
-          次日开盘买 / N 日收盘卖 / 双边 0.30%；基准=全市场等权同成本口径（按信号日对齐，覆盖至信号日 10-09）。
-          仅统计双池同场信号日（34 日，06-09~10-12，数据截至 10-13 收盘<b style="color:#fbbf24">（⚠️此日期仅回放样本区间，非主站停更；实时数据见「运维·健康快照」）</b>）；
-          四量闸门无逐日历史快照 ⇒ 本回放未套入闸门（线上实盘带闸门，可自动 3→2）。
-          18 个 v1 日无因子榜归档不计入；v1 期归档无强度分，IMA 池内归一同分退化（Top3=因子前 2 + IMA）。
-          真实信号流自 10-13 起累积，11 月中切回真实口径。
-          🔴 2026-10-20 主人令「口径和评分都一致」：线上最终推荐口径已回到唯一口径（=当日因子榜前 3 同序同分，混排竞位废止）⇒ 本卡为 10-14 混排方法的历史回放档案，仅存方法对比价值，不再描述线上现行口径。
-        </div>
-      </div>
-
-    <!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」
-         🔄 2026-10-25 主人令「这卡移到回测卡下方，折叠显示」：由独立子 Tab 迁入本面板（回测卡正下方），
-         <details> 默认折叠展开即看；每日记录自动写入（gen_final_recommend_history.py 已挂链
-         final_recommend.py D 批末尾，算法每晚跑完 → dated 快照汇总 → 本卡数据自动重写）；
-         回测侧 gen_final_recommend_backtest.py 同在 D 批末尾，每日新收盘数据出来后继续跟踪计算记录。
-         数据源 data/FINAL_RECOMMEND_HISTORY.js（读 raw_data/history/final_recommend_YYYYMMDD.json
-         逐日真实 Top3，滚动 120 天）。 -->
-      <details class="card" id="finalHistCard" style="margin-top:16px;border-left:4px solid #a78bfa;"
-               ontoggle="if(this.open&&!window.__finalHistRendered){window.__finalHistRendered=true;try{window.renderFinalHist();}catch(e){console.error('[renderFinalHist]',e);}}">
-        <summary style="cursor:pointer;font-size:14px;font-weight:700;color:var(--txt);user-select:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap;list-style:none;">
-          <span class="ic" style="font-style:normal;">📜</span>每日推荐 Top3 历史
-          <span style="font-size:10.5px;font-weight:600;color:var(--dim);">（每日自动记录 · 默认折叠，点开查看）</span>
-          <span id="finalHistBadges" style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;"></span>
-        </summary>
-        <div id="finalHistBody" style="padding:12px 4px 2px;"><div class="note">展开加载…</div></div>
-      </details>
     </div>
 
     <!-- 子 Pane：今日推荐候选池 -->
@@ -2589,7 +2518,7 @@ function fmtSigned(v){
   <section id="sec-st">
     <div class="sec-head" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h2 style="margin:0;">🎯 选股策略</h2>
-      <span class="tag">选股池 · 选股生命周期</span><!-- 🔴 2026-10-11：三重共识/逆势龙头(CRDS) 已下架移出；🔴 2026-10-18：四量终极下架移出 -->
+      <span class="tag">选股池 · 选股生命周期 · 最终跟踪</span><!-- 🔴 2026-10-11：三重共识/逆势龙头(CRDS) 已下架移出；🔴 2026-10-18：四量终极下架移出 -->
     </div>
     <!-- 建议持有期纪律 banner 已于 2026-08-30 移至逻辑详解页「选股策略·持有期纪律」段，此处不再展示（避免客户可看区域堆文字） -->
     <!-- TAB 按钮行（横排，独立于内容区） -->
@@ -2600,6 +2529,9 @@ function fmtSigned(v){
       <!-- 🗑 2026-10-23 主人令：量质双擎（LQSQ）子页 tab 随算法整支下架删除 -->
       <!-- 🆕 2026-10-22 主人令「上」：资金异动三因子（FF3 · 第四支自研算法）选股策略子页 -->
       <button class="st-tab" data-st="ff3" onclick="switchSt('ff3')">⚡ 资金异动 <span style="font-size:10px;color:var(--dim);font-weight:600;">自研</span></button>
+      <!-- 2026-10-25 主人令「这3个移到选股策略最后，成立一个新tab，叫最终跟踪」
+           ⇒ 收益转化算法 / 回测 N 日胜率 / 每日 Top3 历史 三卡整组迁入本子页（原在「最终推荐·rec」）。 -->
+      <button class="st-tab" data-st="track" onclick="switchSt('track')">📌 最终跟踪 <span style="font-size:10px;color:var(--dim);font-weight:600;">选股→执行→复盘</span></button>
       <!-- 🗑 2026-10-23 主人令：三新算法（缩量回踩/板块共振/龙虎机构）选股策略子页随算法整支下架删除 -->
       <!-- 2026-09-18 晚 原记录：此处硬编码「弱市专用·0★观测」被改为接 st-tab-star chip（__committeeRate 实时计算）。
            🔴 2026-09-18 (g) 更正 —— 该次改动的**方向对（统一星级出口）**，但它引用的依据是错的，
@@ -2697,6 +2629,55 @@ function fmtSigned(v){
          原副本与新版 id 完全重复（st-pool / stPoolTime / stPoolSourceDist / stPoolStockList），
          导致 getElementById 只命中第一份、第二份时间戳永远「—」且 tab 切换错乱。 -->
 
+  
+    <!-- ===== 子页：📌 最终跟踪（选股 → 执行 → 复盘，一条链路收在一处） ===== -->
+    <div id="st-track" class="st-pane">
+      <!-- 🧮 收益转化算法（选股 → 仓位 / 移动止损 / 时间止损）：逐票落数；常量同源 window.__EXEC，与「逻辑详解 → 收益转化算法」同一套公式。 -->
+      <div class="card" id="execAlgoCard" style="margin-bottom:16px;border-left:4px solid #38bdf8;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          <span style="font-size:15px;font-weight:700;color:var(--txt);">🧮 收益转化算法 · 选股 → 仓位 / 移动止损</span>
+          <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#38bdf822;color:#38bdf8;border:1px solid #38bdf84d;">逐票落数 · 公式固定 · 可复算</span>
+          <span style="font-size:10px;color:var(--dim);">与「逻辑详解 → 收益转化算法」同口径</span>
+        </div>
+        <div style="font-size:12px;line-height:1.8;color:var(--sub);margin-bottom:10px;">
+          选出来只是起点：<b style="color:#38bdf8;">买多少、止损放哪、什么时候挪、什么时候走</b>，全部按固定公式算，不靠感觉。
+        </div>
+        <div id="execAlgoHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">🧮 算法加载中…</div></div>
+      </div>
+
+      <!-- 📊 最终推荐 Top3 · 回测 N 日胜率：渲染引擎复用 lifeRenderBacktest（全站唯一份），数据源 FINAL_RECOMMEND_REPLAY.js（回放归档；真实流样本足够后删引用即切回）。 -->
+      <div class="card" id="finalRecBackCard" style="margin-top:16px;border-left:4px solid #fbbf24;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          <span style="font-size:14px;font-weight:700;color:var(--txt);">📊 最终推荐 Top3 · 回测 N 日胜率（强势×因子 + 四量闸门）</span>
+          <span id="finalRecBackBadge"></span>
+          <span style="font-size:10px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);padding:1px 7px;border-radius:10px;white-space:nowrap;">回放口径 · 非真实信号流</span>
+        </div>
+        <div class="note" id="finalRecBackNote">加载中…</div>
+        <table id="finalRecBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>中位数</th><th>最好</th><th>最差</th><th>最大回撤</th></tr></thead><tbody id="finalRecBackBody"></tbody></table>
+        <div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.75;">
+          算法 = 「强势×因子 + 四量闸门」（本表回放其混排层）：强势跟踪当日新入选 × 当日因子榜，双池各自 min-max 归一竞位取 Top3（同分因子榜优先）；
+          次日开盘买 / N 日收盘卖 / 双边 0.30%；基准=全市场等权同成本口径（按信号日对齐，覆盖至信号日 10-09）。
+          仅统计双池同场信号日（34 日，06-09~10-12，数据截至 10-13 收盘<b style="color:#fbbf24">（⚠️此日期仅回放样本区间，非主站停更；实时数据见「运维·健康快照」）</b>）；
+          四量闸门无逐日历史快照 ⇒ 本回放未套入闸门（线上实盘带闸门，可自动 3→2）。
+          18 个 v1 日无因子榜归档不计入；v1 期归档无强度分，IMA 池内归一同分退化（Top3=因子前 2 + IMA）。
+          真实信号流自 10-13 起累积，11 月中切回真实口径。
+          🔴 2026-10-20 主人令「口径和评分都一致」：线上最终推荐口径已回到唯一口径（=当日因子榜前 3 同序同分，混排竞位废止）⇒ 本卡为 10-14 混排方法的历史回放档案，仅存方法对比价值，不再描述线上现行口径。
+        </div>
+      </div>
+
+
+      <!-- 📜 每日推荐 Top3 历史：默认折叠，展开才渲染；数据源 FINAL_RECOMMEND_HISTORY.js（gen_final_recommend_history.py 每晚随 D 批自动重写）。 -->
+      <details class="card" id="finalHistCard" style="margin-top:16px;border-left:4px solid #a78bfa;"
+               ontoggle="if(this.open&&!window.__finalHistRendered){window.__finalHistRendered=true;try{window.renderFinalHist();}catch(e){console.error('[renderFinalHist]',e);}}">
+        <summary style="cursor:pointer;font-size:14px;font-weight:700;color:var(--txt);user-select:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap;list-style:none;">
+          <span class="ic" style="font-style:normal;">📜</span>每日推荐 Top3 历史
+          <span style="font-size:10.5px;font-weight:600;color:var(--dim);">（每日自动记录 · 默认折叠，点开查看）</span>
+          <span id="finalHistBadges" style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;"></span>
+        </summary>
+        <div id="finalHistBody" style="padding:12px 4px 2px;"><div class="note">展开加载…</div></div>
+      </details>
+
+    </div>
   </section>
 
 
@@ -14091,6 +14072,12 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     /* 保留：__renderImaStrongStock（#imaStrongBody ✅ 活）+ renderLifeBacktests（回测真实产出） */
     if(n==='life' && typeof window.renderLifeBacktests==='function') setTimeout(window.renderLifeBacktests, 60);
     if(n==='ff3' && typeof window.renderFf3==='function') setTimeout(window.renderFf3, 30);  // 🆕 2026-10-22 主人令：资金异动三因子子页渲染调度
+    // 2026-10-25 主人令：三卡迁入「📌 最终跟踪」子页 ⇒ 切入即按各自数据源重渲（懒加载不变）
+    if(n==='track'){
+      setTimeout(function(){ try{ window.__renderExecAlgo(); }catch(e){ console.warn('[track] exec', e); } }, 30);
+      setTimeout(function(){ try{ window.__renderFinalSec(); }catch(e){ console.warn('[track] backtest', e); } }, 60);
+      if(window.__finalHistRendered){ try{ window.renderFinalHist(); }catch(e){} }
+    }
     // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
     // 2026-10-06 阿狸咪的工程师：fa（因子实验室）分支经审计为不可达死代码（DOM 无 data-st="fa" 按钮、switchSt('fa') 早删），已删净；因子实验室现仅于「最终推荐」页渲染。
   // 2026-09-18 主人令：子页名统一「因子实验室」（原「🧪 因子」），且不评星级（因子=加分项，非选股策略）。
