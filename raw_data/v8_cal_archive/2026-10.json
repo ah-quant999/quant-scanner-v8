@@ -1,6 +1,6 @@
 {
  "month": "2026年10月",
- "update_time": "2026-10-25 13:43",
+ "update_time": "2026-10-26 07:55",
  "legend": [
   {
    "title": "重要政策",
@@ -460,7 +460,7 @@
     {
      "num": 25,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": []
     }
    ]
@@ -472,7 +472,7 @@
     {
      "num": 26,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇺🇸 新屋销售",
