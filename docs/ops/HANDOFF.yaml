@@ -9903,3 +9903,35 @@ items:
     verified_at: "2026-10-25 13:45"
     updated: "2026-10-25 13:45"
     updated_by: 阿狸咪的工程师
+  - id: factor-delist-verify-fix-1025
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: done
+    created: 2026-10-25
+    title: 主人令纠偏「未验证就删」：连续共振天数/分析师关注/52周新高 三因子真实数据补验（判决不变、证据全部换实锤）
+    note: >-
+      主人纠偏：factor-delist-1025 中三个因子曾被误标 NO_DATA 未测即删（连续共振天数没去找
+      gold_pool 个股 history；分析师关注没加载 analyst_ratings.json 就判无数据；52周新高用
+      250日高点代理而非真实名单，且代理人群与生产 top_gainers 次新股人群不等价）。按
+      「验证完再决定去留」补验（scripts/verify_missing3_factors.py，全部真实生产数据）：
+      (1) 连续共振天数：gold_pool history 真实金钻/缠论标记 846票×18日，streak≥1
+      −3.81%(t=−4.26,n=1440)/≥2 −1.98%/≥3 −2.83% 全 DROP，分月 9月−3.66%/10月−4.99% 同向；
+      窗口短（池重建后 history 仅 29 交易日）如实标注，但效应大且一致。
+      (2) 分析师关注：git 53 个真实快照（07-31~10-23，此前声称无数据系错误）重建名单，
+      独立信号日 33 日 807 票次 +0.99%(t=+0.90, win 55%) NO_EDGE。
+      (3) 52周新高：git 553 快照真实 top_gainers 名单，池命中 699 票次(8.4%)几乎全为
+      次新股（K线<300根无法回测），3 个月仅 4 对可测样本（统计无用）；生产中实为
+      「次新股标记」且不可验证；可测类比人群 −0.05%(t=−0.02) NO_EDGE。
+      判决：三个删除决定均维持（DROP/NO_EDGE/不可测+无边际），DELIST_DIMS 开关值不变，
+      仅证据注释与 index.html 三行改标真实数据来源。补充数据落盘
+      raw_data/missing3_factor_verdicts.json（含 supplement_20261025 稳健性检查）。
+      流程教训记档：NO_DATA ≠ 可以删；查不到数据先穷尽数据源（个股 history/git 快照），
+      仍不可验证的交主人定夺而非自动删。
+    verify_how: >-
+      scripts/verify_missing3_factors.py 全真实数据（gold_pool history + git 快照名单 +
+      kline_cache_multi fwd10）；三重稳健性检查（analyst 信号日去重 / w52 池化+月份分布 /
+      consec 分月拆分）。py_compile 过；管线周六数据复跑成功(14:48) 802只/否决73只/TOP20 正常。
+      提交后远端复核。
+    verified_at: "2026-10-25 14:50"
+    updated: "2026-10-25 14:50"
+    updated_by: 阿狸咪的工程师

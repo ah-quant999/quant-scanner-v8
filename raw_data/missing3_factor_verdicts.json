@@ -1,0 +1,77 @@
+{
+ "generated": "2026-10-25",
+ "method": "真实生产数据（gold_pool history + git 快照名单）+ kline fwd10",
+ "consec": {
+  "consec1": {
+   "label": "streak≥1 (+2分档)",
+   "excess": -0.038093653405385584,
+   "win": 0.16666666666666666,
+   "t": -4.2562824632396445,
+   "ns": 1440,
+   "days": 18
+  },
+  "consec2": {
+   "label": "streak≥2 (+4分档)",
+   "excess": -0.019833696168803823,
+   "win": 0.35294117647058826,
+   "t": -1.8773198361769776,
+   "ns": 697,
+   "days": 17
+  },
+  "consec3": {
+   "label": "streak≥3 (+6分档)",
+   "excess": -0.028286421790804886,
+   "win": 0.4375,
+   "t": -2.190366564618296,
+   "ns": 410,
+   "days": 16
+  }
+ },
+ "analyst": {
+  "excess": 0.007077328125782612,
+  "win": 0.5,
+  "t": 0.7846550675138274,
+  "ns": 807,
+  "days": 46
+ },
+ "w52_real": {
+  "n": 0
+ },
+ "supplement_20261025": {
+  "analyst_dedup_by_signal_day": {
+   "days": 33,
+   "excess": 0.0099,
+   "win": 0.55,
+   "t": 0.9,
+   "ns": 807,
+   "note": "按独立信号日去重（跨周末重复抓取同信号日只计一次）后仍 NO_EDGE"
+  },
+  "w52_real_list_diagnosis": {
+   "git_snapshots": 553,
+   "list_entries": 8295,
+   "pool_hits": 699,
+   "hit_rate": "8.4%",
+   "monthly_hits": {
+    "2026-07": 8,
+    "2026-08": 489,
+    "2026-09": 174,
+    "2026-10": 28
+   },
+   "testable_pairs_with_fwd10": 4,
+   "note": "命中几乎全为次新股(K线<300根无法回测)；仅4对可测样本统计无用",
+   "proxy_check": "可测类比人群(250日高点) −0.05%(t=−0.02,n=65) NO_EDGE"
+  },
+  "consec_month_split": {
+   "2026-09": {
+    "days": 16,
+    "excess": -0.0366
+   },
+   "2026-10": {
+    "days": 2,
+    "excess": -0.0499
+   },
+   "note": "分月同向，DROP 稳健；窗口短(池重建后history仅29交易日)如实标注"
+  },
+  "process_note": "三个因子此前曾被误标 NO_DATA 未测即删（主人令纠偏）；本文件为其真实数据补验记录"
+ }
+}
