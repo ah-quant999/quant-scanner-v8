@@ -3706,5 +3706,38 @@
     "message": "SECTOR_YEAR_FLOW.js 更新于 4天前 16:06；超过通用红线 4500 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
+ },
+ {
+  "date": "2026-10-26",
+  "time": "01:46:05",
+  "tz": "Asia/Shanghai",
+  "overall": "fail",
+  "summary": {
+   "ok": 117,
+   "warn": 0,
+   "fail": 3,
+   "limited": 0,
+   "info": 0,
+   "other": 0,
+   "total": 120
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "DO_NOT_DELETE",
+    "name": "防误删清单",
+    "message": "更新于 10-19 01:41；超过阈值 10080 分钟"
+   },
+   {
+    "id": "all_FINAL_RECOMMEND_HISTORY",
+    "name": "FINAL_RECOMMEND_HISTORY",
+    "message": "FINAL_RECOMMEND_HISTORY.js 更新于 4天前 11:50；超过通用红线 4500 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_SECTOR_YEAR_FLOW",
+    "name": "SECTOR_YEAR_FLOW",
+    "message": "SECTOR_YEAR_FLOW.js 更新于 5天前 16:06；超过通用红线 4500 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
