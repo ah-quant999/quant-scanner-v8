@@ -1490,10 +1490,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     再归一化到 0~100 得 
     <code style="background:rgba(56,189,248,.1);padding:1px 4px;border-radius:3px;">total_score</code>。
     <b style="color:#fbbf24;">因子只改排序，不决定谁能进池</b> —— 进池由 scanner 选股策略决定。
+    <b style="color:#22c55e;">当前实际计分 13 项</b>：P2 四信号 edge 4（金钻/缠论买/机构变红<span style="color:#ef5350;">反</span>/上涨趋势<span style="color:#ef5350;">反</span>）
+    + 个股历史胜率均益 1 + 回测反哺组合 1 + P5 walk-forward 达标 2（换手率趋势/60日成交额中位数，PASS 才启用）
+    + P4 研究 2（残差动量<span style="color:#ef5350;">反</span>/低波动）+ 过热惩罚 2（RSI&gt;70 / 20日涨幅≥20%，<b>只罚不奖</b>）
+    + 质差一票否决 1（风控淘汰）。<b style="color:#94a3b8;">已下架 14 项（整项）+ 2 项半下架</b>（RSI&lt;30 加分、20日涨幅 0~10% 加分 —— 加分侧删、惩罚侧保留），
+    <b>全部留在下方全表并逐项注明下架原因与证据</b>（逻辑详解页 2026-10-04 已整体下架，本表即因子逻辑唯一详解处）。
     </div>
-    <!-- 🔻 2026-09-19 主人令：头部静态保留；明细全表默认折叠，主展示=「🏆 当日因子计分榜」（每日计算） -->
+    <!-- 🔻 2026-09-19 主人令：头部静态保留；明细全表默认折叠，主展示=「🏆 当日因子计分榜」（每日计算）
+         🔄 2026-10-25 主人令「现在到底多少个因子，写清楚」：26 为清账前旧口径 —— 清账后原表 26 项中
+         14 项整项下架、2 项半下架，另 2026-10-23 嵌入的「个股历史胜率/期望」此前漏登全表 → 已补入；
+         现全表 27 项 = 实际计分 13 + 已下架 14。计数由 dfcBadge 按行动态统计，不再硬编码。 -->
     <details style="margin:4px 0 0;">
-    <summary style="cursor:pointer;font-size:12px;font-weight:600;color:#38bdf8;user-select:none;padding:4px 0;">▸ 展开 · 明细：26 项因子打分全表（静态口径 · 代码投影）</summary>
+    <summary style="cursor:pointer;font-size:12px;font-weight:600;color:#38bdf8;user-select:none;padding:4px 0;">▸ 展开 · 明细：因子打分全表 27 项 = 实际计分 13 + 已下架 14（保留原因）（静态口径 · 代码投影）</summary>
     <div id="dfcHost"><div class="note" style="padding:14px;text-align:center;color:var(--dim);">&#x1F9EE; 每日因子计算加载中&#x2026;</div></div>
     </details>
 
@@ -6313,6 +6321,22 @@ c.innerHTML = h;
       ]
     });
 
+    // 🆕 2026-10-25 主人令「现在到底多少个因子」：补登 2026-10-23 嵌入的个股历史胜率/期望因子
+    //   —— generate_top10.py 已实际计分（score_winrate/fusion，top1 顺络电子 45.4→14.9 分）
+    //   但本全表此前漏登 → 计数对不上。WINRATE_WEIGHT=1.0 / WINRATE_TERM_MAX=55（L134-138）。
+    GROUPS.push({
+      title: '个股历史胜率 / 期望（2026-10-23 主人令嵌入 · 均益主导）',
+      color: '#f472b6',
+      note: 'gen_stock_winrate 逐票产出：该票历史信号后的实际收益表现直接进 total_score，'
+          + '使「历史信号后平均涨得最多」的票自然顶到因子榜前列（最终推荐=因子榜顺序）。',
+      src: 'generate_top10.py WINRATE_WEIGHT/TERM_MAX',
+      rows: [
+        { f:'个股历史胜率/期望', w:'均益主导 ±55', dir:'双向', ev:'2026-10-23 嵌入',
+          why:'均益(avg)主导、胜率仅微修正；标定基于实测 winrate_score 分布（中位 −5.8 / p90 +17 / 极值 −123~+71），'
+            + '夹紧上限 ±55 让顶部高均益票（raw≈+42≈+32分）真正拉开差距；无历史→0 中性不罚', n:'全池·逐票' }
+      ]
+    });
+
     GROUPS.push({
       title: '形态 / 资金 / 板块 / 机构（工程规则 + 实测）',
       color: '#fbbf24',
@@ -6430,11 +6454,16 @@ c.innerHTML = h;
     // 顶部小徽章
     var bd = document.getElementById('dfcBadge');
     if(bd){
-      var _n = 0;
-      GROUPS.forEach(function(G){ _n += G.rows.length; });
+      // 🔄 2026-10-25 主人令「现在到底多少个因子，写清楚」：不再只给总数 ——
+      //   按行分类统计：w 以「已下架」开头 = 整项下架；其余 = 实际计分（含半下架保留惩罚侧的行）。
+      var _n = 0, _off = 0;
+      GROUPS.forEach(function(G){
+        _n += G.rows.length;
+        _off += G.rows.filter(function(r){ return String(r.w||'').indexOf('已下架')===0; }).length;
+      });
       // 🔴 2026-09-19 主人令：卡头右侧「回测 09-19 18:25」删除
       //   —— 卡头只留项数；回测口径与时间仍在页脚与「口径与独立分层回测明细」折叠内。
-      bd.innerHTML = '共 <b style="color:var(--txt);">'+_n+'</b> 项';
+      bd.innerHTML = '共 <b style="color:var(--txt);">'+_n+'</b> 项 = 实际计分 <b style="color:#22c55e;">'+(_n-_off)+'</b> 项 · 已下架 <b style="color:#94a3b8;">'+_off+'</b> 项（原因在全表内）';
     }
     // 🦊 2026-09-21 补齐 09-19 主人令「更新于紧随卡名」：dfcUpdSlot 槽位此前声明后从未被填充（死槽位）
     if(typeof setBadge === 'function'){ try{ var _td = window.TOP10_DAILY || {}; setBadge('dfcUpdSlot','auto','短线', _td.update_time || ''); }catch(e){} }
@@ -7460,6 +7489,11 @@ window.__renderIndexObserve = function(){
 
     <!-- 2026-10-04 主人令：逻辑详解已下架，运维页说明同步收敛 -->
     <div style="font-size:12px;color:var(--dim);margin:0 0 14px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">ℹ️ <b style="color:var(--gold)">逻辑详解（指标/策略/安全口径）</b> 已于 2026-10-04 下架，公开站点不再承载其全部交易参数内容；管理员本地查看见本机同步盘私有副本 <code>v8_logic_private/logic.full.html</code>。</div>
+    <!-- 🔄 2026-10-25 主人令「现在到底多少个因子，写清楚；运维页也要对齐」：因子清账后口径固化在此，与「最终推荐 → 每日因子计算」明细全表同一口径，防止两处漂移 -->
+    <div style="font-size:12px;color:var(--dim);margin:0 0 14px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">🧮 <b style="color:var(--gold)">因子清账对齐（2026-10-25 主人令「好的留差的删」）</b>：generate_top10 评分体系<b>原 26 项 → 现全表 27 项 = 实际计分 13 + 已下架 14</b>。<br>
+      <b style="color:#22c55e">实际计分 13 项</b>：P2 四信号 edge 4（金钻/缠论买/机构变红反/上涨趋势反）+ 个股历史胜率均益 1（2026-10-23 嵌入，此前漏登全表已补）+ 回测反哺组合 1 + P5 walk-forward 达标 2（换手率趋势/60日成交额中位数，verdict=PASS 才启用，当前均 PASS）+ P4 研究 2（残差动量反/低波动）+ 过热惩罚 2（RSI&gt;70 −5 / 20日涨幅≥20% −6/−3/−1，只罚不奖）+ 质差一票否决 1（风控）。<br>
+      <b style="color:#94a3b8">已下架 14 项（整项）</b>：量能突破 / 温水煮青蛙 / 超跌反弹 / 上涨中继（P3 四因子）· EMA 结构 / 非涨停（form）· 连续共振天数（streak≥1 −3.81%, t=−4.26 实锤）· 5 日突破 · 主力净流入 / 龙虎榜机构净买入（fund −0.801%）· 板块资金共振（sector −0.415%）· 52 周新高（次新股标记不可测）· 分析师关注（+0.99% NO_EDGE）· 基本面质量分（−1.027%，质差否决保留）；<b>另半下架 2 项</b>：RSI&lt;30 超卖加分、20日涨幅 0~10% 温和加分（加分侧删、惩罚侧保留）。<br>
+      <b>每项下架原因与实测证据（样本量/t 值）逐行固化在「最终推荐 → 每日因子计算 → 展开明细全表」</b>（逻辑详解页已整体下架，该全表即因子逻辑唯一详解处）。回滚开关：<code>generate_top10.py DELIST_DIMS</code> 对应项改 False 即整体恢复计分。证据档案：<code>raw_data/untested_factor_verdicts.json</code> + <code>missing3_factor_verdicts.json</code>。</div>
 
     
 
