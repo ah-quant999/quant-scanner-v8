@@ -7502,6 +7502,12 @@ window.__renderIndexObserve = function(){
       <b style="color:#22c55e">实际计分 13 项</b>：P2 四信号 edge 4（金钻/缠论买/机构变红反/上涨趋势反）+ 个股历史胜率均益 1（2026-10-23 嵌入，此前漏登全表已补）+ 回测反哺组合 1 + P5 walk-forward 达标 2（换手率趋势/60日成交额中位数，verdict=PASS 才启用，当前均 PASS）+ P4 研究 2（残差动量反/低波动）+ 过热惩罚 2（RSI&gt;70 −5 / 20日涨幅≥20% −6/−3/−1，只罚不奖）+ 质差一票否决 1（风控）。<br>
       <b style="color:#94a3b8">已下架 14 项（整项）</b>：量能突破 / 温水煮青蛙 / 超跌反弹 / 上涨中继（P3 四因子）· EMA 结构 / 非涨停（form）· 连续共振天数（streak≥1 −3.81%, t=−4.26 实锤）· 5 日突破 · 主力净流入 / 龙虎榜机构净买入（fund −0.801%）· 板块资金共振（sector −0.415%）· 52 周新高（次新股标记不可测）· 分析师关注（+0.99% NO_EDGE）· 基本面质量分（−1.027%，质差否决保留）；<b>另半下架 2 项</b>：RSI&lt;30 超卖加分、20日涨幅 0~10% 温和加分（加分侧删、惩罚侧保留）。<br>
       <b>每项下架原因与实测证据（样本量/t 值）逐行固化在「最终推荐 → 每日因子计算 → 展开明细全表」</b>（逻辑详解页已整体下架，该全表即因子逻辑唯一详解处）。回滚开关：<code>generate_top10.py DELIST_DIMS</code> 对应项改 False 即整体恢复计分。证据档案：<code>raw_data/untested_factor_verdicts.json</code> + <code>missing3_factor_verdicts.json</code>。</div>
+    <!-- 🔄 2026-10-25 主人令「现在马上做掉」：端到端组合层回放结论落档（两个提升开关：清账有效 + H1成本陷阱） -->
+    <div style="font-size:12px;color:var(--dim);margin:0 0 14px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">📈 <b style="color:var(--gold)">端到端组合层回放（2026-10-25 主人令「现在马上做掉」，commit 30795d1065）</b>：以 dated top10_daily 归档=系统每日真实发出名单，滚动等权满仓、次日开盘进、持有H日、双边0.3%成本；三口径 OLD(清账前)/CLEAN(清账后重排)/NEW(10-25纯净档)，92信号日 × N∈{5,10,20}×H∈{1,5,10} 全扫描。<br>
+      <b style="color:#22c55e">① 清账方向改善组合层（开关已验证有效）</b>：CLEAN vs OLD 单笔配对差全正 —— N5 +0.31%/+1.85%/+1.18%、N10 +0.13%/+0.39%/+0.24%（H1/H5/H10）；改善集中在 N5/N10 集中持仓，N20 两口径重合无差别。⇒ <code>DELIST_DIMS</code> 十项维持全 True（已核验）。<br>
+      <b style="color:#f59e0b">② H1 次日 flip = 成本陷阱（开关要关掉）</b>：三口径单笔均全负（OLD −0.54% / CLEAN −0.40%），双边 0.3% 成本即杀手 ⇒ 持有期建议已改为「5~10个交易日、等权分散5~10票」并同步最终推荐卡交易纪律横幅。<br>
+      组合层滚动净年化：CLEAN N5H5 +10.3% / N5H10 +63.4% / N10H10 +16.0%（OLD 对应 −45.1%/−35.1%/−10.2% 全负）。⚠️ 诚实口径：<b>此为每日再平衡等权分散账数字，持有到期单笔仍为负，非「每票都赢」，依赖连续滚动再平衡</b>。NEW 纯净档仅 2 信号日曲线不足，随真实交易日累积重跑脚本自动覆盖。<br>
+      产物：<code>scripts/e2e_system_backtest.py</code> + <code>raw_data/e2e_system_backtest.json</code>（含 tranche 退出基准 off-by-one 修复记录）。</div>
 
     
 
@@ -17927,7 +17933,7 @@ window.__renderV8CalToday();
     }
 
     h+='<div style="margin-top:12px;padding:10px 13px;background:rgba(244,73,93,.07);border:1px solid rgba(244,73,93,.24);border-radius:9px;font-size:12px;color:var(--sub);line-height:1.7">';
-    h+='<b style="color:var(--up)">⚠️ 交易纪律：</b>止损价 = max(20日低点, 现价×0.9, 现价−ATR×2)；目标价按盈亏比 1.5 反推。<b>破止损无条件离场</b>，不摊平、不扛单、不追高。<br>📌 <b>建议持有≈T+10</b>（回测 T+10 超额最优）；<b>短线 T+1~T+5 跑输大盘</b>，勿按短线操作。';
+    h+='<b style="color:var(--up)">⚠️ 交易纪律：</b>止损价 = max(20日低点, 现价×0.9, 现价−ATR×2)；目标价按盈亏比 1.5 反推。<b>破止损无条件离场</b>，不摊平、不扛单、不追高。<br>📌 <b>建议持有≈5~10个交易日、等权分散5~10票</b>（2026-10-25 端到端组合层回放：次日就卖 H1 三口径全负，双边0.3%成本即杀手；净优势只在持有5~10日的滚动等权组合层出现，H10 回撤最低；铺20只以上无改善）。<b>勿日内、勿隔日</b>。';
     h+='</div>';
 
     el.innerHTML=h;
