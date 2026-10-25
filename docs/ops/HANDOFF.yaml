@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 166
+  next_id_seq: 167
 items:
   - id: backtest-bench-attach-fix-1022
     owner: 小九的工程师
@@ -9871,3 +9871,35 @@ items:
     updated_by: 阿狸咪的工程师
 
 
+  - id: factor-delist-1025
+    owner: 阿狸咪的工程师
+    priority: P1
+    status: done
+    created: 2026-10-25
+    title: 因子清账（主人令「好的留差的删，不要不确定的一直留着」）：9 维度下架 + 上游管线处置 + 周六数据管线实跑验证
+    note: >
+      26 项因子打分全表遗留的「未验证」项今天全部清账。新增 scripts/verify_untested_factors.py：
+      4.2 年 kline_cache_multi 846 池票 × 38 再平衡日，忠实复刻生产口径（scanner 7组EMA-FORCAST/SMA-RSI14/
+      量能梯度/蛙streak/超跌梯度/上涨中继/5日突破/52周新高代理），信号组 vs 池基线前向10日期望差，
+      落盘 raw_data/untested_factor_verdicts.json。判读纪律与 skew60 先例一致：正向加分命中组跑输=拖累=删；
+      |excess|<0.30pp 或样本不足=无证据=按主人令「不留不确定」同样下架。
+      实锤 DROP：EMA≥5 −0.57%(t=−2.06,n=8574)/量能3档(vr≥2.5) −1.69%(t=−2.01)/蛙streak5 −1.67%(t=−2.04)/
+      RSI<30 超卖加分 −0.33%(t=−0.85)/20日涨幅0~10%温和加分 −0.40%(t=−1.27)；此前 by_factor 已实锤
+      fund −0.801%/sector −0.415%/quality −1.027%。NO_EDGE 全下架：EMA3-4/1-2、非涨停、RSI<68、20日涨幅<35%、
+      5日突破(旧「唯一 T+10 正期望」池内不成立)、量能1/2档、超跌反弹、上涨中继、52周新高(旧「IC最强+0.116」
+      系自相关诊断非前向证据)；NO_DATA 下架：连续共振天数、分析师关注(无历史数据永久无法回测)。
+      保留(方向获证)：RSI>70 −5 与 20日涨幅≥20% 惩罚(过热组实测跑输)、质差一票否决(风控非倾斜)、
+      P4 残差动量反向、P5 三因子(WF PASS)、base 四信号、回测反哺、胜率因子。
+      上游管线处置(主人令「该删就删」，按消费图)：analyst_ratings 云端抓取链退役(cloud_fetch_v8 注册表
+      摘除 + freshness_guard 巡检项移除；JS 侧 09-23 已退役，评分侧本令下架后全链无消费)；
+      w52_high/capital_flow/lhb_data/sector_flow 抓取保留(前端市场宽度卡/市场简报/展示消费)仅切评分；
+      fundamental 保留(质差否决依赖)。generate_top10.py 加 DELIST_DIMS 总开关(9 项，改 False 即回滚)。
+      index.html 26 因子表 12 项改标「已下架」并附证据数字。
+    verify_how: >
+      三文件 py_compile 全过。周六数据实跑(2026-10-25 13:38 本地)：algorithms/generate_top10.py 全链成功，
+      802 只评分/73 只质差否决正常出清(风控未受伤)/被下架维度全线归零(资金0/板块0/机构0.0/质量0.0/形态0.0)/
+      TOP20 产出正常(顺络电子36.8 分居首)，raw_data/top10_daily.json 结构完好(norm_version/gate_info/top10 齐)；
+      排序改由 base+P4/P5+胜率+回测反哺驱动。提交 f5bf12ca99(凭据闸门 12 文件全过)。
+    verified_at: "2026-10-25 13:45"
+    updated: "2026-10-25 13:45"
+    updated_by: 阿狸咪的工程师
