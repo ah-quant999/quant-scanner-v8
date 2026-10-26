@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-10-26 10:04:46
+// 最后更新：2026-10-26 11:08:59
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-10-26 10:04:46",
+  "update_time": "2026-10-26 11:08:59",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -27,7 +27,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
     "10/26"
   ],
   "columns": 31,
-  "cycle_count": 18,
+  "cycle_count": 19,
   "cycles": [
     {
       "sector": "AI算力",
@@ -39,7 +39,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 29,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 337,
+      "total": 340,
       "ongoing": true
     },
     {
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 31,
       "peak": 236,
       "peak_date": "09/08",
-      "total": 2435,
+      "total": 2438,
       "ongoing": true
     },
     {
@@ -65,7 +65,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 415,
+      "total": 416,
       "ongoing": true
     },
     {
@@ -78,7 +78,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 25,
       "peak": 17,
       "peak_date": "09/21",
-      "total": 237,
+      "total": 240,
       "ongoing": true
     },
     {
@@ -104,7 +104,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 29,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 255,
+      "total": 256,
       "ongoing": true
     },
     {
@@ -182,7 +182,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 20,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 110,
+      "total": 111,
       "ongoing": true
     },
     {
@@ -261,6 +261,19 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "peak": 3,
       "peak_date": "10/21",
       "total": 12,
+      "ongoing": true
+    },
+    {
+      "sector": "地产链",
+      "start": "10/26",
+      "end": "10/26",
+      "start_idx": 30,
+      "end_idx": 30,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 3,
+      "peak_date": "10/26",
+      "total": 3,
       "ongoing": true
     }
   ]
