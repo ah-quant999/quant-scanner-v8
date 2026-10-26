@@ -1,6 +1,6 @@
 {
  "month": "2026年10月",
- "update_time": "2026-10-26 23:54",
+ "update_time": "2026-10-27 03:33",
  "legend": [
   {
    "title": "重要政策",
@@ -472,19 +472,19 @@
     {
      "num": 26,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇺🇸 新屋销售",
        "cls": "us",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 27,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇺🇸 FOMC议息会议第1天",
