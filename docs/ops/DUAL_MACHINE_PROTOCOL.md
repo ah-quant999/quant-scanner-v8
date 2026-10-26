@@ -67,3 +67,79 @@
 - 本协议 = **权威原文**；机器执行清单 = skill `v8-triple-check-after-change`（双方机器同名同义）。
 - 时间口径：一律**北京时间 CST+8**（`datetime.now(timezone(timedelta(hours=8)))`）。
 - 凭证 / 模型 / 部署防覆盖 / 同步盘铁律见 `~/.workbuddy/MEMORY.md`（跨项目偏好，所有专家会话启动即载入）。
+
+---
+
+## 5. 零丢失协议（v2 · 2026-10-26 主人令，双机即时生效）
+
+> **主人原话**：「定个以后双机改动都不会丢失的、可以一直运行的协议，**不要每次都问我**。」
+> 本节即该协议原文；机器执行体 = `algorithms/nolost_guard.py`（双机同源）+
+> 云端 `.github/workflows/v8_nolost_guard.yml`（每 20 分钟）+ 本机 `tools/nolost_daemon.py`（每 10 分钟）。
+> **本节生效后，因「覆盖/遗漏/未发布」造成的改动丢失，一律视为流程事故，按 §5.6 记账。**
+
+### 5.1 为什么必须做（实证事故族，不是假想）
+
+| 时刻 | 事故 | 根因 |
+|---|---|---|
+| 2026-09-20 10:43→10:53 | 一侧刚推的三改被另一侧静默覆盖 | 用**落后基线**建树推送 |
+| 2026-10-25 19:02 | main 历史被云端 bot 无 parent 根 commit 截断 | bot 重建用孤立树 |
+| **2026-10-26 00:2x** | 我的 index.html 推送把**同一批刚推上去的 3 个 data 文件**从 main 树上抹掉（`git log --diff-filter=D` 查不到删除提交 = 从未入史） | API 建树用了**更早的 base_tree**，`git add data/` 只增不改删 |
+| 2026-10-26 00:4x | 小九坚果云里 **227 行未发布**改动，差点被「线上版 + 我的补丁」绕过 | 双机「未发布改动」无账本、对方不可见 |
+
+结论：**「谁改的」不重要，缺的是三样机制**：内容快照、路径集校验、未发布账本。
+
+### 5.2 三道锁（判定表写死，不再逐次请示）
+
+| 锁 | 做什么 | 触发条件（机器自判） | 动作（无需问主人） |
+|---|---|---|---|
+| **锁① 内容快照** | 受保护文件按 `sha1(内容)[:12]` 存 `backup/nolost/<path>/<sha12>.gz`，**只增不删** | 每 10 分钟 | 静默存档 |
+| **锁② 路径集校验** | 推前记远端全量 `path→blob`，推后重取比对 | 「推前有、推后无」且非显式删除 | **自动用原 blob 重建恢复提交** + 记 `severity=high` |
+| **锁③ 基线新鲜** | 建树前**当场**重取 HEAD 与 tree，`base_tree` 合并 | 每次推送 | 强制刷新，禁用任何缓存 sha |
+
+**保护范围**（只保护「人写、bot 不重算」的源）：`index.html` `logic.html` `v6_memo*.html`
+`AGENTS.md` `DO_NOT_DELETE.md` `requirements.txt` `update_v8.py` `guard_*.py` `v8_verify_layer_parity.py`
++ 目录 `algorithms/` `docs/` `.github/` `tools/`。
+**明确排除**：`data/` `raw_data/` `backup/` 与凭证类（`*token*` `*cookie*` `*secret*` `.env` `.pem` `.key`）
+—— 构建产物每日重算，纳入保护只会把陈旧数据强塞回线上；凭证绝不入快照、不入仓。
+
+### 5.3 未发布账本（双机的「说到做到」）
+
+- 每轮把「工作区改了但没推」的受保护文件写进 `docs/ops/UNPUBLISHED.json`（机器/路径/状态/时刻）。
+- **推前必读**：任何一方推送前先读该文件；对方有同路径未发布改动 ⇒ **不覆盖**，
+  改为「以远端真身为基底重放我的补丁 + 把对方改动原样保留」，无法自动合并才写交接件（一次，描述冲突点，不当场求拍板）。
+- 判「有没有真差异」必须**归一化后比**：CRLF→LF、剥离 `?v=` 缓存戳、`var BUILD=` 戳。
+  实测：`generate_top10.py` 裸 diff 2371 行差异，归一后仅 4 行注释差异；`index.html` 裸 diff 36 行，归一后 0 处实质差异。
+  **不去归一化就开始覆盖 = 事故的常见起点。**
+
+### 5.4 常驻（「一直运行」由谁保证）
+
+| 层 | 载体 | 周期 | 双机关机时 |
+|---|---|---|---|
+| 云端 | `.github/workflows/v8_nolost_guard.yml` | 20 min | ✅ 照跑（自愈主通道） |
+| 本机 | `tools/nolost_daemon.py`（Windows 计划任务 `v8-nolost-guard`，开机自启） | 10 min | ❌ 但云端兜底 |
+| 推送 | `algorithms/nolost_guard.py push --files ...` | 每次 | — |
+
+**分工**：云端负责「远端被抹掉」；本机负责「本机改动不被忘记」（快照 + 账本 + 前置自愈）。
+
+### 5.5 不烦主人的边界（照 §0 执行）
+
+- 以下情形**一律不问**，按表执行并记账：快照、自愈、归一化后无实质差异、双方改动可自动合并、删除已被登记在 `NOLOST_IGNORE.json`。
+- 仅以下三种才写**一封**汇总（进 `docs/ops/handover/`，不逐条问、不催办）：
+  ① 同一路径连续 3 轮自愈仍被覆盖（说明有未知写入者）；
+  ② 双方改动对同一语义块冲突且无法自动取舍；
+  ③ 需要主人方向性决策（改产品口径/删功能）。
+- 删受保护文件 = 有意行为，必须先 `python3 algorithms/nolost_guard.py ignore <path>` 登记，
+  否则守卫会把它当覆盖补回来（**这是设计目的**：覆盖事故与「顺手删功能」在机器看来同一件事）。
+
+### 5.6 事故记账与自证
+
+- 事件流：`docs/ops/NOLOST_LOG.jsonl`（`cycle` / `clobber_detected` / `heal`，含 sha 与路径）。
+- 基线：`.nolost_remote_baseline.json`（path→blob sha，**随仓提交**，否则无法跨轮判"曾经有过"）。
+- 复核命令（双机通用，2 分钟）：
+  ```bash
+  python3 algorithms/nolost_guard.py check     # 期望 silently_clobbered: []
+  python3 algorithms/nolost_guard.py seed      # 首次在另一台机器播种基线
+  python3 tools/nolost_daemon.py --status      # 看最近一轮结果与计划任务状态
+  ```
+- **判读纪律**：`check` 里 `local_unpublished_count > 0` 是**正常**的（工作区本就有活）；
+  只有 `silently_clobbered` 非空才是事故。

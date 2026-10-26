@@ -1,0 +1,62 @@
+name: v8 nolost guard（零丢失常驻守卫）
+
+# 主人令 2026-10-26：「定个以后双机改动都不会丢失的、可以一直运行的协议，不要每次都问我。」
+# 本 workflow 就是协议里「一直运行」的那一半：**双机都关机也照样跑**。
+#   每 20 分钟：比对「上次已知良好的远端受保护路径基线」→ 发现被静默覆盖立即用原 blob 补回，
+#   事件写入 docs/ops/NOLOST_LOG.jsonl。任何人（含 cloud-bot / 双机 / 手工 API 推送）
+#   用旧树覆盖掉 algorithms/ docs/ .github/ tools/ index.html 等源文件，都会被这里拉回来。
+#
+# 它**不碰** data/ 与 raw_data/（构建产物，本就每日重算），所以不会与 build_deploy 打架。
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-nolost-guard
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 守卫单步（基线比对 + 自愈 + 记账）
+        env:
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          NOLOST_CI: '1'
+          NOLOST_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          python3 algorithms/nolost_guard.py cycle | tee /tmp/nolost.json
+          echo "---"
+          cat /tmp/nolost.json
+
+      - name: 提交守卫账本（无变化则不提交）
+        run: |
+          git config user.name  "v8-nolost-guard"
+          git config user.email "nolost@users.noreply.github.com"
+          git add -f docs/ops/NOLOST_LOG.jsonl .nolost_remote_baseline.json 2>/dev/null || true
+          git add -f docs/ops/NOLOST_IGNORE.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "✅ 无变化，不提交（避免提交风暴）"
+            exit 0
+          fi
+          git commit -m "chore(nolost): 守卫账本 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') CST"
+          for i in 1 2 3; do
+            if git pull --rebase --autostash -q origin main && git push -q origin HEAD:main; then
+              echo "✅ 已推送"
+              exit 0
+            fi
+            echo "⚠️ 推送冲突，第 $i 次重试"
+            sleep 5
+          done
+          echo "::warning::账本推送 3 次失败（不影响自愈本身）"

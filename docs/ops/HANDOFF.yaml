@@ -26,16 +26,37 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-20 15:10"
-  updated_by: 小九的工程师
+  updated: "2026-10-26 09:00"
+  updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 168
+  next_id_seq: 169
 items:
+  - id: nolost-protocol-v2-1026
+    owner: shared（阿狸咪的工程师落码 · 小九复核）
+    priority: P0
+    status: pending-verify
+    created: 2026-10-26
+    title: 双机零丢失协议 v2 落地（内容快照 + 路径集校验 + 未发布账本 + 云端常驻自愈）
+    note: >
+      主人令「定个以后双机改动都不会丢失的、可以一直运行的协议，不要每次都问我」。
+      事故族实证：09-20 旧基线覆盖三改；10-25 main 历史被 bot 截断；10-26 00:2x 我推 index.html
+      时 base_tree 取自更早 HEAD，把同批刚推的 3 个 data 文件从 main 树上抹掉（--diff-filter=D
+      无记录 = 从未入史）；10-26 00:4x 小九坚果云 227 行未发布改动差点被「线上版+我的补丁」绕过。
+      落地：algorithms/nolost_guard.py（三道锁：快照 / 推前推后路径集校验 / 建树基线强制刷新）；
+      .github/workflows/v8_nolost_guard.yml（20min 云端自愈，双机关机亦生效）；
+      tools/nolost_daemon.py（本机 10min：快照 + UNPUBLISHED 账本 + 前置自愈）。
+      协议原文：docs/ops/DUAL_MACHINE_PROTOCOL.md §5。不覆盖 data/raw_data（构建产物）。
+    verify_how: >
+      待验：① 云端 workflow 首轮 run 成功且 NOLOST_LOG.jsonl 出现 cycle 记录；
+      ② 双机各跑 python3 algorithms/nolost_guard.py seed 播种基线后 check 的 silently_clobbered 为空；
+      ③ 人为制造一次覆盖（用旧 blob 建树删掉 docs/ops/DUAL_MACHINE_PROTOCOL.md）→ 下一轮自动补回。
+    updated: "2026-10-26 09:00"
+    updated_by: 阿狸咪的工程师
   - id: backtest-bench-attach-fix-1022
     owner: 小九的工程师
     priority: P2
