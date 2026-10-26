@@ -2736,6 +2736,35 @@ window.STRATEGY_WALKFORWARD = {
           h+='</div>';
         })();
 
+        // ===== 熊市见底信号（AI速览研判条：移至操作建议上方 · 广度闸为观测点之一 · 2026-10-26）=====
+        var _bearNote=null;
+        (function(){
+          var TD=window.TOP10_DAILY||null;
+          var hc=(TD&&typeof TD.hc_count==='number')?TD.hc_count:null;
+          var ap=window.AVG_PRICE_DATA||null;
+          var pos=(ap&&(ap.position_vs_ma_eff!=null?ap.position_vs_ma_eff:(ap.position_vs_ma20!=null?ap.position_vs_ma20:null)));
+          var kdj=(ap&&ap.kdj_k!=null)?Number(ap.kdj_k):null;
+          var mf=window.MARKET_FUND_FLOW_DATA||{};
+          var net=null; try{ if(mf&&mf.daily&&mf.daily.length){ net=mf.daily[mf.daily.length-1].net_yi; } }catch(e){}
+          var brState=hc==null?'未到位':(hc>=6?'充足':(hc>=3?'稀薄':'枯竭'));
+          var trState; if(pos==null)trState='未到位'; else if(pos>=0&&kdj!=null&&kdj<20)trState='磨底·超卖'; else if(pos>=0)trState='上行·盈利行情'; else if(kdj!=null&&kdj<20)trState='下跌·超卖'; else trState='下跌中';
+          var fdState=net==null?'未到位':(net>=0?'净流入':'净流出');
+          var _status,_verdict,_advice,_dot;
+          if(hc==null||pos==null){ _status='待数据'; _verdict='关键数据未补齐，暂无法研判'; _advice='等数据刷新后再看'; _dot='yellow'; }
+          else if(brState==='枯竭'||brState==='稀薄'){ _status='冰点·空仓'; _verdict='广度冰点，全市场无赚钱效应'; _advice='坚决空仓，不接飞刀；广度<6 不谈出手'; _dot='red'; }
+          else if(trState==='上行·盈利行情'&&fdState==='净流入'){ _status='见底确认·可出手'; _verdict='广度够 + 股价站上均线 + 主力净流入，三重共振底部确认'; _advice='可建 50–70% 仓位，沿强势主线布局'; _dot='green'; }
+          else if(trState.indexOf('超卖')>=0){ _status='见底初现·试探'; _verdict='广度已够但趋势/资金未共振，属超卖磨底、赔率好转但确认不足'; _advice='极小仓(≤30%)试探；广度<6 立即退场'; _dot='green'; }
+          else { _status='见底初现·试探'; _verdict='广度已够，但趋势与资金尚未共振'; _advice='轻仓(≤30%)试探；广度<6 立即退场'; _dot='green'; }
+          _bearNote={status:_status,verdict:_verdict,advice:_advice};
+          h+='<div style="padding:10px 18px;background:rgba(239,83,80,.08);border-left:3px solid #ef5350;font-size:13px;line-height:1.85;color:var(--txt);">';
+          h+='<span style="padding:2px 8px;border-radius:4px;background:rgba(239,83,80,.15);color:#ef5350;font-weight:700;">📉 熊市见底信号</span>';
+          h+=lightDot(_dot,12);
+          h+='<b style="color:#ef5350;">'+_status+'</b> · '+_verdict;
+          h+=' <span style="color:var(--dim);">［广度闸 '+brState+(hc!=null?'('+hc+')':'')+' ｜ 平均股价 '+trState+' ｜ 主力 '+fdState+(net!=null?'('+(net>=0?'+':'')+Number(net).toFixed(0)+'亿)':'')+'］</span>';
+          h+=' <b style="color:var(--gold);">建议：'+_advice+'</b>';
+          h+='</div>';
+        })();
+
         // 5. 操作建议
         var strats=d.strategies||[];
         if(strats.length){
@@ -2746,8 +2775,7 @@ window.STRATEGY_WALKFORWARD = {
           h+='<span style="color:var(--txt);">'+strats.map(function(s){return (typeof s==='object'?s.text:s);}).join(' &nbsp;|&nbsp; ')+'</span>';
           if(_bearNote){
             h+='<div style="margin-top:8px;font-size:12.5px;line-height:1.7;color:var(--dim);">📉 <b style="color:#ef5350;">熊市见底信号 · '+_bearNote.status+'</b>：'+_bearNote.verdict+'；后续操作 — <b style="color:var(--gold);">'+_bearNote.advice+'</b></div>';
-          }
-          // 2026-08-13 补：把「主线板块」和「推荐个股」结构化落地展示
+          }          // 2026-08-13 补：把「主线板块」和「推荐个股」结构化落地展示
           var sectors=(d.mainline_sectors||[]), picks=(d.mainline_picks||[]);
           if(sectors.length || picks.length){
             h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.10);display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;font-size:12.5px;">';
