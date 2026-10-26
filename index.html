@@ -2387,6 +2387,75 @@ window.STRATEGY_WALKFORWARD = {
         <div class="ipo-empty">加载中…</div>
       </div>
     </div>
+📡 熊市见底信号 / 广度闸状态（2026-10-26 主人令：读 window.TOP10_DAILY.hc_count，纯前端·日更） -->
+    <div id="bearSignalCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);">
+        <span style="font-size:16px;font-weight:700;color:var(--txt);">📡 熊市见底信号 · 广度闸状态</span>
+        <span style="font-size:12px;color:var(--sub);font-weight:400;" id="bearSignalTime">--</span>
+      </div>
+      <div style="padding:0;" id="bearSignalContent">
+        <div class="ipo-empty">加载中…</div>
+      </div>
+    </div>
+
+    <script>
+    (function(){
+      var $=function(id){ return document.getElementById(id); };
+      window.__bearRetry = 0;
+      window.__renderBearSignal = function(){
+        var host = $('bearSignalContent');
+        if(!host) return;
+        var D = window.TOP10_DAILY;
+        var isHC = D && D.selection_mode === 'high_conviction_resonance';
+        var hc = (D && typeof D.hc_count==='number') ? D.hc_count : null;
+        if(hc==null){
+          // HC 模式已开但 hc_count 尚未就绪 → 短暂重试；超时则报未到位
+          if(isHC && window.__bearRetry < 15){ window.__bearRetry++; setTimeout(window.__renderBearSignal, 700); return; }
+          if(isHC){
+            host.innerHTML = '<div class="note" style="padding:14px;text-align:center;color:var(--dim);">📡 广度数据未到位（data/TOP10_DAILY.js）· 待算法链下一轮更新</div>';
+          } else {
+            host.innerHTML = '<div class="note" style="padding:14px;text-align:center;color:var(--dim);">📡 当前为传统评分模式，未启用广度闸 · 见底信号暂不可用</div>';
+          }
+          return;
+        }
+        window.__bearRetry = 0;
+        var mode = (D && D.selection_mode) || '未知';
+        var upd  = (D && D.update_time) || '--';
+        var statusTxt, statusColor;
+        if(hc >= 6){ statusTxt='🟢 见底信号初现 · 可出手区间'; statusColor='#5ee0a0'; }
+        else if(hc >= 3){ statusTxt='🟡 探底中 · 广度偏低（空仓/极小仓）'; statusColor='#fbbf24'; }
+        else { statusTxt='🔴 冰点 · 坚决空仓'; statusColor='#ff6b81'; }
+        var oos = [
+          ['金钻+缠论共振 T+10（9/11–10/25 熊市外推）', '−5.93%', '胜率 17%', '#ef5350'],
+          ['其中 广度<6 交易日', '−14.07%', '胜率 0%', '#ef5350'],
+          ['其中 广度≥6 交易日', '−2.97%', '胜率 17%', '#fbbf24']
+        ];
+        var rows = oos.map(function(r){
+          return '<div style="display:flex;justify-content:space-between;gap:8px;padding:6px 12px;font-size:12.5px;border-bottom:1px solid var(--border);">'
+            + '<span style="color:var(--sub);">'+r[0]+'</span>'
+            + '<span style="color:'+r[3]+';font-weight:700;white-space:nowrap;">'+r[1]+' · '+r[2]+'</span></div>';
+        }).join('');
+        var h = ''
+          + '<div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);">'
+          +   '<div style="font-size:34px;font-weight:800;color:'+statusColor+';line-height:1;">'+hc+'</div>'
+          +   '<div style="font-size:12px;color:var(--sub);">只金钻+缠论共振<br>当前广度值（日更）</div>'
+          +   '<div style="margin-left:auto;text-align:right;font-size:12.5px;font-weight:700;color:'+statusColor+';max-width:55%;">'+statusTxt+'</div>'
+          + '</div>'
+          + '<div style="padding:4px 0;">'+rows+'</div>'
+          + '<div style="padding:8px 12px;font-size:11.5px;line-height:1.7;color:var(--dim);">'
+          +   '📌 见底信号 = 金钻+缠论共振广度回升至 ≥6（实证：≥6→T+10 +4.51%/胜64%；<6→ −7.21%/胜20%）。<br>'
+          +   '⚠️ 熊市段即便广度≥6，共振票仍亏约 3%（非盈利）；当前这些票是「最优的亏钱票」，非「赚钱票」。广度<6 即空仓保命，等约 10 交易日后前瞻收益转正再确认转强。'
+          + '</div>';
+        host.innerHTML = h;
+        if($('bearSignalTime')) $('bearSignalTime').innerHTML = '数据 '+String(upd).slice(5,16)+' · '+mode;
+      };
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', window.__renderBearSignal);
+      else window.__renderBearSignal();
+    })();
+    </script>
+
+    <!--
+
     <!-- 💰 平均股价独立卡片已删除（2026-08-12 主人令）：保留在 AI 市场速览紧凑版（renderAiSummary IIFE 内），不再单独 IIFE 渲染 -->
 
     <script>
