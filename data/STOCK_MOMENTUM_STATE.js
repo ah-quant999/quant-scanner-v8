@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-26 16:29",
- "generated": "2026-10-26 16:29",
+ "update_time": "2026-10-26 16:56",
+ "generated": "2026-10-26 16:56",
  "meta": {
-  "generated": "2026-10-26 16:29",
+  "generated": "2026-10-26 16:56",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11483,29 +11483,36 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603278",
       "name": "大业股份",
-      "change_pct": 8.96,
-      "price": 17.39,
+      "change_pct": 8.083,
+      "price": 17.25,
+      "category": "突破"
+     },
+     {
+      "code": "688787",
+      "name": "海天瑞声",
+      "change_pct": 3.071,
+      "price": 145.33,
       "category": "突破"
      },
      {
       "code": "688071",
       "name": "华依科技",
-      "change_pct": 10.038,
-      "price": 52.29,
+      "change_pct": 11.827,
+      "price": 53.14,
       "category": "突破"
      },
      {
       "code": "002702",
       "name": "海欣食品",
-      "change_pct": 3.461,
-      "price": 5.68,
+      "change_pct": 3.643,
+      "price": 5.69,
       "category": "突破"
      },
      {
       "code": "000056",
       "name": "*ST皇庭",
-      "change_pct": 7.442,
-      "price": 2.31,
+      "change_pct": 7.907,
+      "price": 2.32,
       "category": "突破"
      },
      {
@@ -11518,15 +11525,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300307",
       "name": "慈星股份",
-      "change_pct": 5.593,
-      "price": 9.44,
+      "change_pct": 4.81,
+      "price": 9.37,
       "category": "突破"
      },
      {
       "code": "000513",
       "name": "丽珠集团",
-      "change_pct": 5.413,
-      "price": 28.43,
+      "change_pct": 5.302,
+      "price": 28.4,
       "category": "突破"
      },
      {
@@ -11539,8 +11546,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603051",
       "name": "鹿山新材",
-      "change_pct": 4.31,
-      "price": 23.72,
+      "change_pct": 4.046,
+      "price": 23.66,
       "category": "突破"
      },
      {
@@ -11553,8 +11560,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603886",
       "name": "元祖股份",
-      "change_pct": 7.692,
-      "price": 12.88,
+      "change_pct": 8.11,
+      "price": 12.93,
       "category": "突破"
      },
      {
@@ -11574,8 +11581,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605080",
       "name": "浙江自然",
-      "change_pct": 7.465,
-      "price": 22.89,
+      "change_pct": 7.606,
+      "price": 22.92,
+      "category": "突破"
+     },
+     {
+      "code": "688228",
+      "name": "开普云",
+      "change_pct": 8.671,
+      "price": 82.59,
       "category": "突破"
      }
     ],
@@ -11583,29 +11597,36 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603278",
       "name": "大业股份",
-      "change_pct": 8.96,
-      "price": 17.39,
+      "change_pct": 8.083,
+      "price": 17.25,
+      "category": "加速"
+     },
+     {
+      "code": "688787",
+      "name": "海天瑞声",
+      "change_pct": 3.071,
+      "price": 145.33,
       "category": "加速"
      },
      {
       "code": "688071",
       "name": "华依科技",
-      "change_pct": 10.038,
-      "price": 52.29,
+      "change_pct": 11.827,
+      "price": 53.14,
       "category": "加速"
      },
      {
       "code": "002702",
       "name": "海欣食品",
-      "change_pct": 3.461,
-      "price": 5.68,
+      "change_pct": 3.643,
+      "price": 5.69,
       "category": "加速"
      },
      {
       "code": "000056",
       "name": "*ST皇庭",
-      "change_pct": 7.442,
-      "price": 2.31,
+      "change_pct": 7.907,
+      "price": 2.32,
       "category": "加速"
      },
      {
@@ -11618,8 +11639,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300307",
       "name": "慈星股份",
-      "change_pct": 5.593,
-      "price": 9.44,
+      "change_pct": 4.81,
+      "price": 9.37,
       "category": "加速"
      }
     ],
@@ -11627,29 +11648,36 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603278",
       "name": "大业股份",
-      "change_pct": 8.96,
-      "price": 17.39,
+      "change_pct": 8.083,
+      "price": 17.25,
+      "category": "短线选股"
+     },
+     {
+      "code": "688787",
+      "name": "海天瑞声",
+      "change_pct": 3.071,
+      "price": 145.33,
       "category": "短线选股"
      },
      {
       "code": "688071",
       "name": "华依科技",
-      "change_pct": 10.038,
-      "price": 52.29,
+      "change_pct": 11.827,
+      "price": 53.14,
       "category": "短线选股"
      },
      {
       "code": "002702",
       "name": "海欣食品",
-      "change_pct": 3.461,
-      "price": 5.68,
+      "change_pct": 3.643,
+      "price": 5.69,
       "category": "短线选股"
      },
      {
       "code": "000056",
       "name": "*ST皇庭",
-      "change_pct": 7.442,
-      "price": 2.31,
+      "change_pct": 7.907,
+      "price": 2.32,
       "category": "短线选股"
      },
      {
@@ -11662,15 +11690,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300307",
       "name": "慈星股份",
-      "change_pct": 5.593,
-      "price": 9.44,
+      "change_pct": 4.81,
+      "price": 9.37,
       "category": "短线选股"
      },
      {
       "code": "000513",
       "name": "丽珠集团",
-      "change_pct": 5.413,
-      "price": 28.43,
+      "change_pct": 5.302,
+      "price": 28.4,
       "category": "短线选股"
      },
      {
@@ -11683,8 +11711,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603051",
       "name": "鹿山新材",
-      "change_pct": 4.31,
-      "price": 23.72,
+      "change_pct": 4.046,
+      "price": 23.66,
       "category": "短线选股"
      },
      {
@@ -11697,8 +11725,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603886",
       "name": "元祖股份",
-      "change_pct": 7.692,
-      "price": 12.88,
+      "change_pct": 8.11,
+      "price": 12.93,
       "category": "短线选股"
      },
      {
@@ -11718,8 +11746,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605080",
       "name": "浙江自然",
-      "change_pct": 7.465,
-      "price": 22.89,
+      "change_pct": 7.606,
+      "price": 22.92,
+      "category": "短线选股"
+     },
+     {
+      "code": "688228",
+      "name": "开普云",
+      "change_pct": 8.671,
+      "price": 82.59,
       "category": "短线选股"
      }
     ],
@@ -11727,8 +11762,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "000513",
       "name": "丽珠集团",
-      "change_pct": 5.413,
-      "price": 28.43,
+      "change_pct": 5.302,
+      "price": 28.4,
       "category": "强势股"
      },
      {
@@ -11741,8 +11776,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603051",
       "name": "鹿山新材",
-      "change_pct": 4.31,
-      "price": 23.72,
+      "change_pct": 4.046,
+      "price": 23.66,
       "category": "强势股"
      },
      {
@@ -11755,8 +11790,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603886",
       "name": "元祖股份",
-      "change_pct": 7.692,
-      "price": 12.88,
+      "change_pct": 8.11,
+      "price": 12.93,
       "category": "强势股"
      },
      {
@@ -11776,8 +11811,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "605080",
       "name": "浙江自然",
-      "change_pct": 7.465,
-      "price": 22.89,
+      "change_pct": 7.606,
+      "price": 22.92,
+      "category": "强势股"
+     },
+     {
+      "code": "688228",
+      "name": "开普云",
+      "change_pct": 8.671,
+      "price": 82.59,
       "category": "强势股"
      }
     ]
