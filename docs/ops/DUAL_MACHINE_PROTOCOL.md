@@ -143,3 +143,45 @@
   ```
 - **判读纪律**：`check` 里 `local_unpublished_count > 0` 是**正常**的（工作区本就有活）；
   只有 `silently_clobbered` 非空才是事故。
+
+---
+
+## 6. 逻辑详解页 · 双机分段协作协议（v3 · 2026-10-26 主人令）
+
+> **主人原话**：「逻辑详解页要你和小九**重写协议，不要覆盖对方**，但又能**修改好后马上上线**。」
+> 载体：私享目录 `E:/Nutstore/v8_logic_private/`（**不进公网/Pages**）。
+> 机件：`tools/logic_page_sync.py`（仓库版，双机同源）；协议卡：该目录 `逻辑详解页协作协议.md`。
+
+### 6.1 病根（机制原因）
+
+`logic.full.html` 是 **790,208 字节 / 8,960 行单文件**，双机经坚果云同步。
+双方"整份保存"⇒ 同步盘只能**整份 last-writer-wins** ⇒ 后保存者吃掉对方改动。
+旧护栏 `guard_logic_full.py` 仅校验「≥300000 字节 + 禁删标记」，
+**227 行（几 KB）的改动它完全无感** —— 这是"改好了第二天没了"的真实机制。
+
+### 6.2 新协议：段 = 文件
+
+| 项 | 规定 |
+|---|---|
+| 结构 | `sections/000_head.html` + `001..104`（每段 = 原一个 `<div class="card">`）+ `999_tail.html` + `manifest.json` |
+| 可逆自证 | `build` 重建 == 原文件 **sha256 逐字节一致**（`e7d8aefebfe2`，790,208 B，已实测） |
+| 唯一可改处 | `sections/*.html`（单段几 KB）；`logic.full.html` 降级为**构建产物，禁直接编辑** |
+| 立即上线 | 改完 `build` → 原子重建 → 本机双击 `open_logic_detail.bat` 即见；对侧 `启动分段守卫.bat`（watch）自动重建 |
+| 同段冲突 | `conflicts` 检出 → `merge` **并排保留双方**（`nolost-conflict` 标记 + 时间戳）→ **先上线后收口**，绝不整段替换 |
+| 私享边界 | 内容**绝不进公开仓库/Pages**；仓库只放 `tools/logic_page_sync.py` 工具本体 |
+
+### 6.3 硬纪律
+
+1. ❌ 直接编辑/保存 `logic.full.html` = 回到旧坑。
+2. ❌ 删段、重排 `manifest.json` 顺序 = 页面错乱；新增走追加。
+3. ✅ 改完必须 `build`，否则等于没改。
+4. ✅ 双方不再互问"改完没"：段文件本身即分工边界，`conflicts`/`merge` 即收口机制。
+
+### 6.4 复核（双机通用）
+
+```bash
+python3 tools/logic_page_sync.py status     # 段数（应 104 + head/tail）
+python3 tools/logic_page_sync.py verify     # 缺失 0
+python3 tools/logic_page_sync.py conflicts  # 期望：未发现冲突副本
+python3 tools/logic_page_sync.py build      # 需重建时
+```

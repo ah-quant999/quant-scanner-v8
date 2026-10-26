@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-26 09:00"
+  updated: "2026-10-26 09:12"
   updated_by: 阿狸咪的工程师
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,8 +34,31 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 169
+  next_id_seq: 170
 items:
+  - id: logic-page-section-protocol-1026
+    owner: shared（阿狸咪的工程师落码 · 小九接入）
+    priority: P0
+    status: pending-verify
+    created: 2026-10-26
+    title: 逻辑详解页分段协作协议落地（不覆盖对方 + 改完立即生效）
+    note: >
+      主人令「逻辑详解页要你和小九重写协议，不要覆盖对方，但又能修改好后马上上线」。
+      病根：logic.full.html 单文件 790,208B/8,960 行，双机坚果云同步整份 last-writer-wins
+      ⇒ 后保存者吃掉对方改动；旧护栏 guard_logic_full.py 只校验 ≥300000B + 禁删标记，
+      227 行改动完全无感（这就是「改好了第二天没了」的机制）。
+      落地：tools/logic_page_sync.py 把 790KB 按 div.card 切成 104 段 + head/tail，
+      可逆自证 sha256 逐字节一致（e7d8aefebfe2 / 790,208B）；此后只改 sections/*.html
+      （单段几 KB，物理上不可能互相覆盖）；build 原子重建即刻可见；
+      同段冲突走 conflicts→merge「并排保留双方 + 先上线后收口」。
+      协议原文 docs/ops/DUAL_MACHINE_PROTOCOL.md §6；私享目录内另有协议卡。
+      内容不进公开仓库/Pages，仓库只放工具本体。
+    verify_how: >
+      待验：① 小九侧 pull 后 logic_page_sync.py status 段数 104、verify 缺失 0；
+      ② 双方各改不同段 → build 后互不覆盖且都能看到对方内容；
+      ③ 人为造同段冲突副本 → conflicts 检出、merge 并排保留并自动上线。
+    updated: "2026-10-26 09:12"
+    updated_by: 阿狸咪的工程师
   - id: nolost-protocol-v2-1026
     owner: shared（阿狸咪的工程师落码 · 小九复核）
     priority: P0
