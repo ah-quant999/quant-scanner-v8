@@ -2221,10 +2221,32 @@ def main():
     if VETO_COUNT:
         print(f"  ⛔ 质差一票否决合计: {VETO_COUNT} 只（ST/当期亏损/营收崩塌，未进评分）")
 
+    # 🔴 2026-10-26 主人令·高信念输出（仅金钻+缠论共振，不凑数、且全量吐出）：
+    #   诊断(by_signal 1,1,0,0) 实证全市场唯一正 edge 组合：T+10 +4.64% / 胜率 61.9%（n=171）；
+    #   jinzuan / jigou / trend 单维或负组合均负期望，旧逻辑却把它们顶进 TOP10 前排。
+    #   V8_HIGH_CONVICTION 默认开（"1"）：只在 scored 中保留「chan & jinzuan」共振票（金钻+缠论），
+    #   按 total_score 降序【全量输出】，V8_HC_CAP=0（默认）即不限只数——主人令「好票我就都要」；
+    #   共振数为 0 时自然空仓（坏行情不硬凑）。设 V8_HIGH_CONVICTION=0 回退传统 top20 评分口径。
+    _hc = os.environ.get("V8_HIGH_CONVICTION", "1").strip() == "1"
+    _hc_cap = int(os.environ.get("V8_HC_CAP", "0"))
+    _hc_limit = _hc_cap if _hc_cap > 0 else None  # None=全量
+    _SELECTION_MODE = "top20_score"
+    if _hc:
+        _reso = [s for s in scored
+                 if (s.get("breakdown", {}).get("signals", {}) or {}).get("jinzuan")
+                 and (s.get("breakdown", {}).get("signals", {}) or {}).get("chan")]
+        _reso.sort(key=lambda x: -x["total_score"])
+        scored = _reso if _hc_limit is None else _reso[:_hc_limit]
+        _SELECTION_MODE = "high_conviction_resonance"
+        _cap_txt = f"前 {_hc_limit} 只" if _hc_limit else "全量"
+        print(f"  🎯 高信念模式（默认开）：金钻+缠论共振 {len(_reso)} 只 → 输出{_cap_txt}（不凑数，0 只即空仓）")
+
     # 格式化为简洁输出（含完整评分明细）
     # 🔴 2026-10-23 晚主人令撤销「金池排除港股」：港股照常进因子榜，不排除。
     top10 = []
-    for i, s in enumerate(scored[:20]):
+    # 🔴 2026-10-26 主人令：HC 模式全量吐出共振票；传统模式仍取前 20
+    _out_list = scored if _hc else scored[:20]
+    for i, s in enumerate(_out_list):
         bd = s["breakdown"]
         dt = s["details"]
         top10.append({
@@ -2287,6 +2309,9 @@ def main():
     regime_summary = _meta_model.regime_summary() if _meta_model is not None else {}
     result = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "selection_mode": _SELECTION_MODE,
+        "hc_cap": _hc_limit if _hc else None,
+        "hc_count": len(scored) if _hc else None,
         "total_scored": len(scored),
         "count_80plus": count_80plus,
         "max_score": max_score,
