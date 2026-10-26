@@ -110,6 +110,9 @@ MUST_HAVE_CRON = {
     #   本次三链齐补：名单登记 + run 块 ASCII 化（WindowsPS 5.1 GBK 解码坑）+ 手动补跑验证。
     "v8_morning_plan": "盘前预案生成器(工作日07:50·cn runner)",
     "v8_national_team": "国家队活跃度生成器(工作日20:50·云端ubuntu)",
+    # 2026-10-26 阿狸咪补登记（门禁 [4/8] 拦截补漏）：小九 08:59 落地的双机零丢失
+    #   协议 v2 守卫链（*/20 cron），入库时漏本名单 ⇒ build_deploy 午间档起连红。
+    "v8_nolost_guard": "双机零丢失协议v2守卫(*/20·双机轮值)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────
