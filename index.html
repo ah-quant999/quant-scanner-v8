@@ -8683,6 +8683,8 @@ window.__renderIndexObserve = function(){
              原表仍标绿点 ACTIVE 属误导；改为灰色「已下线」，保留行以存历史 -->
         <tr><td>v8_cn_fetch_watchdog</td><td>盘中每 15 分(8:07-15:52)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td><b>唯一状态型兜底</b>：陈旧 &gt;45min 才动手派发；其余一概不新增派发者（2026-09-10 派发源收敛铁律）</td></tr>
         <tr><td>v8_health_patrol</td><td>每小时 :08/:38</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>数据健康巡检 + 自愈（v8_health_check.py --heal）；陈旧阈值 2026-09-10 由 6 分调为 30 分</td></tr>
+        <!-- ✅ 2026-10-26 阿狸咪补登记：小九 9ec1c0dbf 新建 v8_nolost_guard（*/20 cron）漏双登记 ⇒ build_deploy [4/8] 午间档起连红 -->
+        <tr><td>v8_nolost_guard</td><td>每 20 分(全天·双机轮值)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>双机零丢失协议 v2 守卫：核对双机账本，只补「推前有/推后无」的路径缺失，不回滚内容变更</td></tr>
         <tr><td>v8_algo_cloud</td><td>16:40/18:10/20:00/21:00(+22:30/00:30/06:00/08:00)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产（选股四模块+回测）</td></tr>
         <tr><td>v8_backup</td><td>每日23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data / 交接文档（含 v6 备份保留策略：v8 稳定一周前不删）</td></tr>
         <!-- ✅ 2026-10-01 主人令「全面审计」：14 条有 cron 但此前漏登记的 workflow 补齐（周期均按 yml cron 实测换算 CST） -->
@@ -8756,6 +8758,9 @@ window.__renderIndexObserve = function(){
            · v8_cn_fetch / v8_algo / v8_sync_v6_data / v8_sync_legacy —— 文件早已不存在 → 删除死登记
            · v8_cn_fetch_intraday_lemoncat —— 事实有 14 条 cron（旧注释归 ALLOW 属分类错误）→ 归回 MUST
            · v8_cn_fetch_experiments —— 有 16:30 cron 且已文档化 → 由 ALLOW 升入 MUST
+         2026-10-26 阿狸咪补登记（小九 9ec1c0dbf 新建 v8_nolost_guard */20 cron 漏双登记 ⇒
+           build_deploy [4/8] 午间档起连红）：
+           v8_nolost_guard —— 双机零丢失协议 v2 守卫（*/20·双机轮值）
          —— 让 align_logic_ops.py 校验 = 0 漂移 -->
     <!-- 2026-08-30 主人令：opTab4（已下架）已随「已下架」提升为一级 nav 而删除，避免重复显示 -->
 
