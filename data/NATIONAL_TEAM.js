@@ -1,8 +1,8 @@
 window.NATIONAL_TEAM = {
-  "data_date": "2026-10-26",
-  "update_time": "2026-10-26 21:42:07",
-  "source_time": "2026-10-26 20:57",
-  "score": 46.1,
+  "data_date": "2026-10-27",
+  "update_time": "2026-10-27 02:53:08",
+  "source_time": "2026-10-27 00:33",
+  "score": 46.6,
   "verdict": "中性",
   "verdict_color": "#38bdf8",
   "ready_count": 2,
@@ -22,9 +22,9 @@ window.NATIONAL_TEAM = {
       "name": "大金融相对强度",
       "weight": 35,
       "ready": true,
-      "value": -1.56,
+      "value": -1.37,
       "unit": "%",
-      "detail": "大金融 relative_5d 均值 -1.56%（保险/多元金融/银行/证券）",
+      "detail": "大金融 relative_5d 均值 -1.37%（保险/多元金融/银行/证券）",
       "status": "❌弱势"
     },
     {
@@ -50,5 +50,5 @@ window.NATIONAL_TEAM = {
   ],
   "method": "3 子信号加权（缺失项权重重分）；宽基ETF净申购45% + 大金融相对强度35% + 大金融资金净流入20%；汇金持仓季报未接入。",
   "disclaimer": "代理推算·非汇金官方实时持仓；宽基ETF净申购为最强国资托盘指纹，但披露存 T+1 滞后，仅作 regime 参考，不构成交易建议。",
-  "oneline": "综合 46.1（中性）：大金融弱势，大金融资金净流入 0.8 亿。"
+  "oneline": "综合 46.6（中性）：大金融弱势，大金融资金净流入 0.8 亿。"
 };
