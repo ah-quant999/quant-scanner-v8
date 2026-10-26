@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-26 21:04",
- "generated": "2026-10-26 21:04",
+ "update_time": "2026-10-26 21:20",
+ "generated": "2026-10-26 21:20",
  "meta": {
-  "generated": "2026-10-26 21:04",
+  "generated": "2026-10-26 21:20",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 28,
   "days_with_consensus": 0,
@@ -11488,20 +11488,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "688787",
-      "name": "海天瑞声",
-      "change_pct": 3.071,
-      "price": 145.33,
-      "category": "突破"
-     },
-     {
-      "code": "688071",
-      "name": "华依科技",
-      "change_pct": 11.827,
-      "price": 53.14,
-      "category": "突破"
-     },
-     {
       "code": "002702",
       "name": "海欣食品",
       "change_pct": 3.643,
@@ -11516,10 +11502,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "605488",
-      "name": "福莱新材",
-      "change_pct": 10.013,
-      "price": 41.97,
+      "code": "601857",
+      "name": "中国石油",
+      "change_pct": 4.941,
+      "price": 13.38,
       "category": "突破"
      },
      {
@@ -11565,17 +11551,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "601857",
-      "name": "中国石油",
-      "change_pct": 4.941,
-      "price": 13.38,
-      "category": "突破"
-     },
-     {
       "code": "000829",
       "name": "天音控股",
       "change_pct": 6.448,
       "price": 9.08,
+      "category": "突破"
+     },
+     {
+      "code": "300760",
+      "name": "迈瑞医疗",
+      "change_pct": 3.632,
+      "price": 183.74,
+      "category": "突破"
+     },
+     {
+      "code": "002184",
+      "name": "海得控制",
+      "change_pct": 3.836,
+      "price": 11.37,
       "category": "突破"
      },
      {
@@ -11586,10 +11579,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "688228",
-      "name": "开普云",
-      "change_pct": 8.671,
-      "price": 82.59,
+      "code": "001979",
+      "name": "招商蛇口",
+      "change_pct": 8.079,
+      "price": 8.16,
+      "category": "突破"
+     },
+     {
+      "code": "688271",
+      "name": "联影医疗",
+      "change_pct": 3.842,
+      "price": 116.49,
+      "category": "突破"
+     },
+     {
+      "code": "000559",
+      "name": "万向钱潮",
+      "change_pct": 10.043,
+      "price": 12.71,
       "category": "突破"
      }
     ],
@@ -11599,20 +11606,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "大业股份",
       "change_pct": 8.083,
       "price": 17.25,
-      "category": "加速"
-     },
-     {
-      "code": "688787",
-      "name": "海天瑞声",
-      "change_pct": 3.071,
-      "price": 145.33,
-      "category": "加速"
-     },
-     {
-      "code": "688071",
-      "name": "华依科技",
-      "change_pct": 11.827,
-      "price": 53.14,
       "category": "加速"
      },
      {
@@ -11630,10 +11623,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "605488",
-      "name": "福莱新材",
-      "change_pct": 10.013,
-      "price": 41.97,
+      "code": "601857",
+      "name": "中国石油",
+      "change_pct": 4.941,
+      "price": 13.38,
       "category": "加速"
      },
      {
@@ -11653,20 +11646,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "688787",
-      "name": "海天瑞声",
-      "change_pct": 3.071,
-      "price": 145.33,
-      "category": "短线选股"
-     },
-     {
-      "code": "688071",
-      "name": "华依科技",
-      "change_pct": 11.827,
-      "price": 53.14,
-      "category": "短线选股"
-     },
-     {
       "code": "002702",
       "name": "海欣食品",
       "change_pct": 3.643,
@@ -11681,10 +11660,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "605488",
-      "name": "福莱新材",
-      "change_pct": 10.013,
-      "price": 41.97,
+      "code": "601857",
+      "name": "中国石油",
+      "change_pct": 4.941,
+      "price": 13.38,
       "category": "短线选股"
      },
      {
@@ -11730,17 +11709,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "601857",
-      "name": "中国石油",
-      "change_pct": 4.941,
-      "price": 13.38,
-      "category": "短线选股"
-     },
-     {
       "code": "000829",
       "name": "天音控股",
       "change_pct": 6.448,
       "price": 9.08,
+      "category": "短线选股"
+     },
+     {
+      "code": "300760",
+      "name": "迈瑞医疗",
+      "change_pct": 3.632,
+      "price": 183.74,
+      "category": "短线选股"
+     },
+     {
+      "code": "002184",
+      "name": "海得控制",
+      "change_pct": 3.836,
+      "price": 11.37,
       "category": "短线选股"
      },
      {
@@ -11751,10 +11737,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "688228",
-      "name": "开普云",
-      "change_pct": 8.671,
-      "price": 82.59,
+      "code": "001979",
+      "name": "招商蛇口",
+      "change_pct": 8.079,
+      "price": 8.16,
+      "category": "短线选股"
+     },
+     {
+      "code": "688271",
+      "name": "联影医疗",
+      "change_pct": 3.842,
+      "price": 116.49,
+      "category": "短线选股"
+     },
+     {
+      "code": "000559",
+      "name": "万向钱潮",
+      "change_pct": 10.043,
+      "price": 12.71,
       "category": "短线选股"
      }
     ],
@@ -11795,17 +11795,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "601857",
-      "name": "中国石油",
-      "change_pct": 4.941,
-      "price": 13.38,
-      "category": "强势股"
-     },
-     {
       "code": "000829",
       "name": "天音控股",
       "change_pct": 6.448,
       "price": 9.08,
+      "category": "强势股"
+     },
+     {
+      "code": "300760",
+      "name": "迈瑞医疗",
+      "change_pct": 3.632,
+      "price": 183.74,
+      "category": "强势股"
+     },
+     {
+      "code": "002184",
+      "name": "海得控制",
+      "change_pct": 3.836,
+      "price": 11.37,
       "category": "强势股"
      },
      {
@@ -11816,10 +11823,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "688228",
-      "name": "开普云",
-      "change_pct": 8.671,
-      "price": 82.59,
+      "code": "001979",
+      "name": "招商蛇口",
+      "change_pct": 8.079,
+      "price": 8.16,
+      "category": "强势股"
+     },
+     {
+      "code": "688271",
+      "name": "联影医疗",
+      "change_pct": 3.842,
+      "price": 116.49,
+      "category": "强势股"
+     },
+     {
+      "code": "000559",
+      "name": "万向钱潮",
+      "change_pct": 10.043,
+      "price": 12.71,
       "category": "强势股"
      }
     ]
