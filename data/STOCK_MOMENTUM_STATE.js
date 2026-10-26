@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-26 23:59",
- "generated": "2026-10-26 23:59",
+ "update_time": "2026-10-27 00:08",
+ "generated": "2026-10-27 00:08",
  "meta": {
-  "generated": "2026-10-26 23:59",
+  "generated": "2026-10-27 00:08",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 28,
+  "total_days": 29,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -11478,6 +11478,377 @@ window.STOCK_MOMENTUM_STATE = (function() {
   },
   {
    "date": "2026-10-26",
+   "categories": {
+    "突破": [
+     {
+      "code": "603278",
+      "name": "大业股份",
+      "change_pct": 8.083,
+      "price": 17.25,
+      "category": "突破"
+     },
+     {
+      "code": "002702",
+      "name": "海欣食品",
+      "change_pct": 3.643,
+      "price": 5.69,
+      "category": "突破"
+     },
+     {
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 7.907,
+      "price": 2.32,
+      "category": "突破"
+     },
+     {
+      "code": "601857",
+      "name": "中国石油",
+      "change_pct": 4.941,
+      "price": 13.38,
+      "category": "突破"
+     },
+     {
+      "code": "300307",
+      "name": "慈星股份",
+      "change_pct": 4.81,
+      "price": 9.37,
+      "category": "突破"
+     },
+     {
+      "code": "000513",
+      "name": "丽珠集团",
+      "change_pct": 5.302,
+      "price": 28.4,
+      "category": "突破"
+     },
+     {
+      "code": "605003",
+      "name": "众望布艺",
+      "change_pct": 3.614,
+      "price": 24.08,
+      "category": "突破"
+     },
+     {
+      "code": "603051",
+      "name": "鹿山新材",
+      "change_pct": 4.046,
+      "price": 23.66,
+      "category": "突破"
+     },
+     {
+      "code": "600838",
+      "name": "上海九百",
+      "change_pct": 10.0,
+      "price": 12.1,
+      "category": "突破"
+     },
+     {
+      "code": "603886",
+      "name": "元祖股份",
+      "change_pct": 8.11,
+      "price": 12.93,
+      "category": "突破"
+     },
+     {
+      "code": "000829",
+      "name": "天音控股",
+      "change_pct": 6.448,
+      "price": 9.08,
+      "category": "突破"
+     },
+     {
+      "code": "300760",
+      "name": "迈瑞医疗",
+      "change_pct": 3.632,
+      "price": 183.74,
+      "category": "突破"
+     },
+     {
+      "code": "002184",
+      "name": "海得控制",
+      "change_pct": 3.836,
+      "price": 11.37,
+      "category": "突破"
+     },
+     {
+      "code": "605080",
+      "name": "浙江自然",
+      "change_pct": 7.606,
+      "price": 22.92,
+      "category": "突破"
+     },
+     {
+      "code": "001979",
+      "name": "招商蛇口",
+      "change_pct": 8.079,
+      "price": 8.16,
+      "category": "突破"
+     },
+     {
+      "code": "688271",
+      "name": "联影医疗",
+      "change_pct": 3.842,
+      "price": 116.49,
+      "category": "突破"
+     },
+     {
+      "code": "000559",
+      "name": "万向钱潮",
+      "change_pct": 10.043,
+      "price": 12.71,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "603278",
+      "name": "大业股份",
+      "change_pct": 8.083,
+      "price": 17.25,
+      "category": "加速"
+     },
+     {
+      "code": "002702",
+      "name": "海欣食品",
+      "change_pct": 3.643,
+      "price": 5.69,
+      "category": "加速"
+     },
+     {
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 7.907,
+      "price": 2.32,
+      "category": "加速"
+     },
+     {
+      "code": "601857",
+      "name": "中国石油",
+      "change_pct": 4.941,
+      "price": 13.38,
+      "category": "加速"
+     },
+     {
+      "code": "300307",
+      "name": "慈星股份",
+      "change_pct": 4.81,
+      "price": 9.37,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "603278",
+      "name": "大业股份",
+      "change_pct": 8.083,
+      "price": 17.25,
+      "category": "短线选股"
+     },
+     {
+      "code": "002702",
+      "name": "海欣食品",
+      "change_pct": 3.643,
+      "price": 5.69,
+      "category": "短线选股"
+     },
+     {
+      "code": "000056",
+      "name": "*ST皇庭",
+      "change_pct": 7.907,
+      "price": 2.32,
+      "category": "短线选股"
+     },
+     {
+      "code": "601857",
+      "name": "中国石油",
+      "change_pct": 4.941,
+      "price": 13.38,
+      "category": "短线选股"
+     },
+     {
+      "code": "300307",
+      "name": "慈星股份",
+      "change_pct": 4.81,
+      "price": 9.37,
+      "category": "短线选股"
+     },
+     {
+      "code": "000513",
+      "name": "丽珠集团",
+      "change_pct": 5.302,
+      "price": 28.4,
+      "category": "短线选股"
+     },
+     {
+      "code": "605003",
+      "name": "众望布艺",
+      "change_pct": 3.614,
+      "price": 24.08,
+      "category": "短线选股"
+     },
+     {
+      "code": "603051",
+      "name": "鹿山新材",
+      "change_pct": 4.046,
+      "price": 23.66,
+      "category": "短线选股"
+     },
+     {
+      "code": "600838",
+      "name": "上海九百",
+      "change_pct": 10.0,
+      "price": 12.1,
+      "category": "短线选股"
+     },
+     {
+      "code": "603886",
+      "name": "元祖股份",
+      "change_pct": 8.11,
+      "price": 12.93,
+      "category": "短线选股"
+     },
+     {
+      "code": "000829",
+      "name": "天音控股",
+      "change_pct": 6.448,
+      "price": 9.08,
+      "category": "短线选股"
+     },
+     {
+      "code": "300760",
+      "name": "迈瑞医疗",
+      "change_pct": 3.632,
+      "price": 183.74,
+      "category": "短线选股"
+     },
+     {
+      "code": "002184",
+      "name": "海得控制",
+      "change_pct": 3.836,
+      "price": 11.37,
+      "category": "短线选股"
+     },
+     {
+      "code": "605080",
+      "name": "浙江自然",
+      "change_pct": 7.606,
+      "price": 22.92,
+      "category": "短线选股"
+     },
+     {
+      "code": "001979",
+      "name": "招商蛇口",
+      "change_pct": 8.079,
+      "price": 8.16,
+      "category": "短线选股"
+     },
+     {
+      "code": "688271",
+      "name": "联影医疗",
+      "change_pct": 3.842,
+      "price": 116.49,
+      "category": "短线选股"
+     },
+     {
+      "code": "000559",
+      "name": "万向钱潮",
+      "change_pct": 10.043,
+      "price": 12.71,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "000513",
+      "name": "丽珠集团",
+      "change_pct": 5.302,
+      "price": 28.4,
+      "category": "强势股"
+     },
+     {
+      "code": "605003",
+      "name": "众望布艺",
+      "change_pct": 3.614,
+      "price": 24.08,
+      "category": "强势股"
+     },
+     {
+      "code": "603051",
+      "name": "鹿山新材",
+      "change_pct": 4.046,
+      "price": 23.66,
+      "category": "强势股"
+     },
+     {
+      "code": "600838",
+      "name": "上海九百",
+      "change_pct": 10.0,
+      "price": 12.1,
+      "category": "强势股"
+     },
+     {
+      "code": "603886",
+      "name": "元祖股份",
+      "change_pct": 8.11,
+      "price": 12.93,
+      "category": "强势股"
+     },
+     {
+      "code": "000829",
+      "name": "天音控股",
+      "change_pct": 6.448,
+      "price": 9.08,
+      "category": "强势股"
+     },
+     {
+      "code": "300760",
+      "name": "迈瑞医疗",
+      "change_pct": 3.632,
+      "price": 183.74,
+      "category": "强势股"
+     },
+     {
+      "code": "002184",
+      "name": "海得控制",
+      "change_pct": 3.836,
+      "price": 11.37,
+      "category": "强势股"
+     },
+     {
+      "code": "605080",
+      "name": "浙江自然",
+      "change_pct": 7.606,
+      "price": 22.92,
+      "category": "强势股"
+     },
+     {
+      "code": "001979",
+      "name": "招商蛇口",
+      "change_pct": 8.079,
+      "price": 8.16,
+      "category": "强势股"
+     },
+     {
+      "code": "688271",
+      "name": "联影医疗",
+      "change_pct": 3.842,
+      "price": 116.49,
+      "category": "强势股"
+     },
+     {
+      "code": "000559",
+      "name": "万向钱潮",
+      "change_pct": 10.043,
+      "price": 12.71,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-10-27",
    "categories": {
     "突破": [
      {
