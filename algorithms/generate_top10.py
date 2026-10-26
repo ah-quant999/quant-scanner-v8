@@ -34,6 +34,41 @@ WORKSPACE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(WORKSPACE, "..", "raw_data")
 OUTPUT = os.path.join(DATA_DIR, "top10_daily.json")
 
+# 2026-10-26 主人令·行业上限（基石9补完）：加载 code→industry 映射，给每只 top 票补 industry 字段，
+# 供前端执行卡做「同行业合计 ≤30%」仓位约束；并在产物附带 industry_exposure 透明度。
+_INDUSTRY_MAP = None
+def _load_industry_map():
+    global _INDUSTRY_MAP
+    if _INDUSTRY_MAP is not None:
+        return _INDUSTRY_MAP
+    p = os.path.join(BASE, "stock_industry_concepts.json")
+    _INDUSTRY_MAP = {}
+    try:
+        with open(p, "r", encoding="utf-8") as _f:
+            _INDUSTRY_MAP = json.load(_f) or {}
+        print(f"  行业映射已加载：{len(_INDUSTRY_MAP)} 只")
+    except Exception as _e:
+        print(f"  行业映射加载失败（行业上限将跳过）: {_e}")
+    return _INDUSTRY_MAP
+
+def _industry_of(code):
+    m = _load_industry_map()
+    rec = m.get(str(code)) if m else None
+    if isinstance(rec, dict):
+        ind = rec.get("industry")
+        if ind:
+            return ind
+    return ""
+
+def _industry_exposure(top10):
+    exp = {}
+    for s in (top10 or []):
+        ind = s.get("industry") or "未知"
+        exp[ind] = exp.get(ind, 0) + 1
+    n = len(top10) or 1
+    return [{"industry": k, "count": v, "pct": round(v / n * 100, 1)} for k, v in
+            sorted(exp.items(), key=lambda kv: -kv[1])]
+
 # ── 归一化分母（2026-08-28 校准，勿改回 250）─────────────────────────────────
 # 原值 250 是【理论上限】累加值，但实测 46 天 756 个信号的 raw_total 分布是
 #   P50=69  P75=78  P90=88  P95=93  P99=100  MAX=106
@@ -2209,6 +2244,7 @@ def main():
             "regime_open": s.get("regime_open", False),
             "regime_adjust": s.get("regime_adjust", 1.0),
             "sectors": s["sectors"],
+            "industry": _industry_of(s["code"]),
             "stop_loss": s["stop_loss"],
             "target_price": s["target_price"],
             "stop_loss_method": s.get("stop_loss_method", ""),
@@ -2277,6 +2313,8 @@ def main():
             "applied_to": "ge3 (generate_top10)",
         },
         "top10": top10,
+        # 2026-10-26 主人令·行业上限：top 行业集中度透明度（前端执行卡据此做 ≤30% 约束）
+        "industry_exposure": _industry_exposure(top10),
         # 🔴 2026-10-17 审计修复：本轮评分维度上游缺失清单（空=全源正常）。
         #   消费者（前端「每日因子计算」/最终推荐页）可据此把该维度显示为「无数据」，
         #   杜绝「数据缺失」被读成「数据差」。打分数学未变（见 _dim_src_empty 处注释）。
