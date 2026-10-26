@@ -1,5 +1,5 @@
 {
- "update_time": "2026-10-25 09:19:29",
+ "update_time": "2026-10-26 20:16:31",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
@@ -9,7 +9,7 @@
   "n_stocks": 320,
   "signal_date_range": [
    "2026-06-06",
-   "2026-10-24"
+   "2026-10-25"
   ]
  },
  "stocks": [
@@ -542,7 +542,7 @@
     "top10"
    ],
    "first_seen": "2026-07-24",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": true,
    "horizons": {
     "1": {
@@ -673,7 +673,7 @@
     "top10"
    ],
    "first_seen": "2026-08-07",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": true,
    "horizons": {
     "1": {
@@ -863,13 +863,14 @@
   {
    "code": "603186",
    "name": "华正新材",
-   "n_signals": 8,
+   "n_signals": 9,
    "kinds": [
+    "final",
     "top10"
    ],
    "first_seen": "2026-08-25",
-   "last_seen": "2026-10-24",
-   "is_final": false,
+   "last_seen": "2026-10-25",
+   "is_final": true,
    "horizons": {
     "1": {
      "n": 5,
@@ -998,7 +999,7 @@
     "top10"
    ],
    "first_seen": "2026-09-09",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -1063,7 +1064,7 @@
     "top10"
    ],
    "first_seen": "2026-07-20",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -1123,14 +1124,13 @@
   {
    "code": "301511",
    "name": "德福科技",
-   "n_signals": 6,
+   "n_signals": 5,
    "kinds": [
-    "final",
     "top10"
    ],
    "first_seen": "2026-08-28",
-   "last_seen": "2026-10-24",
-   "is_final": true,
+   "last_seen": "2026-10-25",
+   "is_final": false,
    "horizons": {
     "1": {
      "n": 2,
@@ -1260,7 +1260,7 @@
     "top10"
    ],
    "first_seen": "2026-09-11",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": true,
    "horizons": {
     "1": {
@@ -1325,7 +1325,7 @@
     "top10"
    ],
    "first_seen": "2026-07-27",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -1521,7 +1521,7 @@
     "top10"
    ],
    "first_seen": "2026-09-08",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -1586,7 +1586,7 @@
     "top10"
    ],
    "first_seen": "2026-07-28",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -1716,7 +1716,7 @@
     "top10"
    ],
    "first_seen": "2026-08-07",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2106,7 +2106,7 @@
     "top10"
    ],
    "first_seen": "2026-06-11",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2171,7 +2171,7 @@
     "top10"
    ],
    "first_seen": "2026-07-17",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2301,7 +2301,7 @@
     "top10"
    ],
    "first_seen": "2026-07-20",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2491,12 +2491,12 @@
   {
    "code": "002636",
    "name": "金安国纪",
-   "n_signals": 20,
+   "n_signals": 21,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-07-22",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -2941,7 +2941,7 @@
     "top10"
    ],
    "first_seen": "2026-08-07",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -3001,12 +3001,12 @@
   {
    "code": "688037",
    "name": "芯源微",
-   "n_signals": 2,
+   "n_signals": 3,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-09-14",
-   "last_seen": "2026-10-23",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -3071,7 +3071,7 @@
     "top10"
    ],
    "first_seen": "2026-07-17",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -3196,12 +3196,12 @@
   {
    "code": "300657",
    "name": "弘信电子",
-   "n_signals": 2,
+   "n_signals": 3,
    "kinds": [
     "top10"
    ],
    "first_seen": "2026-09-12",
-   "last_seen": "2026-09-13",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -3456,7 +3456,7 @@
   {
    "code": "300033",
    "name": "同花顺",
-   "n_signals": 9,
+   "n_signals": 8,
    "kinds": [
     "final",
     "top10"
@@ -3592,7 +3592,7 @@
     "top10"
    ],
    "first_seen": "2026-08-24",
-   "last_seen": "2026-10-24",
+   "last_seen": "2026-10-25",
    "is_final": false,
    "horizons": {
     "1": {
@@ -6552,7 +6552,7 @@
   {
    "code": "300054",
    "name": "鼎龙股份",
-   "n_signals": 9,
+   "n_signals": 8,
    "kinds": [
     "final",
     "top10"
@@ -6673,7 +6673,7 @@
   {
    "code": "301666",
    "name": "大普微",
-   "n_signals": 3,
+   "n_signals": 2,
    "kinds": [
     "top10"
    ],
