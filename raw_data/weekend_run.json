@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-10-27 05:03:39",
-  "generated": "2026-10-27 05:03:39",
+  "update_time": "2026-10-27 06:20:51",
+  "generated": "2026-10-27 06:20:51",
   "period_start": "2026-10-19",
   "period_end": "2026-10-25",
   "stats": {
@@ -23,7 +23,7 @@
       "file": "top10_daily.json",
       "label": "TOP10推荐池",
       "status": "ok",
-      "update_time": "2026-10-27 04:52:49",
+      "update_time": "2026-10-27 06:10:12",
       "size_kb": 102.2
     },
     {
@@ -44,7 +44,7 @@
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-10-27 04:49:58",
+      "update_time": "2026-10-27 06:07:32",
       "size_kb": 2889.9
     },
     {
