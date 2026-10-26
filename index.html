@@ -2050,11 +2050,11 @@ window.STRATEGY_WALKFORWARD = {
 <main>
   <!-- ============ 🏆 最终推荐（2026-08-08 新建：全站唯一买卖决策入口） ============ -->
   <section id="sec-final" class="active">
-    <div class="sec-head"><h2>🏆 最终推荐</h2><span class="tag" id="finalHeaderTag">因子积分榜同序同分 · Top3 · --</span></div>
+    <div class="sec-head"><h2>🏆 最终推荐</h2><span class="tag" id="finalHeaderTag">因子积分榜同序同分 · Top5 · --</span></div>
 
     <!-- 子 Tab 导航 -->
     <div class="final-tabs" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-      <button class="final-tab active" data-final="rec" onclick="switchFinalTab('rec')">🏆 最终推荐 · Top3</button>
+      <button class="final-tab active" data-final="rec" onclick="switchFinalTab('rec')">🏆 最终推荐 · Top5</button>
       <button class="final-tab" data-final="cand" onclick="switchFinalTab('cand')">🎯 今日推荐候选池</button>
       <button class="final-tab" data-final="fa" onclick="switchFinalTab('fa')">🧪 因子实验室 <span style="font-size:10px;color:var(--dim);">非策略·加分项</span></button>
       <!-- 2026-10-25 主人令：本页只留「选哪几只」——
@@ -2062,7 +2062,7 @@ window.STRATEGY_WALKFORWARD = {
            「🎯 选股策略 → 📌 最终跟踪」子页（pane id=st-track），懒加载与数据源不变。 -->
     </div>
 
-    <!-- 子 Pane：最终推荐 Top3（2026-09-20 主人令唯一口径；🔴 2026-10-20 主人令「要口径和评分都一致」重申并废止 10-14 混排竞位）
+    <!-- 子 Pane：最终推荐 Top5（2026-09-20 主人令唯一口径；🔴 2026-10-20 主人令「要口径和评分都一致」重申并废止 10-14 混排竞位；🔴 2026-10-27 主人令：保留 Top5，统一口径去掉 Top3 重复展示）
          口径 = 当日因子积分榜（TOP10_DAILY）按 total_score 降序前 3 名，同序同分；
          强势跟踪当日新入选仍入候选池展示，但不凭强度分竞位 Top3（事故：迪安诊断 78.0 插队致两榜对不上）。 -->
     <div id="final-pane-rec" class="final-pane active">
@@ -3303,7 +3303,7 @@ function fmtSigned(v){
         <div id="stFinalSelMore" style="display:none;margin:6px 0 4px;">
           <button id="stFinalSelMoreBtn" onclick="window.toggleStFinalSel()" style="background:transparent;color:#5ee0a0;border:1px solid #5ee0a0;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">▾ 展开全部</button>
         </div>
-        <div class="note">口径：金股池经「金钻+缠论共振」过滤的高信念子集（selection_mode=high_conviction_resonance），由 generate_top10.py 每日盘后产出、按 total_score 降序。本卡 = <b>当日终选输出全量</b>；🏷 Top3 = 本榜总分降序前 3 名（即设计上应推的「最终推荐」）。⚠️ 最终推荐目前为独立管线批次，可能与本榜错批（错批以链闸一致性校验为准）。</div>
+        <div class="note">口径：金股池经「金钻+缠论共振」过滤的高信念子集（selection_mode=high_conviction_resonance），由 generate_top10.py 每日盘后产出、按 total_score 降序。本卡 = <b>当日终选输出全量</b>；🏷 Top5 = 本榜总分降序前 5 名（即设计上应推的「最终推荐」）。⚠️ 最终推荐目前为独立管线批次，可能与本榜错批（错批以链闸一致性校验为准）。</div>
       </div>
       <!-- ===== 2026-09-11 主人令：金股池卡片置于「观测候选股池」上方（数据源 GOLD_POOL）===== -->
       <div class="card" style="border-left:4px solid #fbbf24;">
@@ -7264,12 +7264,12 @@ c.innerHTML = h;
     }
     window.__dsbRetry = 0;
     var FR = window.FINAL_RECOMMEND_DATA || {};
-    // 🔴 2026-10-26 主人令：🏷「最终推荐」标记改用 终选输出 Top3（TOP10_DAILY.top10 按 total_score 降序前3），
+    // 🔴 2026-10-26 主人令：🏷「最终推荐」标记改用 终选输出 Top5（TOP10_DAILY.top10 按 total_score 降序前5）；🔴 2026-10-27 主人令：随最终推荐口径升为 Top5
     //   与「终选输出卡 / 最终推荐页」同源同序；不再依赖可能错批的 FINAL_RECOMMEND_DATA.stocks。
     var _rec = {};
     (function(){
       var _sl = (window.TOP10_DAILY && window.TOP10_DAILY.top10) || [];
-      _sl.slice().sort(function(a,b){ return (Number(b.total_score)||0)-(Number(a.total_score)||0); }).slice(0,3).forEach(function(x){
+      _sl.slice().sort(function(a,b){ return (Number(b.total_score)||0)-(Number(a.total_score)||0); }).slice(0,5).forEach(function(x){
         if(x && x.code != null) _rec[String(x.code).replace(/[^0-9]/g,'')] = true;
       });
     })();
@@ -9020,7 +9020,7 @@ function switchSec(sec,el){
     // 🔴 2026-09-17 主人令「统一口径不要打架」：本页所有静态星级占位统一走委员会
     try{ window.__renderCommitteeStars(); }catch(e){}
   },80);
-  // 最终推荐：进入时渲染 Top3 + 今日可入手候选
+  // 最终推荐：进入时渲染 Top5 + 今日可入手候选
   if(sec==='final' && typeof window.__renderFinalSec==='function') setTimeout(window.__renderFinalSec,60);
   // 个股查询：静态交互，无需渲染；切换时隐藏下拉
   if(sec==='query'){ var dd=document.getElementById('v8QueryDropdown'); if(dd) dd.style.display='none'; }
@@ -12800,7 +12800,7 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'最终推荐·Top3', source:'TOP10_DAILY', freq:'收盘后1次', slots:['19:15','20:15'], note:'因子积分榜前3同序同分（2026-10-20 主人令：口径和评分都一致）'},
+          {name:'最终推荐·Top5', source:'TOP10_DAILY', freq:'收盘后1次', slots:['19:15','20:15'], note:'因子积分榜前5同序同分（2026-10-20 主人令：口径和评分都一致；2026-10-27 升 Top5）'},
 
           {name:'今日推荐候选池聚合', source:'CANDIDATE', freq:'收盘后1次', slots:['2','0',':','0','0'], note:'候选池聚合'},
 
@@ -15133,21 +15133,21 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         + '<span style="color:var(--dim);margin-left:auto;">金股池 → 共振过滤</span>'
         + '</div>';
     }
-    // 列表（Top3 标 🏷）
+    // 列表（Top5 标 🏷）
     const limit = _finalSelExpanded ? arr.length : 12;
-    const top3 = arr.slice(0,3).map(s=>String(s.code));
+    const top5 = arr.slice(0,5).map(s=>String(s.code));
     let h = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;">';
     arr.slice(0, limit).forEach(function(s){
       const code = String(s.code||''), name = s.name||'', board = s.board_label || s.board || '';
       const sc = (typeof s.total_score === 'number') ? s.total_score : 0;
-      const isTop3 = top3.indexOf(code) >= 0;
+      const isTop5 = top5.indexOf(code) >= 0;
       const ind = s.industry || '';
-      h += '<div style="background:var(--card);border:1px solid '+(isTop3?'#5ee0a0':'var(--border)')+';border-radius:6px;padding:6px 10px;font-size:12px;">';
+      h += '<div style="background:var(--card);border:1px solid '+(isTop5?'#5ee0a0':'var(--border)')+';border-radius:6px;padding:6px 10px;font-size:12px;">';
       h += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;row-gap:3px;">';
       h += '<span style="font-weight:700;color:var(--txt);">'+name+'</span>';
       h += '<span style="color:var(--dim);font-size:10px;font-family:monospace;">'+code+'</span>';
       if(board) h += '<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(99,102,241,.15);color:#a5b4fc;">'+board+'</span>';
-      if(isTop3) h += '<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(94,224,160,.18);color:#5ee0a0;font-weight:700;">🏷 Top3</span>';
+      if(isTop5) h += '<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(94,224,160,.18);color:#5ee0a0;font-weight:700;">🏷 Top5</span>';
       h += '<span style="margin-left:auto;font-weight:700;color:#5ee0a0;">'+sc.toFixed(1)+'</span>';
       h += '</div>';
       if(ind) h += '<div style="margin-top:3px;font-size:10.5px;color:var(--dim);">'+ind+'</div>';
@@ -18956,7 +18956,7 @@ window.__renderV8CalToday();
       };
     }
     var _sorted = _tdList.slice().sort(function(a,b){ return (Number(b.total_score)||0)-(Number(a.total_score)||0); });
-    var mainStocks = _sorted.slice(0,3).map(_normTop10).filter(Boolean);
+    var mainStocks = _sorted.slice(0,5).map(_normTop10).filter(Boolean);
     var allStocks  = _sorted.map(_normTop10).filter(Boolean);
     var consStocks = _sorted.slice().sort(function(a,b){ return (Number(b.sig_count)||0)-(Number(a.sig_count)||0); }).slice(0, Math.min(5,_sorted.length)).map(_normTop10).filter(Boolean);
     var strongSec  = (TD && TD.regime_summary && TD.regime_summary.recommended_sectors) ? TD.regime_summary.recommended_sectors.slice(0,8) : [];
@@ -18999,7 +18999,7 @@ window.__renderV8CalToday();
     var n=document.getElementById('finalTopN'); if(n) n.textContent=(mainStocks.length||3);
     var tag=document.getElementById('finalHeaderTag');
     // 🔴 2026-10-20 主人令「要口径和评分都一致」：卡头标签回到唯一口径——
-    //   最终推荐 Top3 = 当日因子积分榜前 3 名（同序同分，一眼对得上）；
+    //   最终推荐 Top5 = 当日因子积分榜前 5 名（同序同分，一眼对得上）；
     //   强势跟踪当日新入选仍入候选池展示，但不凭强度分竞位（10-14 混排形态废止）。
     var _ig=D.ima_intake||{}, _rg=D.realflow_gate||{};
     var _lab='终选输出 Top'+mainStocks.length+'（金钻+缠论共振 · 与候选池/因子积分榜同源同序）'
@@ -19069,7 +19069,9 @@ window.__renderV8CalToday();
 
     // ── 2026-08-13 双轨排名：共振最强（独立于上方分数最强）──
     var cons = window._safeArr(consStocks);
-    if(cons.length && cons.length !== mainStocks.length){
+    var _consCodes = cons.map(function(s){return String(s.code).replace(/[^0-9]/g,'');}).sort().join(',');
+    var _mainCodes = window._safeArr(mainStocks).map(function(s){return String(s.code).replace(/[^0-9]/g,'');}).sort().join(',');
+    if(cons.length && _consCodes !== _mainCodes){
       h+='<div style="margin-top:16px;padding:10px 14px;background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.25);border-radius:10px;">';
       h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
       h+='<span style="font-size:15px;font-weight:800;color:#a78bfa">🔗 共振最强 · Top'+cons.length+'</span>';
