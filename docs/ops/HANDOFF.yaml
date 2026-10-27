@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-27 11:38"
+  updated: "2026-10-27 11:47"
   updated_by: 家用机AI(兜底)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 172
+  next_id_seq: 174
 items:
   - id: logic-page-section-protocol-1026
     owner: shared（阿狸咪的工程师落码 · 小九接入）
@@ -10013,4 +10013,37 @@ items:
       查 data/*.js 时间戳（ls -la --time-style=long-iso data/），确认 DAJIJIN_REDUCTION 等
       原陈旧项已更新至 2026-10-27；或线上 window.DAJIJIN_REDUCTION 的 date 字段为今日。
     updated: "2026-10-27 10:02"
+    updated_by: 家用机AI(兜底)
+  - id: st-track-daily-refresh-1027
+    owner: 小九
+    priority: P3
+    status: todo
+    created: 2026-10-27
+    title: 选股策略页最终跟踪日更（st-track 的 T.generated 依赖 RESONANCE_TRACK.js 每日刷新）
+    note: >
+      2026-10-27 主人令：该事项交接小九。现状：主站「选股策略」页 st-track 面板的 T.generated
+      （数据来源 RESONANCE_TRACK.js 的 generated 字段）现停留 2026-10-26，未日更，致最终跟踪显陈旧。
+      根因：RESONANCE_TRACK.js 依赖 nightly/cn runner 跑批产出，当日未跑则日期不前进。
+      请小九确保 cn runner 每日正常跑批产出 RESONANCE_TRACK.js（含最新 generated 日期），使 st-track 显示当日。
+    verify_how: >
+      线上主站 st-track 面板的 T.generated 显示当日日期（或 RESONANCE_TRACK.js 的 generated 字段=今日）。
+    updated: "2026-10-27 11:47"
+    updated_by: 家用机AI(兜底)
+  - id: email-alert-dedup-rootcause-1027
+    owner: 小九
+    priority: P2
+    status: todo
+    created: 2026-10-27
+    title: 邮件告警根因治理（同失败刷屏→平台层去重+修根因）
+    note: >
+      2026-10-27 主人令：该事项交接小九。现状分析：v8 邮件并未停发，真问题是「同失败刷屏」——
+      同一类失败（盘中数据未上线 / runner FAIL / westock 同步失败 / cn_fetch 风暴）被反复告警，
+      每小时 7-21 推送 2814546@qq.com 造成噪声。根因在云端平台层（WorkBuddy 自动化告警去重缺失），
+      本机仓库零邮件代码，无法从仓库侧根治。请小九：① 先确认四类失败当前是否消除
+      （cn_fetch 风暴已由家用机 AI 10-27 修复 commit 8f97c08ac3；runner/westock 同步需小九侧核查）；
+      ② 若根因确属平台层告警去重，向主人反馈需平台侧开启去重/合并，而非仓库能修；
+      ③ 过渡期可在 WorkBuddy 自动化侧收敛告警频率。完成后置 done 并注明结论。
+    verify_how: >
+      邮件不再对同一类失败重复刷屏（同类失败每日至多 1 封或合并），或已定位根因并给出平台侧修复方案。
+    updated: "2026-10-27 11:47"
     updated_by: 家用机AI(兜底)
