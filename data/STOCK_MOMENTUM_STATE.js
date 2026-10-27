@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-28 01:18",
- "generated": "2026-10-28 01:18",
+ "update_time": "2026-10-28 01:54",
+ "generated": "2026-10-28 01:54",
  "meta": {
-  "generated": "2026-10-28 01:18",
+  "generated": "2026-10-28 01:54",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 30,
   "days_with_consensus": 0,
@@ -12046,13 +12046,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 5.817,
       "price": 125.7,
       "category": "突破"
-     },
-     {
-      "code": "603037",
-      "name": "凯众股份",
-      "change_pct": 10.009,
-      "price": 11.87,
-      "category": "突破"
      }
     ],
     "加速": [
@@ -12155,13 +12148,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 5.817,
       "price": 125.7,
       "category": "短线选股"
-     },
-     {
-      "code": "603037",
-      "name": "凯众股份",
-      "change_pct": 10.009,
-      "price": 11.87,
-      "category": "短线选股"
      }
     ],
     "强势股": [
@@ -12177,13 +12163,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "五洲医疗",
       "change_pct": 5.817,
       "price": 125.7,
-      "category": "强势股"
-     },
-     {
-      "code": "603037",
-      "name": "凯众股份",
-      "change_pct": 10.009,
-      "price": 11.87,
       "category": "强势股"
      }
     ]
