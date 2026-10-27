@@ -594,7 +594,7 @@ def _local_runner_age_min(run_time):
     return (now - dt).total_seconds() / 60.0
 
 
-def load_window_var_newest(source_id, var_name, local_path):
+def load_window_var_newest(source_id, var_name, local_path, raw_file=None):
     """取「线上站点」与「本地文件」两者中时间戳较新的一个。
 
     这是 2026-08-28 一劳永逸修复 HEALTH_CHECK 竞态误报的核心：
@@ -615,6 +615,27 @@ def load_window_var_newest(source_id, var_name, local_path):
     #   非 CI（本机/开发环境）仍保留双源比对，防「本机未 pull 导致误报陈旧」。
     if os.environ.get("GITHUB_ACTIONS") == "true":
         if local_data is not None:
+            # 🛡 2026-10-27 一劳永逸（CN runner1号机·紧急修复）：CI 构建 checkout 未必是最新部署态——
+            #   盘中专用链(v8_stock_quote_refresh 等)会越级直推 main，构建本地 data/*.js 可能滞后；
+            #   raw_file 交叉校验卡(local 来自构建旧快照)比线上已部署更旧时，改取线上较新者，
+            #   杜绝「构建旧快照 → 健康卡误报 11:24」类复发
+            #   (实测 STOCK_QUOTE 13:29 轮: 已部署 13:24 但健康卡判 11:24)。
+            #   仅对 raw_file 卡生效（这些卡有独立刷新链路，可能领先/滞后于构建），不波及普通卡，
+            #   代价≤~17 次站点回源（远小于 2026-08-31 移除前的 108 次全量）。
+            if raw_file:
+                site_data = load_window_var_from_site(source_id, var_name)
+                if site_data is not None:
+                    _ts_keys = ("update_time", "date", "generated", "generated_time",
+                                "generated_at", "lastUpdated", "updated", "updated_at", "last_update")
+                    def _ts_of(d):
+                        for k in _ts_keys:
+                            if d.get(k) is not None:
+                                return d.get(k)
+                        return None
+                    ld = _update_time_to_dt(_ts_of(local_data))
+                    sd = _update_time_to_dt(_ts_of(site_data))
+                    if sd is not None and (ld is None or sd > ld):
+                        return site_data
             return local_data
         return load_window_var_from_site(source_id, var_name)
 
@@ -1874,7 +1895,7 @@ def check_data_cards():
         path = DATA_DIR / f"{source_id}.js"  # 本地兜底路径（云端 runner 本地即最新 checkout）
         # 2026-08-28 一劳永逸修复：取线上站点与本地文件中时间戳较新的一个，彻底消除
         # 算法链刚部署新数据但 CDN 缓存未刷新 → HEALTH_CHECK 读到旧值 → 误报 fail 的竞态。
-        data = load_window_var_newest(source_id, var_name, path)
+        data = load_window_var_newest(source_id, var_name, path, d.get("raw_file"))
         if data is None:
             _emit(d, {
                 "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
