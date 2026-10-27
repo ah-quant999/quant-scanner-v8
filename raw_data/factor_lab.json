@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-10-27 07:58:28",
-  "data_date": "2026-10-26",
+  "update_time": "2026-10-27 19:39:31",
+  "data_date": "2026-10-27",
   "meta": {
-    "data_date": "2026-10-26",
+    "data_date": "2026-10-27",
     "close_semantics": "⚠️ 记录里的 close 是「上次算到这只票那天」的快照（roe 按季 asof_q / abn 按月 asof_ym 缓存），**不是当日报价**；需要当日价请查 STOCK_QUOTE.js 或 CANDIDATE_QUOTES.js。同时看 close_date 字段。",
     "liquid_def": "liquid=false 表示最新K线日 != 数据日 或 当月换手率为 0（停牌/零成交），已从榜单剔除",
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
-    "n_universe": 1031,
-    "n_at_valid": 1416,
+    "n_universe": 1035,
+    "n_at_valid": 1418,
     "n_roe_large": 657,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
@@ -378,6 +378,18 @@
     ],
     "bottom": [
       {
+        "code": "sz.002724",
+        "name": "海洋王",
+        "close": 13.09,
+        "close_date": "2026-10-27",
+        "liquid": true,
+        "abn": 3.368,
+        "factor_at": -3.3683,
+        "roe_ttm": null,
+        "size_proxy": 2817928629.1,
+        "asof_ym": "2026-10"
+      },
+      {
         "code": "sh.601949",
         "name": "中国出版",
         "close": 6.26,
@@ -481,18 +493,6 @@
         "factor_at": -1.7351,
         "roe_ttm": null,
         "size_proxy": 1278153349.3,
-        "asof_ym": "2026-10"
-      },
-      {
-        "code": "sz.002242",
-        "name": "九阳股份",
-        "close": 17.67,
-        "close_date": "2026-10-13",
-        "liquid": true,
-        "abn": 1.724,
-        "factor_at": -1.7244,
-        "roe_ttm": null,
-        "size_proxy": 2335092917.6,
         "asof_ym": "2026-10"
       }
     ]

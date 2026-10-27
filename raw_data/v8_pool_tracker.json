@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-27 07:16:18",
+  "update_time": "2026-10-27 18:53:19",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -9,54 +9,54 @@
   "items": [],
   "sentiment_meta": {
     "phase": "高潮",
-    "score": 75.0,
-    "delta_pct": 0.0,
+    "score": 66.0,
+    "delta_pct": -25.45,
     "advice": "✨ 高潮持续：聚焦核心龙头，注意仓位管理",
     "source": "LIMIT_UP_HEATMAP"
   },
   "sector_meta": {
     "top_in": [
       {
-        "name": "人形机器人",
+        "name": "保险重仓",
         "type": "概念",
-        "net": 26.32
+        "net": 5.06
       },
       {
-        "name": "AI芯片",
+        "name": "冰雪经济",
         "type": "概念",
-        "net": 15.84
+        "net": 4.45
       },
       {
-        "name": "汽车",
-        "type": "行业",
-        "net": 11.6
-      },
-      {
-        "name": "婴童概念",
+        "name": "天然气",
         "type": "概念",
-        "net": 11.35
+        "net": 3.82
       },
       {
-        "name": "汽车零部件",
-        "type": "行业",
-        "net": 10.23
+        "name": "供销社概念",
+        "type": "概念",
+        "net": 3.76
+      },
+      {
+        "name": "激光雷达",
+        "type": "概念",
+        "net": 3.42
       }
     ],
     "top_out": [
       {
-        "name": "风电零部件",
-        "type": "行业",
-        "net": -1.95
+        "name": "B股",
+        "type": "概念",
+        "net": -0.02
       },
       {
-        "name": "钨",
-        "type": "行业",
-        "net": -2.02
+        "name": "微盘精选",
+        "type": "概念",
+        "net": -0.06
       },
       {
-        "name": "其他化学制品",
-        "type": "行业",
-        "net": -2.02
+        "name": "电子后视镜",
+        "type": "概念",
+        "net": -0.07
       }
     ]
   },
