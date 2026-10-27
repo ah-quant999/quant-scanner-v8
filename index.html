@@ -17789,7 +17789,7 @@ hm += '</div>'; // /ulPaneBacktest
       h += '<div style="background:rgba(251,146,60,.10);border:1px solid rgba(251,146,60,.4);border-radius:9px;padding:11px 13px;margin-bottom:11px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;">'
         + '<span style="font-size:17px;">'+_vIcon+'</span>'
         + '<span style="font-size:14.5px;font-weight:800;color:'+_vColor+';">'+_verdict+'</span></div>';
-      h += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">';
+      h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">';
       h += _cbRow('周期位置(EDHEC)', cbBst + (edhecDD!=null?(' · 距峰值 '+edhecDD.toFixed(1)+'%'):''), (bst==='bear'?C_RED:(bst==='side'?C_AMB:C_GRN)));
       h += _cbRow('广度闸', brState + (hc!=null?('('+hc+')'):''), (hc==null?C_DIM:(hc>=6?C_GRN:(hc>=3?C_AMB:C_RED))));
       h += _cbRow('平均股价', trState, (pos==null?C_DIM:(pos>=0?C_GRN:C_RED)));
