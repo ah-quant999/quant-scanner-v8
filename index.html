@@ -16635,12 +16635,15 @@ window.__renderMarketState = function(){
 window.__renderInvestAvoid = function(){
   var host = document.getElementById('investAvoidBody');
   if(!host) return;
-  var DJ = window.DAJIJIN_REDUCTION || null;
-  var SA = window.SUSPENSION_ALERT || null;
-  var MR = window.MARKET_REGIME || null;
-  var RG = window.RISK_GAUGE || null;
-  var MB = window.MACRO_BRIEF || null;
-  var MA = window.MARKET_ALERTS || null;
+  // 🧭 2026-10-27 主人令·任务#5盘前并入：优先消费 consolidate 单一源 window.INVEST_AVOID
+  //   （盘前链 v8_morning_plan.yml 07:50 统一刷新）；该源缺失时降级到散源，保证不空白。
+  var IA = window.INVEST_AVOID || null;
+  var DJ = (IA && IA.dajijin) ? IA.dajijin : (window.DAJIJIN_REDUCTION || null);
+  var SA = (IA && IA.suspension) ? IA.suspension : (window.SUSPENSION_ALERT || null);
+  var MR = (IA && IA.avoid_sectors && IA.avoid_sectors.length) ? {recommendation_groups:[{priority:-1, sectors: IA.avoid_sectors}]} : (window.MARKET_REGIME || null);
+  var RG = (IA) ? {overall: IA.risk_overall, verdict: IA.risk_verdict} : (window.RISK_GAUGE || null);
+  var MB = (IA) ? {crisis_score: IA.crisis_score, news_brief: IA.news_brief} : (window.MACRO_BRIEF || null);
+  var MA = (IA) ? {mood: IA.mood, summary: IA.summary} : (window.MARKET_ALERTS || null);
   if((!DJ && !SA && !MR) && (!host.dataset._iaTries || +host.dataset._iaTries < 40)){
     host.dataset._iaTries = (host.dataset._iaTries ? (+host.dataset._iaTries+1) : 1);
     host.innerHTML = '<div class="note">加载中…（等待减持/停牌/风险数据）</div>';
@@ -16681,7 +16684,7 @@ window.__renderInvestAvoid = function(){
   if(MA && MA.summary){ html += '<div style="font-size:12px;color:var(--sub);line-height:1.6;">盘后综述：'+esc(MA.summary)+'</div>'; }
   html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.6;">&#x26A0;&#xFE0F; 新闻语料量化层为轻量版（消费 MACRO_BRIEF 标签化要闻 + MARKET_ALERTS 综述），非逐条新闻 NLP；个股避雷来自法定披露（大基金减持）+ 停牌/*ST 预警，<b style="color:#fbbf24;">非投资建议</b>。</div>';
   host.innerHTML = html;
-  var f=document.getElementById('investAvoidFresh'); if(f) f.textContent = (DJ&&DJ.update_time)||(SA&&SA.update_time)||'—';
+  var f=document.getElementById('investAvoidFresh'); if(f) f.textContent = (IA&&IA.update_time)||(DJ&&DJ.update_time)||(SA&&SA.update_time)||'—';
 };
 
   function renderMahoroCard(){
