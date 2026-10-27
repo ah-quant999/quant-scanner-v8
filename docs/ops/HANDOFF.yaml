@@ -26,15 +26,15 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-26 09:12"
-  updated_by: 阿狸咪的工程师
+  updated: "2026-10-27 10:02"
+  updated_by: 家用机AI(兜底)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
   #   C 本地 git 路径：写前 pull --rebase，冲突即 abort，禁裸 push
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 170
+  next_id_seq: 171
 items:
   - id: logic-page-section-protocol-1026
     owner: shared（阿狸咪的工程师落码 · 小九接入）
@@ -9979,3 +9979,24 @@ items:
     verified_at: "2026-10-25 14:50"
     updated: "2026-10-25 14:50"
     updated_by: 阿狸咪的工程师
+  - id: cnfetch-targeted-stale-refresh-1027
+    owner: 小九
+    priority: P1
+    status: todo
+    created: 2026-10-27
+    title: 针对性刷新陈旧底层数据（DAJIJIN_REDUCTION 等），勿全量风暴，请小九(cn runner)跑
+    note: >-
+      2026-10-27 10:02 家用机 AI 交接：盘前预案 MORNING_PLAN.js 已由家用机重跑并上线
+      (commit bbee40567c, update_time 2026-10-27 09:57)；但底层数据仍有零星陈旧项——
+      实测 data/DAJIJIN_REDUCTION.js 停在 2026-10-23，其余大部分文件已是 2026-10-26。
+      家用机代理不稳(requests 对透明代理偶发 ProxyError/RemoteDisconnected)，不适宜跑全量；
+      按主人令「不要太多任务会风暴」—— 不要跑 17 类全抓，请小九(cn runner 代理稳)只针对性刷新
+      陈旧项（先查 data/*.js 时间戳，对滞后于今日的文件跑对应 cloud_fetch_v8.py --category X，
+      或 run_algorithms 相关步），单批序跑、不并行。最终跟踪 RESONANCE_TRACK.js 现为 2026-10-26，
+      日更机制本就在，今晚跑即刷。完成后更新本 item status=done + verified_at。
+      家用机 AI 为兜底：若 17:45 前未见刷新，家用机将以 retry-on-proxy 重试同类针对性刷新。
+    verify_how: >-
+      查 data/*.js 时间戳（ls -la --time-style=long-iso data/），确认 DAJIJIN_REDUCTION 等
+      原陈旧项已更新至 2026-10-27；或线上 window.DAJIJIN_REDUCTION 的 date 字段为今日。
+    updated: "2026-10-27 10:02"
+    updated_by: 家用机AI(兜底)
