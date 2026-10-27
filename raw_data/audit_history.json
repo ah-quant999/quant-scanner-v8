@@ -3797,5 +3797,39 @@
     "message": "SECTOR_YEAR_FLOW.js 更新于 6天前 16:06；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
+ },
+ {
+  "date": "2026-10-28",
+  "time": "03:34:01",
+  "tz": "Asia/Shanghai",
+  "overall": "warn",
+  "summary": {
+   "ok": 118,
+   "warn": 1,
+   "fail": 2,
+   "limited": 0,
+   "info": 0,
+   "other": 0,
+   "total": 121
+  },
+  "warn_items": [
+   {
+    "id": "FINAL_RECOMMEND_HISTORY",
+    "name": "最终推荐Top3历史",
+    "message": "无法解析更新时间"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "all_BACKTEST_COMPREHENSIVE",
+    "name": "BACKTEST_COMPREHENSIVE",
+    "message": "BACKTEST_COMPREHENSIVE.js 更新于 4天前 21:18；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_BACKTEST_TDX",
+    "name": "BACKTEST_TDX",
+    "message": "BACKTEST_TDX.js 更新于 4天前 21:18；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
