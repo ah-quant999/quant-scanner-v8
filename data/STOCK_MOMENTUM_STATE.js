@@ -1,11 +1,11 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-27 23:56",
- "generated": "2026-10-27 23:56",
+ "update_time": "2026-10-28 00:06",
+ "generated": "2026-10-28 00:06",
  "meta": {
-  "generated": "2026-10-27 23:56",
+  "generated": "2026-10-28 00:06",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 29,
+  "total_days": 30,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
@@ -11849,6 +11849,146 @@ window.STOCK_MOMENTUM_STATE = (function() {
   },
   {
    "date": "2026-10-27",
+   "categories": {
+    "突破": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 3.085,
+      "price": 13.03,
+      "category": "突破"
+     },
+     {
+      "code": "301227",
+      "name": "森鹰窗业",
+      "change_pct": 10.935,
+      "price": 28.0,
+      "category": "突破"
+     },
+     {
+      "code": "002011",
+      "name": "盾安环境",
+      "change_pct": 9.961,
+      "price": 11.37,
+      "category": "突破"
+     },
+     {
+      "code": "300307",
+      "name": "慈星股份",
+      "change_pct": 8.004,
+      "price": 10.12,
+      "category": "突破"
+     },
+     {
+      "code": "600838",
+      "name": "上海九百",
+      "change_pct": 10.0,
+      "price": 13.31,
+      "category": "突破"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 5.817,
+      "price": 125.7,
+      "category": "突破"
+     }
+    ],
+    "加速": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 3.085,
+      "price": 13.03,
+      "category": "加速"
+     },
+     {
+      "code": "301227",
+      "name": "森鹰窗业",
+      "change_pct": 10.935,
+      "price": 28.0,
+      "category": "加速"
+     },
+     {
+      "code": "002011",
+      "name": "盾安环境",
+      "change_pct": 9.961,
+      "price": 11.37,
+      "category": "加速"
+     },
+     {
+      "code": "300307",
+      "name": "慈星股份",
+      "change_pct": 8.004,
+      "price": 10.12,
+      "category": "加速"
+     }
+    ],
+    "短线选股": [
+     {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 3.085,
+      "price": 13.03,
+      "category": "短线选股"
+     },
+     {
+      "code": "301227",
+      "name": "森鹰窗业",
+      "change_pct": 10.935,
+      "price": 28.0,
+      "category": "短线选股"
+     },
+     {
+      "code": "002011",
+      "name": "盾安环境",
+      "change_pct": 9.961,
+      "price": 11.37,
+      "category": "短线选股"
+     },
+     {
+      "code": "300307",
+      "name": "慈星股份",
+      "change_pct": 8.004,
+      "price": 10.12,
+      "category": "短线选股"
+     },
+     {
+      "code": "600838",
+      "name": "上海九百",
+      "change_pct": 10.0,
+      "price": 13.31,
+      "category": "短线选股"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 5.817,
+      "price": 125.7,
+      "category": "短线选股"
+     }
+    ],
+    "强势股": [
+     {
+      "code": "600838",
+      "name": "上海九百",
+      "change_pct": 10.0,
+      "price": 13.31,
+      "category": "强势股"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 5.817,
+      "price": 125.7,
+      "category": "强势股"
+     }
+    ]
+   },
+   "consensus": []
+  },
+  {
+   "date": "2026-10-28",
    "categories": {
     "突破": [
      {
