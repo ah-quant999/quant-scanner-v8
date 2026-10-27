@@ -15,8 +15,10 @@
 # 防假新鲜双闸门（生成器内，2026-10-22 配套）：
 #   ① 盘后新鲜度：C 源（SECTOR_FUND_FLOW）update_time 必须是今日 ≥16:00，否则
 #      上游链未跑完/失败 ⇒ 不写盘、保留线上旧卡（宁缺勿错，看板 ✓/✗ 自然显形）；
-#   ② 同源去重：三源 update_time 均未变 ⇒ 上游无新数据 ⇒ 不写盘（免空推 + 防
+#   ② 同源去重：四源 update_time 均未变 ⇒ 上游无新数据 ⇒ 不写盘（免空推 + 防
 #      「回测/资金流链失败日靠刷新 update_time 冒充更新」）。
+#   汇金持仓季报（D 胶囊真实源）由本链前置 best-effort 抓取（东方财富股东增减持披露），
+#   失败则沿用 checkout 基线 data/HUIJIN_HOLDINGS.js，绝不退回「未接入」。
 #   应急口子：NT_FORCE=1 跳过闸门①（workflow_dispatch 手动补算用）。
 #
 # 2026-10-23 主人令「一劳永逸修复」：板块年度主力净流入卡（SECTOR_YEAR_FLOW）原生成器
@@ -55,6 +57,23 @@ jobs:
     steps:
       - name: "📥 Checkout（默认深度即取 main 最新 tip；只读文件 + Contents API 推送，无需 git 操作）"
         uses: actions/checkout@v4
+
+      - name: "💹 跑 fetch_huijin_holdings.py（汇金持仓季报·D胶囊真实源，best-effort 兜底）"
+        if: always()
+        continue-on-error: true
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          dow=$(date +%u)
+          if [ "$dow" -ge 6 ]; then echo "[skip] weekend, exit ok"; exit 0; fi
+          python v8/fetch_huijin_holdings.py
+          rc=$?
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning title=v8-huijin-fetch(failed)::💹 汇金持仓抓取失败（非阻塞）；将沿用 checkout 基线 data/HUIJIN_HOLDINGS.js（如有）。"
+          else
+            echo "[ok] data/HUIJIN_HOLDINGS.js ready (best-effort)"
+          fi
 
       - name: "🏛️ 跑 gen_national_team.py（产出 data/NATIONAL_TEAM.js）"
         id: gen
