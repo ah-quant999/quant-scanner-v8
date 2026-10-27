@@ -1,6 +1,6 @@
 {
  "month": "2026年10月",
- "update_time": "2026-10-27 23:35",
+ "update_time": "2026-10-28 01:03",
  "legend": [
   {
    "title": "重要政策",
@@ -484,39 +484,39 @@
     {
      "num": 27,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇺🇸 FOMC议息会议第1天",
        "cls": "fomc",
-       "released": false
+       "released": true
       },
       {
        "text": "🇺🇸 耐用品订单",
        "cls": "us",
-       "released": false
+       "released": true
       },
       {
        "text": "微软Q1财报",
        "cls": "us_earnings",
-       "released": false
+       "released": true
       },
       {
        "text": "谷歌Q3财报",
        "cls": "us_earnings",
-       "released": false
+       "released": true
       },
       {
        "text": "三星Q3财报",
        "cls": "kr",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 28,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "上交所/深交所ETF期权最后交易日",
