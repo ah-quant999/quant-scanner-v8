@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-27 10:02"
+  updated: "2026-10-27 11:00"
   updated_by: 家用机AI(兜底)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -34,7 +34,7 @@ meta:
   #   D 🔴 API 路径（本仓主用）：推单文件前重取该文件 blob sha；与读取时不一致
   #     ⇒ 不是 abort，而是**基于新内容重放**（追加语义天然可重放）
   #   E 推本文件时同一提交同步刷新 docs/ops/HANDOFF.ledger.json（[13/13] 门禁的外部锚）
-  next_id_seq: 171
+  next_id_seq: 172
 items:
   - id: logic-page-section-protocol-1026
     owner: shared（阿狸咪的工程师落码 · 小九接入）
@@ -155,8 +155,16 @@ items:
     priority: P3
     status: done
     created: 2026-10-22
-    title: 逻辑详解页线上查看地址固化（主人 2026-10-22 指定，后续核查勿再问）
+    title: 逻辑详解页线上查看地址固化（dd689 已失效 2026-10-27，现行=jiubao-nav-hub）
     note: >
+      ⚠️ 2026-10-27 11:00 家用机 AI 核验更新：原固化地址
+      https://dd689fc661e24962a7090b39a618950e.app.workbuddy.host/index.html 已失效——
+      直连实测仅返回 8KB stub 页（非 815KB 真身），冻结在 2026-10-20 旧快照，且小九机工具
+      无法寻址重发（疑映射挂最初发布机）。现行有效地址 =
+      https://jiubao-nav-hub.app.workbuddy.host/?sharecode=TLJLPGKCUA
+      （小九 2026-10-27 发布，含顶部治理横幅 + 止损三口径取最严内容；host 需登录态，
+      curl/WebFetch 只能拿到加载壳，已请小九浏览器实测确认横幅在）。
+      ——— 以下为 2026-10-22 原始固化记录（保留备查）———
       主人 2026-10-22 17:3x 明确指定：逻辑详解页线上查看地址 =
       https://dd689fc661e24962a7090b39a618950e.app.workbuddy.host/index.html
       （该地址为「九宝一站式导航」门户/主站，逻辑详解为其内板块；非 2026-10-04
@@ -167,10 +175,29 @@ items:
       （线上真身），而非仅查下架的公开 logic.html。主站 GitHub Pages 源
       ah-quant999.github.io/quant-scanner-v8 仍有效，workbuddy.host 为当前
       主人实际查看入口。
-    verify_how: 主人亲口指定（2026-10-22 17:3x），地址已固化本项；下次核查逻辑详解页直接访问该 URL。
-    verified_at: "2026-10-22 17:39"
-    updated: "2026-10-22 17:39"
-    updated_by: 小九的工程师
+    verify_how: 2026-10-27 直连 dd689 返回 8KB stub（确认失效）；jiubao-nav-hub 由小九浏览器实测横幅在。下次核查逻辑详解页改查 jiubao-nav-hub。
+    verified_at: "2026-10-27 11:00"
+    updated: "2026-10-27 11:00"
+    updated_by: 家用机AI(兜底)
+  - id: logic-page-master-sync-1027
+    owner: 小九
+    priority: P3
+    status: todo
+    created: 2026-10-27
+    title: 治理横幅版回流坚果云主版（防主版重发丢横幅）
+    note: >
+      2026-10-27 家用机 AI 核验：小九当日发布的 jiubao-nav-hub 链接含顶部治理横幅
+      （三件套权威定义 / 唯一权威指针 AGENTS.md→SKILL.md / 常看地址 / 文件真身路径 /
+      改主站标准姿势）+ 止损三口径取最严内容；但该版本（小九机 nav-site 本地，md5 15276a7ee889）
+      未回流到坚果云唯一真源 E:/Nutstore/v8_logic_private/logic.full.html。本机主版 md5 77f99c0a…，
+      含止损三口径但缺 AGENTS.md/权威指针横幅（已 grep 确认 AGENTS=0、权威指针=0）。
+      隐患：若日后从主版重发会丢失治理横幅。请小九把她发布的带横幅版（或 jiubao 线上真身）
+      同步覆盖回 Nutstore 主版，使主版=线上一致；完成后置 done 并可删此 item。
+    verify_how: >
+      本机读 E:/Nutstore/v8_logic_private/logic.full.html，grep "AGENTS.md" 与 "唯一权威指针"
+      均 ≥1（治理横幅已回流主版），且 md5 与小九发布版一致。
+    updated: "2026-10-27 11:00"
+    updated_by: 家用机AI(兜底)
 
   - id: selfalgo-audit-fix-1019
     owner: 小九的工程师
