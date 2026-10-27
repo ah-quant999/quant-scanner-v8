@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-27 11:10:53",
+  "update_time": "2026-10-27 13:25:41",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -12,7 +12,7 @@
     "10/27"
   ],
   "columns": 30,
-  "cycle_count": 19,
+  "cycle_count": 20,
   "cycles": [
     {
       "sector": "AI算力",
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 236,
       "peak_date": "09/08",
-      "total": 2235,
+      "total": 2236,
       "ongoing": true
     },
     {
@@ -74,9 +74,9 @@
       "end_idx": 29,
       "days": 30,
       "hot_days": 24,
-      "peak": 19,
+      "peak": 20,
       "peak_date": "10/27",
-      "total": 242,
+      "total": 243,
       "ongoing": true
     },
     {
@@ -154,7 +154,7 @@
       "hot_days": 24,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 391,
+      "total": 394,
       "ongoing": true
     },
     {
@@ -167,7 +167,7 @@
       "hot_days": 21,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 117,
+      "total": 118,
       "ongoing": true
     },
     {
@@ -259,6 +259,19 @@
       "peak": 4,
       "peak_date": "10/26",
       "total": 4,
+      "ongoing": true
+    },
+    {
+      "sector": "电力",
+      "start": "10/27",
+      "end": "10/27",
+      "start_idx": 29,
+      "end_idx": 29,
+      "days": 1,
+      "hot_days": 1,
+      "peak": 3,
+      "peak_date": "10/27",
+      "total": 3,
       "ongoing": true
     }
   ]
