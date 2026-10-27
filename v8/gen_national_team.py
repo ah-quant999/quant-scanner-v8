@@ -78,8 +78,25 @@ if sf:
         c_detail = '大金融净流入 %.1f 亿（%s）' % (fin_net, ';'.join(hit))
         c_ready = True
 
-# ── D. 汇金持仓环比（未接入） ────────────────────────────────────────
-d_ready = False
+# ── D. 汇金持仓环比（中央汇金股票披露 · 东方财富 RPT_SHARE_HOLDER_INCREASE） ──
+# 源：data/HUIJIN_HOLDINGS.js（v8/fetch_huijin_holdings.py 产出）。
+# 口径：汇金自身法定义务披露的股票增减持 = 其股票持仓变动（ETF渠道不在此表，已归胶囊A）。
+# 该表披露滞后且稀疏（最新约 2024Q2），如实标注「披露口径·滞后」，绝不编造实时值。权重仍 0%（滞后不参与实时评分）。
+d_val = None; d_detail = None; d_status = '—未接入'; d_ready = False
+hj = load('data/HUIJIN_HOLDINGS.js')
+if hj and hj.get('data_type') == 'real' and hj.get('latest_net_yi') is not None:
+    _ln = hj.get('latest_net_yi'); _lq = hj.get('latest_quarter') or '?'
+    _pq = hj.get('prev_quarter'); _qoq = hj.get('qoq_yi')
+    d_val = round(_ln, 2)
+    if _ln >= 0:
+        d_status = '✅增持'; _dir = '净增持'
+    else:
+        d_status = '❌减持'; _dir = '净减持'
+    _tail = ''
+    if _pq and _qoq is not None:
+        _tail = '，环比上季(%s) %s%.2f 亿股' % (_pq, '+' if _qoq >= 0 else '', _qoq)
+    d_detail = '汇金股票披露%s %.2f 亿股（%s）%s · 披露口径滞后' % (_dir, abs(_ln), _lq, _tail)
+    d_ready = True
 
 # ── 🛡️ 盘后新鲜度闸门（防假新鲜·主人令 09-23） ──────────────────────
 # C 源 SECTOR_FUND_FLOW.js 必须为「今日收盘后（hour ≥ 15）」的盘后数据，否则整卡保留上版不写盘。
@@ -171,9 +188,9 @@ subs.append({
     'status':('✅流入' if (c_val is not None and c_val>0) else ('❌流出' if (c_val is not None and c_val<0) else ('—未就绪' if c_val is None else '🟡持平')))
 })
 subs.append({
-    'key':'D','name':'汇金持仓环比','weight':W['D'],'ready':False,
-    'value':None,'unit':'','detail':'v8 无季报十大股东源 ⇒ 未接入（季报滞后1-3月，无法实时）',
-    'status':'—未接入'
+    'key':'D','name':'汇金持仓环比','weight':W['D'],'ready':d_ready,
+    'value':d_val,'unit':'亿股','detail':d_detail or 'v8 无季报十大股东源 ⇒ 未接入（季报滞后1-3月，无法实时）',
+    'status':d_status
 })
 
 out = {
@@ -181,27 +198,31 @@ out = {
     'update_time': bj_now().strftime('%Y-%m-%d %H:%M:%S'),
     'source_time': max(x for x in [(e or {}).get('update_time') or '',
                                    (rs or {}).get('update_time') or '',
-                                   (sf or {}).get('update_time') or '']),
+                                   (sf or {}).get('update_time') or '',
+                                   (hj or {}).get('update_time') or '']),
     'score': score,
     'verdict': vtxt,
     'verdict_color': vcol,
-    'ready_count': sum(1 for k in ['A','B','C'] if ready[k]),
+    'ready_count': sum(1 for k in ['A','B','C','D'] if ready[k]),
     'subs': subs,
-    'method': '3 子信号加权（缺失项权重重分）；宽基ETF净申购45% + 大金融相对强度35% + 大金融资金净流入20%；汇金持仓季报未接入。',
-    'disclaimer': '代理推算·非汇金官方实时持仓；宽基ETF净申购为最强国资托盘指纹，但披露存 T+1 滞后，仅作 regime 参考，不构成交易建议。',
+    'method': '4 子信号加权（缺失项权重重分）；宽基ETF净申购45% + 大金融相对强度35% + 大金融资金净流入20%；汇金持仓环比权重0%（季报披露滞后1-3月，不参与实时评分，仅作定性印证）。',
+    'disclaimer': '代理推算·非汇金官方实时持仓；宽基ETF净申购为最强国资托盘指纹，披露存 T+1 滞后；汇金持仓环比取自东方财富股东增减持披露（中央汇金投资有限责任公司），属法定义务披露、口径滞后且稀疏，如实标注，不构成交易建议。',
     'oneline': _oneline()
 }
 
-# ── 🛡️ 同源去重（防假新鲜·主人令 09-23）：三源 update_time 均未变 ⇒ 不写盘 ──
+# ── 🛡️ 同源去重（防假新鲜·主人令 09-23）：四源 update_time 均未变 ⇒ 不写盘 ──
 _prev_nt = load('data/NATIONAL_TEAM.js')
 _prev_st = (_prev_nt or {}).get('source_time') or ''
 if _prev_st and _prev_st == out['source_time']:
-    print('⏸️ NATIONAL_TEAM: 三源 update_time 未变（%s），保留上版不写盘' % _prev_st)
-    sys.exit(0)
+    if os.environ.get('NT_FORCE') == '1':
+        print('⚠️ NATIONAL_TEAM: NT_FORCE=1 强制写盘（跳过同源去重）')
+    else:
+        print('⏸️ NATIONAL_TEAM: 四源 update_time 未变（%s），保留上版不写盘' % _prev_st)
+        sys.exit(0)
 
 with open(os.path.join(ROOT, 'data/NATIONAL_TEAM.js'), 'w', encoding='utf-8') as f:
     f.write('window.NATIONAL_TEAM = ' + json.dumps(out, ensure_ascii=False, indent=2) + ';')
 
-print('✅ NATIONAL_TEAM.js 生成： score=%s verdict=%s ready=%d/3' % (score, vtxt, out['ready_count']))
+print('✅ NATIONAL_TEAM.js 生成： score=%s verdict=%s ready=%d/4' % (score, vtxt, out['ready_count']))
 for s in subs:
     print('  [%s] %s w%s %s val=%s %s' % (s['key'], s['name'], s['weight'], s['status'], s['value'], s['detail']))
