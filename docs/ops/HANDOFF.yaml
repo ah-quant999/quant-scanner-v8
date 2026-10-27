@@ -26,7 +26,7 @@
 # ============================================================================
 
 meta:
-  updated: "2026-10-27 11:00"
+  updated: "2026-10-27 11:38"
   updated_by: 家用机AI(兜底)
   # 🔴 并发写协议（2026-09-21 小九裁决 A+C+D，见 item handoff-concurrent-write）
   #   A 一次 push 只改自己 owner 的 item
@@ -151,54 +151,41 @@ items:
     updated_by: 小九的工程师
 
   - id: logic-page-live-url-1022
-    owner: 小九的工程师
+    owner: 小九
     priority: P3
-    status: done
+    status: todo
     created: 2026-10-22
-    title: 逻辑详解页线上查看地址固化（dd689 已失效 2026-10-27，现行=jiubao-nav-hub）
+    title: 逻辑详解页唯一进入地址固化（dd689，2026-10-27 主人重申唯一入口）
     note: >
-      ⚠️ 2026-10-27 11:00 家用机 AI 核验更新：原固化地址
-      https://dd689fc661e24962a7090b39a618950e.app.workbuddy.host/index.html 已失效——
-      直连实测仅返回 8KB stub 页（非 815KB 真身），冻结在 2026-10-20 旧快照，且小九机工具
-      无法寻址重发（疑映射挂最初发布机）。现行有效地址 =
-      https://jiubao-nav-hub.app.workbuddy.host/?sharecode=TLJLPGKCUA
-      （小九 2026-10-27 发布，含顶部治理横幅 + 止损三口径取最严内容；host 需登录态，
-      curl/WebFetch 只能拿到加载壳，已请小九浏览器实测确认横幅在）。
-      ——— 以下为 2026-10-22 原始固化记录（保留备查）———
-      主人 2026-10-22 17:3x 明确指定：逻辑详解页线上查看地址 =
-      https://dd689fc661e24962a7090b39a618950e.app.workbuddy.host/index.html
-      （该地址为「九宝一站式导航」门户/主站，逻辑详解为其内板块；非 2026-10-04
-      下架的公开 logic.html 占位页）。历史口径不变：公开 logic.html 于 2026-10-04
-      主人令下架为占位；逻辑详解真源为私有母版
-      E:/Nutstore/v8_logic_private/logic.full.html（阿狸咪机持有，本机无副本）。
-      后续任何「对齐/核查逻辑详解页」的任务，默认查上述 workbuddy.host 地址
-      （线上真身），而非仅查下架的公开 logic.html。主站 GitHub Pages 源
-      ah-quant999.github.io/quant-scanner-v8 仍有效，workbuddy.host 为当前
-      主人实际查看入口。
-    verify_how: 2026-10-27 直连 dd689 返回 8KB stub（确认失效）；jiubao-nav-hub 由小九浏览器实测横幅在。下次核查逻辑详解页改查 jiubao-nav-hub。
-    verified_at: "2026-10-27 11:00"
-    updated: "2026-10-27 11:00"
+      2026-10-27 11:38 主人明确裁定：https://dd689fc661e24962a7090b39a618950e.app.workbuddy.host/index.html
+      是逻辑详解页「唯一进入地址」，AI 与小九都不得再建新地址。
+      此前 11:00 家用机 AI 误判 dd689 失效并将 canonical 切到 jiubao-nav-hub——此判定撤销，
+      dd689 恢复为唯一入口（与 2026-10-22 原始固化一致）。
+      ⚠️ 现状（11:00 直连实测）：dd689 当前仅返回 8KB stub 页（非 815KB 真身），疑似未正常服务，
+      需由小九在其原发布机恢复 dd689 为可用唯一入口（映射疑挂最初发布机，本机/小九机常规工具无法寻址重发）。
+      2026-10-22 原始固化口径保留：该地址为「九宝一站式导航」门户/主站，逻辑详解为其内板块；
+      逻辑详解真源为私有母版 E:/Nutstore/v8_logic_private/logic.full.html。
+    verify_how: >
+      直连 dd689 地址返回 815KB 真身（非 stub），且内容含最新止损三口径 + 治理横幅；主人可正常打开。
+    updated: "2026-10-27 11:38"
     updated_by: 家用机AI(兜底)
   - id: logic-page-master-sync-1027
     owner: 小九
     priority: P3
     status: todo
     created: 2026-10-27
-    title: 治理横幅版回流坚果云主版（防主版重发丢横幅）
+    title: 逻辑详解遗留清理：恢复 dd689 唯一入口 + 下线 jiubao-nav-hub/yield-methodology 多余地址（禁止再建新地址）
     note: >
-      2026-10-27 家用机 AI 核验：小九当日发布的 jiubao-nav-hub 链接含顶部治理横幅
-      （三件套权威定义 / 唯一权威指针 AGENTS.md→SKILL.md / 常看地址 / 文件真身路径 /
-      改主站标准姿势）+ 止损三口径取最严内容；但该版本（小九机 nav-site 本地，md5 15276a7ee889）
-      未回流到坚果云唯一真源 E:/Nutstore/v8_logic_private/logic.full.html。本机主版 md5 77f99c0a…，
-      含止损三口径但缺 AGENTS.md/权威指针横幅（已 grep 确认 AGENTS=0、权威指针=0）。
-      隐患：若日后从主版重发会丢失治理横幅。请小九把她发布的带横幅版（或 jiubao 线上真身）
-      同步覆盖回 Nutstore 主版，使主版=线上一致；完成后置 done 并可删此 item。
+      2026-10-27 11:38 主人令：dd689 是唯一进入地址，不得再建新地址，遗留清理交小九。
+      任务：① 恢复 dd689 为可用唯一入口（当前 stub，原发布机映射问题，小九机原发布者）；
+      ② 下线/弃用遗留多余地址——jiabao-nav-hub（小九 10-27 误建）、yield-methodology（AI 早前发）；
+      ③ 逻辑详解真源仍以坚果云 E:/Nutstore/v8_logic_private/logic.full.html 为准，恢复后确保 dd689 线上真身=母版一致
+      （含止损三口径 + 治理横幅）；④ 全程禁止再创建任何新 workbuddy.host 地址。
     verify_how: >
-      本机读 E:/Nutstore/v8_logic_private/logic.full.html，grep "AGENTS.md" 与 "唯一权威指针"
-      均 ≥1（治理横幅已回流主版），且 md5 与小九发布版一致。
-    updated: "2026-10-27 11:00"
+      仅 dd689 一个地址可访问且内容最新；jiabao-nav-hub / yield-methodology 已停用或重定向至 dd689；
+      坚果云母版 md5 与 dd689 线上一致。
+    updated: "2026-10-27 11:38"
     updated_by: 家用机AI(兜底)
-
   - id: selfalgo-audit-fix-1019
     owner: 小九的工程师
     priority: P1
