@@ -17577,7 +17577,7 @@ hm += '</div>'; // /ulPaneBacktest
   window.__fwRetry = 0;
   // ═══════════════════════════════════════════════════════════════════════════════
   // 🧭 大盘 5 卡汇总解析（2026-09-17 主人令：放在「📊 大盘观测」最顶部）
-  //   目的：把下方 5 卡（波浪 / 斐波窗口 / 中信PE / 指数估值 / 周期位置+广度）收敛成「同向 or 分歧」一句话 + 5 行摘要。
+  //   目的：把下方 5 卡（周期位置+广度 / 波浪 / 斐波窗口 / 中信PE / 指数估值，DOM 顺序 0.5→1→2→3→4）收敛成「同向 or 分歧」一句话 + 5 行摘要。
   //   取数口径（全部真实字段，缺则如实空态，绝不填 0、绝不编造）：
   //     · 波浪位置  ← WAVE_ELLIOTT.meta.{date,last,pct} + marks[]（与卡1同源）
   //     · 斐波时间窗 ← SH_FIB.windows[] / current{}（与卡2同源；本卡为【收盘价】口径）
@@ -17698,6 +17698,9 @@ hm += '</div>'; // /ulPaneBacktest
     } else if((window.__obsSumCbRetry||0) < 15){ window.__obsSumCbRetry=(window.__obsSumCbRetry||0)+1; setTimeout(window.__renderObsSummary, 700); }
     cbTxt = cbBst + ((typeof _apDD==='number')?(' · 个股距峰'+Math.round(_apDD)+'%'):'');
     sigs.push({n:'周期位置+个股', d:cbDir, t:cbTxt, c:cbCol});
+    // 2026-10-27 主人令：胶囊按「大盘观测」页下方各卡真实 DOM 顺序排序
+    //   DOM：周期位置+广度(0.5) → 波浪(1) → 斐波(2) → 中信PE(3) → 指数估值(4)
+    sigs.sort(function(a,b){ var _o={'周期位置+个股':0,'波浪位置':1,'斐波时间窗':2,'中信PE分位':3,'指数估值分位':4}; return (_o[a.n]||99)-(_o[b.n]||99); });
     // ── 汇总判据：同向 or 分歧 ────────────────────────────────────────────────
     var upN = 0, dnN = 0, neuN = 0;
     sigs.forEach(function(s){ if(s.d > 0) upN++; else if(s.d < 0) dnN++; else neuN++; });
@@ -17722,13 +17725,13 @@ hm += '</div>'; // /ulPaneBacktest
 
     // 4 行分卡摘要（左侧色条标识归属）
     h += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">';
-    var barC = ['#f472b6','#38bdf8','#fbbf24','#60a5fa','#fb923c'];
+    var _barMap = {'波浪位置':'#f472b6','斐波时间窗':'#38bdf8','中信PE分位':'#fbbf24','指数估值分位':'#60a5fa','周期位置+个股':'#fb923c'};
     for(var q=0;q<sigs.length;q++){
       var s2 = sigs[q];
       var dirTxt = s2.d > 0 ? '\u504f\u591a' : (s2.d < 0 ? '\u504f\u7a7a' : '\u4e2d\u6027');
-      h += '<div style="background:rgba(148,163,184,.07);border:1px solid rgba(148,163,184,.22);border-left:3px solid ' + barC[q] + ';border-radius:7px;padding:9px 11px;">'
+      h += '<div style="background:rgba(148,163,184,.07);border:1px solid rgba(148,163,184,.22);border-left:3px solid ' + _barMap[s2.n] + ';border-radius:7px;padding:9px 11px;">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:5px;">'
-        + '<span style="font-size:11.5px;font-weight:700;color:' + barC[q] + ';">' + _eS(s2.n) + '</span>'
+        + '<span style="font-size:11.5px;font-weight:700;color:' + _barMap[s2.n] + ';">' + _eS(s2.n) + '</span>'
         + '<span style="font-size:11px;font-weight:700;color:' + s2.c + ';">' + dirTxt + '</span>'
         + '</div>'
         + '<div style="font-size:11.5px;color:' + TXT + ';line-height:1.6;">' + _eS(s2.t) + '</div>'
@@ -17789,7 +17792,7 @@ hm += '</div>'; // /ulPaneBacktest
       var trState; if(pos==null) trState='未到位'; else if(pos>=0 && kdj!=null && kdj<20) trState='磨底·超卖'; else if(pos>=0) trState='上行·盈利行情'; else if(kdj!=null && kdj<20) trState='下跌·超卖'; else trState='下跌中';
       // ── 主力净额 ──
       var mf = window.MARKET_FUND_FLOW_DATA || {};
-      var net=null; try{ if(mf && mf.daily && mf.daily.length){ net = mf.daily[mf.daily.length-1].net_yi; } }catch(e){}
+      var net=null, netDate=null; try{ if(mf && mf.daily && mf.daily.length){ var _ld=mf.daily[mf.daily.length-1]; net=_ld.net_yi; netDate=_ld.date; } }catch(e){}
       var fdState = net==null?'未到位':(net>=0?'净流入':'净流出');
       /* 2026-10-27 主人令：个股体感层——平均股价(880003口径)距近 60 日峰值回撤，
          指数失真（二八分化）时的真相；hc_count 是选股管线候选数、非市场广度，禁再当广度用 */
@@ -17800,7 +17803,7 @@ hm += '</div>'; // /ulPaneBacktest
 
       // ── 核心结论（image#2：牛市显示「牛市上行·无需抄底」，熊市才显「见底信号」）──
       var _verdict, _vColor, _vIcon;
-      if(bst==='bull' && apDD!=null && apDD<=-20){ _verdict='指数牛 · 个股熊（分化市）：上证距峰值 '+(edhecDD!=null?edhecDD.toFixed(1):'—')+'% 未破 -20% 牛熊线，但平均股价距峰 '+apDD.toFixed(1)+'% 已达熊市级回撤——指数不等于你的持仓，严控仓位、只做强势主线，不抄底平庸股'; _vColor=C_AMB; _vIcon='🟡'; }
+      if(bst==='bull' && apDD!=null && apDD<=-20){ _verdict='指数牛 · 个股熊（分化市）：上证距峰值 '+(edhecDD!=null?edhecDD.toFixed(1):'—')+'% 未破 -20% 牛熊线，但平均股价距峰 '+apDD.toFixed(1)+'% 已达熊市级回撤——严控仓位、只做强势主线，不抄底平庸股'; _vColor=C_AMB; _vIcon='🟡'; }
       else if(bst==='bull' && edhecDD!=null && edhecDD<=-10){ _verdict='牛市中回调段 · 回调 '+edhecDD.toFixed(1)+'%（未破 -20% 牛熊线，牛市未死；持仓防守、不加仓不抄底，等广度/资金共振再出手）'; _vColor=C_AMB; _vIcon='🟡'; }
       else if(bst==='bull'){ _verdict='牛市上行段 · 无需抄底（持股待涨，不找底部）'; _vColor=C_GRN; _vIcon='🟢'; }
       else { // 熊市确认段 → 启用「见底信号」研判（广度+股价+资金三观测点）
@@ -17812,14 +17815,14 @@ hm += '</div>'; // /ulPaneBacktest
 
       var h='';
       h += '<div style="padding:13px 15px;">';
-      h += '<div style="background:rgba(251,146,60,.10);border:1px solid rgba(251,146,60,.4);border-radius:9px;padding:11px 13px;margin-bottom:11px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;">'
-        + '<span style="font-size:17px;">'+_vIcon+'</span>'
-        + '<span style="font-size:14.5px;font-weight:800;color:'+_vColor+';">'+_verdict+'</span></div>';
+      h += '<div style="background:rgba(251,146,60,.10);border:1px solid rgba(251,146,60,.4);border-radius:9px;padding:11px 13px;margin-bottom:11px;display:flex;align-items:flex-start;gap:9px;flex-wrap:nowrap;">'
+        + '<span style="font-size:17px;flex:0 0 auto;line-height:1.45;">'+_vIcon+'</span>'
+        + '<span style="font-size:14.5px;font-weight:800;color:'+_vColor+';flex:1 1 auto;line-height:1.5;">'+_verdict+'</span></div>';
       h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">';
       h += _cbRow('周期位置(EDHEC)', cbBst + (edhecDD!=null?(' · 距峰值 '+edhecDD.toFixed(1)+'%'):''), (bst==='bear'?C_RED:((edhecDD!=null&&edhecDD<=-10)?C_AMB:C_GRN)));
       h += _cbRow('个股回撤(约2月)', (apDD==null?'未到位':('距峰 '+apDD.toFixed(1)+'%'+(apDD<=-20?' · 熊市级':(apDD<=-10?' · 深回调':' · 健康')))), (apDD==null?C_DIM:(apDD<=-20?C_RED:(apDD<=-10?C_AMB:C_GRN))));
       h += _cbRow('平均股价', trState, (pos==null?C_DIM:(pos>=0?C_GRN:C_RED)));
-      h += _cbRow('主力净额', fdState + (net!=null?('('+(net>=0?'+':'')+Number(net).toFixed(0)+'亿)'):''), (net==null?C_DIM:(net>=0?C_GRN:C_RED)));
+      h += _cbRow('主力净额·单日', fdState + (net!=null?('('+(net>=0?'+':'')+Number(net).toFixed(0)+'亿'+(netDate?(' · '+String(netDate).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3')):'')):''), (net==null?C_DIM:(net>=0?C_GRN:C_RED)));
       h += '</div>';
       h += '<div style="margin-top:10px;padding:8px 10px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.2);border-radius:7px;font-size:11px;line-height:1.7;color:'+C_SUB+';">'
         + '📌 口径：指数层=EDHEC 20%规则牛熊状态机（上证月收盘·零未来函数，与「🔮 未来预测」同源）；个股层=平均股价(880003口径)距近 60 日峰值回撤——指数失真（二八分化）时以个股层为准。指数牛≠个股牛：分化时严控仓位只做强势主线。红涨绿跌。</div>';
