@@ -348,6 +348,13 @@ CARD_DEFS = [
     {"id": "CITIC_PE_THERMO", "name": "中信PE热力", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current", "percentile"]},
     {"id": "SECTOR_LEADERS", "name": "主升/启动板块·龙头股", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["phase", "sector_count"], "raw_file": "sector_leaders.json", "producer": "scripts/fetch_sector_leaders.py"},
     {"id": "DAJIJIN_REDUCTION", "name": "大基金增减持监控", "page": "暂未上架", "freq": "工作日夜间档(cron次日02:30~04:40)", "max_age": 1440, "key_fields": ["update_time"], "cycle": (3, 30)},
+    # 🛡 2026-10-27 一劳永逸（CN runner1号机·all-generic-redline 家族）：以下 4 个「前端活跃卡消费、
+    #   却未登记 CARD_DEFS」的产物，此前掉进 check_all_data_files 通用 1620 红线被误判 fail。
+    #   逐条补齐登记，按真实节拍给 max_age=1440（盘后产物 24h 红线），保留真故障监控（生产者真漏刷仍 fail 触发自愈）。
+    {"id": "CITIC_PE_BACKTEST", "name": "中信PE回测", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
+    {"id": "FACTOR_LAB_BACKTEST", "name": "因子实验室回测", "page": "最终推荐", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
+    {"id": "FACTOR_WALKFORWARD", "name": "因子WalkForward", "page": "最终推荐", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
+    {"id": "FINAL_RECOMMEND_HISTORY", "name": "最终推荐Top3历史", "page": "最终推荐", "freq": "每晚D批(gen_final_recommend_history.py)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
 ]
 
 
