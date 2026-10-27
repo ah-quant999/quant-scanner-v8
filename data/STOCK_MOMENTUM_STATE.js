@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-27 18:52",
- "generated": "2026-10-27 18:52",
+ "update_time": "2026-10-27 19:03",
+ "generated": "2026-10-27 19:03",
  "meta": {
-  "generated": "2026-10-27 18:52",
+  "generated": "2026-10-27 19:03",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 29,
   "days_with_consensus": 0,
@@ -11852,10 +11852,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 3.085,
+      "price": 13.03,
+      "category": "突破"
+     },
+     {
       "code": "301227",
       "name": "森鹰窗业",
-      "change_pct": 11.886,
-      "price": 28.24,
+      "change_pct": 10.935,
+      "price": 28.0,
       "category": "突破"
      },
      {
@@ -11882,31 +11889,31 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301234",
       "name": "五洲医疗",
-      "change_pct": 5.665,
-      "price": 125.52,
+      "change_pct": 5.817,
+      "price": 125.7,
       "category": "突破"
      },
      {
       "code": "000923",
       "name": "河钢资源",
-      "change_pct": 4.032,
-      "price": 14.45,
-      "category": "突破"
-     },
-     {
-      "code": "002300",
-      "name": "太阳电缆",
-      "change_pct": 6.99,
-      "price": 7.5,
+      "change_pct": 3.6,
+      "price": 14.39,
       "category": "突破"
      }
     ],
     "加速": [
      {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 3.085,
+      "price": 13.03,
+      "category": "加速"
+     },
+     {
       "code": "301227",
       "name": "森鹰窗业",
-      "change_pct": 11.886,
-      "price": 28.24,
+      "change_pct": 10.935,
+      "price": 28.0,
       "category": "加速"
      },
      {
@@ -11926,10 +11933,17 @@ window.STOCK_MOMENTUM_STATE = (function() {
     ],
     "短线选股": [
      {
+      "code": "605577",
+      "name": "龙版传媒",
+      "change_pct": 3.085,
+      "price": 13.03,
+      "category": "短线选股"
+     },
+     {
       "code": "301227",
       "name": "森鹰窗业",
-      "change_pct": 11.886,
-      "price": 28.24,
+      "change_pct": 10.935,
+      "price": 28.0,
       "category": "短线选股"
      },
      {
@@ -11956,22 +11970,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301234",
       "name": "五洲医疗",
-      "change_pct": 5.665,
-      "price": 125.52,
+      "change_pct": 5.817,
+      "price": 125.7,
       "category": "短线选股"
      },
      {
       "code": "000923",
       "name": "河钢资源",
-      "change_pct": 4.032,
-      "price": 14.45,
-      "category": "短线选股"
-     },
-     {
-      "code": "002300",
-      "name": "太阳电缆",
-      "change_pct": 6.99,
-      "price": 7.5,
+      "change_pct": 3.6,
+      "price": 14.39,
       "category": "短线选股"
      }
     ],
@@ -11986,22 +11993,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301234",
       "name": "五洲医疗",
-      "change_pct": 5.665,
-      "price": 125.52,
+      "change_pct": 5.817,
+      "price": 125.7,
       "category": "强势股"
      },
      {
       "code": "000923",
       "name": "河钢资源",
-      "change_pct": 4.032,
-      "price": 14.45,
-      "category": "强势股"
-     },
-     {
-      "code": "002300",
-      "name": "太阳电缆",
-      "change_pct": 6.99,
-      "price": 7.5,
+      "change_pct": 3.6,
+      "price": 14.39,
       "category": "强势股"
      }
     ]
