@@ -1,0 +1,56 @@
+# 九宝量化 v8.0 — 最终推荐 · 每日 Top3 历史归档（夜班自愈）
+#
+# 根因（2026-10-28 修复）：algorithms/gen_final_recommend_history.py 是孤儿脚本，
+# 从未被任何 workflow 调用；每日 dated 快照 raw_data/history/final_recommend_YYYYMMDD.json
+# 已由盘后算法链正常落库（→10-28 齐全），但聚合产物 data/FINAL_RECOMMEND_HISTORY.js
+# 只在 2026-10-22 主人令时手动跑过一次，之后无人运行 → 历史卡在 2026-10-20。
+#
+# 本工作流「一劳永逸」修复：每天盘后算法链落库之后自动重跑聚合器并回写
+# data/FINAL_RECOMMEND_HISTORY.js，主站「最终推荐历史」卡从此不再停更。
+#
+# 触发：
+#   - schedule 22:00 CST（14:00 UTC），确保晚于盘后算法链（≈19:15 CST）落库
+#   - workflow_dispatch 手动兜底
+
+name: "📜 v8 最终推荐历史归档(夜班)"
+
+on:
+  schedule:
+    - cron: "0 14 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  gen-history:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出 main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 运行历史聚合器
+        env:
+          V8_ROOT: ${{ github.workspace }}
+        run: python algorithms/gen_final_recommend_history.py
+
+      - name: 回写 data/FINAL_RECOMMEND_HISTORY.js
+        run: |
+          git config user.name "九宝量化·历史归档"
+          git config user.email "2814546@qq.com"
+          git add data/FINAL_RECOMMEND_HISTORY.js
+          if git diff --cached --quiet; then
+            echo "无变化，跳过提交"
+          else
+            git commit -m "📜 最终推荐历史归档 nightly $(date +%F)"
+            git pull --rebase origin main || git pull --rebase --strategy-option=theirs origin main
+            git push origin main
+          fi
