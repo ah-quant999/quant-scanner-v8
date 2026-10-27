@@ -195,6 +195,7 @@ jobs:
       - name: "📥 Checkout 源码（云端 git 直连，秒级）"
         id: co
         continue-on-error: true
+        timeout-minutes: 5
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
