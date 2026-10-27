@@ -1,13 +1,15 @@
 {
-"update_time": "2026-10-27 06:20:50",
-"total": 8028,
+"update_time": "2026-10-27 08:36:23",
+"total": 8027,
 "new_listings_count": 0,
-"delisted_count": 0,
+"delisted_count": 1,
 "new_listings": [],
-"delisted": [],
+"delisted": [
+"02916 创科实业（五百）"
+],
 "meta_enriched": 0,
 "guard_tripped": false,
 "guard_reasons": [],
 "old_universe": 8028,
-"fresh_universe": 8028
+"fresh_universe": 8027
 }
