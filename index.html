@@ -16340,18 +16340,21 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
 //     同批开启盘前日频更新解析（工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿）。原卡为静态快照死卡，详见 R3/R4 注释。
 //   概念ETF龙头参考
 h += '<div id="ulPaneObserve" style="display:block;">';
-h += '<div class="card" id="marketStateCard" style="margin-bottom:16px;border-left:4px solid #60a5fa;">'
+// 🧭 2026-10-28 主人令：两卡「一行2列」并排（L1/L2 市场状态机+仓位引擎 ｜ 投资避雷针），去「评审中」标为「已通过」
+h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;align-items:start;">'
+   + '<div class="card" id="marketStateCard" style="border-left:4px solid #60a5fa;min-width:0;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#60a5fa;">&#x1F9ED; L1 市场状态机 &#183; L2 仓位引擎</span>'
    + '<span id="marketStateFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 情绪分+仓位建议（评审中）</span></div>'
-   + '<div id="marketStateBody"><div class="note">加载中&#x2026;</div></div></div>';
-h += '<div class="card" id="investAvoidCard" style="margin-bottom:16px;border-left:4px solid #f87171;">'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 情绪分+仓位建议（已通过）</span></div>'
+   + '<div id="marketStateBody"><div class="note">加载中&#x2026;</div></div></div>'
+   + '<div class="card" id="investAvoidCard" style="border-left:4px solid #f87171;min-width:0;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#f87171;">&#x1F6AB; 投资避雷针 &#183; 新闻语料量化（轻量）</span>'
    + '<span id="investAvoidFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 不要买哪些股（评审中）</span></div>'
-   + '<div id="investAvoidBody"><div class="note">加载中&#x2026;</div></div></div>';
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 不要买哪些股（已通过）</span></div>'
+   + '<div id="investAvoidBody"><div class="note">加载中&#x2026;</div></div></div>'
+   + '</div>';
 
 // ═══ 📋 2026-10-21 主人令：「这个新卡啊，我让你放暂未上架顶部」——盘前预案（观测类首卡·置顶）═══
 //   数据 window.MORNING_PLAN（data/MORNING_PLAN.js ← v8/gen_morning_plan.py，工作日 07:50 派发；
