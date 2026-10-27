@@ -2,7 +2,7 @@
 #
 # 🔴 2026-08-18 主人令：云端 ubuntu-latest 才是主力，双机只做触发+兜底。
 #
-# 🔴 2026-10-09 阿狸咪的工程师（一劳永逸根治 W52_HIGH 等 push2delay 系断更）：
+# 🔴 2026-10-09 CN runner2号机的工程师（一劳永逸根治 W52_HIGH 等 push2delay 系断更）：
 #   主力链 v8_cn_fetch_cloud.yml 固定 runs-on: ubuntu-latest（GitHub 托管·境外 IP），
 #   东财 push2delay 域唯独对境外不可达 ⇒ W52_HIGH / AVG_PRICE_880003 等 cn-IP 硬约束源
 #   在主力链上每轮软失败（判据 153：单模块失败不阻断、run 照绿 ⇒ 卡面冻结无人知）。
@@ -12,7 +12,7 @@
 #   最小常规兜底档（cron 字符串与 step1 case 分支**逐字匹配**，勿改写格式）：
 #     - 08:25 CST 盘前（category=premarket）
 #     - 17:20 CST 盘后（category=post_close）
-#   两档都落在 [self-hosted, cn] 共享标签 ⇒ 小九白天/阿狸咪夜间谁在线谁接；
+#   两档都落在 [self-hosted, cn] 共享标签 ⇒ CN runner1号机白天/CN runner2号机夜间谁在线谁接；
 #   并发组与主力链同 category 互斥（队列而非互杀），防倒退守卫兜底数据安全。
 #   节假日触发为无害空转（抓取幂等+防倒退跳过），不额外做交易日门控。
 
@@ -27,11 +27,11 @@
 #   ❌ 严禁在本文件重新引入：actions/checkout、git clone/fetch、
 #      rm -rf、git clean -fdx（后三者会撞 cn runner 的 safe-delete 拦截）。
 
-name: "🇨🇳 v8 中国数据抓取(云端·小九应急)"
+name: "🇨🇳 v8 中国数据抓取(云端·CN runner1号机应急)"
 
 on:
   schedule:
-    # 🔴 2026-10-09 阿狸咪的工程师：cn-IP 硬约束源常规兜底档（W52_HIGH 等东财 push2delay 系
+    # 🔴 2026-10-09 CN runner2号机的工程师：cn-IP 硬约束源常规兜底档（W52_HIGH 等东财 push2delay 系
     #   在境外托管 runner 上结构性不可达）。cron 字符串必须与下方 step1 case 分支逐字匹配。
     - cron: '25 0 * * 1-5'   # 08:25 CST 盘前 → category=premarket
     - cron: '20 9 * * 1-5'   # 17:20 CST 盘后 → category=post_close
@@ -52,7 +52,7 @@ concurrency:
   #   → api_push_raw 防倒退守卫互踢、半截 JSON。统一并发组（cancel-in-progress:false
   #   → 队列而非互杀），从根上保证「同一 category 任一时刻只有一条 fetch 在写 main」。
   #
-  # 🔴 2026-09-24 17:3x 小九「同族漏改」根治（HANDOFF: cnfetch-fallback-concurrency-orphan · P0）：
+  # 🔴 2026-09-24 17:3x CN runner1号机「同族漏改」根治（HANDOFF: cnfetch-fallback-concurrency-orphan · P0）：
   #   15:03 为解「僵尸 run 独占单一静态组 62 分钟堵死队列」把**云端主链**改为按 category 动态命名
   #   （`v8-cn-fetch-cloud-${{ github.event.inputs.category || 'scheduled' }}`），
   #   但**漏改同族的两条兜底链**（本文件 + hosted）—— 二者仍留在**旧裸组** `v8-cn-fetch-cloud`
@@ -89,7 +89,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # self-hosted runner 上 WorkBuddy safe-delete 批量删除守卫阈值
       CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 2000
-      # 🔴 2026-09-17 阿狸咪（拍-8 落地）：cn runner（Windows）默认 GBK ——
+      # 🔴 2026-09-17 CN runner2号机（拍-8 落地）：cn runner（Windows）默认 GBK ——
       #   python 打印 emoji/中文会 UnicodeEncodeError('gbk') 崩链。job 级强制
       #   UTF-8，与 v8_algo_cloud.yml / v8_stock_quote_refresh.yml 同口径。
       PYTHONIOENCODING: utf-8
@@ -102,7 +102,7 @@ jobs:
         id: cat
         shell: bash
         run: |
-          # 🛡 2026-08-31 一劳永逸修复（小九令）：workflow_dispatch 入参优先。
+          # 🛡 2026-08-31 一劳永逸修复（CN runner1号机令）：workflow_dispatch 入参优先。
           #   原逻辑只看 github.event.schedule，dispatch 时该值为空 → 落 *) → all
           #   （全量最重→超时被杀→数据推不上去）。同缺陷在主链路 v8_cn_fetch_cloud.yml
           #   已造成 15:42/16:05/16:18 三轮连杀、主站数据停在 14:2x 的生产事故。
@@ -129,7 +129,7 @@ jobs:
             "20 9 * * 1-5")
               echo "category=post_close" >> "$GITHUB_OUTPUT"
               echo "label=盘后" ;;
-            # 🛡️ 2026-08-13 23:1x 根因修复（阿狸咪令）：yml cron '0 9,14'（北京 17:00/22:00）
+            # 🛡️ 2026-08-13 23:1x 根因修复（CN runner2号机令）：yml cron '0 9,14'（北京 17:00/22:00）
             #   但 case 字符串写 '0 9,13'（北京 17:00/21:00），22:00 触发后 case 不匹配
             #   → step 2 '确定抓取类别' 失败 → 整个 fetch job 失败 → raw_data 盘后档不更新
             #   注释里的 21:30 实际 cron 是 22:00（不一致），主人出差前必须修
@@ -284,7 +284,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: "🐍 Python / 依赖检查（缺才装·清华镜像）"
-        # 🔴 2026-10-23 根因修复（小九，run 39939545488 日志实证）：原 PowerShell 写法
+        # 🔴 2026-10-23 根因修复（CN runner1号机，run 39939545488 日志实证）：原 PowerShell 写法
         #   `python -c "import ..." 2>$null` 在 PS 5.1 下 stderr 重定向触发 NativeCommandError
         #   直接把本步打成 exit 1 —— 后面的「清华镜像 pip install」兜底从未有机会执行
         #   ⇒ alimi-cn 依赖缺失后整条 cn 链连续 failure（10-22~10-23 全部 runs 全失败），

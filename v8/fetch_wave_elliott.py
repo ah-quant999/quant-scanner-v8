@@ -278,14 +278,14 @@ def main():
         "date": new_last_date,
         "last": last,
         "pct": pct,
-        "source": " + ".join(sorted(srcs)) + " 行情接口（小九机日频自动化 / 三级降级）",
-        "update_by": "小九机收盘后日频自动化 fetch_wave_elliott.py（客观序列自动 / marks 人工保留）",
+        "source": " + ".join(sorted(srcs)) + " 行情接口（CN runner1号机日频自动化 / 三级降级）",
+        "update_by": "CN runner1号机收盘后日频自动化 fetch_wave_elliott.py（客观序列自动 / marks 人工保留）",
     })
     if "note" not in meta:
         meta["note"] = "客观数据层：上证日线序列 + 浪型拐点 + 5指数对照。主观研判固化在 v8/wave_report_template.html。"
     meta["note"] = ("客观数据层：上证日线序列 + 浪型拐点 + 5指数对照（腾讯/新浪/东财三级降级取数）。"
                     "marks 为人工浪型拐点，脚本只保留不重判；主观研判固化在 v8/wave_report_template.html。"
-                    "更新仅需小九机跑 v8/fetch_wave_elliott.py 自动刷新并推仓库，阿狸咪无需 westock。")
+                    "更新仅需CN runner1号机跑 v8/fetch_wave_elliott.py 自动刷新并推仓库，CN runner2号机无需 westock。")
     new_obj = {"meta": meta, "series": {"dates": dates, "closes": closes}, "marks": marks, "idx": idx_new}
 
     # 6) 校验

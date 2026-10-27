@@ -344,7 +344,7 @@ CARD_DEFS = [
     {"id": "TOP10_DAILY", "name": "最终推荐·Top5因子评分", "page": "最终推荐", "freq": "收盘后1次(算法链)", "max_age": 1440, "key_fields": ["total_scored"], "raw_file": "top10_daily.json", "producer": "generate_top10.py"},
     {"id": "maharo_insights", "name": "机构研究·AI解析", "page": "观测平台", "freq": "盘中+每日3档", "max_age": 1440, "key_fields": ["update_time"], "_window_var": "MAHORO_INSIGHTS"},
     {"id": "INDEX_VALUE_FRAMEWORK", "name": "指数观测·四框架", "page": "观测平台", "freq": "每日盘前", "max_age": 1440, "key_fields": ["indices"], "raw_file": "index_value_framework.json"},
-    {"id": "WAVE_ELLIOTT", "name": "艾略特波浪·深度分析", "page": "观测平台", "freq": "每交易日17:50前后(小九机日频)", "max_age": 1440, "key_fields": ["meta"], "cycle": (18, 0)},
+    {"id": "WAVE_ELLIOTT", "name": "艾略特波浪·深度分析", "page": "观测平台", "freq": "每交易日17:50前后(CN runner1号机日频)", "max_age": 1440, "key_fields": ["meta"], "cycle": (18, 0)},
     {"id": "CITIC_PE_THERMO", "name": "中信PE热力", "page": "观测平台", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current", "percentile"]},
     {"id": "SECTOR_LEADERS", "name": "主升/启动板块·龙头股", "page": "暂未上架", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["phase", "sector_count"], "raw_file": "sector_leaders.json", "producer": "scripts/fetch_sector_leaders.py"},
     {"id": "DAJIJIN_REDUCTION", "name": "大基金增减持监控", "page": "暂未上架", "freq": "工作日夜间档(cron次日02:30~04:40)", "max_age": 1440, "key_fields": ["update_time"], "cycle": (3, 30)},
@@ -1975,7 +1975,7 @@ def check_data_cards():
             status = "warn"
             _note = d.get("net_dep_note") or d.get("manual_note") or d.get("alimi_note")
             if _note:
-                msg = "本机能力受限（非故障）· 待小九中国 IP 在线跑：" + _note
+                msg = "本机能力受限（非故障）· 待CN runner1号机中国 IP 在线跑：" + _note
 
         page = d.get("page")
         # 周末/节假日不更新模块：直接放行，不判 stale、不判空值，避免误告警
@@ -3354,14 +3354,14 @@ def check_guanlan_material_freshness():
             results.append({
                 "id": rid, "name": rname, "page": "内容审计", "status": "limited",
                 "message": ("本工作区不含 out/guanlan_reports.json（out/ 被 .gitignore 忽略、双机不共享）"
-                            "⇒ 该素材新鲜度只在小九机（计划任务 v8-guanlan-refresh）可直判；"
+                            "⇒ 该素材新鲜度只在CN runner1号机（计划任务 v8-guanlan-refresh）可直判；"
                             "且 data/maharo_insights.js 未自述素材窗口，本环境无法间接评估"),
             })
         elif win_end >= _today or (_prev_td and win_end >= _prev_td):
             results.append({
                 "id": rid, "name": rname, "page": "内容审计", "status": "ok",
                 "message": (f"间接判据：出稿档自述素材窗口末端 {win_end}（今日 {_today}），"
-                            f"未落后；直判需在小九机（out/guanlan_reports.json）"),
+                            f"未落后；直判需在CN runner1号机（out/guanlan_reports.json）"),
             })
         else:
             _lag = _count_trade_days(win_end, _today)
@@ -3369,7 +3369,7 @@ def check_guanlan_material_freshness():
                 "id": rid, "name": rname, "page": "内容审计", "status": "fail",
                 "message": (f"素材窗口末端 {win_end} 落后今日 {_today} 达 {_lag} 个交易日"
                             f"（间接判据：data/maharo_insights.js 的素材窗口自述）"
-                            f"⇒ 查小九机计划任务 v8-guanlan-refresh 与 algorithms/guanlan_extractor.py"),
+                            f"⇒ 查CN runner1号机计划任务 v8-guanlan-refresh 与 algorithms/guanlan_extractor.py"),
             })
         return results
 

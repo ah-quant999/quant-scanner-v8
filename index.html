@@ -108,7 +108,7 @@ window.__domReadyFns=[];
        非交易日(周末/法定假期 07:00–23:00): 每 2 小时
      实现见底部 __v8SmartRefreshStarted（含 2026 休市日）。
      数据变化即刷：见底部 __v8LiveDataProbe（2026-09-14 补回，HEAD 探测 HEALTH_CHECK.js）。
-     🔴 2026-09-22 小九更正：此处原写「旧「数据变化即刷」已移除」属**过时注释**——
+     🔴 2026-09-22 CN runner1号机更正：此处原写「旧「数据变化即刷」已移除」属**过时注释**——
         实测该脚本确实存在于本文件后段（idx≈1061701），是刷新双保险的第二条腿。 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -121,7 +121,7 @@ window.__domReadyFns=[];
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=02159ff62d" defer></script>
     <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=5ba9679211" defer></script>
-    <script src="data/DO_NOT_DELETE.js?v=ec9f96bf30" defer></script>
+    <script src="data/DO_NOT_DELETE.js?v=0859e60cd8" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=291b771bf1" defer></script>
     <script src="data/GOLD_POOL.js?v=ec0e5eddca" defer></script>
@@ -156,7 +156,7 @@ window.__domReadyFns=[];
      数据由 algorithms/fetch_dajijin_reduction.py 产出（东财数据中心·股东增减持，按股东全名精确匹配
      国家集成电路产业投资基金一期/二期/三期）。此处漏注入 = 死块（恒 undefined）+ 卡面永久加载中。 -->
 <script src="data/DAJIJIN_REDUCTION.js?v=f04f95b449" defer></script>
-<!-- 🔴 2026-10-06 阿狸咪的工程师：H_AUTO_BUY.js / H_AUTO_BUY_TRACK.js 经全文件审计为「全局零读取」死注入（H 反推短线买点策略已下线，无任何代码读 window.H_AUTO_BUY / window.H_AUTO_BUY_TRACK）⇒ 移除前端 script 注入。 -->
+<!-- 🔴 2026-10-06 CN runner2号机的工程师：H_AUTO_BUY.js / H_AUTO_BUY_TRACK.js 经全文件审计为「全局零读取」死注入（H 反推短线买点策略已下线，无任何代码读 window.H_AUTO_BUY / window.H_AUTO_BUY_TRACK）⇒ 移除前端 script 注入。 -->
     <!-- 🗑 2026-10-08 主人令：「实验区·模块去向索引」卡退役：渲染函数 / 专用子容器 / 轮询补填 / 切页触发 / 注册表条目 / V8_PAGE_SCHEDULE 条目同批删除，本 js 注入随之移除（其全局对象全文件零读取）。 -->
     <!-- 2026-09-07 主人令：机构研究·maharo 聚合卡（本机 cookie 拉取，云端无权限；数据由 .workbuddy/maharo_daily_pull.py 每日生成 data/maharo_macro.js） -->
     <!-- 2026-09-10 一劳永逸：AI 解析 insights 拆成独立文件 data/maharo_insights.js（window.MAHORO_INSIGHTS），
@@ -167,7 +167,7 @@ window.__domReadyFns=[];
          window.MAHORO_INSIGHTS（下一行的独立文件，云端重生成不会覆盖），
          故删此行零功能损失。若日后云端产出 maharo_macro.js，恢复本行即可。 -->
     <!-- 404 死链冗余注入行已删（原 data/maharo_macro.js?v=20261027） -->
-    <!-- 🔴 2026-10-03 阿狸咪更正：data/maharo_macro.js 实际仍被家机 maharo 自动化每日产出（git 仍追踪）但前端零引用，已登记为退役孤儿（v8_health_check._RETIRED_FILES + api_push_raw._RETIRED_ARTIFACTS 防再生）；属可删死数据，非活链。 -->
+    <!-- 🔴 2026-10-03 CN runner2号机更正：data/maharo_macro.js 实际仍被家机 maharo 自动化每日产出（git 仍追踪）但前端零引用，已登记为退役孤儿（v8_health_check._RETIRED_FILES + api_push_raw._RETIRED_ARTIFACTS 防再生）；属可删死数据，非活链。 -->
     <script src="data/maharo_insights.js?v=0c69b24cf0" defer></script>
     <!-- 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡整卡下线（白河愁单源观点卡）。
          data/BAIHECHOU_MACRO.js、data/BAIHECHOU_ANALYSIS.js、raw_data/baihechou_posts.json、
@@ -180,7 +180,7 @@ window.__domReadyFns=[];
     <script src="data/RISK_GAUGE.js?v=81fa422ef7" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=456c1d9068" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=7dbeb446f8" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
-    <!-- 2026-09-13 阿狸咪的工程师：补注入 FRESHNESS_STATUS（2.7 KB）。
+    <!-- 2026-09-13 CN runner2号机的工程师：补注入 FRESHNESS_STATUS（2.7 KB）。
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
@@ -503,7 +503,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     var today0 = new Date(+tp[0], +tp[1]-1, +tp[2]);
     var data0  = new Date(+dp[0], +dp[1]-1, +dp[2]);
     var diff = Math.round((today0 - data0) / 864e5);
-    // 🔴 2026-09-19 主人令（阿狸咪的工程师）—— 「上一交易日收盘」前缀会把当日时刻吞掉。
+    // 🔴 2026-09-19 主人令（CN runner2号机的工程师）—— 「上一交易日收盘」前缀会把当日时刻吞掉。
     //   原实现：非交易日（周末）时 diff>=1 一律 return '上一交易日收盘 ' + hm，
     //   而 hm 是**该时间戳自身的时分** ⇒ 金股池 update_time=2026-09-19 13:24（周六）
     //   被渲染成「上一交易日收盘 13:24」，自相矛盾（收盘不可能在 13:24）。
@@ -545,7 +545,7 @@ window.V8_CAL = {weeks:[],legend:[]};
   };
   /* 盘中/实时类「陈旧判定窗口」（CST 周一至周五 10:15-15:15）
      —— 仅此窗口内才对「实时/盘中」卡做 1.5h SLA 判定。
-     2026-09-11 小九的工程师·一劳永逸（假告警家族·新一类：判定窗口早于数据可产出时间）：
+     2026-09-11 CN runner1号机的工程师·一劳永逸（假告警家族·新一类：判定窗口早于数据可产出时间）：
        原起点 09:15（集合竞价）早于首个盘中数据可产出时间，导致 09:15-10:15 这段必然误报红灯：
        新交易日开盘前本就没有盘中数据可产出。实证（2026-09-11 09:23 截图）——
        「行业树图·细分赛道」被判「已停更 9 小时」：东财板块资金流在新交易日 00:00 后
@@ -1278,7 +1278,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      已连同生成器一起删除 —— 池子是策略的输入宇宙，无买卖点，拿 T+1 胜率考核即误导
      （实测该数据曾被当成「低绩效策略」提请下架）。 -->
     <script src="data/FACTOR_LAB.js?v=538a6dea28" defer></script>
-<!-- 🔴 2026-10-06 阿狸咪的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
+<!-- 🔴 2026-10-06 CN runner2号机的工程师：ALGO_TRACK.js 经全文件审计为「全局零读取」死注入（renderLifeBacktests 实际读 window.IMA_STRONG_BACKTEST，非 ALGO_TRACK；上方 2026-09-16 注释「回测页需要它」与实证不符）⇒ 移除前端 script 注入。生成管线与后端监控见 ALGO_TRACK 类处理（护栏：非孤立死注入前不擅删管线）。 -->
 <script src="data/ETF_PULSE.js?v=79a08467ec" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=0155b8a5cc" defer></script>
 <script src="data/TOP10_DAILY.js?v=bb40c130fe" defer></script>
@@ -1991,11 +1991,11 @@ window.STRATEGY_WALKFORWARD = {
   ]
 };
     </script>
-    <!-- 🔧 2026-09-30 23:0x 阿狸咪的工程师：补 INDEX_VALUE_FRAMEWORK 注入（建卡漏注入=恒 undefined
+    <!-- 🔧 2026-09-30 23:0x CN runner2号机的工程师：补 INDEX_VALUE_FRAMEWORK 注入（建卡漏注入=恒 undefined
          ⇒ 卡上「最新价/门控/120日中枢/短长趋势」四列全为「—」，而线上文件本身有数据）。 -->
     <script src="data/INDEX_VALUE_FRAMEWORK.js?v=0b49e550db" defer></script>
     <!-- 2026-09-09 / 2026-09-13 主人令：A股指数估值分位 + 价格中枢 合并为「A股指数观测」卡（暂未上架·大盘观测） -->
-    <!-- 🆕 2026-09-19 主人令（阿狸咪的工程师）：walk-forward 真值（verdict / IR_OOS / 跑赢基准率），
+    <!-- 🆕 2026-09-19 主人令（CN runner2号机的工程师）：walk-forward 真值（verdict / IR_OOS / 跑赢基准率），
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
     <script src="data/FACTOR_WALKFORWARD.js?v=cbf73e3f5c" defer></script>
@@ -3185,7 +3185,7 @@ function fmtSigned(v){
     </div>
 
     <!-- 🚚 2026-10-20 主人令「这卡移到暂未上架」：🏔 板块年度主力净流入卡已迁往「🔒 暂未上架 > 📡 观测类」卡尾位。
-         ⚠️ 10-19 19:30 阿狸咪的迁卡 commit 2846b7844a77 曾被后续 ?v 原子提交静默回退（git blob 73d0cffd 实证：
+         ⚠️ 10-19 19:30 CN runner2号机的迁卡 commit 2846b7844a77 曾被后续 ?v 原子提交静默回退（git blob 73d0cffd 实证：
          现行 main 无 sectorYearFlowCard、静态卡仍在本页）⇒ 本次重做，并挂账 sector-yearflow-move-unlisted-1019。 -->
 
     <!-- 宏观数据速览（2026-08-30：盘后数据补位） -->
@@ -4545,7 +4545,7 @@ function fmtSigned(v){
 
     var h = '';
     // Header：标题、🐻 胶囊、🧺 计数胶囊统一放同一行（与严格三重共识/四量终极格式一致）
-    // 🔴 2026-09-21 治本（阿狸咪）：原第 4 项读 NF.net_buy —— NORTH_FUND 自 2024-05 停披露
+    // 🔴 2026-09-21 治本（CN runner2号机）：原第 4 项读 NF.net_buy —— NORTH_FUND 自 2024-05 停披露
     //   （stopped:true 仅机械刷时间戳），该计数是**冻结旧值**恒为 1，属死源残留。
     //   改挂真实龙虎榜源 LHB_DATA（当日 stocks[].seats['北向']），口径与北向席位日历卡一致
     //   （净买 = seats['北向'].buy - seats['北向'].sell，同卡内 _nb_net_万）：
@@ -5156,7 +5156,7 @@ c.innerHTML = h;
         **绝不能混档** —— 否则同一持有期被后写覆盖，星级就成了随机数。
         故先由 is_primary 行定出「主口径标签模式」（把 T+数字 归一为 T+#），
         再只取同一档的各持有期。
-        ⚠️ 由此产生**硬约束**（2026-09-13 小九审计补充）：每卡必须**恰好 1 行**
+        ⚠️ 由此产生**硬约束**（2026-09-13 CN runner1号机审计补充）：每卡必须**恰好 1 行**
            is_primary，且该行 label **不得带额外后缀** —— 否则会取到 band 顺序最靠前
            的档（如有三档 3 行 primary），或把同档其余档全过滤掉（label 后缀使归一化
            后不相等，12 档退化为 1 档）⇒ 星级静默失真。生成侧由
@@ -5627,7 +5627,7 @@ c.innerHTML = h;
 (function(){
   var rendered = false;
   function _esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
-  // 🛡 2026-09-11 小九的工程师：IIFE 顶层补 _e 转义助手。
+  // 🛡 2026-09-11 CN runner1号机的工程师：IIFE 顶层补 _e 转义助手。
   //   根因：_e 此前仅在 5094/5220/5367 三处【内层作用域】局部定义，
   //   而部分顶层渲染函数（如 window.__renderJudgmentHeader）位于 IIFE 顶层作用域，拼字符串时引用 _e
   //   → ReferenceError: _e is not defined → dst.innerHTML 那行从未执行
@@ -5670,7 +5670,7 @@ c.innerHTML = h;
      策略回顾统一回测卡片渲染器（2026-09-02 主人令：全部算法回测集中到策略回顾，
      分「主策略回测」与「已下架算法回测」两组，均按星级降序）
      ════════════════════════════════════════════════════════════════════ */
-  /* 🔴 2026-09-14 小九（三件套·遗留③「档位口径一劳永逸」）：
+  /* 🔴 2026-09-14 CN runner1号机（三件套·遗留③「档位口径一劳永逸」）：
      持有期档位**派生器 = 单一真源**。
      原状：TDX 卡、策略回顾卡（_renderPeriodBacktestCard）、最佳策略卡三处各自
      硬编码 `[1,3,5,10,20]`（5 档），而产物 `by_period` / `summary` 实测**已有 12 档**
@@ -5933,7 +5933,7 @@ c.innerHTML = h;
     try{ return String(c==null?'':c).toLowerCase().trim().replace(/^[.\s]*(sh|sz|bj)?[.\s]*/,''); }catch(e){ return String(c||''); }
   };
   window.__gaoshouSet = function(){
-    /* 🔴 2026-09-20 阿狸咪的工程师：同上，删掉结果缓存。data/IMA_STRONG_STOCK.js 亦为
+    /* 🔴 2026-09-20 CN runner2号机的工程师：同上，删掉结果缓存。data/IMA_STRONG_STOCK.js 亦为
        **defer 加载**：首屏若未就绪，旧写法会把「空集」写进 __gaoshouSetCache，此后
        __inGaoshouReso / __gaoshouResoCount 恒判 false ⇒ 高手共振口径永久失真。
        构建开销仅为遍历该文件成员（几十条），极小，改每次实时取数。 */
@@ -6202,7 +6202,7 @@ c.innerHTML = h;
          判据 FACTOR_LAB_BACKTEST.abnormal_volume.spread_oos_pct<=0）随因子实验室行
          一并移除 —— 本表已无该行，警示无挂靠对象；样本外无效的结论由
          最终推荐页「✅ 回测已达标」徽章（数据真值投影）继续承载。
-         🔴 2026-09-20 阿狸咪的工程师（补）：同一次删除**漏删了引用方** ——
+         🔴 2026-09-20 CN runner2号机的工程师（补）：同一次删除**漏删了引用方** ——
          下方 _betaCell() 函数体首行仍写 _betaWarn[card]，调用点在 _btMainRow 的
          「策略」格。定义移除后每次渲染本表都抛
          ReferenceError: _betaWarn is not defined，异常打断整个回测概览渲染，
@@ -6271,7 +6271,7 @@ c.innerHTML = h;
         return '<span title="' + _esc(t) + '" style="color:' + col + ';font-weight:' + (n < 100 ? '700' : '400') + ';">'
              + n + (n < 100 ? ' ⚠' : '') + '</span>';
       }
-      /* 🆕 2026-09-17 阿狸咪的工程师：「源时点」单元格 —— **只摊时点、不下结论**。
+      /* 🆕 2026-09-17 CN runner2号机的工程师：「源时点」单元格 —— **只摊时点、不下结论**。
          ── 依据主人 2026-09-14 令：「主人要判『是否新鲜』看时间即可，
             **不需要一条会误报的红字来替主人下结论**」。故本格只显示时点，不判陈旧。
          ── 口径（两级，**现场真值优先**）：
@@ -6322,7 +6322,7 @@ c.innerHTML = h;
          + ' <span style="color:#7dd3fc;">ⓘ</span></span></div>';
       h += '<div style="overflow-x:auto;overflow-y:hidden;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
       h += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      /* 🆕 2026-09-17 阿狸咪的工程师 追加「源时点」列（源自述，不下结论）
+      /* 🆕 2026-09-17 CN runner2号机的工程师 追加「源时点」列（源自述，不下结论）
          ── 依据主人 2026-09-14 令（见本文件 line 1040-1058 的 _staleMark 注释）：
             「主人要判『是否新鲜』看时间即可，**不需要一条会误报的红字来替主人下结论**」。
          ── 故本列**只摊时点、不判陈旧**：原样显示该策略真值源产物的 update_time
@@ -6534,7 +6534,7 @@ c.innerHTML = h;
         var bpk=null,bw=-1;
         /* 2026-09-13：samples>0 不等于有胜率 —— 全部信号平盘时 win_rate 为 null
            （decided=0）。必须显式判非空，否则下方 m.wr.toFixed() 抛异常崩整卡。 */
-        /* 2026-09-14 小九：档位由硬编码 5 档改为派生（by_period 实测 12 档）——
+        /* 2026-09-14 CN runner1号机：档位由硬编码 5 档改为派生（by_period 实测 12 档）——
            否则「最佳持有期」永远只能在 T+1/3/5/10/20 里挑，长档胜率更好也选不出来。 */
         (window._holdLadder ? window._holdLadder(bp) : [1,3,5,10,20]).forEach(function(p){ var r=bp[String(p)]||{}; if((r.samples||0)>0&&r.win_rate!=null&&(r.win_rate||0)>bw){bw=r.win_rate;bpk=p;} });
         if(bpk!=null){
@@ -7661,7 +7661,7 @@ c.innerHTML = h;
   //               ③图形要「真实」—— 原为「高点→当前→生命线」三点示意，现改为真实数据作图。
   //
   //   数据源（全部真实、可追溯）：
-  //     · window.WAVE_ELLIOT —— 不读；本卡读 window.WAVE_ELLIOTT，小九机日频自动化产出
+  //     · window.WAVE_ELLIOT —— 不读；本卡读 window.WAVE_ELLIOTT，CN runner1号机日频自动化产出
   //       （v8/fetch_wave_elliott.py，交易日 16:00 收盘后，三级降级取数 腾讯→新浪→东财）：
   //       646 个交易日【真实收盘序列】+ 6 个【人工浪型拐点】marks（脚本只原样保留、绝不重判）。
   //       🔒 第三方交叉验证（westock，2026-09-14）：5 指数 last 逐位一致 —— 上证 3885.33 /
@@ -7674,9 +7674,9 @@ c.innerHTML = h;
   //
   //   图形：真实收盘折线（646 交易日）+ 6 个真实人工浪型拐点 + 3 条真实关键位水平线。
   //
-  //   口径修正（2026-09-14 阿狸咪的工程师，随「真实图形」一并修）：
+  //   口径修正（2026-09-14 CN runner2号机的工程师，随「真实图形」一并修）：
   //     ① 原「④浪生命线」由 Math.max(各触发窗口 low_point) 取得 4008.18（= F(21) 低点），
-  //        并不是 ④浪底 → 现直接取 marks 的「④底」= 3741.11（人工浪型资产，与小九研报同源）。
+  //        并不是 ④浪底 → 现直接取 marks 的「④底」= 3741.11（人工浪型资产，与CN runner1号机研报同源）。
   //     ② 原 0.382/0.5/0.618 回撤目标用 peak_close × (1-r) 计算（等价于把价格低点当 0），
   //        会得出 2572.8 这类荒谬值 → 现改为以真实拐点区间「①起 2635.09 → ③顶 4258.86」计。
   window.__ewRetry = 0;
@@ -7849,7 +7849,7 @@ c.innerHTML = h;
     h += '<div style="margin-top:8px;font-size:11px;line-height:1.75;color:var(--sub);">'
        + '<b style="color:#ef5350;">情景A（主 · 约 ' + pA + '%）：</b>五浪已完成 → ABC 回调。确认信号=跌破 ' + _n(lifeVal) + '（④浪生命线）；斐波那契回撤目标 ' + _n(t382) + '（0.382）/ ' + _n(t500) + '（0.5）/ ' + _n(t618) + '（0.618）。<br>'
        + '<b style="color:#34d399;">情景B（次 · 约 ' + pB + '%）：</b>⑤浪尚未走完 → 需站上 ' + _n(newVal) + '（' + _e(newName) + '）并有效突破 ' + _n(hiVal) + '（本轮高点）方成立。<br>'
-       + '<b style="color:#c8a2e8;">口径：</b>数据 <b>window.WAVE_ELLIOTT</b>（真实收盘 + 人工浪型拐点 · 小九机交易日 16:00 自动刷新 · 更新于 ' + _e(stamp || '--') + '）· 概率由 SH_FIB.mode「' + _e(mode || '--') + '」倾向 + 距生命线 ' + gapPct.toFixed(1) + '% + 距高点 ' + ddPct.toFixed(1) + '% 加权归一（每日随数据刷新，不硬编码）· 浪型拐点为人工研判资产（脚本不重判）· 斐波那契回撤以 ①起 ' + _n(startVal) + ' → 本轮高点 整段计 · 仅供研究参考，不构成投资建议。'
+       + '<b style="color:#c8a2e8;">口径：</b>数据 <b>window.WAVE_ELLIOTT</b>（真实收盘 + 人工浪型拐点 · CN runner1号机交易日 16:00 自动刷新 · 更新于 ' + _e(stamp || '--') + '）· 概率由 SH_FIB.mode「' + _e(mode || '--') + '」倾向 + 距生命线 ' + gapPct.toFixed(1) + '% + 距高点 ' + ddPct.toFixed(1) + '% 加权归一（每日随数据刷新，不硬编码）· 浪型拐点为人工研判资产（脚本不重判）· 斐波那契回撤以 ①起 ' + _n(startVal) + ' → 本轮高点 整段计 · 仅供研究参考，不构成投资建议。'
        + '</div>';
     dst.innerHTML = h;
   };
@@ -8501,7 +8501,7 @@ window.__renderIndexObserve = function(){
   // 数据源：raw_data/factor_progress.json（由 gen_factor_progress.py 根据 FACTOR_AUDIT + 主人分批决策生成）
   window.__fpRetry = 0;
 
-  /* 🔧 2026-09-20 21:52 阿狸咪的工程师：恢复被 0d3482be4 误删的 _renderPostReady 定义。
+  /* 🔧 2026-09-20 21:52 CN runner2号机的工程师：恢复被 0d3482be4 误删的 _renderPostReady 定义。
      该提交在删 __renderFactorLab 死代码时把本函数连带删掉，但下方调用点仍在
      ⇒ ReferenceError: _renderPostReady is not defined，策略回测区初始渲染全挂。
      按该提交本意剔除 __renderFactorLab 调用，其余 11 个渲染函数实测均存活。 */
@@ -8585,7 +8585,7 @@ window.__renderIndexObserve = function(){
             how:'wx.zsxq.com 登录 → DevTools → Application → Cookies → 复制 zsxq_access_token' },
           { name:'QQ 邮箱授权码',
             use:'全站邮件告警出口（2814546@qq.com）',
-            where:'.workbuddy/v8_smtp_config.json（小九 · 阿狸咪各一份，不跨机同步）',
+            where:'.workbuddy/v8_smtp_config.json（CN runner1号机 · CN runner2号机各一份，不跨机同步）',
             local:true, cloud:false,
             updated:'2026-09-11', cycle:90, expires:'',
             how:'QQ邮箱 → 设置 → 账户 → 开启 SMTP 服务 → 生成授权码（16 位小写字母）' },
@@ -8684,9 +8684,9 @@ window.__renderIndexObserve = function(){
       <div class="card">
         <h3><span class="ic">🖥️</span>双机状态 <span class="fresh" style="font-size:10px;color:var(--dim)">[实时]</span></h3>
         <div class="kv"><span class="k">执行节点</span><span><span class="status-dot s-ok"></span>cn_fetch / build_deploy = GitHub Actions 云端 ubuntu-latest；<b>algo_cloud（盘后算法链）= self-hosted cn 双机</b>（lemoncat-cn / alimi-cn · 共享 cn 标签谁空谁跑 · 已由 job 日志 runner_name 实证）</span></div>
-        <div class="kv"><span class="k">小九（单位机）</span><span><span class="status-dot s-warn" id="hbXiaojiuDot"></span><span id="hbXiaojiuStatus">等待心跳…</span> · lemoncat-cn runner：承接 algo_cloud 盘后算法链（与阿狸咪共享 cn 标签，谁空谁跑）+ 应急 workflow_dispatch + 云端管线看门狗</span></div>
-        <div class="kv"><span class="k">小九心跳明细</span><span id="hbXiaojiuDetail" style="font-size:12px">正在加载 data/HB_XIAOJIU.js …</span></div>
-        <div class="kv"><span class="k">阿狸咪（家中机）</span><span><span class="status-dot s-ok"></span>本地预览（file:///E:/workspace/stock-scanner/index.html），不接部署</span></div>
+        <div class="kv"><span class="k">CN runner1号机（单位机）</span><span><span class="status-dot s-warn" id="hbXiaojiuDot"></span><span id="hbXiaojiuStatus">等待心跳…</span> · lemoncat-cn runner：承接 algo_cloud 盘后算法链（与CN runner2号机共享 cn 标签，谁空谁跑）+ 应急 workflow_dispatch + 云端管线看门狗</span></div>
+        <div class="kv"><span class="k">CN runner1号机心跳明细</span><span id="hbXiaojiuDetail" style="font-size:12px">正在加载 data/HB_XIAOJIU.js …</span></div>
+        <div class="kv"><span class="k">CN runner2号机（家中机）</span><span><span class="status-dot s-ok"></span>本地预览（file:///E:/workspace/stock-scanner/index.html），不接部署</span></div>
         <div class="kv"><span class="k">failover 守卫</span><span><span class="status-dot s-ok"></span>活跃</span></div>
       </div>
     <script>
@@ -8732,12 +8732,12 @@ window.__renderIndexObserve = function(){
       <h3><span class="ic">⚙️</span>自动化任务 <span class="fresh" style="font-size:10px;color:var(--dim)">[静态]</span></h3>
       <table><thead><tr><th>任务</th><th>周期</th><th>状态</th><th>说明</th></tr></thead><tbody>
         <tr><td>v8_cn_fetch_cloud</td><td>工作日 cron</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>中国数据抓取主链 · push raw_data → 自动触发 build_deploy</td></tr>
-        <tr><td>v8_cn_fetch_intraday_lemoncat</td><td>工作日 14 档(9:40-15:00)</td><td><span class="status-dot s-ok"></span>云端 ubuntu-latest</td><td>盘中准点档调度器（接力赛模型）：每档 dispatch 云端 → sleep 10min → 查状态 → 失败则小九 cn IP 兜底；同 group v8-cn-fetch-cloud 互斥排队。<b>2026-09-10 改</b>：runs-on 由 [self-hosted, cn] 收归 ubuntu-latest（原标签非专属，实测 14 档 11 档被阿狸咪机抢跑）；并新增三重守卫（非交易日拦截 / 时间窗 09:32-15:05 / 云端在途则跳过本档，绝不制造第二个 pending）</td></tr>
+        <tr><td>v8_cn_fetch_intraday_lemoncat</td><td>工作日 14 档(9:40-15:00)</td><td><span class="status-dot s-ok"></span>云端 ubuntu-latest</td><td>盘中准点档调度器（接力赛模型）：每档 dispatch 云端 → sleep 10min → 查状态 → 失败则CN runner1号机 cn IP 兜底；同 group v8-cn-fetch-cloud 互斥排队。<b>2026-09-10 改</b>：runs-on 由 [self-hosted, cn] 收归 ubuntu-latest（原标签非专属，实测 14 档 11 档被CN runner2号机机抢跑）；并新增三重守卫（非交易日拦截 / 时间窗 09:32-15:05 / 云端在途则跳过本档，绝不制造第二个 pending）</td></tr>
         <tr><td>v8_intraday_snapshot</td><td>盘中每 10 分(9:00-15:50)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>板块资金日内快照（独立高频·根治上午空白）：写 SECTOR_FUND_FLOW_INTRADAY，ubuntu-latest 云端，独立 group v8-intraday-snapshot；2026-09-10 补登记（此前漏登记致 Pre-deploy audit 阻断部署）</td></tr>        <!-- ✅ 2026-08-29 一劳永逸：下列 3 个自愈器已于 commit 1fe4f8c71 删除（.github/workflows/ 下已不存在），
              原表仍标绿点 ACTIVE 属误导；改为灰色「已下线」，保留行以存历史 -->
         <tr><td>v8_cn_fetch_watchdog</td><td>盘中每 15 分(8:07-15:52)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td><b>唯一状态型兜底</b>：陈旧 &gt;45min 才动手派发；其余一概不新增派发者（2026-09-10 派发源收敛铁律）</td></tr>
         <tr><td>v8_health_patrol</td><td>每小时 :08/:38</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>数据健康巡检 + 自愈（v8_health_check.py --heal）；陈旧阈值 2026-09-10 由 6 分调为 30 分</td></tr>
-        <!-- ✅ 2026-10-26 阿狸咪补登记：小九 9ec1c0dbf 新建 v8_nolost_guard（*/20 cron）漏双登记 ⇒ build_deploy [4/8] 午间档起连红 -->
+        <!-- ✅ 2026-10-26 CN runner2号机补登记：CN runner1号机 9ec1c0dbf 新建 v8_nolost_guard（*/20 cron）漏双登记 ⇒ build_deploy [4/8] 午间档起连红 -->
         <tr><td>v8_nolost_guard</td><td>每 20 分(全天·双机轮值)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>双机零丢失协议 v2 守卫：核对双机账本，只补「推前有/推后无」的路径缺失，不回滚内容变更</td></tr>
         <tr><td>v8_algo_cloud</td><td>16:40/18:10/20:00/21:00(+22:30/00:30/06:00/08:00)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产（选股四模块+回测）</td></tr>
         <tr><td>v8_backup</td><td>每日23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data / 交接文档（含 v6 备份保留策略：v8 稳定一周前不删）</td></tr>
@@ -8759,7 +8759,7 @@ window.__renderIndexObserve = function(){
         <tr><td>v8_cleanup</td><td>周日 23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>云端周日清理</td></tr>
         <tr><td>cloud_weekly_cleanup</td><td>周六 21:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>云端每周清理</td></tr>
         <tr><td>runner_health_alert</td><td>工作日 13/15/17/19/21 点 · 周末 08-20 点每 2h</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>lemoncat-cn runner 离线告警 + 自动恢复关闭 Issue</td></tr>
-        <tr><td>小九-v8云端管线看门狗</td><td>08-22每小时</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>只监督、不部署、不抢跑</td></tr>
+        <tr><td>CN runner1号机-v8云端管线看门狗</td><td>08-22每小时</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>只监督、不部署、不抢跑</td></tr>
         
       </tbody></table>
     </div>
@@ -8791,14 +8791,14 @@ window.__renderIndexObserve = function(){
 
     </div>
 
-    <!-- 2026-09-05 阿狸咪加注 / 2026-09-10 重构：v8 workflow 同步清单（隐藏不渲染，但 align_logic_ops.py 校验需要这些 stem 出现在 index.html 的 sec-lg/sec-op 或 logic.html 的 sec-lg）——
+    <!-- 2026-09-05 CN runner2号机加注 / 2026-09-10 重构：v8 workflow 同步清单（隐藏不渲染，但 align_logic_ops.py 校验需要这些 stem 出现在 index.html 的 sec-lg/sec-op 或 logic.html 的 sec-lg）——
          22 项 MUST_HAVE_CRON（必须有 cron 且必须文档化）：
            v8_cn_fetch_cloud | v8_cn_fetch_cloud_hosted | v8_cn_fetch_watchdog | v8_algo_cloud | v8_algo_intraday_lite |
            v8_lhb_fetch | v8_ima_strong_stock | v8_stock_quote_refresh | v8_risk_gauge | v8_health_patrol |
            v8_cache_buster_reconcile | v8_daily_audit | v8_backup | v8_cleanup | cloud_weekly_cleanup |
            runner_health_alert | v8_t1_guard | v8_weekend_light | v8_intraday_snapshot |
            v8_cn_fetch_intraday_lemoncat | v8_cn_fetch_experiments | v8_dajijin_fetch
-         2026-09-23 阿狸咪补登记（新建链收尾缺口 · 当晚发现并收口）：
+         2026-09-23 CN runner2号机补登记（新建链收尾缺口 · 当晚发现并收口）：
            · v8_dajijin_fetch —— 主人令新建「🚨 大基金 增减持监控」（暂未上架·观测类，
              工作日 20:30 CST 跑 cn runner，产 data/DAJIJIN_REDUCTION.js）。
              建链时只写了 .github/workflows/ 与前端卡，**漏了「名单 + 文档源」双登记** ⇒
@@ -8807,12 +8807,12 @@ window.__renderIndexObserve = function(){
            ⚠️ 教训：新建带 cron 的 workflow 必须当轮完成双登记，否则当晚数据一律上不了线。
          4 项 ALLOW_NO_CRON（仅 workflow_dispatch 应急 / 事件驱动）：
            v8_algo_run | v8_cn_fetch_cloud_selfhosted | v8_build_deploy | v8_align_gate
-         2026-09-10 阿狸咪「派发源精简」清理（防止名单积灰再次误导）：
+         2026-09-10 CN runner2号机「派发源精简」清理（防止名单积灰再次误导）：
            · v8_freshness_watch / v8_slot_scheduler —— 文件已删除 → 从名单彻底移除
            · v8_cn_fetch / v8_algo / v8_sync_v6_data / v8_sync_legacy —— 文件早已不存在 → 删除死登记
            · v8_cn_fetch_intraday_lemoncat —— 事实有 14 条 cron（旧注释归 ALLOW 属分类错误）→ 归回 MUST
            · v8_cn_fetch_experiments —— 有 16:30 cron 且已文档化 → 由 ALLOW 升入 MUST
-         2026-10-26 阿狸咪补登记（小九 9ec1c0dbf 新建 v8_nolost_guard */20 cron 漏双登记 ⇒
+         2026-10-26 CN runner2号机补登记（CN runner1号机 9ec1c0dbf 新建 v8_nolost_guard */20 cron 漏双登记 ⇒
            build_deploy [4/8] 午间档起连红）：
            v8_nolost_guard —— 双机零丢失协议 v2 守卫（*/20·双机轮值）
          —— 让 align_logic_ops.py 校验 = 0 漂移 -->
@@ -8981,7 +8981,7 @@ function switchSec(sec,el){
   if(sec==='td' && typeof window.__renderJudgmentBody==='function'){
     setTimeout(window.__renderJudgmentBody,60);
     setTimeout(window.__renderJudgmentHeader,60);
-    // 🗑 2026-09-21 小九：删除死调用 window.__retryJudgmentRender（全仓无该定义，恒不执行）。
+    // 🗑 2026-09-21 CN runner1号机：删除死调用 window.__retryJudgmentRender（全仓无该定义，恒不执行）。
   }
   // 2026-08-30：盘后数据补位卡（宏观/期指/解禁/业绩）切 tab 时重绘
   if(sec==='ph'){
@@ -8994,7 +8994,7 @@ function switchSec(sec,el){
     }, 80);
   }
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
-  // 🗑 2026-09-21 小九：删除死调用 window._renderSecPh（全仓无该定义，恒不执行）。
+  // 🗑 2026-09-21 CN runner1号机：删除死调用 window._renderSecPh（全仓无该定义，恒不执行）。
   //    上方 sec==='ph' 分支已用 renderFuturesMain/renderMacroSummary/renderRestrictedCalendar/
   //    renderForecastCalendar 完成盘后卡重绘，功能无缺口。
   // 选股策略页：渲染入口改为 window.switchSt('pool')（2026-08-30 主人令：选股池为默认首 tab）
@@ -9916,7 +9916,7 @@ window.v8SectorFlow = window.v8SectorFlow || (function(){
 
 /* ~~ 已下架：上证+深证成交额 SVG 曲线图 + 近一月涨跌家数 SVG 柱状图（2026-08-16 主人令） ~~ */
 
-/* 🔴🔴 2026-09-16 小九根因修复（一劳永逸）：
+/* 🔴🔴 2026-09-16 CN runner1号机根因修复（一劳永逸）：
    本 <script> 块内共 15 处调用 esc()，但**本块从未定义 esc**；
    全站仅有的 3 个 function esc 分别定义在其它块的 IIFE **局部作用域**内（HTML 行 2572 / 2702 / 14838），
    对本块不可见 ⇒ 一旦执行到任一处 esc(...) 必抛 `ReferenceError: esc is not defined`。
@@ -9950,7 +9950,7 @@ function renderLimitUpHeatmap(){
   var _cstLuh=window._cstParts?window._cstParts(new Date()):null;
   var _hrLuh=_cstLuh?(_cstLuh.hh+_cstLuh.mm/60):(function(){var _n=new Date();return _n.getHours()+_n.getMinutes()/60;})();
   var _isPreMarketLuh=_hrLuh<9.416; // 09:25 前
-  /* 🛡 2026-09-16 小九的股票专家 一劳永逸根因修复：
+  /* 🛡 2026-09-16 CN runner1号机的股票专家 一劳永逸根因修复：
      本行原为 `_nowLuh.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',...})`。
      2026-09-16 04:56 的 a8331c521f「恢复被 5e1f7cea2 覆盖的 UTC+8 调用点」把本块上方两行
      声明（`var _nowLuh=new Date();` / `var _hrLuh=_nowLuh.getHours()+...`）整块替换为 _cstLuh 版，
@@ -11438,7 +11438,7 @@ window.__renderLimitUpHeatmap = renderLimitUpHeatmap;
       xAxis:{type:'category', data:xData, boundaryGap:false,
              axisLine:{lineStyle:{color:'#475569'}}, axisLabel:{color:'#94a3b8', fontSize:11}},
       yAxis:[{type:'value', name:'累计净额（亿）', nameTextStyle:{color:'#94a3b8'},
-              // 🛡 2026-08-19 阿狸咪根治：max/min 回调加 isFinite 兜底。
+              // 🛡 2026-08-19 CN runner2号机根治：max/min 回调加 isFinite 兜底。
               //   旧版当 series 数据全 null 时，v.max/v.min 是 undefined，Math.max(0, undefined+0.15*undefined) = NaN，
               //   ECharts 默认 max = 1e9，Y 轴 label 变成 999999999（主人截图被遮的「999999」就是这个）。
               //   加 isFinite 检查：无效时回退到 ±50 亿合理范围。
@@ -12566,7 +12566,7 @@ function drawUpDownChart(){
       '</div>'+
       credHtml;
 
-    // 2026-08-10 小九：接入孤儿数据源（RISK_GAUGE / WEEKEND_RUN / WEEKEND_META_REPORT）
+    // 2026-08-10 CN runner1号机：接入孤儿数据源（RISK_GAUGE / WEEKEND_RUN / WEEKEND_META_REPORT）
     try {
       let extra = '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">';
       // 🗑️ 2026-09-02 主人令：原「🚨 风险温度计」孤儿卡已合并进「今日判定 · 环境综合」的「🌡️ 外部风险」区块，
@@ -12960,7 +12960,7 @@ function drawUpDownChart(){
     if(!body) return;
 
 
-    /* 🛡 2026-09-16 小九的股票专家 一劳永逸根因修复（TDZ）：
+    /* 🛡 2026-09-16 CN runner1号机的股票专家 一劳永逸根因修复（TDZ）：
        原先 `const todayStr` 声明在本函数后段（原 L11705），但本函数在更早处就调用了
        `parseTs(liveUpdated)`（见下方 `const liveUpdatedDate`），而 `parseTs` 内部
        引用 `todayStr`。函数声明会提升、const 不会 ⇒ 调用早于初始化 ⇒ TDZ：
@@ -12994,7 +12994,7 @@ function drawUpDownChart(){
     } catch (e) {}
     // 🩺 2026-09-08 D2-C 一劳永逸：显式纳入 HEALTH_CHECK 心跳时间（含 updated_at）
     //    旧实现只扫 timeFields（无 updated_at），漏掉 HEALTH_CHECK 心跳 → 页面误报「已停更」红灯。
-    // 🩺 2026-09-09 D2-C 收口（阿狸咪 08:45 P0-2）：HEALTH_CHECK 心跳是「站点是否存活」的权威信号，
+    // 🩺 2026-09-09 D2-C 收口（CN runner2号机 08:45 P0-2）：HEALTH_CHECK 心跳是「站点是否存活」的权威信号，
     //    应优先用其 updated；只有当 HEALTH_CHECK 自身缺失/格式不符时才回退到多源 max（避免 30min 节奏的
     //    HEALTH_CHECK.updated 被其他陈旧源拖成「陈旧 max」反而误报「已停更」）。
     let hcUpdated = null;
@@ -13131,7 +13131,7 @@ function drawUpDownChart(){
 
         // 多 slot 卡（盘中+盘后 等）一劳永逸：只要 lastTs 落在任一槽位 ±60min 区间，整卡全部槽位都标 ✓
         //   否则盘中槽位无数据时被错误判 ✗（如候选池 lastTs=17:36 落在 19:15 区间但 15:30 槽 ✗ → 红边）
-        // 🛡 2026-10-01 主人令「全面审计·亮灯」一劳永逸根因修复（阿狸咪的工程师）：
+        // 🛡 2026-10-01 主人令「全面审计·亮灯」一劳永逸根因修复（CN runner2号机的工程师）：
         //   矩阵大量行 slots 是**字符数组**（['0','8',':','2','5']）而 slotDate 按 '08:25' 整串解析、
         //   全函数无 join 归一化 ⇒ 今日事件/盘后/共振/最终/选股/回测/暂未上架/运维算法链 等组的
         //   时窗胶囊自上线起从未真正亮灯（只渲染灰字符碎片，✓/✗ 判定整体失灵）。
@@ -14930,13 +14930,13 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // 2026-08-29 主人令：选股池子页渲染（2026-09-11：并入金股池卡片，统一走 renderStPoolAll）
     if(n==='pool' && typeof window.renderStPoolAll==='function') setTimeout(window.renderStPoolAll, 30);
     if(n==='life' && typeof window.__renderImaStrongStock==='function') setTimeout(window.__renderImaStrongStock, 30);
-    /* 🔴🔴 2026-09-19 阿狸咪的工程师：此处原有两处**死调度**，已删除（实测铁证）
+    /* 🔴🔴 2026-09-19 CN runner2号机的工程师：此处原有两处**死调度**，已删除（实测铁证）
        · __renderLifecycleSection → 目标 #lifeBody              容器 DOM 定义 **0**
        · __renderStrongBreakout   → 目标 #strongBreakoutBody   容器 DOM 定义 **0**
        两函数体首行都是 `if(!dst) return;` ⇒ 每次切到本页都**静默空转**
        （不报错、不渲染、纯浪费）。主人 2026-09-16 令：生命周期子页与
        强势突破 pane 因回测太差已**永久下架**，调度随之下线。
-       ✅ 2026-10-06 阿狸咪的工程师：经审计确认 __renderLifecycleSection 仅余 L7052 一处活触发（switchSt 调度已于 2026-09-19 删），目标 #lifeBody 全站无 DOM 定义 ⇒ 函数体（原 L6006–L6301）与 L7052 调用已**彻底删净**，死代码从根消除。__renderStrongBreakout 此前已删净。 */
+       ✅ 2026-10-06 CN runner2号机的工程师：经审计确认 __renderLifecycleSection 仅余 L7052 一处活触发（switchSt 调度已于 2026-09-19 删），目标 #lifeBody 全站无 DOM 定义 ⇒ 函数体（原 L6006–L6301）与 L7052 调用已**彻底删净**，死代码从根消除。__renderStrongBreakout 此前已删净。 */
     /* 保留：__renderImaStrongStock（#imaStrongBody ✅ 活）+ renderLifeBacktests（回测真实产出） */
     if(n==='life' && typeof window.renderLifeBacktests==='function') setTimeout(window.renderLifeBacktests, 60);
     if(n==='ff3' && typeof window.renderFf3==='function') setTimeout(window.renderFf3, 30);  // 🆕 2026-10-22 主人令：资金异动三因子子页渲染调度
@@ -14949,7 +14949,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       if(window.__finalHistRendered){ try{ window.renderFinalHist(); }catch(e){} }
     }
     // 2026-09-12 主人令：因子子页（原暂未上架·因子类迁入）
-    // 2026-10-06 阿狸咪的工程师：fa（因子实验室）分支经审计为不可达死代码（DOM 无 data-st="fa" 按钮、switchSt('fa') 早删），已删净；因子实验室现仅于「最终推荐」页渲染。
+    // 2026-10-06 CN runner2号机的工程师：fa（因子实验室）分支经审计为不可达死代码（DOM 无 data-st="fa" 按钮、switchSt('fa') 早删），已删净；因子实验室现仅于「最终推荐」页渲染。
   // 2026-09-18 主人令：子页名统一「因子实验室」（原「🧪 因子」），且不评星级（因子=加分项，非选股策略）。
     // 🛡 2026-09-02 主人令根治：切换后立即启动「子 tab 数据就绪重试」（见 __stRetryTab），消除 defer 未注入导致的首渲空卡
     try{ window.__stRetryTab(n); }catch(e){}
@@ -15793,7 +15793,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       /* 启动板块默认折叠 —— 与图2 的「启动·N 点击查看」交互对齐（状态存 DOM，重渲不丢） */
       var launchOpen = (body.dataset.ulOpen === '1');
       /* 四种「没龙头股」的原因分别明示，绝不静默丢板块（旧版曾因此只显示 9 个）。
-         🛡 2026-09-30 小九（主人令「一劳永逸」）：后端 fetch_sector_leaders.py 现携
+         🛡 2026-09-30 CN runner1号机（主人令「一劳永逸」）：后端 fetch_sector_leaders.py 现携
          em_boards_source（live/cache/unavailable）审计字段——东财全 host 断连日
          （实测 09-30：RemoteDisconnected 云端+本机全断）板块被降级保留为 no_match，
          此处须与「真·无对应行业板块」区分开，避免误导；dict 旧档时今日新晋板块
@@ -16189,7 +16189,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     var el=(typeof $==='function')?$('unlistedPanel'):document.getElementById('unlistedPanel');
     if(!el) return;
     // 🛡 2026-08-26 一劳永逸：提前暴露 __ulSwitch，子 tab 按钮在 renderUnlisted 任何位置抛错后仍可切换
-    // ═══ 🛡 2026-09-14 阿狸咪的工程师：暂未上架子页「卡片渲染派发器」（单一真源 · 一劳永逸）═══
+    // ═══ 🛡 2026-09-14 CN runner2号机的工程师：暂未上架子页「卡片渲染派发器」（单一真源 · 一劳永逸）═══
     //   根因：_renderPostReady() 只在 DOMContentLoaded 跑一次，那时 unlistedPanel 是空壳，
     //         当时两子页共 5 张卡的渲染函数全部因 dst 缺失提前 return（dst 判空在重试逻辑之前 ⇒ 连重试都没布上）；
     //         用户随后进「暂未上架」时 renderUnlisted 只建骨架，__ulSwitch 的 observe 分支还是空块
@@ -16223,7 +16223,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
       if(btn) btn.classList.add('active');
       // 切到对应子页时兜底触发该页全部卡片渲染，避免 defer 数据未到导致空卡。
-      // 🛡 2026-09-14 阿狸咪的工程师：两个子页统一走派发器（原先 observe 分支是空块 ⇒ 主题空间/AI洞察永久「加载中…」）
+      // 🛡 2026-09-14 CN runner2号机的工程师：两个子页统一走派发器（原先 observe 分支是空块 ⇒ 主题空间/AI洞察永久「加载中…」）
       if(typeof window.__ulRenderPane==='function'){ try{ window.__ulRenderPane('observe'); }catch(e){} }
     };
     if(!window.__ulSelfHealTimer){
@@ -16231,7 +16231,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         var p=document.getElementById('unlistedPanel');
         if(!p) return;
         if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneObserve')>=0){
-          // 🛡 2026-09-14 阿狸咪的工程师：骨架就绪后派发一次「当前子页」的卡片渲染。
+          // 🛡 2026-09-14 CN runner2号机的工程师：骨架就绪后派发一次「当前子页」的卡片渲染。
           //   幂等：data-ulpane 标记 === 当前子页 就跳过（防每 1.5s 重渲刷屏）；
           //   renderUnlisted 重建 innerHTML 会丢标记 ⇒ 自动再派发一次，无需人工干预。
           var _t = window.__ulActivePane || 'observe';
@@ -17325,7 +17325,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       if(realTs && item && item.last_update && String(realTs).slice(0,16) !== String(item.last_update).slice(0,16)){
         timeEl.innerHTML += ' (数据)';
       }
-      /* 🛡 2026-09-21 小九：① 原用 s-fail —— CSS 里根本没有这个类（只有 .s-ok/.s-warn/.s-err/.s-off）
+      /* 🛡 2026-09-21 CN runner1号机：① 原用 s-fail —— CSS 里根本没有这个类（只有 .s-ok/.s-warn/.s-err/.s-off）
          ⇒ 失败时圆点**无色**（真 bug，非外观问题）；② limited/info 落 else 显「待更新」+ 黄点（误报）。
          现与**状态视觉单一真相源** V8_STATUS_VISUAL（本文件同名常量）严格同口径：
            limited/info/skip = 灰（真·不适用，不算失败）；unknown = 红（接线缺口必须可见，不得静默灰化）。 */
@@ -17434,7 +17434,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       //   导致「RPS A档回测(limited)」这类降级可用项长期占据运维诊断位（假告警，且经核实本机100%不可解）。
       //   注：RPS/STOCK_STOP_DATA 等「本机网络受限」项的信息已归位到各自卡片内说明。
       if(!it) return;
-      /* 🛡 2026-09-21 小九（一劳永逸 · 补第五态 + 白名单化）：诊断区只列**真失败**。
+      /* 🛡 2026-09-21 CN runner1号机（一劳永逸 · 补第五态 + 白名单化）：诊断区只列**真失败**。
          病灶：原为黑名单（只排除 ok/limited/warn），后端 2026-09-15 新增第五态 info
          （语义「真·不适用，非失败」：不计 fail、不拉红 overall）时**本过滤未同步** ⇒
          info 项落进下方 else 被显示成「待更新」。实测：CI 环境 local_sync
@@ -17450,7 +17450,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
                 : (it.id==='MARGIN_DATA') ? ' → 交易所日频 16:15 一次,阈值已放宽 24h,目前属正常窗口'
                 : (it.id==='LIMIT_UP_HEATMAP' || it.id==='MARKET_ALERTS' || it.id==='MARKET_FUND_FLOW_DATA') ? ' → 盘中每 30 分自愈;盘后非交易时段天然为空属正常'
                 : '';
-      /* 🛡 2026-09-21 小九：上方已白名单化（只 fail 可达）⇒ 原三元链的「待更新」分支是**死代码**，
+      /* 🛡 2026-09-21 CN runner1号机：上方已白名单化（只 fail 可达）⇒ 原三元链的「待更新」分支是**死代码**，
          按主人令彻底删除，不留半截引用（此前它正是把 info 项显成「文件 local_sync 待更新」的执行体）。 */
       diags.push('文件 <b>'+it.id+'</b> 失败：最后更新 '+(it.last_update || '--')+(it.message ? ' · '+it.message : '')+( _hint ? '<br><span style="color:#7dd3fc;font-weight:400;font-size:11px;display:inline-block;margin-top:3px">🔧 '+_hint+'</span>' : '' ));
     });
@@ -17554,14 +17554,14 @@ hm += '</div>'; // /ulPaneBacktest
   };
   // ═══ 🧪 斐波那契观测窗（2026-09-15 主人令：由「🔒 已下架」盘前区迁入「🌍 观测平台 > 📊 大盘观测」）═══
   //   卡位：紧贴「📊 艾略特波浪 · 深度分析」卡下方（主人令：两卡都盘后更新，差别不大，**不合卡**）
-  //   🔴 数值口径修正（2026-09-15 阿狸咪的工程师 · 实测举证）：
+  //   🔴 数值口径修正（2026-09-15 CN runner2号机的工程师 · 实测举证）：
   //     data/SH_FIB.js 的 current.index / total_points / total_pct 三字段写的是【前一交易日】收盘——
   //       实测：index=3888.11，而 2026-09-14 当日真实收盘 = 3885.33（WAVE_ELLIOTT.series 末值，westock 交叉验证）；
   //       反推 peak_close + total_points = 4163.10 + (-274.99) = 3888.11 ⇒ 三字段同源于前一交易日。
   //     而 days_down=60 / peak_date=2026-06-22 / peak_close=4163.10 三项实测【正确】
   //       （2026-06-22 → 2026-09-14 在真实序列中恰好相隔 60 个交易日）。
   //     ⇒ 本卡一律以【最新真实收盘】重算这三项；WAVE_ELLIOTT 缺失时退回 SH_FIB 原值并显式标注「前一交易日」。
-  //     ⚠️ 本卡未改任何数据源、未补造数值；数据层根因（SH_FIB 取数差一日）已报小九修 fetch 脚本。
+  //     ⚠️ 本卡未改任何数据源、未补造数值；数据层根因（SH_FIB 取数差一日）已报CN runner1号机修 fetch 脚本。
   window.__fwRetry = 0;
   // ═══════════════════════════════════════════════════════════════════════════════
   // 🧭 大盘 5 卡汇总解析（2026-09-17 主人令：放在「📊 大盘观测」最顶部）
@@ -18247,7 +18247,7 @@ h+=`</div>`;
        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
        + '<span style="font-size:15px;font-weight:700;color:#f472b6;">📊 艾略特波浪 · 深度分析</span>'
        + '<span class="fresh" id="elliottWaveFresh">&#x2014;</span>'
-       + '<span style="font-size:11.5px;color:var(--dim);">真实收盘序列 + 人工浪型拐点 + 关键位 · 小九机日频刷新</span></div>'
+       + '<span style="font-size:11.5px;color:var(--dim);">真实收盘序列 + 人工浪型拐点 + 关键位 · CN runner1号机日频刷新</span></div>'
        + '<div id="elliottWaveInner"><div class="note" style="padding:16px;text-align:center;color:var(--dim);">加载中&#x2026;</div></div>'
        + '</div>';
     // ── 卡2：斐波那契观测窗（← 2026-09-15 主人令：由「🔒 已下架」盘前区迁入，紧贴波浪卡下方，不合卡）──
@@ -18277,7 +18277,7 @@ h+=`</div>`;
     }catch(e){}
     // 🔴 2026-09-12 补漏：机构研究·AI 解析卡的填充函数 _fillMahoroCard 原先全局
     //   只在 renderUnlisted 里被调用；宿主迁到本页后无任何触发 → 卡永久「加载中」。
-    //   数据源 window.MAHORO_INSIGHTS（云端/小九每日 08:50 拉取）；MAHORO_MACRO 已废弃（见 renderMahoroCard 内注释）。
+    //   数据源 window.MAHORO_INSIGHTS（云端/CN runner1号机每日 08:50 拉取）；MAHORO_MACRO 已废弃（见 renderMahoroCard 内注释）。
     //   defer 数据可能晚于首渲到达，故 3 次退避重试（0/600/1800ms），成功即止。
     try{
       var _mh = function(){ try{ if(typeof window._fillMahoroCard==='function') window._fillMahoroCard(); }catch(e){ console.warn('maharo 卡渲染失败',e); } };
@@ -18309,7 +18309,7 @@ h+=`</div>`;
   };
   window.renderUnlisted=renderUnlisted;
   window.renderDelisted=renderDelisted;
-  // 🛡 2026-08-19 阿狸咪根治空白bug：整个 JS 在 IIFE 内，render 函数必须显式挂 window
+  // 🛡 2026-08-19 CN runner2号机根治空白bug：整个 JS 在 IIFE 内，render 函数必须显式挂 window
   //   否则 try/catch 中 `typeof window.renderXxx` 恒为 undefined → 容器永远空 → 「啥都没有」
   //   2026-09-01：市场路径概率 / AI 预测相关渲染函数已随三卡删除，不再挂载。
   window.renderMarketRegimeCard = renderMarketRegimeCard;
@@ -18491,7 +18491,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
 
   var _last = Date.now();
-  /* 🔴 2026-09-22 一劳永逸修复（小九）：刷新链断裂自愈。
+  /* 🔴 2026-09-22 一劳永逸修复（CN runner1号机）：刷新链断裂自愈。
      血证：原 _tick 写 `if(_maybeReload()) return;`，而 _maybeReload() 在触发时
      先 _last=Date.now() 再 location.reload() 后 return true ⇒ _tick 直接 return、
      **不再 setTimeout(_tick) 续排**，整套逻辑建立在「reload 必然销毁页面」之上。
@@ -18500,7 +18500,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
      jsdom 受控时钟实证：推进 45 分钟，reload 仅 1 次 @15.5min，之后零事件（链彻底断死）。
      ⇒ 修复三点：① _tick 无条件续排；② reload 被抑制 90s 后自愈重试；③ 回前台补链。 */
   var _reloadRequestedAt = 0;                            // 已请求 reload 的时刻（0=未请求）
-  /* 🛡 2026-10-20 主人令「盘中午间自动刷新断了，都要手动刷新才行」一劳永逸修复（小九）：
+  /* 🛡 2026-10-20 主人令「盘中午间自动刷新断了，都要手动刷新才行」一劳永逸修复（CN runner1号机）：
      病灶：_tick 链用 location.reload()（普通刷新，不绕缓存），撞 GitHub Pages CDN
      Cache-Control: max-age=600（index.html / data/*.js 实抓响应头实证）⇒ 刷新后仍拿
      旧 ?v ⇒ 数据不更新，只有 Ctrl+F5 硬刷才灵。修法：换 _hardReload() =
@@ -18581,7 +18581,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   setInterval(function(){
     if((Date.now() - _last) >= 4*60*60*1000){ _last = Date.now(); try{ _hardReload(); }catch(e){} }
   }, 5*60*1000);
-  // 🔴 2026-10-08 加固（小九）：原「递归 setTimeout(_tick)」单链驱动，一旦 _tick 抛异常未续排即永久不刷。
+  // 🔴 2026-10-08 加固（CN runner1号机）：原「递归 setTimeout(_tick)」单链驱动，一旦 _tick 抛异常未续排即永久不刷。
   //     改 setInterval 驱动 ⇒ 链断不死；后台标签 Chrome 会节流但仍每分钟跑一次，配合回前台补刷，
   //     开盘期间自动刷新不再静默消失。
   setInterval(_tick, 60*1000);   // 每分钟检查距上次刷新耗时（保活主链）
@@ -18633,7 +18633,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     setTimeout(function(){ fin(null); }, 5000);   // 跨境长尾保护：5 秒未回也算失败
   }
   function _reloadForData(remoteStamp){
-    /* 🔴 2026-09-22 小九根治「一直刷新，连页面都看不了」
+    /* 🔴 2026-09-22 CN runner1号机根治「一直刷新，连页面都看不了」
        （主人令：说好 15 分钟自动刷新一次就不要乱变动）。
        血证：?v= 缓存戳被 v8-cache-bot / v8-cloud-bot 每 1-3 分钟重写一次
        （实测 16:09-16:38 共 12 次 index.html 提交）⇒ Pages 每次重新部署
@@ -18764,7 +18764,7 @@ window.__renderV8CalToday();
       if(_jdRetryDone) return;
       _jdRetryDone = true;
       try{
-        // 🗑 2026-09-21 小九：删除死调用 window.__retryJudgmentRender（同上，恒不执行）。
+        // 🗑 2026-09-21 CN runner1号机：删除死调用 window.__retryJudgmentRender（同上，恒不执行）。
       }catch(e){ console.warn('[judgment DOMContentLoaded retry]', e); }
     }
     if(document.readyState === 'loading'){
@@ -19511,7 +19511,7 @@ window.__renderV8CalToday();
         });
         // 🆕 2026-10-14 主人令「这卡更新于…加上」：卡头补全站统一「更新于」胶囊
         //   （与兄弟回测卡同范式 _uBadge('盘后','回测', ts)，读 REPLAY.update_time 真值）
-        // 🗂 2026-10-17 阿狸咪的工程师：静态归档产物改显「归档徽章」而非「更新于 X天前」——
+        // 🗂 2026-10-17 CN runner2号机的工程师：静态归档产物改显「归档徽章」而非「更新于 X天前」——
         //   REPLAY 是按设计一次冻结的回放归档（无周期生产者，v8_health_check.py::_STATIC_ARCHIVE_FILES
         //   已登记；HANDOFF ima-strong-fusion-replay-1014：真实流 ≥30 成熟样本、预计 11 月中删引用切回）。
         //   时间徽章把「归档时刻」显示成「停更 N 天」，主人 10-17 截图误判「这个断了」⇒ 假红同族第 5 例。
@@ -19609,7 +19609,7 @@ window.__renderV8CalToday();
       try{ console.error('[A2 lazy] 所有源与重试均失败：', item.name); }catch(e){}
       if(item.name==='LHB_HISTORY'){
         try{ if(typeof window.__rcRedrawBoth==='function') window.__rcRedrawBoth(); }catch(e){}
-        // 🛡 2026-09-28 阿狸咪的工程师（一劳永逸「明示提示被自己的重绘吞掉」）：
+        // 🛡 2026-09-28 CN runner2号机的工程师（一劳永逸「明示提示被自己的重绘吞掉」）：
         //   实证（真浏览器断源 E2E）：__rcRedrawBoth() 会先用 LHB_DATA 降级把容器**填满**，
         //   于是紧随其后的 `!_el.innerHTML.trim()` 恒为假 ⇒ 提示分支**整条被跳过** ⇒
         //   主人看到一张「看似完全正常」的日历，实为降级态且页面**零提示** = 静默降级，

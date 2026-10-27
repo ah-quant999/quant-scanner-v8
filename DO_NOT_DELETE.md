@@ -1,6 +1,6 @@
 # 九宝量化 v8.0 - 禁止删除清单
 
-**最后更新**: 2026-10-07（阿狸咪·防误删重要文件专项审计：补标 HANDOFF.yaml/HANDOFF.ledger.json/index_protected_markers.txt/PROTECTED_FILES.json 四项运维真源 + 私有目录补标 guard_logic_full.py/open_logic_detail.bat + 修正 data/*.js 数量漂移(48→111) + 降级 v6 历史备份段为可清理（有出）；私有逻辑目录禁删另见 E:/Nutstore/v8_logic_private/DO_NOT_DELETE.md） + v6逻辑详解页永久保护再确认（澄清可清理段不含仓库内 v6_memo.html，与主人令一致）
+**最后更新**: 2026-10-07（CN runner2号机·防误删重要文件专项审计：补标 HANDOFF.yaml/HANDOFF.ledger.json/index_protected_markers.txt/PROTECTED_FILES.json 四项运维真源 + 私有目录补标 guard_logic_full.py/open_logic_detail.bat + 修正 data/*.js 数量漂移(48→111) + 降级 v6 历史备份段为可清理（有出）；私有逻辑目录禁删另见 E:/Nutstore/v8_logic_private/DO_NOT_DELETE.md） + v6逻辑详解页永久保护再确认（澄清可清理段不含仓库内 v6_memo.html，与主人令一致）
 **维护人**: HH + AI助手
 **用途**: 防止误删核心资产，每次项目瘦身/清理前必须核对此清单
 **继承自**: v6 DO_NOT_DELETE.md（已验证 v6 2026-07-25 版本）
@@ -61,10 +61,10 @@
 > 🟢 豁免 `data/POTENTIAL_PICKS.js` + `raw_data/potential_picks.json` + `raw_data/history/potential_*.json` + `algorithms/calc_potential_picks.py`：已于 2026-09-06 主人令全链删除（卡下线、考核取消），云端残留允许清理，勿复活。
 > 🟢 豁免 `data/BLOAT_CHECK.js`：v8_bloat_check.py 已停生成（产物迁 .workbuddy/v8_bloat_report.json），全站0引用，允许删除（2026-08-29 轻量化收尾）。
 > 🟢 豁免 `data/DELISTED.js` + `raw_data/delisted_stocks.json` + `scripts/build_delisted.py`：已于 2026-09-09 主人令整链下线（前端「已下架股票目录」卡从 index.html/logic.html 删除 + data/DELISTED.js 删除 + build_delisted.py 停用 + v8_health_check CARD_DEFS 移除 + v8_rollback_guard 受保护列表移除），允许物理删除、勿复活。注：run_algorithms.py 实际从未挂此链（grep 0 命中），所谓「已挂回 ORDER/STAGES」为文档漂移误判。
-> 🔴 **maharo 机构研究卡活链保护（2026-10-03 阿狸咪更正）**：`data/maharo_insights.js`（window.MAHORO_INSIGHTS）是「机构研究 · AI 解析建议」卡的唯一数据源，由**家机 WorkBuddy 自动化**每日产出（非脚本，LLM 型直写 data/*.js），**严禁删除**（删则卡恒空）。旧本行称「maharo 全链路已移除、允许物理删除」系 **2026-08-29 文档漂移**——实际 `maharo_refresh.yml` / `monitor_maharo_refresh.py` / `fetch_maharo_signals.py` / `data/MAHORO.js` **均不存在**（真 probe 是 `v8_maharo_probe.yml` 仅推 `maharo_probe_result.txt`，不动 data/*.js）。
+> 🔴 **maharo 机构研究卡活链保护（2026-10-03 CN runner2号机更正）**：`data/maharo_insights.js`（window.MAHORO_INSIGHTS）是「机构研究 · AI 解析建议」卡的唯一数据源，由**家机 WorkBuddy 自动化**每日产出（非脚本，LLM 型直写 data/*.js），**严禁删除**（删则卡恒空）。旧本行称「maharo 全链路已移除、允许物理删除」系 **2026-08-29 文档漂移**——实际 `maharo_refresh.yml` / `monitor_maharo_refresh.py` / `fetch_maharo_signals.py` / `data/MAHORO.js` **均不存在**（真 probe 是 `v8_maharo_probe.yml` 仅推 `maharo_probe_result.txt`，不动 data/*.js）。
 > 🟢 豁免 `data/maharo_macro.js`：**已退役孤儿**（前端 2026-09-13 起零引用，window.MAHORO_MACRO 恒 `{}`；家机 maharo 自动化仍顺带产出，属死数据）。已登记 `v8_health_check._RETIRED_FILES` + `api_push_raw._RETIRED_ARTIFACTS` 防再生回推。**允许物理删除、勿复活**；生产者须停用其 macro 产出（保留 insights 产出）。
 > 🟢 豁免 `raw_data/kline_cache/*` + `raw_data/backtest_kline_cache/*` + `raw_data/_rps_cache/*` + `raw_data/_tdx_cache/*`：算法运行时行情缓存（RPS / K线 / TDX / 回测K线），纯本地加速用、可随时重建，`.gitignore` 已忽略（严禁入库）。2026-08-29 仓库瘦身：`git rm --cached` 移出版本跟踪，**本地文件全部保留**，仅删除库内副本，不删本地缓存、不影响任何算法运行。本条为通配符豁免，避免「raw_data 下的 json 通配保护规则」（其 `*` 跨 `/`）误伤缓存子目录。
-> 🔴 2026-09-10 阿狸咪修复本文件一处**静默漏洞**（主人令「全面审计瘦身·千万别删错」）：钩子 `git_hooks/pre-commit` 的豁免解析是「取含『豁免』二字行内**全部**反引号内容」，因此上一行原先在**说明文字**里写了反引号包裹的 raw_data 通配保护规则本身 → 该规则被当成豁免路径抓走，**raw_data 全部 json 的保护实际长期失效**。已改为中文引号表述，保护恢复生效。**后续在本文件写豁免说明时，说明文字里不要用反引号包住想保护的通配符。**
+> 🔴 2026-09-10 CN runner2号机修复本文件一处**静默漏洞**（主人令「全面审计瘦身·千万别删错」）：钩子 `git_hooks/pre-commit` 的豁免解析是「取含『豁免』二字行内**全部**反引号内容」，因此上一行原先在**说明文字**里写了反引号包裹的 raw_data 通配保护规则本身 → 该规则被当成豁免路径抓走，**raw_data 全部 json 的保护实际长期失效**。已改为中文引号表述，保护恢复生效。**后续在本文件写豁免说明时，说明文字里不要用反引号包住想保护的通配符。**
 > 🟢 豁免 `algorithms/__pycache__/*` + `algorithms/_opt_kline_cache/*` + `algorithms/.scanner.lock`：Python 字节码缓存与算法运行时候选池缓存、进程互斥锁，全部为运行时可再生文件，`.gitignore` 已忽略。2026-09-10 仓库瘦身：`git rm --cached` 移出版本跟踪（**本地文件全部保留**），并同步修复 `git add -A` 与 `api_push_raw.py::walk_raw()` 两条回潮路径，防止再次入库。
 
 ---
@@ -127,12 +127,12 @@
 
 **注意**: 根目录下所有 `*.py` 脚本都是核心管线组件，**禁止批量删除**。
 
-**🛡 2026-09-08 阿狸咪暗灯审计·重新挂链脚本（原被误当孤儿清掉，现恢复为活链）**：
+**🛡 2026-09-08 CN runner2号机暗灯审计·重新挂链脚本（原被误当孤儿清掉，现恢复为活链）**：
 
 | 文件路径 | 内容描述 | 禁止删除原因 |
 |---------|---------|------------|
 | `scripts/build_delisted.py` | 已下架股票目录生成器（2026-09-09 主人令整链下线后停用：main() 改为 no-op 并打印已下线；data/DELISTED.js 已删除、前端卡已删） | 已下线停用，保留占位避免遗留 import 报错；如需彻底删除可物理删（已不在 CRITICAL_FILES/v8_rollback_guard 受保护列表） |
-| `scripts/gen_lhb_7d.py` | 龙虎榜 7 日聚合生成器 | 阿狸咪 2026-09-08 修复漏挂 ORDER 的 P0（commit c54c5f44d），已挂链；缺失则 LHB 7日卡断更 |
+| `scripts/gen_lhb_7d.py` | 龙虎榜 7 日聚合生成器 | CN runner2号机 2026-09-08 修复漏挂 ORDER 的 P0（commit c54c5f44d），已挂链；缺失则 LHB 7日卡断更 |
 
 ---
 
@@ -205,12 +205,12 @@
 | `V8_PRINCIPLES.md` | v8 设计原则文档 | 架构决策记录 |
 | `DO_NOT_DELETE.md` (本文件) | 禁止删除清单 | 防误删核心文档 |
 | `HANDOVER_LOG.jsonl` | 双机交接索引日志 | 自动化读取最新交接的依据 |
-| `docs/ops/handover/*.md` | 双机交接文档归档（**唯一交接目录**，时间优先命名） | 小九↔阿狸咪协作记录；2026-09-10 起唯一目录 |
+| `docs/ops/handover/*.md` | 双机交接文档归档（**唯一交接目录**，时间优先命名） | CN runner1号机↔CN runner2号机协作记录；2026-09-10 起唯一目录 |
 | `docs/ops/urgent/README.md` | 停用通告 | 本目录已停用，防再次误放交接 |
 | `docs/ops/audit/*.md` | 审计报告归档（时间优先命名） | 全站/算法审计结论 |
 | `docs/ops/handover/_迁移对照表_20260910.md` | 交接迁移对照表 | 旧名→新名追溯依据 |
-> 🟢 豁免 `docs/ops/handover/HANDOVER_阿狸咪给小九_20260910_2130_派发源精简与假成功根治.md`：2026-09-10 主人令统一交接目录 + 去重 —— 该文件是 23 行摘要桩，内容全部包含于同目录 `2026-09-10_2130_URGENT_阿狸咪给小九_派发源精简与假成功根治.md`（125 行完整版），仅保留完整版 |
-> 🟢 豁免 `docs/ops/handover/HANDOVER_阿狸咪_给小九_2026-09-03_收口.md` + `docs/ops/handover/URGENT_小九_2026-09-09_运维红黄灯一劳永逸修复.md`：2026-09-10 统一迁移后残留的旧名重复件 —— 已 md5 实证与同目录 `2026-09-03_0000_阿狸咪_给小九_收口_v2.md` / `2026-09-09_0000_URGENT_小九_运维红黄灯一劳永逸修复_v2.md` 字节级一致，仅保留新名版 |
+> 🟢 豁免 `docs/ops/handover/HANDOVER_CN runner2号机给CN runner1号机_20260910_2130_派发源精简与假成功根治.md`：2026-09-10 主人令统一交接目录 + 去重 —— 该文件是 23 行摘要桩，内容全部包含于同目录 `2026-09-10_2130_URGENT_CN runner2号机给CN runner1号机_派发源精简与假成功根治.md`（125 行完整版），仅保留完整版 |
+> 🟢 豁免 `docs/ops/handover/HANDOVER_CN runner2号机_给CN runner1号机_2026-09-03_收口.md` + `docs/ops/handover/URGENT_CN runner1号机_2026-09-09_运维红黄灯一劳永逸修复.md`：2026-09-10 统一迁移后残留的旧名重复件 —— 已 md5 实证与同目录 `2026-09-03_0000_CN runner2号机_给CN runner1号机_收口_v2.md` / `2026-09-09_0000_URGENT_CN runner1号机_运维红黄灯一劳永逸修复_v2.md` 字节级一致，仅保留新名版 |
 | `docs/ops/scripts/_*.py` | 临时检查/调试脚本归档 | 非核心管线，仅备查 |
 | `docs/ops/archive/*.zip` | 历史打包归档 | 临时产物/探针日志归档 |
 | `docs/ops/notes/*.md` | 临时解读/备注归档 | 宏观事件等一次性备注 |
@@ -275,7 +275,7 @@
 > 3. **临时文件不要放在仓库根**（Nutstore 把 `__*`/`.tmp`/`.bak` 当 temp 清；本机已观察到此类文件数分钟内被删）。放 `C:\Users\HH20210606\.workbuddy\tmp\`（用户级 tmp，**不在同步区**）。
 > 4. **大文件 commit 后 `git status -s` 出现大批 `D ` 状态 = Nutstore 工作树污染，不是真实删除**。不要 `git checkout HEAD -- .`，会冲掉主人本地未保存工作；用 `git show origin/main:<file>` 验证文件远端仍存在。
 > 5. **优先使用 `node -e` / `python -c` 原子写入 + 立即 commit**，比 Edit/Write 工具更可靠（不会被工具回调重新读覆盖）。
-> 6. **跨机同步冲突**：`tmp_debug.py` / `stash@{0}` / `.git/index.lock` 等临时残留若另一机在跑同步脚，**主人不要 `pop`/`drop`**，需联系小九确认。
+> 6. **跨机同步冲突**：`tmp_debug.py` / `stash@{0}` / `.git/index.lock` 等临时残留若另一机在跑同步脚，**主人不要 `pop`/`drop`**，需联系CN runner1号机确认。
 >
 > **自动化解套路径**（已落地）：
 > - `git push` 时 pre-push hook 检测 origin 前进则自动 rebase：若工作树脏，先 `git stash push -u` 再 rebase。
