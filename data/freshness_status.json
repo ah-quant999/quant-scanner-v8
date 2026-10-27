@@ -1,8 +1,13 @@
 {
-  "check_time": "2026-10-27 16:57:57",
+  "check_time": "2026-10-27 16:02:35",
   "last_trade_close": "2026-10-27 15:30:00",
   "is_trading_day": true,
   "core_stale": [
+    {
+      "var": "V8_CAL",
+      "reason": "更新于 10-27 08:44，落后 6.8 小时",
+      "category": "premarket,post_close"
+    },
     {
       "var": "BACKTEST_COMPREHENSIVE",
       "reason": "更新于 10-24 21:18，落后 2 个交易日（阈值 1）",
@@ -19,7 +24,7 @@
   "no_update_time": [],
   "summary": {
     "total_checked": 39,
-    "core_stale": 2,
+    "core_stale": 3,
     "warn_stale": 0,
     "frozen_stale": 0,
     "no_timestamp": 0
