@@ -16111,30 +16111,34 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         var h = '';
         /* ── 头部徽章行（数据日 + 已更新；对齐盘前预案范式·09-23 防假新鲜口径） ── */
         h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
-        h += '<span style="font-size:10px;color:#a78bfa;font-weight:600;background:rgba(167,139,250,.14);padding:1px 7px;border-radius:4px;">试运行</span>';
+        /* 2026-10-27 主人令：该徽章已删 */
         h += '<span style="font-size:11.5px;color:var(--dim);">📅 数据日 '+_e(D.data_date||'—')+' · 已更新 '+_e(D.update_time||'—')+'</span>';
         h += '</div>';
         var sc = (D.score === null || D.score === undefined) ? '—' : Number(D.score).toFixed(1);
         var vc = D.verdict_color || '#38bdf8';
+        /* 🎯 2026-10-27 主人令：解读上移至分数右侧作明细标识（左竖线小字），用法/限制保留注解框 */
         h += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px;">'
            + '<div style="font-size:34px;font-weight:800;color:' + vc + ';line-height:1;">' + sc + '</div>'
            + '<div><div style="font-size:15px;font-weight:700;color:' + vc + ';">' + _e(D.verdict) + '</div>'
-           + '<div style="font-size:11px;color:var(--dim);">0-100 加权分 · 子信号就绪 ' + (D.ready_count||0) + '/3</div></div></div>'
-        // 🎯💡⚠ 2026-10-21 主人令：核心结论/用法/限制 与一句话结论一并置卡名下方（不落卡尾）
+           + '<div style="font-size:11px;color:var(--dim);">0-100 加权分 · 子信号就绪 ' + (D.ready_count||0) + '/3</div></div>'
+           + '<div style="flex:1;min-width:240px;font-size:11.5px;color:var(--dim);line-height:1.7;border-left:2px solid ' + vc + ';padding-left:10px;"><b style="color:#fbbf24;">&#x1F4CC; 解读：</b><span style="color:var(--txt);">' + _e(D.oneline) + '</span></div></div>'
         + '<div style="font-size:12px;color:var(--sub);line-height:1.85;margin:2px 0 8px;padding:8px 10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">'
-        + '<div style="margin-bottom:4px;"><b style="color:#fbbf24;">&#x1F4CC; 核心：</b><b style="color:var(--txt);">' + _e(D.oneline) + '</b></div>'
         + '<div style="margin-bottom:4px;"><b style="color:#fbbf24;">&#x1F4A1; 用法：</b>regime 参考非买点信号——国家队活跃 + 指数回调 ⇒ 系统性暴跌概率低、仓位可放宽；静默 + 高位 ⇒ 收紧防守。</div>'
         + '<div><b style="color:#fbbf24;">&#x26A0; 限制：</b>' + _e(D.disclaimer) + '</div></div>';
+        /* 📐 2026-10-27 主人令：明细区改一行2列（2×2 网格） */
+        h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 18px;">';
         for(var i=0;i<D.subs.length;i++){
           var s = D.subs[i];
           var st = String(s.status||'');
           var stCol = st.indexOf('✅')===0 ? '#ef5350' : (st.indexOf('❌')===0 ? '#26a69a' : '#9ca3af');
-          h += '<div style="display:flex;align-items:baseline;gap:8px;padding:6px 0;border-top:1px dashed var(--border);flex-wrap:wrap;">'
-             + '<b style="font-size:12.5px;color:var(--sub);min-width:132px;">' + _e(s.name) + '</b>'
-             + '<span style="font-size:10.5px;color:var(--dim);min-width:36px;">w' + s.weight + '%</span>'
-             + '<b style="font-size:12px;color:' + stCol + ';min-width:72px;">' + _e(st) + '</b>'
-             + '<span style="font-size:11.5px;color:var(--dim);flex:1;">' + _e(s.detail) + '</span></div>';
+          h += '<div style="padding:6px 0;border-top:1px dashed var(--border);">'
+             + '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">'
+             + '<b style="font-size:12.5px;color:var(--sub);">' + _e(s.name) + '</b>'
+             + '<span style="font-size:10.5px;color:var(--dim);">w' + s.weight + '%</span>'
+             + '<b style="font-size:12px;color:' + stCol + ';">' + _e(st) + '</b></div>'
+             + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:2px;">' + _e(s.detail) + '</div></div>';
         }
+        h += '</div>';
         body.innerHTML = h;
         /* 🔄 2026-10-23 主人令：更新行统一全站 _uBadge 胶囊版式（同盘前预案卡）；派发信息降为胶囊后缀小字 */
         if(window.setBadge) setBadge('nationalTeamFresh','auto','',D.update_time,'观测类 · 工作日 20:50 派发 · 代理推算非官方持仓');
