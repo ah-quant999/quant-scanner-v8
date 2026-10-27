@@ -196,27 +196,21 @@ jobs:
       - name: "📤 推送 data/INVEST_AVOID.js（api_put_file.py）"
         if: always()
         shell: powershell
-        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
           GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           cd $env:GITHUB_WORKSPACE
-          $need = (Get-Content '_ia_need.txt' -ErrorAction SilentlyContinue) -join ''
-          if ($need -notmatch 'need=1') {
-            Write-Host "[skip] INVEST_AVOID content identical; no push"
+          if (-not (Test-Path 'data/INVEST_AVOID.js')) {
+            Write-Host "[warn] 本地未生成 INVEST_AVOID.js；跳过推送"
             exit 0
           }
           python scripts/api_put_file.py data/INVEST_AVOID.js "data: invest-avoid consolidate refresh ($(Get-Date -Format 'yyyy-MM-dd HH:mm') CST)"
           if ($LASTEXITCODE -ne 0) {
-            Write-Host "[warn] push failed (non-blocking)"
+            Write-Error "[fail] INVEST_AVOID.js 推送失败（阻断 job，便于排查令牌/网络）"
             exit 1
           }
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "[warn] push failed (non-blocking; retried next round)" -ForegroundColor Yellow
-            echo "::error title=v8-morning-plan(push-failed)::Push of data/MORNING_PLAN.js failed (non-blocking, retried next round)."
-            exit 1
-          }
+          Write-Host "[ok] INVEST_AVOID.js 已推送"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 链路备忘（2026-10-22 阿狸咪的工程师）：
