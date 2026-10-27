@@ -16111,22 +16111,34 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         var h = '';
         /* ── 头部徽章行（数据日 + 已更新；对齐盘前预案范式·09-23 防假新鲜口径） ── */
         h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
-        /* 2026-10-27 主人令：该徽章已删 */
-        h += '<span style="font-size:11.5px;color:var(--dim);">📅 数据日 '+_e(D.data_date||'—')+' · 已更新 '+_e(D.update_time||'—')+'</span>';
+        /* 2026-10-27 主人令：该徽章已删（数据日/已更新行已移除） */
         h += '</div>';
         var sc = (D.score === null || D.score === undefined) ? '—' : Number(D.score).toFixed(1);
         var vc = D.verdict_color || '#38bdf8';
+        /* 解读：从子信号合成「分析」而非单纯汇总（2026-10-27 主人令） */
+        var _pos=[], _neg=[];
+        for(var _i=0;_i<D.subs.length;_i++){
+          var _s2=D.subs[_i]; var _st=String(_s2.status||'');
+          if(_st.indexOf('✅')===0) _pos.push(_e(_s2.name));
+          else if(_st.indexOf('❌')===0) _neg.push(_e(_s2.name)+'弱势');
+          else _neg.push(_e(_s2.name)+'未就绪');
+        }
+        var _ready=(D.ready_count||0);
+        var _regime = (_ready<3) ? ('托底合力不完整（'+_ready+'/3就绪），缺乏系统性增量') : '托底信号较完整';
+        var _act = (D.verdict==='中性') ? '按regime防守为主，待宽基ETF申购突变或汇金数据接入再加仓' : ((Number(D.score)>60)?'回调中系统性暴跌概率低、仓位可放宽':'宜收紧防守');
+        var _ntAna = '国家队'+_e(D.verdict)+'（'+sc+'）：'+(_pos.length?('正向 '+_pos.join('、')+'；'):'无正向信号；')+_regime+'，'+_act+'。';
+
         /* 🎯 2026-10-27 主人令：解读上移至分数右侧作明细标识（左竖线小字），用法/限制保留注解框 */
         h += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px;">'
            + '<div style="font-size:34px;font-weight:800;color:' + vc + ';line-height:1;">' + sc + '</div>'
            + '<div><div style="font-size:15px;font-weight:700;color:' + vc + ';">' + _e(D.verdict) + '</div>'
            + '<div style="font-size:11px;color:var(--dim);">0-100 加权分 · 子信号就绪 ' + (D.ready_count||0) + '/3</div></div>'
-           + '<div style="flex:1;min-width:240px;font-size:11.5px;color:var(--dim);line-height:1.7;border-left:2px solid ' + vc + ';padding-left:10px;"><b style="color:#fbbf24;">&#x1F4CC; 解读：</b><span style="color:var(--txt);">' + _e(D.oneline) + '</span></div></div>'
+           + '<div style="flex:1;min-width:240px;font-size:11.5px;color:var(--dim);line-height:1.7;border-left:2px solid ' + vc + ';padding-left:10px;"><b style="color:#fbbf24;">&#x1F4CC; 解读：</b><span style="color:var(--txt);">' + _ntAna + '</span></div></div>'
         + '<div style="font-size:12px;color:var(--sub);line-height:1.85;margin:2px 0 8px;padding:8px 10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">'
         + '<div style="margin-bottom:4px;"><b style="color:#fbbf24;">&#x1F4A1; 用法：</b>regime 参考非买点信号——国家队活跃 + 指数回调 ⇒ 系统性暴跌概率低、仓位可放宽；静默 + 高位 ⇒ 收紧防守。</div>'
         + '<div><b style="color:#fbbf24;">&#x26A0; 限制：</b>' + _e(D.disclaimer) + '</div></div>';
-        /* 📐 2026-10-27 主人令：明细区改一行2列（2×2 网格） */
-        h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 18px;">';
+        /* 📐 2026-10-27 主人令：明细区改一行4列（1×4 网格） */
+        h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px 10px;">';
         for(var i=0;i<D.subs.length;i++){
           var s = D.subs[i];
           var st = String(s.status||'');
@@ -16141,7 +16153,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         h += '</div>';
         body.innerHTML = h;
         /* 🔄 2026-10-23 主人令：更新行统一全站 _uBadge 胶囊版式（同盘前预案卡）；派发信息降为胶囊后缀小字 */
-        if(window.setBadge) setBadge('nationalTeamFresh','auto','',D.update_time,'观测类 · 工作日 20:50 派发 · 代理推算非官方持仓');
+        if(window.setBadge) setBadge('nationalTeamFresh','auto','',D.update_time,'');
         else { var _fr = document.getElementById('nationalTeamFresh'); if(_fr) _fr.textContent = '已更新 ' + _e((D.update_time||'').slice(5,16)); }
         card.style.display = 'block';
       }catch(e){ console.warn('[renderNationalTeam]', e); }
