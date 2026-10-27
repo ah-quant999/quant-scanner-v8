@@ -593,7 +593,23 @@ window.V8_CAL = {weeks:[],legend:[]};
       return { stale:false, ageH:ageH, text:'' };
     }catch(e){ return null; }
   };
-})();
+  /* 🛡 2026-10-28 主人令「一劳永逸」护栏（图1建议）：上游断供 → 红字「数据中断·最近更新 X 天前」。
+     阈值固定 72h（与 _staleSlaHours 的「其它/空→72h」兜底同源），远宽于 09-14 删除的 22h 盘后 SLA，
+     专门捕捉真·多日中断（如 backtest 卡 10-24→10-28 冻 4 天），不误伤日频「今日批次未产出」的正常中间态。
+     返回 '' 表示未中断（调用方自行决定补不补常规徽章）。默认全站不触发，仅 backtest/历史类日更卡显式 opt-in。 */
+  window._staleInterrupt = function(ts){
+    if(!ts) return '';
+    try{
+      var d = new Date(String(ts).replace(/-/g,'/'));
+      if(isNaN(d.getTime())) return '';
+      var ageH = (Date.now() - d.getTime())/36e5;
+      if(ageH <= 72) return '';
+      var dd = Math.floor(ageH/24), hh = Math.floor(ageH%24);
+      var ago = dd>0 ? (dd+'天'+((hh>0)?hh+'小时':'')) : (hh+'小时');
+      return '<span title="数据源已 '+ago+'未更新，疑似上游中断。最近更新：'+String(ts)+'" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:700;background:rgba(239,68,68,.14);color:#ef4444;border:1px solid rgba(239,68,68,.45);white-space:nowrap">⚠️ 数据中断 · 最近更新 '+ago+'前</span>';
+    }catch(e){ return ''; }
+  };
+});
 </script>
 <script>
 /* ===== 全站统一「更新于」胶囊（HOIST 版本）=====
@@ -603,7 +619,7 @@ window.V8_CAL = {weeks:[],legend:[]};
    并暴露到 window，**下游 IIFE 与下游脚本块均可同步使用**。
    原始定义（line 2515+）会一并删除以避免重复。
    ================================================================ */
-function _uBadge(slot, horizon, ts, sub, pageSlot){
+function _uBadge(slot, horizon, ts, sub, pageSlot, staleGuard){
   /* ============================================================
      🛡 2026-09-14 主人令「一劳永逸」：标签跟页面走 + 悬停显示真实时点
      ------------------------------------------------------------
@@ -662,6 +678,11 @@ function _uBadge(slot, horizon, ts, sub, pageSlot){
   var _okTitle = '数据更新于 ' + t;
   if(_pageSlot && _realSlot && _realSlot !== _pageSlot){
     _okTitle += '｜数据实际产出时段：' + _realSlot + '（本卡位于「' + _pageSlot + '」页）';
+  }
+  // 🛡 2026-10-28 主人令「一劳永逸」护栏（opt-in, staleGuard）：数据 >72h 未更新 → 以红字「数据中断」替换常规徽章（图1：而非干巴巴的陈旧时间戳）
+  if(staleGuard){
+    var _si = (typeof window._staleInterrupt === 'function') ? window._staleInterrupt(ts) : '';
+    if(_si) return _si;
   }
   return '<span title="'+_okTitle+'" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+t+_livePart+_cadNote+'</span>'
     + (sub ? ' <span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">' + sub + '</span>' : '');
@@ -6480,7 +6501,7 @@ c.innerHTML = h;
     try{
       var btFresh = document.getElementById('btFresh');
       if(btFresh && typeof _uBadge === 'function'){
-        btFresh.innerHTML = _uBadge('盘后','回测', btLatest);
+        btFresh.innerHTML = _uBadge('盘后','回测', btLatest, '', '', true);
       }
     }catch(e){}
 
@@ -19623,7 +19644,7 @@ window.__renderV8CalToday();
     var by=H.by_date||{};
     var days=Object.keys(by).sort().reverse();
     var sb=document.getElementById('finalHistBadges');
-    if(sb) sb.innerHTML='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);white-space:nowrap">'+_frHistEsc(H.days||days.length)+' 天 · '+_frHistEsc(H.date_from||'—')+' → '+_frHistEsc(H.date_to||'—')+'</span>';
+    if(sb) sb.innerHTML='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);white-space:nowrap">'+_frHistEsc(H.days||days.length)+' 天 · '+_frHistEsc(H.date_from||'—')+' → '+_frHistEsc(H.date_to||'—')+'</span>'+(typeof window._staleInterrupt==='function'?window._staleInterrupt(H.generated||H.date_to):'');
     if(!days.length){
       el.innerHTML='<div class="note" style="padding:16px;text-align:center;color:var(--dim)">暂无历史记录（等待每日算法落档）</div>';
       return;
