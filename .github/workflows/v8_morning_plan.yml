@@ -75,7 +75,13 @@ jobs:
             'data/FINAL_RECOMMEND_DATA.js',
             'data/SECTOR_LEADERS.js',
             'data/DAJIJIN_REDUCTION.js',
-            'data/IMA_STRONG_STOCK.js'
+            'data/IMA_STRONG_STOCK.js',
+            'v8/gen_invest_avoid.py',
+            'data/SUSPENSION_ALERT.js',
+            'data/MARKET_REGIME.js',
+            'data/RISK_GAUGE.js',
+            'data/MACRO_BRIEF.js',
+            'data/MARKET_ALERTS.js'
           )
           foreach ($f in $files) {
             $url = "https://api.github.com/repos/$repo/contents/$f`?ref=main"
@@ -161,6 +167,51 @@ jobs:
             exit 0
           }
           python scripts/api_put_file.py data/MORNING_PLAN.js "data: morning plan refresh ($(Get-Date -Format 'yyyy-MM-dd HH:mm') CST)"
+
+      - name: "🧭 跑 gen_invest_avoid.py（产出 data/INVEST_AVOID.js）"
+        id: gen_ia
+        shell: powershell
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          python v8/gen_invest_avoid.py
+          if (-not (Test-Path 'data/INVEST_AVOID.js')) {
+            Write-Host "[warn] no output; skip invest-avoid push"
+            exit 0
+          }
+          Write-Host "[ok] data/INVEST_AVOID.js ready"
+
+      - name: "🔍 内容比对 INVEST_AVOID（相同则 SKIP）"
+        id: diff_ia
+        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.V8_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          $out = python scripts/card_need_push.py data/INVEST_AVOID.js 2>&1 | Out-String
+          Write-Host $out
+          if ($out -match 'NEED_PUSH=1') { "need=1" | Out-File -FilePath "_ia_need.txt" -Encoding ascii }
+          else { "need=0" | Out-File -FilePath "_ia_need.txt" -Encoding ascii }
+
+      - name: "📤 推送 data/INVEST_AVOID.js（api_put_file.py）"
+        if: always()
+        shell: powershell
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          $need = (Get-Content '_ia_need.txt' -ErrorAction SilentlyContinue) -join ''
+          if ($need -notmatch 'need=1') {
+            Write-Host "[skip] INVEST_AVOID content identical; no push"
+            exit 0
+          }
+          python scripts/api_put_file.py data/INVEST_AVOID.js "data: invest-avoid consolidate refresh ($(Get-Date -Format 'yyyy-MM-dd HH:mm') CST)"
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "[warn] push failed (non-blocking)"
+            exit 1
+          }
           if ($LASTEXITCODE -ne 0) {
             Write-Host "[warn] push failed (non-blocking; retried next round)" -ForegroundColor Yellow
             echo "::error title=v8-morning-plan(push-failed)::Push of data/MORNING_PLAN.js failed (non-blocking, retried next round)."
