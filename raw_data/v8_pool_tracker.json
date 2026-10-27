@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-27 18:53:19",
+  "update_time": "2026-10-28 01:30:00",
   "pool_size": 0,
   "raw_pool_size": 0,
   "selected_size": 0,
@@ -17,29 +17,29 @@
   "sector_meta": {
     "top_in": [
       {
-        "name": "保险重仓",
-        "type": "概念",
-        "net": 5.06
+        "name": "银行",
+        "type": "行业",
+        "net": 7.7
       },
       {
-        "name": "冰雪经济",
-        "type": "概念",
-        "net": 4.45
+        "name": "银行Ⅱ",
+        "type": "行业",
+        "net": 7.7
       },
       {
-        "name": "天然气",
-        "type": "概念",
-        "net": 3.82
+        "name": "电机Ⅲ",
+        "type": "行业",
+        "net": 7.25
       },
       {
-        "name": "供销社概念",
-        "type": "概念",
-        "net": 3.76
+        "name": "电机Ⅱ",
+        "type": "行业",
+        "net": 7.25
       },
       {
-        "name": "激光雷达",
-        "type": "概念",
-        "net": 3.42
+        "name": "股份制银行Ⅲ",
+        "type": "行业",
+        "net": 6.77
       }
     ],
     "top_out": [
