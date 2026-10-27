@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-27 19:24",
- "generated": "2026-10-27 19:24",
+ "update_time": "2026-10-27 20:49",
+ "generated": "2026-10-27 20:49",
  "meta": {
-  "generated": "2026-10-27 19:24",
+  "generated": "2026-10-27 20:49",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 29,
   "days_with_consensus": 0,
@@ -11859,6 +11859,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "002724",
+      "name": "海洋王",
+      "change_pct": 10.0,
+      "price": 13.09,
+      "category": "突破"
+     },
+     {
+      "code": "603028",
+      "name": "赛福天",
+      "change_pct": 10.011,
+      "price": 10.33,
+      "category": "突破"
+     },
+     {
       "code": "301227",
       "name": "森鹰窗业",
       "change_pct": 10.935,
@@ -11894,10 +11908,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "000923",
-      "name": "河钢资源",
-      "change_pct": 3.6,
-      "price": 14.39,
+      "code": "603037",
+      "name": "凯众股份",
+      "change_pct": 10.009,
+      "price": 11.87,
       "category": "突破"
      }
     ],
@@ -11907,6 +11921,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "龙版传媒",
       "change_pct": 3.085,
       "price": 13.03,
+      "category": "加速"
+     },
+     {
+      "code": "002724",
+      "name": "海洋王",
+      "change_pct": 10.0,
+      "price": 13.09,
+      "category": "加速"
+     },
+     {
+      "code": "603028",
+      "name": "赛福天",
+      "change_pct": 10.011,
+      "price": 10.33,
       "category": "加速"
      },
      {
@@ -11940,6 +11968,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "002724",
+      "name": "海洋王",
+      "change_pct": 10.0,
+      "price": 13.09,
+      "category": "短线选股"
+     },
+     {
+      "code": "603028",
+      "name": "赛福天",
+      "change_pct": 10.011,
+      "price": 10.33,
+      "category": "短线选股"
+     },
+     {
       "code": "301227",
       "name": "森鹰窗业",
       "change_pct": 10.935,
@@ -11975,10 +12017,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "000923",
-      "name": "河钢资源",
-      "change_pct": 3.6,
-      "price": 14.39,
+      "code": "603037",
+      "name": "凯众股份",
+      "change_pct": 10.009,
+      "price": 11.87,
       "category": "短线选股"
      }
     ],
@@ -11998,10 +12040,10 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "000923",
-      "name": "河钢资源",
-      "change_pct": 3.6,
-      "price": 14.39,
+      "code": "603037",
+      "name": "凯众股份",
+      "change_pct": 10.009,
+      "price": 11.87,
       "category": "强势股"
      }
     ]
