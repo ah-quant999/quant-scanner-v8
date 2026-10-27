@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-27 13:09:00",
+ "generated": "2026-10-27 18:47:13",
  "method": "信号日次一交易日开盘买入，持有 N 个交易日收盘价卖出（真实日K；已扣双边交易成本 0.30%）",
  "cost_pct_roundtrip": 0.3,
  "cost_bps_per_side": 15,
@@ -32,20 +32,20 @@
  },
  "total_signals": 188,
  "skipped_no_signal_date": 0,
- "signal_days": 55,
- "signal_date_range": "2026-06-09 ~ 2026-10-26",
- "ima_update_time": "2026-10-27 03:10:10",
+ "signal_days": 56,
+ "signal_date_range": "2026-06-09 ~ 2026-10-27",
+ "ima_update_time": "2026-10-27 15:43:09",
  "source_coverage": {
   "rows_parsed": 8,
   "expected": null,
   "source_channel": "full-snapshot",
-  "snapshot_fetched_at": "2026-10-26 15:40:23",
-  "snapshot_age_h": 11.5,
+  "snapshot_fetched_at": "2026-10-27 15:42:06",
+  "snapshot_age_h": 0.02,
   "truncated": false,
   "note": "v2 换代水源「短线情绪选股」主报告全文快照（成员连接器）；introduction 兜底通道受 ~300 字硬墙（如实降级 detail_complete=false）。"
  },
  "source_detail_complete": true,
- "source_data_date": "2026-10-26",
+ "source_data_date": "2026-10-27",
  "source_stale": false,
  "source_coverage_summary": "8/None",
  "source_degrade_reasons": [],
@@ -63,9 +63,9 @@
    "best_return": 28.59,
    "worst_return": -15.06,
    "max_drawdown": -1.35,
-   "bench_avg_return": -0.1294,
-   "bench_win_rate": 46.2,
-   "bench_days": 54
+   "bench_avg_return": -0.0491,
+   "bench_win_rate": 47.02,
+   "bench_days": 55
   },
   "2d": {
    "samples": 151,
