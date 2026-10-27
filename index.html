@@ -609,7 +609,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       return '<span title="数据源已 '+ago+'未更新，疑似上游中断。最近更新：'+String(ts)+'" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:700;background:rgba(239,68,68,.14);color:#ef4444;border:1px solid rgba(239,68,68,.45);white-space:nowrap">⚠️ 数据中断 · 最近更新 '+ago+'前</span>';
     }catch(e){ return ''; }
   };
-});
+})();
 </script>
 <script>
 /* ===== 全站统一「更新于」胶囊（HOIST 版本）=====
@@ -18456,7 +18456,7 @@ h+=`</div>`;
        + '<span style="font-size:10.5px;color:var(--dim);font-weight:600;padding:1px 7px;border-radius:6px;background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);white-space:nowrap;">(日频) · 盘中不刷新</span>'
        + '<span style="font-size:15px;font-weight:700;color:#fb923c;">🧭 周期位置 · 广度观测</span>'
        + '<span class="fresh" id="cycleBreadthFresh">&#x2014;</span>'
-       + '<span style="font-size:11.5px;color:var(--dim);">EDHEC 牛熊状态机（月频·中线）+ 广度/股价/资金三观测点</span></div>
+       + '<span style="font-size:11.5px;color:var(--dim);">EDHEC 牛熊状态机（月频·中线）+ 广度/股价/资金三观测点</span></div>'
        + '<div id="cycleBreadthInner"><div class="note" style="padding:16px;text-align:center;color:var(--dim);">加载中…</div></div>'
        + '</div>';
     // ── 卡1：艾略特波浪 · 深度分析（容器 id / 渲染函数 __renderElliottWave 均未变，仅换宿主）──
