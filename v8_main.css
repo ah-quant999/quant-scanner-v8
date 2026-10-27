@@ -6,7 +6,7 @@
     --border:#243150; --border2:#2e3d63;
     --txt:#e6edf7; --sub:#93a4c4; --dim:#5f7099;
     --cyan:#38bdf8; --purple:#a78bfa; --gold:#fbbf24; --pink:#f472b6;
-    --up:#ef5350; --down:#26a69a;
+    --up:#f87171; --down:#4ade80;
     --lock:#5f7099;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -262,7 +262,7 @@
   .fl-sec-label{font-size:12px;font-weight:700;color:var(--txt);margin:10px 0 4px;display:flex;align-items:center;gap:6px}
   .fl-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
   .fl-dot-pass{background:#22c55e}
-  .fl-dot-weak{background:#ef5350}
+  .fl-dot-weak{background:#f87171}
   .fl-toggle{padding:6px 10px;border-radius:6px;background:var(--bg2);color:var(--sub);font-size:12px;cursor:pointer;display:inline-block;margin:6px 0;border:1px solid var(--border)}
   .fl-toggle:hover{border-color:var(--cyan);color:var(--txt)}
   .fl-collapsed{display:none}
@@ -326,7 +326,7 @@
   .v8cal-event.data2{background:rgba(67,160,71,.15);color:#81c784;border-left:3px solid #43a047}
   .v8cal-event.fomc{background:rgba(156,39,176,.15);color:#ce93d8;border-left:3px solid #9c27b0}
   .v8cal-event.us{background:rgba(66,165,245,.15);color:#90caf9;border-left:3px solid #42a5f5}
-  .v8cal-event.hk{background:rgba(239,83,80,.15);color:#ef9a9a;border-left:3px solid #ef5350}
+  .v8cal-event.hk{background:rgba(248,113,113),.15);color:#ef9a9a;border-left:3px solid #f87171}
   .v8cal-event.tw{background:rgba(255,152,0,.15);color:#ffcc80;border-left:3px solid #ff9800}
   .v8cal-event.a50{background:rgba(233,30,99,.15);color:#f48fb1;border-left:3px solid #e91e63}
   .v8cal-event.ipo{background:rgba(103,52,183,.15);color:#b39ddb;border-left:3px solid #673ab7}
@@ -459,7 +459,7 @@
   .ph-macro-table-v2 .v2-abov{font-size:10.5px;line-height:1.45;display:inline;margin-left:6px;color:var(--up)}
   .ph-macro-table-v2 .v2-abov::before{content:"· ⚠ ";opacity:.8}
   .ph-macro-table-v2 .v2-status{font-size:9.5px;padding:0 5px;border-radius:3px;margin-left:4px;display:inline-block;font-weight:500;line-height:1.4;vertical-align:middle}
-  .ph-macro-table-v2 .v2-status.fresh{background:rgba(31,209,123,.15);color:#26a69a}
+  .ph-macro-table-v2 .v2-status.fresh{background:rgba(31,209,123,.15);color:#4ade80}
   .ph-macro-table-v2 .v2-status.stale{background:rgba(251,191,36,.15);color:#fbbf24}
   .ph-macro-table-v2 .v2-pos-above{color:var(--up);font-weight:700}
   .ph-macro-table-v2 .v2-pos-below{color:var(--down);font-weight:700}
@@ -656,7 +656,7 @@
   .fr-tag{font-size:10px;padding:1px 8px;border-radius:6px;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25);font-weight:600;white-space:nowrap;flex-shrink:0}
   .fr-tag.ind{background:rgba(167,139,250,.12);color:#a78bfa;border-color:rgba(167,139,250,.25)}
   .fr-tag.horizon-s{background:rgba(244,73,93,.12);color:var(--up);border-color:rgba(244,73,93,.25)}
-  .fr-tag.horizon-m{background:rgba(31,209,123,.12);color:#26a69a;border-color:rgba(31,209,123,.25)}
+  .fr-tag.horizon-m{background:rgba(31,209,123,.12);color:#4ade80;border-color:rgba(31,209,123,.25)}
   .fr-tag.horizon-d{background:rgba(251,191,36,.12);color:var(--gold);border-color:rgba(251,191,36,.25)}
 
   /* 买入评分紧跟标题，左对齐 */
