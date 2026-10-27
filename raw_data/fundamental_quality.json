@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-10-26 18:29:47",
-  "total": 933,
+  "update_time": "2026-10-27 18:19:12",
+  "total": 1099,
   "grade_summary": {
-    "A": 28,
-    "B": 31,
-    "C": 209,
-    "D": 482,
-    "no_data": 183
+    "A": 29,
+    "B": 34,
+    "C": 236,
+    "D": 611,
+    "no_data": 189
   },
   "stocks": {
     "hk_00001": {
@@ -2405,7 +2405,13 @@
       "revenue_growth": 22.3102,
       "reason": "ROE差(1.6%) | 营收高增(22.3%)",
       "cfo_to_asset": 0.71,
-      "cf_queried": true
+      "cf_queried": true,
+      "news": {
+        "score": 8,
+        "tags": [
+          "中标"
+        ]
+      }
     },
     "sh_601077": {
       "score": 30,
@@ -5410,9 +5416,10 @@
       "cfo_to_asset": 0.82,
       "cf_queried": true,
       "news": {
-        "score": 15,
+        "score": 20,
         "tags": [
-          "中报预增"
+          "中报预增",
+          "回购"
         ]
       }
     },
@@ -7996,9 +8003,10 @@
       "cfo_to_asset": 8.16,
       "cf_queried": true,
       "news": {
-        "score": 10,
+        "score": 18,
         "tags": [
           "三季报扭亏",
+          "中标",
           "诉讼"
         ]
       }
@@ -9562,6 +9570,2152 @@
           "三季报略增"
         ]
       }
+    },
+    "sh_600135": {
+      "score": 30,
+      "grade": "D",
+      "roe": -1.3709,
+      "revenue_growth": 22.4548,
+      "reason": "ROE差(-1.4%) | 营收高增(22.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -7.37,
+      "cfo_to_or": -0.3282,
+      "asset_turn": 0.2245,
+      "cf_queried": true
+    },
+    "sh_600573": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.5618,
+      "revenue_growth": 21.0888,
+      "reason": "ROE差(3.6%) | 营收高增(21.1%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 5.68,
+      "cfo_to_or": 0.2696,
+      "asset_turn": 0.2109,
+      "cf_queried": true
+    },
+    "sh_601778": {
+      "score": 15,
+      "grade": "D",
+      "roe": -1.1441,
+      "revenue_growth": 3.3778,
+      "reason": "ROE差(-1.1%) | 营收持平(3.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.87,
+      "cfo_to_or": 0.5543,
+      "asset_turn": 0.0338,
+      "cf_queried": true,
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报首亏"
+        ]
+      }
+    },
+    "sh_603501": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.0071,
+      "revenue_growth": 29.921799999999998,
+      "reason": "ROE差(4.0%) | 营收高增(29.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.87,
+      "cfo_to_or": 0.0291,
+      "asset_turn": 0.2992,
+      "cf_queried": true,
+      "news": {
+        "score": 8,
+        "tags": [
+          "回购"
+        ]
+      }
+    },
+    "sh_688073": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.0304,
+      "revenue_growth": 27.2789,
+      "reason": "ROE偏低(5.0%) | 营收高增(27.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 3.66,
+      "cfo_to_or": 0.1342,
+      "asset_turn": 0.2728,
+      "cf_queried": true
+    },
+    "sh_688227": {
+      "score": 15,
+      "grade": "D",
+      "roe": 0.3491,
+      "revenue_growth": 8.7224,
+      "reason": "ROE差(0.3%) | 营收持平(8.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.22,
+      "cfo_to_or": -0.1404,
+      "asset_turn": 0.0872,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报扭亏"
+        ]
+      }
+    },
+    "sh_688316": {
+      "score": 30,
+      "grade": "D",
+      "roe": -130.9769,
+      "revenue_growth": 25.6676,
+      "reason": "ROE差(-131.0%) | 营收高增(25.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -4.07,
+      "cfo_to_or": -0.1587,
+      "asset_turn": 0.2567,
+      "cf_queried": true
+    },
+    "sh_688401": {
+      "score": 45,
+      "grade": "C",
+      "roe": 8.522599999999999,
+      "revenue_growth": 20.6824,
+      "reason": "ROE偏低(8.5%) | 营收高增(20.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 7.71,
+      "cfo_to_or": 0.3726,
+      "asset_turn": 0.2068,
+      "cf_queried": true
+    },
+    "sh_688552": {
+      "score": 25,
+      "grade": "D",
+      "roe": 0.15059999999999998,
+      "revenue_growth": 12.153500000000001,
+      "reason": "ROE差(0.2%) | 营收增长(12.2%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -3.03,
+      "cfo_to_or": -0.249,
+      "asset_turn": 0.1215,
+      "cf_queried": true
+    },
+    "sh_688626": {
+      "score": 25,
+      "grade": "D",
+      "roe": 1.9022000000000001,
+      "revenue_growth": 11.3704,
+      "reason": "ROE差(1.9%) | 营收增长(11.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.34,
+      "cfo_to_or": 0.1177,
+      "asset_turn": 0.1137,
+      "cf_queried": true
+    },
+    "sh_688757": {
+      "score": 25,
+      "grade": "D",
+      "roe": 2.0884,
+      "revenue_growth": 14.6616,
+      "reason": "ROE差(2.1%) | 营收增长(14.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 5.81,
+      "cfo_to_or": 0.3964,
+      "asset_turn": 0.1466,
+      "cf_queried": true
+    },
+    "sz_000411": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.6748000000000003,
+      "revenue_growth": 100.14920000000001,
+      "reason": "ROE差(3.7%) | 营收高增(100.1%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.72,
+      "cfo_to_or": -0.0172,
+      "asset_turn": 1.0015,
+      "cf_queried": true
+    },
+    "sz_002010": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.4916,
+      "revenue_growth": 20.4481,
+      "reason": "ROE差(2.5%) | 营收高增(20.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.27,
+      "cfo_to_or": -0.062,
+      "asset_turn": 0.2045,
+      "cf_queried": true
+    },
+    "sz_002356": {
+      "score": 30,
+      "grade": "D",
+      "roe": -2.3781,
+      "revenue_growth": 30.422900000000002,
+      "reason": "ROE差(-2.4%) | 营收高增(30.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.19,
+      "cfo_to_or": 0.0391,
+      "asset_turn": 0.3042,
+      "cf_queried": true
+    },
+    "sz_002664": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.421,
+      "revenue_growth": 27.368399999999998,
+      "reason": "ROE差(1.4%) | 营收高增(27.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.64,
+      "cfo_to_or": 0.0235,
+      "asset_turn": 0.2737,
+      "cf_queried": true
+    },
+    "sz_002892": {
+      "score": 30,
+      "grade": "D",
+      "roe": -0.9079999999999999,
+      "revenue_growth": 37.978699999999996,
+      "reason": "ROE差(-0.9%) | 营收高增(38.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.92,
+      "cfo_to_or": 0.0506,
+      "asset_turn": 0.3798,
+      "cf_queried": true,
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报首亏"
+        ]
+      }
+    },
+    "sz_300232": {
+      "score": 30,
+      "grade": "D",
+      "roe": 0.6988,
+      "revenue_growth": 34.9203,
+      "reason": "ROE差(0.7%) | 营收高增(34.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.45,
+      "cfo_to_or": 0.0414,
+      "asset_turn": 0.3492,
+      "cf_queried": true
+    },
+    "sz_300350": {
+      "score": 30,
+      "grade": "D",
+      "roe": -1.1156,
+      "revenue_growth": 27.4229,
+      "reason": "ROE差(-1.1%) | 营收高增(27.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -5.79,
+      "cfo_to_or": -0.211,
+      "asset_turn": 0.2742,
+      "cf_queried": true
+    },
+    "sz_300479": {
+      "score": 25,
+      "grade": "D",
+      "roe": -5.6851,
+      "revenue_growth": 13.761300000000002,
+      "reason": "ROE差(-5.7%) | 营收增长(13.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -22.08,
+      "cfo_to_or": -1.6048,
+      "asset_turn": 0.1376,
+      "cf_queried": true
+    },
+    "sz_300773": {
+      "score": 65,
+      "grade": "B",
+      "roe": 15.0116,
+      "revenue_growth": 28.7626,
+      "reason": "ROE良好(15.0%) | 营收高增(28.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.91,
+      "cfo_to_or": -0.0316,
+      "asset_turn": 0.2876,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_300971": {
+      "score": 25,
+      "grade": "D",
+      "roe": 3.1413,
+      "revenue_growth": 16.4463,
+      "reason": "ROE差(3.1%) | 营收增长(16.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.81,
+      "cfo_to_or": 0.0493,
+      "asset_turn": 0.1645,
+      "cf_queried": true
+    },
+    "sz_301136": {
+      "score": 25,
+      "grade": "D",
+      "roe": 0.5682,
+      "revenue_growth": 10.8127,
+      "reason": "ROE差(0.6%) | 营收增长(10.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -2.53,
+      "cfo_to_or": -0.2339,
+      "asset_turn": 0.1081,
+      "cf_queried": true
+    },
+    "sz_301388": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.4906000000000001,
+      "revenue_growth": 22.6006,
+      "reason": "ROE差(1.5%) | 营收高增(22.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.07,
+      "cfo_to_or": -0.0474,
+      "asset_turn": 0.226,
+      "cf_queried": true
+    },
+    "sz_561360": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sh_600137": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.5797999999999999,
+      "revenue_growth": 20.4167,
+      "reason": "ROE差(1.6%) | 营收高增(20.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -4.91,
+      "cfo_to_or": -0.2403,
+      "asset_turn": 0.2042,
+      "cf_queried": true
+    },
+    "sh_600658": {
+      "score": 15,
+      "grade": "D",
+      "roe": -4.1721,
+      "revenue_growth": 2.6731000000000003,
+      "reason": "ROE差(-4.2%) | 营收持平(2.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.83,
+      "cfo_to_or": -0.3121,
+      "asset_turn": 0.0267,
+      "cf_queried": true,
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报续亏"
+        ]
+      }
+    },
+    "sh_601998": {
+      "score": 15,
+      "grade": "D",
+      "roe": 4.4223,
+      "revenue_growth": 1.0666,
+      "reason": "ROE差(4.4%) | 营收持平(1.1%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 2.25,
+      "cfo_to_or": 2.1113,
+      "asset_turn": 0.0107,
+      "cf_queried": true
+    },
+    "sh_603520": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.5859999999999999,
+      "revenue_growth": 23.275000000000002,
+      "reason": "ROE差(1.6%) | 营收高增(23.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.82,
+      "cfo_to_or": 0.0781,
+      "asset_turn": 0.2328,
+      "cf_queried": true
+    },
+    "sh_688097": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.219,
+      "revenue_growth": 22.457,
+      "reason": "ROE偏低(5.2%) | 营收高增(22.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -4.09,
+      "cfo_to_or": -0.1823,
+      "asset_turn": 0.2246,
+      "cf_queried": true
+    },
+    "sh_688228": {
+      "score": 15,
+      "grade": "D",
+      "roe": -1.5195,
+      "revenue_growth": 6.296200000000001,
+      "reason": "ROE差(-1.5%) | 营收持平(6.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.22,
+      "cfo_to_or": -0.1942,
+      "asset_turn": 0.063,
+      "cf_queried": true
+    },
+    "sh_688318": {
+      "score": 15,
+      "grade": "D",
+      "roe": 2.402,
+      "revenue_growth": 3.0132,
+      "reason": "ROE差(2.4%) | 营收持平(3.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.58,
+      "cfo_to_or": 0.1911,
+      "asset_turn": 0.0301,
+      "cf_queried": true
+    },
+    "sh_688410": {
+      "score": 40,
+      "grade": "C",
+      "roe": 5.2571,
+      "revenue_growth": 19.3428,
+      "reason": "ROE偏低(5.3%) | 营收增长(19.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.71,
+      "cfo_to_or": 0.0884,
+      "asset_turn": 0.1934,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "三季报预增"
+        ]
+      }
+    },
+    "sh_688567": {
+      "score": 25,
+      "grade": "D",
+      "roe": -4.3713,
+      "revenue_growth": 16.3167,
+      "reason": "ROE差(-4.4%) | 营收增长(16.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.0,
+      "cfo_to_or": 0.061,
+      "asset_turn": 0.1632,
+      "cf_queried": true
+    },
+    "sh_688635": {
+      "score": 15,
+      "grade": "D",
+      "roe": 2.9449,
+      "revenue_growth": 7.2890999999999995,
+      "reason": "ROE差(2.9%) | 营收持平(7.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.25,
+      "cfo_to_or": 0.0349,
+      "asset_turn": 0.0729,
+      "cf_queried": true,
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sh_688758": {
+      "score": 40,
+      "grade": "C",
+      "roe": 8.0754,
+      "revenue_growth": 18.4093,
+      "reason": "ROE偏低(8.1%) | 营收增长(18.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 5.68,
+      "cfo_to_or": 0.3085,
+      "asset_turn": 0.1841,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "三季报预增"
+        ]
+      }
+    },
+    "sz_000559": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.5109,
+      "revenue_growth": 24.918100000000003,
+      "reason": "ROE偏低(6.5%) | 营收高增(24.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.54,
+      "cfo_to_or": 0.0618,
+      "asset_turn": 0.2492,
+      "cf_queried": true
+    },
+    "sz_002073": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.1259,
+      "revenue_growth": 21.040300000000002,
+      "reason": "ROE差(2.1%) | 营收高增(21.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.51,
+      "cfo_to_or": 0.0242,
+      "asset_turn": 0.2104,
+      "cf_queried": true
+    },
+    "sz_002363": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.9588999999999999,
+      "revenue_growth": 30.407899999999998,
+      "reason": "ROE差(2.0%) | 营收高增(30.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 4.97,
+      "cfo_to_or": 0.1636,
+      "asset_turn": 0.3041,
+      "cf_queried": true
+    },
+    "sz_002700": {
+      "score": 25,
+      "grade": "D",
+      "roe": 2.4663,
+      "revenue_growth": 19.4687,
+      "reason": "ROE差(2.5%) | 营收增长(19.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.1,
+      "cfo_to_or": 0.0563,
+      "asset_turn": 0.1947,
+      "cf_queried": true
+    },
+    "sz_002959": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.9974000000000003,
+      "revenue_growth": 41.438,
+      "reason": "ROE差(4.0%) | 营收高增(41.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 3.59,
+      "cfo_to_or": 0.0867,
+      "asset_turn": 0.4144,
+      "cf_queried": true
+    },
+    "sz_300239": {
+      "score": 25,
+      "grade": "D",
+      "roe": 2.1516,
+      "revenue_growth": 16.023200000000003,
+      "reason": "ROE差(2.2%) | 营收增长(16.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 2.11,
+      "cfo_to_or": 0.1315,
+      "asset_turn": 0.1602,
+      "cf_queried": true
+    },
+    "sz_300384": {
+      "score": 15,
+      "grade": "D",
+      "roe": 2.7604,
+      "revenue_growth": 8.4589,
+      "reason": "ROE差(2.8%) | 营收持平(8.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.0,
+      "cfo_to_or": 0.0003,
+      "asset_turn": 0.0846,
+      "cf_queried": true
+    },
+    "sz_300496": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.3482,
+      "revenue_growth": 30.279,
+      "reason": "ROE差(2.3%) | 营收高增(30.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.45,
+      "cfo_to_or": -0.0148,
+      "asset_turn": 0.3028,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_300793": {
+      "score": 30,
+      "grade": "D",
+      "roe": 0.0666,
+      "revenue_growth": 25.4203,
+      "reason": "ROE差(0.1%) | 营收高增(25.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.91,
+      "cfo_to_or": 0.0752,
+      "asset_turn": 0.2542,
+      "cf_queried": true
+    },
+    "sz_300975": {
+      "score": 65,
+      "grade": "B",
+      "roe": 19.136300000000002,
+      "revenue_growth": 80.8247,
+      "reason": "ROE良好(19.1%) | 营收高增(80.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -13.51,
+      "cfo_to_or": -0.1672,
+      "asset_turn": 0.8082,
+      "cf_queried": true
+    },
+    "sz_301185": {
+      "score": 15,
+      "grade": "D",
+      "roe": 2.8701,
+      "revenue_growth": 8.612300000000001,
+      "reason": "ROE差(2.9%) | 营收持平(8.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.43,
+      "cfo_to_or": -0.0504,
+      "asset_turn": 0.0861,
+      "cf_queried": true
+    },
+    "sz_301391": {
+      "score": 25,
+      "grade": "D",
+      "roe": 0.6003999999999999,
+      "revenue_growth": 12.3692,
+      "reason": "ROE差(0.6%) | 营收增长(12.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 6.71,
+      "cfo_to_or": 0.5427,
+      "asset_turn": 0.1237,
+      "cf_queried": true
+    },
+    "sz_561760": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sh_600160": {
+      "score": 55,
+      "grade": "C",
+      "roe": 12.474300000000001,
+      "revenue_growth": 33.5014,
+      "reason": "ROE一般(12.5%) | 营收高增(33.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 5.85,
+      "cfo_to_or": 0.1747,
+      "asset_turn": 0.335,
+      "cf_queried": true
+    },
+    "sh_600713": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.078600000000001,
+      "revenue_growth": 82.1215,
+      "reason": "ROE差(4.1%) | 营收高增(82.1%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -15.23,
+      "cfo_to_or": -0.1855,
+      "asset_turn": 0.8212,
+      "cf_queried": true
+    },
+    "sh_603017": {
+      "score": 25,
+      "grade": "D",
+      "roe": 4.4833,
+      "revenue_growth": 17.2209,
+      "reason": "ROE差(4.5%) | 营收增长(17.2%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.08,
+      "cfo_to_or": 0.0048,
+      "asset_turn": 0.1722,
+      "cf_queried": true
+    },
+    "sh_603579": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.0473,
+      "revenue_growth": 26.495600000000003,
+      "reason": "ROE差(4.0%) | 营收高增(26.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.04,
+      "cfo_to_or": -0.0016,
+      "asset_turn": 0.265,
+      "cf_queried": true
+    },
+    "sh_688138": {
+      "score": 25,
+      "grade": "D",
+      "roe": 4.1775,
+      "revenue_growth": 15.912299999999998,
+      "reason": "ROE差(4.2%) | 营收增长(15.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 6.49,
+      "cfo_to_or": 0.4078,
+      "asset_turn": 0.1591,
+      "cf_queried": true
+    },
+    "sh_688248": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.7515,
+      "revenue_growth": 24.7559,
+      "reason": "ROE差(4.8%) | 营收高增(24.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -3.03,
+      "cfo_to_or": -0.1225,
+      "asset_turn": 0.2476,
+      "cf_queried": true
+    },
+    "sh_688332": {
+      "score": 40,
+      "grade": "C",
+      "roe": 8.736099999999999,
+      "revenue_growth": 15.135599999999998,
+      "reason": "ROE偏低(8.7%) | 营收增长(15.1%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.74,
+      "cfo_to_or": -0.0491,
+      "asset_turn": 0.1514,
+      "cf_queried": true
+    },
+    "sh_688411": {
+      "score": 55,
+      "grade": "C",
+      "roe": 12.6802,
+      "revenue_growth": 34.4833,
+      "reason": "ROE一般(12.7%) | 营收高增(34.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -6.63,
+      "cfo_to_or": -0.1923,
+      "asset_turn": 0.3448,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_688568": {
+      "score": 15,
+      "grade": "D",
+      "roe": -8.8013,
+      "revenue_growth": 6.081,
+      "reason": "ROE差(-8.8%) | 营收持平(6.1%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -6.39,
+      "cfo_to_or": -1.0507,
+      "asset_turn": 0.0608,
+      "cf_queried": true
+    },
+    "sh_688636": {
+      "score": 25,
+      "grade": "D",
+      "roe": 3.7914000000000003,
+      "revenue_growth": 14.3289,
+      "reason": "ROE差(3.8%) | 营收增长(14.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.44,
+      "cfo_to_or": -0.0308,
+      "asset_turn": 0.1433,
+      "cf_queried": true
+    },
+    "sh_688772": {
+      "score": 30,
+      "grade": "D",
+      "roe": -2.7277,
+      "revenue_growth": 27.538400000000003,
+      "reason": "ROE差(-2.7%) | 营收高增(27.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 2.51,
+      "cfo_to_or": 0.0911,
+      "asset_turn": 0.2754,
+      "cf_queried": true
+    },
+    "sz_000631": {
+      "score": 15,
+      "grade": "D",
+      "roe": 0.1983,
+      "revenue_growth": 2.912,
+      "reason": "ROE差(0.2%) | 营收持平(2.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.58,
+      "cfo_to_or": 0.1999,
+      "asset_turn": 0.0291,
+      "cf_queried": true,
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报预减"
+        ]
+      }
+    },
+    "sz_002080": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.9904,
+      "revenue_growth": 24.1339,
+      "reason": "ROE偏低(6.0%) | 营收高增(24.1%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.3,
+      "cfo_to_or": -0.0123,
+      "asset_turn": 0.2413,
+      "cf_queried": true
+    },
+    "sz_002421": {
+      "score": 25,
+      "grade": "D",
+      "roe": -0.6684,
+      "revenue_growth": 14.7843,
+      "reason": "ROE差(-0.7%) | 营收增长(14.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.43,
+      "cfo_to_or": -0.0968,
+      "asset_turn": 0.1478,
+      "cf_queried": true
+    },
+    "sz_002729": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.5024,
+      "revenue_growth": 33.6706,
+      "reason": "ROE差(2.5%) | 营收高增(33.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.41,
+      "cfo_to_or": 0.0419,
+      "asset_turn": 0.3367,
+      "cf_queried": true,
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报预减"
+        ]
+      }
+    },
+    "sz_003003": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.2676000000000003,
+      "revenue_growth": 26.1506,
+      "reason": "ROE差(2.3%) | 营收高增(26.2%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 3.22,
+      "cfo_to_or": 0.1232,
+      "asset_turn": 0.2615,
+      "cf_queried": true
+    },
+    "sz_300247": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.8218,
+      "revenue_growth": 25.796599999999998,
+      "reason": "ROE差(3.8%) | 营收高增(25.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.13,
+      "cfo_to_or": 0.0439,
+      "asset_turn": 0.258,
+      "cf_queried": true
+    },
+    "sz_300389": {
+      "score": 45,
+      "grade": "C",
+      "roe": 8.446,
+      "revenue_growth": 44.7969,
+      "reason": "ROE偏低(8.4%) | 营收高增(44.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -3.74,
+      "cfo_to_or": -0.0835,
+      "asset_turn": 0.448,
+      "cf_queried": true,
+      "news": {
+        "score": 5,
+        "tags": [
+          "三季报略增"
+        ]
+      }
+    },
+    "sz_300507": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.5208,
+      "revenue_growth": 24.559800000000003,
+      "reason": "ROE差(1.5%) | 营收高增(24.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.21,
+      "cfo_to_or": -0.0493,
+      "asset_turn": 0.2456,
+      "cf_queried": true
+    },
+    "sz_300811": {
+      "score": 45,
+      "grade": "C",
+      "roe": 7.1915000000000004,
+      "revenue_growth": 28.609800000000003,
+      "reason": "ROE偏低(7.2%) | 营收高增(28.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 3.4,
+      "cfo_to_or": 0.1188,
+      "asset_turn": 0.2861,
+      "cf_queried": true
+    },
+    "sz_300978": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.122,
+      "revenue_growth": 34.3241,
+      "reason": "ROE差(4.1%) | 营收高增(34.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 8.44,
+      "cfo_to_or": 0.246,
+      "asset_turn": 0.3432,
+      "cf_queried": true
+    },
+    "sz_301199": {
+      "score": 25,
+      "grade": "D",
+      "roe": 1.5216,
+      "revenue_growth": 17.6756,
+      "reason": "ROE差(1.5%) | 营收增长(17.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.24,
+      "cfo_to_or": -0.0133,
+      "asset_turn": 0.1768,
+      "cf_queried": true
+    },
+    "sz_301413": {
+      "score": 30,
+      "grade": "D",
+      "roe": 0.2791,
+      "revenue_growth": 26.333499999999997,
+      "reason": "ROE差(0.3%) | 营收高增(26.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.65,
+      "cfo_to_or": -0.0246,
+      "asset_turn": 0.2633,
+      "cf_queried": true
+    },
+    "sz_563150": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sh_600232": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.0467,
+      "revenue_growth": 34.8986,
+      "reason": "ROE差(2.0%) | 营收高增(34.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -3.42,
+      "cfo_to_or": -0.0979,
+      "asset_turn": 0.349,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报扭亏"
+        ]
+      }
+    },
+    "sh_600724": {
+      "score": 25,
+      "grade": "D",
+      "roe": 4.1554,
+      "revenue_growth": 15.331700000000001,
+      "reason": "ROE差(4.2%) | 营收增长(15.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 2.79,
+      "cfo_to_or": 0.1821,
+      "asset_turn": 0.1533,
+      "cf_queried": true
+    },
+    "sh_603028": {
+      "score": 30,
+      "grade": "D",
+      "roe": -7.1293999999999995,
+      "revenue_growth": 23.9897,
+      "reason": "ROE差(-7.1%) | 营收高增(24.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -2.9,
+      "cfo_to_or": -0.1209,
+      "asset_turn": 0.2399,
+      "cf_queried": true,
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报首亏"
+        ]
+      }
+    },
+    "sh_603602": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.6601000000000001,
+      "revenue_growth": 41.9114,
+      "reason": "ROE差(1.7%) | 营收高增(41.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 4.14,
+      "cfo_to_or": 0.0987,
+      "asset_turn": 0.4191,
+      "cf_queried": true
+    },
+    "sh_688150": {
+      "score": 40,
+      "grade": "C",
+      "roe": 5.394299999999999,
+      "revenue_growth": 12.697600000000001,
+      "reason": "ROE偏低(5.4%) | 营收增长(12.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 3.19,
+      "cfo_to_or": 0.2514,
+      "asset_turn": 0.127,
+      "cf_queried": true
+    },
+    "sh_688261": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.5549999999999997,
+      "revenue_growth": 22.6916,
+      "reason": "ROE差(3.6%) | 营收高增(22.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -3.98,
+      "cfo_to_or": -0.1756,
+      "asset_turn": 0.2269,
+      "cf_queried": true
+    },
+    "sh_688336": {
+      "score": 15,
+      "grade": "D",
+      "roe": 4.3796,
+      "revenue_growth": 9.7577,
+      "reason": "ROE差(4.4%) | 营收持平(9.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.74,
+      "cfo_to_or": -0.0762,
+      "asset_turn": 0.0976,
+      "cf_queried": true
+    },
+    "sh_688416": {
+      "score": 55,
+      "grade": "C",
+      "roe": 10.3405,
+      "revenue_growth": 36.4815,
+      "reason": "ROE一般(10.3%) | 营收高增(36.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 4.22,
+      "cfo_to_or": 0.1156,
+      "asset_turn": 0.3648,
+      "cf_queried": true
+    },
+    "sh_688575": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.574,
+      "revenue_growth": 20.534,
+      "reason": "ROE差(2.6%) | 营收高增(20.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 4.7,
+      "cfo_to_or": 0.2288,
+      "asset_turn": 0.2053,
+      "cf_queried": true
+    },
+    "sh_688646": {
+      "score": 25,
+      "grade": "D",
+      "roe": -1.1025,
+      "revenue_growth": 19.6982,
+      "reason": "ROE差(-1.1%) | 营收增长(19.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 8.71,
+      "cfo_to_or": 0.4423,
+      "asset_turn": 0.197,
+      "cf_queried": true
+    },
+    "sh_688818": {
+      "score": 25,
+      "grade": "D",
+      "roe": 1.5350000000000001,
+      "revenue_growth": 17.5018,
+      "reason": "ROE差(1.5%) | 营收增长(17.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -6.63,
+      "cfo_to_or": -0.379,
+      "asset_turn": 0.175,
+      "cf_queried": true
+    },
+    "sz_000637": {
+      "score": 30,
+      "grade": "D",
+      "roe": -6.7023,
+      "revenue_growth": 91.4398,
+      "reason": "ROE差(-6.7%) | 营收高增(91.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.11,
+      "cfo_to_or": 0.0013,
+      "asset_turn": 0.9144,
+      "cf_queried": true
+    },
+    "sz_002085": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.7762,
+      "revenue_growth": 40.971999999999994,
+      "reason": "ROE偏低(5.8%) | 营收高增(41.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 2.39,
+      "cfo_to_or": 0.0583,
+      "asset_turn": 0.4097,
+      "cf_queried": true
+    },
+    "sz_002441": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.5537,
+      "revenue_growth": 84.80250000000001,
+      "reason": "ROE差(3.6%) | 营收高增(84.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -5.96,
+      "cfo_to_or": -0.0703,
+      "asset_turn": 0.848,
+      "cf_queried": true
+    },
+    "sz_002777": {
+      "score": 25,
+      "grade": "D",
+      "roe": 1.5960999999999999,
+      "revenue_growth": 16.6717,
+      "reason": "ROE差(1.6%) | 营收增长(16.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -5.32,
+      "cfo_to_or": -0.3189,
+      "asset_turn": 0.1667,
+      "cf_queried": true
+    },
+    "sz_003021": {
+      "score": 25,
+      "grade": "D",
+      "roe": 1.7454999999999998,
+      "revenue_growth": 15.967400000000001,
+      "reason": "ROE差(1.7%) | 营收增长(16.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 2.59,
+      "cfo_to_or": 0.1624,
+      "asset_turn": 0.1597,
+      "cf_queried": true
+    },
+    "sz_300251": {
+      "score": 15,
+      "grade": "D",
+      "roe": 0.33930000000000005,
+      "revenue_growth": 3.0668,
+      "reason": "ROE差(0.3%) | 营收持平(3.1%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.26,
+      "cfo_to_or": -0.4118,
+      "asset_turn": 0.0307,
+      "cf_queried": true
+    },
+    "sz_300402": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.8668,
+      "revenue_growth": 27.6406,
+      "reason": "ROE差(1.9%) | 营收高增(27.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -5.29,
+      "cfo_to_or": -0.1915,
+      "asset_turn": 0.2764,
+      "cf_queried": true
+    },
+    "sz_300516": {
+      "score": 25,
+      "grade": "D",
+      "roe": 1.0560999999999998,
+      "revenue_growth": 10.583499999999999,
+      "reason": "ROE差(1.1%) | 营收增长(10.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 11.73,
+      "cfo_to_or": 1.1081,
+      "asset_turn": 0.1058,
+      "cf_queried": true
+    },
+    "sz_300837": {
+      "score": 25,
+      "grade": "D",
+      "roe": 1.2248999999999999,
+      "revenue_growth": 11.9826,
+      "reason": "ROE差(1.2%) | 营收增长(12.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.85,
+      "cfo_to_or": -0.0708,
+      "asset_turn": 0.1198,
+      "cf_queried": true
+    },
+    "sz_300982": {
+      "score": 15,
+      "grade": "D",
+      "roe": -0.2154,
+      "revenue_growth": 8.918,
+      "reason": "ROE差(-0.2%) | 营收持平(8.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.15,
+      "cfo_to_or": 0.1293,
+      "asset_turn": 0.0892,
+      "cf_queried": true
+    },
+    "sz_301200": {
+      "score": 55,
+      "grade": "C",
+      "roe": 10.5625,
+      "revenue_growth": 34.5985,
+      "reason": "ROE一般(10.6%) | 营收高增(34.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -7.46,
+      "cfo_to_or": -0.2156,
+      "asset_turn": 0.346,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_301428": {
+      "score": 25,
+      "grade": "D",
+      "roe": 2.5982000000000003,
+      "revenue_growth": 16.4663,
+      "reason": "ROE差(2.6%) | 营收增长(16.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -11.31,
+      "cfo_to_or": -0.6867,
+      "asset_turn": 0.1647,
+      "cf_queried": true
+    },
+    "sz_588860": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sh_600278": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.5146,
+      "revenue_growth": 81.77170000000001,
+      "reason": "ROE差(1.5%) | 营收高增(81.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -4.5,
+      "cfo_to_or": -0.055,
+      "asset_turn": 0.8177,
+      "cf_queried": true
+    },
+    "sh_600748": {
+      "score": 15,
+      "grade": "D",
+      "roe": -2.4977,
+      "revenue_growth": 3.3917999999999995,
+      "reason": "ROE差(-2.5%) | 营收持平(3.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.69,
+      "cfo_to_or": -0.4996,
+      "asset_turn": 0.0339,
+      "cf_queried": true
+    },
+    "sh_603037": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.0394,
+      "revenue_growth": 23.5214,
+      "reason": "ROE差(3.0%) | 营收高增(23.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.95,
+      "cfo_to_or": 0.0405,
+      "asset_turn": 0.2352,
+      "cf_queried": true
+    },
+    "sh_603633": {
+      "score": 30,
+      "grade": "D",
+      "roe": -3.4965,
+      "revenue_growth": 20.6829,
+      "reason": "ROE差(-3.5%) | 营收高增(20.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.83,
+      "cfo_to_or": 0.0402,
+      "asset_turn": 0.2068,
+      "cf_queried": true,
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报首亏"
+        ]
+      }
+    },
+    "sh_688160": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.7598000000000003,
+      "revenue_growth": 27.2596,
+      "reason": "ROE差(2.8%) | 营收高增(27.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.1,
+      "cfo_to_or": -0.0403,
+      "asset_turn": 0.2726,
+      "cf_queried": true
+    },
+    "sh_688262": {
+      "score": 15,
+      "grade": "D",
+      "roe": -4.231,
+      "revenue_growth": 9.4069,
+      "reason": "ROE差(-4.2%) | 营收持平(9.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 2.92,
+      "cfo_to_or": 0.3104,
+      "asset_turn": 0.0941,
+      "cf_queried": true
+    },
+    "sh_688351": {
+      "score": 25,
+      "grade": "D",
+      "roe": 2.2171,
+      "revenue_growth": 13.661599999999998,
+      "reason": "ROE差(2.2%) | 营收增长(13.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.06,
+      "cfo_to_or": 0.0045,
+      "asset_turn": 0.1366,
+      "cf_queried": true
+    },
+    "sh_688433": {
+      "score": 25,
+      "grade": "D",
+      "roe": 0.40049999999999997,
+      "revenue_growth": 11.9076,
+      "reason": "ROE差(0.4%) | 营收增长(11.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -2.76,
+      "cfo_to_or": -0.2321,
+      "asset_turn": 0.1191,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_688584": {
+      "score": 25,
+      "grade": "D",
+      "roe": 0.6494,
+      "revenue_growth": 11.9269,
+      "reason": "ROE差(0.6%) | 营收增长(11.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 3.0,
+      "cfo_to_or": 0.2519,
+      "asset_turn": 0.1193,
+      "cf_queried": true
+    },
+    "sh_688648": {
+      "score": 30,
+      "grade": "D",
+      "roe": -1.0844,
+      "revenue_growth": 23.8594,
+      "reason": "ROE差(-1.1%) | 营收高增(23.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -3.2,
+      "cfo_to_or": -0.1342,
+      "asset_turn": 0.2386,
+      "cf_queried": true
+    },
+    "sh_688828": {
+      "score": 25,
+      "grade": "D",
+      "roe": -9.7341,
+      "revenue_growth": 16.9483,
+      "reason": "ROE差(-9.7%) | 营收增长(16.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -10.97,
+      "cfo_to_or": -0.6472,
+      "asset_turn": 0.1695,
+      "cf_queried": true,
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报续亏"
+        ]
+      }
+    },
+    "sz_000701": {
+      "score": 65,
+      "grade": "B",
+      "roe": 17.255599999999998,
+      "revenue_growth": 93.70540000000001,
+      "reason": "ROE良好(17.3%) | 营收高增(93.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -17.89,
+      "cfo_to_or": -0.1909,
+      "asset_turn": 0.9371,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报扭亏"
+        ]
+      }
+    },
+    "sz_002135": {
+      "score": 30,
+      "grade": "D",
+      "roe": 0.44889999999999997,
+      "revenue_growth": 21.834400000000002,
+      "reason": "ROE差(0.4%) | 营收高增(21.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 16.67,
+      "cfo_to_or": 0.7634,
+      "asset_turn": 0.2183,
+      "cf_queried": true
+    },
+    "sz_002462": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.9739,
+      "revenue_growth": 67.9523,
+      "reason": "ROE差(2.0%) | 营收高增(68.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 3.59,
+      "cfo_to_or": 0.0528,
+      "asset_turn": 0.6795,
+      "cf_queried": true
+    },
+    "sz_002792": {
+      "score": 25,
+      "grade": "D",
+      "roe": -0.7936000000000001,
+      "revenue_growth": 16.3599,
+      "reason": "ROE差(-0.8%) | 营收增长(16.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.31,
+      "cfo_to_or": -0.019,
+      "asset_turn": 0.1636,
+      "cf_queried": true,
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报首亏"
+        ]
+      }
+    },
+    "sz_003025": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.398,
+      "revenue_growth": 21.1614,
+      "reason": "ROE偏低(5.4%) | 营收高增(21.2%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 4.01,
+      "cfo_to_or": 0.1894,
+      "asset_turn": 0.2116,
+      "cf_queried": true
+    },
+    "sz_300256": {
+      "score": 30,
+      "grade": "D",
+      "roe": -3.46,
+      "revenue_growth": 40.8552,
+      "reason": "ROE差(-3.5%) | 营收高增(40.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.68,
+      "cfo_to_or": 0.0166,
+      "asset_turn": 0.4086,
+      "cf_queried": true
+    },
+    "sz_300412": {
+      "score": 30,
+      "grade": "D",
+      "roe": -0.20140000000000002,
+      "revenue_growth": 20.0142,
+      "reason": "ROE差(-0.2%) | 营收高增(20.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.06,
+      "cfo_to_or": -0.0029,
+      "asset_turn": 0.2001,
+      "cf_queried": true
+    },
+    "sz_300569": {
+      "score": 25,
+      "grade": "D",
+      "roe": 0.9501000000000001,
+      "revenue_growth": 13.1137,
+      "reason": "ROE差(1.0%) | 营收增长(13.1%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.7,
+      "cfo_to_or": -0.0537,
+      "asset_turn": 0.1311,
+      "cf_queried": true
+    },
+    "sz_300839": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.4821,
+      "revenue_growth": 103.6378,
+      "reason": "ROE差(2.5%) | 营收高增(103.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -2.99,
+      "cfo_to_or": -0.0289,
+      "asset_turn": 1.0364,
+      "cf_queried": true
+    },
+    "sz_300990": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.9839,
+      "revenue_growth": 56.6264,
+      "reason": "ROE偏低(6.0%) | 营收高增(56.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 8.5,
+      "cfo_to_or": 0.1501,
+      "asset_turn": 0.5663,
+      "cf_queried": true
+    },
+    "sz_301260": {
+      "score": 30,
+      "grade": "D",
+      "roe": -3.9838999999999998,
+      "revenue_growth": 29.287999999999997,
+      "reason": "ROE差(-4.0%) | 营收高增(29.3%)",
+      "statDate": "2026-06-30",
+      "cf_queried": true
+    },
+    "sz_301456": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_588960": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sh_600293": {
+      "score": 25,
+      "grade": "D",
+      "roe": -4.7555,
+      "revenue_growth": 10.732099999999999,
+      "reason": "ROE差(-4.8%) | 营收增长(10.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.57,
+      "cfo_to_or": -0.1464,
+      "asset_turn": 0.1073,
+      "cf_queried": true
+    },
+    "sh_600780": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.6186,
+      "revenue_growth": 45.5225,
+      "reason": "ROE差(4.6%) | 营收高增(45.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 5.65,
+      "cfo_to_or": 0.1241,
+      "asset_turn": 0.4552,
+      "cf_queried": true
+    },
+    "sh_603085": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.2477,
+      "revenue_growth": 42.8307,
+      "reason": "ROE偏低(5.2%) | 营收高增(42.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 2.08,
+      "cfo_to_or": 0.0484,
+      "asset_turn": 0.4283,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_603829": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.9073,
+      "revenue_growth": 34.003,
+      "reason": "ROE差(1.9%) | 营收高增(34.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -2.76,
+      "cfo_to_or": -0.0812,
+      "asset_turn": 0.34,
+      "cf_queried": true,
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报预减"
+        ]
+      }
+    },
+    "sh_688165": {
+      "score": 25,
+      "grade": "D",
+      "roe": -4.7807,
+      "revenue_growth": 19.392599999999998,
+      "reason": "ROE差(-4.8%) | 营收增长(19.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.8,
+      "cfo_to_or": 0.0414,
+      "asset_turn": 0.1939,
+      "cf_queried": true
+    },
+    "sh_688266": {
+      "score": 70,
+      "grade": "A",
+      "roe": 45.6998,
+      "revenue_growth": 37.1147,
+      "reason": "ROE优质(45.7%) | 营收高增(37.1%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 24.89,
+      "cfo_to_or": 0.6708,
+      "asset_turn": 0.3711,
+      "cf_queried": true
+    },
+    "sh_688359": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.7715,
+      "revenue_growth": 23.7802,
+      "reason": "ROE差(1.8%) | 营收高增(23.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -2.2,
+      "cfo_to_or": -0.0926,
+      "asset_turn": 0.2378,
+      "cf_queried": true
+    },
+    "sh_688475": {
+      "score": 45,
+      "grade": "C",
+      "roe": 7.0172,
+      "revenue_growth": 32.589600000000004,
+      "reason": "ROE偏低(7.0%) | 营收高增(32.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.65,
+      "cfo_to_or": -0.0198,
+      "asset_turn": 0.3259,
+      "cf_queried": true
+    },
+    "sh_688590": {
+      "score": 30,
+      "grade": "D",
+      "roe": -0.6623,
+      "revenue_growth": 29.001900000000003,
+      "reason": "ROE差(-0.7%) | 营收高增(29.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -7.81,
+      "cfo_to_or": -0.2692,
+      "asset_turn": 0.29,
+      "cf_queried": true
+    },
+    "sh_688676": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.7518,
+      "revenue_growth": 28.3625,
+      "reason": "ROE偏低(5.8%) | 营收高增(28.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.19,
+      "cfo_to_or": -0.0067,
+      "asset_turn": 0.2836,
+      "cf_queried": true
+    },
+    "sh_688837": {
+      "score": 15,
+      "grade": "D",
+      "roe": -27.092,
+      "revenue_growth": 9.446,
+      "reason": "ROE差(-27.1%) | 营收持平(9.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -8.51,
+      "cfo_to_or": -0.9012,
+      "asset_turn": 0.0945,
+      "cf_queried": true,
+      "news": {
+        "score": -15,
+        "tags": [
+          "三季报首亏"
+        ]
+      }
+    },
+    "sz_000803": {
+      "score": 25,
+      "grade": "D",
+      "roe": 4.4033999999999995,
+      "revenue_growth": 14.000599999999999,
+      "reason": "ROE差(4.4%) | 营收增长(14.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.62,
+      "cfo_to_or": 0.1159,
+      "asset_turn": 0.14,
+      "cf_queried": true,
+      "news": {
+        "score": 20,
+        "tags": [
+          "中报预增",
+          "战略合作"
+        ]
+      }
+    },
+    "sz_002136": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.3933,
+      "revenue_growth": 50.455099999999995,
+      "reason": "ROE差(4.4%) | 营收高增(50.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.45,
+      "cfo_to_or": -0.0288,
+      "asset_turn": 0.5046,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报扭亏"
+        ]
+      }
+    },
+    "sz_002476": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.0882,
+      "revenue_growth": 30.491699999999998,
+      "reason": "ROE差(2.1%) | 营收高增(30.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.07,
+      "cfo_to_or": 0.0351,
+      "asset_turn": 0.3049,
+      "cf_queried": true
+    },
+    "sz_002801": {
+      "score": 55,
+      "grade": "C",
+      "roe": 10.040000000000001,
+      "revenue_growth": 34.3446,
+      "reason": "ROE一般(10.0%) | 营收高增(34.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 4.23,
+      "cfo_to_or": 0.1233,
+      "asset_turn": 0.3434,
+      "cf_queried": true
+    },
+    "sz_300015": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.0321,
+      "revenue_growth": 32.7658,
+      "reason": "ROE偏低(6.0%) | 营收高增(32.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 8.02,
+      "cfo_to_or": 0.2447,
+      "asset_turn": 0.3277,
+      "cf_queried": true
+    },
+    "sz_300258": {
+      "score": 25,
+      "grade": "D",
+      "roe": -0.5848,
+      "revenue_growth": 11.7661,
+      "reason": "ROE差(-0.6%) | 营收增长(11.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.66,
+      "cfo_to_or": -0.0564,
+      "asset_turn": 0.1177,
+      "cf_queried": true
+    },
+    "sz_300415": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.7559,
+      "revenue_growth": 35.5429,
+      "reason": "ROE偏低(9.8%) | 营收高增(35.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.03,
+      "cfo_to_or": 0.0289,
+      "asset_turn": 0.3554,
+      "cf_queried": true
+    },
+    "sz_300612": {
+      "score": 25,
+      "grade": "D",
+      "roe": -7.544199999999999,
+      "revenue_growth": 19.5423,
+      "reason": "ROE差(-7.5%) | 营收增长(19.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -4.92,
+      "cfo_to_or": -0.2518,
+      "asset_turn": 0.1954,
+      "cf_queried": true
+    },
+    "sz_300848": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.6839,
+      "revenue_growth": 24.266199999999998,
+      "reason": "ROE差(1.7%) | 营收高增(24.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -5.84,
+      "cfo_to_or": -0.2409,
+      "asset_turn": 0.2427,
+      "cf_queried": true
+    },
+    "sz_300993": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.4268,
+      "revenue_growth": 24.008599999999998,
+      "reason": "ROE差(3.4%) | 营收高增(24.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 3.56,
+      "cfo_to_or": 0.1481,
+      "asset_turn": 0.2401,
+      "cf_queried": true
+    },
+    "sz_301278": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.1253000000000002,
+      "revenue_growth": 20.2274,
+      "reason": "ROE差(1.1%) | 营收高增(20.2%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -2.87,
+      "cfo_to_or": -0.1417,
+      "asset_turn": 0.2023,
+      "cf_queried": true
+    },
+    "sz_301515": {
+      "score": 25,
+      "grade": "D",
+      "roe": -1.5083,
+      "revenue_growth": 13.1208,
+      "reason": "ROE差(-1.5%) | 营收增长(13.1%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -2.18,
+      "cfo_to_or": -0.1659,
+      "asset_turn": 0.1312,
+      "cf_queried": true
+    },
+    "sh_600307": {
+      "score": 30,
+      "grade": "D",
+      "roe": -4.015,
+      "revenue_growth": 31.5747,
+      "reason": "ROE差(-4.0%) | 营收高增(31.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.8,
+      "cfo_to_or": 0.0252,
+      "asset_turn": 0.3157,
+      "cf_queried": true
+    },
+    "sh_600807": {
+      "score": 15,
+      "grade": "D",
+      "roe": -19.476599999999998,
+      "revenue_growth": 5.8683,
+      "reason": "ROE差(-19.5%) | 营收持平(5.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -2.46,
+      "cfo_to_or": -0.4188,
+      "asset_turn": 0.0587,
+      "cf_queried": true
+    },
+    "sh_603119": {
+      "score": 45,
+      "grade": "C",
+      "roe": 7.2620000000000005,
+      "revenue_growth": 26.859699999999997,
+      "reason": "ROE偏低(7.3%) | 营收高增(26.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 7.63,
+      "cfo_to_or": 0.2842,
+      "asset_turn": 0.2686,
+      "cf_queried": true
+    },
+    "sh_603859": {
+      "score": 25,
+      "grade": "D",
+      "roe": 2.595,
+      "revenue_growth": 13.5911,
+      "reason": "ROE差(2.6%) | 营收增长(13.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -2.18,
+      "cfo_to_or": -0.1601,
+      "asset_turn": 0.1359,
+      "cf_queried": true
+    },
+    "sh_688179": {
+      "score": 40,
+      "grade": "C",
+      "roe": 5.8588000000000005,
+      "revenue_growth": 13.991000000000001,
+      "reason": "ROE偏低(5.9%) | 营收增长(14.0%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -3.32,
+      "cfo_to_or": -0.2376,
+      "asset_turn": 0.1399,
+      "cf_queried": true
+    },
+    "sh_688281": {
+      "score": 25,
+      "grade": "D",
+      "roe": 3.5839000000000003,
+      "revenue_growth": 10.9223,
+      "reason": "ROE差(3.6%) | 营收增长(10.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.01,
+      "cfo_to_or": 0.0927,
+      "asset_turn": 0.1092,
+      "cf_queried": true
+    },
+    "sh_688365": {
+      "score": 25,
+      "grade": "D",
+      "roe": 1.2192,
+      "revenue_growth": 17.3243,
+      "reason": "ROE差(1.2%) | 营收增长(17.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.74,
+      "cfo_to_or": 0.1007,
+      "asset_turn": 0.1732,
+      "cf_queried": true
+    },
+    "sh_688484": {
+      "score": 30,
+      "grade": "D",
+      "roe": -1.0946,
+      "revenue_growth": 26.205099999999998,
+      "reason": "ROE差(-1.1%) | 营收高增(26.2%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.75,
+      "cfo_to_or": -0.0667,
+      "asset_turn": 0.2621,
+      "cf_queried": true
+    },
+    "sh_688591": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.9843,
+      "revenue_growth": 20.3714,
+      "reason": "ROE差(4.0%) | 营收高增(20.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 0.07,
+      "cfo_to_or": 0.0035,
+      "asset_turn": 0.2037,
+      "cf_queried": true
+    },
+    "sh_688677": {
+      "score": 40,
+      "grade": "C",
+      "roe": 5.6814,
+      "revenue_growth": 19.517300000000002,
+      "reason": "ROE偏低(5.7%) | 营收增长(19.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 4.39,
+      "cfo_to_or": 0.2248,
+      "asset_turn": 0.1952,
+      "cf_queried": true
+    },
+    "sz_000001": {
+      "score": 15,
+      "grade": "D",
+      "roe": 4.6746,
+      "revenue_growth": 1.1814,
+      "reason": "ROE差(4.7%) | 营收持平(1.2%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 3.6,
+      "cfo_to_or": 3.0448,
+      "asset_turn": 0.0118,
+      "cf_queried": true
+    },
+    "sz_000819": {
+      "score": 30,
+      "grade": "D",
+      "roe": 0.6819000000000001,
+      "revenue_growth": 69.2119,
+      "reason": "ROE差(0.7%) | 营收高增(69.2%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.78,
+      "cfo_to_or": -0.0112,
+      "asset_turn": 0.6921,
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报扭亏"
+        ]
+      }
+    },
+    "sz_002178": {
+      "score": 25,
+      "grade": "D",
+      "roe": -2.6315,
+      "revenue_growth": 11.873899999999999,
+      "reason": "ROE差(-2.6%) | 营收增长(11.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -4.93,
+      "cfo_to_or": -0.415,
+      "asset_turn": 0.1187,
+      "cf_queried": true,
+      "news": {
+        "score": -5,
+        "tags": [
+          "中报略减"
+        ]
+      }
+    },
+    "sz_002492": {
+      "score": 15,
+      "grade": "D",
+      "roe": -2.1016,
+      "revenue_growth": 6.531499999999999,
+      "reason": "ROE差(-2.1%) | 营收持平(6.5%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 11.41,
+      "cfo_to_or": 1.7465,
+      "asset_turn": 0.0653,
+      "cf_queried": true,
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报首亏"
+        ]
+      }
+    },
+    "sz_002802": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.4442,
+      "revenue_growth": 31.8986,
+      "reason": "ROE差(4.4%) | 营收高增(31.9%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 2.34,
+      "cfo_to_or": 0.0733,
+      "asset_turn": 0.319,
+      "cf_queried": true
+    },
+    "sz_300115": {
+      "score": 30,
+      "grade": "D",
+      "roe": 0.2133,
+      "revenue_growth": 41.606700000000004,
+      "reason": "ROE差(0.2%) | 营收高增(41.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.79,
+      "cfo_to_or": -0.0189,
+      "asset_turn": 0.4161,
+      "cf_queried": true
+    },
+    "sz_300272": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.1973000000000003,
+      "revenue_growth": 25.570700000000002,
+      "reason": "ROE差(3.2%) | 营收高增(25.6%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 4.36,
+      "cfo_to_or": 0.1705,
+      "asset_turn": 0.2557,
+      "cf_queried": true
+    },
+    "sz_300447": {
+      "score": 25,
+      "grade": "D",
+      "roe": 1.3089,
+      "revenue_growth": 17.3171,
+      "reason": "ROE差(1.3%) | 营收增长(17.3%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -0.34,
+      "cfo_to_or": -0.0194,
+      "asset_turn": 0.1732,
+      "cf_queried": true
+    },
+    "sz_300675": {
+      "score": 15,
+      "grade": "D",
+      "roe": -3.9652,
+      "revenue_growth": 7.7264,
+      "reason": "ROE差(-4.0%) | 营收持平(7.7%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -1.34,
+      "cfo_to_or": -0.1736,
+      "asset_turn": 0.0773,
+      "cf_queried": true
+    },
+    "sz_300881": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.7729,
+      "revenue_growth": 44.7727,
+      "reason": "ROE差(4.8%) | 营收高增(44.8%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -4.33,
+      "cfo_to_or": -0.0968,
+      "asset_turn": 0.4477,
+      "cf_queried": true
+    },
+    "sz_301010": {
+      "score": 25,
+      "grade": "D",
+      "roe": 0.8159,
+      "revenue_growth": 16.4414,
+      "reason": "ROE差(0.8%) | 营收增长(16.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": -2.57,
+      "cfo_to_or": -0.1564,
+      "asset_turn": 0.1644,
+      "cf_queried": true
+    },
+    "sz_301327": {
+      "score": 30,
+      "grade": "D",
+      "roe": 0.1706,
+      "revenue_growth": 30.0881,
+      "reason": "ROE差(0.2%) | 营收高增(30.1%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 2.0,
+      "cfo_to_or": 0.0666,
+      "asset_turn": 0.3009,
+      "cf_queried": true
+    },
+    "sz_301591": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.5031,
+      "revenue_growth": 24.352899999999998,
+      "reason": "ROE差(3.5%) | 营收高增(24.4%)",
+      "statDate": "2026-06-30",
+      "cfo_to_asset": 1.23,
+      "cfo_to_or": 0.0506,
+      "asset_turn": 0.2435,
+      "cf_queried": true
     }
   }
 }
