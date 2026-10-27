@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-27 06:01:35",
+  "update_time": "2026-10-27 09:52:22",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -24,7 +24,7 @@
       "hot_days": 28,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 337,
+      "total": 317,
       "ongoing": true
     },
     {
@@ -37,7 +37,7 @@
       "hot_days": 30,
       "peak": 236,
       "peak_date": "09/08",
-      "total": 2245,
+      "total": 2226,
       "ongoing": true
     },
     {
@@ -50,7 +50,7 @@
       "hot_days": 29,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 411,
+      "total": 405,
       "ongoing": true
     },
     {
@@ -102,7 +102,7 @@
       "hot_days": 28,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 260,
+      "total": 250,
       "ongoing": true
     },
     {
@@ -154,7 +154,7 @@
       "hot_days": 24,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 393,
+      "total": 387,
       "ongoing": true
     },
     {
@@ -167,7 +167,7 @@
       "hot_days": 21,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 115,
+      "total": 114,
       "ongoing": true
     },
     {
@@ -212,53 +212,53 @@
     {
       "sector": "军工",
       "start": "10/14",
-      "end": "10/27",
+      "end": "10/26",
       "start_idx": 20,
-      "end_idx": 29,
-      "days": 10,
-      "hot_days": 8,
+      "end_idx": 28,
+      "days": 9,
+      "hot_days": 7,
       "peak": 9,
       "peak_date": "10/19",
-      "total": 43,
+      "total": 37,
       "ongoing": true
     },
     {
       "sector": "半导体",
       "start": "10/14",
-      "end": "10/27",
+      "end": "10/26",
       "start_idx": 20,
-      "end_idx": 29,
-      "days": 10,
-      "hot_days": 9,
+      "end_idx": 28,
+      "days": 9,
+      "hot_days": 8,
       "peak": 6,
       "peak_date": "10/15",
-      "total": 43,
+      "total": 39,
       "ongoing": true
     },
     {
       "sector": "通信设备",
       "start": "10/21",
-      "end": "10/27",
+      "end": "10/26",
       "start_idx": 25,
-      "end_idx": 29,
-      "days": 5,
-      "hot_days": 5,
+      "end_idx": 28,
+      "days": 4,
+      "hot_days": 4,
       "peak": 4,
       "peak_date": "10/26",
-      "total": 17,
+      "total": 13,
       "ongoing": true
     },
     {
       "sector": "地产链",
       "start": "10/26",
-      "end": "10/27",
+      "end": "10/26",
       "start_idx": 28,
-      "end_idx": 29,
-      "days": 2,
-      "hot_days": 2,
+      "end_idx": 28,
+      "days": 1,
+      "hot_days": 1,
       "peak": 4,
       "peak_date": "10/26",
-      "total": 8,
+      "total": 4,
       "ongoing": true
     }
   ]
