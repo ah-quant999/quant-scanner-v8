@@ -1,8 +1,32 @@
 {
-  "update_time": "2026-10-28 09:02:41",
-  "run_start": "2026-10-28 08:56:54",
-  "ok": 1,
-  "fail": 0,
-  "failed_scripts": [],
-  "skipped_by_time_gate": []
+  "update_time": "2026-10-28 17:41:21",
+  "run_start": "2026-10-28 16:02:01",
+  "ok": 33,
+  "fail": 3,
+  "failed_scripts": [
+    {
+      "script": "refresh_kline_freshness.py",
+      "reason": "超时 >40min"
+    },
+    {
+      "script": "v8/factor_lab_gen.py",
+      "reason": "退出码 1 | 接收数据异常，请稍后再试。"
+    },
+    {
+      "script": "factor_walkforward.py",
+      "reason": "退出码 1 | TypeError: unsupported operand type(s) for +: 'float' and 'NoneType'"
+    }
+  ],
+  "skipped_by_time_gate": [
+    "backtest_expectancy.py",
+    "build_candidate_pool.py",
+    "generate_top10.py",
+    "backtest_tdx.py",
+    "backtest_comprehensive.py",
+    "export_optimized_strategy.py",
+    "calc_volatility_watch.py",
+    "gen_stock_stop.py",
+    "calc_sentiment_cycle.py",
+    "final_recommend.py"
+  ]
 }
