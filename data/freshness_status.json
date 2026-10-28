@@ -1,25 +1,14 @@
 {
-  "check_time": "2026-10-27 17:39:01",
+  "check_time": "2026-10-28 11:53:15",
   "last_trade_close": "2026-10-27 15:30:00",
   "is_trading_day": true,
-  "core_stale": [
-    {
-      "var": "BACKTEST_COMPREHENSIVE",
-      "reason": "更新于 10-24 21:18，落后 2 个交易日（阈值 1）",
-      "category": "algo"
-    },
-    {
-      "var": "BACKTEST_TDX",
-      "reason": "更新于 10-24 21:18，落后 2 个交易日（阈值 1）",
-      "category": "algo"
-    }
-  ],
+  "core_stale": [],
   "warn_stale": [],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 39,
-    "core_stale": 2,
+    "core_stale": 0,
     "warn_stale": 0,
     "frozen_stale": 0,
     "no_timestamp": 0
