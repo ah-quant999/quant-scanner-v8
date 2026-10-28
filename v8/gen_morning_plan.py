@@ -56,19 +56,19 @@ def fetch_index_quotes():
     secids = "1.000001,0.399001,0.399006,1.000688"
     short = {"000001": "沪指", "399001": "深成指", "399006": "创业板", "000688": "科创50"}
     rows = []
-    for attempt in range(3):
+    for attempt in range(5):
         try:
             r = _requests.get(
                 f"{_EM_DELAY}/api/qt/ulist.np/get",
                 params={"fltt": "2", "invt": "2", "ut": "b2884a393a59ad64002292a3e90d46a5",
                         "fields": "f2,f3,f6,f12,f13,f14", "secids": secids},
-                headers=_EM_HEADERS, timeout=15)
+                headers=_EM_HEADERS, timeout=20)
             rows = ((r.json().get("data") or {}).get("diff") or [])
             if rows:
                 break
         except Exception as e:
-            print(f"  ⚠️ 指数行情失败({attempt+1}/3): {e}")
-            time.sleep(1.5)
+            print(f"  ⚠️ 指数行情失败({attempt+1}/5): {e}")
+            time.sleep(2)
     items, turnover = [], 0.0
     for r in rows:
         try:
@@ -92,9 +92,12 @@ def build():
     print(f"📋 盘前预案生成 @ {now}")
 
     idx, turnover = fetch_index_quotes()
+    index_ready = bool(idx)
     if not idx:
-        print("  ❌ 指数行情取失败 → 中止（宁缺毋假）"); sys.exit(1)
-    print(f"  ✓ 指数 {len(idx)} 条 · 两市成交额 {turnover:.0f} 亿")
+        print("  ⚠️ 指数行情缺失 → 降级（其余条目照常生成，指数/成交额显「数据未就绪」）")
+        idx, turnover = [], None
+    else:
+        print(f"  ✓ 指数 {len(idx)} 条 · 两市成交额 {turnover:.0f} 亿")
 
     avg = _read_data("AVG_PRICE_DATA")
     thermo = _read_data("MARKET_THERMO")
@@ -181,7 +184,10 @@ def build():
             cond.append(f"距 MA20 仍 {_f(ap['pos_ma20'],1,'%')}，中期趋势未扭转")
     if th.get("val10_d") is not None:
         cond.append(f"温控：10年估值分位 <b>{_f(th['val10_d'],1,'%')}</b>（{_f(th['date'],0)}）⇒ 高位区需量能维持")
-    cond.append(f"两市成交额 <b>{_f(turnover,0,' 亿')}</b>（缩量反弹需放量确认）")
+    if turnover is None:
+        cond.append("两市成交额：数据未就绪（指数行情源暂不可达，已降级）")
+    else:
+        cond.append(f"两市成交额 <b>{_f(turnover,0,' 亿')}</b>（缩量反弹需放量确认）")
     matrix.append({"cat": "有条件·待确认", "color": "#38bdf8", "items": cond or ["数据未就绪"]})
     # ④ 风险·回避
     rk = []
@@ -202,7 +208,8 @@ def build():
         "data_date": data_date,
         "pipeline": "v8/gen_morning_plan.py",
         "indices": idx,
-        "turnover_yi": turnover,
+        "turnover_yi": (turnover if turnover is not None else 0),
+        "index_ready": index_ready,
         "avg_price": ap or None,
         "thermo": th or None,
         "strong_sectors": strong,
