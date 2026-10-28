@@ -1,11 +1,11 @@
 {
- "update_time": "2026-10-29 02:54:01",
+ "update_time": "2026-10-29 04:44:36",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
   "shrinkage_k": 10,
   "score_formula": "winrate_score = Σ_h [avg_shrunk_h×w_a + (win_shrunk_h−50)×w_w]，h∈{5:(5.0,0.3), 10:(3.0,0.2)}；均益主导、胜率仅微修正",
-  "n_signals": 1947,
+  "n_signals": 1950,
   "n_stocks": 337,
   "signal_date_range": [
    "2026-06-06",
@@ -146,7 +146,7 @@
   {
    "code": "600869",
    "name": "远东股份",
-   "n_signals": 10,
+   "n_signals": 11,
    "kinds": [
     "final",
     "top10"
@@ -1190,13 +1190,14 @@
   {
    "code": "301511",
    "name": "德福科技",
-   "n_signals": 6,
+   "n_signals": 7,
    "kinds": [
+    "final",
     "top10"
    ],
    "first_seen": "2026-08-28",
    "last_seen": "2026-10-28",
-   "is_final": false,
+   "is_final": true,
    "horizons": {
     "1": {
      "n": 5,
@@ -1629,13 +1630,14 @@
   {
    "code": "301183",
    "name": "东田微",
-   "n_signals": 5,
+   "n_signals": 6,
    "kinds": [
+    "final",
     "top10"
    ],
    "first_seen": "2026-09-08",
    "last_seen": "2026-10-28",
-   "is_final": false,
+   "is_final": true,
    "horizons": {
     "1": {
      "n": 4,

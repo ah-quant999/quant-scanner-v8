@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-29 03:29:24",
+  "update_time": "2026-10-29 04:46:41",
   "selection_mode": "high_conviction_resonance",
   "hc_cap": null,
   "hc_count": 61,
@@ -14,28 +14,28 @@
     "confidence": "低",
     "market_trend": "unknown",
     "recommended_sectors": [
-      "银行",
-      "煤炭",
-      "公用事业",
-      "医疗服务",
-      "保险",
-      "通信设备",
-      "化学制药",
       "贵金属",
-      "油气",
-      "通信运营",
+      "医疗服务",
+      "煤炭",
+      "保险",
       "半导体",
+      "通信设备",
+      "银行",
+      "中药",
+      "通信运营",
+      "油气",
       "计算机设备",
-      "中药"
+      "公用事业",
+      "化学制药"
     ],
     "avoid_sectors": [
-      "通信设备",
-      "白酒",
       "食品饮料",
-      "计算机",
+      "通信设备",
       "半导体",
+      "电子元件",
+      "白酒",
       "家用电器",
-      "电子元件"
+      "计算机"
     ],
     "strategy_weights": {
       "triple_consensus": 1.0,
@@ -195,7 +195,7 @@
       "quality_detail": "ROE偏低(8.7%) | 营收高增(34.0%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前77%+3"
+      "p5_detail": "换手率趋势池内前76%+3"
     },
     {
       "rank": 3,
@@ -808,7 +808,7 @@
       "quality_detail": "ROE偏低(7.5%) | 营收高增(21.2%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "低波动52%-3",
-      "p5_detail": "换手率趋势池内前87%+6"
+      "p5_detail": "换手率趋势池内前86%+6"
     },
     {
       "rank": 12,
@@ -1353,7 +1353,7 @@
       "quality_detail": "ROE差(1.5%) | 营收增长(14.6%)",
       "research_detail": "",
       "p4_detail": "低波动50%-3",
-      "p5_detail": "换手率趋势池内前68%+3"
+      "p5_detail": "换手率趋势池内前67%+3"
     },
     {
       "rank": 20,
@@ -1415,7 +1415,7 @@
       "quality_detail": "ROE差(0.9%) | 营收持平(9.5%)",
       "research_detail": "",
       "p4_detail": "低波动44%-6",
-      "p5_detail": "换手率趋势池内前73%+3"
+      "p5_detail": "换手率趋势池内前74%+3"
     },
     {
       "rank": 21,
@@ -1991,7 +1991,7 @@
       "quality_detail": "ROE差(1.2%) | 营收增长(14.6%)",
       "research_detail": "",
       "p4_detail": "低波动45%-3",
-      "p5_detail": "换手率趋势池内前66%+3"
+      "p5_detail": "换手率趋势池内前65%+3"
     },
     {
       "rank": 30,
@@ -2438,7 +2438,7 @@
       "quality_detail": "ROE良好(15.9%) | 营收高增(40.7%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前72%+3"
+      "p5_detail": "换手率趋势池内前73%+3"
     },
     {
       "rank": 37,
@@ -2603,7 +2603,7 @@
       "risk_reward": 5.01,
       "stop_precise": false,
       "score_base": 3,
-      "score_enhance": 3,
+      "score_enhance": 6,
       "score_form": 0.0,
       "score_fund": 0,
       "score_sector": 0,
@@ -2613,7 +2613,7 @@
       "score_breakout": 0,
       "score_research": 0,
       "score_p4": 0,
-      "score_p5": 3,
+      "score_p5": 6,
       "score_winrate": -55.0,
       "score_winrate_fusion": -14.2,
       "winrate_demote": true,
@@ -2636,7 +2636,7 @@
       "quality_detail": "ROE偏低(8.8%) | 营收高增(34.3%) | 消息:三季报预增",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前79%+3"
+      "p5_detail": "换手率趋势池内前80%+6"
     },
     {
       "rank": 40,
@@ -3119,7 +3119,7 @@
       "quality_detail": "ROE良好(18.3%) | 营收高增(30.5%) | 消息:中报扭亏",
       "research_detail": "",
       "p4_detail": "低波动46%-3",
-      "p5_detail": "换手率趋势池内前84%+6"
+      "p5_detail": "换手率趋势池内前85%+6"
     },
     {
       "rank": 47,
@@ -3422,7 +3422,7 @@
       "risk_reward": 3.42,
       "stop_precise": false,
       "score_base": 3,
-      "score_enhance": -6,
+      "score_enhance": -3,
       "score_form": 0.0,
       "score_fund": 0,
       "score_sector": 0,
@@ -3432,7 +3432,7 @@
       "score_breakout": 0,
       "score_research": 0,
       "score_p4": -6,
-      "score_p5": 0,
+      "score_p5": 3,
       "score_winrate": -15.3,
       "score_winrate_fusion": -6.2,
       "winrate_demote": true,
@@ -3455,7 +3455,7 @@
       "quality_detail": "ROE差(3.9%) | 营收高增(23.6%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "低波动30%-6",
-      "p5_detail": ""
+      "p5_detail": "换手率趋势池内前66%+3"
     },
     {
       "rank": 52,
@@ -3524,7 +3524,7 @@
       "quality_detail": "ROE偏低(7.4%) | 营收高增(23.0%)",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前63%+3"
+      "p5_detail": "换手率趋势池内前62%+3"
     },
     {
       "rank": 53,
@@ -3593,7 +3593,7 @@
       "quality_detail": "ROE一般(10.6%) | 营收高增(32.5%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "低波动50%-3",
-      "p5_detail": "换手率趋势池内前72%+3"
+      "p5_detail": "换手率趋势池内前78%+3"
     },
     {
       "rank": 54,
@@ -3620,7 +3620,7 @@
       "risk_reward": 3.95,
       "stop_precise": false,
       "score_base": 3,
-      "score_enhance": -3,
+      "score_enhance": 0,
       "score_form": 0.0,
       "score_fund": 0,
       "score_sector": 0,
@@ -3630,7 +3630,7 @@
       "score_breakout": 0,
       "score_research": 0,
       "score_p4": -3,
-      "score_p5": 0,
+      "score_p5": 3,
       "score_winrate": -11.4,
       "score_winrate_fusion": -4.4,
       "winrate_demote": false,
@@ -3653,7 +3653,7 @@
       "quality_detail": "ROE差(2.0%) | 营收增长(10.2%)",
       "research_detail": "",
       "p4_detail": "低波动55%-3",
-      "p5_detail": ""
+      "p5_detail": "换手率趋势池内前61%+3"
     },
     {
       "rank": 55,
@@ -3722,7 +3722,7 @@
       "quality_detail": "ROE偏低(8.8%) | 营收高增(21.5%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前78%+3"
+      "p5_detail": "换手率趋势池内前79%+3"
     },
     {
       "rank": 56,
@@ -4067,7 +4067,7 @@
       "quality_detail": "ROE偏低(6.3%) | 营收高增(48.1%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "低波动54%-3",
-      "p5_detail": "换手率趋势池内前69%+3"
+      "p5_detail": "换手率趋势池内前70%+3"
     },
     {
       "rank": 61,

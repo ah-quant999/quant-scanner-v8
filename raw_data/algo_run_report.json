@@ -1,8 +1,17 @@
 {
-  "update_time": "2026-10-29 03:30:59",
-  "run_start": "2026-10-29 03:27:19",
-  "ok": 1,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-10-29 04:58:15",
+  "run_start": "2026-10-29 03:47:48",
+  "ok": 17,
+  "fail": 2,
+  "failed_scripts": [
+    {
+      "script": "refresh_kline_freshness.py",
+      "reason": "超时 >40min"
+    },
+    {
+      "script": "gen_ff3_ranksum.py",
+      "reason": "退出码 1 | 有效因子截面不足 15 只（5），退出"
+    }
+  ],
   "skipped_by_time_gate": []
 }
