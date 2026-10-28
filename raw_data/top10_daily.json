@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-29 05:12:47",
+  "update_time": "2026-10-29 07:16:17",
   "selection_mode": "high_conviction_resonance",
   "hc_cap": null,
   "hc_count": 61,
@@ -14,28 +14,28 @@
     "confidence": "低",
     "market_trend": "unknown",
     "recommended_sectors": [
-      "计算机设备",
+      "煤炭",
+      "银行",
       "化学制药",
       "通信设备",
-      "银行",
-      "公用事业",
-      "保险",
       "通信运营",
-      "医疗服务",
+      "公用事业",
       "贵金属",
-      "煤炭",
+      "保险",
       "油气",
       "中药",
-      "半导体"
+      "医疗服务",
+      "半导体",
+      "计算机设备"
     ],
     "avoid_sectors": [
+      "电子元件",
       "通信设备",
       "白酒",
-      "电子元件",
       "计算机",
+      "食品饮料",
       "家用电器",
-      "半导体",
-      "食品饮料"
+      "半导体"
     ],
     "strategy_weights": {
       "triple_consensus": 1.0,
