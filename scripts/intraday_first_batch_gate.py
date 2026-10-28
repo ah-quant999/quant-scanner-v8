@@ -89,7 +89,12 @@ def now_cst():
         from zoneinfo import ZoneInfo
         return dt.datetime.now(ZoneInfo("Asia/Shanghai"))
     except Exception:
-        return dt.datetime.now() + dt.timedelta(hours=8)
+        # 🔴 2026-10-28 血训修正：本机 TZ=中国标准时间(UTC+8) 且时钟准确，
+        #   Windows Python 缺 tzdata 时 ZoneInfo 抛异常走此分支；
+        #   旧回退 now()+8h 在 CST 机器上 = 双重偏移 ⇒ 时钟快 8 小时
+        #   （实测 2026-10-28 11:34 打出 19:34）⇒ _is_trading_now 盘中动态判定线
+        #   自创建起从未生效。本机 naive now() 即真实北京墙钟，直接返回。
+        return dt.datetime.now()
 
 
 def fetch_update_time(var):
@@ -155,7 +160,14 @@ def dispatch():
     for wf in DISPATCH_WFS:
         # workflow_id 只认裸文件名；带 .github/workflows/ 前缀必 404（2026-10-23 实测血证）
         url = "%s/actions/workflows/%s/dispatches" % (API, wf.rsplit("/", 1)[-1])
-        body = json.dumps({"ref": "main"}).encode()
+        # 🔴 2026-10-28 血训修正：hosted 必须带 category=intraday。
+        #   无入参派发 ⇒ 并发组落 v8-cn-fetch-cloud-scheduled（与主链 cron 档互斥组），
+        #   该组被卡死 run 占用时派发只能排队；盘中救援语义本就是 intraday，
+        #   带 category 后落 v8-cn-fetch-cloud-intraday 独立组，与主链盘中档同组互斥、语义一致。
+        if wf.endswith("v8_cn_fetch_cloud_hosted.yml"):
+            body = json.dumps({"ref": "main", "inputs": {"category": "intraday"}}).encode()
+        else:
+            body = json.dumps({"ref": "main"}).encode()
         req = urllib.request.Request(url, data=body, method="POST",
                                      headers={"Authorization": "token %s" % tok,
                                               "Accept": "application/vnd.github+json",
