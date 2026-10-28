@@ -16222,7 +16222,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       // 2026-09-15：__renderAiInsightsCompare 已随卡迁往「🌍 观测平台 > 🌍 宏观观测」，
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderMorningPlan', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '_fillDajijin', '__renderMarketState', '__renderInvestAvoid'];
+      var names = ['__renderMorningPlan', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '_fillDajijin', '__renderMarketState', '__renderInvestAvoid', '__renderComprehensiveSynthesis'];
 /* 🧭 2026-10-27 主人令：+L1/L2 市场状态机+仓位引擎；+投资避雷针·新闻语料量化轻量（暂未上架观测类顶部评审） */   /* 🚨 2026-10-23 审计修复：_fillDajijin 此前仅被 _fillUsHkMap 的「US_HK_MAP 首调缺失」异常重试分支调用，正常路径（US_HK_MAP 已就绪）下大基金卡永不渲染（永久「加载中…」/display:none）；现纳入派发器单一真源，每次渲染即触发，自带 600ms×30 自愈。📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
       var probe = document.getElementById('themeValueBody');
       if(probe) probe.setAttribute('data-ulpane', tab);
@@ -16353,6 +16353,11 @@ h += '<div class="card" id="comprehensiveCard" style="margin-bottom:16px;border-
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">'
    + '<span style="font-size:15px;font-weight:700;color:#a78bfa;">&#x1F9ED; 综合研判</span>'
    + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 盘前/状态/避雷/资金 合并视图（已通过）</span></div>';
+// ── 2026-10-28 主人令：综合解析（不是把卡移到一起，是综合各卡数据给解析结论）──
+h += '<div id="comprehensiveSynthesis" style="margin-bottom:14px;border-left:4px solid #a78bfa;background:rgba(167,139,250,.06);border-radius:0 9px 9px 0;padding:10px 12px;">'
+   + '<div style="font-size:13.5px;font-weight:700;color:#a78bfa;margin-bottom:6px;">&#x1F9E0; 综合解析 &#183; 多源信号汇总</div>'
+   + '<div id="comprehensiveSynthesisBody"><div class="note">综合各卡数据解析中&#x2026;</div></div>'
+   + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 全部结论由规则从下方各卡真实数据自动汇总，<b style="color:#fbbf24">非人工观点、不构成投资建议</b>。</div></div>';
 // ── 今日判定·环境综合（2026-10-28 主人令：自「今日事件」迁入合并；渲染走永久自愈轮询）──
 h += '<div id="judgmentCardHeader"></div>';
 h += '<div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 0 6px;"></div>';
@@ -16647,6 +16652,9 @@ window.__renderMarketState = function(){
   html += '<div style="font-size:11px;color:var(--dim);line-height:1.6;">&#x26A0;&#xFE0F; S1 为「主要指数涨跌比」广度代理（非全市场逐股广度，站内暂无该源）；情绪分=四子指标加权(0.25/0.20/0.30/0.25)；仓位建议为规则推导的区间中枢，<b style="color:#fbbf24;">非投资建议</b>。数据：'+[MA&&MA.update_time,IQ&&IQ.update_time,MFF&&MFF.update_time].filter(Boolean).join(' / ')+'</div>';
   host.innerHTML = html;
   var f=document.getElementById('marketStateFresh'); if(f) f.innerHTML = _uBadge('盘后','',(MA&&MA.update_time)||(IQ&&IQ.update_time));
+  // 2026-10-28: expose window.__marketStateResult for the synthesis block (rule-based, zero new backend)
+  window.__marketStateResult = {score:score, verdict:verdict, pos:pos, posLabel:posLabel, s1raw:s1raw, s2raw:s2raw, s3raw:s3raw, s4raw:s4raw, adjReason:adjReason.slice(0)};
+  setTimeout(function(){ try{ if(window.__renderComprehensiveSynthesis) window.__renderComprehensiveSynthesis(); }catch(e){} }, 0);
 };
 
 // ═══ 🚫 2026-10-27 主人令：投资避雷针 · 新闻语料量化（轻量）（暂未上架·观测类顶部，评审中）═══
@@ -16706,6 +16714,88 @@ window.__renderInvestAvoid = function(){
   html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.6;">&#x26A0;&#xFE0F; 新闻语料量化层为轻量版（消费 MACRO_BRIEF 标签化要闻 + MARKET_ALERTS 综述），非逐条新闻 NLP；个股避雷来自法定披露（大基金减持）+ 停牌/*ST 预警，<b style="color:#fbbf24;">非投资建议</b>。</div>';
   host.innerHTML = html;
   var f=document.getElementById('investAvoidFresh'); if(f) f.innerHTML = _uBadge('盘后','',(IA&&IA.update_time)||(DJ&&DJ.update_time)||(SA&&SA.update_time));
+};
+
+// 2026-10-28 主人令：综合解析·多源信号汇总（暂未上架·综合研判卡顶部）
+// 只读下方各卡已消费的同一批 window 数据源，规则化汇总为「多空矩阵+一句话结论+今日要点」；
+// 零新后端/零新数据源/零新定时任务。数据源：JUDGMENT_DATA.consensus / __marketStateResult /
+// INVEST_AVOID(或 RISK_GAUGE/MACRO_BRIEF/DAJIJIN/SUSPENSION 散源) / MORNING_PLAN / SECTOR_YEAR_FLOW。
+window.__renderComprehensiveSynthesis = function(){
+  var host = document.getElementById('comprehensiveSynthesisBody');
+  if(!host) return;
+  var MS = window.__marketStateResult || null;
+  var JD = window.JUDGMENT_DATA || null;
+  var IA = window.INVEST_AVOID || null;
+  var MP = window.MORNING_PLAN || null;
+  var SYF = window.SECTOR_YEAR_FLOW || null;
+  var RG_ov = IA ? IA.risk_overall : ((window.RISK_GAUGE||{}).overall||null);
+  var crisis = (IA && IA.crisis_score!=null) ? IA.crisis_score : ((window.MACRO_BRIEF||{}).crisis_score);
+  var avoidSec = (IA && IA.avoid_sectors) || [];
+  var djjN = ((IA&&IA.dajijin&&IA.dajijin.records) || (window.DAJIJIN_REDUCTION&&window.DAJIJIN_REDUCTION.records) || []).length;
+  var suspN = ((IA&&IA.suspension&&IA.suspension.stocks) || (window.SUSPENSION_ALERT&&window.SUSPENSION_ALERT.stocks) || []).length;
+  if((!MS || RG_ov==null) && (!host.dataset._csTries || +host.dataset._csTries < 50)){
+    host.dataset._csTries = (host.dataset._csTries ? (+host.dataset._csTries+1) : 1);
+    setTimeout(function(){ try{ window.__renderComprehensiveSynthesis(); }catch(e){} }, 600);
+    return;
+  }
+  host.dataset._csTries = '';
+  function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+  var UP='#f87171', DN='#4ade80', NT='#fbbf24';
+  var votes = [];
+  if(JD && JD.consensus && !JD.no_data){
+    var _c = String(JD.consensus);
+    votes.push({n:'盘前共识', s: _c.indexOf('偏多')>=0?'up': _c.indexOf('偏空')>=0?'dn':'nt', d: esc(_c)});
+  }
+  if(MS){
+    votes.push({n:'情绪状态机', s: MS.score>=60?'up': MS.score<45?'dn':'nt', d: '情绪分 '+MS.score+'（'+esc(MS.verdict)+'）'});
+    votes.push({n:'仓位引擎', s: MS.pos>=65?'up': MS.pos<40?'dn':'nt', d: '中枢 '+MS.pos+'% · '+esc(MS.posLabel)});
+  }
+  votes.push({n:'环境风险', s: RG_ov==='green'?'up': RG_ov==='red'?'dn':'nt', d: (RG_ov==='red'?'红灯':RG_ov==='yellow'?'黄灯':'绿灯')+(crisis!=null?(' · 危机分'+crisis):'')});
+  var avoidN = djjN + suspN;
+  votes.push({n:'个股避雷', s: avoidN===0?'up': avoidN>=10?'dn':'nt', d: avoidN+' 只预警（减持'+djjN+'+停牌'+suspN+'）'});
+  var strongTop=[], yrIn=null, yrOut=null;
+  if(MP && MP.strong_sectors && MP.strong_sectors.length) strongTop = MP.strong_sectors.slice(0,4);
+  if(SYF && SYF.sectors && SYF.sectors.length){
+    var _inf=[],_out=[];
+    SYF.sectors.forEach(function(s){ if(s&&s.name&&s.cur!=null){ (s.cur>=0?_inf:_out).push(s); } });
+    _inf.sort(function(a,b){return b.cur-a.cur;}); _out.sort(function(a,b){return a.cur-b.cur;});
+    yrIn = _inf.slice(0,3); yrOut = _out.slice(0,2);
+  }
+  if(yrIn && yrIn.length){
+    var _yS = (yrOut && yrOut.length && yrOut[0].cur<=-200) ? 'dn' : ((yrIn[0].cur>=200) ? 'up' : 'nt');
+    votes.push({n:'板块资金(年度)', s:_yS, d:'净流入首位 '+esc(yrIn[0].name)+' '+(yrIn[0].cur>0?'+':'')+Number(yrIn[0].cur).toFixed(0)+'亿'});
+  }
+  var nUp=0,nDn=0,nNt=0;
+  votes.forEach(function(v){ if(v.s==='up')nUp++; else if(v.s==='dn')nDn++; else nNt++; });
+  var concl, cc;
+  if(nUp>=4 && nDn<=1){ concl='多信号共振，环境友好，可按仓位中枢积极运作'; cc=UP; }
+  else if(nUp>=3 && nDn<=1){ concl='偏多格局占优，顺势而为，注意节奏'; cc=UP; }
+  else if(nDn>=4){ concl='空信号占优，防守为主，降仓规避'; cc=DN; }
+  else if(nDn>=3){ concl='偏空压力明显，防御轻仓，等待信号修复'; cc=DN; }
+  else if(nUp>=2 && nDn>=2){ concl='多空分歧，结构性机会为主，控制仓位精选方向'; cc=NT; }
+  else { concl='中性震荡，观察为主，等待方向选择'; cc=NT; }
+  if(RG_ov==='red'){ concl += '；⚠ 环境红灯，仓位上限再压一档'; cc=DN; }
+  var html='';
+  html += '<div style="background:'+cc+'14;border:1px solid '+cc+'40;border-radius:8px;padding:9px 12px;margin-bottom:10px;font-size:13.5px;font-weight:700;color:'+cc+';">结论：'+esc(concl)+'</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:8px;">';
+  votes.forEach(function(v){
+    var col = v.s==='up'?UP: v.s==='dn'?DN:NT;
+    var dot = v.s==='up'?'&#x1F534;': v.s==='dn'?'&#x1F7E2;':'&#x1F7E1;';
+    html += '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:7px 9px;">'
+           + '<div style="font-size:11.5px;color:'+col+';font-weight:700;">'+dot+' '+esc(v.n)+'</div>'
+           + '<div style="font-size:11.5px;color:var(--txt);margin-top:2px;">'+v.d+'</div></div>';
+  });
+  html += '</div>';
+  html += '<div style="font-size:12px;color:var(--sub);margin-bottom:8px;">信号计数：看多 '+nUp+' · 看空 '+nDn+' · 中性 '+nNt+'（每源独立判多/空/中性，非加权平均）</div>';
+  var pts=[];
+  if(strongTop.length) pts.push('强势板块：'+strongTop.map(esc).join(' · '));
+  if(MP && MP.turnover_yi!=null) pts.push('两市成交 '+(MP.turnover_yi>=10000 ? (MP.turnover_yi/10000).toFixed(2)+' 万亿' : MP.turnover_yi+' 亿'));
+  if(avoidSec.length) pts.push('规避板块：'+avoidSec.slice(0,4).map(esc).join(' · '));
+  if(yrIn && yrIn.length) pts.push('年线资金净流入：'+yrIn.map(function(s){return esc(s.name)+(s.cur>0?'+':'')+Number(s.cur).toFixed(0)+'亿';}).join('、'));
+  if(yrOut && yrOut.length) pts.push('年线资金净流出：'+yrOut.map(function(s){return esc(s.name)+Number(s.cur).toFixed(0)+'亿';}).join('、'));
+  if(MS && MS.adjReason && MS.adjReason.length) pts.push('仓位调整：'+MS.adjReason.map(esc).join('；'));
+  if(pts.length) html += '<div style="font-size:12px;line-height:1.8;color:var(--txt);">'+pts.map(function(x){return '&#183; '+x;}).join('<br>')+'</div>';
+  host.innerHTML = html;
 };
 
   function renderMahoroCard(){
@@ -18447,7 +18537,6 @@ h+=`</div>`;
     // ── 卡0.5：周期位置 + 广度观测（2026-10-27 主人令 C 方案：由盘后数据页「熊市见底信号」拆出「周期位置+广度观测」层迁入大盘观测，接 EDHEC 牛熊状态机；牛市显示「牛市上行·无需抄底」，熊市才显「见底信号」）──
     hm += '<div class="card" id="cycleBreadthBody" style="margin-bottom:16px;border-left:4px solid #fb923c;">'
        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-       + '<span style="font-size:10.5px;color:var(--dim);font-weight:600;padding:1px 7px;border-radius:6px;background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);white-space:nowrap;">(日频) · 盘中不刷新</span>'
        + '<span style="font-size:15px;font-weight:700;color:#fb923c;">🧭 周期位置 · 广度观测</span>'
        + '<span class="fresh" id="cycleBreadthFresh">&#x2014;</span>'
        + '<span style="font-size:11.5px;color:var(--dim);">EDHEC 牛熊状态机（月频·中线）+ 广度/股价/资金三观测点</span></div>'
