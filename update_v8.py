@@ -1516,6 +1516,7 @@ def build(category=None, detect_changes=False):
 
     updated = 0
     skipped = 0
+    failed = 0
     for src_path in sorted(target_files):
         var_name = DATA_SOURCES.get(src_path.name)
         if not var_name:
@@ -1534,33 +1535,45 @@ def build(category=None, detect_changes=False):
             print(f"  ⏭️  {src_path.name} → data/{var_name}.js | 纯盘后产物，非 post_close 构建跳过（防回滚）")
             skipped += 1
             continue
-        obj = _load_json(src_path)
-        if obj is None:
-            skipped += 1
+        try:
+            obj = _load_json(src_path)
+            if obj is None:
+                skipped += 1
+                continue
+            # 🆕 2026-09-05 cn 离线兜底：空/占位产物跳过重建，保留线上旧版 data/X.js（不写空污染前端）
+            is_empty, empty_reason = _is_raw_empty_or_stale(src_path)
+            if is_empty:
+                print(f"  ⏭️  {src_path.name} 判空/占位（{empty_reason}），跳过重建 data/{var_name}.js（保留线上旧版）")
+                skipped += 1
+                continue
+            # 🛡 2026-09-09 主人令根治「旧 raw 洗新 data」P0 回滚事故：data 比 raw 新则跳过覆盖
+            #   判据：data/<var>.js 的 update_time > raw 的「真实时间」(max(顶层 ut, _meta.last_update, mtime))
+            #   仅跳过本次重写，不影响计数（skipped += 1），前端拿到的是 data 已有的更新版本。
+            is_skipped, skip_reason = _should_skip_data_staleness_guard(var_name, obj)
+            if is_skipped:
+                print(f"  ⏭️  {src_path.name} → data/{var_name}.js | {skip_reason}（云端 build 护栏）")
+                skipped += 1
+                continue
+            out_path = _write_js(var_name, obj)
+            updated += 1
+            print(f"  ✅ {src_path.name} → {out_path.name}")
+            # 🆕 2026-10-21 主人 P1：ETF 净申赎 raw 同步派生东财五分类 js（单源双视图）
+            if var_name == "ETF_NET_SUBSCRIPTION":
+                _derive_etf_eastmoney(obj)
+        except Exception as _e:
+            # 🛡 2026-10-28 九宝量化（一劳永逸根治「单文件异常→整档位构建中断→US_HK_MAP 等后续文件被连坐 blank」）：
+            #   单文件重建异常只隔离本文件、打印完整 traceback（下次运行即定位真凶），绝不再中断整批。
+            import traceback as _tb
+            print(f"  🔴 {src_path.name} → data/{var_name}.js | 重建异常(已隔离，不影响其余文件)：{_e}")
+            _tb.print_exc()
+            failed += 1
             continue
-        # 🆕 2026-09-05 cn 离线兜底：空/占位产物跳过重建，保留线上旧版 data/X.js（不写空污染前端）
-        is_empty, empty_reason = _is_raw_empty_or_stale(src_path)
-        if is_empty:
-            print(f"  ⏭️  {src_path.name} 判空/占位（{empty_reason}），跳过重建 data/{var_name}.js（保留线上旧版）")
-            skipped += 1
-            continue
-        # 🛡 2026-09-09 主人令根治「旧 raw 洗新 data」P0 回滚事故：data 比 raw 新则跳过覆盖
-        #   判据：data/<var>.js 的 update_time > raw 的「真实时间」(max(顶层 ut, _meta.last_update, mtime))
-        #   仅跳过本次重写，不影响计数（skipped += 1），前端拿到的是 data 已有的更新版本。
-        is_skipped, skip_reason = _should_skip_data_staleness_guard(var_name, obj)
-        if is_skipped:
-            print(f"  ⏭️  {src_path.name} → data/{var_name}.js | {skip_reason}（云端 build 护栏）")
-            skipped += 1
-            continue
-        out_path = _write_js(var_name, obj)
-        updated += 1
-        print(f"  ✅ {src_path.name} → {out_path.name}")
-        # 🆕 2026-10-21 主人 P1：ETF 净申赎 raw 同步派生东财五分类 js（单源双视图）
-        if var_name == "ETF_NET_SUBSCRIPTION":
-            _derive_etf_eastmoney(obj)
 
-    print(f"\n完成：更新 {updated} 个，跳过 {skipped} 个。输出目录：{DATA_DIR}")
-    return 0
+    print(f"\n完成：更新 {updated} 个，跳过 {skipped} 个，失败(已隔离) {failed} 个。输出目录：{DATA_DIR}")
+    # 🛡 2026-10-28 九宝量化（一劳永逸根治「单文件崩→整档位 blank」）：
+    #   只要有文件成功重建即视为批次成功（避免一颗雷炸掉 US_HK_MAP 等后续文件）；
+    #   失败文件仍会被 HEALTH_CHECK 按 staleness 单独标红，且本次 traceback 已打印，下次运行即定位真凶。
+    return 1 if failed > 0 else 0
 
 
 def _derive_etf_eastmoney(obj):
