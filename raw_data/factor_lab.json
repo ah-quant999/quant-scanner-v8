@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-10-28 06:56:12",
-  "data_date": "2026-10-27",
+  "update_time": "2026-10-29 00:47:09",
+  "data_date": "2026-10-28",
   "meta": {
-    "data_date": "2026-10-27",
+    "data_date": "2026-10-28",
     "close_semantics": "⚠️ 记录里的 close 是「上次算到这只票那天」的快照（roe 按季 asof_q / abn 按月 asof_ym 缓存），**不是当日报价**；需要当日价请查 STOCK_QUOTE.js 或 CANDIDATE_QUOTES.js。同时看 close_date 字段。",
     "liquid_def": "liquid=false 表示最新K线日 != 数据日 或 当月换手率为 0（停牌/零成交），已从榜单剔除",
     "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
-    "n_universe": 1052,
-    "n_at_valid": 1435,
+    "n_universe": 1016,
+    "n_at_valid": 1472,
     "n_roe_large": 657,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
     "roe_def": "全市场主板·大市值档(成交额代理top1/3)按 ROE_TTM 降序 Top30（TTM=近4个单季 roeAvg 差分求和，单位%）",
@@ -390,6 +390,18 @@
         "asof_ym": "2026-10"
       },
       {
+        "code": "sz.003029",
+        "name": "吉大正元",
+        "close": 18.23,
+        "close_date": "2026-10-28",
+        "liquid": true,
+        "abn": 3.128,
+        "factor_at": -3.1277,
+        "roe_ttm": null,
+        "size_proxy": 5140089936.4,
+        "asof_ym": "2026-10"
+      },
+      {
         "code": "sh.601949",
         "name": "中国出版",
         "close": 6.26,
@@ -436,6 +448,18 @@
         "asof_ym": "2026-09"
       },
       {
+        "code": "sh.688196",
+        "name": "卓越新能",
+        "close": 34.5,
+        "close_date": "2026-10-28",
+        "liquid": true,
+        "abn": 2.206,
+        "factor_at": -2.2062,
+        "roe_ttm": null,
+        "size_proxy": 1967123832.4,
+        "asof_ym": "2026-10"
+      },
+      {
         "code": "sz.002959",
         "name": "小熊电器",
         "close": 36.69,
@@ -470,30 +494,6 @@
         "roe_ttm": null,
         "size_proxy": 2818417695.8,
         "asof_ym": "2026-10"
-      },
-      {
-        "code": "sh.603337",
-        "name": "杰克科技",
-        "close": 44.39,
-        "close_date": "2026-10-27",
-        "liquid": true,
-        "abn": 1.821,
-        "factor_at": -1.8207,
-        "roe_ttm": null,
-        "size_proxy": 3614209770.5,
-        "asof_ym": "2026-10"
-      },
-      {
-        "code": "sz.300112",
-        "name": "万讯自控",
-        "close": 9.11,
-        "close_date": "2026-09-11",
-        "liquid": true,
-        "abn": 1.821,
-        "factor_at": -1.8205,
-        "roe_ttm": null,
-        "size_proxy": 1622918765.7,
-        "asof_ym": "2026-09"
       }
     ]
   },

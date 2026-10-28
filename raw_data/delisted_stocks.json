@@ -61,5 +61,26 @@
 "delisted_date": "2026-10-27",
 "last_board": "",
 "last_industry": ""
+},
+{
+"code": "301139",
+"name": "元道退",
+"delisted_date": "2026-10-29",
+"last_board": "创业板",
+"last_industry": "软件和信息技术服务业"
+},
+{
+"code": "01842",
+"name": "植华集团",
+"delisted_date": "2026-10-29",
+"last_board": "",
+"last_industry": ""
+},
+{
+"code": "02939",
+"name": "怡俊集团（二千）",
+"delisted_date": "2026-10-29",
+"last_board": "",
+"last_industry": ""
 }
 ]

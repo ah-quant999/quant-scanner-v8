@@ -1,12 +1,16 @@
 {
-  "update_time": "2026-10-28 20:32:20",
-  "run_start": "2026-10-28 20:02:13",
-  "ok": 13,
-  "fail": 1,
+  "update_time": "2026-10-29 01:14:58",
+  "run_start": "2026-10-29 00:04:16",
+  "ok": 17,
+  "fail": 2,
   "failed_scripts": [
     {
-      "script": "fetch_orphan_sector_fund_flow.py",
-      "reason": "监督器静默杀(>15min 无输出)"
+      "script": "refresh_kline_freshness.py",
+      "reason": "超时 >40min"
+    },
+    {
+      "script": "gen_ff3_ranksum.py",
+      "reason": "退出码 1 | 有效因子截面不足 15 只（5），退出"
     }
   ],
   "skipped_by_time_gate": []
