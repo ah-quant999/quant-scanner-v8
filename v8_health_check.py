@@ -2350,6 +2350,20 @@ def check_all_data_files():
         #   _LOW_FREQ_FILES（line 1124）根本走不到 → BACKTEST_TDX/OPTIMIZED_STRATEGY/
         #   PORTFOLIO_COST/RUNNER_STATUS_HEALTH/WEEKEND_RUN 5 张低频卡 100% 误报 warn。
         #   正确顺序：先看是否低频白名单 → 友好 OK；不在白名单才走时间戳 warn。
+        # ★ 2026-10-29 一劳永逸修复（九宝令「改完全部直接上线」）：退役检查须对【所有】文件生效，
+        #   不能只嵌在 _LOW_FREQ_FILES 块内（原缩进错误 → 仅「同时是低频」的退役文件才被放行，
+        #   BACKTEST_COMPREHENSIVE/TDX 仅退役、不在低频 → 跳过退役分支直落通用红线判 fail，假红灯复发）。
+        #   退役优先于任何低频/通用判定。
+        if vid in _RETIRED_FILES:
+            _last = str(ts)[:19] if ts and ts != "--" else "—"
+            _msg = (f"{p.name} **已随主人令退役**（产物已删；仅防「旧副本被放回」而复亮红灯）；"
+                    f"如再现请核查 api_push_raw.py::_RETIRED_ARTIFACTS 是否被绕过")
+            results.append({
+                "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                "status": "ok", "last_update": _last, "age_min": None,
+                "heal_cat": vid_heal, "message": _msg,
+            })
+            continue
         if vid in _LOW_FREQ_FILES:
             rel = str(ts)[:19] if ts and ts != "--" else "—"
             if vid in _STATIC_ARCHIVE_FILES:
@@ -2368,12 +2382,7 @@ def check_all_data_files():
                                 f"（归档后不再刷新属预期，非故障），仅校验存在性与可装载性"),
                 })
                 continue
-            if vid in _RETIRED_FILES:
-                # 🗑 已退役产物：既已删除就不该再出现；此处若仍命中，说明有副本被放回
-                #   （放行但不冒充正常 —— 文案须说真话，避免「它还在正常使用」的错觉）。
-                _msg = (f"{p.name} **已随主人令退役**（产物已删；仅防「旧副本被放回」而复亮红灯）；"
-                        f"如再现请核查 api_push_raw.py::_RETIRED_ARTIFACTS 是否被绕过")
-            elif vid in _LOW_FREQ_MAX_AGE and dt is not None:
+            if vid in _LOW_FREQ_MAX_AGE and dt is not None:
                 # ⏱ 低频产物按「生产者节拍」判龄：不套用 24h 通用红线，但也**不放弃监控**。
                 _lfa = _LOW_FREQ_MAX_AGE[vid]
                 _age_lf = (now_cst() - dt).total_seconds() / 60
