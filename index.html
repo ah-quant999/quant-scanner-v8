@@ -16026,7 +16026,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     // ═══ 📋 2026-10-21 主人令：「这个新卡啊，我让你放暂未上架顶部」——盘前预案卡（观测类首卡）═══
     //   数据 window.MORNING_PLAN（data/MORNING_PLAN.js ← v8/gen_morning_plan.py，工作日 07:50 派发）。
     //   口径：色条矩阵（可执行/相对占优/有条件·待确认/风险·回避/验证变量·方法论，规则自动生成）
-    //         + 大盘预判/主线策略/回避清单 三栏。全部条目带真实数字；源缺失 ⇒ 显「数据未就绪」，绝不伪造。
+    //         + 大盘预判/主线策略 两栏。全部条目带真实数字；源缺失 ⇒ 显「数据未就绪」，绝不伪造。
     //   无数据 ⇒ 整卡 display:none（不产空壳卡）；600ms×30 自愈轮询（同 _fillSectorYearFlow 范式）。
     window.__renderMorningPlan = function(){
       try{
@@ -16066,7 +16066,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
              + '<div style="font-size:12px;line-height:1.7;color:var(--txt);">'
              + m.items.map(function(it){ return '· ' + it; }).join('<br>') + '</div></div>';
         }
-        /* ── 三栏：大盘预判 / 主线策略 / 回避清单（窄屏自动换行） ── */
+        /* ── 两栏：大盘预判 / 主线策略（窄屏自动换行） ── */
         h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:12px;">';
         h += '<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.2);border-radius:8px;padding:9px 11px;">'
            + '<div style="font-size:12px;font-weight:700;color:#38bdf8;margin-bottom:5px;">&#x1F4CA; 大盘预判</div>';
@@ -16087,17 +16087,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         });
         if(D.ima_count) h += '<div style="font-size:12px;line-height:1.8;color:var(--txt);">ima 短线情绪候选 <b>'+D.ima_count+'</b> 只</div>';
         h += '</div>';
-        h += '<div style="background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:9px 11px;">'
-           + '<div style="font-size:12px;font-weight:700;color:#4ade80;margin-bottom:5px;">&#x1F6AB; 回避清单</div>';
-        if((D.avoid||[]).length){
-          D.avoid.forEach(function(a){
-            h += '<div style="font-size:12px;line-height:1.8;color:var(--txt);">'+_e(a.name)+'（'+_e(a.holder)+'减持，约 <b style="color:#4ade80;">'+a.amount_est+' 亿</b>）</div>';
-          });
-          h += '<div style="font-size:10.5px;color:var(--dim);margin-top:3px;">法定披露口径，非实时行情</div>';
-        } else {
-          h += '<div style="font-size:12px;color:var(--dim);">暂无规则命中风险项</div>';
-        }
-        h += '</div></div>';
+        h += '</div>';
         body.innerHTML = h;
         /* 🔄 2026-10-23 主人令：更新行统一全站 _uBadge 胶囊版式（🦊 更新于 <时间> <档位> · <档位>档数据，盘中不刷新，
            同「昨日盘后短线」参考卡）；原「已更新 + 观测类·派发」静态字样退役，派发信息降为胶囊后缀小字不丢失。 */
@@ -16379,7 +16369,7 @@ h += '<div class="card" id="investAvoidCard" style="margin-bottom:16px;border-le
 
 // ═══ 📋 2026-10-21 主人令：「这个新卡啊，我让你放暂未上架顶部」——盘前预案（观测类首卡·置顶）═══
 //   数据 window.MORNING_PLAN（data/MORNING_PLAN.js ← v8/gen_morning_plan.py，工作日 07:50 派发；
-//   2026-10-21 19:16 首跑真实数据）。色条矩阵 + 大盘预判/主线策略/回避清单 三栏，全规则生成。
+//   2026-10-21 19:16 首跑真实数据）。色条矩阵 + 大盘预判/主线策略 两栏，全规则生成。
 //   无数据 ⇒ 整卡保持 display:none（不产空壳卡）；填充见 window.__renderMorningPlan（600ms×30 自愈）。
 h += '<div class="card" id="morningPlanCard" style="display:none;margin-bottom:16px;border-left:4px solid #38bdf8;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
