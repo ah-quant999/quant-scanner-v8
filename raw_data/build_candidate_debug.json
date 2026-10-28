@@ -1,5 +1,5 @@
 {
-  "DATA": "D:\\actions-runner-v8\\_work\\quant-scanner-v8\\quant-scanner-v8\\algorithms\\..\\out",
+  "DATA": "D:\\actions\\cn-runner\\_work\\quant-scanner-v8\\quant-scanner-v8\\algorithms\\..\\out",
   "V8_OUT_DIR": "",
   "guanlan_watchlist": {
     "exists": false,
@@ -15,7 +15,7 @@
     "全市场流动性溢出": 351,
     "科创板成交前100": 101,
     "港股成交前50": 105,
-    "因子优选": 257,
+    "因子优选": 258,
     "外资研投": 133
   }
 }
