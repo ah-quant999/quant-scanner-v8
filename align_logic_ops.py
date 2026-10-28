@@ -117,6 +117,10 @@ MUST_HAVE_CRON = {
     #   每日归档链（22:00 CST 盘后落库后聚合回写 FINAL_RECOMMEND_HISTORY.js），
     #   入库时漏双登记 ⇒ 本机离线审计 [4/8] 红灯。
     "v8_final_recommend_history": "最终推荐历史归档(每日22:00·夜班自愈)",
+    # 2026-10-28 小九补登记（门禁 [4/8] 拦截补漏）：10-28 新建的阿狸咪心跳 GitHub 派发链
+    #   （cron 23 */2，alimi-cn 专属路由 label=cn-cn，Contents API 直推 hb_alimi.json，
+    #   根治家机本地调度停摆 ⇒ HB_ALIMI 冻结 33h 假红灯）；入库时漏双登记 ⇒ [4/8] 红灯。
+    "v8_alimi_heartbeat": "阿狸咪心跳GitHub派发(每2h·alimi-cn专属)",
 }
 
 # ── 刻意无 cron（仅 workflow_dispatch 应急 / 事件驱动）──────────
