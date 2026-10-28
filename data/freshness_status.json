@@ -1,16 +1,16 @@
 {
-  "check_time": "2026-10-28 16:28:39",
+  "check_time": "2026-10-28 20:40:39",
   "last_trade_close": "2026-10-28 15:30:00",
   "is_trading_day": true,
   "core_stale": [
     {
       "var": "BACKTEST_COMPREHENSIVE",
-      "reason": "更新于 10-27 17:11，落后 2 个交易日（阈值 1）",
+      "reason": "更新于 10-24 21:18，落后 3 个交易日（阈值 1）",
       "category": "algo"
     },
     {
       "var": "BACKTEST_TDX",
-      "reason": "更新于 10-27 17:10，落后 2 个交易日（阈值 1）",
+      "reason": "更新于 10-24 21:18，落后 3 个交易日（阈值 1）",
       "category": "algo"
     }
   ],
