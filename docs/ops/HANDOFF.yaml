@@ -10047,3 +10047,30 @@ items:
       邮件不再对同一类失败重复刷屏（同类失败每日至多 1 封或合并），或已定位根因并给出平台侧修复方案。
     updated: "2026-10-27 11:47"
     updated_by: 家用机AI(兜底)
+  - id: intraday-morning-blackout-fix-1028
+    owner: 小九
+    priority: P0
+    status: pending-verify
+    created: 2026-10-28
+    title: 盘中「9点开盘后数据看不到·10点后才更新」三真凶根治（哨兵层修复+守门脚本两修）
+    note: >
+      2026-10-28 上午小九根治（主人急令）。三真凶全部实证：
+      ① lemoncat 盘中调度器上午 cron（09:31-11:40 档）连续 3 天被 GitHub 静默丢班
+      （下午档正常，运行史为证）⇒ 盘中主调度上午缺位；
+      ② 哨兵僵尸扫描误杀：runs 列表 API 无 runner 字段 ⇒ 防误杀守卫恒 None 失效，
+      抓数单步 10-15min 致 updated_at 冻结超阈 ⇒ 健康救援 run 在「推送 raw_data」
+      一步被中途击杀（09:58:04 击杀 hosted 40616783874 实证：抓数✅推送❌）；
+      ③ gate 守门脚本 ZoneInfo 缺 tzdata 抛异常走 now()+8h 回退 ⇒ 时钟快 8h
+      （11:34 打 19:34）⇒ 盘中动态判定线自创建从未生效（⚠️ 本机时钟/TZ 完全正常，
+      禁任何脚本用 now()+8h 手工偏移）。
+      修复落地：本地哨兵脚本 v8_intraday_sentinel.py（WorkBuddy 本地件，不入仓）加
+      「开盘强制派发窗 09:30-09:50」+ 僵尸扫描修正（冻结阈 12→25min + job 级
+      runner_name 验证）+ 新建 09:32 哨兵班次（自动化 id cd821ad6）；
+      gate 脚本两修已推 origin 2c19d854（时钟回退改 naive now() + hosted 派发补
+      category=intraday 落独立并发组）。同批补登记 v8_final_recommend_history
+      双登记（19ee49226，离线审计 15/15 全绿）。
+    verify_how: >-
+      次交易日 09:45 前线上 data/INDEX_QUOTES.js 等实时源 update_time 已是当日盘中
+      （即 09:32 强制派发→09:40-09:45 开盘数据上线）；此后每 20 分钟哨兵兜底不再断档。
+    updated: "2026-10-28 12:10"
+    updated_by: 小九
