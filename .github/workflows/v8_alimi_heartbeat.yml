@@ -1,0 +1,52 @@
+name: "v8 alimi heartbeat (阿狸咪心跳·GitHub派发)"
+
+# 🔴 2026-10-28 一劳永逸根治 all_HB_ALIMI 红灯（主人令）：
+#   心跳发送侧原依赖阿狸咪家机本地调度（alimi_heartbeat.py 的 cron/automation），
+#   10-27 05:20 起家机本地调度停摆（runner 仍在线＝机器活着，唯独心跳腿断），
+#   HB_ALIMI.js 冻结 33h+，运维页 all_HB_ALIMI 假红灯。
+#   本 workflow 把调度权上收到 GitHub：只要家机 runner（alimi-cn）在线就必然跳；
+#   家机真离线 ⇒ runner 不接单 ⇒ 心跳停 ⇒ v8_peer_monitor（本机每 2h 哨兵）按
+#   180min 阈值×连续 2 次邮件告警主人 —— 存活监控语义完整保留，无人代跳。
+#
+#   专属路由：alimi-cn runner 在册自定义 label = cn-cn（runner API 实测 2026-10-28，
+#   lemoncat-cn 对应 xiaojiu）。⚠ 若某天 job 永远 queued，先查该 label 是否仍在：
+#   GET /repos/ah-quant999/quant-scanner-v8/actions/runners。
+#
+#   兼容性：脚本纯标准库 + Contents API 直推 raw_data/hb_alimi.json（绝不写工作区），
+#   与家机本地心跳（若日后修复恢复）双写幂等（25min 幂等窗口），互不冲突。
+
+on:
+  schedule:
+    - cron: '23 */2 * * *'   # 每 2 小时（节拍契约：阈值 180 = 120 节拍 + 60 裕度）
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: alimi-heartbeat
+  cancel-in-progress: true   # 家机离线时只保留最新排队 job，恢复后只跑最新一次
+
+jobs:
+  heartbeat:
+    runs-on: [self-hosted, cn-cn]   # 专属阿狸咪机
+    timeout-minutes: 10
+    steps:
+      - name: "⬇️ Checkout（浅·persist-credentials 关闭）"
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: "🐍 Python 3.13 (setup-python，cn runner 血训同款)"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: "💓 心跳上报（Contents API 直推，静默成功）"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/alimi_heartbeat.py --quiet
+
+      - name: "📋 心跳现状诊断（always·供 Actions 页排查）"
+        if: always()
+        run: python scripts/alimi_heartbeat.py --check
