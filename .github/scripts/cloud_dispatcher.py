@@ -366,6 +366,16 @@ def _intraday_snapshot_needs_recompute():
         return True, "SECTOR_FUND_FLOW_INTRADAY 解析异常: " + str(e)
 
 def dispatch_intraday_snapshot(now):
+    # 🔴 2026-10-28 主人令「实时数据页盘后只更新到16:30，不浪费token」：
+    #   板块资金日内快照(SECTOR_FUND_FLOW_INTRADAY) 属实时数据页 intraday 变量，收盘(15:00)后数据已冻结。
+    #   cloud_fetch_v8 已在 16:30 后停止重抓该变量（见其 main() 盘后静默窗），故 16:30 后它必然逐步
+    #   变陈旧 → 下方 _needs_recompute 会误判「需补派」→ 每 ~25 分钟触发一次 v8_intraday_snapshot，
+    #   整夜空转、反复重抓冻结快照，纯浪费 token（正是主人投诉的"一直更新"闭环）。
+    #   修复：当前时刻 > 16:30 时直接跳过派发（快照按设计冻结，非故障，无需兜底）。
+    _hm = now.hour * 60 + now.minute
+    if _hm > 990:  # 16:30 = 16*60 + 30 = 990
+        print("  板块资金日内快照: 已过16:30盘后静默窗（实时页快照按设计冻结，非故障），跳过派发")
+        return
     need, why = _intraday_snapshot_needs_recompute()
     if not need:
         print("  板块资金日内快照: " + why + "，跳过")

@@ -341,7 +341,7 @@ CARD_DEFS = [
     {"id": "RESTRICTED_RELEASE", "name": "今日解禁", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "stats"], "heal_cat": "premarket", "raw_file": "restricted_release.json"},
     {"id": "PERFORMANCE_FORECAST", "name": "今日业绩预告", "page": "今日事件", "dual_page": "盘后数据", "freq": "每日盘前", "max_age": 1440, "key_fields": ["items", "summary"], "heal_cat": "premarket", "raw_file": "performance_forecast.json"},
     {"id": "IMA_STRONG_STOCK", "name": "强势跟踪", "page": "选股策略", "freq": "工作日15:45", "max_age": 1440, "key_fields": ["data_date", "source"], "raw_file": "ima_strong_stock.json", "producer": "fetch_ima_strong_stock.py"},
-    {"id": "TOP10_DAILY", "name": "最终推荐·Top5因子评分", "page": "最终推荐", "freq": "收盘后1次(算法链)", "max_age": 1440, "key_fields": ["total_scored"], "raw_file": "top10_daily.json", "producer": "generate_top10.py"},
+    {"id": "TOP10_DAILY", "name": "最终推荐·Top5因子评分", "page": "最终推荐", "freq": "每日盘前1次(算法链)", "max_age": 1440, "key_fields": ["total_scored"], "raw_file": "top10_daily.json", "producer": "generate_top10.py"},
     {"id": "maharo_insights", "name": "机构研究·AI解析", "page": "观测平台", "freq": "盘中+每日3档", "max_age": 1440, "key_fields": ["update_time"], "_window_var": "MAHORO_INSIGHTS"},
     {"id": "INDEX_VALUE_FRAMEWORK", "name": "指数观测·四框架", "page": "观测平台", "freq": "每日盘前", "max_age": 1440, "key_fields": ["indices"], "raw_file": "index_value_framework.json"},
     {"id": "WAVE_ELLIOTT", "name": "艾略特波浪·深度分析", "page": "观测平台", "freq": "每交易日17:50前后(CN runner1号机日频)", "max_age": 1440, "key_fields": ["meta"], "cycle": (18, 0)},
@@ -2126,6 +2126,13 @@ _OCR_DEPENDENCY_FILES = {
     "STOCK_MOMENTUM_STATE_V2",
 }
 _LOW_FREQ_FILES = {
+    # 2026-10-28 主人令「一劳永逸」：MARKET_THERMO / US_HK_MAP 低频盘后批，偶发漏跑1~2天属正常；
+    #   进本白名单 + _LOW_FREQ_MAX_AGE 给 3 天红线（容忍漏跑，超 3 天仍 fail 保留真故障可见性）。
+    "MARKET_THERMO", "US_HK_MAP",
+    # 2026-10-29 一劳永逸：HUIJIN_HOLDINGS（汇金持仓季报，v8_national_team.yml D胶囊 best-effort 兜底）
+    #   + RESONANCE_TRACK（龙虎榜共振回测研究集，track_resonance.py 手动/周期重算，index.html 有真实卡片渲染）
+    #   二者均为**低频/研究型产物**，被 all_ 通用 24h 红线误杀。进白名单跳过 24h，并由 _LOW_FREQ_MAX_AGE 按节拍给红线。
+    "HUIJIN_HOLDINGS", "RESONANCE_TRACK",
     # 2026-09-13：STOCK_PROFILE 已随 data/STOCK_PROFILE.js 停产移除
     "WEEKEND_META_REPORT", "PORTFOLIO", "PORTFOLIO_COST",
     "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY",
@@ -2194,6 +2201,8 @@ _LOW_FREQ_FILES = {
 #   🔴 本表曾于 2026-09-21T00:19Z 被 commit 3d955c9f5c 整段静默覆盖（同批的 _LOW_FREQ_FILES
 #      新增项也一并丢失），致推送侧与巡检侧护栏口径分叉 18 小时 ⇒ 本批按 cfe5d0bf97 原文恢复。
 _RETIRED_FILES = {
+    "BACKTEST_COMPREHENSIVE",    # 2026-10-28 主人令「一劳永逸」：三重共识综合代理早已下架→孤儿；生成器同轮摘除删除
+    "BACKTEST_TDX",              # 2026-10-28 同上：76MB raw 推送卡死(HTTP422)→停推；前端孤儿 data/BACKTEST_TDX.js 退役；生成器保留(OPTIMIZED_STRATEGY 上游)
     "STRONG_BREAKOUT",           # 强势突破（2026-09-19 主人令全站删除）
     "STRONG_BREAKOUT_BACKTEST",  # 强势突破·信号层回测（同上）
     "ALGO_BACKTEST_COMPARE",     # 两套算法回测对比（2026-09-20 全链退役，本批删除产物）
@@ -2259,6 +2268,10 @@ _STATIC_ARCHIVE_FILES = {
 #        ⇒ 会造出新的每周一假红。已由真实量纲核对拦下并纠正。）
 _LOW_FREQ_MAX_AGE = {
     "STOCK_LIST": 30 * 24 * 60,   # 股票名录 · 30 天（分钟量纲；生产者只挂算法链周度批次）
+    "MARKET_THERMO": 3 * 24 * 60, # 大盘观测·未来预测（v8_market_thermo.yml 交易日16:10盘后批；3天红线容忍偶发漏跑）
+    "US_HK_MAP": 3 * 24 * 60,     # 美股港股地图（v8_us_hk_map.yml 双种子盘前批；3天红线容忍偶发漏跑）
+    "HUIJIN_HOLDINGS": 90 * 24 * 60,   # 汇金持仓季报披露（季度级更新，底层数据为季报；90天红线容忍季报空窗，超季未更仍报真故障）
+    "RESONANCE_TRACK": 30 * 24 * 60,   # 龙虎榜共振回测研究集（手动/周期重算，无自动调度；30天红线，超月未重算即告警）
 }
 
 

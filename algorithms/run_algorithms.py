@@ -214,12 +214,11 @@ ORDER = [
     "gen_stock_winrate.py",            # 🔴 2026-10-23 主人令·嵌入因子榜：读 raw_data/history 真实信号流 + kline_cache 复算个股历史胜率/期望 → data/STOCK_WINRATE.js（generate_top10 嵌入因子用）；须在 generate_top10 之前（与 STAGES["B"] 成对）
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
     # 🛡 2026-10-28 E批缓存新鲜度（与 STAGES["E"] 成对）：kline_cache 是云端 V8_NO_NET 下
-    #   backtest_tdx/backtest_comprehensive/factor_lab/factor_walkforward 的唯一 K 线水源，
+    #   backtest_tdx/factor_lab/factor_walkforward 的唯一 K 线水源，
     #   必须在回测前刷新到 800 根且 ≤4 天新鲜，否则回测永远吃陈旧缓存。
     "scripts/fetch_multiyear_kline.py",
     # 🛡 2026-08-29 主人令：A/B 对照（金股池/候选池/全市场同一信号收益），每日累积信号、T+N 后回填收益。
     "backtest_tdx.py",                 # 读 gold_pool 输入
-    "backtest_comprehensive.py",       # 读 raw_data/history/top10_daily_YYYYMMDD.json（必须在 generate_top10 之后）
     "export_optimized_strategy.py",    # → raw_data/optimized_strategy.json（读 backtest_tdx.json 汇总优化策略效果）
     # 🔴 2026-10-18 主人令「完全下架」：四量终极整体下架——真实信号流 T+5 胜率 33.71% < 红线 45%、
     #   均益 -1.68% ≤ 0（n=89，扣费修复后口径；此前 -1.38% 系未扣成本的高估值），跑输基准；
@@ -461,7 +460,7 @@ STAGES = {
         # 🛡 2026-10-28 E批缓存新鲜度（与 ORDER 成对）：云端 V8_NO_NET 下回测唯一水源是
         #   raw_data/kline_cache，本步前置把金股池并集刷到 ≥800 根且 ≤4 天新鲜（幂等，日常秒级跳过）。
         "scripts/fetch_multiyear_kline.py",
-        "backtest_tdx.py", "backtest_comprehensive.py",
+        "backtest_tdx.py",
         "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
 
         # 🛡 2026-09-09 主人令：因子实验室「生成器」已前置到 B 批最前（必须在 final_recommend 前产完），
@@ -674,7 +673,6 @@ STOCK_PICKING_SCRIPTS = {
 #   STOCK_PICKING_SCRIPTS 门控漏掉回测批，盘中 force 链跳过选股但照跑回测并重刷 update_time）。
 BACKTEST_SCRIPTS = {
     "backtest_tdx.py",
-    "backtest_comprehensive.py",
     "backtest_expectancy.py",
     "export_optimized_strategy.py"}
 # 18:00 = 所有盘后数据（龙虎榜/北向/板块资金/个股行情/机构调研等）稳定就绪时间

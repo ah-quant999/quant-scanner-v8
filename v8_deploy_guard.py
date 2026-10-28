@@ -54,8 +54,6 @@ MIN_SIZE = {
     "CONCEPT_ETF_MAP.js": 3564,
     "COMMODITY_ELASTICITY.js": 2126,
     "CAPITAL_FLOW_DATA.js": 1195,
-    "BACKTEST_TDX.js": 1350,
-    "BACKTEST_COMPREHENSIVE.js": 1395,
     "OPTIMIZED_STRATEGY.js": 342,
     "INDEX_QUOTES.js": 348,
     # 🔴 2026-10-18 主人令「完全下架」：四量两产物已删，基线体积条目摘除。

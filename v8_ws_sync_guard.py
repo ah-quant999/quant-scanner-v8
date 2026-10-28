@@ -74,7 +74,6 @@ CRITICAL = [
     "algorithms/calc_crds.py",
     "algorithms/gen_backtest_all_algos.py",
     "algorithms/backtest_tdx.py",
-    "algorithms/backtest_comprehensive.py",
     # 🔴 2026-10-18 主人令「完全下架」：gen_algo_track.py 随四量下架整链拆除（已删）。
     # "algorithms/gen_algo_track.py",
     "algorithms/gen_market_brief.py",

@@ -403,6 +403,16 @@ _RETIRED_ARTIFACTS = {
     "data/GOLD_POOL_BACKTEST.js",
     "raw_data/candidate_backtest.json",
     "raw_data/gold_pool_backtest.json",
+    # 🗑 2026-10-28 主人令「一劳永逸」：BACKTEST_COMPREHENSIVE 全退役 + BACKTEST_TDX 前端孤儿退役。
+    #   · backtest_comprehensive.py 生成器已随本轮摘除并删除；对应三重共识综合代理早已下架（孤儿死数据）。
+    #   · backtest_tdx.py 生成器保留（它是 OPTIMIZED_STRATEGY 全站择时唯一源的上游），但停止推送 76MB 的
+    #     raw_data/backtest_tdx.json（GitHub blob 超 100MB → HTTP 422 卡死 E 批，连带 OPTIMIZED_STRATEGY 陈旧）
+    #     + 已无前端引用的 data/BACKTEST_TDX.js 孤儿产物。本地仍写 raw 供 OPTIMIZED_STRATEGY 消费，仅不推送。
+    #   · data/BACKTEST_COMPREHENSIVE.js 同步停止推送（前端卡片已退役摘除引用）。
+    "raw_data/backtest_tdx.json",
+    "data/BACKTEST_TDX.js",
+    "raw_data/backtest_comprehensive.json",
+    "data/BACKTEST_COMPREHENSIVE.js",
 }
 # 按前缀兜底：raw_data/strong_breakout_YYYYMMDD.json（逐日留档）
 _RETIRED_PREFIXES = (

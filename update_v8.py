@@ -121,9 +121,7 @@ DATA_SOURCES = {
     "index_history.json":           "INDEX_HISTORY",   # 🛡 2026-09-08 一劳永逸：原 DATA_SOURCES 漏挂此映射 → data/INDEX_HISTORY.js 永停 09-04；现补，post_close 段自动重建
     "capital_flow_data.json":      "CAPITAL_FLOW_DATA",
     "candidate.json":              "CANDIDATE",
-    "backtest_comprehensive.json": "BACKTEST_COMPREHENSIVE",
     # 2026-09-04 主人令收尾：cockpit_backtest.json 映射已删（驾驶舱模块下线）
-    "backtest_tdx.json":           "BACKTEST_TDX",
     "optimized_strategy.json":     "OPTIMIZED_STRATEGY",
     "experiment.json":             "EXPERIMENT",
     "etf_pulse.json":              "ETF_PULSE",
@@ -398,8 +396,6 @@ CATEGORY_MAP = {
     # 🔴 2026-10-22：CRDS 条目随映射一并摘除（2026-10-11 完全下架）。
     # "CRDS_CARD_DATA": "post_close",
     # 2026-09-04 主人令收尾：COCKPIT_TIER_RECOMMEND/COCKPIT_ADVICE/COCKPIT_BACKTEST heal 分类已删（模块下线）
-    "BACKTEST_TDX": "post_close",
-    "BACKTEST_COMPREHENSIVE": "post_close",
     "FACTOR_LAB": "post_close",
     "FACTOR_LAB_BACKTEST": "post_close",
     "EXPERIMENT": "post_close",
@@ -471,28 +467,6 @@ def _make_lite(name, obj):
     """轻量裁剪：只保留累计/计算数值，去掉历史明细。"""
     if not isinstance(obj, dict):
         return obj
-    if name == 'BACKTEST_TDX':
-        return {
-            # 🛡 2026-09-11：必须透传 update_time，否则下方组装逻辑会退回
-            #   `or obj.get('calc_time')` 兜底 → 产物只剩日期精度 → 闸门 floor 判据失效。
-            'update_time': obj.get('update_time'),
-            'calc_time': obj.get('calc_time'),
-            'method': obj.get('method'),
-            'gold_pool_size': obj.get('gold_pool_size'),
-            'stocks_analyzed': obj.get('stocks_analyzed'),
-            'summary': obj.get('summary', {}),
-            # 🔴 2026-09-14 小九审计修复：口径审计字段必须一并透传。
-            #   本函数是白名单裁剪，新增字段默认被丢 ⇒ 算法侧写的
-            #   entry_caliber_ver / stale_caliber_dropped 到不了 window.BACKTEST_TDX，
-            #   前端与看门狗就失去了「口径混用」的判据（审计链断在搬运层）。
-            'entry_caliber_ver': obj.get('entry_caliber_ver'),
-            'stale_caliber_dropped': obj.get('stale_caliber_dropped'),
-            '_lite_note': '个股历史信号明细已裁剪，仅保留汇总统计',
-        }
-    if name == 'BACKTEST_COMPREHENSIVE':
-        lite = {k: v for k, v in obj.items() if k != 'details'}
-        lite['_lite_note'] = 'details 回测明细已裁剪，仅保留 overview/comparison'
-        return lite
     # 2026-09-04 主人令收尾：COCKPIT_BACKTEST lite 裁剪分支已删（驾驶舱模块下线，永不命中）
     if name == 'GOLD_POOL':
         lite = {k: v for k, v in obj.items() if k != 'stocks'}

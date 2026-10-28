@@ -87,8 +87,21 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: "🛡 16:30 盘后静默闸（实时页快照按设计冻结）"
+        id: cap
+        shell: bash
+        run: |
+          HM=$(TZ=Asia/Shanghai date '+%H%M' | sed 's/^0*//'); HM=${HM:-0}
+          if [ "$HM" -gt 1630 ]; then
+            echo "::notice title=快照静默::CST ${HM} 已过16:30盘后静默窗（实时数据页快照按设计冻结），本 job 跳过后续抓取/推送步"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: "📈 追加快日快照（独立解耦·重试5）"
         id: snap
+        if: steps.cap.outputs.skip != 'true'
         continue-on-error: true
         shell: bash
         run: |
@@ -109,6 +122,7 @@ jobs:
 
       - name: "📤 推送 2 个快照文件（仅快照，rebase 无冲突）"
         id: push
+        if: steps.cap.outputs.skip != 'true'
         continue-on-error: true
         shell: bash
         run: |
@@ -148,7 +162,7 @@ jobs:
           done
 
       - name: "📢 软失败告警（不阻断）"
-        if: always()
+        if: steps.cap.outputs.skip != 'true'
         shell: bash
         run: |
           if [ "${{ steps.snap.outcome }}" != "success" ] || [ "${{ steps.push.outcome }}" != "success" ]; then

@@ -5310,6 +5310,29 @@ def main(category=None, only=None):
     if category == "intraday" and target_vars is not None:
         target_vars.add("MARKET_FUND_FLOW_DATA")
 
+    # 🔴 2026-10-28 主人令「实时数据页盘后只更新到16:30，不浪费token」：
+    #   盘后 post_close 轮次（云端 17:20/18:20/19:20 定时 + 看门狗 17:00-21:30 补派，均走 category=post_close
+    #   或全量空类别）原会把「实时数据页」的 19 个 intraday 变量（板块资金流向 / 涨停热力矩阵 / ETF二合一 /
+    #   期指主力持仓 / 沪深成交额 / 平均股价 / 概念资金 / 今日判定·环境综合 / AI速览 等）连同 genuine
+    #   post_close 变量一起重抓。收盘后这些实时数据已冻结，重抓纯属浪费云取 token（且反复覆盖远端 main
+    #   的 raw_data，徒增 api_push_raw 防倒退守卫负担）。
+    #   修复：当前时刻 > 16:30 且非盘中交易窗(09:30-15:10) 时，post_close / 全量 轮次**剔除所有含 intraday
+    #   的变量**，仅保留 genuine post_close 变量（如 CFFEX_POSITION 中金所持仓排名 16:30 后公布）与
+    #   premarket,post_close 变量（IPO/融资/宏观/北向/ETF申赎 等盘后定稿数据）。
+    #   15:30 收盘定稿档(15:30 < 16:30)仍正常抓 intraday 变量 = 当日最终快照（含 SECTOR_FUND_FLOW_INTRADAY
+    #   收盘定格点追加），不受影响；盘中 intraday 轮次由 v8_cn_fetch_intraday_lemoncat 守卫卡在 09:32-15:10，不受影响。
+    #   --only 单变量调试模式不套此闸（用户显式指定，放行）。
+    if category in (None, "", "post_close", "all") and not only and target_vars is not None:
+        _hm_cut = now_cst().hour * 60 + now_cst().minute
+        if _hm_cut > 990:  # 16:30 = 16*60 + 30 = 990 分钟
+            _intraday_vars = {v for v in target_vars
+                              if "intraday" in [x.strip() for x in CATEGORY_MAP[v].split(",")]}
+            if _intraday_vars:
+                _before_n = len(target_vars)
+                target_vars -= _intraday_vars
+                print(f"  ⏸️ 已过16:30盘后静默窗：剔除 {_before_n - len(target_vars)} 个实时(intraday)变量"
+                      f"（{sorted(_intraday_vars)}），仅留 genuine post_close / premarket,post_close")
+
     if only:
         print("  ⏭️ --only 模式，跳过 raw_data 清理（保留其他时段数据）")
     else:

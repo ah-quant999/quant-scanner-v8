@@ -106,7 +106,6 @@ V6_TO_V8 = {
     # "crds_result.json":                  "crds_card_data.json",
     # 2026-09-18 主人令「清除干净」：cockpit_tier_recommend/cockpit_advice/cockpit_backtest 三映射随驾驶舱 09-03 下线彻底删除
     "backtest_tdx.json":                 "backtest_tdx.json",
-    "backtest_comprehensive.json":       "backtest_comprehensive.json",
     # 2026-08-28 主人令：mahoro 不再跟踪，移除映射
     "market_fund_flow.json":             "market_fund_flow.json",
     "volatility_watch.json":             "volatility.json",

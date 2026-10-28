@@ -253,6 +253,12 @@ WARN_SOURCES = {
     #   🔴 量纲不同，**切勿「对齐数值」**：本处单位 = **小时**（24*30 = 720h = 30 天）；
     #      健康检查处单位 = **分钟**（30*24*60 = 43200min = 30 天）。数值不同、语义等价。
     "STOCK_LIST": 24 * 30,
+    # ⏱ 2026-10-29 一劳永逸（九宝）：**本值即 v8_health_check.py::_LOW_FREQ_MAX_AGE["HUIJIN_HOLDINGS"]
+    #   / ["RESONANCE_TRACK"] 的同源口径**。改本值必须同批改另一处 —— 两守卫口径不一致本身就是 bug。
+    #   🔴 量纲不同，切勿「对齐数值」：本处单位 = **小时**（90*24=2160h=90天 / 30*24=720h=30天）；
+    #      健康检查处单位 = **分钟**（90*24*60=129600min / 30*24*60=43200min）。数值不同、语义等价。
+    "HUIJIN_HOLDINGS": 90 * 24,      # 汇金持仓季报（季度级）· 同源 health_check::_LOW_FREQ_MAX_AGE
+    "RESONANCE_TRACK": 30 * 24,      # 龙虎榜共振回测研究集（无自动调度手动重算）· 同源 health_check::_LOW_FREQ_MAX_AGE
     # 🛡 2026-08-27 主人令：SECTOR_FUND_FLOW_TREND 资金验证数据源（fetch_orphan 盘后产出），
     #   此前完全不在审计清单 → "资金验证60日夸张/陈旧"无人发现。纳入 WARN 48h。
     "SECTOR_FUND_FLOW_TREND": 48,
@@ -264,8 +270,6 @@ WARN_SOURCES = {
 # 阈值用 24h：跨一个交易日未更新即 stale（周五→周一按交易日算会正确触发）。
 CORE_SOURCES_ALGO = {
     # 2026-09-04 主人令收尾：COCKPIT_BACKTEST 已删（驾驶舱模块下线）
-    "BACKTEST_COMPREHENSIVE": 24,
-    "BACKTEST_TDX": 24,
     # 🧹 2026-10-15 阿狸咪的工程师：CRDS_CARD_DATA 已**退役摘除**（原阈值 24）。
     #   依据：① 2026-10-11 主人令「完全下架」逆势龙头 CRDS——data/CRDS_CARD_DATA.js 已删、
     #      index.html 零注入（L9079 注释实证「模块下架，window.CRDS_CARD_DATA 恒 undefined」）、
@@ -333,7 +337,6 @@ SELFHEAL_COOLDOWN_MIN = 30   # 同 category 自愈派发冷却，避免每小时
 # 但 cloud_fetch 无法生产它们；需要单独 dispatch algo_cloud 来自愈）。
 ALGO_VARS = {
     # 2026-09-04 主人令收尾：COCKPIT_BACKTEST/COCKPIT_TIER_RECOMMEND/COCKPIT_ADVICE 已删（模块下线）
-    "BACKTEST_COMPREHENSIVE", "BACKTEST_TDX",
     # 🔴 2026-10-11 主人令「完全下架」：CRDS_CARD_DATA / TRIPLE_CONSENSUS / TRIPLE_TRACK /
     #   TRIPLE_HISTORY 移出——模块已下架、data 文件已删、index.html 零注入，
     #   自愈面不再派发永远刷不出的 algo_run。
