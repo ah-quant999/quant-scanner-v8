@@ -1,6 +1,6 @@
 {
-  "generated": "2026-10-29 01:51:59",
-  "update_time": "2026-10-29 01:51:59",
+  "generated": "2026-10-29 03:30:55",
+  "update_time": "2026-10-29 03:30:55",
   "card": "最终推荐 · 每日 Top3 历史",
   "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
   "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",
@@ -1547,17 +1547,17 @@
     },
     "2026-10-28": {
       "date": "2026-10-28",
-      "update_time": "2026-10-28 09:02:36",
-      "file": "final_recommend_20261028.json",
-      "degraded": true,
+      "update_time": "2026-10-29 03:30:54",
+      "file": "final_recommend_20261029.json",
+      "degraded": false,
       "top3": [
         {
           "rank": 1,
           "code": "600869",
           "name": "远东股份",
-          "close": 13.89,
-          "close_date": "2026-10-27",
-          "final_score": 44.7,
+          "close": 14.59,
+          "close_date": "2026-10-28",
+          "final_score": 43.9,
           "resonance": 1,
           "sources": [
             "四量终极"
@@ -1565,11 +1565,11 @@
         },
         {
           "rank": 2,
-          "code": "600641",
-          "name": "先导基电",
-          "close": 34.25,
-          "close_date": "2026-10-27",
-          "final_score": 24.6,
+          "code": "301183",
+          "name": "东田微",
+          "close": 196.9,
+          "close_date": "2026-10-28",
+          "final_score": 24.7,
           "resonance": 1,
           "sources": [
             "四量终极"
@@ -1577,11 +1577,11 @@
         },
         {
           "rank": 3,
-          "code": "688409",
-          "name": "富创精密",
-          "close": 114.36,
-          "close_date": "2026-10-27",
-          "final_score": 19.8,
+          "code": "301511",
+          "name": "德福科技",
+          "close": 63.48,
+          "close_date": "2026-10-28",
+          "final_score": 24.5,
           "resonance": 1,
           "sources": [
             "四量终极"

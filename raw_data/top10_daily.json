@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-29 02:56:03",
+  "update_time": "2026-10-29 03:29:24",
   "selection_mode": "high_conviction_resonance",
   "hc_cap": null,
   "hc_count": 61,
@@ -14,28 +14,28 @@
     "confidence": "低",
     "market_trend": "unknown",
     "recommended_sectors": [
-      "计算机设备",
-      "通信运营",
-      "化学制药",
-      "保险",
-      "中药",
-      "医疗服务",
-      "公用事业",
       "银行",
-      "通信设备",
-      "半导体",
-      "贵金属",
       "煤炭",
-      "油气"
+      "公用事业",
+      "医疗服务",
+      "保险",
+      "通信设备",
+      "化学制药",
+      "贵金属",
+      "油气",
+      "通信运营",
+      "半导体",
+      "计算机设备",
+      "中药"
     ],
     "avoid_sectors": [
-      "食品饮料",
-      "家用电器",
       "通信设备",
-      "半导体",
       "白酒",
-      "电子元件",
-      "计算机"
+      "食品饮料",
+      "计算机",
+      "半导体",
+      "家用电器",
+      "电子元件"
     ],
     "strategy_weights": {
       "triple_consensus": 1.0,
@@ -195,7 +195,7 @@
       "quality_detail": "ROE偏低(8.7%) | 营收高增(34.0%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前76%+3"
+      "p5_detail": "换手率趋势池内前77%+3"
     },
     {
       "rank": 3,
@@ -343,7 +343,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 119.5,
-      "pct_chg": 0,
+      "pct_chg": 4.49,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -37.72473813122101,
       "breakout_5d": false,
@@ -412,7 +412,7 @@
       "board": "主板",
       "sig_count": 2,
       "close": 29.04,
-      "pct_chg": 1.17,
+      "pct_chg": 3.09,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -33.25672259250747,
       "breakout_5d": false,
@@ -481,7 +481,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 33.21,
-      "pct_chg": 0,
+      "pct_chg": 5.0,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -36.81506849315069,
       "breakout_5d": false,
@@ -618,7 +618,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 133.59,
-      "pct_chg": -5.83,
+      "pct_chg": 0.81,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -19.53863759561525,
       "breakout_5d": false,
@@ -680,7 +680,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 73.45,
-      "pct_chg": 0,
+      "pct_chg": 4.29,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -41.31699210635646,
       "breakout_5d": false,
@@ -808,7 +808,7 @@
       "quality_detail": "ROE偏低(7.5%) | 营收高增(21.2%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "低波动52%-3",
-      "p5_detail": "换手率趋势池内前86%+6"
+      "p5_detail": "换手率趋势池内前87%+6"
     },
     {
       "rank": 12,
@@ -818,7 +818,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 213.82,
-      "pct_chg": 0,
+      "pct_chg": 4.62,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -25.913862998510105,
       "breakout_5d": false,
@@ -956,7 +956,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 275.0,
-      "pct_chg": 0,
+      "pct_chg": 4.36,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -42.4541725956307,
       "breakout_5d": false,
@@ -1087,7 +1087,7 @@
       "board": "创业板",
       "sig_count": 2,
       "close": 117.6,
-      "pct_chg": -0.49,
+      "pct_chg": 3.56,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -39.65826876699677,
       "breakout_5d": false,
@@ -1156,7 +1156,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 133.09,
-      "pct_chg": 0,
+      "pct_chg": 4.33,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -40.6404709870211,
       "breakout_5d": false,
@@ -1225,7 +1225,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 16.63,
-      "pct_chg": -0.16,
+      "pct_chg": 3.81,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -29.32426689332767,
       "breakout_5d": false,
@@ -1353,7 +1353,7 @@
       "quality_detail": "ROE差(1.5%) | 营收增长(14.6%)",
       "research_detail": "",
       "p4_detail": "低波动50%-3",
-      "p5_detail": "换手率趋势池内前67%+3"
+      "p5_detail": "换手率趋势池内前68%+3"
     },
     {
       "rank": 20,
@@ -1363,7 +1363,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 154.95,
-      "pct_chg": 0,
+      "pct_chg": 3.62,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -32.93659381086346,
       "breakout_5d": false,
@@ -1415,7 +1415,7 @@
       "quality_detail": "ROE差(0.9%) | 营收持平(9.5%)",
       "research_detail": "",
       "p4_detail": "低波动44%-6",
-      "p5_detail": "换手率趋势池内前74%+3"
+      "p5_detail": "换手率趋势池内前73%+3"
     },
     {
       "rank": 21,
@@ -1425,7 +1425,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 174.72,
-      "pct_chg": 0,
+      "pct_chg": 3.81,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -24.974235657849537,
       "breakout_5d": false,
@@ -1863,7 +1863,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 64.7,
-      "pct_chg": 0.38,
+      "pct_chg": 5.93,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -43.98268398268398,
       "breakout_5d": false,
@@ -1932,7 +1932,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 41.6,
-      "pct_chg": 0,
+      "pct_chg": 1.94,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -34.364152729567685,
       "breakout_5d": false,
@@ -1991,7 +1991,7 @@
       "quality_detail": "ROE差(1.2%) | 营收增长(14.6%)",
       "research_detail": "",
       "p4_detail": "低波动45%-3",
-      "p5_detail": "换手率趋势池内前65%+3"
+      "p5_detail": "换手率趋势池内前66%+3"
     },
     {
       "rank": 30,
@@ -2181,7 +2181,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 196.7,
-      "pct_chg": 0,
+      "pct_chg": 6.32,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -30.73943661971831,
       "breakout_5d": false,
@@ -2241,7 +2241,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 243.79,
-      "pct_chg": 0,
+      "pct_chg": 4.89,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -37.4239585204959,
       "breakout_5d": false,
@@ -2310,7 +2310,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 80.7,
-      "pct_chg": 0,
+      "pct_chg": 4.06,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -31.72011168457568,
       "breakout_5d": false,
@@ -2438,7 +2438,7 @@
       "quality_detail": "ROE良好(15.9%) | 营收高增(40.7%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前73%+3"
+      "p5_detail": "换手率趋势池内前72%+3"
     },
     {
       "rank": 37,
@@ -2448,7 +2448,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 154.6,
-      "pct_chg": 0,
+      "pct_chg": 3.36,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -56.06581602205235,
       "breakout_5d": false,
@@ -2603,7 +2603,7 @@
       "risk_reward": 5.01,
       "stop_precise": false,
       "score_base": 3,
-      "score_enhance": 6,
+      "score_enhance": 3,
       "score_form": 0.0,
       "score_fund": 0,
       "score_sector": 0,
@@ -2613,7 +2613,7 @@
       "score_breakout": 0,
       "score_research": 0,
       "score_p4": 0,
-      "score_p5": 6,
+      "score_p5": 3,
       "score_winrate": -55.0,
       "score_winrate_fusion": -14.2,
       "winrate_demote": true,
@@ -2636,7 +2636,7 @@
       "quality_detail": "ROE偏低(8.8%) | 营收高增(34.3%) | 消息:三季报预增",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前80%+6"
+      "p5_detail": "换手率趋势池内前79%+3"
     },
     {
       "rank": 40,
@@ -3060,7 +3060,7 @@
       "board": "创业板",
       "sig_count": 2,
       "close": 36.36,
-      "pct_chg": -1.97,
+      "pct_chg": 1.14,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -32.95224045731145,
       "breakout_5d": false,
@@ -3119,7 +3119,7 @@
       "quality_detail": "ROE良好(18.3%) | 营收高增(30.5%) | 消息:中报扭亏",
       "research_detail": "",
       "p4_detail": "低波动46%-3",
-      "p5_detail": "换手率趋势池内前85%+6"
+      "p5_detail": "换手率趋势池内前84%+6"
     },
     {
       "rank": 47,
@@ -3258,7 +3258,7 @@
       "board": "主板",
       "sig_count": 2,
       "close": 36.69,
-      "pct_chg": 1.63,
+      "pct_chg": 3.32,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -41.29600000000001,
       "breakout_5d": false,
@@ -3422,7 +3422,7 @@
       "risk_reward": 3.42,
       "stop_precise": false,
       "score_base": 3,
-      "score_enhance": -3,
+      "score_enhance": -6,
       "score_form": 0.0,
       "score_fund": 0,
       "score_sector": 0,
@@ -3432,7 +3432,7 @@
       "score_breakout": 0,
       "score_research": 0,
       "score_p4": -6,
-      "score_p5": 3,
+      "score_p5": 0,
       "score_winrate": -15.3,
       "score_winrate_fusion": -6.2,
       "winrate_demote": true,
@@ -3455,7 +3455,7 @@
       "quality_detail": "ROE差(3.9%) | 营收高增(23.6%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "低波动30%-6",
-      "p5_detail": "换手率趋势池内前66%+3"
+      "p5_detail": ""
     },
     {
       "rank": 52,
@@ -3465,7 +3465,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 251.59,
-      "pct_chg": 0,
+      "pct_chg": 6.11,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -41.17468259720825,
       "breakout_5d": false,
@@ -3524,7 +3524,7 @@
       "quality_detail": "ROE偏低(7.4%) | 营收高增(23.0%)",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前62%+3"
+      "p5_detail": "换手率趋势池内前63%+3"
     },
     {
       "rank": 53,
@@ -3593,7 +3593,7 @@
       "quality_detail": "ROE一般(10.6%) | 营收高增(32.5%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "低波动50%-3",
-      "p5_detail": "换手率趋势池内前78%+3"
+      "p5_detail": "换手率趋势池内前72%+3"
     },
     {
       "rank": 54,
@@ -3620,7 +3620,7 @@
       "risk_reward": 3.95,
       "stop_precise": false,
       "score_base": 3,
-      "score_enhance": 0,
+      "score_enhance": -3,
       "score_form": 0.0,
       "score_fund": 0,
       "score_sector": 0,
@@ -3630,7 +3630,7 @@
       "score_breakout": 0,
       "score_research": 0,
       "score_p4": -3,
-      "score_p5": 3,
+      "score_p5": 0,
       "score_winrate": -11.4,
       "score_winrate_fusion": -4.4,
       "winrate_demote": false,
@@ -3653,7 +3653,7 @@
       "quality_detail": "ROE差(2.0%) | 营收增长(10.2%)",
       "research_detail": "",
       "p4_detail": "低波动55%-3",
-      "p5_detail": "换手率趋势池内前61%+3"
+      "p5_detail": ""
     },
     {
       "rank": 55,
@@ -3722,7 +3722,7 @@
       "quality_detail": "ROE偏低(8.8%) | 营收高增(21.5%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "",
-      "p5_detail": "换手率趋势池内前79%+3"
+      "p5_detail": "换手率趋势池内前78%+3"
     },
     {
       "rank": 56,
@@ -3939,7 +3939,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 74.95,
-      "pct_chg": 0,
+      "pct_chg": 3.52,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -35.15314068177885,
       "breakout_5d": false,
@@ -4067,7 +4067,7 @@
       "quality_detail": "ROE偏低(6.3%) | 营收高增(48.1%) | 消息:中报预增",
       "research_detail": "",
       "p4_detail": "低波动54%-3",
-      "p5_detail": "换手率趋势池内前70%+3"
+      "p5_detail": "换手率趋势池内前69%+3"
     },
     {
       "rank": 61,
@@ -4077,7 +4077,7 @@
       "board": "科创板",
       "sig_count": 2,
       "close": 462.35,
-      "pct_chg": 0,
+      "pct_chg": 1.82,
       "close_source": "STOCK_STOP_DATA",
       "pct_chg_20d": -35.97235878190303,
       "breakout_5d": false,
