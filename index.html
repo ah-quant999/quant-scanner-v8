@@ -2298,6 +2298,17 @@ window.STRATEGY_WALKFORWARD = {
         opBody.innerHTML = window._buildJudgmentEnvHTML(jd);
       }catch(e){ console.error('renderJudgmentBody error',e); }
     };
+    // 🆕 2026-10-28 主人令「这卡折叠」：今日判定·环境综合 卡一键折叠/展开
+    //   按钮 sibling 挂在 judgmentCardHeader 之后，v8CardHeader 自愈只重写 header 内部 ⇒ 按钮不被冲掉；
+    //   折叠只切 judgmentBodyOp 的 display，不影响 body 自愈重渲 innerHTML（display 状态独立保留）。
+    window.__toggleJudgmentCard = function(){
+      var b = document.getElementById('judgmentBodyOp');
+      var btn = document.getElementById('judgmentToggleBtn');
+      if(!b || !btn) return;
+      var hidden = (b.style.display === 'none');
+      b.style.display = hidden ? '' : 'none';
+      btn.innerHTML = hidden ? '&#x25BE; 折叠' : '&#x25B4; 展开';
+    };
     // 🛡️ 2026-08-19 主人令「补回来，别一直被覆盖掉」一劳永逸：
     //   放弃 setTimeout 一次性猜测 / 30 次重试的旧方案，改为**永久自愈轮询**——
     //   每 1 秒检查 head 是否被其他 logic 清空（含缓存戳老版本/v8CardHeader 截断/CDN 缓存）。
@@ -15491,9 +15502,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
             if(r2 && r2.items && r2.items.length){
               clearInterval(window.__uhkRetryTimer); window.__uhkRetryTimer = null; window.__uhkRetryN = 0;
               try{ window._fillUsHkMap(); }catch(e){}
-    /* 🚨 2026-09-23 主人令：大基金 增减持监控卡派发（与 _fillUsHkMap 同处 renderUnlisted 尾部，
-       覆盖首渲即触发；defer 数据未到时由 _fillDajijin 内部 600ms×30 自愈轮询补渲）。 */
-    window._fillDajijin();
             } else if(window.__uhkRetryN > 30){
               clearInterval(window.__uhkRetryTimer); window.__uhkRetryTimer = null; window.__uhkRetryN = 0;
             }
@@ -15647,100 +15655,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       }
     }catch(e){ console.warn('隔夜美股映射卡渲染失败', e); }
   };
-  /* ═══ 🚨 2026-09-23 主人令：大基金 增减持监控卡渲染（观测类）═══
-     数据：window.DAJIJIN_REDUCTION（algorithms/fetch_dajijin_reduction.py 直出 data/*.js）。
-     范式与 _fillUsHkMap 逐条对齐（不许特立独行）：
-       ① 无数据 ⇒ 整卡 display:none（不产空壳卡）；
-       ② 600ms×30 自愈轮询补渲（覆盖 defer 脚本加载窗口，否则表现为「卡面永久加载中」）；
-       ③ 卡尾必带「口径 + 来源 + 免责」，可一眼验真；
-       ④ 全部字段 _esc 转义（防 XSS；股票名来自外部源）。
-     配色遵循全站红涨绿跌：减持 = var(--down) 绿、增持 = var(--up) 红。 */
-  window._fillDajijin = function(){
-    try{
-      var card = document.getElementById('dajijinCard');
-      var body = document.getElementById('dajijinBody');
-      if(!card || !body) return;
-      var d = window.DAJIJIN_REDUCTION || null;
-      if(!d || !(d.records && d.records.length)){
-        if(!window.__djjRetryTimer){
-          window.__djjRetryN = 0;
-          window.__djjRetryTimer = setInterval(function(){
-            window.__djjRetryN++;
-            var r2 = window.DAJIJIN_REDUCTION;
-            if(r2 && r2.records && r2.records.length){
-              clearInterval(window.__djjRetryTimer); window.__djjRetryTimer = null; window.__djjRetryN = 0;
-              try{ window._fillDajijin(); }catch(e){}
-            } else if(window.__djjRetryN > 30){
-              clearInterval(window.__djjRetryTimer); window.__djjRetryTimer = null; window.__djjRetryN = 0;
-            }
-          }, 600);
-        }
-        return;
-      }
-      if(window.__djjRetryTimer){ clearInterval(window.__djjRetryTimer); window.__djjRetryTimer = null; window.__djjRetryN = 0; }
-
-      var _esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
-      var _num = function(v, dg){
-        if(v == null || v === '' || isNaN(v)) return '&#8212;';
-        var p = Number(v).toFixed(dg == null ? 2 : dg).split('.');
-        p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        return p.join('.');
-      };
-      var s = d.summary || {}, recs = d.records || [], BY = s.by_holder || {}, h = '';
-
-      /* ── ① 汇总条：主体拆分（一期/二期/三期）+ 合计 ── */
-      h += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 11px;margin-bottom:10px;background:rgba(244,63,94,.05);border:1px solid rgba(244,63,94,.2);border-radius:7px;font-size:12.5px;">';
-      h += '<span style="color:#f43f5e;font-weight:700;">&#x1F3DB; 近 ' + (d.window_days || 120) + ' 日</span>';
-      ['一期', '二期', '三期'].forEach(function(k){
-        if(!BY[k]) return;
-        h += '<span style="color:var(--sub);">' + k + ' <b style="color:var(--txt);">' + BY[k].n + '</b> 笔 / <b style="color:var(--txt);">' + BY[k].codes + '</b> 只 / <b style="color:var(--txt);">' + _num(BY[k].shares) + '</b> 万股</span>';
-      });
-      if(!Object.keys(BY).length) h += '<span style="color:var(--sub);">无记录</span>';
-      h += '<span style="margin-left:auto;color:var(--sub);">减持合计 <b style="color:var(--down);">' + _num(s.reduce_shares) + '</b> 万股 &#183; 涉及 <b style="color:var(--txt);">' + (s.stock_cnt || 0) + '</b> 只</span>';
-      h += '</div>';
-
-      /* ── ② 明细表：公告日倒序（数据端已排好）── */
-      h += '<div style="font-size:11.5px;color:var(--dim);margin-bottom:4px;">按公告日倒序 &#183; 共 ' + recs.length + ' 条 &#183; 「变动」为该次披露的区间累计股数</div>';
-      recs.forEach(function(r){
-        var isCut = String(r.dir || '').indexOf('减') >= 0;
-        var col = isCut ? 'var(--down)' : 'var(--up)';
-        var bgc = isCut ? 'rgba(74,222,128,.15)' : 'rgba(248,113,113),.15)';
-        h += '<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px dashed var(--border);font-size:12.5px;flex-wrap:wrap;">'
-           + '<span style="color:var(--dim);min-width:74px;">' + _esc(r.date) + '</span>'
-           + '<span style="font-weight:700;color:var(--txt);min-width:62px;">' + _esc(r.code) + '</span>'
-           + '<span style="color:var(--txt);min-width:76px;">' + _esc(r.name) + '</span>'
-           + '<span style="font-size:10px;background:rgba(255,255,255,.06);color:var(--sub);padding:1px 6px;border-radius:4px;">' + _esc(r.holder) + '</span>'
-           + '<span style="font-size:10px;background:' + bgc + ';color:' + col + ';padding:1px 6px;border-radius:4px;">' + _esc(r.dir) + '</span>'
-           + '<span style="min-width:96px;text-align:right;color:' + col + ';font-weight:700;">' + _num(r.shares) + ' 万股</span>'
-           + '<span style="min-width:100px;color:var(--sub);">变动后 ' + _num(r.hold_ratio) + '%</span>'
-           + '<span style="color:var(--dim);font-size:11px;">区间 ' + _esc(r.start) + ' ~ ' + _esc(r.end) + '</span>'
-           + '</div>';
-      });
-      if((s.errors || []).length){
-        h += '<div style="font-size:11px;color:#fbbf24;margin-top:6px;">&#x26A0; 部分主体本条抓取失败：'
-           + _esc((s.errors || []).map(function(x){ return x.holder; }).join('、')) + '（已跳过，未静默降级为 0）</div>';
-      }
-
-      /* ── ③ 口径 / 来源 / 免责（每卡必带）── */
-      h += '<div style="font-size:10.5px;color:var(--dim);line-height:1.75;margin-top:12px;border-top:1px dashed var(--border);padding-top:8px;">'
-         + '&#x1F517; <b>口径</b>：' + _esc(d.caliber || '') + '。<br>'
-         + '&#x1F4E1; <b>来源</b>：' + _esc(d.source || '') + '（结构化法定披露，非行情快照）。<br>'
-         + '&#x26A0;&#xFE0F; 金额列未展示（原口径为估算）；<b style="color:#fbbf24;">减持属「公告先于执行」的利空前瞻信号，本卡不构成投资建议，也不代表大基金完整持仓动作（5% 以下减持不公告）。</b></div>';
-
-      body.innerHTML = h;
-      card.style.display = 'block';
-
-      var ot = document.getElementById('djjOneText');
-      if(ot) ot.innerHTML = _esc(s.one_liner || '');
-
-      var fb = document.getElementById('djjFresh');
-      if(fb){
-        var ts = d.update_time || '';
-        if(typeof _uBadge === 'function'){ try{ fb.innerHTML = _uBadge('auto', '盘后', ts); }catch(e2){ fb.textContent = ts; } }
-        else { fb.textContent = ts; }
-      }
-    }catch(e){ console.warn('大基金增减持卡渲染失败', e); }
-  };
+  // 🗑️ 2026-10-28 主人令：_fillDajijin 渲染函数随「大基金 增减持监控」卡一并删除（死代码清理；数据源 DAJIJIN_REDUCTION 仍由投资避雷针消费，v8_dajijin_fetch 定时任务保留）。
 
 
   window._fillSectorLeaders = function(){
@@ -16222,8 +16137,8 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
       // 2026-09-15：__renderAiInsightsCompare 已随卡迁往「🌍 观测平台 > 🌍 宏观观测」，
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
-      var names = ['__renderMorningPlan', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '_fillDajijin', '__renderMarketState', '__renderInvestAvoid', '__renderComprehensiveSynthesis'];
-/* 🧭 2026-10-27 主人令：+L1/L2 市场状态机+仓位引擎；+投资避雷针·新闻语料量化轻量（暂未上架观测类顶部评审） */   /* 🚨 2026-10-23 审计修复：_fillDajijin 此前仅被 _fillUsHkMap 的「US_HK_MAP 首调缺失」异常重试分支调用，正常路径（US_HK_MAP 已就绪）下大基金卡永不渲染（永久「加载中…」/display:none）；现纳入派发器单一真源，每次渲染即触发，自带 600ms×30 自愈。📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
+      var names = ['__renderMorningPlan', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '__renderMarketState', '__renderInvestAvoid', '__renderComprehensiveSynthesis'];
+/* 🧭 2026-10-27 主人令：+L1/L2 市场状态机+仓位引擎；+投资避雷针·新闻语料量化轻量（暂未上架观测类顶部评审） */   /* 🗑 2026-10-28 主人令：大基金增减持监控卡整卡退役（渲染函数/卡壳/派发同批删；与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图）。DAJIJIN_REDUCTION 数据源与 v8_dajijin_fetch 定时任务保留供投资避雷针消费。📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
       var probe = document.getElementById('themeValueBody');
       if(probe) probe.setAttribute('data-ulpane', tab);
       var out = [];
@@ -16352,7 +16267,9 @@ h += '<div id="ulPaneObserve" style="display:block;">'
 h += '<div class="card" id="comprehensiveCard" style="margin-bottom:16px;border-left:4px solid #a78bfa;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">'
    + '<span style="font-size:15px;font-weight:700;color:#a78bfa;">&#x1F9ED; 综合研判</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 盘前/状态/避雷/资金 合并视图（已通过）</span></div>';
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 盘前/状态/避雷/资金 合并视图（已通过）</span>'
+   + '<span id="comprehensiveFresh" style="display:inline-flex;align-items:center;margin-left:auto;">&#x2014;</span>'
+   + '</div>';
 // ── 2026-10-28 主人令：综合解析（不是把卡移到一起，是综合各卡数据给解析结论）──
 h += '<div id="comprehensiveSynthesis" style="margin-bottom:14px;border-left:4px solid #a78bfa;background:rgba(167,139,250,.06);border-radius:0 9px 9px 0;padding:10px 12px;">'
    + '<div style="font-size:13.5px;font-weight:700;color:#a78bfa;margin-bottom:6px;">&#x1F9E0; 综合解析 &#183; 多源信号汇总</div>'
@@ -16360,6 +16277,7 @@ h += '<div id="comprehensiveSynthesis" style="margin-bottom:14px;border-left:4px
    + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 全部结论由规则从下方各卡真实数据自动汇总，<b style="color:#fbbf24">非人工观点、不构成投资建议</b>。</div></div>';
 // ── 今日判定·环境综合（2026-10-28 主人令：自「今日事件」迁入合并；渲染走永久自愈轮询）──
 h += '<div id="judgmentCardHeader"></div>';
+h += '<div style="padding:0 0 8px;"><button id="judgmentToggleBtn" onclick="window.__toggleJudgmentCard()" style="background:transparent;border:1px solid var(--border);color:var(--sub);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;">&#x25BE; 折叠</button></div>';
 h += '<div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 0 6px;"></div>';
 // ── 盘前预案 ──
 h += '<div id="morningPlanCard" style="display:none;margin-bottom:14px;border-left:4px solid #38bdf8;padding-left:10px;">'
@@ -16382,19 +16300,7 @@ h += '<div id="investAvoidCard" style="margin-bottom:14px;border-left:4px solid 
    + '<span id="investAvoidFresh">&#x2014;</span>'
    + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 不要买哪些股（已通过）</span></div>'
    + '<div id="investAvoidBody"><div class="note">加载中&#x2026;</div></div></div>';
-// ── 大基金 增减持监控 ──
-h += '<div id="dajijinCard" style="display:none;margin-bottom:14px;border-left:4px solid #f43f5e;padding-left:10px;">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
-   + '<span style="font-size:15px;font-weight:700;color:#f43f5e;">&#x1F6A8; 大基金 增减持监控</span>'
-   + '<span class="fresh" id="djjFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 法定披露口径（公告先于执行，非实时行情）</span></div>'
-   + '<div style="background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.3);border-radius:7px;padding:9px 11px;margin-bottom:10px;font-size:12.5px;line-height:1.7;color:var(--txt);">'
-   + '&#x1F4E3; <b style="color:#f43f5e;">一句话结论：</b><span id="djjOneText">加载中&#x2026;</span></div>'
-   + '<div style="background:rgba(244,63,94,.05);border:1px solid rgba(244,63,94,.2);border-radius:7px;padding:9px 11px;margin-bottom:10px;font-size:12px;line-height:1.7;color:var(--txt);">'
-   + '<b style="color:#f43f5e;">&#x1F4CC; 核心：</b>把「大基金减持」这类<b>法定披露</b>信号摆到眼前 &#8212;&#8212; 持股 5% 以上股东减持须提前 15 个交易日预披露，属<b>公告先于执行</b>的确定性信息。<br>'
-   + '<b style="color:#f43f5e;">&#x1F4A1; 用法：</b>当<b>风险排查表</b>用 &#8212;&#8212; 持仓若出现在清单里，说明大基金正在退出，需重新评估；<b style="color:#fbbf24;">不是买入信号</b>。<br>'
-   + '<b style="color:#f43f5e;">&#x26A0; 限制：</b>① 只覆盖持股 &#8805;5% 主体的披露义务，<b>5% 以下减持不公告</b>，故本表 &#8800; 大基金全部动作；② 仅按全名匹配三个基金主体，不含华芯投资等 GP；③ 变动股数为<b>区间累计</b>、非单日；④ 金额为估算（变动股数 &#215; 公告日收盘价）。</div>'
-   + '<div id="dajijinBody"><div class="note">加载中&#x2026;</div></div></div>';
+// 🗑️ 2026-10-28 主人令：大基金 增减持监控卡删除（与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图；数据源 DAJIJIN_REDUCTION 保留供投资避雷针消费，v8_dajijin_fetch 定时任务保留）。
 // ── 板块年度主力净流入 ──
 h += '<div id="sectorYearFlowCard" style="display:none;margin-bottom:14px;border-left:4px solid #f97316;padding-left:10px;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
@@ -16484,16 +16390,6 @@ h += '<div class="card" id="usHkMapCard" style="display:none;margin-bottom:16px;
    + '<span class="fresh" id="usHkFresh">&#x2014;</span>'
    + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 隔夜口径（美东收盘，非实时）</span></div>'
    + '<div id="usHkMapBody"><div class="note">加载中&#x2026;</div></div></div>';
-
-// ═══ 🚨 2026-09-23 主人令：大基金 增减持监控（观测类 · 置于「🔭 主题空间 · 概念资金热度」卡上方）═══
-//   需求原话：「做吧，放暂未上架」＋「这卡上方」＋「核心/用法/限制 这套和一句话结论的解析都要跟上」。
-//   数据 window.DAJIJIN_REDUCTION（data/DAJIJIN_REDUCTION.js ← algorithms/fetch_dajijin_reduction.py）。
-//   口径：东方财富数据中心·股东增减持（RPT_SHARE_HOLDER_INCREASE），按**股东全名精确匹配**
-//         国家集成电路产业投资基金（一期/二期/三期）三个主体 —— 模糊 like 在该接口不生效，必须全名等值。
-//   ⚠ 与「国家大基金持股」概念板块（东财按季报十大股东打的 BK 板块标签）是**两回事**：
-//       本卡 = 大基金**自己的买卖动作**（法定披露）；板块资金流 = **市场资金**对该板块的流入。
-//       两者方向可以完全相反（实测：盛科通信 6/8–9/7 被大基金减持 707 万股，同期板块连续大涨）。
-//   无数据 ⇒ 整卡保持 display:none（不产空壳卡）；填充见 window._fillDajijin（600ms×30 自愈轮询）。
 
 // 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡壳已删（原 baihechouBody，
 //   见 git 历史；同批删渲染函数与派发，生产者/自动化一并退役）。
@@ -16699,7 +16595,7 @@ window.__renderInvestAvoid = function(){
   html += '</div>';
   html += '<div style="font-size:13px;font-weight:700;color:#f87171;margin:6px 0 6px;">&#x1F6AB; 个股级避雷（不要买/慎买清单）</div>';
   if(rows.length){
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
+    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">'
     rows.slice(0,30).forEach(function(r){ html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:7px 9px;"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="font-size:13px;font-weight:700;color:var(--txt);">'+esc(r.name)+'</span><span style="font-size:11px;color:var(--sub);">'+esc(r.code||'')+'</span></div><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:3px;"><span style="font-size:11px;color:#f87171;">'+esc(r.type)+'</span><span style="font-size:11px;color:var(--sub);text-align:right;">'+esc(r.info)+'</span></div></div>'; });
     html += '</div>';
     if(rows.length>30) html += '<div style="font-size:11px;color:var(--dim);margin-top:4px;">… 共 '+rows.length+' 只，展示前 30</div>';
@@ -16750,7 +16646,7 @@ window.__renderComprehensiveSynthesis = function(){
     votes.push({n:'情绪状态机', s: MS.score>=60?'up': MS.score<45?'dn':'nt', d: '情绪分 '+MS.score+'（'+esc(MS.verdict)+'）'});
     votes.push({n:'仓位引擎', s: MS.pos>=65?'up': MS.pos<40?'dn':'nt', d: '中枢 '+MS.pos+'% · '+esc(MS.posLabel)});
   }
-  votes.push({n:'环境风险', s: RG_ov==='green'?'up': RG_ov==='red'?'dn':'nt', d: (RG_ov==='red'?'红灯':RG_ov==='yellow'?'黄灯':'绿灯')+(crisis!=null?(' · 危机分'+crisis):'')});
+  votes.push({n:'环境风险', s: RG_ov==='green'?'up': RG_ov==='red'?'dn':'nt', light: RG_ov, d: (RG_ov==='red'?'红灯':RG_ov==='yellow'?'黄灯':'绿灯')+(crisis!=null?(' · 危机分'+crisis):'')});
   var avoidN = djjN + suspN;
   votes.push({n:'个股避雷', s: avoidN===0?'up': avoidN>=10?'dn':'nt', d: avoidN+' 只预警（减持'+djjN+'+停牌'+suspN+'）'});
   var strongTop=[], yrIn=null, yrOut=null;
@@ -16779,8 +16675,16 @@ window.__renderComprehensiveSynthesis = function(){
   html += '<div style="background:'+cc+'14;border:1px solid '+cc+'40;border-radius:8px;padding:9px 12px;margin-bottom:10px;font-size:13.5px;font-weight:700;color:'+cc+';">结论：'+esc(concl)+'</div>';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:8px;">';
   votes.forEach(function(v){
-    var col = v.s==='up'?UP: v.s==='dn'?DN:NT;
-    var dot = v.s==='up'?'&#x1F534;': v.s==='dn'?'&#x1F7E2;':'&#x1F7E1;';
+    var col, dot;
+    if(v.light){
+      // 🛡 2026-10-28 主人令修复：环境风险走「风险灯」语义（红灯=红/黄灯=黄/绿灯=绿），
+      //   不复用多空红绿，否则红灯环境却显示绿点、文字写「红灯」自相矛盾。
+      col = v.light==='red'?'#f87171': v.light==='yellow'?'#fbbf24':'#4ade80';
+      dot = v.light==='red'?'&#x1F534;': v.light==='yellow'?'&#x1F7E1;':'&#x1F7E2;';
+    } else {
+      col = v.s==='up'?UP: v.s==='dn'?DN:NT;
+      dot = v.s==='up'?'&#x1F534;': v.s==='dn'?'&#x1F7E2;':'&#x1F7E1;';
+    }
     html += '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:7px 9px;">'
            + '<div style="font-size:11.5px;color:'+col+';font-weight:700;">'+dot+' '+esc(v.n)+'</div>'
            + '<div style="font-size:11.5px;color:var(--txt);margin-top:2px;">'+v.d+'</div></div>';
@@ -16795,6 +16699,20 @@ window.__renderComprehensiveSynthesis = function(){
   if(yrOut && yrOut.length) pts.push('年线资金净流出：'+yrOut.map(function(s){return esc(s.name)+Number(s.cur).toFixed(0)+'亿';}).join('、'));
   if(MS && MS.adjReason && MS.adjReason.length) pts.push('仓位调整：'+MS.adjReason.map(esc).join('；'));
   if(pts.length) html += '<div style="font-size:12px;line-height:1.8;color:var(--txt);">'+pts.map(function(x){return '&#183; '+x;}).join('<br>')+'</div>';
+  // 🆕 2026-10-28 主人令：综合研判卡头「更新于」胶囊（统一版式）取各源最新时点，pageSlot 盘后
+  try{
+    var _cf = document.getElementById('comprehensiveFresh');
+    if(_cf){
+      var _tsc = [];
+      if(JD && JD.update_time) _tsc.push(JD.update_time);
+      if(IA && IA.update_time) _tsc.push(IA.update_time);
+      if(MP && MP.update_time) _tsc.push(MP.update_time);
+      if(SYF && SYF.update_time) _tsc.push(SYF.update_time);
+      var _cts = _tsc.slice().sort().reverse()[0] || '';
+      if(_cts && typeof _uBadge === 'function'){ _cf.innerHTML = _uBadge('auto','',_cts,'','盘后'); }
+      else { _cf.innerHTML = '&#x2014;'; }
+    }
+  }catch(e){}
   host.innerHTML = html;
 };
 
