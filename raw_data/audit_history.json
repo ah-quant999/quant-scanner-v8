@@ -3831,5 +3831,48 @@
     "message": "BACKTEST_TDX.js 更新于 4天前 21:18；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
+ },
+ {
+  "date": "2026-10-29",
+  "time": "03:46:34",
+  "tz": "Asia/Shanghai",
+  "overall": "fail",
+  "summary": {
+   "ok": 117,
+   "warn": 0,
+   "fail": 5,
+   "limited": 0,
+   "info": 0,
+   "other": 0,
+   "total": 122
+  },
+  "warn_items": [],
+  "fail_items": [
+   {
+    "id": "all_BACKTEST_COMPREHENSIVE",
+    "name": "BACKTEST_COMPREHENSIVE",
+    "message": "BACKTEST_COMPREHENSIVE.js 更新于 5天前 21:18；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_BACKTEST_TDX",
+    "name": "BACKTEST_TDX",
+    "message": "BACKTEST_TDX.js 更新于 5天前 21:18；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_HUIJIN_HOLDINGS",
+    "name": "HUIJIN_HOLDINGS",
+    "message": "HUIJIN_HOLDINGS.js 更新于 2天前 23:13；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_RESONANCE_TRACK",
+    "name": "RESONANCE_TRACK",
+    "message": "RESONANCE_TRACK.js 更新于 2天前 19:12；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_US_HK_MAP",
+    "name": "US_HK_MAP",
+    "message": "US_HK_MAP.js 更新于 2天前 13:06；超过通用红线 1620 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
