@@ -123,7 +123,7 @@ window.__domReadyFns=[];
     <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=68f4765c9e" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=0859e60cd8" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
-    <script src="data/SUSPENSION_ALERT.js?v=3f27a8ad70" defer></script>
+    <script src="data/SUSPENSION_ALERT.js?v=fd6254aac8" defer></script>
     <script src="data/GOLD_POOL.js?v=a95458f764" defer></script>
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_PROFILE 不再单独下载（1.4MB 与 STOCK_LIST 100% 重复），由 STOCK_LIST 合成 -->
@@ -133,7 +133,7 @@ window.__domReadyFns=[];
     <script src="data/MARKET_THERMO.js?v=621f0cbbe1" defer></script>
     <script src="data/MACRO_BRIEF.js?v=ad21ac6456" defer></script>
     <!-- 🗑 2026-09-30 主人令：「宏观景气背景 · K 型分层」整卡退役（巡检自动化已消亡、09-23 后死数据；生产者/渲染/派发/时窗一并清理，见 git 历史） -->
-    <script src="data/NT_DATA.js?v=4455d19e65" defer></script>
+    <script src="data/NT_DATA.js?v=97e1b5d778" defer></script>
 <script src="data/LHB_DATA.js?v=16ca7aaddb" defer></script>
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
@@ -185,12 +185,12 @@ window.__domReadyFns=[];
          后端 update_v8.py::_emit_freshness_status_js() 每次 build 都生成 data/FRESHNESS_STATUS.js，
          前端 renderTaskSchedule()（L10793）与 logic.html 同函数真读 window.FRESHNESS_STATUS.check_time
          作时间候选，但此前从未注入 ⇒ 后端产了、前端永远拿不到。 -->
-    <script src="data/FRESHNESS_STATUS.js?v=1189e60ced" defer></script>
+    <script src="data/FRESHNESS_STATUS.js?v=0753af47b3" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=ef180bfd40" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
-    <script src="data/SECTOR_LEADERS.js?v=472daf7861" defer></script><!-- 🆕 板块龙头领涨（SECTOR_LEADERS）观测卡数据源（保留功能） -->
+    <script src="data/SECTOR_LEADERS.js?v=485febe29a" defer></script><!-- 🆕 板块龙头领涨（SECTOR_LEADERS）观测卡数据源（保留功能） -->
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
     <script src="data/PORTFOLIO.js?v=9f09142274" defer></script>
     <script>
@@ -1269,7 +1269,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SECTOR_PHASE_HISTORY.js?v=b337452461" defer></script>
 <script src="data/INST_TRADE.js?v=eeea4afe8c" defer></script>
 <script src="data/NORTH_FUND.js?v=322cd5505a" defer></script>
-<script src="data/MARKET_ALERTS.js?v=cc31e9f7b1" defer></script>
+<script src="data/MARKET_ALERTS.js?v=fc0434823a" defer></script>
 <script src="data/MARKET_FUND_FLOW_DATA.js?v=7c996d5f49" defer></script>
 <script src="data/LIMIT_UP_HEATMAP.js?v=887eb4cec5" defer></script>
 <!-- 📚 2026-09-16 主人令「放宽，用于累积」：板块周期档案（累积型重要数据，禁止误删）
@@ -1320,8 +1320,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=6bddd8e887" defer></script>
 <script src="data/HB_XIAOJIU.js?v=060bfbd617" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=1abb5bdaba" defer></script>
-<script src="data/HEALTH_CHECK.js?v=9028934ebe" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=61d2946c56" defer></script>
+<script src="data/HEALTH_CHECK.js?v=9410617ca6" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=f08695ca33" defer></script>
     <!-- 2026-09-07 / 2026-09-13 主人令：中信 PE 极值温度计 + PE<10 历史回测 合并为「中信 PE 观测」卡（暂未上架·观测指标） -->
     <script src="data/CITIC_PE_THERMO.js?v=ac7effb44a" defer></script>
@@ -15465,7 +15465,7 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
    注入行 ⇒ window.SECTOR_LEADERS 恒 undefined、整块恒不渲染（死块）。本版三项全治：
      ① 生成器 scripts/fetch_sector_leaders.py 扩 主升+启动（板块带 phase 字段）；
      ② 独立卡置于「概念/行业 → ETF·龙头 参考」卡上方（#sectorLeadersCard）；
-     ③ index.html 补 <script src="data/SECTOR_LEADERS.js?v=472daf7861"> 注入。
+     ③ index.html 补 <script src="data/SECTOR_LEADERS.js?v=485febe29a"> 注入。
    口径：主升=5日>3%且20日>5%；启动=5日>1.5%且20日>-8%（与「板块资金趋势」卡/生成器 _phase_of 三处同规则）。
    ⚠️ 护栏：无数据 ⇒ 卡保持 display:none（不产出空壳卡）；body.innerHTML 幂等重渲（重复调用不叠加）。 */
   /* ═══ 🌙 2026-09-19 主人令：隔夜美股强势 → A股/港股 映射 · 填充函数 ═══
@@ -19867,7 +19867,7 @@ window.__renderV8CalToday();
   }
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=beb84d6fba', fallbacks:[A2_CDN+'STOCK_LIST.js']},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=31175966d8', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=644f6aa9cf', fallbacks:[A2_CDN+'STOCK_QUOTE.js']},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=f20ab3337a', fallbacks:[A2_CDN+'LHB_HISTORY.js']}
   ];
   function loadOne(item, done){
