@@ -2265,12 +2265,6 @@ window.STRATEGY_WALKFORWARD = {
       <h3><span class="ic">📈</span>今日业绩预告 · <span class="fresh" id="todayEventForecastTime">—</span></h3>
       <div id="todayEventForecastBody" style="font-size:13px;color:var(--txt);">加载中…</div>
     </div>
-
-    <!-- ⚖️ 今日判定 · 环境综合（2026-08-07 迁回今日事件，置于打新上方） -->
-    <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;opacity:0.95;">
-      <div id="judgmentCardHeader"></div>
-      <div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 14px 12px;"></div>
-    </div>
     <script>
     /* 注册渲染函数：v8CardHeader 与 _buildJudgmentEnvHTML 定义在后面脚本块，
        此处只注册、不执行，由末尾 initCardBadges / switchSec-td 统一触发。 */
@@ -16354,31 +16348,61 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
 //   2026-09-16 主人令：「🌐 新周期判定」恢复至本页最下方，并接入现有数据源（雪球 @白河愁博士 ⇒ window.BAIHECHOU_MACRO），
 //     同批开启盘前日频更新解析（工作日盘前 06:30 主跑、08:30 幂等兜底，由本机自动化完成抓原文与 AI 出稿）。原卡为静态快照死卡，详见 R3/R4 注释。
 //   概念ETF龙头参考
-h += '<div id="ulPaneObserve" style="display:block;">';
-// 🧭 2026-10-28 主人令：两卡「一行2列」并排（L1/L2 市场状态机+仓位引擎 ｜ 投资避雷针），去「评审中」标为「已通过」
-h += '<div class="card" id="marketStateCard" style="margin-bottom:16px;border-left:4px solid #60a5fa;">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
-   + '<span style="font-size:15px;font-weight:700;color:#60a5fa;">&#x1F9ED; L1 市场状态机 &#183; L2 仓位引擎</span>'
-   + '<span id="marketStateFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 情绪分+仓位建议（已通过）</span></div>'
-   + '<div id="marketStateBody"><div class="note">加载中&#x2026;</div></div></div>'
-h += '<div class="card" id="investAvoidCard" style="margin-bottom:16px;border-left:4px solid #f87171;">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
-   + '<span style="font-size:15px;font-weight:700;color:#f87171;">&#x1F6AB; 投资避雷针 &#183; 新闻语料量化（轻量）</span>'
-   + '<span id="investAvoidFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 不要买哪些股（已通过）</span></div>'
-   + '<div id="investAvoidBody"><div class="note">加载中&#x2026;</div></div></div>'
-
-// ═══ 📋 2026-10-21 主人令：「这个新卡啊，我让你放暂未上架顶部」——盘前预案（观测类首卡·置顶）═══
-//   数据 window.MORNING_PLAN（data/MORNING_PLAN.js ← v8/gen_morning_plan.py，工作日 07:50 派发；
-//   2026-10-21 19:16 首跑真实数据）。色条矩阵 + 大盘预判/主线策略 两栏，全规则生成。
-//   无数据 ⇒ 整卡保持 display:none（不产空壳卡）；填充见 window.__renderMorningPlan（600ms×30 自愈）。
-h += '<div class="card" id="morningPlanCard" style="display:none;margin-bottom:16px;border-left:4px solid #38bdf8;">'
+h += '<div id="ulPaneObserve" style="display:block;">'
+h += '<div class="card" id="comprehensiveCard" style="margin-bottom:16px;border-left:4px solid #a78bfa;">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">'
+   + '<span style="font-size:15px;font-weight:700;color:#a78bfa;">&#x1F9ED; 综合研判</span>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 盘前/状态/避雷/资金 合并视图（已通过）</span></div>';
+// ── 今日判定·环境综合（2026-10-28 主人令：自「今日事件」迁入合并；渲染走永久自愈轮询）──
+h += '<div id="judgmentCardHeader"></div>';
+h += '<div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 0 6px;"></div>';
+// ── 盘前预案 ──
+h += '<div id="morningPlanCard" style="display:none;margin-bottom:14px;border-left:4px solid #38bdf8;padding-left:10px;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#38bdf8;">&#x1F4CB; 盘前预案</span>'
    + '<span id="morningPlanFresh" style="display:inline-flex;align-items:center;">&#x2014;</span></div>'
    + '<div id="morningPlanBody"><div class="note">加载中&#x2026;</div></div>'
    + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 全部条目由规则从真实数据自动生成，<b style="color:#fbbf24">非人工观点、不构成投资建议</b>。</div></div>';
+// ── L1/L2 市场状态机+仓位引擎 ──
+h += '<div id="marketStateCard" style="margin-bottom:14px;border-left:4px solid #60a5fa;padding-left:10px;">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+   + '<span style="font-size:15px;font-weight:700;color:#60a5fa;">&#x1F9ED; L1 市场状态机 &#183; L2 仓位引擎</span>'
+   + '<span id="marketStateFresh">&#x2014;</span>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 情绪分+仓位建议（已通过）</span></div>'
+   + '<div id="marketStateBody"><div class="note">加载中&#x2026;</div></div></div>';
+// ── 投资避雷针 ──
+h += '<div id="investAvoidCard" style="margin-bottom:14px;border-left:4px solid #f87171;padding-left:10px;">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+   + '<span style="font-size:15px;font-weight:700;color:#f87171;">&#x1F6AB; 投资避雷针 &#183; 新闻语料量化（轻量）</span>'
+   + '<span id="investAvoidFresh">&#x2014;</span>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 不要买哪些股（已通过）</span></div>'
+   + '<div id="investAvoidBody"><div class="note">加载中&#x2026;</div></div></div>';
+// ── 大基金 增减持监控 ──
+h += '<div id="dajijinCard" style="display:none;margin-bottom:14px;border-left:4px solid #f43f5e;padding-left:10px;">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+   + '<span style="font-size:15px;font-weight:700;color:#f43f5e;">&#x1F6A8; 大基金 增减持监控</span>'
+   + '<span class="fresh" id="djjFresh">&#x2014;</span>'
+   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 法定披露口径（公告先于执行，非实时行情）</span></div>'
+   + '<div style="background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.3);border-radius:7px;padding:9px 11px;margin-bottom:10px;font-size:12.5px;line-height:1.7;color:var(--txt);">'
+   + '&#x1F4E3; <b style="color:#f43f5e;">一句话结论：</b><span id="djjOneText">加载中&#x2026;</span></div>'
+   + '<div style="background:rgba(244,63,94,.05);border:1px solid rgba(244,63,94,.2);border-radius:7px;padding:9px 11px;margin-bottom:10px;font-size:12px;line-height:1.7;color:var(--txt);">'
+   + '<b style="color:#f43f5e;">&#x1F4CC; 核心：</b>把「大基金减持」这类<b>法定披露</b>信号摆到眼前 &#8212;&#8212; 持股 5% 以上股东减持须提前 15 个交易日预披露，属<b>公告先于执行</b>的确定性信息。<br>'
+   + '<b style="color:#f43f5e;">&#x1F4A1; 用法：</b>当<b>风险排查表</b>用 &#8212;&#8212; 持仓若出现在清单里，说明大基金正在退出，需重新评估；<b style="color:#fbbf24;">不是买入信号</b>。<br>'
+   + '<b style="color:#f43f5e;">&#x26A0; 限制：</b>① 只覆盖持股 &#8805;5% 主体的披露义务，<b>5% 以下减持不公告</b>，故本表 &#8800; 大基金全部动作；② 仅按全名匹配三个基金主体，不含华芯投资等 GP；③ 变动股数为<b>区间累计</b>、非单日；④ 金额为估算（变动股数 &#215; 公告日收盘价）。</div>'
+   + '<div id="dajijinBody"><div class="note">加载中&#x2026;</div></div></div>';
+// ── 板块年度主力净流入 ──
+h += '<div id="sectorYearFlowCard" style="display:none;margin-bottom:14px;border-left:4px solid #f97316;padding-left:10px;">'
+   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
+   + '<span style="font-size:15px;font-weight:700;color:#f97316;">&#x1F3D4; 板块年度主力净流入</span>'
+   + '<span id="sectorYearFlowTime" style="display:inline-flex;align-items:center;">&#x2014;</span></div>'
+   + '<div id="sectorYearFlowBody"><div class="note">加载中&#x2026;</div></div></div>';
+h += '</div>'; // /comprehensiveCard;
+// 🧭 2026-10-28 主人令：两卡「一行2列」并排（L1/L2 市场状态机+仓位引擎 ｜ 投资避雷针），去「评审中」标为「已通过」
+
+// ═══ 📋 2026-10-21 主人令：「这个新卡啊，我让你放暂未上架顶部」——盘前预案（观测类首卡·置顶）═══
+//   数据 window.MORNING_PLAN（data/MORNING_PLAN.js ← v8/gen_morning_plan.py，工作日 07:50 派发；
+//   2026-10-21 19:16 首跑真实数据）。色条矩阵 + 大盘预判/主线策略 两栏，全规则生成。
+//   无数据 ⇒ 整卡保持 display:none（不产空壳卡）；填充见 window.__renderMorningPlan（600ms×30 自愈）。
 // ═══ 🏛️ 2026-10-21 主人令：「国家队活跃度」复合信号卡（暂未上架·盘前预案之后）═══
 //   数据 window.NATIONAL_TEAM（data/NATIONAL_TEAM.js ← v8/gen_national_team.py，工作日 20:50 盘后派发）。
 //   3 子信号加权代理推算（宽基ETF净申购/大金融RS/大金融资金流），缺失项权重按比例重分；
@@ -16465,18 +16489,6 @@ h += '<div class="card" id="usHkMapCard" style="display:none;margin-bottom:16px;
 //       本卡 = 大基金**自己的买卖动作**（法定披露）；板块资金流 = **市场资金**对该板块的流入。
 //       两者方向可以完全相反（实测：盛科通信 6/8–9/7 被大基金减持 707 万股，同期板块连续大涨）。
 //   无数据 ⇒ 整卡保持 display:none（不产空壳卡）；填充见 window._fillDajijin（600ms×30 自愈轮询）。
-h += '<div class="card" id="dajijinCard" style="display:none;margin-bottom:16px;border-left:4px solid #f43f5e;">'
-   + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
-   + '<span style="font-size:15px;font-weight:700;color:#f43f5e;">&#x1F6A8; 大基金 增减持监控</span>'
-   + '<span class="fresh" id="djjFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 法定披露口径（公告先于执行，非实时行情）</span></div>'
-   + '<div style="background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.3);border-radius:7px;padding:9px 11px;margin-bottom:10px;font-size:12.5px;line-height:1.7;color:var(--txt);">'
-   + '&#x1F4E3; <b style="color:#f43f5e;">一句话结论：</b><span id="djjOneText">加载中&#x2026;</span></div>'
-   + '<div style="background:rgba(244,63,94,.05);border:1px solid rgba(244,63,94,.2);border-radius:7px;padding:9px 11px;margin-bottom:10px;font-size:12px;line-height:1.7;color:var(--txt);">'
-   + '<b style="color:#f43f5e;">&#x1F4CC; 核心：</b>把「大基金减持」这类<b>法定披露</b>信号摆到眼前 &#8212;&#8212; 持股 5% 以上股东减持须提前 15 个交易日预披露，属<b>公告先于执行</b>的确定性信息。<br>'
-   + '<b style="color:#f43f5e;">&#x1F4A1; 用法：</b>当<b>风险排查表</b>用 &#8212;&#8212; 持仓若出现在清单里，说明大基金正在退出，需重新评估；<b style="color:#fbbf24;">不是买入信号</b>。<br>'
-   + '<b style="color:#f43f5e;">&#x26A0; 限制：</b>① 只覆盖持股 &#8805;5% 主体的披露义务，<b>5% 以下减持不公告</b>，故本表 &#8800; 大基金全部动作；② 仅按全名匹配三个基金主体，不含华芯投资等 GP；③ 变动股数为<b>区间累计</b>、非单日；④ 金额为估算（变动股数 &#215; 公告日收盘价）。</div>'
-   + '<div id="dajijinBody"><div class="note">加载中&#x2026;</div></div></div>';
 
 // 🗑 2026-09-22 主人令：「🌐 新周期判定 · 海外宏观 + AI 大周期」卡壳已删（原 baihechouBody，
 //   见 git 历史；同批删渲染函数与派发，生产者/自动化一并退役）。
@@ -16494,11 +16506,6 @@ h += '<div class="card" id="dajijinCard" style="display:none;margin-bottom:16px;
   //        红=净流入、绿=净流出（全站红涨绿跌铁律）。盘后更新。
   //   容器 id（sectorYearFlowBody/sectorYearFlowTime）与渲染函数 renderSectorYearFlow 未变仅换宿主；
   //   无数据 ⇒ 整卡保持 display:none（不产空壳卡）；填充见 window._fillSectorYearFlow（600ms×30 自愈）。
-  h += '<div class="card" id="sectorYearFlowCard" style="display:none;margin-bottom:16px;border-left:4px solid #f97316;">'
-     + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
-     + '<span style="font-size:15px;font-weight:700;color:#f97316;">&#x1F3D4; 板块年度主力净流入</span>'
-     + '<span id="sectorYearFlowTime" style="display:inline-flex;align-items:center;">&#x2014;</span></div>'
-     + '<div id="sectorYearFlowBody"><div class="note">加载中&#x2026;</div></div></div>';
 h += '</div>'; // /ulPaneObserve
 
 // ===== 📊 大盘观察 pane —— 🚚 2026-09-15 主人令：整页迁出 =====
