@@ -260,7 +260,26 @@ def tdx_kline(code, setcode, period="4", count=TDX_BARS):  # 2026-09-13：默认
         except:
             pass
     
-    # 用 baostock 作主数据源（云端/本地都能跑，比MCP可靠）
+    # 🛡 2026-10-28 根治：云端零网络取数。优先读已推送 raw_data/kline_cache（≥640 根），
+    #   云端 runner 无稳定外网时不再依赖 baostock 实时拉取（每支 25s 超时 → 全量超 1800s
+    #   被监督器静默杀 → 产物冻结）。V8_NO_NET=1（云端注入）时**只用缓存**；本地机仍允许 baostock 补刷新。
+    try:
+        _kc = os.path.join(DATA_DIR, "kline_cache", "%s.json" % code)
+        if os.path.exists(_kc):
+            _kr = json.load(open(_kc, encoding="utf-8"))
+            if isinstance(_kr, list) and len(_kr) >= 30:
+                return [{"date": r["date"], "open": float(r.get("open", 0)),
+                         "close": float(r["close"]), "high": float(r.get("high", r["close"])),
+                         "low": float(r.get("low", r["close"])), "volume": float(r.get("volume", 0)),
+                         "amount": float(r.get("amount", float(r["close"]) * float(r.get("volume", 0)) * 100))}
+                        for r in _kr if r.get("date")]
+    except Exception:
+        pass
+
+    if os.environ.get("V8_NO_NET"):
+        return None  # 云端：缓存未命中即放弃，绝不走网络（防超时冻结）
+
+    # 用 baostock 作主数据源（本地机刷新 / 缓存补缺；云端已禁用）
     # 通达信MCP在自动化环境可能不可用，baostock是Pypi包，已安装
     from fetch_source import socket_timeout, SOURCE_BREAKER
     if SOURCE_BREAKER.is_open("baostock"):

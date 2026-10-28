@@ -26,7 +26,11 @@ import json
 import glob
 import datetime as dt
 
-REPO = os.environ.get("V8_ROOT") or r"E:/qs_workspaces/quant-scanner-v8"
+# 🛡 2026-10-28 根治：原硬编码 r"E:/qs_workspaces/quant-scanner-v8" —— 云端 runner 仓库 checkout 路径
+#   并非此 Windows 路径、且 V8_ROOT 未注入 ⇒ 脚本跑到不存在的路径、找不到 history/ 快照、
+#   返回 1 被上层 `|| echo` 静默吞掉 ⇒ FINAL_RECOMMEND_HISTORY 自生成以来永久冻结。
+#   改为从 __file__ 推导仓库根，任何 checkout/CWD 都能正确定位（云端零网络、纯本地汇总，无需联网）。
+REPO = os.environ.get("V8_ROOT") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(REPO, "raw_data")
 DATA = os.path.join(REPO, "data")
 HIST = os.path.join(RAW, "history")
@@ -116,8 +120,15 @@ def main():
         days = days[len(days) - KEEP_DAYS:]
     _log("归因日 %d 天：%s → %s（保留最近 %d 天）" % (len(days), days[0], days[-1], KEEP_DAYS))
 
+    _now = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     out = {
-        "generated": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "generated": _now,
+        # 🛡 2026-10-28 根治：顶层补 update_time = 生成时间（与 generated 同值）。
+        #   原脚本顶层只有 generated、无 update_time，而 v8_health_check 对 FINAL_RECOMMEND_HISTORY
+        #   的 key_fields=["update_time"] 优先读顶层 update_time；缺失时回落 generated 虽也能判新鲜，
+        #   但 by_date 内层也有 update_time（归因日快照时间，最早 2026-09-03）易引发歧义与误判。
+        #   显式置顶层 update_time=生成时间，与 key_fields 语义严格对齐，杜绝「生成了却仍判红」。
+        "update_time": _now,
         "card": "最终推荐 · 每日 Top3 历史",
         "method": "真实每日选股 dated 快照汇总（raw_data/history/final_recommend_YYYYMMDD.json）",
         "attribution_rule": "update_time 小时 < 9 归前一自然日；同一归因日多份归档只认最新",

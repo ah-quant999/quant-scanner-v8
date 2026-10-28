@@ -60,6 +60,9 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     # 🆕 2026-10-22 K线新鲜度修复：串行限速抓取，实测约 0.8~1.2s/只 × 陈旧票数，
     #   显式预算 2400s（40min）足够覆盖常规增量；超时则本步被跳过（不影响后续因子）。
     "refresh_kline_freshness.py": 2400,
+    # 🛡 2026-10-28 E批缓存新鲜度：金股池并集 kline_cache 升级/日常刷新（800根，幂等跳过），
+    #   日常全 skip 秒级过；周末/节后/池子扩容时全量补抓 ~19min，预算 2400s 覆盖。
+    "scripts/fetch_multiyear_kline.py": 2400,
     "factor_lab_backtest.py": 1800,  # 🆕 700日长历史抓取+五分位分层回测（cn ~5min / 云端 ~15min）
     # 🔴 2026-10-18 主人令「直接上线」：H 反推两条摘链——前端注入 2026-10-06 已全面摘除
     #   （H_AUTO_BUY/H_AUTO_BUY_TRACK 零消费），仍每日跑+巡检=纯浪费。脚本同批删除。
@@ -210,6 +213,10 @@ ORDER = [
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "gen_stock_winrate.py",            # 🔴 2026-10-23 主人令·嵌入因子榜：读 raw_data/history 真实信号流 + kline_cache 复算个股历史胜率/期望 → data/STOCK_WINRATE.js（generate_top10 嵌入因子用）；须在 generate_top10 之前（与 STAGES["B"] 成对）
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
+    # 🛡 2026-10-28 E批缓存新鲜度（与 STAGES["E"] 成对）：kline_cache 是云端 V8_NO_NET 下
+    #   backtest_tdx/backtest_comprehensive/factor_lab/factor_walkforward 的唯一 K 线水源，
+    #   必须在回测前刷新到 800 根且 ≤4 天新鲜，否则回测永远吃陈旧缓存。
+    "scripts/fetch_multiyear_kline.py",
     # 🛡 2026-08-29 主人令：A/B 对照（金股池/候选池/全市场同一信号收益），每日累积信号、T+N 后回填收益。
     "backtest_tdx.py",                 # 读 gold_pool 输入
     "backtest_comprehensive.py",       # 读 raw_data/history/top10_daily_YYYYMMDD.json（必须在 generate_top10 之后）
@@ -451,6 +458,9 @@ STAGES = {
     #   现改为 A(16:40 采集) → B(18:10 选股) → D(20:00 汇总·最终推荐上线) → E(21:00 回测)。
     #   键名 C 退役；回测批内容原样迁入 E，另收编 strategy_four_volume.py（回测模式，SCRIPT_ENV 注入）。
     "E": [  # 回测批（~21:00 CST，最终推荐上线后）：backtest 全家 + 因子实验室分层回测（生成器已前置到 B 批）
+        # 🛡 2026-10-28 E批缓存新鲜度（与 ORDER 成对）：云端 V8_NO_NET 下回测唯一水源是
+        #   raw_data/kline_cache，本步前置把金股池并集刷到 ≥800 根且 ≤4 天新鲜（幂等，日常秒级跳过）。
+        "scripts/fetch_multiyear_kline.py",
         "backtest_tdx.py", "backtest_comprehensive.py",
         "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
 

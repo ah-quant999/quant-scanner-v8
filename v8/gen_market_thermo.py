@@ -84,7 +84,7 @@ def build_D():
     ma200 = eq_m.rolling(12).mean()
 
     # 上证月K（gtimg，340个月覆盖 1996~）
-    j = _http_json("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,month,,,340,qfq")
+    j = _http_json("https://ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,month,,,340,qfq")
     node = j["data"]["sh000001"]
     k = node.get("qfqmonth") or node.get("month")
     sh_by_month = {}
@@ -190,7 +190,7 @@ def ext_bond_erp(prev):
 
 def ext_turnover(prev):
     try:
-        j = _http_json("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,day,,,260,qfq")
+        j = _http_json("https://ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,day,,,260,qfq")
         node = j["data"]["sh000001"]
         k = node.get("qfqday") or node.get("day")
         vols = [float(r[5]) for r in k]

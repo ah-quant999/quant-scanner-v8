@@ -89,6 +89,35 @@ def log(msg):
     print(msg, flush=True)
 
 
+def _kline_cache_rows(code, start, end):
+    """🛡 2026-10-28 根治：云端零网络取数。读已推送 raw_data/kline_cache（≥640 根），
+    返回与 baostock 同形的 list-of-lists [date,open,high,low,close,volume]，按 [start,end] 裁剪；
+    不足或缺失返回 None（交本地 baostock 补缺）。云端 V8_NO_NET=1 时不补缺 ⇒ 直接返回 None。"""
+    try:
+        _kc = os.path.join(BASE, "..", "raw_data", "kline_cache", "%s.json" % code)
+        if not os.path.exists(_kc):
+            return None
+        _kr = json.load(open(_kc, encoding="utf-8"))
+        if not isinstance(_kr, list) or len(_kr) < 60:
+            return None
+        _rows = []
+        for r in _kr:
+            d = str(r.get("date") or "")
+            if not d:
+                continue
+            if d < start or d > end:
+                continue
+            try:
+                _rows.append([d, float(r.get("open", 0)), float(r.get("high", r.get("close"))),
+                              float(r.get("low", r.get("close"))), float(r.get("close")),
+                              float(r.get("volume", 0))])
+            except Exception:
+                continue
+        return _rows if _rows else None
+    except Exception:
+        return None
+
+
 def load_json(path: str, default=None):
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -285,16 +314,22 @@ def calc_multi_hold(entry_date: str, entry_price: float, bsc: str, board: str = 
     start = (entry_dt - timedelta(days=LOOKBACK_DAYS)).strftime("%Y-%m-%d")
     end = (entry_dt + timedelta(days=LOOKAHEAD_DAYS)).strftime("%Y-%m-%d")
 
-    rs = bs.query_history_k_data_plus(
-        bsc, fields="date,open,high,low,close,volume",
-        start_date=start, end_date=end,
-        frequency="d", adjustflag="2"
-    )
-    rows = []
-    while (rs.error_code == "0") and rs.next():
-        rows.append(rs.get_row_data())
+    # 🛡 2026-10-28 根治：云端零网络取数。优先读已推送 kline_cache；V8_NO_NET=1（云端注入）时
+    #   缓存未命中即放弃，绝不走 baostock（每信号 25s 超时 → 全量超 1800s 被监督器静默杀 → 产物冻结）。
+    rows = _kline_cache_rows(code, start, end)
     if not rows:
-        return None
+        if os.environ.get("V8_NO_NET"):
+            return None
+        rs = bs.query_history_k_data_plus(
+            bsc, fields="date,open,high,low,close,volume",
+            start_date=start, end_date=end,
+            frequency="d", adjustflag="2"
+        )
+        rows = []
+        while (rs.error_code == "0") and rs.next():
+            rows.append(rs.get_row_data())
+        if not rows:
+            return None
 
     # 🔴 2026-09-13 主人令「统一测算标准 · 用最科学的计算」（小九周末审计 P1-1）：
     #   入场 = 信号日**次一交易日开盘**。原取「<= entry_date 的最后一条」= 信号日本身、

@@ -1990,7 +1990,8 @@ def fetch_hk_daily(code, bars=None):
     # 源3: QQ/腾讯财付通 (最终抢救)
     # 2026-09-11 域名级故障转移：web.ifzq 本机 501（域名级拦截）→ proxy 域同构 API 兜底
     r = None
-    for _tx_host in ("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
+    for _tx_host in ("https://ifzq.gtimg.cn/appstock/app/fqkline/get",
+                     "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
                      "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/fqkline/get"):
         try:
             r = requests.get(_tx_host, params={"param": f"hk{code},day,,,{bars},qfq"}, timeout=10)

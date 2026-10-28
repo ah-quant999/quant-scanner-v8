@@ -75,7 +75,9 @@ def _sb_kline_gtimg(code, n):
     s = _sb_sym(code)
     d = None
     _err = None
-    for _host in ("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
+    # 🛡 2026-10-28 根治：web.ifzq 子域恒 501 → 主域 ifzq.gtimg.cn 提到首位
+    for _host in ("https://ifzq.gtimg.cn/appstock/app/fqkline/get",
+                  "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
                   "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/fqkline/get"):
         try:
             req = urllib.request.Request(f"{_host}?param={s},day,,,{n},qfq", headers=_SB_UA)
@@ -263,9 +265,13 @@ def _load_klines(codes, workers):
     t0 = time.time()
 
     def _work(code):
-        recs = _net_kline_records(code)
-        if recs:
-            return code, recs, "net"
+        # 🛡 2026-10-28 根治：云端零网络取数。V8_NO_NET=1（云端工作流注入）时只用已推送的
+        #   kline_cache，绝不再走 gtimg/新浪 700 日实时拉取（全市场量级 × 25s 超时 → 超 1800s
+        #   被监督器静默杀 → 产物冻结）。本地机（小九）仍走网络主源（刷新缓存、保深度）。
+        if not os.environ.get("V8_NO_NET"):
+            recs = _net_kline_records(code)
+            if recs:
+                return code, recs, "net"
         recs = _load_cache_any(code)
         if recs:
             return code, recs, "cache"

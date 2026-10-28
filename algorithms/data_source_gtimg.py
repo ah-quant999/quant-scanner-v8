@@ -29,6 +29,9 @@ import pandas as pd
 #   同一 API 经 proxy.finance.qq.com/ifzqgtimg 代理域返回 HTTP 200 且 JSON 结构完全一致（qfqday 同构）。
 #   → 域名级故障转移：主域失败自动切代理域；云端（海外 runner）两域均可达，保持主域优先。
 KLINE_HOSTS = (
+    # 🛡 2026-10-28 根治：web.ifzq.gtimg.cn 子域 10-24 起恒 501（腾讯下线）→ 全管线 E 批取 K 线死亡。
+    #   主域 ifzq.gtimg.cn 实测 200（个股 801 根），提到首位；web. 子域降为兜底。
+    "https://ifzq.gtimg.cn/appstock/app/fqkline/get",
     "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
     "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/fqkline/get",
 )

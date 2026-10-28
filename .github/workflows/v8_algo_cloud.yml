@@ -161,6 +161,10 @@ jobs:
       # 2026-09-02 紧急补：手动 dispatch 带 bypass_time_gate=true 时置 1，绕过「选股须≥18:00 CST」守门(凌晨/盘前应急补跑)
       TIME_GATE_BYPASS: ${{ github.event.inputs.bypass_time_gate == 'true' && '1' || '' }}
       SKIP_MOOTDX: "1"
+      # 🛡 2026-10-28 根治：云端 runner 无稳定外网 → 回测脚本禁止实时联网取 K 线，
+      #   只读已推送 raw_data/kline_cache（≥640 根，由小九本地机 fetch_multiyear_kline 刷新并推送）。
+      #   彻底消除「每支 25s 超时 → 超 1800s 被监督器静默杀 → 产物冻结」的死循环假红灯。
+      V8_NO_NET: "1"
       # 2026-08-13 修复：云端 runner 必须走腾讯 GTimg 数据源(mootdx/东财在境外不稳定)，
       # 与 scanner.py 的 GITHUB_ACTIONS 自动识别形成双保险，防止 A股活跃股池缺失。
       CLOUD_RUNNER: "true"
@@ -195,7 +199,6 @@ jobs:
       - name: "📥 Checkout 源码（云端 git 直连，秒级）"
         id: co
         continue-on-error: true
-        timeout-minutes: 5
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
@@ -866,7 +869,7 @@ jobs:
         if: steps.gate.outputs.proceed == 'true'
         run: |
           set +e
-          python algorithms/gen_final_recommend_history.py || echo "⚠️ 每日 Top3 历史重算失败（不影响主产物）"
+          python algorithms/gen_final_recommend_history.py && echo "✅ 每日 Top3 历史重算完成" || echo "::error::每日 Top3 历史重算失败（请排查 gen_final_recommend_history.py：V8_ROOT 路径 / history 快照缺失）"
 
       - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
         if: steps.gate.outputs.proceed == 'true'

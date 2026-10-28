@@ -52,6 +52,8 @@ ROOT = os.environ.get("V8_ROOT") or os.path.dirname(BASE)
 RAW = os.path.join(ROOT, "raw_data")
 OUT_JSON = os.path.join(RAW, "factor_walkforward.json")
 CACHE = os.path.join(RAW, "_wf_cache")
+# 🛡 2026-10-28 根治：已推送的多年份 K 线缓存（≥640 根，云端零网络可取）；云端 V8_NO_NET=1 时只走它。
+KLINE_CACHE = os.path.join(RAW, "kline_cache")
 
 COST = 0.0020          # 往返成本
 STEP = 10              # 调仓间隔（交易日）
@@ -103,7 +105,8 @@ def _fetch_sina(code):
 
 
 def _fetch_gtimg(code):
-    raw = _http("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?"
+    # 🛡 2026-10-28 根治：web.ifzq 子域恒 501 → 切主域 ifzq.gtimg.cn
+    raw = _http("https://ifzq.gtimg.cn/appstock/app/fqkline/get?"
                 "param=%s,day,,,%d,qfq" % (_pfx(code), DATALEN))
     d = json.loads(raw)["data"][_pfx(code)]
     k = d.get("qfqday") or d.get("day") or []
@@ -157,18 +160,26 @@ def get_klines(codes, workers, do_fetch):
     os.makedirs(CACHE, exist_ok=True)
     todo, out = [], {}
     for c in codes:
-        p = os.path.join(CACHE, c + ".json")
-        if os.path.exists(p):
-            try:
-                rows = json.load(open(p, encoding="utf-8"))
-                if rows and len(rows) >= MIN_BARS:
-                    out[c] = rows
-                    continue
-            except Exception:
-                pass
+        # 🛡 2026-10-28 根治：优先读已推送 raw_data/kline_cache（云端零网络可取）；其次本地 _wf_cache。
+        #   V8_NO_NET=1（云端注入）时只走缓存，绝不再联网取数（防超时冻结）。
+        _pk = os.path.join(KLINE_CACHE, c + ".json")
+        _pw = os.path.join(CACHE, c + ".json")
+        _loaded = None
+        for _p in (_pk, _pw):
+            if os.path.exists(_p):
+                try:
+                    _r = json.load(open(_p, encoding="utf-8"))
+                    if _r and len(_r) >= 60:
+                        _loaded = _r
+                        break
+                except Exception:
+                    pass
+        if _loaded is not None:
+            out[c] = _loaded
+            continue
         todo.append(c)
     _log("  缓存命中 %d / 待取 %d" % (len(out), len(todo)))
-    if not todo or not do_fetch:
+    if not todo or not do_fetch or os.environ.get("V8_NO_NET"):
         return out
     t0 = time.time()
     done = 0

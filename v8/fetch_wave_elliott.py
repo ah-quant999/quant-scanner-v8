@@ -48,7 +48,8 @@ def _get_json(url, timeout=25):
 
 def fetch_tencent(tcode):
     """腾讯 ifzq 日K（主源）。返回 [(date, close), ...]"""
-    url = ("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+    # 🛡 2026-10-28 根治：web.ifzq 子域恒 501 → 切主域 ifzq.gtimg.cn
+    url = ("https://ifzq.gtimg.cn/appstock/app/fqkline/get"
            "?param=%s,day,,,%d,qfq" % (tcode, LMT))
     j = _get_json(url)
     d = j.get("data", {}).get(tcode) or {}
