@@ -16364,20 +16364,18 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
 //   概念ETF龙头参考
 h += '<div id="ulPaneObserve" style="display:block;">';
 // 🧭 2026-10-28 主人令：两卡「一行2列」并排（L1/L2 市场状态机+仓位引擎 ｜ 投资避雷针），去「评审中」标为「已通过」
-h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;align-items:start;">'
-   + '<div class="card" id="marketStateCard" style="border-left:4px solid #60a5fa;min-width:0;">'
+h += '<div class="card" id="marketStateCard" style="margin-bottom:16px;border-left:4px solid #60a5fa;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#60a5fa;">&#x1F9ED; L1 市场状态机 &#183; L2 仓位引擎</span>'
    + '<span id="marketStateFresh">&#x2014;</span>'
    + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 情绪分+仓位建议（已通过）</span></div>'
    + '<div id="marketStateBody"><div class="note">加载中&#x2026;</div></div></div>'
-   + '<div class="card" id="investAvoidCard" style="border-left:4px solid #f87171;min-width:0;">'
+h += '<div class="card" id="investAvoidCard" style="margin-bottom:16px;border-left:4px solid #f87171;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#f87171;">&#x1F6AB; 投资避雷针 &#183; 新闻语料量化（轻量）</span>'
    + '<span id="investAvoidFresh">&#x2014;</span>'
    + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 不要买哪些股（已通过）</span></div>'
    + '<div id="investAvoidBody"><div class="note">加载中&#x2026;</div></div></div>'
-   + '</div>';
 
 // ═══ 📋 2026-10-21 主人令：「这个新卡啊，我让你放暂未上架顶部」——盘前预案（观测类首卡·置顶）═══
 //   数据 window.MORNING_PLAN（data/MORNING_PLAN.js ← v8/gen_morning_plan.py，工作日 07:50 派发；
@@ -16641,8 +16639,8 @@ window.__renderMarketState = function(){
   function scColor(v){ return v>=60?'#4ade80': v>=40?'#fbbf24':'#f87171'; }
   var html='';
   html += '<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px;">';
-  html += '<div style="flex:1;min-width:160px;"><div style="font-size:12px;color:var(--dim);">L1 市场情绪分</div><div style="font-size:42px;font-weight:800;color:'+scColor(score)+';line-height:1.1;">'+score+'</div><div style="font-size:13px;color:var(--sub);">'+verdict+'</div></div>';
-  html += '<div style="flex:1;min-width:160px;"><div style="font-size:12px;color:var(--dim);">L2 仓位建议</div><div style="font-size:42px;font-weight:800;color:'+scColor(pos)+';line-height:1.1;">'+pos+'%</div><div style="font-size:13px;color:var(--sub);">'+posLabel+(adjReason.length?(' · 已调'+adj+'%'):'')+'</div></div>';
+  html += '<div style="flex:1;min-width:160px;"><div style="font-size:12px;color:var(--dim);">L1 市场情绪分</div><div style="font-size:28px;font-weight:800;color:'+scColor(score)+';line-height:1.1;">'+score+'</div><div style="font-size:13px;color:var(--sub);">'+verdict+'</div></div>';
+  html += '<div style="flex:1;min-width:160px;"><div style="font-size:12px;color:var(--dim);">L2 仓位建议</div><div style="font-size:28px;font-weight:800;color:'+scColor(pos)+';line-height:1.1;">'+pos+'%</div><div style="font-size:13px;color:var(--sub);">'+posLabel+(adjReason.length?(' · 已调'+adj+'%'):'')+'</div></div>';
   html += '</div>';
   html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">';
   var subs=[['S1 涨跌比(广度代理)',s1raw,s1v],['S2 涨停',s2raw,s2v],['S3 指数强度',s3raw,s3v],['S4 主力资金',s4raw,s4v]];
@@ -16697,9 +16695,9 @@ window.__renderInvestAvoid = function(){
   html += '</div>';
   html += '<div style="font-size:13px;font-weight:700;color:#f87171;margin:6px 0 6px;">&#x1F6AB; 个股级避雷（不要买/慎买清单）</div>';
   if(rows.length){
-    html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;"><tr style="color:var(--dim);text-align:left;"><th style="padding:4px 6px;">股票</th><th style="padding:4px 6px;">代码</th><th style="padding:4px 6px;">类型</th><th style="padding:4px 6px;">关键信息</th></tr>';
-    rows.slice(0,30).forEach(function(r){ html += '<tr style="border-top:1px solid rgba(255,255,255,.06);"><td style="padding:4px 6px;color:var(--txt);font-weight:600;">'+esc(r.name)+'</td><td style="padding:4px 6px;color:var(--sub);">'+esc(r.code||'')+'</td><td style="padding:4px 6px;color:#f87171;">'+esc(r.type)+'</td><td style="padding:4px 6px;color:var(--sub);">'+esc(r.info)+'</td></tr>'; });
-    html += '</table></div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
+    rows.slice(0,30).forEach(function(r){ html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:7px 9px;"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="font-size:13px;font-weight:700;color:var(--txt);">'+esc(r.name)+'</span><span style="font-size:11px;color:var(--sub);">'+esc(r.code||'')+'</span></div><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:3px;"><span style="font-size:11px;color:#f87171;">'+esc(r.type)+'</span><span style="font-size:11px;color:var(--sub);text-align:right;">'+esc(r.info)+'</span></div></div>'; });
+    html += '</div>';
     if(rows.length>30) html += '<div style="font-size:11px;color:var(--dim);margin-top:4px;">… 共 '+rows.length+' 只，展示前 30</div>';
   } else { html += '<div class="note">暂无减持/停牌避雷个股</div>'; }
   if(avoidSec.length){ html += '<div style="font-size:13px;font-weight:700;color:#fbbf24;margin:10px 0 6px;">&#x1F6AB; 板块级避雷（利率框架规避）</div><div style="display:flex;flex-wrap:wrap;gap:6px;">'+avoidSec.map(function(x){return '<span style="font-size:12px;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);border-radius:6px;padding:2px 8px;">'+x+'</span>';}).join('')+'</div>'; }
