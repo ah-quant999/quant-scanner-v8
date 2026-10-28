@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-10-28 09:27:28
+// 最后更新：2026-10-28 10:09:42
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-10-28 09:27:28",
+  "update_time": "2026-10-28 10:09:42",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -32,14 +32,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "AI算力",
       "start": "09/09",
-      "end": "10/27",
+      "end": "10/28",
       "start_idx": 0,
-      "end_idx": 28,
-      "days": 29,
-      "hot_days": 27,
+      "end_idx": 29,
+      "days": 30,
+      "hot_days": 28,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 310,
+      "total": 314,
       "ongoing": true
     },
     {
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 218,
       "peak_date": "09/09",
-      "total": 2016,
+      "total": 2029,
       "ongoing": true
     },
     {
@@ -89,9 +89,9 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "end_idx": 29,
       "days": 30,
       "hot_days": 24,
-      "peak": 20,
-      "peak_date": "10/27",
-      "total": 241,
+      "peak": 21,
+      "peak_date": "10/28",
+      "total": 255,
       "ongoing": true
     },
     {
@@ -117,7 +117,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 28,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 245,
+      "total": 248,
       "ongoing": true
     },
     {
@@ -169,7 +169,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 25,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 402,
+      "total": 413,
       "ongoing": true
     },
     {
@@ -182,7 +182,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 22,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 122,
+      "total": 123,
       "ongoing": true
     },
     {
@@ -253,14 +253,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "通信设备",
       "start": "10/21",
-      "end": "10/27",
+      "end": "10/28",
       "start_idx": 24,
-      "end_idx": 28,
-      "days": 5,
-      "hot_days": 5,
+      "end_idx": 29,
+      "days": 6,
+      "hot_days": 6,
       "peak": 4,
       "peak_date": "10/26",
-      "total": 16,
+      "total": 19,
       "ongoing": true
     },
     {
