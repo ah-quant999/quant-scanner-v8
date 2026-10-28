@@ -16623,8 +16623,6 @@ window.__renderMarketState = function(){
   if(window.RISK_GAUGE && window.RISK_GAUGE.overall==='red'){ adj-=8; adjReason.push('风险温度计红灯'); }
   pos = Math.max(5, Math.min(95, pos+adj));
   var posLabel = pos>=80?'积极重仓': pos>=65?'偏多': pos>=45?'中性': pos>=30?'防御轻仓':'观望轻仓';
-  var avoidSec=[];
-  if(MR && MR.recommendation_groups){ MR.recommendation_groups.forEach(function(g){ if(g.priority<0 && g.sectors) avoidSec=avoidSec.concat(g.sectors); }); }
   function bar(v,c){ return '<div style="height:8px;background:rgba(255,255,255,.08);border-radius:5px;overflow:hidden;margin-top:5px;"><div style="width:'+Math.max(3,v)+'%;height:100%;background:'+c+';border-radius:5px;"></div></div>'; }
   function scColor(v){ return v>=60?'#4ade80': v>=40?'#fbbf24':'#f87171'; }
   var html='';
@@ -16636,7 +16634,6 @@ window.__renderMarketState = function(){
   var subs=[['S1 涨跌比(广度代理)',s1raw,s1v],['S2 涨停',s2raw,s2v],['S3 指数强度',s3raw,s3v],['S4 主力资金',s4raw,s4v]];
   subs.forEach(function(x){ html += '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:9px 10px;"><div style="font-size:12px;color:var(--sub);font-weight:600;">'+x[0]+'</div><div style="font-size:13px;color:var(--txt);margin:3px 0;">'+x[1]+'</div>'+bar(x[2],scColor(x[2]))+'<div style="font-size:11px;color:var(--dim);margin-top:3px;">分 '+x[2]+'</div></div>'; });
   html += '</div>';
-  if(avoidSec.length){ html += '<div style="font-size:12px;color:var(--dim);margin-bottom:4px;">&#x1F6AB; 利率框架规避板块：</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">'+avoidSec.map(function(x){return '<span style="font-size:12px;background:rgba(248,113,113),.14);color:#f87171;border:1px solid rgba(248,113,113),.3);border-radius:6px;padding:2px 8px;">'+x+'</span>';}).join('')+'</div>'; }
   if(adjReason.length){ html += '<div style="font-size:12px;color:var(--sub);margin-bottom:8px;">&#x26A0;&#xFE0F; 仓位下调原因：'+adjReason.join('；')+'</div>'; }
   html += '<div style="font-size:11px;color:var(--dim);line-height:1.6;">&#x26A0;&#xFE0F; S1 为「主要指数涨跌比」广度代理（非全市场逐股广度，站内暂无该源）；情绪分=四子指标加权(0.25/0.20/0.30/0.25)；仓位建议为规则推导的区间中枢，<b style="color:#fbbf24;">非投资建议</b>。数据：'+[MA&&MA.update_time,IQ&&IQ.update_time,MFF&&MFF.update_time].filter(Boolean).join(' / ')+'</div>';
   host.innerHTML = html;
