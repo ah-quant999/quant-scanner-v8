@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-29 01:14",
- "generated": "2026-10-29 01:14",
+ "update_time": "2026-10-29 01:37",
+ "generated": "2026-10-29 01:37",
  "meta": {
-  "generated": "2026-10-29 01:14",
+  "generated": "2026-10-29 01:37",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 31,
   "days_with_consensus": 0,
@@ -12769,6 +12769,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "605488",
+      "name": "福莱新材",
+      "change_pct": 10.002,
+      "price": 48.61,
+      "category": "突破"
+     },
+     {
       "code": "301046",
       "name": "能辉科技",
       "change_pct": 4.378,
@@ -12822,13 +12829,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "春晖智控",
       "change_pct": 6.65,
       "price": 25.34,
-      "category": "突破"
-     },
-     {
-      "code": "688585",
-      "name": "上纬新材",
-      "change_pct": 13.261,
-      "price": 175.0,
       "category": "突破"
      },
      {
@@ -12916,13 +12916,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "600838",
-      "name": "上海九百",
-      "change_pct": 5.109,
-      "price": 13.99,
-      "category": "突破"
-     },
-     {
       "code": "301281",
       "name": "科源制药",
       "change_pct": 3.733,
@@ -12948,6 +12941,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "*ST瑞和",
       "change_pct": 3.425,
       "price": 4.53,
+      "category": "突破"
+     },
+     {
+      "code": "002472",
+      "name": "双环传动",
+      "change_pct": 8.911,
+      "price": 45.1,
       "category": "突破"
      },
      {
@@ -13012,6 +13012,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 7.664,
       "price": 25.99,
       "category": "突破"
+     },
+     {
+      "code": "300128",
+      "name": "锦富技术",
+      "change_pct": 4.884,
+      "price": 4.08,
+      "category": "突破"
      }
     ],
     "加速": [
@@ -13020,6 +13027,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "龙版传媒",
       "change_pct": 5.679,
       "price": 13.77,
+      "category": "加速"
+     },
+     {
+      "code": "605488",
+      "name": "福莱新材",
+      "change_pct": 10.002,
+      "price": 48.61,
       "category": "加速"
      },
      {
@@ -13076,13 +13090,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "春晖智控",
       "change_pct": 6.65,
       "price": 25.34,
-      "category": "加速"
-     },
-     {
-      "code": "688585",
-      "name": "上纬新材",
-      "change_pct": 13.261,
-      "price": 175.0,
       "category": "加速"
      },
      {
@@ -13144,6 +13151,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "605488",
+      "name": "福莱新材",
+      "change_pct": 10.002,
+      "price": 48.61,
+      "category": "短线选股"
+     },
+     {
       "code": "301046",
       "name": "能辉科技",
       "change_pct": 4.378,
@@ -13197,13 +13211,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "春晖智控",
       "change_pct": 6.65,
       "price": 25.34,
-      "category": "短线选股"
-     },
-     {
-      "code": "688585",
-      "name": "上纬新材",
-      "change_pct": 13.261,
-      "price": 175.0,
       "category": "短线选股"
      },
      {
@@ -13291,13 +13298,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "600838",
-      "name": "上海九百",
-      "change_pct": 5.109,
-      "price": 13.99,
-      "category": "短线选股"
-     },
-     {
       "code": "301281",
       "name": "科源制药",
       "change_pct": 3.733,
@@ -13323,6 +13323,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "*ST瑞和",
       "change_pct": 3.425,
       "price": 4.53,
+      "category": "短线选股"
+     },
+     {
+      "code": "002472",
+      "name": "双环传动",
+      "change_pct": 8.911,
+      "price": 45.1,
       "category": "短线选股"
      },
      {
@@ -13386,6 +13393,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "亚华电子",
       "change_pct": 7.664,
       "price": 25.99,
+      "category": "短线选股"
+     },
+     {
+      "code": "300128",
+      "name": "锦富技术",
+      "change_pct": 4.884,
+      "price": 4.08,
       "category": "短线选股"
      }
     ],
@@ -13426,13 +13440,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
-      "code": "600838",
-      "name": "上海九百",
-      "change_pct": 5.109,
-      "price": 13.99,
-      "category": "强势股"
-     },
-     {
       "code": "301281",
       "name": "科源制药",
       "change_pct": 3.733,
@@ -13458,6 +13465,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "*ST瑞和",
       "change_pct": 3.425,
       "price": 4.53,
+      "category": "强势股"
+     },
+     {
+      "code": "002472",
+      "name": "双环传动",
+      "change_pct": 8.911,
+      "price": 45.1,
       "category": "强势股"
      },
      {
@@ -13521,6 +13535,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "亚华电子",
       "change_pct": 7.664,
       "price": 25.99,
+      "category": "强势股"
+     },
+     {
+      "code": "300128",
+      "name": "锦富技术",
+      "change_pct": 4.884,
+      "price": 4.08,
       "category": "强势股"
      }
     ]
