@@ -2284,9 +2284,14 @@ window.STRATEGY_WALKFORWARD = {
       head.innerHTML = window.v8CardHeader('⚖️','今日判定 · 环境综合','宏观/美股/技术/情绪/共同结论/危险信号/大盘','update_time',
         {update_time:ts, slot:_jdSlot.slot, horizon:_jdSlot.horizon}, false);
     };
+    // 🆕 2026-10-28 主人令「这卡折叠」：今日判定·环境综合 卡默认折叠（收起省空间），按钮可一键展开。
+    //   按钮 sibling 挂在 judgmentCardHeader 之后，v8CardHeader 自愈只重写 header 内部 ⇒ 按钮不被冲掉；
+    //   折叠只切 judgmentBodyOp 的 display，不影响 body 自愈重渲 innerHTML（display 状态独立保留）。
+    window.__judgmentCardCollapsed = true;   // 默认折叠（收起）；展开后由此标记翻转
     window.__renderJudgmentBody = function(){
       var opBody=document.getElementById('judgmentBodyOp');
       if(!opBody) return;
+      opBody.style.display = window.__judgmentCardCollapsed ? 'none' : '';
       try{
         var jd = window.JUDGMENT_DATA || {};
         if(!jd.update_time || typeof window._buildJudgmentEnvHTML !== 'function'){
@@ -2298,16 +2303,13 @@ window.STRATEGY_WALKFORWARD = {
         opBody.innerHTML = window._buildJudgmentEnvHTML(jd);
       }catch(e){ console.error('renderJudgmentBody error',e); }
     };
-    // 🆕 2026-10-28 主人令「这卡折叠」：今日判定·环境综合 卡一键折叠/展开
-    //   按钮 sibling 挂在 judgmentCardHeader 之后，v8CardHeader 自愈只重写 header 内部 ⇒ 按钮不被冲掉；
-    //   折叠只切 judgmentBodyOp 的 display，不影响 body 自愈重渲 innerHTML（display 状态独立保留）。
     window.__toggleJudgmentCard = function(){
       var b = document.getElementById('judgmentBodyOp');
       var btn = document.getElementById('judgmentToggleBtn');
       if(!b || !btn) return;
-      var hidden = (b.style.display === 'none');
-      b.style.display = hidden ? '' : 'none';
-      btn.innerHTML = hidden ? '&#x25BE; 折叠' : '&#x25B4; 展开';
+      window.__judgmentCardCollapsed = !window.__judgmentCardCollapsed;
+      b.style.display = window.__judgmentCardCollapsed ? 'none' : '';
+      btn.innerHTML = window.__judgmentCardCollapsed ? '&#x25B4; 展开' : '&#x25BE; 折叠';
     };
     // 🛡️ 2026-08-19 主人令「补回来，别一直被覆盖掉」一劳永逸：
     //   放弃 setTimeout 一次性猜测 / 30 次重试的旧方案，改为**永久自愈轮询**——
@@ -16279,7 +16281,7 @@ h += '<div id="comprehensiveSynthesis" style="margin-bottom:14px;border-left:4px
    + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 全部结论由规则从下方各卡真实数据自动汇总，<b style="color:#fbbf24">非人工观点、不构成投资建议</b>。</div></div>';
 // ── 今日判定·环境综合（2026-10-28 主人令：自「今日事件」迁入合并；渲染走永久自愈轮询）──
 h += '<div id="judgmentCardHeader"></div>';
-h += '<div style="padding:0 0 8px;"><button id="judgmentToggleBtn" onclick="window.__toggleJudgmentCard()" style="background:transparent;border:1px solid var(--border);color:var(--sub);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;">&#x25BE; 折叠</button></div>';
+h += '<div style="padding:0 0 8px;"><button id="judgmentToggleBtn" onclick="window.__toggleJudgmentCard()" style="background:transparent;border:1px solid var(--border);color:var(--sub);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;">&#x25B4; 展开</button></div>';
 h += '<div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 0 6px;"></div>';
 // ── 盘前预案 ──
 h += '<div id="morningPlanCard" style="display:none;margin-bottom:14px;border-left:4px solid #38bdf8;padding-left:10px;">'
