@@ -192,7 +192,7 @@ window.__domReadyFns=[];
     <!-- 🚀 2026-09-18 主人令：补 SECTOR_LEADERS 注入（09-17 建卡漏注入=恒不渲染死块；主升/启动板块·龙头股 独立卡用） -->
     <script src="data/SECTOR_LEADERS.js?v=9276eef228" defer></script><!-- 🆕 板块龙头领涨（SECTOR_LEADERS）观测卡数据源（保留功能） -->
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
-    <script src="data/PORTFOLIO.js?v=f547f9cd43" defer></script>
+    <script src="data/PORTFOLIO.js?v=941aafe2c5" defer></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -1282,19 +1282,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CANDIDATE.js?v=5d3fbdf1d1" defer></script>
 
     <script src="data/STOCK_STOP_DATA.js?v=a6e9547003" defer></script>
-<script src="data/BACKTEST_COMPREHENSIVE.js?v=dc43e3828e" defer></script>
-<script src="data/BACKTEST_TDX.js?v=f8c16bdc79" defer></script>
+<script src="data/BACKTEST_COMPREHENSIVE.js?v=5f4b603b01" defer></script>
+<script src="data/BACKTEST_TDX.js?v=2cb98f852d" defer></script>
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=6ddc8bf071" defer></script>
 <script src="data/EXPERIMENT.js?v=9c1abdc58a" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=03c68904a1" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=3ac5548234" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=19556bda8b" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=03c68904a1" defer></script><script src="data/FINAL_RECOMMEND_HISTORY.js?v=8c8bcc4921" defer></script><!-- 🆕 2026-10-22 主人令「最终推荐的历史记录怎么没了？我要记录每天前3名」：每日 Top3 历史（真实每日选股 dated 快照汇总，gen_final_recommend_history.py 产出） --><script src="data/FINAL_RECOMMEND_BACKTEST.js?v=19556bda8b" defer></script><!-- 🆕 2026-10-14 主人令「那这个就是新方法的最终推荐回测了，可以放上主页了」：新方法混排回放卡（双池同场 34 信号日）。回放口径独立文件，不动链上每晚重产的真实流 FINAL_RECOMMEND_BACKTEST.js；11 月中真实流成熟后删本行即切回 --><script src="data/FINAL_RECOMMEND_REPLAY.js?v=7460c46309" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=2350fe9822" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=edfaa7c3c7" defer></script>
     <script src="data/NATIONAL_TEAM.js?v=9cc4bc55d3" defer></script>
 <!-- 📋 2026-10-21 主人令「这个新卡啊，我让你放暂未上架顶部」：盘前预案卡（v8/gen_morning_plan.py 工作日07:50派发；10-21 19:16 首跑真实数据） -->
 <script src="data/MORNING_PLAN.js?v=71bf74531e" defer></script>
-    <script src="data/FACTOR_LAB_BACKTEST.js?v=e2de018e63" defer></script>
+    <script src="data/FACTOR_LAB_BACKTEST.js?v=a5320ef5d4" defer></script>
 <!-- 🧮 2026-09-11 全算法回测汇总（E 批 gen_backtest_all_algos.py 产出；策略回测页总览块用） -->
 <script src="data/BACKTEST_ALL_ALGOS.js?v=ea10d826f8" defer></script>
 <!-- 🔴 2026-09-14 主人令：「金股池和候选股池是算法的上游水源，不是策略，不需要回测！」
@@ -2022,7 +2022,7 @@ window.STRATEGY_WALKFORWARD = {
     <!-- 🆕 2026-09-19 主人令（CN runner2号机的工程师）：walk-forward 真值（verdict / IR_OOS / 跑赢基准率），
          供「🧮 每日因子计算」卡读 P5 段闸门真值（因子实验室页唯一消费者）。
          映射见 update_v8.py DATA_SOURCES: factor_walkforward.json → FACTOR_WALKFORWARD。 -->
-    <script src="data/FACTOR_WALKFORWARD.js?v=35c36e6753" defer></script>
+    <script src="data/FACTOR_WALKFORWARD.js?v=cbf73e3f5c" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=6c0af005f3" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=adc6bde124" defer></script>
@@ -8763,6 +8763,8 @@ window.__renderIndexObserve = function(){
         <tr><td>v8_health_patrol</td><td>每小时 :08/:38</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>数据健康巡检 + 自愈（v8_health_check.py --heal）；陈旧阈值 2026-09-10 由 6 分调为 30 分</td></tr>
         <!-- ✅ 2026-10-26 CN runner2号机补登记：CN runner1号机 9ec1c0dbf 新建 v8_nolost_guard（*/20 cron）漏双登记 ⇒ build_deploy [4/8] 午间档起连红 -->
         <tr><td>v8_nolost_guard</td><td>每 20 分(全天·双机轮值)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>双机零丢失协议 v2 守卫：核对双机账本，只补「推前有/推后无」的路径缺失，不回滚内容变更</td></tr>
+        <!-- ✅ 2026-10-28 小九补登记（门禁 [4/8] 拦截补漏）：E批回测根治同批新建的每日归档链漏双登记 -->
+        <tr><td>v8_final_recommend_history</td><td>每日22:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>最终推荐历史归档（夜班自愈）：盘后算法链落库后重跑聚合器，回写 data/FINAL_RECOMMEND_HISTORY.js（10-22 建卡后曾停更，孤儿脚本一劳永逸接线）</td></tr>
         <tr><td>v8_algo_cloud</td><td>16:40/18:10/20:00/21:00(+22:30/00:30/06:00/08:00)</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产（选股四模块+回测）</td></tr>
         <tr><td>v8_backup</td><td>每日23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data / 交接文档（含 v6 备份保留策略：v8 稳定一周前不删）</td></tr>
         <!-- ✅ 2026-10-01 主人令「全面审计」：14 条有 cron 但此前漏登记的 workflow 补齐（周期均按 yml cron 实测换算 CST） -->
