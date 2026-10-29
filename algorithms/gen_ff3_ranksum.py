@@ -115,10 +115,23 @@ def main():
     names = load_names()
 
     # ── 复用 factor_walkforward 引擎管线（零第二口径）──
-    klines = fw.get_klines(codes, 1, False)
+    # 🛡 2026-10-29 一劳永逸（九宝令「改完全部直接上线」）：直读 _wf_cache 为权威水源。
+    #   原 `fw.get_klines(codes,1,False)` 会**优先 raw_data/kline_cache**（10-28 根治 commit 3409b71
+    #   引入的短缓存，仅 250~801 根）→ 阴影掉 _wf_cache（2222 根）→ 下方 MIN_BARS=515 过滤把
+    #   603 只几乎全砍到 5 只 → 「截面不足 15 只」保护性退出 → FF3_RANKSUM_* 自 10-28 起恒 stale。
+    #   本脚本声明水源即「全 _wf_cache 宇宙」（L7 注释），故直读 _wf_cache，恢复 10-28 前行为。
+    klines = {}
+    for c in codes:
+        _p = os.path.join(CACHE_DIR, c + ".json")
+        try:
+            _r = json.load(open(_p, encoding="utf-8"))
+            if _r and len(_r) >= 60:
+                klines[c] = _r
+        except Exception:
+            continue
     if len(klines) < 100:
         raise SystemExit("有效 K 线不足 100 只（%d），保护性中止" % len(klines))
-    log("有效 K 线：%d 只" % len(klines))
+    log("有效 K 线：%d 只（直读 _wf_cache，未被 kline_cache 短缓存阴影）" % len(klines))
 
     dates, pos, bars = fw.build_panel(klines)
     n_days = len(dates)
