@@ -1,21 +1,21 @@
 window.NATIONAL_TEAM = {
-  "data_date": "2026-10-28",
-  "update_time": "2026-10-29 16:22:57",
-  "source_time": "2026-10-29 15:20",
-  "score": 53.1,
+  "data_date": "2026-10-29",
+  "update_time": "2026-10-29 21:42:31",
+  "source_time": "2026-10-29 19:37",
+  "score": 48.0,
   "verdict": "中性",
   "verdict_color": "#38bdf8",
-  "ready_count": 4,
+  "ready_count": 3,
   "subs": [
     {
       "key": "A",
       "name": "宽基ETF净申购突变",
       "weight": 45,
-      "ready": true,
-      "value": 18.4,
+      "ready": false,
+      "value": null,
       "unit": "亿",
-      "detail": "宽基净申购 18.4 亿（2 只宽基ETF）",
-      "status": "🟡中性"
+      "detail": "etf_subscription_eastmoney.js 未就绪",
+      "status": "—未就绪"
     },
     {
       "key": "B",
@@ -50,5 +50,5 @@ window.NATIONAL_TEAM = {
   ],
   "method": "4 子信号加权（缺失项权重重分）；宽基ETF净申购45% + 大金融相对强度35% + 大金融资金净流入20%；汇金持仓环比权重0%（季报披露滞后1-3月，不参与实时评分，仅作定性印证）。",
   "disclaimer": "代理推算·非汇金官方实时持仓；宽基ETF净申购为最强国资托盘指纹，披露存 T+1 滞后；汇金持仓环比取自东方财富股东增减持披露（中央汇金投资有限责任公司），属法定义务披露、口径滞后且稀疏，如实标注，不构成交易建议。",
-  "oneline": "综合 53.1（中性）：宽基ETF净申购 18.4 亿＝托盘力度中性，大金融中性，大金融资金净流入 1.1 亿。"
+  "oneline": "综合 48.0（中性）：大金融中性，大金融资金净流入 1.1 亿。"
 };
