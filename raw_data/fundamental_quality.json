@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-10-29 19:34:41",
-  "total": 1185,
+  "update_time": "2026-10-29 21:15:05",
+  "total": 1196,
   "grade_summary": {
     "A": 28,
     "B": 31,
     "C": 247,
-    "D": 695,
-    "no_data": 184
+    "D": 697,
+    "no_data": 193
   },
   "stocks": {
     "hk_00001": {
@@ -12074,6 +12074,108 @@
           "三季报略增"
         ]
       }
+    },
+    "sz_000678": {
+      "score": 0,
+      "grade": "D",
+      "roe": -2.6342999999999996,
+      "revenue_growth": null,
+      "reason": "ROE差(-2.6%) | 营收增速无数据",
+      "statDate": "2026-06-30",
+      "cf_queried": true
+    },
+    "sz_301718": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "三季报预增"
+        ]
+      }
+    },
+    "sz_001379": {
+      "score": 0,
+      "grade": "D",
+      "roe": 1.7508,
+      "revenue_growth": null,
+      "reason": "ROE差(1.8%) | 营收增速无数据",
+      "statDate": "2026-06-30",
+      "cf_queried": true
+    },
+    "sz_399006": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_002979": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true,
+      "news": {
+        "score": 15,
+        "tags": [
+          "三季报预增"
+        ]
+      }
+    },
+    "sz_561760": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_300539": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_563150": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_300900": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_588960": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
+    },
+    "sz_301682": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "无基本面数据",
+      "cf_queried": true
     }
   }
 }
