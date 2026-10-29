@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-10-29 23:20:50",
+    "generated": "2026-10-30 04:08:09",
     "method": "walk-forward / out-of-sample, shrinkage_k=10",
     "horizons": [
       3,
@@ -13,7 +13,7 @@
       "2026-10-29"
     ],
     "coverage": {
-      "stocks_total": 1927,
+      "stocks_total": 1911,
       "with_kline": 0,
       "occ_total": 0,
       "p4_evaluated": 0,

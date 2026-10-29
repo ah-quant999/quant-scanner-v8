@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-29 23:37:32",
+  "update_time": "2026-10-30 04:22:31",
   "source": "INDEX_HISTORY.js 兜底（上证指数 走 INDEX_HISTORY.js 兜底）",
   "note": "价格中枢框架迁移（QQQ/TQQQ → A股指数），基于收盘价布林带/EMA趋势，非PE估值分位",
   "indices": [
