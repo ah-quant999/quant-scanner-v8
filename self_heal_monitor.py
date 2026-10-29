@@ -80,6 +80,23 @@ MOMENTUM_MANUAL_DEPENDENCY = True
 _MOMENTUM_KNOWN_QUIET_PREFIXES = ("last_day=",)
 
 
+# 🔴 2026-10-29 一劳永逸（九宝令）：INVEST_AVOID 此前仅靠 v8_morning_plan.yml 07:50 单点触发，
+#   漏跑即无人兜底 → 长期假红。自愈直接复用 v8_health_check 同一套红线函数，杜绝口径分裂。
+try:
+    sys.path.insert(0, str(ROOT))
+    from v8_health_check import (
+        parse_time as _hc_parse_time,
+        _hard_cap_for_owner_rule as _hc_hard_cap,
+        _next_trading_mark as _hc_next_mark,
+        _legit_ceiling_cycle as _hc_cycle_cap,
+        _REG_CYCLE_MARK as _hc_reg_mark,
+    )
+    _HC_AVAILABLE = True
+except Exception as _hc_err:
+    _HC_AVAILABLE = False
+    _hc_err = _hc_err
+
+
 def now_cst():
     return datetime.now(CST)
 
@@ -585,6 +602,108 @@ def check_zsxq_token():
     return False, det + " / 外置副本: " + bdet
 
 
+# ── P0-4: INVEST_AVOID.js 新鲜度（投资避雷针 consolidate 产物）────────────
+# 2026-10-29 一劳永逸（九宝令）：此前仅靠盘前链 07:50 单点触发，漏跑即红且无人修。
+#   现接入自愈：stale → 重跑 v8/gen_invest_avoid.py → 只推 data/INVEST_AVOID.js。
+#   红线口径 100% 复用 v8_health_check.check_all_data_files 对全量数据页 all_* 文件的计算，
+#   不重写、不另立标准（主人铁律：全站口径必须统一，禁止某模块特立独行）。
+INVEST_AVOID_FILE = DATA_DIR / "INVEST_AVOID.js"
+
+
+def _invest_avoid_cap_min(n=None):
+    """复用 v8_health_check 对全量数据页 all_* 文件的同一红线（交易日 24h / 非交易日 T+1 18:30）。"""
+    n = n or now_cst()
+    if not _HC_AVAILABLE:
+        # 兜底：import 失败时才用近似（交易日 24h / 非交易日 48h），正常路径绝不走这里
+        return 24 * 60 if _is_trading_day(n.date()) else 48 * 60
+    cap = _hc_hard_cap(page="全量数据", n=n)
+    hh, mm = _hc_reg_mark.get("全量数据", (20, 30))
+    if _hc_next_mark(n, hh, mm).date() == n.date():
+        cap = max(cap, _hc_cycle_cap("全量数据", n=n))
+    return cap
+
+
+def check_invest_avoid():
+    if not INVEST_AVOID_FILE.exists():
+        return False, None, 99999, "FILE_MISSING"
+    try:
+        src = open(INVEST_AVOID_FILE, encoding="utf-8").read()
+        i, j = src.index("{"), src.rindex("}")
+        d = json.loads(src[i:j + 1])
+        ts = d.get("update_time") or d.get("data_date") or "--"
+        dt = (_hc_parse_time(ts) if (_HC_AVAILABLE and isinstance(ts, str) and ts != "--") else None)
+        if dt is None:
+            return False, None, 99999, "无法解析时间戳(update_time/data_date)"
+        age_min = (now_cst() - dt).total_seconds() / 60
+        cap = _invest_avoid_cap_min(n=now_cst())
+        stale = age_min > cap
+        return (not stale), ts, age_min, f"update_time={ts}, age={age_min:.0f}min, cap={cap:.0f}min"
+    except Exception as e:
+        return False, None, 99999, "解析错误: " + str(e)
+
+
+def _git_push_file(fpath, msg):
+    """通用：只提交并推送单个文件到 main（autostash 保护其它 WIP；与候选池自愈同款稳健路径）。"""
+    try:
+        check_r = subprocess.run(["git", "status", "--porcelain"],
+                                 capture_output=True, text=True, cwd=str(ROOT), timeout=15)
+        if "UU" in check_r.stdout or "AA" in check_r.stdout or "DU" in check_r.stdout:
+            log("检测到未解决冲突，先 abort rebase...", "WARN")
+            subprocess.run(["git", "rebase", "--abort"], capture_output=True, timeout=15, cwd=str(ROOT))
+        pull_r = subprocess.run(["git", "pull", "--rebase", "--autostash", "origin", "main"],
+                                capture_output=True, text=True, cwd=str(ROOT), timeout=60)
+        status_r = subprocess.run(["git", "status", "--porcelain"],
+                                  capture_output=True, text=True, cwd=str(ROOT), timeout=15)
+        if "UU" in status_r.stdout or "AA" in status_r.stdout:
+            log("rebase 后出现冲突，自动解决（取远端版本后重算当前文件）...", "WARN")
+            for line in status_r.stdout.strip().splitlines():
+                fpath_s = line[3:] if len(line) > 3 else ""
+                if line.startswith("UU") and fpath_s and fpath_s not in str(fpath):
+                    subprocess.run(["git", "checkout", "--theirs", fpath_s],
+                                   capture_output=True, timeout=10, cwd=str(ROOT))
+                    subprocess.run(["git", "add", fpath_s],
+                                   capture_output=True, timeout=10, cwd=str(ROOT))
+            subprocess.run([PYTHON, str(ROOT / "v8" / "gen_invest_avoid.py")],
+                           capture_output=True, text=True, cwd=str(ROOT), timeout=300)
+            subprocess.run(["git", "add", str(fpath)],
+                           capture_output=True, timeout=10, cwd=str(ROOT))
+        r = subprocess.run(["git", "add", str(fpath)],
+                           capture_output=True, text=True, cwd=str(ROOT), timeout=30)
+        r = subprocess.run(["git", "commit", "-m", msg, "--", str(fpath)],
+                           capture_output=True, text=True, cwd=str(ROOT), timeout=30)
+        if r.returncode != 0 and "nothing to commit" not in (r.stdout + r.stderr):
+            return False, "commit 失败: " + r.stderr[-200:]
+        r = subprocess.run(["git", "push", "origin", "main"],
+                           capture_output=True, text=True, cwd=str(ROOT), timeout=60)
+        if r.returncode != 0:
+            subprocess.run(["git", "pull", "--rebase", "--autostash", "origin", "main"],
+                          capture_output=True, text=True, cwd=str(ROOT), timeout=60)
+            r2 = subprocess.run(["git", "push", "origin", "main"],
+                               capture_output=True, text=True, cwd=str(ROOT), timeout=60)
+            if r2.returncode != 0:
+                return False, "push 失败(含重试): " + r2.stderr[-200:]
+        return True, "已推送: " + str(fpath.name)
+    except subprocess.TimeoutExpired as e:
+        return False, "git 操作超时: " + str(e)
+    except Exception as e:
+        return False, "git 异常: " + str(e)
+
+
+def heal_invest_avoid(dry_run=False):
+    log("重算 INVEST_AVOID.js（跑 v8/gen_invest_avoid.py）...", "RUN")
+    r = subprocess.run(
+        [PYTHON, str(ROOT / "v8" / "gen_invest_avoid.py")],
+        capture_output=True, text=True, cwd=str(ROOT), timeout=300
+    )
+    if r.returncode != 0:
+        return False, "gen_invest_avoid.py 失败: " + (r.stdout or r.stderr or "")[-300:]
+    log("gen_invest_avoid.py 成功: " + (r.stdout or "")[-120:], "OK")
+    if dry_run:
+        return True, "[DRY_RUN] 将推送 data/INVEST_AVOID.js"
+    return _git_push_file(INVEST_AVOID_FILE,
+                          "fix(invest-avoid): 自愈重算 data/INVEST_AVOID.js [self_heal_monitor]")
+
+
 # ── 主流程 ──────────────────────────────────────────────
 
 def run_check_only():
@@ -610,6 +729,11 @@ def run_check_only():
     results["zsxq_token"] = {"ok": tok_ok, "detail": tok_det}
     icon = "OK" if tok_ok else "FAIL"
     log("[" + icon + "] zsxq_token: " + tok_det)
+
+    # P0-4: INVEST_AVOID.js 新鲜度（全量数据页，复用健康检查红线口径）
+    ia_ok, ia_ts, ia_age, ia_det = check_invest_avoid()
+    results["invest_avoid"] = {"ok": ia_ok, "detail": ia_det, "update_time": ia_ts, "age_min": ia_age}
+    log("[" + ("OK" if ia_ok else "FAIL") + "] INVEST_AVOID.js: " + ia_det)
 
     # P0-3: 动量共识筛选卡源新鲜度（盘中窗口陈旧→WARN 留痕；缺失/解析失败→FAIL）
     mf_status, mf_gen, mf_age, mf_det = check_momentum_filter()
@@ -695,6 +819,22 @@ def run_heal(json_output=False):
     else:
         log("[OK] P1-1: zsxq_token 正常 (" + tok_det + ")", "OK")
         heal_results["zsxq_token"] = {"ok": True, "message": tok_det}
+
+    # P0-4: INVEST_AVOID.js 新鲜度（盘前链漏跑兜底；stale → 重算 gen_invest_avoid.py → 只推该文件）
+    ia_ok, ia_ts, ia_age, ia_det = check_invest_avoid()
+    if not ia_ok:
+        log("[FAIL] P0-4: INVEST_AVOID.js 陈旧(盘前链漏跑)! " + ia_det, "FAIL")
+        success, msg = heal_invest_avoid()
+        heal_results["invest_avoid"] = {"ok": success, "message": msg}
+        if success:
+            log("[HEAL] P0-4 已自愈: " + msg, "HEAL")
+            actions_taken.append("INVEST_AVOID 重算: " + msg)
+        else:
+            log("[FAIL] P0-4 无法自愈: " + msg, "FAIL")
+            exit_code = max(exit_code, 2)
+    else:
+        log("[OK] P0-4: INVEST_AVOID.js 新鲜 (" + ia_det + ")", "OK")
+        heal_results["invest_avoid"] = {"ok": True, "message": ia_det}
 
     if json_output:
         print(json.dumps({
