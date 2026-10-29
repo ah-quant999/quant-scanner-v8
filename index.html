@@ -15963,16 +15963,13 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
         function _pct(v){ if(v==null) return '—'; var c=v>=0?_up:_dn; return '<b style="color:'+c+';">'+(v>=0?'+':'')+v+'%</b>'; }
         var h = '';
         /* ── 头部徽章行（数据日 + 已更新；沿用 09-23 防假新鲜口径） ── */
-        h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
-        h += '<span style="font-size:10px;color:#38bdf8;font-weight:600;background:rgba(56,189,248,.14);padding:1px 7px;border-radius:4px;">试运行</span>';
-        h += '<span style="font-size:11.5px;color:var(--dim);">📅 数据日 '+_e(D.data_date||'—')+' · 已更新 '+_e(D.update_time||'—')+'</span>';
-        h += '</div>';
+        h += '<div style="font-size:11.5px;color:var(--dim);margin-bottom:8px;">📅 数据日 '+_e(D.data_date||'—')+'</div>';
         /* ── 色条矩阵（5 类；左色条 + 类别标题 + 条目，红涨绿跌铁律） ── */
         for(var i=0;i<D.matrix.length;i++){
           var m = D.matrix[i];
-          h += '<div style="border-left:4px solid '+m.color+';background:'+m.color+'0d;border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:8px;">'
+          h += '<div style="border-left:3px solid '+m.color+';background:'+m.color+'0d;border-radius:0 8px 8px 0;padding:7px 12px;margin-bottom:6px;">'
              + '<div style="font-size:12.5px;font-weight:700;color:'+m.color+';margin-bottom:3px;">'+_e(m.cat)+'</div>'
-             + '<div style="font-size:12px;line-height:1.7;color:var(--txt);">'
+             + '<div style="font-size:12px;line-height:1.6;color:var(--txt);">'
              + m.items.map(function(it){ return '· ' + it; }).join('<br>') + '</div></div>';
         }
         /* ── 两栏：大盘预判 / 主线策略（窄屏自动换行） ── */
@@ -16273,7 +16270,7 @@ h += '<div class="card" id="comprehensiveCard" style="margin-bottom:16px;border-
    + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 盘前/状态/避雷/资金 合并视图</span>'
    + '</div>';
 // ── 2026-10-28 主人令：综合解析（不是把卡移到一起，是综合各卡数据给解析结论）──
-h += '<div id="comprehensiveSynthesis" style="margin-bottom:14px;border-left:4px solid #a78bfa;background:rgba(167,139,250,.06);border-radius:0 9px 9px 0;padding:10px 12px;">'
+h += '<div id="comprehensiveSynthesis" style="margin:14px 0 0;background:rgba(167,139,250,.06);border-radius:9px;padding:10px 12px;">'
    + '<div style="font-size:13.5px;font-weight:700;color:#a78bfa;margin-bottom:6px;">&#x1F9E0; 综合解析 &#183; 多源信号汇总</div>'
    + '<div id="comprehensiveSynthesisBody"><div class="note">综合各卡数据解析中&#x2026;</div></div>'
    + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 全部结论由规则从下方各卡真实数据自动汇总，<b style="color:#fbbf24">非人工观点、不构成投资建议</b>。</div></div>';
@@ -16282,29 +16279,29 @@ h += '<div id="judgmentCardHeader"></div>';
 h += '<div style="padding:0 0 8px;"><button id="judgmentToggleBtn" onclick="window.__toggleJudgmentCard()" style="background:transparent;border:1px solid var(--border);color:var(--sub);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;">&#x25B4; 展开</button></div>';
 h += '<div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 0 6px;"></div>';
 // ── 盘前预案 ──
-h += '<div id="morningPlanCard" style="display:none;margin-bottom:14px;border-left:4px solid #38bdf8;padding-left:10px;">'
+h += '<div id="morningPlanCard" style="display:none;margin:14px 0 0;border-top:1px solid var(--border);padding-top:12px;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#38bdf8;">&#x1F4CB; 盘前预案</span>'
    + '<span id="morningPlanFresh" style="display:inline-flex;align-items:center;">&#x2014;</span></div>'
    + '<div id="morningPlanBody"><div class="note">加载中&#x2026;</div></div>'
    + '<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;">&#x26A0;&#xFE0F; 全部条目由规则从真实数据自动生成，<b style="color:#fbbf24">非人工观点、不构成投资建议</b>。</div></div>';
 // ── L1/L2 市场状态机+仓位引擎 ──
-h += '<div id="marketStateCard" style="margin-bottom:14px;border-left:4px solid #60a5fa;padding-left:10px;">'
+h += '<div id="marketStateCard" style="margin:14px 0 0;border-top:1px solid var(--border);padding-top:12px;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#60a5fa;">&#x1F9ED; L1 市场状态机 &#183; L2 仓位引擎</span>'
    + '<span id="marketStateFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 情绪分+仓位建议（已通过）</span></div>'
+   + '</div>'
    + '<div id="marketStateBody"><div class="note">加载中&#x2026;</div></div></div>';
 // ── 投资避雷针 ──
-h += '<div id="investAvoidCard" style="margin-bottom:14px;border-left:4px solid #f87171;padding-left:10px;">'
+h += '<div id="investAvoidCard" style="margin:14px 0 0;border-top:1px solid var(--border);padding-top:12px;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#f87171;">&#x1F6AB; 投资避雷针 &#183; 新闻语料量化（轻量）</span>'
    + '<span id="investAvoidFresh">&#x2014;</span>'
-   + '<span style="font-size:12px;color:var(--dim);">观测类 &#183; 不要买哪些股（已通过）</span></div>'
+   + '</div>'
    + '<div id="investAvoidBody"><div class="note">加载中&#x2026;</div></div></div>';
 // 🗑️ 2026-10-28 主人令：大基金 增减持监控卡删除（与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图；数据源 DAJIJIN_REDUCTION 保留供投资避雷针消费，v8_dajijin_fetch 定时任务保留）。
 // ── 板块年度主力净流入 ──
-h += '<div id="sectorYearFlowCard" style="display:none;margin-bottom:14px;border-left:4px solid #f97316;padding-left:10px;">'
+h += '<div id="sectorYearFlowCard" style="display:none;margin:14px 0 0;border-top:1px solid var(--border);padding-top:12px;">'
    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
    + '<span style="font-size:15px;font-weight:700;color:#f97316;">&#x1F3D4; 板块年度主力净流入</span>'
    + '<span id="sectorYearFlowTime" style="display:inline-flex;align-items:center;">&#x2014;</span></div>'
@@ -17772,6 +17769,40 @@ hm += '</div>'; // /ulPaneBacktest
   //     · 指数估值分位 ← VALUATION_PERCENTILE.{indices,strategy}（与卡4同源）
   //   配色：全站红涨绿跌铁律（#f87171 涨/多，#4ade80 跌/空）
   // ═══════════════════════════════════════════════════════════════════════════════
+  // 🔴 2026-10-29 统一口径（主人令「对齐市场统一说法、统一口径」+「不要自创·真实数据直接反应」）
+  //   全站唯一牛熊真相源：__renderObsSummary（上方卡·周期位置+个股信号）与 __renderCycleBreadth（下方卡·核心结论）
+  //   共用本函数，杜绝两卡口径打架（历史：上方卡已修「指数牛·个股熊(分化)」而下方卡仍写「分化市」+自创建议，同一市场两结论）。
+  //   口径：指数层=EDHEC 20%规则牛熊线（上证距峰 -20% 为牛熊分界）；个股层=平均股价(880003)距近 60 日峰值回撤，同 -20% 分界。
+  //   结论只描述真实数据 + 标准牛熊线，不夹带任何操作建议（严控仓位/抄底等均为自创，已移除）。
+  window.__v8CycleState = function(sh, apDD){
+    var C_RED='#f87171', C_GRN='#4ade80', C_AMB='#f59e0b';
+    var out = { bst:'bull', edhecDD:null, indexLabel:'数据未就绪', combinedShort:'数据未就绪', dir:0, col:C_AMB, verdict:'数据未就绪', vColor:C_AMB, vIcon:'🟡' };
+    if(sh && sh.length){
+      var pk=sh[0], tr=sh[0], bst='bull';
+      for(var _i=0;_i<sh.length;_i++){ var _v=sh[_i]; if(bst==='bull'){ pk=Math.max(pk,_v); if(_v<=pk*0.8){bst='bear';tr=_v;} } else { tr=Math.min(tr,_v); if(_v>=tr*1.2){bst='bull';pk=_v;} } }
+      var n=sh.length, edhecDD=(sh[n-1]/pk-1)*100;
+      // 指数层标签（仅看指数，不看个股）—— 与「🔮 未来预测」EDHEC 状态机同源同口径
+      var indexLabel = (bst==='bear') ? '熊市确认（破牛熊线）' : (edhecDD<=-10 ? '牛市中回调（未破线）' : '牛市上行（未破线）');
+      // 综合结论（指数 + 个股，数据驱动，无建议）
+      var combinedShort, verdict, dir, col, vColor, vIcon;
+      if(bst==='bear'){
+        combinedShort='熊市确认'; dir=-1; col=C_RED; vColor=C_RED; vIcon='🔴';
+        verdict='熊市（上证距峰 '+edhecDD.toFixed(1)+'% 已破 -20% 牛熊线）'+(apDD!=null?(' · 平均股价距峰 '+apDD.toFixed(1)+'%'):'');
+      } else if(apDD!=null && apDD<=-20){
+        combinedShort='指数牛·个股熊（分化）'; dir=0; col=C_AMB; vColor=C_AMB; vIcon='🟡';
+        verdict='指数牛·个股熊（分化）：上证距峰 '+edhecDD.toFixed(1)+'% 未破 -20% 牛熊线，平均股价距峰 '+apDD.toFixed(1)+'% 已破 -20% 牛熊线';
+      } else if(edhecDD<=-10){
+        combinedShort='牛市中回调'; dir=0; col=C_AMB; vColor=C_AMB; vIcon='🟡';
+        verdict='牛市中回调（上证距峰 '+edhecDD.toFixed(1)+'% 未破 -20% 牛熊线）';
+      } else {
+        combinedShort='牛市上行'; dir=1; col=C_GRN; vColor=C_GRN; vIcon='🟢';
+        verdict='牛市上行（上证距峰 '+edhecDD.toFixed(1)+'% 未破 -20% 牛熊线）';
+      }
+      out = { bst:bst, edhecDD:edhecDD, indexLabel:indexLabel, combinedShort:combinedShort, dir:dir, col:col, verdict:verdict, vColor:vColor, vIcon:vIcon };
+    }
+    return out;
+  };
+
   window.__renderObsSummary = function(){
     var dst = document.getElementById('obsSummaryBody');
     if(!dst) return;
@@ -17869,24 +17900,18 @@ hm += '</div>'; // /ulPaneBacktest
       } else { sigs.push({n:'指数估值分位', d:0, t:'分位数据缺失', c:DIM}); }
     } else { sigs.push({n:'指数估值分位', d:0, t:'数据未到位', c:DIM}); }
 
-    // ⑤ 周期位置 + 广度观测（接 EDHEC 牛熊状态机；牛市上行·无需抄底，熊市才显见底信号）
+    // ⑤ 周期位置 + 个股体感（统一口径见 __v8CycleState；2026-10-29 主人令「对齐市场统一说法·不要自创」）
     var cbTxt='—', cbDir=0, cbBst='—', cbCol=DIM;
     var MTcb = window.MARKET_THERMO || {}; var Dcb = MTcb.D || {};
     if(Dcb && Dcb.sh && Dcb.sh.length){
-      var _pk=Dcb.sh[0], _tr=Dcb.sh[0], _b='bull';
-      for(var _ci=0;_ci<Dcb.sh.length;_ci++){ var _cv=Dcb.sh[_ci]; if(_b==='bull'){ _pk=Math.max(_pk,_cv); if(_cv<=_pk*0.8){_b='bear';_tr=_cv;} } else { _tr=Math.min(_tr,_cv); if(_cv>=_tr*1.2){_b='bull';_pk=_cv;} } }
-      var _ddCb=(Dcb.sh[Dcb.sh.length-1]/_pk-1)*100;
       var _apCb=window.AVG_PRICE_DATA||null,_apDD=null;
       try{ if(_apCb&&_apCb.avg_price!=null&&_apCb.history&&_apCb.history.length){var _am=0;for(var _ai=0;_ai<_apCb.history.length;_ai++){_am=Math.max(_am,Number(_apCb.history[_ai].avg_price)||0);}if(_am>0)_apDD=(Number(_apCb.avg_price)/_am-1)*100;} }catch(e){}
-      /* 2026-10-27 主人令：side 回调段点亮 + 个股体感（指数失真时以平均股价回撤为准）。
-         2026-10-29 主人令「都-21%了还牛市？」修复：个股体感（平均股价距峰回撤 _apDD）≤-20% 时，
-         指数虽牛但个股已熊，标签改「指数牛·个股熊(分化)」（与下方大卡 _verdict 同口径），
-         不再误导贴纯牛标签；方向 cbDir / 配色 cbCol 已在下方据此翻中性(amber)。 */
-      cbBst = (_b==='bear'?'熊市确认段':((_apDD!=null&&_apDD<=-20)?'指数牛·个股熊(分化)':(_ddCb<=-10?'牛市中回调段':'牛市上行段')));
-      cbDir = (_b==='bear' ? -1 : ((_ddCb<=-10||(_apDD!=null&&_apDD<=-20)) ? 0 : 1));
-      cbCol = (_b==='bear' ? DN : ((cbDir===0) ? MID : UP));
+      var _cs = window.__v8CycleState(Dcb.sh, _apDD);
+      cbBst = _cs.combinedShort;
+      cbDir = _cs.dir;
+      cbCol = _cs.col;
+      cbTxt = _cs.combinedShort + ((typeof _apDD==='number')?(' · 个股距峰'+Math.round(_apDD)+'%'):'');
     } else if((window.__obsSumCbRetry||0) < 15){ window.__obsSumCbRetry=(window.__obsSumCbRetry||0)+1; setTimeout(window.__renderObsSummary, 700); }
-    cbTxt = cbBst + ((typeof _apDD==='number')?(' · 个股距峰'+Math.round(_apDD)+'%'):'');
     sigs.push({n:'周期位置+个股', d:cbDir, t:cbTxt, c:cbCol});
     // 2026-10-27 主人令：胶囊按「大盘观测」页下方各卡真实 DOM 顺序排序
     //   DOM：周期位置+广度(0.5) → 波浪(1) → 斐波(2) → 中信PE(3) → 指数估值(4)
@@ -17962,46 +17987,32 @@ hm += '</div>'; // /ulPaneBacktest
     try{
       // ── 周期位置（EDHEC 20%规则牛熊状态机）──
       var MT = window.MARKET_THERMO || {}; var D = MT.D || {};
+      // ── 平均股价位置（个股体感层，与上方卡/个股回撤行同算法；先算，供牛熊真相源使用）──
+      var ap = window.AVG_PRICE_DATA || null;
+      var pos = (ap && (ap.position_vs_ma_eff!=null?ap.position_vs_ma_eff:(ap.position_vs_ma20!=null?ap.position_vs_ma20:null)));
+      var kdj = (ap && ap.kdj_k!=null) ? Number(ap.kdj_k) : null;
+      var trState; if(pos==null) trState='未到位'; else if(pos>=0 && kdj!=null && kdj<20) trState='磨底·超卖'; else if(pos>=0) trState='上行·盈利行情'; else if(kdj!=null && kdj<20) trState='下跌·超卖'; else trState='下跌中';
+      var apDD=null;
+      try{ if(ap && ap.avg_price!=null && ap.history && ap.history.length){ var _aph=0;
+        for(var _ai=0;_ai<ap.history.length;_ai++){ _aph=Math.max(_aph, Number(ap.history[_ai].avg_price)||0); }
+        if(_aph>0) apDD=(Number(ap.avg_price)/_aph-1)*100; } }catch(e){}
+      // ── 周期位置（统一口径：全站唯一牛熊真相源 __v8CycleState，2026-10-29 主人令「对齐市场统一说法·禁自创操作建议」）──
       var bst='bull', edhecDD=null, cbBst='数据未就绪';
+      var _cs=null;
       if(D && D.sh && D.sh.length){
-        var pk=D.sh[0], tr=D.sh[0];
-        for(var _i=0;_i<D.sh.length;_i++){ var _v=D.sh[_i]; if(bst==='bull'){ pk=Math.max(pk,_v); if(_v<=pk*0.8){bst='bear';tr=_v;} } else { tr=Math.min(tr,_v); if(_v>=tr*1.2){bst='bull';pk=_v;} } }
-        var n=D.sh.length; edhecDD=(D.sh[n-1]/pk-1)*100;
-        /* 2026-10-27 主人令「牛市判断千万不能错」：-10%~-20% 回调段点亮（原 side 死代码从未触发，
-           指数跌 12% 仍显示「上行段·持股待涨」误导）；bear 判定仍严格按 EDHEC 20% 规则不变 */
-        cbBst = (bst==='bear'?'熊市确认段':(edhecDD<=-10?'牛市中回调段':'牛市上行段'));
+        _cs = window.__v8CycleState(D.sh, apDD);
+        bst=_cs.bst; edhecDD=_cs.edhecDD; cbBst=_cs.combinedShort;
       } else if((window.__cbRetry||0) < 15){ window.__cbRetry=(window.__cbRetry||0)+1; setTimeout(window.__renderCycleBreadth, 700); return; }
       // ── 广度观测 ──
       var TD = window.TOP10_DAILY || null;
       var hc = (TD && typeof TD.hc_count==='number') ? TD.hc_count : null;
       var brState = hc==null?'未到位':(hc>=6?'充足':(hc>=3?'稀薄':'枯竭'));
-      // ── 平均股价位置 ──
-      var ap = window.AVG_PRICE_DATA || null;
-      var pos = (ap && (ap.position_vs_ma_eff!=null?ap.position_vs_ma_eff:(ap.position_vs_ma20!=null?ap.position_vs_ma20:null)));
-      var kdj = (ap && ap.kdj_k!=null) ? Number(ap.kdj_k) : null;
-      var trState; if(pos==null) trState='未到位'; else if(pos>=0 && kdj!=null && kdj<20) trState='磨底·超卖'; else if(pos>=0) trState='上行·盈利行情'; else if(kdj!=null && kdj<20) trState='下跌·超卖'; else trState='下跌中';
       // ── 主力净额 ──
       var mf = window.MARKET_FUND_FLOW_DATA || {};
       var net=null, netDate=null; try{ if(mf && mf.daily && mf.daily.length){ var _ld=mf.daily[mf.daily.length-1]; net=_ld.net_yi; netDate=_ld.date; } }catch(e){}
       var fdState = net==null?'未到位':(net>=0?'净流入':'净流出');
-      /* 2026-10-27 主人令：个股体感层——平均股价(880003口径)距近 60 日峰值回撤，
-         指数失真（二八分化）时的真相；hc_count 是选股管线候选数、非市场广度，禁再当广度用 */
-      var apDD=null;
-      try{ if(ap && ap.avg_price!=null && ap.history && ap.history.length){ var _aph=0;
-        for(var _ai=0;_ai<ap.history.length;_ai++){ _aph=Math.max(_aph, Number(ap.history[_ai].avg_price)||0); }
-        if(_aph>0) apDD=(Number(ap.avg_price)/_aph-1)*100; } }catch(e){}
-
-      // ── 核心结论（image#2：牛市显示「牛市上行·无需抄底」，熊市才显「见底信号」）──
-      var _verdict, _vColor, _vIcon;
-      if(bst==='bull' && apDD!=null && apDD<=-20){ _verdict='指数牛 · 个股熊（分化市）：上证距峰值 '+(edhecDD!=null?edhecDD.toFixed(1):'—')+'% 未破 -20% 牛熊线，但平均股价距峰 '+apDD.toFixed(1)+'% 已达熊市级回撤——严控仓位、只做强势主线，不抄底平庸股'; _vColor=C_AMB; _vIcon='🟡'; }
-      else if(bst==='bull' && edhecDD!=null && edhecDD<=-10){ _verdict='牛市中回调段 · 回调 '+edhecDD.toFixed(1)+'%（未破 -20% 牛熊线，牛市未死；持仓防守、不加仓不抄底，等广度/资金共振再出手）'; _vColor=C_AMB; _vIcon='🟡'; }
-      else if(bst==='bull'){ _verdict='牛市上行段 · 无需抄底（持股待涨，不找底部）'; _vColor=C_GRN; _vIcon='🟢'; }
-      else { // 熊市确认段 → 启用「见底信号」研判（广度+股价+资金三观测点）
-        if(brState==='枯竭'||brState==='稀薄'){ _verdict='熊市确认 · 广度冰点（全市场无赚钱效应），坚决空仓'; _vColor=C_RED; _vIcon='🔴'; }
-        else if(trState==='上行·盈利行情' && fdState==='净流入'){ _verdict='熊市中的见底确认 · 可出手（广度够+股价站上均线+主力净流入，三重共振）'; _vColor=C_GRN; _vIcon='🟢'; }
-        else if(trState.indexOf('超卖')>=0){ _verdict='熊市中的见底初现 · 试探（赔率好转但确认不足）'; _vColor=C_AMB; _vIcon='🟡'; }
-        else { _verdict='熊市中的见底初现 · 试探（广度已够，趋势/资金未共振）'; _vColor=C_AMB; _vIcon='🟡'; }
-      }
+      // ── 核心结论（统一口径：直接反映真实数据，禁自创操作建议；2026-10-29 主人令）──
+      var _verdict = _cs.verdict, _vColor = _cs.vColor, _vIcon = _cs.vIcon;
 
       var h='';
       h += '<div style="padding:13px 15px;">';
@@ -18009,15 +18020,17 @@ hm += '</div>'; // /ulPaneBacktest
         + '<span style="font-size:17px;flex:0 0 auto;line-height:1.45;">'+_vIcon+'</span>'
         + '<span style="font-size:14.5px;font-weight:800;color:'+_vColor+';flex:1 1 auto;line-height:1.5;">'+_verdict+'</span></div>';
       h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">';
-      h += _cbRow('周期位置(EDHEC)', cbBst + (edhecDD!=null?(' · 距峰值 '+edhecDD.toFixed(1)+'%'):''), (bst==='bear'?C_RED:((edhecDD!=null&&edhecDD<=-10)?C_AMB:C_GRN)));
+      h += _cbRow('周期位置(EDHEC)', _cs.indexLabel + (edhecDD!=null?(' · 距峰值 '+edhecDD.toFixed(1)+'%'):''), (bst==='bear'?C_RED:((edhecDD!=null&&edhecDD<=-10)?C_AMB:C_GRN)));
       h += _cbRow('个股回撤(约2月)', (apDD==null?'未到位':('距峰 '+apDD.toFixed(1)+'%'+(apDD<=-20?' · 熊市级':(apDD<=-10?' · 深回调':' · 健康')))), (apDD==null?C_DIM:(apDD<=-20?C_RED:(apDD<=-10?C_AMB:C_GRN))));
       /* 2026-10-29 主人令：平均股价 这一行也带上「距峰回撤」偏离值（与 EDHEC 距峰值、个股回撤行同口径），
-         让主人在平均股价这一格直接看到偏离，不必去第2行找；配色按回撤深度（与个股回撤行一致）。 */
+         让主人在平均股价这一格直接看到偏离；配色按回撤深度（与个股回撤行一致）。 */
       h += _cbRow('平均股价', trState + (apDD!=null?(' · 距峰 '+apDD.toFixed(1)+'%'):''), (pos==null?C_DIM:(apDD!=null?(apDD<=-20?C_RED:(apDD<=-10?C_AMB:C_GRN)):(pos>=0?C_GRN:C_RED))));
       h += _cbRow('主力净额·单日', fdState + (net!=null?('('+(net>=0?'+':'')+Number(net).toFixed(0)+'亿'+(netDate?(' · '+String(netDate).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3')):'')):''), (net==null?C_DIM:(net>=0?C_GRN:C_RED)));
       h += '</div>';
-      h += '<div style="margin-top:10px;padding:8px 10px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.2);border-radius:7px;font-size:11px;line-height:1.7;color:'+C_SUB+';">'
-        + '📌 口径：指数层=EDHEC 20%规则牛熊状态机（上证月收盘·零未来函数，与「🔮 未来预测」同源）；个股层=平均股价(880003口径)距近 60 日峰值回撤——指数失真（二八分化）时以个股层为准。指数牛≠个股牛：分化时严控仓位只做强势主线。红涨绿跌。</div>';
+      h += '<div style="margin-top:8px;font-size:11.5px;line-height:1.7;color:'+C_SUB+';">'
+        + '📊 市场广度(hc_count)：<b style="color:'+(brState==='未到位'?C_DIM:(brState==='充足'?C_GRN:(brState==='稀薄'?C_AMB:C_RED)))+';">'+brState+'</b>（选股管线候选数，反映赚钱效应宽度）</div>';
+      h += '<div style="margin-top:6px;padding:8px 10px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.2);border-radius:7px;font-size:11px;line-height:1.7;color:'+C_SUB+';">'
+        + '📌 口径：指数层=EDHEC 20%规则牛熊状态机（上证月收盘·零未来函数，与「🔮 未来预测」同源）；个股层=平均股价(880003口径)距近 60 日峰值回撤——指数失真（二八分化）时以个股层为准。红涨绿跌。</div>';
       dst.innerHTML = h;
       var _cbTs = (TD && TD.update_time) ? TD.update_time : ((MT && (MT.update_time || MT.updated_at)) || '');
       var _cbF = document.getElementById('cycleBreadthFresh');
@@ -18267,7 +18280,7 @@ h+=`</div>`;
     var _pvI=-1; for(var _pi=D.val10.length-1;_pi>=0;_pi--){ if(D.val10[_pi]!=null){ _pvI=_pi; break; } }
     var _v10=(_pvI>=0?D.val10[_pvI]:(c.val10!=null?c.val10:null)), _v10Tag=(_pvI>=0?('月末'+D.dates[_pvI]):'');
     /* 2026-10-27 主人令：与周期位置卡对齐——-10%~-20% 点亮回调段（side 死代码根治） */
-    var _bstTxt=(bst==='bear'?'熊市确认段':(edhecDD<=-10?'牛市中回调段':'牛市上行段'));
+    var _bstTxt=window.__v8CycleState(D.sh, null).indexLabel;
     var _valTxt=(_v10==null?'数据累积中':(_v10>=80?'偏贵':(_v10<50?'偏低':'中性')));
     var _tsfY=(EXT.tsf&&EXT.tsf.yoy!=null)?EXT.tsf.yoy:null;
     var _tsfTxt=(_tsfY==null?'待接入':(_tsfY<=-10?'崩塌':(_tsfY<0?'收缩初现':'扩张')));
