@@ -17990,8 +17990,6 @@ hm += '</div>'; // /ulPaneBacktest
       // ── 平均股价位置（个股体感层，与上方卡/个股回撤行同算法；先算，供牛熊真相源使用）──
       var ap = window.AVG_PRICE_DATA || null;
       var pos = (ap && (ap.position_vs_ma_eff!=null?ap.position_vs_ma_eff:(ap.position_vs_ma20!=null?ap.position_vs_ma20:null)));
-      var kdj = (ap && ap.kdj_k!=null) ? Number(ap.kdj_k) : null;
-      var trState; if(pos==null) trState='未到位'; else if(pos>=0 && kdj!=null && kdj<20) trState='磨底·超卖'; else if(pos>=0) trState='上行·盈利行情'; else if(kdj!=null && kdj<20) trState='下跌·超卖'; else trState='下跌中';
       var apDD=null;
       try{ if(ap && ap.avg_price!=null && ap.history && ap.history.length){ var _aph=0;
         for(var _ai=0;_ai<ap.history.length;_ai++){ _aph=Math.max(_aph, Number(ap.history[_ai].avg_price)||0); }
@@ -18022,9 +18020,9 @@ hm += '</div>'; // /ulPaneBacktest
       h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">';
       h += _cbRow('周期位置(EDHEC)', _cs.indexLabel + (edhecDD!=null?(' · 距峰值 '+edhecDD.toFixed(1)+'%'):''), (bst==='bear'?C_RED:((edhecDD!=null&&edhecDD<=-10)?C_AMB:C_GRN)));
       h += _cbRow('个股回撤(约2月)', (apDD==null?'未到位':('距峰 '+apDD.toFixed(1)+'%'+(apDD<=-20?' · 熊市级':(apDD<=-10?' · 深回调':' · 健康')))), (apDD==null?C_DIM:(apDD<=-20?C_RED:(apDD<=-10?C_AMB:C_GRN))));
-      /* 2026-10-29 主人令：平均股价 这一行也带上「距峰回撤」偏离值（与 EDHEC 距峰值、个股回撤行同口径），
-         让主人在平均股价这一格直接看到偏离；配色按回撤深度（与个股回撤行一致）。 */
-      h += _cbRow('平均股价', trState + (apDD!=null?(' · 距峰 '+apDD.toFixed(1)+'%'):''), (pos==null?C_DIM:(apDD!=null?(apDD<=-20?C_RED:(apDD<=-10?C_AMB:C_GRN)):(pos>=0?C_GRN:C_RED))));
+      /* 2026-10-29 主人令：平均股价 这一行只显示真实字段（距峰回撤 / 站上·跌破均线），
+         不再自创「超卖」标签——超买超卖口径以「平均股价·超买超卖」权威卡(position_vs_ma 阈值)为准，杜绝双口径矛盾。 */
+      h += _cbRow('平均股价', (apDD!=null?('距峰 '+apDD.toFixed(1)+'%'):(pos==null?'未到位':(pos>=0?'站上均线':'跌破均线'))), (pos==null?C_DIM:(apDD!=null?(apDD<=-20?C_RED:(apDD<=-10?C_AMB:C_GRN)):(pos>=0?C_GRN:C_RED))));
       h += _cbRow('主力净额·单日', fdState + (net!=null?('('+(net>=0?'+':'')+Number(net).toFixed(0)+'亿'+(netDate?(' · '+String(netDate).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3')):'')):''), (net==null?C_DIM:(net>=0?C_GRN:C_RED)));
       h += '</div>';
       h += '<div style="margin-top:8px;font-size:11.5px;line-height:1.7;color:'+C_SUB+';">'
@@ -18225,18 +18223,21 @@ h+=`</div>`;
     }
     var D = T.D, EXT = T.EXT || {}, SPOT = T.SPOT || {}, c = D.current;
     var C_RED='#f87171', C_GRN='#4ade80', C_AMB='#f59e0b', C_PUR='#c084fc', C_BLU='#60a5fa', C_DIM='#8b93a1', C_TXT='#e6e9ef';
-    // ── EDHEC 状态机 ──
-    var pk=D.sh[0], tr=D.sh[0], bst='bull';
+    // ── EDHEC 状态机（仅用于 27年走势图逐段着色；最终牛熊态/距峰回撤统一走 __v8CycleState 单一真相源）──
+    var pk=D.sh[0], tr=D.sh[0], _bst='bull';
     var st3=D.sh.map(function(v){
-      if(bst==='bull'){ pk=Math.max(pk,v); if(v<=pk*0.8){bst='bear';tr=v;} }
-      else { tr=Math.min(tr,v); if(v>=tr*1.2){bst='bull';pk=v;} }
+      if(_bst==='bull'){ pk=Math.max(pk,v); if(v<=pk*0.8){_bst='bear';tr=v;} }
+      else { tr=Math.min(tr,v); if(v>=tr*1.2){_bst='bull';pk=v;} }
       var dd=v/pk-1;
-      return bst==='bear'?'bear':(dd<=-0.1?'side':'bull');
+      return _bst==='bear'?'bear':(dd<=-0.1?'side':'bull');
     });
     function runs(val){ var out=[],s=-1,i; for(i=0;i<st3.length;i++){ if(st3[i]===val){ if(s<0)s=i; } else if(s>=0){ out.push([D.dates[s],D.dates[i-1]]); s=-1; } } if(s>=0) out.push([D.dates[s],D.dates[st3.length-1]]); return out; }
     var bearRuns=runs('bear'), sideRuns=runs('side');
     var n=D.sh.length;
-    var edhecDD=(D.sh[n-1]/pk-1)*100;
+    // 🔴 2026-10-29 主人令「全站算法口径统一」：最终牛熊态 + 距峰回撤 全站唯一真相源，
+    //   与「周期位置+广度观测」「大盘5卡汇总」同源，杜绝未来预测卡独立复算导致口径漂移。
+    var _cs = window.__v8CycleState(D.sh, null);
+    var bst=_cs.bst, edhecDD=_cs.edhecDD;
     var ex12=(D.eq[n-1]/D.eq[n-13]-1)-(D.sh[n-1]/D.sh[n-13]-1);
     var maWin=D.sh.slice(Math.max(0,n-200));
     var shMA=maWin.reduce(function(a,b){return a+b;},0)/maWin.length;

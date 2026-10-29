@@ -10092,3 +10092,16 @@ items:
       下方卡无自创建议文案；综合研判卡内无嵌套彩色边框、无重复「观测类」灰标。
     updated: "2026-10-29 11:30"
     updated_by: 小九
+  - id: cycle-caliber-dedup-1029b
+    owner: 双机共用
+    priority: P1
+    status: done
+    created: 2026-10-29
+    title: 口径去重续·未来预测EDHEC复算删除 + 平均股价超卖双口径根治（commit 随批）
+    note: >
+      承接 cycle-unify-bullbear-fix-1029。①「🔮 未来预测」卡原内含一套独立 EDHEC 状态机(bst/edhecDD)，
+      现最终牛熊态+距峰回撤改调 __v8CycleState(D.sh,null) 单一真相源（27年走势图逐段着色仍保留同算法 st3 系列）；
+      ②「周期位置+广度观测」卡平均股价行原用 KDJ<20 自创「超卖」标签，与「平均股价·超买超卖」权威卡(position_vs_ma 阈值)双口径矛盾，
+      现改为只显示真实字段(距峰回撤/站上·跌破均线)，超买超卖口径唯一归口权威卡。node --check 31脚本0错。
+    updated: "2026-10-29 11:25"
+    updated_by: 小九
