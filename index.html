@@ -8185,7 +8185,14 @@ c.innerHTML = h;
     function _curMonth(){ var n=new Date(); return n.getFullYear()+'-'+('0'+(n.getMonth()+1)).slice(-2); }
     function _isStale(o){
       if(o.k==='daily') return false;
-      if(o.k==='weekly'){ var w=_curWeekRange(); return (o.scope.indexOf(w.start)<0) && ((o.text||'').indexOf(w.start)<0); }
+      if(o.k==='weekly'){
+        var w=_curWeekRange();
+        if((o.scope.indexOf(w.start)<0) && ((o.text||'').indexOf(w.start)<0)) return true;
+        // 2026-10-29 主人令：正文内嵌旧周区间（如「10/5-10/11」）也判过期——防 AI 生成器不滚动周框架（曾静默停在节后首周 3 周）
+        var _m=(o.text||'').match(/(\d{1,2})\/(\d{1,2})-(\d{1,2})\/(\d{1,2})/);
+        if(_m){ var _ws=_m[1]+'/'+_m[2]; if(_ws!==w.start) return true; }
+        return false;
+      }
       if(o.k==='monthly'){ return o.scope.indexOf(_curMonth())<0; }
       return false;
     }
@@ -8273,7 +8280,7 @@ c.innerHTML = h;
           : '<div style="font-size:12px;color:var(--dim);">' + PENDING + '</div>')
       + '</div>'
       // 三段实情解析
-      + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:10px;margin-bottom:12px;">'
+      + '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;">'
       + SEGS.map(segBlock).join('')
       + '</div>'
       // 三段原文折叠（原始素材 · 保留）
