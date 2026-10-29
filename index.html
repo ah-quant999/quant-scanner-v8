@@ -15148,9 +15148,10 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
       const pill = (t,c)=>'<span style="background:'+c+'1a;color:'+c+';border:1px solid '+c+'4d;border-radius:4px;padding:2px 7px;white-space:nowrap;">'+t+'</span>';
       sumEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:4px 0 10px;font-size:12px;">'
         + pill('🎯 终选 <b>'+arr.length+'</b> 只','#5ee0a0')
-        + pill('模式 '+modeTxt,'#60a5fa')
-        + (TD.hc_count != null ? pill('候选 hc='+TD.hc_count,'#fbbf24') : '')
-        + '<span style="color:var(--dim);margin-left:auto;">金股池 → 共振过滤</span>'
+        + '<span title="selection_mode='+ (mode||'—') +'" style="background:#60a5fa1a;color:#60a5fa;border:1px solid #60a5fa4d;border-radius:4px;padding:2px 7px;white-space:nowrap;">模式 '+modeTxt+'</span>'
+        + (TD.hc_count != null ? pill('共振候选 hc='+TD.hc_count,'#fbbf24') : '')
+        + (TD.total_scored != null ? pill('全池评分 <b>'+TD.total_scored+'</b> 只','#a78bfa') : '')
+        + '<span style="color:var(--dim);margin-left:auto;">金股池 → 金钻+缠论双共振过滤</span>'
         + '</div>';
     }
     // 列表（Top5 标 🏷）

@@ -1359,7 +1359,14 @@ def main():
     #   🛡 2026-09-23：tree_items 改为**在提交循环内**构造 —— 基线前进时
     #     `new_entries["index.html"]` 会被按新基线重算（见 _ix_sha_for），必须同步刷新。
 
-    msg = "v8 cn fetch: " + now_cst().strftime("%Y-%m-%d %H:%M")
+    # 🔴 2026-10-30 主人令「选2·可观测性」：盘后算法链产物用独立 [algo] 前缀，
+    #   与盘中 cn fetch 区分，git log 一眼识别「哪些是算法链落盘、哪些是盘中抓取」。
+    #   判定依据：v8_algo_cloud.yml 跑算法链时设 PUSH_ALGO_RAW=1（仅该 workflow 设置），
+    #   cloud_fetch 默认不设 ⇒ 走原 "v8 cn fetch:" 文案，向后兼容。
+    _is_algo_push = os.environ.get("PUSH_ALGO_RAW") == "1"
+    msg = ("v8 algo: " if _is_algo_push else "v8 cn fetch: ") + now_cst().strftime("%Y-%m-%d %H:%M")
+    if _is_algo_push:
+        msg += " [algo·盘后算法链产物]"
     # 2026-08-11 修复（159 轮看门狗）：提交环节的三类「单点致命」问题一并根治——
     #   ① r2/cmt2 直接下标取值，网络异常时 KeyError 崩溃（blob 已全部上传完却前功尽弃）；
     #   ② 创建 tree / commit 失败即 sys.exit(1)，明明外层就是 3 次重试循环却不复用，
