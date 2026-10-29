@@ -40,6 +40,7 @@ window.NATIONAL_TEAM = {
     {
       "key": "D",
       "name": "汇金持仓环比",
+      "freq": "季度",
       "weight": 0,
       "ready": true,
       "value": 9.82,

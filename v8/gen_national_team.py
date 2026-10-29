@@ -190,7 +190,7 @@ subs.append({
 subs.append({
     'key':'D','name':'汇金持仓环比','weight':W['D'],'ready':d_ready,
     'value':d_val,'unit':'亿股','detail':d_detail or 'v8 无季报十大股东源 ⇒ 未接入（季报滞后1-3月，无法实时）',
-    'status':d_status
+    'status':d_status,'freq':'季度'
 })
 
 out = {
