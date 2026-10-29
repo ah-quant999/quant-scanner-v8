@@ -18008,7 +18008,9 @@ hm += '</div>'; // /ulPaneBacktest
       h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">';
       h += _cbRow('周期位置(EDHEC)', cbBst + (edhecDD!=null?(' · 距峰值 '+edhecDD.toFixed(1)+'%'):''), (bst==='bear'?C_RED:((edhecDD!=null&&edhecDD<=-10)?C_AMB:C_GRN)));
       h += _cbRow('个股回撤(约2月)', (apDD==null?'未到位':('距峰 '+apDD.toFixed(1)+'%'+(apDD<=-20?' · 熊市级':(apDD<=-10?' · 深回调':' · 健康')))), (apDD==null?C_DIM:(apDD<=-20?C_RED:(apDD<=-10?C_AMB:C_GRN))));
-      h += _cbRow('平均股价', trState, (pos==null?C_DIM:(pos>=0?C_GRN:C_RED)));
+      /* 2026-10-29 主人令：平均股价 这一行也带上「距峰回撤」偏离值（与 EDHEC 距峰值、个股回撤行同口径），
+         让主人在平均股价这一格直接看到偏离，不必去第2行找；配色按回撤深度（与个股回撤行一致）。 */
+      h += _cbRow('平均股价', trState + (apDD!=null?(' · 距峰 '+apDD.toFixed(1)+'%'):''), (pos==null?C_DIM:(apDD!=null?(apDD<=-20?C_RED:(apDD<=-10?C_AMB:C_GRN)):(pos>=0?C_GRN:C_RED))));
       h += _cbRow('主力净额·单日', fdState + (net!=null?('('+(net>=0?'+':'')+Number(net).toFixed(0)+'亿'+(netDate?(' · '+String(netDate).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3')):'')):''), (net==null?C_DIM:(net>=0?C_GRN:C_RED)));
       h += '</div>';
       h += '<div style="margin-top:10px;padding:8px 10px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.2);border-radius:7px;font-size:11px;line-height:1.7;color:'+C_SUB+';">'
