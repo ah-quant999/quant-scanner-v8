@@ -1168,7 +1168,11 @@ def check_handoff_ledger():
     if not isinstance(items, list) or not items:
         return False, "HANDOFF.yaml 的 items 为空或非列表"
 
-    ALLOW = {"todo", "doing", "pending-verify", "blocked", "done"}
+    # 🛡 2026-10-29 一劳永逸（九宝令「改完全部直接上线」）：放开 `dropped`（取消/不实现的终态，
+    #    团队真实约定，见 HANDOFF.yaml 的 bc-schemes-dropped-1029「主人 10-29 拍板 B/C 方案都不要」）。
+    #    此前白名单漏 dropped ⇒ 任何人标 dropped 就把全站部署卡死（本次系统性 failure 根因）。
+    #    dropped 与 done 同属终态，放行不影响其余判据（优先级/负责人/未来时戳/ledger 双向一致）。
+    ALLOW = {"todo", "doing", "pending-verify", "blocked", "done", "dropped"}
     ids, bad = [], []
     for i, it in enumerate(items):
         if not isinstance(it, dict):
