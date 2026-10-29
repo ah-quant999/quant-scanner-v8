@@ -517,6 +517,96 @@ def fetch_cons_safe(bk):
     raise last
 
 
+def _compute_fr_sectors(fr_names, boards_exact, boards_norm, src_date):
+    # ═══ 📊 2026-10-19 主人令：最终推荐 · 强势板块龙头股（同一管线扩展）═══
+    #   需求原话：「把最终推荐这里显示的板块对应的龙头股写进去，跟着最终推荐日更」。
+    #   板块清单 = data/FINAL_RECOMMEND_DATA.js 的 strong_sectors（相对强度 TOP，同花顺名空间，
+    #   与 SECTOR_RS 同名空间 ⇒ _resolve_bk / MANUAL_ALIAS 直接复用）；个股 = 东财对应板块
+    #   成分股当日涨幅前 5（与主升/启动卡同口径）。产物键 fr_sectors（与 sectors 平级）。
+    #   兜底全复用：em_boards 双缓存 / 腾讯行情 / NeoData / 同款「同日保底锁」防云端洗回。
+    #   🆕 2026-10-29 抽离为独立函数：build() 与 rebuild_fr_only(--fr-only) 共用同一份逻辑，
+    #   保证 fr_sectors 永远跟随最新 FINAL_RECOMMEND_DATA.strong_sectors（一劳永逸根治时序 race）。
+    fr_out = []
+    if not fr_names:
+        return fr_out
+    if boards_exact is None:
+        boards_exact, boards_norm = fetch_em_boards()
+        log("fr em boards: exact=%d norm=%d" % (len(boards_exact), len(boards_norm)))
+    # 同日保底锁底稿：上一版 fr_sectors（同 data_date 才有效，防跨日冒充）
+    _prev_fr = {}
+    if src_date:
+        _prev_raw = _cache_load(OUT_RAW)
+        if isinstance(_prev_raw, dict) and str(_prev_raw.get("data_date") or "")[:10] == src_date:
+            for _p in (_prev_raw.get("fr_sectors") or []):
+                if isinstance(_p, dict) and _p.get("name"):
+                    _prev_fr[_p["name"]] = _p
+    for nm in fr_names:
+        bk, how = _resolve_bk(nm, boards_exact, boards_norm)
+        if not bk:
+            # 🛡 2026-10-20 小九（与主升/启动路径同款·code 行为一致）：东财无对应板块 ≠ 无龙头，
+            #   fr 名即同花顺行业名 ⇒ 直取同花顺成分股 → 腾讯行情；仅同花顺也失败才 no_match。
+            _thsm = _ths_members_by_name(nm)
+            if _thsm:
+                try:
+                    _rows = _tx_cons(_thsm)
+                    fr_out.append({"name": nm, "bk": None, "cons_count": len(_thsm),
+                                   "leaders": _rows[:TOP_N], "match": "ths"})
+                    time.sleep(0.3)
+                    continue
+                except Exception as _te:
+                    log("fr ths quote fail %s: %s（回退 NeoData）" % (nm, str(_te)[:50]))
+            _neo = _neo_cons(nm)
+            if _neo:
+                fr_out.append({"name": nm, "bk": None, "cons_count": len(_neo),
+                               "leaders": _neo[:TOP_N], "match": "neodata"})
+                continue
+            fr_out.append({"name": nm, "bk": None, "cons_count": 0, "leaders": [],
+                           "no_match": 1, "match": ""})
+            log("fr no-match: %s（东财无对应板块；已保留 + no_match=1，请补 MANUAL_ALIAS）" % nm)
+            continue
+        try:
+            cons = fetch_cons_safe(bk)
+            fr_out.append({"name": nm, "bk": bk, "cons_count": len(cons),
+                           "leaders": cons[:TOP_N], "match": how})
+        except Exception as e:
+            # 🛡 2026-10-19 小九（龙头股「全部没数据」根治）：fetch_cons_safe 三层
+            #   （东财在线/成员缓存/腾讯行情）全失效时，改用**同花顺行业名直取**成分股
+            #   （fr 名即同花顺行业名，精确对应），名单→腾讯行情取涨幅。彻底摆脱对
+            #   东财 clist（云 runner 海外 IP 被封）的依赖，新板块自动解析免 MANUAL_ALIAS。
+            _thsm = _ths_members_by_name(nm)
+            if _thsm:
+                try:
+                    _rows = _tx_cons(_thsm)
+                    fr_out.append({"name": nm, "bk": bk, "cons_count": len(_thsm),
+                                   "leaders": _rows[:TOP_N], "match": "ths"})
+                    time.sleep(0.3)
+                    continue
+                except Exception as _te:
+                    log("fr ths quote fail %s: %s（回退 NeoData）" % (nm, str(_te)[:50]))
+            _neo = _neo_cons(nm)
+            if _neo:
+                fr_out.append({"name": nm, "bk": bk, "cons_count": len(_neo),
+                               "leaders": _neo[:TOP_N], "match": "neodata"})
+            else:
+                fr_out.append({"name": nm, "bk": bk, "cons_count": 0, "leaders": [],
+                               "leaders_error": 1, "match": how})
+                log("fr cons fail %s(%s): %s —— 保留板块，个股留空待下轮补抓" % (nm, bk, str(e)[:60]))
+        time.sleep(0.3)
+    # 同日保底锁（与主升/启动同规则）：本轮空 + 上一版同日有 ⇒ 过继，防云端无 token 跑批洗回
+    for x in fr_out:
+        if x.get("leaders"):
+            continue
+        _pl = (_prev_fr.get(x["name"]) or {}).get("leaders") or []
+        if _pl:
+            x["leaders"] = _pl
+            x["bk"] = (_prev_fr[x["name"]].get("bk"))
+            x["cons_count"] = (_prev_fr[x["name"]].get("cons_count")) or len(_pl)
+            x["match"] = "retained:" + (x.get("match") or "")
+            log("fr retained %s: %d leaders（同 data_date=%s 自上一版过继，防洗回）"
+                % (x["name"], len(_pl), src_date))
+    return fr_out
+
+
 def build():
     rs = _read_window_js(SRC_RS)
     if not rs or not rs.get("sectors"):
@@ -681,83 +771,9 @@ def build():
         fr_names = [str(x) for x in ((_fr or {}).get("strong_sectors") or []) if x]
     except Exception as _fe:
         log("FINAL_RECOMMEND 读取失败（强势板块龙头节跳过）: %s" % str(_fe)[:60])
-    if fr_names:
-        log("fr strong_sectors: %d 个（来自 FINAL_RECOMMEND）" % len(fr_names))
-        if boards_exact is None:
-            boards_exact, boards_norm = fetch_em_boards()
-            log("fr em boards: exact=%d norm=%d" % (len(boards_exact), len(boards_norm)))
-        # 同日保底锁底稿：上一版 fr_sectors（同 data_date 才有效，防跨日冒充）
-        _prev_fr = {}
-        if src_date:
-            _prev_raw = _cache_load(OUT_RAW)
-            if isinstance(_prev_raw, dict) and str(_prev_raw.get("data_date") or "")[:10] == src_date:
-                for _p in (_prev_raw.get("fr_sectors") or []):
-                    if isinstance(_p, dict) and _p.get("name"):
-                        _prev_fr[_p["name"]] = _p
-        for nm in fr_names:
-            bk, how = _resolve_bk(nm, boards_exact, boards_norm)
-            if not bk:
-                # 🛡 2026-10-20 小九（与主升/启动路径同款·code 行为一致）：东财无对应板块 ≠ 无龙头，
-                #   fr 名即同花顺行业名 ⇒ 直取同花顺成分股 → 腾讯行情；仅同花顺也失败才 no_match。
-                _thsm = _ths_members_by_name(nm)
-                if _thsm:
-                    try:
-                        _rows = _tx_cons(_thsm)
-                        fr_out.append({"name": nm, "bk": None, "cons_count": len(_thsm),
-                                       "leaders": _rows[:TOP_N], "match": "ths"})
-                        time.sleep(0.3)
-                        continue
-                    except Exception as _te:
-                        log("fr ths quote fail %s: %s（回退 NeoData）" % (nm, str(_te)[:50]))
-                _neo = _neo_cons(nm)
-                if _neo:
-                    fr_out.append({"name": nm, "bk": None, "cons_count": len(_neo),
-                                   "leaders": _neo[:TOP_N], "match": "neodata"})
-                    continue
-                fr_out.append({"name": nm, "bk": None, "cons_count": 0, "leaders": [],
-                               "no_match": 1, "match": ""})
-                log("fr no-match: %s（东财无对应板块；已保留 + no_match=1，请补 MANUAL_ALIAS）" % nm)
-                continue
-            try:
-                cons = fetch_cons_safe(bk)
-                fr_out.append({"name": nm, "bk": bk, "cons_count": len(cons),
-                               "leaders": cons[:TOP_N], "match": how})
-            except Exception as e:
-                # 🛡 2026-10-19 小九（龙头股「全部没数据」根治）：fetch_cons_safe 三层
-                #   （东财在线/成员缓存/腾讯行情）全失效时，改用**同花顺行业名直取**成分股
-                #   （fr 名即同花顺行业名，精确对应），名单→腾讯行情取涨幅。彻底摆脱对
-                #   东财 clist（云 runner 海外 IP 被封）的依赖，新板块自动解析免 MANUAL_ALIAS。
-                _thsm = _ths_members_by_name(nm)
-                if _thsm:
-                    try:
-                        _rows = _tx_cons(_thsm)
-                        fr_out.append({"name": nm, "bk": bk, "cons_count": len(_thsm),
-                                       "leaders": _rows[:TOP_N], "match": "ths"})
-                        time.sleep(0.3)
-                        continue
-                    except Exception as _te:
-                        log("fr ths quote fail %s: %s（回退 NeoData）" % (nm, str(_te)[:50]))
-                _neo = _neo_cons(nm)
-                if _neo:
-                    fr_out.append({"name": nm, "bk": bk, "cons_count": len(_neo),
-                                   "leaders": _neo[:TOP_N], "match": "neodata"})
-                else:
-                    fr_out.append({"name": nm, "bk": bk, "cons_count": 0, "leaders": [],
-                                   "leaders_error": 1, "match": how})
-                    log("fr cons fail %s(%s): %s —— 保留板块，个股留空待下轮补抓" % (nm, bk, str(e)[:60]))
-            time.sleep(0.3)
-        # 同日保底锁（与主升/启动同规则）：本轮空 + 上一版同日有 ⇒ 过继，防云端无 token 跑批洗回
-        for x in fr_out:
-            if x.get("leaders"):
-                continue
-            _pl = (_prev_fr.get(x["name"]) or {}).get("leaders") or []
-            if _pl:
-                x["leaders"] = _pl
-                x["bk"] = (_prev_fr[x["name"]].get("bk"))
-                x["cons_count"] = (_prev_fr[x["name"]].get("cons_count")) or len(_pl)
-                x["match"] = "retained:" + (x.get("match") or "")
-                log("fr retained %s: %d leaders（同 data_date=%s 自上一版过继，防洗回）"
-                    % (x["name"], len(_pl), src_date))
+    # 📊 2026-10-19/10-29：fr_sectors 生成抽离至 _compute_fr_sectors（与 --fr-only 共用，
+    #   保证 fr_sectors 永远跟随最新 FINAL_RECOMMEND_DATA.strong_sectors，消除 A批/D批 时序 race）
+    fr_out = _compute_fr_sectors(fr_names, boards_exact, boards_norm, src_date)
 
     # 🛡 2026-09-25 阿狸咪的工程师（主人令「改好直接上线」· 卡面假刷新根治）：
     #   原口径 `"update_time": time.strftime(...)` = **本脚本落盘时刻**，与数据日期无关。
@@ -807,7 +823,59 @@ def build():
     return payload
 
 
+def rebuild_fr_only():
+    # 🆕 2026-10-29 主人令「一劳永逸」：仅重算 fr_sectors（强势板块龙头股），
+    #   不碰 sectors 部分、不复跑全量网络。读取磁盘现有 SECTOR_LEADERS.js，
+    #   用**最新** FINAL_RECOMMEND_DATA.strong_sectors 刷新 fr_sectors 后原地回写。
+    #   用途：final_recommend.py 落盘 FINAL 后挂链调用，彻底消除
+    #   「SECTOR_LEADERS 在 A 批读上一轮 FINAL / FINAL 在 D 批末；早盘 FINAL 重算未触发
+    #   SECTOR_LEADERS 重算 ⇒ 新晋强板块次日仍显示『上游字典尚未收录』」的时序 race。
+    #   若磁盘无现有 SECTOR_LEADERS.js（首次/被删），退回全量 build() 兜底。
+    _existing = _read_window_js(OUT_JS)
+    if not isinstance(_existing, dict) or not _existing.get("sectors"):
+        log("rebuild_fr_only: 无现有 SECTOR_LEADERS.js ⇒ 退回全量 build()")
+        return build()
+    src_date = str(_existing.get("data_date") or "")[:10]
+    # 最新 FINAL strong_sectors（fr 板块清单的唯一权威来源）
+    fr_names = []
+    try:
+        _fr = _read_window_js(os.path.join(ROOT, "data", "FINAL_RECOMMEND_DATA.js"))
+        fr_names = [str(x) for x in ((_fr or {}).get("strong_sectors") or []) if x]
+    except Exception as _fe:
+        log("rebuild_fr_only: FINAL 读取失败（保持原 fr_sectors）: %s" % str(_fe)[:60])
+        return _existing
+    if not fr_names:
+        log("rebuild_fr_only: FINAL 无 strong_sectors（保持原 fr_sectors）")
+        return _existing
+    boards_exact, boards_norm = fetch_em_boards()
+    log("rebuild_fr_only: fr strong_sectors=%d（来自最新 FINAL_RECOMMEND）" % len(fr_names))
+    fr_out = _compute_fr_sectors(fr_names, boards_exact, boards_norm, src_date)
+    _existing["fr_sectors"] = fr_out
+    _existing["fr_count"] = len(fr_out)
+    _existing["republish_time"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    _existing["note"] = ((_existing.get("note") or "")
+                         + " | fr_sectors 已于 %s 跟随 FINAL 重算(一劳永逸)" % _existing["republish_time"])
+    _raw_txt = json.dumps(_existing, ensure_ascii=False, indent=2).encode("utf-8")
+    with open(OUT_RAW, "wb") as f:
+        f.write(_raw_txt)
+    _body = json.dumps(_existing, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    with open(OUT_JS, "wb") as f:
+        f.write(b"window.SECTOR_LEADERS = " + _body + b";\n")
+    log("rebuild_fr_only OK js_bytes=%d fr_count=%d" % (len(_body), len(fr_out)))
+    return _existing
+
+
 if __name__ == "__main__":
+    # 🆕 2026-10-29 主人令「一劳永逸」：--fr-only 仅重算 fr_sectors（见 rebuild_fr_only），
+    #   供 final_recommend.py 落盘 FINAL 后挂链调用，消除 A批/D批 时序 race。
+    if "--fr-only" in sys.argv:
+        _res = rebuild_fr_only()
+        if not isinstance(_res, dict):
+            print("::error title=v8-sector-leaders-fr-only::rebuild_fr_only 未产出 payload"
+                  "（全量 build 兜底也失败）—— 本轮 fr_sectors 未更新；请检查上游。")
+            raise SystemExit(1)
+        print("OK fr-only done fr_count=%d" % len(_res.get("fr_sectors") or []))
+        raise SystemExit(0)
     # 🛡 2026-09-24 阿狸咪的工程师（主人令「一劳永逸」· 红卡停更根治）：
     #   原为裸 `build()`：build() 内部在「SECTOR_RS 无 sectors」时 return None，
     #   而进程**仍以 0 退出** ⇒ 上层 run_algorithms 视为成功、failed_scripts 不记

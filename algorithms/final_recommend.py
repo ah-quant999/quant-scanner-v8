@@ -1951,6 +1951,25 @@ def main():
         f.write(js)
     print(f"[ok] {js_path}")
 
+    # 🆕 2026-10-29 主人令「一劳永逸」：FINAL 落盘后立即只重算 fr_sectors（强势板块龙头股），
+    #   根治「SECTOR_LEADERS 在 A 批读上一轮 FINAL、FINAL 在 D 批末；早盘 FINAL 重算未触发
+    #   SECTOR_LEADERS 重算 ⇒ 新晋强板块次日卡面仍显示『上游字典尚未收录』」的时序 race。
+    #   调用 scripts/fetch_sector_leaders.py --fr-only（仅刷新 fr_sectors、不碰 sectors、不复跑全量网络）；
+    #   与回测/历史同哲学：try/except 包裹，失败绝不影响 D 批主产物；轻网络。
+    try:
+        import subprocess as _sp
+        _fsl = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                            "scripts", "fetch_sector_leaders.py")
+        _r = _sp.run([sys.executable, _fsl, "--fr-only"],
+                     capture_output=True, text=True, timeout=300)
+        if _r.returncode == 0:
+            print("[ok] fr_sectors 已跟随最新 FINAL 重算（--fr-only）")
+        else:
+            _tail = (_r.stderr or _r.stdout or "")[-400:]
+            print("[warn] fr_sectors 跟随重算返回非零（已忽略，不影响主产物）: " + _tail)
+    except Exception as e:
+        print(f"[warn] fr_sectors 跟随重算 skipped: {e.__class__.__name__}: {e}")
+
     # 🗂 历史归档（all_site_backtest.py 已删除）：按 update_time 日期落盘 raw_data/history
     # 与 calc_crds.py 同源思路——只有落盘「每日 dated 快照」回测才有过去信号日可算前向收益。
     try:

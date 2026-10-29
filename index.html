@@ -17878,8 +17878,11 @@ hm += '</div>'; // /ulPaneBacktest
       var _ddCb=(Dcb.sh[Dcb.sh.length-1]/_pk-1)*100;
       var _apCb=window.AVG_PRICE_DATA||null,_apDD=null;
       try{ if(_apCb&&_apCb.avg_price!=null&&_apCb.history&&_apCb.history.length){var _am=0;for(var _ai=0;_ai<_apCb.history.length;_ai++){_am=Math.max(_am,Number(_apCb.history[_ai].avg_price)||0);}if(_am>0)_apDD=(Number(_apCb.avg_price)/_am-1)*100;} }catch(e){}
-      /* 2026-10-27 主人令：side 回调段点亮 + 个股体感（指数失真时以平均股价回撤为准） */
-      cbBst = (_b==='bear'?'熊市确认段':(_ddCb<=-10?'牛市中回调段':'牛市上行段'));
+      /* 2026-10-27 主人令：side 回调段点亮 + 个股体感（指数失真时以平均股价回撤为准）。
+         2026-10-29 主人令「都-21%了还牛市？」修复：个股体感（平均股价距峰回撤 _apDD）≤-20% 时，
+         指数虽牛但个股已熊，标签改「指数牛·个股熊(分化)」（与下方大卡 _verdict 同口径），
+         不再误导贴纯牛标签；方向 cbDir / 配色 cbCol 已在下方据此翻中性(amber)。 */
+      cbBst = (_b==='bear'?'熊市确认段':((_apDD!=null&&_apDD<=-20)?'指数牛·个股熊(分化)':(_ddCb<=-10?'牛市中回调段':'牛市上行段')));
       cbDir = (_b==='bear' ? -1 : ((_ddCb<=-10||(_apDD!=null&&_apDD<=-20)) ? 0 : 1));
       cbCol = (_b==='bear' ? DN : ((cbDir===0) ? MID : UP));
     } else if((window.__obsSumCbRetry||0) < 15){ window.__obsSumCbRetry=(window.__obsSumCbRetry||0)+1; setTimeout(window.__renderObsSummary, 700); }
