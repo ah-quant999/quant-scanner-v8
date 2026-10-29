@@ -10,11 +10,11 @@
 //    已登记于 PROTECTED_FILES.json，由 guard_protected_files.py 守卫。
 //
 // 生成器：build_sector_cycle_archive.py
-// 最后更新：2026-10-29 15:47:38
+// 最后更新：2026-10-29 15:51:14
 // ═══════════════════════════════════════════════════════════════════════
 
 window.SECTOR_CYCLE_ARCHIVE = {
-  "update_time": "2026-10-29 15:47:38",
+  "update_time": "2026-10-29 15:51:14",
   "version": 1,
   "source": "raw_data/limit_up_heatmap.json",
   "params": {
@@ -39,7 +39,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 30,
       "peak": 149,
       "peak_date": "09/10",
-      "total": 1846,
+      "total": 1869,
       "ongoing": true
     },
     {
@@ -52,7 +52,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 29,
       "peak": 47,
       "peak_date": "09/22",
-      "total": 387,
+      "total": 388,
       "ongoing": true
     },
     {
@@ -91,7 +91,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 28,
       "peak": 27,
       "peak_date": "09/21",
-      "total": 244,
+      "total": 247,
       "ongoing": true
     },
     {
@@ -136,14 +136,14 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "AI算力",
       "start": "09/11",
-      "end": "10/28",
+      "end": "10/29",
       "start_idx": 1,
-      "end_idx": 28,
-      "days": 28,
-      "hot_days": 27,
+      "end_idx": 29,
+      "days": 29,
+      "hot_days": 28,
       "peak": 28,
       "peak_date": "09/22",
-      "total": 308,
+      "total": 311,
       "ongoing": true
     },
     {
@@ -156,7 +156,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 24,
       "peak": 30,
       "peak_date": "10/28",
-      "total": 256,
+      "total": 264,
       "ongoing": true
     },
     {
@@ -169,7 +169,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 26,
       "peak": 37,
       "peak_date": "10/23",
-      "total": 438,
+      "total": 459,
       "ongoing": true
     },
     {
@@ -182,7 +182,7 @@ window.SECTOR_CYCLE_ARCHIVE = {
       "hot_days": 23,
       "peak": 9,
       "peak_date": "09/23",
-      "total": 131,
+      "total": 130,
       "ongoing": true
     },
     {
@@ -266,15 +266,15 @@ window.SECTOR_CYCLE_ARCHIVE = {
     {
       "sector": "电力",
       "start": "10/27",
-      "end": "10/27",
+      "end": "10/29",
       "start_idx": 27,
-      "end_idx": 27,
-      "days": 1,
-      "hot_days": 1,
-      "peak": 3,
-      "peak_date": "10/27",
-      "total": 3,
-      "ongoing": false
+      "end_idx": 29,
+      "days": 3,
+      "hot_days": 2,
+      "peak": 4,
+      "peak_date": "10/29",
+      "total": 8,
+      "ongoing": true
     }
   ]
 };
