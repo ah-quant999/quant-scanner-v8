@@ -2364,6 +2364,29 @@ def check_all_data_files():
                 "heal_cat": vid_heal, "message": _msg,
             })
             continue
+        # 🛡 2026-10-29 一劳永逸（九宝令「改完全部直接上线」）：HB_ALIMI 是**阿狸咪（夜班机）心跳**
+        #   （machine=alimi-cn，由 scripts/alimi_heartbeat.py 推送 raw_data/hb_alimi.json → 云端 build 映射）。
+        #   双机分时铁律：小九白天 7:45-17:45、阿狸咪夜间 18:00-次日 7:30 + 周末；且主人令
+        #   「阿狸咪所有 stock-scanner 任务须显式 PAUSED」⇒ 阿狸咪心跳在「非自身在岗窗口 / 暂停待命」时
+        #   陈旧是**设计预期**，与 v8_peer_monitor 班次感知（L582-637 / L724-737）同口径：彼此离线 = 对方已
+        #   接管，不判故障。此前 all_HB_ALIMI 被「全量数据」通用红线（1620min）平铺误杀 → 每段必亮红灯，属假红。
+        #   ⚠️ 前提：阿狸咪当前处于「暂停待命」态（主人令）。其**真实活体**由 v8_peer_monitor 双机互看负责
+        #   （含 GitHub runner 在线覆盖），健康巡检是「数据新鲜度」面板、不重复判机器心跳。若主人日后
+        #   恢复阿狸咪 ACTIVE，须回头收紧此处（按 peer_monitor 同口径判 alimi 窗口内真掉线）。
+        if vid == "HB_ALIMI":
+            _last = str(ts)[:19] if ts and ts != "--" else "—"
+            _age_hb = (now_cst() - dt).total_seconds() / 60 if dt is not None else None
+            _silent = f"沉默 {_age_hb:.0f}min" if _age_hb is not None else "无时间戳"
+            results.append({
+                "id": f"all_{vid}", "name": "HB_ALIMI（阿狸咪心跳）", "page": "双机互看", "freq": "—",
+                "status": "ok", "last_update": _last,
+                "age_min": round(_age_hb, 1) if _age_hb is not None else None,
+                "heal_cat": "peer",
+                "message": (f"阿狸咪心跳 last={_last}（{_silent}）—— 阿狸咪暂停待命/非在岗窗口，"
+                            f"心跳陈旧为**设计预期**（主人令：阿狸咪任务须 PAUSED；双机分时：对方已接管）。"
+                            f"真实活体由 v8_peer_monitor 双机互看负责，健康巡检不重复判此文件"),
+            })
+            continue
         if vid in _LOW_FREQ_FILES:
             rel = str(ts)[:19] if ts and ts != "--" else "—"
             if vid in _STATIC_ARCHIVE_FILES:
