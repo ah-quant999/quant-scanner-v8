@@ -1,13 +1,13 @@
 {
-  "fetched_at": "2026-10-28 16:08:19",
+  "fetched_at": "2026-10-29 19:40:35",
   "fetched_tz": "CST+8",
-  "title": "短线情绪选股 2026-10-28",
-  "media_id": "note_85134884db3b8b9fc366f1c5dcf8fab3_75211111640839757500816604757970",
+  "title": "短线情绪选股 2026-10-29",
+  "media_id": "note_85134884db3b8b9fc366f1c5dcf8fab3_75214735729110997500816604757970",
   "kb_id": "ima_kb_gmergquh",
-  "kb_name": "九型人格",
+  "kb_name": "顺势交易",
   "kb_creator": "梧谷枫灯",
   "folder_id": "folder_7507701210837524",
   "folder_name": "短线情绪选股",
   "channel": "member-full-text-snapshot",
-  "note": "小九机(lemoncat)ima 连接器 fetch_media_content 代取全文落盘（2026-10-28 16:08，WorkBuddy 会话执行）。KB_ID 体系漂移：任务/脚本原 knowledge_base_id=7500816604757970 在当前连接器身份下已失效（220001 knowledge_base_id 无效），实测当前账号可见库为 ima_kb_gmergquh（名称「顺势交易」，描述「九型人格交易系统」，creator 梧谷枫灯，成员角色 role_type=100），改用该库恢复代取。云端 fetch_ima_strong_stock.py v2 读它解析。"
+  "note": "小九机(lemoncat)ima 连接器 fetch_media_content 代取全文落盘（2026-10-29 19:40，WorkBuddy 19:40 兜底班会话执行）。KB_ID 沿用 2026-10-28 漂移后实测可用库 ima_kb_gmergquh（名称「顺势交易」，creator 梧谷枫灯）；原任务/脚本 knowledge_base_id=7500816604757970 在当前连接器身份下仍无效（220001 knowledge_base_id 无效）。今日笔记「短线情绪选股 2026-10-29」15:30 发布，19:40 兜底班代取（15:40 主跑未产出今日快照，本班补取）。"
 }
