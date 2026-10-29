@@ -10124,3 +10124,24 @@ items:
       线上 Pages 硬抓核验：__v8CycleState=8、正文内嵌旧周区间=1、flex-direction:column 已生效、自创建议残留=0、周框架/FOMC 已修、旧周框架残留=0。
     updated: "2026-10-29 12:10"
     updated_by: 小九
+
+
+  - id: invest-avoid-selfheal-1029e
+    owner: 双机共用
+    priority: P1
+    status: done
+    created: 2026-10-29
+    title: INVEST_AVOID 接入自愈·根治盘前链漏跑长期假红（已上 main 625b1fe182）
+    note: >
+      2026-10-29 主人令「一劳永逸修复」：INVEST_AVOID.js 此前仅靠 v8_morning_plan.yml 07:50 单点触发，
+      漏跑即无人兜底 → 健康检查长期判 fail（超通用红线 1620 分钟）。修复：self_heal_monitor.py 新增 P0-4，
+      检测陈旧→重跑 v8/gen_invest_avoid.py→只推 data/INVEST_AVOID.js（与候选池自愈同款 git 路径）。
+      红线口径 100% 复用 v8_health_check 对全量数据页 all_* 文件的计算（交易日24h/非交易日T+1 18:30），
+      不重写、不另立标准（主人铁律：全站口径统一，禁止某模块特立独行）。py_compile 通过；check-only 实测新鲜→OK(cap=1620与监控一致)、陈旧→FAIL。
+      同日已重算 data/INVEST_AVOID.js(update_time 2026-10-29 17:03:37)清除当日假红；6 源均为 10-29 新鲜。
+    dual_machine: >
+      双机交接：以 origin/main 为唯一真身；本轮回从最新 main cherry-pick 2 提交快进合入（自愈代码 625b1fe182 + 数据刷新 57b9406f50）；主树 WIP 按协议原封保留不触碰。
+    verify_how: >
+      线上 Pages 硬抓核验：HEALTH_CHECK.js 全量数据页 all_INVEST_AVOID 状态由 fail 转 ok（update_time≈今日）；self_heal_monitor.py 含 P0-4；INVEST_AVOID.js update_time≥今日。
+    updated: "2026-10-29 17:20"
+    updated_by: 小九
