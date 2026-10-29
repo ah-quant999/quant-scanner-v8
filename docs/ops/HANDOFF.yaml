@@ -10145,3 +10145,19 @@ items:
       线上 Pages 硬抓核验：HEALTH_CHECK.js 全量数据页 all_INVEST_AVOID 状态由 fail 转 ok（update_time≈今日）；self_heal_monitor.py 含 P0-4；INVEST_AVOID.js update_time≥今日。
     updated: "2026-10-29 17:20"
     updated_by: 小九
+  - id: bc-schemes-dropped-1029
+    owner: 双机共用
+    priority: P3
+    status: dropped
+    created: 2026-10-29
+    title: 审计遗留 B方案(前端合并)/C方案(选股强度) 主人10-29拍板「都不要，不实现」
+    note: >
+      2026-10-29 主人截图「遗留待拍板」明确：B方案（市场状态卡并入综合研判、连板天梯+涨停热力合一）
+      与 C方案（选股强度多套，涉后端 generate_top10，风险高单列）「这两个方案都不要，不用改了」。
+      两项从未落地代码（仅审计待拍板），故无回滚；仅在此登记取消，防双机/未来会话误复活。
+    dual_machine: >
+      以 origin/main 为唯一真身；本条目登记即终态，无需阿狸咪再处置。
+    verify_how: >
+      全仓无 B/C 相关未完成改动；generate_top10.py 维持现状（C方案不引入多套强度口径）。
+    updated: "2026-10-29 17:35"
+    updated_by: 小九
