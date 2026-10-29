@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-30 01:23",
- "generated": "2026-10-30 01:23",
+ "update_time": "2026-10-30 01:46",
+ "generated": "2026-10-30 01:46",
  "meta": {
-  "generated": "2026-10-30 01:23",
+  "generated": "2026-10-30 01:46",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 31,
   "days_with_consensus": 0,
@@ -12293,13 +12293,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "601956",
-      "name": "东贝集团",
-      "change_pct": 10.016,
-      "price": 6.7,
-      "category": "突破"
-     },
-     {
       "code": "300237",
       "name": "ST美晨",
       "change_pct": 3.043,
@@ -12307,10 +12300,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "300979",
+      "name": "华利集团",
+      "change_pct": 6.169,
+      "price": 38.55,
+      "category": "突破"
+     },
+     {
       "code": "002300",
       "name": "太阳电缆",
       "change_pct": 4.485,
       "price": 7.92,
+      "category": "突破"
+     },
+     {
+      "code": "603131",
+      "name": "上海沪工",
+      "change_pct": 10.0,
+      "price": 15.95,
       "category": "突破"
      },
      {
@@ -12332,13 +12339,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "宝新能源",
       "change_pct": 5.243,
       "price": 5.42,
-      "category": "突破"
-     },
-     {
-      "code": "603871",
-      "name": "嘉友国际",
-      "change_pct": 3.956,
-      "price": 11.3,
       "category": "突破"
      }
     ],
@@ -12360,13 +12360,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "601956",
-      "name": "东贝集团",
-      "change_pct": 10.016,
-      "price": 6.7,
-      "category": "短线选股"
-     },
-     {
       "code": "300237",
       "name": "ST美晨",
       "change_pct": 3.043,
@@ -12374,10 +12367,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "300979",
+      "name": "华利集团",
+      "change_pct": 6.169,
+      "price": 38.55,
+      "category": "短线选股"
+     },
+     {
       "code": "002300",
       "name": "太阳电缆",
       "change_pct": 4.485,
       "price": 7.92,
+      "category": "短线选股"
+     },
+     {
+      "code": "603131",
+      "name": "上海沪工",
+      "change_pct": 10.0,
+      "price": 15.95,
       "category": "短线选股"
      },
      {
@@ -12399,25 +12406,11 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "宝新能源",
       "change_pct": 5.243,
       "price": 5.42,
-      "category": "短线选股"
-     },
-     {
-      "code": "603871",
-      "name": "嘉友国际",
-      "change_pct": 3.956,
-      "price": 11.3,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "601956",
-      "name": "东贝集团",
-      "change_pct": 10.016,
-      "price": 6.7,
-      "category": "强势股"
-     },
-     {
       "code": "300237",
       "name": "ST美晨",
       "change_pct": 3.043,
@@ -12425,10 +12418,24 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "300979",
+      "name": "华利集团",
+      "change_pct": 6.169,
+      "price": 38.55,
+      "category": "强势股"
+     },
+     {
       "code": "002300",
       "name": "太阳电缆",
       "change_pct": 4.485,
       "price": 7.92,
+      "category": "强势股"
+     },
+     {
+      "code": "603131",
+      "name": "上海沪工",
+      "change_pct": 10.0,
+      "price": 15.95,
       "category": "强势股"
      },
      {
@@ -12450,13 +12457,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "宝新能源",
       "change_pct": 5.243,
       "price": 5.42,
-      "category": "强势股"
-     },
-     {
-      "code": "603871",
-      "name": "嘉友国际",
-      "change_pct": 3.956,
-      "price": 11.3,
       "category": "强势股"
      }
     ]
