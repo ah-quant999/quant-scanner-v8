@@ -566,6 +566,11 @@ def _compute_fr_sectors(fr_names, boards_exact, boards_norm, src_date):
             continue
         try:
             cons = fetch_cons_safe(bk)
+            if not cons:
+                # 🛡 2026-10-29 小九（主人令「一劳永逸」配套）：东财 push2 被封时 fetch_cons_safe
+                #   返回空列表却不抛异常 ⇒ 命中东财板的板块被洗成 0 龙头。空结果与异常同判，
+                #   强制走同花顺/腾讯/NeoData 兜底，与「东财失败→同花顺兜底」哲学一致。
+                raise RuntimeError("empty cons for %s" % str(bk))
             fr_out.append({"name": nm, "bk": bk, "cons_count": len(cons),
                            "leaders": cons[:TOP_N], "match": how})
         except Exception as e:
@@ -680,6 +685,11 @@ def build():
                 continue
             try:
                 cons = fetch_cons_safe(bk)
+                if not cons:
+                    # 🛡 2026-10-29 小九（主人令「一劳永逸」配套）：东财 push2 被封时
+                    #   fetch_cons_safe 返回空列表却不抛异常 ⇒ 命中东财板的板块被洗成 0 龙头。
+                    #   空结果与异常同判，强制走同花顺/腾讯/NeoData 兜底（与 fr 循环一致）。
+                    raise RuntimeError("empty cons for %s" % str(bk))
             except Exception as e:
                 # 🛡 2026-10-20 小九（主人令「还是没对应好，没备用方案么？」· 兜底对齐 fr 路径）：
                 #   东财成分股断连（云 runner 海外 IP 对 push2 系列被封）时，改用**同花顺行业名
