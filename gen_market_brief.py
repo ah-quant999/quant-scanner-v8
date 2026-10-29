@@ -708,6 +708,17 @@ def build_closing_summary(indices, up, down, flat, amount_total):
 def main():
     print(f"=== gen_market_brief 开始 {datetime.now().isoformat(timespec='seconds')} ===")
 
+    # 🛡 2026-10-29 主人令（一劳永逸 · 实时数据页 16:30 后停更省 token）：
+    #   算法链每 30 分兜底重跑本脚本；交易日 16:30 后盘中数据已冻结（15:00-16:30 已生成收盘总结），
+    #   再跑只是重复调 LLM 生成同一份总结，纯浪费 token。守卫：交易日 16:30 后直接跳过。
+    _now = datetime.now()
+    if 0 <= _now.weekday() <= 4:  # 周一至周五（交易日）
+        _hm = _now.hour * 60 + _now.minute
+        if _hm > 990:  # 16:30 = 990 分；主人令「更新到交易日 16:30 就够了」
+            print("⏸️ 今日 %s 已过 16:30（%02d:%02d CST），gen_market_brief 跳过"
+                  "（实时速览冻结于收盘总结，省 token）" % (_now.date(), _now.hour, _now.minute))
+            return
+
     idx = load_raw("index_quotes.json", {})
     concepts = load_raw("concept_ranking.json", {})
     sectors = load_raw("sector_fund_flow.json", {})

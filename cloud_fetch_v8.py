@@ -5247,6 +5247,23 @@ def main(category=None, only=None):
     if category in ("intraday", "post_close") and not _is_trading_day(today):
         print(f"⏸️ 今日 {today} 非A股交易日，{category} 跳过，保留上一交易日收盘数据")
         return 0
+
+    # 🛡 2026-10-29 主人令（一劳永逸 · 实时数据页 16:30 后停更省 token）：
+    #   根因：本地 WorkBuddy 调度器每 20 分钟 workflow_dispatch 派发 category=intraday，
+    #   但该派发无 16:30 截止守卫（带 category 入参的派发在 workflow 步骤里不走时刻自适应，
+    #   直接 CAT=intraday）→ 交易日 16:30 后云端仍在跑盘中实时抓取。盘后已无实时数据可抓
+    #   （A股 15:00 收盘，16:30 为盘后定稿窗口，归 post_close 档），纯浪费 token / API 配额。
+    #   守卫：intraday 仅在交易日 09:00–16:30（CST）执行，超出即 no-op 跳过，实时页冻结收盘快照。
+    if category == "intraday" and _is_trading_day(today):
+        _now = now_cst()
+        _hm = _now.hour * 60 + _now.minute
+        if _hm > 990:   # 16:30 = 990 分；主人令「更新到交易日 16:30 就够了」
+            print("⏸️ 今日 %s 已过 16:30（%s CST），intraday 跳过（实时数据页冻结于收盘快照，省 token）"
+                  % (today, _now.strftime("%H:%M")))
+            return 0
+        if _hm < 540:   # 09:00 前无盘中数据，防御性拦截（理论上盘前档已判 premarket）
+            print("⏸️ 今日 %s 未到 09:00（%s CST），intraday 跳过" % (today, _now.strftime("%H:%M")))
+            return 0
     if category == "premarket" and not _is_trading_day(today):
         print(f"⏸️ 今日 {today} 非A股交易日（周末/假期），premarket 跳过清空，保留最后交易日数据")
         return 0
