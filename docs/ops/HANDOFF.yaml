@@ -10105,3 +10105,22 @@ items:
       现改为只显示真实字段(距峰回撤/站上·跌破均线)，超买超卖口径唯一归口权威卡。node --check 31脚本0错。
     updated: "2026-10-29 11:25"
     updated_by: 小九
+
+  - id: insight-layout-fix-1029c
+    owner: 双机共用
+    priority: P1
+    status: done
+    created: 2026-10-29
+    title: 日/周/月整行堆叠 + 周框架过期检测加固 + 节后首周/FOMC旧稿修补（已上 main b30331868a）
+    note: >
+      2026-10-29 主人令「图6不要1行3列」「今天都10月29日了」「FOMC出结果没写没解析」。
+      ① AI洞察·多源观点对比卡：三段实情解析 grid 多列→flex 纵向堆叠，日→周→月各自整行（原 1行3列）。
+      ② _isStale 加固：周框架正文内嵌旧周区间(如 10/5-10/11)也判过期，防生成器不滚动周框架再次静默停在旧周（曾停在节后首周 3 周）。
+      ③ data/maharo_insights.js：周框架「节后首周(10/5-10/11)」旧模板→「本周(10/26-11/1)」并去假期/节后错误指代；月框架 FOMC「10月会议成为暂停共识验证点」未来时旧稿→「10/28 如期暂停、利率维持 3.75%-4.00% 不变」事实稿（已 Web 交叉核实：美联储 10/27-28 维持利率不变）。
+      根因：maharo_insights 周/月框架由 AI 生成器产出、写死国庆后首周未随周滚动；生成器滚动 bug 已标记给管线负责人，检测器加固为兜底。
+    dual_machine: >
+      双机交接：以 origin/main(含阿狸咪 10-29 夜班+日间工作)为唯一真身，本轮回从最新 main cherry-pick 4 修复提交快进合入（绝不 force 推回退阿狸咪提交）；主树本地 main 与 origin/main 仍分叉(185领先/53落后、无共同祖先)，主树 WIP(MORNING_PLAN.js/maharo_insights.js 等)按协议原封保留、不触碰、不强行推送。
+    verify_how: >
+      线上 Pages 硬抓核验：__v8CycleState=8、正文内嵌旧周区间=1、flex-direction:column 已生效、自创建议残留=0、周框架/FOMC 已修、旧周框架残留=0。
+    updated: "2026-10-29 12:10"
+    updated_by: 小九
