@@ -10074,3 +10074,21 @@ items:
       （即 09:32 强制派发→09:40-09:45 开盘数据上线）；此后每 20 分钟哨兵兜底不再断档。
     updated: "2026-10-28 12:10"
     updated_by: 小九
+  - id: cycle-unify-bullbear-fix-1029
+    owner: 双机共用
+    priority: P1
+    status: done
+    created: 2026-10-29
+    title: 牛熊口径全站统一 + 套娃卡A方案去嵌套（commit c214dc0763）
+    note: >
+      2026-10-29 主人令「对齐市场统一说法·禁自创·套娃清理A方案」。根治牛熊判定三处自算口径漂移：
+      新增全站唯一真相源 window.__v8CycleState(sh, apDD)（指数层EDHEC 20%牛熊线 + 个股层平均股价距峰回撤），
+      上方卡(__renderObsSummary ⑤)与下方卡(__renderCycleBreadth)及未来预测(_bstTxt)统一调用，
+      删除下方卡自创操作建议(严控仓位/不加仓不抄底等)。套娃卡 comprehensiveCard 去嵌套：
+      内嵌4px彩色边框改文档式 border-top 分隔、删重复「观测类」灰标；盘前预案删卡内重复时间行、色条改细、行距收紧。
+      净室 worktree fix/cycle-unify 推送 origin/main，已 node --check 31脚本全过。
+    verify_how: >
+      线上主站「周期位置+广度观测」与「大盘5卡汇总解析」核心结论一致(同为 __v8CycleState 输出)，
+      下方卡无自创建议文案；综合研判卡内无嵌套彩色边框、无重复「观测类」灰标。
+    updated: "2026-10-29 11:30"
+    updated_by: 小九
