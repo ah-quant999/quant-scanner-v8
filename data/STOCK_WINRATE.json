@@ -1,11 +1,11 @@
 {
- "update_time": "2026-10-30 05:37:53",
+ "update_time": "2026-10-30 20:16:27",
  "meta": {
   "method": "信号日次一交易日开盘买入，持有N日收盘卖出；扣双边0.30%；真实日K",
   "cost_pct_roundtrip": 0.3,
   "shrinkage_k": 10,
   "score_formula": "winrate_score = Σ_h [avg_shrunk_h×w_a + (win_shrunk_h−50)×w_w]，h∈{5:(5.0,0.3), 10:(3.0,0.2)}；均益主导、胜率仅微修正",
-  "n_signals": 1935,
+  "n_signals": 1973,
   "n_stocks": 339,
   "signal_date_range": [
    "2026-06-06",
@@ -146,7 +146,7 @@
   {
    "code": "600869",
    "name": "远东股份",
-   "n_signals": 11,
+   "n_signals": 12,
    "kinds": [
     "final",
     "top10"
@@ -1190,7 +1190,7 @@
   {
    "code": "301511",
    "name": "德福科技",
-   "n_signals": 7,
+   "n_signals": 8,
    "kinds": [
     "final",
     "top10"
@@ -3608,7 +3608,7 @@
   {
    "code": "688432",
    "name": "有研硅",
-   "n_signals": 5,
+   "n_signals": 6,
    "kinds": [
     "top10"
    ],
@@ -4379,7 +4379,7 @@
   {
    "code": "600183",
    "name": "生益科技",
-   "n_signals": 24,
+   "n_signals": 25,
    "kinds": [
     "final",
     "top10"
@@ -5957,7 +5957,7 @@
   {
    "code": "600498",
    "name": "烽火通信",
-   "n_signals": 10,
+   "n_signals": 11,
    "kinds": [
     "top10"
    ],
@@ -6022,7 +6022,7 @@
   {
    "code": "688549",
    "name": "中巨芯",
-   "n_signals": 2,
+   "n_signals": 3,
    "kinds": [
     "top10"
    ],
@@ -6477,7 +6477,7 @@
   {
    "code": "300285",
    "name": "国瓷材料",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "top10"
    ],
@@ -6562,7 +6562,7 @@
   {
    "code": "301526",
    "name": "国际复材",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "top10"
    ],
@@ -6697,7 +6697,7 @@
   {
    "code": "688019",
    "name": "安集科技",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "top10"
    ],
@@ -6747,7 +6747,7 @@
   {
    "code": "688082",
    "name": "盛美上海",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "top10"
    ],
@@ -6772,7 +6772,7 @@
   {
    "code": "688147",
    "name": "微导纳米",
-   "n_signals": 3,
+   "n_signals": 4,
    "kinds": [
     "top10"
    ],
@@ -6822,7 +6822,7 @@
   {
    "code": "688347",
    "name": "华虹宏力",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "top10"
    ],
@@ -6872,7 +6872,7 @@
   {
    "code": "688411",
    "name": "海博思创",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "top10"
    ],
@@ -6897,7 +6897,7 @@
   {
    "code": "688627",
    "name": "精智达",
-   "n_signals": 4,
+   "n_signals": 5,
    "kinds": [
     "top10"
    ],
@@ -9620,7 +9620,7 @@
   {
    "code": "000636",
    "name": "风华高科",
-   "n_signals": 5,
+   "n_signals": 6,
    "kinds": [
     "top10"
    ],
@@ -10330,7 +10330,7 @@
   {
    "code": "688372",
    "name": "伟测科技",
-   "n_signals": 5,
+   "n_signals": 6,
    "kinds": [
     "top10"
    ],
@@ -10915,7 +10915,7 @@
   {
    "code": "300456",
    "name": "赛微电子",
-   "n_signals": 6,
+   "n_signals": 7,
    "kinds": [
     "top10"
    ],
@@ -12953,7 +12953,7 @@
   {
    "code": "601208",
    "name": "东材科技",
-   "n_signals": 7,
+   "n_signals": 8,
    "kinds": [
     "top10"
    ],
@@ -13409,7 +13409,7 @@
   {
    "code": "300568",
    "name": "星源材质",
-   "n_signals": 5,
+   "n_signals": 6,
    "kinds": [
     "top10"
    ],
@@ -14364,7 +14364,7 @@
   {
    "code": "600522",
    "name": "中天科技",
-   "n_signals": 10,
+   "n_signals": 11,
    "kinds": [
     "final",
     "top10"
@@ -15052,7 +15052,7 @@
   {
    "code": "002371",
    "name": "北方华创",
-   "n_signals": 7,
+   "n_signals": 8,
    "kinds": [
     "top10"
    ],
@@ -15247,7 +15247,7 @@
   {
    "code": "300666",
    "name": "江丰电子",
-   "n_signals": 10,
+   "n_signals": 11,
    "kinds": [
     "top10"
    ],
@@ -16074,7 +16074,7 @@
   {
    "code": "688123",
    "name": "聚辰股份",
-   "n_signals": 6,
+   "n_signals": 7,
    "kinds": [
     "top10"
    ],
@@ -16389,7 +16389,7 @@
   {
    "code": "002080",
    "name": "中材科技",
-   "n_signals": 5,
+   "n_signals": 6,
    "kinds": [
     "top10"
    ],
@@ -16968,7 +16968,7 @@
   {
    "code": "688048",
    "name": "长光华芯",
-   "n_signals": 5,
+   "n_signals": 6,
    "kinds": [
     "top10"
    ],
@@ -17460,7 +17460,7 @@
   {
    "code": "300209",
    "name": "行云科技",
-   "n_signals": 11,
+   "n_signals": 12,
    "kinds": [
     "top10"
    ],
@@ -18049,7 +18049,7 @@
   {
    "code": "300604",
    "name": "长川科技",
-   "n_signals": 8,
+   "n_signals": 9,
    "kinds": [
     "top10"
    ],
@@ -18114,7 +18114,7 @@
   {
    "code": "301165",
    "name": "锐捷网络",
-   "n_signals": 5,
+   "n_signals": 6,
    "kinds": [
     "top10"
    ],
@@ -18636,7 +18636,7 @@
   {
    "code": "002156",
    "name": "通富微电",
-   "n_signals": 12,
+   "n_signals": 13,
    "kinds": [
     "top10"
    ],
@@ -18886,7 +18886,7 @@
   {
    "code": "688183",
    "name": "生益电子",
-   "n_signals": 17,
+   "n_signals": 18,
    "kinds": [
     "top10"
    ],
@@ -19082,7 +19082,7 @@
   {
    "code": "002916",
    "name": "深南电路",
-   "n_signals": 11,
+   "n_signals": 12,
    "kinds": [
     "top10"
    ],
@@ -19464,7 +19464,7 @@
   {
    "code": "688525",
    "name": "佰维存储",
-   "n_signals": 20,
+   "n_signals": 21,
    "kinds": [
     "final",
     "top10"
@@ -20175,7 +20175,7 @@
   {
    "code": "300390",
    "name": "天华新能",
-   "n_signals": 20,
+   "n_signals": 21,
    "kinds": [
     "final",
     "top10"
@@ -20241,7 +20241,7 @@
   {
    "code": "301308",
    "name": "江波龙",
-   "n_signals": 28,
+   "n_signals": 29,
    "kinds": [
     "final",
     "top10"
@@ -20373,7 +20373,7 @@
   {
    "code": "300037",
    "name": "新宙邦",
-   "n_signals": 27,
+   "n_signals": 28,
    "kinds": [
     "final",
     "top10"

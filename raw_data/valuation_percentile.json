@@ -1,15 +1,15 @@
 {
-  "update_time": "2026-10-30 05:51:30",
+  "update_time": "2026-10-30 20:31:50",
   "source": "akshare/stock_index_pe_lg",
   "indices": [
     {
       "name": "沪深300",
       "code": "000300",
       "style": "大盘价值",
-      "current_pe": 12.37,
-      "date": "2026-10-29",
-      "percentile_5y": 0.675,
-      "percentile_3y": 0.5541,
+      "current_pe": 12.17,
+      "date": "2026-10-30",
+      "percentile_5y": 0.6083,
+      "percentile_3y": 0.5,
       "percentile_1y": 0.0385,
       "bucket_5y": "偏高",
       "bucket_3y": "偏高",
@@ -20,29 +20,29 @@
       "name": "中证500",
       "code": "000905",
       "style": "中盘均衡",
-      "current_pe": 22.0,
-      "date": "2026-10-29",
-      "percentile_5y": 0.7,
-      "percentile_3y": 0.5135,
+      "current_pe": 21.72,
+      "date": "2026-10-30",
+      "percentile_5y": 0.6917,
+      "percentile_3y": 0.5,
       "percentile_1y": 0.0385,
-      "bucket_5y": "高估",
+      "bucket_5y": "偏高",
       "bucket_3y": "偏高",
       "bucket_1y": "低估",
-      "signal": "减仓/规避"
+      "signal": "谨慎"
     },
     {
       "name": "中证1000",
       "code": "000852",
       "style": "小盘成长",
-      "current_pe": 24.78,
-      "date": "2026-10-29",
-      "percentile_5y": 0.5667,
-      "percentile_3y": 0.4054,
+      "current_pe": 24.06,
+      "date": "2026-10-30",
+      "percentile_5y": 0.4583,
+      "percentile_3y": 0.3108,
       "percentile_1y": 0.0385,
-      "bucket_5y": "偏高",
+      "bucket_5y": "偏低",
       "bucket_3y": "偏低",
       "bucket_1y": "低估",
-      "signal": "谨慎"
+      "signal": "标配"
     }
   ],
   "strategy": {
