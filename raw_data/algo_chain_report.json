@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-10-30 00:35:55",
+  "update_time": "2026-10-30 06:06:12",
   "base_trade_date": "2026-10-29",
   "stage_window": "B",
   "skipped_out_of_window": [
@@ -21,18 +21,18 @@
     {
       "name": "候选池",
       "path": "raw_data/candidate.json",
-      "status": "✅ 本日新鲜",
-      "ts": "2026-10-29 23:22:17",
+      "status": "✅ 本次产出",
+      "ts": "2026-10-30 05:37:51",
       "required": true,
-      "note": ""
+      "note": "基准日 2026-10-29，产物 2026-10-30（本次运行当日产出）"
     },
     {
       "name": "候选池(前端)",
       "path": "data/CANDIDATE.js",
-      "status": "✅ 本日新鲜",
-      "ts": "2026-10-29 23:22:17",
+      "status": "✅ 本次产出",
+      "ts": "2026-10-30 05:37:51",
       "required": false,
-      "note": ""
+      "note": "基准日 2026-10-29，产物 2026-10-30（本次运行当日产出）"
     },
     {
       "name": "相对强度RPS",
@@ -45,26 +45,26 @@
     {
       "name": "TOP10推荐池",
       "path": "raw_data/top10_daily.json",
-      "status": "✅ 本日新鲜",
-      "ts": "2026-10-29 23:24:41",
+      "status": "✅ 本次产出",
+      "ts": "2026-10-30 05:39:57",
       "required": true,
-      "note": ""
+      "note": "基准日 2026-10-29，产物 2026-10-30（本次运行当日产出）"
     },
     {
       "name": "TOP10推荐池(前端)",
       "path": "data/TOP10_DAILY.js",
-      "status": "✅ 本日新鲜",
-      "ts": "2026-10-29 23:24:41",
+      "status": "✅ 本次产出",
+      "ts": "2026-10-30 05:39:57",
       "required": false,
-      "note": ""
+      "note": "基准日 2026-10-29，产物 2026-10-30（本次运行当日产出）"
     },
     {
       "name": "金股池",
       "path": "raw_data/gold_pool.json",
-      "status": "✅ 本日新鲜",
-      "ts": "2026-10-29 23:22:16",
+      "status": "✅ 本次产出",
+      "ts": "2026-10-30 05:37:50",
       "required": false,
-      "note": ""
+      "note": "基准日 2026-10-29，产物 2026-10-30（本次运行当日产出）"
     }
   ]
 }
