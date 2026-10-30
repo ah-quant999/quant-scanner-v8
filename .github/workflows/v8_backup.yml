@@ -30,7 +30,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: v8-cloud-backup
+  group: v8-main-push
   cancel-in-progress: false
 
 jobs:
@@ -63,7 +63,7 @@ jobs:
             git commit -m "chore(v8): 每日安全网推送当天修改 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" 2>/dev/null || true
             # 🛡 并发 push 互踩加固（对齐 v8_risk_gauge 范本）
             for i in 1 2 3; do
-              if git push origin HEAD:main; then
+              if bash v8_git_push.sh origin HEAD:main; then
                 echo "✅ 当天修改已推送入库（防覆盖）"; break
               fi
               echo "⚠️ push 被拒，fetch+rebase 后重试 ($i/3)"
@@ -83,7 +83,7 @@ jobs:
           git commit -m "backup: v8 每日自动备份 $(TZ=Asia/Shanghai date '+%Y-%m-%d')" 2>/dev/null || echo "无新备份"
           # 🛡 并发 push 互踩加固
           for i in 1 2 3; do
-            if git push origin HEAD:main 2>/dev/null; then echo "✅ 备份已推送"; break; fi
+            if bash v8_git_push.sh origin HEAD:main 2>/dev/null; then echo "✅ 备份已推送"; break; fi
             echo "⚠️ 推送被拒或无新内容，fetch+rebase 后重试 ($i/3)"
             # 🛡 2026-09-20 小九：先清「虚拟脏」（本步改动已 commit，此处丢弃的仅为行尾虚拟差异），
             #    否则 rebase 会在「启动前」即被拒（error: cannot rebase: You have unstaged changes）⇒ 重试全空转。

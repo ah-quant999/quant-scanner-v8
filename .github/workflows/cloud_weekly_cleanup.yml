@@ -17,7 +17,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: v8-weekly-cleanup
+  group: v8-main-push
   cancel-in-progress: false
 
 jobs:
@@ -224,7 +224,7 @@ jobs:
           git commit -m "v8 weekly cleanup: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
           REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
           for i in 1 2 3; do
-            if git push "$REPO" HEAD:main; then
+            if bash v8_git_push.sh "$REPO" HEAD:main; then
               echo "✅ 清理已提交（第 $i 次）"; exit 0
             fi
             # 🛡 2026-09-20 小九：先清「虚拟脏」（本步改动已 commit，此处丢弃的仅为行尾虚拟差异），

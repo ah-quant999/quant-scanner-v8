@@ -22,6 +22,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: v8-main-push
+  cancel-in-progress: false
+
 jobs:
   gen-history:
     runs-on: ubuntu-latest
@@ -52,5 +56,5 @@ jobs:
           else
             git commit -m "📜 最终推荐历史归档 nightly $(date +%F)"
             git pull --rebase origin main || git pull --rebase --strategy-option=theirs origin main
-            git push origin main
+            bash v8_git_push.sh origin main
           fi

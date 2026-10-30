@@ -19,7 +19,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: v8-risk-gauge
+  group: v8-main-push
   cancel-in-progress: false
 
 jobs:
@@ -52,7 +52,7 @@ jobs:
           git commit -m "v8 risk gauge: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
           REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
           for i in 1 2 3; do
-            if git push "$REPO" HEAD:main; then
+            if bash v8_git_push.sh "$REPO" HEAD:main; then
               echo "✅ 已推送风险温度计数据"; exit 0
             fi
             echo "⚠️ push 被拒，rebase 后重试 ($i/3)"

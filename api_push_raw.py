@@ -1372,6 +1372,20 @@ def main():
     #   ② 创建 tree / commit 失败即 sys.exit(1)，明明外层就是 3 次重试循环却不复用，
     #      一次瞬时网络抖动 = 整批 raw_data 不落地（与 157 轮同一失败家族）。
     # 改为：本轮任一步失败 → 记录原因 → continue 进入下一次重试；3 次耗尽才退出。
+    # 🔴 2026-10-30 分布式推送锁（一劳永逸根治「多写者抢 main」竞态）
+    #   经专用锁分支 v8-push-lock 的 Git Data API 原子 CAS，串行所有写者
+    #   （云端 cn_fetch / algo / stock_quote / market_thermo … + 本机 + git-CLI 工作流）。
+    #   锁为 best-effort：获取失败 / 异常一律放行（现有 base 断言已防静默覆盖），
+    #   绝不以「抢不到锁」为由阻断数据推送。锁在提交循环期间持有，覆盖 tree/commit/PATCH main。
+    try:
+        import v8_push_lock as _plk
+        _plk_holder = "api_push_raw:" + os.environ.get("GITHUB_RUN_ID", "local")
+        _plk.acquire(_plk_holder, ttl=1200, max_wait=600)
+        import atexit as _atexit
+        _atexit.register(lambda: _plk.release(_plk_holder))
+    except Exception as _e:
+        print(f"  ⚠️ 推送锁接入异常（已忽略，照常推送）: {type(_e).__name__}: {_e}")
+
     last_err = ""
     for attempt in range(1, 4):
         # 重新读取最新 main（与 build_deploy 并发安全）

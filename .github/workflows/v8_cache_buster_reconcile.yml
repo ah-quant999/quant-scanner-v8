@@ -103,7 +103,7 @@ jobs:
           fi
           git commit -m "chore: 缓存戳实时对齐 ?v → 防覆盖 ($(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M'))"
           for i in 1 2 3; do
-            if git push "$REPO" HEAD:main; then
+            if bash v8_git_push.sh "$REPO" HEAD:main; then
               echo "✅ 已对齐并推送 (第 $i 次)"; exit 0
             fi
             echo "⚠️ push 被拒，同步远端后重试 ($i/3)"
