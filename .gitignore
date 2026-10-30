@@ -81,3 +81,6 @@ package.json
 #   双机各存本机真源；坚果云(同步盘)只做「临时搬运」，搬运完成后即删云端副本（2026-10-04 主人选定）。
 #   防任何人误将完整版放进公开仓根导致泄露；公开 logic.html 仅是「已下架」说明页。
 logic.full.html
+
+# 🔧 2026-10-30 清理令：raw_data 每日快照仅留本地安全网，不再提交进 git（防 280MB 臃肿，raw_data 可云端重生）
+backup/raw_data_backup_*.tar.gz
