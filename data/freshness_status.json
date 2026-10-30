@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-10-29 15:55:34",
+  "check_time": "2026-10-30 15:15:20",
   "last_trade_close": "2026-10-29 15:30:00",
   "is_trading_day": true,
   "core_stale": [],
@@ -28,6 +28,8 @@
     "NORTH_FUND": "premarket,post_close",
     "SUSPENSION_ALERT": "premarket",
     "MARKET_ALERTS": "intraday,post_close",
+    "SEVERE_SWING": "intraday",
+    "KEY_NOTICES": "premarket,post_close",
     "OVERSEAS_MARKETS": "premarket,intraday,post_close",
     "W52_HIGH": "premarket,post_close",
     "JUDGMENT_DATA": "premarket,intraday,post_close",
