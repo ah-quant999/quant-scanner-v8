@@ -24,8 +24,8 @@ PY="$(command -v python3 || command -v python)"
 # ① 抢锁（best-effort）
 "$PY" v8_push_lock.py acquire --holder "$HOLDER" --ttl 1200 --max-wait 600 || true
 
-# ② 集成远端最新（best-effort，失败不阻断）
-git pull --rebase "$REPO_URL" main 2>/dev/null || true
+# ② 集成远端最新（best-effort，失败不阻断；--autostash 兼容本地脏树如 raw_data 运行时写入）
+git pull --rebase --autostash "$REPO_URL" main 2>/dev/null || true
 
 # ③ 推送
 if git push "$REPO_URL" "$TARGET"; then
