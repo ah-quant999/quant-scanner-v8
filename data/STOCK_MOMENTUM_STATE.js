@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-10-30 08:57",
- "generated": "2026-10-30 08:57",
+ "update_time": "2026-10-30 15:57",
+ "generated": "2026-10-30 15:57",
  "meta": {
-  "generated": "2026-10-30 08:57",
+  "generated": "2026-10-30 15:57",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 31,
   "days_with_consensus": 0,
@@ -12468,177 +12468,261 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
-      "code": "002172",
-      "name": "澳洋健康",
-      "change_pct": 10.041,
-      "price": 5.37,
+      "code": "002724",
+      "name": "海洋王",
+      "change_pct": 8.715,
+      "price": 14.72,
       "category": "突破"
      },
      {
-      "code": "300237",
-      "name": "ST美晨",
-      "change_pct": 3.043,
-      "price": 2.37,
+      "code": "002172",
+      "name": "澳洋健康",
+      "change_pct": 10.056,
+      "price": 5.91,
+      "category": "突破"
+     },
+     {
+      "code": "003006",
+      "name": "百亚股份",
+      "change_pct": 3.327,
+      "price": 22.98,
+      "category": "突破"
+     },
+     {
+      "code": "000513",
+      "name": "丽珠集团",
+      "change_pct": 3.184,
+      "price": 28.52,
+      "category": "突破"
+     },
+     {
+      "code": "301252",
+      "name": "同星科技",
+      "change_pct": 4.767,
+      "price": 30.33,
+      "category": "突破"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 3.765,
+      "price": 132.0,
       "category": "突破"
      },
      {
       "code": "300979",
       "name": "华利集团",
-      "change_pct": 6.169,
-      "price": 38.55,
+      "change_pct": 3.865,
+      "price": 40.04,
       "category": "突破"
      },
      {
-      "code": "002300",
-      "name": "太阳电缆",
-      "change_pct": 4.485,
-      "price": 7.92,
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.141,
+      "price": 3.91,
+      "category": "突破"
+     },
+     {
+      "code": "603587",
+      "name": "地素时尚",
+      "change_pct": 9.974,
+      "price": 12.9,
       "category": "突破"
      },
      {
       "code": "603131",
       "name": "上海沪工",
-      "change_pct": 10.0,
-      "price": 15.95,
+      "change_pct": 10.031,
+      "price": 17.55,
       "category": "突破"
      },
      {
-      "code": "301446",
-      "name": "福事特",
-      "change_pct": 12.34,
-      "price": 42.15,
+      "code": "000417",
+      "name": "合百集团",
+      "change_pct": 10.039,
+      "price": 5.7,
       "category": "突破"
      },
      {
-      "code": "600977",
-      "name": "中国电影",
-      "change_pct": 3.663,
-      "price": 15.0,
-      "category": "突破"
-     },
-     {
-      "code": "000690",
-      "name": "宝新能源",
-      "change_pct": 5.243,
-      "price": 5.42,
+      "code": "600358",
+      "name": "国旅联合",
+      "change_pct": 3.733,
+      "price": 5.28,
       "category": "突破"
      }
     ],
     "加速": [
      {
+      "code": "002724",
+      "name": "海洋王",
+      "change_pct": 8.715,
+      "price": 14.72,
+      "category": "加速"
+     },
+     {
       "code": "002172",
       "name": "澳洋健康",
-      "change_pct": 10.041,
-      "price": 5.37,
+      "change_pct": 10.056,
+      "price": 5.91,
+      "category": "加速"
+     },
+     {
+      "code": "003006",
+      "name": "百亚股份",
+      "change_pct": 3.327,
+      "price": 22.98,
       "category": "加速"
      }
     ],
     "短线选股": [
      {
-      "code": "002172",
-      "name": "澳洋健康",
-      "change_pct": 10.041,
-      "price": 5.37,
+      "code": "002724",
+      "name": "海洋王",
+      "change_pct": 8.715,
+      "price": 14.72,
       "category": "短线选股"
      },
      {
-      "code": "300237",
-      "name": "ST美晨",
-      "change_pct": 3.043,
-      "price": 2.37,
+      "code": "002172",
+      "name": "澳洋健康",
+      "change_pct": 10.056,
+      "price": 5.91,
+      "category": "短线选股"
+     },
+     {
+      "code": "003006",
+      "name": "百亚股份",
+      "change_pct": 3.327,
+      "price": 22.98,
+      "category": "短线选股"
+     },
+     {
+      "code": "000513",
+      "name": "丽珠集团",
+      "change_pct": 3.184,
+      "price": 28.52,
+      "category": "短线选股"
+     },
+     {
+      "code": "301252",
+      "name": "同星科技",
+      "change_pct": 4.767,
+      "price": 30.33,
+      "category": "短线选股"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 3.765,
+      "price": 132.0,
       "category": "短线选股"
      },
      {
       "code": "300979",
       "name": "华利集团",
-      "change_pct": 6.169,
-      "price": 38.55,
+      "change_pct": 3.865,
+      "price": 40.04,
       "category": "短线选股"
      },
      {
-      "code": "002300",
-      "name": "太阳电缆",
-      "change_pct": 4.485,
-      "price": 7.92,
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.141,
+      "price": 3.91,
+      "category": "短线选股"
+     },
+     {
+      "code": "603587",
+      "name": "地素时尚",
+      "change_pct": 9.974,
+      "price": 12.9,
       "category": "短线选股"
      },
      {
       "code": "603131",
       "name": "上海沪工",
-      "change_pct": 10.0,
-      "price": 15.95,
+      "change_pct": 10.031,
+      "price": 17.55,
       "category": "短线选股"
      },
      {
-      "code": "301446",
-      "name": "福事特",
-      "change_pct": 12.34,
-      "price": 42.15,
+      "code": "000417",
+      "name": "合百集团",
+      "change_pct": 10.039,
+      "price": 5.7,
       "category": "短线选股"
      },
      {
-      "code": "600977",
-      "name": "中国电影",
-      "change_pct": 3.663,
-      "price": 15.0,
-      "category": "短线选股"
-     },
-     {
-      "code": "000690",
-      "name": "宝新能源",
-      "change_pct": 5.243,
-      "price": 5.42,
+      "code": "600358",
+      "name": "国旅联合",
+      "change_pct": 3.733,
+      "price": 5.28,
       "category": "短线选股"
      }
     ],
     "强势股": [
      {
-      "code": "300237",
-      "name": "ST美晨",
-      "change_pct": 3.043,
-      "price": 2.37,
+      "code": "000513",
+      "name": "丽珠集团",
+      "change_pct": 3.184,
+      "price": 28.52,
+      "category": "强势股"
+     },
+     {
+      "code": "301252",
+      "name": "同星科技",
+      "change_pct": 4.767,
+      "price": 30.33,
+      "category": "强势股"
+     },
+     {
+      "code": "301234",
+      "name": "五洲医疗",
+      "change_pct": 3.765,
+      "price": 132.0,
       "category": "强势股"
      },
      {
       "code": "300979",
       "name": "华利集团",
-      "change_pct": 6.169,
-      "price": 38.55,
+      "change_pct": 3.865,
+      "price": 40.04,
       "category": "强势股"
      },
      {
-      "code": "002300",
-      "name": "太阳电缆",
-      "change_pct": 4.485,
-      "price": 7.92,
+      "code": "002652",
+      "name": "扬子新材",
+      "change_pct": 10.141,
+      "price": 3.91,
+      "category": "强势股"
+     },
+     {
+      "code": "603587",
+      "name": "地素时尚",
+      "change_pct": 9.974,
+      "price": 12.9,
       "category": "强势股"
      },
      {
       "code": "603131",
       "name": "上海沪工",
-      "change_pct": 10.0,
-      "price": 15.95,
+      "change_pct": 10.031,
+      "price": 17.55,
       "category": "强势股"
      },
      {
-      "code": "301446",
-      "name": "福事特",
-      "change_pct": 12.34,
-      "price": 42.15,
+      "code": "000417",
+      "name": "合百集团",
+      "change_pct": 10.039,
+      "price": 5.7,
       "category": "强势股"
      },
      {
-      "code": "600977",
-      "name": "中国电影",
-      "change_pct": 3.663,
-      "price": 15.0,
-      "category": "强势股"
-     },
-     {
-      "code": "000690",
-      "name": "宝新能源",
-      "change_pct": 5.243,
-      "price": 5.42,
+      "code": "600358",
+      "name": "国旅联合",
+      "change_pct": 3.733,
+      "price": 5.28,
       "category": "强势股"
      }
     ]
