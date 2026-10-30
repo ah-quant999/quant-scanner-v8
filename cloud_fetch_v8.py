@@ -54,6 +54,8 @@ _NOISE_CONCEPTS = {
 
 # 变量名 → raw_data 文件名（与 update_v8.py 的 DATA_SOURCES 对应）
 VAR_TO_RAW = {
+    "SEVERE_SWING": "severe_swing.json",  # 🆕 2026-10-30 严重异动雷达
+    "KEY_NOTICES": "key_notices.json",    # 🆕 2026-10-30 重要公告速览
     "ETF_NET_SUBSCRIPTION": "etf_net_subscription.json",  # 2026-09-11 主人 P1：真实 ETF 份额申赎（上交所日环比）
     "ETF_INTRADAY_HEAT": "etf_intraday_heat.json",
     "SECTOR_FUND_FLOW": "sector_fund_flow.json",
@@ -182,6 +184,8 @@ CATEGORY_MAP = {
     #   另：盘中 cron 偶发丢档（09-22 实测 13:00/13:30/14:00/14:30 四档全丢）时，
     #   post_close 兜底可保住当日收盘定格值 —— 同 LIMIT_UP_HEATMAP 的既有处置。
     "MARKET_ALERTS": "intraday,post_close",
+"SEVERE_SWING": "intraday",  # 🆕 2026-10-30 严重异动雷达：盘中每轮刷新（轻量涨停池+池扫描）
+"KEY_NOTICES": "premarket,post_close",  # 🆕 2026-10-30 重要公告：盘前+盘后档（主人「每天能做到」口径）
     # 盘后（15:30 后）：大盘资金流时间轴，累积历史序列，避免盘中覆盖
     "MARKET_FUND_FLOW_DATA": "post_close",
     # 15:30 收盘数据：EXPERIMENT 等 akshare 可抓的 T+1 数据
@@ -4467,6 +4471,63 @@ def f_market_alerts():
     return None
 
 
+def f_severe_swing():
+    """严重异动雷达（2026-10-30 主人令新建，暂未上架›观测类）。
+    复用孤儿模块 algorithms/fetch_orphan_severe_swing.py：连板≥2=已触发档 + 池内涨幅≥15%=逼近档。
+    全轻量接口（涨停池 1 次 + 本地池扫描），接入 intraday 每轮刷新。"""
+    import subprocess as _sp
+    script = ROOT / "algorithms" / "fetch_orphan_severe_swing.py"
+    if not script.exists():
+        print(f"  ⚠️ 未找到 {script}")
+        return None
+    print(f"  🔄 调用严重异动雷达孤儿模块: {script.name}")
+    _SS_TIMEOUT = 180
+    try:
+        r = _sp.run([sys.executable, str(script)], cwd=str(ROOT),
+                    capture_output=True, text=True, timeout=_SS_TIMEOUT)
+    except Exception as e:
+        print(f"::error title=v8-severe-swing-fail::严重异动雷达调用异常"
+              f"(timeout={_SS_TIMEOUT}s): {type(e).__name__}: {e}")
+        return None  # 单卡失败不阻断整轮（同 MARKET_ALERTS 既定设计），但打标可见
+    if r.returncode != 0:
+        print(f"::error title=v8-severe-swing-fail::严重异动雷达 exit {r.returncode}"
+              f"：{(r.stderr or '')[:200]}")
+        return None
+    p = RAW_DIR / "severe_swing.json"
+    if p.exists():
+        return json.loads(p.read_text(encoding="utf-8"))
+    return None
+
+
+def f_key_notices():
+    """重要公告速览（2026-10-30 主人令新建，暂未上架›观测类）。
+    复用孤儿模块 algorithms/fetch_orphan_key_notices.py：巨潮当日公告按
+    停复牌/风险警示/重组并购/回购/业绩预告/股东增减持/重大合同 过滤。
+    归 premarket,post_close 档（主人口径「每天能做到」），盘中不重复消耗抓取预算。"""
+    import subprocess as _sp
+    script = ROOT / "algorithms" / "fetch_orphan_key_notices.py"
+    if not script.exists():
+        print(f"  ⚠️ 未找到 {script}")
+        return None
+    print(f"  🔄 调用重要公告孤儿模块: {script.name}")
+    _KN_TIMEOUT = 180
+    try:
+        r = _sp.run([sys.executable, str(script)], cwd=str(ROOT),
+                    capture_output=True, text=True, timeout=_KN_TIMEOUT)
+    except Exception as e:
+        print(f"::error title=v8-key-notices-fail::重要公告调用异常"
+              f"(timeout={_KN_TIMEOUT}s): {type(e).__name__}: {e}")
+        return None
+    if r.returncode != 0:
+        print(f"::error title=v8-key-notices-fail::重要公告 exit {r.returncode}"
+              f"：{(r.stderr or '')[:200]}")
+        return None
+    p = RAW_DIR / "key_notices.json"
+    if p.exists():
+        return json.loads(p.read_text(encoding="utf-8"))
+    return None
+
+
 # ══════════════════════════════════════════════════════════════════════
 # 🗄 日历月度归档（2026-08-28 主人令「旧的也别丢」）
 #
@@ -6323,6 +6384,8 @@ def main(category=None, only=None):
         ("JUDGMENT_DATA", f_judgment),
         ("MACRO_BRIEF", f_macro_brief),
         ("MARKET_ALERTS", f_market_alerts),
+        ("SEVERE_SWING", f_severe_swing),      # 🆕 2026-10-30 主人令：严重异动雷达（暂未上架›观测类）
+        ("KEY_NOTICES", f_key_notices),        # 🆕 2026-10-30 主人令：重要公告速览（暂未上架›观测类）
         ("OVERSEAS_MARKETS", f_overseas_markets),
         # 2026-08-30：盘后数据页新增
         ("RESTRICTED_RELEASE", f_restricted_release),

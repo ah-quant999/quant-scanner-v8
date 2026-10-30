@@ -102,6 +102,8 @@ DATA_SOURCES = {
     "inst_trade.json":             "INST_TRADE",
     "north_fund.json":             "NORTH_FUND",
     "market_alerts.json":          "MARKET_ALERTS",
+    "severe_swing.json":           "SEVERE_SWING",    # 🆕 2026-10-30 主人令：严重异动雷达（暂未上架›观测类）
+    "key_notices.json":            "KEY_NOTICES",     # 🆕 2026-10-30 主人令：重要公告速览（暂未上架›观测类）
     "market_fund_flow_data.json":  "MARKET_FUND_FLOW_DATA",
     "w52_high.json":               "W52_HIGH",
     "limit_up_heatmap.json":       "LIMIT_UP_HEATMAP",
@@ -266,6 +268,8 @@ CATEGORY_MAP = {
     # （INST_COVERAGE 频次项已于 2026-09-23 主人拍板随因子观测卡整卡删除，见 CATEGORY_MAP 处注记。）
     "SUSPENSION_ALERT": "premarket",
     "MARKET_ALERTS": "intraday,post_close",
+    "SEVERE_SWING": "intraday",             # 🆕 2026-10-30 严重异动雷达（盘中每轮）
+    "KEY_NOTICES": "premarket,post_close",  # 🆕 2026-10-30 重要公告（盘前+盘后档）
     # 🛡 2026-09-28 主人令「亚太比A股早开盘，和盘前一起8点多更新」：与 cloud_fetch_v8.py 侧同步升三档。
     #   血证：09-28 09:17 selfhosted premarket 轮 raw 已新(09:35落main)但本表缺 premarket ⇒
     #   build(premarket) 跳过重建 data/OVERSEAS_MARKETS.js，卡面冻结 09-24。第三处同口径对齐。
