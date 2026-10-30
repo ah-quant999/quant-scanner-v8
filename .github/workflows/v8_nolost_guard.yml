@@ -52,7 +52,7 @@ jobs:
           fi
           git commit -m "chore(nolost): 守卫账本 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') CST"
           for i in 1 2 3; do
-            if git pull --rebase --autostash -q origin main && git push -q origin HEAD:main; then
+            if git pull --rebase --autostash -q origin main && bash v8_git_push.sh origin HEAD:main; then
               echo "✅ 已推送"
               exit 0
             fi

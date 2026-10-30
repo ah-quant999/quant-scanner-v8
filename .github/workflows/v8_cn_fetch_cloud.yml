@@ -686,7 +686,7 @@ jobs:
                 git add index.html
                 if git diff --cached --quiet; then echo "ℹ️ 重试时缓存戳已一致"; break; fi
                 git commit -q -m "chore: 盘中快照缓存戳原子对齐 (fetch soft_9 retry $_i)"
-                if git push origin HEAD:main >/dev/null 2>&1; then echo "✅ 缓存戳同链对齐已推 (attempt=$_i)"; break; fi
+                if bash v8_git_push.sh origin HEAD:main >/dev/null 2>&1; then echo "✅ 缓存戳同链对齐已推 (attempt=$_i)"; break; fi
                 echo "⚠️ 缓存戳推送第 $_i 次失败，重试"
               done
             fi
@@ -927,7 +927,7 @@ jobs:
               echo "ℹ️ ?v 已最新，无需推送"; _v8_ok=1; break
             fi
             git commit -m "chore: 生成器原子提交 ?v → 防覆盖 ($(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M'))"
-            if git push "$REPO" HEAD:main; then
+            if bash v8_git_push.sh "$REPO" HEAD:main; then
               echo "✅ 已原子提交 ?v (第 $i 次)"; _v8_ok=1; break
             fi
             echo "⚠️ push 被拒，同步远端后重试 ($i/3)"

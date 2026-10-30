@@ -143,7 +143,7 @@ jobs:
           git commit -m "$msg"
           # 🛡 并发 push 互踩加固（2026-08-30 全量跑批实测暴露 non-fast-forward）
           for i in 1 2 3; do
-            if git push origin HEAD:main; then
+            if bash v8_git_push.sh origin HEAD:main; then
               echo "✅ pushed: $msg"; exit 0
             fi
             echo "⚠️ push 被拒（并发互踩），fetch+rebase 后重试 ($i/3)"

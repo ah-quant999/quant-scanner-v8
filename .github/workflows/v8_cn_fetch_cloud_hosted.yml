@@ -389,7 +389,7 @@ jobs:
               echo "ℹ️ ?v 已最新，无需推送"; _v8_ok=1; break
             fi
             git commit -m "chore: 生成器原子提交 ?v → 防覆盖 ($(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M'))"
-            if git push "$REPO" HEAD:main; then
+            if bash v8_git_push.sh "$REPO" HEAD:main; then
               echo "✅ 已原子提交 ?v (第 $i 次)"; _v8_ok=1; break
             fi
             echo "⚠️ push 被拒，同步远端后重试 ($i/3)"
