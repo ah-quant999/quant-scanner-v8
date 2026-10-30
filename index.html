@@ -8166,140 +8166,6 @@ c.innerHTML = h;
   //   前端直读 ⇒ 与源卡同一时刻刷新（不再走 raw→update_v8 桥接，避免滞后一整天）。
   //   旧「统计」口径（极性百分条 / 板块绝对次数条 / 字数）与 scripts/fetch_ai_insights_compare.py
   //   → data/AI_INSIGHTS_COMPARE.js 整链已下线。
-  window.__aicRetry = 0;
-  window.__renderAiInsightsCompare = function(){
-    var dst = document.getElementById('aiInsightsCompareBody');
-    if(!dst) return;
-    var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
-    var M = window.MAHORO_INSIGHTS;
-    // ── 周/月段「日期标签永不脱节」一劳永逸修复（2026-10-28 主人令）──
-    //   周/月框架由 AI 段写、易写死旧周不滚动（曾出现「10/5-10/11 停在 10/28」静默过期 3 周）。
-    //   改为：① 日期标签实时计算当前周/月；② 数据 period/正文不含当前周·月起始日 ⇒ 标「⚠ 框架待刷新」。
-    function _curWeekRange(){
-      var n=new Date(), dow=(n.getDay()+6)%7;
-      var mon=new Date(n); mon.setDate(n.getDate()-dow);
-      var sun=new Date(mon); sun.setDate(mon.getDate()+6);
-      var f=function(x){return (x.getMonth()+1)+'/'+x.getDate();};
-      return {label:f(mon)+'–'+f(sun), start:f(mon)};
-    }
-    function _curMonth(){ var n=new Date(); return n.getFullYear()+'-'+('0'+(n.getMonth()+1)).slice(-2); }
-    function _isStale(o){
-      if(o.k==='daily') return false;
-      if(o.k==='weekly'){
-        var w=_curWeekRange();
-        if((o.scope.indexOf(w.start)<0) && ((o.text||'').indexOf(w.start)<0)) return true;
-        // 2026-10-29 主人令：正文内嵌旧周区间（如「10/5-10/11」）也判过期——防 AI 生成器不滚动周框架（曾静默停在节后首周 3 周）
-        var _m=(o.text||'').match(/(\d{1,2})\/(\d{1,2})-(\d{1,2})\/(\d{1,2})/);
-        if(_m){ var _ws=_m[1]+'/'+_m[2]; if(_ws!==w.start) return true; }
-        return false;
-      }
-      if(o.k==='monthly'){ return o.scope.indexOf(_curMonth())<0; }
-      return false;
-    }
-    if(!M || !(M.daily || M.weekly || M.monthly)){
-      if(window.__aicRetry < 40){ window.__aicRetry++; setTimeout(window.__renderAiInsightsCompare, 600); return; }
-      dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">&#x1F52E; AI 洞察·多源观点对比 数据未到位</div>';
-      return;
-    }
-    var dS = M.daily || {}, wS = M.weekly || {}, mS = M.monthly || {};
-    var C = M.compare || {};
-    var SEG = C.segments || {};
-    // 三段定义（顺序固定：日 → 周 → 月）
-    var _wr=_curWeekRange(), _cm=_curMonth();
-    var SEGS = [
-      {k:'daily',   tag:'日', scope:(dS.date   || '—'), liveScope:(dS.date   || '—'), accent:'239, 68, 68',  rawC:'#f87171', text:(dS.text || '')},
-      {k:'weekly',  tag:'周', scope:(wS.period || '—'), liveScope:_wr.label,                 accent:'251, 146, 60', rawC:'#fb923c', text:(wS.text || '')},
-      {k:'monthly', tag:'月', scope:(mS.period || '—'), liveScope:_cm,                       accent:'34, 197, 94',  rawC:'#22c55e', text:(mS.text || '')}
-    ];
-    var LINES = [
-      ['tension', '&#x2460; 本段核心矛盾'],
-      ['delta',   '&#x2461; 与本段上次相比的边际变化'],
-      ['align',   '&#x2462; 与更长周期的分歧/一致']
-    ];
-    var PENDING = '实情解析待出稿（每日 08:50 / 12:30 / 15:10 随 AI 解析同步产出）';
-    function segBlock(o){
-      var s = SEG[o.k];
-      var _stale = _isStale(o);
-      var _scopeShown = _stale
-        ? (o.k==='weekly' ? ('本周 '+o.liveScope) : (o.k==='monthly' ? o.liveScope+' 月' : o.scope))
-        : o.scope;
-      var body = '';
-      if(!s || typeof s !== 'object'){
-        // 🛡 2026-10-19 一劳永逸：结构化 segments 未产出时，回退展示该时段真实 AI 原文
-        var _raw = o.text || '';
-        if(_raw && _stale){
-          body = '<div style="font-size:11px;font-weight:700;color:#f87171;margin-bottom:6px;">⚠ 本段框架为过往周期存档，待 AI 刷新（当前应为 ' + o.liveScope + (o.k==='monthly'?'':' 周') + '）</div>'
-               + '<div style="font-size:11.5px;line-height:1.85;color:var(--sub);">' + _ev(_raw) + '</div>';
-        } else if(_raw){
-          body = '<div style="font-size:11.5px;line-height:1.85;color:var(--txt);">' + _ev(_raw) + '</div>';
-        } else {
-          body = '<div style="font-size:11.5px;color:var(--dim);line-height:1.75;">' + PENDING + '</div>';
-        }
-      } else {
-        for(var i = 0; i < LINES.length; i++){
-          var raw = s[LINES[i][0]];
-          var txt = (raw == null || String(raw).trim() === '') ? '—' : String(raw);
-          body += '<div style="font-size:11.5px;line-height:1.8;margin-bottom:5px;color:var(--txt);">'
-                + '<b style="color:rgb(' + o.accent + ');">' + LINES[i][1] + '：</b>'
-                + '<span' + (txt === '—' ? ' style="color:var(--dim);"' : '') + '>' + _ev(txt) + '</span></div>';
-        }
-      }
-      var _staleChip = _stale
-        ? '<span style="font-size:10px;font-weight:700;color:#fff;background:#ef4444;border-radius:4px;padding:1px 6px;margin-left:6px;">⚠ 框架待刷新</span>'
-        : '';
-      return '<div style="background:rgba(' + o.accent + ',.05);border:1px solid rgba(' + o.accent + ',.25);border-radius:7px;padding:9px 11px;">'
-        + '<div style="font-size:12px;font-weight:700;color:rgb(' + o.accent + ');margin-bottom:6px;">' + o.tag + ' · ' + _ev(_scopeShown) + _staleChip + '</div>'
-        + body + '</div>';
-    }
-    var concl = (C.conclusion == null || String(C.conclusion).trim() === '') ? '' : String(C.conclusion);
-    var srcN = dS.sources_read || '?';
-    dst.innerHTML = ''
-      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
-      + '<b style="font-size:15px;">&#x1F52E; AI 洞察·多源观点对比</b>'
-      + _uBadge('auto', '中长线', M.update_time)
-      + '<span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;color:#8b5cf6;background:rgba(139,92,246,.16);border:1px solid rgba(139,92,246,.4);letter-spacing:.5px;">&#x1F4C6; 日更 · 盘前 08:50 / 午间 12:30 / 盘后 15:10</span>'
-      + '<span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">MAHORO_INSIGHTS 聚合 ' + srcN + ' 源 · AI 阅读后撰写</span>'
-      + '<span style="font-size:10px;color:#fb923c;font-weight:600;margin-left:8px;">· 盘后出数据，盘中不刷新</span>'
-      + '</div>'
-      // 核心 / 解析（2026-09-15 主人令：口径由「统计」改为「实情解析」）
-      + '<div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.22);border-radius:7px;padding:8px 12px;margin-bottom:10px;line-height:1.7;">'
-      + '<div style="font-size:12px;color:var(--txt);margin-bottom:6px;">'
-      + '&#x1F4CC; <b style="color:#8b5cf6;">核心</b>：把 MAHORO 的 <b>daily / weekly / monthly</b> 三段 AI 文本并排对照——'
-      + '直接读出<b>每一段的核心矛盾、边际变化、与更长周期的分歧</b>。'
-      + '</div>'
-      + '<div style="font-size:11.5px;color:var(--sub);">'
-      + '&#x1F4A1; <b style="color:#8b5cf6;">解析</b>：看<b>同一套叙事在三个时间尺度上是否自洽</b>'
-      + '（日级别的边际扰动 ≠ 月度主线变化；三者互相印证才算真共识，互相打架就是分歧未定）。'
-      + '本卡为 <b>AI 阅读后撰写</b>的实情解析，<b>不是量化统计、不替代个股信号</b>；三段原文折叠保留，可回原文核对。'
-      + '</div></div>'
-      // 一句话结论（动态生成 · 解析区顶部）
-      + '<div style="background:rgba(139,92,246,.10);border:1px solid rgba(139,92,246,.45);border-radius:7px;padding:10px 12px;margin-bottom:10px;">'
-      + '<div style="font-size:11.5px;font-weight:700;color:#8b5cf6;margin-bottom:4px;">&#x1F4CC; 一句话结论</div>'
-      + (concl
-          ? '<div style="font-size:13px;font-weight:700;color:var(--txt);line-height:1.8;">' + _ev(concl) + '</div>'
-          : '<div style="font-size:12px;color:var(--dim);">' + PENDING + '</div>')
-      + '</div>'
-      // 三段实情解析
-      + '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;">'
-      + SEGS.map(segBlock).join('')
-      + '</div>'
-      // 三段原文折叠（原始素材 · 保留）
-      + '<div style="background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.2);border-radius:7px;padding:8px 12px;margin-bottom:10px;">'
-      + '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:6px;">三段原文（同期对照 · 原始素材）</div>'
-      + SEGS.map(function(o, i){
-          return '<details' + (i === SEGS.length - 1 ? '' : ' style="margin-bottom:4px;"') + '>'
-            + '<summary style="font-size:11.5px;font-weight:600;color:' + o.rawC + ';cursor:pointer;">' + o.tag + ' · ' + _ev(o.liveScope) + '</summary>'
-            + '<pre style="white-space:pre-wrap;font-size:11.5px;line-height:1.7;color:var(--sub);margin:6px 0 0 0;font-family:inherit;">' + _ev(o.text) + '</pre></details>';
-        }).join('')
-      + '</div>'
-      // 底部口径
-      + '<div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
-      + '&#x26A0;&#xFE0F; <b style="color:#8b5cf6;">展示型卡</b>：本卡与「机构研究 · AI 解析建议」<b>同源同稿</b>（window.MAHORO_INSIGHTS），'
-      + '由每日 08:50 / 12:30 / 15:10 的 AI 步骤阅读后撰写，<b>不抓新源、不增加新接口</b>。'
-      + '三段实情解析为 <b>AI 转述 + 判断</b>，其中个股名称一律为机构观点转述、非推荐，需回原文核对。'
-      + '解析出稿于 ' + _ev(C.generated_at || '—') + ' · 数据源更新于 ' + _ev(M.update_time || '?') + ' · 仅供研究参考，不构成个人投资建议。'
-      + '</div>';
-  };
 
 window.__cpeRetry = 0;
 window.__renderCiticPeObserve = function(){
@@ -8550,7 +8416,7 @@ window.__renderIndexObserve = function(){
      该提交在删 __renderFactorLab 死代码时把本函数连带删掉，但下方调用点仍在
      ⇒ ReferenceError: _renderPostReady is not defined，策略回测区初始渲染全挂。
      按该提交本意剔除 __renderFactorLab 调用，其余 11 个渲染函数实测均存活。 */
-  function _renderPostReady(){ try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderObsPlatform(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeObserve(); }catch(e){} try{ window.__renderIndexObserve(); }catch(e){} try{ window.__renderAiInsightsCompare(); }catch(e){} try{ window.__renderDailyFactorCalc(); }catch(e){} } try{ window.renderLifeBacktests(); }catch(e){}
+  function _renderPostReady(){ try{ window.__renderFactorPane(); }catch(e){} try{ window.__renderObsPlatform(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeObserve(); }catch(e){} try{ window.__renderIndexObserve(); }catch(e){} try{ window.__renderDailyFactorCalc(); }catch(e){} } try{ window.renderLifeBacktests(); }catch(e){}
 
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
@@ -16143,7 +16009,6 @@ function lifeRenderBacktest(bodyId, noteId, periods, meta){
     //   2026-09-15：大盘观察整页迁出至「🌍 观测平台」，本页仅剩「观测类」⇒ 分支收敛为单一 tab。
     window.__ulRenderPane = function(tab){
       tab = 'observe';   // 2026-09-15：本页仅剩「观测类」（大盘观察已整页迁往「🌍 观测平台」）
-      // 2026-09-15：__renderAiInsightsCompare 已随卡迁往「🌍 观测平台 > 🌍 宏观观测」，
       //   由 window.__obsRenderPane 的 macro 分支接管（本页不再派发，避免无容器空跑）。
       var names = ['__renderMorningPlan', '__renderNationalTeam', '__renderThemeValue', '_fillFrLeaders', '_fillSectorYearFlow', '__renderMarketState', '__renderInvestAvoid', '__renderComprehensiveSynthesis'];
 /* 🧭 2026-10-27 主人令：+L1/L2 市场状态机+仓位引擎；+投资避雷针·新闻语料量化轻量（暂未上架观测类顶部评审） */   /* 🗑 2026-10-28 主人令：大基金增减持监控卡整卡退役（渲染函数/卡壳/派发同批删；与「投资避雷针·新闻语料量化」个股避雷清单重复 —— 两卡都列大基金减持个股，投资避雷针已是合并「不要买」视图）。DAJIJIN_REDUCTION 数据源与 v8_dajijin_fetch 定时任务保留供投资避雷针消费。📋 2026-10-21：+盘前预案（暂未上架首卡）；🏛️ 2026-10-21：+国家队活跃度（暂未上架第二卡）；🗑 2026-10-23 主人令：算法记分卡整卡退役（渲染函数/卡壳同批删，派发名单同步移除）；📊 2026-10-19：+最终推荐·强势板块龙头股；🏔 2026-10-20：+板块年度主力净流入（自盘后数据迁入）；三新算法已迁入选股策略子页（renderVcp/renderRotation/renderLhb），本观测区不再填充 */
@@ -18158,7 +18023,6 @@ h+=`</div>`;
       __renderIndexObserve: ['indexObserveBody', 'indexObserveInner', '&#x1F4C8; A股指数观测'],
       __renderCycleBreadth: ['cycleBreadthBody', 'cycleBreadthInner', '&#x1F4CA; 周期位置 + 广度观测'],
       _fillMahoroCard: ['maharoCard', 'maharoCardInner', '&#x1F916; AI 速览（Mahoro）'],
-      __renderAiInsightsCompare: ['aiInsightsCompareBody', 'aiInsightsCompareInner', '&#x1F52E; AI 洞察·多源观点对比']
     };
     var __obsFbShow = function(k, kind, msg){
       try{
@@ -18183,8 +18047,6 @@ h+=`</div>`;
       try{ if(typeof window._fillMahoroCard === 'function'){ window._fillMahoroCard(); out.push('_fillMahoroCard:ok'); } else { out.push('_fillMahoroCard:nofn'); __obsFbShow('_fillMahoroCard', 'nofn', ''); } }
       catch(e){ out.push('_fillMahoroCard:THROW'); __obsFbShow('_fillMahoroCard', 'throw', (e && e.message) || e); }
       // 2026-09-15 主人令：AI 洞察·多源观点对比 随卡迁入本页，与 maharo 卡同处派发（唯一真源）。
-      try{ if(typeof window.__renderAiInsightsCompare === 'function'){ window.__renderAiInsightsCompare(); out.push('__renderAiInsightsCompare:ok'); } else { out.push('__renderAiInsightsCompare:nofn'); __obsFbShow('__renderAiInsightsCompare', 'nofn', ''); } }
-      catch(e){ out.push('__renderAiInsightsCompare:THROW'); __obsFbShow('__renderAiInsightsCompare', 'throw', (e && e.message) || e); }
     }
     for(var i = 0; i < names.length; i++){
       var k = names[i];
@@ -18469,10 +18331,6 @@ h+=`</div>`;
        + '<b style="color:#34d399;">&#x26A0; 限制：</b>AI 摘要，判断需回原文核对；盘前 08:50 / 午间 12:30 / 盘后 15:10 三档出稿。</div></div>'
        + '<div id="maharoCardBody"><div class="note">加载中…</div></div></div>';
 
-    // ═══ 🔮 2026-09-15 主人令：AI 洞察·多源观点对比 由「暂未上架·观测类」整卡迁入（置于 K 型分层卡上方）═══
-    //   容器 id 未变（aiInsightsCompareBody）；渲染函数已改读 window.MAHORO_INSIGHTS（每日 08:50 AI 阅读后撰写）。
-    //   派发入口见 window.__obsRenderPane 的 macro 分支（唯一真源，与 _fillMahoroCard 同处）。
-    hm += '<div class="card" id="aiInsightsCompareBody" style="margin-bottom:16px;border-left:4px solid #8b5cf6;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">&#x1F52E; AI 洞察·多源观点对比 加载中&#x2026;</div></div>';
     hm += '</div>'; // /obsPaneMacro
     // ══ 子页②：📊 大盘观测（4 张内容卡 · 两融余额走势 2026-10-04 主人令迁回「🔒 已下架」）══
     hm += '<div id="obsPaneMarket" style="display:' + (_act==='market' ? 'block' : 'none') + ';">';
@@ -18527,14 +18385,9 @@ h+=`</div>`;
     //   defer 数据可能晚于首渲到达，故 3 次退避重试（0/600/1800ms），成功即止。
     try{
       var _mh = function(){ try{ if(typeof window._fillMahoroCard==='function') window._fillMahoroCard(); }catch(e){ console.warn('maharo 卡渲染失败',e); } };
-      // 2026-09-15：AI 洞察卡迁入本页后同样需要退避重试（defer 数据晚于首渲到达）。
-      var _aic = function(){ try{ if(typeof window.__renderAiInsightsCompare==='function') window.__renderAiInsightsCompare(); }catch(e){ console.warn('AI 洞察卡渲染失败',e); } };
       _mh();
-      _aic();
       setTimeout(_mh, 600);
-      setTimeout(_aic, 600);
       setTimeout(_mh, 1800);
-      setTimeout(_aic, 1800);
     }catch(e){ console.warn('maharo 卡调度失败', e); }
     // 🛡 骨架就绪后派发「当前子页」渲染（defer 数据可能晚于首渲到达）
     setTimeout(function(){ try{ window.__obsRenderPane(window.__obsActivePane || 'macro'); }catch(e){} }, 0);
