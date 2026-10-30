@@ -635,9 +635,12 @@ jobs:
                 echo "✅ 与远端 main 已无差异（他人已部署等价内容），视作部署成功"; _deployed=1; break
               fi
               git commit -m "v8 build: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') (fast-forward retry #$j)"
+              python v8_push_lock.py acquire --holder "build_deploy:i${i}j${j}" --ttl 600 --max-wait 120 || true
               if timeout 120 git $_GITSLOW push "$REPO" HEAD:main; then
+                python v8_push_lock.py release --holder "build_deploy:i${i}j${j}" || true
                 echo "✅ 已部署 main（第 $i 轮构建·第 $j 次推送尝试，GitHub Pages 自动重建）"; _deployed=1; break
               fi
+              python v8_push_lock.py release --holder "build_deploy:i${i}j${j}" || true
               echo "  ⚠️ 第 $i 轮·第 $j 次推送被拒/超时（远端又前进），软重放到新 tip 后重试"; sleep 8
             done
             if [ $_deployed -eq 1 ]; then exit 0; fi
