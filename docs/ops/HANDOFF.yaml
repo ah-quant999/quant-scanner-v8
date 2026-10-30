@@ -10211,3 +10211,26 @@ items:
     verified_at: "2026-10-30 09:30"
     updated: "2026-10-30 09:30"
     updated_by: 家用机AI
+
+  - id: iron-rules-strengthen-1030
+    owner: 双机共用
+    priority: P0
+    status: done
+    created: 2026-10-30
+    title: 交接网关协议铁律强化（改后三件套 + 进入地址/交付方式/存储清理/上线授权）
+    note: >
+      2026-10-30 主人连续三令固化运维铁律：①把"改后三件套"（主站一改完马上审计 + 云端/双机/
+      运维页/逻辑详解页四方全面对齐该删删核心留存 + 推仓防覆盖并双机交接）写入 SKILL.md 第3条；
+      ②新增第5条进入地址铁律（主站+逻辑详解页唯一入口 dd689…app.workbuddy.host/，不新建其他
+      地址、不让去 github.io）；③第6条交付方式铁律（只在对话框，禁生成一堆文件，项目自身文件
+      入库除外）；④第7条存储与清理铁律（双机C盘不驻留项目文件、定时清C/D/E垃圾、工作文档绝不
+      删，落地 scripts/safe_cleanup.ps1 白名单脚本）；⑤第8条上线授权（自校验通过直接 commit+push，
+      免询问）。AGENTS.md 同步镜像指针。落地方式：GitHub Contents API 直推 main（非 git 整文件直推，
+      防覆盖）；safe_cleanup.ps1 为新建脚本。
+    verify_how: >
+      线上 API 解码 SKILL.md 含「改后三件套」「进入地址铁律」「交付方式铁律」「存储与清理铁律」
+      「上线授权」；AGENTS.md 含「进入地址」「交付只在对话框」「上线免询问」「工作文档绝不删」；
+      safe_cleanup.ps1 含「白名单」「protectedRoots」「工作文档」红线。
+    verified_at: "2026-10-30 20:21"
+    updated: "2026-10-30 20:21"
+    updated_by: 家用机AI
